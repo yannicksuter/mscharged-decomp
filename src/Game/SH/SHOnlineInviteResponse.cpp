@@ -33,37 +33,6 @@ SHOnlineInviteResponse::~SHOnlineInviteResponse()
 {
 }
 
-void SHOnlineInviteResponse::InitializeButtons()
-{
-    typedef Detail::MemFunImpl<void, void (SHOnlineInviteResponse::*)(unsigned int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, SHOnlineInviteResponse*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback select(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    for (int i = 0; i < 4; ++i)
-    {
-        mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 0.5f);
-        mButtons[i].SetPointerEnterCallback(over);
-        mButtons[i].SetPointerLeaveCallback(off);
-        mButtons[i].SetPointerPressCallback(select);
-    }
-}
-
-void JoinOnlineFriendInvitation()
-{
-    int index = g_pFriendManager->mHostInvitationIndex;
-    FriendStatusPayload* payload = g_pFriendManager->GetFriendStatusPayload(index);
-    GameInfoManager::Instance()->mNoCheatSettings = payload->mGameplaySettings;
-    GameInfoManager::Instance()->mRulesA = payload->mPowerupSettings;
-    InitializeOnlineMatch(HasOnlineTwoLocalPlayers(), 0, false);
-    g_pNetworkSession->GetOnlineLobby()->ConnectToFriendServer(index);
-    GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
-    SHOnlineInviteStatus* scene = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
-    scene->mStatus = 1;
-    scene->mReturnDelay = 0.0f;
-}
-
 SHOnlineInviteResponse::SHOnlineInviteResponse()
     : mSelectedAction(0)
     , mButtonsInitialized(0)
@@ -192,6 +161,37 @@ void SHOnlineInviteResponse::OnPointerPress(unsigned int, void* context)
     mPresentation->Update(0.0f);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
+}
+
+void SHOnlineInviteResponse::InitializeButtons()
+{
+    typedef Detail::MemFunImpl<void, void (SHOnlineInviteResponse::*)(unsigned int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineInviteResponse*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(PointerBinding(MemFun(&SHOnlineInviteResponse::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    for (int i = 0; i < 4; ++i)
+    {
+        mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 0.5f);
+        mButtons[i].SetPointerEnterCallback(over);
+        mButtons[i].SetPointerLeaveCallback(off);
+        mButtons[i].SetPointerPressCallback(select);
+    }
+}
+
+void JoinOnlineFriendInvitation()
+{
+    int index = g_pFriendManager->mHostInvitationIndex;
+    FriendStatusPayload* payload = g_pFriendManager->GetFriendStatusPayload(index);
+    GameInfoManager::Instance()->mNoCheatSettings = payload->mGameplaySettings;
+    GameInfoManager::Instance()->mRulesA = payload->mPowerupSettings;
+    InitializeOnlineMatch(HasOnlineTwoLocalPlayers(), 0, false);
+    g_pNetworkSession->GetOnlineLobby()->ConnectToFriendServer(index);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
+    SHOnlineInviteStatus* scene = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
+    scene->mStatus = 1;
+    scene->mReturnDelay = 0.0f;
 }
 
 void SHOnlineInviteResponse::ApplySelectedAction()

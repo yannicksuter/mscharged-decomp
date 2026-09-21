@@ -371,12 +371,12 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
 
         nlVector3 transformedPosition;
         nlMultPosVectorMatrix(
-            transformedPosition, position, pObject->GetWorldMatrix());
+            transformedPosition, position, *pObject->GetWorldMatrix());
         position = transformedPosition;
 
         nlVector3 transformedNormal;
         nlMultDirVectorMatrix(
-            transformedNormal, normal, pObject->GetWorldMatrix());
+            transformedNormal, normal, *pObject->GetWorldMatrix());
         normal = transformedNormal;
 
         int particle = m_NetMesh.m_NumParticles;

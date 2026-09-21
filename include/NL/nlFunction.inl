@@ -3,29 +3,9 @@
 
 #include "NL/nlFunction.h"
 
-template <typename ReturnType>
-template <typename Callable>
-inline Function0<ReturnType>::FunctorImpl<Callable>::FunctorImpl(
-    const Callable& callable)
-    : mFunctor(callable)
-{
-}
-
-template <typename ReturnType>
-template <typename Callable>
-inline ReturnType Function0<ReturnType>::FunctorImpl<Callable>::operator()()
-{
-    return Call(BoolToType<IsVoid<ReturnType>::value>());
-}
-
-template <typename ReturnType>
-template <typename Callable>
-inline typename Function0<ReturnType>::FunctorBase*
-Function0<ReturnType>::FunctorImpl<Callable>::Clone() const
-{
-    return new FunctorImpl(*this);
-}
-
+// The callable constructor of the full Function<FnVoidVoid> specialization stays
+// out of NL/nlFunction.h: the ISO template parser that NL/nlConfig.cpp is built
+// with stops with an internal compiler error on its base initializer.
 template <typename Callable>
 inline Function<FnVoidVoid>::Function(Callable callable)
     : Base(callable)

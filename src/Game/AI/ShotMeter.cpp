@@ -225,7 +225,7 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
                + (v3FielderToNet.z * v3BallDirection.z);
     float fDirectionValue
         = InterpolateRangeClamped(0.0f, 1.0f, 1.0f, 0.0f, fDot);
-    float fCombinedValue = (fDirectionValue + fDistanceValue) * 0.5f;
+    float fCombinedValue = (fDirectionValue + fDistanceValue) / 2.0f;
 
     m_fSpeedValue = InterpolateRangeClamped(0.2f,
         fn_8002C7A8(pFielder->GetTweaks()),

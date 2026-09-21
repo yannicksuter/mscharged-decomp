@@ -65,7 +65,7 @@ World::~World()
     while (pIterator->IsValid())
     {
         DrawableObject* pObject = pIterator->Current()->value;
-        pObject->V1();
+        pObject->ReleaseResources();
         if ((pObject->m_uObjectCreationFlags & 1) == 0)
         {
             delete pObject;
@@ -358,7 +358,7 @@ void World::InitializeObjects()
     DrawableIterator* pIterator = m_drawableMap.GetIterator();
     while (pIterator->IsValid())
     {
-        pIterator->Current()->value->V4(this);
+        pIterator->Current()->value->UnidentifiedVirtual18(this);
         pIterator->Next();
     }
     if (pIterator != 0)

@@ -24,6 +24,9 @@ float GetCoPlanarZ();
 void SetCoPlanarZ(float z);
 void SetPlanarShadowOpacity(float opacity);
 float GetPlanarShadowOpacity();
+void DrawPlanarShadow(const glModel* model, const nlMatrix4& transform,
+    int hasTransform, unsigned long boundingBoxCacheKey, const void* owner,
+    float opacity);
 bool ShouldShadowBeUpdated(const ProjectedShadowParams& params);
 void RenderCharacterIntoTexture(const ProjectedShadowParams& params);
 void RenderProjectedShadow(const ProjectedShadowParams& params);

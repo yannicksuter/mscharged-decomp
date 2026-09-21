@@ -55,7 +55,7 @@ SHNavigation::~SHNavigation()
         {
             g_pPlatPadManager->SetDPDEnabled(channel, false);
         }
-        gFEPointerInstances[channel] = 0;
+        SetPointerInstance(channel, 0);
     }
 }
 
@@ -335,7 +335,7 @@ void SHNavigation::SetPointerTeamColours()
     }
 }
 
-void SetPointerInstance(int index, TLComponentInstance* component)
+void SetPointerInstance(unsigned int index, TLComponentInstance* component)
 {
     gFEPointerInstances[index] = component;
 }

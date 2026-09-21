@@ -1,5 +1,5 @@
 #include "Game/SAnim.h"
-#include "Game/SAnimDecode_8030EC30.h"
+#include "Game/SAnimDecode.h"
 
 #include "Game/MathHelpers.h"
 #include "Game/PoseAccumulator.h"
@@ -154,15 +154,15 @@ void cSAnim::BlendRot(int nodeIndex, int remappedNodeIndex, float tNorm,
             nlQuaternion q;
             if (props & 0x10)
             {
-                fn_8030EC4C(&q, pRawKeys);
+                SAnimDecodeRot16(&q, pRawKeys);
             }
             else if (props & 0x20)
             {
-                fn_8030EC60(&q, pRawKeys);
+                SAnimDecodeRot12(&q, pRawKeys);
             }
             else
             {
-                fn_8030ECC8(&q, pRawKeys);
+                SAnimDecodeRot8(&q, pRawKeys);
             }
             acc->BlendRot(nodeIndex, &q, weight, additive);
             return;
@@ -183,17 +183,17 @@ void cSAnim::BlendRot(int nodeIndex, int remappedNodeIndex, float tNorm,
             nlQuaternion q;
             if (props & 0x10)
             {
-                fn_8030EC4C(
+                SAnimDecodeRot16(
                     &q, (unsigned char*)pRawKeys + lastIndex * 8);
             }
             else if (props & 0x20)
             {
-                fn_8030EC60(
+                SAnimDecodeRot12(
                     &q, (unsigned char*)pRawKeys + lastIndex * 6);
             }
             else
             {
-                fn_8030ECC8(
+                SAnimDecodeRot8(
                     &q, (unsigned char*)pRawKeys + lastIndex * 4);
             }
             acc->BlendRot(nodeIndex, &q, weight, additive);
@@ -217,17 +217,17 @@ void cSAnim::BlendRot(int nodeIndex, int remappedNodeIndex, float tNorm,
             nlQuaternion q1;
             if (props & 0x10)
             {
-                fn_8030EC4C(
+                SAnimDecodeRot16(
                     &q1, (unsigned char*)pRawKeys + nKeyIndex * 8);
             }
             else if (props & 0x20)
             {
-                fn_8030EC60(
+                SAnimDecodeRot12(
                     &q1, (unsigned char*)pRawKeys + nKeyIndex * 6);
             }
             else
             {
-                fn_8030ECC8(
+                SAnimDecodeRot8(
                     &q1, (unsigned char*)pRawKeys + nKeyIndex * 4);
             }
             acc->BlendRot(nodeIndex, &q1, fWeight1, additive);
@@ -246,19 +246,19 @@ void cSAnim::BlendRot(int nodeIndex, int remappedNodeIndex, float tNorm,
         nlQuaternion q2;
         if (props & 0x10)
         {
-            fn_8030EC4C(&q2,
+            SAnimDecodeRot16(&q2,
                 (unsigned char*)m_pRotKeys[remappedNodeIndex]
                     + (nKeyIndex + 1) * 8);
         }
         else if (props & 0x20)
         {
-            fn_8030EC60(&q2,
+            SAnimDecodeRot12(&q2,
                 (unsigned char*)m_pRotKeys[remappedNodeIndex]
                     + (nKeyIndex + 1) * 6);
         }
         else
         {
-            fn_8030ECC8(&q2,
+            SAnimDecodeRot8(&q2,
                 (unsigned char*)m_pRotKeys[remappedNodeIndex]
                     + (nKeyIndex + 1) * 4);
         }
@@ -280,7 +280,7 @@ void cSAnim::BlendScale(int nodeIndex, int remappedNodeIndex, float tNorm,
         if (m_pNodeProperties[remappedNodeIndex] & 0x8)
         {
             nlVector3 v;
-            fn_8030ECDC(&v, &pKeys[0]);
+            SAnimDecodeScale(&v, &pKeys[0]);
             acc->BlendScale(nodeIndex, &v, weight, additive);
             return;
         }
@@ -288,7 +288,7 @@ void cSAnim::BlendScale(int nodeIndex, int remappedNodeIndex, float tNorm,
         if (1.0f == tNorm)
         {
             nlVector3 v;
-            fn_8030ECDC(&v, &pKeys[m_nNumKeys - 1]);
+            SAnimDecodeScale(&v, &pKeys[m_nNumKeys - 1]);
             acc->BlendScale(nodeIndex, &v, weight, additive);
             return;
         }
@@ -300,11 +300,11 @@ void cSAnim::BlendScale(int nodeIndex, int remappedNodeIndex, float tNorm,
         float fWeight1 = weight - fWeight2;
 
         nlVector3 v1;
-        fn_8030ECDC(&v1, &pKeys[nKeyIndex]);
+        SAnimDecodeScale(&v1, &pKeys[nKeyIndex]);
         acc->BlendScale(nodeIndex, &v1, fWeight1, additive);
 
         nlVector3 v2;
-        fn_8030ECDC(
+        SAnimDecodeScale(
             &v2, &m_pScaleKeys[remappedNodeIndex][nKeyIndex + 1]);
         acc->BlendScale(nodeIndex, &v2, fWeight2, additive);
     }
@@ -324,11 +324,11 @@ void cSAnim::BlendScaleMultiply(int accumulatorNode, int animNode, float time,
         nlVector3 scale;
         if ((m_pNodeProperties[animNode] & 0x8) || time <= 0.0f)
         {
-            fn_8030ECDC(&scale, &pKeys[0]);
+            SAnimDecodeScale(&scale, &pKeys[0]);
         }
         else if (time >= 1.0f)
         {
-            fn_8030ECDC(&scale, &pKeys[m_nNumKeys - 1]);
+            SAnimDecodeScale(&scale, &pKeys[m_nNumKeys - 1]);
         }
         else
         {
@@ -338,8 +338,8 @@ void cSAnim::BlendScaleMultiply(int accumulatorNode, int animNode, float time,
 
             nlVector3 scale1;
             nlVector3 scale2;
-            fn_8030ECDC(&scale1, &pKeys[nKeyIndex]);
-            fn_8030ECDC(
+            SAnimDecodeScale(&scale1, &pKeys[nKeyIndex]);
+            SAnimDecodeScale(
                 &scale2, &m_pScaleKeys[animNode][nKeyIndex + 1]);
 
             scale.x = (1.0f - fFrac) * scale1.x + fFrac * scale2.x;
@@ -479,8 +479,8 @@ bool cSAnim::fn_8030939C(int channel, float time, float* weight) const
     float fWeightA = 1.0f - fWeightB;
     float weightA;
     float weightB;
-    fn_8030ED48(&weightA, &keys[nIndex]);
-    fn_8030ED48(&weightB, m_Unknown2C[channel] + nIndex + 1);
+    SAnimDecodeWeight(&weightA, &keys[nIndex]);
+    SAnimDecodeWeight(&weightB, m_Unknown2C[channel] + nIndex + 1);
     *weight = fWeightA * weightA + fWeightB * weightB;
     return true;
 }
@@ -518,7 +518,7 @@ float cSAnim::GetMorphWeight(int channel, float fTime) const
     float weight = 0.0f;
     if (numKeys == 1 || fTime == 1.0f)
     {
-        fn_8030ED7C(&weight, &keys[numKeys - 1]);
+        SAnimDecodeMorphWeight(&weight, &keys[numKeys - 1]);
     }
     else
     {
@@ -529,8 +529,8 @@ float cSAnim::GetMorphWeight(int channel, float fTime) const
         float weightA;
         float weightB;
         const unsigned char* pKey = &keys[nIndex];
-        fn_8030ED7C(&weightA, pKey);
-        fn_8030ED7C(&weightB, pKey + 1);
+        SAnimDecodeMorphWeight(&weightA, pKey);
+        SAnimDecodeMorphWeight(&weightB, pKey + 1);
         weight = fWeightA * weightA + fWeightB * weightB;
     }
     return weight;

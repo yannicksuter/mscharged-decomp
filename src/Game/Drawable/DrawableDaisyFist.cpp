@@ -73,7 +73,7 @@ void DrawableDaisyFist::Render(const DaisyFistObject* object) const
     GLView* oldView6C = pWorld->m_pAlphaView;
     pWorld->m_pOpaqueView = GetLayerView(eCLV_ElectricFence);
     pWorld->m_pAlphaView = pWorld->m_pOpaqueView;
-    drawable->SetWorldMatrix(&matrix);
+    drawable->SetWorldMatrix(matrix);
     drawable->Draw();
     pWorld->m_pOpaqueView = oldView68;
     pWorld->m_pAlphaView = oldView6C;

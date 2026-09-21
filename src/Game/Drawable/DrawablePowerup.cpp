@@ -7,25 +7,9 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
-#include "unclassified/tu_80186524.h"
+#include "Game/Render/RenderShadow.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-class RenderObject
-{
-public:
-    virtual void slot08();
-    virtual void slot0C();
-    virtual void* GetShadowSource();
-    virtual void SetTransform(const nlMatrix4*);
-    virtual void slot18();
-    virtual void Draw();
-
-    char _04[0x60];
-    glModel* model;
-    char _68[8];
-    u32 flags;
-};
 
 u8 sDrawPowerupShadows = 1;
 u8 sUseModelPowerupShadows = 1;
@@ -175,8 +159,8 @@ void DrawablePowerup::Grab(int idx)
 void DrawablePowerup::Render(int idx) const
 {
     FindPowerUp(nlStringLowerHash(GetName(idx)));
-    RenderObject* object =
-        (RenderObject*)FindStadiumDrawableObject(nlStringLowerHash(GetName(idx)));
+    DrawableObject* object
+        = FindStadiumDrawableObject(nlStringLowerHash(GetName(idx)));
 
     if (object == 0)
     {
@@ -189,11 +173,11 @@ void DrawablePowerup::Render(int idx) const
 
     if (mVisible)
     {
-        object->flags |= 1;
+        object->m_uObjectFlags |= 1;
     }
     else
     {
-        object->flags &= ~1;
+        object->m_uObjectFlags &= ~1;
     }
 
     nlMatrix4 transform;
@@ -208,7 +192,7 @@ void DrawablePowerup::Render(int idx) const
 
     nlMatrix4 world;
     nlMultMatrices(world, scale, transform);
-    object->SetTransform(&world);
+    object->SetWorldMatrix(world);
 
     if (!mVisible)
     {
@@ -223,10 +207,10 @@ void DrawablePowerup::Render(int idx) const
 
     if (sUseModelPowerupShadows != 0)
     {
-        glModel* model = object->model;
-        void* source = object->GetShadowSource();
+        glModel* model = object->m_pModel;
+        const nlMatrix4* source = object->GetWorldMatrix();
         glModel* geometry = glModelDupNoStreams(model, false, 0);
-        fn_801869AC(geometry, source, 1, 0, this, 0.5f);
+        DrawPlanarShadow(geometry, *source, 1, 0, this, 0.5f);
     }
     else
     {

@@ -193,7 +193,7 @@ void DrawableBirdoEgg::Render(const BirdoEggObject* object) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    drawable->SetWorldMatrix(&matrix);
+    drawable->SetWorldMatrix(matrix);
     drawable->Draw();
 
     DrawShadow(matrix, gShadowScaleIn);

@@ -130,14 +130,16 @@ void NetworkSocket::Initialize(
 
     if (mDirectMode)
     {
-        bool started = false;
+        bool started;
         if (!TransportSocketOpen(&mDirectSocket, false))
         {
             tDebugPrintManager::Print(DC_NETWORK, "Direct socket open error\n");
+            started = false;
         }
         else if (!TransportSocketBind(&mDirectSocket, (u16)g_nLocalDirectPort))
         {
             tDebugPrintManager::Print(DC_NETWORK, "Direct sock bind failed\n");
+            started = false;
         }
         else
         {

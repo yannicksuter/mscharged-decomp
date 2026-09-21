@@ -6,6 +6,7 @@
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
@@ -1071,9 +1072,9 @@ void NetTournManager::AttachTournamentTrophy(void* presentation)
     DrawableObject* object
         = (DrawableObject*)FEModelManager::Instance()->GetObject(4);
     model = ((DrawableObject*)mTrophyPresentation)->m_pModel;
-    glModelSetMatrix(model, object->GetWorldMatrix());
+    glModelSetMatrix(model, *object->GetWorldMatrix());
     ((DrawableObject*)mTrophyPresentation)
-        ->SetWorldMatrix(&object->GetWorldMatrix());
+        ->SetWorldMatrix(*object->GetWorldMatrix());
 }
 
 void NetTournManager::DetachTournamentTrophy()
@@ -1089,12 +1090,12 @@ void NetTournManager::DestroyTournamentTrophy()
                ((DrawableObject*)mTrophyPresentation)->GetHashID())
             != 0)
     {
-        ((DrawableObject*)mTrophyPresentation)->V1();
+        ((DrawableObject*)mTrophyPresentation)->ReleaseResources();
         stadium->RemoveDrawableObject(
             (DrawableObject*)mTrophyPresentation);
         glGetCurrentResourcePool()->ReleaseResource(
             (unsigned long)mTrophyResource);
-        delete (DrawableObject*)mTrophyPresentation;
+        delete (PlanarShadowDrawable*)mTrophyPresentation;
     }
     mTrophyPresentation = 0;
 }
@@ -1158,20 +1159,16 @@ int NetTournManager::GetCurrentMode() const
     return 3;
 }
 
-nlMatrix4& DrawableObject::GetWorldMatrix()
+nlMatrix4* DrawableObject::GetWorldMatrix()
 {
-    return mWorldMatrix;
+    return &mWorldMatrix;
 }
 
-void DrawableObject::SetWorldMatrix(const nlMatrix4* matrix)
+void DrawableObject::SetWorldMatrix(const nlMatrix4& matrix)
 {
-    mWorldMatrix = *matrix;
+    mWorldMatrix = matrix;
 }
 
-void DrawableObject::V1()
-{
-}
-
-DrawableObject::~DrawableObject()
+void DrawableObject::ReleaseResources()
 {
 }

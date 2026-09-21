@@ -187,9 +187,9 @@ void DrawableThwomp::Render(ThwompObject* object) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    drawable->SetWorldMatrix(&matrix);
+    drawable->SetWorldMatrix(matrix);
     material = GetLayerView(eCLV_MoreCharacters);
-    drawable->V8(material);
+    drawable->V8((GLView*)material);
 
     DrawShadow(object, matrix, material);
 }

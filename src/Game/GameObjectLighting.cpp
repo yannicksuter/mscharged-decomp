@@ -11,6 +11,7 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/MathHelpers.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "NL/gl/glMemory.h"
@@ -128,6 +129,8 @@ UnidentifiedTweakAction lbl_806E1434(
 UnidentifiedTweakAction lbl_806E1438(
     "Character Light Blue", gLastTweakCategory, Function0<void>(fn_80182128));
 
+static const nlVector3 sInitialDirection = { 1.0f, 0.0f, 0.0f };
+
 extern "C" {
 extern bool lbl_806DCC40;
 extern bool lbl_806DCC48;
@@ -218,7 +221,7 @@ extern "C" void fn_80182168(UnidentifiedObject_80182168* pLight)
     GameObjectLight var0;
     var0.unknown01 = true;
     var0.enabled = true;
-    const nlMatrix4& matrix = ((DrawableObject*)pLight)->GetWorldMatrix();
+    const nlMatrix4& matrix = *((DrawableObject*)pLight)->GetWorldMatrix();
     ConvertColour(var0.colour, pLight->m_colour);
     var0.worldPosition = matrix.GetTranslation();
     var0.intensity = pLight->m_fIntensity;
@@ -268,18 +271,18 @@ void SetCameraRelativeLightData(void* pLightData)
     static nlVector3 keyLightInViewSpace;
     static nlVector3 fillLightInViewSpace;
     static bool initedLightInViewSpace;
-    nlVector3 transformedDir;
+    nlVector3 initialDirection;
     nlVector3 viewVec;
-    nlMatrix4 viewRotMat;
-    nlMatrix4 matZ;
+    nlVector3 transformedDir;
+    nlVector3 keyDirection;
+    nlVector3 fillDirection;
     nlMatrix4 matY;
+    nlMatrix4 matZ;
+    nlMatrix4 viewRotMat;
 
     if (!initedLightInViewSpace)
     {
-        nlVector3 initialDirection = { 1.0f, 0.0f, 0.0f };
-        nlVector3 fillDirection;
-        nlVector3 keyDirection;
-
+        initialDirection = sInitialDirection;
         nlMakeRotationMatrixY(matY, 0.7853982f);
         nlMakeRotationMatrixZ(matZ, -0.69813174f);
         nlMultDirVectorMatrix(keyLightInViewSpace, initialDirection, matY);
@@ -297,8 +300,7 @@ void SetCameraRelativeLightData(void* pLightData)
 
     cCameraManager::GetViewVector(viewVec);
 
-    f32 angle = nlATan2f(viewVec.y, viewVec.x);
-    u16 u16Angle = (u16)(s32)(angle * 10430.378f);
+    u16 u16Angle = nlVector3ToAngle(viewVec);
     f32 radAngle = (f32)u16Angle * 0.0000958738f;
 
     nlMakeRotationMatrixZ(viewRotMat, radAngle);

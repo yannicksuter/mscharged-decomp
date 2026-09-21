@@ -4,7 +4,7 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/TweakValue.h"
-#include "Game/World/WorldObject_80278E94.h"
+#include "Game/World/WorldObject.h"
 #include "NL/nlMath.h"
 #include "NL/nlDLListContainer.h"
 #include "types.h"
@@ -13,7 +13,7 @@ class CrowdPointCallback;
 class GLView;
 struct WorldObjectLoadContext;
 
-class CrowdLayoutObject : public WorldObject_80278E94
+class CrowdLayoutObject : public WorldObject
 {
 public:
     virtual ~CrowdLayoutObject() {}

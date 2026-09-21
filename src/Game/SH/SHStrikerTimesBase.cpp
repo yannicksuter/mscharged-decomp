@@ -29,135 +29,17 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/SH/SHNavigation.h"
 
-static inline TLInstance* FindInstance(TLSlide* slide, const char* item)
+static inline void ShowDoneButtons(TLSlide* first)
 {
-    return FEFinder<TLInstance, 2>::Find<>(slide, "Layer", item);
-}
-
-static inline TLComponentInstance* FindComponent(TLSlide* slide, const char* item)
-{
-    return FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<>(slide, "Layer", item);
-}
-
-inline TLInstance* SHStrikerTimesBase::FindCurrentInstance(const char* item)
-{
-    return FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide, "Layer", item);
-}
-
-inline TLComponentInstance* SHStrikerTimesBase::FindCurrentComponent(const char* item)
-{
-    TLComponentInstance* result = (TLComponentInstance*)FindCurrentInstance(item);
-    if (result == 0)
-        return &UnidentifiedTLComponentDefault::sInstance;
-    return result;
-}
-
-SHStrikerTimesBase::~SHStrikerTimesBase()
-{
-}
-
-void SHStrikerTimesBase::SetDisplayMode(unsigned int transition)
-{
-    mDisplayMode = transition;
-    if (transition - 0xB <= 2)
+    TLSlide* slide = first;
+    FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
+    do
     {
-        mCanShowDone = true;
-        mPage = 3;
-    }
-    else
-    {
-        mCanShowDone = false;
-        mPage = 0;
-    }
-}
-
-void SHStrikerTimesBase::ShowPreviousPage()
-{
-    FEPresentation* presentation = mPresentation;
-    if (mDisplayMode == 0xD)
-        return;
-    if (mDisplayMode == 0xC)
-        return;
-    if (mDisplayMode == 0xB)
-        return;
-    if (mDisplayMode == 0xA)
-    {
-        if (mPage == 2)
-        {
-            mPage = 1;
-            presentation->SetActiveSlide("headline pic", true);
-            presentation->Update(presentation->m_currentSlide->GetStartTime() + presentation->m_currentSlide->GetDuration());
-        }
-        else if (mPage == 3)
-        {
-            mPage = 2;
-            presentation->SetActiveSlide("story", true);
-            presentation->Update(0.0f);
-        }
-    }
-    else if (mPage == 2)
-    {
-        mPage = 1;
-        presentation->SetActiveSlide("headline pic", true);
-        presentation->Update(presentation->m_currentSlide->GetStartTime() + presentation->m_currentSlide->GetDuration());
-    }
-}
-
-void SHStrikerTimesBase::ShowNextPage()
-{
-    FEPresentation* presentation = mPresentation;
-    if ((unsigned int)(mDisplayMode - 0xB) <= 2)
-    {
-        mCanShowDone = true;
-    }
-    else if (mDisplayMode == 0xA)
-    {
-        if (mPage == 2)
-        {
-            mCanShowDone = GameInfoManager::Instance()->mIsOnlineMode == 0;
-            mPage = 3;
-            presentation->SetActiveSlide("game summary", true);
-        }
-        else if (mPage == 1)
-        {
-            mPage = 2;
-            presentation->SetActiveSlide("story", true);
-            presentation->Update(0.0f);
-        }
-    }
-    else if (mPage == 1)
-    {
-        mCanShowDone = true;
-        mPage = 2;
-        presentation->SetActiveSlide("story", true);
-        presentation->Update(0.0f);
-    }
-}
-
-void SHStrikerTimesBase::OnDoneTransitionComplete()
-{
-}
-
-void SHStrikerTimesBase::InitializeControls()
-{
-    typedef Detail::MemFunImpl<void, void (SHStrikerTimesBase::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, SHStrikerTimesBase*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    if (!mScrollBar.mInitialized)
-    {
-        mScrollBar.SetComponent(FindCurrentComponent("scrollbar"));
-        mScrollBar.Initialize();
-    }
-    FEPointerListener::Callback callback(
-        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    mDoneButton.SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(
-        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    mDoneButton.SetPointerLeaveCallback(callback);
-    FEPointerListener::Callback callback2(
-        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    mDoneButton.SetPointerPressCallback(callback2);
-    SetDoneButtonBounds(&mDoneButton, 0, 0);
+        TLComponentInstance* done = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<>(slide, "Layer", "done");
+        done->m_bVisible = true;
+        done->SetActiveSlide("in", true, false);
+        slide = slide->m_next;
+    } while (slide != first);
 }
 
 SHStrikerTimesBase::SHStrikerTimesBase()
@@ -188,9 +70,13 @@ SHStrikerTimesBase::SHStrikerTimesBase()
     mDoneButton.mPreviousEvents[3] = event;
 }
 
+SHStrikerTimesBase::~SHStrikerTimesBase()
+{
+}
+
 void SHStrikerTimesBase::SceneCreated()
 {
-    mScrollBar.SetComponent(FindCurrentComponent("scrollbar"));
+    mScrollBar.SetComponent(FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "scrollbar"));
     if ((unsigned int)(mDisplayMode - 0xB) <= 2)
     {
         mScrollBar.SetRange(0);
@@ -210,9 +96,9 @@ void SHStrikerTimesBase::SceneCreated()
     TLSlide* slide = first;
     do
     {
-        FindInstance(slide, "TimerText")->m_bVisible = false;
-        FindInstance(slide, "NetworkWait")->m_bVisible = false;
-        FindComponent(slide, "done")->m_bVisible = false;
+        FEFinder<TLInstance, 2>::Find<>(slide, "Layer", "TimerText")->m_bVisible = false;
+        FEFinder<TLInstance, 2>::Find<>(slide, "Layer", "NetworkWait")->m_bVisible = false;
+        FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<>(slide, "Layer", "done")->m_bVisible = false;
         slide = slide->m_next;
     } while (slide != first);
 
@@ -264,6 +150,7 @@ void SHStrikerTimesBase::SceneCreated()
 
 void SHStrikerTimesBase::Update(float dt)
 {
+    TLSlide* first;
     if (SaveEnabled && InOperation)
         return;
     if (!mLogoReady)
@@ -356,16 +243,8 @@ void SHStrikerTimesBase::Update(float dt)
     if (mCanShowDone && !mDoneVisible)
     {
         FEPresentation* presentation = mPresentation;
-        TLSlide* first = presentation->m_currentSlide;
-        TLSlide* slide = first;
-        FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
-        do
-        {
-            TLComponentInstance* done = FindComponent(slide, "done");
-            done->m_bVisible = true;
-            done->SetActiveSlide("in", true, false);
-            slide = slide->m_next;
-        } while (slide != first);
+        first = presentation->m_currentSlide;
+        ShowDoneButtons(first);
         mDoneButton.mDisabled = false;
         mDoneVisible = true;
     }
@@ -505,10 +384,114 @@ void SHStrikerTimesBase::SetArticleImageName(int captain, int mood, int special)
     }
 }
 
+void SHStrikerTimesBase::SetDisplayMode(unsigned int transition)
+{
+    mDisplayMode = transition;
+    if (transition - 0xB <= 2)
+    {
+        mCanShowDone = true;
+        mPage = 3;
+    }
+    else
+    {
+        mCanShowDone = false;
+        mPage = 0;
+    }
+}
+
+void SHStrikerTimesBase::ShowPreviousPage()
+{
+    FEPresentation* presentation = mPresentation;
+    if (mDisplayMode == 0xD)
+        return;
+    if (mDisplayMode == 0xC)
+        return;
+    if (mDisplayMode == 0xB)
+        return;
+    if (mDisplayMode == 0xA)
+    {
+        if (mPage == 2)
+        {
+            mPage = 1;
+            presentation->SetActiveSlide("headline pic", true);
+            presentation->Update(presentation->m_currentSlide->GetStartTime() + presentation->m_currentSlide->GetDuration());
+        }
+        else if (mPage == 3)
+        {
+            mPage = 2;
+            presentation->SetActiveSlide("story", true);
+            presentation->Update(0.0f);
+        }
+    }
+    else if (mPage == 2)
+    {
+        mPage = 1;
+        presentation->SetActiveSlide("headline pic", true);
+        presentation->Update(presentation->m_currentSlide->GetStartTime() + presentation->m_currentSlide->GetDuration());
+    }
+}
+
+void SHStrikerTimesBase::ShowNextPage()
+{
+    FEPresentation* presentation = mPresentation;
+    if ((unsigned int)(mDisplayMode - 0xB) <= 2)
+    {
+        mCanShowDone = true;
+    }
+    else if (mDisplayMode == 0xA)
+    {
+        if (mPage == 2)
+        {
+            mCanShowDone = GameInfoManager::Instance()->mIsOnlineMode == 0;
+            mPage = 3;
+            presentation->SetActiveSlide("game summary", true);
+        }
+        else if (mPage == 1)
+        {
+            mPage = 2;
+            presentation->SetActiveSlide("story", true);
+            presentation->Update(0.0f);
+        }
+    }
+    else if (mPage == 1)
+    {
+        mCanShowDone = true;
+        mPage = 2;
+        presentation->SetActiveSlide("story", true);
+        presentation->Update(0.0f);
+    }
+}
+
+void SHStrikerTimesBase::OnDoneTransitionComplete()
+{
+}
+
+void SHStrikerTimesBase::InitializeControls()
+{
+    typedef Detail::MemFunImpl<void, void (SHStrikerTimesBase::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHStrikerTimesBase*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    if (!mScrollBar.mInitialized)
+    {
+        mScrollBar.SetComponent(FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "scrollbar"));
+        mScrollBar.Initialize();
+    }
+    FEPointerListener::Callback callback(
+        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    mDoneButton.SetPointerEnterCallback(callback);
+    callback = FEPointerListener::Callback(
+        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    mDoneButton.SetPointerLeaveCallback(callback);
+    FEPointerListener::Callback callback2(
+        PointerBinding(MemFun(&SHStrikerTimesBase::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    mDoneButton.SetPointerPressCallback(callback2);
+    SetDoneButtonBounds(&mDoneButton, 0, 0);
+}
+
 void SHStrikerTimesBase::OnDonePointerEnter(int index, void* context)
 {
     mDoneButton.SetPointerState(1, index);
-    TLComponentInstance* done = FindCurrentComponent("done");
+    TLComponentInstance* done = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "done");
     if (!mDoneButton.HasOtherPointerState(1, index))
     {
         done->SetActiveSlide("over", true, false);
@@ -519,7 +502,7 @@ void SHStrikerTimesBase::OnDonePointerEnter(int index, void* context)
 void SHStrikerTimesBase::OnDonePointerLeave(int index, void* context)
 {
     mDoneButton.SetPointerState(0, index);
-    TLComponentInstance* done = FindCurrentComponent("done");
+    TLComponentInstance* done = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "done");
     if (!mDoneButton.HasOtherPointerState(1, index))
     {
         done->SetActiveSlide("off", true, false);
@@ -541,5 +524,5 @@ void SHStrikerTimesBase::OnDonePointerPress(int index, void* context)
     {
         FEAudio::PlayAnimAudioEvent(0x4861E03D, 0, 0, 1);
     }
-    FindCurrentComponent("done")->SetActiveSlide("down", true, false);
+    FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "done")->SetActiveSlide("down", true, false);
 }

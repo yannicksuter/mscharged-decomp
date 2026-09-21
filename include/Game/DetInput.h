@@ -9,8 +9,14 @@ class cGlobalPad;
 class DetInput
 {
 public:
-    DetInput();
+    DetInput()
+        : m_pPrevInput(0)
+        , m_pMyUser(0)
+    {
+        Reset();
+    }
 
+    void Reset();
     u8 GetConnectionStatus();
     int GetControllerType();
     nlVector3* GetRemoteAcceleration();

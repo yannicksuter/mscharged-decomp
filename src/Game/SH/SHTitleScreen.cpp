@@ -314,63 +314,64 @@ void TitleScene::Update(float dt)
     }
 }
 
+static inline int PickRandomCaptain(bool e3Build)
+{
+    while (true)
+    {
+        int captain = nlRandom(12, &nlDefaultSeed);
+        int availability = GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).unknown_0x24;
+        if ((e3Build && availability == 1) || (!e3Build && availability != 0))
+            return captain;
+    }
+}
+
+static inline int PickRandomSidekick(bool e3Build)
+{
+    while (true)
+    {
+        int sidekick = nlRandom(8, &nlDefaultSeed);
+        if (sidekick == 3)
+            continue;
+        int availability = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick)).unknown_0x24;
+        if ((e3Build && availability == 1) || (!e3Build && availability != 0))
+            return sidekick;
+    }
+}
+
 void TitleScene::fn_801D1F6C()
 {
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     gameInfo->SetMode(GameInfoManager::GM_MODE_2, false);
 
-    bool filterCharacters = g_e3_Build;
-    int homeCaptain;
-    do
+    int homeId = PickRandomCaptain(g_e3_Build);
+    int awayId = homeId;
+    while (homeId == awayId)
     {
-        homeCaptain = nlRandom(12, &nlDefaultSeed);
-        int availability = GetCharacterInfo(GetCharacterIndexFromCaptain(homeCaptain)).unknown_0x24;
-        if ((!filterCharacters && availability == 1) || (filterCharacters && availability != 0))
-            break;
-    } while (true);
-
-    int awayCaptain;
-    do
-    {
-        do
-        {
-            awayCaptain = nlRandom(12, &nlDefaultSeed);
-            int availability = GetCharacterInfo(GetCharacterIndexFromCaptain(awayCaptain)).unknown_0x24;
-            if ((!filterCharacters && availability == 1) || (filterCharacters && availability != 0))
-                break;
-        } while (true);
-    } while (awayCaptain == homeCaptain);
-
-    int sidekicks[6];
-    for (int i = 0; i < 6; ++i)
-    {
-        do
-        {
-            sidekicks[i] = nlRandom(8, &nlDefaultSeed);
-            if (sidekicks[i] == 3)
-                continue;
-            int availability = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekicks[i])).unknown_0x24;
-            if ((filterCharacters && availability == 1) || (!filterCharacters && availability != 0))
-                break;
-        } while (true);
+        awayId = PickRandomCaptain(g_e3_Build);
     }
 
-    int stadium;
+    int homeSkId0 = PickRandomSidekick(g_e3_Build);
+    int homeSkId1 = PickRandomSidekick(g_e3_Build);
+    int homeSkId2 = PickRandomSidekick(g_e3_Build);
+    int awaySkId0 = PickRandomSidekick(g_e3_Build);
+    int awaySkId1 = PickRandomSidekick(g_e3_Build);
+    int awaySkId2 = PickRandomSidekick(g_e3_Build);
+
+    int stadId;
     do
     {
-        stadium = nlRandom(17, &nlDefaultSeed);
-    } while (!IsStadiumEnabled(stadium));
+        stadId = nlRandom(17, &nlDefaultSeed);
+    } while (!IsStadiumEnabled(stadId));
 
-    gameInfo->SetStadium(stadium);
-    gameInfo->SetTeam(0, homeCaptain);
-    gameInfo->SetTeam(1, awayCaptain);
-    for (int side = 0; side < 2; ++side)
-    {
-        for (int slot = 0; slot < 3; ++slot)
-        {
-            gameInfo->SetSidekick(side, sidekicks[side * 3 + slot], slot);
-        }
-    }
+    gameInfo->SetStadium(stadId);
+    gameInfo->SetTeam(0, homeId);
+    gameInfo->SetTeam(1, awayId);
+    gameInfo->SetSidekick(0, homeSkId0, 0);
+    gameInfo->SetSidekick(0, homeSkId1, 1);
+    gameInfo->SetSidekick(0, homeSkId2, 2);
+    gameInfo->SetSidekick(1, awaySkId0, 0);
+    gameInfo->SetSidekick(1, awaySkId1, 1);
+    gameInfo->SetSidekick(1, awaySkId2, 2);
     gameInfo->ResetPlayingSides();
     GameSceneManager::Instance()->PushLoadingScene(true);
 }

@@ -2132,7 +2132,7 @@ Game/SH/SHOnlineGuestControllerSelect.cpp:
 	.sdata      start:0x806DEA50 end:0x806DEA98
 	.sdata2     start:0x806E5B08 end:0x806E5B18
 
-Game/SH/tu_8025BD7C.cpp:
+Game/SH/OnlineGameInfo.cpp:
 	.text       start:0x8025BD7C end:0x8025BE74
 	.data       start:0x8051FF40 end:0x8051FF70
 	.sbss       start:0x806E18F8 end:0x806E1900
@@ -2153,7 +2153,7 @@ Game/SH/SHOnlineLogin.cpp:
 	.text       start:0x80260990 end:0x80261940
 	.data       start:0x805202A0 end:0x805204F0
 	.sdata      start:0x806DEB40 end:0x806DEB70
-	.sbss       start:0x806E1900 end:0x806E1908
+	.sbss       start:0x806E1900 end:0x806E1904
 	.sdata2     start:0x806E5B50 end:0x806E5B58
 
 Game/SH/SHOnlineInviteResponse.cpp:
@@ -2272,12 +2272,17 @@ Game/Render/tu_80279AC8.cpp:
 	.sbss       start:0x806E19A8 end:0x806E19B8
 	.sdata2     start:0x806E5C90 end:0x806E5C98
 
-Game/Render/tu_8027A4BC.cpp:
-	.text       start:0x8027A4BC end:0x8027ADC0
+Game/Render/PlanarShadowDrawable.cpp:
+	.text       start:0x8027A4BC end:0x8027A7F0
+	.data       start:0x80523138 end:0x80523170
+	.sdata2     start:0x806E5C98 end:0x806E5CA0
+
+Game/Render/tu_8027A7F0.cpp:
+	.text       start:0x8027A7F0 end:0x8027ADC0
 	.ctors      start:0x804DB7E0 end:0x804DB7E4
-	.data       start:0x80523138 end:0x805231C0
+	.data       start:0x80523170 end:0x805231C0
 	.sdata      start:0x806DEE80 end:0x806DEE88
-	.sdata2     start:0x806E5C98 end:0x806E5CB0
+	.sdata2     start:0x806E5CA0 end:0x806E5CB0
 
 Game/Render/tu_8027AE14.cpp:
 	.text       start:0x8027ADC0 end:0x8027B138
@@ -3887,7 +3892,7 @@ Game/SAnim/tu_8030E550.cpp:
 Game/SAnim/AnimRetargeter.cpp:
 	.text       start:0x8030E940 end:0x8030EC30
 
-Game/SAnimDecode_8030EC30.cpp:
+Game/SAnimDecode.cpp:
 	.text       start:0x8030EC30 end:0x8030EDB0
 	.sdata2     start:0x806E6830 end:0x806E6848
 

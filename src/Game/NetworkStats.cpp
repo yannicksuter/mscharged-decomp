@@ -29,22 +29,27 @@ static char sStatsSeparators[] = " \t\r\n:,";
 
 NetworkStatsReporter::NetworkStatsReporter()
 {
-    TransportSocketInitialize(&mSocket);
-    Reset();
+    mListener = 0;
+    mState = 0;
+    mFilter = 0;
+    mLimit = 0;
+    mLeaderboardPlayers = 0;
+    mLeaderboardMetadata = 0;
+    mHomePlayer.mName[0] = 0;
+    mHomePlayer.mProfileId = 0;
+    memset(mHomePlayer.mData, 0, sizeof(mHomePlayer.mData));
+    mAwayPlayer.mName[0] = 0;
+    mAwayPlayer.mProfileId = 0;
+    memset(mAwayPlayer.mData, 0, sizeof(mAwayPlayer.mData));
+    mReportHome = false;
+    mHomeScore = -1;
+    mAwayScore = -1;
+    mReportStartTime = 0;
 }
 
 void NetworkStatsPlayer::CopyFrom(const NetworkStatsPlayer& other)
 {
-    int i = 0;
-    for (; i < 10; ++i)
-    {
-        mName[i] = other.mName[i];
-        if (other.mName[i] == 0)
-        {
-            break;
-        }
-    }
-    mName[i] = 0;
+    nlStrNCpy(mName, other.mName, 11);
     mProfileId = other.mProfileId;
     memcpy(mData, other.mData, sizeof(mData));
 }
@@ -80,18 +85,8 @@ void NetworkStatsReporter::SetListener(
     mListener = listener;
 }
 
-bool NetworkStatsReporter::ReportGameResult(int,
-    const NetworkScoreSubmission*, const NetworkStatsPlayer* home,
-    const NetworkStatsPlayer* away, bool reportHome, int homeScore,
-    int awayScore, const NetworkScoreSubmission*)
+void NetworkStatsReporter::Open()
 {
-    if (!reportHome)
-    {
-        tDebugPrintManager::Print(DC_NETWORK,
-            "ReportGameResult returning true, but did not really report this game...only home team should do that for now\n");
-        return true;
-    }
-
     if (!TransportSocketOpen(&mSocket, true))
     {
         tDebugPrintManager::Print(DC_NETWORK, "Failed to open Stats TCP Socket");
@@ -104,6 +99,21 @@ bool NetworkStatsReporter::ReportGameResult(int,
     {
         TransportSocketSetNonBlocking(&mSocket, false);
     }
+}
+
+bool NetworkStatsReporter::ReportGameResult(int,
+    const NetworkScoreSubmission*, const NetworkStatsPlayer* home,
+    const NetworkStatsPlayer* away, bool reportHome, int homeScore,
+    int awayScore, const NetworkScoreSubmission*)
+{
+    if (!reportHome)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "ReportGameResult returning true, but did not really report this game...only home team should do that for now\n");
+        return true;
+    }
+
+    Open();
 
     if (!TransportSocketIsOpen(&mSocket))
     {
@@ -152,27 +162,13 @@ bool NetworkStatsReporter::GetLeaderboardStats(int category,
     int filter, int limit, NetworkStatsPlayer* players,
     NetworkRankingMeta* metadata)
 {
-    if (!TransportSocketOpen(&mSocket, true))
-    {
-        tDebugPrintManager::Print(DC_NETWORK, "Failed to open Stats TCP Socket");
-    }
-    else if (!TransportSocketBind(&mSocket, 1002))
-    {
-        tDebugPrintManager::Print(DC_NETWORK, "Failed to bind Stats TCP Socket");
-    }
-    else
-    {
-        TransportSocketSetNonBlocking(&mSocket, false);
-    }
+    Open();
 
     if (!TransportSocketIsOpen(&mSocket))
     {
         tDebugPrintManager::Print(DC_NETWORK, "Failed to Get Leaderboard stats, TCP Socket not open\n");
-        if (mListener != 0)
-        {
-            mListener->OnLeaderboardResult(
-                false, category, filter, 0, 0, 0);
-        }
+        mListener->OnLeaderboardResult(
+            false, category, filter, 0, 0, 0);
         return false;
     }
 
@@ -186,11 +182,8 @@ bool NetworkStatsReporter::GetLeaderboardStats(int category,
     if (result != -26)
     {
         tDebugPrintManager::Print(DC_NETWORK, "Connect Result to Stats Server %d\n", result);
-        if (mListener != 0)
-        {
-            mListener->OnLeaderboardResult(
-                false, category, filter, 0, 0, 0);
-        }
+        mListener->OnLeaderboardResult(
+            false, category, filter, 0, 0, 0);
         Close();
         return false;
     }
@@ -211,57 +204,47 @@ void NetworkStatsReporter::ParseLeaderboardResponse(
     parser.StartParsing(data, size, sStatsSeparators);
 
     int row = 0;
+    int column = 0;
     while (row < mLimit)
     {
-        NetworkStatsPlayer& player = mLeaderboardPlayers[row];
-        NetworkRankingMeta& metadata = mLeaderboardMetadata[row];
         char* token = parser.NextTokenOnLine(true);
-        if (token == 0)
-        {
-            break;
-        }
-        metadata.mUnidentified14 = GetOnlineRegion();
-        metadata.mDisplayRank = atoi(token);
-
-        token = parser.NextTokenOnLine(true);
-        if (token == 0)
-        {
-            break;
-        }
-        nlStrToWcs(token, player.mName, 11);
-        player.mProfileId = 0;
-
-        token = parser.NextTokenOnLine(true);
-        if (token == 0)
-        {
-            break;
-        }
-        metadata.mScore = atoi(token);
-
-        token = parser.NextTokenOnLine(true);
-        // The simple HTTP backend retains this column only as a delimiter.
-        token = parser.NextTokenOnLine(true);
         if (token != 0)
         {
-            metadata.mWins = atoi(token);
+            switch (column)
+            {
+            case 0:
+                mLeaderboardMetadata[row].mUnidentified14 = GetOnlineRegion();
+                mLeaderboardMetadata[row].mDisplayRank = atoi(token);
+                break;
+            case 1:
+                nlStrToWcs(token, mLeaderboardPlayers[row].mName, 11);
+                mLeaderboardPlayers[row].mProfileId = 0;
+                break;
+            case 2:
+                mLeaderboardMetadata[row].mScore = atoi(token);
+                break;
+            case 4:
+                mLeaderboardMetadata[row].mWins = atoi(token);
+                break;
+            case 5:
+                mLeaderboardMetadata[row].mLosses = atoi(token);
+                break;
+            }
+            ++column;
         }
-        token = parser.NextTokenOnLine(true);
-        if (token != 0)
+        else
         {
-            metadata.mLosses = atoi(token);
-        }
-        ++row;
-        if (!parser.AdvanceLine())
-        {
-            break;
+            column = 0;
+            ++row;
+            if (!parser.AdvanceLine())
+            {
+                break;
+            }
         }
     }
 
-    if (mListener != 0)
-    {
-        mListener->OnLeaderboardResult(true, 0, mFilter, row,
-            mLeaderboardPlayers, mLeaderboardMetadata);
-    }
+    mListener->OnLeaderboardResult(true, 0, mFilter, row,
+        mLeaderboardPlayers, mLeaderboardMetadata);
 }
 
 void NetworkStatsReporter::Update()

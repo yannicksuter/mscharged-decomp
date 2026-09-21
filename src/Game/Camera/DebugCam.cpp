@@ -303,6 +303,7 @@ void cDebugCamera::Update(float dt)
     nlVector3 vecUp;
     float sn;
     float cs;
+    float y;
 
     float controlSpeed = sfControlDistanceScale *
         (1.0f + sfControlHeightScale * (m_fRadius + m_fHeight));
@@ -375,13 +376,14 @@ void cDebugCamera::Update(float dt)
     nlVec3Set(vecUp, 0.0f, 0.0f, 1.0f);
 
     nlSinCos(&sn, &cs,
-        (u16)(((3.1415927f * m_fTheta) / 180.0f) * 10430.378f));
+        (s16)(10430.378f * DegreesToRadians(m_fTheta)));
     float z = m_fRadius * sn;
     float distance = m_fRadius * cs;
     nlSinCos(&sn, &cs,
-        (u16)(((3.1415927f * m_fAzimuth) / 180.0f) * 10430.378f));
+        (s16)(10430.378f * DegreesToRadians(m_fAzimuth)));
 
-    nlVec3Set(m_vecCamera, distance * cs, distance * sn, z);
+    y = distance * sn;
+    nlVec3Set(m_vecCamera, distance * cs, y, z);
     m_vecTarget.z = m_fHeight;
     nlVec3Add(m_vecCamera, m_vecCamera, m_vecTarget);
 

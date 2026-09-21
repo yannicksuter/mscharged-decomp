@@ -655,7 +655,7 @@ void SHChooseSides2::fn_8021CBD0()
         FrontEndPresentation::GetInstance()->Call("KillLightCones");
         for (int i = 0; i < 4; ++i)
         {
-            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+            GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             SetPointerColour(i, white);
         }
         GameSceneManager::Instance()->Push((SceneList)3, SCREEN_BACK, false);
@@ -665,7 +665,7 @@ void SHChooseSides2::fn_8021CBD0()
     {
         for (int i = 0; i < 4; ++i)
         {
-            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+            GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             SetPointerColour(i, white);
         }
     }

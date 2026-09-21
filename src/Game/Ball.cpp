@@ -14,7 +14,7 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DebugWriteCache.h"
-#include "Game/Drawable/DrawableObj.h"
+#include "Game/Drawable/DrawableModel.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Effects/EmissionManager.h"
@@ -98,7 +98,7 @@ public:
 template <typename P1, typename P2>
 struct UnidentifiedListener2 : public UnidentifiedConnection
 {
-    Function2<void, P1, P2> callback;
+    Function<void(P1, P2)> callback;
 };
 
 template <typename P1, typename P2>
@@ -127,21 +127,19 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                ListenerEntry* entry = mListeners.Begin(
-                    (ListenerEntry*)((char*)listener - 8)).CurrentEntry();
+                nlDLListIterator<Listener> position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
-                if (entry != NULL)
-                {
-                    entry->entry.~Listener();
-                }
-                mListeners.m_Allocator.DeleteEntry(entry);
+                entry->~ListenerEntry();
+                mListeners.m_Allocator.Free(entry);
             }
         }
         this->mCurrentConnection = 0;
     }
 
 private:
-    DLListContainerBase<Listener, BasicSlotPool<ListenerEntry> > mListeners;
+    DLListContainerBase<Listener, SlotPool<ListenerEntry> > mListeners;
 };
 
 extern "C" LiveBallTrail lbl_8056B518[];
@@ -362,7 +360,8 @@ cBall::cBall()
 
     m_pBlurHandler = NULL;
     mUnidentifiedF0 = 0;
-    m_pDrawableBall = FindStadiumDrawableObject(nlStringHash("gameplay/ball"));
+    m_pDrawableBall = (DrawableModel*)FindStadiumDrawableObject(
+        nlStringHash("gameplay/ball"));
 
     m_pPhysicsBall = new (8, false) PhysicsAIBall(0.18f);
     m_pPhysicsBall->m_pAIBall = this;
@@ -1573,21 +1572,17 @@ extern "C" void fn_80015B38(cBall* pBall, bool bParam)
 
 static inline void ClearBallStateTargets(cBall* pBall)
 {
-    pBall->m_tLightningTimer.m_unk0
-        = pBall->m_tLightningTimer.m_uPackedTime != 0;
-    pBall->m_tLightningTimer.m_uPackedTime = 0;
+    pBall->m_tLightningTimer.UnidentifiedClear();
     pBall->mpDamageTarget = NULL;
     if (pBall->m_pPassTarget != NULL)
     {
         pBall->m_pPassTarget = NULL;
     }
 
-    pBall->m_tPassTargetTimer.m_unk0
-        = pBall->m_tPassTargetTimer.m_uPackedTime != 0;
-    pBall->m_tPassTargetTimer.m_uPackedTime = 0;
     pBall->m_v3PassIntercept.x = 0.0f;
     pBall->m_v3PassIntercept.y = 0.0f;
     pBall->m_v3PassIntercept.z = 0.0f;
+    pBall->m_tPassTargetTimer.UnidentifiedClear();
     pBall->m_fTotalPassTime = 0.0f;
     if (pBall->m_uVoiceID != 0)
     {
@@ -1624,9 +1619,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     {
         pBall->m_pPhysicsBall->m_gravity = -22.5f;
         fn_801BDF08(0);
-        pBall->m_tShotTimer.m_unk0
-            = pBall->m_tShotTimer.m_uPackedTime != 0;
-        pBall->m_tShotTimer.m_uPackedTime = 0;
+        pBall->m_tShotTimer.UnidentifiedClear();
     }
 
     if ((pBall->meBallState == 6 || pBall->meBallState == 7)
@@ -1693,12 +1686,13 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         break;
     case 6:
         UpdateBallShotClock(pBall);
-        if (pBall->m_pPrevOwner != NULL
-            && pBall->m_pPrevOwner->m_eClassType == FIELDER)
+        cPlayer* pPrevOwner = pBall->m_pPrevOwner;
+        if (pPrevOwner != NULL
+            && pPrevOwner->m_eClassType == FIELDER)
         {
             float resistance = pBall->m_pPhysicsBall->fn_80140C3C();
             PlayerTweaks* tweaks
-                = ((cFielder*)pBall->m_pPrevOwner)->GetTweaks();
+                = ((cFielder*)pPrevOwner)->GetTweaks();
             pBall->m_pPhysicsBall->mfBallAirResistance
                 = resistance * Interpolate(24.0f, 1.0f,
                     (float)tweaks->fShooting);
@@ -1726,44 +1720,44 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         StopSound(0x65321E47, pBall);
         if (nBallState == 7)
         {
-            PlayOwnedSound(0, 0xDE8FC45D,
+            PlayOwnedSound(0, 0xDE8EC45D,
                 (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
         }
         else if (nBallState == 6)
         {
-            PlayOwnedSound(0, 0xDE8FC45D,
+            PlayOwnedSound(0, 0xDE8EC45D,
                 (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
             if (pBall->mfChargeValue >= 1.0f
                 && pBall->mfChargeValue < 2.0f)
             {
-                PlayOwnedSound(0, 0xDE8FC45E,
+                PlayOwnedSound(0, 0xDE8EC45E,
                     (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 2.0f
                 && pBall->mfChargeValue < 3.0f)
             {
-                PlayOwnedSound(0, 0xDE8FC45F,
+                PlayOwnedSound(0, 0xDE8EC45F,
                     (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 3.0f
                 && pBall->mfChargeValue < 4.0f)
             {
-                PlayOwnedSound(0, 0xDE8FC460,
+                PlayOwnedSound(0, 0xDE8EC460,
                     (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 4.0f)
             {
-                PlayOwnedSound(0, 0xDE8FC461,
+                PlayOwnedSound(0, 0xDE8EC461,
                     (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
                     NULL);
             }
         }
         else if (nBallState == 5 || nBallState == 3 || nBallState == 1)
         {
-            PlayOwnedSound(0, 0x875086F2,
+            PlayOwnedSound(0, 0x874F86F2,
                 (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
             if (pBall->mfChargeValue >= 1.0f
                 && pBall->mfChargeValue < 2.0f)
@@ -2749,7 +2743,7 @@ nlVector3* cBall::GetAIVelocity() const
 
 nlVector3* cBall::GetDrawablePosition() const
 {
-    const nlMatrix4& mtx = m_pDrawableBall->GetWorldMatrix();
+    const nlMatrix4& mtx = *m_pDrawableBall->GetWorldMatrix();
     return (nlVector3*)&(mtx.e2[3][0]);
 }
 
@@ -3708,7 +3702,7 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
         fn_8001AA0C(pBallTrail, false);
         pBallTrail->position = v3Unidentified;
         pBallTrail->velocity = v3Unidentified;
-        pBallTrail->drawable = GetBallRenderObject(i);
+        pBallTrail->drawable = (DrawableModel*)GetBallRenderObject(i);
     }
 
     for (; i < 10; ++i)

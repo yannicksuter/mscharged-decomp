@@ -47,4 +47,7 @@ public:
     /* 0x448 */ TLComponentInstance* mButtonInstances[2];
 }; // size 0x450
 
+// Button component names, in mButtons order.
+static const char* sButtonNames[2] = { "USE", "UNLINK" };
+
 #endif // GAME_SH_ONLINE_MII_SELECT_OVERLAY_H

@@ -1,5 +1,16 @@
 #include "Game/LANMessages.h"
 
+static inline void UnidentifiedSerializeLANPeerMessageInfo(
+    NetworkMessageSerializer* serializer, LANPeerMessageInfo& info)
+{
+    serializer->Transfer(info.mUnidentified00, sizeof(info.mUnidentified00));
+    serializer->Transfer(&info.mUnidentified04, sizeof(info.mUnidentified04));
+    serializer->Transfer(info.mUnidentified06, sizeof(info.mUnidentified06));
+    serializer->Transfer(&info.mUnidentified11, sizeof(info.mUnidentified11));
+    serializer->Transfer(&info.mUnidentified12, sizeof(info.mUnidentified12));
+    serializer->Transfer(info.mUnidentified13, info.mUnidentified12);
+}
+
 NetMessageJoinRequest::NetMessageJoinRequest()
     : mUnidentified19(0)
 {
@@ -30,13 +41,8 @@ void NetMessageJoinResponse::Serialize(NetworkMessageSerializer* serializer)
     serializer->Transfer(&mUnidentified23, sizeof(mUnidentified23));
     for (u8 index = 0; index < mUnidentified23; ++index)
     {
-        LANPeerMessageInfo& info = mUnidentified24[index];
-        serializer->Transfer(info.mUnidentified00, sizeof(info.mUnidentified00));
-        serializer->Transfer(&info.mUnidentified04, sizeof(info.mUnidentified04));
-        serializer->Transfer(info.mUnidentified06, sizeof(info.mUnidentified06));
-        serializer->Transfer(&info.mUnidentified11, sizeof(info.mUnidentified11));
-        serializer->Transfer(&info.mUnidentified12, sizeof(info.mUnidentified12));
-        serializer->Transfer(info.mUnidentified13, info.mUnidentified12);
+        UnidentifiedSerializeLANPeerMessageInfo(
+            serializer, mUnidentified24[index]);
     }
 }
 
@@ -46,12 +52,7 @@ NetMessageGamePeerAdded::NetMessageGamePeerAdded()
 
 void NetMessageGamePeerAdded::Serialize(NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(mUnidentified08.mUnidentified00, sizeof(mUnidentified08.mUnidentified00));
-    serializer->Transfer(&mUnidentified08.mUnidentified04, sizeof(mUnidentified08.mUnidentified04));
-    serializer->Transfer(mUnidentified08.mUnidentified06, sizeof(mUnidentified08.mUnidentified06));
-    serializer->Transfer(&mUnidentified08.mUnidentified11, sizeof(mUnidentified08.mUnidentified11));
-    serializer->Transfer(&mUnidentified08.mUnidentified12, sizeof(mUnidentified08.mUnidentified12));
-    serializer->Transfer(mUnidentified08.mUnidentified13, mUnidentified08.mUnidentified12);
+    UnidentifiedSerializeLANPeerMessageInfo(serializer, mUnidentified08);
 }
 
 void NetMessageTransportType6::Serialize(NetworkMessageSerializer* serializer)

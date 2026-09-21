@@ -56,10 +56,6 @@ public:
     /* 0x2E0 */ AsyncImage mHeadlineImage;
     /* 0x380 */ AsyncImage mLogoImage;
     /* 0x420 */ FEScrollBar mScrollBar;
-
-private:
-    inline TLInstance* FindCurrentInstance(const char* item);
-    inline TLComponentInstance* FindCurrentComponent(const char* item);
 }; // size 0x5D4
 
 #endif // GAME_SH_SH_STRIKER_TIMES_BASE_H

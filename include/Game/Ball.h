@@ -19,6 +19,7 @@ class cFielder;
 class cPlayer;
 class BlurHandler;
 class DebugWriteCache;
+class DrawableModel;
 class DrawableObject;
 class PhysicsAIBall;
 class RunningChecksum;
@@ -159,7 +160,7 @@ public:
     /* 0xD8 */ cPlayer* m_pShooter;
     /* 0xDC */ cPlayer* mpDamageTarget;
     /* 0xE0 */ BlurHandler* m_pBlurHandler;
-    /* 0xE4 */ DrawableObject* m_pDrawableBall;
+    /* 0xE4 */ DrawableModel* m_pDrawableBall;
     /* 0xE8 */ PhysicsAIBall* m_pPhysicsBall;
     /* 0xEC */ UnidentifiedBallRuntime* mUnidentifiedEC;
     /* 0xF0 */ unsigned long mUnidentifiedF0;

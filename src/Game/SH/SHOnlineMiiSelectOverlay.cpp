@@ -2,11 +2,10 @@
 #include "Game/FE/FEAudio.h"
 #include <revolution/os/OSTime.h>
 
-#include "Game/SH/SHOnlineMiiSelectOverlay.h"
-
 #include "Game/GameSceneManager.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/feTextureResource.h"
@@ -25,14 +24,13 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlineMiiSelect.h"
+#include "Game/SH/SHOnlineMiiSelectOverlay.h"
 #include "Game/MiiManager.h"
 
 #include <string.h>
 #include "Game/FE/fePageControls.h"
 #include "Game/NetworkSession.h"
 #include "NL/nlstring_tmpl.h"
-
-static const char* sButtonNames[2] = { "USE", "UNLINK" };
 
 SHOnlineMiiSelectOverlay::SHOnlineMiiSelectOverlay()
     : mInitialized(false)
@@ -73,6 +71,106 @@ SHOnlineMiiSelectOverlay::~SHOnlineMiiSelectOverlay()
     if (scene != 0)
     {
         scene->RestoreButtonVisibility();
+    }
+}
+
+void SHOnlineMiiSelectOverlay::SceneCreated()
+{
+    if (mOfficialIndex >= 0)
+    {
+        RFLErrcode error = RFLGetAdditionalInfo(&mMiiInfo,
+            RFLDataSource_Official,
+            0,
+            (unsigned short)mOfficialIndex);
+        if (error == RFLErrcode_Success)
+        {
+            memcpy(&mCreateID, &mMiiInfo.createID, sizeof(mCreateID));
+            mSaveSlot = GameInfoManager::Instance()->FindSaveSlot(mCreateID);
+        }
+        else if (error == RFLErrcode_Broken)
+        {
+            FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
+                (SceneList)10, SCREEN_NOTHING, false);
+            popup->Create((ePopupMenu)0x87,
+                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToWiiMenu), this)));
+        }
+    }
+    else
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
+            (SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)0x88,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToMiiSelect), this)));
+    }
+
+    for (int i = 0; i < 2; ++i)
+    {
+        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(GetPresentation()->GetActiveSlide(),
+            "Layer",
+            sButtonNames[i]);
+    }
+
+    TLInstance* box = FEFinder<TLInstance, 5>::FindOrDefault<TLSlide>(GetPresentation()->GetActiveSlide(),
+        "Layer",
+        "PLAYER_BOX");
+    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "NAME");
+    nlStrNCpy(mNameText, (const unsigned short*)mMiiInfo.name, 11);
+    SanitizeMiiName(mNameText);
+    nameText->SetString(mNameText);
+
+    if (!GameInfoManager::Instance()->HasSaveSlot(mCreateID))
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
+            (SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)0x8A);
+        mButtonInstances[1]->SetVisible(false);
+        mButtons[1].Disable();
+        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "DATE")->SetVisible(false);
+        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "lifetime_record")->SetVisible(false);
+    }
+    else
+    {
+        OSCalendarTime calendar;
+        OSTicksToCalendarTime(
+            *(OSTime*)GameInfoManager::Instance()->GetUnknown0xA88(mSaveSlot), &calendar);
+
+        unsigned short day[5];
+        unsigned short month[5];
+        unsigned short year[5];
+        nlSNPrintf(day, 5, (const unsigned short*)L"%.2d", calendar.mday);
+        nlSNPrintf(month, 5, (const unsigned short*)L"%.2d", calendar.month + 1);
+        nlSNPrintf(year, 5, (const unsigned short*)L"%.4d", calendar.year);
+
+        typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
+        WideBasicString formattedDate = Format(
+            WideBasicString(g_pLocalization->GetString("ONLINE_MII_SELECT_DATE")), day, month, year);
+        nlStrNCpy(mDateText, formattedDate.c_str(), 0x40);
+        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "DATE")->SetString(mDateText);
+
+        int wins = GameInfoManager::Instance()->GetUnknown0xAA0Total(mSaveSlot);
+        int losses = GameInfoManager::Instance()->GetUnknown0xAA4Total(mSaveSlot);
+        WideBasicString formattedRecord = Format(
+            WideBasicString(g_pLocalization->GetString("ONLINE_TOTAL_WINS_LOSSES")), wins, losses);
+        nlStrNCpy(mRecordText, formattedRecord.c_str(), 0x40);
+        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "lifetime_record")->SetString(mRecordText);
+        FEFinder<TLImageInstance, 2>::FindOrDefault<TLInstance>(box, "logo_32x32")->SetAssetVisible(true);
+    }
+
+    SHNavigation* scene = GetNavigationScene();
+    TLComponentInstance* screen = 0;
+    if (scene != 0)
+    {
+        scene->SetButtons(4, true);
+        screen = scene->GetButton(4);
+        mPageControls = scene->GetPageControls();
+        mPageControls->SetButtonState(1, true, false);
+        mPageControls->SetButtonState(0, true, false);
+    }
+    mBackButton.SetButtonInstance(screen);
+
+    for (int i = 0; i < 4; ++i)
+    {
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 }
 
@@ -305,106 +403,6 @@ void SHOnlineMiiSelectOverlay::SanitizeMiiName(unsigned short* name)
     }
 }
 
-void SHOnlineMiiSelectOverlay::SceneCreated()
-{
-    if (mOfficialIndex >= 0)
-    {
-        RFLErrcode error = RFLGetAdditionalInfo(&mMiiInfo,
-            RFLDataSource_Official,
-            0,
-            (unsigned short)mOfficialIndex);
-        if (error == RFLErrcode_Success)
-        {
-            memcpy(&mCreateID, &mMiiInfo.createID, sizeof(mCreateID));
-            mSaveSlot = GameInfoManager::Instance()->FindSaveSlot(mCreateID);
-        }
-        else if (error == RFLErrcode_Broken)
-        {
-            FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
-                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToWiiMenu), this)));
-        }
-    }
-    else
-    {
-        FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x88,
-            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToMiiSelect), this)));
-    }
-
-    for (int i = 0; i < 2; ++i)
-    {
-        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(GetPresentation()->GetActiveSlide(),
-            "Layer",
-            sButtonNames[i]);
-    }
-
-    TLInstance* box = FEFinder<TLInstance, 5>::FindOrDefault<TLSlide>(GetPresentation()->GetActiveSlide(),
-        "Layer",
-        "PLAYER_BOX");
-    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "NAME");
-    nlStrNCpy(mNameText, (const unsigned short*)mMiiInfo.name, 11);
-    SanitizeMiiName(mNameText);
-    nameText->SetString(mNameText);
-
-    if (!GameInfoManager::Instance()->HasSaveSlot(mCreateID))
-    {
-        FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x8A);
-        mButtonInstances[1]->SetVisible(false);
-        mButtons[1].Disable();
-        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "DATE")->SetVisible(false);
-        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "lifetime_record")->SetVisible(false);
-    }
-    else
-    {
-        OSCalendarTime calendar;
-        OSTicksToCalendarTime(
-            *(OSTime*)GameInfoManager::Instance()->GetUnknown0xA88(mSaveSlot), &calendar);
-
-        unsigned short day[5];
-        unsigned short month[5];
-        unsigned short year[5];
-        nlSNPrintf(day, 5, (const unsigned short*)L"%.2d", calendar.mday);
-        nlSNPrintf(month, 5, (const unsigned short*)L"%.2d", calendar.month + 1);
-        nlSNPrintf(year, 5, (const unsigned short*)L"%.4d", calendar.year);
-
-        typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-        WideBasicString formattedDate = Format(
-            WideBasicString(g_pLocalization->GetString("ONLINE_MII_SELECT_DATE")), day, month, year);
-        nlStrNCpy(mDateText, formattedDate.c_str(), 0x40);
-        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "DATE")->SetString(mDateText);
-
-        int wins = GameInfoManager::Instance()->GetUnknown0xAA0Total(mSaveSlot);
-        int losses = GameInfoManager::Instance()->GetUnknown0xAA4Total(mSaveSlot);
-        WideBasicString formattedRecord = Format(
-            WideBasicString(g_pLocalization->GetString("ONLINE_TOTAL_WINS_LOSSES")), wins, losses);
-        nlStrNCpy(mRecordText, formattedRecord.c_str(), 0x40);
-        FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(box, "lifetime_record")->SetString(mRecordText);
-        FEFinder<TLImageInstance, 2>::FindOrDefault<TLInstance>(box, "logo_32x32")->SetAssetVisible(true);
-    }
-
-    SHNavigation* scene = GetNavigationScene();
-    TLComponentInstance* screen = 0;
-    if (scene != 0)
-    {
-        scene->SetButtons(4, true);
-        screen = scene->GetButton(4);
-        mPageControls = scene->GetPageControls();
-        mPageControls->SetButtonState(1, true, false);
-        mPageControls->SetButtonState(0, true, false);
-    }
-    mBackButton.SetButtonInstance(screen);
-
-    for (int i = 0; i < 4; ++i)
-    {
-        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-    }
-}
-
 void SHOnlineMiiSelectOverlay::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
@@ -492,5 +490,3 @@ void SHOnlineMiiSelectOverlay::CloseItem(unsigned int index, void* context)
     mButtonInstances[item]->SetActiveSlide("off", true, false);
     mButtons[item].SetPointerState(0, index);
 }
-
-#include "Game/FE/feFinder.inl"

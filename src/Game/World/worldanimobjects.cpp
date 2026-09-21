@@ -1,3 +1,4 @@
+#include "Game/World/WorldDrawable.h"
 #include "Game/World/WorldVisibility.h"
 #include "Game/World/worldanim.h"
 #include "Game/World/WorldPhysicsDescription.h"
@@ -113,7 +114,7 @@ extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
     pManager->BindHierarchy(
         pObject->m_pAnimController, pObject->m_uHierarchyHash);
     pObject->m_pAnimController->SetWorldMatrix(
-        ((DrawableObject*)pObject)->GetWorldMatrix());
+        *((DrawableObject*)pObject)->GetWorldMatrix());
 
     if (pObject->m_nAnimations == 0)
     {
@@ -207,42 +208,35 @@ extern "C" nlMatrix4* fn_80343AE0(void*)
     return &s_worldAnimIdentityMatrix;
 }
 
-extern "C" nlMatrix4* fn_80343B14(
-    WorldAnimDrawable_80343A40* pObject)
+nlMatrix4* WorldDrawable::GetWorldMatrix()
 {
-    if (pObject->m_pAnimController != 0)
+    if (m_pAnimController != 0)
     {
-        return &pObject->m_pAnimController->GetNodeMatrix(
-            pObject->m_nAnimNode);
+        return &m_pAnimController->GetNodeMatrix(m_nAnimNode);
     }
-    return &pObject->m_transform;
+    return &mWorldMatrix;
 }
 
-extern "C" bool fn_80343B34(WorldAnimDrawable_80343A40* pObject,
-    const nlVector4* pCullData)
+bool WorldDrawable::V6(const nlVector4* pCullData)
 {
     FrustumResult result;
-    if (pObject->m_pAnimController != 0)
+    if (m_pAnimController != 0)
     {
-        if (pObject->m_pAnimController->GetMorphWeight(
-                pObject->m_nAnimNode)
-            == 0.0f)
+        if (m_pAnimController->GetMorphWeight(m_nAnimNode) == 0.0f)
         {
             return false;
         }
 
-        float fRadius = pObject->m_fRadius;
+        float fRadius = m_fBoundingRadius;
         nlMatrix4& matrix
-            = pObject->m_pAnimController->GetNodeMatrix(
-                pObject->m_nAnimNode);
+            = m_pAnimController->GetNodeMatrix(m_nAnimNode);
         result = ClassifySphereInFrustum(pCullData,
             (const nlVector3*)&matrix.e2[3][0], fRadius);
     }
     else
     {
-        float fRadius = pObject->m_fRadius;
-        nlMatrix4& matrix
-            = ((DrawableObject*)pObject)->GetWorldMatrix();
+        float fRadius = m_fBoundingRadius;
+        nlMatrix4& matrix = *GetWorldMatrix();
         result = ClassifySphereInFrustum(pCullData,
             (const nlVector3*)&matrix.e2[3][0], fRadius);
     }
@@ -254,43 +248,39 @@ extern "C" void fn_80343C00(WorldAnimDrawable_80343A40* pObject)
     ((DrawableObject*)pObject)->V8(0);
 }
 
-extern "C" void fn_80343C14(
-    WorldAnimDrawable_80343A40* pObject, GLView* pView)
+void WorldDrawable::V8(GLView* pView)
 {
-    unsigned long uAnimationHash
-        = *(unsigned long*)pObject->m_pModel;
+    unsigned long uAnimationHash = *(unsigned long*)m_pModel;
     GLVertexAnim* pVertexAnim
         = glGetCurrentResourcePool()->m_inventory->GetVertexAnim(uAnimationHash);
-    glModel* pModel = (glModel*)pObject->m_pModel;
+    glModel* pModel = m_pModel;
     if (pVertexAnim != 0)
     {
         int nFrames = (int)pVertexAnim->m_nNumFrames;
         float fNumFrames = (float)nFrames;
         float fDuration = fNumFrames / 30.0f;
         float fFrameTime
-            = pObject->m_pWorld->mWorldAnimManager.m_fTime
+            = m_pWorldContext->mWorldAnimManager.m_fTime
             / fDuration;
         float fFrameFraction
             = fFrameTime - (float)floor(fFrameTime);
         int nFrame = (int)(fNumFrames * fFrameFraction);
         pModel = pVertexAnim->GetModel(nFrame);
-        ((DrawableObject*)pObject)->V7(pModel);
+        V7(pModel);
     }
 
-    if (pObject->m_pAnimController != 0)
+    if (m_pAnimController != 0)
     {
         glModelSetMatrix(pModel,
-            pObject->m_pAnimController->GetNodeMatrix(
-                pObject->m_nAnimNode));
+            m_pAnimController->GetNodeMatrix(m_nAnimNode));
     }
     else
     {
-        glModelSetMatrix(pModel,
-            ((DrawableObject*)pObject)->GetWorldMatrix());
+        glModelSetMatrix(pModel, *GetWorldMatrix());
     }
 
-    GLView* pOpaqueView = pObject->m_pWorld->m_pOpaqueView;
-    GLView* pAlphaView = pObject->m_pWorld->m_pAlphaView;
+    GLView* pOpaqueView = m_pWorldContext->m_pOpaqueView;
+    GLView* pAlphaView = m_pWorldContext->m_pAlphaView;
     if (pAlphaView == 0)
     {
         pAlphaView = pView;
@@ -578,10 +568,10 @@ void WorldEffect::Emit()
         pController->m_fGround = 0.02f;
 
         nlMatrix4* pMatrix
-            = &((DrawableObject*)this)->GetWorldMatrix();
+            = ((DrawableObject*)this)->GetWorldMatrix();
         pController->SetPosition(
             *(nlVector3*)&pMatrix->e2[3][0]);
-        pMatrix = &((DrawableObject*)this)->GetWorldMatrix();
+        pMatrix = ((DrawableObject*)this)->GetWorldMatrix();
         nlVector3 direction;
         nlVec3Set(direction, pMatrix->e2[2][0], pMatrix->e2[2][1],
             pMatrix->e2[2][2]);

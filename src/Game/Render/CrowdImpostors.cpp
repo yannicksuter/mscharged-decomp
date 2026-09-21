@@ -420,7 +420,7 @@ void SetCrowdModelTexture(u32 hash, unsigned long texture)
     for (; iterator.hasNext(); iterator.next())
     {
         DrawableObject* pObject = (DrawableObject*)*iterator;
-        if (pObject->mUnidentified08 == 0x10002)
+        if (pObject->m_uRenderLayer == 0x10002)
         {
             glModel* pGlModel = pObject->m_pModel;
             for (glModelPacket* pPacket = pGlModel->packets;

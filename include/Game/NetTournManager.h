@@ -69,6 +69,22 @@ public:
     static void CreateInstance();
     static NetTournManager* Instance();
     int fn_801CA9D0() const { return mWinningMachine; }
+    // Bounded fit, not recovered source: R4QE01's CupKnockoutScene::SceneCreated
+    // keeps this value in a register allocated ahead of the inlined FEFinder
+    // result that follows it. Under GC/3.0a5 a caller-scope local holding the
+    // same computation is allocated after every inline temporary, so the value
+    // came out of an inline function. That function's owner and name are not
+    // recoverable - SceneCreated is its only reader and the DOL keeps no
+    // out-of-line copy - so it sits with the two fields it reads.
+    int UnidentifiedStartSeconds() const
+    {
+        if (!mWaitingToStartGames)
+            return -1;
+        int seconds = (int)mTimeToStartGames;
+        if (seconds < 0)
+            seconds = 0;
+        return seconds;
+    }
     static void GenerateFirstRoundSeedings(int machineCount, u8* seedings);
 
     void Reset(bool clearTeams);

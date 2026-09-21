@@ -4,7 +4,7 @@
 #include "Game/BallTrail.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Drawable/DrawableCharacter.h"
-#include "Game/Drawable/RenderObject.h"
+#include "Game/Drawable/DrawableModel.h"
 #include "Game/RenderSnapshot.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -80,7 +80,7 @@ void DrawableBall::Grab()
 
 void DrawableBall::Render() const
 {
-    RenderObject* drawable = g_pBall->m_pDrawableBall;
+    DrawableModel* drawable = g_pBall->m_pDrawableBall;
     if (mFlags.bits.visible)
     {
         drawable->m_uObjectFlags |= 1;
@@ -140,7 +140,7 @@ void DrawableBall::Render() const
     for (u32 i = 0; i < mTrailCount; ++i)
     {
         const float scale = mScale;
-        RenderObject* trail = fn_8001B284(i)->drawable;
+        DrawableModel* trail = fn_8001B284(i)->drawable;
 
         if (mTrail[i].visible)
         {

@@ -1,4 +1,4 @@
-#include "Game/SAnimDecode_8030EC30.h"
+#include "Game/SAnimDecode.h"
 
 #include "Game/SAnim.h"
 
@@ -17,7 +17,7 @@ void SAnimInitGQR()
 // clang-format on
 
 // clang-format off
-extern "C" void fn_8030EC4C(register nlQuaternion* result, register const void* packed)
+extern "C" void SAnimDecodeRot16(register nlQuaternion* result, register const void* packed)
 {
     asm {
         psq_l f0, 0(packed), 0, 6
@@ -29,18 +29,20 @@ extern "C" void fn_8030EC4C(register nlQuaternion* result, register const void* 
 // clang-format on
 
 // clang-format off
-extern "C" void fn_8030EC60(register nlQuaternion* result, const void* packed)
+extern "C" void SAnimDecodeRot12(register nlQuaternion* result, const void* packed)
 {
     const unsigned char* bytes = (const unsigned char*)packed;
     unsigned char unpacked[8];
     unpacked[0] = bytes[0];
-    unpacked[1] = bytes[1] & 0xF0;
+    unpacked[3] = unpacked[1] = bytes[1];
+    unpacked[1] &= 0xF0;
     unpacked[2] = bytes[2];
-    unpacked[3] = (bytes[1] & 0x0F) << 4;
+    unpacked[3] <<= 4;
     unpacked[4] = bytes[3];
-    unpacked[5] = bytes[4] & 0xF0;
+    unpacked[7] = unpacked[5] = bytes[4];
+    unpacked[5] &= 0xF0;
     unpacked[6] = bytes[5];
-    unpacked[7] = (bytes[4] & 0x0F) << 4;
+    unpacked[7] <<= 4;
     register unsigned char* values = unpacked;
     asm {
         psq_l f0, 0(values), 0, 6
@@ -52,7 +54,7 @@ extern "C" void fn_8030EC60(register nlQuaternion* result, const void* packed)
 // clang-format on
 
 // clang-format off
-extern "C" void fn_8030ECC8(register nlQuaternion* result, register const void* packed)
+extern "C" void SAnimDecodeRot8(register nlQuaternion* result, register const void* packed)
 {
     asm {
         psq_l f0, 0(packed), 0, 7
@@ -63,19 +65,19 @@ extern "C" void fn_8030ECC8(register nlQuaternion* result, register const void* 
 }
 // clang-format on
 
-extern "C" void fn_8030ECDC(nlVector3* result, const PackedScale* packed)
+extern "C" void SAnimDecodeScale(nlVector3* result, const PackedScale* packed)
 {
     result->x = 0.00048828125f * packed->x;
     result->y = 0.00048828125f * packed->y;
     result->z = 0.00048828125f * packed->z;
 }
 
-extern "C" void fn_8030ED48(float* result, const unsigned char* packed)
+extern "C" void SAnimDecodeWeight(float* result, const unsigned char* packed)
 {
     *result = *packed / 255.0f;
 }
 
-extern "C" void fn_8030ED7C(float* result, const unsigned char* packed)
+extern "C" void SAnimDecodeMorphWeight(float* result, const unsigned char* packed)
 {
     *result = *packed / 255.0f;
 }

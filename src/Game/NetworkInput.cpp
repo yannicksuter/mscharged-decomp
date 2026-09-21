@@ -60,16 +60,16 @@ void NetworkPeer::ResetNetworkPeerInputs()
     for (int channel = 0; channel < (int)mPlayerCount; ++channel)
     {
         NetworkPeerChannel* entry = &mChannels[channel];
-        for (int input = 0; input < 4; ++input)
-        {
-            new (&entry->mInputs[input]) DetInput;
-        }
-        entry->mInputs[0].m_pMyUser = entry;
-        entry->mInputs[1].m_pMyUser = entry;
-        entry->mInputs[2].m_pMyUser = entry;
-        entry->mInputs[3].m_pMyUser = entry;
-        entry->mInputs[1].m_pPrevInput = &entry->mInputs[0];
-        entry->mInputs[3].m_pPrevInput = &entry->mInputs[2];
+        entry->mInput0.Reset();
+        entry->mInput1.Reset();
+        entry->mInput2.Reset();
+        entry->mInput3.Reset();
+        entry->mInput0.m_pMyUser = entry;
+        entry->mInput1.m_pMyUser = entry;
+        entry->mInput2.m_pMyUser = entry;
+        entry->mInput3.m_pMyUser = entry;
+        entry->mInput1.m_pPrevInput = &entry->mInput0;
+        entry->mInput3.m_pPrevInput = &entry->mInput2;
     }
 }
 
@@ -77,18 +77,17 @@ NetworkPeerChannel::NetworkPeerChannel()
     : mPeer(0)
     , mChannelIndex(-1)
     , mGlobalPadIndex(0)
-    , mUnidentified00C(false)
 {
-    for (int input = 0; input < 4; ++input)
-    {
-        new (&mInputs[input]) DetInput;
-    }
-    mInputs[0].m_pMyUser = this;
-    mInputs[1].m_pMyUser = this;
-    mInputs[2].m_pMyUser = this;
-    mInputs[3].m_pMyUser = this;
-    mInputs[1].m_pPrevInput = &mInputs[0];
-    mInputs[3].m_pPrevInput = &mInputs[2];
+    mInput0.Reset();
+    mInput1.Reset();
+    mInput2.Reset();
+    mInput3.Reset();
+    mInput0.m_pMyUser = this;
+    mInput1.m_pMyUser = this;
+    mInput2.m_pMyUser = this;
+    mInput3.m_pMyUser = this;
+    mInput1.m_pPrevInput = &mInput0;
+    mInput3.m_pPrevInput = &mInput2;
 }
 
 void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int globalPadIndex)
@@ -101,7 +100,7 @@ void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int glob
 
 DetInput* NetworkPeerChannel::GetNetworkPeerChannelInput()
 {
-    return &mInputs[1];
+    return &mInput1;
 }
 
 s8 NetworkPeerChannel::GetNetworkPeerChannelId()
@@ -125,43 +124,43 @@ cGlobalPad* NetworkPeerChannel::GetLocalChannelPad()
 
 void NetworkPeerChannel::CaptureNetworkPeerChannelInput()
 {
-    mInputs[2].CopyState(mInputs[3]);
+    mInput2.CopyState(mInput3);
     cGlobalPad* pad = this->GetLocalChannelPad();
     if (pad != 0 && !gInputManager->mFrameProvider->IsInPauseMenu())
     {
-        mInputs[3].ReadFromPad(pad);
+        mInput3.ReadFromPad(pad);
     }
     else
     {
-        new (&mInputs[3]) DetInput;
+        mInput3.Reset();
     }
-    mInputs[3].m_aRemapAngle
+    mInput3.m_aRemapAngle
         = gInputManager->mFrameProvider->GetInputRemapAngle();
 }
 
 void NetworkPeerChannel::ApplyNetworkPeerChannelInput(PackedDetInput* record, u16 tick, u8 connected)
 {
-    mInputs[0].CopyState(mInputs[1]);
-    UnpackDetInput(record, &mInputs[1]);
-    mInputs[1].m_aRemapAngle = tick;
-    mInputs[1].m_nConnected = connected;
-    mInputs[1].UpdatePolarAnalog();
-    mInputs[1].UpdateButtonStateTicks();
+    mInput0.CopyState(mInput1);
+    UnpackDetInput(record, &mInput1);
+    mInput1.m_aRemapAngle = tick;
+    mInput1.m_nConnected = connected;
+    mInput1.UpdatePolarAnalog();
+    mInput1.UpdateButtonStateTicks();
 }
 
 void NetworkPeerChannel::PackNetworkPeerChannelInput(PackedDetInput* record)
 {
-    PackDetInput(record, &mInputs[3]);
+    PackDetInput(record, &mInput3);
 }
 
 u16 NetworkPeerChannel::GetNetworkPeerChannelRemapAngle()
 {
-    return mInputs[3].m_aRemapAngle;
+    return mInput3.m_aRemapAngle;
 }
 
 u8 NetworkPeerChannel::GetNetworkPeerChannelConnectionStatus()
 {
-    return mInputs[3].GetConnectionStatus();
+    return mInput3.GetConnectionStatus();
 }
 
 s8 GetNetworkPlayerId(s8 player, s8 machine)

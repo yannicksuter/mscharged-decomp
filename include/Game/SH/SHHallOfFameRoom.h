@@ -11,6 +11,7 @@ class FEPageControls;
 class SHHallOfFameRoom : public BaseSceneHandler
 {
 public:
+    SHHallOfFameRoom();
     virtual ~SHHallOfFameRoom();
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
@@ -29,7 +30,6 @@ class SHHallOfFameCup : public SHHallOfFameRoom
 {
 public:
     SHHallOfFameCup(int mode);
-    virtual ~SHHallOfFameCup();
     virtual void SceneCreated();
     virtual void InitializeButtons();
     virtual void HandlePointerEvent(const FEPointerEvent* event, int index, float fDeltaT);
@@ -58,7 +58,6 @@ class SHHallOfFameProfile : public SHHallOfFameRoom
 {
 public:
     SHHallOfFameProfile();
-    virtual ~SHHallOfFameProfile();
     virtual void SceneCreated();
     virtual void InitializeButtons();
     virtual void HandlePointerEvent(const FEPointerEvent* event, int index, float fDeltaT);

@@ -172,8 +172,8 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    drawable->SetWorldMatrix(&matrix);
-    drawable->V8(GetLayerView(eCLV_MoreCharacters));
+    drawable->SetWorldMatrix(matrix);
+    drawable->V8((GLView*)GetLayerView(eCLV_MoreCharacters));
 
     DrawShadow(matrix, gShadowAlphaScale);
 }

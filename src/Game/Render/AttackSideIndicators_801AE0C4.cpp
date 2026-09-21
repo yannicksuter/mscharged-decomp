@@ -125,7 +125,7 @@ void RegisterAttackSideIndicator(DrawableObject* object)
     AttackSideIndicatorSet* set;
     for (int i = 0; i < 2; ++i)
     {
-        float x = object->GetWorldMatrix().m41;
+        float x = object->GetWorldMatrix()->m41;
         set = gAttackSideIndicatorSets[i];
         if (set->mPositiveX == (x > 0.0f))
         {

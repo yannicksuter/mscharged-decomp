@@ -16,6 +16,7 @@
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/Team.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include <math.h>
 #include <stddef.h>
 
@@ -884,38 +885,37 @@ bool UnidentifiedDesire35::UnidentifiedInitialize(void*)
 void UnidentifiedDesire35::Update(
     UnidentifiedDesireUpdate* update, float fDeltaT)
 {
-    cFielder* pFielder = mUnidentifiedFielder;
-    if (!pFielder->mUnidentified3DC)
+    if (!mUnidentifiedFielder->mUnidentified3DC)
     {
         return;
     }
-    if (!fn_8002EDC8(pFielder, -1))
+    if (!fn_8002EDC8(mUnidentifiedFielder, -1))
     {
-        pFielder->fn_8005001C(true);
-        fn_80060804(g_pGame, pFielder);
-        return;
-    }
-
-    float fSpeed = pFielder->m_pBall != NULL
-                 ? fn_8002C328(pFielder->GetTweaks())
-                 : fn_8002C254(pFielder->GetTweaks());
-    pFielder->mUnidentified024.m_fDesiredSpeed = fSpeed;
-    pFielder->mUnidentified3E0 -= fDeltaT;
-    if (pFielder->mUnidentified3E0 <= 0.0f)
-    {
-        *update = FuzzyVariant(FT_INT, 1);
-        update->mTemporary = false;
+        mUnidentifiedFielder->fn_8005001C(true);
+        fn_80060804(g_pGame, mUnidentifiedFielder);
         return;
     }
 
-    pFielder->mUnidentified3F8.mUnidentified00 -= fDeltaT;
-    short nFacingDelta = (short)(pFielder->mUnidentified024.m_aActualFacingDirection
-        - pFielder->mUnidentified024.m_aDesiredFacingDirection);
-    if (pFielder->mUnidentified3F8.mUnidentified00 <= 0.0f)
+    float fSpeed = mUnidentifiedFielder->m_pBall != NULL
+                 ? fn_8002C328(mUnidentifiedFielder->GetTweaks())
+                 : fn_8002C254(mUnidentifiedFielder->GetTweaks());
+    mUnidentifiedFielder->mUnidentified024.m_fDesiredSpeed = fSpeed;
+    mUnidentifiedFielder->mUnidentified3E0 -= fDeltaT;
+    bool bRunning = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
+    if (!bRunning)
     {
-        if (pFielder->mUnidentified3DD)
+        *update = 1;
+        return;
+    }
+
+    mUnidentifiedFielder->mUnidentified3F8.mUnidentified00 -= fDeltaT;
+    short nFacingDelta = (short)(mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection
+        - mUnidentifiedFielder->mUnidentified024.m_aDesiredFacingDirection);
+    if (mUnidentifiedFielder->mUnidentified3F8.mUnidentified00 <= 0.0f)
+    {
+        if (mUnidentifiedFielder->mUnidentified3DD)
         {
-            pFielder->fn_8005001C(true);
+            mUnidentifiedFielder->fn_8005001C(true);
             return;
         }
 
@@ -923,33 +923,35 @@ void UnidentifiedDesire35::Update(
             = nFacingDelta < 0 ? -nFacingDelta : nFacingDelta;
         if ((unsigned short)nAbsFacingDelta > 0x2000)
         {
-            fn_80060608(g_pGame, pFielder);
-            if (pFielder->mUnidentified3E0 > 0.0f
-                && pFielder->mUnidentified3E0
-                    < pFielder->mUnidentified3F8.mUnidentified04)
+            fn_80060608(g_pGame, mUnidentifiedFielder);
+            if (mUnidentifiedFielder->mUnidentified3E0 > 0.0f
+                && mUnidentifiedFielder->mUnidentified3E0
+                    < mUnidentifiedFielder->mUnidentified3F8.mUnidentified04)
             {
-                pFielder->mUnidentified3E0
-                    = pFielder->mUnidentified3F8.mUnidentified04;
+                mUnidentifiedFielder->mUnidentified3E0
+                    = mUnidentifiedFielder->mUnidentified3F8.mUnidentified04;
             }
             if (nFacingDelta < 0)
             {
-                pFielder->SetFacingDirection(
-                    pFielder->mUnidentified024.m_aActualFacingDirection + 0x4000, true);
+                mUnidentifiedFielder->SetFacingDirection(
+                    mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection + 0x4000, true);
             }
             else
             {
-                pFielder->SetFacingDirection(
-                    pFielder->mUnidentified024.m_aActualFacingDirection - 0x4000, true);
+                mUnidentifiedFielder->SetFacingDirection(
+                    mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection - 0x4000, true);
             }
-            fn_8006040C(g_pGame, pFielder);
-            pFielder->mUnidentified3F8.mUnidentified00 = pFielder->mUnidentified3F8.mUnidentified04;
+            fn_8006040C(g_pGame, mUnidentifiedFielder);
+            mUnidentifiedFielder->mUnidentified3F8.mUnidentified00
+                = mUnidentifiedFielder->mUnidentified3F8.mUnidentified04;
         }
     }
 
-    pFielder->fn_8001DCE0(pFielder->mUnidentified024.m_aActualFacingDirection);
-    pFielder->mUnidentified024.m_aActualMovementDirection
-        = pFielder->mUnidentified024.m_aActualFacingDirection;
-    pFielder->fn_8001E304(fSpeed, fDeltaT);
+    mUnidentifiedFielder->fn_8001DCE0(
+        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
+    mUnidentifiedFielder->mUnidentified024.m_aActualMovementDirection
+        = mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
+    mUnidentifiedFielder->fn_8001E304(fSpeed, fDeltaT);
 }
 
 void UnidentifiedDesire35::UnidentifiedCleanup()

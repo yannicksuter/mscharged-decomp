@@ -109,9 +109,9 @@ float GetPlanarShadowOpacity()
     return sfPlanarShadowOpacity;
 }
 
-extern "C" void fn_80186354(DrawableObject* arg0)
+extern "C" void fn_80186354(DrawableModel* arg0)
 {
-    if (arg0->GetWorldMatrix().m43 >= 0.0f)
+    if (arg0->GetWorldMatrix()->m43 >= 0.0f)
     {
         BallShadowParams p;
         p.fReferenceHeight = g_fBallShadowH;
@@ -124,7 +124,7 @@ extern "C" void fn_80186354(DrawableObject* arg0)
         p.colour.c[2] = 0xFF;
         p.colour.c[3] = 0xFF;
         DrawBallShadow(
-            *(const nlVector3*)&arg0->GetWorldMatrix().e2[3][0], p, false);
+            *(const nlVector3*)&arg0->GetWorldMatrix()->e2[3][0], p, false);
 
         if (g_bBallGlow)
         {
@@ -173,7 +173,7 @@ extern "C" void fn_80186354(DrawableObject* arg0)
             p.colour.c[2] = blue;
             p.colour.c[3] = 0xFF;
             DrawBallShadow(
-                *(const nlVector3*)&arg0->GetWorldMatrix().e2[3][0], p, true);
+                *(const nlVector3*)&arg0->GetWorldMatrix()->e2[3][0], p, true);
         }
     }
 }
@@ -964,7 +964,7 @@ extern "C" void fn_8018680C(eCLV layer, const glModel* model,
  * Draws one model's ground shadow: the flattened bounding box for the
  * projected pass and the co-planar geometry for the planar pass.
  */
-extern "C" void fn_801869AC(const glModel* model, const nlMatrix4& transform,
+void DrawPlanarShadow(const glModel* model, const nlMatrix4& transform,
     int hasTransform, unsigned long boundingBoxCacheKey, const void* owner,
     float opacity)
 {

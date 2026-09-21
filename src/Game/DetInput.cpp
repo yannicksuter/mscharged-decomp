@@ -241,7 +241,7 @@ void DetInput::ResetButtonStateTicks(int button, bool remap)
     }
 }
 
-DetInput::DetInput()
+void DetInput::Reset()
 {
     m_AnalogLeftX = 0.0f;
     m_AnalogLeftY = 0.0f;

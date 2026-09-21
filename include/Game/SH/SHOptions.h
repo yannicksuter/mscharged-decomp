@@ -15,10 +15,10 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void fn_801D2A08(int index, void* context);
-    void fn_801D3098(int index, void* context);
-    void fn_801D3148(int index, void* context);
-    void fn_801D31E0();
+    void OnButtonPointerPress(int index, void* context);
+    void OnButtonPointerEnter(int index, void* context);
+    void OnButtonPointerLeave(int index, void* context);
+    void InitializePointerButtons();
 
     /* 0x01C */ TLComponentInstance* mUnidentified1C[3];
     /* 0x028 */ FEPointerButton mUnidentified28[3];

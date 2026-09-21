@@ -102,6 +102,11 @@ public:
     virtual void Update() = 0;
 };
 
+struct NetworkStatsSocket : public TransportSocket
+{
+    NetworkStatsSocket() { TransportSocketInitialize(this); }
+};
+
 class NetworkStatsReporter : public NetworkStatsInterface
 {
 public:
@@ -110,6 +115,7 @@ public:
     NetworkStatsReporter();
 
     void Reset();
+    void Open();
     void Close();
     void ParseLeaderboardResponse(char* data, int size);
 
@@ -130,7 +136,7 @@ public:
     virtual void Update();
 
     /* 0x004 */ NetworkStatsListener* mListener;
-    /* 0x008 */ TransportSocket mSocket;
+    /* 0x008 */ NetworkStatsSocket mSocket;
     /* 0x00C */ int mState;
     /* 0x010 */ int mFilter;
     /* 0x014 */ int mLimit;

@@ -24,6 +24,20 @@ add_relocations:
   - { source: .text:0x802BB6CC, type: ha, target: lbl_8052B6C8 }
   - { source: .text:0x802BB708, type: l, target: lbl_8052B668 }
   - { source: .text:0x802BB728, type: l, target: lbl_8052B6C8 }
+  # GLInventory::~GLInventory hoists release-function and AVL vtable addresses
+  # through r0 and stack slots.
+  - { source: .text:0x802D09C8, type: ha, target: glReleaseTextureAnim__FP13GLTextureAnim }
+  - { source: .text:0x802D09D4, type: ha, target: glReleaseTexture__FP11PlatTexture }
+  - { source: .text:0x802D09F4, type: ha, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D09F8, type: l, target: glReleaseTextureAnim__FP13GLTextureAnim }
+  - { source: .text:0x802D0A14, type: ha, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0A18, type: l, target: glReleaseTexture__FP11PlatTexture }
+  - { source: .text:0x802D0A34, type: ha, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0A38, type: l, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0A54, type: ha, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0A58, type: l, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0A78, type: l, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802D0A98, type: l, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
   # inflate hoists these literal addresses through r0 and stack slots.
   - { source: .text:0x802AC9F8, type: ha, target: .data:0x8052B1B0 }
   - { source: .text:0x802ACA04, type: ha, target: .rodata:0x804EA900 }

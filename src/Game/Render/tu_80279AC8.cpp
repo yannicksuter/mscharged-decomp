@@ -2,6 +2,7 @@
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/World/WorldDrawable.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/StadiumInfo.h"
@@ -31,10 +32,7 @@ class GLView;
 extern "C"
 {
     void fn_80343DE4(StadiumWorldObject_80279AC8* object, void* context);
-    nlMatrix4* fn_80343B14(StadiumWorldObject_80279AC8* object);
-    bool fn_80343B34(StadiumWorldObject_80279AC8* object, const nlVector4* planes);
     void fn_80343C00(StadiumWorldObject_80279AC8* object);
-    void fn_80343C14(StadiumWorldObject_80279AC8* object, GLView* view);
     void fn_80341EE8(StadiumWorldObject_80279AC8* object, const nlMatrix4* transform);
     void fn_80182168(StadiumWorldObject_80279AC8* object);
     void fn_802092A4(StadiumGoalObject_8027A2C8* object);
@@ -308,7 +306,7 @@ extern "C" bool fn_80279D80(
     StadiumWorldObject_80279AC8* object, const nlVector4* planes)
 {
     if (object->m_pAnimController != 0)
-        return fn_80343B34(object, planes);
+        return ((WorldDrawable*)object)->WorldDrawable::V6(planes);
     return ClassifyBoxInFrustum(
                planes, &object->m_boundsMin, &object->m_boundsMax, 0)
         != 0;
@@ -321,7 +319,8 @@ extern "C" void fn_80279DD4(StadiumWorldObject_80279AC8* object)
 {
     if ((object->m_uFlags & 8) != 0)
     {
-        fn_80343C14(object, (GLView*)GetLayerView((eCLV)5));
+        ((WorldDrawable*)object)
+            ->WorldDrawable::V8((GLView*)GetLayerView((eCLV)5));
     }
     else
     {
@@ -583,7 +582,7 @@ extern "C" void fn_8027A300(StadiumGoalObject_8027A2C8* object)
 /**
  * Address/Size: 0x8027A318 | size: 0x4
  */
-extern "C" void fn_8027A318(StadiumWorldObject_80279AC8*)
+void WorldDrawable::V7(glModel*)
 {
 }
 

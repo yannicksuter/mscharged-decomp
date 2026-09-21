@@ -131,8 +131,6 @@ struct AsyncEntry
 class AsyncManager
 {
 public:
-    AsyncManager();
-
     AsyncEntry* AddEntry(DolphinFile* pFile, ReadAsyncCallback pFunc, void* pBuffer,
         unsigned long position, unsigned long uSize, unsigned long uParam, AsyncReadPhase phase);
     int Service();
@@ -471,22 +469,6 @@ bool AsyncManager::Cancel(AsyncEntry* entry, CancelAsyncCallback callback)
     return true;
 }
 
-AsyncManager::AsyncManager()
-    : mCurrent(0)
-    , m_freeEntryList(0)
-    , m_activeEntryList(0)
-{
-    mTailBuffers = (unsigned char*)nlMalloc(64 * 32, 32, true);
-    for (int i = 0; i < 64; ++i)
-    {
-        AsyncEntry* entry = &m_asyncEntries[i];
-        entry->mTailBuffer = mTailBuffers + i * 32;
-        entry->m_uPosition = 0;
-        entry->Phase = READ_HEAD;
-        nlDLRingAddEnd(&m_freeEntryList, entry);
-    }
-}
-
 AsyncEntry* nlGetCurrentAsyncRead()
 {
     return s_pAsyncManager->mCurrent;
@@ -497,9 +479,23 @@ void nlInitFileSystem()
     DVDInit();
     if (s_pAsyncManager == 0)
     {
-        AsyncManager* pManager =
-            (AsyncManager*)nlMalloc(sizeof(AsyncManager), 8, false);
-        s_pAsyncManager = pManager == 0 ? 0 : new (pManager) AsyncManager;
+        AsyncManager* pManager;
+
+        pManager = (AsyncManager*)nlMalloc(sizeof(AsyncManager), 8, false);
+        if (pManager != 0)
+        {
+            pManager->m_activeEntryList = pManager->m_freeEntryList = 0;
+            pManager->mTailBuffers = (unsigned char*)nlMalloc(64 * 32, 32, true);
+
+            for (s32 i = 0; i < 64; i++)
+            {
+                pManager->m_asyncEntries[i].mTailBuffer = pManager->mTailBuffers + i * 32;
+                pManager->m_asyncEntries[i].m_pFile = 0;
+                nlDLRingAddStart<AsyncEntry>(&pManager->m_freeEntryList, &pManager->m_asyncEntries[i]);
+            }
+        }
+
+        s_pAsyncManager = pManager;
     }
 }
 

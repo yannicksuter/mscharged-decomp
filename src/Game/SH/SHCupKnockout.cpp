@@ -13,6 +13,7 @@
 #include "Game/FE/fePageControls.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/fePresentation.h"
+#include "Game/FE/fePresentation.inl"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
@@ -74,12 +75,9 @@ void CupKnockoutScene::SceneCreated()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     char matchupName[8];
     char timerText[8];
-    TLSlide* currentSlide;
-    TLTextInstance* timer;
-    int startSeconds;
     TLComponentInstance* title =
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
-            presentation->m_currentSlide, "Layer", "tournament_screens", "TITLE2");
+            presentation->GetActiveSlide(), "Layer", "tournament_screens", "TITLE2");
     fn_80208950(title, mTitleText, 64);
 
     if (mNetworkTournament)
@@ -87,23 +85,15 @@ void CupKnockoutScene::SceneCreated()
         mTournament = NetTournManager::Instance();
         TLComponentInstance* scroll =
             FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
-                presentation->m_currentSlide, "Layer", "scroll_horizontal");
+                presentation->GetActiveSlide(), "Layer", "scroll_horizontal");
         scroll->m_bVisible = false;
 
-        NetTournManager* tournament = NetTournManager::Instance();
-        if (!tournament->mWaitingToStartGames)
-            startSeconds = -1;
-        else
-        {
-            startSeconds = (int)tournament->mTimeToStartGames;
-            if (startSeconds < 0)
-                startSeconds = 0;
-        }
+        int startSeconds = NetTournManager::Instance()->UnidentifiedStartSeconds();
         mStartSeconds = startSeconds;
 
-        currentSlide = mPresentation->m_currentSlide;
-        timer = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
-            currentSlide, "Layer", "TimerText");
+        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLTextInstance* timer = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
+            slide, "Layer", "TimerText");
         if (startSeconds == -1)
             timer->m_bVisible = false;
         else
@@ -117,9 +107,9 @@ void CupKnockoutScene::SceneCreated()
     else
     {
         mTournament = g_pCupManager;
-        currentSlide = mPresentation->m_currentSlide;
-        timer = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
-            currentSlide, "Layer", "TimerText");
+        TLSlide* slide = mPresentation->GetActiveSlide();
+        TLTextInstance* timer = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
+            slide, "Layer", "TimerText");
         timer->m_bVisible = false;
     }
 
@@ -171,7 +161,7 @@ void CupKnockoutScene::Update(float fDeltaT)
     BaseSceneHandler::Update(fDeltaT);
     if (mTransitionState == 0 || mTransitionState == 2 || mTransitionState == 3)
     {
-        TLSlide* slide = mPresentation->m_currentSlide;
+        TLSlide* slide = mPresentation->GetActiveSlide();
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
@@ -531,7 +521,7 @@ void CupKnockoutScene::SetTeamLogo(TLImageInstance* image, int team)
     nlSNPrintf(imageName, sizeof(imageName), "logos_TEAM_%s",
         GetCharacterInfo(GetCharacterIndexFromCaptain(team)).mName);
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    TLSlide* slideList = presentation->m_currentSlide;
+    TLSlide* slideList = presentation->GetActiveSlide();
     TLSlide* artSlide = 0;
     TLSlide* slide = slideList->m_next;
     while (slide != 0 && slide != slideList)
@@ -554,7 +544,6 @@ void CupKnockoutScene::PopulateBracket()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     int numGames = mTournament->GetNumGames(1);
-    int gameIndex;
     int firstGame = 7 - numGames;
     UnidentifiedTLGroupInstance* groups[2] = { 0, 0 };
     for (int i = 0; i < 7; ++i)
@@ -566,7 +555,6 @@ void CupKnockoutScene::PopulateBracket()
         groups[1] = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(
             mMatchupInstances[i], "over", gameName);
 
-        gameIndex = i - firstGame;
         for (int j = 0; j < 2; ++j)
         {
             if (i < firstGame)
@@ -577,11 +565,11 @@ void CupKnockoutScene::PopulateBracket()
             }
             else
             {
-                BasicGameInfo* game = mTournament->GetGameInfo(1, gameIndex);
+                BasicGameInfo* game = mTournament->GetGameInfo(1, i - firstGame);
                 if (mNetworkTournament)
                 {
                     NetworkTournamentGame* tournamentGame =
-                        mTournament->GetTournamentGame(1, gameIndex);
+                        mTournament->GetTournamentGame(1, i - firstGame);
                     PopulateNetworkMatchup(tournamentGame, game, groups[j], i);
                 }
                 else

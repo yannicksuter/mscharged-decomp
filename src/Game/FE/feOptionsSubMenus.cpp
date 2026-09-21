@@ -593,10 +593,10 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
     if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
 
@@ -632,13 +632,14 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
 
     for (int i = 0; i < 4; ++i)
     {
+        TLComponentInstance* pointer = GetPointerInstance(i);
         if (mUnidentified28 == 0 && (unsigned int)i != gFEControllerIndex)
         {
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            pointer->SetActiveSlide("waiting", true, false);
             continue;
         }
 
-        gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+        pointer->SetActiveSlide("cursor", true, false);
 
         unsigned char valid = true;
         FEPointerEvent event;
@@ -648,7 +649,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
 
         if (mNavigation.UpdateBackButton(event, fDeltaT))
         {
-            GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel = mBackupSettings[1] * 0.25;
+            GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel = mBackupSettings[1] / 4.0;
             GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera = mBackupSettings[0] == 0;
             FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
             mState = 3;

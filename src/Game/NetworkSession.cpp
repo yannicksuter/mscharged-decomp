@@ -1636,10 +1636,10 @@ static inline void RecordGameConfig(
     NetworkSession* session, u32 seed,
     RecordedGameConfig* config)
 {
-    NetworkInputRecording* state = gNetworkInputRecording;
-    if (state->mRecordingEnabled != 0)
+    NetworkInputRecording& state = *gNetworkInputRecording;
+    if (state.mRecordingEnabled != 0)
     {
-        state->StartNetworkInputRecording((s8)session->GetLocalMachineId(), session->GetNumMachines(), seed, config, 0x58);
+        state.StartNetworkInputRecording((s8)session->GetLocalMachineId(), session->GetNumMachines(), seed, config, 0x58);
     }
 }
 
@@ -2032,7 +2032,7 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
     mMachineCount = (s8)message->mMachineCount;
     mLocalMachineId = (s8)message->mMachineIndex;
 
-    u8* entryFlags = (u8*)NetworkDraft::Instance() + 0xD3C;
+    NetMessageDraft& draftMessage = NetworkDraft::Instance()->GetDraftMessage();
     for (int machine = 0; machine < mMachineCount; ++machine)
     {
         mPeers[machine].mMachineId = machine;
@@ -2043,7 +2043,7 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
         }
         else
         {
-            players = (entryFlags[0x93] != 0) + 1;
+            players = (draftMessage.mEntries[machine].mGuestEnabled != 0) + 1;
         }
         mPeers[machine].mPlayerCount = players;
 
@@ -2063,7 +2063,6 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
                     (s8)player, -1);
             }
         }
-        entryFlags += 0x80;
     }
 
     if (message->mUnidentified1B != 0)
@@ -2107,7 +2106,7 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
         {
             side = NetworkDraft::Instance()->GetDraftTeam(0)
                        ->mPlayers[0]
-                       .mDisconnected
+                       .mPeerIndex
                 != 0;
         }
         for (int machine = 0; machine < mMachineCount; ++machine)
@@ -2124,7 +2123,6 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
     }
     else
     {
-        u8* sides = (u8*)message;
         for (int machine = 0; machine < mMachineCount; ++machine)
         {
             int players = mPeers[machine].mPlayerCount;
@@ -2133,9 +2131,8 @@ void NetworkSession::BaseVirtual44(NetMessageGameStart* message)
                 GameInfoManager* manager = GameInfoManager::GetInstance();
                 manager->SetPlayingSide(
                     (u16)(s8)GetNetworkPlayerId((s8)player, (s8)machine),
-                    (s8)sides[player + 0xB]);
+                    (s8)draftMessage.mPlayerSides.mData[machine][player]);
             }
-            sides += 2;
         }
     }
 

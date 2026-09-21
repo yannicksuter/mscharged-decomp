@@ -27,15 +27,12 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "Game/Render/HighRange.h"
+#include "Game/Render/PlanarShadowDrawable.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 extern "C"
 {
     void fn_80182164();
-    DrawableObject* fn_8027A4BC(void* storage,
-        WorldObjectLoadContext* context, glModel* model, u32 hash);
-    DrawableObject* fn_8027A7F0(void* storage,
-        WorldObjectLoadContext* context, glModel* model, u32 hash);
     RLView* fn_8027261C();
     DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
     void fn_80278818(BasicStadium* stadium);
@@ -45,8 +42,8 @@ extern "C"
     extern char StadiumExcludedMetalShellModel[];
     extern char StadiumModelCloneNameFormat[];
     extern char StadiumResourcePathFormat[];
-    extern char StadiumTextureBundlePathFormat[];
-    extern char StadiumModelBundlePathFormat[];
+    extern char StadiumTextureBundlePathFormat[7];
+    extern char StadiumModelBundlePathFormat[7];
     extern char StadiumTextureResourceLabel[4];
     extern char StadiumModelResourceLabel[6];
     extern StadiumLoadResult gTournamentTrophyLoadResults[3];
@@ -96,10 +93,8 @@ bool CreatePowerupDrawables(glModel* models, unsigned long numModels)
         }
 
         DrawableObject* pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
-        if (pObject != 0)
-        {
-            pObject = fn_8027A4BC(pObject, context, models, models->id);
-        }
+        pObject = new (pObject) PlanarShadowDrawable(
+            context, models, models->id);
         pObject->m_uHashID = models->id;
         fn_8027876C(pBasicStadiumInstance, pObject);
     }
@@ -141,10 +136,8 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
     if (entry == 0)
     {
         pObject = (DrawableObject*)nlMalloc(0xFC, 8, false);
-        if (pObject != 0)
-        {
-            pObject = fn_8027A7F0(pObject, context, models, models->id);
-        }
+        pObject = new (pObject) ChargeShadowDrawable(
+            context, models, models->id);
         fn_8027876C(pBasicStadiumInstance, pObject);
         instance = 0;
     }
@@ -153,10 +146,8 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
         for (; models < end; models++)
         {
             pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
-            if (pObject != 0)
-            {
-                pObject = fn_8027A4BC(pObject, context, models, models->id);
-            }
+            pObject = new (pObject) PlanarShadowDrawable(
+                context, models, models->id);
             fn_8027876C(pBasicStadiumInstance, pObject);
         }
     }
@@ -278,11 +269,12 @@ void BeginLoadStadiumTemporaryResources()
 void SetStadiumBannerTextures()
 {
     const char* szOriginalTexture = "flag/mario_banners";
+    const char* szName;
     const CharacterInfo& team = GetCharacterInfo(GetCharacterIndexFromCaptain(
         GameInfoManager::Instance()->GetTeam(0)));
     const CharacterInfo& opponent = GetCharacterInfo(GetCharacterIndexFromCaptain(
         GameInfoManager::Instance()->GetTeam(1)));
-    const char* szName = team.mName;
+    szName = team.mName;
     char buffer[64];
 
     if (NeedsAlternateColour(team, opponent))
@@ -336,43 +328,49 @@ bool FinishLoadStadiumResources()
     {
         for (int i = 0; i < 22; ++i)
         {
-            if (ShouldLoadStadiumModel(&gStadiumModelEntries[i])
-                && !gStadiumModelLoadResults[0][i].mProcessed)
+            if (ShouldLoadStadiumModel(&gStadiumModelEntries[i]))
             {
-                if (gStadiumModelLoadResults[0][i].mData != 0
-                    && gStadiumModelLoadResults[1][i].mData != 0)
+                if (gStadiumModelLoadResults[0][i].mProcessed)
                 {
-                    glBeginResource(StadiumTextureResourceLabel);
-                    glEndLoadTextureBundle(gStadiumModelLoadResults[0][i].mData,
-                        gStadiumModelLoadResults[0][i].mSize,
-                        glGetCurrentResourcePool(), 1);
-                    glEndResource();
-                    nlFree(gStadiumModelLoadResults[0][i].mData);
-                    gStadiumModelLoadResults[0][i].mData = 0;
-                    gStadiumModelLoadResults[0][i].mProcessed = true;
-
-                    glBeginResource(StadiumModelResourceLabel);
-                    unsigned long numModels = 0;
-                    glModel* models = glEndLoadModel(
-                        gStadiumModelLoadResults[1][i].mData,
-                        gStadiumModelLoadResults[1][i].mSize,
-                        &numModels, glGetCurrentResourcePool());
-                    nlFree(gStadiumModelLoadResults[1][i].mData);
-                    gStadiumModelLoadResults[1][i].mData = 0;
-                    gStadiumModelLoadResults[1][i].mProcessed = true;
-                    if (i < 21)
+                    continue;
+                }
+                else if (!gStadiumModelLoadResults[0][i].mProcessed)
+                {
+                    if (gStadiumModelLoadResults[0][i].mData != 0
+                        && gStadiumModelLoadResults[1][i].mData != 0)
                     {
-                        CreateStadiumModelInstances(i, models, numModels);
+                        glBeginResource(StadiumTextureResourceLabel);
+                        glEndLoadTextureBundle(gStadiumModelLoadResults[0][i].mData,
+                            gStadiumModelLoadResults[0][i].mSize,
+                            glGetCurrentResourcePool(), 1);
+                        glEndResource();
+                        nlFree(gStadiumModelLoadResults[0][i].mData);
+                        gStadiumModelLoadResults[0][i].mData = 0;
+                        gStadiumModelLoadResults[0][i].mProcessed = true;
+
+                        glBeginResource(StadiumModelResourceLabel);
+                        unsigned long numModels = 0;
+                        glModel* models = glEndLoadModel(
+                            gStadiumModelLoadResults[1][i].mData,
+                            gStadiumModelLoadResults[1][i].mSize,
+                            &numModels, glGetCurrentResourcePool());
+                        nlFree(gStadiumModelLoadResults[1][i].mData);
+                        gStadiumModelLoadResults[1][i].mData = 0;
+                        gStadiumModelLoadResults[1][i].mProcessed = true;
+                        if (i < 21)
+                        {
+                            CreateStadiumModelInstances(i, models, numModels);
+                        }
+                        else
+                        {
+                            CreatePowerupDrawables(models, numModels);
+                        }
+                        glEndResource();
                     }
                     else
                     {
-                        CreatePowerupDrawables(models, numModels);
+                        return false;
                     }
-                    glEndResource();
-                }
-                else
-                {
-                    return false;
                 }
             }
         }
@@ -471,18 +469,11 @@ void FinishLoadTournamentTrophy()
     gTournamentTrophyLoadResults[1].mData = 0;
     gTournamentTrophyLoadResults[1].mProcessed = true;
 
-    WorldObjectLoadContext* context
-        = (WorldObjectLoadContext*)nlMalloc(sizeof(WorldObjectLoadContext), 8, true);
-    if (context != 0)
-    {
-        new (context) WorldObjectLoadContext(pBasicStadiumInstance);
-    }
+    WorldObjectLoadContext* context = new (8, true) WorldObjectLoadContext(pBasicStadiumInstance);
 
     DrawableObject* pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
-    if (pObject != 0)
-    {
-        pObject = fn_8027A4BC(pObject, context, models, models->id);
-    }
+    pObject = new (pObject) PlanarShadowDrawable(
+        context, models, models->id);
     pObject->m_uObjectFlags |= 1;
     pBasicStadiumInstance->AddDrawableObject(pObject);
     NetTournManager::Instance()->AttachTournamentTrophy(pObject);

@@ -271,8 +271,7 @@ void StadiumSelectScene::Update(float deltaTime)
     BaseSceneHandler::Update(deltaTime);
     if (!mControlsInitialized)
     {
-        TLInstance* titles = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<>(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES");
-        TLSlide* slide = ((TLComponentInstance*)(titles == 0 ? &UnidentifiedTLComponentDefault::sInstance : titles))->GetActiveSlide();
+        TLSlide* slide = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<>(mPresentation->m_currentSlide, "Layer", "SCREEN_TITLES")->GetActiveSlide();
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;

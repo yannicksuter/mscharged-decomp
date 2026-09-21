@@ -2,8 +2,8 @@
 #include "Game/Drawable/RenderObject.h"
 #include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
-#include "unclassified/tu_80186524.h"
 #include "Game/Render/HammerObject.h"
+#include "Game/Render/RenderShadow.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 u8 lbl_806DCBE8 = 1;
@@ -75,7 +75,7 @@ void DrawableHammer::Render(const HammerObject* object) const
     matrix.m43 = mPosition.z;
     matrix.m44 = 1.0f;
 
-    drawable->SetWorldMatrix(&matrix);
+    drawable->SetWorldMatrix(matrix);
     drawable->Draw();
 
     if (lbl_806DCBE8 != 0)
@@ -83,9 +83,9 @@ void DrawableHammer::Render(const HammerObject* object) const
         nlMatrix4* source;
         glModel* model;
         model = drawable->m_pModel;
-        source = &drawable->GetWorldMatrix();
+        source = drawable->GetWorldMatrix();
         glModel* geometry = glModelDupNoStreams(model, false, 0);
-        fn_801869AC(geometry, source, 1, 0, this, 0.5f);
+        DrawPlanarShadow(geometry, *source, 1, 0, this, 0.5f);
     }
 }
 

@@ -209,6 +209,8 @@ void SHOnlineLogin::OnErrorDismissed()
     FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
 }
 
+int gOnlineErrorCode;
+
 struct OnlineErrorPopupRange
 {
     int mMinCode;

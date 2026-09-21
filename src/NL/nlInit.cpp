@@ -1,6 +1,6 @@
 #include "NL/nlMain.h"
 
-#include "Game/SAnimDecode_8030EC30.h"
+#include "Game/SAnimDecode.h"
 #include "NL/gl/glPlat.h"
 #include "NL/nlFileGC.h"
 #include "NL/nlMath.h"
