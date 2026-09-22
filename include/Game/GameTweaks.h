@@ -13,6 +13,7 @@ public:
     virtual ~GameTweaks();
     virtual void Init();
     void RegisterTweaks(bool registerTweaks);
+    void fn_800756B4();
 
 public:
     /* 0x044 */ TweakFloatBinding fGameDuration;

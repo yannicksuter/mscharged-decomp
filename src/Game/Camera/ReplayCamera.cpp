@@ -2,10 +2,13 @@
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
+#include "Game/AI/Fielder.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Field.h"
 #include "Game/MathHelpers.h"
+#include "Game/Player.h"
 #include "Game/ReplayManager.h"
+#include "Game/Team.h"
 #include "Game/Render/depthoffield.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFormat.h"
@@ -300,51 +303,63 @@ nlVector3 ReplayCamera::fn_800F6B40(int focus) const
     {
     case 0:
         result = render->mBall.mPosition;
-        result.z += 0.48f;
+        result.z += 0.35f;
         break;
+    case 3:
+    {
+        cCharacter* goalie = mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9];
+        result = goalie->mUnidentified024.m_v3Position;
+        result.z = 1.0f;
+        break;
+    }
     case 1:
     {
         DrawableCharacter* player = render->mBall.IndexToPlayer(render->mBall.mFlags.bits.ownerIndex);
-        if (player == NULL)
+        if (player != NULL && player->character != NULL
+            && player->character->m_eClassType == FIELDER)
         {
-            player = render->mBall.IndexToPlayer(render->mBall.mFlags.bits.previousOwnerIndex);
-        }
-        if (player != NULL)
-        {
-            result = player->position;
-            result.z += player->height;
+            nlVector3 bip01Pos = player->position;
+            bip01Pos.z += player->height + 1.0f;
+            result = bip01Pos;
         }
         else
         {
-            result = render->mBall.mPosition;
+            player = render->mBall.IndexToPlayer(render->mBall.mFlags.bits.previousOwnerIndex);
+            if (player != NULL && player->character != NULL
+                && player->character->m_eClassType == FIELDER)
+            {
+                nlVector3 bip01Pos = player->position;
+                bip01Pos.z += player->height + 1.0f;
+                result = bip01Pos;
+            }
+            else
+            {
+                result = render->mBall.mPosition;
+            }
         }
         break;
     }
     case 2:
-        result.x = cField::GetGoalLineX(GetSideDirection(mSideOfInterest));
-        result.x += result.x > 0.0f ? 10.0f : -10.0f;
-        break;
-    case 3:
     {
-        cCharacter* goalie = g_pCharacters[mSideOfInterest == 0 ? 8 : 9];
-        if (goalie != NULL)
-        {
-            result = goalie->mUnidentified024.m_v3Position;
-            result.z = 1.0f;
-        }
+        nlVector3 netPos = { 0.0f, 0.0f, 1.0f };
+        netPos.x = cField::GetGoalLineX(GetSideDirection(mSideOfInterest));
+        if (netPos.x > 0.0f)
+            netPos.x += 3.0f;
+        else
+            netPos.x -= 3.0f;
+        result = netPos;
         break;
     }
     case 4:
     {
-        cCharacter* captain = g_pCharacters[mSideOfInterest == 0 ? 0 : 5];
-        if (captain != NULL)
-        {
-            result = captain->mUnidentified024.m_v3Position;
-            result.z = 1.0f;
-        }
+        cPlayer* goalie = (cPlayer*)(mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9]);
+        cFielder* captain = goalie->m_pTeam->GetCaptain();
+        result = captain->mUnidentified024.m_v3Position;
+        result.z = 1.0f;
         break;
     }
     case 5:
+        nlVec3Set(result, 0.0f, 0.0f, 0.0f);
         break;
     }
     return result;

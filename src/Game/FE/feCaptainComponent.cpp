@@ -4,11 +4,14 @@
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FE/feFinder.inl"
+#include "Game/FE/fePresentation.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feDPD.h"
+#include "Game/BaseSceneHandler.inl"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/GameSceneManager.h"
+#include "Game/BaseSceneHandler.inl"
 #include "Game/EventDataTypes.h"
 #include "Game/EventRegistry.h"
 #include "Game/OverlayManager.h"
@@ -360,7 +363,7 @@ static inline bool SidekickFacingFlag(int sidekick)
 
 static inline TLImageInstance* FindSidekickImage(int sidekick, int captain)
 {
-    FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->mPresentation;
+    FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->GetPresentation();
     const CharacterInfo& sidekickInfo = GetCharacterInfo(GetCharacterIndexFromSidekick(sidekick));
     const CharacterInfo& captainInfo = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     char name[64];
@@ -395,7 +398,7 @@ static inline void SetSidekickImage(const TU801DA134Component* component, TLImag
 
 static inline TLImageInstance* FindCaptainImage(int captain, bool left)
 {
-    FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->mPresentation;
+    FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->GetPresentation();
     const CharacterInfo& captainInfo = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     TLImageInstance* source = 0;
     char name[64];
@@ -412,6 +415,19 @@ static inline TLImageInstance* FindCaptainImage(int captain, bool left)
     return source;
 }
 
+static inline void SetCaptainImage(const TU801DA134Component* component, TLImageInstance* image, int captain)
+{
+    if (image != 0 && captain != -1)
+    {
+        bool left = component->mSide == 0;
+        TLImageInstance* source = FindCaptainImage(component->mUnidentified14, left);
+        if (source->m_pTextureResource != 0)
+        {
+            image->m_pTextureResource = source->m_pTextureResource;
+        }
+    }
+}
+
 void TU801DA134Component::fn_801DB69C(float)
 {
     SetSidekickImage(this, fn_801DA924(0, "off"), mSidekicks[0]);
@@ -423,17 +439,7 @@ void TU801DA134Component::fn_801DB69C(float)
     SetSidekickImage(this, fn_801DA924(0, "down"), mSidekicks[0]);
     SetSidekickImage(this, fn_801DA924(1, "down"), mSidekicks[1]);
     SetSidekickImage(this, fn_801DA924(2, "down"), mSidekicks[2]);
-    int captain = mUnidentified14;
-    TLImageInstance* image = fn_801DA924(3, 0);
-    if (image != 0 && captain != -1)
-    {
-        bool left = mSide == 0;
-        TLImageInstance* source = FindCaptainImage(mUnidentified14, left);
-        if (source->m_pTextureResource != 0)
-        {
-            image->m_pTextureResource = source->m_pTextureResource;
-        }
-    }
+    SetCaptainImage(this, fn_801DA924(3, 0), mUnidentified14);
     fn_801DAFC8();
 }
 
@@ -639,7 +645,7 @@ inline void TU801DE42CComponent::SetValue(int value)
             char name[50];
             nlSNPrintf(name, sizeof(name), "attributes_bar%d", i);
             TLImageInstance* image = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
-                mComponent->GetActiveSlide(), InlineHasher(nlStringLowerHash(name)));
+                mComponent->GetActiveSlide(), name);
             if (image != 0)
             {
                 image->SetAssetColour(i <= value ? sAttributeBarFilledColour : sAttributeBarEmptyColour);
@@ -774,7 +780,7 @@ void TU801DCD9CComponent::fn_801DEDD0(int captain, int, unsigned long flag)
         BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene(SCENE_CHOOSE_CAPTAINS_STRIKER_CUP);
         if (scene != 0)
         {
-            TLSlide* slide = scene->mPresentation->m_currentSlide;
+            TLSlide* slide = scene->mPresentation->GetActiveSlide();
             mScrollText.SetClippingTextInstance(FEFinder<TLTextInstance, 3>::FindOrDefault(slide, "Layer", "Description_clip"));
         }
         return;

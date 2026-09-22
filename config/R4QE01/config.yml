@@ -81,6 +81,14 @@ block_relocations:
   - { source: 0x802D0474 }
   - { source: 0x802D047C }
   - { source: 0x802D049C }
+  # World::LoadChunks compares these chunk IDs; their values overlap .text.
+  - { source: 0x80341060 }
+  - { source: 0x80341068 }
+  - { source: 0x80341070 }
+  - { source: 0x803410AC }
+  - { source: 0x803410BC }
+  - { source: 0x803410CC }
+  - { source: 0x803410EC }
   # OSInit's MEM1 arena-lo default is the constant 0x80004000 (donor-supported
   # source spelling); it is not a reference to the .init routine at that address
   - { source: 0x803B354C }

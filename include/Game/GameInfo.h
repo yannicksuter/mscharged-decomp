@@ -110,7 +110,7 @@ public:
     short GetPlayingSide(unsigned short pad) const;
     void SetPlayingSide(unsigned short pad, short side);
     void ResetPlayingSides();
-    void SetMode(int mode, u8 flag);
+    void SetMode(int mode, bool flag);
 
     unsigned long GetMemoryCardDataSize() const;
     void GetMemoryCardData(void* data) const;
@@ -195,7 +195,7 @@ public:
     /* 0x0094 */ int mCurrentDifficulty[2];
     /* 0x009C */ UserInfo mUserInfo;
     /* 0x011C */ int mCurrentMode;
-    /* 0x0120 */ u8 mIsOnlineMode;
+    /* 0x0120 */ bool mIsOnlineMode;
     /* 0x0121 */ u8 unknown_0x121;
     /* 0x0122 */ u8 mIsInStrikers101Mode;
     /* 0x0123 */ u8 unknown_0x123;

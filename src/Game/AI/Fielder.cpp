@@ -165,6 +165,16 @@ static LooseBallContactAnimInfo gOneTimerLeadGroundContactAnims[2] = {
     { 0x49, 6.0f, 0x4000, 0xC000 },
 };
 
+static inline cFielder* GetAIOrderedFielder(cTeam* pTeam, s32 i)
+{
+    return pTeam->m_pAIOrderedFielders[i];
+}
+
+static inline s16 GetAngleDifference(u32 a, u32 b)
+{
+    return (s16)(a - b);
+}
+
 cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     const int* nModelID, cSHierarchy* pHierarchy,
     cAnimInventory* pAnimInventory,
@@ -1841,19 +1851,33 @@ void cFielder::ShootBallDueToContact(unsigned short aShootDirection)
 
 void cFielder::DoClearBall()
 {
+    cFielder* pFielder;
+    bool bCanReceivePass;
+    bool bCondition6;
+    bool bCondition5;
+    bool bCondition4;
+    bool bCondition3;
+    bool bCondition2;
+    bool bCondition1;
+    bool bCondition0;
+    u16 aClearingAngle;
+    int i;
     nlVector3 v3Target;
     nlVector3 v3ClearBallVelocity;
+    float fAbsPosition = fabsf(mUnidentified024.m_v3Position.x);
     float fPositionValue = lbl_806DB7F0 * InterpolateRangeClamped(0.0f, 1.0f,
-        cField::GetGoalLineX(1U), 0.0f, nlAbs(mUnidentified024.m_v3Position.x));
+        cField::GetGoalLineX(1U), 0.0f, fAbsPosition);
     float fBallChargeValue = (1.0f - lbl_806DB7F0) * fn_800156A8(g_pBall);
     float fDesiredTime = Interpolate(lbl_806DB7E0, lbl_806DB7E4,
         fBallChargeValue + fPositionValue);
-    float fShotMeterValue = lbl_806DB7F4 * m_pShotMeter->m_fSpeedValue;
+    ShotMeter* pShotMeter = m_pShotMeter;
+    float fShotMeterSpeed = pShotMeter->m_fSpeedValue;
+    float fShotMeterValue = lbl_806DB7F4 * fShotMeterSpeed;
     float fPlayerValue = (1.0f - lbl_806DB7F4) * fn_8002BE38(m_pTweaks);
     float fClearDistance = Interpolate(lbl_806DB7E8, lbl_806DB7EC,
         fShotMeterValue + fPlayerValue);
 
-    u16 aClearingAngle = mUnidentified024.m_aActualFacingDirection;
+    aClearingAngle = mUnidentified024.m_aActualFacingDirection;
     if (m_pController != NULL)
     {
         if (m_pController->GetMovementStickMagnitude() > 0.01f)
@@ -1864,20 +1888,120 @@ void cFielder::DoClearBall()
     else
     {
         aClearingAngle = (u16)nlRandom(0xFFFF);
-        for (int i = 0; i < 4; i++)
+        for (i = 0; i < 4; i++)
         {
-            cFielder* pFielder = m_pTeam->m_pAIOrderedFielders[i];
-            if (pFielder != this && pFielder->CanReceivePass()
-                && AIsgn(pFielder->mUnidentified024.m_v3Position.x) != AIsgn(mUnidentified024.m_v3Position.x))
+            pFielder = GetAIOrderedFielder(m_pTeam, i);
+            if (pFielder != this)
             {
-                if (nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
-                        mUnidentified024.m_v3Position), true) > 0.5f * fClearDistance)
+                bCanReceivePass = false;
+                bCondition6 = false;
+                bCondition5 = false;
+                bCondition4 = false;
+                bCondition3 = false;
+                bCondition2 = false;
+                bCondition1 = false;
+                bCondition0 = false;
+
+                if (!pFielder->IsFallenDown())
                 {
-                    nlVector3 v3Direction;
-                    nlVec3Sub(v3Direction, pFielder->mUnidentified024.m_v3Position, mUnidentified024.m_v3Position);
-                    nlPolar pDirection;
-                    nlCartesianToPolar(pDirection, v3Direction);
-                    aClearingAngle = pDirection.a;
+                    bool bAllowedAction = true;
+                    unsigned int nActionIndex
+                        = (unsigned int)(pFielder->m_eActionState - 1);
+                    if (nActionIndex <= 0x1F
+                        && ((1U << nActionIndex) & 0x90000001U) != 0)
+                    {
+                        bAllowedAction = false;
+                    }
+
+                    if (bAllowedAction)
+                    {
+                        bCondition0 = true;
+                    }
+                }
+
+                if (bCondition0
+                    && pFielder->m_eActionState != (eFielderActionState)0x21)
+                {
+                    bCondition1 = true;
+                }
+
+                if (bCondition1)
+                {
+                    bool bExcluded = pFielder->fn_8003EA44();
+                    if (!bExcluded)
+                    {
+                        bCondition2 = true;
+                    }
+                }
+
+                if (bCondition2)
+                {
+                    bool bExcluded = pFielder->fn_8003EA6C();
+                    if (!bExcluded)
+                    {
+                        bCondition3 = true;
+                    }
+                }
+
+                if (bCondition3)
+                {
+                    bool bExcluded
+                        = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
+                       && fn_80319FEC(pFielder->mUnidentified428->mUnidentified18, 0x17);
+                    if (!bExcluded)
+                    {
+                        bCondition4 = true;
+                    }
+                }
+
+                if (bCondition4)
+                {
+                    bool bExcluded
+                        = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
+                       && fn_80319FEC(pFielder->mUnidentified428->mUnidentified18, 0x17);
+                    if (!bExcluded)
+                    {
+                        bCondition5 = true;
+                    }
+                }
+
+                if (bCondition5)
+                {
+                    bool bExcluded = pFielder->fn_8003E8F4();
+                    if (!bExcluded)
+                    {
+                        bCondition6 = true;
+                    }
+                }
+
+                if (bCondition6)
+                {
+                    DesireFrozen* pAction = (DesireFrozen*)
+                        fn_80319FC0(pFielder->mUnidentified428->mUnidentified18, 0x1D);
+                    bool bActionActive = false;
+                    if (pAction != 0 && pAction->mUnidentifiedActive
+                        && pAction->meFrozenState != 0)
+                    {
+                        bActionActive = true;
+                    }
+                    if (!bActionActive)
+                    {
+                        bCanReceivePass = true;
+                    }
+                }
+
+                if (bCanReceivePass
+                    && AIsgn(pFielder->mUnidentified024.m_v3Position.x) != AIsgn(mUnidentified024.m_v3Position.x))
+                {
+                    if (nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
+                            mUnidentified024.m_v3Position), true) > 0.5f * fClearDistance)
+                    {
+                        nlVector3 v3Direction;
+                        nlVec3Sub(v3Direction, pFielder->mUnidentified024.m_v3Position, mUnidentified024.m_v3Position);
+                        nlPolar pDirection;
+                        nlCartesianToPolar(pDirection, v3Direction);
+                        aClearingAngle = pDirection.a;
+                    }
                 }
             }
         }
@@ -1902,9 +2026,12 @@ void cFielder::DoClearBall()
         nlCartesianToPolar(pClearingTopAngle, v3Top);
         nlCartesianToPolar(pClearingBottomAngle, v3Bottom);
         nlCartesianToPolar(pNet, v3Net);
-        s16 nDelta = nlAngleDiff(pNet.a, aClearingAngle);
-        s16 nTopDelta = nlAngleDiff(pNet.a, pClearingTopAngle.a);
-        s16 nBottomDelta = nlAngleDiff(pNet.a, pClearingBottomAngle.a);
+        u32 aNet = pNet.a;
+        u32 aTop = pClearingTopAngle.a;
+        u32 aBottom = pClearingBottomAngle.a;
+        s16 nDelta = GetAngleDifference(aNet, aClearingAngle);
+        s16 nBottomDelta = GetAngleDifference(aNet, aBottom);
+        s16 nTopDelta = GetAngleDifference(aNet, aTop);
         if (abs_ang16(nDelta) < abs_ang16(nTopDelta)
             && abs_ang16(nDelta) < abs_ang16(nBottomDelta))
         {
@@ -1919,8 +2046,8 @@ void cFielder::DoClearBall()
             nlPolar pBottomPost;
             nlCartesianToPolar(pTopPost, v3TopPost);
             nlCartesianToPolar(pBottomPost, v3BottomPost);
-            s16 nTopPostDelta = nlAngleDiff(pNet.a, pTopPost.a);
-            s16 nBottomPostDelta = nlAngleDiff(pNet.a, pBottomPost.a);
+            s16 nTopPostDelta = GetAngleDifference(pNet.a, pTopPost.a);
+            s16 nBottomPostDelta = GetAngleDifference(pNet.a, pBottomPost.a);
             if (abs_ang16(nDelta) < abs_ang16(nTopPostDelta)
                 && abs_ang16(nDelta) < abs_ang16(nBottomPostDelta))
             {
@@ -1936,8 +2063,8 @@ void cFielder::DoClearBall()
         }
         else
         {
-            nBottomDelta = nlAngleDiff(pClearingBottomAngle.a, aClearingAngle);
-            nTopDelta = nlAngleDiff(pClearingTopAngle.a, aClearingAngle);
+            nBottomDelta = GetAngleDifference(aBottom, aClearingAngle);
+            nTopDelta = GetAngleDifference(aTop, aClearingAngle);
             aClearingAngle = abs_ang16(nTopDelta) < abs_ang16(nBottomDelta)
                 ? pClearingTopAngle.a : pClearingBottomAngle.a;
         }

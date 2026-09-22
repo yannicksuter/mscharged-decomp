@@ -9,6 +9,7 @@
 
 class cPlayer;
 class cTeam;
+class FuzzyVariant;
 
 enum eVariantType
 {
@@ -63,6 +64,8 @@ public:
         Reset();
         CopyFrom(other);
     }
+
+    Variant(const FuzzyVariant& other);
 
     ~Variant()
     {

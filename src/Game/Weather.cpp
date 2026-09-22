@@ -606,7 +606,7 @@ void Windy::Start()
 {
     Reset();
     float range = 65536.0f * (gWindAngleRange / 360.0f);
-    aWindDirection = (u16)(s32)(nlRandomf(range) - 0.5f * range - 16384.0f);
+    aWindDirection = (u16)(s32)(nlRandomf(range) - range / 2.0f - 16384.0f);
     if (nlRandomf(65536.0f) < 32768.0f)
     {
         aWindDirection += 32768.0f;
@@ -623,8 +623,7 @@ void Windy::Start()
     nlVec3Set(velocity, 0.0f, 0.0f, 0.0f);
     float effectSpeed = 20.0f;
     ApplyWindForce(&direction);
-    float inverseLength = nlRecipSqrt(nlVec3LengthSquared(direction), true);
-    nlVec3Scale(direction, inverseLength);
+    nlVec3Normalize(direction, direction);
     nlVec3Scale(direction, direction, effectSpeed);
     nlVec3Sub(position1, position1, direction);
     nlVec3Sub(position2, position2, direction);
@@ -639,7 +638,7 @@ void Windy::Start()
     if (!gDisableWeather && !GameInfoManager::Instance()->IsRule0x4Equal1()
         && value <= gDebrisChance && GameInfoManager::Instance()->GetStadium() == 11)
     {
-        if (fabsf(angle - 90.0f) < gWindAngleRange * 0.5f || fabsf(angle - 270.0f) < gWindAngleRange * 0.5f)
+        if (fabsf(angle - 90.0f) < gWindAngleRange / 2.0f || fabsf(angle - 270.0f) < gWindAngleRange / 2.0f)
         {
             eLastDebrisType = eDebrisType;
             float index = 2.0f * nlRandomf(1.0f);
@@ -647,7 +646,7 @@ void Windy::Start()
             eDebrisType = (int)index;
             UnidentifiedNPC_801B43F8* npc = gNPCManager->fn_801A9DE0(eDebrisType);
             int i = 0;
-            while ((npc->mbIsVisible == 1 || eDebrisType == eLastDebrisType) && i < 3)
+            while ((npc->mbIsVisible == 1 || eDebrisType == eLastDebrisType) && i < 3 && i > -1)
             {
                 eDebrisType = (eDebrisType + 1) % 3;
                 npc = gNPCManager->fn_801A9DE0(eDebrisType);
@@ -658,8 +657,7 @@ void Windy::Start()
             {
                 nlVector3 debrisVelocity = GetDebrisVelocity(direction);
                 nlVector3 debrisPosition = position1;
-                inverseLength = nlRecipSqrt(nlVec3LengthSquared(direction), true);
-                nlVec3Scale(direction, inverseLength);
+                nlVec3Normalize(direction, direction);
                 float distance = gDebrisMinTravelTime + nlRandomf(gDebrisMaxTravelTime - gDebrisMinTravelTime);
                 nlVector3 offset;
                 nlVec3Scale(offset, debrisVelocity, distance);

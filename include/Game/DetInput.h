@@ -24,13 +24,17 @@ public:
     bool IsPressed(int button, bool remap);
     bool JustPressed(int button, bool remap);
     bool JustReleased(int button, bool remap);
+    float AnalogLeftX() { return m_AnalogLeftX; }
+    float AnalogLeftY() { return m_AnalogLeftY; }
+    float AnalogRightX() { return m_AnalogRightX; }
+    float AnalogRightY() { return m_AnalogRightY; }
     void UpdatePolarAnalog();
     void UpdateButtonStateTicks();
     int GetButtonStateTicks(int button, bool remap);
     void ResetButtonStateTicks(int button, bool remap);
     void CopyState(const DetInput& input);
     void ReadFromPad(cGlobalPad* pad);
-    int GetPadID();
+    int GetPadID() const;
 
     /* 0x00 */ float m_AnalogLeftX;
     /* 0x04 */ float m_AnalogLeftY;

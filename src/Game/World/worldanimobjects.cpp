@@ -1,5 +1,6 @@
 #include "Game/World/WorldDrawable.h"
 #include "Game/World/WorldVisibility.h"
+#include "Game/World/WorldAnimObjects.h"
 #include "Game/World/worldanim.h"
 #include "Game/World/WorldPhysicsDescription.h"
 
@@ -33,59 +34,10 @@ struct WorldPhysicsOwner_80342170
     PhysicsObject* m_pPhysicsObject;
 };
 
-struct WorldAnimDrawable_80343A40
-{
-    u8 m_pad00[0x10];
-    World* m_pWorld;
-    int m_nAnimNode;
-    WorldAnimController* m_pAnimController;
-    u8 m_pad1C[0x04];
-    nlMatrix4 m_transform;
-    float m_fRadius;
-    glModel* m_pModel;
-    u8 m_pad68[0x0C];
-    void* m_pEmissionController;
-    u8 m_pad78[0x08];
-    PhysicsObject* m_pPhysicsObject;
-};
-
 struct WorldAnimBinding_803438FC
 {
     unsigned long m_uDrawableHash;
     unsigned long m_uNodeHash;
-};
-
-class WorldAnimObject_803437C8
-{
-public:
-    /* 0x00 */ void* m_pVTable;
-    /* 0x04 */ unsigned long m_uHashID;
-    /* 0x08 */ u8 m_pad08[0x08];
-    /* 0x10 */ World* m_pWorld;
-    /* 0x14 */ int m_nAnimNode;
-    /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ u8 m_pad1C[0x44];
-    /* 0x60 */ int m_nBindings;
-    /* 0x64 */ unsigned long m_uHierarchyHash;
-    /* 0x68 */ WorldAnimBinding_803438FC* m_pBindings;
-    /* 0x6C */ u8 m_pad6C[0x04];
-    /* 0x70 */ int m_nAnimations;
-    /* 0x74 */ unsigned long* m_pAnimationHashes;
-    /* 0x78 */ u8 m_pad78[0x08];
-    /* 0x80 */ ePlayMode m_ePlayMode;
-    /* 0x84 */ float m_fAnimationSpeed;
-    /* 0x88 */ float m_fAnimationTime;
-};
-
-struct WorldVertexAnimDrawable_80343E3C
-{
-    glModel* GetModel() const { return m_pModel; }
-
-    /* 0x00 */ u8 m_pad00[0x10];
-    /* 0x10 */ World* m_pWorld;
-    /* 0x14 */ u8 m_pad14[0x0C];
-    /* 0x20 */ glModel* m_pModel;
-    /* 0x24 */ WorldVisibilityNode* m_pVertexAnimNode;
 };
 
 WorldVisibilityNode* FindWorldVisibilityNode(
@@ -325,47 +277,8 @@ void CreateWorldVertexAnimDrawable(
     pObject->m_pModel = glModelDupNoStreams(pObject->GetModel(),
         true, pContext->m_pWorld->m_pResource);
 
-    WorldVisibilityNode* pNode
-        = pContext->m_pWorld->m_pVisibilityTree;
-    unsigned long uModelHash = pObject->GetModel()->id;
-    for (int i = 0; i < pNode->mNumModelHashes; ++i)
-    {
-        if (pNode->mModelHashes[i] == uModelHash)
-        {
-            pObject->m_pVertexAnimNode = pNode;
-            return;
-        }
-    }
-
-    WorldVisibilityNode* pFound = 0;
-    for (int i = 0; i < 2 && pFound == 0; ++i)
-    {
-        WorldVisibilityNode* pChild
-            = pNode->mChildren[i];
-        if (pChild == 0)
-        {
-            continue;
-        }
-
-        for (int j = 0; j < pChild->mNumModelHashes; ++j)
-        {
-            if (pChild->mModelHashes[j] == uModelHash)
-            {
-                pFound = pChild;
-                break;
-            }
-        }
-
-        for (int j = 0; j < 2 && pFound == 0; ++j)
-        {
-            if (pChild->mChildren[j] != 0)
-            {
-                pFound = FindWorldVisibilityNode(
-                    pObject, pChild->mChildren[j]);
-            }
-        }
-    }
-    pObject->m_pVertexAnimNode = pFound;
+    pObject->m_pVertexAnimNode = FindWorldVisibilityNode(
+        pObject, pContext->m_pWorld->m_pVisibilityTree);
 }
 
 WorldVisibilityNode* FindWorldVisibilityNode(
@@ -429,10 +342,11 @@ bool IsWorldVertexAnimDrawableVisible(
 }
 
 extern "C" void fn_80344144(
-    WorldAnimDrawable_80343A40* pObject, void*)
+    WorldPhysicsDrawable_80534448* pObject,
+    WorldObjectLoadContext*)
 {
     pObject->m_pPhysicsObject = fn_80341EEC(
-        (WorldPhysicsDescription_80341EEC*)&pObject->m_transform, 0);
+        &pObject->m_Description, 0);
 }
 
 extern "C" void fn_8034417C(WorldPhysicsOwner_80342170* pObject)
@@ -458,8 +372,6 @@ extern "C" void fn_803441C4(void*)
 }
 
 static bool s_drawEffectBounds;
-static const nlColour s_effectBoundsColour
-    = { 0xFF, 0xFF, 0x80, 0xFF };
 
 extern "C" void fn_803441C8(WorldEffect* pEffect,
     WorldObjectLoadContext* pContext)
@@ -631,32 +543,41 @@ extern "C" void fn_80344798(EmissionController& controller)
     }
 }
 
+static const nlColour s_effectBoundsColour
+    = { 0xFF, 0xFF, 0x80, 0xFF };
+
 void WorldEffect::UpdateVisibility(EmissionController* pController)
 {
-    bool bVisible;
+    const nlVector3& position = pController->GetPosition();
+    float radius = m_fEmissionRadius;
     if (!m_bActive)
     {
-        bVisible = false;
+        pController->m_bVisible = false;
     }
     else if (m_bAlwaysVisible == true)
     {
-        bVisible = true;
+        pController->m_bVisible = true;
     }
     else
     {
         const nlVector4* pCullData = m_pWorld->m_pOpaqueView
                                          ->m_Interface->GetShadowMatrix();
-        bVisible = ClassifySphereInFrustum(pCullData,
-                       &pController->GetPosition(),
-                       m_fEmissionRadius)
-            && m_pWorld->m_bRenderingEnabled;
+        if (ClassifySphereInFrustum(pCullData, &position, radius)
+                == FRUSTUM_OUTSIDE
+            || !m_pWorld->m_bRenderingEnabled)
+        {
+            pController->m_bVisible = false;
+        }
+        else
+        {
+            pController->m_bVisible = true;
+        }
     }
-    pController->m_bVisible = bVisible;
 
     if (s_drawEffectBounds)
     {
-        g_ShapeRenderer.DrawSphere(pController->GetPosition(),
-            s_effectBoundsColour, m_fEmissionRadius);
+        nlColour colour = s_effectBoundsColour;
+        g_ShapeRenderer.DrawSphere(position, colour, radius);
     }
 }
 

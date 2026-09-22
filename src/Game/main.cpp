@@ -9,6 +9,8 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Debug/FrameCounter.h"
 #include "Game/Effects/EmissionManager.h"
+#include "Game/Effects/ParticleSystem.h"
+#include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "Game/Task/FrontEndTask.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/feHelpFuncs_decl.h"
@@ -111,7 +113,6 @@ extern "C"
     void fn_801BF87C(int);
     void fn_801BFA84(int);
     void fn_802E22D8(void*, float*, void*, void*, int, int, int);
-    void fn_802A8278(void*, int, int, void*);
 
     void fn_801BFB08();
     void fn_8013D7A0();
@@ -213,8 +214,9 @@ static TweakValueBool sUseCheckerTextureForWarble(
 static void PreInitFS();
 static void Initialize();
 static void AddTasks();
-extern "C" void fn_8011D3CC(void*, void*,
-    UnidentifiedWarbleVertexList*, int, int, int);
+extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter*, ParticleSystem*,
+    nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
+    const nlMatrix4*);
 extern "C" void fn_8011D5B0(void*, void*,
     UnidentifiedWarbleVertexList*, int, int, int);
 
@@ -518,8 +520,14 @@ extern "C" bool fn_8011D1BC(void* source, void*,
     u8 writer[0x18];
     if (sRenderWarbleToParticleView)
     {
-        fn_8011D3CC(writer, source, vertices, parameter0, parameter1,
-            parameter2);
+        fn_8011D3CC(static_cast<GLTexturedColourMeshWriter*>(
+                        static_cast<void*>(writer)),
+            static_cast<ParticleSystem*>(source),
+            static_cast<nlDLListSlotPool<Particle*>*>(
+                static_cast<void*>(vertices)),
+            *reinterpret_cast<const nlVector3*>(parameter0),
+            *reinterpret_cast<const nlVector3*>(parameter1),
+            reinterpret_cast<const nlMatrix4*>(parameter2));
     }
     else
     {
@@ -529,21 +537,36 @@ extern "C" bool fn_8011D1BC(void* source, void*,
     return true;
 }
 
-extern "C" void fn_8011D3CC(void* writer, void* source,
-    UnidentifiedWarbleVertexList* vertices, int parameter0, int parameter1,
-    int parameter2)
+extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter* writer,
+    ParticleSystem* source, nlDLListSlotPool<Particle*>* vertices,
+    const nlVector3& viewRight, const nlVector3& viewUp,
+    const nlMatrix4* pCoordSys)
 {
-    UnidentifiedWarbleSource* warbleSource =
-        static_cast<UnidentifiedWarbleSource*>(source);
-    fn_802A8278(writer, warbleSource->mVertexCount * 4, 3, 0);
-
-    UnidentifiedWarbleVertex* vertex = vertices->first;
-    while (vertex != 0)
+    ParticleReturn ret;
+    if (writer->Begin(source->mUnidentified0BC * 4, GLP_QuadList, 0))
     {
-        float transformed[20];
-        fn_802E22D8(source, transformed, vertex->source, source, parameter0,
-            parameter1, parameter2);
-        vertex = vertex->next;
+        nlDLListIterator<Particle*> iterator = vertices->Begin();
+        while (iterator.hasNext())
+        {
+            Particle* pPart = *iterator;
+            source->UpdateParticle(&ret, pPart, source->m_pTemplate,
+                viewRight, viewUp, pCoordSys);
+            for (int i = 0; i < 4; ++i)
+            {
+                writer->Texcoord(ret.texcoord[i]);
+                writer->Colour(ret.c);
+                writer->Vertex(ret.position[i]);
+            }
+            iterator.Step();
+        }
+
+        glTextureBinding* textureState =
+            static_cast<glTextureBinding*>(
+                writer->GetModel()->packets->materialParameters);
+        textureState->textureIndex = source->mUnidentified09C;
+        textureState->SetWrapS(false);
+        textureState->SetWrapT(false);
+        textureState->unknown07 = 0;
     }
 }
 

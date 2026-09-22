@@ -118,7 +118,7 @@ inline bool AudioEffectParameter::IsFinished()
 {
     return m_State.m_Flags.bytes[0]
         ? ((AudioEffectBase*)m_State.m_Current.pointer)->m_Enabled
-        : (GetTargetScalar() != 0.0f
+        : (GetTargetScalar()
             && (m_State.m_Current.scalar - GetTargetScalar() > 0.0001f
                 || nlNear(m_State.m_Current.scalar, GetTargetScalar())));
 }

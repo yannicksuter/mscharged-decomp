@@ -13,13 +13,13 @@ public:
     {
     }
 
-    virtual ~DesireSlideAttack();
+    virtual inline ~DesireSlideAttack();
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void Update(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
 
 private:
     cFielder* mpTarget;

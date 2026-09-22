@@ -23,6 +23,7 @@ void MATH_CalcSHA1(void* Message_Digest, const void* buf, u32 size)
     unsigned int d;
     unsigned int e;
     unsigned int w[80];
+    unsigned int* second_final_block;
     unsigned int* src;
     unsigned int* dst;
     unsigned int f;
@@ -64,6 +65,7 @@ void MATH_CalcSHA1(void* Message_Digest, const void* buf, u32 size)
     finalblock[i++] = size;
 
     len = (i == 64) ? ((len + 8) | 0x3f) : (((len + 8) | 0x3f) + 1);
+    second_final_block = (unsigned int*)(finalblock + 64);
 
     while (len > 0)
     {
@@ -73,7 +75,7 @@ void MATH_CalcSHA1(void* Message_Digest, const void* buf, u32 size)
             src = (unsigned int*)finalblock;
             break;
         case 64:
-            src = (unsigned int*)(finalblock + 64);
+            src = second_final_block;
             break;
         case 128:
             src = (unsigned int*)finalblock;
@@ -90,10 +92,24 @@ void MATH_CalcSHA1(void* Message_Digest, const void* buf, u32 size)
             *dst++ = *src++;
         }
 
-        for (i = 16; i < 80; i++)
+        for (i = 0; i < 8; i++)
         {
-            tmp = w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16];
-            w[i] = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
+            tmp = dst[-3] ^ dst[-8] ^ dst[-14] ^ dst[-16];
+            *dst++ = ROTL32(tmp, 1);
         }
 
         a = h0;

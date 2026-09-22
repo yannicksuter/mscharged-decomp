@@ -1,5 +1,6 @@
 #include "Game/FE/tlInstance.h"
 
+#include "NL/nlMath.h"
 #include "NL/nlString.h"
 
 #include <math.h>
@@ -109,32 +110,18 @@ float TLInstance::GetUVHeight() const
 bool TLInstance::IsValidAtTime(float fCurrentTime)
 {
     float sinceStart;
-    float duration;
     float elapsed;
+    float duration;
     bool valid;
 
-    valid = true;
     sinceStart = fCurrentTime - m_fStartTime;
-    if (!(sinceStart > 0.0001f))
-    {
-        if (!((float)fabs(sinceStart) <= 0.0001f))
-        {
-            valid = false;
-        }
-    }
+    valid = sinceStart > 0.0001f || nlNear(fCurrentTime, m_fStartTime);
 
     if (valid != 0)
     {
-        valid = 1;
         duration = m_fDuration;
         elapsed = fCurrentTime - m_fStartTime;
-        if (!((m_fDuration - elapsed) > 0.0001f))
-        {
-            if (!((float)fabs(elapsed - duration) <= 0.0001f))
-            {
-                valid = false;
-            }
-        }
+        valid = m_fDuration - elapsed > 0.0001f || nlNear(elapsed, duration);
 
         if (valid)
         {

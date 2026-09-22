@@ -133,7 +133,7 @@ class AsyncManager
 public:
     AsyncEntry* AddEntry(DolphinFile* pFile, ReadAsyncCallback pFunc, void* pBuffer,
         unsigned long position, unsigned long uSize, unsigned long uParam, AsyncReadPhase phase);
-    int Service();
+    void Service();
     void CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback callback);
     bool Contains(AsyncEntry* entry) const;
     bool Cancel(AsyncEntry* entry, CancelAsyncCallback callback);
@@ -261,8 +261,9 @@ u32 DolphinFile::FileSize(unsigned int* size)
 
 void DolphinFile::Read(void* buffer, unsigned int size, unsigned long bufferSize)
 {
-    unsigned long alignedSize;
+    AsyncEntry* finalEntry;
     unsigned long tailSize;
+    unsigned long alignedSize;
 
     if (bufferSize > size)
     {
@@ -271,12 +272,11 @@ void DolphinFile::Read(void* buffer, unsigned int size, unsigned long bufferSize
     }
     else
     {
-        tailSize = size & 31;
-        alignedSize = size - tailSize;
+        alignedSize = size - (size & 31);
+        tailSize = size - alignedSize;
     }
 
     unsigned long position = m_Position;
-    AsyncEntry* finalEntry;
     if (alignedSize != 0)
     {
         finalEntry = s_pAsyncManager->AddEntry(this, 0, buffer, position, alignedSize, 0, tailSize == 0 ? READ_COMPLETE : READ_HEAD);
@@ -359,86 +359,98 @@ AsyncEntry* AsyncManager::AddEntry(DolphinFile* pFile, ReadAsyncCallback pFunc,
     return pEntry;
 }
 
-int AsyncManager::Service()
+void AsyncManager::Service()
 {
     AsyncEntry* entry = m_activeEntryList == 0 ? 0 : m_activeEntryList->m_next;
     bool stop = false;
 
-    while (m_activeEntryList != 0 && !stop)
+    while (m_activeEntryList != 0)
     {
-        int status = DVDGetCommandBlockStatus(&entry->mFileInfo.block);
-        if (status == DVD_STATE_BUSY || status == DVD_STATE_WAITING)
+        switch (DVDGetCommandBlockStatus(&entry->mFileInfo.block))
         {
+        case DVD_STATE_BUSY:
+        case DVD_STATE_WAITING:
             stop = true;
-            continue;
-        }
-        if (status != DVD_STATE_IDLE)
+            break;
+        case DVD_STATE_IDLE:
         {
-            CheckDVDStatus();
-            continue;
-        }
-
-        if (sServicingReads)
-        {
-            AsyncEntry* last = m_activeEntryList->m_next;
-            while (last != 0 && last != entry)
+            if (sServicingReads)
             {
-                last = last->m_next;
-                if (last == m_activeEntryList->m_next)
+                AsyncEntry* last = nlDLRingGetStart(m_activeEntryList);
+                if (last != 0)
                 {
-                    break;
+                    do
+                    {
+                        last = last->m_next;
+                    } while (!nlDLRingIsStart(m_activeEntryList, last));
                 }
             }
-        }
 
-        AsyncReadPhase phase = (AsyncReadPhase)entry->Phase;
-        if (phase == READ_HEAD)
+            switch ((AsyncReadPhase)entry->Phase)
+            {
+            case READ_HEAD:
+                entry = entry->m_next;
+                break;
+            case READ_TAIL:
+            case READ_TAIL_ONLY:
+                memcpy(entry->m_pBuffer, entry->mTailBuffer, entry->m_uSize);
+                if (entry->Phase == READ_TAIL)
+                {
+                    --entry->m_pFile->PendingAsync;
+                    AsyncEntry* head = entry->m_prev;
+                    head->m_uSize += entry->m_uSize;
+                    DVDGetCommandBlockStatus(&head->mFileInfo.block);
+                    nlDLRingRemove(&m_activeEntryList, entry);
+                    nlDLRingAddEnd(&m_freeEntryList, entry);
+                    DVDClose(&entry->mFileInfo);
+                    entry = head;
+                }
+            case READ_COMPLETE:
+            {
+                mCurrent = entry;
+                --entry->m_pFile->PendingAsync;
+                AsyncEntry* next = entry->m_next;
+                if (next == entry)
+                {
+                    next = 0;
+                }
+                nlDLRingRemove(&m_activeEntryList, entry);
+                nlDLRingAddEnd(&m_freeEntryList, entry);
+                DVDClose(&entry->mFileInfo);
+
+                if (entry->m_pFunc != 0)
+                {
+                    entry->m_pFunc(entry->m_pFile, entry->m_pBuffer, entry->m_uSize, entry->m_uParam);
+                }
+                entry = next != 0 ? next : m_activeEntryList;
+                break;
+            }
+            default:
+                break;
+            }
+            break;
+        }
+        case DVD_RESULT_CANCELED:
+            break;
+        default:
+            CheckDVDStatus();
+            break;
+        }
+        if (stop)
         {
-            entry = entry->m_next;
-            continue;
+            break;
         }
-
-        if (phase == READ_TAIL || phase == READ_TAIL_ONLY)
-        {
-            memcpy(entry->m_pBuffer, entry->mTailBuffer, entry->m_uSize);
-        }
-
-        if (phase == READ_TAIL)
-        {
-            AsyncEntry* head = entry->m_prev;
-            --entry->m_pFile->PendingAsync;
-            head->m_uSize += entry->m_uSize;
-            DVDGetCommandBlockStatus(&head->mFileInfo.block);
-            nlDLRingRemove(&m_activeEntryList, entry);
-            nlDLRingAddEnd(&m_freeEntryList, entry);
-            DVDClose(&entry->mFileInfo);
-            entry = head;
-        }
-
-        mCurrent = entry;
-        --entry->m_pFile->PendingAsync;
-        AsyncEntry* next = entry->m_next == entry ? 0 : entry->m_next;
-        nlDLRingRemove(&m_activeEntryList, entry);
-        nlDLRingAddEnd(&m_freeEntryList, entry);
-        DVDClose(&entry->mFileInfo);
-
-        if (entry->m_pFunc != 0)
-        {
-            entry->m_pFunc(entry->m_pFile, entry->m_pBuffer, entry->m_uSize, entry->m_uParam);
-        }
-        entry = next != 0 ? next : m_activeEntryList;
     }
-    return stop;
 }
 
 bool AsyncManager::Contains(AsyncEntry* wanted) const
 {
-    if (m_activeEntryList == 0)
+    AsyncEntry* entry = nlDLRingGetStart(m_activeEntryList);
+    if (entry == 0)
     {
         return false;
     }
 
-    AsyncEntry* entry = m_activeEntryList->m_next;
     do
     {
         if (entry == wanted)
@@ -446,7 +458,7 @@ bool AsyncManager::Contains(AsyncEntry* wanted) const
             return true;
         }
         entry = entry->m_next;
-    } while (entry != m_activeEntryList->m_next);
+    } while (!nlDLRingIsStart(m_activeEntryList, entry));
     return false;
 }
 

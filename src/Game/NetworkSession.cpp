@@ -1632,6 +1632,13 @@ static inline void NotifyGameStarted(NetworkSession* session)
     state->SetMachineInfo((s8)session->GetLocalMachineId(), count);
 }
 
+static inline void NotifyGameStarted()
+{
+    NetworkSyncState* state = gNetworkSyncState;
+    int count = g_pNetworkSessionBase->GetNumMachines();
+    state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
+}
+
 static inline void RecordGameConfig(
     NetworkSession* session, u32 seed,
     RecordedGameConfig* config)
@@ -1640,6 +1647,17 @@ static inline void RecordGameConfig(
     if (state.mRecordingEnabled != 0)
     {
         state.StartNetworkInputRecording((s8)session->GetLocalMachineId(), session->GetNumMachines(), seed, config, 0x58);
+    }
+}
+
+static inline void RecordGameConfig(
+    u32 seed, RecordedGameConfig* config)
+{
+    NetworkInputRecording& state = *gNetworkInputRecording;
+    if (state.mRecordingEnabled != 0)
+    {
+        state.StartNetworkInputRecording((s8)g_pNetworkSessionBase->GetLocalMachineId(),
+            g_pNetworkSessionBase->GetNumMachines(), seed, config, 0x58);
     }
 }
 
@@ -2189,19 +2207,11 @@ void RestartSinglePlayerGame()
     u32 seed = NetworkRandom();
     SetNetworkRandomSeed(seed);
 
-    NetworkSyncState* state = gNetworkSyncState;
-    int count = g_pNetworkSessionBase->GetNumMachines();
-    state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
+    NotifyGameStarted();
 
     RecordedGameConfig config;
     CaptureRecordedGameConfig(&config);
-    NetworkInputRecording* record = gNetworkInputRecording;
-    if (record->mRecordingEnabled != 0)
-    {
-        int machines = g_pNetworkSessionBase->GetNumMachines();
-        record->StartNetworkInputRecording((s8)g_pNetworkSessionBase->GetLocalMachineId(), machines, seed, &config,
-            0x58);
-    }
+    RecordGameConfig(seed, &config);
 }
 
 void StartSinglePlayerGame()
@@ -2210,8 +2220,9 @@ void StartSinglePlayerGame()
     online.Shutdown();
     g_pNetworkSessionBase->InitializeMachines(1, 4);
 
+    int player;
     NetworkPeer* peer = g_pNetworkSessionBase->GetPeer(0);
-    for (int player = 0; player < (int)peer->mPlayerCount; ++player)
+    for (player = 0; player < (int)peer->mPlayerCount; ++player)
     {
         (peer->GetNetworkPeerChannel(player))->Initialize(peer, (s8)player, player);
     }
@@ -2222,19 +2233,11 @@ void StartSinglePlayerGame()
     tDebugPrintManager::Print(DC_NETWORK, "StartSinglePlayerGame: Set random seed to %x\n", seed);
     GetInputRouter()->Reset(0);
 
-    NetworkSyncState* state = gNetworkSyncState;
-    int count = g_pNetworkSessionBase->GetNumMachines();
-    state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
+    NotifyGameStarted();
 
     RecordedGameConfig config;
     CaptureRecordedGameConfig(&config);
-    NetworkInputRecording* record = gNetworkInputRecording;
-    if (record->mRecordingEnabled != 0)
-    {
-        int machines = g_pNetworkSessionBase->GetNumMachines();
-        record->StartNetworkInputRecording((s8)g_pNetworkSessionBase->GetLocalMachineId(), machines, seed, &config,
-            0x58);
-    }
+    RecordGameConfig(seed, &config);
 }
 
 void PlaybackRecordedGame()

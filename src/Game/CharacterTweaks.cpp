@@ -487,7 +487,7 @@ extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
          * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002CD2C(PlayerTweaks* tweaks)
+extern "C" float fn_8002CD2C(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->mUnidentified034;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;

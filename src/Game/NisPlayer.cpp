@@ -1439,11 +1439,8 @@ void NisPlayer::fn_8027F4B0(NisTarget target, NisWinnerType winnerType)
     mUnidentified3443C = glGetTextureManager()->GetTextureIndex(mUnidentified34438);
 }
 
-void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisUseFilter useFilter, NisWinnerType winnerType, int param5, int param6)
+static inline void FormatNisName(char* fullName, const char* filter, const char* nisType, NisUseFilter useFilter, const char* extraNameFilter)
 {
-    mActive = true;
-
-    const char* filter = GetTargetFilter(target, winnerType);
     char prefix[64];
     if (nlStrCmp(filter, kNisEmpty) != 0)
     {
@@ -1457,15 +1454,30 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     char extra[64];
     if (useFilter != NIS_NO_FILTER)
     {
-        nlSNPrintf(extra, sizeof(extra), "_%s", mExtraNameFilter);
+        nlSNPrintf(extra, sizeof(extra), "_%s", extraNameFilter);
     }
     else
     {
         extra[0] = '\0';
     }
 
+    nlSNPrintf(fullName, 64, "%s%s%s", prefix, nisType, extra);
+}
+
+static inline int RandomNisIndex(int count, unsigned int* seed)
+{
+    float value = (count - 1) * nlRandomf(1.0f, seed);
+    value += value < 0.0f ? -0.5f : 0.5f;
+    return (int)value;
+}
+
+void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisUseFilter useFilter, NisWinnerType winnerType, int param5, int param6)
+{
     char fullName[64];
-    nlSNPrintf(fullName, sizeof(fullName), "%s%s%s", prefix, nisType, extra);
+    mActive = true;
+
+    const char* filter = GetTargetFilter(target, winnerType);
+    FormatNisName(fullName, filter, nisType, useFilter, mExtraNameFilter);
 
     int numAvailableNis = 0;
     NisHeader* availableNis[10] = { 0 };
@@ -1476,15 +1488,16 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
         {
             continue;
         }
-        if (strstr(mDict[dictionaryIndex].name, "_same") != NULL)
+        NisHeader* candidate = &mDict[dictionaryIndex];
+        if (strstr(candidate->name, "_same") != NULL)
         {
             continue;
         }
-        if (strstr(mDict[dictionaryIndex].name, "_other") != NULL)
+        if (strstr(candidate->name, "_other") != NULL)
         {
             continue;
         }
-        availableNis[numAvailableNis++] = &mDict[dictionaryIndex];
+        availableNis[numAvailableNis++] = candidate;
     }
 
     if (numAvailableNis == 0)
@@ -1499,16 +1512,14 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     }
     else
     {
-        float randomValue = (numAvailableNis - 1) * nlRandomf(1.0f, &GetPresentation()->mRandomSeed);
-        index = (int)(randomValue + (randomValue < 0.0f ? -0.5f : 0.5f));
+        index = RandomNisIndex(numAvailableNis, &GetPresentation()->mRandomSeed);
         if (fn_80287B34(GetPresentation()) && param5 == 0)
         {
             if (numAvailableNis > 1 && mUnidentified343F4 == index && nlStrCmp(mUnidentified343F8, mExtraNameFilter) == 0)
             {
                 while (index == mUnidentified343F4)
                 {
-                    randomValue = (numAvailableNis - 1) * nlRandomf(1.0f, &GetPresentation()->mRandomSeed);
-                    index = (int)(randomValue + (randomValue < 0.0f ? -0.5f : 0.5f));
+                    index = RandomNisIndex(numAvailableNis, &GetPresentation()->mRandomSeed);
                 }
             }
             mUnidentified343F4 = index;

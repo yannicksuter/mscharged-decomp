@@ -7,6 +7,7 @@ class AudioBackend;
 extern AudioSystem* g_pAudioSystem;
 extern AudioBackend* g_pAudioBackend;
 extern void* g_pAudioSilenceBuffer;
+extern unsigned long gAudioSourceListCount;
 
 void SetControllerSpeakerEnabled(bool enabled);
 void SetAudioEffectContext(unsigned long* hash, int index);

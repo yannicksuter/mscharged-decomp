@@ -13,4 +13,16 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(int
     return *this;
 }
 
+inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::SetDesireFinished()
+{
+    {
+        FuzzyVariant other(FT_INT, 1);
+        Variant value(other);
+        Reset();
+        CopyFrom(value);
+    }
+    mTemporary = false;
+    return *this;
+}
+
 #endif // GAME_AI_DESIREUPDATE_H

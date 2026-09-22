@@ -120,7 +120,7 @@ void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value)
         for (TweakNode* child = folder->m_ChildHead; child != 0;)
         {
             TweakNode* next = child->m_Next;
-            if (child->m_Value == value)
+            if (value == child->m_Value)
             {
                 delete child;
             }
@@ -150,9 +150,10 @@ void ClearTweakChildren(TweakEntry* entry)
 
 void RemoveDynamicTweakChildren(TweakEntry* entry)
 {
+    TweakNode* next;
     for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
-        TweakNode* next = child->m_Next;
+        next = child->m_Next;
         if (child->m_State == 2)
         {
             delete child;

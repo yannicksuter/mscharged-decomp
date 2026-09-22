@@ -63,57 +63,10 @@ static inline unsigned int GetLargestFreeBlock(MemoryAllocator* allocator)
     return stats.largest;
 }
 
-static inline void DumpFreeMemory(MemoryAllocator* allocator)
-{
-    const char* filename = sFreePanicDumpFilename;
-    nlPrintf(sTotalFreeMemoryFormat, GetTotalFreeMemory(allocator));
-    nlPrintf(sLargestFreeBlockFormat, GetLargestFreeBlock(allocator));
-
-    FreePanicDumpCallback_802AF470 dump;
-    if (filename == 0)
-    {
-        dump.file = 0;
-    }
-    else
-    {
-        dump.file = nlOpenFileDebug(filename, false, false);
-    }
-    dump.total = 0;
-    dump.count = 0;
-    void* file = dump.file;
-    if (nlDebugFileIsValid(dump.file))
-    {
-        nlWriteLineDebug(dump.file, sFreeMemoryDumpHeader, false);
-    }
-    else
-    {
-        nlPrintf(sFreeMemoryDumpHeader);
-    }
-
-    nlWalkDLRing(allocator->m_free_block_list, &dump, &FreePanicDumpCallback_802AF470::Callback);
-
-    char buffer[512];
-    nlSNPrintf(buffer, sizeof(buffer), sFreeMemoryDumpTotalFormat, dump.total);
-    buffer[511] = 0;
-    if (nlDebugFileIsValid(dump.file))
-    {
-        nlWriteLineDebug(dump.file, buffer, false);
-    }
-    else
-    {
-        nlPrintf(buffer);
-    }
-
-    if (nlDebugFileIsValid(file))
-    {
-        nlCloseFileDebug(file);
-    }
-    nlBreak();
-}
-
 void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignment)
 {
-    FreeBlockList* start = m_free_block_list == 0 ? 0 : m_free_block_list->m_next;
+    FreeBlockList* start = nlDLRingGetStart(m_free_block_list);
+    const char* filename;
     FreeBlockList* cur = start;
     u32 alignedSize = (size + 3) & ~3u;
     u32 prefix;
@@ -139,7 +92,50 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
         cur = cur->m_next;
         if (cur == start)
         {
-            DumpFreeMemory(this);
+            nlPrintf(sTotalFreeMemoryFormat, GetTotalFreeMemory(this));
+            nlPrintf(sLargestFreeBlockFormat, GetLargestFreeBlock(this));
+
+            filename = sFreePanicDumpFilename;
+            FreePanicDumpCallback_802AF470 dump;
+            if (filename == 0)
+            {
+                dump.file = 0;
+            }
+            else
+            {
+                dump.file = nlOpenFileDebug(filename, false, false);
+            }
+            dump.total = 0;
+            dump.count = 0;
+            void* file = dump.file;
+            if (nlDebugFileIsValid(dump.file))
+            {
+                nlWriteLineDebug(dump.file, sFreeMemoryDumpHeader, false);
+            }
+            else
+            {
+                nlPrintf(sFreeMemoryDumpHeader);
+            }
+
+            nlWalkDLRing(m_free_block_list, &dump, &FreePanicDumpCallback_802AF470::Callback);
+
+            char buffer[512];
+            nlSNPrintf(buffer, sizeof(buffer), sFreeMemoryDumpTotalFormat, dump.total);
+            buffer[511] = 0;
+            if (nlDebugFileIsValid(dump.file))
+            {
+                nlWriteLineDebug(dump.file, buffer, false);
+            }
+            else
+            {
+                nlPrintf(buffer);
+            }
+
+            if (nlDebugFileIsValid(file))
+            {
+                nlCloseFileDebug(file);
+            }
+            nlBreak();
         }
     }
 
@@ -217,6 +213,7 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
 void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignment)
 {
     FreeBlockList* end = nlDLRingGetEnd(m_free_block_list);
+    const char* filename;
     u32 alignedSize = (size + 3) & ~3u;
     u32 alignMask = ~(alignment - 1);
     FreeBlockList* cur = end;
@@ -242,7 +239,50 @@ void* MemoryAllocator::AllocateFromEnd(unsigned long size, unsigned int alignmen
         cur = cur->m_next;
         if (cur == end)
         {
-            DumpFreeMemory(this);
+            nlPrintf(sTotalFreeMemoryFormat, GetTotalFreeMemory(this));
+            nlPrintf(sLargestFreeBlockFormat, GetLargestFreeBlock(this));
+
+            filename = sFreePanicDumpFilename;
+            FreePanicDumpCallback_802AF470 dump;
+            if (filename == 0)
+            {
+                dump.file = 0;
+            }
+            else
+            {
+                dump.file = nlOpenFileDebug(filename, false, false);
+            }
+            dump.total = 0;
+            dump.count = 0;
+            void* file = dump.file;
+            if (nlDebugFileIsValid(dump.file))
+            {
+                nlWriteLineDebug(dump.file, sFreeMemoryDumpHeader, false);
+            }
+            else
+            {
+                nlPrintf(sFreeMemoryDumpHeader);
+            }
+
+            nlWalkDLRing(m_free_block_list, &dump, &FreePanicDumpCallback_802AF470::Callback);
+
+            char buffer[512];
+            nlSNPrintf(buffer, sizeof(buffer), sFreeMemoryDumpTotalFormat, dump.total);
+            buffer[511] = 0;
+            if (nlDebugFileIsValid(dump.file))
+            {
+                nlWriteLineDebug(dump.file, buffer, false);
+            }
+            else
+            {
+                nlPrintf(buffer);
+            }
+
+            if (nlDebugFileIsValid(file))
+            {
+                nlCloseFileDebug(file);
+            }
+            nlBreak();
         }
     }
 

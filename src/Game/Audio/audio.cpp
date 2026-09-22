@@ -96,6 +96,11 @@ GameAudio::GameAudio()
 
 bool GameAudio::Initialize()
 {
+    CurrentAllocator = &VirtualAllocator;
+    unsigned int index = AllocatorStackDepth++;
+    AllocatorStack[index] = CurrentAllocator;
+    gAudioSourceListCount = 0x800000;
+
     s_AudioInInit__9ResetTask = true;
     SetResourcePath(gAudioResourcePath);
     s_AudioInInit__9ResetTask = false;
@@ -108,6 +113,10 @@ bool GameAudio::Initialize()
     gAudioEnabled = !GetTweakBool(sNoAudio, !gAudioEnabled);
     SetControllerSpeakerEnabled(!GetTweakBool(sDisableControllerSpeaker, false));
     m_Listener->SetEnabled(true);
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
     return true;
 }
 

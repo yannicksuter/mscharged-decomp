@@ -190,17 +190,19 @@ public:
 
     virtual void ApplyModifier(glPoly2& poly, float time)
     {
-        float x = ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x);
-        float y = ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y);
+        nlVector2 scale = {
+            ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x),
+            ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y),
+        };
 
-        poly.m_uv[0].x *= x;
-        poly.m_uv[0].y *= y;
-        poly.m_uv[1].x *= x;
-        poly.m_uv[1].y *= y;
-        poly.m_uv[2].x *= x;
-        poly.m_uv[2].y *= y;
-        poly.m_uv[3].x *= x;
-        poly.m_uv[3].y *= y;
+        poly.m_uv[0].x *= scale.x;
+        poly.m_uv[0].y *= scale.y;
+        poly.m_uv[1].x *= scale.x;
+        poly.m_uv[1].y *= scale.y;
+        poly.m_uv[2].x *= scale.x;
+        poly.m_uv[2].y *= scale.y;
+        poly.m_uv[3].x *= scale.x;
+        poly.m_uv[3].y *= scale.y;
     }
 
     /* 0x4 */ nlVector2 m_v2StartShift;
@@ -296,17 +298,19 @@ public:
 
     virtual void ApplyModifier(glPoly2& poly, float time)
     {
-        float x = ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x);
-        float y = ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y);
+        nlVector2 shift = {
+            ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x),
+            ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y),
+        };
 
-        poly.m_uv[0].x += x;
-        poly.m_uv[0].y += y;
-        poly.m_uv[1].x += x;
-        poly.m_uv[1].y += y;
-        poly.m_uv[2].x += x;
-        poly.m_uv[2].y += y;
-        poly.m_uv[3].x += x;
-        poly.m_uv[3].y += y;
+        poly.m_uv[0].x += shift.x;
+        poly.m_uv[0].y += shift.y;
+        poly.m_uv[1].x += shift.x;
+        poly.m_uv[1].y += shift.y;
+        poly.m_uv[2].x += shift.x;
+        poly.m_uv[2].y += shift.y;
+        poly.m_uv[3].x += shift.x;
+        poly.m_uv[3].y += shift.y;
     }
 
     /* 0x04 */ nlVector2 m_v2StartShift;

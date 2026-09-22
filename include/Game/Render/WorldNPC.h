@@ -8,9 +8,25 @@
 #include "NL/nlMath.h"
 #include "types.h"
 #include "Game/Render/CrowdModelCollection.h"
+#include "Game/World/WorldObject.h"
 
 class GLView;
-class WorldNPC;
+struct WorldObjectLoadContext;
+// Serialized world-NPC record used by the stadium/world object stream.
+class WorldNPC : public WorldObject
+{
+public:
+    virtual ~WorldNPC();
+    virtual void ReleaseResources();
+    virtual nlMatrix4* GetWorldMatrix();
+    virtual void SetWorldMatrix(const nlMatrix4& transform);
+    virtual void Initialize(WorldObjectLoadContext* context);
+
+    /* 0x04 */ u8 mUnidentified004[0x1C];
+    /* 0x20 */ nlMatrix4 mTransform;
+    /* 0x60 */ unsigned long mTemplateHash;
+    /* 0x64 */ u8 mUnidentified064[0x0C];
+}; // size: 0x70
 
 class WorldNPCManager;
 

@@ -31,27 +31,23 @@ public:
     float mTweakIncrement;
 };
 
-static char sTweakMinimum[] = "min";
-static char sTweakMaximum[] = "max";
-static char sTweakIncrement[] = "inc";
-static char sTweakMarker[] = "tweak";
-static char sCommentSeparators[] = "# =\t";
-static char sSectionSeparator[] = "/";
-static char sLineEndCharacters[] = "\n\r";
-static char sTagValueSeparator[] = "=";
-static char sConfigWhitespace[] = " \t\"\r";
-
 void TweakConfigParser::Comment(
     const char* comment, unsigned int size)
 {
+    char* copy;
+    const char* minimum = "min";
+    const char* maximum = "max";
+    const char* increment = "inc";
+    const char* marker = "tweak";
+
     mTweaked = false;
 
-    char* copy = (char*)nlMalloc(size + 1, 8, true);
+    copy = (char*)nlMalloc(size + 1, 8, true);
     memcpy(copy, comment, size);
     copy[size] = 0;
 
     SimpleParser tokens;
-    if (!tokens.StartParsing(copy, size + 1, sCommentSeparators))
+    if (!tokens.StartParsing(copy, size + 1, "# =\t"))
     {
         delete copy;
         return;
@@ -63,20 +59,20 @@ void TweakConfigParser::Comment(
         char* next = tokens.NextToken(false);
         if (mTweaked)
         {
-            if (nlStrICmp(token, sTweakMaximum) == 0 && next != 0)
+            if (nlStrICmp(token, maximum) == 0 && next != 0)
             {
                 mTweakMaxValue = (float)atof(token);
             }
-            else if (nlStrICmp(token, sTweakMinimum) == 0 && next != 0)
+            else if (nlStrICmp(token, minimum) == 0 && next != 0)
             {
                 mTweakMinValue = (float)atof(token);
             }
-            else if (nlStrICmp(token, sTweakIncrement) == 0 && next != 0)
+            else if (nlStrICmp(token, increment) == 0 && next != 0)
             {
                 mTweakIncrement = (float)atof(token);
             }
         }
-        else if (nlStrICmp(token, sTweakMarker) == 0)
+        else if (nlStrICmp(token, marker) == 0)
         {
             mTweaked = true;
         }
@@ -88,7 +84,7 @@ void TweakConfigParser::Comment(
 
 void TweakConfigParser::Section(const BString& section)
 {
-    BString separator(sSectionSeparator);
+    BString separator("/");
     mCurrentSection = mCategory.Append(separator.Append(section));
 }
 
@@ -107,6 +103,10 @@ void TweakConfigParser::TagValuePair(
         node->m_Value->ParseValue(value.c_str());
     }
 }
+
+static char sLineEndCharacters[] = "\n\r";
+static char sTagValueSeparator[] = "=";
+static char sConfigWhitespace[] = " \t\"\r";
 
 #pragma dont_inline on
 void ParseTweakConfigData(

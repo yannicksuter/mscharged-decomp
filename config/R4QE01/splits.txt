@@ -1689,9 +1689,9 @@ Game/FE/feHelpFuncs.cpp:
 	.sdata2     start:0x806E5578 end:0x806E55B8
 
 Game/SH/SHLoading.cpp:
-	.text       start:0x801CDA04 end:0x801D0F90
-	.data       start:0x80518A98 end:0x80518D90
-	.sdata      start:0x806DD340 end:0x806DD398
+	.text       start:0x801CDA04 end:0x801D0DD8
+	.data       start:0x80518A98 end:0x80518D7C
+	.sdata      start:0x806DD340 end:0x806DD394
 
 Game/SH/SHTitleScreen.cpp:
 	.text       start:0x801D0F90 end:0x801D28CC
@@ -1895,7 +1895,7 @@ Game/FE/feCupFlow.cpp:
 	.data       start:0x8051B770 end:0x8051B970
 	.bss        start:0x80578428 end:0x80578450
 	.sdata      start:0x806DDBF8 end:0x806DDC48
-	.sbss       start:0x806E18A8 end:0x806E18B4
+	.sbss       start:0x806E18A8 end:0x806E18B8
 	.sdata2     start:0x806E5838 end:0x806E5848
 
 Game/FE/MatchSummary.cpp:
@@ -1962,7 +1962,7 @@ Game/FE/feDPD.cpp:
 	.data       start:0x8051C8B0 end:0x8051C8DC
 	.bss        start:0x80578450 end:0x80578480
 	.sdata      start:0x806DDFF8 end:0x806DDFFF
-	.sbss       start:0x806E18B4 end:0x806E18C0 align:4
+	.sbss       start:0x806E18B8 end:0x806E18B9
 	.sdata2     start:0x806E58C0 end:0x806E58E0
 
 Game/FE/feButtonComponent.cpp:

@@ -10,6 +10,7 @@
 #include "Game/NetworkEvents.h"
 #include "Game/MathHelpers.h"
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlDebugViews.h"
 #include "NL/nlMath.h"
@@ -39,7 +40,7 @@ NetworkInputRouter* gNetworkInputRouter;
 
 static EventDispatcher sDetermDataDispatcher;
 static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
-    &sDetermDataDispatcher, "DetermDataEventQueue", 21);
+    &sDetermDataDispatcher, "DetermDataEventQueue", -1);
 
 void InitializeInputRouters()
 {
@@ -699,48 +700,48 @@ int SimpleInputRouter::GetUpdateCount()
 }
 
 static TweakIntBinding sTransmitSyncDataEvery(
-    "g_TransmitSyncDataEvery", "Network/InputMan", &g_TransmitSyncDataEvery);
+    "g_TransmitSyncDataEvery", "Network/InputMan", &g_TransmitSyncDataEvery, true);
 static TweakIntBinding sTicksPerPacket(
-    "g_nTicksPerPacket", "Network/InputMan", &g_nTicksPerPacket);
+    "g_nTicksPerPacket", "Network/InputMan", &g_nTicksPerPacket, true);
 static TweakFloatBinding sInputQHighwaterMarkMin(
     "g_fCSInputQHighwaterMarkMin", "Network/InputMan",
-    &g_fCSInputQHighwaterMarkMin);
+    &g_fCSInputQHighwaterMarkMin, true);
 static TweakFloatBinding sInputQHighwaterMarkDef(
     "g_fCSInputQHighwaterMarkDef", "Network/InputMan",
-    &g_fCSInputQHighwaterMarkDef);
+    &g_fCSInputQHighwaterMarkDef, true);
 static TweakFloatBinding sInputQHighwaterMarkMax(
     "g_fCSInputQHighwaterMarkMax", "Network/InputMan",
-    &g_fCSInputQHighwaterMarkMax);
+    &g_fCSInputQHighwaterMarkMax, true);
 static TweakFloatBinding sInputQHighwaterMarkInc(
     "g_fCSInputQHighwaterMarkInc", "Network/InputMan",
-    &g_fCSInputQHighwaterMarkInc);
+    &g_fCSInputQHighwaterMarkInc, true);
 static TweakFloatBinding sInputQHighwaterMarkDec(
     "g_fCSInputQHighwaterMarkDec", "Network/InputMan",
-    &g_fCSInputQHighwaterMarkDec);
+    &g_fCSInputQHighwaterMarkDec, true);
 static TweakIntBinding sHostDelayMin(
-    "g_nCSHostDelayMin", "Network/InputMan", &g_nCSHostDelayMin);
+    "g_nCSHostDelayMin", "Network/InputMan", &g_nCSHostDelayMin, true);
 static TweakIntBinding sHostDelayMax(
-    "g_nCSHostDelayMax", "Network/InputMan", &g_nCSHostDelayMax);
+    "g_nCSHostDelayMax", "Network/InputMan", &g_nCSHostDelayMax, true);
 static TweakFloatBinding sCongestionMultiplierMin(
     "fMinCongestionMultiplier", "Network/InputMan",
-    &fMinCongestionMultiplier);
+    &fMinCongestionMultiplier, true);
 static TweakFloatBinding sCongestionMultiplierDef(
     "fDefCongestionMultiplier", "Network/InputMan",
-    &fDefCongestionMultiplier);
+    &fDefCongestionMultiplier, true);
 static TweakFloatBinding sCongestionMultiplierMax(
     "fMaxCongestionMultiplier", "Network/InputMan",
-    &fMaxCongestionMultiplier);
+    &fMaxCongestionMultiplier, true);
 static TweakFloatBinding sCongestionMultiplierIncrement(
     "fCongestionMultiplierIncrement", "Network/InputMan",
-    &fCongestionMultiplierIncrement);
+    &fCongestionMultiplierIncrement, true);
 static TweakFloatBinding sCongestionMultiplierDecrement(
     "fCongestionMultiplierDecrement", "Network/InputMan",
-    &fCongestionMultiplierDecrement);
+    &fCongestionMultiplierDecrement, true);
 static TweakIntBinding sOverrideTickDelayTarget(
     "g_nOverrideTickDelayTarget", "Network/InputMan",
-    &g_nOverrideTickDelayTarget);
+    &g_nOverrideTickDelayTarget, true);
 static TweakIntBinding sDumpSyncTextAt(
-    "g_nDumpSyncTextAt", "Network/InputMan", &g_nDumpSyncTextAt);
+    "g_nDumpSyncTextAt", "Network", &g_nDumpSyncTextAt, true);
 
 typedef char VerifyDetermDataEventSize[(sizeof(DetermDataEvent) == 0x24) ? 1 : -1];
 typedef char VerifyNetworkMessageType0Size[

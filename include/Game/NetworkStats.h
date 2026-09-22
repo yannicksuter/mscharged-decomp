@@ -68,8 +68,7 @@ struct NetworkScoreSubmission
     /* 0x08 */ int mUnidentified08;
     /* 0x0C */ int mWins;
     /* 0x10 */ int mLosses;
-    /* 0x14 */ u16 mPlayerId;
-    /* 0x16 */ u8 mPadding16[2];
+    /* 0x14 */ int mPlayerId;
 }; // size: 0x18
 
 class NetworkStatsListener

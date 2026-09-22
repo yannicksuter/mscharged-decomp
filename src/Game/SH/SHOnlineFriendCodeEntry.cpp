@@ -447,11 +447,11 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
             }
             return;
         }
@@ -482,8 +482,9 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
     if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
         && g_pFriendManager->FindHostInvitation())
     {
-        g_pFriendManager->mReturnScene = SCENE_ONLINE_FRIEND_CODE_ENTRY;
-        g_pFriendManager->mPreviousRankedMode = 0;
+        FriendManager* friendManager = g_pFriendManager;
+        friendManager->mReturnScene = SCENE_ONLINE_FRIEND_CODE_ENTRY;
+        friendManager->mPreviousRankedMode = 0;
         unsigned short* friendCode =
             g_pFriendManager->mFriendCodeInput;
         for (int i = 0; i < 12; ++i)
@@ -496,7 +497,7 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
 
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* controller = gFEPointerInstances[pad];
+        TLComponentInstance* controller = GetPointerInstance(pad);
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if (pad != gFEControllerIndex)

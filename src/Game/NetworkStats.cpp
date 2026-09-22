@@ -337,13 +337,6 @@ void NetworkStatsReporter::Update()
     }
 }
 
-static u8 sRankingHmacKey[32] = {
-    0x17, 0xB2, 0x40, 0x52, 0x5F, 0x89, 0xF0, 0xFF,
-    0xE9, 0xB9, 0xB0, 0x17, 0x66, 0x06, 0x37, 0xA1,
-    0x63, 0x70, 0x9E, 0xC9, 0xCF, 0x42, 0xD1, 0x89,
-    0x91, 0x36, 0xC7, 0xBD, 0x2B, 0x58, 0xBC, 0x39,
-};
-
 NetworkRanking::NetworkRanking()
 {
     mInitialized = false;
@@ -403,6 +396,13 @@ void NetworkRanking::SetListener(NetworkStatsListener* listener)
     mListener = listener;
 }
 
+static u8 sRankingHmacKey[32] = {
+    0x17, 0xB2, 0x40, 0x52, 0x5F, 0x89, 0xF0, 0xFF,
+    0xE9, 0xB9, 0xB0, 0x17, 0x66, 0x06, 0x37, 0xA1,
+    0x63, 0x70, 0x9E, 0xC9, 0xCF, 0x42, 0xD1, 0x89,
+    0x91, 0x36, 0xC7, 0xBD, 0x2B, 0x58, 0xBC, 0x39,
+};
+
 bool NetworkRanking::ReportGameResult(int category,
     const NetworkScoreSubmission*, const NetworkStatsPlayer*,
     const NetworkStatsPlayer*, bool, int, int,
@@ -411,16 +411,7 @@ bool NetworkRanking::ReportGameResult(int category,
     mSubmission.mWins = fallback->mWins;
     mSubmission.mLosses = fallback->mLosses;
     mSubmission.mUnidentified0C = fallback->mPlayerId;
-    int i = 0;
-    for (; i < 10; ++i)
-    {
-        mSubmission.mName[i] = gNetworkMiiNameWide[i];
-        if (gNetworkMiiNameWide[i] == 0)
-        {
-            break;
-        }
-    }
-    mSubmission.mName[i] = 0;
+    nlStrNCpy(mSubmission.mName, gNetworkMiiNameWide, 11);
     memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
     mSubmission.mDay = fallback->mDay;
     mSubmission.mMonth = fallback->mMonth;
@@ -435,14 +426,21 @@ bool NetworkRanking::ReportGameResult(int category,
         (u8*)mSubmission.mDigest - (u8*)&mSubmission);
     NETHMACGetDigest(&context, mSubmission.mDigest);
 
-    DWCRnkRegion region = DWC_RNK_REGION_US;
-    if (GetRegion() == 1)
+    DWCRnkRegion region;
+    switch (GetRegion())
     {
+    case 0:
+        region = DWC_RNK_REGION_US;
+        break;
+    case 1:
         region = DWC_RNK_REGION_EU;
-    }
-    else if (GetRegion() == 2)
-    {
+        break;
+    case 2:
         region = DWC_RNK_REGION_JP;
+        break;
+    default:
+        region = DWC_RNK_REGION_US;
+        break;
     }
     DWCRnkError result = DWC_RnkPutScoreAsync(category, region,
         fallback->mScore, &mSubmission, sizeof(mSubmission));
@@ -563,42 +561,143 @@ bool NetworkRanking::GetLeaderboardStats(int category,
     mCategory = category;
 
     DWCRnkGetParam parameter;
-    memset(&parameter, 0, sizeof(parameter));
-    DWCRnkGetMode mode = DWC_RNK_GET_MODE_TOPLIST;
-    if (filter == 1)
+    DWCRnkGetMode mode = DWC_RNK_GET_MODE_NEAR;
+    switch (filter)
+    {
+    case 0:
+    {
+        parameter.size = sizeof(parameter.near);
+        parameter.near.sort = DWC_RNK_ORDER_DES;
+        if (mLimit > DWC_RNK_GET_MAX)
+        {
+            mLimit = DWC_RNK_GET_MAX;
+        }
+        parameter.near.limit = mLimit;
+        if (category == 1 || category == 4)
+        {
+            DWCDate date;
+            DWCTime time;
+            GetAdjustedNetworkDate(&date, &time);
+            u32 since = time.min + time.hour * 60 + 1;
+            if (since < 1)
+            {
+                since = 1;
+            }
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Total Mins since beginning of day = %d (Cur time %d:%d)\n",
+                since, time.hour, time.min);
+            parameter.near.since = since;
+        }
+        else
+        {
+            DWCDate date;
+            DWCTime time;
+            GetAdjustedNetworkDate(&date, &time);
+            NetworkSeasonDate current = { date.month, date.mday };
+            int season = FindNetworkSeasonBoundary(
+                &sNetworkSeasonDateTable, current);
+            int days = GetDaysSinceSeasonBoundary(
+                &sNetworkSeasonDateTable, season, current, date.year);
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Time from now %d %d %d to start of season index %d is %d days\n",
+                date.year, date.month, date.mday, season, days);
+            u32 since = days * 1440 + time.min + time.hour * 60 + 1;
+            if (since < 1)
+            {
+                since = 1;
+            }
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Total Mins since beginning of season = %d (Cur time %d:%d)\n",
+                since, time.hour, time.min);
+            parameter.near.since = since;
+        }
+        break;
+    }
+    case 1:
     {
         mode = DWC_RNK_GET_MODE_FRIENDS;
         parameter.size = sizeof(parameter.friends);
         parameter.friends.sort = DWC_RNK_ORDER_DES;
-        parameter.friends.limit = limit;
+        parameter.friends.limit = mLimit;
+        parameter.friends.since = 0;
         for (int i = 0; i < DWC_RNK_FRIENDS_MAX; ++i)
         {
             int* entry = (int*)GameInfoManager::GetInstance()->GetUnknown0x40(
                 gNetworkSaveSlotIndex, i);
             parameter.friends.friends[i] = entry[1];
         }
+        break;
     }
-    else
+    case 2:
     {
-        if (limit > DWC_RNK_GET_MAX)
-        {
-            limit = DWC_RNK_GET_MAX;
-            mLimit = limit;
-        }
+        mode = DWC_RNK_GET_MODE_TOPLIST;
         parameter.size = sizeof(parameter.toplist);
         parameter.toplist.sort = DWC_RNK_ORDER_DES;
-        parameter.toplist.limit = limit;
-        parameter.toplist.since = 1;
+        if (mLimit > DWC_RNK_GET_MAX)
+        {
+            mLimit = DWC_RNK_GET_MAX;
+        }
+        parameter.toplist.limit = mLimit;
+        if (category == 1 || category == 4)
+        {
+            DWCDate date;
+            DWCTime time;
+            GetAdjustedNetworkDate(&date, &time);
+            u32 since = time.min + time.hour * 60 + 1;
+            if (since < 1)
+            {
+                since = 1;
+            }
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Total Mins since beginning of day = %d (Cur time %d:%d)\n",
+                since, time.hour, time.min);
+            parameter.toplist.since = since;
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Getting SOD TOP since %d limit %d\n", since,
+                parameter.toplist.limit);
+        }
+        else
+        {
+            DWCDate date;
+            DWCTime time;
+            GetAdjustedNetworkDate(&date, &time);
+            NetworkSeasonDate current = { date.month, date.mday };
+            int season = FindNetworkSeasonBoundary(
+                &sNetworkSeasonDateTable, current);
+            int days = GetDaysSinceSeasonBoundary(
+                &sNetworkSeasonDateTable, season, current, date.year);
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Time from now %d %d %d to start of season index %d is %d days\n",
+                date.year, date.month, date.mday, season, days);
+            u32 since = days * 1440 + time.min + time.hour * 60 + 1;
+            if (since < 1)
+            {
+                since = 1;
+            }
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Total Mins since beginning of season = %d (Cur time %d:%d)\n",
+                since, time.hour, time.min);
+            parameter.toplist.since = since;
+        }
+        break;
+    }
     }
 
-    DWCRnkRegion region = DWC_RNK_REGION_US;
-    if (GetRegion() == 1)
+    DWCRnkRegion region;
+    switch (GetRegion())
     {
+    case 0:
+        region = DWC_RNK_REGION_US;
+        break;
+    case 1:
         region = DWC_RNK_REGION_EU;
-    }
-    else if (GetRegion() == 2)
-    {
+        break;
+    case 2:
         region = DWC_RNK_REGION_JP;
+        break;
+    default:
+        region = DWC_RNK_REGION_US;
+        break;
     }
     DWCRnkError result =
         DWC_RnkGetScoreAsync(mode, category, region, &parameter);
@@ -621,11 +720,8 @@ void NetworkRanking::ProcessLeaderboardResults()
         tDebugPrintManager::Print(DC_NETWORK,
             "Error %d from DWC_RnkResGetRowCount cat %d filter %d\n",
             result, mCategory, mFilter);
-        if (mListener != 0)
-        {
-            mListener->OnLeaderboardResult(
-                false, mCategory, mFilter, 0, 0, 0);
-        }
+        mListener->OnLeaderboardResult(
+            false, mCategory, mFilter, 0, 0, 0);
         return;
     }
 
@@ -634,77 +730,74 @@ void NetworkRanking::ProcessLeaderboardResults()
     {
         DWCRnkData row;
         result = DWC_RnkResGetRow(&row, i);
-        if (result != DWC_RNK_SUCCESS)
+        if (result == DWC_RNK_SUCCESS)
         {
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Error %d calling DWC_RnkResGetRow %d\n", result, i);
-            continue;
-        }
+            mLeaderboardPlayers[retained].mProfileId = row.pid;
+            mLeaderboardPlayers[retained].mName[0] = 0;
 
-        NetworkStatsPlayer& player = mLeaderboardPlayers[retained];
-        NetworkRankingMeta& metadata = mLeaderboardMetadata[retained];
-        player.mProfileId = row.pid;
-        player.mName[0] = 0;
-
-        bool valid = false;
-        if (row.size == sizeof(NetworkRankingSubmission))
-        {
+            bool valid = false;
             NetworkRankingSubmission* submission =
                 (NetworkRankingSubmission*)row.userdata;
-            u8 digest[16];
-            NETHMACContext context;
-            NETHMACInit(&context, NETGetMD5Interface(), sRankingHmacKey,
-                sizeof(sRankingHmacKey));
-            NETHMACUpdate(&context, submission,
-                (u8*)submission->mDigest - (u8*)submission);
-            NETHMACGetDigest(&context, digest);
-            valid = memcmp(digest, submission->mDigest, sizeof(digest)) == 0;
-            if (!valid)
+            if (row.size == sizeof(NetworkRankingSubmission))
             {
-                tDebugPrintManager::Print(DC_NETWORK, "Warning: Binary Data failed HMAC MD5 check\n");
+                u8 digest[20];
+                memset(digest, '!', sizeof(digest));
+                NETHMACContext context;
+                NETHMACInit(&context, NETGetMD5Interface(), sRankingHmacKey,
+                    sizeof(sRankingHmacKey));
+                NETHMACUpdate(&context, submission,
+                    (u8*)submission->mDigest - (u8*)submission);
+                NETHMACGetDigest(&context, digest);
+                if (memcmp(digest, submission->mDigest,
+                        sizeof(submission->mDigest)) == 0)
+                {
+                    valid = true;
+                }
+                else
+                {
+                    tDebugPrintManager::Print(DC_NETWORK, "Warning: Binary Data failed HMAC MD5 check\n");
+                }
             }
             else
             {
-                int name = 0;
-                for (; name < 10; ++name)
-                {
-                    player.mName[name] = submission->mName[name];
-                    if (submission->mName[name] == 0)
-                    {
-                        break;
-                    }
-                }
-                player.mName[name] = 0;
-                memcpy(player.mData, submission->mData,
-                    sizeof(player.mData));
-                metadata.mDay = submission->mDay;
-                metadata.mMonth = submission->mMonth;
-                metadata.mYear = submission->mYear;
-                metadata.mWins = submission->mWins;
-                metadata.mLosses = submission->mLosses;
-                metadata.mUnidentified14 = submission->mUnidentified0C;
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "Warning: Expected Binary Data Size %d Got Size %d\n",
+                    sizeof(NetworkRankingSubmission), row.size);
             }
+
+            if (valid)
+            {
+                mLeaderboardMetadata[retained].mWins = submission->mWins;
+                mLeaderboardMetadata[retained].mLosses = submission->mLosses;
+                mLeaderboardMetadata[retained].mUnidentified14 = submission->mUnidentified0C;
+                mLeaderboardMetadata[retained].mDay = submission->mDay;
+                mLeaderboardMetadata[retained].mMonth = submission->mMonth;
+                mLeaderboardMetadata[retained].mYear = submission->mYear;
+                nlStrNCpy(mLeaderboardPlayers[retained].mName,
+                    submission->mName, 11);
+                memcpy(mLeaderboardPlayers[retained].mData,
+                    submission->mData, sizeof(mLeaderboardPlayers[retained].mData));
+            }
+            else
+            {
+                mLeaderboardMetadata[retained].mWins = 0;
+                mLeaderboardMetadata[retained].mLosses = 0;
+                mLeaderboardMetadata[retained].mUnidentified14 = 0;
+                mLeaderboardMetadata[retained].mDay = 1;
+                mLeaderboardMetadata[retained].mMonth = 1;
+                mLeaderboardMetadata[retained].mYear = 2000;
+                memset(mLeaderboardPlayers[retained].mData, 0,
+                    sizeof(mLeaderboardPlayers[retained].mData));
+            }
+            mLeaderboardMetadata[retained].mScore = row.score;
+            mLeaderboardMetadata[retained].mDisplayRank = row.order;
+            ++retained;
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK,
-                "Warning: Expected Binary Data Size %d Got Size %d\n",
-                sizeof(NetworkRankingSubmission), row.size);
+                "Error %d calling DWC_RnkResGetRow %d\n", result, i);
         }
-
-        if (!valid)
-        {
-            metadata.mDay = 1;
-            metadata.mMonth = 1;
-            metadata.mYear = 2000;
-            metadata.mWins = 0;
-            metadata.mLosses = 0;
-            metadata.mUnidentified14 = 0;
-            memset(player.mData, 0, sizeof(player.mData));
-        }
-        metadata.mScore = row.score;
-        metadata.mDisplayRank = row.order;
-        ++retained;
     }
 
     if (mFilter == 1)
@@ -712,11 +805,8 @@ void NetworkRanking::ProcessLeaderboardResults()
         FilterCurrentSeason(retained);
     }
     SortLeaderboardResults(retained);
-    if (mListener != 0)
-    {
-        mListener->OnLeaderboardResult(true, mCategory, mFilter, retained,
-            mLeaderboardPlayers, mLeaderboardMetadata);
-    }
+    mListener->OnLeaderboardResult(true, mCategory, mFilter, retained,
+        mLeaderboardPlayers, mLeaderboardMetadata);
 }
 
 void NetworkRanking::FilterCurrentSeason(int count)
@@ -861,7 +951,15 @@ NetworkRankingSortRow::NetworkRankingSortRow()
 
 void NetworkRanking::Update()
 {
-    if (!mInitialized || mRequestComplete || mOperation == 0)
+    if (!mInitialized)
+    {
+        return;
+    }
+    if (mRequestComplete)
+    {
+        return;
+    }
+    if (mOperation == 0)
     {
         return;
     }
@@ -876,8 +974,9 @@ void NetworkRanking::Update()
     {
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkProcesss() returned error %d\n", result);
         mRequestComplete = true;
-        if (mOperation == 1 && mListener != 0)
+        switch (mOperation)
         {
+        case 1:
             tDebugPrintManager::Print(DC_NETWORK, "Putting Score failed!\n");
             if (mReportGame)
             {
@@ -887,19 +986,20 @@ void NetworkRanking::Update()
             {
                 mListener->OnReportGameResult(false, mCategory);
             }
-        }
-        else if (mOperation == 2 && mListener != 0)
-        {
+            break;
+        case 2:
             tDebugPrintManager::Print(DC_NETWORK, "Getting score failed!\n");
             mListener->OnLeaderboardResult(
                 false, mCategory, mFilter, 0, 0, 0);
+            break;
         }
         mOperation = 0;
     }
-    else if (result == DWC_RNK_ERROR_NOTCOMPLETED)
+    else if (result == DWC_RNK_PROCESS_NOTASK)
     {
-        if (mOperation == 1 && mListener != 0)
+        switch (mOperation)
         {
+        case 1:
             tDebugPrintManager::Print(DC_NETWORK, "Putting Score succeeded!\n");
             if (mReportGame)
             {
@@ -909,11 +1009,11 @@ void NetworkRanking::Update()
             {
                 mListener->OnReportGameResult(true, mCategory);
             }
-        }
-        else if (mOperation == 2)
-        {
+            break;
+        case 2:
             tDebugPrintManager::Print(DC_NETWORK, "Getting score succeeded!\n");
             ProcessLeaderboardResults();
+            break;
         }
         mOperation = 0;
     }

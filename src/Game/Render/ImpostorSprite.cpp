@@ -362,10 +362,10 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
             (float)mWidth / (float)mHeight;
         nlVec3Scale(right, aspect);
 
-        int* slot = mRenderSlots;
-        for (i = 0; i < count; ++slot, ++i)
+        int* slots = mRenderSlots;
+        for (i = 0; i < count; ++i)
         {
-            impostor = &impostors[*slot];
+            impostor = &impostors[slots[i]];
             ImpostorQuad quad;
             BuildQuad(&quad, impostor, &right, &up);
 

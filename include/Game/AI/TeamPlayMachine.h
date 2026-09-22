@@ -39,6 +39,15 @@ public:
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
 
+    shdStateMachine* UnidentifiedGet06C(int state) const
+    {
+        if (state >= 0 && state < mUnidentified074)
+        {
+            return mUnidentified06C[state];
+        }
+        return 0;
+    }
+
     shdStateMachine* fn_800C2F20() const { return mUnidentified004; }
 
     shdStateMachine* mUnidentified004;

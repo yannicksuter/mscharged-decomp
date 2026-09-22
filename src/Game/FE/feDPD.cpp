@@ -22,7 +22,25 @@
 
 TLComponentInstance* gFEPointerInstances[4];
 nlVector2 gFEPointerPositions[4];
-bool gFEPointerEnabled[4];
+bool gDisableRemotePointer;
+
+static inline void ClampPointerPosition(int pad, nlVector2 position, int width, int height)
+{
+    int maxX = width / 2 - 20;
+    int minX = -width / 2 + 20;
+    int maxY = height / 2 - 5;
+    int minY = -height / 2 + 5;
+
+    if (position.x <= maxX && position.x >= minX)
+        gFEPointerPositions[pad].x = position.x;
+    else
+        gFEPointerPositions[pad].x = (float)(position.x > maxX ? maxX : minX);
+
+    if (position.y <= maxY && position.y >= minY)
+        gFEPointerPositions[pad].y = position.y;
+    else
+        gFEPointerPositions[pad].y = (float)(position.y > maxY ? maxY : minY);
+}
 
 FEDPDTask::FEDPDTask()
 {
@@ -62,6 +80,7 @@ nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid)
     cGlobalPad* globalPad = g_pPadManager->GetPad(pad);
     PadBackend* device = globalPad->mBackend;
     nlVector2 position;
+    DPDData* data = 0;
     nlVec2Set(position, 0.0f, 0.0f);
 
     gl_ScreenInfo* screenInfo = glGetScreenInfo();
@@ -78,24 +97,22 @@ nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid)
         position.x = randomX + gFEPointerPositions[pad].x;
         position.y = randomY + gFEPointerPositions[pad].y;
 
-        gFEPointerPositions[pad].x = CLAMP(
-            (float)((-width / 2) + 20), (float)((width / 2) - 20), position.x);
-        gFEPointerPositions[pad].y = CLAMP(
-            (float)((-height / 2) + 5), (float)((height / 2) - 5), position.y);
+        ClampPointerPosition(pad, position, width, height);
         *angle = 0;
         *valid = true;
         return position;
     }
 
-    DPDData* data = 0;
-    if (device->GetClassID() == gWiiFreestylePadClassID)
+    int classID = device->GetClassID();
+    if (classID == gWiiFreestylePadClassID)
     {
         data = &static_cast<WiiFreestylePad*>(globalPad->mBackend)->mDPDData;
     }
-    else if (!gDisableRemotePointer
-             && device->GetClassID() == gWiiRemotePadClassID)
+    else if (!gDisableRemotePointer)
     {
-        data = &static_cast<WiiRemotePad*>(globalPad->mBackend)->mDPDData;
+        int remoteClassID = device->GetClassID();
+        if (remoteClassID == gWiiRemotePadClassID)
+            data = &static_cast<WiiRemotePad*>(globalPad->mBackend)->mDPDData;
     }
 
     if (data != 0 && g_pFEInput->IsConnected((eFEINPUT_PAD)pad))
@@ -103,18 +120,11 @@ nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid)
         if (data->mValidFlag > 0)
         {
             data->GetPosition(&position, angle);
-            position.x = -1.0f * (position.x * (float)width * 0.5f);
-            position.y = position.y * (float)height * 0.5f;
+            position.x = -1.0f * (position.x * (float)width / 2.0f);
+            position.y = position.y * (float)height / 2.0f;
             *valid = true;
 
-            gFEPointerPositions[pad].x = CLAMP(
-                (float)((-width / 2) + 20),
-                (float)((width / 2) - 20),
-                position.x);
-            gFEPointerPositions[pad].y = CLAMP(
-                (float)((-height / 2) + 5),
-                (float)((height / 2) - 5),
-                position.y);
+            ClampPointerPosition(pad, position, width, height);
         }
         else
         {
@@ -125,8 +135,9 @@ nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid)
     else
     {
         *valid = false;
-        nlVec2Set(position, -999.0f, -999.0f);
-        return position;
+        nlVector2 invalidPosition;
+        nlVec2Set(invalidPosition, -999.0f, -999.0f);
+        return invalidPosition;
     }
 
     return gFEPointerPositions[pad];

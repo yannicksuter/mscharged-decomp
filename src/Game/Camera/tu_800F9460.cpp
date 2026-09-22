@@ -29,6 +29,7 @@ extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
 extern "C" unsigned char* gNetworkInputRecording;
 extern "C" bool fn_8003C180(cPlayer*);
 
+static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 bool lbl_806DC540 = true;
 float lbl_806DC544 = 0.6f;
@@ -378,13 +379,16 @@ void UnidentifiedCameraEffects::OnGoalScored(
 nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
     const GameplayCamera* camera) const
 {
-    nlVector3 result = { 0.0f, 0.0f, 0.0f };
-    nlVector3 target = result;
+    nlVector3 result = v3Zero;
+    nlVector3 target = v3Zero;
+    nlVector3 offset;
+    nlVector3 finalCameraTarget;
     bool hasTarget = false;
 
     if (mTransitionBlend != 0.0f && mRotateCamera)
     {
-        target = camera->m_v3Target;
+        nlVector3 cameraTarget = camera->m_v3Target;
+        target = cameraTarget;
         hasTarget = true;
     }
     if (mTransitionBlend != 0.0f && mTrackSecondaryPlayer
@@ -394,13 +398,11 @@ nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
         hasTarget = true;
     }
 
-    if (hasTarget)
+    if (hasTarget == true)
     {
-        nlVector3 offset;
-        offset.x = target.x - camera->m_v3Target.x;
-        offset.y = target.y - camera->m_v3Target.y;
-        offset.z = target.z - camera->m_v3Target.z;
+        finalCameraTarget = camera->m_v3Target;
         ReplayManager::Instance();
+        nlVec3Sub(offset, target, finalCameraTarget);
         result.x = Interpolate(0.0f, offset.x, mTransitionBlend);
         result.y = lbl_806DC544
                  * Interpolate(0.0f, offset.y, mTransitionBlend);

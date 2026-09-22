@@ -3227,10 +3227,12 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
             v3Velocity.z = 5.0f + nlRandomf(5.0f);
         }
 
-        g_pBall->SetVelocity(v3Velocity, SPINTYPE_NONE, NULL);
-        g_pBall->m_tNoPickupTimer.SetSeconds(0.1f);
-        g_pBall->m_pPhysicsBall->mbUseMagnusEffect = false;
-        g_pBall->m_pPhysicsBall->mfChargeBonus = 0.0f;
+        cBall* pBall = g_pBall;
+        pBall->SetVelocity(v3Velocity, SPINTYPE_NONE, NULL);
+        pBall->m_tNoPickupTimer.SetSeconds(0.1f);
+        PhysicsBall* pPhysicsBall = pBall->m_pPhysicsBall;
+        pPhysicsBall->mbUseMagnusEffect = false;
+        pPhysicsBall->mfChargeBonus = 0.0f;
     }
     else if (pPatch->m_Type == 10)
     {
@@ -3244,14 +3246,14 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
     if (g_pBall->m_pPhysicsBall->GetPosition().z < 0.207f)
     {
         int nBallState = g_pBall->meBallState;
-        if (nBallState >= 6)
+        if (nBallState < 6)
         {
-            if (nBallState < 9)
+            if (nBallState == 2)
             {
                 return;
             }
         }
-        else if (nBallState == 2)
+        else if (nBallState < 9)
         {
             return;
         }

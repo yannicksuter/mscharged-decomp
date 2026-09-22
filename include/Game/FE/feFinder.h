@@ -36,9 +36,8 @@ inline T* FindItemByHashID(T* list, unsigned long hashID)
     T* curr = list->m_next;
     for (;;)
     {
-        unsigned long id = curr->m_hash;
         T* next = curr->m_next;
-        if (hashID == id)
+        if (hashID == curr->m_hash)
             return curr;
         if (curr == list)
             break;

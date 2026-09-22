@@ -45,6 +45,11 @@ public:
     virtual void ParseValue(const char*);
     virtual void CopyValueFrom(TweakValueBase*);
 
+    operator float() const
+    {
+        return value;
+    }
+
     static void operator delete(void* pointer)
     {
         gTweakValueAllocator->m_Pool1.Free(pointer);

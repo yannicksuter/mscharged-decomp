@@ -1,6 +1,7 @@
 #include "Game/HBMManager.h"
 
 #include "Game/SH/SHLoading.h"
+#include "Game/BaseSceneHandler.inl"
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/BaseSceneHandler.h"
@@ -8,6 +9,7 @@
 #include "Game/DB/CharacterInfo.inl"
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/tlImageInstance.h"
+#include "NL/nlLocalization.inl"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlFormat.h"
 #include <string.h>
@@ -16,6 +18,7 @@
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
+#include "Game/FE/feScene.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
@@ -27,6 +30,8 @@
 #include "Game/Render/RLViewLayers.h"
 #include "NL/nlPrint.h"
 #include "Game/FE/FEAudio.h"
+
+static void DisplayBestOfText(MatchLoadingScene* scene, TLTextInstance* text, int numGames);
 
 SuperLoadingScene::SuperLoadingScene()
     : mType(TT_INVALID)
@@ -124,34 +129,9 @@ void MatchLoadingScene::Update(float dt)
     }
 }
 
-inline void MatchLoadingScene::DisplayBestOfText(TLTextInstance* text, int numGames)
+bool UnidentifiedLoadingHasPresentation(BaseLoadingScene* scene)
 {
-    const unsigned short* unformatted = g_pLocalization->GetString("BEST_OF_X");
-    unsigned short games[4];
-    nlSNPrintf(games, 4, (const unsigned short*)L"%d", numGames);
-    {
-        typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
-        WideString formatted = Format(WideString(unformatted), games);
-        memcpy(mTextBuffers[0], formatted.c_str(), 128);
-        text->SetString(mTextBuffers[0]);
-    }
-    DisplayStadiumName(mTextInstances[1]);
-    mTextInstances[2]->m_bVisible = false;
-    mTextInstances[3]->m_bVisible = false;
-    mTextInstances[4]->m_bVisible = false;
-    mTextInstances[5]->m_bVisible = false;
-}
-
-void MatchLoadingScene::DisplayOnlineInfo()
-{
-    int numGames = GameInfoManager::Instance()->GetCurrentSettings()->NumGames;
-    DisplayBestOfText(mTextInstances[0], numGames);
-}
-
-void MatchLoadingScene::DisplayStadiumName(TLTextInstance* stadiumText)
-{
-    const char* stringID = GetStadiumTickerStringID(GameInfoManager::Instance()->GetStadium());
-    stadiumText->SetStringId(stringID);
+    return scene->GetPresentation() != 0;
 }
 
 void SuperLoadingScene::SceneCreated()
@@ -322,7 +302,7 @@ void MatchLoadingScene::SceneCreated()
 void MatchLoadingScene::DisplayFriendlyInfo()
 {
     int numGames = GameInfoManager::Instance()->GetCurrentSettings()->NumGames;
-    DisplayBestOfText(mTextInstances[0], numGames);
+    DisplayBestOfText(this, mTextInstances[0], numGames);
 }
 
 void MatchLoadingScene::DisplayCupInfo()
@@ -420,6 +400,24 @@ void MatchLoadingScene::DisplayCupInfo()
     mTextInstances[0]->SetString(mTextBuffers[0]);
 }
 
+static void DisplayBestOfText(MatchLoadingScene* scene, TLTextInstance* text, int numGames)
+{
+    const unsigned short* unformatted = g_pLocalization->GetString("BEST_OF_X");
+    unsigned short games[4];
+    nlSNPrintf(games, 4, (const unsigned short*)L"%d", numGames);
+    {
+        typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
+        WideString formatted = Format(WideString(unformatted), games);
+        memcpy(scene->mTextBuffers[0], formatted.c_str(), 128);
+        text->SetString(scene->mTextBuffers[0]);
+    }
+    scene->DisplayStadiumName(scene->mTextInstances[1]);
+    scene->mTextInstances[2]->m_bVisible = false;
+    scene->mTextInstances[3]->m_bVisible = false;
+    scene->mTextInstances[4]->m_bVisible = false;
+    scene->mTextInstances[5]->m_bVisible = false;
+}
+
 void MatchLoadingScene::DisplayChallengeInfo()
 {
     char objective[64];
@@ -449,6 +447,16 @@ void MatchLoadingScene::SetTeamLogo(int side, CharacterInfo character)
         image->m_pTextureResource = source->m_pTextureResource;
 }
 
-#include "Game/BaseSceneHandler.inl"
+void MatchLoadingScene::DisplayOnlineInfo()
+{
+    int numGames = GameInfoManager::Instance()->GetCurrentSettings()->NumGames;
+    DisplayBestOfText(this, mTextInstances[0], numGames);
+}
+
+void MatchLoadingScene::DisplayStadiumName(TLTextInstance* stadiumText)
+{
+    const char* stringID = GetStadiumTickerStringID(GameInfoManager::Instance()->GetStadium());
+    stadiumText->SetStringId(stringID);
+}
 
 #include "Game/FE/feFinder_impl.h"

@@ -487,18 +487,23 @@ template <typename P1, typename P2, typename P3>
 void* UnidentifiedTypedEvent3<P1, P2, P3>::sType;
 
 // Retail queued-event destructors inline one more non-trivial destructor
-// level than UnidentifiedEvent's own copies, with no code of its own; its
-// vtable store is dead in the constructor and the vtable is not retained.
+// level than UnidentifiedEvent's own copies. This base stores the dispatcher
+// before the derived vtable is installed; its own vtable is not retained.
 template <typename T>
 class UnidentifiedQueuedEventBase : public UnidentifiedEvent<T>
 {
 public:
-    UnidentifiedQueuedEventBase(const char* name, int length)
+    UnidentifiedQueuedEventBase(
+        EventDispatcher* dispatcher, const char* name, int length)
         : UnidentifiedEvent<T>(name, length)
+        , mDispatcher(dispatcher)
     {
     }
 
     virtual ~UnidentifiedQueuedEventBase() { }
+
+protected:
+    EventDispatcher* mDispatcher;
 };
 
 template <typename T>
@@ -519,16 +524,12 @@ public:
 
     void Queue(T* data, const Function<T*>& disposer);
     void Queue(const Callback& disposer);
-
-private:
-    EventDispatcher* mDispatcher;
 };
 
 template <typename T>
 UnidentifiedQueuedEvent<T>::UnidentifiedQueuedEvent(
     EventDispatcher* dispatcher, const char* name, int length)
-    : UnidentifiedQueuedEventBase<T>(name, length)
-    , mDispatcher(dispatcher)
+    : UnidentifiedQueuedEventBase<T>(dispatcher, name, length)
 {
 }
 
@@ -545,7 +546,7 @@ void UnidentifiedQueuedEvent<T>::Queue(T* data, const Function<T*>& disposer)
     Function<bool> callback(
         Bind<void>(MemFun((DispatchFunction)&UnidentifiedEvent<T>::Dispatch),
             this, data, disposer, placeholder0));
-    mDispatcher->Add(callback);
+    this->mDispatcher->Add(callback);
 }
 
 template <typename T>
@@ -556,7 +557,7 @@ void UnidentifiedQueuedEvent<T>::Queue(const Callback& disposer)
     Function<bool> callback(
         Bind<void>(MemFun((DispatchFunction)&UnidentifiedEvent<T>::Dispatch),
             this, disposer, placeholder0));
-    mDispatcher->Add(callback);
+    this->mDispatcher->Add(callback);
 }
 
 #endif // GAME_EVENT_H

@@ -63,8 +63,7 @@ void DesireSlideAttack::Update(
     {
         if (mpTarget == NULL || mpTarget != g_pBall->m_pOwner)
         {
-            *update = FuzzyVariant(FT_INT, 1);
-            update->mTemporary = false;
+            update->SetDesireFinished();
             return;
         }
 
@@ -98,12 +97,13 @@ void DesireSlideAttack::Update(
                     true);
                 if (fBallSpeed > 0.05f)
                 {
-                    const nlVector3& ballVelocity = g_pBall->m_v3Velocity;
+                    cBall* const pBall = g_pBall;
+                    const nlVector3& ballVelocity = pBall->m_v3Velocity;
                     fBallClosingSpeed = GetClosingSpeed2D(
                         pFielder->GetJointPosition(
                             pFielder->m_nLeftFootJointIndex),
                         pFielder->mUnidentified024.m_v3Velocity,
-                        g_pBall->m_v3Position, ballVelocity);
+                        pBall->m_v3Position, ballVelocity);
                     if (fBallClosingSpeed < 0.0f
                         && nlRandomf(1.0f) > 0.5f)
                     {
@@ -123,8 +123,7 @@ void DesireSlideAttack::Update(
     {
         if (pFielder->IsActionDone())
         {
-            *update = FuzzyVariant(FT_INT, 1);
-            update->mTemporary = false;
+            update->SetDesireFinished();
         }
         break;
     }
@@ -141,26 +140,19 @@ void DesireSlideAttack::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x6F4 | 0x800C84D0 | size: 0x5C
  */
-DesireSlideAttack::~DesireSlideAttack()
+inline DesireSlideAttack::~DesireSlideAttack()
 {
 }
 
 /**
  * Offset/Address/Size: 0x750 | 0x800C852C | size: 0x110
  */
-void DesireSlideAttack::UnidentifiedVirtual8(
+inline void DesireSlideAttack::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireSlideAttack");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
     cache->AddField(14, gDebugFieldTypes[14].size,
@@ -172,7 +164,7 @@ void DesireSlideAttack::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x860 | 0x800C863C | size: 0xC0
  */
-void DesireSlideAttack::UnidentifiedVirtual7(
+inline void DesireSlideAttack::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSlideAttackType == 0xFFFF)

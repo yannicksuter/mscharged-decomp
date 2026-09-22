@@ -15,6 +15,7 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
+#include "NL/globalpad.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOptionsCheatsList.h"
@@ -51,7 +52,7 @@ SHGameplayOptions::SHGameplayOptions()
     mUnidentified15F4 = 20;
     mUnidentified15F8 = 12;
     GameInfoManager* gameInfo = GameInfoManager::Instance();
-    if (gameInfo->mIsOnlineMode && !gameInfo->mOnlineRankedMatch)
+    if (gameInfo->UseAltRules())
     {
         mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C);
         mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68);
@@ -73,47 +74,49 @@ void SHGameplayOptions::SceneCreated()
 {
     FEPresentation* presentation = mPresentation;
     mUnidentified1388 = FEFinder<TLInstance, 2>::Find(presentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("GOALS"), 0, 0, 0);
+        "OPTIONS", "Layer", "GOALS", 0UL, 0UL, 0UL);
     mUnidentified138C = FEFinder<TLInstance, 2>::Find(presentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("MINUTES"), 0, 0, 0);
+        "OPTIONS", "Layer", "MINUTES", 0UL, 0UL, 0UL);
     mUnidentified1390 = FEFinder<TLInstance, 2>::Find(presentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SKILL LEVEL"), 0, 0, 0);
+        "OPTIONS", "Layer", "SKILL LEVEL", 0UL, 0UL, 0UL);
     mUnidentified1394 = FEFinder<TLInstance, 2>::Find(presentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("BEST OF SERIES"), 0, 0, 0);
+        "OPTIONS", "Layer", "BEST OF SERIES", 0UL, 0UL, 0UL);
     mOptionInstances[10] = FEFinder<TLComponentInstance, 4>::Find(presentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("BTN_GOALS"), 0, 0, 0);
+        "OPTIONS", "Layer", "BTN_GOALS", 0UL, 0UL, 0UL);
     mOptionInstances[11] = FEFinder<TLComponentInstance, 4>::Find(presentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("BTN_TIME"), 0, 0, 0);
-    for (int i = 0; i < 5; ++i)
+        "OPTIONS", "Layer", "BTN_TIME", 0UL, 0UL, 0UL);
+    int i;
+    int button;
+    for (button = 0, i = 0; i < 5; ++button, ++i)
     {
         char name[16];
-        nlSNPrintf(name, sizeof(name), "BUTTON_%d", i);
+        nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
         mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified1390, InlineHasher(name));
     }
-    for (int i = 5; i < 10; ++i)
+    for (button = 0, i = 5; i < 10; ++button, ++i)
     {
         char name[16];
-        nlSNPrintf(name, sizeof(name), "BUTTON_%d", i - 5);
+        nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
         mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified1394, InlineHasher(name));
     }
-    for (int i = 12; i < 20; ++i)
+    for (button = 0, i = 12; i < 20; ++button, ++i)
     {
         char name[16];
-        nlSNPrintf(name, sizeof(name), "BUTTON_%d", i - 12);
+        nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
         mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified1388, InlineHasher(name));
     }
-    for (int i = 20; i < 24; ++i)
+    for (button = 2, i = 20; i < 24; ++button, ++i)
     {
         char name[16];
-        nlSNPrintf(name, sizeof(name), "BUTTON_%d", i - 18);
+        nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
         mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified138C, InlineHasher(name));
     }
     mCheatInstances[0] = FEFinder<TLComponentInstance, 4>::Find(presentation,
-        nlStringLowerHash("CHEATS"), nlStringLowerHash("Layer"), nlStringLowerHash("cheat_0"), 0, 0, 0);
+        "CHEATS", "Layer", "cheat_0", 0UL, 0UL, 0UL);
     mCheatInstances[1] = FEFinder<TLComponentInstance, 4>::Find(presentation,
-        nlStringLowerHash("CHEATS"), nlStringLowerHash("Layer"), nlStringLowerHash("cheat_1"), 0, 0, 0);
+        "CHEATS", "Layer", "cheat_1", 0UL, 0UL, 0UL);
     mCheatInstances[2] = FEFinder<TLComponentInstance, 4>::Find(presentation,
-        nlStringLowerHash("CHEATS"), nlStringLowerHash("Layer"), nlStringLowerHash("cheat_2"), 0, 0, 0);
+        "CHEATS", "Layer", "cheat_2", 0UL, 0UL, 0UL);
     TLComponentInstance* done = 0;
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
@@ -133,16 +136,18 @@ void SHGameplayOptions::SceneCreated()
 void SHGameplayOptions::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
-    if (mUnidentified15FC == 0 || (mUnidentified15FC >= 2 && mUnidentified15FC <= 4))
+    TLSlide* slide;
+    int state = mUnidentified15FC;
+    if (state == 0 || (unsigned int)(state - 2) <= 2)
     {
-        TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_start + slide->m_duration)
+        slide = mPresentation->m_currentSlide;
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mUnidentified15FC == 0)
+        if (state == 0)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
@@ -150,15 +155,15 @@ void SHGameplayOptions::Update(float dt)
             mUnidentified15FC = 1;
             fn_80235928();
         }
-        else if (mUnidentified15FC == 2)
+        else if (state == 2)
         {
             fn_80238050();
             return;
         }
-        else if (mUnidentified15FC == 3)
+        else if (state == 3)
         {
             GameInfoManager* gameInfo = GameInfoManager::Instance();
-            if (gameInfo->mIsOnlineMode && !gameInfo->mOnlineRankedMatch)
+            if (gameInfo->UseAltRules())
             {
                 if (gameInfo->mOnlineTwoLocalPlayers)
                     GameSceneManager::Instance()->Push(SCENE_ONLINE_GUEST_CONTROLLER_SELECT, SCREEN_NOTHING, true);
@@ -173,7 +178,7 @@ void SHGameplayOptions::Update(float dt)
             }
             return;
         }
-        else if (mUnidentified15FC == 4)
+        else if (state == 4)
         {
             mUnidentified15FC = 0;
             mPresentation->SetActiveSlide("IN", true);
@@ -187,20 +192,21 @@ void SHGameplayOptions::Update(float dt)
         mUnidentified15BC = true;
     }
     GameInfoManager* gameInfo = GameInfoManager::Instance();
-    if (gameInfo->mIsOnlineMode && !gameInfo->mOnlineRankedMatch
+    if (gameInfo->UseAltRules()
         && !GameSceneManager::Instance()->IsOnStack((SceneList)10)
         && g_pFriendManager->FindHostInvitation())
     {
         if (GameSceneManager::Instance()->IsOnStack((SceneList)28))
             GameSceneManager::Instance()->Pop();
-        g_pFriendManager->mReturnScene = 27;
-        g_pFriendManager->mPreviousRankedMode = 0;
+        FriendManager* friendManager = g_pFriendManager;
+        friendManager->mReturnScene = 27;
+        friendManager->mPreviousRankedMode = 0;
         GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
         return;
     }
     for (int i = 0; i < 4; ++i)
     {
-        TLComponentInstance* cursor = gFEPointerInstances[i];
+        TLComponentInstance* cursor = GetPointerInstance(i);
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if ((unsigned int)i != gFEControllerIndex)
@@ -218,14 +224,14 @@ void SHGameplayOptions::Update(float dt)
         FEPointerEvent event;
         event.mIndex = i;
         event.mPosition = GetPointerPosition(i, &valid);
+        g_pPadManager->GetPad(i)->GetButtonIndex(30, true);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
         for (int j = 0; j < 24; ++j)
             mOptionButtons[j].HandlePointerEvent(&event);
         for (int j = 0; j < 3; ++j)
             mCheatButtons[j].HandlePointerEvent(&event);
         mPageControls->Update(event, dt);
-        if (mPageControls->mPointerPressed[0] || mPageControls->mPadPressed[0]
-            || mPageControls->mPointerPressed[1] || mPageControls->mPadPressed[1])
+        if (mPageControls->IsButtonPressed(0) || mPageControls->IsButtonPressed(1))
         {
             FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
             FEAudio::PlayAnimAudioEvent(0xEA7AD449, 0, 0, 1);
@@ -235,7 +241,7 @@ void SHGameplayOptions::Update(float dt)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                if (mPageControls->mPointerPressed[0] || mPageControls->mPadPressed[0])
+                if (mPageControls->IsButtonPressed(0))
                     scene->SetButtons(9, false);
                 else
                     scene->SetButtons(10, false);
@@ -345,11 +351,11 @@ void SHGameplayOptions::fn_80235CE4(bool value)
 
 void SHGameplayOptions::fn_80235FE0()
 {
-    int type = mSettings.GameLimitType;
     int skill = mSettings.SkillLevel;
     int series = mSettings.NumGames;
     int time = mSettings.GameTime;
     int goals = mSettings.GoalLimit;
+    int type = mSettings.GameLimitType;
     int value = type == 1 ? goals : time / 60;
     TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation,
         nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SKILL LEVEL SETTINGS"), 0, 0, 0);
@@ -362,7 +368,7 @@ void SHGameplayOptions::fn_80235FE0()
     case 5: instance->SetActiveSlide("MEGASTRIKER", true, false); break;
     }
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SERIES SETTING"), 0, 0, 0);
+        "OPTIONS", "Layer", "SERIES SETTING", 0UL, 0UL, 0UL);
     unsigned short number[4];
     nlSNPrintf(number, 4, (const unsigned short*)L"%d", series);
     {
@@ -371,10 +377,14 @@ void SHGameplayOptions::fn_80235FE0()
         text->SetString(mUnidentified1538);
     }
     mUnidentified15BD = type == 1;
-    mUnidentified15F0 = type == 1 ? 10 : 11;
-    mOptionInstances[mUnidentified15F0]->SetActiveSlide("down", true, false);
+    int selected = 11;
+    if (type == 1)
+        selected = 10;
+    mUnidentified15F0 = selected;
+    mOptionInstances[selected]->SetActiveSlide("down", true, false);
+    FEPointerButton* button = &mOptionButtons[mUnidentified15F0];
     for (int j = 0; j < 4; ++j)
-        mOptionButtons[mUnidentified15F0].SetPointerState(2, j);
+        button->SetPointerState(2, j);
     fn_80236ADC(type, value);
     for (int i = 0; i < 5; ++i)
     {
@@ -382,8 +392,9 @@ void SHGameplayOptions::fn_80235FE0()
         {
             mUnidentified15E8 = i;
             mOptionInstances[i]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mUnidentified15E8];
             for (int j = 0; j < 4; ++j)
-                mOptionButtons[i].SetPointerState(2, j);
+                button->SetPointerState(2, j);
             break;
         }
     }
@@ -393,8 +404,9 @@ void SHGameplayOptions::fn_80235FE0()
         {
             mUnidentified15EC = i + 5;
             mOptionInstances[mUnidentified15EC]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mUnidentified15EC];
             for (int j = 0; j < 4; ++j)
-                mOptionButtons[mUnidentified15EC].SetPointerState(2, j);
+                button->SetPointerState(2, j);
             break;
         }
     }
@@ -404,8 +416,9 @@ void SHGameplayOptions::fn_80235FE0()
         {
             mUnidentified15F8 = i + 12;
             mOptionInstances[mUnidentified15F8]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mUnidentified15F8];
             for (int j = 0; j < 4; ++j)
-                mOptionButtons[mUnidentified15F8].SetPointerState(2, j);
+                button->SetPointerState(2, j);
             break;
         }
     }
@@ -415,8 +428,9 @@ void SHGameplayOptions::fn_80235FE0()
         {
             mUnidentified15F4 = i + 20;
             mOptionInstances[mUnidentified15F4]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mUnidentified15F4];
             for (int j = 0; j < 4; ++j)
-                mOptionButtons[mUnidentified15F4].SetPointerState(2, j);
+                button->SetPointerState(2, j);
             break;
         }
     }

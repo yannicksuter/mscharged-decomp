@@ -34,9 +34,10 @@ public:
         int upper = FindUpperPoint(x);
         const nlVector2& lowerPoint = mData[upper - 1];
         const nlVector2& upperPoint = mData[upper];
-        float range = upperPoint.x - lowerPoint.x;
+        float lowerX = lowerPoint.x;
+        float range = upperPoint.x - lowerX;
         range = range >= 0.0001f ? range : 0.0001f;
-        float percent = (x - lowerPoint.x) / range;
+        float percent = (x - lowerX) / range;
         value = (1.0f - percent) * lowerPoint.y + percent * upperPoint.y;
     }
 

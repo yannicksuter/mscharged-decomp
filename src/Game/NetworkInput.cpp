@@ -262,32 +262,39 @@ void NetMessageInput::SetNetworkInputMessageRecord(s8 player, const PackedDetInp
 
 void NetMessageInput::ApplyNetworkInputMessageRecord(s8 player, PackedDetInput* record)
 {
-    u8* output = (u8*)record;
-    const u8* previous = mUnidentified01C[player].mData;
-    u8 changes = mUnidentified018[player];
-    if (changes & 2)
-        *(u16*)(output + 0) = *(const u16*)(previous + 0);
-    if (changes & 4)
+    if (mUnidentified018[player] & 2)
+        record->mButtonBitfield = *(u16*)mUnidentified01C[player].mData;
+    if (mUnidentified018[player] & 4)
     {
-        output[12] = previous[12];
-        output[13] = previous[13];
+        s8 leftX = mUnidentified01C[player].mData[12];
+        s8 leftY = mUnidentified01C[player].mData[13];
+        record->mAnalogAxes[0] = leftX;
+        record->mAnalogAxes[1] = leftY;
     }
-    if (changes & 8)
+    if (mUnidentified018[player] & 8)
     {
-        output[14] = previous[14];
-        output[15] = previous[15];
+        s8 rightX = mUnidentified01C[player].mData[14];
+        s8 rightY = mUnidentified01C[player].mData[15];
+        record->mAnalogAxes[2] = rightX;
+        record->mAnalogAxes[3] = rightY;
     }
-    if (changes & 0x10)
+    if (mUnidentified018[player] & 0x10)
     {
-        output[3] = previous[3];
-        output[4] = previous[4];
-        output[5] = previous[5];
+        s8 x = mUnidentified01C[player].mData[3];
+        s8 y = mUnidentified01C[player].mData[4];
+        s8 z = mUnidentified01C[player].mData[5];
+        record->mRemoteAccel[0] = x;
+        record->mRemoteAccel[1] = y;
+        record->mRemoteAccel[2] = z;
     }
-    if (changes & 0x20)
+    if (mUnidentified018[player] & 0x20)
     {
-        output[6] = previous[6];
-        output[7] = previous[7];
-        output[8] = previous[8];
+        s8 x = mUnidentified01C[player].mData[6];
+        s8 y = mUnidentified01C[player].mData[7];
+        s8 z = mUnidentified01C[player].mData[8];
+        record->mFreeStyleAccel[0] = x;
+        record->mFreeStyleAccel[1] = y;
+        record->mFreeStyleAccel[2] = z;
     }
 }
 

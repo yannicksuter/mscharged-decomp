@@ -222,7 +222,7 @@ void SHOnlineMatchmakingDraft::SceneCreated()
         UpdateOnlinePlayerRow(&mPlayers[i + mScrollOffset], mPlayerInstances[i],
             mPlayerNameBuffers[i], 0x20, mPlayerDescriptionBuffers[i], 0x30, i, mIntroFinished);
     for (int i = 0; i < 4; ++i)
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
     TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer",
@@ -249,7 +249,7 @@ void SHOnlineMatchmakingDraft::SceneCreated()
     int countdown = NetworkDraft::Instance()->GetCountdown();
     mCountdown = countdown;
     TLSlide* timerSlide = mPresentation->GetActiveSlide();
-    FEFinder<TLInstance, 2>::Find<>(timerSlide,
+    FEFinder<TLInstance, 2>::Find(timerSlide,
         "Layer", "Timer")->m_bVisible = false;
     TLTextInstance* text = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
     if (countdown == -1)

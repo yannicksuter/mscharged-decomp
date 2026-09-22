@@ -5,9 +5,35 @@
 #include "Game/PoseAccumulator.h"
 #include "Game/SHierarchy.h"
 #include "Game/SAnim/pnSAnimController.h"
+#include "Game/World/WorldObject.h"
 #include "NL/nlAVLTree.h"
 
-class WorldAnimObject_803437C8;
+struct WorldAnimBinding_803438FC;
+class WorldAnimController;
+
+class WorldAnimObject_803437C8 : public WorldObject
+{
+public:
+    virtual ~WorldAnimObject_803437C8();
+    virtual void UnidentifiedVirtual1C(WorldObjectLoadContext* context);
+
+    /* 0x04 */ unsigned long m_uHashID;
+    /* 0x08 */ u8 m_pad08[0x08];
+    /* 0x10 */ World* m_pWorld;
+    /* 0x14 */ int m_nAnimNode;
+    /* 0x18 */ WorldAnimController* m_pAnimController;
+    /* 0x1C */ u8 m_pad1C[0x44];
+    /* 0x60 */ int m_nBindings;
+    /* 0x64 */ unsigned long m_uHierarchyHash;
+    /* 0x68 */ WorldAnimBinding_803438FC* m_pBindings;
+    /* 0x6C */ u8 m_pad6C[0x04];
+    /* 0x70 */ int m_nAnimations;
+    /* 0x74 */ unsigned long* m_pAnimationHashes;
+    /* 0x78 */ u8 m_pad78[0x08];
+    /* 0x80 */ ePlayMode m_ePlayMode;
+    /* 0x84 */ float m_fAnimationSpeed;
+    /* 0x88 */ float m_fAnimationTime;
+};
 
 class AnimationSet
 {

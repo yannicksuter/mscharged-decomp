@@ -46,6 +46,11 @@ struct NetworkSeasonDateTable
     {
     }
 
+    NetworkSeasonDate GetDate(int index) const
+    {
+        return mDates[index];
+    }
+
     mutable int mCount;
     NetworkSeasonDate* mDates;
 }; // size: 0x8

@@ -143,33 +143,33 @@ void CycleHallOfFameCup(int mode, bool advance)
     case 0:
         if (wideScreen)
         {
-            PushPresentationCamera("hofbronze", 0, 0.0f, true);
+            PushPresentationCamera("hofbronze", 0, 0.5f, true);
         }
         else
         {
-            PushPresentationCamera("43hofbronze", 0, 0.0f, true);
+            PushPresentationCamera("43hofbronze", 0, 0.5f, true);
         }
         GameSceneManager::Instance()->Push((SceneList)62, SCREEN_NOTHING, true);
         break;
     case 1:
         if (wideScreen)
         {
-            PushPresentationCamera("hofgold", 0, 0.0f, true);
+            PushPresentationCamera("hofgold", 0, 0.5f, true);
         }
         else
         {
-            PushPresentationCamera("43hofgold", 0, 0.0f, true);
+            PushPresentationCamera("43hofgold", 0, 0.5f, true);
         }
         GameSceneManager::Instance()->Push((SceneList)63, SCREEN_NOTHING, true);
         break;
     case 2:
         if (wideScreen)
         {
-            PushPresentationCamera("hofsilver", 0, 0.0f, true);
+            PushPresentationCamera("hofsilver", 0, 0.5f, true);
         }
         else
         {
-            PushPresentationCamera("43hofsilver", 0, 0.0f, true);
+            PushPresentationCamera("43hofsilver", 0, 0.5f, true);
         }
         GameSceneManager::Instance()->Push((SceneList)64, SCREEN_NOTHING, true);
         break;
@@ -181,39 +181,39 @@ void ShowHallOfFameTrophy(int camera)
     switch (camera)
     {
     case 4:
-        PushPresentationCamera("trophycentreofbronzehof", 0, 0.0f, true);
+        PushPresentationCamera("trophycentreofbronzehof", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)66, SCREEN_NOTHING, true);
         break;
     case 6:
-        PushPresentationCamera("trophycentreofgoldhof", 0, 0.0f, true);
+        PushPresentationCamera("trophycentreofgoldhof", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)69, SCREEN_NOTHING, true);
         break;
     case 5:
-        PushPresentationCamera("trophycentreofsilverhof", 0, 0.0f, true);
+        PushPresentationCamera("trophycentreofsilverhof", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)72, SCREEN_NOTHING, true);
         break;
     case 8:
-        PushPresentationCamera("trophyrightofbronze", 0, 0.0f, true);
+        PushPresentationCamera("trophyrightofbronze", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)67, SCREEN_NOTHING, true);
         break;
     case 7:
-        PushPresentationCamera("trophyleftofbronze", 0, 0.0f, true);
+        PushPresentationCamera("trophyleftofbronze", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)68, SCREEN_NOTHING, true);
         break;
     case 12:
-        PushPresentationCamera("trophyrightofgold", 0, 0.0f, true);
+        PushPresentationCamera("trophyrightofgold", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)70, SCREEN_NOTHING, true);
         break;
     case 11:
-        PushPresentationCamera("trophyleftofgold", 0, 0.0f, true);
+        PushPresentationCamera("trophyleftofgold", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)71, SCREEN_NOTHING, true);
         break;
     case 10:
-        PushPresentationCamera("trophyrightofsilver", 0, 0.0f, true);
+        PushPresentationCamera("trophyrightofsilver", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)73, SCREEN_NOTHING, true);
         break;
     case 9:
-        PushPresentationCamera("trophyleftofsilver", 0, 0.0f, true);
+        PushPresentationCamera("trophyleftofsilver", 0, 0.5f, true);
         GameSceneManager::Instance()->Push((SceneList)74, SCREEN_NOTHING, true);
         break;
     }
@@ -287,11 +287,11 @@ void LeaveHallOfFamePage(int mode)
     case 8:
         if (wideScreen)
         {
-            PushPresentationCamera("hofbronze", 0, 0.0f, true);
+            PushPresentationCamera("hofbronze", 0, 0.5f, true);
         }
         else
         {
-            PushPresentationCamera("43hofbronze", 0, 0.0f, true);
+            PushPresentationCamera("43hofbronze", 0, 0.5f, true);
         }
         GameSceneManager::Instance()->Push((SceneList)62, SCREEN_BACK, true);
         break;
@@ -300,11 +300,11 @@ void LeaveHallOfFamePage(int mode)
     case 12:
         if (wideScreen)
         {
-            PushPresentationCamera("hofgold", 0, 0.0f, true);
+            PushPresentationCamera("hofgold", 0, 0.5f, true);
         }
         else
         {
-            PushPresentationCamera("43hofgold", 0, 0.0f, true);
+            PushPresentationCamera("43hofgold", 0, 0.5f, true);
         }
         GameSceneManager::Instance()->Push((SceneList)63, SCREEN_BACK, true);
         break;
@@ -313,11 +313,11 @@ void LeaveHallOfFamePage(int mode)
     case 10:
         if (wideScreen)
         {
-            PushPresentationCamera("hofsilver", 0, 0.0f, true);
+            PushPresentationCamera("hofsilver", 0, 0.5f, true);
         }
         else
         {
-            PushPresentationCamera("43hofsilver", 0, 0.0f, true);
+            PushPresentationCamera("43hofsilver", 0, 0.5f, true);
         }
         GameSceneManager::Instance()->Push((SceneList)64, SCREEN_BACK, true);
         break;
@@ -326,11 +326,11 @@ void LeaveHallOfFamePage(int mode)
         {
             if (wideScreen)
             {
-                PushPresentationCamera("hofbronze", 0, 0.0f, true);
+                PushPresentationCamera("hofbronze", 0, 0.5f, true);
             }
             else
             {
-                PushPresentationCamera("43hofbronze", 0, 0.0f, true);
+                PushPresentationCamera("43hofbronze", 0, 0.5f, true);
             }
             GameSceneManager::Instance()->Push((SceneList)62, SCREEN_BACK, true);
         }
@@ -338,11 +338,11 @@ void LeaveHallOfFamePage(int mode)
         {
             if (wideScreen)
             {
-                PushPresentationCamera("hofsilver", 0, 0.0f, true);
+                PushPresentationCamera("hofsilver", 0, 0.5f, true);
             }
             else
             {
-                PushPresentationCamera("43hofsilver", 0, 0.0f, true);
+                PushPresentationCamera("43hofsilver", 0, 0.5f, true);
             }
             GameSceneManager::Instance()->Push((SceneList)64, SCREEN_BACK, true);
         }
@@ -350,11 +350,11 @@ void LeaveHallOfFamePage(int mode)
         {
             if (wideScreen)
             {
-                PushPresentationCamera("hofgold", 0, 0.0f, true);
+                PushPresentationCamera("hofgold", 0, 0.5f, true);
             }
             else
             {
-                PushPresentationCamera("43hofgold", 0, 0.0f, true);
+                PushPresentationCamera("43hofgold", 0, 0.5f, true);
             }
             GameSceneManager::Instance()->Push((SceneList)63, SCREEN_BACK, true);
         }
@@ -735,7 +735,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
@@ -779,28 +779,31 @@ void SHHallOfFameHistory::Update(float fDeltaT)
     if (mImages[4]->Update(true))
         mImageReady[4] = true;
 
-    if (!mImageReady[0] || !mImageReady[1] || !mImageReady[2]
-        || !mImageReady[3] || !mImageReady[4])
+    if (mImageReady[0] && mImageReady[1] && mImageReady[2]
+        && mImageReady[3] && mImageReady[4])
+    {
+        mImages[0]->mImageInstance->m_bVisible = true;
+        mImages[4]->mImageInstance->m_bVisible = true;
+        mImages[1]->mImageInstance->m_bVisible = true;
+        mImages[2]->mImageInstance->m_bVisible = true;
+        mImages[3]->mImageInstance->m_bVisible = true;
+    }
+    else
     {
         return;
     }
 
-    mImages[0]->mImageInstance->m_bVisible = true;
-    mImages[4]->mImageInstance->m_bVisible = true;
-    mImages[1]->mImageInstance->m_bVisible = true;
-    mImages[2]->mImageInstance->m_bVisible = true;
-    mImages[3]->mImageInstance->m_bVisible = true;
-
     for (unsigned int pad = 0; pad < 4; ++pad)
     {
         TLComponentInstance* controller = GetPointerInstance(pad);
-        bool processInput = true;
+        bool processInput;
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if (pad != gFEControllerIndex)
             {
                 controller->SetActiveSlide("waiting", true, false);
                 processInput = false;
+                goto checkInput;
             }
             else if (mUnidentified314[pad] > 0)
             {
@@ -812,6 +815,8 @@ void SHHallOfFameHistory::Update(float fDeltaT)
             }
         }
 
+        processInput = true;
+    checkInput:
         if (processInput)
         {
             unsigned char valid = 1;
@@ -997,18 +1002,12 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
     {
         unformatted = WideBasicString(LookupLocString("HOF_GOALS_AGAINST"));
 
-        unsigned long goalsForHash = nlStringLowerHash("GOALS FOR");
-        unsigned long historyHash = nlStringLowerHash("HISTORY");
-        goalsText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
-                nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0);
-        if (goalsText == 0)
-        {
-            goalsText = &UnidentifiedTLTextDefault::sInstance;
-        }
+        goalsText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide,
+                "Layer", "HISTORY", "GOALS FOR");
         goalsText->m_bVisible = false;
 
         unsigned long goalsAgainstHash = nlStringLowerHash("GOALS AGAINST");
-        historyHash = nlStringLowerHash("HISTORY");
+        unsigned long historyHash = nlStringLowerHash("HISTORY");
         goalsText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
         if (goalsText == 0)
@@ -1025,12 +1024,8 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
 
         unsigned long goalsAgainstHash = nlStringLowerHash("GOALS AGAINST");
         unsigned long historyHash = nlStringLowerHash("HISTORY");
-        goalsText = FEFinder<TLTextInstance, 3>::Find(presentation->m_currentSlide,
+        goalsText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide,
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
-        if (goalsText == 0)
-        {
-            goalsText = &UnidentifiedTLTextDefault::sInstance;
-        }
         goalsText->m_bVisible = false;
 
         unsigned long goalsForHash = nlStringLowerHash("GOALS FOR");
@@ -1160,28 +1155,28 @@ void SHHallOfFameHistory::UpdateTeamDisplay()
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_kritter_%s", captain.GetName());
     mImages[4]->QueueLoad(path, false);
 
-    const CharacterInfo& sidekick1 = GetCharacterInfo(GetCharacterIndexFromSidekick(value1));
+    const CharacterInfo* sidekick = &GetCharacterInfo(GetCharacterIndexFromSidekick(value1));
     image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK1");
     mImages[1]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_sidekicks_%s_%s",
-        sidekick1.GetName(), captain.GetName());
+        sidekick->GetName(), captain.GetName());
     mImages[1]->QueueLoad(path, false);
 
-    const CharacterInfo& sidekick2 = GetCharacterInfo(GetCharacterIndexFromSidekick(value2));
+    sidekick = &GetCharacterInfo(GetCharacterIndexFromSidekick(value2));
     image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK2");
     mImages[2]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_sidekicks_%s_%s",
-        sidekick2.GetName(), captain.GetName());
+        sidekick->GetName(), captain.GetName());
     mImages[2]->QueueLoad(path, false);
 
-    const CharacterInfo& sidekick3 = GetCharacterInfo(GetCharacterIndexFromSidekick(value3));
+    sidekick = &GetCharacterInfo(GetCharacterIndexFromSidekick(value3));
     image = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(presentation->GetActiveSlide(), "Layer", "HISTORY", "SK3");
     mImages[3]->SetImageInstance(image);
     image->SetVisible(false);
     nlSNPrintf(path, sizeof(path), "fe/hof_history_images/hof_history_sidekicks_%s_%s",
-        sidekick3.GetName(), captain.GetName());
+        sidekick->GetName(), captain.GetName());
     mImages[3]->QueueLoad(path, false);
 
     mImageReady[0] = false;

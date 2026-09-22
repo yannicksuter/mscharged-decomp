@@ -179,7 +179,7 @@ void GameInfoManager::ResetPlayingSides()
     }
 }
 
-void GameInfoManager::SetMode(int mode, u8 flag)
+void GameInfoManager::SetMode(int mode, bool flag)
 {
     mCurrentMode = mode;
     mIsInStrikers101Mode = 0;

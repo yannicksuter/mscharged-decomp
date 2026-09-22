@@ -121,17 +121,13 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         nlSNPrintf(friendName, sizeof(friendName), "friend_%d", i);
 
         TLComponentInstance* home = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[0], nlStringLowerHash("controllers"),
-            nlStringLowerHash(gOnlineSideGroupNames[0]), nlStringLowerHash(controller), 0, 0, 0);
+            mSideInstances[0], "controllers", gOnlineSideGroupNames[0], controller);
         TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[0], nlStringLowerHash("over"),
-            nlStringLowerHash(gOnlineSideGroupNames[0]), nlStringLowerHash(controller), 0, 0, 0);
+            mSideInstances[0], "over", gOnlineSideGroupNames[0], controller);
         TLComponentInstance* away = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[1], nlStringLowerHash("controllers"),
-            nlStringLowerHash(gOnlineSideGroupNames[1]), nlStringLowerHash(controller), 0, 0, 0);
+            mSideInstances[1], "controllers", gOnlineSideGroupNames[1], controller);
         TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[1], nlStringLowerHash("over"),
-            nlStringLowerHash(gOnlineSideGroupNames[1]), nlStringLowerHash(controller), 0, 0, 0);
+            mSideInstances[1], "over", gOnlineSideGroupNames[1], controller);
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(
             mPresentation->m_currentSlide, InlineHasher("Layer"), InlineHasher(friendName));
 
@@ -810,23 +806,13 @@ void SHOnlineFriendsChooseSides::DoChangeSides(int newSide, int oldSide, int ind
         }
         nlSNPrintf(controller, sizeof(controller), "controller%d", slot);
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[newSide], nlStringLowerHash("controllers"),
-            nlStringLowerHash(gOnlineSideGroupNames[newSide]), nlStringLowerHash(controller), 0, 0, 0);
+            mSideInstances[newSide], "controllers", gOnlineSideGroupNames[newSide], controller);
         TLComponentInstance* over = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[newSide], nlStringLowerHash("over"),
-            nlStringLowerHash(gOnlineSideGroupNames[newSide]), nlStringLowerHash(controller), 0, 0, 0);
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(
-            component->GetActiveSlide(), InlineHasher("Text"));
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
-        }
-        TLTextInstance* overText = FEFinder<TLTextInstance, 3>::Find<>(
-            over->GetActiveSlide(), InlineHasher("Text"));
-        if (overText == 0)
-        {
-            overText = &UnidentifiedTLTextDefault::sInstance;
-        }
+            mSideInstances[newSide], "over", gOnlineSideGroupNames[newSide], controller);
+        TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
+            component->GetActiveSlide(), "Text");
+        TLTextInstance* overText = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
+            over->GetActiveSlide(), "Text");
         text->SetString(mPlayerNames[index]);
         overText->SetString(mPlayerNames[index]);
         text->SetAssetColour(mPlayerColours[index]);
@@ -847,13 +833,11 @@ void SHOnlineFriendsChooseSides::DoChangeSides(int newSide, int oldSide, int ind
         }
         nlSNPrintf(controller, sizeof(controller), "controller%d", slot);
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[oldSide], nlStringLowerHash("controllers"),
-            nlStringLowerHash(gOnlineSideGroupNames[oldSide]), nlStringLowerHash(controller), 0, 0, 0);
+            mSideInstances[oldSide], "controllers", gOnlineSideGroupNames[oldSide], controller);
         TLComponentInstance* over = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideInstances[oldSide], nlStringLowerHash("over"),
-            nlStringLowerHash(gOnlineSideGroupNames[oldSide]), nlStringLowerHash(controller), 0, 0, 0);
-        FEFinder<TLTextInstance, 3>::Find<>(component->GetActiveSlide(), InlineHasher("Text"));
-        FEFinder<TLTextInstance, 3>::Find<>(over->GetActiveSlide(), InlineHasher("Text"));
+            mSideInstances[oldSide], "over", gOnlineSideGroupNames[oldSide], controller);
+        FEFinder<TLTextInstance, 3>::Find<>(component->GetActiveSlide(), "Text");
+        FEFinder<TLTextInstance, 3>::Find<>(over->GetActiveSlide(), "Text");
         component->m_bVisible = false;
         over->m_bVisible = false;
     }

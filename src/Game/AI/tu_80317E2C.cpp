@@ -391,8 +391,11 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual6()
 shdStateMachine* UnidentifiedScriptMachine::UnidentifiedVirtual5(
     int state, UnidentifiedVariantCollection* parameters, bool reinitialize)
 {
-    if ((u32)state == 0xA5A5A5A5 || state < 0
-        || state >= mUnidentified074)
+    if ((u32)state == 0xA5A5A5A5)
+    {
+        return 0;
+    }
+    if (state < 0 || state >= mUnidentified074)
     {
         return 0;
     }
@@ -403,24 +406,27 @@ shdStateMachine* UnidentifiedScriptMachine::UnidentifiedVirtual5(
         parameters = &emptyParameters;
     }
 
-    shdStateMachine* machine = mUnidentified06C[state];
+    shdStateMachine* machine = UnidentifiedGet06C(state);
+    shdStateMachine* result = machine;
     if (machine == 0)
     {
         return 0;
     }
 
-    shdStateMachine* result = machine;
     if (machine->UnidentifiedIsActive())
     {
-        if (!reinitialize)
+        if (reinitialize)
+        {
+            if (!fn_803169DC(machine, parameters, true)
+                || mUnidentified004 != machine)
+            {
+                machine->mUnidentifiedActive = false;
+                result = 0;
+            }
+        }
+        else
         {
             return machine;
-        }
-        if (!fn_803169DC(machine, parameters, true)
-            || mUnidentified004 != machine)
-        {
-            machine->mUnidentifiedActive = false;
-            result = 0;
         }
     }
     else
@@ -549,11 +555,7 @@ extern "C" shdStateMachine* fn_80319E84(
 extern "C" shdStateMachine* fn_80319F94(
     UnidentifiedScriptMachine* machine, int state)
 {
-    if (state >= 0 && state < machine->mUnidentified074)
-    {
-        return machine->mUnidentified06C[state];
-    }
-    return 0;
+    return machine->UnidentifiedGet06C(state);
 }
 
 extern "C" shdStateMachine* fn_80319FC0(

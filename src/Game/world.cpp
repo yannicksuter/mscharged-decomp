@@ -12,6 +12,10 @@
 #include "NL/gl/glView.h"
 #include "NL/nlPrint.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Render/CrowdImpostorManager.h"
+#include "Game/Render/WorldNPC.h"
+#include "Game/World/WorldAnimObjects.h"
+#include "NL/nlMemory.h"
 
 class WorldUpdateObject_80341BC8
 {
@@ -25,12 +29,11 @@ public:
 };
 
 extern "C" void fn_80343DE4(
-    DrawableObject*, WorldObjectLoadContext*);
-struct WorldVertexAnimDrawable_80343E3C;
+    WorldAnimDrawable_80343A40*, WorldObjectLoadContext*);
 void CreateWorldVertexAnimDrawable(
     WorldVertexAnimDrawable_80343E3C*, WorldObjectLoadContext*);
 extern "C" void fn_80344144(
-    DrawableObject*, WorldObjectLoadContext*);
+    WorldPhysicsDrawable_80534448*, WorldObjectLoadContext*);
 
 u8* WorldObjectLoadContext::GetParentData()
 {
@@ -184,11 +187,7 @@ bool World::LoadChunks(nlChunk* pChunk, unsigned long uSize)
         switch (pCurrent->GetID())
         {
         case 0x00026000:
-            LoadObjects(pCurrent->GetData(),
-                pCurrent->GetSize()
-                    - ((u8*)pCurrent->GetData()
-                        - ((u8*)pCurrent + sizeof(nlChunk))),
-                false);
+            LoadObjects(pCurrent->GetData(), pCurrent->GetDataSize(), false);
             break;
         case 0x80018000:
             m_pAnimationSet
@@ -203,9 +202,7 @@ bool World::LoadChunks(nlChunk* pChunk, unsigned long uSize)
             break;
         case 0x00024100:
             glEndLoadTextureBundle(pCurrent->GetData(),
-                pCurrent->GetSize()
-                    - ((u8*)pCurrent->GetData()
-                        - ((u8*)pCurrent + sizeof(nlChunk))),
+                pCurrent->GetDataSize(),
                 m_pResource, false);
             break;
         case 0x8001B000:
@@ -278,60 +275,76 @@ DrawableObject* World::CreateObject(
     unsigned long uType, WorldObjectLoadContext* pContext)
 {
     DrawableObject* pObject = 0;
-    unsigned long uSize = 0;
 
     switch (uType)
     {
+    case 0xFFFFFFFF:
+        break;
     case 0x101:
         pObject = (DrawableObject*)pContext->m_pObject;
-        fn_80343DE4(pObject, pContext);
-        uSize = 0x70;
+        new (pObject) WorldAnimDrawable_80343A40;
+        fn_80343DE4((WorldAnimDrawable_80343A40*)pObject, pContext);
+        pContext->m_pObject += 0x70;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x102:
         pObject = (DrawableObject*)pContext->m_pObject;
+        new (pObject) WorldVertexAnimDrawable_80343E3C;
         CreateWorldVertexAnimDrawable(
             (WorldVertexAnimDrawable_80343E3C*)pObject, pContext);
-        uSize = 0x30;
+        pContext->m_pObject += 0x30;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x103:
         pObject = (DrawableObject*)pContext->m_pObject;
-        pObject->m_uObjectCreationFlags |= 4;
-        fn_80344144(pObject, pContext);
-        uSize = 0x90;
+        new (pObject) WorldPhysicsDrawable_80534448;
+        fn_80344144((WorldPhysicsDrawable_80534448*)pObject, pContext);
+        pContext->m_pObject += 0x90;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x104:
         pObject = (DrawableObject*)pContext->m_pObject;
-        uSize = 0x60;
+        new (pObject) WorldObject_805223B0;
+        ((WorldObject_805223B0*)pObject)->UnidentifiedVirtual1C(pContext);
+        pContext->m_pObject += 0x60;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x106:
         pObject = (DrawableObject*)pContext->m_pObject;
-        uSize = 0x90;
+        new (pObject) WorldAnimObject_803437C8;
+        ((WorldAnimObject_803437C8*)pObject)->UnidentifiedVirtual1C(pContext);
+        pContext->m_pObject += 0x90;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x107:
         pObject = (DrawableObject*)pContext->m_pObject;
-        uSize = 0x80;
+        new (pObject) CrowdLayoutObject;
+        ((CrowdLayoutObject*)pObject)->UnidentifiedVirtual1C(pContext);
+        pContext->m_pObject += 0x80;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x108:
         pObject = (DrawableObject*)pContext->m_pObject;
-        uSize = 0x70;
+        new (pObject) WorldNPC;
+        ((WorldNPC*)pObject)->Initialize(pContext);
+        pContext->m_pObject += 0x70;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x109:
         pObject = (DrawableObject*)pContext->m_pObject;
-        uSize = 0xA0;
+        new (pObject) WorldEffect;
+        ((WorldEffect*)pObject)->UnidentifiedVirtual1C(pContext);
+        pContext->m_pObject += 0xA0;
+        ++pContext->m_uNumObjectsLoaded;
         break;
     default:
         break;
     }
 
-    if (pObject != 0)
-    {
-        pContext->m_pObject += uSize;
-        ++pContext->m_uNumObjectsLoaded;
-    }
     return pObject;
 }
 
-bool World::ResolveModel(glModel*& pMaterial)
+bool World::ResolveModel(glModel*& pMaterial) const
 {
     unsigned long uHashID = (unsigned long)pMaterial;
     pMaterial = m_pResource->m_inventory->GetModel(uHashID);

@@ -501,44 +501,36 @@ void SHNavigation::StartTransition()
 {
     this->mTransition->SetActiveSlide("Slide1", true, false);
 
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_1"), 0, 0, 0, 0);
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_1");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_2"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_2");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_3"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_3");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_4"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_4");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_5"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_5");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_6"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_6");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_7"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_7");
     component->SetActiveSlide("Slide1", true, false);
 
-    component = FEFinder<TLComponentInstance, 4>::Find(
-        this->mTransition->GetActiveSlide(), nlStringLowerHash("Group"),
-        nlStringLowerHash("door_8"), 0, 0, 0, 0);
+    component = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        this->mTransition->GetActiveSlide(), "Group", "door_8");
     component->SetActiveSlide("Slide1", true, false);
 
     this->mTransitionPlaying = true;

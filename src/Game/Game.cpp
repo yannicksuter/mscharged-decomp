@@ -45,8 +45,11 @@
 #include "Game/GameTweaks.h"
 #include "Game/TweakRegistry.h"
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/NetworkMessages.h"
 #include "NL/nlAlgorithm.h"
+#include "NL/nlBindMember.h"
+#include "NL/nlFunction.inl"
 #include "NL/nlConfig.h"
 #include "NL/nlMain.h"
 #include "NL/nlMath.h"
@@ -111,8 +114,6 @@ extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
-extern "C" void fn_800EDB9C();
-extern "C" void fn_800EDCAC();
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80038158(cFielder* pFielder, int param2);
 extern "C" float fn_80111D3C();
@@ -126,10 +127,9 @@ extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_800EC2A4(unsigned long soundID, cGame* game);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
-extern "C" void fn_80061AF0();
-extern "C" void fn_80061AF4();
 extern "C" void fn_8005B330(nlVector3* pVector, float fXAxisTilt, float fYAxisTilt);
-extern "C" void StopSuddenDeathMusic();
+extern void PlaySuddenDeathMusic();
+extern void StopSuddenDeathMusic();
 extern int gNextAvoidableObjectId;
 
 struct Unidentified0C74
@@ -263,6 +263,7 @@ cGame::cGame(void* param1, int param2, bool param3)
 
     m_pFuzzyTweaks = new (nlMalloc(sizeof(FuzzyTweaks), 8, false))
         FuzzyTweaks("/ini/FuzzyTweaks.ini", "/Game/Fuzzy");
+    gGameTweaks.m_pGameTweaks->fn_800756B4();
 
     mUnidentified020 = false;
     m_nLastTeamToScore = 1;
@@ -302,7 +303,78 @@ cGame::cGame(void* param1, int param2, bool param3)
     mUnidentified0A4 = 0;
     mUnidentified0A6 = 0;
     mUnidentified0A8 = 0;
-    fn_8005B330((nlVector3*)&mUnidentified0AC, 0.0f, 136.0f);
+    float initialTilt = -kGameTweakZero;
+    fn_8005B330(&mUnidentified0AC, initialTilt, initialTilt);
+    mUnidentified0B8 = lbl_806DBA68;
+    mUnidentified0BC = false;
+    mUnidentified0BD = false;
+    mUnidentified0C0.mStart = 0;
+    mUnidentified0C0.mSize = 0;
+    mUnidentified134.mStart = 0;
+    mUnidentified134.mSize = 0;
+
+    m_fGameDuration = gGameTweaks.m_pGameTweaks->fGameDuration;
+    m_pGameClock = new (nlMalloc(sizeof(Clock), 8, false))
+        Clock(kGameTweakZero, lbl_806E3750, lbl_806E3748, 2, 0);
+    m_pGameClock->Stop();
+    m_pPostGameDoneClock = new (nlMalloc(sizeof(Clock), 8, false))
+        Clock(kGameTweakZero, lbl_806E3754, lbl_806E3748, 2, 0);
+
+    bool noClock = GetTweakBool("user/No Clock", false);
+    lbl_806E0C98 = noClock;
+    cGame* game = g_pGame;
+    if (game != 0 && game->m_pGameClock != 0)
+    {
+        if (noClock)
+        {
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+                game->m_pGameClock->Stop();
+        }
+        else
+        {
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+                game->m_pGameClock->Start();
+        }
+    }
+
+    if (GetConfigBool(Config::Global(), "save_stats", false))
+    {
+        StatsTracker::Instance()->WriteCurrentlyPlaying();
+    }
+
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
+        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::fn_80061AF0)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::fn_80061AF4)), 0, -1);
+
+    mUnidentified014 = new (nlMalloc(sizeof(UnidentifiedFielderInput), 8, false))
+        UnidentifiedFielderInput(
+            this, 0, new (nlMalloc(sizeof(UnidentifiedFuzzyRuntime), 8, false))
+                         UnidentifiedFuzzyRuntime());
+    gNetworkMessageRegistry->RegisterReceiver(34, this);
+    gNetworkMessageRegistry->RegisterReceiver(35, this);
+
+    float avoidableWidth = lbl_806E3748;
+    nlVector3 avoidableCenter = { 20.6f, 0.0f, 0.0f };
+    mUnidentified10E4[0] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+        AvoidablePolygon(1, avoidableCenter, avoidableWidth, lbl_806E3758);
+    avoidableCenter.x *= lbl_806E3740;
+    mUnidentified10E4[1] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+        AvoidablePolygon(1, avoidableCenter, avoidableWidth, lbl_806E3758);
+
+    if (GameInfoManager::Instance()->GetStadium() == 15)
+        avoidableWidth = lbl_806E375C;
+    else if (GameInfoManager::Instance()->GetStadium() == 11)
+        avoidableWidth = lbl_806E3760;
+
+    avoidableCenter.x = kGameTweakZero;
+    avoidableCenter.y = lbl_806E3764;
+    avoidableCenter.z = kGameTweakZero;
+    mUnidentified10E4[2] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+        AvoidablePolygon(1, avoidableCenter, lbl_806E3768, avoidableWidth);
+    avoidableCenter.y *= lbl_806E3740;
+    mUnidentified10E4[3] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
+        AvoidablePolygon(1, avoidableCenter, lbl_806E3768, avoidableWidth);
 }
 
 cGame::~cGame()
@@ -968,7 +1040,7 @@ void cGame::ChangeGameState(int state)
     {
         if (m_eGameState == 6 && state == 3)
         {
-            fn_800EDCAC();
+            StopSuddenDeathMusic();
         }
 
         if (state == 3)
@@ -1264,15 +1336,15 @@ UnidentifiedGameEventQueue::UnidentifiedGameEventQueue()
 {
 }
 
-extern "C" void fn_80061AF0()
+void cGame::fn_80061AF0()
 {
-    fn_800EDB9C();
+    PlaySuddenDeathMusic();
 }
 
-extern "C" void fn_80061AF4()
+void cGame::fn_80061AF4()
 {
     lbl_806E12C8->ResetEffects();
-    fn_800EDCAC();
+    StopSuddenDeathMusic();
 }
 
 extern "C" void fn_80070960(

@@ -91,6 +91,36 @@ public:
     virtual bool IsPointerType() const;
 };
 
+inline Variant::Variant(const FuzzyVariant& other)
+    : mType(FT_UNSPECIFIED)
+{
+    Reset();
+    mType = other.mType;
+    if (other.mType == FT_STRING)
+    {
+        int size;
+        const char* source;
+        char* copy;
+        source = other.mData.string;
+        Reset();
+        mType = FT_STRING;
+        size = nlStrLen(source) + 1;
+        copy = (char*)nlMalloc(size, 8, false);
+        mData.string = copy;
+        {
+            int p = 0;
+            unsigned long n = size - 1;
+            while (n-- != 0 && (copy[p] = source[p]) != 0)
+                p++;
+            copy[p] = '\0';
+        }
+    }
+    else
+    {
+        mData.vector = other.mData.vector;
+    }
+}
+
 class UnidentifiedFuzzyVariantData : public FuzzyVariant
 {
 public:
@@ -188,6 +218,8 @@ public:
     UnidentifiedVariant_80054AB8& operator=(const UnidentifiedVariant_80054AB8& other);
 
     UnidentifiedVariant_80054AB8& operator=(int input);
+
+    UnidentifiedVariant_80054AB8& SetDesireFinished();
 
     UnidentifiedVariant_80054AB8& operator=(const FuzzyVariant& other)
     {

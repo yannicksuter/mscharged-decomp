@@ -1,6 +1,7 @@
 #include "Game/SH/SHRoadToStrikersCupHub.h"
 #include "NL/nlFunction.inl"
 
+#include "Game/BaseSceneHandler.inl"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/BasicGameInfo.h"
 #include "Game/DB/GameProgress.h"
@@ -357,28 +358,16 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
 
 void RoadToStrikersCupHubScene::UpdateRoundMessage()
 {
-    FEPresentation* presentation = mPresentation;
+    FEPresentation* presentation = GetPresentation();
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
-        presentation->m_currentSlide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("summary"),
-        nlStringLowerHash("current round"),
-        0,
-        0,
-        0);
+        presentation->m_currentSlide, "Layer", "summary", "current round");
     if (g_pCupManager->mState == 4)
         currentRound->SetStringId("HUB_CONGRATS");
     else
         currentRound->SetStringId("HUB_ELIMINATED");
 
     TLTextInstance* nextMatch = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
-        presentation->m_currentSlide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("summary"),
-        nlStringLowerHash("NEXT MATCH"),
-        0,
-        0,
-        0);
+        presentation->m_currentSlide, "Layer", "summary", "NEXT MATCH");
     nextMatch->SetStringId("STRIKERSCUP_LAST_MATCH");
 }
 

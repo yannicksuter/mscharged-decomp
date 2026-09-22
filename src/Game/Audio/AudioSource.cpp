@@ -121,10 +121,10 @@ void AudioSource::SetControllerSpeaker(bool enabled, unsigned int channel)
     m_Unknown14_19 = channel;
     AXVPB* voice = GetVoice();
     MIXRmtSetVolumes(voice, 0,
-        m_Unknown14_19 == 0 ? 0 : -960,
-        m_Unknown14_19 == 1 ? 0 : -960,
-        m_Unknown14_19 == 2 ? 0 : -960,
-        m_Unknown14_19 == 3 ? 0 : -960,
+        (m_Unknown14_19 != 0) * -960,
+        (m_Unknown14_19 != 1) * -960,
+        (m_Unknown14_19 != 2) * -960,
+        (m_Unknown14_19 != 3) * -960,
         -960, -960, -960, -960);
     AXSetVoiceRmtOn(voice, true);
 }

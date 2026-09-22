@@ -1,6 +1,7 @@
 #include "Game/Physics/NetMeshModelLoader.h"
 
 #include "Game/Drawable/DrawableModel.h"
+#include "Game/MathHelpers.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
@@ -137,12 +138,12 @@ inline void NetMeshModelLoader::AddEdge(
     const glModelPacket& packet, unsigned short idx1, unsigned short idx2)
 {
     NetMeshEdge edge;
-    NetMeshVertex vertex2;
     NetMeshVertex vertex1;
+    NetMeshVertex vertex2;
 
-    int* pValue;
-    NetMeshVertex* pVertex2;
     NetMeshVertex* pVertex1;
+    NetMeshVertex* pVertex2;
+    int* pValue;
 
     vertex1.mpPacket = &packet;
     vertex1.mIndex = idx1;
@@ -410,9 +411,8 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
             index2 = edgeEntry->key.mpVertex2->mParticleIndex;
             position1 = *edgeEntry->key.mpVertex1->GetPosition();
             position2 = *edgeEntry->key.mpVertex2->GetPosition();
-            nlVector3 delta;
-            nlVec3Sub(delta, position1, position2);
-            float distance = nlVec3Length(delta);
+            float distance = nlSqrt(
+                CalculateDistanceSquared(position1, position2), true);
             m_NetMesh.SetDistanceConstraint(index1, index2, distance);
         }
         edgeIter->Next();

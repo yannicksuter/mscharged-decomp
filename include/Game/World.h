@@ -45,7 +45,7 @@ public:
         void* pData, unsigned long uSize, bool bKeepData);
     DrawableObject* CreateObject(
         unsigned long uType, WorldObjectLoadContext* pContext);
-    bool ResolveModel(glModel*& pMaterial);
+    bool ResolveModel(glModel*& pMaterial) const;
     DrawableObject* FindDrawableObject(unsigned long uHashID);
     void AddEffect(WorldEffect* pEffect);
     void UpdateEffects(float fDeltaT);

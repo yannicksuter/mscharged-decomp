@@ -95,11 +95,11 @@ extern "C" float fn_802B5DD0(const nlVector2& point, const nlVector4& plane)
 
 void nlProjectPointOntoPlane(nlVector3& out, const nlVector3& point, const nlVector4& plane)
 {
-    float scale = -nlPlaneDot(plane, point)
-        / (plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
-    out.x = point.x + scale * plane.x;
-    out.y = point.y + scale * plane.y;
-    out.z = point.z + scale * plane.z;
+    const nlVector3& normal = *(const nlVector3*)&plane;
+    float planeOffset = plane.w;
+    float scale
+        = -(nlVec3DotProduct(normal, point) + planeOffset) / normal.GetLengthSq3D();
+    nlVec3ScaleAdd(out, scale, normal, point);
 }
 
 extern "C" void fn_802B5D10(nlVector4& out, const nlVector3& point, const nlVector3& normal)
@@ -115,11 +115,8 @@ extern "C" void fn_802B5D10(nlVector4& out, const nlVector3& point, const nlVect
 extern "C" void fn_802B5CC0(nlVector4& out, const nlVector2& point, const nlVector2& normal)
 {
     nlVector2 negativeNormal;
-    nlVec2Set(negativeNormal, -normal.x, -normal.y);
-    out.x = normal.x;
-    out.y = normal.y;
-    out.z = 0.0f;
-    out.w = nlVec2DotProduct(negativeNormal, point);
+    nlVec2Neg(negativeNormal, normal);
+    nlVec4Set(out, normal.x, normal.y, 0.0f, nlVec2DotProduct(negativeNormal, point));
 }
 
 nlMatrix4& nlMakeRotTransMatrix(
@@ -187,84 +184,24 @@ nlMatrix4& nlInvertRotTransMatrix(nlMatrix4& out, const nlMatrix4& in)
 
 void RotateVector(nlVector3& result, const nlVector3& v, nlQuaternion& q)
 {
-    f32 xz2;
-    f32 R;
-    f32 xw2;
-    f32 P;
-    f32 zz;
-    f32 S;
-    f32 G;
-    f32 N;
-    f32 z2;
-    f32 C;
-    f32 K;
-    f32 y2;
-    f32 O;
-    f32 A;
-    f32 H;
-    f32 yw2;
-    f32 xy2;
-    f32 yz2;
-    f32 vx;
-    f32 I;
-    f32 xx;
-    f32 T;
-    f32 J;
-    f32 L;
-    f32 F;
-    f32 yy;
-    f32 D;
-    f32 M;
-    f32 zw2;
-    f32 vy;
-    f32 vz;
-    f32 ww;
-    f32 E;
-    f32 U;
-    f32 x2;
-    f32 B;
+    float xx = q.x * q.x;
+    float yy = q.y * q.y;
+    float zz = q.z * q.z;
+    float ww = q.w * q.w;
+    float x2 = 2.0f * q.x;
+    float xy2 = x2 * q.y;
+    float xz2 = x2 * q.z;
+    float xw2 = x2 * q.w;
+    float yz2 = 2.0f * q.y * q.z;
+    float yw2 = 2.0f * q.y * q.w;
+    float zw2 = 2.0f * q.z * q.w;
+    float vx = v.x;
+    float vy = v.y;
+    float vz = v.z;
 
-    xx = q.x * q.x;
-    zz = q.z * q.z;
-    ww = q.w * q.w;
-    x2 = 2.0f * q.x;
-    z2 = 2.0f * q.z;
-    vy = v.y;
-    y2 = 2.0f * q.y;
-    vx = v.x;
-    yy = q.y * q.y;
-
-    A = ww - xx;
-    B = xx + ww;
-    vz = v.z;
-
-    xy2 = x2 * q.y;
-    zw2 = z2 * q.w;
-    C = yy + A;
-    D = B - yy;
-    E = xy2 - zw2;
-    F = C - zz;
-    G = A - yy;
-    xw2 = x2 * q.w;
-    yz2 = y2 * q.z;
-    xz2 = x2 * q.z;
-    yw2 = y2 * q.w;
-    H = xw2 + yz2;
-    I = D - zz;
-    J = vy * E;
-    K = zw2 + xy2;
-    L = vy * F;
-    M = xz2 + yw2;
-    N = vx * I + J;
-    O = xz2 - yw2;
-    P = vy * H;
-    result.x = vz * M + N;
-    R = yz2 - xw2;
-    S = vx * K + L;
-    T = zz + G;
-    U = vx * O + P;
-    result.y = vz * R + S;
-    result.z = vz * T + U;
+    result.x = vx * (xx + ww - yy - zz) + vy * (xy2 - zw2) + vz * (xz2 + yw2);
+    result.y = vx * (zw2 + xy2) + vy * (yy + (ww - xx) - zz) + vz * (yz2 - xw2);
+    result.z = vx * (xz2 - yw2) + vy * (xw2 + yz2) + vz * (zz + (ww - xx - yy));
 }
 
 void GetRotationBetweenVectors(
@@ -311,7 +248,7 @@ void GetRotationBetweenVectors(
     }
     else
     {
-        float fMagic = nlSqrt((float)(2.0 * (1.0 + fCosAngle)), true);
+        float fMagic = nlSqrt(2.0f * (1.0f + fCosAngle), true);
         float fMultiplier = fInvR1R2 / fMagic;
 
         cx = v3Vec1.y * v3Vec2.z - v3Vec1.z * v3Vec2.y;

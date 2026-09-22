@@ -2603,16 +2603,11 @@ void Goalie::ActionMoveWB(float fDeltaT)
 
         if (mfTargetTime > 1.0f)
         {
-            float x = mUnidentified024.m_v3Position.x;
             nlVector3 v3Facing;
+            nlVec3Set(v3Facing, m_m4WorldMatrix.e2[0][0],
+                m_m4WorldMatrix.e2[0][1], m_m4WorldMatrix.e2[0][2]);
             nlVector3 v3Center = mUnidentified024.m_v3Position;
-            float m02 = m_m4WorldMatrix.e2[0][2];
-            float m01 = m_m4WorldMatrix.e2[0][1];
-            float m00 = m_m4WorldMatrix.e2[0][0];
-            nlVec3Set(v3Facing, m00, m01, m02);
-            float dist = nlSqrt(nlGetLengthSquared3D(
-                                    x, mUnidentified024.m_v3Position.y, mUnidentified024.m_v3Position.z),
-                true);
+            float dist = nlSqrt(nlVec3LengthSquared(mUnidentified024.m_v3Position), true);
             float invDist = -1.0f / dist;
             v3Center.x = invDist * mUnidentified024.m_v3Position.x;
             v3Center.y = invDist * mUnidentified024.m_v3Position.y;
@@ -2676,9 +2671,9 @@ void Goalie::ActionMoveWB(float fDeltaT)
         float goalLineX = cField::GetGoalLineX(1U);
         float posX = mUnidentified024.m_v3Position.x;
 
+        float absX = (float)fabs(posX);
         if (mbDoNavigate)
         {
-            float absX = (float)fabs(posX);
             if (absX < goalLineX - lbl_806DBD38
                 || absX > goalLineX - lbl_806DBD34
                 || (float)fabs(mUnidentified024.m_v3Position.y) > lbl_806DBD3C)
@@ -2687,7 +2682,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
                 float targetOffset = 0.5f * boundarySpan;
                 float targetMagnitude = goalLineX - targetOffset;
                 float targetX;
-                if (posX > 0.0f)
+                if (mUnidentified024.m_v3Position.x > 0.0f)
                 {
                     targetX = targetMagnitude;
                 }
@@ -2696,8 +2691,8 @@ void Goalie::ActionMoveWB(float fDeltaT)
                     targetX = -targetMagnitude;
                 }
 
-                float angle = nlATan2f(
-                    -mUnidentified024.m_v3Position.y, targetX - posX);
+                targetX -= mUnidentified024.m_v3Position.x;
+                float angle = nlATan2f(-mUnidentified024.m_v3Position.y, targetX);
                 mUnidentified024.m_aDesiredFacingDirection
                     = (u16)(s32)(10430.378f * angle);
                 GoalieTweaks* pTweaks
@@ -2711,7 +2706,8 @@ void Goalie::ActionMoveWB(float fDeltaT)
             return;
         }
 
-        float angle = nlATan2f(-mUnidentified024.m_v3Position.y, -posX);
+        float angle = nlATan2f(
+            -mUnidentified024.m_v3Position.y, -mUnidentified024.m_v3Position.x);
         mUnidentified024.m_aDesiredFacingDirection
             = (u16)(s32)(10430.378f * angle);
         u16 diff = (u16)abs_s16((s16)(mUnidentified024.m_aDesiredFacingDirection
@@ -3289,6 +3285,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
         }
         else
         {
+            nlVector3* ballPos;
             cFielder* pOwnerFielder = g_pBall->GetOwnerFielder();
 
             if (mnOffplayPending != 0 || g_pGame->mUnidentified20
@@ -3313,14 +3310,14 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
                 return;
             }
 
-            nlVector3& ballPos = g_pBall->m_v3Position;
-            GetLocalPoint(mv3LocalContactPosition, ballPos, mUnidentified024.m_v3Position, mUnidentified024.m_aActualFacingDirection);
+            ballPos = &g_pBall->m_v3Position;
+            GetLocalPoint(mv3LocalContactPosition, *ballPos, mUnidentified024.m_v3Position, mUnidentified024.m_aActualFacingDirection);
 
             nlVector3 ballDelta;
             nlVec3Set(ballDelta,
-                ballPos.x - mUnidentified024.m_v3Position.x,
-                ballPos.y - mUnidentified024.m_v3Position.y,
-                ballPos.z - mUnidentified024.m_v3Position.z);
+                ballPos->x - mUnidentified024.m_v3Position.x,
+                ballPos->y - mUnidentified024.m_v3Position.y,
+                ballPos->z - mUnidentified024.m_v3Position.z);
 
             nlVector3 desiredPos;
             nlVector3 desiredDir;
@@ -3416,7 +3413,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
             {
                 s16 angleDiff = (s16)(mUnidentified024.m_aDesiredFacingDirection
                                       - mUnidentified024.m_aActualFacingDirection);
-                int animID = ChooseRunAnim(angleDiff, ballPos, 1.0f);
+                int animID = ChooseRunAnim(angleDiff, *ballPos, 1.0f);
                 PlayNewAnim(animID);
 
                 float speedScale = 1.5f;

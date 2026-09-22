@@ -21,7 +21,6 @@ typedef AVLTreeBase<unsigned int, ConnectionTreePtr, ConnectionGroupPool,
     DefaultKeyCompare<unsigned int> >
     ConnectionGroupTree;
 
-static const ConnectionValue sDefaultConnectionValue = 0;
 static ConnectionGroupTree sConnectionGroups;
 EventRegistry* g_pEventRegistry = 0;
 
@@ -134,26 +133,27 @@ void RegisterEventConnection(void* event, void* connectionPtr,
         return;
     }
 
+    unsigned int groupKey = (unsigned int)group;
+    ConnectionKey key = connection;
     ConnectionTree** foundTree;
     ConnectionTree* tree = 0;
-    unsigned int key = (unsigned int)group;
-    if (!sConnectionGroups.FindGet(key, &foundTree))
+    if (!sConnectionGroups.FindGet(groupKey, &foundTree))
     {
         tree = new (8, false) ConnectionTree;
         if (tree == 0)
         {
             return;
         }
-        sConnectionGroups.Add(key, tree);
+        sConnectionGroups.Add(groupKey, tree);
     }
     else
     {
         tree = *foundTree;
     }
 
-    if (tree->Add(connection, sDefaultConnectionValue) == 0)
+    if (tree->Add(key, 0) == 0)
     {
-        connection->mGroupCount++;
+        key->mGroupCount++;
     }
 }
 

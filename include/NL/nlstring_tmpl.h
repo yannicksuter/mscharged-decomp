@@ -85,19 +85,34 @@ inline int nlStrICmp(const CharT* str1, const CharT* str2)
 {
     CharT c1;
     CharT c2;
+
+    do
+    {
+        c1 = nlToUpper<CharT>(const_cast<CharT&>(*str1++));
+        c2 = nlToUpper<CharT>(const_cast<CharT&>(*str2++));
+    } while (c1 != 0 && c2 != 0 && c1 == c2);
+
+    return c1 - c2;
+}
+
+template <>
+inline int nlStrICmp<char>(const char* str1, const char* str2)
+{
+    char c1;
+    char c2;
     do
     {
         c1 = *str1++;
         if (c1 >= 0x61)
         {
             if (c1 <= 0x7A)
-                c1 = (CharT)(c1 & 0x5F);
+                c1 = (char)(c1 & 0x5F);
         }
         c2 = *str2++;
         if (c2 >= 0x61)
         {
             if (c2 <= 0x7A)
-                c2 = (CharT)(c2 & 0x5F);
+                c2 = (char)(c2 & 0x5F);
         }
         if (c1 == 0)
             break;

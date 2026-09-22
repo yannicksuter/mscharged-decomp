@@ -243,6 +243,7 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     ParticleSystem* pSystem, EffectsSpec* pSpec,
     const nlMatrix4& mLocalToWorld)
 {
+    EffectsTemplate* pTemplate = pSystem->m_pTemplate;
     float randomZ = RandomizedValue(-0.5f, 1.0f);
     float randomAngleValue = RandomizedValue(6.2831855f);
     float xyRadius = nlSqrt(1.0f - randomZ * randomZ, true);
@@ -258,16 +259,19 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
+        = pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     nlVec3Set(localDir, x, y, z);
-    nlVec3Set(localPos, radius * localDir.x, radius * localDir.y,
-        radius * localDir.z);
+    nlVec3Scale(localPos, localDir, radius);
 
     if (pSpec != 0)
-        nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);
+    {
+        localPos.x += pSpec->m_vLocalOffset.x;
+        localPos.y += pSpec->m_vLocalOffset.y;
+        localPos.z += pSpec->m_vLocalOffset.z;
+    }
 
-    if (pSystem->m_pTemplate->IsLocalSpace())
+    if (pTemplate->IsLocalSpace())
     {
         pos = localPos;
         dir = localDir;
@@ -281,24 +285,25 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
 
 static inline void RotateXYInPlace(nlVector3& v, float sn, float cs)
 {
-    float x = v.x * cs - v.y * sn;
-    float y = v.x * sn + v.y * cs;
-    v.x = x;
-    v.y = y;
+    float x = (v.x * cs) + (-v.y * sn);
+    float y = (v.x * sn) + (v.y * cs);
+    nlVec3Set(v, x, y, v.z);
 }
 
 static inline void RotateXZInPlace(nlVector3& v, float sn, float cs)
 {
-    float x = v.x * cs + v.z * sn;
-    float z = -v.x * sn + v.z * cs;
-    v.x = x;
-    v.z = z;
+    float x = (v.x * cs) + (v.z * sn);
+    float z = (-v.x * sn) + (v.z * cs);
+    nlVec3Set(v, x, v.y, z);
 }
 
 static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
     ParticleSystem* pSystem, EffectsSpec* pSpec,
     const nlMatrix4& mLocalToWorld)
 {
+    EffectsTemplate* pTemplate = pSystem->m_pTemplate;
+    nlVector3 localPos;
+    nlVector3 localDir;
     float sin;
     float cos;
     float randomAngle = RandomizedValue(0.0f, 6.2831855f);
@@ -306,27 +311,29 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
+        = pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
-    nlVector3 localPos;
     nlVec3Set(localPos, cos * radius, -sin * radius, 0.0f);
 
-    float tilt = pSystem->m_pTemplate->mProperties[6]->Evaluate(
+    float tilt = pTemplate->mProperties[6]->Evaluate(
         pSystem->mUnidentified014);
     if (tilt <= -90.0f)
         tilt = -89.9f;
     else if (tilt >= 90.0f)
         tilt = 89.9f;
 
-    nlVector3 localDir;
     localDir.z = nlTan((unsigned short)(((int)(-tilt * 65536.0f)) / 360));
     localDir.x = cos;
     localDir.y = -sin;
-    nlVec3Scale(localDir,
-        nlRecipSqrt(nlVec3LengthSquared(localDir), false));
+    float lengthSq = nlVec3LengthSquared(localDir);
+    float length = nlRecipSqrt(lengthSq, false);
+    nlVec3Set(localDir,
+        length * localDir.x,
+        length * localDir.y,
+        length * localDir.z);
 
     float tiltRotation
-        = pSystem->m_pTemplate->mProperties[7]->Evaluate(
+        = pTemplate->mProperties[7]->Evaluate(
         pSystem->mUnidentified014);
     tiltRotation = -tiltRotation * 3.14159265f / 180.0f;
     if (tiltRotation != 0.0f)
@@ -338,9 +345,13 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
     }
 
     if (pSpec != 0)
-        nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);
+    {
+        localPos.x += pSpec->m_vLocalOffset.x;
+        localPos.y += pSpec->m_vLocalOffset.y;
+        localPos.z += pSpec->m_vLocalOffset.z;
+    }
 
-    if (pSystem->m_pTemplate->IsLocalSpace())
+    if (pTemplate->IsLocalSpace())
     {
         pos = localPos;
         dir = localDir;
@@ -355,26 +366,33 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
             RotateXYInPlace(dir, sin, cos);
             RotateXYInPlace(pos, sin, cos);
         }
-        nlVec3Add(pos, pos, mLocalToWorld.GetTranslation());
+        nlVec3Set(pos,
+            pos.x + mLocalToWorld.e2[3][0],
+            pos.y + mLocalToWorld.e2[3][1],
+            pos.z + mLocalToWorld.e2[3][2]);
     }
 }
 
 void ParticleSystem::CreateNewParticles(int numParticles)
 {
-    nlMatrix4 mCoordSys;
-    UpdateCoordSys(mCoordSys);
-
+    EmitParticlePosition emit;
     nlVector3 baseDir;
+    nlVector3 dir;
+    int i;
+    nlMatrix4& mCoordSys = mUnidentified058;
+
     if (m_pTemplate->IsLocalSpace())
         nlVec3Set(baseDir, 0.0f, 0.0f, -1.0f);
     else
         baseDir = m_vForward;
 
-    EmitParticlePosition emit = 0;
     switch (m_pTemplate->m_eEmitter)
     {
     case Emitter_Circle:
         emit = EmitCircularPosition;
+        break;
+    case Emitter_Disc:
+        emit = EmitDiscPosition;
         break;
     case Emitter_Sphere:
         emit = EmitSphericalPosition;
@@ -386,16 +404,16 @@ void ParticleSystem::CreateNewParticles(int numParticles)
     case Emitter_Hemisphere:
         emit = EmitHemisphericalPosition;
         break;
-    case Emitter_Disc:
-        emit = EmitDiscPosition;
+    default:
+        emit = 0;
         break;
     }
 
-    for (int i = 0; i < numParticles; ++i)
+    for (i = 0; i < numParticles; ++i)
     {
-        Particle* pPart = 0;
-        if (mUnidentified0C0->m_Head != 0)
-            mUnidentified0C0->RemoveStart(&pPart);
+        Particle* removed;
+        Particle* pPart = mUnidentified0C0->m_Head == 0 ? 0
+            : (mUnidentified0C0->RemoveStart(&removed), removed);
         if (pPart == 0)
             break;
 
@@ -405,14 +423,15 @@ void ParticleSystem::CreateNewParticles(int numParticles)
                 m_pTemplate->mUnidentified044);
         }
 
-        m_Particles.AddEnd(pPart);
+        m_Particles.AddStart(pPart);
         ++mUnidentified0BC;
-        pPart->mUnidentified000 = m_pTemplate;
 
-        nlVector3 dir = baseDir;
+        dir = baseDir;
+        pPart->mUnidentified000 = m_pTemplate;
         emit(pPart->mUnidentified010, dir, this, m_pSpec, mCoordSys);
-        nlVec3Add(pPart->position, pPart->mUnidentified010,
-            m_vSourcePosition);
+        pPart->position.x = pPart->mUnidentified010.x + m_vSourcePosition.x;
+        pPart->position.y = pPart->mUnidentified010.y + m_vSourcePosition.y;
+        pPart->position.z = pPart->mUnidentified010.z + m_vSourcePosition.z;
 
         pPart->lifeSpan = RandomizedValue(m_pTemplate->m_rParticleLife);
         pPart->mUnidentified05C
@@ -432,16 +451,17 @@ void ParticleSystem::CreateNewParticles(int numParticles)
             = RandomizedValue(m_pTemplate->m_rInheritVelocity);
         nlVector3 velocity;
         nlVec3Scale(velocity, m_vVelocity, inheritVelocity);
-        float vel
-            = m_pTemplate->mProperties[5]->Evaluate(0.0f);
-        nlVec3ScaleAdd(velocity, vel, dir, velocity);
-        float speedSquared = nlVec3LengthSquared(velocity);
-        pPart->velocity = nlSqrt(speedSquared, true);
+        if (m_pTemplate->mProperties[5]->mUseCurve == 0)
+        {
+            float vel = m_pTemplate->mProperties[5]->Evaluate(0.0f);
+            nlVec3ScaleAdd(velocity, vel, dir, velocity);
+        }
+        pPart->velocity = nlSqrt(nlVec3LengthSquared(velocity), true);
         if (pPart->velocity == 0.0f)
             pPart->velDir = dir;
         else
             nlVec3Scale(pPart->velDir, velocity,
-                nlRecipSqrt(speedSquared, true));
+                nlRecipSqrt(nlVec3LengthSquared(velocity), true));
 
         pPart->acceleration
             = RandomizedValue(m_pTemplate->m_rAcceleration);

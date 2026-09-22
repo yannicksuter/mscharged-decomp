@@ -366,7 +366,27 @@ void StatsTracker::OnMegastrikeEnd(MegaStrikeEndData* data)
     {
         s_pInstance->TrackStat(STATS_GOALS_FOR, side, data->pPlayer->mUnidentified1E4.m_ID, -1, 6,
             data->goals, data->goalValue);
+
+        bool scoreTied = g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore;
+        if (g_pGame != 0)
+        {
+            float gameDuration = g_pGame->m_fGameDuration;
+            if (!((unsigned int)(10.0f * (gameDuration - g_pGame->GetGameTime())) == 0
+                    && !scoreTied
+                    && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0))
+            {
+                int teamScore = g_pTeams[side]->m_nScore;
+                if (teamScore < GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit
+                    || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != 1)
+                {
+                    goto skipTrackWinner;
+                }
+            }
+            s_pInstance->TrackWinner(-1);
+        }
     }
+
+skipTrackWinner:
     s_pInstance->TrackStat(
         STATS_09, side, data->pPlayer->mUnidentified1E4.m_ID, data->attempts, 0, 0, 0);
     s_pInstance->TrackStat(
@@ -473,39 +493,176 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
     }
 }
 
+static inline int CompareInt(eSortOrder sortOrder, int a, int b)
+{
+    if (a < b)
+    {
+        int result = -1;
+        if (sortOrder == SORT_DESCENDING)
+            result = 1;
+        return result;
+    }
+    if (a > b)
+    {
+        int result = 1;
+        if (sortOrder == SORT_DESCENDING)
+            result = -1;
+        return result;
+    }
+    return 0;
+}
+
 void StatsTracker::GetSortedStats(PlayerStats* source, int numsource,
     int* dest, int numelements, ePlayerStats statType,
     eSortOrder sortOrder)
 {
-    if (numelements > numsource)
-    {
-        numelements = numsource;
-    }
+    int tempsorted[64];
 
     for (int i = 0; i < numsource; i++)
     {
-        dest[i] = i;
+        tempsorted[i] = i;
     }
 
-    for (int i = 0; i < numsource - 1; i++)
+    unsigned char swapped;
+    bool doswap;
+    do
     {
-        for (int j = 0; j < numsource - i - 1; j++)
+        swapped = 0;
+        for (int i = 0; i < numsource; i++)
         {
-            int a = GetStatValue(source[dest[j]], statType);
-            int b = GetStatValue(source[dest[j + 1]], statType);
-            bool move = sortOrder == SORT_ASCENDING ? a > b : a < b;
-            if (move)
+            int nexti = i + 1;
+
+            if (nexti >= numsource)
+                break;
+
+            doswap = false;
+            switch (statType)
             {
-                int temp = dest[j];
-                dest[j] = dest[j + 1];
-                dest[j + 1] = temp;
+            case STATS_SHOTS_ON_GOAL:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumShotsOnGoal,
+                    source[tempsorted[nexti]].mNumShotsOnGoal) == 1;
+                break;
+            case STATS_GOALS_FOR:
+            {
+                bool human = CupManager::Instance()->mCurrentCup->IsHumanTeam(
+                    source[tempsorted[nexti]].mRecordType.mTeamID);
+                int comparison = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumGoalsFor,
+                    source[tempsorted[nexti]].mNumGoalsFor);
+                if (comparison == 1)
+                    doswap = true;
+                else if (comparison == 0)
+                {
+                    if (human)
+                        doswap = true;
+                    else
+                        doswap = false;
+                }
+                else
+                    doswap = false;
+                break;
+            }
+            case STATS_0C:
+            {
+                bool human = CupManager::Instance()->mCurrentCup->IsHumanTeam(
+                    source[tempsorted[nexti]].mRecordType.mTeamID);
+                int comparison = CompareInt(sortOrder,
+                    source[tempsorted[i]].unknown_0x12,
+                    source[tempsorted[nexti]].unknown_0x12);
+                if (comparison == 1)
+                    doswap = true;
+                else if (comparison == 0)
+                {
+                    if (human)
+                        doswap = true;
+                    else
+                        doswap = false;
+                }
+                else
+                    doswap = false;
+                break;
+            }
+            case STATS_08:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].unknown_0x0E,
+                    source[tempsorted[nexti]].unknown_0x0E) == 1;
+                break;
+            case STATS_FOULS:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumFouls,
+                    source[tempsorted[nexti]].mNumFouls) == 1;
+                break;
+            case STATS_19:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumPowerupsUsed,
+                    source[tempsorted[nexti]].mNumPowerupsUsed) == 1;
+                break;
+            case STATS_POWERUPS_USED:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].unknown_0x28,
+                    source[tempsorted[nexti]].unknown_0x28) == 1;
+                break;
+            case STATS_26:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].unknown_0x48,
+                    source[tempsorted[nexti]].unknown_0x48) == 1;
+                break;
+            case STATS_PASSES_MADE:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumPassesMade,
+                    source[tempsorted[nexti]].mNumPassesMade) == 1;
+                break;
+            case STATS_PASSES_RECEIVED:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumPassesMade,
+                    source[tempsorted[nexti]].mNumPassesMade) == 1;
+                break;
+            case STATS_PASSES_INTERCEPTED:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumPassesIntercepted,
+                    source[tempsorted[nexti]].mNumPassesIntercepted) == 1;
+                break;
+            case STATS_16:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].unknown_0x3C,
+                    source[tempsorted[nexti]].unknown_0x3C) == 1;
+                break;
+            case STATS_18:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].unknown_0x1C,
+                    source[tempsorted[nexti]].unknown_0x1C) == 1;
+                break;
+            case STATS_ATTACK_SUCCESSES:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumSteals,
+                    source[tempsorted[nexti]].mNumSteals) == 1;
+                break;
+            case STATS_17:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumButtonPresses,
+                    source[tempsorted[nexti]].mNumButtonPresses) == 1;
+                break;
+            case STATS_12:
+                doswap = CompareInt(sortOrder,
+                    source[tempsorted[i]].mNumHitsMade,
+                    source[tempsorted[nexti]].mNumHitsMade) == 1;
+                break;
+            }
+
+            if (doswap)
+            {
+                int temp = tempsorted[i + 1];
+                tempsorted[i + 1] = tempsorted[i];
+                tempsorted[i] = temp;
+                swapped = 1;
             }
         }
-    }
+    } while (swapped);
 
-    for (int i = numelements; i < numsource; i++)
+    for (int i = 0; i < numelements; i++)
     {
-        dest[i] = -1;
+        dest[i] = tempsorted[i];
     }
 }
 

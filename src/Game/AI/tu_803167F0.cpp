@@ -35,10 +35,6 @@ extern const float lbl_806E6884;
 extern const float lbl_806E6888;
 extern const float lbl_806E688C;
 
-char lbl_80530248[] = "Cleanup_";
-char lbl_806DF5A0[] = "Init_";
-char lbl_806DF5A8[] = "Update_";
-
 UnidentifiedUnsetTransition lbl_806E20B8;
 
 class UnidentifiedStateMachine_803171D0 : public shdStateMachine
@@ -280,27 +276,30 @@ UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     UnidentifiedSetContext(context);
 
     char functionName[64];
-    nlStrNCpy(functionName, lbl_806DF5A0, 63);
+    nlStrNCpy(functionName, "Init_", 63);
     nlStrNCat(functionName, functionName, name, 63);
     mUnidentified088 = nlStringHash(functionName);
 
-    nlStrNCpy(functionName, lbl_806DF5A8, 63);
+    nlStrNCpy(functionName, "Update_", 63);
     nlStrNCat(functionName, functionName, name, 63);
     mUnidentified08C = nlStringHash(functionName);
 
-    nlStrNCpy(functionName, lbl_80530248, 63);
+    nlStrNCpy(functionName, "Cleanup_", 63);
     nlStrNCat(functionName, functionName, name, 63);
     mUnidentified090 = nlStringHash(functionName);
 
-    if (!fn_80311734(this)->FunctionExists(mUnidentified088))
+    UnidentifiedFunctionHash_8027F9CC hash(mUnidentified088);
+    if (!fn_80311734(this)->FunctionExists(hash))
     {
         mUnidentified088 = 0;
     }
-    if (!fn_80311734(this)->FunctionExists(mUnidentified08C))
+    hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified08C);
+    if (!fn_80311734(this)->FunctionExists(hash))
     {
         mUnidentified08C = 0;
     }
-    if (!fn_80311734(this)->FunctionExists(mUnidentified090))
+    hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified090);
+    if (!fn_80311734(this)->FunctionExists(hash))
     {
         mUnidentified090 = 0;
     }

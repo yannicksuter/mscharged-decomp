@@ -2,6 +2,8 @@
 #define GAME_GAME_H
 
 #include "Game/GameEventQueue.h"
+#include "Game/NetworkMessage.h"
+#include "NL/nlMath.h"
 #include "types.h"
 
 class Clock;
@@ -56,13 +58,15 @@ struct UnidentifiedCircularByteQueue
 void DestroyPowerups();
 void DestroyGame();
 
-class cGame
+class cGame : public NetworkMessageReceiver
 {
 public:
-    virtual void UnidentifiedVirtual();
+    virtual int ProcessMessage(NetworkMessage* message);
     virtual ~cGame();
 
     cGame(void* param1, int param2, bool param3);
+    void fn_80061AF0();
+    void fn_80061AF4();
 
     void fn_80057FC0();
     void fn_80057FD8(bool param1);
@@ -189,9 +193,7 @@ private:
     /* 0xA4 */ u16 mUnidentified0A4;
     /* 0xA6 */ u16 mUnidentified0A6;
     /* 0xA8 */ u32 mUnidentified0A8;
-    /* 0xAC */ float mUnidentified0AC;
-    /* 0xB0 */ float mUnidentified0B0;
-    /* 0xB4 */ float mUnidentified0B4;
+    /* 0xAC */ nlVector3 mUnidentified0AC;
     /* 0xB8 */ u32 mUnidentified0B8;
 
 public:

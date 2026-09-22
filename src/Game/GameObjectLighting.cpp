@@ -441,18 +441,20 @@ void ApplyGameObjectShadowLighting(s32 arg0, u32 arg1)
         gxSetTevColourIn(numTevStages, 15, 0, 8, 15);
         gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
 
-        glTextureBinding textureState(lbl_806DCC6C);
+        glTextureBinding textureState;
+        textureState.texture = lbl_806DCC6C;
+        textureState.textureIndex = 0xFFFF;
+        textureState.flags = 0;
         textureState.SetWrapS(!lbl_806E1413);
         textureState.SetWrapT(!lbl_806E1413);
+        textureState.unknown07 = 0;
         glx_BindTexture(numTexGens, &textureState);
 
         nlMatrix4 transform;
-        nlMakeScaleMatrix(transform, gShadowLookupScaleX.value,
-            gShadowLookupScaleY.value, lbl_806E4CD4);
-        transform.m41 = gShadowLookupTransX.value;
-        transform.m42 = gShadowLookupTransY.value;
-        transform.m43 = lbl_806E4CD8;
-        transform.m44 = lbl_806E4CD4;
+        nlMakeScaleMatrix(transform, gShadowLookupScaleX,
+            gShadowLookupScaleY, lbl_806E4CD4);
+        transform.SetRow4_(3, gShadowLookupTransX,
+            gShadowLookupTransY, lbl_806E4CD8, lbl_806E4CD4);
 
         Mtx gxTransform;
         glxCopyMatrix(gxTransform, transform);

@@ -1392,17 +1392,24 @@ static int DayOfYear(NetworkSeasonDate date, int year)
 int GetDaysUntilNextSeasonBoundary(
     const NetworkSeasonDateTable* dates, int index, int year)
 {
-    NetworkSeasonDate current = dates->mDates[index];
+    NetworkSeasonDate current = dates->GetDate(index);
+    int currentDay;
+    int nextDay;
     if (index == dates->mCount - 1)
     {
         const NetworkSeasonDate& next = dates->mDates[0];
-        int currentDay = DayOfYear(current, year);
-        int nextDay = DayOfYear(next, year + 1);
+        currentDay = DayOfYear(current, year);
+        int nextYearDay = DayOfYear(next, year + 1);
         int remaining = (year % 4 == 0) ? 366 : 365;
-        return remaining + nextDay - currentDay;
+        nextDay = nextYearDay + remaining;
     }
-    const NetworkSeasonDate& next = dates->mDates[index + 1];
-    return DayOfYear(next, year) - DayOfYear(current, year);
+    else
+    {
+        currentDay = DayOfYear(current, year);
+        const NetworkSeasonDate& next = dates->mDates[index + 1];
+        nextDay = DayOfYear(next, year);
+    }
+    return nextDay - currentDay;
 }
 
 int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
