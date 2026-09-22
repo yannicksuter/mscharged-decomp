@@ -5054,15 +5054,16 @@ void Goalie::fn_8008CED8(float fTargetTime,
             = cField::GetGoalLineX(1U) - lbl_806DBCFC;
         if (fAbsBallX < fLimitX)
         {
+            const nlVector3& rPos = mUnidentified024.m_v3Position;
             nlVector2 v2Distance;
-            v2Distance.x = mUnidentified024.m_v3Position.x - v3TargetPosition.x;
-            v2Distance.y = mUnidentified024.m_v3Position.y - v3TargetPosition.y;
+            v2Distance.x = rPos.x - v3TargetPosition.x;
+            v2Distance.y = rPos.y - v3TargetPosition.y;
             if (nlVec2LengthSquared(v2Distance)
                 > nlGetLengthSquared1D(lbl_806DBD00))
             {
                 GetLocalPoint(mv3LocalContactPosition,
                     v3TargetPosition,
-                    mUnidentified024.m_v3Position,
+                    rPos,
                     mUnidentified024.m_aActualFacingDirection);
                 InitActionChipShotStumble(fTargetTime);
                 return;
@@ -5098,15 +5099,15 @@ void Goalie::fn_8008CED8(float fTargetTime,
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         mLowLobAnim = 0x5D;
-        pOtherAnim = fn_80093780(0x5B);
+        pOtherAnim = GoalieSave::FindSaveData(0x5B);
     }
     else
     {
         mLowLobAnim = nlRandomf(1.0f) < 0.5f ? 0x86 : 0x74;
-        pOtherAnim = fn_80093780(0x2D);
+        pOtherAnim = GoalieSave::FindSaveData(0x2D);
     }
 
-    SaveData* pAnim = fn_80093780(mLowLobAnim);
+    SaveData* pAnim = GoalieSave::FindSaveData(mLowLobAnim);
     float fPredictionHeight = Interpolate(pAnim->mv3SavePos.z,
         pOtherAnim->mv3SavePos.z,
         fHeightRatio);

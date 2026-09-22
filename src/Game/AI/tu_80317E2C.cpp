@@ -58,6 +58,7 @@ char lbl_805302A0[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";
 float lbl_806DF5B0[2] = { -1.0f, 0.0f };
 char lbl_806DF5B8[] = "Init_%s";
+extern int lbl_806DF5C0[2];
 
 float lbl_806E20C0;
 float lbl_806E20C4;
@@ -243,28 +244,37 @@ extern "C" shdStateMachine* fn_80319E84(
 
 void UnidentifiedScriptMachine::UnidentifiedVirtual3(float deltaTime)
 {
-    UnidentifiedVariant_80054AB8 update(FT_INT, 0);
+    UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
     bool selectState = false;
     shdStateMachine* active = mUnidentified004;
 
     if (active != 0)
     {
         fn_80317010(active, &update, true, deltaTime);
-        int result = update.GetInt();
-        if (result != -1 && active == mUnidentified004)
+        if ((unsigned int)update.GetType() == FT_UNSPECIFIED)
         {
-            if (result != 0 && mUnidentified014 > -1)
+            update = 0;
+        }
+    }
+    if (active == mUnidentified004)
+    {
+        int result = update.mData.i;
+        if (result != 0 && mUnidentified014 > -1)
+        {
+            bool force = false;
+            if (mUnidentified018.IsSet(12))
             {
-                bool force = false;
-                if (mUnidentified018.IsSet(12))
-                {
-                    force = mUnidentified018.Get(12)->mData.b;
-                }
-                UnidentifiedVirtual5(
-                    mUnidentified014, &mUnidentified018, force);
-                mUnidentified014 = -1;
+                force = update.ExtraData.Get(12)->mData.b;
             }
-            else if (result == 3)
+            UnidentifiedVirtual5(
+                mUnidentified014, &mUnidentified018, force);
+            mUnidentified014 = -1;
+        }
+        else
+        {
+            switch (result)
+            {
+            case 3:
             {
                 bool force = false;
                 if (update.ExtraData.IsSet(12))
@@ -275,17 +285,22 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual3(float deltaTime)
                     update.ExtraData.Get(8)->mData.i,
                     &update.ExtraData,
                     force);
+                break;
             }
-            else if (result == 1 || result == 2)
-            {
+            case 1:
+            case 2:
                 UnidentifiedVirtual6();
                 selectState = true;
-            }
-            else if (result == 4
-                     && active->mUnidentifiedTimer.GetSeconds()
-                            >= active->mUnidentified07C)
-            {
-                selectState = true;
+                break;
+            case 4:
+                if (mUnidentified004->mUnidentifiedTimer.GetSeconds()
+                    >= mUnidentified004->mUnidentified07C)
+                {
+                    selectState = true;
+                }
+                break;
+            case 0:
+                break;
             }
         }
     }
@@ -304,14 +319,13 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual3(float deltaTime)
         }
 
         fn_80317010(machine, &update, true, deltaTime);
-        int result = update.GetInt();
-        if (result == 0)
+        if (update.mData.i == 0)
         {
             continue;
         }
 
-        fn_80316980(machine, true);
-        if (result == 3)
+        fn_80319E58(this, i);
+        if (update.mData.i == 3)
         {
             fn_80319E84(this, update.ExtraData.Get(8)->mData.i, &update.ExtraData, false);
         }
