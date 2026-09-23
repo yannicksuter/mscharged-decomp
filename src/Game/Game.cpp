@@ -18,6 +18,7 @@
 #include "Game/Ball.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/OverlayManager.h"
+#include "Game/OverlayHandlerHUD.h"
 #include "Game/Camera/tu_800F9460.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/EventDataTypes.h"
@@ -34,6 +35,7 @@
 #include "Game/Player.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/Render/ShootToScoreArrow.h"
+#include "Game/Sys/audio.h"
 #include "Game/Sys/clock.h"
 #include "Game/Task/DispatchEventsTask.h"
 #include "Game/Task/FixedUpdateTask.h"
@@ -1241,11 +1243,11 @@ void cGame::fn_8005DF38()
     {
         ResumeAllAudio();
     }
-    fn_800EDC2C();
+    ResumeSuddenDeathMusic();
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_HUD, true, true);
     static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(lbl_806E3770);
-    fn_801E999C(g_pOverlayManager->GetScene((SceneList)89));
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->DisplayNewScore();
 
     if (mpWeatherManager != 0)
     {
