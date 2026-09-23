@@ -85,7 +85,6 @@ extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_80097358(cPlayer*, float);
 extern "C" void fn_8003E354(cFielder* pFielder);
-extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
 extern FuzzyVariant fvNotSet;
 extern unsigned char lbl_806E0C61;
 extern unsigned char lbl_806E0C62;
@@ -623,10 +622,10 @@ bool cFielder::fn_8003E73C() const
 
 bool cFielder::fn_8003E74C() const
 {
-    bool result = false;
-    if (fn_8003E7F8() || fn_8003E84C())
+    bool result = true;
+    if (fn_8003E7F8() == false && fn_8003E84C() == false)
     {
-        result = true;
+        result = false;
     }
     return result;
 }
@@ -2797,7 +2796,7 @@ void cFielder::PrePhysicsUpdate()
     if (pGoalie->mGoalieActionState == GOALIEACTION_UNIDENTIFIED_13
         && pGoalie->mpTarget == this)
     {
-        fn_80080BFC(pGoalie, 0.0f);
+        pGoalie->fn_80080BFC(0.0f);
     }
 }
 
