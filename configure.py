@@ -421,7 +421,7 @@ config.libs = [
             Object(NonMatching, "Game/AsyncLoading.cpp"),
             Object(NonMatching, "Game/Ball.cpp"),
             Object(NonMatching, "Game/BasicStadium.cpp"),
-            Object(NonMatching, "Game/Blinker.cpp", cflags=cflags_game_deferred),
+            Object(Matching, "Game/Blinker.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/Character.cpp", extra_cflags=["-inline deferred", "-ipa file"]),
             Object(Matching, "Game/CharacterEffects.cpp"),
             Object(Matching, "Game/CharacterTemplate.cpp", extra_cflags=["-ipa file", "-sym on"]),
