@@ -149,11 +149,8 @@ extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
 extern BaseGameSceneManager* g_pOverlayManager;
-extern "C" void fn_80013898(cBall* pBall);
 extern "C" void fn_8005DB44(
     UnidentifiedGoalieActionState* pState, unsigned int nParam, bool bParam);
-extern "C" EmissionController* fn_801B64E8(
-    Goalie* pGoalie, const char* szEffectName, int nParam);
 extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);
 extern "C" void fn_8001AD24(
     LiveBallTrail* pBallTrail, cFielder* pFielder);
@@ -1273,7 +1270,7 @@ void Goalie::fn_80084AE0(MegaBallIndicator* pState)
         LiveBallTrail* pBallTrail
             = fn_8001B284(pState->mIndex);
         EmissionController* pController
-            = fn_801B64E8(this, "mega_ball_explode", 0);
+            = EmitGeneric(this, "mega_ball_explode", 0);
         pController->SetPosition(pBallTrail->position);
         pController->SetVelocity(v3Zero);
 
@@ -1306,7 +1303,7 @@ void Goalie::fn_80084C3C(bool bParam)
 {
     if (bParam)
     {
-        fn_80013898(g_pBall);
+        g_pBall->ClearBallEffects();
     }
 
     g_pBall->m_bVisible = true;
@@ -4088,18 +4085,8 @@ void Goalie::ActionSnapBall(float fDeltaT)
 
 void Goalie::ActionGrabBall(float fDeltaT)
 {
-    bool bShouldInitMove = true;
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
-    {
-        bShouldInitMove = false;
-        if (m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-            && m_pCurrentAnimController->m_fTime == 1.0f)
-        {
-            bShouldInitMove = true;
-        }
-    }
-
-    if (bShouldInitMove)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
+        || m_pCurrentAnimController->UnidentifiedAtEnd())
     {
         if (m_pBall == 0)
         {
@@ -4452,6 +4439,7 @@ void Goalie::InitActionLooseBallSetup()
     mbPickedUp = false;
     mbIsDown = false;
 
+    float pSolutions[2];
     const nlVector3* pBallVelocity = &g_pBall->m_v3Velocity;
     nlVector3 v3BallPosition = g_pBall->m_v3Position;
     const nlVector3& v3NetBase = m_pTeam->m_pNet->m_v3NetLocation;
@@ -4485,8 +4473,8 @@ void Goalie::InitActionLooseBallSetup()
                 }
 
                 mbShouldMiss = false;
-                mfTimeTilSave = fn_8007ECB4(
-                    this, fTimeTilSave, muSaveType, false, false);
+                mfTimeTilSave = CalcSaveParameters(
+                    fTimeTilSave, muSaveType, false, false);
 
                 if (mfTimeTilSave > 0.0f)
                 {
@@ -4569,17 +4557,10 @@ void Goalie::InitActionLooseBallSetup()
                             = v3NetBase.x > 0.0f
                                 ? fPanicLineX
                                 : -fPanicLineX;
-                        float fGuessY = v3GuessBallPos.y;
-                        float fBallPosY = v3BallPosition.y;
-                        float fBallPosX = v3BallPosition.x;
-                        float fTargetX = mv3TargetPosition.x;
-                        float fDiffY = fBallPosY - fGuessY;
-                        float fGuessX = v3GuessBallPos.x;
-                        float fDiffXTarget = fBallPosX - fTargetX;
-                        float fDiffXOrig = fBallPosX - fGuessX;
-                        mv3TargetPosition.y
-                            = fBallPosY
-                            - fDiffXTarget * fDiffY / fDiffXOrig;
+                        mv3TargetPosition.y = v3BallPosition.y
+                            - (v3BallPosition.x - mv3TargetPosition.x)
+                                * (v3BallPosition.y - v3GuessBallPos.y)
+                                / (v3BallPosition.x - v3GuessBallPos.x);
                     }
                 }
 
@@ -4897,7 +4878,6 @@ void Goalie::InitActionLooseBallSetup()
     }
 
     int nNumSolutions;
-    float pSolutions[2];
     CalcInterceptXY(mUnidentified024.m_v3Position,
         0.85f * ((GoalieTweaks*)m_pTweaks)->fRunningSpeed,
         0.5f,
