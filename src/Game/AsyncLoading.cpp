@@ -1,6 +1,7 @@
 #include "Game/Font/FontLoading.h"
 #include "Game/MiiManager.h"
 #include "Game/HBMManager.h"
+#include "Game/ObjectBlur.h"
 
 #include "Game/Sys/audio.h"
 #include "Game/Render/StadiumLoading.h"
@@ -139,7 +140,6 @@ extern "C" bool fn_80311C5C();
 extern "C" bool fn_800F08A4();
 extern "C" void fn_800F06D4();
 extern "C" void fn_800F030C(bool stadiumViewer);
-extern "C" void fn_801FE99C();
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
@@ -153,7 +153,6 @@ extern "C" void fn_8013D85C();
 void fn_80056CF4(void*, int, bool);
 extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
-extern "C" void fn_801ACFC4();
 void FreeImpostorLighting();
 extern "C" void fn_80143FD4();
 
@@ -207,6 +206,39 @@ static inline void ReleaseUnidentifiedOwner(UnidentifiedOwnerHandle* handle)
     {
         handle->mOwner->mTarget->Release(handle);
     }
+}
+
+struct PersistentResourceRequirements
+{
+    GLMemoryRequirement entries[2];
+};
+
+extern PersistentResourceRequirements gPersistentResourceRequirements;
+
+static inline bool IsTeamInCurrentGame(int team)
+{
+    BasicGameInfo* info = GameInfoManager::Instance()->GetCurrentGameInfo();
+    for (short side = 0; side < 2; ++side)
+    {
+        if (team == info->mTeamIndex[side])
+            return true;
+    }
+    return false;
+}
+
+static inline bool IsSidekickInCurrentGame(eSidekickID sidekick)
+{
+    for (short side = 0; side < 2; ++side)
+    {
+        short sideIndex = side;
+        GameInfoManager* info = GameInfoManager::Instance();
+        for (int slot = 0; slot < 3; ++slot)
+        {
+            if (sidekick == info->GetCurrentGameInfo()->GetSidekick(sideIndex, slot))
+                return true;
+        }
+    }
+    return false;
 }
 
 static inline void FinishLoadingStep(AsyncLoadingManager* manager)
@@ -282,12 +314,9 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 4:
     {
         fn_80111654(4);
-        GLMemoryRequirement requirements[] = {
-            { GLM_Header, 0x3C00 },
-            { GLM_TextureData, 0x390800 },
-        };
+        PersistentResourceRequirements requirements = gPersistentResourceRequirements;
         sPersistentResourcePool = glCreateResourcePool(
-            requirements, 2, "PersistentResourcePool");
+            requirements.entries, 2, "PersistentResourcePool");
         break;
     }
     case 5:
@@ -879,19 +908,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 101:
     {
         int value = m_SP[-1];
-        BasicGameInfo* info = GameInfoManager::Instance()->GetCurrentGameInfo();
-        bool found;
-        for (short side = 0; side < 2; ++side)
-        {
-            if (value == info->mTeamIndex[side])
-            {
-                found = true;
-                goto foundTeam;
-            }
-        }
-        found = false;
-    foundTeam:
-        m_SP[-1] = found;
+        m_SP[-1] = IsTeamInCurrentGame(value);
         if (m_RunState == 3)
         {
             m_SP[-1] = value;
@@ -911,23 +928,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 103:
     {
         eSidekickID value = (eSidekickID)m_SP[-1];
-        bool found;
-        for (short side = 0; side < 2; ++side)
-        {
-            short sideIndex = side;
-            GameInfoManager* info = GameInfoManager::Instance();
-            for (int slot = 0; slot < 3; ++slot)
-            {
-                if (value == info->GetCurrentGameInfo()->GetSidekick(sideIndex, slot))
-                {
-                    found = true;
-                    goto foundSidekick;
-                }
-            }
-        }
-        found = false;
-    foundSidekick:
-        m_SP[-1] = found;
+        m_SP[-1] = IsSidekickInCurrentGame(value);
         if (m_RunState == 3)
         {
             m_SP[-1] = value;
@@ -1629,7 +1630,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     nlFree(g_pLocalization->m_pFile);
     ParticleUpdateTask::sInstance->Shutdown();
     cCameraManager::Shutdown();
-    fn_801FE99C();
+    DestroyFEWorld();
     if (FEModelManager::s_pInstance != 0)
     {
         delete FEModelManager::s_pInstance;
@@ -2022,7 +2023,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     g_pAudioSystem->Shutdown();
 
     StopCrowdReactions();
-    fn_801ACFC4();
+    BlurManager::Shutdown();
     FreeImpostorLighting();
     fn_80183E4C();
     gCrowdModelCollection.Clear();
@@ -2272,6 +2273,10 @@ extern "C" UnidentifiedOwnerHandle* fn_8011B858(
     }
     return handle;
 }
+
+PersistentResourceRequirements gPersistentResourceRequirements = {
+    { { GLM_Header, 0x3C00 }, { GLM_TextureData, 0x390800 } },
+};
 
 AsyncLoadingManager::AsyncLoadingManager()
     : InterpreterCore(100)
