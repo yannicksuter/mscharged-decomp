@@ -733,9 +733,9 @@ void Windy::AvoidDebrisObstacle(nlVector3& start, nlVector3& end, nlVector3& dis
         if ((g_pBall->m_v3Position.x > 0.0f && direction.x > 0.0f)
             || (g_pBall->m_v3Position.x < 0.0f && direction.x < 0.0f))
         {
-            distance *= -1.0f;
             direction.x *= -1.0f;
             direction.y *= -1.0f;
+            distance *= -1.0f;
         }
         float inverseLength = nlRecipSqrt(nlVec3LengthSquared(direction), false);
         nlVec3Set(direction,
