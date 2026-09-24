@@ -10,6 +10,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/Field.h"
+#include "Game/Ball.h"
 #include "Game/Goalie.h"
 #include "Game/MathHelpers.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -24,6 +25,8 @@ extern "C" float fn_8002E1B0(cFielder*);
 extern "C" float fn_80039574(cFielder*);
 extern bool lbl_806E0E20;
 extern float lbl_806DC058;
+extern nlVector2 lbl_806DC078;
+extern nlVector2 lbl_806DC080;
 
 float lbl_806DC04C = 60.0f;
 float lbl_806DC050 = 0.3f;
@@ -511,6 +514,21 @@ bool DesireGetInPosition::UnidentifiedInitialize(void* context)
     return result;
 }
 
+void DesireGetInPosition::Update(DesireUpdate* update, float)
+{
+    nlVector3 position;
+    if (fn_800381B4(m_pFielder, &position))
+    {
+        position = m_pFielder->mUnidentified024.m_v3Position;
+    }
+    m_pFielder->AddDesiredPosition(position, 0.8f, 1.0f);
+    if (m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder
+        && update->mData.i == DESIRE_CONTINUE)
+    {
+        *update = 4;
+    }
+}
+
 DesireGetInPosition::~DesireGetInPosition()
 {
 }
@@ -544,6 +562,28 @@ bool DesireRunUpfield::UnidentifiedInitialize(void* context)
     return result;
 }
 
+void DesireRunUpfield::Update(DesireUpdate* update, float)
+{
+    nlVector3 position;
+    if (fn_800381B4(m_pFielder, &position) && g_pBall->GetOwnerGoalie() == 0)
+    {
+        position = m_pFielder->mUnidentified024.m_v3Position;
+    }
+    else
+    {
+        float distance = InterpolateRangeClamped(
+            lbl_806DC080.x, lbl_806DC080.y, lbl_806DC078.x, lbl_806DC078.y,
+            m_pFielder->mUnidentified1E4.m_v3AIPosition.x);
+        position.x += distance * AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
+    }
+    m_pFielder->AddDesiredPosition(position, 1.25f, 1.0f);
+    if (m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder
+        && update->mData.i == DESIRE_CONTINUE)
+    {
+        *update = 4;
+    }
+}
+
 DesireRunUpfield::~DesireRunUpfield()
 {
 }
@@ -575,6 +615,32 @@ bool DesireRunDownfield::UnidentifiedInitialize(void* context)
     bool result = Desire::UnidentifiedInitialize(context);
     m_pFielder->StartRunning();
     return result;
+}
+
+void DesireRunDownfield::Update(DesireUpdate* update, float)
+{
+    nlVector3 position;
+    if (fn_800381B4(m_pFielder, &position) && g_pBall->GetOwnerGoalie() == 0)
+    {
+        position = m_pFielder->mUnidentified024.m_v3Position;
+    }
+    else
+    {
+        float distance = InterpolateRangeClamped(
+            lbl_806DC080.y, lbl_806DC080.x, lbl_806DC078.x, lbl_806DC078.y,
+            m_pFielder->mUnidentified1E4.m_v3AIPosition.x);
+        if (g_pBall->GetOwnerGoalie() != 0)
+        {
+            distance *= 2.0f;
+        }
+        position.x += distance * AIsgn(m_pFielder->m_pTeam->m_pNet->m_v3NetLocation.x);
+    }
+    m_pFielder->AddDesiredPosition(position, 1.25f, 1.0f);
+    if (m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder
+        && update->mData.i == DESIRE_CONTINUE)
+    {
+        *update = 4;
+    }
 }
 
 DesireRunDownfield::~DesireRunDownfield()
