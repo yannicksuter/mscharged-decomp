@@ -219,7 +219,9 @@ void LoadTweakConfigFile(
     const char* filename, const char* category, bool reload)
 {
     unsigned long size;
+    int parseSize;
     char* data = ReadTweakConfigFile(filename, &size);
+    parseSize = size;
 
     {
         TweakConfigParser parser;
@@ -229,7 +231,7 @@ void LoadTweakConfigFile(
             parser.mCurrentSection = category;
         }
 
-        ParseTweakConfigData(data, size, &parser);
+        ParseTweakConfigData(data, parseSize, &parser);
     }
     nlFree(data);
 }
