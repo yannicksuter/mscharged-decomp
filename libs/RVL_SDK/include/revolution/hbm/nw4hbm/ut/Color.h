@@ -35,6 +35,14 @@ typedef struct Color : public GXColor {
 
     // Operators
 
+    Color& operator=(const Color& rhs) {
+        r = rhs.r;
+        g = rhs.g;
+        b = rhs.b;
+        a = rhs.a;
+        return *this;
+    }
+
     Color& operator=(u32 color) {
         ToU32ref() = color;
         return *this;

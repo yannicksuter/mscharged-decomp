@@ -266,20 +266,20 @@ void NetMeshModelLoader::ProcessEdges(
     EdgeIterator* iter = m_EdgeList->GetIterator();
     while (iter->IsValid())
     {
-        EdgeEntry* edgeEntry = iter->Current();
-        if (edgeEntry->key.mpPacket == &packet)
+        NetMeshEdge& edge = iter->CurrentKey();
+        if (edge.mpPacket == &packet)
         {
             unsigned short index2;
             unsigned short index1;
-            int refCount = edgeEntry->value;
-            index1 = edgeEntry->key.mpVertex1->mIndex;
-            index2 = edgeEntry->key.mpVertex2->mIndex;
+            int refCount = iter->CurrentValue();
+            index1 = edge.mpVertex1->mIndex;
+            index2 = edge.mpVertex2->mIndex;
             if (refCount == 1)
             {
                 allReady[index1] = 1;
                 allReady[index2] = 1;
-                edgeEntry->key.mpVertex1->mbIsConstrained = 1;
-                edgeEntry->key.mpVertex2->mbIsConstrained = 1;
+                edge.mpVertex1->mbIsConstrained = 1;
+                edge.mpVertex2->mbIsConstrained = 1;
             }
             readyIndicator[index1] = 1;
             readyIndicator[index2] = 1;
@@ -303,9 +303,8 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
     VertexIterator* vertexIter = m_VertexList->GetIterator();
     while (vertexIter->IsValid())
     {
-        VertexEntry* vertexEntry = vertexIter->Current();
         ++numVertices;
-        if (vertexEntry->key.mbIsConstrained != 0)
+        if (vertexIter->CurrentKey().mbIsConstrained != 0)
             ++numConstrainedVertices;
         vertexIter->Next();
     }
@@ -348,8 +347,7 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
     pullDistance = 5.0f;
     while (vertexIter->IsValid())
     {
-        VertexEntry* vertexEntry = vertexIter->Current();
-        vertex = &vertexEntry->key;
+        vertex = &vertexIter->CurrentKey();
 
         position = *vertex->GetPosition();
         nlVector2 texCoord;
@@ -399,18 +397,15 @@ void NetMeshModelLoader::CreateNetMeshFromVertexList()
         delete vertexIter;
 
     edgeIter = m_EdgeList->GetIterator();
-    int index2;
-    int index1;
-    EdgeEntry* edgeEntry;
     while (edgeIter->IsValid())
     {
-        edgeEntry = edgeIter->Current();
-        if (edgeEntry->value > 1)
+        if (edgeIter->CurrentValue() > 1)
         {
-            index1 = edgeEntry->key.mpVertex1->mParticleIndex;
-            index2 = edgeEntry->key.mpVertex2->mParticleIndex;
-            position1 = *edgeEntry->key.mpVertex1->GetPosition();
-            position2 = *edgeEntry->key.mpVertex2->GetPosition();
+            NetMeshEdge& edge = edgeIter->CurrentKey();
+            int index1 = edge.mpVertex1->GetParticleIndex();
+            int index2 = edge.mpVertex2->GetParticleIndex();
+            position1 = *edge.mpVertex1->GetPosition();
+            position2 = *edge.mpVertex2->GetPosition();
             float distance = nlSqrt(
                 CalculateDistanceSquared(position1, position2), true);
             m_NetMesh.SetDistanceConstraint(index1, index2, distance);

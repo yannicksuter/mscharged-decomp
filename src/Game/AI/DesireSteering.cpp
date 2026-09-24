@@ -677,65 +677,6 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
     return result;
 }
 
-extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
-    unsigned short aDesiredFacingDirection,
-    unsigned short aDesiredMovementDirection)
-{
-    cFielder* pFielder = desire->m_pFielder;
-    short nMovementFacingDelta
-        = (short)(aDesiredMovementDirection - aDesiredFacingDirection);
-
-    float fTransitionToForwardDelta;
-    float fTransitionToBackWardsDelta;
-    if (pFielder->mActionRunningVars.eLastStrafeDirection == 1
-        || pFielder->mActionRunningVars.eLastStrafeDirection == 2)
-    {
-        fTransitionToForwardDelta
-            = gGameTweaks.m_pGameTweaks->nStrafeToRunOutDirectionDelta;
-        fTransitionToBackWardsDelta
-            = gGameTweaks.m_pGameTweaks->nBackwardsToStrafeRunOutDirectionDelta;
-    }
-    else
-    {
-        fTransitionToForwardDelta
-            = gGameTweaks.m_pGameTweaks->nStrafeToRunInDirectionDelta;
-        fTransitionToBackWardsDelta
-            = gGameTweaks.m_pGameTweaks->nBackwardsToStrafeRunInDirectionDelta;
-    }
-
-    float fJoggingSpeed = fn_8002BFB8(pFielder->GetTweaks());
-    float fRunningSpeed = fn_8002C254(pFielder->GetTweaks());
-    float fRunThreshold
-        = 0.5f * (fRunningSpeed - fJoggingSpeed) + fJoggingSpeed;
-
-    if (pFielder->mUnidentified024.m_fDesiredSpeed < 0.1f)
-    {
-        return STRAFE_IDLE;
-    }
-    if (pFielder->mUnidentified024.m_fDesiredSpeed >= fRunThreshold)
-    {
-        return STRAFE_FORWARD;
-    }
-
-    int nAbsDelta = nMovementFacingDelta < 0
-                  ? -nMovementFacingDelta : nMovementFacingDelta;
-    if ((float)(unsigned short)nAbsDelta < fTransitionToForwardDelta)
-    {
-        return STRAFE_FORWARD;
-    }
-    if ((float)nMovementFacingDelta > -fTransitionToBackWardsDelta
-        && (float)nMovementFacingDelta <= fTransitionToForwardDelta)
-    {
-        return STRAFE_RIGHT;
-    }
-    if ((float)nMovementFacingDelta < fTransitionToBackWardsDelta
-        && (float)nMovementFacingDelta >= -fTransitionToForwardDelta)
-    {
-        return STRAFE_LEFT;
-    }
-    return STRAFE_BACK;
-}
-
 extern "C" void fn_800C6FDC(DesireSteering* desire, float)
 {
     cFielder* pFielder = desire->m_pFielder;
@@ -804,6 +745,69 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
                   ? STRAFE_IDLE : STRAFE_FORWARD;
     }
     pFielder->mActionRunningVars.eLastStrafeDirection = eMovement;
+}
+
+extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
+    unsigned short aDesiredFacingDirection,
+    unsigned short aDesiredMovementDirection)
+{
+    cFielder* pFielder = desire->m_pFielder;
+    short nMovementFacingDelta
+        = (short)(aDesiredMovementDirection - aDesiredFacingDirection);
+
+    float fTransitionToForwardDelta;
+    float fTransitionToBackWardsDelta;
+    switch (pFielder->mActionRunningVars.eLastStrafeDirection)
+    {
+    case STRAFE_RIGHT:
+    case STRAFE_LEFT:
+        fTransitionToForwardDelta
+            = gGameTweaks.m_pGameTweaks->nStrafeToRunOutDirectionDelta;
+        fTransitionToBackWardsDelta
+            = gGameTweaks.m_pGameTweaks->nBackwardsToStrafeRunOutDirectionDelta;
+        break;
+    case STRAFE_IDLE:
+    case STRAFE_FORWARD:
+    case STRAFE_BACK:
+    default:
+        fTransitionToForwardDelta
+            = gGameTweaks.m_pGameTweaks->nStrafeToRunInDirectionDelta;
+        fTransitionToBackWardsDelta
+            = gGameTweaks.m_pGameTweaks->nBackwardsToStrafeRunInDirectionDelta;
+        break;
+    }
+
+    float fRunThreshold
+        = 0.5f * (fn_8002C254(desire->m_pFielder->GetTweaks())
+              - fn_8002BFB8(pFielder->GetTweaks()))
+        + fn_8002BFB8(desire->m_pFielder->GetTweaks());
+    float fDesiredSpeed = desire->m_pFielder->mUnidentified024.m_fDesiredSpeed;
+
+    if (fDesiredSpeed < 0.1f)
+    {
+        return STRAFE_IDLE;
+    }
+    if (fDesiredSpeed < fRunThreshold)
+    {
+        int nAbsDelta = nMovementFacingDelta < 0
+                      ? -nMovementFacingDelta : nMovementFacingDelta;
+        if ((float)(unsigned short)nAbsDelta < fTransitionToForwardDelta)
+        {
+            return STRAFE_FORWARD;
+        }
+        if ((float)nMovementFacingDelta > -fTransitionToBackWardsDelta
+            && (float)nMovementFacingDelta <= fTransitionToForwardDelta)
+        {
+            return STRAFE_RIGHT;
+        }
+        if ((float)nMovementFacingDelta < fTransitionToBackWardsDelta
+            && (float)nMovementFacingDelta >= fTransitionToForwardDelta)
+        {
+            return STRAFE_LEFT;
+        }
+        return STRAFE_BACK;
+    }
+    return STRAFE_FORWARD;
 }
 
 void DesireSteering::UnidentifiedVirtual8(

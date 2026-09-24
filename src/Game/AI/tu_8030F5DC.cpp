@@ -21,16 +21,16 @@ static inline float UnidentifiedGetExtraFloat(
 }
 
 int fn_8030FD40(
-    UnidentifiedVariant_80054AB8* const& first,
-    UnidentifiedVariant_80054AB8* const& second)
+    UnidentifiedVariant_80054AB8*& first,
+    UnidentifiedVariant_80054AB8*& second)
 {
-    if (UnidentifiedGetExtraFloat(first, 4, 0.0f)
-        == UnidentifiedGetExtraFloat(second, 4, 0.0f))
+    if (first->UnidentifiedGetFloat(4)
+        == second->UnidentifiedGetFloat(4))
     {
         return 0;
     }
-    if (UnidentifiedGetExtraFloat(first, 4, 0.0f)
-        > UnidentifiedGetExtraFloat(second, 4, 0.0f))
+    if (first->UnidentifiedGetFloat(4)
+        > second->UnidentifiedGetFloat(4))
     {
         return -1;
     }

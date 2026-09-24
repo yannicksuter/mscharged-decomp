@@ -151,7 +151,7 @@ void SHOnlineInvitePreview::SceneCreated()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    TLTextInstance* text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_0");
+    TLTextInstance* text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_0");
     unsigned short value0[4];
     unsigned short value1[4];
     nlSNPrintf(value0, 4, (const unsigned short*)L"%d", payload->mGameplaySettings.NumGames);
@@ -159,7 +159,7 @@ void SHOnlineInvitePreview::SceneCreated()
     memcpy(mBestSeriesText, string.c_str(), sizeof(mBestSeriesText));
     text->SetString(mBestSeriesText);
 
-    text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_1");
+    text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_1");
     const char* id;
     int value;
     if (payload->mGameplaySettings.GameLimitType == 0)
@@ -179,28 +179,28 @@ void SHOnlineInvitePreview::SceneCreated()
     memcpy(mGameLimitText, string.c_str(), sizeof(mGameLimitText));
     text->SetString(mGameLimitText);
 
-    text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_2");
+    text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_2");
     int stadium = payload->mStadium;
     string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_PREVIEW_OPTION_2")),
         g_pLocalization->GetString(GetStadiumTickerStringID(stadium)));
     memcpy(mStadiumText, string.c_str(), sizeof(mStadiumText));
     text->SetString(mStadiumText);
 
-    text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_3");
+    text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_3");
     id = GetLOCEnvironmentCheatName(settings.GetEnvironmentCheat());
     string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_PREVIEW_OPTION_3")),
         g_pLocalization->GetString(id));
     memcpy(mEnvironmentCheatText, string.c_str(), sizeof(mEnvironmentCheatText));
     text->SetString(mEnvironmentCheatText);
 
-    text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_4");
+    text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_4");
     id = GetLOCPowerupCheatName(settings.GetCustomPowerups());
     string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_PREVIEW_OPTION_4")),
         g_pLocalization->GetString(id));
     memcpy(mPowerupCheatText, string.c_str(), sizeof(mPowerupCheatText));
     text->SetString(mPowerupCheatText);
 
-    text = FEFindTextInstance(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_5");
+    text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_5");
     id = GetLOCPlayerCheatName(settings.GetPlayerCheat());
     string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_PREVIEW_OPTION_5")),
         g_pLocalization->GetString(id));

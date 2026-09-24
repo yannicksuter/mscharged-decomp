@@ -232,6 +232,25 @@ FormationSpec* FormationManager::GetFormationSpec(eFormation specType)
     return pSpec;
 }
 
+inline void FormationManager::AccumulateWeightedFielderCenter(const float*& pWeight)
+{
+    cFielder* pFielder;
+    int i;
+    for (i = 0; i < 4; i++)
+    {
+        pFielder = m_pTeam->mUnidentified0D8[i];
+        bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
+        if (!bIgnoreFielder)
+        {
+            float newY = field_0x18.y + *pWeight * pFielder->mUnidentified024.m_v3Position.y;
+            float newX = field_0x18.x + *pWeight * pFielder->mUnidentified024.m_v3Position.x;
+            field_0x18.y = newY;
+            field_0x18.x = newX;
+            pWeight++;
+        }
+    }
+}
+
 void FormationManager::Update(float dt)
 {
     if (!g_pGame->IsGameplayOrOvertime())
@@ -257,22 +276,8 @@ void FormationManager::Update(float dt)
     field_0x18.x = 0.0f;
     field_0x18.y = 0.0f;
 
-    cFielder* pFielder;
-    int i;
     const float* pWeight = lbl_804DBF68;
-    for (i = 0; i < 4; ++i)
-    {
-        pFielder = m_pTeam->mUnidentified0D8[i];
-        bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
-        if (!bIgnoreFielder)
-        {
-            float newY = field_0x18.y + *pWeight * pFielder->mUnidentified024.m_v3Position.y;
-            float newX = field_0x18.x + *pWeight * pFielder->mUnidentified024.m_v3Position.x;
-            field_0x18.y = newY;
-            field_0x18.x = newX;
-            pWeight++;
-        }
-    }
+    AccumulateWeightedFielderCenter(pWeight);
 
     if (m_pTeam->m_nSide == 1)
     {
@@ -853,10 +858,8 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
 
     for (i = 0; i < 4; i++)
     {
-        const nlVector2& v2Location = m_pFormationSpec->m_Positions[i].m_Location;
-        float y = v2Location.y + v2CenterOfPlayers.y;
-        float x = v2Location.x + v2CenterOfPlayers.x;
-        nlVec2Set(av2FormationPositions[i], x, y);
+        nlVec2Add(av2FormationPositions[i],
+            m_pFormationSpec->m_Positions[i].m_Location, v2CenterOfPlayers);
     }
 
     const int* pFielderOrder = lbl_804DBF78;

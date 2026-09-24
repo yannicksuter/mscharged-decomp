@@ -149,7 +149,7 @@ extern "C" float fn_8002BE64(PlayerTweaks*);
 extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
-extern "C" bool fn_80038660(cFielder*);
+extern "C" bool fn_80016768(cBall*);
 float ReceivingPass(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void fn_80017448(cBall*, float);
@@ -172,6 +172,7 @@ extern "C" void fn_801BDF08(int);
 extern "C" void fn_80097358(cPlayer*, float);
 extern "C" void fn_801B79A4(const char*, int);
 extern "C" void fn_801B7A28(cBall*);
+extern "C" void fn_800154FC(cBall*, float);
 extern "C" void fn_801B9904(unsigned long);
 extern "C" void fn_801B9EAC(cBall*, nlVector3*, bool);
 extern "C" void fn_801B9FD0(cBall*, bool);
@@ -381,27 +382,7 @@ cBall::~cBall()
 {
     fn_80015C38(this, 0);
     ClearBallEffects();
-
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
-    {
-        mfChargeValue = 4.0f;
-    }
-    else
-    {
-        mfChargeValue = 0.0f;
-    }
-
-    float fMaxCharge = lbl_806DB510 * 4.0f;
-    if (mfChargeValue >= fMaxCharge)
-    {
-        mfChargeValue = fMaxCharge;
-    }
-    else if (mfChargeValue < 0.0f)
-    {
-        mfChargeValue = 0.0f;
-    }
-
-    fn_801B7A28(this);
+    fn_800154FC(this, 0.0f);
     StopSound(mUnidentifiedF0, this);
     mUnidentifiedF0 = 0;
     ReleaseAudioSoundOwner(g_pAudioSystem, mUnidentifiedEC);
@@ -439,8 +420,14 @@ void cBall::CollideWithCharacterCallback(
     switch (meBallState)
     {
     case 6:
-        bCanDamage = nlSqrt(m_v3Velocity.GetLengthSq3D(), true)
-            > lbl_806DB578;
+        if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB578)
+        {
+            bCanDamage = true;
+        }
+        else
+        {
+            bCanDamage = false;
+        }
         break;
     case 8:
         bCanDamage = true;
@@ -472,15 +459,23 @@ void cBall::CollideWithCharacterCallback(
             }
 
             cPlayer* pShooter = m_pShooter;
-            bool bLightningBall = m_tLightningTimer.m_uPackedTime != 0
-                && meBallState == 8 && pShooter != NULL;
-            if (bLightningBall
+            bool bClassShot = false;
+            bool bState8ShotWithShooter = false;
+            bool bState8Shot = UnidentifiedState8Shot();
+            if (bState8Shot && pShooter != NULL)
+            {
+                bState8ShotWithShooter = true;
+            }
+            if (bState8ShotWithShooter
                 && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xF)
+            {
+                bClassShot = true;
+            }
+            if (bClassShot)
             {
                 fn_80097358(pCharacter, lbl_806E31C8);
             }
-            else if (bLightningBall
-                && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
+            else if (fn_80016768(this))
             {
                 fn_800156F8(this, pShooter);
                 pCharacterFielder->fn_800451B0(pShooter->mUnidentified024.m_v3Position);
@@ -505,13 +500,11 @@ void cBall::CollideWithCharacterCallback(
             if (bReactToHit)
             {
                 int nReact = 0;
-                float fSpeed
-                    = nlSqrt(m_v3Velocity.GetLengthSq3D(), true);
-                if (fSpeed > lbl_806DB580)
+                if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB580)
                 {
                     nReact = 2;
                 }
-                else if (fSpeed > lbl_806DB57C)
+                else if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB57C)
                 {
                     nReact = 1;
                 }
@@ -566,6 +559,7 @@ void cBall::CollideWithCharacterCallback(
             m_tNoPickupTimer.SetSeconds(0.0f);
 
             nlVector3 v3Velocity;
+            nlVector3 v3AngularVelocity;
             if (nlVec3DotProduct(v3BallDirection, m_v3Velocity) > 0.0f)
             {
                 nlVec3Scale(v3Velocity, m_v3Velocity, lbl_806E31D0);
@@ -574,12 +568,7 @@ void cBall::CollideWithCharacterCallback(
                     pCharacter->mUnidentified024.m_v3Position);
                 if (nlVec3DotProduct(v3CharacterToBall, v3Velocity) < 0.0f)
                 {
-                    m_v3Position = m_v3PrevPosition;
-                    m_pPhysicsBall->SetPosition(m_v3PrevPosition,
-                        PhysicsObject::WORLD_COORDINATES);
-                    m_pPhysicsBall->SetRotation(m3Ident);
-                    FakeBallWorld::InvalidateBallCache();
-                    ++m_bBallPathChangeCount;
+                    SetPosition(m_v3PrevPosition);
                 }
             }
             else
@@ -590,7 +579,6 @@ void cBall::CollideWithCharacterCallback(
             v3Velocity.z += lbl_806E31C0 + nlRandomf(lbl_806E31D8);
             v3Velocity.y += lbl_806E31DC + nlRandomf(lbl_806E31E0);
 
-            nlVector3 v3AngularVelocity;
             m_pPhysicsBall->GetAngularVelocity(&v3AngularVelocity);
             SetVelocity(v3Velocity, SPINTYPE_PARAMETER,
                 &v3AngularVelocity);
@@ -600,8 +588,8 @@ void cBall::CollideWithCharacterCallback(
     if (meBallState == 4 && pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pCharacter;
-        if (pFielder->m_eActionState < ACTION_LOOSE_BALL_PASS
-            || pFielder->m_eActionState > ACTION_LOOSE_BALL_SHOT)
+        if (pFielder->m_eActionState >= ACTION_SHOT
+            || pFielder->m_eActionState < ACTION_LOOSE_BALL_PASS)
         {
             if (m_pOwner != NULL)
             {
@@ -643,9 +631,8 @@ void cBall::CollideWithCharacterCallback(
         }
     }
 
-    bool bPassTarget = (meBallState == 5 || meBallState == 3)
-        && m_pPassTarget != NULL;
-    if (m_tShotTimer.m_uPackedTime != 0 || bPassTarget)
+    if (m_tLightningTimer.m_uPackedTime != 0
+        || UnidentifiedHasPassTarget())
     {
         if (pCharacter->m_eClassType == FIELDER)
         {
@@ -691,8 +678,11 @@ void cBall::CollideWithCharacterCallback(
     }
 
     cFielder* pOwnerFielder = (cFielder*)m_pOwner;
-    if (pOwnerFielder == NULL
-        || pOwnerFielder->m_eClassType != FIELDER)
+    if (pOwnerFielder != NULL && pOwnerFielder->m_eClassType == FIELDER)
+    {
+        pOwnerFielder = (cFielder*)m_pOwner;
+    }
+    else
     {
         pOwnerFielder = NULL;
     }
@@ -705,17 +695,20 @@ void cBall::CollideWithCharacterCallback(
 
         if (!pCharacterFielder->IsOnSameTeam(pOwnerFielder))
         {
-            if (fn_80038660(pCharacterFielder))
+            if (pCharacterFielder->fn_80038660())
             {
                 nlVector3 v3ContactLocation
                     = pCharacter->mUnidentified024.m_v3Position;
                 nlVector3 v3PhysicsRadialSpot;
+                float fPlayerScale
+                    = pCharacter->mUnidentified024.m_fPlayerScale;
+                unsigned short aActualFacingDirection
+                    = pCharacter->mUnidentified024.m_aActualFacingDirection;
                 float fRadius = fn_8002BFA8(
-                    pCharacterFielder->GetTweaks(),
-                    pCharacter->mUnidentified024.m_fPlayerScale);
+                    pCharacterFielder->GetTweaks(), fPlayerScale);
                 nlPolarToCartesian(v3PhysicsRadialSpot.x,
                     v3PhysicsRadialSpot.y,
-                    pCharacter->mUnidentified024.m_aActualFacingDirection, fRadius);
+                    aActualFacingDirection, fRadius);
                 v3PhysicsRadialSpot.z = 0.0f;
                 nlVec3Add(v3ContactLocation, v3ContactLocation,
                     v3PhysicsRadialSpot);
@@ -729,7 +722,7 @@ void cBall::CollideWithCharacterCallback(
                     : nHitterContactLocationFacingDelta;
                 if (absFacingDelta < 0x2000)
                 {
-                    if (fn_80038660(pOwnerFielder))
+                    if (pOwnerFielder->fn_80038660())
                     {
                         s16 nHitteeContactLocationFacingDelta
                             = pOwnerFielder->GetFacingDeltaToPosition(
@@ -805,7 +798,7 @@ void cBall::CollideWithCharacterCallback(
                     }
                 }
             }
-            else if (fn_80038660(pOwnerFielder)
+            else if (pOwnerFielder->fn_80038660()
                 && !pCharacterFielder->IsHitting())
             {
                 pCharacterFielder->InitActionSlideAttackReact(
@@ -815,7 +808,7 @@ void cBall::CollideWithCharacterCallback(
         }
         else
         {
-            if (fn_80038660(pOwnerFielder)
+            if (pOwnerFielder->fn_80038660()
                 && !pOwnerFielder->fn_8003E74C())
             {
                 bool bInvincible = !pOwnerFielder->IsStuck()
@@ -825,7 +818,7 @@ void cBall::CollideWithCharacterCallback(
                     pOwnerFielder->fn_8004D238();
                 }
             }
-            if (fn_80038660(pCharacterFielder)
+            if (pCharacterFielder->fn_80038660()
                 && !pCharacterFielder->fn_8003E74C())
             {
                 bool bInvincible = !pCharacterFielder->IsStuck()
@@ -1118,9 +1111,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             pFielder->SetVelocity(v3Velocity);
 
             v3Velocity.z = 0.0f;
-            float fRecipLength
-                = nlRecipSqrt(v3Velocity.GetLengthSq3D(), true);
-            nlVec3Scale(v3Velocity, v3Velocity, fRecipLength);
+            nlVec3Normalize(v3Velocity, v3Velocity);
 
             nlVector3 v3Position;
             nlVec3ScaleAdd(
@@ -1940,7 +1931,10 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 
     if (m_pPhysicsBall->mbUseMagnusEffect)
     {
-        nlVec3Sub(v3Unidentified, m_v3Position, m_v3ShotTarget);
+        nlVec3Set(v3Unidentified,
+            m_v3Position.x - m_v3ShotTarget.x,
+            m_v3Position.y - m_v3ShotTarget.y,
+            m_v3Position.z - m_v3ShotTarget.z);
         float fDist = nlSqrt(v3Unidentified.GetLengthSq3D(), true);
 
         fn_8016F06C();
@@ -2080,8 +2074,7 @@ extern "C" void fn_80017114(cBall* pBall)
         nlRecipSqrt(v3Direction.GetLengthSq3D(), true));
     nlVec3Scale(v3Direction, lbl_806DB560);
 
-    float fSpeed = nlGetLength3D(pBall->m_v3Velocity.x,
-        pBall->m_v3Velocity.y, pBall->m_v3Velocity.z);
+    float fSpeed = nlVec3Length(pBall->m_v3Velocity);
     if (fSpeed < lbl_806DB564)
     {
         fSpeed = lbl_806DB564;

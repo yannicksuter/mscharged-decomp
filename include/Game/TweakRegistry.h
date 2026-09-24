@@ -44,7 +44,7 @@ void ClearTweakRegistryReset(void);
 void RegisterPendingTweaks(void);
 void BindPendingTweaks(void);
 const char* InternTweakString(const char* str, int kind);
-void CreateTweakValueFromString(TweakEntry* entry, const char* name, const char* valueStr);
+TweakValueBase* CreateTweakValueFromString(TweakEntry* entry, const char* name, const char* valueStr);
 int ParseTweakBool(const char* str, bool* out);
 int IsTweakNamePrefix(const char* str, unsigned int count, int index);
 int NeedsTweakNameFormatting(const char* name, int* outLength);
@@ -173,24 +173,24 @@ public:
         mName = name;
     }
     virtual ~TweakValueString() { }
-    virtual int GetValueType() { return 8; }
-    virtual int GetStorageKind() { return 1; }
+    virtual void UnidentifiedVirtual18() { }
     virtual void UnidentifiedVirtual14(float* value, float* min, float* max)
     {
         *value = 0.0f;
         *min = 0.0f;
         *max = 0.0f;
     }
-    virtual void UnidentifiedVirtual18() { }
-    virtual void* GetValueAddress() { return &m_Value; }
-    virtual void FormatValue(char* buffer, unsigned long size)
-    {
-        nlSNPrintf(buffer, size, "%s", m_Value);
-    }
     virtual void ParseValue(const char* str)
     {
         m_Value = InternTweakString(str, kTweakStringValue);
     }
+    virtual void FormatValue(char* buffer, unsigned long size)
+    {
+        nlSNPrintf(buffer, size, "%s", m_Value);
+    }
+    virtual void* GetValueAddress() { return &m_Value; }
+    virtual int GetValueType() { return 8; }
+    virtual int GetStorageKind() { return 1; }
     virtual void CopyValueFrom(TweakValueBase* other)
     {
         switch (other->GetStorageKind())

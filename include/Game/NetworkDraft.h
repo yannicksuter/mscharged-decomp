@@ -100,6 +100,15 @@ public:
     bool HasDisconnectedPlayer(int team) const;
     void Update(float dt);
     bool fn_8022819C() const { return mState != NET_DRAFT_IDLE; }
+    int fn_802281B0()
+    {
+        if (mState != NET_DRAFT_CAPTAINS)
+            return -1;
+        int countdown = (int)mTimeBeforeDrafting;
+        if (countdown < 0)
+            countdown = 0;
+        return countdown;
+    }
     int fn_8022ED88()
     {
         if (mState != NET_DRAFT_SIDEKICKS)

@@ -11,13 +11,13 @@ struct WarbleConfiguration
     /* 0x04 */ nlVector3 position;
     /* 0x10 */ float blobScale;
     /* 0x14 */ float duration;
-    /* 0x18 */ float values18[6];
+    /* 0x18 */ float parameters[6];
 }; // size: 0x30
 
 struct WarbleInstance : public WarbleConfiguration
 {
     WarbleInstance(const WarbleConfiguration& configuration);
-    bool UnidentifiedQuery() const { return elapsed >= duration; }
+    bool IsExpired() const { return elapsed >= duration; }
 
     /* 0x30 */ float elapsed;
     /* 0x34 */ int active;

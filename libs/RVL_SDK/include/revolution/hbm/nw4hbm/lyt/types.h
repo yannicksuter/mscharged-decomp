@@ -171,6 +171,14 @@ class IndirectStage {
 public:
     IndirectStage() { Set(GX_TEXCOORD0, GX_TEXMAP0, GX_ITS_1, GX_ITS_1); }
 
+    IndirectStage& operator=(const IndirectStage& rhs) {
+        texCoordGen = rhs.texCoordGen;
+        texMap = rhs.texMap;
+        scaleS = rhs.scaleS;
+        scaleT = rhs.scaleT;
+        return *this;
+    }
+
     GXTexCoordID GetTexCoordGen() const { return static_cast<GXTexCoordID>(texCoordGen); }
 
     GXTexMapID GetTexMap() const { return static_cast<GXTexMapID>(texMap); }
@@ -195,6 +203,11 @@ private:
 
 class TevSwapMode {
 public:
+    TevSwapMode& operator=(const TevSwapMode& rhs) {
+        swap = rhs.swap;
+        return *this;
+    }
+
     GXTevColorChan GetR() const { return static_cast<GXTevColorChan>((swap) & 0x03); }
     GXTevColorChan GetG() const { return static_cast<GXTevColorChan>((swap >> 2) & 0x03); }
     GXTevColorChan GetB() const { return static_cast<GXTevColorChan>((swap >> 4) & 0x03); }
@@ -251,6 +264,8 @@ public:
         SetIndirect(GX_INDTEXSTAGE0, GX_ITF_8, GX_ITB_NONE, GX_ITM_OFF, GX_ITW_OFF, GX_ITW_OFF, false, false,
                     GX_ITBA_OFF);
     }
+
+    void Reset() { *this = TevStage(); }
 
     GXTexCoordID GetTexCoordGen() const { return static_cast<GXTexCoordID>(texCoordGen); }
     GXChannelID GetColorChan() const { return static_cast<GXChannelID>(colChan); }
@@ -353,6 +368,14 @@ public:
         Set(GX_SRC_VTX, GX_SRC_VTX);
     }
 
+    ChanCtrl& operator=(const ChanCtrl& rhs) {
+        matSrcCol = rhs.matSrcCol;
+        matSrcAlp = rhs.matSrcAlp;
+        reserve1 = rhs.reserve1;
+        reserve2 = rhs.reserve2;
+        return *this;
+    }
+
     GXColorSrc GetColorSrc() const { return static_cast<GXColorSrc>(matSrcCol); }
     GXColorSrc GetAlphaSrc() const { return static_cast<GXColorSrc>(matSrcAlp); }
 
@@ -371,6 +394,14 @@ private:
 class AlphaCompare {
 public:
     AlphaCompare() { Set(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0); }
+
+    AlphaCompare& operator=(const AlphaCompare& rhs) {
+        comp = rhs.comp;
+        op = rhs.op;
+        ref0 = rhs.ref0;
+        ref1 = rhs.ref1;
+        return *this;
+    }
 
     GXCompare GetComp0() const { return static_cast<GXCompare>(comp & 0x0F); }
     GXCompare GetComp1() const { return static_cast<GXCompare>((comp >> 4) & 0x0F); }
@@ -397,6 +428,14 @@ private:
 class BlendMode {
 public:
     BlendMode() { Set(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET); }
+
+    BlendMode& operator=(const BlendMode& rhs) {
+        type = rhs.type;
+        srcFactor = rhs.srcFactor;
+        dstFactor = rhs.dstFactor;
+        op = rhs.op;
+        return *this;
+    }
 
     GXBlendMode GetType() const { return static_cast<GXBlendMode>(type); }
     GXBlendFactor GetSrcFactor() const { return static_cast<GXBlendFactor>(srcFactor); }

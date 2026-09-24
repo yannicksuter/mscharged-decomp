@@ -312,49 +312,47 @@ void FEInput::Update(float)
         mUnidentified024[padIndex] = 0;
         for (int buttonIndex = 0; buttonIndex < 13; buttonIndex++)
         {
-            FEPadData& data = g_aFEPadData[padIndex];
-            cGlobalPad* pPad = g_pPadManager->GetPad(padIndex);
-            int button = pPad->GetButtonMask(buttonIndex);
-            data.bIsPressed[buttonIndex] = false;
+            int button = g_pPadManager->GetPad(padIndex)->GetButtonMask(buttonIndex);
+            g_aFEPadData[padIndex].bIsPressed[buttonIndex] = false;
 
-            if (pPad->IsPressed(button, false))
+            if (g_pPadManager->GetPad(padIndex)->IsPressed(button, false))
             {
-                if (pPad->PlatJustPressed(button, false))
+                if (g_pPadManager->GetPad(padIndex)->PlatJustPressed(button, false))
                 {
-                    data.fButtonTimeSinceLastRepeat[buttonIndex]
-                        = pPad->GetButtonStateTime(button, false);
-                    data.bIsPressed[buttonIndex] = true;
+                    g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex]
+                        = g_pPadManager->GetPad(padIndex)->GetButtonStateTime(button, false);
+                    g_aFEPadData[padIndex].bIsPressed[buttonIndex] = true;
                 }
                 else
                 {
-                    float buttonStateTime = pPad->GetButtonStateTime(button, false);
-                    float diff = buttonStateTime - data.fButtonInitialDelay[buttonIndex];
+                    float buttonStateTime = g_pPadManager->GetPad(padIndex)->GetButtonStateTime(button, false);
+                    float diff = buttonStateTime - g_aFEPadData[padIndex].fButtonInitialDelay[buttonIndex];
                     bool bShouldRepeat = true;
-                    if (!(diff > 0.0001f) && !(fabs(diff) <= 0.0001f))
+                    float timeSinceRepeat = g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex];
+                    float repeatRate = g_aFEPadData[padIndex].fButtonRepeatRate[buttonIndex];
+                    if (!(diff > 0.0001f) && !((float)fabs(diff) <= 0.0001f))
                     {
                         bShouldRepeat = false;
                     }
                     if (bShouldRepeat)
                     {
-                        float diff2 = buttonStateTime
-                            - data.fButtonTimeSinceLastRepeat[buttonIndex]
-                            - data.fButtonRepeatRate[buttonIndex];
+                        float diff2 = buttonStateTime - timeSinceRepeat - repeatRate;
                         bool bShouldRepeat2 = true;
-                        if (!(diff2 > 0.0001f) && !(fabs(diff2) <= 0.0001f))
+                        if (!(diff2 > 0.0001f) && !((float)fabs(diff2) <= 0.0001f))
                         {
                             bShouldRepeat2 = false;
                         }
                         if (bShouldRepeat2)
                         {
-                            data.fButtonTimeSinceLastRepeat[buttonIndex] = buttonStateTime;
-                            data.bIsPressed[buttonIndex] = true;
+                            g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex] = buttonStateTime;
+                            g_aFEPadData[padIndex].bIsPressed[buttonIndex] = true;
                         }
                     }
                 }
             }
             else
             {
-                data.fButtonTimeSinceLastRepeat[buttonIndex] = 0.0f;
+                g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex] = 0.0f;
             }
         }
     }

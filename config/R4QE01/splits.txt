@@ -1553,7 +1553,7 @@ Game/Render/ThwompObject.cpp:
 	.sbss       start:0x806E16B8 end:0x806E16C0
 	.sdata2     start:0x806E5358 end:0x806E5388
 
-Game/Render/tu_801B369C.cpp:
+Game/Render/WarbleOwner.cpp:
 	.text       start:0x801B369C end:0x801B38C4
 	.bss        start:0x805741D0 end:0x80574200
 	.sdata2     start:0x806E5388 end:0x806E53A8
@@ -1737,7 +1737,7 @@ Game/FE/feCaptainComponent.cpp:
 	.sdata      start:0x806DD4B0 end:0x806DD508
 	.sdata2     start:0x806E5660 end:0x806E5668
 
-Game/FE/tu_801DCD9C.cpp:
+Game/FE/feCharacterPDAComponent.cpp:
 	.text       start:0x801DCD9C end:0x801E144C
 	.data       start:0x80519668 end:0x80519920
 	.sdata      start:0x806DD508 end:0x806DD568
@@ -3943,13 +3943,16 @@ Game/AI/tu_803115F4.cpp:
 	.bss        start:0x80584240 end:0x805842E0
 
 Game/AI/tu_80311734.cpp:
-	.text       start:0x80311734 end:0x803167F0
+	.text       start:0x80311734 end:0x80315A14
 	.ctors      start:0x804DBAB4 end:0x804DBAB8
 	.data       start:0x80530148 end:0x80530248
 	.bss        start:0x805842E0 end:0x80584340
 	.sdata      start:0x806DF560 end:0x806DF5A0
 	.sbss       start:0x806E20A0 end:0x806E20B8
 	.sdata2     start:0x806E6870 end:0x806E6880
+
+Game/AI/tu_80315A14.cpp:
+	.text       start:0x80315A14 end:0x803167F0
 
 Game/AI/tu_803167F0.cpp:
 	.text       start:0x803167F0 end:0x80317E2C

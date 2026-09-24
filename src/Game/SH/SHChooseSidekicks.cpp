@@ -253,10 +253,10 @@ void ChooseSidekicksSceneV2::SceneCreated()
     mUnidentified50[1].fn_801DCCEC();
     for (int side = 0; side < 2; ++side)
     {
-        mCaptainComponents[side].fn_801DCFD8(pda[side], side, 0);
-        mCaptainComponents[side].fn_801E0280(1);
-        mCaptainComponents[side].fn_801E0B20(false);
-        mCaptainComponents[side].fn_801DF85C(-1, 0, 0);
+        mCaptainComponents[side].Initialize(pda[side], side, 0);
+        mCaptainComponents[side].SetDisplayMode(1);
+        mCaptainComponents[side].SetReadyPromptVisible(false);
+        mCaptainComponents[side].SetSidekickInfo(-1, 0, 0);
     }
     int captain;
     if (GameInfoManager::Instance()->IsInMode3())
@@ -265,18 +265,18 @@ void ChooseSidekicksSceneV2::SceneCreated()
         captain = GameInfoManager::Instance()->GetTeam(0);
     mUnidentified50[0].fn_801DA88C();
     mUnidentified50[0].fn_801DCD84(captain);
-    mCaptainComponents[0].fn_801E0AD0();
+    mCaptainComponents[0].ShowSlideIn();
     if (GameInfoManager::Instance()->IsOnline() || mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
-        mCaptainComponents[1].fn_801DE570(false);
-        mCaptainComponents[1].fn_801E0280(5);
+        mCaptainComponents[1].SetVisible(false);
+        mCaptainComponents[1].SetDisplayMode(5);
         fn_8022E258(captain, -1);
     }
     else
     {
         mUnidentified50[1].fn_801DA88C();
         mUnidentified50[1].fn_801DCD84(GameInfoManager::Instance()->GetTeam(1));
-        mCaptainComponents[1].fn_801E0AD0();
+        mCaptainComponents[1].ShowSlideIn();
         fn_8022E258(captain, GameInfoManager::Instance()->GetTeam(1));
         FEMusic::StartStreamIfDifferent(2);
     }
@@ -355,8 +355,8 @@ void ChooseSidekicksSceneV2::Update(float dt)
         }
     }
     BaseSceneHandler::Update(dt);
-    mCaptainComponents[0].fn_801DE584(dt);
-    mCaptainComponents[1].fn_801DE584(dt);
+    mCaptainComponents[0].Update(dt);
+    mCaptainComponents[1].Update(dt);
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
         UpdateCharacterIdleAnimations(dt);
     if (mUnidentified1954 == 0 || mUnidentified1954 == 2 || mUnidentified1954 == 3)
@@ -522,7 +522,7 @@ void ChooseSidekicksSceneV2::fn_8022AB68(int index, void* context)
         mUnidentified688[side][i].ResetPointerStates();
     }
     mUnidentifiedE8[which].SetPointerState(0, index);
-    mCaptainComponents[side].fn_801E0280(1);
+    mCaptainComponents[side].SetDisplayMode(1);
     mUnidentified190C[side]->m_bVisible = false;
     mUnidentified50[side].fn_801DABAC(mUnidentified30[side], 1);
     mUnidentified30[side] = -1;
@@ -545,8 +545,8 @@ void ChooseSidekicksSceneV2::fn_8022ACEC(int index, void* context)
 
     mUnidentified28[side] = which;
     int sidekick = lbl_8051D198[which];
-    mCaptainComponents[side].fn_801E0280(3);
-    mCaptainComponents[side].fn_801DF85C(sidekick, index, 0);
+    mCaptainComponents[side].SetDisplayMode(3);
+    mCaptainComponents[side].SetSidekickInfo(sidekick, index, 0);
     mUnidentified190C[side]->m_bVisible = false;
     if (!mUnidentifiedE8[which].HasOtherPointerState(1, index))
     {
@@ -606,7 +606,7 @@ void ChooseSidekicksSceneV2::fn_8022AF84(int index, void* context)
     }
 
     mUnidentified48[group] = false;
-    mCaptainComponents[group].fn_801E0B20(false);
+    mCaptainComponents[group].SetReadyPromptVisible(false);
     if (!mUnidentified4C)
     {
         mUnidentified1914->m_bVisible = true;
@@ -829,7 +829,7 @@ void ChooseSidekicksSceneV2::fn_8022B7C0(int index, void* context)
         mUnidentified1060[which].SetPointerState(2, i);
     }
 
-    mCaptainComponents[which].fn_801E0B20(false);
+    mCaptainComponents[which].SetReadyPromptVisible(false);
     mUnidentified48[which] = false;
     mUnidentified50[which].fn_801DCC28();
 }
@@ -1119,7 +1119,7 @@ void ChooseSidekicksSceneV2::fn_8022D5F8()
         if (mUnidentified20[side] != -1 && idle[side])
         {
             mUnidentified28[side] = -1;
-            mCaptainComponents[side].fn_801E0280(1);
+            mCaptainComponents[side].SetDisplayMode(1);
             mUnidentified190C[side]->m_bVisible = true;
         }
         for (int i = 0; i < 3; ++i)
@@ -1222,7 +1222,7 @@ void ChooseSidekicksSceneV2::fn_8022DC68()
     else if (gameInfo->IsInMode3())
     {
         mUnidentified48[0] = false;
-        mCaptainComponents[0].fn_801E0B20(false);
+        mCaptainComponents[0].SetReadyPromptVisible(false);
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, true);
         popup->Create((ePopupMenu)0x39, Function<FnVoidVoid>(fn_8022E0C0), Function<FnVoidVoid>(fn_8022E18C));
     }
@@ -1466,7 +1466,7 @@ void ChooseSidekicksSceneV2::ReleaseController(int index)
     {
         mUnidentified688[side][slot].ResetPointerStates();
     }
-    mCaptainComponents[side].fn_801E0280(1);
+    mCaptainComponents[side].SetDisplayMode(1);
     mUnidentified190C[side]->m_bVisible = false;
     mUnidentified50[side].fn_801DABAC(mUnidentified30[side], 1);
     mUnidentified30[side] = -1;

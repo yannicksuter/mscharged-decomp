@@ -49,11 +49,6 @@ public:
 private:
     struct Estimated
     {
-        Estimated()
-        {
-            Reset();
-        }
-
         void Reset()
         {
             bLocked = false;

@@ -27,6 +27,11 @@ public:
         {
         }
 
+        int GetParticleIndex() const
+        {
+            return mParticleIndex;
+        }
+
         const nlVector3* GetPosition() const;
         void GetNormal(nlVector3& normal) const;
         void GetTextureCoord(nlVector2& txtCoord) const;

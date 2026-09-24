@@ -45,6 +45,7 @@ TweakPendingValue* gPendingTweakTail;
 
 void ResetDynamicTweaks(void)
 {
+    UnidentifiedStaticStorageScope scope;
     RemoveDynamicTweakChildren(&sTweakRootEntry);
     RecycleTweakNames();
     gTweakNamePool.FreeBlocks();
@@ -335,6 +336,42 @@ const char* InternTweakString(const char* str, int kind)
     return start;
 }
 
+static inline bool IsIntValue(const char* string, int& value)
+{
+    const char* current = string;
+    while (*current != 0)
+    {
+        char c = *current;
+        if (!isdigit(c) && *current != '-')
+        {
+            return false;
+        }
+        current++;
+    }
+    value = (int)atof(string);
+    return true;
+}
+
+static inline bool IsFloatValue(const char* string, float& value)
+{
+    bool seenPeriod = false;
+    const char* current = string;
+    while (*current != 0)
+    {
+        if (*current == '.' || *current == ',')
+        {
+            seenPeriod = true;
+        }
+        else if (!isdigit(*current) && *current != '-')
+        {
+            return false;
+        }
+        current++;
+    }
+    value = (float)atof(string);
+    return seenPeriod;
+}
+
 // Interns the name, allocates the value from the shared pool and registers it
 // under the entry. Retail evaluates the value argument before the interning
 // call in every branch, which only a call boundary reproduces.
@@ -347,61 +384,34 @@ static T* UnidentifiedCreateValue(TweakEntry* entry, const char* name, V value)
     return created;
 }
 
-void CreateTweakValueFromString(TweakEntry* entry, const char* name, const char* valueStr)
+TweakValueBase* CreateTweakValueFromString(TweakEntry* entry, const char* name, const char* valueStr)
 {
     int intValue = 0;
     TweakValueBase* value;
     bool boolValue = 0;
-    const char* scan;
     float floatValue = 0.0f;
-    int isInt;
 
-    for (scan = valueStr; *scan != '\0'; scan++)
-    {
-        if (!isdigit(*scan) && *scan != '-')
-        {
-            isInt = 0;
-            goto scannedInt;
-        }
-    }
-    intValue = (int)atof(valueStr);
-    isInt = 1;
-scannedInt:
-    if (isInt)
+    if (IsIntValue(valueStr, intValue))
     {
         value = UnidentifiedCreateValue<TweakValueInt>(entry, name, intValue);
     }
     else
     {
-        int isFloat = 0;
-        for (scan = valueStr; *scan != '\0'; scan++)
+        if (IsFloatValue(valueStr, floatValue))
         {
-            if (*scan == '.' || *scan == ',')
-            {
-                isFloat = 1;
-            }
-            else if (!isdigit(*scan) && *scan != '-')
-            {
-                isFloat = 0;
-                goto scannedFloat;
-            }
-        }
-        floatValue = (float)atof(valueStr);
-    scannedFloat:
-        if (isFloat)
-        {
-                value = UnidentifiedCreateValue<TweakValueFloat>(entry, name, floatValue);
+            value = UnidentifiedCreateValue<TweakValueFloat>(entry, name, floatValue);
         }
         else if (ParseTweakBool(valueStr, &boolValue))
         {
-                value = UnidentifiedCreateValue<TweakValueBool>(entry, name, boolValue);
+            value = UnidentifiedCreateValue<TweakValueBool>(entry, name, boolValue);
         }
         else
         {
-                value = UnidentifiedCreateValue<TweakValueString>(entry, name, "");
+            value = UnidentifiedCreateValue<TweakValueString>(entry, name, "");
         }
     }
     value->ParseValue(valueStr);
+    return value;
 }
 
 static const char* sTweakBoolStrings[] = {

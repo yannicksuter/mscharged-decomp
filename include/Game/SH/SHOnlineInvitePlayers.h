@@ -37,6 +37,8 @@ public:
     void OnStartPointerLeave(int index, void* context);
     void OnStartPointerPress(int index, void* context);
     void OnInvitationErrorDismissed();
+    inline void ShowInvitationError(int popup);
+    inline void ShowLobbyError(int popup);
     bool RefreshLobbySlots();
     void SetPlayerRow(int value, int index);
     void HidePlayerPortrait(int index);

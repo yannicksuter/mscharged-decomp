@@ -23,6 +23,7 @@
 #include "NL/nlTask.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/fePageControls.h"
+#include "Game/FE/feFinder.inl"
 
 bool sPointerInputEnabled = true;
 bool sPointerHidden;
@@ -84,7 +85,7 @@ void SHNavigation::SceneCreated()
     mHomeWarning->SetVisible(false);
 
     TLComponentInstance* timer = FEFinder<TLComponentInstance, 4>::FindOrDefault(layer, "the_timer");
-    if (GameInfoManager::GetInstance()->GetUserInfo().IsWidescreen())
+    if (GameInfoManager::Instance()->GetUserInfo().IsWidescreen())
     {
         mPlusButton = FEFinder<TLComponentInstance, 4>::FindOrDefault(layer, "+16:9");
         mMinusButton = FEFinder<TLComponentInstance, 4>::FindOrDefault(layer, "-16:9");
@@ -106,7 +107,8 @@ void SHNavigation::SceneCreated()
     mPageControls.SetMinusButton(mMinusButton);
     mPageControls.SetPlusButton(mPlusButton);
 
-    mTimer = FEFindTextInstance(timer->GetActiveSlide(), "Timer");
+    mTimer = FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(timer->GetActiveSlide(), "Timer",
+        InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL));
     mTimer->SetVisible(false);
     RestoreButtonVisibility();
     if (GetOverlayManager() != 0)
@@ -256,7 +258,28 @@ void SHNavigation::HideButtons()
     this->mProgressButton->m_bVisible = false;
 }
 
-#include "Game/FE/feFinder.inl"
+void SHNavigation::ResetButtons(bool enabled)
+{
+    this->mVisibleButtons = 0;
+
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        this->mBackButton->GetActiveSlide(), "back");
+    component->SetActiveSlide("off", true, false);
+
+    if (enabled)
+    {
+        this->mPlusButton->SetActiveSlide("off", true, false);
+        this->mMinusButton->SetActiveSlide("off", true, false);
+    }
+
+    this->mPlayButton->SetActiveSlide("off", true, false);
+    this->mDoneButton->SetActiveSlide("off", true, false);
+    this->mLowerDoneButton->SetActiveSlide("off", true, false);
+    this->mProgressButton->SetActiveSlide("off", true, false);
+    SetPlayButtonText(0);
+    SetBackButtonText(0);
+    SetDoneButtonText(0);
+}
 
 void SHNavigation::SetButtons(int value, bool enabled)
 {
@@ -313,69 +336,16 @@ SHNavigation* GetNavigationScene()
     return (SHNavigation*)FESceneManager::Instance()->m_topMostScene;
 }
 
-void SHNavigation::SetPointerTeamColours()
-{
-    nlColour teamColours[2];
-
-    int team0 = GameInfoManager::Instance()->GetTeam(0);
-    int team1 = GameInfoManager::Instance()->GetTeam(1);
-    const CharacterInfo& info0 = GetCharacterInfo(GetCharacterIndexFromCaptain(team0));
-    const CharacterInfo& info1 = GetCharacterInfo(GetCharacterIndexFromCaptain(team1));
-
-    teamColours[0] = GetTeamColour(info0, info1, true);
-    teamColours[1] = GetTeamColour(info1, info0, true);
-
-    for (int index = 0; index < 4; ++index)
-    {
-        int side = GameInfoManager::Instance()->GetPlayingSide(index);
-        if (side == 0 || side == 1)
-        {
-            SetPointerColour(index, teamColours[side]);
-        }
-    }
-}
-
-void SetPointerInstance(unsigned int index, TLComponentInstance* component)
-{
-    gFEPointerInstances[index] = component;
-}
-
-void SHNavigation::ResetButtons(bool enabled)
-{
-    this->mVisibleButtons = 0;
-
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(
-        this->mBackButton->GetActiveSlide(), "back");
-    component->SetActiveSlide("off", true, false);
-
-    if (enabled)
-    {
-        this->mPlusButton->SetActiveSlide("off", true, false);
-        this->mMinusButton->SetActiveSlide("off", true, false);
-    }
-
-    this->mPlayButton->SetActiveSlide("off", true, false);
-    this->mDoneButton->SetActiveSlide("off", true, false);
-    this->mLowerDoneButton->SetActiveSlide("off", true, false);
-    this->mProgressButton->SetActiveSlide("off", true, false);
-    SetPlayButtonText(0);
-    SetBackButtonText(0);
-    SetDoneButtonText(0);
-}
-
 void SHNavigation::SetPlayButtonText(int value)
 {
     TLTextInstance* text0 = FEFinder<TLTextInstance, 3>::FindOrDefault(this->mPlayButton,
-        nlStringLowerHash("off"), nlStringLowerHash("Group"),
-        nlStringLowerHash("playnow"), 0, 0, 0);
+        "off", "Group", "playnow");
 
     TLTextInstance* text1 = FEFinder<TLTextInstance, 3>::FindOrDefault(this->mPlayButton,
-        nlStringLowerHash("over"), nlStringLowerHash("Group"),
-        nlStringLowerHash("playnow"), 0, 0, 0);
+        "over", "Group", "playnow");
 
     TLTextInstance* text2 = FEFinder<TLTextInstance, 3>::FindOrDefault(this->mPlayButton,
-        nlStringLowerHash("down"), nlStringLowerHash("Group"),
-        nlStringLowerHash("playnow"), 0, 0, 0);
+        "down", "Group", "playnow");
 
     switch (value)
     {
@@ -405,16 +375,13 @@ void SHNavigation::SetPlayButtonText(int value)
 void SHNavigation::SetDoneButtonText(int value)
 {
     TLTextInstance* text0 = FEFinder<TLTextInstance, 3>::FindOrDefault(this->mDoneButton,
-        nlStringLowerHash("off"), nlStringLowerHash("Group"),
-        nlStringLowerHash("done"), 0, 0, 0);
+        "off", "Group", "done");
 
     TLTextInstance* text1 = FEFinder<TLTextInstance, 3>::FindOrDefault(this->mDoneButton,
-        nlStringLowerHash("over"), nlStringLowerHash("Group"),
-        nlStringLowerHash("done"), 0, 0, 0);
+        "over", "Group", "done");
 
     TLTextInstance* text2 = FEFinder<TLTextInstance, 3>::FindOrDefault(this->mDoneButton,
-        nlStringLowerHash("down"), nlStringLowerHash("Group"),
-        nlStringLowerHash("done"), 0, 0, 0);
+        "down", "Group", "done");
 
     switch (value)
     {
@@ -437,13 +404,13 @@ void SHNavigation::SetBackButtonText(int value)
         this->mBackButton->GetActiveSlide(), "back");
 
     TLTextInstance* text0 = FEFinder<TLTextInstance, 3>::FindOrDefault(component,
-        nlStringLowerHash("off"), nlStringLowerHash("back text"), 0, 0, 0, 0);
+        "off", "back text");
 
     TLTextInstance* text1 = FEFinder<TLTextInstance, 3>::FindOrDefault(component,
-        nlStringLowerHash("over"), nlStringLowerHash("back text"), 0, 0, 0, 0);
+        "over", "back text");
 
     TLTextInstance* text2 = FEFinder<TLTextInstance, 3>::FindOrDefault(component,
-        nlStringLowerHash("down"), nlStringLowerHash("back text"), 0, 0, 0, 0);
+        "down", "back text");
 
     switch (value)
     {
@@ -458,43 +425,6 @@ void SHNavigation::SetBackButtonText(int value)
         text2->SetStringId("LOG_OUT");
         break;
     }
-}
-
-void SHNavigation::ShowHomeButtonWarning()
-{
-    if (this->mFEScene == 0 || this->mFEScene->mState != 6
-        || this->mHomeWarningPlaying)
-    {
-        return;
-    }
-
-    if (!sPointerInputEnabled)
-    {
-        if ((nlTaskManager::m_pInstance->mCurrentState & 4) == 0)
-        {
-            this->mPlusButton->m_bVisible = false;
-            this->mMinusButton->m_bVisible = false;
-            this->mBackButton->m_bVisible = false;
-            this->mBreadcrumbs->m_bVisible = false;
-            this->mPlayButton->m_bVisible = false;
-            this->mDoneButton->m_bVisible = false;
-            this->mLowerDoneButton->m_bVisible = false;
-            this->mProgressButton->m_bVisible = false;
-        }
-        sPointerInputEnabled = true;
-        sPointerHidden = true;
-    }
-
-    this->mHomeWarning->m_bVisible = true;
-    if (this->mIsWidescreen)
-    {
-        this->mHomeWarning->SetActiveSlide("widescreen", true, false);
-    }
-    else
-    {
-        this->mHomeWarning->SetActiveSlide("Slide1", true, false);
-    }
-    this->mHomeWarningPlaying = true;
 }
 
 void SHNavigation::StartTransition()
@@ -537,4 +467,61 @@ void SHNavigation::StartTransition()
     this->mTransitionPending = true;
 }
 
-#include "NL/nlSingleton.inl"
+void SHNavigation::ShowHomeButtonWarning()
+{
+    if (this->mFEScene == 0 || this->mFEScene->mState != 6
+        || this->mHomeWarningPlaying)
+    {
+        return;
+    }
+
+    if (!sPointerInputEnabled)
+    {
+        if ((nlTaskManager::m_pInstance->mCurrentState & 4) == 0)
+        {
+            this->mPlusButton->m_bVisible = false;
+            this->mMinusButton->m_bVisible = false;
+            this->mBackButton->m_bVisible = false;
+            this->mBreadcrumbs->m_bVisible = false;
+            this->mPlayButton->m_bVisible = false;
+            this->mDoneButton->m_bVisible = false;
+            this->mLowerDoneButton->m_bVisible = false;
+            this->mProgressButton->m_bVisible = false;
+        }
+        sPointerInputEnabled = true;
+        sPointerHidden = true;
+    }
+
+    this->mHomeWarning->m_bVisible = true;
+    if (this->mIsWidescreen)
+    {
+        this->mHomeWarning->SetActiveSlide("widescreen", true, false);
+    }
+    else
+    {
+        this->mHomeWarning->SetActiveSlide("Slide1", true, false);
+    }
+    this->mHomeWarningPlaying = true;
+}
+
+void SHNavigation::SetPointerTeamColours()
+{
+    nlColour teamColours[2];
+
+    int team0 = GameInfoManager::Instance()->GetTeam(0);
+    int team1 = GameInfoManager::Instance()->GetTeam(1);
+    const CharacterInfo& info0 = GetCharacterInfo(GetCharacterIndexFromCaptain(team0));
+    const CharacterInfo& info1 = GetCharacterInfo(GetCharacterIndexFromCaptain(team1));
+
+    teamColours[0] = GetTeamColour(info0, info1, true);
+    teamColours[1] = GetTeamColour(info1, info0, true);
+
+    for (int index = 0; index < 4; ++index)
+    {
+        int side = GameInfoManager::Instance()->GetPlayingSide(index);
+        if (side == 0 || side == 1)
+        {
+            SetPointerColour(index, teamColours[side]);
+        }
+    }
+}

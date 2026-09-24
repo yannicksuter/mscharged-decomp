@@ -175,7 +175,7 @@ void InitTexSRT(TexSRT* texSRTs, u32 num) {
     }
 }
 
-u32 CalcOffsetTexSRTAry(const detail::BitGXNums& bitGXNums) { return (sizeof(res::TexMap) * 8) * bitGXNums.texMap; }
+u32 CalcOffsetTexSRTAry(const detail::BitGXNums& bitGXNums) { return sizeof(GXTexObj) * bitGXNums.texMap; }
 
 u32 CalcOffsetTexCoordGenAry(const detail::BitGXNums& bitGXNums) {
     return CalcOffsetTexSRTAry(bitGXNums) + sizeof(TexSRT) * bitGXNums.texSRT;
@@ -194,7 +194,7 @@ u32 CalcOffsetTevSwapAry(const detail::BitGXNums& bitGXNums) {
 }
 
 u32 CalcOffsetGetAlphaCompare(const detail::BitGXNums& bitGXNums) {
-    return CalcOffsetTevSwapAry(bitGXNums) + (sizeof(TevSwapMode) + 3) * bitGXNums.tevSwap;
+    return CalcOffsetTevSwapAry(bitGXNums) + sizeof(TevSwapMode) * GX_MAX_TEVSWAP * bitGXNums.tevSwap;
 }
 
 u32 CalcOffsetBlendMode(const detail::BitGXNums& bitGXNums) {
@@ -210,7 +210,7 @@ u32 CalcOffsetIndTexSRTAry(const detail::BitGXNums& bitGXNums) {
 }
 
 u32 CalcOffsetTevStageAry(const detail::BitGXNums& bitGXNums) {
-    return CalcOffsetIndTexSRTAry(bitGXNums) + (sizeof(TevStage) + 4) * bitGXNums.indSRT;
+    return CalcOffsetIndTexSRTAry(bitGXNums) + sizeof(TexSRT) * bitGXNums.indSRT;
 }
 
 void CopyGXTexObj(GXTexObj* pDst, const GXTexObj* pSrc) {
@@ -380,7 +380,7 @@ Material::Material(const res::Material* pRes, const ResBlockSet& resBlockSet) :
 }
 
 void Material::Init() {
-    mTevCols[TEVCOLOR_REG0] = DefaultBlackColor;
+    SetTevColor(TEVCOLOR_REG0, DefaultBlackColor);
     SetDefaultWhiteColor(&mTevCols[TEVCOLOR_REG1]);
     SetDefaultWhiteColor(&mTevCols[TEVCOLOR_REG2]);
 
@@ -623,7 +623,7 @@ void Material::SetTevStageNum(u8 num) {
         TevStage* tevStages = GetTevStageAry();
 
         for (u32 i = mGXMemNum.tevStage; i < num; i++) {
-            tevStages[i] = TevStage();
+            tevStages[i].Reset();
         }
 
         mGXMemNum.tevStage = num;

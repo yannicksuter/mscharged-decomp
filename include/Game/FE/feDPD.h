@@ -27,7 +27,11 @@ public:
     virtual const char* GetName() { return "FE DPD"; }
 };
 
-void SetPointerInstance(unsigned int index, TLComponentInstance* component);
+inline void SetPointerInstance(unsigned int index, TLComponentInstance* component)
+{
+    gFEPointerInstances[index] = component;
+}
+
 nlVector2 GetPointerPosition(int pad, u8* valid);
 nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid);
 void SetPointerColour(int index, nlColour colour);

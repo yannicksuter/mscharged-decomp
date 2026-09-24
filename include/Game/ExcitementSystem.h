@@ -29,6 +29,7 @@ public:
 
 private:
     ExcitementSystem();
+    void LoadScript();
 }; // total size: 0x16C
 
 #endif // GAME_EXCITEMENT_SYSTEM_H

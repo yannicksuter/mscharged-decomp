@@ -6769,16 +6769,12 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
             bFromTakeoff = true;
         }
 
-        nlVector2 v2Distance;
         if (mbShouldMiss
             && fabsf(g_pBall->m_v3Position.x)
                    < cField::GetGoalLineX(1U) - lbl_806DBCFC
-            && ((v2Distance.y = mUnidentified024.m_v3Position.y
-                                   - mv3TargetPosition.y),
-                (v2Distance.x = mUnidentified024.m_v3Position.x
-                                   - mv3TargetPosition.x),
-                nlVec2LengthSquared(v2Distance)
-                    > nlGetLengthSquared1D(lbl_806DBD00)))
+            && nlVec3DistanceSquared2D(
+                   mUnidentified024.m_v3Position, mv3TargetPosition)
+                   > nlGetLengthSquared1D(lbl_806DBD00))
         {
             cBall* pBall = g_pBall;
             bool bState7Shot

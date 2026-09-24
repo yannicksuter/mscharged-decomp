@@ -26,23 +26,7 @@ inline ExcitementSystem::ExcitementSystem()
     , mByteCode(0)
 {
     fn_801967DC();
-
-    if (mByteCode != 0)
-    {
-        nlFree(mByteCode);
-        mByteCode = 0;
-    }
-
-    unsigned long fileSize = 0;
-    mByteCode = nlLoadEntireFile(lbl_80511AD8,
-        &fileSize,
-        0x20,
-        AllocateStart,
-        0,
-        0,
-        0);
-    LoadByteCode(mByteCode);
-    CallFunction(nlStringHash(lbl_806E4EA0));
+    LoadScript();
 }
 
 ExcitementSystem& ExcitementSystem::fn_80196644()
@@ -61,17 +45,27 @@ void ExcitementSystem::fn_801967DC()
     {
         mUnidentified0B2[i] = 0;
     }
-    mUnidentified164[0] = 0;
-    mUnidentified164[1] = 0;
-    mUnidentified164[2] = 0;
-    mUnidentified164[3] = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        mUnidentified164[i] = 0;
+    }
 }
 
 void ExcitementSystem::fn_80196924()
 {
-    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(Bind<void>(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(Bind<void>(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(Bind<void>(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0)), 0, -1);
+    typedef BindExp2<void,
+        Detail::MemFunImpl<void, void (ExcitementSystem::*)(PlayerAttackData*)>,
+        ExcitementSystem*, Placeholder<0> > AttackBinding;
+    typedef BindExp2<void,
+        Detail::MemFunImpl<void, void (ExcitementSystem::*)(LightningStrikeData*)>,
+        ExcitementSystem*, Placeholder<0> > LightningBinding;
+    typedef BindExp2<void,
+        Detail::MemFunImpl<void, void (ExcitementSystem::*)(CollisionBallGoalpostData*)>,
+        ExcitementSystem*, Placeholder<0> > GoalpostBinding;
+
+    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(AttackBinding(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(LightningBinding(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(GoalpostBinding(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0)), 0, -1);
 }
 
 void ExcitementSystem::fn_80196D30(
@@ -141,4 +135,24 @@ void ExcitementSystem::DoFunctionCall(unsigned int function)
         nlBreak();
         break;
     }
+}
+
+void ExcitementSystem::LoadScript()
+{
+    if (mByteCode != 0)
+    {
+        nlFree(mByteCode);
+        mByteCode = 0;
+    }
+
+    unsigned long fileSize = 0;
+    mByteCode = nlLoadEntireFile(lbl_80511AD8,
+        &fileSize,
+        0x20,
+        AllocateStart,
+        0,
+        0,
+        0);
+    LoadByteCode(mByteCode);
+    CallFunction(nlStringHash(lbl_806E4EA0));
 }

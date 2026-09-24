@@ -299,6 +299,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
     float focalLength;
     if (m_fAnimationTime >= 1.0f)
     {
+        nIndex = m_pActiveCameraData->m_uKeyCount - 1;
         m_Fov = m_pActiveCameraData->fFOV[nIndex];
         cameraPos = m_pActiveCameraData->cameraPos[nIndex];
         targetPos = m_pActiveCameraData->targetPos[nIndex];
@@ -336,8 +337,8 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
             m_Fov = fWeightA * m_pActiveCameraData->fFOV[nIndex] + fWeightB * m_pActiveCameraData->fFOV[nIndex + 1];
             nlVec3WeightedSum(cameraPos, fWeightA, m_pActiveCameraData->cameraPos[nIndex], fWeightB, m_pActiveCameraData->cameraPos[nIndex + 1]);
             nlVec3WeightedSum(targetPos, fWeightA, m_pActiveCameraData->targetPos[nIndex], fWeightB, m_pActiveCameraData->targetPos[nIndex + 1]);
-            nlQuatSlerp(cameraRot, m_pActiveCameraData->cameraRot[nIndex], m_pActiveCameraData->cameraRot[nIndex + 1], fWeightB);
             focalLength = fWeightA * m_pActiveCameraData->fFocalLength[nIndex] + fWeightB * m_pActiveCameraData->fFocalLength[nIndex + 1];
+            nlQuatSlerp(cameraRot, m_pActiveCameraData->cameraRot[nIndex], m_pActiveCameraData->cameraRot[nIndex + 1], fWeightB);
         }
     }
 
@@ -376,7 +377,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
         nlQuatToMatrix(viewMatrix, cameraRot, true);
         float facingAngleRadians = (float)mFacingAngle * 0.0000958738f;
         nlMakeRotationMatrixZ(facingAngleMatrix, facingAngleRadians);
-        nlMultMatrices(viewMatrix, viewMatrix, facingAngleMatrix);
+        nlMultMatrices(viewMatrix, facingAngleMatrix);
         viewMatrix.m41 = m_vecCamera.x;
         viewMatrix.m42 = m_vecCamera.y;
         viewMatrix.m43 = m_vecCamera.z;

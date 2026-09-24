@@ -49,4 +49,11 @@ inline UnidentifiedStaticState& UnidentifiedStaticStorageState()
     return UnidentifiedStaticStorage<UnidentifiedStaticTag>::state;
 }
 
+// No code from this scope survives the link. It preserves the registry's
+// observed order of the initializer and inline value methods.
+struct UnidentifiedStaticStorageScope
+{
+    ~UnidentifiedStaticStorageScope() { }
+};
+
 #endif // GAME_UNIDENTIFIED_STATIC_STORAGE_H

@@ -761,8 +761,9 @@ extern "C" void fn_80314750(
     void*, UnidentifiedTransitionReference* reference,
     const char* name)
 {
+    UnidentifiedTransitionOwner* owner = reference->mOwner;
     UnidentifiedStringHash transition(name);
-    reference->mOwner->mTransition = transition;
+    owner->mTransition = transition;
 }
 
 extern "C" bool fn_80314798(void*)
@@ -828,48 +829,4 @@ extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
-}
-
-extern "C" UnidentifiedStateTransition* fn_80315A14(
-    UnidentifiedStateTransition* transition, void* function)
-{
-    transition->mUnidentifiedHash = -1;
-    transition->mUnidentifiedFunction = function;
-    return transition;
-}
-
-UnidentifiedStringHash::UnidentifiedStringHash(const char* name)
-{
-    mUnidentifiedFunction = 0;
-    mUnidentifiedHash = nlStringHash(name);
-}
-
-typedef UnidentifiedVariant_80054AB8 (*UnidentifiedTransitionFunction)(
-    UnidentifiedFuzzyRuntimeValue*, UnidentifiedFuzzyRuntimeValue*);
-
-extern "C" void fn_80315A64(
-    UnidentifiedStateTransition* transition,
-    UnidentifiedFuzzyRuntimeValue* value,
-    UnidentifiedVariant_80054AB8* result,
-    UnidentifiedFuzzyRuntimeValue* context)
-{
-    if (transition->mUnidentifiedFunction != 0)
-    {
-        UnidentifiedVariant_80054AB8 transitionValue =
-            ((UnidentifiedTransitionFunction)
-                transition->mUnidentifiedFunction)(value, context);
-        *result = transitionValue;
-    }
-    else if (value->mRuntime != 0)
-    {
-        UnidentifiedVariant_80054AB8* transitionValue =
-            fn_8031243C(
-                value->mRuntime,
-                transition->mUnidentifiedHash, context);
-        *result = *transitionValue;
-        if (transitionValue->mTemporary)
-        {
-            delete transitionValue;
-        }
-    }
 }

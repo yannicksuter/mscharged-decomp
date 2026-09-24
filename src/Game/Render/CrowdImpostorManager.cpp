@@ -31,19 +31,31 @@ static bool sCrowdRegistrationDisabled;
 static int sNumGeneratedCrowdMembers;
 static int sNumVisibleCrowdMembers;
 
-class CrowdPointCallback
+class CrowdPointCallbackBase
 {
 public:
-    CrowdPointCallback(
+    CrowdPointCallbackBase(
         CrowdLayoutObject* object)
     {
         mObject = object;
+    }
+
+    virtual void Place(nlVector4 point) = 0;
+
+    /* 0x04 */ CrowdLayoutObject* mObject;
+}; // size: 0x08
+
+class CrowdPointCallback : public CrowdPointCallbackBase
+{
+public:
+    CrowdPointCallback(CrowdLayoutObject* object)
+        : CrowdPointCallbackBase(object)
+    {
         mFirst = true;
     }
 
     virtual void Place(nlVector4 point);
 
-    /* 0x04 */ CrowdLayoutObject* mObject;
     /* 0x08 */ bool mFirst;
     /* 0x09 */ u8 mPadding009[3];
     /* 0x0C */ CrowdLayoutRecord* mLayout;
@@ -121,8 +133,8 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
         callback.mLayout = GetCrowdImpostorManager()->AllocateLayout();
         callback.mLayout->mObject = object;
         sNumGeneratedCrowdMembers += object->PlacePoints(&callback,
-            sfDistanceBetweenCrowdRows.value,
-            sfDistanceBetweenCrowdMembers.value);
+            sfDistanceBetweenCrowdRows,
+            sfDistanceBetweenCrowdMembers);
         objectIt.Step();
     }
 }

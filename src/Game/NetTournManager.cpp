@@ -17,6 +17,7 @@
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Team.h"
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -36,7 +37,7 @@ int s_nOverrideCupPersona = 10;
 
 static TweakFloatBinding sDefaultTimeToStartGamesTweak(
     "s_fDefaultTimeToStartGames", "Network/Tournament",
-    &s_fDefaultTimeToStartGames);
+    &s_fDefaultTimeToStartGames, true);
 static TweakIntBinding sSendGameInProgressUpdateEveryTweak(
     "s_nSendGameInProgressUpdateEvery", "Network/Tournament",
     &s_nSendGameInProgressUpdateEvery, true);

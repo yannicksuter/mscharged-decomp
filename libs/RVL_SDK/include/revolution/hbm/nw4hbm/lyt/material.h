@@ -50,6 +50,7 @@ public:
 
     const char* GetName() const { return mName; }
     GXColorS10 GetTevColor(u32 idx) const { return mTevCols[idx]; }
+    void SetTevColor(u32 idx, const GXColorS10& rColor) { mTevCols[idx] = rColor; }
 
     u8 GetTextureCap() const { return mGXMemCap.texMap; }
 
@@ -113,6 +114,8 @@ public:
         NW4HBMAssert_Line(idx < mGXMemNum.texCoordGen, 180);
         GetTexCoordGenAry()[idx] = value;
     }
+
+    void SetTexSRT(const TexSRT& rTexSRT, u32 idx) { GetTexSRTAry()[idx] = rTexSRT; }
 
     void SetTexSRTElement(u32 texSRTIdx, u32 eleIdx, f32 value) {
         NW4HBMAssert_Line(texSRTIdx < mGXMemNum.texSRT, 293);

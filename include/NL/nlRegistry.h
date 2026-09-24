@@ -420,6 +420,13 @@ struct PackedRegistryImage
 class RegistryOwner
 {
 public:
+    RegistryOwner()
+    {
+        mRoot = 0;
+        mLoadFlag = 1;
+        mReservedFlag = 0;
+    }
+
     virtual RegistryContainer* CreateRoot();
     virtual bool Load(void* data, unsigned int size, bool loadFlag);
     virtual RegistryContainer* GetRootAlias();

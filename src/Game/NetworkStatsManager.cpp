@@ -315,8 +315,9 @@ void NetworkStatsManager::UpdateFriendRankingNames(
 {
     for (int i = 0; i < leaderboard->mCount; ++i)
     {
+        int friendIndex;
         int profileId = leaderboard->mPlayers[i].mProfileId;
-        for (int friendIndex = 0; friendIndex < 64; ++friendIndex)
+        for (friendIndex = 0; friendIndex < 64; ++friendIndex)
         {
             DWCAccFriendData* friendData = reinterpret_cast<DWCAccFriendData*>(
                 GameInfoManager::GetInstance()->GetUnknown0x40(

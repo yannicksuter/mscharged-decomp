@@ -92,6 +92,14 @@ public:
         };
         /* 0x4 */ int Kern;
 
+        KernPair& operator=(const KernPair& other)
+        {
+            s.A = other.s.A;
+            s.B = other.s.B;
+            Kern = other.Kern;
+            return *this;
+        }
+
         operator unsigned long() const { return hash; }
         static int SortProc(const KernPair* pa, const KernPair* pb) { return pa->hash - pb->hash; }
     };

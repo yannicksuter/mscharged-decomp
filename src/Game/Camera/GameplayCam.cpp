@@ -95,161 +95,6 @@ static const CameraData gCameraData[4] = {
     },
 };
 
-GameplayCamera::GameplayCamera()
-{
-    m_bDynamicZoom = true;
-    m_fZoom = 0.0f;
-    m_fDesiredZoom = 0.0f;
-    m_fZoomSeekSpeed = 0.0f;
-    m_ForceNeutralAndNearZoom = false;
-    m_fZoomOverride = 0.0f;
-    m_matView.SetIdentity();
-}
-
-void GameplayCamera::Update(float deltaTime)
-{
-    bool gamePaused = (nlTaskManager::m_pInstance->mCurrentState == 1)
-                   | (nlTaskManager::m_pInstance->mCurrentState == 32);
-
-    m_bDynamicZoom = GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera;
-    m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
-
-    if (IsWidescreen())
-    {
-        m_nearZoom.m_CameraData = gCameraData + 2;
-        m_farZoom.m_CameraData = gCameraData + 3;
-    }
-    else
-    {
-        m_nearZoom.m_CameraData = gCameraData;
-        m_farZoom.m_CameraData = gCameraData + 1;
-    }
-
-    m_nearZoom.Update(deltaTime, m_ForceNeutralAndNearZoom);
-    m_farZoom.Update(deltaTime, m_ForceNeutralAndNearZoom);
-
-    if (m_fZoomOverride != 0.0f || lbl_806E0F14)
-    {
-        m_fZoom = m_fZoomOverride;
-        if (lbl_806E0F14)
-        {
-            m_fZoom = lbl_806E0F10;
-        }
-    }
-    else if (m_ForceNeutralAndNearZoom)
-    {
-        if (g_pTeams[0]->m_nScore == 0 && g_pTeams[1]->m_nScore == 0)
-        {
-            m_fZoom = lbl_806DC500;
-        }
-        else
-        {
-            m_fZoom = lbl_806DC504;
-        }
-    }
-    else
-    {
-        if (m_bDynamicZoom && !gGameplayCameraInReplay && !UnidentifiedCameraEffects::Instance()->IsTransitionActive())
-        {
-            m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
-            m_fDesiredZoom = m_fDesiredZoom - lbl_806DC4FC;
-            m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->mZoomScale;
-            m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, lbl_806DC4F8), 1.2f * lbl_806DC4F4);
-        }
-
-        float clampedDesiredZoom = Interpolate(lbl_806DC4F8, lbl_806DC4F4, m_fDesiredZoom);
-        m_fDesiredZoom = clampedDesiredZoom;
-        float smoothTime;
-        if (gamePaused)
-        {
-            smoothTime = 0.1f;
-        }
-        else
-        {
-            smoothTime = 0.75f;
-        }
-        float change;
-        float x;
-        float omega = 2.0f / smoothTime;
-        x = omega * deltaTime;
-        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
-        change = m_fZoom - clampedDesiredZoom;
-        float currentVelocity = m_fZoomSeekSpeed;
-        float smoothChange = deltaTime * ((omega * change) + currentVelocity);
-
-        m_fZoomSeekSpeed = exp * (currentVelocity - (omega * smoothChange));
-        m_fZoom = (exp * (change + smoothChange)) + clampedDesiredZoom;
-    }
-
-    float inverseZoom = 1.0f - m_fZoom;
-    float zoom = m_fZoom;
-
-    m_v3Target.x = (inverseZoom * m_nearZoom.m_v3Target.x) + (zoom * m_farZoom.m_v3Target.x);
-    m_v3Target.y = (inverseZoom * m_nearZoom.m_v3Target.y) + (zoom * m_farZoom.m_v3Target.y);
-    m_v3Target.z = (inverseZoom * m_nearZoom.m_v3Target.z) + (zoom * m_farZoom.m_v3Target.z);
-
-    m_v3Camera.x = (inverseZoom * m_nearZoom.m_v3Camera.x) + (zoom * m_farZoom.m_v3Camera.x);
-    m_v3Camera.y = (inverseZoom * m_nearZoom.m_v3Camera.y) + (zoom * m_farZoom.m_v3Camera.y);
-    m_v3Camera.z = (inverseZoom * m_nearZoom.m_v3Camera.z) + (zoom * m_farZoom.m_v3Camera.z);
-
-    m_fFOV = Interpolate(m_nearZoom.m_CameraData->fov, m_farZoom.m_CameraData->fov, m_fZoom);
-
-    float clampedZoom = nlMinEquals(nlMaxEquals(m_fZoom, lbl_806DC4F8), lbl_806DC4F4);
-    m_v3Camera.x = Interpolate(m_nearZoom.m_v3Camera.x, m_farZoom.m_v3Camera.x, clampedZoom);
-    m_v3Target.x = Interpolate(m_nearZoom.m_v3Target.x, m_farZoom.m_v3Target.x, clampedZoom);
-    m_v3Camera.y = Interpolate(m_nearZoom.m_v3Camera.y, m_farZoom.m_v3Camera.y, clampedZoom);
-    m_v3Target.y = Interpolate(m_nearZoom.m_v3Target.y, m_farZoom.m_v3Target.y, clampedZoom);
-
-    UnidentifiedCameraEffects::Instance()->AdjustCameraVectors(m_fZoom, &m_v3Camera, &m_v3Target);
-
-    nlVector3 up = mUpVector;
-    nlVector3 camera = m_v3Camera;
-    nlVector3 target = m_v3Target;
-
-    if (UnidentifiedCameraEffects::Instance()->IsTransitionActive() == true && !gamePaused && !gGameplayCameraInReplay && ReplayManager::Instance()->mRender != NULL)
-    {
-        up = UnidentifiedCameraEffects::Instance()->RotateCameraVector(mUpVector);
-        nlVector3 offset;
-        offset = UnidentifiedCameraEffects::Instance()->CalculateTargetOffset(this);
-        if (lbl_806DC4F0 == true)
-        {
-            nlVec3Add(camera, camera, offset);
-            nlVec3Add(target, target, offset);
-        }
-        m_fFOV += UnidentifiedCameraEffects::Instance()->mTransitionScale;
-    }
-
-    glMatrixLookAt(m_matView, camera, target, up);
-}
-
-void GameplayCamera::SetForceNeutralAndNearZoom(bool forceNeutralAndNearZoom)
-{
-    if (forceNeutralAndNearZoom && !m_ForceNeutralAndNearZoom)
-    {
-        Reactivate();
-        m_v3Target.x = 0.0f;
-        m_v3Target.y = 0.0f;
-        m_v3Target.z = 0.0f;
-    }
-    m_ForceNeutralAndNearZoom = forceNeutralAndNearZoom;
-}
-
-void GameplayCamera::Reactivate()
-{
-    m_nearZoom.CalcDesiredTarget();
-    m_nearZoom.m_fDampenedTargetX = m_nearZoom.m_fDesiredTargetX;
-    m_nearZoom.m_fDampenedTargetY = m_nearZoom.m_fDesiredTargetY;
-
-    m_farZoom.CalcDesiredTarget();
-    m_farZoom.m_fDampenedTargetX = m_farZoom.m_fDesiredTargetX;
-    m_farZoom.m_fDampenedTargetY = m_farZoom.m_fDesiredTargetY;
-
-    if (m_pFilter[1] != NULL)
-    {
-        m_pFilter[1]->Reset();
-    }
-}
-
 static inline float MapFromFieldPosToTargetPos(float fPos, const float* pFieldKnots, const float* pTargetKnots, int nNumKnots)
 {
     float fMin = pFieldKnots[0];
@@ -278,6 +123,118 @@ static inline float MapFromFieldPosToTargetPos(float fPos, const float* pFieldKn
     }
 
     return Interpolate(pTargetKnots[nKnot], pTargetKnots[nKnot + 1], fKnotPercent);
+}
+
+static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutral);
+
+void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
+{
+    if (gGameplayCameraInReplay)
+    {
+        forceNeutral = true;
+    }
+
+    CalcCurrentKnotTable(this, forceNeutral);
+
+    float t = fDeltaT / 0.75f;
+    for (int i = 0; i < 5; i++)
+    {
+        m_KnotTableBlendQueue[i].fBlendRiser += t;
+        if (m_KnotTableBlendQueue[i].fBlendRiser >= 1.0f)
+        {
+            m_KnotTableBlendQueue[i].fBlendRiser = 1.0f;
+            break;
+        }
+    }
+
+    CalcDesiredTarget();
+
+    if (!forceNeutral)
+    {
+        float omega = 2.0f / m_fTargetSeekTime;
+        float x = omega * fDeltaT;
+        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
+
+        float change = m_fDampenedTargetX - m_fDesiredTargetX;
+        float currentVelocity = m_fTargetSeekSpeedX;
+        m_fTargetSeekSpeedX = exp * (currentVelocity - (omega * (fDeltaT * ((omega * change) + currentVelocity))));
+        m_fDampenedTargetX = (exp * (change + (fDeltaT * ((omega * change) + currentVelocity)))) + m_fDesiredTargetX;
+
+        change = m_fDampenedTargetY - m_fDesiredTargetY;
+        currentVelocity = m_fTargetSeekSpeedY;
+        m_fTargetSeekSpeedY = exp * (currentVelocity - (omega * (fDeltaT * ((omega * change) + currentVelocity))));
+        m_fDampenedTargetY = (exp * (change + (fDeltaT * ((omega * change) + currentVelocity)))) + m_fDesiredTargetY;
+    }
+    else
+    {
+        m_fDampenedTargetX = m_fDesiredTargetX;
+        m_fDampenedTargetY = m_fDesiredTargetY;
+    }
+
+    float fSin;
+    float fCos;
+    float fOrientSin;
+    float fOrientCos;
+    nlSinCos(&fSin, &fCos, ((s32)(65536.0f * m_CameraData->pitch)) / 360);
+    nlSinCos(&fOrientSin, &fOrientCos, ((s32)(65536.0f * m_CameraData->orientation)) / 360);
+
+    float fXYDist = fCos * m_CameraData->distance;
+    m_v3Camera.x = (fOrientCos * fXYDist) + m_fDampenedTargetX;
+    m_v3Camera.y = (fOrientSin * fXYDist) + m_fDampenedTargetY;
+    m_v3Camera.z = fSin * m_CameraData->distance;
+
+    m_v3Target.x = m_fDampenedTargetX;
+    m_v3Target.y = m_fDampenedTargetY;
+    m_v3Target.z = 0.0f;
+}
+static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutral)
+{
+    cPlayer* pBallOwner;
+    if (g_pBall != NULL)
+    {
+        pBallOwner = g_pBall->m_pOwner;
+    }
+    else
+    {
+        pBallOwner = NULL;
+    }
+
+    if (pBallOwner == NULL)
+    {
+        pBallOwner = g_pBall->m_pPassTarget;
+    }
+
+    int nNewKnotTable;
+    if (pBallOwner != NULL && !forceNeutral)
+    {
+        if (pBallOwner->m_pTeam->GetOtherNet()->m_v3NetLocation.x > 0.0f)
+        {
+            nNewKnotTable = 1;
+        }
+        else
+        {
+            nNewKnotTable = 2;
+        }
+    }
+    else
+    {
+        nNewKnotTable = 0;
+    }
+
+    if (nNewKnotTable != self->m_KnotTableBlendQueue[0].nKnotTable)
+    {
+        for (int i = 4; i > 0; i--)
+        {
+            self->m_KnotTableBlendQueue[i] = self->m_KnotTableBlendQueue[i - 1];
+        }
+        self->m_KnotTableBlendQueue[0].nKnotTable = nNewKnotTable;
+        self->m_KnotTableBlendQueue[0].fBlendRiser = 0.0f;
+    }
+
+    if (forceNeutral)
+    {
+        self->m_KnotTableBlendQueue[0].fBlendRiser = 1.0f;
+    }
 }
 
 void GameplayCameraZoomLevel::CalcDesiredTarget()
@@ -352,113 +309,159 @@ void GameplayCameraZoomLevel::CalcDesiredTarget()
     }
 }
 
-static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutral)
+void GameplayCamera::Reactivate()
 {
-    cPlayer* pBallOwner;
-    if (g_pBall != NULL)
-    {
-        pBallOwner = g_pBall->m_pOwner;
-    }
-    else
-    {
-        pBallOwner = NULL;
-    }
+    m_nearZoom.CalcDesiredTarget();
+    m_nearZoom.m_fDampenedTargetX = m_nearZoom.m_fDesiredTargetX;
+    m_nearZoom.m_fDampenedTargetY = m_nearZoom.m_fDesiredTargetY;
 
-    if (pBallOwner == NULL)
-    {
-        pBallOwner = g_pBall->m_pPassTarget;
-    }
+    m_farZoom.CalcDesiredTarget();
+    m_farZoom.m_fDampenedTargetX = m_farZoom.m_fDesiredTargetX;
+    m_farZoom.m_fDampenedTargetY = m_farZoom.m_fDesiredTargetY;
 
-    int nNewKnotTable;
-    if (pBallOwner != NULL && !forceNeutral)
+    if (m_pFilter[1] != NULL)
     {
-        if (pBallOwner->m_pTeam->GetOtherNet()->m_v3NetLocation.x > 0.0f)
-        {
-            nNewKnotTable = 1;
-        }
-        else
-        {
-            nNewKnotTable = 2;
-        }
-    }
-    else
-    {
-        nNewKnotTable = 0;
-    }
-
-    if (nNewKnotTable != self->m_KnotTableBlendQueue[0].nKnotTable)
-    {
-        for (int i = 4; i > 0; i--)
-        {
-            self->m_KnotTableBlendQueue[i] = self->m_KnotTableBlendQueue[i - 1];
-        }
-        self->m_KnotTableBlendQueue[0].nKnotTable = nNewKnotTable;
-        self->m_KnotTableBlendQueue[0].fBlendRiser = 0.0f;
-    }
-
-    if (forceNeutral)
-    {
-        self->m_KnotTableBlendQueue[0].fBlendRiser = 1.0f;
+        m_pFilter[1]->Reset();
     }
 }
 
-void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
+void GameplayCamera::SetForceNeutralAndNearZoom(bool forceNeutralAndNearZoom)
 {
-    if (gGameplayCameraInReplay)
+    if (forceNeutralAndNearZoom && !m_ForceNeutralAndNearZoom)
     {
-        forceNeutral = true;
+        Reactivate();
+        m_v3Target.x = 0.0f;
+        m_v3Target.y = 0.0f;
+        m_v3Target.z = 0.0f;
     }
+    m_ForceNeutralAndNearZoom = forceNeutralAndNearZoom;
+}
 
-    CalcCurrentKnotTable(this, forceNeutral);
+void GameplayCamera::Update(float deltaTime)
+{
+    bool gamePaused = (nlTaskManager::m_pInstance->mCurrentState == 1)
+                    | (nlTaskManager::m_pInstance->mCurrentState == 32);
 
-    float t = fDeltaT / 0.75f;
-    for (int i = 0; i < 5; i++)
+    m_bDynamicZoom = GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera;
+    m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
+
+    if (IsWidescreen())
     {
-        m_KnotTableBlendQueue[i].fBlendRiser += t;
-        if (m_KnotTableBlendQueue[i].fBlendRiser >= 1.0f)
-        {
-            m_KnotTableBlendQueue[i].fBlendRiser = 1.0f;
-            break;
-        }
-    }
-
-    CalcDesiredTarget();
-
-    if (!forceNeutral)
-    {
-        float omega = 2.0f / m_fTargetSeekTime;
-        float x = omega * fDeltaT;
-        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
-
-        float change = m_fDampenedTargetX - m_fDesiredTargetX;
-        float currentVelocity = m_fTargetSeekSpeedX;
-        m_fTargetSeekSpeedX = exp * (currentVelocity - (omega * (fDeltaT * ((omega * change) + currentVelocity))));
-        m_fDampenedTargetX = (exp * (change + (fDeltaT * ((omega * change) + currentVelocity)))) + m_fDesiredTargetX;
-
-        change = m_fDampenedTargetY - m_fDesiredTargetY;
-        currentVelocity = m_fTargetSeekSpeedY;
-        m_fTargetSeekSpeedY = exp * (currentVelocity - (omega * (fDeltaT * ((omega * change) + currentVelocity))));
-        m_fDampenedTargetY = (exp * (change + (fDeltaT * ((omega * change) + currentVelocity)))) + m_fDesiredTargetY;
+        m_nearZoom.m_CameraData = gCameraData + 2;
+        m_farZoom.m_CameraData = gCameraData + 3;
     }
     else
     {
-        m_fDampenedTargetX = m_fDesiredTargetX;
-        m_fDampenedTargetY = m_fDesiredTargetY;
+        m_nearZoom.m_CameraData = gCameraData;
+        m_farZoom.m_CameraData = gCameraData + 1;
     }
 
-    float fSin;
-    float fCos;
-    float fOrientSin;
-    float fOrientCos;
-    nlSinCos(&fSin, &fCos, ((s32)(65536.0f * m_CameraData->pitch)) / 360);
-    nlSinCos(&fOrientSin, &fOrientCos, ((s32)(65536.0f * m_CameraData->orientation)) / 360);
+    m_nearZoom.Update(deltaTime, m_ForceNeutralAndNearZoom);
+    m_farZoom.Update(deltaTime, m_ForceNeutralAndNearZoom);
 
-    float fXYDist = fCos * m_CameraData->distance;
-    m_v3Camera.x = (fOrientCos * fXYDist) + m_fDampenedTargetX;
-    m_v3Camera.y = (fOrientSin * fXYDist) + m_fDampenedTargetY;
-    m_v3Camera.z = fSin * m_CameraData->distance;
+    if (m_fZoomOverride != 0.0f || lbl_806E0F14)
+    {
+        m_fZoom = m_fZoomOverride;
+        if (lbl_806E0F14)
+        {
+            m_fZoom = lbl_806E0F10;
+        }
+    }
+    else if (m_ForceNeutralAndNearZoom)
+    {
+        if (g_pTeams[0]->m_nScore == 0 && g_pTeams[1]->m_nScore == 0)
+        {
+            m_fZoom = lbl_806DC500;
+        }
+        else
+        {
+            m_fZoom = lbl_806DC504;
+        }
+    }
+    else
+    {
+        if (m_bDynamicZoom && !gGameplayCameraInReplay
+            && !UnidentifiedCameraEffects::Instance()->IsTransitionActive())
+        {
+            m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
+            m_fDesiredZoom = m_fDesiredZoom - lbl_806DC4FC;
+            m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->mZoomScale;
+            m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, lbl_806DC4F8), 1.2f * lbl_806DC4F4);
+        }
 
-    m_v3Target.x = m_fDampenedTargetX;
-    m_v3Target.y = m_fDampenedTargetY;
-    m_v3Target.z = 0.0f;
+        m_fDesiredZoom = Interpolate(lbl_806DC4F8, lbl_806DC4F4, m_fDesiredZoom);
+        float smoothTime;
+        if (gamePaused)
+        {
+            smoothTime = 0.1f;
+        }
+        else
+        {
+            smoothTime = 0.75f;
+        }
+
+        float change;
+        float x;
+        float omega = 2.0f / smoothTime;
+        x = omega * deltaTime;
+        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
+        change = m_fZoom - m_fDesiredZoom;
+        float temp = deltaTime * ((omega * change) + m_fZoomSeekSpeed);
+
+        m_fZoomSeekSpeed = exp * (m_fZoomSeekSpeed - (omega * temp));
+        m_fZoom = (exp * (change + temp)) + m_fDesiredZoom;
+    }
+
+    float inverseZoom = 1.0f - m_fZoom;
+    float zoom = m_fZoom;
+
+    m_v3Target.x = (inverseZoom * m_nearZoom.m_v3Target.x) + (zoom * m_farZoom.m_v3Target.x);
+    m_v3Target.y = (inverseZoom * m_nearZoom.m_v3Target.y) + (zoom * m_farZoom.m_v3Target.y);
+    m_v3Target.z = (inverseZoom * m_nearZoom.m_v3Target.z) + (zoom * m_farZoom.m_v3Target.z);
+
+    m_v3Camera.x = (inverseZoom * m_nearZoom.m_v3Camera.x) + (zoom * m_farZoom.m_v3Camera.x);
+    m_v3Camera.y = (inverseZoom * m_nearZoom.m_v3Camera.y) + (zoom * m_farZoom.m_v3Camera.y);
+    m_v3Camera.z = (inverseZoom * m_nearZoom.m_v3Camera.z) + (zoom * m_farZoom.m_v3Camera.z);
+
+    m_fFOV = Interpolate(m_nearZoom.m_CameraData->fov, m_farZoom.m_CameraData->fov, m_fZoom);
+
+    float clampedZoom = nlMinEquals(nlMaxEquals(m_fZoom, lbl_806DC4F8), lbl_806DC4F4);
+    m_v3Camera.x = Interpolate(m_nearZoom.m_v3Camera.x, m_farZoom.m_v3Camera.x, clampedZoom);
+    m_v3Target.x = Interpolate(m_nearZoom.m_v3Target.x, m_farZoom.m_v3Target.x, clampedZoom);
+    m_v3Camera.y = Interpolate(m_nearZoom.m_v3Camera.y, m_farZoom.m_v3Camera.y, clampedZoom);
+    m_v3Target.y = Interpolate(m_nearZoom.m_v3Target.y, m_farZoom.m_v3Target.y, clampedZoom);
+
+    UnidentifiedCameraEffects::Instance()->AdjustCameraVectors(m_fZoom, &m_v3Camera, &m_v3Target);
+
+    nlVector3 up = mUpVector;
+    nlVector3 camera = m_v3Camera;
+    nlVector3 target = m_v3Target;
+
+    if (UnidentifiedCameraEffects::Instance()->IsTransitionActive() == true
+        && !gamePaused && !gGameplayCameraInReplay
+        && ReplayManager::Instance()->mRender != NULL)
+    {
+        up = UnidentifiedCameraEffects::Instance()->RotateCameraVector(mUpVector);
+        nlVector3 targetOffset = UnidentifiedCameraEffects::Instance()->CalculateTargetOffset(this);
+        if (lbl_806DC4F0 == true)
+        {
+            nlVec3Add(camera, camera, targetOffset);
+        }
+        nlVec3Add(target, target, targetOffset);
+        float fovIncrease = UnidentifiedCameraEffects::Instance()->mTransitionScale;
+        m_fFOV += fovIncrease;
+    }
+
+    glMatrixLookAt(m_matView, camera, target, up);
+}
+
+GameplayCamera::GameplayCamera()
+{
+    m_bDynamicZoom = true;
+    m_fZoom = 0.0f;
+    m_fDesiredZoom = 0.0f;
+    m_fZoomSeekSpeed = 0.0f;
+    m_ForceNeutralAndNearZoom = false;
+    m_fZoomOverride = 0.0f;
+    m_matView.SetIdentity();
 }
