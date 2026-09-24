@@ -104,6 +104,24 @@ public:
         nlVec3Set(m_Up, 0.0f, 0.0f, 1.0f);
     }
 
+    void SetPosition(const nlVector3& position)
+    {
+        m_Position = position;
+        m_HasTransform = true;
+    }
+
+    void SetView(const nlVector3& view)
+    {
+        m_View = view;
+        m_HasTransform = true;
+    }
+
+    void SetUp(const nlVector3& up)
+    {
+        m_Up = up;
+        m_HasTransform = true;
+    }
+
     virtual void SetHasTransform(bool);
     virtual bool HasTransform();
     virtual bool IsTransformValid();
