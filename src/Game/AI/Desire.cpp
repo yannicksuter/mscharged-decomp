@@ -9,6 +9,7 @@
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
+#include "Game/AI/AvoidController.h"
 #include "Game/Field.h"
 #include "Game/Ball.h"
 #include "Game/Goalie.h"
@@ -854,4 +855,93 @@ class SandTombWeather;
 extern "C" int fn_800B04B4(SandTombWeather*)
 {
     return 4;
+}
+
+extern "C" cTeam* fn_800D6670(cFielder*);
+extern "C" float fn_800DAD3C(cBall*);
+extern "C" float fn_800DF0B8(cFielder*);
+extern "C" float fn_800394A8(cFielder*, int);
+extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
+extern "C" void fn_800180F4(cBall*, nlVector3*, float);
+extern "C" float fn_800D7B00(cFielder*);
+extern "C" AvoidController* fn_8002E144(cFielder*);
+extern float lbl_806DC0A8;
+extern int lbl_806DC0B0;
+
+void DesireInterceptBall::Update(DesireUpdate* update, float)
+{
+    if (update->mData.i == DESIRE_CHANGE)
+    {
+        switch (update->ExtraData.Get(8)->mData.i)
+        {
+        case 15:
+            m_pFielder->InitActionLooseBallShot(update->ExtraData.Get(16)->mData.b);
+            update->SetDesireFinished();
+            return;
+        case 14:
+        {
+            cFielder* target = static_cast<cFielder*>(update->ExtraData.Get(14)->mData.pPlayer);
+            m_pFielder->InitActionLooseBallPass(target, OpenTo(m_pFielder, target) < 0.5f);
+            update->SetDesireFinished();
+            return;
+        }
+        }
+    }
+
+    if (Offensive(fn_800D6670(m_pFielder))
+        || fn_800DAD3C(g_pBall) || BallOwner(m_pFielder))
+    {
+        update->SetDesireFinished();
+        return;
+    }
+
+    nlVector3 position;
+    cPlayer* passTarget = g_pBall->m_pPassTarget;
+    if (passTarget != NULL && passTarget->m_eClassType == FIELDER)
+    {
+        cFielder* target = static_cast<cFielder*>(passTarget);
+        if (fn_800DF0B8(target))
+        {
+            if (g_pBall->m_v3Position.z > fn_800394A8(m_pFielder, 0))
+            {
+                float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
+                float predictionTime = lbl_806DC0A8 <= interceptTime ? lbl_806DC0A8 : interceptTime;
+                fn_800180F4(g_pBall, &position, predictionTime);
+            }
+            else
+            {
+                fn_80039350(target, &position, &m_pFielder->mUnidentified024.m_v3Position, 0.1f);
+            }
+        }
+        else
+        {
+            position = GetClosestPointOnLineABFromPointC(g_pBall->m_v3Position,
+                g_pBall->m_v3PassIntercept, m_pFielder->mUnidentified024.m_v3Position);
+            if (mUnidentifiedA4[4] && fn_800D7B00(m_pFielder) >= 0.5f)
+            {
+                *update = DESIRE_CHANGE;
+                update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC0B0));
+            }
+        }
+    }
+    else if (g_pBall->GetOwnerFielder() != NULL)
+    {
+        fn_80039350(g_pBall->GetOwnerFielder(), &position,
+            &m_pFielder->mUnidentified024.m_v3Position, 0.25f);
+    }
+    else
+    {
+        float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
+        float predictionTime = lbl_806DC0A8 <= interceptTime ? lbl_806DC0A8 : interceptTime;
+        fn_800180F4(g_pBall, &position, predictionTime);
+    }
+
+    position.z = 0.0f;
+    m_pFielder->AddDesiredPosition(position, 2.0f, 1.0f);
+    AvoidController* avoidance = fn_8002E144(m_pFielder);
+    avoidance->m_fRepulsionMult = 0.5f;
+    if (g_pBall->m_pOwner != NULL && g_pBall->m_pOwner->m_eClassType == GOALIE)
+    {
+        update->SetDesireFinished();
+    }
 }
