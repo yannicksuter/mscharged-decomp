@@ -122,6 +122,7 @@ public:
     void SerializeSettings(void* data) const;
     void DeserializeSettings(void* data);
     const GameplaySettings* GetCurrentSettings() const;
+    int GetDifficulty(short side) const { return mCurrentDifficulty[side]; }
 
     int FindSaveSlot(u64 id) const;
     bool HasSaveSlot(u64 id) const;
