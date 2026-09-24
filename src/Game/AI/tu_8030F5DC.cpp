@@ -100,6 +100,63 @@ void UnidentifiedActionQueue::fn_80310034(
     mNumSelectionWeights = count;
 }
 
+template <typename T>
+static inline void nlListAddAfter(nlList<T>* list, T* prev, T* node)
+{
+    if (prev == list->m_pEnd)
+    {
+        nlListAddEnd(&list->m_pStart, &list->m_pEnd, node);
+    }
+    else
+    {
+        T* next = prev->next;
+        prev->next = node;
+        node->next = next;
+    }
+}
+
+static inline void InsertSortedAction(
+    nlList<UnidentifiedVariant_80054AB8>* list,
+    UnidentifiedVariant_80054AB8* pAction,
+    int (*compare)(UnidentifiedVariant_80054AB8* const&,
+                   UnidentifiedVariant_80054AB8* const&))
+{
+    UnidentifiedVariant_80054AB8* prev = 0;
+    UnidentifiedVariant_80054AB8* cur
+        = list->m_pStart;
+
+    if (cur == 0)
+    {
+        nlListAddStart(&list->m_pStart, pAction,
+            &list->m_pEnd);
+    }
+    else
+    {
+        for (; cur != 0; prev = cur, cur = cur->next)
+        {
+            if (compare(cur, pAction) > 0)
+            {
+                if (prev == 0)
+                {
+                    nlListAddStart(&list->m_pStart,
+                        pAction, &list->m_pEnd);
+                }
+                else
+                {
+                    nlListAddAfter(list, prev, pAction);
+                }
+                break;
+            }
+        }
+
+        if (cur == 0)
+        {
+            nlListAddEnd(&list->m_pStart,
+                &list->m_pEnd, pAction);
+        }
+    }
+}
+
 UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310040(
     UnidentifiedVariant_80054AB8* pNewAction)
 {
@@ -148,48 +205,7 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310040(
 
     if (pAction != 0)
     {
-        UnidentifiedVariant_80054AB8* prev = 0;
-        UnidentifiedVariant_80054AB8* cur
-            = m_lQueuedActions.m_pStart;
-
-        if (cur == 0)
-        {
-            nlListAddStart(&m_lQueuedActions.m_pStart, pAction,
-                &m_lQueuedActions.m_pEnd);
-        }
-        else
-        {
-            for (; cur != 0; prev = cur, cur = cur->next)
-            {
-                if (fn_8030FD40(cur, pAction) > 0)
-                {
-                    if (prev == 0)
-                    {
-                        nlListAddStart(&m_lQueuedActions.m_pStart,
-                            pAction, &m_lQueuedActions.m_pEnd);
-                    }
-                    else if (prev == m_lQueuedActions.m_pEnd)
-                    {
-                        nlListAddEnd(&m_lQueuedActions.m_pStart,
-                            &m_lQueuedActions.m_pEnd, pAction);
-                    }
-                    else
-                    {
-                        UnidentifiedVariant_80054AB8* next = prev->next;
-                        prev->next = pAction;
-                        pAction->next = next;
-                    }
-                    break;
-                }
-            }
-
-            if (cur == 0)
-            {
-                nlListAddEnd(&m_lQueuedActions.m_pStart,
-                    &m_lQueuedActions.m_pEnd, pAction);
-            }
-        }
-
+        InsertSortedAction(&m_lQueuedActions, pAction, fn_8030FD40);
         m_pLastQueuedAction = pAction;
     }
 

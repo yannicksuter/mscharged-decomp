@@ -330,7 +330,9 @@ void cCharacter::PostPhysicsUpdate()
     m_pPhysicsCharacter->GetCharacterPositionXY(&mUnidentified024.m_v3Position);
     m_pPhysicsCharacter->GetCharacterVelocityXY(&mUnidentified024.m_v3Velocity);
 
-    mUnidentified024.m_fActualSpeed = nlGetLength2D(mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y);
+    float velY = mUnidentified024.m_v3Velocity.y;
+    float velX = mUnidentified024.m_v3Velocity.x;
+    mUnidentified024.m_fActualSpeed = nlGetLength2D(velX, velY);
 
     CreateWorldMatrix();
 
@@ -1746,13 +1748,15 @@ void cCharacter::GetCurrentAnimFuture(int nJointIndex, float fTime,
     nlVector3& v3Out, nlVector3& v3FutureRoot, unsigned short& outFacing)
 {
     cPN_SAnimController* pAnim = m_pCurrentAnimController;
+    float savedTime;
     float savedPrevTime = pAnim->m_fPrevTime;
-    float savedTime = pAnim->m_fTime;
+    savedTime = pAnim->m_fTime;
     pAnim->SetTime(fTime);
 
     outFacing = mUnidentified024.m_aActualFacingDirection;
+    float movementScale = mUnidentified024.m_fMovementScale;
     m_pCurrentAnimController->GetRootTrans(&v3FutureRoot, outFacing,
-        mUnidentified024.m_fMovementScale);
+        movementScale);
     unsigned short rootRot;
     m_pCurrentAnimController->GetRootRot(&rootRot);
     outFacing += rootRot;

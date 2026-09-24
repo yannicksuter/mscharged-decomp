@@ -20,6 +20,7 @@
 #include "NL/nlstring_tmpl.h"
 
 #include <string.h>
+#include "Game/TweakValue.inl"
 
 static int s_nTimeoutFindingMaxPlayersAcceptMin = 20;
 
@@ -302,26 +303,27 @@ void NetworkLobby::OnConnectionClosed(
 {
     u8 aid = *((u8*)connection + 0x27);
     tDebugPrintManager::Print(DC_NETWORK, "Connection Lost %d reason %d\n", aid, reason);
-    if (aid >= mMachineCount)
+    if (aid < mMachineCount)
     {
-        tDebugPrintManager::Print(DC_NETWORK,
-            "Lost connection AID %d not in range 0 >= x < %d\n",
-            aid,
-            mMachineCount);
-        return;
-    }
-
-    if (mPlayers[aid].mConnection == connection)
-    {
-        mPlayers[aid].mConnection = 0;
+        unsigned int peerConnection = mPlayers[aid].mConnection;
+        if (peerConnection != connection)
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "PeerInfoList[%d] connection %x does not match lost connection %x\n",
+                aid,
+                peerConnection,
+                connection);
+        }
+        else
+        {
+            mPlayers[aid].mConnection = 0;
+        }
     }
     else
     {
         tDebugPrintManager::Print(DC_NETWORK,
-            "PeerInfoList[%d] connection %x does not match lost connection %x\n",
-            aid,
-            mPlayers[aid].mConnection,
-            connection);
+            "Lost connection AID %d not in range 0 >= x < %d\n",
+            mMachineCount);
     }
 }
 
@@ -364,9 +366,7 @@ void NetworkLobby::CloseConnectionsAndReset()
 void NetworkLobby::Shutdown(bool reset)
 {
     (void)reset;
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
-    CloseConnections();
-    Reset();
+    CloseConnectionsAndReset();
 }
 
 static void MatchmakingCallback(

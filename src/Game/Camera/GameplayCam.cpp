@@ -1,9 +1,11 @@
 #include "Game/Camera/GameplayCam.h"
+#include "Game/Camera/tu_800F9460.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/Ball.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/GameInfo.h"
+#include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
@@ -106,11 +108,11 @@ GameplayCamera::GameplayCamera()
 
 void GameplayCamera::Update(float deltaTime)
 {
+    bool gamePaused = (nlTaskManager::m_pInstance->mCurrentState == 1)
+                   | (nlTaskManager::m_pInstance->mCurrentState == 32);
+
     m_bDynamicZoom = GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera;
     m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
-
-    bool gamePaused = nlTaskManager::m_pInstance->mCurrentState == 1
-                   || nlTaskManager::m_pInstance->mCurrentState == 32;
 
     if (IsWidescreen())
     {
@@ -147,16 +149,36 @@ void GameplayCamera::Update(float deltaTime)
     }
     else
     {
-        float clampedDesiredZoom = Interpolate(lbl_806DC4F8, lbl_806DC4F4, m_fDesiredZoom);
-        float smoothTime = gamePaused ? 0.1f : 0.75f;
-        float omega = 2.0f / smoothTime;
-        float x = omega * deltaTime;
-        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
-        float change = m_fZoom - clampedDesiredZoom;
-        float currentVelocity = m_fZoomSeekSpeed;
+        if (m_bDynamicZoom && !gGameplayCameraInReplay && !UnidentifiedCameraEffects::Instance()->IsTransitionActive())
+        {
+            m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
+            m_fDesiredZoom = m_fDesiredZoom - lbl_806DC4FC;
+            m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->mZoomScale;
+            m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, lbl_806DC4F8), 1.2f * lbl_806DC4F4);
+        }
 
-        m_fZoomSeekSpeed = exp * (currentVelocity - (omega * (deltaTime * ((omega * change) + currentVelocity))));
-        m_fZoom = (exp * (change + (deltaTime * ((omega * change) + currentVelocity)))) + clampedDesiredZoom;
+        float clampedDesiredZoom = Interpolate(lbl_806DC4F8, lbl_806DC4F4, m_fDesiredZoom);
+        m_fDesiredZoom = clampedDesiredZoom;
+        float smoothTime;
+        if (gamePaused)
+        {
+            smoothTime = 0.1f;
+        }
+        else
+        {
+            smoothTime = 0.75f;
+        }
+        float change;
+        float x;
+        float omega = 2.0f / smoothTime;
+        x = omega * deltaTime;
+        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
+        change = m_fZoom - clampedDesiredZoom;
+        float currentVelocity = m_fZoomSeekSpeed;
+        float smoothChange = deltaTime * ((omega * change) + currentVelocity);
+
+        m_fZoomSeekSpeed = exp * (currentVelocity - (omega * smoothChange));
+        m_fZoom = (exp * (change + smoothChange)) + clampedDesiredZoom;
     }
 
     float inverseZoom = 1.0f - m_fZoom;
@@ -171,7 +193,33 @@ void GameplayCamera::Update(float deltaTime)
     m_v3Camera.z = (inverseZoom * m_nearZoom.m_v3Camera.z) + (zoom * m_farZoom.m_v3Camera.z);
 
     m_fFOV = Interpolate(m_nearZoom.m_CameraData->fov, m_farZoom.m_CameraData->fov, m_fZoom);
-    glMatrixLookAt(m_matView, m_v3Camera, m_v3Target, mUpVector);
+
+    float clampedZoom = nlMinEquals(nlMaxEquals(m_fZoom, lbl_806DC4F8), lbl_806DC4F4);
+    m_v3Camera.x = Interpolate(m_nearZoom.m_v3Camera.x, m_farZoom.m_v3Camera.x, clampedZoom);
+    m_v3Target.x = Interpolate(m_nearZoom.m_v3Target.x, m_farZoom.m_v3Target.x, clampedZoom);
+    m_v3Camera.y = Interpolate(m_nearZoom.m_v3Camera.y, m_farZoom.m_v3Camera.y, clampedZoom);
+    m_v3Target.y = Interpolate(m_nearZoom.m_v3Target.y, m_farZoom.m_v3Target.y, clampedZoom);
+
+    UnidentifiedCameraEffects::Instance()->AdjustCameraVectors(m_fZoom, &m_v3Camera, &m_v3Target);
+
+    nlVector3 up = mUpVector;
+    nlVector3 camera = m_v3Camera;
+    nlVector3 target = m_v3Target;
+
+    if (UnidentifiedCameraEffects::Instance()->IsTransitionActive() == true && !gamePaused && !gGameplayCameraInReplay && ReplayManager::Instance()->mRender != NULL)
+    {
+        up = UnidentifiedCameraEffects::Instance()->RotateCameraVector(mUpVector);
+        nlVector3 offset;
+        offset = UnidentifiedCameraEffects::Instance()->CalculateTargetOffset(this);
+        if (lbl_806DC4F0 == true)
+        {
+            nlVec3Add(camera, camera, offset);
+            nlVec3Add(target, target, offset);
+        }
+        m_fFOV += UnidentifiedCameraEffects::Instance()->mTransitionScale;
+    }
+
+    glMatrixLookAt(m_matView, camera, target, up);
 }
 
 void GameplayCamera::SetForceNeutralAndNearZoom(bool forceNeutralAndNearZoom)

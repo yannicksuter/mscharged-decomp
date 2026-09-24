@@ -24,6 +24,7 @@
 #include "NL/nlstring_tmpl.h"
 
 #include <math.h>
+#include "Game/TweakValue.inl"
 
 static CrowdCharacterDefinition sCrowdCharacterDefinitions[36] = {
     { "birdo", "art/animation/crowdbirdo.sanim.zlib",
@@ -232,6 +233,13 @@ static ImpostorCluster* sCrowdCluster;
 static bool sLockCrowdImpostorAnimation;
 CrowdModelCollection gCrowdModelCollection;
 
+inline CrowdSidelineFilter::CrowdSidelineFilter()
+{
+    mSidelineCullingDistance.BindWithDefault("mfSidelineCullingDistance",
+        sCrowdZero, "/Render/Crowd", true, sCrowdZero,
+        sMaxCrowdSidelineCullingDistance, sCrowdSidelineCullingDistanceStep);
+}
+
 void UpdateImpostorPositions()
 {
     nlVector3 viewVector;
@@ -288,9 +296,6 @@ void LoadCrowdCharacterList()
 void InitializeCrowdImpostors(bool alternateView)
 {
     CrowdSidelineFilter* tweak = new (8, false) CrowdSidelineFilter;
-    tweak->mSidelineCullingDistance.BindWithDefault("mfSidelineCullingDistance",
-        sCrowdZero, "/Render/Crowd", true, sCrowdZero,
-        sMaxCrowdSidelineCullingDistance, sCrowdSidelineCullingDistanceStep);
     sCrowdSidelineFilter = tweak;
 
     int crowdMax = GetTweakInt(sMaxCrowdSizePath, 10000);
@@ -358,8 +363,8 @@ void UninitializeCrowdImpostors()
     ImpostorManager::GetInstance()->ResetImpostors();
     for (int i = 0; i < sNumCrowdCharacters; ++i)
     {
-        delete sCrowdModels.data[i];
-        delete sCrowdCharacters.data[i];
+        delete sCrowdModels[i];
+        delete sCrowdCharacters[i];
     }
     sNumCrowdCharacters = 0;
 

@@ -60,11 +60,6 @@ TLTextInstance* FEFindTextInstance(TLSlide* pTopLevel, InlineHasher Level1,
     InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
     InlineHasher Level6 = InlineHasher(0UL));
 
-TLTextInstance* FEFindTextInstance(TLInstance* pTopLevel, InlineHasher Level1,
-    InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
-    InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL),
-    InlineHasher Level6 = InlineHasher(0UL));
-
 void* FEFindInstance(FEPresentation* pPresentation, unsigned long Level1, unsigned long Level2,
     unsigned long Level3, unsigned long Level4, unsigned long Level5, unsigned long Level6);
 void* FEFindInstanceRecursive(TLInstance* pInstance, unsigned long Level1, unsigned long Level2,
@@ -115,6 +110,10 @@ struct FEFinder
 
     template <typename U>
     static T* Find(U* pTopLevel, InlineHasher Level1, InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
+        InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL), InlineHasher Level6 = InlineHasher(0UL));
+
+    template <typename U>
+    static T* FindChecked(U* pTopLevel, InlineHasher Level1, InlineHasher Level2 = InlineHasher(0UL), InlineHasher Level3 = InlineHasher(0UL),
         InlineHasher Level4 = InlineHasher(0UL), InlineHasher Level5 = InlineHasher(0UL), InlineHasher Level6 = InlineHasher(0UL));
 
     template <typename U>

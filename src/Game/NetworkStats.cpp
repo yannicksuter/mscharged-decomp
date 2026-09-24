@@ -17,9 +17,11 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
+#include "NL/nlstring_tmpl.h"
 
 #include <stdlib.h>
 #include <string.h>
+#include "Game/TweakValue.inl"
 
 int g_nConnectToStatsAddress[4] = { 192, 168, 2, 188 };
 
@@ -249,29 +251,29 @@ void NetworkStatsReporter::ParseLeaderboardResponse(
 
 void NetworkStatsReporter::Update()
 {
-    if (mState == 1)
+    switch (mState)
+    {
+    case 1:
     {
         char request[256];
         nlSNPrintf(request, 255,
             "GET /OnlineRankingSimulator/Rankings.py?SimpleFormat=true\r\n\r\n");
-        int result = TransportSocketSend(&mSocket, request, strlen(request));
-        tDebugPrintManager::Print(DC_NETWORK, "Send Result to Stats Server %d\n", result);
+        int result = TransportSocketSend(&mSocket, request, nlStrLen(request));
         if (result > 0)
         {
+            tDebugPrintManager::Print(DC_NETWORK, "Send Result to Stats Server %d\n", result);
             mState = 2;
         }
         else
         {
-            if (mListener != 0)
-            {
-                mListener->OnLeaderboardResult(
-                    false, 0, mFilter, 0, 0, 0);
-            }
+            tDebugPrintManager::Print(DC_NETWORK, "Send Result to Stats Server %d\n", result);
+            mListener->OnLeaderboardResult(false, 0, mFilter, 0, 0, 0);
             mState = 0;
             Close();
         }
+        break;
     }
-    else if (mState == 2)
+    case 2:
     {
         char response[1000];
         int result = TransportSocketReceiveFrom(&mSocket, response, 999, 0, 0);
@@ -280,11 +282,7 @@ void NetworkStatsReporter::Update()
             if (result != -6)
             {
                 tDebugPrintManager::Print(DC_NETWORK, "Received Stats String Error %d\n", result);
-                if (mListener != 0)
-                {
-                    mListener->OnLeaderboardResult(
-                        false, 0, mFilter, 0, 0, 0);
-                }
+                mListener->OnLeaderboardResult(false, 0, mFilter, 0, 0, 0);
                 mState = 0;
                 Close();
             }
@@ -299,8 +297,9 @@ void NetworkStatsReporter::Update()
             mState = 0;
             Close();
         }
+        break;
     }
-    else if (mState == 3)
+    case 3:
     {
         char homeName[11] = { 0 };
         char awayName[11] = { 0 };
@@ -310,7 +309,7 @@ void NetworkStatsReporter::Update()
         nlSNPrintf(request, 255,
             "GET /OnlineRankingSimulator/Rankings.py?yourname=%s&opponentsname=%s&yourscore=%d&opponentsscore=%d HTTP/1.0\r\n\r\n",
             homeName, awayName, mHomeScore, mAwayScore);
-        int result = TransportSocketSend(&mSocket, request, strlen(request));
+        int result = TransportSocketSend(&mSocket, request, nlStrLen(request));
         if (result > 0)
         {
             tDebugPrintManager::Print(DC_NETWORK,
@@ -325,15 +324,23 @@ void NetworkStatsReporter::Update()
             mState = 0;
             Close();
         }
+        break;
     }
-    else if (mState == 4
-        && nlGetTickerDifference(mReportStartTime, nlGetTicker())
-            > sReportSocketLifetime)
+    case 4:
     {
-        tDebugPrintManager::Print(DC_NETWORK,
-            "Waited, now closing socket that was used for ReportGameResult\n");
-        mState = 0;
-        Close();
+        if (nlGetTickerDifference(mReportStartTime, nlGetTicker())
+            > sReportSocketLifetime)
+        {
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Waited, now closing socket that was used for ReportGameResult\n");
+            mState = 0;
+            Close();
+        }
+        break;
+    }
+    case 0:
+    default:
+        break;
     }
 }
 
@@ -480,16 +487,7 @@ void NetworkRankingMeta::LoadLocal()
 bool NetworkRanking::SubmitScore(int category,
     const NetworkRankingMeta* submission)
 {
-    int i = 0;
-    for (; i < 10; ++i)
-    {
-        mSubmission.mName[i] = gNetworkMiiNameWide[i];
-        if (gNetworkMiiNameWide[i] == 0)
-        {
-            break;
-        }
-    }
-    mSubmission.mName[i] = 0;
+    nlStrNCpy(mSubmission.mName, gNetworkMiiNameWide, 11);
     memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
 
     if (submission == 0)
@@ -497,8 +495,8 @@ bool NetworkRanking::SubmitScore(int category,
         mSubmission.mWins = 0;
         mSubmission.mLosses = 0;
         mSubmission.mUnidentified0C = (u16)GetOnlineRegion();
-        DWCDate date;
         DWCTime time;
+        DWCDate date;
         GetAdjustedNetworkDate(&date, &time);
         mSubmission.mDay = date.mday;
         mSubmission.mMonth = date.month;
@@ -523,14 +521,21 @@ bool NetworkRanking::SubmitScore(int category,
         (u8*)mSubmission.mDigest - (u8*)&mSubmission);
     NETHMACGetDigest(&context, mSubmission.mDigest);
 
-    DWCRnkRegion region = DWC_RNK_REGION_US;
-    if (GetRegion() == 1)
+    DWCRnkRegion region;
+    switch (GetRegion())
     {
+    case 0:
+        region = DWC_RNK_REGION_US;
+        break;
+    case 1:
         region = DWC_RNK_REGION_EU;
-    }
-    else if (GetRegion() == 2)
-    {
+        break;
+    case 2:
         region = DWC_RNK_REGION_JP;
+        break;
+    default:
+        region = DWC_RNK_REGION_US;
+        break;
     }
     int score = submission != 0 ? submission->mScore : 0;
     DWCRnkError result = DWC_RnkPutScoreAsync(

@@ -1,12 +1,11 @@
 #include "Game/RenderSnapshot.h"
 
 #include "Game/GameInfo.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
-
-extern cPlayer* lbl_8056B800[10];
 
 RenderSnapshot::RenderSnapshot()
     : mEvents(0)
@@ -34,9 +33,10 @@ void RenderSnapshot::Initialize()
     pNetMesh = new (nlMalloc(sizeof(DrawableNetMesh), 8, false)) DrawableNetMesh(false);
     mpNetMeshNegativeX = pNetMesh;
 
-    for (int i = 0; i < 10; ++i)
+    int index = 0;
+    for (DrawableFlyingCamera* camera = _2298; index < 10; ++camera)
     {
-        _2298[i].mIndex = i;
+        camera->mIndex = index++;
     }
 
     _2294 = 0;
@@ -46,7 +46,7 @@ void RenderSnapshot::Initialize()
 
     for (int i = 0; i < 10; ++i)
     {
-        int value = lbl_8056B800[i]->mUnidentified024.m_eCharacterClass;
+        int value = g_pCharacters[i]->mUnidentified024.m_eCharacterClass;
         if (value == 8)
         {
             _2714 |= 0x80000000;

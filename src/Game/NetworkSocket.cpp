@@ -9,6 +9,7 @@
 #include "NL/plat/ReliableSocket.h"
 
 #include <string.h>
+#include "Game/TweakValue.inl"
 
 struct NetworkSocketInitializeInfo
 {

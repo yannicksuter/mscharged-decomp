@@ -1,6 +1,7 @@
 #include "Game/Sys/simpleparser.h"
 #include "Game/Sys/debug.h"
 #include "Game/TweakRegistry.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "Game/TweakValue.h"
 
 #include "Game/TweakConfig.h"

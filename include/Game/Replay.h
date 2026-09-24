@@ -120,52 +120,7 @@ enum ReplayNonBlendables
     DO_NOT_REPLAY_NON_BLENDABLES = 1,
 };
 
-class SaveFrame
-{
-public:
-    template <int N, typename T>
-    void ReplayablePolymorphicPtr(T* current);
-    int GetInterval() const;
-    void fn_80191504();
-    bool fn_801919D0() const;
-    template <int N, typename T>
-    void Replayable(T& current);
-
-    template <int N, typename T>
-    void Replayable(T& current, ReplayablePod);
-
-    template <int N, typename T>
-    void Replayable(T& current, NotReplayablePod);
-
-    /* 0x0 */ int mInterval;
-    /* 0x4 */ WriteByteStream mStream;
-}; // total size: 0xC
-
-template <int N, typename T>
-inline void SaveFrame::Replayable(T& current)
-{
-    typename ReplayableCategory<T>::Type category;
-    Replayable<N>(current, category);
-}
-
-template <int N, typename T>
-inline void SaveFrame::Replayable(T& current, ReplayablePod)
-{
-    if (N == 0 || mInterval == N)
-    {
-        memcpy(mStream.mStorage, &current, sizeof(T));
-        mStream.mStorage += sizeof(T);
-    }
-}
-
-template <int N, typename T>
-inline void SaveFrame::Replayable(T& current, NotReplayablePod)
-{
-    if (N == 0 || mInterval == N)
-    {
-        current.Replay(*this);
-    }
-}
+class SaveFrame;
 
 template <int N, typename FrameType, typename T>
 static inline void ReplayFrameValue(
@@ -192,27 +147,8 @@ void Replayable(SaveFrame& frame, char typeId, cPoseNode*& poseNode);
 template <int N>
 void Replayable(LoadFrame& frame, char typeId, cPoseNode*& poseNode);
 
+#include "Game/SaveFrame.h"
 #include "Game/LoadFrame.h"
-
-template <int N, typename T>
-inline void SaveFrame::ReplayablePolymorphicPtr(T* current)
-{
-    if (N == 0 || mInterval == N)
-    {
-        unsigned char notNull = (current != 0);
-        memcpy(mStream.mStorage, &notNull, 1);
-        mStream.mStorage++;
-        if (notNull)
-        {
-            char typeId = (char)current->GetType();
-            if (typeId < 0 || typeId > 4)
-                nlBreak();
-            memcpy(mStream.mStorage, &typeId, 1);
-            mStream.mStorage++;
-            ::Replayable<N>(*this, typeId, current);
-        }
-    }
-}
 
 #include "Game/Compressor.h"
 
@@ -231,8 +167,6 @@ inline void Replayable(FrameType& frame, const T& proxy)
         }
     }
 }
-
-#include "Game/UnidentifiedQuaternionCompressor.h"
 
 template <int N, typename FrameType, typename T>
 inline void ReplayablePolymorphic(FrameType& frame, T*& ptr)

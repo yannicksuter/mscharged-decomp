@@ -22,6 +22,7 @@
 #include "NL/nlMemory.h"
 
 #include <string.h>
+#include "Game/TweakValue.inl"
 
 
 static NetTournManager* sNetTournManager;
@@ -45,120 +46,6 @@ static TweakIntBinding sSendGameInProgressMajorUpdateTweak(
 static TweakIntBinding sOverrideCupPersonaTweak(
     "s_nOverrideCupPersona", "Network/Tournament", &s_nOverrideCupPersona,
     true);
-
-void NetMessageMegaBallPointer::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mPointerX, sizeof(mPointerX));
-    serializer->Transfer(&mPointerY, sizeof(mPointerY));
-    serializer->Transfer(&mAngleHighByte, sizeof(mAngleHighByte));
-    serializer->Transfer(&mTextureIndex, sizeof(mTextureIndex));
-    serializer->Transfer(&mStatus, sizeof(mStatus));
-}
-
-void NetworkMessageType35::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mCount, sizeof(mCount));
-
-    if (serializer->mDirection == 0)
-    {
-        u8 values = 0;
-        memcpy(&values, serializer->mPosition, sizeof(values));
-        serializer->mPosition += sizeof(values);
-        for (int i = 0; i < mCount; ++i)
-        {
-            if ((values & (1 << i)) != 0)
-            {
-                mValues[i] = true;
-            }
-            else
-            {
-                mValues[i] = false;
-            }
-        }
-    }
-    else
-    {
-        u8 values = 0;
-        for (int i = 0; i < mCount; ++i)
-        {
-            if (mValues[i])
-            {
-                values |= 1 << i;
-            }
-        }
-        memcpy(serializer->mPosition, &values, sizeof(values));
-        serializer->mPosition += sizeof(values);
-    }
-}
-
-int NetworkMessageType35::GetType()
-{
-    return 35;
-}
-
-int NetMessageMegaBallPointer::GetType()
-{
-    return 34;
-}
-
-void NetMessageTournamentStart::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
-    serializer->Transfer(&mMachineCount, sizeof(mMachineCount));
-    serializer->Transfer(&mCupPersona, sizeof(mCupPersona));
-    serializer->Transfer(&mFirstStadium, sizeof(mFirstStadium));
-    serializer->Transfer(&mSecondStadium, sizeof(mSecondStadium));
-    serializer->Transfer(mSeedings, sizeof(mSeedings));
-}
-
-void NetMessageTournamentGameUpdate::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mUpdateType, sizeof(mUpdateType));
-    serializer->Transfer(&mGameIndex, sizeof(mGameIndex));
-    serializer->Transfer(&mIsHomeMachine, sizeof(mIsHomeMachine));
-    serializer->Transfer(&mGameStatus, sizeof(mGameStatus));
-    serializer->Transfer(&mGameTimeDelta, sizeof(mGameTimeDelta));
-    serializer->Transfer(&mHasGameInfo, sizeof(mHasGameInfo));
-    if (mHasGameInfo != 0)
-    {
-        serializer->Transfer(&mGameInfo, sizeof(mGameInfo));
-    }
-}
-
-void NetMessageTournamentLoadingState::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
-    serializer->Transfer(
-        &mFinishedLoadingToKnockout, sizeof(mFinishedLoadingToKnockout));
-}
-
-NetMessageTournamentGameUpdate::~NetMessageTournamentGameUpdate()
-{
-}
-
-NetMessageTournamentLoadingState::~NetMessageTournamentLoadingState()
-{
-}
-
-int NetMessageTournamentLoadingState::GetType()
-{
-    return 33;
-}
-
-int NetMessageTournamentGameUpdate::GetType()
-{
-    return 32;
-}
-
-int NetMessageTournamentStart::GetType()
-{
-    return 20;
-}
 
 void NetTournManager::CreateInstance()
 {
@@ -1082,45 +969,198 @@ int NetTournManager::ProcessMessage(NetworkMessage* message)
 void NetTournManager::HandleTournamentGameUpdate(
     NetMessageTournamentGameUpdate* message)
 {
-    if (message->mGameIndex >= 7)
+    if (mState != 1)
     {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Ignoring NetworkTournamentGameUpdate because in tournament stage %d\n",
+            mState);
         return;
     }
 
     NetworkTournamentGame& game = mGames[message->mGameIndex];
-    switch (message->mUpdateType)
+    if (message->mUpdateType == 2)
     {
-    case 0:
-        game.mState = message->mGameStatus;
-        break;
-    case 1:
-        game.mState = NET_TOURN_GAME_IN_PROGRESS;
-        break;
-    case 2:
-        game.mState = NET_TOURN_GAME_OVER;
-        break;
-    case 3:
-        game.mState = NET_TOURN_GAME_NO_CONTEST;
-        break;
-    default:
-        tDebugPrintManager::Print(DC_NETWORK,
-            "Ignoring unknown NetworkTournamentGameUpdate type %d\n",
-            message->mUpdateType);
-        return;
+        switch (game.mState)
+        {
+        default:
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Ignoring DNF NetworkTournamentGameUpdate because game group BGI status is %d\n",
+                game.mState);
+            break;
+        case NET_TOURN_GAME_EMPTY:
+        case NET_TOURN_GAME_READY:
+        case NET_TOURN_GAME_IN_PROGRESS:
+        case NET_TOURN_GAME_STATE_3:
+        case NET_TOURN_GAME_STATE_4:
+        case NET_TOURN_GAME_STATE_10:
+            game.mState = NET_TOURN_GAME_STATE_10;
+            break;
+        }
     }
-
-    if (message->mIsHomeMachine)
+    else if (message->mUpdateType == 3)
     {
-        game.mHomeUpdate = message->mGameTimeDelta;
+        switch (game.mState)
+        {
+        default:
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Ignoring CNS NetworkTournamentGameUpdate because game group BGI status is %d\n",
+                game.mState);
+            break;
+        case NET_TOURN_GAME_EMPTY:
+        case NET_TOURN_GAME_READY:
+        case NET_TOURN_GAME_STATE_11:
+            game.mState = NET_TOURN_GAME_STATE_11;
+            break;
+        }
+    }
+    else if (message->mUpdateType == 1)
+    {
+        switch (game.mState)
+        {
+        case NET_TOURN_GAME_EMPTY:
+        case NET_TOURN_GAME_STATE_3:
+        case NET_TOURN_GAME_STATE_4:
+        case NET_TOURN_GAME_OVER:
+        case NET_TOURN_GAME_NO_CONTEST:
+        case NET_TOURN_GAME_NO_PLAYERS:
+        case NET_TOURN_GAME_HOME_ADVANCES:
+        case NET_TOURN_GAME_AWAY_ADVANCES:
+        case NET_TOURN_GAME_STATE_10:
+        case NET_TOURN_GAME_STATE_11:
+        default:
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Ignoring GameInProgress NetworkTournamentGameUpdate because game group BGI status is %d\n",
+                game.mState);
+            break;
+        case NET_TOURN_GAME_READY:
+        case NET_TOURN_GAME_IN_PROGRESS:
+        {
+            int status = message->mGameStatus;
+            game.mHomeUpdate = status;
+            game.mAwayUpdate = message->mGameTimeDelta;
+            switch (status)
+            {
+            case 2:
+            case 3:
+                game.mState = NET_TOURN_GAME_IN_PROGRESS;
+                if (message->mHasGameInfo)
+                {
+                    game.mGameInfo = message->mGameInfo;
+                }
+                break;
+            case 0:
+            case 1:
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "Received GameInProgress status %d\n",
+                    status);
+                break;
+            }
+            break;
+        }
+        }
+    }
+    else if (message->mUpdateType == 0)
+    {
+        switch (game.mState)
+        {
+        case NET_TOURN_GAME_EMPTY:
+        case NET_TOURN_GAME_OVER:
+        case NET_TOURN_GAME_NO_CONTEST:
+        case NET_TOURN_GAME_NO_PLAYERS:
+        case NET_TOURN_GAME_HOME_ADVANCES:
+        case NET_TOURN_GAME_AWAY_ADVANCES:
+        case NET_TOURN_GAME_STATE_10:
+        case NET_TOURN_GAME_STATE_11:
+        default:
+            tDebugPrintManager::Print(DC_NETWORK,
+                "Ignoring GameOver NetworkTournamentGameUpdate because game group BGI status is %d\n",
+                game.mState);
+            break;
+        case NET_TOURN_GAME_READY:
+        case NET_TOURN_GAME_IN_PROGRESS:
+            game.mHomeUpdate = message->mGameStatus;
+            game.mAwayUpdate = message->mGameTimeDelta;
+            if (message->mIsHomeMachine)
+            {
+                game.mState = NET_TOURN_GAME_STATE_3;
+            }
+            else
+            {
+                game.mState = NET_TOURN_GAME_STATE_4;
+            }
+            game.mGameInfo = message->mGameInfo;
+            break;
+        case NET_TOURN_GAME_STATE_3:
+        {
+            if (message->mIsHomeMachine)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "Ignoring NetworkTournamentGameUpdate because already have HOME results\n");
+                break;
+            }
+            game.mHomeUpdate = message->mGameStatus;
+            game.mAwayUpdate = message->mGameTimeDelta;
+            bool gameInfoMatches;
+            if (memcmp(&game.mGameInfo, &message->mGameInfo,
+                    sizeof(game.mGameInfo)) == 0)
+            {
+                gameInfoMatches = true;
+            }
+            else
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "WARNING: BasicGameInfo does not match other one!\n");
+                gameInfoMatches = false;
+            }
+            if (gameInfoMatches)
+            {
+                game.mState = NET_TOURN_GAME_OVER;
+            }
+            else
+            {
+                game.mState = NET_TOURN_GAME_NO_CONTEST;
+            }
+            break;
+        }
+        case NET_TOURN_GAME_STATE_4:
+        {
+            if (!message->mIsHomeMachine)
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "Ignoring NetworkTournamentGameUpdate because already have AWAY results\n");
+                break;
+            }
+            game.mHomeUpdate = message->mGameStatus;
+            game.mAwayUpdate = message->mGameTimeDelta;
+            bool gameInfoMatches;
+            if (memcmp(&game.mGameInfo, &message->mGameInfo,
+                    sizeof(game.mGameInfo)) == 0)
+            {
+                gameInfoMatches = true;
+            }
+            else
+            {
+                tDebugPrintManager::Print(DC_NETWORK,
+                    "WARNING: BasicGameInfo does not match other one!\n");
+                gameInfoMatches = false;
+            }
+            if (gameInfoMatches)
+            {
+                game.mState = NET_TOURN_GAME_OVER;
+            }
+            else
+            {
+                game.mState = NET_TOURN_GAME_NO_CONTEST;
+            }
+            break;
+        }
+        }
     }
     else
     {
-        game.mAwayUpdate = message->mGameTimeDelta;
-    }
-    if (message->mHasGameInfo)
-    {
-        memcpy(
-            &game.mGameInfo, &message->mGameInfo, sizeof(game.mGameInfo));
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Ignoring NetworkTournamentGameUpdate because unknown update type %d\n",
+            message->mUpdateType);
     }
 }
 

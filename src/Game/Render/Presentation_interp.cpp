@@ -198,10 +198,10 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 26:
     {
         int original = m_SP[-1];
-        short side = (short)NisPlayer::Instance()->mUnidentified34238;
+        int side = NisPlayer::Instance()->mUnidentified34238;
         int team = GameInfoManager::Instance()
                        ->GetCurrentGameInfo()
-                       ->GetTeam(side);
+                       ->GetTeam((short)side);
         m_SP[-1] = team == original;
         if (m_RunState == 3)
         {
@@ -600,22 +600,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         m_SP = stack;
         if (!mByPassing)
         {
-            float cutTime;
-            if (ScreenTransitionManager::Instance()->m_SelectedTransition == 0)
-            {
-                ScreenTransitionManager::Instance()->SelectRandomTransition(
-                    filter);
-            }
-            cutTime = 0.0f;
-            if (ScreenTransitionManager::Instance()->m_SelectedTransition != 0)
-            {
-                cutTime = ScreenTransitionManager::Instance()
-                              ->GetSelectedTransitionCutTime();
-            }
-            if (!ReplayChoreo::Instance().Done(cutTime))
-            {
-                StopWithUndo();
-            }
+            WaitForAutoReplayCompletion(filter);
         }
         break;
     }
@@ -653,26 +638,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         m_SP = stack;
         if (!mByPassing)
         {
-            float cutTime = 0.0f;
-            if (ScreenTransitionManager::Instance()->m_SelectedTransition == 0)
-            {
-                ScreenTransitionManager::Instance()->SelectRandomTransition(
-                    wipe);
-            }
-
-            if (nlStrCmp<char>(wipe, "cut") != 0
-                && ScreenTransitionManager::Instance()->m_SelectedTransition
-                    != 0)
-            {
-                cutTime = ScreenTransitionManager::Instance()
-                              ->GetSelectedTransitionCutTime();
-            }
-
-            if (NisPlayer::Instance()->TimeLeft() > cutTime
-                || !NisPlayer::Instance()->fn_8027CB44())
-            {
-                StopWithUndo();
-            }
+            WaitForNisCompletion(wipe);
         }
         break;
     }

@@ -220,12 +220,7 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
                 mDigitInstances[mSelectedDigit]->SetActiveSlide(
                     "OFF", true, false);
 
-                mDigitButtons[item].mDisabled = true;
-                FEPointerEvent event;
-                mDigitButtons[item].mPreviousEvents[0] = event;
-                mDigitButtons[item].mPreviousEvents[1] = event;
-                mDigitButtons[item].mPreviousEvents[2] = event;
-                mDigitButtons[item].mPreviousEvents[3] = event;
+                mDigitButtons[item].Disable();
 
                 mDigitButtons[mSelectedDigit].mDisabled = false;
                 mSelectedDigit = item;
@@ -241,31 +236,16 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
         }
         nlStrNCpy(mDigits[item], character, 2);
 
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[item], nlStringLowerHash("off"),
-            nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
-        }
+        TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(
+            mDigitInstances[item], "off", "BOX", "NUMBER");
         text->SetString(mDigits[item]);
 
-        text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[item], nlStringLowerHash("over"),
-            nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
-        }
+        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
+            mDigitInstances[item], "over", "BOX", "NUMBER");
         text->SetString(mDigits[item]);
 
-        text = FEFinder<TLTextInstance, 3>::Find(
-            mDigitInstances[item], nlStringLowerHash("down"),
-            nlStringLowerHash("BOX"), nlStringLowerHash("NUMBER"), 0, 0, 0);
-        if (text == 0)
-        {
-            text = &UnidentifiedTLTextDefault::sInstance;
-        }
+        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
+            mDigitInstances[item], "down", "BOX", "NUMBER");
         text->SetString(mDigits[item]);
     }
 
@@ -274,12 +254,7 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
         mDigitInstances[11]->SetActiveSlide("DOWN", true, false);
         mDigitInstances[mSelectedDigit]->SetActiveSlide("OFF", true, false);
 
-        mDigitButtons[11].mDisabled = true;
-        FEPointerEvent event;
-        mDigitButtons[11].mPreviousEvents[0] = event;
-        mDigitButtons[11].mPreviousEvents[1] = event;
-        mDigitButtons[11].mPreviousEvents[2] = event;
-        mDigitButtons[11].mPreviousEvents[3] = event;
+        mDigitButtons[11].Disable();
 
         mDigitButtons[mSelectedDigit].mDisabled = false;
         mSelectedDigit = 11;

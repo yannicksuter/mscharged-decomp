@@ -3,10 +3,6 @@
 #include "Game/TweakConfig.h"
 #include "Game/TweakFileLoader.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "Game/TweakValueInt.h"
-#include "NL/nlPrint.h"
-
-#include <stdlib.h>
 
 GameTweaks::GameTweaks(const char* name, const char* category)
     : TweaksBase(name)
@@ -28,98 +24,12 @@ void GameTweaks::fn_800756B4()
 {
 }
 
-TweakIntBinding::TweakIntBinding(int* value)
-    : m_pValue(value)
-{
-}
-
-bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
-    const char* group, bool reload, float value, float min, float max)
-{
-    bool found = Bind(name, value, group, reload, min, max);
-    if (!found)
-    {
-        *m_pValue = defaultValue;
-    }
-    return found;
-}
-
-int TweakIntBinding::GetDefault()
-{
-    return 0;
-}
-
-int TweakIntBinding::GetValueType()
-{
-    return 3;
-}
-
-int TweakIntBinding::GetStorageKind()
-{
-    return 2;
-}
-
-void TweakIntBinding::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-TweakValueBase* TweakIntBinding::CreateValue(
-    const char* name, void* entry)
-{
-    TweakValueInt* created = new (
-        gTweakValueAllocator->Allocate(sizeof(TweakValueInt)))
-        TweakValueInt(name, 0);
-    AddTweakValue((TweakEntry*)entry, created);
-    return created;
-}
-
-void* TweakIntBinding::GetValueAddress()
-{
-    return m_pValue;
-}
-
-void TweakIntBinding::FormatValue(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, "%d", *m_pValue);
-}
-
-void TweakIntBinding::ParseValue(const char* value)
-{
-    *m_pValue = atoi(value);
-}
-
-void TweakIntBinding::CopyValueFrom(
-    TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        *m_pValue = ((TweakValueInt*)other)->value;
-        break;
-    case 2:
-        *m_pValue = *((TweakIntBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-int TweakIntBinding::IsBound()
-{
-    return m_pValue != 0;
-}
-
-void TweakIntBinding::BindValueAddress(void* value)
-{
-    m_pValue = (int*)value;
-}
+#include "Game/TweakIntBinding.inl"
 
 void GameTweaks::Init()
 {
-    fGameDuration.BindWithDefault("Game Duration", (float)GameInfoManager::Instance()->GetCurrentSettings()->GameTime, mCategory, false, 0.0f, 0.0f, 0.0f);
+    const GameplaySettings& gameOptions = *GameInfoManager::Instance()->GetCurrentSettings();
+    fGameDuration.BindWithDefault("Game Duration", (float)gameOptions.GameTime, mCategory, false, 0.0f, 0.0f, 0.0f);
     fFielderAttributeWeight.BindWithDefault("Fielder Attributes Weight", 0.2f, mCategory, false, 0.0f, 0.0f, 0.0f);
     vGetInPositionKeyFielderDistX.BindWithDefault("Get In Position Key Fielder Min Distance", 2.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     vGetInPositionKeyFielderDistY.BindWithDefault("Get In Position Key Fielder Max Distance", 12.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
@@ -270,3 +180,9 @@ void GameTweaks::Init()
     fShotWidthVariance.BindWithDefault("Shot Width Variance", 0.12f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fShotHeightVariance.BindWithDefault("Shot Height Variance", 0.06f, mCategory, false, 0.0f, 0.0f, 0.0f);
 }
+
+// TweakIntBinding::FormatValue's format. Retail keeps FormatValue inside the
+// TweakIntBinding.inl code group and Init in the following one; a string
+// literal first used by FormatValue would move FormatValue out of that group.
+// The original construct is not recoverable from the retail image.
+char gTweakIntBindingFormat[] = "%d";

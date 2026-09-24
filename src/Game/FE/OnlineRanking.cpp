@@ -104,7 +104,7 @@ void UnidentifiedOnlineRankingScene::fn_801F05D4()
 {
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
     TLInstance* screen = FEFinder<TLInstance, TLAT_UNKNOWN>::Find<TLSlide>(presentation->GetActiveSlide(), "Layer", "screen");
-    FEFindTextInstance(screen, "TimerText")->SetVisible(false);
+    FEFinder<TLTextInstance, TLAT_TEXT>::FindChecked(screen, "TimerText")->SetVisible(false);
     TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->GetTimer());
     GetNavigationScene()->fn_801CA9E0(true);
     char countdown[12];

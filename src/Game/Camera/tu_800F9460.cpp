@@ -223,10 +223,16 @@ void UnidentifiedCameraEffects::OnGoalieSave(
         return;
     }
 
-    if (g_pBall->m_v3Velocity.GetLengthSq3D()
-            < lbl_806DC588 * lbl_806DC588
-        || FixedUpdateTask::GetTargetTimeScale() != 1.0f
-        || fn_800155A0(g_pBall, 0) <= lbl_806DC58C)
+    float ballSpeedSq = g_pBall->m_v3Velocity.GetLengthSq3D();
+    if (FixedUpdateTask::GetTargetTimeScale() != 1.0f)
+    {
+        return;
+    }
+    if (!(ballSpeedSq >= lbl_806DC588 * lbl_806DC588))
+    {
+        return;
+    }
+    if (!(fn_800155A0(g_pBall, 0) > lbl_806DC58C))
     {
         return;
     }

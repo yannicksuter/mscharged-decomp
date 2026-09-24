@@ -197,26 +197,7 @@ extern "C" bool fn_80316A84(
 
     if (result)
     {
-        for (int i = 0; i < 19; i++)
-        {
-            if (parameters->IsSet(i))
-            {
-                if (machine->mUnidentified01C.mData[i] == 0)
-                {
-                    machine->mUnidentified01C.mData[i] = new (lbl_80584200.Allocate())
-                        UnidentifiedFuzzyVariantData(
-                            i, (const FuzzyVariant&)*parameters->mData[i]);
-                }
-                else
-                {
-                    *machine->mUnidentified01C.mData[i] = *parameters->mData[i];
-                }
-            }
-            else if (machine->mUnidentified01C.IsSet(i))
-            {
-                machine->mUnidentified01C.Remove(i);
-            }
-        }
+        machine->mUnidentified01C = *parameters;
         machine->mUnidentifiedActive = true;
     }
     return result;

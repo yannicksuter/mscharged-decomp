@@ -47,7 +47,24 @@ void TLTextInstance::Render(eGLView view, const nlColour& colour) const
     const nlFont* pFont;
     nlVector3 position;
 
-    GetPosition().GetNLVector3(position);
+    // Retail loads the three components in reverse offset order (0x8, 0x4, 0x0) and
+    // numbers the FPRs ascending with that order (z->f0, y->f1, x->f2), then stores
+    // them to three dead frame slots. Declaring all three as named locals in reverse
+    // order is what reproduces that here: the FPR numbers follow declaration order
+    // while the loads follow the initialiser order.
+    // A plain copy through GetNLVector3 leaves four rows differing only in the order of
+    // two loads and two stores; a plain nlVec3Set, e[] arguments and e[] assignment are
+    // the same four, while naming only one or two components or moving the ordering into
+    // GetNLVector3 itself is no better (four to six rows).
+    // The identifiers carry no semantic content, and the stripped DOL cannot show whether
+    // retail named them - do not read this as evidence that it did. The predecessor's own
+    // byte-exact Render has no component copy at this point, so it makes no statement
+    // either way.
+    const feVector3& tlPosition = GetPosition();
+    float posZ = tlPosition.f.z;
+    float posY = tlPosition.f.y;
+    float posX = tlPosition.f.x;
+    nlVec3Set(position, posX, posY, posZ);
 
     const FEText* component = (const FEText*)m_component;
     const FEFontResource* resource = component->m_pFeFontResource;

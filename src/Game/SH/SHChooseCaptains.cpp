@@ -358,9 +358,15 @@ void ChooseCaptainsSceneV2::fn_80225AA0(int index, void* context)
         return;
     }
 
-    if (mUnidentifiedA88[which].GetPointerState(index) == 0)
+    if (mUnidentifiedA88[which].GetPointerState(index) == 0 && mUnidentified28[which] == -1 && GetSide(index) == -1
+        && mUnidentified38[which] && !mUnidentified3A[which])
     {
-        fn_802258B8(index, context);
+        if (!mUnidentifiedA88[which].HasOtherPointerState(1, index))
+        {
+            mUnidentified130C[which]->SetActiveSlide("over", true, false);
+        }
+
+        mUnidentifiedA88[which].SetPointerState(1, index);
     }
 }
 
@@ -547,11 +553,11 @@ void ChooseCaptainsSceneV2::fn_80228140()
 void ChooseCaptainsSceneV2::fn_80227BCC(int which)
 {
     TLTextInstance* offText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified1304[which],
-        nlStringLowerHash("off"), nlStringLowerHash("Group"), nlStringLowerHash("select text"), 0, 0, 0);
+        "off", "Group", "select text");
     TLTextInstance* overText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified1304[which],
-        nlStringLowerHash("over"), nlStringLowerHash("Group"), nlStringLowerHash("select text"), 0, 0, 0);
+        "over", "Group", "select text");
     TLTextInstance* downText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified1304[which],
-        nlStringLowerHash("down"), nlStringLowerHash("Group"), nlStringLowerHash("select text"), 0, 0, 0);
+        "down", "Group", "select text");
 
     if (!mUnidentified3C[which])
     {

@@ -29,8 +29,8 @@ inline void nlRingAddEnd(T** list, T* item)
 template <typename T>
 inline void nlDeleteRing(T** head)
 {
-    T* next;
     T* current;
+    T* next;
 
     T* headPtr = *head;
     if (headPtr != 0)

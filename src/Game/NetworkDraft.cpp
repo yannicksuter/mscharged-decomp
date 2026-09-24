@@ -545,24 +545,20 @@ int NetworkDraft::GetCurrentDraftingTeam() const
 
 int NetworkDraft::GetRandomAvailableCaptain() const
 {
-    int attempts = 0;
     int index = (int)nlRandomf(0.0f, 12.0f, &nlDefaultSeed);
-    if (index >= 12)
+    for (int attempts = 0; attempts < 12; ++attempts, ++index)
     {
-        index = 0;
-    }
-    int captain = gCaptainSelectionOrder[index];
-    while (IsCaptainTaken(captain) && attempts < 12)
-    {
-        ++attempts;
-        ++index;
         if (index >= 12)
         {
             index = 0;
         }
-        captain = gCaptainSelectionOrder[index];
+        int captain = gCaptainSelectionOrder[index];
+        if (!IsCaptainTaken(captain))
+        {
+            return captain;
+        }
     }
-    return attempts < 12 ? captain : -1;
+    return -1;
 }
 
 void NetworkDraft::SendCaptainChoice()

@@ -401,96 +401,70 @@ void SHOnlineFriends::SceneCreated()
 
 void SHOnlineFriends::UpdateAddFriendRow()
 {
-    const char* slides[2] = { "off", "over" };
-    TLInstance* views[2];
-    for (int i = 0; i < 2; ++i)
-    {
-        views[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified0618[0],
-            nlStringLowerHash(slides[i]),
-            nlStringLowerHash("FRIEND_0"),
-            0,
-            0,
-            0,
-            0);
-        if (views[i] == 0)
-            views[i] = &UnidentifiedTLGroupDefault::sInstance;
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("cancel"));
-        if (component == 0)
-            component = &UnidentifiedTLComponentDefault::sInstance;
-        component->m_bVisible = false;
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher("SEARCHING_ADD"));
-        if (component == 0)
-            component = &UnidentifiedTLComponentDefault::sInstance;
-        component->SetActiveSlide("ADD", true, false);
-        component->m_bVisible = true;
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLTextInstance* name = FEFinder<TLTextInstance, 3>::Find(views[i], InlineHasher("NAME"));
-        if (name == 0)
-            name = &UnidentifiedTLTextDefault::sInstance;
-        name->m_bVisible = false;
-    }
-    const char* hidden[] = { "STATUS", "GUEST_HOME_AWAY", "PLAYER CLASS" };
-    for (int j = 0; j < 3; ++j)
-    {
-        for (int i = 0; i < 2; ++i)
-        {
-            TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find(views[i], InlineHasher(hidden[j]));
-            if (component == 0)
-                component = &UnidentifiedTLComponentDefault::sInstance;
-            component->m_bVisible = false;
-        }
-    }
-    const char* stats[2] = { "RANK", "RECORD" };
-    for (int j = 0; j < 2; ++j)
-    {
-        for (int i = 0; i < 2; ++i)
-        {
-            TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(views[i],
-                InlineHasher("STATS"),
-                InlineHasher("Slide1"),
-                InlineHasher(stats[j]),
-                InlineHasher(stats[j]));
-            if (text == 0)
-                text = &UnidentifiedTLTextDefault::sInstance;
-            text->m_bVisible = false;
-        }
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("00_dummy_texture"));
-        if (image == 0)
-            image = &UnidentifiedTLImageDefault::sInstance;
-        image->m_bVisible = false;
-    }
-    const char* images[] = { "Mii", "logo_32x32", "shoulders", "Online_Mii_select_background" };
-    for (int j = 0; j < 4; ++j)
-    {
-        for (int i = 0; i < 2; ++i)
-        {
-            TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(views[i],
-                InlineHasher("Mii_btn"),
-                InlineHasher(images[j]));
-            if (image == 0)
-                image = &UnidentifiedTLImageDefault::sInstance;
-            image->m_bVisible = false;
-            image->SetAssetVisible(false);
-        }
-    }
+    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "off", "FRIEND_0");
+    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "over", "FRIEND_0");
+
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "cancel")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "cancel")->SetVisible(false);
+
+    TLComponentInstance* addOff = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(off, "SEARCHING_ADD");
+    addOff->SetActiveSlide("ADD", true, false);
+    addOff->SetVisible(true);
+    TLComponentInstance* addOver = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(over, "SEARCHING_ADD");
+    addOver->SetActiveSlide("ADD", true, false);
+    addOver->SetVisible(true);
+
+    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "NAME")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "NAME")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "STATUS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "STATUS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "GUEST_HOME_AWAY")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "GUEST_HOME_AWAY")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "PLAYER CLASS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "PLAYER CLASS")->SetVisible(false);
+
+    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RANK", "RANK")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RANK", "RANK")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RECORD", "RECORD")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RECORD", "RECORD")->SetVisible(false);
+
+    FEFinder<TLImageInstance, 2>::FindOrDefault(off, "00_dummy_texture")->SetVisible(false);
+    FEFinder<TLImageInstance, 2>::FindOrDefault(over, "00_dummy_texture")->SetVisible(false);
+
+    TLImageInstance* miiOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Mii");
+    miiOff->SetVisible(false);
+    miiOff->SetAssetVisible(false);
+    TLImageInstance* miiOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Mii");
+    miiOver->SetVisible(false);
+    miiOver->SetAssetVisible(false);
+
+    TLImageInstance* logoOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "logo_32x32");
+    logoOff->SetVisible(false);
+    logoOff->SetAssetVisible(false);
+    TLImageInstance* logoOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "logo_32x32");
+    logoOver->SetVisible(false);
+    logoOver->SetAssetVisible(false);
+
+    TLImageInstance* shouldersOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "shoulders");
+    shouldersOff->SetVisible(false);
+    shouldersOff->SetAssetVisible(false);
+    TLImageInstance* shouldersOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "shoulders");
+    shouldersOver->SetVisible(false);
+    shouldersOver->SetAssetVisible(false);
+
+    TLImageInstance* backgroundOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Online_Mii_select_background");
+    backgroundOff->SetVisible(false);
+    backgroundOff->SetAssetVisible(false);
+    TLImageInstance* backgroundOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Online_Mii_select_background");
+    backgroundOver->SetVisible(false);
+    backgroundOver->SetAssetVisible(false);
 }
 
-static const char* const sOnlinePlayerSearchSlides[5] = { "SEARCHING", "CONNECTING", "INVITE", "ADD", "OFF" };
-static const char* const sOnlinePlayerStatusSlides[12] = {
+static const char* sOnlinePlayerSearchSlides[5] = { "SEARCHING", "CONNECTING", "INVITE", "ADD", "OFF" };
+static const char* sOnlinePlayerStatusSlides[12] = {
     "WAITING FOR FRIEND", "WAITING_FOR_OPPONENT", "AVAILABLE", "BUSY", "CHOOSING_CAPTAIN", "CHOOSING_SIDEKICKS", "CAPTAINNAMES", "ESTABLISHING", "OFFLINE", "DECLINED", "INVITING", "OFFLINE"
 };
-static const char* const sOnlinePlayerSideSlides[4] = { "HOME", "HOME", "AWAY", "GUEST" };
+static const char* sOnlinePlayerSideSlides[4] = { "HOME", "HOME", "AWAY", "GUEST" };
 
 const char* GetOnlineCaptainSlideName(unsigned int captain)
 {
@@ -528,104 +502,100 @@ const char* GetOnlineCaptainSlideName(unsigned int captain)
 void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance,
     u16* name, int nameSize, u16* description, int descriptionSize, int index, bool value)
 {
-    TLInstance* views[2];
-    views[0] = FEFinder<TLInstance, 5>::FindOrDefault(instance, "off", "FRIEND_0");
-    views[1] = FEFinder<TLInstance, 5>::FindOrDefault(instance, "over", "FRIEND_0");
-    for (int i = 0; i < 2; ++i)
+    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(instance, "off", "FRIEND_0");
+    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(instance, "over", "FRIEND_0");
+    off->SetVisible(row->mVisible);
+    over->SetVisible(row->mVisible);
+
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "cancel")->SetVisible(row->mShowCancel);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "cancel")->SetVisible(row->mShowCancel);
+
+    TLComponentInstance* searching = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "SEARCHING_ADD"));
+    searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
+    searching = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "SEARCHING_ADD"));
+    searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
+
+    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "NAME");
+    nameText->SetString(row->mName);
+    nameText->SetVisible(row->mSearchState == 4);
+    nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "NAME");
+    nameText->SetString(row->mName);
+    nameText->SetVisible(row->mSearchState == 4);
+
+    TLComponentInstance* status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "STATUS"));
+    status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
+    status->SetVisible(row->mSearchState == 4);
+    if (row->mStatus == 6)
     {
-        views[i]->SetVisible(row->mVisible);
+        TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, "NAMES");
+        names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
     }
-    for (int i = 0; i < 2; ++i)
+    status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "STATUS"));
+    status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
+    status->SetVisible(row->mSearchState == 4);
+    if (row->mStatus == 6)
     {
-        FEFinder<TLInstance, 4>::FindOrDefault(views[i], "cancel")->SetVisible(row->mShowCancel);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLComponentInstance* searching = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(views[i], "SEARCHING_ADD"));
-        searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(views[i], "NAME");
-        nameText->SetString(row->mName);
-        nameText->SetVisible(row->mSearchState == 4);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLComponentInstance* status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(views[i], "STATUS"));
-        status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
-        status->SetVisible(row->mSearchState == 4);
-        if (row->mStatus == 6)
-        {
-            TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, InlineHasher("NAMES"), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL), InlineHasher(0UL));
-            names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
-        }
+        TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, "NAMES");
+        names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
     }
     bool show = row->mSearchState == 4
              && row->mStatus != 7 && row->mStatus != 9 && row->mStatus != 10;
-    for (int i = 0; i < 2; ++i)
-    {
-        TLComponentInstance* guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(views[i], "GUEST_HOME_AWAY"));
-        guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
-        guest->SetVisible(show && row->mSide != 0);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        FEFinder<TLInstance, 4>::FindOrDefault(views[i], "PLAYER CLASS")->SetVisible(false);
-    }
-    WideString string = Format(WideString(LookupLocString("ONLINE_RANKING")), row->mStats.mDisplayRank);
+    bool hasSide = row->mSide != 0;
+    TLComponentInstance* guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "GUEST_HOME_AWAY"));
+    guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
+    guest->SetVisible(show && hasSide);
+    guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "GUEST_HOME_AWAY"));
+    guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
+    guest->SetVisible(show && hasSide);
+
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "PLAYER CLASS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "PLAYER CLASS")->SetVisible(false);
+    WideString string = Format(WideString(g_pLocalization->GetString("ONLINE_RANKING")), row->mStats.mDisplayRank);
     nlStrNCpy(name, string.c_str(), nameSize);
-    for (int i = 0; i < 2; ++i)
-    {
-        TLTextInstance* rank = FEFinder<TLTextInstance, 3>::FindOrDefault(views[i],
-            InlineHasher("STATS"),
-            InlineHasher("Slide1"),
-            InlineHasher("RANK"),
-            InlineHasher("RANK"));
-        rank->SetString(name);
-        rank->SetVisible(show && !row->mGuest);
-    }
-    string = Format(WideString(LookupLocString("ONLINE_SLOT_STATS")), row->mStats.mWins, row->mStats.mLosses, row->mStats.mScore);
+    TLTextInstance* rank = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RANK", "RANK");
+    rank->SetString(name);
+    rank->SetVisible(show && !row->mGuest);
+    rank = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RANK", "RANK");
+    rank->SetString(name);
+    rank->SetVisible(show && !row->mGuest);
+    string = Format(WideString(g_pLocalization->GetString("ONLINE_SLOT_STATS")), row->mStats.mWins, row->mStats.mLosses, row->mStats.mScore);
     nlStrNCpy(description, string.c_str(), descriptionSize);
-    for (int i = 0; i < 2; ++i)
-    {
-        TLTextInstance* record = FEFinder<TLTextInstance, 3>::FindOrDefault(views[i],
-            InlineHasher("STATS"),
-            InlineHasher("Slide1"),
-            InlineHasher("RECORD"),
-            InlineHasher("RECORD"));
-        record->SetString(description);
-        record->SetVisible(show && !row->mGuest);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        FEFinder<TLImageInstance, 2>::FindOrDefault(views[i], "00_dummy_texture")->SetVisible(show);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLImageInstance* background = FEFinder<TLImageInstance, 2>::FindOrDefault(views[i],
-            InlineHasher("Mii_btn"),
-            InlineHasher("Online_Mii_select_background"));
-        background->SetAssetVisible(show);
-    }
+    TLTextInstance* record = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RECORD", "RECORD");
+    record->SetString(description);
+    record->SetVisible(show && !row->mGuest);
+    record = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RECORD", "RECORD");
+    record->SetString(description);
+    record->SetVisible(show && !row->mGuest);
+
+    FEFinder<TLImageInstance, 2>::FindOrDefault(off, "00_dummy_texture")->SetVisible(show);
+    FEFinder<TLImageInstance, 2>::FindOrDefault(over, "00_dummy_texture")->SetVisible(show);
+
+    TLImageInstance* background = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Online_Mii_select_background");
+    background->SetAssetVisible(show);
+    background = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Online_Mii_select_background");
+    background->SetAssetVisible(show);
     bool valid = MiiManager::Instance()->CreateIcon((const RFLStoreData*)row->mMiiData, index, (RFLExpression)0);
     unsigned long texture = MiiManager::Instance()->GetIconTextureId(index);
     nlColour colour = { 0, 0, 0, 255 };
-    for (int i = 0; i < 2; ++i)
-    {
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("Mii_btn"), InlineHasher("Mii"));
-        image->GetTextureResource()->SetTextureHandle(texture);
-        image->SetAssetVisible(valid && show && value);
-        image->SetVisible(valid && show && value);
-        if (row->mGuest)
-            image->SetAssetColour(colour);
-    }
-    for (int i = 0; i < 2; ++i)
-    {
-        TLImageInstance* shoulders = FEFinder<TLImageInstance, 2>::Find(views[i], InlineHasher("Mii_btn"), InlineHasher("shoulders"));
-        shoulders->SetAssetVisible(false);
-        shoulders->SetVisible(false);
-    }
+    TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(off, "Mii_btn", "Mii");
+    image->GetTextureResource()->SetTextureHandle(texture);
+    image->SetAssetVisible(valid && show && value);
+    image->SetVisible(valid && show && value);
+    if (row->mGuest)
+        image->SetAssetColour(colour);
+    image = FEFinder<TLImageInstance, 2>::Find(over, "Mii_btn", "Mii");
+    image->GetTextureResource()->SetTextureHandle(texture);
+    image->SetAssetVisible(valid && show && value);
+    image->SetVisible(valid && show && value);
+    if (row->mGuest)
+        image->SetAssetColour(colour);
+
+    TLImageInstance* shoulders = FEFinder<TLImageInstance, 2>::Find(off, "Mii_btn", "shoulders");
+    shoulders->SetAssetVisible(false);
+    shoulders->SetVisible(false);
+    shoulders = FEFinder<TLImageInstance, 2>::Find(over, "Mii_btn", "shoulders");
+    shoulders->SetAssetVisible(false);
+    shoulders->SetVisible(false);
 }
 
 void SHOnlineFriends::Update(float dt)

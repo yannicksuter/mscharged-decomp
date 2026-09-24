@@ -1,23 +1,19 @@
-#ifndef _LOADFRAME_H_
-#define _LOADFRAME_H_
+#ifndef _SAVEFRAME_H_
+#define _SAVEFRAME_H_
 
-class LoadFrame
+class SaveFrame
 {
 public:
     template <int N, typename T>
-    void ReplayablePolymorphicPtr(T*& current);
+    void ReplayablePolymorphicPtr(T* current);
     int GetInterval() const
     {
         return mInterval;
     }
-    float fn_801948B0() const
-    {
-        return mNonBlendableAheadOfFrame;
-    }
     void fn_80191504();
     bool fn_801919D0() const
     {
-        return mReplayNonBlendables == REPLAY_NON_BLENDABLES;
+        return true;
     }
     template <int N, typename T>
     void Replayable(T& current);
@@ -29,30 +25,28 @@ public:
     void Replayable(T& current, NotReplayablePod);
 
     /* 0x0 */ int mInterval;
-    /* 0x4 */ ReadByteStream mStream;
-    /* 0xC */ ReplayNonBlendables mReplayNonBlendables;
-    /* 0x10 */ float mNonBlendableAheadOfFrame;
-}; // total size: 0x14
+    /* 0x4 */ WriteByteStream mStream;
+}; // total size: 0xC
 
 template <int N, typename T>
-inline void LoadFrame::Replayable(T& current)
+inline void SaveFrame::Replayable(T& current)
 {
     typename ReplayableCategory<T>::Type category;
     Replayable<N>(current, category);
 }
 
 template <int N, typename T>
-inline void LoadFrame::Replayable(T& current, ReplayablePod)
+inline void SaveFrame::Replayable(T& current, ReplayablePod)
 {
     if (N == 0 || mInterval == N)
     {
-        memcpy(&current, mStream.mStorage, sizeof(T));
+        memcpy(mStream.mStorage, &current, sizeof(T));
         mStream.mStorage += sizeof(T);
     }
 }
 
 template <int N, typename T>
-inline void LoadFrame::Replayable(T& current, NotReplayablePod)
+inline void SaveFrame::Replayable(T& current, NotReplayablePod)
 {
     if (N == 0 || mInterval == N)
     {
@@ -61,27 +55,23 @@ inline void LoadFrame::Replayable(T& current, NotReplayablePod)
 }
 
 template <int N, typename T>
-inline void LoadFrame::ReplayablePolymorphicPtr(T*& current)
+inline void SaveFrame::ReplayablePolymorphicPtr(T* current)
 {
     if (N == 0 || mInterval == N)
     {
-        unsigned char notNull = 1;
-        memcpy(&notNull, mStream.mStorage, 1);
+        unsigned char notNull = (current != 0);
+        memcpy(mStream.mStorage, &notNull, 1);
         mStream.mStorage++;
         if (notNull)
         {
-            char typeId = 0;
-            memcpy(&typeId, mStream.mStorage, 1);
-            mStream.mStorage++;
+            char typeId = (char)current->GetType();
             if (typeId < 0 || typeId > 4)
                 nlBreak();
+            memcpy(mStream.mStorage, &typeId, 1);
+            mStream.mStorage++;
             ::Replayable<N>(*this, typeId, current);
-        }
-        else
-        {
-            current = 0;
         }
     }
 }
 
-#endif // _LOADFRAME_H_
+#endif // _SAVEFRAME_H_

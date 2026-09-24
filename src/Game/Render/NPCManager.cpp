@@ -103,6 +103,14 @@ NPCManager::NPCManager()
 void NPCManager::CreateNPCTemplate(
     const char* pName, bool bPersistent)
 {
+    // R4QE01 measures the name here and discards the result: strlen runs on
+    // pName before the allocation and r3 is overwritten by the nlMalloc size
+    // without the length ever being read. The GameCube predecessor's engine
+    // does the same thing in two places, and its debug metadata shows no local
+    // holding the length at either site, so the evaluation was not assigned in
+    // the original source. What enclosed it is not recoverable from a stripped
+    // executable; the copy below is the plain strcpy the image shows.
+    strlen(pName);
     NPCTemplate* pTemplate
         = new (nlMalloc(sizeof(NPCTemplate), 8, false))
             NPCTemplate();

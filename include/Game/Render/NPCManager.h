@@ -57,7 +57,10 @@ class NPCManager
 {
 public:
     static NPCManager* fn_801948A0();
-    DiddyBanana* fn_801919A4() const;
+    DiddyBanana* fn_801919A4() const
+    {
+        return mpDiddyBanana;
+    }
     NPCManager();
     virtual ~NPCManager();
 

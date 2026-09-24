@@ -6,6 +6,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
+#include "Game/TweakValue.inl"
 
 GXCrystalMaterialProgram* GXCrystalMaterialProgram::Instance;
 

@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
+#include "Game/TweakValue.inl"
 
 static TweakEntry sTweakRootEntry;
 

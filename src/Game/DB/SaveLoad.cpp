@@ -602,7 +602,7 @@ void SaveLoad::WriteSaveData()
 {
     ResetTask::s_resetPaused = true;
     u32 dataSize = SaveFileSize();
-    u32 alignedSize = Align32(dataSize);
+    unsigned long alignedSize = Align32(dataSize);
     SaveBuffer = nlMalloc(alignedSize, 0x20, true);
 
     GameInfoManager::GetInstance()->mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);

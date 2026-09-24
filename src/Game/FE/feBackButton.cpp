@@ -6,6 +6,7 @@
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
 #include "NL/nlBind.h"
@@ -100,8 +101,7 @@ void FEBackButton::SetButtonInstance(TLComponentInstance* instance)
     }
 
     mButtonPosition = instance->GetAssetPosition();
-    mButtonInstance = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find<TLSlide>(
-        instance->GetActiveSlide(), nlStringLowerHash("back"), 0, 0, 0, 0, 0);
+    mButtonInstance = FEFinder<TLComponentInstance, 2>::Find<TLSlide>(instance->GetActiveSlide(), "back");
 }
 
 /**

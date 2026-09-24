@@ -44,6 +44,11 @@ public:
     bool GetFileInfo(unsigned long hash, BundleFileDirectoryEntry* entry, bool printError);
     bool GetFileInfoByIndex(unsigned long index, BundleFileDirectoryEntry* entry);
 
+    inline unsigned long GetNumFiles() const
+    {
+        return nNumFiles;
+    }
+
     void ReadFileByIndex(unsigned long index, void* buffer, unsigned long size);
     void ReadFileAsync(const char* filename, void* buffer, unsigned long size, FileReadAsyncCallback callback, unsigned long userParam);
     void ReadFileAsync(unsigned long hash, void* buffer, unsigned long size, FileReadAsyncCallback callback, unsigned long userParam);

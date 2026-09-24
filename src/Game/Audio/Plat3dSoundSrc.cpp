@@ -4,7 +4,7 @@
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-static float sSpeedOfSound = 343.5f;
+float sSpeedOfSound = 343.5f;
 
 float g_Pan;
 float g_Dist;

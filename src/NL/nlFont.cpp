@@ -29,10 +29,6 @@ static inline void ParseKernPairs(nlFont* self, nlFont::GlyphInfo* pInfo, char* 
     pInfo->HasKernPairs = 1;
     nlFont::KernPair kp;
     char* pKernToken = nlStrChr(pToken, ' ');
-    ListEntry<nlFont::KernPair>** pKernHead;
-    ListEntry<nlFont::KernPair>** pKernTail;
-    pKernTail = &KernList.m_Tail;
-    pKernHead = &KernList.m_Head;
     pKernToken++;
     while ((unsigned long)pKernToken != 1)
     {
@@ -49,8 +45,7 @@ static inline void ParseKernPairs(nlFont* self, nlFont::GlyphInfo* pInfo, char* 
         kp.s.B = (unsigned short)nB;
         pKernToken = nlStrChr(pKernToken, ' ') + 1;
         kp.Kern = atoi(pKernToken);
-        ListEntry<nlFont::KernPair>* pEntry = KernList.Allocate(kp);
-        nlListAddStart<ListEntry<nlFont::KernPair> >(pKernHead, pEntry, pKernTail);
+        KernList.AddStart(kp);
         self->m_KernTableSize++;
         pKernToken = nlStrChr(pKernToken, ' ') + 1;
     }

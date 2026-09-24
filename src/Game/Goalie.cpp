@@ -3595,14 +3595,15 @@ inline void SaveBlendInfo::UnidentifiedSyncLog(void* context, DebugWriteCache* c
 {
     if (lbl_806DBD58 == 0xFFFF)
     {
+        int milestone;
+        int blend;
         lbl_806DBD58 = cache->BeginType("SaveBlendInfo");
         REGISTER_GOALIE_FIELD(17, mfStartTime, mfStartTime, "mfStartTime");
         for (int milestone = 0; milestone < 5; milestone++)
         {
             REGISTER_GOALIE_FIELD(17, mfStartTime, mfMilestoneTime[milestone], "mfMilestoneTime[milestone]");
         }
-        int milestone;
-        for (int blend = 0; blend < 4; blend++)
+        for (blend = 0; blend < 4; blend++)
         {
             for (milestone = 0; milestone < 5; milestone++)
             {

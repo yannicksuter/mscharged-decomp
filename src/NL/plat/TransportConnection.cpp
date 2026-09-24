@@ -612,6 +612,10 @@ void TransportConnection::CheckTimeouts()
         {
             TRANSPORT_CONNECTION_ERROR(3, 4);
         }
+        else
+        {
+            return;
+        }
     }
     else
     {
@@ -654,6 +658,9 @@ void TransportConnection::CheckTimeouts()
             }
             break;
         }
+        case STATE_8:
+        default:
+            break;
         }
     }
 }

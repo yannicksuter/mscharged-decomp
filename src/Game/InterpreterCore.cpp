@@ -1,6 +1,7 @@
 #include "Game/InterpreterCore.h"
 
 #include "Game/TweakValue.h"
+#include "Game/TweakValue.inl"
 
 #include "NL/nlAlgorithm.h"
 #include "NL/nlDebug.h"
@@ -12,11 +13,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 typedef void (*InterpreterOperation)(InterpreterCore*);
-
-inline TweakIntBinding::TweakIntBinding(int* value)
-    : m_pValue(value)
-{
-}
 
 struct InterpreterTweakStorage
 {

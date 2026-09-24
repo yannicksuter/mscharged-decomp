@@ -40,6 +40,7 @@ public:
 class CrowdSidelineFilter
 {
 public:
+    CrowdSidelineFilter();
     virtual bool IsVisible(const Impostor* impostor);
 
     /* 0x04 */ TweakFloatBinding mSidelineCullingDistance;

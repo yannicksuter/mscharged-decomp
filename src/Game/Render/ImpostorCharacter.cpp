@@ -11,6 +11,7 @@
 #include "NL/nlMemory.h"
 
 #include <math.h>
+#include "Game/TweakValue.inl"
 
 u32 gNumImpostorSpritesCreated;
 

@@ -836,10 +836,14 @@ Game/NetworkMessages_80126A70.cpp:
 	.text       start:0x80126A70 end:0x80126BE8
 	.data       start:0x8050AD90 end:0x8050ADB8
 
+Game/NetworkTournamentMessages.cpp:
+	.text       start:0x80126BE8 end:0x801274A4
+	.data       start:0x8050ADB8 end:0x8050AE20
+
 Game/NetTournManager.cpp:
-	.text       start:0x80126BE8 end:0x8012A2F0
+	.text       start:0x801274A4 end:0x8012A2F0
 	.ctors      start:0x804DB614 end:0x804DB618
-	.data       start:0x8050ADB8 end:0x8050B750
+	.data       start:0x8050AE20 end:0x8050B750
 	.bss        start:0x8056FAA0 end:0x8056FB20
 	.sdata      start:0x806DC8D8 end:0x806DC8F0
 	.sbss       start:0x806E1160 end:0x806E1170

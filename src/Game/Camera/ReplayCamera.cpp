@@ -603,7 +603,7 @@ float ReplayCamera::GetFOV() const
  */
 const nlMatrix4& ReplayCamera::GetViewMatrix() const
 {
-    glMatrixLookAt(*(nlMatrix4*)&mViewMatrix, mPosition, mLookAt, mUpVector);
+    glMatrixLookAt(mViewMatrix, mPosition, mLookAt, mUpVector);
     return mViewMatrix;
 }
 

@@ -23,6 +23,13 @@ struct GLWarbleMeshWriter
         *colour++ = *(const u32*)&c;
     }
 
+    void Colour(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+    {
+        nlColour value;
+        nlColourSet(value, r, g, b, a);
+        Colour(value);
+    }
+
     void Texcoord(short u, short v)
     {
         *texcoord++ = u;
@@ -34,6 +41,17 @@ struct GLWarbleMeshWriter
         *position++ = x;
         *position++ = y;
         *position++ = z;
+    }
+
+    void Texture(int index, u32 texture)
+    {
+        glTextureBinding* binding
+            = (glTextureBinding*)model->packets->materialParameters + index;
+        binding->texture = texture;
+        binding->textureIndex = 0xFFFF;
+        binding->SetWrapS(true);
+        binding->SetWrapT(true);
+        binding->unknown07 = 0;
     }
 }; // size: 0x18
 

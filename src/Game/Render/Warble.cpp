@@ -83,8 +83,8 @@ void LoadWarbleBlob()
 
 static inline int SwizzledIA8Offset(int x, int y)
 {
-    const int yOffset = ((y << 6) & ~0xFF) | ((y & 3) << 2);
-    const int xOffset = ((x << 2) & ~0xF) | (x & 3);
+    const int yOffset = ((y & 3) << 2) | ((y & ~3) << 6);
+    const int xOffset = (x & 3) | ((x & ~3) << 2);
     return (yOffset | xOffset) << 1;
 }
 
@@ -158,16 +158,6 @@ void UpdateWarblePhase(bool*, float dt)
     sWarblePhase = phase - scaled;
 }
 
-static inline void WriteWarbleVertex(GLWarbleMeshWriter& writer,
-    float x, float y, short u, short v)
-{
-    nlColour colour;
-    nlColourSet(colour, 0xFF, 0xFF, 0xFF, 0xFF);
-    writer.Colour(colour);
-    writer.Texcoord(u, v);
-    writer.Position(x, y, 0.0f);
-}
-
 void RenderWarbleQuad(bool*)
 {
     if (!sWarbleColourLoaded)
@@ -186,19 +176,24 @@ void RenderWarbleQuad(bool*)
 
     if (writer.Begin(4, 3, 0))
     {
-        WriteWarbleVertex(writer, left, top, 0, 0);
-        WriteWarbleVertex(writer, left, bottom, 0, 0x400);
-        const u32 colourHandle = sWarbleColourHandle;
-        WriteWarbleVertex(writer, right, bottom, 0x400, 0x400);
-        WriteWarbleVertex(writer, right, top, 0x400, 0);
+        writer.Colour(0xFF, 0xFF, 0xFF, 0xFF);
+        writer.Texcoord(0, 0);
+        writer.Position(left, top, 0.0f);
 
-        glTextureBinding* textureState = static_cast<glTextureBinding*>(
-            writer.model->packets->materialParameters);
-        textureState->texture = colourHandle;
-        textureState->textureIndex = 0xFFFF;
-        textureState->SetWrapS(true);
-        textureState->SetWrapT(true);
-        textureState->unknown07 = 0;
+        writer.Colour(0xFF, 0xFF, 0xFF, 0xFF);
+        writer.Texcoord(0, 0x400);
+        writer.Position(left, bottom, 0.0f);
+
+        writer.Colour(0xFF, 0xFF, 0xFF, 0xFF);
+        const u32 colourHandle = sWarbleColourHandle;
+        writer.Texcoord(0x400, 0x400);
+        writer.Position(right, bottom, 0.0f);
+
+        writer.Colour(0xFF, 0xFF, 0xFF, 0xFF);
+        writer.Texcoord(0x400, 0);
+        writer.Position(right, top, 0.0f);
+
+        writer.Texture(0, colourHandle);
 
         if (writer.End())
             GetLayerView(eCLV_WarbleBlend)->AttachModel(writer.model, 0);

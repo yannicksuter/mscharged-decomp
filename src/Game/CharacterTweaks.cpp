@@ -9,6 +9,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/TweakConfig.h"
 #include "Game/TweakFileLoader.h"
+#include "Game/TweakValue.inl"
 
 extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
 

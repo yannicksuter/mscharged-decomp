@@ -346,6 +346,8 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
 static void UpdateAndRenderPlayerIndicators(float)
 {
     static int whoHadBall = -1;
+    float screenOffset;
+    unsigned long directionArrowTexID;
     int whoHasBall = -1;
 
     for (int i = 0; i < 10; ++i)
@@ -371,8 +373,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             = GetCharacterTexID((cPlayer*)g_pCharacters[i], &sameMachine);
         unsigned long glowTexID
             = GetCharacterGlowTexID((cPlayer*)g_pCharacters[i], &sameMachine);
-        unsigned long directionArrowTexID
-            = nlStringLowerHash("fe/direction_arrow");
+        directionArrowTexID = nlStringLowerHash("fe/direction_arrow");
         float opacityScale = 1.0f;
         if (!sameMachine)
         {
@@ -393,8 +394,8 @@ static void UpdateAndRenderPlayerIndicators(float)
                     continue;
                 }
                 fVerticalOffset
-                    = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() * 0.5f
-                    * pCharacter->mUnidentified024.m_fPlayerScale;
+                    = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() / 2.0f;
+                fVerticalOffset *= pCharacter->mUnidentified024.m_fPlayerScale;
             }
             else
             {
@@ -403,7 +404,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             }
         }
 
-        float screenOffset = lbl_806DCEF0;
+        screenOffset = lbl_806DCEF0;
         nlColour colour = GetIndicatorColour((cPlayer*)g_pCharacters[i]);
         v3Position.z += fVerticalOffset;
         nlVector3 v3ScreenPosition;
@@ -429,7 +430,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             float fDistInPixels = s_fOverheadSize * sizeScale;
             DrawIndicator((int)v3ScreenPosition.x,
                 (int)v3ScreenPosition.y, fDistInPixels, fDistInPixels,
-                opacityScale * fOpacity, indicatorTexID, colour, 0.0f,
+                fOpacity * opacityScale, indicatorTexID, colour, 0.0f,
                 false);
         }
         else if (((cPlayer*)g_pCharacters[i])->m_pBall != 0)
@@ -444,14 +445,13 @@ static void UpdateAndRenderPlayerIndicators(float)
                 (int)v3ScreenPosition.y,
                 s_fOverheadSize * s_fAdditiveTextureScale,
                 s_fOverheadSize * s_fAdditiveTextureScale,
-                opacityScale
-                    * (s_fAdditiveBlendingIntensity
-                        * (s_bPulseGlowTexture ? s_fGlowIntensityScale : 1.0f)),
+                (opacityScale * s_fAdditiveBlendingIntensity)
+                    * (s_bPulseGlowTexture ? s_fGlowIntensityScale : 1.0f),
                 glowTexID, colour, 0.0f, true);
 
             DrawIndicator((int)v3ScreenPosition.x,
                 (int)v3ScreenPosition.y, s_fOverheadSize,
-                s_fOverheadSize, opacityScale * fOpacity, indicatorTexID,
+                s_fOverheadSize, fOpacity * opacityScale, indicatorTexID,
                 colour, 0.0f, false);
 
             float rotationDegrees;
@@ -474,14 +474,14 @@ static void UpdateAndRenderPlayerIndicators(float)
                 = 3.1415927f * rotationDegrees / 180.0f;
             DrawIndicator((int)(v3ScreenPosition.x + xOffset),
                 (int)(v3ScreenPosition.y - yOffset), lbl_806DCED4,
-                lbl_806DCED4, opacityScale * fOpacity,
+                lbl_806DCED4, fOpacity * opacityScale,
                 directionArrowTexID, colour, rotationAngle, false);
         }
         else
         {
             DrawIndicator((int)v3ScreenPosition.x,
                 (int)v3ScreenPosition.y, s_fOverheadSize,
-                s_fOverheadSize, opacityScale * fOpacity, indicatorTexID,
+                s_fOverheadSize, fOpacity * opacityScale, indicatorTexID,
                 colour, 0.0f, false);
         }
     }

@@ -1,6 +1,7 @@
 #include "Game/TerrainTweaks.h"
 
 #include "Game/TweakFileLoader.h"
+#include "Game/TweakValue.inl"
 
 TerrainTweaks::~TerrainTweaks()
 {

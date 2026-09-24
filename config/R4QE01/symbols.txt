@@ -6964,7 +6964,7 @@ Format<46BasicString<Us,Q26Detail19TempStringAllocator>,i,i>__FRC46BasicString<U
 nlStrNCpy<Us>__FPUsPCUsUl_PUs = .text:0x801F1394; // type:function size:0x48
 Find<10TLInstance>__28FEFinder<14TLTextInstance,3>FP10TLInstance12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P14TLTextInstance = .text:0x801F13DC; // type:function size:0xC8
 Find<10TLInstance>__24FEFinder<10TLInstance,4>FP10TLInstance12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P10TLInstance = .text:0x801F14A4; // type:function size:0xC8
-FEFindTextInstance__FP10TLInstance12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher = .text:0x801F156C; // type:function size:0xC8
+FindChecked<10TLInstance>__28FEFinder<14TLTextInstance,3>FP10TLInstance12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P14TLTextInstance = .text:0x801F156C; // type:function size:0xC8
 Find<7TLSlide>__25FEFinder<10TLInstance,-1>FP7TLSlide12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher12InlineHasher_P10TLInstance = .text:0x801F1634; // type:function size:0xC8
 __dt__11GoalOverlayFv = .text:0x801F16FC; // type:function size:0x40
 Update__11GoalOverlayFf = .text:0x801F173C; // type:function size:0x50

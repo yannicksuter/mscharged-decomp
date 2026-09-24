@@ -24,6 +24,7 @@
 #include "Game/NetworkInput.h"
 
 #include <string.h>
+#include "Game/TweakValue.inl"
 
 static int sLeaderboardJobs[5] = { 6, 7, 8, 9, 10 };
 
@@ -1021,8 +1022,8 @@ void NetworkStatsManager::Update(float dt)
                 mPersistentCategories[0], 0, 0, 0, false, 0, 0,
                 reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[0])))
         {
-            mOperation = 2;
             mOperationStartTime = mCurrentTime;
+            mOperation = 2;
             mSubmissionCategory = 0;
         }
         else
@@ -1038,8 +1039,8 @@ void NetworkStatsManager::Update(float dt)
                 mPersistentCategories[1], 0, 0, 0, false, 0, 0,
                 reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[1])))
         {
-            mOperation = 2;
             mOperationStartTime = mCurrentTime;
+            mOperation = 2;
             mSubmissionCategory = 1;
         }
         else
@@ -1055,8 +1056,8 @@ void NetworkStatsManager::Update(float dt)
                 mPersistentCategories[2], 0, 0, 0, false, 0, 0,
                 reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[2])))
         {
-            mOperation = 2;
             mOperationStartTime = mCurrentTime;
+            mOperation = 2;
             mSubmissionCategory = 2;
         }
         else

@@ -11,9 +11,18 @@
 class PhysicsNet
 {
 public:
-    NetMesh* fn_801949CC() const;
-    static PhysicsNet* fn_801949D4();
-    static PhysicsNet* fn_801949DC();
+    NetMesh* fn_801949CC() const
+    {
+        return mpNetMesh;
+    }
+    static PhysicsNet* fn_801949D4()
+    {
+        return spPhysNetPositiveX;
+    }
+    static PhysicsNet* fn_801949DC()
+    {
+        return spPhysNetNegativeX;
+    }
     static PhysicsNet* spPhysNetNegativeX;
     static PhysicsNet* spPhysNetPositiveX;
     static float sfPhysicsNetWidth;

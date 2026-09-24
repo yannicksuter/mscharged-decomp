@@ -195,7 +195,8 @@ void AudioSampleSource::Update()
             if (address < m_Unknown18)
             {
                 ++m_Unknown14_0C;
-                if (!(m_Unknown14_0C < m_Unknown14_00 || m_Unknown14_00 == 0xFFFF))
+                bool canLoop = m_Unknown14_0C < m_Unknown14_00 || m_Unknown14_00 == 0xFFFF;
+                if (!canLoop)
                 {
                     AXSetVoiceLoop(m_Unknown1C, false);
                     AXSetVoiceLoopAddr(m_Unknown1C, (unsigned long)g_pAudioSilenceBuffer * 2);
@@ -314,11 +315,12 @@ void AudioStreamChannel::PrepareVoice(AudioStreamHeader* header)
     addr.loopFlag = 1;
     addr.format = 0;
     addr.loopAddressHi = start >> 16;
-    addr.loopAddressLo = start;
+    unsigned short startLow = start;
+    addr.loopAddressLo = startLow;
     addr.endAddressHi = end >> 16;
     addr.endAddressLo = end;
     addr.currentAddressHi = start >> 16;
-    addr.currentAddressLo = start;
+    addr.currentAddressLo = startLow;
     AXPBADPCM adpcm;
     unsigned short* coefficients = &adpcm.a[0][0];
     for (int i = 0; i < 16; ++i)

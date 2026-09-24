@@ -2438,7 +2438,7 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
         int numSolutions;
         float times[2];
 
-        SolveQuadratic(0.5f * m_pPhysicsBall->m_gravity, m_v3Velocity.z,
+        SolveQuadratic(m_pPhysicsBall->m_gravity / 2.0f, m_v3Velocity.z,
             m_v3Position.z - fHeight,
             numSolutions, times[0], times[1]);
 
@@ -3520,10 +3520,7 @@ extern "C" void fn_8001AA6C(LiveBallTrail* pBallTrail, float fParam)
             = pBallTrail->velocity.GetLengthSq3D();
         if (fVelocityLengthSq > 0.1f)
         {
-            float fRecipLength
-                = nlRecipSqrt(fVelocityLengthSq, true);
-            nlVec3Scale(v3Position,
-                pBallTrail->velocity, fRecipLength);
+            nlVec3Normalize(v3Position, pBallTrail->velocity);
             nlVec3Scale(v3Position, 0.36f);
             nlVec3Add(
                 v3Position, v3Position, pBallTrail->position);
@@ -3542,9 +3539,9 @@ extern "C" void fn_8001AA6C(LiveBallTrail* pBallTrail, float fParam)
             v3Position, v3Up);
     }
 
-    if ((float)fabs(pBallTrail->position.x) > 0.02f
-        || (float)fabs(pBallTrail->position.y) > 0.02f
-        || (float)fabs(pBallTrail->position.z) > 0.02f)
+    if (fabsf(pBallTrail->position.x) > 100.0f
+        || fabsf(pBallTrail->position.y) > 100.0f
+        || fabsf(pBallTrail->position.z) > 100.0f)
     {
         pBallTrail->visible = false;
         pBallTrail->position = v3Zero;
@@ -3560,12 +3557,12 @@ extern "C" void fn_8001AA6C(LiveBallTrail* pBallTrail, float fParam)
                      + v3Rotation.y * pBallTrail->orientation.z
                      - v3Rotation.z * pBallTrail->orientation.y);
     qOrientation.y = pBallTrail->orientation.y
-        + 0.5f * (v3Rotation.z * pBallTrail->orientation.x
-                     + v3Rotation.y * pBallTrail->orientation.w
+        + 0.5f * (v3Rotation.y * pBallTrail->orientation.w
+                     + v3Rotation.z * pBallTrail->orientation.x
                      - v3Rotation.x * pBallTrail->orientation.z);
     qOrientation.z = pBallTrail->orientation.z
-        + 0.5f * (v3Rotation.x * pBallTrail->orientation.y
-                     + v3Rotation.z * pBallTrail->orientation.w
+        + 0.5f * (v3Rotation.z * pBallTrail->orientation.w
+                     + v3Rotation.x * pBallTrail->orientation.y
                      - v3Rotation.y * pBallTrail->orientation.x);
     qOrientation.w = pBallTrail->orientation.w
         - 0.5f * (v3Rotation.x * pBallTrail->orientation.x

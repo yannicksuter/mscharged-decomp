@@ -263,7 +263,7 @@ void FEResourceManager::LoadPermanentTextures()
     BundleFileDirectoryEntry fileDirectoryEntry;
     unsigned long i;
     FEResourceHandle** pPreExistingResourceHandle;
-    unsigned long fileCount = s_pPermanentBundle->nNumFiles;
+    unsigned long fileCount = s_pPermanentBundle->GetNumFiles();
 
     for (i = 0; i < fileCount; ++i)
     {
@@ -286,16 +286,7 @@ void FEResourceManager::LoadPermanentTextures()
 
                 s_pResourceLoadBuffer = (unsigned char*)nlMalloc(uFileLength, 0x20, true);
                 s_pPermanentBundle->ReadFileByIndex(i, s_pResourceLoadBuffer, uFileLength);
-                GLResourcePool* resourcePool = s_pResourcePool;
-                glBeginResource(pTextureResource->m_hashID);
-                glTextureAdd(pTextureResource->m_hashID, s_pResourceLoadBuffer, uFileLength, resourcePool);
-                glEndResource();
-                delete[] s_pResourceLoadBuffer;
-                s_pResourceLoadBuffer = 0;
-                unsigned long textureHandle = pTextureResource->m_hashID;
-                pTextureResource->SetTextureHandle(textureHandle);
-                AddResourceToResourceList(pTextureResource);
-                pTextureResource->m_bValid = true;
+                TextureResourceLoadComplete(NULL, uFileLength, (unsigned long)pTextureResource);
                 delete[] s_pResourceLoadBuffer;
                 s_pResourceLoadBuffer = 0;
                 pTextureResource->m_bValid = true;

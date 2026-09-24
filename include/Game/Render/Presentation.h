@@ -41,6 +41,8 @@ public:
     void OnMegaStrikeIntro(cPlayer* player);
     void OnMegaStrikeEnd(MegaStrikeEndData* data);
     void HandleMegaStrikeResult(MegaStrikeEndData* data);
+    void WaitForAutoReplayCompletion(const char* wipe);
+    void WaitForNisCompletion(const char* wipe);
     void WaitForNisLoaded();
     void PlayNis();
     void LoadNis(const char* name, int variant);

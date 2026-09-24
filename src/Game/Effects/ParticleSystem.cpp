@@ -203,6 +203,7 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     ParticleSystem* pSystem, EffectsSpec* pSpec,
     const nlMatrix4& mLocalToWorld)
 {
+    EffectsTemplate* pTemplate = pSystem->m_pTemplate;
     float randomZ = RandomizedValue(0.0f, 2.0f);
     float randomAngleValue = RandomizedValue(6.2831855f);
     float xyRadius = nlSqrt(1.0f - randomZ * randomZ, true);
@@ -218,16 +219,19 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
+        = pTemplate->mProperties[4]->Evaluate(
             pSystem->mUnidentified014);
     nlVec3Set(localDir, x, y, z);
-    nlVec3Set(localPos, radius * localDir.x, radius * localDir.y,
-        radius * localDir.z);
+    nlVec3Scale(localPos, localDir, radius);
 
     if (pSpec != 0)
-        nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);
+    {
+        localPos.x += pSpec->m_vLocalOffset.x;
+        localPos.y += pSpec->m_vLocalOffset.y;
+        localPos.z += pSpec->m_vLocalOffset.z;
+    }
 
-    if (pSystem->m_pTemplate->IsLocalSpace())
+    if (pTemplate->IsLocalSpace())
     {
         pos = localPos;
         dir = localDir;

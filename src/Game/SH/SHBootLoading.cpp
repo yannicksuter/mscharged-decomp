@@ -194,7 +194,7 @@ void BootLoadingScene::ShowHomeButtonWarning()
 bool BootLoadingScene::IsBootScreenPending()
 {
     FEPresentation* presentation = mPresentation;
-    unsigned char alpha;
+    int alpha;
     switch (mPhase)
     {
     case 0:
@@ -225,7 +225,7 @@ bool BootLoadingScene::IsBootScreenPending()
         alpha = 255;
         break;
     }
-    return alpha != 255;
+    return 255 > alpha;
 }
 
 void BootLoadingScene::SceneCreated()
