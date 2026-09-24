@@ -298,7 +298,8 @@ cGame::cGame(void* param1, int param2, bool param3)
     mUnidentified042 = false;
     m_pScorer = 0;
     m_pAssister = 0;
-    m_pTeamTouch[0] = m_pTeamTouch[1] = 0;
+    m_pTeamTouch[0] = 0;
+    m_pTeamTouch[1] = 0;
     m_pRandomPlayersArray[0] = 0;
     m_pRandomPlayersArray[1] = 0;
     m_pRandomPlayersArray[2] = 0;
@@ -347,15 +348,15 @@ cGame::cGame(void* param1, int param2, bool param3)
         if (noClock)
         {
             if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
-            {
                 game->m_pGameClock->Stop();
-            }
         }
-        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        else
         {
-            game->m_pGameClock->Start();
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+                game->m_pGameClock->Start();
         }
     }
+
     if (GetConfigBool(Config::Global(), "save_stats", false))
     {
         StatsTracker::Instance()->WriteCurrentlyPlaying();
@@ -642,7 +643,8 @@ void cGame::BeginGame(bool param1, bool param2)
     mUnidentified042 = false;
     m_pScorer = 0;
     m_pAssister = 0;
-    m_pTeamTouch[0] = m_pTeamTouch[1] = 0;
+    m_pTeamTouch[0] = 0;
+    m_pTeamTouch[1] = 0;
     m_pRandomPlayersArray[0] = 0;
     m_pRandomPlayersArray[1] = 0;
     m_pRandomPlayersArray[2] = 0;
@@ -666,15 +668,8 @@ void cGame::BeginGame(bool param1, bool param2)
     mUnidentified0A4 = 0;
     mUnidentified0A6 = 0;
     mUnidentified0A8 = 0;
-    float sinTilt;
-    float cosTilt;
     float tilt = -kGameTweakZero;
-    nlSinCos(&sinTilt, &cosTilt, (s32)(lbl_806E374C * tilt) / 360);
-    nlVec3Set(mTiltDirection, sinTilt, kGameTweakZero, cosTilt);
-    nlSinCos(&sinTilt, &cosTilt, (s32)(lbl_806E374C * tilt) / 360);
-    mTiltDirection.y = sinTilt;
-    mTiltDirection.z *= cosTilt;
-    nlVec3Scale(mTiltDirection, nlRecipSqrt(mTiltDirection.GetLengthSq3D(), true));
+    fn_8005B330(&mTiltDirection, tilt, tilt);
 
     mUnidentified0B8 = lbl_806DBA68;
     mUnidentified0BC = false;
@@ -1446,17 +1441,7 @@ extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt)
         yTilt = yTilt >= -yLimit ? yTilt : -yLimit;
         yTilt = yTilt <= yLimit ? yTilt : yLimit;
 
-        float cosTilt;
-        float sinTilt;
-        nlSinCos(&sinTilt, &cosTilt, (s32)(lbl_806E374C * -yTilt) / 360);
-        const float cosine = cosTilt;
-        const float sine = sinTilt;
-        nlVec3Set(game->mTiltDirection, sine, kGameTweakZero, cosine);
-        nlSinCos(&sinTilt, &cosTilt, (s32)(lbl_806E374C * -xTilt) / 360);
-        game->mTiltDirection.y = sinTilt;
-        game->mTiltDirection.z *= cosTilt;
-        float invLength = nlRecipSqrt(game->mTiltDirection.GetLengthSq3D(), true);
-        nlVec3Scale(game->mTiltDirection, invLength);
+        fn_8005B330(&game->mTiltDirection, -xTilt, -yTilt);
 
         g_pGame->mUnidentified080 = xTilt;
         g_pGame->mUnidentified084 = yTilt;

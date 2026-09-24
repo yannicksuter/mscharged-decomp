@@ -64,6 +64,7 @@ extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt);
 class cGame : public NetworkMessageReceiver
 {
     friend void fn_80061B1C(int relative, float xTilt, float yTilt);
+
 public:
     virtual int ProcessMessage(NetworkMessage* message);
     virtual ~cGame();

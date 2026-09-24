@@ -152,7 +152,7 @@ void GameAudio::Update(float deltaTime)
         m_Listener->SetPosition(listenerVector);
 
         transformValid = nlNear((float)(double)nlVec3Length(m_Listener->m_View), 1.0f)
-            && nlNear((float)(double)nlVec3Length(m_Listener->m_Up), 1.0f);
+                      && nlNear((float)(double)nlVec3Length(m_Listener->m_Up), 1.0f);
     }
 
     m_Listener->SetTransformValid(transformValid);
@@ -438,7 +438,11 @@ void ResumeSound(unsigned long cueId, void* context)
                 else
                 {
                     *slot = CreateSoundHandle(state->m_FlagsHi16,
-                        state->m_CueId, 0, sResumedCue, context, true);
+                        state->m_CueId,
+                        0,
+                        sResumedCue,
+                        context,
+                        true);
                     (*slot)->Play(false);
                 }
                 state->m_FlagsBits12_14 = 0;

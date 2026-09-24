@@ -62,31 +62,16 @@ void Blinker::Update(float fDeltaT)
             m_State = Blink_HalfClosed;
             if (m_bJustDoubleBlinked == 0)
             {
-                float blinkChance = 0.5f;
-                bool doubleBlink = RandomizedValue(blinkChance, 1.0f) < 0.2f;
+                bool doubleBlink = RandomizedValue(0.5f, 1.0f) < 0.2f;
                 if (doubleBlink)
                 {
                     float doubleBlinkInterval = 0.06666667f;
-                    float doubleBlinkHalfRange = 0.033333335f;
-                    float blinkInterval = doubleBlinkInterval;
-                    float intervalOffset = nlRandomf(doubleBlinkHalfRange, &uSeed);
-                    unsigned int intervalSign = nlRandom(0x7FFFFFFF, &uSeed);
-                    blinkInterval = (intervalSign & 1)
-                        ? blinkInterval + intervalOffset
-                        : blinkInterval - intervalOffset;
-                    m_fBlinkTimes[0] = blinkInterval;
+                    m_fBlinkTimes[0] = RandomizedValue(doubleBlinkInterval, 0.06666667f);
                     m_bJustDoubleBlinked = 1;
                     return;
                 }
             }
-            float halfIntervalRange = 0.5f;
-            float blinkInterval = 1.2f;
-            float intervalOffset = nlRandomf(halfIntervalRange, &uSeed);
-            unsigned int intervalSign = nlRandom(0x7FFFFFFF, &uSeed);
-            blinkInterval = (intervalSign & 1)
-                ? blinkInterval + intervalOffset
-                : blinkInterval - intervalOffset;
-            m_fBlinkTimes[0] = blinkInterval;
+            m_fBlinkTimes[0] = RandomizedValue(1.2f, 1.0f);
             m_bJustDoubleBlinked = 0;
             break;
         }

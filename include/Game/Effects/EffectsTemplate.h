@@ -94,16 +94,18 @@ public:
 
 inline float RandomizedValue(float base, float range)
 {
-    float randomOffset = nlRandomf(0.5f * range, &uSeed);
+    float halfRange = 0.5f * range;
+    float result = base;
+    float randomOffset = nlRandomf(halfRange, &uSeed);
     unsigned int randomSign = nlRandom(0x7FFFFFFF, &uSeed);
 
     if (randomSign & 1)
     {
-        return base + randomOffset;
+        return result + randomOffset;
     }
     else
     {
-        return base - randomOffset;
+        return result - randomOffset;
     }
 }
 
