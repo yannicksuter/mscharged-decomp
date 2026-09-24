@@ -16,6 +16,8 @@
 #include "Game/AI/FielderInput.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Ball.h"
+#include "Game/BasicStadium.h"
+#include "Game/Effects/EmissionManager.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/OverlayManager.h"
 #include "Game/OverlayHandlerHUD.h"
@@ -41,6 +43,7 @@
 #include "Game/Render/PeachPhoto.h"
 #include "Game/Render/ElectricFence.h"
 #include "Game/ReplayChoreo.h"
+#include "Game/ReplayManager.h"
 #include "Game/Render/Presentation.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/GameplayCam.h"
@@ -58,6 +61,7 @@
 #include "Game/Event.h"
 #include "Game/EventRegistry.h"
 #include "Game/NetworkMessages.h"
+#include "Game/NetworkEvents.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlBindMember.h"
 #include "NL/nlFunction.inl"
@@ -76,6 +80,9 @@
 #include "Game/DB/StadiumInfo.h"
 
 extern PowerupBase* g_pPowerups[];
+extern "C" void fn_8031A0FC(float value);
+extern float (*lbl_806DF560)();
+extern float (*lbl_806DF564)();
 extern "C" const nlVector3 lbl_804DBFE8;
 bool fn_80287B7C(Presentation* state);
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
@@ -174,6 +181,7 @@ extern "C" const float lbl_806E3740;
 extern "C" const float lbl_806E3748;
 extern "C" const float lbl_806E376C;
 extern "C" const float lbl_806E3770;
+extern "C" const float lbl_806E3774;
 extern "C" const float lbl_806E3744;
 extern "C" const float lbl_806E3750;
 extern "C" const float lbl_806E3754;
@@ -606,6 +614,152 @@ void cGame::fn_8005848C()
     mUnidentified0BD = false;
 }
 
+void cGame::BeginGame(bool param1, bool param2)
+{
+    ++lbl_806E2130;
+    FixedUpdateTask::SetTimeScale(lbl_806E3748);
+    ParticleUpdateTask::sInstance->SetTimeScale(lbl_806E3748);
+
+    Function<DetermDataEvent*> callback(BindMember(this, &cGame::fn_8005A028));
+    GetInputRouter();
+    GetDetermDataEventQueue()->Add(callback, 0, -1);
+
+    if (m_eGameState != 0)
+    {
+        ChangeGameState(0);
+    }
+
+    mUnidentified020 = false;
+    m_nLastTeamToScore = 1;
+    mUnidentified028 = 0;
+    mUnidentified02C = 0;
+    mUnidentified030 = 0;
+    mUnidentified034 = 0;
+    mUnidentified038 = 0;
+    mUnidentified03C = 0;
+    mbCaptainShotToScoreOn = false;
+    mUnidentified041 = false;
+    mUnidentified042 = false;
+    m_pScorer = 0;
+    m_pAssister = 0;
+    m_pTeamTouch[0] = m_pTeamTouch[1] = 0;
+    m_pRandomPlayersArray[0] = 0;
+    m_pRandomPlayersArray[1] = 0;
+    m_pRandomPlayersArray[2] = 0;
+    m_pRandomPlayersArray[3] = 0;
+    m_pRandomPlayersArray[4] = 0;
+    m_pRandomPlayersArray[5] = 0;
+    m_pRandomPlayersArray[6] = 0;
+    m_pRandomPlayersArray[7] = 0;
+    m_pRandomPlayersArray[8] = 0;
+    m_pRandomPlayersArray[9] = 0;
+    mUnidentified07C = kGameTweakZero;
+    mUnidentified080 = kGameTweakZero;
+    mUnidentified084 = kGameTweakZero;
+    mUnidentified088 = lbl_806E3740;
+    mUnidentified08C = lbl_806E3748;
+    mUnidentified090 = lbl_806E3740;
+    mUnidentified094 = lbl_806E3748;
+    mUnidentified098 = kGameTweakZero;
+    mUnidentified09C = kGameTweakZero;
+    mUnidentified0A0 = kGameTweakZero;
+    mUnidentified0A4 = 0;
+    mUnidentified0A6 = 0;
+    mUnidentified0A8 = 0;
+    float sinTilt;
+    float cosTilt;
+    float tilt = -kGameTweakZero;
+    nlSinCos(&sinTilt, &cosTilt, (s32)(lbl_806E374C * tilt) / 360);
+    nlVec3Set(mTiltDirection, sinTilt, kGameTweakZero, cosTilt);
+    nlSinCos(&sinTilt, &cosTilt, (s32)(lbl_806E374C * tilt) / 360);
+    mTiltDirection.y = sinTilt;
+    mTiltDirection.z *= cosTilt;
+    nlVec3Scale(mTiltDirection, nlRecipSqrt(mTiltDirection.GetLengthSq3D(), true));
+
+    mUnidentified0B8 = lbl_806DBA68;
+    mUnidentified0BC = false;
+    mUnidentified0BD = false;
+
+    fn_80058498(false, 0, 0);
+    fn_80059A1C();
+    mpWeatherManager->Reset();
+    mpWeatherManager->Stop(true);
+    RandomizePlayerUpdateOrder();
+    for (int i = 0; i < 2; i++)
+    {
+        g_pTeams[i]->fn_800A6248();
+        g_pTeams[i]->ResetCharacters();
+    }
+    fn_8001847C(g_pBall, false);
+    mUnidentified020 = false;
+    ResetPowerups(true);
+    EndPeachPhoto(&gPeachPhotoState, true);
+    EmissionManager::Instance()->KillAll();
+    BasicStadium::GetCurrentStadium()->ResetEffects();
+    for (float elapsed = kGameTweakZero; elapsed < lbl_806E3760; elapsed += lbl_806E3774)
+    {
+        static_cast<World*>(BasicStadium::GetCurrentStadium())->Update(lbl_806E3774, true);
+        EmissionManager::Instance()->Update(lbl_806E3774);
+    }
+    gNPCManager->fn_801ABF8C();
+
+    m_pGameClock->Reset(kGameTweakZero, lbl_806E3750, lbl_806E3748);
+    m_pGameClock->Stop();
+    m_pPostGameDoneClock->Reset(kGameTweakZero, lbl_806E3754, lbl_806E3748);
+    m_pPostGameDoneClock->Stop();
+    gpNumberDisplay->Reset();
+    if (!GameInfoManager::Instance()->IsInMode4())
+    {
+        gpNumberDisplay->SetScores(0, 0);
+        g_pTeams[0]->m_nScore = 0;
+        g_pTeams[1]->m_nScore = 0;
+    }
+    else
+    {
+        gpNumberDisplay->SetScores(g_pStrikerChallenge->mScore[0], g_pStrikerChallenge->mScore[1]);
+        g_pTeams[0]->m_nScore = 0;
+        g_pTeams[0]->m_nScore += g_pStrikerChallenge->mScore[0];
+        g_pTeams[1]->m_nScore = 0;
+        g_pTeams[1]->m_nScore += g_pStrikerChallenge->mScore[1];
+    }
+    for (int i = 0; i < 10; i++)
+    {
+        g_pCharacters[i]->fn_80022E60();
+        cCharacter* character = g_pCharacters[i];
+        character->m_Dirt = kGameTweakZero;
+        character->mUnidentified16C = 0;
+        g_pCharacters[i]->m_MinDirt = kGameTweakZero;
+    }
+    GetPresentation()->Reset();
+    ReplayChoreo::Instance().FlushHighlights();
+    ReplayChoreo::Instance().Finish();
+    if (param2)
+    {
+        ChangeGameState(1);
+        FixedUpdateTask* task = GetFixedUpdateTask();
+        task->mUnidentified38 = true;
+    }
+    else
+    {
+        GetPresentation()->PlayHighlights();
+    }
+
+    --lbl_806E2130;
+    ReplayManager::Instance()->ResetSnapshots();
+    if (IsNetworkOrRecordedGame())
+    {
+        fn_8031A0FC(lbl_806E3740);
+        lbl_806DF560 = fn_80056CA4;
+        lbl_806DF564 = fn_80056CA4;
+    }
+    else
+    {
+        fn_8031A0FC(lbl_806E3748);
+        lbl_806DF560 = fn_80056CD0;
+        lbl_806DF564 = fn_80056CA4;
+    }
+}
+
 void cGame::fn_80058498(bool param1, int param2, int param3)
 {
     mbCaptainShotToScoreOn = param1;
@@ -756,8 +910,21 @@ void cGame::fn_80058748()
 
 void cGame::fn_80058A78(float seconds)
 {
-    m_pPostResetClock->Reset(0.0f, seconds, 1.0f);
+    m_pPostResetClock->Reset(0.0f, seconds, lbl_806E3748);
     m_pPostResetClock->Start();
+}
+
+extern "C" void fn_80058ABC(unsigned long, unsigned long)
+{
+    cGame* game = g_pGame;
+    game->fn_8005DF38();
+    game->mUnidentified49C.mEvent12.Queue(Function<FnVoidVoid>());
+
+    GameplayCamera* camera = cCameraManager::GetCamera<GameplayCamera>(eCameraType_Gameplay);
+    if (camera != 0)
+    {
+        camera->SetForceNeutralAndNearZoom(false);
+    }
 }
 
 void cGame::BlowUpPowerups(

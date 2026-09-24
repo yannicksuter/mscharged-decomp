@@ -16,6 +16,7 @@ class Terrain;
 class CrowdRiot;
 class AvoidablePolygon;
 class UnidentifiedFielderInput;
+struct DetermDataEvent;
 class cFielder;
 class cPlayer;
 
@@ -78,6 +79,7 @@ public:
     void fn_80058400();
     void fn_8005848C();
     void BeginGame(bool bRematch, bool bStraightToKickoff);
+    void fn_8005A028(DetermDataEvent* data);
     void OnSuddenDeath();
     void OnGameOver();
     void SendPauseGameEvent();
