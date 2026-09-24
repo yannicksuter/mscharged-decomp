@@ -30,6 +30,8 @@ extern "C" void fn_8005B330(nlVector3*, float, float);
 extern "C" void fn_80277BB0();
 extern "C" void fn_800F0990(float);
 
+extern const float kCameraZero;
+
 eCameraType g_eCurrentCameraType;
 
 cBaseCamera* cCameraManager::m_cameraStack;
@@ -216,7 +218,7 @@ void cCameraManager::PushCameraWithTransition(cBaseCamera* pCamera, float fDurat
 
     m_transition = transition;
     m_fTransitionSpeed = 1.0f / fDuration;
-    m_fTransitionTime = 0.0f;
+    m_fTransitionTime = kCameraZero;
     m_pCallback = pCallback;
 
     if (bDeleteCurrentCamera)
@@ -387,7 +389,7 @@ void cCameraManager::UpdateGameCameraType()
         }
         else if (tvp.type == CONFIG_FLOAT)
         {
-            noCameraTweakCrash = tvp.value.floatValue;
+            noCameraTweakCrash = tvp.value.floatValue != kCameraZero;
         }
         else if (tvp.type == CONFIG_STRING)
         {
@@ -509,8 +511,8 @@ void cCameraManager::Update(float fDeltaT)
         }
         else
         {
-            pCamera->mUpVector.x = 0.0f;
-            pCamera->mUpVector.y = 0.0f;
+            pCamera->mUpVector.x = kCameraZero;
+            pCamera->mUpVector.y = kCameraZero;
             pCamera->mUpVector.z = 1.0f;
         }
     }
@@ -557,8 +559,8 @@ void cCameraManager::Update(float fDeltaT)
     {
         ImpostorManager* pUnidentified = ImpostorManager::GetInstance();
         pUnidentified->mUnidentified037 = cameraType != eCameraType_Gameplay;
-        ImpostorManager::GetInstance()->SetUpdatePeriod(
-            (cameraType == eCameraType_Gameplay) + 1);
+        int updatePeriod = cameraType == eCameraType_Gameplay ? 2 : 1;
+        ImpostorManager::GetInstance()->SetUpdatePeriod(updatePeriod);
     }
     lbl_806E0EE4 = cameraType;
 }
@@ -807,3 +809,5 @@ void FireCameraRumbleFilter(float fRumbleX, float fRumbleY, float fSpring, float
     if (pCamera->m_pFilter[0] != 0)
         static_cast<cRumbleFilter*>(pCamera->m_pFilter[0])->Rumble(fRumbleX, fRumbleY, fSpring, fDamping);
 }
+
+const float kCameraZero = 0.0f;
