@@ -3,9 +3,9 @@
 
 #include "Game/DB/GameProgress.h"
 
-inline StrikerChallenge* fn_801CA670()
+inline int StrikerChallenge::fn_801CAA18() const
 {
-    return g_pStrikerChallenge;
+    return mCaptain;
 }
 
 inline int StrikerChallenge::GetCurrentChallenge() const

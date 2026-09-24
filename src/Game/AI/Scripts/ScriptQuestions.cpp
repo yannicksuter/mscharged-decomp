@@ -40,7 +40,6 @@ extern "C" AvoidController* fn_8002E144(cFielder* pFielder);
 extern "C" float fn_8000F558(AvoidController* pController, eAvoidableThings eThings);
 extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C328(PlayerTweaks* pTweaks);
 extern "C" float fn_8002BFB8(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C254(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002BE18(PlayerTweaks* pTweaks);
@@ -56,8 +55,6 @@ static float CloseToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& 
 static float FarToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float InBetween(const nlVector3& v3InBetweenPos, const nlVector3& v3A, const nlVector3& v3B);
 extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
-extern "C" float fn_8004028C(cFielder*);
-extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" float fn_8002BE38(PlayerTweaks*);
 extern "C" float fn_8002BE18(PlayerTweaks*);
 extern "C" float fn_8002BE84(const PlayerTweaks*);
@@ -392,7 +389,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
     float fAttribute;
     if (pFielder->m_pBall != NULL)
     {
-        fAttribute = fn_8002C328(pFielder->GetTweaks());
+        fAttribute = pFielder->GetTweaks()->GetRunningSpeed();
     }
     else
     {
@@ -422,7 +419,7 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
     float fAttribute;
     if (pFielder->m_pBall != NULL)
     {
-        fAttribute = fn_8002C328(pFielder->GetTweaks());
+        fAttribute = pFielder->GetTweaks()->GetRunningSpeed();
     }
     else
     {
@@ -855,7 +852,7 @@ extern "C" float fn_800D7AB8(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (fn_8002F858(pFielder, false))
+    if (pFielder->CanContactLooseBall(false))
     {
         return 1.0f;
     }
@@ -2633,7 +2630,7 @@ extern "C" float fn_800DD45C(cFielder* pFielder)
         return 0.0f;
     }
 
-    return NormalizeVal(fn_8004028C(pFielder), lbl_806E4270);
+    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4270);
 }
 
 static const nlVector2 lbl_806E4278 = { 10.0f, 1.0f };
@@ -2646,7 +2643,7 @@ extern "C" float fn_800DD494(cFielder* pFielder)
         return 0.0f;
     }
 
-    return NormalizeVal(fn_8004028C(pFielder), lbl_806E4278);
+    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4278);
 }
 
 static const nlVector2 lbl_806E4280 = { 4.0f, 10.0f };
@@ -2659,7 +2656,7 @@ extern "C" float fn_800DD4CC(cFielder* pFielder)
         return 0.0f;
     }
 
-    return NormalizeVal(fn_8004028C(pFielder), lbl_806E4280);
+    return NormalizeVal(pFielder->GetDistanceToDesiredPos(), lbl_806E4280);
 }
 
 extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)

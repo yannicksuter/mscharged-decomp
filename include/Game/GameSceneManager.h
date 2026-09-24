@@ -12,9 +12,6 @@ public:
     virtual void Pop();
 };
 
-inline GameSceneManager* fn_801CA660()
-{
-    return nlSingleton<GameSceneManager>::s_pInstance;
-}
+GameSceneManager* fn_801CA660();
 
 #endif // GAME_GAME_SCENE_MANAGER_H

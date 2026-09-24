@@ -12,6 +12,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/FE/tlSlide.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/GameInfo.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
@@ -201,7 +202,8 @@ void SHOnlineFriendsChooseSides::SceneCreated()
         mSelectSideText = &UnidentifiedTLTextDefault::sInstance;
     }
     TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
-    GetNavigationScene()->mTimer->m_bVisible = true;
+    TLInstance* timerInstance = GetNavigationScene()->mTimer;
+    timerInstance->m_bVisible = true;
     nlSNPrintf(mTimerText, 8, (const unsigned short*)L"%d", mSecondsRemaining);
     timer->SetString(mTimerText);
     memset(g_pFriendManager->mFriendCodeInput, 0, sizeof(g_pFriendManager->mFriendCodeInput));
@@ -228,6 +230,41 @@ void SHOnlineFriendsChooseSides::OnCountdownTick(FETimer* timer)
     }
 }
 
+inline void SHOnlineFriendsChooseSides::ShowDisconnectedError()
+{
+    g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
+    SHNavigation* object = GetNavigationScene();
+    if (object != 0)
+    {
+        object->mTimer->m_bVisible = false;
+    }
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+    {
+        FEPopupMenu* popup = static_cast<FEPopupMenu*>(
+            GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
+        popup->Create((ePopupMenu)0x60,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDisconnectPopupClosed), this)));
+        mDisconnectPopupActive = true;
+    }
+}
+
+inline void SHOnlineFriendsChooseSides::SendDisconnectedSideChange(int pad)
+{
+    NetMessageSidesChanged message;
+    message.mMachineIndex = mDraftMessage.mMachineIndex;
+    message.mSide = -1;
+    message.mAccepted = 0;
+    if (HasOnlineTwoLocalPlayers())
+    {
+        message.mGuest = pad == gOnlineLocalControllerIndices[1];
+    }
+    else
+    {
+        message.mGuest = 0;
+    }
+    g_pNetworkSession->SendSidesChangedToHost(&message);
+}
+
 void SHOnlineFriendsChooseSides::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
@@ -239,7 +276,8 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
     if (mTimerTextDirty)
     {
         TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
-        GetNavigationScene()->mTimer->m_bVisible = true;
+        TLInstance* timerInstance = GetNavigationScene()->mTimer;
+        timerInstance->m_bVisible = true;
         nlSNPrintf(mTimerText, 8, (const unsigned short*)L"%d", mSecondsRemaining);
         timer->SetString(mTimerText);
         mTimerTextDirty = false;
@@ -248,7 +286,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
     if (mDoneButtonAnimating)
     {
         TLSlide* slide = mDoneButtonInstance->GetActiveSlide();
-        if (slide->GetCurrentTime() >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             SetDoneButtonBounds(&mDoneButton, mDoneButtonInstance, 0);
             mDoneButton.mDisabled = false;
@@ -259,7 +297,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
     if (!mButtonsInitialized)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;
         }
@@ -268,7 +306,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
         mButtonsInitialized = true;
         for (int pad = 0; pad < 4; ++pad)
         {
-            TLComponentInstance* controller = gFEPointerInstances[pad];
+            TLComponentInstance* controller = GetPointerInstance(pad);
             int index = GetOnlinePlayerIndex(pad);
             if (index == -1)
             {
@@ -297,20 +335,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
     }
     if (disconnected)
     {
-        g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
-        SHNavigation* object = GetNavigationScene();
-        if (object != 0)
-        {
-            object->mTimer->m_bVisible = false;
-        }
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
-        {
-            FEPopupMenu* popup = static_cast<FEPopupMenu*>(
-                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
-            popup->Create((ePopupMenu)0x60,
-                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDisconnectPopupClosed), this)));
-            mDisconnectPopupActive = true;
-        }
+        ShowDisconnectedError();
         return;
     }
 
@@ -336,7 +361,12 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
                         ++away;
                     }
                 }
-                mPlayerSides[i] = home > away ? 1 : 0;
+                int side = 0;
+                if (home > away)
+                {
+                    side = 1;
+                }
+                mPlayerSides[i] = side;
             }
         }
         OnDonePointerPress(0, (void*)2);
@@ -345,7 +375,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
 
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* controller = gFEPointerInstances[pad];
+        TLComponentInstance* controller = GetPointerInstance(pad);
         int index = GetOnlinePlayerIndex(pad);
         if (index == -1)
         {
@@ -367,20 +397,8 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
         if (mPlayerSides[index] != -1 && !g_pFEInput->IsConnected((eFEINPUT_PAD)pad))
         {
             GetOnlinePlayerIndex(pad);
-            mPointerInsideCounts[pad] = 0;
-            NetMessageSidesChanged message;
-            message.mMachineIndex = mDraftMessage.mMachineIndex;
-            message.mSide = -1;
-            message.mAccepted = 0;
-            if (HasOnlineTwoLocalPlayers())
-            {
-                message.mGuest = pad == gOnlineLocalControllerIndices[1];
-            }
-            else
-            {
-                message.mGuest = 0;
-            }
-            g_pNetworkSession->SendSidesChangedToHost(&message);
+            mPointerInsideCounts[(unsigned int)pad] = 0;
+            SendDisconnectedSideChange(pad);
         }
         if (mPlayerSides[index] == -1)
         {
@@ -443,15 +461,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerEnter(unsigned int index, void* co
     }
     if (value == -1)
     {
-        int count = 0;
-        GetOnlinePlayerIndex(index);
-        for (int i = 0; i < mPlayerCount; ++i)
-        {
-            if ((int)context == mPlayerSides[i])
-            {
-                ++count;
-            }
-        }
+        int count = CountSidePlayers(index, (int)context);
         if (count >= mPlayerCount - 1)
         {
             return;
@@ -492,15 +502,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* c
         {
             return;
         }
-        int count = 0;
-        GetOnlinePlayerIndex(index);
-        for (int i = 0; i < mPlayerCount; ++i)
-        {
-            if ((int)context == mPlayerSides[i])
-            {
-                ++count;
-            }
-        }
+        int count = CountSidePlayers(index, (int)context);
         if (count < mPlayerCount - 1)
         {
             OnSidePointerEnter(index, context);
@@ -508,15 +510,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* c
     }
     else if (mSideButtons[(int)context].GetPointerState(index) == 1 && mPlayerSides[slot] == -1)
     {
-        int count = 0;
-        GetOnlinePlayerIndex(index);
-        for (int i = 0; i < mPlayerCount; ++i)
-        {
-            if ((int)context == mPlayerSides[i])
-            {
-                ++count;
-            }
-        }
+        int count = CountSidePlayers(index, (int)context);
         if (count >= mPlayerCount - 1)
         {
             if (!mSideButtons[(int)context].HasOtherPointerState(1, index))
@@ -538,15 +532,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerPress(unsigned int index, void* co
     }
     if (mPlayerSides[slot] == -1)
     {
-        int count = 0;
-        GetOnlinePlayerIndex(index);
-        for (int i = 0; i < mPlayerCount; ++i)
-        {
-            if ((int)context == mPlayerSides[i])
-            {
-                ++count;
-            }
-        }
+        int count = CountSidePlayers(index, (int)context);
         if (count >= mPlayerCount - 1)
         {
             return;
@@ -738,15 +724,7 @@ void SHOnlineFriendsChooseSides::OnSidesChanged(NetMessageSidesChanged* message)
         int side = (s8)message->mSide;
         if (side != -1)
         {
-            int count = 0;
-            GetOnlinePlayerIndex(index);
-            for (int i = 0; i < mPlayerCount; ++i)
-            {
-                if (side == mPlayerSides[i])
-                {
-                    ++count;
-                }
-            }
+            int count = CountSidePlayers(index, side);
             if (count >= mPlayerCount - 1)
             {
                 return;

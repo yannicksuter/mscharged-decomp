@@ -119,7 +119,7 @@ void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value)
         TweakEntry* folder = entry->UnidentifiedVirtual18();
         for (TweakNode* child = folder->m_ChildHead; child != 0;)
         {
-            TweakNode* next = child->m_Next;
+            TweakNode* next = child->GetNext();
             if (value == child->m_Value)
             {
                 delete child;
@@ -135,9 +135,10 @@ void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value)
 
 void ClearTweakChildren(TweakEntry* entry)
 {
+    TweakNode* next;
     for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
-        TweakNode* next = child->m_Next;
+        next = child->GetNext();
         if (child->UnidentifiedVirtual0C())
         {
             ClearTweakChildren(child->UnidentifiedVirtual18());
@@ -153,7 +154,7 @@ void RemoveDynamicTweakChildren(TweakEntry* entry)
     TweakNode* next;
     for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
-        next = child->m_Next;
+        next = child->GetNext();
         if (child->m_State == 2)
         {
             delete child;

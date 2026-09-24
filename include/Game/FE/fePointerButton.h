@@ -8,6 +8,7 @@ class FEPointerButton : public FEPointerRegion
 public:
     FEPointerButton();
     FEPointerButton(void* context);
+    virtual ~FEPointerButton() { }
 
     bool HasOtherPointerState(int value, unsigned int which) const;
     int GetPointerState(int which)

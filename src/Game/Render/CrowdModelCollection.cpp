@@ -105,20 +105,18 @@ void CrowdModelCollection::BeginNextModelLoad()
             = new (8, false) cInventory<cSHierarchy>;
     }
 
-    CrowdCharacterDefinition& definition
-        = mDefinitions[mLoadIndex];
-
     mTextureBundleData = 0;
     mTextureBundleSize = 0;
     if (sLoadCrowdModelsSynchronously)
     {
         glLoadTextureBundle(
-            definition.mTextureBundleFile, glGetCurrentResourcePool());
+            mDefinitions[mLoadIndex].mTextureBundleFile, glGetCurrentResourcePool());
         mTextureBundleData = (void*)-1;
     }
     else
     {
-        glBeginLoadTextureBundle(definition.mTextureBundleFile, TextureBundleLoadCallback,
+        glBeginLoadTextureBundle(
+            mDefinitions[mLoadIndex].mTextureBundleFile, TextureBundleLoadCallback,
             this, glGetCurrentResourcePool());
     }
 
@@ -129,28 +127,28 @@ void CrowdModelCollection::BeginNextModelLoad()
     {
         unsigned long numModels;
         unsigned int* models = (unsigned int*)glLoadModel(
-            definition.mModelFile, &numModels, glGetCurrentResourcePool());
+            mDefinitions[mLoadIndex].mModelFile, &numModels, glGetCurrentResourcePool());
         mModelHash = *models;
     }
     else
     {
-        glBeginLoadModel(definition.mModelFile, ModelLoadCallback,
+        glBeginLoadModel(mDefinitions[mLoadIndex].mModelFile, ModelLoadCallback,
             this, glGetCurrentResourcePool());
     }
 
     mHierarchyData = 0;
     mHierarchySize = 0;
-    CurrentAllocator = &StandardAllocator;
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
+    CurrentAllocator = &StandardAllocator;
     if (sLoadCrowdModelsSynchronously)
     {
         mHierarchyData = nlLoadEntireFile(
-            definition.mHierarchyFile, &mHierarchySize,
+            mDefinitions[mLoadIndex].mHierarchyFile, &mHierarchySize,
             0x20, AllocateStart, 0, 0, 0);
     }
     else
     {
-        nlLoadEntireFileAsync(definition.mHierarchyFile, HierarchyLoadCallback,
+        nlLoadEntireFileAsync(mDefinitions[mLoadIndex].mHierarchyFile, HierarchyLoadCallback,
             this, 0x20, AllocateStart, 0, 0, 0);
     }
 
@@ -160,7 +158,7 @@ void CrowdModelCollection::BeginNextModelLoad()
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
     mCurrentAnimationInventory = 0;
 
-    const char* path = definition.mAnimationFile;
+    const char* path = mDefinitions[mLoadIndex].mAnimationFile;
     if (sLoadCrowdModelsSynchronously)
     {
         if (strstr(path, sCrowdAnimationCompressionExtension) == 0)

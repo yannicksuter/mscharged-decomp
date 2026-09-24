@@ -134,22 +134,16 @@ public:
             case FT_FLOAT:
                 bEqual = nlAbs(mData.f - other.mData.f) < 0.000001f;
                 break;
+            case FT_POINTER:
+                bEqual = mData.pointer == other.mData.pointer;
+                break;
             case FT_VECTOR:
                 bEqual = nlNear(other.mData.vector.x, mData.vector.x)
                       && nlNear(other.mData.vector.y, mData.vector.y)
                       && nlNear(other.mData.vector.z, mData.vector.z);
                 break;
-            case FT_POINTER:
-                bEqual = mData.pointer == other.mData.pointer;
-                break;
             case FT_STRING:
                 bEqual = nlStrCmp(mData.string, other.mData.string) == 0;
-                break;
-            case FT_PLAYER:
-            case FT_TEAM:
-            case FT_GAME:
-            case FT_BALL:
-                bEqual = mData.pointer == other.mData.pointer;
                 break;
             }
         }

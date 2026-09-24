@@ -146,6 +146,7 @@ public:
 };
 
 extern cTeam* g_pTeams[];
+extern cTeam* g_pCurrentlyUpdatingTeam;
 
 class SkillTweaks;
 SkillTweaks* fn_800A636C(cTeam* pTeam);

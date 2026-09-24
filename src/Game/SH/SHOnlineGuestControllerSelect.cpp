@@ -13,6 +13,7 @@
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"

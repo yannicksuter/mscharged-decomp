@@ -7,6 +7,7 @@
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/FEAudio.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/FE/feBackButton.h"
 #include "Game/FE/feInput.h"

@@ -42,6 +42,21 @@ public:
     void fn_801C88B4(unsigned int index, void* context);
     void fn_801C8960(unsigned int index, void* context);
     ePopupMenu fn_801CA644() const { return mType; }
+
+    // Never called. R4QE01 keeps the implicit nlColour copy-assignment that
+    // SceneCreated calls out of line in the position of an already-synthesized
+    // member: at its call slot in SceneCreated's header drain, right behind
+    // TLInstance::SetVisible (0x801CA618). Under GC/3.0a5 -sym on an implicit
+    // member drains there only when some body parsed before SceneCreated
+    // already assigned an nlColour; no header this unit includes does, and the
+    // linker kept no trace of the body that did. This inline reproduces that
+    // parse-time synthesis and emits nothing itself. Still unidentified, hence
+    // the name: the original setter's spelling, signature and callers.
+    // Registered as an accepted exception in the workspace final review.
+    void UnidentifiedSetHighlightedOptionColour(const nlColour& colour)
+    {
+        mHighlightedOptionColour = colour;
+    }
     void SetBackButtonCallback(_FEPopupMenuCB callback);
 
     void Create(ePopupMenu type)

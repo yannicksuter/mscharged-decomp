@@ -7,107 +7,7 @@
 #include "NL/nlTicker.h"
 #include "NL/nlPrint.h"
 
-
 extern UnidentifiedVariant_80054AB8 lbl_80584250;
-
-class UnidentifiedTimerCountdown
-{
-public:
-    UnidentifiedTimerCountdown(float dt)
-        : mDeltaTime(dt)
-    {
-    }
-
-    void fn_8030F9A4(const unsigned long&, Timer* timer)
-    {
-        timer->Countdown(mDeltaTime, 0.0f);
-    }
-
-    float mDeltaTime;
-};
-
-float fn_8030F5DC()
-{
-    return nlTicksToMilliseconds(nlGetTicker());
-}
-
-UnidentifiedFielderInput::~UnidentifiedFielderInput()
-{
-}
-
-void UnidentifiedFielderInput::fn_8030F74C(
-    bool deleteOwner, bool deleteController)
-{
-    if (deleteController && mUnidentified18 != 0)
-    {
-        mUnidentified18->UnidentifiedVirtual4(true);
-        delete mUnidentified18;
-        mUnidentified18 = 0;
-    }
-
-    if (deleteOwner)
-    {
-        delete mUnidentified14;
-        mUnidentified14 = 0;
-    }
-}
-
-void UnidentifiedFielderInput::fn_8030F800(
-    bool updateController, float dt)
-{
-    UnidentifiedTimerCountdown callback(dt);
-    mTimers.Walk(&callback, &UnidentifiedTimerCountdown::fn_8030F9A4);
-
-    if (updateController && mUnidentified18 != 0)
-    {
-        mUnidentified18->UnidentifiedVirtual3(dt);
-    }
-}
-
-unsigned long UnidentifiedFielderInput::fn_8030F9B4(
-    unsigned long key, unsigned long concurrent) const
-{
-    return concurrent * key;
-}
-
-Timer* UnidentifiedFielderInput::fn_8030F9BC(unsigned long key)
-{
-    Timer* timer = 0;
-    mTimers.FindGet(key, &timer);
-    return timer;
-}
-
-Timer* UnidentifiedFielderInput::fn_8030FA10(
-    unsigned long key, float seconds)
-{
-    Timer* timer = fn_8030F9BC(key);
-    if (timer == 0)
-    {
-        Timer newTimer;
-        mTimers.Add(key, newTimer);
-        timer = fn_8030F9BC(key);
-    }
-
-    if (seconds == 0.0f)
-    {
-        timer->m_unk0 = timer->m_uPackedTime != 0;
-        timer->m_uPackedTime = 0;
-    }
-    else
-    {
-        float jitter = nlMinEquals(0.185f * seconds, 0.1f);
-        timer->SetSeconds(
-            seconds + (2.0f * jitter * nlRandomf(1.0f) - jitter));
-    }
-
-    return timer;
-}
-
-bool UnidentifiedFielderInput::fn_8030FB7C(unsigned long key)
-{
-    Timer* timer = fn_8030F9BC(key);
-    return timer != 0 && timer->m_uPackedTime != 0;
-}
 
 static inline float UnidentifiedGetExtraFloat(
     UnidentifiedVariant_80054AB8* pAction, int index,
@@ -308,27 +208,27 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310B80(
         = m_lQueuedActions.m_pStart;
     while (pAction != 0)
     {
-        bool bEqual = *(const Variant*)pAction == *(const Variant*)pFind;
-        if (bEqual)
+        if (*pAction == *pFind)
         {
+            bool bEqual = true;
             for (int i = 0; i < 19; ++i)
             {
-                if (i == 4 || i == 6)
+                if (i == 6 || i == 4)
                 {
                     continue;
                 }
-                bEqual = *pAction->ExtraData.Get(i)
-                      == *pFind->ExtraData.Get(i);
-                if (!bEqual)
+                if (!(*pAction->ExtraData.Get(i)
+                      == *pFind->ExtraData.Get(i)))
                 {
+                    bEqual = false;
                     break;
                 }
             }
-        }
 
-        if (bEqual)
-        {
-            return pAction;
+            if (bEqual)
+            {
+                return pAction;
+            }
         }
         pAction = pAction->next;
     }
@@ -337,6 +237,8 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310B80(
 
 UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
 {
+    UnidentifiedVariant_80054AB8* pSelectedAction;
+    int count;
     UnidentifiedVariant_80054AB8* pAction
         = m_lQueuedActions.m_pStart;
     if (pAction == 0)
@@ -344,60 +246,15 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
         return &lbl_80584250;
     }
 
-    UnidentifiedVariant_80054AB8* pSelectedAction = 0;
+    pSelectedAction = 0;
     switch (mActionSelection)
     {
-    case 0:
-        pSelectedAction = pAction;
-        break;
-
-    case 1:
-    {
-        int index = 0;
-        for (; pAction != 0; pAction = pAction->next, ++index)
-        {
-            float chance = UnidentifiedGetExtraFloat(pAction, 6, 1.0f);
-            if (m_pSelectionWeights != 0)
-            {
-                int weightIndex = index;
-                if (weightIndex >= mNumSelectionWeights)
-                {
-                    weightIndex = mNumSelectionWeights - 1;
-                }
-                chance *= m_pSelectionWeights[weightIndex];
-            }
-
-            if (chance == 1.0f || nlRandomf(1.0f) <= chance)
-            {
-                pSelectedAction = pAction;
-                break;
-            }
-        }
-
-        if (pSelectedAction == 0)
-        {
-            for (UnidentifiedVariant_80054AB8* pBest
-                     = m_lQueuedActions.m_pStart;
-                 pBest != 0; pBest = pBest->next)
-            {
-                if (pSelectedAction == 0
-                    || UnidentifiedGetExtraFloat(pBest, 6, 1.0f)
-                           > UnidentifiedGetExtraFloat(
-                               pSelectedAction, 6, 1.0f))
-                {
-                    pSelectedAction = pBest;
-                }
-            }
-        }
-        break;
-    }
-
     case 2:
     {
-        float chances[16];
         UnidentifiedVariant_80054AB8* actions[16];
+        float chances[16];
         float total = 0.0f;
-        int count = 0;
+        count = 0;
 
         for (; pAction != 0; pAction = pAction->next, ++count)
         {
@@ -405,18 +262,15 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
             float weight = 1.0f;
             if (m_pSelectionWeights != 0)
             {
-                int weightIndex = count;
-                if (weightIndex >= mNumSelectionWeights)
-                {
-                    weightIndex = mNumSelectionWeights - 1;
-                }
+                int weightIndex = nlMin(mNumSelectionWeights - 1, count);
                 weight = m_pSelectionWeights[weightIndex];
             }
 
             float chance = UnidentifiedGetExtraFloat(pAction, 6, 1.0f);
+            chance = weight * chance;
             float confidence = UnidentifiedGetExtraFloat(
                 pAction, 4, 0.0f);
-            chances[count] = weight * chance * confidence;
+            chances[count] = chance * confidence;
             total += chances[count];
         }
 
@@ -440,6 +294,48 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
             {
                 pSelectedAction = actions[i];
                 break;
+            }
+        }
+        break;
+    }
+
+    case 0:
+        pSelectedAction = pAction;
+        break;
+
+    case 1:
+    {
+        int index = 0;
+        for (; pAction != 0; pAction = pAction->next, ++index)
+        {
+            float chance = UnidentifiedGetExtraFloat(pAction, 6, 1.0f);
+            if (m_pSelectionWeights != 0)
+            {
+                int weightIndex = nlMin(mNumSelectionWeights - 1, index);
+                chance *= m_pSelectionWeights[weightIndex];
+            }
+
+            bool selected = chance == 1.0f ? true : nlRandomf(1.0f) <= chance;
+            if (selected)
+            {
+                pSelectedAction = pAction;
+                break;
+            }
+        }
+
+        if (pSelectedAction == 0)
+        {
+            for (UnidentifiedVariant_80054AB8* pBest
+                     = m_lQueuedActions.m_pStart;
+                 pBest != 0; pBest = pBest->next)
+            {
+                if (pSelectedAction == 0
+                    || UnidentifiedGetExtraFloat(pBest, 6, 1.0f)
+                           > UnidentifiedGetExtraFloat(
+                               pSelectedAction, 6, 1.0f))
+                {
+                    pSelectedAction = pBest;
+                }
             }
         }
         break;

@@ -1818,13 +1818,15 @@ inline float ClampMax(float speedRatio, const float max);
 void cCharacter::MatchAnimSpeedToCharacterSpeed(unsigned int nParam,
     cPN_SAnimController* pController)
 {
-    cFielder* fielder = (cFielder*)nParam;
-    if (fielder->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM
-        && fielder->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM_SEEK)
+    cCharacter* pChar = (cCharacter*)nParam;
+    if (pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM
+        && pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM_SEEK)
     {
+        float min = 0.6f;
+        float max = 1.4f;
         pController->m_fPlaybackSpeedScale = ClampMax(ClampMin(
-            fielder->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->m_fLinearSpeed,
-            0.6f), 1.4f);
+            pChar->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->m_fLinearSpeed,
+            min), max);
     }
 }
 

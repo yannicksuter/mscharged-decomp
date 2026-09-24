@@ -70,27 +70,27 @@ void FEPointerListener::ProcessPointerEvent(const FEPointerEvent* event)
     mPreviousEvents[event->mIndex] = *event;
 }
 
-void FEPointerListener::SetPointerEnterCallback(const Callback& callback)
+void FEPointerListener::SetPointerEnterCallback(Callback& callback)
 {
     mEnterCallback = callback;
 }
 
-void FEPointerListener::SetPointerLeaveCallback(const Callback& callback)
+void FEPointerListener::SetPointerLeaveCallback(Callback& callback)
 {
     mLeaveCallback = callback;
 }
 
-void FEPointerListener::SetPointerInsideCallback(const Callback& callback)
+void FEPointerListener::SetPointerInsideCallback(Callback& callback)
 {
     mInsideCallback = callback;
 }
 
-void FEPointerListener::SetPointerPressCallback(const Callback& callback)
+void FEPointerListener::SetPointerPressCallback(Callback& callback)
 {
     mPressCallback = callback;
 }
 
-void FEPointerListener::SetPointerReleaseCallback(const Callback& callback)
+void FEPointerListener::SetPointerReleaseCallback(Callback& callback)
 {
     mReleaseCallback = callback;
 }

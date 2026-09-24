@@ -11,7 +11,6 @@
 
 class AudioEffectBase;
 class UnidentifiedAudioTransitionState;
-class UnidentifiedAudioEffectSetState;
 
 // Callback used when an effect is first created for a binding. The middle
 // field is left uninitialised by the construction retail emits.
@@ -122,6 +121,8 @@ struct UnidentifiedAudioScriptEntry
 
 struct UnidentifiedAudioScriptList
 {
+    bool UnidentifiedContains(const u32& key) const;
+
     u16 mCount;
     u16 mUnidentified02;
     u32* mValues;
@@ -163,7 +164,7 @@ public:
     void Unidentified6BC4();
     void Unidentified6DF8(const u32&, AudioEffectBinding*);
     bool Unidentified6E00(void* data, unsigned int size);
-    int Unidentified6E98(u32 hash, UnidentifiedAudioEffectSetState* value);
+    int Unidentified6E98(u32 hash, int value);
     void Unidentified6F00(u32 hash, u32 instance);
     bool Unidentified77C8(u32 instance);
     void Unidentified78C0(float deltaTime);
@@ -180,7 +181,7 @@ public:
         DefaultKeyCompare<u32> > mBindings;
     /* 0x30 */ nlAVLTreeSlotPool<u32, UnidentifiedAudioTransitionState*,
         DefaultKeyCompare<u32> > mTransitions;
-    /* 0x54 */ nlAVLTreeSlotPool<u32, UnidentifiedAudioEffectSetState*,
+    /* 0x54 */ nlAVLTreeSlotPool<u32, int,
         DefaultKeyCompare<u32> > mEffectSets;
     /* 0x78 */ UnidentifiedAudioInterpreter mInterpreter;
 }; // size: 0xA0

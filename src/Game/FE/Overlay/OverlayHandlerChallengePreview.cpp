@@ -1,6 +1,8 @@
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/Overlay/OverlayHandlerChallengePreview.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/DB/GameProgress.inl"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feDPD.h"
@@ -44,24 +46,6 @@ ChallengePreviewOverlay::ChallengePreviewOverlay(ScreenMovement movement)
 
 ChallengePreviewOverlay::~ChallengePreviewOverlay()
 {
-}
-
-inline void ChallengePreviewOverlay::InitializeContinueButton()
-{
-    typedef Detail::MemFunImpl<void, void (ChallengePreviewOverlay::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, ChallengePreviewOverlay*, Placeholder<0>, Placeholder<1> > PointerBinding;
-    FEPointerListener::Callback over(PointerBinding(
-        MemFun(&ChallengePreviewOverlay::OnContinuePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(PointerBinding(
-        MemFun(&ChallengePreviewOverlay::OnContinuePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(PointerBinding(
-        MemFun(&ChallengePreviewOverlay::OnContinuePointerPress), this, Placeholder<0>(), Placeholder<1>()));
-
-    mContinueButton.SetInstanceBounds(
-        mContinueButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
-    mContinueButton.SetPointerEnterCallback(over);
-    mContinueButton.SetPointerLeaveCallback(off);
-    mContinueButton.SetPointerPressCallback(down);
 }
 
 void ChallengePreviewOverlay::Update(float fDeltaT)
@@ -240,7 +224,24 @@ void ChallengePreviewOverlay::OnContinuePointerPress(int index, void*)
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
 }
 
-#include "NL/nlFunction.inl"
-#include "Game/FE/feFinder_impl.h"
-#include "Game/DB/GameProgress.inl"
 #include "Game/HBMManager.inl"
+
+inline void ChallengePreviewOverlay::InitializeContinueButton()
+{
+    typedef Detail::MemFunImpl<void, void (ChallengePreviewOverlay::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, ChallengePreviewOverlay*, Placeholder<0>, Placeholder<1> > PointerBinding;
+    FEPointerListener::Callback over(PointerBinding(
+        MemFun(&ChallengePreviewOverlay::OnContinuePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(
+        MemFun(&ChallengePreviewOverlay::OnContinuePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(
+        MemFun(&ChallengePreviewOverlay::OnContinuePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+
+    mContinueButton.SetInstanceBounds(
+        mContinueButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
+    mContinueButton.SetPointerEnterCallback(over);
+    mContinueButton.SetPointerLeaveCallback(off);
+    mContinueButton.SetPointerPressCallback(down);
+}
+
+#include "NL/nlFunction.inl"

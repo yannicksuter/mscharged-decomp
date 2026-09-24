@@ -13,12 +13,15 @@ UnidentifiedVariantCollection::UnidentifiedVariantCollection()
 
 UnidentifiedVariantCollection::~UnidentifiedVariantCollection()
 {
-    for (int i = 0; i < 19; i++)
+    int i;
+    UnidentifiedFuzzyVariantData** slot = mData;
+    for (i = 0; i < 19; i++, slot++)
     {
-        if (mData[i] != 0)
+        UnidentifiedFuzzyVariantData* entry = *slot;
+        if (entry != 0)
         {
-            delete mData[i];
-            mData[i] = 0;
+            delete entry;
+            *slot = 0;
         }
     }
 }
@@ -51,7 +54,7 @@ bool UnidentifiedVariantCollection::IsSet(int index) const
     return index > -1 && index < 19 && mData[index] != 0;
 }
 
-Variant* UnidentifiedVariantCollection::Get(int index)
+FuzzyVariant* UnidentifiedVariantCollection::Get(int index)
 {
     if (IsSet(index))
     {

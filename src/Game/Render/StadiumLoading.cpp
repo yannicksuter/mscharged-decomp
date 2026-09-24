@@ -653,30 +653,21 @@ bool ShouldLoadStadiumModel(const StadiumModelEntry* entry)
 {
     GameInfoManager* pInfo = GameInfoManager::Instance();
 
-    for (short side = 0; side < 2; side++)
+    for (int side = 0; side < 2; side++)
     {
         if (entry->mCaptain != -1
-            && entry->mCaptain == pInfo->GetCurrentGameInfo()->mTeamIndex[side])
+            && entry->mCaptain == pInfo->GetCurrentGameInfo()->GetTeam((short)side))
         {
             return true;
         }
-        if (entry->mSidekick != -1
-            && entry->mSidekick
-                == pInfo->GetCurrentGameInfo()->mSidekickIndex[side][0])
+        for (int slot = 0; slot < 3; ++slot)
         {
-            return true;
-        }
-        if (entry->mSidekick != -1
-            && entry->mSidekick
-                == pInfo->GetCurrentGameInfo()->mSidekickIndex[side][1])
-        {
-            return true;
-        }
-        if (entry->mSidekick != -1
-            && entry->mSidekick
-                == pInfo->GetCurrentGameInfo()->mSidekickIndex[side][2])
-        {
-            return true;
+            if (entry->mSidekick != -1
+                && entry->mSidekick
+                    == pInfo->GetCurrentGameInfo()->GetSidekick((short)side, slot))
+            {
+                return true;
+            }
         }
     }
 

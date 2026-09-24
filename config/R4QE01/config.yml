@@ -89,6 +89,12 @@ block_relocations:
   - { source: 0x803410BC }
   - { source: 0x803410CC }
   - { source: 0x803410EC }
+  # AudioBundleManager::ParseChunk compares chunk IDs that overlap .text.
+  - { source: 0x802EDC3C }
+  - { source: 0x802EDC44 }
+  - { source: 0x802EDC64 }
+  - { source: 0x802EDC74 }
+  - { source: 0x802EDC84 }
   # OSInit's MEM1 arena-lo default is the constant 0x80004000 (donor-supported
   # source spelling); it is not a reference to the .init routine at that address
   - { source: 0x803B354C }

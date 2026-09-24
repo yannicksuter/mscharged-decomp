@@ -83,6 +83,19 @@ public:
         return entry;
     }
 
+    ListEntry<T>* Allocate()
+    {
+        ListEntry<T> localEntry;
+        ListEntry<T>* entry;
+        m_Allocator.AllocateForReturn(entry);
+        if (entry != NULL)
+        {
+            entry->next = localEntry.next;
+            entry->entry = localEntry.entry;
+        }
+        return entry;
+    }
+
     void AddEntry(const T& value)
     {
         ListEntry<T> local(value);

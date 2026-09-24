@@ -83,13 +83,18 @@ float Terrain::GetRestitution(float value)
         gGameTweaks.mTerrainTweaks->mfField_Bounce);
 }
 
+inline void Terrain::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
+{
+    *type = cache->BeginType("FieldTerrain");
+    cache->AddField(14, gDebugFieldTypes[14].size, 0, "meTerrain");
+    cache->EndType();
+}
+
 void Terrain::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sFieldTerrainType == 0xFFFF)
     {
-        sFieldTerrainType = cache->BeginType("FieldTerrain");
-        cache->AddField(14, gDebugFieldTypes[14].size, 0, "meTerrain");
-        cache->EndType();
+        RegisterDebugFields(&sFieldTerrainType, cache);
     }
 
     cache->ChecksumData(sFieldTerrainType, &mIndex, context);
@@ -97,3 +102,5 @@ void Terrain::SyncLog(void* context, DebugWriteCache* cache)
 }
 
 #include "Game/UnidentifiedStaticStorage.h"
+
+#include "Game/TerrainTweakValue.inl"

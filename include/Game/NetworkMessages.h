@@ -221,6 +221,12 @@ public:
 class NetMessagePauseResponse : public NetworkMessage
 {
 public:
+    NetMessagePauseResponse() { }
+    NetMessagePauseResponse(u8 machineMask)
+        : mMachineMask(machineMask)
+    {
+    }
+
     virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessagePauseResponse() { }
     virtual int GetType();

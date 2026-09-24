@@ -61,6 +61,32 @@ struct LexicalCastImpl<BasicString<char, Allocator>, bool>
     static BasicString<char, Allocator> Do(bool t);
 };
 
+template <typename Allocator>
+inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, int>::Do(int t)
+{
+    char s[0x40];
+    nlSNPrintf(s, 0x40, "%i", t);
+    return BasicString<char, Allocator>(s);
+}
+
+template <typename Allocator>
+inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, float>::Do(float t)
+{
+    char s[0x40];
+    nlSNPrintf(s, 0x40, "%f", t);
+    return BasicString<char, Allocator>(s);
+}
+
+template <typename Allocator>
+inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, bool>::Do(bool t)
+{
+    if (t)
+    {
+        return BasicString<char, Allocator>("true");
+    }
+    return BasicString<char, Allocator>("false");
+}
+
 template <typename To>
 struct LexicalCastImpl<To, char>
 {
@@ -127,32 +153,26 @@ struct LexicalCastImpl<BasicString<unsigned short, Allocator>, int>
 };
 } // namespace Detail
 
-template <>
-inline WideBasicString Detail::LexicalCastImpl<WideBasicString, WideBasicString>::Do(
-    const WideBasicString& f)
+namespace Detail
 {
-    return f;
-}
+template <typename Allocator>
+struct LexicalCastImpl<BasicString<unsigned short, Allocator>, BasicString<unsigned short, Allocator> >
+{
+    static BasicString<unsigned short, Allocator> Do(const BasicString<unsigned short, Allocator>& f)
+    {
+        return f;
+    }
+};
 
-template <>
-inline WideBasicString Detail::LexicalCastImpl<WideBasicString, const unsigned short*>::Do(
-    const unsigned short* const& f)
+template <typename Allocator>
+struct LexicalCastImpl<BasicString<unsigned short, Allocator>, const unsigned short*>
 {
-    return WideBasicString(f);
-}
+    static BasicString<unsigned short, Allocator> Do(const unsigned short* const& f)
+    {
+        return BasicString<unsigned short, Allocator>(f);
+    }
+};
 
-template <>
-inline WideBasicString LexicalCast<WideBasicString, WideBasicString>(
-    const WideBasicString& from)
-{
-    return Detail::LexicalCastImpl<WideBasicString, WideBasicString>::Do(from);
-}
-
-template <>
-inline WideBasicString LexicalCast<WideBasicString, const unsigned short*>(
-    const unsigned short* const& from)
-{
-    return Detail::LexicalCastImpl<WideBasicString, const unsigned short*>::Do(from);
-}
+} // namespace Detail
 
 #endif // _NLLEXICALCAST_H_

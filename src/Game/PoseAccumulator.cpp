@@ -254,42 +254,43 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
     bool ScaleIdentityStack[32];
     nlVector3 ScaleStack[32];
     int nStackIndex = -1;
+    int nScaleIndex = 0;
 
     if (m_scale[0].bIdentity && fabsf(m_Scale - 1.0f) < 0.0001f)
     {
         ScaleIdentityStack[0] = true;
-        ScaleStack[0] = v3ScaleIdentity;
+        ScaleStack[0].x = 1.0f;
+        ScaleStack[0].y = 1.0f;
+        ScaleStack[0].z = 1.0f;
     }
     else
     {
         ScaleIdentityStack[0] = false;
-        ScaleStack[0].x = m_scale[0].s.x * m_Scale;
-        ScaleStack[0].y = m_scale[0].s.y * m_Scale;
-        ScaleStack[0].z = m_scale[0].s.z * m_Scale;
+        nlVec3Scale(ScaleStack[0], m_scale[0].s, m_Scale);
     }
 
     for (int i = 0; i < m_BaseSHierarchy->m_nNumNodes; ++i)
     {
+        nlMatrix4* pLocalMatrix = &m_NodeMatrices[i + 1];
         nlQuaternion* pLocalQuaternion = &m_pQuaternions[i + 1];
-        RotAccum& r = m_rot[i];
-        if (!r.bIdentity)
+        if (!m_rot[i].bIdentity)
         {
-            if (r.quatAccumulatedWeight == 0.0f)
+            if (m_rot[i].quatAccumulatedWeight == 0.0f)
             {
-                fn_802B549C(*pLocalQuaternion, r.rotAroundZ);
+                fn_802B549C(*pLocalQuaternion, m_rot[i].rotAroundZ);
             }
             else
             {
-                float fTotalWeight = r.rotAroundZAccumulatedWeight
-                    + r.quatAccumulatedWeight;
+                float fTotalWeight = m_rot[i].rotAroundZAccumulatedWeight
+                    + m_rot[i].quatAccumulatedWeight;
                 if (fabsf(fTotalWeight) > 0.0001f)
                 {
                     nlQuaternion quatAroundZ;
-                    fn_802B549C(quatAroundZ, r.rotAroundZ);
-                    nlQuatNLerp(r.q, r.q, quatAroundZ,
-                        r.rotAroundZAccumulatedWeight / fTotalWeight);
+                    fn_802B549C(quatAroundZ, m_rot[i].rotAroundZ);
+                    nlQuatNLerp(m_rot[i].q, m_rot[i].q, quatAroundZ,
+                        m_rot[i].rotAroundZAccumulatedWeight / fTotalWeight);
                 }
-                *pLocalQuaternion = r.q;
+                *pLocalQuaternion = m_rot[i].q;
             }
         }
         else
@@ -299,25 +300,32 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
             pLocalQuaternion->w = 1.0f;
         }
 
-        nlVector3 v3Position;
-        if (!m_trans[i].bIdentity)
+        TransAccum& t = m_trans[i];
+        if (!t.bIdentity)
         {
-            v3Position = m_trans[i].t;
+            pLocalMatrix->m41 = t.t.x;
+            pLocalMatrix->m42 = t.t.y;
+            pLocalMatrix->m43 = t.t.z;
+            pLocalMatrix->m44 = 1.0f;
         }
         else
         {
-            v3Position = v3TransIdentity;
+            pLocalMatrix->m41 = 0.0f;
+            pLocalMatrix->m42 = 0.0f;
+            pLocalMatrix->m43 = 0.0f;
+            pLocalMatrix->m44 = 1.0f;
         }
 
+        nlVector3 v3Position;
         int nParentIndex = -1;
-        int nScaleIndex = nStackIndex + 1;
         if (i > 0)
         {
             nParentIndex = ParentStack[nStackIndex];
+            nScaleIndex = nStackIndex + 1;
             nlMultQuat(m_pQuaternions[i], m_pQuaternions[nParentIndex],
                 *pLocalQuaternion);
-            nlMultPosVectorMatrix(
-                v3Position, v3Position, m_NodeMatrices[nParentIndex]);
+            nlMultPosVectorMatrix(v3Position, pLocalMatrix->GetTranslation(),
+                m_NodeMatrices[nParentIndex]);
 
             ScaleAccum& s = m_scale[i];
             if (s.bIdentity)
@@ -349,39 +357,48 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
         }
         else
         {
-            nlVector3 v3WorldScale;
-            v3WorldScale.x = nlSqrt(pWorldMatrix.m11 * pWorldMatrix.m11
-                    + pWorldMatrix.m12 * pWorldMatrix.m12
-                    + pWorldMatrix.m13 * pWorldMatrix.m13,
-                true);
-            v3WorldScale.y = nlSqrt(pWorldMatrix.m21 * pWorldMatrix.m21
-                    + pWorldMatrix.m22 * pWorldMatrix.m22
-                    + pWorldMatrix.m23 * pWorldMatrix.m23,
-                true);
-            v3WorldScale.z = nlSqrt(pWorldMatrix.m31 * pWorldMatrix.m31
-                    + pWorldMatrix.m32 * pWorldMatrix.m32
-                    + pWorldMatrix.m33 * pWorldMatrix.m33,
-                true);
-
             nlQuaternion qWorld;
-            if (v3WorldScale.x < 0.9999f || v3WorldScale.x > 1.0001f
-                || v3WorldScale.y < 0.9999f || v3WorldScale.y > 1.0001f
-                || v3WorldScale.z < 0.9999f || v3WorldScale.z > 1.0001f)
+            nlVector3 v3WorldScaleSquared;
+            v3WorldScaleSquared.x = pWorldMatrix.m11 * pWorldMatrix.m11
+                + pWorldMatrix.m12 * pWorldMatrix.m12
+                + pWorldMatrix.m13 * pWorldMatrix.m13;
+            v3WorldScaleSquared.y = pWorldMatrix.m21 * pWorldMatrix.m21
+                + pWorldMatrix.m22 * pWorldMatrix.m22
+                + pWorldMatrix.m23 * pWorldMatrix.m23;
+            v3WorldScaleSquared.z = pWorldMatrix.m31 * pWorldMatrix.m31
+                + pWorldMatrix.m32 * pWorldMatrix.m32
+                + pWorldMatrix.m33 * pWorldMatrix.m33;
+
+            if (v3WorldScaleSquared.x < 0.9999f || v3WorldScaleSquared.x > 1.0001f
+                || v3WorldScaleSquared.y < 0.9999f || v3WorldScaleSquared.y > 1.0001f
+                || v3WorldScaleSquared.z < 0.9999f || v3WorldScaleSquared.z > 1.0001f)
             {
-                nlMatrix4 mWorldNoScale = pWorldMatrix;
-                mWorldNoScale.m11 /= v3WorldScale.x;
-                mWorldNoScale.m12 /= v3WorldScale.x;
-                mWorldNoScale.m13 /= v3WorldScale.x;
-                mWorldNoScale.m21 /= v3WorldScale.y;
-                mWorldNoScale.m22 /= v3WorldScale.y;
-                mWorldNoScale.m23 /= v3WorldScale.y;
-                mWorldNoScale.m31 /= v3WorldScale.z;
-                mWorldNoScale.m32 /= v3WorldScale.z;
-                mWorldNoScale.m33 /= v3WorldScale.z;
+                float fWorldScaleX = nlSqrt(v3WorldScaleSquared.x, true);
+                float fWorldScaleY = nlSqrt(v3WorldScaleSquared.y, true);
+                float fWorldScaleZ = nlSqrt(v3WorldScaleSquared.z, true);
+
+                float fRightScale = 1.0f / fWorldScaleX;
+                float fForwardScale = 1.0f / fWorldScaleZ;
+                float rightX = fRightScale * pWorldMatrix.m11;
+                float rightY = fRightScale * pWorldMatrix.m12;
+                float rightZ = fRightScale * pWorldMatrix.m13;
+                float forwardX = fForwardScale * pWorldMatrix.m31;
+                float forwardY = fForwardScale * pWorldMatrix.m32;
+                float forwardZ = fForwardScale * pWorldMatrix.m33;
+                float upX = forwardY * rightZ - forwardZ * rightY;
+                float upY = -forwardX * rightZ + forwardZ * rightX;
+                float upZ = forwardX * rightY - forwardY * rightX;
+
+                nlMatrix4 mWorldNoScale;
+                mWorldNoScale.SetRow4_(0, rightX, rightY, rightZ, 0.0f);
+                mWorldNoScale.SetRow4_(2, forwardX, forwardY, forwardZ, 0.0f);
+                mWorldNoScale.SetRow4_(1, upX, upY, upZ, 0.0f);
+                mWorldNoScale.SetRow4_(3, pWorldMatrix.m41, pWorldMatrix.m42,
+                    pWorldMatrix.m43, 1.0f);
                 ScaleIdentityStack[0] = false;
-                ScaleStack[0].x *= v3WorldScale.x;
-                ScaleStack[0].y *= v3WorldScale.y;
-                ScaleStack[0].z *= v3WorldScale.z;
+                ScaleStack[0].x *= fWorldScaleX;
+                ScaleStack[0].y *= fWorldScaleY;
+                ScaleStack[0].z *= fWorldScaleZ;
                 nlMatrixToQuat(qWorld, mWorldNoScale);
             }
             else
@@ -389,15 +406,18 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
                 nlMatrixToQuat(qWorld, pWorldMatrix);
             }
             nlMultQuat(m_pQuaternions[i], qWorld, *pLocalQuaternion);
-            nlMultPosVectorMatrix(v3Position, v3Position, pWorldMatrix);
+            nlMultPosVectorMatrix(v3Position, pLocalMatrix->GetTranslation(),
+                pWorldMatrix);
         }
 
-        nlMatrix4& mNode = m_NodeMatrices[i];
-        nlQuatToMatrix(mNode, m_pQuaternions[i], false);
-        mNode.m41 = v3Position.x;
-        mNode.m42 = v3Position.y;
-        mNode.m43 = v3Position.z;
-        mNode.m44 = 1.0f;
+        nlQuatToMatrix(m_NodeMatrices[i], m_pQuaternions[i], false);
+        {
+            nlMatrix4& mNode = m_NodeMatrices[i];
+            mNode.m41 = v3Position.x;
+            mNode.m42 = v3Position.y;
+            mNode.m43 = v3Position.z;
+            mNode.m44 = 1.0f;
+        }
 
         int nPushPop = m_BaseSHierarchy->GetPushPop(i);
         nStackIndex += nPushPop;
@@ -408,15 +428,10 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
 
         if (!ScaleIdentityStack[nScaleIndex])
         {
-            mNode.m11 *= ScaleStack[nScaleIndex].x;
-            mNode.m12 *= ScaleStack[nScaleIndex].x;
-            mNode.m13 *= ScaleStack[nScaleIndex].x;
-            mNode.m21 *= ScaleStack[nScaleIndex].y;
-            mNode.m22 *= ScaleStack[nScaleIndex].y;
-            mNode.m23 *= ScaleStack[nScaleIndex].y;
-            mNode.m31 *= ScaleStack[nScaleIndex].z;
-            mNode.m32 *= ScaleStack[nScaleIndex].z;
-            mNode.m33 *= ScaleStack[nScaleIndex].z;
+            nlMatrix4& mNode = m_NodeMatrices[i];
+            nlVec3Scale(*(nlVector3*)&mNode.e2[0][0], ScaleStack[nScaleIndex].x);
+            nlVec3Scale(*(nlVector3*)&mNode.e2[1][0], ScaleStack[nScaleIndex].y);
+            nlVec3Scale(*(nlVector3*)&mNode.e2[2][0], ScaleStack[nScaleIndex].z);
         }
 
         cBuildNodeMatrixCallbackInfo* pCallback = &m_cb[i];
@@ -443,12 +458,8 @@ extern "C" void fn_8030B9C8(
     else
     {
         ScaleIdentityStack[0] = false;
-        ScaleStack[0].x
-            = pAccumulator->m_scale[0].s.x * pAccumulator->m_Scale;
-        ScaleStack[0].y
-            = pAccumulator->m_scale[0].s.y * pAccumulator->m_Scale;
-        ScaleStack[0].z
-            = pAccumulator->m_scale[0].s.z * pAccumulator->m_Scale;
+        nlVec3Scale(ScaleStack[0], pAccumulator->m_scale[0].s,
+            pAccumulator->m_Scale);
     }
 
     for (int i = 0; i < pAccumulator->m_BaseSHierarchy->m_nNumNodes; ++i)
@@ -460,46 +471,49 @@ extern "C" void fn_8030B9C8(
         }
         else
         {
-            v3Position = v3TransIdentity;
+            v3Position.x = 0.0f;
+            v3Position.y = 0.0f;
+            v3Position.z = 0.0f;
         }
 
         if (i > 0)
         {
+            int nPreviousScaleIndex = nStackIndex - 1;
             ScaleAccum& s = pAccumulator->m_scale[i];
             if (s.bIdentity)
             {
                 ScaleIdentityStack[nStackIndex]
-                    = ScaleIdentityStack[nStackIndex - 1];
-                if (!ScaleIdentityStack[nStackIndex - 1])
+                    = ScaleIdentityStack[nPreviousScaleIndex];
+                if (!ScaleIdentityStack[nPreviousScaleIndex])
                 {
-                    ScaleStack[nStackIndex] = ScaleStack[nStackIndex - 1];
+                    ScaleStack[nStackIndex] = ScaleStack[nPreviousScaleIndex];
                 }
             }
             else
             {
                 ScaleIdentityStack[nStackIndex] = false;
-                if (ScaleIdentityStack[nStackIndex - 1])
+                if (ScaleIdentityStack[nPreviousScaleIndex])
                 {
                     ScaleStack[nStackIndex] = s.s;
                 }
                 else
                 {
                     ScaleStack[nStackIndex].x
-                        = ScaleStack[nStackIndex - 1].x * s.s.x;
+                        = ScaleStack[nPreviousScaleIndex].x * s.s.x;
                     ScaleStack[nStackIndex].y
-                        = ScaleStack[nStackIndex - 1].y * s.s.y;
+                        = ScaleStack[nPreviousScaleIndex].y * s.s.y;
                     ScaleStack[nStackIndex].z
-                        = ScaleStack[nStackIndex - 1].z * s.s.z;
+                        = ScaleStack[nPreviousScaleIndex].z * s.s.z;
                 }
             }
 
             int nParentIndex = pAccumulator->m_BaseSHierarchy->GetParent(i);
-            nlMultPosVectorMatrix(v3Position, v3Position,
-                pAccumulator->m_NodeMatrices[nParentIndex]);
+            nlMultPosVectorMatrix(
+                v3Position, pAccumulator->m_NodeMatrices[nParentIndex]);
         }
         else
         {
-            nlMultPosVectorMatrix(v3Position, v3Position, *pWorldMatrix);
+            nlMultPosVectorMatrix(v3Position, *pWorldMatrix);
         }
 
         nlMatrix4& mNode = pAccumulator->m_NodeMatrices[i];
@@ -511,15 +525,9 @@ extern "C" void fn_8030B9C8(
 
         if (!ScaleIdentityStack[nStackIndex])
         {
-            mNode.m11 *= ScaleStack[nStackIndex].x;
-            mNode.m12 *= ScaleStack[nStackIndex].x;
-            mNode.m13 *= ScaleStack[nStackIndex].x;
-            mNode.m21 *= ScaleStack[nStackIndex].y;
-            mNode.m22 *= ScaleStack[nStackIndex].y;
-            mNode.m23 *= ScaleStack[nStackIndex].y;
-            mNode.m31 *= ScaleStack[nStackIndex].z;
-            mNode.m32 *= ScaleStack[nStackIndex].z;
-            mNode.m33 *= ScaleStack[nStackIndex].z;
+            nlVec3Scale(*(nlVector3*)&mNode.e2[0][0], ScaleStack[nStackIndex].x);
+            nlVec3Scale(*(nlVector3*)&mNode.e2[1][0], ScaleStack[nStackIndex].y);
+            nlVec3Scale(*(nlVector3*)&mNode.e2[2][0], ScaleStack[nStackIndex].z);
         }
 
         nStackIndex += pAccumulator->m_BaseSHierarchy->GetPushPop(i);

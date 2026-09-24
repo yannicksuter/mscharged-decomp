@@ -59,11 +59,12 @@ public:
 
 void SkillTweak::ParseCurve(const char* text, int length)
 {
+    char* buffer;
     const char* rangeToken = "Range";
     const char* curveToken = "Curve";
     int count = 0;
     float values[16];
-    char* buffer = (char*)nlMalloc(length, 8, false);
+    buffer = (char*)nlMalloc(length, 8, false);
     memcpy(buffer, text, length);
     SimpleParser parser;
     parser.StartParsing(buffer, length, ",: ");
@@ -420,7 +421,7 @@ void SkillTweaks::Init(int difficulty, bool blend, bool reload)
     fGoalieDekeChance = cfg.Get<float>("Goalie/Goalie Deke Chance", -9999.9f);
     fGoalieDekeSpeed = cfg.Get<float>("Goalie/Goalie Deke Speed", -9999.9f);
     mDecisionWeights[0] = -1.0f;
-    mCharacterWeight = Interpolate(sMinimumCharacterDifficulty, sMaximumCharacterDifficulty, (float)(nlMin(difficulty, 5) - 1) * 0.25f);
+    mCharacterWeight = Interpolate(sMinimumCharacterDifficulty, sMaximumCharacterDifficulty, (float)(nlMin(difficulty, 5) - 1) / 4.0f);
 }
 
 SkillTweakCopier::SkillTweakCopier(SkillTweaks* tweaks, Config* config)

@@ -1330,15 +1330,12 @@ void SHHallOfFamePlayerCard::UpdateText()
     WideBasicString name;
 
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
-    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::Find<>(
-        presentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("player card"),
-        InlineHasher("title"));
-    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find<>(
-        presentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("player card"),
-        InlineHasher("name"));
-    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find<>(
-        presentation->GetActiveSlide(), InlineHasher("Layer"), InlineHasher("player card"),
-        InlineHasher("description"));
+    TLTextInstance* titleText = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        presentation->GetActiveSlide(), "Layer", "player card", "title");
+    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        presentation->GetActiveSlide(), "Layer", "player card", "name");
+    TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        presentation->GetActiveSlide(), "Layer", "player card", "description");
 
     switch (mCardIndex)
     {
@@ -1457,15 +1454,13 @@ void SHHallOfFamePlayerCard::UpdateImages()
     FEPresentation* presentation;
     TLImageInstance* image0;
     TLImageInstance* image1;
-    const char* name1;
-    const char* name0;
     char path0[64];
     char path1[64];
 
     presentation = mFEScene->m_pFEPackage->GetPresentation();
     {
-        unsigned long playerCardHash;
         unsigned long imageHash;
+        unsigned long playerCardHash;
         imageHash = nlStringLowerHash("00_dummy_texture");
         playerCardHash = nlStringLowerHash("player card");
         image0 = FEFinder<TLImageInstance, 2>::Find(presentation->m_currentSlide,
@@ -1487,8 +1482,8 @@ void SHHallOfFamePlayerCard::UpdateImages()
         image1 = &UnidentifiedTLImageDefault::sInstance;
     }
 
-    name0 = 0;
-    name1 = 0;
+    const char* name0 = 0;
+    const char* name1 = 0;
     switch (mCardIndex)
     {
     case 0:

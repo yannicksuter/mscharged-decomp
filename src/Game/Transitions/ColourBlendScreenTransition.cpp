@@ -9,6 +9,15 @@
 
 #include <stdlib.h>
 
+ColourBlendScreenTransition::ColourBlendScreenTransition(float length, const nlVector4& startColour, const nlVector4& endColour, u32 texture)
+{
+    m_fLength = length;
+    m_fCurrentTime = 0.0f;
+    m_RGBAstart = startColour;
+    m_RGBAend = endColour;
+    m_nTexture = texture;
+}
+
 /**
  * Offset/Address/Size: 0x3E0 | 0x80339B84 | size: 0x10
  */

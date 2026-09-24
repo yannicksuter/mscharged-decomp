@@ -25,6 +25,7 @@
 #include "NL/nlString.h"
 #include "types.h"
 #include "Game/NetworkInput.h"
+#include <math.h>
 
 static float s_fOverheadSize = 35.0f;
 static float lbl_806DCED4 = 15.0f;
@@ -120,10 +121,12 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
             return -1;
         }
 
-        NetworkPeer* pPeer = g_pNetworkSessionBase->GetLocalPeer();
-        int index = -1;
-        NetworkPeerChannel* pOwner
-            = (NetworkPeerChannel*)pGlobalPad->m_pMyUser;
+        NetworkPeerChannel* pOwner;
+        NetworkPeer* pPeer;
+        int index;
+        pPeer = g_pNetworkSessionBase->GetLocalPeer();
+        index = -1;
+        pOwner = (NetworkPeerChannel*)pGlobalPad->m_pMyUser;
 
         if (pOwner->mPeer == pPeer)
         {
@@ -140,24 +143,15 @@ extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
                     = true;
             }
 
-            int remoteChannelIndex = pOwner->mChannelIndex;
             int available[4] = { -1, -1, -1, -1 };
             int next = 0;
-            if (!used[0])
+            int remoteChannelIndex = pOwner->mChannelIndex;
+            for (int pad = 0; pad < 4; ++pad)
             {
-                available[0] = next++;
-            }
-            if (!used[1])
-            {
-                available[1] = next++;
-            }
-            if (!used[2])
-            {
-                available[2] = next++;
-            }
-            if (!used[3])
-            {
-                available[3] = next;
+                if (!used[pad])
+                {
+                    available[pad] = next++;
+                }
             }
 
             if (remoteChannelIndex == available[0])
@@ -261,14 +255,13 @@ static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
     screenPosY
         = nlMinEquals(nlMaxEquals(screenPosY, 32.0f), screenLimitY);
 
-    float absY = (float)__fabs(screenPosY);
-    float absX = (float)__fabs(screenPosX);
-    float scale = (float)__fabs(1.0f - max_float(absY, absX));
+    float absY = fabsf(screenPosY);
+    float absX = fabsf(screenPosX);
+    float scale = fabsf(1.0f - max_float(absY, absX));
     scale = InterpolateRangeClamped(1.0f, 0.5f, 0.0f, 2.0f, scale);
 
     bool sameMachine = false;
-    int padIndex = fn_801A323C(pCharacter, &sameMachine);
-    unsigned long indicatorTexID = uIndicatorTexID[padIndex];
+    unsigned long indicatorTexID = GetCharacterTexID(pCharacter, &sameMachine);
     float opacityScale = 1.0f;
     if (!sameMachine)
     {
@@ -284,7 +277,6 @@ static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
 static void UpdateAndRenderOffScreenIndicators(float dt)
 {
     nlVector3 worldPos = { 0.0f, 0.0f, 0.0f };
-    float half = 0.5f;
 
     for (int i = 0; i < 10; ++i)
     {
@@ -309,13 +301,13 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
                     continue;
                 }
                 float height = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue();
-                worldPos.z += height * half;
+                worldPos.z += height / 2.0f;
             }
             else
             {
                 float height
                     = ((Goalie*)pCharacter)->m_pTweaks->fPhysCapsuleHeight.GetValue();
-                worldPos.z += height * half;
+                worldPos.z += height / 2.0f;
             }
         }
 

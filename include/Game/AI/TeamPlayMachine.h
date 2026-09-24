@@ -88,7 +88,7 @@ public:
     virtual bool UnidentifiedInitialize(void*) = 0;
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
 
 protected:
@@ -108,7 +108,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
 };
 
 class cFielder;

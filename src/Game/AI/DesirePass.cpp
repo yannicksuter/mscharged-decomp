@@ -1,44 +1,37 @@
-#include "Game/AI/Desire.h"
+#include "Game/AI/DesirePass.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Fuzzy.h"
-#include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
-#include <stddef.h>
+#include "Game/AI/SkillTweaks.h"
 #include "Game/AI/SpaceSearch.h"
 #include "Game/Ball.h"
+#include "Game/CharacterTweaks.h"
 #include "Game/DebugWriteCache.h"
-#include "Game/GameTweaks.h"
 #include "Game/Player.h"
 #include "Game/Team.h"
+#include "NL/nlMemory.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_800401C0(
-    cFielder*, const nlVector3&, float, float);
-extern "C" float fn_8004028C(cFielder*);
-extern "C" void* fn_80311734(void*);
-extern "C" void fn_800B6A1C(void*, int, const Variant&);
-extern "C" float fn_8002C328(PlayerTweaks*);
-extern "C" bool fn_8002F858(cFielder*, bool);
-extern "C" bool fn_80035F34(cFielder*);
-extern cTeam* g_pCurrentlyUpdatingTeam;
-extern bool lbl_806E0E38;
-extern cFielder* g_pScriptCurrentFielder;
-extern nlVector3 lbl_804DC190;
+static bool sDebugPassSpaceSearch;
+const nlVector3 sStationaryTargetVelocity = { 0.0f, 0.0f, 0.0f };
 
-static float lbl_806DC130 = 4.5f;
-static float lbl_806DC134 = 3.0f;
-static float lbl_806DC138 = 0.85f;
-static float lbl_806DC13C = 0.3f;
-static float lbl_806DC140 = 1.0f;
-static unsigned short lbl_806DC144 = 0xFFFF;
-static unsigned short lbl_806DC146 = 0xFFFF;
-static int lbl_806DC148 = 14;
-static int lbl_806DC14C = 0;
+static float sPassSearchRadius = 4.5f;
+static float sPreparePassDuration = 3.0f;
+static float sPassAbortThreshold = 0.85f;
+static float sPassAbortThresholdVariation = 0.3f;
+static float sPassArrivalDistance = 1.0f;
+static unsigned short sDesirePreparePassType = 0xFFFF;
+static unsigned short sDesirePassType = 0xFFFF;
+static int sPassDesireState = FIELDERDESIRE_PASS;
+// The default transition result resides in initialized small data.
+#pragma explicit_zero_data on
+static int sContinueDesire = DESIRE_CONTINUE;
+#pragma explicit_zero_data off
 
 /**
  * Offset/Address/Size: 0x0 | 0x800BA57C | size: 0x188
@@ -54,7 +47,7 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
         return false;
     }
 
-    float fDuration = lbl_806DC134;
+    float fDuration = sPreparePassDuration;
     mUnidentified078 = fDuration + 0.2f;
     if (mbVolleyPass)
     {
@@ -68,55 +61,53 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
 
     SkillTweaks* pSkillTweaks = fn_800A636C(g_pCurrentlyUpdatingTeam);
     float fReactionTime = 1.0f - pSkillTweaks->GetReaction(0);
-    float fAbortThreshold = lbl_806DC138;
+    float fAbortThreshold = sPassAbortThreshold;
     float fReactionTimeRange =
-        fAbortThreshold * (lbl_806DC13C * fReactionTime);
+        fAbortThreshold * (sPassAbortThresholdVariation * fReactionTime);
     mfAbortThreshold = fAbortThreshold
         + (nlRandomf(fReactionTimeRange)
             - (0.5f * fReactionTimeRange));
 
     m_pSpaceSearch = new (nlMalloc(sizeof(SSearchOpenLane), 8, false))
-        SSearchOpenLane(mUnidentifiedFielder, mpPassTarget);
-    mUnidentifiedFielder->SetSpaceSearch(m_pSpaceSearch);
-    mUnidentifiedFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E38;
-    mUnidentifiedFielder->m_pSpaceSearch->FindBestPosition(
-        mvDesiredPosition, mUnidentifiedFielder->mUnidentified024.m_v3Position,
+        SSearchOpenLane(m_pFielder, mpPassTarget);
+    m_pFielder->SetSpaceSearch(m_pSpaceSearch);
+    m_pFielder->m_pSpaceSearch->m_bDebugOn = sDebugPassSpaceSearch;
+    m_pFielder->m_pSpaceSearch->FindBestPosition(
+        mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position,
         DIR_UPFIELD, &mpPassTarget->mUnidentified024.m_v3Position,
-        lbl_806DC130, 0x8000);
+        sPassSearchRadius, 0x8000);
     return true;
 }
 
 /**
  * Offset/Address/Size: 0x188 | 0x800BA704 | size: 0x6A0
  */
-void DesirePreparePass::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesirePreparePass::Update(DesireUpdate* update, float fDeltaT)
 {
     if (Incapacitated(mpPassTarget))
     {
-        *update = 1;
+        *update = DESIRE_FINISHED;
         return;
     }
 
     mThinkTimer.Countdown(fDeltaT, 0.0f);
-    fn_800401C0(
-        mUnidentifiedFielder, mvDesiredPosition, 1.5f, 1.0f);
+    m_pFielder->AddDesiredPosition(mvDesiredPosition, 1.5f, 1.0f);
 
     bool bSwitchToPassDesire = false;
     if (mThinkTimer.m_uPackedTime != 0)
     {
-        float fInDanger = fn_80041B0C(fn_80311734(this),
-            mUnidentifiedFielder, "InDangerDelayed").mData.f;
+        float fInDanger = fn_80041B0C(GetFuzzyRuntime(),
+            m_pFielder, "InDangerDelayed").mData.f;
         float fNotFarToTheirGoalie =
             FLESS(FarToTheirGoalie(g_pScriptCurrentFielder), 0.3f);
         float fDistanceToDesiredPos =
-            fn_8004028C(mUnidentifiedFielder);
+            m_pFielder->GetDistanceToDesiredPos();
         float fClosingSpeedToDesiredPos = GetClosingSpeed2D(
-            mvDesiredPosition, lbl_804DC190,
-            mUnidentifiedFielder->mUnidentified024.m_v3Position,
-            mUnidentifiedFielder->mUnidentified024.m_v3Velocity);
+            mvDesiredPosition, sStationaryTargetVelocity,
+            m_pFielder->mUnidentified024.m_v3Position,
+            m_pFielder->mUnidentified024.m_v3Velocity);
         if (fClosingSpeedToDesiredPos < 0.0f
-            || fDistanceToDesiredPos <= lbl_806DC140
+            || fDistanceToDesiredPos <= sPassArrivalDistance
             || ((fInDanger >= fNotFarToTheirGoalie
                     ? fInDanger : fNotFarToTheirGoalie)
                 >= mfAbortThreshold))
@@ -131,13 +122,10 @@ void DesirePreparePass::Update(
 
     if (bSwitchToPassDesire)
     {
-        *update = 3;
-        fn_800B6A1C(
-            update, 8, FuzzyVariant(FT_INT, lbl_806DC148));
-        fn_800B6A1C(
-            update, 14, FuzzyVariant(mpPassTarget));
-        fn_800B6A1C(
-            update, 16, FuzzyVariant(FT_BOOL, mbVolleyPass));
+        *update = DESIRE_CHANGE;
+        update->SetParameter(8, FuzzyVariant(FT_INT, sPassDesireState));
+        update->SetParameter(14, FuzzyVariant(mpPassTarget));
+        update->SetParameter(16, FuzzyVariant(FT_BOOL, mbVolleyPass));
     }
 }
 
@@ -146,9 +134,9 @@ void DesirePreparePass::Update(
  */
 void DesirePreparePass::UnidentifiedCleanup()
 {
-    if (m_pSpaceSearch == mUnidentifiedFielder->m_pSpaceSearch)
+    if (m_pSpaceSearch == m_pFielder->m_pSpaceSearch)
     {
-        mUnidentifiedFielder->SetSpaceSearch(0);
+        m_pFielder->SetSpaceSearch(0);
     }
     m_pSpaceSearch = 0;
 }
@@ -185,23 +173,23 @@ bool DesirePass::UnidentifiedInitialize(void* context)
         return false;
     }
 
-    PlayerTweaks* pTweaks = mUnidentifiedFielder->GetTweaks();
-    float fMaxSpeed = fn_8002C328(pTweaks);
-    mUnidentifiedFielder->mUnidentified024.m_fDesiredSpeed =
-        FMIN(mUnidentifiedFielder->mUnidentified024.m_fDesiredSpeed, fMaxSpeed);
+    PlayerTweaks* pTweaks = m_pFielder->GetTweaks();
+    float fMaxSpeed = pTweaks->GetRunningSpeed();
+    m_pFielder->mUnidentified024.m_fDesiredSpeed =
+        FMIN(m_pFielder->mUnidentified024.m_fDesiredSpeed, fMaxSpeed);
 
-    if (mUnidentifiedFielder->m_pBall != 0)
+    if (m_pFielder->m_pBall != 0)
     {
-        mUnidentifiedFielder->InitActionPass(
+        m_pFielder->InitActionPass(
             mpPassTarget, mbVolleyPass, 0, false);
     }
-    else if (fn_8002F858(mUnidentifiedFielder, false))
+    else if (m_pFielder->CanContactLooseBall(false))
     {
-        mUnidentifiedFielder->InitActionLooseBallPass(
+        m_pFielder->InitActionLooseBallPass(
             (cFielder*)mpPassTarget, mbVolleyPass);
-        result = mUnidentifiedFielder->m_eActionState
+        result = m_pFielder->m_eActionState
                 == ACTION_LOOSE_BALL_PASS
-            || mUnidentifiedFielder->m_eActionState
+            || m_pFielder->m_eActionState
                 == ACTION_LOOSE_BALL_SHOT;
     }
     else
@@ -214,8 +202,7 @@ bool DesirePass::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x9DC | 0x800BAF58 | size: 0x4
  */
-void DesirePass::Update(
-    UnidentifiedDesireUpdate*, float)
+void DesirePass::Update(DesireUpdate*, float)
 {
 }
 
@@ -229,25 +216,25 @@ void DesirePass::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x9E4 | 0x800BAF60 | size: 0xCC8
  */
-extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
+DesireUpdate TransDesireLooseBallContact(
     UnidentifiedFuzzyRuntimeValue* fielderValue,
-    UnidentifiedFuzzyRuntimeValue* value)
+    UnidentifiedFuzzyRuntimeValue* action)
 {
-    UnidentifiedVariant_80054AB8 result(FT_INT, lbl_806DC14C);
+    DesireUpdate result(FT_INT, sContinueDesire);
     if (g_pBall->m_pOwner != 0)
     {
-        result = 1;
+        result = DESIRE_FINISHED;
     }
-    else if (value->mType == (eVariantType)13)
+    else if (action->mType == (eVariantType)13)
     {
         cFielder* pFielder =
             (cFielder*)fielderValue->mData.pPlayer;
-        if (fn_8002F858(pFielder, false))
+        if (pFielder->CanContactLooseBall(false))
         {
             cFielder* pPassTarget;
-            bool bVolleyPass = fn_80035F34(pFielder);
+            bool bVolleyPass = pFielder->IsActionModifierPressed();
             bool bActionInitialized;
-            if (value->ExtraData.Get(1)->mData.b)
+            if (action->ExtraData.Get(1)->mData.b)
             {
                 pFielder->InitActionLooseBallShot(bVolleyPass);
                 bActionInitialized =
@@ -256,7 +243,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
             else
             {
                 pPassTarget = (cFielder*)
-                    value->ExtraData.Get(0)->mData.pPlayer;
+                    action->ExtraData.Get(0)->mData.pPlayer;
                 if (pPassTarget != 0 && pPassTarget->CanReceivePass())
                 {
                     pFielder->InitActionLooseBallPass(
@@ -268,7 +255,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
                 else
                 {
                     pFielder->InitActionLooseBallShot(
-                        fn_80035F34(pFielder));
+                        pFielder->IsActionModifierPressed());
                     bActionInitialized =
                         pFielder->m_eActionState
                         == ACTION_LOOSE_BALL_SHOT;
@@ -276,81 +263,26 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800BAF60(
             }
             if (bActionInitialized)
             {
-                result = 1;
+                result = DESIRE_FINISHED;
             }
         }
     }
     else
     {
-        result = 1;
+        result = DESIRE_FINISHED;
     }
     return result;
 }
 
 /**
- * Offset/Address/Size: 0x16AC | 0x800BBC28 | size: 0x110
- */
-void DesirePass::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesirePass");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
-    cache->AddField(15, gDebugFieldTypes[15].size,
-        (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
-        "mpPassTarget");
-    cache->AddField(16, gDebugFieldTypes[16].size,
-        (u8*)&mbVolleyPass - (u8*)&mvDesiredPosition,
-        "mbVolleyPass");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x17BC | 0x800BBD38 | size: 0xC0
- */
-void DesirePass::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (lbl_806DC146 == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&lbl_806DC146, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = cache->WriteData(lbl_806DC146,
-        (u8*)this + offset, sizeof(DesirePass) - offset);
-    if (data != 0)
-    {
-        DesirePass* desire =
-            (DesirePass*)((u8*)data - offset);
-        desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
-                ? -1 : mpPassTarget->mUnidentified120);
-        cache->ChecksumData(lbl_806DC146, data, context);
-    }
-}
-
-/**
  * Offset/Address/Size: 0x187C | 0x800BBDF8 | size: 0x134
  */
-void DesirePreparePass::UnidentifiedVirtual8(
+inline void DesirePreparePass::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field =
         cache->BeginType("DesirePreparePass");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
@@ -366,16 +298,16 @@ void DesirePreparePass::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x19B0 | 0x800BBF2C | size: 0xC0
  */
-void DesirePreparePass::UnidentifiedVirtual7(
+inline void DesirePreparePass::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DC144 == 0xFFFF)
+    if (sDesirePreparePassType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&lbl_806DC144, cache);
+        UnidentifiedVirtual8(&sDesirePreparePassType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = cache->WriteData(lbl_806DC144,
+    void* data = cache->WriteData(sDesirePreparePassType,
         (u8*)this + offset, sizeof(DesirePreparePass) - offset);
     if (data != 0)
     {
@@ -383,20 +315,47 @@ void DesirePreparePass::UnidentifiedVirtual7(
             (DesirePreparePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
                 ? -1 : mpPassTarget->mUnidentified120);
-        cache->ChecksumData(lbl_806DC144, data, context);
+        cache->ChecksumData(sDesirePreparePassType, data, context);
     }
 }
 
 /**
- * Offset/Address/Size: 0x1A70 | 0x800BBFEC | size: 0x5C
+ * Offset/Address/Size: 0x16AC | 0x800BBC28 | size: 0x110
  */
-DesirePreparePass::~DesirePreparePass()
+inline void DesirePass::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesirePass");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
+        "mpPassTarget");
+    cache->AddField(16, gDebugFieldTypes[16].size,
+        (u8*)&mbVolleyPass - (u8*)&mvDesiredPosition,
+        "mbVolleyPass");
+    cache->EndType();
 }
 
 /**
- * Offset/Address/Size: 0x1ACC | 0x800BC048 | size: 0x5C
+ * Offset/Address/Size: 0x17BC | 0x800BBD38 | size: 0xC0
  */
-DesirePass::~DesirePass()
+inline void DesirePass::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
 {
+    if (sDesirePassType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesirePassType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = cache->WriteData(sDesirePassType,
+        (u8*)this + offset, sizeof(DesirePass) - offset);
+    if (data != 0)
+    {
+        DesirePass* desire =
+            (DesirePass*)((u8*)data - offset);
+        desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
+                ? -1 : mpPassTarget->mUnidentified120);
+        cache->ChecksumData(sDesirePassType, data, context);
+    }
 }

@@ -40,6 +40,7 @@ public:
     void StaggerAnimations();
     void SetEnabled(bool enable);
     void SetUpdatePeriod(int period);
+    u32 CalculateRenderChecksum();
 
     /* 0x00 */ u8 mEnabled;
     /* 0x01 */ u8 mUnidentified001[3];

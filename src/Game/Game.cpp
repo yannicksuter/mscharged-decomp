@@ -58,6 +58,7 @@
 #include "Game/ScriptTuning.h"
 #include "Game/GameTweaks.h"
 #include "Game/TweakRegistry.h"
+#include "Game/TweakValueInt.h"
 #include "Game/Event.h"
 #include "Game/EventRegistry.h"
 #include "Game/NetworkMessages.h"
@@ -73,6 +74,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
+#include <stdlib.h>
 #include "Game/Render/NumberDisplay.h"
 #include "Game/InputRouter.h"
 #include "Game/NetworkInput.h"
@@ -1771,3 +1773,60 @@ extern "C" char lbl_804FB404[] = "Sending Slow Down End at frame %d\n";
 extern "C" char lbl_804FB66C[] = "Changing game state %d to %d at frame %d\n";
 
 #include "NL/nlBind_impl.h"
+
+TweakValueInt::~TweakValueInt()
+{
+}
+
+void TweakValueInt::CopyValueFrom(
+    TweakValueBase* other)
+{
+    switch (other->GetStorageKind())
+    {
+    case 1:
+        value = ((TweakValueInt*)other)->value;
+        break;
+    case 2:
+        value = *((TweakIntBinding*)other)->m_pValue;
+        break;
+    }
+}
+
+int TweakValueInt::GetStorageKind()
+{
+    return 1;
+}
+
+int TweakValueInt::GetValueType()
+{
+    return 3;
+}
+
+void* TweakValueInt::GetValueAddress()
+{
+    return &value;
+}
+
+void TweakValueInt::FormatValue(
+    char* buffer, unsigned long size)
+{
+    nlSNPrintf(buffer, size, "%d", value);
+}
+
+void TweakValueInt::ParseValue(
+    const char* string)
+{
+    value = atoi(string);
+}
+
+void TweakValueInt::UnidentifiedVirtual14(
+    float* minimum, float* maximum, float* increment)
+{
+    *minimum = kGameTweakZero;
+    *maximum = kGameTweakZero;
+    *increment = kGameTweakZero;
+}
+
+void TweakValueInt::UnidentifiedVirtual18()
+{
+}

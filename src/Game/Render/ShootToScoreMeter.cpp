@@ -278,8 +278,8 @@ void ShootToScoreMeter::DrawIndicatorBar(float angle,
 
     glQuad3 barQuad;
     float zDepth;
-    float angleRadians;
     float scaledMeterWidth = MeterWidth * scale;
+    float angleRadians;
     float scaledWhiteBarWidth
         = (lbl_806DD0C0 + lbl_806DD0C4) * scale;
     float scaledWhiteBarHeight = lbl_806DD0BC * scale;
@@ -288,9 +288,9 @@ void ShootToScoreMeter::DrawIndicatorBar(float angle,
     nlMatrix4 barMatrix;
     nlMakeRotationMatrixZ(barMatrix, angleRadians);
 
+    float sine;
     float radius = scaledMeterWidth * lbl_806DD0C8;
-    float sine
-        = radius * nlSin((u16)(s32)(10430.378f * angleRadians));
+    sine = radius * nlSin((u16)(s32)(10430.378f * angleRadians));
     float cosine = radius
         * nlSin(
             (u16)((u16)(s32)(10430.378f * angleRadians) + 0x4000));

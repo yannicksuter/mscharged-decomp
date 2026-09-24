@@ -41,7 +41,7 @@ static unsigned short sDesireMegaStrikeType = 0xFFFF;
 bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    DetInput* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
+    DetInput* pGlobalPad = m_pFielder->GetGlobalPad();
     if (pGlobalPad != 0)
     {
         ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
@@ -49,7 +49,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
     else
     {
         mUnidentifiedB0 = InterpolateClamped(lbl_806DC11C, lbl_806DC120,
-            1.0f - Difficult(fn_800D6670(mUnidentifiedFielder)));
+            1.0f - Difficult(fn_800D6670(m_pFielder)));
         float fDelay = mUnidentifiedB0;
 
         float fRange = fDelay * lbl_806DC124;
@@ -92,20 +92,20 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
         mUnidentifiedA4 = nRequestedBalls;
 
         mUnidentifiedA4 = (int)(
-            (float)mUnidentifiedA4 + mUnidentifiedFielder->fn_800489C4());
+            (float)mUnidentifiedA4 + m_pFielder->fn_800489C4());
 
         if (g_pGame->GetNormalizedGameTime() > 0.75f)
         {
             cTeam* pOtherTeam =
-                mUnidentifiedFielder->m_pTeam->GetOtherTeam();
-            int nScoreDifference = mUnidentifiedFielder->m_pTeam->m_nScore
+                m_pFielder->m_pTeam->GetOtherTeam();
+            int nScoreDifference = m_pFielder->m_pTeam->m_nScore
                 - pOtherTeam->m_nScore;
             if (nScoreDifference < 0)
             {
                 if ((unsigned int)mUnidentifiedA4
                         < (unsigned int)_abs(nScoreDifference)
                     && (float)(unsigned int)_abs(nScoreDifference)
-                        < mUnidentifiedFielder->fn_80048A08())
+                        < m_pFielder->fn_80048A08())
                 {
                     mUnidentifiedA4 = _abs(nScoreDifference);
                     if (nlRandomf(1.0f) < 0.33f)
@@ -118,12 +118,12 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 
         float fAccuracyRange = InterpolateRangeClamped(
             0.49f, 0.98f, 1.0f, 0.2f,
-            Difficult(fn_800D6670(mUnidentifiedFielder)));
+            Difficult(fn_800D6670(m_pFielder)));
         mUnidentifiedA8 = nlRandomf(1.0f);
 
         float fAccuracy = fn_800A636C(g_pCurrentlyUpdatingTeam)
                               ->MegaGoalAccuracy[(int)((float)mUnidentifiedA4
-                                  - mUnidentifiedFielder->fn_800489C4())]
+                                  - m_pFielder->fn_800489C4())]
                               ->GetValue();
         if (mUnidentifiedA8 < fAccuracy)
         {
@@ -140,13 +140,13 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
             mUnidentifiedA4, mUnidentifiedA8);
     }
 
-    mUnidentifiedFielder->InitActionMegaStrikeMeter(true);
-    fn_8002E340(mUnidentifiedFielder);
+    m_pFielder->InitActionMegaStrikeMeter(true);
+    fn_8002E340(m_pFielder);
     mUnidentified078 = lbl_806DC118;
 
     if (lbl_806E0E31 || GameInfoManager::Instance()->IsRule0x8Equal2())
     {
-        mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
+        m_pFielder->muInvincibleStatus |= 0x1F;
     }
     return result;
 }
@@ -155,14 +155,14 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
  * Offset/Address/Size: 0x384 | 0x800B9748 | size: 0x63C
  */
 void DesireMegaStrike::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+    DesireUpdate* update, float fDeltaT)
 {
     if (!g_pGame->IsGameplayOrOvertime())
     {
         *update = 1;
     }
 
-    if (mUnidentifiedFielder->IsStuck())
+    if (m_pFielder->IsStuck())
     {
         *update = 1;
     }
@@ -174,20 +174,20 @@ void DesireMegaStrike::Update(
 
     if (lbl_806E0E31 || GameInfoManager::Instance()->IsRule0x8Equal2())
     {
-        if (!mUnidentifiedFielder->IsInvincible())
+        if (!m_pFielder->IsInvincible())
         {
-            mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
+            m_pFielder->muInvincibleStatus |= 0x1F;
         }
     }
 
-    if (mUnidentifiedFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
+    if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         bool bButtonPressed = false;
         int nParam = 0;
-        bool bHasGlobalPad = mUnidentifiedFielder->GetGlobalPad() != 0;
+        bool bHasGlobalPad = m_pFielder->GetGlobalPad() != 0;
         if (bHasGlobalPad)
         {
-            DetInput* pGlobalPad = mUnidentifiedFielder->GetGlobalPad();
+            DetInput* pGlobalPad = m_pFielder->GetGlobalPad();
             cGlobalPad* pInputPad = 0;
             if (pGlobalPad != 0)
             {
@@ -213,14 +213,14 @@ void DesireMegaStrike::Update(
             nParam = 1;
             bButtonPressed = fn_800B9D84(update, fDeltaT);
         }
-        mUnidentifiedFielder->fn_8004923C(
+        m_pFielder->fn_8004923C(
             fDeltaT, bButtonPressed, nParam);
-        fn_80098098(mUnidentifiedFielder);
+        fn_80098098(m_pFielder);
     }
-    else if (mUnidentifiedFielder->m_eActionState == ACTION_SHOT)
+    else if (m_pFielder->m_eActionState == ACTION_SHOT)
     {
-        fn_8002E39C(mUnidentifiedFielder);
-        mUnidentifiedFielder->fn_800489C0(fDeltaT);
+        fn_8002E39C(m_pFielder);
+        m_pFielder->fn_800489C0(fDeltaT);
     }
 }
 
@@ -228,11 +228,11 @@ void DesireMegaStrike::Update(
  * Offset/Address/Size: 0x9C0 | 0x800B9D84 | size: 0x5E0
  */
 bool DesireMegaStrike::fn_800B9D84(
-    UnidentifiedDesireUpdate* update, float)
+    DesireUpdate* update, float)
 {
     bool bButtonPressed = false;
-    float fMeterResult = fn_800499EC(mUnidentifiedFielder, 1);
-    float fMeterPosition = fn_80049CC0(mUnidentifiedFielder, 1);
+    float fMeterResult = fn_800499EC(m_pFielder, 1);
+    float fMeterPosition = fn_80049CC0(m_pFielder, 1);
 
     if (update->mData.i == 3)
     {
@@ -259,23 +259,23 @@ bool DesireMegaStrike::fn_800B9D84(
     case 0:
     {
         bool bAtRequestedValue = false;
-        if (Difficult(mUnidentifiedFielder->m_pTeam) < 0.25f
+        if (Difficult(m_pFielder->m_pTeam) < 0.25f
             && (float)mUnidentifiedA4
-                == mUnidentifiedFielder->fn_800489C4())
+                == m_pFielder->fn_800489C4())
         {
             bAtRequestedValue = true;
         }
 
         if (nMeterResult >= mUnidentifiedA4 && !bAtRequestedValue
-            && mUnidentifiedFielder->fn_8002E058() > 0.225f)
+            && m_pFielder->fn_8002E058() > 0.225f)
         {
             float fChance = InterpolateRangeClamped(
                 0.65f, 0.8f, 1.0f, 0.2f,
-                Difficult(mUnidentifiedFielder->m_pTeam));
+                Difficult(m_pFielder->m_pTeam));
             if (nlRandomf(1.0f) > fChance)
             {
                 bButtonPressed = true;
-                if (mUnidentifiedFielder->fn_8002E058() <= 0.225f)
+                if (m_pFielder->fn_8002E058() <= 0.225f)
                 {
                     mUnidentifiedB4 = 2;
                 }
@@ -345,7 +345,7 @@ bool DesireMegaStrike::fn_800B9D84(
 void DesireMegaStrike::UnidentifiedCleanup()
 {
     fn_8005FA2C(g_pGame);
-    fn_8003A0E4(mUnidentifiedFielder);
+    fn_8003A0E4(m_pFielder);
 }
 
 /**

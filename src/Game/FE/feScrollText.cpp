@@ -30,55 +30,6 @@ FEScrollText::FEScrollText(int axis)
     m_useMessage = false;
 }
 
-void FEScrollText::SetDisplayMessage(const BasicString<unsigned short, Detail::TempStringAllocator>& theMessage)
-{
-    m_useMessage = true;
-    m_message = theMessage;
-    m_controlText->SetString(m_message.c_str());
-    RefreshText();
-}
-
-void FEScrollText::SetDisplayMessage(const char* locMessage)
-{
-    const unsigned short* text = LookupLocString(locMessage);
-    SetDisplayMessage(BasicString<unsigned short, Detail::TempStringAllocator>(text));
-}
-
-void FEScrollText::SetScrollMode(int mode)
-{
-    m_scrollMode = mode;
-}
-
-void FEScrollText::SetScrollDirection(int direction)
-{
-    m_scrollDirection = direction;
-}
-
-void FEScrollText::SetEndBehavior(int behavior)
-{
-    m_endBehavior = behavior;
-}
-
-void FEScrollText::SetClippingTextInstance(TLTextInstance* controlText)
-{
-    if (m_scrollAxis == 0)
-    {
-        nlVector2& boxSize = (controlText->m_OverloadFlags & 0x4)
-            ? controlText->m_OverloadedAttributes.BoxSize
-            : ((FEText*)controlText->m_component)->m_TextAttributes.BoxSize;
-        m_width = (int)boxSize.x;
-        SetMetrics((int)(controlText->GetPosition().f.x - controlText->GetPivot().f.x));
-    }
-    else
-    {
-        nlVector2& boxSize = (controlText->m_OverloadFlags & 0x4)
-            ? controlText->m_OverloadedAttributes.BoxSize
-            : ((FEText*)controlText->m_component)->m_TextAttributes.BoxSize;
-        m_width = (int)boxSize.y;
-        SetMetrics((int)(controlText->GetPosition().f.y - controlText->GetPivot().f.y));
-    }
-}
-
 void FEScrollText::ApplyNewTextInstancePointer(TLTextInstance* controltext, int pos, int width, int)
 {
     if (m_controlText != 0)
@@ -209,6 +160,20 @@ void FEScrollText::RefreshText()
         }
     }
     Update(0.0f);
+}
+
+void FEScrollText::SetDisplayMessage(const BasicString<unsigned short, Detail::TempStringAllocator>& theMessage)
+{
+    m_useMessage = true;
+    m_message = theMessage;
+    m_controlText->SetString(m_message.c_str());
+    RefreshText();
+}
+
+void FEScrollText::SetDisplayMessage(const char* locMessage)
+{
+    const unsigned short* text = LookupLocString(locMessage);
+    SetDisplayMessage(BasicString<unsigned short, Detail::TempStringAllocator>(text));
 }
 
 void FEScrollText::Update(float fDeltaT)
@@ -346,6 +311,21 @@ void FEScrollText::Update(float fDeltaT)
     }
 }
 
+void FEScrollText::SetScrollMode(int mode)
+{
+    m_scrollMode = mode;
+}
+
+void FEScrollText::SetScrollDirection(int direction)
+{
+    m_scrollDirection = direction;
+}
+
+void FEScrollText::SetEndBehavior(int behavior)
+{
+    m_endBehavior = behavior;
+}
+
 void FEScrollText::SetMetrics(int pos)
 {
     const gl_ScreenInfo* screenInfo = glGetScreenInfo();
@@ -363,7 +343,10 @@ void FEScrollText::SetMetrics(int pos)
     {
         boxPos = screenWidth / 2 + pos;
         if (IsWidescreen())
-            boxPos = (int)(boxPos * (640.0f / 854.0f));
+        {
+            float scale = 640.0f / 854.0f;
+            boxPos = (int)(boxPos * scale);
+        }
     }
     else
     {
@@ -372,7 +355,10 @@ void FEScrollText::SetMetrics(int pos)
 
     int boxWidth = m_width;
     if (m_scrollAxis == 0 && IsWidescreen())
-        boxWidth = (int)(boxWidth * (640.0f / 854.0f));
+    {
+        float scale = 640.0f / 854.0f;
+        boxWidth = (int)(boxWidth * scale);
+    }
 
     if (boxPos < 0)
         boxPos = 0;
@@ -385,6 +371,26 @@ void FEScrollText::SetMetrics(int pos)
         m_controlText->SetScissorBox((u16)boxPos, 0, (u16)boxWidth, (u16)screenInfo->ScreenHeight);
     else
         m_controlText->SetScissorBox(0, (u16)boxPos, (u16)screenInfo->ScreenWidth, (u16)boxWidth);
+}
+
+void FEScrollText::SetClippingTextInstance(TLTextInstance* controlText)
+{
+    if (m_scrollAxis == 0)
+    {
+        nlVector2& boxSize = (controlText->m_OverloadFlags & 0x4)
+            ? controlText->m_OverloadedAttributes.BoxSize
+            : ((FEText*)controlText->m_component)->m_TextAttributes.BoxSize;
+        m_width = (int)boxSize.x;
+        SetMetrics((int)(controlText->GetPosition().f.x - controlText->GetPivot().f.x));
+    }
+    else
+    {
+        nlVector2& boxSize = (controlText->m_OverloadFlags & 0x4)
+            ? controlText->m_OverloadedAttributes.BoxSize
+            : ((FEText*)controlText->m_component)->m_TextAttributes.BoxSize;
+        m_width = (int)boxSize.y;
+        SetMetrics((int)(controlText->GetPosition().f.y - controlText->GetPivot().f.y));
+    }
 }
 
 int FEScrollText::GetScrollSteps(float fDeltaT) const

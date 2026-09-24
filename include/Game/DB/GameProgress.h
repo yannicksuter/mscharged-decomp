@@ -189,7 +189,7 @@ public:
     virtual ~StrikerChallenge();
 
     int GetCaptain(int challenge) const;
-    int fn_801CAA18() const { return mCaptain; }
+    int fn_801CAA18() const;
     void SetCurrentChallenge(int challenge);
     void LoadSettings();
     bool IsUnlocked(int challenge) const;

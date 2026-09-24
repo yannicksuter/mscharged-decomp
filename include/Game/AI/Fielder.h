@@ -47,6 +47,7 @@ enum eFielderActionState
 
 enum eFielderDesireState
 {
+    FIELDERDESIRE_PASS = 14,
     FIELDERDESIRE_FINISH_ACTION = 0x15,
 };
 
@@ -191,6 +192,10 @@ class cFielder : public cPlayer
 
 public:
     PlayerTweaks* GetTweaks() const;
+    void AddDesiredPosition(const nlVector3& position, float urgency, float weight);
+    float GetDistanceToDesiredPos();
+    bool CanContactLooseBall(bool requireBestInterceptor);
+    bool IsActionModifierPressed();
     UnidentifiedFuzzyRuntimeBase* fn_8002E198() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 

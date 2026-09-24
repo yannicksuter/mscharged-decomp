@@ -154,9 +154,7 @@ extern bool lbl_806DCC5A;
 extern u32 lbl_806DCC70;
 extern s32 lbl_806DCC74;
 extern f32 lbl_806DCC44;
-extern GLView* lbl_806E143C;
 extern bool lbl_806E1413;
-extern bool lbl_806E1440;
 extern const u32 lbl_804DCD00[6];
 extern const u32 lbl_804DCD18[6];
 extern const nlVector3 lbl_804DCD30;
@@ -325,36 +323,6 @@ int fn_80183DEC(const nlVector3* arg0)
 {
     nlColour var0 = fn_80183C9C((const nlVector2*)arg0, true);
     return (var0.c[0] * 140 + var0.c[1] * 88 + var0.c[2] * 29) >> 8;
-}
-
-void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
-{
-    int var0 = fn_80183DEC(&arg0->mWorldMatrix.GetTranslation());
-    nlColour var1;
-    nlColourSet(var1, var0, var0, var0, 1);
-    unsigned long var2 = *(unsigned long*)&var1;
-    static unsigned long var3 = nlStringLowerHash("shadowLevel");
-    for (glModelPacket* var4 = arg1->packets; var4 < arg1->packets + arg1->numPackets; ++var4)
-    {
-        glSetMaterialUnsignedParameter(var4, var3, var2);
-    }
-}
-
-void fn_80183F78(ImpostorModel*, glModel* arg1)
-{
-    static unsigned long var0 = nlStringLowerHash("shadowLevel");
-    for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)
-    {
-        nlMatrix4 var2;
-        glGetMatrix(var1->matrix, var2);
-        nlVector3 var3 = var2.GetTranslation();
-        nlColour var4 = fn_80183C9C((const nlVector2*)&var3, false);
-        unsigned long var5 = *(unsigned long*)&var4;
-        if (glHasMaterialParameter(var1, var0))
-        {
-            glSetMaterialUnsignedParameter(var1, var0, var5);
-        }
-    }
 }
 
 void fn_80183E4C()
@@ -754,10 +722,12 @@ void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mv
 
 void LoadGameObjectLights(s32 arg0, GLView* arg1, bool arg2)
 {
+    static GLView* lbl_806E143C;
+    static bool lbl_806E1440;
     s32 var0;
     nlMatrix4 var1;
 
-    if (arg1 == lbl_806E143C && arg2 == lbl_806E1440)
+    if (lbl_806E143C == arg1 && arg2 == lbl_806E1440)
         return;
 
     GLViewInterface* var2 = arg1->m_Interface;
@@ -786,6 +756,36 @@ u32 GetGameObjectLightTexture()
 {
     return lbl_806DCC60;
 }
+}
+
+void fn_80183E8C(ImpostorModel* arg0, glModel* arg1)
+{
+    int var0 = fn_80183DEC(&arg0->mWorldMatrix.GetTranslation());
+    nlColour var1;
+    nlColourSet(var1, var0, var0, var0, 1);
+    unsigned long var2 = *(unsigned long*)&var1;
+    static unsigned long var3 = nlStringLowerHash("shadowLevel");
+    for (glModelPacket* var4 = arg1->packets; var4 < arg1->packets + arg1->numPackets; ++var4)
+    {
+        glSetMaterialUnsignedParameter(var4, var3, var2);
+    }
+}
+
+void fn_80183F78(ImpostorModel*, glModel* arg1)
+{
+    static unsigned long var0 = nlStringLowerHash("shadowLevel");
+    for (glModelPacket* var1 = arg1->packets; var1 < arg1->packets + arg1->numPackets; ++var1)
+    {
+        nlMatrix4 var2;
+        glGetMatrix(var1->matrix, var2);
+        nlVector3 var3 = var2.GetTranslation();
+        nlColour var4 = fn_80183C9C((const nlVector2*)&var3, false);
+        unsigned long var5 = *(unsigned long*)&var4;
+        if (glHasMaterialParameter(var1, var0))
+        {
+            glSetMaterialUnsignedParameter(var1, var0, var5);
+        }
+    }
 }
 
 u32 GetGameObjectLightRamp()

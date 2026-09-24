@@ -34,6 +34,7 @@ extern TweakRecycledName* gRecycledTweakNameHead;
 extern TweakRecycledName* gRecycledTweakNameTail;
 extern u8 gTweakStatePushed;
 extern u8 gDeletePersistentTweakValues;
+extern u8 gResetTweakValueStrings;
 
 void ResetDynamicTweaks(void);
 TweakNode* GetTweakPriorityNode(void);
@@ -88,6 +89,8 @@ public:
     virtual int UnidentifiedVirtual10() { return 1; }
     virtual int UnidentifiedVirtual14() { return 0; }
     virtual TweakEntry* UnidentifiedVirtual18();
+
+    TweakNode* GetNext() const { return m_Next; }
 
     static void operator delete(void* ptr) { gTweakNodePool.Free(ptr); }
 

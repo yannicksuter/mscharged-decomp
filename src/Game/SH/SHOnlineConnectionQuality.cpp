@@ -11,6 +11,7 @@
 #include "Game/FriendManager.h"
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"

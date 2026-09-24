@@ -103,8 +103,10 @@ bool ReplayChoreo::Done(float param) const
     if (param > 0.0f)
     {
         float endTime = mReplayManager->mReplay->EndTime();
-        float timeRemaining = (1.0f / mReplayManager->mSpeed) *
-                              (endTime - mReplayManager->mTime);
+        float speed = mReplayManager->mSpeed;
+        float currentTime = mReplayManager->mTime;
+        float timeRemaining = (1.0f / speed) *
+                              (endTime - currentTime);
         if (timeRemaining < param)
         {
             return true;

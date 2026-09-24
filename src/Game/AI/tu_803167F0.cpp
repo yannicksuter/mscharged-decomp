@@ -10,8 +10,6 @@
 
 extern "C" void fn_80319904(
     UnidentifiedScriptMachine*, shdStateMachine*);
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311734(
-    shdStateMachine*);
 extern "C" void fn_80315A64(
     UnidentifiedStateTransition*, UnidentifiedFuzzyRuntimeValue*,
     UnidentifiedVariant_80054AB8*, UnidentifiedFuzzyRuntimeValue*);
@@ -22,9 +20,9 @@ extern "C" bool fn_80317E34(const UnidentifiedStateTransition*);
 extern "C" bool fn_80317E60(const UnidentifiedStateTransition*);
 extern "C" bool fn_80317E88(shdStateMachine*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
-    UnidentifiedFuzzyRuntimeBase*, u32*, void*);
+    UnidentifiedFuzzyRuntimeBase*, const u32&, void*);
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
-    UnidentifiedFuzzyRuntimeBase*, u32*, void*, float);
+    UnidentifiedFuzzyRuntimeBase*, const u32&, void*, float);
 extern "C" float fn_8031A0C8(float, float);
 
 extern float (*lbl_806DF560)();
@@ -48,7 +46,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
 
     u32 mUnidentified088;
     u32 mUnidentified08C;
@@ -289,17 +287,17 @@ UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     mUnidentified090 = nlStringHash(functionName);
 
     UnidentifiedFunctionHash_8027F9CC hash(mUnidentified088);
-    if (!fn_80311734(this)->FunctionExists(hash))
+    if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified088 = 0;
     }
     hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified08C);
-    if (!fn_80311734(this)->FunctionExists(hash))
+    if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified08C = 0;
     }
     hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified090);
-    if (!fn_80311734(this)->FunctionExists(hash))
+    if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified090 = 0;
     }
@@ -314,7 +312,7 @@ bool UnidentifiedStateMachine_803171D0::UnidentifiedInitialize(void*)
         void* context = mUnidentified018->mUnidentified064->mData.pointer;
         u32 hash = mUnidentified088;
         UnidentifiedVariant_80054AB8 result
-            = fn_80317EFC(fn_80311734(this), &hash, context);
+            = fn_80317EFC(GetFuzzyRuntime(), hash, context);
         initialized = result.mData.b;
         fn_8031A0C8(start, lbl_806DF560());
     }
@@ -322,7 +320,7 @@ bool UnidentifiedStateMachine_803171D0::UnidentifiedInitialize(void*)
 }
 
 void UnidentifiedStateMachine_803171D0::Update(
-    UnidentifiedDesireUpdate* update, float deltaTime)
+    DesireUpdate* update, float deltaTime)
 {
     if (update->mData.pointer != 0)
     {
@@ -338,7 +336,7 @@ void UnidentifiedStateMachine_803171D0::Update(
     u32 hash = mUnidentified08C;
     {
         UnidentifiedVariant_80054AB8 result = fn_803184A8(
-            fn_80311734(this), &hash, context, deltaTime);
+            GetFuzzyRuntime(), hash, context, deltaTime);
         *update = result;
     }
     fn_8031A0C8(start, lbl_806DF560());
@@ -354,7 +352,7 @@ void UnidentifiedStateMachine_803171D0::UnidentifiedCleanup()
     float start = lbl_806DF560();
     void* context = mUnidentified018->mUnidentified064->mData.pointer;
     u32 hash = mUnidentified090;
-    fn_80317EFC(fn_80311734(this), &hash, context);
+    fn_80317EFC(GetFuzzyRuntime(), hash, context);
     fn_8031A0C8(start, lbl_806DF560());
 }
 

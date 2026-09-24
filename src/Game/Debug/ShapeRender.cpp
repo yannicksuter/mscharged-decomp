@@ -199,31 +199,32 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
     pdst = prim.position;
     ndst = prim.normal;
     tdst = prim.texcoord;
+    float ringFactor = 0.31415927f;
+    float segmentFactor = 0.44879895f;
 
     for (nRing = 0; nRing < 5; nRing++)
     {
         float fAngle;
 
         fAngle = (float)nRing;
-        fAngle *= 0.31415927f;
+        fAngle *= ringFactor;
         angle0 = (int)(fAngle * 10430.378f);
         z0 = 0.5f * nlSin((u16)angle0);
 
         fAngle = (float)(nRing + 1);
-        fAngle *= 0.31415927f;
+        fAngle *= ringFactor;
         angle1 = (int)(fAngle * 10430.378f);
         z1 = 0.5f * nlSin((u16)angle1);
 
-        ring0 = nlSin((u16)((u16)angle0 + 0x4000));
-        ring1 = nlSin((u16)((u16)angle1 + 0x4000));
+        ring0 = nlSin((u16)((u16)(int)(((float)nRing * ringFactor) * 10430.378f) + 0x4000));
+        ring1 = nlSin((u16)((u16)(int)(((float)(nRing + 1) * ringFactor) * 10430.378f) + 0x4000));
 
         for (nSegment = 0; nSegment < 15; nSegment++)
         {
             float fSegmentAngle;
 
             fSegmentAngle = (float)nSegment;
-            angle =
-                (int)((fSegmentAngle *= 0.44879895f) * 10430.378f);
+            angle = (int)((fSegmentAngle *= segmentFactor) * 10430.378f);
 
             x0 = 0.5f * (ring0 * nlSin((u16)angle));
 
@@ -318,11 +319,11 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
         sinAngle = nlSin((u16)angle);
         x0 = half * (one * sinAngle);
 
-        angle90 = (u16)angle + 0x4000;
+        angle90 = (u16)(int)(angleFactor * ((float)nSegment * segmentFactor)) + 0x4000;
         y0 = half * (one * nlSin((u16)angle90));
 
-        x1 = half * (z0 * nlSin((u16)angle));
-        y1 = half * (z0 * nlSin((u16)angle90));
+        x1 = half * (z0 * nlSin((u16)(int)(angleFactor * ((float)nSegment * segmentFactor))));
+        y1 = half * (z0 * nlSin((u16)((u16)(int)(angleFactor * ((float)nSegment * segmentFactor)) + 0x4000)));
 
         vNormal.x = x0;
         vNormal.y = y0;
@@ -408,16 +409,15 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
             float fSegmentAngle;
 
             fSegmentAngle = (float)nSegment;
-            angle =
-                (int)((fSegmentAngle *= 0.41887903f) * 10430.378f);
+            angle = (int)((fSegmentAngle *= 0.41887903f) * 10430.378f);
 
             x0 = 0.5f * nlSin((u16)angle);
 
-            angle90 = (u16)angle + 0x4000;
+            angle90 = (u16)(int)(((float)nSegment * 0.41887903f) * 10430.378f) + 0x4000;
             y0 = 0.5f * nlSin((u16)angle90);
 
-            x1 = 0.5f * nlSin((u16)angle);
-            y1 = 0.5f * nlSin((u16)angle90);
+            x1 = 0.5f * nlSin((u16)(int)(((float)nSegment * 0.41887903f) * 10430.378f));
+            y1 = 0.5f * nlSin((u16)((u16)(int)(((float)nSegment * 0.41887903f) * 10430.378f) + 0x4000));
 
             vNormal.x = x0;
             vNormal.y = y0;
@@ -492,6 +492,7 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
         glSetMatrix(matrix, mat_world);
     }
 
+    unsigned long offset;
     glModel* pModel = glModelDupNoStreams(prim.model, false, 0);
     nlFloatColour local_08;
     local_08.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
@@ -499,9 +500,12 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
     local_08.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
     local_08.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
 
-    for (u32 index = 0; index < pModel->numPackets; index++)
+    unsigned long index;
+    index = 0;
+    offset = 0;
+    while (index < pModel->numPackets)
     {
-        glModelPacket* packet = &pModel->packets[index];
+        glModelPacket* packet = (glModelPacket*)((u8*)pModel->packets + offset);
         packet->matrix = matrix;
         memcpy((u8*)packet->materialParameters + sizeof(glTextureBinding),
             &local_08,
@@ -518,6 +522,9 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
             glSetRasterState(packet->rasterState, GLS_FillMode, 1);
             glSetRasterState(packet->rasterState, GLS_Culling, 0);
         }
+
+        offset += sizeof(glModelPacket);
+        ++index;
     }
 
     if (arg0->m_eView != 0)
@@ -547,8 +554,8 @@ void ShapeRender::DrawSpherePrimitive(const nlMatrix4& mat_world,
     nlMakeScaleMatrix(mat_hemiTop, radius, radius, radius);
     nlMakeRotationMatrixX(mat_rot, 3.1415927f);
     nlMultMatrices(mat_hemiBottom, mat_hemiTop, mat_rot);
-    nlMultMatrices(mat_hemiTop, mat_hemiTop, mat_world);
-    nlMultMatrices(mat_hemiBottom, mat_hemiBottom, mat_world);
+    nlMultMatrices(mat_hemiTop, mat_world);
+    nlMultMatrices(mat_hemiBottom, mat_world);
 
     fn_802BC83C(this, m_Hemisphere, mat_hemiTop, true, colour);
     fn_802BC83C(this, m_Hemisphere, mat_hemiBottom, true, colour);

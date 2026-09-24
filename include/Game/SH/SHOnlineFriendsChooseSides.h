@@ -44,6 +44,19 @@ public:
     void OnDonePointerPress(unsigned int index, void* context);
     void UpdateDoneButton();
     int GetOnlinePlayerIndex(int pad);
+    int CountSidePlayers(unsigned int index, int side)
+    {
+        int count = 0;
+        GetOnlinePlayerIndex(index);
+        for (int i = 0; i < mPlayerCount; ++i)
+        {
+            if (side == mPlayerSides[i])
+            {
+                ++count;
+            }
+        }
+        return count;
+    }
     int GetOnlinePlayerIndex(int machine, bool guest)
     {
         for (int i = 0; i < 4; ++i)
@@ -59,6 +72,8 @@ public:
     void OnSidesChanged(NetMessageSidesChanged* message);
     void DoChangeSides(int newSide, int oldSide, int index);
     void OnDisconnectPopupClosed();
+    void ShowDisconnectedError();
+    void SendDisconnectedSideChange(int pad);
 
     /* 0x01C */ bool mDisconnectPopupActive;
     /* 0x01D */ u8 mPadding01D[3];

@@ -184,6 +184,10 @@ void* MultiArcResourceAccessor::GetResource(u32 resType, const char* name, u32* 
     return NULL;
 }
 
+ArcResourceLink& FirstArcResource(ArcResourceLinkList* pLinks) {
+    return *pLinks->GetBeginIter();
+}
+
 void MultiArcResourceAccessor::RegistFont(FontRefLink* pLink) { mFontList.PushBack(pLink); }
 
 ut::Font* MultiArcResourceAccessor::GetFont(const char* name) { return detail::FindFont(&mFontList, name); }

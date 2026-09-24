@@ -114,6 +114,7 @@ class PlayerTweaks
 {
 public:
     float GetSkillRating(unsigned int index);
+    float GetRunningSpeed();
 
     PlayerTweaks(const char* name, const char* category);
     virtual ~PlayerTweaks();

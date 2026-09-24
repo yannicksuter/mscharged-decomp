@@ -148,27 +148,28 @@ void Volume::CreateParameter(unsigned int definition, void* context, bool negate
 {
     AudioConfigNode* node = ConfigFindDefinition(definition);
     VolumeParameter* parameter = new VolumeParameter;
-    AudioConfigValue* argument = (AudioConfigValue*)context;
+    RegistryValue* argument = (RegistryValue*)context;
+    int type = argument->mType;
     *output = parameter;
-    unsigned int key;
-    if (argument->m_Words.m_Type == 2)
+    if (type == 2)
     {
-        key = 0xCE5C5677;
-        parameter->m_Unknown10 = node->Get(key).m_Float;
-    }
-    else if (argument->m_Words.m_Type == 1)
-    {
-        parameter->m_Unknown10 = argument->m_Float;
+        unsigned int volumeKey = 0xCE5C5677;
+        parameter->m_Unknown10 = node->Get(volumeKey).m_Float;
     }
     else
     {
-        parameter->m_Unknown10 = (float)(int)argument->m_Words.m_Value;
+        float value;
+        if (type == 1)
+            value = *(float*)&argument->mData;
+        else
+            value = (float)(int)argument->mData;
+        parameter->m_Unknown10 = value;
     }
     parameter->m_Unknown10 = negate ? -parameter->m_Unknown10 : parameter->m_Unknown10;
-    key = sPauseOnZeroKey;
-    parameter->m_Unknown14_00 = node->Get(key).m_Words.m_Value;
-    key = sStopOnZeroKey;
-    parameter->m_Unknown14_01 = node->Get(key).m_Words.m_Value;
+    unsigned int pauseOnZeroKey = sPauseOnZeroKey;
+    parameter->m_Unknown14_00 = node->Get(pauseOnZeroKey).m_Words.m_Value;
+    unsigned int stopOnZeroKey = sStopOnZeroKey;
+    parameter->m_Unknown14_01 = node->Get(stopOnZeroKey).m_Words.m_Value;
 }
 
 AudioEffectFactory::~AudioEffectFactory()

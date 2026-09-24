@@ -7,7 +7,7 @@
 extern UnidentifiedUnsetTransition lbl_806E20B8;
 class DesireUsePowerup;
 class UnidentifiedFielderInput;
-extern "C" UnidentifiedDesireUpdate fn_800D2074(
+extern "C" DesireUpdate fn_800D2074(
     UnidentifiedFielderInput*);
 extern "C" void fn_800D38D0(DesireUsePowerup*);
 extern "C" void fn_800D3CBC(DesireUsePowerup*);
@@ -23,13 +23,13 @@ public:
     {
     }
 
-    virtual ~DesireUsePowerup();
+    virtual inline ~DesireUsePowerup();
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void Update(DesireUpdate*, float);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
     ePowerUpType GetPowerupType() const { return mePowerup; }
     void fn_800D3968(cFielder*, ePowerUpType, bool);

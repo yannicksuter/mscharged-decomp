@@ -214,8 +214,8 @@ public:
     void CompileEndOfGameStats();
     void SimulateGame();
     void AddStat(ePlayerStats stat, int team, int player, int value);
+    void fn_80101E0C(ePlayerStats stat, int team, int player, int amount);
     void AddUserStatByPad(ePlayerStats stat, int pad, int amount);
-    void AddMilestoneUserStat(ePlayerStats stat, int amount);
     void TrackWinner(int forfeitSide);
     void WriteStats(float gameTime, float gameDuration, const char* filename);
     void WriteCurrentlyPlaying() const;

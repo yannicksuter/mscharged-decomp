@@ -6,6 +6,7 @@
 #include "Game/GameSceneManager.h"
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
@@ -536,7 +537,7 @@ void SHGameplayOptions::fn_80236E54()
     for (int i = 0; i < 3; ++i)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find(mCheatInstances[i],
-            nlStringLowerHash("off"), nlStringLowerHash("CHALLENGE_0"), nlStringLowerHash("list_back_480x70 "), 0, 0, 0);
+            "off", "CHALLENGE_0", "list_back_480x70 ");
         feVector3 position = mCheatInstances[i]->GetAssetPosition();
         mCheatButtons[i].SetInstanceBounds(instance, true, position.f.x, position.f.y, 0.95f, 0.75f);
         mCheatButtons[i].SetPointerEnterCallback(cheatOver);

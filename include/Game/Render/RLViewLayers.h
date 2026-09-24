@@ -140,6 +140,7 @@ extern bool sWidescreen;
 
 void rlSetWidescreen(bool widescreen);
 bool IsWidescreen();
+void SetupViews();
 
 extern const nlMatrix4 sIdentityMatrix;
 

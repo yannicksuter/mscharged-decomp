@@ -15,6 +15,8 @@ public:
     }
     ~CrowdModelArray();
 
+    ImpostorModel*& operator[](unsigned int index) { return data[index]; }
+
     ImpostorModel** data;
     int capacity;
 };
@@ -28,6 +30,11 @@ public:
         capacity = count;
     }
     ~CrowdCharacterArray();
+
+    AnimatedImpostorCharacter*& operator[](unsigned int index)
+    {
+        return data[index];
+    }
 
     AnimatedImpostorCharacter** data;
     int capacity;

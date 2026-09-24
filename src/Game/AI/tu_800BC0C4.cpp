@@ -27,7 +27,6 @@ extern "C" void fn_8002E818(cFielder*);
 extern "C" void fn_8002E898(cFielder*, bool);
 extern "C" void fn_8002E934(cFielder*, bool);
 extern "C" void fn_80038158(cFielder*, bool);
-extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
 extern "C" void fn_801B865C(cFielder*);
@@ -63,9 +62,9 @@ static nlVector2 lbl_806DC188 = { 0.1f, 0.0f };
 bool DesireStar::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002CFD8(mUnidentifiedFielder->GetTweaks());
-    mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
-    EmitStar(mUnidentifiedFielder, false);
+    mUnidentified078 = fn_8002CFD8(m_pFielder->GetTweaks());
+    m_pFielder->muInvincibleStatus |= 0x1F;
+    EmitStar(m_pFielder, false);
     return result;
 }
 
@@ -77,8 +76,8 @@ bool DesireStar::UnidentifiedReinitialize(void* context)
     mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002CFD8(mUnidentifiedFielder->GetTweaks());
-    EmitStar(mUnidentifiedFielder, true);
+    mUnidentified078 = fn_8002CFD8(m_pFielder->GetTweaks());
+    EmitStar(m_pFielder, true);
     return result;
 }
 
@@ -86,20 +85,20 @@ bool DesireStar::UnidentifiedReinitialize(void* context)
  * Offset/Address/Size: 0xDC | 0x800BC1A0 | size: 0x58C
  */
 void DesireStar::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+    DesireUpdate* update, float fDeltaT)
 {
-    eFielderActionState action = mUnidentifiedFielder->m_eActionState;
+    eFielderActionState action = m_pFielder->m_eActionState;
     if (action == ACTION_SHOOT_TO_SCORE
         || (action == ACTION_UNKNOWN_30
-            && mUnidentifiedFielder->m_pShotMeter->m_eShotMeterState
+            && m_pFielder->m_pShotMeter->m_eShotMeterState
                 == SHOT_METER_STS_ACTIVE
-            && !mUnidentifiedFielder->fn_8001E168()))
+            && !m_pFielder->fn_8001E168()))
     {
         mUnidentifiedTimer.Countup(
             fDeltaT * lbl_806DC180 - fDeltaT, 10.0f);
     }
 
-    action = mUnidentifiedFielder->m_eActionState;
+    action = m_pFielder->m_eActionState;
     if (action == ACTION_SHOT || action == ACTION_UNKNOWN_32
         || action == (eFielderActionState)0x21)
     {
@@ -107,9 +106,9 @@ void DesireStar::Update(
     }
     else
     {
-        if (!mUnidentifiedFielder->IsInvincible())
+        if (!m_pFielder->IsInvincible())
         {
-            mUnidentifiedFielder->muInvincibleStatus |= 0x1F;
+            m_pFielder->muInvincibleStatus |= 0x1F;
         }
 
         if (!g_pGame->IsGameplayOrOvertime())
@@ -124,8 +123,8 @@ void DesireStar::Update(
  */
 void DesireStar::UnidentifiedCleanup()
 {
-    KillStar(mUnidentifiedFielder);
-    fn_80038158(mUnidentifiedFielder, true);
+    KillStar(m_pFielder);
+    fn_80038158(m_pFielder, true);
 }
 
 /**
@@ -134,13 +133,13 @@ void DesireStar::UnidentifiedCleanup()
 bool DesireMushroom::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002C7D0(mUnidentifiedFielder->GetTweaks());
-    fn_8002E340(mUnidentifiedFielder);
-    if (!mUnidentifiedFielder->fn_8003E74C())
+    mUnidentified078 = fn_8002C7D0(m_pFielder->GetTweaks());
+    fn_8002E340(m_pFielder);
+    if (!m_pFielder->fn_8003E74C())
     {
-        mUnidentifiedFielder->fn_8001EE74(lbl_806DC17C, 0.2f, -1.0f);
+        m_pFielder->fn_8001EE74(lbl_806DC17C, 0.2f, -1.0f);
     }
-    EmitMushroom(mUnidentifiedFielder, false);
+    EmitMushroom(m_pFielder, false);
     return result;
 }
 
@@ -152,7 +151,7 @@ bool DesireMushroom::UnidentifiedReinitialize(void* context)
     mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
-    EmitMushroom(mUnidentifiedFielder, true);
+    EmitMushroom(m_pFielder, true);
     return result;
 }
 
@@ -161,11 +160,11 @@ bool DesireMushroom::UnidentifiedReinitialize(void* context)
  */
 void DesireMushroom::UnidentifiedCleanup()
 {
-    KillMushroom(mUnidentifiedFielder);
-    if (!mUnidentifiedFielder->fn_8003E74C()
-        && !mUnidentifiedFielder->fn_8003E73C())
+    KillMushroom(m_pFielder);
+    if (!m_pFielder->fn_8003E74C()
+        && !m_pFielder->fn_8003E73C())
     {
-        mUnidentifiedFielder->fn_8001EE74(1.0f, 0.2f, -1.0f);
+        m_pFielder->fn_8001EE74(1.0f, 0.2f, -1.0f);
     }
 }
 
@@ -259,7 +258,7 @@ float DesireGooey::fn_800BD1F0()
  * Offset/Address/Size: 0x1144 | 0x800BD208 | size: 0x344
  */
 void DesireGooey::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+    DesireUpdate* update, float fDeltaT)
 {
     if (mUnidentifiedAC != -1.0f)
     {
@@ -268,20 +267,20 @@ void DesireGooey::Update(
 
     mfGooPercentage = 1.0f
                     - (mUnidentifiedTimer.GetSeconds() / mUnidentified078);
-    if (!mUnidentifiedFielder->IsRunning())
+    if (!m_pFielder->IsRunning())
     {
-        mUnidentifiedFielder->m_pCurrentAnimController
+        m_pFielder->m_pCurrentAnimController
             ->m_fPlaybackSpeedScale = InterpolateRangeClamped(
             1.0f, mf_NotRunning_SpeedScale, 0.02f, 2.0f, mfGooPercentage);
         float movementScale = InterpolateRangeClamped(
             1.0f, mf_NotRunning_MovementScale, 0.02f, 2.0f, mfGooPercentage);
-        mUnidentifiedFielder->fn_8001EF6C(movementScale);
+        m_pFielder->fn_8001EF6C(movementScale);
     }
     else
     {
         float movementScale = InterpolateRangeClamped(
             1.0f, mfMaxGooEffect, 0.0f, 1.0f, mfGooPercentage);
-        mUnidentifiedFielder->fn_8001EF6C(movementScale);
+        m_pFielder->fn_8001EF6C(movementScale);
     }
 
     if (!g_pGame->IsGameplayOrOvertime())
@@ -296,8 +295,8 @@ void DesireGooey::Update(
 void DesireGooey::UnidentifiedCleanup()
 {
     mfMaxGooEffect = 1.0f;
-    mUnidentifiedFielder->fn_8001EF6C(1.0f);
-    mUnidentifiedFielder->m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
+    m_pFielder->fn_8001EF6C(1.0f);
+    m_pFielder->m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
 }
 
 /**
@@ -309,42 +308,42 @@ bool DesireShrink::UnidentifiedInitialize(void* context)
     mUnidentified078 = lbl_806DC168;
     mfSlowPercentage = 1.0f;
 
-    fn_8002E2E4(mUnidentifiedFielder);
-    fn_8002E718(mUnidentifiedFielder);
-    fn_8002E898(mUnidentifiedFielder, false);
-    fn_8002E934(mUnidentifiedFielder, false);
-    fn_8002E66C(mUnidentifiedFielder, false);
-    fn_8002E818(mUnidentifiedFielder);
-    fn_8002E798(mUnidentifiedFielder);
-    fn_8002E3F8(mUnidentifiedFielder);
-    mUnidentifiedFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
-    mUnidentifiedFielder->fn_8001EE74(
+    fn_8002E2E4(m_pFielder);
+    fn_8002E718(m_pFielder);
+    fn_8002E898(m_pFielder, false);
+    fn_8002E934(m_pFielder, false);
+    fn_8002E66C(m_pFielder, false);
+    fn_8002E818(m_pFielder);
+    fn_8002E798(m_pFielder);
+    fn_8002E3F8(m_pFielder);
+    m_pFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
+    m_pFielder->fn_8001EE74(
         lbl_806DC174, lbl_806DC178, lbl_806DC170);
 
     UnidentifiedVariantCollection* params
         = (UnidentifiedVariantCollection*)context;
     cFielder* source = (cFielder*)params->Get(14)->mData.pointer;
-    mUnidentifiedFielder->fn_8003063C(source->mUnidentified328);
-    mUnidentifiedFielder->m_pTweaks->mUnidentified004
-        = mUnidentifiedFielder->mUnidentified32C->mUnidentified004;
-    mUnidentifiedFielder->m_pTweaks->mUnidentified014
-        = fn_8002BFA8(mUnidentifiedFielder->mUnidentified32C, 1.0f);
-    fn_801BA510(mUnidentifiedFielder);
+    m_pFielder->fn_8003063C(source->mUnidentified328);
+    m_pFielder->m_pTweaks->mUnidentified004
+        = m_pFielder->mUnidentified32C->mUnidentified004;
+    m_pFielder->m_pTweaks->mUnidentified014
+        = fn_8002BFA8(m_pFielder->mUnidentified32C, 1.0f);
+    fn_801BA510(m_pFielder);
 
-    if (mUnidentifiedFielder->m_pBall != 0)
+    if (m_pFielder->m_pBall != 0)
     {
-        if (mUnidentifiedFielder->fn_8002E060()
+        if (m_pFielder->fn_8002E060()
             == (eFielderDesireState)ACTION_UNKNOWN_32)
         {
-            mUnidentifiedFielder->ReleaseBall(0);
-            mUnidentifiedFielder->EndDesire();
-            mUnidentifiedFielder->InitActionRunning();
+            m_pFielder->ReleaseBall(0);
+            m_pFielder->EndDesire();
+            m_pFielder->InitActionRunning();
         }
         else
         {
-            mUnidentifiedFielder->ReleaseBall(0);
-            mUnidentifiedFielder->ShootBallDueToContact(
-                mUnidentifiedFielder->mUnidentified024
+            m_pFielder->ReleaseBall(0);
+            m_pFielder->ShootBallDueToContact(
+                m_pFielder->mUnidentified024
                     .m_aActualFacingDirection);
         }
     }
@@ -366,6 +365,23 @@ float DesireShrink::fn_800BD75C()
 }
 
 /**
+ * Offset/Address/Size: 0x16A0 | 0x800BD764 | size: 0x2AC
+ */
+void DesireShrink::Update(DesireUpdate* update, float)
+{
+    if (!(m_pFielder->mUnidentified024.m_fPlayerScale < 0.99f))
+    {
+        m_pFielder->fn_8001EE74(
+            lbl_806DC174, 0.0f, lbl_806DC170);
+    }
+
+    if (!g_pGame->IsGameplayOrOvertime())
+    {
+        *update = 1;
+    }
+}
+
+/**
  * Offset/Address/Size: 0x1C40 | 0x800BDD04 | size: 0xAC
  */
 bool DesireFrozen::UnidentifiedReinitialize(void* context)
@@ -382,7 +398,7 @@ bool DesireFrozen::UnidentifiedReinitialize(void* context)
 
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     fn_800BE1AC(params->Get(0)->mData.i);
-    fn_801B865C(mUnidentifiedFielder);
+    fn_801B865C(m_pFielder);
     return Desire::UnidentifiedInitialize(context);
 }
 
@@ -398,35 +414,35 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
         mfConfusedDirection = -mfConfusedDirection;
     }
     mfConfusedPercentage = 0.0f;
-    fn_801B7F8C(mUnidentifiedFielder);
+    fn_801B7F8C(m_pFielder);
 
-    if (mUnidentifiedFielder->m_pBall != 0)
+    if (m_pFielder->m_pBall != 0)
     {
-        if (mUnidentifiedFielder->fn_8002E060()
+        if (m_pFielder->fn_8002E060()
             == (eFielderDesireState)ACTION_UNKNOWN_32)
         {
-            mUnidentifiedFielder->ReleaseBall(0);
-            mUnidentifiedFielder->EndDesire();
-            mUnidentifiedFielder->InitActionRunning();
+            m_pFielder->ReleaseBall(0);
+            m_pFielder->EndDesire();
+            m_pFielder->InitActionRunning();
         }
-        else if (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass
+        else if (m_pFielder->mUnidentified024.m_eCharacterClass
                      == (eCharacterClass)0x13
-                 && mUnidentifiedFielder->m_eActionState
+                 && m_pFielder->m_eActionState
                         == ACTION_UNKNOWN_32)
         {
-            unsigned short direction = mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
-            bool hasGlobalPad = mUnidentifiedFielder->GetGlobalPad() != 0;
+            unsigned short direction = m_pFielder->mUnidentified024.m_aActualFacingDirection;
+            bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
             if (hasGlobalPad)
             {
                 direction += (int)(mfConfusedDirection * mfConfusedPercentage);
             }
-            mUnidentifiedFielder->SetFacingDirection(direction, true);
+            m_pFielder->SetFacingDirection(direction, true);
         }
         else
         {
-            mUnidentifiedFielder->ReleaseBall(0);
-            mUnidentifiedFielder->ShootBallDueToContact(
-                mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
+            m_pFielder->ReleaseBall(0);
+            m_pFielder->ShootBallDueToContact(
+                m_pFielder->mUnidentified024.m_aActualFacingDirection);
         }
     }
 
@@ -450,15 +466,15 @@ bool DesireConfused::UnidentifiedReinitialize(void* context)
         mfConfusedPercentage = 1.0f;
     }
 
-    if (mUnidentifiedFielder->m_pBall != 0
-        && (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass
+    if (m_pFielder->m_pBall != 0
+        && (m_pFielder->mUnidentified024.m_eCharacterClass
                 != (eCharacterClass)0x13
-            || mUnidentifiedFielder->m_eActionState
+            || m_pFielder->m_eActionState
                    != ACTION_UNKNOWN_32))
     {
-        mUnidentifiedFielder->ReleaseBall(0);
-        mUnidentifiedFielder->ShootBallDueToContact(
-            mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
+        m_pFielder->ReleaseBall(0);
+        m_pFielder->ShootBallDueToContact(
+            m_pFielder->mUnidentified024.m_aActualFacingDirection);
     }
     return result;
 }
@@ -467,7 +483,7 @@ bool DesireConfused::UnidentifiedReinitialize(void* context)
  * Offset/Address/Size: 0x2464 | 0x800BE528 | size: 0x7FC
  */
 void DesireConfused::Update(
-    UnidentifiedDesireUpdate* update, float)
+    DesireUpdate* update, float)
 {
     mfConfusedPercentage
         += mUnidentifiedTimer.GetSeconds() / lbl_806DC184;
@@ -480,38 +496,34 @@ void DesireConfused::Update(
     {
         *update = 1;
     }
-    if (mUnidentifiedFielder->fn_8003E6FC())
+    if (m_pFielder->fn_8003E6FC())
     {
         *update = 1;
     }
-    if (mUnidentifiedFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime
+    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime
         != 0)
     {
         *update = 1;
     }
 
-    if (mUnidentifiedFielder->GetGlobalPad() == 0)
+    bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
+    if (!hasGlobalPad)
     {
-        UnidentifiedFielderInput* input = fn_80316974(this);
-        if (!input->fn_8030FB7C(0xFF))
+        if (!fn_80316974(this)->fn_8030FB7C(0xFF))
         {
-            input->fn_8030FA10(0xFF, 0.5f);
+            fn_80316974(this)->fn_8030FA10(0xFF, 0.5f);
             nlPolar polar;
             polar.r = 1.0f;
             polar.a = nlRandom(0xFFFF);
             nlPolarToCartesian(mvDesiredPosition, polar);
         }
 
-        if (ReceivingPass(mUnidentifiedFielder) == 0.0f)
+        if (!ReceivingPass(m_pFielder))
         {
             nlVector3 position;
-            position.x = mUnidentifiedFielder->GetPosition().x
-                       + 5.0f * mvDesiredPosition.x;
-            position.y = mUnidentifiedFielder->GetPosition().y
-                       + 5.0f * mvDesiredPosition.y;
-            position.z = mUnidentifiedFielder->GetPosition().z
-                       + 5.0f * mvDesiredPosition.z;
-            fn_800401C0(mUnidentifiedFielder, position, 1.0f, 4.0f);
+            nlVec3ScaleAdd(position, 5.0f, mvDesiredPosition,
+                m_pFielder->GetPosition());
+            m_pFielder->AddDesiredPosition(position, 1.0f, 4.0f);
         }
     }
 }
@@ -521,7 +533,7 @@ void DesireConfused::Update(
  */
 void DesireConfused::fn_800BED24(unsigned short* direction)
 {
-    bool hasGlobalPad = mUnidentifiedFielder->GetGlobalPad() != 0;
+    bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
     if (hasGlobalPad)
     {
         *direction += (int)(mfConfusedDirection * mfConfusedPercentage);
@@ -533,7 +545,7 @@ void DesireConfused::fn_800BED24(unsigned short* direction)
  */
 void DesireConfused::UnidentifiedCleanup()
 {
-    fn_801B8164(mUnidentifiedFielder);
+    fn_801B8164(m_pFielder);
 }
 
 /**

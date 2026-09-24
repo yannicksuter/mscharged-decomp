@@ -4,6 +4,7 @@
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/ParticleSystem.h"
 #include "Game/TweakValue.h"
+#include "Game/Sys/debug.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glTexture.h"
@@ -56,23 +57,26 @@ extern void* lbl_806E1FF0;
 extern void* gEffectsGeometryData;
 extern void* gEffectsTextureData;
 extern int lbl_806E1FD8;
+extern int lbl_806DF4C0;
+static int lbl_806E1FDC;
 extern nlAVLTree<unsigned long, EffectsGroup*, DefaultKeyCompare<unsigned long> > lbl_8057F6B8;
 
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
 
 inline EmissionResourceStats::EmissionResourceStats()
-    : mCount(0)
-    , mHighWaterMark(0)
-    , mBudgetTweak(0)
-    , mId(sResourceIdCounter++)
+    : mId(sResourceIdCounter++)
 {
-    mFlags &= 0x3FFF;
+    unknown_0x32_bit15 = 0;
+    unknown_0x32_bit14 = 0;
+    mBudgetTweak = 0;
+    mHighWaterMark = 0;
+    mCount = 0;
     if (mId < 2)
     {
         nlStrNCpy(mName, sDefaultResourceNames[mId], sizeof(mName));
         mBudget = 0xFFFF;
-        mFlags = (mFlags & 0x7FFF) | 0x8000;
+        unknown_0x32_bit15 = mBudget != 0;
     }
 }
 
@@ -197,6 +201,20 @@ EmissionManager::~EmissionManager()
     Shutdown();
 }
 
+static void AllocateParticles(EmissionManager* manager)
+{
+    int i;
+    const int count = manager->mNumParticles;
+    manager->mParticleMemory = (Particle*)nlMalloc(count * sizeof(Particle), 8, false);
+    tDebugPrintManager::Print(DC_RENDER, "%dKB used by Particle pool\n",
+        (manager->mNumParticles * sizeof(Particle)) >> 10);
+
+    for (i = 0; i < manager->mNumParticles; ++i)
+    {
+        manager->mParticles.AddStart(&manager->mParticleMemory[i]);
+    }
+}
+
 /**
  * Offset/Address/Size: 0x0 | 0x802E6C20 | size: 0x1D8
  */
@@ -205,12 +223,19 @@ void EmissionManager::Startup(void* context,
 {
     mContext = context;
     mNumParticles = numParticles;
+    mMemoryContext = &VirtualAllocator;
+
+    lingerers = new (nlMalloc(sizeof(LingerTree), 8, false)) LingerTree();
+
+    AllocateParticles(this);
+
     fxParticleStartup(numParticles);
     fxSetMaxNumParticles(maxRenderedParticles);
 
-    for (int i = 0; i < 8; ++i)
+    EmissionResourceStats* stats = Instance()->mResourceStats;
+    for (unsigned int i = 0; i < 8; ++i)
     {
-        mResourceStats[i].Initialize();
+        stats[i].Initialize();
     }
     mUpdateEnabled = true;
 }
@@ -376,18 +401,30 @@ void EmissionManager::AddEffectsLight(const EffectsLight& light)
 void EmissionManager::Render()
 {
     g_nNumLights = 0;
+    sUnidentified_806E1FAC = 0;
 
+    EmissionResourceStats* stats = Instance()->mResourceStats;
+    for (int i = 0; i < 8; ++i)
+    {
+        if (stats[i].unknown_0x32_bit14)
+        {
+            *stats[i].mCount->m_pValue = lbl_806DF4C0;
+        }
+    }
+
+    int renderedParticles = 0;
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
-        iterator.Step();
         if (!mRenderPersistentOnly
-            || current->m_pGroup->IsPersistent())
+            || !current->m_pGroup->IsPersistent())
         {
-            current->Render();
+            renderedParticles += current->Render();
         }
+        iterator.Step();
     }
+    lbl_806E1FDC = renderedParticles;
 }
 
 /**
@@ -902,15 +939,14 @@ void EmissionManager::PrepareForReplay()
 {
     while (mReplayControllers.m_Head != 0)
     {
-        nlDLListIterator<EmissionController*> iterator
-            = mReplayControllers.Begin();
-        EmissionController* current = *iterator;
-        mReplayControllers.Remove(&iterator);
+        EmissionController* current;
+        mReplayControllers.RemoveStart(&current);
         delete current;
     }
 
+    DLListEntry<EmissionController*>* replayHead = mReplayControllers.m_Head;
     mReplayControllers.m_Head = mControllers.m_Head;
-    mControllers.m_Head = 0;
+    mControllers.m_Head = replayHead;
 }
 
 /**
@@ -963,8 +999,7 @@ void EmissionManager::ConfigureResource(
         EmissionResourceStats& resourceStats = stats[resource];
         nlStrNCpy(resourceStats.mName, name, sizeof(resourceStats.mName));
         resourceStats.mBudget = budget;
-        resourceStats.mFlags
-            = (resourceStats.mFlags & 0x7FFF) | ((budget != 0) << 15);
+        resourceStats.unknown_0x32_bit15 = budget != 0;
     }
 }
 

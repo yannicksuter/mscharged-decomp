@@ -21,6 +21,7 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"

@@ -26,7 +26,7 @@ public:
         return UnidentifiedInitialize(context);
     }
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
 
     u32 mUnidentified088;
     u32 mUnidentified08C;
@@ -112,18 +112,18 @@ extern const float lbl_806E6888 = -99999.0f;
 extern const float lbl_806E688C = 10.0f;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
-    UnidentifiedFuzzyRuntimeBase* runtime, u32* hash, void* argument)
+    UnidentifiedFuzzyRuntimeBase* runtime, const u32& hash, void* argument)
 {
-    u32 localHash = *hash;
+    u32 localHash = hash;
     return UnidentifiedVariant_80054AB8(fn_80312360(
         runtime, runtime->FindFunctionEntryPoint(localHash), 1, argument, 0));
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
-    UnidentifiedFuzzyRuntimeBase* runtime, u32* hash, void* argument,
+    UnidentifiedFuzzyRuntimeBase* runtime, const u32& hash, void* argument,
     float value)
 {
-    u32 localHash = *hash;
+    u32 localHash = hash;
     u32 valueBits = *(u32*)&value;
     return UnidentifiedVariant_80054AB8(fn_80312360(
         runtime, runtime->FindFunctionEntryPoint(localHash), 2, argument, (void*)valueBits));
@@ -346,35 +346,36 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
         UnidentifiedVirtual8();
     }
 
-    if (!fn_80317E34(&mUnidentified00C))
+    if (fn_80317E34(&mUnidentified00C))
     {
-        UnidentifiedVirtual6();
-        return;
-    }
+        float start = lbl_806DF560();
+        UnidentifiedVariant_80054AB8 result;
+        fn_80315A64(&mUnidentified00C, mUnidentified064, &result, 0);
+        fn_8031A0C8(start, lbl_806DF560());
 
-    float start = lbl_806DF560();
-    UnidentifiedVariant_80054AB8 result;
-    fn_80315A64(&mUnidentified00C, mUnidentified064, &result, 0);
-    fn_8031A0C8(start, lbl_806DF560());
-
-    if (result.GetInt() == -1)
-    {
-        tDebugPrintManager::Print(DC_AI, lbl_805302A0, mUnidentified00C.mUnidentifiedHash);
-        UnidentifiedVirtual6();
-    }
-    else if (result.ExtraData.Get(9)->mData.b)
-    {
-        if (fn_80319E84(
-                this, result.GetInt(), &result.ExtraData, false)
-            != 0)
+        if ((unsigned int)result.GetType() == FT_UNSPECIFIED)
         {
+            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mUnidentified00C.mUnidentifiedHash);
             UnidentifiedVirtual6();
+        }
+        else if (result.ExtraData.Get(9)->mData.b)
+        {
+            if (fn_80319E84(
+                    this, result.mData.i, &result.ExtraData, false)
+                != 0)
+            {
+                UnidentifiedVirtual6();
+            }
+        }
+        else
+        {
+            UnidentifiedVirtual5(
+                result.mData.i, &result.ExtraData, true);
         }
     }
     else
     {
-        UnidentifiedVirtual5(
-            result.GetInt(), &result.ExtraData, true);
+        UnidentifiedVirtual6();
     }
 }
 

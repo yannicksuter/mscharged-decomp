@@ -6,6 +6,7 @@
 #include "Game/World/WorldObjectLoadContext.h"
 #include "Game/Drawable/DrawableObj.h"
 #include "Game/DB/CharacterInfo.h"
+#include "Game/Field.h"
 #include "Game/GameInfo.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/Render/RLView.h"
@@ -21,6 +22,8 @@
 #include "NL/nlString.h"
 #include "Game/Render/CrowdImpostors.h"
 #include "NL/nlstring_tmpl.h"
+
+#include <math.h>
 
 static CrowdCharacterDefinition sCrowdCharacterDefinitions[36] = {
     { "birdo", "art/animation/crowdbirdo.sanim.zlib",
@@ -185,13 +188,13 @@ public:
 };
 
 static const char* sCrowdCharactersToLoadPath = "/Render/Crowd/CharactersToLoad";
-static const char sAlternateCrowdListSuffix[] = "Alt";
-static const char sDefaultCrowdListSuffix[] = "";
-static const char sCrowdIdleAnimation[] = "idle";
-static const char sCrowdExcitedAnimation[] = "excited";
+static char sAlternateCrowdListSuffix[] = "Alt";
+static char sDefaultCrowdListSuffix[] = "";
+static char sCrowdIdleAnimation[] = "idle";
+static char sCrowdExcitedAnimation[] = "excited";
 static float sCrowdExcitedThreshold = 200.0f;
 static float sCrowdIdleThreshold = 100.0f;
-static const char sCrowdCharacterListFormat[] = "ini/CrowdCharacterLists/%s%s.ini";
+static char sCrowdCharacterListFormat[] = "ini/CrowdCharacterLists/%s%s.ini";
 static const double sCrowdViewVectorMinLengthSq = 0.001;
 static const float sCrowdZero = 0.0f;
 static const float sMaxCrowdSidelineCullingDistance = 50.0f;
@@ -210,12 +213,12 @@ static GLMemoryRequirement sCrowdResourceRequirements[2]
     = { { GLM_Header, 0x8000 }, { GLM_VertexData, 0 } };
 static GLMemoryRequirement sEmptyCrowdResourceRequirements[2]
     = { { GLM_Header, 0x400 }, { GLM_VertexData, 0x400 } };
-static const char sMaxCrowdSizePath[] = "user/CrowdMax";
-static const char sCrowdClusterName[] = "impostorCluster";
-static const char sViceCrowdModelName[] = "_vice/crowd_testanim";
-static const char sViceNightCrowdModelName[] = "_vicenight/crowd_testanim";
-static const char sUndergroundCrowdModelName[] = "_underground/crowd_testanim";
-static const char sWastelandsCrowdModelName[] = "_wastelands/crowd_testanim";
+static char sMaxCrowdSizePath[] = "user/CrowdMax";
+static char sCrowdClusterName[] = "impostorCluster";
+static char sViceCrowdModelName[] = "_vice/crowd_testanim";
+static char sViceNightCrowdModelName[] = "_vicenight/crowd_testanim";
+static char sUndergroundCrowdModelName[] = "_underground/crowd_testanim";
+static char sWastelandsCrowdModelName[] = "_wastelands/crowd_testanim";
 static CrowdLayoutObject* sCrowdLayoutObject;
 static CrowdModelArray sCrowdModels(36);
 static CrowdCharacterArray sCrowdCharacters(36);
@@ -223,7 +226,7 @@ static CrowdDefinitionArray sCrowdLoadDefinitions(8);
 static int sNumCrowdCharacters;
 static bool sCullCrowdInDebugCamera;
 static CrowdSidelineFilter* sCrowdSidelineFilter;
-static bool sCrowdViewBudgetConfigured;
+static signed char sCrowdViewBudgetConfigured;
 static bool sCrowdImpostorsExcited;
 static ImpostorCluster* sCrowdCluster;
 static bool sLockCrowdImpostorAnimation;
@@ -317,33 +320,25 @@ void InitializeCrowdImpostors(bool alternateView)
     params.mBaseAngle = 0;
     for (int i = 0; i < sNumCrowdCharacters; ++i)
     {
-        sCrowdModels.data[i] = gCrowdModelCollection.mModels[i];
-        CrowdImpostorCharacter* character
-            = new (8, false) CrowdImpostorCharacter(
+        sCrowdModels[i] = gCrowdModelCollection.mModels[i];
+        sCrowdCharacters[i] = new (8, false) CrowdImpostorCharacter(
                 sCrowdLoadDefinitions.data[i % sNumCrowdCharacters].mName,
-                sCrowdModels.data[i],
+                sCrowdModels[i],
                 (void*)sCrowdIdleAnimation, budget, 4, 2, &params);
-        sCrowdCharacters.data[i] = character;
-        GetCrowdImpostorManager()->AddCharacter( character);
+        GetCrowdImpostorManager()->AddCharacter(sCrowdCharacters[i]);
     }
 
     sCrowdImpostorsExcited = false;
     CreateCrowdLayoutObject();
 
     ImpostorCharacterParams clusterParams;
-    clusterParams.mWidth = 128;
-    clusterParams.mHeight = 128;
     clusterParams.mUnidentified008 = false;
     clusterParams.mUseIntensityAlpha = false;
     clusterParams.mBaseAngle = 0;
-    void* clusterMemory = nlMalloc(0x70, 8, false);
+    clusterParams.mWidth = 128;
+    clusterParams.mHeight = 128;
     ImpostorCluster* clusterCharacter
-        = (ImpostorCluster*)clusterMemory;
-    if (clusterCharacter != 0)
-    {
-        clusterCharacter = new (clusterCharacter) ImpostorCluster(
-            sCrowdClusterName, 10, &clusterParams);
-    }
+        = new (8, false) ImpostorCluster(sCrowdClusterName, 10, &clusterParams);
     sCrowdCluster = clusterCharacter;
     u32 firstHash = nlStringLowerHash(sViceCrowdModelName);
     unsigned long cluster = sCrowdCluster->GetTexture();
@@ -481,7 +476,27 @@ void UpdateCrowdImpostorAnimation(float value)
     }
 }
 
+bool CrowdSidelineFilter::IsVisible(const Impostor* impostor)
+{
+    if (cCameraManager::PeekCamera()->GetType() != eCameraType_Gameplay
+        && cCameraManager::PeekCamera()->GetType() != eCameraType_Gameplay
+        && (cCameraManager::PeekCamera()->GetType() != eCameraType_Debug
+            || !sCullCrowdInDebugCamera))
+    {
+        return true;
+    }
+
+    if (impostor->mPosition.y > sCrowdZero)
+        return true;
+
+    if (fabsf(impostor->mPosition.x) > cField::GetGoalLineX(1U))
+        return true;
+
+    float sideline = cField::GetSidelineY(1U);
+    sideline += (float)mSidelineCullingDistance;
+    return -impostor->mPosition.y > sideline;
+}
+
 CrowdImpostorCharacter::~CrowdImpostorCharacter()
 {
 }
-

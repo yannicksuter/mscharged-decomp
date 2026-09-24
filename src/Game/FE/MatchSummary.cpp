@@ -163,5 +163,6 @@ const char* MatchSummary::GetCaptainTextureName(int team)
         "captain_diddykong_s",
         "captain_petey_s",
     };
-    return CAPTAIN_TEXTURES[team];
+    const char* const* pNames = CAPTAIN_TEXTURES;
+    return pNames[team];
 }

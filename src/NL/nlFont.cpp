@@ -18,7 +18,7 @@ nlFont::~nlFont()
 
 static inline nlFont::GlyphInfo* AddExtendedGlyph(nlFont* self, nlListSlotPoolHigh<nlFont::GlyphInfo>& GlyphList)
 {
-    ListEntry<nlFont::GlyphInfo>* pEntry = GlyphList.Allocate(nlFont::GlyphInfo());
+    ListEntry<nlFont::GlyphInfo>* pEntry = GlyphList.Allocate();
     nlListAddStart<ListEntry<nlFont::GlyphInfo> >(&GlyphList.m_Head, pEntry, &GlyphList.m_Tail);
     self->m_ExtendedGlyphCount++;
     return &pEntry->entry;
@@ -58,6 +58,11 @@ static inline void ParseKernPairs(nlFont* self, nlFont::GlyphInfo* pInfo, char* 
 
 unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned long HashId)
 {
+    unsigned long CurrentPage;
+    unsigned long CurrentTexelX;
+    unsigned long CurrentTexelY;
+    unsigned long RenderHeight;
+    unsigned short RenderAscent;
     char* pCurrentLine;
 
     nlStrNCpy(m_FontName, szFontName, 0x20);
@@ -71,9 +76,6 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
     m_ExtendedGlyphCount = 0;
     m_pExtendedGlyphs = NULL;
 
-    unsigned long CurrentPage;
-    unsigned long CurrentTexelX;
-    unsigned long CurrentTexelY;
     char* pEOL;
     char* pToken;
     unsigned short Character;
@@ -82,13 +84,13 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
     nlFont::KernPair* pCurKP;
     nlFont::KernPair* pKP;
 
-    unsigned long uVar_r21 = 0;
-    unsigned short uVar_r20 = 0;
     float fVar_f24 = 0.0f;
 
     CurrentPage = 0;
     CurrentTexelX = 0;
     CurrentTexelY = 0;
+    RenderHeight = 0;
+    RenderAscent = 0;
     m_bScissorBox = false;
     m_Metrics.FontName = HashId;
 
@@ -106,6 +108,10 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
 
         switch (nlToUpper(*pCurrentLine))
         {
+        case 'V':
+            fVar_f24 = atof(pToken);
+            break;
+
         case 'P':
         {
             if (nlToUpper(pCurrentLine[4]) == 'S')
@@ -165,7 +171,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             pCurrentLine = nlStrChr(pToken, ' ');
             pCurrentLine++;
             pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
-            uVar_r21 = atoi(pCurrentLine);
+            RenderHeight = atoi(pCurrentLine);
 
             pCurrentLine = nlStrChr(pCurrentLine, ' ');
             pCurrentLine++;
@@ -175,7 +181,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             pCurrentLine = nlStrChr(pCurrentLine, ' ');
             pCurrentLine++;
             pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
-            uVar_r20 = (unsigned short)atoi(pCurrentLine);
+            RenderAscent = (unsigned short)atoi(pCurrentLine);
 
             pCurrentLine = nlStrChr(pCurrentLine, ' ');
             pCurrentLine++;
@@ -231,13 +237,14 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             pCurrentLine = nlStrChr(pCurrentLine, ' ') + 1;
             pInfo->Offset = (signed char)atoi(pCurrentLine);
 
-            if (1.2f - fVar_f24 > 0.0001f)
+            bool usePackedGlyphs = 1.2f - fVar_f24 > 0.0001f;
+            if (usePackedGlyphs)
             {
                 if ((CurrentTexelX + pInfo->RenderWidth) > m_PageSize)
                 {
                     CurrentTexelX = 0;
-                    CurrentTexelY += uVar_r21;
-                    if ((CurrentTexelY + uVar_r21) > m_PageSize)
+                    CurrentTexelY += RenderHeight;
+                    if ((CurrentTexelY + RenderHeight) > m_PageSize)
                     {
                         CurrentTexelX = 0;
                         CurrentTexelY = 0;
@@ -245,8 +252,8 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
                     }
                 }
 
-                pInfo->Unidentified_13 = uVar_r20;
-                pInfo->Unidentified_12 = uVar_r21;
+                pInfo->Unidentified_13 = RenderAscent;
+                pInfo->Unidentified_12 = RenderHeight;
             }
             else
             {
@@ -295,20 +302,14 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             }
             Base = (unsigned short)nBase;
 
-            unsigned short c = Base;
-            if (c > 0x7F)
+            unsigned short c;
+            if (Base <= 0x7F)
             {
-                GlyphInfo key;
-                key.UnicodeChar = c;
-                GlyphInfo* result;
-                if (m_pExtendedGlyphs != NULL && m_ExtendedGlyphCount != 0 && (result = nlBSearch<GlyphInfo, GlyphInfo>(key, m_pExtendedGlyphs, m_ExtendedGlyphCount)) != NULL)
-                {
-                    c = ((result - m_pExtendedGlyphs) + 0x80) & 0xFFFF;
-                }
-                else
-                {
-                    c = 0x3F;
-                }
+                c = Base;
+            }
+            else
+            {
+                c = GetExtendedFontChar(Base);
             }
             if (c > 0x7F)
             {
@@ -322,10 +323,6 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
             ParseKernPairs(this, pInfo, pToken, Base, KernList);
             break;
         }
-
-        case 'V':
-            fVar_f24 = atof(pToken);
-            break;
 
         default:
             break;

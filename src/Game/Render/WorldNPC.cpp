@@ -325,45 +325,54 @@ void WorldNPCManager::LoadTemplates(const char*)
     mTemplatesLoaded = true;
 }
 
+static char sWorldNPCAnimationFileKey[] = "AnimationFile";
+static char sWorldNPCHierarchyFileKey[] = "HierarchyFile";
+static char sWorldNPCHierarchyNameKey[] = "HierarchyName";
+static char sWorldNPCTextureBundleFileKey[] = "TextureBundleFile";
+static char sWorldNPCModelFileKey[] = "ModelFile";
+
 void WorldNPCManager::AddTemplate(
     TweakNode* entry, const char* name)
 {
     const char* hierarchyFile = 0;
-    const char* animationFile = 0;
     const char* hierarchyName = 0;
-    const char* textureBundleFile = 0;
+    const char* animationFile = 0;
     const char* modelFile = 0;
+    const char* textureBundleFile = 0;
 
     for (TweakNode* child
          = ((TweakEntry*)entry)->m_ChildHead;
          child != 0; child = child->m_Next)
     {
-        const char* value
-            = static_cast<TweakValueString*>(child->m_Value)->m_Value;
-        if (nlStrICmp(GetTweakNodeName(child), "AnimationFile") == 0)
+        if (nlStrICmp(GetTweakNodeName(child), sWorldNPCAnimationFileKey) == 0)
         {
-            animationFile = value;
+            animationFile
+                = static_cast<TweakValueString*>(child->m_Value)->m_Value;
         }
-        if (nlStrICmp(GetTweakNodeName(child), "HierarchyFile") == 0)
+        if (nlStrICmp(GetTweakNodeName(child), sWorldNPCHierarchyFileKey) == 0)
         {
-            hierarchyFile = value;
+            hierarchyFile
+                = static_cast<TweakValueString*>(child->m_Value)->m_Value;
         }
-        if (nlStrICmp(GetTweakNodeName(child), "HierarchyName") == 0)
+        if (nlStrICmp(GetTweakNodeName(child), sWorldNPCHierarchyNameKey) == 0)
         {
-            hierarchyName = value;
+            hierarchyName
+                = static_cast<TweakValueString*>(child->m_Value)->m_Value;
         }
-        if (nlStrICmp(GetTweakNodeName(child), "TextureBundleFile") == 0)
+        if (nlStrICmp(GetTweakNodeName(child), sWorldNPCTextureBundleFileKey) == 0)
         {
-            textureBundleFile = value;
+            textureBundleFile
+                = static_cast<TweakValueString*>(child->m_Value)->m_Value;
         }
-        if (nlStrICmp(GetTweakNodeName(child), "ModelFile") == 0)
+        if (nlStrICmp(GetTweakNodeName(child), sWorldNPCModelFileKey) == 0)
         {
-            modelFile = value;
+            modelFile
+                = static_cast<TweakValueString*>(child->m_Value)->m_Value;
         }
     }
 
-    if (hierarchyFile != 0 && animationFile != 0 && hierarchyName != 0
-        && textureBundleFile != 0 && modelFile != 0)
+    if (hierarchyFile != 0 && hierarchyName != 0 && animationFile != 0
+        && modelFile != 0 && textureBundleFile != 0)
     {
         CrowdCharacterDefinition& definition
             = mTemplates[mNumTemplates];

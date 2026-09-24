@@ -13,6 +13,7 @@ public:
     float GetSlideFactor();
     float GetRollingResistance(float value);
     float GetRestitution(float value);
+    void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
     void SyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ char mName[0x40];

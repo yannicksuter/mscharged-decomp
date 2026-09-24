@@ -27,10 +27,14 @@ extern "C" PhysicsObject* fn_8027944C(StadiumPhysicsObject_8027944C* object)
     {
         const nlMatrix4& transform = pDescription->m_transform;
         bool inside = false;
-        nlVector3 position = { transform.m41, transform.m42, transform.m43 };
-        nlVector3 axis0 = { transform.m11, transform.m12, transform.m13 };
-        nlVector3 axis1 = { transform.m21, transform.m22, transform.m23 };
-        nlVector3 axis2 = { transform.m31, transform.m32, transform.m33 };
+        nlVector3 position;
+        nlVector3 axis0;
+        nlVector3 axis1;
+        nlVector3 axis2;
+        transform.GetRow_(3, position);
+        transform.GetRow_(0, axis0);
+        transform.GetRow_(1, axis1);
+        transform.GetRow_(2, axis2);
         if ((position.x > 0.0f && axis2.x > 0.01f)
             || (position.x < 0.0f && axis2.x < -0.01f))
             inside = true;

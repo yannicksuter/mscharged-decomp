@@ -469,6 +469,23 @@ void StatsTracker::OnCollisionBallGoalpost(CollisionBallGoalpostData*)
     }
 }
 
+static unsigned char GetGlobalPadID(int homeaway, int playerindex, int& padid)
+{
+    cTeam* team = g_pTeams[homeaway];
+    if (team != 0)
+    {
+        DetInput* globalPad = team->GetPlayer(playerindex)->GetGlobalPad();
+        if (globalPad != 0)
+        {
+            padid = globalPad->GetPadID();
+            return true;
+        }
+    }
+
+    padid = -1;
+    return false;
+}
+
 void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
     int playerindex, int param0, int, int, int)
 {
@@ -741,25 +758,506 @@ void StatsTracker::AddStat(
     }
 }
 
+void StatsTracker::fn_80101E0C(
+    ePlayerStats stat, int team, int player, int amount)
+{
+    int pad;
+    unsigned char hasPad = GetGlobalPadID(team, player, pad);
+    if (!hasPad)
+    {
+        return;
+    }
+    if (pad < 0)
+    {
+        return;
+    }
+
+    switch (stat)
+    {
+    case STATS_00:
+        mCurrentUserStats[pad].unknown_0x00 += amount;
+        break;
+    case STATS_01:
+        mCurrentUserStats[pad].unknown_0x02 += amount;
+        break;
+    case STATS_02:
+        mCurrentUserStats[pad].unknown_0x04 += amount;
+        break;
+    case STATS_SHOTS_ON_GOAL:
+        mCurrentUserStats[pad].mNumShotsOnGoal += amount;
+        mCurrentUserStats[pad].mNumShotsOnGoal = mCurrentUserStats[pad].mNumShotsOnGoal <= 999U ? mCurrentUserStats[pad].mNumShotsOnGoal : 999U;
+        break;
+    case STATS_05:
+        mCurrentUserStats[pad].unknown_0x08 += amount;
+        break;
+    case STATS_06:
+        mCurrentUserStats[pad].unknown_0x0A += amount;
+        break;
+    case STATS_07:
+        mCurrentUserStats[pad].unknown_0x0C += amount;
+        break;
+    case STATS_08:
+        mCurrentUserStats[pad].unknown_0x0E += amount;
+        break;
+    case STATS_GOALS_FOR:
+        mCurrentUserStats[pad].mNumGoalsFor += amount;
+        mCurrentUserStats[pad].mNumGoalsFor = mCurrentUserStats[pad].mNumGoalsFor <= 999U ? mCurrentUserStats[pad].mNumGoalsFor : 999U;
+        break;
+    case STATS_0C:
+        mCurrentUserStats[pad].unknown_0x12 += amount;
+        mCurrentUserStats[pad].unknown_0x12 = mCurrentUserStats[pad].unknown_0x12 <= 999U ? mCurrentUserStats[pad].unknown_0x12 : 999U;
+        break;
+    case STATS_04:
+        mCurrentUserStats[pad].unknown_0x14 += amount;
+        mCurrentUserStats[pad].unknown_0x14 = mCurrentUserStats[pad].unknown_0x14 <= 999U ? mCurrentUserStats[pad].unknown_0x14 : 999U;
+        break;
+    case STATS_09:
+        mCurrentUserStats[pad].unknown_0x16 += amount;
+        mCurrentUserStats[pad].unknown_0x16 = mCurrentUserStats[pad].unknown_0x16 <= 999U ? mCurrentUserStats[pad].unknown_0x16 : 999U;
+        break;
+    case STATS_0A:
+        mCurrentUserStats[pad].unknown_0x18 += amount;
+        mCurrentUserStats[pad].unknown_0x18 = mCurrentUserStats[pad].unknown_0x18 <= 999U ? mCurrentUserStats[pad].unknown_0x18 : 999U;
+        break;
+    case STATS_FOULS:
+        mCurrentUserStats[pad].mNumFouls += amount;
+        break;
+    case STATS_18:
+        mCurrentUserStats[pad].unknown_0x1C += amount;
+        break;
+    case STATS_19:
+        mCurrentUserStats[pad].mNumPowerupsUsed += amount;
+        break;
+    case STATS_1A:
+        mCurrentUserStats[pad].unknown_0x20 += amount;
+        break;
+    case STATS_1B:
+        mCurrentUserStats[pad].unknown_0x22 += amount;
+        break;
+    case STATS_1C:
+        mCurrentUserStats[pad].unknown_0x24 += amount;
+        break;
+    case STATS_1D:
+        mCurrentUserStats[pad].unknown_0x26 += amount;
+        break;
+    case STATS_PASSES_MADE:
+        mCurrentUserStats[pad].mNumPassesMade += amount;
+        break;
+    case STATS_0E:
+        mCurrentUserStats[pad].unknown_0x2C += amount;
+        break;
+    case STATS_0F:
+        mCurrentUserStats[pad].unknown_0x2E += amount;
+        break;
+    case STATS_PASSES_RECEIVED:
+        mCurrentUserStats[pad].mNumPassesReceived += amount;
+        break;
+    case STATS_12:
+        mCurrentUserStats[pad].mNumHitsMade += amount;
+        mCurrentUserStats[pad].mNumHitsMade = mCurrentUserStats[pad].mNumHitsMade <= 999U ? mCurrentUserStats[pad].mNumHitsMade : 999U;
+        break;
+    case STATS_ATTACK_ATTEMPTS:
+        mCurrentUserStats[pad].unknown_0x34 += amount;
+        break;
+    case STATS_ATTACK_SUCCESSES:
+        mCurrentUserStats[pad].mNumSteals += amount;
+        mCurrentUserStats[pad].mNumSteals = mCurrentUserStats[pad].mNumSteals <= 999U ? mCurrentUserStats[pad].mNumSteals : 999U;
+        break;
+    case STATS_15:
+        mCurrentUserStats[pad].unknown_0x38 += amount;
+        break;
+    case STATS_16:
+        mCurrentUserStats[pad].unknown_0x3C += amount;
+        break;
+    case STATS_17:
+        mCurrentUserStats[pad].mNumButtonPresses += amount;
+        break;
+    case STATS_PERFECT_PASSES:
+        mCurrentUserStats[pad].mNumPerfectPasses += amount;
+        break;
+    case STATS_25:
+        mCurrentUserStats[pad].unknown_0x46 += amount;
+        break;
+    case STATS_26:
+        mCurrentUserStats[pad].unknown_0x48 += amount;
+        break;
+    case STATS_POWERUPS_USED:
+        mCurrentUserStats[pad].unknown_0x28 += amount;
+        break;
+    case STATS_PASSES_INTERCEPTED:
+        mCurrentUserStats[pad].mNumPassesIntercepted += amount;
+        break;
+    default:
+        break;
+    }
+
+    switch (stat)
+    {
+    case STATS_00:
+        mCumulativeUserStats[pad].unknown_0x00 += amount;
+        break;
+    case STATS_01:
+        mCumulativeUserStats[pad].unknown_0x02 += amount;
+        break;
+    case STATS_02:
+        mCumulativeUserStats[pad].unknown_0x04 += amount;
+        break;
+    case STATS_SHOTS_ON_GOAL:
+        mCumulativeUserStats[pad].mNumShotsOnGoal += amount;
+        mCumulativeUserStats[pad].mNumShotsOnGoal = mCumulativeUserStats[pad].mNumShotsOnGoal <= 999U ? mCumulativeUserStats[pad].mNumShotsOnGoal : 999U;
+        break;
+    case STATS_05:
+        mCumulativeUserStats[pad].unknown_0x08 += amount;
+        break;
+    case STATS_06:
+        mCumulativeUserStats[pad].unknown_0x0A += amount;
+        break;
+    case STATS_07:
+        mCumulativeUserStats[pad].unknown_0x0C += amount;
+        break;
+    case STATS_08:
+        mCumulativeUserStats[pad].unknown_0x0E += amount;
+        break;
+    case STATS_GOALS_FOR:
+        mCumulativeUserStats[pad].mNumGoalsFor += amount;
+        mCumulativeUserStats[pad].mNumGoalsFor = mCumulativeUserStats[pad].mNumGoalsFor <= 999U ? mCumulativeUserStats[pad].mNumGoalsFor : 999U;
+        break;
+    case STATS_0C:
+        mCumulativeUserStats[pad].unknown_0x12 += amount;
+        mCumulativeUserStats[pad].unknown_0x12 = mCumulativeUserStats[pad].unknown_0x12 <= 999U ? mCumulativeUserStats[pad].unknown_0x12 : 999U;
+        break;
+    case STATS_04:
+        mCumulativeUserStats[pad].unknown_0x14 += amount;
+        mCumulativeUserStats[pad].unknown_0x14 = mCumulativeUserStats[pad].unknown_0x14 <= 999U ? mCumulativeUserStats[pad].unknown_0x14 : 999U;
+        break;
+    case STATS_09:
+        mCumulativeUserStats[pad].unknown_0x16 += amount;
+        mCumulativeUserStats[pad].unknown_0x16 = mCumulativeUserStats[pad].unknown_0x16 <= 999U ? mCumulativeUserStats[pad].unknown_0x16 : 999U;
+        break;
+    case STATS_0A:
+        mCumulativeUserStats[pad].unknown_0x18 += amount;
+        mCumulativeUserStats[pad].unknown_0x18 = mCumulativeUserStats[pad].unknown_0x18 <= 999U ? mCumulativeUserStats[pad].unknown_0x18 : 999U;
+        break;
+    case STATS_FOULS:
+        mCumulativeUserStats[pad].mNumFouls += amount;
+        break;
+    case STATS_18:
+        mCumulativeUserStats[pad].unknown_0x1C += amount;
+        break;
+    case STATS_19:
+        mCumulativeUserStats[pad].mNumPowerupsUsed += amount;
+        break;
+    case STATS_1A:
+        mCumulativeUserStats[pad].unknown_0x20 += amount;
+        break;
+    case STATS_1B:
+        mCumulativeUserStats[pad].unknown_0x22 += amount;
+        break;
+    case STATS_1C:
+        mCumulativeUserStats[pad].unknown_0x24 += amount;
+        break;
+    case STATS_1D:
+        mCumulativeUserStats[pad].unknown_0x26 += amount;
+        break;
+    case STATS_PASSES_MADE:
+        mCumulativeUserStats[pad].mNumPassesMade += amount;
+        break;
+    case STATS_0E:
+        mCumulativeUserStats[pad].unknown_0x2C += amount;
+        break;
+    case STATS_0F:
+        mCumulativeUserStats[pad].unknown_0x2E += amount;
+        break;
+    case STATS_PASSES_RECEIVED:
+        mCumulativeUserStats[pad].mNumPassesReceived += amount;
+        break;
+    case STATS_12:
+        mCumulativeUserStats[pad].mNumHitsMade += amount;
+        mCumulativeUserStats[pad].mNumHitsMade = mCumulativeUserStats[pad].mNumHitsMade <= 999U ? mCumulativeUserStats[pad].mNumHitsMade : 999U;
+        break;
+    case STATS_ATTACK_ATTEMPTS:
+        mCumulativeUserStats[pad].unknown_0x34 += amount;
+        break;
+    case STATS_ATTACK_SUCCESSES:
+        mCumulativeUserStats[pad].mNumSteals += amount;
+        mCumulativeUserStats[pad].mNumSteals = mCumulativeUserStats[pad].mNumSteals <= 999U ? mCumulativeUserStats[pad].mNumSteals : 999U;
+        break;
+    case STATS_15:
+        mCumulativeUserStats[pad].unknown_0x38 += amount;
+        break;
+    case STATS_16:
+        mCumulativeUserStats[pad].unknown_0x3C += amount;
+        break;
+    case STATS_17:
+        mCumulativeUserStats[pad].mNumButtonPresses += amount;
+        break;
+    case STATS_PERFECT_PASSES:
+        mCumulativeUserStats[pad].mNumPerfectPasses += amount;
+        break;
+    case STATS_25:
+        mCumulativeUserStats[pad].unknown_0x46 += amount;
+        break;
+    case STATS_26:
+        mCumulativeUserStats[pad].unknown_0x48 += amount;
+        break;
+    case STATS_POWERUPS_USED:
+        mCumulativeUserStats[pad].unknown_0x28 += amount;
+        break;
+    case STATS_PASSES_INTERCEPTED:
+        mCumulativeUserStats[pad].mNumPassesIntercepted += amount;
+        break;
+    default:
+        break;
+    }
+
+}
+
 void StatsTracker::AddUserStatByPad(
     ePlayerStats stat, int pad, int amount)
 {
-    if (pad >= 0 && pad < 16)
+    if (pad < 0)
     {
-        AddStatValue(mCurrentUserStats[pad], stat, amount);
-        AddStatValue(mCumulativeUserStats[pad], stat, amount);
+        return;
     }
-}
 
-void StatsTracker::AddMilestoneUserStat(ePlayerStats stat, int amount)
-{
-    for (int pad = 0; pad < 16; pad++)
+    switch (stat)
     {
-        if (mBasicGameInfo->mPadSides[pad] != -1)
-        {
-            AddUserStatByPad(stat, pad, amount);
-        }
+    case STATS_00:
+        mCurrentUserStats[pad].unknown_0x00 += amount;
+        break;
+    case STATS_01:
+        mCurrentUserStats[pad].unknown_0x02 += amount;
+        break;
+    case STATS_02:
+        mCurrentUserStats[pad].unknown_0x04 += amount;
+        break;
+    case STATS_SHOTS_ON_GOAL:
+        mCurrentUserStats[pad].mNumShotsOnGoal += amount;
+        mCurrentUserStats[pad].mNumShotsOnGoal = mCurrentUserStats[pad].mNumShotsOnGoal <= 999U ? mCurrentUserStats[pad].mNumShotsOnGoal : 999U;
+        break;
+    case STATS_05:
+        mCurrentUserStats[pad].unknown_0x08 += amount;
+        break;
+    case STATS_06:
+        mCurrentUserStats[pad].unknown_0x0A += amount;
+        break;
+    case STATS_07:
+        mCurrentUserStats[pad].unknown_0x0C += amount;
+        break;
+    case STATS_08:
+        mCurrentUserStats[pad].unknown_0x0E += amount;
+        break;
+    case STATS_GOALS_FOR:
+        mCurrentUserStats[pad].mNumGoalsFor += amount;
+        mCurrentUserStats[pad].mNumGoalsFor = mCurrentUserStats[pad].mNumGoalsFor <= 999U ? mCurrentUserStats[pad].mNumGoalsFor : 999U;
+        break;
+    case STATS_0C:
+        mCurrentUserStats[pad].unknown_0x12 += amount;
+        mCurrentUserStats[pad].unknown_0x12 = mCurrentUserStats[pad].unknown_0x12 <= 999U ? mCurrentUserStats[pad].unknown_0x12 : 999U;
+        break;
+    case STATS_04:
+        mCurrentUserStats[pad].unknown_0x14 += amount;
+        mCurrentUserStats[pad].unknown_0x14 = mCurrentUserStats[pad].unknown_0x14 <= 999U ? mCurrentUserStats[pad].unknown_0x14 : 999U;
+        break;
+    case STATS_09:
+        mCurrentUserStats[pad].unknown_0x16 += amount;
+        mCurrentUserStats[pad].unknown_0x16 = mCurrentUserStats[pad].unknown_0x16 <= 999U ? mCurrentUserStats[pad].unknown_0x16 : 999U;
+        break;
+    case STATS_0A:
+        mCurrentUserStats[pad].unknown_0x18 += amount;
+        mCurrentUserStats[pad].unknown_0x18 = mCurrentUserStats[pad].unknown_0x18 <= 999U ? mCurrentUserStats[pad].unknown_0x18 : 999U;
+        break;
+    case STATS_FOULS:
+        mCurrentUserStats[pad].mNumFouls += amount;
+        break;
+    case STATS_18:
+        mCurrentUserStats[pad].unknown_0x1C += amount;
+        break;
+    case STATS_19:
+        mCurrentUserStats[pad].mNumPowerupsUsed += amount;
+        break;
+    case STATS_1A:
+        mCurrentUserStats[pad].unknown_0x20 += amount;
+        break;
+    case STATS_1B:
+        mCurrentUserStats[pad].unknown_0x22 += amount;
+        break;
+    case STATS_1C:
+        mCurrentUserStats[pad].unknown_0x24 += amount;
+        break;
+    case STATS_1D:
+        mCurrentUserStats[pad].unknown_0x26 += amount;
+        break;
+    case STATS_PASSES_MADE:
+        mCurrentUserStats[pad].mNumPassesMade += amount;
+        break;
+    case STATS_0E:
+        mCurrentUserStats[pad].unknown_0x2C += amount;
+        break;
+    case STATS_0F:
+        mCurrentUserStats[pad].unknown_0x2E += amount;
+        break;
+    case STATS_PASSES_RECEIVED:
+        mCurrentUserStats[pad].mNumPassesReceived += amount;
+        break;
+    case STATS_12:
+        mCurrentUserStats[pad].mNumHitsMade += amount;
+        mCurrentUserStats[pad].mNumHitsMade = mCurrentUserStats[pad].mNumHitsMade <= 999U ? mCurrentUserStats[pad].mNumHitsMade : 999U;
+        break;
+    case STATS_ATTACK_ATTEMPTS:
+        mCurrentUserStats[pad].unknown_0x34 += amount;
+        break;
+    case STATS_ATTACK_SUCCESSES:
+        mCurrentUserStats[pad].mNumSteals += amount;
+        mCurrentUserStats[pad].mNumSteals = mCurrentUserStats[pad].mNumSteals <= 999U ? mCurrentUserStats[pad].mNumSteals : 999U;
+        break;
+    case STATS_15:
+        mCurrentUserStats[pad].unknown_0x38 += amount;
+        break;
+    case STATS_16:
+        mCurrentUserStats[pad].unknown_0x3C += amount;
+        break;
+    case STATS_17:
+        mCurrentUserStats[pad].mNumButtonPresses += amount;
+        break;
+    case STATS_PERFECT_PASSES:
+        mCurrentUserStats[pad].mNumPerfectPasses += amount;
+        break;
+    case STATS_25:
+        mCurrentUserStats[pad].unknown_0x46 += amount;
+        break;
+    case STATS_26:
+        mCurrentUserStats[pad].unknown_0x48 += amount;
+        break;
+    case STATS_POWERUPS_USED:
+        mCurrentUserStats[pad].unknown_0x28 += amount;
+        break;
+    case STATS_PASSES_INTERCEPTED:
+        mCurrentUserStats[pad].mNumPassesIntercepted += amount;
+        break;
+    default:
+        break;
     }
+
+    switch (stat)
+    {
+    case STATS_00:
+        mCumulativeUserStats[pad].unknown_0x00 += amount;
+        break;
+    case STATS_01:
+        mCumulativeUserStats[pad].unknown_0x02 += amount;
+        break;
+    case STATS_02:
+        mCumulativeUserStats[pad].unknown_0x04 += amount;
+        break;
+    case STATS_SHOTS_ON_GOAL:
+        mCumulativeUserStats[pad].mNumShotsOnGoal += amount;
+        mCumulativeUserStats[pad].mNumShotsOnGoal = mCumulativeUserStats[pad].mNumShotsOnGoal <= 999U ? mCumulativeUserStats[pad].mNumShotsOnGoal : 999U;
+        break;
+    case STATS_05:
+        mCumulativeUserStats[pad].unknown_0x08 += amount;
+        break;
+    case STATS_06:
+        mCumulativeUserStats[pad].unknown_0x0A += amount;
+        break;
+    case STATS_07:
+        mCumulativeUserStats[pad].unknown_0x0C += amount;
+        break;
+    case STATS_08:
+        mCumulativeUserStats[pad].unknown_0x0E += amount;
+        break;
+    case STATS_GOALS_FOR:
+        mCumulativeUserStats[pad].mNumGoalsFor += amount;
+        mCumulativeUserStats[pad].mNumGoalsFor = mCumulativeUserStats[pad].mNumGoalsFor <= 999U ? mCumulativeUserStats[pad].mNumGoalsFor : 999U;
+        break;
+    case STATS_0C:
+        mCumulativeUserStats[pad].unknown_0x12 += amount;
+        mCumulativeUserStats[pad].unknown_0x12 = mCumulativeUserStats[pad].unknown_0x12 <= 999U ? mCumulativeUserStats[pad].unknown_0x12 : 999U;
+        break;
+    case STATS_04:
+        mCumulativeUserStats[pad].unknown_0x14 += amount;
+        mCumulativeUserStats[pad].unknown_0x14 = mCumulativeUserStats[pad].unknown_0x14 <= 999U ? mCumulativeUserStats[pad].unknown_0x14 : 999U;
+        break;
+    case STATS_09:
+        mCumulativeUserStats[pad].unknown_0x16 += amount;
+        mCumulativeUserStats[pad].unknown_0x16 = mCumulativeUserStats[pad].unknown_0x16 <= 999U ? mCumulativeUserStats[pad].unknown_0x16 : 999U;
+        break;
+    case STATS_0A:
+        mCumulativeUserStats[pad].unknown_0x18 += amount;
+        mCumulativeUserStats[pad].unknown_0x18 = mCumulativeUserStats[pad].unknown_0x18 <= 999U ? mCumulativeUserStats[pad].unknown_0x18 : 999U;
+        break;
+    case STATS_FOULS:
+        mCumulativeUserStats[pad].mNumFouls += amount;
+        break;
+    case STATS_18:
+        mCumulativeUserStats[pad].unknown_0x1C += amount;
+        break;
+    case STATS_19:
+        mCumulativeUserStats[pad].mNumPowerupsUsed += amount;
+        break;
+    case STATS_1A:
+        mCumulativeUserStats[pad].unknown_0x20 += amount;
+        break;
+    case STATS_1B:
+        mCumulativeUserStats[pad].unknown_0x22 += amount;
+        break;
+    case STATS_1C:
+        mCumulativeUserStats[pad].unknown_0x24 += amount;
+        break;
+    case STATS_1D:
+        mCumulativeUserStats[pad].unknown_0x26 += amount;
+        break;
+    case STATS_PASSES_MADE:
+        mCumulativeUserStats[pad].mNumPassesMade += amount;
+        break;
+    case STATS_0E:
+        mCumulativeUserStats[pad].unknown_0x2C += amount;
+        break;
+    case STATS_0F:
+        mCumulativeUserStats[pad].unknown_0x2E += amount;
+        break;
+    case STATS_PASSES_RECEIVED:
+        mCumulativeUserStats[pad].mNumPassesReceived += amount;
+        break;
+    case STATS_12:
+        mCumulativeUserStats[pad].mNumHitsMade += amount;
+        mCumulativeUserStats[pad].mNumHitsMade = mCumulativeUserStats[pad].mNumHitsMade <= 999U ? mCumulativeUserStats[pad].mNumHitsMade : 999U;
+        break;
+    case STATS_ATTACK_ATTEMPTS:
+        mCumulativeUserStats[pad].unknown_0x34 += amount;
+        break;
+    case STATS_ATTACK_SUCCESSES:
+        mCumulativeUserStats[pad].mNumSteals += amount;
+        mCumulativeUserStats[pad].mNumSteals = mCumulativeUserStats[pad].mNumSteals <= 999U ? mCumulativeUserStats[pad].mNumSteals : 999U;
+        break;
+    case STATS_15:
+        mCumulativeUserStats[pad].unknown_0x38 += amount;
+        break;
+    case STATS_16:
+        mCumulativeUserStats[pad].unknown_0x3C += amount;
+        break;
+    case STATS_17:
+        mCumulativeUserStats[pad].mNumButtonPresses += amount;
+        break;
+    case STATS_PERFECT_PASSES:
+        mCumulativeUserStats[pad].mNumPerfectPasses += amount;
+        break;
+    case STATS_25:
+        mCumulativeUserStats[pad].unknown_0x46 += amount;
+        break;
+    case STATS_26:
+        mCumulativeUserStats[pad].unknown_0x48 += amount;
+        break;
+    case STATS_POWERUPS_USED:
+        mCumulativeUserStats[pad].unknown_0x28 += amount;
+        break;
+    case STATS_PASSES_INTERCEPTED:
+        mCumulativeUserStats[pad].mNumPassesIntercepted += amount;
+        break;
+    default:
+        break;
+    }
+
 }
 
 void StatsTracker::TrackWinner(int forfeitSide)

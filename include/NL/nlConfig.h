@@ -57,32 +57,6 @@ struct LexicalCastImpl<BasicString<char, TempStringAllocator>, const char*>
     }
 };
 
-template <typename Allocator>
-inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, int>::Do(int t)
-{
-    char s[0x40];
-    nlSNPrintf(s, 0x40, "%i", t);
-    return BasicString<char, Allocator>(s);
-}
-
-template <typename Allocator>
-inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, float>::Do(float t)
-{
-    char s[0x40];
-    nlSNPrintf(s, 0x40, "%f", t);
-    return BasicString<char, Allocator>(s);
-}
-
-template <typename Allocator>
-inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, bool>::Do(bool t)
-{
-    if (t)
-    {
-        return BasicString<char, Allocator>("true");
-    }
-    return BasicString<char, Allocator>("false");
-}
-
 template <typename To>
 inline To LexicalCastImpl<To, int>::Do(int t)
 {
@@ -148,26 +122,7 @@ public:
         TagValuePair();
 
         template <typename T>
-        T Get() const
-        {
-            if (type == CONFIG_BOOL)
-            {
-                return LexicalCast<T, bool>(value.boolValue);
-            }
-            else if (type == CONFIG_INT)
-            {
-                return LexicalCast<T, int>(value.intValue);
-            }
-            else if (type == CONFIG_FLOAT)
-            {
-                return LexicalCast<T, float>(value.floatValue);
-            }
-            else if (type == CONFIG_STRING)
-            {
-                return LexicalCast<T, const char*>(value.stringValue);
-            }
-            return T();
-        }
+        T Get() const;
 
         const char* tag;
         ConfigType type;
@@ -227,6 +182,28 @@ public:
     unsigned int mTvpCapacity;
     bool mLoaded;
 };
+
+template <typename T>
+T Config::TagValuePair::Get() const
+{
+    if (type == CONFIG_BOOL)
+    {
+        return LexicalCast<T, bool>(value.boolValue);
+    }
+    else if (type == CONFIG_INT)
+    {
+        return LexicalCast<T, int>(value.intValue);
+    }
+    else if (type == CONFIG_FLOAT)
+    {
+        return LexicalCast<T, float>(value.floatValue);
+    }
+    else if (type == CONFIG_STRING)
+    {
+        return LexicalCast<T, const char*>(value.stringValue);
+    }
+    return T();
+}
 
 typedef Config::TagValuePair TagValuePair;
 

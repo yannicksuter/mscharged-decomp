@@ -19,6 +19,7 @@
 #include "NL/nlString.h"
 #include "NL/nlVector.h"
 #include "Game/GL/GLColourMeshWriter.h"
+#include "Game/MathHelpers.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -53,10 +54,7 @@ static void ShuffleIntoOutline(
 
     for (int i = 1; i < polygon.mSize; i++)
     {
-        float dist = nlGetLengthSquared3D(
-            polygon.mData[0].x - polygon.mData[i].x,
-            polygon.mData[0].y - polygon.mData[i].y,
-            polygon.mData[0].z - polygon.mData[i].z);
+        float dist = CalculateDistanceSquared(polygon[0], polygon[i]);
 
         if (dist < min)
         {
@@ -72,22 +70,15 @@ static void ShuffleIntoOutline(
     for (int i = 1; i < polygon.mSize - 1; i++)
     {
         float max = 1.0f;
-        nlRecipSqrt(
-            dir.x * dir.x + dir.y * dir.y + dir.z * dir.z, true);
+        nlVec3Normalize(dir, dir);
 
-        int prev = i;
-        prev -= 1;
-        nlVec3Set(dir,
-            polygon.mData[i].x - polygon.mData[prev].x,
-            polygon.mData[i].y - polygon.mData[prev].y,
-            polygon.mData[i].z - polygon.mData[prev].z);
+        nlVec3Sub(dir, polygon[i], polygon[i - 1]);
 
         for (int j = i + 1; j < polygon.mSize; j++)
         {
             nlVector3 delta;
             nlVec3Sub(delta, polygon[i], polygon[j]);
-            float recip = nlRecipSqrt(delta.GetLengthSq3D(), true);
-            nlVec3Scale(delta, recip);
+            nlVec3Normalize(delta, delta);
             float dot = nlVec3DotProduct(dir, delta);
 
             if (dot <= max)

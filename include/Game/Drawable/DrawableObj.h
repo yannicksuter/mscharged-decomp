@@ -21,7 +21,7 @@ public:
     virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);
     virtual void Draw();
-    virtual bool V6(const nlVector4* planes);
+    virtual bool V6(const nlVector4* planes) const;
     virtual void V7(glModel* model);
     virtual void V8(GLView* view);
     virtual DrawableObject* Clone(unsigned long hash);

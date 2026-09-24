@@ -14,7 +14,8 @@ class cBall;
 class Desire;
 class SpaceSearch;
 class UnidentifiedScriptMachine;
-typedef UnidentifiedVariant_80054AB8 UnidentifiedDesireUpdate;
+class UnidentifiedFuzzyRuntimeBase;
+typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 extern "C" Desire* fn_8002E08C(cFielder*, int);
 
@@ -47,9 +48,11 @@ public:
     virtual bool UnidentifiedInitialize(void*) = 0;
     virtual bool UnidentifiedReinitialize(void*) = 0;
     virtual void UnidentifiedCleanup() = 0;
-    virtual void Update(UnidentifiedDesireUpdate*, float) = 0;
+    virtual void Update(DesireUpdate*, float) = 0;
     virtual void UnidentifiedReset(bool);
     virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
+
+    UnidentifiedFuzzyRuntimeBase* GetFuzzyRuntime();
 
     int UnidentifiedGetState() const
     {
@@ -90,13 +93,13 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 protected:
-    cFielder* mUnidentifiedFielder;
+    cFielder* m_pFielder;
     nlVector3 mvDesiredPosition;
     int mTurboRequest;
     Timer mThinkTimer;
@@ -114,7 +117,7 @@ public:
     virtual ~DesireFinishAction();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
 };
 
 class DesireWait : public Desire
@@ -128,7 +131,7 @@ public:
     virtual ~DesireWait();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
 };
 
 class DesireCutAndBreak : public Desire
@@ -144,7 +147,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -164,7 +167,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -183,7 +186,7 @@ public:
     virtual ~DesireHit();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -201,7 +204,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -221,7 +224,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -242,7 +245,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -274,7 +277,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -299,7 +302,7 @@ public:
     virtual ~DesireRunDownfield();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -316,7 +319,7 @@ public:
     virtual ~DesireRunUpfield();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -333,7 +336,7 @@ public:
     virtual ~DesireGetInPosition();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -349,7 +352,7 @@ public:
     virtual ~DesireMark();
 
     virtual bool UnidentifiedInitialize(void*);
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -367,7 +370,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -385,63 +388,18 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
-    bool fn_800B9D84(UnidentifiedDesireUpdate*, float);
+    bool fn_800B9D84(DesireUpdate*, float);
 
     int mUnidentifiedA4;
     float mUnidentifiedA8;
     float mUnidentifiedAC;
     float mUnidentifiedB0;
     int mUnidentifiedB4;
-};
-
-class DesirePass : public Desire
-{
-public:
-    DesirePass(int state, const UnidentifiedStateTransition& transition)
-        : Desire(state, transition)
-    {
-    }
-
-    virtual ~DesirePass();
-
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
-
-private:
-    cPlayer* mpPassTarget;
-    bool mbVolleyPass;
-};
-
-class DesirePreparePass : public Desire
-{
-public:
-    DesirePreparePass(
-        int state, const UnidentifiedStateTransition& transition)
-        : Desire(state, transition)
-    {
-    }
-
-    virtual ~DesirePreparePass();
-
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
-
-private:
-    cPlayer* mpPassTarget;
-    bool mbVolleyPass;
-    float mfAbortThreshold;
-    SpaceSearch* m_pSpaceSearch;
 };
 
 class DesireStar : public Desire
@@ -457,7 +415,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -476,7 +434,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -495,7 +453,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
@@ -509,7 +467,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -536,7 +494,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -561,7 +519,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -596,7 +554,7 @@ public:
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 

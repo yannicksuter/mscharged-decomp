@@ -7,6 +7,7 @@
 #include "Game/Render/RLView.h"
 
 #include "Game/Render/ImpostorCharacter.h"
+#include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorManager.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/gl.h"
@@ -65,7 +66,7 @@ public:
     /* 0x5C */ FEImpostorCharacter* mCharacter;
     /* 0x60 */ nlVector3 mPosition;
     /* 0x6C */ float mTime;
-    /* 0x70 */ void* mModels[6];
+    /* 0x70 */ Impostor* mModels[6];
 }; // size: 0x88
 
 class FEImpostorCharacter
@@ -367,20 +368,30 @@ bool FEModelHandle::IsLoaded() const
 
 void FEModelHandle::SetTransform(const nlMatrix4& transform)
 {
-    if (mModel->mType == FE_MODEL_SKINNED)
+    switch (mModel->mType)
+    {
+    case FE_MODEL_SKINNED:
     {
         FESkinnedModel* model
             = (FESkinnedModel*)mModel;
         model->mModel->mWorldMatrix = transform;
+        break;
     }
-    else if (mModel->mType == FE_MODEL_IMPOSTOR)
+    case FE_MODEL_IMPOSTOR:
     {
         FEImpostorModel* model
             = (FEImpostorModel*)mModel;
-        model->mPosition.x = transform.m41;
-        model->mPosition.y = transform.m42;
-        model->mPosition.z = transform.m43;
+        model->mPosition = transform.GetTranslation();
         model->mTime = 0.0f;
+        for (int i = 0; i < 6; ++i)
+        {
+            Impostor* impostor = model->mModels[i];
+            impostor->mPosition.x = transform.m41;
+            impostor->mPosition.y = transform.m42;
+            impostor->mPosition.z = transform.m43;
+        }
+        break;
+    }
     }
 }
 

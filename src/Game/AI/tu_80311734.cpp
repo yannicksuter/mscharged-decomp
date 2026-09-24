@@ -12,18 +12,10 @@
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
 
-extern "C" void fn_800B6A1C(
-    UnidentifiedVariant_80054AB8*, int, const Variant&);
 extern "C" bool fn_8031A04C();
 extern "C" void fn_80311C54(void*, unsigned long, void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     UnidentifiedFuzzyRuntimeBase*, UnidentifiedVariant_80054AB8, float);
-
-struct UnidentifiedFuzzyRuntimeReference
-{
-    u8 mPadding000[0x18];
-    UnidentifiedFuzzyRuntimeBase* mRuntime;
-};
 
 struct UnidentifiedTransitionOwner
 {
@@ -69,10 +61,9 @@ ScriptQuestionCache lbl_805842EC;
 UnidentifiedRuntimeTypeList lbl_806E20B0;
 SlotPool<UnidentifiedRuntimeActionQueue> lbl_80584328(16, 16);
 
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311734(
-    UnidentifiedFuzzyRuntimeReference* reference)
+UnidentifiedFuzzyRuntimeBase* shdStateMachine::GetFuzzyRuntime()
 {
-    return reference->mRuntime->mUnidentified064->mRuntime;
+    return mUnidentified018->mUnidentified064->mUnidentified14;
 }
 
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311744(
@@ -604,9 +595,10 @@ extern "C" void fn_80314160(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long value,
     unsigned long hash, UnidentifiedVariant_80054AB8* action)
 {
+    int index = fn_80312208(hash);
     FuzzyVariant variant(FT_U32, value);
     runtime->UnidentifiedVirtual14(
-        action, fn_80312208(hash), variant);
+        action, index, variant);
 }
 
 extern "C" void fn_803141F4(
@@ -833,7 +825,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     UnidentifiedVariant_80054AB8* result =
         new (lbl_805842C8.Allocate())
             UnidentifiedVariant_80054AB8(value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }

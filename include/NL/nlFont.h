@@ -101,6 +101,7 @@ public:
     unsigned long fn_80305278(const FontCharString& Text, unsigned long Width, bool WordWrap) const;
     unsigned long fn_80305278(const BasicString<unsigned short, Detail::TempStringAllocator>& Text, unsigned long Width, bool WordWrap) const;
     unsigned long GetCharWidth(unsigned short FontChar, unsigned short PrevFontChar) const;
+    unsigned short GetExtendedFontChar(unsigned short Character) const;
     void DisableScissorBox() const;
     void SetScissorBox(const ScissorBox& other) const;
     void DrawString(eGLView View, const FontCharString& Text, const nlVector2& Position, const nlColour& Colour, const nlColour& EffectColour, int Length, nlFont::TextPass Passes, bool FlipY, unsigned long* pMatrix, nlColour* pOverrideColour) const;
@@ -129,6 +130,18 @@ public:
     /* 0x9C8 */ KernPair* m_pKernTable;
     /* 0x9CC */ unsigned long m_KernTableSize;
 };
+
+inline unsigned short nlFont::GetExtendedFontChar(unsigned short Character) const
+{
+    GlyphInfo key;
+    key.UnicodeChar = Character;
+    GlyphInfo* result;
+    if (m_pExtendedGlyphs != 0 && m_ExtendedGlyphCount != 0 && (result = nlBSearch<GlyphInfo, GlyphInfo>(key, m_pExtendedGlyphs, m_ExtendedGlyphCount)) != 0)
+    {
+        return ((result - m_pExtendedGlyphs) + 0x80) & 0xFFFF;
+    }
+    return 0x3F;
+}
 
 class FontCharString
 {
@@ -185,17 +198,7 @@ inline FontCharString::FontCharString(const T* Source, const nlFont* pFont, T* p
             }
             else
             {
-                nlFont::GlyphInfo key;
-                key.UnicodeChar = ch;
-                nlFont::GlyphInfo* result;
-                if (pFont->m_pExtendedGlyphs != 0 && pFont->m_ExtendedGlyphCount != 0 && (result = nlBSearch<nlFont::GlyphInfo, nlFont::GlyphInfo>(key, pFont->m_pExtendedGlyphs, pFont->m_ExtendedGlyphCount)) != 0)
-                {
-                    ch = ((result - pFont->m_pExtendedGlyphs) + 0x80) & 0xFFFF;
-                }
-                else
-                {
-                    ch = 0x3F;
-                }
+                ch = pFont->GetExtendedFontChar(ch);
             }
             *dest++ = ch;
             src++;

@@ -30,6 +30,15 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
 #include "NL/plat/SocketNetwork.h"
+#include "Game/FE/feFinder.inl"
+#include "Game/FE/fePresentation.inl"
+#include "NL/nlstring_tmpl.h"
+#include "Game/DB/CharacterInfo.inl"
+#include "Game/DB/GameProgress.inl"
+#include "NL/nlLocalizationLookup.h"
+#include "Game/FE/tlInstance.inl"
+#include "Game/GameInfo.inl"
+#include "Game/SH/SHNavigation.inl"
 #include <cmath>
 
 char* optionNames[3] = { "button_1", "button_2", "button_3" };
@@ -610,7 +619,8 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     }
     case 47:
     {
-        const char* captainName = GetCharacterInfo(GetCharacterIndexFromCaptain(fn_801CA670()->fn_801CAA18())).GetName();
+        int captain = fn_801CA670()->fn_801CAA18();
+        const char* captainName = GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).GetName();
         char key[64];
         nlSNPrintf(key, sizeof(key), "POPUP_CHALLENGE_UNLOCK_%s", captainName);
         const unsigned short* message = g_pLocalization->GetString(key);
@@ -853,16 +863,3 @@ void FEPopupMenu::fn_801C8960(unsigned int index, void* context)
     mUnidentified9A3 = gpHBMManager->mBlocked;
     gpHBMManager->mBlocked = true;
 }
-
-#include "Game/FE/feFinder.inl"
-#include "Game/FE/fePresentation.inl"
-#include "NL/nlstring_tmpl.h"
-
-#include "Game/DB/CharacterInfo.inl"
-#include "Game/DB/GameProgress.inl"
-#include "NL/nlLocalizationLookup.h"
-#include "Game/FE/tlInstance.inl"
-#include "Game/GameInfo.inl"
-#include "Game/BaseGameSceneManager.inl"
-#include "Game/FriendManager.inl"
-#include "Game/SH/SHNavigation.inl"

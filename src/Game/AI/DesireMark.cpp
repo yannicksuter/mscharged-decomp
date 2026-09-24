@@ -16,17 +16,14 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_800401C0(cFielder*, const nlVector3&, float, float);
 extern "C" nlVector3* fn_80040234(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 float ReceivingPass(cFielder*);
 extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
-extern "C" void* fn_80311734(void*);
-extern "C" void fn_800B6A1C(UnidentifiedDesireUpdate*, int, FuzzyVariant);
-extern "C" UnidentifiedDesireUpdate fn_800B9020(void*, cFielder*, const char*);
-extern "C" UnidentifiedDesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
+extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
+extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
 extern "C" float fn_800DA050(cFielder*);
 extern "C" bool fn_8031A04C();
 extern "C" cTeam* fn_800D6670(cFielder*);
@@ -64,19 +61,19 @@ bool DesireMark::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x48 | 0x800B6E08 | size: 0xD14
  */
-void DesireMark::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireMark::Update(DesireUpdate* update, float fDeltaT)
 {
-    bool bBestBallInterceptor = mUnidentifiedFielder->m_pTeam->mpBestBallInterceptor == mUnidentifiedFielder;
-    cFielder* pMark = mUnidentifiedFielder->GetMark();
+    bool bBestBallInterceptor = m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder;
+    cFielder* pMark = m_pFielder->GetMark();
     if (pMark == 0 || pMark->fn_800344B0()
-        || mUnidentifiedFielder == g_pBall->m_pOwner
+        || m_pFielder == g_pBall->m_pOwner
         || (bBestBallInterceptor
-            && mUnidentifiedFielder->m_pTeam->mpCurrentSituation == SITUATION_LOOSE))
+            && m_pFielder->m_pTeam->mpCurrentSituation == SITUATION_LOOSE))
     {
         *update = 1;
         return;
     }
-    if (mUnidentifiedFielder->IsOnSameTeam(g_pBall->m_pOwner)
+    if (m_pFielder->IsOnSameTeam(g_pBall->m_pOwner)
         || bBestBallInterceptor)
     {
         if (update->mData.i == 0)
@@ -87,12 +84,12 @@ void DesireMark::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
     if (pMark->m_pBall != 0)
     {
         if (fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_SlideAttackChance->GetValue() > 0.0f
-            && Difficult(mUnidentifiedFielder->m_pTeam) > 0.7f
+            && Difficult(m_pFielder->m_pTeam) > 0.7f
             && pMark->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() > lbl_806DC0C4)
         {
             *update = 3;
-            fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC108));
-            fn_800B6A1C(update, 14, FuzzyVariant((cPlayer*)pMark));
+            update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC108));
+            update->SetParameter(14, FuzzyVariant((cPlayer*)pMark));
             return;
         }
     }
@@ -109,7 +106,7 @@ void DesireMark::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
 
         nlVector3 v3MarkPosition;
         nlVector3 v3NetPosition;
-        v3NetPosition = mUnidentifiedFielder->m_pTeam->m_pNet->m_v3NetLocation;
+        v3NetPosition = m_pFielder->m_pTeam->m_pNet->m_v3NetLocation;
         nlVec3ScaleAdd(v3MarkPosition, lbl_806DC0B8, pMark->mUnidentified024.m_v3Velocity, pMark->mUnidentified024.m_v3Position);
         v3MarkPosition.z = 0.0f;
         nlVector3 v3Dir;
@@ -134,7 +131,7 @@ void DesireMark::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
         }
         if (pMark->m_pBall == 0)
         {
-            cPlayer* pSBC = fn_800DF790(mUnidentifiedFielder->m_pTeam->GetOtherTeam());
+            cPlayer* pSBC = fn_800DF790(m_pFielder->m_pTeam->GetOtherTeam());
             if (pSBC != 0 && pSBC != pMark)
             {
                 nlVector3 v3SBCDir;
@@ -151,34 +148,34 @@ void DesireMark::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
                 nlVec3Sub(vThreatTarget, v3NetPosition, v3SBCPosition);
                 nlVec3Normalize(vThreatTarget, vThreatTarget);
                 nlVec3Set(vThreatTarget, fMarkingDistance * vThreatTarget.x + v3SBCPosition.x, fMarkingDistance * vThreatTarget.y + v3SBCPosition.y, fMarkingDistance * vThreatTarget.z + v3SBCPosition.z);
-                float fMarkBallOwner = fn_800B9020(fn_80311734(this),
-                    mUnidentifiedFielder,
+                float fMarkBallOwner = fn_800B9020(GetFuzzyRuntime(),
+                    m_pFielder,
                     "MarkBallOwner")
                                            .mData.f;
                 if (fMarkBallOwner > 0.0f)
                 {
-                    fn_800401C0(mUnidentifiedFielder, vThreatTarget, lbl_806DC0BC, fMarkBallOwner * fMarkBallOwnerBalance);
+                    m_pFielder->AddDesiredPosition(vThreatTarget, lbl_806DC0BC, fMarkBallOwner * fMarkBallOwnerBalance);
                 }
             }
         }
         nlVector3 v3MarkTarget;
         nlVec3ScaleAdd(v3MarkTarget, fMarkingDistance, v3Dir, v3MarkPosition);
-        fn_800401C0(mUnidentifiedFielder, v3MarkTarget, lbl_806DC0BC, fMarkFormationBalance);
+        m_pFielder->AddDesiredPosition(v3MarkTarget, lbl_806DC0BC, fMarkFormationBalance);
         nlVector3 v3FormationPosition;
-        if (fn_800381B4(mUnidentifiedFielder, &v3FormationPosition))
+        if (fn_800381B4(m_pFielder, &v3FormationPosition))
         {
-            v3FormationPosition = mUnidentifiedFielder->mUnidentified024.m_v3Position;
+            v3FormationPosition = m_pFielder->mUnidentified024.m_v3Position;
         }
-        fn_800401C0(mUnidentifiedFielder, v3FormationPosition, lbl_806DC0BC, 1.0f - fMarkFormationBalance);
+        m_pFielder->AddDesiredPosition(v3FormationPosition, lbl_806DC0BC, 1.0f - fMarkFormationBalance);
     }
 }
 
 /**
  * Offset/Address/Size: 0xD5C | 0x800B7B1C | size: 0xF40
  */
-extern "C" UnidentifiedDesireUpdate fn_800B7B1C(UnidentifiedFielderInput* input)
+extern "C" DesireUpdate fn_800B7B1C(UnidentifiedFielderInput* input)
 {
-    UnidentifiedDesireUpdate result(FT_INT, lbl_806DC110);
+    DesireUpdate result(FT_INT, lbl_806DC110);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
     unsigned long key = input->fn_8030F9B4((unsigned long)fn_800B7B1C, 1);
     if (pFielder->m_pBall != 0 || (bool)fn_800DA050(pFielder))
@@ -191,7 +188,7 @@ extern "C" UnidentifiedDesireUpdate fn_800B7B1C(UnidentifiedFielderInput* input)
         unsigned int hash = nlStringHash("TransDesireDefendPosHelper");
         result = fn_80041B6C(input->mUnidentified14, hash, pFielder);
     }
-    return UnidentifiedDesireUpdate(result, -1.0f, -1.0f);
+    return DesireUpdate(result, -1.0f, -1.0f);
 }
 
 /**
@@ -199,7 +196,7 @@ extern "C" UnidentifiedDesireUpdate fn_800B7B1C(UnidentifiedFielderInput* input)
  */
 bool DesireDefendPos::UnidentifiedInitialize(void*)
 {
-    mvDesiredPosition = mUnidentifiedFielder->mUnidentified024.m_v3Position;
+    mvDesiredPosition = m_pFielder->mUnidentified024.m_v3Position;
     mThinkTimer.m_unk0 = mThinkTimer.m_uPackedTime != 0;
     mThinkTimer.m_uPackedTime = 0;
     return true;
@@ -209,13 +206,12 @@ bool DesireDefendPos::UnidentifiedInitialize(void*)
  * Offset/Address/Size: 0x1CDC | 0x800B8A9C | size: 0x580
  */
 void DesireDefendPos::Update(
-    UnidentifiedDesireUpdate*, float fDeltaT)
+    DesireUpdate*, float fDeltaT)
 {
     mThinkTimer.Countdown(fDeltaT, 0.0f);
     if (mThinkTimer.m_uPackedTime != 0)
     {
-        fn_800401C0(
-            mUnidentifiedFielder, mvDesiredPosition, 1.0f, 1.0f);
+        m_pFielder->AddDesiredPosition(mvDesiredPosition, 1.0f, 1.0f);
         return;
     }
 
@@ -250,22 +246,22 @@ void DesireDefendPos::Update(
     float fSpeed = lbl_806DC0BC;
 
     float fFormationBalanceScale = InterpolateRangeClamped(
-        1.5f, 1.0f, 0.0f, 0.5f, NearToFormationPosition(mUnidentifiedFielder));
+        1.5f, 1.0f, 0.0f, 0.5f, NearToFormationPosition(m_pFielder));
     fMarkFormationBalance /= fFormationBalanceScale;
 
-    nlVector3 v3NetPosition = mUnidentifiedFielder->m_pTeam->m_pNet->m_v3NetLocation;
+    nlVector3 v3NetPosition = m_pFielder->m_pTeam->m_pNet->m_v3NetLocation;
     int nMarks = 0;
     int i;
     for (i = 0; i < 4; ++i)
     {
-        cFielder* pMark = mUnidentifiedFielder->GetMark(i);
+        cFielder* pMark = m_pFielder->GetMark(i);
         if (pMark == 0)
         {
             break;
         }
 
         nlVector3 v3MarkPosition;
-        int difficulty = GameInfoManager::Instance()->mCurrentDifficulty[(short)mUnidentifiedFielder->m_pTeam->m_nSide];
+        int difficulty = GameInfoManager::Instance()->mCurrentDifficulty[(short)m_pFielder->m_pTeam->m_nSide];
         if ((unsigned int)(difficulty - 5) <= 2
             && (pMark->m_pBall != 0
                 || (bool)ReceivingPass(pMark)
@@ -290,7 +286,7 @@ void DesireDefendPos::Update(
 
         if (pMark->m_pBall == 0)
         {
-            cPlayer* pSBC = fn_800DF790(mUnidentifiedFielder->m_pTeam->GetOtherTeam());
+            cPlayer* pSBC = fn_800DF790(m_pFielder->m_pTeam->GetOtherTeam());
             if (pSBC != 0 && pSBC != pMark)
             {
                 nlVector3 v3SBCDir;
@@ -313,7 +309,7 @@ void DesireDefendPos::Update(
             (fMarkingDistance * v3Dir.x) + v3MarkPosition.x,
             (fMarkingDistance * v3Dir.y) + v3MarkPosition.y,
             (fMarkingDistance * v3Dir.z) + v3MarkPosition.z);
-        fn_800401C0(mUnidentifiedFielder, v3MarkTarget, fSpeed, fMarkFormationBalance);
+        m_pFielder->AddDesiredPosition(v3MarkTarget, fSpeed, fMarkFormationBalance);
         ++nMarks;
     }
 
@@ -330,15 +326,15 @@ void DesireDefendPos::Update(
     if (fFormationWeight > 0.0f)
     {
         nlVector3 v3FormationPosition;
-        bool bInPosition = fn_800381B4(mUnidentifiedFielder, &v3FormationPosition);
+        bool bInPosition = fn_800381B4(m_pFielder, &v3FormationPosition);
         if (bInPosition)
         {
-            v3FormationPosition = mUnidentifiedFielder->mUnidentified024.m_v3Position;
+            v3FormationPosition = m_pFielder->mUnidentified024.m_v3Position;
         }
-        fn_800401C0(mUnidentifiedFielder, v3FormationPosition, lbl_806DC0BC, fFormationWeight);
+        m_pFielder->AddDesiredPosition(v3FormationPosition, lbl_806DC0BC, fFormationWeight);
     }
 
-    mvDesiredPosition = *fn_80040234(mUnidentifiedFielder);
+    mvDesiredPosition = *fn_80040234(m_pFielder);
 }
 
 /**
@@ -351,7 +347,7 @@ void DesireDefendPos::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x2260 | 0x800B9020 | size: 0x4
  */
-extern "C" UnidentifiedDesireUpdate fn_800B9020(
+extern "C" DesireUpdate fn_800B9020(
     void* runtime, cFielder* fielder, const char* name)
 {
     return fn_80041B0C(runtime, fielder, name);

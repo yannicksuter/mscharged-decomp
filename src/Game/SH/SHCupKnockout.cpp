@@ -11,6 +11,7 @@
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePageControls.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/fePresentation.inl"

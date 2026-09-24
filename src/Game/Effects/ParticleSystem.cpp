@@ -47,7 +47,7 @@ bool (*ParticleSystem::m_Callback)(ParticleSystem*, GLView*,
     const nlMatrix4*);
 glModel* (*ParticleSystem::m_LightingCallback)(glModel*);
 static int MaxNumParticles;
-static int sUnidentified_806E1FAC;
+int sUnidentified_806E1FAC;
 static unsigned short hackyFacingAngle;
 
 extern const nlVector3 lbl_804EB340;
@@ -571,7 +571,7 @@ void ParticleSystem::fn_802E1EC0(Particle* pPart,
         pPart->position, gravityDistance, gravity, pPart->position);
 }
 
-static unsigned long fn_802E2034(const Particle* pPart,
+static nlColour fn_802E2034(const Particle* pPart,
     const EffectsTemplate* pTemplate)
 {
     float frame = 24.0f * (pPart->timeElapsed / pPart->lifeSpan);
@@ -611,7 +611,7 @@ static unsigned long fn_802E2034(const Particle* pPart,
     colour.c[0] = (unsigned char)red;
     colour.c[1] = (unsigned char)green;
     colour.c[2] = (unsigned char)blue;
-    return *(unsigned long*)&colour;
+    return colour;
 }
 
 void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
@@ -619,21 +619,24 @@ void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
     const nlVector3& viewRight, const nlVector3& viewUp,
     const nlMatrix4* pCoordSys)
 {
-    *(unsigned long*)&pReturn->c = fn_802E2034(pPart, pTemplate);
+    pReturn->c = fn_802E2034(pPart, pTemplate);
 
+    float rot = pPart->rot;
     float size;
-    if (pTemplate->mProperties[1]->mUseCurve != 0)
-        size = pTemplate->mProperties[1]->Evaluate(
+    if (pPart->mUnidentified000->mProperties[1]->mUseCurve != 0)
+        size = pPart->mUnidentified000->mProperties[1]->Evaluate(
             pPart->mUnidentified008);
     else
         size = pPart->size;
-    if (pTemplate->mProperties[2]->mUseCurve != 0)
-        size *= pTemplate->mProperties[2]->Evaluate(
+    if (pPart->mUnidentified000->mProperties[2]->mUseCurve != 0)
+        size *= pPart->mUnidentified000->mProperties[2]->Evaluate(
             mUnidentified014);
     else
         size *= pPart->mUnidentified040;
 
     nlVector3 position = pPart->position;
+    nlVector3 a;
+    nlVector3 b;
     if (pCoordSys != 0)
     {
         nlVector3 transformed;
@@ -641,74 +644,63 @@ void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
         position = transformed;
     }
 
+    float s2 = 0.5f * size;
     if (pTemplate->m_uModelID != 0xFFFFFFFF)
     {
         pReturn->position[0] = position;
         pReturn->position[1].x = size;
-        pReturn->position[1].y = pPart->rot;
+        pReturn->position[1].y = rot;
         return;
     }
 
-    int animFrame
+    unsigned int animFrame
         = (int)(pPart->FPS * pPart->timeElapsed + pPart->frame);
     animFrame %= pTemplate->m_nFrames;
     TextureFrame* frame
         = &textureFrames[pTemplate->m_nFrames - 1][animFrame];
+    float u0 = frame->mUnidentified000;
+    float v0 = frame->mUnidentified004;
+    float increment = frame->mUnidentified008;
     if (pPart->mUnidentified060)
     {
-        pReturn->texcoord[0].x = frame->mUnidentified000;
-        pReturn->texcoord[0].y = frame->mUnidentified004;
-        pReturn->texcoord[1].x
-            = frame->mUnidentified000 + frame->mUnidentified008;
-        pReturn->texcoord[1].y = frame->mUnidentified004;
-        pReturn->texcoord[2].x = frame->mUnidentified000;
-        pReturn->texcoord[2].y
-            = frame->mUnidentified004 + frame->mUnidentified008;
-        pReturn->texcoord[3].x
-            = frame->mUnidentified000 + frame->mUnidentified008;
-        pReturn->texcoord[3].y
-            = frame->mUnidentified004 + frame->mUnidentified008;
+        nlVec2Set(pReturn->texcoord[1], u0 + increment, v0);
+        nlVec2Set(pReturn->texcoord[0], u0, v0);
+        nlVec2Set(pReturn->texcoord[3], u0, v0 + increment);
+        nlVec2Set(pReturn->texcoord[2], u0 + increment, v0 + increment);
     }
     else
     {
-        pReturn->texcoord[0].x
-            = frame->mUnidentified000 + frame->mUnidentified008;
-        pReturn->texcoord[0].y = frame->mUnidentified004;
-        pReturn->texcoord[1].x = frame->mUnidentified000;
-        pReturn->texcoord[1].y = frame->mUnidentified004;
-        pReturn->texcoord[2].x
-            = frame->mUnidentified000 + frame->mUnidentified008;
-        pReturn->texcoord[2].y
-            = frame->mUnidentified004 + frame->mUnidentified008;
-        pReturn->texcoord[3].x = frame->mUnidentified000;
-        pReturn->texcoord[3].y
-            = frame->mUnidentified004 + frame->mUnidentified008;
+        nlVec2Set(pReturn->texcoord[0], u0 + increment, v0);
+        nlVec2Set(pReturn->texcoord[1], u0, v0);
+        nlVec2Set(pReturn->texcoord[2], u0, v0 + increment);
+        nlVec2Set(pReturn->texcoord[3], u0 + increment, v0 + increment);
     }
 
     float sn;
     float cs;
     nlSinCos(&sn, &cs,
-        (unsigned short)(((int)(65536.0f * pPart->rot)) / 360));
-    sn *= 0.5f * size;
-    cs *= 0.5f * size;
+        (unsigned short)(((int)(65536.0f * rot)) / 360));
+    sn = sn * s2;
+    cs = cs * s2;
+    a.x = (cs * viewRight.x) + (sn * viewUp.x);
+    a.y = (cs * viewRight.y) + (sn * viewUp.y);
+    a.z = (cs * viewRight.z) + (sn * viewUp.z);
+    b.x = ((-sn) * viewRight.x) + (cs * viewUp.x);
+    b.y = ((-sn) * viewRight.y) + (cs * viewUp.y);
+    b.z = ((-sn) * viewRight.z) + (cs * viewUp.z);
 
-    nlVector3 a;
-    nlVector3 b;
-    nlVec3Set(a, cs * viewRight.x + sn * viewUp.x,
-        cs * viewRight.y + sn * viewUp.y,
-        cs * viewRight.z + sn * viewUp.z);
-    nlVec3Set(b, -sn * viewRight.x + cs * viewUp.x,
-        -sn * viewRight.y + cs * viewUp.y,
-        -sn * viewRight.z + cs * viewUp.z);
-
-    nlVec3Set(pReturn->position[0], position.x + a.x + b.x,
-        position.y + a.y + b.y, position.z + a.z + b.z);
-    nlVec3Set(pReturn->position[1], position.x - a.x + b.x,
-        position.y - a.y + b.y, position.z - a.z + b.z);
-    nlVec3Set(pReturn->position[2], position.x - a.x - b.x,
-        position.y - a.y - b.y, position.z - a.z - b.z);
-    nlVec3Set(pReturn->position[3], position.x + a.x - b.x,
-        position.y + a.y - b.y, position.z + a.z - b.z);
+    pReturn->position[0].x = (position.x + a.x) + b.x;
+    pReturn->position[0].y = (position.y + a.y) + b.y;
+    pReturn->position[0].z = (position.z + a.z) + b.z;
+    pReturn->position[1].x = (position.x - a.x) + b.x;
+    pReturn->position[1].y = (position.y - a.y) + b.y;
+    pReturn->position[1].z = (position.z - a.z) + b.z;
+    pReturn->position[2].x = (position.x - a.x) - b.x;
+    pReturn->position[2].y = (position.y - a.y) - b.y;
+    pReturn->position[2].z = (position.z - a.z) - b.z;
+    pReturn->position[3].x = (position.x + a.x) - b.x;
+    pReturn->position[3].y = (position.y + a.y) - b.y;
+    pReturn->position[3].z = (position.z + a.z) - b.z;
 }
 
 static void RenderLightOnField(GLView* view, const EffectsLight& light)

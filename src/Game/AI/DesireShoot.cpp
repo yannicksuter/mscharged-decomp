@@ -26,14 +26,12 @@ struct UnidentifiedDesireMachine
     void* mUnidentified018;
 };
 
-extern "C" bool fn_8002F858(cFielder*, bool);
 extern "C" bool fn_8003C180(cFielder*);
 extern "C" float fn_8002C7E8(PlayerTweaks*);
 extern "C" UnidentifiedDesireMachine* fn_80316974(void*);
 extern "C" void fn_8031998C(
     void*, int, const UnidentifiedVariantCollection*);
 
-extern "C" void fn_800B6A1C(UnidentifiedDesireUpdate*, int, FuzzyVariant);
 extern "C" float fn_80039574(cFielder*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
 
@@ -52,11 +50,11 @@ static float lbl_806DC220 = 2.0f;
 bool DesireWindupShot::UnidentifiedInitialize(void*)
 {
     bool result = true;
-    if (mUnidentifiedFielder->m_pBall != NULL)
+    if (m_pFielder->m_pBall != NULL)
     {
-        mUnidentifiedFielder->fn_8004B658();
+        m_pFielder->fn_8004B658();
         mUnidentified078 = lbl_806DC208
-                         + mUnidentifiedFielder->m_pShotMeter->GetTotalDuration();
+                         + m_pFielder->m_pShotMeter->GetTotalDuration();
         mbShotMeterActivated = true;
         lbl_806DC210 = true;
     }
@@ -70,9 +68,9 @@ bool DesireWindupShot::UnidentifiedInitialize(void*)
 /**
  * Offset/Address/Size: 0x7C | 0x800C4214 | size: 0xBAC
  */
-void DesireWindupShot::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
 {
-    if (mUnidentifiedFielder->m_pBall == NULL)
+    if (m_pFielder->m_pBall == NULL)
     {
         *update = 1;
         return;
@@ -80,7 +78,7 @@ void DesireWindupShot::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
 
     bool bMeterTransition = false;
     unsigned char bSwitchToShootDesire = 0;
-    ShotMeter* pShotMeter = mUnidentifiedFielder->m_pShotMeter;
+    ShotMeter* pShotMeter = m_pFielder->m_pShotMeter;
     if (pShotMeter->m_eShotMeterState == SHOT_METER_RELEASED
         || pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
     {
@@ -97,45 +95,45 @@ void DesireWindupShot::Update(UnidentifiedDesireUpdate* update, float fDeltaT)
         if (bMeterTransition)
         {
             *update = 3;
-            fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC214));
+            update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC214));
         }
         else
         {
             *update = 3;
-            fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC218));
+            update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC218));
         }
         return;
     }
 
     if (lbl_806DC210)
     {
-        switch (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass)
+        switch (m_pFielder->mUnidentified024.m_eCharacterClass)
         {
         case DONKEYKONG:
         case MARIO:
         case (eCharacterClass)17:
         {
-            float fSign = AIsgn(mUnidentifiedFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
-            Goalie* pGoalie = mUnidentifiedFielder->m_pTeam->GetOtherTeam()->GetGoalie();
+            float fSign = AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
+            Goalie* pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
             float fGoalieX = fSign * pGoalie->mUnidentified024.m_v3Position.x;
-            if (fSign * mUnidentifiedFielder->mUnidentified024.m_v3Position.x < fGoalieX
-                || (float)fabs(mUnidentifiedFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
+            if (fSign * m_pFielder->mUnidentified024.m_v3Position.x < fGoalieX
+                || (float)fabs(m_pFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
             {
-                float fRange = fn_80039574(mUnidentifiedFielder);
+                float fRange = fn_80039574(m_pFielder);
                 float fDistance = nlSqrt(nlVec3DistanceSquared2D(
-                    mUnidentifiedFielder->mUnidentified024.m_v3Position,
-                    mUnidentifiedFielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position), true);
-                pGoalie = mUnidentifiedFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-                AvoidableObject* pAvoidable = mUnidentifiedFielder->mUnidentified320;
+                    m_pFielder->mUnidentified024.m_v3Position,
+                    m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position), true);
+                pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
+                AvoidableObject* pAvoidable = m_pFielder->mUnidentified320;
                 if (0.25f + (fDistance + (pAvoidable->GetRadius()
                         + pGoalie->mUnidentified320->GetRadius())) < fRange)
                 {
                     float fSkillshotChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->GetSkillValue(
-                        nlStringLowerHash("Windup/Skillshot"), mUnidentifiedFielder);
+                        nlStringLowerHash("Windup/Skillshot"), m_pFielder);
                     if (nlRandomf(1.0f) < fSkillshotChance)
                     {
                         *update = 3;
-                        fn_800B6A1C(update, 8, FuzzyVariant(FT_INT, lbl_806DC21C));
+                        update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC21C));
                     }
                     else
                     {
@@ -165,29 +163,29 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
-    if (mUnidentifiedFielder->fn_8002E9D0() != 20
-        && mUnidentifiedFielder->fn_8002E9D0() != 19)
+    if (m_pFielder->fn_8002E9D0() != 20
+        && m_pFielder->fn_8002E9D0() != 19)
     {
-        mUnidentifiedFielder->DoResetShotMeter(0.0f);
+        m_pFielder->DoResetShotMeter(0.0f);
     }
 
-    if (fn_8003C180(mUnidentifiedFielder))
+    if (fn_8003C180(m_pFielder))
     {
-        mUnidentifiedFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)(fn_8002C7E8(mUnidentifiedFielder->GetTweaks()) - 0.2f));
+        m_pFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)(fn_8002C7E8(m_pFielder->GetTweaks()) - 0.2f));
     }
 
-    if (mUnidentifiedFielder->m_pBall != NULL)
+    if (m_pFielder->m_pBall != NULL)
     {
-        mUnidentifiedFielder->fn_8004B86C(mbLobShot, false);
+        m_pFielder->fn_8004B86C(mbLobShot, false);
     }
-    else if (fn_8002F858(mUnidentifiedFielder, false))
+    else if (m_pFielder->CanContactLooseBall(false))
     {
-        mUnidentifiedFielder->InitActionLooseBallShot(mbLobShot);
-        result = mUnidentifiedFielder->m_eActionState
+        m_pFielder->InitActionLooseBallShot(mbLobShot);
+        result = m_pFielder->m_eActionState
               == ACTION_LOOSE_BALL_SHOT;
     }
 
-    if (mUnidentifiedFielder->m_pShotMeter->m_eShotMeterState
+    if (m_pFielder->m_pShotMeter->m_eShotMeterState
         == SHOT_METER_STS_RELEASED)
     {
         UnidentifiedVariantCollection transitionParams;
@@ -209,7 +207,7 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
  * Offset/Address/Size: 0xE70 | 0x800C5008 | size: 0x4
  */
 void DesireShoot::Update(
-    UnidentifiedDesireUpdate*, float)
+    DesireUpdate*, float)
 {
 }
 

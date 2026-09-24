@@ -44,7 +44,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -98,7 +98,7 @@ public:
     virtual ~UnidentifiedDesire35();
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
 };
 
 #endif // GAME_AI_DESIRE_STEERING_H

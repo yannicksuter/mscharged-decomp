@@ -94,12 +94,10 @@ extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fParam);
 
 extern "C" cFielder* fn_80096F54(cPlayer* pPlayer, bool bParam);
-extern "C" bool fn_80035F34(cFielder* pFielder);
 extern "C" bool fn_8003881C(cFielder* pFielder);
 extern "C" void* fn_80319FC0(void* pParam, int nParam);
 extern "C" void fn_80316968(void* pParam);
 extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" bool fn_8002D2C4(nlVector3* v3Position, float fParam, int nParam);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
 extern "C" void fn_800978E8(cPlayer* pPlayer, int nParam);
@@ -107,7 +105,6 @@ extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 extern bool lbl_806DB5A8;
 extern "C" void fn_8003A544(cFielder* pFielder);
 extern "C" float fn_8002CFB0(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C328(PlayerTweaks* pTweaks);
 extern "C" void fn_8005F03C(void* pParam, cFielder** ppFielder);
 extern "C" void fn_8005CBF0(void* pParam);
 extern "C" void fn_801B9C90(const char* pName);
@@ -187,7 +184,6 @@ struct UnidentifiedActionTarget806E0C94
 
 extern "C" void fn_8005CA10(cGame* pGame);
 extern "C" void fn_8005C830(cGame* pGame);
-extern "C" float fn_8004F58C(void);
 extern bool gbUseTurboCharging;
 extern "C" void fn_8005F238(cGame* pGame, void* pEvent);
 
@@ -1067,14 +1063,12 @@ bool cFielder::DoCommonInitActionLooseBall(
     float fVolleyReachDelta[2];
     float fLeadReachDelta[2];
     float fPhysicsRadius;
-    float fCos;
-    float fSin;
 
     cSAnim* pIdleGroundContactAnim = m_pAnimInventory->GetAnim(
         GetOneTimerIdleGroundContactAnims()->nAnimID);
+    float fContactFrame = GetOneTimerIdleGroundContactAnims()->fAnimContactFrame;
     float fMaxSimulatedTime
-        = GetOneTimerIdleGroundContactAnims()->fAnimContactFrame
-        / (float)pIdleGroundContactAnim->m_nNumKeys;
+        = fContactFrame / (float)pIdleGroundContactAnim->m_nNumKeys;
 
     float fSimulatedTime = 0.0f;
 
@@ -1083,35 +1077,35 @@ bool cFielder::DoCommonInitActionLooseBall(
     const LooseBallContactAnimInfo* pAnimInfoList
         = GetOneTimerIdleGroundContactAnims();
     int nNumAnims = GetNumOneTimerIdleGroundContactAnims();
+    fContactFrame = pAnimInfoList->fAnimContactFrame;
 
     GetJointPositionFuture(&v3IdleGroundContactOffset,
         pAnimInfoList->nAnimID, m_nBallJointIndex,
-        pAnimInfoList->fAnimContactFrame
-            / (float)pIdleGroundContactAnim->m_nNumKeys,
+        fContactFrame / (float)pIdleGroundContactAnim->m_nNumKeys,
         true, true, true, true);
 
     cSAnim* pIdleVolleyContactAnim
         = m_pAnimInventory->GetAnim(pAnimInfoList->nAnimID);
+    fContactFrame = GetOneTimerIdleVolleyContactAnims()->fAnimContactFrame;
     float fIdleVolleyTime
-        = GetOneTimerIdleVolleyContactAnims()->fAnimContactFrame
-        / (float)pIdleVolleyContactAnim->m_nNumKeys;
+        = fContactFrame / (float)pIdleVolleyContactAnim->m_nNumKeys;
     GetJointPositionFuture(&v3IdleVolleyContactOffset,
         GetOneTimerIdleVolleyContactAnims()->nAnimID, m_nBallJointIndex,
         fIdleVolleyTime, true, true, true, true);
 
     cSAnim* pLeadGroundContactAnim
         = m_pAnimInventory->GetAnim(pAnimInfoList->nAnimID);
+    fContactFrame = GetOneTimerLeadGroundContactAnims()->fAnimContactFrame;
     float fLeadGroundTime
-        = GetOneTimerLeadGroundContactAnims()->fAnimContactFrame
-        / (float)pLeadGroundContactAnim->m_nNumKeys;
+        = fContactFrame / (float)pLeadGroundContactAnim->m_nNumKeys;
     GetJointPositionFuture(&v3LeadGroundContactOffset,
         GetOneTimerLeadGroundContactAnims()->nAnimID, m_nBallJointIndex,
         fLeadGroundTime, true, true, true, true);
 
     float fMaxCatchupSpeed = fn_8002E1B0(this);
     float fMinBallZ = lbl_806E35FC;
-    bool bNoContactFound = true;
     bool bBallState5 = g_pBall->meBallState == 5;
+    bool bNoContactFound = true;
 
     while (fSimulatedTime < fMaxSimulatedTime)
     {
@@ -1221,7 +1215,7 @@ bool cFielder::DoCommonInitActionLooseBall(
             }
         }
 
-        if (fn_8002D2C4(&v3SimulatedBallPos, 0.0f, 0))
+        if (cField::FixOutOfBoundsPosition(v3SimulatedBallPos, 0.0f, false))
         {
             fSimulatedTime = fMaxSimulatedTime;
             break;
@@ -1270,26 +1264,19 @@ bool cFielder::DoCommonInitActionLooseBall(
         = m_pAnimInventory->GetAnim(pBestBallContactAnimInfo->nAnimID);
     s16 nFacingDelta
         = (s16)(aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection);
+    fContactFrame = pBestBallContactAnimInfo->fAnimContactFrame;
 
     GetJointPositionFuture(&v3ContactOffsetLocal,
         pBestBallContactAnimInfo->nAnimID, m_nBallJointIndex,
-        pBestBallContactAnimInfo->fAnimContactFrame
-            / (float)pBestContactAnim->m_nNumKeys,
+        fContactFrame / (float)pBestContactAnim->m_nNumKeys,
         true, true, false, true);
 
-    nlSinCos(&fSin, &fCos, aDesiredFacingDirection);
-
+    nlVec2Rotate(*(nlVector2*)&v3ContactOffsetWorld,
+        *(const nlVector2*)&v3ContactOffsetLocal, aDesiredFacingDirection);
     v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
 
     mUnidentified368 = pBestBallContactAnimInfo->fAnimContactFrame
         / (float)pBestContactAnim->m_nNumKeys;
-
-    const float fRotationCos = fCos;
-    const float fContactOffsetX = v3ContactOffsetLocal.x;
-    v3ContactOffsetWorld.x = (fContactOffsetX * fRotationCos)
-        - (v3ContactOffsetLocal.y * fSin);
-    v3ContactOffsetWorld.y = (v3ContactOffsetLocal.y * fRotationCos)
-        + (fContactOffsetX * fSin);
 
     SetAnimState(pBestBallContactAnimInfo->nAnimID, false,
         mUnidentified368 * lbl_806DB990, false, false);
@@ -1310,7 +1297,7 @@ bool cFielder::DoCommonInitActionLooseBall(
     float fNetWidth = cNet::m_fNetWidth;
     float fMaxGoalY = (0.5f * fNetWidth) + lbl_806E355C;
     float fMinGoalY
-        = ((0.5f * fNetWidth) - fn_8004F58C()) - fPhysicsRadius;
+        = ((0.5f * fNetWidth) - m_pTeam->m_pNet->GetPostRadius()) - fPhysicsRadius;
 
     float fAbsX = (float)fabs(v3SimulatedBallPos.x);
     if ((fAbsX < fMaxGoalX)
@@ -1371,7 +1358,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
 void cFielder::fn_80048484(float fDeltaT)
 {
     bool bIsChipShot = false;
-    if (bIsModified || fn_80035F34(this))
+    if (bIsModified || IsActionModifierPressed())
     {
         bIsChipShot = true;
     }
@@ -1413,7 +1400,7 @@ void cFielder::InitActionLooseBallShot(bool bIsChipShot)
 void cFielder::fn_800486DC(float fDeltaT)
 {
     bool bIsChipShot = false;
-    if (bIsModified || fn_80035F34(this))
+    if (bIsModified || IsActionModifierPressed())
     {
         bIsChipShot = true;
     }
@@ -1543,18 +1530,19 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         fn_8005001C(true);
     }
 
+    bool bDidWindup = false;
     bool bNearGoal = false;
     float fAbsX = (float)fabs(mUnidentified024.m_v3Position.x);
     if (fAbsX > cField::GetGoalLineX(1U) - lbl_806E3570)
     {
-        if ((float)fabs(mUnidentified024.m_v3Position.y)
-            < 0.5f * cNet::m_fNetWidth + 1.0f)
+        float fNetWidth = cNet::m_fNetWidth;
+        float fAbsY = (float)fabs(mUnidentified024.m_v3Position.y);
+        if (fAbsY < 0.5f * fNetWidth + 1.0f)
         {
             bNearGoal = true;
         }
     }
 
-    bool bDidWindup = false;
     if (g_pGame->m_eGameState == 3 || bNearGoal)
     {
         fn_801BA4C8("ball_sts_windup");
@@ -1578,19 +1566,19 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         nlVector3 v3NetLocation = m_pTeam->GetOtherNet()->m_v3NetLocation;
 
-        InitMovementFromAnim(
-            (s16)CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
-                (u16)(s32)(10430.378f
-                    * nlATan2f(v3NetLocation.y - mUnidentified024.m_v3Position.y,
-                        v3NetLocation.x - mUnidentified024.m_v3Position.x)),
-                m_eAnimID, 1.0f),
-            v3Zero, lbl_806E35CC, false);
+        float fDeltaX = v3NetLocation.x - mUnidentified024.m_v3Position.x;
+        float fDeltaY = v3NetLocation.y - mUnidentified024.m_v3Position.y;
+        float fAngleRad = nlATan2f(fDeltaY, fDeltaX);
+        u16 nAngleUnits = (u16)(s32)(10430.378f * fAngleRad);
+        s16 nTurnAdjust = CalcAnimTurnAdjust(
+            mUnidentified024.m_aActualFacingDirection, nAngleUnits, m_eAnimID, 1.0f);
+        InitMovementFromAnim(nTurnAdjust, v3Zero, lbl_806E35CC, false);
 
         if (bParam)
         {
-            ShootToScoreMeter::instance.m_v3OriginalMeterPosition
+            ShootToScoreMeter::instance.m_v3MeterPosition
+                = ShootToScoreMeter::instance.m_v3OriginalMeterPosition
                 = mUnidentified024.m_v3Position;
-            ShootToScoreMeter::instance.m_v3MeterPosition = mUnidentified024.m_v3Position;
             ShootToScoreMeter::instance.TurnOnMeter();
             PlaySound(0, 0xC4534945, 0, 0);
         }
@@ -1605,10 +1593,11 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
         g_pGame->mpWeatherManager->Pause();
 
-        fn_800978E8(this, 0);
+        ClearPowerupAnimState(false);
 
-        mUnidentified3B4 = lbl_806DB924;
-        mUnidentified3AC = lbl_806DB924;
+        float fMeterTime = lbl_806DB924;
+        mUnidentified3B4 = fMeterTime;
+        mUnidentified3AC = fMeterTime;
         mUnidentified3B8 = false;
 
         float fShooting = this->GetTweaks()->fShooting;
@@ -1630,10 +1619,10 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         float fSegmentD
             = InterpolateClamped(lbl_806E0C68, lbl_806E0C6C, fShooting);
 
-        float fHalfA = fSegmentA * 0.5f;
-        float fHalfB = fSegmentB * 0.5f;
-        float fHalfD = fSegmentD * 0.5f;
-        float fHalfC = fSegmentC * 0.5f;
+        float fHalfA = fSegmentA / 2.0f;
+        float fHalfB = fSegmentB / 2.0f;
+        float fHalfC = fSegmentC / 2.0f;
+        float fHalfD = fSegmentD / 2.0f;
 
         mUnidentified3C4 = lbl_806DB970 + fHalfA;
         ShootToScoreMeter::instance.fn_801B1004(mUnidentified3C4);
@@ -2064,7 +2053,7 @@ void cFielder::InitActionOneTimer(int animID, nlVector3& targetPos,
 void cFielder::fn_80049EA0(float fDeltaT)
 {
     bool bIsChipShot = false;
-    if (bIsModified || fn_80035F34(this))
+    if (bIsModified || IsActionModifierPressed())
     {
         bIsChipShot = true;
     }
@@ -2085,7 +2074,7 @@ void cFielder::fn_80049EA0(float fDeltaT)
 void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
 {
     bool bIsChipShot = false;
-    if (bIsModified || fn_80035F34(this))
+    if (bIsModified || IsActionModifierPressed())
     {
         bIsChipShot = true;
     }
@@ -2104,13 +2093,14 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
     s16 facingDelta = GetFacingDeltaToPosition(pPlayer->mUnidentified024.m_v3Position);
     int index = (u16)(facingDelta + 0x2000) >> 14;
 
+    int nAnimID;
     bool bMirror = false;
     if (index == 2)
     {
         bMirror = m_pCurrentAnimController->m_bMirror;
     }
 
-    int nAnimID = LateOneTimerFromVolleyAnims[index];
+    nAnimID = LateOneTimerFromVolleyAnims[index];
 
     s16 nTurnAdjust = 0;
     switch (nAnimID)
@@ -2388,7 +2378,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (nAbsActualToDesiredFacingDirection >= 0x639C)
             {
                 if (mUnidentified024.m_fActualSpeed
-                    < fSpeedFactor * fn_8002C328(this->GetTweaks()))
+                    < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
                     fn_8003A5C8(this);
                 }
@@ -2402,7 +2392,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
             {
                 if (mUnidentified024.m_fActualSpeed
-                    < fSpeedFactor * fn_8002C328(this->GetTweaks()))
+                    < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
                     fn_8003A5C8(this);
                 }
@@ -2415,7 +2405,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (mUnidentified024.m_fDesiredSpeed > 1.0f)
             {
                 if (mUnidentified024.m_fActualSpeed
-                    < fSpeedFactor * fn_8002C328(this->GetTweaks()))
+                    < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
                     fn_8003A5C8(this);
                 }
@@ -2425,7 +2415,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 }
             }
             else if (mUnidentified024.m_fActualSpeed
-                > 0.6f * fn_8002C328(this->GetTweaks()))
+                > 0.6f * this->GetTweaks()->GetRunningSpeed())
             {
                 fn_8003B54C(this);
             }
@@ -2467,7 +2457,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (nAbsActualToDesiredFacingDirection >= 0x639C)
             {
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002C328(this->GetTweaks()))
+                    > 0.6f * this->GetTweaks()->GetRunningSpeed())
                 {
                     fn_8003ADAC(this);
                 }
@@ -2481,7 +2471,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if (mUnidentified024.m_fDesiredSpeed < fn_8002CE14(this->GetTweaks()) - 0.15f)
             {
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002C328(this->GetTweaks()))
+                    > 0.6f * this->GetTweaks()->GetRunningSpeed())
                 {
                     fn_8003B54C(this);
                 }
@@ -4240,9 +4230,9 @@ void cFielder::fn_8004B658()
         fn_8003A544(this);
         InitMovementRunningNoTurn(0.0f, fn_8002CFB0(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
-        if (mUnidentified024.m_fActualSpeed > fn_8002C328(this->GetTweaks()))
+        if (mUnidentified024.m_fActualSpeed > this->GetTweaks()->GetRunningSpeed())
         {
-            mUnidentified024.m_fActualSpeed = fn_8002C328(this->GetTweaks());
+            mUnidentified024.m_fActualSpeed = this->GetTweaks()->GetRunningSpeed();
         }
 
         cFielder* pFielder = this;
@@ -4661,8 +4651,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
             nlVector3 v3Dir;
             nlVec3Sub(v3Dir, mUnidentified024.m_v3Position,
                 m_pTeam->GetOtherNet()->m_v3NetLocation);
-            float fRecipLength = nlRecipSqrt(v3Dir.GetLengthSq3D(), true);
-            nlVec3Scale(v3Dir, v3Dir, fRecipLength);
+            nlVec3Normalize(v3Dir, v3Dir);
             nlVec3ScaleAdd(v3Dir, 2.0f, v3Dir, mUnidentified024.m_v3Position);
 
             lbl_806E0C74 = new (nlMalloc(
@@ -4686,8 +4675,9 @@ void cFielder::fn_8004BB80(float fDeltaT)
         float fTime = pShotMeter->m_fTime;
         if (fTime > fReleaseTime - fWindow)
         {
+            float fTimeLeft = fReleaseTime - fTime;
             mUnidentified178 = InterpolateRangeClamped(
-                mUnidentified178, 0.0f, fWindow, 0.0f, fReleaseTime - fTime);
+                mUnidentified178, 0.0f, fWindow, 0.0f, fTimeLeft);
         }
     }
 
@@ -4769,44 +4759,41 @@ void cFielder::fn_8004C88C(float fDeltaT)
 {
     if (!bAttackSucceeded && mUnidentified388 == 0 && fn_8003E6FC())
     {
-        nlVector3 v3Delta;
-        v3Delta.y = g_pBall->m_v3Position.y - mUnidentified024.m_v3Position.y;
-        v3Delta.x = g_pBall->m_v3Position.x - mUnidentified024.m_v3Position.x;
-        float fLength = nlSqrt(
-            v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y, true);
-        float fRecipLength = 1.0f
-            / nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y, true);
+        float fCurrSpeed;
+        nlVector3 v3NewVelocity;
+        nlVector2 v2Delta;
+        v2Delta.y = g_pBall->m_v3Position.y - mUnidentified024.m_v3Position.y;
+        v2Delta.x = g_pBall->m_v3Position.x - mUnidentified024.m_v3Position.x;
+        nlVec2Length(v2Delta);
 
-        float fDir[2];
-        fDir[1] = fRecipLength * v3Delta.y;
-        fDir[0] = fRecipLength * v3Delta.x;
-        v3Delta.y = lbl_806E3620 * fDir[1];
-        v3Delta.x = lbl_806E3620 * fDir[0];
+        nlVector2 v2Direction;
+        nlVec2Scale(v2Direction, v2Delta, 1.0f / nlVec2Length(v2Delta));
+        v2Delta.y = lbl_806E3620 * v2Direction.y;
+        v2Delta.x = lbl_806E3620 * v2Direction.x;
 
-        float fVelX2 = mUnidentified024.m_v3Velocity.x * mUnidentified024.m_v3Velocity.x;
-        float fVelY2 = mUnidentified024.m_v3Velocity.y * mUnidentified024.m_v3Velocity.y;
-        float fSpeed = nlSqrt(fVelX2 + fVelY2, true);
+        float velY = mUnidentified024.m_v3Velocity.y;
+        float velX = mUnidentified024.m_v3Velocity.x;
+        fCurrSpeed = nlGetLength2D(velX, velY);
 
-        float fBlend[2];
-        fBlend[1] = v3Delta.y + mUnidentified024.m_v3Velocity.y;
-        fBlend[0] = v3Delta.x + mUnidentified024.m_v3Velocity.x;
+        nlVector2 v2NewVelocity;
+        v2NewVelocity.y = v2Delta.y + mUnidentified024.m_v3Velocity.y;
+        v2NewVelocity.x = v2Delta.x + mUnidentified024.m_v3Velocity.x;
         float fRecipBlend = 1.0f
-            / nlSqrt(fBlend[0] * fBlend[0] + fBlend[1] * fBlend[1], true);
-        float fBlendN[2];
-        fBlendN[1] = fRecipBlend * fBlend[1];
-        fBlendN[0] = fRecipBlend * fBlend[0];
+            / nlVec2Length(v2NewVelocity);
+        nlVector2 v2NormalizedVelocity;
+        v2NormalizedVelocity.y = fRecipBlend * v2NewVelocity.y;
+        v2NormalizedVelocity.x = fRecipBlend * v2NewVelocity.x;
 
-        if (fBlendN[0] * fDir[0] + fBlendN[1] * fDir[1] >= 0.0f)
+        if (v2NormalizedVelocity.x * v2Direction.x
+            + v2NormalizedVelocity.y * v2Direction.y >= 0.0f)
         {
-            nlVector3 v3NewVelocity;
-            v3NewVelocity.z = 0.0f;
-            fBlend[1] = fSpeed * fBlendN[1];
-            fBlend[0] = fSpeed * fBlendN[0];
-            v3NewVelocity.y = fBlend[1];
-            v3NewVelocity.x = fBlend[0];
+            v2NewVelocity.y = fCurrSpeed * v2NormalizedVelocity.y;
+            v2NewVelocity.x = fCurrSpeed * v2NormalizedVelocity.x;
+            nlVec3Set(v3NewVelocity,
+                v2NewVelocity.x, v2NewVelocity.y, 0.0f);
 
             nlPolar polar;
-            nlCartesianToPolar(polar, fBlend[0], fBlend[1]);
+            nlCartesianToPolar(polar, v3NewVelocity.x, v3NewVelocity.y);
             Unknown8(polar.a, false);
             SetFacingDirection(polar.a, true);
             SetVelocity(v3NewVelocity);
@@ -4851,7 +4838,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                         unsigned long soundID = 0x0DCA472D;
                         if (m_pTeam->m_nSide == 0)
                         {
-                            soundID = 0x902EA0E4;
+                            soundID = 0x902DA0E4;
                         }
                         PlayCrowdReaction(soundID);
                     }
@@ -4928,9 +4915,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
     }
     }
 
-    bool bUnidentified2 = g_pGame->m_eGameState == 5
-        || g_pGame->m_eGameState == 6;
-    if (!bUnidentified2)
+    if (!g_pGame->IsGameplayOrOvertime())
     {
         fn_8004D238();
     }
@@ -5506,11 +5491,6 @@ void cFielder::fn_8004E11C(float fParam)
     {
         SwapController(false);
     }
-}
-
-extern "C" float fn_8004F58C(void)
-{
-    return cNet::m_fNetPostRadius;
 }
 
 namespace tDebugPrintManager

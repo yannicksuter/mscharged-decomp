@@ -1053,10 +1053,11 @@ void Nis::fn_80283A40(const char* param1, int param2)
 
     if (entry != 0)
     {
+        eCharacterClass characterClass = character->mUnidentified024.m_eCharacterClass;
         entry->mUnidentified00 = param1;
         entry->mUnidentified04 = param2;
         entry->mUnidentified08 = false;
-        tCharacterTemplateInfo* info = GetCharacterTemplateInfo(character->mUnidentified024.m_eCharacterClass);
+        tCharacterTemplateInfo* info = GetCharacterTemplateInfo(characterClass);
         char filename[100];
         nlSNPrintf(filename, sizeof(filename) - 1, "Art/Animation/%s/%s.sanim", info->szHierarchy, param1);
 

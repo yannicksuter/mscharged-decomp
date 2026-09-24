@@ -36,7 +36,9 @@ struct EmissionResourceStats
     /* 0x0C */ char mName[0x20];
     /* 0x2C */ int mBudget;
     /* 0x30 */ u16 mId;
-    /* 0x32 */ u16 mFlags;
+    /* 0x32 */ u16 unknown_0x32_bit15 : 1;
+    /*      */ u16 unknown_0x32_bit14 : 1;
+    /*      */ u16 unknown_0x32_low : 14;
 }; // size: 0x34
 
 class EmissionManager
@@ -103,7 +105,7 @@ public:
     /* 0x1BC */ nlDLListContainer<EmissionController*> mControllers;
     /* 0x1C4 */ nlDLListContainer<EmissionController*> mUnidentifiedControllers;
     /* 0x1CC */ int mNumParticles;
-    /* 0x1D0 */ void* mParticleMemory;
+    /* 0x1D0 */ Particle* mParticleMemory;
     /* 0x1D4 */ nlDLListSlotPool<Particle*> mParticles;
     /* 0x1F0 */ bool mUpdateEnabled;
     /* 0x1F1 */ bool mRenderPersistentOnly;

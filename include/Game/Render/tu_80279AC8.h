@@ -73,6 +73,8 @@ public:
         clamped = nlMinEquals(clamped, 1.0f);
         m_fCupTrophyOpacity = clamped;
     }
+
+    float GetOpacity() const { return m_fCupTrophyOpacity; }
 };
 
 class StadiumLayerObject_8027A130 : public StadiumWorldObject_80279AC8

@@ -628,23 +628,33 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
 
 void UnidentifiedCameraEffects::UpdateCameraFlags()
 {
-    if (AreFieldersClear())
+    if (AreFieldersClear() == true)
         mCameraFlags |= 0x10;
     else
         mCameraFlags &= ~0x10;
 
     cFielder* owner = (cFielder*)g_pBall->m_pOwner;
-    bool facingGoal = false;
+    bool facingGoal;
     if (owner != 0 && owner->m_eClassType == FIELDER)
     {
         float goalLineX = cField::GetGoalLineX((unsigned int)
             owner->m_pTeam->GetOtherTeam()->m_nSide);
-        facingGoal = (goalLineX > 0.0
-                         && owner->mUnidentified024.m_v3Position.x > 0.0f)
-                  || (goalLineX < 0.0
-                         && owner->mUnidentified024.m_v3Position.x < 0.0f);
+        if (goalLineX > 0.0
+            && owner->mUnidentified024.m_v3Position.x > 0.0f)
+        {
+            facingGoal = true;
+            goto facingGoalKnown;
+        }
+        if (goalLineX < 0.0
+            && owner->mUnidentified024.m_v3Position.x < 0.0f)
+        {
+            facingGoal = true;
+            goto facingGoalKnown;
+        }
     }
-    if (facingGoal)
+    facingGoal = false;
+facingGoalKnown:
+    if (facingGoal == true)
         mCameraFlags |= 1;
     else
         mCameraFlags &= ~1;
@@ -655,8 +665,7 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
     else
         mCameraFlags &= ~0x20;
 
-    if (g_pGame->mUnidentified080 != 0.0f
-        || g_pGame->mUnidentified084 != 0.0f)
+    if (g_pGame->mUnidentified080 || g_pGame->mUnidentified084)
         mCameraFlags |= 0x40;
 }
 

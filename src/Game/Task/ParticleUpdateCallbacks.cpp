@@ -8,7 +8,7 @@ bool g_bRenderParticles = true;
 
 ParticleUpdateTask* GetParticleUpdateTask();
 
-void ParticleUpdateNoOp()
+void ParticleUpdateNoOp(u8*)
 {
 }
 

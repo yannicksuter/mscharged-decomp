@@ -109,8 +109,9 @@ void EffectsTemplate::Cleanup()
 {
 }
 
-float EffectsTemplate::GetBoundingRadius() const
+float EffectsTemplate::GetBoundingRadius()
 {
+    float duration;
     float result;
     switch (m_eEmitter)
     {
@@ -121,9 +122,9 @@ float EffectsTemplate::GetBoundingRadius() const
     {
         float value4 = mProperties[4]->GetMaximum();
         float value1 = mProperties[1]->GetMaximum();
-        result = value4 + value1 * mProperties[2]->GetMaximum();
-        float duration
-            = 0.5f * m_rParticleLife.range + m_rParticleLife.base;
+        float value2 = mProperties[2]->GetMaximum();
+        result = value4 + value2 * value1;
+        duration = 0.5f * m_rParticleLife.range + m_rParticleLife.base;
         result += duration * mProperties[5]->GetMaximum();
         break;
     }

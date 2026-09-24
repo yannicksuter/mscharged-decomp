@@ -302,9 +302,9 @@ extern "C" float fn_8002C254(const PlayerTweaks* tweaks)
     return terrainScale * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002C328(PlayerTweaks* tweaks)
+float PlayerTweaks::GetRunningSpeed()
 {
-    float playerValue = tweaks->mUnidentified034;
+    float playerValue = mUnidentified034;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;
     float maximum = fielderTweaks->mUnidentified134;
     float minimum = fielderTweaks->mUnidentified124;

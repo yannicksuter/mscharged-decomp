@@ -39,9 +39,9 @@ bool UnidentifiedAudioScriptRuntime::Unidentified6E00(void* data, unsigned int s
     return true;
 }
 
-int UnidentifiedAudioScriptRuntime::Unidentified6E98(u32 hash, UnidentifiedAudioEffectSetState* value)
+int UnidentifiedAudioScriptRuntime::Unidentified6E98(u32 hash, int value)
 {
-    UnidentifiedAudioEffectSetState** previous = mEffectSets.Add(hash, value);
+    int* previous = mEffectSets.Add(hash, value);
     if (previous != 0)
         *previous = value;
     return 0;
@@ -65,6 +65,22 @@ static inline void UnidentifiedAddBinding(UnidentifiedAudioScriptRuntime* script
     nlDLRingAddEnd(head, entry);
 }
 
+inline bool UnidentifiedAudioScriptList::UnidentifiedContains(const u32& key) const
+{
+    bool found = false;
+    if (mCount != 0)
+        found = nlBSearch<u32, u32>(key, mValues, mCount) != 0;
+    return found;
+}
+
+static inline bool UnidentifiedListAbsent(const u32& key, u32* values, int count)
+{
+    bool absent = true;
+    if (count != 0)
+        absent = nlBSearch<u32, u32>(key, values, count) == 0;
+    return absent;
+}
+
 void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
 {
     UnidentifiedAddBinding(this, 0x8CE35E27, instance);
@@ -80,9 +96,7 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
     UnidentifiedAudioScriptSelection* selection = (UnidentifiedAudioScriptSelection*)entry->mData;
     for (u32 i = 0; i < selection->mCount; ++i)
     {
-        if (mUnidentified08->mCount == 0
-            || nlBSearch<u32, u32>(selection->mValues[i],
-                mUnidentified08->mValues, mUnidentified08->mCount) == 0)
+        if (!mUnidentified08->UnidentifiedContains(selection->mValues[i]))
             UnidentifiedAddBinding(this, selection->mValues[i], instance);
     }
 
@@ -94,14 +108,11 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
         keys[i] = condition->mKey;
         if (condition->mFunction == 0xFFFF)
         {
-            UnidentifiedAudioEffectSetState** found;
-            UnidentifiedAudioEffectSetState* value = 0;
+            int* found;
+            int value = 0;
             if (mEffectSets.FindGet(condition->mArguments[0], &found))
                 value = *found;
-            if (value != 0
-                && (mUnidentified08->mCount == 0
-                    || nlBSearch<u32, u32>(condition->mKey,
-                        mUnidentified08->mValues, mUnidentified08->mCount) == 0))
+            if (value != 0 && !mUnidentified08->UnidentifiedContains(condition->mKey))
                 UnidentifiedAddBinding(this, condition->mKey, instance);
         }
         else
@@ -110,15 +121,15 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
             u32 values[4];
             for (int j = 0; j < condition->mCount; ++j)
             {
-                UnidentifiedAudioEffectSetState** found;
-                values[j] = mEffectSets.FindGet(condition->mArguments[j], &found)
-                    ? (u32)*found : 0;
+                int* found;
+                u32 value = 0;
+                if (mEffectSets.FindGet(condition->mArguments[j], &found))
+                    value = (u32)*found;
+                values[j] = value;
             }
             mInterpreter.ExecuteFunction(function, condition->mCount, values);
             if (*mInterpreter.m_SP != 0
-                && (mUnidentified08->mCount == 0
-                    || nlBSearch<u32, u32>(condition->mKey,
-                        mUnidentified08->mValues, mUnidentified08->mCount) == 0))
+                && !mUnidentified08->UnidentifiedContains(condition->mKey))
                 UnidentifiedAddBinding(this, condition->mKey, instance);
         }
         condition = (UnidentifiedAudioScriptCondition*)(condition->mArguments + condition->mCount);
@@ -128,10 +139,8 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
     for (u32 i = 0; i < mUnidentified08->mCount; ++i)
     {
         u32* key = &mUnidentified08->mValues[i];
-        if ((selection->mCount == 0
-                || nlBSearch<u32, u32>(*key, selection->mValues, selection->mCount) == 0)
-            && (selection->mConditionCount == 0
-                || nlBSearch<u32, u32>(*key, keys, selection->mConditionCount) == 0))
+        if (UnidentifiedListAbsent(*key, selection->mValues, selection->mCount)
+            && UnidentifiedListAbsent(*key, keys, selection->mConditionCount))
             UnidentifiedAddBinding(this, *key, instance);
     }
 }

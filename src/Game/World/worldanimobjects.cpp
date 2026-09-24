@@ -169,7 +169,7 @@ nlMatrix4* WorldDrawable::GetWorldMatrix()
     return &mWorldMatrix;
 }
 
-bool WorldDrawable::V6(const nlVector4* pCullData)
+bool WorldDrawable::V6(const nlVector4* pCullData) const
 {
     FrustumResult result;
     if (m_pAnimController != 0)
@@ -188,7 +188,8 @@ bool WorldDrawable::V6(const nlVector4* pCullData)
     else
     {
         float fRadius = m_fBoundingRadius;
-        nlMatrix4& matrix = *GetWorldMatrix();
+        nlMatrix4& matrix
+            = *const_cast<WorldDrawable*>(this)->GetWorldMatrix();
         result = ClassifySphereInFrustum(pCullData,
             (const nlVector3*)&matrix.e2[3][0], fRadius);
     }

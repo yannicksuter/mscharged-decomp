@@ -63,7 +63,7 @@ class EffectsTemplate
 public:
     static EffectsTemplate* LoadFromChunk(nlChunk* chunk);
     void Cleanup();
-    float GetBoundingRadius() const;
+    float GetBoundingRadius();
 
     /* 0x00 */ unsigned long m_uHashID;
     /* 0x04 */ float m_fFountainLife;

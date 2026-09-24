@@ -10,7 +10,7 @@ class PitchParameter : public AudioEffectParameter
 {
 public:
     PitchParameter();
-    virtual ~PitchParameter() { }
+    virtual ~PitchParameter();
 
     static void* operator new(unsigned long)
     {
@@ -32,7 +32,6 @@ public:
 class Pitch : public AudioEffectBase
 {
 public:
-    virtual ~Pitch() { }
     virtual void CreateParameter(unsigned int definition, void* context,
         bool negate, AudioEffectParameter** output);
     virtual void BeginBlend();
@@ -146,6 +145,10 @@ void Pitch::ApplyToSound(void* handle)
 void Pitch::OnParameterFinished(AudioEffectParameter* parameter)
 {
     m_Initial.m_Semitones += ((PitchParameter*)parameter)->m_Semitones;
+}
+
+PitchParameter::~PitchParameter()
+{
 }
 
 void Pitch::BeginBlend()

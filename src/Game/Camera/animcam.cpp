@@ -122,16 +122,12 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             nlVector3* v3Pos = (nlVector3*)outerChunk->GetData();
             if (ownsKeyData)
             {
-                unsigned long offset;
                 unsigned long i;
                 i = 0;
-                offset = 0;
                 while (i < pAnimCameraData->m_uKeyCount)
                 {
-                    *(nlVector3*)((u8*)pAnimCameraData->cameraPos + offset) = *v3Pos;
+                    pAnimCameraData->cameraPos[i] = v3Pos[i];
                     i++;
-                    offset += sizeof(nlVector3);
-                    v3Pos++;
                 }
             }
             else
@@ -145,16 +141,12 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             nlVector3* v3Pos = (nlVector3*)outerChunk->GetData();
             if (ownsKeyData)
             {
-                unsigned long offset;
                 unsigned long i;
                 i = 0;
-                offset = 0;
                 while (i < pAnimCameraData->m_uKeyCount)
                 {
-                    *(nlVector3*)((u8*)pAnimCameraData->targetPos + offset) = *v3Pos;
+                    pAnimCameraData->targetPos[i] = v3Pos[i];
                     i++;
-                    offset += sizeof(nlVector3);
-                    v3Pos++;
                 }
             }
             else
@@ -168,16 +160,12 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             nlQuaternion* rot = (nlQuaternion*)outerChunk->GetData();
             if (ownsKeyData)
             {
-                unsigned long offset;
                 unsigned long i;
                 i = 0;
-                offset = 0;
                 while (i < pAnimCameraData->m_uKeyCount)
                 {
-                    *(nlQuaternion*)((u8*)pAnimCameraData->cameraRot + offset) = *rot;
+                    pAnimCameraData->cameraRot[i] = rot[i];
                     i++;
-                    offset += sizeof(nlQuaternion);
-                    rot++;
                 }
             }
             else

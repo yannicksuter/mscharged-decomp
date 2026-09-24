@@ -12,6 +12,7 @@
 #include "Game/GameInfo.h"
 #include "Game/GameSceneManager.h"
 #include "Game/NetworkDraft.h"
+#include "Game/NetworkRandom.h"
 #include "Game/NetworkSession.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Team.h"
@@ -450,12 +451,80 @@ int NetTournManager::TournamentIdxToMachineIdx(int machine) const
 
 bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
 {
-    if (game == 0 || game->mMachines[0] == -1 || game->mMachines[1] == -1)
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    if (roster == 0)
     {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "No lobby found, cannot send tournament game start message\n");
         return false;
     }
 
-    game->mState = NET_TOURN_GAME_IN_PROGRESS;
+    u32 randomSeed = NetworkRandom();
+    NetMessageGameStart message;
+    message.mRandomSeed = randomSeed;
+    message.mMachineIndex = 0;
+    message.mMachineCount = 2;
+    message.mUnidentified20 = 0;
+    message.mUnidentified24 = 0;
+    message.mUnidentified1B = 1;
+    message.mUnidentified1C[0] = game->mBracketIndex;
+    message.mUnidentified1C[1] = game->mMachines[0];
+    message.mUnidentified1C[2] = game->mMachines[1];
+
+    BasicGameInfo& info = game->mGameInfo;
+    message.mHomeCharacters[0] = info.mTeamIndex[0];
+    message.mHomeCharacters[1] = info.mSidekickIndex[0][0];
+    message.mHomeCharacters[2] = info.mSidekickIndex[0][1];
+    message.mHomeCharacters[3] = info.mSidekickIndex[0][2];
+    message.mAwayCharacters[0] = info.mTeamIndex[1];
+    message.mAwayCharacters[1] = info.mSidekickIndex[1][0];
+    message.mAwayCharacters[2] = info.mSidekickIndex[1][1];
+    message.mAwayCharacters[3] = info.mSidekickIndex[1][2];
+    message.mStadium = info.mStadiumIndex;
+
+    u8 remote = gOnlineTwoLocalPlayers;
+    for (int machine = 0; machine < 4; ++machine)
+    {
+        if (machine < 2)
+        {
+            if (remote)
+            {
+                message.mMachineFlags[machine] = 2;
+            }
+            else
+            {
+                message.mMachineFlags[machine] = 1;
+            }
+        }
+        else
+        {
+            message.mMachineFlags[machine] = 0;
+        }
+    }
+
+    if (roster->GetMachineAid(game->mMachines[1]) == 0)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Warning: Cannot send tournament start game message to tournament midx %d - no connection\n",
+            game->mMachines[1]);
+        return false;
+    }
+
+    for (int machine = 0; machine < 2; ++machine)
+    {
+        u8 buffer[0x64];
+        message.mMachineIndex = machine;
+        int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
+        u32 aid = roster->GetMachineAid(game->mMachines[machine]);
+        if (aid == 0xFFFFFFFF)
+        {
+            g_pNetworkSessionBase->GetDirectSocket()->Receive(buffer, size);
+        }
+        else if (aid != 0)
+        {
+            g_pNetworkSessionBase->GetDirectSocket()->Send(aid, buffer, size, true);
+        }
+    }
     return true;
 }
 
@@ -532,29 +601,63 @@ void NetTournManager::StartReadyGames()
 {
     for (int i = 0; i < 8; ++i)
     {
-        mLoadedToGame[i] = false;
         mLoadedToKnockout[i] = false;
+        mLoadedToGame[i] = false;
     }
 
-    for (int gameIndex = mFirstGameInRound; gameIndex <= mLastGameInRound;
-         ++gameIndex)
+    NetworkTournamentGame* game;
+    int gameIndex = mFirstGameInRound;
+    game = &mGames[gameIndex];
+    for (; gameIndex <= mLastGameInRound; ++game, ++gameIndex)
     {
-        NetworkTournamentGame& game = mGames[gameIndex];
-        if (game.mMachines[0] == -1 && game.mMachines[1] == -1)
+        if (game->mMachines[0] == mLocalMachineIndex
+            && game->mMachines[1] != -1)
         {
-            game.mState = NET_TOURN_GAME_NO_PLAYERS;
+            if (!SendTournamentGameStart(game))
+            {
+                game->mState = NET_TOURN_GAME_STATE_11;
+                u8 buffer[0xFF];
+                NetMessageTournamentGameUpdate update(
+                    3, gameIndex, true, 0, 0, false);
+                int size = gNetworkMessageRegistry->Serialize(
+                    &update, buffer, sizeof(buffer));
+                SendToAllTournamentMachines(buffer, size);
+            }
         }
-        else if (game.mMachines[0] == -1)
+
+        if (game->mMachines[0] == -1 && game->mMachines[1] == -1)
         {
-            game.mState = NET_TOURN_GAME_AWAY_ADVANCES;
+            game->mState = NET_TOURN_GAME_NO_PLAYERS;
+            continue;
         }
-        else if (game.mMachines[1] == -1)
+        if (game->mMachines[0] == -1 || game->mMachines[1] == -1)
         {
-            game.mState = NET_TOURN_GAME_HOME_ADVANCES;
-        }
-        else if (game.mMachines[0] == mLocalMachineIndex)
-        {
-            SendTournamentGameStart(&game);
+            if (game->mMachines[0] == -1)
+            {
+                game->mState = NET_TOURN_GAME_AWAY_ADVANCES;
+                if (mCurrentRound < GetNumPlayoffRounds() - 1)
+                {
+                    int relativeIndex = gameIndex - mFirstGameInRound;
+                    int nextGame = mLastGameInRound + relativeIndex / 2 + 1;
+                    NetworkDraftTeam* team = NetworkDraft::Instance()
+                        ->FindDraftTeamByPeerIndex(game->mMachines[1]);
+                    short side = relativeIndex % 2;
+                    mGames[nextGame].mGameInfo.mTeamIndex[side] = team->mCaptain;
+                }
+            }
+            else
+            {
+                game->mState = NET_TOURN_GAME_HOME_ADVANCES;
+                if (mCurrentRound < GetNumPlayoffRounds() - 1)
+                {
+                    int relativeIndex = gameIndex - mFirstGameInRound;
+                    int nextGame = mLastGameInRound + relativeIndex / 2 + 1;
+                    NetworkDraftTeam* team = NetworkDraft::Instance()
+                        ->FindDraftTeamByPeerIndex(game->mMachines[0]);
+                    short side = relativeIndex % 2;
+                    mGames[nextGame].mGameInfo.mTeamIndex[side] = team->mCaptain;
+                }
+            }
         }
     }
 }

@@ -284,6 +284,30 @@ inline bool CrowdImpostorManager::IsObjectEnabled(CrowdLayoutObject* object)
     return false;
 }
 
+inline bool CrowdImpostorManager::IsPointOccluded(
+    const nlVector4& worldPoint, nlVector4& localPoint)
+{
+    nlDLListIterator<CrowdLayoutObject*> occlusionIt
+        = mOcclusionObjects.Begin();
+    while (occlusionIt.hasNext())
+    {
+        CrowdLayoutObject* object = *occlusionIt;
+        nlMultVectorMatrix(localPoint, worldPoint, mInverseMatrices[0]);
+        if (object->ContainsLocalPoint((nlVector3*)&localPoint))
+            return true;
+        occlusionIt.Step();
+    }
+    return false;
+}
+
+inline ImpostorCharacter* CrowdImpostorManager::GetCharacter(int index)
+{
+    nlDLListIterator<ImpostorCharacter*> characterIt = mCharacters.Begin();
+    while (index-- > 0)
+        characterIt.Step();
+    return characterIt.m_Curr->entry;
+}
+
 void CrowdImpostorManager::ReleaseCrowdImpostors()
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
@@ -323,40 +347,14 @@ void CrowdPointCallback::Place(
     nlMultVectorMatrix(
         worldPoint, localPoint, *mObject->GetWorldMatrix());
 
-    CrowdImpostorManager* manager = GetCrowdImpostorManager();
-    nlDLListIterator<CrowdLayoutObject*> occlusionIt
-        = manager->mOcclusionObjects.Begin();
     nlVector4 occlusionPoint;
-    bool occluded;
-    for (;;)
-    {
-        if (!occlusionIt.hasNext())
-        {
-            occluded = false;
-            break;
-        }
-        CrowdLayoutObject* object = *occlusionIt;
-        nlMultVectorMatrix(
-            occlusionPoint, worldPoint, manager->mInverseMatrices[0]);
-        if (object->ContainsLocalPoint((nlVector3*)&occlusionPoint))
-        {
-            occluded = true;
-            break;
-        }
-        occlusionIt.Step();
-    }
-    if (occluded)
+    if (GetCrowdImpostorManager()->IsPointOccluded(worldPoint, occlusionPoint))
         return;
 
-    manager = GetCrowdImpostorManager();
-    int numCharacters
-        = nlDLRingCountElements(manager->mCharacters.m_Head);
+    CrowdImpostorManager* manager = GetCrowdImpostorManager();
+    int numCharacters = nlDLRingCountElements(manager->mCharacters.m_Head);
     int characterIndex = nlRandom(numCharacters, &nlDefaultSeed);
-    nlDLListIterator<ImpostorCharacter*> characterIt
-        = manager->mCharacters.Begin();
-    while (characterIndex-- > 0)
-        characterIt.Step();
-    ImpostorCharacter* character = characterIt.m_Curr->entry;
+    ImpostorCharacter* character = manager->GetCharacter(characterIndex);
 
     if (GetCrowdImpostorManager()->mNumAngles == 0)
         GetCrowdImpostorManager()->mNumAngles = character->mNumAngles;
@@ -377,7 +375,7 @@ void CrowdPointCallback::Place(
         return;
 
     impostor->Set(character, *(nlVector3*)&worldPoint, angle,
-        sfImpostorWidth.value, sfImpostorHeight.value);
+        sfImpostorWidth, sfImpostorHeight);
 
     if (GetCrowdImpostorManager()->IsObjectEnabled(mObject))
         impostor->mUnidentified02C = true;
@@ -391,10 +389,12 @@ void CrowdPointCallback::Place(
     CrowdLayoutRecord* layout = mLayout;
 
     nlVector3 boundsMax;
-    nlVector3 boundsMin = *(const nlVector3*)&worldPoint;
+    nlVector3 boundsMin;
+    nlVector3 center = *(const nlVector3*)&worldPoint;
+    boundsMin = center;
     boundsMin.x -= sfImpostorWidth.value;
     boundsMin.y -= sfImpostorWidth.value;
-    boundsMax = *(const nlVector3*)&worldPoint;
+    boundsMax = center;
     boundsMax.x += sfImpostorWidth.value;
     boundsMax.y += sfImpostorWidth.value;
     boundsMax.z += sfImpostorHeight.value;

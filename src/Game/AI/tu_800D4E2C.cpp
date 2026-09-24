@@ -2,6 +2,7 @@
 #include "Game/AI/FielderInput.h"
 
 #include "Game/AI/AiUtil.h"
+#include "Game/AI/DesirePass.h"
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/DesireRunToNet.h"
 #include "Game/AI/DesireShoot.h"

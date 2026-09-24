@@ -403,6 +403,12 @@ public:
         return this->mTag != FUNCTION_EMPTY;
     }
 
+    Function& operator=(const Function& other)
+    {
+        Base::operator=(other);
+        return *this;
+    }
+
     template <typename Other>
     Function& operator=(const Other& other)
     {

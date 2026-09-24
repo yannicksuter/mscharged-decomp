@@ -4,7 +4,10 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/fePresentation.h"
+#include "Game/FE/fePresentation.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
@@ -54,7 +57,14 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
     mUnidentified30[0] = -1;
     mUnidentified30[1] = -1;
     mUnidentified38[0] = false;
-    mUnidentified38[1] = GameInfoManager::Instance()->IsInMode3() || GameInfoManager::Instance()->mIsOnlineMode != 0;
+    if (GameInfoManager::Instance()->IsInMode3() || GameInfoManager::Instance()->mIsOnlineMode != 0)
+    {
+        mUnidentified38[1] = true;
+    }
+    else
+    {
+        mUnidentified38[1] = false;
+    }
     mUnidentified3A[0] = false;
     mUnidentified3A[1] = false;
     mUnidentified3C[0] = false;
@@ -74,8 +84,9 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
     {
         if (mSceneType == ST_STRIKER_CUP)
         {
+            int team = g_pCupManager->unknown_0x8A28;
             mUnidentified38[0] = true;
-            mUnidentified40[0] = g_pCupManager->unknown_0x8A28;
+            mUnidentified40[0] = team;
         }
         else
         {
@@ -83,8 +94,9 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
             mUnidentified38[0] = true;
             if (GameInfoManager::Instance()->mIsOnlineMode == 0)
             {
-                mUnidentified40[1] = GameInfoManager::Instance()->GetTeam(1);
+                int team = GameInfoManager::Instance()->GetTeam(1);
                 mUnidentified38[1] = true;
+                mUnidentified40[1] = team;
             }
         }
     }
@@ -110,7 +122,8 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
  */
 ChooseCaptainsSceneV2::~ChooseCaptainsSceneV2()
 {
-    GetNavigationScene()->mTimer->m_bVisible = false;
+    TLInstance* timer = GetNavigationScene()->GetTimer();
+    timer->m_bVisible = false;
 }
 
 int ChooseCaptainsSceneV2::GetSide(unsigned long pad)
@@ -248,9 +261,24 @@ void ChooseCaptainsSceneV2::fn_80225674(int index, void* context)
         return;
     }
 
-    if (mUnidentified920[which].GetPointerState(index) == 0)
+    if (mUnidentified920[which].GetPointerState(index) == 0 && mUnidentified28[which] == -1 && GetSide(index) == -1)
     {
-        fn_80225484(index, context);
+        if (!mUnidentified920[which].HasOtherPointerState(1, index))
+        {
+            mUnidentified132C[which]->SetActiveSlide("over", true, false);
+
+            if (mUnidentified48[which])
+            {
+                FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
+            }
+            else
+            {
+                FEAudio::PlayAnimAudioEvent(0x50204AFA, 0, 0, 1);
+            }
+        }
+
+        mUnidentified920[which].SetPointerState(1, index);
+        mUnidentified920[which].PlayHoverFeedback(index);
     }
 }
 
@@ -406,14 +434,15 @@ void ChooseCaptainsSceneV2::fn_80224D30(int index, unsigned long which)
     }
 
     mUnidentified30[side] = which;
+    int selectedCaptain = lbl_8051CE60[which];
 
     if (mSceneType == ST_STRIKER_CUP)
     {
         mCaptainComponents[1].fn_801E0280(6);
-        mCaptainComponents[1].fn_801DEDD0(captain, index, 1);
+        mCaptainComponents[1].fn_801DEDD0(selectedCaptain, index, 1);
     }
 
-    mCaptainComponents[side].fn_801DEDD0(captain, index, 1);
+    mCaptainComponents[side].fn_801DEDD0(selectedCaptain, index, 1);
 
     if (!mCaptainButtons[which].HasOtherPointerState(1, index))
     {
@@ -545,13 +574,11 @@ void ChooseCaptainsSceneV2::fn_80227BCC(int which)
  */
 void ChooseCaptainsSceneV2::fn_80223B98(int value)
 {
-    TLSlide* slide = mPresentation->m_currentSlide;
+    TLSlide* slide = mPresentation->GetActiveSlide();
 
-    FEFinder<TLTextInstance, 3>::FindOrDefault(slide,
-        nlStringLowerHash("Layer"), nlStringLowerHash("TimerText"), 0, 0, 0, 0)
-        ->m_bVisible = false;
+    FEFinder<TLTextInstance, 3>::FindOrDefault<TLSlide>(slide, "Layer", "TimerText")->m_bVisible = false;
 
-    TLInstance* timer = GetNavigationScene()->mTimer;
+    TLInstance* timer = GetNavigationScene()->GetTimer();
 
     if (value == -1)
     {

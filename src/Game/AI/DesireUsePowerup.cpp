@@ -22,7 +22,7 @@ extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" float fn_800D85F8(cFielder*);
 extern "C" float fn_800E0034();
 extern "C" bool fn_8031A04C();
-extern "C" UnidentifiedDesireUpdate fn_80041B6C(
+extern "C" DesireUpdate fn_80041B6C(
     void*, const unsigned int&, cFielder*);
 extern "C" UnidentifiedStateTransition* fn_80315A14(
     UnidentifiedStateTransition*, void*);
@@ -33,20 +33,20 @@ extern "C" bool fn_80099C80(ePowerUpType);
 extern "C" bool fn_80099C94(ePowerUpType);
 extern "C" bool fn_80099CE8(ePowerUpType);
 extern "C" bool fn_80099CC4(ePowerUpType);
-extern "C" void fn_800B6A1C(UnidentifiedDesireUpdate*, int, const Variant&);
+static unsigned short sDesireUsePowerupType = 0xFFFF;
+#pragma explicit_zero_data on
+static int lbl_806DC39C = 0;
+#pragma explicit_zero_data off
 static int lbl_806DC3A0 = 17;
 static bool lbl_806DC3A4 = true;
-static int lbl_806DC39C = 0;
-static int lbl_80502B10[4] = { 0x59, 0x5C, 0x5B, 0x5A };
-static unsigned short sDesireUsePowerupType = 0xFFFF;
 
 /**
  * Offset/Address/Size: 0x0 | 0x800D2074 | size: 0xF48
  */
-extern "C" UnidentifiedDesireUpdate fn_800D2074(
+extern "C" DesireUpdate fn_800D2074(
     UnidentifiedFielderInput* input)
 {
-    UnidentifiedDesireUpdate result(FT_INT, lbl_806DC39C);
+    DesireUpdate result(FT_INT, lbl_806DC39C);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
     unsigned long key = input->fn_8030F9B4(
         (unsigned long)fn_800D2074, 1);
@@ -64,8 +64,10 @@ extern "C" UnidentifiedDesireUpdate fn_800D2074(
         result = fn_80041B6C(input->mUnidentified14, hash, pFielder);
     }
 
-    return UnidentifiedDesireUpdate(result, -1.0f, -1.0f);
+    return DesireUpdate(result, -1.0f, -1.0f);
 }
+
+static int lbl_80502B10[4] = { 0x59, 0x5C, 0x5B, 0x5A };
 
 /**
  * Offset/Address/Size: 0xF48 | 0x800D2FBC | size: 0x128
@@ -86,7 +88,7 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
     mtPowerupEffectTime.m_unk0
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
-    mUnidentifiedFielder->m_nPowerupAnimID = -1;
+    m_pFielder->m_nPowerupAnimID = -1;
     mUnidentified078 = -1.0f;
 
     if (params->IsSet(15))
@@ -105,12 +107,12 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
  * Offset/Address/Size: 0x1070 | 0x800D30E4 | size: 0x7B0
  */
 void DesireUsePowerup::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+    DesireUpdate* update, float fDeltaT)
 {
     if (update->mData.i == 3)
     {
-        fn_800B6A1C(update, 8, FuzzyVariant(lbl_806DC3A0));
-        fn_800B6A1C(update, 9, FuzzyVariant(lbl_806DC3A4));
+        update->SetParameter(8, FuzzyVariant(lbl_806DC3A0));
+        update->SetParameter(9, FuzzyVariant(lbl_806DC3A4));
         return;
     }
 
@@ -144,7 +146,7 @@ void DesireUsePowerup::UnidentifiedCleanup()
     mtPowerupEffectTime.m_unk0
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
-    mUnidentifiedFielder->m_nPowerupAnimID = -1;
+    m_pFielder->m_nPowerupAnimID = -1;
 }
 
 /**
@@ -152,7 +154,7 @@ void DesireUsePowerup::UnidentifiedCleanup()
  */
 extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 {
-    if (!fn_8002EDC8(pDesire->mUnidentifiedFielder, -1))
+    if (!fn_8002EDC8(pDesire->m_pFielder, -1))
     {
         return;
     }
@@ -162,7 +164,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
         fn_80319E84(pDesire->mUnidentified018, 17, NULL, false);
     }
 
-    cTeam* pTeam = pDesire->mUnidentifiedFielder->m_pTeam;
+    cTeam* pTeam = pDesire->m_pFielder->m_pTeam;
     pDesire->fn_800D3A50(pTeam->GetCurrentPowerUp().eType,
         pTeam->GetCurrentPowerUp().nnumOfPowerups, NULL);
 }
@@ -173,7 +175,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 void DesireUsePowerup::fn_800D3968(
     cFielder* pTarget, ePowerUpType ePowerup, bool bActivate)
 {
-    if (!fn_8002EDC8(mUnidentifiedFielder, -1))
+    if (!fn_8002EDC8(m_pFielder, -1))
     {
         return;
     }
@@ -183,7 +185,7 @@ void DesireUsePowerup::fn_800D3968(
         fn_80319E84(mUnidentified018, 17, NULL, false);
     }
 
-    cTeam* pTeam = mUnidentifiedFielder->m_pTeam;
+    cTeam* pTeam = m_pFielder->m_pTeam;
     if (ePowerup != POWER_UP_NONE
         && ePowerup != pTeam->GetCurrentPowerUp().eType)
     {
@@ -206,7 +208,7 @@ void DesireUsePowerup::fn_800D3A50(
     mtPowerupEffectTime.m_unk0
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
-    mUnidentifiedFielder->m_nPowerupAnimID = -1;
+    m_pFielder->m_nPowerupAnimID = -1;
     mbThrowingPowerup = true;
 
     switch (ePowerup)
@@ -219,7 +221,7 @@ void DesireUsePowerup::fn_800D3A50(
     case POWER_UP_BOBOMB:
         if (pTarget == NULL)
         {
-            pTarget = FindPowerupTarget(mUnidentifiedFielder, ePowerup);
+            pTarget = FindPowerupTarget(m_pFielder, ePowerup);
         }
         break;
     case POWER_UP_NONE:
@@ -265,21 +267,21 @@ void DesireUsePowerup::fn_800D3A50(
         int nDirection = 0;
         if (mpTarget != NULL)
         {
-            nDirection = (mUnidentifiedFielder->GetFacingDeltaToPosition(
+            nDirection = (m_pFielder->GetFacingDeltaToPosition(
                 mpTarget->mUnidentified024.m_v3Position) >> 14) & 3;
         }
 
-        switch (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass)
+        switch (m_pFielder->mUnidentified024.m_eCharacterClass)
         {
         case (eCharacterClass)3:
-            if (mUnidentifiedFielder->m_eAnimID == 0x52
-                || mUnidentifiedFielder->m_eAnimID == 0x54)
+            if (m_pFielder->m_eAnimID == 0x52
+                || m_pFielder->m_eAnimID == 0x54)
             {
                 if (nDirection == 0) nDirection = 3;
                 else if (nDirection == 2) nDirection = 1;
             }
-            else if (mUnidentifiedFielder->m_eAnimID == 0x53
-                || mUnidentifiedFielder->m_eAnimID == 0x55)
+            else if (m_pFielder->m_eAnimID == 0x53
+                || m_pFielder->m_eAnimID == 0x55)
             {
                 if (nDirection == 1) nDirection = 2;
                 else if (nDirection == 3) nDirection = 0;
@@ -288,14 +290,14 @@ void DesireUsePowerup::fn_800D3A50(
         case (eCharacterClass)7:
         case (eCharacterClass)11:
         case (eCharacterClass)13:
-            if (mUnidentifiedFielder->m_eAnimID == 0x52
-                || mUnidentifiedFielder->m_eAnimID == 0x54)
+            if (m_pFielder->m_eAnimID == 0x52
+                || m_pFielder->m_eAnimID == 0x54)
             {
                 if (nDirection == 1) nDirection = 2;
                 else if (nDirection == 3) nDirection = 0;
             }
-            else if (mUnidentifiedFielder->m_eAnimID == 0x53
-                || mUnidentifiedFielder->m_eAnimID == 0x55)
+            else if (m_pFielder->m_eAnimID == 0x53
+                || m_pFielder->m_eAnimID == 0x55)
             {
                 if (nDirection == 0) nDirection = 3;
                 else if (nDirection == 2) nDirection = 1;
@@ -305,15 +307,15 @@ void DesireUsePowerup::fn_800D3A50(
             break;
         }
 
-        mUnidentifiedFielder->SetPowerupAnimState(lbl_80502B10[nDirection]);
-        mUnidentifiedFielder->m_nPowerupAnimID = lbl_80502B10[nDirection];
-        mUnidentifiedFielder->mtPowerupThrowTime.SetSeconds(0.2f);
+        m_pFielder->SetPowerupAnimState(lbl_80502B10[nDirection]);
+        m_pFielder->m_nPowerupAnimID = lbl_80502B10[nDirection];
+        m_pFielder->mtPowerupThrowTime.SetSeconds(0.2f);
         break;
     }
 
     if (!bRetainPowerup)
     {
-        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
+        m_pFielder->m_pTeam->ClearCurrentPowerUp();
     }
 }
 
@@ -325,7 +327,7 @@ inline void DesireUsePowerup::UnidentifiedResetPowerupState()
     mtPowerupEffectTime.m_unk0
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
-    mUnidentifiedFielder->m_nPowerupAnimID = -1;
+    m_pFielder->m_nPowerupAnimID = -1;
 }
 
 /**
@@ -339,7 +341,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
         return;
     }
 
-    ePowerUpType ePowerup = pDesire->mUnidentifiedFielder->GetPowerupType();
+    ePowerUpType ePowerup = pDesire->m_pFielder->GetPowerupType();
     switch (ePowerup)
     {
     case (ePowerUpType)9:
@@ -355,7 +357,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
     case (ePowerUpType)19:
     case (ePowerUpType)20:
     {
-        if (!pDesire->mUnidentifiedFielder->fn_8003E6EC())
+        if (!pDesire->m_pFielder->fn_8003E6EC())
         {
             UnidentifiedVariantCollection params;
             UnidentifiedStateTransition* pTransition
@@ -394,24 +396,24 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
     case POWER_UP_BANANA:
     case POWER_UP_BOBOMB:
     {
-        bool bHasPad = pDesire->mUnidentifiedFielder->GetGlobalPad() != NULL;
+        bool bHasPad = pDesire->m_pFielder->GetGlobalPad() != NULL;
         if (bHasPad)
         {
             pDesire->mpTarget = FindPowerupTarget(
-                pDesire->mUnidentifiedFielder,
-                pDesire->mUnidentifiedFielder->GetPowerupType());
+                pDesire->m_pFielder,
+                pDesire->m_pFielder->GetPowerupType());
         }
 
         unk_8009A5D8 params;
-        fn_8009A5D8(pDesire->mUnidentifiedFielder, pDesire->mePowerup,
+        fn_8009A5D8(pDesire->m_pFielder, pDesire->mePowerup,
             pDesire->mnNumPowerups, &params);
-        if (PowerupCreateAndThrow(pDesire->mUnidentifiedFielder,
+        if (PowerupCreateAndThrow(pDesire->m_pFielder,
                 pDesire->mpTarget, params))
         {
             PowerupUsedEventData* event
                 = (PowerupUsedEventData*)g_PowerupUsedEventDataPool.Allocate();
             event->Type = params.eType;
-            event->Thrower = pDesire->mUnidentifiedFielder;
+            event->Thrower = pDesire->m_pFielder;
             event->Target = pDesire->mpTarget;
             fn_80148074(event);
         }
@@ -421,7 +423,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
     case POWER_UP_CHAIN_CHOMP:
     {
         gNPCManager->GetChainChomp()->Spawn(
-            pDesire->mUnidentifiedFielder, NULL);
+            pDesire->m_pFielder, NULL);
         pDesire->UnidentifiedResetPowerupState();
         break;
     }
@@ -432,31 +434,31 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
     if (g_pGame->IsGameplayOrOvertime())
     {
         StatsTracker::s_pInstance->TrackStat(
-            STATS_19, pDesire->mUnidentifiedFielder->m_pTeam->m_nSide,
-            pDesire->mUnidentifiedFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+            STATS_19, pDesire->m_pFielder->m_pTeam->m_nSide,
+            pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         if (fn_80099C80(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1A, pDesire->mUnidentifiedFielder->m_pTeam->m_nSide,
-                pDesire->mUnidentifiedFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                STATS_1A, pDesire->m_pFielder->m_pTeam->m_nSide,
+                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (fn_80099C94(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1C, pDesire->mUnidentifiedFielder->m_pTeam->m_nSide,
-                pDesire->mUnidentifiedFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                STATS_1C, pDesire->m_pFielder->m_pTeam->m_nSide,
+                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (fn_80099CE8(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1D, pDesire->mUnidentifiedFielder->m_pTeam->m_nSide,
-                pDesire->mUnidentifiedFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                STATS_1D, pDesire->m_pFielder->m_pTeam->m_nSide,
+                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (fn_80099CC4(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1B, pDesire->mUnidentifiedFielder->m_pTeam->m_nSide,
-                pDesire->mUnidentifiedFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                STATS_1B, pDesire->m_pFielder->m_pTeam->m_nSide,
+                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
     }
 }
@@ -469,14 +471,7 @@ void DesireUsePowerup::UnidentifiedVirtual8(
 {
     *(unsigned short*)field
         = cache->BeginType("DesireUsePowerup");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
     cache->AddField(16, gDebugFieldTypes[16].size,

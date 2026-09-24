@@ -1,4 +1,5 @@
 #include "Game/AI/DesireUserControlled.h"
+#include "Game/CharacterTweaks.h"
 #include "Game/DetInput.h"
 
 #include "Game/AI/DesireSteering.h"
@@ -15,14 +16,11 @@ extern "C" void fn_80098098(cFielder*);
 extern "C" void fn_80095870(cFielder*);
 extern "C" float fn_8002C254(const PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" float fn_8002C328(PlayerTweaks*);
 extern "C" void fn_8003C268(cFielder*, float, float);
 extern "C" void fn_8003DA94(cFielder*, bool);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" void fn_800368E4(cFielder*);
 extern "C" void fn_8003E0A8(cFielder*);
-extern "C" bool fn_80035F34(cFielder*);
-extern "C" void fn_800B6A1C(void*, int, const Variant&);
 extern "C" void fn_8003E168(cFielder*, float);
 
 extern float g_fSimulationTick;
@@ -38,7 +36,7 @@ bool DesireUserControlled::UnidentifiedInitialize(void* context)
     bool result = Desire::UnidentifiedInitialize(context);
 
     DesireSteering* desire = (DesireSteering*)fn_8002E08C(
-        mUnidentifiedFielder, 34);
+        m_pFielder, 34);
     fn_800C5784(desire);
     fn_800C574C(desire);
     fn_800C577C(desire);
@@ -47,7 +45,7 @@ bool DesireUserControlled::UnidentifiedInitialize(void* context)
 
     UnidentifiedVariant_80054AB8 update;
     Update(
-        (UnidentifiedDesireUpdate*)&update, g_fSimulationTick);
+        (DesireUpdate*)&update, g_fSimulationTick);
 
     return result;
 }
@@ -56,9 +54,9 @@ bool DesireUserControlled::UnidentifiedInitialize(void* context)
  * Offset/Address/Size: 0x100 | 0x800D458C | size: 0x6BC
  */
 void DesireUserControlled::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+    DesireUpdate* update, float fDeltaT)
 {
-    bool bHasPad = (bool)mUnidentifiedFielder->GetGlobalPad();
+    bool bHasPad = (bool)m_pFielder->GetGlobalPad();
     if (!bHasPad)
     {
         *update = FuzzyVariant(FT_INT, 1);
@@ -70,58 +68,58 @@ void DesireUserControlled::Update(
     {
         return;
     }
-    else if (mUnidentifiedFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
+    else if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         return;
     }
-    else if (mUnidentifiedFielder->m_eActionState == ACTION_SHOT)
+    else if (m_pFielder->m_eActionState == ACTION_SHOT)
     {
         return;
     }
     else
     {
-        fn_80098098(mUnidentifiedFielder);
-        if (mUnidentifiedFielder->m_eActionState == ACTION_NEED_ACTION
-            || mUnidentifiedFielder->m_eActionState == ACTION_WAIT)
+        fn_80098098(m_pFielder);
+        if (m_pFielder->m_eActionState == ACTION_NEED_ACTION
+            || m_pFielder->m_eActionState == ACTION_WAIT)
         {
-            mUnidentifiedFielder->StartRunning();
+            m_pFielder->StartRunning();
         }
 
-        fn_80095870(mUnidentifiedFielder);
-        if (mUnidentifiedFielder->m_eActionState == ACTION_RUNNING)
+        fn_80095870(m_pFielder);
+        if (m_pFielder->m_eActionState == ACTION_RUNNING)
         {
             float fMaxSpeed = fn_8002C254(
-                mUnidentifiedFielder->GetTweaks());
+                m_pFielder->GetTweaks());
             float fMinSpeed = fn_8002CE14(
-                mUnidentifiedFielder->GetTweaks());
-            fn_8003C268(mUnidentifiedFielder, fMinSpeed, fMaxSpeed);
-            fn_8003DA94(mUnidentifiedFielder, false);
+                m_pFielder->GetTweaks());
+            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
+            fn_8003DA94(m_pFielder, false);
 
             if (g_pBall->m_pOwner == NULL
-                && (!fn_8003E948(mUnidentifiedFielder)
-                    || !mUnidentifiedFielder->mUnidentified3DC))
+                && (!fn_8003E948(m_pFielder)
+                    || !m_pFielder->mUnidentified3DC))
             {
-                fn_800368E4(mUnidentifiedFielder);
+                fn_800368E4(m_pFielder);
             }
             return;
         }
 
-        if (mUnidentifiedFielder->m_eActionState == ACTION_UNKNOWN_30)
+        if (m_pFielder->m_eActionState == ACTION_UNKNOWN_30)
         {
-            fn_8003E0A8(mUnidentifiedFielder);
-            if (mUnidentifiedFielder->m_eActionState != ACTION_UNKNOWN_30)
+            fn_8003E0A8(m_pFielder);
+            if (m_pFielder->m_eActionState != ACTION_UNKNOWN_30)
             {
                 return;
             }
-            if (mUnidentifiedFielder->m_pBall == NULL)
+            if (m_pFielder->m_pBall == NULL)
             {
                 return;
             }
 
-            mUnidentifiedFielder->bIsModified
-                = fn_80035F34(mUnidentifiedFielder);
+            m_pFielder->bIsModified
+                = m_pFielder->IsActionModifierPressed();
             u8 bIsShotActive = true;
-            ShotMeter* pShotMeter = mUnidentifiedFielder->m_pShotMeter;
+            ShotMeter* pShotMeter = m_pFielder->m_pShotMeter;
             eShotMeterState state = pShotMeter->m_eShotMeterState;
             if (state != SHOT_METER_ACTIVE
                 && state != SHOT_METER_STS_ACTIVE)
@@ -130,10 +128,10 @@ void DesireUserControlled::Update(
             }
             if (bIsShotActive)
             {
-                if (!mUnidentifiedFielder->GetGlobalPad()->IsPressed(0x1C, true))
+                if (!m_pFielder->GetGlobalPad()->IsPressed(0x1C, true))
                 {
-                    mUnidentifiedFielder->fn_8004B86C(
-                        mUnidentifiedFielder->bIsModified,
+                    m_pFielder->fn_8004B86C(
+                        m_pFielder->bIsModified,
                         false);
                 }
                 return;
@@ -143,8 +141,8 @@ void DesireUserControlled::Update(
                 || pShotMeter->m_eShotMeterState
                     == SHOT_METER_STS_RELEASED)
             {
-                mUnidentifiedFielder->fn_8004B86C(
-                    mUnidentifiedFielder->bIsModified,
+                m_pFielder->fn_8004B86C(
+                    m_pFielder->bIsModified,
                     false);
                 return;
             }
@@ -154,20 +152,18 @@ void DesireUserControlled::Update(
             {
                 *update = FuzzyVariant(FT_INT, 3);
                 update->mTemporary = false;
-                fn_800B6A1C(
-                    update, 8, FuzzyVariant(FT_INT, lbl_806DC3AC));
+                update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC3AC));
             }
             return;
         }
 
-        if (mUnidentifiedFielder->m_eActionState == ACTION_RUNNING_WB)
+        if (m_pFielder->m_eActionState == ACTION_RUNNING_WB)
         {
-            float fMaxSpeed = fn_8002C328(
-                mUnidentifiedFielder->GetTweaks());
+            float fMaxSpeed = m_pFielder->GetTweaks()->GetRunningSpeed();
             float fMinSpeed = fn_8002CE14(
-                mUnidentifiedFielder->GetTweaks());
-            fn_8003C268(mUnidentifiedFielder, fMinSpeed, fMaxSpeed);
-            fn_8003E168(mUnidentifiedFielder, fDeltaT);
+                m_pFielder->GetTweaks());
+            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
+            fn_8003E168(m_pFielder, fDeltaT);
         }
     }
 }

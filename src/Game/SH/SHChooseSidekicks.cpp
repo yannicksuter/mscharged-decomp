@@ -15,6 +15,7 @@
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/GameInfo.h"
 #include "Game/GameSceneManager.h"
 #include "Game/NetworkDraft.h"

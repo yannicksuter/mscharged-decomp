@@ -3,11 +3,6 @@
 
 #include "Game/HBMManager.h"
 
-inline void HBMManager::Unblock()
-{
-    mBlocked = false;
-}
-
 inline HBMManager* fn_801FA19C()
 {
     return gpHBMManager;

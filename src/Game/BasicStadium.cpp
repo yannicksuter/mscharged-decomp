@@ -17,6 +17,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
 #include "Game/Render/HighRange.h"
+#include "Game/TweakValue.inl"
 
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -226,7 +227,6 @@ void BasicStadium::SetEffectsActive(unsigned long uType, int active)
 BasicStadium::BasicStadium(GLResourcePool* pResource)
     : World(pResource)
 {
-    m_registeredDrawables.Clear();
     m_shadowHeight = 0.0f;
     m_fTime = 0.0f;
 
@@ -237,20 +237,12 @@ BasicStadium::BasicStadium(GLResourcePool* pResource)
     m_shadowLightPosition.y = -10.0f;
     m_shadowLightPosition.z = 40.0f;
 
-    m_pStadiumHighRangeTweaks = (HighRangeTweaks*)nlMalloc(
-        sizeof(HighRangeTweaks), 8, false);
-    if (m_pStadiumHighRangeTweaks != 0)
-    {
-        new (m_pStadiumHighRangeTweaks) HighRangeTweaks();
-    }
+    m_pStadiumHighRangeTweaks = new (
+        nlMalloc(sizeof(HighRangeTweaks), 8, false)) HighRangeTweaks();
     BindHighRangeTweaks(m_pStadiumHighRangeTweaks, "/Rendering/Effects/HighRange/Stadium");
 
-    m_pMegastrikeHighRangeTweaks = (HighRangeTweaks*)nlMalloc(
-        sizeof(HighRangeTweaks), 8, false);
-    if (m_pMegastrikeHighRangeTweaks != 0)
-    {
-        new (m_pMegastrikeHighRangeTweaks) HighRangeTweaks();
-    }
+    m_pMegastrikeHighRangeTweaks = new (
+        nlMalloc(sizeof(HighRangeTweaks), 8, false)) HighRangeTweaks();
     BindHighRangeTweaks(
         m_pMegastrikeHighRangeTweaks, "/Rendering/Effects/HighRange/Megastrike");
 

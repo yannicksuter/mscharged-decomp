@@ -10,8 +10,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_800401C0(
-    cFielder*, const nlVector3&, float, float);
 
 bool lbl_806E0E50;
 
@@ -26,18 +24,18 @@ bool DesireRunToNet::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
 
-    m_pSpaceSearch = new (8, false) SSearchRunToNet(mUnidentifiedFielder);
-    mUnidentifiedFielder->SetSpaceSearch(m_pSpaceSearch);
-    mUnidentifiedFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E50;
+    m_pSpaceSearch = new (8, false) SSearchRunToNet(m_pFielder);
+    m_pFielder->SetSpaceSearch(m_pSpaceSearch);
+    m_pFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E50;
 
     nlVector3 v3BestPosition;
-    mUnidentifiedFielder->m_pSpaceSearch->FindBestPosition(
-        v3BestPosition, mUnidentifiedFielder->mUnidentified024.m_v3Position,
+    m_pFielder->m_pSpaceSearch->FindBestPosition(
+        v3BestPosition, m_pFielder->mUnidentified024.m_v3Position,
         DIR_NONE, NULL, lbl_806DC1F8, 0x8000);
 
     nlVector3 v3DesiredVelDirection;
     v3DesiredVelDirection.Sub2D(
-        v3BestPosition, mUnidentifiedFielder->mUnidentified024.m_v3Position);
+        v3BestPosition, m_pFielder->mUnidentified024.m_v3Position);
     v3DesiredVelDirection.z = 0.0f;
 
     float fLengthSq = v3DesiredVelDirection.GetLengthSq3D();
@@ -45,7 +43,7 @@ bool DesireRunToNet::UnidentifiedInitialize(void* context)
     {
         nlPolarToCartesian(v3DesiredVelDirection.x,
             v3DesiredVelDirection.y,
-            mUnidentifiedFielder->mUnidentified024.m_aDesiredFacingDirection, 1.0f);
+            m_pFielder->mUnidentified024.m_aDesiredFacingDirection, 1.0f);
     }
     else
     {
@@ -61,14 +59,13 @@ bool DesireRunToNet::UnidentifiedInitialize(void* context)
  * Offset/Address/Size: 0x148 | 0x800C3EE4 | size: 0x84
  */
 void DesireRunToNet::Update(
-    UnidentifiedDesireUpdate*, float)
+    DesireUpdate*, float)
 {
     nlVector3 v3DesiredPosition;
     nlVec3ScaleAdd(v3DesiredPosition, lbl_806DC1FC,
-        mvDesiredPosition, mUnidentifiedFielder->mUnidentified024.m_v3Position);
+        mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position);
     cField::FixOutOfBoundsPosition(v3DesiredPosition, 0.2f, true);
-    fn_800401C0(
-        mUnidentifiedFielder, v3DesiredPosition, 1.5f, 1.0f);
+    m_pFielder->AddDesiredPosition(v3DesiredPosition, 1.5f, 1.0f);
 }
 
 /**
@@ -76,9 +73,9 @@ void DesireRunToNet::Update(
  */
 void DesireRunToNet::UnidentifiedCleanup()
 {
-    if (m_pSpaceSearch == mUnidentifiedFielder->m_pSpaceSearch)
+    if (m_pSpaceSearch == m_pFielder->m_pSpaceSearch)
     {
-        mUnidentifiedFielder->SetSpaceSearch(NULL);
+        m_pFielder->SetSpaceSearch(NULL);
     }
     m_pSpaceSearch = NULL;
 }

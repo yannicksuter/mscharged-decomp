@@ -8,9 +8,11 @@
 #include "Game/GameSceneManager.h"
 #include "Game/GameInfo.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePackage.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
@@ -469,30 +471,30 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
 {
     if (value == 0)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
-        nlStrNCpy(row.mName, gNetworkMiiNameWide, 14);
-        memcpy(row.mMiiData, &gNetworkMiiData, sizeof(row.mMiiData));
-        row.mSearchState = 4;
-        row.mStatus = 1;
-        memset(&row.mStats, 0, sizeof(row.mStats));
+        mRows[index].Reset();
+        nlStrNCpy(mRows[index].mName, gNetworkMiiNameWide, 14);
+        memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
+        mRows[index].mSearchState = 4;
+        mRows[index].mStatus = 1;
+        memset(&mRows[index].mStats, 0, sizeof(mRows[index].mStats));
         if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
         {
             if (NetworkStatsManager::Instance()->GetLocalStats(2) != 0)
-                row.mStats = *NetworkStatsManager::Instance()->GetLocalStats(2);
+                mRows[index].mStats = *NetworkStatsManager::Instance()->GetLocalStats(2);
         }
         else
         {
             NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
             if (category != 0)
             {
-                int player = category->FindPlayer(GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex)->unknown_0x01C);
+                int profileId = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex)->unknown_0x01C;
+                int player = category->FindPlayer(profileId);
                 if (player != -1)
-                    row.mStats = category->mMetadata[player];
+                    mRows[index].mStats = category->mMetadata[player];
             }
         }
-        row.mVisible = true;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+        mRows[index].mVisible = true;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Disable();
         mCancelButtons[index].Disable();
@@ -500,20 +502,19 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     }
     else if (value == 1 || value == 6)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
+        mRows[index].Reset();
         BasicString<unsigned short, Detail::TempStringAllocator> string(
             g_pLocalization->GetString("ONLINE_CONTROLLERS_GUEST"));
-        nlStrNCpy(row.mName, string.c_str(), 14);
+        nlStrNCpy(mRows[index].mName, string.c_str(), 14);
         if (value == 6)
-            memcpy(row.mMiiData, mSlots[index].mEntry->mMiiData, sizeof(row.mMiiData));
+            memcpy(mRows[index].mMiiData, mSlots[index].mEntry->mMiiData, sizeof(mRows[index].mMiiData));
         else
-            memcpy(row.mMiiData, &gNetworkMiiData, sizeof(row.mMiiData));
-        row.mSearchState = 4;
-        row.mStatus = 1;
-        row.mGuest = true;
-        row.mVisible = true;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+            memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
+        mRows[index].mSearchState = 4;
+        mRows[index].mStatus = 1;
+        mRows[index].mGuest = true;
+        mRows[index].mVisible = true;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Disable();
         mCancelButtons[index].Disable();
@@ -521,23 +522,22 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     }
     else if (value == 5)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
+        mRows[index].Reset();
         NetworkDraftMachineInfo* entry = mSlots[index].mEntry;
-        nlStrNCpy(row.mName, entry->mName, 14);
-        memcpy(row.mMiiData, entry->mMiiData, sizeof(row.mMiiData));
-        row.mSearchState = 4;
-        row.mStatus = 1;
-        row.mStats = entry->mStats;
+        nlStrNCpy(mRows[index].mName, entry->mName, 14);
+        memcpy(mRows[index].mMiiData, entry->mMiiData, sizeof(mRows[index].mMiiData));
+        mRows[index].mSearchState = 4;
+        mRows[index].mStatus = 1;
+        mRows[index].mStats = entry->mStats;
         NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
         if (category != 0)
         {
             int player = category->FindPlayer(entry->mProfileId);
             if (player != -1)
-                row.mStats.mDisplayRank = category->mMetadata[player].mDisplayRank;
+                mRows[index].mStats.mDisplayRank = category->mMetadata[player].mDisplayRank;
         }
-        row.mVisible = true;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+        mRows[index].mVisible = true;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Disable();
         mCancelButtons[index].Disable();
@@ -545,11 +545,10 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     }
     else if (value == 2)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
-        row.mSearchState = 2;
-        row.mVisible = true;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+        mRows[index].Reset();
+        mRows[index].mSearchState = 2;
+        mRows[index].mVisible = true;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Enable();
         mCancelButtons[index].Disable();
@@ -558,19 +557,19 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     }
     else if (value == 3)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
-        int friendIndex = g_pFriendManager->GetFriendStatusIndex();
-        nlStrNCpy(row.mName,
-            GameInfoManager::GetInstance()->GetSavedFriendName(gNetworkSaveSlotIndex, friendIndex), 14);
-        row.mSearchState = 4;
-        row.mStatus = 10;
-        row.mStats.Reset();
-        row.mSide = 0;
-        row.mVisible = true;
-        row.mGuest = false;
-        row.mShowCancel = true;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+        mRows[index].Reset();
+        GetFriendManager()->GetOwnStatus();
+        int friendIndex = GetFriendManager()->GetFriendStatusIndex();
+        nlStrNCpy(mRows[index].mName,
+            GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, friendIndex), 14);
+        mRows[index].mSearchState = 4;
+        mRows[index].mStatus = 10;
+        mRows[index].mStats.Reset();
+        mRows[index].mSide = 0;
+        mRows[index].mVisible = true;
+        mRows[index].mGuest = false;
+        mRows[index].mShowCancel = true;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Disable();
         mCancelButtons[index].Enable();
@@ -579,18 +578,17 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     }
     else if (value == 4)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
-        nlStrNCpy(row.mName,
-            GameInfoManager::GetInstance()->GetSavedFriendName(gNetworkSaveSlotIndex, mDeclinedFriendIndex), 14);
-        row.mSearchState = 4;
-        row.mStatus = 9;
-        row.mStats.Reset();
-        row.mSide = 0;
-        row.mVisible = true;
-        row.mGuest = false;
-        row.mShowCancel = true;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+        mRows[index].Reset();
+        nlStrNCpy(mRows[index].mName,
+            GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, mDeclinedFriendIndex), 14);
+        mRows[index].mSearchState = 4;
+        mRows[index].mStatus = 9;
+        mRows[index].mStats.Reset();
+        mRows[index].mSide = 0;
+        mRows[index].mVisible = true;
+        mRows[index].mGuest = false;
+        mRows[index].mShowCancel = true;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Disable();
         mCancelButtons[index].Enable();
@@ -599,10 +597,9 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
     }
     else if (value == 7)
     {
-        FEOnlinePlayerRow& row = mRows[index];
-        row.Reset();
-        row.mVisible = false;
-        UpdateOnlinePlayerRow(&row, mRowInstances[index], mRankText[index], 0x20,
+        mRows[index].Reset();
+        mRows[index].mVisible = false;
+        UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
         mInviteButtons[index].Disable();
         mCancelButtons[index].Disable();
@@ -613,40 +610,30 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
 
 void SHOnlineInvitePlayers::HidePlayerPortrait(int index)
 {
-    TLInstance* over = FEFinder<TLInstance, 5>::Find(mRowInstances[index],
-        nlStringLowerHash("over"), nlStringLowerHash("FRIEND_0"), 0, 0, 0, 0);
-    TLInstance* off = FEFinder<TLInstance, 5>::Find(mRowInstances[index],
-        nlStringLowerHash("off"), nlStringLowerHash("FRIEND_0"), 0, 0, 0, 0);
-    TLInstance* image = FEFinder<TLComponentInstance, 4>::Find(
-        over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Mii"), 0, 0, 0, 0);
+    TLInstance* over = FEFinder<TLInstance, 5>::Find(mRowInstances[index], "over", "FRIEND_0");
+    TLInstance* off = FEFinder<TLInstance, 5>::Find(mRowInstances[index], "off", "FRIEND_0");
+    TLInstance* image = FEFinder<TLComponentInstance, 4>::Find(over, "Mii_btn", "Mii");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Mii"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(off, "Mii_btn", "Mii");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("logo_32x32"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(over, "Mii_btn", "logo_32x32");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("logo_32x32"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(off, "Mii_btn", "logo_32x32");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("shoulders"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(over, "Mii_btn", "shoulders");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("shoulders"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(off, "Mii_btn", "shoulders");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Online_Mii_select_background"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(over, "Mii_btn", "Online_Mii_select_background");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
-    image = FEFinder<TLComponentInstance, 4>::Find(
-        off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("Online_Mii_select_background"), 0, 0, 0, 0);
+    image = FEFinder<TLComponentInstance, 4>::Find(off, "Mii_btn", "Online_Mii_select_background");
     image->m_bVisible = false;
     image->SetAssetVisible(false);
 }

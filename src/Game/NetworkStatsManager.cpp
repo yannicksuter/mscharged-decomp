@@ -721,7 +721,6 @@ void NetworkStatsManager::ReportGameResult(int result,
         }
 
         int categoryCount = UsesEuropeanRankings() ? 3 : 2;
-        int* disconnectPoints = mUnidentifiedC41C;
         for (int category = 0; category < categoryCount; ++category)
         {
             int oldPoints = mLocalStats[category].mScore;
@@ -758,16 +757,16 @@ void NetworkStatsManager::ReportGameResult(int result,
                         ++mLocalStats[category].mLosses;
                     }
                 }
-                disconnectPoints[category] = 0;
+                mUnidentifiedC41C[category] = 0;
                 mDisconnectLossPending[category] = false;
             }
             else if (mDisconnectLossPending[category]
                 && restoreDisconnectLoss)
             {
-                mLocalStats[category].mScore +=
-                    pointsScored + disconnectPoints[category];
+                pointsScored += mUnidentifiedC41C[category];
+                mLocalStats[category].mScore += pointsScored;
                 tDebugPrintManager::Print(DC_NETWORK, "Returning Default Disconnect Loss\n");
-                disconnectPoints[category] = 0;
+                mUnidentifiedC41C[category] = 0;
                 mDisconnectLossPending[category] = false;
                 if (result == 2)
                 {

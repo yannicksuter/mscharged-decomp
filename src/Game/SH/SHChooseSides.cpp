@@ -9,7 +9,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/GameProgress.h"
-#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feMusic.h"
@@ -18,6 +18,7 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlSlide.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/Render/FrontEndPresentation.h"
@@ -134,20 +135,12 @@ SHChooseSides2::~SHChooseSides2()
  */
 void SHChooseSides2::SceneCreated()
 {
-    TLComponentInstance* sideGroup = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(
-        mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("home"), 0, 0, 0, 0);
-    if (sideGroup == 0)
-    {
-        sideGroup = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* sideGroup = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        mPresentation->m_currentSlide, "Layer", "home");
     mSideGroups[0] = sideGroup;
 
-    sideGroup = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(
-        mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("away"), 0, 0, 0, 0);
-    if (sideGroup == 0)
-    {
-        sideGroup = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    sideGroup = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        mPresentation->m_currentSlide, "Layer", "away");
     mSideGroups[1] = sideGroup;
 
     mSideGroups[0]->SetActiveSlide("controllers", true, false);
@@ -189,50 +182,26 @@ void SHChooseSides2::SceneCreated()
 
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
         char controllerName[16];
         nlSNPrintf(controllerName, 16, "controller%d", i);
 
-        TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find(
-            mSideGroups[0], nlStringLowerHash("controllers"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
-        TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find(
-            mSideGroups[0], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
+        TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find<>(
+            mSideGroups[0], "controllers", lbl_806DE038[0], controllerName);
+        TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find<>(
+            mSideGroups[0], "over", lbl_806DE038[0], controllerName);
 
-        FEFinder<TLInstance, 2>::_Find<TLSlide>(homeController->GetActiveSlide(),
-            nlStringLowerHash("Text"),
-            0,
-            0,
-            0,
-            0,
-            0);
-        FEFinder<TLInstance, 2>::_Find<TLSlide>(homeOver->GetActiveSlide(),
-            nlStringLowerHash("Text"),
-            0,
-            0,
-            0,
-            0,
-            0);
+        FEFinder<TLTextInstance, 3>::Find<>(homeController->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(homeOver->GetActiveSlide(), InlineHasher("Text"));
 
-        TLComponentInstance* awayController = FEFinder<TLComponentInstance, 4>::Find(
-            mSideGroups[1], nlStringLowerHash("controllers"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
-        TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find(
-            mSideGroups[1], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
+        TLComponentInstance* awayController = FEFinder<TLComponentInstance, 4>::Find<>(
+            mSideGroups[1], "controllers", lbl_806DE038[1], controllerName);
+        TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find<>(
+            mSideGroups[1], "over", lbl_806DE038[1], controllerName);
 
-        FEFinder<TLInstance, 2>::_Find<TLSlide>(awayController->GetActiveSlide(),
-            nlStringLowerHash("Text"),
-            0,
-            0,
-            0,
-            0,
-            0);
-        FEFinder<TLInstance, 2>::_Find<TLSlide>(awayOver->GetActiveSlide(),
-            nlStringLowerHash("Text"),
-            0,
-            0,
-            0,
-            0,
-            0);
+        FEFinder<TLTextInstance, 3>::Find<>(awayController->GetActiveSlide(), InlineHasher("Text"));
+        FEFinder<TLTextInstance, 3>::Find<>(awayOver->GetActiveSlide(), InlineHasher("Text"));
 
         if (mPlayingSides[i] == 0)
         {
@@ -324,81 +293,37 @@ void SHChooseSides2::SceneCreated()
         if (mContext != PAUSE)
         {
             const char* componentName = team == 0 ? "sk_left2" : "sk_right";
-            TLInstance* component = FEFinder<TLInstance, 5>::_Find<TLSlide>(
-                mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash(componentName), 0, 0, 0, 0);
-            if (component == 0)
-            {
-                component = &UnidentifiedTLGroupDefault::sInstance;
-            }
+            TLInstance* component = FEFinder<TLInstance, 5>::FindOrDefault<>(
+                mPresentation->m_currentSlide, "Layer", componentName);
 
             const char** sidekickName = lbl_8051CAFC;
             for (int slot = 0; slot < 3; ++slot)
             {
-                TLComponentInstance* sidekick = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find<TLInstance>(
-                    component, nlStringLowerHash(*sidekickName), 0, 0, 0, 0, 0);
-                if (sidekick == 0)
-                {
-                    sidekick = &UnidentifiedTLComponentDefault::sInstance;
-                }
+                TLComponentInstance* sidekick = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(component, *sidekickName);
 
-                TLImageInstance* image = (TLImageInstance*)FEFinder<TLImageInstance, 2>::_Find<TLSlide>(
-                    sidekick->GetActiveSlide(), nlStringLowerHash("00_dummy_texture"), 0, 0, 0, 0, 0);
-                if (image == 0)
-                {
-                    image = &UnidentifiedTLImageDefault::sInstance;
-                }
+                TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault<>(
+                    sidekick->GetActiveSlide(), "00_dummy_texture");
 
                 fn_8021ED64(image, GameInfoManager::Instance()->GetSidekick(team, slot), team);
                 ++sidekickName;
             }
         }
 
-        TLInstance* instance = FEFinder<TLInstance, 2>::Find(mSideGroups[team],
-            nlStringLowerHash("empty"),
-            nlStringLowerHash(lbl_806DE038[team]),
-            nlStringLowerHash("white_8x8"),
-            0,
-            0,
-            0);
-        if (instance == 0)
-        {
-            instance = &UnidentifiedTLImageDefault::sInstance;
-        }
+        TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
+            mSideGroups[team], "empty", lbl_806DE038[team], "white_8x8");
         instance->SetAssetColour(mUnidentified3F0[team]);
 
-        instance = FEFinder<TLInstance, 2>::Find(mSideGroups[team],
-            nlStringLowerHash("over"),
-            nlStringLowerHash(lbl_806DE038[team]),
-            nlStringLowerHash("white_8x8"),
-            0,
-            0,
-            0);
-        if (instance == 0)
-        {
-            instance = &UnidentifiedTLImageDefault::sInstance;
-        }
+        instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
+            mSideGroups[team], "over", lbl_806DE038[team], "white_8x8");
         instance->SetAssetColour(mUnidentified3F0[team]);
 
-        instance = FEFinder<TLInstance, 2>::Find(mSideGroups[team],
-            nlStringLowerHash("controllers"),
-            nlStringLowerHash(lbl_806DE038[team]),
-            nlStringLowerHash("white_8x8"),
-            0,
-            0,
-            0);
-        if (instance == 0)
-        {
-            instance = &UnidentifiedTLImageDefault::sInstance;
-        }
+        instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
+            mSideGroups[team], "controllers", lbl_806DE038[team], "white_8x8");
         instance->SetAssetColour(mUnidentified3F0[team]);
     }
 
-    TLComponentInstance* help = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find<TLSlide>(
-        mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("HELP_BUTTON"), 0, 0, 0, 0);
-    if (help == 0)
-    {
-        help = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        mPresentation->m_currentSlide, "Layer", "HELP_BUTTON");
 
     if (IsWidescreen())
     {
@@ -409,12 +334,8 @@ void SHChooseSides2::SceneCreated()
         help->SetActiveSlide("4:3", true, false);
     }
 
-    TLComponentInstance* helpButton = (TLComponentInstance*)FEFinder<TLComponentInstance, 2>::_Find<TLSlide>(
-        help->GetActiveSlide(), nlStringLowerHash("HELP"), 0, 0, 0, 0, 0);
-    if (helpButton == 0)
-    {
-        helpButton = &UnidentifiedTLComponentDefault::sInstance;
-    }
+    TLComponentInstance* helpButton = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
+        help->GetActiveSlide(), "HELP");
     mHelpButton = helpButton;
 
     if (mContext == PAUSE)
@@ -1054,7 +975,7 @@ void SHChooseSides2::fn_8021E76C(unsigned int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);

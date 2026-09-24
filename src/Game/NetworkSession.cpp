@@ -24,6 +24,7 @@
 #include "Game/AI/AIPad.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/GameInfo.h"
+#include "Game/GameSceneManager.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetTournManager.h"
 #include "Game/TrophyInfo.h"
@@ -81,8 +82,6 @@ typedef Detail::MemFunImpl<void, void (NetworkSession::*)()>
     NetworkSessionCallback;
 typedef BindExp1<void, NetworkSessionCallback, NetworkSession*>
     NetworkSessionBinding;
-
-extern BaseGameSceneManager* g_pGameSceneManager;
 
 static inline void PushAllocator(MemoryAllocator* pAllocator)
 {
@@ -1683,6 +1682,43 @@ static inline void RegisterLoadedGameActions(NetworkSession* session)
     }
 }
 
+static inline void PlaybackRecordedGameBody()
+{
+    if (gNetworkInputRecording->mPlaybackEnabled == 0)
+    {
+        return;
+    }
+    if (!gNetworkInputRecording->ReadNetworkInputRecordingHeader())
+    {
+        return;
+    }
+
+    NetworkGameStartInfo* info =
+        (NetworkGameStartInfo*)&gNetworkInputRecording->mConfigSize;
+    SetNetworkRandomSeed(info->mSeed);
+    RecordedGameConfig* config = info->mConfig;
+    ApplyRecordedGameConfig(config);
+    tDebugPrintManager::Print(DC_NETWORK,
+        "PlaybackRecordedGame: Random seed %x Stadium %d HOME %d "
+        "[%d, %d, %d] Vs AWAY %d [%d, %d, %d]\n",
+        info->mSeed, config->mStadium, config->mHomeTeam,
+        config->mHomeSidekicks[0], config->mHomeSidekicks[1],
+        config->mHomeSidekicks[2], config->mAwayTeam,
+        config->mAwaySidekicks[0], config->mAwaySidekicks[1],
+        config->mAwaySidekicks[2]);
+    tDebugPrintManager::Print(DC_NETWORK,
+        "PlaybackRecordedGame: Skill %d WinBy %s GameTime %d GameGoals %d "
+        "BestSeries %d\n",
+        config->mSkillLevel,
+        config->mWinBy == 0 ? "Timed" : "Goals",
+        config->mGameTime, config->mGameGoals, config->mBestSeries);
+    GetInputRouter()->Reset(0);
+    g_pNetworkSessionBase->BaseVirtual3C(info);
+    NetworkSyncState* state = gNetworkSyncState;
+    int count = g_pNetworkSessionBase->GetNumMachines();
+    state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
+}
+
 int NetworkSession::ProcessMessage(
     NetworkMessage* message)
 {
@@ -1719,49 +1755,19 @@ int NetworkSession::ProcessMessage(
     case 0xD:
         if (gNetworkInputRecording->mPlaybackEnabled != 0)
         {
-            // Retail re-evaluates the playback flag inside the branch,
-            // matching an inlined predicate called twice.
-            if (gNetworkInputRecording->mPlaybackEnabled != 0
-                && gNetworkInputRecording->ReadNetworkInputRecordingHeader())
-            {
-            NetworkGameStartInfo* info =
-                (NetworkGameStartInfo*)&gNetworkInputRecording->mConfigSize;
-            SetNetworkRandomSeed(gNetworkInputRecording->mRandomSeed);
-            RecordedGameConfig* config = info->mConfig;
-            ApplyRecordedGameConfig(config);
-            tDebugPrintManager::Print(DC_NETWORK,
-                "PlaybackRecordedGame: Random seed %x Stadium %d HOME %d "
-                "[%d, %d, %d] Vs AWAY %d [%d, %d, %d]\n",
-                info->mSeed, config->mStadium, config->mHomeTeam,
-                config->mHomeSidekicks[0], config->mHomeSidekicks[1],
-                config->mHomeSidekicks[2], config->mAwayTeam,
-                config->mAwaySidekicks[0], config->mAwaySidekicks[1],
-                config->mAwaySidekicks[2]);
-            tDebugPrintManager::Print(DC_NETWORK,
-                "PlaybackRecordedGame: Skill %d WinBy %s GameTime %d "
-                "GameGoals %d BestSeries %d\n",
-                config->mSkillLevel,
-                config->mWinBy == 0 ? "Timed" : "Goals",
-                config->mGameTime, config->mGameGoals,
-                config->mBestSeries);
-            GetInputRouter()->Reset(0);
-            g_pNetworkSessionBase->BaseVirtual3C(info);
-            NetworkSyncState* state = gNetworkSyncState;
-            int count = g_pNetworkSessionBase->GetNumMachines();
-            state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
-            }
+            PlaybackRecordedGameBody();
         }
         else
         {
             BaseVirtual44((NetMessageGameStart*)message);
         }
         mSessionState = 4;
-        g_pGameSceneManager->PopToScene((SceneList)0x1D);
+        GameSceneManager::Instance()->PopToScene((SceneList)0x1D);
         for (int component = 0; component < 4; ++component)
         {
-            gFEPointerInstances[component]->SetActiveSlide("waiting", true, false);
+            GetPointerInstance(component)->SetActiveSlide("waiting", true, false);
         }
-        g_pGameSceneManager->PushLoadingScene(false);
+        GameSceneManager::Instance()->PushLoadingScene(false);
         break;
 
     case 0x14:
@@ -1773,7 +1779,7 @@ int NetworkSession::ProcessMessage(
         if (((NetMessageDraft*)message)->mUnidentified0A != 0)
         {
             SHOnlineFriendsChooseSides* scene = (SHOnlineFriendsChooseSides*)
-                g_pGameSceneManager->Push((SceneList)0x38, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push((SceneList)0x38, SCREEN_FORWARD, true);
             scene->SetDraftMessage(*(NetMessageDraft*)message);
         }
         else
@@ -1794,8 +1800,12 @@ int NetworkSession::ProcessMessage(
 
     case 0x19:
     {
-        BaseSceneHandler* scene = g_pGameSceneManager->GetScene((SceneList)0x38);
-        SHOnlineFriendsChooseSides* handler = static_cast<SHOnlineFriendsChooseSides*>(scene);
+        BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene((SceneList)0x38);
+        SHOnlineFriendsChooseSides* handler = 0;
+        if (scene != 0)
+        {
+            handler = static_cast<SHOnlineFriendsChooseSides*>(scene);
+        }
         if (handler != 0)
         {
             handler->OnSidesChanged(static_cast<NetMessageSidesChanged*>(message));
@@ -1813,7 +1823,7 @@ int NetworkSession::ProcessMessage(
         }
         FEMusic::StartStreamIfDifferent(8);
         OnlineConnectionQualityScene* scene = static_cast<OnlineConnectionQualityScene*>(
-            g_pGameSceneManager->Push((SceneList)0x39, SCREEN_FORWARD, true));
+            GameSceneManager::Instance()->Push((SceneList)0x39, SCREEN_FORWARD, true));
         scene->OnCheckConnection(static_cast<NetMessageCheckConnection*>(message));
         break;
     }
@@ -1821,7 +1831,7 @@ int NetworkSession::ProcessMessage(
     case 0x1B:
     {
         OnlineConnectionQualityScene* scene = static_cast<OnlineConnectionQualityScene*>(
-            g_pGameSceneManager->GetScene((SceneList)0x39));
+            GameSceneManager::Instance()->GetScene((SceneList)0x39));
         if (scene != 0)
         {
             scene->OnConnectionDecision(static_cast<NetMessageConnectionDecision*>(message));
@@ -1936,8 +1946,7 @@ int NetworkSession::ProcessMessage(
             mPauseRequestMachineMask = mPauseRequestMachineMask & ~bit;
         }
 
-        NetMessagePauseResponse response;
-        response.mMachineMask = mPauseRequestMachineMask;
+        NetMessagePauseResponse response(mPauseRequestMachineMask);
         u8 buffer[0x32];
         u32 size = gNetworkMessageRegistry->Serialize(&response, buffer, 0x32);
         tDebugPrintManager::Print(DC_NETWORK, "HOST sending Pause Response to all clients and myself\n");
@@ -2242,39 +2251,7 @@ void StartSinglePlayerGame()
 
 void PlaybackRecordedGame()
 {
-    if (gNetworkInputRecording->mPlaybackEnabled == 0)
-    {
-        return;
-    }
-    if (!gNetworkInputRecording->ReadNetworkInputRecordingHeader())
-    {
-        return;
-    }
-
-    NetworkGameStartInfo* info =
-        (NetworkGameStartInfo*)&gNetworkInputRecording->mConfigSize;
-    SetNetworkRandomSeed(info->mSeed);
-    RecordedGameConfig* config = info->mConfig;
-    ApplyRecordedGameConfig(config);
-    tDebugPrintManager::Print(DC_NETWORK,
-        "PlaybackRecordedGame: Random seed %x Stadium %d HOME %d "
-        "[%d, %d, %d] Vs AWAY %d [%d, %d, %d]\n",
-        info->mSeed, config->mStadium, config->mHomeTeam,
-        config->mHomeSidekicks[0], config->mHomeSidekicks[1],
-        config->mHomeSidekicks[2], config->mAwayTeam,
-        config->mAwaySidekicks[0], config->mAwaySidekicks[1],
-        config->mAwaySidekicks[2]);
-    tDebugPrintManager::Print(DC_NETWORK,
-        "PlaybackRecordedGame: Skill %d WinBy %s GameTime %d GameGoals %d "
-        "BestSeries %d\n",
-        config->mSkillLevel,
-        config->mWinBy == 0 ? "Timed" : "Goals",
-        config->mGameTime, config->mGameGoals, config->mBestSeries);
-    GetInputRouter()->Reset(0);
-    g_pNetworkSessionBase->BaseVirtual3C(info);
-    NetworkSyncState* state = gNetworkSyncState;
-    int count = g_pNetworkSessionBase->GetNumMachines();
-    state->SetMachineInfo((s8)g_pNetworkSessionBase->GetLocalMachineId(), count);
+    PlaybackRecordedGameBody();
 }
 
 void NetworkSession::BaseVirtual48(int reason)

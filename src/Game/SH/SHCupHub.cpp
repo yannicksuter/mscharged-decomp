@@ -15,6 +15,7 @@
 #include "Game/FE/feCupFlow.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/fePopupMenu.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/GameSceneManager.h"
 #include "Game/SH/SHGameResults.h"
 #include "NL/nlBind.h"

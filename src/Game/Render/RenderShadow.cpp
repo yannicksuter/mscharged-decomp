@@ -99,13 +99,11 @@ static inline void CastDirectional(nlVector3& p, const nlVector3& lightPos)
 
     nlVec3Scale(L, nlRecipSqrt(L.GetLengthSq3D(), false));
 
-    float num = nlVec3DotProduct(V, Q);
-    float den = nlVec3DotProduct(V, L);
-    float t = -(num / den);
+    float t = -(nlVec3DotProduct(V, Q) / nlVec3DotProduct(V, L));
 
-    p.z = Q.z + t * L.z;
     p.x = Q.x + t * L.x;
     p.y = Q.y + t * L.y;
+    p.z = Q.z + t * L.z;
 }
 
 static void DrawBallShadow(
@@ -579,8 +577,7 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
         nlVec3Scale(vRight,
             nlRecipSqrt(vRight.GetLengthSq3D(), true));
         nlVec3CrossProduct(vUp, vRight, vDir);
-        nlVec3Scale(vUp,
-            nlRecipSqrt(vUp.GetLengthSq3D(), true));
+        nlVec3Normalize(vUp, vUp);
 
         nlVec3ScaleAdd(p[0], radius, vRight, vTemp);
         nlVec3ScaleAdd(p[1], -radius, vRight, vTemp);
@@ -594,7 +591,7 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
 
     nlColourSet(c, 0x40, 0x40, 0xFF, 0xFF);
 
-    if (g_bShadowBounds)
+    if (lbl_806E146D)
     {
         nlColour colour = c;
         g_ShapeRenderer.DrawLine3D(p[0], p[1], colour, false);
@@ -614,7 +611,7 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
         }
     }
 
-    if (g_bShadowBounds)
+    if (lbl_806E146D)
     {
         nlColourSet(c, 0x40, 0xFF, 0x40, 0xFF);
         nlColour colour = c;
@@ -643,7 +640,7 @@ void RenderProjectedShadow(const ProjectedShadowParams& params)
         g_AntiFlimmer = oldAntiFlimmer;
     }
 
-    if (g_bShadowBounds)
+    if (lbl_806E146D)
     {
         nlVec3Set(light,
             params.vLight.x, params.vLight.y, params.vLight.z);

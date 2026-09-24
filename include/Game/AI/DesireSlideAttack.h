@@ -17,7 +17,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
     virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
 

@@ -74,6 +74,8 @@ public:
     void UpdateCrowdVisibility(GLView* view);
     void ReleaseCrowdImpostors();
     bool IsObjectEnabled(CrowdLayoutObject* object);
+    bool IsPointOccluded(const nlVector4& worldPoint, nlVector4& localPoint);
+    ImpostorCharacter* GetCharacter(int index);
 
     CrowdLayoutRecord* AllocateLayout()
     {

@@ -1,4 +1,5 @@
 #include "Game/AI/AvoidController.h"
+#include "Game/CharacterTweaks.h"
 
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Fielder.h"
@@ -87,9 +88,7 @@ extern "C" void fn_802BCE50(
     const ShapeRender*, const nlVector3&, float, float, float,
     const nlColour&, bool);
 
-extern "C" float fn_8004028C(cFielder*);
 
-extern "C" float fn_8002C328(const PlayerTweaks*);
 
 extern "C" void fn_8000F178(AvoidController* controller);
 inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
@@ -316,8 +315,8 @@ void UnidentifiedAvoidanceCallback_8000F7FC::UnidentifiedCallback(
 
 void AvoidController::Update(float fDeltaT)
 {
-    nlVector3 vAccumulated_v3 = v3Zero;
     float fTotalWeight_v3 = 0.0f;
+    nlVector3 vAccumulated_v3 = v3Zero;
     nlVector3 v3Repulsion = v3Zero;
     float fWeights[NUM_AVOIDABLES];
     int nCounts[NUM_AVOIDABLES];
@@ -350,7 +349,7 @@ void AvoidController::Update(float fDeltaT)
     for (AvoidableObject* pObject = gAvoidableObjects.m_pStart;
          pObject != 0 && mUnidentified198 < 99; pObject = pObject->next)
     {
-        bCanAvoid = !mUnidentified174.FindGet((u32)pObject->mUnidentified008, &value);
+        bool bCanAvoid = !mUnidentified174.FindGet((u32)pObject->mUnidentified008, &value);
         if (bCanAvoid)
             bCanAvoid = UnidentifiedCanAvoid(pObject->mType);
         if (bCanAvoid)
@@ -377,9 +376,8 @@ void AvoidController::Update(float fDeltaT)
                     v3Repulsion, vAccumulated_v3);
                 fTotalWeight_v3 += fWeight;
                 int index = GetAvoidableIndex((eAvoidableThings)pObject->mType);
-                v3Vectors[index].x += fWeight * v3Repulsion.x;
-                v3Vectors[index].y += fWeight * v3Repulsion.y;
-                v3Vectors[index].z += fWeight * v3Repulsion.z;
+                nlVec3ScaleAdd(v3Vectors[index], fWeight,
+                    v3Repulsion, v3Vectors[index]);
                 fWeights[index] += fWeight;
                 ++nCounts[index];
             }
@@ -642,7 +640,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     sCornerSegment corner;
 
     mUnidentified028 = v3Zero;
-    if (fn_8004028C(m_pFielder) <= 0.25f)
+    if (m_pFielder->GetDistanceToDesiredPos() <= 0.25f)
         return false;
     bTurboAllowed = true;
     nlSinCos(&vCurrentVelDir.y, &vCurrentVelDir.x, m_pFielder->mUnidentified024.m_aActualMovementDirection);
@@ -710,7 +708,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     }
     if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
     {
-        f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->mUnidentified024.m_fDesiredSpeed, fn_8002C328(m_pFielder->GetTweaks()));
+        f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->mUnidentified024.m_fDesiredSpeed, m_pFielder->GetTweaks()->GetRunningSpeed());
         u16 aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(aDesiredMovementDir);

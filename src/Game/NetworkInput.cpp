@@ -522,7 +522,7 @@ void NetworkInputRecording::Reset(bool constructing)
     mPlayerCounts[3] = 0;
 }
 
-void NetworkInputRecording::StartNetworkInputRecording(s8 localMachine, int machineCount, u32 randomSeed, const void* config, int configSize)
+void NetworkInputRecording::StartNetworkInputRecording(int localMachine, int machineCount, u32 randomSeed, const void* config, int configSize)
 {
     mRecording = true;
     if ((s8)mFileName[0] == 0)
@@ -540,6 +540,7 @@ void NetworkInputRecording::StartNetworkInputRecording(s8 localMachine, int mach
     nlBufferedWriterAttach(&mWriter, mDebugFile,
         mUnidentified02, 2000, 1800);
 
+    NetworkSessionData* session = g_pNetworkSessionBase;
     NetworkRecordingHeader header;
     header.mType = 13;
     header.mConfigSize = configSize;
@@ -550,7 +551,7 @@ void NetworkInputRecording::StartNetworkInputRecording(s8 localMachine, int mach
     {
         if (machine < machineCount)
             header.mPlayerCounts[machine]
-                = g_pNetworkSessionBase->GetPeer((s8)machine)->mPlayerCount;
+                = session->GetPeer((s8)machine)->mPlayerCount;
         else
             header.mPlayerCounts[machine] = 0;
     }

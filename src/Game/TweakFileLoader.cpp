@@ -1,74 +1,12 @@
 #include "Game/TweakFileLoader.h"
 
 #include "Game/TweakConfig.h"
-#include "Game/TweakValueInt.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
-#include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 
-#include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
-
-extern const float kGameTweakZero;
-
-TweakValueInt::~TweakValueInt()
-{
-}
-
-void TweakValueInt::CopyValueFrom(
-    TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        value = ((TweakValueInt*)other)->value;
-        break;
-    case 2:
-        value = *((TweakIntBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-int TweakValueInt::GetStorageKind()
-{
-    return 1;
-}
-
-int TweakValueInt::GetValueType()
-{
-    return 3;
-}
-
-void* TweakValueInt::GetValueAddress()
-{
-    return &value;
-}
-
-void TweakValueInt::FormatValue(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, "%d", value);
-}
-
-void TweakValueInt::ParseValue(
-    const char* string)
-{
-    value = atoi(string);
-}
-
-void TweakValueInt::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = kGameTweakZero;
-    *maximum = kGameTweakZero;
-    *increment = kGameTweakZero;
-}
-
-void TweakValueInt::UnidentifiedVirtual18()
-{
-}
 
 void OnTweakFileLoaded(
     void* fileData, unsigned long fileSize, void* userData)

@@ -575,7 +575,7 @@ extern "C" void fn_8027A2FC(StadiumWorldObject_80279AC8*)
  */
 extern "C" void fn_8027A300(StadiumGoalObject_8027A2C8* object)
 {
-    if (object->m_fCupTrophyOpacity != 0.0f)
+    if (0.0f != object->GetOpacity())
         fn_80343C00(object);
 }
 

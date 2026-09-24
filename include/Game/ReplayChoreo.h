@@ -72,7 +72,7 @@ public:
     /* 0x334 */ void* mByteCode;
     /* 0x338 */ bool mUnidentified338;
     /* 0x339 */ u8 mPadding339[3];
-    /* 0x33C */ UnidentifiedReplayGoalData mGoalScoredData;
+    /* 0x33C */ mutable UnidentifiedReplayGoalData mGoalScoredData;
     /* 0x350 */ Highlight mHighlights[3];
     /* 0x3EC */ Highlight* mUnidentified3EC;
     /* 0x3F0 */ Highlight* mUnidentified3F0;

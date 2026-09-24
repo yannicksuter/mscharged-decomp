@@ -7,6 +7,7 @@
 
 class TLComponentInstance;
 class TLInstance;
+class TLTextInstance;
 
 class OptionsSubMenu : public BaseSceneHandler
 {
@@ -100,6 +101,7 @@ public:
     virtual void SceneCreated();
 
     void fn_801D6E80();
+    void UpdateZoomLevelText(TLTextInstance* text, const u16 (&number)[4], const u16* localized);
     void fn_801D7948(int index, void* context);
     void fn_801D7A0C(int index, void* context);
     void fn_801D7AA8(int index, void* context);

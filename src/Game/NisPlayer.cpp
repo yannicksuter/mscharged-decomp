@@ -5,6 +5,7 @@
 #include "Game/EventDataTypes.h"
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
+#include "NL/nlBindMember.h"
 #include "Game/Render/Presentation.h"
 #include "Game/Sys/tweak.h"
 #include "Game/Player.h"
@@ -99,10 +100,10 @@ void NisPlayer::fn_8027ED18()
 
 void NisPlayer::fn_8027DA28()
 {
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(Bind<void>(MemFun(&NisPlayer::fn_8027DF70), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(Bind<void>(MemFun(&NisPlayer::fn_8027DFE0), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(Bind<void>(MemFun(&NisPlayer::fn_8027DFE4), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&NisPlayer::fn_8027E054), this)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &NisPlayer::fn_8027DF70)), 0, -1);
+    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &NisPlayer::fn_8027DFE0)), 0, -1);
+    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(BindMember(this, &NisPlayer::fn_8027DFE4)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::fn_8027E054)), 0, -1);
 }
 
 void NisPlayer::fn_8027BD64()

@@ -211,8 +211,45 @@ int ImpostorManager::GetNumImpostors()
     return mNumUsed;
 }
 
+inline u32 ImpostorManager::CalculateRenderChecksum()
+{
+    u32 total = 0;
+    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
+    DLListEntry<ImpostorCharacter*>* head = it.m_Head;
+    while (entry != 0)
+    {
+        nlDLListIterator<ImpostorSprite*> sprites =
+            entry->entry->mSprites.Begin();
+        DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
+        DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
+        while (spriteEntry != 0)
+        {
+            total += spriteEntry->entry->CalculateRenderChecksum();
+            if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
+            {
+                spriteEntry = 0;
+            }
+            else
+            {
+                spriteEntry = spriteEntry->m_next;
+            }
+        }
+        if (nlDLRingIsEnd(head, entry) || entry == 0)
+        {
+            entry = 0;
+        }
+        else
+        {
+            entry = entry->m_next;
+        }
+    }
+    return total;
+}
+
 void ImpostorManager::Render(void* target, bool skipCapture)
 {
+    u32 total;
     if (mEnabled == 0)
     {
         return;
@@ -231,38 +268,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
 
     if (cached)
     {
-        u32 total = 0;
-        nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
-        DLListEntry<ImpostorCharacter*>* head = it.m_Head;
-        DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
-        while (entry != 0)
-        {
-            nlDLListIterator<ImpostorSprite*> sprites =
-                entry->entry->mSprites.Begin();
-            DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
-            DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
-            while (spriteEntry != 0)
-            {
-                total += spriteEntry->entry->CalculateRenderChecksum();
-                if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
-                {
-                    spriteEntry = 0;
-                }
-                else
-                {
-                    spriteEntry = spriteEntry->m_next;
-                }
-            }
-            if (nlDLRingIsEnd(head, entry) || entry == 0)
-            {
-                entry = 0;
-            }
-            else
-            {
-                entry = entry->m_next;
-            }
-        }
-
+        total = CalculateRenderChecksum();
         if (total != mLastRenderChecksum)
         {
             cached = false;
@@ -299,12 +305,12 @@ void ImpostorManager::Render(void* target, bool skipCapture)
     }
     glSetCurrentRasterState(glHandleizeRasterState());
 
+    int rendered;
+    ImpostorCharacter* character;
     nlDLListIterator<ImpostorCharacter*> drawIt = mCharacters.Begin();
-    DLListEntry<ImpostorCharacter*>* drawHead = drawIt.m_Head;
-    DLListEntry<ImpostorCharacter*>* drawEntry = drawIt.m_Curr;
-    while (drawEntry != 0)
+    for (; drawIt.hasNext(); drawIt.next())
     {
-        ImpostorCharacter* character = drawEntry->entry;
+        character = *drawIt;
         if (character->mUnidentified034 != 0)
         {
             glSetRasterState(GLS_DepthTest, 1);
@@ -326,27 +332,11 @@ void ImpostorManager::Render(void* target, bool skipCapture)
 
         nlDLListIterator<ImpostorSprite*> sprites =
             character->mSprites.Begin();
-        DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
-        DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
-        while (spriteEntry != 0)
+        for (; sprites.hasNext(); sprites.next())
         {
-            sNumImpostorsRendered.value += spriteEntry->entry->Render((GLView*)target, mImpostors, cached, skipCapture);
-            if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
-            {
-                spriteEntry = 0;
-            }
-            else
-            {
-                spriteEntry = spriteEntry->m_next;
-            }
-        }
-        if (nlDLRingIsEnd(drawHead, drawEntry) || drawEntry == 0)
-        {
-            drawEntry = 0;
-        }
-        else
-        {
-            drawEntry = drawEntry->m_next;
+            rendered = sNumImpostorsRendered.value;
+            sNumImpostorsRendered.value = rendered
+                + (*sprites)->Render((GLView*)target, mImpostors, cached, skipCapture);
         }
     }
 

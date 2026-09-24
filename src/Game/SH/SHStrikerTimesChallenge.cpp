@@ -9,6 +9,7 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/DB/GameProgress.inl"
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"

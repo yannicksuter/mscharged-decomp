@@ -83,14 +83,6 @@ public:
     /* 0x24 */ LANPeerMessageInfo mUnidentified24[7];
 }; // size: 0xE8
 
-class NetMessageTransportType6 : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageTransportType6();
-    virtual int GetType();
-};
-
 class NetMessageGamePeerAdded : public NetworkMessage
 {
 public:
@@ -101,6 +93,14 @@ public:
 
     /* 0x08 */ LANPeerMessageInfo mUnidentified08;
 }; // size: 0x24
+
+class NetMessageTransportType6 : public NetworkMessage
+{
+public:
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetMessageTransportType6();
+    virtual int GetType();
+};
 
 class NetMessageReadyToLaunchRequest : public NetworkMessage
 {

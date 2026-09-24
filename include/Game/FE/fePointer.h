@@ -35,11 +35,11 @@ public:
     virtual ~FEPointerListener();
 
     void ProcessPointerEvent(const FEPointerEvent* event);
-    void SetPointerEnterCallback(const Callback& callback);
-    void SetPointerLeaveCallback(const Callback& callback);
-    void SetPointerInsideCallback(const Callback& callback);
-    void SetPointerPressCallback(const Callback& callback);
-    void SetPointerReleaseCallback(const Callback& callback);
+    void SetPointerEnterCallback(Callback& callback);
+    void SetPointerLeaveCallback(Callback& callback);
+    void SetPointerInsideCallback(Callback& callback);
+    void SetPointerPressCallback(Callback& callback);
+    void SetPointerReleaseCallback(Callback& callback);
     void Disable();
     void Enable() { mDisabled = false; }
 
@@ -145,14 +145,6 @@ inline float FEPointerRegion::GetMinY() const
 inline bool FEPointerListener::IsEnabled()
 {
     return !mDisabled;
-}
-
-inline void FEPointerListener::Disable()
-{
-    mDisabled = true;
-    FEPointerEvent event;
-    for (int i = 0; i < 4; ++i)
-        mPreviousEvents[i] = event;
 }
 
 #endif // GAME_FE_FEPOINTER_H

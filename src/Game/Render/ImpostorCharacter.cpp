@@ -44,7 +44,8 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
 
     glBeginResource("ImpostorCharacter");
 
-    u16 angleStep = (u16)((int)(65536.0f * (360.0f / (float)mNumAngles)) / 360);
+    float angleDegrees = 360.0f / (float)mNumAngles;
+    u16 angleStep = (u16)((int)(65536.0f * angleDegrees) / 360);
     for (int i = 0; i < mNumTextures; ++i)
     {
         // Retail computes this per-texture stagger value and discards it; the
@@ -63,9 +64,9 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
 
             sprite->mAngle = mBaseAngle + angle;
             mSprites.AddEnd(sprite);
-            gNumImpostorSpritesCreated++;
             angle += angleStep;
         }
+        gNumImpostorSpritesCreated++;
     }
     glEndResource();
 

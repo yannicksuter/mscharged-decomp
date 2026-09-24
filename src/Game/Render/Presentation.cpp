@@ -1500,12 +1500,11 @@ void Presentation::LoadNis(const char* name, int variant)
     else
     {
         GameInfoManager* gameInfo;
-        short winnerSide;
-        winnerSide
-            = (short)NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
+        int winnerSide;
+        winnerSide = NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
         gameInfo = nlSingleton<GameInfoManager>::Instance();
         winnerTeam
-            = gameInfo->GetCurrentGameInfo()->GetTeam(winnerSide);
+            = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
         isCupWinner = false;
         if (gameInfo->mIsOnlineMode && gameInfo->IsInMode1()
             && NetTournManager::Instance()->IsCupWinningGame(winnerTeam))
@@ -1537,12 +1536,11 @@ void Presentation::LoadNis(const char* name, int variant)
         else
         {
             GameInfoManager* gameInfo;
-            short winnerSide;
+            int winnerSide;
             winnerSide
-                = (short)NisPlayer::Instance()
-                      ->mWinnerSide[NIS_GAME_WINNER];
+                = NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
             gameInfo = nlSingleton<GameInfoManager>::Instance();
-            winnerTeam = gameInfo->GetCurrentGameInfo()->GetTeam(winnerSide);
+            winnerTeam = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
             isCupWinner = false;
             if (gameInfo->IsInMode3()
                 && g_pCupManager->IsCupWinningGame(winnerTeam))

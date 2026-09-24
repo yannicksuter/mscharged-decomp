@@ -7,16 +7,17 @@
 
 AudioBankTable* AudioBankTable::ParseChunk(nlChunk* chunk)
 {
+    u32 groupIndex;
     nlChunk* current = chunk->GetFirstChunk();
     AudioBankTable* table = (AudioBankTable*)current->GetData();
     AudioResourceSource* oldRecords = table->records_0C;
 
     current = current->GetNextChunk();
     table->records_04 = (AudioBankGroup*)current->GetData();
-    for (u32 i = 0; i < table->count_00; ++i)
+    for (groupIndex = 0; groupIndex < table->count_00; ++groupIndex)
     {
         current = current->GetNextChunk();
-        table->records_04[i].records_0C = (AudioResourceSource**)current->GetData();
+        table->records_04[groupIndex].records_0C = (AudioResourceSource**)current->GetData();
     }
 
     current = current->GetNextChunk();
@@ -72,8 +73,8 @@ void AudioBankTable::LoadBank(int slotId, unsigned long cueId,
     AudioResourceLoadCallback callback, void* context,
     MemoryAllocator* allocator)
 {
-    AudioResourceSource* source = &records_0C[cueId];
     AudioResourceName* resource = &records_14[slotId];
+    AudioResourceSource* source = &records_0C[cueId];
     tDebugPrintManager::Print(DC_SOUND, "Loading Bank %s into slot %s::%s\n", resource->name,
         nlLookupDebugString(g_pDebugStringTable, source->field_0C->field_04),
         nlLookupDebugString(g_pDebugStringTable, source->field_04));

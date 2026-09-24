@@ -52,7 +52,6 @@ extern "C" cTeam* fn_800C2F38(const cFielder*);
 extern "C" cBall* fn_800C2F40(cPlayer*);
 extern "C" float fn_800C2F50(float);
 extern "C" float fn_800DBAB0(cFielder*);
-extern "C" void fn_800B6A1C(UnidentifiedVariant_80054AB8*, int, const Variant&);
 extern "C" int fn_800D1D34(const shdStateMachine*);
 extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
 extern "C" float fn_800D1D44(const DesireRunInDirection*);
@@ -211,7 +210,7 @@ void DesireSuperPower::UnidentifiedSetContext(
 {
     Desire::UnidentifiedSetContext(context);
 
-    if (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == YOSHI)
+    if (m_pFielder->mUnidentified024.m_eCharacterClass == YOSHI)
     {
         UnidentifiedFindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(fn_800D1140), 0, -1);
         UnidentifiedFindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(fn_800D1140), 0, -1);
@@ -225,25 +224,25 @@ void DesireSuperPower::UnidentifiedSetContext(
 bool DesireSuperPower::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    fn_8002E340(mUnidentifiedFielder);
+    fn_8002E340(m_pFielder);
 
-    switch (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass)
+    switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
     {
         mpTarget = 0;
-        fn_8002E3F8(mUnidentifiedFielder);
+        fn_8002E3F8(m_pFielder);
         mUnidentified078 = lbl_806DC320;
-        mUnidentifiedFielder->fn_800501F0(
-            (bool)UserControlledT(mUnidentifiedFielder->m_pTeam));
-        fn_801B97DC(mUnidentifiedFielder);
-        bool userControlled = (bool)mUnidentifiedFielder->GetGlobalPad();
+        m_pFielder->fn_800501F0(
+            (bool)UserControlledT(m_pFielder->m_pTeam));
+        fn_801B97DC(m_pFielder);
+        bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
-            && (mUnidentifiedFielder->fn_8002E060() == 21
-                || mUnidentifiedFielder->fn_8002E060() == 18
-                || mUnidentifiedFielder->fn_8002E060() == 9))
+            && (m_pFielder->fn_8002E060() == 21
+                || m_pFielder->fn_8002E060() == 18
+                || m_pFielder->fn_8002E060() == 9))
         {
-            mUnidentifiedFielder->EndDesire();
+            m_pFielder->EndDesire();
         }
         result = true;
         break;
@@ -252,15 +251,15 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         result = fn_800C9F4C(this, context);
         break;
     case DONKEYKONG:
-        mUnidentifiedFielder->InitDesire(
+        m_pFielder->InitDesire(
             (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        mUnidentifiedFielder->SetAction((eFielderActionState)29);
-        mUnidentifiedFielder->muInvincibleStatus |= 1;
-        mUnidentifiedFielder->SetAnimState(104, true, 0.2f, false, false);
-        mUnidentifiedFielder->InitMovementFromAnim(
+        m_pFielder->SetAction((eFielderActionState)29);
+        m_pFielder->muInvincibleStatus |= 1;
+        m_pFielder->SetAnimState(104, true, 0.2f, false, false);
+        m_pFielder->InitMovementFromAnim(
             0, lbl_804DC338, 1.0f, false);
         mUnidentified078 = lbl_806DC2D4;
-        result = mUnidentifiedFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case WARIO:
         result = fn_800CAC8C(this, context);
@@ -268,49 +267,49 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     case HAMMERBROS:
         mpDKShockAvoidable = new (nlMalloc(sizeof(AvoidablePoint), 8, false))
             AvoidablePoint(AVOID_BOWSER,
-                (const nlVector2&)mUnidentifiedFielder->mUnidentified024.m_v3Position,
+                (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
                 4.0f + lbl_806DB9D8);
-        mUnidentifiedFielder->fn_8004F828();
+        m_pFielder->fn_8004F828();
         mUnidentified078 = lbl_806DC318;
-        result = mUnidentifiedFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case KOOPA:
-        mUnidentifiedFielder->m_pTweaks = mUnidentifiedFielder->mUnidentified328;
-        mUnidentifiedFielder->fn_8001EE74(lbl_806DC25C, lbl_806DC250, -1.0f);
-        fn_801BBE80(mUnidentifiedFielder);
+        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
+        m_pFielder->fn_8001EE74(lbl_806DC25C, lbl_806DC250, -1.0f);
+        fn_801BBE80(m_pFielder);
         mUnidentified078 = lbl_806DC258;
-        fn_800367B4(mUnidentifiedFielder);
+        fn_800367B4(m_pFielder);
         result = true;
         break;
     case BIRDO:
-        mUnidentifiedFielder->m_pTweaks = mUnidentifiedFielder->mUnidentified328;
-        mUnidentifiedFielder->fn_8001EE74(lbl_806DC25C, lbl_806DC250, -1.0f);
-        fn_801BBE80(mUnidentifiedFielder);
+        m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
+        m_pFielder->fn_8001EE74(lbl_806DC25C, lbl_806DC250, -1.0f);
+        fn_801BBE80(m_pFielder);
         mUnidentified078 = lbl_806DC258;
-        fn_800367B4(mUnidentifiedFielder);
+        fn_800367B4(m_pFielder);
         result = true;
         break;
     case LUIGI:
-        mUnidentifiedFielder->fn_8004FB04();
+        m_pFielder->fn_8004FB04();
         mUnidentified078 = lbl_806DC31C;
-        result = mUnidentifiedFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
     case YOSHI:
     {
         mpTarget = 0;
-        fn_8002E3F8(mUnidentifiedFielder);
+        fn_8002E3F8(m_pFielder);
         mUnidentified078 = lbl_806DC328;
-        mUnidentifiedFielder->fn_800501F0(
-            (bool)UserControlledT(mUnidentifiedFielder->m_pTeam));
-        mUnidentifiedFielder->mUnidentified408 = 0.0f;
-        mUnidentifiedFielder->mUnidentified40C = 0.0f;
-        bool userControlled = (bool)mUnidentifiedFielder->GetGlobalPad();
+        m_pFielder->fn_800501F0(
+            (bool)UserControlledT(m_pFielder->m_pTeam));
+        m_pFielder->mUnidentified408 = 0.0f;
+        m_pFielder->mUnidentified40C = 0.0f;
+        bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
-            && (mUnidentifiedFielder->fn_8002E060() == 21
-                || mUnidentifiedFielder->fn_8002E060() == 18
-                || mUnidentifiedFielder->fn_8002E060() == 9))
+            && (m_pFielder->fn_8002E060() == 21
+                || m_pFielder->fn_8002E060() == 18
+                || m_pFielder->fn_8002E060() == 9))
         {
-            mUnidentifiedFielder->EndDesire();
+            m_pFielder->EndDesire();
         }
         result = true;
         break;
@@ -318,23 +317,23 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     case MARIO:
         mpTarget = 0;
         mUnidentified078 = lbl_806DC324;
-        mUnidentifiedFielder->fn_800501F0(
-            (bool)UserControlledT(mUnidentifiedFielder->m_pTeam));
+        m_pFielder->fn_800501F0(
+            (bool)UserControlledT(m_pFielder->m_pTeam));
         result = true;
         break;
     case PEACH:
     {
         mpTarget = 0;
         mUnidentified078 = lbl_806DC324;
-        mUnidentifiedFielder->fn_800501F0(
-            (bool)UserControlledT(mUnidentifiedFielder->m_pTeam));
-        bool userControlled = (bool)mUnidentifiedFielder->GetGlobalPad();
+        m_pFielder->fn_800501F0(
+            (bool)UserControlledT(m_pFielder->m_pTeam));
+        bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
-            && (mUnidentifiedFielder->fn_8002E060() == 21
-                || mUnidentifiedFielder->fn_8002E060() == 18
-                || mUnidentifiedFielder->fn_8002E060() == 9))
+            && (m_pFielder->fn_8002E060() == 21
+                || m_pFielder->fn_8002E060() == 18
+                || m_pFielder->fn_8002E060() == 9))
         {
-            mUnidentifiedFielder->EndDesire();
+            m_pFielder->EndDesire();
         }
         result = true;
         break;
@@ -347,9 +346,9 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     if (result)
     {
         mUnidentified018->UnidentifiedSetTransition("SuperPowerPlayDesire");
-        fn_800A6968(mUnidentifiedFielder->m_pTeam);
+        fn_800A6968(m_pFielder->m_pTeam);
         fn_803198F4();
-        cFielder* fielder = mUnidentifiedFielder;
+        cFielder* fielder = m_pFielder;
         if (fielder->m_pBall != 0 && g_pGame->IsGameplayOrOvertime())
         {
             gSuperAbilityTeam = (eTeamID)GameInfoManager::Instance()->GetTeam(fielder->m_pTeam->m_nSide);
@@ -359,20 +358,20 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         }
 
         unsigned long sound = PowerupBase::GetSoundType(
-            (ePowerUpType)mUnidentifiedFielder->mUnidentified11C->unknown_0x14,
+            (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
             PowerupBase::PWRUP_SOUND_ACTIVATE);
-        if (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == BIRDO
-            || mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == KOOPA)
+        if (m_pFielder->mUnidentified024.m_eCharacterClass == BIRDO
+            || m_pFielder->mUnidentified024.m_eCharacterClass == KOOPA)
         {
-            PlayCaptainPowerupStream(18, sound, mUnidentifiedFielder);
+            PlayCaptainPowerupStream(18, sound, m_pFielder);
             unsigned long hash = nlStringLowerHash("MarioPowerup");
             fn_802F4E84(&hash, 0, 0);
             PauseSuddenDeathMusic();
         }
         else
         {
-            PlayCaptainPowerupStream(mUnidentifiedFielder->mUnidentified318,
-                sound, mUnidentifiedFielder);
+            PlayCaptainPowerupStream(m_pFielder->mUnidentified318,
+                sound, m_pFielder);
         }
     }
     return result;
@@ -382,7 +381,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
  * Offset/Address/Size: 0x87C | 0x800C8F78 | size: 0x174
  */
 void DesireSuperPower::Update(
-    UnidentifiedDesireUpdate* update, float fDeltaT)
+    DesireUpdate* update, float fDeltaT)
 {
     if (!fn_800D1458(g_pGame))
     {
@@ -390,7 +389,7 @@ void DesireSuperPower::Update(
         return;
     }
 
-    switch (fn_800D1440(mUnidentifiedFielder))
+    switch (fn_800D1440(m_pFielder))
     {
     case DAISY:
         fn_800C93A4(update, fDeltaT);
@@ -436,18 +435,18 @@ void DesireSuperPower::Update(
  */
 void DesireSuperPower::UnidentifiedCleanup()
 {
-    fn_800A6968(mUnidentifiedFielder->m_pTeam);
+    fn_800A6968(m_pFielder->m_pTeam);
     fn_803198F4();
 
-    switch (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass)
+    switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
-        mUnidentifiedFielder->fn_80050008();
-        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
-        fn_801B98A0(mUnidentifiedFielder);
+        m_pFielder->fn_80050008();
+        m_pFielder->m_pTeam->ClearCurrentPowerUp();
+        fn_801B98A0(m_pFielder);
         break;
     case WALUIGI:
-        fn_80038158(mUnidentifiedFielder, 0);
+        fn_80038158(m_pFielder, 0);
         {
             EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
                 "bowserjr_shriek_mouth");
@@ -458,80 +457,80 @@ void DesireSuperPower::UnidentifiedCleanup()
         }
         break;
     case DONKEYKONG:
-        fn_80038158(mUnidentifiedFielder, 0);
+        fn_80038158(m_pFielder, 0);
         break;
     case WARIO:
-        mUnidentifiedFielder->mUnidentified181 = false;
-        mUnidentifiedFielder->mUnidentified182 = false;
-        fn_80038158(mUnidentifiedFielder, 0);
+        m_pFielder->mUnidentified181 = false;
+        m_pFielder->mUnidentified182 = false;
+        fn_80038158(m_pFielder, 0);
         break;
     case HAMMERBROS:
-        fn_801BB0DC(mUnidentifiedFielder);
-        fn_80038158(mUnidentifiedFielder, 0);
+        fn_801BB0DC(m_pFielder);
+        fn_80038158(m_pFielder, 0);
         delete (AvoidablePoint*)mpDKShockAvoidable;
         mpDKShockAvoidable = 0;
         break;
     case KOOPA:
-        mUnidentifiedFielder->m_pTweaks
-            = mUnidentifiedFielder->mUnidentified32C;
-        mUnidentifiedFielder->fn_8001EE74(1.0f, lbl_806DC254, 1.0f);
-        fn_801BC094(mUnidentifiedFielder);
+        m_pFielder->m_pTweaks
+            = m_pFielder->mUnidentified32C;
+        m_pFielder->fn_8001EE74(1.0f, lbl_806DC254, 1.0f);
+        fn_801BC094(m_pFielder);
         break;
     case BIRDO:
-        mUnidentifiedFielder->m_pTweaks
-            = mUnidentifiedFielder->mUnidentified32C;
-        mUnidentifiedFielder->fn_8001EE74(1.0f, lbl_806DC254, 1.0f);
-        fn_801BC094(mUnidentifiedFielder);
+        m_pFielder->m_pTweaks
+            = m_pFielder->mUnidentified32C;
+        m_pFielder->fn_8001EE74(1.0f, lbl_806DC254, 1.0f);
+        fn_801BC094(m_pFielder);
         break;
     case LUIGI:
-        mUnidentifiedFielder->fn_8004FA34();
+        m_pFielder->fn_8004FA34();
         SetFlyingCameraTarget((cFielder*)0);
         break;
     case YOSHI:
-        fn_80038158(mUnidentifiedFielder, 0);
-        mUnidentifiedFielder->mUnidentified404 = 0.0f;
-        mUnidentifiedFielder->mUnidentified408 = 0.0f;
-        mUnidentifiedFielder->fn_80050008();
-        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
-        if (mUnidentifiedFielder->m_eAnimID == 104)
+        fn_80038158(m_pFielder, 0);
+        m_pFielder->mUnidentified404 = 0.0f;
+        m_pFielder->mUnidentified408 = 0.0f;
+        m_pFielder->fn_80050008();
+        m_pFielder->m_pTeam->ClearCurrentPowerUp();
+        if (m_pFielder->m_eAnimID == 104)
         {
-            mUnidentifiedFielder->EndDesire();
-            mUnidentifiedFielder->StartRunning();
+            m_pFielder->EndDesire();
+            m_pFielder->StartRunning();
         }
         break;
     case MARIO:
-        if (mUnidentifiedFielder->fn_8002E060() == 12)
+        if (m_pFielder->fn_8002E060() == 12)
         {
-            mUnidentifiedFielder->EndDesire();
+            m_pFielder->EndDesire();
         }
-        mUnidentifiedFielder->fn_80050008();
-        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
+        m_pFielder->fn_80050008();
+        m_pFielder->m_pTeam->ClearCurrentPowerUp();
         break;
     case PEACH:
-        mUnidentifiedFielder->fn_80050008();
-        mUnidentifiedFielder->m_pTeam->ClearCurrentPowerUp();
-        if (mUnidentifiedFielder->m_eAnimID == 104)
+        m_pFielder->fn_80050008();
+        m_pFielder->m_pTeam->ClearCurrentPowerUp();
+        if (m_pFielder->m_eAnimID == 104)
         {
-            mUnidentifiedFielder->EndDesire();
-            mUnidentifiedFielder->StartRunning();
+            m_pFielder->EndDesire();
+            m_pFielder->StartRunning();
         }
         break;
     case TOAD:
-        mUnidentifiedFielder->m_pTweaks
-            = mUnidentifiedFielder->mUnidentified32C;
-        fn_80039CF0(mUnidentifiedFielder, 0);
-        mUnidentifiedFielder->bYoshiInWindup = false;
-        fn_801B881C(mUnidentifiedFielder);
+        m_pFielder->m_pTweaks
+            = m_pFielder->mUnidentified32C;
+        fn_80039CF0(m_pFielder, 0);
+        m_pFielder->bYoshiInWindup = false;
+        fn_801B881C(m_pFielder);
         gNPCManager->mUnidentified024->Break();
         break;
     }
 
     unsigned long sound = PowerupBase::GetSoundType(
-        (ePowerUpType)mUnidentifiedFielder->mUnidentified11C->unknown_0x14,
+        (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
         PowerupBase::PWRUP_SOUND_ACTIVATE);
-    StopCaptainPowerupStream(sound, mUnidentifiedFielder);
-    if ((mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == BIRDO)
-        || (mUnidentifiedFielder->mUnidentified024.m_eCharacterClass == KOOPA))
+    StopCaptainPowerupStream(sound, m_pFielder);
+    if ((m_pFielder->mUnidentified024.m_eCharacterClass == BIRDO)
+        || (m_pFielder->mUnidentified024.m_eCharacterClass == KOOPA))
     {
         ResumeSuddenDeathMusic();
         unsigned long hash = nlStringLowerHash("MarioPowerup");
@@ -542,19 +541,19 @@ void DesireSuperPower::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x1980 | 0x800CA07C | size: 0x500
  */
-void DesireSuperPower::fn_800CA07C(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CA07C(DesireUpdate* update, float fDeltaT)
 {
-    if (mUnidentifiedFielder->ShouldStartCrossBlend(4))
+    if (m_pFielder->ShouldStartCrossBlend(4))
     {
-        mUnidentifiedFielder->EndAction();
+        m_pFielder->EndAction();
     }
 
-    if (mUnidentifiedFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
+    if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
-        mUnidentifiedFielder->EndDesire();
+        m_pFielder->EndDesire();
         *update = 1;
     }
-    if (mUnidentifiedFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != (eFielderActionState)29)
     {
         *update = 1;
     }
@@ -563,59 +562,59 @@ void DesireSuperPower::fn_800CA07C(UnidentifiedDesireUpdate* update, float fDelt
 /**
  * Offset/Address/Size: 0x1E80 | 0x800CA57C | size: 0x59C
  */
-void DesireSuperPower::fn_800CA57C(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CA57C(DesireUpdate* update, float fDeltaT)
 {
-    if (mUnidentifiedFielder->ShouldStartCrossBlend(4))
+    if (m_pFielder->ShouldStartCrossBlend(4))
     {
-        mUnidentifiedFielder->EndAction();
+        m_pFielder->EndAction();
     }
 
-    if (mUnidentifiedFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
+    if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
-        mUnidentifiedFielder->EndDesire();
+        m_pFielder->EndDesire();
         *update = 1;
     }
-    if (mUnidentifiedFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != (eFielderActionState)29)
     {
         *update = 1;
     }
 
-    if (mUnidentifiedFielder->m_pCurrentAnimController->TestTrigger(lbl_806DC2D8))
+    if (m_pFielder->m_pCurrentAnimController->TestTrigger(lbl_806DC2D8))
     {
         int step = 65536 / lbl_806DC2DC;
-        unsigned short angle = mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
+        unsigned short angle = m_pFielder->mUnidentified024.m_aActualFacingDirection;
         for (int i = 0; i < lbl_806DC2DC; i++)
         {
             DaisyFistObject* fist = gNPCManager->fn_801A9CA4(-1);
             if (fist != 0)
             {
-                fist->Spawn(mUnidentifiedFielder, angle);
+                fist->Spawn(m_pFielder, angle);
             }
             angle += step;
         }
     }
-    else if (mUnidentifiedFielder->m_pCurrentAnimController->TestTrigger(0.04f + lbl_806DC2D8))
+    else if (m_pFielder->m_pCurrentAnimController->TestTrigger(0.04f + lbl_806DC2D8))
     {
-        fn_80038158(mUnidentifiedFielder, 0);
+        fn_80038158(m_pFielder, 0);
     }
 }
 
 /**
  * Offset/Address/Size: 0x26C0 | 0x800CADBC | size: 0x500
  */
-void DesireSuperPower::fn_800CADBC(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CADBC(DesireUpdate* update, float fDeltaT)
 {
-    if (mUnidentifiedFielder->ShouldStartCrossBlend(4))
+    if (m_pFielder->ShouldStartCrossBlend(4))
     {
-        mUnidentifiedFielder->EndAction();
+        m_pFielder->EndAction();
     }
 
-    if (mUnidentifiedFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
+    if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
-        mUnidentifiedFielder->EndDesire();
+        m_pFielder->EndDesire();
         *update = 1;
     }
-    if (mUnidentifiedFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != (eFielderActionState)29)
     {
         *update = 1;
     }
@@ -624,16 +623,16 @@ void DesireSuperPower::fn_800CADBC(UnidentifiedDesireUpdate* update, float fDelt
 /**
  * Offset/Address/Size: 0x2BC0 | 0x800CB2BC | size: 0x4EC
  */
-void DesireSuperPower::fn_800CB2BC(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CB2BC(DesireUpdate* update, float fDeltaT)
 {
-    mUnidentifiedFielder->fn_8004F974(fDeltaT);
+    m_pFielder->fn_8004F974(fDeltaT);
 
-    if (mUnidentifiedFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
+    if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
-        mUnidentifiedFielder->EndDesire();
+        m_pFielder->EndDesire();
         *update = 1;
     }
-    if (mUnidentifiedFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != (eFielderActionState)29)
     {
         *update = 1;
     }
@@ -642,32 +641,32 @@ void DesireSuperPower::fn_800CB2BC(UnidentifiedDesireUpdate* update, float fDelt
 /**
  * Offset/Address/Size: 0x4024 | 0x800CC720 | size: 0x4EC
  */
-void DesireSuperPower::fn_800CC720(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CC720(DesireUpdate* update, float fDeltaT)
 {
-    mUnidentifiedFielder->fn_8004FC90(fDeltaT);
+    m_pFielder->fn_8004FC90(fDeltaT);
 
-    if (mUnidentifiedFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
+    if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
-        mUnidentifiedFielder->EndDesire();
+        m_pFielder->EndDesire();
         *update = 1;
     }
-    if (mUnidentifiedFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != (eFielderActionState)29)
     {
         *update = 1;
     }
 }
 
-void DesireSuperPower::fn_800CB7A8(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CB7A8(DesireUpdate* update, float fDeltaT)
 {
-    mUnidentifiedFielder->fn_800305DC(lbl_806DC268);
-    if (mUnidentifiedFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
+    m_pFielder->fn_800305DC(lbl_806DC268);
+    if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * lbl_806DC240;
         mUnidentifiedTimer.Countup(scaledDelta - fDeltaT, 10.0f);
     }
     if (update->mData.i != 0)
     {
-        switch (mUnidentifiedFielder->m_eActionState)
+        switch (m_pFielder->m_eActionState)
         {
         case ACTION_ELECTROCUTION:
         case ACTION_LOOSE_BALL_PASS:
@@ -680,14 +679,14 @@ void DesireSuperPower::fn_800CB7A8(UnidentifiedDesireUpdate* update, float fDelt
             return;
         }
     }
-    mUnidentifiedFielder->fn_8001EF6C(1.0f);
-    switch (mUnidentifiedFielder->m_eActionState)
+    m_pFielder->fn_8001EF6C(1.0f);
+    switch (m_pFielder->m_eActionState)
     {
     case (eFielderActionState)1:
-        mUnidentifiedFielder->fn_8001EF6C(lbl_806DC260);
+        m_pFielder->fn_8001EF6C(lbl_806DC260);
         break;
     case ACTION_HIT:
-        mUnidentifiedFielder->fn_8001EF6C(lbl_806DC264);
+        m_pFielder->fn_8001EF6C(lbl_806DC264);
         break;
     case ACTION_SHOT:
         *update = 1;
@@ -701,17 +700,17 @@ void DesireSuperPower::fn_800CB7A8(UnidentifiedDesireUpdate* update, float fDelt
     }
 }
 
-void DesireSuperPower::fn_800CBF64(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CBF64(DesireUpdate* update, float fDeltaT)
 {
-    mUnidentifiedFielder->fn_800305DC(lbl_806DC268);
-    if (mUnidentifiedFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
+    m_pFielder->fn_800305DC(lbl_806DC268);
+    if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         float scaledDelta = fDeltaT * lbl_806DC240;
         mUnidentifiedTimer.Countup(scaledDelta - fDeltaT, 10.0f);
     }
     if (update->mData.i != 0)
     {
-        switch (mUnidentifiedFielder->m_eActionState)
+        switch (m_pFielder->m_eActionState)
         {
         case ACTION_ELECTROCUTION:
         case ACTION_LOOSE_BALL_PASS:
@@ -724,14 +723,14 @@ void DesireSuperPower::fn_800CBF64(UnidentifiedDesireUpdate* update, float fDelt
             return;
         }
     }
-    mUnidentifiedFielder->fn_8001EF6C(1.0f);
-    switch (mUnidentifiedFielder->m_eActionState)
+    m_pFielder->fn_8001EF6C(1.0f);
+    switch (m_pFielder->m_eActionState)
     {
     case (eFielderActionState)1:
-        mUnidentifiedFielder->fn_8001EF6C(lbl_806DC260);
+        m_pFielder->fn_8001EF6C(lbl_806DC260);
         break;
     case ACTION_HIT:
-        mUnidentifiedFielder->fn_8001EF6C(lbl_806DC264);
+        m_pFielder->fn_8001EF6C(lbl_806DC264);
         break;
     case ACTION_SHOT:
         *update = 1;
@@ -745,11 +744,11 @@ void DesireSuperPower::fn_800CBF64(UnidentifiedDesireUpdate* update, float fDelt
     }
 }
 
-void DesireSuperPower::fn_800D0EAC(UnidentifiedDesireUpdate* update, float)
+void DesireSuperPower::fn_800D0EAC(DesireUpdate* update, float)
 {
     if (update->mData.i != 0)
     {
-        switch (mUnidentifiedFielder->m_eActionState)
+        switch (m_pFielder->m_eActionState)
         {
         case ACTION_ELECTROCUTION:
         case ACTION_LOOSE_BALL_PASS:
@@ -762,16 +761,16 @@ void DesireSuperPower::fn_800D0EAC(UnidentifiedDesireUpdate* update, float)
     }
 }
 
-void DesireSuperPower::fn_800CD61C(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CD61C(DesireUpdate* update, float fDeltaT)
 {
-    bool userControlled = (bool)mUnidentifiedFielder->GetGlobalPad();
+    bool userControlled = (bool)m_pFielder->GetGlobalPad();
     if (!userControlled)
     {
         fn_800CDBF0(update, fDeltaT);
     }
     if (update->mData.i == 0)
     {
-        bool active = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
         if (!active)
         {
             *update = 1;
@@ -781,13 +780,13 @@ void DesireSuperPower::fn_800CD61C(UnidentifiedDesireUpdate* update, float fDelt
 
 void DesireSuperPower::fn_800CAB18()
 {
-    fn_80038158(mUnidentifiedFielder, 0);
+    fn_80038158(m_pFielder, 0);
     nlVector3 direction;
     nlPolarToCartesian(direction.x, direction.y,
-        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
+        m_pFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
     direction.z = 0.0f;
-    nlVector3 pos = mUnidentifiedFielder->GetJointPosition(
-        mUnidentifiedFielder->m_nRightHandJointIndex);
+    nlVector3 pos = m_pFielder->GetJointPosition(
+        m_pFielder->m_nRightHandJointIndex);
     nlVector3 offset = direction;
     pos.z = 0.0f;
     float inverseLength = nlRecipSqrt(nlVec3DotProduct(offset, offset), true);
@@ -796,32 +795,32 @@ void DesireSuperPower::fn_800CAB18()
     nlVec3Add(pos, pos, offset);
     cField::FixOutOfBoundsPosition(pos, 0.9f * lbl_806DC308, true);
     PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(2,
-        mUnidentifiedFielder, pos, lbl_804DC338,
+        m_pFielder, pos, lbl_804DC338,
         lbl_806DC300, lbl_806DC308, lbl_806DC30C);
     patch->fn_80173B08(lbl_806DC310);
-    PlayRumbleAction(1, mUnidentifiedFielder->GetGlobalPad());
+    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
 }
 
 int DesireSuperPower::fn_800D0004()
 {
     int count;
-    if (UserControlledT(mUnidentifiedFielder->m_pTeam))
+    if (UserControlledT(m_pFielder->m_pTeam))
     {
-        mUnidentifiedPositions[0] = (const nlVector2&)mUnidentifiedFielder->mUnidentified024.m_v3Position;
+        mUnidentifiedPositions[0] = (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position;
         count = 2;
         nlVector3 pos;
         pos.z = 0.0f;
         nlPolarToCartesian(pos.x, pos.y,
-            mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection, 4.0f);
-        nlVec3Add(pos, mUnidentifiedFielder->mUnidentified024.m_v3Position, pos);
+            m_pFielder->mUnidentified024.m_aActualFacingDirection, 4.0f);
+        nlVec3Add(pos, m_pFielder->mUnidentified024.m_v3Position, pos);
         cField::FixOutOfBoundsPosition(pos,
-            mUnidentifiedFielder->mUnidentified320->GetRadius(), true);
+            m_pFielder->mUnidentified320->GetRadius(), true);
         mUnidentifiedPositions[1] = (const nlVector2&)pos;
     }
     else
     {
         const nlVector2* positions;
-        if (mUnidentifiedFielder->m_pBall != 0)
+        if (m_pFielder->m_pBall != 0)
         {
             count = 6;
             positions = lbl_804DC348;
@@ -831,7 +830,7 @@ int DesireSuperPower::fn_800D0004()
             count = 2;
             positions = lbl_804DC378;
         }
-        bool flip = mUnidentifiedFielder->mUnidentified024.m_v3Position.y > 0.0f;
+        bool flip = m_pFielder->mUnidentified024.m_v3Position.y > 0.0f;
         for (int i = 0; i < count; i++)
         {
             mUnidentifiedPositions[i] = positions[i];
@@ -839,7 +838,7 @@ int DesireSuperPower::fn_800D0004()
             {
                 mUnidentifiedPositions[i].y = -mUnidentifiedPositions[i].y;
             }
-            if (mUnidentifiedFielder->m_pTeam->m_nSide == 1)
+            if (m_pFielder->m_pTeam->m_nSide == 1)
             {
                 nlVec2Scale(mUnidentifiedPositions[i], mUnidentifiedPositions[i], -1.0f);
             }
@@ -848,51 +847,51 @@ int DesireSuperPower::fn_800D0004()
     return count;
 }
 
-void DesireSuperPower::fn_800C93A4(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800C93A4(DesireUpdate* update, float fDeltaT)
 {
     if (update->mData.i == 3)
     {
         if (update->ExtraData.Get(11)->mData.b)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
-            if (!mUnidentifiedFielder->mUnidentified3DC)
+            if (!m_pFielder->mUnidentified3DC)
             {
-                mUnidentifiedFielder->fn_80050284();
+                m_pFielder->fn_80050284();
             }
         }
-        else if (mUnidentifiedFielder->mUnidentified3DC)
+        else if (m_pFielder->mUnidentified3DC)
         {
-            mUnidentifiedFielder->fn_8005001C(false);
+            m_pFielder->fn_8005001C(false);
         }
         *update = 0;
     }
     if (update->mData.i == 0)
     {
-        bool active = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
         if (!active)
         {
             *update = 1;
             return;
         }
-        if (mUnidentifiedFielder->mUnidentified3DC)
+        if (m_pFielder->mUnidentified3DC)
         {
-            if (!fn_8002EDC8(mUnidentifiedFielder, -1))
+            if (!fn_8002EDC8(m_pFielder, -1))
             {
-                mUnidentifiedFielder->fn_8005001C(true);
+                m_pFielder->fn_8005001C(true);
                 return;
             }
-            mUnidentifiedFielder->fn_800D0534(fDeltaT);
-            bool active = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
+            m_pFielder->fn_800D0534(fDeltaT);
+            bool active = m_pFielder->mUnidentified3E0 > 0.0f;
             if (active)
             {
-                mUnidentifiedFielder->mUnidentified3E8.fireballStageTime += fDeltaT;
-                mUnidentifiedFielder->mUnidentified3E8.nextFireballTime -= fDeltaT;
-                if (mUnidentifiedFielder->mUnidentified3E8.nextFireballTime <= 0.0f)
+                m_pFielder->mUnidentified3E8.fireballStageTime += fDeltaT;
+                m_pFielder->mUnidentified3E8.nextFireballTime -= fDeltaT;
+                if (m_pFielder->mUnidentified3E8.nextFireballTime <= 0.0f)
                 {
                     nlVector3 pos;
                     nlVector3 direction;
-                    const nlMatrix4& mat = mUnidentifiedFielder->m_pPoseAccumulator->GetNodeMatrix(
-                        mUnidentifiedFielder->m_nHeadJointIndex);
+                    const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
+                        m_pFielder->m_nHeadJointIndex);
                     nlVec3Set(direction, mat.m21, mat.m22, mat.m23);
                     nlVec3ScaleAdd(pos, lbl_806DC26C, direction, (const nlVector3&)mat.m41);
                     nlVector3 flat = direction;
@@ -904,17 +903,17 @@ void DesireSuperPower::fn_800C93A4(UnidentifiedDesireUpdate* update, float fDelt
                         direction = flat;
                     }
                     float stage = InterpolateRangeClamped(0.0f, 1.0f, 0.0f, lbl_806DC270,
-                        mUnidentifiedFielder->mUnidentified3E8.fireballStageTime);
-                    mUnidentifiedFielder->mUnidentified3E8.nextFireballTime
+                        m_pFielder->mUnidentified3E8.fireballStageTime);
+                    m_pFielder->mUnidentified3E8.nextFireballTime
                         += Interpolate(lbl_806DC290, lbl_806DC294, stage);
                     float speed = Interpolate(lbl_806DC288, lbl_806DC28C, stage);
                     nlVec3ScaleAdd(direction, speed,
-                        direction, mUnidentifiedFielder->mUnidentified024.m_v3Velocity);
+                        direction, m_pFielder->mUnidentified024.m_v3Velocity);
                     float radius = Interpolate(lbl_806DC278, lbl_806DC27C, stage);
                     float lifetime = Interpolate(lbl_806DC280, lbl_806DC284, stage);
-                    lbl_806E12C8->fn_801743A8(1, mUnidentifiedFielder, pos, direction,
+                    lbl_806E12C8->fn_801743A8(1, m_pFielder, pos, direction,
                         lbl_806DC274, radius, lifetime);
-                    PlayRumbleAction(1, mUnidentifiedFielder->GetGlobalPad());
+                    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
                 }
             }
             else
@@ -924,7 +923,7 @@ void DesireSuperPower::fn_800C93A4(UnidentifiedDesireUpdate* update, float fDelt
         }
         else
         {
-            mUnidentifiedFielder->mUnidentified3E8.nextFireballTime = 0.0f;
+            m_pFielder->mUnidentified3E8.nextFireballTime = 0.0f;
         }
     }
 }
@@ -937,55 +936,55 @@ static inline unsigned short UnidentifiedAngleRange_800CD060(float degrees)
 inline bool DesireSuperPower::fn_800CCF90() const
 {
     bool fire = false;
-    if (mUnidentifiedFielder->mUnidentified40C - mUnidentifiedFielder->mUnidentified404 > lbl_806DC2B4
-        && mUnidentifiedFielder->IsFallenDown() != true)
+    if (m_pFielder->mUnidentified40C - m_pFielder->mUnidentified404 > lbl_806DC2B4
+        && m_pFielder->IsFallenDown() != true)
         fire = true;
     return fire;
 }
 
-void DesireSuperPower::fn_800CCC0C(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800CCC0C(DesireUpdate* update, float fDeltaT)
 {
-    mUnidentifiedFielder->mUnidentified40C += fDeltaT;
-    mUnidentifiedFielder->mUnidentified408 += lbl_806DC2B0 * fDeltaT;
-    mUnidentifiedFielder->mUnidentified408 = FMIN(
-        FMAX(mUnidentifiedFielder->mUnidentified408, lbl_806DC2A8), lbl_806DC2AC);
+    m_pFielder->mUnidentified40C += fDeltaT;
+    m_pFielder->mUnidentified408 += lbl_806DC2B0 * fDeltaT;
+    m_pFielder->mUnidentified408 = FMIN(
+        FMAX(m_pFielder->mUnidentified408, lbl_806DC2A8), lbl_806DC2AC);
     if (update->mData.i == 3)
     {
         if (update->ExtraData.Get(11)->mData.b)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
-            if (!mUnidentifiedFielder->mUnidentified3DC)
+            if (!m_pFielder->mUnidentified3DC)
             {
-                mUnidentifiedFielder->fn_80050284();
+                m_pFielder->fn_80050284();
             }
         }
-        else if (mUnidentifiedFielder->mUnidentified3DC)
+        else if (m_pFielder->mUnidentified3DC)
         {
-            mUnidentifiedFielder->fn_8005001C(false);
+            m_pFielder->fn_8005001C(false);
         }
         *update = 0;
     }
     if (update->mData.i == 0)
     {
-        bool active = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
         if (active)
         {
-            if (mUnidentifiedFielder->m_eAnimID == 104
-                && mUnidentifiedFielder->ShouldStartCrossBlend(4))
+            if (m_pFielder->m_eAnimID == 104
+                && m_pFielder->ShouldStartCrossBlend(4))
             {
-                mUnidentifiedFielder->EndDesire();
-                mUnidentifiedFielder->StartRunning();
+                m_pFielder->EndDesire();
+                m_pFielder->StartRunning();
             }
-            if (mUnidentifiedFielder->mUnidentified3DC)
+            if (m_pFielder->mUnidentified3DC)
             {
                 if (fn_800CCF90() == true)
                 {
-                    mUnidentifiedFielder->mUnidentified404 = mUnidentifiedFielder->mUnidentified40C;
-                    mUnidentifiedFielder->fn_800D0534(1.0f / (float)lbl_806DC2A0);
+                    m_pFielder->mUnidentified404 = m_pFielder->mUnidentified40C;
+                    m_pFielder->fn_800D0534(1.0f / (float)lbl_806DC2A0);
                     nlVector3 pos;
                     nlVector3 direction;
-                    const nlMatrix4& mat = mUnidentifiedFielder->m_pPoseAccumulator->GetNodeMatrix(
-                        mUnidentifiedFielder->m_nHeadJointIndex);
+                    const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
+                        m_pFielder->m_nHeadJointIndex);
                     nlVec3Set(direction, mat.m21, mat.m22, mat.m23);
                     nlVec3ScaleAdd(pos, lbl_806DC2B8, direction, (const nlVector3&)mat.m41);
                     nlPolar polar;
@@ -993,22 +992,22 @@ void DesireSuperPower::fn_800CCC0C(UnidentifiedDesireUpdate* update, float fDelt
                     unsigned short angle = polar.a;
                     unsigned short range = UnidentifiedAngleRange_800CD060(lbl_806DC2A4);
                     angle += nlRandom(range) - 0.5f * range;
-                    direction.x = mUnidentifiedFielder->mUnidentified408 * nlSin(angle + 0x4000);
-                    direction.y = mUnidentifiedFielder->mUnidentified408 * nlSin(angle);
+                    direction.x = m_pFielder->mUnidentified408 * nlSin(angle + 0x4000);
+                    direction.y = m_pFielder->mUnidentified408 * nlSin(angle);
                     direction.z = lbl_806DC2BC;
-                    nlVec3Add(direction, direction, mUnidentifiedFielder->mUnidentified024.m_v3Velocity);
-                    PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(3, mUnidentifiedFielder,
+                    nlVec3Add(direction, direction, m_pFielder->mUnidentified024.m_v3Velocity);
+                    PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(3, m_pFielder,
                         pos, direction, lbl_806DC2C4, lbl_806DC2C4, 9999.0f);
                     patch->m_Gravity = lbl_806DC2C0;
                 }
             }
         }
-        else if (mUnidentifiedFielder->m_eAnimID == 104)
+        else if (m_pFielder->m_eAnimID == 104)
         {
-            if (mUnidentifiedFielder->ShouldStartCrossBlend(4))
+            if (m_pFielder->ShouldStartCrossBlend(4))
             {
-                mUnidentifiedFielder->EndDesire();
-                mUnidentifiedFielder->StartRunning();
+                m_pFielder->EndDesire();
+                m_pFielder->StartRunning();
                 *update = 1;
             }
         }
@@ -1137,25 +1136,25 @@ extern "C" int fn_800CFCC8(cFielder* fielder, const unsigned short* angles,
     return bestIndex;
 }
 
-void DesireSuperPower::fn_800CDBF0(UnidentifiedDesireUpdate*, float)
+void DesireSuperPower::fn_800CDBF0(DesireUpdate*, float)
 {
-    if (mUnidentifiedFielder->fn_8002E060() == 13 && mUnidentifiedFielder->mUnidentified3DC)
+    if (m_pFielder->fn_8002E060() == 13 && m_pFielder->mUnidentified3DC)
     {
         nlVector2 direction;
-        nlSinCos(&direction.y, &direction.x, mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection);
-        if (mUnidentifiedFielder->m_pBall == 0 && NearToBall(mUnidentifiedFielder) >= 0.7f
-            || fn_800CD8F8(&direction, mUnidentifiedFielder))
-            mUnidentifiedFielder->fn_8005001C(true);
+        nlSinCos(&direction.y, &direction.x, m_pFielder->mUnidentified024.m_aActualFacingDirection);
+        if (m_pFielder->m_pBall == 0 && NearToBall(m_pFielder) >= 0.7f
+            || fn_800CD8F8(&direction, m_pFielder))
+            m_pFielder->fn_8005001C(true);
     }
-    else if (!mUnidentifiedFielder->mUnidentified3DC
-        && (mUnidentifiedFielder->fn_8002E060() == 12 || mUnidentifiedFielder->fn_8002E060() == 13))
+    else if (!m_pFielder->mUnidentified3DC
+        && (m_pFielder->fn_8002E060() == 12 || m_pFielder->fn_8002E060() == 13))
     {
-        if (!(bool)UserControlledT(mUnidentifiedFielder->m_pTeam))
+        if (!(bool)UserControlledT(m_pFielder->m_pTeam))
         {
-            mUnidentifiedFielder->fn_800305DC(0.0f);
+            m_pFielder->fn_800305DC(0.0f);
             nlVector3 direction;
-            const nlVector3& target = *fn_80040234(mUnidentifiedFielder);
-            nlVec3Sub(direction, target, mUnidentifiedFielder->mUnidentified024.m_v3Position);
+            const nlVector3& target = *fn_80040234(m_pFielder);
+            nlVec3Sub(direction, target, m_pFielder->mUnidentified024.m_v3Position);
             bool valid;
             float lengthSq = direction.GetLengthSq3D();
             if (lengthSq == 0.0f)
@@ -1170,43 +1169,43 @@ void DesireSuperPower::fn_800CDBF0(UnidentifiedDesireUpdate*, float)
             if (valid)
             {
                 unsigned short angle = fn_800D1CCC(direction.y, direction.x);
-                short delta = mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection - angle;
-                float sideline = CloseToSideline(mUnidentifiedFielder);
-                float question = fn_800DD744(mUnidentifiedFielder);
+                short delta = m_pFielder->mUnidentified024.m_aActualFacingDirection - angle;
+                float sideline = CloseToSideline(m_pFielder);
+                float question = fn_800DD744(m_pFielder);
                 int difference = fn_800D1D10(delta);
                 bool near = difference < 0x800
-                    && (mUnidentifiedFielder->m_pBall != 0 || (bool)(NearToBall(mUnidentifiedFielder) < 0.7f));
+                    && (m_pFielder->m_pBall != 0 || (bool)(NearToBall(m_pFielder) < 0.7f));
                 bool clear = false;
                 if (near && sideline < 0.9f && question < 0.9f)
                     clear = true;
-                bool moving = clear && mUnidentifiedFielder->mUnidentified024.m_fActualSpeed > 1.0f;
-                bool start = moving && !fn_800CD8F8((const nlVector2*)&direction, mUnidentifiedFielder);
+                bool moving = clear && m_pFielder->mUnidentified024.m_fActualSpeed > 1.0f;
+                bool start = moving && !fn_800CD8F8((const nlVector2*)&direction, m_pFielder);
                 if (start)
                 {
-                    bool active = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
-                    if (active && fn_8002EDC8(mUnidentifiedFielder, -1))
+                    bool active = m_pFielder->mUnidentified3E0 > 0.0f;
+                    if (active && fn_8002EDC8(m_pFielder, -1))
                     {
-                        mUnidentifiedFielder->fn_80050284();
-                        mUnidentifiedFielder->fn_8003057C(0);
+                        m_pFielder->fn_80050284();
+                        m_pFielder->fn_8003057C(0);
                     }
                 }
             }
         }
     }
-    else if (mUnidentifiedFielder->fn_8002E060() != 12
-        && mUnidentifiedFielder->fn_8002E060() != 13
-        && (!(bool)UserControlledT(mUnidentifiedFielder->m_pTeam) || mUnidentifiedFielder->mUnidentified3DC)
-        && (bool)(1.0f - ReceivingPass(mUnidentifiedFielder))
-        && (bool)(1.0f - fn_800DEAB4(mUnidentifiedFielder))
-        && fn_8002EDC8(mUnidentifiedFielder, -1))
+    else if (m_pFielder->fn_8002E060() != 12
+        && m_pFielder->fn_8002E060() != 13
+        && (!(bool)UserControlledT(m_pFielder->m_pTeam) || m_pFielder->mUnidentified3DC)
+        && (bool)(1.0f - ReceivingPass(m_pFielder))
+        && (bool)(1.0f - fn_800DEAB4(m_pFielder))
+        && fn_8002EDC8(m_pFielder, -1))
     {
-        if ((bool)UserControlledT(mUnidentifiedFielder->m_pTeam))
+        if ((bool)UserControlledT(m_pFielder->m_pTeam))
         {
             int count = fn_800D0004();
             nlVector3 pos;
             nlVec3Set(pos, mUnidentifiedPositions[0].x, mUnidentifiedPositions[0].y, 0.0f);
             nlVector3 direction;
-            nlVec3Sub(direction, pos, mUnidentifiedFielder->mUnidentified024.m_v3Position);
+            nlVec3Sub(direction, pos, m_pFielder->mUnidentified024.m_v3Position);
             float distance = nlVec2Length((const nlVector2&)direction);
             unsigned short angle = fn_800D1CCC(direction.y, direction.x);
             UnidentifiedVariantCollection params;
@@ -1217,25 +1216,25 @@ void DesireSuperPower::fn_800CDBF0(UnidentifiedDesireUpdate*, float)
             params.Set(1, FuzzyVariant(FT_INT, count));
             params.Set(13, FuzzyVariant(FT_FLOAT, lbl_806DC33C));
             params.Set(10, FuzzyVariant(FT_POINTER, (void*)fn_800CE588));
-            fn_8003EBD0(mUnidentifiedFielder, 12, &params);
+            fn_8003EBD0(m_pFielder, 12, &params);
         }
-        else if (mUnidentifiedFielder->mUnidentified3DC)
+        else if (m_pFielder->mUnidentified3DC)
         {
-            mUnidentifiedFielder->fn_8005001C(true);
+            m_pFielder->fn_8005001C(true);
         }
-        else if (mUnidentifiedFielder->m_pBall != 0 && InDefensiveZone(mUnidentifiedFielder) < 0.5f)
+        else if (m_pFielder->m_pBall != 0 && InDefensiveZone(m_pFielder) < 0.5f)
         {
             float x;
-            if (mUnidentifiedFielder->m_pBall != 0)
-                x = AIsgn(mUnidentifiedFielder->GetAIOffNetLocation(0).x);
+            if (m_pFielder->m_pBall != 0)
+                x = AIsgn(m_pFielder->GetAIOffNetLocation(0).x);
             else
-                x = AIsgn(mUnidentifiedFielder->GetAIDefNetLocation(0).x);
+                x = AIsgn(m_pFielder->GetAIDefNetLocation(0).x);
             nlVector2 direction;
             nlVec2Set(direction, x, 0.0f);
-            unsigned short facing = mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection;
+            unsigned short facing = m_pFielder->mUnidentified024.m_aActualFacingDirection;
             unsigned short angles[4] = { facing, facing + 0x4000, facing - 0x4000, facing + 0x8000 };
             float score = 0.0f;
-            unsigned short angle = angles[fn_800CFCC8(mUnidentifiedFielder, angles, 4, &direction, &score)];
+            unsigned short angle = angles[fn_800CFCC8(m_pFielder, angles, 4, &direction, &score)];
             if (score > 0.0f)
             {
                 UnidentifiedVariantCollection params;
@@ -1244,20 +1243,20 @@ void DesireSuperPower::fn_800CDBF0(UnidentifiedDesireUpdate*, float)
                 params.Set(18, FuzzyVariant(FT_FLOAT, lbl_806DC344));
                 params.Set(13, FuzzyVariant(FT_FLOAT, lbl_806DC348));
                 params.Set(10, FuzzyVariant(FT_POINTER, (void*)fn_800CEA20));
-                fn_8003EBD0(mUnidentifiedFielder, 12, &params);
+                fn_8003EBD0(m_pFielder, 12, &params);
             }
         }
-        else if (!(bool)Offensive(mUnidentifiedFielder->m_pTeam)
-            && NearToBall(fn_800D66C4(mUnidentifiedFielder)) < 0.35f
-            && NearToBall(fn_800D66A0(mUnidentifiedFielder)) < 0.35f
-            && FarToBall(mUnidentifiedFielder) < 0.35f)
+        else if (!(bool)Offensive(m_pFielder->m_pTeam)
+            && NearToBall(fn_800D66C4(m_pFielder)) < 0.35f
+            && NearToBall(fn_800D66A0(m_pFielder)) < 0.35f
+            && FarToBall(m_pFielder) < 0.35f)
         {
             UnidentifiedVariantCollection params;
             params.Set(7, FuzzyVariant(FT_FLOAT, lbl_806DC34C));
             params.Set(14, FuzzyVariant(g_pBall));
             params.Set(13, FuzzyVariant(FT_FLOAT, lbl_806DC350));
             params.Set(10, FuzzyVariant(FT_U32, (unsigned long)nlStringHash("TransDesireInterceptBall")));
-            fn_8003EBD0(mUnidentifiedFielder, 13, &params);
+            fn_8003EBD0(m_pFielder, 13, &params);
         }
     }
 }
@@ -1288,8 +1287,8 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CE588(
             else if (fn_800DBAB0(fielder) > 0.1f && fn_800C2F40(fielder))
             {
                 result = 3;
-                fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC35C));
-                fn_800B6A1C(&result, 10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
+                result.SetParameter(8, FuzzyVariant(lbl_806DC35C));
+                result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
             }
             else
             {
@@ -1307,14 +1306,14 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CE588(
             float distance = fn_800D1C80((const nlVector2*)&oldPos, (const nlVector2*)&pos);
             unsigned short angle = fn_800D1CCC(delta.y, delta.x);
             result = 3;
-            fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC360));
-            fn_800B6A1C(&result, 12, FuzzyVariant(lbl_806DC364));
-            fn_800B6A1C(&result, 17, FuzzyVariant((unsigned long)angle));
-            fn_800B6A1C(&result, 18, FuzzyVariant(distance));
-            fn_800B6A1C(&result, 0, FuzzyVariant(index));
-            fn_800B6A1C(&result, 1, FuzzyVariant(count));
-            fn_800B6A1C(&result, 13, FuzzyVariant(lbl_806DC368));
-            fn_800B6A1C(&result, 10, FuzzyVariant((void*)fn_800CE588));
+            result.SetParameter(8, FuzzyVariant(lbl_806DC360));
+            result.SetParameter(12, FuzzyVariant(lbl_806DC364));
+            result.SetParameter(17, FuzzyVariant((unsigned long)angle));
+            result.SetParameter(18, FuzzyVariant(distance));
+            result.SetParameter(0, FuzzyVariant(index));
+            result.SetParameter(1, FuzzyVariant(count));
+            result.SetParameter(13, FuzzyVariant(lbl_806DC368));
+            result.SetParameter(10, FuzzyVariant((void*)fn_800CE588));
             if (fn_800D1C34(fielder) && fn_800D1D34(machine) == 12)
             {
                 unsigned short absolute = fn_800D1D10(fn_800D1D10(fn_800D1D04(fn_800D1448(fielder), angle)));
@@ -1353,8 +1352,8 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
     if (fielder->m_pBall != 0 && shoot && InOffensiveZone(fielder) > 0.9f)
     {
         result = 3;
-        fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC374));
-        fn_800B6A1C(&result, 10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
+        result.SetParameter(8, FuzzyVariant(lbl_806DC374));
+        result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
         if (fielder->mUnidentified3DC)
             fielder->fn_8005001C(true);
     }
@@ -1404,20 +1403,20 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
             if (score == 0.0f && fielder->m_pBall != 0 && InOffensiveZone(fielder) > 0.0f)
             {
                 result = 3;
-                fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC378));
-                fn_800B6A1C(&result, 10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
+                result.SetParameter(8, FuzzyVariant(lbl_806DC378));
+                result.SetParameter(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireWindupMegastrike")));
                 if (fielder->mUnidentified3DC)
                     fielder->fn_8005001C(true);
             }
             else
             {
                 result = 3;
-                fn_800B6A1C(&result, 8, FuzzyVariant(lbl_806DC37C));
-                fn_800B6A1C(&result, 12, FuzzyVariant(lbl_806DC380));
-                fn_800B6A1C(&result, 17, FuzzyVariant((unsigned long)angle));
-                fn_800B6A1C(&result, 18, FuzzyVariant(lbl_806DC384));
-                fn_800B6A1C(&result, 13, FuzzyVariant(lbl_806DC388));
-                fn_800B6A1C(&result, 10, FuzzyVariant((void*)fn_800CEA20));
+                result.SetParameter(8, FuzzyVariant(lbl_806DC37C));
+                result.SetParameter(12, FuzzyVariant(lbl_806DC380));
+                result.SetParameter(17, FuzzyVariant((unsigned long)angle));
+                result.SetParameter(18, FuzzyVariant(lbl_806DC384));
+                result.SetParameter(13, FuzzyVariant(lbl_806DC388));
+                result.SetParameter(10, FuzzyVariant((void*)fn_800CEA20));
             }
             if (fielder->mUnidentified3DC && machine->UnidentifiedGetState() == 12)
             {
@@ -1433,82 +1432,82 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
     return result;
 }
 
-void DesireSuperPower::fn_800D01A0(UnidentifiedDesireUpdate* update, float fDeltaT)
+void DesireSuperPower::fn_800D01A0(DesireUpdate* update, float fDeltaT)
 {
     if (update->mData.i == 3)
     {
         if (update->ExtraData.Get(11)->mData.b)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
-            if (!mUnidentifiedFielder->mUnidentified3DC)
-                mUnidentifiedFielder->fn_80050284();
+            if (!m_pFielder->mUnidentified3DC)
+                m_pFielder->fn_80050284();
         }
-        else if (mUnidentifiedFielder->mUnidentified3DC)
-            mUnidentifiedFielder->fn_8005001C(false);
+        else if (m_pFielder->mUnidentified3DC)
+            m_pFielder->fn_8005001C(false);
         *update = 0;
     }
     if (update->mData.i == 0)
     {
-        bool active = mUnidentifiedFielder->mUnidentified3E0 > 0.0f;
+        bool active = m_pFielder->mUnidentified3E0 > 0.0f;
         if (active)
         {
-            if (mUnidentifiedFielder->m_eAnimID == 104
-                && mUnidentifiedFielder->ShouldStartCrossBlend(4))
+            if (m_pFielder->m_eAnimID == 104
+                && m_pFielder->ShouldStartCrossBlend(4))
             {
-                mUnidentifiedFielder->EndDesire();
-                mUnidentifiedFielder->StartRunning();
+                m_pFielder->EndDesire();
+                m_pFielder->StartRunning();
             }
-            if (mUnidentifiedFielder->mUnidentified3DC)
+            if (m_pFielder->mUnidentified3DC)
             {
-                if (!fn_8002EDC8(mUnidentifiedFielder, -1))
+                if (!fn_8002EDC8(m_pFielder, -1))
                 {
-                    mUnidentifiedFielder->fn_8005001C(true);
+                    m_pFielder->fn_8005001C(true);
                     return;
                 }
-                mUnidentifiedFielder->mUnidentified3F4 -= fDeltaT;
-                if (mUnidentifiedFielder->mUnidentified3F4 <= 0.0f)
+                m_pFielder->mUnidentified3F4 -= fDeltaT;
+                if (m_pFielder->mUnidentified3F4 <= 0.0f)
                 {
                     unsigned long sound = PowerupBase::GetSoundType(
-                        (ePowerUpType)mUnidentifiedFielder->mUnidentified11C->unknown_0x14,
+                        (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
-                    PlaySound(mUnidentifiedFielder->mUnidentified318, sound, 0, 0);
-                    fn_800367B4(mUnidentifiedFielder);
-                    mUnidentifiedFielder->fn_800D0534(lbl_806DC298);
-                    mUnidentifiedFielder->mUnidentified3F4 = lbl_806DC298;
+                    PlaySound(m_pFielder->mUnidentified318, sound, 0, 0);
+                    fn_800367B4(m_pFielder);
+                    m_pFielder->fn_800D0534(lbl_806DC298);
+                    m_pFielder->mUnidentified3F4 = lbl_806DC298;
                     nlVector3 pos;
                     nlVector3 offset;
                     nlPolarToCartesian(offset.x, offset.y,
-                        mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection, lbl_806DC29C);
+                        m_pFielder->mUnidentified024.m_aActualFacingDirection, lbl_806DC29C);
                     offset.z = 0.0f;
-                    const nlMatrix4& mat = mUnidentifiedFielder->m_pPoseAccumulator->GetNodeMatrix(
-                        mUnidentifiedFielder->m_nBip01JointIndex_0xA4);
+                    const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
+                        m_pFielder->m_nBip01JointIndex_0xA4);
                     nlVec3Add(pos, (const nlVector3&)mat.m41, offset);
-                    lbl_806E12C8->fn_801743A8(0, mUnidentifiedFielder, pos, lbl_804DC338,
+                    lbl_806E12C8->fn_801743A8(0, m_pFielder, pos, lbl_804DC338,
                         lbl_806DC244, lbl_806DC248, lbl_806DC24C);
-                    PlayRumbleAction(1, mUnidentifiedFielder->GetGlobalPad());
+                    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
                     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("wario_ignition");
                     if (group != 0)
                     {
                         EmissionController* emitter = EmissionManager::Instance()->Create(group, 3, true, 0);
-                        emitter->m_uUserData = (unsigned int)mUnidentifiedFielder;
-                        emitter->SetPosition(mUnidentifiedFielder->mUnidentified024.m_v3Position);
-                        emitter->SetVelocity(mUnidentifiedFielder->mUnidentified024.m_v3Velocity);
+                        emitter->m_uUserData = (unsigned int)m_pFielder;
+                        emitter->SetPosition(m_pFielder->mUnidentified024.m_v3Position);
+                        emitter->SetVelocity(m_pFielder->mUnidentified024.m_v3Velocity);
                         emitter->SetUpdateCallback(UpdateEmitterFromCharacterBackward);
                     }
                 }
-                if ((bool)UserControlledT(mUnidentifiedFielder->m_pTeam))
+                if ((bool)UserControlledT(m_pFielder->m_pTeam))
                 {
-                    bool userControlled = (bool)mUnidentifiedFielder->GetGlobalPad();
-                    if (!userControlled && mUnidentifiedFielder->fn_8002E060() != 12)
+                    bool userControlled = (bool)m_pFielder->GetGlobalPad();
+                    if (!userControlled && m_pFielder->fn_8002E060() != 12)
                     {
                         nlVector3 pos;
                         pos.z = 0.0f;
                         nlPolarToCartesian(pos.x, pos.y,
-                            mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection, 5.0f);
-                        nlVec3Add(pos, mUnidentifiedFielder->mUnidentified024.m_v3Position, pos);
-                        cField::FixOutOfBoundsPosition(pos, mUnidentifiedFielder->mUnidentified320->GetRadius(), true);
+                            m_pFielder->mUnidentified024.m_aActualFacingDirection, 5.0f);
+                        nlVec3Add(pos, m_pFielder->mUnidentified024.m_v3Position, pos);
+                        cField::FixOutOfBoundsPosition(pos, m_pFielder->mUnidentified320->GetRadius(), true);
                         nlVector3 delta;
-                        nlVec3Sub(delta, pos, mUnidentifiedFielder->mUnidentified024.m_v3Position);
+                        nlVec3Sub(delta, pos, m_pFielder->mUnidentified024.m_v3Position);
                         float distance = nlSqrt(delta.GetLengthSq2D(), true);
                         unsigned short angle = fn_800D1CCC(delta.y, delta.x);
                         UnidentifiedVariantCollection params;
@@ -1517,21 +1516,21 @@ void DesireSuperPower::fn_800D01A0(UnidentifiedDesireUpdate* update, float fDelt
                         params.Set(18, FuzzyVariant(FT_FLOAT, distance));
                         params.Set(13, FuzzyVariant(FT_FLOAT, lbl_806DC390));
                         params.Set(10, FuzzyVariant(FT_INT, lbl_806DC394));
-                        fn_8003EBD0(mUnidentifiedFielder, 12, &params);
+                        fn_8003EBD0(m_pFielder, 12, &params);
                     }
                 }
             }
             else
             {
-                mUnidentifiedFielder->mUnidentified3F4 = 0.0f;
+                m_pFielder->mUnidentified3F4 = 0.0f;
             }
         }
-        else if (mUnidentifiedFielder->m_eAnimID == 104)
+        else if (m_pFielder->m_eAnimID == 104)
         {
-            if (mUnidentifiedFielder->ShouldStartCrossBlend(4))
+            if (m_pFielder->ShouldStartCrossBlend(4))
             {
-                mUnidentifiedFielder->EndDesire();
-                mUnidentifiedFielder->StartRunning();
+                m_pFielder->EndDesire();
+                m_pFielder->StartRunning();
                 *update = 1;
             }
         }
@@ -1722,32 +1721,32 @@ extern "C" float fn_800D1D4C(const DesireRunInDirection* desire)
  */
 extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
 {
-    gNPCManager->mUnidentified024->Activate(self->mUnidentifiedFielder);
-    self->mUnidentifiedFielder->m_pTweaks
-        = self->mUnidentifiedFielder->mUnidentified328;
-    fn_8002E52C(self->mUnidentifiedFielder);
-    if (self->mUnidentifiedFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    gNPCManager->mUnidentified024->Activate(self->m_pFielder);
+    self->m_pFielder->m_pTweaks
+        = self->m_pFielder->mUnidentified328;
+    fn_8002E52C(self->m_pFielder);
+    if (self->m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
-        self->mUnidentifiedFielder->fn_8009750C();
-        self->mUnidentifiedFielder->EndAction();
+        self->m_pFielder->fn_8009750C();
+        self->m_pFielder->EndAction();
     }
-    self->mUnidentifiedFielder->bYoshiInWindup
-        = (self->mUnidentifiedFielder->m_eActionState
+    self->m_pFielder->bYoshiInWindup
+        = (self->m_pFielder->m_eActionState
             == ACTION_UNKNOWN_30);
-    if ((self->mUnidentifiedFielder->fn_8002E060() == 21)
-        || (self->mUnidentifiedFielder->fn_8002E060() == 19)
-        || (self->mUnidentifiedFielder->fn_8002E060() == 18)
-        || (self->mUnidentifiedFielder->fn_8002E060() == 9))
+    if ((self->m_pFielder->fn_8002E060() == 21)
+        || (self->m_pFielder->fn_8002E060() == 19)
+        || (self->m_pFielder->fn_8002E060() == 18)
+        || (self->m_pFielder->fn_8002E060() == 9))
     {
-        self->mUnidentifiedFielder->EndDesire();
-        self->mUnidentifiedFielder->StartRunning();
+        self->m_pFielder->EndDesire();
+        self->m_pFielder->StartRunning();
     }
-    else if (self->mUnidentifiedFielder->m_eActionState
+    else if (self->m_pFielder->m_eActionState
         == ACTION_UNKNOWN_30)
     {
-        self->mUnidentifiedFielder->StartRunning();
+        self->m_pFielder->StartRunning();
     }
-    fn_800395C0(self->mUnidentifiedFielder);
+    fn_800395C0(self->m_pFielder);
     self->mUnidentified078 = lbl_806DC32C;
     return true;
 }
@@ -1757,33 +1756,33 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
  */
 extern "C" bool fn_800C9F4C(DesireSuperPower* self, void*)
 {
-    if (self->mUnidentifiedFielder->GetGlobalPad() != 0)
+    if (self->m_pFielder->GetGlobalPad() != 0)
     {
-        if (self->mUnidentifiedFielder->m_pController
+        if (self->m_pFielder->m_pController
                 ->GetMovementStickMagnitude() > 0.01f)
         {
-            self->mUnidentifiedFielder->m_pController
+            self->m_pFielder->m_pController
                 ->GetMovementStickDirection();
         }
     }
     short dir = 0;
     cFielder* target = FindPowerupTarget(
-        self->mUnidentifiedFielder, (ePowerUpType)-1);
+        self->m_pFielder, (ePowerUpType)-1);
     self->mpTarget = target;
     if ((target != 0) && (lbl_806DC2F8 != 0))
     {
-        dir = self->mUnidentifiedFielder->GetFacingDeltaToPosition(
+        dir = self->m_pFielder->GetFacingDeltaToPosition(
             target->mUnidentified024.m_v3Position);
     }
-    self->mUnidentifiedFielder->InitDesire(
+    self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    self->mUnidentifiedFielder->SetAction((eFielderActionState)29);
-    self->mUnidentifiedFielder->muInvincibleStatus |= 1;
-    self->mUnidentifiedFielder->SetAnimState(104, true, 0.2f, false, false);
-    self->mUnidentifiedFielder->InitMovementFromAnim(
+    self->m_pFielder->SetAction((eFielderActionState)29);
+    self->m_pFielder->muInvincibleStatus |= 1;
+    self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
+    self->m_pFielder->InitMovementFromAnim(
         dir, lbl_804DC338, 0.15f, false);
     self->mUnidentified078 = lbl_806DC2E0;
-    return self->mUnidentifiedFielder->m_eActionState
+    return self->m_pFielder->m_eActionState
         == (eFielderActionState)29;
 }
 
@@ -1794,7 +1793,7 @@ extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
 {
     if (param != 0)
     {
-        self->mUnidentifiedFielder->fn_8004FF40();
+        self->m_pFielder->fn_8004FF40();
     }
     fn_80316968(self);
 }
@@ -1804,33 +1803,33 @@ extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
  */
 extern "C" bool fn_800CAC8C(DesireSuperPower* self, void*)
 {
-    if (self->mUnidentifiedFielder->GetGlobalPad() != 0)
+    if (self->m_pFielder->GetGlobalPad() != 0)
     {
-        if (self->mUnidentifiedFielder->m_pController
+        if (self->m_pFielder->m_pController
                 ->GetMovementStickMagnitude() > 0.01f)
         {
-            self->mUnidentifiedFielder->m_pController
+            self->m_pFielder->m_pController
                 ->GetMovementStickDirection();
         }
     }
     short dir = 0;
     cFielder* target = FindPowerupTarget(
-        self->mUnidentifiedFielder, (ePowerUpType)-1);
+        self->m_pFielder, (ePowerUpType)-1);
     self->mpTarget = target;
     if ((target != 0) && (lbl_806DC314 != 0))
     {
-        dir = self->mUnidentifiedFielder->GetFacingDeltaToPosition(
+        dir = self->m_pFielder->GetFacingDeltaToPosition(
             target->mUnidentified024.m_v3Position);
     }
-    self->mUnidentifiedFielder->InitDesire(
+    self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    self->mUnidentifiedFielder->SetAction((eFielderActionState)29);
-    self->mUnidentifiedFielder->muInvincibleStatus |= 1;
-    self->mUnidentifiedFielder->SetAnimState(104, true, 0.2f, false, false);
-    self->mUnidentifiedFielder->InitMovementFromAnim(
+    self->m_pFielder->SetAction((eFielderActionState)29);
+    self->m_pFielder->muInvincibleStatus |= 1;
+    self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
+    self->m_pFielder->InitMovementFromAnim(
         dir, lbl_804DC338, 0.15f, false);
     self->mUnidentified078 = lbl_806DC2FC;
-    return self->mUnidentifiedFielder->m_eActionState
+    return self->m_pFielder->m_eActionState
         == (eFielderActionState)29;
 }
 
@@ -1839,30 +1838,30 @@ extern "C" bool fn_800CAC8C(DesireSuperPower* self, void*)
  */
 extern "C" void fn_800C9DB4(DesireSuperPower* self)
 {
-    fn_80038158(self->mUnidentifiedFielder, 0);
+    fn_80038158(self->m_pFielder, 0);
     nlVector3 vel;
     vel.z = 0.0f;
     nlPolarToCartesian(vel.x, vel.y,
-        self->mUnidentifiedFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
+        self->m_pFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
     nlVec3Scale(vel, vel, lbl_806DC2F4);
-    nlVector3 pos = self->mUnidentifiedFielder->GetJointPosition(
-        self->mUnidentifiedFielder->m_nHeadJointIndex);
+    nlVector3 pos = self->m_pFielder->GetJointPosition(
+        self->m_pFielder->m_nHeadJointIndex);
     PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(7,
-        self->mUnidentifiedFielder, pos, vel,
+        self->m_pFielder, pos, vel,
         lbl_806DC2E4, lbl_806DC2E8, lbl_806DC2EC);
     patch->fn_80173B08(lbl_806DC2F0);
-    PlayRumbleAction(1, self->mUnidentifiedFielder->GetGlobalPad());
+    PlayRumbleAction(1, self->m_pFielder->GetGlobalPad());
     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
         "bowserjr_shriek_mouth");
     if (group != 0)
     {
         EmissionController* controller = EmissionManager::Instance()->Create(
             group, 3, true, 0);
-        controller->m_uUserData = (u32)self->mUnidentifiedFielder;
+        controller->m_uUserData = (u32)self->m_pFielder;
         controller->SetPosition(
-            self->mUnidentifiedFielder->mUnidentified024.m_v3Position);
+            self->m_pFielder->mUnidentified024.m_v3Position);
         controller->SetVelocity(
-            self->mUnidentifiedFielder->mUnidentified024.m_v3Velocity);
+            self->m_pFielder->mUnidentified024.m_v3Velocity);
         controller->SetUpdateCallback(
             Function1<void, EmissionController&>(
                 UpdateEmitterFromCharacterForward));

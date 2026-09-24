@@ -300,19 +300,23 @@ void DolphinFile::Read(void* buffer, unsigned int size, unsigned long bufferSize
 
 void AsyncManager::CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback callback)
 {
-    if (pFile->PendingAsync == 0 || m_activeEntryList == 0)
+    if (pFile->PendingAsync == 0)
+    {
+        return;
+    }
+    if (m_activeEntryList == 0)
     {
         return;
     }
 
-    AsyncEntry* entry = m_activeEntryList->m_next;
+    AsyncEntry* entry = nlDLRingGetStart(m_activeEntryList);
     for (;;)
     {
         AsyncEntry* next = entry->m_next;
-        BOOL interrupts = OSDisableInterrupts();
+        bool interrupts = OSDisableInterrupts();
         if (entry->m_pFile == pFile && !IsAsyncReadBusy(entry))
         {
-            --pFile->PendingAsync;
+            --entry->m_pFile->PendingAsync;
             mCurrent = entry;
             if (callback != 0)
             {
@@ -324,7 +328,7 @@ void AsyncManager::CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback ca
         }
         OSRestoreInterrupts(interrupts);
 
-        if (m_activeEntryList == 0 || entry == m_activeEntryList)
+        if (nlDLRingIsEnd(m_activeEntryList, entry))
         {
             break;
         }

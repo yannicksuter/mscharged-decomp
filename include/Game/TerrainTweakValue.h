@@ -54,6 +54,8 @@ public:
 class TerrainTweakValue : public TerrainTweakValueBase
 {
 public:
+    virtual ~TerrainTweakValue() { }
+
     TerrainTweakValue(
         const char* name, const char* category, int value, char**)
         : TerrainTweakValueBase(name, category, value)
@@ -114,35 +116,6 @@ inline void TerrainTweakValueBase::UnidentifiedVirtual14(
 }
 
 inline void TerrainTweakValueBase::UnidentifiedVirtual18()
-{
-}
-
-inline void TerrainTweakValueBase::CopyValueFrom(TweakValueBase*)
-{
-}
-
-inline int TerrainTweakValueBase::GetStorageKind()
-{
-    return 0;
-}
-
-inline int TerrainTweakValueBase::GetValueType()
-{
-    return 0;
-}
-
-inline void* TerrainTweakValueBase::GetValueAddress()
-{
-    return 0;
-}
-
-inline void TerrainTweakValueBase::FormatValue(
-    char* buffer, unsigned long size)
-{
-    buffer[0] = '\0';
-}
-
-inline void TerrainTweakValueBase::ParseValue(const char*)
 {
 }
 

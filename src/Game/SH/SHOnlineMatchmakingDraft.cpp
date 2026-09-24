@@ -10,6 +10,7 @@
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
 #include "Game/NetworkLobby.h"

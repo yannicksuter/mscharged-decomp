@@ -26,30 +26,27 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 static float gUnidentified804FAD80[4] = { 0.15f, 0.4f, 0.0f, 0.0f };
 
-extern float lbl_806DB9C8;
-extern float lbl_806DB9CC;
-extern float lbl_806DB9D0;
-extern float lbl_806DB9D4;
-extern float lbl_806DB9D8;
-extern float lbl_806DB9DC;
-extern float lbl_806DB9E0;
-extern float lbl_806DB9E4;
-extern float lbl_806DB9E8;
-extern float lbl_806DB9EC;
-extern float lbl_806DB9F0;
-extern float lbl_806DB9F4;
-extern float lbl_806DB9F8;
-extern float lbl_806DB9FC;
-extern float lbl_806DBA00;
-extern float lbl_806DBA04;
-extern float lbl_806DBA08;
-extern int lbl_806DBA0C;
-extern float lbl_806DBA10;
-extern float lbl_806E0C78;
-extern bool lbl_806E0C7C;
-extern float lbl_806E364C;
-extern float lbl_806E3650;
-extern float lbl_806E3658;
+float lbl_806DB9C8 = 0.25f;
+float lbl_806DB9CC = 15.0f;
+float lbl_806DB9D0 = 30.0f;
+float lbl_806DB9D4 = 1.0f;
+float lbl_806DB9D8 = 9.0f;
+float lbl_806DB9DC = 2.5f;
+float lbl_806DB9E0 = 0.3f;
+float lbl_806DB9E4 = 3.5f;
+float lbl_806DB9E8 = 0.3f;
+float lbl_806DB9EC = 1.5f;
+float lbl_806DB9F0 = 0.5f;
+float lbl_806DB9F4 = 5.4f;
+float lbl_806DB9F8 = 5.15f;
+float lbl_806DB9FC = 1.0f;
+float lbl_806DBA00 = 10.0f;
+float lbl_806DBA04 = 15.0f;
+float lbl_806DBA08 = 0.5f;
+int lbl_806DBA0C = 4;
+float lbl_806DBA10 = 0.4f;
+float lbl_806E0C78;
+bool lbl_806E0C7C;
 
 extern const FuzzyVariant fvNotSet;
 
@@ -193,7 +190,7 @@ void cFielder::fn_8004FC90(float fDeltaT)
     if (fFrame <= 1.0f)
     {
         u32 aFacing = mUnidentified024.m_aActualFacingDirection;
-        float fBlend = fFrame * (lbl_806E3650 * fFrame + lbl_806E364C);
+        float fBlend = fFrame * (-2.0f * fFrame + 3.0f);
         fBlend = fFrame * fBlend;
         float fTurn = (float)aFacing / 65536.0f;
         fTurn = lbl_806DBA08 - fTurn;
@@ -314,9 +311,9 @@ void cFielder::fn_8005001C(bool bForce)
             bool bRunning = mUnidentified3E0 > 0.0f;
             if (bRunning)
             {
-                if (mUnidentified3E0 < lbl_806E3658)
+                if (mUnidentified3E0 < 0.03f)
                 {
-                    mUnidentified3E0 = lbl_806E3658;
+                    mUnidentified3E0 = 0.03f;
                 }
             }
             mUnidentified3E8.nextFireballTime = 0.0f;

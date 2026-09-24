@@ -10,6 +10,7 @@ class TLComponentInstance;
 class TLImageInstance;
 class TLInstance;
 struct UnidentifiedTLGroupInstance;
+struct CharacterInfo;
 
 struct TU801DE42CComponent
 {
@@ -40,6 +41,9 @@ public:
     int fn_801DCD74(int index);
     void fn_801DCD84(int value);
     void fn_801DCD8C(int index, int value);
+    static TLImageInstance* FindSidekickImage(int sidekick, int captain);
+    static TLImageInstance* FindCaptainImage(int captain, bool left);
+    static void SetOverallSlide(TLComponentInstance* overall, const CharacterInfo& info);
 
     /* 0x04 */ TLComponentInstance* mComponent;
     /* 0x08 */ TLComponentInstance* mUnidentified08;

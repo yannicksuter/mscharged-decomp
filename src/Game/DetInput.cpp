@@ -341,8 +341,9 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
     else if (backend->GetClassID() == gWiiRemotePadClassID)
     {
         m_nConnected = 1;
+        WPADStatus* status;
         WiiRemotePad* remote = static_cast<WiiRemotePad*>(pad->mBackend);
-        WPADStatus* status = &remote->mCurrentStatus->wpad;
+        status = &remote->mCurrentStatus->wpad;
         m_ButtonBitfield = status->button;
         m_LeftTrigger = 0;
         m_RightTrigger = 0;
@@ -353,15 +354,17 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
         m_v3RevFreeStyleAccel.x = 0.0f;
         m_v3RevFreeStyleAccel.y = 0.0f;
         m_v3RevFreeStyleAccel.z = 0.0f;
-        m_nRevDPDNumTargets = remote->mCurrentStatus->kpad.dpd_valid_fg;
-        m_v2RevDPDCoord.x = remote->mCurrentStatus->kpad.pos.x;
-        m_v2RevDPDCoord.y = remote->mCurrentStatus->kpad.pos.y;
+        KPADStatus* kpad = &remote->mCurrentStatus->kpad;
+        m_nRevDPDNumTargets = kpad->dpd_valid_fg;
+        m_v2RevDPDCoord.x = kpad->pos.x;
+        m_v2RevDPDCoord.y = kpad->pos.y;
     }
     else if (backend->GetClassID() == gWiiFreestylePadClassID)
     {
         m_nConnected = 2;
+        WPADFSStatus* status;
         WiiFreestylePad* nunchuk = static_cast<WiiFreestylePad*>(pad->mBackend);
-        WPADFSStatus* status = &nunchuk->mCurrentStatus->wpad;
+        status = &nunchuk->mCurrentStatus->wpad;
         m_ButtonBitfield = status->button;
         m_LeftTrigger = 0;
         m_RightTrigger = 0;
@@ -372,9 +375,10 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
         m_v3RevFreeStyleAccel.x = scale * status->fsAccX;
         m_v3RevFreeStyleAccel.y = scale * status->fsAccY;
         m_v3RevFreeStyleAccel.z = scale * status->fsAccZ;
-        m_nRevDPDNumTargets = nunchuk->mCurrentStatus->kpad.dpd_valid_fg;
-        m_v2RevDPDCoord.x = nunchuk->mCurrentStatus->kpad.pos.x;
-        m_v2RevDPDCoord.y = nunchuk->mCurrentStatus->kpad.pos.y;
+        KPADStatus* kpad = &nunchuk->mCurrentStatus->kpad;
+        m_nRevDPDNumTargets = kpad->dpd_valid_fg;
+        m_v2RevDPDCoord.x = kpad->pos.x;
+        m_v2RevDPDCoord.y = kpad->pos.y;
     }
     else if (backend->GetClassID() == gGameCubePadClassID)
     {
@@ -396,8 +400,8 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
     }
     else if (backend->GetClassID() == PadMonkey::sClassID)
     {
-        PadMonkey* monkey = static_cast<PadMonkey*>(pad->mBackend);
         m_nConnected = 3;
+        PadMonkey* monkey = static_cast<PadMonkey*>(pad->mBackend);
         m_ButtonBitfield = 0;
         for (int button = 1; button < (1 << monkey->GetButtonCount()); button <<= 1)
         {

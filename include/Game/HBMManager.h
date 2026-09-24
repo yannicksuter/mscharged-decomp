@@ -19,7 +19,7 @@ public:
     void Show();
     void Update();
     static void Render();
-    void Unblock();
+    void Unblock() { mBlocked = false; }
     void SetBlocked(bool blocked) { mBlocked = blocked; }
     bool IsBlocked();
     void OnHomeButtonPressed();

@@ -105,7 +105,7 @@ public:
     /* 0x00ED */ bool mMachineInfoReceived[4];
     /* 0x00F1 */ u8 mPadding0F1[3];
     /* 0x00F4 */ NetworkDraftMachineInfo mMachineInfo[4];
-    /* 0x02F4 */ bool mMatchmakingThreadRunning;
+    /* 0x02F4 */ volatile bool mMatchmakingThreadRunning;
     /* 0x02F5 */ u8 mPadding2F5[3];
     /* 0x02F8 */ u8 mMatchmakingThread[0x318];
     /* 0x0610 */ u8 mMatchmakingThreadStack[0x4000];

@@ -5,6 +5,7 @@
 #include "Game/FE/FEAudio.h"
 
 #include "Game/FE/feInput.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "NL/nlBind.h"

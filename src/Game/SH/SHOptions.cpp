@@ -9,6 +9,7 @@
 #include "Game/FE/feFinder.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feMusic.h"
+#include "Game/FE/fePointer.inl"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Render/FrontEndPresentation.h"

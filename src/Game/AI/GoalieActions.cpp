@@ -953,6 +953,7 @@ void Goalie::fn_80083DE0(float fDeltaT)
 
 extern "C" void fn_80083EC0(Goalie*)
 {
+    unsigned int i;
     ResetMegaBallIndicators();
 
     float fCenterX = 320.0f;
@@ -975,7 +976,7 @@ extern "C" void fn_80083EC0(Goalie*)
     nIndices[4] = 4;
     nIndices[5] = 5;
 
-    for (unsigned int i = 0; i < 15; i++)
+    for (i = 0; i < 15; i++)
     {
         int nFirst = nlRandom(6);
         int nSecond = nlRandom(5);
@@ -989,7 +990,7 @@ extern "C" void fn_80083EC0(Goalie*)
         nIndices[nSecond] = nTemp;
     }
 
-    for (unsigned int i = 0;
+    for (i = 0;
         i < g_pGame->mUnidentified28;
         i++)
     {
@@ -1003,18 +1004,18 @@ extern "C" void fn_80083EC0(Goalie*)
                        - 0.5f * lbl_806DBC0C));
 
         MegaBallIndicator* pState
-            = CreateMegaBallIndicator((float)nX, (float)nY, 0.0f);
+            = CreateMegaBallIndicator((float)nX, (float)nY, 1.0f);
         pState->mVisible = false;
     }
 
-    for (unsigned int i = 0;
-        i < g_pGame->mUnidentified28;
-        i++)
+    for (unsigned int j = 0;
+        j < g_pGame->mUnidentified28;
+        j++)
     {
-        MegaBallIndicator* pState = GetMegaBallIndicator(i);
+        MegaBallIndicator* pState = GetMegaBallIndicator(j);
         pState->mActive = false;
 
-        LiveBallTrail* pBallTrail = fn_8001B284(i);
+        LiveBallTrail* pBallTrail = fn_8001B284(j);
         nlVector3 v3Position = { 0.0f, 60.0f, -60.0f };
         pBallTrail->position = v3Position;
         fn_8001AA0C(pBallTrail, false);

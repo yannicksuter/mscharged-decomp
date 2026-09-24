@@ -329,13 +329,11 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
         for (int i = 0; i < round; ++i)
         {
             BasicGameInfo* game = g_pCupManager->GetMatchupInfo(2, (short)i, 0);
-            short captainSide = i == 1;
-            short userSide = i != 1;
-            short captainScore = game->GetFinalScore(captainSide);
-            short userScore = game->GetFinalScore(userSide);
-            if (captainScore > userScore)
+            bool captainSide = (i == 1) ? true : false;
+            bool userSide = (i != 1) ? true : false;
+            if (game->GetFinalScore(captainSide) > game->GetFinalScore(userSide))
                 ++losses;
-            else if (captainScore < userScore)
+            else if (game->GetFinalScore(captainSide) < game->GetFinalScore(userSide))
                 ++wins;
         }
 
@@ -594,3 +592,5 @@ void CupManager::SetShowCupPhasePopup(bool value)
 {
     mShowCupPhasePopup = value;
 }
+
+#include "Game/FE/fePointer.inl"

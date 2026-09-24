@@ -7,6 +7,8 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+extern int sUnidentified_806E1FAC;
+
 class GLView;
 class EffectsLight;
 struct glModel;

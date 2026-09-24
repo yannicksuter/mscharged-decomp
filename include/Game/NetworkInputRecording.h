@@ -11,7 +11,7 @@ struct PackedDetInput;
 struct NetworkInputRecording
 {
     void Reset(bool constructing);
-    void StartNetworkInputRecording(s8 localMachine, int machineCount, u32 randomSeed, const void* config, int configSize);
+    void StartNetworkInputRecording(int localMachine, int machineCount, u32 randomSeed, const void* config, int configSize);
     bool ReadNetworkInputRecordingHeader();
     int GetNetworkInputPlaybackExtraUpdates();
     void WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u16 eventCount, u32 value);
@@ -26,7 +26,7 @@ struct NetworkInputRecording
 
     /* 0x00 */ bool mRecordingEnabled;
     /* 0x01 */ bool mRecording;
-    /* 0x02 */ u8 mUnidentified02;
+    /* 0x02 */ bool mUnidentified02;
     /* 0x03 */ bool mPlaybackEnabled;
     /* 0x04 */ bool mPlaybackReady;
     /* 0x05 */ char mFileName[0x64];

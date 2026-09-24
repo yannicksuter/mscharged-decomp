@@ -130,21 +130,17 @@ nlMatrix4& nlMakeRotTransMatrix(
     nlVector3 v3Forward;
     nlVector3 v3Up;
 
-    nlVec3Scale(v3Up, v3UpVector, nlRecipSqrt(nlVec3LengthSquared(v3UpVector), true));
-    nlVec3Scale(
-        v3Forward, v3ForwardVector, nlRecipSqrt(nlVec3LengthSquared(v3ForwardVector), true));
+    nlVec3Normalize(v3Up, v3UpVector);
+    nlVec3Normalize(v3Forward, v3ForwardVector);
     nlVec3CrossProduct(v3Right, v3Up, v3Forward);
 
     if (nlVec3LengthSquared(v3Right) < 0.1f)
     {
-        nlVec3Scale(
-            v3Up,
-            v3AlternateUpVector,
-            nlRecipSqrt(nlVec3LengthSquared(v3AlternateUpVector), true));
+        nlVec3Normalize(v3Up, v3AlternateUpVector);
         nlVec3CrossProduct(v3Right, v3Up, v3Forward);
     }
 
-    nlVec3Scale(v3Right, nlRecipSqrt(nlVec3LengthSquared(v3Right), true));
+    nlVec3Normalize(v3Right, v3Right);
     nlVec3CrossProduct(v3Up, v3Forward, v3Right);
 
     out.SetRow_(0, v3Forward);

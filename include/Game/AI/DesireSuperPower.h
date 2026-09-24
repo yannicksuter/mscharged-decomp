@@ -26,7 +26,7 @@ public:
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
-    virtual void Update(UnidentifiedDesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -36,21 +36,21 @@ public:
 private:
     static UnidentifiedVariant_80054AB8 fn_800CE588(const FuzzyVariant&, shdStateMachine*);
     static UnidentifiedVariant_80054AB8 fn_800CEA20(const FuzzyVariant&, shdStateMachine*);
-    void fn_800D01A0(UnidentifiedDesireUpdate*, float);
+    void fn_800D01A0(DesireUpdate*, float);
     bool fn_800CCF90() const;
-    void fn_800CCC0C(UnidentifiedDesireUpdate*, float);
-    void fn_800CDBF0(UnidentifiedDesireUpdate*, float);
-    void fn_800C93A4(UnidentifiedDesireUpdate*, float);
+    void fn_800CCC0C(DesireUpdate*, float);
+    void fn_800CDBF0(DesireUpdate*, float);
+    void fn_800C93A4(DesireUpdate*, float);
     int fn_800D0004();
-    void fn_800CD61C(UnidentifiedDesireUpdate*, float);
-    void fn_800D0EAC(UnidentifiedDesireUpdate*, float);
-    void fn_800CBF64(UnidentifiedDesireUpdate*, float);
-    void fn_800CB7A8(UnidentifiedDesireUpdate*, float);
-    void fn_800CA07C(UnidentifiedDesireUpdate*, float);
-    void fn_800CA57C(UnidentifiedDesireUpdate*, float);
-    void fn_800CADBC(UnidentifiedDesireUpdate*, float);
-    void fn_800CB2BC(UnidentifiedDesireUpdate*, float);
-    void fn_800CC720(UnidentifiedDesireUpdate*, float);
+    void fn_800CD61C(DesireUpdate*, float);
+    void fn_800D0EAC(DesireUpdate*, float);
+    void fn_800CBF64(DesireUpdate*, float);
+    void fn_800CB7A8(DesireUpdate*, float);
+    void fn_800CA07C(DesireUpdate*, float);
+    void fn_800CA57C(DesireUpdate*, float);
+    void fn_800CADBC(DesireUpdate*, float);
+    void fn_800CB2BC(DesireUpdate*, float);
+    void fn_800CC720(DesireUpdate*, float);
 
     void* mpDKShockAvoidable;
     cFielder* mpTarget;

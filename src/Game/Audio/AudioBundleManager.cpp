@@ -49,24 +49,22 @@ void AudioBundleManager::ParseChunk(nlChunk* chunk)
 {
     switch (chunk->GetID())
     {
-    case 0x23800:
+    case 0x80023800:
         break;
-    case 0x13500:
+    case 0x80023500:
         m_Chunk13500 = AudioBankTable::ParseChunk(chunk);
         m_Chunk13500->Initialize();
         break;
-    case 0x13400:
+    case 0x80023400:
         m_Chunk13400 = ParseAudioCalculationTable(chunk);
         break;
-    case 0x13100:
+    case 0x80023100:
         m_Chunk13100 = ParseAudioSliderTable(chunk);
         break;
-    case 0x21200:
+    case 0x1200:
         if (m_Runtime.Load(
                 chunk->GetData(),
-                chunk->GetSize()
-                    - ((u8*)chunk->GetData()
-                        - (u8*)chunk->GetUnalignedData()),
+                chunk->GetDataSize(),
                 false))
         {
             m_Runtime.m_ConfigRoot = (AudioConfigNode*)m_Runtime.GetRoot();
@@ -75,9 +73,7 @@ void AudioBundleManager::ParseChunk(nlChunk* chunk)
     case 0x23704:
         m_Runtime.LoadScriptData(
             chunk->GetData(),
-            chunk->GetSize()
-                - ((u8*)chunk->GetData()
-                    - (u8*)chunk->GetUnalignedData()));
+            chunk->GetDataSize());
         break;
     }
 }

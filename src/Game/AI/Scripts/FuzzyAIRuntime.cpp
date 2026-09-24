@@ -333,8 +333,6 @@ extern "C" void fn_800A695C();
 extern "C" float fn_80314444(void*, float, bool);
 extern "C" void fn_803140CC(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" bool fn_80312E0C(void*, const Variant&);
-extern "C" void fn_800B6A1C(
-    UnidentifiedVariant_80054AB8*, int, const Variant&);
 
 char lbl_80503EEC[] = "art/Scripts/FuzzyAI.byte_code";
 char* lbl_806DC3F0 = lbl_80503EEC;
@@ -471,7 +469,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E35D4(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_INT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -481,7 +479,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E3700(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_INT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -491,7 +489,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E382C(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_INT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -501,7 +499,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E3958(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_INT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -733,7 +731,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E7F60(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_BOOL, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -754,7 +752,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8090(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_INT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -764,7 +762,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E81BC(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_INT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -774,7 +772,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E82E8(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_FLOAT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -784,7 +782,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8414(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_FLOAT, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -796,7 +794,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8540(
     UnidentifiedVariant_80054AB8* result;
     lbl_805842C8.Allocate(result);
     result = new (result) UnidentifiedVariant_80054AB8(value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -806,7 +804,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8B80(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(FT_U32, value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -869,7 +867,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8E38(
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(value);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }
@@ -881,7 +879,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_800E8F8C(
     cFielder* fielder = value->mTeam->GetFielder(value->mIndex);
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(fielder);
-    fn_800B6A1C(result, 4, FuzzyVariant(confidence));
+    result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
     return runtime->UnidentifiedReturn(result, confidence);
 }

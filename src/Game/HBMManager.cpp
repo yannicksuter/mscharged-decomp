@@ -302,7 +302,11 @@ void HBMManager::Update()
         }
     }
 
-    if (!mReady || !mActive)
+    if (!mReady)
+    {
+        return;
+    }
+    if (!mActive)
     {
         return;
     }
@@ -312,6 +316,11 @@ void HBMManager::Update()
 
     switch (HBMGetSelectBtnNum())
     {
+    case HBM_SELECT_NULL:
+    case HBM_SELECT_BTN3:
+    case HBM_SELECT_BTN4:
+        break;
+
     case HBM_SELECT_HOMEBTN:
         HBMDeleteSound();
         HBMDelete();
@@ -349,10 +358,9 @@ void HBMManager::Update()
             sHBMHideEvent.Deliver();
         }
         ResetTask::s_ResetMode = 3;
-        if (ResetTask::s_ResetState == RS_RUNNING)
-        {
-            ResetTask::s_ResetState = RS_STARTRESET;
-        }
+        ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
+                                    ? RS_STARTRESET
+                                    : ResetTask::s_ResetState;
         break;
 
     case HBM_SELECT_BTN2:
@@ -368,10 +376,9 @@ void HBMManager::Update()
             sHBMHideEvent.Deliver();
         }
         ResetTask::s_ResetMode = 0;
-        if (ResetTask::s_ResetState == RS_RUNNING)
-        {
-            ResetTask::s_ResetState = RS_STARTRESET;
-        }
+        ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
+                                    ? RS_STARTRESET
+                                    : ResetTask::s_ResetState;
         break;
     }
 }

@@ -8,6 +8,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -27,16 +28,16 @@ static float s_fDefaultTimeFinalCountdown = 5.0f;
 
 static TweakFloatBinding sDefaultTimeToWaitBeforeDraftingTweak(
     "s_fDefaultTimeToWaitBeforeDrafting", "Network/Draft",
-    &s_fDefaultTimeToWaitBeforeDrafting);
+    &s_fDefaultTimeToWaitBeforeDrafting, true);
 static TweakFloatBinding sDefaultTimeToChangeDraftersTweak(
     "s_fDefaultTimeToChangeDrafters", "Network/Draft",
-    &s_fDefaultTimeToChangeDrafters);
+    &s_fDefaultTimeToChangeDrafters, true);
 static TweakFloatBinding sDefaultTimeToChooseSidekicksTweak(
     "s_fDefaultTimeToChooseSidekicks", "Network/Draft",
-    &s_fDefaultTimeToChooseSidekicks);
+    &s_fDefaultTimeToChooseSidekicks, true);
 static TweakFloatBinding sDefaultTimeFinalCountdownTweak(
     "s_fDefaultTimeFinalCountdown", "Network/Draft",
-    &s_fDefaultTimeFinalCountdown);
+    &s_fDefaultTimeFinalCountdown, true);
 
 void NetMessageDraft::Serialize(NetworkMessageSerializer* serializer)
 {
@@ -44,17 +45,18 @@ void NetMessageDraft::Serialize(NetworkMessageSerializer* serializer)
     serializer->Transfer(&mMachineCount, sizeof(mMachineCount));
     serializer->Transfer(&mUnidentified0A, sizeof(mUnidentified0A));
     serializer->Transfer(&mPlayerSides, sizeof(mPlayerSides));
-    for (int i = 0; i < 8; ++i)
+    NetworkDraftMachineInfo* entry = mEntries;
+    for (int i = 0; i < mMachineCount; ++entry, ++i)
     {
-        serializer->Transfer(&mEntries[i].mStats, sizeof(mEntries[i].mStats));
+        serializer->Transfer(&entry->mStats, sizeof(entry->mStats));
         serializer->Transfer(
-            &mEntries[i].mProfileId, sizeof(mEntries[i].mProfileId));
-        serializer->Transfer(mEntries[i].mName, sizeof(mEntries[i].mName));
+            &entry->mProfileId, sizeof(entry->mProfileId));
+        serializer->Transfer(entry->mName, sizeof(entry->mName));
         serializer->Transfer(
-            mEntries[i].mMiiData, sizeof(mEntries[i].mMiiData));
-        serializer->Transfer(&mEntries[i].mMachineIndex, sizeof(mEntries[i].mMachineIndex));
-        serializer->Transfer(&mEntries[i].mGuestEnabled,
-            sizeof(mEntries[i].mGuestEnabled));
+            entry->mMiiData, sizeof(entry->mMiiData));
+        serializer->Transfer(&entry->mMachineIndex, sizeof(entry->mMachineIndex));
+        serializer->Transfer(&entry->mGuestEnabled,
+            sizeof(entry->mGuestEnabled));
     }
 }
 
