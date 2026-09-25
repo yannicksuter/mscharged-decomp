@@ -1,4 +1,5 @@
 #include "Game/TweakRegistry.h"
+#include "NL/nlSlotPoolFixed.inl"
 
 #include "NL/PointerEntryTable.h"
 #include "NL/nlMemory.h"

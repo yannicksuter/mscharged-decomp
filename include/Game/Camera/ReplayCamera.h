@@ -80,7 +80,7 @@ public:
     /* 0x06C */ ReplayCameraPosition mCamPos;
     /* 0x070 */ nlVector3 mPosition;
     /* 0x07C */ nlVector3 mLookAt;
-    /* 0x088 */ nlMatrix4 mViewMatrix;
+    /* 0x088 */ mutable nlMatrix4 mViewMatrix;
     /* 0x0C8 */ nlVector3 mUnidentified0C8;
     /* 0x0D4 */ bool mUnidentified0D4;
     /* 0x0D5 */ u8 mPadding0D5[3];

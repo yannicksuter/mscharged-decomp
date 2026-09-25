@@ -142,11 +142,10 @@ static inline bool IsCupWinner()
         return true;
     }
 
-    short winnerSide
-        = (short)NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
+    int winnerSide = NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     int winnerTeam
-        = gameInfo->GetCurrentGameInfo()->GetTeam(winnerSide);
+        = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
     return gameInfo->IsInMode3()
         && g_pCupManager->IsCupWinningGame(winnerTeam);
 }
@@ -158,11 +157,10 @@ static inline bool IsCupPersonaWinner()
         return true;
     }
 
-    short winnerSide
-        = (short)NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
+    int winnerSide = NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     int winnerTeam
-        = gameInfo->GetCurrentGameInfo()->GetTeam(winnerSide);
+        = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
     return gameInfo->mIsOnlineMode && gameInfo->IsInMode1()
         && NetTournManager::Instance()->IsCupWinningGame(winnerTeam);
 }
@@ -1876,6 +1874,47 @@ void Presentation::PlayGoalEffects(const char* effects)
             }
             controller->SetPosition(position);
         }
+    }
+}
+
+inline void Presentation::WaitForAutoReplayCompletion(const char* wipe)
+{
+    float cutTime;
+    if (ScreenTransitionManager::Instance()->m_SelectedTransition == 0)
+    {
+        ScreenTransitionManager::Instance()->SelectRandomTransition(wipe);
+    }
+    cutTime = 0.0f;
+    if (ScreenTransitionManager::Instance()->m_SelectedTransition != 0)
+    {
+        cutTime = ScreenTransitionManager::Instance()
+                      ->GetSelectedTransitionCutTime();
+    }
+    if (!ReplayChoreo::Instance().Done(cutTime))
+    {
+        StopWithUndo();
+    }
+}
+
+inline void Presentation::WaitForNisCompletion(const char* wipe)
+{
+    float cutTime = 0.0f;
+    if (ScreenTransitionManager::Instance()->m_SelectedTransition == 0)
+    {
+        ScreenTransitionManager::Instance()->SelectRandomTransition(wipe);
+    }
+
+    if (nlStrCmp<char>(wipe, "cut") != 0
+        && ScreenTransitionManager::Instance()->m_SelectedTransition != 0)
+    {
+        cutTime = ScreenTransitionManager::Instance()
+                      ->GetSelectedTransitionCutTime();
+    }
+
+    if (NisPlayer::Instance()->TimeLeft() > cutTime
+        || !NisPlayer::Instance()->fn_8027CB44())
+    {
+        StopWithUndo();
     }
 }
 

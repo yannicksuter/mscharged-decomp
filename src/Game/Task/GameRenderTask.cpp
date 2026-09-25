@@ -104,12 +104,12 @@ static void WarbleTest(float fDeltaT)
             + BasicStadium::GetCurrentStadium()->m_shadowHeight;
         config.blobScale = g_fWarbleBlobScale;
         config.duration = g_fWarbleDuration;
-        config.values18[0] = lbl_806DC7E0;
-        config.values18[1] = lbl_806DC7E4;
-        config.values18[2] = lbl_806DC7E8;
-        config.values18[3] = lbl_806DC7EC;
-        config.values18[4] = lbl_806DC7F0;
-        config.values18[5] = lbl_806E101C;
+        config.parameters[0] = lbl_806DC7E0;
+        config.parameters[1] = lbl_806DC7E4;
+        config.parameters[2] = lbl_806DC7E8;
+        config.parameters[3] = lbl_806DC7EC;
+        config.parameters[4] = lbl_806DC7F0;
+        config.parameters[5] = lbl_806E101C;
         SetWarbleInstance(&gWarble, new (8, false) WarbleInstance(config));
     }
 

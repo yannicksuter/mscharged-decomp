@@ -2,6 +2,7 @@
 #define GAME_SH_SH_CHOOSE_SIDEKICKS_H
 
 #include "Game/SH/SHChooseCaptains.h"
+#include "Game/FE/feCaptainComponent.h"
 #include "Game/DB/StatsTracker.h"
 
 class AsyncImage;
@@ -80,7 +81,7 @@ public:
     /* 0x1060 */ FEPointerButton mUnidentified1060[2];
     /* 0x11C8 */ FEPointerButton mUnidentified11C8;
     /* 0x127C */ FEBackButton mBackButton;
-    /* 0x1354 */ TU801DCD9CComponent mCaptainComponents[2];
+    /* 0x1354 */ FECharacterPDAComponent mCaptainComponents[2];
     /* 0x18AC */ TLComponentInstance* mUnidentified18AC[8];
     /* 0x18CC */ TLComponentInstance* mUnidentified18CC[2][3];
     /* 0x18E4 */ TLComponentInstance* mUnidentified18E4[2][3];

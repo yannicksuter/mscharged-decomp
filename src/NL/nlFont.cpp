@@ -29,10 +29,6 @@ static inline void ParseKernPairs(nlFont* self, nlFont::GlyphInfo* pInfo, char* 
     pInfo->HasKernPairs = 1;
     nlFont::KernPair kp;
     char* pKernToken = nlStrChr(pToken, ' ');
-    ListEntry<nlFont::KernPair>** pKernHead;
-    ListEntry<nlFont::KernPair>** pKernTail;
-    pKernTail = &KernList.m_Tail;
-    pKernHead = &KernList.m_Head;
     pKernToken++;
     while ((unsigned long)pKernToken != 1)
     {
@@ -49,8 +45,7 @@ static inline void ParseKernPairs(nlFont* self, nlFont::GlyphInfo* pInfo, char* 
         kp.s.B = (unsigned short)nB;
         pKernToken = nlStrChr(pKernToken, ' ') + 1;
         kp.Kern = atoi(pKernToken);
-        ListEntry<nlFont::KernPair>* pEntry = KernList.Allocate(kp);
-        nlListAddStart<ListEntry<nlFont::KernPair> >(pKernHead, pEntry, pKernTail);
+        KernList.AddEntry(kp);
         self->m_KernTableSize++;
         pKernToken = nlStrChr(pKernToken, ' ') + 1;
     }
@@ -81,7 +76,6 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
     unsigned short Character;
     nlFont::GlyphInfo* pInfo;
     unsigned short Base;
-    nlFont::KernPair* pCurKP;
     nlFont::KernPair* pKP;
 
     float fVar_f24 = 0.0f;
@@ -338,17 +332,7 @@ unsigned char nlFont::Load(const char* szFontName, char* pFontDescData, unsigned
 
         while (KernList.m_Head != NULL)
         {
-            pCurKP = pKP;
-            pKP++;
-            ListEntry<nlFont::KernPair>* pEntry = nlListRemoveStart<ListEntry<nlFont::KernPair> >(&KernList.m_Head, &KernList.m_Tail);
-            if (pCurKP != NULL)
-            {
-                pCurKP->s.A = pEntry->entry.s.A;
-                pCurKP->s.B = pEntry->entry.s.B;
-                pCurKP->Kern = pEntry->entry.Kern;
-            }
-
-            KernList.m_Allocator.DeleteEntry(pEntry);
+            KernList.RemoveStart(pKP++);
         }
 
         nlQSort<nlFont::KernPair>(m_pKernTable, m_KernTableSize, nlFont::KernPair::SortProc);

@@ -66,15 +66,9 @@ struct GameInfoSaveSlot
     /* 0xABE */ u8 unknown_0xABE[0x52];
 };
 
-/**
- * The 0x54-byte per-controller record at GameInfoManager+0x128. Only the two
- * trailing words the constructor seeds are known.
- */
 struct GameInfoSlotEntry
 {
-    /* 0x00 */ u8 unknown_0x00[0x4C];
-    /* 0x4C */ int unknown_0x4C;
-    /* 0x50 */ int unknown_0x50;
+    /* 0x00 */ PlayerStats mStats;
 };
 
 /**
@@ -128,6 +122,7 @@ public:
     void SerializeSettings(void* data) const;
     void DeserializeSettings(void* data);
     const GameplaySettings* GetCurrentSettings() const;
+    int GetDifficulty(short side) const { return mCurrentDifficulty[side]; }
 
     int FindSaveSlot(u64 id) const;
     bool HasSaveSlot(u64 id) const;

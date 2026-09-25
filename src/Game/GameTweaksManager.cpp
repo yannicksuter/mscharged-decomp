@@ -8,6 +8,7 @@
 #include "NL/nlConfig.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
+#include "Game/TweakValue.inl"
 
 extern const char sUnidentifiedHomeSkillCategory[];
 extern const char sUnidentifiedAwaySkillCategory[];

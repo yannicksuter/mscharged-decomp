@@ -35,7 +35,7 @@ union DrawableBallFlags
     {
     }
 
-    u32 value;
+    unsigned int value;
     struct
     {
         u32 visible : 1;
@@ -51,7 +51,10 @@ union DrawableBallFlags
 class DrawableBall
 {
 public:
-    const nlVector3& fn_801925BC() const;
+    const nlVector3& fn_801925BC() const
+    {
+        return mPosition;
+    }
     template <typename T>
     void Replay(T& frame);
     DrawableBall(RenderSnapshot*);
@@ -69,7 +72,7 @@ public:
     nlQuaternion mOrientation;
     nlQuaternion mPrevOrientation;
     BallTrailState mTrail[10];
-    u32 mTrailCount;
+    unsigned int mTrailCount;
 };
 
 

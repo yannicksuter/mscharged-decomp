@@ -730,24 +730,14 @@ void SHChooseSides2::fn_8021DDAC(unsigned int index, void* context)
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    TLComponentInstance* controller = gFEPointerInstances[index];
+    TLComponentInstance* controller = GetPointerInstance(index);
     char controllerName[16];
     nlSNPrintf(controllerName, 16, "controller%d", index);
 
     TLComponentInstance* selected = FEFinder<TLComponentInstance, 4>::Find(mSideGroups[side],
-        nlStringLowerHash("controllers"),
-        nlStringLowerHash(lbl_806DE038[side]),
-        nlStringLowerHash(controllerName),
-        0,
-        0,
-        0);
+        "controllers", lbl_806DE038[side], controllerName);
     TLComponentInstance* highlighted = FEFinder<TLComponentInstance, 4>::Find(mSideGroups[side],
-        nlStringLowerHash("over"),
-        nlStringLowerHash(lbl_806DE038[side]),
-        nlStringLowerHash(controllerName),
-        0,
-        0,
-        0);
+        "over", lbl_806DE038[side], controllerName);
 
     if (mPlayingSides[index] == -1)
     {
@@ -762,7 +752,7 @@ void SHChooseSides2::fn_8021DDAC(unsigned int index, void* context)
     }
     else if (mPlayingSides[index] == side)
     {
-        controller->SetActiveSlide("OVER", true, false);
+        controller->SetActiveSlide("holding", true, false);
         mPlayingSides[index] = -1;
         selected->m_bVisible = false;
         highlighted->m_bVisible = false;
@@ -897,7 +887,7 @@ void SHChooseSides2::Proceed()
     for (int i = 0; i < 4; ++i)
     {
         GameInfoManager::Instance()->SetPlayingSide(i, (short)mPlayingSides[i]);
-        gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
     SHNavigation* object = GetNavigationScene();
@@ -905,7 +895,7 @@ void SHChooseSides2::Proceed()
     {
         FEAudio::PlayAnimAudioEvent(0xF8350154, 0, 0, 1);
         g_pCupManager->mUnidentified869C = 1;
-        CupManager* info = g_pCupManager;
+        CupManager* info = CupManager::Instance();
         info->mPreviousGameTeams[0] = GameInfoManager::Instance()->GetTeam(0);
         info->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);
         GameSceneManager::Instance()->PushLoadingScene(true);
@@ -1010,28 +1000,20 @@ void SHChooseSides2::fn_8021E910(int index)
     char controllerName[16];
     nlSNPrintf(controllerName, 16, "controller%d", index);
 
-    TLInstance* instance = (TLInstance*)FEFindInstance(mSideGroups[0],
-        nlStringLowerHash("controllers"),
-        nlStringLowerHash(lbl_806DE038[0]),
-        nlStringLowerHash(controllerName),
-        0,
-        0,
-        0);
+    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(
+        mSideGroups[0], "controllers", lbl_806DE038[0], controllerName);
     instance->m_bVisible = false;
 
-    instance = (TLInstance*)FEFindInstance(mSideGroups[1],
-        nlStringLowerHash("controllers"),
-        nlStringLowerHash(lbl_806DE038[1]),
-        nlStringLowerHash(controllerName),
-        0,
-        0,
-        0);
+    instance = FEFinder<TLComponentInstance, 4>::Find<>(
+        mSideGroups[1], "controllers", lbl_806DE038[1], controllerName);
     instance->m_bVisible = false;
 
-    instance = (TLInstance*)FEFindInstance(mSideGroups[0], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[0]), nlStringLowerHash(controllerName), 0, 0, 0);
+    instance = FEFinder<TLComponentInstance, 4>::Find<>(
+        mSideGroups[0], "over", lbl_806DE038[0], controllerName);
     instance->m_bVisible = false;
 
-    instance = (TLInstance*)FEFindInstance(mSideGroups[1], nlStringLowerHash("over"), nlStringLowerHash(lbl_806DE038[1]), nlStringLowerHash(controllerName), 0, 0, 0);
+    instance = FEFinder<TLComponentInstance, 4>::Find<>(
+        mSideGroups[1], "over", lbl_806DE038[1], controllerName);
     instance->m_bVisible = false;
 
     nlColour white;

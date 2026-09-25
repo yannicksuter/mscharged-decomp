@@ -12,6 +12,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "Game/InputRouter.h"
+#include "Game/TweakValue.inl"
 
 struct NetworkRecordedFrameHeader
 {

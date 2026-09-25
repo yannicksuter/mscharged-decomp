@@ -13,8 +13,7 @@ extern "C" UnidentifiedReplayFramePool* lbl_806E1E9C;
 UnidentifiedReplayFramePool* lbl_806E1E9C;
 
 Replay::Replay(char* memory, int memorySize, int maxFrameSize)
-    : mFree(0)
-    , mReels()
+    : mReels()
     , mReelIdx(0)
     , mTick(0)
     , mMemorySize(memorySize)
@@ -25,14 +24,10 @@ Replay::Replay(char* memory, int memorySize, int maxFrameSize)
         = new (nlMalloc(sizeof(UnidentifiedReplayFramePool), 8, false))
             UnidentifiedReplayFramePool(memory);
 
-    Frame* frame = lbl_806E1E9C->Allocate();
-    if (frame != 0)
-    {
-        frame = new (frame)
-            Frame(memory + kFrameCount * sizeof(Frame),
-                memorySize - kFrameCount * sizeof(Frame),
-                0);
-    }
+    Frame* frame = new (lbl_806E1E9C->Allocate())
+        Frame(memory + kFrameCount * sizeof(Frame),
+            memorySize - kFrameCount * sizeof(Frame),
+            0);
     mFree = frame;
     mFree->mNext = mFree;
     mReels[0].mBegin = mReels[0].mLast = mFree;

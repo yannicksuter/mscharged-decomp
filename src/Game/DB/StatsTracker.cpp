@@ -1354,25 +1354,29 @@ static int CountNewlines(FILE* file)
 void StatsTracker::WriteStats(
     float gameTime, float gameDuration, const char* filename)
 {
+    int gameID = 0;
+    unsigned char firstTime = 1;
+
     if (gameDuration <= 0.0f)
     {
-        gameDuration = 10.0f;
+        gameDuration =
+            (float)GameInfoManager::Instance()->GetCurrentSettings()->GameTime;
     }
     if (filename == 0)
     {
         filename = STATS_FILE;
     }
 
-    bool firstTime = true;
-    FILE* file = fopen(filename, "r");
-    if (file != 0)
+    FILE* pFile = fopen(filename, "r");
+    if (pFile != 0)
     {
-        firstTime = CountNewlines(file) == 0;
-        fclose(file);
+        firstTime = 0;
+        gameID = (int)((CountNewlines(pFile) - 1) * 0.5f);
+        fclose(pFile);
     }
 
-    file = fopen(filename, firstTime ? "wt" : "at");
-    if (file == 0)
+    pFile = fopen(filename, firstTime ? "wt" : "at");
+    if (pFile == 0)
     {
         return;
     }
@@ -1390,33 +1394,45 @@ void StatsTracker::WriteStats(
         header.AppendInPlace("Shoot Rating,");
         header.AppendInPlace("Pass Rating,");
         header.AppendInPlace("Defense Rating,");
-        header.AppendInPlace("Difficulty,\n");
-        fwrite(header.c_str(), 1, header.size(), file);
+        header.AppendInPlace("Difficulty,");
+        header[header.size() - 1] = '\n';
+        fwrite(header.c_str(), 1, header.size(), pFile);
     }
 
-    for (int side = 0; side < 2; side++)
+    int numHumans[2] = { 0, 0 };
+    for (int i = 0; i < 4; i++)
     {
-        int numHumans = 0;
-        for (int pad = 0; pad < 16; pad++)
+        if (GameInfoManager::Instance()->GetPlayingSide((u16)i) == 0)
         {
-            if (GameInfoManager::Instance()->GetPlayingSide((u16)pad) == side)
-            {
-                numHumans++;
-            }
+            numHumans[0]++;
         }
-
-        NLString line = Format(NLString("{0},{1},{2},{3},{4},{5},"),
-            (int)gameTime, side,
-            GameInfoManager::Instance()->GetStadium(),
-            (int)gameDuration, numHumans,
-            GameInfoManager::Instance()->GetTeam((short)side));
-        line.AppendInPlace(Format(NLString("{0},{1},{2},{3},\n"),
-            0, 0, 0,
-            GameInfoManager::Instance()->mCurrentDifficulty[side]));
-        fwrite(line.c_str(), 1, line.size(), file);
+        else if (GameInfoManager::Instance()->GetPlayingSide((u16)i) == 1)
+        {
+            numHumans[1]++;
+        }
     }
 
-    fclose(file);
+    NLString stats;
+    for (int team = 0; team < 2; team++)
+    {
+        stats = Format(NLString("{0},{1},{2},{3},{4},{5},"),
+            gameID, team, GameInfoManager::Instance()->GetStadium(),
+            gameDuration, numHumans[team],
+            GameInfoManager::Instance()->GetTeam((short)team));
+
+        stats = stats.Append(Format(NLString("{0},{1},{2},{3},"),
+            g_pTeams[team]->fn_800A8EC0(), g_pTeams[team]->fn_800A8F20(),
+            g_pTeams[team]->fn_800A8F80(), g_pTeams[team]->fn_800A8FE0()));
+
+        float possession = (float)GetStatValue(
+            mCumulativeTeamStats[team]->mPlayerTotalStats, STATS_16);
+        int difficulty = GameInfoManager::Instance()->GetDifficulty((short)team);
+        stats.AppendInPlace(Format(NLString("{0},"), difficulty));
+        stats[stats.size() - 1] = '\n';
+        fwrite(stats.c_str(), 1, stats.size(), pFile);
+    }
+
+    fclose(pFile);
 }
 
 bool StatsTracker::MoveTeamBUp(TeamStats b, TeamStats a)

@@ -2,6 +2,7 @@
 
 #include "Game/TweakFileLoader.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/TweakValue.inl"
 
 GoalieTweaks::GoalieTweaks(const char* name, const char* category)
     : TweaksBase(name)

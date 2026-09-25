@@ -23,7 +23,7 @@ void AudioEffectBase::Update(float dt)
             m_Parameters.Remove(&iterator);
             ReleaseParameter(state);
         }
-        iterator.next();
+        iterator.Step();
     }
     EndBlend();
 }

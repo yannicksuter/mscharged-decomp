@@ -996,10 +996,9 @@ void EmissionManager::ConfigureResource(
     {
         EmissionResourceStats* stats
             = EmissionManager::Instance()->mResourceStats;
-        EmissionResourceStats& resourceStats = stats[resource];
-        nlStrNCpy(resourceStats.mName, name, sizeof(resourceStats.mName));
-        resourceStats.mBudget = budget;
-        resourceStats.unknown_0x32_bit15 = budget != 0;
+        nlStrNCpy(stats[resource].mName, name, sizeof(stats[resource].mName));
+        stats[resource].mBudget = budget;
+        stats[resource].unknown_0x32_bit15 = budget != 0;
     }
 }
 

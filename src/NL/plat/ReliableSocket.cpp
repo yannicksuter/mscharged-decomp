@@ -19,6 +19,7 @@
 #include "NL/nlDebugViews.h"
 
 #include <stdarg.h>
+#include "Game/TweakValue.inl"
 
 int g_TransportLayerLog = 1;
 int s_nPayloadRedundancy = 3;

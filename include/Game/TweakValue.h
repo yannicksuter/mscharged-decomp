@@ -54,10 +54,7 @@ public:
 class TweakFloatBinding : public TweakBindingBase
 {
 public:
-    TweakFloatBinding(float* value = 0)
-        : m_pValue(value)
-    {
-    }
+    TweakFloatBinding(float* value = 0);
     TweakFloatBinding(const char* path, float defaultValue)
         : m_pValue(0)
     {
@@ -199,6 +196,7 @@ public:
         void* entry);
     virtual void BindValueAddress(void* value);
     virtual int GetDefault();
+    ~TweakIntBinding();
 
     using TweakBindingBase::Bind;
 

@@ -78,4 +78,12 @@ public:
     float _2718;
 };
 
+inline void SaveFrame::fn_80191504()
+{
+}
+
+inline void LoadFrame::fn_80191504()
+{
+}
+
 #endif // _RENDERSNAPSHOT_H_

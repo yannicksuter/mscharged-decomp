@@ -131,6 +131,8 @@ template <int kBlockSize>
 class nlSlotPoolFixed : public UnidentifiedSlotPoolFixedState<kBlockSize>
 {
 public:
+    ~nlSlotPoolFixed();
+
     nlSlotPoolFixed(int count = 16)
     {
         this->m_Depth = 0;

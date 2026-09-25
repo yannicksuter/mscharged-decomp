@@ -241,24 +241,42 @@ nlColour LightingLookup::SampleFilteredColour(
 {
     int ix = (int)x;
     int iy = (int)y;
-    nlColour centre = SampleColour(ix, iy, tint);
-    nlColour up = SampleColour(ix, iy - 1, tint);
-    nlColour down = SampleColour(ix, iy + 1, tint);
-    nlColour left = SampleColour(ix - 1, iy, tint);
-    nlColour right = SampleColour(ix + 1, iy, tint);
+    nlColour samples[5];
+    samples[0] = SampleColour(ix, iy, tint);
+    samples[1] = SampleColour(ix, iy - 1, tint);
+    samples[2] = SampleColour(ix, iy + 1, tint);
+    samples[3] = SampleColour(ix - 1, iy, tint);
+    samples[4] = SampleColour(ix + 1, iy, tint);
+    int red = 3 * samples[0][0];
+    int green = 3 * samples[0][1];
+    int blue = 3 * samples[0][2];
+    int alpha = 3 * samples[0][3];
+
+    red += samples[1][0];
+    green += samples[1][1];
+    blue += samples[1][2];
+    alpha += samples[1][3];
+
+    red += samples[2][0];
+    green += samples[2][1];
+    blue += samples[2][2];
+    alpha += samples[2][3];
+
+    red += samples[3][0];
+    green += samples[3][1];
+    blue += samples[3][2];
+    alpha += samples[3][3];
+
+    red += samples[4][0];
+    green += samples[4][1];
+    blue += samples[4][2];
+    alpha += samples[4][3];
+
     nlColour result;
-    result.c[0] = (3 * centre.c[0] + up.c[0] + down.c[0]
-                      + left.c[0] + right.c[0])
-                / 7;
-    result.c[1] = (3 * centre.c[1] + up.c[1] + down.c[1]
-                      + left.c[1] + right.c[1])
-                / 7;
-    result.c[2] = (3 * centre.c[2] + up.c[2] + down.c[2]
-                      + left.c[2] + right.c[2])
-                / 7;
-    result.c[3] = (3 * centre.c[3] + up.c[3] + down.c[3]
-                      + left.c[3] + right.c[3])
-                / 7;
+    result[0] = red / 7;
+    result[1] = green / 7;
+    result[2] = blue / 7;
+    result[3] = alpha / 7;
     return result;
 }
 

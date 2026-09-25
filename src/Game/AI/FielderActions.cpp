@@ -164,7 +164,6 @@ extern "C" void fn_8003B020(cFielder* pFielder);
 extern "C" void fn_8003B0D8(cFielder* pFielder);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
 extern "C" void fn_801B8FF4(cFielder* pFielder);
-extern "C" void fn_80080BFC(Goalie* pGoalie, float fDeltaT);
 extern "C" void fn_801B7E4C(const char* pName, cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
 extern "C" void fn_8002E798(cFielder* pFielder);
@@ -2326,8 +2325,7 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (mActionRunningWBVars.bWaitForAnimToFinish)
             {
-                bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-                    && m_pCurrentAnimController->m_fTime == 1.0f;
+                bool bAnimFinished = m_pCurrentAnimController->UnidentifiedAtEnd();
                 if (bAnimFinished
                     || mUnidentified024.m_fDesiredSpeed >= fIdleToRunWBDesiredSpeed)
                 {
@@ -2492,8 +2490,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
         case 0x18:
         {
-            bool bAnimFinished = m_pCurrentAnimController->m_ePlayMode == PM_HOLD
-                && m_pCurrentAnimController->m_fTime == 1.0f;
+            bool bAnimFinished = m_pCurrentAnimController->UnidentifiedAtEnd();
 
             if (bAnimFinished)
             {
@@ -3157,8 +3154,12 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
     PlaySound(mUnidentified318, soundID, 0, 0);
 
-    bool bUnidentified2 = g_pGame->m_eGameState == 5
-        || g_pGame->m_eGameState == 6;
+    bool bUnidentified2 = false;
+    if (g_pGame->GetGameState() == 5
+        || g_pGame->GetGameState() == 6)
+    {
+        bUnidentified2 = true;
+    }
     if (bUnidentified2)
     {
         StatsTracker::Instance()->TrackStat(
@@ -3211,8 +3212,8 @@ void cFielder::fn_80044290(float fDeltaT)
                 }
                 SetVelocity(v3Velocity);
             }
-            else if ((float)fabs(v3Position.x) - (5.0f + fGoalLineX) > 0.0f
-                     || (float)fabs(v3Position.y) - (1.0f + fSidelineY)
+            else if (fabsf(v3Position.x) - (5.0f + fGoalLineX) > 0.0f
+                     || fabsf(v3Position.y) - (1.0f + fSidelineY)
                          > 0.0f)
             {
                 fn_80046244();
@@ -3240,14 +3241,15 @@ void cFielder::fn_80044290(float fDeltaT)
             if (pGoalie->mGoalieActionState == (eGoalieActionState)0x0D
                 && pGoalie->mpTarget == this)
             {
-                fn_80080BFC(pGoalie, fDeltaT);
+                pGoalie->fn_80080BFC(fDeltaT);
             }
 
             float fSpin = 1.0f
                 - this->GetTweaks()->mUnidentified064;
-            Unknown8(mUnidentified024.m_aActualFacingDirection
-                    + (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f)),
-                false);
+            int nSpinStep
+                = (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f));
+            Unknown8(
+                mUnidentified024.m_aActualFacingDirection + nSpinStep, false);
 
             SetFacingDirection(
                 SeekDirection(mUnidentified024.m_aActualFacingDirection,

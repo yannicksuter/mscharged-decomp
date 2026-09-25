@@ -198,6 +198,7 @@ public:
     void ChooseNewFormations();
     void fn_80050D24();
     void fn_80051F00(nlVector2* pCenter);
+    void AccumulateWeightedFielderCenter(const float*& pWeight);
     unsigned int* fn_80052034();
     bool CalculateFielderPosition(nlVector3& v3DestPosition, cFielder* pFielder,
         bool bInPosition, float fBallPosFormationWeight);

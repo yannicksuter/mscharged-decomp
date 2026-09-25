@@ -84,8 +84,8 @@ GameInfoManager::GameInfoManager()
 
     for (int i = 0; i < 4; i++) {
         memset(&unknown_0x128[i], 0, sizeof(GameInfoSlotEntry));
-        unknown_0x128[i].unknown_0x4C = i;
-        unknown_0x128[i].unknown_0x50 = 2;
+        unknown_0x128[i].mStats.mRecordType.mControllerID = i;
+        unknown_0x128[i].mStats.mType = TYPE_USER;
     }
 
     mUserInfo.mGameplayOptions.InitializeDefaults();

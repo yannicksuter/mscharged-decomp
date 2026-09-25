@@ -149,8 +149,12 @@ void WorldAnimManager::fn_80342324()
 
 void WorldAnimManager::Clear()
 {
-    delete m_pHierarchyInventory;
-    m_pHierarchyInventory = 0;
+    if (m_pHierarchyInventory != 0)
+    {
+        m_pHierarchyInventory->Clear();
+        delete m_pHierarchyInventory;
+        m_pHierarchyInventory = 0;
+    }
     m_animationSetMap.DeleteValues();
     m_animationControllerMap.DeleteValues();
 }
@@ -197,20 +201,22 @@ AnimationSet* WorldAnimManager::LoadHierarchy(nlChunk* pChunk)
 {
     m_pHierarchyInventory->ParseChunk(pChunk);
     cSHierarchy* pHierarchy = m_pHierarchyInventory->Find(0);
+    unsigned long uHierarchyHash = pHierarchy->GetHashID();
 
     AnimationSet** ppAnimationSet;
     AnimationSet* pAnimationSet;
     if (m_animationSetMap.FindGet(
-            pHierarchy->GetHashID(), &ppAnimationSet))
+            uHierarchyHash, &ppAnimationSet))
     {
         pAnimationSet = *ppAnimationSet;
     }
     else
     {
-        pAnimationSet
+        AnimationSet* pNewAnimationSet
             = new (nlMalloc(sizeof(AnimationSet), 8, false))
                 AnimationSet();
-        m_animationSetMap.Add(pHierarchy->GetHashID(), pAnimationSet);
+        m_animationSetMap.Add(uHierarchyHash, pNewAnimationSet);
+        pAnimationSet = pNewAnimationSet;
     }
 
     pAnimationSet->m_pHierarchy = pHierarchy;
@@ -248,19 +254,19 @@ void WorldAnimManager::Update(float fDeltaT)
 void WorldAnimUpdate::Update(const unsigned long&,
     WorldAnimController** ppController)
 {
+    float fDeltaT = m_fDeltaT;
     WorldAnimController* pController = *ppController;
     if (pController->m_pPoseTree != 0)
     {
         spCurrentWorldAnimController = pController;
-        pController->m_pPoseTree->Update(m_fDeltaT);
+        pController->m_pPoseTree->Update(fDeltaT);
         if (pController->m_pPoseTree->m_fTime
             != pController->m_pPoseTree->m_fPrevTime)
         {
             fn_8030B038(pController->m_pPoseAccumulator,
                 pController->m_pPoseTree, &pController->m_worldMatrix);
         }
-        if (pController->m_pPoseTree->m_ePlayMode == PM_HOLD
-            && pController->m_pPoseTree->m_fTime == 1.0f
+        if (pController->m_pPoseTree->UnidentifiedAtEnd()
             && pController->m_pWorldAnimObject != 0)
         {
             fn_803439A4(pController->m_pWorldAnimObject);

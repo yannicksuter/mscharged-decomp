@@ -3,6 +3,7 @@
 #include "NL/nlPrint.h"
 #include "Game/TweakFileLoader.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/TweakValue.inl"
 
 StadiumTweaks::StadiumTweaks(
     const char* category, const char* szBaseName)

@@ -115,9 +115,6 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
 
 AudioResourceRuntime::AudioResourceRuntime()
 {
-    mRoot = 0;
-    mLoadFlag = 1;
-    mReservedFlag = 0;
     m_ConfigRoot = 0;
     g_pAudioResourceRuntime = this;
     m_EffectFactory = GetAudioEffectFactory();

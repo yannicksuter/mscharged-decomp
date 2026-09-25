@@ -15,6 +15,7 @@
 #include "NL/nlDebugViews.h"
 #include "NL/nlMath.h"
 #include "NL/nlPrint.h"
+#include "Game/TweakValue.inl"
 
 int g_TransmitSyncDataEvery = 4;
 int g_nTicksPerPacket = 2;

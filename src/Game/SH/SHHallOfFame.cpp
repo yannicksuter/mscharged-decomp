@@ -1266,7 +1266,7 @@ void SHHallOfFamePlayerCard::Update(float fDeltaT)
     if (!mSlideFinished)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;
         }
@@ -1283,24 +1283,21 @@ void SHHallOfFamePlayerCard::Update(float fDeltaT)
             {
                 controller->SetActiveSlide("waiting", true, false);
                 processInput = false;
+                goto checkInput;
+            }
+
+            if (mUnidentified0FC[pad] > 0)
+            {
+                controller->SetActiveSlide("A", true, false);
             }
             else
             {
-                if (mUnidentified0FC[pad] > 0)
-                {
-                    controller->SetActiveSlide("A", true, false);
-                }
-                else
-                {
-                    controller->SetActiveSlide("cursor", true, false);
-                }
-                processInput = true;
+                controller->SetActiveSlide("cursor", true, false);
             }
         }
-        else
-        {
-            processInput = true;
-        }
+        processInput = true;
+
+    checkInput:
         if (processInput)
         {
             unsigned char valid = 1;

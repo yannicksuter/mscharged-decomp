@@ -879,7 +879,7 @@ void RenderCharacterIntoTexture(const ProjectedShadowParams& params)
         nlVec3Scale(vRight,
             nlRecipSqrt(vRight.GetLengthSq3D(), true));
         nlVec3CrossProduct(vUp, vRight, vDir);
-        nlVec3Scale(vUp, nlRecipSqrt(vUp.GetLengthSq3D(), true));
+        nlVec3Normalize(vUp, vUp);
 
         nlVector3 p[4];
         nlVec3ScaleAdd(p[0], radius, vRight, vTemp);

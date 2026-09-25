@@ -2887,7 +2887,7 @@ extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
     nlVector3 v3Direction;
     nlVec3Sub(v3Direction, pTargetFielder->GetPosition(),
         pCandidateFielder->GetPosition());
-    unsigned short facingAngle = pCandidateFielder->mUnidentified024.m_aActualFacingDirection;
+    unsigned short facingAngle = pCandidateFielder->GetActualFacing();
     if (pCandidateFielder->m_pController != NULL
         && pCandidateFielder->m_pController->GetMovementStickMagnitude() > 0.001f)
         facingAngle = pCandidateFielder->m_pController->GetMovementStickDirection();
@@ -2900,7 +2900,7 @@ extern "C" float fn_800DE0A8(cPlayer* pPlayer)
         return 0.0f;
     nlVector3 v3Direction;
     nlVec3Sub(v3Direction, g_pBall->GetPosition(), pPlayer->GetPosition());
-    unsigned short facingAngle = pPlayer->mUnidentified024.m_aActualFacingDirection;
+    unsigned short facingAngle = pPlayer->GetActualFacing();
     if (pPlayer->m_pController != NULL && pPlayer->m_pController->GetMovementStickMagnitude() > 0.001f)
         facingAngle = pPlayer->m_pController->GetMovementStickDirection();
     return Facing(facingAngle, v3Direction);
@@ -2915,10 +2915,10 @@ extern "C" float fn_800DE1F0(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
     nlVector3 v3Direction;
     nlVec3Sub(v3Direction, pTargetFielder->GetPosition(),
         pCandidateFielder->GetPosition());
-    float fScore = Facing(pCandidateFielder->mUnidentified024.m_aActualFacingDirection, v3Direction);
+    float fScore = Facing(pCandidateFielder->GetActualFacing(), v3Direction);
     nlVec3Sub(v3Direction, pCandidateFielder->GetPosition(),
         pTargetFielder->GetPosition());
-    fScore += Facing(pTargetFielder->mUnidentified024.m_aActualFacingDirection, v3Direction);
+    fScore += Facing(pTargetFielder->GetActualFacing(), v3Direction);
     fScore *= 0.5f;
     return fScore;
 }
@@ -3964,13 +3964,15 @@ extern "C" float fn_800E06F4(cPlayer* pPlayer)
 {
     if (pPlayer == NULL)
         return 0.0f;
+    float fMaxDistance;
+    float fMinDistance;
     float fTotal = 0.0f;
     float fClose = NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
         lbl_806E42B0.x, lbl_806E42B0.y);
     if (fClose < 1.0f)
     {
-        float fMinDistance = lbl_806E42B0.x;
-        float fMaxDistance = lbl_806E42B0.y;
+        fMaxDistance = lbl_806E42B0.y;
+        fMinDistance = lbl_806E42B0.x;
         for (int i = 0; i < 10; i++)
         {
             cPlayer* pOther = (cPlayer*)g_pCharacters[i];

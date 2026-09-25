@@ -204,8 +204,8 @@ static inline float DoCalculatePassSpeed(const nlVector2& distance,
 
 DesireReceivePass::DesireReceivePass()
     : Desire(22, UnidentifiedStringHash("TransDesireReceivePass"))
-    , mEstimated()
 {
+    mEstimated.Reset();
 }
 
 bool DesireReceivePass::UnidentifiedInitialize(void* context)
@@ -807,6 +807,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     int nNumAnims;
     const LooseBallContactAnimInfo* pAnimInfo =
         fn_800C1FA4(receiveAnimType, nNumAnims);
+    float fAnimContactFrame = pAnimInfo->fAnimContactFrame;
 
     cSAnim* pAnim = m_pFielder->m_pAnimInventory
                         ->GetAnim(pAnimInfo->nAnimID);
@@ -816,27 +817,31 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     m_pFielder->GetJointPositionFuture(
         &v3ContactOffsetLocal, pAnimInfo->nAnimID,
         m_pFielder->m_nBallJointIndex,
-        pAnimInfo->fAnimContactFrame / (float)pAnim->m_nNumKeys,
+        fAnimContactFrame / (float)pAnim->m_nNumKeys,
         true, true, false, true);
 
-    float fSin;
     float fCos;
+    float fSin;
     nlSinCos(&fSin, &fCos, aFacingDirection);
 
     nlVector3 v3ContactOffsetWorld;
-    nlVec3Set(v3ContactOffsetWorld,
-        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin,
-        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin,
-        v3ContactOffsetLocal.z);
+    float fContactHeight = v3ContactOffsetLocal.z;
+    v3ContactOffsetWorld.z = fContactHeight;
+    v3ContactOffsetWorld.x =
+        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin;
+    v3ContactOffsetWorld.y =
+        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin;
 
     int nNumIntercepts;
     float fInterceptTimes[2];
-    if (v3ContactOffsetWorld.z
-        > lbl_806DC1CC * mv3PassIntercept.z)
+    float fDesiredScale =
+        m_pFielder->mUnidentified024.m_fDesiredPlayerScale;
+    if (fContactHeight
+        > lbl_806DC1CC * fDesiredScale)
     {
         g_pBall->PredictLandingSpotAndTime(estimated.v3BallContactPos,
             &nNumIntercepts, fInterceptTimes,
-            v3ContactOffsetWorld.z);
+            fContactHeight);
         bUseGroundIntercept = false;
 
         if (nNumIntercepts == 2)
@@ -858,7 +863,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                     estimated.fBallContactTime = fInterceptTimes[i];
                     estimated.v3BallContactPos = v3BallPosition;
                     estimated.v3BallContactPos.z =
-                        v3ContactOffsetWorld.z;
+                        fContactHeight;
                 }
             }
         }
@@ -928,9 +933,13 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                 m_pFielder->mUnidentified024.m_v3Position);
 
             float fDot = 0.0f;
-            bool bBallDirectionValid = false;
+            bool bBallDirectionValid;
             float fLengthSq = v3BallDirection.GetLengthSq3D();
-            if (fLengthSq != 0.0f)
+            if (fLengthSq == 0.0f)
+            {
+                bBallDirectionValid = false;
+            }
+            else
             {
                 nlVec3Scale(v3BallDirection,
                     nlRecipSqrt(fLengthSq, true));
@@ -938,9 +947,13 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
             }
             if (bBallDirectionValid)
             {
-                bool bFielderDirectionValid = false;
+                bool bFielderDirectionValid;
                 fLengthSq = v3FielderDirection.GetLengthSq3D();
-                if (fLengthSq != 0.0f)
+                if (fLengthSq == 0.0f)
+                {
+                    bFielderDirectionValid = false;
+                }
+                else
                 {
                     nlVec3Scale(v3FielderDirection,
                         nlRecipSqrt(fLengthSq, true));
@@ -966,16 +979,11 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                     lbl_806E4024, lbl_806E4018);
                 nlVecLerp(estimated.v3BallContactPos,
                     v3FirstBallPosition, v3ClosestPoint, fBlend);
-            }
-            else
-            {
-                estimated.v3BallContactPos = v3FirstBallPosition;
+                goto BallContactPositionReady;
             }
         }
-        else
-        {
-            estimated.v3BallContactPos = v3FirstBallPosition;
-        }
+        estimated.v3BallContactPos = v3FirstBallPosition;
+    BallContactPositionReady:
 
         nlVector2 v2BallDelta = {
             estimated.v3BallContactPos.x - g_pBall->m_v3Position.x,

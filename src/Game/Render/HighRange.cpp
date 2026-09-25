@@ -106,8 +106,10 @@ void InitializeHighRange(HighRange* state)
     }
 
     char targetName0[0x20];
-    nlSNPrintf(state->mNames[0], sizeof(state->mNames[0]), "%s", "hr320d");
-    nlSNPrintf(targetName0, sizeof(targetName0), "target/%s", "hr320d");
+    const char* name0;
+    nlSNPrintf(state->mNames[0], sizeof(state->mNames[0]), "%s",
+        name0 = "hr320d");
+    nlSNPrintf(targetName0, sizeof(targetName0), "target/%s", name0);
     state->mTextures[0] = glGetTexture(targetName0);
 
     char targetName1[0x20];

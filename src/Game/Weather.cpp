@@ -1655,7 +1655,6 @@ void SandTombWeather::SpawnThwomps()
     int count = gThwompMinCount + RandomWeatherIndex(gThwompMaxCount - gThwompMinCount);
     count = nlMin(count, 8);
     nlVector3 position;
-    ThwompObject* thwomp;
     const nlVector3 origin = sThwompOrigin;
     for (int i = 0; i < count; i++)
     {
@@ -1664,8 +1663,7 @@ void SandTombWeather::SpawnThwomps()
         {
             index = RandomWeatherIndex(8);
         }
-        thwomp = gNPCManager->GetThwomp(-1);
-        m_Thwomps[index] = thwomp;
+        ThwompObject* thwomp = m_Thwomps[index] = gNPCManager->GetThwomp(-1);
         if (thwomp)
         {
             position = origin;

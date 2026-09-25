@@ -6,6 +6,7 @@
 #include "Game/Task/TextWindowTask.h"
 
 #include "Game/Audio/AudioBankTable.h"
+#include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/XSoundCueHandle.h"
 #include "revolution/sc.h"
 #include "Game/Audio/AudioBundleManager.h"
@@ -174,12 +175,16 @@ void LoadSoundBank(GameAudio* audio, int slotId,
         return;
     }
 
+    AudioSliderTable* sliders = (AudioSliderTable*)
+        audio->GetBundleManager()->GetSliderTable();
+    sSpeedOfSound = sliders->globalDefinitionsCopy[0].initialValue;
+    ++audio->m_PlayRequestCount;
+
     if (!audio->IsInitialized())
     {
         return;
     }
 
-    ++audio->m_PlayRequestCount;
     audio->GetBundleManager()->GetSoundMap()->LoadBank(slotId,
         cueId, callback, context, 0);
 }
@@ -551,7 +556,7 @@ void PauseAllAudio()
                 break;
             }
         }
-        sounds.Step();
+        sounds.next();
     }
     sPausedAudioHandles.Clear();
 }

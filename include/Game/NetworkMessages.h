@@ -290,7 +290,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageTournamentGameUpdate();
+    virtual ~NetMessageTournamentGameUpdate() { }
     virtual int GetType();
 
     /* 0x008 */ u8 mUpdateType;
@@ -317,7 +317,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageTournamentLoadingState();
+    virtual ~NetMessageTournamentLoadingState() { }
     virtual int GetType();
 
     /* 0x08 */ s8 mMachineIndex;

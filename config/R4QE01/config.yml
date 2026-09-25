@@ -95,6 +95,9 @@ block_relocations:
   - { source: 0x802EDC64 }
   - { source: 0x802EDC74 }
   - { source: 0x802EDC84 }
+  # The platform manager compares chunk ID 0x80023600, which overlaps .text.
+  - { source: 0x802EF9C4 }
+  - { source: 0x802EF9CC }
   # OSInit's MEM1 arena-lo default is the constant 0x80004000 (donor-supported
   # source spelling); it is not a reference to the .init routine at that address
   - { source: 0x803B354C }

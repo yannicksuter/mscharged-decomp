@@ -44,6 +44,16 @@ static const char* sOnlineHubButtonNames[4] = {
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
+static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create(type, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), hub));
+        hub->mUnidentified58C = true;
+    }
+}
+
 SHOnlineHub::SHOnlineHub()
     : mUnidentified4B4(false)
     , mUnidentified588(0.0f)
@@ -83,15 +93,13 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
         {
             if (g_pFriendManager->CountBuddies() > 0)
                 change = true;
-            else if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-            {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)113, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), this));
-                mUnidentified58C = true;
-            }
+            else
+                ShowOnlineHubDialog(this, (ePopupMenu)113);
         }
         break;
     case 1:
+        change = true;
+        break;
     case 2:
         change = true;
         break;
@@ -101,19 +109,14 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
         break;
     case 4:
         g_pFriendManager->SetOwnStatusInitial(0);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-        {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)58, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), this));
-            mUnidentified58C = true;
-        }
+        ShowOnlineHubDialog(this, (ePopupMenu)58);
         break;
     }
     if (change)
     {
         mUnidentified894 = item;
         for (int i = 0; i < 4; ++i)
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         mUnidentified890 = 2;
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)

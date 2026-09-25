@@ -276,6 +276,10 @@ static inline void SetCaptainImage(const TU801DA134Component* component, TLImage
     }
 }
 
+static char SLIDE_OFF[] = "off";
+static char SLIDE_OVER[] = "over";
+static char SLIDE_DOWN[] = "down";
+
 void TU801DA134Component::SetOverallSlide(TLComponentInstance* overall, const CharacterInfo& info)
 {
     if (overall != 0)
@@ -351,15 +355,15 @@ void TU801DA134Component::fn_801DAFC8()
 
 void TU801DA134Component::fn_801DB69C(float)
 {
-    SetSidekickImage(this, fn_801DA924(0, "off"), mSidekicks[0]);
-    SetSidekickImage(this, fn_801DA924(1, "off"), mSidekicks[1]);
-    SetSidekickImage(this, fn_801DA924(2, "off"), mSidekicks[2]);
-    SetSidekickImage(this, fn_801DA924(0, "over"), mSidekicks[0]);
-    SetSidekickImage(this, fn_801DA924(1, "over"), mSidekicks[1]);
-    SetSidekickImage(this, fn_801DA924(2, "over"), mSidekicks[2]);
-    SetSidekickImage(this, fn_801DA924(0, "down"), mSidekicks[0]);
-    SetSidekickImage(this, fn_801DA924(1, "down"), mSidekicks[1]);
-    SetSidekickImage(this, fn_801DA924(2, "down"), mSidekicks[2]);
+    SetSidekickImage(this, fn_801DA924(0, SLIDE_OFF), mSidekicks[0]);
+    SetSidekickImage(this, fn_801DA924(1, SLIDE_OFF), mSidekicks[1]);
+    SetSidekickImage(this, fn_801DA924(2, SLIDE_OFF), mSidekicks[2]);
+    SetSidekickImage(this, fn_801DA924(0, SLIDE_OVER), mSidekicks[0]);
+    SetSidekickImage(this, fn_801DA924(1, SLIDE_OVER), mSidekicks[1]);
+    SetSidekickImage(this, fn_801DA924(2, SLIDE_OVER), mSidekicks[2]);
+    SetSidekickImage(this, fn_801DA924(0, SLIDE_DOWN), mSidekicks[0]);
+    SetSidekickImage(this, fn_801DA924(1, SLIDE_DOWN), mSidekicks[1]);
+    SetSidekickImage(this, fn_801DA924(2, SLIDE_DOWN), mSidekicks[2]);
     SetCaptainImage(this, fn_801DA924(3, 0), mUnidentified14);
     fn_801DAFC8();
 }

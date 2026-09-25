@@ -22,6 +22,7 @@
 #include "NL/nlString.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/TweakValue.inl"
 
 class FESkinnedModel : public FEModel
 {
@@ -146,20 +147,23 @@ FEModel::~FEModel()
     if (mAlternateTextureFileData != 0)
     {
         ::operator delete(mAlternateTextureFileData);
-        mAlternateTextureFileData = 0;
+        mTextureFileData = 0;
     }
     if (mModelFileData != 0)
     {
         ::operator delete(mModelFileData);
         mModelFileData = 0;
     }
-    if (mLoader != 0)
+    mLoader->ReleaseResource(mLoaderHandle);
+    glDestroyResourcePool(mLoader);
+    if (mAnimations != 0)
     {
-        mLoader->ReleaseResource(mLoaderHandle);
-        glDestroyResourcePool(mLoader);
+        delete mAnimations;
     }
-    delete mAnimations;
-    delete mHierarchies;
+    if (mHierarchies != 0)
+    {
+        delete mHierarchies;
+    }
 }
 
 void FEModel::OnTexturesLoaded(void* data, unsigned long size, void* userData)

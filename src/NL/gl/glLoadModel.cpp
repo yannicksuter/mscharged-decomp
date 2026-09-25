@@ -47,8 +47,9 @@ void RLGReader::LoadVertexAnimData(nlChunk* chunk)
 
     unsigned long vertexDataSize = *(unsigned long*)(data + 4)
                                  * *(unsigned long*)(data + 8) * *(unsigned long*)(data + 0x0C);
-    model->m_pVertices = (u8*)glResourceAlloc(vertexDataSize, GLM_VertexData, m_pResource);
-    memcpy(model->m_pVertices, vertexData, vertexDataSize);
+    u8* vertices = (u8*)glResourceAlloc(vertexDataSize, GLM_VertexData, m_pResource);
+    memcpy(vertices, vertexData, vertexDataSize);
+    model->m_pVertices = vertices;
     model->m_pModel = m_pResource->m_inventory->GetModel(
         *(unsigned long*)data);
     m_pResource->m_inventory->AddVertexAnim(

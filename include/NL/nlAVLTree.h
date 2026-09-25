@@ -360,6 +360,11 @@ public:
         return m_Stack[m_NumStackEntries - 1];
     }
 
+    KeyType& CurrentKey()
+    {
+        return m_Stack[m_NumStackEntries - 1]->key;
+    }
+
     ValueType& CurrentValue()
     {
         return m_Stack[m_NumStackEntries - 1]->value;

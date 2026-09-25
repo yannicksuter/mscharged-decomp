@@ -21,6 +21,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "Game/TweakValue.inl"
 
 static int s_nTournamentLowBound = 3;
 static int s_nTournamentHiBound = 6;

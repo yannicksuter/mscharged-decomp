@@ -208,6 +208,26 @@ void SHOnlineInvitePlayers::OnInvitationErrorDismissed()
     RefreshRows();
 }
 
+inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    {
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitationErrorDismissed), this)));
+        mPopupActive = true;
+    }
+}
+
+inline void SHOnlineInvitePlayers::ShowLobbyError(int popup)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    {
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnLobbyErrorDismissed), this)));
+        mPopupActive = true;
+    }
+}
+
 void SHOnlineInvitePlayers::SceneCreated()
 {
     mSlotCount = 0;
@@ -337,32 +357,54 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
     if (!mInitialized)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (!(slide->m_time >= slide->m_duration + slide->m_start))
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
+        {
+            InitializeButtons();
+            mInitialized = true;
+            RefreshRows();
+        }
+        else
+        {
             return;
-        InitializeButtons();
-        mInitialized = true;
-        RefreshRows();
+        }
     }
     if (RefreshLobbySlots())
         RefreshRows();
     if (mBackEnabled)
     {
-        if (!(mIsHost && !(mDeclinedDisplayTime > 0.0f) && g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer))
+        bool backAvailable;
+        if (!mIsHost)
+            backAvailable = false;
+        else if (mDeclinedDisplayTime > 0.0f)
+            backAvailable = false;
+        else
+            backAvailable = g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer;
+        if (!backAvailable)
         {
             mBackButtonInstance->m_bVisible = false;
             mBackButton.Disable();
             mBackEnabled = false;
         }
     }
-    else if (mIsHost && !(mDeclinedDisplayTime > 0.0f) && g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer)
+    else
     {
-        mBackButtonInstance->m_bVisible = true;
-        mBackButton.Enable();
-        mBackEnabled = true;
+        bool backAvailable;
+        if (!mIsHost)
+            backAvailable = false;
+        else if (mDeclinedDisplayTime > 0.0f)
+            backAvailable = false;
+        else
+            backAvailable = g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer;
+        if (backAvailable)
+        {
+            mBackButtonInstance->m_bVisible = true;
+            mBackButton.Enable();
+            mBackEnabled = true;
+        }
     }
-    for (unsigned int i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; ++i)
     {
-        TLComponentInstance* controller = gFEPointerInstances[i];
+        TLComponentInstance* controller = GetPointerInstance(i);
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if (i != gFEControllerIndex)
@@ -426,13 +468,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         g_pFriendManager->SetOwnStatusInitial(0);
         mDeclinedFriendIndex = -1;
         mDeclinedDisplayTime = 0.0f;
-        int popup = GetOnlineErrorPopup(0x13A2E, false, 0x79);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
-        {
-            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-            menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitationErrorDismissed), this)));
-            mPopupActive = true;
-        }
+        ShowInvitationError(GetOnlineErrorPopup(0x13A2E, false, 0x79));
         return;
     }
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
@@ -440,13 +476,8 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
     {
         lobby->CloseConnectionsAndReset();
         g_pFriendManager->SetOwnStatusInitial(0);
-        int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5B);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
-        {
-            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-            menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnLobbyErrorDismissed), this)));
-            mPopupActive = true;
-        }
+        int errorCode = g_pNetworkSession->fn_801CA9D8();
+        ShowLobbyError(GetOnlineErrorPopup(errorCode, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5B));
     }
     else if (lobby->mUnidentified052)
     {

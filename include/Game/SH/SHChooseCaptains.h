@@ -3,11 +3,13 @@
 
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/feBackButton.h"
-#include "Game/FE/feCaptainComponent.h"
+#include "Game/FE/feCharacterPDAComponent.h"
 #include "Game/FE/fePointerButton.h"
 
 class TLComponentInstance;
 class TLInstance;
+class TLImageInstance;
+class FETextureResource;
 
 class ChooseCaptainsSceneV2 : public BaseSceneHandler
 {
@@ -24,9 +26,12 @@ public:
     virtual void SceneCreated();
 
     int GetSide(unsigned long pad);
+    void fn_80224814();
+    void fn_80227608();
+    void fn_8022497C(int index, void* context);
     void fn_80223B98(int value);
     void fn_80224CE4(int index, void* context);
-    void fn_80224D30(int index, unsigned long which);
+    void fn_80224D30(int index, void* context);
     void fn_80224F78(int index, void* context);
     void fn_80225484(int index, void* context);
     void fn_80225674(int index, void* context);
@@ -41,6 +46,14 @@ public:
     void fn_8022559C(int index, void* context);
     void fn_80225DA8(int index, void* context);
     void fn_80225E58(int index, void* context);
+    void fn_80225FB0();
+    void fn_80226524();
+    void fn_80225040(int index, void* context);
+    void fn_80227308();
+    void fn_80227988();
+    void fn_80227DA8(int index);
+    void SetSelectButtonBounds(int side);
+    void ShowDisconnectedError();
 
     /* 0x001C */ bool mUnidentified1C;
     /* 0x001D */ u8 mPadding1D[3];
@@ -60,28 +73,23 @@ public:
     /* 0x004D */ bool mUnidentified4D;
     /* 0x004E */ bool mUnidentified4E;
     /* 0x004F */ u8 mPadding4F;
-    /* 0x0050 */ int mUnidentified50;
-    /* 0x0054 */ int mUnidentified54;
-    /* 0x0058 */ u8 mUnidentified58[0x58];
+    /* 0x0050 */ FETextureResource* mUnidentified50[12][2];
     /* 0x00B0 */ FEPointerButton mCaptainButtons[12];
     /* 0x0920 */ FEPointerButton mUnidentified920[2];
     /* 0x0A88 */ FEPointerButton mUnidentifiedA88[2];
     /* 0x0BF0 */ FEPointerButton mUnidentifiedBF0;
     /* 0x0CA4 */ FEBackButton mBackButton;
-    /* 0x0D7C */ TU801DCD9CComponent mCaptainComponents[2];
+    /* 0x0D7C */ FECharacterPDAComponent mCaptainComponents[2];
     /* 0x12D4 */ TLComponentInstance* mUnidentified12D4[12];
     /* 0x1304 */ TLComponentInstance* mUnidentified1304[2];
     /* 0x130C */ TLComponentInstance* mUnidentified130C[2];
     /* 0x1314 */ TLComponentInstance* mUnidentified1314;
-    /* 0x1318 */ int mUnidentified1318;
-    /* 0x131C */ int mUnidentified131C;
+    /* 0x1318 */ TLInstance* mUnidentified1318[2];
     /* 0x1320 */ TLComponentInstance* mUnidentified1320;
-    /* 0x1324 */ TLComponentInstance* mUnidentified1324;
-    /* 0x1328 */ TLComponentInstance* mUnidentified1328;
+    /* 0x1324 */ TLComponentInstance* mUnidentified1324[2];
     /* 0x132C */ TLComponentInstance* mUnidentified132C[2];
     /* 0x1334 */ TLComponentInstance* mUnidentified1334;
-    /* 0x1338 */ TLInstance* mUnidentified1338;
-    /* 0x133C */ u8 mUnidentified133C[0x2C];
+    /* 0x1338 */ TLImageInstance* mUnidentified1338[12];
     /* 0x1368 */ int mUnidentified1368;
     /* 0x136C */ unsigned short mTimerText[8];
     /* 0x137C */ bool mUnidentified137C;

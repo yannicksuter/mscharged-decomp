@@ -8,6 +8,7 @@
 #include "NL/gl/glFont.h"
 #include "NL/nlDebugViews.h"
 #include "Game/InputRouter.h"
+#include "Game/TweakValue.inl"
 
 char gNetworkMiiName[12];
 unsigned short gNetworkMiiNameWide[11];

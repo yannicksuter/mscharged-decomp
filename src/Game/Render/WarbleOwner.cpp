@@ -12,12 +12,12 @@ void InitializeWarble(WarbleOwner* owner)
     sWarbleConfiguration.view = GetLayerView(eCLV_Warble);
     sWarbleConfiguration.blobScale = 5.0f;
     sWarbleConfiguration.duration = 2.0f;
-    sWarbleConfiguration.values18[0] = 3.0f;
-    sWarbleConfiguration.values18[1] = 12.0f;
-    sWarbleConfiguration.values18[2] = 32.0f;
-    sWarbleConfiguration.values18[3] = 32.0f;
-    sWarbleConfiguration.values18[4] = 1.0f;
-    sWarbleConfiguration.values18[5] = 0.0f;
+    sWarbleConfiguration.parameters[0] = 3.0f;
+    sWarbleConfiguration.parameters[1] = 12.0f;
+    sWarbleConfiguration.parameters[2] = 32.0f;
+    sWarbleConfiguration.parameters[3] = 32.0f;
+    sWarbleConfiguration.parameters[4] = 1.0f;
+    sWarbleConfiguration.parameters[5] = 0.0f;
 }
 
 static inline void ClearWarble(WarbleOwner* owner)
@@ -45,7 +45,7 @@ void UpdateWarble(WarbleOwner* owner, float dt)
     if (instance == 0)
         return;
 
-    bool expired = instance->UnidentifiedQuery();
+    bool expired = instance->IsExpired();
     if (expired)
     {
         delete instance;

@@ -92,15 +92,5 @@ void AudioBundleManager::Load(const char* path)
     unsigned long size;
     void* data = nlLoadEntireFile(
         fileName, &size, 0x20, AllocateStart, 0, 0, 0);
-    m_LoadedData = data;
-
-    nlChunk* outerChunk = (nlChunk*)data;
-    nlChunk* end = outerChunk->GetNextChunk();
-    nlChunk* chunk = outerChunk->GetFirstChunk();
-    while (chunk != end)
-    {
-        ParseChunk(chunk);
-        chunk = chunk->GetNextChunk();
-    }
-    OnLoadComplete();
+    OnBundleLoaded(data, size, this);
 }

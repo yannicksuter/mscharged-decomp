@@ -9,6 +9,7 @@
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "types.h"
+#include "Game/TweakValue.inl"
 
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;

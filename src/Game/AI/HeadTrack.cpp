@@ -93,13 +93,11 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
             nlVector3 v3Head;
             nlVec3Set(v3Constrain, m4Constrain.m21, m4Constrain.m22, m4Constrain.m23);
             nlVec3Set(v3Head, m4HeadMatrix.m21, m4HeadMatrix.m22, m4HeadMatrix.m23);
-            unsigned short spinConstraint
-                = (unsigned short)(int)(10430.378f
-                                        * nlATan2f(v3Constrain.y, v3Constrain.x));
-            unsigned short spinHead
-                = (unsigned short)(int)(10430.378f
-                                        * nlATan2f(v3Head.y, v3Head.x));
-            nHeadSpin += (short)(spinConstraint - spinHead);
+            nHeadSpin += (short)(
+                (unsigned short)(int)(10430.378f
+                    * nlATan2f(v3Constrain.y, v3Constrain.x))
+                - (unsigned short)(int)(10430.378f
+                    * nlATan2f(v3Head.y, v3Head.x)));
         }
         m_fDesiredHeadSpin = nHeadSpin;
         m_fDesiredHeadTilt = nHeadTilt;

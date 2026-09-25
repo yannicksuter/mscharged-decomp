@@ -69,7 +69,10 @@ public:
     cPoseAccumulator& operator=(const cPoseAccumulator& other);
     template <typename T>
     void Replay(T& frame);
-    void fn_801949E4(float scale);
+    void fn_801949E4(float scale)
+    {
+        m_Scale = scale;
+    }
     void InitAccumulators();
     void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
     void BlendRot(int nNode, const nlQuaternion* pRot, float fWeight,

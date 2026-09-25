@@ -142,10 +142,10 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
     if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
 
@@ -181,13 +181,14 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
 
     for (int i = 0; i < 4; ++i)
     {
+        TLComponentInstance* pointer = GetPointerInstance(i);
         if (mUnidentified28 == 0 && (unsigned int)i != gFEControllerIndex)
         {
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            pointer->SetActiveSlide("waiting", true, false);
             continue;
         }
 
-        gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+        pointer->SetActiveSlide("cursor", true, false);
 
         unsigned char valid = true;
         FEPointerEvent event;
@@ -237,13 +238,9 @@ void OptionsAudioMenuV2::fn_801D474C()
         MemFun(&OptionsAudioMenuV2::fn_801D583C), this, Placeholder<0>(), Placeholder<1>()));
 
     TLInstance* right = FEFinder<TLInstance, 2>::Find(mPresentation,
-        nlStringLowerHash("OPTIONS_IN"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("visual_options"), nlStringLowerHash("scrollbar_right"),
-        0UL, 0UL);
+        "OPTIONS_IN", "Layer", "visual_options", "scrollbar_right");
     TLInstance* left = FEFinder<TLInstance, 2>::Find(mPresentation,
-        nlStringLowerHash("OPTIONS_IN"), nlStringLowerHash("Layer"),
-        nlStringLowerHash("visual_options"), nlStringLowerHash("scrollbar_left"),
-        0UL, 0UL);
+        "OPTIONS_IN", "Layer", "visual_options", "scrollbar_left");
     feVector3 leftPosition = left->GetAssetPosition();
     feVector3 rightPosition = right->GetAssetPosition();
     for (int i = 0; i < 6; ++i)

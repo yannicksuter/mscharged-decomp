@@ -1,5 +1,6 @@
 #include "Game/EventRegistry.h"
 #include "Game/Event.h"
+#include "NL/nlSlotPoolFixed.inl"
 
 #include "NL/nlAVLTree.h"
 #include "NL/nlMemory.h"
