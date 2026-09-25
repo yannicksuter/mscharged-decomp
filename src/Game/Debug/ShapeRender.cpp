@@ -174,10 +174,10 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
     int nRing;
     int angle0;
     int angle1;
-    int angle;
-    int angle90;
     float ring0;
     float ring1;
+    float ringFactor;
+    float segmentFactor;
     float z0;
     float z1;
     int nSegment;
@@ -185,8 +185,6 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
     float y0;
     float x1;
     float y1;
-    float lengthSquared;
-    float invLen;
 
     prim.vertCount = 150;
     prim.position = (nlVector3*)glResourceAlloc(
@@ -199,8 +197,8 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
     pdst = prim.position;
     ndst = prim.normal;
     tdst = prim.texcoord;
-    float ringFactor = 0.31415927f;
-    float segmentFactor = 0.44879895f;
+    ringFactor = 0.31415927f;
+    segmentFactor = 0.44879895f;
 
     for (nRing = 0; nRing < 5; nRing++)
     {
@@ -221,28 +219,19 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
 
         for (nSegment = 0; nSegment < 15; nSegment++)
         {
-            float fSegmentAngle;
-
-            fSegmentAngle = (float)nSegment;
-            angle = (int)((fSegmentAngle *= segmentFactor) * 10430.378f);
-
-            x0 = 0.5f * (ring0 * nlSin((u16)angle));
-
-            angle90 = (u16)angle + 0x4000;
-            y0 = 0.5f * (ring0 * nlSin((u16)angle90));
-
-            x1 = 0.5f * (ring1 * nlSin((u16)angle));
-            y1 = 0.5f * (ring1 * nlSin((u16)angle90));
+            x0 = 0.5f * (ring0 * nlSin((u16)(int)(((float)nSegment * segmentFactor) * 10430.378f)));
+            y0 = 0.5f * (ring0 * nlSin((u16)((u16)(int)(((float)nSegment * segmentFactor) * 10430.378f)
+                + 0x4000)));
+            x1 = 0.5f * (ring1 * nlSin((u16)(int)(((float)nSegment * segmentFactor) * 10430.378f)));
+            y1 = 0.5f * (ring1 * nlSin((u16)((u16)(int)(((float)nSegment * segmentFactor) * 10430.378f)
+                + 0x4000)));
 
             vNormal.x = x0;
             vNormal.y = y0;
             vNormal.z = z0;
 
-            lengthSquared = vNormal.GetLengthSq3D();
-            invLen = nlRecipSqrt(lengthSquared, true);
-
+            nlVec3Normalize(vNormal, vNormal);
             pdst->x = x0;
-            nlVec3Scale(vNormal, invLen);
             pdst->y = y0;
             pdst->z = z0;
             *ndst = vNormal;
@@ -254,11 +243,8 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
             vNormal.y = y1;
             vNormal.z = z1;
 
-            lengthSquared = vNormal.GetLengthSq3D();
-            invLen = nlRecipSqrt(lengthSquared, true);
-
+            nlVec3Normalize(vNormal, vNormal);
             pdst[1].x = x1;
-            nlVec3Scale(vNormal, invLen);
             pdst[1].y = y1;
             pdst[1].z = z1;
             ndst[1] = vNormal;

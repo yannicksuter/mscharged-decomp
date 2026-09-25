@@ -89,6 +89,11 @@ block_relocations:
   - { source: 0x803410BC }
   - { source: 0x803410CC }
   - { source: 0x803410EC }
+  # OnAudioResourceBundleLoaded compares chunk IDs that overlap .text.
+  - { source: 0x802ED1FC }
+  - { source: 0x802ED21C }
+  - { source: 0x802ED22C }
+  - { source: 0x802ED23C }
   # AudioBundleManager::ParseChunk compares chunk IDs that overlap .text.
   - { source: 0x802EDC3C }
   - { source: 0x802EDC44 }
