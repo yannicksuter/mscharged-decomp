@@ -836,9 +836,13 @@ Game/NetworkMessages_80126A70.cpp:
 	.text       start:0x80126A70 end:0x80126BE8
 	.data       start:0x8050AD90 end:0x8050ADB8
 
+Game/NetworkMessages_80126BE8.cpp:
+	.text       start:0x80126BE8 end:0x80126F2C
+	.data       start:0x8050ADB8 end:0x8050ADE0
+
 Game/NetworkTournamentMessages.cpp:
-	.text       start:0x80126BE8 end:0x801274A4
-	.data       start:0x8050ADB8 end:0x8050AE20
+	.text       start:0x80126F2C end:0x801274A4
+	.data       start:0x8050ADE0 end:0x8050AE20
 
 Game/NetTournManager.cpp:
 	.text       start:0x801274A4 end:0x8012A2F0
@@ -2072,11 +2076,17 @@ Game/SH/SHOnlineHub.cpp:
 	.sdata2     start:0x806E5A10 end:0x806E5A20
 
 Game/SH/SHOnlineFriends.cpp:
-	.text       start:0x8023E9F4 end:0x802441B4
+	.text       start:0x8023E9F4 end:0x80242A90
 	.rodata     start:0x804E85A8 end:0x804E85D8
-	.data       start:0x8051E010 end:0x8051E3D0
-	.sdata      start:0x806DE4F8 end:0x806DE668
-	.sdata2     start:0x806E5A20 end:0x806E5A48
+	.data       start:0x8051E010 end:0x8051E1D0
+	.sdata      start:0x806DE4F8 end:0x806DE588
+	.sdata2     start:0x806E5A20 end:0x806E5A40
+
+Game/FE/feOnlinePlayerRow.cpp:
+	.text       start:0x80242A90 end:0x802441B4
+	.data       start:0x8051E1D0 end:0x8051E3D0
+	.sdata      start:0x806DE588 end:0x806DE668
+	.sdata2     start:0x806E5A40 end:0x806E5A48
 
 Game/SH/SHOnlineMatchmakingDraft.cpp:
 	.text       start:0x802441B4 end:0x80245F04
@@ -2106,13 +2116,19 @@ Game/HBMManager.cpp:
 	.sdata2     start:0x806E5A58 end:0x806E5A88
 
 Game/SH/SHHallOfFame.cpp:
-	.text       start:0x802492E4 end:0x8024F4E0
+	.text       start:0x802492E4 end:0x8024A368
 	.rodata     start:0x804E85D8 end:0x804E8680
-	.data       start:0x8051E6A0 end:0x8051F6B0
+	.data       start:0x8051E6A0 end:0x8051EBB8
 	.bss        start:0x805785C8 end:0x805785F8
-	.sdata      start:0x806DE6F8 end:0x806DE7B0
+	.sdata      start:0x806DE6F8 end:0x806DE700
 	.sbss       start:0x806E18E0 end:0x806E18F0
-	.sdata2     start:0x806E5A88 end:0x806E5A98
+	.sdata2     start:0x806E5A88 end:0x806E5A90
+
+Game/SH/SHHallOfFameHistory.cpp:
+	.text       start:0x8024A368 end:0x8024F4E0
+	.data       start:0x8051EBB8 end:0x8051F6B0
+	.sdata      start:0x806DE700 end:0x806DE7B0
+	.sdata2     start:0x806E5A90 end:0x806E5A98
 
 Game/SH/SHOnlineFriendCodeEntry.cpp:
 	.text       start:0x8024F4E0 end:0x80252180
@@ -2301,7 +2317,7 @@ Game/Render/PlanarShadowDrawable.cpp:
 	.data       start:0x80523138 end:0x80523170
 	.sdata2     start:0x806E5C98 end:0x806E5CA0
 
-Game/Render/tu_8027A7F0.cpp:
+Game/Render/ChargeShadowDrawable.cpp:
 	.text       start:0x8027A7F0 end:0x8027ADC0
 	.ctors      start:0x804DB7E0 end:0x804DB7E4
 	.data       start:0x80523170 end:0x805231C0

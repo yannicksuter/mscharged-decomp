@@ -1,7 +1,10 @@
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/AudioStreamSource.h"
 
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlArrayAllocator.h"
 #include "NL/nlFileGC.h"
 #include "NL/nlMath.h"
 #include "NL/nlRing.h"
@@ -17,7 +20,18 @@ unsigned int gAudioStreamChannelCount;
 AXPBLPF sVoiceLowPassFilter;
 
 SlotPool<AudioSampleSource> gAudioSampleSourcePool(64, 16);
+SlotPool<AudioReadState_8035D154> lbl_80585C48(16, 16);
+SlotPool<AudioReadState_80361920> lbl_80585C70(16, 16);
 SlotPool<AudioReadQueueEntry> gAudioReadQueueEntryPool(32, 16);
+
+struct AudioReadCallbackEntry
+{
+    void* m_Unknown00;
+    void* m_Unknown04;
+};
+
+AudioReadCallbackEntry lbl_80585CB0[24];
+nlArrayAllocator<AudioReadCallbackEntry> lbl_806E2228(lbl_80585CB0, 24);
 
 void SetVoiceInputVolume(AXVPB* voice, float value)
 {

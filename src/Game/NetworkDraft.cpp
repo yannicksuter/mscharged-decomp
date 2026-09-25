@@ -709,7 +709,8 @@ int NetworkDraft::ProcessMessage(NetworkMessage* message)
 
 void NetworkDraft::SendToAllDraftPlayers(void* data, int size)
 {
-    if (g_pNetworkSessionBase == 0)
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    if (roster == 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "No lobby found, cannot send message of size %d to all machines in draft\n",
@@ -717,21 +718,20 @@ void NetworkDraft::SendToAllDraftPlayers(void* data, int size)
         return;
     }
 
-    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
-    NetworkSocket* socket = g_pNetworkSessionBase->GetDirectSocket();
     for (int team = 0; team < mTeamCount; ++team)
     {
-        for (int player = 0; player < mTeams[team].mPlayerCount; ++player)
+        NetworkDraftTeam& draftTeam = mTeams[team];
+        for (int player = 0; player < draftTeam.mPlayerCount; ++player)
         {
-            NetworkDraftPlayer& draftPlayer = mTeams[team].mPlayers[player];
-            if (draftPlayer.mGuest)
+            int peer = draftTeam.mPlayers[player].mPeerIndex;
+            if (draftTeam.mPlayers[player].mGuest)
             {
                 continue;
             }
-            u32 aid = roster->GetMachineAid(draftPlayer.mPeerIndex);
+            u32 aid = roster->GetMachineAid(peer);
             if (aid == 0xFFFFFFFF)
             {
-                socket->Receive(data, size);
+                g_pNetworkSessionBase->GetDirectSocket()->Receive(data, size);
             }
             else if (aid == 0)
             {
@@ -741,7 +741,7 @@ void NetworkDraft::SendToAllDraftPlayers(void* data, int size)
             }
             else
             {
-                socket->Send(aid, data, size, true);
+                g_pNetworkSessionBase->GetDirectSocket()->Send(aid, data, size, true);
             }
         }
     }

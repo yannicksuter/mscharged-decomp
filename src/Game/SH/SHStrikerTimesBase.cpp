@@ -92,8 +92,10 @@ void SHStrikerTimesBase::SceneCreated()
     }
     mScrollBar.SetValue(0);
 
-    TLSlide* first = mPresentation->m_currentSlide;
-    TLSlide* slide = first;
+    FEPresentation* presentation = mPresentation;
+    TLSlide* first = presentation->m_currentSlide;
+    presentation = mPresentation;
+    TLSlide* slide = presentation->m_currentSlide;
     do
     {
         FEFinder<TLInstance, 2>::Find<>(slide, "Layer", "TimerText")->m_bVisible = false;

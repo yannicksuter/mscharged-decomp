@@ -74,8 +74,8 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800B7B1C(
 class UnidentifiedDesire33 : public Desire
 {
 public:
-    UnidentifiedDesire33()
-        : Desire(33, UnidentifiedStateTransition(lbl_806E20B8))
+    UnidentifiedDesire33(UnidentifiedStateTransition transition)
+        : Desire(33, transition)
     {
     }
 
@@ -130,7 +130,8 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(3, deke, false);
 
     UnidentifiedDesire33* desire33 = new (nlMalloc(
-        sizeof(UnidentifiedDesire33), 8, false)) UnidentifiedDesire33();
+        sizeof(UnidentifiedDesire33), 8, false))
+        UnidentifiedDesire33(UnidentifiedStateTransition(lbl_806E20B8));
     UnidentifiedAddState(33, desire33, false);
 
     UnidentifiedStateTransition finishActionTransition;
@@ -196,7 +197,8 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(22, receivePass, false);
 
     DesireRunToNet* runToNet = new (nlMalloc(
-        sizeof(DesireRunToNet), 8, false)) DesireRunToNet();
+        sizeof(DesireRunToNet), 8, false))
+        DesireRunToNet(UnidentifiedStringHash("TransDesireRunToNet"));
     UnidentifiedAddState(9, runToNet, false);
 
     UnidentifiedStateTransition runUpfieldTransition;
@@ -234,11 +236,13 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(15, shoot, false);
 
     DesireSlideAttack* slideAttack = new (nlMalloc(
-        sizeof(DesireSlideAttack), 8, false)) DesireSlideAttack();
+        sizeof(DesireSlideAttack), 8, false))
+        DesireSlideAttack(UnidentifiedStateTransition(lbl_806E20B8));
     UnidentifiedAddState(16, slideAttack, false);
 
     DesireUserControlled* userControlled = new (nlMalloc(
-        sizeof(DesireUserControlled), 8, false)) DesireUserControlled();
+        sizeof(DesireUserControlled), 8, false))
+        DesireUserControlled(UnidentifiedStateTransition(lbl_806E20B8));
     UnidentifiedAddState(20, userControlled, false);
 
     DesireWait* wait = new (nlMalloc(sizeof(DesireWait), 8, false))
@@ -288,7 +292,8 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(23, superPower, true);
 
     DesireUsePowerup* usePowerup = new (nlMalloc(
-        sizeof(DesireUsePowerup), 8, false)) DesireUsePowerup();
+        sizeof(DesireUsePowerup), 8, false))
+        DesireUsePowerup(UnidentifiedStateTransition(lbl_806E20B8));
     UnidentifiedAddState(17, usePowerup, true);
 
     DesireSteering* steering = new (nlMalloc(
@@ -296,7 +301,8 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(34, steering, true);
 
     UnidentifiedDesire35* desire35 = new (nlMalloc(
-        sizeof(UnidentifiedDesire35), 8, false)) UnidentifiedDesire35();
+        sizeof(UnidentifiedDesire35), 8, false))
+        UnidentifiedDesire35(UnidentifiedStateTransition(lbl_806E20B8));
     UnidentifiedAddState(35, desire35, true);
 }
 

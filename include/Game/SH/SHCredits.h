@@ -3,6 +3,7 @@
 
 #include "Game/SH/SHMoviePlayer.h"
 #include "Game/Sys/simpleparser.h"
+#include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 
 class TLComponentInstance;
@@ -28,6 +29,8 @@ public:
             }
         }
 
+        void Load();
+
         /* 0x000 */ unsigned long mFileSize;
         /* 0x004 */ char* mFileData;
         /* 0x008 */ SimpleParser mParser;
@@ -39,6 +42,7 @@ public:
     virtual void Update(float fDeltaT);
     virtual void MoviePlayerVirtual3C();
 
+    void DisplayFinalMessage();
     void SetupForPhase();
     void SetupForCredits();
     void UpdateForCopyrightMessage(float fDeltaT);

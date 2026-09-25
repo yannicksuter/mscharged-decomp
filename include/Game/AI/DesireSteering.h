@@ -90,8 +90,8 @@ extern UnidentifiedUnsetTransition lbl_806E20B8;
 class UnidentifiedDesire35 : public Desire
 {
 public:
-    UnidentifiedDesire35()
-        : Desire(35, UnidentifiedStateTransition(lbl_806E20B8))
+    UnidentifiedDesire35(UnidentifiedStateTransition transition)
+        : Desire(35, transition)
     {
     }
 

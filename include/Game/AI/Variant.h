@@ -65,6 +65,16 @@ public:
         CopyFrom(other);
     }
 
+    Variant(const char* value)
+        : mType(FT_UNSPECIFIED)
+    {
+        Reset();
+        mType = FT_STRING;
+        unsigned long size = nlStrLen(value) + 1;
+        char* copy = (char*)nlMalloc(size, 8, false);
+        UnidentifiedCopyString(copy, value, size);
+    }
+
     Variant(const FuzzyVariant& other);
 
     ~Variant()

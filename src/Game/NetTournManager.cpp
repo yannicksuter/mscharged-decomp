@@ -6,6 +6,7 @@
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/World/WorldObject_80129EE0.h"
 #include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/Game.h"
@@ -1303,7 +1304,7 @@ int NetTournManager::GetCurrentMode() const
     return 3;
 }
 
-nlMatrix4* DrawableObject::GetWorldMatrix()
+nlMatrix4* WorldObject_80129EE0::GetWorldMatrix()
 {
     return &mWorldMatrix;
 }

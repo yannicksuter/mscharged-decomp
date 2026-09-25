@@ -7,8 +7,8 @@
 class DesireRunToNet : public Desire
 {
 public:
-    DesireRunToNet()
-        : Desire(9, UnidentifiedStringHash("TransDesireRunToNet"))
+    DesireRunToNet(const UnidentifiedStateTransition& transition)
+        : Desire(9, transition)
     {
     }
 

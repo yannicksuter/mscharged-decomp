@@ -4462,7 +4462,11 @@ bool Goalie::fn_8007BF68(bool bParam)
     pBall->PredictLandingSpotAndTime(v3LandingPos, &nNumSolutions, fTimes, 0.23f);
     if (nNumSolutions > 0)
     {
-        float fTime = nNumSolutions > 1 ? nlMaxEquals(fTimes[0], fTimes[1]) : fTimes[0];
+        float fTime;
+        if (nNumSolutions > 1)
+            fTime = nlMaxEquals(fTimes[0], fTimes[1]);
+        else
+            fTime = fTimes[0];
         if (fTime < lbl_806DBBB0)
             return false;
         fn_800180F4(g_pBall, &v3LandingPos, fTime);
@@ -4476,13 +4480,13 @@ bool Goalie::fn_8007BF68(bool bParam)
                 bShouldMiss = true;
         }
         float fGoalLine = cField::GetGoalLineX(v3LandingPos.x);
-        if ((float)fabs(v3LandingPos.x) > 0.1f + (float)fabs(fGoalLine))
+        if (fabsf(v3LandingPos.x) > 0.1f + fabsf(fGoalLine))
         {
-            float fDiffX = v3LandingPos.x - pBall->m_v3Position.x;
             float fY = pBall->m_v3Position.y;
-            if ((float)fabs(fDiffX) > 0.01f)
+            float fDiffX = v3LandingPos.x - pBall->m_v3Position.x;
+            if (fabsf(fDiffX) > 0.01f)
                 fY += (v3LandingPos.y - fY) * (fGoalLine - pBall->m_v3Position.x) / fDiffX;
-            if ((float)fabs(fY) < 0.5f * cNet::GetNetWidth() + 0.18f)
+            if (fabsf(fY) < 0.5f * cNet::GetNetWidth() + 0.18f)
             {
                 nlVector4 v4Plane;
                 if (fGoalLine < 0.0f)

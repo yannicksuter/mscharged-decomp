@@ -124,7 +124,7 @@ void LoadAudioResource(AudioResourceLoadOwner* state,
     state->m_CallbackParam = field1C;
 
     char path[0x80];
-    nlSNPrintf(path, sizeof(path), "%s%s.resbun", (char*)g_pAudioSystem + 0x4A, name);
+    nlSNPrintf(path, sizeof(path), "%s%s.resbun", g_pAudioSystem->m_ResourcePath, name);
 
     if (g_pAudioSystem->IsAsyncLoading())
     {

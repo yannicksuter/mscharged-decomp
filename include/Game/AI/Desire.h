@@ -123,7 +123,7 @@ public:
 class DesireWait : public Desire
 {
 public:
-    DesireWait(int state, const UnidentifiedStateTransition& transition)
+    DesireWait(int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }
@@ -405,7 +405,7 @@ private:
 class DesireStar : public Desire
 {
 public:
-    DesireStar(int state, const UnidentifiedStateTransition& transition)
+    DesireStar(int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }
@@ -424,7 +424,7 @@ class DesireMushroom : public Desire
 {
 public:
     DesireMushroom(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }
@@ -443,7 +443,7 @@ class DesireSlippery : public Desire
 {
 public:
     DesireSlippery(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }
@@ -485,7 +485,7 @@ private:
 class DesireShrink : public Desire
 {
 public:
-    DesireShrink(int state, const UnidentifiedStateTransition& transition)
+    DesireShrink(int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }
@@ -509,7 +509,7 @@ class DesireFrozen : public Desire
     friend class cFielder;
 
 public:
-    DesireFrozen(int state, const UnidentifiedStateTransition& transition)
+    DesireFrozen(int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }
@@ -544,7 +544,7 @@ class DesireConfused : public Desire
 {
 public:
     DesireConfused(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, UnidentifiedStateTransition transition)
         : Desire(state, transition)
     {
     }

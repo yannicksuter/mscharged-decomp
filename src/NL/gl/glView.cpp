@@ -392,42 +392,7 @@ void GLView::Iterate(GLViewPacketCallback callback)
 
 void GLView::RemoveChild(GLView* child)
 {
-    ListEntry<GLView*>* current = m_Children.m_Head;
-    if (current == 0)
-        return;
-
-    if (current->entry == child)
-    {
-        ListEntry<GLView*>* next;
-        if (current == m_Children.m_Tail)
-        {
-            m_Children.m_Tail = 0;
-            next = 0;
-        }
-        else
-        {
-            next = current->next;
-        }
-        delete m_Children.m_Head;
-        m_Children.m_Head = next;
-        return;
-    }
-
-    ListEntry<GLView*>* previous = current;
-    current = current->next;
-    while (current != 0)
-    {
-        if (current->entry == child)
-        {
-            previous->next = current->next;
-            if (current == m_Children.m_Tail)
-                m_Children.m_Tail = previous;
-            delete current;
-            return;
-        }
-        previous = current;
-        current = current->next;
-    }
+    m_Children.RemoveEntry(child);
 }
 
 GLRenderPair GLView::GetRenderPair() const

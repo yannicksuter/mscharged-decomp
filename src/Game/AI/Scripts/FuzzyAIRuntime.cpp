@@ -147,7 +147,7 @@ extern "C" float fn_800D9FC8(cFielder*);
 extern "C" void fn_80313FA0(UnidentifiedFuzzyRuntimeBase*, bool, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_800E3B34(void*, cBall*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_800E8CB8(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_8031423C(UnidentifiedFuzzyRuntimeBase*, const Variant&, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void fn_8031423C(UnidentifiedFuzzyRuntimeBase*, const char*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_800E3A84(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_800E8D68(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_800E8D6C(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
@@ -2082,7 +2082,7 @@ void UnidentifiedFuzzyRuntime::DoFunctionCall(unsigned int function)
     {
         UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
-        const Variant& arg0 = *(const Variant*)m_SP[-3];
+        const char* arg0 = (const char*)m_SP[-3];
         m_SP -= 3;
         fn_8031423C(this, arg0, arg1, arg2);
         break;

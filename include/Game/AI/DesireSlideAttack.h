@@ -8,8 +8,8 @@ extern UnidentifiedUnsetTransition lbl_806E20B8;
 class DesireSlideAttack : public Desire
 {
 public:
-    DesireSlideAttack()
-        : Desire(16, UnidentifiedStateTransition(lbl_806E20B8))
+    DesireSlideAttack(UnidentifiedStateTransition transition)
+        : Desire(16, transition)
     {
     }
 

@@ -610,11 +610,25 @@ extern "C" void fn_803141F4(
 }
 
 extern "C" void fn_8031423C(
-    UnidentifiedFuzzyRuntimeBase* runtime, const Variant& value,
+    UnidentifiedFuzzyRuntimeBase* runtime, const char* value,
     unsigned long hash, UnidentifiedVariant_80054AB8* action)
 {
-    runtime->UnidentifiedVirtual14(
-        action, fn_80312208(hash), value);
+    int index = fn_80312208(hash);
+    if (index == 10)
+    {
+        unsigned long hashed = 0;
+        if (nlStrLen(value) != 0)
+        {
+            hashed = nlStringHash(value);
+        }
+        FuzzyVariant variant(FT_U32, hashed);
+        runtime->UnidentifiedVirtual14(action, index, variant);
+    }
+    else
+    {
+        FuzzyVariant variant(value);
+        runtime->UnidentifiedVirtual14(action, index, variant);
+    }
 }
 
 extern "C" float fn_80314428(

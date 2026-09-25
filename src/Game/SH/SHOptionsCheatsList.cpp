@@ -185,11 +185,11 @@ void SHOptionsCheatsList::Update(float fDeltaT)
     if (state == 0 || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; ++pad)
             {
-                gFEPointerInstances[pad]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
             }
             return;
         }
@@ -219,7 +219,7 @@ void SHOptionsCheatsList::Update(float fDeltaT)
 
     for (int pad = 0; pad < 4; ++pad)
     {
-        TLComponentInstance* controller = gFEPointerInstances[pad];
+        TLComponentInstance* controller = GetPointerInstance(pad);
         if ((unsigned int)pad != gFEControllerIndex)
         {
             controller->SetActiveSlide("waiting", true, false);

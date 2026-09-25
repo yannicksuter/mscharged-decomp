@@ -33,6 +33,10 @@ public:
     ChargeShadowDrawable(
         WorldObjectLoadContext* context, glModel* model, unsigned long type);
     virtual ~ChargeShadowDrawable();
+    virtual void ReleaseResources();
+    virtual void Draw();
+    virtual PlanarShadowDrawable* Clone(unsigned long hash);
+    virtual void Initialize(glModel* model, unsigned long hash);
 
     /* 0x78 */ unsigned long m_uChargeFlags;
     /* 0x7C */ nlQuaternion m_orientation;

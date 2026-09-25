@@ -56,24 +56,24 @@ extern "C" PhysicsObject* fn_8027944C(StadiumPhysicsObject_8027944C* object)
     return pPhysicsObject;
 }
 
-void StadiumPhysicsObject_8027944C::fn_80279700(void*)
+void StadiumPhysicsObject_8027944C::UnidentifiedVirtual1C(WorldObjectLoadContext*)
 {
     m_pPhysicsObject = fn_8027944C(this);
 }
 
-void StadiumPhysicsObject_8027944C::fn_80279730()
+void StadiumPhysicsObject_8027944C::ReleaseResources()
 {
     g_StaticPhysicsPrimitives.RemoveEntry(m_pPhysicsObject);
     g_NetPhysicsObjects.RemoveEntry(m_pPhysicsObject);
     fn_8034417C(this);
 }
 
-void StadiumPhysicsObject_8027944C::SetWorldMatrix(const nlMatrix4* transform)
+void WorldPhysicsDrawable_80534448::SetWorldMatrix(const nlMatrix4& transform)
 {
-    m_Description.m_transform = *transform;
+    m_Description.m_transform = transform;
 }
 
-nlMatrix4* StadiumPhysicsObject_8027944C::GetWorldMatrix()
+nlMatrix4* WorldPhysicsDrawable_80534448::GetWorldMatrix()
 {
     return &m_Description.m_transform;
 }
@@ -82,16 +82,16 @@ StadiumPhysicsObject_8027944C::~StadiumPhysicsObject_8027944C()
 {
 }
 
-void StadiumMarker_8027999C::fn_8027999C(void*)
+void StadiumMarker_8027999C::UnidentifiedVirtual1C(WorldObjectLoadContext*)
 {
     nlSingleton<FEModelManager>::Instance()->RegisterObject(this);
 }
 
-void StadiumMarker_8027999C::fn_802799A8()
+void StadiumMarker_8027999C::ReleaseResources()
 {
 }
 
-void StadiumMarker_802799AC::fn_802799AC(void*)
+void StadiumMarker_802799AC::UnidentifiedVirtual1C(WorldObjectLoadContext*)
 {
     BasicStadium* stadium = BasicStadium::GetCurrentStadium();
     if (stadium != 0)
@@ -102,7 +102,7 @@ void StadiumMarker_802799AC::fn_802799AC(void*)
     }
 }
 
-void StadiumMarker_802799AC::fn_80279A24()
+void StadiumMarker_802799AC::ReleaseResources()
 {
 }
 

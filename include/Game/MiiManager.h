@@ -11,7 +11,7 @@ struct MiiManager
     virtual ~MiiManager();
 
     static MiiManager* Instance();
-    unsigned long GetIconTextureId(int index);
+    unsigned long GetIconTextureId(int index) { return mIconTextureIds[index]; }
 
     void LoadResources();
     void LoadResources(void* buffer);

@@ -65,12 +65,12 @@ void NetworkPeer::ResetNetworkPeerInputs()
         entry->mInput1.Reset();
         entry->mInput2.Reset();
         entry->mInput3.Reset();
-        entry->mInput0.m_pMyUser = entry;
-        entry->mInput1.m_pMyUser = entry;
-        entry->mInput2.m_pMyUser = entry;
-        entry->mInput3.m_pMyUser = entry;
-        entry->mInput1.m_pPrevInput = &entry->mInput0;
-        entry->mInput3.m_pPrevInput = &entry->mInput2;
+        mChannels[channel].mInput0.m_pMyUser = entry;
+        mChannels[channel].mInput1.m_pMyUser = entry;
+        mChannels[channel].mInput2.m_pMyUser = entry;
+        mChannels[channel].mInput3.m_pMyUser = entry;
+        mChannels[channel].mInput1.m_pPrevInput = &entry->mInput0;
+        mChannels[channel].mInput3.m_pPrevInput = &entry->mInput2;
     }
 }
 

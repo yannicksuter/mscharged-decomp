@@ -8,8 +8,8 @@ extern UnidentifiedUnsetTransition lbl_806E20B8;
 class DesireUserControlled : public Desire
 {
 public:
-    DesireUserControlled()
-        : Desire(20, UnidentifiedStateTransition(lbl_806E20B8))
+    DesireUserControlled(UnidentifiedStateTransition transition)
+        : Desire(20, transition)
     {
     }
 

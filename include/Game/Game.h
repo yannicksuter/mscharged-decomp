@@ -129,6 +129,7 @@ public:
     }
 
     inline int GetGameState() const { return m_eGameState; }
+    inline bool IsCaptainShotToScoreOn() const { return mbCaptainShotToScoreOn; }
     inline u32 GetMegaStrikeSaveMask() const { return mUnidentified038; }
 
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;

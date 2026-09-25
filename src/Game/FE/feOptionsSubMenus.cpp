@@ -87,12 +87,12 @@ void OptionsAudioMenuV2::SceneCreated()
         "OPTIONS_IN", "Layer", "visual_options", "scrollbar_right");
     TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<>(presentation,
         "OPTIONS_IN", "Layer", "visual_options", "scrollbar_left");
-    mButtons[0] = FEFinder<TLComponentInstance, 4>::Find<>(right->GetActiveSlide(), "down_arrow");
-    mButtons[1] = FEFinder<TLComponentInstance, 4>::Find<>(left->GetActiveSlide(), "up_arrow");
-    mButtons[2] = FEFinder<TLComponentInstance, 4>::Find<>(right->GetActiveSlide(), "down_arrow2");
-    mButtons[3] = FEFinder<TLComponentInstance, 4>::Find<>(left->GetActiveSlide(), "up_arrow2");
-    mButtons[4] = FEFinder<TLComponentInstance, 4>::Find<>(right->GetActiveSlide(), "down_arrow3");
-    mButtons[5] = FEFinder<TLComponentInstance, 4>::Find<>(left->GetActiveSlide(), "up_arrow3");
+    mButtons[0] = FEFinder<TLComponentInstance, 4>::Find<>(left->GetActiveSlide(), "down_arrow");
+    mButtons[1] = FEFinder<TLComponentInstance, 4>::Find<>(right->GetActiveSlide(), "up_arrow");
+    mButtons[2] = FEFinder<TLComponentInstance, 4>::Find<>(left->GetActiveSlide(), "down_arrow2");
+    mButtons[3] = FEFinder<TLComponentInstance, 4>::Find<>(right->GetActiveSlide(), "up_arrow2");
+    mButtons[4] = FEFinder<TLComponentInstance, 4>::Find<>(left->GetActiveSlide(), "down_arrow3");
+    mButtons[5] = FEFinder<TLComponentInstance, 4>::Find<>(right->GetActiveSlide(), "up_arrow3");
 
     TLInstance* volume[3];
     volume[0] = FEFinder<TLInstance, 2>::Find<>(presentation,
@@ -441,10 +441,8 @@ void OptionsAudioMenuV2::fn_801D58EC(int setting)
     unsigned short number[4];
     if (setting == 0)
     {
-        TLTextInstance* text = FEFinder<TLTextInstance, 4>::Find(
-            mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
-            nlStringLowerHash("visual_options"), nlStringLowerHash("MUSIC SETTING"),
-            0UL, 0UL, 0UL);
+        TLTextInstance* text = FEFindTextInstance(
+            mPresentation->m_currentSlide, "Layer", "visual_options", "MUSIC SETTING");
         nlSNPrintf(number, 4, (const unsigned short*)L"%d", mSettings[0]);
         BasicString<unsigned short, Detail::TempStringAllocator> formatted = Format(
             BasicString<unsigned short, Detail::TempStringAllocator>(
@@ -454,10 +452,8 @@ void OptionsAudioMenuV2::fn_801D58EC(int setting)
     }
     else if (setting == 1)
     {
-        TLTextInstance* text = FEFinder<TLTextInstance, 4>::Find(
-            mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
-            nlStringLowerHash("visual_options"), nlStringLowerHash("SFX SETTING2"),
-            0UL, 0UL, 0UL);
+        TLTextInstance* text = FEFindTextInstance(
+            mPresentation->m_currentSlide, "Layer", "visual_options", "SFX SETTING2");
         nlSNPrintf(number, 4, (const unsigned short*)L"%d", mSettings[1]);
         BasicString<unsigned short, Detail::TempStringAllocator> formatted = Format(
             BasicString<unsigned short, Detail::TempStringAllocator>(
@@ -467,10 +463,8 @@ void OptionsAudioMenuV2::fn_801D58EC(int setting)
     }
     else
     {
-        TLTextInstance* text = FEFinder<TLTextInstance, 4>::Find(
-            mPresentation->m_currentSlide, nlStringLowerHash("Layer"),
-            nlStringLowerHash("visual_options"), nlStringLowerHash("VOX SETTING3"),
-            0UL, 0UL, 0UL);
+        TLTextInstance* text = FEFindTextInstance(
+            mPresentation->m_currentSlide, "Layer", "visual_options", "VOX SETTING3");
         nlSNPrintf(number, 4, (const unsigned short*)L"%d", mSettings[2]);
         BasicString<unsigned short, Detail::TempStringAllocator> formatted = Format(
             BasicString<unsigned short, Detail::TempStringAllocator>(

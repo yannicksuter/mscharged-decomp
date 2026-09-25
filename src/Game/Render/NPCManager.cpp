@@ -46,7 +46,6 @@ extern "C"
 int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
 
 static char sChainChompTemplateName[] = "ChainChomp";
-static char sDiddyBananaTemplateName[] = "DiddyBanana";
 static char sNPCAnimationPath[] = "art/animation/%s.sanim.zlib";
 static char sNPCHierarchyPath[] = "art/animation/%s.shier";
 static char sNPCTexturePath[] = "art/characters/npcs/%s/%s.rlt";
@@ -262,7 +261,7 @@ void NPCManager::fn_801A9DF0()
 void NPCManager::CreateDiddyBanana()
 {
     NPCTemplate* pTemplate
-        = fn_801ABBDC_inline(sDiddyBananaTemplateName);
+        = fn_801ABBDC_inline("DiddyBanana");
     DiddyBanana* pObject
         = (DiddyBanana*)nlMalloc(0x84, 8, false);
     pObject = new (pObject) DiddyBanana(

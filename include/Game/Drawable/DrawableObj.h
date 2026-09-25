@@ -18,7 +18,6 @@ class DrawableObject : public WorldObject
 public:
     virtual ~DrawableObject() { }
     virtual void ReleaseResources();
-    virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);
     virtual void Draw();
     virtual bool V6(const nlVector4* planes) const;

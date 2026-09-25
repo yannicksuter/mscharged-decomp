@@ -85,12 +85,12 @@ public:
     /* 0x4C */ fxRange m_rFPS;
     /* 0x54 */ unsigned long m_uModelID;
     /* 0x58 */ fxAnimatedRange* mProperties[8];
-    /* 0x78 */ nlColour m_cColour[25];
+    /* 0x78 */ nlColour m_cColour[26];
 
     bool IsInFront() const { return (mUnidentified037 & 1) != 0; }
     bool IsLocalSpace() const { return (mUnidentified037 & 2) != 0; }
     bool IsLit() const { return (mUnidentified037 & 4) != 0; }
-}; // size: 0xDC
+}; // size: 0xE0
 
 inline float RandomizedValue(float base, float range)
 {

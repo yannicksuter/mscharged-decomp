@@ -246,7 +246,8 @@ float ReplayCamera::GetFov(ReplayCameraPosition position) const
             BasicString<char, Detail::TempStringAllocator> prefix("replay/camera_");
             BasicString<char, Detail::TempStringAllocator> formatString("generic_{0}_fov");
             int index = position - REPLAY_CAMERA_POSITION_GENERIC_0;
-            prefix.AppendInPlace(Format(formatString, index));
+            BasicString<char, Detail::TempStringAllocator> formatted(Format(formatString, index));
+            prefix.AppendInPlace(formatted);
             return GetConfigFloat(Config::Global(), prefix.c_str(), 50.0f);
         }
         return 27.0f;

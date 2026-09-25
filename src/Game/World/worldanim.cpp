@@ -9,6 +9,7 @@
 #include "Game/Physics/PhysicsSphere.h"
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/World/WorldObject_80129EE0.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/GL/GLInventory.h"
@@ -45,7 +46,7 @@ public:
         WorldAnimController** ppController);
 };
 
-extern "C" void fn_80341EE8(void*)
+void WorldObject_80129EE0::SetWorldMatrix(const nlMatrix4& transform)
 {
 }
 

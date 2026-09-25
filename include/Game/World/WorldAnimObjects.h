@@ -64,7 +64,7 @@ public:
 class WorldPhysicsDrawable_80534448 : public WorldObjectBase_803416DC
 {
 public:
-    virtual ~WorldPhysicsDrawable_80534448();
+    virtual ~WorldPhysicsDrawable_80534448() { }
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);

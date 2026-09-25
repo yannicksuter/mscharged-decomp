@@ -3,11 +3,6 @@
 
 #include "Game/MiiManager.h"
 
-inline unsigned long MiiManager::GetIconTextureId(int index)
-{
-    return mIconTextureIds[index];
-}
-
 inline MiiManager* MiiManager::Instance()
 {
     return g_pMiiManager;

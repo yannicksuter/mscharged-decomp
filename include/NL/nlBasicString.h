@@ -323,17 +323,10 @@ BasicString<CharT, Allocator>& BasicString<CharT, Allocator>::AppendInPlace(cons
     }
 
     typename BasicString<CharT, OtherAllocator>::Data* rhsData = rhs.mData;
-    const CharT* begin;
-    if (rhsData != 0)
-    {
-        begin = rhsData->mData.mData;
-    }
-    else
-    {
-        begin = 0;
-    }
+    const CharT* end = rhsData != 0 ? rhsData->mData.mData + rhsData->mData.mSize - 1 : 0;
+    const CharT* begin = rhsData != 0 ? rhsData->mData.mData : 0;
 
-    insert(at, begin, rhsData != 0 ? rhsData->mData.mData + rhsData->mData.mSize - 1 : 0);
+    insert(at, begin, end);
     return *this;
 }
 
@@ -368,16 +361,7 @@ BasicString<CharT, Allocator> BasicString<CharT, Allocator>::Append(const BasicS
 {
     BasicString r(*this);
     r.AppendInPlace(rhs);
-    Data* data = r.mData;
-    if (data != 0)
-    {
-        data->mRefCount++;
-    }
-    else
-    {
-        data = 0;
-    }
-    return BasicString(data);
+    return r;
 }
 
 template <typename CharT, typename Allocator>

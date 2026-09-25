@@ -33,6 +33,11 @@ public:
     {
     }
 
+    FuzzyVariant(const char* value)
+        : Variant(value)
+    {
+    }
+
     template <typename T>
     FuzzyVariant(const T& value)
         : Variant(VariantTypeOf(value), value)

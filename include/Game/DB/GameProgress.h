@@ -8,6 +8,38 @@
 
 struct CupHistoryRecord
 {
+    bool IsEmpty() const
+    {
+        bool emptyThrough04, emptyThrough07, emptyThrough0A, emptyThrough0D,
+            emptyThrough12, emptyThrough16, emptyThrough20, emptyThrough2B,
+            emptyThrough32, empty;
+        emptyThrough04 = emptyThrough07 = emptyThrough0A = emptyThrough0D
+            = emptyThrough12 = emptyThrough16 = emptyThrough20 = emptyThrough2B
+            = emptyThrough32 = empty = false;
+
+        if (mCaptain == 0 && mSidekick1 == 0)
+            emptyThrough04 = true;
+        if (emptyThrough04 && mSidekick2 == 0)
+            emptyThrough07 = true;
+        if (emptyThrough07 && mSidekick3 == 0)
+            emptyThrough0A = true;
+        if (emptyThrough0A && mDay == 0)
+            emptyThrough0D = true;
+        if (emptyThrough0D && mMonth == 0)
+            emptyThrough12 = true;
+        if (emptyThrough12 && mYearOffset == 0)
+            emptyThrough16 = true;
+        if (emptyThrough16 && mGoals == 0)
+            emptyThrough20 = true;
+        if (emptyThrough20 && mUnidentified2B == 0)
+            emptyThrough2B = true;
+        if (emptyThrough2B && mUnidentified32 == 0)
+            emptyThrough32 = true;
+        if (emptyThrough32 && mUnidentified39 == 0)
+            empty = true;
+        return empty;
+    }
+
     unsigned int mCaptain : 4;
     unsigned int mSidekick1 : 3;
     unsigned int mSidekick2 : 3;

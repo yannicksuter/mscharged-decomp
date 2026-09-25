@@ -11,8 +11,7 @@ class NetMessageTournamentStart : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageTournamentStart() { }
-    virtual int GetType();
+    virtual int GetType() { return 20; }
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ u8 mMachineCount;
@@ -290,8 +289,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageTournamentGameUpdate() { }
-    virtual int GetType();
+    virtual int GetType() { return 32; }
 
     /* 0x008 */ u8 mUpdateType;
     /* 0x009 */ u8 mGameIndex;
@@ -317,8 +315,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageTournamentLoadingState() { }
-    virtual int GetType();
+    virtual int GetType() { return 33; }
 
     /* 0x08 */ s8 mMachineIndex;
     /* 0x09 */ u8 mFinishedLoadingToKnockout;

@@ -361,23 +361,26 @@ void AudioBackend::InitializeAuxEffects()
 
 void ServiceControllerSpeakers(OSAlarm*, OSContext*)
 {
+    AudioBackend* self = g_pAudioBackend;
     s16 samples[40] = { 0 };
     u8 encoded[20];
-    AudioBackend* self = g_pAudioBackend;
+    u32* speakerState = self->m_Unknown698;
+    WENCInfo* encoder = self->m_Unknown6A8;
+    int chan;
     bool advance = false;
-    for (int chan = 0; chan < 4; ++chan)
+    for (chan = 0; chan < 4; ++chan, ++speakerState, ++encoder)
     {
         if (AXRmtGetSamples(chan, samples, 40) != 40)
             continue;
         advance = true;
-        if ((self->m_Unknown698[chan] & 0x80000000) == 0)
+        if ((*speakerState >> 31) == 0)
             continue;
         BOOL enabled = OSDisableInterrupts();
         if (WPADCanSendStreamData(chan))
         {
-            bool reuse = (self->m_Unknown698[chan] & 0x40000000) == 0;
-            self->m_Unknown698[chan] &= ~0x40000000;
-            WENCGetEncodeData(&self->m_Unknown6A8[chan], reuse, samples, 40, encoded);
+            bool reuse = !((*speakerState >> 30) & 1);
+            *speakerState &= ~0x40000000;
+            WENCGetEncodeData(encoder, reuse, samples, 40, encoded);
             WPADSendStreamData(chan, encoded, 20);
         }
         OSRestoreInterrupts(enabled);

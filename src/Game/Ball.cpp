@@ -2405,18 +2405,17 @@ extern "C" void fn_800180F4(
     float k = lbl_806DB584 * airResistance;
     float g = lbl_806DB588 * gravity;
     float eToTheNegativeKT = Exp(-k * fTime);
-    float oneOverK = 1.0f / k;
     float oneMinusEToTheNegativeKTOverK
-        = oneOverK * (1.0f - eToTheNegativeKT);
+        = (1.0f / k) * (1.0f - eToTheNegativeKT);
 
     pPosition->x = pBall->m_v3Position.x
         + pBall->m_v3Velocity.x * oneMinusEToTheNegativeKTOverK;
     pPosition->y = pBall->m_v3Position.y
         + pBall->m_v3Velocity.y * oneMinusEToTheNegativeKTOverK;
     pPosition->z = pBall->m_v3Position.z + fTime * g / k
-        + oneOverK * oneMinusEToTheNegativeKTOverK
+        + (1.0f / k) * oneMinusEToTheNegativeKTOverK
             * (k * pBall->m_v3Velocity.z - g);
-    pPosition->z = nlMaxEquals(0.0f, pPosition->z);
+    pPosition->z = nlMaxEquals(0.18f, pPosition->z);
 }
 
 float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
@@ -2431,7 +2430,8 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
         int numSolutions;
         float times[2];
 
-        SolveQuadratic(m_pPhysicsBall->m_gravity / 2.0f, m_v3Velocity.z,
+        float fGravity = m_pPhysicsBall->m_gravity;
+        SolveQuadratic(0.5f * fGravity, m_v3Velocity.z,
             m_v3Position.z - fHeight,
             numSolutions, times[0], times[1]);
 

@@ -7,6 +7,8 @@
 #include "Game/DB/BasicGameInfo.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinderFind_impl.h"
+#include "Game/FE/feInlineHasher.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
@@ -27,19 +29,6 @@
 
 extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
 extern BaseGameSceneManager* g_pOverlayManager;
-
-template <typename T>
-static inline T* FindInPresentation(FEPresentation* presentation,
-    unsigned long Level1, unsigned long Level2, unsigned long Level3)
-{
-    void* result = FEFindInstance(
-        presentation, Level1, Level2, Level3, 0, 0, 0);
-    if (result == 0)
-    {
-        return 0;
-    }
-    return (T*)result;
-}
 
 static inline const unsigned short* LookupLocHash(const char* stringId)
 {
@@ -186,7 +175,8 @@ void InGameTextOverlay::DisplayFinalScore()
     nlStrToWcs(scoreLeftString, scoreLeftWideString, 32);
     nlStrToWcs(scoreRightString, scoreRightWideString, 32);
 
-    WideString formatted(Format(WideString(LookupLocHash("FINAL_SCORE")),
+    const unsigned short* formatLocString = LookupLocHash("FINAL_SCORE");
+    WideString formatted(Format(WideString(formatLocString),
         scoreLeftWideString,
         scoreRightWideString));
 
@@ -199,10 +189,8 @@ void InGameTextOverlay::DisplayFinalScore()
 
     if (mCurrentSlideName == SLIDE_NAME_TEXT_WINNER)
     {
-        pTextInstance = FindInPresentation<TLTextInstance>(presentation,
-            nlStringLowerHash(WINNER_SLIDE_NAME),
-            nlStringLowerHash(OVERLAY_HANDLER_LAYER_NAME),
-            nlStringLowerHash("Score"));
+        pTextInstance = FEFinder<TLTextInstance, 3>::Find(presentation,
+            WINNER_SLIDE_NAME, OVERLAY_HANDLER_LAYER_NAME, "Score");
 
         winningSide = scoreLeft > scoreRight ? 0 : 1;
         eTeamID winningTeam = (eTeamID)nlSingleton<GameInfoManager>::Instance()->GetTeam(
@@ -214,35 +202,32 @@ void InGameTextOverlay::DisplayFinalScore()
 
         if (winningTeam == (eTeamID)0)
         {
-            WideString space((const unsigned short*)L" ");
+            const unsigned short* const& spaceCharacters = (const unsigned short*)L" ";
+            WideString space(spaceCharacters);
             winnerNameWideString = space.Append(winnerNameWideString);
         }
 
-        WideString formattedName(Format(
-            WideString(LookupLocHash("THE_WINNER")), winnerNameWideString.c_str()));
+        const unsigned short* winnerFormatLocString = LookupLocHash("THE_WINNER");
+        WideString unformattedName(winnerFormatLocString);
+        WideString formattedName(Format(unformattedName, winnerNameWideString.c_str()));
 
-        TLTextInstance* winnerNameTextInstance
-            = FindInPresentation<TLTextInstance>(presentation,
-                nlStringLowerHash(WINNER_SLIDE_NAME),
-                nlStringLowerHash(OVERLAY_HANDLER_LAYER_NAME),
-                nlStringLowerHash("name"));
+        TLInstance* winnerNameInstance
+            = FEFinder<TLInstance, 3>::Find(presentation,
+                WINNER_SLIDE_NAME, OVERLAY_HANDLER_LAYER_NAME, "name");
+        TLTextInstance* winnerNameTextInstance = (TLTextInstance*)winnerNameInstance;
 
         memcpy(mWinnerBuffer, formattedName.c_str(), sizeof(mWinnerBuffer));
         winnerNameTextInstance->SetString(mWinnerBuffer);
 
         eTeamID team = (eTeamID)nlSingleton<GameInfoManager>::Instance()->GetTeam(0);
         TLComponentInstance* pComponentInstance
-            = FindInPresentation<TLComponentInstance>(presentation,
-                nlStringLowerHash(WINNER_SLIDE_NAME),
-                nlStringLowerHash(OVERLAY_HANDLER_LAYER_NAME),
-                nlStringLowerHash("left_face"));
+            = FEFinder<TLComponentInstance, 4>::Find(presentation,
+                WINNER_SLIDE_NAME, OVERLAY_HANDLER_LAYER_NAME, "left_face");
         pComponentInstance->SetActiveSlide(TEAM_SLIDE_NAMES[team], true, false);
 
         team = (eTeamID)nlSingleton<GameInfoManager>::Instance()->GetTeam(1);
-        pComponentInstance = FindInPresentation<TLComponentInstance>(presentation,
-            nlStringLowerHash(WINNER_SLIDE_NAME),
-            nlStringLowerHash(OVERLAY_HANDLER_LAYER_NAME),
-            nlStringLowerHash("right_face"));
+        pComponentInstance = FEFinder<TLComponentInstance, 4>::Find(presentation,
+            WINNER_SLIDE_NAME, OVERLAY_HANDLER_LAYER_NAME, "right_face");
         pComponentInstance->SetActiveSlide(TEAM_SLIDE_NAMES[team], true, false);
 
         if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode != 0)

@@ -1,6 +1,7 @@
 #include "Game/FE/fePointerManager.h"
 
 #include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 FEPointerManager* g_pFEPointerManager;
 

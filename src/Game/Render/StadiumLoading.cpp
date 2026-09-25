@@ -547,13 +547,21 @@ void UpdateHighRange()
     else if (IsHighRangeEnabled(&gHighRange))
     {
         cBaseCamera* pCamera = cCameraManager::PeekCamera();
-        bool bBlocked = pCamera == 0 || pCamera->GetType() == 0;
+        bool bBlocked;
+        if (pCamera != 0 && pCamera->GetType() == 0)
+        {
+            bBlocked = true;
+        }
+        else
+        {
+            bBlocked = false;
+        }
         if (bBlocked || (nlTaskManager::m_pInstance->mCurrentState & 4) != 0)
         {
             bDisable = true;
         }
         else if (GetStadiumUnknown0x2C(GameInfoManager::Instance()->GetStadium())
-            && (nlTaskManager::m_pInstance->mCurrentState & 0x2000C) != 0)
+            && (nlTaskManager::m_pInstance->mCurrentState & 0x20018) != 0)
         {
             bDisable = true;
         }

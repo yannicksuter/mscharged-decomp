@@ -575,47 +575,49 @@ void ParticleSystem::fn_802E1EC0(Particle* pPart,
         pPart->position, gravityDistance, gravity, pPart->position);
 }
 
-static nlColour fn_802E2034(const Particle* pPart,
+static nlColour fn_802E2034(Particle* pPart,
     const EffectsTemplate* pTemplate)
 {
     float frame = 24.0f * (pPart->timeElapsed / pPart->lifeSpan);
-    int first = (int)floor(frame);
+    int first = (int)(float)floor(frame);
     int second = first + 1;
     nlColour colour;
     if (first >= 24)
     {
-        colour = pTemplate->m_cColour[24];
+        colour = pTemplate->m_cColour[25];
     }
     else
     {
-        float fraction = frame - (float)first;
+        const nlColour* firstColour = &pTemplate->m_cColour[first];
+        const nlColour* secondColour = &pTemplate->m_cColour[second];
+        unsigned int fraction = (unsigned int)(65536.0f
+            * ((frame - (float)first) / (float)(second - first)));
+        unsigned int inverseFraction = 65536 - fraction;
         for (int i = 0; i < 4; ++i)
         {
-            colour.c[i] = (unsigned char)(
-                fraction * pTemplate->m_cColour[second].c[i]
-                + (1.0f - fraction) * pTemplate->m_cColour[first].c[i]);
+            colour.c[i] = (unsigned char)((
+                fraction * secondColour->c[i]
+                + inverseFraction * firstColour->c[i]) >> 16);
         }
     }
 
+    nlColour result;
     float red = colour.c[0] * sfParticleRedScale.value;
+    red = red >= 0.0f ? red : 0.0f;
+    red = red <= 255.0f ? red : 255.0f;
+    result.c[0] = (unsigned char)red;
+
     float green = colour.c[1] * sfParticleGreenScale.value;
+    green = green >= 0.0f ? green : 0.0f;
+    green = green <= 255.0f ? green : 255.0f;
+    result.c[1] = (unsigned char)green;
+
     float blue = colour.c[2] * sfParticleBlueScale.value;
-    if (red < 0.0f)
-        red = 0.0f;
-    else if (red > 255.0f)
-        red = 255.0f;
-    if (green < 0.0f)
-        green = 0.0f;
-    else if (green > 255.0f)
-        green = 255.0f;
-    if (blue < 0.0f)
-        blue = 0.0f;
-    else if (blue > 255.0f)
-        blue = 255.0f;
-    colour.c[0] = (unsigned char)red;
-    colour.c[1] = (unsigned char)green;
-    colour.c[2] = (unsigned char)blue;
-    return colour;
+    blue = blue >= 0.0f ? blue : 0.0f;
+    blue = blue <= 255.0f ? blue : 255.0f;
+    result.c[2] = (unsigned char)blue;
+    result.c[3] = colour.c[3];
+    return result;
 }
 
 void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,

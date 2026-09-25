@@ -38,34 +38,31 @@ public:
         {
             if (currentEntry->entry == data)
             {
-                ListEntry<T>* newHead;
                 if (currentEntry == m_Tail)
                 {
                     m_Tail = 0;
-                    newHead = 0;
+                    currentEntry = 0;
                 }
                 else
-                    newHead = currentEntry->next;
+                    currentEntry = currentEntry->next;
                 DeleteEntry(m_Head);
-                m_Head = newHead;
+                m_Head = currentEntry;
             }
             else
             {
-                ListEntry<T>* previousEntry = currentEntry;
-                nlListIterator<T> iterator(currentEntry->next);
-                while (iterator.IsValid())
+                ListEntry<T>* nextEntry = currentEntry->next;
+                while (nextEntry != 0)
                 {
-                    ListEntry<T>* nextEntry = iterator.CurrentEntry();
-                    if (iterator.Current() == data)
+                    if (nextEntry->entry == data)
                     {
-                        previousEntry->next = nextEntry->next;
+                        currentEntry->next = nextEntry->next;
                         if (nextEntry == m_Tail)
-                            m_Tail = previousEntry;
+                            m_Tail = currentEntry;
                         DeleteEntry(nextEntry);
                         break;
                     }
-                    previousEntry = nextEntry;
-                    iterator.Next();
+                    currentEntry = nextEntry;
+                    nextEntry = nextEntry->next;
                 }
             }
         }

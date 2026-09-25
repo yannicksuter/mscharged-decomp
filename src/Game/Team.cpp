@@ -705,7 +705,7 @@ extern "C" void fn_800A6C94(cTeam* pTeam, float fDeltaT)
 {
     if ((g_pGame->IsGameplayOrOvertime()
             || g_pGame->GetGameState() == 1)
-        && !g_pGame->mbCaptainShotToScoreOn)
+        && !g_pGame->IsCaptainShotToScoreOn())
     {
         pTeam->mfPowerupTimer -= fDeltaT;
         if (pTeam->mfPowerupTimer < 0.0f)

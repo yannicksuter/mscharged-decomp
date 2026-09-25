@@ -33,12 +33,10 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feOnlineError.h"
-#include "Game/MiiManager.h"
 
 #include <stdlib.h>
 #include "Game/FE/UnidentifiedTLDefault.h"
 
-static const int sFriendStatusSortOrder[12] = { 5, 4, 0, 3, 6, 7, 8, 10, 9, 1, 2, 11 };
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 SHOnlineFriends::SHOnlineFriends()
@@ -139,122 +137,6 @@ void SHOnlineFriends::UpdateFriend(int index)
     nlStrNCpy(row->mName, name, 14);
 }
 
-int SHOnlineFriends::CompareFriendStatus(const void* a, const void* b)
-{
-    const FEOnlinePlayerRow* first = *(const FEOnlinePlayerRow* const*)a;
-    const FEOnlinePlayerRow* second = *(const FEOnlinePlayerRow* const*)b;
-    int secondOrder = sFriendStatusSortOrder[second->mStatus];
-    int firstOrder = sFriendStatusSortOrder[first->mStatus];
-    if (firstOrder > secondOrder)
-        return 1;
-    return firstOrder < secondOrder ? -1 : 0;
-}
-
-void SHOnlineFriends::InitializeButtons()
-{
-    typedef Detail::MemFunImpl<void, void (SHOnlineFriends::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, SHOnlineFriends*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineFriends::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineFriends::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineFriends::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    for (int i = 0; i < 4; ++i)
-    {
-        mUnidentified0038[i].SetInstanceBounds(mUnidentified0618[i], true, -24.0f, 10.0f, 0.7f, 0.55f);
-        mUnidentified0038[i].SetPointerEnterCallback(over);
-        mUnidentified0038[i].SetPointerLeaveCallback(off);
-        mUnidentified0038[i].SetPointerPressCallback(down);
-    }
-    if (!mUnidentified0308.mInitialized)
-        mUnidentified0308.Initialize();
-}
-
-void SHOnlineFriends::OnPointerPress(int index, void* context)
-{
-    FEPopupMenu* popup;
-    int selected;
-    u8 region;
-    int item = (int)context;
-    mUnidentified002C = item;
-    mUnidentified0031 = true;
-    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-    bool change = false;
-    if (item == 0 && !IsOnlineFriendSelectionMode())
-    {
-        if (g_pFriendManager->CountFriends() >= 64)
-        {
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-            {
-                popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)104, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
-                mUnidentified2FA8 = true;
-            }
-        }
-        else
-            change = true;
-    }
-    else if (!IsOnlineFriendSelectionMode())
-    {
-        g_pFriendManager->SetOwnStatusInitial(0);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-        {
-            popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)106,
-                Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, item),
-                Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
-            mUnidentified2FA8 = true;
-        }
-    }
-    else
-    {
-        selected = item + mUnidentified0020;
-        if (!IsOnlineFriendSelectionMode())
-            --selected;
-        region = *(u8*)GameInfoManager::Instance()->GetUnknown0xA40(
-            gNetworkSaveSlotIndex, mUnidentified2EA8[selected]->mFriendIndex);
-        bool differentRegion = region != GetOnlineRegion();
-        if (differentRegion)
-        {
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-            {
-                popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-                popup->Create((ePopupMenu)105, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
-                mUnidentified2FA8 = true;
-            }
-        }
-        else
-            change = true;
-    }
-    if (change)
-    {
-        mUnidentified2FAC = 2;
-        SHNavigation* scene = GetNavigationScene();
-        if (scene != 0)
-            scene->HideButtons();
-        for (int i = 0; i < 4; ++i)
-            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-        mPresentation->SetActiveSlide("out", true);
-        mPresentation->Update(0.0f);
-    }
-}
-
-void SHOnlineFriends::OnPointerEnter(int index, void* context)
-{
-    int item = (int)context;
-    ++mUnidentified0028;
-    mUnidentified0618[item]->SetActiveSlide("over", true, false);
-    mUnidentified0038[item].SetPointerState(1, index);
-    FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-}
-
-void SHOnlineFriends::OnPointerLeave(int index, void* context)
-{
-    int item = (int)context;
-    --mUnidentified0028;
-    mUnidentified0618[item]->SetActiveSlide("off", true, false);
-    mUnidentified0038[item].SetPointerState(0, index);
-}
-
 inline void SHOnlineFriends::UpdateVisibleRows()
 {
     for (int i = 0; i < 4; ++i)
@@ -282,78 +164,6 @@ static inline void RefreshFriends(SHOnlineFriends* self)
     for (int i = 0; i < 64; ++i)
         self->mUnidentified2EA8[i] = &self->mUnidentified08A8[i];
     qsort(self->mUnidentified2EA8, 64, sizeof(self->mUnidentified2EA8[0]), SHOnlineFriends::CompareFriendStatus);
-}
-
-void SHOnlineFriends::DeleteFriend(int index)
-{
-    mUnidentified2FA8 = false;
-    int selected = index + mUnidentified0020;
-    if (!IsOnlineFriendSelectionMode())
-        --selected;
-    g_pFriendManager->DeleteFriend(mUnidentified2EA8[selected]->mFriendIndex);
-    mUnidentified2EA8[selected]->mStatus = 11;
-    if (mUnidentified0020 == mUnidentified0024 && mUnidentified0020 > 0)
-        --mUnidentified0020;
-    RefreshFriends(this);
-    UpdateScrollRange();
-    UpdateVisibleRows();
-    g_pFriendManager->SetOwnStatusInitial(1);
-}
-
-void SHOnlineFriends::CancelDeleteFriend()
-{
-    mUnidentified2FA8 = false;
-    g_pFriendManager->SetOwnStatusInitial(1);
-}
-
-void SHOnlineFriends::UpdateFriendCode()
-{
-    WideString format;
-    WideString string;
-    u16 friendKey[14];
-    g_pFriendManager->GetOwnFriendKeyString(friendKey);
-    nlStrNCpy(mUnidentified0598, friendKey, 14);
-    format = WideString(LookupLocString("ONLINE_FRIEND_CODE_YOURS"));
-    string = Format(format, mUnidentified0598);
-    memcpy(mUnidentified0598, string.c_str(), sizeof(mUnidentified0598));
-    mUnidentified0594->SetString(mUnidentified0598);
-}
-
-void SHOnlineFriends::OnDialogDismissed()
-{
-    mUnidentified2FA8 = false;
-}
-
-void SHOnlineFriends::OnErrorDismissed()
-{
-    mUnidentified2FA8 = false;
-    GameSceneManager::Instance()->Pop();
-    FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-    FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
-}
-
-inline void SHOnlineFriends::ShowError(int error)
-{
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-    {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)error,
-            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriends::OnErrorDismissed), this)));
-        mUnidentified2FA8 = true;
-    }
-}
-
-inline void SHOnlineFriends::StartFriendInvite()
-{
-    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);
-    scene->mIsHost = true;
-    scene->mStartFriendServer = false;
-    SetOnlineFriendSelectionMode(false);
-    GameInfoManager* gameInfo = GameInfoManager::Instance();
-    int selected = mUnidentified2EA8[mUnidentified002C + mUnidentified0020]->mFriendIndex;
-    GetFriendManager()->SetOwnStatusHostInvitingPlayer(selected,
-        reinterpret_cast<const GameplaySettings*>(gameInfo->GetCurrentSettings()),
-        reinterpret_cast<const CheatSettings*>(gameInfo->GetActiveRules()), gameInfo->GetStadium());
 }
 
 void SHOnlineFriends::SceneCreated()
@@ -397,205 +207,6 @@ void SHOnlineFriends::SceneCreated()
     }
     mUnidentified04BC.SetButtonInstance(done);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
-}
-
-void SHOnlineFriends::UpdateAddFriendRow()
-{
-    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "off", "FRIEND_0");
-    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "over", "FRIEND_0");
-
-    FEFinder<TLInstance, 4>::FindOrDefault(off, "cancel")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(over, "cancel")->SetVisible(false);
-
-    TLComponentInstance* addOff = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(off, "SEARCHING_ADD");
-    addOff->SetActiveSlide("ADD", true, false);
-    addOff->SetVisible(true);
-    TLComponentInstance* addOver = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(over, "SEARCHING_ADD");
-    addOver->SetActiveSlide("ADD", true, false);
-    addOver->SetVisible(true);
-
-    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "NAME")->SetVisible(false);
-    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "NAME")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(off, "STATUS")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(over, "STATUS")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(off, "GUEST_HOME_AWAY")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(over, "GUEST_HOME_AWAY")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(off, "PLAYER CLASS")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(over, "PLAYER CLASS")->SetVisible(false);
-
-    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RANK", "RANK")->SetVisible(false);
-    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RANK", "RANK")->SetVisible(false);
-    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RECORD", "RECORD")->SetVisible(false);
-    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RECORD", "RECORD")->SetVisible(false);
-
-    FEFinder<TLImageInstance, 2>::FindOrDefault(off, "00_dummy_texture")->SetVisible(false);
-    FEFinder<TLImageInstance, 2>::FindOrDefault(over, "00_dummy_texture")->SetVisible(false);
-
-    TLImageInstance* miiOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Mii");
-    miiOff->SetVisible(false);
-    miiOff->SetAssetVisible(false);
-    TLImageInstance* miiOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Mii");
-    miiOver->SetVisible(false);
-    miiOver->SetAssetVisible(false);
-
-    TLImageInstance* logoOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "logo_32x32");
-    logoOff->SetVisible(false);
-    logoOff->SetAssetVisible(false);
-    TLImageInstance* logoOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "logo_32x32");
-    logoOver->SetVisible(false);
-    logoOver->SetAssetVisible(false);
-
-    TLImageInstance* shouldersOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "shoulders");
-    shouldersOff->SetVisible(false);
-    shouldersOff->SetAssetVisible(false);
-    TLImageInstance* shouldersOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "shoulders");
-    shouldersOver->SetVisible(false);
-    shouldersOver->SetAssetVisible(false);
-
-    TLImageInstance* backgroundOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Online_Mii_select_background");
-    backgroundOff->SetVisible(false);
-    backgroundOff->SetAssetVisible(false);
-    TLImageInstance* backgroundOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Online_Mii_select_background");
-    backgroundOver->SetVisible(false);
-    backgroundOver->SetAssetVisible(false);
-}
-
-static const char* sOnlinePlayerSearchSlides[5] = { "SEARCHING", "CONNECTING", "INVITE", "ADD", "OFF" };
-static const char* sOnlinePlayerStatusSlides[12] = {
-    "WAITING FOR FRIEND", "WAITING_FOR_OPPONENT", "AVAILABLE", "BUSY", "CHOOSING_CAPTAIN", "CHOOSING_SIDEKICKS", "CAPTAINNAMES", "ESTABLISHING", "OFFLINE", "DECLINED", "INVITING", "OFFLINE"
-};
-static const char* sOnlinePlayerSideSlides[4] = { "HOME", "HOME", "AWAY", "GUEST" };
-
-const char* GetOnlineCaptainSlideName(unsigned int captain)
-{
-    switch (captain)
-    {
-    case 0:
-        return "MARIO";
-    case 1:
-        return "BOWSER";
-    case 2:
-        return "DAISY";
-    case 3:
-        return "DONKEYKONG";
-    case 4:
-        return "LUIGI";
-    case 5:
-        return "PEACH";
-    case 6:
-        return "WALUIGI";
-    case 7:
-        return "WARIO";
-    case 8:
-        return "YOSHI";
-    case 9:
-        return "BOWSERJR";
-    case 10:
-        return "DIDDYKONG";
-    case 11:
-        return "PETEY";
-    default:
-        return 0;
-    }
-}
-
-void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance,
-    u16* name, int nameSize, u16* description, int descriptionSize, int index, bool value)
-{
-    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(instance, "off", "FRIEND_0");
-    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(instance, "over", "FRIEND_0");
-    off->SetVisible(row->mVisible);
-    over->SetVisible(row->mVisible);
-
-    FEFinder<TLInstance, 4>::FindOrDefault(off, "cancel")->SetVisible(row->mShowCancel);
-    FEFinder<TLInstance, 4>::FindOrDefault(over, "cancel")->SetVisible(row->mShowCancel);
-
-    TLComponentInstance* searching = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "SEARCHING_ADD"));
-    searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
-    searching = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "SEARCHING_ADD"));
-    searching->SetActiveSlide(sOnlinePlayerSearchSlides[row->mSearchState], false, false);
-
-    TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "NAME");
-    nameText->SetString(row->mName);
-    nameText->SetVisible(row->mSearchState == 4);
-    nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "NAME");
-    nameText->SetString(row->mName);
-    nameText->SetVisible(row->mSearchState == 4);
-
-    TLComponentInstance* status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "STATUS"));
-    status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
-    status->SetVisible(row->mSearchState == 4);
-    if (row->mStatus == 6)
-    {
-        TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, "NAMES");
-        names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
-    }
-    status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "STATUS"));
-    status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
-    status->SetVisible(row->mSearchState == 4);
-    if (row->mStatus == 6)
-    {
-        TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, "NAMES");
-        names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
-    }
-    bool show = row->mSearchState == 4
-             && row->mStatus != 7 && row->mStatus != 9 && row->mStatus != 10;
-    bool hasSide = row->mSide != 0;
-    TLComponentInstance* guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "GUEST_HOME_AWAY"));
-    guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
-    guest->SetVisible(show && hasSide);
-    guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "GUEST_HOME_AWAY"));
-    guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
-    guest->SetVisible(show && hasSide);
-
-    FEFinder<TLInstance, 4>::FindOrDefault(off, "PLAYER CLASS")->SetVisible(false);
-    FEFinder<TLInstance, 4>::FindOrDefault(over, "PLAYER CLASS")->SetVisible(false);
-    WideString string = Format(WideString(g_pLocalization->GetString("ONLINE_RANKING")), row->mStats.mDisplayRank);
-    nlStrNCpy(name, string.c_str(), nameSize);
-    TLTextInstance* rank = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RANK", "RANK");
-    rank->SetString(name);
-    rank->SetVisible(show && !row->mGuest);
-    rank = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RANK", "RANK");
-    rank->SetString(name);
-    rank->SetVisible(show && !row->mGuest);
-    string = Format(WideString(g_pLocalization->GetString("ONLINE_SLOT_STATS")), row->mStats.mWins, row->mStats.mLosses, row->mStats.mScore);
-    nlStrNCpy(description, string.c_str(), descriptionSize);
-    TLTextInstance* record = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RECORD", "RECORD");
-    record->SetString(description);
-    record->SetVisible(show && !row->mGuest);
-    record = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RECORD", "RECORD");
-    record->SetString(description);
-    record->SetVisible(show && !row->mGuest);
-
-    FEFinder<TLImageInstance, 2>::FindOrDefault(off, "00_dummy_texture")->SetVisible(show);
-    FEFinder<TLImageInstance, 2>::FindOrDefault(over, "00_dummy_texture")->SetVisible(show);
-
-    TLImageInstance* background = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Online_Mii_select_background");
-    background->SetAssetVisible(show);
-    background = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Online_Mii_select_background");
-    background->SetAssetVisible(show);
-    bool valid = MiiManager::Instance()->CreateIcon((const RFLStoreData*)row->mMiiData, index, (RFLExpression)0);
-    unsigned long texture = MiiManager::Instance()->GetIconTextureId(index);
-    nlColour colour = { 0, 0, 0, 255 };
-    TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(off, "Mii_btn", "Mii");
-    image->GetTextureResource()->SetTextureHandle(texture);
-    image->SetAssetVisible(valid && show && value);
-    image->SetVisible(valid && show && value);
-    if (row->mGuest)
-        image->SetAssetColour(colour);
-    image = FEFinder<TLImageInstance, 2>::Find(over, "Mii_btn", "Mii");
-    image->GetTextureResource()->SetTextureHandle(texture);
-    image->SetAssetVisible(valid && show && value);
-    image->SetVisible(valid && show && value);
-    if (row->mGuest)
-        image->SetAssetColour(colour);
-
-    TLImageInstance* shoulders = FEFinder<TLImageInstance, 2>::Find(off, "Mii_btn", "shoulders");
-    shoulders->SetAssetVisible(false);
-    shoulders->SetVisible(false);
-    shoulders = FEFinder<TLImageInstance, 2>::Find(over, "Mii_btn", "shoulders");
-    shoulders->SetAssetVisible(false);
-    shoulders->SetVisible(false);
 }
 
 void SHOnlineFriends::Update(float dt)
@@ -712,4 +323,253 @@ void SHOnlineFriends::Update(float dt)
     }
 }
 
-#include "Game/MiiManager.inl"
+void SHOnlineFriends::UpdateAddFriendRow()
+{
+    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "off", "FRIEND_0");
+    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "over", "FRIEND_0");
+
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "cancel")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "cancel")->SetVisible(false);
+
+    TLComponentInstance* addOff = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(off, "SEARCHING_ADD");
+    addOff->SetActiveSlide("ADD", true, false);
+    addOff->SetVisible(true);
+    TLComponentInstance* addOver = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(over, "SEARCHING_ADD");
+    addOver->SetActiveSlide("ADD", true, false);
+    addOver->SetVisible(true);
+
+    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "NAME")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "NAME")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "STATUS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "STATUS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "GUEST_HOME_AWAY")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "GUEST_HOME_AWAY")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(off, "PLAYER CLASS")->SetVisible(false);
+    FEFinder<TLInstance, 4>::FindOrDefault(over, "PLAYER CLASS")->SetVisible(false);
+
+    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RANK", "RANK")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RANK", "RANK")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(off, "STATS", "Slide1", "RECORD", "RECORD")->SetVisible(false);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(over, "STATS", "Slide1", "RECORD", "RECORD")->SetVisible(false);
+
+    FEFinder<TLImageInstance, 2>::FindOrDefault(off, "00_dummy_texture")->SetVisible(false);
+    FEFinder<TLImageInstance, 2>::FindOrDefault(over, "00_dummy_texture")->SetVisible(false);
+
+    TLImageInstance* miiOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Mii");
+    miiOff->SetVisible(false);
+    miiOff->SetAssetVisible(false);
+    TLImageInstance* miiOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Mii");
+    miiOver->SetVisible(false);
+    miiOver->SetAssetVisible(false);
+
+    TLImageInstance* logoOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "logo_32x32");
+    logoOff->SetVisible(false);
+    logoOff->SetAssetVisible(false);
+    TLImageInstance* logoOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "logo_32x32");
+    logoOver->SetVisible(false);
+    logoOver->SetAssetVisible(false);
+
+    TLImageInstance* shouldersOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "shoulders");
+    shouldersOff->SetVisible(false);
+    shouldersOff->SetAssetVisible(false);
+    TLImageInstance* shouldersOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "shoulders");
+    shouldersOver->SetVisible(false);
+    shouldersOver->SetAssetVisible(false);
+
+    TLImageInstance* backgroundOff = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii_btn", "Online_Mii_select_background");
+    backgroundOff->SetVisible(false);
+    backgroundOff->SetAssetVisible(false);
+    TLImageInstance* backgroundOver = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "Mii_btn", "Online_Mii_select_background");
+    backgroundOver->SetVisible(false);
+    backgroundOver->SetAssetVisible(false);
+}
+
+static const int sFriendStatusSortOrder[12] = { 5, 4, 0, 3, 6, 7, 8, 10, 9, 1, 2, 11 };
+
+int SHOnlineFriends::CompareFriendStatus(const void* a, const void* b)
+{
+    const FEOnlinePlayerRow* first = *(const FEOnlinePlayerRow* const*)a;
+    const FEOnlinePlayerRow* second = *(const FEOnlinePlayerRow* const*)b;
+    int secondOrder = sFriendStatusSortOrder[second->mStatus];
+    int firstOrder = sFriendStatusSortOrder[first->mStatus];
+    if (firstOrder > secondOrder)
+        return 1;
+    return firstOrder < secondOrder ? -1 : 0;
+}
+
+void SHOnlineFriends::InitializeButtons()
+{
+    typedef Detail::MemFunImpl<void, void (SHOnlineFriends::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineFriends*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineFriends::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineFriends::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineFriends::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    for (int i = 0; i < 4; ++i)
+    {
+        mUnidentified0038[i].SetInstanceBounds(mUnidentified0618[i], true, -24.0f, 10.0f, 0.7f, 0.55f);
+        mUnidentified0038[i].SetPointerEnterCallback(over);
+        mUnidentified0038[i].SetPointerLeaveCallback(off);
+        mUnidentified0038[i].SetPointerPressCallback(down);
+    }
+    if (!mUnidentified0308.mInitialized)
+        mUnidentified0308.Initialize();
+}
+
+inline void SHOnlineFriends::ShowDialog(int type)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)type, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
+        mUnidentified2FA8 = true;
+    }
+}
+
+inline void SHOnlineFriends::ConfirmDeleteFriend(int index)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)106,
+            Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, index),
+            Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
+        mUnidentified2FA8 = true;
+    }
+}
+
+void SHOnlineFriends::OnPointerPress(int index, void* context)
+{
+    int selected;
+    u8 region;
+    int item = (int)context;
+    mUnidentified002C = item;
+    mUnidentified0031 = true;
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
+    bool change = false;
+    if (item == 0 && !IsOnlineFriendSelectionMode())
+    {
+        if (g_pFriendManager->CountFriends() >= 64)
+            ShowDialog(104);
+        else
+            change = true;
+    }
+    else if (!IsOnlineFriendSelectionMode())
+    {
+        g_pFriendManager->SetOwnStatusInitial(0);
+        ConfirmDeleteFriend(item);
+    }
+    else
+    {
+        selected = item + mUnidentified0020;
+        if (!IsOnlineFriendSelectionMode())
+            --selected;
+        region = *(u8*)GameInfoManager::Instance()->GetUnknown0xA40(
+            gNetworkSaveSlotIndex, mUnidentified2EA8[selected]->mFriendIndex);
+        bool differentRegion = region != GetOnlineRegion();
+        if (differentRegion)
+            ShowDialog(105);
+        else
+            change = true;
+    }
+    if (change)
+    {
+        mUnidentified2FAC = 2;
+        SHNavigation* scene = GetNavigationScene();
+        if (scene != 0)
+            scene->HideButtons();
+        for (int i = 0; i < 4; ++i)
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+        mPresentation->SetActiveSlide("out", true);
+        mPresentation->Update(0.0f);
+    }
+}
+
+void SHOnlineFriends::OnPointerEnter(int index, void* context)
+{
+    int item = (int)context;
+    ++mUnidentified0028;
+    mUnidentified0618[item]->SetActiveSlide("over", true, false);
+    mUnidentified0038[item].SetPointerState(1, index);
+    FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
+}
+
+void SHOnlineFriends::OnPointerLeave(int index, void* context)
+{
+    int item = (int)context;
+    --mUnidentified0028;
+    mUnidentified0618[item]->SetActiveSlide("off", true, false);
+    mUnidentified0038[item].SetPointerState(0, index);
+}
+
+void SHOnlineFriends::DeleteFriend(int index)
+{
+    mUnidentified2FA8 = false;
+    int selected = index + mUnidentified0020;
+    if (!IsOnlineFriendSelectionMode())
+        --selected;
+    g_pFriendManager->DeleteFriend(mUnidentified2EA8[selected]->mFriendIndex);
+    mUnidentified2EA8[selected]->mStatus = 11;
+    if (mUnidentified0020 == mUnidentified0024 && mUnidentified0020 > 0)
+        --mUnidentified0020;
+    RefreshFriends(this);
+    UpdateScrollRange();
+    UpdateVisibleRows();
+    g_pFriendManager->SetOwnStatusInitial(1);
+}
+
+void SHOnlineFriends::CancelDeleteFriend()
+{
+    mUnidentified2FA8 = false;
+    g_pFriendManager->SetOwnStatusInitial(1);
+}
+
+void SHOnlineFriends::UpdateFriendCode()
+{
+    WideString format;
+    WideString string;
+    u16 friendKey[14];
+    g_pFriendManager->GetOwnFriendKeyString(friendKey);
+    nlStrNCpy(mUnidentified0598, friendKey, 14);
+    format = WideString(LookupLocString("ONLINE_FRIEND_CODE_YOURS"));
+    string = Format(format, mUnidentified0598);
+    memcpy(mUnidentified0598, string.c_str(), sizeof(mUnidentified0598));
+    mUnidentified0594->SetString(mUnidentified0598);
+}
+
+void SHOnlineFriends::OnDialogDismissed()
+{
+    mUnidentified2FA8 = false;
+}
+
+void SHOnlineFriends::OnErrorDismissed()
+{
+    mUnidentified2FA8 = false;
+    GameSceneManager::Instance()->Pop();
+    FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
+    FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+}
+
+inline void SHOnlineFriends::ShowError(int error)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)error,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriends::OnErrorDismissed), this)));
+        mUnidentified2FA8 = true;
+    }
+}
+
+inline void SHOnlineFriends::StartFriendInvite()
+{
+    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);
+    scene->mIsHost = true;
+    scene->mStartFriendServer = false;
+    SetOnlineFriendSelectionMode(false);
+    GameInfoManager* gameInfo = GameInfoManager::Instance();
+    int selected = mUnidentified2EA8[mUnidentified002C + mUnidentified0020]->mFriendIndex;
+    GetFriendManager()->SetOwnStatusHostInvitingPlayer(selected,
+        reinterpret_cast<const GameplaySettings*>(gameInfo->GetCurrentSettings()),
+        reinterpret_cast<const CheatSettings*>(gameInfo->GetActiveRules()), gameInfo->GetStadium());
+}
