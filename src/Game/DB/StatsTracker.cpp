@@ -108,66 +108,127 @@ static inline void InitializePlayerStats(
 
 static int GetStatValue(const PlayerStats& stats, ePlayerStats stat);
 
+
 static inline void AddStatValue(
     PlayerStats& stats, ePlayerStats stat, int amount)
 {
-    u16* value = 0;
     switch (stat)
     {
-    case STATS_00: value = &stats.unknown_0x00; break;
-    case STATS_01: value = &stats.unknown_0x02; break;
-    case STATS_02: value = &stats.unknown_0x04; break;
-    case STATS_SHOTS_ON_GOAL: value = &stats.mNumShotsOnGoal; break;
-    case STATS_04: value = &stats.unknown_0x14; break;
-    case STATS_05: value = &stats.unknown_0x08; break;
-    case STATS_06: value = &stats.unknown_0x0A; break;
-    case STATS_07: value = &stats.unknown_0x0C; break;
-    case STATS_08: value = &stats.unknown_0x0E; break;
-    case STATS_09: value = &stats.unknown_0x16; break;
-    case STATS_0A: value = &stats.unknown_0x18; break;
-    case STATS_GOALS_FOR: value = &stats.mNumGoalsFor; break;
-    case STATS_0C: value = &stats.unknown_0x12; break;
-    case STATS_PASSES_MADE: value = &stats.mNumPassesMade; break;
-    case STATS_0E: value = &stats.unknown_0x2C; break;
-    case STATS_0F: value = &stats.unknown_0x2E; break;
-    case STATS_PASSES_RECEIVED: value = &stats.mNumPassesReceived; break;
-    case STATS_FOULS: value = &stats.mNumFouls; break;
-    case STATS_12: value = &stats.mNumHitsMade; break;
-    case STATS_ATTACK_ATTEMPTS: value = &stats.unknown_0x34; break;
-    case STATS_ATTACK_SUCCESSES: value = &stats.mNumSteals; break;
-    case STATS_15: value = &stats.unknown_0x38; break;
-    case STATS_18: value = &stats.unknown_0x1C; break;
-    case STATS_19: value = &stats.mNumPowerupsUsed; break;
-    case STATS_1A: value = &stats.unknown_0x20; break;
-    case STATS_1B: value = &stats.unknown_0x22; break;
-    case STATS_1C: value = &stats.unknown_0x24; break;
-    case STATS_1D: value = &stats.unknown_0x26; break;
-    case STATS_POWERUPS_USED: value = &stats.unknown_0x28; break;
-    case STATS_PERFECT_PASSES: value = &stats.mNumPerfectPasses; break;
-    case STATS_PASSES_INTERCEPTED:
-        value = &stats.mNumPassesIntercepted;
+    case STATS_00:
+        stats.unknown_0x00 += amount;
         break;
-    case STATS_25: value = &stats.unknown_0x46; break;
-    case STATS_26: value = &stats.unknown_0x48; break;
-    default: break;
-    }
-
-    if (value != 0)
-    {
-        int result = *value + amount;
-        if (result > 999)
-        {
-            result = 999;
-        }
-        *value = (u16)result;
-    }
-    else if (stat == STATS_16)
-    {
+    case STATS_01:
+        stats.unknown_0x02 += amount;
+        break;
+    case STATS_02:
+        stats.unknown_0x04 += amount;
+        break;
+    case STATS_SHOTS_ON_GOAL:
+        stats.mNumShotsOnGoal += amount;
+        stats.mNumShotsOnGoal = stats.mNumShotsOnGoal <= 999U ? stats.mNumShotsOnGoal : 999U;
+        break;
+    case STATS_05:
+        stats.unknown_0x08 += amount;
+        break;
+    case STATS_06:
+        stats.unknown_0x0A += amount;
+        break;
+    case STATS_07:
+        stats.unknown_0x0C += amount;
+        break;
+    case STATS_08:
+        stats.unknown_0x0E += amount;
+        break;
+    case STATS_GOALS_FOR:
+        stats.mNumGoalsFor += amount;
+        stats.mNumGoalsFor = stats.mNumGoalsFor <= 999U ? stats.mNumGoalsFor : 999U;
+        break;
+    case STATS_0C:
+        stats.unknown_0x12 += amount;
+        stats.unknown_0x12 = stats.unknown_0x12 <= 999U ? stats.unknown_0x12 : 999U;
+        break;
+    case STATS_04:
+        stats.unknown_0x14 += amount;
+        stats.unknown_0x14 = stats.unknown_0x14 <= 999U ? stats.unknown_0x14 : 999U;
+        break;
+    case STATS_09:
+        stats.unknown_0x16 += amount;
+        stats.unknown_0x16 = stats.unknown_0x16 <= 999U ? stats.unknown_0x16 : 999U;
+        break;
+    case STATS_0A:
+        stats.unknown_0x18 += amount;
+        stats.unknown_0x18 = stats.unknown_0x18 <= 999U ? stats.unknown_0x18 : 999U;
+        break;
+    case STATS_FOULS:
+        stats.mNumFouls += amount;
+        break;
+    case STATS_18:
+        stats.unknown_0x1C += amount;
+        break;
+    case STATS_19:
+        stats.mNumPowerupsUsed += amount;
+        break;
+    case STATS_1A:
+        stats.unknown_0x20 += amount;
+        break;
+    case STATS_1B:
+        stats.unknown_0x22 += amount;
+        break;
+    case STATS_1C:
+        stats.unknown_0x24 += amount;
+        break;
+    case STATS_1D:
+        stats.unknown_0x26 += amount;
+        break;
+    case STATS_PASSES_MADE:
+        stats.mNumPassesMade += amount;
+        break;
+    case STATS_0E:
+        stats.unknown_0x2C += amount;
+        break;
+    case STATS_0F:
+        stats.unknown_0x2E += amount;
+        break;
+    case STATS_PASSES_RECEIVED:
+        stats.mNumPassesReceived += amount;
+        break;
+    case STATS_12:
+        stats.mNumHitsMade += amount;
+        stats.mNumHitsMade = stats.mNumHitsMade <= 999U ? stats.mNumHitsMade : 999U;
+        break;
+    case STATS_ATTACK_ATTEMPTS:
+        stats.unknown_0x34 += amount;
+        break;
+    case STATS_ATTACK_SUCCESSES:
+        stats.mNumSteals += amount;
+        stats.mNumSteals = stats.mNumSteals <= 999U ? stats.mNumSteals : 999U;
+        break;
+    case STATS_15:
+        stats.unknown_0x38 += amount;
+        break;
+    case STATS_16:
         stats.unknown_0x3C += amount;
-    }
-    else if (stat == STATS_17)
-    {
+        break;
+    case STATS_17:
         stats.mNumButtonPresses += amount;
+        break;
+    case STATS_PERFECT_PASSES:
+        stats.mNumPerfectPasses += amount;
+        break;
+    case STATS_25:
+        stats.unknown_0x46 += amount;
+        break;
+    case STATS_26:
+        stats.unknown_0x48 += amount;
+        break;
+    case STATS_POWERUPS_USED:
+        stats.unknown_0x28 += amount;
+        break;
+    case STATS_PASSES_INTERCEPTED:
+        stats.mNumPassesIntercepted += amount;
+        break;
+    default:
+        break;
     }
 }
 
@@ -487,26 +548,101 @@ static unsigned char GetGlobalPadID(int homeaway, int playerindex, int& padid)
 }
 
 void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
-    int playerindex, int param0, int, int, int)
+    int playerindex, int param0, int param1, int param2, int param3)
 {
-    if (stat < STATS_00 || stat >= NUM_STATS || homeaway < 0
-        || homeaway >= 2)
+    switch (stat)
     {
-        return;
-    }
-
-    int amount = param0 == 0 ? 1 : param0;
-    AddStat(stat, homeaway, playerindex, amount);
-
-    if (playerindex >= 0 && mBasicGameInfo != 0)
-    {
-        for (int pad = 0; pad < 16; pad++)
-        {
-            if (mBasicGameInfo->mPadSides[pad] == homeaway)
-            {
-                AddUserStatByPad(stat, pad, amount);
-            }
-        }
+    case STATS_00:
+    case STATS_01:
+    case STATS_02:
+        AddStat(stat, homeaway, playerindex, 1);
+        fn_80101E0C(stat, homeaway, playerindex, 1);
+        break;
+    case STATS_SHOTS_ON_GOAL:
+    case STATS_04:
+    case STATS_09:
+    case STATS_0A:
+        AddStat(stat, homeaway, playerindex, param0);
+        fn_80101E0C(stat, homeaway, playerindex, param0);
+        break;
+    case STATS_05:
+    case STATS_06:
+    case STATS_07:
+        AddStat(stat, homeaway, playerindex, param0);
+        AddUserStatByPad(stat, param1, param0);
+        break;
+    case STATS_08:
+    case STATS_PASSES_RECEIVED:
+    case STATS_FOULS:
+    case STATS_12:
+    case STATS_15:
+    case STATS_19:
+    case STATS_1A:
+    case STATS_1B:
+    case STATS_1C:
+    case STATS_1D:
+    case STATS_25:
+        AddStat(stat, homeaway, playerindex, 1);
+        fn_80101E0C(stat, homeaway, playerindex, 1);
+        break;
+    case STATS_GOALS_FOR:
+        AddStat(stat, homeaway, playerindex, param2);
+        AddUserStatByPad(stat, param3, param2);
+        if (param1 == 1)
+            Track(STATS_06, homeaway, playerindex, param2, param3, 0, 0);
+        else if (param1 == 0 || param1 == 7)
+            Track(STATS_05, homeaway, playerindex, param2, param3, 0, 0);
+        else if (param1 == 2)
+            Track(STATS_07, homeaway, playerindex, param2, param3, 0, 0);
+        if (param0 >= 0)
+            Track(STATS_08, homeaway, param0, 0, 0, 0, 0);
+        Track(STATS_0C, homeaway == 0, playerindex, param2, 0, 0, 0);
+        break;
+    case STATS_0C:
+        AddStat(stat, homeaway, -1, param0);
+        for (unsigned int i = 0; i < 5; i++)
+            fn_80101E0C(stat, homeaway, i, param0);
+        break;
+    case STATS_PASSES_MADE:
+    case STATS_0E:
+    case STATS_0F:
+    case STATS_ATTACK_ATTEMPTS:
+    case STATS_ATTACK_SUCCESSES:
+    case STATS_POWERUPS_USED:
+    case STATS_PERFECT_PASSES:
+        AddStat(stat, homeaway, playerindex, 1);
+        AddUserStatByPad(stat, param0, 1);
+        break;
+    case STATS_16:
+        AddStat(stat, homeaway, playerindex, param0);
+        fn_80101E0C(stat, homeaway, playerindex, param0);
+        break;
+    case STATS_17:
+        AddStat(stat, homeaway, playerindex, param1);
+        AddUserStatByPad(stat, param0, param1);
+        break;
+    case STATS_WIN:
+    case STATS_OT_WIN:
+        mIsUserCupWinner = false;
+        AddStat(stat, homeaway, -1, 1);
+        mBasicGameInfo->mFinalScore[0] = param0;
+        mBasicGameInfo->mFinalScore[1] = param1;
+        Track(stat == STATS_WIN ? STATS_LOSS : STATS_OT_LOSS,
+            homeaway == 0, 0, 0, 0, 0, 0);
+        break;
+    case STATS_LOSS:
+    case STATS_OT_LOSS:
+        AddStat(stat, homeaway, -1, 1);
+        break;
+    case STATS_PASSES_INTERCEPTED:
+        AddStat(stat, homeaway, playerindex, 1);
+        break;
+    case STATS_26:
+        AddStat(stat, homeaway, playerindex, param0);
+        AddUserStatByPad(stat, param1, param0);
+        break;
+    default:
+        break;
     }
 }
 
@@ -715,26 +851,173 @@ void StatsTracker::GetSortedTeamStats(
     }
 }
 
+static inline void AccumulateUserStats(PlayerStats* total, const PlayerStats& current)
+{
+    total->unknown_0x00 += current.unknown_0x00;
+    total->unknown_0x02 += current.unknown_0x02;
+    total->unknown_0x04 += current.unknown_0x04;
+    total->mNumShotsOnGoal += current.mNumShotsOnGoal;
+    total->unknown_0x08 += current.unknown_0x08;
+    total->unknown_0x0A += current.unknown_0x0A;
+    total->unknown_0x0C += current.unknown_0x0C;
+    total->unknown_0x0E += current.unknown_0x0E;
+    total->mNumGoalsFor += current.mNumGoalsFor;
+    total->unknown_0x12 = current.unknown_0x12;
+    total->unknown_0x14 += current.unknown_0x14;
+    total->unknown_0x16 += current.unknown_0x16;
+    total->unknown_0x18 += current.unknown_0x18;
+    total->mNumFouls += current.mNumFouls;
+    total->unknown_0x1C = current.unknown_0x1C;
+    total->mNumPowerupsUsed += current.mNumPowerupsUsed;
+    total->unknown_0x20 += current.unknown_0x20;
+    total->unknown_0x22 += current.unknown_0x22;
+    total->unknown_0x24 += current.unknown_0x24;
+    total->unknown_0x26 += current.unknown_0x26;
+    total->mNumPassesMade += current.mNumPassesMade;
+    total->unknown_0x2C += current.unknown_0x2C;
+    total->unknown_0x2E += current.unknown_0x2E;
+    total->mNumPassesReceived += current.mNumPassesReceived;
+    total->mNumHitsMade += current.mNumHitsMade;
+    total->unknown_0x34 += current.unknown_0x34;
+    total->mNumSteals += current.mNumSteals;
+    total->unknown_0x38 += current.unknown_0x38;
+    total->unknown_0x3C += current.unknown_0x3C;
+    total->mNumButtonPresses += current.mNumButtonPresses;
+    total->mNumPerfectPasses += current.mNumPerfectPasses;
+    total->unknown_0x46 += current.unknown_0x46;
+    total->unknown_0x48 += current.unknown_0x48;
+    total->unknown_0x28 += current.unknown_0x28;
+    total->mNumPassesIntercepted += current.mNumPassesIntercepted;
+}
+
 void StatsTracker::CompileEndOfGameStats()
 {
-    for (int team = 0; team < 2; team++)
+    if (GameInfoManager::Instance()->IsInMode3())
     {
-        for (int stat = 0; stat < NUM_STATS; stat++)
+        int teamIndexes[2] = {-1, -1};
+        CupManager* cup = CupManager::Instance();
+        int homeTeam = mBasicGameInfo->mTeamIndex[0];
+        int awayTeam = mBasicGameInfo->mTeamIndex[1];
+        int numTeams = cup->GetNumPlayingTeams();
+        int previousTeam = cup->fn_8010AFA4();
+        if (cup->GetCurrentRoundType() == 2)
         {
-            AddStatValue(mCumulativeTeamStats[team]->mPlayerTotalStats,
-                (ePlayerStats)stat,
-                GetStatValue(mCurrentTeamStats[team].mPlayerTotalStats,
-                    (ePlayerStats)stat));
+            if (homeTeam == previousTeam)
+                teamIndexes[0] = numTeams;
+            else if (awayTeam == previousTeam)
+                teamIndexes[1] = numTeams;
+        }
+        for (int i = 0; i < numTeams; i++)
+        {
+            if (homeTeam == cup->GetTeamStatsByIndex(i).mTeamIndex)
+                teamIndexes[0] = i;
+            if (awayTeam == cup->GetTeamStatsByIndex(i).mTeamIndex)
+                teamIndexes[1] = i;
+        }
+        int tempStat;
+        for (int side = 0; side < 2; side++)
+        {
+            bool otherSide = side == 0;
+            TeamStats* cumulative = cup->pGetTeamStatsByIndex((u16)teamIndexes[side]);
+            if (mBasicGameInfo->mFinalScore[(short)side] != -5)
+            {
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumShotsOnGoal;
+                cumulative->mPlayerTotalStats.mNumShotsOnGoal += tempStat;
+                if (cup->GetCurrentRoundType() == 0)
+                {
+                    tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumGoalsFor;
+                    cumulative->mPlayerTotalStats.mNumGoalsFor += tempStat;
+                    if (cumulative->mPlayerTotalStats.mNumGoalsFor > 999)
+                        cumulative->mPlayerTotalStats.mNumGoalsFor = 999;
+                    tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x12;
+                    cumulative->mPlayerTotalStats.unknown_0x12 += tempStat;
+                    if (cumulative->mPlayerTotalStats.unknown_0x12 > 999)
+                        cumulative->mPlayerTotalStats.unknown_0x12 = 999;
+                }
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x0E;
+                cumulative->mPlayerTotalStats.unknown_0x0E += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumFouls;
+                cumulative->mPlayerTotalStats.mNumFouls += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPowerupsUsed;
+                cumulative->mPlayerTotalStats.mNumPowerupsUsed += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x28;
+                cumulative->mPlayerTotalStats.unknown_0x28 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x48;
+                cumulative->mPlayerTotalStats.unknown_0x48 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPassesMade;
+                cumulative->mPlayerTotalStats.mNumPassesMade += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPassesReceived;
+                cumulative->mPlayerTotalStats.mNumPassesReceived += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPassesIntercepted;
+                cumulative->mPlayerTotalStats.mNumPassesIntercepted += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumHitsMade;
+                cumulative->mPlayerTotalStats.mNumHitsMade += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumSteals;
+                cumulative->mPlayerTotalStats.mNumSteals += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x0A;
+                cumulative->mPlayerTotalStats.unknown_0x0A += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x3C;
+                cumulative->mPlayerTotalStats.unknown_0x3C += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumButtonPresses;
+                cumulative->mPlayerTotalStats.mNumButtonPresses += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x46;
+                cumulative->mPlayerTotalStats.unknown_0x46 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPerfectPasses;
+                cumulative->mPlayerTotalStats.mNumPerfectPasses += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x14;
+                cumulative->mPlayerTotalStats.unknown_0x14 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x16;
+                cumulative->mPlayerTotalStats.unknown_0x16 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x18;
+                cumulative->mPlayerTotalStats.unknown_0x18 += tempStat;
+                cumulative->mPlayerTotalStats.unknown_0x1C++;
+            }
+            else
+            {
+                mBasicGameInfo->mFinalScore[(short)side] = 0;
+                if (cup->GetCurrentRoundType() == 0)
+                {
+                    u16 otherGoals = mCumulativeTeamStats[otherSide]->mPlayerTotalStats.mNumGoalsFor;
+                    mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x12 = otherGoals;
+                    cumulative->mPlayerTotalStats.unknown_0x12 += otherGoals;
+                }
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumShotsOnGoal = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumGoalsFor = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x0E = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumFouls = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPowerupsUsed = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x28 = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x48 = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPassesMade = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPassesReceived = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPassesIntercepted = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumHitsMade = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumSteals = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x0A = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumButtonPresses = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x46 = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.mNumPerfectPasses = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x14 = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x16 = 0;
+                mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x18 = 0;
+            }
+            if (cup->GetCurrentRoundType() == 0)
+            {
+                tempStat = mCumulativeTeamStats[side]->unknown_0x10;
+                cumulative->unknown_0x10 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->unknown_0x12;
+                cumulative->unknown_0x12 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->unknown_0x14;
+                cumulative->unknown_0x14 += tempStat;
+                tempStat = mCumulativeTeamStats[side]->unknown_0x16;
+                cumulative->unknown_0x16 += tempStat;
+            }
         }
     }
 
-    for (int pad = 0; pad < 16; pad++)
+    for (int pad = 0; pad < 4; pad++)
     {
-        for (int stat = 0; stat < NUM_STATS; stat++)
-        {
-            AddStatValue(mCumulativeUserStats[pad], (ePlayerStats)stat,
-                GetStatValue(mCurrentUserStats[pad], (ePlayerStats)stat));
-        }
+        AccumulateUserStats(&GameInfoManager::Instance()->unknown_0x128[pad].mStats, mCurrentUserStats[pad]);
     }
 }
 
@@ -746,15 +1029,69 @@ void StatsTracker::SimulateGame()
 void StatsTracker::AddStat(
     ePlayerStats stat, int team, int player, int value)
 {
-    if (team < 0 || team >= 2)
+    switch (stat)
     {
-        return;
+    case STATS_0C:
+    {
+        int start = (player == -1) ? 0 : player;
+        int end = (player == -1) ? 5 : start + 1;
+        for (int i = start; i < end; i++)
+        {
+            AddStatValue(mCurrentPlayerStats[team][i], stat, value);
+        }
+        break;
+    }
+    case STATS_WIN:
+    case STATS_OT_WIN:
+    case STATS_LOSS:
+    case STATS_OT_LOSS:
+        break;
+    default:
+        AddStatValue(mCurrentPlayerStats[team][player], stat, value);
+        break;
     }
 
-    AddStatValue(mCurrentTeamStats[team].mPlayerTotalStats, stat, value);
-    if (player >= 0 && player < 5)
+    switch (stat)
     {
-        AddStatValue(mCurrentPlayerStats[team][player], stat, value);
+    case STATS_WIN:
+        mCumulativeTeamStats[team]->unknown_0x10++;
+        mCumulativeTeamStats[team]->unknown_0x16 += 3;
+        break;
+    case STATS_OT_WIN:
+        mCumulativeTeamStats[team]->unknown_0x10++;
+        mCumulativeTeamStats[team]->unknown_0x16 += 3;
+        break;
+    case STATS_LOSS:
+        mCumulativeTeamStats[team]->unknown_0x12++;
+        break;
+    case STATS_OT_LOSS:
+        mCumulativeTeamStats[team]->unknown_0x14++;
+        mCumulativeTeamStats[team]->unknown_0x16++;
+        break;
+    default:
+        AddStatValue(mCumulativeTeamStats[team]->mPlayerTotalStats, stat, value);
+        break;
+    }
+
+    switch (stat)
+    {
+    case STATS_WIN:
+        mCurrentTeamStats[team].unknown_0x10++;
+        mCurrentTeamStats[team].unknown_0x16 += 3;
+        break;
+    case STATS_OT_WIN:
+        mCurrentTeamStats[team].unknown_0x10++;
+        mCurrentTeamStats[team].unknown_0x16 += 3;
+        break;
+    case STATS_LOSS:
+        mCurrentTeamStats[team].unknown_0x12++;
+        break;
+    case STATS_OT_LOSS:
+        mCurrentTeamStats[team].unknown_0x16++;
+        break;
+    default:
+        AddStatValue(mCurrentTeamStats[team].mPlayerTotalStats, stat, value);
+        break;
     }
 }
 
