@@ -555,7 +555,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/tu_800D4E2C.cpp"),
             Object(NonMatching, "Game/AI/tu_8030EDB0.cpp", cflags=[*cflags_game, "-char signed"]),
             Object(NonMatching, "Game/AI/FielderInput.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/AI/tu_8030F5DC.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/AI/tu_8030F5DC.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-inline noauto"]),
             Object(Matching, "Game/AI/tu_803115F4.cpp", cflags=[*cflags_game, "-char signed"]),
             Object(NonMatching, "Game/AI/tu_80311734.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/AI/tu_80315A14.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
