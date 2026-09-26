@@ -268,16 +268,14 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
     nlVector3* ndst;
     nlVector2* tdst;
     int nSegment;
-    float z0;
-    float angleFactor;
     float segmentFactor;
-    float texDenom;
+    float z0;
+    float one;
     float x0;
     float y0;
     float x1;
     float y1;
     float sinAngle;
-    float invLen;
 
     prim.vertCount = 0x20;
     prim.position = (nlVector3*)glResourceAlloc(
@@ -287,12 +285,9 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
     prim.texcoord = (nlVector2*)glResourceAlloc(
         0x100, GLM_VertexData, m_Unknown00);
 
-    float half = 0.5f;
-    float one = 1.0f;
-    z0 = 0.0f;
-    angleFactor = 10430.378f;
     segmentFactor = 0.41887903f;
-    texDenom = 15.0f;
+    z0 = 0.0f;
+    one = 1.0f;
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -300,45 +295,43 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
 
     for (nSegment = 0; nSegment < 0x10; nSegment++)
     {
-        angle = (int)(angleFactor * ((float)nSegment * segmentFactor));
+        angle = (int)(10430.378f * ((float)nSegment * segmentFactor));
 
         sinAngle = nlSin((u16)angle);
-        x0 = half * (one * sinAngle);
+        x0 = 0.5f * (one * sinAngle);
 
-        angle90 = (u16)(int)(angleFactor * ((float)nSegment * segmentFactor)) + 0x4000;
-        y0 = half * (one * nlSin((u16)angle90));
+        angle90 = (u16)(int)(10430.378f * ((float)nSegment * segmentFactor)) + 0x4000;
+        y0 = 0.5f * (one * nlSin((u16)angle90));
 
-        x1 = half * (z0 * nlSin((u16)(int)(angleFactor * ((float)nSegment * segmentFactor))));
-        y1 = half * (z0 * nlSin((u16)((u16)(int)(angleFactor * ((float)nSegment * segmentFactor)) + 0x4000)));
+        x1 = 0.5f * (z0 * nlSin((u16)(int)(10430.378f * ((float)nSegment * segmentFactor))));
+        y1 = 0.5f * (z0 * nlSin((u16)((u16)(int)(10430.378f * ((float)nSegment * segmentFactor)) + 0x4000)));
 
         vNormal.x = x0;
         vNormal.y = y0;
         vNormal.z = z0;
 
-        invLen = nlRecipSqrt(vNormal.GetLengthSq3D(), true);
+        nlVec3Normalize(vNormal, vNormal);
 
         pdst->x = x0;
-        nlVec3Scale(vNormal, invLen);
         pdst->y = y0;
         pdst->z = z0;
         *ndst = vNormal;
 
-        tdst->x = (float)nSegment / texDenom;
+        tdst->x = (float)nSegment / 15.0f;
         tdst->y = z0;
 
         vNormal.x = x1;
         vNormal.y = y1;
-        vNormal.z = z0;
+        vNormal.z = one;
 
-        invLen = nlRecipSqrt(vNormal.GetLengthSq3D(), true);
+        nlVec3Normalize(vNormal, vNormal);
 
         pdst[1].x = x1;
         pdst[1].y = y1;
-        pdst[1].z = z0;
-        nlVec3Scale(vNormal, invLen);
+        pdst[1].z = one;
         ndst[1] = vNormal;
 
-        tdst[1].x = (float)nSegment / texDenom;
+        tdst[1].x = (float)nSegment / 15.0f;
         tdst[1].y = one;
 
         pdst += 2;
@@ -555,12 +548,18 @@ void ShapeRender::DrawLine3D(const nlVector3& p0, const nlVector3& p1,
     glSetDefaultState(bWithDepth);
     glSetCurrentMatrix(glGetIdentityMatrix());
 
+    nlFloatColour floatColour;
+    floatColour.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
+    floatColour.c[1] = (float)colour.c[1] * (1.0f / 255.0f);
+    floatColour.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
+    floatColour.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
+
     if (writer.Begin(2, GLP_LineList, 0))
     {
         writer.Colour(colour);
-        writer.Vertex(p0.x, p0.y, p0.z);
+        writer.Vertex(p0);
         writer.Colour(colour);
-        writer.Vertex(p1.x, p1.y, p1.z);
+        writer.Vertex(p1);
 
         if (!writer.End())
         {

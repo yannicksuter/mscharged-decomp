@@ -1,4 +1,5 @@
 #include "NL/plat/PlatPadManager.h"
+#include "Game/Player.h"
 
 #include "Game/Sys/audio.h"
 #include "Game/Goalie.h"
@@ -59,6 +60,7 @@
 #include "Game/Audio/RegistryPools.h"
 
 #include <math.h>
+#include "Game/Task/BeginFrameTask.h"
 
 extern "C" void fn_8005D354(
     cGame* pGame, const GoalieSaveData* pData);
@@ -68,20 +70,14 @@ extern "C" void fn_8005E9FC(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8003C5D8(
     cFielder* pFielder, bool bParam, unsigned short aDirection);
-extern "C" void fn_8003C6E0(cFielder* pFielder);
 extern "C" bool fn_8003877C(cFielder* pFielder);
-extern "C" void fn_8001B314(unsigned int nNumTrails);
 extern "C" void fn_8005DB7C();
 extern "C" void fn_8007F534(Goalie* pGoalie);
 class UnidentifiedFuzzyRuntimeBase;
-extern "C" cPlayer* fn_80096F54(cPlayer*, bool);
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_800A695C(cTeam*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80082140(
     UnidentifiedFuzzyRuntimeBase*, const char*, cPlayer*);
-extern float lbl_806DC7C8;
 extern nlVector4 lbl_8056D3B0;
 u8 lbl_806E0D13;
-extern cTeam* g_pCurrentlyUpdatingTeam;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -2194,7 +2190,6 @@ float Goalie::IsSoloBreakaway()
 
 
 
-extern "C" bool fn_80016768(cBall* pBall);
 
 bool Goalie::PreCollideWithBallCallback(const dContact& contact)
 {
@@ -2304,7 +2299,6 @@ bool Goalie::FindSTSMissData(const nlVector3& rPos)
     return false;
 }
 
-extern "C" float fn_800DEB04(cFielder* pFielder);
 
 bool Goalie::CheckForSTSAttack()
 {
@@ -2470,7 +2464,6 @@ bool Goalie::CanInterceptPass()
     return false;
 }
 
-extern "C" float fn_800DF888(cTeam* pTeam);
 
 bool Goalie::IsLooseBallClose(float fDistFromBox)
 {
@@ -2743,7 +2736,6 @@ inline void Goalie::CheckForBallOnHead()
 }
 
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
-extern "C" float fn_800156A8(cBall* pBall);
 
 bool Goalie::InitiatePickup()
 {
@@ -2933,7 +2925,6 @@ float Goalie::fn_8007BEEC(cFielder* pTarget)
     return fTime;
 }
 
-extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
 
 void Goalie::fn_80099074(const UnidentifiedEventData24* pData)
 {
@@ -3275,7 +3266,6 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
     }
 }
 
-extern "C" void fn_801BAF0C(cPlayer* pPlayer);
 extern "C" void fn_8005E604(void* pManager, const PlayerAttackData* pData);
 
 void Goalie::fn_80080638(cFielder* pFielder, bool bParam)
@@ -4350,7 +4340,6 @@ void Goalie::DoNavigation(float fDeltaT, float fIdleDistance, Goalie::eNaviMode 
     InitMovementFromAnim(0, v3Zero, 1.0f, true);
 }
 
-extern "C" bool fn_800977A4(cFielder* pFielder, float fHeight);
 
 void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 {
@@ -4444,7 +4433,6 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     }
 }
 
-extern "C" void fn_800180F4(cBall* pBall, nlVector3* pPosition, float fTime);
 
 bool Goalie::fn_8007BF68(bool bParam)
 {

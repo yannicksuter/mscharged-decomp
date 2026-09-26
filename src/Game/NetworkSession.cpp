@@ -45,8 +45,6 @@
 #include "Game/SH/SHOnlineConnectionQuality.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 bool g_bNoPopupNetworkError;
 NetworkSession* g_pNetworkSession;
@@ -60,7 +58,6 @@ u32 gNetworkGameCodeR4QP = 0x52345150;
 u32 gNetworkGameCodeR4QJ = 0x5234514A;
 u32 gNetworkGameCodeR4QE = 0x52345145;
 
-extern NetworkSessionBase* g_pNetworkSessionBase;
 
 static MemoryAllocator s_NetworkAllocator;
 

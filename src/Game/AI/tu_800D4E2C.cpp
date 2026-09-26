@@ -1,5 +1,6 @@
 #include "Game/AI/FielderDesireMachine.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/AIContext.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesirePass.h"
@@ -32,18 +33,11 @@ extern "C" void fn_80316968(shdStateMachine*);
 extern "C" void fn_80316980(shdStateMachine*, bool);
 extern "C" void fn_80317010(
     shdStateMachine*, UnidentifiedVariant_80054AB8*, bool, float);
-extern "C" void fn_80319DA0(UnidentifiedScriptMachine*);
 extern "C" void fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
-extern "C" float fn_800D85F8(cFielder*);
 
-extern bool lbl_806E0C50;
-extern bool lbl_806E0C51;
-extern bool lbl_806E0C52;
-extern cGame* g_pGame;
 extern const nlVector3 lbl_804DC388;
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 char lbl_80502C28[] = "Kickoff Neutral";
 char lbl_80502C38[] = "Kickoff Advantage";
@@ -69,7 +63,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800B38AC(
 extern "C" UnidentifiedVariant_80054AB8 fn_800B4DC0(
     UnidentifiedFielderContext*);
 extern "C" UnidentifiedVariant_80054AB8 fn_800B7B1C(
-    UnidentifiedFielderInput*);
+    AIContext*);
 
 class UnidentifiedDesire33 : public Desire
 {
@@ -84,7 +78,7 @@ public:
 
 inline cFielder* UnidentifiedFielderDesireMachine::GetFielder() const
 {
-    return static_cast<cFielder*>(mUnidentified064->mData.pPlayer);
+    return static_cast<cFielder*>(mAIContext->mData.pPlayer);
 }
 
 /**
@@ -309,9 +303,9 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 /**
  * Offset/Address/Size: 0xCB8 | 0x800D5AE4 | size: 0x54
  */
-void UnidentifiedFielderDesireMachine::UnidentifiedVirtual4(bool param)
+void UnidentifiedFielderDesireMachine::Reset(bool param)
 {
-    UnidentifiedScriptMachine::UnidentifiedVirtual4(param);
+    UnidentifiedScriptMachine::Reset(param);
     if (!param)
     {
         fn_80319E84(this, 34, 0, false);
@@ -321,7 +315,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual4(bool param)
 /**
  * Offset/Address/Size: 0xD0C | 0x800D5B38 | size: 0x2C0
  */
-void UnidentifiedFielderDesireMachine::UnidentifiedVirtual3(float deltaTime)
+void UnidentifiedFielderDesireMachine::Update(float deltaTime)
 {
     Desire* frozen = fn_8002E08C(GetFielder(), 29);
     if (frozen->UnidentifiedIsActive())
@@ -362,7 +356,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual3(float deltaTime)
         fn_80319E84(this, 17, &params, false);
     }
 
-    UnidentifiedScriptMachine::UnidentifiedVirtual3(deltaTime);
+    UnidentifiedScriptMachine::Update(deltaTime);
     if (GetFielder()->m_eActionState == ACTION_NEED_ACTION)
     {
         GetFielder()->StartRunning();

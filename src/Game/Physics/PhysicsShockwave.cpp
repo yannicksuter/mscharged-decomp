@@ -1,4 +1,5 @@
 #include "Game/AI/Fielder.h"
+#include "Game/Player.h"
 #include "Game/Render/BulletBill.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -17,7 +18,6 @@
 class cFielder;
 class EffectsGroup;
 
-extern "C" bool fn_800977A4(cFielder*, float);
 extern "C" void fn_800F026C(
     const nlVector3&, float, float);
 

@@ -44,4 +44,10 @@ public:
 
 extern AudioResourceRuntime* g_pAudioResourceRuntime;
 
+extern "C" void fn_802F4904(AudioResourceRuntime* runtime, float deltaTime);
+extern "C" void fn_802F4958(AudioResourceRuntime* runtime);
+extern "C" void fn_802F499C(AudioResourceRuntime* runtime, u32 hash, u32 instance);
+extern "C" void fn_802F49A4(AudioResourceRuntime* runtime, u32 instance);
+extern "C" bool fn_802F4E84(const u32* hash, bool invert, void* owner);
+
 #endif // GAME_AUDIO_AUDIO_RESOURCE_RUNTIME_H

@@ -1,4 +1,5 @@
 #include "Game/AI/Desire.h"
+#include "Game/AI/FielderActions.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.h"
@@ -17,15 +18,9 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" cTeam* fn_800D6670(cFielder*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
-extern "C" void fn_8003A0E4(cFielder*);
-extern "C" float fn_800499EC(cFielder*, int);
-extern "C" float fn_80049CC0(cFielder*, int);
 extern "C" void fn_8005FA2C(cGame*);
-extern "C" void fn_80098098(cFielder*);
-extern cTeam* g_pCurrentlyUpdatingTeam;
 bool lbl_806E0E30;
 bool lbl_806E0E31;
 

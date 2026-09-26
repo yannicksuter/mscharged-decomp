@@ -3942,7 +3942,7 @@ Game/AI/tu_8030EDB0.cpp:
 	.ctors      start:0x804DBAA8 end:0x804DBAAC
 	.bss        start:0x805841C8 end:0x80584218
 
-Game/AI/FielderInput.cpp:
+Game/AI/AIContext.cpp:
 	.text       start:0x8030F5DC end:0x8030FD40
 	.data       start:0x805300C8 end:0x805300D8
 	.sdata2     start:0x806E6848 end:0x806E6860

@@ -9,6 +9,7 @@ class cGlobalPad;
 struct UnidentifiedDebugCameraTarget;
 
 extern float sfDebugCamFOV;
+extern "C" void fn_800F2504();
 
 class cDebugCamera : public cBaseCamera
 {

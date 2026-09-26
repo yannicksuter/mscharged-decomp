@@ -1,5 +1,4 @@
 #include "Game/FE/feResourceManager.h"
-#include "Game/Font/fontmanager.h"
 
 #include "Game/FE/feFontResource.h"
 #include "Game/FE/feScene.h"
@@ -20,6 +19,12 @@
 
 struct PendingResourceLoad
 {
+    PendingResourceLoad(FEResourceHandle* handle, MemoryAllocator* allocator)
+        : pHandle(handle)
+        , pAllocator(allocator)
+    {
+    }
+
     FEResourceHandle* pHandle;
     MemoryAllocator* pAllocator;
 };
@@ -34,14 +39,12 @@ struct PermanentBundleLoadState
     /* 0x14 */ unsigned long field_0x14;
 };
 
-extern int nlPrintf(const char* format, ...);
-
 static nlAVLTreeSlotPool<unsigned long, FEResourceHandle*, DefaultKeyCompare<unsigned long> > s_loadedResourceList(0x200, 0);
 static unsigned char* s_pResourceLoadBuffer;
 static nlDLListSlotPool<PendingResourceLoad> pendingResourceQueue(0x100, 0);
 static FEResourceHandle* s_pCurrentResourceBeingLoaded;
-FESceneResource* s_pCurrentFESceneResourceContext;
 static GLResourcePool* s_pResourcePool;
+FESceneResource* s_pCurrentFESceneResourceContext;
 static BundleFile* s_pPermanentBundle;
 static BundleFile* s_pOnDemandBundle;
 static FESceneResource* s_pPermanentBundleSceneResource;
@@ -92,51 +95,9 @@ FEResourceHandle* FEResourceManager::FindExistingResourceInResourceList(FEResour
     return *pPreExistingResourceHandle;
 }
 
-ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSceneResource)
+void FEResourceManager::PermanentBundleOpenComplete(void*, unsigned long, unsigned long uParam)
 {
-    if (s_pCurrentFESceneResourceContext != 0
-        && s_pCurrentFESceneResourceContext != pFeSceneResource
-        && s_pPermanentBundleSceneResource != s_pCurrentFESceneResourceContext)
-    {
-        s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = 6;
-        s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
-    }
-
-    pFeSceneResource->m_glResourceMarker = s_pResourcePool->MarkResource();
-    pFeSceneResource->m_bValid = true;
-    s_pCurrentFESceneResourceContext = pFeSceneResource;
-    return FERR_WaitingForResource;
-}
-
-FEResourceManager::FEResourceManager()
-    : m_bPermanentBundleLoadInProgress(false)
-{
-    s_pResourcePool = glGetCurrentResourcePool();
-}
-
-void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSize, unsigned long uParam)
-{
-    FETextureResource* pHandle = (FETextureResource*)uParam;
-    GLResourcePool* resourcePool = s_pResourcePool;
-    glBeginResource(pHandle->m_hashID);
-    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
-    glEndResource();
-    delete[] s_pResourceLoadBuffer;
-    s_pResourceLoadBuffer = 0;
-    unsigned long textureHandle = pHandle->m_hashID;
-    pHandle->SetTextureHandle(textureHandle);
-    FEResourceManager::Instance()->AddResourceToResourceList(pHandle);
-    pHandle->m_bValid = true;
-}
-
-void FEResourceManager::PermanentTextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam)
-{
-    PermanentBundleLoadState* state = (PermanentBundleLoadState*)uParam;
-    FETextureResource* pTextureResource = new (8, false) FETextureResource();
-    pTextureResource->m_hashID = state->uFileHashID;
-    s_pResourceLoadBuffer = (unsigned char*)buffer;
-    TextureResourceLoadComplete(NULL, uReadSize, (unsigned long)pTextureResource);
-    LoadNextPermanentTexture(state);
+    LoadNextPermanentTexture((PermanentBundleLoadState*)uParam);
 }
 
 int FEResourceManager::LoadNextPermanentTexture(PermanentBundleLoadState* state)
@@ -178,9 +139,20 @@ int FEResourceManager::LoadNextPermanentTexture(PermanentBundleLoadState* state)
     return false;
 }
 
-void FEResourceManager::PermanentBundleOpenComplete(void*, unsigned long, unsigned long uParam)
+void FEResourceManager::PermanentTextureLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam)
 {
-    LoadNextPermanentTexture((PermanentBundleLoadState*)uParam);
+    PermanentBundleLoadState* state = (PermanentBundleLoadState*)uParam;
+    FETextureResource* pTextureResource = new (8, false) FETextureResource();
+    pTextureResource->m_hashID = state->uFileHashID;
+    s_pResourceLoadBuffer = (unsigned char*)buffer;
+    TextureResourceLoadComplete(NULL, uReadSize, (unsigned long)pTextureResource);
+    LoadNextPermanentTexture(state);
+}
+
+FEResourceManager::FEResourceManager()
+    : m_bPermanentBundleLoadInProgress(false)
+{
+    s_pResourcePool = glGetCurrentResourcePool();
 }
 
 void FEResourceManager::Cleanup()
@@ -342,7 +314,7 @@ void FEResourceManager::QueueResourceLoad(FEResourceHandle* pHandle, MemoryAlloc
         pAllocator = CurrentAllocator;
     }
 
-    PendingResourceLoad pendingResource = { pHandle, pAllocator };
+    PendingResourceLoad pendingResource(pHandle, pAllocator);
     if (s_pOnDemandBundle != 0 && pHandle->m_type != FERT_SCENE && pendingResourceQueue.m_Head != 0)
     {
         BundleFileDirectoryEntry fileDirectoryEntry;
@@ -392,9 +364,9 @@ void FEResourceManager::UnloadPermanentResourceBundle()
         s_pPermanentBundle->GetFileInfoByIndex(fileIndex, &fileDirectoryEntry);
         if (s_loadedResourceList.FindGet(fileDirectoryEntry.m_hash, &pLoadedResourceHandle))
         {
-            unsigned long hashToDelete = (*pLoadedResourceHandle)->GetHashID();
+            unsigned long hashtodelete = (*pLoadedResourceHandle)->GetHashID();
             delete *pLoadedResourceHandle;
-            s_loadedResourceList.Remove(hashToDelete);
+            s_loadedResourceList.Remove(hashtodelete);
         }
     }
 
@@ -403,6 +375,104 @@ void FEResourceManager::UnloadPermanentResourceBundle()
     s_pPermanentBundle = 0;
     delete s_pPermanentBundleSceneResource;
     s_pPermanentBundleSceneResource = 0;
+}
+
+ResourceResult FEResourceManager::IssueFontLoadRequest(FEFontResource* pFeFontResource)
+{
+    FEResourceHandle* pFeResourceHandle = (FEResourceHandle*)pFeFontResource;
+    nlFont* pExistingFont = FontManager::Instance()->GetFontByHashID(pFeResourceHandle->m_hashID);
+    pFeFontResource->SetFontReference(pExistingFont);
+    pFeResourceHandle->m_bValid = true;
+    return FERR_AlreadyLoaded;
+}
+
+void FEResourceManager::TextureResourceLoadComplete(void*, unsigned long uReadSize, unsigned long uParam)
+{
+    FETextureResource* pHandle = (FETextureResource*)uParam;
+    GLResourcePool* resourcePool = s_pResourcePool;
+    glBeginResource(pHandle->m_hashID);
+    glTextureAdd(pHandle->m_hashID, s_pResourceLoadBuffer, uReadSize, resourcePool);
+    glEndResource();
+    delete[] s_pResourceLoadBuffer;
+    s_pResourceLoadBuffer = 0;
+    unsigned long textureHandle = pHandle->m_hashID;
+    pHandle->SetTextureHandle(textureHandle);
+    FEResourceManager::Instance()->AddResourceToResourceList(pHandle);
+    pHandle->m_bValid = true;
+}
+
+ResourceResult FEResourceManager::IssueTextureLoadRequest(FETextureResource* pFeTextureResource, MemoryAllocator* pAllocator)
+{
+    FETextureResource* pFeExistingTextureResource = (FETextureResource*)FindExistingResourceInResourceList(pFeTextureResource);
+    if (pFeExistingTextureResource != 0
+        && pFeExistingTextureResource->GetResourceType() == pFeTextureResource->GetResourceType())
+    {
+        unsigned long textureHandle = pFeExistingTextureResource->GetTextureHandle();
+        pFeTextureResource->SetTextureHandle(textureHandle);
+        pFeTextureResource->m_bValid = pFeExistingTextureResource->m_bValid;
+        return FERR_AlreadyLoaded;
+    }
+
+    BundleFileDirectoryEntry fileDirectoryEntry;
+    if (s_pOnDemandBundle->GetFileInfo(pFeTextureResource->m_hashID, &fileDirectoryEntry, true))
+    {
+        if (pAllocator != 0)
+        {
+            PushAllocator(pAllocator);
+        }
+        unsigned char* pResourceLoadBuffer = (unsigned char*)nlMalloc(fileDirectoryEntry.m_length, 0x20, true);
+        s_pResourceLoadBuffer = pResourceLoadBuffer;
+        s_pOnDemandBundle->ReadFileAsync(
+            pFeTextureResource->m_hashID,
+            pResourceLoadBuffer,
+            fileDirectoryEntry.m_length,
+            FEResourceManager::TextureResourceLoadComplete,
+            (unsigned long)pFeTextureResource);
+        if (pAllocator != 0)
+        {
+            PopAllocator();
+        }
+    }
+    return FERR_WaitingForResource;
+}
+
+ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSceneResource)
+{
+    if (s_pCurrentFESceneResourceContext != 0
+        && s_pCurrentFESceneResourceContext != pFeSceneResource
+        && s_pPermanentBundleSceneResource != s_pCurrentFESceneResourceContext)
+    {
+        s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = 6;
+        s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
+    }
+
+    pFeSceneResource->m_glResourceMarker = s_pResourcePool->MarkResource();
+    pFeSceneResource->m_bValid = true;
+    s_pCurrentFESceneResourceContext = pFeSceneResource;
+    return FERR_WaitingForResource;
+}
+
+ResourceResult FEResourceManager::IssueResourceLoadRequest(PendingResourceLoad pendingResource)
+{
+    ResourceResult resourceRequestResult = FERR_WaitingForResource;
+    s_pCurrentResourceBeingLoaded = pendingResource.pHandle;
+
+    switch (pendingResource.pHandle->m_type)
+    {
+    case FERT_TEXTURE:
+        resourceRequestResult = IssueTextureLoadRequest((FETextureResource*)s_pCurrentResourceBeingLoaded, pendingResource.pAllocator);
+        break;
+    case FERT_SCENE:
+        resourceRequestResult = IssueSceneContextSwitch((FESceneResource*)pendingResource.pHandle);
+        break;
+    case FERT_FONT:
+        resourceRequestResult = IssueFontLoadRequest((FEFontResource*)pendingResource.pHandle);
+        break;
+    default:
+        break;
+    }
+
+    return resourceRequestResult;
 }
 
 void FEResourceManager::Update(float dt)
@@ -433,66 +503,9 @@ void FEResourceManager::Update(float dt)
             return;
         }
 
-        PendingResourceLoad pendingResource = pendingResourceQueue.Begin().m_Curr->entry;
-        s_pCurrentResourceBeingLoaded = pendingResource.pHandle;
-        result = FERR_WaitingForResource;
-        switch (s_pCurrentResourceBeingLoaded->m_type)
-        {
-        case FERT_TEXTURE:
-            result = IssueTextureLoadRequest((FETextureResource*)s_pCurrentResourceBeingLoaded, pendingResource.pAllocator);
-            break;
-        case FERT_SCENE:
-            result = IssueSceneContextSwitch((FESceneResource*)s_pCurrentResourceBeingLoaded);
-            break;
-        case FERT_FONT:
-        {
-            FEFontResource* pFeFontResource = (FEFontResource*)pendingResource.pHandle;
-            FEResourceHandle* pFeResourceHandle = (FEResourceHandle*)pFeFontResource;
-            nlFont* pExistingFont = FontManager::Instance()->GetFontByHashID(pFeResourceHandle->m_hashID);
-            pFeFontResource->SetFontReference(pExistingFont);
-            pFeResourceHandle->m_bValid = true;
-            result = FERR_AlreadyLoaded;
-            break;
-        }
-        default:
-            break;
-        }
+        result = IssueResourceLoadRequest(pendingResourceQueue.Begin().m_Curr->entry);
         bQueueNextResource = result == FERR_AlreadyLoaded;
     }
-}
-
-ResourceResult FEResourceManager::IssueTextureLoadRequest(FETextureResource* pFeTextureResource, MemoryAllocator* pAllocator)
-{
-    FETextureResource* pFeExistingTextureResource = (FETextureResource*)FindExistingResourceInResourceList(pFeTextureResource);
-    if (pFeExistingTextureResource != 0
-        && pFeExistingTextureResource->GetResourceType() == pFeTextureResource->GetResourceType())
-    {
-        unsigned long textureHandle = pFeExistingTextureResource->GetTextureHandle();
-        pFeTextureResource->SetTextureHandle(textureHandle);
-        pFeTextureResource->m_bValid = pFeExistingTextureResource->m_bValid;
-        return FERR_AlreadyLoaded;
-    }
-
-    BundleFileDirectoryEntry fileDirectoryEntry;
-    if (s_pOnDemandBundle->GetFileInfo(pFeTextureResource->m_hashID, &fileDirectoryEntry, true))
-    {
-        if (pAllocator != 0)
-        {
-            PushAllocator(pAllocator);
-        }
-        s_pResourceLoadBuffer = (unsigned char*)nlMalloc(fileDirectoryEntry.m_length, 0x20, true);
-        s_pOnDemandBundle->ReadFileAsync(
-            pFeTextureResource->m_hashID,
-            s_pResourceLoadBuffer,
-            fileDirectoryEntry.m_length,
-            FEResourceManager::TextureResourceLoadComplete,
-            (unsigned long)pFeTextureResource);
-        if (pAllocator != 0)
-        {
-            PopAllocator();
-        }
-    }
-    return FERR_WaitingForResource;
 }
 
 GLResourcePool* FEResourceManager::GetResourcePool()
@@ -531,9 +544,9 @@ bool FEResourceManager::UnloadMiniBundle(FEMiniBundle* miniBundle)
         bundle->GetFileInfoByIndex(fileIndex, &fileDirectoryEntry);
         if (s_loadedResourceList.FindGet(fileDirectoryEntry.m_hash, &pLoadedResourceHandle))
         {
-            unsigned long hashToDelete = (*pLoadedResourceHandle)->GetHashID();
+            unsigned long hashtodelete = (*pLoadedResourceHandle)->GetHashID();
             delete *pLoadedResourceHandle;
-            s_loadedResourceList.Remove(hashToDelete);
+            s_loadedResourceList.Remove(hashtodelete);
         }
     }
 

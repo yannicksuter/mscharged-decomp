@@ -27,8 +27,6 @@ struct UnidentifiedDebugCameraTarget
     nlVector3 mPosition;
 };
 
-extern "C" void fn_800F2504();
-
 struct DebugCameraControlTweakValues
 {
     float speed0;

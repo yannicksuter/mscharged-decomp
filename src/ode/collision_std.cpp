@@ -30,6 +30,7 @@ dContactGeom::g1 and dContactGeom::g2.
 */
 
 #include <ode/common.h>
+#include <cstring>
 #include <ode/collision.h>
 #include <ode/matrix.h>
 #include <ode/rotation.h>
@@ -41,7 +42,6 @@ dContactGeom::g1 and dContactGeom::g2.
 #include "NL/nlMath.h"
 #include "math.h"
 
-extern "C" void* memcpy(void*, const void*, size_t);
 
 #define dFabs(x) ((float)fabsf(float(x)))
 #define dInfinity (3.402823466e+38F)

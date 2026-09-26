@@ -27,13 +27,13 @@ geom transform
 */
 
 #include <ode/collision.h>
+#include <cstring>
 #include <ode/matrix.h>
 #include <ode/rotation.h>
 #include <ode/odemath.h>
 #include "collision_transform.h"
 #include "collision_util.h"
 
-extern "C" void* memcpy(void*, const void*, size_t);
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4291) // for VC++, no complaints about "no matching operator delete found"

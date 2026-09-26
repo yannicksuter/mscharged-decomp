@@ -13,16 +13,18 @@ void nlPolygonRegion::Allocate(int capacity)
 inline void nlPolygonRegion::UpdateBoundingSphere()
 {
     nlVector3 centre = { 0.0f, 0.0f, 0.0f };
-    for (int i = 0; i < mNumPoints; i++)
+    int i;
+    for (i = 0; i < mNumPoints; i++)
     {
-        nlVec3Add(centre, centre, mPoints[i]);
+        nlVec3Set(centre, centre.x + mPoints[i].x,
+            centre.y + mPoints[i].y, centre.z + mPoints[i].z);
     }
 
     float radiusSquared = 0.0f;
     float scale = 1.0f / (float)mNumPoints;
     nlVec3Scale(centre, scale);
 
-    for (int i = 0; i < mNumPoints; i++)
+    for (i = 0; i < mNumPoints; i++)
     {
         float distanceSquared = CalculateDistanceSquared(centre, mPoints[i]);
         if (distanceSquared > radiusSquared)

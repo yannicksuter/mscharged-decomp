@@ -1,11 +1,12 @@
 #include "revolution/os/OSTime.h"
+#include "Game/CharacterTweaks.h"
 
 #include <stddef.h>
 
 #include "Game/Team.h"
 
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -117,21 +118,16 @@ extern "C" unsigned long fn_800A6EE0(cTeam*);
 extern "C" void fn_800A701C(cTeam*);
 extern "C" void fn_800A83CC(cTeam*, bool);
 extern "C" float fn_800A0508(cFielder*, bool, bool);
-extern "C" float fn_80034F98(cFielder*, float);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" float fn_8002E1B0(cFielder*);
-extern "C" float fn_800394A8(cFielder*, int);
-extern "C" void fn_800180F4(cBall*, nlVector3*, float);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" bool fn_8003E99C(const cFielder* pFielder);
 extern "C" bool fn_8003E6EC(cFielder* pFielder);
-extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 extern "C" void fn_801BB6A4(cFielder* pFielder, int nPowerupIndex);
 
 extern "C" void fn_800A2290(
     SkillTweaks* pTweaks, int difficulty, int param2, bool param3);
-extern "C" float fn_8002BE38(PlayerTweaks*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
 
@@ -195,7 +191,7 @@ cTeam::~cTeam()
 {
     delete m_pNet;
     delete m_pFormationManager;
-    mUnidentified0F0->fn_8030F74C(true, true);
+    mUnidentified0F0->Cleanup(true, true);
     delete mUnidentified0F0;
 }
 
@@ -210,7 +206,7 @@ void cTeam::fn_800A6248()
     }
 
     m_pFormationManager->fn_80050D24();
-    mUnidentified0F0->mUnidentified18->UnidentifiedVirtual4(false);
+    mUnidentified0F0->mScriptMachine->Reset(false);
 
     for (int i = 0; i < 4; i++)
     {
@@ -231,7 +227,7 @@ void cTeam::fn_800A607C()
     }
 
     m_pFormationManager->fn_80050D24();
-    mUnidentified0F0->mUnidentified18->UnidentifiedVirtual4(false);
+    mUnidentified0F0->mScriptMachine->Reset(false);
 
     for (int i = 0; i < 4; i++)
     {
@@ -317,10 +313,10 @@ cTeam::cTeam(int nSide)
 
     m_pNet = new (8, false) cNet(nSide);
     m_pFormationManager = new (8, false) FormationManager(this);
-    mUnidentified0F0 = new (8, false) UnidentifiedFielderInput(this,
+    mUnidentified0F0 = new (8, false) AIContext(this,
         new (8, false) TeamPlayMachine(),
         new (8, false) UnidentifiedFuzzyRuntime());
-    mUnidentified0F0->mUnidentified18->UnidentifiedVirtual2();
+    mUnidentified0F0->mScriptMachine->UnidentifiedVirtual2();
 }
 
 SkillTweaks* fn_800A636C(cTeam* pTeam)
@@ -552,12 +548,12 @@ Goalie* cTeam::GetGoalie()
 
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_800A695C(cTeam* pTeam)
 {
-    return pTeam->mUnidentified0F0->mUnidentified14;
+    return pTeam->mUnidentified0F0->mRuntime;
 }
 
 extern "C" UnidentifiedScriptMachine* fn_800A6968(cTeam* pTeam)
 {
-    return pTeam->mUnidentified0F0->mUnidentified18;
+    return pTeam->mUnidentified0F0->mScriptMachine;
 }
 
 /**
@@ -1330,7 +1326,7 @@ void cTeam::UpdateTeamAI(float fDeltaT)
         }
     }
 
-    mUnidentified0F0->fn_8030F800(true, fDeltaT);
+    mUnidentified0F0->Update(true, fDeltaT);
 }
 
 /**
@@ -1715,7 +1711,7 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
             : m_pBallInterceptOrderedFielders[i]->mUnidentified120;
     }
     data.m_nTeamPlayTransFunc
-        = mUnidentified0F0->mUnidentified18->mUnidentified00C.mUnidentifiedHash;
+        = mUnidentified0F0->mScriptMachine->mUnidentified00C.mUnidentifiedHash;
 
     if (lbl_806DBF04 == 0xFFFF)
     {

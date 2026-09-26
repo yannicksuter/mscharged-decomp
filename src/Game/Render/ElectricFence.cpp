@@ -1,4 +1,5 @@
 #include "Game/Render/ElectricFence.h"
+#include <cstring>
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Effects/EmissionManager.h"
@@ -16,7 +17,6 @@
 
 class EffectsGroup;
 
-extern "C" void* memcpy(void*, const void*, unsigned long);
 
 static float sfGridTextureSize = 7.0f;
 static float sfNumGridSquares = 9.48f;

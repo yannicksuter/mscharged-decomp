@@ -37,7 +37,7 @@ public:
     virtual void Update(float dt);
     virtual void Render(GLView* view);
     virtual void Cancel();
-    virtual bool UnidentifiedVirtual30();
+    virtual bool ConsumeScreenGrabRequest();
 
     void InitializeFromParser(SimpleParser* parser);
     TransitionModifierInterface* GetModifierFromName(char* pName);

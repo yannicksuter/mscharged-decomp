@@ -1,4 +1,5 @@
 #include "Game/Sys/audio.h"
+#include "Game/CharacterTriggers.h"
 #include "Game/AI/Fielder.h"
 #include "Game/RumbleActions.h"
 #include "Game/Render/FlyingCamera.h"
@@ -60,8 +61,6 @@ struct UnidentifiedAbilityEvent
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
-extern "C" void fn_8002FE54(cFielder* pFielder);
-extern "C" void fn_800301E8(cFielder* pFielder);
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 extern "C" bool fn_80319FEC(void* pParam, int nAction);
 extern "C" void fn_80319E58(void* pParam, int nAction);
@@ -72,11 +71,7 @@ extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);
 extern "C" void fn_80060210(cGame* pGame, void* pEvent);
 
 extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
-extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
 extern "C" void fn_801B897C(cFielder* pFielder);
-extern "C" void fn_801BAF98(cFielder* pFielder);
-extern "C" void fn_801BB0DC(cFielder* pFielder);
-extern "C" void fn_801BB120(cFielder* pFielder);
 bool IsNetworkOrRecordedGame(void);
 
 void cFielder::fn_8004F828()

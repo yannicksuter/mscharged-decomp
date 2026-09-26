@@ -1,5 +1,7 @@
 #include "Game/Font/FontLoading.h"
 #include "Game/MiiManager.h"
+#include "Game/AI/FuzzyAIRuntime.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/HBMManager.h"
 #include "Game/ObjectBlur.h"
 
@@ -119,6 +121,7 @@
 #include "Game/NetworkInput.h"
 #include "Game/NetworkSync.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/main.h"
 
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
@@ -128,42 +131,30 @@ bool IsNetworkOrRecordedGame();
 extern "C" u32 OSGetTick();
 extern "C" void OSYieldThread();
 
-extern "C" void fn_801440BC();
 extern "C" void fn_8013DB18();
 void ShutdownWarbleRendering(void*);
 extern "C" void fn_8013DDD4();
 extern "C" void fn_802EC9D0(void*);
 extern "C" bool fn_802773B8(bool stadiumViewer);
-extern "C" const char* fn_800E3198();
-extern "C" void fn_80311AFC(const char* filename, bool async);
-extern "C" bool fn_80311C5C();
-extern "C" bool fn_800F08A4();
-extern "C" void fn_800F06D4();
-extern "C" void fn_800F030C(bool stadiumViewer);
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
-extern "C" void fn_80018A00();
 extern "C" void GoalieOnGameOver();
 extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
     void* parameterData, bool immediate, float value);
 extern "C" void fn_8013D8DC();
-extern "C" void fn_80144070();
 extern "C" void fn_8013D85C();
 void fn_80056CF4(void*, int, bool);
 extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
 void FreeImpostorLighting();
-extern "C" void fn_80143FD4();
 
 void fn_80056EA8();
 void DestroyCharacters();
 
-extern cBall* g_pBall;
 extern bool gAudioEnabled;
 extern SlotPool<cSAnimCallback> lbl_805840D8;
 extern SlotPoolBase lbl_8057AB80;
-extern bool g_e3_Build;
 
 bool g_VerboseAudio;
 bool g_bDumpMemoryStatsOnLoad;

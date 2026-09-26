@@ -34,4 +34,7 @@ struct UnidentifiedAbilityEffect
     /* 0x08 */ WaluigiWallManager* mUnidentified08;
 }; // size: 0xC
 
+
+extern float lbl_806DB9D8;
+
 #endif // GAME_AI_FIELDER_ABILITY_H

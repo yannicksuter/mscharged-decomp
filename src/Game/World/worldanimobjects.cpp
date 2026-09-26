@@ -200,21 +200,20 @@ void WorldDrawable::Draw()
 
 void WorldDrawable::V8(GLView* pView)
 {
-    unsigned long uAnimationHash = *(unsigned long*)m_pModel;
+    glModel* pModel = m_pModel;
+    unsigned long uAnimationHash = pModel->id;
     GLVertexAnim* pVertexAnim
         = glGetCurrentResourcePool()->m_inventory->GetVertexAnim(uAnimationHash);
-    glModel* pModel = m_pModel;
     if (pVertexAnim != 0)
     {
         int nFrames = (int)pVertexAnim->m_nNumFrames;
-        float fNumFrames = (float)nFrames;
-        float fDuration = fNumFrames / 30.0f;
+        float fDuration = (float)nFrames / 30.0f;
         float fFrameTime
             = m_pWorldContext->mWorldAnimManager.m_fTime
             / fDuration;
         float fFrameFraction
             = fFrameTime - (float)floor(fFrameTime);
-        int nFrame = (int)(fNumFrames * fFrameFraction);
+        int nFrame = (int)((float)nFrames * fFrameFraction);
         pModel = pVertexAnim->GetModel(nFrame);
         V7(pModel);
     }

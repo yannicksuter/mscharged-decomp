@@ -165,4 +165,5 @@ void ButtonComponent::SetState(ButtonComponent::ButtonState buttonstate)
     }
 }
 
-#include "Game/FE/feFinder_impl.h"
+#include "Game/FE/feFinderFind_impl.h"
+#include "Game/FE/feFinderDefault_impl.h"

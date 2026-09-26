@@ -32,10 +32,7 @@
 #include <string.h>
 
 extern BaseGameSceneManager* g_pGameSceneManager;
-extern BaseGameSceneManager* g_pOverlayManager;
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 class UnidentifiedHBMScene : public BaseSceneHandler
 {

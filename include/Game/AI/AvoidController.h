@@ -270,4 +270,9 @@ inline void UnidentifiedAvoidanceHistory::UnidentifiedGetValue(
     }
 }
 
+
+extern "C" void fn_8000F178(AvoidController* controller);
+extern "C" float fn_8000F558( AvoidController* controller, eAvoidableThings things);
+extern "C" void fn_8000F594(AvoidableObject* pObject);
+
 #endif // GAME_AI_AVOID_CONTROLLER_H

@@ -107,9 +107,12 @@ ImpostorSprite::ImpostorSprite(
 
     unsigned long allocationSize = capacity * sizeof(int);
     mImpostorSlots = (int*)nlMalloc(allocationSize, 8, false);
-    mRenderSlots = (int*)nlMalloc(allocationSize, 8, false);
+    int* renderSlots = (int*)nlMalloc(allocationSize, 8, false);
 
-    mID = gNextImpostorSpriteID++;
+    int id = gNextImpostorSpriteID;
+    mRenderSlots = renderSlots;
+    mID = id;
+    gNextImpostorSpriteID = id + 1;
 }
 
 ImpostorSprite::~ImpostorSprite()

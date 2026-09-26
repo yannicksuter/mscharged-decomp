@@ -1,9 +1,11 @@
 #include "Game/Formation.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Ball.h"
 #include "Game/Field.h"
 #include "Game/GameTweaks.h"
@@ -16,36 +18,15 @@
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-enum eGameState
-{
-    GS_GAMEPLAY = 5,
-    GS_OVERTIME = 6,
-};
-
-struct cGame
-{
-    /* 0x00 */ u8 field_0x00[0x18];
-    /* 0x18 */ eGameState m_eGameState;
-
-    bool IsGameplayOrOvertime()
-    {
-        return m_eGameState == GS_GAMEPLAY || m_eGameState == GS_OVERTIME;
-    }
-};
-
-extern cGame* g_pGame;
+#include "Game/Game.h"
+#include <mem.h>
 
 extern "C" float fn_8002E1B0(cFielder*);
 float ReceivingPass(cFielder*);
-extern "C" InterpreterCore* fn_800A695C(cTeam*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
 extern "C" cFielder* fn_800A8800(cTeam*);
 extern "C" cFielder* fn_800A8808(cTeam*);
 extern "C" cFielder* fn_800A8884(cTeam*);
-extern "C" void fn_800180F4(cBall*, nlVector3*, float);
-extern "C" float fn_800DFF1C();
-extern "C" void* memset(void*, int, unsigned long);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -93,7 +74,7 @@ FormationManager::FormationManager(cTeam* pTeam)
     m_v2AIFielderCenter.y = 0.0f;
     field_0x18.x = 0.0f;
     field_0x18.y = 0.0f;
-    m_tSelectFormationsTimer.m_unk0 = m_tSelectFormationsTimer.m_uPackedTime != 0;
+    m_tSelectFormationsTimer.m_uWasRunning = m_tSelectFormationsTimer.m_uPackedTime != 0;
     m_tSelectFormationsTimer.m_uPackedTime = 0;
 }
 
@@ -305,7 +286,7 @@ void FormationManager::fn_80050D24()
         *++pp = 0;
     }
 
-    m_tSelectFormationsTimer.m_unk0 = m_tSelectFormationsTimer.m_uPackedTime != 0;
+    m_tSelectFormationsTimer.m_uWasRunning = m_tSelectFormationsTimer.m_uPackedTime != 0;
     m_tSelectFormationsTimer.m_uPackedTime = 0;
     m_CachedPositions[0].bCacheIsValid = false;
     m_CachedPositions[1].bCacheIsValid = false;

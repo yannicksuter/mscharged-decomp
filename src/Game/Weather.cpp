@@ -17,6 +17,7 @@
 #include "math.h"
 #include "Game/Render/tu_8027AE14.h"
 #include "Game/AI/Fielder.h"
+#include "Game/Player.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/GameplayCam.h"
@@ -42,6 +43,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Weather.h"
+#include "Game/WeatherData.h"
 #include "types.h"
 
 float gWindStrength = 5.0f;
@@ -116,18 +118,7 @@ static u16 sBubblingLavaSyncLogType = 0xFFFF;
 static u16 sStormShipWeatherSyncLogType = 0xFFFF;
 static u16 sSandTombWeatherSyncLogType = 0xFFFF;
 
-extern "C" void fn_801BDC1C(const nlVector3&, const nlVector3&, const nlVector3&);
-extern "C" void fn_80031A30(cFielder*, int, float);
-extern "C" void fn_80097358(cPlayer*, float);
 void OnLavaCollisionPatchGround(UnidentifiedEventData24*);
-extern "C" void fn_800B0358();
-extern "C" nlVector3* fn_800B0464(int);
-extern "C" int fn_800B0478(int);
-extern "C" nlVector3* fn_800B048C(int);
-extern "C" int fn_800B04A0(int);
-extern "C" int fn_800B045C();
-extern "C" int fn_800B04B4(SandTombWeather*);
-extern "C" nlVector4 fn_800B04BC(SandTombWeather*, int, bool);
 
 inline bool SolarFlare::IsTargetSelected(int target, int count)
 {

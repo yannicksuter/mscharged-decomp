@@ -74,26 +74,32 @@ nlColour GetImpostorLightingColour(const nlVector3* position)
     if (spImpostorLightingLookup == 0)
     {
         nlColourSet(colour, 255, 255, 255, 255);
-        return colour;
     }
-
-    float x = position->x * gShadowLookupScaleX.value;
-    x += gShadowLookupTransX.value;
-    x = 0.5f * x + 0.5f;
-    float y = position->y * gShadowLookupScaleY.value;
-    y += gShadowLookupTransY.value;
-    y = -0.5f * y + 0.5f;
-    int lookupX = (int)(x * (spImpostorLightingLookup->mWidth - 1));
-    int lookupY = (int)(y * (spImpostorLightingLookup->mHeight - 1));
-    if (lookupX >= spImpostorLightingLookup->mWidth)
+    else
     {
-        lookupX = spImpostorLightingLookup->mWidth - 1;
+        LightingLookup* lookup = spImpostorLightingLookup;
+        nlVector2 coordinate;
+        float x = position->x * gShadowLookupScaleX.value;
+        x += gShadowLookupTransX.value;
+        x = 0.5f * x + 0.5f;
+        float y = position->y * gShadowLookupScaleY.value;
+        y += gShadowLookupTransY.value;
+        y = -0.5f * y + 0.5f;
+        nlVec2Set(coordinate, x, y);
+        int width = lookup->mWidth;
+        int height = lookup->mHeight;
+        int lookupX = (int)(coordinate.x * (width - 1));
+        int lookupY = (int)(coordinate.y * (height - 1));
+        if (lookupX >= width)
+        {
+            lookupX = width - 1;
+        }
+        if (lookupY >= height)
+        {
+            lookupY = height - 1;
+        }
+        colour = lookup->SampleColour(lookupX, lookupY, true);
     }
-    if (lookupY >= spImpostorLightingLookup->mHeight)
-    {
-        lookupY = spImpostorLightingLookup->mHeight - 1;
-    }
-    colour = spImpostorLightingLookup->SampleColour(lookupX, lookupY, true);
     return colour;
 }
 

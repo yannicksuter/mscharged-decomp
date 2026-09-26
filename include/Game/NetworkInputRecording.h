@@ -14,7 +14,7 @@ struct NetworkInputRecording
     void StartNetworkInputRecording(int localMachine, int machineCount, u32 randomSeed, const void* config, int configSize);
     bool ReadNetworkInputRecordingHeader();
     int GetNetworkInputPlaybackExtraUpdates();
-    void WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u16 eventCount, u32 value);
+    void WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 value);
     void WriteNetworkInputEvent(const DetermDataEvent* event);
     void WriteData(const void* data, int size);
     void WriteNetworkInputRecord(s8 machine, const PackedDetInput* record, u8 connected);

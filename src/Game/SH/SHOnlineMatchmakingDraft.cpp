@@ -2,8 +2,10 @@
 #include "Game/GameInfo.h"
 
 #include "Game/BaseGameSceneManager.h"
+#include "Game/GameSceneManager.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePresentation.inl"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feMusic.h"
@@ -20,6 +22,7 @@
 #include "Game/OnlineMatchmaking.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "NL/nlBind.h"
+#include "NL/nlBindMember.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -187,6 +190,13 @@ SHOnlineMatchmakingDraft::~SHOnlineMatchmakingDraft()
         scene->mTimer->m_bVisible = false;
 }
 
+inline void SHOnlineMatchmakingDraft::RefreshPlayerRows()
+{
+    for (int i = 0; i < 4; ++i)
+        UpdateOnlinePlayerRow(&mPlayers[i + mScrollOffset], mPlayerInstances[i],
+            mPlayerNameBuffers[i], 0x20, mPlayerDescriptionBuffers[i], 0x30, i, mIntroFinished);
+}
+
 void SHOnlineMatchmakingDraft::SceneCreated()
 {
     for (int i = 0; i < 4; ++i)
@@ -219,9 +229,7 @@ void SHOnlineMatchmakingDraft::SceneCreated()
     if (mCanCancel)
         pointerButtons = 4;
     scene->SetButtons(pointerButtons, true);
-    for (int i = 0; i < 4; ++i)
-        UpdateOnlinePlayerRow(&mPlayers[i + mScrollOffset], mPlayerInstances[i],
-            mPlayerNameBuffers[i], 0x20, mPlayerDescriptionBuffers[i], 0x30, i, mIntroFinished);
+    RefreshPlayerRows();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
@@ -280,13 +288,13 @@ void SHOnlineMatchmakingDraft::Update(float fDeltaT)
     if (!mIntroFinished)
     {
         TLSlide* slide = mPresentation->GetActiveSlide();
-        if (slide->m_time >= slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             if (mScrollingEnabled && !mScrollWidget.mInitialized)
                 mScrollWidget.Initialize();
             mIntroFinished = true;
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+                GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
         }
         else
         {
@@ -308,16 +316,16 @@ void SHOnlineMatchmakingDraft::Update(float fDeltaT)
             g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
             if (g_pNetworkSession->RequiresDisconnectAfterError())
                 mReturnScene = SCENE_MAIN_MENU;
-            int error = g_pNetworkSession->mDWCErrorCode;
+            int error = g_pNetworkSession->fn_801CA9D8();
             int popup = GetOnlineErrorPopup(error, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5A);
-            if (g_pGameSceneManager->GetSceneType(g_pGameSceneManager->GetCurrentScene()) == (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) == (SceneList)10)
                 return;
             FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
             FEMusic::StartStreamIfDifferent(3);
             FEPopupMenu* menu = static_cast<FEPopupMenu*>(
-                g_pGameSceneManager->Push((SceneList)10, SCREEN_NOTHING, false));
+                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
             menu->Create((ePopupMenu)popup,
-                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this)));
+                Function<FnVoidVoid>(BindMember(this, &SHOnlineMatchmakingDraft::OnErrorDismissed)));
             mErrorPopupOpen = true;
             return;
         }
@@ -355,14 +363,14 @@ void SHOnlineMatchmakingDraft::Update(float fDeltaT)
         if (NetworkDraft::Instance()->mState == NET_DRAFT_DISCONNECTED)
         {
             g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
-            if (g_pGameSceneManager->GetSceneType(g_pGameSceneManager->GetCurrentScene()) == (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) == (SceneList)10)
                 return;
             FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
             FEMusic::StartStreamIfDifferent(3);
             FEPopupMenu* menu = static_cast<FEPopupMenu*>(
-                g_pGameSceneManager->Push((SceneList)10, SCREEN_NOTHING, false));
+                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
             menu->Create((ePopupMenu)0x60,
-                Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this)));
+                Function<FnVoidVoid>(BindMember(this, &SHOnlineMatchmakingDraft::OnErrorDismissed)));
             mErrorPopupOpen = true;
             return;
         }
@@ -406,14 +414,14 @@ void SHOnlineMatchmakingDraft::Update(float fDeltaT)
 
     for (int i = 0; i < 4; ++i)
     {
-        TLComponentInstance* pointer = gFEPointerInstances[i];
+        TLComponentInstance* pointer = GetPointerInstance(i);
         if (i != gFEControllerIndex || !CanCancelOnlineMatchmaking())
             pointer->SetActiveSlide("waiting", true, false);
         else
         {
+            u8 valid = true;
             FEPointerEvent event;
             event.mIndex = i;
-            u8 valid = true;
             event.mPosition = GetPointerPosition(i, &valid);
             event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
             event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)i, 30, true, 0);
@@ -438,9 +446,7 @@ void SHOnlineMatchmakingDraft::Update(float fDeltaT)
         else if (mScrollWidget.IsScrolling(0, 1))
             --mScrollOffset;
     }
-    for (int i = 0; i < 4; ++i)
-        UpdateOnlinePlayerRow(&mPlayers[i + mScrollOffset], mPlayerInstances[i],
-            mPlayerNameBuffers[i], 0x20, mPlayerDescriptionBuffers[i], 0x30, i, mIntroFinished);
+    RefreshPlayerRows();
 }
 
 void SHOnlineMatchmakingDraft::OnErrorDismissed()

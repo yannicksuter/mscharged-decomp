@@ -21,36 +21,33 @@ struct FE_FILE_HEADER
 class QueueResourceLoadCallback
 {
 public:
-    QueueResourceLoadCallback(FEResourceManager* resourceManager, MemoryAllocator* pAllocator)
-        : m_resourceManager(resourceManager)
+    QueueResourceLoadCallback(FEResourceManager* pResourceManager, MemoryAllocator* pAllocator)
+        : m_pResourceManager(pResourceManager)
         , m_pAllocator(pAllocator)
     {
     }
 
-    void Callback(FEResourceHandle* handle);
+    void Callback(FEResourceHandle* pFeResourceHandle);
 
-    FEResourceManager* m_resourceManager;
+    FEResourceManager* m_pResourceManager;
     MemoryAllocator* m_pAllocator;
 };
 
 class UnloadResourceCallback
 {
 public:
-    void Callback(FEResourceHandle* handle);
+    void Callback(FEResourceHandle* pFeResourceHandle);
 
-    FEResourceManager* m_resourceManager;
+    FEResourceManager* m_pResourceManager;
 };
 
 class ReleaseResourceCallback
 {
 public:
-    void Callback(FEResourceHandle* handle);
+    void Callback(FEResourceHandle* pFeResourceHandle);
 
-    FEResourceManager* m_resourceManager;
+    FEResourceManager* m_pResourceManager;
 };
-
-
-extern "C" void InitializeScene(FESceneManager* pSceneManager, FEScene* pFEScene);
 
 static inline void PushAllocator(MemoryAllocator* pAllocator)
 {
@@ -88,13 +85,13 @@ FEScene::FEScene()
     , m_pResourceHandles(0)
     , m_pAllocator(0)
 {
-    nlVector3 FROM;
-    nlVec3Set(FROM, 0.0f, 0.0f, 600.0f);
-    nlVector3 TO;
-    nlVec3Set(TO, 0.0f, 0.0f, 0.0f);
-    nlVector3 UP;
-    nlVec3Set(UP, 0.0f, 1.0f, 0.0f);
-    glMatrixLookAt(m_matView, FROM, TO, UP);
+    nlVector3 v3Eye;
+    nlVec3Set(v3Eye, 0.0f, 0.0f, 600.0f);
+    nlVector3 v3At;
+    nlVec3Set(v3At, 0.0f, 0.0f, 0.0f);
+    nlVector3 v3Up;
+    nlVec3Set(v3Up, 0.0f, 1.0f, 0.0f);
+    glMatrixLookAt(m_matView, v3Eye, v3At, v3Up);
 
     m_pFileHeader = (FE_FILE_HEADER*)nlMalloc(sizeof(FE_FILE_HEADER), 0x20, false);
 }
@@ -124,9 +121,23 @@ void FEScene::LoadPackageCallback(void* pData, unsigned long uSize, void* pUserD
     ::operator delete[](pData);
 }
 
+inline void FEScene::LoadPackageResources(FEPackage* pFEPackage)
+{
+    QueueResourceLoadCallback cb(FEResourceManager::Instance(), m_pAllocator);
+
+    m_feSceneResourceHandle.m_pFESceneContext = this;
+    m_feSceneResourceHandle.m_hashID = m_uHashID;
+    m_feSceneResourceHandle.m_next = 0;
+    m_feSceneResourceHandle.m_prev = 0;
+    m_feSceneResourceHandle.m_type = FERT_SCENE;
+    FEResourceManager::Instance()->QueueResourceLoad(&m_feSceneResourceHandle, 0);
+
+    nlWalkRing<FEResourceHandle, QueueResourceLoadCallback>(
+        pFEPackage->m_pResourceList, &cb, &QueueResourceLoadCallback::Callback);
+}
+
 void FEScene::LoadPackage(void* pData, unsigned long)
 {
-    nlFile* file;
     unsigned char* pFileData;
     unsigned long* pCurrentPointer;
     unsigned long* pLastPointer;
@@ -163,18 +174,7 @@ void FEScene::LoadPackage(void* pData, unsigned long)
     m_pPointerTable = 0;
     mState = 5;
 
-    file = (nlFile*)m_pFEPackage;
-    QueueResourceLoadCallback cb(FEResourceManager::Instance(), m_pAllocator);
-
-    m_feSceneResourceHandle.m_pFESceneContext = this;
-    m_feSceneResourceHandle.m_hashID = m_uHashID;
-    m_feSceneResourceHandle.m_next = 0;
-    m_feSceneResourceHandle.m_prev = 0;
-    m_feSceneResourceHandle.m_type = FERT_SCENE;
-    FEResourceManager::Instance()->QueueResourceLoad(&m_feSceneResourceHandle, 0);
-
-    nlWalkRing<FEResourceHandle, QueueResourceLoadCallback>(
-        ((FEPackage*)file)->m_pResourceList, &cb, &QueueResourceLoadCallback::Callback);
+    LoadPackageResources(m_pFEPackage);
 
     FESceneManager::Instance()->InitializeScene(this);
 
@@ -186,23 +186,23 @@ void FEScene::LoadPackage(void* pData, unsigned long)
 
 void FEScene::UnloadPackage()
 {
-    UnloadResourceCallback unloadResourceCallback;
-    unloadResourceCallback.m_resourceManager = FEResourceManager::Instance();
+    UnloadResourceCallback cb;
+    cb.m_pResourceManager = FEResourceManager::Instance();
     nlWalkRing<FEResourceHandle, UnloadResourceCallback>(
         m_pFEPackage->m_pResourceList,
-        &unloadResourceCallback,
+        &cb,
         &UnloadResourceCallback::Callback);
     FEResourceManager::Instance()->UnloadResource(&m_feSceneResourceHandle);
 }
 
-void UnloadResourceCallback::Callback(FEResourceHandle* handle)
+void UnloadResourceCallback::Callback(FEResourceHandle* pFeResourceHandle)
 {
-    m_resourceManager->UnloadResource(handle);
+    m_pResourceManager->UnloadResource(pFeResourceHandle);
 }
 
-void QueueResourceLoadCallback::Callback(FEResourceHandle* handle)
+void QueueResourceLoadCallback::Callback(FEResourceHandle* pFeResourceHandle)
 {
-    m_resourceManager->QueueResourceLoad(handle, m_pAllocator);
+    m_pResourceManager->QueueResourceLoad(pFeResourceHandle, m_pAllocator);
 }
 
 void FEScene::AllResourcesLoadedCallback()
@@ -212,19 +212,19 @@ void FEScene::AllResourcesLoadedCallback()
 void FEScene::ReleaseResourceHandles()
 {
     ReleaseResourceCallback callback;
-    callback.m_resourceManager = FEResourceManager::Instance();
+    callback.m_pResourceManager = FEResourceManager::Instance();
     nlWalkRing<FEResourceHandle, ReleaseResourceCallback>(
         m_pResourceHandles, &callback, &ReleaseResourceCallback::Callback);
     m_pResourceHandles = 0;
 }
 
-void ReleaseResourceCallback::Callback(FEResourceHandle* handle)
+void ReleaseResourceCallback::Callback(FEResourceHandle* pFeResourceHandle)
 {
-    m_resourceManager->UnloadResource(handle);
-    ::operator delete(handle);
+    m_pResourceManager->UnloadResource(pFeResourceHandle);
+    ::operator delete(pFeResourceHandle);
 }
 
-void FEScene::Update(float dt)
+void FEScene::Update(float fDeltaT)
 {
-    m_pFEPackage->Update(dt);
+    m_pFEPackage->Update(fDeltaT);
 }

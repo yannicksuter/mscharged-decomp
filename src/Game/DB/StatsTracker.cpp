@@ -67,7 +67,6 @@ public:
 };
 
 extern StatsEventRegistry* g_pEventRegistry;
-extern BaseGameSceneManager* g_pOverlayManager;
 
 extern "C" void fn_801E2A14(BaseGameSceneManager* manager);
 extern "C" int fn_80380C34(FILE* file, long offset, int origin);

@@ -30,11 +30,6 @@ extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
 
 extern "C" void fn_8005E29C(cGame*, void*);
-extern "C" void fn_800298D8(void*);
-extern "C" void fn_800299C4(void*);
-extern "C" void fn_80029AB0(void*);
-extern "C" void fn_80029B9C(void*);
-extern "C" void fn_800297B8(cBall*, CrowdRiot*);
 extern "C" void fn_80029C80(
     PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
 
@@ -318,7 +313,7 @@ void fn_800297B8(cBall* ball, CrowdRiot* crowdRiot)
         u32 packedTime = ball->mtNoChargeLossTimer.m_uPackedTime;
         bool wasRunning = packedTime != 0;
         ball->mtNoChargeLossTimer.m_uPackedTime = 0;
-        ball->mtNoChargeLossTimer.m_unk0 = wasRunning;
+        ball->mtNoChargeLossTimer.m_uWasRunning = wasRunning;
         ball->mbStuckInRiotDone = false;
     }
     else if (ball->mtNoChargeLossTimer.m_uPackedTime == 0)

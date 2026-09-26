@@ -1,4 +1,5 @@
 #include "Game/AI/Fielder.h"
+#include "Game/Player.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/AnimInventory.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -37,7 +38,6 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void fn_800957E4(cCharacter* pCharacter, cTeam* pTeam);
 extern "C" bool nlLoadCompressedFileAsync(const char* path, LoadAsyncCallback callback,
     void* userData, unsigned int alignment, int allocType,
     unsigned int chunkSize, void* readBuffer0, void* readBuffer1, void*,
@@ -945,7 +945,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
         g_pCharacters[mCurrent->nCharIdx] = pGoalie;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(goaliepos[mCurrent->nTeamID]);
         g_pTeams[mCurrent->nTeamID]->SetGoalie(pGoalie);
-        fn_800957E4(g_pCharacters[mCurrent->nCharIdx], g_pTeams[mCurrent->nTeamID]);
+        fn_800957E4(static_cast<cPlayer*>(g_pCharacters[mCurrent->nCharIdx]), g_pTeams[mCurrent->nTeamID]);
 
         if (mCurrent->bGoalie && mCurrent->cc != 20)
         {
@@ -971,7 +971,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
         g_pCharacters[mCurrent->nCharIdx] = pFielder;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(pos[mCurrent->nCharIdx]);
         g_pTeams[mCurrent->nTeamID]->SetPlayer((cPlayer*)g_pCharacters[mCurrent->nCharIdx], mCurrent->nPlayerID);
-        fn_800957E4(g_pCharacters[mCurrent->nCharIdx], g_pTeams[mCurrent->nTeamID]);
+        fn_800957E4(static_cast<cPlayer*>(g_pCharacters[mCurrent->nCharIdx]), g_pTeams[mCurrent->nTeamID]);
     }
 }
 

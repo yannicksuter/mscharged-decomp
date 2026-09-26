@@ -21,6 +21,7 @@
  *************************************************************************/
 
 #include "objects.h"
+#include <cstring>
 #include "joint.h"
 #include <ode/config.h>
 #include <ode/odemath.h>
@@ -29,7 +30,6 @@
 #include <ode/matrix.h>
 #include "util.h"
 
-extern "C" void* memcpy(void*, const void*, size_t);
 
 #define dFabs(x) ((float)__fabs(float(x)))
 #define dInfinity (3.402823466e+38F)

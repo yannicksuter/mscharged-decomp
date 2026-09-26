@@ -16,7 +16,6 @@
 
 #include "math.h"
 
-extern CollisionSpace* g_CollisionSpace;
 
 PhysicsNPC::PhysicsNPC(float radius)
     : PhysicsSphere(g_CollisionSpace, (PhysicsWorld*)0, radius)

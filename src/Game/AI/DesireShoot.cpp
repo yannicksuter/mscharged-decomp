@@ -26,14 +26,10 @@ struct UnidentifiedDesireMachine
     void* mUnidentified018;
 };
 
-extern "C" bool fn_8003C180(cFielder*);
-extern "C" float fn_8002C7E8(PlayerTweaks*);
 extern "C" UnidentifiedDesireMachine* fn_80316974(void*);
 extern "C" void fn_8031998C(
     void*, int, const UnidentifiedVariantCollection*);
 
-extern "C" float fn_80039574(cFielder*);
-extern cTeam* g_pCurrentlyUpdatingTeam;
 
 static float lbl_806DC208 = 0.5f;
 static unsigned short sDesireWindupShotType = 0xFFFF;

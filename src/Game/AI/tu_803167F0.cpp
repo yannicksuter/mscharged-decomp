@@ -1,5 +1,5 @@
 #include "Game/AI/Desire.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/AI/FuzzyAIRuntime.h"
@@ -16,14 +16,11 @@ extern "C" void fn_80315A64(
 extern "C" int fn_800C2BD4(UnidentifiedVariant_80054AB8*);
 extern "C" UnidentifiedFuzzyRuntimeValue* fn_80317E2C(
     UnidentifiedScriptMachine*);
-extern "C" bool fn_80317E34(const UnidentifiedStateTransition*);
-extern "C" bool fn_80317E60(const UnidentifiedStateTransition*);
 extern "C" bool fn_80317E88(shdStateMachine*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
     UnidentifiedFuzzyRuntimeBase*, const u32&, void*);
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
     UnidentifiedFuzzyRuntimeBase*, const u32&, void*, float);
-extern "C" float fn_8031A0C8(float, float);
 
 extern float (*lbl_806DF560)();
 extern float (*lbl_806DF564)();
@@ -70,7 +67,7 @@ shdStateMachine::shdStateMachine(
 
 void shdStateMachine::UnidentifiedReset(bool)
 {
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     mUnidentifiedActive = false;
     mUnidentified078 = lbl_806E6884;
@@ -94,10 +91,10 @@ extern "C" void fn_80316968(shdStateMachine* machine)
     fn_80319904(machine->mUnidentified018, machine);
 }
 
-extern "C" UnidentifiedFielderInput* fn_80316974(
+extern "C" AIContext* fn_80316974(
     shdStateMachine* machine)
 {
-    return machine->mUnidentified018->mUnidentified064;
+    return machine->mUnidentified018->mAIContext;
 }
 
 extern "C" void fn_80316980(
@@ -119,14 +116,14 @@ extern "C" bool fn_803169DC(
     bool reinitialize)
 {
     machine->mUnidentifiedActive = false;
-    u32 timerState = machine->mUnidentifiedTimer.m_unk0;
+    u32 timerState = machine->mUnidentifiedTimer.m_uWasRunning;
     u32 packedTime = machine->mUnidentifiedTimer.m_uPackedTime;
     float secondDuration = machine->mUnidentified07C;
     float duration = machine->mUnidentified078;
 
     bool result = fn_80316A84(machine, parameters, false);
 
-    machine->mUnidentifiedTimer.m_unk0 = timerState;
+    machine->mUnidentifiedTimer.m_uWasRunning = timerState;
     machine->mUnidentifiedTimer.m_uPackedTime = packedTime;
     machine->mUnidentified07C = secondDuration;
     machine->mUnidentified078 = duration;
@@ -186,7 +183,7 @@ extern "C" bool fn_80316A84(
         machine->mUnidentified07C = machine->mUnidentified080;
     }
 
-    machine->mUnidentifiedTimer.m_unk0 = machine->mUnidentifiedTimer.m_uPackedTime != 0;
+    machine->mUnidentifiedTimer.m_uWasRunning = machine->mUnidentifiedTimer.m_uPackedTime != 0;
     machine->mUnidentifiedTimer.m_uPackedTime = 0;
 
     bool result = true;
@@ -290,7 +287,7 @@ bool UnidentifiedStateMachine_803171D0::UnidentifiedInitialize(void*)
     if (mUnidentified088 != 0)
     {
         float start = lbl_806DF560();
-        void* context = mUnidentified018->mUnidentified064->mData.pointer;
+        void* context = mUnidentified018->mAIContext->mData.pointer;
         u32 hash = mUnidentified088;
         UnidentifiedVariant_80054AB8 result
             = fn_80317EFC(GetFuzzyRuntime(), hash, context);
@@ -313,7 +310,7 @@ void UnidentifiedStateMachine_803171D0::Update(
     }
 
     float start = lbl_806DF560();
-    void* context = mUnidentified018->mUnidentified064->mData.pointer;
+    void* context = mUnidentified018->mAIContext->mData.pointer;
     u32 hash = mUnidentified08C;
     {
         UnidentifiedVariant_80054AB8 result = fn_803184A8(
@@ -331,7 +328,7 @@ void UnidentifiedStateMachine_803171D0::UnidentifiedCleanup()
     }
 
     float start = lbl_806DF560();
-    void* context = mUnidentified018->mUnidentified064->mData.pointer;
+    void* context = mUnidentified018->mAIContext->mData.pointer;
     u32 hash = mUnidentified090;
     fn_80317EFC(GetFuzzyRuntime(), hash, context);
     fn_8031A0C8(start, lbl_806DF560());

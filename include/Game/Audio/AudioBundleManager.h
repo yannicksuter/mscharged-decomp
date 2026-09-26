@@ -28,6 +28,7 @@ public:
     void* GetSliderTable() const { return m_Chunk13100; }
     void* GetCalculationTable() const { return m_Chunk13400; }
     AudioBackend* GetBackend() const { return m_Backend; }
+    AudioResourceRuntime* GetResourceRuntime() { return &m_Runtime; }
 
 protected:
     static void OnBundleLoaded(

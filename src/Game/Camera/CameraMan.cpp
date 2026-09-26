@@ -14,6 +14,8 @@
 #include "Game/Camera/kickoffcam.h"
 #include "Game/Camera/noisefilter.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/Render/StadiumLoading.h"
+#include "Game/Game.h"
 #include "Game/Task/BeginFrameTask.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFile.h"
@@ -22,15 +24,8 @@
 
 #include <string.h>
 #include "NL/nlPrint.h"
+#include "Game/Task/FixedUpdateTask.h"
 
-extern float g_fSimulationTick;
-
-extern "C" void fn_800F02DC(void*, unsigned long, void*);
-extern "C" void fn_8005B330(nlVector3*, float, float);
-extern "C" void fn_80277BB0();
-extern "C" void fn_800F0990(float);
-
-extern const float kCameraZero;
 
 eCameraType g_eCurrentCameraType;
 

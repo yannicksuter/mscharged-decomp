@@ -5,6 +5,8 @@
 #include "NL/nlSingleton.h"
 #include "types.h"
 
+extern float lbl_806E0F20[2];
+
 class GameplayCamera;
 class cFielder;
 struct CollisionThwompPlayerData;

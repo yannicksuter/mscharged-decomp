@@ -4,7 +4,8 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/feScene.h"
@@ -18,10 +19,9 @@
 #include "NL/nlBasicString.h"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalization.h"
+#include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
 struct HallOfFameTrophyEntry
 {
@@ -79,27 +79,6 @@ static HallOfFameChallengeEntry sChallengeEntries[] = {
     { "NAME_BOWSERJR", 20 },
     { "NAME_DIDDYKONG", 21 },
 };
-
-static inline const unsigned short* LookupLocString(const char* id)
-{
-    nlLocalization* localization = g_pLocalization;
-    unsigned long hash = nlStringLowerHash(id);
-    if (localization->m_LookupTable == 0)
-    {
-        return LocalizationTableNotFound;
-    }
-
-    nlLocalization::StringLookup* lookup
-        = nlBSearch<nlLocalization::StringLookup, unsigned long>(
-            hash, localization->m_LookupTable,
-            (int)localization->m_pFile->StringCount);
-    if (lookup != 0)
-    {
-        return localization->m_FirstString + lookup->StringOffset;
-    }
-
-    return MissingLocString;
-}
 
 SHHallOfFameSummary::SHHallOfFameSummary(int mode)
     : mMode(mode)
@@ -200,11 +179,10 @@ void SHHallOfFameSummary::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_duration + slide->m_start)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int pad = 0; pad < 4; pad++)
             {
@@ -213,11 +191,11 @@ void SHHallOfFameSummary::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (mState == 0)
         {
             mState = 1;
         }
-        else if (state == 2)
+        else if (mState == 2)
         {
             if (mPreviousPageRequested)
             {
@@ -230,7 +208,7 @@ void SHHallOfFameSummary::Update(float fDeltaT)
             }
             return;
         }
-        else if (state == 3)
+        else if (mState == 3)
         {
             LeaveHallOfFamePage(mMode);
             return;
@@ -247,18 +225,20 @@ void SHHallOfFameSummary::Update(float fDeltaT)
         mScrollBar.Initialize();
     }
 
+    bool processInput;
     for (unsigned int pad = 0; pad < 4; pad++)
     {
         TLComponentInstance* controller = GetPointerInstance(pad);
-        bool processInput = true;
         if (g_pFEInput->m_InputLockDepth == 0)
         {
             if (pad != gFEControllerIndex)
             {
                 controller->SetActiveSlide("waiting", true, false);
                 processInput = false;
+                goto checkInput;
             }
-            else if (mPointerInsideCount[pad] > 0)
+
+            if (mPointerInsideCount[pad] > 0)
             {
                 controller->SetActiveSlide("A", true, false);
             }
@@ -267,7 +247,9 @@ void SHHallOfFameSummary::Update(float fDeltaT)
                 controller->SetActiveSlide("cursor", true, false);
             }
         }
+        processInput = true;
 
+    checkInput:
         if (processInput)
         {
             unsigned char valid = 1;
@@ -294,23 +276,19 @@ void SHHallOfFameSummary::Update(float fDeltaT)
                 return;
             }
 
-            if ((mPageControls->mPointerPressed[1]
-                    || mPageControls->mPadPressed[1])
-                || (mPageControls->mPointerPressed[0]
-                    || mPageControls->mPadPressed[0]))
+            if (mPageControls->IsButtonPressed(1)
+                || mPageControls->IsButtonPressed(0))
             {
-                FEAudio::PlayAnimAudioEvent(0x375D885A, 0, 0, 1);
-                FEAudio::PlayAnimAudioEvent(0x3050DD1E, 0, 0, 1);
+                FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
+                FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
                 mState = 2;
                 mPresentation->SetActiveSlide("out", true);
 
-                if (mPageControls->mPointerPressed[1]
-                    || mPageControls->mPadPressed[1])
+                if (mPageControls->IsButtonPressed(1))
                 {
                     mPreviousPageRequested = true;
                 }
-                else if (mPageControls->mPointerPressed[0]
-                    || mPageControls->mPadPressed[0])
+                else if (mPageControls->IsButtonPressed(0))
                 {
                     mNextPageRequested = true;
                 }
@@ -430,9 +408,6 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     nlSNPrintf(tournamentName, sizeof(tournamentName), "TOURNAMENT_%d",
         index + this->mFirstVisibleItem + 1);
 
-    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::Find<>(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
-    TLTextInstance* displayedTournamentText = tournamentText == 0
-        ? &UnidentifiedTLTextDefault::sInstance
-        : tournamentText;
-    displayedTournamentText->SetStringId(tournamentName);
+    TLTextInstance* tournamentText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "number");
+    tournamentText->SetStringId(tournamentName);
 }

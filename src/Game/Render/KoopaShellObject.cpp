@@ -4,6 +4,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
+#include "Game/CharacterTriggers.h"
 #include "Game/Drawable/DrawableKoopaShell.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
@@ -17,12 +18,6 @@
 #include "NL/nlMemory.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
-
-extern "C"
-{
-    void fn_801BC6E4(cFielder*);
-    void fn_801BC96C(const nlVector3*);
-}
 
 static const nlVector3 sInitialVelocity = { 0.0f, 0.0f, 0.0f };
 static const nlVector3 sHiddenPosition = { 0.0f, 20.0f, -10.0f };
@@ -67,7 +62,7 @@ static inline void Deactivate(KoopaShellObject* object, bool destroyEffect)
 
         if (!destroyEffect)
         {
-            fn_801BC96C(&object->mPosition);
+            fn_801BC96C(object->mPosition);
         }
 
         SetPosition(object, sHiddenPosition);

@@ -1,6 +1,7 @@
 #include "Game/FE/MatchSummary.h"
 
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"

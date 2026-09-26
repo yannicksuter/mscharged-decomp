@@ -1,4 +1,7 @@
 #include "Game/Weather.h"
+#include "NL/nlDebug.h"
+#include "Game/CharacterTweaks.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Sys/audio.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Powerups.h"
@@ -35,15 +38,8 @@
 
 extern "C" void fn_802772A4(DrawableObject*);
 extern "C" bool fn_8003877C(cFielder*);
-extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" float fn_8002CFF0(PlayerTweaks*);
 extern "C" void fn_800EDCE8(cPlayer*);
 extern "C" bool fn_8019C988(void*);
-extern "C" void fn_80146964(CollisionBallShellData*);
-extern "C" void fn_8014777C(void*);
-extern "C" void fn_801478C4(CollisionPlayerBananaData*);
-extern "C" void fn_80147A0C(CollisionPlayerShellData*);
-extern "C" void fn_80147B54(CollisionPlayerFreezeData*);
 extern "C" void fn_8009F1B8(EmissionController&);
 extern "C" bool fn_8002D2C4(nlVector3*, bool, float);
 extern "C" void fn_800F0240(float, float, float, float);
@@ -970,11 +966,11 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_v3Position.y = 0.0f;
     m_v3Position.z = fRadius;
 
-    m_unk44.m_unk0 = m_unk44.m_uPackedTime != 0;
+    m_unk44.m_uWasRunning = m_unk44.m_uPackedTime != 0;
     m_unk44.m_uPackedTime = 0;
-    m_unk3C.m_unk0 = m_unk3C.m_uPackedTime != 0;
+    m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
     m_unk3C.m_uPackedTime = 0;
-    m_unk34.m_unk0 = m_unk34.m_uPackedTime != 0;
+    m_unk34.m_uWasRunning = m_unk34.m_uPackedTime != 0;
     m_unk34.m_uPackedTime = 0;
 
     nlVector3 v3Unidentified = v3Zero;
@@ -1090,9 +1086,9 @@ void PowerupBase::Update(float dt)
 
         if (m_unk44.Countdown(dt, 0.0f))
         {
-            m_unk44.m_unk0 = m_unk44.m_uPackedTime != 0;
+            m_unk44.m_uWasRunning = m_unk44.m_uPackedTime != 0;
             m_unk44.m_uPackedTime = 0;
-            m_unk3C.m_unk0 = m_unk3C.m_uPackedTime != 0;
+            m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
             m_unk3C.m_uPackedTime = 0;
             m_v3Velocity = m_unk50;
             m_pPhysicsObject->SetLinearVelocity(m_unk50);
@@ -1108,7 +1104,7 @@ void PowerupBase::Update(float dt)
 
         if (m_unk3C.m_uPackedTime != 0 && m_unk3C.Countdown(dt, 0.0f))
         {
-            m_unk3C.m_unk0 = m_unk3C.m_uPackedTime != 0;
+            m_unk3C.m_uWasRunning = m_unk3C.m_uPackedTime != 0;
             m_unk3C.m_uPackedTime = 0;
             m_unk20 = false;
         }
@@ -1992,7 +1988,6 @@ static inline void UnregisterPowerup(unsigned long hashID)
         }
     }
 
-    extern void nlBreak();
     nlBreak();
 }
 
@@ -2339,7 +2334,6 @@ static inline void RegisterPowerup(unsigned long hashID, PowerupBase* powerup)
         }
     }
 
-    extern void nlBreak();
     nlBreak();
 }
 

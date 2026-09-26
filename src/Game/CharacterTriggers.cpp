@@ -53,9 +53,6 @@ static nlVector3 lbl_80515478 = { 0.0f, 0.0f, 1.0f };
 extern "C" void fn_800EDCE8(cPlayer* pPlayer);
 extern "C" bool fn_800EBBFC(int slotId, unsigned long cueId, const void* debugName, void* context);
 extern "C" bool fn_8003877C(cFielder* pFielder);
-extern "C" bool fn_80014EA4(cBall* pBall, const EffectsGroup* pGroup);
-extern "C" void fn_800152B4(cBall* pBall);
-extern "C" void fn_800189C4(cBall* pBall);
 extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pGroup);
 extern "C" void fn_800F026C(const nlVector3& v3Shake, float fParam1, float fParam2);
 extern "C" {
@@ -65,120 +62,39 @@ extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);
 extern "C" void fn_80060FF4(cGame* pGame, const void* pEventData);
 extern "C" EffectsGroup* fn_802E7D54(EmissionManager* pManager, unsigned long uHash);
 extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pEffectsGroup);
-extern cCharacter* lbl_806E0C34;
 extern "C" bool fn_8019464C(cCharacter*);
 extern "C" bool fn_80194660(cCharacter*);
 extern "C" cPN_SAnimController* fn_800C2F64(cCharacter*);
 extern "C" cBall* fn_800C2F40(cPlayer*);
-extern "C" const nlVector3* fn_800D1450(const cCharacter*);
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
-extern "C" void fn_800318F8(cFielder*);
 extern "C" void fn_800395C0(cFielder*);
-extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_80039CF0(cFielder*, int);
 
-extern "C" float fn_801BE138(TweakFloatBinding* pTweak);
-extern "C" int fn_801BE130(cFielder* pFielder);
-extern "C" bool fn_801BE128(Desire* pDesire);
-extern "C" void fn_801BE120(cBall* pBall, bool bVisible);
-extern "C" cPlayer* fn_801BE118(cBall* pBall);
-extern "C" bool fn_801BE0EC(cPlayer* pPlayer);
-extern "C" bool fn_801BE0E0(cPN_SAnimController* pController);
-extern "C" cSAnim* fn_801BE0D8(cPN_SAnimController* pController);
-extern "C" void fn_801BE0D0(cCharacter* pCharacter, bool bValue);
-extern "C" void fn_801BE0C8(cCharacter* pCharacter, bool bValue);
-extern "C" bool fn_801BE0B4(cCharacter* pCharacter);
-extern "C" void fn_801BE0AC(cCharacter* pCharacter, bool bValue);
-extern "C" void fn_801BE0A4(cCharacter* pCharacter, bool bValue);
-extern "C" const char* fn_801BE09C(cCharacter* pCharacter);
 void SetEffectsGroupFountainLife(EffectsGroup* group, float life);
-extern "C" void fn_801BDF0C(cCharacter* pCharacter);
 extern "C" void fn_801BDF08(cCharacter* pCharacter);
-extern "C" void fn_801BDDE4();
 extern "C" void fn_801BDC1C(const nlVector3& v3Position, const nlVector3& v3Direction, const nlVector3& v3Velocity);
-extern "C" void fn_801BD4EC(cFielder* pFielder);
-extern "C" void fn_801BD1C0(cFielder* pFielder);
-extern "C" void fn_801BD144(cCharacter* pCharacter);
-extern "C" void fn_801BCE90(cCharacter* pCharacter);
-extern "C" void fn_801BCE2C(cCharacter* pCharacter);
-extern "C" void fn_801BCC9C(cCharacter* pCharacter);
-extern "C" void fn_801BCC38(cCharacter* pCharacter);
-extern "C" void fn_801BCAD4(cCharacter* pCharacter);
 extern "C" void fn_801BCA5C(const nlVector3& v3Position);
-extern "C" void fn_801BC9E4(const nlVector3& v3Position);
-extern "C" void fn_801BC96C(const nlVector3& v3Position);
-extern "C" void fn_801BC828(cCharacter* pCharacter);
-extern "C" void fn_801BC6E4(cFielder* pFielder);
-extern "C" void fn_801BC2A8(cCharacter* pCharacter, bool bRight);
 extern "C" void fn_801BC094(cCharacter* pCharacter);
 extern "C" void fn_801BBE80(cCharacter* pCharacter);
 extern "C" void fn_801BB6A4(cCharacter* pCharacter, int nIcon);
-extern "C" void fn_801BB640(cFielder* pFielder, int nParam);
-extern "C" void fn_801BB5DC(cFielder* pFielder, int nParam);
-extern "C" void fn_801BB45C(cCharacter* pCharacter);
-extern "C" void fn_801BB318(cCharacter* pCharacter);
-extern "C" void fn_801BB20C(cCharacter* pCharacter);
-extern "C" void fn_801BB120(cFielder* pFielder);
-extern "C" void fn_801BB0DC(cFielder* pFielder);
-extern "C" void fn_801BAF98(cFielder* pFielder);
-extern "C" void fn_801BAF0C(cPlayer* pCharacter);
-extern "C" void fn_801BAD30(cCharacter* pCharacter);
-extern "C" void fn_801BABEC(cPlayer* pPlayer);
-extern "C" void fn_801BAA94(cCharacter* pCharacter);
 void KillStar(cFielder* pFielder);
 void EmitStar(cFielder* pFielder, bool bParam);
 void KillMushroom(cFielder* pFielder);
 void EmitMushroom(cFielder* pFielder, bool bParam);
-extern "C" void fn_801BA510(cFielder* pFielder);
-extern "C" void fn_801BA4C8(const char* szName);
-extern "C" void fn_801BA358();
-extern "C" void fn_801BA034();
-extern "C" void fn_801B9FD0(cBall* pBall, bool bActive);
-extern "C" void fn_801B9EAC(cBall* pBall, nlVector3* pPosition, bool bActive);
-extern "C" bool fn_801B9DAC(const char* szEffectName);
 extern "C" bool fn_801B9C90(const char* szEffectName);
-extern "C" void fn_801B9B94(cCharacter* pCharacter);
-extern "C" void fn_801B9A98(cCharacter* pCharacter);
 void EmitGoalieCatch(cPlayer* pPlayer, const char* name, bool bRumble);
 extern "C" void fn_801B9904(unsigned long uEffectHash);
-extern "C" void fn_801B98A0(cFielder* pFielder);
-extern "C" void fn_801B97DC(cFielder* pFielder);
 extern "C" void fn_801B968C(cCharacter* pCharacter);
-extern "C" void fn_801B94EC(cCharacter* pCharacter, const nlVector3& v3Position, const nlVector3& v3Normal);
-extern "C" void fn_801B9440(EmissionController& ec);
-extern "C" void fn_801B93E8(cCharacter* pCharacter);
-extern "C" void fn_801B9370(cCharacter* pCharacter);
-extern "C" void fn_801B92F8(cCharacter* pCharacter);
-extern "C" void fn_801B91F8(cFielder* pFielder);
-extern "C" void fn_801B90F8(cFielder* pFielder);
-extern "C" void fn_801B8FF8(cFielder* pFielder);
-extern "C" void fn_801B8FF4(cFielder* pFielder);
-extern "C" void fn_801B8F7C(cCharacter* pCharacter, const char* name);
-extern "C" void fn_801B8F04(cCharacter* pCharacter, const char* name);
-extern "C" void fn_801B8E5C(cPlayer* pPlayer);
-extern "C" void fn_801B8DE4(cCharacter* pCharacter);
-extern "C" void fn_801B8D6C(cCharacter* pCharacter);
-extern "C" void fn_801B8CF4(const nlVector3& v3Position);
 extern "C" void fn_801B8C7C(const nlVector3& v3Position);
-extern "C" void fn_801B8B38(cPlayer* pPlayer);
-extern "C" void fn_801B89F4(cFielder* pFielder);
 extern "C" void fn_801B897C(cCharacter* pCharacter);
 extern "C" void fn_801B881C(cCharacter* pCharacter);
-extern "C" void fn_801B86A4(cPlayer* pCharacter);
 extern "C" void fn_801B865C(cPlayer* pCharacter);
-extern "C" void fn_801B84B4(cPlayer* pCharacter);
 bool KillDaze(cPlayer* player);
 extern "C" bool fn_801B8164(cFielder* pFielder);
 extern "C" void fn_801B7F8C(cPlayer* pCharacter);
 extern "C" void fn_801B7E4C(const char* pName, cCharacter* pCharacter);
-extern "C" void fn_801B7D00(cCharacter* pCharacter);
-extern "C" void fn_801B7CD4(cPlayer* pPlayer);
-extern "C" void fn_801B7CA8(cPlayer* pPlayer);
-extern "C" unsigned long fn_801B7B70(float fLevel);
-extern "C" void fn_801B7A28(cBall* pBall);
 extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill);
 extern "C" void fn_801B75C8(cFielder* pCharacter, eBallShotEffectType eNewBallEffect, cPlayer* pPassTarget, bool bSilent, bool bParam5);
-extern "C" void fn_801B74C8(cPlayer* pCharacter);
 void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex, bool (*callback)(float, float, unsigned long, float, void*), void* pData);
 
 EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName, const char* characterName);
@@ -2094,11 +2010,12 @@ extern "C" void fn_801BD144(cCharacter* pCharacter)
 
 extern "C" void fn_801BD1C0(cFielder* pFielder)
 {
-    int eCharacterClass = pFielder->mUnidentified024.m_eCharacterClass;
-
-    if (eCharacterClass == 7 || eCharacterClass == 9 || eCharacterClass == 1
-        || eCharacterClass == 3 || eCharacterClass == 11
-        || eCharacterClass == 12)
+    if (pFielder->GetCharacterClass() == 7
+        || pFielder->GetCharacterClass() == 9
+        || pFielder->GetCharacterClass() == 1
+        || pFielder->GetCharacterClass() == 3
+        || pFielder->GetCharacterClass() == 11
+        || pFielder->GetCharacterClass() == 12)
     {
         pFielder->muInvincibleStatus |= 1;
     }
@@ -2109,7 +2026,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         if (pAnimController->m_fTime
             < 15.0f / (float)pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pFielder->mUnidentified024.m_eCharacterClass == 11)
+            if (pFielder->GetCharacterClass() == 11)
             {
                 const char* groupName = "petey_deke";
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
@@ -2126,7 +2043,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
                     pController->SetUpdateCallback(update2);
                 }
             }
-            else if (pFielder->mUnidentified024.m_eCharacterClass == 12)
+            else if (pFielder->GetCharacterClass() == 12)
             {
                 const char* groupName = "birdo_deke";
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
@@ -2146,8 +2063,8 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         }
     }
 
-    if (pFielder->mUnidentified024.m_eCharacterClass == 13 || pFielder->mUnidentified024.m_eCharacterClass == 7
-        || pFielder->mUnidentified024.m_eCharacterClass == 9)
+    if (pFielder->GetCharacterClass() == 13 || pFielder->GetCharacterClass() == 7
+        || pFielder->GetCharacterClass() == 9)
     {
         pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
     }

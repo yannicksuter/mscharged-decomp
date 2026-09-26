@@ -3,7 +3,8 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/DB/CharacterInfo.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/Sys/audio.h"

@@ -1,4 +1,5 @@
 #include "Game/AI/DesireUserControlled.h"
+#include "Game/Player.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DetInput.h"
 
@@ -11,19 +12,11 @@
 #include "Game/Game.h"
 #include <stddef.h>
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Task/FixedUpdateTask.h"
 
-extern "C" void fn_80098098(cFielder*);
-extern "C" void fn_80095870(cFielder*);
-extern "C" float fn_8002C254(const PlayerTweaks*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" void fn_8003C268(cFielder*, float, float);
-extern "C" void fn_8003DA94(cFielder*, bool);
 extern "C" bool fn_8003E948(cFielder*);
-extern "C" void fn_800368E4(cFielder*);
-extern "C" void fn_8003E0A8(cFielder*);
-extern "C" void fn_8003E168(cFielder*, float);
 
-extern float g_fSimulationTick;
 
 static unsigned short sDesireUserControlledType = 0xFFFF;
 static unsigned int lbl_806DC3AC = 0x20;

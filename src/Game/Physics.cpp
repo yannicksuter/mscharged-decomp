@@ -1,4 +1,6 @@
 #include "Game/Physics/Physics.h"
+#include <cstring>
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/Ball.h"
 #include "Game/Field.h"
@@ -19,10 +21,7 @@
 #include "ode/ext/dRoundedCorner.h"
 #include "ode/memory.h"
 
-extern "C" void* memcpy(void*, const void*, unsigned long);
 extern "C" bool fn_8013E2E4();
-extern "C" void fn_80144130(void*);
-extern void* lbl_806E11F0;
 
 class SimpleCollisionSpace : public CollisionSpace
 {

@@ -1,4 +1,6 @@
 #include "Game/AI/AvoidableObject.h"
+#include "Game/CharacterTweaks.h"
+#include "Game/AI/AvoidController.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 
 #include "Game/AI/AiUtil.h"
@@ -19,15 +21,11 @@
 #include "NL/nlMath.h"
 #include "Game/Render/YoshiEggObject.h"
 
-extern cTeam* g_pCurrentlyUpdatingTeam;
 
-extern "C" void fn_8000F594(AvoidableObject* pObject);
 extern "C" float fn_80030750(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E99C(cFielder*);
-extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" float fn_800DEAB4(cFielder*);
 extern "C" float fn_800DED80(cFielder*);
 extern "C" void fn_802B5CC0(
     nlVector4& out, const nlVector2& point, const nlVector2& normal);

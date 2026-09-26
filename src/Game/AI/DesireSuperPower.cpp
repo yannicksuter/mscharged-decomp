@@ -1,4 +1,5 @@
 #include "NL/nlIntersection.h"
+#include "Game/AI/FielderAbility.h"
 #include "Game/AI/DesireSuperPower.h"
 #include "Game/AI/Fuzzy.h"
 
@@ -41,65 +42,34 @@
 #include <stdlib.h>
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/EventRegistry.h"
 
 extern "C" cGame* g_pGame;
 extern "C" const nlVector3* fn_80040234(cFielder*);
-extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cFielder* fn_800D66A0(cFielder*);
 extern "C" cFielder* fn_800C2E78(const FuzzyVariant*);
 extern "C" cTeam* fn_800C2F38(const cFielder*);
 extern "C" cBall* fn_800C2F40(cPlayer*);
 extern "C" float fn_800C2F50(float);
-extern "C" float fn_800DBAB0(cFielder*);
-extern "C" int fn_800D1D34(const shdStateMachine*);
-extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
-extern "C" float fn_800D1D44(const DesireRunInDirection*);
-extern "C" float fn_800D1D4C(const DesireRunInDirection*);
-extern "C" bool fn_800D1C34(const cFielder*);
-extern "C" nlVector3* fn_800D1C4C(nlVector3*, const nlVector3*, const nlVector3*);
-extern "C" float fn_800D1C80(const nlVector2*, const nlVector2*);
-extern "C" unsigned short fn_800D1CCC(float, float);
-extern "C" short fn_800D1D04(unsigned short, unsigned short);
-extern "C" unsigned short fn_800D1D10(short);
-extern "C" int fn_800D1D24(int);
-extern "C" void fn_800CD8E4(nlVector2*, const nlVector2*);
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311750(UnidentifiedFuzzyRuntimeValue*);
-extern "C" float fn_800DBB0C(cFielder*);
 extern "C" cPlayer* fn_800D674C(cFielder*);
 extern "C" float fn_800DDF54(cFielder*, cPlayer*);
-extern "C" cTeam* fn_800D6688(cFielder*);
 extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
-extern "C" float fn_800DD234(cFielder*);
-extern "C" float fn_800DD744(cFielder*);
 extern "C" float fn_800DAFCC(const nlVector3*, const nlVector3*, cFielder*,
     int, float, float, float, float);
-extern "C" float fn_800DCB4C(const nlVector3*, const nlVector3*);
 extern "C" cFielder* fn_800D66C4(cFielder*);
-extern "C" void fn_800D1140(void*);
-extern "C" void fn_800D12E8(void*);
-extern "C" eCharacterClass fn_800D1440(const cCharacter*);
-extern "C" unsigned short fn_800D1448(const cCharacter*);
-extern "C" const nlVector3* fn_800D1450(const cCharacter*);
-extern "C" bool fn_800D1458(const cGame*);
-extern "C" void fn_8002E52C(cFielder*);
 extern "C" void fn_800395C0(cFielder*);
 extern "C" void fn_80316968(shdStateMachine*);
 extern "C" void fn_80038158(cFielder*, int);
-extern "C" void fn_801B98A0(cFielder*);
-extern "C" void fn_801BB0DC(cFielder*);
 extern "C" void fn_801BC094(cFielder*);
 extern "C" void fn_801B881C(cFielder*);
 extern "C" void fn_80039CF0(cFielder*, int);
-extern "C" void fn_800A6968(cTeam*);
 extern "C" void fn_803198F4();
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E3F8(cFielder*);
-extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_801BBE80(cFielder*);
 extern "C" void fn_80060A00(void*, cFielder*);
-extern "C" void fn_802F4E84(unsigned long*, int, int);
 extern "C" const nlVector2 lbl_804DC348[6];
 extern "C" const nlVector2 lbl_804DC378[2];
 extern FuzzyVariant fvNotSet;
@@ -107,7 +77,6 @@ extern const nlVector3 lbl_804DC338;
 extern bool lbl_806DC2F8;
 extern bool lbl_806DC314;
 extern float lbl_806DC254;
-extern float lbl_806DB9D8;
 extern float lbl_806DC250;
 extern float lbl_806DC258;
 extern float lbl_806DC25C;
@@ -364,7 +333,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
             || m_pFielder->mUnidentified024.m_eCharacterClass == KOOPA)
         {
             PlayCaptainPowerupStream(18, sound, m_pFielder);
-            unsigned long hash = nlStringLowerHash("MarioPowerup");
+            u32 hash = nlStringLowerHash("MarioPowerup");
             fn_802F4E84(&hash, 0, 0);
             PauseSuddenDeathMusic();
         }
@@ -533,7 +502,7 @@ void DesireSuperPower::UnidentifiedCleanup()
         || (m_pFielder->mUnidentified024.m_eCharacterClass == KOOPA))
     {
         ResumeSuddenDeathMusic();
-        unsigned long hash = nlStringLowerHash("MarioPowerup");
+        u32 hash = nlStringLowerHash("MarioPowerup");
         fn_802F4E84(&hash, 1, 0);
     }
 }

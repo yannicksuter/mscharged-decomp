@@ -2,8 +2,8 @@
 #define GAME_AI_DESIRE_SUPER_POWER_H
 
 #include "Game/AI/Desire.h"
+#include "Game/Character.h"
 
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 class DesireSuperPower;
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
@@ -56,5 +56,25 @@ private:
     cFielder* mpTarget;
     nlVector2 mUnidentifiedPositions[8];
 };
+
+
+// Shared functions and data from Game/AI/DesireSuperPower.cpp.
+extern "C" void fn_800CD8E4(nlVector2*, const nlVector2*);
+extern "C" void fn_800D1140(void*);
+extern "C" void fn_800D12E8(void*);
+extern "C" eCharacterClass fn_800D1440(const cCharacter*);
+extern "C" unsigned short fn_800D1448(const cCharacter*);
+extern "C" const nlVector3* fn_800D1450(const cCharacter*);
+extern "C" bool fn_800D1458(const cGame*);
+extern "C" nlVector3* fn_800D1C4C(nlVector3*, const nlVector3*, const nlVector3*);
+extern "C" float fn_800D1C80(const nlVector2*, const nlVector2*);
+extern "C" unsigned short fn_800D1CCC(float, float);
+extern "C" short fn_800D1D04(unsigned short, unsigned short);
+extern "C" unsigned short fn_800D1D10(short);
+extern "C" int fn_800D1D24(int);
+extern "C" int fn_800D1D34(const shdStateMachine*);
+extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
+extern "C" float fn_800D1D44(const DesireRunInDirection*);
+extern "C" float fn_800D1D4C(const DesireRunInDirection*);
 
 #endif // GAME_AI_DESIRE_SUPER_POWER_H

@@ -13,7 +13,6 @@
 #include <stddef.h>
 
 extern "C" AvoidController* fn_8002E144(cFielder*);
-extern "C" float fn_800D7B00(cFielder*);
 static float lbl_806DC238 = 0.25f;
 static unsigned short sDesireSlideAttackType = 0xFFFF;
 

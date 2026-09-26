@@ -1,9 +1,9 @@
 #include "NL/MemAlloc.h"
+#include "NL/nlDebug.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlPrint.h"
 
-extern void nlBreak();
 
 bool g_bPrintMemoryNewLowWaterMarks;
 bool g_bActivateMemoryLowWaterMarkChecking;

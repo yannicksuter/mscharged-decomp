@@ -30,11 +30,11 @@
 #include "Game/SH/SHLoading.h"
 #include "Game/SH/SHMoviePlayer.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/main.h"
 
 class SHNavigation;
 extern "C" int VISetTimeToDimming(int time);
 
-extern bool g_e3_Build;
 static bool setDimmingTime;
 
 extern const int lbl_804E8368[10] = {
@@ -485,4 +485,5 @@ void HealthWarningSceneV2::Update(float fDeltaT)
     }
 }
 
-#include "Game/FE/feFinder_impl.h"
+#include "Game/FE/feFinderFind_impl.h"
+#include "Game/FE/feFinderDefault_impl.h"

@@ -41,7 +41,6 @@
 #include <math.h>
 
 extern u16 m_aJoystickRemap__14cCameraManager;
-extern u16 lbl_806DF740;
 
 float g_fFixedUpdateTick = 0.02f;
 bool g_bRunSimAndRenderInLockStep;

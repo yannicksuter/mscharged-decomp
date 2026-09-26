@@ -11,8 +11,6 @@
 #include "types.h"
 #include "Game/TweakValue.inl"
 
-extern MemoryAllocator* AllocatorStack[16];
-extern unsigned int AllocatorStackDepth;
 
 
 int g_nHardcodeIPAddr[4] = { 0x42, 0x77, 0xA7, 0x68 };

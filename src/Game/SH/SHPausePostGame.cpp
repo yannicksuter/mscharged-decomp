@@ -2,7 +2,8 @@
 
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/StatsTracker.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePackage.h"

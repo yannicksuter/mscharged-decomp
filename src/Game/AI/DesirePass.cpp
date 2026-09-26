@@ -51,7 +51,7 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
     mUnidentified078 = fDuration + 0.2f;
     if (mbVolleyPass)
     {
-        mThinkTimer.m_unk0 = mThinkTimer.m_uPackedTime != 0;
+        mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
         mThinkTimer.m_uPackedTime = 0;
     }
     else

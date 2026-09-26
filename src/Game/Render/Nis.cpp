@@ -506,7 +506,7 @@ void Nis::AddTrigger(NisTriggerType triggerType, float frameNumber,
     mNumTriggers++;
 }
 
-bool Nis::fn_80282474(nlVector3& param1)
+bool Nis::fn_80282474(nlVector3& param1) const
 {
     int charIdx;
     if (mMainCharacterIndex >= 0)
@@ -720,7 +720,7 @@ static inline int FindAvailableSidekickIndex(int firstIndex)
     return index + firstIndex;
 }
 
-int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
+int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) const
 {
     if (target == NIS_TARGET_HOME_CAPTAIN)
     {

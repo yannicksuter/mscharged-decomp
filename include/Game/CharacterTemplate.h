@@ -77,4 +77,7 @@ int GetCharacterIndex(const cCharacter* character);
 
 extern cCharacter* g_pCharacters[10];
 
+
+extern cCharacter* lbl_806E0C34;
+
 #endif // GAME_CHARACTER_TEMPLATE_H

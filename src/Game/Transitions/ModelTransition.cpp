@@ -27,11 +27,11 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 GLView* ModeledScreenTransition::s_3DView;
-void (*lbl_806E217C)(glModel*);
+void (*g_ModelTransitionRenderCallback)(glModel*);
 nlAVLTree<unsigned long, TransitionModelStore,
     DefaultKeyCompare<unsigned long> > ModeledScreenTransition::g_ModelInventory;
 
-static inline int GetNumLeafNodesInHierarchy(
+static int GetNumLeafNodesInHierarchy(
     cSHierarchy& h, int node, int ret)
 {
     if (h.GetNumChildren(node) == 0)
@@ -92,7 +92,7 @@ static void ShuffleIntoOutline(
     }
 }
 
-static inline int UpdateEffectsFromLeafNodes(cPoseAccumulator& pa,
+static int UpdateEffectsFromLeafNodes(cPoseAccumulator& pa,
     EmissionController** ecs, cSHierarchy& skeleton, int leaf, int node)
 {
     if (skeleton.GetNumChildren(node) == 0)
@@ -217,7 +217,7 @@ void ModeledScreenTransition::Update(float deltaTime)
     }
 }
 
-bool ModeledScreenTransition::UnidentifiedVirtual30()
+bool ModeledScreenTransition::ConsumeScreenGrabRequest()
 {
     if (m_bEnableGrab)
     {
@@ -248,9 +248,9 @@ void ModeledScreenTransition::Render(GLView* view)
         }
 
         s_3DView->AttachModel(&m_pModels[i], 0);
-        if (lbl_806E217C != NULL)
+        if (g_ModelTransitionRenderCallback != NULL)
         {
-            lbl_806E217C(&m_pModels[i]);
+            g_ModelTransitionRenderCallback(&m_pModels[i]);
         }
     }
 
@@ -263,52 +263,11 @@ void ModeledScreenTransition::Render(GLView* view)
 static inline void ClearOutline(
     Vector<nlVector3, DefaultAllocator>& outline);
 
-static inline void ReserveOutline(
-    Vector<nlVector3, DefaultAllocator>& outline, int capacity)
-{
-    if (outline.mCapacity < capacity)
-    {
-        Vector<nlVector3, DefaultAllocator> other(capacity, 0);
-        for (int i = 0; i < outline.mSize; i++)
-        {
-            other.mData[i] = outline.mData[i];
-        }
-        other.mSize = outline.mSize;
-        outline.Swap(other);
-    }
-}
-
-static inline void InsertOutline(
-    Vector<nlVector3, DefaultAllocator>& outline, nlVector3* at,
-    const nlVector3* begin, const nlVector3* end)
-{
-    int size = end - begin;
-    int offset = at - outline.mData;
-    ReserveOutline(outline, outline.mSize + size);
-    at = outline.mData + offset;
-    nlVector3* t = outline.mData + outline.mSize - 1;
-    while (t >= at)
-    {
-        *(t + size) = *t;
-        t--;
-    }
-    while (begin != end)
-    {
-        *at = *begin;
-        begin++;
-        at++;
-    }
-    outline.mSize += size;
-}
-
 void ModeledScreenTransition::RenderOutline() const
 {
     Vector<nlVector3, DefaultAllocator> outline;
     nlVector3 current;
-    outline.mData = NULL;
-    outline.mSize = 0;
-    outline.mCapacity = 0;
-    ReserveOutline(outline, 8);
+    outline.reserve(8);
 
     for (int i = 0; (u32)i < m_nModels; i++)
     {
@@ -329,14 +288,12 @@ void ModeledScreenTransition::RenderOutline() const
             const nlVector3* positions
                 = (const nlVector3*)positionStream->address;
             const u16* indices = packet.indexBuffer;
-            for (int iVertex = 0;
-                iVertex < (int)packet.numVertices; iVertex++)
+            for (u32 iVertex = 0;
+                iVertex < packet.numVertices; indices++, iVertex++)
             {
-                current = positions[*indices++];
-                nlMultPosVectorMatrix(current, current,
+                nlMultPosVectorMatrix(current, positions[*indices],
                     m_pPoseAccumulator->GetNodeMatrix(m_pModelMap[i]));
-                InsertOutline(outline, outline.mData + outline.mSize,
-                    &current, &current + 1);
+                outline.push_back(current);
             }
 
             ShuffleIntoOutline(outline);
@@ -350,26 +307,16 @@ void ModeledScreenTransition::RenderOutline() const
 
             for (int k = 0; k < outline.mSize; k++)
             {
-                *mesh.colour++ = *(const u32*)&m_OutlineColour;
-                float z = outline.mData[k].z;
-                float y = outline.mData[k].y;
-                float x = outline.mData[k].x;
-                *mesh.position++ = x;
-                *mesh.position++ = y;
-                *mesh.position++ = z;
+                mesh.Colour(m_OutlineColour);
+                mesh.Vertex(outline.mData[k]);
             }
 
-            *mesh.colour++ = *(const u32*)&m_OutlineColour;
-            float z = outline.mData[0].z;
-            float y = outline.mData[0].y;
-            float x = outline.mData[0].x;
-            *mesh.position++ = x;
-            *mesh.position++ = y;
-            *mesh.position++ = z;
+            mesh.Colour(m_OutlineColour);
+            mesh.Vertex(outline.mData[0]);
 
             if (mesh.End())
             {
-                s_3DView->AttachModel(mesh.model, 2);
+                s_3DView->AttachModel(mesh.GetModel(), 2);
             }
 
             ClearOutline(outline);
@@ -466,7 +413,7 @@ ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
         if (nlStrCmp(pToken, "texture") == 0)
         {
             m_nTexture = glHash(parser->NextTokenOnLine(true));
-            m_Unknown20
+            m_nTextureIndex
                 = glGetTextureManager()->GetTextureIndex(m_nTexture);
         }
         else if (nlStrCmp(pToken, "name") == 0)
@@ -526,7 +473,7 @@ void ModeledScreenTransition::Load(const char* szName)
     unsigned long fileSize = 0;
     TransitionModelStore* pModelStore;
     unsigned long hash;
-    TransitionModelStore newStore;
+    TransitionModelStore store;
     char buf[128];
     hash = glHash(szName);
 
@@ -544,9 +491,9 @@ void ModeledScreenTransition::Load(const char* szName)
 
         glSetIgnoreDuplicateModels(false);
 
-        newStore.pModels = m_pModels;
-        newStore.nModels = m_nModels;
-        ModeledScreenTransition::g_ModelInventory.Add(hash, newStore);
+        store.pModels = m_pModels;
+        store.nModels = m_nModels;
+        ModeledScreenTransition::g_ModelInventory.Add(hash, store);
     }
 
     nlSNPrintf(buf, 128, "art/transitions/%s.sanim", szName);
@@ -588,9 +535,9 @@ void ModeledScreenTransition::FixupModel()
             {
                 glSetMaterialTextureParameter(&m_pModels[i].packets[j],
                     diffuseTextureSemantic, m_nTexture);
-                unsigned long unknown20 = m_Unknown20;
+                unsigned long textureIndex = m_nTextureIndex;
                 glSetMaterialTextureIndexParameter(&m_pModels[i].packets[j],
-                    diffuseTextureSemantic, &unknown20);
+                    diffuseTextureSemantic, &textureIndex);
             }
 
             glModelPacket* packet = &m_pModels[i].packets[j];

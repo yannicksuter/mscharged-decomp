@@ -1,6 +1,6 @@
 #include "Game/MiiManager.h"
 #include "Game/FE/feOnlinePlayerRow.h"
-#include "Game/FE/feInlineHasher.inl"
+#include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinderFind_impl.h"
 #include "Game/FE/feFinderDefault_impl.h"
 #include "Game/FE/feTextureResource.h"

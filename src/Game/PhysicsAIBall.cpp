@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsAIBall.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
@@ -21,17 +22,11 @@
 #include "types.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Physics/Physics.h"
 
-extern CollisionSpace* g_CollisionSpace;
-extern PhysicsWorld* g_PhysicsWorld;
 extern bool gbEnableBallGoalieSweepTest;
 
 extern "C" void fn_8013F854(const char*, ...);
-extern "C" bool fn_800167A8(cBall*);
-extern "C" void fn_80145C9C();
-extern "C" void fn_801462DC(CollisionPlayerBallData*);
-extern "C" void fn_8014658C(CollisionBallGroundData*);
-extern "C" void fn_801466D4(CollisionBallWallData*);
 
 static unsigned short sPhysicsAIBallType = 0xFFFF;
 float lbl_806DCA0C = 0.05f;

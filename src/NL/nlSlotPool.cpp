@@ -1,11 +1,11 @@
 #include "NL/nlSlotPool.h"
+#include "NL/nlDebug.h"
 
 #include "NL/MemAlloc.h"
 #include "NL/nlList.h"
 #include "NL/nlMemory.h"
 
 
-extern void nlBreak();
 
 static void* DefaultSlotPoolAllocator(unsigned long size)
 {

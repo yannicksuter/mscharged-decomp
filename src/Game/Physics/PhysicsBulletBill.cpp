@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsBulletBill.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -18,8 +19,6 @@
 #include <math.h>
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_80147C9C(CollisionBulletBillData*);
-extern "C" void fn_80147DE4(CollisionBulletBillData*);
 extern "C" void fn_80147F2C(CollisionBulletBillData*);
 
 PhysicsBulletBill::PhysicsBulletBill(

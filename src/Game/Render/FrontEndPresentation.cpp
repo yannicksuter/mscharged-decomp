@@ -31,6 +31,7 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/main.h"
 
 static char sPresentationByteCode[] = "art/Scripts/fe_presentation.byte_code";
 static char sBronzeFormat[] = "%sbronze";
@@ -53,7 +54,6 @@ extern "C" void FinishLoadTournamentTrophy();
 extern "C" void SetWorldAnimation(unsigned int, unsigned int, unsigned int);
 extern "C" void TriggerEffects(BasicStadium*, unsigned int);
 
-extern bool g_e3_Build;
 
 class PresentationLookupResult
 {

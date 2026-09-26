@@ -1,4 +1,5 @@
 #include "Game/NetworkMessageRegistry.h"
+#include "Game/AI/TeamPlayMachine.h"
 #include "Game/Game.h"
 #include "Game/Weather.h"
 #include "Game/Sys/debug.h"
@@ -13,7 +14,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/AI/AvoidableObject.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Ball.h"
 #include "Game/BasicStadium.h"
@@ -82,7 +83,6 @@
 #include "Game/DB/StadiumInfo.h"
 
 extern PowerupBase* g_pPowerups[];
-extern "C" void fn_8031A0FC(float value);
 extern float (*lbl_806DF560)();
 extern float (*lbl_806DF564)();
 extern "C" const nlVector3 lbl_804DBFE8;
@@ -140,11 +140,7 @@ extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80038158(cFielder* pFielder, int param2);
 extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
-extern "C" void fn_8031A02C(ScriptQuestionCache* cache);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
-extern "C" void fn_80061B1C(int nParam, float fParam1, float fParam2);
-extern "C" void fn_8001847C(cBall* pBall, bool bParam);
-extern "C" void fn_8005B330(nlVector3* pVector, float fXAxisTilt, float fYAxisTilt);
 extern void PlaySuddenDeathMusic();
 extern void StopSuddenDeathMusic();
 extern int gNextAvoidableObjectId;
@@ -158,7 +154,6 @@ extern Unidentified0C74* lbl_806E0C74;
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
-extern BaseGameSceneManager* g_pOverlayManager;
 extern "C" char lbl_804FB2F4[];
 extern "C" char lbl_804FB318[];
 extern "C" char lbl_804FB364[];
@@ -369,8 +364,8 @@ cGame::cGame(void* param1, int param2, bool param3)
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
         ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
 
-    mUnidentified014 = new (nlMalloc(sizeof(UnidentifiedFielderInput), 8, false))
-        UnidentifiedFielderInput(
+    mUnidentified014 = new (nlMalloc(sizeof(AIContext), 8, false))
+        AIContext(
             this, 0, new (nlMalloc(sizeof(UnidentifiedFuzzyRuntime), 8, false))
                          UnidentifiedFuzzyRuntime());
     gNetworkMessageRegistry->RegisterReceiver(34, this);
@@ -415,7 +410,7 @@ cGame::~cGame()
     delete m_pFuzzyTweaks;
     delete m_pPostGameDoneClock;
 
-    mUnidentified014->fn_8030F74C(true, true);
+    mUnidentified014->Cleanup(true, true);
     delete mUnidentified014;
 
     gNetworkMessageRegistry->UnregisterReceiver(34);

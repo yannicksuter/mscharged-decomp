@@ -6,13 +6,14 @@
 #include "Game/AI/Variant.h"
 
 class cTeam;
+class ScriptQuestionCache;
 class UnidentifiedVariantCollection;
 
 class UnidentifiedScriptMachine
 {
 public:
     UnidentifiedScriptMachine(
-        int, bool, UnidentifiedFielderInput*, const char*);
+        int, bool, AIContext*, const char*);
     virtual ~UnidentifiedScriptMachine();
 
     virtual bool UnidentifiedVirtual1() const
@@ -20,8 +21,8 @@ public:
         return mUnidentified004 == 0;
     }
     virtual void UnidentifiedVirtual2();
-    virtual void UnidentifiedVirtual3(float deltaTime);
-    virtual void UnidentifiedVirtual4(bool);
+    virtual void Update(float deltaTime);
+    virtual void Reset(bool);
     virtual shdStateMachine* UnidentifiedVirtual5(
         int, UnidentifiedVariantCollection*, bool);
     virtual void UnidentifiedVirtual6();
@@ -55,7 +56,7 @@ public:
     UnidentifiedUnsetTransition mUnidentified00C;
     int mUnidentified014;
     UnidentifiedVariantCollection mUnidentified018;
-    UnidentifiedFielderInput* mUnidentified064;
+    AIContext* mAIContext;
     bool mUnidentified068;
     u8 mPadding069[3];
     shdStateMachine** mUnidentified06C;
@@ -71,7 +72,7 @@ public:
     virtual ~TeamPlayMachine();
 
     virtual void UnidentifiedVirtual2();
-    virtual void UnidentifiedVirtual3(float deltaTime);
+    virtual void Update(float deltaTime);
     virtual void UnidentifiedVirtual7();
     virtual void UnidentifiedVirtual8();
 };
@@ -113,5 +114,16 @@ public:
 
 class cFielder;
 UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder);
+
+
+extern "C" bool fn_80317E34( const UnidentifiedStateTransition* transition);
+extern "C" bool fn_80317E60( const UnidentifiedStateTransition* transition);
+extern "C" void fn_80318D34( UnidentifiedScriptMachine* machine, int state, const char* name, bool secondary);
+extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
+extern "C" shdStateMachine* fn_80319F94( UnidentifiedScriptMachine* machine, int state);
+extern "C" void fn_8031A02C(ScriptQuestionCache*);
+extern "C" bool fn_8031A04C();
+extern "C" float fn_8031A0C8(float start, float end);
+extern "C" void fn_8031A0FC(float value);
 
 #endif // GAME_AI_TEAM_PLAY_MACHINE_H

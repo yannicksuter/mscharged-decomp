@@ -9,7 +9,8 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/DB/GameProgress.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/feMusic.h"
@@ -30,9 +31,9 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
+#include "Game/BaseGameSceneManager.h"
 
 
-extern BaseGameSceneManager* g_pOverlayManager;
 
 class TU8021CBD0Scene : public BaseSceneHandler
 {
@@ -597,86 +598,53 @@ void SHChooseSides2::fn_8021CBD0()
  */
 void SHChooseSides2::BindChooseSideInstances()
 {
-    TLInstance* found = FEFinder<TLImageInstance, 2>::Find(mSideGroups[0],
-        nlStringLowerHash("empty"),
-        nlStringLowerHash("home_group"),
-        nlStringLowerHash("home_away_box"),
-        0,
-        0,
-        0);
-    TLInstance* homeInstance;
-    if (found == 0)
-    {
-        homeInstance = &UnidentifiedTLImageDefault::sInstance;
-    }
-    else
-    {
-        homeInstance = found;
-    }
+    typedef Detail::MemFunImpl<void, void (SHChooseSides2::*)(unsigned int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHChooseSides2*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    TLInstance* homeInstance = FEFinder<TLImageInstance, 2>::FindOrDefault<>(
+        mSideGroups[0], "empty", "home_group", "home_away_box");
     feVector3 position = mSideGroups[0]->GetAssetPosition();
     mControllerComponents[0].SetInstanceBounds(
         homeInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    found = FEFinder<TLImageInstance, 2>::Find(mSideGroups[1],
-        nlStringLowerHash("empty"),
-        nlStringLowerHash("away_group"),
-        nlStringLowerHash("home_away_box"),
-        0,
-        0,
-        0);
-    TLInstance* awayInstance;
-    if (found == 0)
-    {
-        awayInstance = &UnidentifiedTLImageDefault::sInstance;
-    }
-    else
-    {
-        awayInstance = found;
-    }
+    TLInstance* awayInstance = FEFinder<TLImageInstance, 2>::FindOrDefault<>(
+        mSideGroups[1], "empty", "away_group", "home_away_box");
     position = mSideGroups[1]->GetAssetPosition();
     mControllerComponents[1].SetInstanceBounds(
         awayInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    FEPointerListener::Callback callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DC28), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback(PointerBinding(MemFun(&SHChooseSides2::fn_8021DC28), this, Placeholder<0>(), Placeholder<1>()));
     mControllerComponents[0].SetPointerEnterCallback(callback);
     mControllerComponents[1].SetPointerEnterCallback(callback);
 
-    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DCFC), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHChooseSides2::fn_8021DCFC), this, Placeholder<0>(), Placeholder<1>()));
     mControllerComponents[0].SetPointerLeaveCallback(callback);
     mControllerComponents[1].SetPointerLeaveCallback(callback);
 
-    FEPointerListener::Callback selectCallback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DDAC), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectCallback(PointerBinding(MemFun(&SHChooseSides2::fn_8021DDAC), this, Placeholder<0>(), Placeholder<1>()));
     mControllerComponents[0].SetPointerPressCallback(selectCallback);
     mControllerComponents[1].SetPointerPressCallback(selectCallback);
 
-    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021DFCC), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHChooseSides2::fn_8021DFCC), this, Placeholder<0>(), Placeholder<1>()));
     mHomeAwayComponent.SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E170), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHChooseSides2::fn_8021E170), this, Placeholder<0>(), Placeholder<1>()));
     mHomeAwayComponent.SetPointerLeaveCallback(callback);
-    callback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E098), this, Placeholder<0>(), Placeholder<1>()));
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&SHChooseSides2::fn_8021E098), this, Placeholder<0>(), Placeholder<1>()));
     mHomeAwayComponent.SetPointerInsideCallback(callback);
-    selectCallback = FEPointerListener::Callback(Bind<void>(MemFun(&SHChooseSides2::fn_8021E1E0), this, Placeholder<0>(), Placeholder<1>()));
+    selectCallback = FEPointerListener::Callback(PointerBinding(MemFun(&SHChooseSides2::fn_8021E1E0), this, Placeholder<0>(), Placeholder<1>()));
     mHomeAwayComponent.SetPointerPressCallback(selectCallback);
 
     mHomeAwayComponent.Disable();
 
-    FEPointerListener::Callback helpEnter(Bind<void>(MemFun(&SHChooseSides2::fn_8021E64C), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback helpLeave(Bind<void>(MemFun(&SHChooseSides2::fn_8021E6E8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback helpSelect(Bind<void>(MemFun(&SHChooseSides2::fn_8021E76C), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback helpEnter(PointerBinding(MemFun(&SHChooseSides2::fn_8021E64C), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback helpLeave(PointerBinding(MemFun(&SHChooseSides2::fn_8021E6E8), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback helpSelect(PointerBinding(MemFun(&SHChooseSides2::fn_8021E76C), this, Placeholder<0>(), Placeholder<1>()));
 
-    found = FEFinder<TLImageInstance, 2>::Find(mHelpButton, nlStringLowerHash("OVER"), nlStringLowerHash("list_high_250x60"), 0, 0, 0, 0);
-    TLInstance* helpInstance;
-    if (found == 0)
-    {
-        helpInstance = &UnidentifiedTLImageDefault::sInstance;
-    }
-    else
-    {
-        helpInstance = found;
-    }
-    position = mHelpButton->GetAssetPosition();
+    TLInstance* helpInstance = FEFinder<TLImageInstance, 2>::FindOrDefault<>(
+        mHelpButton, "OVER", "list_high_250x60");
+    feVector3 helpPosition = mHelpButton->GetAssetPosition();
     mHelpComponent.SetInstanceBounds(
-        helpInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
+        helpInstance, true, helpPosition.f.x, helpPosition.f.y, 1.0f, 1.0f);
 
     mHelpComponent.SetPointerEnterCallback(helpEnter);
     mHelpComponent.SetPointerLeaveCallback(helpLeave);
@@ -834,30 +802,9 @@ void SHChooseSides2::fn_8021E1E0(unsigned int, void*)
     if (mContext == PAUSE && fn_8021EED8(true))
         return;
 
-    {
-        mControllerComponents[0].mDisabled = true;
-        FEPointerEvent event;
-        mControllerComponents[0].mPreviousEvents[0] = event;
-        mControllerComponents[0].mPreviousEvents[1] = event;
-        mControllerComponents[0].mPreviousEvents[2] = event;
-        mControllerComponents[0].mPreviousEvents[3] = event;
-    }
-    {
-        mControllerComponents[1].mDisabled = true;
-        FEPointerEvent event;
-        mControllerComponents[1].mPreviousEvents[0] = event;
-        mControllerComponents[1].mPreviousEvents[1] = event;
-        mControllerComponents[1].mPreviousEvents[2] = event;
-        mControllerComponents[1].mPreviousEvents[3] = event;
-    }
-    {
-        mHomeAwayComponent.mDisabled = true;
-        FEPointerEvent event;
-        mHomeAwayComponent.mPreviousEvents[0] = event;
-        mHomeAwayComponent.mPreviousEvents[1] = event;
-        mHomeAwayComponent.mPreviousEvents[2] = event;
-        mHomeAwayComponent.mPreviousEvents[3] = event;
-    }
+    mControllerComponents[0].Disable();
+    mControllerComponents[1].Disable();
+    mHomeAwayComponent.Disable();
     mState = 2;
 
     SHNavigation* object = GetNavigationScene();

@@ -39,6 +39,8 @@ struct UnidentifiedUnsetTransition : public UnidentifiedStateTransition
     }
 };
 
+extern UnidentifiedUnsetTransition lbl_806E20B8;
+
 class shdStateMachine
 {
 public:

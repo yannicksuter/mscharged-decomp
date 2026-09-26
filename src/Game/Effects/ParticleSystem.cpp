@@ -106,12 +106,10 @@ void ParticleSystem::UpdateCoordSys()
 
 void ParticleSystem::UpdateCoordSys(nlMatrix4& mCoordSys)
 {
-    float lenSq = nlVec3LengthSquared(m_vForward);
-    float rsqrt = nlRecipSqrt(lenSq, true);
-
     nlVector3 grav;
-    nlVec3Scale(grav, m_vForward, rsqrt);
+    nlVec3Normalize(grav, m_vForward);
 
+    nlVector3 right;
     nlVector3 ref;
     nlVec3Set(ref, 0.0f, 0.0f, 1.0f);
     if ((float)__fabs(nlVec3DotProduct(ref, grav)) > 0.99f)
@@ -119,19 +117,17 @@ void ParticleSystem::UpdateCoordSys(nlMatrix4& mCoordSys)
         nlVec3Set(ref, 0.0f, 1.0f, 0.0f);
     }
 
-    nlVector3 right;
     nlVec3CrossProduct(right, grav, ref);
-    nlVec3Scale(right, nlRecipSqrt(nlVec3LengthSquared(right), true));
+    nlVec3Normalize(right, right);
 
-    nlVector3 up;
-    nlVec3CrossProduct(up, right, grav);
-    nlVec3Scale(up, nlRecipSqrt(nlVec3LengthSquared(up), true));
+    nlVec3CrossProduct(ref, right, grav);
+    nlVec3Normalize(ref, ref);
+
+    nlVec3Neg(grav, grav);
 
     mCoordSys.SetRow_(0, right);
-    mCoordSys.SetRow_(1, up);
-    mCoordSys.e[8] = -grav.x;
-    mCoordSys.e[9] = -grav.y;
-    mCoordSys.e[10] = -grav.z;
+    mCoordSys.SetRow_(1, ref);
+    mCoordSys.SetRow_(2, grav);
     mCoordSys.SetTranslation(m_vPosition);
     mCoordSys.e[11] = 0.0f;
     mCoordSys.e[7] = 0.0f;
@@ -152,8 +148,7 @@ static void EmitCircularPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
-            pSystem->mUnidentified014);
+        = pSystem->m_pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     nlVector3 localPos;
     localPos.x = cosVal * radius;
     localPos.y = -sinVal * radius;
@@ -181,8 +176,7 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->mProperties[4]->Evaluate(
-            pSystem->mUnidentified014);
+        = pSystem->m_pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     radius = RandomizedValue(0.0f, radius);
 
     nlVector3 localPos;
@@ -219,8 +213,7 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pTemplate->mProperties[4]->Evaluate(
-            pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     nlVec3Set(localDir, x, y, z);
     nlVec3Scale(localPos, localDir, radius);
 
@@ -263,8 +256,7 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pTemplate->mProperties[4]->Evaluate(
-            pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     nlVec3Set(localDir, x, y, z);
     nlVec3Scale(localPos, localDir, radius);
 
@@ -315,12 +307,10 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pTemplate->mProperties[4]->Evaluate(
-            pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     nlVec3Set(localPos, cos * radius, -sin * radius, 0.0f);
 
-    float tilt = pTemplate->mProperties[6]->Evaluate(
-        pSystem->mUnidentified014);
+    float tilt = pTemplate->EvaluateProperty(6, pSystem->mUnidentified014);
     if (tilt <= -90.0f)
         tilt = -89.9f;
     else if (tilt >= 90.0f)
@@ -337,8 +327,7 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         length * localDir.z);
 
     float tiltRotation
-        = pTemplate->mProperties[7]->Evaluate(
-        pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(7, pSystem->mUnidentified014);
     tiltRotation = -tiltRotation * 3.14159265f / 180.0f;
     if (tiltRotation != 0.0f)
     {

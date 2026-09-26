@@ -23,7 +23,8 @@
 #include "NL/nlTask.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/fePageControls.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 
 bool sPointerInputEnabled = true;
 bool sPointerHidden;

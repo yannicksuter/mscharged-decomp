@@ -1,10 +1,11 @@
 #include "Game/Ball.h"
 #include "Game/AI/SkillTweaks.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
+#include "Game/Game.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlDebug.h"
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/TeamPlayMachine.h"
@@ -34,303 +35,104 @@ struct UnidentifiedRuntimeFielderReference
 
 struct UnidentifiedTransitionReference;
 float AbleToInterceptBall(cPlayer*);
-extern "C" float fn_800D82C0(cFielder*);
-extern "C" float fn_800D7AB8(cFielder*);
-extern "C" float fn_800D7B00(cFielder*);
-extern "C" float fn_800D85F8(cFielder*);
-extern "C" float fn_800D8764(cFielder*, int);
-extern "C" float fn_800D84F8(cFielder*);
-extern "C" float fn_800D7988(int, cFielder*);
-extern "C" void fn_80318D34(UnidentifiedScriptMachine*, int, const char*, bool);
 float AggressiveT(cTeam*);
-extern "C" float fn_800DA330(cFielder*);
-extern "C" float fn_800DA310(cFielder*);
-extern "C" float fn_800DD9C8(cFielder*, cPlayer*);
 float PlayerShotDistance(cFielder*);
-extern "C" float fn_800DDD70(cFielder*);
-extern "C" float fn_800D96F4(cFielder*);
-extern "C" void* fn_800E3BF4(void*, void*);
-extern "C" void* fn_800E3C04(void*, void*);
-extern "C" void* fn_800E3C0C(void*, void*);
-extern "C" void* fn_800E3BE4(void*, void*);
-extern "C" cFielder* fn_800E3F10(void*, UnidentifiedFielderIterator*);
-extern "C" cFielder* fn_800E3F1C(void*, UnidentifiedFielderIterator*);
-extern "C" UnidentifiedFielderInput* fn_800E3F28(void*, UnidentifiedFielderIterator*);
-extern "C" void* fn_800E3BFC(void*, void*);
-extern "C" void* fn_800E3BEC(void*, void*);
-extern "C" void* fn_800E3C5C(void*, Variant*);
-extern "C" void* fn_800E3C44(void*, Variant*);
-extern "C" float fn_800E7ECC(void*, Variant*);
-extern "C" unsigned long fn_800E7ED4(void*, Variant*);
-extern "C" void* fn_800E3C14(void*, Variant*);
-extern "C" void* fn_800E3C2C(void*, Variant*);
-extern "C" unsigned long fn_800E8CB0(void*, Variant*);
-extern "C" unsigned long fn_800E7EE4(void*, Variant*);
-extern "C" float fn_800E7EEC(void*, Variant*);
-extern "C" unsigned long fn_800E7EDC(void*, Variant*);
-extern "C" UnidentifiedFuzzyRuntimeValue* fn_8031479C(void*, UnidentifiedFuzzyRuntimeBase*);
-extern "C" float fn_800D9B0C(cFielder*);
-extern "C" float fn_800D9A38(cFielder*);
-extern "C" float fn_800D9B74(cFielder*);
-extern "C" float fn_800D9BDC(cFielder*);
-extern "C" float fn_800D9C24(cFielder*);
-extern "C" float fn_800E06F4(cPlayer*);
-extern "C" float fn_800DF838(cPlayer*);
 float BallOwner(cPlayer*);
 float BallOwnerT(cTeam*);
-extern "C" cFielder* fn_800D671C(cTeam*);
 float Captain(cFielder*);
-extern "C" cFielder* fn_800D6708(cTeam*);
-extern "C" float fn_800D795C(cFielder*, int);
-extern "C" float fn_800DF590(cBall*);
 extern "C" float fn_800DED80(cPlayer*);
-extern "C" float fn_80314494(float, float, float);
 extern "C" cFielder* fn_800D674C(cPlayer*);
-extern "C" float fn_800D8A9C(cFielder*);
-extern "C" float fn_800D8BAC(cFielder*);
 float CloseTo(cPlayer*, cPlayer*);
 float CloseToBall(cPlayer*);
-extern "C" float fn_800DD45C(cFielder*);
-extern "C" float fn_800DD504(cPlayer*, cFielder*);
 float CloseToFormationPosition(cFielder*);
 float CloseToMyGoalie(cPlayer*);
 float CloseToMyNet(cPlayer*);
-extern "C" float fn_800D92DC(cFielder*);
 float CloseToSideline(cFielder*);
-extern "C" float fn_800DD2F4(cBall*);
-extern "C" float fn_800D912C(cFielder*);
-extern "C" float fn_800DE804(cBall*, cTeam*);
 float CloseToTheirGoalie(cPlayer*);
 float CloseToTheirNet(cPlayer*);
 float ClosingTo(cPlayer*, cPlayer*);
 float ClosingTo(cPlayer*, cBall*);
-extern "C" float fn_800E7EF4(void*, UnidentifiedVariant_80054AB8*);
-extern "C" float fn_800DA130(cFielder*);
-extern "C" void fn_803148C4(float);
-extern "C" void fn_803148D0(void*, const char*);
 float Defence(cFielder*);
 float Defensive(cTeam*);
-extern "C" float fn_800D7910(cFielder*);
 float Difficult(cTeam*);
 extern "C" bool fn_803147C0(UnidentifiedFuzzyRuntimeBase*, unsigned long);
 float DoingS2S(cFielder*);
-extern "C" float fn_800DE4B0(cPlayer*, cPlayer*);
-extern "C" void fn_80314740(void*, bool);
-extern "C" float fn_800DE1F0(cPlayer*, cPlayer*);
 extern "C" float fn_800DDF54(cPlayer*, cPlayer*);
-extern "C" float fn_800DE0A8(cPlayer*);
-extern "C" float fn_800DD744(cFielder*);
 float FallenDown(cFielder*);
-extern "C" float fn_800DA050(cFielder*);
-extern "C" float fn_800DD4CC(cFielder*);
-extern "C" float fn_800DD684(cPlayer*, cFielder*);
-extern "C" float fn_800DD294(cFielder*);
-extern "C" float fn_800DD37C(cFielder*);
 float FarTo(cPlayer*, cPlayer*);
 float FarToBall(cPlayer*);
 float FarToFormationPosition(cFielder*);
 float FarToMyGoalie(cPlayer*);
 float FarToMyNet(cPlayer*);
-extern "C" float fn_800D93F4(cFielder*);
-extern "C" float fn_800D924C(cFielder*);
-extern "C" float fn_800DE994(cBall*, cTeam*);
 float FarToTheirGoalie(cPlayer*);
 float FarToTheirNet(cPlayer*);
-extern "C" float fn_800E7F48(bool);
-extern "C" void fn_800E3EF8(void*, UnidentifiedFielderIterator*);
-extern "C" UnidentifiedFielderIterator* fn_800E3E68(void*, UnidentifiedFielderIterator*);
-extern "C" bool fn_800E3EDC(void*, UnidentifiedFielderIterator*);
-extern "C" UnidentifiedFielderIterator* fn_800E3C74(void*, cTeam*);
 float FielderType(cPlayer*);
-extern "C" float fn_800D7A70(cFielder*);
-extern "C" float fn_800D9FC8(cFielder*);
 extern "C" void fn_80313FA0(UnidentifiedFuzzyRuntimeBase*, bool, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E3B34(void*, cBall*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8CB8(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_8031423C(UnidentifiedFuzzyRuntimeBase*, const char*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E3A84(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D68(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D6C(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D70(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D74(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D78(void*, UnidentifiedRuntimeFielderReference*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_80314034(UnidentifiedFuzzyRuntimeBase*, float, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_803140CC(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_803141F4(UnidentifiedFuzzyRuntimeBase*, const Variant&, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void fn_80314160(UnidentifiedFuzzyRuntimeBase*, unsigned long, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E7F60(UnidentifiedFuzzyRuntime*, bool, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8E38(UnidentifiedFuzzyRuntime*, cPlayer*, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E3958(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E35D4(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E3700(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8090(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E382C(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E82E8(UnidentifiedFuzzyRuntime*, float, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8F8C(UnidentifiedFuzzyRuntime*, UnidentifiedRuntimeFielderReference*, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8414(UnidentifiedFuzzyRuntime*, float, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E81BC(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8540(UnidentifiedFuzzyRuntime*, UnidentifiedVariant_80054AB8*, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8B80(UnidentifiedFuzzyRuntime*, unsigned long, float);
-extern "C" void fn_80314438(void*, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_80314434(void*, UnidentifiedVariant_80054AB8*, float);
-extern "C" float fn_800E8CAC(void*, float, bool);
-extern "C" float fn_80314444(void*, float, bool);
-extern "C" void* fn_8031443C(void*, void*, bool);
-extern "C" float fn_80314428(UnidentifiedFuzzyRuntimeBase*);
-extern "C" cBall* fn_800E34E4();
-extern "C" cPlayer* fn_800E34D8();
-extern "C" void* fn_800E34EC();
-extern "C" bool fn_800E90EC(void*, cPlayer*);
-extern "C" bool fn_800E9194(void*, cPlayer*);
-extern "C" bool fn_800E923C(void*, cTeam*);
-extern "C" int fn_803147A4(UnidentifiedFuzzyRuntimeBase*);
 extern "C" Variant* fn_80314830(UnidentifiedFuzzyRuntimeBase*, unsigned long);
 extern "C" float fn_80314690(UnidentifiedFuzzyRuntimeBase*, unsigned long);
 extern "C" Goalie* fn_800D66A0(cFielder*);
 float GoalieOutOfPosition(cFielder*);
 float GoalieType(cPlayer*);
-extern "C" float fn_800DF888(cTeam*);
-extern "C" float fn_800D763C(cFielder*);
-extern "C" float fn_800D76B8(cFielder*);
-extern "C" unsigned long fn_800E3FDC(const char*);
 float High(cBall*);
-extern "C" float fn_800D7734(cFielder*);
 float InBetweenMyNetAnd(cFielder*, cFielder*);
-extern "C" float fn_800DC19C(cFielder*, cBall*);
-extern "C" float fn_800DBEF4(cFielder*, cFielder*);
-extern "C" float fn_800DC434(cFielder*, cBall*);
 float Incapacitated(cPlayer*);
 float InControlOfBall(cFielder*);
 float InDefensiveZone(cPlayer*);
 float InDefensiveZoneOfPlayer(cBall*, cPlayer*);
 float InFrontOfMyNet(cFielder*);
 float InFrontOfTheirNet(cFielder*);
-extern "C" float fn_800DA518(cFielder*);
-extern "C" float fn_800E0470(cPlayer*);
-extern "C" float fn_800E05A4(cBall*, cPlayer*);
 float InOffensiveZone(cPlayer*);
 float InOffensiveZoneOfPlayer(cBall*, cPlayer*);
 float InPassingLane(cFielder*);
-extern "C" float fn_800D74D8(cFielder*);
-extern "C" float fn_803144BC(float, float, float);
-extern "C" float fn_803144C8(float, float, float);
-extern "C" float fn_80314504(float, float, float, float, float);
-extern "C" float fn_80314538(float, float, float, float, float);
 float Invincible(cFielder*);
-extern "C" float fn_800D9D04(cFielder*);
-extern "C" bool fn_80314798(void*);
 extern "C" bool fn_803145C8(UnidentifiedFuzzyRuntimeBase*, unsigned long);
-extern "C" float fn_800D6AF0(cFielder*);
 float LastBallOwner(cPlayer*);
-extern "C" float fn_800D79F4(int, cFielder*);
-extern "C" float fn_800D8834(cFielder*, int);
 float Loose(cTeam*);
 float Losing(cTeam*);
-extern "C" void* fn_800D673C(void*);
 float Marking(cFielder*, cPlayer*);
-extern "C" cFielder* fn_800D6734(cFielder*);
 float Midfield(cFielder*);
 float Moderate(cTeam*);
 float NearTo(cPlayer*, cPlayer*);
 float NearToBall(cPlayer*);
-extern "C" float fn_800DD494(cFielder*);
-extern "C" float fn_800DD5C4(cPlayer*, cFielder*);
 float NearToFormationPosition(cFielder*);
 float NearToMyGoalie(cPlayer*);
 float NearToMyNet(cPlayer*);
-extern "C" float fn_800D9368(cFielder*);
-extern "C" float fn_800DD234(cFielder*);
-extern "C" float fn_800DD31C(cFielder*);
-extern "C" float fn_800D91BC(cFielder*);
-extern "C" float fn_800DE8CC(cBall*, cTeam*);
 float NearToTheirGoalie(cPlayer*);
 float NearToTheirNet(cPlayer*);
-extern "C" float fn_80314448(float, float, float);
 float Offensive(cTeam*);
-extern "C" float fn_800D78C4(cFielder*);
-extern "C" float fn_800DACF4(cPlayer*);
-extern "C" float fn_800DAD3C(cBall*);
-extern "C" float fn_800DA91C(cFielder*);
-extern "C" float fn_800DF028(cFielder*);
-extern "C" float fn_800DED3C(cFielder*);
-extern "C" float fn_800D6D14(cPlayer*, cPlayer*);
-extern "C" float fn_800D6D78(cPlayer*);
-extern "C" float fn_800D6CD4(cPlayer*, cPlayer*);
 float OnTheGround(cPlayer*);
-extern "C" float fn_800DBAB0(cFielder*);
 float OpenTo(cPlayer*, cPlayer*);
 float LikelyToScore(cFielder*);
-extern "C" float fn_800DBB88(cFielder*);
 extern "C" Goalie* fn_800D66C4(cFielder*);
-extern "C" UnidentifiedFielderIterator* fn_800E3D00(void*, cFielder*);
-extern "C" cTeam* fn_800D6688(cFielder*);
-extern "C" float fn_800DE71C(cPlayer*);
 float Ownerless(cBall*);
-extern "C" float fn_800E3FE0();
-extern "C" float fn_800E3FE4();
 float Passive(cTeam*);
-extern "C" float fn_800DF2C0(cFielder*);
-extern "C" cPlayer* fn_800D6744(cBall*);
-extern "C" float fn_800E3FE8();
-extern "C" float fn_800D782C(cFielder*);
-extern "C" float fn_800D7878(cFielder*);
-extern "C" float fn_800D9480(cFielder*);
-extern "C" float fn_800D88B4(cFielder*);
 float RandomChance(float);
 float ReallyCloseToBall(cPlayer*);
 float ReallyHigh(cBall*);
-extern "C" float fn_800DF118(cFielder*);
-extern "C" float fn_800DF474(cFielder*);
 float ReceivingPass(cFielder*);
-extern "C" float fn_800DF1B8(cFielder*);
-extern "C" float fn_800DF0B8(cFielder*);
-extern "C" float fn_800DF390(cPlayer*);
-extern "C" float fn_800D9D78(cPlayer*);
 float GenerateFilteredRandom();
-extern "C" float fn_800D6BD8(cFielder*);
 float SeparatingFrom(cPlayer*, cPlayer*);
 float SeparatingFrom(cPlayer*, cBall*);
-extern "C" void fn_80314744(UnidentifiedFuzzyRuntimeBase*, int);
-extern "C" void fn_80314750(void*, UnidentifiedTransitionReference*, const char*);
-extern "C" void fn_800E92E4(UnidentifiedScriptMachine*, const char*);
 extern "C" float fn_803146E8(UnidentifiedFuzzyRuntimeBase*, unsigned long, float);
-extern "C" float fn_800E3FEC();
-extern "C" float fn_800D77B0(cFielder*);
 float Stalling(cTeam*);
-extern "C" float fn_800D6A90(cFielder*);
 extern "C" cFielder* fn_800DF790(cTeam*);
 float StrategicBallOwner(cFielder*);
-extern "C" float fn_800D8970(cFielder*);
 float Striker(cFielder*);
-extern "C" float fn_800DA0C8(cFielder*);
-extern "C" float fn_800DD7F4(cFielder*);
-extern "C" float fn_800DE7D8(Goalie*);
-extern "C" float fn_800DD944(cPlayer*);
-extern "C" float fn_800DD99C(cFielder*);
-extern "C" UnidentifiedFielderIterator* fn_800E3D98(void*, cFielder*);
-extern "C" cTeam* fn_800D6670(cFielder*);
-extern "C" char fn_80312358(void*, char);
 float Tied(cTeam*);
 float TimeCloseToOver(cGame*);
 float TimeFarFromOver(cGame*);
 float TimeNearlyOver(cGame*);
-extern "C" float fn_800D9DD8(cPlayer*);
-extern "C" float fn_800DE40C(cPlayer*, cPlayer*);
 float UserControlled(cFielder*);
 float UserControlledT(cTeam*);
 extern "C" bool fn_8031462C(UnidentifiedFuzzyRuntimeBase*, unsigned long);
-extern "C" float fn_800DBB0C(cFielder*);
-extern "C" float fn_800DEB04(cFielder*);
-extern "C" float fn_800DEBBC(cPlayer*);
-extern "C" float fn_800DEAB4(cFielder*);
-extern "C" float fn_800DEBF4(cFielder*);
-extern "C" float fn_800DEC88(cFielder*);
 float Winger(cFielder*);
 float Winning(cTeam*);
-extern "C" bool fn_800E7EB4(InterpreterCore*);
 
-extern "C" void fn_800A695C();
-extern "C" float fn_80314444(void*, float, bool);
 extern "C" void fn_803140CC(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" bool fn_80312E0C(void*, const Variant&);
 
@@ -358,9 +160,9 @@ extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30A8(cFielder* pFielder)
     return pFielder->fn_8002E198();
 }
 
-extern "C" void fn_800E30AC()
+extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30AC(cTeam* pTeam)
 {
-    fn_800A695C();
+    return fn_800A695C(pTeam);
 }
 
 extern "C" const char* fn_800E3198()
@@ -581,10 +383,6 @@ extern "C" unsigned long fn_800E3FDC(const char* value)
     return nlStringHash(value);
 }
 
-extern "C" float fn_800DFF1C();
-extern "C" float fn_800DFF60();
-extern "C" float fn_800E00F8();
-extern "C" float fn_800E0034();
 
 extern "C" float fn_800E3FE0()
 {
@@ -689,7 +487,7 @@ extern "C" cFielder* fn_800E3F1C(
     return iterator->mTeam->GetFielder(iterator->mCurrent);
 }
 
-extern "C" UnidentifiedFielderInput* fn_800E3F28(
+extern "C" AIContext* fn_800E3F28(
     void*, UnidentifiedFielderIterator* iterator)
 {
     cFielder* fielder = iterator->mTeam->GetFielder(iterator->mCurrent);

@@ -6,16 +6,17 @@
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
+#include "Game/BaseGameSceneManager.h"
 
 
-extern BaseGameSceneManager* g_pOverlayManager;
 
 /**
  * Offset/Address/Size: 0x0 | 0x8022EF84 | size: 0x84

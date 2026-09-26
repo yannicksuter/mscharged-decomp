@@ -92,7 +92,8 @@ public:
 
     float GetDuration() const
     {
-        return (float)m_nNumKeys / 30.0f;
+        float fNumKeys = m_nNumKeys;
+        return fNumKeys / 30.0f;
     }
 
     unsigned int m_nNumKeys;

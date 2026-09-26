@@ -1,5 +1,6 @@
 #include "Game/AI/FuzzyAIRuntime.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
 
 #include "Game/AI/Desire.h"
@@ -12,7 +13,6 @@
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
 
-extern "C" bool fn_8031A04C();
 extern "C" void fn_80311C54(void*, unsigned long, void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     UnidentifiedFuzzyRuntimeBase*, UnidentifiedVariant_80054AB8, float);
@@ -63,7 +63,7 @@ SlotPool<UnidentifiedRuntimeActionQueue> lbl_80584328(16, 16);
 
 UnidentifiedFuzzyRuntimeBase* shdStateMachine::GetFuzzyRuntime()
 {
-    return mUnidentified018->mUnidentified064->mUnidentified14;
+    return mUnidentified018->mAIContext->mRuntime;
 }
 
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311744(
@@ -79,7 +79,7 @@ extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311750(
 }
 
 UnidentifiedFuzzyRuntimeBase::UnidentifiedFuzzyRuntimeBase(
-    UnidentifiedFielderInput* value)
+    AIContext* value)
     : InterpreterCore(0x100)
     , mCollection(0, 0)
     , mUnidentified038(16, 16)
@@ -94,7 +94,7 @@ UnidentifiedFuzzyRuntimeBase::UnidentifiedFuzzyRuntimeBase(
 
     if (mValue != 0)
     {
-        mValue->mUnidentified14 = this;
+        mValue->mRuntime = this;
     }
 
     if (lbl_806E20A0 != 0)
@@ -724,30 +724,30 @@ extern "C" float fn_80314538(
 extern "C" bool fn_803145C8(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
-    UnidentifiedFielderInput* value = runtime->mValue;
-    unsigned long key = value->fn_8030F9B4(
+    AIContext* value = runtime->mValue;
+    unsigned long key = value->GetTimerKey(
         runtime->mUnidentified05C, concurrent);
-    Timer* timer = value->fn_8030F9BC(key);
+    Timer* timer = value->FindTimer(key);
     return timer != 0 && timer->m_uPackedTime != 0;
 }
 
 extern "C" bool fn_8031462C(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
-    UnidentifiedFielderInput* value = runtime->mValue;
-    unsigned long key = value->fn_8030F9B4(
+    AIContext* value = runtime->mValue;
+    unsigned long key = value->GetTimerKey(
         runtime->mUnidentified05C, concurrent);
-    Timer* timer = value->fn_8030F9BC(key);
-    return timer != 0 && timer->m_unk0 != 0;
+    Timer* timer = value->FindTimer(key);
+    return timer != 0 && timer->m_uWasRunning != 0;
 }
 
 extern "C" float fn_80314690(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
-    UnidentifiedFielderInput* value = runtime->mValue;
-    unsigned long key = value->fn_8030F9B4(
+    AIContext* value = runtime->mValue;
+    unsigned long key = value->GetTimerKey(
         runtime->mUnidentified05C, concurrent);
-    Timer* timer = value->fn_8030F9BC(key);
+    Timer* timer = value->FindTimer(key);
     return timer != 0 ? timer->GetSeconds() : 0.0f;
 }
 
@@ -755,10 +755,10 @@ extern "C" float fn_803146E8(
     UnidentifiedFuzzyRuntimeBase* runtime, unsigned long concurrent,
     float seconds)
 {
-    UnidentifiedFielderInput* value = runtime->mValue;
-    unsigned long key = value->fn_8030F9B4(
+    AIContext* value = runtime->mValue;
+    unsigned long key = value->GetTimerKey(
         runtime->mUnidentified05C, concurrent);
-    return value->fn_8030FA10(key, seconds)->GetSeconds();
+    return value->SetTimer(key, seconds)->GetSeconds();
 }
 
 extern "C" void fn_80314740(void*, bool)

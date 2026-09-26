@@ -5,8 +5,9 @@
 #include "Game/Player.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-#include "Game/Game.h"
 #include "Game/AI/Fielder.h"
+
+class cGame;
 
 extern cFielder* g_pScriptCurrentFielder;
 extern cFielder* g_pScriptCurrentMark;
@@ -159,5 +160,132 @@ nlVector3& PositionOf(T pObject)
 {
     return pObject->m_v3Position;
 }
+
+
+// Shared functions and data from Game/AI/Scripts/ScriptQuestions.cpp.
+extern "C" cTeam* fn_800D6670(cFielder*);
+extern "C" cTeam* fn_800D6688(cFielder*);
+extern "C" cFielder* fn_800D6708(cTeam*);
+extern "C" cFielder* fn_800D671C(cTeam*);
+extern "C" cFielder* fn_800D6734(cFielder*);
+extern "C" void* fn_800D673C(void*);
+extern "C" cPlayer* fn_800D6744(cBall*);
+extern "C" float fn_800D6A90(cFielder*);
+extern "C" float fn_800D6AF0(cFielder*);
+extern "C" float fn_800D6BD8(cFielder*);
+extern "C" float fn_800D6CD4(cPlayer*, cPlayer*);
+extern "C" float fn_800D6D14(cPlayer*, cPlayer*);
+extern "C" float fn_800D6D78(cPlayer*);
+extern "C" float fn_800D74D8(cFielder*);
+extern "C" float fn_800D763C(cFielder*);
+extern "C" float fn_800D76B8(cFielder*);
+extern "C" float fn_800D7734(cFielder*);
+extern "C" float fn_800D77B0(cFielder*);
+extern "C" float fn_800D782C(cFielder*);
+extern "C" float fn_800D7878(cFielder*);
+extern "C" float fn_800D78C4(cFielder*);
+extern "C" float fn_800D7910(cFielder*);
+extern "C" float fn_800D795C(cFielder*, int);
+extern "C" float fn_800D7988(int, cFielder*);
+extern "C" float fn_800D79F4(int, cFielder*);
+extern "C" float fn_800D7A70(cFielder*);
+extern "C" float fn_800D7AB8(cFielder*);
+extern "C" float fn_800D7B00(cFielder*);
+extern "C" float fn_800D82C0(cFielder*);
+extern "C" float fn_800D84F8(cFielder*);
+extern "C" float fn_800D85F8(cFielder*);
+extern "C" float fn_800D8764(cFielder*, int);
+extern "C" float fn_800D8834(cFielder*, int);
+extern "C" float fn_800D88B4(cFielder*);
+extern "C" float fn_800D8970(cFielder*);
+extern "C" float fn_800D8A9C(cFielder*);
+extern "C" float fn_800D8BAC(cFielder*);
+extern "C" float fn_800D8C84(cFielder*);
+extern "C" float fn_800D912C(cFielder*);
+extern "C" float fn_800D91BC(cFielder*);
+extern "C" float fn_800D924C(cFielder*);
+extern "C" float fn_800D92DC(cFielder*);
+extern "C" float fn_800D9368(cFielder*);
+extern "C" float fn_800D93F4(cFielder*);
+extern "C" float fn_800D9480(cFielder*);
+extern "C" float fn_800D96F4(cFielder*);
+extern "C" float fn_800D9A38(cFielder*);
+extern "C" float fn_800D9B0C(cFielder*);
+extern "C" float fn_800D9B74(cFielder*);
+extern "C" float fn_800D9BDC(cFielder*);
+extern "C" float fn_800D9C24(cFielder*);
+extern "C" float fn_800D9D04(cFielder*);
+extern "C" float fn_800D9D78(cPlayer*);
+extern "C" float fn_800D9DD8(cPlayer*);
+extern "C" float fn_800D9FC8(cFielder*);
+extern "C" float fn_800DA050(cFielder*);
+extern "C" float fn_800DA0C8(cFielder*);
+extern "C" float fn_800DA130(cFielder*);
+extern "C" float fn_800DA310(cFielder*);
+extern "C" float fn_800DA330(cFielder*);
+extern "C" float fn_800DA518(cFielder*);
+extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition);
+extern "C" float fn_800DA91C(cFielder*);
+extern "C" float fn_800DACF4(cPlayer*);
+extern "C" float fn_800DAD3C(cBall*);
+extern "C" float fn_800DBB0C(cFielder*);
+extern "C" float fn_800DBB88(cFielder*);
+extern "C" float fn_800DBEF4(cFielder*, cFielder*);
+extern "C" float fn_800DC19C(cFielder*, cBall*);
+extern "C" float fn_800DC434(cFielder*, cBall*);
+extern "C" float fn_800DCB4C(const nlVector3*, const nlVector3*);
+extern "C" float fn_800DD234(cFielder*);
+extern "C" float fn_800DD294(cFielder*);
+extern "C" float fn_800DD2F4(cBall*);
+extern "C" float fn_800DD31C(cFielder*);
+extern "C" float fn_800DD37C(cFielder*);
+extern "C" float fn_800DD45C(cFielder*);
+extern "C" float fn_800DD494(cFielder*);
+extern "C" float fn_800DD4CC(cFielder*);
+extern "C" float fn_800DD504(cPlayer*, cFielder*);
+extern "C" float fn_800DD5C4(cPlayer*, cFielder*);
+extern "C" float fn_800DD684(cPlayer*, cFielder*);
+extern "C" float fn_800DD744(cFielder*);
+extern "C" float fn_800DD7F4(cFielder*);
+extern "C" float fn_800DD944(cPlayer*);
+extern "C" float fn_800DD99C(cFielder*);
+extern "C" float fn_800DD9C8(cFielder*, cPlayer*);
+extern "C" float fn_800DDD70(cFielder*);
+extern "C" float fn_800DE1F0(cPlayer*, cPlayer*);
+extern "C" float fn_800DE4B0(cPlayer*, cPlayer*);
+extern "C" float fn_800DE71C(cPlayer*);
+extern "C" float fn_800DE7D8(Goalie*);
+extern "C" float fn_800DE804(cBall*, cTeam*);
+extern "C" float fn_800DE8CC(cBall*, cTeam*);
+extern "C" float fn_800DE994(cBall*, cTeam*);
+extern "C" float fn_800DEAB4(cFielder*);
+extern "C" float fn_800DEBBC(cPlayer*);
+extern "C" float fn_800DEBF4(cFielder*);
+extern "C" float fn_800DEC88(cFielder*);
+extern "C" float fn_800DED3C(cFielder*);
+extern "C" float fn_800DF0B8(cFielder*);
+extern "C" float fn_800DF118(cFielder*);
+extern "C" float fn_800DF1B8(cFielder*);
+extern "C" float fn_800DF2C0(cFielder*);
+extern "C" float fn_800DF390(cPlayer*);
+extern "C" float fn_800DF474(cFielder*);
+extern "C" float fn_800DF590(cBall*);
+extern "C" float fn_800DF838(cPlayer*);
+extern "C" float fn_800DFD74(cTeam*);
+extern "C" float fn_800DFF1C();
+extern "C" float fn_800DFF60();
+extern "C" float fn_800E0034();
+extern "C" float fn_800E00F8();
+extern "C" float fn_800E0470(cPlayer*);
+extern "C" float fn_800E05A4(cBall*, cPlayer*);
+extern "C" float fn_800E06F4(cPlayer*);
+
+
+extern "C" float fn_800DBAB0(cFielder* pFielder);
+extern "C" float fn_800DE0A8(cPlayer* pPlayer);
+extern "C" float fn_800DE40C(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer);
+extern "C" float fn_800DEB04(cFielder* pFielder);
+extern "C" float fn_800DF028(cFielder* pFielder);
+extern "C" float fn_800DF888(cTeam* team);
 
 #endif // _SCRIPTQUESTIONS_H_

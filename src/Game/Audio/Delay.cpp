@@ -186,17 +186,7 @@ void Delay::CreateParameter(unsigned int definition, void*, bool negate,
         m_Final.m_Settings.m_Output[2] = sDelayOutputSurround;
         m_Final.m_AuxVolume = gDelayOverrideVolume;
 
-        parameter->m_State = m_Final.m_State;
-        for (u32 i = 0; i < 3; ++i)
-        {
-            parameter->m_Settings.m_Delay[i]
-                = m_Final.m_Settings.m_Delay[i];
-            parameter->m_Settings.m_Feedback[i]
-                = m_Final.m_Settings.m_Feedback[i];
-            parameter->m_Settings.m_Output[i]
-                = m_Final.m_Settings.m_Output[i];
-        }
-        parameter->m_AuxVolume = m_Final.m_AuxVolume;
+        *parameter = m_Final;
         return;
     }
 
@@ -292,4 +282,3 @@ void Delay::EndBlend()
     if (m_Parameters.m_Head == 0 && m_Final.m_AuxVolume < FLT_MIN)
         m_Enabled = true;
 }
-

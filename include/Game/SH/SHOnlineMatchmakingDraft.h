@@ -36,6 +36,9 @@ public:
     /* 0x3E4 */ u16 mPlayerDescriptionBuffers[4][0x30];
     /* 0x564 */ u16 mCountdownBuffer[8];
     /* 0x574 */ FEOnlinePlayerRow mPlayers[8];
+
+private:
+    void RefreshPlayerRows();
 }; // size 0xA34
 
 #endif // GAME_SH_ONLINE_DRAFT_H

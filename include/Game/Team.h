@@ -12,7 +12,9 @@ class cPlayer;
 class cGlobalPad;
 class Goalie;
 class FormationManager;
-class UnidentifiedFielderInput;
+class AIContext;
+class UnidentifiedFuzzyRuntimeBase;
+class UnidentifiedScriptMachine;
 
 enum eTeamSide
 {
@@ -141,11 +143,13 @@ public:
     /* 0xD8 */ cFielder* mUnidentified0D8[4];
     /* 0xE8 */ cNet* m_pNet;
     /* 0xEC */ FormationManager* m_pFormationManager;
-    /* 0xF0 */ UnidentifiedFielderInput* mUnidentified0F0;
+    /* 0xF0 */ AIContext* mUnidentified0F0;
     /* 0xF4 */ u32 mUnidentified0F4;
 };
 
 extern cTeam* g_pTeams[];
+extern "C" UnidentifiedFuzzyRuntimeBase* fn_800A695C(cTeam*);
+extern "C" UnidentifiedScriptMachine* fn_800A6968(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
 
 class SkillTweaks;

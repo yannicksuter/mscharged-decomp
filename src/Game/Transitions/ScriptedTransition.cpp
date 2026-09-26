@@ -625,22 +625,23 @@ void ScriptedScreenTransition::Render(GLView* view)
         normalizedTime = 0.0f;
     }
 
-    float finalTime;
+    float easedTime;
     switch (m_eTimeLine)
     {
     case TIME_ACCEL:
-        finalTime = normalizedTime * normalizedTime;
+        easedTime = normalizedTime * normalizedTime;
         break;
     case TIME_DECEL:
-        finalTime = nlSqrt(normalizedTime, true);
+        easedTime = nlSqrt(normalizedTime, true);
         break;
     case TIME_LINEAR:
-        finalTime = normalizedTime;
+        easedTime = normalizedTime;
         break;
     default:
-        finalTime = normalizedTime;
+        easedTime = normalizedTime;
         break;
     }
+    float finalTime = easedTime;
 
     glSetDefaultState(false);
     glSetCurrentTexture(m_nTexture, GLTT_Diffuse);
@@ -657,14 +658,14 @@ void ScriptedScreenTransition::Render(GLView* view)
     poly.Attach(view, 0, NULL);
 }
 
-bool ScriptedScreenTransition::UnidentifiedVirtual30()
+bool ScriptedScreenTransition::ConsumeScreenGrabRequest()
 {
-    bool unknown = false;
+    bool screenGrabRequested = false;
     for (int i = 0; i < m_nModifiers; i++)
     {
-        unknown |= m_pModifiers[i]->UnidentifiedVirtual18();
+        screenGrabRequested |= m_pModifiers[i]->UnidentifiedVirtual18();
     }
-    return unknown;
+    return screenGrabRequested;
 }
 
 void ScriptedScreenTransition::Cancel()

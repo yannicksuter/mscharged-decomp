@@ -1,4 +1,5 @@
 #include "Game/AI/AiUtil.h"
+#include "Game/CharacterTriggers.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
 #include "Game/Effects/EmissionController.h"
@@ -18,9 +19,6 @@
 #include "types.h"
 
 extern "C" DrawableBulletBill& fn_8018755C(RenderSnapshot*, unsigned int);
-extern "C" void fn_801B8FF8(cFielder*);
-extern "C" void fn_801B91F8(cFielder*);
-extern "C" void fn_800367B4(cFielder*);
 
 static const nlVector3 lbl_804DCDB8 = { 0.0f, 0.0f, 0.0f };
 static const nlVector3 lbl_804DCDC4 = { 0.0f, -20.0f, -10.0f };

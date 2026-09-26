@@ -153,8 +153,8 @@ public:
     nlVector3 Offset() const;
     void AddTrigger(NisTriggerType triggerType, float frameNumber,
         const char* name, const char* target, TriggerParams* trigParams);
-    bool fn_80282474(nlVector3& param1);
-    int fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3);
+    bool fn_80282474(nlVector3& param1) const;
+    int fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) const;
     void fn_802834A0();
     ImpostorModel* fn_8028350C(eCharacterClass param1, const char* param2,
         const char* param3, DrawableCharacter** param4);

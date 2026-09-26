@@ -10,8 +10,8 @@ public:
     virtual ~UnidentifiedFielderDesireMachine();
 
     virtual void UnidentifiedVirtual2();
-    virtual void UnidentifiedVirtual3(float deltaTime);
-    virtual void UnidentifiedVirtual4(bool param);
+    virtual void Update(float deltaTime);
+    virtual void Reset(bool param);
     virtual shdStateMachine* UnidentifiedVirtual5(
         int state, UnidentifiedVariantCollection* params, bool force);
     virtual void UnidentifiedVirtual6();

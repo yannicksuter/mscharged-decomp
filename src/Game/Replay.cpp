@@ -9,7 +9,6 @@ const int kFrameCount = 2000;
 bool renderMemoryLayout;
 } // namespace
 
-extern "C" UnidentifiedReplayFramePool* lbl_806E1E9C;
 UnidentifiedReplayFramePool* lbl_806E1E9C;
 
 Replay::Replay(char* memory, int memorySize, int maxFrameSize)

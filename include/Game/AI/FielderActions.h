@@ -22,4 +22,8 @@ extern SlotPool<PlayerAttackData> g_PlayerAttackDataPool;
 
 void UnFreezeEveryoneButCaptain(cFielder* pCaptain);
 
+
+extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
+extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
+
 #endif // GAME_AI_FIELDERACTIONS_H

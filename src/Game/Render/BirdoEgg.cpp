@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsBirdoEgg.h"
+#include "Game/CharacterTriggers.h"
 
 #include "Game/Render/BirdoEgg.h"
 
@@ -22,8 +23,6 @@
 #include <math.h>
 
 extern "C" void fn_8013F854(const char*, ...);
-extern "C" void fn_801BC828(cCharacter*);
-extern "C" void fn_801BC9E4(const nlVector3&);
 extern "C" void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
 
 static const nlVector3 lbl_804DCD90 = { 0.0f, 0.0f, 0.0f };

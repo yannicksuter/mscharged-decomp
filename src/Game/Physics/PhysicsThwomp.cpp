@@ -1,4 +1,5 @@
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -14,8 +15,6 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/Render/ThwompObject.h"
 
-extern "C" void fn_80149984(void* source, cCharacter* target);
-extern "C" void fn_80149B30(UnidentifiedEventData33* data);
 
 float gThwompBounce = 0.26f;
 float gThwompFriction = 0.0f;

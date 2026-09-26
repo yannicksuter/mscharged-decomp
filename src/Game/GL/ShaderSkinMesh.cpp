@@ -201,6 +201,8 @@ void ShaderSkinMesh::GetPoseMatrix(nlMatrix4* matrix, int nodeIndex)
 
 void ShaderSkinMesh::PrepareToRender()
 {
+    glModelPacket* pPackets;
+    unsigned long numPackets;
     glModelPacket* pPacket = pModel->packets;
     BoneMapList* node = nlDLRingGetStart(boneMaps);
     for (int i = 0; i < (int)pModel->numPackets; i++, pPacket++)
@@ -215,10 +217,13 @@ void ShaderSkinMesh::PrepareToRender()
     if (numActiveMorphs != 0)
     {
         unsigned long count = 0;
-        for (unsigned long i = 0; i < pModel->numPackets; i++)
+        unsigned long offset = 0;
+        for (unsigned long i = 0; i < pModel->numPackets;
+             i++, offset += sizeof(PacketSkinData))
         {
-            count = count >= packetSkinData[i].numVertices
-                        ? count : packetSkinData[i].numVertices;
+            PacketSkinData* data =
+                (PacketSkinData*)((unsigned char*)packetSkinData + offset);
+            count = count >= data->numVertices ? count : data->numVertices;
         }
         morphBuffer = (nlVector3*)glFrameAlloc(
             count * sizeof(nlVector3), GLM_VertexData);
@@ -230,8 +235,8 @@ void ShaderSkinMesh::PrepareToRender()
         glModel* newModel = (glModel*)glFrameAlloc(sizeof(glModel), GLM_Header);
         softwareModel = newModel;
         memcpy(newModel, pModel, sizeof(glModel));
-        unsigned long numPackets = newModel->numPackets;
-        glModelPacket* pPackets = (glModelPacket*)glFrameAlloc(
+        numPackets = newModel->numPackets;
+        pPackets = (glModelPacket*)glFrameAlloc(
             numPackets * sizeof(glModelPacket), GLM_Header);
         memcpy(pPackets, newModel->packets, numPackets * sizeof(glModelPacket));
         glSetModelPackets(newModel, pPackets, numPackets);
@@ -273,6 +278,8 @@ void ShaderSkinMesh::PrepareToRender()
 void ShaderSkinMesh::CreateMorphBuffer(unsigned long packetIndex,
     unsigned long count)
 {
+    const MorphDeltaList* entry;
+    const MorphDelta* pCurrentMorph;
     if (numActiveMorphs != 0)
     {
         nlZeroMemory(morphBuffer, count * sizeof(nlVector3));
@@ -281,13 +288,13 @@ void ShaderSkinMesh::CreateMorphBuffer(unsigned long packetIndex,
             float w = morphWeights[morphIndex].morphWeight;
             if (0.0f != w)
             {
-                const MorphDeltaList* entry =
+                entry =
                     morphData == 0 ? 0
                         : morphData
                             + (packetIndex * numMorphs + morphIndex);
                 for (unsigned long i = 0; i < entry->numDeltas; i++)
                 {
-                    const MorphDelta* pCurrentMorph = &entry->deltas[i];
+                    pCurrentMorph = &entry->deltas[i];
                     nlVector3* dst = &morphBuffer[pCurrentMorph->index];
                     nlVec3ScaleAdd(*dst, w, pCurrentMorph->delta, *dst);
                 }

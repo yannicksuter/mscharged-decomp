@@ -6,7 +6,8 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePopupMenu.h"
@@ -409,7 +410,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
             if (GameInfoManager::Instance()->IsOnline())
                 GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
             else if (mSceneType != ST_STRIKER_CUP)
-                GameSceneManager::Instance()->Push((SceneList)0x1B, SCREEN_BACK, true);
+                GameSceneManager::Instance()->Push(SCENE_GAMEPLAY_OPTIONS, SCREEN_BACK, true);
             if (mSceneType == ST_STRIKER_CUP)
             {
                 GameSceneManager::Instance()->Pop();

@@ -406,29 +406,28 @@ bool FriendManager::ValidateHostInvitation()
 bool FriendManager::HasFriendDeclined()
 {
     int index = mFriendStatusIndex;
-    if (index < 0 || index >= 64)
+    if (index >= 0 && index < 64)
     {
-        return false;
+        DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
+            GameInfoManager::GetInstance()->GetUnknown0x40(gNetworkSaveSlotIndex, index));
+        if (DWC_IsValidFriendData(friendData))
+        {
+            if (DWC_GetFriendStatus(friendData, 0) == 0)
+            {
+                return true;
+            }
+            if ((int)mFriendStatus[index].mStatus == EFriendStatus_ClientDecliningHost)
+            {
+                DWCUserData* userData = reinterpret_cast<DWCUserData*>(
+                    GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
+                if (userData->gs_profile_id == mFriendStatus[index].mProfileId)
+                {
+                    return true;
+                }
+            }
+        }
     }
-
-    DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
-        GameInfoManager::GetInstance()->GetUnknown0x40(gNetworkSaveSlotIndex, index));
-    if (!DWC_IsValidFriendData(friendData))
-    {
-        return false;
-    }
-    if (DWC_GetFriendStatus(friendData, 0) == 0)
-    {
-        return true;
-    }
-
-    if (mFriendStatus[index].mStatus != EFriendStatus_ClientDecliningHost)
-    {
-        return false;
-    }
-    DWCUserData* userData = reinterpret_cast<DWCUserData*>(
-        GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
-    return userData->gs_profile_id == mFriendStatus[index].mProfileId;
+    return false;
 }
 
 int FriendManager::GetFriendInvitationResponse()
@@ -463,18 +462,26 @@ int FriendManager::GetFriendInvitationResponse()
 void FriendManager::Update(float dt)
 {
     mUpdateTime += dt;
-    if (!mFriendListChanged || g_pNetworkSessionBase->GetSessionState() != 2)
+    if (!mFriendListChanged)
+    {
+        return;
+    }
+    if (g_pNetworkSessionBase->GetSessionState() != 2)
     {
         return;
     }
 
     bool matchmaking = false;
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-    if (lobby != 0 && (lobby->mMatchmakingThreadRunning || lobby->mState != 0))
+    if (lobby != 0 && lobby->IsMatchmaking())
     {
         matchmaking = true;
     }
-    bool invitationScene = GameSceneManager::Instance()->IsOnStack(static_cast<SceneList>(0x2F));
+    bool invitationScene = false;
+    if (GameSceneManager::Instance()->IsOnStack(static_cast<SceneList>(0x2F)))
+    {
+        invitationScene = true;
+    }
     if (matchmaking && !invitationScene)
     {
         return;

@@ -6,9 +6,9 @@
 #include "Game/AsyncLoading.h"
 #include "Game/Pad/FlickDetection.h"
 #include "types.h"
+#include "Game/Task/FrontEndTask.h"
+#include "Game/main.h"
 
-extern bool g_e3_Build;
-extern bool g_bE3IdleReset;
 
 void LoadingTask::Start()
 {

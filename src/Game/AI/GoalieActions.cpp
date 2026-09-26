@@ -1,4 +1,7 @@
 #include "Game/Sys/audio.h"
+#include "Game/CharacterTemplate.h"
+#include "Game/Player.h"
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/DetInput.h"
 #include "Game/Goalie.h"
 #include "Game/RumbleActions.h"
@@ -61,7 +64,6 @@ struct UnidentifiedFESceneState
 };
 
 extern UnidentifiedGoalieActionState* g_pGame;
-extern cCharacter* lbl_806E0C34;
 extern float lbl_806DBB08;
 extern float lbl_806DBBE0;
 extern float lbl_806DBBE4;
@@ -143,15 +145,12 @@ extern unsigned char lbl_806E0D18;
 extern unsigned char lbl_806E0D19;
 extern unsigned char lbl_806E0D1A;
 extern unsigned char lbl_806E0D22;
-extern cTeam* g_pCurrentlyUpdatingTeam;
 float Difficult(cTeam* pTeam);
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
-extern BaseGameSceneManager* g_pOverlayManager;
 extern "C" void fn_8005DB44(
     UnidentifiedGoalieActionState* pState, unsigned int nParam, bool bParam);
-extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);
 extern "C" void fn_8001AD24(
     LiveBallTrail* pBallTrail, cFielder* pFielder);
 extern "C" void fn_802779EC(
@@ -163,30 +162,20 @@ extern "C" bool fn_8007B9EC(
     Goalie* pGoalie, const nlVector3& v3Position);
 extern "C" float fn_8007ACB8(Goalie* pGoalie,
     const nlVector3& v3TargetPosition, float fParam1, float fParam2);
-extern "C" float fn_800DF028(cFielder* pFielder);
-extern "C" bool fn_80016768(cBall* pBall);
-extern "C" float fn_800156A8(cBall* pBall);
 extern "C" void fn_8003C5D8(
     cFielder* pFielder, bool bParam, unsigned short aParam);
-extern "C" void fn_80098098(Goalie* pGoalie);
 extern "C" void fn_8005E408(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E604(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E800(
     void* pManager, const PlayerAttackData* pData);
-extern "C" void fn_801BABEC(cPlayer* pPlayer);
-extern "C" void fn_801BAF0C(cPlayer* pPlayer);
-extern "C" void fn_801B8B38(cPlayer* pPlayer);
-extern "C" void fn_801B8E5C(cPlayer* pPlayer);
 extern "C" SaveData* fn_800925C0(
     SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
 extern "C" SaveData* fn_80092644(SaveData* pSaveData,
     SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
 extern "C" SaveData* fn_80093780(int nAnimID);
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
-extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
-extern "C" float fn_800DEB04(cFielder* pFielder);
 extern "C" void fn_801B968C(cCharacter* pCharacter);
 extern "C" void fn_8008CED8(Goalie* pGoalie, float fTargetTime,
     const nlVector3& v3TargetPosition,

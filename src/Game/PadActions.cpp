@@ -16,7 +16,6 @@
 #include "NL/plat/WiiPad.h"
 #include "types.h"
 
-extern int* gGameCubePadButtonMap;
 
 bool g_bEnableGamecubePadMonkey;
 

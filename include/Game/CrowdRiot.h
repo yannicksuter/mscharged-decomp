@@ -8,6 +8,7 @@ class DebugWriteCache;
 class EmissionController;
 class PhysicsObject;
 class PhysicsTriggerVolume;
+class cBall;
 
 struct Generators
 {
@@ -37,5 +38,13 @@ public:
     /* 0x30 */ PhysicsTriggerVolume* mTriggerVolume;
     /* 0x34 */ int meState;
 }; // total size: 0x38
+
+
+// Shared functions and data from Game/CrowdRiot.cpp.
+extern "C" void fn_800297B8(cBall*, CrowdRiot*);
+extern "C" void fn_800298D8(void*);
+extern "C" void fn_800299C4(void*);
+extern "C" void fn_80029AB0(void*);
+extern "C" void fn_80029B9C(void*);
 
 #endif // GAME_CROWD_RIOT_H

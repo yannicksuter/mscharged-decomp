@@ -253,6 +253,11 @@ inline void nlVec3Sub(nlVector3& result, const nlVector3& a, const nlVector3& b)
     nlVec3Set(result, a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
+inline void nlVec3Neg(nlVector3& result, const nlVector3& v)
+{
+    nlVec3Set(result, -v.x, -v.y, -v.z);
+}
+
 inline void nlVec3Sub2D(nlVector3& result, const nlVector3& a, const nlVector3& b)
 {
     result.x = a.x - b.x;
@@ -584,5 +589,7 @@ void nlPolarToCartesian(float& x, float& y, unsigned short angle, float radius);
 void nlCartesianToPolar(nlPolar& out, float x, float y);
 
 void fn_802B549C(nlQuaternion& out, unsigned short angle);
+extern "C" void fn_802B5370(
+    nlQuaternion& out, const nlVector3& rotationAxis, unsigned short angle);
 
 #endif

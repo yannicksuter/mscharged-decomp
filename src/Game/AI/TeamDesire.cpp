@@ -1,5 +1,5 @@
 #include "Game/AI/TeamPlayMachine.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
@@ -17,7 +17,7 @@ void UnidentifiedTeamDesire::UnidentifiedSetContext(
     shdStateMachine::UnidentifiedSetContext(context);
     if (context != 0)
     {
-        m_pTeam = (cTeam*)context->mUnidentified064->mData.pointer;
+        m_pTeam = (cTeam*)context->mAIContext->mData.pointer;
     }
     else
     {

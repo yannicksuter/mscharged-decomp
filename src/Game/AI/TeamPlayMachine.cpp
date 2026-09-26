@@ -1,4 +1,5 @@
 #include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/Desire.h"
 
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/DB/GameProgress.h"
@@ -12,7 +13,6 @@ struct UnidentifiedGameState
 };
 
 extern UnidentifiedGameState* g_pGame;
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 float lbl_806DC448 = 1.1f;
 char lbl_80503FC0[] = "TeamPlayMachine";
@@ -31,9 +31,9 @@ void TeamPlayMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(5, desire, false);
 }
 
-void TeamPlayMachine::UnidentifiedVirtual3(float deltaTime)
+void TeamPlayMachine::Update(float deltaTime)
 {
-    UnidentifiedScriptMachine::UnidentifiedVirtual3(deltaTime);
+    UnidentifiedScriptMachine::Update(deltaTime);
 }
 
 void TeamPlayMachine::UnidentifiedVirtual7()

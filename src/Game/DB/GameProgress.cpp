@@ -1828,7 +1828,6 @@ void CupManager::fn_8010EA28()
 }
 
 extern const int lbl_804DC9F0[3][3];
-extern "C" void fn_8010FED8();
 
 inline void CupManager::SetUserSelectedCupTeam(int team)
 {

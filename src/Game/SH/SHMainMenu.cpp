@@ -15,6 +15,8 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feInput.h"
@@ -61,6 +63,12 @@ SHMainMenu::SHMainMenu()
  */
 SHMainMenu::~SHMainMenu()
 {
+}
+
+void UnidentifiedMainMenuEarlyUser(SHMainMenu* menu)
+{
+    FEPointerListener::Callback callback;
+    menu->GetPresentation()->SetActiveSlide("MAIN", true);
 }
 
 /**
@@ -479,5 +487,3 @@ void SHMainMenu::ApplyItem(unsigned int item)
     }
     }
 }
-
-#include "Game/FE/feFinder_impl.h"

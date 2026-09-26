@@ -11,6 +11,14 @@ static nlQuaternion qRotIdentity = { 0.0f, 0.0f, 0.0f, 1.0f };
 static nlVector3 v3ScaleIdentity = { 1.0f, 1.0f, 1.0f };
 static nlVector3 v3TransIdentity = { 0.0f, 0.0f, 0.0f };
 
+static inline void PoseAccumulatorMultiplyScale(
+    nlVector3& result, const nlVector3& parent, const nlVector3& scale)
+{
+    result.x = parent.x * scale.x;
+    result.y = parent.y * scale.y;
+    result.z = parent.z * scale.z;
+}
+
 /**
  * Offset/Address/Size: 0x0 | 0x8030A9D0 | size: 0x228
  */
@@ -346,12 +354,8 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
                 }
                 else
                 {
-                    ScaleStack[nScaleIndex].x
-                        = ScaleStack[nStackIndex].x * s.s.x;
-                    ScaleStack[nScaleIndex].y
-                        = ScaleStack[nStackIndex].y * s.s.y;
-                    ScaleStack[nScaleIndex].z
-                        = ScaleStack[nStackIndex].z * s.s.z;
+                    PoseAccumulatorMultiplyScale(ScaleStack[nScaleIndex],
+                        ScaleStack[nStackIndex], s.s);
                 }
             }
         }
@@ -498,12 +502,8 @@ extern "C" void fn_8030B9C8(
                 }
                 else
                 {
-                    ScaleStack[nStackIndex].x
-                        = ScaleStack[nPreviousScaleIndex].x * s.s.x;
-                    ScaleStack[nStackIndex].y
-                        = ScaleStack[nPreviousScaleIndex].y * s.s.y;
-                    ScaleStack[nStackIndex].z
-                        = ScaleStack[nPreviousScaleIndex].z * s.s.z;
+                    PoseAccumulatorMultiplyScale(ScaleStack[nStackIndex],
+                        ScaleStack[nPreviousScaleIndex], s.s);
                 }
             }
 

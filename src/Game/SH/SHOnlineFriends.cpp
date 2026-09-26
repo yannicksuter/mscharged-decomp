@@ -9,7 +9,7 @@
 #include "Game/NetworkLobby.h"
 
 #include "Game/GameSceneManager.h"
-#include "Game/FE/feInlineHasher.inl"
+#include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinderFind_impl.h"
 #include "Game/FE/feFinderDefault_impl.h"
 #include "Game/FE/feInput.h"

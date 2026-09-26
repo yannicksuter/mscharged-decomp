@@ -13,7 +13,7 @@ class cFielder;
 class cGame;
 class InterpreterCore;
 class UnidentifiedScriptMachine;
-class UnidentifiedFielderInput;
+class AIContext;
 
 class FuzzyVariant : public Variant
 {

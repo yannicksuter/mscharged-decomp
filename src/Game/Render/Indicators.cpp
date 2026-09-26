@@ -6,6 +6,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTweaks.h"
+#include "Game/CharacterEffects.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Game.h"
@@ -193,12 +194,8 @@ static void DrawIndicator(int xCentre, int yCentre, float fPixelWidth,
         glPoly2 poly;
 
         glSetDefaultState(false);
-        unsigned long blendMode = 1;
-        if (additiveBlending != 0)
-        {
-            blendMode = 2;
-        }
-        glSetRasterState(GLS_AlphaBlend, blendMode);
+        glSetRasterState(GLS_AlphaBlend,
+            additiveBlending ? GLB_Additive : GLB_Standard);
         glSetRasterState(GLS_AlphaTest, 1);
         glSetRasterState(GLS_AlphaTestRef, 0);
         glSetCurrentRasterState(glHandleizeRasterState());

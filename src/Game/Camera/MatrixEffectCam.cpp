@@ -1,9 +1,7 @@
 #include "Game/Camera/MatrixEffectCam.h"
+#include "Game/Camera/ReplayCamera.h"
 
 #include "NL/gl/glMatrix.h"
-
-extern float lbl_806DC510;
-extern bool lbl_806E0F18;
 
 void MatrixEffectCam::Update(float dt)
 {
@@ -12,10 +10,10 @@ void MatrixEffectCam::Update(float dt)
     up.y = 0.0f;
     up.z = 1.0f;
 
-    if (!lbl_806E0F18)
+    if (!lbl_806E0F18[0])
     {
         nlVector3 currentCameraPosition = mCameraPosition;
-        nlVec3ScaleAdd(mCameraPosition, lbl_806DC510, mUnidentified078, mTargetPosition);
+        nlVec3ScaleAdd(mCameraPosition, lbl_806DC510[0], mUnidentified078, mTargetPosition);
         nlVec3WeightedSum(mCameraPosition, 0.85f, currentCameraPosition, 0.15f, mCameraPosition);
         glMatrixLookAt(mViewMatrix, mCameraPosition, mTargetPosition, up);
     }

@@ -7,6 +7,7 @@
 #include "types.h"
 
 class FEScene;
+class FEFontResource;
 class FESceneResource;
 class FETextureResource;
 class MemoryAllocator;
@@ -60,6 +61,7 @@ struct FEMiniBundle
     /* 0x04 */ char m_szBundleFileName[32];
 }; // size 0x24
 
+struct PendingResourceLoad;
 struct PermanentBundleLoadState;
 
 class FEResourceManager : public nlTask, public nlSingleton<FEResourceManager>
@@ -88,8 +90,10 @@ public:
     static void TextureResourceLoadComplete(void* buffer, unsigned long uReadSize, unsigned long uParam);
 
 private:
+    ResourceResult IssueResourceLoadRequest(PendingResourceLoad pendingResource);
     ResourceResult IssueTextureLoadRequest(FETextureResource* pFeTextureResource, MemoryAllocator* pAllocator);
     ResourceResult IssueSceneContextSwitch(FESceneResource* pFeSceneResource);
+    ResourceResult IssueFontLoadRequest(FEFontResource* pFeFontResource);
     FEResourceHandle* FindExistingResourceInResourceList(FEResourceHandle* pFEResourceHandle);
     void RemoveResourceFromResourceList(FEResourceHandle* pFEResourceHandle);
     void AddResourceToResourceList(FEResourceHandle* pFEResourceHandle);

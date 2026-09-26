@@ -2,7 +2,8 @@
 
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePresentation.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/BaseSceneHandler.inl"

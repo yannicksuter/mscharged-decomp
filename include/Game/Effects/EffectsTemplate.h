@@ -90,6 +90,10 @@ public:
     bool IsInFront() const { return (mUnidentified037 & 1) != 0; }
     bool IsLocalSpace() const { return (mUnidentified037 & 2) != 0; }
     bool IsLit() const { return (mUnidentified037 & 4) != 0; }
+    float EvaluateProperty(unsigned int index, float time) const
+    {
+        return mProperties[index]->Evaluate(time);
+    }
 }; // size: 0xE0
 
 inline float RandomizedValue(float base, float range)

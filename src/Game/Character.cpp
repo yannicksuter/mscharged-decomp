@@ -11,6 +11,7 @@
 #include "Game/Render/ShootToScoreMeter.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Character.h"
+#include "Game/Player.h"
 
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/AiUtil.h"
@@ -68,8 +69,8 @@
 #include <stddef.h>
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/Physics/Physics.h"
 
-extern PhysicsWorld* g_PhysicsWorld;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -938,7 +939,6 @@ extern "C" void fn_80022614(UnidentifiedEventData04*)
     }
     fn_80015B38(g_pBall, false);
 }
-extern "C" void fn_80014494(cBall*);
 extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
 {
     if (pEventData->pBall != NULL
@@ -949,7 +949,6 @@ extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
     PlaySound(11, 0x94AC3A20UL, NULL, NULL);
     SetLastSoundParameter(6, pEventData->fVecZComponent);
 }
-extern "C" void fn_800145A4(cBall*);
 extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
 {
     if (pEventData->pBall != NULL)
@@ -992,7 +991,6 @@ extern "C" void fn_80021BB4(CollisionBallGoalpostData* pEventData)
         PlaySound(10, 0xEFE291A8UL, NULL, NULL);
     }
 }
-extern "C" bool fn_8002F1E0(cFielder*);
 extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
 {
     if (!fn_8002F1E0(pEventData->player))
@@ -1092,7 +1090,6 @@ extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
     ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->egg->mShooter != NULL);
     PlaySound(pEventData->egg->mShooter->mUnidentified318, 0x16BA5AE9UL, NULL, NULL);
 }
-extern "C" bool fn_8002F1E0(cFielder*);
 extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
 {
     if (fn_8002F1E0(pEventData->pFielder))
@@ -1516,7 +1513,6 @@ extern "C" void fn_80022B04(UnidentifiedEventData24* pEventData)
 }
 float lbl_806DB5F4 = 1.5f;
 extern "C" void fn_80060FF4(cGame*, const CharacterImpactEvent*);
-extern "C" void fn_800367B4(cFielder*);
 extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
 {
     CharacterImpactEvent event;
@@ -1527,7 +1523,6 @@ extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
     fn_80060FF4(g_pGame, &event);
     fn_800367B4(pEventData->pFielder);
 }
-extern "C" void fn_801BAF0C(cPlayer* pCharacter);
 
 extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
 {
@@ -1562,7 +1557,6 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
         }
     }
 }
-extern "C" void fn_80098750();
 
 extern "C" void fn_8001FE80()
 {
@@ -2025,7 +2019,6 @@ void cCharacter::CaptureHammerTransform()
     mUnidentified1A0 = nlVec3Length(*(nlVector3*)&m.e2[0][0]);
 }
 
-extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 
 nlVector3 g_v3PrevJointPosition = { 0.0f, 0.0f, 0.0f };
 unsigned char lbl_806E0C22;
@@ -2209,8 +2202,6 @@ void cCharacter::PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType)
     }
 }
 
-extern "C" bool fn_80014D38(cBall*);
-extern "C" bool fn_800392D8(cFielder*);
 extern float lbl_806E0E40;
 float lbl_806DB5D8 = 12.5f;
 float lbl_806DB5DC = 0.4f;

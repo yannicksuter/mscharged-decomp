@@ -452,19 +452,10 @@ extern "C" int THPSimpleSetBuffer(unsigned char* buffer)
     return 1;
 }
 
-static void __THPSimpleDVDCallback(nlFile*, void*, unsigned int, unsigned long)
+static void __THPSimpleDVDCallback(nlFile*, void*, unsigned int, unsigned long);
+
+static inline void readFrameAsync()
 {
-    SimpleControl.readProgress = 0;
-    SimpleControl.readBuffer[SimpleControl.readIndex].frameNumber = SimpleControl.totalReadFrame;
-    SimpleControl.totalReadFrame++;
-    SimpleControl.readBuffer[SimpleControl.readIndex].isValid = TRUE;
-    SimpleControl.curOffset += SimpleControl.readSize;
-    SimpleControl.readSize = *(u32*)SimpleControl.readBuffer[SimpleControl.readIndex].ptr;
-
-    SimpleControl.readIndex = (SimpleControl.readIndex + 1 >= 10) ? 0 : SimpleControl.readIndex + 1;
-
-    if (SimpleControl.readBuffer[SimpleControl.readIndex].isValid != 0)
-        return;
     if (SimpleControl.dvdError != 0)
         return;
     if (SimpleControl.preFetchState != 1)
@@ -482,6 +473,22 @@ static void __THPSimpleDVDCallback(nlFile*, void*, unsigned int, unsigned long)
     SimpleControl.readProgress = 1;
     nlSeek(SimpleControl.fileInfo, SimpleControl.curOffset, 0);
     nlReadAsync(SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].ptr, SimpleControl.readSize, __THPSimpleDVDCallback, 0, 0);
+}
+
+static void __THPSimpleDVDCallback(nlFile*, void*, unsigned int, unsigned long)
+{
+    SimpleControl.readProgress = 0;
+    SimpleControl.readBuffer[SimpleControl.readIndex].frameNumber = SimpleControl.totalReadFrame;
+    SimpleControl.totalReadFrame++;
+    SimpleControl.readBuffer[SimpleControl.readIndex].isValid = TRUE;
+    SimpleControl.curOffset += SimpleControl.readSize;
+    SimpleControl.readSize = *(u32*)SimpleControl.readBuffer[SimpleControl.readIndex].ptr;
+
+    SimpleControl.readIndex = (SimpleControl.readIndex + 1 >= 10) ? 0 : SimpleControl.readIndex + 1;
+
+    if (SimpleControl.readBuffer[SimpleControl.readIndex].isValid != 0)
+        return;
+    readFrameAsync();
 }
 
 extern "C" int THPSimplePreLoad(long loop)
@@ -596,6 +603,16 @@ static inline int VideoDecode(unsigned char* videoFrame)
     return 0;
 }
 
+static inline void checkPrefetch()
+{
+    int old = OSDisableInterrupts();
+    if (SimpleControl.readBuffer[SimpleControl.readIndex].isValid == 0 && SimpleControl.readProgress == 0)
+    {
+        readFrameAsync();
+    }
+    OSRestoreInterrupts(old);
+}
+
 extern "C" long THPSimpleDecode(long audioTrack)
 {
     int old;
@@ -665,27 +682,7 @@ extern "C" long THPSimpleDecode(long audioTrack)
         SimpleControl.readBuffer[SimpleControl.nextDecodeIndex].isValid = 0;
         SimpleControl.nextDecodeIndex = (SimpleControl.nextDecodeIndex + 1 >= 10) ? 0 : SimpleControl.nextDecodeIndex + 1;
 
-        old = OSDisableInterrupts();
-        do
-        {
-            if (SimpleControl.readBuffer[SimpleControl.readIndex].isValid == 0 && SimpleControl.readProgress == 0 && SimpleControl.dvdError == 0 && SimpleControl.preFetchState == 1)
-            {
-                if ((unsigned long)SimpleControl.totalReadFrame > SimpleControl.numFrames - 1)
-                {
-                    if (SimpleControl.loop != 1)
-                        break;
-                    SimpleControl.totalReadFrame = 0;
-                    SimpleControl.curOffset = SimpleControl.movieDataOffsets;
-                    SimpleControl.readSize = SimpleControl.firstFrameSize;
-                }
-
-                SimpleControl.readProgress = 1;
-                nlSeek(SimpleControl.fileInfo, SimpleControl.curOffset, 0);
-                nlReadAsync(SimpleControl.fileInfo, SimpleControl.readBuffer[SimpleControl.readIndex].ptr, SimpleControl.readSize, __THPSimpleDVDCallback, 0, 0);
-            }
-        } while (false);
-
-        OSRestoreInterrupts(old);
+        checkPrefetch();
         return 0;
     } while (false);
 

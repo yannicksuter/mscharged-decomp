@@ -15,7 +15,7 @@ class nlPolygonRegion;
 class Terrain;
 class CrowdRiot;
 class AvoidablePolygon;
-class UnidentifiedFielderInput;
+class AIContext;
 struct DetermDataEvent;
 class cFielder;
 class cPlayer;
@@ -58,6 +58,7 @@ struct UnidentifiedCircularByteQueue
 
 void DestroyPowerups();
 void DestroyGame();
+extern "C" void fn_8005B330(nlVector3*, float, float);
 
 extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt);
 
@@ -139,7 +140,7 @@ public:
     /* 0x10 */ Clock* m_pPostGameDoneClock;
 
 private:
-    /* 0x14 */ UnidentifiedFielderInput* mUnidentified014;
+    /* 0x14 */ AIContext* mUnidentified014;
 
 public:
     /* 0x18 */ int m_eGameState;

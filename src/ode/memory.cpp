@@ -4,10 +4,10 @@
  *************************************************************************/
 
 #include <ode/config.h>
+#include <stdlib.h>
 #include <ode/memory.h>
 
 extern "C" void* malloc(size_t size);
-extern "C" void free(void* ptr);
 
 static dAllocFunction* allocfn = 0;
 static dReallocFunction* reallocfn = 0;

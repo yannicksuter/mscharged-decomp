@@ -1,9 +1,10 @@
 #include "Game/AI/Fielder.h"
+#include "Game/AI/TeamPlayMachine.h"
 #include "Game/DetInput.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/RumbleActions.h"
 #include "Game/AI/FielderDesireMachine.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/AIPad.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/FielderActions.h"
@@ -48,51 +49,21 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 
 extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
-extern "C" shdStateMachine* fn_80319F94(UnidentifiedScriptMachine*, int);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 extern "C" shdStateMachine* fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" void fn_80316968(shdStateMachine*);
-extern "C" float fn_8002C0AC(PlayerTweaks*);
-extern "C" float fn_8002CF10(PlayerTweaks*);
-extern "C" float fn_8002C180(PlayerTweaks*);
-extern "C" float fn_8002CF24(PlayerTweaks*);
-extern "C" void fn_80039F24(cFielder*);
-extern "C" void fn_8003A178(cFielder*);
 extern "C" void fn_80039CF0(cFielder*, int);
-extern "C" void fn_8003EAC0(cFielder*, float);
 extern "C" float fn_800DDF54(cPlayer*, cPlayer*);
-extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fTime);
-extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
-extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
-extern "C" float fn_8002D038(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C254(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE38(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE84(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
-extern "C" float fn_800156A8(cBall* pBall);
-extern "C" void fn_800154FC(cBall* pBall, float fCharge);
-extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
-extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
 extern "C" void fn_80139D1C(int, DetInput*);
-extern "C" bool fn_8002F310(cFielder* pFielder);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
 extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_80097358(cPlayer*, float);
-extern "C" void fn_8003E354(cFielder* pFielder);
 extern FuzzyVariant fvNotSet;
-extern unsigned char lbl_806E0C61;
-extern unsigned char lbl_806E0C62;
-extern float lbl_806E3418;
-extern float lbl_806E3420;
-extern float lbl_806E3424;
-extern float lbl_806E3428;
-extern float lbl_806E342C;
 
 float lbl_806DB6E8 = 0.22f;
 float lbl_806DB74C = 0.2f;
@@ -267,10 +238,10 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     mUnidentified328 = pUnidentifiedTweaks;
 
     m_pShotMeter = new (8, false) ShotMeter();
-    mUnidentified428 = new (8, false) UnidentifiedFielderInput(this,
+    mUnidentified428 = new (8, false) AIContext(this,
         new (8, false) UnidentifiedFielderDesireMachine(),
         new (8, false) UnidentifiedFuzzyRuntime());
-    mUnidentified428->mUnidentified18->UnidentifiedVirtual2();
+    mUnidentified428->mScriptMachine->UnidentifiedVirtual2();
 
     bIsModified = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6)
@@ -313,7 +284,7 @@ cFielder::~cFielder()
         mUnidentified420->Hide(true);
     }
     delete m_pShotMeter;
-    mUnidentified428->fn_8030F74C(true, true);
+    mUnidentified428->Cleanup(true, true);
     delete mUnidentified428;
 }
 
@@ -325,11 +296,11 @@ float cFielder::fn_8002E058()
 extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction)
 {
     shdStateMachine* pAction
-        = fn_80319F94(pFielder->mUnidentified428->mUnidentified18, nAction);
+        = fn_80319F94(pFielder->mUnidentified428->mScriptMachine, nAction);
     if (pAction == 0)
     {
         pAction = fn_80319FC0(
-            pFielder->mUnidentified428->mUnidentified18, nAction);
+            pFielder->mUnidentified428->mScriptMachine, nAction);
     }
     return (Desire*)pAction;
 }
@@ -355,7 +326,7 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
     else if (fUnidentified2 >= lbl_806DB804)
         nUnidentified = 2;
 
-    if (fn_80319FEC(pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x19))
+    if (fn_80319FEC(pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x19))
     {
         nUnidentified = 2;
     }
@@ -363,10 +334,10 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
     {
         bool bUnidentified0 = false;
         bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                           pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x1D))
+                           pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
                           ->IsUnidentifiedState(1)
             || ((DesireFrozen*)fn_80319FC0(
-                    pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x1D))
+                    pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
                    ->IsUnidentifiedState(2);
         if (!bFrozen && (pFielderCollidedWith->muInvincibleStatus & 0x1F) == 0x1F)
             bUnidentified0 = true;
@@ -378,10 +349,10 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
         {
             bool bUnidentified1 = false;
             bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                               pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x1D))
+                               pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
                               ->IsUnidentifiedState(1)
                 || ((DesireFrozen*)fn_80319FC0(
-                        pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x1D))
+                        pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
                        ->IsUnidentifiedState(2);
             if (!bFrozen && (pFielderCollidedWith->muInvincibleStatus & 1))
                 bUnidentified1 = true;
@@ -455,7 +426,7 @@ bool cFielder::CanGetElectrocuted(
             bool bUnidentified = false;
             if (mUnidentified024.m_eCharacterClass == MARIO
                 && fn_80319FEC(
-                    mUnidentified428->mUnidentified18, 0x17))
+                    mUnidentified428->mScriptMachine, 0x17))
             {
                 bUnidentified = true;
             }
@@ -582,7 +553,7 @@ cFielder* cFielder::DoFindBestHitTarget()
 
 bool cFielder::fn_8003E6EC() const
 {
-    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x17);
+    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
 }
 
 void cFielder::SetSlideAttackSuccessFlag()
@@ -592,32 +563,32 @@ void cFielder::SetSlideAttackSuccessFlag()
 
 UnidentifiedFuzzyRuntimeBase* cFielder::fn_8002E198() const
 {
-    return mUnidentified428->mUnidentified14;
+    return mUnidentified428->mRuntime;
 }
 
 bool cFielder::fn_8003E6FC() const
 {
-    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x18);
+    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x18);
 }
 
 bool cFielder::fn_8003E70C() const
 {
-    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x1E);
+    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E);
 }
 
 bool cFielder::fn_8003E71C() const
 {
-    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x19);
+    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x19);
 }
 
 bool cFielder::fn_8003E72C() const
 {
-    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x1A);
+    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1A);
 }
 
 bool cFielder::fn_8003E73C() const
 {
-    return fn_80319FEC(mUnidentified428->mUnidentified18, 0x1C);
+    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C);
 }
 
 bool cFielder::fn_8003E74C() const
@@ -634,7 +605,7 @@ bool cFielder::fn_8003E7F8() const
 {
     bool result = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0
-        && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -645,7 +616,7 @@ bool cFielder::fn_8003E84C() const
 {
     bool result = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)4
-        && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -656,7 +627,7 @@ extern "C" bool fn_8003E8A0(const cFielder* pFielder)
 {
     bool result = false;
     if (pFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)1
-        && fn_80319FEC(pFielder->mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -667,7 +638,7 @@ bool cFielder::fn_8003E8F4() const
 {
     bool result = false;
     if (mUnidentified024.m_eCharacterClass == LUIGI
-        && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -678,7 +649,7 @@ bool cFielder::fn_8003E9F0() const
 {
     bool result = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0xB
-        && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -700,7 +671,7 @@ bool cFielder::fn_8003EA6C() const
 {
     bool result = false;
     if (mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -763,7 +734,7 @@ bool cFielder::CanReceivePass()
     {
         bool bExcluded
             = mUnidentified024.m_eCharacterClass == DONKEYKONG
-           && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17);
+           && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
         if (!bExcluded)
         {
             bCondition4 = true;
@@ -774,7 +745,7 @@ bool cFielder::CanReceivePass()
     {
         bool bExcluded
             = mUnidentified024.m_eCharacterClass == WALUIGI
-           && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17);
+           && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
         if (!bExcluded)
         {
             bCondition5 = true;
@@ -793,7 +764,7 @@ bool cFielder::CanReceivePass()
     if (bCondition6)
     {
         DesireFrozen* pAction = (DesireFrozen*)
-            fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D);
+            fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
         bool bActionActive = false;
         if (pAction != 0 && pAction->mUnidentifiedActive
             && pAction->meFrozenState != 0)
@@ -811,14 +782,14 @@ bool cFielder::CanReceivePass()
 
 void cFielder::Unknown8(unsigned short aParam, bool bParam)
 {
-    if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x1E))
+    if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E))
     {
         DesireConfused* pAction = (DesireConfused*)
-            fn_80319F94(mUnidentified428->mUnidentified18, 0x1E);
+            fn_80319F94(mUnidentified428->mScriptMachine, 0x1E);
         if (pAction == 0)
         {
             pAction = (DesireConfused*)fn_80319FC0(
-                mUnidentified428->mUnidentified18, 0x1E);
+                mUnidentified428->mScriptMachine, 0x1E);
         }
         pAction->fn_800BED24(&aParam);
     }
@@ -829,11 +800,11 @@ void cFielder::Unknown8(unsigned short aParam, bool bParam)
 void cFielder::fn_8003057C(int nParam)
 {
     DesireSteering* pAction = (DesireSteering*)
-        fn_80319F94(mUnidentified428->mUnidentified18, 0x22);
+        fn_80319F94(mUnidentified428->mScriptMachine, 0x22);
     if (pAction == 0)
     {
         pAction = (DesireSteering*)fn_80319FC0(
-            mUnidentified428->mUnidentified18, 0x22);
+            mUnidentified428->mScriptMachine, 0x22);
     }
     pAction->m_ThingsToAvoid = nParam;
 }
@@ -841,11 +812,11 @@ void cFielder::fn_8003057C(int nParam)
 void cFielder::fn_800305DC(float fParam)
 {
     DesireSteering* pAction = (DesireSteering*)
-        fn_80319F94(mUnidentified428->mUnidentified18, 0x22);
+        fn_80319F94(mUnidentified428->mScriptMachine, 0x22);
     if (pAction == 0)
     {
         pAction = (DesireSteering*)fn_80319FC0(
-            mUnidentified428->mUnidentified18, 0x22);
+            mUnidentified428->mScriptMachine, 0x22);
     }
     pAction->m_fAvoidanceMult = fParam;
 }
@@ -1144,10 +1115,10 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         && !pFielderCollidedWith->fn_8003E74C())
     {
         bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                           pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x1D))
+                           pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
                           ->IsUnidentifiedState(1)
             || ((DesireFrozen*)fn_80319FC0(
-                    pFielderCollidedWith->mUnidentified428->mUnidentified18, 0x1D))
+                    pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
                    ->IsUnidentifiedState(2);
         bool bUnidentified = !bFrozen && (pFielderCollidedWith->muInvincibleStatus & 1);
         if (!bUnidentified)
@@ -1161,7 +1132,7 @@ void cFielder::CollideWithWallCallback(
     cPlayer::CollideWithWallCallback(eventData);
 
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D);
+        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mUnidentifiedActive
         && pAction->meFrozenState != 0)
@@ -1229,9 +1200,9 @@ void cFielder::CollideWithWallCallback(
 
 bool cFielder::IsStuck() const
 {
-    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D))
+    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(1)
-        || ((DesireFrozen*)fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D))
+        || ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(2);
 }
 
@@ -1266,8 +1237,8 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
         {
             UnidentifiedVariantCollection params;
             params.Set(7, FuzzyVariant(lbl_806DB750));
-            fn_80319E84(mUnidentified428->mUnidentified18, 0x1E, &params,
-                fn_80319FEC(mUnidentified428->mUnidentified18, 0x1E));
+            fn_80319E84(mUnidentified428->mScriptMachine, 0x1E, &params,
+                fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E));
         }
     }
     else if (type == 2)
@@ -1317,8 +1288,8 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
                 AddRandomDirt();
                 fn_8001F1C0(1);
             }
-            fn_80319E84(mUnidentified428->mUnidentified18, 0x1B, &params,
-                fn_80319FEC(mUnidentified428->mUnidentified18, 0x1B));
+            fn_80319E84(mUnidentified428->mScriptMachine, 0x1B, &params,
+                fn_80319FEC(mUnidentified428->mScriptMachine, 0x1B));
         }
     }
     else if (type == 3)
@@ -1356,13 +1327,13 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
                 return;
             }
             fn_800470B4(this, eventData->mUnidentified10->m_pOwner);
-            if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x1C))
+            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C))
             {
                 return;
             }
             UnidentifiedVariantCollection params;
             params.Set(14, FuzzyVariant(pOwner));
-            fn_80319E84(mUnidentified428->mUnidentified18, 0x1C, &params, false);
+            fn_80319E84(mUnidentified428->mScriptMachine, 0x1C, &params, false);
         }
     }
     else if (type == 6)
@@ -1395,7 +1366,7 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
     }
     else if (type == 12)
     {
-        fn_80319E84(mUnidentified428->mUnidentified18, 0x19, 0, true);
+        fn_80319E84(mUnidentified428->mScriptMachine, 0x19, 0, true);
     }
     else if (type == 8 || type == 9)
     {
@@ -1472,10 +1443,10 @@ extern "C" bool fn_800344DC(cFielder* pFielder, const nlVector3* position)
 {
     bool bUnidentified = false;
     bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                       pFielder->mUnidentified428->mUnidentified18, 0x1D))
+                       pFielder->mUnidentified428->mScriptMachine, 0x1D))
                       ->IsUnidentifiedState(1)
         || ((DesireFrozen*)fn_80319FC0(
-                pFielder->mUnidentified428->mUnidentified18, 0x1D))
+                pFielder->mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(2);
     if (!bFrozen && (pFielder->muInvincibleStatus & 2))
         bUnidentified = true;
@@ -1694,7 +1665,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_tMoveToTurboTimer.UnidentifiedClear();
         if (fn_8003EA6C())
         {
-            if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
             {
                 fn_80316968(fn_8002E08C(this, 0x17));
             }
@@ -1718,7 +1689,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         mUnidentified1E4.m_eLastPadAction = 50;
         if (fn_8003EA6C())
         {
-            if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
             {
                 fn_80316968(fn_8002E08C(this, 0x17));
             }
@@ -1946,7 +1917,7 @@ void cFielder::DoClearBall()
                 {
                     bool bExcluded
                         = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
-                       && fn_80319FEC(pFielder->mUnidentified428->mUnidentified18, 0x17);
+                       && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
                     if (!bExcluded)
                     {
                         bCondition4 = true;
@@ -1957,7 +1928,7 @@ void cFielder::DoClearBall()
                 {
                     bool bExcluded
                         = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
-                       && fn_80319FEC(pFielder->mUnidentified428->mUnidentified18, 0x17);
+                       && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
                     if (!bExcluded)
                     {
                         bCondition5 = true;
@@ -1976,7 +1947,7 @@ void cFielder::DoClearBall()
                 if (bCondition6)
                 {
                     DesireFrozen* pAction = (DesireFrozen*)
-                        fn_80319FC0(pFielder->mUnidentified428->mUnidentified18, 0x1D);
+                        fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D);
                     bool bActionActive = false;
                     if (pAction != 0 && pAction->mUnidentifiedActive
                         && pAction->meFrozenState != 0)
@@ -2288,9 +2259,9 @@ void cFielder::DoRegularShooting(bool bParam)
     if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
     {
         nBallState = 8;
-        if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x1C))
+        if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C))
         {
-            fn_80319E58(mUnidentified428->mUnidentified18, 0x1C);
+            fn_80319E58(mUnidentified428->mScriptMachine, 0x1C);
         }
         if (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12)
         {
@@ -2656,7 +2627,7 @@ bool cFielder::IsFallenDown() const
 bool cFielder::fn_80038918() const
 {
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D);
+        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mUnidentifiedActive
         && pAction->meFrozenState != 0)
@@ -2736,7 +2707,7 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
 
     bool bUnidentified = false;
     if (mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(mUnidentified428->mUnidentified18, 0x17))
+        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
     {
         bUnidentified = true;
     }
@@ -2758,7 +2729,7 @@ bool cFielder::InitDesire(eFielderDesireState eDesireType, float fConfidence,
     params.Set(0, FuzzyVariant(opt1));
     params.Set(1, FuzzyVariant(opt2));
 
-    bool bDesireInitSuccess = mUnidentified428->mUnidentified18
+    bool bDesireInitSuccess = mUnidentified428->mScriptMachine
         ->UnidentifiedVirtual5(eDesireType, &params, true) != 0;
     return bDesireInitSuccess;
 }
@@ -2775,7 +2746,7 @@ void cFielder::PrePhysicsUpdate()
     cPlayer::PrePhysicsUpdate();
 
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mUnidentified18, 0x1D);
+        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mUnidentifiedActive
         && pAction->meFrozenState != 0)
@@ -2805,7 +2776,7 @@ void cFielder::Update(float fDeltaT)
     SetPlayerAudioController(this);
     fn_8003EAC0(this, fDeltaT);
     cPlayer::Update(fDeltaT);
-    mUnidentified428->fn_8030F800(true, fDeltaT);
+    mUnidentified428->Update(true, fDeltaT);
 
     if (!mUnidentified1E4.m_bSkipActionUpdate)
     {
@@ -2840,13 +2811,13 @@ void cFielder::Update(float fDeltaT)
 ePowerUpType cFielder::GetPowerupType() const
 {
     return ((DesireUsePowerup*)fn_80319FC0(
-        mUnidentified428->mUnidentified18, 0x11))->GetPowerupType();
+        mUnidentified428->mScriptMachine, 0x11))->GetPowerupType();
 }
 
 void cFielder::UseTeamPowerup(cFielder* pTarget)
 {
     ((DesireUsePowerup*)fn_80319FC0(
-        mUnidentified428->mUnidentified18, 0x11))->fn_800D3968(
+        mUnidentified428->mScriptMachine, 0x11))->fn_800D3968(
         pTarget, POWER_UP_NONE, true);
 }
 
@@ -3156,7 +3127,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         return;
     }
 
-    if (fn_80319FEC(mUnidentified428->mUnidentified18, 0x1E)
+    if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E)
         && !IsFallenDown()
         && (mUnidentified024.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
     {
@@ -3462,7 +3433,7 @@ void cFielder::Unknown10(
     const nlVector3& v3Position, unsigned short aDirection)
 {
     cPlayer::Unknown10(v3Position, aDirection);
-    mUnidentified428->mUnidentified18->UnidentifiedVirtual4(false);
+    mUnidentified428->mScriptMachine->Reset(false);
     CleanUpAction(ACTION_NEED_ACTION);
     mtPowerupThrowTime.UnidentifiedClear();
     m_tMoveToTurboTimer.UnidentifiedClear();
@@ -3958,12 +3929,12 @@ void cFielder::Unknown12(RunningChecksum* pChecksum)
 
 UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder)
 {
-    return pFielder->mUnidentified428->mUnidentified18;
+    return pFielder->mUnidentified428->mScriptMachine;
 }
 
 eFielderDesireState cFielder::fn_8002E060()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0 && machine->mUnidentified004 != 0)
     {
         return (eFielderDesireState)machine->mUnidentified004->mUnidentifiedState;
@@ -3989,7 +3960,7 @@ extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
 
 void cFielder::EndDesire()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0)
     {
         fn_803198F4(machine);
@@ -4026,21 +3997,20 @@ void cFielder::fn_80036A38(int nParam, float fAmount)
     }
 }
 
-extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
 
 void cFielder::fn_8002E0FC()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0)
     {
         fn_803198F4(machine);
-        fn_80319DA0(mUnidentified428->mUnidentified18);
+        fn_80319DA0(mUnidentified428->mScriptMachine);
     }
 }
 
 int cFielder::fn_8002E9D0() const
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mUnidentified18;
+    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0 && machine->mUnidentified008 != 0)
     {
         return machine->mUnidentified008->mUnidentifiedState;
@@ -4052,10 +4022,10 @@ bool cFielder::fn_8003499C() const
 {
     bool result = false;
     int state;
-    if (mUnidentified428->mUnidentified18 != 0
-        && mUnidentified428->mUnidentified18->mUnidentified004 != 0)
+    if (mUnidentified428->mScriptMachine != 0
+        && mUnidentified428->mScriptMachine->mUnidentified004 != 0)
     {
-        state = mUnidentified428->mUnidentified18->mUnidentified004
+        state = mUnidentified428->mScriptMachine->mUnidentified004
                     ->UnidentifiedGetState();
     }
     else
@@ -4065,7 +4035,7 @@ bool cFielder::fn_8003499C() const
     if (state == 0x16)
     {
         result = ((DesireReceivePass*)
-            mUnidentified428->mUnidentified18->mUnidentified004)->fn_800C0E54();
+            mUnidentified428->mScriptMachine->mUnidentified004)->fn_800C0E54();
     }
     return result;
 }

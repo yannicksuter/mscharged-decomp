@@ -22,6 +22,8 @@ class DebugWriteCache;
 class DrawableModel;
 class DrawableObject;
 class PhysicsAIBall;
+class PhysicsPatch;
+class EffectsGroup;
 class RunningChecksum;
 class Plat3dSoundSrc;
 
@@ -174,5 +176,40 @@ LiveBallTrail* fn_8001B284(unsigned int nIndex);
 unsigned int fn_8001B30C();
 
 extern cBall* g_pBall;
+
+
+// Shared functions and data from Game/Ball.cpp.
+extern "C" void fn_80014494(cBall*);
+extern "C" void fn_8001458C(cBall* pBall);
+extern "C" void fn_800145A4(cBall*);
+extern "C" bool fn_80014D38(cBall*);
+extern "C" bool fn_80014E20(cBall* pBall);
+extern "C" bool fn_80014EA4(cBall* pBall, const EffectsGroup* pGroup);
+extern "C" void fn_800152B4(cBall* pBall);
+extern "C" void fn_80017448(cBall*, float);
+extern "C" void fn_80017F18(cBall*);
+extern "C" void fn_800189C4(cBall* pBall);
+extern "C" void fn_80018A00();
+extern "C" void fn_8001929C();
+extern "C" void fn_800193A0(void*);
+extern "C" void fn_800194A4(void*);
+extern "C" void fn_800195D8();
+extern "C" void fn_800196FC(void*);
+extern "C" void fn_80019718(void*);
+extern "C" void fn_80019814(void*);
+extern "C" void fn_80019910(PhysicsPatch*);
+extern "C" void fn_80019F10(void*);
+extern "C" void fn_8001A00C(void*);
+extern "C" void fn_8001A108(int, int);
+extern "C" void fn_8001B314(unsigned int nNumTrails);
+
+
+extern "C" void fn_800154FC(cBall* pBall, float fParam);
+extern "C" float fn_800156A8(cBall* pBall);
+extern "C" bool fn_80016768(cBall* pBall);
+extern "C" bool fn_800167A8(cBall* pBall);
+extern "C" void fn_800180F4( cBall* pBall, nlVector3* pPosition, float fTime);
+extern "C" void fn_8001847C(cBall* pBall, bool bParam);
+extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);
 
 #endif // GAME_BALL_H

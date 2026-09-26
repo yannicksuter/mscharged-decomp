@@ -8,12 +8,7 @@
 #include "Game/Audio/XSoundCueHandle.h"
 #include "NL/nlChunk.h"
 #include "NL/nlSlotPool.h"
-
-struct SoundInstance;
-extern SlotPool<SoundInstance> sSoundInstancePool;
-
-extern "C" void fn_802F4904(void* controller, float dt);
-extern "C" void fn_802F4958(void* controller);
+#include "Game/Audio/SoundInstancePool.h"
 
 bool UnidentifiedAudioBundleManager_802ECD34::Initialize()
 {

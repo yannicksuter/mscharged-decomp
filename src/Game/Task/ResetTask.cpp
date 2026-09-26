@@ -10,6 +10,7 @@
 #include "NL/globalpad.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/PadActions.h"
 
 #define OSSleepMilliseconds(msec) OSSleepTicks(OSMillisecondsToTicks((OSTime)msec))
 
@@ -22,7 +23,6 @@ bool ResetTask::s_checkCardRemoved = false;
 
 u32 softResetTime[4] = { 0, 0, 0, 0 };
 
-extern bool g_bEnableGamecubePadMonkey;
 
 bool lbl_806E107C;
 

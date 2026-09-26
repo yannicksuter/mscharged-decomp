@@ -15,7 +15,6 @@
 #include "Game/Field.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" int GetAvoidableIndex(eAvoidableThings);
 extern "C" AvoidController* fn_8002E144(cFielder*);
 
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
@@ -75,7 +74,6 @@ public:
     nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
 };
 
-extern "C" const nlVector3& fn_80040318(cFielder*);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" float fn_8002CE14(const PlayerTweaks*);
 bool lbl_806E0BB8;
@@ -90,7 +88,6 @@ extern "C" void fn_802BCE50(
 
 
 
-extern "C" void fn_8000F178(AvoidController* controller);
 inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
     : mTimer()
 {

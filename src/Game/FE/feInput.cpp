@@ -2,9 +2,9 @@
 
 #include "NL/globalpad.h"
 
+#include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-#include <math.h>
 #include <string.h>
 
 struct FEPadData
@@ -305,54 +305,45 @@ bool FEInput::HasInputLock(BaseSceneHandler* pRequestingSceneHandler) const
     return m_nExclusiveInputSceneHashIDStack[depth - 1].m_pBaseSceneHandler == pRequestingSceneHandler;
 }
 
+static inline bool IsAtLeast(float value, float threshold)
+{
+    return value - threshold > 0.0001f || nlNear(value, threshold);
+}
+
 void FEInput::Update(float)
 {
-    for (int padIndex = 0; padIndex < 4; padIndex++)
+    for (int i = 0; i < 4; i++)
     {
-        mUnidentified024[padIndex] = 0;
-        for (int buttonIndex = 0; buttonIndex < 13; buttonIndex++)
+        mUnidentified024[i] = 0;
+        for (int buttonindex = 0; buttonindex < 13; buttonindex++)
         {
-            int button = g_pPadManager->GetPad(padIndex)->GetButtonMask(buttonIndex);
-            g_aFEPadData[padIndex].bIsPressed[buttonIndex] = false;
+            int button = g_pPadManager->GetPad(i)->GetButtonMask(buttonindex);
+            g_aFEPadData[i].bIsPressed[buttonindex] = false;
 
-            if (g_pPadManager->GetPad(padIndex)->IsPressed(button, false))
+            if (g_pPadManager->GetPad(i)->IsPressed(button, false))
             {
-                if (g_pPadManager->GetPad(padIndex)->PlatJustPressed(button, false))
+                if (g_pPadManager->GetPad(i)->PlatJustPressed(button, false))
                 {
-                    g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex]
-                        = g_pPadManager->GetPad(padIndex)->GetButtonStateTime(button, false);
-                    g_aFEPadData[padIndex].bIsPressed[buttonIndex] = true;
+                    g_aFEPadData[i].fButtonTimeSinceLastRepeat[buttonindex]
+                        = g_pPadManager->GetPad(i)->GetButtonStateTime(button, false);
+                    g_aFEPadData[i].bIsPressed[buttonindex] = true;
                 }
                 else
                 {
-                    float buttonStateTime = g_pPadManager->GetPad(padIndex)->GetButtonStateTime(button, false);
-                    float diff = buttonStateTime - g_aFEPadData[padIndex].fButtonInitialDelay[buttonIndex];
-                    bool bShouldRepeat = true;
-                    float timeSinceRepeat = g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex];
-                    float repeatRate = g_aFEPadData[padIndex].fButtonRepeatRate[buttonIndex];
-                    if (!(diff > 0.0001f) && !((float)fabs(diff) <= 0.0001f))
+                    float ontime = g_pPadManager->GetPad(i)->GetButtonStateTime(button, false);
+                    float lastrepeat = g_aFEPadData[i].fButtonTimeSinceLastRepeat[buttonindex];
+                    float repeatrate = g_aFEPadData[i].fButtonRepeatRate[buttonindex];
+                    if (IsAtLeast((double)ontime, g_aFEPadData[i].fButtonInitialDelay[buttonindex])
+                        && IsAtLeast(ontime - lastrepeat, repeatrate))
                     {
-                        bShouldRepeat = false;
-                    }
-                    if (bShouldRepeat)
-                    {
-                        float diff2 = buttonStateTime - timeSinceRepeat - repeatRate;
-                        bool bShouldRepeat2 = true;
-                        if (!(diff2 > 0.0001f) && !((float)fabs(diff2) <= 0.0001f))
-                        {
-                            bShouldRepeat2 = false;
-                        }
-                        if (bShouldRepeat2)
-                        {
-                            g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex] = buttonStateTime;
-                            g_aFEPadData[padIndex].bIsPressed[buttonIndex] = true;
-                        }
+                        g_aFEPadData[i].fButtonTimeSinceLastRepeat[buttonindex] = ontime;
+                        g_aFEPadData[i].bIsPressed[buttonindex] = true;
                     }
                 }
             }
             else
             {
-                g_aFEPadData[padIndex].fButtonTimeSinceLastRepeat[buttonIndex] = 0.0f;
+                g_aFEPadData[i].fButtonTimeSinceLastRepeat[buttonindex] = 0.0f;
             }
         }
     }

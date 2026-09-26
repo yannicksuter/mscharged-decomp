@@ -3,6 +3,9 @@
 
 #include "Game/Camera/BaseCam.h"
 
+extern float lbl_806DC510[2];
+extern u8 lbl_806E0F18[8];
+
 enum ReplayCameraPosition
 {
     REPLAY_CAMERA_POSITION_INSIDE_NET = 0,

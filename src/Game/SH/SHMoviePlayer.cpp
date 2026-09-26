@@ -2,7 +2,8 @@
 #include "NL/nlFunction.inl"
 #include "Game/BasicStadium.h"
 #include "Game/EventRegistry.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feTextureResource.h"
 #include "Game/GameInfo.h"
@@ -15,9 +16,9 @@
 #include "NL/gl/glState.h"
 #include "NL/nlConfig.h"
 #include "NL/nlString.h"
+#include "Game/Task/GameRenderTask.h"
+#include "Game/main.h"
 
-extern bool g_e3_Build;
-extern bool g_bRenderWorld;
 extern "C" unsigned char SCGetSoundMode();
 extern "C" void THPSimpleSetVolume(int, int);
 extern "C" char* strstr(const char*, const char*);

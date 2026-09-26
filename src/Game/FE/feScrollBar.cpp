@@ -4,7 +4,8 @@
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlBind.h"

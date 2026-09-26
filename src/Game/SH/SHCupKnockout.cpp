@@ -6,7 +6,8 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feCupFlow.h"
 #include "Game/FE/feDPD.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -29,10 +30,7 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void fn_80208950(TLComponentInstance*, unsigned short*, unsigned long);
 extern "C" void fn_80207724(int);
-extern "C" void fn_802088B4();
-extern "C" void fn_80207060(bool);
 
 CupKnockoutScene::CupKnockoutScene()
     : mUnidentified2DC(true)

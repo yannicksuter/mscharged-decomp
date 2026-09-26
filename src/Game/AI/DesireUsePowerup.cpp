@@ -1,7 +1,10 @@
 #include "Game/AI/DesireUsePowerup.h"
+#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/Powerups.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -18,21 +21,14 @@
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" shdStateMachine* fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
-extern "C" cTeam* fn_800D6670(cFielder*);
-extern "C" float fn_800D85F8(cFielder*);
-extern "C" float fn_800E0034();
-extern "C" bool fn_8031A04C();
 extern "C" DesireUpdate fn_80041B6C(
     void*, const unsigned int&, cFielder*);
 extern "C" UnidentifiedStateTransition* fn_80315A14(
     UnidentifiedStateTransition*, void*);
 extern "C" void fn_8009A5D8(
     cFielder*, ePowerUpType, int, unk_8009A5D8*);
-extern "C" void fn_80148074(PowerupUsedEventData*);
 extern "C" bool fn_80099C80(ePowerUpType);
-extern "C" bool fn_80099C94(ePowerUpType);
 extern "C" bool fn_80099CE8(ePowerUpType);
-extern "C" bool fn_80099CC4(ePowerUpType);
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on
 static int lbl_806DC39C = 0;
@@ -44,11 +40,11 @@ static bool lbl_806DC3A4 = true;
  * Offset/Address/Size: 0x0 | 0x800D2074 | size: 0xF48
  */
 extern "C" DesireUpdate fn_800D2074(
-    UnidentifiedFielderInput* input)
+    AIContext* input)
 {
     DesireUpdate result(FT_INT, lbl_806DC39C);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
-    unsigned long key = input->fn_8030F9B4(
+    unsigned long key = input->GetTimerKey(
         (unsigned long)fn_800D2074, 1);
 
     if (UserControlledT(fn_800D6670(pFielder))
@@ -56,12 +52,12 @@ extern "C" DesireUpdate fn_800D2074(
     {
         result = 1;
     }
-    else if (fn_8031A04C() && !input->fn_8030FB7C(key)
+    else if (fn_8031A04C() && !input->IsTimerRunning(key)
         && !fn_800E0034())
     {
-        input->fn_8030FA10(key, 0.4f);
+        input->SetTimer(key, 0.4f);
         unsigned int hash = nlStringHash("TransDesireUsePowerup");
-        result = fn_80041B6C(input->mUnidentified14, hash, pFielder);
+        result = fn_80041B6C(input->mRuntime, hash, pFielder);
     }
 
     return DesireUpdate(result, -1.0f, -1.0f);
@@ -85,7 +81,7 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
     mePowerup = POWER_UP_NONE;
     mnNumPowerups = 0;
     mpTarget = NULL;
-    mtPowerupEffectTime.m_unk0
+    mtPowerupEffectTime.m_uWasRunning
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
     m_pFielder->m_nPowerupAnimID = -1;
@@ -143,7 +139,7 @@ void DesireUsePowerup::UnidentifiedCleanup()
     mePowerup = POWER_UP_NONE;
     mnNumPowerups = 0;
     mpTarget = NULL;
-    mtPowerupEffectTime.m_unk0
+    mtPowerupEffectTime.m_uWasRunning
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
     m_pFielder->m_nPowerupAnimID = -1;
@@ -205,7 +201,7 @@ void DesireUsePowerup::fn_800D3A50(
     mePowerup = POWER_UP_NONE;
     mnNumPowerups = 0;
     mpTarget = NULL;
-    mtPowerupEffectTime.m_unk0
+    mtPowerupEffectTime.m_uWasRunning
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
     m_pFielder->m_nPowerupAnimID = -1;
@@ -324,7 +320,7 @@ inline void DesireUsePowerup::UnidentifiedResetPowerupState()
     mePowerup = POWER_UP_NONE;
     mnNumPowerups = 0;
     mpTarget = NULL;
-    mtPowerupEffectTime.m_unk0
+    mtPowerupEffectTime.m_uWasRunning
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
     m_pFielder->m_nPowerupAnimID = -1;

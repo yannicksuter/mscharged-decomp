@@ -10,7 +10,8 @@
 #include "Game/GameSceneManager.h"
 #include "Game/GameInfo.h"
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feManager.h"
 #include "Game/FE/fePointer.inl"
@@ -186,7 +187,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             else
             {
                 FEAudio::PlayAnimAudioEvent(0x94A22E0E, 0, 0, 1);
-                GameSceneManager::Instance()->Push((SceneList)0x1B, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_GAMEPLAY_OPTIONS, SCREEN_FORWARD, true);
             }
             FrontEnd::SetControllerState();
             return;

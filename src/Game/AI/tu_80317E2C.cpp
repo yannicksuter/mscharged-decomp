@@ -1,6 +1,7 @@
 #include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/Desire.h"
 #include "Game/Sys/debug.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/FuzzyAIRuntime.h"
@@ -37,7 +38,7 @@ extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311744(void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 extern "C" void fn_80315A64(
-    UnidentifiedStateTransition*, UnidentifiedFielderInput*,
+    UnidentifiedStateTransition*, AIContext*,
     UnidentifiedVariant_80054AB8*, UnidentifiedFuzzyRuntimeValue*);
 extern "C" void fn_80316980(shdStateMachine*, bool);
 extern "C" bool fn_803169DC(
@@ -46,13 +47,10 @@ extern "C" bool fn_80316A84(
     shdStateMachine*, UnidentifiedVariantCollection*, bool);
 extern "C" void fn_80317010(
     shdStateMachine*, UnidentifiedVariant_80054AB8*, bool, float);
-extern "C" float fn_80314538(float, float, float, float, float);
-extern "C" void fn_80319DA0(UnidentifiedScriptMachine*);
 extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 
 extern float (*lbl_806DF560)();
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 char lbl_805302A0[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";
@@ -73,10 +71,10 @@ extern const float lbl_806E6890;
 extern const float lbl_806E6894;
 extern const float lbl_806E6898[2];
 
-extern "C" UnidentifiedFielderInput* fn_80317E2C(
+extern "C" AIContext* fn_80317E2C(
     UnidentifiedScriptMachine* context)
 {
-    return context->mUnidentified064;
+    return context->mAIContext;
 }
 
 extern "C" bool fn_80317E34(
@@ -130,7 +128,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
 }
 
 UnidentifiedScriptMachine::UnidentifiedScriptMachine(
-    int stateCount, bool deleteStates, UnidentifiedFielderInput* input,
+    int stateCount, bool deleteStates, AIContext* input,
     const char* name)
     : mUnidentified018()
 {
@@ -138,11 +136,11 @@ UnidentifiedScriptMachine::UnidentifiedScriptMachine(
     mUnidentified004 = 0;
     mUnidentified008 = 0;
     mUnidentified014 = -1;
-    mUnidentified064 = input;
+    mAIContext = input;
     mUnidentified068 = deleteStates;
     if (input != 0)
     {
-        input->mUnidentified18 = this;
+        input->mScriptMachine = this;
     }
 
     unsigned long size = stateCount * sizeof(shdStateMachine*);
@@ -221,7 +219,7 @@ void UnidentifiedScriptMachine::UnidentifiedAddState(
     machine->UnidentifiedSetContext(this);
 }
 
-void UnidentifiedScriptMachine::UnidentifiedVirtual4(bool param)
+void UnidentifiedScriptMachine::Reset(bool param)
 {
     UnidentifiedVirtual6();
     fn_80319DA0(this);
@@ -242,7 +240,7 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual4(bool param)
 extern "C" shdStateMachine* fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 
-void UnidentifiedScriptMachine::UnidentifiedVirtual3(float deltaTime)
+void UnidentifiedScriptMachine::Update(float deltaTime)
 {
     UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
     bool selectState = false;
@@ -332,8 +330,6 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual3(float deltaTime)
     }
 }
 
-extern "C" bool fn_8031A04C();
-extern "C" float fn_8031A0C8(float, float);
 
 void UnidentifiedScriptMachine::UnidentifiedVirtual7()
 {
@@ -350,7 +346,7 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
     {
         float start = lbl_806DF560();
         UnidentifiedVariant_80054AB8 result;
-        fn_80315A64(&mUnidentified00C, mUnidentified064, &result, 0);
+        fn_80315A64(&mUnidentified00C, mAIContext, &result, 0);
         fn_8031A0C8(start, lbl_806DF560());
 
         if ((unsigned int)result.GetType() == FT_UNSPECIFIED)

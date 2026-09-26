@@ -48,6 +48,7 @@
 #include "NL/gl/glMaterialParameters.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glTexture.h"
+#include "Game/Transitions/ModelTransition.h"
 
 extern "C" bool lbl_806DCD60;
 extern "C" unsigned long OSGetConsoleType(void);
@@ -61,7 +62,6 @@ void fn_8027F0D8(void*, unsigned long, void*);
 void fn_8027F12C(void*, unsigned long, void*);
 void fn_8027F174(glModel*);
 }
-extern void (*lbl_806E217C)(glModel*);
 
 NisPlayer* NisPlayer::sInstance;
 bool g_ForceDoubleBallTransition;
@@ -572,7 +572,7 @@ NisPlayer::NisPlayer()
     {
         mUnidentified34440[i] = NULL;
     }
-    lbl_806E217C = fn_8027F174;
+    g_ModelTransitionRenderCallback = fn_8027F174;
     mUnidentified343F8[0] = '\0';
 }
 

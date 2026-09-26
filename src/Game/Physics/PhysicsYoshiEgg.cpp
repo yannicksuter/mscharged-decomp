@@ -17,7 +17,6 @@
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" bool fn_800167A8(cBall*);
 
 PhysicsYoshiEgg::PhysicsYoshiEgg(YoshiEggObject* egg, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)

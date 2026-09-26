@@ -1,4 +1,6 @@
 #include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
+#include "Game/Player.h"
+#include "Game/CharacterTriggers.h"
 #include "NL/nlIntersection.h"
 #include "Game/Sys/audio.h"
 #include "Game/DetInput.h"
@@ -9,7 +11,7 @@
 #include "Game/Sys/debug.h"
 #include "Game/AI/Fielder.h"
 #include "NL/gl/glView.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/Render/BulletBill.h"
 
 #include "Game/Render/RLView.h"
@@ -74,105 +76,42 @@ static const nlVector3 v3Up = { 0.0f, 0.0f, 1.0f };
 extern FuzzyVariant fvNotSet;
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
-extern "C" void fn_8002E580(cFielder* pFielder);
 extern "C" bool fn_8003E948(cFielder* pFielder);
 extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
-extern "C" void fn_8003B854(cFielder* pFielder);
-extern "C" void fn_8003B790(cFielder* pFielder);
-extern "C" void fn_8003B6CC(cFielder* pFielder);
-extern "C" void fn_8003B2EC(cFielder* pFielder);
-extern "C" void fn_8003B384(cFielder* pFielder);
-extern "C" void fn_8003B190(cFielder* pFielder);
-extern "C" void fn_8003B4B4(cFielder* pFielder);
-extern "C" void fn_8003B41C(cFielder* pFielder);
-extern "C" void fn_8003B664(cFielder* pFielder);
-extern "C" void fn_8003B5FC(cFielder* pFielder);
-extern "C" void fn_8003B254(cFielder* pFielder);
-extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
-extern "C" float fn_8002CD2C(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002BFA8(PlayerTweaks* pTweaks, float fParam);
 
-extern "C" cFielder* fn_80096F54(cPlayer* pPlayer, bool bParam);
-extern "C" bool fn_8003881C(cFielder* pFielder);
 extern "C" void* fn_80319FC0(void* pParam, int nParam);
 extern "C" void fn_80316968(void* pParam);
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
-extern "C" void fn_80097358(cPlayer* pPlayer, float fParam);
 extern "C" void fn_800978E8(cPlayer* pPlayer, int nParam);
-extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 extern bool lbl_806DB5A8;
-extern "C" void fn_8003A544(cFielder* pFielder);
-extern "C" float fn_8002CFB0(PlayerTweaks* pTweaks);
 extern "C" void fn_8005F03C(void* pParam, cFielder** ppFielder);
 extern "C" void fn_8005CBF0(void* pParam);
 extern "C" void fn_801B9C90(const char* pName);
-extern "C" float fn_8002C5A4(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C180(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CF10(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C0AC(PlayerTweaks* pTweaks);
-extern "C" void fn_800154FC(cBall* pBall, float fParam);
 extern "C" void fn_801B75C8(cFielder* pFielder, int, int, int, int);
 extern "C" void fn_800395C0(cFielder* pFielder);
-extern "C" float fn_8002C7E8(PlayerTweaks* pTweaks);
-extern "C" void fn_801BA034();
 
 extern "C" void fn_8005CDD0(void* pParam);
-extern "C" float fn_8002CF9C(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C730(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C678(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C6E8(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CFC4(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CF88(PlayerTweaks* pTweaks);
 extern "C" float fn_80030750(cFielder* pFielder);
-extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
-extern "C" float fn_8002D050(PlayerTweaks* pTweaks);
-extern "C" bool fn_8003C180(cFielder* pFielder);
-extern "C" float fn_800DBAB0(cFielder* pFielder);
 extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
-extern "C" bool fn_8003D9BC(cFielder* pFielder);
 extern "C" bool fn_8003E8A0(cFielder* pFielder);
-extern "C" void fn_801B98A0(cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
-extern "C" void fn_801B8FF8(cFielder* pFielder);
-extern "C" void fn_8003C560(cFielder* pFielder, int nParam1, int nParam2);
-extern "C" void fn_801B90F8(cFielder* pFielder);
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 extern "C" void fn_80039CF0(cFielder* pFielder, int nParam);
 extern "C" void fn_80147F2C(void* pParam);
-extern "C" bool fn_800167A8(cBall* pBall);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
-extern "C" float fn_8002C800(PlayerTweaks* pTweaks);
-extern "C" float fn_8002CF24(PlayerTweaks* pTweaks);
 extern "C" void fn_8005EBF8(void* pParam, void* pNode);
 extern "C" void fn_8005ED64(void* pParam, void* pNode);
-extern "C" bool fn_80014E20(cBall* pBall);
-extern "C" bool fn_80036F88(cFielder* pFielder);
-extern "C" void fn_8003D8A4(cFielder* pFielder, float fDeltaT);
-extern "C" float fn_8002C8D4(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BFB8(PlayerTweaks* pTweaks);
-extern "C" void fn_8003B920(cFielder* pFielder);
-extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
-extern "C" void fn_8003A5C8(cFielder* pFielder);
-extern "C" void fn_8003ADAC(cFielder* pFielder);
-extern "C" void fn_8003B54C(cFielder* pFielder);
-extern "C" void fn_8003B020(cFielder* pFielder);
-extern "C" void fn_8003B0D8(cFielder* pFielder);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
-extern "C" void fn_801B8FF4(cFielder* pFielder);
 extern "C" void fn_801B7E4C(const char* pName, cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
 extern "C" void fn_8002E798(cFielder* pFielder);
 extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
-extern "C" void fn_801BB640(cFielder* pFielder, int nParam);
-extern "C" void fn_8001458C(cBall* pBall);
 
-extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
 extern "C" void ResetButtonStateTicks(void* pPad, int nParam, int nParam2);
 
 struct UnidentifiedActionTarget806E0C94
@@ -208,9 +147,6 @@ public:
     /* 0x04 */ u8 mUnknown04[0x28];
     /* 0x2C */ float mUnidentified2C;
 };
-extern "C" void fn_801BA4C8(const char* szName);
-extern "C" float fn_800499EC(cFielder* pFielder, int nParam);
-extern "C" float fn_80049CC0(cFielder* pFielder, int nParam);
 extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
 extern "C" void fn_8005F630(cGame* pGame, void* pEvent);
 extern "C" void fn_80111D7C(float fParam);
@@ -223,7 +159,6 @@ struct UnidentifiedOnlineState
 extern UnidentifiedOnlineState* gNetworkInputRecording;
 bool IsNetworkOrRecordedGame(void);
 extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
-extern BaseGameSceneManager* g_pOverlayManager;
 
 struct UnidentifiedSkillshotNode
 {
@@ -233,8 +168,6 @@ struct UnidentifiedSkillshotNode
 extern BasicSlotPool<UnidentifiedSkillshotNode> lbl_805712F8;
 
 extern AvoidablePolygon* lbl_806E0C74;
-extern "C" void fn_801B94EC(
-    cFielder* pFielder, const nlVector3* pPosition, const nlVector3* pNormal);
 extern "C" void fn_801B968C(cFielder* pFielder);
 
 static int gHitReactAnims[3][4] = {
@@ -1311,7 +1244,7 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
     }
     else
     {
-        finalPassTarget = fn_80096F54(this, bVolleyPass);
+        finalPassTarget = static_cast<cFielder*>(fn_80096F54(this, bVolleyPass));
     }
 
     mActionLooseBallPassVars.passTarget = finalPassTarget;
@@ -3398,7 +3331,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
             v3EffectPos.x = wallPosition.x;
             v3EffectPos.y = wallPosition.y;
             v3EffectPos.z = jointPos.z;
-            fn_801B94EC(this, &v3EffectPos, &wallNormal);
+            fn_801B94EC(this, v3EffectPos, wallNormal);
         }
         else
         {

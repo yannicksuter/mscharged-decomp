@@ -35,10 +35,8 @@
 
 class EffectsGroup;
 
-extern CollisionSpace* g_CollisionSpace;
 
 extern "C" void fn_8017472C(void*);
-extern "C" bool fn_800977A4(cFielder*, float);
 
 extern SlotPool<UnidentifiedEventData30> lbl_80570160;
 

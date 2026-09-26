@@ -5,7 +5,8 @@
 #include "Game/FE/FEAudio.h"
 
 #include "Game/GameSceneManager.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/tlComponentInstance.h"
@@ -59,6 +60,265 @@ SHOptionsCheatsList::~SHOptionsCheatsList()
     if (scene != 0)
     {
         scene->SetButtons(mSavedNavigationButtons, true);
+    }
+}
+
+void SHOptionsCheatsList::Update(float fDeltaT)
+{
+    BaseSceneHandler::Update(fDeltaT);
+
+    int state = mState;
+    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    {
+        TLSlide* slide = mPresentation->m_currentSlide;
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
+        {
+            for (int pad = 0; pad < 4; ++pad)
+            {
+                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
+            }
+            return;
+        }
+
+        if (state == 0)
+        {
+            GetNavigationScene()->SetButtons(4, true);
+            if (!mButtonsInitialized)
+            {
+                InitializeButtons();
+                mButtonsInitialized = true;
+            }
+            mState = 1;
+        }
+        else if (state == 2)
+        {
+            GameSceneManager::Instance()->Pop();
+            ((SHGameplayOptions*)GameSceneManager::Instance()->GetScene(SCENE_GAMEPLAY_OPTIONS))->UpdateCheatText();
+            return;
+        }
+        else if (state == 3)
+        {
+            GameSceneManager::Instance()->Pop();
+            return;
+        }
+    }
+
+    for (int pad = 0; pad < 4; ++pad)
+    {
+        TLComponentInstance* controller = GetPointerInstance(pad);
+        if ((unsigned int)pad != gFEControllerIndex)
+        {
+            controller->SetActiveSlide("waiting", true, false);
+            continue;
+        }
+
+        if (mPointerInsideCounts[pad] > 0)
+        {
+            controller->SetActiveSlide("A", true, false);
+        }
+        else
+        {
+            controller->SetActiveSlide("cursor", true, false);
+        }
+
+        unsigned char valid = 1;
+        FEPointerEvent event;
+        event.mIndex = pad;
+        event.mPosition = GetPointerPosition(pad, &valid);
+        g_pPadManager->GetPad(pad)->GetButtonIndex(0x1E, true);
+        event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
+        event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
+
+        if (mNavigation.UpdateBackButton(event, fDeltaT))
+        {
+            mState = 3;
+            GetNavigationScene()->HideButtons();
+            mPresentation->SetActiveSlide("out", true);
+            return;
+        }
+
+        for (int i = 0; i < 5; ++i)
+        {
+            mComponents[i].HandlePointerEvent(&event);
+        }
+        mScrollWidget.Update(event, fDeltaT);
+    }
+
+    if (mScrollWidget.IsScrolling(1, 1))
+    {
+        ++mFirstVisibleCheat;
+        UpdateCheatText();
+    }
+    else if (mScrollWidget.IsScrolling(0, 1))
+    {
+        --mFirstVisibleCheat;
+        UpdateCheatText();
+    }
+}
+
+void SHOptionsCheatsList::SceneCreated()
+{
+    SHNavigation* scene = GetNavigationScene();
+    TLComponentInstance* backButton = 0;
+    if (scene != 0)
+    {
+        mSavedNavigationButtons = scene->mVisibleButtons;
+        scene->HideButtons();
+        backButton = scene->GetButton(4);
+    }
+    mNavigation.SetButtonInstance(backButton);
+
+    TLSlide* slide = mPresentation->m_currentSlide;
+    int itemCount = 0;
+    TLComponentInstance* title = FEFinder<TLComponentInstance, 2>::Find(slide,
+        nlStringLowerHash("Layer"),
+        nlStringLowerHash("TITLE2"),
+        0,
+        0,
+        0,
+        0);
+
+    if (mCheatCategory == 0)
+    {
+        itemCount = 6;
+        title->SetActiveSlide("environment", true, false);
+    }
+    else if (mCheatCategory == 2)
+    {
+        itemCount = 5;
+        title->SetActiveSlide("player", true, false);
+    }
+    else if (mCheatCategory == 1)
+    {
+        itemCount = 12;
+        title->SetActiveSlide("pups", true, false);
+    }
+
+    int scrollRange = itemCount - 5;
+    unsigned long hash = nlStringLowerHash("cheat_0");
+    mCheatInstances[0] = FEFinder<TLComponentInstance, 2>::Find(slide, nlStringLowerHash("Layer"), hash, 0, 0, 0, 0);
+    hash = nlStringLowerHash("cheat_1");
+    mCheatInstances[1] = FEFinder<TLComponentInstance, 2>::Find(slide, nlStringLowerHash("Layer"), hash, 0, 0, 0, 0);
+    hash = nlStringLowerHash("cheat_2");
+    mCheatInstances[2] = FEFinder<TLComponentInstance, 2>::Find(slide, nlStringLowerHash("Layer"), hash, 0, 0, 0, 0);
+    hash = nlStringLowerHash("cheat_3");
+    mCheatInstances[3] = FEFinder<TLComponentInstance, 2>::Find(slide, nlStringLowerHash("Layer"), hash, 0, 0, 0, 0);
+    hash = nlStringLowerHash("cheat_4");
+    mCheatInstances[4] = FEFinder<TLComponentInstance, 2>::Find(slide, nlStringLowerHash("Layer"), hash, 0, 0, 0, 0);
+
+    hash = nlStringLowerHash("scrollbar");
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 2>::Find(slide, nlStringLowerHash("Layer"), hash, 0, 0, 0, 0);
+    mScrollWidget.SetComponent(scrollbar);
+    mScrollWidget.SetRange(scrollRange);
+    mScrollWidget.SetValue(mFirstVisibleCheat);
+
+    UpdateCheatText();
+}
+
+void SHOptionsCheatsList::InitializeButtons()
+{
+    typedef Detail::MemFunImpl<void, void (SHOptionsCheatsList::*)(unsigned int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOptionsCheatsList*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(
+        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+
+    for (int i = 0; i < 5; ++i)
+    {
+        TLComponentInstance* instance = FEFinder<TLComponentInstance, 3>::Find(
+            mCheatInstances[i], "off", "CHALLENGE_0", "list_back_480x70 ");
+        feVector3 position = mCheatInstances[i]->GetAssetPosition();
+        mComponents[i].SetInstanceBounds(
+            instance, true, position.f.x, position.f.y, 1.0f, 0.5f);
+        mComponents[i].SetPointerEnterCallback(over);
+        mComponents[i].SetPointerLeaveCallback(off);
+        mComponents[i].SetPointerInsideCallback(down);
+        mComponents[i].SetPointerPressCallback(select);
+    }
+
+    if (!mScrollWidget.mInitialized)
+    {
+        mScrollWidget.Initialize();
+    }
+}
+
+void SHOptionsCheatsList::OnCheatPointerEnter(unsigned int index, void* context)
+{
+    bool unlocked = false;
+    unsigned int item = (unsigned int)context;
+
+    if (mCheatCategory == 0 && IsEnvironmentCheatUnlocked(item + mFirstVisibleCheat))
+    {
+        unlocked = true;
+    }
+    else if (mCheatCategory == 2 && IsPlayerCheatUnlocked(item + mFirstVisibleCheat))
+    {
+        unlocked = true;
+    }
+    else if (mCheatCategory == 1 && IsPowerupCheatUnlocked(item + mFirstVisibleCheat))
+    {
+        unlocked = true;
+    }
+
+    if (unlocked)
+    {
+        ++mPointerInsideCounts[index];
+        mComponents[item].PlayHoverFeedback(index);
+        if (!mComponents[item].HasOtherPointerState(1, index))
+        {
+            mCheatInstances[item]->SetActiveSlide("over", true, false);
+            FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
+        }
+        mComponents[item].SetPointerState(1, index);
+    }
+}
+
+void SHOptionsCheatsList::OnCheatPointerPress(unsigned int, void* context)
+{
+    bool unlocked = false;
+    int item = (int)context;
+
+    if (mCheatCategory == 0 && IsEnvironmentCheatUnlocked(item + mFirstVisibleCheat))
+    {
+        unlocked = true;
+    }
+    else if (mCheatCategory == 2 && IsPlayerCheatUnlocked(item + mFirstVisibleCheat))
+    {
+        unlocked = true;
+    }
+    else if (mCheatCategory == 1 && IsPowerupCheatUnlocked(item + mFirstVisibleCheat))
+    {
+        unlocked = true;
+    }
+
+    if (unlocked)
+    {
+        mCheatInstances[item]->SetActiveSlide("down", true, false);
+
+        if (mCheatCategory == 0)
+        {
+            mSettings->mEnvironmentCheat = item + mFirstVisibleCheat;
+        }
+        else if (mCheatCategory == 2)
+        {
+            mSettings->mPlayerCheat = item + mFirstVisibleCheat;
+        }
+        else if (mCheatCategory == 1)
+        {
+            mSettings->mCustomPowerups = item + mFirstVisibleCheat;
+        }
+
+        FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
+        FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
+        mState = 2;
+        GetNavigationScene()->HideButtons();
+        mPresentation->SetActiveSlide("out", true);
     }
 }
 
@@ -177,300 +437,10 @@ void SHOptionsCheatsList::UpdateCheatText(int item)
     }
 }
 
-void SHOptionsCheatsList::Update(float fDeltaT)
+void SHOptionsCheatsList::UpdateCheatText()
 {
-    BaseSceneHandler::Update(fDeltaT);
-
-    int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
-    {
-        TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
-        {
-            for (int pad = 0; pad < 4; ++pad)
-            {
-                GetPointerInstance(pad)->SetActiveSlide("waiting", true, false);
-            }
-            return;
-        }
-
-        if (state == 0)
-        {
-            GetNavigationScene()->SetButtons(4, true);
-            if (!mButtonsInitialized)
-            {
-                InitializeButtons();
-                mButtonsInitialized = true;
-            }
-            mState = 1;
-        }
-        else if (state == 2)
-        {
-            GameSceneManager::Instance()->Pop();
-            ((SHGameplayOptions*)GameSceneManager::Instance()->GetScene((SceneList)0x1B))->UpdateCheatText();
-            return;
-        }
-        else if (state == 3)
-        {
-            GameSceneManager::Instance()->Pop();
-            return;
-        }
-    }
-
-    for (int pad = 0; pad < 4; ++pad)
-    {
-        TLComponentInstance* controller = GetPointerInstance(pad);
-        if ((unsigned int)pad != gFEControllerIndex)
-        {
-            controller->SetActiveSlide("waiting", true, false);
-            continue;
-        }
-
-        if (mPointerInsideCounts[pad] > 0)
-        {
-            controller->SetActiveSlide("A", true, false);
-        }
-        else
-        {
-            controller->SetActiveSlide("cursor", true, false);
-        }
-
-        unsigned char valid = 1;
-        FEPointerEvent event;
-        event.mIndex = pad;
-        event.mPosition = GetPointerPosition(pad, &valid);
-        g_pPadManager->GetPad(pad)->GetButtonIndex(0x1E, true);
-        event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0);
-        event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
-
-        if (mNavigation.UpdateBackButton(event, fDeltaT))
-        {
-            mState = 3;
-            GetNavigationScene()->HideButtons();
-            mPresentation->SetActiveSlide("out", true);
-            return;
-        }
-
-        for (int i = 0; i < 5; ++i)
-        {
-            mComponents[i].HandlePointerEvent(&event);
-        }
-        mScrollWidget.Update(event, fDeltaT);
-    }
-
-    if (mScrollWidget.IsScrolling(1, 1))
-    {
-        ++mFirstVisibleCheat;
-        for (int i = 0; i < 5; ++i)
-        {
-            UpdateCheatText(i);
-        }
-    }
-    else if (mScrollWidget.IsScrolling(0, 1))
-    {
-        --mFirstVisibleCheat;
-        for (int i = 0; i < 5; ++i)
-        {
-            UpdateCheatText(i);
-        }
-    }
-}
-
-void SHOptionsCheatsList::SceneCreated()
-{
-    SHNavigation* scene = GetNavigationScene();
-    TLComponentInstance* screen = 0;
-    if (scene != 0)
-    {
-        mSavedNavigationButtons = scene->mVisibleButtons;
-        scene->HideButtons();
-        screen = scene->GetButton(4);
-    }
-    mNavigation.SetButtonInstance(screen);
-
-    TLSlide* slide = mPresentation->m_currentSlide;
-    int itemCount = 0;
-    TLComponentInstance* title = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("TITLE2"),
-        0,
-        0,
-        0,
-        0);
-
-    if (mCheatCategory == 0)
-    {
-        itemCount = 6;
-        title->SetActiveSlide("environment", true, false);
-    }
-    else if (mCheatCategory == 2)
-    {
-        itemCount = 5;
-        title->SetActiveSlide("player", true, false);
-    }
-    else if (mCheatCategory == 1)
-    {
-        itemCount = 12;
-        title->SetActiveSlide("pups", true, false);
-    }
-
-    int scrollRange = itemCount - 5;
-    mCheatInstances[0] = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("cheat_0"),
-        0,
-        0,
-        0,
-        0);
-    mCheatInstances[1] = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("cheat_1"),
-        0,
-        0,
-        0,
-        0);
-    mCheatInstances[2] = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("cheat_2"),
-        0,
-        0,
-        0,
-        0);
-    mCheatInstances[3] = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("cheat_3"),
-        0,
-        0,
-        0,
-        0);
-    mCheatInstances[4] = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("cheat_4"),
-        0,
-        0,
-        0,
-        0);
-
-    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 2>::Find(slide,
-        nlStringLowerHash("Layer"),
-        nlStringLowerHash("scrollbar"),
-        0,
-        0,
-        0,
-        0);
-    mScrollWidget.SetComponent(scrollbar);
-    mScrollWidget.SetRange(scrollRange);
-    mScrollWidget.SetValue(mFirstVisibleCheat);
-
     for (int i = 0; i < 5; ++i)
     {
         UpdateCheatText(i);
-    }
-}
-
-void SHOptionsCheatsList::InitializeButtons()
-{
-    typedef Detail::MemFunImpl<void, void (SHOptionsCheatsList::*)(unsigned int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, SHOptionsCheatsList*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    FEPointerListener::Callback over(
-        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(
-        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(
-        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerInside), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback select(
-        PointerBinding(MemFun(&SHOptionsCheatsList::OnCheatPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-
-    for (int i = 0; i < 5; ++i)
-    {
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 3>::Find(
-            mCheatInstances[i], "off", "CHALLENGE_0", "list_back_480x70 ");
-        feVector3 position = mCheatInstances[i]->GetAssetPosition();
-        mComponents[i].SetInstanceBounds(
-            instance, true, position.f.x, position.f.y, 1.0f, 0.5f);
-        mComponents[i].SetPointerEnterCallback(over);
-        mComponents[i].SetPointerLeaveCallback(off);
-        mComponents[i].SetPointerInsideCallback(down);
-        mComponents[i].SetPointerPressCallback(select);
-    }
-
-    if (!mScrollWidget.mInitialized)
-    {
-        mScrollWidget.Initialize();
-    }
-}
-
-void SHOptionsCheatsList::OnCheatPointerEnter(unsigned int index, void* context)
-{
-    bool unlocked = false;
-    unsigned int item = (unsigned int)context;
-
-    if (mCheatCategory == 0 && IsEnvironmentCheatUnlocked(item + mFirstVisibleCheat))
-    {
-        unlocked = true;
-    }
-    else if (mCheatCategory == 2 && IsPlayerCheatUnlocked(item + mFirstVisibleCheat))
-    {
-        unlocked = true;
-    }
-    else if (mCheatCategory == 1 && IsPowerupCheatUnlocked(item + mFirstVisibleCheat))
-    {
-        unlocked = true;
-    }
-
-    if (unlocked)
-    {
-        ++mPointerInsideCounts[index];
-        mComponents[item].PlayHoverFeedback(index);
-        if (!mComponents[item].HasOtherPointerState(1, index))
-        {
-            mCheatInstances[item]->SetActiveSlide("over", true, false);
-            FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-        }
-        mComponents[item].SetPointerState(1, index);
-    }
-}
-
-void SHOptionsCheatsList::OnCheatPointerPress(unsigned int, void* context)
-{
-    bool unlocked = false;
-    int item = (int)context;
-
-    if (mCheatCategory == 0 && IsEnvironmentCheatUnlocked(item + mFirstVisibleCheat))
-    {
-        unlocked = true;
-    }
-    else if (mCheatCategory == 2 && IsPlayerCheatUnlocked(item + mFirstVisibleCheat))
-    {
-        unlocked = true;
-    }
-    else if (mCheatCategory == 1 && IsPowerupCheatUnlocked(item + mFirstVisibleCheat))
-    {
-        unlocked = true;
-    }
-
-    if (unlocked)
-    {
-        mCheatInstances[item]->SetActiveSlide("down", true, false);
-
-        if (mCheatCategory == 0)
-        {
-            mSettings->mEnvironmentCheat = item + mFirstVisibleCheat;
-        }
-        else if (mCheatCategory == 2)
-        {
-            mSettings->mPlayerCheat = item + mFirstVisibleCheat;
-        }
-        else if (mCheatCategory == 1)
-        {
-            mSettings->mCustomPowerups = item + mFirstVisibleCheat;
-        }
-
-        FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-        FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
-        mState = 2;
-        GetNavigationScene()->HideButtons();
-        mPresentation->SetActiveSlide("out", true);
     }
 }

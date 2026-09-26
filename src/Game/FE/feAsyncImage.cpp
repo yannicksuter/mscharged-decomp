@@ -12,7 +12,6 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 
-extern unsigned int nlDefaultSeed;
 
 inline bool AsyncImage::CanSwapTextures() const
 {

@@ -1,9 +1,10 @@
 #include "Game/AI/Desire.h"
+#include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Ball.h"
 #include "Game/DebugWriteCache.h"
@@ -19,14 +20,9 @@
 extern "C" nlVector3* fn_80040234(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 float ReceivingPass(cFielder*);
-extern "C" float fn_800DEAB4(cFielder*);
 extern "C" cPlayer* fn_800DF790(cTeam*);
-extern cTeam* g_pCurrentlyUpdatingTeam;
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
 extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
-extern "C" float fn_800DA050(cFielder*);
-extern "C" bool fn_8031A04C();
-extern "C" cTeam* fn_800D6670(cFielder*);
 
 static float lbl_806DC0B8 = 0.1f;
 float lbl_806DC0BC = 0.8f;
@@ -53,7 +49,7 @@ static unsigned short sDesireDefendPosType = 0xFFFF;
 bool DesireMark::UnidentifiedInitialize(void* context)
 {
     bool result = Desire::UnidentifiedInitialize(context);
-    mThinkTimer.m_unk0 = mThinkTimer.m_uPackedTime != 0;
+    mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
     mThinkTimer.m_uPackedTime = 0;
     return result;
 }
@@ -173,20 +169,20 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
 /**
  * Offset/Address/Size: 0xD5C | 0x800B7B1C | size: 0xF40
  */
-extern "C" DesireUpdate fn_800B7B1C(UnidentifiedFielderInput* input)
+extern "C" DesireUpdate fn_800B7B1C(AIContext* input)
 {
     DesireUpdate result(FT_INT, lbl_806DC110);
     cFielder* pFielder = (cFielder*)input->mData.pPlayer;
-    unsigned long key = input->fn_8030F9B4((unsigned long)fn_800B7B1C, 1);
+    unsigned long key = input->GetTimerKey((unsigned long)fn_800B7B1C, 1);
     if (pFielder->m_pBall != 0 || (bool)fn_800DA050(pFielder))
     {
         result = 1;
     }
-    else if (fn_8031A04C() && !input->fn_8030FB7C(key))
+    else if (fn_8031A04C() && !input->IsTimerRunning(key))
     {
-        input->fn_8030FA10(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(fn_800D6670(pFielder))));
+        input->SetTimer(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(fn_800D6670(pFielder))));
         unsigned int hash = nlStringHash("TransDesireDefendPosHelper");
-        result = fn_80041B6C(input->mUnidentified14, hash, pFielder);
+        result = fn_80041B6C(input->mRuntime, hash, pFielder);
     }
     return DesireUpdate(result, -1.0f, -1.0f);
 }
@@ -197,7 +193,7 @@ extern "C" DesireUpdate fn_800B7B1C(UnidentifiedFielderInput* input)
 bool DesireDefendPos::UnidentifiedInitialize(void*)
 {
     mvDesiredPosition = m_pFielder->mUnidentified024.m_v3Position;
-    mThinkTimer.m_unk0 = mThinkTimer.m_uPackedTime != 0;
+    mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
     mThinkTimer.m_uPackedTime = 0;
     return true;
 }

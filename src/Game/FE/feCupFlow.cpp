@@ -8,7 +8,8 @@
 #include "Game/FE/feDPD.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feHelpFuncs_decl.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
@@ -37,19 +38,6 @@ struct CupTrophyUnlock_8051B770
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
-extern "C" void fn_802079DC();
-extern "C" void fn_80207AB4();
-extern "C" void fn_80207DC4();
-extern "C" void fn_80209474();
-extern "C" void fn_8020785C();
-extern "C" void fn_8010FED8();
-extern "C" bool fn_8010FEF0(unsigned int flags);
-extern "C" bool fn_801102D8();
-extern "C" bool fn_801102F8();
-extern "C" bool fn_80110318();
-extern "C" bool fn_80110CF0();
-extern "C" bool fn_80110D18();
-extern "C" bool fn_80110D40();
 
 CupTrophyUnlock_8051B770 lbl_8051B770[] = {
     { nlStringHash("0"), 0x001 },

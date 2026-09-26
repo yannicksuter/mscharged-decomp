@@ -67,20 +67,25 @@ World::~World()
     DrawableIterator* pIterator = m_drawableMap.GetIterator();
     while (pIterator->IsValid())
     {
-        DrawableObject* pObject = pIterator->Current()->value;
-        pObject->ReleaseResources();
-        if ((pObject->m_uObjectCreationFlags & 1) == 0)
+        pIterator->Current()->value->ReleaseResources();
+        if ((pIterator->Current()->value->m_uObjectCreationFlags & 1) == 0)
         {
-            delete pObject;
+            delete pIterator->Current()->value;
         }
         pIterator->Next();
     }
-    delete pIterator;
+    if (pIterator != 0)
+    {
+        delete pIterator;
+    }
 
     mWorldAnimManager.fn_80342324();
     UnidentifiedVirtual20();
     mWorldAnimManager.Clear();
-    delete m_pOwnedData;
+    if (m_pOwnedData != 0)
+    {
+        delete m_pOwnedData;
+    }
 }
 
 void World::AddDrawableObject(DrawableObject* pDrawableObject)

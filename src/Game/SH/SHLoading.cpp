@@ -14,11 +14,11 @@
 #include "NL/nlFormat.h"
 #include <string.h>
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
-#include "Game/FE/feScene.inl"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
@@ -458,5 +458,3 @@ void MatchLoadingScene::DisplayStadiumName(TLTextInstance* stadiumText)
     const char* stringID = GetStadiumTickerStringID(GameInfoManager::Instance()->GetStadium());
     stadiumText->SetStringId(stringID);
 }
-
-#include "Game/FE/feFinder_impl.h"

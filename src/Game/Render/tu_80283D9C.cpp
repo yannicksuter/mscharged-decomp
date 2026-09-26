@@ -75,8 +75,9 @@ void NisPlayerOverlay_80523808::Render()
     glSetCurrentRasterState(glHandleizeRasterState());
     glSetCurrentTextureState(glHandleizeTextureState());
 
+    float u;
     float t = mTime / mDuration;
-    float u = 1.0f - t;
+    u = 1.0f - t;
 
     glPoly2 poly;
     poly.SetupRectangle(360.0f * u, 270.0f * u, 640.0f * t + 240.0f * u,

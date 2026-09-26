@@ -1,4 +1,5 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
+#include "Game/Game.h"
 #include "Game/AI/Desire.h"
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/Scripts/ScriptCaching.h"
@@ -28,24 +29,17 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "types.h"
 #include "NL/nlPrint.h"
-extern cTeam* g_pCurrentlyUpdatingTeam;
+#include "Game/Ball.h"
+#include "Game/Team.h"
 extern cBall* g_pScriptBall;
-extern cBall* g_pBall;
 extern cTeam* g_pScriptOtherTeam;
 extern cTeam* g_pScriptCurrentTeam;
 extern cFielder* g_pScriptBallOwner;
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" float fn_800A0508(cFielder* pFielder, bool bParam1, bool bParam2);
 extern "C" AvoidController* fn_8002E144(cFielder* pFielder);
-extern "C" float fn_8000F558(AvoidController* pController, eAvoidableThings eThings);
 extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BFB8(PlayerTweaks* pTweaks);
-extern "C" float fn_8002C254(const PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE18(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE38(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE64(PlayerTweaks* pTweaks);
-extern "C" float fn_8002BE84(const PlayerTweaks* pTweaks);
 extern "C" float fn_800DB298(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
 extern "C" float fn_800DAFCC(const nlVector3&, const nlVector3&, cPlayer*,
@@ -55,12 +49,6 @@ static float CloseToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& 
 static float FarToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float InBetween(const nlVector3& v3InBetweenPos, const nlVector3& v3A, const nlVector3& v3B);
 extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
-extern "C" float fn_8002BE38(PlayerTweaks*);
-extern "C" float fn_8002BE18(PlayerTweaks*);
-extern "C" float fn_8002BE84(const PlayerTweaks*);
-extern "C" float fn_8002BE64(PlayerTweaks*);
-extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction);
-extern "C" float fn_800156A8(cBall*);
 extern float (*lbl_806DF564)();
 extern "C" const nlVector3& fn_80040234(cFielder*);
 nlVector2 lbl_806DC3D8 = { 10.0f, 10.0f };
@@ -71,18 +59,14 @@ static TweakFloatBinding lbl_8056DB70("Min Angle", gLastTweakCategory, &lbl_806D
 static TweakFloatBinding lbl_8056DB90("Max Angle", gLastTweakCategory, &lbl_806DC3E0.y);
 extern "C" bool fn_80099CE8(int);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" float fn_8002C800(PlayerTweaks*);
 extern "C" float fn_8003C40C(cFielder*, unsigned short);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
 extern "C" float fn_80030750(cFielder*);
 
-extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition);
 float CloseToFormationPosition(cFielder* pFielder);
 float FarToFormationPosition(cFielder* pFielder);
-extern "C" float fn_800DE40C(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer);
 extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder);
-extern "C" float fn_800DE0A8(cPlayer* pPlayer);
 extern "C" float fn_800DED80(cPlayer* pPlayer);
 
 float GenerateFilteredRandom()
@@ -3613,6 +3597,18 @@ extern "C" float fn_800DF838(cPlayer* pPlayer)
     return fScore;
 }
 
+static float fn_800DF888_helper(cFielder* player)
+{
+    float fOwner = BallOwner(player);
+    float fReceiving = ReceivingPass(player);
+    float fClosing = ClosingTo(player, g_pBall);
+    float fNear = NearToBall(player);
+    float fAble = AbleToInterceptBall(player);
+    float fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
+    fIntercept = FMIN(fn_800DED80(player), fIntercept);
+    return FMAX(fOwner, FMAX(fReceiving, fIntercept));
+}
+
 extern "C" float fn_800DF888(cTeam* team)
 {
     if (team == NULL)
@@ -3620,29 +3616,7 @@ extern "C" float fn_800DF888(cTeam* team)
     cFielder* players[2];
     players[0] = team->mpBestBallInterceptor;
     players[1] = team->GetOtherTeam()->mpBestBallInterceptor;
-    float score[2];
-    {
-        float fOwner = BallOwner(players[0]);
-        float fReceiving = ReceivingPass(players[0]);
-        float fClosing = ClosingTo(players[0], g_pBall);
-        float fNear = NearToBall(players[0]);
-        float fAble = AbleToInterceptBall(players[0]);
-        float fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
-        fIntercept = FMIN(fn_800DED80(players[0]), fIntercept);
-        fReceiving = FMAX(fReceiving, fIntercept);
-        score[0] = FMAX(fOwner, fReceiving);
-    }
-    {
-        float fOwner = BallOwner(players[1]);
-        float fReceiving = ReceivingPass(players[1]);
-        float fClosing = ClosingTo(players[1], g_pBall);
-        float fNear = NearToBall(players[1]);
-        float fAble = AbleToInterceptBall(players[1]);
-        float fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
-        fIntercept = FMIN(fn_800DED80(players[1]), fIntercept);
-        fReceiving = FMAX(fReceiving, fIntercept);
-        score[1] = FMAX(fOwner, fReceiving);
-    }
+    float score[2] = { fn_800DF888_helper(players[0]), fn_800DF888_helper(players[1]) };
     return score[0] / FMAX(0.1f, score[0] + score[1]);
 }
 

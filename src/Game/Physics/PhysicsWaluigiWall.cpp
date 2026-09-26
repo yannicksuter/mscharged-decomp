@@ -30,13 +30,7 @@
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
 
-extern "C" void fn_8014A180(cFielder*);
-extern "C" bool fn_800167A8(cBall*);
-extern "C" float fn_800156A8(cBall*);
 extern "C" void fn_80060608(cGame*, cFielder*);
-extern "C" void fn_80146060(UnidentifiedEventData24*);
-extern "C" void fn_801461A8();
-extern SlotPool<UnidentifiedEventData24> lbl_80570138;
 float Interpolate(float, float, float);
 
 void OnWaluigiWallEffectFinished(EmissionController&, int);

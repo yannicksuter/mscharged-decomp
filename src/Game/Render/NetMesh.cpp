@@ -1,4 +1,5 @@
 #include "Game/Render/NetMesh.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/Ball.h"
 #include "Game/DebugWriteCache.h"
@@ -51,7 +52,6 @@ struct NetMeshGameState
 
 extern "C" unsigned int fn_802AAC88(const void*, unsigned int);
 NetMeshFrameProvider* GetFixedUpdateTask();
-extern "C" void fn_80146424(BallNetmeshEventData*, bool);
 extern "C" PlatTexture* fn_802D064C(unsigned long);
 
 extern NetMeshGameState* g_pGame;

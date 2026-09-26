@@ -1,4 +1,5 @@
 #include "Game/TweakQuery.h"
+#include "NL/nlDebug.h"
 #include "NL/gl/glPlat.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glMaterialProgram.h"
@@ -215,7 +216,6 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
         renderMode = &GXEurgb60Hz480IntDf;
         break;
     default:
-        extern void nlBreak();
         nlBreak();
         break;
     }

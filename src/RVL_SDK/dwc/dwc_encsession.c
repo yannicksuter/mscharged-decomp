@@ -48,6 +48,11 @@ static u32 b64size(u32 len)
     return ((len / 3) + i) * 4;
 }
 
+static u32 b64bufsize(u32 len)
+{
+    return b64size(len) + 1;
+}
+
 static void my_randinit(u32 seed)
 {
     s_local_seed = seed | (seed << 16);
@@ -131,7 +136,7 @@ static BOOL DWCi_EncSessionValidateResponse(const char* buf, int len)
     }
 
     tmpbuf = DWC_Alloc(DWC_ALLOCTYPE_ENC,
-        b64size(len - strlen("0000000000000000000000000000000000000000")) + 41);
+        b64bufsize(len - strlen("0000000000000000000000000000000000000000")) + 40);
     if (tmpbuf == NULL)
     {
         DWC_Printf(DWC_REPORTFLAG_WARNING, "no enough memory\n");
@@ -314,7 +319,7 @@ static DWCiRankingSessionResult DWCi_EncSessionEncrypt(u8* outbuf,
 
     B64Encode((const char*)tmpbuf, (char*)outbuf, srclen + headerlen + 4, 2);
     DWC_Free(DWC_ALLOCTYPE_ENC, tmpbuf, 0);
-    outbuf[b64size(srclen + headerlen + 4)] = '\0';
+    outbuf[b64bufsize(srclen + headerlen + 4) - 1] = '\0';
 
     return DWCi_ENC_SESSION_SUCCESS;
 }
@@ -351,10 +356,10 @@ void DWCi_EncSessionInitialize(int server, const char* initdata)
     strncpy(secretkey, initdata, 20);
     secretkey[20] = '\0';
 
-    key1 = strtol(strncpy(keybuf, initdata + 20, 8), NULL, 16);
-    key2 = strtol(strncpy(keybuf, initdata + 28, 8), NULL, 16);
-    key3 = strtol(strncpy(keybuf, initdata + 36, 8), NULL, 16);
-    key4 = strtol(strncpy(keybuf, initdata + 44, 8), NULL, 16);
+    key1 = strtoul(strncpy(keybuf, initdata + 20, 8), NULL, 16);
+    key2 = strtoul(strncpy(keybuf, initdata + 28, 8), NULL, 16);
+    key3 = strtoul(strncpy(keybuf, initdata + 36, 8), NULL, 16);
+    key4 = strtoul(strncpy(keybuf, initdata + 44, 8), NULL, 16);
 
     DWCi_EncValidateKey(initdata + 52, secretkey, key1, key2, key3, key4);
     DWC_InitGHTTP(NULL);
@@ -368,9 +373,6 @@ DWCiRankingSessionState DWCi_EncSessionProcess(void)
     switch (g_session.state)
     {
     case DWCi_ENC_SESSION_STATE_CANCELED:
-        break;
-
-    case DWCi_ENC_SESSION_STATE_ERROR:
         break;
 
     case DWCi_ENC_SESSION_STATE_INITIAL:

@@ -1,4 +1,5 @@
 #include "Game/Camera/animcam.h"
+#include "Game/Camera/CameraMan.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
@@ -27,7 +28,6 @@ struct UnidentifiedCameraDisplayState
 };
 
 UnidentifiedCameraDisplayState* GetPresentation();
-extern "C" float fn_800F2410(float fFOV);
 
 struct UnidentifiedSimulationTimeProvider
 {
@@ -62,6 +62,12 @@ struct DofDebugFlag
 };
 
 static DofDebugFlag g_EnableDofDebug;
+
+template <class T>
+static inline void nlGetChunkDataAs(nlChunk* chunk, T*& out)
+{
+    out = (T*)chunk->GetData();
+}
 
 cCameraData::cCameraData()
 {
@@ -119,7 +125,8 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             break;
         case 0x25003:
         {
-            nlVector3* v3Pos = (nlVector3*)outerChunk->GetData();
+            nlVector3* v3Pos;
+            nlGetChunkDataAs(outerChunk, v3Pos);
             if (ownsKeyData)
             {
                 unsigned long i;
@@ -138,7 +145,8 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
         }
         case 0x25006:
         {
-            nlVector3* v3Pos = (nlVector3*)outerChunk->GetData();
+            nlVector3* v3Pos;
+            nlGetChunkDataAs(outerChunk, v3Pos);
             if (ownsKeyData)
             {
                 unsigned long i;
@@ -157,7 +165,8 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
         }
         case 0x25004:
         {
-            nlQuaternion* rot = (nlQuaternion*)outerChunk->GetData();
+            nlQuaternion* rot;
+            nlGetChunkDataAs(outerChunk, rot);
             if (ownsKeyData)
             {
                 unsigned long i;
@@ -191,7 +200,9 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             }
             else
             {
-                pAnimCameraData->fFOV = (float*)outerChunk->GetData();
+                float* data;
+                nlGetChunkDataAs(outerChunk, data);
+                pAnimCameraData->fFOV = data;
             }
             break;
         case 0x2500A:
@@ -211,14 +222,18 @@ bool LoadAnimCameraData(nlChunk* outerChunk, nlChunk* outerEnd, cCameraData* pAn
             }
             else
             {
-                pAnimCameraData->fFocalLength = (float*)outerChunk->GetData();
+                float* data;
+                nlGetChunkDataAs(outerChunk, data);
+                pAnimCameraData->fFocalLength = data;
             }
             break;
         case 0x25000:
             if (ownsKeyData)
             {
                 pAnimCameraData->field_0x0C = (char*)nlMalloc(32, 8, false);
-                nlStrNCpy(pAnimCameraData->field_0x0C, (char*)outerChunk->GetData(), 32);
+                char* data;
+                nlGetChunkDataAs(outerChunk, data);
+                nlStrNCpy(pAnimCameraData->field_0x0C, data, 32);
             }
             else
             {

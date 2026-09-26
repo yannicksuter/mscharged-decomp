@@ -9,9 +9,6 @@
 #include "NL/nlDebugFile.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void fn_802F499C(void*, unsigned long, XSoundHandle*);
-extern "C" void fn_802F49A4(void*, XSoundHandle*);
-
 unsigned int lbl_806E2018;
 AudioSystem* g_pAudioSystem;
 AudioBackend* g_pAudioBackend;
@@ -68,16 +65,10 @@ XSoundCueHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOw
     if (handle != 0)
         audio->m_ActiveSoundList.AddEnd(handle);
     if (handle != 0)
-        fn_802F499C((u8*)audio->GetBundleManager() + 0x18,
-            (value3 ^ value1) ^ (value2 ^ cueId), handle);
+        fn_802F499C(audio->GetBundleManager()->GetResourceRuntime(),
+            (value3 ^ value1) ^ (value2 ^ cueId), reinterpret_cast<u32>(handle));
     return handle;
 }
-
-struct AudioSliderSet_802EC1F4
-{
-    u32 m_Unknown00;
-    AudioParameter* m_Parameters;
-};
 
 void UpdateAudioSystem(AudioSystem* audio, float dt)
 {
@@ -89,7 +80,7 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
     {
         audio->m_Listener->Update(dt);
         audio->m_SoundInstancePool.Walk(
-            Function1<bool, Plat3dSoundSrc&>(Bind<bool>(MemFun(&AudioSystem::fn_802ECDC8), audio, dt, placeholder0)));
+            Function<bool(Plat3dSoundSrc&)>(Bind<bool>(MemFun(&AudioSystem::fn_802ECDC8), audio, dt, placeholder0)));
         unsigned int count = audio->m_Unknown2E0;
         nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
         while (it.hasNext() && count != 0)
@@ -97,14 +88,14 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
             XSoundHandle* handle = *it;
             if (handle->m_Owner != 0)
             {
-                Plat3dSoundSrc* owner = (Plat3dSoundSrc*)handle->m_Owner;
-                AudioSliderSet_802EC1F4* sliders = (AudioSliderSet_802EC1F4*)handle->m_LocalSliders;
+                XSoundOwner* owner = handle->m_Owner;
+                LocalSliderSet_802F1758* sliders = handle->m_LocalSliders;
                 float value1 = owner->m_Unknown10;
                 float value2 = owner->m_Unknown14;
                 float value3 = owner->m_Unknown18;
                 if (sliders != 0)
                 {
-                    AudioParameter* parameter = (AudioParameter*)((u8*)sliders->m_Parameters + 0xC8);
+                    AudioParameter* parameter = (AudioParameter*)(sliders->sliders + 5);
                     if (value1 < parameter->m_Min)
                         parameter->m_Value = parameter->m_Min;
                     else if (value1 > parameter->m_Max)
@@ -112,7 +103,7 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
                     else
                         parameter->m_Value = value1;
                     parameter->m_Time = 0.0f;
-                    parameter = sliders->m_Parameters;
+                    parameter = (AudioParameter*)sliders->sliders;
                     if (value2 < parameter->m_Min)
                         parameter->m_Value = parameter->m_Min;
                     else if (value2 > parameter->m_Max)
@@ -120,7 +111,7 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
                     else
                         parameter->m_Value = value2;
                     parameter->m_Time = 0.0f;
-                    parameter = (AudioParameter*)((u8*)sliders->m_Parameters + 0x28);
+                    parameter = (AudioParameter*)(sliders->sliders + 1);
                     if (value3 < parameter->m_Min)
                         parameter->m_Value = parameter->m_Min;
                     else if (value3 > parameter->m_Max)
@@ -142,7 +133,7 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         handle->Update(dt);
         if (handle->m_State == 9)
         {
-            fn_802F49A4((u8*)audio->GetBundleManager() + 0x18, handle);
+            fn_802F49A4(audio->GetBundleManager()->GetResourceRuntime(), reinterpret_cast<u32>(handle));
             if (handle->m_Owner != 0)
                 --audio->m_Unknown2E0;
             audio->m_ActiveSoundList.Remove(&it);
@@ -159,8 +150,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         {
             audio->m_SoundOwnerPool.Remove(&owners);
             DLListEntry<Plat3dSoundSrc>* entry = (DLListEntry<Plat3dSoundSrc>*)((u8*)owner - 8);
-            nlDLRingRemove(&audio->m_SoundInstancePool.m_Head, entry);
-            audio->m_SoundInstancePool.m_Allocator.Free(entry);
+            nlDLListIterator<Plat3dSoundSrc> instance = audio->m_SoundInstancePool.Begin(entry);
+            audio->m_SoundInstancePool.Remove(&instance);
         }
         else
             owners.next();

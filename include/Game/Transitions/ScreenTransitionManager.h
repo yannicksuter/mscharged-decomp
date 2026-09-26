@@ -23,7 +23,7 @@ public:
     virtual void Cancel() = 0;
     virtual float GetTransitionLength() = 0;
     virtual void DoSanityCheck() { }
-    virtual bool UnidentifiedVirtual30() { return false; }
+    virtual bool ConsumeScreenGrabRequest() { return false; }
 };
 
 class ScreenTransitionCallback

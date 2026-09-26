@@ -1,5 +1,6 @@
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder_impl.h"
+#include "Game/FE/feFinderFind_impl.h"
+#include "Game/FE/feFinderDefault_impl.h"
 #include "Game/FE/Overlay/OverlayHandlerChallengePreview.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/DB/GameProgress.inl"

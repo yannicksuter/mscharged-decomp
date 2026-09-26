@@ -11,7 +11,6 @@
 #include "Game/TweakFileLoader.h"
 #include "Game/TweakValue.inl"
 
-extern "C" void fn_8002B934(PlayerTweaks*, const char*, const char*, bool);
 
 float g_pTweaks[2] = {
     10.0f,
@@ -400,7 +399,7 @@ extern "C" float fn_8002C7A8(PlayerTweaks* tweaks)
         tweaks->fShooting);
 }
 
-extern "C" float fn_8002C7D0()
+extern "C" float fn_8002C7D0(PlayerTweaks*)
 {
     return gGameTweaks.mFielderTweaks->mUnidentified3B4;
 }

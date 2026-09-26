@@ -28,6 +28,8 @@ for geometry objects
 */
 
 #include <ode/common.h>
+#include <mem.h>
+#include <cstring>
 #include <ode/error.h>
 #include <ode/matrix.h>
 #include <ode/rotation.h>
@@ -38,8 +40,6 @@ for geometry objects
 #include "collision_transform.h"
 #include "collision_trimesh_internal.h"
 
-extern "C" void* memcpy(void*, const void*, size_t);
-extern "C" void* memset(void*, int, size_t);
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4291) // for VC++, no complaints about "no matching operator delete found"

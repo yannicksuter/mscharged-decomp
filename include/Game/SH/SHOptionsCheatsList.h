@@ -20,6 +20,7 @@ public:
     void OnCheatPointerInside(unsigned int index, void* context);
     void OnCheatPointerLeave(unsigned int index, void* context);
     void UpdateCheatText(int item);
+    void UpdateCheatText();
     void InitializeButtons();
     void OnCheatPointerEnter(unsigned int index, void* context);
     void OnCheatPointerPress(unsigned int index, void* context);

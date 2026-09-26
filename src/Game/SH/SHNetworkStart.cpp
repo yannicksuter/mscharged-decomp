@@ -2,7 +2,8 @@
 
 #include "Game/FE/feFinder.h"
 #include "Game/FE/fePresentation.inl"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/NetworkSession.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/GameSceneManager.h"

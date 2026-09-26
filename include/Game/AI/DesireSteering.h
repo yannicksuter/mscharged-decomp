@@ -85,7 +85,6 @@ private:
     UnidentifiedAvoidanceHistory m_AvoidanceHistory;
 };
 
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 class UnidentifiedDesire35 : public Desire
 {

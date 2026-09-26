@@ -109,24 +109,34 @@ FEPointerRegion::~FEPointerRegion()
 {
 }
 
-void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, float offsetX, float offsetY, float scaleX, float scaleY)
+static inline nlVector2 MeasurePointerBoundsSize(TLInstance* instance)
 {
-    nlVector2 size;
-    nlVector2 measuredSize;
+    nlVector2 defaultSize;
     switch (instance->m_type)
     {
     case TLAT_LAYER:
-        measuredSize = MeasurePointerInstanceList(instance->pChildren);
-        break;
+        return MeasurePointerInstanceList(instance->pChildren);
     case TLAT_IMAGE:
-        measuredSize.y = instance->GetScale().f.y * 100.0f;
-        measuredSize.x = instance->GetScale().f.x * 100.0f;
-        break;
+    {
+        float height = instance->GetScale().f.y * 100.0f;
+        nlVector2 size;
+        size.x = instance->GetScale().f.x * 100.0f;
+        size.y = height;
+        return size;
+    }
     case TLAT_TEXT:
     {
         TLTextInstance* text = (TLTextInstance*)instance;
         const FEFontResource* fontResource = ((const FEText*)text->m_component)->m_pFeFontResource;
-        nlFont* font = fontResource == 0 ? FontManager::Instance()->GetFontByHashID(0) : fontResource->m_pFontReference;
+        nlFont* font;
+        if (fontResource == 0)
+        {
+            font = FontManager::Instance()->GetFontByHashID(0);
+        }
+        else
+        {
+            font = fontResource->m_pFontReference;
+        }
 
         float width;
         {
@@ -142,23 +152,31 @@ void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, 
         nlVector2 textSize;
         textSize.x = width;
         textSize.y = (float)(font->m_Metrics.Height * drawInfo.RowCount);
-        measuredSize = textSize;
-        break;
+        return textSize;
     }
     case TLAT_COMPONENT:
-        measuredSize = MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->pChildren);
-        break;
+        return MeasurePointerInstanceList(((TLComponentInstance*)instance)->GetActiveSlide()->pChildren);
     case TLAT_GROUP:
-        measuredSize = MeasurePointerInstanceList(instance->pChildren);
-        break;
+        return MeasurePointerInstanceList(instance->pChildren);
     default:
-        nlVec2Set(measuredSize, 0.0f, 0.0f);
-        break;
+    {
+        nlVec2Set(defaultSize, 0.0f, 0.0f);
+        return defaultSize;
     }
+    }
+}
 
-    size = measuredSize;
-    size.x *= scaleX;
-    size.y *= scaleY;
+static inline void ScalePointerBoundsSize(nlVector2& result, nlVector2 source, float scaleX, float scaleY)
+{
+    result.x = source.x * scaleX;
+    result.y = source.y * scaleY;
+}
+
+void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, float offsetX, float offsetY, float scaleX, float scaleY)
+{
+    nlVector2 measuredSize = MeasurePointerBoundsSize(instance);
+    nlVector2 size;
+    ScalePointerBoundsSize(size, measuredSize, scaleX, scaleY);
 
     feVector3 position = instance->GetAssetPosition();
     float x = position.f.x + offsetX;

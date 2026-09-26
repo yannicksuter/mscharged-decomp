@@ -1,5 +1,5 @@
 #include "Game/AI/Desire.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.h"
@@ -14,27 +14,18 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/audio.h"
 
-extern "C" float fn_8002C7D0(PlayerTweaks*);
-extern "C" float fn_8002CFD8(PlayerTweaks*);
-extern "C" float fn_8002BFA8(PlayerTweaks*, float);
 extern "C" void fn_8002E2E4(cFielder*);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E3F8(cFielder*);
-extern "C" void fn_8002E66C(cFielder*, bool);
 extern "C" void fn_8002E718(cFielder*);
 extern "C" void fn_8002E798(cFielder*);
-extern "C" void fn_8002E818(cFielder*);
-extern "C" void fn_8002E898(cFielder*, bool);
-extern "C" void fn_8002E934(cFielder*, bool);
 extern "C" void fn_80038158(cFielder*, bool);
 extern "C" void fn_801B8164(cFielder*);
 extern "C" void fn_801B7F8C(cFielder*);
 extern "C" void fn_801B865C(cFielder*);
-extern "C" void fn_801BA510(cFielder*);
-extern "C" UnidentifiedFielderInput* fn_80316974(void*);
+extern "C" AIContext* fn_80316974(void*);
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 static unsigned short sDesireStarType = 0xFFFF;
 static unsigned short sDesireMushroomType = 0xFFFF;
@@ -73,7 +64,7 @@ bool DesireStar::UnidentifiedInitialize(void* context)
  */
 bool DesireStar::UnidentifiedReinitialize(void* context)
 {
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
     mUnidentified078 = fn_8002CFD8(m_pFielder->GetTweaks());
@@ -148,7 +139,7 @@ bool DesireMushroom::UnidentifiedInitialize(void* context)
  */
 bool DesireMushroom::UnidentifiedReinitialize(void* context)
 {
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
     EmitMushroom(m_pFielder, true);
@@ -184,7 +175,7 @@ bool DesireSlippery::UnidentifiedInitialize(void* context)
  */
 bool DesireSlippery::UnidentifiedReinitialize(void* context)
 {
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     return Desire::UnidentifiedInitialize(context);
 }
@@ -240,7 +231,7 @@ bool DesireGooey::UnidentifiedInitialize(void* context)
  */
 bool DesireGooey::UnidentifiedReinitialize(void* context)
 {
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     return UnidentifiedInitialize(context);
 }
@@ -393,7 +384,7 @@ bool DesireFrozen::UnidentifiedReinitialize(void* context)
 
     mePrevFrozenState = meFrozenState;
     mfPrevFrozenTime = mUnidentified078 - mUnidentifiedTimer.GetSeconds();
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
 
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
@@ -448,7 +439,7 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
 
     mvDesiredPosition = lbl_804DC1A0;
     mvDesiredPosition.x = 1.0f;
-    fn_80316974(this)->fn_8030FA10(0xFF, 0.0f);
+    fn_80316974(this)->SetTimer(0xFF, 0.0f);
     return result;
 }
 
@@ -457,7 +448,7 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
  */
 bool DesireConfused::UnidentifiedReinitialize(void* context)
 {
-    mUnidentifiedTimer.m_unk0 = mUnidentifiedTimer.m_uPackedTime != 0;
+    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
     mUnidentifiedTimer.m_uPackedTime = 0;
     bool result = Desire::UnidentifiedInitialize(context);
     mfConfusedPercentage += lbl_806DC188.x;
@@ -509,9 +500,9 @@ void DesireConfused::Update(
     bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
     if (!hasGlobalPad)
     {
-        if (!fn_80316974(this)->fn_8030FB7C(0xFF))
+        if (!fn_80316974(this)->IsTimerRunning(0xFF))
         {
-            fn_80316974(this)->fn_8030FA10(0xFF, 0.5f);
+            fn_80316974(this)->SetTimer(0xFF, 0.5f);
             nlPolar polar;
             polar.r = 1.0f;
             polar.a = nlRandom(0xFFFF);

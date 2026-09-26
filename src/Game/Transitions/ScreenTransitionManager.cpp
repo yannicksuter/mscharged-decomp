@@ -90,7 +90,7 @@ void ScreenTransitionManager::Render()
 
         m_pActiveTransition->Render(m_eView);
 
-        if (m_pCallback != 0 && m_pActiveTransition->UnidentifiedVirtual30())
+        if (m_pCallback != 0 && m_pActiveTransition->ConsumeScreenGrabRequest())
         {
             m_pCallback->fn_80188764();
         }

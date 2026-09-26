@@ -3,7 +3,6 @@
 
 #include "Game/AI/Desire.h"
 
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 
 class DesireUserControlled : public Desire
 {

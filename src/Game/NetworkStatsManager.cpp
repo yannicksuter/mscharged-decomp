@@ -35,7 +35,6 @@ static float sRankingRequestTimeout = 30.0f;
 
 extern NetworkSeasonDate sNetworkSeasonDates[52];
 extern int sMonthDays[12];
-extern NetworkSeasonDateTable sNetworkSeasonDateTable;
 
 struct NetworkGameResultDetails
 {

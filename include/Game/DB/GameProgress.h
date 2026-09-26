@@ -307,4 +307,15 @@ bool IsGlassJawPlayerCheatUnlocked();
 
 bool IsButterfingersPlayerCheatUnlocked();
 
+
+// Shared functions and data from Game/DB/GameProgress.cpp.
+extern "C" void fn_8010FED8();
+extern "C" bool fn_8010FEF0(unsigned int flags);
+extern "C" bool fn_801102D8();
+extern "C" bool fn_801102F8();
+extern "C" bool fn_80110318();
+extern "C" bool fn_80110CF0();
+extern "C" bool fn_80110D18();
+extern "C" bool fn_80110D40();
+
 #endif // GAME_DB_CUP_MANAGER_H

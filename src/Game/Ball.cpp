@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include "Game/CharacterTriggers.h"
 #include <stdlib.h>
 #include "Game/Audio/GameStreams.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
@@ -126,38 +127,13 @@ private:
 
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
-extern "C" void fn_8001847C(cBall*, bool);
-extern "C" float fn_8002BE64(PlayerTweaks*);
-extern "C" float fn_8002BFA8(PlayerTweaks*, float);
-extern "C" void fn_80031A30(cFielder*, int, float);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
-extern "C" bool fn_80016768(cBall*);
 float ReceivingPass(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
-extern "C" void fn_80017448(cBall*, float);
-extern "C" void fn_80017F18(cBall*);
-extern "C" void fn_8001929C();
-extern "C" void fn_800193A0(void*);
-extern "C" void fn_800194A4(void*);
-extern "C" void fn_800195D8();
-extern "C" void fn_800196FC(void*);
-extern "C" void fn_80019718(void*);
-extern "C" void fn_80019814(void*);
-extern "C" void fn_80019910(PhysicsPatch*);
-extern "C" void fn_80019F10(void*);
-extern "C" void fn_8001A00C(void*);
-extern "C" void fn_8001A108(int, int);
-extern "C" void fn_8001AA0C(LiveBallTrail*, bool);
 extern "C" void Hide(BirdoEggObject*, bool);
-extern "C" void fn_801BDDE4();
 extern "C" void fn_801BDF08(int);
-extern "C" void fn_80097358(cPlayer*, float);
 extern "C" void fn_801B79A4(const char*, int);
-extern "C" void fn_801B7A28(cBall*);
-extern "C" void fn_800154FC(cBall*, float);
 extern "C" void fn_801B9904(unsigned long);
-extern "C" void fn_801B9EAC(cBall*, nlVector3*, bool);
-extern "C" void fn_801B9FD0(cBall*, bool);
 void ReleaseAudioSoundOwner(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);

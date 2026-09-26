@@ -1,5 +1,7 @@
 #include "Game/Camera/ReplayCamera.h"
 #include "Game/Camera/CameraDamping.h"
+#include "Game/Camera/CameraMan.h"
+#include "Game/Camera/tu_800F9460.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
@@ -19,11 +21,6 @@
 #include "NL/gl/glPlat.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-extern "C" float fn_800F2410(float fov);
-extern "C" void fn_802B5370(
-    nlQuaternion& out, const nlVector3& rotationAxis, unsigned short angle);
-extern float lbl_806E0F20[2];
 
 static const nlVector3 lbl_804DC520 = { 0.0f, 0.0f, 0.0f };
 

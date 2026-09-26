@@ -13,6 +13,8 @@
 
 class cPN_SAnimController;
 
+extern void (*g_ModelTransitionRenderCallback)(glModel*);
+
 struct TransitionModelStore
 {
     glModel* pModels;
@@ -33,7 +35,7 @@ public:
     virtual void Cancel();
     virtual float GetTransitionLength();
     virtual void DoSanityCheck();
-    virtual bool UnidentifiedVirtual30();
+    virtual bool ConsumeScreenGrabRequest();
 
     void RenderOutline() const;
     ModeledScreenTransition* LoadFromParser(SimpleParser* parser);
@@ -48,7 +50,7 @@ public:
     /* 0x14 */ char* m_pSkelFile;
     /* 0x18 */ char* m_pAnimFile;
     /* 0x1C */ unsigned long m_nTexture;
-    /* 0x20 */ unsigned long m_Unknown20;
+    /* 0x20 */ unsigned long m_nTextureIndex;
     /* 0x24 */ cPoseAccumulator* m_pPoseAccumulator;
     /* 0x28 */ cPN_SAnimController* m_pPoseTree;
     /* 0x2C */ nlMatrix4 m_mWorldMatrix;

@@ -4,7 +4,8 @@
 #include "Game/FE/FEAudio.h"
 
 #include "Game/GameSceneManager.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePointer.inl"
 #include "Game/FE/tlComponentInstance.h"
@@ -197,7 +198,7 @@ void SHGameplayOptions::Update(float dt)
         && !GameSceneManager::Instance()->IsOnStack((SceneList)10)
         && g_pFriendManager->FindHostInvitation())
     {
-        if (GameSceneManager::Instance()->IsOnStack((SceneList)28))
+        if (GameSceneManager::Instance()->IsOnStack(SCENE_OPTIONS_CHEATS_LIST))
             GameSceneManager::Instance()->Pop();
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = 27;
@@ -656,7 +657,7 @@ void SHGameplayOptions::fn_80237D34(unsigned int index, void* context)
 
 void SHGameplayOptions::fn_80237DE0(unsigned int index, void* context)
 {
-    SHOptionsCheatsList* scene = (SHOptionsCheatsList*)GameSceneManager::Instance()->Push((SceneList)28, SCREEN_NOTHING, false);
+    SHOptionsCheatsList* scene = (SHOptionsCheatsList*)GameSceneManager::Instance()->Push(SCENE_OPTIONS_CHEATS_LIST, SCREEN_NOTHING, false);
     scene->mCheatCategory = (int)context;
     scene->mSettings = &mPowerupSettings;
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);

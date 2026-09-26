@@ -6,6 +6,7 @@
 #include "Game/Camera/GameplayCam.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Event.h"
+#include "Game/EventRegistry.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
@@ -13,6 +14,7 @@
 #include "Game/GameInfo.h"
 #include "Game/MathHelpers.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkInputRecording.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
 #include "NL/nlAVLTree.h"
@@ -21,13 +23,6 @@
 #include "NL/nlTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    UnidentifiedEventRegistry;
-
-extern "C" UnidentifiedEventRegistry* g_pEventRegistry;
-extern "C" unsigned char* gNetworkInputRecording;
-extern "C" bool fn_8003C180(cPlayer*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -99,9 +94,9 @@ static UnidentifiedTypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length)
 {
     unsigned int hash = HashEventName(name, length);
-    UnidentifiedEventBase** foundEvent = 0;
+    EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+    UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
     return (UnidentifiedTypedEvent<GoalieSaveData>*)event;
 }
 
@@ -282,7 +277,7 @@ void UnidentifiedCameraEffects::OnWindupPresentation()
         return;
     }
 
-    if (fn_8003C180(g_pBall->m_pOwner) == true)
+    if (fn_8003C180((cFielder*)g_pBall->m_pOwner) == true)
     {
         mCameraFlags |= 4;
     }
@@ -504,7 +499,7 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
         && mTransitionTime <= 0.0f)
     {
         if (g_pNetworkSessionBase->GetLocalMachineId() == 0
-            && gNetworkInputRecording[4] == 0)
+            && !gNetworkInputRecording->mPlaybackReady)
         {
             g_pGame->fn_80059FC4();
         }
@@ -678,7 +673,7 @@ facingGoalKnown:
 void UnidentifiedCameraEffects::Reset()
 {
     if (mOwnsTimeScale && g_pNetworkSessionBase->GetLocalMachineId() == 0
-        && gNetworkInputRecording[4] == 0)
+        && !gNetworkInputRecording->mPlaybackReady)
     {
         g_pGame->fn_80059FC4();
     }

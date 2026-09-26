@@ -4,11 +4,10 @@
 #include "Game/AI/Desire.h"
 #include "Game/AI/Powerups.h"
 
-extern UnidentifiedUnsetTransition lbl_806E20B8;
 class DesireUsePowerup;
-class UnidentifiedFielderInput;
+class AIContext;
 extern "C" DesireUpdate fn_800D2074(
-    UnidentifiedFielderInput*);
+    AIContext*);
 extern "C" void fn_800D38D0(DesireUsePowerup*);
 extern "C" void fn_800D3CBC(DesireUsePowerup*);
 

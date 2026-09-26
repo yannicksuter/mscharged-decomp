@@ -6,7 +6,8 @@
 #include "Game/DB/GameProgress.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/StatsTracker.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feCupFlow.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
@@ -22,8 +23,6 @@
 #include "Game/FE/feDPD.h"
 
 extern "C" void fn_80207724(int);
-extern "C" void fn_802088B4();
-extern "C" void fn_80207060(bool);
 
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation,
     const char* name)

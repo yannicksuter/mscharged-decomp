@@ -42,10 +42,10 @@ static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* mate
     float size = (1.0f - fade) * gShadowSizeLow + fade * gShadowSizeHigh;
     float alpha = (1.0f - fade) * gShadowAlphaLow + fade * gShadowAlphaHigh;
 
-    alpha = alpha * object->GetScale();
+    alpha *= object->GetScale();
     if (gShadowScalesWithObject == 1)
     {
-        size = size * object->GetScale();
+        size *= object->GetScale();
     }
 
     int value = (int)alpha;

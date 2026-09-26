@@ -1288,32 +1288,36 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
     SaveData* pNextNextRight;
     SaveData* pCurLeft;
     SaveData* pCurRight;
-    SaveData* pCurUp;
-    SaveData* pCurRightUp;
     SaveData* pClosest;
     float fCloseDist;
 
-    pCur = pRoot;
-    while (pCur != 0)
     {
-        pCurRightUp = pCur;
-        pCur = pCur->mpConnectedSaveData[3];
-    }
-    while (pCurRightUp != 0)
-    {
-        pCurRightUp = pCurRightUp->mpConnectedSaveData[0];
+        SaveData* pCurRightUp;
+        pCur = pRoot;
+        while (pCur != 0)
+        {
+            pCurRightUp = pCur;
+            pCur = pCur->mpConnectedSaveData[3];
+        }
+        while (pCurRightUp != 0)
+        {
+            pCurRightUp = pCurRightUp->mpConnectedSaveData[0];
+        }
     }
 
-    pCur = pRoot;
-    while (pCur != 0)
     {
-        pCurUp = pCur;
-        pCur = pCur->mpConnectedSaveData[2];
-    }
-    while (pCurUp != 0)
-    {
-        pCurBot = pCurUp;
-        pCurUp = pCurUp->mpConnectedSaveData[0];
+        SaveData* pCurUp;
+        pCur = pRoot;
+        while (pCur != 0)
+        {
+            pCurUp = pCur;
+            pCur = pCur->mpConnectedSaveData[2];
+        }
+        while (pCurUp != 0)
+        {
+            pCurBot = pCurUp;
+            pCurUp = pCurUp->mpConnectedSaveData[0];
+        }
     }
 
     {
@@ -1407,6 +1411,8 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
 
         while (v3CurColPos.z < v3TopRight.z)
         {
+            SaveData* pCurUp;
+            SaveData* pCurRightUp;
             FindVerticalBoundingPoints(
                 pCurLeft, v3CurColPos, &pCurLeft, &pCurUp);
             FindVerticalBoundingPoints(

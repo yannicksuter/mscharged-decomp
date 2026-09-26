@@ -1,4 +1,5 @@
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Player.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -15,7 +16,6 @@
 #include "Game/Render/HammerObject.h"
 #include "math.h"
 
-extern "C" bool fn_800977A4(cPlayer*, float);
 
 bool gLandedHammersBlockFielders = true;
 bool gBreakHammerOnFielderHit;

@@ -1,6 +1,7 @@
 #include "Game/Render/Presentation.h"
 
 #include "Game/Ball.h"
+#include "Game/CharacterTriggers.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/BaseGameSceneManager.h"
@@ -23,6 +24,7 @@
 #include "Game/NetworkMessageRegistry.h"
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkInputRecording.h"
+#include "Game/NetworkInput.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/NetTournManager.h"
 #include "Game/NetworkSession.h"
@@ -61,8 +63,6 @@
 
 extern "C"
 {
-    void fn_801B9DAC(const char* name);
-    void fn_801BA358();
     void fn_801E2564(void* manager);
     void fn_80195868(ReplayChoreo* choreo, float deltaTime);
     void fn_801955E8(ReplayChoreo* choreo, bool alternate);
@@ -72,7 +72,6 @@ extern "C"
     float fn_800155A0(void* ball, int index);
     extern bool lbl_806DCD60;
     extern bool lbl_806E1961;
-    extern int lbl_806E2130;
 }
 
 static inline bool IsNumberDisplayCounting()

@@ -678,6 +678,7 @@ static s32 _ES_GetTicketViews(s32* fd, u64 tid, void* pViews, u32* count)
 
 static s32 _ES_LaunchTitle(s32* fd, u64 tid, void* pViews)
 {
+    s32 result = IPC_RESULT_OK;
     u8 tidWork[256] ALIGN(32);
     u8 vectorWork[32] ALIGN(32);
     IPCIOVector* pVectors = (IPCIOVector*)vectorWork;
@@ -685,12 +686,14 @@ static s32 _ES_LaunchTitle(s32* fd, u64 tid, void* pViews)
 
     if (*fd < 0)
     {
-        return ES_ERR_INVALID;
+        result = ES_ERR_INVALID;
+        goto out;
     }
 
     if ((u32)pViews % 32 != 0)
     {
-        return ES_ERR_INVALID;
+        result = ES_ERR_INVALID;
+        goto out;
     }
 
     *pTid = tid;
@@ -699,5 +702,8 @@ static s32 _ES_LaunchTitle(s32* fd, u64 tid, void* pViews)
     pVectors[1].base = pViews;
     pVectors[1].length = TICKET_VIEW_SIZE;
 
-    return IOS_IoctlvReboot(*fd, ES_IOCTLV_LAUNCH_TITLE, 2, 0, pVectors);
+    result = IOS_IoctlvReboot(*fd, ES_IOCTLV_LAUNCH_TITLE, 2, 0, pVectors);
+
+out:
+    return result;
 }

@@ -21,9 +21,12 @@ public:
     static void LoadPackageCallback(void* pData, unsigned long uSize, void* pUserData);
     void UnloadPackage();
     void ReleaseResourceHandles();
-    void Update(float dt);
+    void Update(float fDeltaT);
     void AllResourcesLoadedCallback();
-    FEPackage* GetPackage() const;
+    FEPackage* GetPackage() const
+    {
+        return m_pFEPackage;
+    }
 
     /* 0x00 */ FEPackage* m_pFEPackage;
     /* 0x04 */ unsigned long m_uHashID;
@@ -35,6 +38,9 @@ public:
     /* 0x74 */ int mState;
     /* 0x78 */ FEResourceHandle* m_pResourceHandles;
     /* 0x7C */ MemoryAllocator* m_pAllocator;
+
+private:
+    void LoadPackageResources(FEPackage* pFEPackage);
 }; // size 0x80
 
 #endif // _FESCENE_H_

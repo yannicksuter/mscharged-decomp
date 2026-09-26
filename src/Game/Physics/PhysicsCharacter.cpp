@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsCharacter.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
@@ -21,16 +22,13 @@
 #include "types.h"
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
+#include "Game/Physics/Physics.h"
 
-extern PhysicsWorld* g_PhysicsWorld;
 
 extern "C" void fn_8013F854(const char*, ...);
 extern "C" int strcmpi(const char*, const char*);
 extern "C" bool fn_8003E948(cFielder*);
 
-extern "C" void fn_80145F18(CollisionPlayerWallData*);
-extern "C" void fn_801462DC(CollisionPlayerBallData*);
-extern "C" void fn_80145DD0(CollisionPlayerPlayerData*);
 
 static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
 static bool sbDoDKBallStuckHack = true;

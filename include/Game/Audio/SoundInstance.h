@@ -5,6 +5,7 @@
 #include "Game/Audio/AudioRpc.h"
 #include "Game/Audio/Transition.h"
 #include "NL/nlSlotPool.h"
+#include "Game/Audio/SoundInstancePool.h"
 #include "types.h"
 
 class AudioSource;
@@ -23,9 +24,6 @@ enum SoundInstanceState
     SOUND_INSTANCE_STATE_STOPPING = 7,
     SOUND_INSTANCE_STATE_STOPPED = 8
 };
-
-struct SoundInstance;
-extern SlotPool<SoundInstance> sSoundInstancePool;
 
 struct SoundInstance
 {

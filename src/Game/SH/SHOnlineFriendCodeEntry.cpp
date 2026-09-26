@@ -7,7 +7,8 @@
 #include "Game/DB/SaveLoad.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePointer.inl"
 #include "Game/FE/fePopupMenu.h"
@@ -77,14 +78,8 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
     for (int i = 0; i < 12; ++i)
     {
         float scale = 0.8f;
-        TLInstance* positionInstance =
-            FEFinder<TLInstance, 5>::Find(
-                mPresentation->m_currentSlide, InlineHasher("Layer"),
-                InlineHasher("Group"), InlineHasher("PAD"));
-        if (positionInstance == 0)
-        {
-            positionInstance = &UnidentifiedTLGroupDefault::sInstance;
-        }
+        TLInstance* positionInstance = FEFinder<TLInstance, 5>::FindOrDefault(
+            mPresentation->m_currentSlide, "Layer", "Group", "PAD");
 
         feVector3 position = positionInstance->GetAssetPosition();
         if (i == 11)
@@ -101,14 +96,8 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
     for (int i = 0; i < 12; ++i)
     {
         float scale = 0.8f;
-        TLInstance* positionInstance =
-            FEFinder<TLInstance, 5>::Find(
-                mPresentation->m_currentSlide, InlineHasher("Layer"),
-                InlineHasher("Group"), InlineHasher("CODE"));
-        if (positionInstance == 0)
-        {
-            positionInstance = &UnidentifiedTLGroupDefault::sInstance;
-        }
+        TLInstance* positionInstance = FEFinder<TLInstance, 5>::FindOrDefault(
+            mPresentation->m_currentSlide, "Layer", "Group", "CODE");
 
         feVector3 position = positionInstance->GetAssetPosition();
         mDigitButtons[i].SetInstanceBounds(
@@ -200,27 +189,7 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
     {
         if (friendCode[i] == 0 && !foundEmpty)
         {
-            int item = i;
-            if (item >= 12)
-            {
-                item = 11;
-            }
-            if (item < 0)
-            {
-                item = 0;
-            }
-
-            if (mSelectedDigit != item)
-            {
-                mDigitInstances[item]->SetActiveSlide("DOWN", true, false);
-                mDigitInstances[mSelectedDigit]->SetActiveSlide(
-                    "OFF", true, false);
-
-                mDigitButtons[item].Disable();
-
-                mDigitButtons[mSelectedDigit].mDisabled = false;
-                mSelectedDigit = item;
-            }
+            SetSelectedDigit(this, i);
             foundEmpty = true;
         }
 
@@ -245,15 +214,9 @@ void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
         text->SetString(mDigits[item]);
     }
 
-    if (!foundEmpty && mSelectedDigit != 11)
+    if (!foundEmpty)
     {
-        mDigitInstances[11]->SetActiveSlide("DOWN", true, false);
-        mDigitInstances[mSelectedDigit]->SetActiveSlide("OFF", true, false);
-
-        mDigitButtons[11].Disable();
-
-        mDigitButtons[mSelectedDigit].mDisabled = false;
-        mSelectedDigit = 11;
+        SetSelectedDigit(this, 11);
     }
 
     memset(friendCode, 0, sizeof(g_pFriendManager->mFriendCodeInput));

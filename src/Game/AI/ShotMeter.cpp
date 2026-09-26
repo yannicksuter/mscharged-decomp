@@ -7,17 +7,9 @@
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/GameInfo.h"
+#include "Game/Game.h"
 #include "NL/nlMath.h"
 
-extern "C" void fn_800154FC(cBall*, float);
-extern "C" float fn_800156A8(cBall*);
-extern "C" float fn_8002BE18(PlayerTweaks*);
-extern "C" float fn_8002C7A8(PlayerTweaks*);
-extern "C" float fn_8002C7E8(PlayerTweaks*);
-extern "C" float fn_8002C7F4(PlayerTweaks*);
-extern "C" bool fn_80039148(cFielder*);
-extern "C" void fn_80039CA0(cFielder*);
-extern "C" bool fn_8003C180(cFielder*);
 extern "C" void fn_80060A00(void*, cFielder*);
 extern "C" float fn_800A0508(cFielder*, bool, bool);
 

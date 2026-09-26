@@ -1,5 +1,6 @@
 #include "Game/AI/AiUtil.h"
 
+#include <arith.h>
 #include "math.h"
 
 unsigned int nlRandom(unsigned int range);
@@ -104,7 +105,6 @@ bool IsPointInCone(const nlVector3& v3Point, const nlVector3& v3Pivot, const nlV
 }
 
 #undef abs
-extern "C" int abs(int n);
 
 unsigned short SeekDirection(unsigned short aCurrent, unsigned short aDesired, float fSeekSpeed, float fFalloff, float fDeltaT)
 {

@@ -257,6 +257,10 @@ public:
     {
         return m_pAnimInventory;
     }
+    eCharacterClass GetCharacterClass() const
+    {
+        return mUnidentified024.m_eCharacterClass;
+    }
     const nlVector3& GetPosition() const
     {
         return mUnidentified024.m_v3Position;

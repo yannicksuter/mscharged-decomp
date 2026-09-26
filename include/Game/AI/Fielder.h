@@ -78,6 +78,7 @@ struct LooseBallContactAnimInfo
 }; // total size: 0xC
 
 class cFielder;
+extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 class ChainChomp;
 class UnidentifiedNPC_801B43F8;
 struct CollisionThwompPlayerData;
@@ -174,7 +175,7 @@ extern "C" bool fn_800D1C34(const cFielder*);
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
 class PhysicsObject;
 class ShotMeter;
-class UnidentifiedFielderInput;
+class AIContext;
 class UnidentifiedFuzzyRuntimeBase;
 struct BulletBillObject;
 
@@ -605,7 +606,7 @@ private:
     /* 0x425 */ u8 mUnknown425[0x03];
 
 public:
-    /* 0x428 */ UnidentifiedFielderInput* mUnidentified428;
+    /* 0x428 */ AIContext* mUnidentified428;
 
 private:
     /* 0x42C */ bool m_bHasBeenUpdated;
@@ -654,5 +655,84 @@ public:
 public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
 }; // total size: 0x480
+
+
+// Shared fielder functions and data.
+extern "C" bool fn_8003C180(cFielder*);
+extern "C" void fn_8002E52C(cFielder*);
+extern "C" void fn_8002E580(cFielder* pFielder);
+extern "C" void fn_8002E66C(cFielder*, bool);
+extern "C" void fn_8002E818(cFielder*);
+extern "C" void fn_8002E898(cFielder*, bool);
+extern "C" void fn_8002E934(cFielder*, bool);
+extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
+extern "C" bool fn_8002F1E0(cFielder*);
+extern "C" bool fn_8002F310(cFielder* pFielder);
+extern "C" void fn_8002FE54(cFielder* pFielder);
+extern "C" void fn_800301E8(cFielder* pFielder);
+extern "C" void fn_800318F8(cFielder*);
+extern "C" void fn_80031C3C(cFielder*, float);
+extern "C" void fn_80032534(cFielder*, const nlVector3&);
+extern "C" float fn_80034F98(cFielder*, float);
+extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
+extern "C" void fn_800367B4(cFielder*);
+extern "C" void fn_800368E4(cFielder*);
+extern "C" bool fn_80036A58(cFielder*, unsigned short*);
+extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
+extern "C" bool fn_80036F88(cFielder* pFielder);
+extern "C" bool fn_8003881C(cFielder* pFielder);
+extern "C" bool fn_80039148(cFielder*);
+extern "C" bool fn_800392D8(cFielder*);
+extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
+extern "C" float fn_800394A8(cFielder*, int);
+extern "C" float fn_80039574(cFielder*);
+extern "C" void fn_80039CA0(cFielder*);
+extern "C" void fn_80039F24(cFielder*);
+extern "C" void fn_8003A0E4(cFielder*);
+extern "C" void fn_8003A178(cFielder*);
+extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
+extern "C" void fn_8003A544(cFielder* pFielder);
+extern "C" void fn_8003A5C8(cFielder* pFielder);
+extern "C" void fn_8003ADAC(cFielder* pFielder);
+extern "C" void fn_8003B020(cFielder* pFielder);
+extern "C" void fn_8003B0D8(cFielder* pFielder);
+extern "C" void fn_8003B190(cFielder* pFielder);
+extern "C" void fn_8003B254(cFielder* pFielder);
+extern "C" void fn_8003B2EC(cFielder* pFielder);
+extern "C" void fn_8003B384(cFielder* pFielder);
+extern "C" void fn_8003B41C(cFielder* pFielder);
+extern "C" void fn_8003B4B4(cFielder* pFielder);
+extern "C" void fn_8003B54C(cFielder* pFielder);
+extern "C" void fn_8003B5FC(cFielder* pFielder);
+extern "C" void fn_8003B664(cFielder* pFielder);
+extern "C" void fn_8003B6CC(cFielder* pFielder);
+extern "C" void fn_8003B790(cFielder* pFielder);
+extern "C" void fn_8003B854(cFielder* pFielder);
+extern "C" void fn_8003B920(cFielder* pFielder);
+extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
+extern "C" void fn_8003C268(cFielder*, float, float);
+extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
+extern "C" void fn_8003C560(cFielder* pFielder, int nParam1, int nParam2);
+extern "C" void fn_8003C6E0(cFielder* pFielder);
+extern "C" void fn_8003C7B0(cFielder*);
+extern "C" void fn_8003D8A4(cFielder* pFielder, float fDeltaT);
+extern "C" bool fn_8003D9BC(cFielder* pFielder);
+extern "C" void fn_8003DA94(cFielder*, bool);
+extern "C" void fn_8003E0A8(cFielder*);
+extern "C" void fn_8003E168(cFielder*, float);
+extern "C" void fn_8003E354(cFielder* pFielder);
+extern "C" void fn_8003EAC0(cFielder*, float);
+extern "C" void fn_8003F1E8(cFielder*);
+extern "C" const nlVector3& fn_80040318(cFielder*);
+extern bool lbl_806E0C50;
+extern bool lbl_806E0C51;
+extern bool lbl_806E0C52;
+extern unsigned char lbl_806E0C61;
+extern unsigned char lbl_806E0C62;
+extern float lbl_806E3418;
+extern float lbl_806E3420;
+extern float lbl_806E3424;
+extern float lbl_806E3428;
+extern float lbl_806E342C;
 
 #endif // GAME_AI_FIELDER_H

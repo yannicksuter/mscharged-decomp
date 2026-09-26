@@ -1,7 +1,8 @@
 #include "Game/AI/Desire.h"
+#include "Game/Player.h"
 #include "Game/Sys/debug.h"
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FielderInput.h"
+#include "Game/AI/AIContext.h"
 #include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Variant.h"
@@ -17,13 +18,12 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "NL/nlMemory.h"
 #include "Game/DebugWriteCache.h"
+#include "Game/WeatherData.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_80098098(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
 extern "C" float fn_8002E1B0(cFielder*);
-extern "C" float fn_80039574(cFielder*);
 extern bool lbl_806E0E20;
 extern float lbl_806DC058;
 extern nlVector2 lbl_806DC078;
@@ -94,7 +94,7 @@ void Desire::UnidentifiedSetContext(UnidentifiedScriptMachine* context)
     if (context != 0)
     {
         m_pFielder
-            = (cFielder*)context->mUnidentified064->mData.pointer;
+            = (cFielder*)context->mAIContext->mData.pointer;
     }
     else
     {
@@ -850,20 +850,11 @@ void DesireRunToTarget::UnidentifiedVirtual7(void* context, DebugWriteCache* cac
     }
 }
 
-class SandTombWeather;
-
 extern "C" int fn_800B04B4(SandTombWeather*)
 {
     return 4;
 }
 
-extern "C" cTeam* fn_800D6670(cFielder*);
-extern "C" float fn_800DAD3C(cBall*);
-extern "C" float fn_800DF0B8(cFielder*);
-extern "C" float fn_800394A8(cFielder*, int);
-extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
-extern "C" void fn_800180F4(cBall*, nlVector3*, float);
-extern "C" float fn_800D7B00(cFielder*);
 extern "C" AvoidController* fn_8002E144(cFielder*);
 extern float lbl_806DC0A8;
 extern int lbl_806DC0B0;

@@ -276,4 +276,8 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 void CompactPowerups();
 void InitializePowerups();
 
+
+extern "C" bool fn_80099C94(ePowerUpType eType);
+extern "C" bool fn_80099CC4(ePowerUpType eType);
+
 #endif // GAME_AI_POWERUPS_H

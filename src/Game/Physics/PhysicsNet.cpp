@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsNet.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Ball.h"
@@ -14,9 +15,7 @@
 #include "math.h"
 #include "types.h"
 
-extern cTeam* g_pTeams[];
 
-extern "C" void fn_8014681C(CollisionBallGoalpostData*);
 
 PhysicsNet* PhysicsNet::spPhysNetNegativeX = 0;
 PhysicsNet* PhysicsNet::spPhysNetPositiveX = 0;

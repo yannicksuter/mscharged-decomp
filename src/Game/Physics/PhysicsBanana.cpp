@@ -1,4 +1,5 @@
 #include "Game/AI/Powerups.h"
+#include "Game/Player.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Ball.h"
 #include "Game/EventDataTypes.h"
@@ -24,10 +25,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 
-extern "C" bool fn_800167A8(cBall*);
-extern "C" bool fn_800977A4(cFielder*, float);
-extern "C" void fn_801473A4(CollisionPowerupGroundData*);
-extern "C" void fn_80147634(CollisionPowerupWallData*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 

@@ -46,8 +46,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern float g_fSimulationTick;
-extern float g_fFixedUpdateTick;
 
 extern "C"
 {

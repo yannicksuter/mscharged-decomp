@@ -6,7 +6,8 @@
 #include "Game/FE/FEAudio.h"
 
 #include "Game/FE/feFinder.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePointer.inl"

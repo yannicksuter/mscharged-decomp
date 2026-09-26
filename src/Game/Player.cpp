@@ -1,4 +1,6 @@
 #include <stddef.h>
+#include "Game/CharacterTriggers.h"
+#include "Game/AI/Fielder.h"
 #include <float.h>
 #include <math.h>
 
@@ -24,6 +26,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/FormationDefines.h"
 #include "Game/GameTweaks.h"
+#include "Game/Game.h"
 #include "Game/Goalie.h"
 #include "Game/PoseAccumulator.h"
 #include "Game/Physics/PhysicsAIBall.h"
@@ -56,25 +59,15 @@
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
-extern "C" void fn_801BCC38(cCharacter*);
-extern "C" void fn_801BCE2C(cCharacter*);
-extern "C" void fn_801BCAD4(cCharacter*);
-extern "C" void fn_801BCC9C(cCharacter*);
 extern "C" void fn_8002E3F8(cFielder*);
 extern FuzzyVariant fvNotSet;
-extern float g_fFixedUpdateTick;
 extern "C" float fn_800DAD84(const nlVector3&, const nlVector3&, unsigned short,
                              float, const nlVector2&, const nlVector2&, bool, bool);
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30AC(cTeam*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80099660(
     UnidentifiedFuzzyRuntimeBase*, const char*, cPlayer*);
-extern "C" float fn_800DF028(cFielder*);
-extern "C" void fn_801B73B8(cPlayer*, bool);
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
 extern "C" bool fn_8003E99C(const cFielder*);
-extern "C" void fn_8003F1E8(cFielder*);
-extern "C" void fn_80031C3C(cFielder*, float);
 extern "C" void fn_80015B38(cBall*, bool);
 
 static u16 g_aOOIConstraint = (u16)DegreesToAngle(180.0f);
@@ -881,7 +874,7 @@ void cPlayer::fn_800974B0()
     {
         fn_801BCE2C(this);
     }
-    mUnidentified1E4.m_tFireTimer.m_unk0 = mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0;
+    mUnidentified1E4.m_tFireTimer.m_uWasRunning = mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0;
     mUnidentified1E4.m_tFireTimer.m_uPackedTime = 0;
 }
 

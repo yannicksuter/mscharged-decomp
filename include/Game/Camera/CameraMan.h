@@ -20,6 +20,13 @@ enum eCameraMessage
 };
 
 void FireCameraRumbleFilter(float fRumbleX, float fRumbleY, float fSpring, float fDamping);
+extern "C" float fn_800F2410(float fFOV);
+extern "C" void fn_800F02DC(void*, unsigned long, void*);
+extern "C" void fn_800F0990(float);
+extern "C" bool fn_800F08A4();
+extern "C" void fn_800F06D4();
+extern "C" void fn_800F030C(bool stadiumViewer);
+extern const float kCameraZero;
 
 class cCameraManager
 {

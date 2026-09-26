@@ -1,4 +1,5 @@
 #include "Game/OverlayHandlerInGameText.h"
+#include <cstring>
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/Render/RLViewLayers.h"
 
@@ -8,7 +9,7 @@
 #include "Game/DB/StatsTracker.h"
 #include "Game/FE/feFinder.h"
 #include "Game/FE/feFinderFind_impl.h"
-#include "Game/FE/feInlineHasher.inl"
+#include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
@@ -27,8 +28,6 @@
 #include "NL/nlTask.h"
 #include "Game/Render/RLViewLayers.h"
 
-extern "C" void* memcpy(void* dest, const void* src, unsigned long count);
-extern BaseGameSceneManager* g_pOverlayManager;
 
 static inline const unsigned short* LookupLocHash(const char* stringId)
 {

@@ -138,14 +138,6 @@ extern bool g_bDisableWriteOut;
 extern void* lbl_806E1C20;
 extern u8 lbl_806E1458;
 
-extern int lbl_806DF2E0;
-extern int lbl_806DF2E4;
-extern int lbl_806DF2E8;
-extern int lbl_806DF2EC;
-extern int lbl_806DF2F0;
-extern int lbl_806DF2F4;
-extern int lbl_806DF2F8;
-extern int lbl_806DF2FC;
 
 
 volatile int g_Region = 3;

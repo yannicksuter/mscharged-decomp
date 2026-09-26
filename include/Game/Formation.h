@@ -81,7 +81,7 @@ public:
     FormationEval();
     FormationEval(FormationManager* pMgr, eFormationType type, const FormationSpec* spec)
     {
-        m_SortTimer.m_unk0 = m_SortTimer.m_uPackedTime != 0;
+        m_SortTimer.m_uWasRunning = m_SortTimer.m_uPackedTime != 0;
         m_SortTimer.m_uPackedTime = 0;
         m_pFormationManager = pMgr;
         m_pKeyPlayer = 0;

@@ -1,8 +1,10 @@
 #include "Game/SH/SHOnlineRanking.h"
 
+#include "Game/BaseSceneHandler.inl"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feDPD.h"
-#include "Game/FE/feFinder.inl"
+#include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feOnlineError.h"
@@ -78,7 +80,7 @@ inline void SHOnlineRanking::UpdateRows()
 
 void SHOnlineRanking::SceneCreated()
 {
-    FEPresentation* presentation = mPresentation;
+    FEPresentation* presentation = GetPresentation();
     for (int i = 0; i < 10; ++i)
     {
         char name[8];
@@ -105,9 +107,9 @@ void SHOnlineRanking::SceneCreated()
     mScrollBar.SetRange(count - 10);
     mScrollBar.SetValue(mFirstVisibleRank);
 
-    mMyRank = NetworkStatsManager::Instance()
-                  ->GetCategory(categoryIndex)
-                  ->mFirstRank;
+    int rankCategory = mLeaderboardCategory;
+    NetworkStatsManager* stats = NetworkStatsManager::Instance();
+    mMyRank = stats->GetCategory(rankCategory)->mFirstRank;
     UpdateRows();
     UpdateHeader();
 

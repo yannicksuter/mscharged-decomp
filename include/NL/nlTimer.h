@@ -18,11 +18,11 @@ public:
     void SetSeconds(float seconds);
     void UnidentifiedClear()
     {
-        m_unk0 = m_uPackedTime != 0;
+        m_uWasRunning = m_uPackedTime != 0;
         m_uPackedTime = 0;
     }
 
-    u32 m_unk0;
+    u32 m_uWasRunning;
     u32 m_uPackedTime;
 };
 
