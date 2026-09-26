@@ -155,9 +155,9 @@ void fn_80278860(BasicStadium* pStadium, int active)
 /**
  * Address/Size: 0x802788BC | size: 0x50
  */
-void fn_802788BC(BasicStadium* pStadium, float fTimeScale)
+void SetStadiumShadowHeight(BasicStadium* pStadium, float fHeight)
 {
-    pStadium->m_shadowHeight = fTimeScale;
+    pStadium->m_shadowHeight = fHeight;
     fn_80184AF8(pStadium->m_shadowHeight);
     GetEmissionManager()->mTimeScale = pStadium->m_shadowHeight;
 }

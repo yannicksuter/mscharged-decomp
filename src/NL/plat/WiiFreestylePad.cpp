@@ -8,6 +8,31 @@ nlArrayAllocator<WiiFreestylePad> gWiiFreestylePadAllocator(reinterpret_cast<Wii
 int* gWiiFreestyleButtonRemap;
 int gWiiFreestylePadClassID = gNextPadClassID++;
 
+inline void WiiFreestylePad::UpdateState(float dt)
+{
+    int changed;
+    int i;
+    WPADFSStatus* status;
+    mDPDData.Update(&mCurrentStatus->kpad);
+
+    status = &mCurrentStatus->wpad;
+    mAnalogLeft.x = status->fsStickX / 56.0f;
+    mAnalogLeft.y = status->fsStickY / 56.0f;
+    if (m_isLeftAnalogToDPadMapEnabled)
+    {
+        status->button |= MapWiiStickToDPad(mAnalogLeft.x, mAnalogLeft.y, 1, 2, 4, 8);
+    }
+
+    changed = mCurrentStatus->wpad.button ^ mPreviousStatus->wpad.button;
+    for (i = 0; i < 13; ++i)
+    {
+        if (changed & GetButtonMask(i))
+            mButtonStateTime[i] = 0.0f;
+        else
+            mButtonStateTime[i] += dt;
+    }
+}
+
 WiiFreestylePad::WiiFreestylePad(int padIndex)
     : PadBackend(padIndex)
     , mCurrentStatus(&mStatusBuffers[0])
@@ -28,24 +53,7 @@ void WiiFreestylePad::Update(float dt)
         mPreviousStatus = temp;
         *mCurrentStatus = *g_pPlatPadManager->GetFreestyleStatus(m_padIndex);
         ClampWiiStick(&mCurrentStatus->wpad.fsStickX, &mCurrentStatus->wpad.fsStickY);
-        mDPDData.Update(&mCurrentStatus->kpad);
-
-        WPADFSStatus* status = &mCurrentStatus->wpad;
-        mAnalogLeft.x = status->fsStickX / 56.0f;
-        mAnalogLeft.y = status->fsStickY / 56.0f;
-        if (m_isLeftAnalogToDPadMapEnabled)
-        {
-            status->button |= MapWiiStickToDPad(mAnalogLeft.x, mAnalogLeft.y, 1, 2, 4, 8);
-        }
-
-        int changed = mCurrentStatus->wpad.button ^ mPreviousStatus->wpad.button;
-        for (int i = 0; i < 13; ++i)
-        {
-            if (changed & GetButtonMask(i))
-                mButtonStateTime[i] = 0.0f;
-            else
-                mButtonStateTime[i] += dt;
-        }
+        UpdateState(dt);
         PadBackend::Update(dt);
     }
 }

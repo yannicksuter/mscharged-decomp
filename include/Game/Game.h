@@ -108,6 +108,7 @@ public:
     void fn_80059FC4();
     void PreUpdate(float deltaTime);
     void RandomizePlayerUpdateOrder();
+    void ResetCharacters();
     void fn_8005B508();
     float fn_8005B748(int param1, int param2);
     cPlayer* fn_8005B780(int param1, int param2, int param3);

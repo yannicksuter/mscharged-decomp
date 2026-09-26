@@ -707,6 +707,19 @@ void Nis::Trigger::Fire(Nis& nis) const
     }
 }
 
+static inline int FindAvailableSidekickIndex(int firstIndex)
+{
+    int index;
+    for (index = 0; index < 3; ++index)
+    {
+        if (!lbl_8057AB68[index + firstIndex])
+        {
+            break;
+        }
+    }
+    return index + firstIndex;
+}
+
 int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
 {
     if (target == NIS_TARGET_HOME_CAPTAIN)
@@ -721,15 +734,7 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
     {
         if (param3)
         {
-            int index;
-            for (index = 0; index < 3; ++index)
-            {
-                if (!lbl_8057AB68[index + 1])
-                {
-                    break;
-                }
-            }
-            return index + 1;
+            return FindAvailableSidekickIndex(1);
         }
         return 1;
     }
@@ -749,15 +754,7 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
     {
         if (param3)
         {
-            int index;
-            for (index = 0; index < 3; ++index)
-            {
-                if (!lbl_8057AB68[index + 5])
-                {
-                    break;
-                }
-            }
-            return index + 5;
+            return FindAvailableSidekickIndex(5);
         }
         return 5;
     }
@@ -791,29 +788,13 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
         {
             if (param3)
             {
-                int index;
-                for (index = 0; index < 3; ++index)
-                {
-                    if (!lbl_8057AB68[index + 5])
-                    {
-                        break;
-                    }
-                }
-                return index + 5;
+                return FindAvailableSidekickIndex(5);
             }
             return 5;
         }
         if (param3)
         {
-            int index;
-            for (index = 0; index < 3; ++index)
-            {
-                if (!lbl_8057AB68[index + 1])
-                {
-                    break;
-                }
-            }
-            return index + 1;
+            return FindAvailableSidekickIndex(1);
         }
         return 1;
     }
@@ -823,29 +804,13 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3)
         {
             if (param3)
             {
-                int index;
-                for (index = 0; index < 3; ++index)
-                {
-                    if (!lbl_8057AB68[index + 1])
-                    {
-                        break;
-                    }
-                }
-                return index + 1;
+                return FindAvailableSidekickIndex(1);
             }
             return 1;
         }
         if (param3)
         {
-            int index;
-            for (index = 0; index < 3; ++index)
-            {
-                if (!lbl_8057AB68[index + 5])
-                {
-                    break;
-                }
-            }
-            return index + 5;
+            return FindAvailableSidekickIndex(5);
         }
         return 5;
     }

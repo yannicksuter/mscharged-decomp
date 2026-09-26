@@ -25,6 +25,21 @@ static float g_fFollowCamMaxZOffset = 3.0f;
 static float g_fFollowCamMinZOffset = 0.6f;
 
 /**
+ * Offset/Address/Size: 0x0 | 0x800F3C1C | size: 0xA8
+ */
+cFollowCamera::cFollowCamera(FollowTarget followTarget)
+{
+    m_FollowTarget = followTarget;
+    m_bOOISet = false;
+    m_aFacingDirection = 0;
+    m_aPitch = 0x1000;
+    m_fOOIDistance = 5.0f;
+    m_bPitchLimits = true;
+    m_bControlsLocked = false;
+    m_matView.SetIdentity();
+}
+
+/**
  * Offset/Address/Size: 0xA8 | 0x800F3CC4 | size: 0x728
  */
 void cFollowCamera::Update(float fDeltaT)
@@ -34,10 +49,12 @@ void cFollowCamera::Update(float fDeltaT)
     cGlobalPad* pController;
     cCharacter* pCharacter;
     nlMatrix4 m4Orient;
-    nlVector3 v3CameraDirection;
+    nlVector3 v3ViewDirection;
     nlVector3 v3OOIMovement;
-    nlVector3 v3CameraMovement;
-    nlVector3 v3Cross;
+    nlVector3 v3PerpendicularMovement;
+    nlVector3 v3CrossProduct;
+    nlVector3 v3PitchRotatedPosition;
+    nlVector3 v3FacingRotatedPosition;
 
     pController = g_pPadManager->GetPad(0);
     if (!pController->IsConnected())
@@ -117,9 +134,9 @@ void cFollowCamera::Update(float fDeltaT)
     if (!g_bTweaking && !IsProfiling() && !m_bControlsLocked
         && !pController->IsPressed(0xF, true) && !pController->IsPressed(0x10, true))
     {
-        const float fSeek = InterpolateRange(
+        const float fDistanceScalar = InterpolateRange(
             g_fDistanceSeek, lbl_806DC4CC, g_fMinDistance, g_fMaxDistance, m_fOOIDistance);
-        m_fOOIDistance -= fSeek * pController->AnalogLeftY();
+        m_fOOIDistance -= fDistanceScalar * pController->AnalogLeftY();
     }
 
     if (m_fOOIDistance > g_fMaxDistance)
@@ -138,57 +155,41 @@ void cFollowCamera::Update(float fDeltaT)
             m_aPitch = g_aFollowCamMinPitch;
     }
 
-    const float vx = -m_matView.e2[0][2];
-    const float vy = -m_matView.e2[1][2];
-    nlVec3Set(v3CameraDirection, vx, vy, 0.0f);
+    float vy = -m_matView.e2[1][2];
+    float vx = -m_matView.e2[0][2];
+    nlVec3Set(v3ViewDirection, vx, vy, 0.0f);
     nlVec3Sub2D(v3OOIMovement, m_v3OOIDampened, m_v3OOIDampenedPrev);
     v3OOIMovement.z = 0.0f;
 
-    const float denom = nlVec3Length(v3CameraDirection);
-    const float t = nlVec3DotProduct(v3CameraDirection, v3OOIMovement)
-        / (denom * denom);
+    float denom = nlVec3Length(v3ViewDirection);
+    float t = nlVec3DotProduct(v3ViewDirection, v3OOIMovement) / (denom * denom);
+    v3PerpendicularMovement.x = v3OOIMovement.x - t * v3ViewDirection.x;
+    v3PerpendicularMovement.y = v3OOIMovement.y - t * v3ViewDirection.y;
+    v3PerpendicularMovement.z = 0.0f;
 
-    float rx = v3OOIMovement.x - t * v3CameraDirection.x;
-    float ry = v3OOIMovement.y - t * v3CameraDirection.y;
-    nlVec3Set(v3CameraMovement, rx, ry, 0.0f);
-    const float len = nlVec3Length(v3CameraMovement);
+    float invDist = nlVec3Length(v3PerpendicularMovement) / m_fOOIDistance;
+    float angleShortF = 10430.378f * invDist;
+    u16 angleShort = (u16)(int)angleShortF;
 
-    const float invDist = len / m_fOOIDistance;
-    const float angleShortF = 10430.378f * invDist;
-    const u16 angleShort = (u16)(int)angleShortF;
-
-    nlVec3CrossProduct(v3Cross, v3CameraMovement, v3CameraDirection);
-    if (v3Cross.z >= 0.0f)
+    nlVec3CrossProduct(v3CrossProduct, v3PerpendicularMovement, v3ViewDirection);
+    if (v3CrossProduct.z >= 0.0f)
         m_aFacingDirection = m_aFacingDirection - angleShort;
     else
         m_aFacingDirection = m_aFacingDirection + angleShort;
 
     nlVec3Set(m_v3CameraPosition, m_fOOIDistance, 0.0f, 0.0f);
 
-    nlMakeRotationMatrixY(m4Orient, (u16)(-m_aPitch) * 0.0000958738f);
-    nlMultPosVectorMatrix(m_v3CameraPosition, m4Orient);
+    nlMakeRotationMatrixY(m4Orient, AngUnitsToRad_fromUnsignedShort(-m_aPitch));
+    nlMultPosVectorMatrix(v3PitchRotatedPosition, m_v3CameraPosition, m4Orient);
+    m_v3CameraPosition = v3PitchRotatedPosition;
 
-    nlMakeRotationMatrixZ(m4Orient, m_aFacingDirection * 0.0000958738f);
-    nlMultPosVectorMatrix(m_v3CameraPosition, m4Orient);
+    nlMakeRotationMatrixZ(m4Orient, AngUnitsToRad_fromUnsignedShort(m_aFacingDirection));
+    nlMultPosVectorMatrix(v3FacingRotatedPosition, m_v3CameraPosition, m4Orient);
+    m_v3CameraPosition = v3FacingRotatedPosition;
 
     m_v3CameraPosition.x += m_v3OOIDampened.x;
     m_v3CameraPosition.y += m_v3OOIDampened.y;
     m_v3CameraPosition.z += m_v3OOIDampened.z;
 
     glMatrixLookAt(m_matView, m_v3CameraPosition, m_v3OOIDampened, mUpVector);
-}
-
-/**
- * Offset/Address/Size: 0x0 | 0x800F3C1C | size: 0xA8
- */
-cFollowCamera::cFollowCamera(FollowTarget followTarget)
-{
-    m_FollowTarget = followTarget;
-    m_bOOISet = false;
-    m_aFacingDirection = 0;
-    m_aPitch = 0x1000;
-    m_fOOIDistance = 5.0f;
-    m_bPitchLimits = true;
-    m_bControlsLocked = false;
-    m_matView.SetIdentity();
 }

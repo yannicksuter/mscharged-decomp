@@ -318,10 +318,10 @@ inline void nlVec3Project(nlVector3& result, const nlVector3& v, const nlVector3
     nlVec3Scale(result, normal, scale);
 }
 
-inline void nlVec3Normalize(nlVector3& result, const nlVector3& value)
+inline void nlVec3Normalize(nlVector3& result, const nlVector3& value, bool bAccurate = true)
 {
     float lengthSquared = nlVec3LengthSquared(value);
-    float scale = nlRecipSqrt(lengthSquared, true);
+    float scale = nlRecipSqrt(lengthSquared, bAccurate);
     nlVec3Scale(result, value, scale);
 }
 

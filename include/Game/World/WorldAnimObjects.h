@@ -70,11 +70,13 @@ public:
     virtual void SetWorldMatrix(const nlMatrix4& transform);
 
     /* 0x10 */ u8 m_pad10[0x10];
-    /* 0x20 */ WorldPhysicsDescription_80341EEC m_Description;
+    /* 0x20 */ WorldPhysicsDescription m_Description;
     /* 0x74 */ u8 m_pad74[0x0C];
     /* 0x80 */ PhysicsObject* m_pPhysicsObject;
     /* 0x84 */ u8 m_pad84[0x0C];
 }; // size: 0x90
+
+extern "C" void fn_8034417C(WorldPhysicsDrawable_80534448* pObject);
 
 typedef char WorldAnimDrawable_80343A40_size_check[
     sizeof(WorldAnimDrawable_80343A40) == 0x70 ? 1 : -1];

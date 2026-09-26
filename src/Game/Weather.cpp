@@ -1,5 +1,6 @@
 #include "Game/Render/tu_801B43F8.h"
 #include "NL/nlFunction.inl"
+#include "NL/nlBindMember.h"
 #include "NL/utility.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Goalie.h"
@@ -522,7 +523,7 @@ Windy::Windy()
 {
     meWeather = 2;
     Reset();
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (Windy::*)()>, Windy*>(MemFun(&Windy::OnGetReadyForKickoff), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &Windy::OnGetReadyForKickoff)), 0, -1);
 }
 
 void Windy::OnGetReadyForKickoff()
@@ -586,7 +587,7 @@ inline nlVector3 Windy::GetDebrisVelocity(const nlVector3& direction)
         break;
     }
     nlVector3 velocity;
-    nlVec3Scale(velocity, direction, nlRecipSqrt(nlVec3LengthSquared(direction), false));
+    nlVec3Normalize(velocity, direction, false);
     nlVec3Scale(velocity, speed);
     return velocity;
 }
@@ -687,7 +688,7 @@ nlVector3 Windy::CalculateDebrisDisplacement(const nlVector3& position, const nl
     nlVector3 end;
     nlVec3ScaleAdd(end, 1000.0f, velocity, start);
     nlVector3 direction;
-    nlVec3Scale(direction, velocity, nlRecipSqrt(nlVec3LengthSquared(velocity), false));
+    nlVec3Normalize(direction, velocity, false);
     nlVector3 closest = GetClosestPointOnLineABFromPointC(start, end, ballPosition);
     nlVector3 displacement;
     nlVec3Sub(displacement, ballPosition, closest);
@@ -737,11 +738,7 @@ void Windy::AvoidDebrisObstacle(nlVector3& start, nlVector3& end, nlVector3& dis
             direction.y *= -1.0f;
             distance *= -1.0f;
         }
-        float inverseLength = nlRecipSqrt(nlVec3LengthSquared(direction), false);
-        nlVec3Set(direction,
-            inverseLength * direction.x,
-            inverseLength * direction.y,
-            inverseLength * direction.z);
+        nlVec3Normalize(direction, direction, false);
         nlVec3Scale(offset, direction, radius - distance);
         nlVec3Add(displacement, displacement, offset);
         nlVec3Add(start, start, offset);
@@ -781,8 +778,8 @@ void Windy::Stop(bool value)
 SolarFlare::SolarFlare()
 {
     meWeather = 4;
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (SolarFlare::*)()>, SolarFlare*>(MemFun(&SolarFlare::OnGetReadyForKickoff), this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (SolarFlare::*)()>, SolarFlare*>(MemFun(&SolarFlare::OnKickoff), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnGetReadyForKickoff)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnKickoff)), 0, -1);
     m_StartCount = 0;
     for (int i = 0; i < 3; i++)
         m_TargetIndicies[i] = -1;
@@ -1513,7 +1510,7 @@ SandTombWeather::SandTombWeather()
 {
     meWeather = 7;
     Reset();
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindExp1<void, Detail::MemFunImpl<void, void (SandTombWeather::*)()>, SandTombWeather*>(MemFun(&SandTombWeather::OnKickoff), this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SandTombWeather::OnKickoff)), 0, -1);
 }
 
 float SandTombWeather::GetStartChance()
@@ -1536,7 +1533,7 @@ float SandTombWeather::GetStartChance()
 
 void SandTombWeather::Reset()
 {
-    SandTombWeather::Stop(false);
+    ResetThwomps(false);
     Weather::Reset();
 }
 
@@ -1610,7 +1607,7 @@ void SandTombWeather::Update(float dt)
     }
 }
 
-void SandTombWeather::Stop(bool initialize)
+inline void SandTombWeather::ResetThwomps(bool initialize)
 {
     m_NumActiveThwomps = 0;
     m_ThwompSpawnTimer = 0.0f;
@@ -1620,8 +1617,13 @@ void SandTombWeather::Stop(bool initialize)
     {
         if (m_Thwomps[i])
             m_Thwomps[i]->Stop(initialize);
-        m_Thwomps[i] = 0;
+        SetThwomp(i, 0);
     }
+}
+
+void SandTombWeather::Stop(bool initialize)
+{
+    ResetThwomps(initialize);
     Weather::Stop(initialize);
 }
 
@@ -1663,7 +1665,7 @@ void SandTombWeather::SpawnThwomps()
         {
             index = RandomWeatherIndex(8);
         }
-        ThwompObject* thwomp = m_Thwomps[index] = gNPCManager->GetThwomp(-1);
+        ThwompObject* thwomp = SetThwomp(index, gNPCManager->GetThwomp(-1));
         if (thwomp)
         {
             position = origin;

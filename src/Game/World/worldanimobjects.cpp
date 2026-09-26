@@ -43,9 +43,6 @@ struct WorldAnimBinding_803438FC
 WorldVisibilityNode* FindWorldVisibilityNode(
     WorldVertexAnimDrawable_80343E3C*, WorldVisibilityNode*);
 
-extern "C" PhysicsObject* fn_80341EEC(
-    WorldPhysicsDescription_80341EEC* pDescription,
-    CollisionSpace* pCollisionSpace);
 extern "C" void fn_80342170(WorldPhysicsOwner_80342170* pOwner);
 extern "C" EffectsGroup* fn_802E7D54(
     EmissionManager*, unsigned long);
@@ -196,9 +193,9 @@ bool WorldDrawable::V6(const nlVector4* pCullData) const
     return result != FRUSTUM_OUTSIDE;
 }
 
-extern "C" void fn_80343C00(WorldAnimDrawable_80343A40* pObject)
+void WorldDrawable::Draw()
 {
-    ((DrawableObject*)pObject)->V8(0);
+    V8(0);
 }
 
 void WorldDrawable::V8(GLView* pView)
@@ -346,13 +343,13 @@ extern "C" void fn_80344144(
     WorldPhysicsDrawable_80534448* pObject,
     WorldObjectLoadContext*)
 {
-    pObject->m_pPhysicsObject = fn_80341EEC(
+    pObject->m_pPhysicsObject = CreatePhysicsPrimitive(
         &pObject->m_Description, 0);
 }
 
-extern "C" void fn_8034417C(WorldPhysicsOwner_80342170* pObject)
+extern "C" void fn_8034417C(WorldPhysicsDrawable_80534448* pObject)
 {
-    fn_80342170(pObject);
+    fn_80342170((WorldPhysicsOwner_80342170*)pObject);
 }
 
 extern "C" void* fn_80344180(void* pObject, int shouldDelete)

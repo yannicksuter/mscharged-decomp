@@ -38,7 +38,6 @@ public:
 class CategoryVolume : public AudioEffectBase
 {
 public:
-    virtual ~CategoryVolume();
     virtual void CreateParameter(u32 definition, void* context, bool negate,
         AudioEffectParameter** output);
     virtual void BeginBlend();
@@ -112,12 +111,14 @@ static CategoryEntry s_CategoryEntries[5] = {
     CategoryEntry(0xAB29FE50, 0),
 };
 
+static inline CategoryEntry* FindCategoryEntry(u32 category);
+
 SlotPool<CategoryVolumeParameter>
     CategoryVolumeParameter::s_Pool(16, 16);
 SlotPool<CategoryVolume> CategoryVolume::s_Pool(16, 16);
 
-extern bool gCategoryVolumeOverrideEnabled;
-extern s32 gCategoryVolumeOverride;
+bool gCategoryVolumeOverrideEnabled;
+s32 gCategoryVolumeOverride;
 
 CategoryVolumeParameter::CategoryVolumeParameter()
     : m_Volume(0.0f)
@@ -151,9 +152,7 @@ void CategoryVolume::CreateParameter(u32 definition, void*, bool negate,
     volume = volume <= 6.0f ? volume : 6.0f;
     parameter->m_Volume = volume;
 
-    CategoryEntry* entry
-        = nlBSearch<CategoryEntry, CategoryEntry>(
-            CategoryEntry(parameter->m_Category, 0), s_CategoryEntries, 5);
+    CategoryEntry* entry = FindCategoryEntry(parameter->m_Category);
     if (entry != 0)
     {
         CategoryBackendEntry* backend
@@ -186,14 +185,15 @@ CategoryVolumeParameter::~CategoryVolumeParameter()
 {
 }
 
+static inline CategoryEntry* FindCategoryEntry(u32 category)
+{
+    CategoryEntry key(category, 0);
+    return nlBSearch<CategoryEntry, CategoryEntry>(key, s_CategoryEntries, 5);
+}
+
 void CategoryVolume::BeginBlend()
 {
     m_Final.m_State = m_Initial.m_State;
     m_Final.m_Volume = m_Initial.m_Volume;
     m_Final.m_Category = m_Initial.m_Category;
 }
-
-CategoryVolume::~CategoryVolume()
-{
-}
-

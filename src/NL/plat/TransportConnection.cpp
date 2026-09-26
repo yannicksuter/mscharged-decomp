@@ -363,7 +363,7 @@ int TransportConnection::ResendNotACKed(
     return 0;
 }
 
-void TransportConnection::UpdateConnected()
+void TransportConnection::UpdateKeepAlive()
 {
     unsigned long long now = nlGetTime();
     int elapsed = (int)nlGetTimeDifference(mKeepAliveSendTime, now);
@@ -374,7 +374,7 @@ void TransportConnection::UpdateConnected()
         TransportKeepAlive payload;
         payload.Serialize(&serializer);
         u8* data = serializer.mBuffer;
-        int length = serializer.GetLength();
+        unsigned int length = serializer.GetLength();
         SubmitReliable(0xE5, data, length);
         if (g_TransportLayerLog >= 2)
         {
@@ -384,6 +384,11 @@ void TransportConnection::UpdateConnected()
         }
         mKeepAliveSendTime = now;
     }
+}
+
+void TransportConnection::UpdateConnected()
+{
+    UpdateKeepAlive();
 
     if (m_OutgoingSendQ.GetCount() > 0)
     {
@@ -1078,12 +1083,22 @@ bool TransportConnection::Hold(
     return true;
 }
 
+inline void TransportConnection::CompactOutOfOrderPackets(int delivered)
+{
+    for (int i = delivered; i < mOutOfOrderCount; i++)
+    {
+        mOutOfOrderPackets[i - delivered] = mOutOfOrderPackets[i];
+    }
+    mOutOfOrderCount -= delivered;
+}
+
 void TransportConnection::ProcessHold()
 {
     int delivered = 0;
     while (delivered < mOutOfOrderCount)
     {
-        if (mOutOfOrderPackets[delivered]->mSequence != mNextReceiveSequence)
+        u16 sequence = mOutOfOrderPackets[delivered]->mSequence;
+        if (sequence != mNextReceiveSequence)
         {
             break;
         }
@@ -1108,11 +1123,7 @@ void TransportConnection::ProcessHold()
         {
             tDebugPrintManager::Print(DC_NETWORK, "Moved Out Of Order Hold up %d spots\n", delivered);
         }
-        for (int i = delivered; i < mOutOfOrderCount; i++)
-        {
-            mOutOfOrderPackets[i - delivered] = mOutOfOrderPackets[i];
-        }
-        mOutOfOrderCount -= delivered;
+        CompactOutOfOrderPackets(delivered);
     }
 }
 

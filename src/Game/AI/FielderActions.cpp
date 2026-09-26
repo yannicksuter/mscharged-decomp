@@ -887,20 +887,13 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         = (s16)((u16)(aDirection + 0x8000) - mUnidentified024.m_aActualFacingDirection);
     u32 index = (u32)((s16)(angleDiff + 0x2000)) >> 14 & 3;
 
-    bool bTrackStats = false;
-
     SetAnimState(gHitReactAnims[nReact][index], true, 0.2f, false, false);
     SetFacingDirection(
         (u16)(aDirection + gHitReactFacingOffsets[index]), true);
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-    if (g_pGame->m_eGameState == 5
-        || g_pGame->m_eGameState == 6)
-    {
-        bTrackStats = true;
-    }
-    if (bTrackStats)
+    if (g_pGame->IsGameplayOrOvertime())
     {
         StatsTracker::Instance()->TrackStat((ePlayerStats)0x12,
             pAttacker->m_pTeam->m_nSide, pAttacker->mUnidentified1E4.m_ID, 0, 0, 0, 0);
@@ -1259,10 +1252,10 @@ bool cFielder::DoCommonInitActionLooseBall(
         break;
     }
 
-    cSAnim* pBestContactAnim
-        = m_pAnimInventory->GetAnim(pBestBallContactAnimInfo->nAnimID);
     s16 nFacingDelta
         = (s16)(aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection);
+    cSAnim* pBestContactAnim
+        = m_pAnimInventory->GetAnim(pBestBallContactAnimInfo->nAnimID);
     fContactFrame = pBestBallContactAnimInfo->fAnimContactFrame;
 
     GetJointPositionFuture(&v3ContactOffsetLocal,
@@ -4395,25 +4388,31 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
             {
                 fn_800395C0(this);
             }
-            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0D
-                     || mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12
-                     || mUnidentified024.m_eCharacterClass + 0 == (eCharacterClass)0x13)
+            else
             {
-                fn_8004E438();
-                return true;
-            }
-            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0E)
-            {
-                if (gNPCManager->mUnidentified02C != 0)
+                switch (mUnidentified024.m_eCharacterClass)
                 {
-                    gNPCManager->mUnidentified02C->Activate(this);
+                case (eCharacterClass)0x0D:
+                case (eCharacterClass)0x12:
+                case (eCharacterClass)0x13:
+                    fn_8004E438();
+                    return true;
+                default:
+                    break;
                 }
-            }
-            else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0C)
-            {
-                if (gNPCManager->mpBirdoEgg != 0)
+                if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0E)
                 {
-                    gNPCManager->mpBirdoEgg->Show(this);
+                    if (gNPCManager->mUnidentified02C != 0)
+                    {
+                        gNPCManager->mUnidentified02C->Activate(this);
+                    }
+                }
+                else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0C)
+                {
+                    if (gNPCManager->mpBirdoEgg != 0)
+                    {
+                        gNPCManager->mpBirdoEgg->Show(this);
+                    }
                 }
             }
         }
@@ -5143,6 +5142,7 @@ void cFielder::fn_8004E6B4()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
+        float fZero = 0.0f;
         HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
         if (pProjectile != 0)
         {
@@ -5175,15 +5175,11 @@ void cFielder::fn_8004E6B4()
                 0.5f * fSpeed, fHeight, fGravity, nNumRoots, fX1, fX2);
 
             float fRoot;
-            if (fX1 > 0.0f)
+            if (fX1 > fZero)
             {
                 fRoot = fX1;
             }
-            else if (fX2 > 0.0f)
-            {
-                fRoot = fX2;
-            }
-            else
+            else if (fX2 > fZero)
             {
                 fRoot = fX2;
             }

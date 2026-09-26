@@ -1,5 +1,6 @@
 #include "Game/Render/tu_8027AE14.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "Game/World/WorldDrawable.h"
 
 extern "C"
 {
@@ -13,7 +14,6 @@ bool lbl_806E19B8;
 StadiumDrawable_8027ADC0* lbl_806E19BC;
 
 extern "C" void fn_80343DE4(StadiumDrawable_8027ADC0*, void*);
-extern "C" void fn_80343C00(StadiumDrawable_8027ADC0*);
 
 extern "C" void fn_8027ADC0(StadiumDrawable_8027ADC0* object, void* context)
 {
@@ -28,7 +28,7 @@ extern "C" void fn_8027ADF0(StadiumDrawable_8027ADC0*)
 extern "C" void fn_8027ADF4(StadiumDrawable_8027ADC0* object)
 {
     if (object->m_Unknown70 != 0 || lbl_806E19B8)
-        fn_80343C00(object);
+        ((WorldDrawable*)object)->WorldDrawable::Draw();
 }
 
 UnidentifiedObject_8027AE14::UnidentifiedObject_8027AE14(const nlVector3& param1)

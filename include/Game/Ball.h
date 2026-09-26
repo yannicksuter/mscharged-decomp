@@ -23,7 +23,7 @@ class DrawableModel;
 class DrawableObject;
 class PhysicsAIBall;
 class RunningChecksum;
-struct UnidentifiedBallRuntime;
+class Plat3dSoundSrc;
 
 class cBall
 {
@@ -162,7 +162,7 @@ public:
     /* 0xE0 */ BlurHandler* m_pBlurHandler;
     /* 0xE4 */ DrawableModel* m_pDrawableBall;
     /* 0xE8 */ PhysicsAIBall* m_pPhysicsBall;
-    /* 0xEC */ UnidentifiedBallRuntime* mUnidentifiedEC;
+    /* 0xEC */ Plat3dSoundSrc* mUnidentifiedEC;
     /* 0xF0 */ unsigned long mUnidentifiedF0;
 }; // total size: 0xF4
 

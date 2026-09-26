@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include "Game/Audio/GameStreams.h"
+#include "Game/Audio/Plat3dSoundSrc.h"
 #include "Game/RumbleActions.h"
 #include <math.h>
 
@@ -51,25 +52,6 @@
 #include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
-
-struct UnidentifiedBallRuntime
-{
-    u8 mUnidentified00[0x04];
-    nlVector3* m_pPosition;
-    u8 mUnidentified08[0x14];
-    union
-    {
-        unsigned int mUnidentified1C;
-        struct
-        {
-            unsigned int mUnidentified1C00 : 18;
-            unsigned int mUnidentified1CFlag : 1;
-            unsigned int mUnidentified1C13 : 13;
-        } mUnidentified1CBits;
-    };
-    u8 mUnidentified20[0x24];
-    unsigned int mUnidentified44;
-};
 
 struct UnidentifiedGameState
 {
@@ -179,7 +161,7 @@ extern "C" void fn_801B9FD0(cBall*, bool);
 void ReleaseAudioSoundOwner(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
-extern "C" UnidentifiedBallRuntime* fn_802ECB68(void*);
+extern "C" Plat3dSoundSrc* fn_802ECB68(AudioSystem*);
 float Exp(float);
 
 cBall* g_pBall = NULL;
@@ -373,9 +355,8 @@ cBall::cBall()
     m_pPhysicsBall->SetAngularVelocity(v3Zero);
 
     mUnidentifiedEC = fn_802ECB68(g_pAudioSystem);
-    mUnidentifiedEC->mUnidentified44 |= 0x00800000;
-    mUnidentifiedEC->m_pPosition = &m_v3Position;
-    mUnidentifiedEC->mUnidentified1C |= 0x8000;
+    mUnidentifiedEC->m_Unknown44 |= 0x00800000;
+    mUnidentifiedEC->SetPosition(&m_v3Position);
 }
 
 cBall::~cBall()
@@ -1360,7 +1341,7 @@ extern "C" void fn_800154FC(cBall* pBall, float fParam)
     {
         pBall->mfChargeValue = fMaxCharge;
     }
-    else if (fValue < 0.0f)
+    else if (pBall->mfChargeValue < 0.0f)
     {
         pBall->mfChargeValue = 0.0f;
     }
@@ -2249,7 +2230,7 @@ void cBall::Update(float fDeltaT)
             m_iConsecutiveVolleyPasses = 0;
         }
 
-        mUnidentifiedEC->mUnidentified1CBits.mUnidentified1CFlag
+        mUnidentifiedEC->count.field_2000
             = !g_pGame->IsGameplayOrOvertime();
     }
 }
@@ -3236,24 +3217,21 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
     {
         return;
     }
-    if (g_pBall->m_pPhysicsBall->GetPosition().z < 0.207f)
-    {
-        int nBallState = g_pBall->meBallState;
-        if (nBallState < 6)
-        {
-            if (nBallState == 2)
-            {
-                return;
-            }
-        }
-        else if (nBallState < 9)
-        {
-            return;
-        }
-    }
-    else
+    if (!(g_pBall->m_pPhysicsBall->GetPosition().z < 0.207f))
     {
         return;
+    }
+
+    int nBallState = g_pBall->meBallState;
+    switch (nBallState)
+    {
+    case 2:
+    case 6:
+    case 7:
+    case 8:
+        return;
+    default:
+        break;
     }
 
     int nPatchType = pPatch->m_Type;

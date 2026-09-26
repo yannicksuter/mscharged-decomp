@@ -300,7 +300,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     if (!mUnidentified030)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->GetCurrentTime() < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             return;
         }
@@ -308,7 +308,7 @@ void OnlineConnectionQualityScene::Update(float dt)
         mUnidentified030 = true;
         for (int i = 0; i < 4; ++i)
         {
-            gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
+            GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
         }
     }
 
@@ -321,10 +321,11 @@ void OnlineConnectionQualityScene::Update(float dt)
     }
     if (mUnidentified180 <= 0)
     {
-        mUnidentified2F4[0]->m_bVisible = false;
-        mUnidentified18C[0].Disable();
-        mUnidentified2F4[1]->m_bVisible = false;
-        mUnidentified18C[1].Disable();
+        for (int i = 0; i < 2; ++i)
+        {
+            mUnidentified2F4[i]->m_bVisible = false;
+            mUnidentified18C[i].Disable();
+        }
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
         component->m_bVisible = true;
     }
@@ -379,15 +380,17 @@ void OnlineConnectionQualityScene::Update(float dt)
     if (mUnidentified034 == 2 && isHost)
     {
         NetworkMachineRoster* machines = g_pNetworkSessionBase->GetMachineRoster();
-        bool rejected = false;
+        bool rejected;
         for (int i = 0; i < machines->GetMachineCount(); ++i)
         {
             if (mUnidentified03C[i] == 0)
             {
                 rejected = true;
-                break;
+                goto have_rejection;
             }
         }
+        rejected = false;
+    have_rejection:
         if (rejected)
         {
             mUnidentified034 = 0;
@@ -398,7 +401,7 @@ void OnlineConnectionQualityScene::Update(float dt)
         }
         else
         {
-            bool accepted = true;
+            bool accepted;
             if (mUnidentified180 > 0)
             {
                 NetworkMachineRoster* machines = g_pNetworkSessionBase->GetMachineRoster();
@@ -407,10 +410,12 @@ void OnlineConnectionQualityScene::Update(float dt)
                     if (mUnidentified03C[i] != 1)
                     {
                         accepted = false;
-                        break;
+                        goto have_acceptance;
                     }
                 }
             }
+            accepted = true;
+        have_acceptance:
             if (accepted)
             {
                 mUnidentified034 = 1;

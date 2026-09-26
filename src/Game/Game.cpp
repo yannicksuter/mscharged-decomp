@@ -617,7 +617,17 @@ void cGame::fn_8005848C()
     mUnidentified0BD = false;
 }
 
-void cGame::BeginGame(bool param1, bool param2)
+inline void cGame::ResetCharacters()
+{
+    RandomizePlayerUpdateOrder();
+    for (int i = 0; i < 2; i++)
+    {
+        g_pTeams[i]->fn_800A6248();
+        g_pTeams[i]->ResetCharacters();
+    }
+}
+
+void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
 {
     ++lbl_806E2130;
     FixedUpdateTask::SetTimeScale(lbl_806E3748);
@@ -645,8 +655,8 @@ void cGame::BeginGame(bool param1, bool param2)
     mUnidentified042 = false;
     m_pScorer = 0;
     m_pAssister = 0;
-    m_pTeamTouch[0] = 0;
     m_pTeamTouch[1] = 0;
+    m_pTeamTouch[0] = 0;
     m_pRandomPlayersArray[0] = 0;
     m_pRandomPlayersArray[1] = 0;
     m_pRandomPlayersArray[2] = 0;
@@ -681,12 +691,7 @@ void cGame::BeginGame(bool param1, bool param2)
     fn_80059A1C();
     mpWeatherManager->Reset();
     mpWeatherManager->Stop(true);
-    RandomizePlayerUpdateOrder();
-    for (int i = 0; i < 2; i++)
-    {
-        g_pTeams[i]->fn_800A6248();
-        g_pTeams[i]->ResetCharacters();
-    }
+    ResetCharacters();
     fn_8001847C(g_pBall, false);
     mUnidentified020 = false;
     ResetPowerups(true);
@@ -730,7 +735,7 @@ void cGame::BeginGame(bool param1, bool param2)
     GetPresentation()->Reset();
     ReplayChoreo::Instance().FlushHighlights();
     ReplayChoreo::Instance().Finish();
-    if (param2)
+    if (bStraightToKickoff)
     {
         ChangeGameState(1);
         FixedUpdateTask* task = GetFixedUpdateTask();
@@ -865,17 +870,11 @@ void cGame::fn_80058748()
         fn_80058400();
         mUnidentified0BD = false;
     }
-    mUnidentified49C.mEvent11.Queue(Function<FnVoidVoid>());
+    mUnidentified49C.mEvent11.Queue();
 
     fn_80061B1C(0, 0.0f, 0.0f);
     gNPCManager->fn_801ABF8C();
-    RandomizePlayerUpdateOrder();
-
-    for (int i = 0; i < 2; i++)
-    {
-        g_pTeams[i]->fn_800A6248();
-        g_pTeams[i]->ResetCharacters();
-    }
+    ResetCharacters();
 
     fn_8001847C(g_pBall, false);
     mUnidentified020 = false;
@@ -915,7 +914,7 @@ extern "C" void fn_80058ABC(unsigned long, unsigned long)
 {
     cGame* game = g_pGame;
     game->fn_8005DF38();
-    game->mUnidentified49C.mEvent12.Queue(Function<FnVoidVoid>());
+    game->mUnidentified49C.mEvent12.Queue();
 
     GameplayCamera* camera = cCameraManager::GetCamera<GameplayCamera>(eCameraType_Gameplay);
     if (camera != 0)
@@ -1297,7 +1296,7 @@ void cGame::InitGameState(int state)
 {
     if (m_eGameState == 5 && state == 6)
     {
-        mUnidentified49C.mEvent13.Queue(Function<FnVoidVoid>());
+        mUnidentified49C.mEvent13.Queue();
     }
 
     m_eGameState = state;

@@ -198,7 +198,7 @@ class NetMessageConnectionDecision : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageConnectionDecision();
+    virtual ~NetMessageConnectionDecision() { }
     virtual int GetType();
 
     /* 0x08 */ u8 mAccepted;

@@ -219,6 +219,12 @@ public:
         return *m_pValue;
     }
 
+    const int& operator=(const int& value)
+    {
+        *m_pValue = value;
+        return *m_pValue;
+    }
+
 public:
     /* 0x0C */ int* m_pValue;
 

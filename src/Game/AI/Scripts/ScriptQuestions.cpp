@@ -1399,12 +1399,12 @@ extern "C" float fn_800D9480(cFielder* pFielder)
     for (int i = 0; i < 4; i++)
     {
         cFielder* pOpponent = pFielder->m_pTeam->GetOtherTeam()->GetFielder(i);
-        float fNear = NearTo(pFielder, pOpponent);
-        if (!Incapacitated(pOpponent) && fNear >= 0.4f)
+        float fNearScore = NearTo(pFielder, pOpponent);
+        if (!Incapacitated(pOpponent) && fNearScore >= 0.4f)
         {
-            float fClosing = ClosingTo(pFielder, pOpponent);
-            fScore += fNear * g_pGame->m_pFuzzyTweaks->mUnidentified4A4
-                + fClosing * (1.0f - g_pGame->m_pFuzzyTweaks->mUnidentified4A4);
+            float fClosingScore = ClosingTo(pFielder, pOpponent);
+            fScore += fNearScore * g_pGame->m_pFuzzyTweaks->mUnidentified4A4
+                + fClosingScore * (1.0f - g_pGame->m_pFuzzyTweaks->mUnidentified4A4.GetValue());
         }
     }
     fScore *= 0.5f;

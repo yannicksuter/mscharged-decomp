@@ -23,6 +23,7 @@
 #include "Game/TweakValue.inl"
 
 static int s_nTimeoutFindingMaxPlayersAcceptMin = 20;
+static float s_fConnectionTimeout = 5.0f;
 
 static void MatchmakingCallback(
     DWCError error, BOOL cancelled, void* param);
@@ -582,13 +583,26 @@ void NetworkLobby::OnMatchmakingResult(
     DWCError error, BOOL cancelled, void* param)
 {
     (void)param;
-    if (error == 0 && !cancelled)
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Matching err:%d, cancel:%d\n", error, cancelled);
+
+    if (cancelled)
     {
-        mMachineCount = DWC_GetNumConnectionHost();
-        for (int aid = 0; aid < mMachineCount; ++aid)
+        return;
+    }
+
+    if (error == 0)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Connected to anybody Number %d I am %d!\n",
+            DWC_GetNumConnectionHost(), DWC_GetMyAID());
+        mMachineCount = GetConnectionCount();
+        for (int aid = 0; aid < GetConnectionCount(); ++aid)
         {
-            mPlayers[aid].mUnidentified0C = aid;
+            mPlayers[aid].mUnidentified18[0] = aid;
             mPlayers[aid].mConnection = 0;
+            mPlayers[aid].mName[0] = 0;
+            mPlayers[aid].mUnidentified0B = 0;
             mPlayers[aid].mConnectionState = 0;
             if (aid != DWC_GetMyAID())
             {
@@ -596,10 +610,13 @@ void NetworkLobby::OnMatchmakingResult(
             }
         }
         mState = 4;
-        mConnectionDeadline = mElapsedTime + 5.0f;
+        mConnectionDeadline = mElapsedTime + s_fConnectionTimeout;
     }
     else
     {
+        tDebugPrintManager::Print(DC_NETWORK, "Matching Error\n");
+        g_pNetworkSession->ReadAndClearDWCError();
+        g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
         mState = 0;
         mMatchFailed = true;
     }
@@ -760,7 +777,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
                 g_pFriendManager->SetOwnStatusInitial(false);
             }
             mState = 2;
-            mConnectionDeadline = mElapsedTime + 5.0f;
+            mConnectionDeadline = mElapsedTime + s_fConnectionTimeout;
             tDebugPrintManager::Print(DC_NETWORK,
                 "Friend Matchmaking Success Peers changed from %d to %d!\n",
                 previousMachineCount, mMachineCount);

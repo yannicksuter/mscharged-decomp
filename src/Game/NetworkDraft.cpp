@@ -115,7 +115,6 @@ void NetMessageConnectionDecision::Serialize(
 
 NetMessageDraftPickedCaptain::~NetMessageDraftPickedCaptain() { }
 NetMessageDraftPickedSidekicks::~NetMessageDraftPickedSidekicks() { }
-NetMessageConnectionDecision::~NetMessageConnectionDecision() { }
 
 int NetMessageConnectionDecision::GetType() { return 27; }
 int NetMessageCheckConnection::GetType() { return 26; }

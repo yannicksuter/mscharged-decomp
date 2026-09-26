@@ -1,4 +1,5 @@
 #include "Game/Camera/ReplayCamera.h"
+#include "Game/Camera/CameraDamping.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
@@ -42,18 +43,6 @@ u8 lbl_806E0F18[8];
 static inline float GetSideDirection(int side)
 {
     return side == 0 ? -1.0f : 1.0f;
-}
-
-static inline void Dampen(float& current, const float& target,
-    float& currentVelocity, float smoothTime, float deltaTime)
-{
-    float omega = 2.0f / smoothTime;
-    float x = omega * deltaTime;
-    float exp = 1.0f / ((0.48f * x * x + (1.0f + x)) + x * (0.235f * x * x));
-    float change = current - target;
-    float temp = deltaTime * (omega * change + currentVelocity);
-    currentVelocity = exp * (currentVelocity - omega * temp);
-    current = exp * (change + temp) + target;
 }
 
 static inline float LimitMagnitude(float value, float limit)
@@ -244,11 +233,14 @@ float ReplayCamera::GetFov(ReplayCameraPosition position) const
         if (position >= REPLAY_CAMERA_POSITION_GENERIC_0 && position <= REPLAY_CAMERA_POSITION_GENERIC_LAST)
         {
             BasicString<char, Detail::TempStringAllocator> prefix("replay/camera_");
-            BasicString<char, Detail::TempStringAllocator> formatString("generic_{0}_fov");
-            int index = position - REPLAY_CAMERA_POSITION_GENERIC_0;
-            BasicString<char, Detail::TempStringAllocator> formatted(Format(formatString, index));
-            prefix.AppendInPlace(formatted);
-            return GetConfigFloat(Config::Global(), prefix.c_str(), 50.0f);
+            {
+                BasicString<char, Detail::TempStringAllocator> formatString("generic_{0}_fov");
+                int index = position - REPLAY_CAMERA_POSITION_GENERIC_0;
+                BasicString<char, Detail::TempStringAllocator> formatted(Format(formatString, index));
+                prefix.AppendInPlace(formatted);
+            }
+            float fov = GetConfigFloat(Config::Global(), prefix.c_str(), 50.0f);
+            return fov;
         }
         return 27.0f;
     }

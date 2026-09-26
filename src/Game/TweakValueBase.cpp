@@ -5,6 +5,8 @@
 
 #include "NL/nlString.h"
 
+const char* gLastTweakCategory;
+
 void SplitTweakPath(const char* path, const char** leafName, char* directory)
 {
     int lastSlash = -1;

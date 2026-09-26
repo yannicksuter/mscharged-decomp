@@ -1008,18 +1008,17 @@ void EmissionManager::ConfigureResource(
 void EmissionManager::RecordRenderedParticles(
     unsigned long resource, int numParticles)
 {
-    if (resource != (unsigned long)-1)
+    if ((int)resource != -1)
     {
         EmissionResourceStats* stats
             = EmissionManager::Instance()->mResourceStats;
-        EmissionResourceStats& resourceStats = stats[resource];
-        TweakIntBinding* count = resourceStats.mCount;
-        TweakIntBinding* highWaterMark
-            = resourceStats.mHighWaterMark;
-        *count->m_pValue += numParticles;
-        if (*count->m_pValue >= *highWaterMark->m_pValue)
+        TweakIntBinding* count = stats[resource].mCount;
+        unsigned int rendered = (int)*count + numParticles;
+        *count = rendered;
+        if (rendered
+            >= (unsigned int)(int)*stats[resource].mHighWaterMark)
         {
-            *highWaterMark->m_pValue = *count->m_pValue;
+            *stats[resource].mHighWaterMark = rendered;
         }
     }
 }

@@ -3,6 +3,7 @@
 #include "Game/Sys/debug.h"
 #include "Game/EventDispatcher.inl"
 #include "Game/NetworkInput.h"
+#include "Game/NetworkMessageRegistry.h"
 #include "Game/NetworkSync.h"
 
 #include <string.h>
@@ -306,8 +307,9 @@ void NetworkInputRouter::Reset(int resetQueues)
 {
     InputRouter::Reset(resetQueues);
     mCongested = false;
-    mWasCongested = false;
     mCongestionMultiplier = fDefCongestionMultiplier;
+    mWasCongested = false;
+    mCurrentMessage.Reset(true, true);
     mUnidentified290 = 0;
     mUnidentified294 = 0;
 
@@ -364,14 +366,91 @@ bool NetworkInputRouter::HasInput()
 
 void NetworkInputRouter::OnInputCaptured()
 {
-    for (int machine = 0; machine < 4; ++machine)
+    int frame = gInputManager->mFrameProvider->GetFrame();
+    if (mLastGameFrame != frame)
     {
-        NetworkInputMessageQueue& queue = mInputQueues[machine];
-        if (queue.mCount != 0)
+        mCurrentCRC = gInputManager->mEnabled
+            ? gInputManager->mFrameProvider->CalculateChecksum()
+            : gInputManager->mFrameProvider->WriteSyncLog();
+        mLastGameFrame = frame;
+    }
+
+    mCurrentMessage.Reset(false, !mUnidentified290);
+    mUnidentified290 = false;
+
+    NetworkPeer* peer = mSession->GetLocalPeer();
+    for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
+    {
+        NetworkPeerChannel* channel = peer->GetNetworkPeerChannel(player);
+        PackedDetInput input;
+        channel->PackNetworkPeerChannelInput(&input);
+        mCurrentMessage.SetNetworkInputMessageRecord(player, &input);
+        mCurrentMessage.SetNetworkInputMessageRemapAngle(
+            channel->GetNetworkPeerChannelRemapAngle());
+        mCurrentMessage.SetNetworkInputMessagePlayerState(
+            player, channel->GetNetworkPeerChannelConnectionStatus());
+    }
+
+    frame = gInputManager->mFrameProvider->GetFrame();
+    if (frame % g_TransmitSyncDataEvery == 0)
+    {
+        mCurrentMessage.SetNetworkInputMessageSyncData(
+            mCurrentCRC, frame, GetNetworkRandomSeed());
+    }
+
+    while (m_OutgoingCustomDetermDataQ.GetCount() > 0)
+    {
+        DetermDataEvent* event = m_OutgoingCustomDetermDataQ.Pop();
+        mCurrentMessage.AddNetworkInputMessageEvent(event);
+        delete event;
+    }
+
+    mCurrentMessage.SetNetworkInputMessageCongested(mWasCongested);
+    mWasCongested = false;
+
+    if (mQueueCursor > mQueueLimit && (frame & 1) != 0)
+    {
+        mUnidentified290 = true;
+        --mQueueCursor;
+        return;
+    }
+
+    switch (g_nTicksPerPacket)
+    {
+    case 1:
+    {
+        u8 buffer[200];
+        int size = gNetworkMessageRegistry->Serialize(
+            &mCurrentMessage, buffer, sizeof(buffer));
+        int machines = mSession->GetNumMachines();
+        for (s8 machine = 0; machine < machines; ++machine)
         {
-            queue.mHead = (queue.mHead + 1) % queue.mCapacity;
-            --queue.mCount;
+            g_pNetworkSessionBase->Send(machine, buffer, size, true);
         }
+        break;
+    }
+    case 2:
+    {
+        if (mUnidentified294 == 0)
+        {
+            mBundledMessage.mMessage0.CopyFrom(&mCurrentMessage);
+            ++mUnidentified294;
+        }
+        else if (mUnidentified294 == 1)
+        {
+            mBundledMessage.mMessage1.CopyFrom(&mCurrentMessage);
+            u8 buffer[400];
+            int size = gNetworkMessageRegistry->Serialize(
+                &mBundledMessage, buffer, sizeof(buffer));
+            int machines = mSession->GetNumMachines();
+            for (s8 machine = 0; machine < machines; ++machine)
+            {
+                g_pNetworkSessionBase->Send(machine, buffer, size, true);
+            }
+            mUnidentified294 = 0;
+        }
+        break;
+    }
     }
 }
 

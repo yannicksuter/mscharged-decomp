@@ -27,6 +27,8 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
+static inline void CreateGoalEventHandler(GoalOverlay* goalOverlay);
+
 GoalOverlay::~GoalOverlay()
 {
 }
@@ -67,6 +69,31 @@ void GoalOverlay::fn_801F17F4(MegaStrikeEndData*)
 {
 }
 
+GoalOverlay::GoalOverlay()
+    : BaseOverlayHandler(0x18, POSITION_BOTTOM)
+{
+    mIsCreated = false;
+    mIsInOvertime = false;
+    CreateGoalEventHandler(this);
+
+    if (GameInfoManager::Instance()->IsInFriendlyMode() || GameInfoManager::Instance()->IsInMode1())
+    {
+        mHasSniperCup = true;
+    }
+    else
+    {
+        mHasSniperCup = GameInfoManager::Instance()->HasTrophy(TROPHY_SNIPER_CUP);
+    }
+    Reset();
+}
+
+void GoalOverlay::SceneCreated()
+{
+    mIsCreated = true;
+    const char* slideName = IsWidescreen() ? "widescreen" : "normal";
+    mPresentation->SetActiveSlide(slideName, true);
+}
+
 void GoalOverlay::Restart()
 {
     if (mIsCreated)
@@ -92,31 +119,33 @@ void GoalOverlay::Reset()
     }
 }
 
-GoalOverlay::GoalOverlay()
-    : BaseOverlayHandler(0x18, POSITION_BOTTOM)
+template <typename EventData>
+static inline BindExp2<void,
+    Detail::MemFunImpl<void, void (GoalOverlay::*)(EventData*)>,
+    GoalOverlay*, Placeholder<0> >
+MakeGoalBinding(void (GoalOverlay::*callback)(EventData*), GoalOverlay* goalOverlay)
 {
-    mIsCreated = false;
-    mIsInOvertime = false;
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&GoalOverlay::Reset), this)), 0, -1);
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(Bind<void>(MemFun(&GoalOverlay::fn_801F178C), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(Bind<void>(MemFun(&GoalOverlay::fn_801F17F4), this, placeholder0)), 0, -1);
-
-    if (GameInfoManager::Instance()->IsInFriendlyMode() || GameInfoManager::Instance()->IsInMode1())
-    {
-        mHasSniperCup = true;
-    }
-    else
-    {
-        mHasSniperCup = GameInfoManager::Instance()->HasTrophy(TROPHY_SNIPER_CUP);
-    }
-    Reset();
+    typedef Detail::MemFunImpl<void, void (GoalOverlay::*)(EventData*)> CallbackMemFun;
+    typedef BindExp2<void, CallbackMemFun, GoalOverlay*, Placeholder<0> > CallbackBind;
+    CallbackMemFun function(callback);
+    return CallbackBind(function, goalOverlay, placeholder0);
 }
 
-void GoalOverlay::SceneCreated()
+static inline BindExp1<void,
+    Detail::MemFunImpl<void, void (GoalOverlay::*)()>, GoalOverlay*>
+MakeGoalBinding(void (GoalOverlay::*callback)(), GoalOverlay* goalOverlay)
 {
-    mIsCreated = true;
-    const char* slideName = IsWidescreen() ? "widescreen" : "normal";
-    mPresentation->SetActiveSlide(slideName, true);
+    typedef Detail::MemFunImpl<void, void (GoalOverlay::*)()> CallbackMemFun;
+    typedef BindExp1<void, CallbackMemFun, GoalOverlay*> CallbackBind;
+    CallbackMemFun function(callback);
+    return CallbackBind(function, goalOverlay);
+}
+
+static inline void CreateGoalEventHandler(GoalOverlay* goalOverlay)
+{
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(MakeGoalBinding(&GoalOverlay::Reset, goalOverlay)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(MakeGoalBinding(&GoalOverlay::fn_801F178C, goalOverlay)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(MakeGoalBinding(&GoalOverlay::fn_801F17F4, goalOverlay)), 0, -1);
 }
 
 void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2S, int numGoals)

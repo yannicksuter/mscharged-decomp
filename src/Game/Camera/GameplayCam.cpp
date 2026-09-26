@@ -1,4 +1,5 @@
 #include "Game/Camera/GameplayCam.h"
+#include "Game/Camera/CameraDamping.h"
 #include "Game/Camera/tu_800F9460.h"
 #include "Game/Render/RLViewLayers.h"
 
@@ -129,6 +130,13 @@ static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutra
 
 void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
 {
+    float fSin;
+    float fCos;
+    float fOrientSin;
+    float fOrientCos;
+    float fXYDist;
+    int i;
+
     if (gGameplayCameraInReplay)
     {
         forceNeutral = true;
@@ -137,7 +145,7 @@ void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
     CalcCurrentKnotTable(this, forceNeutral);
 
     float t = fDeltaT / 0.75f;
-    for (int i = 0; i < 5; i++)
+    for (i = 0; i < 5; i++)
     {
         m_KnotTableBlendQueue[i].fBlendRiser += t;
         if (m_KnotTableBlendQueue[i].fBlendRiser >= 1.0f)
@@ -151,19 +159,8 @@ void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
 
     if (!forceNeutral)
     {
-        float omega = 2.0f / m_fTargetSeekTime;
-        float x = omega * fDeltaT;
-        float exp = 1.0f / (((0.48f * x * x) + (1.0f + x)) + (x * (0.235f * x * x)));
-
-        float change = m_fDampenedTargetX - m_fDesiredTargetX;
-        float currentVelocity = m_fTargetSeekSpeedX;
-        m_fTargetSeekSpeedX = exp * (currentVelocity - (omega * (fDeltaT * ((omega * change) + currentVelocity))));
-        m_fDampenedTargetX = (exp * (change + (fDeltaT * ((omega * change) + currentVelocity)))) + m_fDesiredTargetX;
-
-        change = m_fDampenedTargetY - m_fDesiredTargetY;
-        currentVelocity = m_fTargetSeekSpeedY;
-        m_fTargetSeekSpeedY = exp * (currentVelocity - (omega * (fDeltaT * ((omega * change) + currentVelocity))));
-        m_fDampenedTargetY = (exp * (change + (fDeltaT * ((omega * change) + currentVelocity)))) + m_fDesiredTargetY;
+        Dampen(m_fDampenedTargetX, m_fDesiredTargetX, m_fTargetSeekSpeedX, m_fTargetSeekTime, fDeltaT);
+        Dampen(m_fDampenedTargetY, m_fDesiredTargetY, m_fTargetSeekSpeedY, m_fTargetSeekTime, fDeltaT);
     }
     else
     {
@@ -171,14 +168,10 @@ void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
         m_fDampenedTargetY = m_fDesiredTargetY;
     }
 
-    float fSin;
-    float fCos;
-    float fOrientSin;
-    float fOrientCos;
-    nlSinCos(&fSin, &fCos, ((s32)(65536.0f * m_CameraData->pitch)) / 360);
-    nlSinCos(&fOrientSin, &fOrientCos, ((s32)(65536.0f * m_CameraData->orientation)) / 360);
+    nlSinCos(&fSin, &fCos, DegreesToAngle(m_CameraData->pitch));
+    nlSinCos(&fOrientSin, &fOrientCos, DegreesToAngle(m_CameraData->orientation));
 
-    float fXYDist = fCos * m_CameraData->distance;
+    fXYDist = fCos * m_CameraData->distance;
     m_v3Camera.x = (fOrientCos * fXYDist) + m_fDampenedTargetX;
     m_v3Camera.y = (fOrientSin * fXYDist) + m_fDampenedTargetY;
     m_v3Camera.z = fSin * m_CameraData->distance;

@@ -34,6 +34,8 @@ public:
     virtual void Update(float dt);
     virtual int GetClassID() { return gWiiFreestylePadClassID; }
 
+    void UpdateState(float dt);
+
     static void* operator new(unsigned long)
     {
         return gWiiFreestylePadAllocator.Allocate();

@@ -20,12 +20,6 @@
 #include "NL/nlTask.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C"
-{
-    void fn_80343C00(PlanarShadowDrawable* object);
-    void fn_80186354(ChargeShadowDrawable* object);
-}
-
 // Distance the charge glow is allowed to reach past the sideline.
 static float sSidelineMargin = 0.25f;
 
@@ -151,11 +145,11 @@ void ChargeShadowDrawable::Draw()
     {
         previous = m_pWorldContext->m_pOpaqueView;
         m_pWorldContext->m_pOpaqueView = GetLayerView((eCLV)0xD);
-        fn_80343C00(this);
+        WorldDrawable::Draw();
         m_pWorldContext->m_pOpaqueView = previous;
     }
     else
-        fn_80343C00(this);
+        WorldDrawable::Draw();
 
     glModel* charged = m_pChargeModels[level];
     if (charged != 0)

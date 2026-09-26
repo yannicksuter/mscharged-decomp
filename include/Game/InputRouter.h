@@ -116,7 +116,7 @@ public:
     /* 0x01A0 */ NetMessageInput mCurrentMessage;
     /* 0x0290 */ u8 mUnidentified290;
     /* 0x0291 */ u8 mPadding291[3];
-    /* 0x0294 */ u32 mUnidentified294;
+    /* 0x0294 */ s32 mUnidentified294;
     /* 0x0298 */ NetMessageInputBundle mBundledMessage;
     /* 0x0480 */ NetworkInputMessageQueue mInputQueues[4];
     /* 0xE5C0 */ u32 mQueueCursor;

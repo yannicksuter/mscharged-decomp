@@ -135,7 +135,7 @@ public:
         unsigned long position, unsigned long uSize, unsigned long uParam, AsyncReadPhase phase);
     void Service();
     void CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback callback);
-    bool Contains(AsyncEntry* entry) const;
+    bool Contains(AsyncEntry* entry);
     bool Cancel(AsyncEntry* entry, CancelAsyncCallback callback);
 
     /* 0x0000 */ AsyncEntry* mCurrent;
@@ -447,7 +447,7 @@ void AsyncManager::Service()
     }
 }
 
-bool AsyncManager::Contains(AsyncEntry* wanted) const
+bool AsyncManager::Contains(AsyncEntry* wanted)
 {
     AsyncEntry* entry = nlDLRingGetStart(m_activeEntryList);
     if (entry == 0)

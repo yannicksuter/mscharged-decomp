@@ -32,7 +32,6 @@ class GLView;
 extern "C"
 {
     void fn_80343DE4(StadiumWorldObject_80279AC8* object, void* context);
-    void fn_80343C00(StadiumWorldObject_80279AC8* object);
     void fn_80341EE8(StadiumWorldObject_80279AC8* object, const nlMatrix4* transform);
     void fn_80182168(StadiumWorldObject_80279AC8* object);
     void fn_802092A4(StadiumGoalObject_8027A2C8* object);
@@ -327,7 +326,7 @@ extern "C" void fn_80279DD4(StadiumWorldObject_80279AC8* object)
         if ((object->m_uFlags & 0x37) != 0)
             fn_80279E88(object);
         if (0.0f != object->GetBlend())
-            fn_80343C00(object);
+            ((WorldDrawable*)object)->WorldDrawable::Draw();
     }
 
     if (sShowObjectBounds && object->m_pAnimController == 0)
@@ -449,7 +448,7 @@ extern "C" void fn_8027A0FC(StadiumWorldObject_80279AC8*)
 extern "C" void fn_8027A100(StadiumWorldObject_80279AC8* object)
 {
     if (object->m_pLayerModels[1] != 0)
-        fn_80343C00(object);
+        ((WorldDrawable*)object)->WorldDrawable::Draw();
 }
 
 /**
@@ -474,7 +473,7 @@ extern "C" void fn_8027A118(StadiumWorldObject_80279AC8*)
 extern "C" void fn_8027A11C(StadiumWorldObject_80279AC8* object)
 {
     if (object->m_pLayerModels[0] != 0)
-        fn_80343C00(object);
+        ((WorldDrawable*)object)->WorldDrawable::Draw();
 }
 
 /**
@@ -576,7 +575,7 @@ extern "C" void fn_8027A2FC(StadiumWorldObject_80279AC8*)
 extern "C" void fn_8027A300(StadiumGoalObject_8027A2C8* object)
 {
     if (0.0f != object->GetOpacity())
-        fn_80343C00(object);
+        ((WorldDrawable*)object)->WorldDrawable::Draw();
 }
 
 /**

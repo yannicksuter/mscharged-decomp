@@ -9,6 +9,9 @@
 #include "NL/nlAVLTree.h"
 
 struct WorldAnimBinding_803438FC;
+struct WorldPhysicsDescription;
+class CollisionSpace;
+class PhysicsObject;
 class WorldAnimController;
 
 class WorldAnimObject_803437C8 : public WorldObject
@@ -125,6 +128,9 @@ public:
         DefaultKeyCompare<unsigned long> > m_animationControllerMap;
     /* 0x24 */ float m_fTime;
 };
+
+PhysicsObject* CreatePhysicsPrimitive(
+    WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
 
 typedef char AnimationSet_size_check[sizeof(AnimationSet) == 0x20 ? 1 : -1];
 typedef char WorldAnimController_size_check[

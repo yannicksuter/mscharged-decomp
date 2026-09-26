@@ -15,6 +15,12 @@ struct XSoundOwner
 
     virtual ~XSoundOwner() { }
 
+    void SetPosition(const nlVector3* position)
+    {
+        m_Unknown04.m_Pointer = position;
+        m_Unknown1C |= 0x8000;
+    }
+
     /* 0x04 */ union
     {
         nlVector3 m_Value;

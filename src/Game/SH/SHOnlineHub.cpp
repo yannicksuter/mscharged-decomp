@@ -2,7 +2,6 @@
 #include <dwc/dwc_friend.h>
 #include <dwc/dwc_nastime.h>
 
-#include "Game/SH/SHOnlineHub.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "NL/nlPrint.h"
@@ -37,20 +36,23 @@
 #include "Game/FE/feOnlineError.h"
 #include "Game/MiiManager.h"
 #include "Game/FE/UnidentifiedTLDefault.h"
-
-static const char* sOnlineHubButtonNames[4] = {
-    "BTN_UNRANKED", "BTN_RANKED", "BTN_LEADERBOARD", "BTN_FRIENDS"
-};
+#include "Game/SH/SHOnlineHub.h"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
-static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type)
+static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type);
+
+static inline void UpdateOnlineHubMiiIcon(SHOnlineHub* hub)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(hub->mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn", "Mii");
+    unsigned long texture = g_pMiiManager->mIconTextureIds[0];
+    image->SetAssetVisible(true);
+    int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
+    if (profile >= 0)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-        popup->Create(type, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), hub));
-        hub->mUnidentified58C = true;
+        bool valid = g_pMiiManager->CreateIcon(profile, 0, (RFLExpression)0);
+        image->m_pTextureResource->SetTextureHandle(texture);
+        image->SetAssetVisible(valid);
     }
 }
 
@@ -79,65 +81,6 @@ SHOnlineHub::SHOnlineHub()
 
 SHOnlineHub::~SHOnlineHub()
 {
-}
-
-void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
-{
-    int item = (int)context;
-    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-    bool change = false;
-    switch (item)
-    {
-    case 0:
-        if (g_pNetworkSessionBase->GetSessionMode() == 2)
-        {
-            if (g_pFriendManager->CountBuddies() > 0)
-                change = true;
-            else
-                ShowOnlineHubDialog(this, (ePopupMenu)113);
-        }
-        break;
-    case 1:
-        change = true;
-        break;
-    case 2:
-        change = true;
-        break;
-    case 3:
-        if (g_pNetworkSessionBase->GetSessionMode() == 2)
-            change = true;
-        break;
-    case 4:
-        g_pFriendManager->SetOwnStatusInitial(0);
-        ShowOnlineHubDialog(this, (ePopupMenu)58);
-        break;
-    }
-    if (change)
-    {
-        mUnidentified894 = item;
-        for (int i = 0; i < 4; ++i)
-            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-        mUnidentified890 = 2;
-        SHNavigation* scene = GetNavigationScene();
-        if (scene != 0)
-            scene->HideButtons();
-        mPresentation->SetActiveSlide("out", true);
-        mPresentation->Update(0.0f);
-    }
-}
-
-void SHOnlineHub::OnDialogDismissed()
-{
-    g_pFriendManager->SetOwnStatusInitial(1);
-    mUnidentified58C = false;
-}
-
-void SHOnlineHub::OnErrorDismissed()
-{
-    mUnidentified58C = false;
-    GameSceneManager::Instance()->Pop();
-    FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-    FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
 }
 
 void SHOnlineHub::SceneCreated()
@@ -180,10 +123,10 @@ void SHOnlineHub::Update(float dt)
     if (mUnidentified890 == 0 || mUnidentified890 == 2 || mUnidentified890 == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
-        if (slide->m_time < slide->m_start + slide->m_duration)
+        if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
         {
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+                GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
         if (mUnidentified890 == 0)
@@ -197,17 +140,8 @@ void SHOnlineHub::Update(float dt)
             InitializeButtons();
             mUnidentified4B4 = true;
             for (int i = 0; i < 4; ++i)
-                gFEPointerInstances[i]->SetActiveSlide("cursor", true, false);
-            TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn", "Mii");
-            unsigned long texture = g_pMiiManager->mIconTextureIds[0];
-            image->SetAssetVisible(true);
-            int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
-            if (profile >= 0)
-            {
-                bool valid = g_pMiiManager->CreateIcon(profile, 0, (RFLExpression)0);
-                image->m_pTextureResource->SetTextureHandle(texture);
-                image->SetAssetVisible(valid);
-            }
+                GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
+            UpdateOnlineHubMiiIcon(this);
             UpdateStrikerOfTheDay();
             mUnidentified890 = 1;
         }
@@ -235,8 +169,9 @@ void SHOnlineHub::Update(float dt)
     }
     if (!GameSceneManager::Instance()->IsOnStack((SceneList)10) && g_pFriendManager->FindHostInvitation())
     {
-        g_pFriendManager->mReturnScene = 40;
-        g_pFriendManager->mPreviousRankedMode = 0;
+        FriendManager* friendManager = g_pFriendManager;
+        friendManager->mReturnScene = 40;
+        friendManager->mPreviousRankedMode = 0;
         GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
         return;
     }
@@ -244,13 +179,7 @@ void SHOnlineHub::Update(float dt)
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();
-        int error = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
-        {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)error, Bind<void>(MemFun(&SHOnlineHub::OnErrorDismissed), this));
-            mUnidentified58C = true;
-        }
+        ShowError(GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111));
         return;
     }
     for (int i = 0; i < 4; ++i)
@@ -260,9 +189,10 @@ void SHOnlineHub::Update(float dt)
         event.mIndex = i;
         event.mPosition = GetPointerPosition(i, &valid);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
+        TLComponentInstance* pointer = GetPointerInstance(i);
         if ((unsigned int)i != gFEControllerIndex)
         {
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
+            pointer->SetActiveSlide("waiting", true, false);
             continue;
         }
         for (int j = 0; j < 4; ++j)
@@ -287,16 +217,7 @@ void SHOnlineHub::Update(float dt)
         UpdateFriendAndSeasonText();
         UpdateLocalStats();
         UpdateStrikerOfTheDay();
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn", "Mii");
-        unsigned long texture = g_pMiiManager->mIconTextureIds[0];
-        image->SetAssetVisible(true);
-        int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
-        if (profile >= 0)
-        {
-            bool valid = g_pMiiManager->CreateIcon(profile, 0, (RFLExpression)0);
-            image->m_pTextureResource->SetTextureHandle(texture);
-            image->SetAssetVisible(valid);
-        }
+        UpdateOnlineHubMiiIcon(this);
         mUnidentified588 = 0.0f;
     }
 }
@@ -455,6 +376,65 @@ void SHOnlineHub::InitializeButtons()
     mUnidentified300.SetPointerPressCallback(down);
 }
 
+void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
+{
+    int item = (int)context;
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
+    bool change = false;
+    switch (item)
+    {
+    case 0:
+        if (g_pNetworkSessionBase->GetSessionMode() == 2)
+        {
+            if (g_pFriendManager->CountBuddies() > 0)
+                change = true;
+            else
+                ShowOnlineHubDialog(this, (ePopupMenu)113);
+        }
+        break;
+    case 1:
+        change = true;
+        break;
+    case 2:
+        change = true;
+        break;
+    case 3:
+        if (g_pNetworkSessionBase->GetSessionMode() == 2)
+            change = true;
+        break;
+    case 4:
+        g_pFriendManager->SetOwnStatusInitial(0);
+        ShowOnlineHubDialog(this, (ePopupMenu)58);
+        break;
+    }
+    if (change)
+    {
+        mUnidentified894 = item;
+        for (int i = 0; i < 4; ++i)
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+        mUnidentified890 = 2;
+        SHNavigation* scene = GetNavigationScene();
+        if (scene != 0)
+            scene->HideButtons();
+        mPresentation->SetActiveSlide("out", true);
+        mPresentation->Update(0.0f);
+    }
+}
+
+void SHOnlineHub::OnDialogDismissed()
+{
+    g_pFriendManager->SetOwnStatusInitial(1);
+    mUnidentified58C = false;
+}
+
+void SHOnlineHub::OnErrorDismissed()
+{
+    mUnidentified58C = false;
+    GameSceneManager::Instance()->Pop();
+    FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
+    FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+}
+
 void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
@@ -492,5 +472,26 @@ void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
     {
         mUnidentified300.SetPointerState(0, index);
         mUnidentified3B4->SetActiveSlide("off", true, false);
+    }
+}
+
+static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create(type, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), hub));
+        hub->mUnidentified58C = true;
+    }
+}
+
+inline void SHOnlineHub::ShowError(int error)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)error,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineHub::OnErrorDismissed), this)));
+        mUnidentified58C = true;
     }
 }

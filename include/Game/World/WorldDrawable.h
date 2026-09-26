@@ -14,6 +14,7 @@ class WorldDrawable : public DrawableObject
 {
 public:
     virtual nlMatrix4* GetWorldMatrix();
+    virtual void Draw();
     virtual bool V6(const nlVector4* planes) const;
     virtual void V7(glModel* model);
     virtual void V8(GLView* view);

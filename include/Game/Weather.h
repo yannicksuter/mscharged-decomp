@@ -154,6 +154,11 @@ struct SandTombWeather : Weather
     virtual void Reset();
     void OnKickoff();
     void SpawnThwomps();
+    ThwompObject* SetThwomp(int index, ThwompObject* thwomp)
+    {
+        return m_Thwomps[index] = thwomp;
+    }
+    void ResetThwomps(bool initialize);
     void CreateSandPatches();
     void InvalidateSandPatches();
     bool DropThwompNearPlayer();

@@ -50,43 +50,43 @@ void WorldObject_80129EE0::SetWorldMatrix(const nlMatrix4& transform)
 {
 }
 
-extern "C" PhysicsObject* fn_80341EEC(
-    WorldPhysicsDescription_80341EEC* pDescription,
+PhysicsObject* CreatePhysicsPrimitive(
+    WorldPhysicsDescription* pDescription,
     CollisionSpace* pCollisionSpace)
 {
     PhysicsObject* pPhysicsObject = 0;
-    switch (pDescription->m_uType)
+    switch (pDescription->uPrimitiveType)
     {
     case 0:
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsBox), 8, false)) PhysicsBox(
-                pCollisionSpace, 0, pDescription->m_f48,
-                pDescription->m_f44, pDescription->m_f4C);
-        pPhysicsObject->SetWorldMatrix(pDescription->m_transform);
+                pCollisionSpace, 0, pDescription->fLength,
+                pDescription->fWidth, pDescription->fHeight);
+        pPhysicsObject->SetWorldMatrix(pDescription->matLocalToParent);
         break;
     case 1:
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsSphere), 8, false)) PhysicsSphere(
-                pCollisionSpace, 0, pDescription->m_f50);
-        pPhysicsObject->SetWorldMatrix(pDescription->m_transform);
+                pCollisionSpace, 0, pDescription->fRadius);
+        pPhysicsObject->SetWorldMatrix(pDescription->matLocalToParent);
         break;
     case 2:
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsCapsule), 8, false))
                 PhysicsCapsule(pCollisionSpace, 0,
-                    pDescription->m_f50, pDescription->m_f4C);
-        pPhysicsObject->SetWorldMatrix(pDescription->m_transform);
+                    pDescription->fRadius, pDescription->fHeight);
+        pPhysicsObject->SetWorldMatrix(pDescription->matLocalToParent);
         break;
     case 4:
     {
-        const float* m = (const float*)&pDescription->m_transform;
+        const float* m = (const float*)&pDescription->matLocalToParent;
         nlVector3 position = { m[12], m[13], m[14] };
-        nlVector3 axis0 = { 0.5f * pDescription->m_f44 * m[0],
-            0.5f * pDescription->m_f44 * m[1],
-            0.5f * pDescription->m_f44 * m[2] };
-        nlVector3 axis1 = { 0.5f * pDescription->m_f48 * m[4],
-            0.5f * pDescription->m_f48 * m[5],
-            0.5f * pDescription->m_f48 * m[6] };
+        nlVector3 axis0 = { 0.5f * pDescription->fWidth * m[0],
+            0.5f * pDescription->fWidth * m[1],
+            0.5f * pDescription->fWidth * m[2] };
+        nlVector3 axis1 = { 0.5f * pDescription->fLength * m[4],
+            0.5f * pDescription->fLength * m[5],
+            0.5f * pDescription->fLength * m[6] };
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false))
                 PhysicsFinitePlane(pCollisionSpace, position, axis0,
@@ -95,7 +95,7 @@ extern "C" PhysicsObject* fn_80341EEC(
     }
     case 6:
     {
-        const float* m = (const float*)&pDescription->m_transform;
+        const float* m = (const float*)&pDescription->matLocalToParent;
         float distance
             = m[8] * m[12] + m[9] * m[13] + m[10] * m[14];
         pPhysicsObject

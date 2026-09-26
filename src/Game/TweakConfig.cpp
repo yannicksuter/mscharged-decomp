@@ -253,7 +253,6 @@ void TweakConfigParser::EmptyLine()
 }
 
 bool g_bSupportReloading;
-const char* gLastTweakCategory;
 
 static TweakBoolBinding sSupportReloading(
     "g_bSupportReloading", "General", &g_bSupportReloading, true);

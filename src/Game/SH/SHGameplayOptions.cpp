@@ -459,7 +459,7 @@ void SHGameplayOptions::fn_802365F0(int item)
         int series = lbl_804E8554[item - 5];
         mSettings.NumGames = series;
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation,
-            nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SERIES SETTING"), 0, 0, 0);
+            "OPTIONS", "Layer", "SERIES SETTING", 0UL, 0UL, 0UL);
         unsigned short number[4];
         nlSNPrintf(number, 4, (const unsigned short*)L"%d", series);
         WideString string = Format(WideString(LookupLocString("OPTIONS_BEST_OF")), number);
@@ -492,7 +492,7 @@ void SHGameplayOptions::fn_80236ADC(int type, int value)
 {
     TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation,
         nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("GAMEPLAYOPTIONS SETTING"), 0, 0, 0);
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(instance->GetActiveSlide(), InlineHasher("GAMEPLAY OPTIONS SETTING"));
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(instance->GetActiveSlide(), "GAMEPLAY OPTIONS SETTING");
     unsigned short number[4];
     nlSNPrintf(number, 4, (const unsigned short*)L"%d", value);
     const char* id = "X_GOALS";

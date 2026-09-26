@@ -2298,7 +2298,7 @@ Game/Render/StadiumTweaks.cpp:
 	.sdata      start:0x806DEE70 end:0x806DEE78
 	.sdata2     start:0x806E5C70 end:0x806E5C80
 
-Game/Render/tu_8027944C.cpp:
+Game/Render/StadiumPhysicsObject.cpp:
 	.text       start:0x8027944C end:0x80279AC8
 	.ctors      start:0x804DB7D8 end:0x804DB7DC
 	.data       start:0x80522528 end:0x80522588
@@ -3307,12 +3307,13 @@ Game/TweakConfig.cpp:
 	.data       start:0x8052BF20 end:0x8052BF70
 	.bss        start:0x8057C778 end:0x8057C798
 	.sdata      start:0x806DF368 end:0x806DF3A0
-	.sbss       start:0x806E1E88 end:0x806E1E98
+	.sbss       start:0x806E1E88 end:0x806E1E89
 	.sdata2     start:0x806E62D8 end:0x806E62E0
 
 Game/TweakValueBase.cpp:
 	.text       start:0x802C7480 end:0x802C76F8
 	.data       start:0x8052BF70 end:0x8052BFA0
+	.sbss       start:0x806E1E90 end:0x806E1E94
 
 Game/Replay.cpp:
 	.text       start:0x802C76F8 end:0x802C7FD0

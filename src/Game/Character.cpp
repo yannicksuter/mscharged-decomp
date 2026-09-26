@@ -1027,7 +1027,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     }
     v3Velocity.x += pBall->m_v3Velocity.x;
     v3Velocity.y += pBall->m_v3Velocity.y;
-    unsigned short aDirection = (unsigned short)(s32)(nlATan2f(v3Velocity.y, v3Velocity.x) * 10430.378f);
+    unsigned short aDirection = RadToAng16(nlATan2f(v3Velocity.y, v3Velocity.x));
     nlVector3 v3Position;
     nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->mUnidentified024.m_v3Position);
     pEventData->player->SetPosition(v3Position);

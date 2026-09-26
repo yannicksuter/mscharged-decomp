@@ -18,6 +18,7 @@ public:
     void OnPointerPress(unsigned int index, void* context);
     void OnDialogDismissed();
     void OnErrorDismissed();
+    void ShowError(int error);
     void UpdateFriendAndSeasonText();
     void UpdateLocalStats();
     void UpdateStrikerOfTheDay();
@@ -51,5 +52,9 @@ public:
     /* 0x890 */ int mUnidentified890;
     /* 0x894 */ int mUnidentified894;
 }; // size 0x898
+
+static const char* sOnlineHubButtonNames[4] = {
+    "BTN_UNRANKED", "BTN_RANKED", "BTN_LEADERBOARD", "BTN_FRIENDS"
+};
 
 #endif // GAME_SH_SHONLINEHUB_H

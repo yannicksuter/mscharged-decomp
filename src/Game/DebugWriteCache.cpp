@@ -62,6 +62,7 @@ void DebugWriteCache::WriteFloat(u16* type,
 {
     if (*type == 0xFFFF)
     {
+        u16 fieldSize = gDebugFieldTypes[17].size;
         if (mTypeCount >= mTypeCapacity)
         {
             nlBreak();
@@ -70,23 +71,28 @@ void DebugWriteCache::WriteFloat(u16* type,
         u16 newType = mTypeCount++;
         *type = newType;
         DebugWriteType* entry = &mTypes[newType];
-        entry->mType = newType;
         entry->mKind = 2;
+        entry->mType = newType;
         nlStrNCpy(entry->mName, name, sizeof(entry->mName));
         entry->mData.mScalar.mFieldType = 17;
-        entry->mData.mScalar.mSize = gDebugFieldTypes[17].size;
+        entry->mData.mScalar.mSize = fieldSize;
         entry->mData.mScalar.mCount = 0;
     }
 
     checksum->ChecksumData(&value, sizeof(value));
 
+    u16 recordType = *type;
     DebugWriteBuffer* buffer
         = GetCurrentDebugBuffer(this);
     DebugWriteRecordHeader header;
-    header.mType = *type;
+    header.mType = recordType;
     header.mSize = sizeof(value);
-    header.mPaddedSize = sizeof(value);
     header.mMarker = 0xDADA;
+    header.mPaddedSize = header.mSize;
+    if (header.mPaddedSize % 4 != 0)
+    {
+        header.mPaddedSize += 4 - (header.mPaddedSize % 4);
+    }
 
     if (buffer->mCurrent + sizeof(header) + sizeof(value)
         < buffer->mData + buffer->mSize)
@@ -96,7 +102,7 @@ void DebugWriteCache::WriteFloat(u16* type,
         memcpy(buffer->mCurrent, &value, sizeof(value));
         buffer->mCurrent += sizeof(value);
 
-        for (u16 i = header.mSize; i < header.mPaddedSize; ++i)
+        for (int i = header.mSize; i < header.mPaddedSize; ++i)
         {
             *buffer->mCurrent++ = 0;
         }

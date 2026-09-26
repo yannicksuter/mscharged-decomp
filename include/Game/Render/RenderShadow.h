@@ -5,6 +5,7 @@
 #include "NL/nlMath.h"
 
 struct glModel;
+class ChargeShadowDrawable;
 class RLView;
 
 struct ProjectedShadowParams
@@ -34,5 +35,6 @@ void RenderProjectedShadow(const ProjectedShadowParams& params);
 
 RLView* SetCharacterShadowView(RLView* view);
 void ClearCharacterShadowsUpdated();
+void fn_80186354(ChargeShadowDrawable* object);
 
 #endif // GAME_RENDER_RENDERSHADOW_H

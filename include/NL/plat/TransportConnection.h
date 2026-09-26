@@ -67,12 +67,14 @@ public:
     }
 
 private:
+    void UpdateKeepAlive();
     void SetClosed();
     bool IsAckPending();
     void PrepareMessage(
         TransportMessage& message, TransportAck ack);
     void Send(TransportMessage& message);
     ReliableSocketCallback* GetCallback();
+    void CompactOutOfOrderPackets(int delivered);
 
 public:
     /* 0x000 */ u8 mExpectedChallengeResponse[0x20];

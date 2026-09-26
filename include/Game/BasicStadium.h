@@ -35,6 +35,7 @@ bool SetWorldAnimation(const char* objectName, const char* animationName,
 void UpdateHighRange();
 void RenderWorldNPCs();
 void fn_80278860(BasicStadium* pStadium, int active);
+void SetStadiumShadowHeight(BasicStadium* pStadium, float fHeight);
 void fn_8027890C(BasicStadium* pStadium, const char* effects, unsigned long uType);
 void fn_802789A8(BasicStadium* pStadium, unsigned long uType);
 

@@ -679,20 +679,19 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
 
 extern "C" void fn_800C6FDC(DesireSteering* desire, float)
 {
-    cFielder* pFielder = desire->m_pFielder;
-    bool bCanFaceBall = pFielder->m_pBall == NULL
-                     && !pFielder->fn_8003E70C()
-                     && pFielder->GetGlobalPad() == NULL
-                     && !(fn_8003E948(pFielder)
-                          && pFielder->mUnidentified3DC)
-                     && !pFielder->fn_8003EA6C()
-                     && !fn_8003E948(pFielder)
-                     && !fn_8003E8A0(pFielder)
-                     && !pFielder->fn_8003E8F4()
-                     && ReceivingPass(pFielder) == 0.0f
-                     && fn_800DED80(pFielder) < 0.2f;
+    bool bCanFaceBall = desire->m_pFielder->m_pBall == NULL
+                     && !desire->m_pFielder->fn_8003E70C()
+                     && desire->m_pFielder->GetGlobalPad() == NULL
+                     && !(fn_8003E948(desire->m_pFielder)
+                          && desire->m_pFielder->mUnidentified3DC)
+                     && !desire->m_pFielder->fn_8003EA6C()
+                     && !fn_8003E948(desire->m_pFielder)
+                     && !fn_8003E8A0(desire->m_pFielder)
+                     && !desire->m_pFielder->fn_8003E8F4()
+                     && !(bool)ReceivingPass(desire->m_pFielder)
+                     && fn_800DED80(desire->m_pFielder) < 0.2f;
 
-    unsigned short aFacingDirection = pFielder->mUnidentified024.m_aDesiredMovementDirection;
+    int aFacingDirection = desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
     eStrafeDirection eMovement = STRAFE_IDLE;
     if (bCanFaceBall)
     {
@@ -701,50 +700,62 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
             desire->m_fDesiredFacingDirection
                 /= desire->m_fFacingTotalWeight;
             desire->m_fFacingTotalWeight = 0.0f;
-            aFacingDirection = (unsigned short)(int)(
+            aFacingDirection = (int)(
                 desire->m_fDesiredFacingDirection + 0.5f);
         }
         else
         {
-            float fFacingWeight = fn_800C6EB0(pFielder);
-            cFielder* pMark = fn_800D6734(pFielder);
-            float fMarkWeight = InBetweenMyNetAnd(pFielder, pMark);
+            float fFacingWeight = fn_800C6EB0(desire->m_pFielder);
+            cFielder* pFielder = desire->m_pFielder;
+            float fMarkWeight = InBetweenMyNetAnd(pFielder,
+                fn_800D6734(pFielder));
             float fTotalWeight = fFacingWeight + fMarkWeight;
-            bool bTurning = pFielder->mActionRunningVars.eLastStrafeDirection == 1
-                         || pFielder->mActionRunningVars.eLastStrafeDirection == 2
-                         || pFielder->mActionRunningVars.eLastStrafeDirection == 4;
+            eStrafeDirection eLastMovement
+                = desire->m_pFielder->mActionRunningVars.eLastStrafeDirection;
+            bool bTurning = true;
+            bool bStrafing = true;
+            if (eLastMovement != STRAFE_LEFT
+                && eLastMovement != STRAFE_RIGHT)
+            {
+                bStrafing = false;
+            }
+            if (!bStrafing && eLastMovement != STRAFE_BACK)
+            {
+                bTurning = false;
+            }
             float fThreshold = bTurning ? 0.5f : 0.75f;
             if (fTotalWeight > fThreshold)
             {
-                nlVector3 v3FacingPos = g_pBall->m_v3Position;
+                nlVector3 v3FacingPos;
+                nlVec3Scale(v3FacingPos, g_pBall->m_v3Position, 1.0f);
+                cFielder* pMark = desire->m_pFielder->GetMark();
                 if (pMark != NULL)
                 {
                     float fScale = fMarkWeight / fTotalWeight;
-                    v3FacingPos.x += fScale * pMark->mUnidentified024.m_v3Position.x;
-                    v3FacingPos.y += fScale * pMark->mUnidentified024.m_v3Position.y;
-                    v3FacingPos.z += fScale * pMark->mUnidentified024.m_v3Position.z;
+                    nlVec3ScaleAdd(v3FacingPos, fScale,
+                        pMark->mUnidentified024.m_v3Position, v3FacingPos);
                 }
                 aFacingDirection = (unsigned short)(int)(
-                    nlATan2f(v3FacingPos.y - pFielder->mUnidentified024.m_v3Position.y,
-                        v3FacingPos.x - pFielder->mUnidentified024.m_v3Position.x)
+                    nlATan2f(v3FacingPos.y - desire->m_pFielder->mUnidentified024.m_v3Position.y,
+                        v3FacingPos.x - desire->m_pFielder->mUnidentified024.m_v3Position.x)
                     * 10430.378f);
             }
         }
 
-        eMovement = fn_800C7348(desire, aFacingDirection,
-            pFielder->mUnidentified024.m_aDesiredMovementDirection);
+        eMovement = fn_800C7348(desire, (unsigned short)aFacingDirection,
+            desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection);
         if (eMovement == STRAFE_FORWARD)
         {
-            aFacingDirection = pFielder->mUnidentified024.m_aDesiredMovementDirection;
+            aFacingDirection = desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         }
-        pFielder->SetFacingDirection(aFacingDirection, false);
+        desire->m_pFielder->Unknown8((unsigned short)aFacingDirection, false);
     }
     else
     {
-        eMovement = pFielder->mUnidentified024.m_fDesiredSpeed < 0.1f
+        eMovement = desire->m_pFielder->mUnidentified024.m_fDesiredSpeed < 0.1f
                   ? STRAFE_IDLE : STRAFE_FORWARD;
     }
-    pFielder->mActionRunningVars.eLastStrafeDirection = eMovement;
+    desire->m_pFielder->mActionRunningVars.eLastStrafeDirection = eMovement;
 }
 
 extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,

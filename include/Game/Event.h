@@ -383,11 +383,7 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
-                    (ListenerEntry*)((char*)listener - 8));
-                ListenerEntry* entry = position.CurrentEntry();
-                nlDLRingRemove(&mListeners.m_Head, entry);
-                mListeners.DeleteEntry(entry);
+                UnidentifiedDeleteListener(listener);
             }
         }
         this->mCurrentConnection = 0;
@@ -412,11 +408,7 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
-                    (ListenerEntry*)((char*)listener - 8));
-                ListenerEntry* entry = position.CurrentEntry();
-                nlDLRingRemove(&mListeners.m_Head, entry);
-                mListeners.DeleteEntry(entry);
+                UnidentifiedDeleteListener(listener);
             }
         }
         this->mCurrentConnection = 0;
@@ -524,6 +516,7 @@ public:
 
     void Queue(T* data, const Function<T*>& disposer);
     void Queue(const Callback& disposer);
+    void Queue() { Queue(Callback()); }
 };
 
 template <typename T>

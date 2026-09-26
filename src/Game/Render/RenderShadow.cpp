@@ -6,6 +6,7 @@
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/Frustum.h"
 #include "NL/gl/gl.h"
@@ -346,9 +347,9 @@ float GetPlanarShadowOpacity()
     return sfPlanarShadowOpacity;
 }
 
-extern "C" void fn_80186354(DrawableModel* arg0)
+void fn_80186354(ChargeShadowDrawable* object)
 {
-    if (arg0->GetWorldMatrix()->m43 >= 0.0f)
+    if (object->GetWorldMatrix()->m43 >= 0.0f)
     {
         BallShadowParams p;
         p.fReferenceHeight = g_fBallShadowH;
@@ -361,7 +362,7 @@ extern "C" void fn_80186354(DrawableModel* arg0)
         p.colour.c[2] = 0xFF;
         p.colour.c[3] = 0xFF;
         DrawBallShadow(
-            *(const nlVector3*)&arg0->GetWorldMatrix()->e2[3][0], p, false);
+            *(const nlVector3*)&object->GetWorldMatrix()->e2[3][0], p, false);
 
         if (g_bBallGlow)
         {
@@ -374,26 +375,26 @@ extern "C" void fn_80186354(DrawableModel* arg0)
             int red;
             int blue;
             int green;
-            float scale = arg0->snapshotScale;
-            if (scale < 1.0f)
+            float charge = object->m_fCharge;
+            if (charge < 1.0f)
             {
                 red = 180;
                 blue = 200;
                 green = 15;
             }
-            else if (scale >= 1.0f && scale < 2.0f)
+            else if (charge >= 1.0f && charge < 2.0f)
             {
                 red = 200;
                 blue = 25;
                 green = 25;
             }
-            else if (scale >= 2.0f && scale < 3.0f)
+            else if (charge >= 2.0f && charge < 3.0f)
             {
                 red = 200;
                 blue = 15;
                 green = 100;
             }
-            else if (scale >= 3.0f && scale < 4.0f)
+            else if (charge >= 3.0f && charge < 4.0f)
             {
                 red = 200;
                 blue = 10;
@@ -410,7 +411,7 @@ extern "C" void fn_80186354(DrawableModel* arg0)
             p.colour.c[2] = blue;
             p.colour.c[3] = 0xFF;
             DrawBallShadow(
-                *(const nlVector3*)&arg0->GetWorldMatrix()->e2[3][0], p, true);
+                *(const nlVector3*)&object->GetWorldMatrix()->e2[3][0], p, true);
         }
     }
 }
