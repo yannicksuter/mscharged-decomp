@@ -11,7 +11,7 @@ static TargetTree targets;
 
 static inline GLRenderPair GetBackBufferTarget()
 {
-    static const unsigned long hash = glHash("target/backbuffer");
+    static const unsigned long hash __attribute__((section(".sdata2"))) = glHash("target/backbuffer");
     return GLRenderPair(hash, glplatGetBackBufferTarget());
 }
 

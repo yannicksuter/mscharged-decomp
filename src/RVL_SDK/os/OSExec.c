@@ -1,6 +1,7 @@
 #include <decomp.h>
 #include <revolution/dvd/dvd.h>
 #include <revolution/esp/esp.h>
+#include <revolution/gx/GXTypes.h>
 #include <revolution/ipc.h>
 #include <revolution/os.h>
 #include <stdio.h>
@@ -213,10 +214,8 @@ void __OSLaunchNextFirmware(void)
     ESTicketView* t = (ESTicketView*)views;
     u64 version;
     s32 fd = -1;
-    struct
-    {
-        u8 tmp[4];
-    } unused = { 0xFF, 0xFF, 0xFF, 0 };
+    GXColor bg = { 0, 0, 0, 0 };
+    GXColor fg = { 255, 255, 255, 0 };
 
     DVDLowIntType = 0;
     DVDLowClosePartition(callback);
@@ -349,10 +348,8 @@ void __OSLaunchMenu(void)
     void* pviews = views;
     u32 count = 1;
     s32 fd = -1;
-    struct
-    {
-        u8 tmp[4];
-    } unused = { 0xFF, 0xFF, 0xFF, 0 };
+    GXColor bg = { 0, 0, 0, 0 };
+    GXColor fg = { 255, 255, 255, 0 };
 
     if (_ES_InitLib(&fd) != IPC_RESULT_OK)
     {
@@ -425,6 +422,8 @@ void __OSRelaunchTitle(void)
 static inline void ReadDisc(void* addr, s32 length, u32 offset)
 {
     DVDCommandBlock block;
+    GXColor bg = { 0, 0, 0, 0 };
+    GXColor fg = { 255, 255, 255, 0 };
 
     DVDReadAbsAsyncPrio(&block, addr, length, offset, NULL, 0);
     while (DVDGetCommandBlockStatus(&block) != DVD_STATE_IDLE)
