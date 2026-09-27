@@ -214,9 +214,9 @@ void CreateShadowPartitionViews()
         nlZeroMemory(&info, sizeof(GLTargetInfo));
         info.width = 0x48;
         info.height = 0x48;
-        info.format = GLTargetFormat_6;
-        info.unknown18 = 0;
-        info.unknown1C = 0;
+        info.format = GLTargetFormat_A8;
+        info.clearFlags = 0;
+        info.clearDepthSetting = 0;
         GLRenderPair pair = glCreateTarget(sShadowPartitionNames[i], &info);
         sShadowPartitionPairs[i] = pair;
         sShadowPartitionTextures[i] = pair.hash;
@@ -360,9 +360,9 @@ void CreateWarbleTargets()
     GLTargetInfo info;
     info.width = 0x40;
     info.height = 0x40;
-    info.format = GLTargetFormat_7;
-    info.unknown18 = 0;
-    info.unknown1C = 0;
+    info.format = GLTargetFormat_IA8;
+    info.clearFlags = 0;
+    info.clearDepthSetting = 0;
     info.colour[0] = 0x7C;
     info.colour[1] = 0x7C;
     info.colour[2] = 0x7C;
@@ -372,9 +372,9 @@ void CreateWarbleTargets()
 
     info.width = glplatGetDefaultTargetWidth();
     info.height = glplatGetDefaultTargetHeight();
-    info.format = GLTargetFormat_1;
-    info.unknown18 = 0;
-    info.unknown1C = 0;
+    info.format = GLTargetFormat_RGB565;
+    info.clearFlags = 0;
+    info.clearDepthSetting = 0;
     info.colour[0] = 0;
     info.colour[1] = 0;
     info.colour[2] = 0;
@@ -390,8 +390,8 @@ void CreateWarbleTargets()
 
     info.width = glplatGetDefaultTargetWidth() >> 2;
     info.height = glplatGetDefaultTargetHeight() >> 2;
-    info.format = GLTargetFormat_5;
-    info.unknown18 = 1;
+    info.format = GLTargetFormat_RGBA8;
+    info.clearFlags = 1;
     info.colour[0] = 0x80;
     info.colour[1] = 0x80;
     info.colour[2] = 0x80;
@@ -409,9 +409,9 @@ void CreateRenderTargets()
     nlZeroMemory(&info, sizeof(GLTargetInfo));
     info.width = glplatGetDefaultTargetWidth() >> 1;
     info.height = glplatGetDefaultTargetHeight() >> 1;
-    info.format = GLTargetFormat_1;
-    info.unknown18 = 1;
-    info.unknown1C = 0;
+    info.format = GLTargetFormat_RGB565;
+    info.clearFlags = 1;
+    info.clearDepthSetting = 0;
     info.colour[0] = 0xFF;
     info.colour[1] = 0xFF;
     info.colour[2] = 0;
@@ -422,7 +422,7 @@ void CreateRenderTargets()
     sLayerViews[eCLV_UnsortedPerspective]->m_ClearColour = false;
     sLayerViews[eCLV_UnsortedPerspective]->m_ClearDepth = false;
 
-    info.unknown18 = 0;
+    info.clearFlags = 0;
     info.colour[0] = 0;
     info.colour[1] = 0;
     info.colour[2] = 0;
@@ -436,9 +436,9 @@ void CreateRenderTargets()
     nlZeroMemory(&info, sizeof(GLTargetInfo));
     info.width = 0x100;
     info.height = 0x80;
-    info.format = GLTargetFormat_1;
-    info.unknown18 = 1;
-    info.unknown1C = 0;
+    info.format = GLTargetFormat_RGB565;
+    info.clearFlags = 1;
+    info.clearDepthSetting = 0;
     info.colour[0] = 0;
     info.colour[1] = 0;
     info.colour[2] = 0;
@@ -456,8 +456,8 @@ void CreateRenderTargets()
 
     info.width = glplatGetDefaultTargetWidth() >> 1;
     info.height = glplatGetDefaultTargetHeight() >> 1;
-    info.format = GLTargetFormat_7;
-    info.unknown18 = 0;
+    info.format = GLTargetFormat_IA8;
+    info.clearFlags = 0;
     GLRenderPair greyPair = glCreateTarget("grayscale", &info);
     sLayerViews[eCLV_Characters]->SetRenderPair(greyPair);
     sLayerViews[eCLV_Characters]->m_ClearDepth = false;

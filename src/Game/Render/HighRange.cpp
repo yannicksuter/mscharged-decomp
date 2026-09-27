@@ -153,9 +153,9 @@ void InitializeHighRange(HighRange* state)
         nlZeroMemory(&info, sizeof(info));
         info.width = widths[i];
         info.height = heights[i];
-        info.format = GLTargetFormat_6;
-        info.unknown18 = 0;
-        info.unknown1C = 0;
+        info.format = GLTargetFormat_A8;
+        info.clearFlags = 0;
+        info.clearDepthSetting = 0;
         state->mRenderPairs[i]
             = glCreateTarget(state->mNames[i], &info);
     }

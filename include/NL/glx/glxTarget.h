@@ -16,9 +16,9 @@ public:
         mWidth = targetInfo->width;
         mHeight = targetInfo->height;
         mFormat = targetInfo->format;
-        mClearColourEnabled = (targetInfo->unknown18 & 1) != 0;
-        mClearDepthEnabled = (targetInfo->unknown18 & 4) != 0;
-        mClearDepthEnabled |= targetInfo->unknown1C != 0;
+        mClearColourEnabled = (targetInfo->clearFlags & 1) != 0;
+        mClearDepthEnabled = (targetInfo->clearFlags & 4) != 0;
+        mClearDepthEnabled |= targetInfo->clearDepthSetting != 0;
         for (int i = 0; i < 4; ++i)
             mClearColour.c[i] = targetInfo->colour[i];
         mTextureData = 0;

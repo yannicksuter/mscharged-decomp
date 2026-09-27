@@ -23,8 +23,12 @@ static inline GLRenderPair FindTarget(unsigned long hash)
     return GLRenderPair(0, 0);
 }
 
-static inline GLRenderPair CreateTarget(unsigned long& hash, const GLTargetInfo* targetInfo)
+static inline GLRenderPair FindOrCreateTarget(unsigned long& hash, const GLTargetInfo* targetInfo)
 {
+    GLRenderPair result = FindTarget(hash);
+    if (result)
+        return result;
+
     GLXTarget* platformTarget = glplatCreateTarget(targetInfo);
     if (platformTarget != 0)
     {
@@ -36,14 +40,6 @@ static inline GLRenderPair CreateTarget(unsigned long& hash, const GLTargetInfo*
         hash = 0;
     }
     return GLRenderPair(hash, platformTarget);
-}
-
-static inline GLRenderPair FindOrCreateTarget(unsigned long& hash, const GLTargetInfo* targetInfo)
-{
-    GLRenderPair result = FindTarget(hash);
-    if (result)
-        return result;
-    return CreateTarget(hash, targetInfo);
 }
 
 void gl_TargetStartup()

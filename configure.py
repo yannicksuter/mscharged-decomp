@@ -1039,7 +1039,7 @@ config.libs = [
             Object(Matching, "NL/gl/glStat.cpp"),
             Object(Matching, "NL/gl/glState.cpp"),
             Object(Matching, "NL/gl/glStruct.cpp"),
-            Object(NonMatching, "NL/gl/glTarget.cpp"),
+            Object(NonMatching, "NL/gl/glTarget.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "NL/gl/glTexture.cpp"),
             Object(Matching, "NL/gl/glTextureManager.cpp"),
             Object(NonMatching, "NL/gl/glView.cpp", extra_cflags=["-ipa file", "-sym on"]),

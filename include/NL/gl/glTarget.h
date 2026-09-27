@@ -7,11 +7,11 @@ class GLXTarget;
 
 enum GLTargetFormat
 {
-    GLTargetFormat_0 = 0,
-    GLTargetFormat_1 = 1,
-    GLTargetFormat_5 = 5,
-    GLTargetFormat_6 = 6,
-    GLTargetFormat_7 = 7
+    GLTargetFormat_RGB5A3 = 0,
+    GLTargetFormat_RGB565 = 1,
+    GLTargetFormat_RGBA8 = 5,
+    GLTargetFormat_A8 = 6,
+    GLTargetFormat_IA8 = 7
 };
 
 enum GLTargetInfoMode10
@@ -34,8 +34,8 @@ struct GLTargetInfo
     /* 0x0C */ unsigned long unknown0C;
     /* 0x10 */ GLTargetInfoMode10 unknown10;
     /* 0x14 */ GLTargetFormat format;
-    /* 0x18 */ unsigned long unknown18;
-    /* 0x1C */ unsigned long unknown1C;
+    /* 0x18 */ unsigned long clearFlags;
+    /* 0x1C */ unsigned long clearDepthSetting;
     /* 0x20 */ unsigned long unknown20;
     /* 0x24 */ unsigned char colour[4];
 }; // size: 0x28

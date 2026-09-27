@@ -30,13 +30,13 @@ void glxInitTargets()
     info.width = 640;
     info.height = 448;
     info.unknown10 = GLTargetInfoMode10_0;
-    info.format = GLTargetFormat_0;
+    info.format = GLTargetFormat_RGB5A3;
     info.colour[0] = 0;
     info.colour[1] = 0;
     info.colour[2] = 0;
     info.colour[3] = 0;
-    info.unknown18 = 7;
-    info.unknown1C = 3;
+    info.clearFlags = 7;
+    info.clearDepthSetting = 3;
     sBackBufferTarget = new (8, false) GLXTarget(&info);
     sCurrentTarget = 0;
 }
