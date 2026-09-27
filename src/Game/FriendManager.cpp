@@ -104,17 +104,17 @@ void FriendManager::Reset(bool setInstance)
     mPreviousRankedMode = 0;
     memset(mFriendCodeInput, 0, sizeof(mFriendCodeInput));
 
-    mOwnStatus.mMagic[0] = 'S';
-    mOwnStatus.mMagic[1] = 'C';
-    mOwnStatus.mMagic[2] = '2';
-    mOwnStatus.mStatus = EFriendStatus_Initial_NotAvailable;
+    mOwnStatus.mHeader.mMagic[0] = 'S';
+    mOwnStatus.mHeader.mMagic[1] = 'C';
+    mOwnStatus.mHeader.mMagic[2] = '2';
+    mOwnStatus.mHeader.mStatus = EFriendStatus_Initial_NotAvailable;
 
     for (int i = 0; i < 64; ++i)
     {
-        mFriendStatus[i].mMagic[0] = 'S';
-        mFriendStatus[i].mMagic[1] = 'C';
-        mFriendStatus[i].mMagic[2] = '2';
-        mFriendStatus[i].mStatus = EFriendStatus_Initial_NotAvailable;
+        mFriendStatus[i].mHeader.mMagic[0] = 'S';
+        mFriendStatus[i].mHeader.mMagic[1] = 'C';
+        mFriendStatus[i].mHeader.mMagic[2] = '2';
+        mFriendStatus[i].mHeader.mStatus = EFriendStatus_Initial_NotAvailable;
         mFriendStatusChanged[i] = false;
     }
 }
@@ -220,30 +220,30 @@ void FriendManager::HandleFriendStatus(
     u32 decodedLength = DWC_Base64Decode(statusString, encodedLength, reinterpret_cast<char*>(&current), sizeof(current));
 
     bool valid = decodedLength >= 4
-              && current.mMagic[0] == 'S'
-              && current.mMagic[1] == 'C'
-              && current.mMagic[2] == '2'
-              && current.mStatus <= EFriendStatus_ClientReceivedInvitation
-              && decodedLength == GetStatusDataSize(current.mStatus);
+              && current.mHeader.mMagic[0] == 'S'
+              && current.mHeader.mMagic[1] == 'C'
+              && current.mHeader.mMagic[2] == '2'
+              && current.mHeader.mStatus <= EFriendStatus_ClientReceivedInvitation
+              && decodedLength == GetStatusDataSize(current.mHeader.mStatus);
     if (!valid)
     {
-        current.mMagic[0] = 'S';
-        current.mMagic[1] = 'C';
-        current.mMagic[2] = '2';
-        current.mStatus = EFriendStatus_Initial_NotAvailable;
+        current.mHeader.mMagic[0] = 'S';
+        current.mHeader.mMagic[1] = 'C';
+        current.mHeader.mMagic[2] = '2';
+        current.mHeader.mStatus = EFriendStatus_Initial_NotAvailable;
     }
 
-    bool unchanged = current.mStatus == previous.mStatus
-                  && current.mMagic[0] == previous.mMagic[0]
-                  && current.mMagic[1] == previous.mMagic[1]
-                  && current.mMagic[2] == previous.mMagic[2];
+    bool unchanged = current.mHeader.mStatus == previous.mHeader.mStatus
+                  && current.mHeader.mMagic[0] == previous.mHeader.mMagic[0]
+                  && current.mHeader.mMagic[1] == previous.mHeader.mMagic[1]
+                  && current.mHeader.mMagic[2] == previous.mHeader.mMagic[2];
     if (unchanged)
     {
-        if (current.mStatus <= EFriendStatus_Initial_Available)
+        if (current.mHeader.mStatus <= EFriendStatus_Initial_Available)
         {
             unchanged = true;
         }
-        else if (current.mStatus == EFriendStatus_ClientDecliningHost || current.mStatus == EFriendStatus_ClientReceivedInvitation)
+        else if (current.mHeader.mStatus == EFriendStatus_ClientDecliningHost || current.mHeader.mStatus == EFriendStatus_ClientReceivedInvitation)
         {
             unchanged = current.mProfileId == previous.mProfileId;
         }
@@ -283,7 +283,7 @@ void FriendManager::HandleFriendStatus(
         return;
     }
 
-    switch (current.mStatus)
+    switch (current.mHeader.mStatus)
     {
     case EFriendStatus_Initial_NotAvailable:
         tDebugPrintManager::Print(DC_NETWORK,
@@ -317,7 +317,7 @@ void FriendManager::HandleFriendStatus(
         tDebugPrintManager::Print(DC_NETWORK,
             "FriendStatusChanged FriendPID %d Invalid Status %d\n",
             friendData->gs_profile_id.id,
-            current.mStatus);
+            current.mHeader.mStatus);
         break;
     }
 
@@ -345,7 +345,7 @@ bool FriendManager::FindHostInvitation()
 
         DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
             GameInfoManager::GetInstance()->GetUnknown0x40(gNetworkSaveSlotIndex, i));
-        if (!DWC_IsValidFriendData(friendData) || (int)mFriendStatus[i].mStatus != EFriendStatus_HostInvitingPlayer)
+        if (!DWC_IsValidFriendData(friendData) || (int)mFriendStatus[i].mHeader.mStatus != EFriendStatus_HostInvitingPlayer)
         {
             continue;
         }
@@ -388,7 +388,7 @@ bool FriendManager::ValidateHostInvitation()
             GameInfoManager::GetInstance()->GetUnknown0x40(
                 gNetworkSaveSlotIndex, index));
         if (DWC_IsValidFriendData(friendData)
-            && (int)mFriendStatus[index].mStatus == EFriendStatus_HostInvitingPlayer)
+            && (int)mFriendStatus[index].mHeader.mStatus == EFriendStatus_HostInvitingPlayer)
         {
             DWCUserData* userData = reinterpret_cast<DWCUserData*>(
                 GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
@@ -416,7 +416,7 @@ bool FriendManager::HasFriendDeclined()
             {
                 return true;
             }
-            if ((int)mFriendStatus[index].mStatus == EFriendStatus_ClientDecliningHost)
+            if ((int)mFriendStatus[index].mHeader.mStatus == EFriendStatus_ClientDecliningHost)
             {
                 DWCUserData* userData = reinterpret_cast<DWCUserData*>(
                     GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
@@ -443,7 +443,7 @@ int FriendManager::GetFriendInvitationResponse()
             {
                 return 0;
             }
-            if ((int)mFriendStatus[index].mStatus == EFriendStatus_ClientReceivedInvitation)
+            if ((int)mFriendStatus[index].mHeader.mStatus == EFriendStatus_ClientReceivedInvitation)
             {
                 DWCUserData* userData = reinterpret_cast<DWCUserData*>(
                     GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex));
@@ -524,15 +524,15 @@ void FriendManager::SetOwnStatusInitial(
     int available)
 {
     mFriendStatusIndex = -1;
-    int currentStatus = mOwnStatus.mStatus;
+    int currentStatus = mOwnStatus.mHeader.mStatus;
     EFriendStatus status = available ? EFriendStatus_Initial_Available
                                     : EFriendStatus_Initial_NotAvailable;
     if (currentStatus != status)
     {
-        mOwnStatus.mStatus = status;
+        mOwnStatus.mHeader.mStatus = status;
         tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusInitial %d\n", status);
         DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
-            GetStatusDataSize(mOwnStatus.mStatus));
+            GetStatusDataSize(mOwnStatus.mHeader.mStatus));
     }
     else
     {
@@ -548,11 +548,11 @@ void FriendManager::SetOwnStatusDecline(int index)
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
     DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
         gameInfo->GetUnknown0x40(gNetworkSaveSlotIndex, index));
-    mOwnStatus.mStatus = EFriendStatus_ClientDecliningHost;
+    mOwnStatus.mHeader.mStatus = EFriendStatus_ClientDecliningHost;
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
     tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusDecline forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
-        GetStatusDataSize(mOwnStatus.mStatus));
+        GetStatusDataSize(mOwnStatus.mHeader.mStatus));
 }
 
 void FriendManager::
@@ -562,11 +562,11 @@ void FriendManager::
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
     DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
         gameInfo->GetUnknown0x40(gNetworkSaveSlotIndex, index));
-    mOwnStatus.mStatus = EFriendStatus_ClientReceivedInvitation;
+    mOwnStatus.mHeader.mStatus = EFriendStatus_ClientReceivedInvitation;
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
     tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusReceivedInvitation forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
-        GetStatusDataSize(mOwnStatus.mStatus));
+        GetStatusDataSize(mOwnStatus.mHeader.mStatus));
 }
 
 void FriendManager::SetOwnStatusHostInvitingPlayer(
@@ -577,7 +577,7 @@ void FriendManager::SetOwnStatusHostInvitingPlayer(
     GameInfoManager* gameInfo = GameInfoManager::GetInstance();
     DWCFriendData* friendData = reinterpret_cast<DWCFriendData*>(
         gameInfo->GetUnknown0x40(gNetworkSaveSlotIndex, index));
-    mOwnStatus.mStatus = EFriendStatus_HostInvitingPlayer;
+    mOwnStatus.mHeader.mStatus = EFriendStatus_HostInvitingPlayer;
     mOwnStatus.mProfileId = friendData->gs_profile_id.id;
     mOwnStatus.mGameplaySettings = *gameplaySettings;
     mOwnStatus.mPowerupSettings = *cheatSettings;
@@ -585,7 +585,7 @@ void FriendManager::SetOwnStatusHostInvitingPlayer(
     mOwnStatus.mNetworkVersion = GetNetworkVersionWord();
     tDebugPrintManager::Print(DC_NETWORK, "SetOwnStatusHostInvitingPlayer forPID %d\n", mOwnStatus.mProfileId);
     DWC_SetOwnStatusData(reinterpret_cast<const char*>(&mOwnStatus),
-        GetStatusDataSize(mOwnStatus.mStatus));
+        GetStatusDataSize(mOwnStatus.mHeader.mStatus));
 }
 
 void FriendManager::DeleteFriend(int index)

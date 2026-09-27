@@ -676,7 +676,7 @@ config.libs = [
             Object(Matching, "Game/FE/feAnimation.cpp"),
             Object(Matching, "Game/FE/feAsyncImage.cpp", cflags=cflags_game_deferred),
             Object(NonMatching, "Game/FE/FEAudio.cpp", extra_cflags=["-inline auto", "-inline deferred"]),
-            Object(NonMatching, "Game/FE/feBackButton.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/FE/feBackButton.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/feButtonComponent.cpp"),
             Object(Matching, "Game/FE/feCamera.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/FE/feCaptainComponent.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
@@ -708,7 +708,7 @@ config.libs = [
             Object(NonMatching, "Game/FE/feRender.cpp", cflags=cflags_game),
             Object(Matching, "Game/FE/feResourceManager.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/feScene.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/FE/feSceneManager.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/FE/feSceneManager.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/FE/feSceneResource.cpp"),
             Object(Matching, "Game/FE/feScrollBar.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/feScrollText.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
@@ -899,7 +899,7 @@ config.libs = [
             Object(Matching, "Game/SH/SHNavigation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHNetworkStart.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/SH/SHOnlineConnectionQuality.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/SH/SHOnlineFriendCodeEntry.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/SH/SHOnlineFriendCodeEntry.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlineFriends.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/SH/SHOnlineFriendsChooseSides.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHOnlineFriendsDraft.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
@@ -910,7 +910,7 @@ config.libs = [
             Object(Matching, "Game/SH/SHOnlineInviteResponse.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlineInviteStatus.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHOnlineLogin.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/SH/SHOnlineMatchmakingDraft.cpp", extra_cflags=["-ipa file", "-sym on"] + [flag for flag in cflags_rvl_dwc if flag.startswith("-i ")]),
+            Object(Matching, "Game/SH/SHOnlineMatchmakingDraft.cpp", extra_cflags=["-ipa file", "-sym on"] + [flag for flag in cflags_rvl_dwc if flag.startswith("-i ")]),
             Object(Matching, "Game/SH/SHOnlineMiiSelect.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SH/SHOnlineMiiSelectOverlay.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/SH/SHOnlinePlayerCount.cpp", extra_cflags=["-ipa file"]),
@@ -1034,7 +1034,7 @@ config.libs = [
             Object(Matching, "NL/gl/glMemoryInit.cpp"),
             Object(Matching, "NL/gl/glModel.cpp"),
             Object(Matching, "NL/gl/glMultiTextureModelWriter.cpp"),
-            Object(NonMatching, "NL/gl/glPlat.cpp"),
+            Object(Matching, "NL/gl/glPlat.cpp"),
             Object(Matching, "NL/gl/glRenderList.cpp"),
             Object(Matching, "NL/gl/glStat.cpp"),
             Object(Matching, "NL/gl/glState.cpp"),
@@ -1331,20 +1331,27 @@ config.libs = [
     },
     {
         "lib": "RVL_SDK",
-        "mw_version": config.linker_version,
+        # Every RVL_SDK and DWC banner in the retail DOL carries the compiler stamp
+        # 0x4199_60831, which is the GC/3.0a5.2 package (mwcceppc -version: 4.1 build
+        # 60831); the game itself needs GC/3.0a5 (4.2 build 60422). Nintendo built the
+        # SDK libraries with 3.0a5.2, so that is the default here and NLG code inside
+        # this block pins the game compiler explicitly.
+        # Libraries R4QE01 links from other suppliers or packages (the Broadcom
+        # Bluetooth stack, NHTTP and RevoEX) keep their own blocks below.
+        "mw_version": "GC/3.0a5.2",
         "cflags": cflags_rvl_sdk,
         "progress_category": "sdk",
         "objects": [
             # NL/glx
-            Object(Matching, "NL/glx/glxMemory.cpp", cflags=cflags_game),
+            Object(Matching, "NL/glx/glxMemory.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
 
             # NL/plat
-            Object(Matching, "NL/plat/nlFileCache.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
-            Object(Matching, "NL/plat/nlFlash.cpp", cflags=cflags_game),
-            Object(Matching, "NL/plat/nlMemory.cpp", cflags=cflags_game),
-            Object(NonMatching, "NL/plat/PlatPadManager.cpp", cflags=cflags_game),
-            Object(Matching, "NL/plat/SocketNetwork.cpp", cflags=cflags_game),
-            Object(Matching, "NL/plat/TransportSocket.cpp", cflags=cflags_game),
+            Object(Matching, "NL/plat/nlFileCache.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"], mw_version="GC/3.0a5"),
+            Object(Matching, "NL/plat/nlFlash.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(Matching, "NL/plat/nlMemory.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(NonMatching, "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(Matching, "NL/plat/SocketNetwork.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(Matching, "NL/plat/TransportSocket.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
 
             # RVL_SDK/ai
             Object(Matching, "RVL_SDK/ai/ai.c"),
@@ -1376,76 +1383,6 @@ config.libs = [
             # RVL_SDK/base
             Object(Matching, "RVL_SDK/base/PPCArch.c"),
 
-            # RVL_SDK/bte
-            Object(Matching, "RVL_SDK/bte/bd.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_dm_act.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_dm_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_dm_cfg.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_dm_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_dm_pm.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_hh_act.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_hh_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_hh_cfg.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_hh_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_hh_utils.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_sys_cfg.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_sys_conn.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bta_sys_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bte_hcisu.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bte_init.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bte_logmsg.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/bte_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_acl.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_dev.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_devctl.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_discovery.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_inq.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_pm.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_sco.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btm_sec.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btu_hcif.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btu_init.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/btu_task1.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/gap_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/gap_conn.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/gap_utils.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/gki_buffer.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/gki_ppc.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/gki_time.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hcicmds.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hcisu_h2.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hidd_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hidd_conn.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hidd_mgmt.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hidd_pm.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hidh_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/hidh_conn.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/l2c_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/l2c_csm.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/l2c_link.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/l2c_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/l2c_utils.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/port_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/port_rfc.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/port_utils.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/ptim.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/rfc_l2cap_if.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/rfc_mx_fsm.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/rfc_port_fsm.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/rfc_port_if.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/rfc_ts_frames.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/rfc_utils.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/sdp_api.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/sdp_db.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/sdp_discovery.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/sdp_main.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/sdp_server.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/sdp_utils.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/utl.c", cflags=cflags_rvl_bte),
-            Object(Matching, "RVL_SDK/bte/uusb_ppc.c", cflags=cflags_rvl_bte, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/bte/wbt_ext.c", cflags=cflags_rvl_bte),
-
             # RVL_SDK/db
             Object(Matching, "RVL_SDK/db/db.c"),
 
@@ -1465,24 +1402,24 @@ config.libs = [
 
             # RVL_SDK/dwc
             Object(Matching, "RVL_SDK/dwc/dwc_account.c", cflags=cflags_rvl_dwc),
-            Object(Matching, "RVL_SDK/dwc/dwc_auth_interface.c", cflags=cflags_rvl_dwc, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/dwc/dwc_auth_interface.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_base64.c"),
-            Object(Matching, "RVL_SDK/dwc/dwc_common.c", cflags=cflags_rvl_dwc, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/dwc/dwc_common.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_encsession.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_error.c"),
-            Object(Matching, "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/dwc/dwc_friend.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_ghttp.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_init.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_login.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_main.c", cflags=cflags_rvl_dwc),
-            Object(Matching, "RVL_SDK/dwc/dwc_match.c", cflags=cflags_rvl_dwc, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/dwc/dwc_match.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_memfunc.c"),
             Object(Matching, "RVL_SDK/dwc/dwc_nastime.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_nonport.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_ranking.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_ranksession.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwc_report.c"),
-            Object(Matching, "RVL_SDK/dwc/dwc_transport.c", cflags=cflags_rvl_dwc, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/dwc/dwc_transport.c", cflags=cflags_rvl_dwc),
             Object(Matching, "RVL_SDK/dwc/dwci_np_math.c", cflags=cflags_rvl_dwc),
 
             # RVL_SDK/euart
@@ -1500,38 +1437,38 @@ config.libs = [
             Object(Matching, "RVL_SDK/gamespy/darray.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/hashtable.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/md5c.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/nonport.c", cflags=cflags_rvl_spy, extra_cflags=["-D_REVOLUTION"], mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/nonport.c", cflags=cflags_rvl_spy, extra_cflags=["-D_REVOLUTION"]),
             Object(Matching, "RVL_SDK/gamespy/common/gsAvailable.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/common/gsCrypt.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/common/gsLargeInt.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/common/gsRC4.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/common/gsCrypt.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/common/gsLargeInt.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/common/gsRC4.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/common/gsSHA1.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/common/gsSSL.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/common/gsXML.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpBuffer.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpBuffer.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpCallbacks.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpCommon.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpCommon.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpConnection.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpEncryption.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpMain.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpPost.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpProcess.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gp.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpi.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiBuddy.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiBuffer.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiCallback.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiConnect.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiInfo.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiOperation.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiPeer.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiProfile.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiSearch.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiTransfer.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/GP/gpiUnique.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpPost.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/ghttp/ghttpProcess.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gp.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpi.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiBuddy.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiBuffer.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiCallback.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiConnect.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiInfo.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiOperation.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiPeer.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiProfile.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiSearch.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiTransfer.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/GP/gpiUnique.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/GP/gpiUtility.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gstats/gbucket.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/gstats/gstats.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/gstats/gstats.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Auth.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Buffer.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Callback.c", cflags=cflags_rvl_spy),
@@ -1541,14 +1478,14 @@ config.libs = [
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Socket.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/gt2/gt2Utility.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/natneg/NATify.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/natneg/natneg.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/natneg/natneg.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/qr2/qr2.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/qr2/qr2regkeys.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_crypt.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_queryengine.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_crypt.c", cflags=cflags_rvl_spy),
+            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_queryengine.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_server.c", cflags=cflags_rvl_spy),
             Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_serverbrowsing.c", cflags=cflags_rvl_spy),
-            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c", cflags=cflags_rvl_spy, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gamespy/serverbrowsing/sb_serverlist.c", cflags=cflags_rvl_spy),
 
             # RVL_SDK/gx
             Object(Matching, "RVL_SDK/gx/GXAttr.c"),
@@ -1561,7 +1498,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/gx/GXLight.c"),
             Object(Matching, "RVL_SDK/gx/GXMisc.c"),
             Object(Matching, "RVL_SDK/gx/GXPerf.c"),
-            Object(Matching, "RVL_SDK/gx/GXPixel.c", mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/gx/GXPixel.c"),
             Object(Matching, "RVL_SDK/gx/GXTev.c"),
             Object(Matching, "RVL_SDK/gx/GXTexture.c"),
             Object(Matching, "RVL_SDK/gx/GXTransform.c"),
@@ -1576,7 +1513,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/hbm/nw4hbm/db/db_assert.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/db/db_console.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/db/db_DbgPrintBase.cpp", cflags=cflags_rvl_hbm),
-            Object(Matching, "RVL_SDK/hbm/nw4hbm/db/db_directPrint.cpp", cflags=cflags_rvl_hbm, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/db/db_directPrint.cpp", cflags=cflags_rvl_hbm),
             Object(NonMatching, "RVL_SDK/hbm/nw4hbm/db/db_mapFile.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_animation.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_arcResourceAccessor.cpp", cflags=cflags_rvl_hbm),
@@ -1589,8 +1526,8 @@ config.libs = [
             Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_pane.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_picture.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_resourceAccessor.cpp", cflags=cflags_rvl_hbm),
-            Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_textBox.cpp", cflags=cflags_rvl_hbm, mw_version="GC/3.0a5.2"),
-            Object(NonMatching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_window.cpp", cflags=cflags_rvl_hbm, mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_textBox.cpp", cflags=cflags_rvl_hbm),
+            Object(NonMatching, "RVL_SDK/hbm/nw4hbm/lyt/lyt_window.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/math/math_triangular.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/snd/snd_AnimSound.cpp", cflags=cflags_rvl_hbm),
             Object(Matching, "RVL_SDK/hbm/nw4hbm/snd/snd_AxManager.cpp", cflags=cflags_rvl_hbm),
@@ -1667,7 +1604,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/ipc/memory.c"),
 
             # RVL_SDK/kpad
-            Object(Matching, "RVL_SDK/kpad/KPAD.c", mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/kpad/KPAD.c"),
 
             # RVL_SDK/mem
             Object(Matching, "RVL_SDK/mem/mem_allocator.c"),
@@ -1701,28 +1638,6 @@ config.libs = [
             Object(NonMatching, "RVL_SDK/ndev/DebuggerDriver.c"),
             Object(Matching, "RVL_SDK/ndev/exi2.c"),
 
-            # RVL_SDK/net
-            Object(Matching, "RVL_SDK/net/hmac.c"),
-            Object(Matching, "RVL_SDK/net/md5.c"),
-            Object(Matching, "RVL_SDK/net/neterrorcode.c", cflags=[*(flag for flag in cflags_rvl_sdk if flag != "-inline auto"), "-inline on"]),
-            Object(Matching, "RVL_SDK/net/NETVersion.c"),
-            Object(Matching, "RVL_SDK/net/wireless_macaddr.c"),
-
-            # RVL_SDK/nhttp
-            Object(Matching, "RVL_SDK/nhttp/d_nhttp.c"),
-            Object(NonMatching, "RVL_SDK/nhttp/d_nhttp_common.c"),
-            Object(Matching, "RVL_SDK/nhttp/d_nhttp_private.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_bgnend.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_control.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_list.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_os_RVL.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_recvbuf.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_request.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_response.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_socket_RVL.c"),
-            Object(Matching, "RVL_SDK/nhttp/NHTTP_stdlib_RVL.c"),
-            Object(NonMatching, "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp),
-
             # RVL_SDK/nwc24
             Object(Matching, "RVL_SDK/nwc24/NWC24Config.c"),
             Object(Matching, "RVL_SDK/nwc24/NWC24Download.c"),
@@ -1749,7 +1664,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/os/OSCache.c"),
             Object(Matching, "RVL_SDK/os/OSContext.c"),
             Object(Matching, "RVL_SDK/os/OSError.c"),
-            Object(Matching, "RVL_SDK/os/OSExec.c", mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/os/OSExec.c"),
             Object(Matching, "RVL_SDK/os/OSFatal.c"),
             Object(Matching, "RVL_SDK/os/OSFont.c"),
             Object(Matching, "RVL_SDK/os/OSInterrupt.c"),
@@ -1774,22 +1689,6 @@ config.libs = [
             # RVL_SDK/pad
             Object(Matching, "RVL_SDK/pad/Pad.c", extra_cflags=["-inline noauto"]),
 
-            # RVL_SDK/rfl
-            Object(Matching, "RVL_SDK/rfl/RFL_Controller.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_Database.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_DataUtility.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_DefaultDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_Format.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_HiddenDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_Icon.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_MakeRandomFace.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_MakeTex.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_MiddleDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_Model.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_NANDAccess.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_NANDLoader.c", extra_cflags=["-Cpp_exceptions on"]),
-            Object(Matching, "RVL_SDK/rfl/RFL_System.c", extra_cflags=["-Cpp_exceptions on"]),
-
             # RVL_SDK/sc
             Object(Matching, "RVL_SDK/sc/scapi.c"),
             Object(Matching, "RVL_SDK/sc/scapi_prdinfo.c"),
@@ -1801,7 +1700,7 @@ config.libs = [
 
             # RVL_SDK/so
             Object(NonMatching, "RVL_SDK/so/soBasic.c"),
-            Object(Matching, "RVL_SDK/so/soCommon.c", mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/so/soCommon.c"),
             Object(Matching, "RVL_SDK/so/SOInformation.c"),
             Object(Equivalent, "RVL_SDK/so/SOOption.c"),
 
@@ -1822,6 +1721,185 @@ config.libs = [
 
             # RVL_SDK/usb
             Object(Matching, "RVL_SDK/usb/usb.c"),
+
+            # RVL_SDK/vi
+            Object(Matching, "RVL_SDK/vi/i2c.c"),
+            Object(Matching, "RVL_SDK/vi/vi.c"),
+            Object(Matching, "RVL_SDK/vi/vi3in1.c"),
+
+            # RVL_SDK/wenc
+            Object(Matching, "RVL_SDK/wenc/wenc.c"),
+
+            # RVL_SDK/wpad
+            Object(Matching, "RVL_SDK/wpad/debug_msg.c"),
+            Object(Matching, "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad),
+            Object(Matching, "RVL_SDK/wpad/WPADEncrypt.c"),
+            Object(Matching, "RVL_SDK/wpad/WPADHIDParser.c"),
+            Object(Matching, "RVL_SDK/wpad/WPADMem.c"),
+
+            # RVL_SDK/wud
+            Object(Matching, "RVL_SDK/wud/debug_msg.c", cflags=cflags_rvl_wud),
+            Object(Matching, "RVL_SDK/wud/WUD.c", cflags=cflags_rvl_wud),
+            Object(Matching, "RVL_SDK/wud/WUDHidHost.c", cflags=cflags_rvl_wud),
+        ],
+    },
+    {
+        # RVLFaceLib ships as its own package and registers no banner. Its one
+        # compiler signature is data: RFLiInitShapeRes keeps a static const
+        # header table that only debug assertions read, GC/3.0a5 drops the
+        # unreferenced table as retail does, and GC/3.0a5.2 emits it into
+        # .rodata, moving every later section of the DOL by 0x20.
+        "lib": "RVLFaceLib",
+        "mw_version": "GC/3.0a5",
+        "cflags": cflags_rvl_sdk,
+        "progress_category": "sdk",
+        "objects": [
+            # RVL_SDK/rfl
+            Object(Matching, "RVL_SDK/rfl/RFL_Controller.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_Database.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_DataUtility.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_DefaultDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_Format.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_HiddenDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_Icon.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_MakeRandomFace.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_MakeTex.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_MiddleDatabase.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_Model.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_NANDAccess.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_NANDLoader.c", extra_cflags=["-Cpp_exceptions on"]),
+            Object(Matching, "RVL_SDK/rfl/RFL_System.c", extra_cflags=["-Cpp_exceptions on"]),
+        ],
+    },
+    {
+        # Broadcom Bluetooth stack (the bluedroid-derived files). It carries no
+        # banner, and its retail code keeps the older compiler's constant
+        # placement: the pristine Broadcom spelling of rfc_send_test, sdp_init or
+        # WBT_ExtCreateRecord is exact under GC/3.0a5 and not under GC/3.0a5.2.
+        # Nintendo's USB transport glue for it, uusb_ppc.c, is the reverse and
+        # belongs to the 3.0a5.2 SDK build.
+        "lib": "BTE",
+        "mw_version": "GC/3.0a5",
+        "cflags": cflags_rvl_bte,
+        "progress_category": "sdk",
+        "objects": [
+            # RVL_SDK/bte
+            Object(Matching, "RVL_SDK/bte/bd.c"),
+            Object(Matching, "RVL_SDK/bte/bta_dm_act.c"),
+            Object(Matching, "RVL_SDK/bte/bta_dm_api.c"),
+            Object(Matching, "RVL_SDK/bte/bta_dm_cfg.c"),
+            Object(Matching, "RVL_SDK/bte/bta_dm_main.c"),
+            Object(Matching, "RVL_SDK/bte/bta_dm_pm.c"),
+            Object(Matching, "RVL_SDK/bte/bta_hh_act.c"),
+            Object(Matching, "RVL_SDK/bte/bta_hh_api.c"),
+            Object(Matching, "RVL_SDK/bte/bta_hh_cfg.c"),
+            Object(Matching, "RVL_SDK/bte/bta_hh_main.c"),
+            Object(Matching, "RVL_SDK/bte/bta_hh_utils.c"),
+            Object(Matching, "RVL_SDK/bte/bta_sys_cfg.c"),
+            Object(Matching, "RVL_SDK/bte/bta_sys_conn.c"),
+            Object(Matching, "RVL_SDK/bte/bta_sys_main.c"),
+            Object(Matching, "RVL_SDK/bte/bte_hcisu.c"),
+            Object(Matching, "RVL_SDK/bte/bte_init.c"),
+            Object(Matching, "RVL_SDK/bte/bte_logmsg.c"),
+            Object(Matching, "RVL_SDK/bte/bte_main.c"),
+            Object(Matching, "RVL_SDK/bte/btm_acl.c"),
+            Object(Matching, "RVL_SDK/bte/btm_dev.c"),
+            Object(Matching, "RVL_SDK/bte/btm_devctl.c"),
+            Object(Matching, "RVL_SDK/bte/btm_discovery.c"),
+            Object(Matching, "RVL_SDK/bte/btm_inq.c"),
+            Object(Matching, "RVL_SDK/bte/btm_main.c"),
+            Object(Matching, "RVL_SDK/bte/btm_pm.c"),
+            Object(Matching, "RVL_SDK/bte/btm_sco.c"),
+            Object(Matching, "RVL_SDK/bte/btm_sec.c"),
+            Object(Matching, "RVL_SDK/bte/btu_hcif.c"),
+            Object(Matching, "RVL_SDK/bte/btu_init.c"),
+            Object(Matching, "RVL_SDK/bte/btu_task1.c"),
+            Object(Matching, "RVL_SDK/bte/gap_api.c"),
+            Object(Matching, "RVL_SDK/bte/gap_conn.c"),
+            Object(Matching, "RVL_SDK/bte/gap_utils.c"),
+            Object(Matching, "RVL_SDK/bte/gki_buffer.c"),
+            Object(Matching, "RVL_SDK/bte/gki_ppc.c"),
+            Object(Matching, "RVL_SDK/bte/gki_time.c"),
+            Object(Matching, "RVL_SDK/bte/hcicmds.c"),
+            Object(Matching, "RVL_SDK/bte/hcisu_h2.c"),
+            Object(Matching, "RVL_SDK/bte/hidd_api.c"),
+            Object(Matching, "RVL_SDK/bte/hidd_conn.c"),
+            Object(Matching, "RVL_SDK/bte/hidd_mgmt.c"),
+            Object(Matching, "RVL_SDK/bte/hidd_pm.c"),
+            Object(Matching, "RVL_SDK/bte/hidh_api.c"),
+            Object(Matching, "RVL_SDK/bte/hidh_conn.c"),
+            Object(Matching, "RVL_SDK/bte/l2c_api.c"),
+            Object(Matching, "RVL_SDK/bte/l2c_csm.c"),
+            Object(Matching, "RVL_SDK/bte/l2c_link.c"),
+            Object(Matching, "RVL_SDK/bte/l2c_main.c"),
+            Object(Matching, "RVL_SDK/bte/l2c_utils.c"),
+            Object(Matching, "RVL_SDK/bte/port_api.c"),
+            Object(Matching, "RVL_SDK/bte/port_rfc.c"),
+            Object(Matching, "RVL_SDK/bte/port_utils.c"),
+            Object(Matching, "RVL_SDK/bte/ptim.c"),
+            Object(Matching, "RVL_SDK/bte/rfc_l2cap_if.c"),
+            Object(Matching, "RVL_SDK/bte/rfc_mx_fsm.c"),
+            Object(Matching, "RVL_SDK/bte/rfc_port_fsm.c"),
+            Object(Matching, "RVL_SDK/bte/rfc_port_if.c"),
+            Object(Matching, "RVL_SDK/bte/rfc_ts_frames.c"),
+            Object(Matching, "RVL_SDK/bte/rfc_utils.c"),
+            Object(Matching, "RVL_SDK/bte/sdp_api.c"),
+            Object(Matching, "RVL_SDK/bte/sdp_db.c"),
+            Object(Matching, "RVL_SDK/bte/sdp_discovery.c"),
+            Object(Matching, "RVL_SDK/bte/sdp_main.c"),
+            Object(Matching, "RVL_SDK/bte/sdp_server.c"),
+            Object(Matching, "RVL_SDK/bte/sdp_utils.c"),
+            Object(Matching, "RVL_SDK/bte/utl.c"),
+            Object(Matching, "RVL_SDK/bte/uusb_ppc.c", mw_version="GC/3.0a5.2"),
+            Object(Matching, "RVL_SDK/bte/wbt_ext.c"),
+        ],
+    },
+    {
+        # NHTTP ships as its own library package without a banner. Its retail
+        # code keeps the older compiler's constant order and saved-register
+        # zeros (NHTTPi_strnicmp, NHTTPi_compareToken, NHTTPi_ThreadParseHeaderProc),
+        # exact under GC/3.0a5 only.
+        "lib": "NHTTP",
+        "mw_version": "GC/3.0a5",
+        "cflags": cflags_rvl_sdk,
+        "progress_category": "sdk",
+        "objects": [
+            # RVL_SDK/nhttp
+            Object(Matching, "RVL_SDK/nhttp/d_nhttp.c"),
+            Object(NonMatching, "RVL_SDK/nhttp/d_nhttp_common.c"),
+            Object(Matching, "RVL_SDK/nhttp/d_nhttp_private.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_bgnend.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_control.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_list.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_os_RVL.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_recvbuf.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_request.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_response.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_socket_RVL.c"),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_stdlib_RVL.c"),
+            Object(NonMatching, "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp),
+        ],
+    },
+    {
+        # RevoEX 1.0: NETVersion.c registers the "<< REX-PPC 1.0.0.0 (RevoEX-1.0)
+        # REL 070309140556 >>" banner, which carries no compiler stamp. The VF
+        # file system (RevoEX in the wii-ipl tree) shows both compilers: the
+        # constant placement of VFiPFENT_ITER_DoGetEntry and VFiPFCODE_CP932_* is
+        # exact under GC/3.0a5 only and inert to every donor spelling, while
+        # VFiPFPATH_DoSplitPath copies its 16-byte token through GPR words, which
+        # only GC/3.0a5.2 emits (3.0a5 uses FPR pairs). pf_path.c is pinned; the
+        # objects were evidently not all produced by one compiler build.
+        "lib": "RevoEX",
+        "mw_version": "GC/3.0a5",
+        "cflags": cflags_rvl_sdk,
+        "progress_category": "sdk",
+        "objects": [
+            # RVL_SDK/net
+            Object(Matching, "RVL_SDK/net/hmac.c"),
+            Object(Matching, "RVL_SDK/net/md5.c"),
+            Object(Matching, "RVL_SDK/net/neterrorcode.c", cflags=[*(flag for flag in cflags_rvl_sdk if flag != "-inline auto"), "-inline on"]),
+            Object(Matching, "RVL_SDK/net/NETVersion.c"),
+            Object(Matching, "RVL_SDK/net/wireless_macaddr.c"),
 
             # RVL_SDK/vf
             Object(Matching, "RVL_SDK/vf/d_common.c"),
@@ -1868,26 +1946,6 @@ config.libs = [
             Object(Matching, "RVL_SDK/vf/pf_volume.c"),
             Object(Matching, "RVL_SDK/vf/pf_w_clib.c"),
             Object(Matching, "RVL_SDK/vf/sd_drv.c"),
-
-            # RVL_SDK/vi
-            Object(Matching, "RVL_SDK/vi/i2c.c"),
-            Object(Matching, "RVL_SDK/vi/vi.c", mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/vi/vi3in1.c"),
-
-            # RVL_SDK/wenc
-            Object(Matching, "RVL_SDK/wenc/wenc.c", mw_version="GC/3.0a5.2"),
-
-            # RVL_SDK/wpad
-            Object(Matching, "RVL_SDK/wpad/debug_msg.c"),
-            Object(Matching, "RVL_SDK/wpad/WPAD.c", cflags=cflags_rvl_wpad),
-            Object(Matching, "RVL_SDK/wpad/WPADEncrypt.c"),
-            Object(Matching, "RVL_SDK/wpad/WPADHIDParser.c"),
-            Object(Matching, "RVL_SDK/wpad/WPADMem.c"),
-
-            # RVL_SDK/wud
-            Object(Matching, "RVL_SDK/wud/debug_msg.c", cflags=cflags_rvl_wud),
-            Object(Matching, "RVL_SDK/wud/WUD.c", cflags=cflags_rvl_wud, mw_version="GC/3.0a5.2"),
-            Object(Matching, "RVL_SDK/wud/WUDHidHost.c", cflags=cflags_rvl_wud),
         ],
     },
 ]

@@ -83,7 +83,7 @@ void SHOnlineInvitePlayers::RefreshRows()
     {
         if (mDeclinedDisplayTime > 0.0f)
             SetPlayerRow(4, i);
-        else if (g_pFriendManager->mOwnStatus.mStatus == EFriendStatus_HostInvitingPlayer)
+        else if (g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer)
             SetPlayerRow(3, i);
         else
             SetPlayerRow(2, i);
@@ -259,7 +259,7 @@ void SHOnlineInvitePlayers::SceneCreated()
     mScrollBar.SetComponent(scrollbar);
     mScrollBar.SetRange(0);
     mScrollBar.SetValue(0);
-    mBackEnabled = mIsHost && !(mDeclinedDisplayTime > 0.0f) && g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer;
+    mBackEnabled = mIsHost && !(mDeclinedDisplayTime > 0.0f) && g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
     SHNavigation* screen = GetNavigationScene();
     screen->SetButtons(0x24, true);
     mBackButtonInstance = screen->GetButton(4);
@@ -379,7 +379,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         else if (mDeclinedDisplayTime > 0.0f)
             backAvailable = false;
         else
-            backAvailable = g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer;
+            backAvailable = g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
         if (!backAvailable)
         {
             mBackButtonInstance->m_bVisible = false;
@@ -395,7 +395,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         else if (mDeclinedDisplayTime > 0.0f)
             backAvailable = false;
         else
-            backAvailable = g_pFriendManager->mOwnStatus.mStatus != EFriendStatus_HostInvitingPlayer;
+            backAvailable = g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
         if (backAvailable)
         {
             mBackButtonInstance->m_bVisible = true;
@@ -445,7 +445,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
             }
         }
     }
-    if (g_pFriendManager->mOwnStatus.mStatus == EFriendStatus_HostInvitingPlayer && g_pFriendManager->HasFriendDeclined())
+    if (g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer && g_pFriendManager->HasFriendDeclined())
     {
         mDeclinedFriendIndex = g_pFriendManager->mFriendStatusIndex;
         g_pFriendManager->SetOwnStatusInitial(0);
@@ -463,7 +463,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         }
     }
     else if (mInvitationTimeout > 0.0f && (mInvitationTimeout -= fDeltaT) <= 0.0f
-        && g_pFriendManager->mOwnStatus.mStatus == EFriendStatus_HostInvitingPlayer
+        && g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer
         && g_pFriendManager->GetFriendInvitationResponse() == 0)
     {
         g_pFriendManager->SetOwnStatusInitial(0);
@@ -488,7 +488,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
     }
     else if (lobby->mCancelRequested)
     {
-        if (g_pFriendManager->mOwnStatus.mStatus == EFriendStatus_HostInvitingPlayer)
+        if (g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer)
         {
             mDeclinedFriendIndex = g_pFriendManager->mFriendStatusIndex;
             g_pFriendManager->SetOwnStatusInitial(0);

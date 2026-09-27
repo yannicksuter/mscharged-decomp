@@ -444,15 +444,17 @@ void InterpreterCore::Reset()
 
 void InterpreterCore::InitializeTweaks()
 {
+    u8* data;
+    u32 i;
     u32 count = m_Header->unknown_0x28 - m_Header->unknown_0x1C;
     if (count != 0)
     {
         AllocateTweaks(count);
 
-        u8* data = m_Header->unknown_0x34;
-        for (u32 i = 0; i < count; i++)
+        data = m_Header->unknown_0x34;
+        for (i = 0; i < count; i++)
         {
-            u32 valueIndex = m_Header->unknown_0x1C + i;
+            u32 valueIndex = i + m_Header->unknown_0x1C;
             u32 type;
             if (valueIndex < m_Header->unknown_0x20)
             {

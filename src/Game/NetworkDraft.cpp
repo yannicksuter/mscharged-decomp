@@ -126,13 +126,7 @@ int NetMessageDraft::GetType() { return 21; }
 
 void NetworkDraft::CreateInstance()
 {
-    void* storage = nlMalloc(sizeof(NetworkDraft), 8, false);
-    NetworkDraft* draft = 0;
-    if (storage != 0)
-    {
-        draft = new (storage) NetworkDraft;
-    }
-    sNetworkDraft = draft;
+    sNetworkDraft = new (nlMalloc(sizeof(NetworkDraft), 8, false)) NetworkDraft;
 }
 
 NetworkDraft* NetworkDraft::Instance()

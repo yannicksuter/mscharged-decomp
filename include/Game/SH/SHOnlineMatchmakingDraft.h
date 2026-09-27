@@ -39,6 +39,8 @@ public:
 
 private:
     void RefreshPlayerRows();
+    void UpdateCountdownText(int countdown);
+    void ShowError(int error);
 }; // size 0xA34
 
 #endif // GAME_SH_ONLINE_DRAFT_H

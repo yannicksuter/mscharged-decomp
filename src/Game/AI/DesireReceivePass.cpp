@@ -793,6 +793,9 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
     Estimated estimated = mEstimated;
     bool bUseGroundIntercept = true;
+    int nNumIntercepts;
+    float fCos;
+    float fSin;
     int nNumAnims;
     const LooseBallContactAnimInfo* pAnimInfo =
         fn_800C1FA4(receiveAnimType, nNumAnims);
@@ -809,8 +812,6 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         fAnimContactFrame / (float)pAnim->m_nNumKeys,
         true, true, false, true);
 
-    float fCos;
-    float fSin;
     nlSinCos(&fSin, &fCos, aFacingDirection);
 
     nlVector3 v3ContactOffsetWorld;
@@ -821,7 +822,6 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     v3ContactOffsetWorld.y =
         v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin;
 
-    int nNumIntercepts;
     float fInterceptTimes[2];
     float fDesiredScale =
         m_pFielder->mUnidentified024.m_fDesiredPlayerScale;
@@ -872,12 +872,13 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
     if (bUseGroundIntercept)
     {
-        float fRadius =
-            m_pFielder->mUnidentified320->GetRadius();
+        cFielder* pFielder = m_pFielder;
+        cBall* pBall = g_pBall;
+        float fRadius = pFielder->mUnidentified320->GetRadius();
         float fMaxCatchupSpeed = fn_8002E1B0(m_pFielder);
-        CalcInterceptXY(m_pFielder->mUnidentified024.m_v3Position,
-            fMaxCatchupSpeed, fRadius, g_pBall->m_v3Position,
-            g_pBall->m_v3Velocity, nNumIntercepts, fInterceptTimes);
+        CalcInterceptXY(pFielder->mUnidentified024.m_v3Position,
+            fMaxCatchupSpeed, fRadius, pBall->m_v3Position,
+            pBall->m_v3Velocity, nNumIntercepts, fInterceptTimes);
 
         if (nNumIntercepts == 0)
         {
@@ -981,8 +982,9 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         float fBallDistance = nlVec2Length(v2BallDelta);
         float fBallSpeed =
             nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity);
+        estimated.fBallContactTime = fBallDistance / fBallSpeed;
         estimated.fBallContactTime = nlMaxEquals(
-            lbl_806E4008, fBallDistance / fBallSpeed);
+            lbl_806E4008, estimated.fBallContactTime);
     }
 
     if (mEstimated.fBallContactTime > 0.0f

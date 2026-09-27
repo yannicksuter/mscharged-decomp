@@ -37,8 +37,6 @@ SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
     , mPopupActive(false)
     , mState(0)
 {
-    const unsigned short* empty = (const unsigned short*)L"";
-
     for (int i = 0; i < 12; ++i)
     {
         mKeypadButtons[i].mContext = (void*)i;
@@ -47,7 +45,7 @@ SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
     for (int i = 0; i < 12; ++i)
     {
         mDigitButtons[i].mContext = (void*)i;
-        nlStrNCpy(mDigits[i], empty, 2);
+        ClearDigit(i);
     }
 
     mBackButton.SetPopScene(false);
@@ -55,207 +53,6 @@ SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
 
 SHOnlineFriendCodeEntry::~SHOnlineFriendCodeEntry()
 {
-}
-
-void SHOnlineFriendCodeEntry::InitializeButtons()
-{
-    typedef Detail::MemFunImpl<void, void (SHOnlineFriendCodeEntry::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, SHOnlineFriendCodeEntry*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    FEPointerListener::Callback padSelect(
-        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback padOver(
-        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback padOff(
-        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback codeSelect(
-        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback codeOver(
-        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback codeOff(
-        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-
-    for (int i = 0; i < 12; ++i)
-    {
-        float scale = 0.8f;
-        TLInstance* positionInstance = FEFinder<TLInstance, 5>::FindOrDefault(
-            mPresentation->m_currentSlide, "Layer", "Group", "PAD");
-
-        feVector3 position = positionInstance->GetAssetPosition();
-        if (i == 11)
-        {
-            scale = 0.7f;
-        }
-        mKeypadButtons[i].SetInstanceBounds(
-            mKeypadInstances[i], true, position.f.x, position.f.y, scale, scale);
-        mKeypadButtons[i].SetPointerPressCallback(padSelect);
-        mKeypadButtons[i].SetPointerEnterCallback(padOver);
-        mKeypadButtons[i].SetPointerLeaveCallback(padOff);
-    }
-
-    for (int i = 0; i < 12; ++i)
-    {
-        float scale = 0.8f;
-        TLInstance* positionInstance = FEFinder<TLInstance, 5>::FindOrDefault(
-            mPresentation->m_currentSlide, "Layer", "Group", "CODE");
-
-        feVector3 position = positionInstance->GetAssetPosition();
-        mDigitButtons[i].SetInstanceBounds(
-            mDigitInstances[i], true, position.f.x, position.f.y, scale, scale);
-        mDigitButtons[i].SetPointerPressCallback(codeSelect);
-        mDigitButtons[i].SetPointerEnterCallback(codeOver);
-        mDigitButtons[i].SetPointerLeaveCallback(codeOff);
-    }
-}
-
-void SHOnlineFriendCodeEntry::OnKeypadPointerEnter(int index, void* context)
-{
-    unsigned int item = (unsigned int)context;
-    ++mHoverCount;
-    mKeypadInstances[item]->SetActiveSlide("over", true, false);
-    mKeypadButtons[item].SetPointerState(1, index);
-    FEAudio::PlayAnimAudioEvent(0x0E2B7F90, 0, 0, 1);
-}
-
-void SHOnlineFriendCodeEntry::OnKeypadPointerLeave(int index, void* context)
-{
-    unsigned int item = (unsigned int)context;
-    --mHoverCount;
-    mKeypadInstances[item]->SetActiveSlide("off", true, false);
-    mKeypadButtons[item].SetPointerState(0, index);
-}
-
-static inline void SetSelectedDigit(SHOnlineFriendCodeEntry* scene, int item)
-{
-    if (item >= 12)
-    {
-        item = 11;
-    }
-    if (item < 0)
-    {
-        item = 0;
-    }
-
-    if (scene->mSelectedDigit != item)
-    {
-        scene->mDigitInstances[item]->SetActiveSlide("DOWN", true, false);
-        scene->mDigitInstances[scene->mSelectedDigit]->SetActiveSlide("OFF", true, false);
-
-        scene->mDigitButtons[item].Disable();
-        scene->mDigitButtons[scene->mSelectedDigit].Enable();
-        scene->mSelectedDigit = item;
-    }
-}
-
-void SHOnlineFriendCodeEntry::OnDigitPointerPress(int, void* context)
-{
-    FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
-    SetSelectedDigit(this, (int)context);
-    --mHoverCount;
-}
-
-void SHOnlineFriendCodeEntry::OnDigitPointerEnter(int index, void* context)
-{
-    unsigned int item = (unsigned int)context;
-    if (item != mSelectedDigit)
-    {
-        ++mHoverCount;
-        mDigitInstances[item]->SetActiveSlide("over", true, false);
-        mDigitButtons[item].SetPointerState(1, index);
-        FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
-    }
-}
-
-void SHOnlineFriendCodeEntry::OnDigitPointerLeave(int index, void* context)
-{
-    unsigned int item = (unsigned int)context;
-    if (item != mSelectedDigit)
-    {
-        --mHoverCount;
-        mDigitInstances[item]->SetActiveSlide("off", true, false);
-        mDigitButtons[item].SetPointerState(0, index);
-    }
-}
-
-void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
-{
-    unsigned short* friendCode =
-        g_pFriendManager->mFriendCodeInput;
-    unsigned short character[2];
-    character[1] = 0;
-    bool foundEmpty = false;
-
-    for (int i = 0; i < 12; ++i)
-    {
-        if (friendCode[i] == 0 && !foundEmpty)
-        {
-            SetSelectedDigit(this, i);
-            foundEmpty = true;
-        }
-
-        character[0] = friendCode[i];
-        int item = i;
-        if (item < 0)
-        {
-            item = mSelectedDigit;
-        }
-        nlStrNCpy(mDigits[item], character, 2);
-
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[item], "off", "BOX", "NUMBER");
-        text->SetString(mDigits[item]);
-
-        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[item], "over", "BOX", "NUMBER");
-        text->SetString(mDigits[item]);
-
-        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[item], "down", "BOX", "NUMBER");
-        text->SetString(mDigits[item]);
-    }
-
-    if (!foundEmpty)
-    {
-        SetSelectedDigit(this, 11);
-    }
-
-    memset(friendCode, 0, sizeof(g_pFriendManager->mFriendCodeInput));
-}
-
-void SHOnlineFriendCodeEntry::UpdateConfirmButton()
-{
-    mKeypadInstances[10]->m_bVisible = true;
-    mKeypadButtons[10].mDisabled = false;
-    mOutConfirmButtonInstance->m_bVisible = true;
-
-    bool valid = true;
-    for (int i = 0; i < 12; ++i)
-    {
-        if (mDigits[i][0] == 0)
-        {
-            mOutConfirmButtonInstance->m_bVisible = false;
-            mKeypadInstances[10]->m_bVisible = false;
-            mKeypadButtons[10].mDisabled = true;
-
-            FEPointerEvent event;
-            mKeypadButtons[10].mPreviousEvents[0] = event;
-            mKeypadButtons[10].mPreviousEvents[1] = event;
-            mKeypadButtons[10].mPreviousEvents[2] = event;
-            mKeypadButtons[10].mPreviousEvents[3] = event;
-            valid = false;
-        }
-    }
-
-    if (valid)
-    {
-        FEAudio::PlayAnimAudioEvent(0xCC2C93F1, 0, 0, 1);
-    }
-}
-
-void SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed()
-{
-    g_pFriendManager->SetOwnStatusInitial(true);
-    mPopupActive = false;
 }
 
 void SHOnlineFriendCodeEntry::SceneCreated()
@@ -291,28 +88,7 @@ void SHOnlineFriendCodeEntry::SceneCreated()
     mOutConfirmButtonInstance = FEFinder<TLComponentInstance, 5>::Find(
         mPresentation, "out", "Layer", "Group", "PAD", "button_ok");
 
-    const unsigned short* empty = (const unsigned short*)L"";
-    for (int i = 0; i < 12; ++i)
-    {
-        int item = i;
-        if (item < 0)
-        {
-            item = mSelectedDigit;
-        }
-        nlStrNCpy(mDigits[item], empty, 2);
-
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[item], "off", "BOX", "NUMBER");
-        text->SetString(mDigits[item]);
-
-        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[item], "over", "BOX", "NUMBER");
-        text->SetString(mDigits[item]);
-
-        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[item], "down", "BOX", "NUMBER");
-        text->SetString(mDigits[item]);
-    }
+    ClearDigitTexts();
 
     RestoreFriendCodeInput();
     UpdateConfirmButton();
@@ -332,6 +108,81 @@ void SHOnlineFriendCodeEntry::SceneCreated()
     mBackButton.SetButtonInstance(screen);
 
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
+}
+
+void SHOnlineFriendCodeEntry::ClearDigit(int index)
+{
+    SetDigit(index, L"");
+}
+
+void SHOnlineFriendCodeEntry::SetDigit(int index, const wchar_t* text)
+{
+    nlStrNCpy(mDigits[index], (const unsigned short*)text, 2);
+}
+
+void SHOnlineFriendCodeEntry::SetDigitText(int index, const wchar_t* text)
+{
+    if (index < 0)
+    {
+        index = mSelectedDigit;
+    }
+    nlStrNCpy(mDigits[index], (const unsigned short*)text, 2);
+
+    TLTextInstance* textInstance = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        mDigitInstances[index], "off", "BOX", "NUMBER");
+    textInstance->SetString(mDigits[index]);
+
+    textInstance = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        mDigitInstances[index], "over", "BOX", "NUMBER");
+    textInstance->SetString(mDigits[index]);
+
+    textInstance = FEFinder<TLTextInstance, 3>::FindOrDefault(
+        mDigitInstances[index], "down", "BOX", "NUMBER");
+    textInstance->SetString(mDigits[index]);
+}
+
+void SHOnlineFriendCodeEntry::ClearDigitTexts()
+{
+    for (int i = 0; i < 12; ++i)
+    {
+        SetDigitText(i, L"");
+    }
+}
+
+void SHOnlineFriendCodeEntry::SetSelectedDigit(int index)
+{
+    if (index >= 12)
+    {
+        index = 11;
+    }
+    if (index < 0)
+    {
+        index = 0;
+    }
+
+    if (mSelectedDigit != index)
+    {
+        mDigitInstances[index]->SetActiveSlide("DOWN", true, false);
+        mDigitInstances[mSelectedDigit]->SetActiveSlide("OFF", true, false);
+
+        mDigitButtons[index].Disable();
+        mDigitButtons[mSelectedDigit].Enable();
+        mSelectedDigit = index;
+    }
+}
+
+unsigned long long SHOnlineFriendCodeEntry::ParseFriendKey()
+{
+    unsigned long long friendKey = 0;
+    char* digit = "0";
+    for (int i = 0; i < 12; ++i)
+    {
+        nlWcsToStr(mDigits[i], digit, 4);
+        int digitValue = atoi(digit);
+        double placeValue = pow(10.0, 11 - i);
+        friendKey += digitValue * placeValue;
+    }
+    return friendKey;
 }
 
 void SHOnlineFriendCodeEntry::Update(float fDeltaT)
@@ -454,19 +305,179 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
     }
 }
 
-inline unsigned long long SHOnlineFriendCodeEntry::ParseFriendKey()
+void SHOnlineFriendCodeEntry::InitializeButtons()
 {
-    static char buffer[4] = "0";
-    unsigned long long friendKey = 0;
-    char* digit = buffer;
+    typedef Detail::MemFunImpl<void, void (SHOnlineFriendCodeEntry::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineFriendCodeEntry*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback padSelect(
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback padOver(
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback padOff(
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback codeSelect(
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback codeOver(
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback codeOff(
+        PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+
     for (int i = 0; i < 12; ++i)
     {
-        nlWcsToStr(mDigits[i], digit, 4);
-        int digitValue = atoi(digit);
-        double placeValue = pow(10.0, 11 - i);
-        friendKey += digitValue * placeValue;
+        float scale = 0.8f;
+        TLInstance* positionInstance = FEFinder<TLInstance, 5>::FindOrDefault(
+            mPresentation->m_currentSlide, "Layer", "Group", "PAD");
+
+        feVector3 position = positionInstance->GetAssetPosition();
+        if (i == 11)
+        {
+            scale = 0.7f;
+        }
+        mKeypadButtons[i].SetInstanceBounds(
+            mKeypadInstances[i], true, position.f.x, position.f.y, scale, scale);
+        mKeypadButtons[i].SetPointerPressCallback(padSelect);
+        mKeypadButtons[i].SetPointerEnterCallback(padOver);
+        mKeypadButtons[i].SetPointerLeaveCallback(padOff);
     }
-    return friendKey;
+
+    for (int i = 0; i < 12; ++i)
+    {
+        float scale = 0.8f;
+        TLInstance* positionInstance = FEFinder<TLInstance, 5>::FindOrDefault(
+            mPresentation->m_currentSlide, "Layer", "Group", "CODE");
+
+        feVector3 position = positionInstance->GetAssetPosition();
+        mDigitButtons[i].SetInstanceBounds(
+            mDigitInstances[i], true, position.f.x, position.f.y, scale, scale);
+        mDigitButtons[i].SetPointerPressCallback(codeSelect);
+        mDigitButtons[i].SetPointerEnterCallback(codeOver);
+        mDigitButtons[i].SetPointerLeaveCallback(codeOff);
+    }
+}
+
+void SHOnlineFriendCodeEntry::OnKeypadPointerEnter(int index, void* context)
+{
+    unsigned int item = (unsigned int)context;
+    ++mHoverCount;
+    mKeypadInstances[item]->SetActiveSlide("over", true, false);
+    mKeypadButtons[item].SetPointerState(1, index);
+    FEAudio::PlayAnimAudioEvent(0x0E2B7F90, 0, 0, 1);
+}
+
+void SHOnlineFriendCodeEntry::OnKeypadPointerLeave(int index, void* context)
+{
+    unsigned int item = (unsigned int)context;
+    --mHoverCount;
+    mKeypadInstances[item]->SetActiveSlide("off", true, false);
+    mKeypadButtons[item].SetPointerState(0, index);
+}
+
+void SHOnlineFriendCodeEntry::OnDigitPointerPress(int, void* context)
+{
+    FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
+    SetSelectedDigit((int)context);
+    --mHoverCount;
+}
+
+void SHOnlineFriendCodeEntry::OnDigitPointerEnter(int index, void* context)
+{
+    unsigned int item = (unsigned int)context;
+    if (item != mSelectedDigit)
+    {
+        ++mHoverCount;
+        mDigitInstances[item]->SetActiveSlide("over", true, false);
+        mDigitButtons[item].SetPointerState(1, index);
+        FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
+    }
+}
+
+void SHOnlineFriendCodeEntry::OnDigitPointerLeave(int index, void* context)
+{
+    unsigned int item = (unsigned int)context;
+    if (item != mSelectedDigit)
+    {
+        --mHoverCount;
+        mDigitInstances[item]->SetActiveSlide("off", true, false);
+        mDigitButtons[item].SetPointerState(0, index);
+    }
+}
+
+void SHOnlineFriendCodeEntry::RestoreFriendCodeInput()
+{
+    unsigned short* friendCode =
+        g_pFriendManager->mFriendCodeInput;
+    unsigned short character[2];
+    character[1] = 0;
+    bool foundEmpty = false;
+
+    for (int i = 0; i < 12; ++i)
+    {
+        if (friendCode[i] == 0 && !foundEmpty)
+        {
+            SetSelectedDigit(i);
+            foundEmpty = true;
+        }
+
+        character[0] = friendCode[i];
+        SetDigitText(i, (const wchar_t*)character);
+    }
+
+    if (!foundEmpty)
+    {
+        SetSelectedDigit(11);
+    }
+
+    memset(friendCode, 0, sizeof(g_pFriendManager->mFriendCodeInput));
+}
+
+void SHOnlineFriendCodeEntry::UpdateConfirmButton()
+{
+    mKeypadInstances[10]->m_bVisible = true;
+    mKeypadButtons[10].mDisabled = false;
+    mOutConfirmButtonInstance->m_bVisible = true;
+
+    bool valid = true;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (mDigits[i][0] == 0)
+        {
+            mOutConfirmButtonInstance->m_bVisible = false;
+            mKeypadInstances[10]->m_bVisible = false;
+            mKeypadButtons[10].mDisabled = true;
+
+            FEPointerEvent event;
+            mKeypadButtons[10].mPreviousEvents[0] = event;
+            mKeypadButtons[10].mPreviousEvents[1] = event;
+            mKeypadButtons[10].mPreviousEvents[2] = event;
+            mKeypadButtons[10].mPreviousEvents[3] = event;
+            valid = false;
+        }
+    }
+
+    if (valid)
+    {
+        FEAudio::PlayAnimAudioEvent(0xCC2C93F1, 0, 0, 1);
+    }
+}
+
+void SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed()
+{
+    g_pFriendManager->SetOwnStatusInitial(true);
+    mPopupActive = false;
+}
+
+inline void SHOnlineFriendCodeEntry::ShowAddFriendError(int error)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene())
+        != (SceneList)10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
+            (SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)error,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this)));
+        mPopupActive = true;
+    }
 }
 
 void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
@@ -501,23 +512,13 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
         else
         {
             g_pFriendManager->SetOwnStatusInitial(false);
-            ePopupMenu popupType = (ePopupMenu)error;
-
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene())
-                != (SceneList)10)
-            {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                    (SceneList)10, SCREEN_NOTHING, false);
-                popup->Create(popupType,
-                    Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this));
-                mPopupActive = true;
-            }
+            ShowAddFriendError(error);
 
             FEAudio::EnableSounds(true);
             FEAudio::PlayAnimAudioEvent(0xD641865E, 0, 0, 1);
             FEAudio::EnableSounds(false);
 
-            SetSelectedDigit(this, 0);
+            SetSelectedDigit(0);
         }
     }
     else if (item == 11)
@@ -525,68 +526,27 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerPress(int, void* context)
         if (mDigits[mSelectedDigit][0] == 0
             && mSelectedDigit > 0)
         {
-            SetSelectedDigit(this, mSelectedDigit - 1);
+            SetSelectedDigit(mSelectedDigit - 1);
         }
 
-        int selectedDigit = mSelectedDigit;
-        nlStrNCpy(
-            mDigits[selectedDigit], (const unsigned short*)L"", 2);
-
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[selectedDigit], "off", "BOX", "NUMBER");
-        text->SetString(mDigits[selectedDigit]);
-
-        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[selectedDigit], "over", "BOX", "NUMBER");
-        text->SetString(mDigits[selectedDigit]);
-
-        text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-            mDigitInstances[selectedDigit], "down", "BOX", "NUMBER");
-        text->SetString(mDigits[selectedDigit]);
+        SetDigitText(-1, L"");
     }
     else
     {
         if (item == 9)
         {
-            int selectedDigit = mSelectedDigit;
-            nlStrNCpy(mDigits[selectedDigit],
-                (const unsigned short*)L"0", 2);
-
-            TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-                mDigitInstances[selectedDigit], "off", "BOX", "NUMBER");
-            text->SetString(mDigits[selectedDigit]);
-
-            text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-                mDigitInstances[selectedDigit], "over", "BOX", "NUMBER");
-            text->SetString(mDigits[selectedDigit]);
-
-            text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-                mDigitInstances[selectedDigit], "down", "BOX", "NUMBER");
-            text->SetString(mDigits[selectedDigit]);
+            SetDigitText(-1, L"0");
         }
         else
         {
             unsigned short character[2];
             nlSNPrintf(character, 2, (const unsigned short*)L"%d", item + 1);
-            int selectedDigit = mSelectedDigit;
-            nlStrNCpy(mDigits[selectedDigit], character, 2);
-
-            TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-                mDigitInstances[selectedDigit], "off", "BOX", "NUMBER");
-            text->SetString(mDigits[selectedDigit]);
-
-            text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-                mDigitInstances[selectedDigit], "over", "BOX", "NUMBER");
-            text->SetString(mDigits[selectedDigit]);
-
-            text = FEFinder<TLTextInstance, 3>::FindOrDefault(
-                mDigitInstances[selectedDigit], "down", "BOX", "NUMBER");
-            text->SetString(mDigits[selectedDigit]);
+            SetDigitText(-1, (const wchar_t*)character);
         }
 
         if (mSelectedDigit < 11)
         {
-            SetSelectedDigit(this, mSelectedDigit + 1);
+            SetSelectedDigit(mSelectedDigit + 1);
         }
     }
 

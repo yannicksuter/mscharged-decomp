@@ -40,6 +40,7 @@ struct NetworkDraftPlayer
 struct NetworkDraftTeam
 {
     NetworkDraftTeam()
+        : mSidekicks()
     {
         Reset();
     }

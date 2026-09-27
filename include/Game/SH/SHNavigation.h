@@ -10,6 +10,19 @@ extern NLString gNextFETransition;
 class TLComponentInstance;
 class TLInstance;
 
+enum NavigationButton
+{
+    NAVIGATION_BUTTON_NONE = 0x00,
+    NAVIGATION_BUTTON_PLUS = 0x01,
+    NAVIGATION_BUTTON_MINUS = 0x02,
+    NAVIGATION_BUTTON_BACK = 0x04,
+    NAVIGATION_BUTTON_BREADCRUMBS = 0x08,
+    NAVIGATION_BUTTON_PLAY = 0x10,
+    NAVIGATION_BUTTON_DONE = 0x20,
+    NAVIGATION_BUTTON_LOWER_DONE = 0x40,
+    NAVIGATION_BUTTON_PROGRESS = 0x80
+};
+
 class SHNavigation : public BaseSceneHandler
 {
 public:

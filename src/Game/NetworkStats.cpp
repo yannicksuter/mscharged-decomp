@@ -555,6 +555,46 @@ bool NetworkRanking::StatsVirtual0C()
     return false;
 }
 
+static inline u32 GetMinutesSinceNetworkDayStart(const DWCTime& time)
+{
+    u32 since = time.min + time.hour * 60;
+    ++since;
+    if (since < 1)
+    {
+        since = 1;
+    }
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Total Mins since beginning of day = %d (Cur time %d:%d)\n",
+        since, time.hour, time.min);
+    return since;
+}
+
+static inline u32 GetMinutesSinceNetworkSeasonStart(
+    const DWCDate& date, const DWCTime& time)
+{
+    NetworkSeasonDate current;
+    current.mMonth = date.month;
+    current.mDay = date.mday;
+    int year = date.year;
+    int season = FindNetworkSeasonBoundary(
+        &sNetworkSeasonDateTable, current);
+    int days = GetDaysSinceSeasonBoundary(
+        &sNetworkSeasonDateTable, season, current, year);
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Time from now %d %d %d to start of season index %d is %d days\n",
+        year, current.mMonth, current.mDay, season, days);
+    u32 since = days * 1440 + time.min + time.hour * 60;
+    ++since;
+    if (since < 1)
+    {
+        since = 1;
+    }
+    tDebugPrintManager::Print(DC_NETWORK,
+        "Total Mins since beginning of season = %d (Cur time %d:%d)\n",
+        since, time.hour, time.min);
+    return since;
+}
+
 bool NetworkRanking::GetLeaderboardStats(int category,
     int filter, int limit, NetworkStatsPlayer* players,
     NetworkRankingMeta* metadata)
@@ -571,50 +611,32 @@ bool NetworkRanking::GetLeaderboardStats(int category,
     {
     case 0:
     {
+        mode = DWC_RNK_GET_MODE_NEAR;
         parameter.size = sizeof(parameter.near);
         parameter.near.sort = DWC_RNK_ORDER_DES;
-        if (mLimit > DWC_RNK_GET_MAX)
-        {
-            mLimit = DWC_RNK_GET_MAX;
-        }
-        parameter.near.limit = mLimit;
         if (category == 1 || category == 4)
         {
-            DWCDate date;
             DWCTime time;
-            GetAdjustedNetworkDate(&date, &time);
-            u32 since = time.min + time.hour * 60 + 1;
-            if (since < 1)
+            DWCDate date;
+            if (mLimit > DWC_RNK_GET_MAX)
             {
-                since = 1;
+                mLimit = DWC_RNK_GET_MAX;
             }
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Total Mins since beginning of day = %d (Cur time %d:%d)\n",
-                since, time.hour, time.min);
-            parameter.near.since = since;
+            parameter.near.limit = mLimit;
+            GetAdjustedNetworkDate(&date, &time);
+            parameter.near.since = GetMinutesSinceNetworkDayStart(time);
         }
         else
         {
-            DWCDate date;
             DWCTime time;
-            GetAdjustedNetworkDate(&date, &time);
-            NetworkSeasonDate current = { date.month, date.mday };
-            int season = FindNetworkSeasonBoundary(
-                &sNetworkSeasonDateTable, current);
-            int days = GetDaysSinceSeasonBoundary(
-                &sNetworkSeasonDateTable, season, current, date.year);
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Time from now %d %d %d to start of season index %d is %d days\n",
-                date.year, date.month, date.mday, season, days);
-            u32 since = days * 1440 + time.min + time.hour * 60 + 1;
-            if (since < 1)
+            DWCDate date;
+            if (mLimit > DWC_RNK_GET_MAX)
             {
-                since = 1;
+                mLimit = DWC_RNK_GET_MAX;
             }
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Total Mins since beginning of season = %d (Cur time %d:%d)\n",
-                since, time.hour, time.min);
-            parameter.near.since = since;
+            parameter.near.limit = mLimit;
+            GetAdjustedNetworkDate(&date, &time);
+            parameter.near.since = GetMinutesSinceNetworkSeasonStart(date, time);
         }
         break;
     }
@@ -638,24 +660,17 @@ bool NetworkRanking::GetLeaderboardStats(int category,
         mode = DWC_RNK_GET_MODE_TOPLIST;
         parameter.size = sizeof(parameter.toplist);
         parameter.toplist.sort = DWC_RNK_ORDER_DES;
-        if (mLimit > DWC_RNK_GET_MAX)
-        {
-            mLimit = DWC_RNK_GET_MAX;
-        }
-        parameter.toplist.limit = mLimit;
         if (category == 1 || category == 4)
         {
-            DWCDate date;
             DWCTime time;
-            GetAdjustedNetworkDate(&date, &time);
-            u32 since = time.min + time.hour * 60 + 1;
-            if (since < 1)
+            DWCDate date;
+            if (mLimit > DWC_RNK_GET_MAX)
             {
-                since = 1;
+                mLimit = DWC_RNK_GET_MAX;
             }
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Total Mins since beginning of day = %d (Cur time %d:%d)\n",
-                since, time.hour, time.min);
+            parameter.toplist.limit = mLimit;
+            GetAdjustedNetworkDate(&date, &time);
+            u32 since = GetMinutesSinceNetworkDayStart(time);
             parameter.toplist.since = since;
             tDebugPrintManager::Print(DC_NETWORK,
                 "Getting SOD TOP since %d limit %d\n", since,
@@ -663,26 +678,15 @@ bool NetworkRanking::GetLeaderboardStats(int category,
         }
         else
         {
-            DWCDate date;
             DWCTime time;
-            GetAdjustedNetworkDate(&date, &time);
-            NetworkSeasonDate current = { date.month, date.mday };
-            int season = FindNetworkSeasonBoundary(
-                &sNetworkSeasonDateTable, current);
-            int days = GetDaysSinceSeasonBoundary(
-                &sNetworkSeasonDateTable, season, current, date.year);
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Time from now %d %d %d to start of season index %d is %d days\n",
-                date.year, date.month, date.mday, season, days);
-            u32 since = days * 1440 + time.min + time.hour * 60 + 1;
-            if (since < 1)
+            DWCDate date;
+            if (mLimit > DWC_RNK_GET_MAX)
             {
-                since = 1;
+                mLimit = DWC_RNK_GET_MAX;
             }
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Total Mins since beginning of season = %d (Cur time %d:%d)\n",
-                since, time.hour, time.min);
-            parameter.toplist.since = since;
+            parameter.toplist.limit = mLimit;
+            GetAdjustedNetworkDate(&date, &time);
+            parameter.toplist.since = GetMinutesSinceNetworkSeasonStart(date, time);
         }
         break;
     }

@@ -47,6 +47,88 @@ FEBackButton::~FEBackButton()
 }
 
 /**
+ * Offset/Address/Size: 0x210 | 0x8022F194 | size: 0x14C
+ */
+void FEBackButton::SetButtonInstance(TLComponentInstance* instance)
+{
+    if (IsWidescreen())
+    {
+        instance->SetActiveSlide("16:9", true, false);
+    }
+    else
+    {
+        instance->SetActiveSlide("4:3", true, false);
+    }
+
+    mButtonPosition = instance->GetAssetPosition();
+    mButtonInstance = FEFinder<TLComponentInstance, 2>::Find<TLSlide>(instance->GetActiveSlide(), "back");
+}
+
+static void InitializePointerButton(FEBackButton* button)
+{
+    typedef Detail::MemFunImpl<void, void (FEBackButton::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, FEBackButton*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    button->mBoundsInitialized = true;
+
+    FEPointerListener::Callback callback(PointerBinding(
+        MemFun(&FEBackButton::OnPointerInside), button, Placeholder<0>(), Placeholder<1>()));
+    button->SetPointerInsideCallback(callback);
+
+    TLImageInstance* over = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
+        button->mButtonInstance, "over", "list_high_250x60");
+    feVector3 position = button->mButtonInstance->GetAssetPosition();
+    button->SetInstanceBounds(over, true, position.f.x, position.f.y, 1.0f, 1.0f);
+}
+
+/**
+ * Offset/Address/Size: 0x35C | 0x8022F2E0 | size: 0x2B0
+ */
+bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
+{
+    if (mDisabled)
+    {
+        return false;
+    }
+
+    if (!mBoundsInitialized)
+    {
+        InitializePointerButton(this);
+    }
+
+    mPointerInside[event.mIndex] = false;
+    HandlePointerEvent(&event);
+
+    BaseGameSceneManager* manager = GameSceneManager::Instance();
+    if (manager == 0)
+    {
+        manager = g_pOverlayManager;
+    }
+
+    if (mPressed && mPushBackScene)
+    {
+        if (mBackScene != SCENE_INVALID)
+        {
+            manager->Push((SceneList)mBackScene, SCREEN_BACK, true);
+        }
+        mPressed = false;
+        return true;
+    }
+
+    if (mPressed && !mPushBackScene)
+    {
+        if (mPopScene)
+        {
+            manager->Pop();
+        }
+        mPressed = false;
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Offset/Address/Size: 0xE0 | 0x8022F064 | size: 0xA0
  */
 void FEBackButton::OnPointerEnter(int index, void* context)
@@ -85,98 +167,6 @@ void FEBackButton::OnPointerRelease(int index, void* context)
 {
     FEPointerButton::OnPointerRelease(index, context);
     mPressed = false;
-}
-
-/**
- * Offset/Address/Size: 0x210 | 0x8022F194 | size: 0x14C
- */
-void FEBackButton::SetButtonInstance(TLComponentInstance* instance)
-{
-    if (IsWidescreen())
-    {
-        instance->SetActiveSlide("16:9", true, false);
-    }
-    else
-    {
-        instance->SetActiveSlide("4:3", true, false);
-    }
-
-    mButtonPosition = instance->GetAssetPosition();
-    mButtonInstance = FEFinder<TLComponentInstance, 2>::Find<TLSlide>(instance->GetActiveSlide(), "back");
-}
-
-/**
- * Offset/Address/Size: 0x35C | 0x8022F2E0 | size: 0x2B0
- */
-bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
-{
-    typedef Detail::MemFunImpl<void, void (FEBackButton::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, FEBackButton*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    if (mDisabled)
-    {
-        return false;
-    }
-
-    if (!mBoundsInitialized)
-    {
-        mBoundsInitialized = true;
-
-        FEPointerListener::Callback callback(PointerBinding(
-            MemFun(&FEBackButton::OnPointerInside), this, Placeholder<0>(), Placeholder<1>()));
-        SetPointerInsideCallback(callback);
-
-        TLInstance* found = (TLInstance*)FEFindInstance(mButtonInstance,
-            nlStringLowerHash("over"),
-            nlStringLowerHash("list_high_250x60"),
-            0,
-            0,
-            0,
-            0);
-        TLInstance* over;
-        if (found == 0)
-        {
-            over = &UnidentifiedTLImageDefault::sInstance;
-        }
-        else
-        {
-            over = found;
-        }
-
-        feVector3 position = mButtonInstance->GetAssetPosition();
-        SetInstanceBounds(over, true, position.f.x, position.f.y, 1.0f, 1.0f);
-    }
-
-    mPointerInside[event.mIndex] = false;
-    HandlePointerEvent(&event);
-
-    BaseGameSceneManager* manager = GameSceneManager::Instance();
-    if (manager == 0)
-    {
-        manager = g_pOverlayManager;
-    }
-
-    if (mPressed && mPushBackScene)
-    {
-        if (mBackScene != SCENE_INVALID)
-        {
-            manager->Push((SceneList)mBackScene, SCREEN_BACK, true);
-        }
-        mPressed = false;
-        return true;
-    }
-
-    if (mPressed && !mPushBackScene)
-    {
-        if (mPopScene)
-        {
-            manager->Pop();
-        }
-        mPressed = false;
-        return true;
-    }
-
-    return false;
 }
 
 /**

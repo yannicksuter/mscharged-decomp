@@ -24,7 +24,13 @@ public:
     void RestoreFriendCodeInput();
     void UpdateConfirmButton();
     void OnAddFriendErrorDismissed();
+    void SetDigit(int index, const wchar_t* text);
+    void ClearDigit(int index);
+    void SetDigitText(int index, const wchar_t* text);
+    void ClearDigitTexts();
+    void SetSelectedDigit(int index);
     unsigned long long ParseFriendKey();
+    void ShowAddFriendError(int error);
     void OnKeypadPointerPress(int index, void* context);
 
     /* 0x001C */ int mHoverCount;

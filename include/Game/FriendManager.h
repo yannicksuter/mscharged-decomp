@@ -13,9 +13,9 @@ enum EFriendStatus
     EFriendStatus_ClientReceivedInvitation = 4,
 };
 
-struct FriendStatusPayload
+struct FriendStatusHeader
 {
-    FriendStatusPayload()
+    FriendStatusHeader()
     {
         mMagic[0] = 'S';
         mMagic[1] = 'C';
@@ -25,6 +25,11 @@ struct FriendStatusPayload
 
     /* 0x00 */ char mMagic[3];
     /* 0x03 */ u8 mStatus;
+};
+
+struct FriendStatusPayload
+{
+    /* 0x00 */ FriendStatusHeader mHeader;
     /* 0x04 */ int mProfileId;
     /* 0x08 */ GameplaySettings mGameplaySettings;
     /* 0x24 */ CheatSettings mPowerupSettings;

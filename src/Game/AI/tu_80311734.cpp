@@ -48,13 +48,6 @@ struct UnidentifiedFuzzyRuntimeList
     UnidentifiedFuzzyRuntimeBase* mTail;
 };
 
-char lbl_806DF570[] = "Arg1";
-char lbl_806DF578[] = "Arg2";
-char lbl_806DF580[] = "Arg3";
-char lbl_806DF588[] = "Arg4";
-char lbl_806DF590[] = "StateID";
-char lbl_806DF598[] = "%f";
-
 void* lbl_806E20A0;
 UnidentifiedFuzzyRuntimeList lbl_806E20A8(0, 0);
 ScriptQuestionCache lbl_805842EC;
@@ -218,60 +211,50 @@ extern "C" bool fn_80311C5C()
     return false;
 }
 
-char lbl_80530154[] = "Undefined";
-char lbl_80530160[] = "Confidence";
-char lbl_8053016C[] = "ConfThreshold";
-char lbl_8053017C[] = "SelectChance";
-char lbl_8053018C[] = "Duration";
-char lbl_80530198[] = "Concurrent";
-char lbl_805301A4[] = "Transition";
-char lbl_805301B0[] = "Modifier";
-char lbl_805301BC[] = "AllowReinit";
-
 void UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual15()
 {
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_80530154, -1));
+            UnidentifiedRuntimeTypeEntry("Undefined", -1));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DF570, 0));
+            UnidentifiedRuntimeTypeEntry("Arg1", 0));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DF578, 1));
+            UnidentifiedRuntimeTypeEntry("Arg2", 1));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DF580, 2));
+            UnidentifiedRuntimeTypeEntry("Arg3", 2));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DF588, 3));
+            UnidentifiedRuntimeTypeEntry("Arg4", 3));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_80530160, 4));
+            UnidentifiedRuntimeTypeEntry("Confidence", 4));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_8053016C, 5));
+            UnidentifiedRuntimeTypeEntry("ConfThreshold", 5));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_8053017C, 6));
+            UnidentifiedRuntimeTypeEntry("SelectChance", 6));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_8053018C, 7));
+            UnidentifiedRuntimeTypeEntry("Duration", 7));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_806DF590, 8));
+            UnidentifiedRuntimeTypeEntry("StateID", 8));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_80530198, 9));
+            UnidentifiedRuntimeTypeEntry("Concurrent", 9));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_805301A4, 10));
+            UnidentifiedRuntimeTypeEntry("Transition", 10));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_805301B0, 11));
+            UnidentifiedRuntimeTypeEntry("Modifier", 11));
     lbl_806E20B0.AddEnd(new (nlMalloc(
         sizeof(UnidentifiedRuntimeTypeEntry), 8, false))
-            UnidentifiedRuntimeTypeEntry(lbl_805301BC, 12));
+            UnidentifiedRuntimeTypeEntry("AllowReinit", 12));
 }
 
 extern "C" int fn_80312208(unsigned long hash)
@@ -825,7 +808,7 @@ extern "C" Variant* fn_80314830(
 
 extern "C" void fn_803148C4(float value)
 {
-    nlPrintf(lbl_806DF598, value);
+    nlPrintf("%f", value);
 }
 
 extern "C" void fn_803148D0(void*, const char* value)

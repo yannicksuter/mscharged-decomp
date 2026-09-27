@@ -2025,13 +2025,14 @@ extern "C" float fn_800DB298(const nlVector3& vFrom, const nlVector3& vTo,
     if (nlNear(fDistance, 0.0f))
         return 1.0f;
     unsigned short aDirection = nlVector3ToAngle(diff);
-    float fWidth = cNet::GetNetWidth() + cNet::GetPostRadius();
     nlVector2 post1;
     nlVector2 post2;
-    nlVec2Set(post1, vTo.x, 0.0f);
-    post1.y += fWidth;
-    nlVec2Set(post2, vTo.x, 0.0f);
-    post2.y -= fWidth;
+    post1.x = vTo.x;
+    post1.y = 0.0f;
+    post1.y += cNet::GetNetWidth() + cNet::GetPostRadius();
+    post2.x = vTo.x;
+    post2.y = 0.0f;
+    post2.y -= cNet::GetNetWidth() + cNet::GetPostRadius();
     float dx1 = post1.x - vFrom.x;
     float dy1 = post1.y - vFrom.y;
     unsigned short aPost1 = RadToAng16(nlATan2f(dy1, dx1));

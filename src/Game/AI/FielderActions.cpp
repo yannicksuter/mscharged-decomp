@@ -4712,11 +4712,9 @@ void cFielder::fn_8004C88C(float fDeltaT)
         nlVector2 v2NewVelocity;
         v2NewVelocity.y = v2Delta.y + mUnidentified024.m_v3Velocity.y;
         v2NewVelocity.x = v2Delta.x + mUnidentified024.m_v3Velocity.x;
-        float fRecipBlend = 1.0f
-            / nlVec2Length(v2NewVelocity);
         nlVector2 v2NormalizedVelocity;
-        v2NormalizedVelocity.y = fRecipBlend * v2NewVelocity.y;
-        v2NormalizedVelocity.x = fRecipBlend * v2NewVelocity.x;
+        nlVec2Scale(v2NormalizedVelocity, v2NewVelocity,
+            1.0f / nlVec2Length(v2NewVelocity));
 
         if (v2NormalizedVelocity.x * v2Direction.x
             + v2NormalizedVelocity.y * v2Direction.y >= 0.0f)

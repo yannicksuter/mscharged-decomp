@@ -1,3 +1,6 @@
+#include <revolution/gx/GXPixel.h>
+#include <revolution/gx/GXTransform.h>
+
 #include "Game/TweakQuery.h"
 #include "NL/nlDebug.h"
 #include "NL/gl/glPlat.h"
@@ -40,13 +43,10 @@ extern "C"
 
     void GXAdjustForOverscan(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
     f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
-    void fn_803A7828(f32 x, f32 y, f32 width, f32 height, f32 nearZ, f32 farZ);
-    void fn_803A78A4(u32 x, u32 y, u32 width, u32 height);
     void GXSetDispCopySrc(u16 left, u16 top, u16 width, u16 height);
     void GXSetDispCopyDst(u16 width, u16 height);
     void GXSetDispCopyYScale(f32 scale);
     void GXSetDispCopyGamma(s32 gamma);
-    void fn_803A6FE8(u8 fieldMode, u8 halfAspectRatio);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
 
     extern GXRenderModeObj GXNtsc480IntDf;
@@ -91,19 +91,6 @@ static void* glx_FIFO;
 static void* glx_FrameBuffer[2];
 static s32 glx_FBSize;
 
-static inline void ClearXFBInline(void* framebuffer)
-{
-    s32 offset = 0;
-    u8* destination = (u8*)framebuffer;
-    while (offset < glx_FBSize)
-    {
-        *(u32*)destination = glx_ClearPixel;
-        destination += 4;
-        offset += 4;
-    }
-    DCFlushRange(framebuffer, glx_FBSize);
-}
-
 u32 glplatGetFrameBufferWidth()
 {
     return glx_rmode.fbWidth;
@@ -124,9 +111,13 @@ u32 glx_GetScaledXFBWidth()
     return glx_VIWidth;
 }
 
-void glx_ClearXFB(void* framebuffer)
+void glx_ClearXFB(void* xfb)
 {
-    ClearXFBInline(framebuffer);
+    for (int i = 0; i < glx_FBSize; i += 4)
+    {
+        *(u32*)((u32)xfb + i) = glx_ClearPixel;
+    }
+    DCFlushRange(xfb, glx_FBSize);
 }
 
 static void glx_InitGX()
@@ -134,13 +125,13 @@ static void glx_InitGX()
     gxInit();
     GXSetMisc(1, 8);
     GXRenderModeObj& mode = glx_rmode;
-    fn_803A7828(0.0f, 0.0f, (f32)mode.fbWidth, (f32)mode.efbHeight, 0.0f, 1.0f);
-    fn_803A78A4(0, 0, mode.fbWidth, mode.efbHeight);
+    GXSetViewport(0.0f, 0.0f, (f32)mode.fbWidth, (f32)mode.efbHeight, 0.0f, 1.0f);
+    GXSetScissor(0, 0, mode.fbWidth, mode.efbHeight);
     GXSetDispCopySrc(0, 0, mode.fbWidth, mode.efbHeight);
     GXSetDispCopyDst(mode.fbWidth, mode.xfbHeight);
     GXSetDispCopyYScale(glx_CopyDispScaleFactor);
     GXSetCopyFilter(mode.aa, mode.sample_pattern, true, mode.vfilter);
-    fn_803A6FE8(true, false);
+    GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
     gxSetDither(true);
     gxSetColourUpdate(true);
     gxSetAlphaUpdate(true);
@@ -277,8 +268,8 @@ bool glplatStartup(gl_ScreenInfo* screenInfo)
     glx_FrameBuffer[0] = framebufferMemory;
     glx_FrameBuffer[1] = (u8*)framebufferMemory + fbSize;
     glx_FBSize = fbSize;
-    ClearXFBInline(framebufferMemory);
-    ClearXFBInline(glx_FrameBuffer[1]);
+    glx_ClearXFB(framebufferMemory);
+    glx_ClearXFB(glx_FrameBuffer[1]);
 
     tDebugPrintManager::Print(DC_GL, "%uKB used for FB and FIFO\n", totalSize >> 10, glx_FIFOSize >> 10);
     glx_InitGX();
@@ -332,13 +323,13 @@ static void glx_SendViews()
     glx_viewport.y = 0;
     glx_viewport.width = 640;
     glx_viewport.height = 448;
-    fn_803A7828((f32)glx_viewport.x,
+    GXSetViewport((f32)glx_viewport.x,
         (f32)glx_viewport.y,
         (f32)glx_viewport.width,
         (f32)glx_viewport.height,
         0.0f,
         1.0f);
-    fn_803A78A4(0, 0, 640, 448);
+    GXSetScissor(0, 0, 640, 448);
 
     GLViewIterator iterator(&gRootView);
     for (; !iterator.IsDone(); iterator.Next())
@@ -358,8 +349,8 @@ static void glx_SendViews()
             const s32 viewportWidth = view->m_Viewport.width;
             const s32 viewportY = view->m_Viewport.y;
             const s32 viewportX = view->m_Viewport.x;
-            fn_803A7828((f32)viewportX, (f32)viewportY, (f32)viewportWidth, (f32)viewportHeight, 0.0f, 1.0f);
-            fn_803A78A4(viewportX, viewportY, viewportWidth, viewportHeight);
+            GXSetViewport((f32)viewportX, (f32)viewportY, (f32)viewportWidth, (f32)viewportHeight, 0.0f, 1.0f);
+            GXSetScissor(viewportX, viewportY, viewportWidth, viewportHeight);
             glGetDrawSyncLog()->SetCurrentView(view->m_Name);
 
             if (view->m_ClearDepth || view->m_ClearColour || view->m_Unknown32)
@@ -457,4 +448,3 @@ void glplatViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v
     v3NDC.y = -v3NDC.y * wc;
     v3NDC.z *= wc;
 }
-

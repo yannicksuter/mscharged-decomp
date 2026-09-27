@@ -733,7 +733,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
         {
             acceptConnection = true;
         }
-        else if (g_pFriendManager->mOwnStatus.mStatus
+        else if (g_pFriendManager->mOwnStatus.mHeader.mStatus
             == EFriendStatus_HostInvitingPlayer)
         {
             if (index == g_pFriendManager->mFriendStatusIndex)
@@ -751,7 +751,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Friends Matching OwnFriendStatus %d not host inviting player\n",
-                g_pFriendManager->mOwnStatus.mStatus);
+                g_pFriendManager->mOwnStatus.mHeader.mStatus);
         }
 
         if (acceptConnection)
