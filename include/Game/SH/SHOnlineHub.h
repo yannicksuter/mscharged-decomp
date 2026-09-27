@@ -27,11 +27,11 @@ public:
     void OnPointerLeave(unsigned int index, void* context);
 
     /* 0x01C */ u32 mUnidentified01C;
-    /* 0x020 */ FEPointerButton mUnidentified020[4];
-    /* 0x2F0 */ TLComponentInstance* mUnidentified2F0[4];
-    /* 0x300 */ FEPointerButton mUnidentified300;
-    /* 0x3B4 */ TLComponentInstance* mUnidentified3B4;
-    /* 0x3B8 */ FEBackButton mUnidentified3B8;
+    /* 0x020 */ FEPointerButton mButtons[4];
+    /* 0x2F0 */ TLComponentInstance* mButtonInstances[4];
+    /* 0x300 */ FEPointerButton mHelpButton;
+    /* 0x3B4 */ TLComponentInstance* mHelpButtonInstance;
+    /* 0x3B8 */ FEBackButton mBackButton;
     /* 0x490 */ ButtonComponent mUnidentified490;
     /* 0x4B4 */ bool mUnidentified4B4;
     /* 0x4B8 */ int mUnidentified4B8[4];

@@ -66,16 +66,16 @@ SHOnlineHub::SHOnlineHub()
     , mUnidentified894(0)
 {
     for (int i = 0; i < 4; ++i)
-        mUnidentified020[i].mContext = (void*)i;
-    mUnidentified300.mContext = (void*)4;
+        mButtons[i].mContext = (void*)i;
+    mHelpButton.mContext = (void*)4;
     mUnidentified590.Reset();
     mUnidentified5A8.Reset();
     mUnidentified5C0.mName[0] = 0;
     mUnidentified5C0.mProfileId = 0;
     memset(mUnidentified5C0.mData, 0, sizeof(mUnidentified5C0.mData));
     mUnidentified628.Reset();
-    mUnidentified3B8.SetPushBackScene(false);
-    mUnidentified3B8.SetPopScene(false);
+    mBackButton.SetPushBackScene(false);
+    mBackButton.SetPopScene(false);
     SetOnlineTwoLocalPlayers(false);
     gOnlineLocalControllerIndices[1] = -1;
 }
@@ -94,11 +94,11 @@ void SHOnlineHub::SceneCreated()
     }
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified2F0[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
+        mButtonInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", sOnlineHubButtonNames[i]);
     }
     TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "HELP_BUTTON");
     help->SetActiveSlide(IsWidescreen() ? "16:9" : "4:3", true, false);
-    mUnidentified3B4 = FEFinder<TLComponentInstance, 4>::FindOrDefault(help, "HELP");
+    mHelpButtonInstance = FEFinder<TLComponentInstance, 4>::FindOrDefault(help, "HELP");
     SHNavigation* scene = GetNavigationScene();
     TLComponentInstance* done = 0;
     if (scene != 0)
@@ -107,7 +107,7 @@ void SHOnlineHub::SceneCreated()
         done = scene->GetButton(4);
         scene->SetBackButtonText(1);
     }
-    mUnidentified3B8.SetButtonInstance(done);
+    mBackButton.SetButtonInstance(done);
     g_pNetworkSessionBase->SetSessionState(2);
     UpdateFriendAndSeasonText();
     UpdateLocalStats();
@@ -197,11 +197,11 @@ void SHOnlineHub::Update(float dt)
             continue;
         }
         for (int j = 0; j < 4; ++j)
-            mUnidentified020[j].HandlePointerEvent(&event);
+            mButtons[j].HandlePointerEvent(&event);
         if (mUnidentified890 != 1)
             return;
-        mUnidentified300.HandlePointerEvent(&event);
-        if (mUnidentified3B8.UpdateBackButton(event, dt))
+        mHelpButton.HandlePointerEvent(&event);
+        if (mBackButton.UpdateBackButton(event, dt))
         {
             mUnidentified890 = 3;
             SHNavigation* scene = GetNavigationScene();
@@ -364,17 +364,17 @@ void SHOnlineHub::InitializeButtons()
     FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineHub::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified020[i].SetInstanceBounds(mUnidentified2F0[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mUnidentified020[i].SetPointerEnterCallback(over);
-        mUnidentified020[i].SetPointerLeaveCallback(off);
-        mUnidentified020[i].SetPointerPressCallback(down);
+        mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
+        mButtons[i].SetPointerEnterCallback(over);
+        mButtons[i].SetPointerLeaveCallback(off);
+        mButtons[i].SetPointerPressCallback(down);
     }
-    TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault(mUnidentified3B4, "OVER", "list_high_250x60");
-    feVector3 position = mUnidentified3B4->GetAssetPosition();
-    mUnidentified300.SetInstanceBounds(instance, true, position.f.x, position.f.y, 1.0f, 1.0f);
-    mUnidentified300.SetPointerEnterCallback(over);
-    mUnidentified300.SetPointerLeaveCallback(off);
-    mUnidentified300.SetPointerPressCallback(down);
+    TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault(mHelpButtonInstance, "OVER", "list_high_250x60");
+    feVector3 position = mHelpButtonInstance->GetAssetPosition();
+    mHelpButton.SetInstanceBounds(instance, true, position.f.x, position.f.y, 1.0f, 1.0f);
+    mHelpButton.SetPointerEnterCallback(over);
+    mHelpButton.SetPointerLeaveCallback(off);
+    mHelpButton.SetPointerPressCallback(down);
 }
 
 void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
@@ -442,17 +442,17 @@ void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
     ++mUnidentified4B8[index];
     if (item < 4)
     {
-        if (!mUnidentified020[item].HasOtherPointerState(1, index))
+        if (!mButtons[item].HasOtherPointerState(1, index))
         {
-            mUnidentified020[item].SetPointerState(1, index);
-            mUnidentified2F0[item]->SetActiveSlide("over", true, false);
+            mButtons[item].SetPointerState(1, index);
+            mButtonInstances[item]->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         }
     }
-    else if (!mUnidentified300.HasOtherPointerState(1, index))
+    else if (!mHelpButton.HasOtherPointerState(1, index))
     {
-        mUnidentified300.SetPointerState(1, index);
-        mUnidentified3B4->SetActiveSlide("over", true, false);
+        mHelpButton.SetPointerState(1, index);
+        mHelpButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
 }
@@ -463,16 +463,16 @@ void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
     --mUnidentified4B8[index];
     if (item < 4)
     {
-        if (!mUnidentified020[item].HasOtherPointerState(1, index))
+        if (!mButtons[item].HasOtherPointerState(1, index))
         {
-            mUnidentified020[item].SetPointerState(0, index);
-            mUnidentified2F0[item]->SetActiveSlide("off", true, false);
+            mButtons[item].SetPointerState(0, index);
+            mButtonInstances[item]->SetActiveSlide("off", true, false);
         }
     }
-    else if (!mUnidentified300.HasOtherPointerState(1, index))
+    else if (!mHelpButton.HasOtherPointerState(1, index))
     {
-        mUnidentified300.SetPointerState(0, index);
-        mUnidentified3B4->SetActiveSlide("off", true, false);
+        mHelpButton.SetPointerState(0, index);
+        mHelpButtonInstance->SetActiveSlide("off", true, false);
     }
 }
 

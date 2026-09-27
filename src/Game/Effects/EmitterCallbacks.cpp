@@ -58,8 +58,9 @@ void UpdateEmitterFromCharacterUnculled(EmissionController& controller)
 }
 
 void UpdateEmitterFromCharacterWithoutAnimController(
-    EmissionController& controller, cCharacter* character)
+    EmissionController& controller, void* context)
 {
+    cCharacter* character = (cCharacter*)context;
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
         return;
@@ -273,8 +274,9 @@ void UpdateEmitterFromCharacterForward(EmissionController& controller)
 }
 
 void UpdateEmitterFromImpostorModel(EmissionController& controller,
-    ImpostorModel* model)
+    void* context)
 {
+    ImpostorModel* model = (ImpostorModel*)context;
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
         return;

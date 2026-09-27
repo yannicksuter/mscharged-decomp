@@ -226,10 +226,10 @@ void CreateShadowPartitionViews()
     {
         RLView* newView = new (8, false) RLView(&sShadowPartitionCameras[i], sShadowPartitionPairs[i], GLViewSort_None);
         newView->m_Name = sShadowPartitionNames[i];
-        newView->m_ViewportX = sShadowPartitionRects[i].x;
-        newView->m_ViewportY = sShadowPartitionRects[i].y;
-        newView->m_ViewportWidth = sShadowPartitionRects[i].width;
-        newView->m_ViewportHeight = sShadowPartitionRects[i].height;
+        newView->m_Viewport.x = sShadowPartitionRects[i].x;
+        newView->m_Viewport.y = sShadowPartitionRects[i].y;
+        newView->m_Viewport.width = sShadowPartitionRects[i].width;
+        newView->m_Viewport.height = sShadowPartitionRects[i].height;
         newView->m_ClearColour = false;
         newView->m_ClearDepth = false;
         newView->m_Target = 0;

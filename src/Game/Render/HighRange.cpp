@@ -165,10 +165,10 @@ void InitializeHighRange(HighRange* state)
         GLView* view = new (8, false) GLView(
             GetOrthoCamera(), state->mRenderPairs[i], GLViewSort_Texture);
         view->m_Name = state->mNames[i];
-        view->m_ViewportX = state->mViewports[i].x;
-        view->m_ViewportY = state->mViewports[i].y;
-        view->m_ViewportWidth = state->mViewports[i].width;
-        view->m_ViewportHeight = state->mViewports[i].height;
+        view->m_Viewport.x = state->mViewports[i].x;
+        view->m_Viewport.y = state->mViewports[i].y;
+        view->m_Viewport.width = state->mViewports[i].width;
+        view->m_Viewport.height = state->mViewports[i].height;
         view->m_ClearColour = false;
         view->m_ClearDepth = false;
         view->m_Target = 10;

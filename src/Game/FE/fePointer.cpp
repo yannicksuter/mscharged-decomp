@@ -52,9 +52,9 @@ void FEPointerListener::ProcessPointerEvent(const FEPointerEvent* event)
             OnPointerPress(event->mIndex, mContext);
         }
 
-        if (event->mSecondaryAction)
+        if (event->mUnidentified0E)
         {
-            OnPointerSecondaryAction(event->mIndex, mContext);
+            UnidentifiedVirtual24(event->mIndex, mContext);
         }
     }
     else if (ContainsPoint(mPreviousEvents[event->mIndex].mPosition))
@@ -166,17 +166,12 @@ static inline nlVector2 MeasurePointerBoundsSize(TLInstance* instance)
     }
 }
 
-static inline void ScalePointerBoundsSize(nlVector2& result, nlVector2 source, float scaleX, float scaleY)
-{
-    result.x = source.x * scaleX;
-    result.y = source.y * scaleY;
-}
-
 void FEPointerRegion::SetInstanceBounds(TLInstance* instance, bool useRotation, float offsetX, float offsetY, float scaleX, float scaleY)
 {
     nlVector2 measuredSize = MeasurePointerBoundsSize(instance);
     nlVector2 size;
-    ScalePointerBoundsSize(size, measuredSize, scaleX, scaleY);
+    size.x = measuredSize.x * scaleX;
+    size.y = measuredSize.y * scaleY;
 
     feVector3 position = instance->GetAssetPosition();
     float x = position.f.x + offsetX;
@@ -350,11 +345,11 @@ void FEPointerListener::OnPointerPress(int index, void* context)
     }
 }
 
-void FEPointerListener::OnPointerSecondaryAction(int index, void* context)
+void FEPointerListener::UnidentifiedVirtual24(int index, void* context)
 {
-    if (mSecondaryActionCallback)
+    if (mUnidentified34)
     {
-        mSecondaryActionCallback(index, context);
+        mUnidentified34(index, context);
     }
 }
 

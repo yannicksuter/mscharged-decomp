@@ -40,6 +40,14 @@ public:
 
 typedef UnidentifiedPacketSorter* (*UnidentifiedPacketSorterFactory)();
 
+struct GLViewViewport
+{
+    unsigned long x;
+    unsigned long y;
+    unsigned long width;
+    unsigned long height;
+};
+
 // GLView::m_Target selects the platform copy issued after the view is drawn.
 // glPlat only acts on 8, 9 and 10; any other value skips the copy entirely.
 // The stripped DOL preserves the values but not their names, so they stay
@@ -90,10 +98,10 @@ public:
     void SetViewport(unsigned long x, unsigned long y, unsigned long width,
         unsigned long height)
     {
-        m_ViewportX = x;
-        m_ViewportY = y;
-        m_ViewportWidth = width;
-        m_ViewportHeight = height;
+        m_Viewport.x = x;
+        m_Viewport.y = y;
+        m_Viewport.width = width;
+        m_Viewport.height = height;
     }
 
     virtual void BeginRender();
@@ -104,10 +112,7 @@ public:
     nlListContainer<GLView*> m_Children;
     UnidentifiedPacketSorterFactory m_CreateSorter;
     UnidentifiedPacketSorterTree_8052E504* m_Sorters;
-    unsigned long m_ViewportX;
-    unsigned long m_ViewportY;
-    unsigned long m_ViewportWidth;
-    unsigned long m_ViewportHeight;
+    GLViewViewport m_Viewport;
     GLRenderPair m_RenderPair;
     bool m_Enabled;
     bool m_ClearDepth;

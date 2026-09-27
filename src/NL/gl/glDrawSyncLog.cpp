@@ -10,6 +10,7 @@ extern "C" GLDrawSyncLog* glGetDrawSyncLog()
 
 GLDrawSyncLog::~GLDrawSyncLog()
 {
+    EndFrame();
 }
 
 void GLDrawSyncLog::EndFrame()

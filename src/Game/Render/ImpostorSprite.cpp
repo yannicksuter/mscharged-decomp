@@ -199,10 +199,10 @@ void ImpostorSprite::UpdateViewport()
         mEnabled ? mHeight : 0;
 
     view = mView;
-    view->m_ViewportX = 0;
-    view->m_ViewportY = 0;
-    view->m_ViewportWidth = width;
-    view->m_ViewportHeight = height;
+    view->m_Viewport.x = 0;
+    view->m_Viewport.y = 0;
+    view->m_Viewport.width = width;
+    view->m_Viewport.height = height;
 
     bool enabled = mEnabled && !mUnidentified079;
     mView->m_Target =
@@ -259,10 +259,10 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
     mView->m_Name = mName;
     mView->m_Target = GLViewTarget_Mode9;
     GLView* view = mView;
-    view->m_ViewportX = 0;
-    view->m_ViewportY = 0;
-    view->m_ViewportWidth = width;
-    view->m_ViewportHeight = height;
+    view->m_Viewport.x = 0;
+    view->m_Viewport.y = 0;
+    view->m_Viewport.width = width;
+    view->m_Viewport.height = height;
 
     GLView* activeView;
     unsigned long activeWidth =
@@ -270,10 +270,10 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
     unsigned long activeHeight =
         mEnabled ? mHeight : 0;
     activeView = mView;
-    activeView->m_ViewportX = 0;
-    activeView->m_ViewportY = 0;
-    activeView->m_ViewportWidth = activeWidth;
-    activeView->m_ViewportHeight = activeHeight;
+    activeView->m_Viewport.x = 0;
+    activeView->m_Viewport.y = 0;
+    activeView->m_Viewport.width = activeWidth;
+    activeView->m_Viewport.height = activeHeight;
     bool enabled = mEnabled && !mUnidentified079;
     mView->m_Target =
         enabled ? GLViewTarget_Mode9 : GLViewTarget_None;

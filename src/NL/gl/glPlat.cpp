@@ -344,20 +344,20 @@ static void glx_SendViews()
     for (; !iterator.IsDone(); iterator.Next())
     {
         view = iterator.Current();
-        if (view->m_ViewportWidth != 0 && view->m_ViewportHeight != 0)
+        if (view->m_Viewport.width != 0 && view->m_Viewport.height != 0)
         {
             GLRenderPair renderPair = view->GetRenderPair();
             target = renderPair.target;
             target->Activate(0);
 
-            glx_viewport.x = view->m_ViewportX;
-            glx_viewport.y = view->m_ViewportY;
-            glx_viewport.width = view->m_ViewportWidth;
-            glx_viewport.height = view->m_ViewportHeight;
-            const s32 viewportHeight = view->m_ViewportHeight;
-            const s32 viewportWidth = view->m_ViewportWidth;
-            const s32 viewportY = view->m_ViewportY;
-            const s32 viewportX = view->m_ViewportX;
+            glx_viewport.x = view->m_Viewport.x;
+            glx_viewport.y = view->m_Viewport.y;
+            glx_viewport.width = view->m_Viewport.width;
+            glx_viewport.height = view->m_Viewport.height;
+            const s32 viewportHeight = view->m_Viewport.height;
+            const s32 viewportWidth = view->m_Viewport.width;
+            const s32 viewportY = view->m_Viewport.y;
+            const s32 viewportX = view->m_Viewport.x;
             fn_803A7828((f32)viewportX, (f32)viewportY, (f32)viewportWidth, (f32)viewportHeight, 0.0f, 1.0f);
             fn_803A78A4(viewportX, viewportY, viewportWidth, viewportHeight);
             glGetDrawSyncLog()->SetCurrentView(view->m_Name);

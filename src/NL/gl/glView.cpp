@@ -91,14 +91,15 @@ float glViewGetOrthographicHeight(GLView* view)
 
 void glViewProjectPointToViewport(GLView* view, const nlVector3* world, nlVector3* screen)
 {
-    unsigned long vpWidth = view->m_ViewportWidth;
-    unsigned long vpHeight = view->m_ViewportHeight;
     nlVector3 v3NDC;
+    GLViewViewport viewport = view->m_Viewport;
     glViewProjectPoint(view, *world, v3NDC);
-    screen->x = v3NDC.x * (float)vpWidth * 0.5f;
-    screen->y = v3NDC.y * (float)vpHeight * 0.5f;
-    screen->x += (float)vpWidth * 0.5f;
-    screen->y += (float)vpHeight * 0.5f;
+    unsigned long vpWidth = viewport.width;
+    unsigned long vpHeight = viewport.height;
+    screen->x = (v3NDC.x * (float)vpWidth) / 2.0f;
+    screen->y = (v3NDC.y * (float)vpHeight) / 2.0f;
+    screen->x += (float)vpWidth / 2.0f;
+    screen->y += (float)vpHeight / 2.0f;
 }
 
 void glViewProjectPointBetweenViews(GLView* source, GLView* destination, const nlVector3* world, nlVector3* projected)
@@ -274,10 +275,10 @@ GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
 
     m_CreateSorter = createSorter;
     m_Sorters = new UnidentifiedPacketSorterTree_8052E504(16, 16);
-    m_ViewportX = 0;
-    m_ViewportY = 0;
-    m_ViewportWidth = glGetScreenWidth();
-    m_ViewportHeight = glGetScreenHeight();
+    m_Viewport.x = 0;
+    m_Viewport.y = 0;
+    m_Viewport.width = glGetScreenWidth();
+    m_Viewport.height = glGetScreenHeight();
     m_Enabled = true;
     m_ClearDepth = false;
     m_Unknown32 = false;
@@ -298,10 +299,10 @@ inline GLView::GLView()
     m_Parent = 0;
     m_CreateSorter = fn_802CEF1C;
     m_Sorters = new UnidentifiedPacketSorterTree_8052E504(16, 16);
-    m_ViewportX = 0;
-    m_ViewportY = 0;
-    m_ViewportWidth = glGetScreenWidth();
-    m_ViewportHeight = glGetScreenHeight();
+    m_Viewport.x = 0;
+    m_Viewport.y = 0;
+    m_Viewport.width = glGetScreenWidth();
+    m_Viewport.height = glGetScreenHeight();
     m_Enabled = true;
     m_ClearDepth = false;
     m_Unknown32 = false;

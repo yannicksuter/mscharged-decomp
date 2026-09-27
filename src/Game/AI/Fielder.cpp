@@ -2094,9 +2094,11 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
     else
     {
         float speedFactor = InterpolateRangeClamped(0.0f, 1.0f, 18.0f, 6.0f, fShotDist);
+        float fShotMinSpeed;
+        float fShotMaxSpeed;
         float fCharge = fn_800156A8(g_pBall);
-        float fShotMinSpeed = fn_8002C780(m_pTweaks);
-        float fShotMaxSpeed = fn_8002C758(m_pTweaks);
+        fShotMinSpeed = fn_8002C780(m_pTweaks);
+        fShotMaxSpeed = fn_8002C758(m_pTweaks);
         fShotSpeed = Interpolate(fShotMinSpeed, fShotMaxSpeed, fCharge);
     }
 
@@ -2196,8 +2198,8 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         if (nlRandomf(1.0f) < fProbability)
         {
             v3PositionOut.y = pBall->m_v3Position.y + v3Post1Delta.y;
-            float fDistPost1Sq = nlVec3LengthSquared(v3Post1Delta);
             float fDistPost2Sq = nlVec3LengthSquared(v3Post2Delta);
+            float fDistPost1Sq = nlVec3LengthSquared(v3Post1Delta);
             if (fDistPost1Sq < fDistPost2Sq)
             {
                 v3PositionOut.x = 0.985f * pNet->m_v3NetLocation.x;
@@ -2206,8 +2208,8 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         else
         {
             v3PositionOut.y = pBall->m_v3Position.y + v3Post2Delta.y;
-            float fDistPost2Sq = nlVec3LengthSquared(v3Post2Delta);
             float fDistPost1Sq = nlVec3LengthSquared(v3Post1Delta);
+            float fDistPost2Sq = nlVec3LengthSquared(v3Post2Delta);
             if (fDistPost2Sq < fDistPost1Sq)
             {
                 v3PositionOut.x = 0.985f * pNet->m_v3NetLocation.x;
@@ -2244,7 +2246,8 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
             float fHeightAllowance = 0.18f + gGameTweaks.m_pGameTweaks->fShotHeightOffsetFromPost;
             float fAllowableHeight = cNet::m_fNetHeight - 2.0f * fHeightAllowance;
             float fMinimumHeight = (1.0f - fHeightVariance) * fAllowableHeight;
-            v3PositionOut.z = fMinimumHeight + fHeightAllowance + nlRandomf(fHeightVariance * fAllowableHeight);
+            float fHeightRange = fHeightVariance * fAllowableHeight;
+            v3PositionOut.z = fMinimumHeight + fHeightAllowance + nlRandomf(fHeightRange);
         }
     }
 }

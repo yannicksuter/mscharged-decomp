@@ -35,7 +35,7 @@ public:
     virtual void OnPointerInside(int index, void* context);
     virtual void OnPointerPress(int index, void* context);
     virtual void OnPointerRelease(int index, void* context);
-    virtual void OnPointerSecondaryAction(int index, void* context);
+    virtual void UnidentifiedVirtual24(int index, void* context);
 
 private:
     /* 0xA0 */ int mPointerStates[4];

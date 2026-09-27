@@ -95,11 +95,11 @@ void FEPointerButton::OnPointerRelease(int index, void* context)
     }
 }
 
-void FEPointerButton::OnPointerSecondaryAction(int index, void* context)
+void FEPointerButton::UnidentifiedVirtual24(int index, void* context)
 {
-    if (mSecondaryActionCallback)
+    if (mUnidentified34)
     {
-        mSecondaryActionCallback(index, context);
+        mUnidentified34(index, context);
     }
 }
 

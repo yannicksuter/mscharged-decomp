@@ -533,6 +533,7 @@ void Nis::Trigger::FireEffect(Nis& nis) const
         player = NisPlayer::Instance();
     }
     int charIdx = -1;
+    void* context;
     if (nlStrICmp(target, "ball") == 0)
     {
         EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
@@ -548,7 +549,8 @@ void Nis::Trigger::FireEffect(Nis& nis) const
         EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
         if (ctrl != 0)
         {
-            ctrl->SetPosition(ReplayManager::Instance()->mRender->mBall.mPosition);
+            ReplayManager* manager = ReplayManager::Instance();
+            ctrl->SetPosition(manager->mRender->mBall.mPosition);
         }
     }
     else if (nlStrICmp(target, "bip01") == 0)
@@ -587,14 +589,14 @@ void Nis::Trigger::FireEffect(Nis& nis) const
     }
     if (charIdx >= 0 && charIdx < MAX_NUM_CHARACTERS)
     {
-        cCharacter* character = g_pCharacters[charIdx];
+        context = g_pCharacters[charIdx];
         EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
         if (ctrl == 0)
             return;
         ctrl->SetAnimController(*nis.mCharacterControllers[charIdx]);
         ctrl->m_uUserData = (u32)player;
         Function<void(EmissionController&)> callback(
-            Bind<void>(UpdateEmitterFromCharacterWithoutAnimController, placeholder0, character));
+            Bind<void>(UpdateEmitterFromCharacterWithoutAnimController, placeholder0, context));
         ctrl->SetUpdateCallback(callback);
     }
     else
@@ -609,10 +611,11 @@ void Nis::Trigger::FireEffect(Nis& nis) const
                 if (ctrl == 0)
                     return;
                 ctrl->SetAnimController(*nis.mUnidentified10C[i]->mAnimController);
+                context = nis.mUnidentified10C[i];
                 ctrl->m_uUserData = (u32)player;
                 {
                     Function<void(EmissionController&)> callback(
-                        Bind<void>(UpdateEmitterFromImpostorModel, placeholder0, nis.mUnidentified10C[i]));
+                        Bind<void>(UpdateEmitterFromImpostorModel, placeholder0, context));
                     ctrl->SetUpdateCallback(callback);
                 }
                 ctrl->m_bVisible = nis.mUnidentified10C[i]->mVisible;

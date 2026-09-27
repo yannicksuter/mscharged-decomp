@@ -781,12 +781,14 @@ static inline cTeam* GetFormationTeam(FormationManager* manager)
 
 void FormationEval::SortPlayers(const nlVector2* v2Center)
 {
+    cFielder* pFielder;
     float fFielderToPositionDistance[4][4];
     nlVector2 av2FormationPositions[4];
     nlVector3 av3FielderAILocs[4];
     int i;
     nlVector2 v2CenterOfPlayers;
     int i_fielder;
+    cFielder* pFielder2;
     int i_pos;
 
     if (!fn_80054A20())
@@ -799,30 +801,29 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
 
     for (i = 0; i < 4; i++)
     {
-        cFielder* pFielder = team->GetFielder(i);
-        do
+        pFielder = team->GetFielder(i);
+        if (ReceivingPass(pFielder) && g_pBall->UnidentifiedHasPassTarget())
         {
-            if (ReceivingPass(pFielder))
-            {
-                if (g_pBall->UnidentifiedHasPassTarget())
-                {
-                    av3FielderAILocs[i] = g_pBall->m_v3PassIntercept;
-                    break;
-                }
-            }
-
+            av3FielderAILocs[i] = g_pBall->m_v3PassIntercept;
+        }
+        else
+        {
             bool bHasGlobalPad = pFielder->GetGlobalPad() != 0;
             if (bHasGlobalPad)
             {
-                nlVec3ScaleAdd(av3FielderAILocs[i], 0.1f,
-                    pFielder->mUnidentified024.m_v3Velocity, pFielder->mUnidentified024.m_v3Position);
+                nlVec3Set(av3FielderAILocs[i],
+                    0.1f * pFielder->mUnidentified024.m_v3Velocity.x + pFielder->mUnidentified024.m_v3Position.x,
+                    0.1f * pFielder->mUnidentified024.m_v3Velocity.y + pFielder->mUnidentified024.m_v3Position.y,
+                    0.1f * pFielder->mUnidentified024.m_v3Velocity.z + pFielder->mUnidentified024.m_v3Position.z);
             }
             else
             {
-                nlVec3ScaleAdd(av3FielderAILocs[i], 0.1f,
-                    pFielder->mUnidentified024.m_v3Velocity, pFielder->mUnidentified024.m_v3Position);
+                nlVec3Set(av3FielderAILocs[i],
+                    0.1f * pFielder->mUnidentified024.m_v3Velocity.x + pFielder->mUnidentified024.m_v3Position.x,
+                    0.1f * pFielder->mUnidentified024.m_v3Velocity.y + pFielder->mUnidentified024.m_v3Position.y,
+                    0.1f * pFielder->mUnidentified024.m_v3Velocity.z + pFielder->mUnidentified024.m_v3Position.z);
             }
-        } while (false);
+        }
 
         FieldLocToAILoc(av3FielderAILocs[i], av3FielderAILocs[i], team->m_nSide);
     }
@@ -851,8 +852,8 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
 
     for (i_fielder = 0; i_fielder < 4; i_fielder++)
     {
-        cFielder* pFielder = team->GetFielder(i_fielder);
-        bool bApplyFielderOrder = pFielder->fn_800344B0() || pFielder->IsShattered();
+        pFielder2 = team->GetFielder(i_fielder);
+        bool bApplyFielderOrder = pFielder2->fn_800344B0() || pFielder2->IsShattered();
 
         for (i_pos = 0; i_pos < 4; i_pos++)
         {
@@ -861,7 +862,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
             offset.x = av2FormationPositions[i_pos].x - av3FielderAILocs[i_fielder].x;
             fFielderToPositionDistance[i_fielder][i_pos]
                 = nlSqrt(offset.x * offset.x + offset.y * offset.y, true);
-            fFielderToPositionDistance[i_fielder][i_pos] /= fn_8002E1B0(pFielder);
+            fFielderToPositionDistance[i_fielder][i_pos] /= fn_8002E1B0(pFielder2);
 
             if (bApplyFielderOrder)
             {

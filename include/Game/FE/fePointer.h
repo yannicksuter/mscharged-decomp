@@ -12,7 +12,7 @@ struct FEPointerEvent
     FEPointerEvent()
         : mPressed(false)
         , mReleased(false)
-        , mSecondaryAction(false)
+        , mUnidentified0E(false)
     {
         mPosition.x = -9999.9f;
         mPosition.y = -9999.9f;
@@ -23,7 +23,7 @@ struct FEPointerEvent
     /* 0x04 */ nlVector2 mPosition;
     /* 0x0C */ bool mPressed;
     /* 0x0D */ bool mReleased;
-    /* 0x0E */ bool mSecondaryAction;
+    /* 0x0E */ bool mUnidentified0E;
 }; // size 0x10
 
 class FEPointerListener
@@ -49,7 +49,7 @@ public:
     virtual void OnPointerInside(int index, void* context);
     virtual void OnPointerPress(int index, void* context);
     virtual void OnPointerRelease(int index, void* context);
-    virtual void OnPointerSecondaryAction(int index, void* context);
+    virtual void UnidentifiedVirtual24(int index, void* context);
     virtual bool IsEnabled();
     virtual bool ContainsPoint(nlVector2 position) const = 0;
 
@@ -59,7 +59,7 @@ public:
     /* 0x1C */ Function<void(int, void*)> mInsideCallback;
     /* 0x24 */ Function<void(int, void*)> mPressCallback;
     /* 0x2C */ Function<void(int, void*)> mReleaseCallback;
-    /* 0x34 */ Function<void(int, void*)> mSecondaryActionCallback;
+    /* 0x34 */ Function<void(int, void*)> mUnidentified34;
     /* 0x3C */ FEPointerEvent mPreviousEvents[4];
     /* 0x7C */ void* mContext;
     /* 0x80 */ bool mDisabled;
