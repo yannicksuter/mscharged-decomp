@@ -661,12 +661,10 @@ bool NetworkLobby::StartFriendServer()
     return true;
 }
 
-void NetworkLobby::StopFriendServer()
+bool NetworkLobby::StopFriendServer()
 {
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
-    DWC_ShutdownFriendsMatch();
-    mState = 0;
-    mFriendHostInviting = false;
+    CloseConnectionsAndReset();
+    return true;
 }
 
 void NetworkLobby::SetFriendHostInviting()

@@ -4,6 +4,8 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/Sys/debug.h"
 
+const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
+
 #include "Game/GameSceneManager.h"
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkSession.h"
@@ -29,8 +31,6 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/UnidentifiedTLDefault.h"
-
-const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
 
 static inline void UpdateConnectionQualityTimerText(
     OnlineConnectionQualityScene* scene, TLTextInstance* timer)
@@ -111,111 +111,16 @@ void OnlineConnectionQualityScene::OnReturnTimer(FETimer* timer)
     CloseConnectionsAndReturn();
 }
 
-void OnlineConnectionQualityScene::InitializeInput()
+static inline void ShowWaitingForDecisions(OnlineConnectionQualityScene* scene)
 {
-    typedef Detail::MemFunImpl<void, void (OnlineConnectionQualityScene::*)(unsigned int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, OnlineConnectionQualityScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    FEPointerListener::Callback over(
-        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(
-        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback select(
-        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-
     for (int i = 0; i < 2; ++i)
     {
-        mUnidentified18C[i].SetInstanceBounds(
-            mUnidentified2F4[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mUnidentified18C[i].SetPointerEnterCallback(over);
-        mUnidentified18C[i].SetPointerLeaveCallback(off);
-        mUnidentified18C[i].SetPointerPressCallback(select);
+        scene->mUnidentified2F4[i]->m_bVisible = false;
+        scene->mUnidentified18C[i].Disable();
     }
-}
 
-void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, void* context)
-{
-    mUnidentified2F4[0]->m_bVisible = false;
-    mUnidentified18C[0].Disable();
-    mUnidentified2F4[1]->m_bVisible = false;
-    mUnidentified18C[1].Disable();
-
-    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
+    TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(scene->mPresentation->m_currentSlide, "Layer", "WAITING");
     component->m_bVisible = true;
-
-    if (!mUnidentified031)
-    {
-        mUnidentified031 = true;
-        for (int i = 0; i < 4; ++i)
-        {
-            gFEPointerInstances[i]->SetActiveSlide("waiting", true, false);
-        }
-
-        NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
-        bool isHost = roster->GetLocalMachineIndex() == 0;
-        bool accepted = false;
-        switch ((int)context)
-        {
-        case 0:
-            accepted = true;
-            mUnidentified038 = 1;
-            FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
-            break;
-        case 1:
-            accepted = false;
-            mUnidentified038 = 0;
-            FEAudio::PlayAnimAudioEvent(0x6F6A3A07, 0, 0, true);
-            break;
-        }
-
-        if (isHost)
-        {
-            if (accepted)
-            {
-                mUnidentified03C[0] = 1;
-            }
-            else
-            {
-                mUnidentified03C[0] = 0;
-            }
-        }
-        else
-        {
-            int machineIndex = roster->GetLocalMachineIndex();
-            NetMessageConnectionDecision message;
-            message.mAccepted = accepted;
-            message.mMachineIndex = machineIndex;
-            g_pNetworkSession->SendConnectionDecisionToHost(&message);
-        }
-    }
-}
-
-void OnlineConnectionQualityScene::OnConnectionDecision(NetMessageConnectionDecision* message)
-{
-    g_pNetworkSessionBase->GetMachineRoster()->GetLocalMachineIndex();
-    s8 machine = message->mMachineIndex;
-    if (machine == 0)
-    {
-        if (message->mAccepted)
-        {
-            mUnidentified034 = 1;
-        }
-        else
-        {
-            mUnidentified034 = 0;
-        }
-    }
-    else
-    {
-        if (message->mAccepted)
-        {
-            mUnidentified03C[machine] = 1;
-        }
-        else
-        {
-            mUnidentified03C[machine] = 0;
-        }
-    }
 }
 
 void OnlineConnectionQualityScene::SceneCreated()
@@ -286,6 +191,39 @@ void OnlineConnectionQualityScene::UpdateConnectionQuality()
     }
 }
 
+static inline bool IsAnyConnectionRejected(OnlineConnectionQualityScene* scene)
+{
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    for (int i = 0; i < roster->GetMachineCount(); ++i)
+    {
+        if (scene->mUnidentified03C[i] == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+static inline bool AreAllConnectionsAccepted(OnlineConnectionQualityScene* scene)
+{
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    for (int i = 0; i < roster->GetMachineCount(); ++i)
+    {
+        if (scene->mUnidentified03C[i] != 1)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+static inline void SendLobbyDraft()
+{
+    NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
+    bool unranked = !IsOnlineRankedMatch();
+    g_pNetworkSession->SendDraftToEveryone(lobby->GetPlayerCount(), lobby->GetLocalMachineInfo(), false, unranked);
+}
+
 void OnlineConnectionQualityScene::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
@@ -322,13 +260,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     }
     if (mUnidentified180 <= 0)
     {
-        for (int i = 0; i < 2; ++i)
-        {
-            mUnidentified2F4[i]->m_bVisible = false;
-            mUnidentified18C[i].Disable();
-        }
-        TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "WAITING");
-        component->m_bVisible = true;
+        ShowWaitingForDecisions(this);
     }
 
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
@@ -343,14 +275,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     }
     if (disconnected)
     {
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
-        {
-            FEPopupMenu* popup = static_cast<FEPopupMenu*>(
-                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
-            popup->Create((ePopupMenu)0x60,
-                Function<FnVoidVoid>(Bind<void>(MemFun(&OnlineConnectionQualityScene::CloseConnectionsAndReturn), this)));
-            mUnidentified300 = true;
-        }
+        ShowError(0x60);
         return;
     }
 
@@ -380,19 +305,7 @@ void OnlineConnectionQualityScene::Update(float dt)
     bool isHost = roster->GetLocalMachineIndex() == 0;
     if (mUnidentified034 == 2 && isHost)
     {
-        NetworkMachineRoster* machines = g_pNetworkSessionBase->GetMachineRoster();
-        bool rejected;
-        for (int i = 0; i < machines->GetMachineCount(); ++i)
-        {
-            if (mUnidentified03C[i] == 0)
-            {
-                rejected = true;
-                goto have_rejection;
-            }
-        }
-        rejected = false;
-    have_rejection:
-        if (rejected)
+        if (IsAnyConnectionRejected(this))
         {
             mUnidentified034 = 0;
             NetMessageConnectionDecision message;
@@ -400,31 +313,10 @@ void OnlineConnectionQualityScene::Update(float dt)
             message.mMachineIndex = 0;
             g_pNetworkSession->SendConnectionDecisionToEveryone(&message);
         }
-        else
+        else if (mUnidentified180 <= 0 || AreAllConnectionsAccepted(this))
         {
-            bool accepted;
-            if (mUnidentified180 > 0)
-            {
-                NetworkMachineRoster* machines = g_pNetworkSessionBase->GetMachineRoster();
-                for (int i = 0; i < machines->GetMachineCount(); ++i)
-                {
-                    if (mUnidentified03C[i] != 1)
-                    {
-                        accepted = false;
-                        goto have_acceptance;
-                    }
-                }
-            }
-            accepted = true;
-        have_acceptance:
-            if (accepted)
-            {
-                mUnidentified034 = 1;
-                NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
-                bool value = !IsOnlineRankedMatch();
-                NetworkDraftMachineInfo* info = lobby->GetLocalMachineInfo();
-                g_pNetworkSession->SendDraftToEveryone(lobby->GetPlayerCount(), info, false, value);
-            }
+            mUnidentified034 = 1;
+            SendLobbyDraft();
         }
     }
 
@@ -434,13 +326,121 @@ void OnlineConnectionQualityScene::Update(float dt)
         {
             mUnidentified160.SetEnabled(true);
         }
-        else if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        else
         {
-            FEPopupMenu* popup = static_cast<FEPopupMenu*>(
-                GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
-            popup->Create((ePopupMenu)0x72,
-                Function<FnVoidVoid>(Bind<void>(MemFun(&OnlineConnectionQualityScene::CloseConnectionsAndReturn), this)));
-            mUnidentified300 = true;
+            ShowError(0x72);
+        }
+    }
+}
+
+void OnlineConnectionQualityScene::InitializeInput()
+{
+    typedef Detail::MemFunImpl<void, void (OnlineConnectionQualityScene::*)(unsigned int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, OnlineConnectionQualityScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(
+        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(
+        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(
+        PointerBinding(MemFun(&OnlineConnectionQualityScene::OnDecisionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        mUnidentified18C[i].SetInstanceBounds(
+            mUnidentified2F4[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
+        mUnidentified18C[i].SetPointerEnterCallback(over);
+        mUnidentified18C[i].SetPointerLeaveCallback(off);
+        mUnidentified18C[i].SetPointerPressCallback(select);
+    }
+}
+
+inline void OnlineConnectionQualityScene::ShowError(int error)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)error,
+            Function<FnVoidVoid>(Bind<void>(MemFun(&OnlineConnectionQualityScene::CloseConnectionsAndReturn), this)));
+        mUnidentified300 = true;
+    }
+}
+
+void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, void* context)
+{
+    ShowWaitingForDecisions(this);
+
+    if (!mUnidentified031)
+    {
+        mUnidentified031 = true;
+        for (int i = 0; i < 4; ++i)
+        {
+            GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+        }
+
+        NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+        bool isHost = roster->GetLocalMachineIndex() == 0;
+        bool accepted = false;
+        switch ((int)context)
+        {
+        case 0:
+            accepted = true;
+            mUnidentified038 = 1;
+            FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
+            break;
+        case 1:
+            accepted = false;
+            mUnidentified038 = 0;
+            FEAudio::PlayAnimAudioEvent(0x6F6A3A07, 0, 0, true);
+            break;
+        }
+
+        if (isHost)
+        {
+            if (accepted)
+            {
+                mUnidentified03C[0] = 1;
+            }
+            else
+            {
+                mUnidentified03C[0] = 0;
+            }
+        }
+        else
+        {
+            int machineIndex = roster->GetLocalMachineIndex();
+            NetMessageConnectionDecision message;
+            message.mAccepted = accepted;
+            message.mMachineIndex = machineIndex;
+            g_pNetworkSession->SendConnectionDecisionToHost(&message);
+        }
+    }
+}
+
+void OnlineConnectionQualityScene::OnConnectionDecision(NetMessageConnectionDecision* message)
+{
+    g_pNetworkSessionBase->GetMachineRoster()->GetLocalMachineIndex();
+    s8 machine = message->mMachineIndex;
+    if (machine == 0)
+    {
+        if (message->mAccepted)
+        {
+            mUnidentified034 = 1;
+        }
+        else
+        {
+            mUnidentified034 = 0;
+        }
+    }
+    else
+    {
+        if (message->mAccepted)
+        {
+            mUnidentified03C[machine] = 1;
+        }
+        else
+        {
+            mUnidentified03C[machine] = 0;
         }
     }
 }

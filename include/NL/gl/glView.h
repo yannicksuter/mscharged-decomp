@@ -26,12 +26,12 @@ enum GLViewSortMode
 class GLViewInterface
 {
 public:
-    virtual void GetViewMatrix(nlMatrix4&) const;
-    virtual void GetProjectionMatrix(nlMatrix4&) const;
-    virtual void GetInverseViewMatrix(nlMatrix4&) const;
-    virtual void GetViewProjectionMatrix(nlMatrix4&) const;
-    virtual const nlMatrix4* GetViewMatrix() const;
-    virtual const nlMatrix4* GetProjectionMatrix() const;
+    virtual void GetViewMatrix(nlMatrix4&) const = 0;
+    virtual void GetProjectionMatrix(nlMatrix4&) const = 0;
+    virtual void GetInverseViewMatrix(nlMatrix4&) const = 0;
+    virtual void GetViewProjectionMatrix(nlMatrix4&) const = 0;
+    virtual const nlMatrix4* GetViewMatrix() const = 0;
+    virtual const nlMatrix4* GetProjectionMatrix() const = 0;
     virtual const nlVector4* GetShadowMatrix() const
     {
         return 0;
@@ -104,10 +104,21 @@ public:
         m_Viewport.height = height;
     }
 
-    virtual void BeginRender();
-    virtual void EndRender();
-    virtual void BeginPacket(const glModelPacket*);
-    virtual void EndPacket(const glModelPacket*);
+    virtual void BeginRender()
+    {
+    }
+
+    virtual void EndRender()
+    {
+    }
+
+    virtual void BeginPacket(const glModelPacket*)
+    {
+    }
+
+    virtual void EndPacket(const glModelPacket*)
+    {
+    }
 
     nlListContainer<GLView*> m_Children;
     UnidentifiedPacketSorterFactory m_CreateSorter;
@@ -130,34 +141,18 @@ public:
     GLView* m_Parent;
 };
 
-struct GLViewIteratorEntry
-{
-    GLViewIteratorEntry()
-        : next((ListEntry<GLView*>*)0)
-    {
-    }
-
-    GLViewIteratorEntry(
-        ListEntry<GLView*>* nextEntry, GLView* currentView)
-        : next(nextEntry)
-        , view(currentView)
-    {
-    }
-
-    static GLViewIteratorEntry Root(GLView* view)
-    {
-        return GLViewIteratorEntry(0, view);
-    }
-
-    nlListIterator<GLView*> next;
-    GLView* view;
-};
+typedef ListEntry<GLView*> GLViewIteratorEntry;
 
 class GLViewIterator
 {
 public:
+    static GLViewIteratorEntry Root(GLView* view)
+    {
+        return GLViewIteratorEntry(view);
+    }
+
     GLViewIterator(GLView*);
-    inline void Push(const GLViewIteratorEntry&);
+    void Push(GLViewIteratorEntry);
     void Next();
     GLView* Current() const;
     bool IsDone() const;
@@ -166,7 +161,6 @@ public:
     int m_Depth;
 };
 
-extern GLViewInterface gDefaultViewInterface;
 extern GLView gRootView;
 
 void glViewCompact();

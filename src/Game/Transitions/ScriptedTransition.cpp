@@ -9,12 +9,10 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glStruct.h"
 #include "NL/nlColour.h"
+#include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
-
-extern "C" void fn_802B5370(
-    nlQuaternion& out, const nlVector3& v3RotationAxis, unsigned short angle);
 
 inline float parseFloat(const char* str, float defaultValue = 0.0f)
 {
@@ -28,6 +26,48 @@ inline float parseFloat(const char* str, float defaultValue = 0.0f)
 namespace TransitionModifiers
 {
 
+class ToScreenCoordinates : public TransitionModifierInterface
+{
+public:
+    ToScreenCoordinates()
+    {
+        float temp_f30 = 0.5f * glGetOrthographicWidth();
+        float temp_f31 = 0.5f * glGetOrthographicHeight();
+        float temp_f1 = -glGetScreenInfo()->PixelCentre;
+
+        m_m3Position.SetIdentity();
+        m_m3UV.SetIdentity();
+
+        m_m3Position.m11 = temp_f30;
+        m_m3Position.m22 = temp_f31;
+        m_m3Position.m31 = temp_f30 - temp_f1;
+        m_m3Position.m32 = temp_f31 - temp_f1;
+
+        m_m3UV.m32 = 0.5f;
+        m_m3UV.m31 = 0.5f;
+        m_m3UV.m22 = 0.5f;
+        m_m3UV.m11 = 0.5f;
+    };
+
+    virtual void InitializeFromParser(SimpleParser* parser) { }
+
+    virtual void ApplyModifier(glPoly2& poly, float time)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            nlVector2 temp;
+            nlMultVectorMatrix(temp, poly.m_pos[i], m_m3Position);
+            poly.m_pos[i] = temp;
+
+            nlMultVectorMatrix(temp, poly.m_uv[i], m_m3UV);
+            poly.m_uv[i] = temp;
+        }
+    }
+
+    /* 0x04 */ nlMatrix3 m_m3Position;
+    /* 0x28 */ nlMatrix3 m_m3UV;
+}; // total size: 0x4C
+
 class ScaleModel : public TransitionModifierInterface
 {
 public:
@@ -38,8 +78,6 @@ public:
         m_v2EndScale.x = 1.0f;
         m_v2EndScale.y = 1.0f;
     }
-
-    virtual ~ScaleModel() { }
 
     virtual void InitializeFromParser(SimpleParser* parser)
     {
@@ -91,8 +129,6 @@ public:
         nlColourSet(m_cStartColour, 0xFF, 0xFF, 0xFF, 0xFF);
         nlColourSet(m_cEndColour, 0xFF, 0xFF, 0xFF, 0xFF);
     }
-
-    virtual ~ColourBlend() { }
 
     virtual void InitializeFromParser(SimpleParser* parser)
     {
@@ -154,61 +190,6 @@ public:
     /* 0x8 */ nlColour m_cEndColour;
 }; // total size: 0xC
 
-class ScaleTexture : public TransitionModifierInterface
-{
-public:
-    ScaleTexture()
-    {
-        m_v2StartShift.x = 1.0f;
-        m_v2StartShift.y = 1.0f;
-        m_v2EndShift.x = 1.0f;
-        m_v2EndShift.y = 1.0f;
-    }
-
-    virtual ~ScaleTexture() { }
-
-    virtual void InitializeFromParser(SimpleParser* parser)
-    {
-        m_v2StartShift.x = atof(parser->NextTokenOnLine(true));
-        m_v2StartShift.y = atof(parser->NextTokenOnLine(true));
-        f32 val = m_v2StartShift.x;
-        char* token = parser->NextTokenOnLine(true);
-        if (token != NULL)
-        {
-            val = atof(token);
-        }
-        m_v2EndShift.x = val;
-
-        val = m_v2StartShift.y;
-        token = parser->NextTokenOnLine(true);
-        if (token != NULL)
-        {
-            val = atof(token);
-        }
-        m_v2EndShift.y = val;
-    }
-
-    virtual void ApplyModifier(glPoly2& poly, float time)
-    {
-        nlVector2 scale = {
-            ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x),
-            ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y),
-        };
-
-        poly.m_uv[0].x *= scale.x;
-        poly.m_uv[0].y *= scale.y;
-        poly.m_uv[1].x *= scale.x;
-        poly.m_uv[1].y *= scale.y;
-        poly.m_uv[2].x *= scale.x;
-        poly.m_uv[2].y *= scale.y;
-        poly.m_uv[3].x *= scale.x;
-        poly.m_uv[3].y *= scale.y;
-    }
-
-    /* 0x4 */ nlVector2 m_v2StartShift;
-    /* 0xC */ nlVector2 m_v2EndShift;
-}; // total size: 0x14
-
 class TranslateModel : public TransitionModifierInterface
 {
 public:
@@ -219,8 +200,6 @@ public:
         m_v2EndShift.x = 0.0f;
         m_v2EndShift.y = 0.0f;
     }
-
-    virtual ~TranslateModel() { }
 
     virtual void InitializeFromParser(SimpleParser* parser)
     {
@@ -264,6 +243,122 @@ public:
     /* 0xC */ nlVector2 m_v2EndShift;
 }; // total size: 0x14
 
+class RotateModel : public TransitionModifierInterface
+{
+public:
+    RotateModel()
+    {
+        m_angleStart = 0.0f;
+        m_angleEnd = 0.0f;
+        m_v3Axis.x = 0.0f;
+        m_v3Axis.y = 0.0f;
+        m_v3Axis.z = 1.0f;
+    }
+
+    virtual void InitializeFromParser(SimpleParser* parser)
+    {
+        f32 angleEnd;
+
+        m_v3Axis.x = atof(parser->NextTokenOnLine(true));
+        m_v3Axis.y = atof(parser->NextTokenOnLine(true));
+        m_v3Axis.z = atof(parser->NextTokenOnLine(true));
+        m_angleStart = atof(parser->NextTokenOnLine(true));
+
+        angleEnd = m_angleStart;
+        char* token = parser->NextTokenOnLine(true);
+        if (token != NULL)
+        {
+            angleEnd = atof(token);
+        }
+        m_angleEnd = angleEnd;
+    }
+
+    virtual void ApplyModifier(glPoly2& poly, float time)
+    {
+        nlMatrix4 m4;
+        nlMatrix3 m3;
+        nlQuaternion quat;
+
+        nlMakeQuat(quat, m_v3Axis,
+            (3.1415927f * ((m_angleStart * (1.0f - time)) + (time * m_angleEnd))) / 180.0f);
+        nlQuatToMatrix(m4, quat, true);
+
+        m3.e[0] = m4.m11;
+        m3.e[1] = m4.m12;
+        m3.e[3] = m4.m21;
+        m3.e[4] = m4.m22;
+        m3.e[7] = 0.0f;
+        m3.e[6] = 0.0f;
+        m3.e[5] = 0.0f;
+        m3.e[2] = 0.0f;
+        m3.e[8] = 1.0f;
+
+        for (int i = 0; i < 4; i++)
+        {
+            nlVector2 temp;
+            nlMultVectorMatrix(temp, poly.m_pos[i], m3);
+            poly.m_pos[i] = temp;
+        }
+    }
+
+    /* 0x04 */ nlVector3 m_v3Axis;
+    /* 0x10 */ float m_angleStart;
+    /* 0x14 */ float m_angleEnd;
+}; // total size: 0x18
+
+class ScaleTexture : public TransitionModifierInterface
+{
+public:
+    ScaleTexture()
+    {
+        m_v2StartShift.x = 1.0f;
+        m_v2StartShift.y = 1.0f;
+        m_v2EndShift.x = 1.0f;
+        m_v2EndShift.y = 1.0f;
+    }
+
+    virtual void InitializeFromParser(SimpleParser* parser)
+    {
+        m_v2StartShift.x = atof(parser->NextTokenOnLine(true));
+        m_v2StartShift.y = atof(parser->NextTokenOnLine(true));
+        f32 val = m_v2StartShift.x;
+        char* token = parser->NextTokenOnLine(true);
+        if (token != NULL)
+        {
+            val = atof(token);
+        }
+        m_v2EndShift.x = val;
+
+        val = m_v2StartShift.y;
+        token = parser->NextTokenOnLine(true);
+        if (token != NULL)
+        {
+            val = atof(token);
+        }
+        m_v2EndShift.y = val;
+    }
+
+    virtual void ApplyModifier(glPoly2& poly, float time)
+    {
+        nlVector2 scale = {
+            ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x),
+            ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y),
+        };
+
+        poly.m_uv[0].x *= scale.x;
+        poly.m_uv[0].y *= scale.y;
+        poly.m_uv[1].x *= scale.x;
+        poly.m_uv[1].y *= scale.y;
+        poly.m_uv[2].x *= scale.x;
+        poly.m_uv[2].y *= scale.y;
+        poly.m_uv[3].x *= scale.x;
+        poly.m_uv[3].y *= scale.y;
+    }
+
+    /* 0x4 */ nlVector2 m_v2StartShift;
+    /* 0xC */ nlVector2 m_v2EndShift;
+}; // total size: 0x14
+
 class TranslateTexture : public TransitionModifierInterface
 {
 public:
@@ -274,8 +369,6 @@ public:
         m_v2EndShift.x = 0.0f;
         m_v2EndShift.y = 0.0f;
     }
-
-    virtual ~TranslateTexture() { }
 
     virtual void InitializeFromParser(SimpleParser* parser)
     {
@@ -319,75 +412,6 @@ public:
     /* 0x0C */ nlVector2 m_v2EndShift;
 }; // total size: 0x14
 
-class RotateModel : public TransitionModifierInterface
-{
-public:
-    RotateModel()
-    {
-        m_angleStart = 0.0f;
-        m_angleEnd = 0.0f;
-        m_v3Axis.x = 0.0f;
-        m_v3Axis.y = 0.0f;
-        m_v3Axis.z = 1.0f;
-    }
-
-    virtual ~RotateModel() { }
-
-    virtual void InitializeFromParser(SimpleParser* parser)
-    {
-        f32 angleEnd;
-
-        m_v3Axis.x = atof(parser->NextTokenOnLine(true));
-        m_v3Axis.y = atof(parser->NextTokenOnLine(true));
-        m_v3Axis.z = atof(parser->NextTokenOnLine(true));
-        m_angleStart = atof(parser->NextTokenOnLine(true));
-
-        angleEnd = m_angleStart;
-        char* token = parser->NextTokenOnLine(true);
-        if (token != NULL)
-        {
-            angleEnd = atof(token);
-        }
-        m_angleEnd = angleEnd;
-    }
-
-    virtual void ApplyModifier(glPoly2& poly, float time)
-    {
-        nlMatrix4 m4;
-        nlMatrix3 m3;
-        nlQuaternion quat;
-
-        fn_802B5370(quat, m_v3Axis,
-            (unsigned short)(int)(10430.378f
-                * ((3.1415927f
-                       * ((m_angleStart * (1.0f - time))
-                           + (time * m_angleEnd)))
-                    / 180.0f)));
-        nlQuatToMatrix(m4, quat, true);
-
-        m3.e[0] = m4.m11;
-        m3.e[1] = m4.m12;
-        m3.e[3] = m4.m21;
-        m3.e[4] = m4.m22;
-        m3.e[7] = 0.0f;
-        m3.e[6] = 0.0f;
-        m3.e[5] = 0.0f;
-        m3.e[2] = 0.0f;
-        m3.e[8] = 1.0f;
-
-        for (int i = 0; i < 4; i++)
-        {
-            nlVector2 temp;
-            nlMultVectorMatrix(temp, poly.m_pos[i], m3);
-            poly.m_pos[i] = temp;
-        }
-    }
-
-    /* 0x04 */ nlVector3 m_v3Axis;
-    /* 0x10 */ float m_angleStart;
-    /* 0x14 */ float m_angleEnd;
-}; // total size: 0x18
-
 class RotateTexture : public TransitionModifierInterface
 {
 public:
@@ -400,8 +424,6 @@ public:
         m_v3Axis.z = 1.0f;
     }
 
-    virtual ~RotateTexture() { }
-
     virtual void InitializeFromParser(SimpleParser* parser)
     {
         f32 angleEnd;
@@ -426,12 +448,8 @@ public:
         nlMatrix3 m3;
         nlQuaternion quat;
 
-        fn_802B5370(quat, m_v3Axis,
-            (unsigned short)(int)(10430.378f
-                * ((3.1415927f
-                       * ((m_angleStart * (1.0f - time))
-                           + (time * m_angleEnd)))
-                    / 180.0f)));
+        nlMakeQuat(quat, m_v3Axis,
+            (3.1415927f * ((m_angleStart * (1.0f - time)) + (time * m_angleEnd))) / 180.0f);
         nlQuatToMatrix(m4, quat, true);
 
         m3.e[0] = m4.m11;
@@ -466,8 +484,6 @@ public:
         m_fEndBlend = 1.0f;
     }
 
-    virtual ~ScreenBlur() { }
-
     virtual void InitializeFromParser(SimpleParser* parser)
     {
         m_fStartBlend = parseFloat(parser->NextTokenOnLine(true), 1.0f);
@@ -493,17 +509,10 @@ public:
         m_nTexture = glHash("target/backbuffer");
     }
 
-    virtual ~ScreenGrab() { }
-
     virtual void InitializeFromParser(SimpleParser* parser) { }
 
     virtual void ApplyModifier(glPoly2& poly, float time)
     {
-    }
-
-    virtual void Cleanup()
-    {
-        m_bDoGrab = true;
     }
 
     virtual bool UnidentifiedVirtual18()
@@ -513,53 +522,14 @@ public:
         return unknown;
     }
 
+    virtual void Cleanup()
+    {
+        m_bDoGrab = true;
+    }
+
     /* 0x4 */ bool m_bDoGrab;
     /* 0x8 */ u32 m_nTexture;
 }; // total size: 0xC
-
-class ToScreenCoordinates : public TransitionModifierInterface
-{
-public:
-    ToScreenCoordinates()
-    {
-        float temp_f30 = 0.5f * glGetOrthographicWidth();
-        float temp_f31 = 0.5f * glGetOrthographicHeight();
-        float temp_f1 = -glGetScreenInfo()->PixelCentre;
-
-        m_m3Position.SetIdentity();
-        m_m3UV.SetIdentity();
-
-        m_m3Position.m11 = temp_f30;
-        m_m3Position.m22 = temp_f31;
-        m_m3Position.m31 = temp_f30 - temp_f1;
-        m_m3Position.m32 = temp_f31 - temp_f1;
-
-        m_m3UV.m32 = 0.5f;
-        m_m3UV.m31 = 0.5f;
-        m_m3UV.m22 = 0.5f;
-        m_m3UV.m11 = 0.5f;
-    };
-
-    virtual ~ToScreenCoordinates() { }
-
-    virtual void InitializeFromParser(SimpleParser* parser) { }
-
-    virtual void ApplyModifier(glPoly2& poly, float time)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            nlVector2 temp;
-            nlMultVectorMatrix(temp, poly.m_pos[i], m_m3Position);
-            poly.m_pos[i] = temp;
-
-            nlMultVectorMatrix(temp, poly.m_uv[i], m_m3UV);
-            poly.m_uv[i] = temp;
-        }
-    }
-
-    /* 0x04 */ nlMatrix3 m_m3Position;
-    /* 0x28 */ nlMatrix3 m_m3UV;
-}; // total size: 0x4C
 
 }; // namespace TransitionModifiers
 
@@ -593,6 +563,31 @@ void ScriptedScreenTransition::Update(float dt)
     m_fCurrentTime += dt;
 }
 
+float ScriptedScreenTransition::GetDuration()
+{
+    float normalizedTime;
+    if (m_fLength > 0.00001)
+    {
+        normalizedTime = m_fCurrentTime / m_fLength;
+    }
+    else
+    {
+        normalizedTime = 0.0f;
+    }
+
+    switch (m_eTimeLine)
+    {
+    case TIME_ACCEL:
+        return normalizedTime * normalizedTime;
+    case TIME_DECEL:
+        return nlSqrt(normalizedTime, true);
+    case TIME_LINEAR:
+        return normalizedTime;
+    default:
+        return normalizedTime;
+    }
+}
+
 void ScriptedScreenTransition::Render(GLView* view)
 {
     glPoly2 poly;
@@ -615,33 +610,7 @@ void ScriptedScreenTransition::Render(GLView* view)
     *(u32*)&poly.m_colour[2] = *(u32*)&colour;
     *(u32*)&poly.m_colour[3] = *(u32*)&colour;
 
-    float normalizedTime;
-    if (m_fLength > 0.00001)
-    {
-        normalizedTime = m_fCurrentTime / m_fLength;
-    }
-    else
-    {
-        normalizedTime = 0.0f;
-    }
-
-    float easedTime;
-    switch (m_eTimeLine)
-    {
-    case TIME_ACCEL:
-        easedTime = normalizedTime * normalizedTime;
-        break;
-    case TIME_DECEL:
-        easedTime = nlSqrt(normalizedTime, true);
-        break;
-    case TIME_LINEAR:
-        easedTime = normalizedTime;
-        break;
-    default:
-        easedTime = normalizedTime;
-        break;
-    }
-    float finalTime = easedTime;
+    float finalTime = GetDuration();
 
     glSetDefaultState(false);
     glSetCurrentTexture(m_nTexture, GLTT_Diffuse);

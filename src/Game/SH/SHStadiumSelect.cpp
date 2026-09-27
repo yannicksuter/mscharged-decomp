@@ -437,11 +437,11 @@ void StadiumSelectScene::InitializeButtons()
         SetPlayButtonBounds(&mPlayButton, mPlayButtonInstance);
     }
 
-    Function2<void, int, void*> callback = PointerBinding(MemFun(&StadiumSelectScene::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>());
+    FEPointerListener::Callback callback(PointerBinding(MemFun(&StadiumSelectScene::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     mPlayButton.SetPointerEnterCallback(callback);
-    callback = PointerBinding(MemFun(&StadiumSelectScene::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>());
+    callback = FEPointerListener::Callback(PointerBinding(MemFun(&StadiumSelectScene::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     mPlayButton.SetPointerLeaveCallback(callback);
-    Function2<void, int, void*> pressCallback = PointerBinding(MemFun(&StadiumSelectScene::OnSelectStadium), this, Placeholder<0>(), Placeholder<1>());
+    FEPointerListener::Callback pressCallback(PointerBinding(MemFun(&StadiumSelectScene::OnSelectStadium), this, Placeholder<0>(), Placeholder<1>()));
     mPlayButton.SetPointerPressCallback(pressCallback);
 }
 

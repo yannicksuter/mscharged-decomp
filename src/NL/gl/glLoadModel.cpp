@@ -1,6 +1,5 @@
 #include "NL/nlPrint.h"
 #include "NL/gl/glLoadModel.h"
-#include "NL/gl/glMaterialProgram.h"
 
 #include "Game/GL/GLInventory.h"
 #include "Game/GL/GLVertexAnim.h"
@@ -9,18 +8,12 @@
 #include "NL/gl/glModel.h"
 #include "NL/gl/glMemory.h"
 #include "NL/glx/glxLoadModel.h"
-#include "NL/nlAVLTree.h"
-#include "NL/nlFunction.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
 
 
-typedef nlAVLTree<unsigned long, void*, DefaultKeyCompare<unsigned long> >
-    MaterialProgramTree;
-
 static bool glIgnoreDuplicateModels;
-static MaterialProgramTree sMaterialPrograms;
 
 void glSetIgnoreDuplicateModels(bool ignore)
 {
@@ -114,10 +107,11 @@ static void FixupModelData(RLGReader* reader)
 {
     glModelPacket* packets = (glModelPacket*)reader->m_pPackets;
     unsigned char* pStreamData = (unsigned char*)reader->m_pStreamData;
-    glModel* model = reader->m_pModels;
+    glModel* models = reader->m_pModels;
     for (unsigned long modelIndex = 0; modelIndex < reader->m_nModels;
-        ++model, ++modelIndex)
+        ++modelIndex)
     {
+        glModel* model = &models[modelIndex];
         model->packets = packets;
         packets += model->numPackets;
 
@@ -225,32 +219,5 @@ void RLGReader::Read(void* data)
         m_pModels = 0;
         m_nModels = 0;
         outerChunk = outerChunk->GetNextChunk();
-    }
-}
-
-void glRegisterMaterialProgram(void* program, unsigned long hash)
-{
-    sMaterialPrograms.Add(hash, program);
-}
-
-void* glGetMaterialProgram(unsigned long hash)
-{
-    void** program = 0;
-    if (sMaterialPrograms.FindGet(hash, &program))
-        return *program;
-    return 0;
-}
-
-void glForEachMaterialProgram(MaterialProgramCallback* callback)
-{
-    MaterialProgramTree::Entry* entry = sMaterialPrograms.m_Root;
-    while (entry != 0)
-    {
-        if (!sMaterialPrograms.InorderWalk(
-                (MaterialProgramTree::Entry*)entry->node.left, callback))
-            return;
-        if (!(*callback)(entry->key, entry->value))
-            return;
-        entry = (MaterialProgramTree::Entry*)entry->node.right;
     }
 }

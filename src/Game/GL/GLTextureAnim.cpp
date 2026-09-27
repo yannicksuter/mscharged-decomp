@@ -23,48 +23,48 @@ void glAddTextureAnim(const void* data, unsigned long size,
         sizeof(GLTextureAnim), GLM_Header);
     memcpy(anim, data, sizeof(GLTextureAnim));
 
-    anim->m_frames = (GLAnimTex*)resource->Allocate(
-        anim->m_frameCount * sizeof(GLAnimTex), GLM_Header);
+    anim->m_pAnimTex = (GLAnimTex*)resource->Allocate(
+        anim->m_nNumTextures * sizeof(GLAnimTex), GLM_Header);
 
     const GLAnimTex* source = (const GLAnimTex*)((const u8*)data
                                                  + sizeof(GLTextureAnim));
-    for (int i = 0; i < anim->m_frameCount; ++i)
+    int i;
+    for (i = 0; i < anim->m_nNumTextures; ++i)
     {
         GLAnimTex animTex;
-        animTex.textureHandle = source->textureHandle;
-        animTex.time = source->time;
-        ++source;
+        animTex.m_TexHandle = source[i].m_TexHandle;
+        animTex.m_fTime = source[i].m_fTime;
         anim->SetTexture(i, animTex);
     }
 
-    anim->m_currentFrame = 0;
-    for (int i = 0; i < anim->m_frameCount; ++i)
+    anim->m_nFrame = 0;
+    for (i = 0; i < anim->m_nNumTextures; ++i)
     {
-        anim->m_frames[i].textureHandle = glGetTextureIndex(anim->m_frames[i].textureHandle);
+        anim->m_pAnimTex[i].m_TexHandle = glGetTextureIndex(anim->m_pAnimTex[i].m_TexHandle);
     }
 
-    resource->m_inventory->AddTextureAnim(anim->m_hashID, anim);
+    resource->m_inventory->AddTextureAnim(anim->m_uHashID, anim);
     glGetTextureManager()->RegisterTextureAnim(anim);
 }
 
 void glReleaseTextureAnim(GLTextureAnim* anim)
 {
     glTextureManager* manager = glGetTextureManager();
-    u32 textureHandle = anim->m_textureIndex;
+    u32 textureHandle = anim->GetTextureIndex();
     manager->mFreeIndices->AddEnd((u16)textureHandle);
 
     manager->mTextures[textureHandle] = 0;
     anim->m_textureIndex = 0xFFFF;
 }
 
-GLAnimTex* GLTextureAnim::GetTexture(int frameIndex)
+GLAnimTex& GLTextureAnim::GetTexture(int index)
 {
-    GLAnimTex* textureArray = m_frames;
-    if (frameIndex < 0)
+    GLAnimTex* textureArray = m_pAnimTex;
+    if (index < 0)
     {
-        frameIndex = m_currentFrame;
+        index = m_nFrame;
     }
-    return textureArray + frameIndex;
+    return textureArray[index];
 }
 
 void GLTextureAnim::Update(float dt)
@@ -75,56 +75,56 @@ void GLTextureAnim::Update(float dt)
     s32 forwardFrame;
     s32 frameCount;
 
-    if (m_isStopped || m_frameCount < 2)
+    if (m_bPaused || m_nNumTextures < 2)
     {
         return;
     }
 
-    m_currentTime += dt;
-    GLAnimTex* frame = m_frames + m_currentFrame;
+    m_fTime += dt;
+    GLAnimTex* frame = m_pAnimTex + m_nFrame;
 
-    if (m_currentTime >= frame->time)
+    if (m_fTime >= frame->m_fTime)
     {
-        m_currentTime = 0.0f;
-        switch (m_mode)
+        m_fTime = 0.0f;
+        switch (m_ePlayMode)
         {
-        case 0:
-            nextFrame = m_currentFrame + 1;
-            m_currentFrame = nextFrame;
-            if (nextFrame >= m_frameCount)
+        case GLAnimMode_Loop:
+            nextFrame = m_nFrame + 1;
+            m_nFrame = nextFrame;
+            if (nextFrame >= m_nNumTextures)
             {
-                m_currentFrame = 0;
+                m_nFrame = 0;
             }
             break;
-        case 1:
-            if (m_direction > 0)
+        case GLAnimMode_PingPong:
+            if (m_nPlayDir > 0)
             {
-                forwardFrame = m_currentFrame + 1;
-                m_currentFrame = forwardFrame;
-                if (forwardFrame >= m_frameCount)
+                forwardFrame = m_nFrame + 1;
+                m_nFrame = forwardFrame;
+                if (forwardFrame >= m_nNumTextures)
                 {
-                    m_currentFrame -= 2;
-                    m_direction = -1;
+                    m_nFrame -= 2;
+                    m_nPlayDir = -1;
                 }
             }
             else
             {
-                backwardFrame = m_currentFrame - 1;
-                m_currentFrame = backwardFrame;
+                backwardFrame = m_nFrame - 1;
+                m_nFrame = backwardFrame;
                 if (backwardFrame < 0)
                 {
-                    m_currentFrame = 1;
-                    m_direction = 1;
+                    m_nFrame = 1;
+                    m_nPlayDir = 1;
                 }
             }
             break;
-        case 2:
-            advancedFrame = m_currentFrame + 1;
-            m_currentFrame = advancedFrame;
-            frameCount = m_frameCount;
+        case GLAnimMode_Hold:
+            advancedFrame = m_nFrame + 1;
+            m_nFrame = advancedFrame;
+            frameCount = m_nNumTextures;
             if (advancedFrame >= frameCount)
             {
-                m_currentFrame = frameCount - 1;
+                m_nFrame = frameCount - 1;
             }
             break;
         }

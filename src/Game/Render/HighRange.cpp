@@ -92,10 +92,10 @@ bool IsHighRangeEnabled(const HighRange*)
 
 void InitializeHighRange(HighRange* state)
 {
+    GLTargetInfo info;
     u32 widths[7] = { 320, 160, 80, 40, 80, 160, 320 };
     u32 heights[7] = { 224, 112, 56, 28, 56, 112, 224 };
     int i;
-    GLTargetInfo info;
 
     for (i = 0; i < 7; ++i)
     {

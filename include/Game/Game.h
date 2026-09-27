@@ -80,6 +80,7 @@ public:
     void fn_8005830C();
     void fn_80058400();
     void fn_8005848C();
+    void ResetGameFields();
     void BeginGame(bool bRematch, bool bStraightToKickoff);
     void fn_8005A028(DetermDataEvent* data);
     void OnSuddenDeath();

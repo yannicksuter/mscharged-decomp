@@ -97,6 +97,11 @@ public:
             return mData.mData;
         }
 
+        const CharT* begin() const
+        {
+            return mData.mData;
+        }
+
         const CharT* c_str() const
         {
             return mData.mData;
@@ -108,6 +113,11 @@ public:
         }
 
         CharT* end()
+        {
+            return mData.mData + mData.mSize - 1;
+        }
+
+        const CharT* end() const
         {
             return mData.mData + mData.mSize - 1;
         }
@@ -206,6 +216,16 @@ public:
             return GetData().end();
         }
         return (CharT*)0;
+    }
+
+    const CharT* begin() const
+    {
+        return mData ? GetData().begin() : (const CharT*)0;
+    }
+
+    const CharT* end() const
+    {
+        return mData ? GetData().end() : (const CharT*)0;
     }
 
     Data& GetData()
@@ -322,9 +342,8 @@ BasicString<CharT, Allocator>& BasicString<CharT, Allocator>::AppendInPlace(cons
         at = 0;
     }
 
-    typename BasicString<CharT, OtherAllocator>::Data* rhsData = rhs.mData;
-    const CharT* end = rhsData != 0 ? rhsData->mData.mData + rhsData->mData.mSize - 1 : 0;
-    const CharT* begin = rhsData != 0 ? rhsData->mData.mData : 0;
+    const CharT* end = rhs.end();
+    const CharT* begin = rhs.begin();
 
     insert(at, begin, end);
     return *this;

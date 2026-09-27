@@ -795,7 +795,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
         mPeerInfoList[0].mUnidentified18 = 0;
         mPeerInfoList[0].mUnidentified22 = false;
         int peer = 1;
-        for (int entry = 0; entry < message->mUnidentified23; ++entry, ++peer)
+        for (int entry = 0; entry < message->mUnidentified23; ++peer, ++entry)
         {
             LANPeerMessageInfo& info = message->mUnidentified24[entry];
             nlStrNCpy(mPeerInfoList[peer].mName, info.mUnidentified06, 11);

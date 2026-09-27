@@ -31,11 +31,7 @@ struct NetworkRankingMeta
         mDay = 1;
         mMonth = 1;
         mYear = 2000;
-        mScore = 0;
-        mDisplayRank = 0;
-        mWins = 0;
-        mLosses = 0;
-        mUnidentified14 = 0;
+        Reset();
     }
 
     void Reset()

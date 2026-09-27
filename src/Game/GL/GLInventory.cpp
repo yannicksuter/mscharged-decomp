@@ -103,32 +103,6 @@ static inline void DeleteFileEntries(ListEntry<void*>* current)
     }
 }
 
-inline void GLInventory::ReleaseLevel(int nLevel)
-{
-    DeleteFileEntries(m_pFileData[nLevel]->m_Head);
-    m_pFileData[nLevel]->Clear();
-    m_pSkinData[nLevel]->Release();
-    m_pModels[nLevel]->Release(mModelReleaseCallback);
-    m_pTextureAnims[nLevel]->Release(glReleaseTextureAnim);
-    m_pVertexAnims[nLevel]->Release();
-    m_pTextures[nLevel]->Release(glReleaseTexture);
-}
-
-inline void GLInventory::Delete()
-{
-    m_bCreated = false;
-    for (int i = 0; i < 16; i++)
-    {
-        ReleaseLevel(i);
-        delete m_pFileData[i];
-        delete m_pSkinData[i];
-        delete m_pTextureAnims[i];
-        delete m_pVertexAnims[i];
-        delete m_pModels[i];
-        delete m_pTextures[i];
-    }
-}
-
 GLInventory::~GLInventory()
 {
     Delete();
@@ -148,6 +122,32 @@ void GLInventory::Create()
             new (8, false) deleting_GLInventoryContainer<GLVertexAnim>();
         m_pTextures[i] = new (8, false) clearing_GLInventory<PlatTexture>();
     }
+}
+
+void GLInventory::Delete()
+{
+    m_bCreated = false;
+    for (int i = 0; i < 16; i++)
+    {
+        ReleaseLevel(i);
+        delete m_pFileData[i];
+        delete m_pSkinData[i];
+        delete m_pTextureAnims[i];
+        delete m_pVertexAnims[i];
+        delete m_pModels[i];
+        delete m_pTextures[i];
+    }
+}
+
+void GLInventory::ReleaseLevel(int nLevel)
+{
+    DeleteFileEntries(m_pFileData[nLevel]->m_Head);
+    m_pFileData[nLevel]->Clear();
+    m_pSkinData[nLevel]->Release();
+    m_pModels[nLevel]->Release(mModelReleaseCallback);
+    m_pTextureAnims[nLevel]->Release(glReleaseTextureAnim);
+    m_pVertexAnims[nLevel]->Release();
+    m_pTextures[nLevel]->Release(glReleaseTexture);
 }
 
 void GLInventory::SetModelReleaseCallback(const ModelReleaseCallback& callback)
@@ -345,24 +345,30 @@ GLSkinMesh* GLInventory::MakeSkinMesh(
     return glx_MakeSkinMesh(pChunk, pModel, hierarchy);
 }
 
-void GLInventory::Update(float deltaTime)
+void GLInventory::UpdateTextureAnims(float dt)
 {
     UpdateTextureAnimCallback textureCallback;
-    textureCallback.mDeltaTime = deltaTime;
+    textureCallback.mDeltaTime = dt;
     for (int i = m_nLevel; i >= 0; i--)
     {
-        clearing_GLInventory<GLTextureAnim>::Tree* tree = m_pTextureAnims[i]->m_pItems;
-        tree->Walk(
+        m_pTextureAnims[i]->Walk(
             &textureCallback, &UpdateTextureAnimCallback::Update);
     }
+}
 
+void GLInventory::UpdateVertexAnims(float dt)
+{
     UpdateVertexAnimCallback vertexCallback;
-    vertexCallback.mDeltaTime = deltaTime;
+    vertexCallback.mDeltaTime = dt;
     for (int i = m_nLevel; i >= 0; i--)
     {
-        deleting_GLInventoryContainer<GLVertexAnim>::Tree* tree =
-            m_pVertexAnims[i]->m_pItems;
-        tree->Walk(
+        m_pVertexAnims[m_nLevel]->Walk(
             &vertexCallback, &UpdateVertexAnimCallback::Update);
     }
+}
+
+void GLInventory::Update(float dt)
+{
+    UpdateTextureAnims(dt);
+    UpdateVertexAnims(dt);
 }

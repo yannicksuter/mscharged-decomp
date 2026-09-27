@@ -48,7 +48,7 @@ int UnidentifiedAudioScriptRuntime::Unidentified6E98(u32 hash, int value)
 }
 
 static inline void UnidentifiedAddBinding(UnidentifiedAudioScriptRuntime* script,
-    u32 key, u32 instance)
+    u32 instance, u32 key)
 {
     bool added;
     AudioEffectBinding* binding = script->mBindings.UnidentifiedAddOrGet(key, added);
@@ -81,15 +81,36 @@ static inline bool UnidentifiedListAbsent(const u32& key, u32* values, int count
     return absent;
 }
 
+static inline bool UnidentifiedEffectSetValue(UnidentifiedAudioScriptRuntime* script,
+    const u32& key, int& value)
+{
+    int* found;
+    bool hasValue = script->mEffectSets.FindGet(key, &found);
+    if (hasValue)
+        value = *found;
+    return hasValue;
+}
+
+static inline void UnidentifiedAddConditionalBinding(
+    UnidentifiedAudioScriptRuntime* script, u32 instance,
+    const UnidentifiedAudioScriptCondition* condition, bool active)
+{
+    if (active && !script->mUnidentified08->UnidentifiedContains(condition->mKey))
+        UnidentifiedAddBinding(script, instance, condition->mKey);
+}
+
 void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
 {
-    UnidentifiedAddBinding(this, 0x8CE35E27, instance);
+    UnidentifiedAddBinding(this, instance, 0x8CE35E27);
     UnidentifiedAudioScriptEntry* entry =
         nlBSearch<UnidentifiedAudioScriptEntry, u32>(hash, mUnidentified00, mUnidentified04);
     if (entry == 0)
     {
         for (u32 i = 0; i < mUnidentified08->mCount; ++i)
-            UnidentifiedAddBinding(this, mUnidentified08->mValues[i], instance);
+        {
+            u32 key = mUnidentified08->mValues[i];
+            UnidentifiedAddBinding(this, instance, key);
+        }
         return;
     }
 
@@ -97,7 +118,10 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
     for (u32 i = 0; i < selection->mCount; ++i)
     {
         if (!mUnidentified08->UnidentifiedContains(selection->mValues[i]))
-            UnidentifiedAddBinding(this, selection->mValues[i], instance);
+        {
+            u32 key = selection->mValues[i];
+            UnidentifiedAddBinding(this, instance, key);
+        }
     }
 
     u32 keys[50];
@@ -108,12 +132,9 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
         keys[i] = condition->mKey;
         if (condition->mFunction == 0xFFFF)
         {
-            int* found;
             int value = 0;
-            if (mEffectSets.FindGet(condition->mArguments[0], &found))
-                value = *found;
-            if (value != 0 && !mUnidentified08->UnidentifiedContains(condition->mKey))
-                UnidentifiedAddBinding(this, condition->mKey, instance);
+            UnidentifiedEffectSetValue(this, condition->mArguments[0], value);
+            UnidentifiedAddConditionalBinding(this, instance, condition, value != 0);
         }
         else
         {
@@ -121,16 +142,13 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
             u32 values[4];
             for (int j = 0; j < condition->mCount; ++j)
             {
-                int* found;
-                u32 value = 0;
-                if (mEffectSets.FindGet(condition->mArguments[j], &found))
-                    value = (u32)*found;
-                values[j] = value;
+                int value;
+                bool found = UnidentifiedEffectSetValue(this, condition->mArguments[j], value);
+                values[j] = found ? value : 0;
             }
             mInterpreter.ExecuteFunction(function, condition->mCount, values);
-            if (*mInterpreter.m_SP != 0
-                && !mUnidentified08->UnidentifiedContains(condition->mKey))
-                UnidentifiedAddBinding(this, condition->mKey, instance);
+            UnidentifiedAddConditionalBinding(this, instance, condition,
+                *mInterpreter.m_SP != 0);
         }
         condition = (UnidentifiedAudioScriptCondition*)(condition->mArguments + condition->mCount);
     }
@@ -141,7 +159,10 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
         u32* key = &mUnidentified08->mValues[i];
         if (UnidentifiedListAbsent(*key, selection->mValues, selection->mCount)
             && UnidentifiedListAbsent(*key, keys, selection->mConditionCount))
-            UnidentifiedAddBinding(this, *key, instance);
+        {
+            u32 bindingKey = *key;
+            UnidentifiedAddBinding(this, instance, bindingKey);
+        }
     }
 }
 
@@ -174,7 +195,7 @@ void UnidentifiedAudioScriptRuntime::Unidentified78C0(float deltaTime)
     UnidentifiedAudioScriptUpdate update;
     update.mDeltaTime = deltaTime;
     update.mCount = 0;
-    mBindings.Walk(Function2<bool, const u32&, AudioEffectBinding*>(
+    mBindings.Walk(Function<bool(const u32&, AudioEffectBinding*)>(
         Bind<bool>(fn_802F7CFC, Placeholder<0>(), Placeholder<1>(), &update)));
     for (u32 i = 0; i < update.mCount; ++i)
         mBindings.Remove(update.mKeys[i]);

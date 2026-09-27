@@ -28,6 +28,11 @@ extern "C" void fn_800F06D4();
 extern "C" void fn_800F030C(bool stadiumViewer);
 extern const float kCameraZero;
 
+inline float BlendCameraValue(float start, float end, float blend)
+{
+    return end * blend + start * (1.0f - blend);
+}
+
 class cCameraManager
 {
 public:

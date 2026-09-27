@@ -39,6 +39,8 @@
 #include "NL/gl/glState.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/Render/Presentation.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 
 GLView* g_pNisRenderView;
 

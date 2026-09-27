@@ -34,6 +34,32 @@ static const char* sLeaderboardTextNames[5] = {
 
 static int sLeaderboardCategories[5] = { 2, 5, 3, 0, 1 };
 
+static inline NetworkLeaderboardCategory* GetLeaderboardCategory(int category)
+{
+    NetworkStatsManager* stats = NetworkStatsManager::Instance();
+    return stats->GetCategory(category);
+}
+
+static inline NetworkLeaderboardCategory* GetLeaderboardCategoryRef(
+    const int& category)
+{
+    NetworkStatsManager* stats = NetworkStatsManager::Instance();
+    return stats->GetCategory(category);
+}
+
+static inline TLComponentInstance* FindScrollBar(SHOnlineRanking* scene)
+{
+    return FEFinder<TLComponentInstance, 4>::Find(
+        scene->mPresentation->m_currentSlide, "Layer", "Group", "scrollbar");
+}
+
+static inline void UpdateScrollBar(SHOnlineRanking* scene, int count)
+{
+    scene->mScrollBar.SetComponent(FindScrollBar(scene));
+    scene->mScrollBar.SetRange(count - 10);
+    scene->mScrollBar.SetValue(scene->mFirstVisibleRank);
+}
+
 SHOnlineRanking::SHOnlineRanking()
     : mUnidentified30(false)
     , mMyRank(-1)
@@ -95,21 +121,12 @@ void SHOnlineRanking::SceneCreated()
     u16* friendCodeInput = g_pFriendManager->mFriendCodeInput;
     mLeaderboardSelection = friendCodeInput[0];
     memset(friendCodeInput, 0, sizeof(g_pFriendManager->mFriendCodeInput));
-    int categoryIndex = sLeaderboardCategories[mLeaderboardSelection];
-    mLeaderboardCategory = categoryIndex;
+    mLeaderboardCategory = sLeaderboardCategories[mLeaderboardSelection];
 
-    NetworkLeaderboardCategory* category
-        = NetworkStatsManager::Instance()->GetCategory(categoryIndex);
-    int count = category->mCount;
-    TLComponentInstance* scrollBar = FEFinder<TLComponentInstance, 4>::Find(
-        mPresentation->m_currentSlide, "Layer", "Group", "scrollbar");
-    mScrollBar.SetComponent(scrollBar);
-    mScrollBar.SetRange(count - 10);
-    mScrollBar.SetValue(mFirstVisibleRank);
+    UpdateScrollBar(
+        this, GetLeaderboardCategory(mLeaderboardCategory)->GetCount());
 
-    int rankCategory = mLeaderboardCategory;
-    NetworkStatsManager* stats = NetworkStatsManager::Instance();
-    mMyRank = stats->GetCategory(rankCategory)->mFirstRank;
+    mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mFirstRank;
     UpdateRows();
     UpdateHeader();
 
@@ -128,6 +145,40 @@ void SHOnlineRanking::SceneCreated()
     }
     mBackButton.SetButtonInstance(backButton);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
+}
+
+inline void SHOnlineRanking::InitializeButtons()
+{
+    typedef Detail::MemFunImpl<void, void (SHOnlineRanking::*)(int, void*)>
+        PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineRanking*, Placeholder<0>,
+        Placeholder<1> >
+        PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(
+        MemFun(&SHOnlineRanking::OnRowPointerEnter), this, Placeholder<0>(),
+        Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(
+        MemFun(&SHOnlineRanking::OnRowPointerLeave), this, Placeholder<0>(),
+        Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(
+        MemFun(&SHOnlineRanking::OnRowPointerPress), this, Placeholder<0>(),
+        Placeholder<1>()));
+}
+
+inline void SHOnlineRanking::ShowError(int error)
+{
+    if (GameSceneManager::Instance()->GetSceneType(
+            GameSceneManager::Instance()->GetCurrentScene())
+        != SCENE_POPUP_MENU)
+    {
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create((ePopupMenu)error,
+            Function<FnVoidVoid>(
+                Bind<void>(MemFun(&SHOnlineRanking::OnErrorDismissed), this)));
+        mErrorPopupOpen = true;
+    }
 }
 
 void SHOnlineRanking::Update(float fDeltaT)
@@ -162,22 +213,7 @@ void SHOnlineRanking::Update(float fDeltaT)
                 mPageControls->SetButtonState(0, true, true);
             }
 
-            {
-                typedef Detail::MemFunImpl<void,
-                    void (SHOnlineRanking::*)(int, void*)>
-                    PointerMethod;
-                typedef BindExp3<void, PointerMethod, SHOnlineRanking*,
-                    Placeholder<0>, Placeholder<1> >
-                    PointerBinding;
-                FEPointerListener::Callback callbacks[3] = {
-                    PointerBinding(MemFun(&SHOnlineRanking::OnRowPointerEnter),
-                        this, Placeholder<0>(), Placeholder<1>()),
-                    PointerBinding(MemFun(&SHOnlineRanking::OnRowPointerLeave),
-                        this, Placeholder<0>(), Placeholder<1>()),
-                    PointerBinding(MemFun(&SHOnlineRanking::OnRowPointerPress),
-                        this, Placeholder<0>(), Placeholder<1>()),
-                };
-            }
+            InitializeButtons();
             mTransitionState = 1;
         }
         else if (state == 3)
@@ -192,9 +228,7 @@ void SHOnlineRanking::Update(float fDeltaT)
     if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete)
     {
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = false;
-        mMyRank = NetworkStatsManager::Instance()
-                      ->GetCategory(mLeaderboardCategory)
-                      ->mFirstRank;
+        mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mFirstRank;
         UpdateRows();
         return;
     }
@@ -215,18 +249,8 @@ void SHOnlineRanking::Update(float fDeltaT)
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();
-        int error
-            = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111);
-        if (GameSceneManager::Instance()->GetSceneType(
-                GameSceneManager::Instance()->GetCurrentScene())
-            != SCENE_POPUP_MENU)
-        {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)error,
-                Bind<void>(MemFun(&SHOnlineRanking::OnErrorDismissed), this));
-            mErrorPopupOpen = true;
-        }
+        ShowError(
+            GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111));
         return;
     }
 
@@ -285,17 +309,8 @@ void SHOnlineRanking::Update(float fDeltaT)
                 = sLeaderboardCategories[mLeaderboardSelection];
             SelectLeaderboardCategory();
 
-            int categoryIndex = mLeaderboardCategory;
-            int count = NetworkStatsManager::Instance()
-                            ->GetCategory(categoryIndex)
-                            ->mCount;
-            TLComponentInstance* scrollBar
-                = FEFinder<TLComponentInstance, 4>::Find(
-                    mPresentation->m_currentSlide, "Layer", "Group",
-                    "scrollbar");
-            mScrollBar.SetComponent(scrollBar);
-            mScrollBar.SetRange(count - 10);
-            mScrollBar.SetValue(mFirstVisibleRank);
+            UpdateScrollBar(this,
+                GetLeaderboardCategoryRef((int)mLeaderboardCategory)->mCount);
         }
         else if (mPageControls->IsButtonPressed(0))
         {
@@ -306,29 +321,42 @@ void SHOnlineRanking::Update(float fDeltaT)
                 = sLeaderboardCategories[mLeaderboardSelection];
             SelectLeaderboardCategory();
 
-            int categoryIndex = mLeaderboardCategory;
-            int count = NetworkStatsManager::Instance()
-                            ->GetCategory(categoryIndex)
-                            ->mCount;
-            TLComponentInstance* scrollBar
-                = FEFinder<TLComponentInstance, 4>::Find(
-                    mPresentation->m_currentSlide, "Layer", "Group",
-                    "scrollbar");
-            mScrollBar.SetComponent(scrollBar);
-            mScrollBar.SetRange(count - 10);
-            mScrollBar.SetValue(mFirstVisibleRank);
+            UpdateScrollBar(this,
+                GetLeaderboardCategoryRef((int)mLeaderboardCategory)->mCount);
         }
     }
 
     if (mScrollBar.IsScrolling(1, true))
     {
         ++mFirstVisibleRank;
-        UpdateRows();
+        mHighlight->m_bVisible = false;
+        for (int row = 0; row < 10; ++row)
+        {
+            if (PopulateRow(row, row + mFirstVisibleRank))
+            {
+                mRowInstances[row]->m_bVisible = true;
+            }
+            else
+            {
+                mRowInstances[row]->m_bVisible = false;
+            }
+        }
     }
     else if (mScrollBar.IsScrolling(0, true))
     {
         --mFirstVisibleRank;
-        UpdateRows();
+        mHighlight->m_bVisible = false;
+        for (int row = 0; row < 10; ++row)
+        {
+            if (PopulateRow(row, row + mFirstVisibleRank))
+            {
+                mRowInstances[row]->m_bVisible = true;
+            }
+            else
+            {
+                mRowInstances[row]->m_bVisible = false;
+            }
+        }
     }
 }
 
@@ -337,19 +365,14 @@ void SHOnlineRanking::SelectLeaderboardCategory()
     FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
     UpdateHeader();
 
-    int categoryIndex = mLeaderboardCategory;
-    NetworkLeaderboardCategory* category
-        = NetworkStatsManager::Instance()->GetCategory(categoryIndex);
-    mMyRank = category->mFirstRank;
+    mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mFirstRank;
 
     if ((mLeaderboardCategory == 0 || mLeaderboardCategory == 2)
         && mMyRank >= 0)
     {
         mFirstVisibleRank = mMyRank - 5;
-        int maximum = NetworkStatsManager::Instance()
-                          ->GetCategory(categoryIndex)
-                          ->mCount
-            - 10;
+        int maximum
+            = GetLeaderboardCategory(mLeaderboardCategory)->GetCount() - 10;
         if (mFirstVisibleRank > maximum)
             mFirstVisibleRank = maximum;
         if (mFirstVisibleRank < 0)
@@ -365,10 +388,8 @@ void SHOnlineRanking::SelectLeaderboardCategory()
 
 bool SHOnlineRanking::PopulateRow(int row, int leaderboardIndex)
 {
-    int categoryIndex = mLeaderboardCategory;
-    NetworkLeaderboardCategory* category
-        = NetworkStatsManager::Instance()->GetCategory(categoryIndex);
-    if (leaderboardIndex >= category->mCount)
+    if (leaderboardIndex
+        >= GetLeaderboardCategory(mLeaderboardCategory)->GetCount())
         return false;
 
     if (leaderboardIndex == mMyRank)
@@ -381,7 +402,7 @@ bool SHOnlineRanking::PopulateRow(int row, int leaderboardIndex)
 
     NetworkStatsPlayer* player
         = &NetworkStatsManager::Instance()
-               ->GetCategory(categoryIndex)
+               ->GetCategory(mLeaderboardCategory)
                ->mPlayers[leaderboardIndex];
     NetworkRankingMeta* metadata
         = &NetworkStatsManager::Instance()

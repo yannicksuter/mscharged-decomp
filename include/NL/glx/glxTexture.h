@@ -82,6 +82,8 @@ public:
 
     ~PlatTexture();
 
+    u32 GetTextureIndex() const { return m_TextureIndex; }
+
     void ClearData();
     void Prepare();
     void Swizzle(bool bDeleteLinear);

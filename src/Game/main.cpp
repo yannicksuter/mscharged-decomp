@@ -3,6 +3,7 @@
 #include "Game/TweakConfig.h"
 
 #include "Game/Task/FixedUpdateTask.h"
+#include "Game/Audio/AudioGlobals.h"
 
 #include "Game/Task/BeginFrameTask.h"
 #include "Game/Task/ComUpdateTask.h"
@@ -113,8 +114,8 @@ public:
     virtual const char* GetName() { return "Mem Check"; }
 
 private:
-    u32 mAccumulatedDelta;
-    u32 mSampleCount;
+    s32 mAccumulatedDelta;
+    s32 mSampleCount;
 }; // size 0x28
 
 extern "C"
@@ -135,7 +136,6 @@ void nlRegHandleDVDRetryingCB(const Function<void(int)>&);
 void nlRegCheckForResetFromFSCB(const Function<FnVoidVoid>&);
 
 extern bool g_bDisableWriteOut;
-extern void* lbl_806E1C20;
 extern u8 lbl_806E1458;
 
 
@@ -154,7 +154,7 @@ GameAudio* g_pGameAudio;
 bool g_e3_Build;
 bool lbl_806E1091;
 nlLocalization::nlLanguage g_Language;
-static u32 sLastVirtualFreeDelta;
+static s32 sLastVirtualFreeDelta;
 static float sAverageVirtualFreeDelta;
 static float sVirtualFreeMiB;
 static float sVirtualLargestFreeMiB;
@@ -287,19 +287,20 @@ void UnidentifiedMemCheckTask::Run(float)
     sStandardLargestFreeMiB =
         StandardAllocator.LargestFreeBlock() / bytesPerMiB;
 
-    MemoryAllocator* subsystemAllocator =
+    // AudioBackend::m_Unknown434.
+    MemoryAllocator* audioAllocator =
         reinterpret_cast<MemoryAllocator*>(
-            reinterpret_cast<u8*>(lbl_806E1C20) + 0x434);
-    sSubsystemFreeMiB = subsystemAllocator->TotalFreeMemory() / bytesPerMiB;
-    sSubsystemLargestFreeMiB =
-        subsystemAllocator->LargestFreeBlock() / bytesPerMiB;
-
-    sVirtualUsedMiB =
-        (VirtualAllocator.m_14 - VirtualAllocator.m_10) / bytesPerMiB;
+            reinterpret_cast<u8*>(g_pAudioBackend) + 0x434);
+    sVirtualUsedMiB = audioAllocator->TotalFreeMemory() / bytesPerMiB;
     sStandardUsedMiB =
-        (StandardAllocator.m_14 - StandardAllocator.m_10) / bytesPerMiB;
-    sSubsystemUsedMiB =
-        (subsystemAllocator->m_14 - subsystemAllocator->m_10) / bytesPerMiB;
+        audioAllocator->LargestFreeBlock() / bytesPerMiB;
+
+    sSubsystemFreeMiB = VirtualAllocator.m_14 / bytesPerMiB;
+    sSubsystemUsedMiB = VirtualAllocator.m_10 / bytesPerMiB;
+    sSubsystemLargestFreeMiB = StandardAllocator.m_14 / bytesPerMiB;
+    sUnidentifiedMemoryMetric0 = StandardAllocator.m_10 / bytesPerMiB;
+    sUnidentifiedMemoryMetric1 = audioAllocator->m_14 / bytesPerMiB;
+    sUnidentifiedMemoryMetric2 = audioAllocator->m_10 / bytesPerMiB;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 2 &&
         sPreviousTaskState == 2 && !g_bTweaking)

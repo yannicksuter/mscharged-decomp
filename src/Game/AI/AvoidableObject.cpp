@@ -27,12 +27,6 @@ extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E99C(cFielder*);
 extern "C" float fn_800DED80(cFielder*);
-extern "C" void fn_802B5CC0(
-    nlVector4& out, const nlVector2& point, const nlVector2& normal);
-extern "C" void fn_802B5D10(
-    nlVector4& out, const nlVector3& point, const nlVector3& normal);
-extern "C" float fn_802B5DD0(const nlVector2& point, const nlVector4& plane);
-
 // The desire queried by the fielder strength rule carries its target fielder
 // at 0xB8; the concrete desire class is not reconstructed yet.
 struct UnidentifiedDesire_8000D62C
@@ -661,8 +655,8 @@ bool AvoidablePolygon::UnidentifiedVirtual1C(
 
     for (i = 0; i < 4; i++)
     {
-        fn_802B5CC0(line, mPoints[i], mNormals[i]);
-        float fDist = fn_802B5DD0(v2Target, line);
+        nlMakePlaneFromPointNormal(line, mPoints[i], mNormals[i]);
+        float fDist = nlPlaneDot(v2Target, line);
         bool bFront = fDist - fThreshold > 0.0001f || nlNear(fDist, fThreshold);
         int nSide = 2;
         if (bFront)
@@ -749,9 +743,9 @@ bool AvoidablePolygon::UnidentifiedVirtual20(
     }
     if (!bInside)
     {
-        fn_802B5D10(line, v3Point, v3Dir);
+        nlMakePlaneFromPointNormal(line, v3Point, v3Dir);
         float fDist
-            = fn_802B5DD0(*(const nlVector2*)&other->GetPosition(), line);
+            = nlPlaneDot(*(const nlVector2*)&other->GetPosition(), line);
         float fRadius = other->GetRadius();
         return fDist - fRadius <= range;
     }

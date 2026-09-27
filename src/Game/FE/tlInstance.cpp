@@ -107,23 +107,22 @@ float TLInstance::GetUVHeight() const
     return m_component->GetUVHeight();
 }
 
+static inline bool IsAtLeast(double time, float threshold)
+{
+    float value = time;
+    return value - threshold > 0.0001f || nlNear(value, threshold);
+}
+
+static inline bool IsAtMost(float value, float threshold)
+{
+    return threshold - value > 0.0001f || nlNear(value, threshold);
+}
+
 bool TLInstance::IsValidAtTime(float fCurrentTime)
 {
-    float sinceStart;
-    float elapsed;
-    float duration;
-    bool valid;
-
-    sinceStart = fCurrentTime - m_fStartTime;
-    valid = sinceStart > 0.0001f || nlNear(fCurrentTime, m_fStartTime);
-
-    if (valid != 0)
+    if (IsAtLeast(fCurrentTime, m_fStartTime))
     {
-        duration = m_fDuration;
-        elapsed = fCurrentTime - m_fStartTime;
-        valid = m_fDuration - elapsed > 0.0001f || nlNear(elapsed, duration);
-
-        if (valid)
+        if (IsAtMost(fCurrentTime - m_fStartTime, m_fDuration))
         {
             return true;
         }

@@ -4,6 +4,7 @@
 #include <dwc/dwc_base64.h>
 #include <dwc/dwc_common.h>
 #include <dwc/dwc_friend.h>
+#include "NL/nlstring_tmpl.h"
 
 #include "Game/FriendManager.h"
 
@@ -207,24 +208,26 @@ void FriendManager::HandleFriendStatus(
         return;
     }
 
-    tDebugPrintManager::Print(DC_NETWORK, "friend[%.2d] type %d Friend:%s status %s (%s).\n", index, DWC_GetFriendDataType(friendData), DWC_IsBuddyFriendData(friendData) ? "Yes" : "No", sFriendStatusNames[status], statusString);
+    int friendType = DWC_GetFriendDataType(friendData);
+    bool isBuddy = DWC_IsBuddyFriendData(friendData);
+    tDebugPrintManager::Print(DC_NETWORK, "friend[%.2d] type %d Friend:%s status %s (%s).\n", index, friendType, isBuddy ? "Yes" : "No", sFriendStatusNames[status], statusString);
 
     FriendStatusPayload previous = mFriendStatus[index];
     FriendStatusPayload& current = mFriendStatus[index];
 
-    u32 encodedLength = 0;
-    if (statusString != 0)
-    {
-        encodedLength = strlen(statusString);
-    }
+    u32 encodedLength = nlStrLen<char>(statusString);
     u32 decodedLength = DWC_Base64Decode(statusString, encodedLength, reinterpret_cast<char*>(&current), sizeof(current));
 
-    bool valid = decodedLength >= 4
-              && current.mHeader.mMagic[0] == 'S'
-              && current.mHeader.mMagic[1] == 'C'
-              && current.mHeader.mMagic[2] == '2'
-              && current.mHeader.mStatus <= EFriendStatus_ClientReceivedInvitation
-              && decodedLength == GetStatusDataSize(current.mHeader.mStatus);
+    bool valid = false;
+    if (decodedLength >= 4
+        && current.mHeader.mMagic[0] == 'S'
+        && current.mHeader.mMagic[1] == 'C'
+        && current.mHeader.mMagic[2] == '2'
+        && current.mHeader.mStatus <= EFriendStatus_ClientReceivedInvitation
+        && decodedLength == GetStatusDataSize(current.mHeader.mStatus))
+    {
+        valid = true;
+    }
     if (!valid)
     {
         current.mHeader.mMagic[0] = 'S';

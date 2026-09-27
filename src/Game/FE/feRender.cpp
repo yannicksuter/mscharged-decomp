@@ -26,8 +26,7 @@ static const nlVector3 s_quadPositions[4] = {
 };
 FEScene* FERender::m_pRenderScene;
 
-typedef void (*MovieRenderCallback)(eGLView, unsigned long, const nlFloatColour&, const nlVector2*, const nlVector2*);
-static MovieRenderCallback s_movieRenderCallback;
+RenderImageCallback g_pfnRenderImage;
 static const unsigned long grabTex = nlStringLowerHash("target/grab_texture");
 static const unsigned long movieTex = nlStringLowerHash("movie");
 
@@ -288,18 +287,10 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
     }
     glSetCurrentMatrix(matrixHandle);
 
-    if (textureHandle == movieTex && s_movieRenderCallback != 0)
+    if (textureHandle == movieTex && g_pfnRenderImage != 0)
     {
         nlVector2 uv[4];
         nlVector2 pos[4];
-        pos[0].x = s_quadPositions[0].x;
-        pos[0].y = s_quadPositions[0].y;
-        pos[1].x = s_quadPositions[1].x;
-        pos[1].y = s_quadPositions[1].y;
-        pos[2].x = s_quadPositions[2].x;
-        pos[2].y = s_quadPositions[2].y;
-        pos[3].x = s_quadPositions[3].x;
-        pos[3].y = s_quadPositions[3].y;
         uv[0].x = left + halfPixelU;
         uv[0].y = bottom + halfPixelV;
         uv[1].x = left + halfPixelU;
@@ -308,7 +299,17 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
         uv[2].y = top - halfPixelV;
         uv[3].x = right - halfPixelU;
         uv[3].y = bottom + halfPixelV;
-        s_movieRenderCallback((eGLView)m_pRenderScene->m_uRenderView, textureHandle, s_currentAssetColour, pos, uv);
+
+        const nlVector3* pSrc = s_quadPositions;
+        nlVector2* pDst = pos;
+        unsigned int count = 4;
+        while (count--)
+        {
+            nlVec2Set(*pDst, pSrc->x, pSrc->y);
+            pDst++;
+            pSrc++;
+        }
+        g_pfnRenderImage((GLView*)m_pRenderScene->m_uRenderView, textureHandle, s_currentAssetColour, pos, uv);
     }
     else
     {

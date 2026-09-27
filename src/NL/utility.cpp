@@ -2,11 +2,6 @@
 
 #include "math.h"
 
-// Pooled 1.0f owned by NL/math.cpp (retail sdata2 0x806E60F8). Retail
-// SolveQuadratic loads this shared slot for the p/q/r identities instead of
-// emitting a private literal; referencing it keeps this TU's pool identical.
-extern const float lbl_806E60F8;
-
 static const f32 CANT_COLLIDE = 3.402823466e+38F;
 
 void SolveQuadratic(float a, float b, float c, int& numRoots, float& x1,
@@ -28,19 +23,19 @@ void SolveQuadratic(float a, float b, float c, int& numRoots, float& x1,
     if (absA > absB && absA > absC)
     {
         q = b / a;
-        p = lbl_806E60F8;
+        p = 1.0f;
         r = c / a;
     }
     else if (absB > absA && absB > absC)
     {
         p = a / b;
-        q = lbl_806E60F8;
+        q = 1.0f;
         r = c / b;
     }
     else
     {
         p = a / c;
-        r = lbl_806E60F8;
+        r = 1.0f;
         q = b / c;
     }
 
@@ -125,4 +120,55 @@ float SweepSpheres(float rp, const nlVector3& p1, const nlVector3& p2,
 
     float t = (-dot - nlSqrt(disc, true)) / a;
     return t;
+}
+
+float nlBezier(float* fControlPoints, int nNumPoints, float fMu)
+{
+    int nFactorial;
+    int kFactorial;
+    int nMinusKFactorial;
+    float powVal;
+    float oneMinusMuToNMinusK;
+    float muToK;
+    int i;
+    float result;
+    int k;
+    float blend;
+
+    if (fMu == 1.0f)
+    {
+        return fControlPoints[nNumPoints - 1];
+    }
+
+    nFactorial = 1;
+    kFactorial = 1;
+    powVal = pow(1.0f - fMu, (float)nNumPoints);
+    oneMinusMuToNMinusK = powVal;
+    muToK = 1.0f;
+
+    for (i = 1; i <= nNumPoints; i++)
+    {
+        nFactorial *= i;
+    }
+
+    nMinusKFactorial = nFactorial;
+    result = *fControlPoints * oneMinusMuToNMinusK;
+
+    for (k = 1; k <= nNumPoints; k++)
+    {
+        kFactorial *= k;
+        if (k != nNumPoints)
+        {
+            nMinusKFactorial /= (nNumPoints - k) + 1;
+        }
+
+        oneMinusMuToNMinusK /= 1.0f - fMu;
+        muToK *= fMu;
+        blend = (float)(nFactorial / (kFactorial * nMinusKFactorial));
+        blend *= muToK * oneMinusMuToNMinusK;
+        blend *= fControlPoints[k];
+        result += blend;
+    }
+
+    return result;
 }

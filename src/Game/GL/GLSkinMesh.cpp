@@ -4,6 +4,10 @@
 #include "NL/nlMemory.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
+int gMorphOverrideID = -1;
+float gMorphOverrideWeight = 1.0f;
+unsigned char gMorphOverrideEnabled;
+
 GLSkinMesh::~GLSkinMesh()
 {
     if (morphWeights != 0)
@@ -54,15 +58,7 @@ void GLSkinMesh::UpdateMorphWeights(cPoseAccumulator* pPoseAccumulator)
     morphWeightsChanged = changed;
     ApplyMorphOverride();
 
-    unsigned long count = 0;
-    for (unsigned long i = 0; i < numMorphs; ++i)
-    {
-        if (morphWeights[i].morphWeight > 0.0f)
-        {
-            ++count;
-        }
-    }
-    numActiveMorphs = count;
+    numActiveMorphs = CountActiveMorphs();
 }
 
 void GLSkinMesh::ApplyMorphOverride()

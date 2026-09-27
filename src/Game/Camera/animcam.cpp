@@ -311,6 +311,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
     nlQuaternion cameraRot = { 0.0f, 0.0f, 0.0f, 1.0f };
     nlMatrix4 viewMatrix;
     nlMatrix4 facingAngleMatrix;
+    nlVector3 up;
     float focalLength;
     if (m_fAnimationTime >= 1.0f)
     {
@@ -352,7 +353,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
             m_Fov = fWeightA * m_pActiveCameraData->fFOV[nIndex] + fWeightB * m_pActiveCameraData->fFOV[nIndex + 1];
             nlVec3WeightedSum(cameraPos, fWeightA, m_pActiveCameraData->cameraPos[nIndex], fWeightB, m_pActiveCameraData->cameraPos[nIndex + 1]);
             nlVec3WeightedSum(targetPos, fWeightA, m_pActiveCameraData->targetPos[nIndex], fWeightB, m_pActiveCameraData->targetPos[nIndex + 1]);
-            focalLength = fWeightA * m_pActiveCameraData->fFocalLength[nIndex] + fWeightB * m_pActiveCameraData->fFocalLength[nIndex + 1];
+            focalLength = BlendCameraValue(m_pActiveCameraData->fFocalLength[nIndex], m_pActiveCameraData->fFocalLength[nIndex + 1], fWeightB);
             nlQuatSlerp(cameraRot, m_pActiveCameraData->cameraRot[nIndex], m_pActiveCameraData->cameraRot[nIndex + 1], fWeightB);
         }
     }
@@ -384,7 +385,8 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
     GetWorldPoint(m_vecCamera, m_vecCamera, m_OffsetPos, mFacingAngle);
     if (m_bUnusedPad)
     {
-        nlVector3 up = { 0.0f, 0.0f, 1.0f };
+        static const nlVector3 kUp = { 0.0f, 0.0f, 1.0f };
+        up = kUp;
         glMatrixLookAt(mView, m_vecCamera, m_vecTarget, up);
     }
     else
@@ -400,8 +402,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
         nlInvertMatrix(mView, viewMatrix);
     }
 
-    float fScale = lbl_806DC464 / m_Fov;
-    fScale = (1.0f - lbl_806DC468) * 1.0f + fScale * lbl_806DC468;
+    float fScale = BlendCameraValue(1.0f, lbl_806DC464 / m_Fov, lbl_806DC468);
     fScale *= fScale;
     lbl_806DC46C = fScale;
     m_FocalLength = dofBehindTarget * fScale + focalLength;

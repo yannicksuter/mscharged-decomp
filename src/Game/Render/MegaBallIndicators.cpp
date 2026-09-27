@@ -882,8 +882,9 @@ void SetMegaBallTimerCount(unsigned int nCount)
         gMegaBallTimerSegments[i].mActive = true;
         gMegaBallTimerSegments[i].mVisible = true;
         gMegaBallTimerSegments[i].mScale = gMegaBallTimerScale;
+        fY = gMegaBallTimerY;
         gMegaBallTimerSegments[i].mX = fX;
-        gMegaBallTimerSegments[i].mY = gMegaBallTimerY;
+        gMegaBallTimerSegments[i].mY = fY;
         gMegaBallTimerStatuses[i] = -1;
         fX += fSpacing;
     }

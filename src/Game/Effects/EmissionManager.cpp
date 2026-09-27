@@ -1015,10 +1015,13 @@ void EmissionManager::RecordRenderedParticles(
         TweakIntBinding* count = stats[resource].mCount;
         unsigned int rendered = (int)*count + numParticles;
         *count = rendered;
-        if (rendered
-            >= (unsigned int)(int)*stats[resource].mHighWaterMark)
+        unsigned int maximum;
+        TweakIntBinding* highWaterMark = stats[resource].mHighWaterMark;
+        maximum = (int)*highWaterMark;
+        if (rendered >= maximum)
         {
-            *stats[resource].mHighWaterMark = rendered;
+            maximum = rendered;
         }
+        *highWaterMark = maximum;
     }
 }

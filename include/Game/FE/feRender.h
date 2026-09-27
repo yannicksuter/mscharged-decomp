@@ -10,7 +10,6 @@ class TLImageInstance;
 class TLInstance;
 class TLSlide;
 class TLComponentInstance;
-struct glTextureBinding;
 
 class FERender
 {
@@ -29,10 +28,10 @@ public:
 };
 
 // Image-instance model callback installed by GameRenderTask and invoked from
-// FERender::RenderImageInstance.
+// FERender::RenderImageInstance with the current asset colour.
 typedef void (*RenderImageCallback)(GLView* view, unsigned long texture,
-    const glTextureBinding* pExtraTextureStates,
-    const nlVector2* positions, const nlVector2* texcoords);
+    const nlFloatColour& colour, const nlVector2* positions,
+    const nlVector2* texcoords);
 extern RenderImageCallback g_pfnRenderImage;
 
 #endif // GAME_FE_RENDER_H

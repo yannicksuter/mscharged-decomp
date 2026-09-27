@@ -169,6 +169,7 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
     ParticleSystem* pSystem, EffectsSpec* pSpec,
     const nlMatrix4& mLocalToWorld)
 {
+    EffectsTemplate* pTemplate = pSystem->m_pTemplate;
     float randomAngle = RandomizedValue(0.0f, 6.2831855f);
     float sinVal;
     float cosVal;
@@ -176,7 +177,7 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pSystem->m_pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     radius = RandomizedValue(0.0f, radius);
 
     nlVector3 localPos;
@@ -185,9 +186,13 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
     localPos.z = 0.0f;
 
     if (pSpec != 0)
-        nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);
+    {
+        localPos.x += pSpec->m_vLocalOffset.x;
+        localPos.y += pSpec->m_vLocalOffset.y;
+        localPos.z += pSpec->m_vLocalOffset.z;
+    }
 
-    if (pSystem->m_pTemplate->IsLocalSpace())
+    if (pTemplate->IsLocalSpace())
         pos = localPos;
     else
         nlMultPosVectorMatrix(pos, localPos, mLocalToWorld);

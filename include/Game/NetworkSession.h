@@ -398,7 +398,7 @@ public:
 
     void SendTournamentStartToEveryone();
     void SendGameStartToEveryone();
-    void SendDraftToEveryone(int count, NetworkDraftMachineInfo* entries, bool, u8);
+    void SendDraftToEveryone(int count, NetworkDraftMachineInfo* entries, bool, bool);
     void SendDraftToEveryone(NetMessageDraft* message);
     void SendSidesChangedToEveryone(NetworkMessage* message);
     void SendSidesChangedToHost(NetworkMessage* message);

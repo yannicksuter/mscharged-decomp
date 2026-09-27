@@ -29,17 +29,17 @@ struct FEPointerEvent
 class FEPointerListener
 {
 public:
-    typedef Function2<void, int, void*> Callback;
+    typedef Function<void(int, void*)> Callback;
 
     FEPointerListener(void* context);
     virtual ~FEPointerListener();
 
     void ProcessPointerEvent(const FEPointerEvent* event);
-    void SetPointerEnterCallback(Callback& callback);
-    void SetPointerLeaveCallback(Callback& callback);
-    void SetPointerInsideCallback(Callback& callback);
-    void SetPointerPressCallback(Callback& callback);
-    void SetPointerReleaseCallback(Callback& callback);
+    void SetPointerEnterCallback(Function2<void, int, void*>& callback);
+    void SetPointerLeaveCallback(Function2<void, int, void*>& callback);
+    void SetPointerInsideCallback(Function2<void, int, void*>& callback);
+    void SetPointerPressCallback(Function2<void, int, void*>& callback);
+    void SetPointerReleaseCallback(Function2<void, int, void*>& callback);
     void Disable();
     void Enable() { mDisabled = false; }
 

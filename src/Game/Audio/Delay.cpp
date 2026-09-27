@@ -250,31 +250,34 @@ void Delay::ApplyToSound(void* handle)
 void Delay::OnSoundStarted(void*)
 {
     AXFX_DELAY* delay = &g_pAudioBackend->m_DelayEffect.m_Delay;
-    for (u32 i = 0; i < 3; ++i)
-    {
-        u32 delayTime = m_Final.m_Settings.m_Delay[i];
-        if (delayTime < 1)
-            delayTime = 1;
-        if (delayTime > 750)
-            delayTime = 750;
-        delay->delay[i] = delayTime;
-
-        u32 feedback = m_Final.m_Settings.m_Feedback[i];
-        if (feedback > 99)
-            feedback = 99;
-        delay->feedback[i] = feedback;
-
-        u32 output = m_Final.m_Settings.m_Output[i];
-        if (output > 100)
-            output = 100;
-        delay->output[i] = output;
-    }
-
     if (g_pAudioBackend->m_OutputMode == 3)
-        AXFXDelayExpSettingsDpl2(
-            (AXFX_DELAY_EXP_DPL2*)&g_pAudioBackend->m_DelayEffect);
+    {
+        for (u16 i = 0; i < 3; ++i)
+        {
+            u32 value = m_Final.m_Settings.m_Delay[i];
+            value = value >= 1 ? value : 1;
+            delay->delay[i] = value <= 750 ? value : 750;
+            value = m_Final.m_Settings.m_Feedback[i];
+            delay->feedback[i] = value <= 99 ? value : 99;
+            value = m_Final.m_Settings.m_Output[i];
+            delay->output[i] = value <= 100 ? value : 100;
+        }
+        AXFXDelayExpSettingsDpl2((AXFX_DELAY_EXP_DPL2*)delay);
+    }
     else
+    {
+        for (u16 i = 0; i < 3; ++i)
+        {
+            u32 value = m_Final.m_Settings.m_Delay[i];
+            value = value >= 1 ? value : 1;
+            delay->delay[i] = value <= 750 ? value : 750;
+            value = m_Final.m_Settings.m_Feedback[i];
+            delay->feedback[i] = value <= 99 ? value : 99;
+            value = m_Final.m_Settings.m_Output[i];
+            delay->output[i] = value <= 100 ? value : 100;
+        }
         AXFXDelaySettings(delay);
+    }
 }
 
 void Delay::EndBlend()

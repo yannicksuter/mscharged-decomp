@@ -17,6 +17,8 @@ public:
     virtual void SceneCreated();
 
     void UpdateRows();
+    void InitializeButtons();
+    void ShowError(int error);
     void SelectLeaderboardCategory();
     bool PopulateRow(int row, int leaderboardIndex);
     void OnRowPointerEnter(int index, void* context);

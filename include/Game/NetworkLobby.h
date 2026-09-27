@@ -58,7 +58,7 @@ public:
     void StartMatchmakingThread();
     void OnMatchmakingResult(DWCErrorType error, int cancelled, void* param);
     bool StartFriendServer();
-    void StopFriendServer();
+    bool StopFriendServer();
     void SetFriendHostInviting();
     bool ConnectToFriendServer(int profileId);
     void OnFriendMatchmakingResult(DWCErrorType error, int cancelled,

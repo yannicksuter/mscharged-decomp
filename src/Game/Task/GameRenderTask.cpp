@@ -138,7 +138,7 @@ static int sTriStripIndices[4] = { 3, 0, 2, 1 };
 static int sQuadIndices[4] = { 0, 1, 2, 3 };
 
 static void RenderImageQuad(GLView* view, unsigned long texture,
-    const glTextureBinding* pExtraTextureStates, const nlVector2* positions,
+    const nlFloatColour& colour, const nlVector2* positions,
     const nlVector2* texcoords)
 {
     UnidentifiedMeshWriter_802A195C writer;
@@ -158,7 +158,7 @@ static void RenderImageQuad(GLView* view, unsigned long texture,
 
     if (writer.Begin(4, primitive, 0))
     {
-        memcpy((u8*)writer.model->packets->materialParameters + 8, pExtraTextureStates, 0x10);
+        memcpy((u8*)writer.model->packets->materialParameters + 8, &colour, 0x10);
 
         glTextureBinding* state
             = (glTextureBinding*)writer.model->packets->materialParameters;

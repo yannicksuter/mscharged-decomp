@@ -698,10 +698,10 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
             float fMarkWeight = InBetweenMyNetAnd(pFielder,
                 fn_800D6734(pFielder));
             float fTotalWeight = fFacingWeight + fMarkWeight;
-            eStrafeDirection eLastMovement
-                = desire->m_pFielder->mActionRunningVars.eLastStrafeDirection;
             bool bTurning = true;
             bool bStrafing = true;
+            eStrafeDirection eLastMovement
+                = desire->m_pFielder->mActionRunningVars.eLastStrafeDirection;
             if (eLastMovement != STRAFE_LEFT
                 && eLastMovement != STRAFE_RIGHT)
             {
@@ -719,13 +719,15 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
                 cFielder* pMark = desire->m_pFielder->GetMark();
                 if (pMark != NULL)
                 {
-                    float fScale = fMarkWeight / fTotalWeight;
-                    nlVec3ScaleAdd(v3FacingPos, fScale,
+                    nlVec3ScaleAdd(v3FacingPos, fMarkWeight / fTotalWeight,
                         pMark->mUnidentified024.m_v3Position, v3FacingPos);
                 }
+                float fDeltaX = v3FacingPos.x
+                              - desire->m_pFielder->mUnidentified024.m_v3Position.x;
+                float fDeltaY = v3FacingPos.y
+                              - desire->m_pFielder->mUnidentified024.m_v3Position.y;
                 aFacingDirection = (unsigned short)(int)(
-                    nlATan2f(v3FacingPos.y - desire->m_pFielder->mUnidentified024.m_v3Position.y,
-                        v3FacingPos.x - desire->m_pFielder->mUnidentified024.m_v3Position.x)
+                    nlATan2f(fDeltaY, fDeltaX)
                     * 10430.378f);
             }
         }

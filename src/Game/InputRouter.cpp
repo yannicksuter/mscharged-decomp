@@ -170,12 +170,62 @@ void InputRouter::CheckSyncMismatch()
 
 bool InputRouter::ProcessPlaybackFrame()
 {
-    while (m_OutgoingCustomDetermDataQ.GetCount() != 0)
+    int frame = gInputManager->mFrameProvider->GetFrame();
+    if (mLastGameFrame != frame)
     {
-        DetermDataEvent* event = m_OutgoingCustomDetermDataQ.Pop();
+        mCurrentCRC = gInputManager->mEnabled
+            ? gInputManager->mFrameProvider->CalculateChecksum()
+            : gInputManager->mFrameProvider->WriteSyncLog();
+        mLastGameFrame = frame;
+    }
 
-        Function<DetermDataEvent*> disposer(fn_803353DC);
-        sDetermDataEventQueue.Queue(event, disposer);
+    int machineCount = mSession->GetNumMachines();
+    for (s8 machine = 0; machine < machineCount; ++machine)
+    {
+        NetworkPeer* peer = mSession->GetPeer(machine);
+        int eventCount = 0;
+        u32 dataSize = 0;
+        if (!gNetworkInputRecording->ReadNetworkInputPacketHeader(machine,
+                &mNetworkTicks[machine], &mNetworkCRCs[machine],
+                (u32*)&mRemoteTicks[machine], &mRandomSeeds[machine],
+                (u32*)&eventCount, &dataSize))
+        {
+            return false;
+        }
+
+        for (int eventIndex = 0; eventIndex < eventCount; ++eventIndex)
+        {
+            DetermDataEvent* event = new DetermDataEvent();
+            if (!gNetworkInputRecording->ReadNetworkInputEvent(event))
+            {
+                delete event;
+                return false;
+            }
+
+            Function<DetermDataEvent*> disposer(fn_803353DC);
+            sDetermDataEventQueue.Queue(event, disposer);
+        }
+
+        u8 data[300];
+        if (!gNetworkInputRecording->ReadNetworkInputData(dataSize, data))
+        {
+            return false;
+        }
+
+        int playerCount = peer->mPlayerCount;
+        for (s8 player = 0; player < playerCount; ++player)
+        {
+            NetworkPeerChannel* channel = peer->GetNetworkPeerChannel(player);
+            s8 playerId = GetNetworkPlayerId(player, machine);
+            if (!gNetworkInputRecording->ReadNetworkInputRecord(
+                    player, &mInputRecords[playerId], &mInputStates[playerId]))
+            {
+                return false;
+            }
+            channel->ApplyNetworkPeerChannelInput(
+                &mInputRecords[playerId], mNetworkTicks[machine],
+                mInputStates[playerId]);
+        }
     }
 
     CheckSyncMismatch();
@@ -408,7 +458,7 @@ void NetworkInputRouter::OnInputCaptured()
     mCurrentMessage.SetNetworkInputMessageCongested(mWasCongested);
     mWasCongested = false;
 
-    if (mQueueCursor > mQueueLimit && (frame & 1) != 0)
+    if (mQueueLimit < mQueueCursor && (frame & 1) != 0)
     {
         mUnidentified290 = true;
         --mQueueCursor;

@@ -3598,18 +3598,6 @@ extern "C" float fn_800DF838(cPlayer* pPlayer)
     return fScore;
 }
 
-static float fn_800DF888_helper(cFielder* player)
-{
-    float fOwner = BallOwner(player);
-    float fReceiving = ReceivingPass(player);
-    float fClosing = ClosingTo(player, g_pBall);
-    float fNear = NearToBall(player);
-    float fAble = AbleToInterceptBall(player);
-    float fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
-    fIntercept = FMIN(fn_800DED80(player), fIntercept);
-    return FMAX(fOwner, FMAX(fReceiving, fIntercept));
-}
-
 extern "C" float fn_800DF888(cTeam* team)
 {
     if (team == NULL)
@@ -3617,7 +3605,31 @@ extern "C" float fn_800DF888(cTeam* team)
     cFielder* players[2];
     players[0] = team->mpBestBallInterceptor;
     players[1] = team->GetOtherTeam()->mpBestBallInterceptor;
-    float score[2] = { fn_800DF888_helper(players[0]), fn_800DF888_helper(players[1]) };
+    float score[2];
+    float fOwner;
+    float fReceiving;
+    float fClosing;
+    float fNear;
+    float fAble;
+    float fIntercept;
+
+    fOwner = BallOwner(players[0]);
+    fReceiving = ReceivingPass(players[0]);
+    fClosing = ClosingTo(players[0], g_pBall);
+    fNear = NearToBall(players[0]);
+    fAble = AbleToInterceptBall(players[0]);
+    fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
+    fIntercept = FMIN(fn_800DED80(players[0]), fIntercept);
+    score[0] = FMAX(fOwner, FMAX(fReceiving, fIntercept));
+
+    fOwner = BallOwner(players[1]);
+    fReceiving = ReceivingPass(players[1]);
+    fClosing = ClosingTo(players[1], g_pBall);
+    fNear = NearToBall(players[1]);
+    fAble = AbleToInterceptBall(players[1]);
+    fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
+    fIntercept = FMIN(fn_800DED80(players[1]), fIntercept);
+    score[1] = FMAX(fOwner, FMAX(fReceiving, fIntercept));
     return score[0] / FMAX(0.1f, score[0] + score[1]);
 }
 

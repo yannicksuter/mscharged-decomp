@@ -183,8 +183,9 @@ float SkillTweak::GetValue()
             skill = mpSkillTweaks->mDifficulty[13];
             break;
         }
-        weightedSkill += skill * (1.0f - mpSkillTweaks->mCharacterWeight);
-        totalWeight += 1.0f - mpSkillTweaks->mCharacterWeight;
+        float characterWeight = mpSkillTweaks->mCharacterWeight;
+        weightedSkill += skill * (1.0f - characterWeight);
+        totalWeight += 1.0f - characterWeight;
         if (skill == 0.0f)
         {
             result = skill;

@@ -1472,6 +1472,22 @@ static inline int RandomNisIndex(int count, unsigned int* seed)
     return (int)value;
 }
 
+static inline void PlayNisCue(NisPlayer* player, const char* nisName)
+{
+    char cueName[128];
+    nlStrNCpy(cueName, nisName, sizeof(cueName));
+    unsigned long length = nlStrLen(cueName);
+    if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+    {
+        cueName[length - 4] = '\0';
+    }
+    else
+    {
+        nlStrNCpy(cueName + length - 4, "_nocrowd", sizeof(cueName) - length - 4);
+    }
+    player->fn_8027EDCC(nlStringLowerHash(cueName));
+}
+
 void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisUseFilter useFilter, NisWinnerType winnerType, int param5, int param6)
 {
     char fullName[64];
@@ -1622,18 +1638,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
 
     if (param5 != 1 && mUnidentified34354 == 0)
     {
-        char cueName[128];
-        nlStrNCpy(cueName, nisHeader.name, sizeof(cueName));
-        unsigned long length = nlStrLen(cueName);
-        if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
-        {
-            cueName[length - 4] = '\0';
-        }
-        else
-        {
-            nlStrNCpy(cueName + length - 4, "_nocrowd", sizeof(cueName) - length - 4);
-        }
-        fn_8027EDCC(nlStringLowerHash(cueName));
+        PlayNisCue(this, nisHeader.name);
     }
 }
 

@@ -98,8 +98,20 @@ public:
     {
     }
 
-    virtual const glModelPacket* fn_08();
-    virtual const glModelPacket* fn_0C();
+    virtual const glModelPacket* fn_08()
+    {
+        m_Current = m_Head;
+        return fn_0C();
+    }
+
+    virtual const glModelPacket* fn_0C()
+    {
+        if (m_Current == 0)
+            return 0;
+        const glModelPacket* packet = m_Current->entry;
+        m_Current = m_Current->next;
+        return packet;
+    }
 
 protected:
     u8 m_Allocator;
@@ -108,16 +120,30 @@ protected:
     ListEntry<const glModelPacket*>* m_Current;
 };
 
-class UnidentifiedPacketSorter_8052E540 : public UnidentifiedPacketSorter_802D033C
-{
-public:
-    virtual void fn_10(GLView*, const glModelPacket*);
-};
-
 class UnidentifiedPacketSorter_8052E554 : public UnidentifiedPacketSorter_802D033C
 {
 public:
-    virtual void fn_10(GLView*, const glModelPacket*);
+    virtual void fn_10(GLView*, const glModelPacket* packet)
+    {
+        ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
+            sizeof(ListEntry<const glModelPacket*>), GLM_Header);
+        entry->entry = packet;
+        entry->next = 0;
+        nlListAddEnd(&m_Head, &m_Tail, entry);
+    }
+};
+
+class UnidentifiedPacketSorter_8052E540 : public UnidentifiedPacketSorter_802D033C
+{
+public:
+    virtual void fn_10(GLView*, const glModelPacket* packet)
+    {
+        ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
+            sizeof(ListEntry<const glModelPacket*>), GLM_Header);
+        entry->next = 0;
+        entry->entry = packet;
+        nlListAddStart(&m_Head, entry, &m_Tail);
+    }
 };
 
 #endif // NL_GL_GLRENDERLIST_H

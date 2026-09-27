@@ -811,9 +811,7 @@ static inline void fn_80014494Impl(cBall* pBall)
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
-                    && pBall->m_pPassTarget != NULL;
+    bool bPassTarget = pBall->UnidentifiedHasPassTarget();
     if (bPassTarget)
     {
         if (ReceivingPass((cFielder*)pBall->m_pPassTarget))

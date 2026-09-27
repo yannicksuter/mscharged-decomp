@@ -351,16 +351,10 @@ void SHGameplayOptions::fn_80235CE4(bool value)
     }
 }
 
-void SHGameplayOptions::fn_80235FE0()
+static inline void UpdateSkillLevelSetting(SHGameplayOptions* scene, int skill)
 {
-    int skill = mSettings.SkillLevel;
-    int series = mSettings.NumGames;
-    int time = mSettings.GameTime;
-    int goals = mSettings.GoalLimit;
-    int type = mSettings.GameLimitType;
-    int value = type == 1 ? goals : time / 60;
-    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation,
-        nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SKILL LEVEL SETTINGS"), 0, 0, 0);
+    TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(scene->mPresentation,
+        "OPTIONS", "Layer", "SKILL LEVEL SETTINGS", 0UL, 0UL, 0UL);
     switch (skill)
     {
     case 1: instance->SetActiveSlide("ROOKIE", true, false); break;
@@ -369,15 +363,29 @@ void SHGameplayOptions::fn_80235FE0()
     case 4: instance->SetActiveSlide("LEGEND", true, false); break;
     case 5: instance->SetActiveSlide("MEGASTRIKER", true, false); break;
     }
-    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation,
+}
+
+static inline void UpdateSeriesSetting(SHGameplayOptions* scene, int series)
+{
+    TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(scene->mPresentation,
         "OPTIONS", "Layer", "SERIES SETTING", 0UL, 0UL, 0UL);
     unsigned short number[4];
     nlSNPrintf(number, 4, (const unsigned short*)L"%d", series);
-    {
-        WideString string = Format(WideString(LookupLocString("OPTIONS_BEST_OF")), number);
-        memcpy(mUnidentified1538, string.c_str(), sizeof(mUnidentified1538));
-        text->SetString(mUnidentified1538);
-    }
+    WideString string = Format(WideString(LookupLocString("OPTIONS_BEST_OF")), number);
+    memcpy(scene->mUnidentified1538, string.c_str(), sizeof(scene->mUnidentified1538));
+    text->SetString(scene->mUnidentified1538);
+}
+
+void SHGameplayOptions::fn_80235FE0()
+{
+    int skill = mSettings.SkillLevel;
+    int series = mSettings.NumGames;
+    int time = mSettings.GameTime;
+    int goals = mSettings.GoalLimit;
+    int type = mSettings.GameLimitType;
+    int value = type == 1 ? goals : time / 60;
+    UpdateSkillLevelSetting(this, skill);
+    UpdateSeriesSetting(this, series);
     mUnidentified15BD = type == 1;
     int selected = 11;
     if (type == 1)
@@ -442,30 +450,13 @@ void SHGameplayOptions::fn_802365F0(int item)
 {
     if (item >= 0 && item < 5)
     {
-        int skill = lbl_804E8540[item];
-        mSettings.SkillLevel = (GameplaySettings::eSkillLevel)skill;
-        TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find(mPresentation,
-            nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("SKILL LEVEL SETTINGS"), 0, 0, 0);
-        switch (skill)
-        {
-        case 1: instance->SetActiveSlide("ROOKIE", true, false); break;
-        case 2: instance->SetActiveSlide("PROFESSIONAL", true, false); break;
-        case 3: instance->SetActiveSlide("SUPERSTAR", true, false); break;
-        case 4: instance->SetActiveSlide("LEGEND", true, false); break;
-        case 5: instance->SetActiveSlide("MEGASTRIKER", true, false); break;
-        }
+        mSettings.SkillLevel = (GameplaySettings::eSkillLevel)lbl_804E8540[item];
+        UpdateSkillLevelSetting(this, mSettings.SkillLevel);
     }
     else if (item >= 5 && item < 10)
     {
-        int series = lbl_804E8554[item - 5];
-        mSettings.NumGames = series;
-        TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(mPresentation,
-            "OPTIONS", "Layer", "SERIES SETTING", 0UL, 0UL, 0UL);
-        unsigned short number[4];
-        nlSNPrintf(number, 4, (const unsigned short*)L"%d", series);
-        WideString string = Format(WideString(LookupLocString("OPTIONS_BEST_OF")), number);
-        memcpy(mUnidentified1538, string.c_str(), sizeof(mUnidentified1538));
-        text->SetString(mUnidentified1538);
+        mSettings.NumGames = lbl_804E8554[item - 5];
+        UpdateSeriesSetting(this, mSettings.NumGames);
     }
     else if (item == 10)
     {

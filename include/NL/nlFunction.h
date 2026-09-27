@@ -503,7 +503,7 @@ public:
     }
 
     template <typename Callable>
-    Function2(Callable callable)
+    Function2(const Callable& callable)
         : mTag(FUNCTION_FUNCTOR)
     {
         typedef FunctorImpl<Callable> Impl;

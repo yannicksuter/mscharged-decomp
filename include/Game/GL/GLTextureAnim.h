@@ -3,10 +3,18 @@
 
 #include "types.h"
 
+enum eGLTexAnimMode
+{
+    GLAnimMode_Loop = 0,
+    GLAnimMode_PingPong = 1,
+    GLAnimMode_Hold = 2,
+    GLAnimMode_Num = 3,
+};
+
 struct GLAnimTex
 {
-    /* 0x00 */ unsigned long textureHandle;
-    /* 0x04 */ f32 time;
+    /* 0x00 */ unsigned long m_TexHandle;
+    /* 0x04 */ f32 m_fTime;
 };
 
 class GLResourcePool;
@@ -14,29 +22,26 @@ class GLResourcePool;
 class GLTextureAnim
 {
 public:
-    void SetTexture(int frameIndex, const GLAnimTex& animTex)
+    void SetTexture(int index, const GLAnimTex& animTex)
     {
-        GLAnimTex* textureArray = m_frames;
-        u32 offset = frameIndex * sizeof(GLAnimTex);
-        GLAnimTex* targetTex = (GLAnimTex*)((u8*)textureArray + offset);
-
-        targetTex->textureHandle = animTex.textureHandle;
-        targetTex->time = animTex.time;
+        m_pAnimTex[index] = animTex;
     }
 
-    GLAnimTex* GetTexture(int frameIndex);
+    u32 GetTextureIndex() const { return m_textureIndex; }
+
+    GLAnimTex& GetTexture(int index);
     void Update(float dt);
 
-    /* 0x00 */ s32 m_currentFrame;
-    /* 0x04 */ u32 m_hashID;
-    /* 0x08 */ s32 m_frameCount;
-    /* 0x0C */ u32 m_mode;
-    /* 0x10 */ s32 m_direction;
-    /* 0x14 */ bool m_isStopped;
+    /* 0x00 */ s32 m_nFrame;
+    /* 0x04 */ unsigned long m_uHashID;
+    /* 0x08 */ s32 m_nNumTextures;
+    /* 0x0C */ eGLTexAnimMode m_ePlayMode;
+    /* 0x10 */ s32 m_nPlayDir;
+    /* 0x14 */ unsigned char m_bPaused;
     /* 0x15 */ u8 m_pad15[3];
     /* 0x18 */ u32 m_textureIndex;
-    /* 0x1C */ f32 m_currentTime;
-    /* 0x20 */ GLAnimTex* m_frames;
+    /* 0x1C */ f32 m_fTime;
+    /* 0x20 */ GLAnimTex* m_pAnimTex;
 };
 
 GLTextureAnim* glGetTextureAnim(unsigned long texture);

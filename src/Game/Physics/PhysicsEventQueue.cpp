@@ -315,6 +315,7 @@ extern "C" void HandleCollisionShockwave(CollisionShockwaveData* data)
     UnidentifiedEventData_80066A04* pStats;
     bool bInvincible;
     cBall* pBall;
+    eSpinType spinType;
     PhysicsObject* pObject = data->pObject;
     PhysicsShockwave* pShockwave = data->pShockwave;
     int shockwaveType = pShockwave->mType;
@@ -473,8 +474,14 @@ extern "C" void HandleCollisionShockwave(CollisionShockwaveData* data)
             }
         }
 
-        eSpinType spinType =
-            nlRandom(2) != 0 ? SPINTYPE_FORWARD : SPINTYPE_BACK;
+        if (nlRandom(2) != 0)
+        {
+            spinType = SPINTYPE_FORWARD;
+        }
+        else
+        {
+            spinType = SPINTYPE_BACK;
+        }
         nlVector3 v3Velocity;
         if (shockwaveType == SHOCKWAVE_DAISY_FIST)
         {

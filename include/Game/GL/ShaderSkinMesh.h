@@ -85,6 +85,18 @@ public:
     void SetMorphID(unsigned long index, unsigned long id);
     void UpdateMorphWeights(cPoseAccumulator* pPoseAccumulator);
     void ApplyMorphOverride();
+    unsigned long CountActiveMorphs() const
+    {
+        unsigned long count = 0;
+        for (unsigned long i = 0; i < numMorphs; ++i)
+        {
+            if (morphWeights[i].morphWeight > 0.0f)
+            {
+                ++count;
+            }
+        }
+        return count;
+    }
 
     /* 0x04 */ glModel* pModel;
     /* 0x08 */ unsigned long hierarchySignature;

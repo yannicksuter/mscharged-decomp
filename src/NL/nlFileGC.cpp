@@ -3,6 +3,7 @@
 #include "revolution/os/OSThread.h"
 
 #include "NL/nlFileGC.h"
+#include "NL/nlArrayAllocator.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlFile.h"
 #include "NL/nlFunction.h"
@@ -53,43 +54,19 @@ public:
     static DolphinFileAllocator_80589450 sAllocator;
 };
 
-class DolphinFileAllocator_80589450
+class DolphinFileAllocator_80589450 : public nlArrayAllocator<DolphinFile>
 {
 public:
     DolphinFileAllocator_80589450()
-        : m_pFree(0)
-        , mMemory((DolphinFile*)mStorage)
     {
-        m_pFree = mMemory;
-        for (int i = 0; i < 95; ++i)
-        {
-            *(DolphinFile**)(mMemory + i) = mMemory + i + 1;
-        }
-        *(DolphinFile**)(mMemory + 95) = 0;
+        m_pFree = 0;
+        m_Unknown04 = 0;
+        Init((DolphinFile*)mStorage, 96);
     }
 
     ~DolphinFileAllocator_80589450() { }
 
-    DolphinFile* Allocate()
-    {
-        DolphinFile* entry = m_pFree;
-        if (entry == 0)
-        {
-            return 0;
-        }
-        m_pFree = *(DolphinFile**)entry;
-        return entry;
-    }
-
-    void DeleteEntry(DolphinFile* entry)
-    {
-        *(DolphinFile**)entry = m_pFree;
-        m_pFree = entry;
-    }
-
 private:
-    DolphinFile* m_pFree;
-    DolphinFile* mMemory;
     unsigned char mStorage[sizeof(DolphinFile) * 96];
 };
 

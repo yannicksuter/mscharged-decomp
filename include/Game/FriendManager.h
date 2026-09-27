@@ -23,7 +23,7 @@ struct FriendStatusHeader
         mStatus = EFriendStatus_Initial_NotAvailable;
     }
 
-    /* 0x00 */ char mMagic[3];
+    /* 0x00 */ u8 mMagic[3];
     /* 0x03 */ u8 mStatus;
 };
 
@@ -35,7 +35,6 @@ struct FriendStatusPayload
     /* 0x24 */ CheatSettings mPowerupSettings;
     /* 0x30 */ u32 mNetworkVersion;
     /* 0x34 */ u8 mStadium;
-    /* 0x35 */ u8 mPadding35[3];
 }; // size: 0x38
 
 class FriendManager

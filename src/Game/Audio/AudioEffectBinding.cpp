@@ -16,7 +16,7 @@ void AudioEffectBinding::Unidentified8418(u32 key)
 void AudioEffectBinding::OnSoundStarted(u32 instance)
 {
     mInstances.Add(instance, false);
-    mEffects.Walk(Function2<bool, const u32&, AudioEffectBase**>(
+    mEffects.Walk(Function<bool(const u32&, AudioEffectBase**)>(
         Bind<bool>(NotifyEffectSoundStarted, Placeholder<0>(), Placeholder<1>(), instance)));
 }
 
@@ -29,7 +29,7 @@ bool NotifyEffectSoundStarted(const u32&, AudioEffectBase** effect, u32 instance
 void AudioEffectBinding::OnSoundStopped(u32 instance)
 {
     mInstances.Remove(instance);
-    mEffects.Walk(Function2<bool, const u32&, AudioEffectBase**>(
+    mEffects.Walk(Function<bool(const u32&, AudioEffectBase**)>(
         Bind<bool>(NotifyEffectSoundStopped, Placeholder<0>(), Placeholder<1>(), instance)));
 }
 
@@ -44,7 +44,7 @@ void AudioEffectBinding::Update(float deltaTime)
     UpdateState update;
     update.mDeltaTime = deltaTime;
     update.mCount = 0;
-    mEffects.Walk(Function2<bool, const u32&, AudioEffectBase**>(
+    mEffects.Walk(Function<bool(const u32&, AudioEffectBase**)>(
         Bind<bool>(MemFun(&AudioEffectBinding::UpdateEffect),
             this, Placeholder<0>(), Placeholder<1>(), &update)));
     for (u32 i = 0; i < update.mCount; ++i)
@@ -81,7 +81,7 @@ bool AudioEffectBinding::UpdateEffect(const u32& key,
     }
     else
     {
-        mInstances.Walk(Function2<bool, const u32&, bool*>(
+        mInstances.Walk(Function<bool(const u32&, bool*)>(
             Bind<bool>(ApplyEffectToSound, Placeholder<0>(), Placeholder<1>(), value)));
     }
     return true;

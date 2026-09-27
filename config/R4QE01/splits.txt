@@ -1706,6 +1706,10 @@ Game/SH/SHLoading.cpp:
 	.data       start:0x80518A98 end:0x80518D7C
 	.sdata      start:0x806DD340 end:0x806DD394
 
+Game/FE/MenuListComponentInstantiations.cpp:
+	.text       start:0x801D0DD8 end:0x801D0F90
+	.data       start:0x80518D7C end:0x80518D90 align:4
+
 Game/SH/SHTitleScreen.cpp:
 	.text       start:0x801D0F90 end:0x801D28CC
 	.ctors      start:0x804DB778 end:0x804DB77C
@@ -3108,12 +3112,20 @@ NL/nlTask.cpp:
 	.sdata2     start:0x806E60B8 end:0x806E60C0
 
 NL/math.cpp:
-	.text       start:0x802B51D8 end:0x802B6234
-	.sdata2     start:0x806E60C0 end:0x806E6108
+	.text       start:0x802B51D8 end:0x802B5CC0
+	.sdata2     start:0x806E60C0 end:0x806E60E8
+
+NL/plane.cpp:
+	.text       start:0x802B5CC0 end:0x802B5DF4
+	.sdata2     start:0x806E60E8 end:0x806E60F0
+
+NL/polar.cpp:
+	.text       start:0x802B5DF4 end:0x802B5FD8
+	.sdata2     start:0x806E60F0 end:0x806E60F8
 
 NL/utility.cpp:
-	.text       start:0x802B6234 end:0x802B6568
-	.sdata2     start:0x806E6108 end:0x806E6128
+	.text       start:0x802B5FD8 end:0x802B6568
+	.sdata2     start:0x806E60F8 end:0x806E6128
 
 NL/tu_802B6568.cpp:
 	.text       start:0x802B6568 end:0x802B66D8
@@ -3351,11 +3363,15 @@ NL/gl/glFont.cpp:
 	.sdata2     start:0x806E6310 end:0x806E632C
 
 NL/gl/glLoadModel.cpp:
-	.text       start:0x802CA770 end:0x802CBE10
-	.ctors      start:0x804DB9E0 end:0x804DB9E4
-	.data       start:0x8052E220 end:0x8052E270
-	.bss        start:0x8057F1A8 end:0x8057F1C8
+	.text       start:0x802CA770 end:0x802CB790
+	.data       start:0x8052E220 end:0x8052E248
 	.sbss       start:0x806E1ED0 end:0x806E1ED8
+
+NL/gl/glMaterialProgram.cpp:
+	.text       start:0x802CB790 end:0x802CBE10
+	.ctors      start:0x804DB9E0 end:0x804DB9E4
+	.data       start:0x8052E248 end:0x8052E270
+	.bss        start:0x8057F1A8 end:0x8057F1C8
 
 NL/gl/glMatrix.cpp:
 	.text       start:0x802CBE10 end:0x802CBEC4

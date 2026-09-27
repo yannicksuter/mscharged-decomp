@@ -204,35 +204,30 @@ nlColour LightingLookup::SampleColour(
     nlColour colour;
     if (tint)
     {
-        nlColour shadowColour = { {
-            (u8)g_ShadowRed.value,
-            (u8)g_ShadowGreen.value,
-            (u8)g_ShadowBlue.value,
-            255,
-        } };
-        nlColour highlightColour = { {
-            (u8)g_HighlightRed.value,
-            (u8)g_HighlightGreen.value,
-            (u8)g_HighlightBlue.value,
-            255,
-        } };
+        nlColour shadowColour = { { 0, 0, 0, 255 } };
         nlFloatColour shadow;
+        shadowColour.c[0] = (u8)g_ShadowRed.value;
         shadow.c[0] = shadowColour.c[0] * (1.0f / 255.0f);
+        shadowColour.c[1] = (u8)g_ShadowGreen.value;
         shadow.c[1] = shadowColour.c[1] * (1.0f / 255.0f);
+        shadowColour.c[2] = (u8)g_ShadowBlue.value;
         shadow.c[2] = shadowColour.c[2] * (1.0f / 255.0f);
         shadow.c[3] = shadowColour.c[3] * (1.0f / 255.0f);
+        nlColour highlightColour = { { 0, 0, 0, 255 } };
         nlFloatColour highlight;
+        highlightColour.c[0] = (u8)g_HighlightRed.value;
         highlight.c[0] = highlightColour.c[0] * (1.0f / 255.0f);
+        highlightColour.c[1] = (u8)g_HighlightGreen.value;
         highlight.c[1] = highlightColour.c[1] * (1.0f / 255.0f);
+        highlightColour.c[2] = (u8)g_HighlightBlue.value;
         highlight.c[2] = highlightColour.c[2] * (1.0f / 255.0f);
         highlight.c[3] = highlightColour.c[3] * (1.0f / 255.0f);
-        float factor = value / 255.0f;
-        float inverseFactor = 1.0f - factor;
+        float inverseFactor = 1.0f - value / 255.0f;
         nlFloatColour result;
-        result.c[0] = inverseFactor * shadow.c[0] + factor * highlight.c[0];
-        result.c[1] = inverseFactor * shadow.c[1] + factor * highlight.c[1];
-        result.c[2] = inverseFactor * shadow.c[2] + factor * highlight.c[2];
-        result.c[3] = inverseFactor * shadow.c[3] + factor * highlight.c[3];
+        result.c[0] = inverseFactor * shadow.c[0] + (value / 255.0f) * highlight.c[0];
+        result.c[1] = inverseFactor * shadow.c[1] + (value / 255.0f) * highlight.c[1];
+        result.c[2] = inverseFactor * shadow.c[2] + (value / 255.0f) * highlight.c[2];
+        result.c[3] = inverseFactor * shadow.c[3] + (value / 255.0f) * highlight.c[3];
         ConvertColour(colour, result);
     }
     else

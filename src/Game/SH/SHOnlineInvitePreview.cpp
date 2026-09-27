@@ -7,6 +7,7 @@
 #include "Game/GameSceneManager.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
@@ -235,6 +236,3 @@ void SHOnlineInvitePreview::OnContinuePointerPress(unsigned int index, void*)
     mPresentation->SetActiveSlide("out", true);
     mPresentation->Update(0.0f);
 }
-
-#include "Game/FE/feFinderFind_impl.h"
-#include "Game/FE/feFinderDefault_impl.h"

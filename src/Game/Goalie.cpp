@@ -3273,6 +3273,7 @@ void Goalie::fn_80080638(cFielder* pFielder, bool bParam)
     if (pFielder != NULL && !pFielder->IsFallenDown() && !pFielder->fn_8003E6FC())
     {
         PlaySound(9, 0x06024E5D, NULL, NULL);
+        unsigned short aDirection;
         bool bReleased = false;
         if (IsOnSameTeam(pFielder))
         {
@@ -3308,7 +3309,6 @@ void Goalie::fn_80080638(cFielder* pFielder, bool bParam)
             case 6:
                 if (v3Velocity.x * mUnidentified024.m_v3Position.x > 0.0f)
                 {
-                    unsigned short aDirection;
                     if (pFielder->mUnidentified024.m_v3Position.y - mUnidentified024.m_v3Position.y > 0.0f)
                         aDirection = 0x4000;
                     else

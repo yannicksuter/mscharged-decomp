@@ -47,22 +47,7 @@ ImpostorManager::ImpostorManager()
     mFrameCount = 0;
     mCaptured = false;
 
-    mEnabled = false;
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
-    DLListEntry<ImpostorCharacter*>* head = it.m_Head;
-    DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
-    while (entry != 0)
-    {
-        entry->entry->EnableSprites(false);
-        if (nlDLRingIsEnd(head, entry) || entry == 0)
-        {
-            entry = 0;
-        }
-        else
-        {
-            entry = entry->m_next;
-        }
-    }
+    SetEnabled(false);
 }
 
 void ImpostorManager::Initialize(GLView* registry, int capacity,
@@ -306,6 +291,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
     glSetCurrentRasterState(glHandleizeRasterState());
 
     int rendered;
+    DLListEntry<ImpostorSprite*>* spriteEntry;
     ImpostorCharacter* character;
     nlDLListIterator<ImpostorCharacter*> drawIt = mCharacters.Begin();
     for (; drawIt.hasNext(); drawIt.next())
@@ -332,11 +318,21 @@ void ImpostorManager::Render(void* target, bool skipCapture)
 
         nlDLListIterator<ImpostorSprite*> sprites =
             character->mSprites.Begin();
-        for (; sprites.hasNext(); sprites.next())
+        DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
+        spriteEntry = sprites.m_Curr;
+        while (spriteEntry != 0)
         {
             rendered = sNumImpostorsRendered.value;
             sNumImpostorsRendered.value = rendered
-                + (*sprites)->Render((GLView*)target, mImpostors, cached, skipCapture);
+                + spriteEntry->entry->Render((GLView*)target, mImpostors, cached, skipCapture);
+            if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
+            {
+                spriteEntry = 0;
+            }
+            else
+            {
+                spriteEntry = spriteEntry->m_next;
+            }
         }
     }
 
@@ -502,19 +498,10 @@ void ImpostorManager::SetEnabled(bool enable)
 {
     mEnabled = enable;
     nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
-    DLListEntry<ImpostorCharacter*>* head = it.m_Head;
-    DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
-    while (entry != 0)
+    while (it.hasNext())
     {
-        entry->entry->EnableSprites(enable);
-        if (nlDLRingIsEnd(head, entry) || entry == 0)
-        {
-            entry = 0;
-        }
-        else
-        {
-            entry = entry->m_next;
-        }
+        (*it)->EnableSprites(enable);
+        it.Step();
     }
 }
 

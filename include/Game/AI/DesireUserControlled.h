@@ -12,13 +12,13 @@ public:
     {
     }
 
-    virtual ~DesireUserControlled();
+    virtual inline ~DesireUserControlled();
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
 #endif // GAME_AI_DESIRE_USER_CONTROLLED_H

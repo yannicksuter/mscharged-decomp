@@ -3,6 +3,7 @@
 #include "Game/Audio/RegistryPools.h"
 
 #include "Game/SH/SHBootLoading.h"
+#include "Game/BaseSceneHandler.inl"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/FE/FEAudio.h"
 
@@ -15,6 +16,7 @@
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlImageInstance.h"
+#include "Game/FE/tlInstance.inl"
 #include "Game/main.h"
 #include "NL/nlColour.h"
 #include "NL/nlLocalization.h"
@@ -36,6 +38,121 @@ BootLoadingScene::BootLoadingScene()
 
 BootLoadingScene::~BootLoadingScene()
 {
+}
+
+void BootLoadingScene::SceneCreated()
+{
+    FEPresentation* presentation = mPresentation;
+    if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
+    {
+        if (IsWidescreen())
+        {
+            mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("strap"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_jp"));
+            TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(presentation, InlineHasher("strap"),
+                InlineHasher("Layer"), InlineHasher("strap_jp"));
+            image->SetVisible(false);
+            mWidescreen = true;
+        }
+        else
+        {
+            mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("strap"),
+                InlineHasher("Layer"), InlineHasher("strap_jp"));
+            TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(presentation, InlineHasher("strap"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_jp"));
+            image->SetVisible(false);
+        }
+    }
+    else if (IsWidescreen())
+    {
+        mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("strap"),
+            InlineHasher("Layer"), InlineHasher("strap_16_9_us"));
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(presentation, InlineHasher("strap"),
+            InlineHasher("Layer"), InlineHasher("strap_us"));
+        image->SetVisible(false);
+        mWidescreen = true;
+    }
+    else
+    {
+        mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("strap"),
+            InlineHasher("Layer"), InlineHasher("strap_us"));
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(presentation, InlineHasher("strap"),
+            InlineHasher("Layer"), InlineHasher("strap_16_9_us"));
+        image->SetVisible(false);
+    }
+    TLImageInstance* image = 0;
+    switch (g_Language)
+    {
+    case nlLocalization::LangFrench:
+    case nlLocalization::LangNAFrench:
+        if (IsWidescreen())
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_French"));
+        else
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_French"));
+        break;
+    case nlLocalization::LangGerman:
+        if (IsWidescreen())
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_German"));
+        else
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_German"));
+        break;
+    case nlLocalization::LangSpanish:
+    case nlLocalization::LangNASpanish:
+        if (IsWidescreen())
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_Spanish"));
+        else
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_Spanish"));
+        break;
+    case nlLocalization::LangItalian:
+        if (IsWidescreen())
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_Italian"));
+        else
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_Italian"));
+        break;
+    }
+    if (SCGetLanguage() == 6)
+    {
+        if (IsWidescreen())
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_16_9_Dutch"));
+        else
+            image = FEFinder<TLImageInstance, 2>::Find(presentation, InlineHasher("art"),
+                InlineHasher("Layer"), InlineHasher("strap_Dutch"));
+    }
+    if (image != 0)
+        mStrapImage->SetTextureResource(image->GetTextureResource());
+    SetPhaseSlide();
+    mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide,
+        nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0, 0);
+    mHomeButtonWarning->SetVisible(false);
+    TLComponentInstance* component;
+    component = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation, InlineHasher("Slide1"),
+        InlineHasher("Layer"), InlineHasher("no home"));
+    component->SetVisible(false);
+    component = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation, InlineHasher("ESRB"),
+        InlineHasher("Layer"), InlineHasher("no home"));
+    component->SetVisible(false);
+    component = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation, InlineHasher("strap"),
+        InlineHasher("Layer"), InlineHasher("no home"));
+    component->SetVisible(false);
+    component = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation, InlineHasher("nunchuk"),
+        InlineHasher("Layer"), InlineHasher("no home"));
+    component->SetVisible(false);
+    component = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation, InlineHasher("NLG"),
+        InlineHasher("Layer"), InlineHasher("no home"));
+    component->SetVisible(false);
+    if (mWidescreen)
+        mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
+    else
+        mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
 }
 
 void BootLoadingScene::Update(float fDeltaT)
@@ -194,14 +311,14 @@ void BootLoadingScene::ShowHomeButtonWarning()
 
 bool BootLoadingScene::IsBootScreenPending()
 {
-    FEPresentation* presentation = mPresentation;
+    FEPresentation* presentation = GetPresentation();
     int alpha;
     switch (mPhase)
     {
     case 0:
     {
-        nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, nlStringLowerHash("ESRB"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("Text2"), 0, 0, 0)->GetAssetColour();
+        nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "ESRB",
+            "Layer", "Text2")->GetAssetColour();
         alpha = colour.c[3];
         break;
     }
@@ -210,15 +327,15 @@ bool BootLoadingScene::IsBootScreenPending()
         break;
     case 2:
     {
-        nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, nlStringLowerHash("nunchuk"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("nunchuk"), 0, 0, 0)->GetAssetColour();
+        nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "nunchuk",
+            "Layer", "nunchuk")->GetAssetColour();
         alpha = colour.c[3];
         break;
     }
     case 3:
     {
-        nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, nlStringLowerHash("NLG"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("nlgameslogo"), 0, 0, 0)->GetAssetColour();
+        nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "NLG",
+            "Layer", "nlgameslogo")->GetAssetColour();
         alpha = colour.c[3];
         break;
     }
@@ -227,139 +344,4 @@ bool BootLoadingScene::IsBootScreenPending()
         break;
     }
     return 255 > alpha;
-}
-
-void BootLoadingScene::SceneCreated()
-{
-    FEPresentation* presentation = mPresentation;
-    if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
-    {
-        if (IsWidescreen())
-        {
-            mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_jp"), 0, 0, 0);
-            TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_jp"), 0, 0, 0);
-            if (image == 0)
-                image = &UnidentifiedTLImageDefault::sInstance;
-            image->m_bVisible = false;
-            mWidescreen = true;
-        }
-        else
-        {
-            mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_jp"), 0, 0, 0);
-            TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_jp"), 0, 0, 0);
-            if (image == 0)
-                image = &UnidentifiedTLImageDefault::sInstance;
-            image->m_bVisible = false;
-        }
-    }
-    else if (IsWidescreen())
-    {
-        mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_us"), 0, 0, 0);
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("strap_us"), 0, 0, 0);
-        if (image == 0)
-            image = &UnidentifiedTLImageDefault::sInstance;
-        image->m_bVisible = false;
-        mWidescreen = true;
-    }
-    else
-    {
-        mStrapImage = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("strap_us"), 0, 0, 0);
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("strap"),
-            nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_us"), 0, 0, 0);
-        if (image == 0)
-            image = &UnidentifiedTLImageDefault::sInstance;
-        image->m_bVisible = false;
-    }
-    TLImageInstance* image = 0;
-    switch (g_Language)
-    {
-    case nlLocalization::LangFrench:
-    case nlLocalization::LangNAFrench:
-        if (IsWidescreen())
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_French"), 0, 0, 0);
-        else
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_French"), 0, 0, 0);
-        break;
-    case nlLocalization::LangGerman:
-        if (IsWidescreen())
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_German"), 0, 0, 0);
-        else
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_German"), 0, 0, 0);
-        break;
-    case nlLocalization::LangSpanish:
-    case nlLocalization::LangNASpanish:
-        if (IsWidescreen())
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_Spanish"), 0, 0, 0);
-        else
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_Spanish"), 0, 0, 0);
-        break;
-    case nlLocalization::LangItalian:
-        if (IsWidescreen())
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_Italian"), 0, 0, 0);
-        else
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_Italian"), 0, 0, 0);
-        break;
-    }
-    if (SCGetLanguage() == 6)
-    {
-        if (IsWidescreen())
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_16_9_Dutch"), 0, 0, 0);
-        else
-            image = FEFinder<TLImageInstance, 2>::Find(presentation, nlStringLowerHash("art"),
-                nlStringLowerHash("Layer"), nlStringLowerHash("strap_Dutch"), 0, 0, 0);
-    }
-    if (image != 0 && image->m_pTextureResource != 0)
-        mStrapImage->m_pTextureResource = image->m_pTextureResource;
-    SetPhaseSlide();
-    mHomeButtonWarning = FEFinder<TLComponentInstance, 4>::Find(presentation->m_currentSlide,
-        InlineHasher("Layer"), InlineHasher("no home"));
-    if (mHomeButtonWarning == 0)
-        mHomeButtonWarning = &UnidentifiedTLComponentDefault::sInstance;
-    mHomeButtonWarning->m_bVisible = false;
-    TLComponentInstance* component;
-    component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("Slide1"),
-        nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
-    if (component == 0)
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    component->m_bVisible = false;
-    component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("ESRB"),
-        nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
-    if (component == 0)
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    component->m_bVisible = false;
-    component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("strap"),
-        nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
-    if (component == 0)
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    component->m_bVisible = false;
-    component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("nunchuk"),
-        nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
-    if (component == 0)
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    component->m_bVisible = false;
-    component = FEFinder<TLComponentInstance, 4>::Find(presentation, nlStringLowerHash("NLG"),
-        nlStringLowerHash("Layer"), nlStringLowerHash("no home"), 0, 0, 0);
-    if (component == 0)
-        component = &UnidentifiedTLComponentDefault::sInstance;
-    component->m_bVisible = false;
-    if (mWidescreen)
-        mHomeButtonWarning->SetActiveSlide("widescreen", true, false);
-    else
-        mHomeButtonWarning->SetActiveSlide("Slide1", true, false);
 }

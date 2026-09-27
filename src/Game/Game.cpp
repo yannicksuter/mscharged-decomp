@@ -255,6 +255,47 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     WorldDarkening::Instance().fn_801AF550();
 }
 
+inline void cGame::ResetGameFields()
+{
+    mUnidentified020 = false;
+    m_nLastTeamToScore = 1;
+    mUnidentified028 = 0;
+    mUnidentified02C = 0;
+    mUnidentified030 = 0;
+    mUnidentified034 = 0;
+    mUnidentified038 = 0;
+    mUnidentified03C = 0;
+    mbCaptainShotToScoreOn = false;
+    mUnidentified041 = false;
+    mUnidentified042 = false;
+    m_pScorer = 0;
+    m_pAssister = 0;
+    m_pTeamTouch[1] = 0;
+    m_pTeamTouch[0] = 0;
+    for (int i = 0; i < 10; i++)
+    {
+        m_pRandomPlayersArray[i] = 0;
+    }
+    mUnidentified07C = kGameTweakZero;
+    mUnidentified080 = kGameTweakZero;
+    mUnidentified084 = kGameTweakZero;
+    mUnidentified088 = lbl_806E3740;
+    mUnidentified08C = lbl_806E3748;
+    mUnidentified090 = lbl_806E3740;
+    mUnidentified094 = lbl_806E3748;
+    mUnidentified098 = kGameTweakZero;
+    mUnidentified09C = kGameTweakZero;
+    mUnidentified0A0 = kGameTweakZero;
+    mUnidentified0A4 = 0;
+    mUnidentified0A6 = 0;
+    mUnidentified0A8 = 0;
+    float initialTilt = -kGameTweakZero;
+    fn_8005B330(&mTiltDirection, initialTilt, initialTilt);
+    mUnidentified0B8 = lbl_806DBA68;
+    mUnidentified0BC = false;
+    mUnidentified0BD = false;
+}
+
 cGame::cGame(void* param1, int param2, bool param3)
     : mUnidentified0C0((bool*)mUnidentified0D0, 0, 0, 100)
     , mUnidentified134((bool*)mUnidentified144, 0, 0, 16)
@@ -282,49 +323,7 @@ cGame::cGame(void* param1, int param2, bool param3)
         FuzzyTweaks("/ini/FuzzyTweaks.ini", "/Game/Fuzzy");
     gGameTweaks.m_pGameTweaks->fn_800756B4();
 
-    mUnidentified020 = false;
-    m_nLastTeamToScore = 1;
-    mUnidentified028 = 0;
-    mUnidentified02C = 0;
-    mUnidentified030 = 0;
-    mUnidentified034 = 0;
-    mUnidentified038 = 0;
-    mUnidentified03C = 0;
-    mbCaptainShotToScoreOn = false;
-    mUnidentified041 = false;
-    mUnidentified042 = false;
-    m_pScorer = 0;
-    m_pAssister = 0;
-    m_pTeamTouch[0] = 0;
-    m_pTeamTouch[1] = 0;
-    m_pRandomPlayersArray[0] = 0;
-    m_pRandomPlayersArray[1] = 0;
-    m_pRandomPlayersArray[2] = 0;
-    m_pRandomPlayersArray[3] = 0;
-    m_pRandomPlayersArray[4] = 0;
-    m_pRandomPlayersArray[5] = 0;
-    m_pRandomPlayersArray[6] = 0;
-    m_pRandomPlayersArray[7] = 0;
-    m_pRandomPlayersArray[8] = 0;
-    m_pRandomPlayersArray[9] = 0;
-    mUnidentified07C = kGameTweakZero;
-    mUnidentified080 = kGameTweakZero;
-    mUnidentified084 = kGameTweakZero;
-    mUnidentified088 = lbl_806E3740;
-    mUnidentified08C = lbl_806E3748;
-    mUnidentified090 = lbl_806E3740;
-    mUnidentified094 = lbl_806E3748;
-    mUnidentified098 = kGameTweakZero;
-    mUnidentified09C = kGameTweakZero;
-    mUnidentified0A0 = kGameTweakZero;
-    mUnidentified0A4 = 0;
-    mUnidentified0A6 = 0;
-    mUnidentified0A8 = 0;
-    float initialTilt = -kGameTweakZero;
-    fn_8005B330(&mTiltDirection, initialTilt, initialTilt);
-    mUnidentified0B8 = lbl_806DBA68;
-    mUnidentified0BC = false;
-    mUnidentified0BD = false;
+    ResetGameFields();
     mUnidentified0C0.mStart = 0;
     mUnidentified0C0.mSize = 0;
     mUnidentified134.mStart = 0;
@@ -637,50 +636,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
         ChangeGameState(0);
     }
 
-    mUnidentified020 = false;
-    m_nLastTeamToScore = 1;
-    mUnidentified028 = 0;
-    mUnidentified02C = 0;
-    mUnidentified030 = 0;
-    mUnidentified034 = 0;
-    mUnidentified038 = 0;
-    mUnidentified03C = 0;
-    mbCaptainShotToScoreOn = false;
-    mUnidentified041 = false;
-    mUnidentified042 = false;
-    m_pScorer = 0;
-    m_pAssister = 0;
-    m_pTeamTouch[1] = 0;
-    m_pTeamTouch[0] = 0;
-    m_pRandomPlayersArray[0] = 0;
-    m_pRandomPlayersArray[1] = 0;
-    m_pRandomPlayersArray[2] = 0;
-    m_pRandomPlayersArray[3] = 0;
-    m_pRandomPlayersArray[4] = 0;
-    m_pRandomPlayersArray[5] = 0;
-    m_pRandomPlayersArray[6] = 0;
-    m_pRandomPlayersArray[7] = 0;
-    m_pRandomPlayersArray[8] = 0;
-    m_pRandomPlayersArray[9] = 0;
-    mUnidentified07C = kGameTweakZero;
-    mUnidentified080 = kGameTweakZero;
-    mUnidentified084 = kGameTweakZero;
-    mUnidentified088 = lbl_806E3740;
-    mUnidentified08C = lbl_806E3748;
-    mUnidentified090 = lbl_806E3740;
-    mUnidentified094 = lbl_806E3748;
-    mUnidentified098 = kGameTweakZero;
-    mUnidentified09C = kGameTweakZero;
-    mUnidentified0A0 = kGameTweakZero;
-    mUnidentified0A4 = 0;
-    mUnidentified0A6 = 0;
-    mUnidentified0A8 = 0;
-    float tilt = -kGameTweakZero;
-    fn_8005B330(&mTiltDirection, tilt, tilt);
-
-    mUnidentified0B8 = lbl_806DBA68;
-    mUnidentified0BC = false;
-    mUnidentified0BD = false;
+    ResetGameFields();
 
     fn_80058498(false, 0, 0);
     fn_80059A1C();

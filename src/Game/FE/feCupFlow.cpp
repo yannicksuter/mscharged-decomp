@@ -9,6 +9,7 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feInlineHasher.h"
+#include "Game/FE/feInput.h"
 #include "Game/FE/feFinder_impl.h"
 #include "Game/FE/feMusic.h"
 #include "Game/FE/fePopupMenu.h"
@@ -25,6 +26,8 @@
 bool gMainMenuInputResetPending;
 int gCupAwardModelCount;
 StadiumGoalObject_8027A2C8* gCupAwardModels[10];
+unsigned int gFEControllerIndex;
+bool gFEPointerEnabled[4];
 
 extern const int sCupPageOrder[3] = { 4, 5, 6 };
 extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
@@ -51,50 +54,57 @@ CupTrophyUnlock_8051B770 lbl_8051B770[] = {
     { nlStringHash("8"), 0x100 },
 };
 
+static void fn_80206CF8(int currentPage, bool advance);
+
 void CycleCupPage(int currentPage, bool advance)
 {
-    if ((unsigned int)(currentPage - 4) > 2)
+    if ((unsigned int)(currentPage - 4) <= 2)
     {
-        CycleCupRoundPage(currentPage, advance);
+        fn_80206CF8(currentPage, advance);
     }
     else
     {
-        int currentIndex = 0;
-        for (int i = 0; i < 3; ++i)
-        {
-            if (currentPage == sCupPageOrder[i])
-            {
-                currentIndex = i;
-                break;
-            }
-        }
+        CycleCupRoundPage(currentPage, advance);
+    }
+}
 
-        int nextIndex = currentIndex - 1;
-        if (advance)
+static void fn_80206CF8(int currentPage, bool advance)
+{
+    int currentIndex = 0;
+    for (int i = 0; i < 3; ++i)
+    {
+        if (currentPage == sCupPageOrder[i])
         {
-            nextIndex = currentIndex + 1;
+            currentIndex = i;
+            break;
         }
-        if (nextIndex >= 3)
-        {
-            nextIndex = 0;
-        }
-        else if (nextIndex < 0)
-        {
-            nextIndex = 2;
-        }
+    }
 
-        switch (sCupPageOrder[nextIndex])
-        {
-        case 4:
-            GameSceneManager::Instance()->Push((SceneList)36, SCREEN_NOTHING, true);
-            break;
-        case 5:
-            GameSceneManager::Instance()->Push((SceneList)37, SCREEN_NOTHING, true);
-            break;
-        case 6:
-            GameSceneManager::Instance()->Push((SceneList)38, SCREEN_NOTHING, true);
-            break;
-        }
+    int nextIndex = currentIndex - 1;
+    if (advance)
+    {
+        nextIndex = currentIndex + 1;
+    }
+    if (nextIndex >= 3)
+    {
+        nextIndex = 0;
+    }
+    else if (nextIndex < 0)
+    {
+        nextIndex = 2;
+    }
+
+    switch (sCupPageOrder[nextIndex])
+    {
+    case 4:
+        GameSceneManager::Instance()->Push((SceneList)36, SCREEN_NOTHING, true);
+        break;
+    case 5:
+        GameSceneManager::Instance()->Push((SceneList)37, SCREEN_NOTHING, true);
+        break;
+    case 6:
+        GameSceneManager::Instance()->Push((SceneList)38, SCREEN_NOTHING, true);
+        break;
     }
 }
 
@@ -267,7 +277,7 @@ extern "C" void fn_80207060(bool pad)
     }
 }
 
-void HandleCupBack(bool fromSubPage)
+void HandleCupBack(int fromSubPage)
 {
     if (!fromSubPage)
     {

@@ -408,7 +408,10 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                UnidentifiedDeleteListener(listener);
+                ListenerEntry* entry = UnidentifiedGetEntry(listener);
+                nlDLRingRemove(&mListeners.m_Head, entry);
+                entry->~ListenerEntry();
+                mListeners.m_Allocator.Free(entry);
             }
         }
         this->mCurrentConnection = 0;

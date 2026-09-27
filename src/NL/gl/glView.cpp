@@ -11,6 +11,49 @@
 
 #include <math.h>
 
+const nlMatrix4 gGLViewIdentityMatrix = {
+    { { { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f } } }
+};
+
+class DefaultGLViewInterface : public GLViewInterface
+{
+public:
+    virtual void GetViewMatrix(nlMatrix4& matrix) const
+    {
+        matrix.SetIdentity();
+    }
+
+    virtual void GetProjectionMatrix(nlMatrix4& matrix) const
+    {
+        matrix.SetIdentity();
+    }
+
+    virtual void GetInverseViewMatrix(nlMatrix4& matrix) const
+    {
+        matrix.SetIdentity();
+    }
+
+    virtual void GetViewProjectionMatrix(nlMatrix4& matrix) const
+    {
+        matrix.SetIdentity();
+    }
+
+    virtual const nlMatrix4* GetViewMatrix() const
+    {
+        return &gGLViewIdentityMatrix;
+    }
+
+    virtual const nlMatrix4* GetProjectionMatrix() const
+    {
+        return &gGLViewIdentityMatrix;
+    }
+};
+
+static DefaultGLViewInterface gDefaultViewInterface;
+
 class UnidentifiedPacketSorterTree_8052E504
     : public nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
           DefaultKeyCompare<long> >
@@ -36,6 +79,7 @@ static bool IsSimpleProjection(const nlMatrix4* projection)
     return diagonal
         ? projection->m41 == 0.0f && projection->m42 == 0.0f
             && projection->m43 == 0.0f && projection->m44 == 1.0f
+            && diagonal
         : false;
 }
 
@@ -65,16 +109,15 @@ void glViewProjectPoint(GLView* view, const nlVector3& v3world, nlVector3& v3NDC
 void glViewUnprojectOrthographicPoint(GLView* view, const nlVector3* normalized, nlVector3* viewPosition)
 {
     const nlMatrix4* pProj = view->m_Interface->GetProjectionMatrix();
-    const float xOffset = pProj->m14;
-    const float yOffset = pProj->m24;
-    const float zOffset = pProj->m34;
     const float xScale = pProj->m11;
     const float yScale = pProj->m22;
     const float zScale = pProj->m33;
-    const float x = (normalized->x - xOffset) / xScale;
-    const float y = (normalized->y - yOffset) / yScale;
-    const float z = (normalized->z - zOffset) / zScale;
-    nlVec3Set(*viewPosition, x, y, z);
+    const float xOffset = pProj->m14;
+    const float yOffset = pProj->m24;
+    const float zOffset = pProj->m34;
+    viewPosition->x = (normalized->x - xOffset) / xScale;
+    viewPosition->y = (normalized->y - yOffset) / yScale;
+    viewPosition->z = (normalized->z - zOffset) / zScale;
 }
 
 float glViewGetOrthographicWidth(GLView* view)
@@ -122,41 +165,6 @@ void gl_ViewReset()
 
 void gl_ViewStartup()
 {
-}
-
-const glModelPacket* UnidentifiedPacketSorter_802D033C::fn_0C()
-{
-    if (m_Current == 0)
-        return 0;
-    const glModelPacket* packet = m_Current->entry;
-    m_Current = m_Current->next;
-    return packet;
-}
-
-const glModelPacket* UnidentifiedPacketSorter_802D033C::fn_08()
-{
-    m_Current = m_Head;
-    return fn_0C();
-}
-
-void UnidentifiedPacketSorter_8052E540::fn_10(
-    GLView*, const glModelPacket* packet)
-{
-    ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
-        sizeof(ListEntry<const glModelPacket*>), GLM_Header);
-    entry->next = 0;
-    entry->entry = packet;
-    nlListAddStart(&m_Head, entry, &m_Tail);
-}
-
-void UnidentifiedPacketSorter_8052E554::fn_10(
-    GLView*, const glModelPacket* packet)
-{
-    ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
-        sizeof(ListEntry<const glModelPacket*>), GLM_Header);
-    entry->entry = packet;
-    entry->next = 0;
-    nlListAddEnd(&m_Head, &m_Tail, entry);
 }
 
 class UnidentifiedPacketSorterIterator
@@ -405,39 +413,22 @@ GLRenderPair GLView::GetRenderPair() const
     return glGetBackBufferTarget();
 }
 
-void GLView::BeginRender()
+GLViewIterator::GLViewIterator(GLView* root)
 {
+    m_Depth = -1;
+    Push(Root(root));
 }
 
-void GLView::EndRender()
-{
-}
-
-void GLView::BeginPacket(const glModelPacket*)
-{
-}
-
-void GLView::EndPacket(const glModelPacket*)
-{
-}
-
-inline void GLViewIterator::Push(const GLViewIteratorEntry& entry)
+void GLViewIterator::Push(GLViewIteratorEntry entry)
 {
     GLViewIteratorEntry* stackEntry = &m_Stack[++m_Depth];
     *stackEntry = entry;
 
-    if (entry.view->HasChildren())
+    if (entry.entry->HasChildren())
     {
-        GLViewIteratorEntry childEntry(entry.view->m_Children.m_Head->next,
-            entry.view->m_Children.m_Head->Entry());
-        Push(childEntry);
+        nlListIterator<GLView*> children = entry.entry->m_Children.Begin();
+        Push(*children.CurrentEntry());
     }
-}
-
-GLViewIterator::GLViewIterator(GLView* root)
-{
-    m_Depth = -1;
-    Push(GLViewIteratorEntry::Root(root));
 }
 
 void GLViewIterator::Next()
@@ -445,17 +436,15 @@ void GLViewIterator::Next()
     if (m_Depth < 0)
         return;
 
-    if (m_Stack[m_Depth].next.IsValid())
+    if (m_Stack[m_Depth].next != 0)
     {
-        m_Stack[m_Depth] =
-            *(GLViewIteratorEntry*)m_Stack[m_Depth].next.CurrentEntry();
+        m_Stack[m_Depth] = *m_Stack[m_Depth].next;
 
-        GLView* view = m_Stack[m_Depth].view;
+        GLView* view = m_Stack[m_Depth].entry;
         if (view->HasChildren())
         {
-            GLViewIteratorEntry childEntry(view->m_Children.m_Head->next,
-                view->m_Children.m_Head->Entry());
-            Push(childEntry);
+            nlListIterator<GLView*> children = view->m_Children.Begin();
+            Push(*children.CurrentEntry());
         }
     }
     else
@@ -466,7 +455,7 @@ void GLViewIterator::Next()
 GLView* GLViewIterator::Current() const
 {
     if (m_Depth >= 0)
-        return m_Stack[m_Depth].view;
+        return m_Stack[m_Depth].entry;
     return 0;
 }
 
@@ -474,9 +463,6 @@ bool GLViewIterator::IsDone() const
 {
     return m_Depth < 0;
 }
-
-extern const nlMatrix4 gGLViewIdentityMatrix;
-
 
 void glViewCompact()
 {
@@ -490,36 +476,4 @@ void glViewCompact()
     }
 }
 
-GLViewInterface gDefaultViewInterface;
-
 GLView gRootView;
-
-void GLViewInterface::GetViewMatrix(nlMatrix4& matrix) const
-{
-    matrix.SetIdentity();
-}
-
-void GLViewInterface::GetProjectionMatrix(nlMatrix4& matrix) const
-{
-    matrix.SetIdentity();
-}
-
-void GLViewInterface::GetInverseViewMatrix(nlMatrix4& matrix) const
-{
-    matrix.SetIdentity();
-}
-
-void GLViewInterface::GetViewProjectionMatrix(nlMatrix4& matrix) const
-{
-    matrix.SetIdentity();
-}
-
-const nlMatrix4* GLViewInterface::GetViewMatrix() const
-{
-    return &gGLViewIdentityMatrix;
-}
-
-const nlMatrix4* GLViewInterface::GetProjectionMatrix() const
-{
-    return &gGLViewIdentityMatrix;
-}

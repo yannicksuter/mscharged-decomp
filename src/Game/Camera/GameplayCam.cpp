@@ -194,7 +194,7 @@ static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutra
 
     if (pBallOwner == NULL)
     {
-        pBallOwner = g_pBall->m_pPassTarget;
+        pBallOwner = g_pBall->fn_800C2EC0();
     }
 
     int nNewKnotTable;

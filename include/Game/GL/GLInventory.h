@@ -88,6 +88,13 @@ public:
         m_pItems->Clear();
     }
 
+    template <typename CallbackType>
+    void Walk(CallbackType* cbClass,
+        void (CallbackType::*cb)(const unsigned long&, ValueType**))
+    {
+        m_pItems->Walk(cbClass, cb);
+    }
+
     Tree* m_pItems;
 };
 
@@ -131,6 +138,13 @@ public:
         m_pItems->Clear();
     }
 
+    template <typename CallbackType>
+    void Walk(CallbackType* cbClass,
+        void (CallbackType::*cb)(const unsigned long&, ValueType**))
+    {
+        m_pItems->Walk(cbClass, cb);
+    }
+
     Tree* m_pItems;
 };
 
@@ -160,6 +174,8 @@ public:
     void AddSkinData(unsigned long key, nlChunk* skinData);
     GLSkinMesh* MakeSkinMesh(unsigned long hashID, cSHierarchy* hierarchy);
     void Update(float deltaTime);
+    void UpdateTextureAnims(float dt);
+    void UpdateVertexAnims(float dt);
 
     /* 0x000 */ ModelReleaseCallback mModelReleaseCallback;
     /* 0x004 */ nlListContainer<void*>* m_pFileData[16];

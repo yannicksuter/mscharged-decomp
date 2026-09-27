@@ -76,7 +76,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
-            Function2<bool, const u32&, bool*>(
+            Function<bool(const u32&, bool*)>(
                 UnidentifiedAudioInstanceVisitor(effect)));
     }
 
@@ -104,7 +104,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
-            Function2<bool, const u32&, bool*>(
+            Function<bool(const u32&, bool*)>(
                 UnidentifiedAudioInstanceVisitor(effect)));
     }
 
@@ -201,7 +201,7 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
-            Function2<bool, const u32&, bool*>(
+            Function<bool(const u32&, bool*)>(
                 UnidentifiedAudioInstanceVisitor(effect)));
     }
 

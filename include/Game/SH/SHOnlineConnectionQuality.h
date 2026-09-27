@@ -27,6 +27,7 @@ public:
     void OnDecisionPointerEnter(unsigned int index, void* context);
     void OnDecisionPointerLeave(unsigned int index, void* context);
     void CloseConnectionsAndReturn();
+    void ShowError(int error);
 
     /* 0x01C */ unsigned int mUnidentified01C;
     /* 0x020 */ int mUnidentified020[4];

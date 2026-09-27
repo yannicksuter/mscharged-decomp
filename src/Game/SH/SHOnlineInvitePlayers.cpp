@@ -93,142 +93,6 @@ void SHOnlineInvitePlayers::RefreshRows()
         SetPlayerRow(7, i);
 }
 
-void SHOnlineInvitePlayers::InitializeButtons()
-{
-    typedef Detail::MemFunImpl<void, void (SHOnlineInvitePlayers::*)(int, void*)> PointerMethod;
-    typedef BindExp3<void, PointerMethod, SHOnlineInvitePlayers*, Placeholder<0>, Placeholder<1> > PointerBinding;
-
-    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback select(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cancelOver(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cancelOff(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cancelSelect(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback startOver(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback startOff(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback startSelect(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    mStartButton.SetPointerEnterCallback(startOver);
-    mStartButton.SetPointerLeaveCallback(startOff);
-    mStartButton.SetPointerPressCallback(startSelect);
-    for (int i = 0; i < 4; ++i)
-    {
-        feVector3 position = mRowInstances[i]->GetAssetPosition();
-        mInviteButtons[i].SetInstanceBounds(mRowInstances[i], true, -24.0f, 10.0f, 0.7f, 0.55f);
-        mInviteButtons[i].SetPointerEnterCallback(over);
-        mInviteButtons[i].SetPointerLeaveCallback(off);
-        mInviteButtons[i].SetPointerPressCallback(select);
-        mCancelButtons[i].SetInstanceBounds(mCancelInstances[i], true, position.f.x, position.f.y, 1.0f, 1.4f);
-        mCancelButtons[i].SetPointerEnterCallback(cancelOver);
-        mCancelButtons[i].SetPointerLeaveCallback(cancelOff);
-        mCancelButtons[i].SetPointerPressCallback(cancelSelect);
-    }
-}
-
-void SHOnlineInvitePlayers::OnInvitePointerEnter(int index, void* context)
-{
-    FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-    ++mHoverCounts[(int)context];
-    mRowInstances[(int)context]->SetActiveSlide("over", true, false);
-    mInviteButtons[(int)context].SetPointerState(1, index);
-}
-
-void SHOnlineInvitePlayers::OnInvitePointerLeave(int index, void* context)
-{
-    --mHoverCounts[(int)context];
-    mRowInstances[(int)context]->SetActiveSlide("off", true, false);
-    mInviteButtons[(int)context].SetPointerState(0, index);
-}
-
-void SHOnlineInvitePlayers::OnInvitePointerPress(int index, void* context)
-{
-    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-    SetOnlineFriendSelectionMode(1);
-    SetOnlineFriendSelectionContext(context);
-    GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
-}
-
-void SHOnlineInvitePlayers::OnCancelPointerEnter(int index, void* context)
-{
-    FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
-    ++mHoverCounts[(int)context];
-    mCancelInstances[(int)context]->SetActiveSlide("over", true, false);
-    mCancelButtons[(int)context].SetPointerState(1, index);
-}
-
-void SHOnlineInvitePlayers::OnCancelPointerLeave(int index, void* context)
-{
-    --mHoverCounts[(int)context];
-    mCancelInstances[(int)context]->SetActiveSlide("off", true, false);
-    mCancelButtons[(int)context].SetPointerState(0, index);
-}
-
-void SHOnlineInvitePlayers::OnCancelPointerPress(int, void*)
-{
-    FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
-    g_pFriendManager->SetOwnStatusInitial(0);
-    mDeclinedFriendIndex = -1;
-    mDeclinedDisplayTime = 0.0f;
-    RefreshRows();
-}
-
-void SHOnlineInvitePlayers::OnStartPointerEnter(int index, void*)
-{
-    mStartButtonInstance->SetActiveSlide("over", true, false);
-    mStartButton.SetPointerState(1, index);
-    FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-    mStartHovered = true;
-}
-
-void SHOnlineInvitePlayers::OnStartPointerLeave(int index, void*)
-{
-    mStartButtonInstance->SetActiveSlide("off", true, false);
-    mStartButton.SetPointerState(0, index);
-    mStartHovered = false;
-}
-
-void SHOnlineInvitePlayers::OnStartPointerPress(int, void*)
-{
-    mBackButton.Disable();
-    mStartButton.Disable();
-    mStartingMatch = true;
-    g_pNetworkSession->GetOnlineLobby()->SetFriendHostInviting();
-    for (int i = 0; i < 4; ++i)
-        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-}
-
-void SHOnlineInvitePlayers::OnInvitationErrorDismissed()
-{
-    mPopupActive = false;
-    if (g_pNetworkSession->RequiresDisconnectAfterError())
-    {
-        GameSceneManager::Instance()->Pop();
-        FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
-        FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
-        return;
-    }
-    RefreshRows();
-}
-
-inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
-{
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
-    {
-        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-        menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitationErrorDismissed), this)));
-        mPopupActive = true;
-    }
-}
-
-inline void SHOnlineInvitePlayers::ShowLobbyError(int popup)
-{
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
-    {
-        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-        menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnLobbyErrorDismissed), this)));
-        mPopupActive = true;
-    }
-}
-
 void SHOnlineInvitePlayers::SceneCreated()
 {
     mSlotCount = 0;
@@ -252,14 +116,22 @@ void SHOnlineInvitePlayers::SceneCreated()
         mBackButton.SetBackScene(5);
     }
 
-    TLComponentInstance* scrollbar = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find(
-        mPresentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("scrollbar"), 0, 0, 0, 0);
-    if (scrollbar == 0)
-        scrollbar = &UnidentifiedTLComponentDefault::sInstance;
+    TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        mPresentation->m_currentSlide, "Layer", "scrollbar");
     mScrollBar.SetComponent(scrollbar);
     mScrollBar.SetRange(0);
     mScrollBar.SetValue(0);
-    mBackEnabled = mIsHost && !(mDeclinedDisplayTime > 0.0f) && g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
+    bool backAvailable;
+    if (!mIsHost)
+        backAvailable = false;
+    else if (mDeclinedDisplayTime > 0.0f)
+        backAvailable = false;
+    else
+        backAvailable = g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
+    if (backAvailable)
+        mBackEnabled = true;
+    else
+        mBackEnabled = false;
     SHNavigation* screen = GetNavigationScene();
     screen->SetButtons(0x24, true);
     mBackButtonInstance = screen->GetButton(4);
@@ -284,25 +156,18 @@ void SHOnlineInvitePlayers::SceneCreated()
     {
         char name[0x10];
         nlSNPrintf(name, sizeof(name), "FRIEND_%d", i);
-        mRowInstances[i] = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find(
-            presentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash(name), 0, 0, 0, 0);
-        TLInstance* over = FEFinder<TLInstance, 5>::Find(mRowInstances[i],
-            nlStringLowerHash("over"), nlStringLowerHash("FRIEND_0"), 0, 0, 0, 0);
-        TLInstance* off = FEFinder<TLInstance, 5>::Find(mRowInstances[i],
-            nlStringLowerHash("off"), nlStringLowerHash("FRIEND_0"), 0, 0, 0, 0);
-        mCancelInstances[i] = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find(
-            over, nlStringLowerHash("cancel"), 0, 0, 0, 0, 0);
-        TLInstance* image = FEFinder<TLComponentInstance, 4>::_Find(
-            over, nlStringLowerHash("Mii_btn"), nlStringLowerHash("logo_32x32"), 0, 0, 0, 0);
+        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindChecked(presentation->m_currentSlide, "Layer", name);
+        TLInstance* over = FEFinder<TLInstance, 5>::Find(mRowInstances[i], "over", "FRIEND_0");
+        TLInstance* off = FEFinder<TLInstance, 5>::Find(mRowInstances[i], "off", "FRIEND_0");
+        mCancelInstances[i] = FEFinder<TLComponentInstance, 4>::Find(over, "cancel");
+        TLInstance* image = FEFinder<TLComponentInstance, 4>::Find(over, "Mii_btn", "logo_32x32");
         image->m_bVisible = false;
         image->SetAssetVisible(false);
-        image = FEFinder<TLComponentInstance, 4>::_Find(
-            off, nlStringLowerHash("Mii_btn"), nlStringLowerHash("logo_32x32"), 0, 0, 0, 0);
+        image = FEFinder<TLComponentInstance, 4>::Find(off, "Mii_btn", "logo_32x32");
         image->m_bVisible = false;
         image->SetAssetVisible(false);
     }
-    TLComponentInstance* timer = (TLComponentInstance*)FEFinder<TLComponentInstance, 4>::_Find(
-        presentation->m_currentSlide, nlStringLowerHash("Layer"), nlStringLowerHash("timer"), 0, 0, 0, 0);
+    TLComponentInstance* timer = FEFinder<TLComponentInstance, 4>::FindChecked(presentation->m_currentSlide, "Layer", "timer");
     timer->m_bVisible = false;
     RefreshLobbySlots();
     RefreshRows();
@@ -379,7 +244,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         else if (mDeclinedDisplayTime > 0.0f)
             backAvailable = false;
         else
-            backAvailable = g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
+            backAvailable = g_pFriendManager->GetOwnStatus()->mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
         if (!backAvailable)
         {
             mBackButtonInstance->m_bVisible = false;
@@ -395,7 +260,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         else if (mDeclinedDisplayTime > 0.0f)
             backAvailable = false;
         else
-            backAvailable = g_pFriendManager->mOwnStatus.mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
+            backAvailable = g_pFriendManager->GetOwnStatus()->mHeader.mStatus != EFriendStatus_HostInvitingPlayer;
         if (backAvailable)
         {
             mBackButtonInstance->m_bVisible = true;
@@ -445,7 +310,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
             }
         }
     }
-    if (g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer && g_pFriendManager->HasFriendDeclined())
+    if (g_pFriendManager->GetOwnStatus()->mHeader.mStatus == EFriendStatus_HostInvitingPlayer && g_pFriendManager->HasFriendDeclined())
     {
         mDeclinedFriendIndex = g_pFriendManager->mFriendStatusIndex;
         g_pFriendManager->SetOwnStatusInitial(0);
@@ -463,7 +328,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         }
     }
     else if (mInvitationTimeout > 0.0f && (mInvitationTimeout -= fDeltaT) <= 0.0f
-        && g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer
+        && g_pFriendManager->GetOwnStatus()->mHeader.mStatus == EFriendStatus_HostInvitingPlayer
         && g_pFriendManager->GetFriendInvitationResponse() == 0)
     {
         g_pFriendManager->SetOwnStatusInitial(0);
@@ -488,7 +353,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
     }
     else if (lobby->mCancelRequested)
     {
-        if (g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer)
+        if (g_pFriendManager->GetOwnStatus()->mHeader.mStatus == EFriendStatus_HostInvitingPlayer)
         {
             mDeclinedFriendIndex = g_pFriendManager->mFriendStatusIndex;
             g_pFriendManager->SetOwnStatusInitial(0);
@@ -670,6 +535,129 @@ void SHOnlineInvitePlayers::HidePlayerPortrait(int index)
     image->SetAssetVisible(false);
 }
 
+void SHOnlineInvitePlayers::InitializeButtons()
+{
+    typedef Detail::MemFunImpl<void, void (SHOnlineInvitePlayers::*)(int, void*)> PointerMethod;
+    typedef BindExp3<void, PointerMethod, SHOnlineInvitePlayers*, Placeholder<0>, Placeholder<1> > PointerBinding;
+
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback select(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnInvitePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cancelOver(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cancelOff(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cancelSelect(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnCancelPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback startOver(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback startOff(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback startSelect(PointerBinding(MemFun(&SHOnlineInvitePlayers::OnStartPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    mStartButton.SetPointerEnterCallback(startOver);
+    mStartButton.SetPointerLeaveCallback(startOff);
+    mStartButton.SetPointerPressCallback(startSelect);
+    for (int i = 0; i < 4; ++i)
+    {
+        feVector3 position = mRowInstances[i]->GetAssetPosition();
+        mInviteButtons[i].SetInstanceBounds(mRowInstances[i], true, -24.0f, 10.0f, 0.7f, 0.55f);
+        mInviteButtons[i].SetPointerEnterCallback(over);
+        mInviteButtons[i].SetPointerLeaveCallback(off);
+        mInviteButtons[i].SetPointerPressCallback(select);
+        mCancelButtons[i].SetInstanceBounds(mCancelInstances[i], true, position.f.x, position.f.y, 1.0f, 1.4f);
+        mCancelButtons[i].SetPointerEnterCallback(cancelOver);
+        mCancelButtons[i].SetPointerLeaveCallback(cancelOff);
+        mCancelButtons[i].SetPointerPressCallback(cancelSelect);
+    }
+}
+
+inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    {
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitationErrorDismissed), this)));
+        mPopupActive = true;
+    }
+}
+
+inline void SHOnlineInvitePlayers::ShowLobbyError(int popup)
+{
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    {
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnLobbyErrorDismissed), this)));
+        mPopupActive = true;
+    }
+}
+
+void SHOnlineInvitePlayers::OnInvitePointerEnter(int index, void* context)
+{
+    FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
+    ++mHoverCounts[(int)context];
+    mRowInstances[(int)context]->SetActiveSlide("over", true, false);
+    mInviteButtons[(int)context].SetPointerState(1, index);
+}
+
+void SHOnlineInvitePlayers::OnInvitePointerLeave(int index, void* context)
+{
+    --mHoverCounts[(int)context];
+    mRowInstances[(int)context]->SetActiveSlide("off", true, false);
+    mInviteButtons[(int)context].SetPointerState(0, index);
+}
+
+void SHOnlineInvitePlayers::OnInvitePointerPress(int index, void* context)
+{
+    FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
+    SetOnlineFriendSelectionMode(1);
+    SetOnlineFriendSelectionContext(context);
+    GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
+}
+
+void SHOnlineInvitePlayers::OnCancelPointerEnter(int index, void* context)
+{
+    FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
+    ++mHoverCounts[(int)context];
+    mCancelInstances[(int)context]->SetActiveSlide("over", true, false);
+    mCancelButtons[(int)context].SetPointerState(1, index);
+}
+
+void SHOnlineInvitePlayers::OnCancelPointerLeave(int index, void* context)
+{
+    --mHoverCounts[(int)context];
+    mCancelInstances[(int)context]->SetActiveSlide("off", true, false);
+    mCancelButtons[(int)context].SetPointerState(0, index);
+}
+
+void SHOnlineInvitePlayers::OnCancelPointerPress(int, void*)
+{
+    FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
+    g_pFriendManager->SetOwnStatusInitial(0);
+    mDeclinedFriendIndex = -1;
+    mDeclinedDisplayTime = 0.0f;
+    RefreshRows();
+}
+
+void SHOnlineInvitePlayers::OnStartPointerEnter(int index, void*)
+{
+    mStartButtonInstance->SetActiveSlide("over", true, false);
+    mStartButton.SetPointerState(1, index);
+    FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
+    mStartHovered = true;
+}
+
+void SHOnlineInvitePlayers::OnStartPointerLeave(int index, void*)
+{
+    mStartButtonInstance->SetActiveSlide("off", true, false);
+    mStartButton.SetPointerState(0, index);
+    mStartHovered = false;
+}
+
+void SHOnlineInvitePlayers::OnStartPointerPress(int, void*)
+{
+    mBackButton.Disable();
+    mStartButton.Disable();
+    mStartingMatch = true;
+    g_pNetworkSession->GetOnlineLobby()->SetFriendHostInviting();
+    for (int i = 0; i < 4; ++i)
+        GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
+}
+
 void SHOnlineInvitePlayers::OnLobbyErrorDismissed()
 {
     mPopupActive = false;
@@ -687,4 +675,17 @@ void SHOnlineInvitePlayers::OnLobbyErrorDismissed()
     }
     g_pFriendManager->SetOwnStatusAvailable();
     GameSceneManager::Instance()->Push((SceneList)g_pFriendManager->mReturnScene, SCREEN_BACK, true);
+}
+
+void SHOnlineInvitePlayers::OnInvitationErrorDismissed()
+{
+    mPopupActive = false;
+    if (g_pNetworkSession->RequiresDisconnectAfterError())
+    {
+        GameSceneManager::Instance()->Pop();
+        FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
+        FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
+        return;
+    }
+    RefreshRows();
 }

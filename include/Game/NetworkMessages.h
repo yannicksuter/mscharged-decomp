@@ -189,7 +189,7 @@ public:
     virtual int GetType();
 
     /* 0x08 */ u8 mMachineIndex;
-    /* 0x09 */ u8 mSide;
+    /* 0x09 */ s8 mSide;
     /* 0x0A */ bool mGuest;
     /* 0x0B */ u8 mAccepted;
 };

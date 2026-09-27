@@ -39,6 +39,7 @@ public:
     virtual void Cancel();
     virtual bool ConsumeScreenGrabRequest();
 
+    float GetDuration();
     void InitializeFromParser(SimpleParser* parser);
     TransitionModifierInterface* GetModifierFromName(char* pName);
 

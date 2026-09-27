@@ -1,5 +1,6 @@
 #include "NL/nlSingleton.inl"
 #include "NL/nlFunction.inl"
+#include "NL/nlBindMember.h"
 #include "Game/TweakQuery.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/NetworkMessageRegistry.h"
@@ -74,11 +75,6 @@ struct UnidentifiedVersionInfo
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Game.h"
-
-typedef Detail::MemFunImpl<void, void (NetworkSession::*)()>
-    NetworkSessionCallback;
-typedef BindExp1<void, NetworkSessionCallback, NetworkSession*>
-    NetworkSessionBinding;
 
 static inline void PushAllocator(MemoryAllocator* pAllocator)
 {
@@ -329,7 +325,7 @@ void NetworkSession::SendGameStartToEveryone()
 }
 
 void NetworkSession::SendDraftToEveryone(
-    int count, NetworkDraftMachineInfo* entries, bool unused, u8 flag)
+    int count, NetworkDraftMachineInfo* entries, bool unused, bool flag)
 {
     NetMessageDraft message;
     message.mMachineCount = count;
@@ -1657,18 +1653,14 @@ static inline void RecordGameConfig(
     }
 }
 
-typedef void (NetworkSession::*UnidentifiedSessionCallback)();
-
 static inline void RegisterLoadedGameActions(NetworkSession* session)
 {
-    Function<FnVoidVoid> first(NetworkSessionBinding(
-        MemFun<NetworkSession, void>(&NetworkSession::OnPauseGame), session));
+    Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
     UnidentifiedTypedEvent<UnidentifiedEventNoData>* pauseEvent
         = &g_pGame->mUnidentified49C.mEvent00;
     pauseEvent->Add(first, (unsigned int)&session->mUnidentified2464, -1);
 
-    Function<FnVoidVoid> second(NetworkSessionBinding(
-        MemFun<NetworkSession, void>(&NetworkSession::OnResumingGame), session));
+    Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
     UnidentifiedTypedEvent<UnidentifiedEventNoData>* resumingEvent
         = &g_pGame->mUnidentified49C.mEvent01;
     resumingEvent->Add(second, (unsigned int)&session->mUnidentified2468, -1);
@@ -2226,9 +2218,8 @@ void StartSinglePlayerGame()
     online.Shutdown();
     g_pNetworkSessionBase->InitializeMachines(1, 4);
 
-    int player;
     NetworkPeer* peer = g_pNetworkSessionBase->GetPeer(0);
-    for (player = 0; player < (int)peer->mPlayerCount; ++player)
+    for (int player = 0; player < (int)peer->mPlayerCount; ++player)
     {
         (peer->GetNetworkPeerChannel(player))->Initialize(peer, (s8)player, player);
     }

@@ -1441,15 +1441,7 @@ bool cFielder::fn_800344B0() const
 
 extern "C" bool fn_800344DC(cFielder* pFielder, const nlVector3* position)
 {
-    bool bUnidentified = false;
-    bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                       pFielder->mUnidentified428->mScriptMachine, 0x1D))
-                      ->IsUnidentifiedState(1)
-        || ((DesireFrozen*)fn_80319FC0(
-                pFielder->mUnidentified428->mScriptMachine, 0x1D))
-               ->IsUnidentifiedState(2);
-    if (!bFrozen && (pFielder->muInvincibleStatus & 2))
-        bUnidentified = true;
+    bool bUnidentified = pFielder->UnidentifiedInvincibleStatus2();
 
     s16 facingDelta = pFielder->GetFacingDeltaToPosition(*position);
     bool result = false;

@@ -146,7 +146,7 @@ void glRegisterTexture(unsigned long texture, PlatTexture* platformTexture,
 void glReleaseTexture(PlatTexture* texture)
 {
     glTextureManager* manager = gTextureManager;
-    u32 index = texture->m_TextureIndex;
+    u32 index = texture->GetTextureIndex();
     manager->mFreeIndices->AddEnd((u16)index);
     manager->mTextures[index] = 0;
     texture->m_TextureIndex = 0xFFFF;

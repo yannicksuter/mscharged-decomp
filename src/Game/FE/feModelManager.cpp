@@ -99,19 +99,10 @@ public:
 }; // size: 0xDC
 
 
-static const GLMemoryRequirement sLoaderConfiguration[2] = {
-    { GLM_Header, 0x8000 },
-    { GLM_VertexData, 0x100000 },
-};
 static char sDefaultAnimation[] = "fe_idle";
 
 FEModel::FEModel(tCharacterTemplateInfo* modelData)
-    : mType((FEModelType)-1)
-    , mAnimations(0)
-    , mHierarchies(0)
-    , mLoader(0)
-    , mLoaderHandle(0)
-    , mModelID(0)
+    : mModelID(-1)
     , mUnidentified1C(0)
     , mModelData(modelData)
     , mTextureFileData(0)
@@ -133,7 +124,11 @@ FEModel::FEModel(tCharacterTemplateInfo* modelData)
 
     mHierarchies = new (8, false) cInventory<cSHierarchy>;
 
-    mLoader = glCreateResourcePool(sLoaderConfiguration, 2, "FEModelManager");
+    GLMemoryRequirement requirements[2] = {
+        { GLM_Header, 0x8000 },
+        { GLM_VertexData, 0x100000 },
+    };
+    mLoader = glCreateResourcePool(requirements, 2, "FEModelManager");
     mLoaderHandle = mLoader->MarkResource();
 }
 

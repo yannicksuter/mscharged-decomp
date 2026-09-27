@@ -187,6 +187,11 @@ public:
         }
     }
 
+    bool Walk(Function2<bool, KeyType&, ValueType&>* callback)
+    {
+        return InorderWalk(m_Root, callback);
+    }
+
     template <typename CallbackType>
     bool InorderWalk(Entry* curr, CallbackType* callback)
     {

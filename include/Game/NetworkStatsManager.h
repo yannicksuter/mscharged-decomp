@@ -20,6 +20,7 @@ enum NetworkPersistentCategory
 struct NetworkLeaderboardCategory
 {
     int FindPlayer(int profileId) const;
+    int GetCount() const { return mCount; }
 
     /* 0x0000 */ NetworkPersistentCategory mPersistentCategory;
     /* 0x0004 */ int mFilter;

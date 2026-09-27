@@ -313,6 +313,13 @@ public:
             result = true;
         return result;
     }
+    bool UnidentifiedInvincibleStatus2() const
+    {
+        bool result = false;
+        if (!IsStuck() && (muInvincibleStatus & 2))
+            result = true;
+        return result;
+    }
     bool IsInvincibleChars() const
     {
         bool result = !IsStuck() && (muInvincibleStatus & 1);

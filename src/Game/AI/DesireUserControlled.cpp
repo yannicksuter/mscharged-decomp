@@ -52,8 +52,7 @@ void DesireUserControlled::Update(
     bool bHasPad = (bool)m_pFielder->GetGlobalPad();
     if (!bHasPad)
     {
-        *update = FuzzyVariant(FT_INT, 1);
-        update->mTemporary = false;
+        *update = 1;
         return;
     }
 
@@ -61,11 +60,8 @@ void DesireUserControlled::Update(
     {
         return;
     }
-    else if (m_pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
-    {
-        return;
-    }
-    else if (m_pFielder->m_eActionState == ACTION_SHOT)
+    else if (m_pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
+        || m_pFielder->GetActionState() == ACTION_SHOT)
     {
         return;
     }
@@ -112,8 +108,9 @@ void DesireUserControlled::Update(
             m_pFielder->bIsModified
                 = m_pFielder->IsActionModifierPressed();
             u8 bIsShotActive = true;
+            eShotMeterState state;
             ShotMeter* pShotMeter = m_pFielder->m_pShotMeter;
-            eShotMeterState state = pShotMeter->m_eShotMeterState;
+            state = pShotMeter->m_eShotMeterState;
             if (state != SHOT_METER_ACTIVE
                 && state != SHOT_METER_STS_ACTIVE)
             {
@@ -143,8 +140,7 @@ void DesireUserControlled::Update(
             if (pShotMeter->m_eShotMeterState
                 == SHOT_METER_STS_TRANSISTION)
             {
-                *update = FuzzyVariant(FT_INT, 3);
-                update->mTemporary = false;
+                *update = 3;
                 update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC3AC));
             }
             return;
@@ -171,26 +167,19 @@ void DesireUserControlled::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x7C0 | 0x800D4C4C | size: 0xC8
  */
-void DesireUserControlled::UnidentifiedVirtual8(
+inline void DesireUserControlled::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireUserControlled");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition,
-        "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition,
-        "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x888 | 0x800D4D14 | size: 0x9C
  */
-void DesireUserControlled::UnidentifiedVirtual7(
+inline void DesireUserControlled::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireUserControlledType == 0xFFFF)
@@ -208,6 +197,6 @@ void DesireUserControlled::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x924 | 0x800D4DB0 | size: 0x5C
  */
-DesireUserControlled::~DesireUserControlled()
+inline DesireUserControlled::~DesireUserControlled()
 {
 }
