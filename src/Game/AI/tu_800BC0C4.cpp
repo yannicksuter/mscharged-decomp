@@ -295,6 +295,7 @@ void DesireGooey::UnidentifiedCleanup()
  */
 bool DesireShrink::UnidentifiedInitialize(void* context)
 {
+    cFielder* source;
     bool result = Desire::UnidentifiedInitialize(context);
     mUnidentified078 = lbl_806DC168;
     mfSlowPercentage = 1.0f;
@@ -313,10 +314,10 @@ bool DesireShrink::UnidentifiedInitialize(void* context)
 
     UnidentifiedVariantCollection* params
         = (UnidentifiedVariantCollection*)context;
-    cFielder* source = (cFielder*)params->Get(14)->mData.pointer;
+    source = (cFielder*)params->Get(14)->mData.pointer;
     m_pFielder->fn_8003063C(source->mUnidentified328);
     m_pFielder->m_pTweaks->mUnidentified004
-        = m_pFielder->mUnidentified32C->mUnidentified004;
+        = m_pFielder->mUnidentified32C->mUnidentified004.GetValue();
     m_pFielder->m_pTweaks->mUnidentified014
         = fn_8002BFA8(m_pFielder->mUnidentified32C, 1.0f);
     fn_801BA510(m_pFielder);
@@ -340,7 +341,7 @@ bool DesireShrink::UnidentifiedInitialize(void* context)
     }
 
     if (g_pGame->IsGameplayOrOvertime()
-        && g_pGame->GetGameState() != 4)
+        && g_pGame->m_eGameState != 4)
     {
         PlaySound(source->mUnidentified318, 0xE6E31092, 0, 0);
     }

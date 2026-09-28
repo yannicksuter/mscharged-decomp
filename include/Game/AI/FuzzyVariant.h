@@ -248,6 +248,8 @@ public:
 
     UnidentifiedVariant_80054AB8& operator=(const UnidentifiedVariant_80054AB8& other);
 
+    UnidentifiedVariant_80054AB8& operator=(UnidentifiedVariant_80054AB8* other);
+
     UnidentifiedVariant_80054AB8& operator=(int input);
 
     UnidentifiedVariant_80054AB8& SetDesireFinished();
@@ -400,6 +402,19 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
 
     ExtraData = other.ExtraData;
     mTemporary = false;
+    return *this;
+}
+
+inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
+    UnidentifiedVariant_80054AB8* other)
+{
+    FuzzyVariant::operator=(*other);
+    ExtraData = other->ExtraData;
+    mTemporary = false;
+    if (other->mTemporary)
+    {
+        delete other;
+    }
     return *this;
 }
 

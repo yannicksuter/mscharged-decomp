@@ -1,4 +1,5 @@
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/AudioResourcePlatform.h"
 #include "Game/Audio/AudioStreamSource.h"
 
 #include "Game/Audio/AudioBackend.h"
@@ -157,7 +158,7 @@ AudioSampleSource::AudioSampleSource()
 void AudioSampleSource::Initialize(AudioSourceInfo* info)
 {
     m_Unknown08 = info;
-    m_Unknown20 = SPGetSoundEntry(info->m_Unknown18->m_Unknown18.m_SoundTable, info->m_Unknown00);
+    m_Unknown20 = SPGetSoundEntry(((AudioMemoryLoader*)info->m_Unknown18)->m_SoundTable, info->m_Unknown00);
     m_Unknown1C = AXAcquireVoice(15, OnVoiceDropped, (unsigned long)this);
     if (m_Unknown1C == 0)
         DumpAudioMemory();
@@ -322,7 +323,7 @@ AudioStreamChannel::~AudioStreamChannel()
 
 void AudioStreamChannel::PrepareVoice(AudioStreamHeader* header)
 {
-    unsigned int size = m_Unknown00->m_Unknown08->m_Unknown18->m_Unknown10->m_Unknown04 * 2;
+    unsigned int size = m_Unknown00->m_Unknown08->m_Unknown18->m_Chunk23200->m_Unknown04 * 2;
     unsigned int start = (m_Unknown14 + 1) * 2;
     unsigned int end = (m_Unknown14 + size - 1) * 2;
     AXPBADDR addr;
@@ -418,7 +419,7 @@ void AudioReadState::Initialize(AudioSourceInfo* info)
     while ((channel = GetNextChannel(channel)) != 0)
     {
         channel->m_Unknown00 = this;
-        channel->m_Unknown08 = g_pAudioBackend->AllocateAudioMemory(m_Unknown08->m_Unknown18->m_Unknown10->m_Unknown04 * 2);
+        channel->m_Unknown08 = g_pAudioBackend->AllocateAudioMemory(m_Unknown08->m_Unknown18->m_Chunk23200->m_Unknown04 * 2);
         if (channel->m_Unknown08 == 0)
             DumpAudioMemory();
         channel->m_Unknown04 = AXAcquireVoice(31, AudioStreamChannel::OnVoiceDropped, (unsigned long)channel);

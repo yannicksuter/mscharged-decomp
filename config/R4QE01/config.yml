@@ -100,6 +100,9 @@ block_relocations:
   - { source: 0x802EDC64 }
   - { source: 0x802EDC74 }
   - { source: 0x802EDC84 }
+  # AudioBankLoader::ParseChunk compares chunk ID 0x80023200, which overlaps .text.
+  - { source: 0x802EF6B4 }
+  - { source: 0x802EF6B8 }
   # The platform manager compares chunk ID 0x80023600, which overlaps .text.
   - { source: 0x802EF9C4 }
   - { source: 0x802EF9CC }

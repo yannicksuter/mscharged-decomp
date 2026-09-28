@@ -363,9 +363,10 @@ SkillTweakLoader::SkillTweakLoader(Config* curves, Config* modifiers)
 
 void SkillTweakLoader::Load(const unsigned long& key, SkillTweak** value)
 {
+    SkillTweak* tweak;
     Config* modifiers = mModifiers;
     Config* curves = mCurves;
-    SkillTweak* tweak = *value;
+    tweak = *value;
     tweak->mOverride = -9999.9f;
     Config::String text = curves->Get<Config::String>(tweak->mNameInFile, Config::String("0.12345"));
     tweak->ParseCurve(text.c_str(), text.size());
@@ -374,16 +375,18 @@ void SkillTweakLoader::Load(const unsigned long& key, SkillTweak** value)
         const char* name = modifiers->Get<const char*>(tweak->mNameInFile, "None");
         unsigned long hash = nlStringLowerHash(name);
         SkillTweakModifier* modifier = sSkillTweakModifiers.m_pStart;
-        unsigned long id = 0;
+        unsigned long id;
         while (modifier != 0)
         {
             if (hash == modifier->mHash)
             {
                 id = modifier->mModifier;
-                break;
+                goto modifier_done;
             }
             modifier = modifier->next;
         }
+        id = 0;
+    modifier_done:
         tweak->mModifier = id;
     }
 }

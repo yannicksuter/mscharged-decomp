@@ -103,7 +103,7 @@ public:
     /* 0x1B1 */ u8 unknown_0x1B1[0x03];
     /* 0x1B4 */ nlDLListContainer<EmissionController*> mReplayControllers;
     /* 0x1BC */ nlDLListContainer<EmissionController*> mControllers;
-    /* 0x1C4 */ nlDLListContainer<EmissionController*> mUnidentifiedControllers;
+    /* 0x1C4 */ nlDLListContainer<char*> mUnidentifiedControllers;
     /* 0x1CC */ int mNumParticles;
     /* 0x1D0 */ Particle* mParticleMemory;
     /* 0x1D4 */ nlDLListSlotPool<Particle*> mParticles;

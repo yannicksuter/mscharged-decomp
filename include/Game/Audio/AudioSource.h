@@ -7,6 +7,7 @@
 
 class Plat3dSoundSrc;
 class AudioReadState;
+class AudioBankLoader;
 struct AudioStreamChannel;
 
 struct AudioSourceData
@@ -14,18 +15,6 @@ struct AudioSourceData
     unsigned int m_Unknown00;
     unsigned int m_Unknown04;
     unsigned char m_Unknown08;
-};
-
-struct AudioSourceResource
-{
-    unsigned char m_Unknown00[0x10];
-    AudioSourceData* m_Unknown10;
-    void* m_Unknown14;
-    union
-    {
-        SPSoundTable* m_SoundTable;
-        nlFile* m_File;
-    } m_Unknown18;
 };
 
 struct AudioSourceInfo
@@ -36,7 +25,7 @@ struct AudioSourceInfo
     unsigned int m_Unknown0C;
     unsigned int m_Unknown10;
     unsigned int m_Unknown14;
-    AudioSourceResource* m_Unknown18;
+    AudioBankLoader* m_Unknown18;
 };
 
 class AudioSource

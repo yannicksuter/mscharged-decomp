@@ -24,7 +24,66 @@ static unsigned long fx_sTerrain;
 static unsigned int sResourceIdCounter;
 static const char* sDefaultResourceNames[2] = { "Default", "World" };
 
-class EffectsBundle;
+struct EffectsBundleData
+{
+    unsigned char unknown_0x00[8];
+    unsigned int mNumTemplates;
+    EffectsTemplate** mTemplates;
+    int mNumGroups;
+    EffectsGroup** mGroups;
+};
+
+extern "C" void fn_802EB294(EffectsBundleData*);
+
+class EffectsBundlePayload
+{
+public:
+    void Cleanup()
+    {
+        for (ListEntry<EffectsBundleData*>* entry = mEntries.m_Head;
+             entry != 0; entry = entry->next)
+        {
+            fn_802EB294(entry->entry);
+        }
+        mEntries.Clear();
+
+        while (mAllocations.m_Head != 0)
+        {
+            char* allocation;
+            mAllocations.RemoveStart(&allocation);
+            delete allocation;
+        }
+        mNumEntries = 0;
+    }
+
+    ~EffectsBundlePayload()
+    {
+        Cleanup();
+    }
+
+    /* 0x00 */ nlListContainer<EffectsBundleData*> mEntries;
+    /* 0x0C */ nlListContainer<char*> mAllocations;
+    /* 0x18 */ int mNumEntries;
+};
+
+class EffectsBundle
+{
+public:
+    ~EffectsBundle()
+    {
+        mPayload.Cleanup();
+        if (mData != 0 && !mExternallyOwnedData)
+        {
+            ::operator delete(mData);
+        }
+    }
+
+    /* 0x00 */ EffectsBundle* m_next;
+    /* 0x04 */ EffectsBundle* m_prev;
+    /* 0x08 */ void* mData;
+    /* 0x0C */ EffectsBundlePayload mPayload;
+    /* 0x28 */ bool mExternallyOwnedData;
+};
 
 struct LingerMessage
 {
@@ -44,6 +103,7 @@ class EffectsBundleManager
 {
 public:
     void Load(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
+    inline void ClearAdditional();
 
     EffectsBundle* mDefaultBundles;
     EffectsBundle* mAdditionalBundles;
@@ -60,6 +120,28 @@ extern int lbl_806E1FD8;
 extern int lbl_806DF4C0;
 static int lbl_806E1FDC;
 extern nlAVLTree<unsigned long, EffectsGroup*, DefaultKeyCompare<unsigned long> > lbl_8057F6B8;
+
+inline void EffectsBundleManager::ClearAdditional()
+{
+    while (mAdditionalBundles != 0)
+    {
+        EffectsBundle* bundle = mAdditionalBundles;
+        nlDLRingRemove(&mAdditionalBundles, bundle);
+
+        for (ListEntry<EffectsBundleData*>* entry = bundle->mPayload.mEntries.m_Head;
+             entry != 0; entry = entry->next)
+        {
+            EffectsBundleData* data = entry->entry;
+            for (int i = 0; i < data->mNumGroups; ++i)
+            {
+                unsigned long hash = data->mGroups[i]->GetHashID();
+                lbl_8057F6B8.Remove(hash);
+            }
+        }
+
+        delete bundle;
+    }
+}
 
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
@@ -250,22 +332,71 @@ void EmissionManager::Shutdown()
         return;
     }
 
+    if (mControllers.m_Head != 0)
+    {
+        tDebugPrintManager::Print(DC_RENDER,
+            "EmissionManager being deleted non-empty\n");
+    }
+
     nlDLListIterator<EmissionController*> iterator = mControllers.Begin();
     while (iterator.hasNext())
     {
         EmissionController* current = *iterator;
-        iterator.Step();
         delete current;
+        iterator.Step();
     }
     mControllers.Clear();
 
+    nlDLListIterator<char*> errorIterator
+        = mUnidentifiedControllers.Begin();
+    while (errorIterator.hasNext())
+    {
+        delete *errorIterator;
+        errorIterator.Step();
+    }
+    mUnidentifiedControllers.Clear();
+
+    if (lingerers != 0)
+    {
+        lingerers->DeleteValues();
+    }
+    delete lingerers;
+    lingerers = 0;
+
     while (mReplayControllers.m_Head != 0)
     {
-        nlDLListIterator<EmissionController*> replayIterator
-            = mReplayControllers.Begin();
-        EmissionController* current = *replayIterator;
-        mReplayControllers.Remove(&replayIterator);
+        EmissionController* current;
+        mReplayControllers.RemoveStart(&current);
         delete current;
+    }
+
+    fxParticleShutdown();
+    mParticles.Clear();
+    if (mParticleMemory != 0)
+    {
+        delete[] mParticleMemory;
+    }
+    mParticleMemory = 0;
+
+    MemoryAllocator* allocator = mMemoryContext;
+    AllocatorStack[AllocatorStackDepth++] = allocator;
+    CurrentAllocator = allocator;
+
+    gEffectsBundleManager.ClearAdditional();
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+
+    EmissionResourceStats* stats = Instance()->mResourceStats;
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+        delete stats[i].mCount;
+        delete stats[i].mHighWaterMark;
+        delete stats[i].mBudgetTweak;
+        stats[i].mBudgetTweak = 0;
+        stats[i].mHighWaterMark = 0;
+        stats[i].mCount = 0;
     }
 
     mUpdateEnabled = false;

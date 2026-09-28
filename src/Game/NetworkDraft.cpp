@@ -225,22 +225,23 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     mTeams[0].Reset();
     mTeams[1].Reset();
 
+    const NetworkDraftMachineInfo* entry = message->mEntries;
     for (int entryIndex = 0; entryIndex < message->mMachineCount; ++entryIndex)
     {
-        const NetworkDraftMachineInfo& entry = message->mEntries[entryIndex];
-        int playerCount = entry.mGuestEnabled ? 2 : 1;
+        int playerCount = entry->mGuestEnabled ? 2 : 1;
         for (int playerIndex = 0; playerIndex < playerCount; ++playerIndex)
         {
             int teamIndex = message->mPlayerSides.mData[entryIndex][playerIndex];
-            NetworkDraftTeam& team = mTeams[teamIndex];
-            NetworkDraftPlayer& player = team.mPlayers[team.mPlayerCount];
-            player.mHead = entry.mStats;
-            nlStrNCpy(player.mName, entry.mName, 11);
-            memcpy(player.mData, entry.mMiiData, sizeof(player.mData));
-            player.mPeerIndex = (s8)entry.mMachineIndex;
+            NetworkDraftPlayer& player =
+                mTeams[teamIndex].mPlayers[mTeams[teamIndex].mPlayerCount];
+            player.mHead = entry->mStats;
+            nlStrNCpy(player.mName, entry->mName, 11);
+            memcpy(player.mData, entry->mMiiData, sizeof(player.mData));
+            player.mPeerIndex = (s8)entry->mMachineIndex;
             player.mGuest = playerIndex == 1;
-            ++team.mPlayerCount;
+            ++mTeams[teamIndex].mPlayerCount;
         }
+        ++entry;
     }
     AssignDraftSides();
     mNextDraftingTeam = -1;

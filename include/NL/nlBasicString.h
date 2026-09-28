@@ -331,16 +331,8 @@ BasicString<CharT, Allocator>& BasicString<CharT, Allocator>::AppendInPlace(cons
 {
     (*this)[0];
 
-    CharT* at;
     Data* currentData = mData;
-    if (currentData != 0)
-    {
-        at = currentData->mData.mData + currentData->mData.mSize - 1;
-    }
-    else
-    {
-        at = 0;
-    }
+    CharT* at = currentData != 0 ? currentData->mData.mData + currentData->mData.mSize - 1 : 0;
 
     const CharT* end = rhs.end();
     const CharT* begin = rhs.begin();

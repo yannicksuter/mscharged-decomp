@@ -285,13 +285,13 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
     prim.texcoord = (nlVector2*)glResourceAlloc(
         0x100, GLM_VertexData, m_Unknown00);
 
-    segmentFactor = 0.41887903f;
-    z0 = 0.0f;
-    one = 1.0f;
-
     pdst = prim.position;
     ndst = prim.normal;
     tdst = prim.texcoord;
+
+    segmentFactor = 0.41887903f;
+    z0 = 0.0f;
+    one = 1.0f;
 
     for (nSegment = 0; nSegment < 0x10; nSegment++)
     {

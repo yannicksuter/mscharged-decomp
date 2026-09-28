@@ -4,6 +4,7 @@
 #include "Game/Audio/AudioResourceLoader.h"
 
 class nlChunk;
+struct AudioSourceData;
 struct AudioSourceInfo;
 
 class AudioBankLoader : public AudioResourceLoader
@@ -22,12 +23,11 @@ public:
 
     AudioSourceInfo* GetChunk23200Entries() const
     {
-        return (AudioSourceInfo*)m_Chunk23200Entries;
+        return m_Chunk23200Entries;
     }
 
-protected:
-    void* m_Chunk23200;
-    void* m_Chunk23200Entries;
+    AudioSourceData* m_Chunk23200;
+    AudioSourceInfo* m_Chunk23200Entries;
 };
 
 #endif // GAME_AUDIO_AUDIO_BANK_LOADER_H

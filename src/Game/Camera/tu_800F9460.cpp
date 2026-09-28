@@ -591,40 +591,52 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
 bool UnidentifiedCameraEffects::AreFieldersClear() const
 {
     cFielder* owner = (cFielder*)g_pBall->m_pOwner;
-    if (owner == 0 || owner->m_eClassType != FIELDER)
-        return false;
-
-    cTeam* otherTeam = owner->m_pTeam->GetOtherTeam();
-    float goalLineX = cField::GetGoalLineX(
-        (unsigned int)otherTeam->m_nSide);
+    bool clear = false;
     float minimumDistanceSq = lbl_806DC5F0 * lbl_806DC5F0;
-    for (int i = 0; i < 4; ++i)
+    if (owner != 0 && owner->m_eClassType == FIELDER)
     {
-        cFielder* fielder = g_pTeams[otherTeam->m_nSide]->GetFielder(i);
-        if (fielder->mUnidentified120 == owner->mUnidentified120)
-            continue;
-
-        bool beyondOwner = goalLineX > 0.0f
-                         ? fielder->mUnidentified024.m_v3Position.x > owner->mUnidentified024.m_v3Position.x
-                         : fielder->mUnidentified024.m_v3Position.x < owner->mUnidentified024.m_v3Position.x;
-        if (beyondOwner && !fielder->fn_800344B0()
-            && !fielder->IsFallenDown()
-            && fielder->m_eActionState != (eFielderActionState)0x23)
+        int otherTeam = owner->m_pTeam->GetOtherTeam()->m_nSide;
+        float goalLineX = cField::GetGoalLineX((unsigned int)otherTeam);
+        for (int i = 0; i < 4; ++i)
         {
-            return false;
-        }
+            cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
+            if (fielder->mUnidentified120 == owner->mUnidentified120)
+                continue;
 
-        float dy = fielder->mUnidentified024.m_v3Position.y - owner->mUnidentified024.m_v3Position.y;
-        float dx = fielder->mUnidentified024.m_v3Position.x - owner->mUnidentified024.m_v3Position.x;
-        float dz = fielder->mUnidentified024.m_v3Position.z - owner->mUnidentified024.m_v3Position.z;
-        nlVector3 delta;
-        delta.x = dx;
-        delta.y = dy;
-        delta.z = dz;
-        if (delta.GetLengthSq3D() < minimumDistanceSq)
-            return false;
+            if (goalLineX > 0.0f)
+            {
+                if (fielder->mUnidentified024.m_v3Position.x > owner->mUnidentified024.m_v3Position.x
+                    && !fielder->fn_800344B0()
+                    && !fielder->IsFallenDown()
+                    && fielder->m_eActionState != (eFielderActionState)0x23)
+                {
+                    return false;
+                }
+            }
+            if (goalLineX < 0.0f)
+            {
+                if (fielder->mUnidentified024.m_v3Position.x < owner->mUnidentified024.m_v3Position.x
+                    && !fielder->fn_800344B0()
+                    && !fielder->IsFallenDown()
+                    && fielder->m_eActionState != (eFielderActionState)0x23)
+                {
+                    return false;
+                }
+            }
+
+            float dy = fielder->mUnidentified024.m_v3Position.y - owner->mUnidentified024.m_v3Position.y;
+            float dx = fielder->mUnidentified024.m_v3Position.x - owner->mUnidentified024.m_v3Position.x;
+            float dz = fielder->mUnidentified024.m_v3Position.z - owner->mUnidentified024.m_v3Position.z;
+            nlVector3 delta;
+            delta.x = dx;
+            delta.y = dy;
+            delta.z = dz;
+            if (delta.GetLengthSq3D() < minimumDistanceSq)
+                return false;
+        }
+        clear = true;
     }
-    return true;
+    return clear;
 }
 
 void UnidentifiedCameraEffects::UpdateCameraFlags()

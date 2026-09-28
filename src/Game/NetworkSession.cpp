@@ -968,12 +968,18 @@ void NetworkSession::UpdateLogin()
     if (mLoginStartTime != 0.0f
         && mLoginStartTime + gNetworkLoginTimeout <= mElapsedTime)
     {
-        if ((mLoginStage < 0xE || mLoginStage >= 0x10)
-            && (mLoginStage >= 3 || mLoginStage < 1))
+        switch (mLoginStage)
         {
+        case 1:
+        case 2:
+        case 0xE:
+        case 0xF:
+            break;
+        default:
             tDebugPrintManager::Print(DC_NETWORK, "Aborting Getting Stats in Login Timed out!\n");
             mLoginStage = 0xF;
             mLoginListener->OnStatsResult(false);
+            break;
         }
         mLoginStartTime = 0.0f;
     }
@@ -1006,9 +1012,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            NetworkRankingMeta* record = NetworkStatsManager::Instance()->mHasLocalStats[2] != 0
-                                           ? &NetworkStatsManager::Instance()->mLocalStats[2]
-                                           : 0;
+            NetworkRankingMeta* record = NetworkStatsManager::Instance()->GetLocalStats(2);
             if (record != 0)
             {
                 if (IsNewNetworkSeason(record))
@@ -1085,9 +1089,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            NetworkRankingMeta* record = NetworkStatsManager::Instance()->mHasLocalStats[0] != 0
-                                           ? &NetworkStatsManager::Instance()->mLocalStats[0]
-                                           : 0;
+            NetworkRankingMeta* record = NetworkStatsManager::Instance()->GetLocalStats(0);
             if (record != 0)
             {
                 if (IsNewNetworkSeason(record))
@@ -1201,9 +1203,7 @@ void NetworkSession::UpdateLogin()
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            NetworkRankingMeta* record = NetworkStatsManager::Instance()->mHasLocalStats[1] != 0
-                                           ? &NetworkStatsManager::Instance()->mLocalStats[1]
-                                           : 0;
+            NetworkRankingMeta* record = NetworkStatsManager::Instance()->GetLocalStats(1);
             if (record != 0)
             {
                 if (IsNewNetworkDay(record))
@@ -1406,6 +1406,10 @@ void NetworkSession::UpdateLogin()
             mLoginStage = 0xF;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
+        break;
+
+    case 0xE:
+    case 0xF:
         break;
     }
 }

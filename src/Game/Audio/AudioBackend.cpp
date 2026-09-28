@@ -186,7 +186,7 @@ void UpdateAudioSources()
 AudioSource* AudioBackend::CreateSource(AudioSourceInfo* info, XSoundOwner*)
 {
     AudioSource* source = 0;
-    if (info->m_Unknown18->m_Unknown10->m_Unknown08 != 0)
+    if (info->m_Unknown18->m_Chunk23200->m_Unknown08 != 0)
     {
         if (info->m_Unknown10 == 1)
             source = new AudioReadState_8035D154;

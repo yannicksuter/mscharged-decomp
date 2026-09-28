@@ -149,15 +149,19 @@ void NetTournManager::TransitionOnlineMenuToTournament(
 void NetTournManager::GenerateFirstRoundSeedings(
     int machineCount, u8* seedings)
 {
-    static const u8 largeBracketOrder[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
-    static const u8 smallBracketOrder[8] = { 0, 2, 1, 3, 4, 5, 6, 7 };
+    const u8 largeBracketOrder[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
+    const u8 smallBracketOrder[8] = { 0, 2, 1, 3, 4, 5, 6, 7 };
     const u8* order = machineCount > 4 ? largeBracketOrder : smallBracketOrder;
-    bool used[8] = { false, false, false, false, false, false, false, false };
+    bool used[8];
+    for (int index = 0; index < 8; ++index)
+    {
+        used[index] = false;
+    }
 
     int i = 0;
     for (; i < machineCount; ++i)
     {
-        int candidate = (int)nlRandomf((float)machineCount);
+        int candidate = (int)nlRandomf((float)machineCount, &nlDefaultSeed);
         for (int tries = 0; tries < machineCount; ++tries)
         {
             if (candidate >= machineCount)
@@ -167,10 +171,12 @@ void NetTournManager::GenerateFirstRoundSeedings(
             if (!used[candidate])
             {
                 used[candidate] = true;
-                break;
+                goto assigned;
             }
             ++candidate;
         }
+        candidate = 0;
+    assigned:
         seedings[order[i]] = candidate;
     }
 
@@ -856,19 +862,49 @@ void NetTournManager::Update(float dt)
 
 void NetTournManager::NotifyGameStarted()
 {
-    typedef Detail::MemFunImpl<void, void (NetTournManager::*)()>
-        NetTournManagerCallback;
-    typedef BindExp1<void, NetTournManagerCallback, NetTournManager*>
-        NetTournManagerBinding;
+    {
+        typedef Detail::MemFunImpl<void, void (NetTournManager::*)()>
+            NetTournManagerCallback;
+        typedef BindExp1<void, NetTournManagerCallback, NetTournManager*>
+            NetTournManagerBinding;
 
-    Function<FnVoidVoid> callback(NetTournManagerBinding(
-        MemFun(&NetTournManager::NotifyGameOver), this));
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
-        ->Add(callback, 0, -1);
+        Function<FnVoidVoid> callback(NetTournManagerBinding(
+            MemFun(&NetTournManager::NotifyGameOver), this));
+        UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+            ->Add(callback, 0, -1);
+    }
 
-    // TODO: broadcast the initial progress update.
-    mLastGameProgressUpdate = 0;
-    mGameProgressUpdateCount = 0;
+    bool isHomeMachine = false;
+    if (mLocalMachineIndex == mTournamentToMachine[0])
+    {
+        isHomeMachine = true;
+    }
+
+    if (isHomeMachine)
+    {
+        int gameDuration = (int)g_pGame->m_fGameDuration;
+        int gameTime = (int)g_pGame->GetGameTime();
+        int gameTimeDelta;
+        int gameStatus = 2;
+        if (gameTime > gameDuration)
+        {
+            gameTimeDelta = gameTime - gameDuration;
+            gameStatus = 3;
+        }
+        else
+        {
+            gameTimeDelta = gameDuration - gameTime;
+        }
+
+        NetMessageTournamentGameUpdate message(1, mCurrentGameIndex,
+            isHomeMachine, gameStatus, gameTimeDelta, false);
+        u8 buffer[0xFF];
+        int size = gNetworkMessageRegistry->Serialize(
+            &message, buffer, sizeof(buffer));
+        SendToAllTournamentMachines(buffer, size);
+        mLastGameProgressUpdate = 0;
+        mGameProgressUpdateCount = 0;
+    }
 }
 
 void NetTournManager::NotifyFinishedLoadingToKnockout()

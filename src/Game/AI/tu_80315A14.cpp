@@ -37,14 +37,8 @@ extern "C" void fn_80315A64(
     }
     else if (value->mRuntime != 0)
     {
-        UnidentifiedVariant_80054AB8* transitionValue =
-            fn_8031243C(
-                value->mRuntime,
-                transition->mUnidentifiedHash, context);
-        *result = *transitionValue;
-        if (transitionValue->mTemporary)
-        {
-            delete transitionValue;
-        }
+        *result = fn_8031243C(
+            value->mRuntime,
+            transition->mUnidentifiedHash, context);
     }
 }

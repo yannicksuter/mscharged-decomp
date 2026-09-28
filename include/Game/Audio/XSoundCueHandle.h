@@ -7,21 +7,7 @@
 #include "types.h"
 
 class AudioSource;
-
-struct SliderState_802F1758
-{
-    void** vtable;
-    float value;
-    u8 valid;
-    u8 pad_09[0x1F];
-};
-
-struct LocalSliderSet_802F1758
-{
-    u32 field_00;
-    SliderState_802F1758* sliders;
-    void* owner;
-};
+class AudioSlider;
 
 struct SoundInstance;
 
@@ -41,7 +27,7 @@ public:
     virtual bool IsValid() { return true; }
     void UpdateSlider(float dt);
     inline AudioVoiceDefinition* SelectSound();
-    LocalSliderSet_802F1758* GetLocalSliders() const
+    AudioSliderSet* GetLocalSliders() const
     {
         return m_LocalSliders;
     }
@@ -49,7 +35,7 @@ public:
     static void operator delete(void* handle);
     AudioCueDefinition* definition;
     SoundInstance* instance;
-    SliderState_802F1758* slider;
+    AudioSlider* slider;
     float sliderValue;
     struct
     {

@@ -622,13 +622,51 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
     const char* name, tCharacterTemplateInfo* modelData, bool unidentified59,
     void* unidentified4C, void* unidentified50, bool alternate)
 {
-    FEModelHandle* handle = GetModel(name);
+    unsigned int nameHash = nlStringLowerHash(name);
+    FEModelHandle* handle = 0;
+    nlDLListIterator<FEModelHandle*> pending = mPendingModels.Begin();
+    while (pending.hasNext())
+    {
+        FEModelHandle* current = *pending;
+        if (current->mNameHash == nameHash)
+        {
+            handle = current;
+            if (handle->mModel->mLoadQueued
+                || handle->mModel->mType == FE_MODEL_IMPOSTOR)
+            {
+                mDanglingModels.AddEnd(handle);
+                mPendingModels.Remove(&pending);
+                handle = 0;
+                nlPrintf("Can't reuse this model handle as there is still a pending load happening.  Added to dangling model list.\n");
+            }
+            else
+            {
+                mPendingModels.Remove(&pending);
+            }
+            break;
+        }
+        pending.Step();
+    }
+
     if (handle == 0)
     {
         handle = new (8, false) FEModelHandle(type, name, modelData,
             unidentified59, unidentified4C, unidentified50, alternate);
-        mHandles.AddStart(handle);
     }
+    else
+    {
+        handle->mNameHash = nlStringLowerHash(name);
+        handle->mModel->Initialize();
+        handle->mModel->mModelData = modelData;
+        handle->mUnidentified4C = unidentified4C;
+        handle->mUnidentified50 = unidentified50;
+        handle->mEnabled = true;
+        handle->mUnidentified59 = unidentified59;
+        handle->mAnimationCompleteCallback = 0;
+        handle->mUnidentified5A = alternate;
+    }
+    handle->mModel->mType = type;
+    mLoadedModels.AddEnd(handle);
     return handle;
 }
 

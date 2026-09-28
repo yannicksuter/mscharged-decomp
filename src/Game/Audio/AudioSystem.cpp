@@ -2,6 +2,7 @@
 
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
 #include "Game/Audio/XSoundHandle.h"
@@ -44,8 +45,10 @@ void AudioSystem::Shutdown()
 {
     if (m_BundleManager != 0)
         m_BundleManager->Shutdown();
-    m_SoundInstancePool.m_Allocator.FreeBlocks();
-    m_SoundOwnerPool.m_Allocator.FreeBlocks();
+    BasicSlotPool<DLListEntry<Plat3dSoundSrc> >* instances = &m_SoundInstancePool.m_Allocator;
+    instances->FreeBlocks();
+    BasicSlotPool<DLListEntry<XSoundOwner*> >* owners = &m_SoundOwnerPool.m_Allocator;
+    owners->FreeBlocks();
 }
 
 XSoundCueHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOwner* owner,
@@ -74,8 +77,9 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
 {
     if (!audio->IsInitialized())
         return;
-    while (audio->m_UnknownD0.GetCount() > 0)
-        audio->m_UnknownD0.Pop()->IsValid();
+    StaticCircularQueue<XSoundHandle*, 128>& pending = audio->m_UnknownD0;
+    while (pending.GetCount() > 0)
+        pending.Pop()->IsValid();
     if (audio->m_Listener->IsTransformValid())
     {
         audio->m_Listener->Update(dt);
@@ -89,36 +93,15 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
             if (handle->m_Owner != 0)
             {
                 XSoundOwner* owner = handle->m_Owner;
-                LocalSliderSet_802F1758* sliders = handle->m_LocalSliders;
+                AudioSliderSet* sliders = ((XSoundCueHandle*)handle)->GetLocalSliders();
                 float value1 = owner->m_Unknown10;
                 float value2 = owner->m_Unknown14;
                 float value3 = owner->m_Unknown18;
                 if (sliders != 0)
                 {
-                    AudioParameter* parameter = (AudioParameter*)(sliders->sliders + 5);
-                    if (value1 < parameter->m_Min)
-                        parameter->m_Value = parameter->m_Min;
-                    else if (value1 > parameter->m_Max)
-                        parameter->m_Value = parameter->m_Max;
-                    else
-                        parameter->m_Value = value1;
-                    parameter->m_Time = 0.0f;
-                    parameter = (AudioParameter*)sliders->sliders;
-                    if (value2 < parameter->m_Min)
-                        parameter->m_Value = parameter->m_Min;
-                    else if (value2 > parameter->m_Max)
-                        parameter->m_Value = parameter->m_Max;
-                    else
-                        parameter->m_Value = value2;
-                    parameter->m_Time = 0.0f;
-                    parameter = (AudioParameter*)(sliders->sliders + 1);
-                    if (value3 < parameter->m_Min)
-                        parameter->m_Value = parameter->m_Min;
-                    else if (value3 > parameter->m_Max)
-                        parameter->m_Value = parameter->m_Max;
-                    else
-                        parameter->m_Value = value3;
-                    parameter->m_Time = 0.0f;
+                    sliders->sliders[5].SetTarget(value1, 0.0f);
+                    sliders->sliders[0].SetTarget(value2, 0.0f);
+                    sliders->sliders[1].SetTarget(value3, 0.0f);
                 }
                 --count;
             }

@@ -46,7 +46,7 @@ struct XSoundOwner
 };
 
 class XSoundHandle;
-struct LocalSliderSet_802F1758;
+struct AudioSliderSet;
 typedef void (*XSoundHitMarkerCallback)(
     void*, XSoundHandle*, void*);
 
@@ -82,7 +82,7 @@ public:
     XSoundOwner* m_Owner;
     float m_PreviousTime;
     float m_CurrentTime;
-    LocalSliderSet_802F1758* m_LocalSliders;
+    AudioSliderSet* m_LocalSliders;
     XSoundHitMarkerCallback m_Callback;
     void* m_CallbackContext;
 };
