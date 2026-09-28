@@ -169,22 +169,26 @@ void UnidentifiedAudioScriptRuntime::Unidentified6F00(u32 hash, u32 instance)
 bool UnidentifiedAudioScriptRuntime::Unidentified77C8(u32 instance)
 {
     UnidentifiedAudioTransitionState** found;
-    if (!mTransitions.FindGet(instance, &found))
-        return false;
-
-    UnidentifiedAudioTransitionState* head = *found;
-    UnidentifiedAudioTransitionState* current = head;
-    for (;;)
+    bool exists = mTransitions.FindGet(instance, &found);
+    UnidentifiedAudioTransitionState* head;
+    if (exists)
+        head = *found;
+    if (exists)
     {
-        current->mBinding->OnSoundStopped(instance);
-        UnidentifiedAudioTransitionState* next = current->m_next;
-        sUnidentifiedTransitions.Free(current);
-        if (next == head)
-            break;
-        current = next;
+        UnidentifiedAudioTransitionState* current = head;
+        for (;;)
+        {
+            current->mBinding->OnSoundStopped(instance);
+            UnidentifiedAudioTransitionState* next = current->m_next;
+            sUnidentifiedTransitions.Free(current);
+            if (next == head)
+                break;
+            current = next;
+        }
+        mTransitions.Remove(instance);
+        return true;
     }
-    mTransitions.Remove(instance);
-    return true;
+    return false;
 }
 
 extern "C" bool fn_802F7CFC(const u32& key, AudioEffectBinding* binding,

@@ -27,6 +27,26 @@ inline void nlRingAddEnd(T** list, T* item)
 }
 
 template <typename T>
+inline T* nlRingGetStart(T* head)
+{
+    if (head == 0)
+        return 0;
+    return head->m_next;
+}
+
+template <typename T>
+inline T* nlRingRemoveStart(T** list)
+{
+    T* head = *list;
+    T* first = head->m_next;
+    if (first == head)
+        *list = 0;
+    else
+        head->m_next = first->m_next;
+    return first;
+}
+
+template <typename T>
 inline void nlDeleteRing(T** head)
 {
     T* current;

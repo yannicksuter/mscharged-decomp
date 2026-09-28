@@ -482,6 +482,17 @@ void NetworkDraft::Update(float dt)
     }
 }
 
+static void StartCaptainChoice(NetworkDraft* draft)
+{
+    int captain = draft->GetRandomAvailableCaptain();
+    tDebugPrintManager::Print(DC_NETWORK, "Found initial captain choice %d\n", captain);
+    GameInfoManager::Instance()->SetTeam(0, captain);
+    GameInfoManager::Instance()->SetTeam(1, captain);
+    GameInfoManager::Instance()->ResetPlayingSides();
+    FEAudio::PlayAnimAudioEvent(0x74572C29, 0, 0, true);
+    GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_NOTHING, true);
+}
+
 void NetworkDraft::AdvanceDraftTeam()
 {
     ++mNextDraftingTeam;
@@ -499,30 +510,21 @@ void NetworkDraft::AdvanceDraftTeam()
             return;
 
         mCurrentDraftingTeam = mMyTeamIndex;
-        int captain = GetRandomAvailableCaptain();
-        tDebugPrintManager::Print(DC_NETWORK, "Found initial captain choice %d\n", captain);
-        GameInfoManager::Instance()->SetTeam(0, captain);
-        GameInfoManager::Instance()->SetTeam(1, captain);
-        GameInfoManager::Instance()->ResetPlayingSides();
-        FEAudio::PlayAnimAudioEvent(0x74572C29, 0, 0, true);
-        GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_NOTHING, true);
+        StartCaptainChoice(this);
     }
     else
     {
-        if (mNextDraftingTeam < 0 || mNextDraftingTeam >= 2
-            || mLocalMachineIndex != mSideToTeam[mNextDraftingTeam])
+        if (mNextDraftingTeam < 0)
+            return;
+        if (mNextDraftingTeam >= 2)
+            return;
+        if (mLocalMachineIndex != mSideToTeam[mNextDraftingTeam])
             return;
 
         mCurrentDraftingTeam = mNextDraftingTeam;
         mCurrentDraftingPeer = mSideToTeam[mNextDraftingTeam];
         mCurrentDrafterIsGuest = mSideDrafted[mNextDraftingTeam];
-        int captain = GetRandomAvailableCaptain();
-        tDebugPrintManager::Print(DC_NETWORK, "Found initial captain choice %d\n", captain);
-        GameInfoManager::Instance()->SetTeam(0, captain);
-        GameInfoManager::Instance()->SetTeam(1, captain);
-        GameInfoManager::Instance()->ResetPlayingSides();
-        FEAudio::PlayAnimAudioEvent(0x74572C29, 0, 0, true);
-        GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_NOTHING, true);
+        StartCaptainChoice(this);
     }
 }
 

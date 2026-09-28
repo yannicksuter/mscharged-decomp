@@ -157,7 +157,7 @@ public:
     void SetMorphDeltas(unsigned long packetIndex, unsigned long morphIndex,
         unsigned long count, const MorphDelta* data);
     void InitializeSkinData();
-    void SetHierarchy(cSHierarchy* hierarchy);
+    void SetHierarchy(const cSHierarchy* hierarchy);
     void SetBoneMatrix(int nodeIndex, const nlMatrix4* matrix);
 
     /* 0x20 */ BoneMapList* boneMaps;

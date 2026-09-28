@@ -33,6 +33,7 @@ class DelayParameter : public AudioEffectParameter
 public:
     DelayParameter();
     virtual ~DelayParameter() { }
+    void ApplySettings(AXFX_DELAY* delay);
 
     static void* operator new(unsigned long)
     {
@@ -247,35 +248,31 @@ void Delay::ApplyToSound(void* handle)
         voices[i]->SetAuxiliaryVolume(auxIndex, volume);
 }
 
+inline void DelayParameter::ApplySettings(AXFX_DELAY* delay)
+{
+    for (u16 i = 0; i < 3; ++i)
+    {
+        u32 value = m_Settings.m_Delay[i];
+        value = value >= 1 ? value : 1;
+        delay->delay[i] = value <= 750 ? value : 750;
+        value = m_Settings.m_Feedback[i];
+        delay->feedback[i] = value <= 99 ? value : 99;
+        value = m_Settings.m_Output[i];
+        delay->output[i] = value <= 100 ? value : 100;
+    }
+}
+
 void Delay::OnSoundStarted(void*)
 {
     AXFX_DELAY* delay = &g_pAudioBackend->m_DelayEffect.m_Delay;
     if (g_pAudioBackend->m_OutputMode == 3)
     {
-        for (u16 i = 0; i < 3; ++i)
-        {
-            u32 value = m_Final.m_Settings.m_Delay[i];
-            value = value >= 1 ? value : 1;
-            delay->delay[i] = value <= 750 ? value : 750;
-            value = m_Final.m_Settings.m_Feedback[i];
-            delay->feedback[i] = value <= 99 ? value : 99;
-            value = m_Final.m_Settings.m_Output[i];
-            delay->output[i] = value <= 100 ? value : 100;
-        }
+        m_Final.ApplySettings(delay);
         AXFXDelayExpSettingsDpl2((AXFX_DELAY_EXP_DPL2*)delay);
     }
     else
     {
-        for (u16 i = 0; i < 3; ++i)
-        {
-            u32 value = m_Final.m_Settings.m_Delay[i];
-            value = value >= 1 ? value : 1;
-            delay->delay[i] = value <= 750 ? value : 750;
-            value = m_Final.m_Settings.m_Feedback[i];
-            delay->feedback[i] = value <= 99 ? value : 99;
-            value = m_Final.m_Settings.m_Output[i];
-            delay->output[i] = value <= 100 ? value : 100;
-        }
+        m_Final.ApplySettings(delay);
         AXFXDelaySettings(delay);
     }
 }

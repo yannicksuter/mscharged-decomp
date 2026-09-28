@@ -1550,8 +1550,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         {
             if (pBall->m_pOwner == 0)
             {
-                CollisionBallShellData* pData = 0;
-                g_CollisionBallShellDataPool.Allocate(pData);
+                CollisionBallShellData* pData = g_CollisionBallShellDataPool.Allocate();
                 pData->pPowerup = pObj;
                 pData->pBall = pBall;
                 pData->v3CollisionVelocity = pObj->m_v3Velocity;
@@ -1690,8 +1689,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             {
                 if (pObj->m_eType == POWER_UP_BANANA)
                 {
-                    CollisionPlayerBananaData* pData = 0;
-                    g_CollisionPlayerBananaDataPool.Allocate(pData);
+                    CollisionPlayerBananaData* pData = g_CollisionPlayerBananaDataPool.Allocate();
                     pData->pPlayer = (cFielder*)pCharacter;
                     pData->pThrower = pObj->m_pThrower;
                     pData->nThrowerPadID = pObj->m_nThrowerPadID;
@@ -1706,8 +1704,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                     {
                         if (!bUnknown || pObj->m_eType == POWER_UP_SPINY_SHELL)
                         {
-                            CollisionPlayerShellData* pData = 0;
-                            g_CollisionPlayerShellDataPool.Allocate(pData);
+                            CollisionPlayerShellData* pData = g_CollisionPlayerShellDataPool.Allocate();
                             pData->pPlayer = (cFielder*)pCharacter;
                             pData->eSize = (int)pObj->meSize;
                             pData->pThrower = pObj->m_pThrower;
@@ -1727,8 +1724,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                     }
                     else
                     {
-                        CollisionPlayerFreezeData* pData = 0;
-                        g_CollisionPlayerFreezeDataPool.Allocate(pData);
+                        CollisionPlayerFreezeData* pData = g_CollisionPlayerFreezeDataPool.Allocate();
                         pData->pPlayer = (cFielder*)pCharacter;
                         pData->eSize = (int)pObj->meSize;
                         pData->pThrower = pObj->m_pThrower;
@@ -1754,9 +1750,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
             }
 
-            bool bInvincible = !((cFielder*)pCharacter)->IsStuck()
-                            && (((cFielder*)pCharacter)->muInvincibleStatus & 8) != 0;
-            if (bInvincible)
+            if (((cFielder*)pCharacter)->UnidentifiedInvinciblePowerups())
             {
                 pObj->m_bShouldDestroy = true;
             }
@@ -1765,8 +1759,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
 
     if (pPlayerTarget != 0)
     {
-        PowerupHitPlayerEventData* pData = 0;
-        g_PowerupHitPlayerEventDataPool.Allocate(pData);
+        PowerupHitPlayerEventData* pData = g_PowerupHitPlayerEventDataPool.Allocate();
         pData->Type = pObj->m_eType;
         pData->Thrower = (cPlayer*)pObj->m_pThrower;
         pData->Target = pPlayerTarget;

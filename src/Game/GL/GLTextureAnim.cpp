@@ -19,6 +19,7 @@ bool glIsTextureAnim(const void* data, unsigned long size)
 void glAddTextureAnim(const void* data, unsigned long size,
     GLResourcePool* resource)
 {
+    int offset;
     GLTextureAnim* anim = (GLTextureAnim*)resource->Allocate(
         sizeof(GLTextureAnim), GLM_Header);
     memcpy(anim, data, sizeof(GLTextureAnim));
@@ -38,9 +39,12 @@ void glAddTextureAnim(const void* data, unsigned long size,
     }
 
     anim->m_nFrame = 0;
-    for (i = 0; i < anim->m_nNumTextures; ++i)
+    for (i = 0, offset = 0; i < anim->m_nNumTextures;
+         ++i, offset += sizeof(GLAnimTex))
     {
-        anim->m_pAnimTex[i].m_TexHandle = glGetTextureIndex(anim->m_pAnimTex[i].m_TexHandle);
+        unsigned long texture = glGetTextureIndex(
+            ((GLAnimTex*)((u8*)anim->m_pAnimTex + offset))->m_TexHandle);
+        ((GLAnimTex*)((u8*)anim->m_pAnimTex + offset))->m_TexHandle = texture;
     }
 
     resource->m_inventory->AddTextureAnim(anim->m_uHashID, anim);

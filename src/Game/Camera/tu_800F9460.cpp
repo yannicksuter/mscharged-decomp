@@ -22,6 +22,7 @@
 #include "NL/nlFunction.inl"
 #include "NL/nlTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include <math.h>
 
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -421,8 +422,7 @@ void UnidentifiedCameraEffects::AdjustCameraVectors(float deltaTime,
         float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
         float gameY = g_pGame->mUnidentified084;
         float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
-        float amount = nlAbs(clampedX);
-        amount = nlMaxEquals(amount, nlAbs(clampedY));
+        float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
         target->y += lbl_806DC5F8 * (amount / lbl_806DC5F4);
     }
     else if (GameInfoManager::Instance()->GetStadium() == 10)
@@ -542,8 +542,7 @@ float UnidentifiedCameraEffects::CalculateZoomScale(float) const
         float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
         float gameY = g_pGame->mUnidentified084;
         float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
-        float amount = nlAbs(clampedX);
-        amount = nlMaxEquals(amount, nlAbs(clampedY));
+        float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
         float fraction = amount / lbl_806DC5F4;
         result -= fraction * lbl_806E0F44;
     }

@@ -97,9 +97,8 @@ GameAudio::GameAudio()
 
 bool GameAudio::Initialize()
 {
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
     CurrentAllocator = &VirtualAllocator;
-    unsigned int index = AllocatorStackDepth++;
-    AllocatorStack[index] = CurrentAllocator;
     gAudioSourceListCount = 0x800000;
 
     s_AudioInInit__9ResetTask = true;

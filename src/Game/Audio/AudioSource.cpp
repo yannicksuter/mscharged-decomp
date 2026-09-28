@@ -359,11 +359,7 @@ void OnAudioStreamReadComplete(nlFile*, void*, unsigned int, unsigned long userP
     --state->m_Unknown20_00;
     nlGetCurrentAsyncRead();
 
-    AudioReadQueueEntry* entry = state->m_Unknown24->m_next;
-    if (entry == state->m_Unknown24)
-        state->m_Unknown24 = 0;
-    else
-        state->m_Unknown24->m_next = entry->m_next;
+    AudioReadQueueEntry* entry = nlRingRemoveStart(&state->m_Unknown24);
     gAudioReadQueueEntryPool.Free(entry);
 }
 
@@ -528,19 +524,16 @@ void CancelAudioReads(AudioReadState* state)
     bool cancelled = false;
     while (state->m_Unknown24 != 0)
     {
-        AudioReadQueueEntry* entry = state->m_Unknown24->m_next;
+        AudioReadQueueEntry* entry = nlRingGetStart(state->m_Unknown24);
         if (cancelled || nlAsyncReadBusy(entry->m_Unknown00))
         {
-            if (entry == state->m_Unknown24)
-                state->m_Unknown24 = 0;
-            else
-                state->m_Unknown24->m_next = entry->m_next;
+            nlRingRemoveStart(&state->m_Unknown24);
             nlRingAddEnd(&pending, entry);
         }
         else
         {
-            nlCancelAsyncRead(entry->m_Unknown00, OnAudioReadCancelled);
             cancelled = true;
+            nlCancelAsyncRead(entry->m_Unknown00, OnAudioReadCancelled);
         }
     }
     state->m_Unknown24 = pending;

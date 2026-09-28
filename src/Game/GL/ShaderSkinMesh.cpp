@@ -158,7 +158,7 @@ void ShaderSkinMesh::BuildPacketSkinData(
     delete[] pairs;
 }
 
-void ShaderSkinMesh::SetHierarchy(cSHierarchy* hierarchy)
+void ShaderSkinMesh::SetHierarchy(const cSHierarchy* hierarchy)
 {
     hierarchySignature = hierarchy->GetHashID();
     numBones = hierarchy->GetNumNodes();

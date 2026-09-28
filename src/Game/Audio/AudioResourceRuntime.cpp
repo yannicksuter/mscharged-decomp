@@ -5,22 +5,13 @@
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/UnidentifiedAudioScriptRuntime.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/Audio/AudioResourceRuntime.inl"
 #include "NL/nlFunction.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlRegistry.h"
 
 AudioResourceRuntime* g_pAudioResourceRuntime;
-
-inline UnidentifiedAudioPoolOwner::~UnidentifiedAudioPoolOwner()
-{
-    SlotPoolBase::BaseFreeBlocks(
-        &RegistryPoolTypes::sContainerPool,
-        sizeof(ScopedRegistryContainer));
-    SlotPoolBase::BaseFreeBlocks(
-        &RegistryPoolTypes::sNodePool,
-        sizeof(RegistryNode));
-}
 
 // Configuration keys the runtime resolves by lower-cased name hash. The DOL
 // keeps only the hashes; the names behind them are not recoverable.
@@ -319,14 +310,6 @@ extern "C" bool fn_802F4E84(const u32* hash, bool invert, void* owner)
     }
     return true;
 }
-
-/**
- * Address/Size: 0x802F6680 | size: 0x84
- */
-AudioResourceRuntime::~AudioResourceRuntime()
-{
-}
-
 
 /**
  * Address/Size: 0x802F6704 | size: 0x68

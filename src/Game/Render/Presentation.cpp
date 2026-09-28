@@ -559,11 +559,11 @@ void Presentation::Update(float deltaTime)
             g_pGame->mUnidentified49C.mEvent04.Queue(
                 Function<FnVoidVoid>());
         }
-    }
 
-    if (m_RunState == 2)
-    {
-        Finish();
+        if (m_RunState == 2)
+        {
+            Finish();
+        }
     }
 
     Wiper::Instance().Render();

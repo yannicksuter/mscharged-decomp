@@ -37,10 +37,10 @@ private:
     unsigned char mCallbackPadding[2];
 
 public:
-    Function0<bool> mCanRender;
-    Function0<bool> mCanUpdate;
-    Function0<void> mBeforeUpdate;
-    Function0<void> mUnknownCallback;
+    Function<bool()> mCanRender;
+    Function<bool()> mCanUpdate;
+    Function<FnVoidVoid> mBeforeUpdate;
+    Function<FnVoidVoid> mUnknownCallback;
 };
 
 #endif // GAME_PARTICLE_UPDATE_TASK_H

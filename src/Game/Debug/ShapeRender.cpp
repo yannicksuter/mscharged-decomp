@@ -369,10 +369,11 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
     ndst = prim.normal;
     tdst = prim.texcoord;
 
+    float ringScale = 0.5f;
+    float segmentFactor = 0.41887903f;
+
     for (nRing = 0; nRing < 2; nRing++)
     {
-        float ringScale = 0.5f;
-
         z0 = -0.5f + (float)nRing * ringScale;
         z1 = -0.5f + (float)(nRing + 1) * ringScale;
 
@@ -388,15 +389,15 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
             float fSegmentAngle;
 
             fSegmentAngle = (float)nSegment;
-            angle = (int)((fSegmentAngle *= 0.41887903f) * 10430.378f);
+            angle = (int)((fSegmentAngle *= segmentFactor) * 10430.378f);
 
             x0 = 0.5f * nlSin((u16)angle);
 
-            angle90 = (u16)(int)(((float)nSegment * 0.41887903f) * 10430.378f) + 0x4000;
+            angle90 = (u16)(int)(((float)nSegment * segmentFactor) * 10430.378f) + 0x4000;
             y0 = 0.5f * nlSin((u16)angle90);
 
-            x1 = 0.5f * nlSin((u16)(int)(((float)nSegment * 0.41887903f) * 10430.378f));
-            y1 = 0.5f * nlSin((u16)((u16)(int)(((float)nSegment * 0.41887903f) * 10430.378f) + 0x4000));
+            x1 = 0.5f * nlSin((u16)(int)(((float)nSegment * segmentFactor) * 10430.378f));
+            y1 = 0.5f * nlSin((u16)((u16)(int)(((float)nSegment * segmentFactor) * 10430.378f) + 0x4000));
 
             vNormal.x = x0;
             vNormal.y = y0;

@@ -16,6 +16,7 @@
 extern "C" void fn_80311C54(void*, unsigned long, void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_803152F0(
     UnidentifiedFuzzyRuntimeBase*, UnidentifiedVariant_80054AB8, float);
+extern UnidentifiedVariant_80054AB8 lbl_80584250;
 
 struct UnidentifiedTransitionOwner
 {
@@ -438,12 +439,29 @@ UnidentifiedFuzzyRuntimeBase::UnidentifiedVirtual9()
         nlListRemoveStart(&mCollection.mHead, &mCollection.mTail);
     UnidentifiedActionQueue* queue = entry->mQueue;
     UnidentifiedVariant_80054AB8* selected = queue->SelectAction();
-    queue->fn_8030FF6C(true);
-    if (entry->mOwnsQueue)
+    if (queue->m_pSelectedAction == 0)
     {
-        delete queue;
+        selected = new (lbl_805842C8.Allocate())
+            UnidentifiedVariant_80054AB8(lbl_80584250);
     }
-    lbl_80584328.DeleteEntry(entry);
+    else if (entry->mUnidentified008 != 0)
+    {
+        unsigned long hash = entry->mUnidentified008;
+        if (lbl_806DF568)
+        {
+            lbl_805842EC.mQuestionCacheMap.Add(hash, *selected);
+        }
+    }
+    mUnidentified038.AddEnd(selected);
+    queue->fn_8030FF6C(true);
+    if (entry != 0)
+    {
+        if (entry->mOwnsQueue)
+        {
+            delete entry->mQueue;
+        }
+        lbl_80584328.DeleteEntry(entry);
+    }
     return selected;
 }
 

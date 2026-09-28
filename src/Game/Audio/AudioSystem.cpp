@@ -1,4 +1,6 @@
 #include "Game/Audio/AudioSystem.h"
+#include "Game/TweakValue.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioBundleManager.h"
@@ -9,10 +11,14 @@
 #include "NL/nlBind.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlstring_tmpl.h"
+#include "Game/Audio/AudioResourceRuntime.inl"
 
-unsigned int lbl_806E2018;
+int lbl_806E2018;
 AudioSystem* g_pAudioSystem;
 AudioBackend* g_pAudioBackend;
+
+static TweakIntBinding lbl_8057F938(
+    "AllocatedCueCount", "audio/Stats", &lbl_806E2018, true);
 
 AudioSystem::AudioSystem()
     : m_Unknown48(false), m_AsyncLoading(true), m_BundleManager(0), m_Unknown2E0(0)

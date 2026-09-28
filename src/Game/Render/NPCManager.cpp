@@ -45,7 +45,6 @@ extern "C"
 
 int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
 
-static char sChainChompTemplateName[] = "ChainChomp";
 static char sNPCAnimationPath[] = "art/animation/%s.sanim.zlib";
 static char sNPCHierarchyPath[] = "art/animation/%s.shier";
 static char sNPCTexturePath[] = "art/characters/npcs/%s/%s.rlt";
@@ -150,7 +149,7 @@ bool NPCManager::SelectNextNPCTemplate()
 void NPCManager::CreateChainChomp()
 {
     NPCTemplate* pTemplate
-        = fn_801ABBDC_inline(sChainChompTemplateName);
+        = fn_801ABBDC_inline("ChainChomp");
 
     PhysicsNPC* chainPhysics = new (nlMalloc(
         sizeof(PhysicsNPC), 8, false)) PhysicsNPC(
@@ -240,7 +239,7 @@ UnidentifiedNPC_801B43F8* NPCManager::fn_801A9DE0(int nIndex)
 
 void NPCManager::fn_801A9DF0()
 {
-    for (int i = 0; i < 3; ++i)
+    for (long i = 0; i < 3; ++i)
     {
         UnidentifiedNPCConfig_801B532C* pConfig = fn_801B532C(i);
         NPCTemplate* pTemplate

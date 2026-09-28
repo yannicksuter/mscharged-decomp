@@ -10,6 +10,7 @@
 #include "Game/GameInfo.h"
 #include "Game/main.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkDebug.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/TweakValue.h"
@@ -18,6 +19,8 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
+#include "NL/gl/glFont.h"
+#include "NL/nlDebugViews.h"
 
 #include <string.h>
 #include "Game/TweakValue.inl"
@@ -257,8 +260,23 @@ bool NetworkLobby::AreAllConnectionsReady()
 
 void NetworkLobby::DebugDraw(int column, int* row)
 {
-    (void)column;
-    (void)row;
+    if (g_bDisplayNetworkVerbose)
+    {
+        glFontPrintf(GetDebugFontView(), column, (*row)++, "DWCLobby: %d", mState);
+
+        int localMachine;
+        int machineCount = GetMachineCount();
+        localMachine = GetLocalMachineIndex();
+        int connectionCount = GetConnectionCount();
+        glFontPrintf(GetDebugFontView(), column, (*row)++,
+            "DWCNumCon: %d (%d/%d)", connectionCount,
+            localMachine, machineCount);
+
+        glFontPrintf(GetDebugFontView(), column, (*row)++, "Name: %s", gNetworkMiiName);
+    }
+
+    GameInfoSaveSlot* slot = GameInfoManager::Instance()->GetSaveSlot(gNetworkSaveSlotIndex);
+    glFontPrintf(GetDebugFontView(), column, (*row)++, "PID: %d", slot->unknown_0x01C);
 }
 
 void NetworkLobby::OnConnected(unsigned int connection, int result)
@@ -279,7 +297,8 @@ void NetworkLobby::OnConnected(unsigned int connection, int result)
         }
     }
 
-    tDebugPrintManager::Print(DC_NETWORK, "Unknown connection established from %d I am %d\n", *((u8*)connection + 0x27), DWC_GetMyAID());
+    u8 aid = *((u8*)connection + 0x27);
+    tDebugPrintManager::Print(DC_NETWORK, "Unknown connection established from %d I am %d\n", aid, DWC_GetMyAID());
 }
 
 int NetworkLobby::ShouldAcceptConnection(

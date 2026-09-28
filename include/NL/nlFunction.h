@@ -417,6 +417,42 @@ public:
     }
 };
 
+template <typename ReturnType>
+class Function<ReturnType()> : public Function0<ReturnType>
+{
+    typedef Function0<ReturnType> Base;
+
+public:
+    Function()
+        : Base()
+    {
+    }
+
+    Function(ReturnType (*function)())
+        : Base(function)
+    {
+    }
+
+    template <typename Callable>
+    Function(Callable callable)
+        : Base(callable)
+    {
+    }
+
+    Function& operator=(const Function& other)
+    {
+        Base::operator=(other);
+        return *this;
+    }
+
+    template <typename Other>
+    Function& operator=(const Other& other)
+    {
+        Base::operator=(other);
+        return *this;
+    }
+};
+
 template <typename ReturnType, typename P1>
 class Function<ReturnType(P1)> : public Function1<ReturnType, P1>
 {
