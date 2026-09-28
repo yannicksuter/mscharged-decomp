@@ -27,7 +27,7 @@
 
 class SHNavigation;
 
-extern "C" void fn_80207724(bool);
+extern "C" void fn_80207724(int);
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
@@ -64,7 +64,7 @@ CupHubScene::CupHubScene()
         mMatchupComponents[i].mSpeakerEnabled = false;
     }
 
-    fn_80203B54();
+    BuildMatchupStates();
     if (g_pCupManager->mState == 0x10
         || g_pCupManager->GetCurrentRoundType() == 0)
     {
@@ -79,7 +79,7 @@ CupHubScene::~CupHubScene()
 inline void CupHubScene::UpdateRows()
 {
     for (int i = 0; i < 4; ++i)
-        fn_80201BE0(i);
+        UpdateRow(i);
 }
 
 void CupHubScene::SceneCreated()
@@ -163,7 +163,7 @@ void CupHubScene::Update(float fDeltaT)
                 else
                     navigation->SetButtons(0x14, true);
                 fn_802088B4();
-                fn_80202C34();
+                InitializePointerButtons();
                 mUnidentified300 = true;
             }
             mUnidentified894 = 1;
@@ -268,7 +268,7 @@ void CupHubScene::Update(float fDeltaT)
     mUnidentified67C = false;
 }
 
-void CupHubScene::fn_802017C4(int index, int value)
+void CupHubScene::UpdateRoundText(int index, int value)
 {
     mUnidentified20[index]->SetActiveSlide("ROUND", true, false);
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified20[index]->GetActiveSlide(), "BIG_ROUND");
@@ -284,7 +284,7 @@ void CupHubScene::fn_802017C4(int index, int value)
     text->SetString(mTextBuffers[index]);
 }
 
-void CupHubScene::fn_80201BE0(int index)
+void CupHubScene::UpdateRow(int index)
 {
     if (mMatchupComponents[index].HasOtherPointerState(1, -1))
         mUnidentified20[index]->SetActiveSlide("over", true, false);
@@ -299,7 +299,7 @@ void CupHubScene::fn_80201BE0(int index)
     int matchup = mMatchupStates[mUnidentified304 + index][1];
     if (matchup == -1)
     {
-        fn_802017C4(index, round);
+        UpdateRoundText(index, round);
         return;
     }
 
@@ -352,10 +352,10 @@ void CupHubScene::fn_80201BE0(int index)
     TLTextInstance* roundText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "ROUND");
     TLTextInstance* gameText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "GAME");
     FEFinder<TLImageInstance, 2>::Find<>(mUnidentified20[index]->GetActiveSlide(), "matchup_content", "round_bar");
-    fn_802025F4(roundText, round + 1, gameText, matchup + 1, index);
+    UpdateRoundGameText(roundText, round + 1, gameText, matchup + 1, index);
 }
 
-void CupHubScene::fn_802025F4(TLTextInstance* roundText, int round, TLTextInstance* gameText, int game, int index)
+void CupHubScene::UpdateRoundGameText(TLTextInstance* roundText, int round, TLTextInstance* gameText, int game, int index)
 {
     char roundBuffer[4];
     char gameBuffer[4];
@@ -379,15 +379,15 @@ void CupHubScene::fn_802025F4(TLTextInstance* roundText, int round, TLTextInstan
     gameText->SetString(mUnidentified53C[index]);
 }
 
-void CupHubScene::fn_80202C34()
+void CupHubScene::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (CupHubScene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, CupHubScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback enter(PointerBinding(MemFun(&CupHubScene::fn_80203498), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leave(PointerBinding(MemFun(&CupHubScene::fn_80203674), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback inside(PointerBinding(MemFun(&CupHubScene::fn_802037E8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback press(PointerBinding(MemFun(&CupHubScene::fn_80203320), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback enter(PointerBinding(MemFun(&CupHubScene::OnMatchupPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leave(PointerBinding(MemFun(&CupHubScene::OnMatchupPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback inside(PointerBinding(MemFun(&CupHubScene::OnMatchupPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback press(PointerBinding(MemFun(&CupHubScene::OnMatchupPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
         mMatchupComponents[i].mContext = (void*)i;
@@ -397,16 +397,16 @@ void CupHubScene::fn_80202C34()
         mMatchupComponents[i].SetPointerInsideCallback(inside);
         mMatchupComponents[i].SetPointerPressCallback(press);
     }
-    FEPointerListener::Callback rulesEnter(PointerBinding(MemFun(&CupHubScene::fn_80203980), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback rulesLeave(PointerBinding(MemFun(&CupHubScene::fn_80203A10), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback rulesPress(PointerBinding(MemFun(&CupHubScene::fn_80203A88), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback rulesEnter(PointerBinding(MemFun(&CupHubScene::OnRulesPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback rulesLeave(PointerBinding(MemFun(&CupHubScene::OnRulesPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback rulesPress(PointerBinding(MemFun(&CupHubScene::OnRulesPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     SetPlayButtonBounds(&mRulesComponent, mRulesButton);
     mRulesComponent.SetPointerEnterCallback(rulesEnter);
     mRulesComponent.SetPointerLeaveCallback(rulesLeave);
     mRulesComponent.SetPointerPressCallback(rulesPress);
 }
 
-void CupHubScene::fn_80203320(unsigned int index, void* context)
+void CupHubScene::OnMatchupPointerPress(unsigned int index, void* context)
 {
     int row = (int)context;
     int round = mMatchupStates[mUnidentified304 + row][0];
@@ -430,7 +430,7 @@ void CupHubScene::fn_80203320(unsigned int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203498(unsigned int index, void* context)
+void CupHubScene::OnMatchupPointerEnter(unsigned int index, void* context)
 {
     int row = (int)context;
     if (mMatchupStates[mUnidentified304 + row][1] == -1)
@@ -445,7 +445,7 @@ void CupHubScene::fn_80203498(unsigned int index, void* context)
     mMatchupComponents[row].SetPointerState(1, index);
     mUnidentified20[row]->SetActiveSlide("over", true, false);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-    fn_80201BE0(row);
+    UpdateRow(row);
 
     char buffer[4];
     nlSNPrintf(buffer, sizeof(buffer), "%d", row + 1);
@@ -453,7 +453,7 @@ void CupHubScene::fn_80203498(unsigned int index, void* context)
     mUnidentified1C->SetActiveSlide(buffer, true, false);
 }
 
-void CupHubScene::fn_80203674(unsigned int index, void* context)
+void CupHubScene::OnMatchupPointerLeave(unsigned int index, void* context)
 {
     int row = (int)context;
     if (mMatchupStates[mUnidentified304 + row][1] != -1)
@@ -462,11 +462,11 @@ void CupHubScene::fn_80203674(unsigned int index, void* context)
         FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified20[row]->GetActiveSlide(), "highlite")->SetActiveSlide("off", true, false);
         mMatchupComponents[row].SetPointerState(0, index);
         mUnidentified20[row]->SetActiveSlide("off", true, false);
-        fn_80201BE0(row);
+        UpdateRow(row);
     }
 }
 
-void CupHubScene::fn_802037E8(unsigned int index, void* context)
+void CupHubScene::OnMatchupPointerInside(unsigned int index, void* context)
 {
     int matchup = mMatchupStates[mUnidentified304 + (int)context][1];
     int state = mMatchupComponents[(int)context].GetPointerState(index);
@@ -476,15 +476,15 @@ void CupHubScene::fn_802037E8(unsigned int index, void* context)
         FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified20[(int)context]->GetActiveSlide(), "highlite")->SetActiveSlide("off", true, false);
         mMatchupComponents[(int)context].SetPointerState(0, index);
         mUnidentified20[(int)context]->SetActiveSlide("off", true, false);
-        fn_80201BE0((int)context);
+        UpdateRow((int)context);
     }
     else if (state == 0 && matchup != -1)
     {
-        fn_80203498(index, context);
+        OnMatchupPointerEnter(index, context);
     }
 }
 
-void CupHubScene::fn_80203980(unsigned int index, void* context)
+void CupHubScene::OnRulesPointerEnter(unsigned int index, void* context)
 {
     if (context == 0 && !mRulesComponent.HasOtherPointerState(1, index))
     {
@@ -494,7 +494,7 @@ void CupHubScene::fn_80203980(unsigned int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203A10(unsigned int index, void* context)
+void CupHubScene::OnRulesPointerLeave(unsigned int index, void* context)
 {
     if (context == 0 && !mRulesComponent.HasOtherPointerState(1, index))
     {
@@ -503,7 +503,7 @@ void CupHubScene::fn_80203A10(unsigned int index, void* context)
     }
 }
 
-void CupHubScene::fn_80203A88(unsigned int, void* context)
+void CupHubScene::OnRulesPointerPress(unsigned int, void* context)
 {
     mUnidentified67C = true;
     for (int i = 0; i < 4; ++i)
@@ -529,7 +529,7 @@ void CupHubScene::fn_80203A88(unsigned int, void* context)
     }
 }
 
-void CupHubScene::fn_80203B54()
+void CupHubScene::BuildMatchupStates()
 {
     CupManager* cupManager = g_pCupManager;
     int entry = -1;

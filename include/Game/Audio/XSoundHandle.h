@@ -21,6 +21,11 @@ struct XSoundOwner
         m_Unknown1C |= 0x8000;
     }
 
+    const nlVector3& GetPosition() const
+    {
+        return count.field_8000 ? *m_Unknown04.m_Pointer : m_Unknown04.m_Value;
+    }
+
     /* 0x04 */ union
     {
         nlVector3 m_Value;

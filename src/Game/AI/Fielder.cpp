@@ -2155,8 +2155,9 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         }
         else
         {
-            float fAngToNet = nlATan2f(pNet->m_v3NetLocation.y - pBall->m_v3Position.y,
-                pNet->m_v3NetLocation.x - pBall->m_v3Position.x);
+            float fNetDX = pNet->m_v3NetLocation.x - pBall->m_v3Position.x;
+            float fNetDY = pNet->m_v3NetLocation.y - pBall->m_v3Position.y;
+            float fAngToNet = nlATan2f(fNetDY, fNetDX);
             u16 angle2Net = (u16)(s32)(10430.378f * fAngToNet);
             if (pNet->m_v3NetLocation.x < 0.0f)
             {
@@ -2210,7 +2211,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
 
         if (nParam == 8 && (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12))
         {
-            v3PositionOut.z = lbl_806DB754 * cNet::m_fNetHeight;
+            v3PositionOut.z = cNet::m_fNetHeight * lbl_806DB754;
             v3PositionOut.y = 0.0f;
         }
         else if (bIsModified)
@@ -3883,11 +3884,11 @@ void cFielder::Unknown11(void* context, DebugWriteCache* cache)
         if (desire != 0 && desire->UnidentifiedIsActive())
         {
             UnidentifiedFielderDesireState state;
-            const UnidentifiedStateTransition& transition
-                = !desire->mUnidentified070.UnidentifiedIsUnset()
-                ? desire->mUnidentified070
-                : desire->mUnidentified068;
-            state.m_nTransitionFuncHash = transition.mUnidentifiedHash;
+            const TransitionFunc& transition
+                = !desire->mOverrideTransition.IsUnset()
+                ? desire->mOverrideTransition
+                : desire->mDefaultTransition;
+            state.m_nTransitionFuncHash = transition.mFuncHash;
             state.m_nLastActiveTime = (u32)desire->mUnidentified014;
             state.m_fMaxDuration = desire->mUnidentified078;
             state.m_fMinDuration = desire->mUnidentified07C;

@@ -1,6 +1,6 @@
 #include "Game/Render/AttackSideIndicators.h"
 
-#include "Game/Drawable/DrawableObj.h"
+#include "Game/Render/StadiumWorldObjects.h"
 #include "Game/Net.h"
 #include "Game/Team.h"
 #include "NL/nlList.h"
@@ -38,19 +38,19 @@ public:
         }
         mProgress = progress;
 
-        nlListIterator<DrawableObject*> iterator = mObjects.Begin();
+        nlListIterator<StadiumAttackSideIndicator*> iterator = mObjects.Begin();
         while (iterator.IsValid())
         {
-            DrawableObject* object = iterator.Current();
-            float fraction = (float)(int)object->m_uObjectFlags
+            StadiumAttackSideIndicator* object = iterator.Current();
+            float fraction = (float)(int)object->m_nIndex
                            / (float)(mMaxIndex + 1);
             if (fraction <= mProgress)
             {
-                object->mUnidentified074 = 1;
+                object->m_nVisible = 1;
             }
             else
             {
-                object->mUnidentified074 = 0;
+                object->m_nVisible = 0;
             }
             iterator.Next();
         }
@@ -58,19 +58,19 @@ public:
 
     void UpdateMaxIndex()
     {
-        nlListIterator<DrawableObject*> iterator = mObjects.Begin();
+        nlListIterator<StadiumAttackSideIndicator*> iterator = mObjects.Begin();
         while (iterator.IsValid())
         {
-            int objectFlags = (int)iterator.Current()->m_uObjectFlags;
-            if (objectFlags > mMaxIndex)
+            int index = (int)iterator.Current()->m_nIndex;
+            if (index > mMaxIndex)
             {
-                mMaxIndex = objectFlags;
+                mMaxIndex = index;
             }
             iterator.Next();
         }
     }
 
-    /* 0x04 */ nlListContainer<DrawableObject*> mObjects;
+    /* 0x04 */ nlListContainer<StadiumAttackSideIndicator*> mObjects;
     /* 0x10 */ float mProgress;
     /* 0x14 */ int mMaxIndex;
     /* 0x18 */ bool mPositiveX;
@@ -120,7 +120,7 @@ AttackSideIndicatorSet::~AttackSideIndicatorSet()
     mObjects.Clear();
 }
 
-void RegisterAttackSideIndicator(DrawableObject* object)
+void RegisterAttackSideIndicator(StadiumAttackSideIndicator* object)
 {
     AttackSideIndicatorSet* set;
     for (int i = 0; i < 2; ++i)

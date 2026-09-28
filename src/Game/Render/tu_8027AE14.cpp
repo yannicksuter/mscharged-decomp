@@ -13,11 +13,10 @@ extern "C"
 bool lbl_806E19B8;
 StadiumDrawable_8027ADC0* lbl_806E19BC;
 
-extern "C" void fn_80343DE4(StadiumDrawable_8027ADC0*, void*);
 
 extern "C" void fn_8027ADC0(StadiumDrawable_8027ADC0* object, void* context)
 {
-    fn_80343DE4(object, context);
+    ((WorldDrawable*)object)->Initialize((WorldObjectLoadContext*)context);
     lbl_806E19BC = object;
 }
 

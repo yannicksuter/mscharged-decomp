@@ -427,8 +427,8 @@ void BeginFrameTask::Run(float dt)
         }
     }
 
-    fn_80273A30(eCLV_ShadowVolume);
-    fn_80273A30(eCLV_ShadowVolumeBlend);
+    HideLayerView(eCLV_ShadowVolume);
+    HideLayerView(eCLV_ShadowVolumeBlend);
     nlServiceFileSystem();
 
     g_FrameCounter.StartTimer(0);

@@ -76,26 +76,24 @@ StadiumLoadResult gStadiumModelLoadResults[2][22];
 
 bool CreatePowerupDrawables(glModel* models, unsigned long numModels)
 {
+    glModel* model = models;
     glModel* end = models + numModels;
     WorldObjectLoadContext* context
         = (WorldObjectLoadContext*)nlMalloc(sizeof(WorldObjectLoadContext), 8, true);
-    if (context != 0)
-    {
-        new (context) WorldObjectLoadContext(pBasicStadiumInstance);
-    }
+    new (context) WorldObjectLoadContext(pBasicStadiumInstance);
 
     unsigned long uExcluded = nlStringHash(StadiumExcludedMetalShellModel);
-    for (; models < end; models++)
+    for (; model < end; model++)
     {
-        if (uExcluded == models->id)
+        if (uExcluded == model->id)
         {
             continue;
         }
 
         DrawableObject* pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
         pObject = new (pObject) PlanarShadowDrawable(
-            context, models, models->id);
-        pObject->m_uHashID = models->id;
+            context, model, model->id);
+        pObject->m_uHashID = model->id;
         fn_8027876C(pBasicStadiumInstance, pObject);
     }
 
@@ -560,7 +558,7 @@ void UpdateHighRange()
         {
             bDisable = true;
         }
-        else if (GetStadiumUnknown0x2C(GameInfoManager::Instance()->GetStadium())
+        else if (StadiumHasHighRangeDrawables(GameInfoManager::Instance()->GetStadium())
             && (nlTaskManager::m_pInstance->mCurrentState & 0x20018) != 0)
         {
             bDisable = true;

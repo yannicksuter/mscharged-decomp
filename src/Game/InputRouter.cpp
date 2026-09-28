@@ -529,14 +529,15 @@ void NetworkInputRouter::OnInputReady()
                 NetworkPeerChannel* channel
                     = peer->GetNetworkPeerChannel(player);
                 s8 playerId = GetNetworkPlayerId(player, machine);
+                u8* state = &mInputStates[playerId];
                 PackedDetInput* input = &mInputRecords[playerId];
                 channel->ApplyNetworkPeerChannelInput(
-                    input, mNetworkTicks[machine], mInputStates[playerId]);
+                    input, mNetworkTicks[machine], *state);
 
                 if (gNetworkInputRecording->mRecording)
                 {
                     gNetworkInputRecording->WriteNetworkInputRecord(
-                        player, input, mInputStates[playerId]);
+                        player, input, *state);
                 }
             }
         }
@@ -598,7 +599,8 @@ void NetworkInputRouter::OnInputReady()
                     serializer.mBuffer, serializedLength);
             }
 
-            for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
+            int playerCount = peer->mPlayerCount;
+            for (s8 player = 0; player < playerCount; ++player)
             {
                 NetworkPeerChannel* channel
                     = peer->GetNetworkPeerChannel(player);
@@ -717,10 +719,9 @@ void NetworkInputRouter::CheckPeerSynchronization()
 void NetworkInputRouter::ReceiveInput(
     s8 machine, NetMessageInput* message)
 {
-    NetworkInputMessageQueue& queue = mInputQueues[machine];
-    if (!queue.IsFull())
+    if (!mInputQueues[machine].IsFull())
     {
-        queue.PushSlot()->CopyFrom(message);
+        mInputQueues[machine].PushSlot()->CopyFrom(message);
     }
     else
     {

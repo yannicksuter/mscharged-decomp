@@ -2,8 +2,9 @@
 #define _FONTMANAGER_H_
 
 #include "NL/nlDLListContainer.h"
-#include "NL/nlFont.h"
 #include "NL/nlSingleton.h"
+
+class nlFont;
 
 class FontManager : public nlSingleton<FontManager>
 {

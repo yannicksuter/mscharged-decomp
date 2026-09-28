@@ -1,5 +1,6 @@
 #include "Game/FE/FEAudio.h"
 
+#include "Game/Audio/RegistryPools.h"
 #include "Game/Sys/audio.h"
 
 static bool mIsEnabled = true;

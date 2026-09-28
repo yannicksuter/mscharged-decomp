@@ -2,7 +2,7 @@
 #define GAME_AI_TEAM_PLAY_MACHINE_H
 
 #include "Game/AI/Desire.h"
-#include "Game/AI/UnidentifiedStringHash.h"
+#include "Game/AI/TransitionFunc.h"
 #include "Game/AI/Variant.h"
 
 class cTeam;
@@ -31,11 +31,11 @@ public:
     {
     }
 
-    void UnidentifiedSetTransition(const char* name)
+    void SetTransition(const char* name)
     {
-        UnidentifiedStringHash transition(name);
-        mUnidentified00C.mUnidentifiedHash = transition.mUnidentifiedHash;
-        mUnidentified00C.mUnidentifiedFunction = transition.mUnidentifiedFunction;
+        ScriptTransitionFunc transition(name);
+        mTransition.mFuncHash = transition.mFuncHash;
+        mTransition.mNativeFunc = transition.mNativeFunc;
     }
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
@@ -53,7 +53,7 @@ public:
 
     shdStateMachine* mUnidentified004;
     shdStateMachine* mUnidentified008;
-    UnidentifiedUnsetTransition mUnidentified00C;
+    UnsetTransitionFunc mTransition;
     int mUnidentified014;
     UnidentifiedVariantCollection mUnidentified018;
     AIContext* mAIContext;
@@ -81,7 +81,7 @@ class UnidentifiedTeamDesire : public shdStateMachine
 {
 public:
     UnidentifiedTeamDesire(
-        int state, const UnidentifiedStateTransition& transition);
+        int state, const TransitionFunc& transition);
     virtual ~UnidentifiedTeamDesire()
     {
     }
@@ -100,7 +100,7 @@ class TutorialMegastrikeDesire : public UnidentifiedTeamDesire
 {
 public:
     TutorialMegastrikeDesire(
-        int state, UnidentifiedStateTransition transition)
+        int state, TransitionFunc transition)
         : UnidentifiedTeamDesire(state, transition)
     {
     }
@@ -116,8 +116,8 @@ class cFielder;
 UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
 
-extern "C" bool fn_80317E34( const UnidentifiedStateTransition* transition);
-extern "C" bool fn_80317E60( const UnidentifiedStateTransition* transition);
+bool IsTransitionFuncSet(const TransitionFunc* transition);
+bool HasTransitionFunc(const TransitionFunc* transition);
 extern "C" void fn_80318D34( UnidentifiedScriptMachine* machine, int state, const char* name, bool secondary);
 extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
 extern "C" shdStateMachine* fn_80319F94( UnidentifiedScriptMachine* machine, int state);

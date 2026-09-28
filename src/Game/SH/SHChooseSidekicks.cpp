@@ -389,7 +389,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
                     GetNavigationScene()->SetButtons(0x24, true);
                 for (int i = 0; i < 4; ++i)
                     GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
-                fn_8022C720();
+                InitializePointerButtons();
                 mUnidentified4A = true;
                 mUnidentified1954 = 1;
             }
@@ -413,7 +413,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
     }
     if (!mUnidentified4B)
     {
-        fn_8022BFEC();
+        InitializeSidekickButtons();
         mUnidentified4B = true;
     }
     if (mUnidentified4D)
@@ -505,7 +505,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
 /**
  * Offset/Address/Size: 0x26B0 | 0x8022AB68 | size: 0x184
  */
-void ChooseSidekicksSceneV2::fn_8022AB68(int index, void* context)
+void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -535,7 +535,7 @@ void ChooseSidekicksSceneV2::fn_8022AB68(int index, void* context)
 /**
  * Offset/Address/Size: 0x2834 | 0x8022ACEC | size: 0x1B8
  */
-void ChooseSidekicksSceneV2::fn_8022ACEC(int index, void* context)
+void ChooseSidekicksSceneV2::OnSidekickPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -576,7 +576,7 @@ void ChooseSidekicksSceneV2::fn_8022ACEC(int index, void* context)
 /**
  * Offset/Address/Size: 0x29EC | 0x8022AEA4 | size: 0xE0
  */
-void ChooseSidekicksSceneV2::fn_8022AEA4(int index, void* context)
+void ChooseSidekicksSceneV2::OnSidekickPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -595,7 +595,7 @@ void ChooseSidekicksSceneV2::fn_8022AEA4(int index, void* context)
 /**
  * Offset/Address/Size: 0x2ACC | 0x8022AF84 | size: 0x2B0
  */
-void ChooseSidekicksSceneV2::fn_8022AF84(int index, void* context)
+void ChooseSidekicksSceneV2::OnSlotPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     bool group = which >= 3;
@@ -665,7 +665,7 @@ void ChooseSidekicksSceneV2::fn_8022AF84(int index, void* context)
 /**
  * Offset/Address/Size: 0x2D7C | 0x8022B234 | size: 0x1CC
  */
-void ChooseSidekicksSceneV2::fn_8022B234(int index, void* context)
+void ChooseSidekicksSceneV2::OnSlotPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     bool group = which >= 3;
@@ -702,7 +702,7 @@ void ChooseSidekicksSceneV2::fn_8022B234(int index, void* context)
 /**
  * Offset/Address/Size: 0x2F48 | 0x8022B400 | size: 0x94
  */
-void ChooseSidekicksSceneV2::fn_8022B400(int index, void* context)
+void ChooseSidekicksSceneV2::OnSlotPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     bool group = which >= 3;
@@ -721,7 +721,7 @@ void ChooseSidekicksSceneV2::fn_8022B400(int index, void* context)
 /**
  * Offset/Address/Size: 0x2FDC | 0x8022B494 | size: 0x98
  */
-void ChooseSidekicksSceneV2::fn_8022B494(int index, void* context)
+void ChooseSidekicksSceneV2::OnSlotPointerInside(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     bool group = which >= 3;
@@ -738,13 +738,13 @@ void ChooseSidekicksSceneV2::fn_8022B494(int index, void* context)
         return;
     }
 
-    fn_8022B234(index, context);
+    OnSlotPointerEnter(index, context);
 }
 
 /**
  * Offset/Address/Size: 0x3074 | 0x8022B52C | size: 0xD4
  */
-void ChooseSidekicksSceneV2::fn_8022B52C(int index, void* context)
+void ChooseSidekicksSceneV2::OnSelectPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -768,7 +768,7 @@ void ChooseSidekicksSceneV2::fn_8022B52C(int index, void* context)
 /**
  * Offset/Address/Size: 0x3148 | 0x8022B600 | size: 0xE8
  */
-void ChooseSidekicksSceneV2::fn_8022B600(int index, void* context)
+void ChooseSidekicksSceneV2::OnSelectPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -791,7 +791,7 @@ void ChooseSidekicksSceneV2::fn_8022B600(int index, void* context)
 /**
  * Offset/Address/Size: 0x3230 | 0x8022B6E8 | size: 0xD8
  */
-void ChooseSidekicksSceneV2::fn_8022B6E8(int index, void* context)
+void ChooseSidekicksSceneV2::OnSelectPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -812,7 +812,7 @@ void ChooseSidekicksSceneV2::fn_8022B6E8(int index, void* context)
 /**
  * Offset/Address/Size: 0x3308 | 0x8022B7C0 | size: 0xF4
  */
-void ChooseSidekicksSceneV2::fn_8022B7C0(int index, void* context)
+void ChooseSidekicksSceneV2::OnRandomPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -838,7 +838,7 @@ void ChooseSidekicksSceneV2::fn_8022B7C0(int index, void* context)
 /**
  * Offset/Address/Size: 0x33FC | 0x8022B8B4 | size: 0xE8
  */
-void ChooseSidekicksSceneV2::fn_8022B8B4(int index, void* context)
+void ChooseSidekicksSceneV2::OnRandomPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -861,7 +861,7 @@ void ChooseSidekicksSceneV2::fn_8022B8B4(int index, void* context)
 /**
  * Offset/Address/Size: 0x34E4 | 0x8022B99C | size: 0xD8
  */
-void ChooseSidekicksSceneV2::fn_8022B99C(int index, void* context)
+void ChooseSidekicksSceneV2::OnRandomPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -882,7 +882,7 @@ void ChooseSidekicksSceneV2::fn_8022B99C(int index, void* context)
 /**
  * Offset/Address/Size: 0x35BC | 0x8022BA74 | size: 0x370
  */
-void ChooseSidekicksSceneV2::fn_8022BA74(int index, void* context)
+void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
 {
     if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
     {
@@ -923,7 +923,7 @@ void ChooseSidekicksSceneV2::fn_8022BA74(int index, void* context)
 /**
  * Offset/Address/Size: 0x392C | 0x8022BDE4 | size: 0xB0
  */
-void ChooseSidekicksSceneV2::fn_8022BDE4(int index, void* context)
+void ChooseSidekicksSceneV2::OnDonePointerEnter(int index, void* context)
 {
     if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
     {
@@ -943,7 +943,7 @@ void ChooseSidekicksSceneV2::fn_8022BDE4(int index, void* context)
 /**
  * Offset/Address/Size: 0x39DC | 0x8022BE94 | size: 0x8C
  */
-void ChooseSidekicksSceneV2::fn_8022BE94(int index, void* context)
+void ChooseSidekicksSceneV2::OnDonePointerLeave(int index, void* context)
 {
     if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
     {
@@ -961,7 +961,7 @@ void ChooseSidekicksSceneV2::fn_8022BE94(int index, void* context)
 /**
  * Offset/Address/Size: 0x3A68 | 0x8022BF20 | size: 0xCC
  */
-void ChooseSidekicksSceneV2::fn_8022BF20(int index, void* context)
+void ChooseSidekicksSceneV2::OnDonePointerInside(int index, void* context)
 {
     if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
     {
@@ -970,21 +970,21 @@ void ChooseSidekicksSceneV2::fn_8022BF20(int index, void* context)
 
     if (mUnidentified11C8.GetPointerState(index) == 0)
     {
-        fn_8022BDE4(index, context);
+        OnDonePointerEnter(index, context);
     }
 }
 
 /**
  * Offset/Address/Size: 0x3B34 | 0x8022BFEC | size: 0x734
  */
-void ChooseSidekicksSceneV2::fn_8022BFEC()
+void ChooseSidekicksSceneV2::InitializeSidekickButtons()
 {
     typedef Detail::MemFunImpl<void, void (ChooseSidekicksSceneV2::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, ChooseSidekicksSceneV2*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback enter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022ACEC), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022AEA4), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback press(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022AB68), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback enter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSidekickPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSidekickPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback press(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSidekickPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     TLComponentInstance* sidekicks;
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
         sidekicks = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "SIDEKICKS RTSC");
@@ -1017,25 +1017,25 @@ void ChooseSidekicksSceneV2::fn_8022BFEC()
 /**
  * Offset/Address/Size: 0x4268 | 0x8022C720 | size: 0xED8
  */
-void ChooseSidekicksSceneV2::fn_8022C720()
+void ChooseSidekicksSceneV2::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (ChooseSidekicksSceneV2::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, ChooseSidekicksSceneV2*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback selectEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B600), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback selectLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B6E8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback selectPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B52C), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback randomEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B8B4), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback randomLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B99C), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback randomPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B7C0), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback doneEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022BDE4), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback doneLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022BE94), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback doneInside(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022BF20), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback donePress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022BA74), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback slotEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B234), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback slotLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B400), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback slotInside(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022B494), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback slotPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::fn_8022AF84), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSelectPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSelectPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSelectPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback randomEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnRandomPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback randomLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnRandomPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback randomPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnRandomPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback doneEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback doneLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback doneInside(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnDonePointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback donePress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback slotEnter(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback slotLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback slotInside(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback slotPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     SetDoneButtonBounds(&mUnidentified11C8, mUnidentified1918, 0);
     mUnidentified11C8.SetPointerEnterCallback(doneEnter);
     mUnidentified11C8.SetPointerLeaveCallback(doneLeave);

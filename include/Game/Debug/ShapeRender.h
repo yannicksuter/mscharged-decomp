@@ -41,6 +41,8 @@ public:
         const nlColour& colour, int view) const;
     void DrawSphere(const nlVector3& position, const nlColour& colour,
         float radius) const;
+    void DrawWireBox(const nlVector3& boundsMin, const nlVector3& boundsMax,
+        const nlColour& colour) const;
     void Initialize(void* resource);
 
     /* 0x00 */ void* m_Unknown00;

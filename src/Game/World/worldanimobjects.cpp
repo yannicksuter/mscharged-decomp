@@ -97,8 +97,8 @@ extern "C" void fn_803438FC(WorldAnimObject_803437C8* pObject)
     {
         for (int i = 0; i < pObject->m_nBindings; ++i)
         {
-            WorldAnimDrawable_80343A40* pDrawable
-                = (WorldAnimDrawable_80343A40*)pObject->m_pWorld
+            WorldDrawable* pDrawable
+                = (WorldDrawable*)pObject->m_pWorld
                       ->FindDrawableObject(
                           pObject->m_pBindings[i].m_uDrawableHash);
             if (pDrawable != 0)
@@ -134,15 +134,15 @@ extern "C" void* fn_80343A00(void* pObject, int shouldDelete)
 }
 
 extern "C" nlMatrix4* fn_80343A40(
-    WorldAnimDrawable_80343A40* pObject)
+    WorldDrawable* pObject)
 {
-    return &pObject->m_transform;
+    return &pObject->mWorldMatrix;
 }
 
-extern "C" void fn_80343A48(WorldAnimDrawable_80343A40* pObject,
+extern "C" void fn_80343A48(WorldDrawable* pObject,
     const nlMatrix4* pTransform)
 {
-    pObject->m_transform = *pTransform;
+    pObject->mWorldMatrix = *pTransform;
 }
 
 extern "C" void fn_80343ADC(void*)
@@ -166,7 +166,7 @@ nlMatrix4* WorldDrawable::GetWorldMatrix()
     return &mWorldMatrix;
 }
 
-bool WorldDrawable::V6(const nlVector4* pCullData) const
+bool WorldDrawable::IsVisibleInFrustum(const nlVector4* pCullData) const
 {
     FrustumResult result;
     if (m_pAnimController != 0)
@@ -195,10 +195,10 @@ bool WorldDrawable::V6(const nlVector4* pCullData) const
 
 void WorldDrawable::Draw()
 {
-    V8(0);
+    DrawToView(0);
 }
 
-void WorldDrawable::V8(GLView* pView)
+void WorldDrawable::DrawToView(GLView* pView)
 {
     glModel* pModel = m_pModel;
     unsigned long uAnimationHash = pModel->id;
@@ -215,7 +215,7 @@ void WorldDrawable::V8(GLView* pView)
             = fFrameTime - (float)floor(fFrameTime);
         int nFrame = (int)((float)nFrames * fFrameFraction);
         pModel = pVertexAnim->GetModel(nFrame);
-        V7(pModel);
+        UpdateModelMaterials(pModel);
     }
 
     if (m_pAnimController != 0)
@@ -255,13 +255,12 @@ void WorldDrawable::V8(GLView* pView)
     }
 }
 
-extern "C" void fn_80343DE4(WorldAnimDrawable_80343A40* pObject,
-    WorldObjectLoadContext* pContext)
+void WorldDrawable::Initialize(WorldObjectLoadContext* pContext)
 {
-    glModel*& pMaterial = pObject->m_pModel;
+    glModel*& pMaterial = m_pModel;
     pContext->m_pWorld->ResolveModel(pMaterial);
-    pObject->m_pModel = glModelDupNoStreams(
-        (glModel*)pObject->m_pModel, true,
+    m_pModel = glModelDupNoStreams(
+        (glModel*)m_pModel, true,
         pContext->m_pWorld->m_pResource);
 }
 

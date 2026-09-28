@@ -223,6 +223,12 @@ void AudioSampleSource::Update()
     case 6:
         m_Unknown10 = 1;
         break;
+    case 0:
+        return;
+    case 1:
+    case 3:
+    case 7:
+        break;
     }
 }
 

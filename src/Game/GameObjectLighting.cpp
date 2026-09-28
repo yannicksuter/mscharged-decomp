@@ -4,6 +4,7 @@
 #include <revolution/mtx/mtx.h>
 
 #include "Game/GameObjectLighting.h"
+#include "Game/Render/StadiumWorldObjects.h"
 #include "Game/Render/ImpostorModel.h"
 
 #include "Game/BasicStadium.h"
@@ -77,15 +78,6 @@ struct GameObjectLightArray
 {
     GameObjectLight lights[2];
 }; // total size: 0x48
-
-struct UnidentifiedObject_80182168
-{
-    /* 0x00 */ u8 mUnidentified00[0x64];
-    /* 0x64 */ float m_fIntensity;
-    /* 0x68 */ float m_fFarAttenuationStart;
-    /* 0x6C */ float m_fFarAttenuationEnd;
-    /* 0x70 */ nlFloatColour m_colour;
-};
 
 TweakValueFloat gShadowLookupScaleX(
     "Scale X", "/Rendering/Lighting/Shadow Lookup", 0.042f, false);
@@ -213,16 +205,16 @@ GameObjectLight::GameObjectLight()
 
 void FillInGameObjectLightRamp();
 
-extern "C" void fn_80182168(UnidentifiedObject_80182168* pLight)
+void PrepareStadiumLight(StadiumLight* pLight)
 {
     // This retained path prepares a light locally but does not publish it.
-    GameObjectLight var0;
-    var0.unknown01 = true;
-    var0.enabled = true;
-    const nlMatrix4& matrix = *((DrawableObject*)pLight)->GetWorldMatrix();
-    ConvertColour(var0.colour, pLight->m_colour);
-    var0.worldPosition = matrix.GetTranslation();
-    var0.intensity = pLight->m_fIntensity;
+    GameObjectLight light;
+    light.unknown01 = true;
+    light.enabled = true;
+    const nlMatrix4& matrix = *pLight->GetWorldMatrix();
+    ConvertColour(light.colour, pLight->m_colour);
+    light.worldPosition = matrix.GetTranslation();
+    light.intensity = pLight->m_fIntensity;
 }
 
 void InitializeGameObjectLighting()
@@ -633,8 +625,8 @@ void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mv
             var3 = 255;
 
         GXColor colour;
-        colour.r = (u8)((var3 * pLight->colour.c[0]) >> 8);
         colour.a = lbl_806E4D1B;
+        colour.r = (u8)((var3 * pLight->colour.c[0]) >> 8);
         colour.g = (u8)((var3 * pLight->colour.c[1]) >> 8);
         colour.b = (u8)((var3 * pLight->colour.c[2]) >> 8);
         GXInitLightColor(&light, colour);

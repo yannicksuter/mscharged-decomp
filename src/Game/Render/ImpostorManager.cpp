@@ -93,30 +93,17 @@ void ImpostorManager::InvalidateCapture()
 
 void ImpostorManager::ResetImpostors()
 {
-    for (nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
-         it.hasNext(); it.next())
+    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    while (it.hasNext())
     {
         (*it)->ReleaseSprites();
+        it.Step();
     }
 
     for (int i = 0; i < mNumUsed; ++i)
     {
         mImpostors[i].Reset();
-        for (nlDLListIterator<ImpostorCharacter*> characters = mCharacters.Begin();
-             characters.hasNext(); characters.next())
-        {
-            for (nlDLListIterator<ImpostorSprite*> sprites =
-                     (*characters)->mSprites.Begin();
-                 sprites.hasNext(); sprites.next())
-            {
-                ImpostorSprite* sprite = *sprites;
-                sprite->ClearRenderSlots();
-                if (gImpostorSpritesInvalid != 0)
-                {
-                    sprite->QueueAllSlots();
-                }
-            }
-        }
+        ResetSpriteSlots();
     }
 
     mNumUsed = 0;
@@ -145,39 +132,21 @@ void ImpostorManager::Uninitialize()
 void ImpostorManager::ResetSpriteSlots()
 {
     nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
-    DLListEntry<ImpostorCharacter*>* head = it.m_Head;
-    DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
-    while (entry != 0)
+    while (it.hasNext())
     {
         nlDLListIterator<ImpostorSprite*> sprites =
-            entry->entry->mSprites.Begin();
-        DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
-        DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
-        while (spriteEntry != 0)
+            (*it)->mSprites.Begin();
+        while (sprites.hasNext())
         {
-            ImpostorSprite* sprite = spriteEntry->entry;
+            ImpostorSprite* sprite = *sprites;
             sprite->ClearRenderSlots();
             if (gImpostorSpritesInvalid != 0)
             {
                 sprite->QueueAllSlots();
             }
-            if (nlDLRingIsEnd(spriteHead, spriteEntry) || spriteEntry == 0)
-            {
-                spriteEntry = 0;
-            }
-            else
-            {
-                spriteEntry = spriteEntry->m_next;
-            }
+            sprites.Step();
         }
-        if (nlDLRingIsEnd(head, entry) || entry == 0)
-        {
-            entry = 0;
-        }
-        else
-        {
-            entry = entry->m_next;
-        }
+        it.Step();
     }
 }
 

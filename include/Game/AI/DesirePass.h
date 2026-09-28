@@ -9,7 +9,7 @@ class DesirePreparePass : public Desire
 {
 public:
     DesirePreparePass(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -30,7 +30,7 @@ private:
 class DesirePass : public Desire
 {
 public:
-    DesirePass(int state, const UnidentifiedStateTransition& transition)
+    DesirePass(int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }

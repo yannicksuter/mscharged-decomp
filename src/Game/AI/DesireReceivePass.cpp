@@ -192,7 +192,7 @@ static inline float DoCalculatePassSpeed(const nlVector2& distance,
 }
 
 DesireReceivePass::DesireReceivePass()
-    : Desire(22, UnidentifiedStringHash("TransDesireReceivePass"))
+    : Desire(22, ScriptTransitionFunc("TransDesireReceivePass"))
 {
     mEstimated.Reset();
 }
@@ -778,10 +778,10 @@ bool DesireReceivePass::fn_800C0E74()
 void DesireReceivePass::fn_800C0F14()
 {
     float fDuration = 0.5f + g_pBall->m_tPassTargetTimer.GetSeconds();
-    const UnidentifiedStateTransition& transition =
-        !mUnidentified070.UnidentifiedIsUnset() ? mUnidentified070 : mUnidentified068;
+    const TransitionFunc& transition =
+        !mOverrideTransition.IsUnset() ? mOverrideTransition : mDefaultTransition;
     AIContext* input = mUnidentified018->mAIContext;
-    input->SetTimer(input->GetTimerKey(transition.mUnidentifiedHash, 1), fDuration);
+    input->SetTimer(input->GetTimerKey(transition.mFuncHash, 1), fDuration);
 }
 
 bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)

@@ -16,7 +16,7 @@ class DesireUsePowerup : public Desire
     friend void fn_800D38D0(DesireUsePowerup*);
     friend void fn_800D3CBC(DesireUsePowerup*);
 public:
-    DesireUsePowerup(UnidentifiedStateTransition transition)
+    DesireUsePowerup(TransitionFunc transition)
         : Desire(17, transition)
         , mePowerup(POWER_UP_NONE)
     {

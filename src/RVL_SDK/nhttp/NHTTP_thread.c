@@ -902,7 +902,8 @@ s32 NHTTPi_SendProcPostDataAscii(NHTTPThreadData* threadData_p)
     NHTTPHeader* datalist_p;
     for (datalist_p = req_p->postData; datalist_p != NULL;)
     {
-        contentLength += NHTTPi_getUrlEncodedSize(datalist_p->name) + 1;
+        contentLength += NHTTPi_getUrlEncodedSize(datalist_p->name);
+        contentLength++;
         if (datalist_p->value == NULL)
         {
             if (!NHTTPi_GetPostContentlength(mutexInfo_p, req_p,

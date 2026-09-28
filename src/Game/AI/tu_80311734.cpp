@@ -4,7 +4,7 @@
 #include "Game/AI/Scripts/ScriptCaching.h"
 
 #include "Game/AI/Desire.h"
-#include "Game/AI/UnidentifiedStringHash.h"
+#include "Game/AI/TransitionFunc.h"
 #include "Game/MathHelpers.h"
 #include "Game/TweakConfig.h"
 #include "NL/nlAVLTree.h"
@@ -21,7 +21,7 @@ extern UnidentifiedVariant_80054AB8 lbl_80584250;
 struct UnidentifiedTransitionOwner
 {
     u8 mPadding000[0x0C];
-    UnidentifiedStateTransition mTransition;
+    TransitionFunc mTransition;
 };
 
 struct UnidentifiedTransitionReference
@@ -339,7 +339,7 @@ extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     return result;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* fn_8031243C(
+UnidentifiedVariant_80054AB8* ExecuteScriptFunction(
     UnidentifiedFuzzyRuntimeBase* runtime, u32 hash,
     UnidentifiedFuzzyRuntimeValue* action)
 {
@@ -777,7 +777,7 @@ extern "C" void fn_80314750(
     const char* name)
 {
     UnidentifiedTransitionOwner* owner = reference->mOwner;
-    UnidentifiedStringHash transition(name);
+    ScriptTransitionFunc transition(name);
     owner->mTransition = transition;
 }
 

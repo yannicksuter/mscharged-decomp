@@ -559,8 +559,9 @@ int NetworkDraft::GetRandomAvailableCaptain() const
 
 void NetworkDraft::SendCaptainChoice()
 {
+    int teamIndex = mCurrentDraftingTeam;
     NetMessageDraftPickedCaptain message;
-    message.mTeamIndex = mCurrentDraftingTeam;
+    message.mTeamIndex = teamIndex;
     message.mCaptain = GameInfoManager::Instance()->GetTeam(0);
     u8 buffer[0x20];
     int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));

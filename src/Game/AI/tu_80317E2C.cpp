@@ -19,7 +19,7 @@ class UnidentifiedStateMachine_803171D0 : public shdStateMachine
 public:
     UnidentifiedStateMachine_803171D0(
         int, const char*, UnidentifiedScriptMachine*,
-        const UnidentifiedStateTransition&);
+        const TransitionFunc&);
     virtual ~UnidentifiedStateMachine_803171D0();
     virtual bool UnidentifiedInitialize(void*);
     virtual bool UnidentifiedReinitialize(void* context)
@@ -37,9 +37,6 @@ public:
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311744(void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
-extern "C" void fn_80315A64(
-    UnidentifiedStateTransition*, AIContext*,
-    UnidentifiedVariant_80054AB8*, UnidentifiedFuzzyRuntimeValue*);
 extern "C" void fn_80316980(shdStateMachine*, bool);
 extern "C" bool fn_803169DC(
     shdStateMachine*, UnidentifiedVariantCollection*, bool);
@@ -77,17 +74,17 @@ extern "C" AIContext* fn_80317E2C(
     return context->mAIContext;
 }
 
-extern "C" bool fn_80317E34(
-    const UnidentifiedStateTransition* transition)
+bool IsTransitionFuncSet(
+    const TransitionFunc* transition)
 {
-    return !transition->UnidentifiedIsUnset();
+    return !transition->IsUnset();
 }
 
-extern "C" bool fn_80317E60(
-    const UnidentifiedStateTransition* transition)
+bool HasTransitionFunc(
+    const TransitionFunc* transition)
 {
-    return transition->mUnidentifiedFunction != 0
-        || transition->mUnidentifiedHash != 0;
+    return transition->mNativeFunc != 0
+        || transition->mFuncHash != 0;
 }
 
 extern "C" bool fn_80317E88(const shdStateMachine* machine)
@@ -201,7 +198,7 @@ extern "C" void fn_80318D34(
         = new (nlMalloc(sizeof(UnidentifiedStateMachine_803171D0), 8, false))
             UnidentifiedStateMachine_803171D0(
                 state, name, machine,
-                UnidentifiedUnsetTransition(lbl_806E20B8));
+                UnsetTransitionFunc(g_UnsetTransitionFunc));
     machine->UnidentifiedAddState(state, result, secondary);
 }
 
@@ -242,8 +239,8 @@ extern "C" shdStateMachine* fn_80319E84(
 
 void UnidentifiedScriptMachine::Update(float deltaTime)
 {
-    UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
     bool selectState = false;
+    UnidentifiedVariant_80054AB8 update(FT_INT, lbl_806DF5C0[0]);
     shdStateMachine* active = mUnidentified004;
 
     if (active != 0)
@@ -256,8 +253,7 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
     }
     if (active == mUnidentified004)
     {
-        int result = update.mData.i;
-        if (result != 0 && mUnidentified014 > -1)
+        if (update.mData.i != 0 && mUnidentified014 > -1)
         {
             bool force = false;
             if (mUnidentified018.IsSet(12))
@@ -270,7 +266,7 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
         }
         else
         {
-            switch (result)
+            switch (update.mData.i)
             {
             case 3:
             {
@@ -342,16 +338,16 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
         UnidentifiedVirtual8();
     }
 
-    if (fn_80317E34(&mUnidentified00C))
+    if (IsTransitionFuncSet(&mTransition))
     {
         float start = lbl_806DF560();
         UnidentifiedVariant_80054AB8 result;
-        fn_80315A64(&mUnidentified00C, mAIContext, &result, 0);
+        mTransition.Execute(mAIContext, &result, 0);
         fn_8031A0C8(start, lbl_806DF560());
 
         if ((unsigned int)result.GetType() == FT_UNSPECIFIED)
         {
-            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mUnidentified00C.mUnidentifiedHash);
+            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mTransition.mFuncHash);
             UnidentifiedVirtual6();
         }
         else if (result.ExtraData.Get(9)->mData.b)

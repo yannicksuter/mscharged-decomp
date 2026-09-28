@@ -6,6 +6,7 @@
 extern nlLocalization::nlLanguage g_Language;
 extern int g_BuildNumber;
 extern bool g_e3_Build;
+extern bool lbl_806E1091;
 
 int GetRegion();
 int GetOnlineRegion();

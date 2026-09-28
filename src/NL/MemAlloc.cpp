@@ -1,4 +1,5 @@
 #include "NL/MemAlloc.h"
+#include "NL/nlMath.h"
 #include "NL/nlDebug.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlDLRing.h"
@@ -78,9 +79,7 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
         blockSize = cur->m_size;
         if (blockSize > alignedSize)
         {
-            u32 address = (u32)cur + 4;
-            u32 remainder = address % alignment;
-            address += (alignment - remainder) * (remainder != 0);
+            u32 address = nlAlignUp((u32)cur + 4, alignment);
             prefix = address - (u32)cur;
             usedSize = prefix + alignedSize;
             if (usedSize <= blockSize)

@@ -104,8 +104,8 @@ void NetworkStatsReporter::Open()
 }
 
 bool NetworkStatsReporter::ReportGameResult(int,
-    const NetworkScoreSubmission*, const NetworkStatsPlayer* home,
-    const NetworkStatsPlayer* away, bool reportHome, int homeScore,
+    const NetworkScoreSubmission*, NetworkStatsPlayer* home,
+    NetworkStatsPlayer* away, bool reportHome, int homeScore,
     int awayScore, const NetworkScoreSubmission*)
 {
     if (!reportHome)
@@ -411,8 +411,8 @@ static u8 sRankingHmacKey[32] = {
 };
 
 bool NetworkRanking::ReportGameResult(int category,
-    const NetworkScoreSubmission*, const NetworkStatsPlayer*,
-    const NetworkStatsPlayer*, bool, int, int,
+    const NetworkScoreSubmission*, NetworkStatsPlayer*,
+    NetworkStatsPlayer*, bool, int, int,
     const NetworkScoreSubmission* fallback)
 {
     mSubmission.mWins = fallback->mWins;
@@ -850,7 +850,7 @@ int NetworkRanking::CompareLeaderboardRows(
 {
     const NetworkRankingSortRow* a = (const NetworkRankingSortRow*)left;
     const NetworkRankingSortRow* b = (const NetworkRankingSortRow*)right;
-    int scoreDifference = a->mMetadata.mWins - b->mMetadata.mWins;
+    int scoreDifference = a->mMetadata.mScore - b->mMetadata.mScore;
     if (scoreDifference > 0)
     {
         return -1;
@@ -872,46 +872,29 @@ int NetworkRanking::CompareLeaderboardRows(
         return 1;
     }
 
-    int i = 0;
-    while (true)
+    int nameDifference = nlStrICmp(a->mPlayer.mName, b->mPlayer.mName);
+    if (nameDifference != 0)
     {
-        u16 aChar = a->mPlayer.mName[i];
-        u16 bChar = b->mPlayer.mName[i];
-        if (aChar >= 'a' && aChar <= 'z')
-        {
-            aChar &= 0x5F;
-        }
-        if (bChar >= 'a' && bChar <= 'z')
-        {
-            bChar &= 0x5F;
-        }
-        if (aChar == 0 || bChar == 0 || aChar != bChar)
-        {
-            int difference = (int)aChar - (int)bChar;
-            if (difference != 0)
-            {
-                return difference;
-            }
-            break;
-        }
-        ++i;
+        return nameDifference;
     }
 
-    int differentialA = a->mMetadata.mWins - a->mMetadata.mLosses;
+    int winDifference = a->mMetadata.mWins - b->mMetadata.mWins;
     int differentialB = b->mMetadata.mWins - b->mMetadata.mLosses;
-    if (differentialA > differentialB)
+    int differentialA = a->mMetadata.mWins - a->mMetadata.mLosses;
+    int differentialDifference = differentialA - differentialB;
+    if (differentialDifference > 0)
     {
         return -1;
     }
-    if (differentialA < differentialB)
+    if (differentialDifference < 0)
     {
         return 1;
     }
-    if (a->mMetadata.mWins > b->mMetadata.mWins)
+    if (winDifference > 0)
     {
         return -1;
     }
-    return a->mMetadata.mWins < b->mMetadata.mWins;
+    return winDifference < 0;
 }
 
 void NetworkRanking::AssignDisplayRanks(

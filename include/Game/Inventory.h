@@ -48,6 +48,11 @@ public:
         ParseChunks((nlChunk*)memory, (nlChunk*)(memory + length));
     }
 
+    void AddFile(void* memory, unsigned long length)
+    {
+        AddFile((char*)memory, length);
+    }
+
     nlListIterator<T*> Begin()
     {
         return m_lItemList.Begin();

@@ -936,7 +936,7 @@ extern "C" float fn_800D82C0(cFielder* pFielder)
             float fClosenessScore = NormalizeVal(fDistance,
                 g_pGame->m_pFuzzyTweaks->mUnidentified484, g_pGame->m_pFuzzyTweaks->mUnidentified494);
             fScore = fInterceptScore * g_pGame->m_pFuzzyTweaks->mUnidentified444
-                + fClosenessScore * (1.0f - g_pGame->m_pFuzzyTweaks->mUnidentified444);
+                + fClosenessScore * (1.0f - g_pGame->m_pFuzzyTweaks->mUnidentified444.GetValue());
             if (fScore == 0.0f)
                 tDebugPrintManager::Print((eDEBUG_CHANNEL)4,
                     "AbleToInterceptBall should never return 0! Debug yer code.\n");

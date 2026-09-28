@@ -1,19 +1,43 @@
 #include "Game/FE/feHelpFuncs_decl.h"
 
+#include <cmath>
+#include <stdio.h>
+
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/DB/StadiumInfo.h"
+#include "Game/FE/feFinder.h"
+#include "Game/FE/feFinder_impl.h"
+#include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feInput.h"
 #include "Game/FE/feModelManager.h"
+#include "Game/FE/fePointerButton.h"
 #include "Game/FE/feText.h"
 #include "Game/FE/tlComponent.h"
 #include "Game/FE/tlComponentInstance.h"
+#include "Game/FE/tlImageInstance.h"
+#include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
-#include "NL/MemAlloc.h"
-#include "NL/nlString.h"
-#include "Game/FE/fePointerButton.h"
-#include "NL/nlstring_tmpl.h"
+#include "Game/Font/fontmanager.h"
+#include "Game/GameInfo.h"
+#include "Game/SH/SHNavigation.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "NL/MemAlloc.h"
+#include "NL/nlBasicString.h"
+#include "NL/nlFont.h"
+#include "NL/nlLexicalCast.h"
+#include "NL/nlString.h"
+#include "NL/nlstring_tmpl.h"
+
+// The predecessor's retail map keeps this unit's own copies of the Format
+// family (Format, FormatImpl) inside the TakeGameMemSnapshot namespace, and
+// R4QE01 likewise links a second FormatImpl conversion operator here next to
+// the shared one. LexicalCast stays global: the int instantiation used by this
+// Format is the shared copy.
+namespace TakeGameMemSnapshot
+{
+#include "NL/nlFormat.h"
+} // namespace TakeGameMemSnapshot
 
 static const char* ModeToStringName[10] = {
     "FRIENDLY",
@@ -27,6 +51,22 @@ static const char* ModeToStringName[10] = {
     "SUPER_BOWSER_CUP",
     "TOURNAMENT",
 };
+
+static const float sDoneButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
+static const float sPlayButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
+
+// Retail's .sdata2 pool for this unit opens with 0.0f, ahead of the constants
+// EnableAutoPressed creates, although no surviving function generated before
+// EnableAutoPressed uses a float. Under -ipa file a non-static, non-inline
+// function is generated at its definition and creates its literals there, and
+// the release link strips its body when nothing references it. So a function
+// defined here used 0.0f and was stripped whole; R4QE01 keeps no byte of it.
+// This never-called placeholder reproduces the pool position only. Its real
+// name, signature and body are unknown (final_review.md).
+void UnidentifiedZeroFloat(float* value)
+{
+    *value = 0.0f;
+}
 
 const char* GetLOCCharacterName(eTeamID teamid)
 {
@@ -132,7 +172,7 @@ unsigned long FECharacterSound::GetSidekickAcceptSound(eSidekickID sidekickID)
 
 static unsigned long GetLargestFreeBlock()
 {
-    return StandardAllocator.LargestFreeBlock();
+    return VirtualAllocator.LargestFreeBlock();
 }
 
 void TakeGameMemSnapshot::Update(float dt)
@@ -162,108 +202,238 @@ void TakeGameMemSnapshot::ResetTimers()
     gTimeElapsed = 0.0f;
 }
 
+// The Wii build has no virtual-memory statistics; the two columns the
+// predecessor filled from them are written as -1.
+static int freeVM = -1;
+static int largestFreeVM = -1;
 
-bool IsPowerupCheatUnlocked(int cheat)
+void TakeGameMemSnapshot::WriteToDisk()
 {
-    bool unlocked = true;
-    switch (cheat)
+    const char* filename = "gamesnapshot.txt";
+    FILE* pFile = fopen(filename, "r");
+
+    if (!pFile)
     {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 10:
-        unlocked = IsPowerupCheatsUnlocked();
-        break;
-    case 11:
-        unlocked = IsButterfingersPlayerCheatUnlocked();
-        break;
-    case 9:
-        unlocked = IsSuperPowerupsCheatUnlocked();
-        break;
+        pFile = fopen(filename, "wt");
+        NLString header;
+        header.AppendInPlace("hcaptain,hsidekick0,hsidekick1,hsidekick2,acaptain,asidekick0,asidekick1,asidekick2,stadium,largestfree,freevm,largestfreevm\n");
+        int size = header.size();
+        fwrite(header.c_str(), 1, size, pFile);
     }
-    return unlocked;
+    fclose(pFile);
+
+    pFile = fopen(filename, "at");
+
+    NLString data;
+    data.AppendInPlace(GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam(0)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 0)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 1)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, 2)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetTeamName((eTeamID)GameInfoManager::Instance()->GetTeam(1)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 0)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 1)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetSidekickName((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, 2)));
+    data.AppendInPlace(",");
+    data.AppendInPlace(GetStadiumName(GameInfoManager::Instance()->GetStadium()));
+    data.AppendInPlace(",");
+
+    fwrite(data.c_str(), 1, data.size(), pFile);
+
+    NLString stats;
+    {
+        NLString fmt("{0},{1},{2}\n");
+        unsigned long largestFree;
+
+        largestFree = GetLargestFreeBlock();
+
+        stats = Format<NLString, unsigned long, int, int>(fmt, largestFree, freeVM, largestFreeVM);
+    }
+
+    fwrite(stats.c_str(), 1, stats.size(), pFile);
+    fclose(pFile);
 }
 
-bool IsPlayerCheatUnlocked(int cheat)
+void MakeTextBoxReallyWide(TLTextInstance& textInstance)
 {
-    bool unlocked = true;
-    switch (cheat)
-    {
-    case 1:
-        unlocked = IsDevastatingPlayerCheatUnlocked();
-        break;
-    case 2:
-        unlocked = IsSafePlayerCheatUnlocked();
-        break;
-    case 3:
-        unlocked = IsSkillShotPlayerCheatUnlocked();
-        break;
-    case 4:
-        unlocked = IsGlassJawPlayerCheatUnlocked();
-        break;
-    }
-    return unlocked;
+    nlVector2& boxSize = ((textInstance.m_OverloadFlags & 0x4) != 0)
+        ? textInstance.m_OverloadedAttributes.BoxSize
+        : ((FEText*)textInstance.m_component)->m_TextAttributes.BoxSize;
+    nlVector2 bb = boxSize;
+    bb.x = 999.9f;
+    textInstance.m_OverloadedAttributes.BoxSize = bb;
+    textInstance.m_OverloadFlags |= 0x4;
 }
 
-bool IsEnvironmentCheatUnlocked(int cheat)
+nlVector2 fn_801CC48C(TLTextInstance* pText)
 {
-    bool unlocked = true;
-    switch (cheat)
+    FEText* pFeText = (FEText*)pText->m_component;
+    nlFont* pFont;
+    if (pFeText->m_pFeFontResource == 0)
     {
-    case 1:
-        unlocked = IsSecureEnvironmentCheatUnlocked();
-        break;
-    case 2:
-        unlocked = IsPowerEnvironmentCheatUnlocked();
-        break;
-    case 3:
-        unlocked = IsVoltageEnvironmentCheatUnlocked();
-        break;
-    case 4:
-        unlocked = IsTiltEnvironmentCheatUnlocked();
-        break;
-    case 5:
-        unlocked = IsWhiteBallEnvironmentCheatUnlocked();
-        break;
+        pFont = FontManager::Instance()->GetFontByHashID(0);
     }
-    return unlocked;
+    else
+    {
+        pFont = pFeText->m_pFeFontResource->GetFontReference();
+    }
+
+    float width = pFont->GetStringWidth(pText->GetString(), false, 640, true);
+
+    nlTextBox::StringDrawInfo drawInfo = pText->m_DrawInfo;
+    float height = pFont->m_Metrics.Height * drawInfo.RowCount;
+
+    nlVector2 size;
+    nlVec2Set(size, width, height);
+    return size;
+}
+
+// The same pool keeps 0.5f between fn_801CC48C's constants and the idle
+// animation constants, while SetBreadcrumbs, its only surviving reader, is the
+// unit's last function. A stripped function defined here created it; its
+// identity is unknown (final_review.md).
+void UnidentifiedHalveFloat(float* value)
+{
+    *value *= 0.5f;
+}
+
+static float sCharacterIdleTime;
+
+void ResetCharacterIdleAnimation(FEModelHandle* model)
+{
+    if (model != 0)
+    {
+        model->PlayAnimation("fe_idle", PM_CYCLIC, 0.2f, 0.0f, false);
+    }
+}
+
+void UpdateCharacterIdleAnimations(float dt)
+{
+    sCharacterIdleTime += dt;
+    if (sCharacterIdleTime >= 2.0f)
+    {
+        sCharacterIdleTime = 0.0f;
+    }
+
+    if (sCharacterIdleTime == 0.0f)
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            if (nlRandom(100, &nlDefaultSeed) < 25)
+            {
+                FEModelHandle* model = FEModelManager::Instance()->GetModel(
+                    i == 0 ? "homemodel" : "awaymodel");
+                if (model != 0 && model->IsLoaded()
+                    && model->IsPlayingAnimation("fe_idle"))
+                {
+                    model->PlayAnimation(
+                        "fe_idle_action_01", PM_HOLD, 0.2f, 0.0f, false);
+                    model->SetAnimationCompleteCallback(ResetCharacterIdleAnimation);
+                }
+            }
+        }
+    }
+}
+
+void SetPlayButtonBounds(
+    FEPointerButton* component, TLComponentInstance*)
+{
+    component->SetBounds(sPlayButtonBounds[0], sPlayButtonBounds[1],
+        sPlayButtonBounds[2], sPlayButtonBounds[3]);
+}
+
+void SetDoneButtonBounds(
+    FEPointerButton* component, TLComponentInstance*, int value)
+{
+    if (value)
+    {
+        component->SetBounds(sPlayButtonBounds[0], sPlayButtonBounds[1],
+            sPlayButtonBounds[2], sPlayButtonBounds[3]);
+    }
+    else
+    {
+        component->SetBounds(sDoneButtonBounds[0], sDoneButtonBounds[1],
+            sDoneButtonBounds[2], sDoneButtonBounds[3]);
+    }
 }
 
 // Retail leaves the result unspecified for an invalid cheat ID.
 #pragma warning off(10184) // return value expected
-const char* GetLOCPowerupCheatDescription(int cheat)
+const char* GetLOCEnvironmentCheatName(int cheat)
+{
+    switch (cheat)
+    {
+    case 0:
+        return "CHEATS_NONE";
+    case 1:
+        return "CHEATS_ENVIRONMENT_SECURE";
+    case 2:
+        return "CHEATS_ENVIRONMENT_POWER";
+    case 3:
+        return "CHEATS_ENVIRONMENT_VOLTAGE";
+    case 4:
+        return "CHEATS_ENVIRONMENT_TILT";
+    case 5:
+        return "CHEATS_ENVIRONMENT_WHITE_BALL";
+    }
+}
+
+const char* GetLOCEnvironmentCheatDescription(int cheat)
 {
     switch (cheat)
     {
     case 0:
         return "CHEATS_NONE_DESC";
-    case 5:
-        return "CHEATS_POWERUPS_ACCELERATOR_DESC";
     case 1:
-        return "CHEATS_POWERUPS_EXPLOSIVES_DESC";
+        return "CHEATS_ENVIRONMENT_SECURE_DESC";
     case 2:
-        return "CHEATS_POWERUPS_FREEZING_DESC";
-    case 4:
-        return "CHEATS_POWERUPS_GIANT_DESC";
+        return "CHEATS_ENVIRONMENT_POWER_DESC";
     case 3:
-        return "CHEATS_POWERUPS_SHELLS_DESC";
-    case 10:
-        return "CHEATS_POWERUPS_INFINITE_DESC";
-    case 9:
-        return "CHEATS_POWERUPS_SUPER_DESC";
-    case 6:
-        return "CHEATS_POWERUPS_PEELINOUT_DESC";
-    case 7:
-        return "CHEATS_POWERUPS_HEATSEEEKERS_DESC";
-    case 8:
-        return "CHEATS_POWERUPS_BOMBSAWAY_DESC";
-    case 11:
-        return "CHEATS_PLAYER_BUTTERFINGERS_DESC";
+        return "CHEATS_ENVIRONMENT_VOLTAGE_DESC";
+    case 4:
+        return "CHEATS_ENVIRONMENT_TILT_DESC";
+    case 5:
+        return "CHEATS_ENVIRONMENT_WHITE_BALL_DESC";
+    }
+}
+
+const char* GetLOCPlayerCheatName(int cheat)
+{
+    switch (cheat)
+    {
+    case 0:
+        return "CHEATS_NONE";
+    case 1:
+        return "CHEATS_PLAYER_DEVASTATING";
+    case 2:
+        return "CHEATS_PLAYER_SAFE";
+    case 3:
+        return "CHEATS_PLAYER_SKILL_SHOT";
+    case 4:
+        return "CHEATS_PLAYER_GLASS_JAW";
+    }
+}
+
+const char* GetLOCPlayerCheatDescription(int cheat)
+{
+    switch (cheat)
+    {
+    case 0:
+        return "CHEATS_NONE_DESC";
+    case 1:
+        return "CHEATS_PLAYER_DEVASTATING_DESC";
+    case 2:
+        return "CHEATS_PLAYER_SAFE_DESC";
+    case 3:
+        return "CHEATS_PLAYER_SKILL_SHOT_DESC";
+    case 4:
+        return "CHEATS_PLAYER_GLASS_JAW_DESC";
     }
 }
 
@@ -298,151 +468,190 @@ const char* GetLOCPowerupCheatName(int cheat)
     }
 }
 
-const char* GetLOCPlayerCheatDescription(int cheat)
+const char* GetLOCPowerupCheatDescription(int cheat)
 {
     switch (cheat)
     {
     case 0:
         return "CHEATS_NONE_DESC";
-    case 1:
-        return "CHEATS_PLAYER_DEVASTATING_DESC";
-    case 2:
-        return "CHEATS_PLAYER_SAFE_DESC";
-    case 3:
-        return "CHEATS_PLAYER_SKILL_SHOT_DESC";
-    case 4:
-        return "CHEATS_PLAYER_GLASS_JAW_DESC";
-    }
-}
-
-const char* GetLOCPlayerCheatName(int cheat)
-{
-    switch (cheat)
-    {
-    case 0:
-        return "CHEATS_NONE";
-    case 1:
-        return "CHEATS_PLAYER_DEVASTATING";
-    case 2:
-        return "CHEATS_PLAYER_SAFE";
-    case 3:
-        return "CHEATS_PLAYER_SKILL_SHOT";
-    case 4:
-        return "CHEATS_PLAYER_GLASS_JAW";
-    }
-}
-
-const char* GetLOCEnvironmentCheatDescription(int cheat)
-{
-    switch (cheat)
-    {
-    case 0:
-        return "CHEATS_NONE_DESC";
-    case 1:
-        return "CHEATS_ENVIRONMENT_SECURE_DESC";
-    case 2:
-        return "CHEATS_ENVIRONMENT_POWER_DESC";
-    case 3:
-        return "CHEATS_ENVIRONMENT_VOLTAGE_DESC";
-    case 4:
-        return "CHEATS_ENVIRONMENT_TILT_DESC";
     case 5:
-        return "CHEATS_ENVIRONMENT_WHITE_BALL_DESC";
-    }
-}
-
-const char* GetLOCEnvironmentCheatName(int cheat)
-{
-    switch (cheat)
-    {
-    case 0:
-        return "CHEATS_NONE";
+        return "CHEATS_POWERUPS_ACCELERATOR_DESC";
     case 1:
-        return "CHEATS_ENVIRONMENT_SECURE";
+        return "CHEATS_POWERUPS_EXPLOSIVES_DESC";
     case 2:
-        return "CHEATS_ENVIRONMENT_POWER";
-    case 3:
-        return "CHEATS_ENVIRONMENT_VOLTAGE";
+        return "CHEATS_POWERUPS_FREEZING_DESC";
     case 4:
-        return "CHEATS_ENVIRONMENT_TILT";
-    case 5:
-        return "CHEATS_ENVIRONMENT_WHITE_BALL";
+        return "CHEATS_POWERUPS_GIANT_DESC";
+    case 3:
+        return "CHEATS_POWERUPS_SHELLS_DESC";
+    case 10:
+        return "CHEATS_POWERUPS_INFINITE_DESC";
+    case 9:
+        return "CHEATS_POWERUPS_SUPER_DESC";
+    case 6:
+        return "CHEATS_POWERUPS_PEELINOUT_DESC";
+    case 7:
+        return "CHEATS_POWERUPS_HEATSEEEKERS_DESC";
+    case 8:
+        return "CHEATS_POWERUPS_BOMBSAWAY_DESC";
+    case 11:
+        return "CHEATS_PLAYER_BUTTERFINGERS_DESC";
     }
 }
-
 #pragma warning reset(10184)
 
-static const float sDoneButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
-static const float sPlayButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
-
-void SetDoneButtonBounds(
-    FEPointerButton* component, TLComponentInstance*, int value)
+bool IsEnvironmentCheatUnlocked(int cheat)
 {
-    if (value)
+    bool unlocked = true;
+    switch (cheat)
     {
-        component->SetBounds(sPlayButtonBounds[0], sPlayButtonBounds[1],
-            sPlayButtonBounds[2], sPlayButtonBounds[3]);
+    case 1:
+        unlocked = IsSecureEnvironmentCheatUnlocked();
+        break;
+    case 2:
+        unlocked = IsPowerEnvironmentCheatUnlocked();
+        break;
+    case 3:
+        unlocked = IsVoltageEnvironmentCheatUnlocked();
+        break;
+    case 4:
+        unlocked = IsTiltEnvironmentCheatUnlocked();
+        break;
+    case 5:
+        unlocked = IsWhiteBallEnvironmentCheatUnlocked();
+        break;
     }
-    else
-    {
-        component->SetBounds(sDoneButtonBounds[0], sDoneButtonBounds[1],
-            sDoneButtonBounds[2], sDoneButtonBounds[3]);
-    }
+    return unlocked;
 }
 
-void SetPlayButtonBounds(
-    FEPointerButton* component, TLComponentInstance*)
+bool IsPlayerCheatUnlocked(int cheat)
 {
-    component->SetBounds(sPlayButtonBounds[0], sPlayButtonBounds[1],
-        sPlayButtonBounds[2], sPlayButtonBounds[3]);
+    bool unlocked = true;
+    switch (cheat)
+    {
+    case 1:
+        unlocked = IsDevastatingPlayerCheatUnlocked();
+        break;
+    case 2:
+        unlocked = IsSafePlayerCheatUnlocked();
+        break;
+    case 3:
+        unlocked = IsSkillShotPlayerCheatUnlocked();
+        break;
+    case 4:
+        unlocked = IsGlassJawPlayerCheatUnlocked();
+        break;
+    }
+    return unlocked;
 }
 
-
-static float sCharacterIdleTime;
-
-void UpdateCharacterIdleAnimations(float dt)
+bool IsPowerupCheatUnlocked(int cheat)
 {
-    sCharacterIdleTime += dt;
-    if (sCharacterIdleTime >= 2.0f)
+    bool unlocked = true;
+    switch (cheat)
     {
-        sCharacterIdleTime = 0.0f;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 10:
+        unlocked = IsPowerupCheatsUnlocked();
+        break;
+    case 11:
+        unlocked = IsButterfingersPlayerCheatUnlocked();
+        break;
+    case 9:
+        unlocked = IsSuperPowerupsCheatUnlocked();
+        break;
+    }
+    return unlocked;
+}
+
+void SetBreadcrumbs(int numBreadcrumbs, int currentBreadcrumb)
+{
+    SHNavigation* pNavigation = GetNavigationScene();
+    if (pNavigation == 0)
+    {
+        return;
     }
 
-    if (sCharacterIdleTime == 0.0f)
+    int middle = (int)std::ceil(17 / 2.0f);
+    int half = (int)std::floor(numBreadcrumbs / 2.0f);
+    int first = middle - half;
+    int last = middle + half;
+    bool odd = (bool)(numBreadcrumbs % 2);
+
+    TLComponentInstance* pButton = pNavigation->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
+    TLComponentInstance* pBreadcrumbs = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
+        pButton->GetActiveSlide(), "breadcrumb_17");
+
+    for (int i = 0; i < 17; ++i)
     {
-        for (int i = 0; i < 2; ++i)
+        char name[16];
+        nlSNPrintf(name, sizeof(name), "breadcrumb_%d", i + 1);
+        TLComponentInstance* pBreadcrumb = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
+            pBreadcrumbs->GetActiveSlide(), name);
+        TLComponentInstance* pBox = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
+            pBreadcrumb->GetActiveSlide(), "box");
+        TLImageInstance* pDot = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
+            pBreadcrumb->GetActiveSlide(), "breadcrumb_dot3");
+
+        if (!odd)
         {
-            if (nlRandom(100, &nlDefaultSeed) < 25)
+            if (i == middle - 1)
             {
-                FEModelHandle* model = FEModelManager::Instance()->GetModel(
-                    i == 0 ? "homemodel" : "awaymodel");
-                if (model != 0 && model->IsLoaded()
-                    && model->IsPlayingAnimation("fe_idle"))
+                pBox->m_bVisible = false;
+                pDot->m_bVisible = false;
+            }
+            else if (i + 1 < first || i + 1 > last)
+            {
+                pBox->m_bVisible = false;
+                pDot->m_bVisible = false;
+            }
+            else
+            {
+                int index = i - first + 1;
+                if (i >= middle)
                 {
-                    model->PlayAnimation(
-                        "fe_idle_action_01", PM_HOLD, 0.2f, 0.0f, false);
-                    model->SetAnimationCompleteCallback(ResetCharacterIdleAnimation);
+                    index = i - first;
+                }
+                if (index == currentBreadcrumb)
+                {
+                    pBox->m_bVisible = true;
+                    pDot->m_bVisible = false;
+                }
+                else
+                {
+                    pBox->m_bVisible = false;
+                    pDot->m_bVisible = true;
+                }
+            }
+        }
+        else
+        {
+            if (i + 1 < first || i + 1 > last)
+            {
+                pBox->m_bVisible = false;
+                pDot->m_bVisible = false;
+            }
+            else
+            {
+                int index = i - first + 1;
+                if (index == currentBreadcrumb)
+                {
+                    pBox->m_bVisible = true;
+                    pDot->m_bVisible = false;
+                }
+                else
+                {
+                    pBox->m_bVisible = false;
+                    pDot->m_bVisible = true;
                 }
             }
         }
     }
-}
-
-void ResetCharacterIdleAnimation(FEModelHandle* model)
-{
-    if (model != 0)
-    {
-        model->PlayAnimation("fe_idle", PM_CYCLIC, 0.2f, 0.0f, false);
-    }
-}
-
-void MakeTextBoxReallyWide(TLTextInstance& textInstance)
-{
-    nlVector2& boxSize = ((textInstance.m_OverloadFlags & 0x4) != 0)
-        ? textInstance.m_OverloadedAttributes.BoxSize
-        : ((FEText*)textInstance.m_component)->m_TextAttributes.BoxSize;
-    nlVector2 bb = boxSize;
-    bb.x = 999.9f;
-    textInstance.m_OverloadedAttributes.BoxSize = bb;
-    textInstance.m_OverloadFlags |= 0x4;
 }

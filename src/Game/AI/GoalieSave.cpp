@@ -1274,7 +1274,6 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
 
 void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
 {
-    SaveData* const pRoot = pSaveData;
     SaveData* pCur;
     nlVector3 v3TopRight;
     nlVector3 v3BotLeft;
@@ -1290,6 +1289,7 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
     SaveData* pCurRight;
     SaveData* pClosest;
     float fCloseDist;
+    SaveData* const pRoot = pSaveData;
 
     {
         SaveData* pCurRightUp;
@@ -1409,63 +1409,66 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
         pCurRight = pNextRight;
         v3CurColPos = v3CurRowPos;
 
-        while (v3CurColPos.z < v3TopRight.z)
+        if (v3CurColPos.z < v3TopRight.z)
         {
-            SaveData* pCurUp;
-            SaveData* pCurRightUp;
-            FindVerticalBoundingPoints(
-                pCurLeft, v3CurColPos, &pCurLeft, &pCurUp);
-            FindVerticalBoundingPoints(
-                pCurRight, v3CurColPos, &pCurRight, &pCurRightUp);
-
+            while (v3CurColPos.z < v3TopRight.z)
             {
-                float dy = pCurLeft->mv3SavePos.y - v3CurColPos.y;
-                float dz = pCurLeft->mv3SavePos.z - v3CurColPos.z;
-                fCloseDist = nlGetLengthSquared2D(dy, dz);
-                pClosest = pCurLeft;
+                SaveData* pCurUp;
+                SaveData* pCurRightUp;
+                FindVerticalBoundingPoints(
+                    pCurLeft, v3CurColPos, &pCurLeft, &pCurUp);
+                FindVerticalBoundingPoints(
+                    pCurRight, v3CurColPos, &pCurRight, &pCurRightUp);
 
-                if (pCurLeft != pCurUp)
                 {
-                    float upDy = pCurUp->mv3SavePos.y - v3CurColPos.y;
-                    float upDz = pCurUp->mv3SavePos.z - v3CurColPos.z;
-                    float d = nlGetLengthSquared2D(upDy, upDz);
-                    if (d < fCloseDist)
-                    {
-                        fCloseDist = d;
-                        pClosest = pCurUp;
-                    }
-                }
+                    float dy = pCurLeft->mv3SavePos.y - v3CurColPos.y;
+                    float dz = pCurLeft->mv3SavePos.z - v3CurColPos.z;
+                    fCloseDist = nlGetLengthSquared2D(dy, dz);
+                    pClosest = pCurLeft;
 
-                if (pCurLeft != pCurRight)
-                {
-                    float rightDy = pCurRight->mv3SavePos.y - v3CurColPos.y;
-                    float rightDz = pCurRight->mv3SavePos.z - v3CurColPos.z;
-                    float d = nlGetLengthSquared2D(rightDy, rightDz);
-                    if (d < fCloseDist)
+                    if (pCurLeft != pCurUp)
                     {
-                        fCloseDist = d;
-                        pClosest = pCurRight;
-                    }
-                    if (pCurRight != pCurRightUp)
-                    {
-                        float upRightDy = pCurRightUp->mv3SavePos.y
-                                        - v3CurColPos.y;
-                        float upRightDz = pCurRightUp->mv3SavePos.z
-                                        - v3CurColPos.z;
-                        float fUpRightDistSq = nlGetLengthSquared2D(upRightDy, upRightDz);
-                        if (fUpRightDistSq < fCloseDist)
+                        float upDy = pCurUp->mv3SavePos.y - v3CurColPos.y;
+                        float upDz = pCurUp->mv3SavePos.z - v3CurColPos.z;
+                        float d = nlGetLengthSquared2D(upDy, upDz);
+                        if (d < fCloseDist)
                         {
-                            fCloseDist = fUpRightDistSq;
-                            pClosest = pCurRightUp;
+                            fCloseDist = d;
+                            pClosest = pCurUp;
+                        }
+                    }
+
+                    if (pCurLeft != pCurRight)
+                    {
+                        float rightDy = pCurRight->mv3SavePos.y - v3CurColPos.y;
+                        float rightDz = pCurRight->mv3SavePos.z - v3CurColPos.z;
+                        float d = nlGetLengthSquared2D(rightDy, rightDz);
+                        if (d < fCloseDist)
+                        {
+                            fCloseDist = d;
+                            pClosest = pCurRight;
+                        }
+                        if (pCurRight != pCurRightUp)
+                        {
+                            float upRightDy = pCurRightUp->mv3SavePos.y
+                                            - v3CurColPos.y;
+                            float upRightDz = pCurRightUp->mv3SavePos.z
+                                            - v3CurColPos.z;
+                            float fUpRightDistSq = nlGetLengthSquared2D(upRightDy, upRightDz);
+                            if (fUpRightDistSq < fCloseDist)
+                            {
+                                fCloseDist = fUpRightDistSq;
+                                pClosest = pCurRightUp;
+                            }
                         }
                     }
                 }
-            }
 
-            pClosest->mv3GroupMinCoords = pRoot->mv3GroupMinCoords;
-            pClosest->mv3GroupMaxCoords = pRoot->mv3GroupMaxCoords;
-            AddPointToGrid(pClosest, v3CurColPos);
-            v3CurColPos.z += zInc;
+                pClosest->mv3GroupMinCoords = pRoot->mv3GroupMinCoords;
+                pClosest->mv3GroupMaxCoords = pRoot->mv3GroupMaxCoords;
+                AddPointToGrid(pClosest, v3CurColPos);
+                v3CurColPos.z += zInc;
+            }
         }
         v3CurRowPos.y += yInc;
     }
@@ -1514,19 +1517,24 @@ void GoalieSave::AddSegmentToGrid(
         nlVec3Scale(v3Delta, v3Delta, 1.0f / (float)divisions);
     }
     v3CurPos = pSaveData1->mv3SavePos;
-    for (count = 0; count <= divisions; count++)
+    count = 0;
+    if (divisions >= 0)
     {
-        if (nlGetLengthSquared2D(
-                pSaveData1->mv3SavePos.y - v3CurPos.y,
-                pSaveData1->mv3SavePos.z - v3CurPos.z)
-            < nlGetLengthSquared2D(
-                pSaveData2->mv3SavePos.y - v3CurPos.y,
-                pSaveData2->mv3SavePos.z - v3CurPos.z))
-            pCurSaveData = pSaveData1;
-        else
-            pCurSaveData = pSaveData2;
-        AddPointToGrid(pCurSaveData, v3CurPos);
-        nlVec3Add(v3CurPos, v3CurPos, v3Delta);
+        while (count <= divisions)
+        {
+            if (nlGetLengthSquared2D(
+                    pSaveData1->mv3SavePos.y - v3CurPos.y,
+                    pSaveData1->mv3SavePos.z - v3CurPos.z)
+                < nlGetLengthSquared2D(
+                    pSaveData2->mv3SavePos.y - v3CurPos.y,
+                    pSaveData2->mv3SavePos.z - v3CurPos.z))
+                pCurSaveData = pSaveData1;
+            else
+                pCurSaveData = pSaveData2;
+            AddPointToGrid(pCurSaveData, v3CurPos);
+            nlVec3Add(v3CurPos, v3CurPos, v3Delta);
+            count++;
+        }
     }
 }
 

@@ -7,7 +7,7 @@
 class DesireUserControlled : public Desire
 {
 public:
-    DesireUserControlled(UnidentifiedStateTransition transition)
+    DesireUserControlled(TransitionFunc transition)
         : Desire(20, transition)
     {
     }

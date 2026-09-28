@@ -124,6 +124,11 @@ public:
 extern UnidentifiedRuntimeTypeList lbl_806E20B0;
 
 extern "C" int fn_80312208(unsigned long hash);
+// Executes the script function named by hash through the runtime for its
+// current value and returns the result variant it leaves on the stack.
+UnidentifiedVariant_80054AB8* ExecuteScriptFunction(
+    UnidentifiedFuzzyRuntimeBase* runtime, u32 hash,
+    UnidentifiedFuzzyRuntimeValue* action);
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30A8(cFielder*);
 
 

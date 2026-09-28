@@ -29,6 +29,7 @@ struct EmissionResourceStats
 {
     EmissionResourceStats();
     void Initialize();
+    void Configure(const char* name, int budget);
 
     /* 0x00 */ TweakIntBinding* mCount;
     /* 0x04 */ TweakIntBinding* mHighWaterMark;

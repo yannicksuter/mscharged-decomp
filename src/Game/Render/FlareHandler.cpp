@@ -63,14 +63,18 @@ void FlareHandler::AddFace(
     b.y = -sn * viewRight.y + cs * viewUp.y;
     b.z = -sn * viewRight.z + cs * viewUp.z;
 
-    nlVec3Set(v[0], position.x + a.x + b.x,
-        position.y + a.y + b.y, position.z + a.z + b.z);
-    nlVec3Set(v[1], position.x - a.x + b.x,
-        position.y - a.y + b.y, position.z - a.z + b.z);
-    nlVec3Set(v[2], position.x - a.x - b.x,
-        position.y - a.y - b.y, position.z - a.z - b.z);
-    nlVec3Set(v[3], position.x + a.x - b.x,
-        position.y + a.y - b.y, position.z + a.z - b.z);
+    v[0].x = position.x + a.x + b.x;
+    v[0].y = position.y + a.y + b.y;
+    v[0].z = position.z + a.z + b.z;
+    v[1].x = position.x - a.x + b.x;
+    v[1].y = position.y - a.y + b.y;
+    v[1].z = position.z - a.z + b.z;
+    v[2].x = position.x - a.x - b.x;
+    v[2].y = position.y - a.y - b.y;
+    v[2].z = position.z - a.z - b.z;
+    v[3].x = position.x + a.x - b.x;
+    v[3].y = position.y + a.y - b.y;
+    v[3].z = position.z + a.z - b.z;
 
     pMeshWriter->Texcoord(0, 0);
     pMeshWriter->Colour(pFlare->colour);

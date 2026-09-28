@@ -85,8 +85,8 @@ public:
         int category, const NetworkRankingMeta* submission) = 0;
     virtual bool ReportGameResult(int category,
         const NetworkScoreSubmission* submission,
-        const NetworkStatsPlayer* home,
-        const NetworkStatsPlayer* away,
+        NetworkStatsPlayer* home,
+        NetworkStatsPlayer* away,
         bool reportHome,
         int homeScore,
         int awayScore,
@@ -119,8 +119,8 @@ public:
         int category, const NetworkRankingMeta* submission);
     virtual bool ReportGameResult(int category,
         const NetworkScoreSubmission* submission,
-        const NetworkStatsPlayer* home,
-        const NetworkStatsPlayer* away,
+        NetworkStatsPlayer* home,
+        NetworkStatsPlayer* away,
         bool reportHome,
         int homeScore,
         int awayScore,
@@ -202,8 +202,8 @@ public:
         int category, const NetworkRankingMeta* submission);
     virtual bool ReportGameResult(int category,
         const NetworkScoreSubmission* submission,
-        const NetworkStatsPlayer* home,
-        const NetworkStatsPlayer* away,
+        NetworkStatsPlayer* home,
+        NetworkStatsPlayer* away,
         bool reportHome,
         int homeScore,
         int awayScore,

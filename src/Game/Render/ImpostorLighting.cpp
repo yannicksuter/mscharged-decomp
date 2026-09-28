@@ -158,18 +158,23 @@ void LightingLookup::LoadTexture(u32 textureHandle)
 
     if (glTextureLoad(textureHandle))
     {
+        int height;
+        int width;
+        int y;
+        int x;
         PlatTexture* texture = glx_GetTex(textureHandle);
-        mWidth = texture->m_Width;
-        mHeight = texture->m_Height;
-        mValues = new (8, false) u8[mWidth * mHeight];
+        width = texture->m_Width;
+        mWidth = width;
+        height = texture->m_Height;
+        mHeight = height;
+        mValues = new (8, false) u8[width * height];
 
         u8* output = mValues;
-        for (int y = 0; y < mHeight; ++y)
+        for (y = 0; y < height; ++y)
         {
-            for (int x = 0; x < mWidth; ++x)
+            for (x = 0; x < width; ++x, ++output)
             {
                 *output = ReadTextureIntensity(texture, x, y);
-                ++output;
             }
         }
     }

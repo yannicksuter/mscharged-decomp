@@ -494,6 +494,11 @@ public:
         e2[2][col] = v.z;
     }
 
+    void GetColumn_(int col, nlVector3& v) const
+    {
+        nlVec3Set(v, e2[0][col], e2[1][col], e2[2][col]);
+    }
+
     void SetRow_(int row, const nlVector3& v)
     {
         e2[row][0] = v.x;

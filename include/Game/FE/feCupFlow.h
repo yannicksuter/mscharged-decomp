@@ -2,6 +2,7 @@
 #define GAME_SH_CUP_SCENE_HELPERS_H
 
 class TLComponentInstance;
+class StadiumCupTrophyDrawable;
 
 void CycleCupPage(int currentPage, bool advance);
 void CycleCupRoundPage(int currentPage, bool advance);
@@ -21,6 +22,7 @@ void ShowCupGoldenBootNews();
 void FinishCupAwardPresentation();
 void ShowCupAwardRewardsPopup();
 void ShowCupTrophyRewardsPopup();
+void RegisterCupTrophy(StadiumCupTrophyDrawable* trophy);
 void SetCupTrophiesVisible(bool visible);
 void SetLockedTrophyVisibility(bool visible);
 

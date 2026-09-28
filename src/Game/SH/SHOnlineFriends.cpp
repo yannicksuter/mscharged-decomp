@@ -41,21 +41,21 @@ typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 SHOnlineFriends::SHOnlineFriends()
     : mUnidentified001C(64)
-    , mUnidentified0020(0)
-    , mUnidentified0024(0)
+    , mScrollOffset(0)
+    , mScrollRange(0)
     , mUnidentified0028(0)
-    , mUnidentified002C(0)
-    , mUnidentified0030(false)
-    , mUnidentified0031(false)
-    , mUnidentified0034(0.5f)
-    , mUnidentified2FA8(false)
+    , mPressedItem(0)
+    , mInitialized(false)
+    , mPressHandled(false)
+    , mRefreshTimer(0.5f)
+    , mPopupActive(false)
     , mUnidentified2FAC(0)
 {
     for (int i = 0; i < 4; ++i)
-        mUnidentified0038[i].mContext = (void*)i;
+        mRowButtons[i].mContext = (void*)i;
     for (int i = 0; i < 64; ++i)
-        mUnidentified2EA8[i] = &mUnidentified08A8[i];
-    mUnidentified04BC.SetPopScene(false);
+        mSortedFriendRows[i] = &mFriendRows[i];
+    mBackButton.SetPopScene(false);
 }
 
 SHOnlineFriends::~SHOnlineFriends()
@@ -65,27 +65,27 @@ SHOnlineFriends::~SHOnlineFriends()
 
 void SHOnlineFriends::UpdateScrollRange()
 {
-    mUnidentified0024 = 0;
+    mScrollRange = 0;
     for (int i = 0; i < 64; ++i)
     {
-        if (!mUnidentified2EA8[i]->mVisible)
+        if (!mSortedFriendRows[i]->mVisible)
             break;
-        ++mUnidentified0024;
+        ++mScrollRange;
     }
     if (!IsOnlineFriendSelectionMode())
-        ++mUnidentified0024;
-    if (mUnidentified0024 > 4)
-        mUnidentified0024 -= 4;
+        ++mScrollRange;
+    if (mScrollRange > 4)
+        mScrollRange -= 4;
     else
-        mUnidentified0024 = 0;
-    mUnidentified0308.ResetScrolling();
-    mUnidentified0308.SetRange(mUnidentified0024);
-    mUnidentified0308.SetValue(mUnidentified0020);
+        mScrollRange = 0;
+    mScrollBar.ResetScrolling();
+    mScrollBar.SetRange(mScrollRange);
+    mScrollBar.SetValue(mScrollOffset);
 }
 
 void SHOnlineFriends::UpdateFriend(int index)
 {
-    FEOnlinePlayerRow* row = &mUnidentified08A8[index];
+    FEOnlinePlayerRow* row = &mFriendRows[index];
     DWCAccFriendData* data = (DWCAccFriendData*)GameInfoManager::Instance()->GetUnknown0x40(gNetworkSaveSlotIndex, index);
     u16* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);
     row->mFriendIndex = index;
@@ -146,14 +146,14 @@ inline void SHOnlineFriends::UpdateVisibleRows()
             UpdateAddFriendRow();
             continue;
         }
-        int selected = i + mUnidentified0020;
+        int selected = i + mScrollOffset;
         if (!IsOnlineFriendSelectionMode())
             --selected;
-        UpdateOnlinePlayerRow(mUnidentified2EA8[selected], mUnidentified0618[i], mUnidentified0628[i], 32, mUnidentified0728[i], 48, i, mUnidentified0030);
-        if (!mUnidentified2EA8[selected]->mVisible || (IsOnlineFriendSelectionMode() && mUnidentified2EA8[selected]->mStatus != 2))
-            mUnidentified0038[i].Disable();
+        UpdateOnlinePlayerRow(mSortedFriendRows[selected], mRowInstances[i], mRankText[i], 32, mRecordText[i], 48, i, mInitialized);
+        if (!mSortedFriendRows[selected]->mVisible || (IsOnlineFriendSelectionMode() && mSortedFriendRows[selected]->mStatus != 2))
+            mRowButtons[i].Disable();
         else
-            mUnidentified0038[i].Enable();
+            mRowButtons[i].Enable();
     }
 }
 
@@ -162,19 +162,19 @@ static inline void RefreshFriends(SHOnlineFriends* self)
     for (int i = 0; i < 64; ++i)
         self->UpdateFriend(i);
     for (int i = 0; i < 64; ++i)
-        self->mUnidentified2EA8[i] = &self->mUnidentified08A8[i];
-    qsort(self->mUnidentified2EA8, 64, sizeof(self->mUnidentified2EA8[0]), SHOnlineFriends::CompareFriendStatus);
+        self->mSortedFriendRows[i] = &self->mFriendRows[i];
+    qsort(self->mSortedFriendRows, 64, sizeof(self->mSortedFriendRows[0]), SHOnlineFriends::CompareFriendStatus);
 }
 
 void SHOnlineFriends::SceneCreated()
 {
-    mUnidentified0594 = FEFinder<TLTextInstance, 3>::FindOrDefault(
+    mFriendCodeText = FEFinder<TLTextInstance, 3>::FindOrDefault(
         mPresentation->m_currentSlide, "Layer", "Group", "FRIEND CODE");
     for (int i = 0; i < 4; ++i)
     {
         char name[9];
         nlSNPrintf(name, sizeof(name), "FRIEND_%d", i);
-        mUnidentified0618[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
             mPresentation->m_currentSlide, "Layer", "Group", name);
     }
     TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::FindOrDefault(
@@ -182,7 +182,7 @@ void SHOnlineFriends::SceneCreated()
     if (IsOnlineFriendSelectionMode())
     {
         title->SetActiveSlide("friends2", true, false);
-        mUnidentified0594->m_bVisible = false;
+        mFriendCodeText->m_bVisible = false;
     }
     else
     {
@@ -193,8 +193,8 @@ void SHOnlineFriends::SceneCreated()
     UpdateVisibleRows();
     TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::FindOrDefault(
         mPresentation->m_currentSlide, "Layer", "Group", "scrollbar");
-    mUnidentified0308.SetComponent(scrollbar);
-    mUnidentified0308.SetValue(mUnidentified0020);
+    mScrollBar.SetComponent(scrollbar);
+    mScrollBar.SetValue(mScrollOffset);
     UpdateScrollRange();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -205,15 +205,15 @@ void SHOnlineFriends::SceneCreated()
         scene->SetButtons(0, true);
         done = scene->GetButton(4);
     }
-    mUnidentified04BC.SetButtonInstance(done);
+    mBackButton.SetButtonInstance(done);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }
 
 void SHOnlineFriends::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
-    mUnidentified0031 = false;
-    if (mUnidentified2FA8 && !g_pFEInput->HasInputLock(this))
+    mPressHandled = false;
+    if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
     if (mUnidentified2FAC == 0 || mUnidentified2FAC == 2 || mUnidentified2FAC == 3)
     {
@@ -231,7 +231,7 @@ void SHOnlineFriends::Update(float dt)
                 scene->SetButtons(4, true);
             mUnidentified2FAC = 1;
             InitializeButtons();
-            mUnidentified0030 = true;
+            mInitialized = true;
         }
         else if (mUnidentified2FAC == 2)
         {
@@ -271,12 +271,12 @@ void SHOnlineFriends::Update(float dt)
         ShowError(GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 111));
         return;
     }
-    mUnidentified0034 -= dt;
-    if (mUnidentified0034 <= 0.0f)
+    mRefreshTimer -= dt;
+    if (mRefreshTimer <= 0.0f)
     {
         RefreshFriends(this);
         UpdateVisibleRows();
-        mUnidentified0034 = 0.5f;
+        mRefreshTimer = 0.5f;
     }
     for (int i = 0; i < 4; ++i)
     {
@@ -293,12 +293,12 @@ void SHOnlineFriends::Update(float dt)
         event.mPosition = GetPointerPosition(i, &valid);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
         event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)i, 30, true, 0);
-        mUnidentified0308.Update(event, dt);
+        mScrollBar.Update(event, dt);
         for (int j = 0; j < 4; ++j)
-            mUnidentified0038[j].HandlePointerEvent(&event);
-        if (mUnidentified0031)
+            mRowButtons[j].HandlePointerEvent(&event);
+        if (mPressHandled)
             return;
-        if (mUnidentified04BC.UpdateBackButton(event, dt))
+        if (mBackButton.UpdateBackButton(event, dt))
         {
             for (int j = 0; j < 4; ++j)
                 GetPointerInstance(j)->SetActiveSlide("waiting", true, false);
@@ -311,22 +311,22 @@ void SHOnlineFriends::Update(float dt)
             return;
         }
     }
-    if (mUnidentified0308.IsScrolling(1, 1))
+    if (mScrollBar.IsScrolling(1, 1))
     {
-        ++mUnidentified0020;
+        ++mScrollOffset;
         UpdateVisibleRows();
     }
-    else if (mUnidentified0308.IsScrolling(0, 1))
+    else if (mScrollBar.IsScrolling(0, 1))
     {
-        --mUnidentified0020;
+        --mScrollOffset;
         UpdateVisibleRows();
     }
 }
 
 void SHOnlineFriends::UpdateAddFriendRow()
 {
-    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "off", "FRIEND_0");
-    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mUnidentified0618[0], "over", "FRIEND_0");
+    TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(mRowInstances[0], "off", "FRIEND_0");
+    TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(mRowInstances[0], "over", "FRIEND_0");
 
     FEFinder<TLInstance, 4>::FindOrDefault(off, "cancel")->SetVisible(false);
     FEFinder<TLInstance, 4>::FindOrDefault(over, "cancel")->SetVisible(false);
@@ -407,13 +407,13 @@ void SHOnlineFriends::InitializeButtons()
     FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineFriends::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified0038[i].SetInstanceBounds(mUnidentified0618[i], true, -24.0f, 10.0f, 0.7f, 0.55f);
-        mUnidentified0038[i].SetPointerEnterCallback(over);
-        mUnidentified0038[i].SetPointerLeaveCallback(off);
-        mUnidentified0038[i].SetPointerPressCallback(down);
+        mRowButtons[i].SetInstanceBounds(mRowInstances[i], true, -24.0f, 10.0f, 0.7f, 0.55f);
+        mRowButtons[i].SetPointerEnterCallback(over);
+        mRowButtons[i].SetPointerLeaveCallback(off);
+        mRowButtons[i].SetPointerPressCallback(down);
     }
-    if (!mUnidentified0308.mInitialized)
-        mUnidentified0308.Initialize();
+    if (!mScrollBar.mInitialized)
+        mScrollBar.Initialize();
 }
 
 inline void SHOnlineFriends::ShowDialog(int type)
@@ -422,7 +422,7 @@ inline void SHOnlineFriends::ShowDialog(int type)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)type, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
-        mUnidentified2FA8 = true;
+        mPopupActive = true;
     }
 }
 
@@ -434,7 +434,7 @@ inline void SHOnlineFriends::ConfirmDeleteFriend(int index)
         popup->Create((ePopupMenu)106,
             Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, index),
             Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
-        mUnidentified2FA8 = true;
+        mPopupActive = true;
     }
 }
 
@@ -443,8 +443,8 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     int selected;
     u8 region;
     int item = (int)context;
-    mUnidentified002C = item;
-    mUnidentified0031 = true;
+    mPressedItem = item;
+    mPressHandled = true;
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     bool change = false;
     if (item == 0 && !IsOnlineFriendSelectionMode())
@@ -461,11 +461,11 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     }
     else
     {
-        selected = item + mUnidentified0020;
+        selected = item + mScrollOffset;
         if (!IsOnlineFriendSelectionMode())
             --selected;
         region = *(u8*)GameInfoManager::Instance()->GetUnknown0xA40(
-            gNetworkSaveSlotIndex, mUnidentified2EA8[selected]->mFriendIndex);
+            gNetworkSaveSlotIndex, mSortedFriendRows[selected]->mFriendIndex);
         bool differentRegion = region != GetOnlineRegion();
         if (differentRegion)
             ShowDialog(105);
@@ -489,8 +489,8 @@ void SHOnlineFriends::OnPointerEnter(int index, void* context)
 {
     int item = (int)context;
     ++mUnidentified0028;
-    mUnidentified0618[item]->SetActiveSlide("over", true, false);
-    mUnidentified0038[item].SetPointerState(1, index);
+    mRowInstances[item]->SetActiveSlide("over", true, false);
+    mRowButtons[item].SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
 }
 
@@ -498,20 +498,20 @@ void SHOnlineFriends::OnPointerLeave(int index, void* context)
 {
     int item = (int)context;
     --mUnidentified0028;
-    mUnidentified0618[item]->SetActiveSlide("off", true, false);
-    mUnidentified0038[item].SetPointerState(0, index);
+    mRowInstances[item]->SetActiveSlide("off", true, false);
+    mRowButtons[item].SetPointerState(0, index);
 }
 
 void SHOnlineFriends::DeleteFriend(int index)
 {
-    mUnidentified2FA8 = false;
-    int selected = index + mUnidentified0020;
+    mPopupActive = false;
+    int selected = index + mScrollOffset;
     if (!IsOnlineFriendSelectionMode())
         --selected;
-    g_pFriendManager->DeleteFriend(mUnidentified2EA8[selected]->mFriendIndex);
-    mUnidentified2EA8[selected]->mStatus = 11;
-    if (mUnidentified0020 == mUnidentified0024 && mUnidentified0020 > 0)
-        --mUnidentified0020;
+    g_pFriendManager->DeleteFriend(mSortedFriendRows[selected]->mFriendIndex);
+    mSortedFriendRows[selected]->mStatus = 11;
+    if (mScrollOffset == mScrollRange && mScrollOffset > 0)
+        --mScrollOffset;
     RefreshFriends(this);
     UpdateScrollRange();
     UpdateVisibleRows();
@@ -520,7 +520,7 @@ void SHOnlineFriends::DeleteFriend(int index)
 
 void SHOnlineFriends::CancelDeleteFriend()
 {
-    mUnidentified2FA8 = false;
+    mPopupActive = false;
     g_pFriendManager->SetOwnStatusInitial(1);
 }
 
@@ -530,21 +530,21 @@ void SHOnlineFriends::UpdateFriendCode()
     WideString string;
     u16 friendKey[14];
     g_pFriendManager->GetOwnFriendKeyString(friendKey);
-    nlStrNCpy(mUnidentified0598, friendKey, 14);
+    nlStrNCpy(mFriendCodeBuffer, friendKey, 14);
     format = WideString(LookupLocString("ONLINE_FRIEND_CODE_YOURS"));
-    string = Format(format, mUnidentified0598);
-    memcpy(mUnidentified0598, string.c_str(), sizeof(mUnidentified0598));
-    mUnidentified0594->SetString(mUnidentified0598);
+    string = Format(format, mFriendCodeBuffer);
+    memcpy(mFriendCodeBuffer, string.c_str(), sizeof(mFriendCodeBuffer));
+    mFriendCodeText->SetString(mFriendCodeBuffer);
 }
 
 void SHOnlineFriends::OnDialogDismissed()
 {
-    mUnidentified2FA8 = false;
+    mPopupActive = false;
 }
 
 void SHOnlineFriends::OnErrorDismissed()
 {
-    mUnidentified2FA8 = false;
+    mPopupActive = false;
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
     FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
@@ -557,7 +557,7 @@ inline void SHOnlineFriends::ShowError(int error)
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriends::OnErrorDismissed), this)));
-        mUnidentified2FA8 = true;
+        mPopupActive = true;
     }
 }
 
@@ -568,7 +568,7 @@ inline void SHOnlineFriends::StartFriendInvite()
     scene->mStartFriendServer = false;
     SetOnlineFriendSelectionMode(false);
     GameInfoManager* gameInfo = GameInfoManager::Instance();
-    int selected = mUnidentified2EA8[mUnidentified002C + mUnidentified0020]->mFriendIndex;
+    int selected = mSortedFriendRows[mPressedItem + mScrollOffset]->mFriendIndex;
     GetFriendManager()->SetOwnStatusHostInvitingPlayer(selected,
         reinterpret_cast<const GameplaySettings*>(gameInfo->GetCurrentSettings()),
         reinterpret_cast<const CheatSettings*>(gameInfo->GetActiveRules()), gameInfo->GetStadium());

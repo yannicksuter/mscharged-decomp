@@ -1,4 +1,4 @@
-#include "Game/Render/tu_80279AC8.h"
+#include "Game/Render/StadiumWorldObjects.h"
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/DrawableObj.h"
@@ -7,8 +7,11 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/StadiumInfo.h"
 #include "Game/GameInfo.h"
+#include "Game/GameObjectLighting.h"
+#include "Game/FE/feCupFlow.h"
 #include "Game/Render/AttackSideIndicators.h"
 #include "Game/Render/Frustum.h"
+#include "Game/Render/Presentation.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/Render/ShadowVolume.h"
 #include "Game/AI/Fielder.h"
@@ -26,22 +29,6 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/nlstring_tmpl.h"
-
-class GLView;
-
-extern "C"
-{
-    void fn_80343DE4(StadiumWorldObject_80279AC8* object, void* context);
-    void fn_80341EE8(StadiumWorldObject_80279AC8* object, const nlMatrix4* transform);
-    void fn_80182168(StadiumWorldObject_80279AC8* object);
-    void fn_802092A4(StadiumGoalObject_8027A2C8* object);
-    void fn_802BC678(const ShapeRender* renderer, const nlVector3& boundsMin,
-        const nlVector3& boundsMax, const nlColour& colour);
-    void* GetPresentation();
-    void fn_80279E88(StadiumWorldObject_80279AC8* object);
-}
-
-void* fn_80273A14(eCLV layer);
 
 // Proxy objects of the stadium hierarchies that carry the team banner
 // material; matching one marks the drawable for the banner texture swap.
@@ -198,28 +185,27 @@ static unsigned long sStadiumBannerTexture;
 static unsigned long sTeamBannerTexture;
 static unsigned long sTeamBannerTextureIndex;
 static bool sShowObjectBounds;
-static bool sForceBlendOn;
-static bool sBlendOverride;
-static bool sBlendOverrideConsumed;
+static bool sForceBannerHidden;
+static bool sAlternateBannerVisibility;
+static bool sAlternateBannerVisible;
 
 /**
  * Address/Size: 0x80279AC8 | size: 0xCC
  */
-extern "C" void fn_80279AC8(
-    StadiumWorldObject_80279AC8* object, void* context)
+void StadiumWorldDrawable::Initialize(WorldObjectLoadContext* context)
 {
-    fn_80343DE4(object, context);
+    WorldDrawable::Initialize(context);
 
     for (unsigned int i = 0; i < 0x89; i++)
     {
-        unsigned long hash = nlStringHash(sBannerProxyObjects[i]);
-        if (hash == object->m_uHashID)
-            object->m_uFlags |= 2;
+        unsigned long objectHash = nlStringHash(sBannerProxyObjects[i]);
+        if (objectHash == m_uHashID)
+            m_uFlags |= 2;
     }
 
-    unsigned long state = nlTaskManager::m_pInstance->mCurrentState;
-    if (state == 2 || state == 0x18 || state == 0x200000 || state == 0x800000)
-        object->V7(object->m_pModel);
+    unsigned long taskState = nlTaskManager::m_pInstance->mCurrentState;
+    if (taskState == 2 || taskState == 0x18 || taskState == 0x200000 || taskState == 0x800000)
+        UpdateModelMaterials(m_pModel);
 
     sTeamBannerTexture = 0;
     sStadiumBannerTexture = 0;
@@ -231,8 +217,7 @@ extern "C" void fn_80279AC8(
  * Replaces the stadium banner texture of every packet of the model with the
  * banner of the two captains taking part.
  */
-extern "C" void fn_80279B94(
-    StadiumWorldObject_80279AC8* object, glModel* model)
+void StadiumWorldDrawable::UpdateModelMaterials(glModel* model)
 {
     if (sTeamBannerTexture == 0)
     {
@@ -242,34 +227,34 @@ extern "C" void fn_80279B94(
                 nlSingleton<GameInfoManager>::Instance()->GetStadium()));
         sStadiumBannerTexture = glGetTexture(stadiumTexture);
 
-        int first;
-        int second;
+        int firstCharacter;
+        int secondCharacter;
         if (nlTaskManager::m_pInstance->mCurrentState > 0x10)
         {
-            first = nlSingleton<GameInfoManager>::Instance()->GetTeam(0);
-            second = nlSingleton<GameInfoManager>::Instance()->GetTeam(1);
-            first = GetCharacterIndexFromCaptain(first);
-            second = GetCharacterIndexFromCaptain(second);
+            firstCharacter = nlSingleton<GameInfoManager>::Instance()->GetTeam(0);
+            secondCharacter = nlSingleton<GameInfoManager>::Instance()->GetTeam(1);
+            firstCharacter = GetCharacterIndexFromCaptain(firstCharacter);
+            secondCharacter = GetCharacterIndexFromCaptain(secondCharacter);
         }
         else
         {
-            first = GetCaptainCharacter(g_pTeams[0]->GetCaptain());
-            second = GetCaptainCharacter(g_pTeams[1]->GetCaptain());
+            firstCharacter = GetCaptainCharacter(g_pTeams[0]->GetCaptain());
+            secondCharacter = GetCaptainCharacter(g_pTeams[1]->GetCaptain());
         }
 
-        const CharacterInfo& firstInfo = GetCharacterInfo(first);
-        const CharacterInfo& secondInfo = GetCharacterInfo(second);
-        const char* name = GetCharacterInfo(first).mName;
+        const CharacterInfo& firstCharacterInfo = GetCharacterInfo(firstCharacter);
+        const CharacterInfo& secondCharacterInfo = GetCharacterInfo(secondCharacter);
+        const char* characterName = GetCharacterInfo(firstCharacter).mName;
         char bannerTexture[64];
-        if (NeedsAlternateColour(firstInfo, secondInfo))
+        if (NeedsAlternateColour(firstCharacterInfo, secondCharacterInfo))
         {
             nlSNPrintf(bannerTexture, sizeof(bannerTexture),
-                "%s/%s_banners_alt", name, name);
+                "%s/%s_banners_alt", characterName, characterName);
         }
         else
         {
             nlSNPrintf(bannerTexture, sizeof(bannerTexture),
-                "%s/%s_banners", name, name);
+                "%s/%s_banners", characterName, characterName);
         }
         sTeamBannerTexture = glGetTexture(bannerTexture);
         sTeamBannerTextureIndex = glGetTextureManager()->GetTextureIndex(
@@ -294,57 +279,55 @@ extern "C" void fn_80279B94(
 /**
  * Address/Size: 0x80279D7C | size: 0x4
  */
-extern "C" void fn_80279D7C(StadiumWorldObject_80279AC8*)
+void StadiumWorldDrawable::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x80279D80 | size: 0x54
  */
-extern "C" bool fn_80279D80(
-    StadiumWorldObject_80279AC8* object, const nlVector4* planes)
+bool StadiumWorldDrawable::IsVisibleInFrustum(const nlVector4* planes) const
 {
-    if (object->m_pAnimController != 0)
-        return ((WorldDrawable*)object)->WorldDrawable::V6(planes);
+    if (m_pAnimController != 0)
+        return WorldDrawable::IsVisibleInFrustum(planes);
     return ClassifyBoxInFrustum(
-               planes, &object->m_boundsMin, &object->m_boundsMax, 0)
+               planes, &m_boundsMin, &m_boundsMax, 0)
         != 0;
 }
 
 /**
  * Address/Size: 0x80279DD4 | size: 0xB4
  */
-extern "C" void fn_80279DD4(StadiumWorldObject_80279AC8* object)
+void StadiumWorldDrawable::Draw()
 {
-    if ((object->m_uFlags & 8) != 0)
+    if ((m_uFlags & 8) != 0)
     {
-        ((WorldDrawable*)object)
-            ->WorldDrawable::V8((GLView*)GetLayerView((eCLV)5));
+        WorldDrawable::DrawToView((GLView*)GetLayerView(eCLV_NoFog));
     }
     else
     {
-        if ((object->m_uFlags & 0x37) != 0)
-            fn_80279E88(object);
-        if (0.0f != object->GetBlend())
-            ((WorldDrawable*)object)->WorldDrawable::Draw();
+        if ((m_uFlags & 0x37) != 0)
+            UpdateBlend();
+        if (0.0f != GetBlend())
+            WorldDrawable::Draw();
     }
 
-    if (sShowObjectBounds && object->m_pAnimController == 0)
+    if (sShowObjectBounds && m_pAnimController == 0)
     {
         nlColour colour;
         nlColourSet(colour, 0xFF, 0xFF, 0xFF, 0xFF);
-        fn_802BC678(&g_ShapeRenderer, object->m_boundsMin,
-            object->m_boundsMax, colour);
+        g_ShapeRenderer.DrawWireBox(m_boundsMin,
+            m_boundsMax, colour);
     }
 }
 
 
 // Every blend update clamps into [0, 1] the same way.
 static inline void SetObjectBlend(
-    StadiumWorldObject_80279AC8* object, float blend)
+    StadiumWorldDrawable* object, float blend)
 {
     object->m_fBlend = blend;
-    if (blend < 0.0f)
+    if (object->GetBlend() < 0.0f)
         object->m_fBlend = 0.0f;
     if (object->GetBlend() > 1.0f)
         object->m_fBlend = 1.0f;
@@ -353,201 +336,199 @@ static inline void SetObjectBlend(
 /**
  * Address/Size: 0x80279E88 | size: 0x1CC
  */
-extern "C" void fn_80279E88(StadiumWorldObject_80279AC8* object)
+void StadiumWorldDrawable::UpdateBlend()
 {
-    unsigned long flags = object->m_uFlags;
+    unsigned long flags = m_uFlags;
     if ((flags & 0x10) != 0
         && nlTaskManager::m_pInstance->mCurrentState == 0x10)
     {
-        SetObjectBlend(object, 0.0f);
+        SetObjectBlend(this, 0.0f);
         return;
     }
 
     if ((flags & 0x20) != 0)
     {
-        unsigned long state = nlTaskManager::m_pInstance->mCurrentState;
-        if (state == 0x10 || state == 8 || state == 0x20000)
+        unsigned long taskState = nlTaskManager::m_pInstance->mCurrentState;
+        if (taskState == 0x10 || taskState == 8 || taskState == 0x20000)
         {
-            SetObjectBlend(object, 0.0f);
+            SetObjectBlend(this, 0.0f);
             return;
         }
     }
 
-    if (cCameraManager::m_pBeginFrameCameraType == 9)
+    if (cCameraManager::m_pBeginFrameCameraType == eCameraType_Animated)
     {
-        SetObjectBlend(object, 1.0f);
+        SetObjectBlend(this, 1.0f);
         return;
     }
 
-    bool hide = sForceBlendOn;
-    int camera = cCameraManager::m_pBeginFrameCameraType;
-    if (camera == 1 || camera == 7 || camera == 6
-        || *((bool*)GetPresentation() + 0x164))
+    bool hide = sForceBannerHidden;
+    int cameraType = cCameraManager::m_pBeginFrameCameraType;
+    if (cameraType == eCameraType_Gameplay
+        || cameraType == eCameraType_ShootToScore
+        || cameraType == eCameraType_Goal
+        || !GetPresentation()->mUnidentified164)
     {
         hide = true;
     }
 
-    if (sBlendOverride)
+    if (sAlternateBannerVisibility)
     {
-        bool consumed = sBlendOverrideConsumed;
-        sBlendOverrideConsumed = consumed == 0;
-        if (consumed)
+        bool visible = !sAlternateBannerVisible;
+        sAlternateBannerVisible = visible;
+        if (visible)
             hide = false;
     }
 
-    if ((object->m_uFlags & 2) != 0 && hide)
-        SetObjectBlend(object, 0.0f);
+    if ((m_uFlags & 2) != 0 && hide)
+        SetObjectBlend(this, 0.0f);
     else
-        SetObjectBlend(object, 1.0f);
+        SetObjectBlend(this, 1.0f);
 }
 
 /**
  * Address/Size: 0x8027A054 | size: 0x70
  */
-extern "C" void fn_8027A054(StadiumWorldObject_80279AC8* object)
+void StadiumLight::Initialize(WorldObjectLoadContext*)
 {
-    if (object->m_fLightRange <= 0.0f)
+    if (m_fIntensity <= 0.0f)
     {
-        nlMatrix4* transform = object->GetWorldMatrix();
+        nlMatrix4* transform = GetWorldMatrix();
         BasicStadium* stadium = BasicStadium::GetCurrentStadium();
         stadium->m_shadowLightPosition = *(nlVector3*)&transform->m41;
     }
     else
     {
-        fn_80182168(object);
+        PrepareStadiumLight(this);
     }
 }
 
 /**
  * Address/Size: 0x8027A0C4 | size: 0x4
  */
-extern "C" void fn_8027A0C4(StadiumWorldObject_80279AC8*)
+void StadiumLight::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x8027A0C8 | size: 0x34
  */
-extern "C" void fn_8027A0C8(
-    StadiumWorldObject_80279AC8* object, void* context)
+void StadiumAttackSideIndicator::Initialize(WorldObjectLoadContext* context)
 {
-    fn_80343DE4(object, context);
-    RegisterAttackSideIndicator((DrawableObject*)object);
+    WorldDrawable::Initialize(context);
+    RegisterAttackSideIndicator(this);
 }
 
 /**
  * Address/Size: 0x8027A0FC | size: 0x4
  */
-extern "C" void fn_8027A0FC(StadiumWorldObject_80279AC8*)
+void StadiumAttackSideIndicator::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x8027A100 | size: 0x14
  */
-extern "C" void fn_8027A100(StadiumWorldObject_80279AC8* object)
+void StadiumAttackSideIndicator::Draw()
 {
-    if (object->m_pLayerModels[1] != 0)
-        ((WorldDrawable*)object)->WorldDrawable::Draw();
+    if (m_nVisible != 0)
+        WorldDrawable::Draw();
 }
 
 /**
  * Address/Size: 0x8027A114 | size: 0x4
  */
-extern "C" void fn_8027A114(
-    StadiumWorldObject_80279AC8* object, void* context)
+void StadiumToggleDrawable::Initialize(WorldObjectLoadContext* context)
 {
-    fn_80343DE4(object, context);
+    WorldDrawable::Initialize(context);
 }
 
 /**
  * Address/Size: 0x8027A118 | size: 0x4
  */
-extern "C" void fn_8027A118(StadiumWorldObject_80279AC8*)
+void StadiumToggleDrawable::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x8027A11C | size: 0x14
  */
-extern "C" void fn_8027A11C(StadiumWorldObject_80279AC8* object)
+void StadiumToggleDrawable::Draw()
 {
-    if (object->m_pLayerModels[0] != 0)
-        ((WorldDrawable*)object)->WorldDrawable::Draw();
+    if (m_nVisible != 0)
+        WorldDrawable::Draw();
 }
 
 /**
  * Address/Size: 0x8027A130 | size: 0x6C
  */
-extern "C" void fn_8027A130(
-    StadiumWorldObject_80279AC8* object, void* context)
+void StadiumShadowVolumeDrawable::Initialize(WorldObjectLoadContext* context)
 {
-    fn_80343DE4(object, context);
+    WorldDrawable::Initialize(context);
 
-    glModel* source = object->m_pModel;
-    for (int i = 0; i < 2; i++)
+    glModel* model = m_pModel;
+    for (int modelIndex = 0; modelIndex < 2; modelIndex++)
     {
-        object->m_pLayerModels[i]
-            = glModelDupNoStreams(source, true, glGetCurrentResourcePool());
+        m_pShadowModels[modelIndex]
+            = glModelDupNoStreams(model, true, glGetCurrentResourcePool());
     }
 }
 
 /**
  * Address/Size: 0x8027A19C | size: 0x4
  */
-extern "C" void fn_8027A19C(StadiumWorldObject_80279AC8*)
+void StadiumShadowVolumeDrawable::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x8027A1A0 | size: 0x68
  */
-extern "C" void fn_8027A1A0(StadiumWorldObject_80279AC8* object)
+void StadiumShadowVolumeDrawable::Draw()
 {
-    AttachShadowVolumeModels(object->m_pLayerModels[0], object->m_pLayerModels[1],
-        (GLView*)GetLayerView((eCLV)0x14), (GLView*)GetLayerView((eCLV)0x14));
-    fn_80273A14((eCLV)0x14);
-    fn_80273A14((eCLV)0x15);
+    AttachShadowVolumeModels(m_pShadowModels[0], m_pShadowModels[1],
+        (GLView*)GetLayerView(eCLV_ShadowVolume), (GLView*)GetLayerView(eCLV_ShadowVolume));
+    ShowLayerView(eCLV_ShadowVolume);
+    ShowLayerView(eCLV_ShadowVolumeBlend);
 }
 
 /**
  * Address/Size: 0x8027A208 | size: 0x3C
  */
-extern "C" void fn_8027A208(
-    StadiumWorldObject_80279AC8* object, void* context)
+void StadiumHighRangeDrawable::Initialize(WorldObjectLoadContext* context)
 {
-    fn_80343DE4(object, context);
+    WorldDrawable::Initialize(context);
     GameInfoManager* info = nlSingleton<GameInfoManager>::Instance();
     if (info->mCurrentMode != -1)
-        SetStadiumUnknown0x2C(info->GetStadium(), true);
+        SetStadiumHasHighRangeDrawables(info->GetStadium(), true);
 }
 
 /**
  * Address/Size: 0x8027A244 | size: 0x4
  */
-extern "C" void fn_8027A244(StadiumWorldObject_80279AC8*)
+void StadiumHighRangeDrawable::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x8027A248 | size: 0x80
  */
-extern "C" void fn_8027A248(StadiumWorldObject_80279AC8* object)
+void StadiumHighRangeDrawable::Draw()
 {
-    if ((object->m_uFlags & 0x37) != 0)
-        fn_80279E88(object);
+    if ((m_uFlags & 0x37) != 0)
+        UpdateBlend();
 
-    if (0.0f != object->GetBlend())
+    if (0.0f != GetBlend())
     {
-        if ((object->m_uFlags & 8) != 0)
+        if ((m_uFlags & 8) != 0)
         {
-            ((GLView*)GetLayerView((eCLV)0x10))
-                ->AttachModel(object->m_pModel, 0);
+            ((GLView*)GetLayerView(eCLV_HighRange3DNoFog))
+                ->AttachModel(m_pModel, 0);
         }
         else
         {
-            ((GLView*)GetLayerView((eCLV)0xF))
-                ->AttachModel(object->m_pModel, 0);
+            ((GLView*)GetLayerView(eCLV_HighRange3D))
+                ->AttachModel(m_pModel, 0);
         }
     }
 }
@@ -555,56 +536,55 @@ extern "C" void fn_8027A248(StadiumWorldObject_80279AC8* object)
 /**
  * Address/Size: 0x8027A2C8 | size: 0x34
  */
-extern "C" void fn_8027A2C8(
-    StadiumGoalObject_8027A2C8* object, void* context)
+void StadiumCupTrophyDrawable::Initialize(WorldObjectLoadContext* context)
 {
-    fn_80343DE4(object, context);
-    fn_802092A4(object);
+    WorldDrawable::Initialize(context);
+    RegisterCupTrophy(this);
 }
 
 /**
  * Address/Size: 0x8027A2FC | size: 0x4
  */
-extern "C" void fn_8027A2FC(StadiumWorldObject_80279AC8*)
+void StadiumCupTrophyDrawable::ReleaseResources()
 {
 }
 
 /**
  * Address/Size: 0x8027A300 | size: 0x18
  */
-extern "C" void fn_8027A300(StadiumGoalObject_8027A2C8* object)
+void StadiumCupTrophyDrawable::Draw()
 {
-    if (0.0f != object->GetOpacity())
-        ((WorldDrawable*)object)->WorldDrawable::Draw();
+    if (0.0f != GetOpacity())
+        WorldDrawable::Draw();
 }
 
 /**
  * Address/Size: 0x8027A318 | size: 0x4
  */
-void WorldDrawable::V7(glModel*)
+void WorldDrawable::UpdateModelMaterials(glModel*)
 {
 }
 
-StadiumLightObject_8027A054::~StadiumLightObject_8027A054()
+StadiumLight::~StadiumLight()
 {
 }
 
-StadiumIndicatorObject_8027A0C8::~StadiumIndicatorObject_8027A0C8()
+StadiumAttackSideIndicator::~StadiumAttackSideIndicator()
 {
 }
 
-StadiumEffectObject_8027A11C::~StadiumEffectObject_8027A11C()
+StadiumToggleDrawable::~StadiumToggleDrawable()
 {
 }
 
-StadiumLayerObject_8027A130::~StadiumLayerObject_8027A130()
+StadiumShadowVolumeDrawable::~StadiumShadowVolumeDrawable()
 {
 }
 
-StadiumCrowdObject_8027A208::~StadiumCrowdObject_8027A208()
+StadiumHighRangeDrawable::~StadiumHighRangeDrawable()
 {
 }
 
-StadiumGoalObject_8027A2C8::~StadiumGoalObject_8027A2C8()
+StadiumCupTrophyDrawable::~StadiumCupTrophyDrawable()
 {
 }

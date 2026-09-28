@@ -75,7 +75,7 @@ extern "C" int fn_800B04A0(int index)
     return lbl_8056DA18[index];
 }
 
-Desire::Desire(int state, const UnidentifiedStateTransition& transition)
+Desire::Desire(int state, const TransitionFunc& transition)
     : shdStateMachine(state, transition)
     , mThinkTimer()
 {

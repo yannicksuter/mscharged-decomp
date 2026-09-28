@@ -2,7 +2,7 @@
 #define GAME_AI_DESIRE_RECEIVE_PASS_H
 
 #include "Game/AI/Desire.h"
-#include "Game/AI/UnidentifiedStringHash.h"
+#include "Game/AI/TransitionFunc.h"
 
 class DesireReceivePass;
 class SpaceSearch;

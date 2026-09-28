@@ -85,17 +85,17 @@ PlanarShadowDrawable* PlanarShadowDrawable::Clone(unsigned long hash)
  */
 void PlanarShadowDrawable::Draw()
 {
-    V8(0);
+    DrawToView(0);
 }
 
 /**
  * Address/Size: 0x8027A708 | size: 0x58
  */
-void PlanarShadowDrawable::V8(GLView* view)
+void PlanarShadowDrawable::DrawToView(GLView* view)
 {
     if ((m_uObjectFlags & 1) != 0)
     {
-        WorldDrawable::V8(view);
+        WorldDrawable::DrawToView(view);
         if ((m_uObjectFlags & 4) != 0)
             DrawPlanarShadow();
     }

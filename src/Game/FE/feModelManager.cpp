@@ -628,7 +628,7 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
     while (pending.hasNext())
     {
         FEModelHandle* current = *pending;
-        if (current->mNameHash == nameHash)
+        if (nameHash == current->mNameHash)
         {
             handle = current;
             if (handle->mModel->mLoadQueued

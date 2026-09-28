@@ -2,6 +2,7 @@
 #define GAME_WORLD_WORLD_ANIM_OBJECTS_H
 
 #include "Game/World/WorldObject.h"
+#include "Game/World/WorldDrawable.h"
 #include "Game/World/WorldPhysicsDescription.h"
 #include "NL/nlMath.h"
 #include "types.h"
@@ -11,29 +12,6 @@ class glModel;
 class PhysicsObject;
 class WorldAnimController;
 struct WorldVisibilityNode;
-
-class WorldAnimDrawable_80343A40 : public WorldObject
-{
-public:
-    virtual ~WorldAnimDrawable_80343A40();
-    virtual void ReleaseResources();
-    virtual nlMatrix4* GetWorldMatrix();
-    virtual void SetWorldMatrix(const nlMatrix4& transform);
-    virtual void Draw();
-    virtual bool V6(const nlVector4* planes);
-    virtual void V7(glModel* model);
-    virtual void V8(GLView* view);
-
-    /* 0x04 */ u8 m_pad04[0x0C];
-    /* 0x10 */ World* m_pWorld;
-    /* 0x14 */ int m_nAnimNode;
-    /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ u8 m_pad1C[0x04];
-    /* 0x20 */ nlMatrix4 m_transform;
-    /* 0x60 */ float m_fRadius;
-    /* 0x64 */ glModel* m_pModel;
-    /* 0x68 */ u8 m_pad68[0x08];
-}; // size: 0x70
 
 class WorldVertexAnimDrawable_80343E3C : public WorldObject
 {
@@ -78,8 +56,8 @@ public:
 
 extern "C" void fn_8034417C(WorldPhysicsDrawable_80534448* pObject);
 
-typedef char WorldAnimDrawable_80343A40_size_check[
-    sizeof(WorldAnimDrawable_80343A40) == 0x70 ? 1 : -1];
+typedef char WorldDrawable_size_check[
+    sizeof(WorldDrawable) == 0x70 ? 1 : -1];
 typedef char WorldPhysicsDrawable_80534448_size_check[
     sizeof(WorldPhysicsDrawable_80534448) == 0x90 ? 1 : -1];
 

@@ -296,6 +296,14 @@ inline void cGame::ResetGameFields()
     mUnidentified0BD = false;
 }
 
+inline void cGame::RegisterEventListeners()
+{
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
+        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnSuddenDeath)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
+}
+
 cGame::cGame(void* param1, int param2, bool param3)
     : mUnidentified0C0((bool*)mUnidentified0D0, 0, 0, 100)
     , mUnidentified134((bool*)mUnidentified144, 0, 0, 16)
@@ -358,10 +366,7 @@ cGame::cGame(void* param1, int param2, bool param3)
         StatsTracker::Instance()->WriteCurrentlyPlaying();
     }
 
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
-        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnSuddenDeath)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
-        ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
+    RegisterEventListeners();
 
     mUnidentified014 = new (nlMalloc(sizeof(AIContext), 8, false))
         AIContext(

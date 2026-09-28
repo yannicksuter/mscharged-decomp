@@ -25,9 +25,9 @@ public:
     virtual void SetWorldMatrix(const nlMatrix4* transform);
     virtual void V4(void* world);
     virtual void Draw();
-    virtual bool V6(const nlVector4* planes);
-    virtual void V7(void* model);
-    virtual void V8(void* view);
+    virtual bool IsVisibleInFrustum(const nlVector4* planes);
+    virtual void UpdateModelMaterials(void* model);
+    virtual void DrawToView(void* view);
     virtual void V9(void* context);
 
     /* 0x04 */ u8 m_Unknown04[0x1C];

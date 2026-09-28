@@ -16,7 +16,7 @@ bool glIsTextureAnim(const void* data, unsigned long size)
     return *(const u32*)data == 0x5F6C6669;
 }
 
-void glAddTextureAnim(const void* data, unsigned long size,
+void glAddTextureAnim(void* data, unsigned long size,
     GLResourcePool* resource)
 {
     int offset;
@@ -27,7 +27,7 @@ void glAddTextureAnim(const void* data, unsigned long size,
     anim->m_pAnimTex = (GLAnimTex*)resource->Allocate(
         anim->m_nNumTextures * sizeof(GLAnimTex), GLM_Header);
 
-    const GLAnimTex* source = (const GLAnimTex*)((const u8*)data
+    const GLAnimTex* source = (const GLAnimTex*)((u8*)data
                                                  + sizeof(GLTextureAnim));
     int i;
     for (i = 0; i < anim->m_nNumTextures; ++i)

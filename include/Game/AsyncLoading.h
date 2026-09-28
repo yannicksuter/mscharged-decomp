@@ -64,6 +64,7 @@ public:
     static AsyncLoadingManager* Instance();
     GLResourcePool* GetPersistentResourcePool();
     void LoadTrophyTemplates();
+    void SetLoadingComment(const char* comment) { mLoadingComment = comment; }
 
     /* 0x28 */ void* mByteCode;
     /* 0x2C */ u32 mSequenceState;

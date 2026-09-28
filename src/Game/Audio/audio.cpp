@@ -40,7 +40,7 @@ static char sResumedCue[] = "Resumed cue";
 
 bool gAudioEnabled = true;
 unsigned long sAudioPauseDepth = 1;
-char gAudioResourcePath[8] = "audio/";
+char gAudioResourcePath[] = "audio/";
 
 typedef nlAVLTreeSlotPool<unsigned long, XSoundHandle*,
     DefaultKeyCompare<unsigned long> > AudioHandleMap;
@@ -66,14 +66,6 @@ static inline XSoundHandle** FindAudioHandleSlot(
     unsigned long key = MakeAudioHandleKey(cueId, context);
     sAudioHandles.FindGet(key, &slot);
     return slot;
-}
-
-static inline AudioHandleState* FindAudioHandleState(
-    unsigned long key)
-{
-    AudioHandleState* state = 0;
-    sAudioHandleStates.FindGet(key, &state);
-    return state;
 }
 
 static inline void AddAudioHandleState(int slotId, unsigned long cueId,
@@ -575,21 +567,17 @@ int GetAudioPauseDepth()
 void AudioSystem::PauseTrackedSound(
     const unsigned long& key, XSoundHandle** handle)
 {
-    AudioHandleState* state = FindAudioHandleState(key);
-    if (state != 0)
+    AudioHandleState* state;
+    if (sAudioHandleStates.FindGet(key, &state))
     {
         PauseSound(state->m_CueId, state->m_Context);
     }
-    else if (*handle != 0)
+    else
     {
         (*handle)->Stop(0, 0);
     }
 
-    if (*handle != 0)
-    {
-        unsigned long handleKey = (unsigned long)*handle;
-        sPausedAudioHandles.Add(handleKey, gAudioResourcePath[7]);
-    }
+    sPausedAudioHandles.Add(*(unsigned long*)handle, false);
 }
 
 

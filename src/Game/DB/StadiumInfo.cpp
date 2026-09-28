@@ -167,15 +167,15 @@ const char* GetStadiumTerrain(int stadium)
     return sStadiumInfo[stadium].mTerrain;
 }
 
-bool GetStadiumUnknown0x2C(int stadium)
+bool StadiumHasHighRangeDrawables(int stadium)
 {
-    return sStadiumInfo[stadium].unknown_0x2C;
+    return sStadiumInfo[stadium].mHasHighRangeDrawables;
 }
 
-bool SetStadiumUnknown0x2C(int stadium, bool value)
+bool SetStadiumHasHighRangeDrawables(int stadium, bool value)
 {
-    bool previous = sStadiumInfo[stadium].unknown_0x2C;
-    sStadiumInfo[stadium].unknown_0x2C = value;
+    bool previous = sStadiumInfo[stadium].mHasHighRangeDrawables;
+    sStadiumInfo[stadium].mHasHighRangeDrawables = value;
     return previous;
 }
 

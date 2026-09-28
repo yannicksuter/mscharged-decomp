@@ -46,17 +46,18 @@ inline void WorldNPCManager::RegisterObject(WorldNPC* npc)
 static inline bool FindLoadedTemplate(const WorldNPCManager& manager,
     unsigned long templateHash, int& index)
 {
+    int currentIndex = 0;
     bool found = false;
-    index = 0;
-    for (; index < manager.mNumLoadTemplates; ++index)
+    for (; currentIndex < manager.mNumLoadTemplates; ++currentIndex)
     {
         if (templateHash
-            == nlStringLowerHash(manager.mLoadTemplates[index].mName))
+            == nlStringLowerHash(manager.mLoadTemplates[currentIndex].mName))
         {
             found = true;
             break;
         }
     }
+    index = currentIndex;
     return found;
 }
 

@@ -436,31 +436,31 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
     }
 }
 
-extern "C" void fn_802BC678(const ShapeRender* arg0,
-    const nlVector3& arg1, const nlVector3& arg2, const nlColour& colour)
+void ShapeRender::DrawWireBox(
+    const nlVector3& boundsMin, const nlVector3& boundsMax, const nlColour& colour) const
 {
     nlVector3 points[8];
-    nlVec3Set(points[0], arg1.x, arg1.y, arg1.z);
-    nlVec3Set(points[1], arg1.x, arg2.y, arg1.z);
-    nlVec3Set(points[2], arg2.x, arg2.y, arg1.z);
-    nlVec3Set(points[3], arg2.x, arg1.y, arg1.z);
-    nlVec3Set(points[4], arg1.x, arg1.y, arg2.z);
-    nlVec3Set(points[5], arg1.x, arg2.y, arg2.z);
-    nlVec3Set(points[6], arg2.x, arg2.y, arg2.z);
-    nlVec3Set(points[7], arg2.x, arg1.y, arg2.z);
+    nlVec3Set(points[0], boundsMin.x, boundsMin.y, boundsMin.z);
+    nlVec3Set(points[1], boundsMin.x, boundsMax.y, boundsMin.z);
+    nlVec3Set(points[2], boundsMax.x, boundsMax.y, boundsMin.z);
+    nlVec3Set(points[3], boundsMax.x, boundsMin.y, boundsMin.z);
+    nlVec3Set(points[4], boundsMin.x, boundsMin.y, boundsMax.z);
+    nlVec3Set(points[5], boundsMin.x, boundsMax.y, boundsMax.z);
+    nlVec3Set(points[6], boundsMax.x, boundsMax.y, boundsMax.z);
+    nlVec3Set(points[7], boundsMax.x, boundsMin.y, boundsMax.z);
 
-    arg0->DrawLine3D(points[0], points[1], colour, true);
-    arg0->DrawLine3D(points[1], points[2], colour, true);
-    arg0->DrawLine3D(points[2], points[3], colour, true);
-    arg0->DrawLine3D(points[3], points[0], colour, true);
-    arg0->DrawLine3D(points[4], points[5], colour, true);
-    arg0->DrawLine3D(points[5], points[6], colour, true);
-    arg0->DrawLine3D(points[6], points[7], colour, true);
-    arg0->DrawLine3D(points[7], points[4], colour, true);
-    arg0->DrawLine3D(points[0], points[4], colour, true);
-    arg0->DrawLine3D(points[1], points[5], colour, true);
-    arg0->DrawLine3D(points[2], points[6], colour, true);
-    arg0->DrawLine3D(points[3], points[7], colour, true);
+    DrawLine3D(points[0], points[1], colour, true);
+    DrawLine3D(points[1], points[2], colour, true);
+    DrawLine3D(points[2], points[3], colour, true);
+    DrawLine3D(points[3], points[0], colour, true);
+    DrawLine3D(points[4], points[5], colour, true);
+    DrawLine3D(points[5], points[6], colour, true);
+    DrawLine3D(points[6], points[7], colour, true);
+    DrawLine3D(points[7], points[4], colour, true);
+    DrawLine3D(points[0], points[4], colour, true);
+    DrawLine3D(points[1], points[5], colour, true);
+    DrawLine3D(points[2], points[6], colour, true);
+    DrawLine3D(points[3], points[7], colour, true);
 }
 
 extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,

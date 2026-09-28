@@ -165,7 +165,7 @@ static unsigned short sDesireSuperPowerType = 0xFFFF;
  * Offset/Address/Size: 0x0 | 0x800C86FC | size: 0x60
  */
 DesireSuperPower::DesireSuperPower()
-    : Desire(23, UnidentifiedStateTransition(lbl_806E20B8))
+    : Desire(23, TransitionFunc(g_UnsetTransitionFunc))
     , mpDKShockAvoidable(0)
     , mpTarget(0)
 {
@@ -314,7 +314,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
 
     if (result)
     {
-        mUnidentified018->UnidentifiedSetTransition("SuperPowerPlayDesire");
+        mUnidentified018->SetTransition("SuperPowerPlayDesire");
         fn_800A6968(m_pFielder->m_pTeam);
         fn_803198F4();
         cFielder* fielder = m_pFielder;

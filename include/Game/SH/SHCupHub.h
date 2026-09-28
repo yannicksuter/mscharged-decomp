@@ -19,18 +19,18 @@ public:
     virtual void SceneCreated();
 
     void UpdateRows();
-    void fn_802017C4(int index, int value);
-    void fn_80201BE0(int index);
-    void fn_802025F4(TLTextInstance* roundText, int round, TLTextInstance* gameText, int game, int index);
-    void fn_80202C34();
-    void fn_80203320(unsigned int index, void* context);
-    void fn_80203498(unsigned int index, void* context);
-    void fn_80203674(unsigned int index, void* context);
-    void fn_802037E8(unsigned int index, void* context);
-    void fn_80203980(unsigned int index, void* context);
-    void fn_80203A10(unsigned int index, void* context);
-    void fn_80203A88(unsigned int index, void* context);
-    void fn_80203B54();
+    void UpdateRoundText(int index, int value);
+    void UpdateRow(int index);
+    void UpdateRoundGameText(TLTextInstance* roundText, int round, TLTextInstance* gameText, int game, int index);
+    void InitializePointerButtons();
+    void OnMatchupPointerPress(unsigned int index, void* context);
+    void OnMatchupPointerEnter(unsigned int index, void* context);
+    void OnMatchupPointerLeave(unsigned int index, void* context);
+    void OnMatchupPointerInside(unsigned int index, void* context);
+    void OnRulesPointerEnter(unsigned int index, void* context);
+    void OnRulesPointerLeave(unsigned int index, void* context);
+    void OnRulesPointerPress(unsigned int index, void* context);
+    void BuildMatchupStates();
 
     /* 0x01C */ TLComponentInstance* mUnidentified1C;
     /* 0x020 */ TLComponentInstance* mUnidentified20[4];

@@ -84,7 +84,7 @@ void LoadWarbleBlob()
 static inline int SwizzledIA8Offset(int x, int y)
 {
     const int yOffset = ((y & 3) << 2) | ((y & ~3) << 6);
-    const int xOffset = (x & 3) | ((x & ~3) << 2);
+    const int xOffset = (x & 3) | ((x >> 2) << 4);
     return (yOffset | xOffset) << 1;
 }
 
@@ -112,13 +112,15 @@ void GenerateWarbleTexture(
                 const float inverseRadius = 1.0f / radius;
                 const float radialY = dy * inverseRadius;
                 const float wave = nlSin(
-                    (u16)((radius * frequency + phase) * 10430.378f));
+                    (u16)(s32)((radius * frequency + phase) * 10430.378f));
                 float scaledWave = radialY * wave;
                 scaledWave = sWarbleDisplacementScale * scaledWave;
                 displacement = (int)(amplitude * scaledWave + 128.0f);
             }
 
-            const int offset = SwizzledIA8Offset(x, y);
+            const int pixel = ((y & 3) << 2) | (x & 3);
+            const int tile = ((y & ~3) << 6) | ((x >> 2) << 4);
+            const int offset = (pixel | tile) << 1;
             const float normalized = (float)(u8)(int)source / 255.0f;
             const int mapped = (int)((float)sWarbleInputExtent + normalized * (float)(sWarbleOutputExtent - sWarbleInputExtent));
             output[offset] = (u8)mapped;

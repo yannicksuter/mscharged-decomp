@@ -52,7 +52,7 @@ void glTextureAdd(unsigned long texture, const void* buffer,
     GLResourcePool* resource = (GLResourcePool*)resourceInterface;
     if (glIsTextureAnim(buffer, length))
     {
-        glAddTextureAnim(buffer, length, resource);
+        glAddTextureAnim((void*)buffer, length, resource);
     }
     else
     {
@@ -114,7 +114,7 @@ bool glEndLoadTextureBundle(
 
     for (i = 0; i < numTextures; ++dict, ++i)
     {
-        const void* texture = textureData + dict->offset;
+        void* texture = textureData + dict->offset;
         if (glIsTextureAnim(texture, dict->fileSize))
         {
             glAddTextureAnim(texture, dict->fileSize, resource);

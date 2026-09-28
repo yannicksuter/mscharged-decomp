@@ -29,9 +29,6 @@ float lbl_806DC0BC = 0.8f;
 float lbl_806DC0C0 = 1.5f;
 float lbl_806DC0C4 = 5.0f;
 float lbl_806DC0C8 = 0.8f;
-float lbl_806DC100 = 0.5f;
-int lbl_806DC108 = 16;
-extern int lbl_806DC110;
 
 static nlVector2 g_vMarkingNetPassBalance = { 0.0f, 0.25f };
 static nlVector2 g_vMarkDistance = { 7.0f, 4.0f };
@@ -40,8 +37,14 @@ static nlVector2 g_vMarkBallOwner = { 0.0f, 0.5f };
 static nlVector2 g_vMarkImmediateThreatCoeff = { 1.0f, 0.5f };
 static nlVector2 g_vMarkFollowTimeDelay = { 0.3f, 0.1f };
 
+float lbl_806DC100 = 0.5f;
 static unsigned short sDesireMarkType = 0xFFFF;
+int lbl_806DC108 = 16;
 static unsigned short sDesireDefendPosType = 0xFFFF;
+// The default transition result resides in initialized small data.
+#pragma explicit_zero_data on
+int lbl_806DC110 = DESIRE_CONTINUE;
+#pragma explicit_zero_data off
 
 /**
  * Offset/Address/Size: 0x0 | 0x800B6DC0 | size: 0x48
@@ -132,7 +135,10 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
             {
                 nlVector3 v3SBCDir;
                 nlVector3 v3SBCPosition;
-                nlVec3ScaleAdd(v3SBCPosition, lbl_806DC0B8, pSBC->mUnidentified024.m_v3Velocity, pSBC->mUnidentified024.m_v3Position);
+                nlVec3Set(v3SBCPosition,
+                    (lbl_806DC0B8 * pSBC->mUnidentified024.m_v3Velocity.x) + pSBC->mUnidentified024.m_v3Position.x,
+                    (lbl_806DC0B8 * pSBC->mUnidentified024.m_v3Velocity.y) + pSBC->mUnidentified024.m_v3Position.y,
+                    (lbl_806DC0B8 * pSBC->mUnidentified024.m_v3Velocity.z) + pSBC->mUnidentified024.m_v3Position.z);
                 nlVec3Sub(v3SBCDir, v3SBCPosition, v3MarkPosition);
                 nlVec3Normalize(v3SBCDir, v3SBCDir);
                 if (nlVec3DotProduct(v3SBCDir, v3Dir) >= 0.0f)
@@ -287,7 +293,10 @@ void DesireDefendPos::Update(
             {
                 nlVector3 v3SBCDir;
                 nlVector3 v3SBCPosition;
-                nlVec3ScaleAdd(v3SBCPosition, lbl_806DC0B8, pSBC->mUnidentified024.m_v3Velocity, pSBC->mUnidentified024.m_v3Position);
+                nlVec3Set(v3SBCPosition,
+                    (lbl_806DC0B8 * pSBC->mUnidentified024.m_v3Velocity.x) + pSBC->mUnidentified024.m_v3Position.x,
+                    (lbl_806DC0B8 * pSBC->mUnidentified024.m_v3Velocity.y) + pSBC->mUnidentified024.m_v3Position.y,
+                    (lbl_806DC0B8 * pSBC->mUnidentified024.m_v3Velocity.z) + pSBC->mUnidentified024.m_v3Position.z);
 
                 nlVec3Sub(v3SBCDir, v3SBCPosition, v3MarkPosition);
                 nlVec3Normalize(v3SBCDir, v3SBCDir);
@@ -350,59 +359,20 @@ extern "C" DesireUpdate fn_800B9020(
 }
 
 /**
- * Offset/Address/Size: 0x2264 | 0x800B9024 | size: 0xC8
- */
-void DesireDefendPos::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireDefendPos");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0x232C | 0x800B90EC | size: 0x9C
- */
-void DesireDefendPos::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireDefendPosType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireDefendPosType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireDefendPosType, data, context);
-    cache->WriteData(sDesireDefendPosType, data,
-        sizeof(DesireDefendPos) - offset);
-}
-
-/**
  * Offset/Address/Size: 0x23C8 | 0x800B9188 | size: 0xC8
  */
-void DesireMark::UnidentifiedVirtual8(
+inline void DesireMark::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireMark");
-    cache->AddField(22, gDebugFieldTypes[22].size,
-        0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size,
-        (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size,
-        (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x2490 | 0x800B9250 | size: 0x9C
  */
-void DesireMark::UnidentifiedVirtual7(
+inline void DesireMark::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireMarkType == 0xFFFF)
@@ -418,15 +388,30 @@ void DesireMark::UnidentifiedVirtual7(
 }
 
 /**
- * Offset/Address/Size: 0x252C | 0x800B92EC | size: 0x5C
+ * Offset/Address/Size: 0x2264 | 0x800B9024 | size: 0xC8
  */
-DesireMark::~DesireMark()
+inline void DesireDefendPos::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesireDefendPos");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->EndType();
 }
 
 /**
- * Offset/Address/Size: 0x2588 | 0x800B9348 | size: 0x5C
+ * Offset/Address/Size: 0x232C | 0x800B90EC | size: 0x9C
  */
-DesireDefendPos::~DesireDefendPos()
+inline void DesireDefendPos::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
 {
+    if (sDesireDefendPosType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireDefendPosType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireDefendPosType, data, context);
+    cache->WriteData(sDesireDefendPosType, data,
+        sizeof(DesireDefendPos) - offset);
 }

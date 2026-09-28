@@ -190,7 +190,7 @@ void SHGameplayOptions::Update(float dt)
     }
     if (!mUnidentified15BC)
     {
-        fn_80236E54();
+        InitializePointerButtons();
         mUnidentified15BC = true;
     }
     GameInfoManager* gameInfo = GameInfoManager::Instance();
@@ -495,14 +495,14 @@ void SHGameplayOptions::fn_80236ADC(int type, int value)
     text->SetString(mUnidentified1578);
 }
 
-void SHGameplayOptions::fn_80236E54()
+void SHGameplayOptions::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (SHGameplayOptions::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHGameplayOptions*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback over(PointerBinding(MemFun(&SHGameplayOptions::fn_802378F8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(PointerBinding(MemFun(&SHGameplayOptions::fn_802379D0), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(PointerBinding(MemFun(&SHGameplayOptions::fn_80237A80), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback over(PointerBinding(MemFun(&SHGameplayOptions::OnOptionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback off(PointerBinding(MemFun(&SHGameplayOptions::OnOptionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback down(PointerBinding(MemFun(&SHGameplayOptions::OnOptionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     feVector3 skill = mUnidentified1390->GetAssetPosition();
     feVector3 series = mUnidentified1394->GetAssetPosition();
     feVector3 minutes = mUnidentified138C->GetAssetPosition();
@@ -523,9 +523,9 @@ void SHGameplayOptions::fn_80236E54()
         mOptionButtons[i].SetPointerLeaveCallback(off);
         mOptionButtons[i].SetPointerPressCallback(down);
     }
-    FEPointerListener::Callback cheatOver(PointerBinding(MemFun(&SHGameplayOptions::fn_80237C7C), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cheatOff(PointerBinding(MemFun(&SHGameplayOptions::fn_80237D34), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback cheatDown(PointerBinding(MemFun(&SHGameplayOptions::fn_80237DE0), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cheatOver(PointerBinding(MemFun(&SHGameplayOptions::OnCheatPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cheatOff(PointerBinding(MemFun(&SHGameplayOptions::OnCheatPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback cheatDown(PointerBinding(MemFun(&SHGameplayOptions::OnCheatPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 3; ++i)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find(mCheatInstances[i],
@@ -536,16 +536,16 @@ void SHGameplayOptions::fn_80236E54()
         mCheatButtons[i].SetPointerLeaveCallback(cheatOff);
         mCheatButtons[i].SetPointerPressCallback(cheatDown);
     }
-    FEPointerListener::Callback nextOver(PointerBinding(MemFun(&SHGameplayOptions::fn_80237E70), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback nextOff(PointerBinding(MemFun(&SHGameplayOptions::fn_80237EF8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback nextDown(PointerBinding(MemFun(&SHGameplayOptions::fn_80237F68), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback nextOver(PointerBinding(MemFun(&SHGameplayOptions::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback nextOff(PointerBinding(MemFun(&SHGameplayOptions::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback nextDown(PointerBinding(MemFun(&SHGameplayOptions::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
     SetDoneButtonBounds(&mDoneButton, mDoneButtonInstance, true);
     mDoneButton.SetPointerEnterCallback(nextOver);
     mDoneButton.SetPointerLeaveCallback(nextOff);
     mDoneButton.SetPointerPressCallback(nextDown);
 }
 
-void SHGameplayOptions::fn_802378F8(unsigned int index, void* context)
+void SHGameplayOptions::OnOptionPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (!mOptionButtons[item].HasOtherPointerState(2, -1))
@@ -561,7 +561,7 @@ void SHGameplayOptions::fn_802378F8(unsigned int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_802379D0(unsigned int index, void* context)
+void SHGameplayOptions::OnOptionPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (!mOptionButtons[item].HasOtherPointerState(2, -1))
@@ -575,7 +575,7 @@ void SHGameplayOptions::fn_802379D0(unsigned int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237A80(unsigned int index, void* context)
+void SHGameplayOptions::OnOptionPointerPress(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if (mOptionButtons[item].HasOtherPointerState(2, -1))
@@ -622,7 +622,7 @@ void SHGameplayOptions::fn_80237A80(unsigned int index, void* context)
         mOptionButtons[previous].SetPointerState(0, j);
 }
 
-void SHGameplayOptions::fn_80237C7C(unsigned int index, void* context)
+void SHGameplayOptions::OnCheatPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mPointerInsideCounts[index];
@@ -635,7 +635,7 @@ void SHGameplayOptions::fn_80237C7C(unsigned int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237D34(unsigned int index, void* context)
+void SHGameplayOptions::OnCheatPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mPointerInsideCounts[index];
@@ -646,7 +646,7 @@ void SHGameplayOptions::fn_80237D34(unsigned int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237DE0(unsigned int index, void* context)
+void SHGameplayOptions::OnCheatPointerPress(unsigned int index, void* context)
 {
     SHOptionsCheatsList* scene = (SHOptionsCheatsList*)GameSceneManager::Instance()->Push(SCENE_OPTIONS_CHEATS_LIST, SCREEN_NOTHING, false);
     scene->mCheatCategory = (int)context;
@@ -655,7 +655,7 @@ void SHGameplayOptions::fn_80237DE0(unsigned int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }
 
-void SHGameplayOptions::fn_80237E70(unsigned int index, void* context)
+void SHGameplayOptions::OnDonePointerEnter(unsigned int index, void* context)
 {
     ++mPointerInsideCounts[index];
     mDoneButton.SetPointerState(1, index);
@@ -666,7 +666,7 @@ void SHGameplayOptions::fn_80237E70(unsigned int index, void* context)
     }
 }
 
-void SHGameplayOptions::fn_80237EF8(unsigned int index, void* context)
+void SHGameplayOptions::OnDonePointerLeave(unsigned int index, void* context)
 {
     --mPointerInsideCounts[index];
     mDoneButton.SetPointerState(0, index);
@@ -674,7 +674,7 @@ void SHGameplayOptions::fn_80237EF8(unsigned int index, void* context)
         mDoneButtonInstance->SetActiveSlide("off", true, false);
 }
 
-void SHGameplayOptions::fn_80237F68(unsigned int index, void* context)
+void SHGameplayOptions::OnDonePointerPress(unsigned int index, void* context)
 {
     mUnidentified15FC = 2;
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);

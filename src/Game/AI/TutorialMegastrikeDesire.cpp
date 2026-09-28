@@ -25,9 +25,9 @@ bool TutorialMegastrikeDesire::UnidentifiedInitialize(void*)
     for (int i = 0; i < 4; ++i)
     {
         UnidentifiedScriptMachine* state = fn_8002E1A4(m_pTeam->GetFielder(i));
-        UnidentifiedStringHash value(name);
-        state->mUnidentified00C.mUnidentifiedHash = value.mUnidentifiedHash;
-        state->mUnidentified00C.mUnidentifiedFunction = value.mUnidentifiedFunction;
+        ScriptTransitionFunc value(name);
+        state->mTransition.mFuncHash = value.mFuncHash;
+        state->mTransition.mNativeFunc = value.mNativeFunc;
     }
 
     return true;

@@ -1,5 +1,7 @@
 #include "Game/FE/feResourceManager.h"
 
+#include <stddef.h>
+
 #include "Game/FE/feFontResource.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/feSceneResource.h"

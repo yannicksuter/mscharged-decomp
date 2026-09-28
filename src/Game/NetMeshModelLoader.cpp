@@ -96,29 +96,34 @@ void NetMeshModelLoader::LoadGeometryFromModel()
 void NetMeshModelLoader::ReadVerticesFromGeometryPacket(
     const glModelPacket& packet)
 {
-    DisplayList* pList = packet.displayList;
     u16 vertexOffset = (u16)m_NumParticles;
+    DisplayList* pList = packet.displayList;
 
-    int i = 0;
-    while (i < packet.numVertices)
+    struct TriStripIV
+    {
+        int index;
+    };
+    TriStripIV iv;
+    iv.index = 0;
+    while (iv.index < packet.numVertices)
     {
         u16* ptr;
         if (pList->hasColorStream != 0)
         {
             u16 ns = pList->numStreams;
             int stride = (ns - 1) * 2 + 1;
-            ptr = (u16*)((u8*)pList->list + stride * i + 4);
+            ptr = (u16*)((u8*)pList->list + stride * iv.index + 4);
         }
         else
         {
             u16 ns = pList->numStreams;
             int stride = ns * 2;
-            ptr = (u16*)((u8*)pList->list + i * stride + 3);
+            ptr = (u16*)((u8*)pList->list + iv.index * stride + 3);
         }
 
         m_TriStripIndices[m_CurrentTriStripIndex] = *ptr + vertexOffset;
         ++m_CurrentTriStripIndex;
-        ++i;
+        ++iv.index;
     }
 
     m_NetMesh.SetTexture(glGetMaterialUnsignedParameter(&packet, gDiffuseTextureSemantic));

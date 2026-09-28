@@ -1,7 +1,7 @@
 #ifndef GAME_RENDER_PLANAR_SHADOW_DRAWABLE_H
 #define GAME_RENDER_PLANAR_SHADOW_DRAWABLE_H
 
-#include "Game/World/WorldDrawable.h"
+#include "Game/Drawable/DrawableObj.h"
 #include "Game/World/WorldObjectLoadContext.h"
 #include "NL/nlMath.h"
 #include "types.h"
@@ -11,15 +11,15 @@ class GLView;
 
 // The stadium model drawable. It owns one model, renders it through the
 // world's views and casts the planar ground shadow that gives it its name.
-// It adds no storage of its own to the world drawable.
-class PlanarShadowDrawable : public WorldDrawable
+// It adds no storage of its own to DrawableObject.
+class PlanarShadowDrawable : public DrawableObject
 {
 public:
     PlanarShadowDrawable(
         WorldObjectLoadContext* context, glModel* model, unsigned long type);
 
     virtual void Draw();
-    virtual void V8(GLView* view);
+    virtual void DrawToView(GLView* view);
     virtual PlanarShadowDrawable* Clone(unsigned long hash);
     virtual void Initialize(glModel* model, unsigned long hash);
     virtual void DrawPlanarShadow();

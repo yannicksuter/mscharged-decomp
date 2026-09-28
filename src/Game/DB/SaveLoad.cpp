@@ -502,7 +502,7 @@ void SaveLoad::StartLoadDirectoryCallback(s32 result)
     }
 }
 
-static u32 NANDBlocksForBytes(u32 bytes)
+static inline u32 NANDBlocksForBytes(u32 bytes)
 {
     return (u32)(float)ceil((float)bytes / 16384.0f);
 }

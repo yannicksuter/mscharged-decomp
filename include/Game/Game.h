@@ -81,6 +81,7 @@ public:
     void fn_80058400();
     void fn_8005848C();
     void ResetGameFields();
+    void RegisterEventListeners();
     void BeginGame(bool bRematch, bool bStraightToKickoff);
     void fn_8005A028(DetermDataEvent* data);
     void OnSuddenDeath();

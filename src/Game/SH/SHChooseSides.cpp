@@ -41,8 +41,8 @@ public:
     virtual void fn_8021CBD0(int value);
 };
 
-static const char* lbl_806DE038[2] = { "home_group", "away_group" };
-extern const char* lbl_8051CAFC[3];
+static const char* sSideGroupNames[2] = { "home_group", "away_group" };
+extern const char* sSidekickSlotNames[3];
 
 /**
  * Offset/Address/Size: 0x0 | 0x8021B1EC | size: 0x2B0
@@ -134,12 +134,12 @@ static inline void UpdateSidekickImages(SHChooseSides2* scene, int team)
 
     for (int slot = 0; slot < 3; ++slot)
     {
-        TLComponentInstance* sidekick = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(component, lbl_8051CAFC[slot]);
+        TLComponentInstance* sidekick = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(component, sSidekickSlotNames[slot]);
 
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault<>(
             sidekick->GetActiveSlide(), "00_dummy_texture");
 
-        scene->fn_8021ED64(image, GameInfoManager::Instance()->GetSidekick(team, slot), team);
+        scene->SetSidekickImage(image, GameInfoManager::Instance()->GetSidekick(team, slot), team);
     }
 }
 
@@ -201,17 +201,17 @@ void SHChooseSides2::SceneCreated()
         nlSNPrintf(controllerName, 16, "controller%d", i);
 
         TLComponentInstance* homeController = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideGroups[0], "controllers", lbl_806DE038[0], controllerName);
+            mSideGroups[0], "controllers", sSideGroupNames[0], controllerName);
         TLComponentInstance* homeOver = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideGroups[0], "over", lbl_806DE038[0], controllerName);
+            mSideGroups[0], "over", sSideGroupNames[0], controllerName);
 
         FEFinder<TLTextInstance, 3>::Find<>(homeController->GetActiveSlide(), "Text");
         FEFinder<TLTextInstance, 3>::Find<>(homeOver->GetActiveSlide(), "Text");
 
         TLComponentInstance* awayController = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideGroups[1], "controllers", lbl_806DE038[1], controllerName);
+            mSideGroups[1], "controllers", sSideGroupNames[1], controllerName);
         TLComponentInstance* awayOver = FEFinder<TLComponentInstance, 4>::Find<>(
-            mSideGroups[1], "over", lbl_806DE038[1], controllerName);
+            mSideGroups[1], "over", sSideGroupNames[1], controllerName);
 
         FEFinder<TLTextInstance, 3>::Find<>(awayController->GetActiveSlide(), "Text");
         FEFinder<TLTextInstance, 3>::Find<>(awayOver->GetActiveSlide(), "Text");
@@ -294,15 +294,15 @@ void SHChooseSides2::SceneCreated()
         }
 
         TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
-            mSideGroups[team], "empty", lbl_806DE038[team], "white_8x8");
+            mSideGroups[team], "empty", sSideGroupNames[team], "white_8x8");
         instance->SetAssetColour(mUnidentified3F0[team]);
 
         instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
-            mSideGroups[team], "over", lbl_806DE038[team], "white_8x8");
+            mSideGroups[team], "over", sSideGroupNames[team], "white_8x8");
         instance->SetAssetColour(mUnidentified3F0[team]);
 
         instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
-            mSideGroups[team], "controllers", lbl_806DE038[team], "white_8x8");
+            mSideGroups[team], "controllers", sSideGroupNames[team], "white_8x8");
         instance->SetAssetColour(mUnidentified3F0[team]);
     }
 
@@ -377,7 +377,7 @@ void SHChooseSides2::Update(float fDeltaT)
 
                 object->SetButtonVisibility(mUnidentified408, false);
                 BindChooseSideInstances();
-                fn_8021EB18();
+                UpdateHomeAwayVisibility();
                 mUnidentified1C = true;
                 mState = 1;
 
@@ -396,7 +396,7 @@ void SHChooseSides2::Update(float fDeltaT)
 
                 if (mContext == PAUSE)
                 {
-                    fn_8021EED8(false);
+                    RemoveDisconnectedControllers(false);
                     return;
                 }
             }
@@ -408,7 +408,7 @@ void SHChooseSides2::Update(float fDeltaT)
         }
         else if (mState == 3)
         {
-            fn_8021CBD0();
+            LeaveScene();
             return;
         }
     }
@@ -478,7 +478,7 @@ void SHChooseSides2::Update(float fDeltaT)
 
         if (mPlayingSides[i] != -1 && !g_pFEInput->IsConnected((eFEINPUT_PAD)i))
         {
-            fn_8021E910(i);
+            ReleaseController(i);
         }
 
         bool leave = mContext != PAUSE && mUnidentified2F0.UpdateBackButton(event, fDeltaT);
@@ -516,7 +516,7 @@ void SHChooseSides2::Update(float fDeltaT)
 /**
  * Offset/Address/Size: 0x19E4 | 0x8021CBD0 | size: 0x234
  */
-void SHChooseSides2::fn_8021CBD0()
+void SHChooseSides2::LeaveScene()
 {
     nlColour white;
     nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -592,32 +592,32 @@ void SHChooseSides2::BindChooseSideInstances()
     mControllerComponents[1].SetInstanceBounds(
         awayInstance, true, position.f.x, position.f.y, 1.0f, 1.0f);
 
-    FEPointerListener::Callback callback(BindPointerCallback(this, &SHChooseSides2::fn_8021DC28));
+    FEPointerListener::Callback callback(BindPointerCallback(this, &SHChooseSides2::OnControllerPointerEnter));
     mControllerComponents[0].SetPointerEnterCallback(callback);
     mControllerComponents[1].SetPointerEnterCallback(callback);
 
-    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::fn_8021DCFC));
+    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::OnControllerPointerLeave));
     mControllerComponents[0].SetPointerLeaveCallback(callback);
     mControllerComponents[1].SetPointerLeaveCallback(callback);
 
-    FEPointerListener::Callback selectCallback(BindPointerCallback(this, &SHChooseSides2::fn_8021DDAC));
+    FEPointerListener::Callback selectCallback(BindPointerCallback(this, &SHChooseSides2::OnControllerPointerPress));
     mControllerComponents[0].SetPointerPressCallback(selectCallback);
     mControllerComponents[1].SetPointerPressCallback(selectCallback);
 
-    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::fn_8021DFCC));
+    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::OnHomeAwayPointerEnter));
     mHomeAwayComponent.SetPointerEnterCallback(callback);
-    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::fn_8021E170));
+    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::OnHomeAwayPointerLeave));
     mHomeAwayComponent.SetPointerLeaveCallback(callback);
-    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::fn_8021E098));
+    callback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::OnHomeAwayPointerInside));
     mHomeAwayComponent.SetPointerInsideCallback(callback);
-    selectCallback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::fn_8021E1E0));
+    selectCallback = FEPointerListener::Callback(BindPointerCallback(this, &SHChooseSides2::OnHomeAwayPointerPress));
     mHomeAwayComponent.SetPointerPressCallback(selectCallback);
 
     mHomeAwayComponent.Disable();
 
-    FEPointerListener::Callback helpEnter(BindPointerCallback(this, &SHChooseSides2::fn_8021E64C));
-    FEPointerListener::Callback helpLeave(BindPointerCallback(this, &SHChooseSides2::fn_8021E6E8));
-    FEPointerListener::Callback helpSelect(BindPointerCallback(this, &SHChooseSides2::fn_8021E76C));
+    FEPointerListener::Callback helpEnter(BindPointerCallback(this, &SHChooseSides2::OnHelpPointerEnter));
+    FEPointerListener::Callback helpLeave(BindPointerCallback(this, &SHChooseSides2::OnHelpPointerLeave));
+    FEPointerListener::Callback helpSelect(BindPointerCallback(this, &SHChooseSides2::OnHelpPointerPress));
 
     TLInstance* helpInstance = FEFinder<TLImageInstance, 2>::FindOrDefault<>(
         mHelpButton, "OVER", "list_high_250x60");
@@ -633,7 +633,7 @@ void SHChooseSides2::BindChooseSideInstances()
 /**
  * Offset/Address/Size: 0x2A3C | 0x8021DC28 | size: 0xD4
  */
-void SHChooseSides2::fn_8021DC28(unsigned int index, void* context)
+void SHChooseSides2::OnControllerPointerEnter(unsigned int index, void* context)
 {
     unsigned long side = (unsigned long)context;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
@@ -653,7 +653,7 @@ void SHChooseSides2::fn_8021DC28(unsigned int index, void* context)
 /**
  * Offset/Address/Size: 0x2B10 | 0x8021DCFC | size: 0xB0
  */
-void SHChooseSides2::fn_8021DCFC(unsigned int index, void* context)
+void SHChooseSides2::OnControllerPointerLeave(unsigned int index, void* context)
 {
     unsigned long side = (unsigned long)context;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
@@ -671,7 +671,7 @@ void SHChooseSides2::fn_8021DCFC(unsigned int index, void* context)
 /**
  * Offset/Address/Size: 0x2BC0 | 0x8021DDAC | size: 0x220
  */
-void SHChooseSides2::fn_8021DDAC(unsigned int index, void* context)
+void SHChooseSides2::OnControllerPointerPress(unsigned int index, void* context)
 {
     unsigned long side = (unsigned long)context;
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
@@ -682,9 +682,9 @@ void SHChooseSides2::fn_8021DDAC(unsigned int index, void* context)
     nlSNPrintf(controllerName, 16, "controller%d", index);
 
     TLComponentInstance* selected = FEFinder<TLComponentInstance, 4>::Find(mSideGroups[side],
-        "controllers", lbl_806DE038[side], controllerName);
+        "controllers", sSideGroupNames[side], controllerName);
     TLComponentInstance* highlighted = FEFinder<TLComponentInstance, 4>::Find(mSideGroups[side],
-        "over", lbl_806DE038[side], controllerName);
+        "over", sSideGroupNames[side], controllerName);
 
     if (mPlayingSides[index] == -1)
     {
@@ -710,13 +710,13 @@ void SHChooseSides2::fn_8021DDAC(unsigned int index, void* context)
         FEAudio::PlayAnimAudioEvent(0xB3586309, 0, 0, 1);
     }
 
-    fn_8021EB18();
+    UpdateHomeAwayVisibility();
 }
 
 /**
  * Offset/Address/Size: 0x2DE0 | 0x8021DFCC | size: 0xCC
  */
-void SHChooseSides2::fn_8021DFCC(unsigned int index, void*)
+void SHChooseSides2::OnHomeAwayPointerEnter(unsigned int index, void*)
 {
     ++mControllerCounts[index];
     mHomeAwayComponent.SetPointerState(1, index);
@@ -738,7 +738,7 @@ void SHChooseSides2::fn_8021DFCC(unsigned int index, void*)
 /**
  * Offset/Address/Size: 0x2EAC | 0x8021E098 | size: 0xD8
  */
-void SHChooseSides2::fn_8021E098(unsigned int index, void*)
+void SHChooseSides2::OnHomeAwayPointerInside(unsigned int index, void*)
 {
     if (mHomeAwayComponent.GetPointerState(index) != 0)
         return;
@@ -763,7 +763,7 @@ void SHChooseSides2::fn_8021E098(unsigned int index, void*)
 /**
  * Offset/Address/Size: 0x2F84 | 0x8021E170 | size: 0x70
  */
-void SHChooseSides2::fn_8021E170(unsigned int index, void*)
+void SHChooseSides2::OnHomeAwayPointerLeave(unsigned int index, void*)
 {
     --mControllerCounts[index];
     mHomeAwayComponent.SetPointerState(0, index);
@@ -776,9 +776,9 @@ void SHChooseSides2::fn_8021E170(unsigned int index, void*)
 /**
  * Offset/Address/Size: 0x2FF4 | 0x8021E1E0 | size: 0x27C
  */
-void SHChooseSides2::fn_8021E1E0(unsigned int, void*)
+void SHChooseSides2::OnHomeAwayPointerPress(unsigned int, void*)
 {
-    if (mContext == PAUSE && fn_8021EED8(true))
+    if (mContext == PAUSE && RemoveDisconnectedControllers(true))
         return;
 
     mControllerComponents[0].Disable();
@@ -858,7 +858,7 @@ void SHChooseSides2::Proceed()
 /**
  * Offset/Address/Size: 0x3460 | 0x8021E64C | size: 0x9C
  */
-void SHChooseSides2::fn_8021E64C(unsigned int index, void*)
+void SHChooseSides2::OnHelpPointerEnter(unsigned int index, void*)
 {
     ++mControllerCounts[index];
     if (!mHelpComponent.HasOtherPointerState(1, index))
@@ -872,7 +872,7 @@ void SHChooseSides2::fn_8021E64C(unsigned int index, void*)
 /**
  * Offset/Address/Size: 0x34FC | 0x8021E6E8 | size: 0x84
  */
-void SHChooseSides2::fn_8021E6E8(unsigned int index, void*)
+void SHChooseSides2::OnHelpPointerLeave(unsigned int index, void*)
 {
     --mControllerCounts[index];
     if (!mHelpComponent.HasOtherPointerState(1, index))
@@ -885,7 +885,7 @@ void SHChooseSides2::fn_8021E6E8(unsigned int index, void*)
 /**
  * Offset/Address/Size: 0x3580 | 0x8021E76C | size: 0x1A4
  */
-void SHChooseSides2::fn_8021E76C(unsigned int, void*)
+void SHChooseSides2::OnHelpPointerPress(unsigned int, void*)
 {
     for (int i = 0; i < 4; ++i)
     {
@@ -915,7 +915,7 @@ void SHChooseSides2::fn_8021E76C(unsigned int, void*)
 /**
  * Offset/Address/Size: 0x3724 | 0x8021E910 | size: 0x208
  */
-void SHChooseSides2::fn_8021E910(int index)
+void SHChooseSides2::ReleaseController(int index)
 {
     gFEPointerInstances[index]->SetActiveSlide("holding", true, false);
     mPlayingSides[index] = -1;
@@ -925,31 +925,31 @@ void SHChooseSides2::fn_8021E910(int index)
     nlSNPrintf(controllerName, 16, "controller%d", index);
 
     TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(
-        mSideGroups[0], "controllers", lbl_806DE038[0], controllerName);
+        mSideGroups[0], "controllers", sSideGroupNames[0], controllerName);
     instance->m_bVisible = false;
 
     instance = FEFinder<TLComponentInstance, 4>::Find<>(
-        mSideGroups[1], "controllers", lbl_806DE038[1], controllerName);
+        mSideGroups[1], "controllers", sSideGroupNames[1], controllerName);
     instance->m_bVisible = false;
 
     instance = FEFinder<TLComponentInstance, 4>::Find<>(
-        mSideGroups[0], "over", lbl_806DE038[0], controllerName);
+        mSideGroups[0], "over", sSideGroupNames[0], controllerName);
     instance->m_bVisible = false;
 
     instance = FEFinder<TLComponentInstance, 4>::Find<>(
-        mSideGroups[1], "over", lbl_806DE038[1], controllerName);
+        mSideGroups[1], "over", sSideGroupNames[1], controllerName);
     instance->m_bVisible = false;
 
     nlColour white;
     nlColourSet(white, 0xFF, 0xFF, 0xFF, 0xFF);
     SetPointerColour(index, white);
-    fn_8021EB18();
+    UpdateHomeAwayVisibility();
 }
 
 /**
  * Offset/Address/Size: 0x392C | 0x8021EB18 | size: 0x24C
  */
-void SHChooseSides2::fn_8021EB18()
+void SHChooseSides2::UpdateHomeAwayVisibility()
 {
     SHNavigation* object = GetNavigationScene();
     bool hasPlayingSide = false;
@@ -997,12 +997,12 @@ void SHChooseSides2::fn_8021EB18()
     }
 }
 
-const char* lbl_8051CAFC[3] = { "sk_2", "sk_1", "sk_0" };
+const char* sSidekickSlotNames[3] = { "sk_2", "sk_1", "sk_0" };
 
 /**
  * Offset/Address/Size: 0x3B78 | 0x8021ED64 | size: 0x174
  */
-void SHChooseSides2::fn_8021ED64(TLImageInstance* image, int sidekick, int team)
+void SHChooseSides2::SetSidekickImage(TLImageInstance* image, int sidekick, int team)
 {
     if (image != 0 && sidekick != -1)
     {
@@ -1044,14 +1044,14 @@ void SHChooseSides2::fn_8021ED64(TLImageInstance* image, int sidekick, int team)
 /**
  * Offset/Address/Size: 0x3CEC | 0x8021EED8 | size: 0x134
  */
-bool SHChooseSides2::fn_8021EED8(bool playSound)
+bool SHChooseSides2::RemoveDisconnectedControllers(bool playSound)
 {
     bool removedController = false;
     for (int i = 0; i < 4; ++i)
     {
         if (mPlayingSides[i] != -1 && g_pFEInput->IsConnected((eFEINPUT_PAD)i) && !IsFreeStylePad(i))
         {
-            fn_8021E910(i);
+            ReleaseController(i);
             removedController = true;
         }
     }

@@ -1020,18 +1020,17 @@ extern "C" void fn_801B8CF4(const nlVector3& v3Position)
     pController->SetVelocity(v3Zero);
 }
 
-static char s_szGroundPound[] = "ground_pound";
-static char s_szBowserJrGroundPound[] = "bowserjr_ground_pound";
-
-static inline void EmitGroundPound(cCharacter* pCharacter)
+static void EmitGroundPound(cCharacter* pCharacter)
 {
     if (pCharacter->mUnidentified024.m_eCharacterClass == 7)
     {
-        EmitCharacterEffect(pCharacter, s_szGroundPound);
+        const char* groupName = "ground_pound";
+        EmitCharacterEffect(pCharacter, groupName);
     }
     else if (pCharacter->mUnidentified024.m_eCharacterClass == 9)
     {
-        EmitCharacterEffect(pCharacter, s_szBowserJrGroundPound);
+        const char* groupName = "bowserjr_ground_pound";
+        EmitCharacterEffect(pCharacter, groupName);
     }
 }
 

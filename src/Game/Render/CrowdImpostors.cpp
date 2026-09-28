@@ -345,8 +345,9 @@ void InitializeCrowdImpostors(bool alternateView)
     ImpostorCluster* clusterCharacter
         = new (8, false) ImpostorCluster(sCrowdClusterName, 10, &clusterParams);
     sCrowdCluster = clusterCharacter;
+    unsigned long cluster;
     u32 firstHash = nlStringLowerHash(sViceCrowdModelName);
-    unsigned long cluster = sCrowdCluster->GetTexture();
+    cluster = sCrowdCluster->GetTexture();
     SetCrowdModelTexture(firstHash, cluster);
     SetCrowdModelTexture(nlStringLowerHash(sViceNightCrowdModelName), cluster);
     SetCrowdModelTexture(nlStringLowerHash(sUndergroundCrowdModelName), cluster);

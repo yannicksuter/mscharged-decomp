@@ -50,9 +50,6 @@ static int MaxNumParticles;
 int sUnidentified_806E1FAC;
 static unsigned short hackyFacingAngle;
 
-extern const nlVector3 lbl_804EB340;
-
-
 ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,
     nlDLListSlotPool<Particle*>* pFreeParticles, EffectsSpec* spec,
     unsigned long resourceID)
@@ -141,25 +138,25 @@ static void EmitCircularPosition(nlVector3& pos, nlVector3& dir,
     ParticleSystem* pSystem, EffectsSpec* pSpec,
     const nlMatrix4& mLocalToWorld)
 {
+    EffectsTemplate* pTemplate = pSystem->m_pTemplate;
     float randomAngle = RandomizedValue(0.0f, 6.2831855f);
     float sinVal;
     float cosVal;
     nlSinCos(&sinVal, &cosVal,
         (unsigned short)(int)(10430.378f * randomAngle));
 
-    float radius
-        = pSystem->m_pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+    float radius = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
     nlVector3 localPos;
-    localPos.x = cosVal * radius;
-    localPos.y = -sinVal * radius;
-    localPos.z = 0.0f;
+    nlVec3Set(localPos, cosVal * radius, -sinVal * radius, 0.0f);
 
     if (pSpec != 0)
     {
-        nlVec3Add(localPos, localPos, pSpec->m_vLocalOffset);
+        localPos.x += pSpec->m_vLocalOffset.x;
+        localPos.y += pSpec->m_vLocalOffset.y;
+        localPos.z += pSpec->m_vLocalOffset.z;
     }
 
-    if (pSystem->m_pTemplate->IsLocalSpace())
+    if (pTemplate->IsLocalSpace())
         pos = localPos;
     else
         nlMultPosVectorMatrix(pos, localPos, mLocalToWorld);
@@ -559,9 +556,9 @@ void ParticleSystem::fn_802E1EC0(Particle* pPart,
     nlVec3ScaleAdd(
         pPart->position, distance, pPart->velDir, pPart->position);
 
-    nlVector3 gravity = lbl_804EB340;
+    nlVector3 gravity = { 0.0f, 0.0f, 1.0f };
     if (pCoordSys != 0)
-        nlMultDirVectorMatrix(gravity, gravity, *pCoordSys);
+        pCoordSys->GetColumn_(2, gravity);
 
     float gravityDistance
         = pPart->mass * mUnidentified010 * pPart->timeElapsed;
@@ -658,9 +655,12 @@ void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
     animFrame %= pTemplate->m_nFrames;
     TextureFrame* frame
         = &textureFrames[pTemplate->m_nFrames - 1][animFrame];
-    float u0 = frame->mUnidentified000;
-    float v0 = frame->mUnidentified004;
-    float increment = frame->mUnidentified008;
+    float v0;
+    float u0;
+    float increment;
+    u0 = frame->mUnidentified000;
+    v0 = frame->mUnidentified004;
+    increment = frame->mUnidentified008;
     if (pPart->mUnidentified060)
     {
         nlVec2Set(pReturn->texcoord[1], u0 + increment, v0);

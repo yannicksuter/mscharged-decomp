@@ -10,6 +10,7 @@ class nlMatrix4;
 class ImpostorModel;
 class LightingLookup;
 class TweakValueFloat;
+class StadiumLight;
 
 extern TweakValueFloat gShadowLookupScaleX;
 extern TweakValueFloat gShadowLookupScaleY;
@@ -28,6 +29,7 @@ void fn_80183E8C(ImpostorModel*, glModel*);
 void fn_80183F78(ImpostorModel*, glModel*);
 void UpdateGameObjectLighting();
 void InitializeGameObjectLighting();
+void PrepareStadiumLight(StadiumLight* light);
 bool AlwaysUseCameraRelativeCharacterLighting();
 
 // Shared lighting hooks used by the material programs.

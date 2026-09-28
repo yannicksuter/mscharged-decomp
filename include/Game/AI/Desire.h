@@ -2,6 +2,7 @@
 #define GAME_AI_DESIRE_H
 
 #include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/TransitionFunc.h"
 #include "Game/DebugWriteCache.h"
 #include "NL/nlMath.h"
 #include "NL/nlTimer.h"
@@ -19,32 +20,10 @@ typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 extern "C" Desire* fn_8002E08C(cFielder*, int);
 
-struct UnidentifiedStateTransition
-{
-    bool UnidentifiedIsUnset() const
-    {
-        return mUnidentifiedFunction == 0 && mUnidentifiedHash == (u32)-1;
-    }
-
-    u32 mUnidentifiedHash;
-    void* mUnidentifiedFunction;
-};
-
-struct UnidentifiedUnsetTransition : public UnidentifiedStateTransition
-{
-    UnidentifiedUnsetTransition()
-    {
-        mUnidentifiedFunction = 0;
-        mUnidentifiedHash = (u32)-1;
-    }
-};
-
-extern UnidentifiedUnsetTransition lbl_806E20B8;
-
 class shdStateMachine
 {
 public:
-    shdStateMachine(int, const UnidentifiedStateTransition&);
+    shdStateMachine(int, const TransitionFunc&);
     virtual ~shdStateMachine();
 
     virtual bool UnidentifiedInitialize(void*) = 0;
@@ -76,8 +55,11 @@ public:
     float mUnidentified014;
     UnidentifiedScriptMachine* mUnidentified018;
     UnidentifiedVariantCollection mUnidentified01C;
-    UnidentifiedUnsetTransition mUnidentified068;
-    UnidentifiedUnsetTransition mUnidentified070;
+    // Copied from the constructor; executed when no override is set.
+    UnsetTransitionFunc mDefaultTransition;
+    // Supplied with the activation parameters (slot 10); takes precedence
+    // over the default while set.
+    UnsetTransitionFunc mOverrideTransition;
     float mUnidentified078;
     float mUnidentified07C;
     float mUnidentified080;
@@ -87,7 +69,7 @@ public:
 class Desire : public shdStateMachine
 {
 public:
-    Desire(int, const UnidentifiedStateTransition&);
+    Desire(int, const TransitionFunc&);
     virtual ~Desire()
     {
     }
@@ -111,7 +93,7 @@ class DesireFinishAction : public Desire
 {
 public:
     DesireFinishAction(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -125,7 +107,7 @@ public:
 class DesireWait : public Desire
 {
 public:
-    DesireWait(int state, UnidentifiedStateTransition transition)
+    DesireWait(int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }
@@ -140,7 +122,7 @@ class DesireCutAndBreak : public Desire
 {
 public:
     DesireCutAndBreak(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -160,7 +142,7 @@ private:
 class DesireDeke : public Desire
 {
 public:
-    DesireDeke(int state, const UnidentifiedStateTransition& transition)
+    DesireDeke(int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -180,7 +162,7 @@ private:
 class DesireHit : public Desire
 {
 public:
-    DesireHit(int state, const UnidentifiedStateTransition& transition)
+    DesireHit(int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -197,7 +179,7 @@ class DesireInterceptBall : public Desire
 {
 public:
     DesireInterceptBall(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -217,7 +199,7 @@ private:
 class DesireGetOpen : public Desire
 {
 public:
-    DesireGetOpen(int state, const UnidentifiedStateTransition& transition)
+    DesireGetOpen(int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -238,7 +220,7 @@ class DesireRunToTarget : public Desire
 {
 public:
     DesireRunToTarget(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -270,7 +252,7 @@ public:
     float GetMaxDistance() const { return m_fMaxDistance; }
     float GetDistanceTravelled() const { return m_fDistTravelled; }
     DesireRunInDirection(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -296,7 +278,7 @@ class DesireRunDownfield : public Desire
 {
 public:
     DesireRunDownfield(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -313,7 +295,7 @@ class DesireRunUpfield : public Desire
 {
 public:
     DesireRunUpfield(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -330,7 +312,7 @@ class DesireGetInPosition : public Desire
 {
 public:
     DesireGetInPosition(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -346,42 +328,38 @@ public:
 class DesireMark : public Desire
 {
 public:
-    DesireMark(int state, const UnidentifiedStateTransition& transition)
+    DesireMark(int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
 
-    virtual ~DesireMark();
-
     virtual bool UnidentifiedInitialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
 class DesireDefendPos : public Desire
 {
 public:
     DesireDefendPos(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
 
-    virtual ~DesireDefendPos();
-
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
 class DesireMegaStrike : public Desire
 {
 public:
     DesireMegaStrike(
-        int state, const UnidentifiedStateTransition& transition)
+        int state, const TransitionFunc& transition)
         : Desire(state, transition)
     {
     }
@@ -407,7 +385,7 @@ private:
 class DesireStar : public Desire
 {
 public:
-    DesireStar(int state, UnidentifiedStateTransition transition)
+    DesireStar(int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }
@@ -426,7 +404,7 @@ class DesireMushroom : public Desire
 {
 public:
     DesireMushroom(
-        int state, UnidentifiedStateTransition transition)
+        int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }
@@ -445,7 +423,7 @@ class DesireSlippery : public Desire
 {
 public:
     DesireSlippery(
-        int state, UnidentifiedStateTransition transition)
+        int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }
@@ -487,7 +465,7 @@ private:
 class DesireShrink : public Desire
 {
 public:
-    DesireShrink(int state, UnidentifiedStateTransition transition)
+    DesireShrink(int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }
@@ -511,7 +489,7 @@ class DesireFrozen : public Desire
     friend class cFielder;
 
 public:
-    DesireFrozen(int state, UnidentifiedStateTransition transition)
+    DesireFrozen(int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }
@@ -546,7 +524,7 @@ class DesireConfused : public Desire
 {
 public:
     DesireConfused(
-        int state, UnidentifiedStateTransition transition)
+        int state, TransitionFunc transition)
         : Desire(state, transition)
     {
     }

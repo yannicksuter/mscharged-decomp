@@ -46,7 +46,7 @@ public:
 
 GLTextureAnim* glGetTextureAnim(unsigned long texture);
 bool glIsTextureAnim(const void* data, unsigned long size);
-void glAddTextureAnim(const void* data, unsigned long size,
+void glAddTextureAnim(void* data, unsigned long size,
     GLResourcePool* resource);
 void glReleaseTextureAnim(GLTextureAnim* anim);
 

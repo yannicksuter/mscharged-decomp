@@ -185,7 +185,6 @@ static unsigned short gHitReactFacingOffsets[4] = {
 extern float lbl_806E3610;
 extern float lbl_806E35E0;
 extern float lbl_806E35DC;
-extern float lbl_806E3614;
 extern float lbl_806E3618;
 extern float lbl_806E361C;
 extern float lbl_806E3620;
@@ -4624,7 +4623,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
 void cFielder::fn_8004C02C(float fDeltaT)
 {
     if (m_pCurrentAnimController->m_fTime
-        <= lbl_806E3614 / (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys)
+        <= 1.825f / (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys)
     {
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
         nlVector3 v3Delta;
@@ -4639,7 +4638,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
     }
 
     if (m_pBall != 0
-        && m_pCurrentAnimController->TestFrameTrigger(lbl_806E3614))
+        && m_pCurrentAnimController->TestFrameTrigger(1.825f))
     {
         if (!fn_8003C180(this))
         {
@@ -4696,8 +4695,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
         float fCurrSpeed;
         nlVector3 v3NewVelocity;
         nlVector2 v2Delta;
-        v2Delta.y = g_pBall->m_v3Position.y - mUnidentified024.m_v3Position.y;
         v2Delta.x = g_pBall->m_v3Position.x - mUnidentified024.m_v3Position.x;
+        v2Delta.y = g_pBall->m_v3Position.y - mUnidentified024.m_v3Position.y;
         nlVec2Length(v2Delta);
 
         nlVector2 v2Direction;
@@ -4710,8 +4709,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
         fCurrSpeed = nlGetLength2D(velX, velY);
 
         nlVector2 v2NewVelocity;
-        v2NewVelocity.y = v2Delta.y + mUnidentified024.m_v3Velocity.y;
         v2NewVelocity.x = v2Delta.x + mUnidentified024.m_v3Velocity.x;
+        v2NewVelocity.y = v2Delta.y + mUnidentified024.m_v3Velocity.y;
         nlVector2 v2NormalizedVelocity;
         nlVec2Scale(v2NormalizedVelocity, v2NewVelocity,
             1.0f / nlVec2Length(v2NewVelocity));

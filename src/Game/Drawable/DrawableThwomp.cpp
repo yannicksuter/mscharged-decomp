@@ -21,7 +21,7 @@ static int gShadowAlphaHigh = 100;
 static float gShadowFadeHeight = 25.0f;
 static u8 gShadowScalesWithObject = 1;
 
-static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* material)
+static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* view)
 {
     u8 colour[4];
     nlVector3 extent;
@@ -106,11 +106,11 @@ static void DrawShadow(ThwompObject* object, const nlMatrix4& matrix, void* mate
     glSetTextureState(GLTS_DiffuseWrap, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
 
-    if (material == 0)
+    if (view == 0)
     {
-        material = GetUnshadowedView();
+        view = GetUnshadowedView();
     }
-    quad.Attach((eGLView)(u32)material, 0);
+    quad.Attach((eGLView)(u32)view, 0);
 }
 
 DrawableThwomp::DrawableThwomp()
@@ -145,7 +145,7 @@ void DrawableThwomp::Render(ThwompObject* object) const
 {
     nlMatrix4 matrix;
     RenderObject* drawable;
-    void* material;
+    void* view;
 
     if (object == 0 || !mVisible)
     {
@@ -188,10 +188,10 @@ void DrawableThwomp::Render(ThwompObject* object) const
     matrix.m44 = 1.0f;
 
     drawable->SetWorldMatrix(matrix);
-    material = GetLayerView(eCLV_MoreCharacters);
-    drawable->V8((GLView*)material);
+    view = GetLayerView(eCLV_MoreCharacters);
+    drawable->DrawToView((GLView*)view);
 
-    DrawShadow(object, matrix, material);
+    DrawShadow(object, matrix, view);
 }
 
 void DrawableThwomp::Blend(const float* factors, const DrawableThwomp& lhs, const DrawableThwomp& rhs)

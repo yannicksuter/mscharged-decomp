@@ -45,11 +45,6 @@ extern "C"
 
 int nlSNPrintf(char* pBuffer, unsigned long nSize, const char* pFormat, ...);
 
-static char sNPCAnimationPath[] = "art/animation/%s.sanim.zlib";
-static char sNPCHierarchyPath[] = "art/animation/%s.shier";
-static char sNPCTexturePath[] = "art/characters/npcs/%s/%s.rlt";
-static char sNPCModelPath[] = "art/characters/npcs/%s/%s.rlg";
-
 float lbl_806DD000 = 0.48f;
 const float lbl_806E5210 = 0.45f;
 const float lbl_806E5214 = 1.0f;
@@ -346,14 +341,14 @@ void OnNPCAnimationsLoaded(
     void* pData, unsigned long nSize, void* pUserData)
 {
     gNPCManager->mPendingTemplate->mAnimationsLoaded = true;
-    ((cInventory<cSAnim>*)pUserData)->AddFile((char*)pData, nSize);
+    ((cInventory<cSAnim>*)pUserData)->AddFile(pData, nSize);
 }
 
 void OnNPCHierarchyLoaded(
     void* pData, unsigned long nSize, void* pUserData)
 {
     gNPCManager->mPendingTemplate->mHierarchyLoaded = true;
-    ((cInventory<cSHierarchy>*)pUserData)->AddFile((char*)pData, nSize);
+    ((cInventory<cSHierarchy>*)pUserData)->AddFile(pData, nSize);
 }
 
 void OnNPCTexturesLoaded(
@@ -397,22 +392,22 @@ void NPCManager::BeginLoadNPCTemplate()
     }
 
     char path[256];
-    nlSNPrintf(path, sizeof(path), sNPCAnimationPath, mPendingTemplate->mName, mPendingTemplate->mName);
+    nlSNPrintf(path, sizeof(path), "art/animation/%s.sanim.zlib", mPendingTemplate->mName, mPendingTemplate->mName);
     if (nlLoadCompressedFileAsync(path, OnNPCAnimationsLoaded, &mPendingTemplate->mInventorySAnim, 0x20, AllocateStart, 0x40000, 0, 0, 0, 0, &StandardAllocator))
     {
         mPendingTemplate->mAnimationLoadStarted = true;
     }
 
-    nlSNPrintf(path, sizeof(path), sNPCHierarchyPath, mPendingTemplate->mName, mPendingTemplate->mName);
+    nlSNPrintf(path, sizeof(path), "art/animation/%s.shier", mPendingTemplate->mName, mPendingTemplate->mName);
     cInventory<cSHierarchy>* pInventory = mPendingTemplate->mPersistent
                                             ? mPersistentHierarchies
                                             : mTransientHierarchies;
     nlLoadEntireFileAsync(path, OnNPCHierarchyLoaded, pInventory, 0x20, AllocateStart, 0, 0, &StandardAllocator);
 
-    nlSNPrintf(path, sizeof(path), sNPCTexturePath, mPendingTemplate->mName, mPendingTemplate->mName);
+    nlSNPrintf(path, sizeof(path), "art/characters/npcs/%s/%s.rlt", mPendingTemplate->mName, mPendingTemplate->mName);
     glBeginLoadTextureBundle(path, OnNPCTexturesLoaded, mPendingTemplate, pContext);
 
-    nlSNPrintf(path, sizeof(path), sNPCModelPath, mPendingTemplate->mName, mPendingTemplate->mName);
+    nlSNPrintf(path, sizeof(path), "art/characters/npcs/%s/%s.rlg", mPendingTemplate->mName, mPendingTemplate->mName);
     glBeginLoadModel(path, OnNPCModelLoaded, mPendingTemplate, pContext);
 }
 

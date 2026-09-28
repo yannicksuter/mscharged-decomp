@@ -39,12 +39,13 @@ extern "C"
 bool PlaySound(int, unsigned long, const void*, void*);
 
 inline AvoidablePoint::AvoidablePoint(
-    int type, float radius, const nlVector2& position)
+    int type, float radius, const nlVector3& position)
     : AvoidableObject(type)
     , mRadius(radius)
 {
-    mPosition.x = position.x;
-    mPosition.y = position.y;
+    const nlVector2& v2Position = *(const nlVector2*)&position;
+    mPosition.x = v2Position.x;
+    mPosition.y = v2Position.y;
     mPosition.z = sHammerZero;
 }
 
@@ -261,10 +262,8 @@ void HammerObject::OnLanding()
             }
         }
 
-        AvoidableObject* avoidable = new (8, false)
-            AvoidablePoint(AVOID_BOWSER, mPhysics->GetRadius(),
-                (const nlVector2&)mPhysics->GetPosition());
-        mAvoidable = avoidable;
+        mAvoidable = new (8, false) AvoidablePoint(
+            AVOID_BOWSER, mPhysics->GetRadius(), mPhysics->GetPosition());
     }
 }
 

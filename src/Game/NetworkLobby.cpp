@@ -64,6 +64,10 @@ void NetworkLobby::Reset()
     mHostingFriendMatch = false;
     mFriendHostInviting = false;
     mMatchFlags = 0;
+    if (mTournamentMode)
+    {
+        mMatchFlags |= 1;
+    }
     if (gOnlineTwoLocalPlayers)
     {
         mMatchFlags |= 2;
@@ -75,8 +79,8 @@ void NetworkLobby::Reset()
     mProfileId = 0;
     mMaxMatchmakingEntries = 0;
     mMinMatchmakingEntries = 0;
-    mUnidentified030 = 0;
     mUnidentified034 = 0;
+    mUnidentified030 = 0;
     mFriendProfileId = -1;
     mState = 0;
     mMatchFailed = false;

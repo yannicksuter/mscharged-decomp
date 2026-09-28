@@ -89,7 +89,7 @@ private:
 class UnidentifiedDesire35 : public Desire
 {
 public:
-    UnidentifiedDesire35(UnidentifiedStateTransition transition)
+    UnidentifiedDesire35(TransitionFunc transition)
         : Desire(35, transition)
     {
     }

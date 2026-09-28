@@ -361,10 +361,11 @@ void Nis::fn_80281C70(cAnimCamera& camera)
 
 void Nis::Render(int param1)
 {
+    GLSkinMesh* skinMesh;
     DrawableCharacter* pDC;
     RenderSnapshot& snapshot = ReplayManager::Instance()->GetMutableRenderSnapshot();
-    nlVector3 offset = { 0.0f, 0.0f, 0.0f };
     int numBalls = 0;
+    nlVector3 offset = { 0.0f, 0.0f, 0.0f };
 
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
@@ -379,9 +380,8 @@ void Nis::Render(int param1)
         if (index >= 0)
         {
             mCharacterControllers[i]->GetRootTrans(&rootTrans, mUnidentified0F8[index], 1.0f);
-            nlVec2Set(mUnidentified0B8[index],
-                mUnidentified0B8[index].x + rootTrans.x,
-                mUnidentified0B8[index].y + rootTrans.y);
+            nlVec2Add(mUnidentified0B8[index], mUnidentified0B8[index],
+                *(const nlVector2*)&rootTrans);
             nlVec3Set(rootTrans, mUnidentified0B8[index].x, mUnidentified0B8[index].y, 0.0f);
             mCharacterControllers[i]->GetRootRot(&angle);
             mUnidentified0F8[index] += angle;
@@ -441,7 +441,7 @@ void Nis::Render(int param1)
         {
             view = GetLayerView(eCLV_PictureInPicture);
         }
-        GLSkinMesh* skinMesh = mUnidentified10C[i]->mSkinMesh;
+        skinMesh = mUnidentified10C[i]->mSkinMesh;
         if (skinMesh != 0)
         {
             static const u32 hash1 = nlStringLowerHash("peachwingleft/peachwingleft");

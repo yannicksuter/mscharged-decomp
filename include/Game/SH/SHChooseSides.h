@@ -26,23 +26,23 @@ public:
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void fn_8021CBD0();
+    void LeaveScene();
     void BindChooseSideInstances();
-    void fn_8021DC28(unsigned int index, void* context);
-    void fn_8021DCFC(unsigned int index, void* context);
-    void fn_8021DDAC(unsigned int index, void* context);
-    void fn_8021DFCC(unsigned int index, void* context);
-    void fn_8021E098(unsigned int index, void* context);
-    void fn_8021E170(unsigned int index, void* context);
-    void fn_8021E1E0(unsigned int index, void* context);
+    void OnControllerPointerEnter(unsigned int index, void* context);
+    void OnControllerPointerLeave(unsigned int index, void* context);
+    void OnControllerPointerPress(unsigned int index, void* context);
+    void OnHomeAwayPointerEnter(unsigned int index, void* context);
+    void OnHomeAwayPointerInside(unsigned int index, void* context);
+    void OnHomeAwayPointerLeave(unsigned int index, void* context);
+    void OnHomeAwayPointerPress(unsigned int index, void* context);
     void Proceed();
-    void fn_8021E64C(unsigned int index, void* context);
-    void fn_8021E6E8(unsigned int index, void* context);
-    void fn_8021E76C(unsigned int index, void* context);
-    void fn_8021E910(int index);
-    void fn_8021EB18();
-    void fn_8021ED64(TLImageInstance* image, int sidekick, int team);
-    bool fn_8021EED8(bool playSound);
+    void OnHelpPointerEnter(unsigned int index, void* context);
+    void OnHelpPointerLeave(unsigned int index, void* context);
+    void OnHelpPointerPress(unsigned int index, void* context);
+    void ReleaseController(int index);
+    void UpdateHomeAwayVisibility();
+    void SetSidekickImage(TLImageInstance* image, int sidekick, int team);
+    bool RemoveDisconnectedControllers(bool playSound);
 
     /* 0x01C */ bool mUnidentified1C;
     /* 0x01D */ bool mUnidentified1D;

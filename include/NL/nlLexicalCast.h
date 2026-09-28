@@ -70,6 +70,14 @@ inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>
 }
 
 template <typename Allocator>
+inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, unsigned long>::Do(unsigned long t)
+{
+    char s[0x40];
+    nlSNPrintf(s, 0x40, "%u", t);
+    return BasicString<char, Allocator>(s);
+}
+
+template <typename Allocator>
 inline BasicString<char, Allocator> LexicalCastImpl<BasicString<char, Allocator>, float>::Do(float t)
 {
     char s[0x40];

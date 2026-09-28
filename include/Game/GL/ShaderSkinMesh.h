@@ -28,8 +28,13 @@ struct SkinWeight
 
 struct BoneSkinWeights
 {
-    BoneSkinWeights();
-    ~BoneSkinWeights();
+    BoneSkinWeights()
+        : numWeights(0)
+        , weights(0)
+    {
+    }
+
+    ~BoneSkinWeights() { delete[] weights; }
 
     /* 0x00 */ unsigned long numWeights;
     /* 0x04 */ SkinWeight* weights;
@@ -37,8 +42,14 @@ struct BoneSkinWeights
 
 struct PacketSkinData
 {
-    PacketSkinData();
-    ~PacketSkinData();
+    PacketSkinData()
+        : numVertices(0)
+        , numBones(0)
+        , boneWeights(0)
+    {
+    }
+
+    ~PacketSkinData() { delete[] boneWeights; }
 
     /* 0x00 */ unsigned long numVertices;
     /* 0x04 */ unsigned long numBones;
@@ -78,11 +89,12 @@ public:
     virtual void PrepareToRender() = 0;
     virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex) = 0;
 
-    unsigned long GetNumPackets() { return GetModel()->numPackets; }
+    unsigned long GetNumPackets() { return GetModel()->GetNumPackets(); }
     int GetModelIndex() const { return m_Unknown0C; }
 
     void SetNumMorphs(unsigned long count);
     void SetMorphID(unsigned long index, unsigned long id);
+    float GetMorphWeight(int index) const { return morphWeights[index].morphWeight; }
     void UpdateMorphWeights(cPoseAccumulator* pPoseAccumulator);
     void ApplyMorphOverride();
     unsigned long CountActiveMorphs() const
@@ -148,7 +160,19 @@ public:
     }
 
     virtual ~ShaderSkinMesh();
-    virtual glModel* GetModel();
+    virtual glModel* GetModel()
+    {
+        bool softwareSkinning = false;
+        if (!rigidSkin && m_Unknown0C == 0)
+        {
+            softwareSkinning = true;
+        }
+        if (softwareSkinning)
+        {
+            return softwareModel;
+        }
+        return pModel;
+    }
     virtual void Pose(cPoseAccumulator* pPoseAccumulator);
     virtual void PrepareToRender();
     virtual void GetPoseMatrix(nlMatrix4* matrix, int nodeIndex);

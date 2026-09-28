@@ -28,8 +28,6 @@ public:
     virtual void Update(float fDeltaT);
 };
 
-extern "C" void fn_80343DE4(
-    WorldAnimDrawable_80343A40*, WorldObjectLoadContext*);
 void CreateWorldVertexAnimDrawable(
     WorldVertexAnimDrawable_80343E3C*, WorldObjectLoadContext*);
 extern "C" void fn_80344144(
@@ -287,8 +285,8 @@ DrawableObject* World::CreateObject(
         break;
     case 0x101:
         pObject = (DrawableObject*)pContext->m_pObject;
-        new (pObject) WorldAnimDrawable_80343A40;
-        fn_80343DE4((WorldAnimDrawable_80343A40*)pObject, pContext);
+        new (pObject) WorldDrawable;
+        ((WorldDrawable*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x70;
         ++pContext->m_uNumObjectsLoaded;
         break;
@@ -400,7 +398,7 @@ void World::Render()
         while (iterator.hasNext())
         {
             if (((DrawableObject*)*iterator)
-                    ->V6(m_pOpaqueView->m_Interface->GetShadowMatrix()))
+                    ->IsVisibleInFrustum(m_pOpaqueView->m_Interface->GetShadowMatrix()))
             {
                 ((DrawableObject*)*iterator)->Draw();
             }

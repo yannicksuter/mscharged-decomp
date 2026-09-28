@@ -1345,11 +1345,11 @@ nlMatrix4* WorldObject_80129EE0::GetWorldMatrix()
     return &mWorldMatrix;
 }
 
-void DrawableObject::SetWorldMatrix(const nlMatrix4& matrix)
+void WorldDrawable::SetWorldMatrix(const nlMatrix4& matrix)
 {
     mWorldMatrix = matrix;
 }
 
-void DrawableObject::ReleaseResources()
+void WorldDrawable::ReleaseResources()
 {
 }

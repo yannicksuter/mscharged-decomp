@@ -63,6 +63,8 @@ struct glModelPacket
 
 struct glModel
 {
+    u32 GetNumPackets() const { return numPackets; }
+
     /* 0x00 */ u32 id;
     /* 0x04 */ u32 numPackets;
     /* 0x08 */ glModelPacket* packets;

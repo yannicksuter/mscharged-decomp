@@ -366,31 +366,40 @@ void NetMessageInput::Serialize(
     serializer->Transfer(&mUnidentified05C, 1);
     for (int i = 0; i < mUnidentified05C; ++i)
         mDetermData[i].Serialize(serializer);
-    for (s8 i = 0; i < 4; ++i)
+    if (serializer->mDirection == 0)
     {
-        if (mUnidentified008 & (0x10 << i))
-            serializer->Transfer(&mUnidentified018[i], 1);
+        for (s8 i = 0; i < 4; ++i)
+        {
+            if (mUnidentified008 & (0x10 << i))
+                serializer->Transfer(&mUnidentified018[i], 1);
+        }
+    }
+    else
+    {
+        for (s8 i = 0; i < 4; ++i)
+        {
+            if (mUnidentified008 & (0x10 << i))
+                serializer->Transfer(&mUnidentified018[i], 1);
+        }
     }
     for (s8 i = 0; i < 4; ++i)
     {
-        u8* data = mUnidentified01C[i].mData;
-        u8 changes = mUnidentified018[i];
-        if (changes & 2)
-            serializer->Transfer(data + 0, 2);
-        if (changes & 4)
+        if (mUnidentified018[i] & 2)
+            serializer->Transfer(mUnidentified01C[i].mData + 0, 2);
+        if (mUnidentified018[i] & 4)
         {
-            serializer->Transfer(data + 12, 1);
-            serializer->Transfer(data + 13, 1);
+            serializer->Transfer(mUnidentified01C[i].mData + 12, 1);
+            serializer->Transfer(mUnidentified01C[i].mData + 13, 1);
         }
-        if (changes & 8)
+        if (mUnidentified018[i] & 8)
         {
-            serializer->Transfer(data + 14, 1);
-            serializer->Transfer(data + 15, 1);
+            serializer->Transfer(mUnidentified01C[i].mData + 14, 1);
+            serializer->Transfer(mUnidentified01C[i].mData + 15, 1);
         }
-        if (changes & 0x10)
-            serializer->Transfer(data + 3, 3);
-        if (changes & 0x20)
-            serializer->Transfer(data + 6, 3);
+        if (mUnidentified018[i] & 0x10)
+            serializer->Transfer(mUnidentified01C[i].mData + 3, 3);
+        if (mUnidentified018[i] & 0x20)
+            serializer->Transfer(mUnidentified01C[i].mData + 6, 3);
     }
 }
 

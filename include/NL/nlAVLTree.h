@@ -239,11 +239,15 @@ public:
 
     nlAVLTreeIterator<KeyType, ValueType, CompareType>* GetIterator();
 
+#ifdef NL_AVL_TREE_DEFER_DELETE_ENTRY
+    static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry);
+#else
     static void DeleteEntry(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {
         Entry* e = (Entry*)entry;
         ((AVLTreeBase*)tree)->m_Allocator.Delete(e);
     }
+#endif
 
     static void DeleteValue(AVLTreeUntemplated* tree, AVLTreeNode* entry)
     {

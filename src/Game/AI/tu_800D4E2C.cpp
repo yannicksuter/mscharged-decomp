@@ -27,8 +27,6 @@ struct UnidentifiedFielderContext
     cFielder* mFielder;
 };
 
-extern "C" UnidentifiedStateTransition* fn_80315A14(
-    UnidentifiedStateTransition*, void*);
 extern "C" void fn_80316968(shdStateMachine*);
 extern "C" void fn_80316980(shdStateMachine*, bool);
 extern "C" void fn_80317010(
@@ -68,7 +66,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800B7B1C(
 class UnidentifiedDesire33 : public Desire
 {
 public:
-    UnidentifiedDesire33(UnidentifiedStateTransition transition)
+    UnidentifiedDesire33(TransitionFunc transition)
         : Desire(33, transition)
     {
     }
@@ -103,87 +101,87 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 {
     UnidentifiedScriptMachine::UnidentifiedVirtual2();
 
-    UnidentifiedStateTransition cutAndBreakTransition;
+    TransitionFunc cutAndBreakTransition;
     DesireCutAndBreak* cutAndBreak = new (nlMalloc(
         sizeof(DesireCutAndBreak), 8, false))
         DesireCutAndBreak(1,
-            *fn_80315A14(&cutAndBreakTransition, (void*)fn_800D6298));
+            *BindNativeTransitionFunc(&cutAndBreakTransition, (void*)fn_800D6298));
     UnidentifiedAddState(1, cutAndBreak, false);
 
-    UnidentifiedStateTransition defendPosTransition;
+    TransitionFunc defendPosTransition;
     DesireDefendPos* defendPos = new (nlMalloc(
         sizeof(DesireDefendPos), 8, false))
         DesireDefendPos(2,
-            *fn_80315A14(&defendPosTransition, (void*)fn_800B7B1C));
+            *BindNativeTransitionFunc(&defendPosTransition, (void*)fn_800B7B1C));
     UnidentifiedAddState(2, defendPos, false);
 
-    UnidentifiedStateTransition dekeTransition;
+    TransitionFunc dekeTransition;
     DesireDeke* deke = new (nlMalloc(sizeof(DesireDeke), 8, false))
         DesireDeke(
-            3, *fn_80315A14(&dekeTransition, (void*)fn_800D63C8));
+            3, *BindNativeTransitionFunc(&dekeTransition, (void*)fn_800D63C8));
     UnidentifiedAddState(3, deke, false);
 
     UnidentifiedDesire33* desire33 = new (nlMalloc(
         sizeof(UnidentifiedDesire33), 8, false))
-        UnidentifiedDesire33(UnidentifiedStateTransition(lbl_806E20B8));
+        UnidentifiedDesire33(TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(33, desire33, false);
 
-    UnidentifiedStateTransition finishActionTransition;
+    TransitionFunc finishActionTransition;
     DesireFinishAction* finishAction = new (nlMalloc(
         sizeof(DesireFinishAction), 8, false))
         DesireFinishAction(21,
-            *fn_80315A14(&finishActionTransition, (void*)fn_800D63C8));
+            *BindNativeTransitionFunc(&finishActionTransition, (void*)fn_800D63C8));
     UnidentifiedAddState(21, finishAction, false);
 
-    UnidentifiedStateTransition getInPositionTransition;
+    TransitionFunc getInPositionTransition;
     DesireGetInPosition* getInPosition = new (nlMalloc(
         sizeof(DesireGetInPosition), 8, false))
         DesireGetInPosition(4,
-            *fn_80315A14(&getInPositionTransition, (void*)fn_800D6298));
+            *BindNativeTransitionFunc(&getInPositionTransition, (void*)fn_800D6298));
     UnidentifiedAddState(4, getInPosition, false);
 
-    UnidentifiedStateTransition getOpenTransition;
+    TransitionFunc getOpenTransition;
     DesireGetOpen* getOpen = new (nlMalloc(
         sizeof(DesireGetOpen), 8, false))
         DesireGetOpen(
-            5, *fn_80315A14(&getOpenTransition, (void*)fn_800B4DC0));
+            5, *BindNativeTransitionFunc(&getOpenTransition, (void*)fn_800B4DC0));
     UnidentifiedAddState(5, getOpen, false);
 
-    UnidentifiedStateTransition hitTransition;
+    TransitionFunc hitTransition;
     DesireHit* hit = new (nlMalloc(sizeof(DesireHit), 8, false))
         DesireHit(
-            6, *fn_80315A14(&hitTransition, (void*)fn_800D63C8));
+            6, *BindNativeTransitionFunc(&hitTransition, (void*)fn_800D63C8));
     UnidentifiedAddState(6, hit, false);
 
     DesireInterceptBall* interceptBall = new (nlMalloc(
         sizeof(DesireInterceptBall), 8, false))
         DesireInterceptBall(
-            7, UnidentifiedStringHash("TransDesireInterceptBall"));
+            7, ScriptTransitionFunc("TransDesireInterceptBall"));
     UnidentifiedAddState(7, interceptBall, false);
 
-    UnidentifiedStateTransition markTransition;
+    TransitionFunc markTransition;
     DesireMark* mark = new (nlMalloc(sizeof(DesireMark), 8, false))
         DesireMark(
-            8, *fn_80315A14(&markTransition, (void*)fn_800D6298));
+            8, *BindNativeTransitionFunc(&markTransition, (void*)fn_800D6298));
     UnidentifiedAddState(8, mark, false);
 
     DesireMegaStrike* megaStrike = new (nlMalloc(
         sizeof(DesireMegaStrike), 8, false))
         DesireMegaStrike(
-            32, UnidentifiedStringHash("TransDesireMegastrikeMeter"));
+            32, ScriptTransitionFunc("TransDesireMegastrikeMeter"));
     UnidentifiedAddState(32, megaStrike, false);
 
-    UnidentifiedStateTransition passTransition;
+    TransitionFunc passTransition;
     DesirePass* pass = new (nlMalloc(sizeof(DesirePass), 8, false))
         DesirePass(
-            14, *fn_80315A14(&passTransition, (void*)fn_800D63C8));
+            14, *BindNativeTransitionFunc(&passTransition, (void*)fn_800D63C8));
     UnidentifiedAddState(14, pass, false);
 
-    UnidentifiedStateTransition preparePassTransition;
+    TransitionFunc preparePassTransition;
     DesirePreparePass* preparePass = new (nlMalloc(
         sizeof(DesirePreparePass), 8, false))
         DesirePreparePass(18,
-            *fn_80315A14(&preparePassTransition, (void*)fn_800D6330));
+            *BindNativeTransitionFunc(&preparePassTransition, (void*)fn_800D6330));
     UnidentifiedAddState(18, preparePass, false);
 
     DesireReceivePass* receivePass = new (nlMalloc(
@@ -192,74 +190,74 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireRunToNet* runToNet = new (nlMalloc(
         sizeof(DesireRunToNet), 8, false))
-        DesireRunToNet(UnidentifiedStringHash("TransDesireRunToNet"));
+        DesireRunToNet(ScriptTransitionFunc("TransDesireRunToNet"));
     UnidentifiedAddState(9, runToNet, false);
 
-    UnidentifiedStateTransition runUpfieldTransition;
+    TransitionFunc runUpfieldTransition;
     DesireRunUpfield* runUpfield = new (nlMalloc(
         sizeof(DesireRunUpfield), 8, false))
         DesireRunUpfield(10,
-            *fn_80315A14(&runUpfieldTransition, (void*)fn_800D6298));
+            *BindNativeTransitionFunc(&runUpfieldTransition, (void*)fn_800D6298));
     UnidentifiedAddState(10, runUpfield, false);
 
-    UnidentifiedStateTransition runDownfieldTransition;
+    TransitionFunc runDownfieldTransition;
     DesireRunDownfield* runDownfield = new (nlMalloc(
         sizeof(DesireRunDownfield), 8, false))
         DesireRunDownfield(11,
-            *fn_80315A14(&runDownfieldTransition, (void*)fn_800D6298));
+            *BindNativeTransitionFunc(&runDownfieldTransition, (void*)fn_800D6298));
     UnidentifiedAddState(11, runDownfield, false);
 
-    UnidentifiedStateTransition runInDirectionTransition;
+    TransitionFunc runInDirectionTransition;
     DesireRunInDirection* runInDirection = new (nlMalloc(
         sizeof(DesireRunInDirection), 8, false))
         DesireRunInDirection(12,
-            *fn_80315A14(&runInDirectionTransition, (void*)fn_800D6298));
+            *BindNativeTransitionFunc(&runInDirectionTransition, (void*)fn_800D6298));
     UnidentifiedAddState(12, runInDirection, false);
 
-    UnidentifiedStateTransition runToTargetTransition;
+    TransitionFunc runToTargetTransition;
     DesireRunToTarget* runToTarget = new (nlMalloc(
         sizeof(DesireRunToTarget), 8, false))
         DesireRunToTarget(13,
-            *fn_80315A14(&runToTargetTransition, (void*)fn_800B38AC));
+            *BindNativeTransitionFunc(&runToTargetTransition, (void*)fn_800B38AC));
     UnidentifiedAddState(13, runToTarget, false);
 
-    UnidentifiedStateTransition shootTransition;
+    TransitionFunc shootTransition;
     DesireShoot* shoot = new (nlMalloc(sizeof(DesireShoot), 8, false))
         DesireShoot(
-            15, *fn_80315A14(&shootTransition, (void*)fn_800D6330));
+            15, *BindNativeTransitionFunc(&shootTransition, (void*)fn_800D6330));
     UnidentifiedAddState(15, shoot, false);
 
     DesireSlideAttack* slideAttack = new (nlMalloc(
         sizeof(DesireSlideAttack), 8, false))
-        DesireSlideAttack(UnidentifiedStateTransition(lbl_806E20B8));
+        DesireSlideAttack(TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(16, slideAttack, false);
 
     DesireUserControlled* userControlled = new (nlMalloc(
         sizeof(DesireUserControlled), 8, false))
-        DesireUserControlled(UnidentifiedStateTransition(lbl_806E20B8));
+        DesireUserControlled(TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(20, userControlled, false);
 
     DesireWait* wait = new (nlMalloc(sizeof(DesireWait), 8, false))
-        DesireWait(31, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireWait(31, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(31, wait, false);
 
     DesireWindupShot* windupShot = new (nlMalloc(
         sizeof(DesireWindupShot), 8, false))
-        DesireWindupShot(19, UnidentifiedStringHash("TransDesireWindup"));
+        DesireWindupShot(19, ScriptTransitionFunc("TransDesireWindup"));
     UnidentifiedAddState(19, windupShot, false);
 
     DesireStar* star = new (nlMalloc(sizeof(DesireStar), 8, false))
-        DesireStar(24, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireStar(24, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(24, star, true);
 
     DesireMushroom* mushroom = new (nlMalloc(
         sizeof(DesireMushroom), 8, false))
-        DesireMushroom(25, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireMushroom(25, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(25, mushroom, true);
 
     DesireSlippery* slippery = new (nlMalloc(
         sizeof(DesireSlippery), 8, false))
-        DesireSlippery(26, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireSlippery(26, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(26, slippery, true);
 
     DesireGooey* gooey = new (nlMalloc(
@@ -268,17 +266,17 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireShrink* shrink = new (nlMalloc(
         sizeof(DesireShrink), 8, false))
-        DesireShrink(28, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireShrink(28, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(28, shrink, true);
 
     DesireFrozen* frozen = new (nlMalloc(
         sizeof(DesireFrozen), 8, false))
-        DesireFrozen(29, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireFrozen(29, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(29, frozen, true);
 
     DesireConfused* confused = new (nlMalloc(
         sizeof(DesireConfused), 8, false))
-        DesireConfused(30, UnidentifiedStateTransition(lbl_806E20B8));
+        DesireConfused(30, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(30, confused, true);
 
     DesireSuperPower* superPower = new (nlMalloc(
@@ -287,7 +285,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireUsePowerup* usePowerup = new (nlMalloc(
         sizeof(DesireUsePowerup), 8, false))
-        DesireUsePowerup(UnidentifiedStateTransition(lbl_806E20B8));
+        DesireUsePowerup(TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(17, usePowerup, true);
 
     DesireSteering* steering = new (nlMalloc(
@@ -296,7 +294,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     UnidentifiedDesire35* desire35 = new (nlMalloc(
         sizeof(UnidentifiedDesire35), 8, false))
-        UnidentifiedDesire35(UnidentifiedStateTransition(lbl_806E20B8));
+        UnidentifiedDesire35(TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(35, desire35, true);
 }
 

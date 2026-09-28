@@ -390,7 +390,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
                 mCaptainComponents[1].SetCaptainInfo(captain, 0, 1);
             }
             mUnidentified1380 = 1;
-            fn_80226524();
+            InitializePointerButtons();
             mUnidentified4B = true;
         }
         else if (mUnidentified1380 == 2)
@@ -425,7 +425,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
     }
     if (!mUnidentified4A)
     {
-        fn_80225FB0();
+        InitializeCaptainButtons();
         mUnidentified4A = true;
         return;
     }
@@ -530,7 +530,7 @@ void ChooseCaptainsSceneV2::fn_80224814()
 /**
  * Offset/Address/Size: 0x28E4 | 0x8022497C | size: 0x368
  */
-void ChooseCaptainsSceneV2::fn_8022497C(int index, void* context)
+void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -580,7 +580,7 @@ void ChooseCaptainsSceneV2::fn_8022497C(int index, void* context)
 /**
  * Offset/Address/Size: 0x2C4C | 0x80224CE4 | size: 0x4C
  */
-void ChooseCaptainsSceneV2::fn_80224CE4(int index, void* context)
+void ChooseCaptainsSceneV2::OnCaptainPointerInside(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -595,13 +595,13 @@ void ChooseCaptainsSceneV2::fn_80224CE4(int index, void* context)
         return;
     }
 
-    fn_80224D30(index, context);
+    OnCaptainPointerEnter(index, context);
 }
 
 /**
  * Offset/Address/Size: 0x2C98 | 0x80224D30 | size: 0x248
  */
-void ChooseCaptainsSceneV2::fn_80224D30(int index, void* context)
+void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -670,7 +670,7 @@ void ChooseCaptainsSceneV2::fn_80224D30(int index, void* context)
 /**
  * Offset/Address/Size: 0x2EE0 | 0x80224F78 | size: 0xC8
  */
-void ChooseCaptainsSceneV2::fn_80224F78(int index, void* context)
+void ChooseCaptainsSceneV2::OnCaptainPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
@@ -687,7 +687,7 @@ void ChooseCaptainsSceneV2::fn_80224F78(int index, void* context)
     mCaptainButtons[which].SetPointerState(0, index);
 }
 
-void ChooseCaptainsSceneV2::fn_80225040(int index, void* context)
+void ChooseCaptainsSceneV2::OnSelectPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     if (mUnidentified28[which] != -1 || GetSide(index) != -1)
@@ -727,7 +727,7 @@ void ChooseCaptainsSceneV2::fn_80225040(int index, void* context)
 /**
  * Offset/Address/Size: 0x33EC | 0x80225484 | size: 0x118
  */
-void ChooseCaptainsSceneV2::fn_80225484(int index, void* context)
+void ChooseCaptainsSceneV2::OnSelectPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
@@ -757,7 +757,7 @@ void ChooseCaptainsSceneV2::fn_80225484(int index, void* context)
 /**
  * Offset/Address/Size: 0x3504 | 0x8022559C | size: 0xD8
  */
-void ChooseCaptainsSceneV2::fn_8022559C(int index, void* context)
+void ChooseCaptainsSceneV2::OnSelectPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
@@ -777,7 +777,7 @@ void ChooseCaptainsSceneV2::fn_8022559C(int index, void* context)
 /**
  * Offset/Address/Size: 0x35DC | 0x80225674 | size: 0x158
  */
-void ChooseCaptainsSceneV2::fn_80225674(int index, void* context)
+void ChooseCaptainsSceneV2::OnSelectPointerInside(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
@@ -810,7 +810,7 @@ void ChooseCaptainsSceneV2::fn_80225674(int index, void* context)
 /**
  * Offset/Address/Size: 0x3734 | 0x802257CC | size: 0xEC
  */
-void ChooseCaptainsSceneV2::fn_802257CC(int index, void* context)
+void ChooseCaptainsSceneV2::OnReadyPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
@@ -834,7 +834,7 @@ void ChooseCaptainsSceneV2::fn_802257CC(int index, void* context)
 /**
  * Offset/Address/Size: 0x3820 | 0x802258B8 | size: 0xF4
  */
-void ChooseCaptainsSceneV2::fn_802258B8(int index, void* context)
+void ChooseCaptainsSceneV2::OnReadyPointerEnter(int index, void* context)
 {
     if (mUnidentified28[(unsigned long)context] != -1 || GetSide(index) != -1
         || !mUnidentified38[(unsigned long)context] || mUnidentified3A[(unsigned long)context])
@@ -853,7 +853,7 @@ void ChooseCaptainsSceneV2::fn_802258B8(int index, void* context)
 /**
  * Offset/Address/Size: 0x3914 | 0x802259AC | size: 0xF4
  */
-void ChooseCaptainsSceneV2::fn_802259AC(int index, void* context)
+void ChooseCaptainsSceneV2::OnReadyPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
@@ -873,7 +873,7 @@ void ChooseCaptainsSceneV2::fn_802259AC(int index, void* context)
 /**
  * Offset/Address/Size: 0x3A08 | 0x80225AA0 | size: 0x138
  */
-void ChooseCaptainsSceneV2::fn_80225AA0(int index, void* context)
+void ChooseCaptainsSceneV2::OnReadyPointerInside(int index, void* context)
 {
     if (mUnidentified28[(unsigned long)context] != -1 || GetSide(index) != -1
         || !mUnidentified38[(unsigned long)context] || mUnidentified3A[(unsigned long)context])
@@ -883,14 +883,14 @@ void ChooseCaptainsSceneV2::fn_80225AA0(int index, void* context)
 
     if (mUnidentifiedA88[(unsigned long)context].GetPointerState(index) == 0)
     {
-        fn_802258B8(index, context);
+        OnReadyPointerEnter(index, context);
     }
 }
 
 /**
  * Offset/Address/Size: 0x3B40 | 0x80225BD8 | size: 0x1D0
  */
-void ChooseCaptainsSceneV2::fn_80225BD8(int index, void* context)
+void ChooseCaptainsSceneV2::OnDonePointerPress(int index, void* context)
 {
     if (!mUnidentified38[0] || !mUnidentified38[1])
     {
@@ -934,7 +934,7 @@ void ChooseCaptainsSceneV2::fn_80225BD8(int index, void* context)
 /**
  * Offset/Address/Size: 0x3D10 | 0x80225DA8 | size: 0xB0
  */
-void ChooseCaptainsSceneV2::fn_80225DA8(int index, void* context)
+void ChooseCaptainsSceneV2::OnDonePointerEnter(int index, void* context)
 {
     if (!mUnidentified38[0] || !mUnidentified38[1])
     {
@@ -954,7 +954,7 @@ void ChooseCaptainsSceneV2::fn_80225DA8(int index, void* context)
 /**
  * Offset/Address/Size: 0x3DC0 | 0x80225E58 | size: 0x8C
  */
-void ChooseCaptainsSceneV2::fn_80225E58(int index, void* context)
+void ChooseCaptainsSceneV2::OnDonePointerLeave(int index, void* context)
 {
     if (!mUnidentified38[0] || !mUnidentified38[1])
     {
@@ -972,7 +972,7 @@ void ChooseCaptainsSceneV2::fn_80225E58(int index, void* context)
 /**
  * Offset/Address/Size: 0x3E4C | 0x80225EE4 | size: 0xCC
  */
-void ChooseCaptainsSceneV2::fn_80225EE4(int index, void* context)
+void ChooseCaptainsSceneV2::OnDonePointerInside(int index, void* context)
 {
     if (!mUnidentified38[0] || !mUnidentified38[1])
     {
@@ -981,19 +981,19 @@ void ChooseCaptainsSceneV2::fn_80225EE4(int index, void* context)
 
     if (mUnidentifiedBF0.GetPointerState(index) == 0)
     {
-        fn_80225DA8(index, context);
+        OnDonePointerEnter(index, context);
     }
 }
 
-void ChooseCaptainsSceneV2::fn_80225FB0()
+void ChooseCaptainsSceneV2::InitializeCaptainButtons()
 {
     typedef Detail::MemFunImpl<void, void (ChooseCaptainsSceneV2::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, ChooseCaptainsSceneV2*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback enter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80224D30), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback leave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80224F78), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback inside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80224CE4), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback press(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_8022497C), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback enter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnCaptainPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnCaptainPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback inside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnCaptainPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback press(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnCaptainPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     TLInstance* captains = FEFinder<TLInstance, 4>::Find(mUnidentified1320, "in", "captains");
     feVector3 scale = mUnidentified1320->GetAssetScale();
@@ -1014,23 +1014,23 @@ void ChooseCaptainsSceneV2::fn_80225FB0()
     }
 }
 
-void ChooseCaptainsSceneV2::fn_80226524()
+void ChooseCaptainsSceneV2::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (ChooseCaptainsSceneV2::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, ChooseCaptainsSceneV2*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback selectEnter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225484), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback selectLeave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_8022559C), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback selectInside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225674), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback selectPress(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225040), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback readyEnter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_802258B8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback readyLeave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_802259AC), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback readyInside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225AA0), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback readyPress(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_802257CC), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback doneEnter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225DA8), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback doneLeave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225E58), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback doneInside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225EE4), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback donePress(PointerBinding(MemFun(&ChooseCaptainsSceneV2::fn_80225BD8), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectEnter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnSelectPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectLeave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnSelectPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectInside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnSelectPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback selectPress(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnSelectPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback readyEnter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnReadyPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback readyLeave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnReadyPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback readyInside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnReadyPointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback readyPress(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnReadyPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback doneEnter(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnDonePointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback doneLeave(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnDonePointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback doneInside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnDonePointerInside), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback donePress(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnDonePointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int side = 0; side < 2; ++side)
     {

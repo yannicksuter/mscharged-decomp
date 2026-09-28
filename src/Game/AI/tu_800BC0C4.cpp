@@ -191,7 +191,7 @@ void DesireSlippery::UnidentifiedCleanup()
  * Offset/Address/Size: 0xFB4 | 0x800BD078 | size: 0x78
  */
 DesireGooey::DesireGooey()
-    : Desire(27, UnidentifiedStateTransition(lbl_806E20B8))
+    : Desire(27, TransitionFunc(g_UnsetTransitionFunc))
     , mfGooPercentage(1.0f)
     , mfMaxGooEffect(1.0f)
     , mUnidentifiedAC(-1.0f)

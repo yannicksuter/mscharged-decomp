@@ -1,5 +1,6 @@
 #include "NL/nlPrint.h"
 #include "Game/Font/fontmanager.h"
+#include "NL/nlFont.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlPrint.h"
 

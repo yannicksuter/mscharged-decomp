@@ -235,18 +235,17 @@ void cDebugCamera::fn_800F2BD0(float dt, float controlSpeed)
     }
 
     nlVector3 offset;
-    float forward = dt * (x * controlSpeed);
-    nlVec3Set(offset,
-        forward * m_matView.m11,
-        forward * m_matView.m21,
-        0.0f);
+    float t = 0.0f;
+    float amount = dt * (x * controlSpeed);
+    float x0 = amount * m_matView.m11;
+    float y0 = amount * m_matView.m21;
+    nlVec3Set(offset, x0, y0, t);
     nlVec3Add(m_vecTarget, m_vecTarget, offset);
 
-    float side = dt * (-y * controlSpeed);
-    nlVec3Set(offset,
-        side * m_matView.m13,
-        side * m_matView.m23,
-        0.0f);
+    amount = dt * (-y * controlSpeed);
+    float x1 = amount * m_matView.m13;
+    float y1 = amount * m_matView.m23;
+    nlVec3Set(offset, x1, y1, t);
     nlVec3Add(m_vecTarget, m_vecTarget, offset);
 }
 

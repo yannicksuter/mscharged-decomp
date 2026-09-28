@@ -670,7 +670,7 @@ void NetworkStatsManager::ReportDefaultDisconnectLoss()
 }
 
 void NetworkStatsManager::ReportGameResult(int result,
-    const NetworkStatsPlayer* home, const NetworkStatsPlayer* away,
+    NetworkStatsPlayer* home, NetworkStatsPlayer* away,
     bool reportHome, int homeScore, int awayScore,
     const NetworkScoreSubmission* fallback)
 {

@@ -5,6 +5,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/BaseSceneHandler.h"
 #include "Game/FE/feButtonComponent.h"
+#include "Game/Render/RLViewLayers.h"
 
 class TLImageInstance;
 
@@ -49,6 +50,18 @@ public:
 class NLGLogoMovieScene : public MoviePlayerScene
 {
 public:
+    NLGLogoMovieScene()
+    {
+        if (IsWidescreen())
+        {
+            SetMovieDetails("movies/nlgintrowide.thp", true, false);
+        }
+        else
+        {
+            SetMovieDetails("movies/nlgintrofull.thp", true, false);
+        }
+        mNextScene = (SceneList)23;
+    }
     virtual ~NLGLogoMovieScene() { }
     virtual void PlayScreenForwardSFX() { }
     virtual void PlayScreenBackSFX() { }

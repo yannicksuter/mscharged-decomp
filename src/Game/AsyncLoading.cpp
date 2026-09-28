@@ -318,7 +318,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         fn_8011B2E4(this);
         break;
     case 7:
-        mLoadingComment = "AsyncFEGameResourceLoadFinalize";
+        SetLoadingComment("AsyncFEGameResourceLoadFinalize");
         if (lbl_806E1068 && lbl_806E1069)
         {
             FEResourceManager::Instance()->m_bPermanentBundleLoadInProgress = false;
@@ -369,7 +369,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FEMusic::SetInGame(false);
         break;
     case 11:
-        mLoadingComment = "AsyncFELocalizationBegin";
+        SetLoadingComment("AsyncFELocalizationBegin");
         if (FontManager::Instance() == 0)
         {
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
@@ -430,7 +430,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 16:
     {
-        mLoadingComment = "AsyncFEResourceLoadFinalize";
+        SetLoadingComment("AsyncFEResourceLoadFinalize");
         BootLoadingScene* loadingScene;
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
@@ -468,19 +468,19 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             fn_80116988, (void*)"MUSICSTREAMS");
         break;
     case 19:
-        mLoadingComment = "AsyncFinalizeCameraLoading";
+        SetLoadingComment("AsyncFinalizeCameraLoading");
         FinishLoadingStepOrUndo(this, fn_800F08A4());
         break;
     case 20:
-        mLoadingComment = "AsyncFinalizeGameWorldLoading";
+        SetLoadingComment("AsyncFinalizeGameWorldLoading");
         FinishLoadingStepOrUndo(this, fn_802773B8(false));
         break;
     case 21:
-        mLoadingComment = "AsyncFinalizeGameWorldLoadingForStadiumViewer";
+        SetLoadingComment("AsyncFinalizeGameWorldLoadingForStadiumViewer");
         FinishLoadingStepOrUndo(this, fn_802773B8(true));
         break;
     case 22:
-        mLoadingComment = "AsyncFinalizeLoadingAI";
+        SetLoadingComment("AsyncFinalizeLoadingAI");
         FinishLoadingStepOrUndo(this, fn_80311C5C());
         break;
     case 23:
@@ -497,11 +497,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 24:
-        mLoadingComment = "AsyncFinalizeLoadingINIFiles";
+        SetLoadingComment("AsyncFinalizeLoadingINIFiles");
         FinishLoadingStepOrUndo(this, UpdateGameTweaksLoading(&gGameTweaks));
         break;
     case 25:
-        mLoadingComment = "AsyncGameLocalizationBegin";
+        SetLoadingComment("AsyncGameLocalizationBegin");
         if (FontManager::Instance() == 0)
         {
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
@@ -512,11 +512,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 26:
-        mLoadingComment = "AsyncHBMFinalize";
+        SetLoadingComment("AsyncHBMFinalize");
         FinishLoadingStepOrUndo(this, gpHBMManager->mReady);
         break;
     case 27:
-        mLoadingComment = "AsyncHBMLoad";
+        SetLoadingComment("AsyncHBMLoad");
         if (gpHBMManager == 0)
         {
             CreateInstance(gpHBMManager);
@@ -524,7 +524,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         gpHBMManager->LoadResources();
         break;
     case 28:
-        mLoadingComment = "AsyncInitializeEmissionManager";
+        SetLoadingComment("AsyncInitializeEmissionManager");
         if (ParticleUpdateTask::sInstance->FinishLoading(sPersistentResourcePool))
         {
             glDiscardFrame(1);
@@ -548,11 +548,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C1B0();
         break;
     case 33:
-        mLoadingComment = "AsyncFELocalizationFinalize";
+        SetLoadingComment("AsyncFELocalizationFinalize");
         FinishLoadingStepOrUndo(this, UpdateFontLoading(&gLoadInGameFonts));
         break;
     case 34:
-        mLoadingComment = "AsyncMiiLoadingBegin";
+        SetLoadingComment("AsyncMiiLoadingBegin");
         if (g_pMiiManager == 0)
         {
             CreateInstance(g_pMiiManager);
@@ -560,42 +560,42 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         g_pMiiManager->LoadResources();
         break;
     case 35:
-        mLoadingComment = "AsyncMiiLoadingFinalize";
+        SetLoadingComment("AsyncMiiLoadingFinalize");
         FinishLoadingStepOrUndo(this, g_pMiiManager->mResourcesLoaded);
         break;
     case 36:
     {
         bool stadiumViewer = m_SP[-1] != 0;
         m_SP--;
-        mLoadingComment = "AsyncStartCameraLoading";
+        SetLoadingComment("AsyncStartCameraLoading");
         fn_800F030C(stadiumViewer);
         FinishLoadingStep(this);
         break;
     }
     case 37:
-        mLoadingComment = "AsyncStartCameraLoadingForStadiumViewer";
+        SetLoadingComment("AsyncStartCameraLoadingForStadiumViewer");
         fn_800F06D4();
         break;
     case 38:
         fn_8011A2E8(this);
         break;
     case 39:
-        mLoadingComment = "AsyncStartGameWorldLoadingForStadiumViewer";
+        SetLoadingComment("AsyncStartGameWorldLoadingForStadiumViewer");
         fn_802772D0(GetStadiumName(GameInfoManager::Instance()->GetStadium()), true);
         FinishLoadingStep(this);
         break;
     case 40:
-        mLoadingComment = "AsyncStartLoadingAI";
+        SetLoadingComment("AsyncStartLoadingAI");
         fn_80311AFC(fn_800E3198(), true);
         FinishLoadingStep(this);
         break;
     case 41:
-        mLoadingComment = "AsyncStartLoadingEmissionManager";
+        SetLoadingComment("AsyncStartLoadingEmissionManager");
         ParticleUpdateTask::sInstance->StartLoading(false, false, false, true);
         FinishLoadingStep(this);
         break;
     case 42:
-        mLoadingComment = "AsyncStartLoadingGameFE";
+        SetLoadingComment("AsyncStartLoadingGameFE");
         lbl_806E1060 = 0;
         lbl_806E1064 = 0;
         glBeginLoadTextureBundle("art/fe/fe.rlt", fn_8011A2DC, 0,
@@ -603,24 +603,24 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         FinishLoadingStep(this);
         break;
     case 43:
-        mLoadingComment = "AsyncStartLoadingINIFiles";
+        SetLoadingComment("AsyncStartLoadingINIFiles");
         InitializeGameTweaks(&gGameTweaks);
         FinishLoadingStep(this);
         break;
     case 44:
-        mLoadingComment = "AsyncStartupFEWorldBegin";
+        SetLoadingComment("AsyncStartupFEWorldBegin");
         BeginLoadFEWorld();
         FinishLoadingStep(this);
         break;
     case 45:
-        mLoadingComment = "AsyncStartupFEWorldFinalize";
+        SetLoadingComment("AsyncStartupFEWorldFinalize");
         FinishLoadingStepOrUndo(this, FinishLoadFEWorld());
         break;
     case 46:
         StopSound(0x7FC13AA3, this);
         break;
     case 47:
-        mLoadingComment = "AsyncWaitForAllScenesValid";
+        SetLoadingComment("AsyncWaitForAllScenesValid");
         if (!FESceneManager::Instance()->AreAllScenesValid())
         {
             FESceneManager::Instance()->Update(0.0f);
@@ -649,7 +649,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BD88();
         break;
     case 53:
-        mLoadingComment = "CreateCharacterInstance";
+        SetLoadingComment("CreateCharacterInstance");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BA00();
         FinishLoadingStep(this);
         break;
@@ -661,7 +661,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         gCrowdModelCollection.CreateLoadedModel();
         break;
     case 56:
-        mLoadingComment = "CreateGameBall";
+        SetLoadingComment("CreateGameBall");
         g_pBall = new (8, false) cBall;
         FakeBallWorld::Init(g_pBall);
         FinishLoadingStep(this);
@@ -682,7 +682,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         --m_SP;
         break;
     case 62:
-        mLoadingComment = "FinalizeAudio";
+        SetLoadingComment("FinalizeAudio");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000C254());
         break;
@@ -690,90 +690,89 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BD70();
         break;
     case 64:
-        mLoadingComment = "FinalizeLoadingAnimRetarget";
+        SetLoadingComment("FinalizeLoadingAnimRetarget");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B230());
         break;
     case 65:
-        mLoadingComment = "FinalizeLoadingCaptainOrGoalieAlternateSwapTexture";
+        SetLoadingComment("FinalizeLoadingCaptainOrGoalieAlternateSwapTexture");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BFA0());
         break;
     case 66:
-        mLoadingComment = "FinalizeLoadingCharacterAnimations";
+        SetLoadingComment("FinalizeLoadingCharacterAnimations");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B00C());
         break;
     case 67:
-        mLoadingComment = "FinalizeLoadingCharacterEffects";
+        SetLoadingComment("FinalizeLoadingCharacterEffects");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A5D8());
         break;
     case 68:
     {
-        u32* stackPointer = m_SP;
-        int value = stackPointer[-1];
-        m_SP = stackPointer - 1;
-        mLoadingComment = "FinalizeLoadingCharacterModel";
+        int value = m_SP[-1];
+        m_SP--;
+        SetLoadingComment("FinalizeLoadingCharacterModel");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A9A4(value));
         break;
     }
     case 69:
-        mLoadingComment = "FinalizeLoadingCharacterPhysicsElements";
+        SetLoadingComment("FinalizeLoadingCharacterPhysicsElements");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AD4C());
         break;
     case 70:
-        mLoadingComment = "FinalizeLoadingCharacterTextures";
+        SetLoadingComment("FinalizeLoadingCharacterTextures");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A144());
         break;
     case 71:
-        mLoadingComment = "FinalizeLoadingCharacterTriggers";
+        SetLoadingComment("FinalizeLoadingCharacterTriggers");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B14C());
         break;
     case 72:
-        mLoadingComment = "FinalizeLoadingCharINIFiles";
+        SetLoadingComment("FinalizeLoadingCharINIFiles");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B9F4());
         break;
     case 73:
-        mLoadingComment = "FinalizeLoadingCrowdCharacter";
+        SetLoadingComment("FinalizeLoadingCrowdCharacter");
         FinishLoadingStepOrUndo(this, gCrowdModelCollection.UpdateModelLoad());
         break;
     case 74:
-        mLoadingComment = "FinalizeLoadingExtraTextures";
+        SetLoadingComment("FinalizeLoadingExtraTextures");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A790());
         break;
     case 75:
-        mLoadingComment = "FinalizeLoadingHierarchy";
+        SetLoadingComment("FinalizeLoadingHierarchy");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AB18());
         break;
     case 76:
-        mLoadingComment = "FinalizeLoadingNPCTemplate";
+        SetLoadingComment("FinalizeLoadingNPCTemplate");
         FinishLoadingStepOrUndo(this, gNPCManager->FinishLoadNPCTemplate());
         break;
     case 77:
-        mLoadingComment = "FinalizeLoadingSharedTextures";
+        SetLoadingComment("FinalizeLoadingSharedTextures");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A378());
         break;
     case 78:
-        mLoadingComment = "FinalizeLoadingShockTexture";
+        SetLoadingComment("FinalizeLoadingShockTexture");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A224());
         break;
     case 79:
-        mLoadingComment = "FinalizeLoadingSidekickSwapTexture";
+        SetLoadingComment("FinalizeLoadingSidekickSwapTexture");
         FinishLoadingStepOrUndo(this,
             CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B6C4());
         break;
     case 80:
-        mLoadingComment = "FinalizeLoadingWorldNPCs";
+        SetLoadingComment("FinalizeLoadingWorldNPCs");
         if (lbl_806E1050->UpdateModelLoading())
         {
             SetStadiumBannerTextures();
@@ -825,14 +824,14 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         fn_8011A0A8(this);
         break;
     case 89:
-        mLoadingComment = "AudioLoader";
+        SetLoadingComment("AudioLoader");
         FinishLoadingStep(this);
         break;
     case 90:
         fn_8011A800(this);
         break;
     case 91:
-        mLoadingComment = "InitializeGameStateFinalizeForStadimViewer";
+        SetLoadingComment("InitializeGameStateFinalizeForStadimViewer");
         BeginFrameTask::s_FramerateLocked = false;
         InitializeGameObjectLighting();
         UseDefaultFreestyleButtonRemap(IsNetworkOrRecordedGame());
@@ -843,13 +842,13 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         fn_8011A570(this);
         break;
     case 93:
-        mLoadingComment = "InitializeGameStateInGameFE2";
+        SetLoadingComment("InitializeGameStateInGameFE2");
         FESceneManager::Instance()->GetTopSceneHandler()->SetVisible(false);
         g_pNetworkSession->NotifyGameLoaded();
         FinishLoadingStep(this);
         break;
     case 94:
-        mLoadingComment = "NetworkWaitGameLoadedForEveryone";
+        SetLoadingComment("NetworkWaitGameLoadedForEveryone");
         if (g_pNetworkSession->PollGameLoaded())
         {
             FinishLoadingStep(this);
@@ -860,19 +859,19 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         }
         break;
     case 95:
-        mLoadingComment = "PhysicsLoad";
+        SetLoadingComment("PhysicsLoad");
         fn_8013D8DC();
         FinishLoadingStep(this);
         break;
     case 96:
-        mLoadingComment = "PostCameraLoader";
+        SetLoadingComment("PostCameraLoader");
         FrontEnd::EnterStartScreen(false);
         ReplayManager::Instance()->InitializeSnapshots();
         InitializeGameObjectLighting();
         FinishLoadingStep(this);
         break;
     case 97:
-        mLoadingComment = "PhysicsPreGameLoad";
+        SetLoadingComment("PhysicsPreGameLoad");
         fn_80144070();
         fn_8013D85C();
         FinishLoadingStep(this);
@@ -882,7 +881,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 99:
     {
-        mLoadingComment = "InitializeStadiumViewer2";
+        SetLoadingComment("InitializeStadiumViewer2");
         fn_80056CF4((void*)gGameTweaks.mTerrainType,
             gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
         ParticleUpdateTask* particleUpdateTask = ParticleUpdateTask::sInstance;
@@ -893,7 +892,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     }
     case 100:
-        mLoadingComment = "InitializeWorldNPCTemplates";
+        SetLoadingComment("InitializeWorldNPCTemplates");
         lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
         break;
     case 101:
@@ -1008,7 +1007,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B3C0();
         break;
     case 126:
-        mLoadingComment = "StartLoadingAnimRetarget";
+        SetLoadingComment("StartLoadingAnimRetarget");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B1F8();
         FinishLoadingStep(this);
         break;
@@ -1017,47 +1016,46 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000BF04();
         break;
     case 128:
-        mLoadingComment = "StartLoadingCharacterAnimations";
+        SetLoadingComment("StartLoadingCharacterAnimations");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AE90();
         FinishLoadingStep(this);
         break;
     case 129:
-        mLoadingComment = "StartLoadingCharacterEffects";
+        SetLoadingComment("StartLoadingCharacterEffects");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A418();
         FinishLoadingStep(this);
         break;
     case 130:
     {
-        u32* stackPointer = m_SP;
-        int value = stackPointer[-1];
-        m_SP = stackPointer - 1;
-        mLoadingComment = "StartLoadingCharacterModel";
+        int value = m_SP[-1];
+        m_SP--;
+        SetLoadingComment("StartLoadingCharacterModel");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A8E4(value);
         FinishLoadingStep(this);
         break;
     }
     case 131:
-        mLoadingComment = "StartLoadingCharacterPhysicsElements";
+        SetLoadingComment("StartLoadingCharacterPhysicsElements");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000ACEC();
         FinishLoadingStep(this);
         break;
     case 132:
-        mLoadingComment = "StartLoadingCharacterTextures";
+        SetLoadingComment("StartLoadingCharacterTextures");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_80009FCC();
         FinishLoadingStep(this);
         break;
     case 133:
-        mLoadingComment = "StartLoadingCharacterTriggers";
+        SetLoadingComment("StartLoadingCharacterTriggers");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B0E8();
         FinishLoadingStep(this);
         break;
     case 134:
-        mLoadingComment = "StartLoadingCharINIFiles";
+        SetLoadingComment("StartLoadingCharINIFiles");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B8E8();
         FinishLoadingStep(this);
         break;
     case 135:
-        mLoadingComment = "StartLoadingCrowdCharacter";
+        SetLoadingComment("StartLoadingCrowdCharacter");
         CurrentAllocator = &VirtualAllocator;
         AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
         gCrowdModelCollection.BeginNextModelLoad();
@@ -1071,22 +1069,22 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A67C();
         break;
     case 137:
-        mLoadingComment = "StartLoadingHierarchy";
+        SetLoadingComment("StartLoadingHierarchy");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000AAB8();
         FinishLoadingStep(this);
         break;
     case 138:
-        mLoadingComment = "StartLoadingNPCTemplate";
+        SetLoadingComment("StartLoadingNPCTemplate");
         gNPCManager->BeginLoadNPCTemplate();
         FinishLoadingStep(this);
         break;
     case 139:
-        mLoadingComment = "StartLoadingSharedTextures";
+        SetLoadingComment("StartLoadingSharedTextures");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A324();
         FinishLoadingStep(this);
         break;
     case 140:
-        mLoadingComment = "StartLoadingShockTextures";
+        SetLoadingComment("StartLoadingShockTextures");
         CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000A0A8();
         FinishLoadingStep(this);
         break;
@@ -1095,7 +1093,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         m_SP[-1] = CharacterLoader_8056B290::sUnidentifiedInstance.fn_8000B3E0();
         break;
     case 142:
-        mLoadingComment = "StartLoadingWorldNPCs";
+        SetLoadingComment("StartLoadingWorldNPCs");
         lbl_806E1050->BeginModelLoading();
         FinishLoadingStep(this);
         break;
@@ -1126,6 +1124,20 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         nlBreak();
         break;
     }
+}
+
+AsyncLoadingManager::AsyncLoadingManager()
+    : InterpreterCore(100)
+{
+    mLoadingHandle.mOwner = 0;
+    mByteCode = 0;
+    mSequenceState = ASYNC_LOADING_IDLE;
+    mLoadingState = 0;
+    mPreviousStageTick = 0;
+    mSequenceStartTime = 0;
+    mStageStartTick = 0;
+    lbl_806E103C = 0;
+    SetLoadingComment("No Loading Comment");
 }
 
 AsyncLoadingManager* AsyncLoadingManager::Instance()
@@ -1165,7 +1177,7 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
 
     int result = ASYNC_LOADING_NO_TRANSITION;
     manager->mStageStartTick = nlGetTicker();
-    manager->mLoadingComment = "No Loading Comment";
+    manager->SetLoadingComment("No Loading Comment");
 
     bool completed = false;
     switch (manager->mSequenceState)
@@ -1360,7 +1372,7 @@ extern "C" void fn_80119220(AsyncLoadingManager* manager)
 extern "C" void fn_8011926C(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 3;
-    manager->mLoadingComment = "DestroyFEFast";
+    manager->SetLoadingComment("DestroyFEFast");
     g_pFEInput->Reset(true);
     while (!FESceneManager::Instance()->AreAllScenesValid())
     {
@@ -1404,7 +1416,7 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
 extern "C" void fn_80119454(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 2;
-    manager->mLoadingComment = "InitializeFEState1";
+    manager->SetLoadingComment("InitializeFEState1");
     fn_80111654(2);
     ClearTweakRegistryReset();
     GLMemoryRequirement requirements[] = {
@@ -1429,7 +1441,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
     GLView* view = GetLayerView((eCLV)0);
     ImpostorManager::GetInstance()->Initialize(view, 30, requirements, 2, true);
     ImpostorManager::GetInstance()->SetEnabled(true);
-    manager->mLoadingComment = "InitializeFEState2";
+    manager->SetLoadingComment("InitializeFEState2");
     ParticleUpdateTask* particleTask = ParticleUpdateTask::sInstance;
     particleTask->Initialize(GetLayerView((eCLV)0x19), 0x5F6, 0x2FB);
     GameInfoManager::Instance()->ResetUnknown0xA0();
@@ -1584,7 +1596,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
 extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 3;
-    manager->mLoadingComment = "DestroyFEState";
+    manager->SetLoadingComment("DestroyFEState");
     g_pFEInput->Reset(true);
     while (!FESceneManager::Instance()->AreAllScenesValid())
     {
@@ -1682,7 +1694,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
 extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 2;
-    manager->mLoadingComment = "InitializeGameState1";
+    manager->SetLoadingComment("InitializeGameState1");
     fn_80111654(1);
     ClearTweakRegistryReset();
     if (GameInfoManager::Instance()->IsInMode3())
@@ -1727,7 +1739,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "InitializeGameState2";
+    manager->SetLoadingComment("InitializeGameState2");
     fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
     static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E1514();
     InitializeGameStreams();
@@ -1763,7 +1775,7 @@ extern "C" void fn_8011A2DC(void* value0, unsigned long value1, void*)
 
 extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "AsyncStartGameWorldLoading";
+    manager->SetLoadingComment("AsyncStartGameWorldLoading");
     int stadium = GameInfoManager::Instance()->GetStadium();
     fn_802772D0(GetStadiumName(stadium), false);
     fxSetTerrain(nlStringLowerHash(GetStadiumTerrain(stadium)));
@@ -1822,7 +1834,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011A570(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "InitializeGameStateInGameFE1";
+    manager->SetLoadingComment("InitializeGameStateInGameFE1");
     g_pOverlayManager->Push((SceneList)0x5A, SCREEN_NOTHING, false);
     g_pOverlayManager->Push(OVERLAY_HUD, SCREEN_NOTHING, false)->SetVisible(false);
     lbl_806E1058 += gAudioEnabled ? 2 : 0;
@@ -1853,7 +1865,7 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011A800(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "GameStateFinalize";
+    manager->SetLoadingComment("GameStateFinalize");
 
     PauseMenuScene::mLastSelectedIndex = 0;
     InitializeElectricFence(GetLayerView(eCLV_ElectricFence));
@@ -1894,7 +1906,7 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "DestroyGameState";
+    manager->SetLoadingComment("DestroyGameState");
 
     nlPrintf("RL memory free: %dK\n", glGetCurrentResourcePool()->GetFreeMemory() >> 10);
     glGetCurrentResourcePool();
@@ -2094,7 +2106,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011B178(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "AsyncFEResourceLoadBeing";
+    manager->SetLoadingComment("AsyncFEResourceLoadBeing");
     lbl_806E1068 = false;
     lbl_806E1069 = false;
     if (!lbl_806E1044)
@@ -2140,7 +2152,7 @@ extern "C" void fn_8011B178(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011B2E4(AsyncLoadingManager* manager)
 {
-    manager->mLoadingComment = "AsyncFEGameResourceLoadBegin";
+    manager->SetLoadingComment("AsyncFEGameResourceLoadBegin");
     lbl_806E1068 = false;
     lbl_806E1069 = false;
     InitializeFunctionMemory();
@@ -2220,7 +2232,7 @@ void AsyncLoadingManager::LoadTrophyTemplates()
 extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
 {
     manager->mLoadingState = 2;
-    manager->mLoadingComment = "InitializeStadiumViewer";
+    manager->SetLoadingComment("InitializeStadiumViewer");
     fn_80111654(1);
     ClearTweakRegistryReset();
     GLMemoryRequirement requirements[] = {
@@ -2268,17 +2280,3 @@ extern "C" UnidentifiedOwnerHandle* fn_8011B858(
 PersistentResourceRequirements gPersistentResourceRequirements = {
     { { GLM_Header, 0x3C00 }, { GLM_TextureData, 0x390800 } },
 };
-
-AsyncLoadingManager::AsyncLoadingManager()
-    : InterpreterCore(100)
-{
-    mLoadingHandle.mOwner = 0;
-    mByteCode = 0;
-    mSequenceState = ASYNC_LOADING_IDLE;
-    mLoadingState = 0;
-    mPreviousStageTick = 0;
-    mSequenceStartTime = 0;
-    mStageStartTick = 0;
-    lbl_806E103C = 0;
-    mLoadingComment = "No Loading Comment";
-}

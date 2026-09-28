@@ -851,27 +851,6 @@ void OptionsVisualMenuV2::fn_801D8538(int, void*)
     SaveLoad::StartSave(false);
 }
 
-class Class_801D87C4 : public BaseSceneHandler
-{
-public:
-    Class_801D87C4();
-    virtual ~Class_801D87C4();
-    virtual void Update(float dt);
-    virtual void SceneCreated();
-
-    /* 0x1C */ int mScreenCount;
-    /* 0x20 */ int mCurrentScreen;
-    /* 0x24 */ TLInstance** mScreens;
-    /* 0x28 */ TLInstance* mBackground;
-    /* 0x2C */ TLComponentInstance* mHomeMessage;
-    /* 0x30 */ bool mWidescreen;
-    /* 0x31 */ u8 mPadding31[3];
-    /* 0x34 */ float mScreenTime;
-    /* 0x38 */ float mFadeAlpha;
-    /* 0x3C */ int mState;
-    /* 0x40 */ float mEndTime;
-}; // size 0x44
-
 static u8 lbl_806DD478 = 1;
 
 Class_801D87C4::Class_801D87C4()

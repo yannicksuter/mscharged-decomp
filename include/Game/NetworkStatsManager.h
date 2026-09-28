@@ -87,8 +87,8 @@ public:
         int result, bool home, int homeScore, int awayScore);
     bool ShouldRestoreDefaultDisconnectLoss();
     void ReportDefaultDisconnectLoss();
-    void ReportGameResult(int result, const NetworkStatsPlayer* home,
-        const NetworkStatsPlayer* away, bool reportHome, int homeScore,
+    void ReportGameResult(int result, NetworkStatsPlayer* home,
+        NetworkStatsPlayer* away, bool reportHome, int homeScore,
         int awayScore, const NetworkScoreSubmission* fallback);
     void SubmitJob(int job);
     void RefreshSaveState_801314D0();

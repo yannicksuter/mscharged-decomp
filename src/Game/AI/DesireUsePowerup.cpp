@@ -23,8 +23,6 @@ extern "C" shdStateMachine* fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" DesireUpdate fn_80041B6C(
     void*, const unsigned int&, cFielder*);
-extern "C" UnidentifiedStateTransition* fn_80315A14(
-    UnidentifiedStateTransition*, void*);
 extern "C" void fn_8009A5D8(
     cFielder*, ePowerUpType, int, unk_8009A5D8*);
 extern "C" bool fn_80099C80(ePowerUpType);
@@ -356,19 +354,19 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
         if (!pDesire->m_pFielder->fn_8003E6EC())
         {
             UnidentifiedVariantCollection params;
-            UnidentifiedStateTransition* pTransition
-                = !pDesire->mUnidentified070.UnidentifiedIsUnset()
-                ? &pDesire->mUnidentified070
-                : &pDesire->mUnidentified068;
+            TransitionFunc* pTransition
+                = !pDesire->mOverrideTransition.IsUnset()
+                ? &pDesire->mOverrideTransition
+                : &pDesire->mDefaultTransition;
             params.Set(10, FuzzyVariant(FT_U32,
-                pTransition->mUnidentifiedHash));
+                pTransition->mFuncHash));
             fn_80319E84(pDesire->mUnidentified018, 23, &params, false);
-            UnidentifiedStateTransition transition;
-            fn_80315A14(&transition, (void*)fn_800D2074);
-            pDesire->mUnidentified070.mUnidentifiedHash
-                = transition.mUnidentifiedHash;
-            pDesire->mUnidentified070.mUnidentifiedFunction
-                = transition.mUnidentifiedFunction;
+            TransitionFunc transition;
+            BindNativeTransitionFunc(&transition, (void*)fn_800D2074);
+            pDesire->mOverrideTransition.mFuncHash
+                = transition.mFuncHash;
+            pDesire->mOverrideTransition.mNativeFunc
+                = transition.mNativeFunc;
             pDesire->UnidentifiedResetPowerupState();
         }
         break;

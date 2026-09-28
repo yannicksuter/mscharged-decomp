@@ -2,12 +2,12 @@
 #define GAME_AI_DESIRE_RUN_TO_NET_H
 
 #include "Game/AI/Desire.h"
-#include "Game/AI/UnidentifiedStringHash.h"
+#include "Game/AI/TransitionFunc.h"
 
 class DesireRunToNet : public Desire
 {
 public:
-    DesireRunToNet(const UnidentifiedStateTransition& transition)
+    DesireRunToNet(const TransitionFunc& transition)
         : Desire(9, transition)
     {
     }

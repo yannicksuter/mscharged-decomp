@@ -10,11 +10,8 @@
 
 extern "C" void fn_80319904(
     UnidentifiedScriptMachine*, shdStateMachine*);
-extern "C" void fn_80315A64(
-    UnidentifiedStateTransition*, UnidentifiedFuzzyRuntimeValue*,
-    UnidentifiedVariant_80054AB8*, UnidentifiedFuzzyRuntimeValue*);
 extern "C" int fn_800C2BD4(UnidentifiedVariant_80054AB8*);
-extern "C" UnidentifiedFuzzyRuntimeValue* fn_80317E2C(
+extern "C" AIContext* fn_80317E2C(
     UnidentifiedScriptMachine*);
 extern "C" bool fn_80317E88(shdStateMachine*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
@@ -30,14 +27,14 @@ extern const float lbl_806E6884;
 extern const float lbl_806E6888;
 extern const float lbl_806E688C;
 
-UnidentifiedUnsetTransition lbl_806E20B8;
+UnsetTransitionFunc g_UnsetTransitionFunc;
 
 class UnidentifiedStateMachine_803171D0 : public shdStateMachine
 {
 public:
     UnidentifiedStateMachine_803171D0(
         int state, const char* name, UnidentifiedScriptMachine* context,
-        const UnidentifiedStateTransition& transition);
+        const TransitionFunc& transition);
     virtual ~UnidentifiedStateMachine_803171D0();
 
     virtual bool UnidentifiedInitialize(void*);
@@ -51,14 +48,14 @@ public:
 };
 
 shdStateMachine::shdStateMachine(
-    int state, const UnidentifiedStateTransition& transition)
+    int state, const TransitionFunc& transition)
     : mUnidentifiedTimer(lbl_806E6880)
     , mUnidentified01C()
 {
     mUnidentifiedState = state;
-    mUnidentified068.mUnidentifiedHash = transition.mUnidentifiedHash;
-    mUnidentified068.mUnidentifiedFunction
-        = transition.mUnidentifiedFunction;
+    mDefaultTransition.mFuncHash = transition.mFuncHash;
+    mDefaultTransition.mNativeFunc
+        = transition.mNativeFunc;
     mUnidentified018 = 0;
     mUnidentified080 = lbl_806E6880;
     mUnidentified084 = lbl_806E6884;
@@ -73,7 +70,7 @@ void shdStateMachine::UnidentifiedReset(bool)
     mUnidentified078 = lbl_806E6884;
     mUnidentified07C = lbl_806E6884;
     mUnidentified014 = lbl_806E6888;
-    mUnidentified070 = lbl_806E20B8;
+    mOverrideTransition = g_UnsetTransitionFunc;
 }
 
 void shdStateMachine::UnidentifiedSetContext(
@@ -105,7 +102,7 @@ extern "C" void fn_80316980(
         machine->UnidentifiedCleanup();
     }
     machine->mUnidentifiedActive = false;
-    machine->mUnidentified070 = lbl_806E20B8;
+    machine->mOverrideTransition = g_UnsetTransitionFunc;
 }
 
 extern "C" bool fn_80316A84(
@@ -141,7 +138,7 @@ extern "C" bool fn_80316A84(
 {
     machine->mUnidentified078 = lbl_806E6884;
     machine->mUnidentified07C = lbl_806E6884;
-    machine->mUnidentified070 = lbl_806E20B8;
+    machine->mOverrideTransition = g_UnsetTransitionFunc;
 
     if (parameters->IsSet(10))
     {
@@ -149,23 +146,23 @@ extern "C" bool fn_80316A84(
         switch (value->GetType())
         {
         case FT_U32:
-            machine->mUnidentified070.mUnidentifiedHash = value->mData.u;
-            machine->mUnidentified070.mUnidentifiedFunction = 0;
+            machine->mOverrideTransition.mFuncHash = value->mData.u;
+            machine->mOverrideTransition.mNativeFunc = 0;
             break;
         case FT_INT:
-            machine->mUnidentified070.mUnidentifiedHash = value->mData.i;
-            machine->mUnidentified070.mUnidentifiedFunction = 0;
+            machine->mOverrideTransition.mFuncHash = value->mData.i;
+            machine->mOverrideTransition.mNativeFunc = 0;
             break;
         case FT_POINTER:
         {
             void* function = value->mData.pointer;
-            machine->mUnidentified070.mUnidentifiedHash = -1;
-            machine->mUnidentified070.mUnidentifiedFunction = function;
+            machine->mOverrideTransition.mFuncHash = -1;
+            machine->mOverrideTransition.mNativeFunc = function;
             break;
         }
         case FT_STRING:
-            machine->mUnidentified070.mUnidentifiedHash = nlStringHash(value->mData.string);
-            machine->mUnidentified070.mUnidentifiedFunction = 0;
+            machine->mOverrideTransition.mFuncHash = nlStringHash(value->mData.string);
+            machine->mOverrideTransition.mNativeFunc = 0;
             break;
         }
     }
@@ -209,20 +206,20 @@ extern "C" void fn_80317010(
     machine->mUnidentified014 = lbl_806DF564();
 
     float start = lbl_806DF560();
-    if (fn_80317E34(&machine->mUnidentified070))
+    if (IsTransitionFuncSet(&machine->mOverrideTransition))
     {
-        if (fn_80317E60(&machine->mUnidentified070))
+        if (HasTransitionFunc(&machine->mOverrideTransition))
         {
-            fn_80315A64(&machine->mUnidentified070,
+            machine->mOverrideTransition.Execute(
                 fn_80317E2C(machine->mUnidentified018),
                 update,
                 (UnidentifiedFuzzyRuntimeValue*)machine);
         }
     }
-    else if (fn_80317E34(&machine->mUnidentified068)
-             && fn_80317E60(&machine->mUnidentified068))
+    else if (IsTransitionFuncSet(&machine->mDefaultTransition)
+             && HasTransitionFunc(&machine->mDefaultTransition))
     {
-        fn_80315A64(&machine->mUnidentified068,
+        machine->mDefaultTransition.Execute(
             fn_80317E2C(machine->mUnidentified018),
             update,
             (UnidentifiedFuzzyRuntimeValue*)machine);
@@ -246,7 +243,7 @@ extern "C" void fn_80317010(
 
 UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     int state, const char* name, UnidentifiedScriptMachine* context,
-    const UnidentifiedStateTransition& transition)
+    const TransitionFunc& transition)
     : shdStateMachine(state, transition)
 {
     UnidentifiedSetContext(context);
@@ -264,17 +261,17 @@ UnidentifiedStateMachine_803171D0::UnidentifiedStateMachine_803171D0(
     nlStrNCat(functionName, functionName, name, 63);
     mUnidentified090 = nlStringHash(functionName);
 
-    UnidentifiedFunctionHash_8027F9CC hash(mUnidentified088);
+    FunctionHash hash(mUnidentified088);
     if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified088 = 0;
     }
-    hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified08C);
+    hash = FunctionHash(mUnidentified08C);
     if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified08C = 0;
     }
-    hash = UnidentifiedFunctionHash_8027F9CC(mUnidentified090);
+    hash = FunctionHash(mUnidentified090);
     if (!GetFuzzyRuntime()->FunctionExists(hash))
     {
         mUnidentified090 = 0;

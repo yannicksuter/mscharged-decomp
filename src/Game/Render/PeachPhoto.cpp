@@ -326,8 +326,8 @@ void RenderPeachPhoto(PeachPhotoState* photo)
                 photo->projectedCorners[i].y);
 
             const nlVector2& tex = texture[(i + gPeachPhotoTextureRotation) % 4];
-            writer.Texcoord1(tex.x, tex.y);
-            writer.Texcoord2(tex.x, tex.y);
+            writer.Texcoord1(tex);
+            writer.Texcoord2(tex);
             writer.Colour(colour);
 
             nlVector3 position = photo->corners[i];

@@ -4,7 +4,7 @@
 #include "Game/Audio/RegistryPools.h"
 
 UnidentifiedTeamDesire::UnidentifiedTeamDesire(
-    int state, const UnidentifiedStateTransition& transition)
+    int state, const TransitionFunc& transition)
     : shdStateMachine(state, transition)
 {
     mUnidentified080 = 0.33f;

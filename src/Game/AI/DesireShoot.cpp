@@ -113,7 +113,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
             Goalie* pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
             float fGoalieX = fSign * pGoalie->mUnidentified024.m_v3Position.x;
             if (fSign * m_pFielder->mUnidentified024.m_v3Position.x < fGoalieX
-                || (float)fabs(m_pFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
+                || (float)__fabs(m_pFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
             {
                 float fRange = fn_80039574(m_pFielder);
                 float fDistance = nlSqrt(nlVec3DistanceSquared2D(
@@ -167,7 +167,8 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
 
     if (fn_8003C180(m_pFielder))
     {
-        m_pFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)(fn_8002C7E8(m_pFielder->GetTweaks()) - 0.2f));
+        float fRange = fn_8002C7E8(m_pFielder->GetTweaks()) - 0.2f;
+        m_pFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)fRange);
     }
 
     if (m_pFielder->m_pBall != NULL)
@@ -208,46 +209,13 @@ void DesireShoot::Update(
 }
 
 /**
- * Offset/Address/Size: 0xE74 | 0x800C500C | size: 0xEC
- */
-void DesireShoot::UnidentifiedVirtual8(
-    void* field, DebugWriteCache* cache)
-{
-    *(unsigned short*)field = cache->BeginType("DesireShoot");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
-    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbLobShot - (u8*)&mvDesiredPosition, "mbLobShot");
-    cache->EndType();
-}
-
-/**
- * Offset/Address/Size: 0xF60 | 0x800C50F8 | size: 0x9C
- */
-void DesireShoot::UnidentifiedVirtual7(
-    void* context, DebugWriteCache* cache)
-{
-    if (sDesireShootType == 0xFFFF)
-    {
-        UnidentifiedVirtual8(&sDesireShootType, cache);
-    }
-
-    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
-    void* data = (u8*)this + offset;
-    cache->ChecksumData(sDesireShootType, data, context);
-    cache->WriteData(sDesireShootType, data, sizeof(DesireShoot) - offset);
-}
-
-/**
  * Offset/Address/Size: 0xFFC | 0x800C5194 | size: 0xEC
  */
-void DesireWindupShot::UnidentifiedVirtual8(
+inline void DesireWindupShot::UnidentifiedVirtual8(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireWindupShot");
-    cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
-    cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
-    cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
+    Desire::UnidentifiedVirtual8(field, cache);
     cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbShotMeterActivated - (u8*)&mvDesiredPosition, "mbShotMeterActivated");
     cache->EndType();
 }
@@ -255,7 +223,7 @@ void DesireWindupShot::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x10E8 | 0x800C5280 | size: 0x9C
  */
-void DesireWindupShot::UnidentifiedVirtual7(
+inline void DesireWindupShot::UnidentifiedVirtual7(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireWindupShotType == 0xFFFF)
@@ -270,15 +238,30 @@ void DesireWindupShot::UnidentifiedVirtual7(
 }
 
 /**
- * Offset/Address/Size: 0x1184 | 0x800C531C | size: 0x5C
+ * Offset/Address/Size: 0xE74 | 0x800C500C | size: 0xEC
  */
-DesireWindupShot::~DesireWindupShot()
+inline void DesireShoot::UnidentifiedVirtual8(
+    void* field, DebugWriteCache* cache)
 {
+    *(unsigned short*)field = cache->BeginType("DesireShoot");
+    Desire::UnidentifiedVirtual8(field, cache);
+    cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbLobShot - (u8*)&mvDesiredPosition, "mbLobShot");
+    cache->EndType();
 }
 
 /**
- * Offset/Address/Size: 0x11E0 | 0x800C5378 | size: 0x5C
+ * Offset/Address/Size: 0xF60 | 0x800C50F8 | size: 0x9C
  */
-DesireShoot::~DesireShoot()
+inline void DesireShoot::UnidentifiedVirtual7(
+    void* context, DebugWriteCache* cache)
 {
+    if (sDesireShootType == 0xFFFF)
+    {
+        UnidentifiedVirtual8(&sDesireShootType, cache);
+    }
+
+    unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
+    void* data = (u8*)this + offset;
+    cache->ChecksumData(sDesireShootType, data, context);
+    cache->WriteData(sDesireShootType, data, sizeof(DesireShoot) - offset);
 }

@@ -2309,7 +2309,7 @@ Game/Render/StadiumPhysicsObject.cpp:
 	.sdata      start:0x806DEE78 end:0x806DEE80
 	.sdata2     start:0x806E5C80 end:0x806E5C90
 
-Game/Render/tu_80279AC8.cpp:
+Game/Render/StadiumWorldObjects.cpp:
 	.text       start:0x80279AC8 end:0x8027A4BC
 	.ctors      start:0x804DB7DC end:0x804DB7E0
 	.data       start:0x80522588 end:0x80523138
@@ -3522,27 +3522,36 @@ Game/Render/ImpostorModel.cpp:
 	.sdata2     start:0x806E6478 end:0x806E6480
 
 Game/Render/CrowdModelCollection.cpp:
-	.text       start:0x802DB930 end:0x802DCDB4
-	.ctors      start:0x804DBA14 end:0x804DBA18
+	.text       start:0x802DB930 end:0x802DC800
 	.data       start:0x8052ECA8 end:0x8052ECF0
 	.sdata      start:0x806DF448 end:0x806DF450
-	.sbss       start:0x806E1F80 end:0x806E1F90
+	.sbss       start:0x806E1F80 end:0x806E1F88
+
+Game/World/WorldVisibility.cpp:
+	.text       start:0x802DC800 end:0x802DCDB4
+	.ctors      start:0x804DBA14 end:0x804DBA18
+	.sbss       start:0x806E1F88 end:0x806E1F90
 
 Game/Render/WorldNPC.cpp:
 	.text       start:0x802DCDB4 end:0x802DE284
 	.ctors      start:0x804DBA18 end:0x804DBA1C
-	.rodata     start:0x804EB320 end:0x804EB350
+	.rodata     start:0x804EB320 end:0x804EB340
 	.data       start:0x8052ECF0 end:0x8052EDC8
 	.sdata      start:0x806DF450 end:0x806DF460
 	.sbss       start:0x806E1F90 end:0x806E1F98
 	.sdata2     start:0x806E6480 end:0x806E6490
 
+Game/InterpreterOperations.cpp:
+	.text       start:0x802DE284 end:0x802DECB8
+	.data       start:0x8052EDC8 end:0x8052EE68
+	.sdata2     start:0x806E6490 end:0x806E64A0
+
 Game/InterpreterCore.cpp:
-	.text       start:0x802DE284 end:0x802E0010
+	.text       start:0x802DECB8 end:0x802E0010
 	.ctors      start:0x804DBA1C end:0x804DBA20
-	.data       start:0x8052EDC8 end:0x8052EED4
+	.data       start:0x8052EE68 end:0x8052EED4
 	.sdata      start:0x806DF460 end:0x806DF468
-	.sdata2     start:0x806E6490 end:0x806E64B0
+	.sdata2     start:0x806E64A0 end:0x806E64B0
 
 Game/Effects/EffectsTemplate.cpp:
 	.text       start:0x802E0010 end:0x802E0598
@@ -3554,6 +3563,7 @@ Game/Effects/EffectsTemplate.cpp:
 Game/Effects/ParticleSystem.cpp:
 	.text       start:0x802E0598 end:0x802E3D4C
 	.ctors      start:0x804DBA24 end:0x804DBA28
+	.rodata     start:0x804EB340 end:0x804EB350
 	.data       start:0x8052EEE8 end:0x8052F068
 	.bss        start:0x8057F5A8 end:0x8057F698
 	.sdata      start:0x806DF470 end:0x806DF480
@@ -3564,7 +3574,9 @@ Game/Effects/EffectsGroup.cpp:
 	.text       start:0x802E3D4C end:0x802E4358
 	.ctors      start:0x804DBA28 end:0x804DBA2C
 	.data       start:0x8052F068 end:0x8052F098
-	.sbss       start:0x806E1FC8 end:0x806E1FD0
+	.bss        start:0x8057F698 end:0x8057F6A4
+	.sdata      start:0x806DF480 end:0x806DF488
+	.sbss       start:0x806E1FC8 end:0x806E1FCC
 	.sdata2     start:0x806E6550 end:0x806E6558
 
 Game/Effects/EmissionController.cpp:
@@ -3578,8 +3590,8 @@ Game/Effects/EmissionManager.cpp:
 	.text       start:0x802E5B60 end:0x802EB344
 	.ctors      start:0x804DBA30 end:0x804DBA38
 	.data       start:0x8052F0E8 end:0x8052F3A0
-	.bss        start:0x8057F698 end:0x8057F928
-	.sdata      start:0x806DF480 end:0x806DF4C8
+	.bss        start:0x8057F6A8 end:0x8057F928
+	.sdata      start:0x806DF488 end:0x806DF4C8
 	.sbss       start:0x806E1FD4 end:0x806E2010 align:4
 	.sdata2     start:0x806E6570 end:0x806E65A0
 
@@ -3984,7 +3996,7 @@ Game/AI/tu_80311734.cpp:
 	.sbss       start:0x806E20A0 end:0x806E20B8
 	.sdata2     start:0x806E6870 end:0x806E6880
 
-Game/AI/tu_80315A14.cpp:
+Game/AI/TransitionFunc.cpp:
 	.text       start:0x80315A14 end:0x803167F0
 
 Game/AI/tu_803167F0.cpp:

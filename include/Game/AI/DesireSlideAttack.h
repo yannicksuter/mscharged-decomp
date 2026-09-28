@@ -7,7 +7,7 @@
 class DesireSlideAttack : public Desire
 {
 public:
-    DesireSlideAttack(UnidentifiedStateTransition transition)
+    DesireSlideAttack(TransitionFunc transition)
         : Desire(16, transition)
     {
     }

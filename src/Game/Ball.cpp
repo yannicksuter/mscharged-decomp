@@ -103,8 +103,7 @@ public:
             if ((listener->mFlags >> 31) != 0)
             {
                 listener->callback(p1, p2);
-                iterator = mListeners.Begin();
-                iterator.m_Curr = currentEntry;
+                UnidentifiedRestartAt(iterator, currentEntry);
             }
 
             iterator.next();
@@ -122,6 +121,13 @@ public:
     }
 
 private:
+    void UnidentifiedRestartAt(
+        nlDLListIterator<Listener>& iterator, ListenerEntry* current)
+    {
+        iterator = mListeners.Begin();
+        iterator.m_Curr = current;
+    }
+
     DLListContainerBase<Listener, SlotPool<ListenerEntry> > mListeners;
 };
 

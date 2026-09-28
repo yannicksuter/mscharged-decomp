@@ -5,6 +5,16 @@
 
 class MemoryAllocator;
 
+inline unsigned long KB(unsigned long size)
+{
+    return size << 10;
+}
+
+inline unsigned long MB(unsigned long size)
+{
+    return KB(KB(size));
+}
+
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 

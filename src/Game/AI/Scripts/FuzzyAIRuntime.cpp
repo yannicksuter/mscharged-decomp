@@ -709,9 +709,9 @@ extern "C" bool fn_800E923C(void* runtime, cTeam* value)
 extern "C" void fn_800E92E4(
     UnidentifiedScriptMachine* state, const char* name)
 {
-    UnidentifiedStringHash value(name);
-    state->mUnidentified00C.mUnidentifiedHash = value.mUnidentifiedHash;
-    state->mUnidentified00C.mUnidentifiedFunction = value.mUnidentifiedFunction;
+    ScriptTransitionFunc value(name);
+    state->mTransition.mFuncHash = value.mFuncHash;
+    state->mTransition.mNativeFunc = value.mNativeFunc;
 }
 
 void UnidentifiedFuzzyRuntime::DoFunctionCall(unsigned int function)

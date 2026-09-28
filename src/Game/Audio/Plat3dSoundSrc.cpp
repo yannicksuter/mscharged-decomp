@@ -3,6 +3,7 @@
 
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "math.h"
 
 float sSpeedOfSound = 343.5f;
 
@@ -16,14 +17,12 @@ static TweakFloatBinding sRelativeVelocityTweak("g_RelVel", "audio/Stats", &g_Re
 
 void Plat3dSoundSrc::Update(PlatAudioListener* listener, float deltaTime)
 {
-    if ((m_Unknown1C & 0x4000) == 0 && (m_Unknown1C & 0x8000) == 0)
+    if (!count.field_4000 && !count.field_8000)
         return;
 
-    m_Unknown1C &= ~0x4000;
+    count.field_4000 = false;
     nlVector3 ListenerOffset;
-    nlVec3Sub(ListenerOffset,
-        (m_Unknown1C & 0x8000) ? *m_Unknown04.m_Pointer : m_Unknown04.m_Value,
-        listener->m_Position);
+    nlVec3Sub(ListenerOffset, GetPosition(), listener->m_Position);
     m_Unknown10 = nlVec3Length(ListenerOffset);
     if (nlNear(m_Unknown10, 0.0f))
     {
@@ -33,49 +32,53 @@ void Plat3dSoundSrc::Update(PlatAudioListener* listener, float deltaTime)
     }
     g_Dist = m_Unknown10;
 
-    nlVector4 plane;
     nlVector3 projected;
+    nlVector4 plane;
     nlVec4Set(plane, listener->m_Up.x, listener->m_Up.y, listener->m_Up.z, 0.0f);
     nlProjectPointOntoPlane(projected, ListenerOffset, plane);
-    nlVec3Scale(projected, nlRecipSqrt(nlVec3LengthSquared(projected), true));
-    m_Unknown20 = nlVec3DotProduct(projected, listener->m_Unknown2C);
-    if (m_Unknown44 & 0x00800000)
+    nlVec3Normalize(projected, projected);
+    float pan = nlVec3DotProduct(projected, listener->m_Unknown2C);
+    m_Unknown20 = pan;
+    if (m_Flags44.m_UnknownFlag08)
     {
-        int sign = m_Unknown20 < 0.0f ? -1 : 1;
-        m_Unknown20 = sign * nlSqrt(nlAbs(m_Unknown20), true);
+        float magnitude = fabsf(pan);
+        int sign = pan < 0.0f ? -1 : 1;
+        m_Unknown20 = sign * nlSqrt(magnitude, true);
     }
     g_Pan = m_Unknown20;
     m_Unknown14 = 180.0f * m_Unknown20;
 
     nlVec4Set(plane, listener->m_Unknown2C.x, listener->m_Unknown2C.y, listener->m_Unknown2C.z, 0.0f);
     nlProjectPointOntoPlane(projected, ListenerOffset, plane);
-    nlVec3Scale(projected, nlRecipSqrt(nlVec3LengthSquared(projected), true));
-    m_Unknown24 = nlVec3DotProduct(projected, listener->m_View);
-    if (m_Unknown44 & 0x00800000)
+    nlVec3Normalize(projected, projected);
+    float frontBack = nlVec3DotProduct(projected, listener->m_View);
+    m_Unknown24 = frontBack;
+    if (m_Flags44.m_UnknownFlag08)
     {
-        int sign = m_Unknown24 < 0.0f ? -1 : 1;
-        m_Unknown24 = sign * nlSqrt(nlAbs(m_Unknown24), true);
+        float magnitude = fabsf(frontBack);
+        int sign = frontBack < 0.0f ? -1 : 1;
+        m_Unknown24 = sign * nlSqrt(magnitude, true);
     }
-    m_Unknown44 &= 0x00FFFFFF;
+    m_Flags44.m_UnknownFlags00 = 0;
 
-    if (m_Unknown1C & 0x2000)
+    if (count.field_2000)
     {
         nlVec3Set(m_Unknown34, 0.0f, 0.0f, 0.0f);
     }
     else
     {
-        nlVector3 velocity;
-        nlVec3Sub(velocity, m_Unknown28, (m_Unknown1C & 0x8000) ? *m_Unknown04.m_Pointer : m_Unknown04.m_Value);
-        nlVec3Scale(m_Unknown34, velocity, 1.0f / deltaTime);
+        nlVec3Sub(m_Unknown34, m_Unknown28, GetPosition());
+        nlVec3Scale(m_Unknown34, 1.0f / deltaTime);
     }
-    m_Unknown28 = (m_Unknown1C & 0x8000) ? *m_Unknown04.m_Pointer : m_Unknown04.m_Value;
+    m_Unknown28 = GetPosition();
 
     nlVector3 relativeVelocity;
     nlVec3Sub(relativeVelocity, m_Unknown34, listener->m_Unknown38);
-    g_RelVel = nlVec3Length(relativeVelocity);
+    float relativeSpeed = nlVec3Length(relativeVelocity);
+    g_RelVel = relativeSpeed;
     if (g_RelVel != 0.0f)
     {
-        m_Unknown40 = 12.0f * nlFastLog2(1.0f / (1.0f - g_RelVel / sSpeedOfSound));
+        m_Unknown40 = 12.0f * nlFastLog2(1.0f / (1.0f - relativeSpeed / sSpeedOfSound));
     }
 }
 

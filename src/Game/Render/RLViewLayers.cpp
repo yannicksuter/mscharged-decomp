@@ -588,12 +588,12 @@ void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect, 
     fn_80271DE0();
 }
 
-void fn_80273A14(eCLV layer)
+void ShowLayerView(eCLV layer)
 {
     sLayerViews[layer]->m_Visible = true;
 }
 
-void fn_80273A30(eCLV layer)
+void HideLayerView(eCLV layer)
 {
     sLayerViews[layer]->m_Visible = false;
 }

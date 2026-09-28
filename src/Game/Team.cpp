@@ -1711,7 +1711,7 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
             : m_pBallInterceptOrderedFielders[i]->mUnidentified120;
     }
     data.m_nTeamPlayTransFunc
-        = mUnidentified0F0->mScriptMachine->mUnidentified00C.mUnidentifiedHash;
+        = mUnidentified0F0->mScriptMachine->mTransition.mFuncHash;
 
     if (lbl_806DBF04 == 0xFFFF)
     {

@@ -7,17 +7,6 @@
 
 #include <stdlib.h>
 
-bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
-    const char* group, bool reload, float value, float min, float max)
-{
-    bool found = Bind(name, value, group, reload, min, max);
-    if (!found)
-    {
-        *m_pValue = defaultValue;
-    }
-    return found;
-}
-
 int TweakIntBinding::GetDefault()
 {
     return 0;

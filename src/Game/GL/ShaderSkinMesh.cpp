@@ -69,13 +69,13 @@ void ShaderSkinMesh::SetMorphDeltas(unsigned long packetIndex,
 void ShaderSkinMesh::InitializeSkinData()
 {
     packetSkinData = new (8, false)
-        PacketSkinData[pModel->numPackets];
+        PacketSkinData[pModel->GetNumPackets()];
 
     glModelPacket* pPacket = pModel->packets;
     BoneMapList* node = nlDLRingGetStart(boneMaps);
     rigidSkin = true;
 
-    for (int i = 0; i < (int)pModel->numPackets; i++, pPacket++)
+    for (int i = 0; i < (int)pModel->GetNumPackets(); i++, pPacket++)
     {
         CopyMatrices(node);
 
@@ -96,15 +96,16 @@ void ShaderSkinMesh::BuildPacketSkinData(
     PacketSkinData* data, glModelPacket* pPacket,
     BoneMapList* node)
 {
-    unsigned long i;
     unsigned long numBones;
     unsigned long numVertices;
+    unsigned char* buffer;
     SkinWeight* pairs;
 
     numVertices = pPacket->numUniqueVertices;
     numBones = node->m_nBones;
-    pairs = (SkinWeight*)nlMalloc(
+    buffer = (unsigned char*)nlMalloc(
         numVertices * 2 * sizeof(SkinWeight), 8, false);
+    pairs = (SkinWeight*)buffer;
     data->numVertices = numVertices;
     data->numBones = numBones;
     data->boneWeights = new (8, false)
@@ -115,12 +116,17 @@ void ShaderSkinMesh::BuildPacketSkinData(
     const unsigned char (*indices)[4] = (const unsigned char (*)[4])indexStream->address;
     const float (*weights)[4] = (const float (*)[4])weightStream->address;
 
+    BoneSkinWeights* entry;
+    const unsigned char (*pIndices)[4];
+    const float (*pWeights)[4];
+    SkinWeight* pPair;
+    unsigned long i;
     for (i = 0; i < numBones; i++)
     {
-        BoneSkinWeights* entry = &data->boneWeights[i];
-        const unsigned char (*pIndices)[4] = indices;
-        const float (*pWeights)[4] = weights;
-        SkinWeight* pPair = pairs;
+        entry = &data->boneWeights[i];
+        pIndices = indices;
+        pWeights = weights;
+        pPair = pairs;
         int numPairs = 0;
         for (unsigned long j = 0; j < numVertices; j++)
         {
@@ -151,11 +157,11 @@ void ShaderSkinMesh::BuildPacketSkinData(
             entry->numWeights = numPairs;
             entry->weights = (SkinWeight*)nlMalloc(
                 numPairs * sizeof(SkinWeight), 8, false);
-            memcpy(entry->weights, pairs,
+            memcpy(entry->weights, buffer,
                 numPairs * sizeof(SkinWeight));
         }
     }
-    delete[] pairs;
+    delete[] buffer;
 }
 
 void ShaderSkinMesh::SetHierarchy(const cSHierarchy* hierarchy)
@@ -201,11 +207,9 @@ void ShaderSkinMesh::GetPoseMatrix(nlMatrix4* matrix, int nodeIndex)
 
 void ShaderSkinMesh::PrepareToRender()
 {
-    glModelPacket* pPackets;
-    unsigned long numPackets;
     glModelPacket* pPacket = pModel->packets;
     BoneMapList* node = nlDLRingGetStart(boneMaps);
-    for (int i = 0; i < (int)pModel->numPackets; i++, pPacket++)
+    for (int i = 0; i < (int)pModel->GetNumPackets(); i++, pPacket++)
     {
         CopyMatrices(node);
         glSetMaterialBufferParameter(pPacket, SkinMatricesHash,
@@ -218,7 +222,7 @@ void ShaderSkinMesh::PrepareToRender()
     {
         unsigned long count = 0;
         unsigned long offset = 0;
-        for (unsigned long i = 0; i < pModel->numPackets;
+        for (unsigned long i = 0; i < pModel->GetNumPackets();
              i++, offset += sizeof(PacketSkinData))
         {
             PacketSkinData* data =
@@ -235,13 +239,13 @@ void ShaderSkinMesh::PrepareToRender()
         glModel* newModel = (glModel*)glFrameAlloc(sizeof(glModel), GLM_Header);
         softwareModel = newModel;
         memcpy(newModel, pModel, sizeof(glModel));
-        numPackets = newModel->numPackets;
-        pPackets = (glModelPacket*)glFrameAlloc(
+        unsigned long numPackets = newModel->GetNumPackets();
+        glModelPacket* pPackets = (glModelPacket*)glFrameAlloc(
             numPackets * sizeof(glModelPacket), GLM_Header);
         memcpy(pPackets, newModel->packets, numPackets * sizeof(glModelPacket));
         glSetModelPackets(newModel, pPackets, numPackets);
 
-        for (unsigned long i = 0; i < newModel->numPackets; i++)
+        for (unsigned long i = 0; i < newModel->GetNumPackets(); i++)
         {
             glModelPacket* pPacket = &newModel->packets[i];
             unsigned long numStreams = pPacket->numStreams;
@@ -268,7 +272,7 @@ void ShaderSkinMesh::PrepareToRender()
     }
     else
     {
-        for (unsigned long i = 0; i < pModel->numPackets; i++)
+        for (unsigned long i = 0; i < pModel->GetNumPackets(); i++)
         {
             pModel->packets[i].skinnedVertices = 0;
         }
@@ -285,7 +289,7 @@ void ShaderSkinMesh::CreateMorphBuffer(unsigned long packetIndex,
         nlZeroMemory(morphBuffer, count * sizeof(nlVector3));
         for (unsigned long morphIndex = 0; morphIndex < numMorphs; morphIndex++)
         {
-            float w = morphWeights[morphIndex].morphWeight;
+            float w = GetMorphWeight(morphIndex);
             if (0.0f != w)
             {
                 entry =
@@ -306,15 +310,16 @@ void ShaderSkinMesh::CreateMorphBuffer(unsigned long packetIndex,
 void ShaderSkinMesh::SoftwareSkinModel(glModel* model)
 {
     nlMatrix4 tempMatrices[32];
+    unsigned long size;
     BoneMapList* node = nlDLRingGetStart(boneMaps);
     glModelPacket* pPacket = model->packets;
 
-    for (unsigned long packetIndex = 0; packetIndex < model->numPackets;
+    for (unsigned long packetIndex = 0; packetIndex < model->GetNumPackets();
          packetIndex++, pPacket++)
     {
         PacketSkinData* data = &packetSkinData[packetIndex];
         unsigned long numVertices = data->numVertices;
-        unsigned long size = numVertices * sizeof(nlVector3);
+        size = numVertices * sizeof(nlVector3);
         nlVector3* outVertices = (nlVector3*)glFrameAlloc(size, GLM_VertexData);
         nlZeroMemory(outVertices, size);
         pPacket->skinnedVertices = (unsigned long)outVertices;
@@ -334,10 +339,12 @@ void ShaderSkinMesh::SoftwareSkinModel(glModel* model)
         const nlVector3* inVertices = (const nlVector3*)glFindModelStream(pPacket, 1)->address;
         const float (*pMatrices)[3][4] =
             *(const float (**)[3][4])glGetMaterialParameterData(pPacket, SkinMatricesHash);
+        nlMatrix4* pTempMatrix = tempMatrices;
         for (unsigned long i = 0; i < node->m_nBones; i++)
         {
-            glxCopyMatrix(tempMatrices[i], *pMatrices);
+            glxCopyMatrix(*pTempMatrix, *pMatrices);
             pMatrices++;
+            pTempMatrix++;
         }
 
         for (unsigned long matrixOffset = 0; matrixOffset < data->numBones; matrixOffset++)
@@ -466,41 +473,4 @@ void ShaderSkinMesh::SoftwareSkinModel(glModel* model)
         }
         node = node->m_next;
     }
-}
-
-PacketSkinData::~PacketSkinData()
-{
-    delete[] boneWeights;
-}
-
-BoneSkinWeights::~BoneSkinWeights()
-{
-    delete[] weights;
-}
-
-PacketSkinData::PacketSkinData()
-    : numVertices(0)
-    , numBones(0)
-    , boneWeights(0)
-{
-}
-
-BoneSkinWeights::BoneSkinWeights()
-    : numWeights(0)
-    , weights(0)
-{
-}
-
-glModel* ShaderSkinMesh::GetModel()
-{
-    bool softwareSkinning = false;
-    if (!rigidSkin && m_Unknown0C == 0)
-    {
-        softwareSkinning = true;
-    }
-    if (softwareSkinning)
-    {
-        return softwareModel;
-    }
-    return pModel;
 }

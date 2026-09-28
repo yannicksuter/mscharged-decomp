@@ -27,7 +27,7 @@ void TeamPlayMachine::UnidentifiedVirtual2()
 
     TutorialMegastrikeDesire* desire =
         new (nlMalloc(sizeof(TutorialMegastrikeDesire), 8, false))
-            TutorialMegastrikeDesire(5, UnidentifiedStateTransition(lbl_806E20B8));
+            TutorialMegastrikeDesire(5, TransitionFunc(g_UnsetTransitionFunc));
     UnidentifiedAddState(5, desire, false);
 }
 

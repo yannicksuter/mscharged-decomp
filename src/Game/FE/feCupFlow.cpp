@@ -15,7 +15,7 @@
 #include "Game/FE/fePopupMenu.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/Render/FrontEndPresentation.h"
-#include "Game/Render/tu_80279AC8.h"
+#include "Game/Render/StadiumWorldObjects.h"
 #include "Game/SH/SHCupNews.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/TweakQuery.h"
@@ -25,7 +25,7 @@
 
 bool gMainMenuInputResetPending;
 int gCupAwardModelCount;
-StadiumGoalObject_8027A2C8* gCupAwardModels[10];
+StadiumCupTrophyDrawable* gCupAwardModels[10];
 unsigned int gFEControllerIndex;
 bool gFEPointerEnabled[4];
 
@@ -746,7 +746,7 @@ extern "C" void fn_80208950(TLComponentInstance* component,
     third->SetString(buffer);
 }
 
-extern "C" void fn_802092A4(StadiumGoalObject_8027A2C8* object)
+void RegisterCupTrophy(StadiumCupTrophyDrawable* object)
 {
     if (gCupAwardModelCount == 9)
     {
