@@ -32,14 +32,19 @@
 #include <revolution/tpl.h>
 #include <string.h>
 
-extern BaseGameSceneManager* g_pGameSceneManager;
-
-
 class UnidentifiedHBMScene : public BaseSceneHandler
 {
 public:
     virtual void UnidentifiedVirtual2C();
 };
+
+static inline void CallHomeButtonWarning(UnidentifiedHBMScene* scene)
+{
+    if (scene != 0)
+    {
+        scene->UnidentifiedVirtual2C();
+    }
+}
 
 class HBMHideEvent
     : public UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>
@@ -425,20 +430,20 @@ void HBMManager::OnHomeButtonPressed()
 
     if ((state & 0x00080000) != 0)
     {
-        if (g_pGameSceneManager != 0)
+        if (GameSceneManager::Instance() != 0)
         {
             if (g_pLocalization->m_CurrentLanguage
                 == nlLocalization::LangJapanese)
             {
-                scene = g_pGameSceneManager->GetScene((SceneList)19);
+                scene = GameSceneManager::Instance()->GetScene((SceneList)19);
             }
             else
             {
-                scene = g_pGameSceneManager->GetScene((SceneList)18);
+                scene = GameSceneManager::Instance()->GetScene((SceneList)18);
             }
             if (scene != 0)
             {
-                ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();
+                CallHomeButtonWarning((UnidentifiedHBMScene*)scene);
             }
         }
     }
@@ -449,18 +454,18 @@ void HBMManager::OnHomeButtonPressed()
             scene = g_pOverlayManager->GetScene((SceneList)25);
             if (scene != 0)
             {
-                ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();
+                CallHomeButtonWarning((UnidentifiedHBMScene*)scene);
             }
         }
     }
     else if ((state & 0x00400000) != 0)
     {
-        if (g_pGameSceneManager != 0)
+        if (GameSceneManager::Instance() != 0)
         {
-            scene = g_pGameSceneManager->GetScene((SceneList)25);
+            scene = GameSceneManager::Instance()->GetScene((SceneList)25);
             if (scene != 0)
             {
-                ((UnidentifiedHBMScene*)scene)->UnidentifiedVirtual2C();
+                CallHomeButtonWarning((UnidentifiedHBMScene*)scene);
             }
         }
     }

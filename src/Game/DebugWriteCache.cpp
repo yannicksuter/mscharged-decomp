@@ -86,8 +86,8 @@ void DebugWriteCache::WriteFloat(u16* type,
         = GetCurrentDebugBuffer(this);
     DebugWriteRecordHeader header;
     header.mType = recordType;
-    header.mSize = sizeof(value);
     header.mMarker = 0xDADA;
+    header.mSize = sizeof(value);
     header.mPaddedSize = header.mSize;
     if (header.mPaddedSize % 4 != 0)
     {

@@ -150,10 +150,17 @@ public:
 
     static void Free(void* ptr)
     {
-        unsigned long size;
-        memcpy(&size, (char*)ptr - 4, 4);
+        unsigned long size = ReadSize(ptr);
         sTempStringAllocatorPool.allocator.pool.Free(
             (char*)ptr - 4, size);
+    }
+
+private:
+    static unsigned long ReadSize(const void* ptr)
+    {
+        unsigned long size;
+        memcpy(&size, (const char*)ptr - 4, 4);
+        return size;
     }
 };
 

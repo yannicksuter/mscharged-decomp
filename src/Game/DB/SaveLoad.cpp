@@ -662,7 +662,7 @@ void SaveLoad::HandleNANDResult(s32 result)
     {
         ResetTask::s_resetPaused = false;
         FEPopupMenu* popup = PushSavePopup();
-        popup->Create((ePopupMenu)0x45, Function<FnVoidVoid>(DeleteSaveFile));
+        popup->Create((ePopupMenu)0x45, DeleteSaveFile);
         InOperation = true;
     }
     else if (result == -4)
@@ -946,14 +946,14 @@ void SaveLoad::CheckSpaceAnswer(u32 answer, bool online)
         if (online)
         {
             popup->Create((ePopupMenu)0x40,
-                Function<FnVoidVoid>(BeginReset),
-                Function<FnVoidVoid>(ContinueWithoutSaving));
+                Function<FnVoidVoid>(ContinueWithoutSaving),
+                Function<FnVoidVoid>(BeginReset));
         }
         else
         {
             popup->Create((ePopupMenu)0x3F,
-                Function<FnVoidVoid>(BeginReset),
-                Function<FnVoidVoid>(CancelSave));
+                Function<FnVoidVoid>(CancelSave),
+                Function<FnVoidVoid>(BeginReset));
         }
     }
     else if ((answer & 2) != 0 || (answer & 8) != 0)
@@ -962,14 +962,14 @@ void SaveLoad::CheckSpaceAnswer(u32 answer, bool online)
         if (online)
         {
             popup->Create((ePopupMenu)0x42,
-                Function<FnVoidVoid>(BeginReset),
-                Function<FnVoidVoid>(ContinueWithoutSaving));
+                Function<FnVoidVoid>(ContinueWithoutSaving),
+                Function<FnVoidVoid>(BeginReset));
         }
         else
         {
             popup->Create((ePopupMenu)0x41,
-                Function<FnVoidVoid>(BeginReset),
-                Function<FnVoidVoid>(CancelSave));
+                Function<FnVoidVoid>(CancelSave),
+                Function<FnVoidVoid>(BeginReset));
         }
     }
     else

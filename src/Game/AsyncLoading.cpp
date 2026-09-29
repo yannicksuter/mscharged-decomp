@@ -123,13 +123,14 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/main.h"
 
+#include <revolution/os/OSThread.h>
+#include <revolution/os/OSTime_fwd.h>
+
 #define OS_BUS_CLOCK_SPEED           (*(volatile u32*)0x800000F8)
 #define OS_TIME_SPEED                (OS_BUS_CLOCK_SPEED / 4)
 #define OSTicksToMilliseconds(ticks) ((ticks) / (OS_TIME_SPEED / 1000))
 
 bool IsNetworkOrRecordedGame();
-extern "C" u32 OSGetTick();
-extern "C" void OSYieldThread();
 
 extern "C" void fn_8013DB18();
 void ShutdownWarbleRendering(void*);

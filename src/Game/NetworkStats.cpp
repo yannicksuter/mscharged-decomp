@@ -583,7 +583,8 @@ static inline u32 GetMinutesSinceNetworkSeasonStart(
     tDebugPrintManager::Print(DC_NETWORK,
         "Time from now %d %d %d to start of season index %d is %d days\n",
         year, current.mMonth, current.mDay, season, days);
-    u32 since = days * 1440 + time.min + time.hour * 60;
+    u32 since = days * 1440;
+    since += time.min + time.hour * 60;
     ++since;
     if (since < 1)
     {

@@ -116,8 +116,7 @@ void ScreenTransitionManager::AddTransitionToMap(char* name, ScreenTransition* p
     unsigned long transitionHash = glHash(name);
     m_TransitionMap.Add(transitionHash, pTransition);
 
-    BasicString<char, Detail::TempStringPoolAllocator> nameString(name);
-    m_Transitions.push_back(nameString);
+    m_Transitions.push_back(name);
 }
 
 void ScreenTransitionManager::EnableRandomTransition(const char* filter)

@@ -73,7 +73,8 @@ void HomeButtonFade::Render()
     glSetCurrentTextureState(glHandleizeTextureState());
     glSetRasterState(GLS_DepthTest, 0);
     glSetCurrentRasterState(glHandleizeRasterState());
-    poly.SetupRectangle(0.0f, 0.0f, 640.0f, 480.0f, -1.0f);
+    float depth = -1.0f;
+    poly.SetupRectangle(0.0f, 0.0f, 640.0f, 480.0f, depth);
     SetPolyColour(poly, 0, 0, 0, darkenAmount);
     poly.Attach(GetLayerView(eCLV_HomeButtonFadeOut), 0, 0);
     glSetDefaultState(false);

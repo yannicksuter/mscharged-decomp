@@ -955,9 +955,9 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     if (bCanDamage && mpDamageTarget != NULL)
     {
         nlVector3 v3HitSpot;
-        nlVector3 v3CurPos;
         nlVector3 targetDelta;
         nlVector3 currentDelta;
+        nlVector3 v3CurPos;
         nlVector3 v3PrevPos;
         float fPercent;
         nlVector3 v3BallVel;
@@ -981,10 +981,8 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             v3PrevPos.z = 0.3f;
         }
 
-        nlVec3Set(targetDelta, v3HitSpot.x - v3PrevPos.x,
-            v3HitSpot.y - v3PrevPos.y, v3HitSpot.z - v3PrevPos.z);
-        nlVec3Set(currentDelta, v3CurPos.x - v3PrevPos.x,
-            v3CurPos.y - v3PrevPos.y, v3CurPos.z - v3PrevPos.z);
+        nlVec3Sub(targetDelta, v3HitSpot, v3PrevPos);
+        nlVec3Sub(currentDelta, v3CurPos, v3PrevPos);
 
         float targetDist = nlSqrt(targetDelta.GetLengthSq3D(), true);
         float currentDist = nlSqrt(currentDelta.GetLengthSq3D(), true);
@@ -1004,8 +1002,8 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             fPercent += 0.5f * (1.0f - targetDist / 5.0f);
         }
 
-        nlVecLerp(currentDelta, currentDelta, targetDelta, fPercent);
-        nlVec3Add(v3CurPos, v3PrevPos, currentDelta);
+        nlVecLerp(targetDelta, currentDelta, targetDelta, fPercent);
+        nlVec3Add(v3CurPos, v3PrevPos, targetDelta);
 
         m_v3Position = v3CurPos;
         m_pPhysicsBall->SetPosition(
@@ -1015,12 +1013,9 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
         FakeBallWorld::InvalidateBallCache();
         m_bBallPathChangeCount = m_bBallPathChangeCount + 1;
 
-        fPrevZVel = m_v3Velocity.z;
         const nlVector3& ballVelocity = m_v3Velocity;
-        float distanceSq = currentDelta.GetLengthSq3D();
-        float projectedScale
-            = nlVec3DotProduct(ballVelocity, currentDelta) / distanceSq;
-        nlVec3Scale(v3BallVel, currentDelta, projectedScale);
+        fPrevZVel = ballVelocity.z;
+        nlVec3Project(v3BallVel, ballVelocity, targetDelta);
         v3BallVel.z = fPrevZVel;
 
         float speedSq = v3BallVel.GetLengthSq3D();
@@ -1052,15 +1047,16 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
                 pFielder->m_nBip01JointIndex_0xA4);
-            nlVector3 v3Delta;
-            v3Delta.x = v3JointPosition.x - pFielder->mUnidentified024.m_v3Position.x;
-            v3Delta.y = v3JointPosition.y - pFielder->mUnidentified024.m_v3Position.y;
+            nlVector2 v2Delta;
+            v2Delta.x = v3JointPosition.x - pFielder->mUnidentified024.m_v3Position.x;
+            v2Delta.y = v3JointPosition.y - pFielder->mUnidentified024.m_v3Position.y;
             float fDistance
-                = nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
+                = nlSqrt(v2Delta.x * v2Delta.x + v2Delta.y * v2Delta.y,
                     true);
             float fHeight
                 = pFielder->mUnidentified024.m_v3Position.z - v3JointPosition.z;
 
+            nlVector3 v3Position;
             nlVector3 v3Velocity = m_v3Velocity;
             pFielder->SetFacingDirection(
                 (unsigned short)(int)(10430.378f
@@ -1071,7 +1067,6 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             v3Velocity.z = 0.0f;
             nlVec3Normalize(v3Velocity, v3Velocity);
 
-            nlVector3 v3Position;
             nlVec3ScaleAdd(
                 v3Position, -fDistance, v3Velocity, m_v3Position);
             v3Position.z += fHeight;

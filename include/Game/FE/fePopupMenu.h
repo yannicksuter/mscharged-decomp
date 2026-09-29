@@ -69,6 +69,11 @@ public:
         Create(type, option1, Function<FnVoidVoid>(Nothing));
     }
 
+    void Create(ePopupMenu type, FnVoidVoid* callback)
+    {
+        Create(type, Function<FnVoidVoid>(callback));
+    }
+
     void Create(ePopupMenu type, Function<FnVoidVoid> option1, Function<FnVoidVoid> option2)
     {
         Create(type, option1, option2, Function<FnVoidVoid>(Nothing));
