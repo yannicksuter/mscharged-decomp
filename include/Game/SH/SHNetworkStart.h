@@ -27,14 +27,14 @@ public:
     void SetActionButtons(int state);
     void SelectMenuItem(TLComponentInstance* component);
     void DeselectMenuItem(TLComponentInstance* component);
-    void fn_801FC7E4(int state);
-    void fn_801FCA60(TLComponentInstance* component, int state);
-    void fn_801FD834();
-    void fn_801FDD08();
+    void EnterState(int state);
+    void OnMenuItemApply(TLComponentInstance* component, int state);
+    void UpdateMenuInput();
+    void UpdateLobby();
 
     /* 0x020 */ MenuList<TLComponentInstance> mMenuItems;
     /* 0x234 */ int mState;
-    /* 0x238 */ bool mUnidentified238;
+    /* 0x238 */ bool mShowPlayer2Controls;
     /* 0x23C */ TLTextInstance* mPlayerText[7];
     /* 0x258 */ unsigned short mPlayerNames[7][11];
 }; // size: 0x2F4

@@ -37,6 +37,7 @@
 #include "NL/nlString.h"
 
 #include <math.h>
+#include "Game/CharacterTriggers.h"
 
 static const LooseBallContactAnimInfo lbl_804DC1B0[5] = {
     { 0x29, 3.0f, 0x0000, 0xFFFF },
@@ -96,7 +97,6 @@ extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_80016DF8(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
-extern "C" void fn_801B75C8(cFielder*, int, int, int, int);
 extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
@@ -170,19 +170,19 @@ static inline float DoCalculatePassSpeed(const nlVector2& distance,
     float fPassCharge = NormalizeVal(
                             nlVec2Length(distance), passDistMin, passDistMax)
         - lbl_806E0E48;
-    if (fn_800155A0(g_pBall, 0) > 1.0f)
+    if (GetBallChargeValue(g_pBall, 0) > 1.0f)
     {
         fPassCharge += lbl_806DC1E4;
     }
-    if (fn_800155A0(g_pBall, 0) > 2.0f)
+    if (GetBallChargeValue(g_pBall, 0) > 2.0f)
     {
         fPassCharge += lbl_806DC1E8;
     }
-    if (fn_800155A0(g_pBall, 0) > 3.0f)
+    if (GetBallChargeValue(g_pBall, 0) > 3.0f)
     {
         fPassCharge += lbl_806DC1EC;
     }
-    if (fn_800155A0(g_pBall, 0) >= 4.0f)
+    if (GetBallChargeValue(g_pBall, 0) >= 4.0f)
     {
         fPassCharge += lbl_806DC1F0;
     }
@@ -449,7 +449,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                 else if (fn_800C0E54())
                 {
                     if (fabsf(mEstimated.fReceivePassAnimTime
-                            - m_pFielder->fn_800C2F64()->get_fTime()) <= 0.06666667f)
+                            - m_pFielder->GetCurrentAnimController()->get_fTime()) <= 0.06666667f)
                     {
                         m_pFielder->InitActionOneTouchPassFromVolley(mpOneTouchPassTarget, mbOneTouchVolley);
                     }
@@ -472,7 +472,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                 else if (fn_800C0E54())
                 {
                     if (fabsf(mEstimated.fReceivePassAnimTime
-                            - m_pFielder->fn_800C2F64()->get_fTime()) <= 0.06666667f)
+                            - m_pFielder->GetCurrentAnimController()->get_fTime()) <= 0.06666667f)
                     {
                         m_pFielder->InitActionLateOneTimerFromVolley();
                     }
@@ -1521,7 +1521,7 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
     fn_80016DF8(g_pBall, pPasser, &v3BallVelocity,
         eSpinType, bVolleyPass && !bHighArc, false);
     pPasser->SetNoPickUpTime(lbl_806DC1A0);
-    fn_801B75C8((cFielder*)pPasser, 0, 0, 0, 0);
+    EmitBallShot((cFielder*)pPasser, BALL_EFFECT_S2S_SUPER_SHOT, 0, 0, 0);
 
     if (pPassTarget->CanReceivePass() && !bHighArc)
     {

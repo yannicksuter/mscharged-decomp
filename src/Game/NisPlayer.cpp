@@ -1574,7 +1574,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     case NIS_TARGET_UNIDENTIFIED_14:
     {
         cCharacter* character = g_pCharacters[mGoalScorerCharIndex];
-        if (character != NULL && character->fn_8001E168())
+        if (character != NULL && character->IsCaptain())
         {
             if (((cPlayer*)character)->m_pTeam->m_nSide == 0)
             {
@@ -1592,7 +1592,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     case NIS_TARGET_UNIDENTIFIED_22:
     {
         cCharacter* character = g_pCharacters[mGoalScorerCharIndex];
-        if (character != NULL && character->fn_8001E168())
+        if (character != NULL && character->IsCaptain())
         {
             if (((cPlayer*)character)->m_pTeam->m_nSide == 0)
             {
@@ -1610,7 +1610,7 @@ void NisPlayer::Load(const char* nisType, NisTarget target, NisUseStadiumOffset 
     case NIS_TARGET_UNIDENTIFIED_21:
     {
         cCharacter* character = g_pCharacters[mGoalScorerCharIndex];
-        if (character != NULL && character->fn_8001E168())
+        if (character != NULL && character->IsCaptain())
         {
             if (((cPlayer*)character)->m_pTeam->m_nSide == 0)
             {

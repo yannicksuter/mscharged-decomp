@@ -178,9 +178,8 @@ public:
 class DesireInterceptBall : public Desire
 {
 public:
-    DesireInterceptBall(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireInterceptBall(int state)
+        : Desire(state, ScriptTransitionFunc("TransDesireInterceptBall"))
     {
     }
 
@@ -358,9 +357,8 @@ public:
 class DesireMegaStrike : public Desire
 {
 public:
-    DesireMegaStrike(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireMegaStrike(int state)
+        : Desire(state, ScriptTransitionFunc("TransDesireMegastrikeMeter"))
     {
     }
 

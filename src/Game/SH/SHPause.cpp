@@ -45,19 +45,19 @@ PauseMenuScene::PauseMenuScene()
     : mGameIsOver(false)
     , mQuitDelay(0.0f)
     , mQuittingController(FE_ALL_PADS)
-    , mUnidentified530(false)
+    , mInitialized(false)
     , mTransitionTo(TT_IN)
     , mIsInTransition(false)
     , mStartAnimAtEnd(false)
-    , mUnidentified54A(false)
-    , mUnidentified54B(false)
+    , mSelectionMade(false)
+    , mIntroSoundPlayed(false)
 {
     mDelayBeforeUnpause = 0.1f;
     for (int i = 0; i < 7; ++i)
     {
-        mUnidentified044[i].mContext = (void*)i;
+        mOptionButtons[i].mContext = (void*)i;
         // Retail also clears three words beyond the four controller counts.
-        mUnidentified534[i] = 0;
+        mHoverCounts[i] = 0;
     }
 }
 
@@ -73,7 +73,7 @@ void PauseMenuScene::OnSelectRESUME(TLComponentInstance* instance)
 {
     TransitionOut(TT_OUT);
     g_pFEInput->Reset();
-    mUnidentified54A = true;
+    mSelectionMade = true;
     mLastSelectedIndex = 0;
     FEAudio::PlayAnimAudioEvent(0xDF52130F, 0, 0, 1);
 }
@@ -83,7 +83,7 @@ void PauseMenuScene::OnSelectRESUME(TLComponentInstance* instance)
  */
 void PauseMenuScene::OnSelectQUIT()
 {
-    mUnidentified54A = true;
+    mSelectionMade = true;
     if (FrontEnd::m_bGameOver)
     {
         g_pOverlayManager->Pop();
@@ -130,7 +130,7 @@ void PauseMenuScene::OnSelectQUIT()
 void PauseMenuScene::OnSelectPopupNOFORFEIT()
 {
     WorldDarkening::Instance().Fade(100.0f, 0.0f);
-    mUnidentified54A = false;
+    mSelectionMade = false;
 }
 
 /**
@@ -139,7 +139,7 @@ void PauseMenuScene::OnSelectPopupNOFORFEIT()
 void PauseMenuScene::OnSelectPopupYESFORFEIT()
 {
     FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide, InlineHasher("Layer"))->m_bVisible = false;
-    mUnidentified54A = true;
+    mSelectionMade = true;
     GameInfoManager* gameInfoManager = GameInfoManager::Instance();
     CupManager* cupManager = g_pCupManager;
     if (gameInfoManager->mIsInStrikers101Mode)
@@ -184,7 +184,7 @@ void PauseMenuScene::SceneCreated()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     for (int i = 0; i < 7; ++i)
     {
-        mUnidentified028[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(
             presentation->m_currentSlide, "Layer", MENU_NAMES[i]);
     }
     FEAudio::EnableSounds(true);
@@ -192,17 +192,17 @@ void PauseMenuScene::SceneCreated()
     {
         if (GetRegion() == 1)
         {
-            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
-            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
-            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "down", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "down", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
         }
         else
         {
             const char* string = g_pStrikerChallenge->mCurrentChallenge < 10
                 ? "101_OBJECTIVES_BUTTON" : "CHALLENGES_OBJECTIVES_BUTTON";
-            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "off", "option")->SetStringId(string);
-            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "over", "option")->SetStringId(string);
-            FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified028[4], "down", "option")->SetStringId(string);
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "off", "option")->SetStringId(string);
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId(string);
+            FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "down", "option")->SetStringId(string);
         }
     }
 }
@@ -229,19 +229,19 @@ void PauseMenuScene::Update(float fDeltaT)
         mPresentation->m_fadeDuration = 999.9f;
         mStartAnimAtEnd = false;
     }
-    if (!mUnidentified54B)
+    if (!mIntroSoundPlayed)
     {
-        mUnidentified54B = true;
+        mIntroSoundPlayed = true;
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
     }
     BaseSceneHandler::Update(fDeltaT);
-    if (!mUnidentified530)
+    if (!mInitialized)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
             return;
-        fn_8023A85C();
-        mUnidentified530 = true;
+        InitializePointerButtons();
+        mInitialized = true;
         for (int i = 0; i < 4; ++i)
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
@@ -260,31 +260,31 @@ void PauseMenuScene::Update(float fDeltaT)
             FrontEnd::ExitMenuState();
             break;
         case 2:
-            mUnidentified54A = true;
+            mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)81, SCREEN_FORWARD, true);
             break;
         case 3:
-            mUnidentified54A = true;
+            mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)82, SCREEN_FORWARD, true);
             break;
         case 4:
-            mUnidentified54A = true;
+            mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)83, SCREEN_FORWARD, true);
             break;
         case 5:
-            mUnidentified54A = true;
+            mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)103, SCREEN_NOTHING, true);
             break;
         case 6:
         {
-            mUnidentified54A = true;
+            mSelectionMade = true;
             PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push((SceneList)92, SCREEN_FORWARD, true));
-            scene->mUnidentified5D8 = mControllingInput;
+            scene->mControllingInput = mControllingInput;
             scene->SetDisplayMode(12);
             break;
         }
         case 7:
-            mUnidentified54A = true;
+            mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)104, SCREEN_NOTHING, true);
             break;
         }
@@ -295,7 +295,7 @@ void PauseMenuScene::Update(float fDeltaT)
     u8 goToChooseSides = 0;
     for (int i = 0; i < 4; ++i)
     {
-        if (mUnidentified54A)
+        if (mSelectionMade)
             return;
         bool curConnected = g_pFEInput->IsConnected((eFEINPUT_PAD)i) && IsFreeStylePad(i);
         if (!curConnected && GameInfoManager::Instance()->GetPlayingSide((unsigned short)i) != -1)
@@ -307,7 +307,7 @@ void PauseMenuScene::Update(float fDeltaT)
                     g_pOverlayManager->Pop();
                     FESceneManager::Instance()->ForceImmediateStackProcessing();
                 }
-                mUnidentified54A = true;
+                mSelectionMade = true;
                 g_pOverlayManager->Push((SceneList)81, SCREEN_FORWARD, true);
             }
             goToChooseSides = 1;
@@ -325,8 +325,8 @@ void PauseMenuScene::Update(float fDeltaT)
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 30, true, 0);
         TLComponentInstance* cursor = GetPointerInstance(i);
         for (int j = 0; j < 7; ++j)
-            mUnidentified044[j].HandlePointerEvent(&event);
-        if (mUnidentified534[i] > 0)
+            mOptionButtons[j].HandlePointerEvent(&event);
+        if (mHoverCounts[i] > 0)
             cursor->SetActiveSlide("A", true, false);
         else
             cursor->SetActiveSlide("cursor", true, false);
@@ -351,58 +351,58 @@ void PauseMenuScene::TransitionOut(TransitionType newtype)
 /**
  * Offset/Address/Size: 0x1408 | 0x8023A85C | size: 0x338
  */
-void PauseMenuScene::fn_8023A85C()
+void PauseMenuScene::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (PauseMenuScene::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, PauseMenuScene*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback callback0(PointerBinding(MemFun(&PauseMenuScene::fn_8023AB94), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback1(PointerBinding(MemFun(&PauseMenuScene::fn_8023AC58), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback2(PointerBinding(MemFun(&PauseMenuScene::fn_8023AD04), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback0(PointerBinding(MemFun(&PauseMenuScene::OnOptionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback1(PointerBinding(MemFun(&PauseMenuScene::OnOptionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback callback2(PointerBinding(MemFun(&PauseMenuScene::OnOptionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 7; ++i)
     {
-        mUnidentified044[i].SetInstanceBounds(mUnidentified028[i], true, 0.0f, 0.0f, 1.0f, 0.5f);
-        mUnidentified044[i].SetPointerEnterCallback(callback0);
-        mUnidentified044[i].SetPointerLeaveCallback(callback1);
-        mUnidentified044[i].SetPointerPressCallback(callback2);
+        mOptionButtons[i].SetInstanceBounds(mOptionInstances[i], true, 0.0f, 0.0f, 1.0f, 0.5f);
+        mOptionButtons[i].SetPointerEnterCallback(callback0);
+        mOptionButtons[i].SetPointerLeaveCallback(callback1);
+        mOptionButtons[i].SetPointerPressCallback(callback2);
     }
 }
 
 /**
  * Offset/Address/Size: 0x1740 | 0x8023AB94 | size: 0xC4
  */
-void PauseMenuScene::fn_8023AB94(unsigned int index, void* context)
+void PauseMenuScene::OnOptionPointerEnter(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
-    ++mUnidentified534[index];
-    if (!mUnidentified044[which].HasOtherPointerState(1, index))
+    ++mHoverCounts[index];
+    if (!mOptionButtons[which].HasOtherPointerState(1, index))
     {
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-        mUnidentified028[which]->SetActiveSlide("over", true, false);
+        mOptionInstances[which]->SetActiveSlide("over", true, false);
     }
-    mUnidentified044[which].SetPointerState(1, index);
+    mOptionButtons[which].SetPointerState(1, index);
 }
 
 /**
  * Offset/Address/Size: 0x1804 | 0x8023AC58 | size: 0xAC
  */
-void PauseMenuScene::fn_8023AC58(unsigned int index, void* context)
+void PauseMenuScene::OnOptionPointerLeave(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
-    --mUnidentified534[index];
-    if (!mUnidentified044[which].HasOtherPointerState(1, index))
-        mUnidentified028[which]->SetActiveSlide("off", true, false);
-    mUnidentified044[which].SetPointerState(0, index);
+    --mHoverCounts[index];
+    if (!mOptionButtons[which].HasOtherPointerState(1, index))
+        mOptionInstances[which]->SetActiveSlide("off", true, false);
+    mOptionButtons[which].SetPointerState(0, index);
 }
 
 /**
  * Offset/Address/Size: 0x18B0 | 0x8023AD04 | size: 0x280
  */
-void PauseMenuScene::fn_8023AD04(unsigned int index, void* context)
+void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
 {
-    if (mUnidentified54A)
+    if (mSelectionMade)
         return;
-    mUnidentified54A = true;
+    mSelectionMade = true;
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     switch ((unsigned int)context)
     {

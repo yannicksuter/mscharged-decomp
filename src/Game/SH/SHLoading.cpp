@@ -422,10 +422,10 @@ void MatchLoadingScene::DisplayChallengeInfo()
 {
     char objective[64];
     if (g_pStrikerChallenge->mCurrentChallenge < 10)
-        nlSNPrintf(objective, sizeof(objective), "tutorial_objective_%s", g_pStrikerChallenge->GetTitle());
+        nlSNPrintf(objective, sizeof(objective), "tutorial_objective_%s", g_pStrikerChallenge->GetName());
     else
-        nlSNPrintf(objective, sizeof(objective), "objective_%s", g_pStrikerChallenge->GetTitle());
-    mTextInstances[0]->SetStringId(g_pStrikerChallenge->GetDifficulty());
+        nlSNPrintf(objective, sizeof(objective), "objective_%s", g_pStrikerChallenge->GetName());
+    mTextInstances[0]->SetStringId(g_pStrikerChallenge->GetTitle());
     mTextInstances[1]->SetStringId(objective);
     mTextInstances[2]->m_bVisible = false;
     mTextInstances[3]->m_bVisible = false;

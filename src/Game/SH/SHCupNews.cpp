@@ -87,9 +87,9 @@ void CupNewsScene::SceneCreated()
     CupManager* cupManager = CupManager::Instance();
     int captain = cupManager->GetUserSelectedCupTeam();
     bool formatOpponent = false;
-    int opponentCaptain = cupManager->fn_8010AFA4();
+    int opponentCaptain = cupManager->GetFinalOpponentTeam();
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
-    int rank = cupManager->fn_8010E460();
+    int rank = cupManager->GetUserTeamRank();
     int cup = cupManager->GetCurrentMode();
     int mood = -1;
     char cupName[0x10];
@@ -196,7 +196,7 @@ void CupNewsScene::SceneCreated()
     case 6:
     {
         int statistic = 0;
-        CupManager::Instance()->fn_8010D9C4(&statistic);
+        CupManager::Instance()->GetGoalsForLeader(&statistic);
         String name(g_pLocalization->GetString(character.GetDisplayNameKey()));
         nlSNPrintf(mStoryStringID, 0x40, "ST_CUP_AWARDS_GOLDENBOOT_%s", cupName);
         nlSNPrintf(mHeadlineStringID, 0x40, "STH_CUP_AWARDS_GOLDENBOOT_%s", cupName);
@@ -210,7 +210,7 @@ void CupNewsScene::SceneCreated()
     case 7:
     {
         int statistic = 0;
-        CupManager::Instance()->fn_8010DE2C(&statistic);
+        CupManager::Instance()->GetGoalsAgainstLeader(&statistic);
         String name(g_pLocalization->GetString(character.GetDisplayNameKey()));
         nlSNPrintf(mStoryStringID, 0x40, "ST_CUP_AWARDS_BRICK_%s", cupName);
         nlSNPrintf(mHeadlineStringID, 0x40, "STH_CUP_AWARDS_BRICK_%s", cupName);

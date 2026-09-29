@@ -418,6 +418,58 @@ BOOL NHTTPi_BufFull(void* mutexInfo, NHTTPResponseInfo* response)
     return result;
 }
 
+static inline s32 NHTTPi_SendProxyAuthorization(NHTTPThreadData* threadData_p)
+{
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
+    s32 sendStatus;
+
+    NHTTPi_SEND(threadData_p, "Proxy-Authorization: Basic ", 27, sendStatus);
+    if (sendStatus != 0)
+    {
+        return sendStatus;
+    }
+    NHTTPi_SEND(threadData_p, req_p->proxyAuthorization,
+        req_p->proxyAuthorizationLength, sendStatus);
+    if (sendStatus != 0)
+    {
+        return sendStatus;
+    }
+    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    if (sendStatus != 0)
+    {
+        return sendStatus;
+    }
+    return 0;
+}
+
+static inline s32 NHTTPi_SendBasicAuthorization(NHTTPThreadData* threadData_p)
+{
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
+    s32 sendStatus;
+
+    NHTTPi_SEND(threadData_p, "Authorization: Basic ", 21, sendStatus);
+    if (sendStatus != 0)
+    {
+        return sendStatus;
+    }
+    NHTTPi_SEND(threadData_p, req_p->authorization,
+        req_p->authorizationLength, sendStatus);
+    if (sendStatus != 0)
+    {
+        return sendStatus;
+    }
+    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    if (sendStatus != 0)
+    {
+        return sendStatus;
+    }
+    return 0;
+}
+
 s32 NHTTPi_SendProxyConnectMethod(NHTTPThreadData* threadData_p)
 {
     char portString[8];
@@ -486,22 +538,7 @@ s32 NHTTPi_SendProxyConnectMethod(NHTTPThreadData* threadData_p)
     {
         return err;
     }
-    {
-        NHTTPRequestInfo* current =
-            NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->reqQueue->request;
-        NHTTPi_SEND(threadData_p, "Proxy-Authorization: Basic ", 27, err);
-        if (err != 0)
-        {
-            return err;
-        }
-        NHTTPi_SEND(threadData_p, current->proxyAuthorization,
-            current->proxyAuthorizationLength, err);
-        if (err != 0)
-        {
-            return err;
-        }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, err);
-    }
+    err = NHTTPi_SendProxyAuthorization(threadData_p);
     if (err != 0)
     {
         return err;
@@ -1322,21 +1359,7 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     if (req_p->proxyEnabled != 0 && req_p->secure == 0
         && req_p->proxyAuthorizationLength > 0)
     {
-        NHTTPRequestInfo* current =
-            NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->reqQueue->request;
-        NHTTPi_SEND(
-            threadData_p, "Proxy-Authorization: Basic ", 27, sendStatus);
-        if (sendStatus != 0)
-        {
-            return sendStatus;
-        }
-        NHTTPi_SEND(threadData_p, current->proxyAuthorization,
-            current->proxyAuthorizationLength, sendStatus);
-        if (sendStatus != 0)
-        {
-            return sendStatus;
-        }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendProxyAuthorization(threadData_p);
     }
     if (sendStatus != 0)
     {
@@ -1344,21 +1367,7 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     }
     if (req_p->authorizationLength > 0)
     {
-        NHTTPRequestInfo* current =
-            NHTTPi_GetReqInfoP(NHTTPi_GetSystemInfoP())->reqQueue->request;
-        NHTTPi_SEND(
-            threadData_p, "Authorization: Basic ", 21, sendStatus);
-        if (sendStatus != 0)
-        {
-            return sendStatus;
-        }
-        NHTTPi_SEND(threadData_p, current->authorization,
-            current->authorizationLength, sendStatus);
-        if (sendStatus != 0)
-        {
-            return sendStatus;
-        }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendBasicAuthorization(threadData_p);
     }
     if (sendStatus != 0)
     {

@@ -58,17 +58,11 @@ extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_800DAFCC(const nlVector3*, const nlVector3*, cFielder*,
     int, float, float, float, float);
 extern "C" cFielder* fn_800D66C4(cFielder*);
-extern "C" void fn_800395C0(cFielder*);
 extern "C" void fn_80316968(shdStateMachine*);
-extern "C" void fn_80038158(cFielder*, int);
-extern "C" void fn_801BC094(cFielder*);
-extern "C" void fn_801B881C(cFielder*);
-extern "C" void fn_80039CF0(cFielder*, int);
 extern "C" void fn_803198F4();
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E3F8(cFielder*);
-extern "C" void fn_801BBE80(cFielder*);
 extern "C" void fn_80060A00(void*, cFielder*);
 extern "C" const nlVector2 lbl_804DC348[6];
 extern "C" const nlVector2 lbl_804DC378[2];
@@ -204,7 +198,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         mUnidentified078 = lbl_806DC320;
         m_pFielder->fn_800501F0(
             (bool)UserControlledT(m_pFielder->m_pTeam));
-        fn_801B97DC(m_pFielder);
+        EmitBowserSmoke(m_pFielder);
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
             && (m_pFielder->fn_8002E060() == 21
@@ -245,7 +239,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     case KOOPA:
         m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
         m_pFielder->fn_8001EE74(lbl_806DC25C, lbl_806DC250, -1.0f);
-        fn_801BBE80(m_pFielder);
+        EmitSuperGrow(m_pFielder);
         mUnidentified078 = lbl_806DC258;
         fn_800367B4(m_pFielder);
         result = true;
@@ -253,7 +247,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
     case BIRDO:
         m_pFielder->m_pTweaks = m_pFielder->mUnidentified328;
         m_pFielder->fn_8001EE74(lbl_806DC25C, lbl_806DC250, -1.0f);
-        fn_801BBE80(m_pFielder);
+        EmitSuperGrow(m_pFielder);
         mUnidentified078 = lbl_806DC258;
         fn_800367B4(m_pFielder);
         result = true;
@@ -322,7 +316,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         {
             gSuperAbilityTeam = (eTeamID)GameInfoManager::Instance()->GetTeam(fielder->m_pTeam->m_nSide);
             ((SuperAbilityOverlay*)g_pOverlayManager->GetScene((SceneList)102))->Start();
-            PlaySound(fielder->mUnidentified318, 0x790F135F, 0, 0);
+            PlaySound(fielder->m_uSoundSlotId, 0x790F135F, 0, 0);
             fn_80060A00(g_pGame, fielder);
         }
 
@@ -339,7 +333,7 @@ bool DesireSuperPower::UnidentifiedInitialize(void* context)
         }
         else
         {
-            PlayCaptainPowerupStream(m_pFielder->mUnidentified318,
+            PlayCaptainPowerupStream(m_pFielder->m_uSoundSlotId,
                 sound, m_pFielder);
         }
     }
@@ -412,7 +406,7 @@ void DesireSuperPower::UnidentifiedCleanup()
     case DAISY:
         m_pFielder->fn_80050008();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
-        fn_801B98A0(m_pFielder);
+        EndBowserSmoke(m_pFielder);
         break;
     case WALUIGI:
         fn_80038158(m_pFielder, 0);
@@ -434,7 +428,7 @@ void DesireSuperPower::UnidentifiedCleanup()
         fn_80038158(m_pFielder, 0);
         break;
     case HAMMERBROS:
-        fn_801BB0DC(m_pFielder);
+        KillDKSuperCharge(m_pFielder);
         fn_80038158(m_pFielder, 0);
         delete (AvoidablePoint*)mpDKShockAvoidable;
         mpDKShockAvoidable = 0;
@@ -443,13 +437,13 @@ void DesireSuperPower::UnidentifiedCleanup()
         m_pFielder->m_pTweaks
             = m_pFielder->mUnidentified32C;
         m_pFielder->fn_8001EE74(1.0f, lbl_806DC254, 1.0f);
-        fn_801BC094(m_pFielder);
+        EmitSuperShrink(m_pFielder);
         break;
     case BIRDO:
         m_pFielder->m_pTweaks
             = m_pFielder->mUnidentified32C;
         m_pFielder->fn_8001EE74(1.0f, lbl_806DC254, 1.0f);
-        fn_801BC094(m_pFielder);
+        EmitSuperShrink(m_pFielder);
         break;
     case LUIGI:
         m_pFielder->fn_8004FA34();
@@ -489,7 +483,7 @@ void DesireSuperPower::UnidentifiedCleanup()
             = m_pFielder->mUnidentified32C;
         fn_80039CF0(m_pFielder, 0);
         m_pFielder->bYoshiInWindup = false;
-        fn_801B881C(m_pFielder);
+        EmitYoshiShellBreak(m_pFielder);
         gNPCManager->mUnidentified024->Break();
         break;
     }
@@ -1271,7 +1265,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CE588(
             nlVector3 pos;
             pos.Set(current.x, current.y, 0.0f);
             nlVector3 delta;
-            fn_800D1C4C(&delta, &pos, fn_800D1450(fielder));
+            fn_800D1C4C(&delta, &pos, GetCharacterPosition(fielder));
             float distance = fn_800D1C80((const nlVector2*)&oldPos, (const nlVector2*)&pos);
             unsigned short angle = fn_800D1CCC(delta.y, delta.x);
             result = 3;
@@ -1439,7 +1433,7 @@ void DesireSuperPower::fn_800D01A0(DesireUpdate* update, float fDeltaT)
                     unsigned long sound = PowerupBase::GetSoundType(
                         (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
-                    PlaySound(m_pFielder->mUnidentified318, sound, 0, 0);
+                    PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
                     fn_800367B4(m_pFielder);
                     m_pFielder->fn_800D0534(lbl_806DC298);
                     m_pFielder->mUnidentified3F4 = lbl_806DC298;
@@ -1598,7 +1592,7 @@ extern "C" unsigned short fn_800D1448(const cCharacter* character)
 /**
  * Offset/Address/Size: 0x8D54 | 0x800D1450 | size: 0x8
  */
-extern "C" const nlVector3* fn_800D1450(const cCharacter* character)
+const nlVector3* GetCharacterPosition(const cCharacter* character)
 {
     return &character->mUnidentified024.m_v3Position;
 }
@@ -1805,7 +1799,7 @@ extern "C" bool fn_800CAC8C(DesireSuperPower* self, void*)
 /**
  * Offset/Address/Size: 0x16B8 | 0x800C9DB4 | size: 0x198
  */
-extern "C" void fn_800C9DB4(DesireSuperPower* self)
+void EmitBowserJrShriek(DesireSuperPower* self)
 {
     fn_80038158(self->m_pFielder, 0);
     nlVector3 vel;

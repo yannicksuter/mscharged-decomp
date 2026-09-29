@@ -10,10 +10,10 @@ void MatrixEffectCam::Update(float dt)
     up.y = 0.0f;
     up.z = 1.0f;
 
-    if (!lbl_806E0F18[0])
+    if (!gMatrixEffectCameraFrozen[0])
     {
         nlVector3 currentCameraPosition = mCameraPosition;
-        nlVec3ScaleAdd(mCameraPosition, lbl_806DC510[0], mUnidentified078, mTargetPosition);
+        nlVec3ScaleAdd(mCameraPosition, gMatrixEffectCameraDistance[0], mUnidentified078, mTargetPosition);
         nlVec3WeightedSum(mCameraPosition, 0.85f, currentCameraPosition, 0.15f, mCameraPosition);
         glMatrixLookAt(mViewMatrix, mCameraPosition, mTargetPosition, up);
     }

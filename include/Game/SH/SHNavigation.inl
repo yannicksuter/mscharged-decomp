@@ -4,7 +4,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/tlInstance.inl"
 
-inline void SHNavigation::fn_801CA9E0(bool visible)
+inline void SHNavigation::SetTimerVisible(bool visible)
 {
     mTimer->SetVisible(visible);
 }

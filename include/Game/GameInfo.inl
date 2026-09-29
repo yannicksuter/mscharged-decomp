@@ -33,7 +33,7 @@ inline BaseGameSceneManager* GetOverlayManager()
     return g_pOverlayManager;
 }
 
-inline StrikerChallenge* fn_801CA670()
+inline StrikerChallenge* GetStrikerChallenge()
 {
     return g_pStrikerChallenge;
 }

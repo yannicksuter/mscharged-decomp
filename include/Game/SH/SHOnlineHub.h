@@ -33,24 +33,24 @@ public:
     /* 0x3B4 */ TLComponentInstance* mHelpButtonInstance;
     /* 0x3B8 */ FEBackButton mBackButton;
     /* 0x490 */ ButtonComponent mUnidentified490;
-    /* 0x4B4 */ bool mUnidentified4B4;
-    /* 0x4B8 */ int mUnidentified4B8[4];
-    /* 0x4C8 */ u16 mUnidentified4C8[48];
-    /* 0x528 */ u16 mUnidentified528[48];
-    /* 0x588 */ float mUnidentified588;
-    /* 0x58C */ bool mUnidentified58C;
-    /* 0x58D */ bool mUnidentified58D;
-    /* 0x590 */ NetworkRankingMeta mUnidentified590;
-    /* 0x5A8 */ NetworkRankingMeta mUnidentified5A8;
-    /* 0x5C0 */ NetworkStatsPlayer mUnidentified5C0;
-    /* 0x628 */ NetworkRankingMeta mUnidentified628;
-    /* 0x640 */ u16 mUnidentified640[24];
-    /* 0x670 */ u16 mUnidentified670[48];
-    /* 0x6D0 */ u16 mUnidentified6D0[48];
-    /* 0x730 */ u16 mUnidentified730[48];
-    /* 0x790 */ u16 mUnidentified790[128];
-    /* 0x890 */ int mUnidentified890;
-    /* 0x894 */ int mUnidentified894;
+    /* 0x4B4 */ bool mInitialized;
+    /* 0x4B8 */ int mHoverCounts[4];
+    /* 0x4C8 */ u16 mFriendsText[48];
+    /* 0x528 */ u16 mDaysRemainText[48];
+    /* 0x588 */ float mRefreshTimer;
+    /* 0x58C */ bool mPopupActive;
+    /* 0x58D */ bool mHasStrikerOfTheDay;
+    /* 0x590 */ NetworkRankingMeta mPointsStats;
+    /* 0x5A8 */ NetworkRankingMeta mRankStats;
+    /* 0x5C0 */ NetworkStatsPlayer mStrikerOfTheDay;
+    /* 0x628 */ NetworkRankingMeta mStrikerOfTheDayStats;
+    /* 0x640 */ u16 mPlayerNameText[24];
+    /* 0x670 */ u16 mRankText[48];
+    /* 0x6D0 */ u16 mTodayPointsText[48];
+    /* 0x730 */ u16 mStrikerPointsText[48];
+    /* 0x790 */ u16 mStrikerDescriptionText[128];
+    /* 0x890 */ int mState;
+    /* 0x894 */ int mPressedItem;
 }; // size 0x898
 
 static const char* sOnlineHubButtonNames[4] = {

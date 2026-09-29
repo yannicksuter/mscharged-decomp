@@ -26,7 +26,7 @@ static THPVideoInfo videoInfo;
 static PlatTexture* pTex[4];
 
 static unsigned int lbl_806DFAC0 = -1;
-static bool lbl_806DFAC4 = true;
+static bool g_bSyncedDecode = true;
 
 static bool g_bActive;
 static bool lbl_806E2419;
@@ -62,9 +62,9 @@ bool fn_80370E64()
     return true;
 }
 
-void fn_80370E90(bool value)
+void SetSyncedDecode(bool value)
 {
-    lbl_806DFAC4 = value;
+    g_bSyncedDecode = value;
 }
 
 bool MovieStart(
@@ -209,7 +209,7 @@ bool MoviePlay()
     }
 
     bool decode = false;
-    if (lbl_806DFAC4)
+    if (g_bSyncedDecode)
     {
         if (frame >= lbl_806E2428)
         {
@@ -226,7 +226,7 @@ bool MoviePlay()
     {
         ++lbl_806E242C;
 
-        if (lbl_806DFAC4)
+        if (g_bSyncedDecode)
         {
             GXSetDrawDone();
             GXFlush();
@@ -268,22 +268,22 @@ bool MoviePlay()
     return true;
 }
 
-bool fn_803713C4()
+bool IsMovieActive()
 {
     return g_bActive;
 }
 
-bool fn_803713CC()
+bool IsMovieFinished()
 {
     return lbl_806E2434;
 }
 
-void fn_803713D4()
+void ClearMovieFinished()
 {
     lbl_806E2434 = false;
 }
 
-unsigned int fn_803713E0()
+unsigned int GetMovieFrame()
 {
     return lbl_806E2424;
 }

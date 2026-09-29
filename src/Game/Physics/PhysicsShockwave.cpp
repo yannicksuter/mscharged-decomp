@@ -14,12 +14,11 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 #include "types.h"
+#include "Game/Camera/CameraMan.h"
 
 class cFielder;
 class EffectsGroup;
 
-extern "C" void fn_800F026C(
-    const nlVector3&, float, float);
 
 extern SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool;
 extern "C" void QueueCollisionShockwave(CollisionShockwaveData*);
@@ -282,7 +281,7 @@ PhysicsShockwave* CreateDaisyFistImpact(
         EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
         controller->SetPosition(*position);
     }
-    fn_800F026C(sDaisyFistCameraShakeAmplitude,
+    FireCameraNoiseFilter(sDaisyFistCameraShakeAmplitude,
         gDaisyFistCameraShakeFrequency, gDaisyFistCameraShakeDuration);
     return CreateShockwave(*position, SHOCKWAVE_DAISY_FIST,
         gDaisyFistShockwaveRadius, gDaisyFistShockwaveExpansionRate, owner);

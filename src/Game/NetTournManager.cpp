@@ -31,7 +31,7 @@ static NetTournManager* sNetTournManager;
 static bool sCupPersonaOverrideActive;
 static int sCupPersonaOverride;
 
-static float s_fDefaultTimeToStartGames = 50.0f;
+static float s_fDefaultTimeToStartGames = 25.0f;
 static int s_nSendGameInProgressUpdateEvery = 1;
 static int s_nSendGameInProgressMajorUpdate = 5;
 int s_nOverrideCupPersona = 10;
@@ -146,6 +146,25 @@ void NetTournManager::TransitionOnlineMenuToTournament(
         (SceneList)0x22, SCREEN_NOTHING, true);
 }
 
+int NetTournManager::ChooseFirstRoundMachine(int machineCount, bool* used)
+{
+    int candidate = (int)nlRandomf((float)machineCount, &nlDefaultSeed);
+    for (int tries = 0; tries < machineCount; ++tries)
+    {
+        if (candidate >= machineCount)
+        {
+            candidate = 0;
+        }
+        if (!used[candidate])
+        {
+            used[candidate] = true;
+            return candidate;
+        }
+        ++candidate;
+    }
+    return 0;
+}
+
 void NetTournManager::GenerateFirstRoundSeedings(
     int machineCount, u8* seedings)
 {
@@ -161,22 +180,7 @@ void NetTournManager::GenerateFirstRoundSeedings(
     int i = 0;
     for (; i < machineCount; ++i)
     {
-        int candidate = (int)nlRandomf((float)machineCount, &nlDefaultSeed);
-        for (int tries = 0; tries < machineCount; ++tries)
-        {
-            if (candidate >= machineCount)
-            {
-                candidate = 0;
-            }
-            if (!used[candidate])
-            {
-                used[candidate] = true;
-                goto assigned;
-            }
-            ++candidate;
-        }
-        candidate = 0;
-    assigned:
+        int candidate = ChooseFirstRoundMachine(machineCount, used);
         seedings[order[i]] = candidate;
     }
 
@@ -533,7 +537,7 @@ void NetTournManager::StartReadyGames()
                 if (mCurrentRound < GetNumPlayoffRounds() - 1)
                 {
                     int relativeIndex = gameIndex - mFirstGameInRound;
-                    int nextGame = mLastGameInRound + relativeIndex / 2 + 1;
+                    int nextGame = (mLastGameInRound + 1) + relativeIndex / 2;
                     NetworkDraftTeam* team = NetworkDraft::Instance()
                         ->FindDraftTeamByPeerIndex(game->mMachines[1]);
                     short side = relativeIndex % 2;
@@ -546,7 +550,7 @@ void NetTournManager::StartReadyGames()
                 if (mCurrentRound < GetNumPlayoffRounds() - 1)
                 {
                     int relativeIndex = gameIndex - mFirstGameInRound;
-                    int nextGame = mLastGameInRound + relativeIndex / 2 + 1;
+                    int nextGame = (mLastGameInRound + 1) + relativeIndex / 2;
                     NetworkDraftTeam* team = NetworkDraft::Instance()
                         ->FindDraftTeamByPeerIndex(game->mMachines[0]);
                     short side = relativeIndex % 2;
@@ -1250,8 +1254,8 @@ void NetTournManager::AttachTournamentTrophy(void* presentation)
 {
     mTrophyPresentation = presentation;
     glModel* model;
-    DrawableObject* object
-        = (DrawableObject*)FEModelManager::Instance()->GetObject(4);
+    WorldObject_80129EE0* object
+        = (WorldObject_80129EE0*)FEModelManager::Instance()->GetObject(4);
     model = ((DrawableObject*)mTrophyPresentation)->m_pModel;
     glModelSetMatrix(model, *object->GetWorldMatrix());
     ((DrawableObject*)mTrophyPresentation)
@@ -1338,18 +1342,4 @@ int NetTournManager::GetCurrentRoundType() const
 int NetTournManager::GetCurrentMode() const
 {
     return 3;
-}
-
-nlMatrix4* WorldObject_80129EE0::GetWorldMatrix()
-{
-    return &mWorldMatrix;
-}
-
-void WorldDrawable::SetWorldMatrix(const nlMatrix4& matrix)
-{
-    mWorldMatrix = matrix;
-}
-
-void WorldDrawable::ReleaseResources()
-{
 }

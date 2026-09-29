@@ -211,7 +211,7 @@ public:
 
     /* 0x310 */ cBall* m_pBall;
     /* 0x314 */ cTeam* m_pTeam;
-    /* 0x318 */ u32 mUnidentified318;
+    /* 0x318 */ u32 m_uSoundSlotId;
 
 public:
     /* 0x31C */ SpaceSearch* m_pSpaceSearch;

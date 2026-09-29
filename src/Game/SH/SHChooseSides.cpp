@@ -32,14 +32,9 @@
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/BaseGameSceneManager.h"
+#include "Game/SH/SHStrikerTimesChallenge.h"
 
 
-
-class TU8021CBD0Scene : public BaseSceneHandler
-{
-public:
-    virtual void fn_8021CBD0(int value);
-};
 
 static const char* sSideGroupNames[2] = { "home_group", "away_group" };
 extern const char* sSidekickSlotNames[3];
@@ -48,16 +43,16 @@ extern const char* sSidekickSlotNames[3];
  * Offset/Address/Size: 0x0 | 0x8021B1EC | size: 0x2B0
  */
 SHChooseSides2::SHChooseSides2(eCSContext context, ScreenMovement movement)
-    : mUnidentified1C(false)
-    , mUnidentified1D(false)
-    , mUnidentified1E(false)
-    , mUnidentified1F(false)
+    : mInitialized(false)
+    , mHomeAwayEntering(false)
+    , mExiting(false)
+    , mHelpPressed(false)
     , mHomeAwayComponent((void*)2)
     , mHelpComponent()
     , mMovement(movement)
     , mHomeAwayBox(0)
     , mContext(context)
-    , mUnidentified408(0)
+    , mHomeAwayButtonMask(0)
     , mState(0)
 {
     if (movement == SCREEN_BACK || context == PAUSE)
@@ -80,22 +75,22 @@ SHChooseSides2::SHChooseSides2(eCSContext context, ScreenMovement movement)
         FrontEndPresentation::GetInstance()->Call("StartHomeAwayCaptainHologramSequence");
     }
 
-    mUnidentified2F0.SetPopScene(false);
+    mBackButton.SetPopScene(false);
     if (mContext == CUP)
     {
-        mUnidentified2F0.SetPushBackScene(false);
+        mBackButton.SetPushBackScene(false);
     }
     else if (mContext == TOURNAMENT)
     {
-        mUnidentified2F0.SetPushBackScene(false);
+        mBackButton.SetPushBackScene(false);
     }
     else if (mContext != PAUSE)
     {
-        mUnidentified2F0.SetPushBackScene(false);
+        mBackButton.SetPushBackScene(false);
     }
     else
     {
-        mUnidentified2F0.Disable();
+        mBackButton.Disable();
     }
 
     mControllerComponents[0].mContext = 0;
@@ -121,7 +116,7 @@ SHChooseSides2::~SHChooseSides2()
         if (object != 0)
         {
             object->ResetButtons(true);
-            object->SetButtonVisibility(mUnidentified408, false);
+            object->SetButtonVisibility(mHomeAwayButtonMask, false);
         }
     }
 }
@@ -164,8 +159,8 @@ void SHChooseSides2::SceneCreated()
     const CharacterInfo& info0 = GetCharacterInfo(GetCharacterIndexFromCaptain(team0));
     const CharacterInfo& info1 = GetCharacterInfo(GetCharacterIndexFromCaptain(team1));
 
-    mUnidentified3F0[0] = GetTeamColour(info0, info1, true);
-    mUnidentified3F0[1] = GetTeamColour(info1, info0, true);
+    mTeamColours[0] = GetTeamColour(info0, info1, true);
+    mTeamColours[1] = GetTeamColour(info1, info0, true);
 
     TLComponentInstance* screen = 0;
     SHNavigation* object = GetNavigationScene();
@@ -176,20 +171,20 @@ void SHChooseSides2::SceneCreated()
             object->HideButtons();
             screen = object->GetButton(4);
             mHomeAwayBox = object->GetButton(0x10);
-            mUnidentified408 = 0x10;
+            mHomeAwayButtonMask = 0x10;
         }
         else if (mContext != PAUSE)
         {
             object->HideButtons();
             screen = object->GetButton(4);
             mHomeAwayBox = object->GetButton(0x20);
-            mUnidentified408 = 0x20;
+            mHomeAwayButtonMask = 0x20;
         }
         else
         {
             object->HideButtons();
             mHomeAwayBox = object->GetButton(0x20);
-            mUnidentified408 = 0x20;
+            mHomeAwayButtonMask = 0x20;
         }
     }
 
@@ -283,7 +278,7 @@ void SHChooseSides2::SceneCreated()
 
     if (mContext != PAUSE)
     {
-        mUnidentified2F0.SetButtonInstance(screen);
+        mBackButton.SetButtonInstance(screen);
     }
 
     for (int team = 0; team < 2; ++team)
@@ -295,15 +290,15 @@ void SHChooseSides2::SceneCreated()
 
         TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
             mSideGroups[team], "empty", sSideGroupNames[team], "white_8x8");
-        instance->SetAssetColour(mUnidentified3F0[team]);
+        instance->SetAssetColour(mTeamColours[team]);
 
         instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
             mSideGroups[team], "over", sSideGroupNames[team], "white_8x8");
-        instance->SetAssetColour(mUnidentified3F0[team]);
+        instance->SetAssetColour(mTeamColours[team]);
 
         instance = FEFinder<TLInstance, 2>::FindOrDefault<>(
             mSideGroups[team], "controllers", sSideGroupNames[team], "white_8x8");
-        instance->SetAssetColour(mUnidentified3F0[team]);
+        instance->SetAssetColour(mTeamColours[team]);
     }
 
     TLComponentInstance* help = FEFinder<TLComponentInstance, 4>::FindOrDefault<>(
@@ -338,7 +333,7 @@ void SHChooseSides2::SceneCreated()
 void SHChooseSides2::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
-    mUnidentified1F = false;
+    mHelpPressed = false;
 
     if (mContext != PAUSE)
     {
@@ -359,7 +354,7 @@ void SHChooseSides2::Update(float fDeltaT)
 
         if (mState == 0)
         {
-            if (!mUnidentified1C)
+            if (!mInitialized)
             {
                 SHNavigation* object = GetNavigationScene();
                 if (mContext == CUP || mContext == TOURNAMENT)
@@ -375,10 +370,10 @@ void SHChooseSides2::Update(float fDeltaT)
                     object->SetButtons(32, true);
                 }
 
-                object->SetButtonVisibility(mUnidentified408, false);
+                object->SetButtonVisibility(mHomeAwayButtonMask, false);
                 BindChooseSideInstances();
                 UpdateHomeAwayVisibility();
-                mUnidentified1C = true;
+                mInitialized = true;
                 mState = 1;
 
                 for (int i = 0; i < 4; ++i)
@@ -413,7 +408,7 @@ void SHChooseSides2::Update(float fDeltaT)
         }
     }
 
-    if (mUnidentified1D)
+    if (mHomeAwayEntering)
     {
         TLSlide* slide = mHomeAwayBox->GetActiveSlide();
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
@@ -427,7 +422,7 @@ void SHChooseSides2::Update(float fDeltaT)
                 SetDoneButtonBounds(&mHomeAwayComponent, mHomeAwayBox, 0);
             }
             mHomeAwayComponent.mDisabled = false;
-            mUnidentified1D = false;
+            mHomeAwayEntering = false;
         }
     }
 
@@ -471,7 +466,7 @@ void SHChooseSides2::Update(float fDeltaT)
         mControllerComponents[0].HandlePointerEvent(&event);
         mControllerComponents[1].HandlePointerEvent(&event);
 
-        if (mUnidentified1E)
+        if (mExiting)
         {
             return;
         }
@@ -481,7 +476,7 @@ void SHChooseSides2::Update(float fDeltaT)
             ReleaseController(i);
         }
 
-        bool leave = mContext != PAUSE && mUnidentified2F0.UpdateBackButton(event, fDeltaT);
+        bool leave = mContext != PAUSE && mBackButton.UpdateBackButton(event, fDeltaT);
         if (leave)
         {
             mState = 3;
@@ -495,13 +490,13 @@ void SHChooseSides2::Update(float fDeltaT)
         }
 
         mHelpComponent.HandlePointerEvent(&event);
-        if (!mUnidentified1F)
+        if (!mHelpPressed)
         {
             if (mPlayingSides[i] == -1)
             {
                 controller->SetActiveSlide("holding", true, false);
             }
-            else if (mUnidentified2F0.mPointerInside[i] || mControllerCounts[i] > 0)
+            else if (mBackButton.mPointerInside[i] || mControllerCounts[i] > 0)
             {
                 controller->SetActiveSlide("A", true, false);
             }
@@ -538,11 +533,11 @@ void SHChooseSides2::LeaveScene()
             SetPointerColour(i, white);
         }
         FrontEndPresentation::GetInstance()->Call("TransitionFromStrikerChallengeChooseSides");
-        TU8021CBD0Scene* scene = (TU8021CBD0Scene*)GameSceneManager::Instance()->Push(
-            (SceneList)77, SCREEN_BACK, false);
+        SHStrikerTimesChallenge* scene = static_cast<SHStrikerTimesChallenge*>(GameSceneManager::Instance()->Push(
+            (SceneList)77, SCREEN_BACK, false));
         if (scene != 0)
         {
-            scene->fn_8021CBD0(8);
+            scene->SetDisplayMode(8);
         }
     }
     else if (mContext != PAUSE)
@@ -693,7 +688,7 @@ void SHChooseSides2::OnControllerPointerPress(unsigned int index, void* context)
         selected->m_bVisible = true;
         highlighted->m_bVisible = true;
 
-        nlColour colour = mUnidentified3F0[side];
+        nlColour colour = mTeamColours[side];
         SetPointerColour(index, colour);
         FEAudio::PlayAnimAudioEvent(0xB3586309, 0, 0, 1);
     }
@@ -802,7 +797,7 @@ void SHChooseSides2::OnHomeAwayPointerPress(unsigned int, void*)
     }
 
     mPresentation->SetActiveSlide("out", true);
-    mUnidentified1E = true;
+    mExiting = true;
 }
 
 /**
@@ -820,7 +815,7 @@ void SHChooseSides2::Proceed()
     if (mContext == CUP)
     {
         FEAudio::PlayAnimAudioEvent(0xF8350154, 0, 0, 1);
-        g_pCupManager->mUnidentified869C = 1;
+        g_pCupManager->mGameInProgress = 1;
         CupManager* info = CupManager::Instance();
         info->mPreviousGameTeams[0] = GameInfoManager::Instance()->GetTeam(0);
         info->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);
@@ -909,7 +904,7 @@ void SHChooseSides2::OnHelpPointerPress(unsigned int, void*)
         popup->mUnidentified9A1 = true;
     }
 
-    mUnidentified1F = true;
+    mHelpPressed = true;
 }
 
 /**
@@ -966,8 +961,8 @@ void SHChooseSides2::UpdateHomeAwayVisibility()
     {
         if (!hasPlayingSide)
         {
-            mUnidentified1D = false;
-            object->SetButtonVisibility(mUnidentified408, false);
+            mHomeAwayEntering = false;
+            object->SetButtonVisibility(mHomeAwayButtonMask, false);
             mHomeAwayComponent.Disable();
 
             for (int i = 0; i < 4; ++i)
@@ -983,7 +978,7 @@ void SHChooseSides2::UpdateHomeAwayVisibility()
     else if (hasPlayingSide == true)
     {
         FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, 1);
-        object->SetButtonVisibility(mUnidentified408, true);
+        object->SetButtonVisibility(mHomeAwayButtonMask, true);
 
         if (mContext == CUP || mContext == TOURNAMENT)
         {
@@ -993,7 +988,7 @@ void SHChooseSides2::UpdateHomeAwayVisibility()
         {
             mHomeAwayBox->SetActiveSlide("in", true, false);
         }
-        mUnidentified1D = true;
+        mHomeAwayEntering = true;
     }
 }
 

@@ -120,7 +120,7 @@ void FielderTweaks::Init()
     mUnidentified3E4.BindWithDefault("Star Speed Boost", 15.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
     fGreenShellSpeed.BindWithDefault("Shell Speed", 12.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
     mUnidentified404.BindWithDefault("Shell Time", 1.5f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified414.BindWithDefault("Bowser Explode Radius", 5.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
+    fBowserExplodeRadius.BindWithDefault("Bowser Explode Radius", 5.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
     mUnidentified424.BindWithDefault("Terrain Min Speed Adjust", 1.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
     mUnidentified434.BindWithDefault("Terrain Max Speed Adjust", 1.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);
     mUnidentified444.BindWithDefault("Terrain Min Slippery Adjust", 1.0f, mUnidentified4E0, false, 0.0f, 0.0f, 0.0f);

@@ -96,7 +96,7 @@ cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
     m_pController = NULL;
     m_pBall = NULL;
     m_pTeam = NULL;
-    mUnidentified318 = 0;
+    m_uSoundSlotId = 0;
     {
         cSHierarchy* pHierarchy = m_pPoseAccumulator->m_BaseSHierarchy;
         m_nBallJointIndex = pHierarchy->GetNodeIndexByID(nlStringLowerHash("ball"));
@@ -174,15 +174,15 @@ void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
 extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam)
 {
     pPlayer->m_pTeam = pTeam;
-    pPlayer->mUnidentified318 = pTeam->m_nSide == 0 ? 1 : 5;
-    bool bSidekick = !pPlayer->fn_8001E168();
+    pPlayer->m_uSoundSlotId = pTeam->m_nSide == 0 ? 1 : 5;
+    bool bSidekick = !pPlayer->IsCaptain();
     if (bSidekick && pPlayer->m_eClassType == FIELDER)
     {
-        pPlayer->mUnidentified318 += pPlayer->mUnidentified1E4.m_ID;
+        pPlayer->m_uSoundSlotId += pPlayer->mUnidentified1E4.m_ID;
     }
     else if (pPlayer->m_eClassType == GOALIE)
     {
-        pPlayer->mUnidentified318 = 9;
+        pPlayer->m_uSoundSlotId = 9;
     }
 }
 
@@ -403,8 +403,8 @@ void cPlayer::fn_80095DF4(float fDeltaT)
                     float fWholeSeconds = floor(mUnidentified1E4.m_tFireTimer.GetSeconds());
                     if (mUnidentified1E4.m_tFireTimer.GetSeconds() - fWholeSeconds < 0.02f)
                     {
-                        unsigned long sound = fn_8001E168() ? 0x3642C41B : 0x00E606A2;
-                        PlaySound(mUnidentified318, sound, NULL, NULL);
+                        unsigned long sound = IsCaptain() ? 0x3642C41B : 0x00E606A2;
+                        PlaySound(m_uSoundSlotId, sound, NULL, NULL);
                     }
                 }
                 if (mUnidentified1E4.m_tFireTimer.Countdown(fDeltaT, 0.0f))
@@ -626,7 +626,7 @@ void cPlayer::PickupBall(cBall* pBall)
             bOneTouchShot = true;
         if (!bOneTouchShot)
         {
-            fn_801B73B8(this, false);
+            EmitBallImpact(this, false);
             PlayRumbleAction(1, GetGlobalPad());
         }
     }
@@ -838,7 +838,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
                 pPlayer->KillEffect(pGroup);
             }
         }
-        fn_801BCAD4(pPlayer);
+        EmitSkillshotHandFire(pPlayer);
         if (fDuration > 0.0f)
         {
             pPlayer->mUnidentified1E4.m_tFireTimer.SetSeconds(fDuration);
@@ -846,15 +846,15 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
     }
     else
     {
-        fn_801BCC9C(pPlayer);
+        EmitSkillshotPlayerOnFire(pPlayer);
         pPlayer->AddRandomDirt();
         pPlayer->fn_8001F1C0(2);
         fn_8002E3F8((cFielder*)pPlayer);
         pPlayer->mUnidentified1E4.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)
         {
-            unsigned long sound = pPlayer->fn_8001E168() ? 0x3642C41B : 0x00E606A2;
-            PlaySound(pPlayer->mUnidentified318, sound, NULL, NULL);
+            unsigned long sound = pPlayer->IsCaptain() ? 0x3642C41B : 0x00E606A2;
+            PlaySound(pPlayer->m_uSoundSlotId, sound, NULL, NULL);
         }
     }
 }
@@ -868,11 +868,11 @@ void cPlayer::fn_800974B0()
 {
     if (m_eClassType == GOALIE)
     {
-        fn_801BCC38(this);
+        KillSkillshotHandFire(this);
     }
     else
     {
-        fn_801BCE2C(this);
+        KillSkillshotPlayerOnFire(this);
     }
     mUnidentified1E4.m_tFireTimer.m_uWasRunning = mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0;
     mUnidentified1E4.m_tFireTimer.m_uPackedTime = 0;
@@ -1315,7 +1315,7 @@ void cPlayer::UnidentifiedVirtual1C()
 extern "C" void fn_80098A68(UnidentifiedEventData_800673FC* pData)
 {
     PlaySound(
-        pData->mUnidentified00->mUnidentified318,
+        pData->mUnidentified00->m_uSoundSlotId,
         0x9F35CA0F,
         NULL,
         NULL);
@@ -1324,7 +1324,7 @@ extern "C" void fn_80098A68(UnidentifiedEventData_800673FC* pData)
 extern "C" void fn_80098A84(UnidentifiedEventData_800673FC* pData)
 {
     PlaySound(
-        pData->mUnidentified00->mUnidentified318,
+        pData->mUnidentified00->m_uSoundSlotId,
         0x85EF26D0,
         NULL,
         NULL);
@@ -1502,7 +1502,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
             }
         }
         if (pData->mUnidentified00->m_pBall == NULL)
-            PlaySound(pData->mUnidentified00->mUnidentified318, 0xBCA543B2, NULL, NULL);
+            PlaySound(pData->mUnidentified00->m_uSoundSlotId, 0xBCA543B2, NULL, NULL);
     }
 }
 

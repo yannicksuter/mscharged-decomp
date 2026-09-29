@@ -19,10 +19,6 @@ extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E3F8(cFielder*);
 extern "C" void fn_8002E718(cFielder*);
 extern "C" void fn_8002E798(cFielder*);
-extern "C" void fn_80038158(cFielder*, bool);
-extern "C" void fn_801B8164(cFielder*);
-extern "C" void fn_801B7F8C(cFielder*);
-extern "C" void fn_801B865C(cFielder*);
 extern "C" AIContext* fn_80316974(void*);
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
@@ -83,7 +79,7 @@ void DesireStar::Update(
         || (action == ACTION_UNKNOWN_30
             && m_pFielder->m_pShotMeter->m_eShotMeterState
                 == SHOT_METER_STS_ACTIVE
-            && !m_pFielder->fn_8001E168()))
+            && !m_pFielder->IsCaptain()))
     {
         mUnidentifiedTimer.Countup(
             fDeltaT * lbl_806DC180 - fDeltaT, 10.0f);
@@ -320,7 +316,7 @@ bool DesireShrink::UnidentifiedInitialize(void* context)
         = m_pFielder->mUnidentified32C->mUnidentified004.GetValue();
     m_pFielder->m_pTweaks->mUnidentified014
         = fn_8002BFA8(m_pFielder->mUnidentified32C, 1.0f);
-    fn_801BA510(m_pFielder);
+    CreateMushroomEffect(m_pFielder);
 
     if (m_pFielder->m_pBall != 0)
     {
@@ -343,7 +339,7 @@ bool DesireShrink::UnidentifiedInitialize(void* context)
     if (g_pGame->IsGameplayOrOvertime()
         && g_pGame->m_eGameState != 4)
     {
-        PlaySound(source->mUnidentified318, 0xE6E31092, 0, 0);
+        PlaySound(source->m_uSoundSlotId, 0xE6E31092, 0, 0);
     }
     return result;
 }
@@ -390,7 +386,7 @@ bool DesireFrozen::UnidentifiedReinitialize(void* context)
 
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     fn_800BE1AC(params->Get(0)->mData.i);
-    fn_801B865C(m_pFielder);
+    KillFreeze(m_pFielder);
     return Desire::UnidentifiedInitialize(context);
 }
 
@@ -406,7 +402,7 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
         mfConfusedDirection = -mfConfusedDirection;
     }
     mfConfusedPercentage = 0.0f;
-    fn_801B7F8C(m_pFielder);
+    EmitConfused(m_pFielder);
 
     if (m_pFielder->m_pBall != 0)
     {
@@ -537,7 +533,7 @@ void DesireConfused::fn_800BED24(unsigned short* direction)
  */
 void DesireConfused::UnidentifiedCleanup()
 {
-    fn_801B8164(m_pFielder);
+    KillConfused(m_pFielder);
 }
 
 /**

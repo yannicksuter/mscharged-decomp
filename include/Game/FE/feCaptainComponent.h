@@ -12,35 +12,35 @@ class TLInstance;
 struct UnidentifiedTLGroupInstance;
 struct CharacterInfo;
 
-class TU801DA134Component
+class FECaptainComponent
 {
 public:
-    TU801DA134Component();
-    virtual ~TU801DA134Component();
+    FECaptainComponent();
+    virtual ~FECaptainComponent();
 
-    void fn_801DA198(TLComponentInstance* component, int side);
-    void fn_801DA718(TLInstance* instance, int captain, unsigned char alpha);
-    void fn_801DA88C();
-    TLImageInstance* fn_801DA924(int index, const char* name);
-    void fn_801DABAC(int index, int state);
-    void fn_801DAFC8();
-    void fn_801DB69C(float dt);
-    void fn_801DCB28();
-    void fn_801DCC28();
-    void fn_801DCCEC();
-    void fn_801DC824(bool visible0, bool visible1, bool visible2);
-    int fn_801DCD74(int index);
-    void fn_801DCD84(int value);
-    void fn_801DCD8C(int index, int value);
+    void Initialize(TLComponentInstance* component, int side);
+    void ApplyTeamColour(TLInstance* instance, int captain, unsigned char alpha);
+    void Show();
+    TLImageInstance* FindPositionImage(int index, const char* name);
+    void SetRecycleState(int index, int state);
+    void UpdateOverallSlides();
+    void LoadSlotImages(float dt);
+    void RandomizeSidekicks();
+    void ResetSidekicks();
+    void ReloadSidekicks();
+    void SetSlotVisibility(bool visible0, bool visible1, bool visible2);
+    int GetSidekick(int index);
+    void SetCaptain(int value);
+    void SetSidekick(int index, int value);
     static TLImageInstance* FindSidekickImage(int sidekick, int captain);
     static TLImageInstance* FindCaptainImage(int captain, bool left);
     static void SetOverallSlide(TLComponentInstance* overall, const CharacterInfo& info);
 
     /* 0x04 */ TLComponentInstance* mComponent;
-    /* 0x08 */ TLComponentInstance* mUnidentified08;
+    /* 0x08 */ TLComponentInstance* mPositions;
     /* 0x0C */ int mUnidentified0C;
     /* 0x10 */ int mSide;
-    /* 0x14 */ int mUnidentified14;
+    /* 0x14 */ int mCaptain;
     /* 0x18 */ int mSidekicks[3];
     /* 0x24 */ int mUnidentified24;
 }; // size 0x28

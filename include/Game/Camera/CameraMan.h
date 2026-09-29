@@ -100,4 +100,6 @@ T* cCameraManager::GetCamera(eCameraType type)
 
 cBaseCamera* GetNextCamera();
 
+void FireCameraNoiseFilter(nlVector3& amplitude, float frequency, float duration);
+
 #endif // _CAMERAMAN_H_

@@ -19,7 +19,7 @@
 extern "C" void fn_801BE234(cSAnim*, unsigned int);
 
 SebringAnimTagScriptInterpreter* g_pAnimScriptInterp;
-cCharacter* lbl_806E0C34;
+cCharacter* g_pCurrentlyUpdatingCharacter;
 cCharacter* g_pCharacters[10];
 static tCharacterTemplate* g_aCharacterTemplates[20];
 static tCharacterTemplate* g_GoalieTemplate;

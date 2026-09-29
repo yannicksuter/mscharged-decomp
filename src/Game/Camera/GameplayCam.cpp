@@ -159,8 +159,8 @@ void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
 
     if (!forceNeutral)
     {
-        Dampen(m_fDampenedTargetX, m_fDesiredTargetX, m_fTargetSeekSpeedX, m_fTargetSeekTime, fDeltaT);
-        Dampen(m_fDampenedTargetY, m_fDesiredTargetY, m_fTargetSeekSpeedY, m_fTargetSeekTime, fDeltaT);
+        m_fDampenedTargetX = Dampen(m_fDampenedTargetX, m_fDesiredTargetX, m_fTargetSeekSpeedX, m_fTargetSeekTime, fDeltaT);
+        m_fDampenedTargetY = Dampen(m_fDampenedTargetY, m_fDesiredTargetY, m_fTargetSeekSpeedY, m_fTargetSeekTime, fDeltaT);
     }
     else
     {

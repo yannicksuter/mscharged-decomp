@@ -33,7 +33,6 @@
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
-extern "C" void fn_80207724(int);
 
 RoadToStrikersCupHubScene::RoadToStrikersCupHubScene()
     : mPointerButtonsInitialized(false)
@@ -142,7 +141,7 @@ void RoadToStrikersCupHubScene::SceneCreated()
         mPlayButtonInstance = navigation->GetButton(16);
     }
     mBackButton.SetButtonInstance(backButton);
-    fn_80207724(0);
+    UpdateCupBreadcrumbs(0);
 
     FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
         presentation->GetActiveSlide(), "Layer", "summary", "TROPHY WIN")
@@ -183,13 +182,13 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
         {
             SHNavigation* navigation = GetNavigationScene();
             navigation->SetButtons(0x14, true);
-            fn_802088B4();
+            UpdatePlayButtonText();
             mTransitionState = 1;
         }
         else if (mTransitionState == 2)
         {
             if (mSelectedButton == 0)
-                fn_80207060(false);
+                AdvanceCupFlow(false);
             else if (mSelectedButton == 1)
                 ShowCurrentCupRoundPage();
             else if (mSelectedButton == 2)
@@ -264,7 +263,7 @@ void RoadToStrikersCupHubScene::UpdateCupRecordText(TLTextInstance* text)
     WideString unformatted;
     WideString formatted;
 
-    CupRecord_8010C5C0& record = g_pCupManager->mCupRecord.mUnidentified86A0;
+    CupRecordCounters& record = g_pCupManager->mCupRecord.mCurrentRecord;
     int wins = record.mValues[0];
     int losses = record.mValues[1];
     int cups = record.mValues[2];
@@ -380,7 +379,7 @@ void RoadToStrikersCupHubScene::UpdateCupHeading()
     }
     else
     {
-        captain = cupManager->fn_8010AFA4();
+        captain = cupManager->GetFinalOpponentTeam();
     }
 
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));

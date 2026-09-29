@@ -69,7 +69,7 @@ void SHStrikerTimesChallenge::OnBackTransitionComplete()
         sceneID = (SceneList)76;
     ChallengeSelectScene* scene = static_cast<ChallengeSelectScene*>(manager->Push(sceneID, SCREEN_BACK, true));
     if (scene != 0)
-        scene->mChallengeOffset = g_pStrikerChallenge->mUnidentified6C;
+        scene->mChallengeOffset = g_pStrikerChallenge->mChallengeOffset;
 }
 
 /**
@@ -107,20 +107,20 @@ void SHStrikerTimesChallenge::SceneCreated()
     }
     SetPointerEnabled(true);
     StrikerChallenge* challenge = g_pStrikerChallenge;
-    int captain = challenge->fn_801CAA18();
+    int captain = challenge->GetCurrentCaptain();
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     int mood = -1;
     if (mDisplayMode == 8)
     {
         if (challenge->mCurrentChallenge < 10)
         {
-            nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_START_%s", challenge->GetTitle());
-            nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_START_%s", challenge->GetTitle());
+            nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_START_%s", challenge->GetName());
+            nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_START_%s", challenge->GetName());
         }
         else
         {
-            nlSNPrintf(mStoryStringID, 0x40, "ST_%s_CHALLENGE_START", challenge->GetTitle());
-            nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_CHALLENGE_START", challenge->GetTitle());
+            nlSNPrintf(mStoryStringID, 0x40, "ST_%s_CHALLENGE_START", challenge->GetName());
+            nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_CHALLENGE_START", challenge->GetName());
         }
         mood = 1;
     }
@@ -131,13 +131,13 @@ void SHStrikerTimesChallenge::SceneCreated()
         {
             if (challenge->mCurrentChallenge < 10)
             {
-                nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_SUCCEED_%s", challenge->GetTitle());
-                nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_SUCCEED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_SUCCEED_%s", challenge->GetName());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_SUCCEED_%s", challenge->GetName());
             }
             else
             {
-                nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_SUCCEED_%s", challenge->GetTitle());
-                nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_SUCCEED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_SUCCEED_%s", challenge->GetName());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_SUCCEED_%s", challenge->GetName());
             }
             mood = 0;
         }
@@ -145,13 +145,13 @@ void SHStrikerTimesChallenge::SceneCreated()
         {
             if (challenge->mCurrentChallenge < 10)
             {
-                nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_FAILED_%s", challenge->GetTitle());
-                nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_FAILED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_TUTORIAL_FAILED_%s", challenge->GetName());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_TUTORIAL_FAILED_%s", challenge->GetName());
             }
             else
             {
-                nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_FAILED_%s", challenge->GetTitle());
-                nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_FAILED_%s", challenge->GetTitle());
+                nlSNPrintf(mStoryStringID, 0x40, "ST_CHALLENGE_FAILED_%s", challenge->GetName());
+                nlSNPrintf(mHeadlineStringID, 0x40, "STH_CHALLENGE_FAILED_%s", challenge->GetName());
             }
             mood = 2;
         }
@@ -247,7 +247,7 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
     if (mDisplayMode == 8)
     {
         mLoadingChallengeSettings = true;
-        gTweakFileLoader.LoadFileAsync(g_pStrikerChallenge->GetName(), "/challenge");
+        gTweakFileLoader.LoadFileAsync(g_pStrikerChallenge->GetConfigPath(), "/challenge");
     }
     else
     {

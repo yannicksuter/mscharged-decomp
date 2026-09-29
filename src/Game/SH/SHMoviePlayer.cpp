@@ -45,7 +45,7 @@ MoviePlayerScene::MoviePlayerScene()
     {
         mGameSceneManager = g_pOverlayManager;
     }
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(Function<FnVoidVoid>(BindExp1_MoviePlayerScene_v(MemFun(&MoviePlayerScene::fn_801D9868), this)), (unsigned int)&mUnidentified0B0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(Function<FnVoidVoid>(BindExp1_MoviePlayerScene_v(MemFun(&MoviePlayerScene::OnHBMHide), this)), (unsigned int)&mHBMHideConnection, -1);
 }
 
 MoviePlayerScene::~MoviePlayerScene()
@@ -85,7 +85,7 @@ void MoviePlayerScene::Update(float fDeltaT)
     if (!mMovieStarted)
     {
         mMovieStarted = MovieStart(mMovieFilename, false, mLoopMovie, SCGetSoundMode() == 0);
-        fn_80370E90(true);
+        SetSyncedDecode(true);
 
         const char* streamName;
         if (strstr(mMovieFilename, "nlg"))
@@ -125,7 +125,7 @@ void MoviePlayerScene::Update(float fDeltaT)
         mMovieInstance->m_pTextureResource->SetTextureHandle(movieHandle);
         mSwappedTexture = true;
     }
-    if (fn_803713CC())
+    if (IsMovieFinished())
     {
         MovieStop();
         MoviePlayerVirtual3C();
@@ -163,7 +163,7 @@ void MoviePlayerScene::OverrideMovieDimensions()
 {
 }
 
-void MoviePlayerScene::fn_801D9868()
+void MoviePlayerScene::OnHBMHide()
 {
     MoviePlayerVirtual3C();
     mMovieStarted = false;
@@ -205,8 +205,8 @@ void NLGLogoMovieScene::OverrideMovieDimensions()
 
 IntroMovieScene::IntroMovieScene()
     : mUnidentifiedB4(0.0f)
-    , mUnidentifiedB8(false)
-    , mUnidentifiedB9(false)
+    , mMovieFinished(false)
+    , mTransitionPending(false)
 {
     if (glx_GetVideoMode() == 1)
     {
@@ -217,10 +217,10 @@ IntroMovieScene::IntroMovieScene()
         SetMovieDetails("art/movies/introtest.thp", true, false);
     }
     mNextScene = SCENE_TITLE;
-    fn_801D9B84();
+    ResetMoviePlayer();
 }
 
-void IntroMovieScene::fn_801D9B84()
+void IntroMovieScene::ResetMoviePlayer()
 {
     if (mMovieStarted)
     {
@@ -230,8 +230,8 @@ void IntroMovieScene::fn_801D9B84()
     BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
     pStadium->m_bRenderingEnabled = false;
     mUnidentifiedB4 = 0.0f;
-    mUnidentifiedB8 = false;
-    mUnidentifiedB9 = false;
+    mMovieFinished = false;
+    mTransitionPending = false;
 }
 
 void IntroMovieScene::MoviePlayerVirtual3C()
@@ -239,7 +239,7 @@ void IntroMovieScene::MoviePlayerVirtual3C()
     GameSceneManager::s_pInstance->Push(mNextScene, SCREEN_NOTHING, true);
     BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
     pStadium->m_bRenderingEnabled = true;
-    fn_80370E90(false);
+    SetSyncedDecode(false);
 }
 
 void IntroMovieScene::SceneCreated()
@@ -256,20 +256,20 @@ void IntroMovieScene::Update(float fDeltaT)
     int frame = glx_GetVideoMode() == 1 ? 0x9E5 : 0xBE0;
     if (mMovieStarted)
     {
-        if (!mUnidentifiedB8)
+        if (!mMovieFinished)
         {
-            if ((int)fn_803713E0() >= frame)
+            if ((int)GetMovieFrame() >= frame)
             {
-                mUnidentifiedB8 = true;
+                mMovieFinished = true;
                 FrontEndPresentation::GetInstance()->Call("TransitionFromMovieToTitleScreen");
-                mUnidentifiedB9 = true;
+                mTransitionPending = true;
                 BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = true;
-                fn_80370E90(false);
+                SetSyncedDecode(false);
             }
         }
-        else if (mUnidentifiedB9)
+        else if (mTransitionPending)
         {
-            mUnidentifiedB9 = false;
+            mTransitionPending = false;
             if (IsWidescreen())
             {
                 mPresentation->SetActiveSlide("transition16:9", true);

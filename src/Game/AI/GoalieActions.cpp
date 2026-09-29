@@ -176,7 +176,6 @@ extern "C" SaveData* fn_80092644(SaveData* pSaveData,
     SaveBlendInfo* pBlendInfo, const nlVector3* pLocalPosition);
 extern "C" SaveData* fn_80093780(int nAnimID);
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
-extern "C" void fn_801B968C(cCharacter* pCharacter);
 extern "C" void fn_8008CED8(Goalie* pGoalie, float fTargetTime,
     const nlVector3& v3TargetPosition,
     const nlVector3& v3TargetVelocity);
@@ -730,7 +729,7 @@ void Goalie::fn_80083750(float)
         || (bAnimDone = (pController->m_ePlayMode == PM_HOLD
                          && pController->m_fTime == 1.0f)))
     {
-        fn_801B93E8(this);
+        EndElectrocution(this);
         fn_80097648(0.06f);
         mUnidentified1E4.m_bForceFeatherUpdate = false;
         mUnidentified1E4.m_bSkipAnimUpdate = false;
@@ -777,7 +776,7 @@ void Goalie::fn_80083960(float)
     if (m_eAnimID == 0xAD
         && m_pCurrentAnimController->TestTrigger(lbl_806DBC74))
     {
-        fn_801B8E5C(this);
+        EmitGoalieArmInGround(this);
     }
 
     if (mbGrabMonty)
@@ -792,7 +791,7 @@ void Goalie::fn_80083960(float)
             mpMonty->SetPosition(v3Position);
             mpMonty->mUnidentified17C = true;
             mpMonty->mUnidentified178 = 1.0f;
-            fn_801B8B38(mpMonty);
+            EmitMontyDekeExit(mpMonty);
         }
 
         if (m_pCurrentAnimController->TestTrigger(0.6756757f)
@@ -818,7 +817,7 @@ void Goalie::fn_80083960(float)
             unsigned short aDirection
                 = (unsigned short)(mUnidentified024.m_aActualFacingDirection + 0x9FF6);
             fn_8003C5D8(mpMonty, true, aDirection);
-            PlaySound(mUnidentified318, 0x4AE0B399, 0, 0);
+            PlaySound(m_uSoundSlotId, 0x4AE0B399, 0, 0);
         }
 
         if (m_pCurrentAnimController->m_fTime >= fGrabTime
@@ -863,7 +862,7 @@ void Goalie::fn_80083960(float)
                 }
 
                 mpMonty->fn_8004F204();
-                PlaySound(mUnidentified318, 0x76520305, 0, 0);
+                PlaySound(m_uSoundSlotId, 0x76520305, 0, 0);
 
                 nlVector3 v3Position
                     = GetJointPosition(m_nRightHandJointIndex);
@@ -2829,8 +2828,8 @@ bool Goalie::fn_80090958(bool bParam)
         if (fParam > 0.0f)
         {
             m_pCurrentAnimController->SetTime(fParam);
-            fn_801BAF0C(this);
-            fn_801BABEC(this);
+            EmitTackleImpact(this);
+            EmitPushHeadIn(this);
         }
         mbIsDown = true;
         m_pPhysicsCharacter->m_CanCollideWithGoalLine = false;
@@ -2904,7 +2903,7 @@ bool Goalie::fn_80090958(bool bParam)
     }
 
     PlaySound(
-        mpSkillShooter->mUnidentified318, 0xB721918A, 0, 0);
+        mpSkillShooter->m_uSoundSlotId, 0xB721918A, 0, 0);
     mbDoHeadTrack = false;
     mpSkillShooter = 0;
     return true;
@@ -3750,7 +3749,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             mUnidentified024.m_fDesiredSpeed = 0.0f;
             mUnidentified024.m_fActualSpeed = 0.0f;
             SetVelocity(v3Zero);
-            PlaySound(mUnidentified318, 0x76520305, 0, 0);
+            PlaySound(m_uSoundSlotId, 0x76520305, 0, 0);
             return;
         }
 
@@ -5695,13 +5694,13 @@ void Goalie::fn_8008E130()
                     nNodeIndex);
         }
 
-        cCharacter* pPreviousCharacter = lbl_806E0C34;
-        lbl_806E0C34 = this;
+        cCharacter* pPreviousCharacter = g_pCurrentlyUpdatingCharacter;
+        g_pCurrentlyUpdatingCharacter = this;
         fn_8001EF78(0.0f);
-        lbl_806E0C34 = pPreviousCharacter;
+        g_pCurrentlyUpdatingCharacter = pPreviousCharacter;
 
         SetVelocity(v3Zero);
-        fn_801B968C(this);
+        EmitElectrocution(this);
         mbDoHeadTrack = false;
 
         nlVector3 v3Position = mUnidentified024.m_v3Position;
@@ -6965,8 +6964,8 @@ void Goalie::fn_80090320(float fParam)
     if (fParam > 0.0f)
     {
         m_pCurrentAnimController->SetTime(fParam);
-        fn_801BAF0C(this);
-        fn_801BABEC(this);
+        EmitTackleImpact(this);
+        EmitPushHeadIn(this);
     }
 
     mbIsDown = true;

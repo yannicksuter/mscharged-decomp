@@ -33,10 +33,7 @@ public:
 
     void Clear()
     {
-        EntryCallback callback = &TimedObjectList::DeleteEntry;
-        nlWalkList(m_Head, this, callback);
-        m_Head = 0;
-        m_Tail = 0;
+        ClearWithCallback(this, &TimedObjectList::DeleteEntry);
     }
 
     void DeleteEntry(ListEntry<TimedObject*>* entry);

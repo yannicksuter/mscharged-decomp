@@ -25,14 +25,8 @@ enum NetworkTournamentGameState
 struct NetworkTournamentGame
 {
     NetworkTournamentGame()
-        : mState(NET_TOURN_GAME_EMPTY)
-        , mBracketIndex(-1)
-        , mHomeUpdate(0)
-        , mAwayUpdate(0)
     {
-        mMachines[0] = -1;
-        mMachines[1] = -1;
-        mGameInfo.Reset(true);
+        Reset(-1);
     }
 
     bool IsFinished() const;
@@ -163,6 +157,9 @@ public:
     /* 0x940 */ int mGameProgressUpdateCount;
     /* 0x944 */ void* mTrophyPresentation;
     /* 0x948 */ void* mTrophyResource;
+
+private:
+    static int ChooseFirstRoundMachine(int machineCount, bool* used);
 }; // size: 0x94C
 
 extern int s_nOverrideCupPersona;

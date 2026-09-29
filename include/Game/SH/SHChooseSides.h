@@ -44,23 +44,23 @@ public:
     void SetSidekickImage(TLImageInstance* image, int sidekick, int team);
     bool RemoveDisconnectedControllers(bool playSound);
 
-    /* 0x01C */ bool mUnidentified1C;
-    /* 0x01D */ bool mUnidentified1D;
-    /* 0x01E */ bool mUnidentified1E;
-    /* 0x01F */ bool mUnidentified1F;
+    /* 0x01C */ bool mInitialized;
+    /* 0x01D */ bool mHomeAwayEntering;
+    /* 0x01E */ bool mExiting;
+    /* 0x01F */ bool mHelpPressed;
     /* 0x020 */ FEPointerButton mControllerComponents[2];
     /* 0x188 */ FEPointerButton mHomeAwayComponent;
     /* 0x23C */ FEPointerButton mHelpComponent;
-    /* 0x2F0 */ FEBackButton mUnidentified2F0;
+    /* 0x2F0 */ FEBackButton mBackButton;
     /* 0x3C8 */ ScreenMovement mMovement;
     /* 0x3CC */ TLComponentInstance* mSideGroups[2];
     /* 0x3D4 */ TLComponentInstance* mHomeAwayBox;
     /* 0x3D8 */ TLComponentInstance* mHelpButton;
     /* 0x3DC */ eCSContext mContext;
     /* 0x3E0 */ int mPlayingSides[4];
-    /* 0x3F0 */ nlColour mUnidentified3F0[2];
+    /* 0x3F0 */ nlColour mTeamColours[2];
     /* 0x3F8 */ int mControllerCounts[4];
-    /* 0x408 */ int mUnidentified408;
+    /* 0x408 */ int mHomeAwayButtonMask;
     /* 0x40C */ int mState;
 }; // size 0x410
 

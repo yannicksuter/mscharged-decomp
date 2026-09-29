@@ -22,7 +22,7 @@ public:
     virtual void PlayScreenBackSFX();
     virtual void OverrideMovieDimensions();
     virtual void MoviePlayerVirtual3C();
-    void fn_801D9868();
+    void OnHBMHide();
 
     /* 0x01C */ SceneList mNextScene;
     /* 0x020 */ bool mSwappedTexture;
@@ -33,7 +33,7 @@ public:
     /* 0x0A9 */ bool mLoopMovie;
     /* 0x0AA */ bool mPushWithPop;
     /* 0x0AC */ BaseGameSceneManager* mGameSceneManager;
-    /* 0x0B0 */ UnidentifiedEventConnectionOwner mUnidentified0B0;
+    /* 0x0B0 */ UnidentifiedEventConnectionOwner mHBMHideConnection;
 }; // size 0xB4
 
 class LessonMoviePlayerScene : public MoviePlayerScene
@@ -78,11 +78,11 @@ public:
     virtual void MoviePlayerVirtual3C();
     virtual void SceneCreated();
     virtual void Update(float fDeltaT);
-    void fn_801D9B84();
+    void ResetMoviePlayer();
 
     /* 0xB4 */ float mUnidentifiedB4;
-    /* 0xB8 */ bool mUnidentifiedB8;
-    /* 0xB9 */ bool mUnidentifiedB9;
+    /* 0xB8 */ bool mMovieFinished;
+    /* 0xB9 */ bool mTransitionPending;
 };
 
 #endif // GAME_SH_SHMOVIEPLAYER_H

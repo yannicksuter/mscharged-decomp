@@ -100,10 +100,9 @@ s32 NHTTPi_CommitConnectionList(void* mutexInfo_p,
 s32 NHTTPi_OmitConnectionList(void* mutexInfo_p,
     NHTTPConnectionInfo* connection_p)
 {
-    return ((NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 4)
-                != NULL)
-            ? 0
-            : -1);
+    NHTTPConnectionInfo* result =
+        NHTTPi_ControlConnectionList(mutexInfo_p, connection_p, 4);
+    return (result != NULL) - 1;
 }
 
 NHTTPRequestInfo* NHTTPi_Connection2Request(void* mutexInfo,

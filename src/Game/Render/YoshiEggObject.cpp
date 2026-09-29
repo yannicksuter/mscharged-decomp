@@ -189,7 +189,7 @@ void YoshiEggObject::Deactivate(bool destroyEffects)
         if (!destroyEffects)
         {
             mFielder->IsFallenDown();
-            PlaySound(mFielder->mUnidentified318, 0x1B274A7A, 0, 0);
+            PlaySound(mFielder->m_uSoundSlotId, 0x1B274A7A, 0, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("yoshi_egg_trail");
         if (!destroyEffects)

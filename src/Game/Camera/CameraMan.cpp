@@ -786,12 +786,12 @@ extern "C" void fn_800F02DC(void* pUnidentified0, unsigned long pUnidentified1, 
 /**
  * Offset/Address/Size: 0x2C | 0x800F026C | size: 0x70
  */
-extern "C" void fn_800F026C(nlVector3& v3Unidentified, float fUnidentified0, float fUnidentified1)
+void FireCameraNoiseFilter(nlVector3& amplitude, float frequency, float duration)
 {
     cNoiseFilter* pFilter = static_cast<cNoiseFilter*>(cCameraManager::PeekCamera()->m_pFilter[1]);
     if (pFilter != 0)
     {
-        pFilter->Start(v3Unidentified, fUnidentified0, fUnidentified1);
+        pFilter->Start(amplitude, frequency, duration);
     }
 }
 

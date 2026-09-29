@@ -17,6 +17,8 @@ class CrowdRiot;
 class AvoidablePolygon;
 class AIContext;
 struct DetermDataEvent;
+struct CharacterImpactEvent;
+struct GoalieSaveData;
 class cFielder;
 class cPlayer;
 
@@ -249,5 +251,11 @@ public:
 extern cGame* g_pGame;
 
 extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
+
+extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
+
+extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData);
+
+extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);
 
 #endif // GAME_GAME_H

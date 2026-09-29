@@ -462,11 +462,11 @@ void Lightning::Update(float value)
             fn_8005D210(g_pGame, data);
             if (nlRandomf(1.0f) < 0.5f)
             {
-                fn_801BDD24("weather_lightning_weak", position, false);
+                EmitLightning("weather_lightning_weak", position, false);
             }
             else
             {
-                fn_801BDD24("weather_lightning_weak_left", position, false);
+                EmitLightning("weather_lightning_weak_left", position, false);
             }
             PlaySound(12, 0xC46BD58A, 0, 0);
         }
@@ -481,11 +481,11 @@ void Lightning::Update(float value)
             fn_8005D210(g_pGame, data);
             if (nlRandomf(1.0f) < 0.5f)
             {
-                fn_801BDD24("weather_lightning", data->position, true);
+                EmitLightning("weather_lightning", data->position, true);
             }
             else
             {
-                fn_801BDD24("weather_lightning_left", data->position, true);
+                EmitLightning("weather_lightning_left", data->position, true);
             }
             WorldDarkening::Instance().Fade(0.5f * gLightningFadeTime, 0.0f);
             PlaySound(12, 0x900C09E3, 0, 0);
@@ -619,9 +619,9 @@ void Windy::Start()
     nlVec3Scale(direction, direction, effectSpeed);
     nlVec3Sub(position1, position1, direction);
     nlVec3Sub(position2, position2, direction);
-    fn_801BDCB4(true);
-    fn_801BDC1C(position1, direction, velocity);
-    fn_801BDC1C(position2, direction, velocity);
+    KillWind(true);
+    EmitWind(position1, direction, velocity);
+    EmitWind(position2, direction, velocity);
     Weather::Start();
     StopSound(0x04EE0B75, this);
     PlaySound(11, 0x04EE0B75, "Wind Event", this);
@@ -762,7 +762,7 @@ void Windy::Stop(bool value)
     {
         g_pBall->m_pPhysicsBall->mbUseWindForce = false;
     }
-    fn_801BDCB4(value);
+    KillWind(value);
     StopSound(0x04EE0B75, this);
 }
 

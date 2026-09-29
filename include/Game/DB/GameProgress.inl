@@ -3,7 +3,7 @@
 
 #include "Game/DB/GameProgress.h"
 
-inline int StrikerChallenge::fn_801CAA18() const
+inline int StrikerChallenge::GetCurrentCaptain() const
 {
     return mCaptain;
 }

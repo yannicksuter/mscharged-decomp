@@ -24,6 +24,7 @@ struct FunctionEntryPoint
     /* 0x0B */ u8 flags;
 
     operator unsigned long() const { return hash; }
+    bool operator==(const unsigned long& key) const { return hash == key; }
 };
 
 struct ByteCodeHeader

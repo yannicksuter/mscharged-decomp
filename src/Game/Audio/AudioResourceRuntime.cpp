@@ -3,7 +3,7 @@
 
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioEffects.h"
-#include "Game/Audio/UnidentifiedAudioScriptRuntime.h"
+#include "Game/Audio/AudioScriptRuntime.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioResourceRuntime.inl"
 #include "NL/nlFunction.h"
@@ -68,7 +68,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
             Function<bool(const u32&, bool*)>(
-                UnidentifiedAudioInstanceVisitor(effect)));
+                AudioEffectSoundStartedVisitor(effect)));
     }
 
     AudioEffectParameter* effectParameter
@@ -96,7 +96,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
             Function<bool(const u32&, bool*)>(
-                UnidentifiedAudioInstanceVisitor(effect)));
+                AudioEffectSoundStartedVisitor(effect)));
     }
 
     AudioEffectParameter* effectParameter
@@ -109,7 +109,7 @@ AudioResourceRuntime::AudioResourceRuntime()
     m_ConfigRoot = 0;
     g_pAudioResourceRuntime = this;
     m_EffectFactory = GetAudioEffectFactory();
-    m_Script = new UnidentifiedAudioScriptRuntime;
+    m_Script = new AudioScriptRuntime;
 }
 
 /**
@@ -117,7 +117,7 @@ AudioResourceRuntime::AudioResourceRuntime()
  */
 void AudioResourceRuntime::LoadScriptData(void* data, unsigned int size)
 {
-    m_Script->Unidentified6E00(data, size);
+    m_Script->LoadScriptData(data, size);
 }
 
 /**
@@ -125,7 +125,7 @@ void AudioResourceRuntime::LoadScriptData(void* data, unsigned int size)
  */
 extern "C" void fn_802F4904(AudioResourceRuntime* runtime, float deltaTime)
 {
-    runtime->m_Script->Unidentified78C0(deltaTime);
+    runtime->m_Script->Update(deltaTime);
     runtime->m_EffectFactory->Update(deltaTime);
 }
 
@@ -134,7 +134,7 @@ extern "C" void fn_802F4904(AudioResourceRuntime* runtime, float deltaTime)
  */
 extern "C" void fn_802F4958(AudioResourceRuntime* runtime)
 {
-    runtime->m_Script->Unidentified6BC4();
+    runtime->m_Script->Shutdown();
     runtime->m_EffectFactory->Shutdown();
 }
 
@@ -143,7 +143,7 @@ extern "C" void fn_802F4958(AudioResourceRuntime* runtime)
  */
 extern "C" void fn_802F499C(AudioResourceRuntime* runtime, u32 hash, u32 instance)
 {
-    runtime->m_Script->Unidentified6F00(hash, instance);
+    runtime->m_Script->OnSoundStarted(hash, instance);
 }
 
 /**
@@ -151,7 +151,7 @@ extern "C" void fn_802F499C(AudioResourceRuntime* runtime, u32 hash, u32 instanc
  */
 extern "C" void fn_802F49A4(AudioResourceRuntime* runtime, u32 instance)
 {
-    runtime->m_Script->Unidentified77C8(instance);
+    runtime->m_Script->OnSoundStopped(instance);
 }
 
 /**
@@ -159,7 +159,7 @@ extern "C" void fn_802F49A4(AudioResourceRuntime* runtime, u32 instance)
  */
 void SetAudioEffectContext(unsigned long* hash, int index)
 {
-    g_pAudioResourceRuntime->m_Script->Unidentified6E98(*hash, index);
+    g_pAudioResourceRuntime->m_Script->SetEffectContext(*hash, index);
 }
 
 /**
@@ -193,7 +193,7 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
         binding->mEffects.Add(effectId, effect);
         binding->mInstances.Walk(
             Function<bool(const u32&, bool*)>(
-                UnidentifiedAudioInstanceVisitor(effect)));
+                AudioEffectSoundStartedVisitor(effect)));
     }
 
     AudioEffectParameter* parameter

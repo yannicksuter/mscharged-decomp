@@ -28,7 +28,7 @@ public:
 
     virtual ~UnidentifiedStaticEvent3();
 
-    void UnidentifiedRemoveAll()
+    void RemoveAll()
     {
         while (mListeners.m_Head != 0)
         {
@@ -58,7 +58,7 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                ListenerEntry* entry = UnidentifiedGetEntry(listener);
+                ListenerEntry* entry = GetEntry(listener);
                 nlDLRingRemove(&mListeners.m_Head, entry);
                 entry->~ListenerEntry();
                 mListeners.m_Allocator.Free(entry);
@@ -76,17 +76,17 @@ protected:
             listener->mFlags |= 0x20000000;
             return;
         }
-        UnidentifiedDeleteListener(listener);
+        DeleteListener(listener);
     }
 
-    ListenerEntry* UnidentifiedGetEntry(Listener* listener)
+    ListenerEntry* GetEntry(Listener* listener)
     {
         return mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
     }
 
-    void UnidentifiedDeleteListener(Listener* listener)
+    void DeleteListener(Listener* listener)
     {
-        ListenerEntry* entry = UnidentifiedGetEntry(listener);
+        ListenerEntry* entry = GetEntry(listener);
         nlDLRingRemove(&mListeners.m_Head, entry);
         mListeners.DeleteEntry(entry);
     }
@@ -97,7 +97,7 @@ protected:
 template <typename P1, typename P2, typename P3, int Count>
 UnidentifiedStaticEvent3<P1, P2, P3, Count>::~UnidentifiedStaticEvent3()
 {
-    UnidentifiedRemoveAll();
+    RemoveAll();
     UnregisterEvent(this);
 }
 

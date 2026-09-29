@@ -51,26 +51,29 @@ class IndicatorInfo
 public:
     IndicatorInfo();
 
-    inline void IncrementOnscreenTimer(float fTimeDelta)
-    {
-        m_fOpacity -= fTimeDelta * fOpacityFadePerSecond;
-        if (m_fOpacity < 0.0f)
-        {
-            m_fOpacity = 0.0f;
-        }
-    }
-
-    inline void IncrementOffscreenTimer(float fTimeDelta)
-    {
-        m_fOpacity += fTimeDelta * fOpacityFadePerSecond;
-        if (m_fOpacity > fMaxAlpha)
-        {
-            m_fOpacity = fMaxAlpha;
-        }
-    }
+    void IncrementOnscreenTimer(float fTimeDelta);
+    void IncrementOffscreenTimer(float fTimeDelta);
 
     float m_fOpacity;
 };
+
+void IndicatorInfo::IncrementOnscreenTimer(float fTimeDelta)
+{
+    m_fOpacity -= fTimeDelta * fOpacityFadePerSecond;
+    if (m_fOpacity < 0.0f)
+    {
+        m_fOpacity = 0.0f;
+    }
+}
+
+void IndicatorInfo::IncrementOffscreenTimer(float fTimeDelta)
+{
+    m_fOpacity += fTimeDelta * fOpacityFadePerSecond;
+    if (m_fOpacity > fMaxAlpha)
+    {
+        m_fOpacity = fMaxAlpha;
+    }
+}
 
 unsigned long uIndicatorTexID[4] = {
     nlStringLowerHash("fe/controller_1_indicator"),
@@ -392,7 +395,7 @@ static void UpdateAndRenderPlayerIndicators(float)
                 }
                 fVerticalOffset
                     = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() / 2.0f;
-                fVerticalOffset *= pCharacter->mUnidentified024.m_fPlayerScale;
+                fVerticalOffset *= pCharacter->GetPlayerScale();
             }
             else
             {
@@ -424,9 +427,9 @@ static void UpdateAndRenderPlayerIndicators(float)
                     * (s_fAdditiveBlendingIntensity * switchScale),
                 glowTexID, colour, 0.0f, true);
 
-            float fDistInPixels = s_fOverheadSize * sizeScale;
             DrawIndicator((int)v3ScreenPosition.x,
-                (int)v3ScreenPosition.y, fDistInPixels, fDistInPixels,
+                (int)v3ScreenPosition.y, s_fOverheadSize * sizeScale,
+                s_fOverheadSize * sizeScale,
                 fOpacity * opacityScale, indicatorTexID, colour, 0.0f,
                 false);
         }

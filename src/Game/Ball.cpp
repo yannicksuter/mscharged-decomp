@@ -103,7 +103,7 @@ public:
             if ((listener->mFlags >> 31) != 0)
             {
                 listener->callback(p1, p2);
-                UnidentifiedRestartAt(iterator, currentEntry);
+                RestartAt(iterator, currentEntry);
             }
 
             iterator.next();
@@ -121,7 +121,7 @@ public:
     }
 
 private:
-    void UnidentifiedRestartAt(
+    void RestartAt(
         nlDLListIterator<Listener>& iterator, ListenerEntry* current)
     {
         iterator = mListeners.Begin();
@@ -137,9 +137,6 @@ extern "C" void fn_80036594(cFielder*, cFielder*, int);
 float ReceivingPass(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void Hide(BirdoEggObject*, bool);
-extern "C" void fn_801BDF08(int);
-extern "C" void fn_801B79A4(const char*, int);
-extern "C" void fn_801B9904(unsigned long);
 void ReleaseAudioSoundOwner(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
@@ -371,9 +368,9 @@ void cBall::ClearBallEffects()
         m_pBlurHandler->Die(0.25f);
         m_pBlurHandler = NULL;
     }
-    fn_801B79A4("skillshot_ball_meteor", 0);
-    fn_801B79A4("skillshot_ball_drybones", 0);
-    fn_801B79A4("skillshot_ball_boo", 0);
+    KillBallShot("skillshot_ball_meteor", 0);
+    KillBallShot("skillshot_ball_drybones", 0);
+    KillBallShot("skillshot_ball_boo", 0);
 }
 
 void cBall::CollideWithCharacterCallback(
@@ -1163,7 +1160,7 @@ extern "C" bool fn_80014E20(cBall* pBall)
     }
 }
 
-extern "C" bool fn_80014EA4(
+bool IsBallEffectPlaying(
     cBall* pBall, const EffectsGroup* pEffectsGroup)
 {
     return EmissionManager::Instance()->IsPlaying(
@@ -1230,38 +1227,38 @@ void cBall::InitiateBallBlur(
     }
 }
 
-extern "C" void fn_800152B4(cBall* pBall)
+void EmitBallChargeTransition(cBall* pBall)
 {
-    static unsigned long sUnidentified0
+    static unsigned long sHashBallShotWindupTrans0To1
         = nlStringLowerHash("ball_shot_windup_trans_0_1");
-    static unsigned long sUnidentified1
+    static unsigned long sHashBallShotWindupTrans1To2
         = nlStringLowerHash("ball_shot_windup_trans_1_2");
-    static unsigned long sUnidentified2
+    static unsigned long sHashBallShotWindupTrans2To3
         = nlStringLowerHash("ball_shot_windup_trans_2_3");
-    static unsigned long sUnidentified3
+    static unsigned long sHashBallShotWindupTrans3ToMax
         = nlStringLowerHash("ball_shot_windup_trans_3_max");
-    static unsigned long sUnidentified4
+    static unsigned long sHashBallShotWindupTransMax
         = nlStringLowerHash("ball_shot_windup_trans_max");
 
     if (pBall->mfChargeValue < 1.0f)
     {
-        fn_801B9904(sUnidentified0);
+        EmitBallWindupTransition(sHashBallShotWindupTrans0To1);
     }
     else if (pBall->mfChargeValue < 2.0f)
     {
-        fn_801B9904(sUnidentified1);
+        EmitBallWindupTransition(sHashBallShotWindupTrans1To2);
     }
     else if (pBall->mfChargeValue < 3.0f)
     {
-        fn_801B9904(sUnidentified2);
+        EmitBallWindupTransition(sHashBallShotWindupTrans2To3);
     }
     else if (pBall->mfChargeValue < 4.0f)
     {
-        fn_801B9904(sUnidentified3);
+        EmitBallWindupTransition(sHashBallShotWindupTrans3ToMax);
     }
     else
     {
-        fn_801B9904(sUnidentified4);
+        EmitBallWindupTransition(sHashBallShotWindupTransMax);
     }
 }
 
@@ -1269,7 +1266,7 @@ extern "C" void fn_800153FC(cBall* pBall, bool bParam)
 {
     if (pBall->mfChargeValue >= 0.0f && !bParam)
     {
-        fn_800152B4(pBall);
+        EmitBallChargeTransition(pBall);
     }
 
     if (pBall->m_pBlurHandler != NULL)
@@ -1277,9 +1274,9 @@ extern "C" void fn_800153FC(cBall* pBall, bool bParam)
         pBall->m_pBlurHandler->Die(0.25f);
         pBall->m_pBlurHandler = NULL;
     }
-    fn_801B79A4("skillshot_ball_meteor", 0);
-    fn_801B79A4("skillshot_ball_drybones", 0);
-    fn_801B79A4("skillshot_ball_boo", 0);
+    KillBallShot("skillshot_ball_meteor", 0);
+    KillBallShot("skillshot_ball_drybones", 0);
+    KillBallShot("skillshot_ball_boo", 0);
 
     if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
     {
@@ -1301,7 +1298,7 @@ extern "C" void fn_800153FC(cBall* pBall, bool bParam)
         pBall->mfChargeValue = 0.0f;
     }
 
-    fn_801B7A28(pBall);
+    UpdateBallGlow(pBall);
 }
 
 extern "C" void fn_800154FC(cBall* pBall, float fParam)
@@ -1326,7 +1323,7 @@ extern "C" void fn_800154FC(cBall* pBall, float fParam)
         pBall->mfChargeValue = 0.0f;
     }
 
-    fn_801B7A28(pBall);
+    UpdateBallGlow(pBall);
 }
 
 extern "C" float fn_800156A8(cBall* pBall)
@@ -1577,7 +1574,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     if ((pBall->meBallState == 6 || pBall->meBallState == 7)
         && nBallState != 6 && nBallState != 7 && nBallState != 10)
     {
-        fn_800152B4(pBall);
+        EmitBallChargeTransition(pBall);
         pBall->m_pPhysicsBall->fn_80140C30();
     }
     else if (pBall->meBallState == 1 && nBallState != 10)
@@ -1606,7 +1603,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         break;
     case 9:
     {
-        fn_801BDDE4();
+        EmitLightningBall();
         pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
         pBall->m_pPhysicsBall->m_gravity = 0.0f;
         pBall->m_tShotTimer.SetSeconds(0.5f);
@@ -1748,7 +1745,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         }
         else if (nBallState == 8)
         {
-            PlayOwnedSound(pBall->m_pPrevOwner->mUnidentified318,
+            PlayOwnedSound(pBall->m_pPrevOwner->m_uSoundSlotId,
                 0x3D267BDF,
                 (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
         }
@@ -1991,7 +1988,7 @@ extern "C" void fn_80016DF8(cBall* pBall, cPlayer* pPlayer,
             pBall->mfChargeValue = 0.0f;
         }
 
-        fn_801B7A28(pBall);
+        UpdateBallGlow(pBall);
     }
 }
 
@@ -2185,7 +2182,7 @@ void cBall::Update(float fDeltaT)
                     nlVector3 v3Unidentified;
                     PredictLandingSpotAndTime(v3Unidentified,
                         NULL, NULL, lbl_806DB5A4);
-                    fn_801B9EAC(this, &v3Unidentified, false);
+                    EmitHeaderTarget(this, &v3Unidentified, false);
                     sUnidentifiedUpdateActive = true;
                     bUnidentified = false;
                 }
@@ -2193,14 +2190,14 @@ void cBall::Update(float fDeltaT)
 
             if (sUnidentifiedUpdateActive && bUnidentified)
             {
-                fn_801B9FD0(this, false);
+                KillHeaderTarget(this, false);
                 sUnidentifiedUpdateActive = false;
                 tUnidentifiedUpdateTimer.SetSeconds(lbl_806DB5AC);
             }
         }
         else
         {
-            fn_801B9FD0(this, false);
+            KillHeaderTarget(this, false);
             sUnidentifiedUpdateActive = false;
             tUnidentifiedUpdateTimer.SetSeconds(lbl_806DB5B0);
         }
@@ -2555,7 +2552,7 @@ extern "C" void fn_8001847C(cBall* pBall, bool bParam)
         fn_800154FC(pBall, nlRandomf(4.0f));
     }
 
-    fn_801B9FD0(pBall, false);
+    KillHeaderTarget(pBall, false);
 }
 
 extern "C" void fn_800189C4(cBall* pBall)
@@ -2777,10 +2774,10 @@ extern "C" void fn_80017F18(cBall* pBall)
         pBall->mfChargeValue = 0.0f;
     }
 
-    fn_801B7A28(pBall);
+    UpdateBallGlow(pBall);
 }
 
-float fn_800155A0(cBall* pBall, int nParam)
+float GetBallChargeValue(cBall* pBall, int nParam)
 {
     if (nParam != 0)
     {
@@ -3385,7 +3382,7 @@ extern "C" void fn_8001A108(int previousState, int currentState)
                 pBall->mfChargeValue = 0.0f;
             }
 
-            fn_801B7A28(pBall);
+            UpdateBallGlow(pBall);
         }
 
         KoopaShellObject* pKoopaShell
@@ -3409,7 +3406,7 @@ extern "C" void fn_8001A108(int previousState, int currentState)
         if (g_pBall->mbBallOnFire)
         {
             g_pBall->mbBallOnFire = false;
-            fn_801B79A4("skillshot_ball_meteor", 0);
+            KillBallShot("skillshot_ball_meteor", 0);
         }
 
         g_pBall->ClearBallEffects();

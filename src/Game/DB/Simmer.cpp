@@ -168,5 +168,5 @@ void Simulator::fn_80109E34()
             STATS_WIN, winningSide, 0, goals[0], goals[1], 0, 0);
     }
 
-    g_pCupManager->fn_8010BCB8(overtime, winningSide);
+    g_pCupManager->SetRoundResult(overtime, winningSide);
 }

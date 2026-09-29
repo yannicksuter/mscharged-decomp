@@ -3,12 +3,12 @@
 
 #include "Game/Character.h"
 
-extern "C" inline bool fn_8019464C(cCharacter* character)
+inline bool IsCharacterFielder(cCharacter* character)
 {
     return character->m_eClassType == FIELDER;
 }
 
-extern "C" inline bool fn_80194660(cCharacter* character)
+inline bool IsCharacterHammerBro(cCharacter* character)
 {
     return character->mUnidentified024.m_eCharacterClass == 13;
 }

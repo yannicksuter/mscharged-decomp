@@ -1428,7 +1428,7 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
     FinishLoadingStep(manager);
     if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_3)
     {
-        CupManager::Instance()->fn_8010CAE8();
+        CupManager::Instance()->AdvanceToNextUserGame();
     }
 }
 
@@ -1505,12 +1505,12 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
                 if (cup->GetCurrentMode() == 0)
                 {
                     SetUnlockFlag(1);
-                    cup->fn_8010C5A0();
+                    cup->SaveCupRecord();
                 }
                 else if (cup->GetCurrentMode() == 1)
                 {
                     SetUnlockFlag(2);
-                    cup->fn_8010C5A0();
+                    cup->SaveCupRecord();
                 }
                 else
                 {
@@ -1518,8 +1518,8 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
                 }
             }
             CupManager::Instance()->ShowRoundNews();
-            CupManager::Instance()->mUnidentified869C = false;
-            CupManager::Instance()->fn_8010E8E0();
+            CupManager::Instance()->mGameInProgress = false;
+            CupManager::Instance()->AwardGoalTrophies();
             SaveLoad::StartSave(false);
             FrontEndPresentation::GetInstance()->Call("TransitionGameToStrikerCup");
         }
@@ -1532,7 +1532,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
                         SCREEN_NOTHING, false));
                 if (challengeScene != 0)
                 {
-                    challengeScene->mChallengeOffset = g_pStrikerChallenge->mUnidentified6C;
+                    challengeScene->mChallengeOffset = g_pStrikerChallenge->mChallengeOffset;
                 }
                 FrontEndPresentation::GetInstance()->Call("TransitionGameToStrikerChallenge");
             }
@@ -1699,7 +1699,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     ClearTweakRegistryReset();
     if (GameInfoManager::Instance()->IsInMode3())
     {
-        CupManager::Instance()->fn_8010C5E0();
+        CupManager::Instance()->PrepareCurrentGame();
     }
     GameInfoManager::Instance()->SetupGameFromConfig();
     GLMemoryRequirement requirements[] = {

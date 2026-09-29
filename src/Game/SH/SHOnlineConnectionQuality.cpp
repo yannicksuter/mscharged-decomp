@@ -36,39 +36,39 @@ static inline void UpdateConnectionQualityTimerText(
     OnlineConnectionQualityScene* scene, TLTextInstance* timer)
 {
     typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-    timer->SetString(nlStrNCpy(scene->mUnidentified044,
+    timer->SetString(nlStrNCpy(scene->mTimerText,
         Format(WideBasicString(LookupLocString("ONLINE_CONNECTION_QUALITY_TIME")),
-            scene->mUnidentified180).c_str(), 128));
+            scene->mCountdownSeconds).c_str(), 128));
 }
 
 OnlineConnectionQualityScene::OnlineConnectionQualityScene()
-    : mUnidentified030(false)
-    , mUnidentified031(false)
-    , mUnidentified034(2)
-    , mUnidentified038(2)
-    , mUnidentified144(1.0f,
+    : mInitialized(false)
+    , mDecisionMade(false)
+    , mDecisionOutcome(2)
+    , mDecision(2)
+    , mCountdownTimer(1.0f,
           Function<FETimer*>(
               Bind<void>(MemFun(&OnlineConnectionQualityScene::OnCountdownTick), this, Placeholder<0>())))
-    , mUnidentified160(1.0f,
+    , mReturnTimer(1.0f,
           Function<FETimer*>(
               Bind<void>(MemFun(&OnlineConnectionQualityScene::OnReturnTimer), this, Placeholder<0>())))
-    , mUnidentified17C(false)
-    , mUnidentified180(30)
-    , mUnidentified300(false)
+    , mTimerTextDirty(false)
+    , mCountdownSeconds(30)
+    , mPopupActive(false)
 {
-    mUnidentified020[0] = 0;
-    mUnidentified020[1] = 0;
-    mUnidentified020[2] = 0;
-    mUnidentified020[3] = 0;
-    mUnidentified18C[0].mContext = (void*)0;
-    mUnidentified18C[0].mIgnoreInputLock = true;
-    mUnidentified18C[1].mContext = (void*)1;
-    mUnidentified18C[1].mIgnoreInputLock = true;
-    mUnidentified03C[0] = 2;
-    mUnidentified184[0] = 0;
-    mUnidentified03C[1] = 2;
-    mUnidentified184[1] = 0;
-    mUnidentified160.SetEnabled(false);
+    mHoverCounts[0] = 0;
+    mHoverCounts[1] = 0;
+    mHoverCounts[2] = 0;
+    mHoverCounts[3] = 0;
+    mDecisionButtons[0].mContext = (void*)0;
+    mDecisionButtons[0].mIgnoreInputLock = true;
+    mDecisionButtons[1].mContext = (void*)1;
+    mDecisionButtons[1].mIgnoreInputLock = true;
+    mMachineDecisions[0] = 2;
+    mProfileIds[0] = 0;
+    mMachineDecisions[1] = 2;
+    mProfileIds[1] = 0;
+    mReturnTimer.SetEnabled(false);
 }
 
 OnlineConnectionQualityScene::~OnlineConnectionQualityScene()
@@ -82,19 +82,19 @@ OnlineConnectionQualityScene::~OnlineConnectionQualityScene()
 
 void OnlineConnectionQualityScene::OnCheckConnection(NetMessageCheckConnection* message)
 {
-    mUnidentified184[0] = message->mProfileIds[0];
-    mUnidentified184[1] = message->mProfileIds[1];
+    mProfileIds[0] = message->mProfileIds[0];
+    mProfileIds[1] = message->mProfileIds[1];
 }
 
 void OnlineConnectionQualityScene::OnCountdownTick(FETimer* timer)
 {
-    mUnidentified17C = true;
-    if (mUnidentified180 > 0)
+    mTimerTextDirty = true;
+    if (mCountdownSeconds > 0)
     {
-        --mUnidentified180;
-        if (mUnidentified180 <= 5 && mUnidentified180 > 0)
+        --mCountdownSeconds;
+        if (mCountdownSeconds <= 5 && mCountdownSeconds > 0)
         {
-            if (mUnidentified180 == 1)
+            if (mCountdownSeconds == 1)
             {
                 FEAudio::PlayAnimAudioEvent(0x09AA8790, 0, 0, true);
             }
@@ -115,8 +115,8 @@ static inline void ShowWaitingForDecisions(OnlineConnectionQualityScene* scene)
 {
     for (int i = 0; i < 2; ++i)
     {
-        scene->mUnidentified2F4[i]->m_bVisible = false;
-        scene->mUnidentified18C[i].Disable();
+        scene->mDecisionButtonInstances[i]->m_bVisible = false;
+        scene->mDecisionButtons[i].Disable();
     }
 
     TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(scene->mPresentation->m_currentSlide, "Layer", "WAITING");
@@ -128,7 +128,7 @@ void OnlineConnectionQualityScene::SceneCreated()
     for (int i = 0; i < 2; ++i)
     {
         TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", sConnectionDecisionComponentNames[i]);
-        mUnidentified2F4[i] = component;
+        mDecisionButtonInstances[i] = component;
     }
 
     FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "QUALITY");
@@ -167,7 +167,7 @@ void OnlineConnectionQualityScene::UpdateConnectionQuality()
     }
 
     TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "QUALITY", "RATING", "stars");
-    mUnidentified2FC = component;
+    mStarsComponent = component;
     unsigned int latency = value >> 1;
     if (latency > 200)
     {
@@ -196,7 +196,7 @@ static inline bool IsAnyConnectionRejected(OnlineConnectionQualityScene* scene)
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
-        if (scene->mUnidentified03C[i] == 0)
+        if (scene->mMachineDecisions[i] == 0)
         {
             return true;
         }
@@ -209,7 +209,7 @@ static inline bool AreAllConnectionsAccepted(OnlineConnectionQualityScene* scene
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
-        if (scene->mUnidentified03C[i] != 1)
+        if (scene->mMachineDecisions[i] != 1)
         {
             return false;
         }
@@ -227,16 +227,16 @@ static inline void SendLobbyDraft()
 void OnlineConnectionQualityScene::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
-    if (mUnidentified300 && !g_pFEInput->HasInputLock(this))
+    if (mPopupActive && !g_pFEInput->HasInputLock(this))
     {
         return;
     }
-    mUnidentified160.Update(dt);
-    if (mUnidentified160.mEnabled)
+    mReturnTimer.Update(dt);
+    if (mReturnTimer.mEnabled)
     {
         return;
     }
-    if (!mUnidentified030)
+    if (!mInitialized)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -244,21 +244,21 @@ void OnlineConnectionQualityScene::Update(float dt)
             return;
         }
         InitializeInput();
-        mUnidentified030 = true;
+        mInitialized = true;
         for (int i = 0; i < 4; ++i)
         {
             GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
         }
     }
 
-    mUnidentified144.Update(dt);
-    if (mUnidentified17C)
+    mCountdownTimer.Update(dt);
+    if (mTimerTextDirty)
     {
         TLTextInstance* timer = FEFinder<TLTextInstance, 3>::Find(mPresentation->m_currentSlide, "Layer", "TIMER");
         UpdateConnectionQualityTimerText(this, timer);
-        mUnidentified17C = false;
+        mTimerTextDirty = false;
     }
-    if (mUnidentified180 <= 0)
+    if (mCountdownSeconds <= 0)
     {
         ShowWaitingForDecisions(this);
     }
@@ -297,34 +297,34 @@ void OnlineConnectionQualityScene::Update(float dt)
             event.mReleased = g_pFEInput->JustReleased((eFEINPUT_PAD)pad, 0x1E, true, 0);
             for (int i = 0; i < 2; ++i)
             {
-                mUnidentified18C[i].HandlePointerEvent(&event);
+                mDecisionButtons[i].HandlePointerEvent(&event);
             }
         }
     }
 
     bool isHost = roster->GetLocalMachineIndex() == 0;
-    if (mUnidentified034 == 2 && isHost)
+    if (mDecisionOutcome == 2 && isHost)
     {
         if (IsAnyConnectionRejected(this))
         {
-            mUnidentified034 = 0;
+            mDecisionOutcome = 0;
             NetMessageConnectionDecision message;
             message.mAccepted = false;
             message.mMachineIndex = 0;
             g_pNetworkSession->SendConnectionDecisionToEveryone(&message);
         }
-        else if (mUnidentified180 <= 0 || AreAllConnectionsAccepted(this))
+        else if (mCountdownSeconds <= 0 || AreAllConnectionsAccepted(this))
         {
-            mUnidentified034 = 1;
+            mDecisionOutcome = 1;
             SendLobbyDraft();
         }
     }
 
-    if (mUnidentified034 == 0)
+    if (mDecisionOutcome == 0)
     {
-        if (mUnidentified038 == 0)
+        if (mDecision == 0)
         {
-            mUnidentified160.SetEnabled(true);
+            mReturnTimer.SetEnabled(true);
         }
         else
         {
@@ -347,11 +347,11 @@ void OnlineConnectionQualityScene::InitializeInput()
 
     for (int i = 0; i < 2; ++i)
     {
-        mUnidentified18C[i].SetInstanceBounds(
-            mUnidentified2F4[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mUnidentified18C[i].SetPointerEnterCallback(over);
-        mUnidentified18C[i].SetPointerLeaveCallback(off);
-        mUnidentified18C[i].SetPointerPressCallback(select);
+        mDecisionButtons[i].SetInstanceBounds(
+            mDecisionButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
+        mDecisionButtons[i].SetPointerEnterCallback(over);
+        mDecisionButtons[i].SetPointerLeaveCallback(off);
+        mDecisionButtons[i].SetPointerPressCallback(select);
     }
 }
 
@@ -362,7 +362,7 @@ inline void OnlineConnectionQualityScene::ShowError(int error)
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&OnlineConnectionQualityScene::CloseConnectionsAndReturn), this)));
-        mUnidentified300 = true;
+        mPopupActive = true;
     }
 }
 
@@ -370,9 +370,9 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, vo
 {
     ShowWaitingForDecisions(this);
 
-    if (!mUnidentified031)
+    if (!mDecisionMade)
     {
-        mUnidentified031 = true;
+        mDecisionMade = true;
         for (int i = 0; i < 4; ++i)
         {
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -385,12 +385,12 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, vo
         {
         case 0:
             accepted = true;
-            mUnidentified038 = 1;
+            mDecision = 1;
             FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
             break;
         case 1:
             accepted = false;
-            mUnidentified038 = 0;
+            mDecision = 0;
             FEAudio::PlayAnimAudioEvent(0x6F6A3A07, 0, 0, true);
             break;
         }
@@ -399,11 +399,11 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, vo
         {
             if (accepted)
             {
-                mUnidentified03C[0] = 1;
+                mMachineDecisions[0] = 1;
             }
             else
             {
-                mUnidentified03C[0] = 0;
+                mMachineDecisions[0] = 0;
             }
         }
         else
@@ -425,44 +425,44 @@ void OnlineConnectionQualityScene::OnConnectionDecision(NetMessageConnectionDeci
     {
         if (message->mAccepted)
         {
-            mUnidentified034 = 1;
+            mDecisionOutcome = 1;
         }
         else
         {
-            mUnidentified034 = 0;
+            mDecisionOutcome = 0;
         }
     }
     else
     {
         if (message->mAccepted)
         {
-            mUnidentified03C[machine] = 1;
+            mMachineDecisions[machine] = 1;
         }
         else
         {
-            mUnidentified03C[machine] = 0;
+            mMachineDecisions[machine] = 0;
         }
     }
 }
 
 void OnlineConnectionQualityScene::OnDecisionPointerEnter(unsigned int index, void* context)
 {
-    ++mUnidentified020[index];
-    mUnidentified2F4[(int)context]->SetActiveSlide("OVER", true, false);
-    mUnidentified18C[(int)context].SetPointerState(1, index);
+    ++mHoverCounts[index];
+    mDecisionButtonInstances[(int)context]->SetActiveSlide("OVER", true, false);
+    mDecisionButtons[(int)context].SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
 }
 
 void OnlineConnectionQualityScene::OnDecisionPointerLeave(unsigned int index, void* context)
 {
-    --mUnidentified020[index];
-    mUnidentified2F4[(int)context]->SetActiveSlide("OFF", true, false);
-    mUnidentified18C[(int)context].SetPointerState(0, index);
+    --mHoverCounts[index];
+    mDecisionButtonInstances[(int)context]->SetActiveSlide("OFF", true, false);
+    mDecisionButtons[(int)context].SetPointerState(0, index);
 }
 
 void OnlineConnectionQualityScene::CloseConnectionsAndReturn()
 {
-    mUnidentified300 = false;
+    mPopupActive = false;
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
     int machineIndex = lobby->GetLocalMachineIndex();
     bool isHost = machineIndex == 0;
@@ -471,7 +471,7 @@ void OnlineConnectionQualityScene::CloseConnectionsAndReturn()
     {
         if (i != machineIndex)
         {
-            profileId = mUnidentified184[i];
+            profileId = mProfileIds[i];
             break;
         }
     }

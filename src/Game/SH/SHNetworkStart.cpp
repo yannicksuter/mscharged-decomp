@@ -36,7 +36,7 @@ void ResumeNetworkStart()
 
 NetworkStartScene::NetworkStartScene()
     : mState(0)
-    , mUnidentified238(false)
+    , mShowPlayer2Controls(false)
 {
     gNetworkStartWaitingForDialog = false;
     gNetworkStartResetRequested = false;
@@ -81,7 +81,7 @@ void NetworkStartScene::SetActionButtons(int state)
     buttons->m_bVisible = visible;
 }
 
-void NetworkStartScene::fn_801FC7E4(int state)
+void NetworkStartScene::EnterState(int state)
 {
     mMenuItems.SetItem(0);
     int buttons = 0;
@@ -118,7 +118,7 @@ void NetworkStartScene::fn_801FC7E4(int state)
     }
 }
 
-void NetworkStartScene::fn_801FCA60(TLComponentInstance* component, int state)
+void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int state)
 {
     struct MatchData
     {
@@ -129,11 +129,11 @@ void NetworkStartScene::fn_801FCA60(TLComponentInstance* component, int state)
     switch (state)
     {
     case 0:
-        fn_801FC7E4(0);
+        EnterState(0);
         break;
     case 1:
     {
-        fn_801FC7E4(1);
+        EnterState(1);
         LANLobby* lobby = g_pNetworkSessionBase->GetTransport();
         MatchData data;
         NetworkStatsManager* stats = NetworkStatsManager::Instance();
@@ -176,7 +176,7 @@ void NetworkStartScene::fn_801FCA60(TLComponentInstance* component, int state)
     }
     case 2:
     {
-        fn_801FC7E4(2);
+        EnterState(2);
         LANLobby* lobby = g_pNetworkSessionBase->GetTransport();
         MatchData data;
         NetworkStatsManager* stats = NetworkStatsManager::Instance();
@@ -257,7 +257,7 @@ void NetworkStartScene::SceneCreated()
             item->SetCallback(ON_UNHIGHLIGHT, callback);
         }
         {
-            MenuItem<TLComponentInstance>::Callback callback(Bind<void>(MemFun(&NetworkStartScene::fn_801FCA60), this, placeholder0, menuStates[i]));
+            MenuItem<TLComponentInstance>::Callback callback(Bind<void>(MemFun(&NetworkStartScene::OnMenuItemApply), this, placeholder0, menuStates[i]));
             item->SetCallback(ON_APPLY, callback);
         }
         item->SetLockedFlag(false);
@@ -266,7 +266,7 @@ void NetworkStartScene::SceneCreated()
     presentation->SetActiveSlide("online options", true);
     UpdatePlayer2Controls(this);
     mMenuItems.SetFlag(1);
-    fn_801FC7E4(mState);
+    EnterState(mState);
     g_pNetworkSessionBase->SetSessionState(2);
     g_pNetworkSessionBase->GetTransport()->SetLobbyListener(this);
     FEMusic::StartStreamIfDifferent(1);
@@ -279,8 +279,8 @@ static void UpdatePlayer2Controls(NetworkStartScene* scene)
     {
         bool visible = false;
         if (i == 0)
-            visible = !scene->mUnidentified238;
-        FEFinder<TLTextInstance, 3>::Find(scene->mPresentation, slides[i], "Layer", "P2ReadyText")->m_bVisible = scene->mUnidentified238;
+            visible = !scene->mShowPlayer2Controls;
+        FEFinder<TLTextInstance, 3>::Find(scene->mPresentation, slides[i], "Layer", "P2ReadyText")->m_bVisible = scene->mShowPlayer2Controls;
         FEFinder<TLComponentInstance, 2>::Find(scene->mPresentation, slides[i], "Layer", "P2StartComponent")->m_bVisible = visible;
     }
 }
@@ -292,32 +292,32 @@ void NetworkStartScene::Update(float dt)
         return;
     if (gNetworkStartResetRequested)
     {
-        fn_801FC7E4(0);
+        EnterState(0);
         gNetworkStartResetRequested = false;
     }
     switch (mState)
     {
     case 0:
-        fn_801FD834();
+        UpdateMenuInput();
         break;
     case 1:
-        fn_801FDD08();
+        UpdateLobby();
         break;
     case 2:
         if (g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0))
-            fn_801FC7E4(0);
+            EnterState(0);
         break;
     case 3:
         break;
     }
 }
 
-void NetworkStartScene::fn_801FD834()
+void NetworkStartScene::UpdateMenuInput()
 {
     eFEINPUT_PAD pad = FE_ALL_PADS;
     if (g_pFEInput->IsAutoPressed(FE_PAD2_ID, 32, true, 0))
     {
-        mUnidentified238 = true;
+        mShowPlayer2Controls = true;
         UpdatePlayer2Controls(this);
     }
     TLSlide* slide = mPresentation->GetActiveSlide();
@@ -345,7 +345,7 @@ void NetworkStartScene::fn_801FD834()
     }
 }
 
-void NetworkStartScene::fn_801FDD08()
+void NetworkStartScene::UpdateLobby()
 {
     int playerCount = 0;
     for (int i = 0; i < 7; ++i)
@@ -372,7 +372,7 @@ void NetworkStartScene::fn_801FDD08()
     {
         int result = lobby->AbortCreateGame();
         tDebugPrintManager::Print(DC_NETWORK, "Abort create game returned status %d\n", result);
-        fn_801FC7E4(0);
+        EnterState(0);
     }
     else if (g_pFEInput->JustPressed(FE_ALL_PADS, 30, true, 0) && playerCount >= 2)
     {
@@ -426,7 +426,7 @@ void NetworkStartScene::OnGameJoined(int result)
     switch (result)
     {
     case 0:
-        fn_801FC7E4(3);
+        EnterState(3);
         break;
     case 4:
         if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)

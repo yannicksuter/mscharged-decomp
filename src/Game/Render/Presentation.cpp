@@ -69,7 +69,6 @@ extern "C"
     void fn_8019571C(ReplayChoreo* choreo);
     void fn_801959F0(ReplayChoreo* choreo, int quality);
     void fn_801E2230(void* manager, int value);
-    float fn_800155A0(void* ball, int index);
     extern bool lbl_806DCD60;
     extern bool lbl_806E1961;
 }
@@ -799,11 +798,11 @@ void Presentation::OnGoalScored(GoalScoredData* data)
 
     if (data->uGoalType == 5)
     {
-        data->pLastTouch[data->uTeamIndex]->fn_8001E168();
+        data->pLastTouch[data->uTeamIndex]->IsCaptain();
     }
     else
     {
-        data->pScorer->fn_8001E168();
+        data->pScorer->IsCaptain();
     }
 
     const char* filter = "high";
@@ -1785,34 +1784,34 @@ void Presentation::UpdateBallGlow(int level)
     }
     else if (g_pBall != 0)
     {
-        mBallGlowLevel = fn_800155A0(g_pBall, 0);
+        mBallGlowLevel = GetBallChargeValue(g_pBall, 0);
     }
     else
     {
         mBallGlowLevel = 0.0f;
     }
 
-    fn_801BA358();
+    KillBallGlow();
 
     if (mBallGlowLevel < 1.0f)
     {
-        fn_801B9DAC("ball_shot_windup_glow_0");
+        EmitBallGlow("ball_shot_windup_glow_0");
     }
     else if (mBallGlowLevel < 2.0f)
     {
-        fn_801B9DAC("ball_shot_windup_glow_1");
+        EmitBallGlow("ball_shot_windup_glow_1");
     }
     else if (mBallGlowLevel < 3.0f)
     {
-        fn_801B9DAC("ball_shot_windup_glow_2");
+        EmitBallGlow("ball_shot_windup_glow_2");
     }
     else if (mBallGlowLevel < 4.0f)
     {
-        fn_801B9DAC("ball_shot_windup_glow_3");
+        EmitBallGlow("ball_shot_windup_glow_3");
     }
     else
     {
-        fn_801B9DAC("ball_shot_windup_glow_max");
+        EmitBallGlow("ball_shot_windup_glow_max");
     }
 }
 

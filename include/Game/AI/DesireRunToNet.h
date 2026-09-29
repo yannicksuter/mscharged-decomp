@@ -7,8 +7,8 @@
 class DesireRunToNet : public Desire
 {
 public:
-    DesireRunToNet(const TransitionFunc& transition)
-        : Desire(9, transition)
+    DesireRunToNet()
+        : Desire(9, ScriptTransitionFunc("TransDesireRunToNet"))
     {
     }
 

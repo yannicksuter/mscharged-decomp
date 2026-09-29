@@ -47,6 +47,7 @@
 #include <stddef.h>
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
+#include "Game/CharacterTriggers.h"
 
 extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
 extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
@@ -54,7 +55,6 @@ extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 extern "C" shdStateMachine* fn_80319E84(
     UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" void fn_80316968(shdStateMachine*);
-extern "C" void fn_80039CF0(cFielder*, int);
 extern "C" float fn_800DDF54(cPlayer*, cPlayer*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
@@ -256,11 +256,11 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
 
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)19)
     {
-        mUnidentified420 = gNPCManager->fn_801A9D20();
+        m_pBulletBill = gNPCManager->fn_801A9D20();
     }
     else
     {
-        mUnidentified420 = 0;
+        m_pBulletBill = 0;
     }
 }
 
@@ -279,9 +279,9 @@ cFielder::~cFielder()
     {
         delete mUnidentified3F8.mUnidentified08;
     }
-    if (mUnidentified420 != 0)
+    if (m_pBulletBill != 0)
     {
-        mUnidentified420->Hide(true);
+        m_pBulletBill->Hide(true);
     }
     delete m_pShotMeter;
     mUnidentified428->Cleanup(true, true);
@@ -498,7 +498,7 @@ bool cFielder::CanDoCaptainShootToScore()
             bUnidentified1 = true;
         }
 
-        bool bUnidentified2 = fn_8001E168();
+        bool bUnidentified2 = IsCaptain();
         if (bUnidentified1 && bUnidentified2)
         {
             float fRadius = lbl_806E3420;
@@ -902,9 +902,10 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 }
                 else
                 {
+                    float fNumKeys = pFielderCollidedWith->m_pCurrentAnimController
+                        ->m_pSAnim->m_nNumKeys;
                     float fHitTime = fn_8002D038(pFielderCollidedWith->m_pTweaks)
-                        / pFielderCollidedWith->m_pCurrentAnimController
-                              ->m_pSAnim->m_nNumKeys;
+                        / fNumKeys;
                     float fMyHitTime = fabsf(m_pCurrentAnimController->m_fTime - fHitTime);
                     float fOtherHitTime = fabsf(pFielderCollidedWith->m_pCurrentAnimController->m_fTime - fHitTime);
                     if (fMyHitTime <= fOtherHitTime)
@@ -934,17 +935,17 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             float fRunningSpeed = fn_8002C254(m_pTweaks);
             float attackIntensity = NormalizeVal(closingSpeed, -fRunningSpeed, fRunningSpeed);
             int nUnidentified = fn_8002E9FC(this, pFielderCollidedWith, attackIntensity);
-            u8 canPickup = 0;
+            bool canPickup = false;
             if (m_pBall != 0 && (attackIntensity >= lbl_806DB7FC || fn_8003E74C()))
             {
                 if (lbl_806DB808)
                 {
                     if (nUnidentified == 2 || fn_8003E74C())
-                        canPickup = 1;
+                        canPickup = true;
                 }
                 else
                 {
-                    canPickup = 1;
+                    canPickup = true;
                 }
             }
 
@@ -970,7 +971,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
             fn_80047240(pFielderCollidedWith,
                 pFielderCollidedWith->mUnidentified024.m_aActualFacingDirection,
-                nUnidentified, canPickup != 0, true);
+                nUnidentified, canPickup, true);
             PlayerAttackData* pAttackData = g_PlayerAttackDataPool.Allocate();
             pAttackData->pAttacker = pFielderCollidedWith;
             u8 bHasGlobalPad = pFielderCollidedWith->GetGlobalPad() != 0;
@@ -1077,14 +1078,14 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             || m_eActionState == ACTION_LOOSE_BALL_SHOT)
         {
             nlVector3 v3Position = mUnidentified024.m_v3Position;
-            float thisRadius, otherRadius;
+            float otherRadius, thisRadius;
             pFielderCollidedWith->m_pPhysicsCharacter->GetRadius(&otherRadius);
             m_pPhysicsCharacter->GetRadius(&thisRadius);
             nlVector2 v2Delta;
             nlVec2Set(v2Delta, pFielderCollidedWith->mUnidentified024.m_v3Position.x - v3Position.x,
                 pFielderCollidedWith->mUnidentified024.m_v3Position.y - v3Position.y);
             float fOverlap = thisRadius + otherRadius - nlVec2Length(v2Delta);
-            if (fOverlap <= 0.0f)
+            if (!(fOverlap > 0.0f))
                 return;
 
             nlVector3 v3BallDelta;
@@ -1352,14 +1353,14 @@ void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
                 else
                 {
                     fn_80047240(pOwner, pOwner->mUnidentified024.m_aActualFacingDirection, 0, false, false);
-                    PlaySound(pOwner->mUnidentified318, 0x9E87FEBC, 0, 0);
+                    PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                     fn_80139D1C(2, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
                 fn_80047240(pOwner, pOwner->mUnidentified024.m_aActualFacingDirection, 1, false, true);
-                PlaySound(pOwner->mUnidentified318, 0x9E87FEBC, 0, 0);
+                PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                 fn_80139D1C(2, pOwner->GetGlobalPad());
             }
         }
@@ -1600,7 +1601,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_ModelType = CharModel_Rigid;
         mUnidentified024.m_v3Position.z = 0.0f;
         mUnidentified024.m_v3Velocity.z = 0.0f;
-        fn_801B93E8(this);
+        EndElectrocution(this);
         break;
 
     case 1:
@@ -1611,7 +1612,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_ModelType = CharModel_Rigid;
         mUnidentified024.m_v3Position.z = 0.0f;
         mUnidentified024.m_v3Velocity.z = 0.0f;
-        fn_801B93E8(this);
+        EndElectrocution(this);
         break;
 
     case 3:
@@ -1693,7 +1694,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case ACTION_SLIDE_ATTACK:
-        fn_801BB5DC(this, 0);
+        KillSlideTackleTrail(this, 0);
         StopSound(0x2AE03886, this);
         break;
 
@@ -1701,7 +1702,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         KillDaze(this);
         if (fn_8003E8A0(this))
         {
-            fn_801B97DC(this);
+            EmitBowserSmoke(this);
         }
         if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12 && !mbTangible)
         {
@@ -2044,7 +2045,7 @@ void cFielder::DoClearBall()
     {
         float fCharge = Interpolate(lbl_806DB834, lbl_806DB838,
             InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE38(m_pTweaks)));
-        fn_800154FC(g_pBall, fCharge + fn_800155A0(g_pBall, 0));
+        fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     }
     g_pBall->ShootAtFast(v3ClearBallVelocity, v3Target, fDesiredTime);
     g_pBall->ShootRelease(v3ClearBallVelocity, SPINTYPE_BACK);
@@ -2272,7 +2273,7 @@ void cFielder::DoRegularShooting(bool bParam)
 
     float fCharge = Interpolate(lbl_806DB790, lbl_806DB794,
         InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE84(m_pTweaks)));
-    fn_800154FC(g_pBall, fCharge + fn_800155A0(g_pBall, 0));
+    fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     fn_80035194(this, v3BallVelocity, v3Target, nBallState);
 
     if (nBallState == 8)
@@ -3527,9 +3528,9 @@ void cFielder::ResetEffects()
     {
         mUnidentified3F8.mUnidentified08->ClearWalls();
     }
-    if (mUnidentified420 != 0)
+    if (m_pBulletBill != 0)
     {
-        mUnidentified420->Hide(true);
+        m_pBulletBill->Hide(true);
     }
 }
 
@@ -3985,7 +3986,7 @@ bool FuzzyVariant::IsPointerType() const
             <= (unsigned int)(FT_BALL - FT_PLAYER)));
 }
 
-void cFielder::fn_80036A38(int nParam, float fAmount)
+void cFielder::IncrementPowerupMeter(int nParam, float fAmount)
 {
     if (fAmount > 0.0f)
     {

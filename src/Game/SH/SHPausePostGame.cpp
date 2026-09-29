@@ -36,20 +36,20 @@ void PausePostGameScene::OnSelectQuit()
 }
 
 PausePostGameScene::PausePostGameScene(int mode)
-    : mUnidentified5D4(mode)
-    , mUnidentified5D8(FE_ALL_PADS)
-    , mTimer(1.0f, Function<FETimer*>(Bind<void>(MemFun(&PausePostGameScene::fn_801EDBF8), this, Placeholder<0>())))
-    , mUnidentified60C(false)
-    , mUnidentified60D(false)
-    , mUnidentified610(lbl_806DD818)
+    : mMode(mode)
+    , mControllingInput(FE_ALL_PADS)
+    , mTimer(1.0f, Function<FETimer*>(Bind<void>(MemFun(&PausePostGameScene::OnCountdownTick), this, Placeholder<0>())))
+    , mTimerTicked(false)
+    , mSummaryDisplayed(false)
+    , mCountdownSeconds(lbl_806DD818)
 {
-    mUnidentified5DC = g_pNetworkSessionBase->GetNumMachines() > 1;
-    mTimer.SetEnabled(mUnidentified5DC);
+    mIsMultiplayer = g_pNetworkSessionBase->GetNumMachines() > 1;
+    mTimer.SetEnabled(mIsMultiplayer);
 }
 
 PausePostGameScene::~PausePostGameScene()
 {
-    if (mUnidentified5D4 == 1)
+    if (mMode == 1)
         g_bRenderWorld = true;
 }
 
@@ -57,19 +57,19 @@ void PausePostGameScene::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     SetPointerEnabled(true);
-    if (mUnidentified5D4 == 1 && g_e3_Build)
+    if (mMode == 1 && g_e3_Build)
         g_bRenderWorld = false;
-    if (mUnidentified5D4 == 0 && GameInfoManager::Instance()->IsInFriendlyMode())
-        fn_801EE6A8();
-    if (mUnidentified5D4 == 0)
+    if (mMode == 0 && GameInfoManager::Instance()->IsInFriendlyMode())
+        BuildStoryArticle();
+    if (mMode == 0)
         FEMusic::StartStreamIfDifferent(13);
     SHStrikerTimesBase::SceneCreated();
 }
 
-void PausePostGameScene::fn_801EDBF8(FETimer* timer)
+void PausePostGameScene::OnCountdownTick(FETimer* timer)
 {
-    mUnidentified60C = true;
-    --mUnidentified610;
+    mTimerTicked = true;
+    --mCountdownSeconds;
 }
 
 bool IsCurrentSeriesComplete()
@@ -82,7 +82,7 @@ bool IsCurrentSeriesComplete()
     return false;
 }
 
-void fn_801EDC90(bool online)
+void ContinuePostGame(bool online)
 {
     const GameplaySettings* settings = GameInfoManager::Instance()->GetCurrentSettings();
     if (IsCurrentSeriesComplete())
@@ -126,7 +126,7 @@ void fn_801EDC90(bool online)
 void PausePostGameScene::Update(float dt)
 {
     SHStrikerTimesBase::Update(dt);
-    if (mUnidentified5D4 == 0)
+    if (mMode == 0)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "blackbox2");
         nlColour colour = instance->GetAssetColour();
@@ -136,42 +136,42 @@ void PausePostGameScene::Update(float dt)
             nlColourSet(colour, colour[0], colour[1], colour[2], 178);
         instance->SetAssetColour(colour);
     }
-    if (mUnidentified5DC)
+    if (mIsMultiplayer)
         mTimer.Update(dt);
-    if (!mUnidentified60D || mUnidentified60C)
+    if (!mSummaryDisplayed || mTimerTicked)
     {
-        fn_801EE180();
-        mUnidentified60D = true;
-        if (mUnidentified60C)
-            mUnidentified60C = false;
+        UpdateSummaryDisplay();
+        mSummaryDisplayed = true;
+        if (mTimerTicked)
+            mTimerTicked = false;
     }
-    if (mUnidentified5D4 == 0 && mUnidentified5DC && mUnidentified610 <= 0)
+    if (mMode == 0 && mIsMultiplayer && mCountdownSeconds <= 0)
         OnDoneTransitionComplete();
 }
 
-void PausePostGameScene::fn_801EE180()
+void PausePostGameScene::UpdateSummaryDisplay()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     unsigned long titleHash = nlStringLowerHash("title");
     unsigned long summaryHash = nlStringLowerHash("game summary");
     unsigned long layerHash = nlStringLowerHash("Layer");
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find(presentation, nlStringLowerHash("game summary"), layerHash, summaryHash, titleHash, 0, 0);
-    if (mUnidentified5D4 == 0)
+    if (mMode == 0)
         text->SetStringId("GAME_RESULTS_TITLE");
-    else if (mUnidentified5D4 == 1)
+    else if (mMode == 1)
         text->SetStringId("STATISTICS");
-    if (mUnidentified5DC)
+    if (mIsMultiplayer)
     {
         char buffer[8];
-        nlSNPrintf(buffer, 8, "%d", mUnidentified610);
-        nlStrToWcs(buffer, mUnidentified5DE, 8);
+        nlSNPrintf(buffer, 8, "%d", mCountdownSeconds);
+        nlStrToWcs(buffer, mCountdownText, 8);
         TLSlide* first = presentation->m_currentSlide;
         TLSlide* slide = first;
         do
         {
             TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->mTimer);
             GetNavigationScene()->mTimer->m_bVisible = true;
-            timer->SetString(mUnidentified5DE);
+            timer->SetString(mCountdownText);
             FEFinder<TLInstance, 2>::Find<TLSlide>(slide, "Layer", "NetworkWait")->m_bVisible = true;
             slide = slide->m_next;
         } while (slide != first);
@@ -182,16 +182,16 @@ void PausePostGameScene::fn_801EE180()
 
 void PausePostGameScene::OnDoneTransitionComplete()
 {
-    if (mUnidentified5DC && mUnidentified610 > 0)
+    if (mIsMultiplayer && mCountdownSeconds > 0)
         return;
     SHStrikerTimesBase::OnDoneTransitionComplete();
-    if (mUnidentified5D4 == 1)
+    if (mMode == 1)
     {
         BaseSceneHandler* scene = g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
         // The retail caller writes this byte in the returned pause scene.
         reinterpret_cast<u8*>(scene)[0x241] = true;
     }
-    else if (mUnidentified5D4 == 0)
+    else if (mMode == 0)
     {
         SetPointerEnabled(false);
         SHNavigation* navigation = GetNavigationScene();
@@ -204,11 +204,11 @@ void PausePostGameScene::OnDoneTransitionComplete()
         {
             if (g_e3_Build)
             {
-                mUnidentified5D4 = 2;
+                mMode = 2;
                 FEPopupMenu* popup = static_cast<FEPopupMenu*>(g_pOverlayManager->Push((SceneList)10, SCREEN_NOTHING, false));
                 popup->Create((ePopupMenu)142, Function<FnVoidVoid>(OnSelectQuit));
             }
-            else if (mUnidentified5DC && IsOnlineRankedMatch())
+            else if (mIsMultiplayer && IsOnlineRankedMatch())
             {
                 SetPointerEnabled(true);
                 g_pOverlayManager->Push((SceneList)93, SCREEN_NOTHING, true);
@@ -216,7 +216,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
             else
             {
                 g_pOverlayManager->Pop();
-                fn_801EDC90(mUnidentified5DC);
+                ContinuePostGame(mIsMultiplayer);
             }
         }
         else if (!GameInfoManager::Instance()->IsInMode4())
@@ -227,7 +227,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
     }
 }
 
-void PausePostGameScene::fn_801EE6A8()
+void PausePostGameScene::BuildStoryArticle()
 {
     BasicGameInfo* game = GameInfoManager::Instance()->GetCurrentGameInfo();
     int homeTeam = game->mTeamIndex[0];

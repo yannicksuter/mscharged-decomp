@@ -22,6 +22,7 @@ public:
         /* 0x4 */ ESCAPE_TYPE type;
 
         operator unsigned long() const { return hash; }
+        bool operator==(const unsigned long& key) const { return hash == key; }
     };
 
     nlColour GetExtendedColour();

@@ -1283,6 +1283,7 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
     nlVector3 v3CurRowPos;
     SaveData* pNextRight;
     SaveData* pCurBot;
+    SaveData* pRowBot;
     SaveData* pRightCorner;
     SaveData* pNextNextRight;
     SaveData* pCurLeft;
@@ -1392,7 +1393,7 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
     v3BotLeft.z -= 0.51f * zInc;
 
     pNextRight = pRightCorner;
-    pCurBot = pNextRight;
+    pRowBot = pNextRight;
     pNextNextRight = pNextRight->mpConnectedSaveData[2];
     v3CurRowPos = v3BotLeft;
 
@@ -1401,11 +1402,11 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
         if (v3CurRowPos.y >= pNextRight->mv3SavePos.y
             && pNextNextRight != 0)
         {
-            pCurBot = pNextRight;
+            pRowBot = pNextRight;
             pNextRight = pNextNextRight;
             pNextNextRight = pNextNextRight->mpConnectedSaveData[2];
         }
-        pCurLeft = pCurBot;
+        pCurLeft = pRowBot;
         pCurRight = pNextRight;
         v3CurColPos = v3CurRowPos;
 

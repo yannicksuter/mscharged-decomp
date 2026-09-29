@@ -193,7 +193,7 @@ public:
     void SetElectrocutionTextureEnabled(bool isEnabled);
     void fn_8001F1D8();
     bool IsPlayingEffect(const EffectsGroup* effectGroup) const;
-    bool fn_8001E2C0(const EffectsGroup* effectGroup) const;
+    bool IsEffectDying(const EffectsGroup* effectGroup) const;
     void EndEffect(const EffectsGroup* effectGroup);
     void KillEffect(const EffectsGroup* effectGroup);
     void PerformBlinking(GLSkinMesh* skinMesh, glModel* model) const;
@@ -233,7 +233,7 @@ public:
     void AttachEffect(EmissionController* pEmissionController);
     GLSkinMesh* GetSkinMesh(int modelType) const;
     void PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType);
-    void fn_8001C510(int modelType);
+    void SetModelType(int modelType);
     bool fn_8001C534(int modelType);
     void fn_8001C574();
     void fn_80022DAC(unsigned long uTextureID);
@@ -249,9 +249,9 @@ public:
     void fn_8001EF6C(float movementScale);
     void fn_8001DCE0(unsigned short aDirection);
     bool fn_8001E160();
-    bool fn_8001E168() const;
+    bool IsCaptain() const;
     bool fn_8001E184();
-    cPN_SAnimController* fn_800C2F64() const { return m_pCurrentAnimController; }
+    cPN_SAnimController* GetCurrentAnimController() const { return m_pCurrentAnimController; }
 
     cAnimInventory* GetAnimInventory() const
     {
@@ -272,6 +272,10 @@ public:
     u16 GetActualFacing() const
     {
         return mUnidentified024.m_aActualFacingDirection;
+    }
+    float GetPlayerScale() const
+    {
+        return mUnidentified024.m_fPlayerScale;
     }
     int GetHeadJointIndex() const
     {
@@ -321,8 +325,8 @@ public:
     /* 0x178 */ float mUnidentified178;
     /* 0x17C */ bool mUnidentified17C;
     /* 0x17D */ bool mUnidentified17D;
-    /* 0x17E */ bool mUnidentified17E;
-    /* 0x17F */ bool mUnidentified17F;
+    /* 0x17E */ bool m_bLeftPropAnimated;
+    /* 0x17F */ bool m_bRightPropAnimated;
     /* 0x180 */ bool mUnidentified180;
     /* 0x181 */ bool mUnidentified181;
     /* 0x182 */ bool mUnidentified182;

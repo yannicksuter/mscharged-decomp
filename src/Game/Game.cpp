@@ -138,7 +138,6 @@ extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
-extern "C" void fn_80038158(cFielder* pFielder, int param2);
 extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern void PlaySuddenDeathMusic();

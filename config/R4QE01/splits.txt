@@ -688,13 +688,27 @@ Game/TrophyInfo.cpp:
 	.data       start:0x80506F48 end:0x80507140
 	.sdata      start:0x806DC720 end:0x806DC740
 
+Game/DB/CupManager.cpp:
+	.text       start:0x8010A40C end:0x8010FD74
+	.rodata     start:0x804DC660 end:0x804DCA30
+	.data       start:0x80507140 end:0x80507290
+	.sbss       start:0x806E0F90 end:0x806E0F98
+
 Game/DB/GameProgress.cpp:
-	.text       start:0x8010A40C end:0x80111654
-	.ctors      start:0x804DB5DC end:0x804DB5E0
-	.rodata     start:0x804DC660 end:0x804DCBF8
-	.data       start:0x80507140 end:0x80507BD8
+	.text       start:0x8010FD74 end:0x80110D68
+	.data       start:0x80507290 end:0x805072B8
+	.sbss       start:0x806E0F98 end:0x806E0FA0
+
+Game/DB/StrikerChallenge.cpp:
+	.text       start:0x80110D68 end:0x8011162C
+	.rodata     start:0x804DCA30 end:0x804DCBE8
+	.data       start:0x805072B8 end:0x80507BD8
 	.sdata      start:0x806DC740 end:0x806DC7B8
-	.sbss       start:0x806E0F90 end:0x806E0FA8
+	.sbss       start:0x806E0FA0 end:0x806E0FA8
+
+NL/gl/glResourcePool.cpp:
+	.text       start:0x8011162C end:0x80111654
+	.ctors      start:0x804DB5DC end:0x804DB5E0
 
 Game/Task/FixedUpdateTask.cpp:
 	.text       start:0x80111654 end:0x80112C70
@@ -749,6 +763,7 @@ Game/Task/PlatPadUpdateTask.cpp:
 Game/Task/GameRenderTask.cpp:
 	.text       start:0x80115128 end:0x80115EE4
 	.ctors      start:0x804DB5F0 end:0x804DB5F4
+	.rodata     start:0x804DCBE8 end:0x804DCBF8
 	.data       start:0x80508080 end:0x80508148
 	.sdata      start:0x806DC7D8 end:0x806DC7F8
 	.sbss       start:0x806E1010 end:0x806E1030
@@ -3719,7 +3734,7 @@ Game/Audio/AudioResourceRuntime.cpp:
 	.sbss       start:0x806E2028 end:0x806E2030
 	.sdata2     start:0x806E6658 end:0x806E6660
 
-Game/Audio/UnidentifiedAudioScriptRuntime.cpp:
+Game/Audio/AudioScriptRuntime.cpp:
 	.text       start:0x802F6BC4 end:0x802F8418
 	.ctors      start:0x804DBA70 end:0x804DBA74
 	.data       start:0x8052F978 end:0x8052F998

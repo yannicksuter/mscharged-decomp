@@ -19,23 +19,23 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glPlat.h"
-#include "Game/Render/RLViewLayers.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include <math.h>
 
-static const nlVector3 lbl_804DC520 = { 0.0f, 0.0f, 0.0f };
+static const nlVector3 sZeroVector = { 0.0f, 0.0f, 0.0f };
 
-float lbl_806DC510[2] = { 18.0f, 0.0f };
-float lbl_806DC518 = 0.25f;
-float lbl_806DC51C = 0.25f;
-float lbl_806DC520 = 0.5f;
-float lbl_806DC524 = 4.0f;
-float lbl_806DC528 = 45.0f;
-float lbl_806DC52C = 1.0f;
-float lbl_806DC530 = 12.0f;
-float lbl_806DC534 = 1.25f;
-float lbl_806DC538[2] = { 1.666f, 0.0f };
+float gMatrixEffectCameraDistance[2] = { 18.0f, 0.0f };
+float gReplayCameraPositionDampingTime = 0.25f;
+float gReplayCameraLookAtDampingTime = 0.25f;
+float gReplayCameraLookAtOffsetDampingTime = 0.5f;
+float gReplayCameraDepthOfFieldOffset = 4.0f;
+float gReplayCameraDepthOfFieldReferenceFov = 45.0f;
+float gReplayCameraDepthOfFieldFovBlend = 1.0f;
+float gReplayCameraVerticalFovMarginDegrees = 12.0f;
+float gReplayCameraAspectRatio = 1.25f;
+float gReplayCameraWidescreenAspectRatio[2] = { 1.666f, 0.0f };
 
-u8 lbl_806E0F18[8];
+u8 gMatrixEffectCameraFrozen[8];
 
 static inline float GetSideDirection(int side)
 {
@@ -69,31 +69,31 @@ void ReplayCamera::UpdateTweakMode()
 ReplayCamera::ReplayCamera()
 {
     mDeltaFov = 0.0f;
-    mUnidentified024 = 0.0f;
+    mTargetFov = 0.0f;
     mFov = 50.0f;
     mSideOfInterest = 0;
     mNoDampenForOneUpdate = false;
-    mUnidentified061 = false;
+    mNoDampenLookAtForOneUpdate = false;
     mFrozen = false;
-    mUnidentified063 = false;
+    mPositionFrozen = false;
     mFocus = 0;
-    mUnidentified068 = 0;
+    mSecondaryFocus = 0;
     mCamPos = REPLAY_CAMERA_POSITION_SIDELINE;
-    mUnidentified0D4 = false;
-    mUnidentified0D8 = -1.0f;
-    mUnidentified0DC = -1.0f;
-    mUnidentified0E0 = -1.0f;
-    mUnidentified0E4 = -1.0f;
-    mUnidentified0E8 = 0.0f;
+    mAutoFov = false;
+    mAutoFovMin = -1.0f;
+    mAutoFovMax = -1.0f;
+    mAutoFovMinDistance = -1.0f;
+    mAutoFovMaxDistance = -1.0f;
+    mAutoFovMaxChangeRate = 0.0f;
     mViewMatrix.SetIdentity();
     nlVec3Set(mPosition, 0.0f, 0.0f, 2.0f);
     nlVec3Set(mLookAt, 0.0f, 0.0f, 1.0f);
-    nlVec3Set(mUnidentified030, 0.0f, 0.0f, 0.0f);
-    nlVec3Set(mUnidentified03C, 0.0f, 0.0f, 0.0f);
-    nlVec3Set(mUnidentified048, 0.0f, 0.0f, 0.0f);
-    nlVec3Set(mUnidentified054, 0.0f, 0.0f, 0.0f);
-    nlVec3Set(mUnidentified0C8, 0.0f, 0.0f, 0.0f);
-    mUnidentified0FC = 0.0f;
+    nlVec3Set(mPositionVelocity, 0.0f, 0.0f, 0.0f);
+    nlVec3Set(mLookAtVelocity, 0.0f, 0.0f, 0.0f);
+    nlVec3Set(mLookAtOffsetVelocity, 0.0f, 0.0f, 0.0f);
+    nlVec3Set(mLookAtOffset, 0.0f, 0.0f, 0.0f);
+    nlVec3Set(mPositionOffset, 0.0f, 0.0f, 0.0f);
+    mBallToGoalRotationDegrees = 0.0f;
 }
 
 /**
@@ -128,7 +128,7 @@ void ReplayCamera::Update(float fDeltaT)
 /**
  * Offset/Address/Size: 0x36DC | 0x800F5B3C | size: 0x8BC
  */
-void ReplayCamera::ManualUpdate(float deltaTime)
+void ReplayCamera::ManualUpdate(float deltaT)
 {
     ReplayManager* replayManager = ReplayManager::Instance();
     if (replayManager->mRender == NULL)
@@ -138,10 +138,10 @@ void ReplayCamera::ManualUpdate(float deltaTime)
 
     if (!mFrozen)
     {
-        nlVector3 lookAt = fn_800F6B40(mFocus);
+        nlVector3 lookAt = GetFocusPosition(mFocus);
         nlVector3 position = GetPosition(mCamPos, GetSideDirection(mSideOfInterest));
 
-        if (mUnidentified063)
+        if (mPositionFrozen)
         {
             position = mPosition;
         }
@@ -151,32 +151,32 @@ void ReplayCamera::ManualUpdate(float deltaTime)
             mLookAt = lookAt;
             mPosition = position;
             mNoDampenForOneUpdate = false;
-            mUnidentified061 = false;
+            mNoDampenLookAtForOneUpdate = false;
         }
-        else if (mUnidentified061)
+        else if (mNoDampenLookAtForOneUpdate)
         {
             mLookAt = lookAt;
-            mUnidentified061 = false;
+            mNoDampenLookAtForOneUpdate = false;
         }
         else
         {
-            nlVec3Sub(mLookAt, mLookAt, mUnidentified054);
-            Dampen(mPosition.x, position.x, mUnidentified030.x, lbl_806DC518, deltaTime);
-            Dampen(mPosition.y, position.y, mUnidentified030.y, lbl_806DC518, deltaTime);
-            Dampen(mPosition.z, position.z, mUnidentified030.z, lbl_806DC518, deltaTime);
-            Dampen(mLookAt.x, lookAt.x, mUnidentified03C.x, lbl_806DC51C, deltaTime);
-            Dampen(mLookAt.y, lookAt.y, mUnidentified03C.y, lbl_806DC51C, deltaTime);
-            Dampen(mLookAt.z, lookAt.z, mUnidentified03C.z, lbl_806DC51C, deltaTime);
+            nlVec3Sub(mLookAt, mLookAt, mLookAtOffset);
+            mPosition.x = Dampen(mPosition.x, position.x, mPositionVelocity.x, gReplayCameraPositionDampingTime, deltaT);
+            mPosition.y = Dampen(mPosition.y, position.y, mPositionVelocity.y, gReplayCameraPositionDampingTime, deltaT);
+            mPosition.z = Dampen(mPosition.z, position.z, mPositionVelocity.z, gReplayCameraPositionDampingTime, deltaT);
+            mLookAt.x = Dampen(mLookAt.x, lookAt.x, mLookAtVelocity.x, gReplayCameraLookAtDampingTime, deltaT);
+            mLookAt.y = Dampen(mLookAt.y, lookAt.y, mLookAtVelocity.y, gReplayCameraLookAtDampingTime, deltaT);
+            mLookAt.z = Dampen(mLookAt.z, lookAt.z, mLookAtVelocity.z, gReplayCameraLookAtDampingTime, deltaT);
         }
 
-        if (mUnidentified0D4 == true)
+        if (mAutoFov == true)
         {
             nlVector3 difference;
             nlVec3Sub(difference, lookAt, position);
             float distance = nlSqrt(difference.GetLengthSq3D(), true);
-            float maxChange = mUnidentified0E8 * deltaTime;
-            float fov = InterpolateRangeClamped(mUnidentified0D8, mUnidentified0DC,
-                mUnidentified0E0, mUnidentified0E4, distance);
+            float maxChange = mAutoFovMaxChangeRate * deltaT;
+            float fov = InterpolateRangeClamped(mAutoFovMin, mAutoFovMax,
+                mAutoFovMinDistance, mAutoFovMaxDistance, distance);
             if (nlAbs(mFov - fov) > maxChange)
             {
                 if (fov < mFov)
@@ -188,68 +188,65 @@ void ReplayCamera::ManualUpdate(float deltaTime)
         }
         else if (mDeltaFov != 0.0f)
         {
-            if (mFov < mUnidentified024)
-                mFov += deltaTime * mDeltaFov;
-            else if (mFov > mUnidentified024)
-                mFov -= deltaTime * mDeltaFov;
+            if (mFov < mTargetFov)
+                mFov += deltaT * mDeltaFov;
+            else if (mFov > mTargetFov)
+                mFov -= deltaT * mDeltaFov;
 
-            if (nlAbs(mFov - mUnidentified024) < 2.0f * (deltaTime * mDeltaFov))
+            if (fabsf(mFov - mTargetFov) < 2.0f * (deltaT * mDeltaFov))
                 mDeltaFov = 0.0f;
         }
 
         nlVector3 targetOffset = { 0.0f, 0.0f, 0.0f };
-        if (mUnidentified068 != mFocus)
+        if (mSecondaryFocus != mFocus)
         {
-            nlVector3 previousLookAt = fn_800F6B40(mUnidentified068);
-            targetOffset = fn_800F63F8(position, lookAt, previousLookAt,
+            nlVector3 secondaryLookAt = GetFocusPosition(mSecondaryFocus);
+            targetOffset = GetClampedFocusPosition(position, lookAt, secondaryLookAt,
                 glplatGetDefaultTargetWidth(), glplatGetDefaultTargetHeight(),
                 DegreesToRadians(mFov));
             nlVec3Sub(targetOffset, targetOffset, lookAt);
         }
 
-        if (mUnidentified054.x != targetOffset.x
-            && mUnidentified054.y != targetOffset.y
-            && mUnidentified054.z != targetOffset.z)
+        if (mLookAtOffset.x != targetOffset.x
+            && mLookAtOffset.y != targetOffset.y
+            && mLookAtOffset.z != targetOffset.z)
         {
-            nlVec3Scale(mUnidentified054, mUnidentified054, 10.0f);
             nlVec3Scale(targetOffset, targetOffset, 10.0f);
-            Dampen(mUnidentified054.x, targetOffset.x,
-                mUnidentified048.x, lbl_806DC520, deltaTime);
-            Dampen(mUnidentified054.y, targetOffset.y,
-                mUnidentified048.y, lbl_806DC520, deltaTime);
-            Dampen(mUnidentified054.z, targetOffset.z,
-                mUnidentified048.z, lbl_806DC520, deltaTime);
-            nlVec3Scale(mUnidentified054, mUnidentified054, 0.1f);
+            nlVec3Scale(mLookAtOffset, mLookAtOffset, 10.0f);
+            mLookAtOffset.x = Dampen(mLookAtOffset.x, targetOffset.x,
+                mLookAtOffsetVelocity.x, gReplayCameraLookAtOffsetDampingTime, deltaT);
+            mLookAtOffset.y = Dampen(mLookAtOffset.y, targetOffset.y,
+                mLookAtOffsetVelocity.y, gReplayCameraLookAtOffsetDampingTime, deltaT);
+            mLookAtOffset.z = Dampen(mLookAtOffset.z, targetOffset.z,
+                mLookAtOffsetVelocity.z, gReplayCameraLookAtOffsetDampingTime, deltaT);
+            nlVec3Scale(mLookAtOffset, mLookAtOffset, 0.1f);
         }
 
-        mLookAt.z += mUnidentified054.z;
-        mLookAt.y += mUnidentified054.y;
-        mLookAt.x += mUnidentified054.x;
+        nlVec3Add(mLookAt, mLookAt, mLookAtOffset);
 
-        if (mFov < 10.0f)
-            mFov = 10.0f;
+        if (mFov < 1.0f)
+            mFov = 1.0f;
         if (mFov > 120.0f)
             mFov = 120.0f;
     }
 
     if (nlTaskManager::m_pInstance->mCurrentState == 8)
     {
-        float fovScale = BlendCameraValue(1.0f, lbl_806DC528 / mFov, lbl_806DC52C);
+        float fovScale = BlendCameraValue(1.0f, gReplayCameraDepthOfFieldReferenceFov / mFov, gReplayCameraDepthOfFieldFovBlend);
         fovScale *= fovScale;
         lbl_806E0F20[0] = fovScale;
 
-        nlVector3 direction;
-        nlVec3Sub(direction, mPosition, mLookAt);
         DepthOfFieldManager::instance.m_fDistanceFromCamera
-            = lbl_806DC524 * lbl_806E0F20[0] + nlSqrt(direction.GetLengthSq3D(), true);
+            = gReplayCameraDepthOfFieldOffset * lbl_806E0F20[0]
+            + nlSqrt(CalculateDistanceSquared(mPosition, mLookAt), true);
     }
 }
 
 /**
  * Offset/Address/Size: 0x2E20 | 0x800F63F8 | size: 0x748
  */
-nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
-    const nlVector3& lookAt, const nlVector3& previousLookAt,
+nlVector3 ReplayCamera::GetClampedFocusPosition(const nlVector3& position,
+    const nlVector3& lookAt, const nlVector3& secondaryLookAt,
     unsigned int width, unsigned int height, float fov) const
 {
     float maximumAngle = DegreesToRadians(110.0f);
@@ -257,23 +254,23 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
     float angleScale = 1.0 - 1.0 / divisor;
     float horizontalLimit = fov * angleScale;
     horizontalLimit *= 0.5f;
-    float aspectRatio = IsWidescreen() ? lbl_806DC538[0] : lbl_806DC534;
+    float aspectRatio = IsWidescreen() ? gReplayCameraWidescreenAspectRatio[0] : gReplayCameraAspectRatio;
     float verticalLimit = fov * (1.0 / aspectRatio) * angleScale;
     verticalLimit *= 0.5f;
-    verticalLimit -= DegreesToRadians(lbl_806DC530);
+    verticalLimit -= DegreesToRadians(gReplayCameraVerticalFovMarginDegrees);
     verticalLimit = nlMaxEquals(0.005f, verticalLimit);
 
     nlVector3 result = lookAt;
-    if (!nlNear(previousLookAt, lookAt))
+    if (!nlNear(secondaryLookAt, lookAt))
     {
         nlVector3 direction;
         nlVec3Sub(direction, lookAt, position);
         float distance = nlSqrt(direction.GetLengthSq3D(), true);
         nlVec3Normalize(direction, direction);
 
-        nlVector3 previousDirection;
-        nlVec3Sub(previousDirection, previousLookAt, position);
-        nlVec3Normalize(previousDirection, previousDirection);
+        nlVector3 secondaryDirection;
+        nlVec3Sub(secondaryDirection, secondaryLookAt, position);
+        nlVec3Normalize(secondaryDirection, secondaryDirection);
 
         nlVector3 side;
         nlVec3CrossProduct(side, direction, mUpVector);
@@ -285,16 +282,19 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
         if (cameraUp.GetLengthSq3D() < 0.0f)
             nlVec3Scale(cameraUp, -1.0f);
 
+        nlVector3 v3Unidentified;
+        nlVec3Set(v3Unidentified, 1.0f, 0.0f, 0.0f);
+
         nlMatrix4 cameraMatrix;
         nlMatrix4 inverseCameraMatrix;
-        nlMakeRotTransMatrix(cameraMatrix, direction, cameraUp, mUpVector, lbl_804DC520);
+        nlMakeRotTransMatrix(cameraMatrix, direction, cameraUp, mUpVector, sZeroVector);
         nlInvertRotTransMatrix(inverseCameraMatrix, cameraMatrix);
 
         nlVector3 localDirection;
-        nlMultDirVectorMatrix(localDirection, previousDirection, inverseCameraMatrix);
+        nlMultDirVectorMatrix(localDirection, secondaryDirection, inverseCameraMatrix);
 
         float horizontalAngle = AngUnitsToRad_fromUnsignedShort(
-            (unsigned short)(int)(10430.378f * nlATan2f(localDirection.x, localDirection.y)));
+            nlVector3ToAngle(localDirection));
         if (localDirection.y < 0.0f && nlAbs(horizontalAngle) > horizontalLimit)
             horizontalAngle = -1.0f * (DegreesToRadians(360.0f) - horizontalAngle);
         if (nlAbs(horizontalAngle) > maximumAngle)
@@ -304,7 +304,7 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
             (unsigned short)(int)(10430.378f * nlATan2f(localDirection.z, 1.0f)));
         if (nlAbs(verticalAngle) > DegreesToRadians(180.0f))
             verticalAngle = DegreesToRadians(360.0f) - verticalAngle;
-        if (localDirection.y > 0.0f)
+        if (localDirection.z > 0.0f)
             verticalAngle *= -1.0f;
         if (nlAbs(verticalAngle) > maximumAngle)
             verticalAngle = 0.0f;
@@ -316,8 +316,7 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
         {
             nlVector3 unrotatedDirection = direction;
             nlQuaternion horizontalRotation;
-            fn_802B5370(horizontalRotation, cameraUp,
-                (unsigned short)(int)(10430.378f * horizontalAngle));
+            nlMakeQuat(horizontalRotation, cameraUp, horizontalAngle);
             RotateVector(direction, unrotatedDirection, horizontalRotation);
         }
 
@@ -326,8 +325,7 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
             nlVec3CrossProduct(side, direction, mUpVector);
             nlVector3 unrotatedDirection = direction;
             nlQuaternion verticalRotation;
-            fn_802B5370(verticalRotation, side,
-                (unsigned short)(int)(10430.378f * verticalAngle));
+            nlMakeQuat(verticalRotation, side, verticalAngle);
             RotateVector(direction, unrotatedDirection, verticalRotation);
         }
 
@@ -342,7 +340,7 @@ nlVector3 ReplayCamera::fn_800F63F8(const nlVector3& position,
 /**
  * Offset/Address/Size: 0x26D8 | 0x800F6B40 | size: 0x310
  */
-nlVector3 ReplayCamera::fn_800F6B40(int focus) const
+nlVector3 ReplayCamera::GetFocusPosition(int focus) const
 {
     RenderSnapshot* render = ReplayManager::Instance()->mRender;
     nlVector3 result = { 0.0f, 0.0f, 0.0f };
@@ -418,39 +416,39 @@ nlVector3 ReplayCamera::fn_800F6B40(int focus) const
 /**
  * Offset/Address/Size: 0x23C8 | 0x800F6E50 | size: 0x8
  */
-void ReplayCamera::SetSideOfInterest(int sideOfInterest)
+void ReplayCamera::SetSideOfInterest(int side)
 {
-    mSideOfInterest = sideOfInterest;
+    mSideOfInterest = side;
 }
 
 /**
  * Offset/Address/Size: 0x23C0 | 0x800F6E58 | size: 0xA0
  */
-void ReplayCamera::CutTo(ReplayCameraPosition camPos)
+void ReplayCamera::CutTo(ReplayCameraPosition position)
 {
-    mCamPos = camPos;
+    mCamPos = position;
     mFrozen = false;
-    mUnidentified063 = false;
+    mPositionFrozen = false;
     mPosition = GetPosition(mCamPos, -1.0f);
     mFov = GetFov(mCamPos);
-    mUnidentified061 = true;
+    mNoDampenLookAtForOneUpdate = true;
     mNoDampenForOneUpdate = false;
-    mUnidentified0EC = false;
-    nlVec3Set(mUnidentified0C8, 0.0f, 0.0f, 0.0f);
-    mUnidentified0FC = 0.0f;
+    mUsePositionLimits = false;
+    nlVec3Set(mPositionOffset, 0.0f, 0.0f, 0.0f);
+    mBallToGoalRotationDegrees = 0.0f;
 }
 
 /**
  * Offset/Address/Size: 0x2320 | 0x800F6EF8 | size: 0x2C
  */
-void ReplayCamera::fn_800F6EF8(ReplayCameraPosition camPos)
+void ReplayCamera::MoveTo(ReplayCameraPosition position)
 {
     mFrozen = false;
-    mUnidentified063 = false;
-    mCamPos = camPos;
-    mUnidentified0EC = false;
-    nlVec3Set(mUnidentified0C8, 0.0f, 0.0f, 0.0f);
-    mUnidentified0FC = 0.0f;
+    mPositionFrozen = false;
+    mCamPos = position;
+    mUsePositionLimits = false;
+    nlVec3Set(mPositionOffset, 0.0f, 0.0f, 0.0f);
+    mBallToGoalRotationDegrees = 0.0f;
 }
 
 /**
@@ -469,9 +467,9 @@ float ReplayCamera::GetFov(ReplayCameraPosition position) const
         {
             BasicString<char, Detail::TempStringAllocator> prefix("replay/camera_");
             {
-                BasicString<char, Detail::TempStringAllocator> formatString("generic_{0}_fov");
-                int index = position - REPLAY_CAMERA_POSITION_GENERIC_0;
-                prefix.AppendInPlace(Format(formatString, index));
+                BasicString<char, Detail::TempStringAllocator> formatStr("generic_{0}_fov");
+                int idx = position - REPLAY_CAMERA_POSITION_GENERIC_0;
+                prefix.AppendInPlace(Format(formatStr, idx));
             }
             float fov = GetConfigFloat(Config::Global(), prefix.c_str(), 50.0f);
             return fov;
@@ -485,9 +483,9 @@ float ReplayCamera::GetFov(ReplayCameraPosition position) const
  */
 nlVector3 ReplayCamera::GetPosition(ReplayCameraPosition position, float direction) const
 {
-    nlVector3 result = { 0.0f, 0.0f, 0.0f };
+    nlVector3 ret = { 0.0f, 0.0f, 0.0f };
     float goalLineX = cField::GetGoalLineX(direction);
-    float sidelineY = cField::GetSidelineY(1);
+    float sideLineY = cField::GetSidelineY(1);
 
     switch (position)
     {
@@ -496,16 +494,16 @@ nlVector3 ReplayCamera::GetPosition(ReplayCameraPosition position, float directi
         float x = GetConfigFloat(Config::Global(), "replay/camera_inside_net_x", 7.0f);
         float y = GetConfigFloat(Config::Global(), "replay/camera_inside_net_y", 8.0f);
         float z = GetConfigFloat(Config::Global(), "replay/camera_inside_net_z", 2.0f);
-        result.x = cField::GetGoalLineX(direction) + direction * x;
-        result.y = y;
-        result.z = z;
+        ret.x = cField::GetGoalLineX(direction) + direction * x;
+        ret.y = y;
+        ret.z = z;
         break;
     }
     case REPLAY_CAMERA_POSITION_SIDELINE:
-        result = ReplayManager::Instance()->mRender->mBall.mPosition;
-        result.x *= 0.0f;
-        result.y = cField::GetSidelineY(0);
-        result.z = 0.0f;
+        ret = ReplayManager::Instance()->mRender->mBall.mPosition;
+        ret.x *= 0.0f;
+        ret.y = cField::GetSidelineY(0);
+        ret.z = 0.0f;
         break;
     case REPLAY_CAMERA_POSITION_BALL_TO_GOAL:
     {
@@ -519,22 +517,20 @@ nlVector3 ReplayCamera::GetPosition(ReplayCameraPosition position, float directi
         nlQuaternion rotation;
         nlVector3 rotationAxis = { 0.0f, 0.0f, 1.0f };
         fn_802B5370(rotation, rotationAxis,
-            (unsigned short)((int)(65536.0f * mUnidentified0FC) / 360));
+            DegreesToAngle(mBallToGoalRotationDegrees));
         RotateVector(ballToGoal, ballToGoal, rotation);
 
-        float behindDist = GetConfigFloat(Config::Global(), "replay/camera_ball_to_goal_behind_dist", 16.0f);
-        float scale = -behindDist;
-        nlVec3Scale(ballToGoal, scale);
-        nlVec3Add(result, ballPos, ballToGoal);
+        nlVec3Scale(ballToGoal, -GetConfigFloat(Config::Global(), "replay/camera_ball_to_goal_behind_dist", 16.0f));
+        nlVec3Add(ret, ballPos, ballToGoal);
         float minHeight = GetConfigFloat(Config::Global(), "replay/camera_ball_to_goal_min_height", 3.0f);
-        if (result.z < minHeight)
-            result.z = minHeight;
+        if (ret.z < minHeight)
+            ret.z = minHeight;
 
         float minDistToGoal = GetConfigFloat(Config::Global(), "replay/camera_ball_to_goal_min_dist_to_goal", 8.0f);
-        if (nlAbs(goalPos.x - result.x) < minDistToGoal)
-            result.x = goalPos.x - direction * minDistToGoal;
+        if (nlAbs(goalPos.x - ret.x) < minDistToGoal)
+            ret.x = goalPos.x - direction * minDistToGoal;
 
-        result.y += GetConfigFloat(Config::Global(), "replay/camera_ball_to_goal_y_offset", 0.0f);
+        ret.y += GetConfigFloat(Config::Global(), "replay/camera_ball_to_goal_y_offset", 0.0f);
         break;
     }
     case REPLAY_CAMERA_POSITION_HIGH_UP:
@@ -544,11 +540,11 @@ nlVector3 ReplayCamera::GetPosition(ReplayCameraPosition position, float directi
         float highZ = GetConfigFloat(Config::Global(), "replay/camera_high_up_z", 8.0f);
         float minDistBehind = GetConfigFloat(Config::Global(), "replay/camera_high_up_min_dist_behind", 8.0f);
 
-        result.x = highX * GetSideDirection(mSideOfInterest);
-        result.y = highY;
-        result.z = highZ;
-        if (nlAbs(result.x - mLookAt.x) < minDistBehind)
-            result.x = mLookAt.x - minDistBehind * GetSideDirection(mSideOfInterest);
+        ret.x = highX * GetSideDirection(mSideOfInterest);
+        ret.y = highY;
+        ret.z = highZ;
+        if (nlAbs(ret.x - mLookAt.x) < minDistBehind)
+            ret.x = mLookAt.x - minDistBehind * GetSideDirection(mSideOfInterest);
         break;
     }
     default:
@@ -561,91 +557,91 @@ nlVector3 ReplayCamera::GetPosition(ReplayCameraPosition position, float directi
             float yVal = GetConfigFloat(Config::Global(), key, 0.0f);
             nlSNPrintf(key, sizeof(key), "replay/camera_generic_%d_z", position - REPLAY_CAMERA_POSITION_GENERIC_0);
             float zVal = GetConfigFloat(Config::Global(), key, 0.0f);
-            result.x = xVal;
-            result.y = yVal;
-            result.z = zVal;
+            ret.x = xVal;
+            ret.y = yVal;
+            ret.z = zVal;
         }
         break;
     }
 
-    result.x += mUnidentified0C8.x;
-    result.y += mUnidentified0C8.y;
-    result.z += mUnidentified0C8.z;
+    ret.x += mPositionOffset.x;
+    ret.y += mPositionOffset.y;
+    ret.z += mPositionOffset.z;
 
-    nlVector3 limits;
-    limits.x = GetConfigFloat(Config::Global(), "replay/camera_max_behind_goal_line", 2.0f);
-    limits.y = GetConfigFloat(Config::Global(), "replay/camera_max_beyond_side_line", 2.0f);
-    limits.z = GetConfigFloat(Config::Global(), "replay/camera_max_height", 20.0f);
-    if (mUnidentified0EC == true)
+    nlVector3 max;
+    max.x = GetConfigFloat(Config::Global(), "replay/camera_max_behind_goal_line", 2.0f);
+    max.y = GetConfigFloat(Config::Global(), "replay/camera_max_beyond_side_line", 2.0f);
+    max.z = GetConfigFloat(Config::Global(), "replay/camera_max_height", 20.0f);
+    if (mUsePositionLimits == true)
     {
-        limits.x = mUnidentified0F0;
-        limits.y = mUnidentified0F4;
-        limits.z = mUnidentified0F8;
+        max.x = mMaxBehindGoalLine;
+        max.y = mMaxBeyondSideLine;
+        max.z = mMaxHeight;
     }
 
     float minZ = GetConfigFloat(Config::Global(), "replay/camera_min_height", 0.5f);
 
-    if (result.z > limits.z)
-        result.z = limits.z;
-    if (result.z < minZ)
-        result.z = minZ;
-    if (result.x < -((float)fabs(goalLineX)) - limits.x)
-        result.x = -((float)fabs(goalLineX)) - limits.x;
-    if (result.x > limits.x + (float)fabs(goalLineX))
-        result.x = limits.x + (float)fabs(goalLineX);
-    if (result.y < -sidelineY - limits.y)
-        result.y = -sidelineY - limits.y;
-    if (result.y > sidelineY + limits.y)
-        result.y = sidelineY + limits.y;
+    if (ret.z > max.z)
+        ret.z = max.z;
+    if (ret.z < minZ)
+        ret.z = minZ;
+    if (ret.x < -fabsf(goalLineX) - max.x)
+        ret.x = -fabsf(goalLineX) - max.x;
+    if (ret.x > max.x + fabsf(goalLineX))
+        ret.x = max.x + fabsf(goalLineX);
+    if (ret.y < -sideLineY - max.y)
+        ret.y = -sideLineY - max.y;
+    if (ret.y > sideLineY + max.y)
+        ret.y = sideLineY + max.y;
 
-    return result;
+    return ret;
 }
 
 /**
  * Offset/Address/Size: 0x2F8 | 0x800F8F20 | size: 0xC
  */
-void ReplayCamera::fn_800F8F20(const float& value)
+void ReplayCamera::SetLookAtDampingTime(const float& dampingTime)
 {
-    lbl_806DC51C = value;
+    gReplayCameraLookAtDampingTime = dampingTime;
 }
 
 /**
  * Offset/Address/Size: 0x2EC | 0x800F8F2C | size: 0xC
  */
-void ReplayCamera::fn_800F8F2C(const float& value)
+void ReplayCamera::SetPositionDampingTime(const float& dampingTime)
 {
-    lbl_806DC518 = value;
+    gReplayCameraPositionDampingTime = dampingTime;
 }
 
 /**
  * Offset/Address/Size: 0x2E0 | 0x800F8F38 | size: 0x1C
  */
-void ReplayCamera::fn_800F8F38(const nlVector3& value)
+void ReplayCamera::SetPositionOffset(const nlVector3& offset)
 {
-    mUnidentified0C8 = value;
+    mPositionOffset = offset;
 }
 
 /**
  * Offset/Address/Size: 0x2C4 | 0x800F8F54 | size: 0x28
  */
-void ReplayCamera::fn_800F8F54(float value0, float value1, float value2, float value3, float value4)
+void ReplayCamera::SetAutoFov(float minFov, float maxFov, float minDistance, float maxDistance, float maxChangeRate)
 {
-    mUnidentified0D4 = true;
+    mAutoFov = true;
     mDeltaFov = 0.0f;
-    mUnidentified0D8 = value0;
-    mUnidentified0DC = value1;
-    mUnidentified0E0 = value2;
-    mUnidentified0E4 = value3;
-    mUnidentified0E8 = value4;
+    mAutoFovMin = minFov;
+    mAutoFovMax = maxFov;
+    mAutoFovMinDistance = minDistance;
+    mAutoFovMaxDistance = maxDistance;
+    mAutoFovMaxChangeRate = maxChangeRate;
 }
 
 /**
  * Offset/Address/Size: 0x29C | 0x800F8F7C | size: 0x18
  */
-void ReplayCamera::fn_800F8F7C(float value0, float value1, float value2)
+void ReplayCamera::SetPositionLimits(float maxBehindGoalLine, float maxBeyondSideLine, float maxHeight)
 {
-    mUnidentified0EC = true;
-    mUnidentified0F0 = value0;
-    mUnidentified0F4 = value1;
-    mUnidentified0F8 = value2;
+    mUsePositionLimits = true;
+    mMaxBehindGoalLine = maxBehindGoalLine;
+    mMaxBeyondSideLine = maxBeyondSideLine;
+    mMaxHeight = maxHeight;
 }

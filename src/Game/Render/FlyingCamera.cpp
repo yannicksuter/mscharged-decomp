@@ -81,7 +81,6 @@ char sPeachCameraFlashEventName[] = "PeachCameraFlash";
 char sResetEffectsEventName[] = "ResetEffects";
 char sMegaStrikeMeterEndEventName[] = "MegaStrikeMeterEnd";
 
-extern "C" bool fn_8003877C(cFielder* fielder);
 void OnPeachCameraFlash(void*);
 void OnResetFlyingCameras(void*);
 

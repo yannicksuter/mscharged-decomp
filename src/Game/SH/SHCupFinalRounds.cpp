@@ -26,7 +26,6 @@
 
 class SHNavigation;
 
-extern "C" void fn_80207724(int);
 
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation, const char* name)
 {
@@ -64,7 +63,7 @@ void CupFinalRoundsScene::SceneCreated()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     TLComponentInstance* title = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "TITLE2");
-    fn_80208950(title, mTitleText, 64);
+    UpdateCupTitleText(title, mTitleText, 64);
 
     for (int i = 0; i < 3; ++i)
     {
@@ -94,7 +93,7 @@ void CupFinalRoundsScene::SceneCreated()
         mPageControls->SetButtonState(0, true, true);
     }
     mBackButton.SetButtonInstance(backButton);
-    fn_80207724(3);
+    UpdateCupBreadcrumbs(3);
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -121,7 +120,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
             {
                 SHNavigation* navigation = GetNavigationScene();
                 navigation->SetButtons(0x1F, false);
-                fn_802088B4();
+                UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
@@ -139,7 +138,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
                 CycleCupPage(3, true);
                 return;
             }
-            fn_80207060(false);
+            AdvanceCupFlow(false);
             return;
         }
         else if (mTransitionState == 3)
@@ -214,9 +213,9 @@ void CupFinalRoundsScene::PopulateMatchup(BasicGameInfo* game, TLInstance* group
     short homeScore = game->mFinalScore[0];
     short awayScore = game->mFinalScore[1];
     TeamStats homeStats = cupManager->GetTeamStats(teams[0]);
-    int homeType = homeStats.mUnidentified18;
+    int homeType = homeStats.mSkillLevel;
     TeamStats awayStats = cupManager->GetTeamStats(teams[1]);
-    int awayType = awayStats.mUnidentified18;
+    int awayType = awayStats.mSkillLevel;
     if (teams[0] == userTeam)
         homeType = 6;
     else if (teams[1] == userTeam)
@@ -455,7 +454,7 @@ void CupFinalRoundsScene::OnMatchupPointerPress(unsigned int, void* context)
     {
         GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(
             (SceneList)0x21, SCREEN_NOTHING, false);
-        results->fn_8020A494(game, this, 0);
+        results->SetResultsData(game, this, 0);
         results->SetDisplayMode(0xD);
     }
     else

@@ -201,7 +201,7 @@ void ShowCurrentCupRoundPage()
     GameSceneManager::Instance()->Push((SceneList)scene, SCREEN_NOTHING, true);
 }
 
-extern "C" void fn_80207060(bool pad)
+extern "C" void AdvanceCupFlow(bool pad)
 {
     CupManager* cupManager = g_pCupManager;
     if (cupManager->GetCurrentRoundNumber() == -5)
@@ -210,9 +210,9 @@ extern "C" void fn_80207060(bool pad)
         {
             if (cupManager->GetCurrentMode() == 0)
             {
-                cupManager->fn_8010C52C(1);
+                cupManager->SetMode(1);
                 cupManager->mState = -1;
-                cupManager->fn_8010C280(19);
+                cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
                     (SceneList)39, SCREEN_NOTHING, true);
                 scene->SetDisplayMode(1);
@@ -220,9 +220,9 @@ extern "C" void fn_80207060(bool pad)
             }
             else if (cupManager->GetCurrentMode() == 1)
             {
-                cupManager->fn_8010C52C(2);
+                cupManager->SetMode(2);
                 cupManager->mState = -1;
-                cupManager->fn_8010C280(19);
+                cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
                     (SceneList)39, SCREEN_NOTHING, true);
                 scene->SetDisplayMode(1);
@@ -232,7 +232,7 @@ extern "C" void fn_80207060(bool pad)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                     (SceneList)10, SCREEN_NOTHING, true);
-                popup->Create((ePopupMenu)56, Function<FnVoidVoid>(fn_80209474));
+                popup->Create((ePopupMenu)56, Function<FnVoidVoid>(ResetCupFlow));
             }
         }
         else
@@ -291,13 +291,13 @@ void HandleCupBack(int fromSubPage)
             if (saveEnabled)
             {
                 popup->Create((ePopupMenu)0,
-                              Function<FnVoidVoid>(fn_8020785C),
+                              Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
             else
             {
                 popup->Create((ePopupMenu)2,
-                              Function<FnVoidVoid>(fn_8020785C),
+                              Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
         }
@@ -308,15 +308,15 @@ void HandleCupBack(int fromSubPage)
             if (saveEnabled)
             {
                 popup->Create((ePopupMenu)1,
-                              Function<FnVoidVoid>(fn_8020785C),
-                              Function<FnVoidVoid>(fn_80207AB4),
+                              Function<FnVoidVoid>(ExitCupToMainMenu),
+                              Function<FnVoidVoid>(ShowCupSavePrompt),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
             else
             {
                 popup->Create((ePopupMenu)3,
-                              Function<FnVoidVoid>(fn_8020785C),
-                              Function<FnVoidVoid>(fn_80207AB4),
+                              Function<FnVoidVoid>(ExitCupToMainMenu),
+                              Function<FnVoidVoid>(ShowCupSavePrompt),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
         }
@@ -327,7 +327,7 @@ void HandleCupBack(int fromSubPage)
     }
 }
 
-extern "C" void fn_80207724(int currentPage)
+extern "C" void UpdateCupBreadcrumbs(int currentPage)
 {
     int currentIndex = 0;
     int pageCount = 0;
@@ -380,7 +380,7 @@ extern "C" void fn_80207724(int currentPage)
     }
 }
 
-extern "C" void fn_8020785C()
+extern "C" void ExitCupToMainMenu()
 {
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
     GameSceneManager::Instance()->Pop();
@@ -393,12 +393,12 @@ void ShowCupStartOptions()
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
     popup->Create((ePopupMenu)15,
-                  Function<FnVoidVoid>(fn_80207DC4),
-                  Function<FnVoidVoid>(fn_802079DC),
+                  Function<FnVoidVoid>(ContinueStrikerCup),
+                  Function<FnVoidVoid>(ShowNewCupPrompt),
                   Function<FnVoidVoid>(RequestMainMenuInputReset));
 }
 
-extern "C" void fn_802079DC()
+extern "C" void ShowNewCupPrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
@@ -407,7 +407,7 @@ extern "C" void fn_802079DC()
                   Function<FnVoidVoid>(ShowCupStartOptions));
 }
 
-extern "C" void fn_80207AB4()
+extern "C" void ShowCupSavePrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
@@ -439,9 +439,9 @@ void StartNewCup()
     }
 
     g_pCupManager->mState = -1;
-    g_pCupManager->fn_8010C57C();
-    g_pCupManager->fn_8010C52C(-1);
-    g_pCupManager->mUnidentified869C = false;
+    g_pCupManager->ResetCupRecord();
+    g_pCupManager->SetMode(-1);
+    g_pCupManager->mGameInProgress = false;
     GameSceneManager::Instance()->Pop();
     SaveLoad::StartSave(false);
     FEAudio::PlayAnimAudioEvent(0x5854D494, 0, 0, true);
@@ -449,11 +449,11 @@ void StartNewCup()
     gNextFETransition = "TransitionMainMenuToNewStrikerCup";
 }
 
-extern "C" void fn_80207DC4()
+extern "C" void ContinueStrikerCup()
 {
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
-    g_pCupManager->fn_8010C4DC();
+    g_pCupManager->UpdateCurrentCup();
     BasicGameInfo* currentGame = g_pCupManager->GetCurrentGameInfo();
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     gameInfo->mGameInfo[gameInfo->mCurrentMode] = currentGame;
@@ -463,12 +463,12 @@ extern "C" void fn_80207DC4()
     {
         navigation->SetButtons(0, true);
     }
-    if (g_pCupManager->mUnidentified869C)
+    if (g_pCupManager->mGameInProgress)
     {
-        fn_8010FED8();
-        g_pCupManager->fn_8010EA28();
-        g_pCupManager->mUnidentified869C = false;
-        g_pCupManager->fn_8010E8E0();
+        SavePreGameUnlockState();
+        g_pCupManager->ForfeitCurrentGame();
+        g_pCupManager->mGameInProgress = false;
+        g_pCupManager->AwardGoalTrophies();
         SaveLoad::StartSave(false);
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         gNextFETransition = "TransitionMainMenuToContinueStrikerCupForfeit";
@@ -559,8 +559,8 @@ void BeginCupAwardPresentation()
 {
     int firstStatistic = 0;
     int secondStatistic = 0;
-    int firstTeam = g_pCupManager->fn_8010D9C4(&firstStatistic);
-    int secondTeam = g_pCupManager->fn_8010DE2C(&secondStatistic);
+    int firstTeam = g_pCupManager->GetGoalsForLeader(&firstStatistic);
+    int secondTeam = g_pCupManager->GetGoalsAgainstLeader(&secondStatistic);
     int userTeam = g_pCupManager->GetUserSelectedCupTeam();
 
     if (secondTeam == userTeam)
@@ -587,7 +587,7 @@ void ShowCupBrickWallNews()
 void AdvanceCupAwardPresentation()
 {
     int statistic = 0;
-    int team = g_pCupManager->fn_8010D9C4(&statistic);
+    int team = g_pCupManager->GetGoalsForLeader(&statistic);
     if (team == g_pCupManager->GetUserSelectedCupTeam())
     {
         FrontEndPresentation::GetInstance()->Call("TransitionCupLeftToRightAward");
@@ -617,15 +617,15 @@ void ShowCupAwardRewardsPopup()
     switch (g_pCupManager->GetCurrentMode())
     {
     case 0:
-        showRewards = fn_801102D8() && fn_80110CF0();
+        showRewards = HasWastelandsUnlockFlags() && WasWastelandsLockedBeforeGame();
         menuType = 41;
         break;
     case 1:
-        showRewards = fn_801102F8() && fn_80110D18();
+        showRewards = HasDumpUnlockFlags() && WasDumpLockedBeforeGame();
         menuType = 42;
         break;
     case 2:
-        showRewards = fn_80110318() && fn_80110D40();
+        showRewards = HasGalacticStadiumUnlockFlags() && WasGalacticStadiumLockedBeforeGame();
         menuType = 43;
         break;
     default:
@@ -652,15 +652,15 @@ void ShowCupTrophyRewardsPopup()
     switch (g_pCupManager->GetCurrentMode())
     {
     case 0:
-        showRewards = IsUnlockFlagSet(1) && fn_8010FEF0(1);
+        showRewards = IsUnlockFlagSet(1) && WereUnlockFlagsClearBeforeGame(1);
         menuType = 44;
         break;
     case 1:
-        showRewards = IsUnlockFlagSet(2) && fn_8010FEF0(2);
+        showRewards = IsUnlockFlagSet(2) && WereUnlockFlagsClearBeforeGame(2);
         menuType = 45;
         break;
     case 2:
-        showRewards = IsUnlockFlagSet(4) && fn_8010FEF0(4);
+        showRewards = IsUnlockFlagSet(4) && WereUnlockFlagsClearBeforeGame(4);
         menuType = 46;
         break;
     default:
@@ -680,7 +680,7 @@ void ShowCupTrophyRewardsPopup()
     }
 }
 
-extern "C" void fn_802088B4()
+extern "C" void UpdatePlayButtonText()
 {
     CupManager* cupManager = g_pCupManager;
     SHNavigation* navigation = GetNavigationScene();
@@ -701,7 +701,7 @@ extern "C" void fn_802088B4()
     }
 }
 
-extern "C" void fn_80208950(TLComponentInstance* component,
+extern "C" void UpdateCupTitleText(TLComponentInstance* component,
                               unsigned short* buffer, unsigned long capacity)
 {
     TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find<>(
@@ -791,12 +791,12 @@ void SetLockedTrophyVisibility(bool visible)
     }
 }
 
-extern "C" void fn_80209474()
+extern "C" void ResetCupFlow()
 {
     CupManager* cupManager = g_pCupManager;
     cupManager->mState = -1;
-    cupManager->fn_8010C57C();
-    cupManager->fn_8010C52C(-1);
+    cupManager->ResetCupRecord();
+    cupManager->SetMode(-1);
     SaveLoad::StartSave(false);
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)

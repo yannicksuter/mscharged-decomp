@@ -28,7 +28,6 @@
 
 class SHNavigation;
 
-extern "C" void fn_80207724(int);
 
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation,
     const char* name)
@@ -83,7 +82,7 @@ void StrikerCupStandingsScene::SceneCreated()
     TLComponentInstance* title =
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
             presentation->m_currentSlide, "Layer", "stats_screen", "TITLE2");
-    fn_80208950(title, mTitleText, 64);
+    UpdateCupTitleText(title, mTitleText, 64);
 
     TLComponentInstance* help =
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
@@ -159,7 +158,7 @@ void StrikerCupStandingsScene::SceneCreated()
         mPageControls->SetButtonState(0, true, true);
     }
     mBackButton.SetButtonInstance(backButton);
-    fn_80207724(4);
+    UpdateCupBreadcrumbs(4);
 }
 
 void StrikerCupStandingsScene::Update(float fDeltaT)
@@ -184,7 +183,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
             {
                 SHNavigation* navigation = GetNavigationScene();
                 navigation->SetButtons(0x1F, false);
-                fn_802088B4();
+                UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
@@ -202,7 +201,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
                 CycleCupPage(4, true);
                 return;
             }
-            fn_80207060(false);
+            AdvanceCupFlow(false);
             return;
         }
         else if (mTransitionState == 3)
@@ -313,7 +312,7 @@ void StrikerCupStandingsScene::UpdateStandings()
     mMovingHighlight->SetActiveSlide(slideName, true, false);
     mHighlight->m_bVisible = userVisible;
 
-    int linePosition = g_pCupManager->fn_8010D600() - mScrollOffset;
+    int linePosition = g_pCupManager->GetNumPlayoffTeams() - mScrollOffset;
     if (linePosition <= 5)
     {
         char lineName[2];
@@ -382,7 +381,7 @@ bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
             value = stats.mPlayerTotalStats.mNumGoalsFor;
             break;
         case 5:
-            value = stats.mPlayerTotalStats.unknown_0x12;
+            value = stats.mPlayerTotalStats.mNumGoalsAgainst;
             break;
         case 6:
             value = stats.unknown_0x16;

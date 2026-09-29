@@ -171,7 +171,7 @@ public:
 extern "C" void fn_80015C38(cBall* pBall, int nBallState);
 
 struct LiveBallTrail;
-float fn_800155A0(cBall* pBall, int nParam);
+float GetBallChargeValue(cBall* pBall, int nParam);
 LiveBallTrail* fn_8001B284(unsigned int nIndex);
 unsigned int fn_8001B30C();
 
@@ -184,8 +184,8 @@ extern "C" void fn_8001458C(cBall* pBall);
 extern "C" void fn_800145A4(cBall*);
 extern "C" bool fn_80014D38(cBall*);
 extern "C" bool fn_80014E20(cBall* pBall);
-extern "C" bool fn_80014EA4(cBall* pBall, const EffectsGroup* pGroup);
-extern "C" void fn_800152B4(cBall* pBall);
+bool IsBallEffectPlaying(cBall* pBall, const EffectsGroup* pGroup);
+void EmitBallChargeTransition(cBall* pBall);
 extern "C" void fn_80017448(cBall*, float);
 extern "C" void fn_80017F18(cBall*);
 extern "C" void fn_800189C4(cBall* pBall);

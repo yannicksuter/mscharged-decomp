@@ -49,7 +49,7 @@ SHOnlineFriends::SHOnlineFriends()
     , mPressHandled(false)
     , mRefreshTimer(0.5f)
     , mPopupActive(false)
-    , mUnidentified2FAC(0)
+    , mState(0)
 {
     for (int i = 0; i < 4; ++i)
         mRowButtons[i].mContext = (void*)i;
@@ -215,7 +215,7 @@ void SHOnlineFriends::Update(float dt)
     mPressHandled = false;
     if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
-    if (mUnidentified2FAC == 0 || mUnidentified2FAC == 2 || mUnidentified2FAC == 3)
+    if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -224,16 +224,16 @@ void SHOnlineFriends::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mUnidentified2FAC == 0)
+        if (mState == 0)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->SetButtons(4, true);
-            mUnidentified2FAC = 1;
+            mState = 1;
             InitializeButtons();
             mInitialized = true;
         }
-        else if (mUnidentified2FAC == 2)
+        else if (mState == 2)
         {
             if (!IsOnlineFriendSelectionMode())
                 GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIEND_CODE_ENTRY, SCREEN_FORWARD, true);
@@ -241,7 +241,7 @@ void SHOnlineFriends::Update(float dt)
                 StartFriendInvite();
             return;
         }
-        else if (mUnidentified2FAC == 3)
+        else if (mState == 3)
         {
             if (IsOnlineFriendSelectionMode())
             {
@@ -302,7 +302,7 @@ void SHOnlineFriends::Update(float dt)
         {
             for (int j = 0; j < 4; ++j)
                 GetPointerInstance(j)->SetActiveSlide("waiting", true, false);
-            mUnidentified2FAC = 3;
+            mState = 3;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->HideButtons();
@@ -474,7 +474,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     }
     if (change)
     {
-        mUnidentified2FAC = 2;
+        mState = 2;
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
             scene->HideButtons();

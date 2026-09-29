@@ -61,10 +61,10 @@ SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     mImages[2] = 0;
     mImages[3] = 0;
     mImages[4] = 0;
-    mUnidentified314[0] = 0;
-    mUnidentified314[1] = 0;
-    mUnidentified314[2] = 0;
-    mUnidentified314[3] = 0;
+    mHoverCounts[0] = 0;
+    mHoverCounts[1] = 0;
+    mHoverCounts[2] = 0;
+    mHoverCounts[3] = 0;
 
     mImages[0] = new (0x20, true) AsyncImage(sHallOfFameResource, 0);
     mImageReady[0] = false;
@@ -81,7 +81,7 @@ SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     memset(mHistory, 0, sizeof(mHistory));
 
     int historyIndex;
-    CupRecord_8010EB90& cupRecord = g_pCupManager->mCupRecord;
+    CupProgressRecord& cupRecord = g_pCupManager->mCupRecord;
     historyIndex = 11;
     if (cupRecord.mHistory.mWriteIndex[modeIndex] != 0)
     {
@@ -236,7 +236,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
                 processInput = false;
                 goto checkInput;
             }
-            else if (mUnidentified314[pad] > 0)
+            else if (mHoverCounts[pad] > 0)
             {
                 controller->SetActiveSlide("A", true, false);
             }

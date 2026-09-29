@@ -31,10 +31,10 @@ static const int lbl_804E8588[4] = { 120, 180, 240, 300 };
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 SHGameplayOptions::SHGameplayOptions()
-    : mUnidentified15B8(1)
-    , mUnidentified15BC(false)
-    , mUnidentified15BD(true)
-    , mUnidentified15FC(0)
+    : mViewIndex(1)
+    , mInitialized(false)
+    , mGoalLimitSelected(true)
+    , mFlowState(0)
 {
     for (int i = 0; i < 24; ++i)
     {
@@ -48,11 +48,11 @@ SHGameplayOptions::SHGameplayOptions()
     }
     for (int i = 0; i < 4; ++i)
         mPointerInsideCounts[i] = 0;
-    mUnidentified15E8 = 0;
-    mUnidentified15EC = 5;
-    mUnidentified15F0 = 10;
-    mUnidentified15F4 = 20;
-    mUnidentified15F8 = 12;
+    mSelectedSkill = 0;
+    mSelectedSeries = 5;
+    mSelectedLimitType = 10;
+    mSelectedTime = 20;
+    mSelectedGoals = 12;
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
@@ -75,13 +75,13 @@ SHGameplayOptions::~SHGameplayOptions()
 void SHGameplayOptions::SceneCreated()
 {
     FEPresentation* presentation = mPresentation;
-    mUnidentified1388 = FEFinder<TLInstance, 2>::Find(presentation,
+    mGoalsSection = FEFinder<TLInstance, 2>::Find(presentation,
         "OPTIONS", "Layer", "GOALS", 0UL, 0UL, 0UL);
-    mUnidentified138C = FEFinder<TLInstance, 2>::Find(presentation,
+    mMinutesSection = FEFinder<TLInstance, 2>::Find(presentation,
         "OPTIONS", "Layer", "MINUTES", 0UL, 0UL, 0UL);
-    mUnidentified1390 = FEFinder<TLInstance, 2>::Find(presentation,
+    mSkillSection = FEFinder<TLInstance, 2>::Find(presentation,
         "OPTIONS", "Layer", "SKILL LEVEL", 0UL, 0UL, 0UL);
-    mUnidentified1394 = FEFinder<TLInstance, 2>::Find(presentation,
+    mSeriesSection = FEFinder<TLInstance, 2>::Find(presentation,
         "OPTIONS", "Layer", "BEST OF SERIES", 0UL, 0UL, 0UL);
     mOptionInstances[10] = FEFinder<TLComponentInstance, 4>::Find(presentation,
         "OPTIONS", "Layer", "BTN_GOALS", 0UL, 0UL, 0UL);
@@ -93,25 +93,25 @@ void SHGameplayOptions::SceneCreated()
     {
         char name[16];
         nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
-        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified1390, InlineHasher(name));
+        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mSkillSection, InlineHasher(name));
     }
     for (button = 0, i = 5; i < 10; ++button, ++i)
     {
         char name[16];
         nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
-        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified1394, InlineHasher(name));
+        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mSeriesSection, InlineHasher(name));
     }
     for (button = 0, i = 12; i < 20; ++button, ++i)
     {
         char name[16];
         nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
-        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified1388, InlineHasher(name));
+        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mGoalsSection, InlineHasher(name));
     }
     for (button = 2, i = 20; i < 24; ++button, ++i)
     {
         char name[16];
         nlSNPrintf(name, sizeof(name), "BUTTON_%d", button);
-        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mUnidentified138C, InlineHasher(name));
+        mOptionInstances[i] = FEFinder<TLComponentInstance, 4>::Find(mMinutesSection, InlineHasher(name));
     }
     mCheatInstances[0] = FEFinder<TLComponentInstance, 4>::Find(presentation,
         "CHEATS", "Layer", "cheat_0", 0UL, 0UL, 0UL);
@@ -131,7 +131,7 @@ void SHGameplayOptions::SceneCreated()
         mPageControls->SetButtonState(0, true, false);
     }
     mNavigation.SetButtonInstance(done);
-    fn_80235FE0();
+    InitializeSelections();
     presentation->SetActiveSlide("OPTIONS_IN", true);
 }
 
@@ -139,7 +139,7 @@ void SHGameplayOptions::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
     TLSlide* slide;
-    int state = mUnidentified15FC;
+    int state = mFlowState;
     if (state == 0 || (unsigned int)(state - 2) <= 2)
     {
         slide = mPresentation->m_currentSlide;
@@ -154,12 +154,12 @@ void SHGameplayOptions::Update(float dt)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->SetButtons(79, true);
-            mUnidentified15FC = 1;
-            fn_80235928();
+            mFlowState = 1;
+            ToggleOptionsView();
         }
         else if (state == 2)
         {
-            fn_80238050();
+            CommitSettings();
             return;
         }
         else if (state == 3)
@@ -182,16 +182,16 @@ void SHGameplayOptions::Update(float dt)
         }
         else if (state == 4)
         {
-            mUnidentified15FC = 0;
+            mFlowState = 0;
             mPresentation->SetActiveSlide("IN", true);
             mPresentation->Update(0.0f);
             return;
         }
     }
-    if (!mUnidentified15BC)
+    if (!mInitialized)
     {
         InitializePointerButtons();
-        mUnidentified15BC = true;
+        mInitialized = true;
     }
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules()
@@ -237,7 +237,7 @@ void SHGameplayOptions::Update(float dt)
         {
             FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
             FEAudio::PlayAnimAudioEvent(0xEA7AD449, 0, 0, 1);
-            mUnidentified15FC = 4;
+            mFlowState = 4;
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             mPresentation->Update(0.0f);
             SHNavigation* scene = GetNavigationScene();
@@ -252,7 +252,7 @@ void SHGameplayOptions::Update(float dt)
         }
         if (mNavigation.UpdateBackButton(event, dt))
         {
-            mUnidentified15FC = 3;
+            mFlowState = 3;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->HideButtons();
@@ -263,14 +263,14 @@ void SHGameplayOptions::Update(float dt)
     }
 }
 
-void SHGameplayOptions::fn_80235928()
+void SHGameplayOptions::ToggleOptionsView()
 {
     SHNavigation* scene = GetNavigationScene();
-    if (mUnidentified15B8 == 1)
+    if (mViewIndex == 1)
     {
         mPresentation->SetActiveSlide("OPTIONS", true);
         mPresentation->Update(0.0f);
-        mUnidentified15B8 = 0;
+        mViewIndex = 0;
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, false, false);
         mPageControls->ClearButtonHighlight(1);
@@ -282,7 +282,7 @@ void SHGameplayOptions::fn_80235928()
     {
         mPresentation->SetActiveSlide("CHEATS", true);
         mPresentation->Update(0.0f);
-        mUnidentified15B8 = 1;
+        mViewIndex = 1;
         mPageControls->SetButtonState(0, true, true);
         mPageControls->SetButtonState(1, false, false);
         mPageControls->ClearButtonHighlight(0);
@@ -291,8 +291,8 @@ void SHGameplayOptions::fn_80235928()
         if (scene != 0)
             scene->SetButtonVisibility(1, false);
     }
-    bool options = mUnidentified15B8 == 0;
-    bool cheats = mUnidentified15B8 == 1;
+    bool options = mViewIndex == 0;
+    bool cheats = mViewIndex == 1;
     for (int i = 0; i < 24; ++i)
     {
         if (options)
@@ -325,19 +325,19 @@ void SHGameplayOptions::fn_80235928()
     }
     for (int i = 0; i < 4; ++i)
         mPointerInsideCounts[i] = 0;
-    if (mUnidentified15B8 == 0)
-        fn_80235CE4(mUnidentified15BD);
+    if (mViewIndex == 0)
+        UpdateLimitView(mGoalLimitSelected);
 }
 
-void SHGameplayOptions::fn_80235CE4(bool value)
+void SHGameplayOptions::UpdateLimitView(bool value)
 {
-    mUnidentified15BD = value;
-    bool other = !mUnidentified15BD;
-    mUnidentified1388->m_bVisible = value;
-    mUnidentified138C->m_bVisible = other;
+    mGoalLimitSelected = value;
+    bool other = !mGoalLimitSelected;
+    mGoalsSection->m_bVisible = value;
+    mMinutesSection->m_bVisible = other;
     for (int i = 12; i < 20; ++i)
     {
-        if (mUnidentified15BD)
+        if (mGoalLimitSelected)
             mOptionButtons[i].Enable();
         else
             mOptionButtons[i].Disable();
@@ -372,11 +372,11 @@ static inline void UpdateSeriesSetting(SHGameplayOptions* scene, int series)
     unsigned short number[4];
     nlSNPrintf(number, 4, (const unsigned short*)L"%d", series);
     WideString string = Format(WideString(LookupLocString("OPTIONS_BEST_OF")), number);
-    memcpy(scene->mUnidentified1538, string.c_str(), sizeof(scene->mUnidentified1538));
-    text->SetString(scene->mUnidentified1538);
+    memcpy(scene->mSeriesText, string.c_str(), sizeof(scene->mSeriesText));
+    text->SetString(scene->mSeriesText);
 }
 
-void SHGameplayOptions::fn_80235FE0()
+void SHGameplayOptions::InitializeSelections()
 {
     int skill = mSettings.SkillLevel;
     int series = mSettings.NumGames;
@@ -386,23 +386,23 @@ void SHGameplayOptions::fn_80235FE0()
     int value = type == 1 ? goals : time / 60;
     UpdateSkillLevelSetting(this, skill);
     UpdateSeriesSetting(this, series);
-    mUnidentified15BD = type == 1;
+    mGoalLimitSelected = type == 1;
     int selected = 11;
     if (type == 1)
         selected = 10;
-    mUnidentified15F0 = selected;
+    mSelectedLimitType = selected;
     mOptionInstances[selected]->SetActiveSlide("down", true, false);
-    FEPointerButton* button = &mOptionButtons[mUnidentified15F0];
+    FEPointerButton* button = &mOptionButtons[mSelectedLimitType];
     for (int j = 0; j < 4; ++j)
         button->SetPointerState(2, j);
-    fn_80236ADC(type, value);
+    UpdateLimitText(type, value);
     for (int i = 0; i < 5; ++i)
     {
         if (skill == lbl_804E8540[i])
         {
-            mUnidentified15E8 = i;
+            mSelectedSkill = i;
             mOptionInstances[i]->SetActiveSlide("down", true, false);
-            FEPointerButton* button = &mOptionButtons[mUnidentified15E8];
+            FEPointerButton* button = &mOptionButtons[mSelectedSkill];
             for (int j = 0; j < 4; ++j)
                 button->SetPointerState(2, j);
             break;
@@ -412,9 +412,9 @@ void SHGameplayOptions::fn_80235FE0()
     {
         if (series == lbl_804E8554[i])
         {
-            mUnidentified15EC = i + 5;
-            mOptionInstances[mUnidentified15EC]->SetActiveSlide("down", true, false);
-            FEPointerButton* button = &mOptionButtons[mUnidentified15EC];
+            mSelectedSeries = i + 5;
+            mOptionInstances[mSelectedSeries]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mSelectedSeries];
             for (int j = 0; j < 4; ++j)
                 button->SetPointerState(2, j);
             break;
@@ -424,9 +424,9 @@ void SHGameplayOptions::fn_80235FE0()
     {
         if (goals == lbl_804E8568[i])
         {
-            mUnidentified15F8 = i + 12;
-            mOptionInstances[mUnidentified15F8]->SetActiveSlide("down", true, false);
-            FEPointerButton* button = &mOptionButtons[mUnidentified15F8];
+            mSelectedGoals = i + 12;
+            mOptionInstances[mSelectedGoals]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mSelectedGoals];
             for (int j = 0; j < 4; ++j)
                 button->SetPointerState(2, j);
             break;
@@ -436,9 +436,9 @@ void SHGameplayOptions::fn_80235FE0()
     {
         if (time == lbl_804E8588[i])
         {
-            mUnidentified15F4 = i + 20;
-            mOptionInstances[mUnidentified15F4]->SetActiveSlide("down", true, false);
-            FEPointerButton* button = &mOptionButtons[mUnidentified15F4];
+            mSelectedTime = i + 20;
+            mOptionInstances[mSelectedTime]->SetActiveSlide("down", true, false);
+            FEPointerButton* button = &mOptionButtons[mSelectedTime];
             for (int j = 0; j < 4; ++j)
                 button->SetPointerState(2, j);
             break;
@@ -446,7 +446,7 @@ void SHGameplayOptions::fn_80235FE0()
     }
 }
 
-void SHGameplayOptions::fn_802365F0(int item)
+void SHGameplayOptions::ApplyOptionSelection(int item)
 {
     if (item >= 0 && item < 5)
     {
@@ -461,26 +461,26 @@ void SHGameplayOptions::fn_802365F0(int item)
     else if (item == 10)
     {
         mSettings.GameLimitType = 1;
-        fn_80236ADC(1, mSettings.GoalLimit);
+        UpdateLimitText(1, mSettings.GoalLimit);
     }
     else if (item == 11)
     {
         mSettings.GameLimitType = 0;
-        fn_80236ADC(0, mSettings.GameTime / 60);
+        UpdateLimitText(0, mSettings.GameTime / 60);
     }
     else if (item >= 12 && item < 20)
     {
         mSettings.GoalLimit = lbl_804E8568[item - 12];
-        fn_80236ADC(1, mSettings.GoalLimit);
+        UpdateLimitText(1, mSettings.GoalLimit);
     }
     else if (item >= 20 && item < 24)
     {
         mSettings.GameTime = lbl_804E8588[item - 20];
-        fn_80236ADC(0, mSettings.GameTime / 60);
+        UpdateLimitText(0, mSettings.GameTime / 60);
     }
 }
 
-void SHGameplayOptions::fn_80236ADC(int type, int value)
+void SHGameplayOptions::UpdateLimitText(int type, int value)
 {
     TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation,
         nlStringLowerHash("OPTIONS"), nlStringLowerHash("Layer"), nlStringLowerHash("GAMEPLAYOPTIONS SETTING"), 0, 0, 0);
@@ -491,8 +491,8 @@ void SHGameplayOptions::fn_80236ADC(int type, int value)
     if (type == 0)
         id = "X_MINUTES";
     WideString string = Format(WideString(LookupLocString(id)), number);
-    memcpy(mUnidentified1578, string.c_str(), sizeof(mUnidentified1578));
-    text->SetString(mUnidentified1578);
+    memcpy(mLimitText, string.c_str(), sizeof(mLimitText));
+    text->SetString(mLimitText);
 }
 
 void SHGameplayOptions::InitializePointerButtons()
@@ -503,10 +503,10 @@ void SHGameplayOptions::InitializePointerButtons()
     FEPointerListener::Callback over(PointerBinding(MemFun(&SHGameplayOptions::OnOptionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback off(PointerBinding(MemFun(&SHGameplayOptions::OnOptionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback down(PointerBinding(MemFun(&SHGameplayOptions::OnOptionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    feVector3 skill = mUnidentified1390->GetAssetPosition();
-    feVector3 series = mUnidentified1394->GetAssetPosition();
-    feVector3 minutes = mUnidentified138C->GetAssetPosition();
-    feVector3 goals = mUnidentified1388->GetAssetPosition();
+    feVector3 skill = mSkillSection->GetAssetPosition();
+    feVector3 series = mSeriesSection->GetAssetPosition();
+    feVector3 minutes = mMinutesSection->GetAssetPosition();
+    feVector3 goals = mGoalsSection->GetAssetPosition();
     for (int i = 0; i < 24; ++i)
     {
         float x = 0.0f;
@@ -587,36 +587,36 @@ void SHGameplayOptions::OnOptionPointerPress(unsigned int index, void* context)
     int previous = -1;
     if (item < 5)
     {
-        previous = mUnidentified15E8;
-        mUnidentified15E8 = item;
+        previous = mSelectedSkill;
+        mSelectedSkill = item;
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     }
     else if (item >= 5 && item < 10)
     {
-        previous = mUnidentified15EC;
-        mUnidentified15EC = item;
+        previous = mSelectedSeries;
+        mSelectedSeries = item;
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     }
     else if (item == 10 || item == 11)
     {
-        fn_80235CE4(item == 10);
-        previous = mUnidentified15F0;
-        mUnidentified15F0 = item;
+        UpdateLimitView(item == 10);
+        previous = mSelectedLimitType;
+        mSelectedLimitType = item;
         FEAudio::PlayAnimAudioEvent(0x362F2841, 0, 0, 1);
     }
     else if (item >= 12 && item < 20)
     {
-        previous = mUnidentified15F8;
-        mUnidentified15F8 = item;
+        previous = mSelectedGoals;
+        mSelectedGoals = item;
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     }
     else if (item >= 20 && item < 24)
     {
-        previous = mUnidentified15F4;
-        mUnidentified15F4 = item;
+        previous = mSelectedTime;
+        mSelectedTime = item;
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     }
-    fn_802365F0(item);
+    ApplyOptionSelection(item);
     mOptionInstances[previous]->SetActiveSlide("off", true, false);
     for (int j = 0; j < 4; ++j)
         mOptionButtons[previous].SetPointerState(0, j);
@@ -676,7 +676,7 @@ void SHGameplayOptions::OnDonePointerLeave(unsigned int index, void* context)
 
 void SHGameplayOptions::OnDonePointerPress(unsigned int index, void* context)
 {
-    mUnidentified15FC = 2;
+    mFlowState = 2;
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
@@ -690,7 +690,7 @@ void SHGameplayOptions::OnDonePointerPress(unsigned int index, void* context)
         FEAudio::PlayAnimAudioEvent(0x5BCD337B, 0, 0, 1);
 }
 
-void SHGameplayOptions::fn_80238050()
+void SHGameplayOptions::CommitSettings()
 {
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())

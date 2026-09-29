@@ -147,11 +147,11 @@ public:
 
     virtual ~UnidentifiedEvent()
     {
-        UnidentifiedRemoveAll();
+        RemoveAll();
         UnregisterEvent(this);
     }
 
-    void UnidentifiedRemoveAll()
+    void RemoveAll()
     {
         while (mListeners.m_Head != 0)
         {
@@ -178,7 +178,7 @@ public:
             if ((listener->mFlags >> 31) != 0)
             {
                 listener->callback(data);
-                UnidentifiedRestartAt(iterator, currentEntry);
+                RestartAt(iterator, currentEntry);
             }
 
             iterator.next();
@@ -206,7 +206,7 @@ public:
             if ((listener->mFlags >> 31) != 0)
             {
                 listener->callback();
-                UnidentifiedRestartAt(iterator, currentEntry);
+                RestartAt(iterator, currentEntry);
             }
 
             iterator.next();
@@ -261,9 +261,9 @@ protected:
     }
 
     void Remove(Listener* listener);
-    ListenerEntry* UnidentifiedGetEntry(Listener* listener);
-    void UnidentifiedDeleteListener(Listener* listener);
-    void UnidentifiedRestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current);
+    ListenerEntry* GetEntry(Listener* listener);
+    void DeleteListener(Listener* listener);
+    void RestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current);
 
 public:
     // The listener list runs a single Clear()/FreeBlocks() teardown, so it is
@@ -277,7 +277,7 @@ public:
 // re-anchored on the current list head before it continues past the entry
 // that was just delivered.
 template <typename T>
-void UnidentifiedEvent<T>::UnidentifiedRestartAt(
+void UnidentifiedEvent<T>::RestartAt(
     nlDLListIterator<Listener>& iterator, ListenerEntry* current)
 {
     iterator = mListeners.Begin();
@@ -294,20 +294,20 @@ void UnidentifiedEvent<T>::Remove(Listener* listener)
         return;
     }
 
-    UnidentifiedDeleteListener(listener);
+    DeleteListener(listener);
 }
 
 template <typename T>
 DLListEntry<UnidentifiedListener<T> >*
-UnidentifiedEvent<T>::UnidentifiedGetEntry(Listener* listener)
+UnidentifiedEvent<T>::GetEntry(Listener* listener)
 {
     return mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
 }
 
 template <typename T>
-void UnidentifiedEvent<T>::UnidentifiedDeleteListener(Listener* listener)
+void UnidentifiedEvent<T>::DeleteListener(Listener* listener)
 {
-    ListenerEntry* entry = UnidentifiedGetEntry(listener);
+    ListenerEntry* entry = GetEntry(listener);
     nlDLRingRemove(&mListeners.m_Head, entry);
     mListeners.DeleteEntry(entry);
 }
@@ -318,142 +318,6 @@ void UnidentifiedEvent<T>::Disconnect(void* owner)
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
 }
-
-template <typename T, int Count>
-class UnidentifiedStaticEvent : public UnidentifiedTypedEvent<T>
-{
-    typedef UnidentifiedListener<T> Listener;
-    typedef DLListEntry<Listener> ListenerEntry;
-    typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
-
-public:
-    typedef typename UnidentifiedTypedEvent<T>::Callback Callback;
-
-    UnidentifiedStaticEvent(const char* name, int length)
-        : UnidentifiedTypedEvent<T>(name, length)
-        , mListeners()
-    {
-        RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
-    }
-
-    virtual ~UnidentifiedStaticEvent()
-    {
-        UnidentifiedRemoveAll();
-        UnregisterEvent(this);
-    }
-
-    void UnidentifiedRemoveAll()
-    {
-        while (mListeners.m_Head != 0)
-        {
-            Remove(&*mListeners.Begin());
-        }
-    }
-
-    virtual void Disconnect(void* owner)
-    {
-        Listener* listener = (Listener*)FindEventConnection(this, owner);
-        Remove(listener);
-    }
-
-    virtual void Add(const Callback& callback, unsigned int value, int flags)
-    {
-        Listener* listener = mListeners.AllocateAtEnd(0);
-
-        void* target = listener->callback.UnidentifiedTransfer(callback);
-        RegisterEventConnection(this, listener, value, flags, target);
-    }
-
-    void Deliver(typename UnidentifiedEventCallback<T>::Parameter data)
-    {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
-        while (iterator.hasNext())
-        {
-            Listener* listener = &*iterator;
-            ListenerEntry* currentEntry = iterator.CurrentEntry();
-            this->mCurrentConnection = listener;
-
-            if ((listener->mFlags >> 31) != 0)
-            {
-                listener->callback(data);
-                UnidentifiedRestartAt(iterator, currentEntry);
-            }
-
-            iterator.next();
-            if (((listener->mFlags >> 29) & 1) != 0)
-            {
-                nlDLListIterator<Listener> position = mListeners.Begin(
-                    (ListenerEntry*)((char*)listener - 8));
-                ListenerEntry* entry = position.CurrentEntry();
-                nlDLRingRemove(&mListeners.m_Head, entry);
-                mListeners.DeleteEntry(entry);
-            }
-        }
-        this->mCurrentConnection = 0;
-    }
-
-    void Deliver()
-    {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
-        while (iterator.hasNext())
-        {
-            Listener* listener = &*iterator;
-            ListenerEntry* currentEntry = iterator.CurrentEntry();
-            this->mCurrentConnection = listener;
-
-            if ((listener->mFlags >> 31) != 0)
-            {
-                listener->callback();
-                UnidentifiedRestartAt(iterator, currentEntry);
-            }
-
-            iterator.next();
-            if (((listener->mFlags >> 29) & 1) != 0)
-            {
-                nlDLListIterator<Listener> position = mListeners.Begin(
-                    (ListenerEntry*)((char*)listener - 8));
-                ListenerEntry* entry = position.CurrentEntry();
-                nlDLRingRemove(&mListeners.m_Head, entry);
-                entry->~ListenerEntry();
-                mListeners.m_Allocator.Free(entry);
-            }
-        }
-        this->mCurrentConnection = 0;
-    }
-
-protected:
-    void UnidentifiedRestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current)
-    {
-        iterator = mListeners.Begin();
-        iterator.m_Curr = current;
-    }
-
-    void Remove(Listener* listener)
-    {
-        UnregisterEventConnection(this, listener);
-        if (this->mCurrentConnection == listener)
-        {
-            listener->mFlags |= 0x20000000;
-            return;
-        }
-        UnidentifiedDeleteListener(listener);
-    }
-
-    ListenerEntry* UnidentifiedGetEntry(Listener* listener)
-    {
-        return mListeners.Begin(
-            (ListenerEntry*)((char*)listener - 8)).CurrentEntry();
-    }
-
-    void UnidentifiedDeleteListener(Listener* listener)
-    {
-        ListenerEntry* entry = UnidentifiedGetEntry(listener);
-        nlDLRingRemove(&mListeners.m_Head, entry);
-        mListeners.DeleteEntry(entry);
-    }
-
-    DLListContainerBase<Listener, ListenerPool> mListeners;
-};
 
 template <typename P1, typename P2, typename P3>
 struct UnidentifiedListener3 : public UnidentifiedConnection

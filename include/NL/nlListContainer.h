@@ -29,6 +29,15 @@ public:
         m_Tail = 0;
     }
 
+    template <typename Container>
+    void ClearWithCallback(Container* container,
+        void (Container::*callback)(ListEntry<T>*))
+    {
+        nlWalkList(m_Head, container, callback);
+        m_Head = 0;
+        m_Tail = 0;
+    }
+
     void DeleteEntry(ListEntry<T>* entry);
 
     void RemoveEntry(const T& data)

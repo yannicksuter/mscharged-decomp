@@ -37,7 +37,7 @@ extern "C" int VISetTimeToDimming(int time);
 
 static bool setDimmingTime;
 
-extern const int lbl_804E8368[10] = {
+extern const int sControllerDefaults[10] = {
     13, 14, 13, 14, 11, 12, 0, 1, 2, 0,
 };
 
@@ -56,13 +56,13 @@ TitleScene::TitleScene(ScreenMovement movement)
     , mControllerComponent()
     , mStartedDemo(false)
     , mStartedMovie(false)
-    , mUnidentifiedDE(false)
+    , mInitialized(false)
     , mUnidentifiedDF(false)
     , mMovement(movement)
 {
     for (int i = 0; i < 9; ++i)
     {
-        mControllerDefaults[i] = lbl_804E8368[i];
+        mControllerDefaults[i] = sControllerDefaults[i];
         mControllerReady[i] = false;
     }
 
@@ -118,17 +118,17 @@ void TitleScene::SceneCreated()
     }
 }
 
-inline void TitleScene::UnidentifiedInitializeControls()
+inline void TitleScene::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (TitleScene::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, TitleScene*, Placeholder<0>, Placeholder<1> >
         PointerBinding;
     FEPointerListener::Callback enter(
-        PointerBinding(MemFun(&TitleScene::fn_801D2478), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TitleScene::OnControllerPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback leave(
-        PointerBinding(MemFun(&TitleScene::fn_801D24EC), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TitleScene::OnControllerPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback select(
-        PointerBinding(MemFun(&TitleScene::fn_801D22C8), this, Placeholder<0>(), Placeholder<1>()));
+        PointerBinding(MemFun(&TitleScene::OnControllerPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     mControllerComponent.SetInstanceBounds(mTextPressStart, true, 0.0f, 0.0f, 1.0f, 1.0f);
     mControllerComponent.SetPointerEnterCallback(enter);
@@ -143,15 +143,15 @@ void TitleScene::Update(float dt)
     if (m_fTimeElapsed < 1.5f)
         return;
 
-    if (!mUnidentifiedDE)
+    if (!mInitialized)
     {
-        UnidentifiedInitializeControls();
+        InitializePointerButtons();
 
         for (int i = 0; i < 4; ++i)
         {
             GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
         }
-        mUnidentifiedDE = true;
+        mInitialized = true;
     }
 
     if (mStartedDemo)
@@ -162,7 +162,7 @@ void TitleScene::Update(float dt)
     {
         if (GameInfoManager::Instance()->unknown_0x121 && GetTweakBool("/user/dosoak", false))
         {
-            fn_801D1F6C();
+            StartDemoMatch();
         }
         m_fTimeElapsed = 0.0f;
         mStartedDemo = true;
@@ -196,7 +196,7 @@ void TitleScene::Update(float dt)
                 GameSceneManager::Instance()->Push(SCENE_INTRO_MOVIE, SCREEN_NOTHING, true));
             if (scene != 0)
             {
-                scene->fn_801D9B84();
+                scene->ResetMoviePlayer();
             }
             mStartedDemo = true;
             m_fTimeElapsed = 0.0f;
@@ -206,7 +206,7 @@ void TitleScene::Update(float dt)
         pointer->SetActiveSlide("A", true, false);
         if (g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 0x1E, true, 0))
         {
-            fn_801D22C8(pad, 0);
+            OnControllerPointerPress(pad, 0);
         }
 
         bool acceptedInput = false;
@@ -301,9 +301,9 @@ void TitleScene::Update(float dt)
                 sequenceReady = sequenceReady && mControllerReady[input];
             }
 
-            if (sequenceReady && !fn_8010FD74())
+            if (sequenceReady && !GetUnlockAll())
             {
-                fn_8010FD7C(true);
+                SetUnlockAll(true);
                 FEAudio::PlayAnimAudioEvent(0xCF37DAC7, 0, 0, true);
                 for (int input = 0; input < 9; ++input)
                 {
@@ -338,7 +338,7 @@ static inline int PickRandomSidekick(bool e3Build)
     }
 }
 
-void TitleScene::fn_801D1F6C()
+void TitleScene::StartDemoMatch()
 {
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     gameInfo->SetMode(GameInfoManager::GM_MODE_2, false);
@@ -376,7 +376,7 @@ void TitleScene::fn_801D1F6C()
     GameSceneManager::Instance()->PushLoadingScene(true);
 }
 
-void TitleScene::fn_801D22C8(int index, void*)
+void TitleScene::OnControllerPointerPress(int index, void*)
 {
     mTextPressStart->SetActiveSlide("down", true, false);
     mControllerComponent.SetPointerState(2, index);
@@ -401,7 +401,7 @@ void TitleScene::fn_801D22C8(int index, void*)
     }
 }
 
-void TitleScene::fn_801D2478(int index, void*)
+void TitleScene::OnControllerPointerEnter(int index, void*)
 {
     mTextPressStart->SetActiveSlide("over", true, false);
     mControllerComponent.SetPointerState(1, index);
@@ -409,7 +409,7 @@ void TitleScene::fn_801D2478(int index, void*)
     mUnidentifiedDF = true;
 }
 
-void TitleScene::fn_801D24EC(int index, void*)
+void TitleScene::OnControllerPointerLeave(int index, void*)
 {
     mTextPressStart->SetActiveSlide("off", true, false);
     mControllerComponent.SetPointerState(0, index);

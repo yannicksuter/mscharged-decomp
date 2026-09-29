@@ -7,6 +7,7 @@
 #include "Game/AI/Powerups.h"
 #include "Game/Ball.h"
 #include "Game/Character.h"
+#include "Game/CharacterQueries.h"
 #include "Game/CharacterEffects.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Effects/EmissionController.h"
@@ -35,69 +36,20 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/Camera/CameraMan.h"
 
-extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
-static bool lbl_806E16F8;
+static bool sAwardPowerupForBallCharge;
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
-static float lbl_806DD1C0 = 2.0f;
-static float lbl_806DD1C4 = 2.0f;
-static float lbl_806DD1C8 = 2.0f;
-static float lbl_806DD1CC = 0.25f;
-static float lbl_806DD1D0 = 1.0f;
-static float lbl_806DD1D4 = 1.0f;
-static bool lbl_806DD1D8 = true;
-static float lbl_806DD1DC = 1.0f;
-static float lbl_806DD1E0 = -0.3f;
-extern "C" EffectsGroup* fn_802E7D54(EmissionManager* pManager, unsigned long uHashID);
-static nlVector3 lbl_80515478 = { 0.0f, 0.0f, 1.0f };
-extern "C" void fn_800EDCE8(cPlayer* pPlayer);
-extern "C" bool fn_800EBBFC(int slotId, unsigned long cueId, const void* debugName, void* context);
-extern "C" bool fn_8003877C(cFielder* pFielder);
-extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pGroup);
-extern "C" void fn_800F026C(const nlVector3& v3Shake, float fParam1, float fParam2);
-extern "C" {
-} // extern "C"
-extern "C" void fn_80038158(cFielder* pFielder, int nParam);
-extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);
-extern "C" void fn_80060FF4(cGame* pGame, const void* pEventData);
-extern "C" EffectsGroup* fn_802E7D54(EmissionManager* pManager, unsigned long uHash);
-extern "C" void fn_802E83C4(EmissionManager* pManager, const EffectsGroup* pEffectsGroup);
-extern "C" bool fn_8019464C(cCharacter*);
-extern "C" bool fn_80194660(cCharacter*);
-extern "C" cPN_SAnimController* fn_800C2F64(cCharacter*);
-extern "C" cBall* fn_800C2F40(cPlayer*);
-extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
-extern "C" void fn_800395C0(cFielder*);
-extern "C" void fn_80039CF0(cFielder*, int);
-
-void SetEffectsGroupFountainLife(EffectsGroup* group, float life);
-extern "C" void fn_801BDF08(cCharacter* pCharacter);
-extern "C" void fn_801BDC1C(const nlVector3& v3Position, const nlVector3& v3Direction, const nlVector3& v3Velocity);
-extern "C" void fn_801BCA5C(const nlVector3& v3Position);
-extern "C" void fn_801BC094(cCharacter* pCharacter);
-extern "C" void fn_801BBE80(cCharacter* pCharacter);
-extern "C" void fn_801BB6A4(cCharacter* pCharacter, int nIcon);
-void KillStar(cFielder* pFielder);
-void EmitStar(cFielder* pFielder, bool bParam);
-void KillMushroom(cFielder* pFielder);
-void EmitMushroom(cFielder* pFielder, bool bParam);
-extern "C" bool fn_801B9C90(const char* szEffectName);
-void EmitGoalieCatch(cPlayer* pPlayer, const char* name, bool bRumble);
-extern "C" void fn_801B9904(unsigned long uEffectHash);
-extern "C" void fn_801B968C(cCharacter* pCharacter);
-extern "C" void fn_801B8C7C(const nlVector3& v3Position);
-extern "C" void fn_801B897C(cCharacter* pCharacter);
-extern "C" void fn_801B881C(cCharacter* pCharacter);
-extern "C" void fn_801B865C(cPlayer* pCharacter);
-bool KillDaze(cPlayer* player);
-extern "C" bool fn_801B8164(cFielder* pFielder);
-extern "C" void fn_801B7F8C(cPlayer* pCharacter);
-extern "C" void fn_801B7E4C(const char* pName, cCharacter* pCharacter);
-extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill);
-extern "C" void fn_801B75C8(cFielder* pCharacter, eBallShotEffectType eNewBallEffect, cPlayer* pPassTarget, bool bSilent, bool bParam5);
-void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex, bool (*callback)(float, float, unsigned long, float, void*), void* pData);
-
-EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName, const char* characterName);
+static float sWarioGroundPoundRadius = 2.0f;
+static float sBowserJrGroundPoundRadius = 2.0f;
+static float sHammerBroHammerRadius = 2.0f;
+static float sHammerBroHammerForwardOffset = 0.25f;
+static float sPowerupMeterShotSpeedThreshold = 1.0f;
+static float sPowerupMeterBallChargeThreshold = 1.0f;
+static bool sAwardPowerupForShotSpeed = true;
+static float sGoalieArmInGroundOffsetX = 1.0f;
+static float sGoalieArmInGroundOffsetY = -0.3f;
+static nlVector3 sBallEffectVelocity = { 0.0f, 0.0f, 1.0f };
 
 static inline void SetDefaultVelocity(EmissionController* pController)
 {
@@ -150,12 +102,12 @@ static inline void SetZeroVelocity(EmissionController* pController)
 static inline EmissionController* CreateBallEffect(
     unsigned long uEffectHash, cBall* pBall)
 {
-    EffectsGroup* pGroup = fn_802E7D54(EmissionManager::Instance(), uEffectHash);
+    EffectsGroup* pGroup = fxGetGroup(EmissionManager::Instance(), uEffectHash);
     EmissionController* pControl
         = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pControl->m_uUserData = (unsigned long)pBall;
 
-    nlVector3 v3Direction = lbl_80515478;
+    nlVector3 v3Direction = sBallEffectVelocity;
     pControl->SetVelocity(v3Direction);
     pControl->m_fGround = 0.02f;
     return pControl;
@@ -169,18 +121,12 @@ static inline void SetBallUpdateCallback(EmissionController* pController)
 
 static inline void EmitCharacterEffect(cCharacter* pCharacter, const char* szName)
 {
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, szName, 0);
     {
         Function1<void, EmissionController&> update2(UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
 }
-
 
 EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName,
     const char* characterName)
@@ -213,129 +159,129 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         float m_fIntensity;
     };
 
-    AnimTriggerCallbackInfo* pInfo = (AnimTriggerCallbackInfo*)uParam;
+    AnimTriggerCallbackInfo* pAnimTriggerCallbackInfo = (AnimTriggerCallbackInfo*)uParam;
 
-    fn_801BE09C(lbl_806E0C34);
+    GetCharacterEffectsName(g_pCurrentlyUpdatingCharacter);
 
-    if (fn_801BE0D8(fn_800C2F64(lbl_806E0C34)) == pAnim
-        || pInfo->m_uEventID == 0xC5408AC8
-        || pInfo->m_uEventID == 0x0F3E9247)
+    if (GetControllerSAnim(g_pCurrentlyUpdatingCharacter->GetCurrentAnimController()) == pAnim
+        || pAnimTriggerCallbackInfo->m_uEventID == 0xC5408AC8
+        || pAnimTriggerCallbackInfo->m_uEventID == 0x0F3E9247)
     {
-        switch (pInfo->m_uEventID)
+        switch (pAnimTriggerCallbackInfo->m_uEventID)
         {
         case 0xC9F4F4B0:
         {
-            u32 hasPad = fn_801BE0EC((cPlayer*)lbl_806E0C34);
+            u32 hasPad = HasGlobalPad((cPlayer*)g_pCurrentlyUpdatingCharacter);
             bool ownsBall
-                = (g_pBall != 0 && lbl_806E0C34 == fn_801BE118(g_pBall));
+                = (g_pBall != 0 && g_pCurrentlyUpdatingCharacter == GetBallOwner(g_pBall));
             if (g_pBall != 0 && !ownsBall)
             {
                 break;
             }
-            fn_800EBBFC(0xB, 0x38DF70D6, 0, 0);
+            PlaySound(0xB, 0x38DF70D6, 0, 0);
             break;
         }
 
         case 0x3650221E:
         case 0xE272718B:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_801BC2A8(lbl_806E0C34, pInfo->m_uEventID == 0x3650221E);
+                EmitSuperFootstep(g_pCurrentlyUpdatingCharacter, pAnimTriggerCallbackInfo->m_uEventID == 0x3650221E);
             }
             break;
 
         case 0x50DF765D:
         {
-            u32 hasPad = fn_801BE0EC((cPlayer*)lbl_806E0C34);
+            u32 hasPad = HasGlobalPad((cPlayer*)g_pCurrentlyUpdatingCharacter);
             bool ownsBall
-                = (g_pBall != 0 && lbl_806E0C34 == fn_801BE118(g_pBall));
+                = (g_pBall != 0 && g_pCurrentlyUpdatingCharacter == GetBallOwner(g_pBall));
             if (g_pBall != 0 && !ownsBall)
             {
                 break;
             }
-            fn_800EBBFC(0xB, 0x38DF70D6, 0, 0);
+            PlaySound(0xB, 0x38DF70D6, 0, 0);
             break;
         }
 
         case 0x05D46E25:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_801BDF0C(lbl_806E0C34);
+                EmitDKDeke(g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0x04F80245:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_801B7D00(lbl_806E0C34);
+                EmitDivot(g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0xD1B12A6E:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800318F8((cFielder*)lbl_806E0C34);
+                fn_800318F8((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0xE26970B8:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800395C0((cFielder*)lbl_806E0C34);
+                fn_800395C0((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0x09FC95CF:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_80039CF0((cFielder*)lbl_806E0C34, 0);
+                fn_80039CF0((cFielder*)g_pCurrentlyUpdatingCharacter, 0);
             }
             break;
 
         case 0x6E78F532:
-            if (fn_8019464C(lbl_806E0C34)
-                && fn_800C2F40((cPlayer*)lbl_806E0C34) != 0)
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
+                && ((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40() != 0)
             {
-                fn_801BE120(fn_800C2F40((cPlayer*)lbl_806E0C34), false);
+                SetBallVisible(((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40(), false);
             }
             break;
 
         case 0x63907309:
-            if (fn_8019464C(lbl_806E0C34)
-                && fn_800C2F40((cPlayer*)lbl_806E0C34) != 0)
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
+                && ((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40() != 0)
             {
-                fn_801BE120(fn_800C2F40((cPlayer*)lbl_806E0C34), true);
+                SetBallVisible(((cPlayer*)g_pCurrentlyUpdatingCharacter)->fn_800C2F40(), true);
             }
             break;
 
         case 0xC79FF559:
-            if (fn_801BE0E0(fn_800C2F64(lbl_806E0C34)))
+            if (IsControllerMirrored(g_pCurrentlyUpdatingCharacter->GetCurrentAnimController()))
             {
-                fn_801BE0A4(lbl_806E0C34, true);
+                fn_801BE0A4(g_pCurrentlyUpdatingCharacter, true);
             }
             else
             {
-                fn_801BE0AC(lbl_806E0C34, true);
+                fn_801BE0AC(g_pCurrentlyUpdatingCharacter, true);
             }
             break;
 
         case 0x39CB7792:
-            fn_801BE0A4(lbl_806E0C34, false);
-            fn_801BE0AC(lbl_806E0C34, false);
+            fn_801BE0A4(g_pCurrentlyUpdatingCharacter, false);
+            fn_801BE0AC(g_pCurrentlyUpdatingCharacter, false);
             break;
 
         case 0x3A7ADECB:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)lbl_806E0C34)->fn_8004E8B8();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004E8B8();
             }
             break;
 
         case 0x5D68C1D2:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = fn_8002E08C((cFielder*)lbl_806E0C34, 0x17);
-                if (fn_801BE128(pDesire))
+                Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                if (IsDesireActive(pDesire))
                 {
                     ((DesireSuperPower*)pDesire)->fn_800CAB18();
                 }
@@ -343,179 +289,179 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
             break;
 
         case 0xCFEAC332:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = fn_8002E08C((cFielder*)lbl_806E0C34, 0x17);
-                if (fn_801BE128(pDesire))
+                Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                if (IsDesireActive(pDesire))
                 {
-                    fn_800C9DB4((DesireSuperPower*)pDesire);
+                    EmitBowserJrShriek((DesireSuperPower*)pDesire);
                 }
             }
             break;
 
         case 0xB86275EC:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)lbl_806E0C34)->fn_8004E6B4();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->ReleaseHammerProjectile();
             }
             break;
 
         case 0x25590436:
         case 0xBBA47C42:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)lbl_806E0C34)->fn_8004E92C();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004E92C();
             }
             break;
 
         case 0x09823AC3:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                lbl_806E0C34->SetHammerTransformFrozen(true);
+                g_pCurrentlyUpdatingCharacter->SetHammerTransformFrozen(true);
             }
             break;
 
         case 0xA5C86614:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)lbl_806E0C34)->fn_8004EA9C();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004EA9C();
             }
             break;
 
         case 0x411A6B8F:
-            if (fn_8019464C(lbl_806E0C34)
-                && fn_801BE130((cFielder*)lbl_806E0C34) == 1)
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
+                && GetFielderActionState((cFielder*)g_pCurrentlyUpdatingCharacter) == 1)
             {
-                fn_801BD1C0((cFielder*)lbl_806E0C34);
+                BeginDeke((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0x32D5F1D8:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_801BD4EC((cFielder*)lbl_806E0C34);
+                EndDeke((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0xAC352365:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)lbl_806E0C34)->fn_8004F8E8();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004F8E8();
             }
             break;
 
         case 0x0E4E0F3F:
-            fn_801B9A98(lbl_806E0C34);
+            EmitLandingFeetTrigger(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x64D870A7:
-            fn_801B9B94(lbl_806E0C34);
+            EmitToadGoalDustTrigger(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x5251A784:
-            fn_801BAA94(lbl_806E0C34);
+            EmitPullHeadOut(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x16893826:
-            fn_801BABEC((cPlayer*)lbl_806E0C34);
+            EmitPushHeadIn((cPlayer*)g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0xAC6452C8:
-            fn_801BB45C(lbl_806E0C34);
+            EmitHitTrail(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0xE68D3F18:
-            fn_801BB318(lbl_806E0C34);
+            EmitSlideTackleTrail(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x6D249451:
-            fn_801BB640((cFielder*)lbl_806E0C34, 0);
+            KillHitTrail((cFielder*)g_pCurrentlyUpdatingCharacter, 0);
             break;
 
         case 0x0F3E9247:
         case 0xC5408AC8:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cPlayer*)lbl_806E0C34)->ClearPowerupAnimState(false);
+                ((cPlayer*)g_pCurrentlyUpdatingCharacter)->ClearPowerupAnimState(false);
             }
             break;
 
         case 0x00266A23:
-            if (fn_8019464C(lbl_806E0C34)
-                && !((cFielder*)lbl_806E0C34)->fn_800344B0())
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
+                && !((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_800344B0())
             {
-                EmitDaze((cPlayer*)lbl_806E0C34);
+                EmitDaze((cPlayer*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0x77935C1C:
-            fn_801BAD30(lbl_806E0C34);
+            EmitLanding(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x1A8EBA53:
-            if (fn_8019464C(lbl_806E0C34))
+            if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800367B4((cFielder*)lbl_806E0C34);
+                fn_800367B4((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
         case 0x73819990:
-            fn_801BAF0C((cPlayer*)lbl_806E0C34);
+            EmitTackleImpact((cPlayer*)g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x71FED95E:
-            fn_801B7CA8((cPlayer*)lbl_806E0C34);
+            EmitSmallRumble((cPlayer*)g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x18F99186:
-            fn_801B7CD4((cPlayer*)lbl_806E0C34);
+            EmitMediumRumble((cPlayer*)g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0xB631C31A:
-            if (fn_801BE0B4(lbl_806E0C34))
+            if (IsCharacterGoalie(g_pCurrentlyUpdatingCharacter))
             {
-                ((Goalie*)lbl_806E0C34)->DoPassRelease();
+                ((Goalie*)g_pCurrentlyUpdatingCharacter)->DoPassRelease();
             }
             break;
 
         case 0x25642360:
         case 0x35B0F74E:
-            if (fn_801BE0B4(lbl_806E0C34))
+            if (IsCharacterGoalie(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800EBBFC(0xB, 0x38DF70D6, 0, 0);
+                PlaySound(0xB, 0x38DF70D6, 0, 0);
             }
             break;
 
         case 0xC21A0381:
-            CreateHitShockwave((cFielder*)lbl_806E0C34, fn_800D1450(lbl_806E0C34),
-                fn_801BE138(&gGameTweaks.mFielderTweaks->mUnidentified414));
-            fn_801BB20C(lbl_806E0C34);
+            CreateHitShockwave((cFielder*)g_pCurrentlyUpdatingCharacter, GetCharacterPosition(g_pCurrentlyUpdatingCharacter),
+                GetTweakFloatValue(&gGameTweaks.mFielderTweaks->fBowserExplodeRadius));
+            EmitBowserExplode(g_pCurrentlyUpdatingCharacter);
             break;
 
         case 0x89E63F15:
-            if (fn_80194660(lbl_806E0C34))
+            if (IsCharacterHammerBro(g_pCurrentlyUpdatingCharacter))
             {
-                if (fn_801BE0E0(fn_800C2F64(lbl_806E0C34)))
+                if (IsControllerMirrored(g_pCurrentlyUpdatingCharacter->GetCurrentAnimController()))
                 {
-                    fn_801BE0C8(lbl_806E0C34, true);
+                    SetCharacterLeftPropAnimated(g_pCurrentlyUpdatingCharacter, true);
                 }
                 else
                 {
-                    fn_801BE0D0(lbl_806E0C34, true);
+                    SetCharacterRightPropAnimated(g_pCurrentlyUpdatingCharacter, true);
                 }
             }
             break;
 
         case 0x005B41CF:
-            if (fn_80194660(lbl_806E0C34))
+            if (IsCharacterHammerBro(g_pCurrentlyUpdatingCharacter))
             {
-                if (fn_801BE0E0(fn_800C2F64(lbl_806E0C34)))
+                if (IsControllerMirrored(g_pCurrentlyUpdatingCharacter->GetCurrentAnimController()))
                 {
-                    fn_801BE0D0(lbl_806E0C34, true);
+                    SetCharacterRightPropAnimated(g_pCurrentlyUpdatingCharacter, true);
                 }
                 else
                 {
-                    fn_801BE0C8(lbl_806E0C34, true);
+                    SetCharacterLeftPropAnimated(g_pCurrentlyUpdatingCharacter, true);
                 }
             }
             break;
@@ -559,10 +505,10 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
     }
 }
 
-void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex,
-    bool (*callback)(float, float, unsigned long, float, void*), void* pData)
+void GetAnimTriggerInfo(cCharacter* pCharacter, int animID,
+    bool (*pInfoCallback)(float, float, unsigned long, float, void*), void* pUserData)
 {
-    cSAnim* pAnim = pCharacter->m_pAnimInventory->GetAnim(animIndex);
+    cSAnim* pAnim = pCharacter->m_pAnimInventory->GetAnim(animID);
     cSAnimCallback* cb = pAnim->m_pCallbackList;
 
     while (cb != 0)
@@ -570,7 +516,7 @@ void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex,
         GetAnimScriptInterpreter();
         cSAnim* pTriggerAnim = (cSAnim*)cb->m_nParam1;
         float numKeys = (float)pAnim->m_nNumKeys;
-        if (!callback(cb->m_fTime, numKeys / 30.0f, pTriggerAnim->GetHashID(), 0.0f, pData))
+        if (!pInfoCallback(cb->m_fTime, numKeys / 30.0f, pTriggerAnim->GetHashID(), 0.0f, pUserData))
         {
             break;
         }
@@ -578,34 +524,24 @@ void GetAnimTriggerInfo(cCharacter* pCharacter, int animIndex,
     }
 }
 
-extern "C" void fn_801B73B8(cPlayer* pCharacter, bool)
+void EmitBallImpact(cPlayer* pCharacter, bool bSilent)
 {
     const char* groupName = "ball_impact";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     pController->SetPosition(g_pBall->m_v3Position);
     pController->SetVelocity(g_pBall->m_v3Velocity);
 }
 
-extern "C" void fn_801B74C8(cPlayer* pCharacter)
+void EmitBallPass(cPlayer* pCharacter)
 {
     const char* groupName = "ball_impact";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     pController->SetPosition(g_pBall->m_v3Position);
 }
 
-extern "C" void fn_801B75C8(cFielder* pCharacter,
+void EmitBallShot(cFielder* pCharacter,
     eBallShotEffectType eNewBallEffect, cPlayer* pPassTarget, bool bSilent,
-    bool bParam5)
+    bool bAwardPowerup)
 {
     EmissionController* pGlowControl = 0;
     int nRumble = 1;
@@ -614,8 +550,8 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
     {
     case BALL_EFFECT_PERFECT_PASS:
     {
-        fn_801BA034();
-        fn_801BA358();
+        KillWindups();
+        KillBallGlow();
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_meteor");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
@@ -624,8 +560,8 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
     }
     case BALL_EFFECT_REGULAR_SHOT:
     {
-        fn_801BA034();
-        fn_801BA358();
+        KillWindups();
+        KillBallGlow();
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_drybones");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
@@ -634,41 +570,41 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
     }
     case BALL_EFFECT_ONETIMER_SHOT:
     {
-        fn_801BA034();
-        fn_801BA358();
+        KillWindups();
+        KillBallGlow();
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_boo");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         PlayRumbleAction(2, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_S2S_SHOT:
-        if (pCharacter->m_eClassType == FIELDER && bParam5)
+        if (pCharacter->m_eClassType == FIELDER && bAwardPowerup)
         {
             float fAmount = 0.0f;
-            if (lbl_806E16F8)
+            if (sAwardPowerupForBallCharge)
             {
-                if (fn_800155A0(g_pBall, 0) >= lbl_806DD1D4)
+                if (GetBallChargeValue(g_pBall, 0) >= sPowerupMeterBallChargeThreshold)
                 {
                     fAmount = 1.0f;
                 }
             }
-            if (lbl_806DD1D8)
+            if (sAwardPowerupForShotSpeed)
             {
-                if (pCharacter->m_pShotMeter->m_fSpeedValue >= lbl_806DD1D0)
+                if (pCharacter->m_pShotMeter->m_fSpeedValue >= sPowerupMeterShotSpeedThreshold)
                 {
                     fAmount = 1.0f;
                 }
             }
-            pCharacter->fn_80036A38(0, fAmount);
+            pCharacter->IncrementPowerupMeter(0, fAmount);
         }
     case BALL_EFFECT_PERFECT_SHOT:
-        if (fn_800155A0(g_pBall, 0) >= 4.0f)
+        if (GetBallChargeValue(g_pBall, 0) >= 4.0f)
         {
             nRumble = 2;
         }
     default:
         PlayRumbleAction(nRumble, pCharacter->GetGlobalPad());
-        fn_800152B4(g_pBall);
+        EmitBallChargeTransition(g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, pCharacter);
         break;
     }
@@ -683,12 +619,12 @@ extern "C" void fn_801B75C8(cFielder* pCharacter,
     }
 }
 
-extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill)
+void KillBallShot(const char* szEffectName, bool bReallyKill)
 {
     EffectsGroup* pGroup
         = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
 
-    if (pGroup != 0 && fn_80014EA4(g_pBall, pGroup))
+    if (pGroup != 0 && IsBallEffectPlaying(g_pBall, pGroup))
     {
         if (bReallyKill)
         {
@@ -696,33 +632,33 @@ extern "C" void fn_801B79A4(const char* szEffectName, bool bReallyKill)
         }
         else
         {
-            fn_802E83C4(EmissionManager::Instance(), pGroup);
+            EmissionManager::Instance()->Kill(pGroup);
         }
     }
 }
 
-extern "C" void fn_801B7A28(cBall* pBall)
+void UpdateBallGlow(cBall* pBall)
 {
     cBall* pGlowBall;
 
     if (!pBall->m_bVisible)
     {
-        fn_801BA358();
+        KillBallGlow();
         fn_800189C4(pBall);
     }
     else
     {
-        unsigned long uHash = fn_801B7B70(fn_800155A0(pBall, 0));
+        unsigned long uHash = GetBallGlowEffectHash(GetBallChargeValue(pBall, 0));
         if (uHash != pBall->m_CurrentGlowEffect)
         {
             if (uHash == 0)
             {
-                fn_801BA358();
+                KillBallGlow();
                 fn_800189C4(pBall);
             }
             else
             {
-                fn_801BA358();
+                KillBallGlow();
                 pGlowBall = g_pBall;
                 SetBallUpdateCallback(CreateBallEffect(uHash, pGlowBall));
                 g_pBall->m_CurrentGlowEffect = uHash;
@@ -731,7 +667,7 @@ extern "C" void fn_801B7A28(cBall* pBall)
     }
 }
 
-extern "C" unsigned long fn_801B7B70(float fLevel)
+unsigned long GetBallGlowEffectHash(float fCharge)
 {
     static unsigned long uHash0 = nlStringLowerHash("ball_shot_windup_glow_0");
     static unsigned long uHash1 = nlStringLowerHash("ball_shot_windup_glow_1");
@@ -739,39 +675,39 @@ extern "C" unsigned long fn_801B7B70(float fLevel)
     static unsigned long uHash3 = nlStringLowerHash("ball_shot_windup_glow_3");
     static unsigned long uHashMax = nlStringLowerHash("ball_shot_windup_glow_max");
 
-    if (fLevel < 1.0f)
+    if (fCharge < 1.0f)
     {
         return uHash0;
     }
-    if (fLevel < 2.0f)
+    if (fCharge < 2.0f)
     {
         return uHash1;
     }
-    if (fLevel < 3.0f)
+    if (fCharge < 3.0f)
     {
         return uHash2;
     }
-    if (fLevel < 4.0f)
+    if (fCharge < 4.0f)
     {
         return uHash3;
     }
     return uHashMax;
 }
 
-static int lbl_806E173C;
-static bool lbl_806E1740;
+static int numUpdatesUntilNextToggle;
+static bool isEffectOn;
 
-extern "C" void fn_801B7CA8(cPlayer* pPlayer)
+void EmitSmallRumble(cPlayer* pPlayer)
 {
     PlayRumbleAction(1, pPlayer->GetGlobalPad());
 }
 
-extern "C" void fn_801B7CD4(cPlayer* pPlayer)
+void EmitMediumRumble(cPlayer* pPlayer)
 {
     PlayRumbleAction(2, pPlayer->GetGlobalPad());
 }
 
-extern "C" void fn_801B7D00(cCharacter* pCharacter)
+void EmitDivot(cCharacter* pCharacter)
 {
     cSHierarchy* pHierarchy;
     EmissionController* pController = EmissionManager::Instance()->Create(
@@ -803,16 +739,16 @@ extern "C" void fn_801B7D00(cCharacter* pCharacter)
     SetZeroVelocity(pController);
 }
 
-extern "C" void fn_801B7E4C(const char* pName, cCharacter* pCharacter)
+void EmitElectrocutionExplosion(const char* szEffectName, cCharacter* pCharacter)
 {
-    EmissionController* pController = EmitGeneric(pCharacter, pName, 0);
+    EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
     Function1<void, EmissionController&> update2(UpdateEmitterFromCharacter);
     pController->SetUpdateCallback(update2);
 }
 
-extern "C" void fn_801B7F8C(cPlayer* pCharacter)
+void EmitConfused(cPlayer* pCharacter)
 {
-    StopSound(pCharacter->fn_8001E168() ? 0xD73B11EC : 0x1CCDFC62, pCharacter);
+    StopSound(pCharacter->IsCaptain() ? 0xD73B11EC : 0x1CCDFC62, pCharacter);
 
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("confused");
     if (pCharacter->IsPlayingEffect(pGroup))
@@ -833,15 +769,15 @@ extern "C" void fn_801B7F8C(cPlayer* pCharacter)
         pController->SetUpdateCallback(update2);
     }
 
-    fn_800EDCE8(pCharacter);
-    fn_800EBBFC(pCharacter->mUnidentified318,
-        pCharacter->fn_8001E168() ? 0xD73B11EC : 0x1CCDFC62,
+    SetPlayerAudioController(pCharacter);
+    PlaySound(pCharacter->m_uSoundSlotId,
+        pCharacter->IsCaptain() ? 0xD73B11EC : 0x1CCDFC62,
         "confused", pCharacter);
 }
 
-extern "C" bool fn_801B8164(cFielder* pFielder)
+bool KillConfused(cFielder* pFielder)
 {
-    unsigned long soundID = pFielder->fn_8001E168()
+    unsigned long soundID = pFielder->IsCaptain()
                               ? 0xD73B11EC
                               : 0x1CCDFC62;
     StopSound(soundID, pFielder);
@@ -859,7 +795,7 @@ void EmitDaze(cPlayer* pCharacter)
 {
     if (pCharacter->m_eClassType == FIELDER)
     {
-        StopSound(pCharacter->fn_8001E168() ? 0xFDC268FB : 0x1CCDFC62, pCharacter);
+        StopSound(pCharacter->IsCaptain() ? 0xFDC268FB : 0x1CCDFC62, pCharacter);
     }
     else
     {
@@ -887,48 +823,44 @@ void EmitDaze(cPlayer* pCharacter)
 
     if (pCharacter->m_eClassType == FIELDER)
     {
-        fn_800EBBFC(pCharacter->mUnidentified318,
-            pCharacter->fn_8001E168() ? 0xFDC268FB : 0x1CCDFC62,
+        PlaySound(pCharacter->m_uSoundSlotId,
+            pCharacter->IsCaptain() ? 0xFDC268FB : 0x1CCDFC62,
             "dazed", pCharacter);
     }
     else
     {
-        fn_800EBBFC(9, 0x8F82BB80, "dazed", pCharacter);
+        PlaySound(9, 0x8F82BB80, "dazed", pCharacter);
     }
 }
 
-bool KillDaze(cPlayer* player)
+bool KillDaze(cPlayer* pCharacter)
 {
-    if (player->m_eClassType == FIELDER)
+    if (pCharacter->m_eClassType == FIELDER)
     {
-        unsigned long soundID = player->fn_8001E168()
+        unsigned long soundID = pCharacter->IsCaptain()
                                   ? 0xFDC268FB
                                   : 0x1CCDFC62;
-        StopSound(soundID, player);
+        StopSound(soundID, pCharacter);
     }
     else
     {
-        StopSound(0x8F82BB80, player);
+        StopSound(0x8F82BB80, pCharacter);
     }
 
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dazed");
-    if (player->IsPlayingEffect(pGroup))
+    if (pCharacter->IsPlayingEffect(pGroup))
     {
-        player->KillEffect(pGroup);
+        pCharacter->KillEffect(pGroup);
         return true;
     }
     return false;
 }
 
-extern "C" void fn_801B84B4(cPlayer* pCharacter)
+void EmitFreeze(cPlayer* pCharacter)
 {
     const char* groupName = "freeze";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EffectsGroup* pGroup;
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     {
         Function1<void, EmissionController&> update2(
             UpdateEmitterFromCharacter);
@@ -943,24 +875,19 @@ extern "C" void fn_801B84B4(cPlayer* pCharacter)
     pCharacter->m_pEffectsTexturing = fxGetTexturing(eFXTex_Freeze);
 }
 
-extern "C" void fn_801B865C(cPlayer* pCharacter)
+void KillFreeze(cPlayer* pCharacter)
 {
     pCharacter->KillEffect(EmissionManager::Instance()->GetEffectsGroup("freeze"));
     pCharacter->m_pEffectsTexturing = 0;
 }
 
-extern "C" void fn_801B86A4(cPlayer* pCharacter)
+void EmitUnFreeze(cPlayer* pCharacter)
 {
     pCharacter->KillEffect(EmissionManager::Instance()->GetEffectsGroup("freeze"));
     pCharacter->m_pEffectsTexturing = 0;
 
     const char* groupName = "unfreeze";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     {
         Function1<void, EmissionController&> update2(
             UpdateEmitterFromCharacter);
@@ -969,15 +896,10 @@ extern "C" void fn_801B86A4(cPlayer* pCharacter)
     PlayRumbleAction(1, pCharacter->GetGlobalPad());
 }
 
-extern "C" void fn_801B881C(cCharacter* pCharacter)
+void EmitYoshiShellBreak(cCharacter* pCharacter)
 {
     const char* groupName = "yoshi_shell_break";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
     {
@@ -987,24 +909,26 @@ extern "C" void fn_801B881C(cCharacter* pCharacter)
     }
 }
 
-extern "C" void fn_801B897C(cCharacter* pCharacter)
+void EmitPeachPhoto(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("peach_photo"), 0, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B89F4(cFielder* pFielder)
+void EmitMontyDekeEnter(cFielder* pFielder)
 {
-    fn_801B7E4C("monty_deke_enter", pFielder);
+    EmissionController* pController = EmitGeneric(pFielder, "monty_deke_enter", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801B8B38(cPlayer* pPlayer)
+void EmitMontyDekeExit(cPlayer* pPlayer)
 {
-    fn_801B7E4C("monty_deke_exit", pPlayer);
+    EmissionController* pController = EmitGeneric(pPlayer, "monty_deke_exit", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801B8C7C(const nlVector3& v3Position)
+void EmitHammerGround(const nlVector3& v3Position)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("hammer_ground"), 3, true, 0);
     pController->SetPosition(v3Position);
@@ -1013,63 +937,63 @@ extern "C" void fn_801B8C7C(const nlVector3& v3Position)
 
 static char s_szHammerGroundBig[] = "hammer_ground_big";
 
-extern "C" void fn_801B8CF4(const nlVector3& v3Position)
+void EmitHammerDestroyBig(const nlVector3& v3Position)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("hammer_destroy_big"), 3, true, 0);
     pController->SetPosition(v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-static void EmitGroundPound(cCharacter* pCharacter)
+void EmitGroundPound(cCharacter* pCharacter)
 {
     if (pCharacter->mUnidentified024.m_eCharacterClass == 7)
     {
-        const char* groupName = "ground_pound";
-        EmitCharacterEffect(pCharacter, groupName);
+        EmissionController* pController = EmitGeneric(pCharacter, "ground_pound", 0);
+        pController->SetUpdateCallback(UpdateEmitterFromCharacter);
     }
     else if (pCharacter->mUnidentified024.m_eCharacterClass == 9)
     {
-        const char* groupName = "bowserjr_ground_pound";
-        EmitCharacterEffect(pCharacter, groupName);
+        EmissionController* pController = EmitGeneric(pCharacter, "bowserjr_ground_pound", 0);
+        pController->SetUpdateCallback(UpdateEmitterFromCharacter);
     }
 }
 
-extern "C" void fn_801B8D6C(cCharacter* pCharacter)
+void EmitMontySquishEnter(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("monty_squish_enter"), 3, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B8DE4(cCharacter* pCharacter)
+void EmitMontySquishExit(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("monty_squish_exit"), 3, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B8E5C(cPlayer* pPlayer)
+void EmitGoalieArmInGround(cPlayer* pPlayer)
 {
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("goalie_arm_in_ground");
     EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
 
     nlVector3 v3Point;
-    nlVec3Set(v3Point, lbl_806DD1DC, lbl_806DD1E0, 0.2f);
+    nlVec3Set(v3Point, sGoalieArmInGroundOffsetX, sGoalieArmInGroundOffsetY, 0.2f);
     GetWorldPoint(v3Point, v3Point, pPlayer->mUnidentified024.m_v3Position, pPlayer->mUnidentified024.m_aActualFacingDirection);
     pController->SetPosition(v3Point);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B8F04(cCharacter* pCharacter, const char* name)
+void EmitDekeEnter(cCharacter* pCharacter, const char* szEffectName)
 {
-    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(name), 3, true, 0);
+    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(szEffectName), 3, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B8F7C(cCharacter* pCharacter, const char* name)
+void EmitDekeExit(cCharacter* pCharacter, const char* szEffectName)
 {
-    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(name), 3, true, 0);
+    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(szEffectName), 3, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
@@ -1078,66 +1002,51 @@ extern "C" void fn_801B8FF4(cFielder* pFielder)
 {
 }
 
-extern "C" void fn_801B8FF8(cFielder* pFielder)
+void EmitShyGuyBulletStart(cFielder* pFielder)
 {
     const char* groupName = "shyguy_bullet_start";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pFielder->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pFielder, groupName, 0);
     pController->SetPosition(g_pBall->m_v3Position);
 }
 
-extern "C" void fn_801B90F8(cFielder* pFielder)
+void EmitShyGuyBulletShoot(cFielder* pFielder)
 {
     const char* groupName = "shyguy_bullet_shoot";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pFielder->AttachEffect(pController);
-    pController->SetPosition(pFielder->mUnidentified420->position);
+    EmissionController* pController = EmitGeneric(pFielder, groupName, 0);
+    pController->SetPosition(pFielder->m_pBulletBill->position);
 }
 
-extern "C" void fn_801B91F8(cFielder* pFielder)
+void EmitShyGuyBulletEnd(cFielder* pFielder)
 {
     const char* groupName = "shyguy_bullet_end";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pFielder->AttachEffect(pController);
-    pController->SetPosition(pFielder->mUnidentified420->position);
+    EmissionController* pController = EmitGeneric(pFielder, groupName, 0);
+    pController->SetPosition(pFielder->m_pBulletBill->position);
 }
 
-extern "C" void fn_801B92F8(cCharacter* pCharacter)
+void EmitBooDekePuffStart(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("boo_deke_puff_start"), 3, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B9370(cCharacter* pCharacter)
+void EmitBooDekePuffEnd(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("boo_deke_puff_end"), 3, true, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B93E8(cCharacter* pCharacter)
+void EndElectrocution(cCharacter* pCharacter)
 {
     pCharacter->EndEffect(EmissionManager::Instance()->GetEffectsGroup("electrocution"));
     pCharacter->m_pEffectsTexturing = 0;
-    pCharacter->fn_8001C510(0);
+    pCharacter->SetModelType(0);
 }
 
-static int lbl_806DD20C = 4;
+static int sNumUpdatesBetweenElectrocutionToggles = 4;
 
-extern "C" void fn_801B9440(EmissionController& ec)
+void ElectrocutionUpdateCallback(EmissionController& ec)
 {
     UpdateEmitterFromCharacterUnculled(ec);
 
@@ -1147,9 +1056,9 @@ extern "C" void fn_801B9440(EmissionController& ec)
         return;
     }
 
-    if (lbl_806E173C == 0)
+    if (numUpdatesUntilNextToggle == 0)
     {
-        if (lbl_806E1740)
+        if (isEffectOn)
         {
             pCharacter->SetElectrocutionTextureEnabled(false);
         }
@@ -1157,16 +1066,16 @@ extern "C" void fn_801B9440(EmissionController& ec)
         {
             pCharacter->SetElectrocutionTextureEnabled(true);
         }
-        lbl_806E1740 = !lbl_806E1740;
-        lbl_806E173C = nlRandom(lbl_806DD20C, &nlDefaultSeed);
+        isEffectOn = !isEffectOn;
+        numUpdatesUntilNextToggle = nlRandom(sNumUpdatesBetweenElectrocutionToggles, &nlDefaultSeed);
     }
     else
     {
-        lbl_806E173C--;
+        numUpdatesUntilNextToggle--;
     }
 }
 
-extern "C" void fn_801B94EC(cCharacter* pCharacter, const nlVector3& v3Position,
+void CharacterElectrocutionEffect(cCharacter* pCharacter, const nlVector3& v3Position,
     const nlVector3& v3Normal)
 {
     EmissionManager::Instance()->IsPlaying(GetCharacterIndex(pCharacter),
@@ -1179,28 +1088,23 @@ extern "C" void fn_801B94EC(cCharacter* pCharacter, const nlVector3& v3Position,
     pController->m_fGround = 0.02f;
     SetFreeUpdateCallback(pController, UpdateEmitterPoseFromCharacter);
     pCharacter->AttachEffect(pController);
-    SetFreeUpdateCallback(pController, fn_801B9440);
-    pCharacter->fn_8001C510(1);
+    SetFreeUpdateCallback(pController, ElectrocutionUpdateCallback);
+    pCharacter->SetModelType(1);
     EmitElectricFenceCharacterEffect(v3Position, v3Normal, GetCharacterIndex(pCharacter));
 }
 
-extern "C" void fn_801B968C(cCharacter* pCharacter)
+void EmitElectrocution(cCharacter* pCharacter)
 {
     const char* szName = "electrocution";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, szName, 0);
     {
-        Function1<void, EmissionController&> update2(fn_801B9440);
+        Function1<void, EmissionController&> update2(ElectrocutionUpdateCallback);
         pController->SetUpdateCallback(update2);
     }
-    pCharacter->fn_8001C510(1);
+    pCharacter->SetModelType(1);
 }
 
-extern "C" void fn_801B97DC(cFielder* pFielder)
+void EmitBowserSmoke(cFielder* pFielder)
 {
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("bowser_smoke");
     EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
@@ -1209,7 +1113,7 @@ extern "C" void fn_801B97DC(cFielder* pFielder)
     UpdateEmitterFromCharacterHead(*pController);
 }
 
-extern "C" void fn_801B98A0(cFielder* pFielder)
+void EndBowserSmoke(cFielder* pFielder)
 {
     const EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("bowser_smoke");
     if (pFielder->IsPlayingEffect(pGroup))
@@ -1218,21 +1122,21 @@ extern "C" void fn_801B98A0(cFielder* pFielder)
     }
 }
 
-static nlVector3 lbl_80515720 = { 0.0f, 0.0f, 1.0f };
+static nlVector3 sBallWindupTransitionVelocity = { 0.0f, 0.0f, 1.0f };
 
-extern "C" void fn_801B9904(unsigned long uEffectHash)
+void EmitBallWindupTransition(unsigned long uEffectHash)
 {
     EmissionController* pControl = EmissionManager::Instance()->Create(
-        fn_802E7D54(EmissionManager::Instance(), uEffectHash), 3, true, 0);
-    nlVector3 v3Direction = lbl_80515720;
+        fxGetGroup(EmissionManager::Instance(), uEffectHash), 3, true, 0);
+    nlVector3 v3Direction = sBallWindupTransitionVelocity;
 
     pControl->SetVelocity(v3Direction);
     pControl->SetPosition(g_pBall->m_v3Position);
 }
 
-void EmitGoalieCatch(cPlayer* pPlayer, const char* name, bool bRumble)
+void EmitGoalieCatch(cPlayer* pPlayer, const char* szEffectName, bool bDoRumble)
 {
-    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(name),
+    EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(szEffectName),
         3,
         true,
         0);
@@ -1247,44 +1151,34 @@ void EmitGoalieCatch(cPlayer* pPlayer, const char* name, bool bRumble)
     fn_8005D74C(g_pGame, &data);
 }
 
-extern "C" void fn_801B9A98(cCharacter* pCharacter)
+void EmitLandingFeetTrigger(cCharacter* pCharacter)
 {
     const char* groupName = "landing_feet";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
 }
 
-extern "C" void fn_801B9B94(cCharacter* pCharacter)
+void EmitToadGoalDustTrigger(cCharacter* pCharacter)
 {
     const char* groupName = "toad_goal_hi_0_dust";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
 }
 
-extern "C" bool fn_801B9C90(const char* szEffectName)
+bool EmitWindupAtBall(const char* szEffectName)
 {
     EffectsGroup* pCheckGroup
         = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
-    if (!fn_80014EA4(g_pBall, pCheckGroup))
+    if (!IsBallEffectPlaying(g_pBall, pCheckGroup))
     {
         cBall* pBall = g_pBall;
         unsigned long uHash = nlStringLowerHash(szEffectName);
         EffectsGroup* pGroup
-            = fn_802E7D54(EmissionManager::Instance(), uHash);
+            = fxGetGroup(EmissionManager::Instance(), uHash);
         EmissionController* pController
             = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
         pController->m_uUserData = (unsigned long)pBall;
-        nlVector3 vel = lbl_80515478;
+        nlVector3 vel = sBallEffectVelocity;
         pController->SetVelocity(vel);
         pController->m_fGround = 0.02f;
         SetBallUpdateCallback(pController);
@@ -1293,20 +1187,20 @@ extern "C" bool fn_801B9C90(const char* szEffectName)
     return false;
 }
 
-extern "C" bool fn_801B9DAC(const char* szEffectName)
+bool EmitBallGlow(const char* szEffectName)
 {
     unsigned long uHash = nlStringLowerHash(szEffectName);
 
-    fn_801BA358();
+    KillBallGlow();
 
     EmissionController* pController;
     EffectsGroup* pGroup;
     cBall* pBall;
     pBall = g_pBall;
-    pGroup = fn_802E7D54(EmissionManager::Instance(), uHash);
+    pGroup = fxGetGroup(EmissionManager::Instance(), uHash);
     pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pController->m_uUserData = (unsigned long)pBall;
-    nlVector3 vel = lbl_80515478;
+    nlVector3 vel = sBallEffectVelocity;
     pController->SetVelocity(vel);
     pController->m_fGround = 0.02f;
     SetBallUpdateCallback(pController);
@@ -1317,15 +1211,15 @@ extern "C" bool fn_801B9DAC(const char* szEffectName)
 static const char* s_szHeaderTarget = "header_target";
 static const char* s_szHeaderTargetActive = "header_target_active";
 
-extern "C" void fn_801B9EAC(cBall* pBall, nlVector3* pPosition, bool bActive)
+void EmitHeaderTarget(cBall* pBall, nlVector3* pPosition, bool bActive)
 {
     const char* szName = bActive ? s_szHeaderTargetActive : s_szHeaderTarget;
 
     EmissionController* pController = EmissionManager::Instance()->Create(
-        fn_802E7D54(EmissionManager::Instance(), nlStringLowerHash(szName)),
+        fxGetGroup(EmissionManager::Instance(), nlStringLowerHash(szName)),
         3, true, 0);
     pController->m_uUserData = (unsigned long)pBall;
-    nlVector3 vel = lbl_80515478;
+    nlVector3 vel = sBallEffectVelocity;
     pController->SetVelocity(vel);
     pController->m_fGround = 0.02f;
     pController->SetPosition(*pPosition);
@@ -1334,7 +1228,7 @@ extern "C" void fn_801B9EAC(cBall* pBall, nlVector3* pPosition, bool bActive)
     pController->SetUpdateCallback(update);
 }
 
-extern "C" void fn_801B9FD0(cBall* pBall, bool bActive)
+void KillHeaderTarget(cBall* pBall, bool bActive)
 {
     const char* szEffectName = bActive ? s_szHeaderTargetActive : s_szHeaderTarget;
 
@@ -1342,7 +1236,7 @@ extern "C" void fn_801B9FD0(cBall* pBall, bool bActive)
         EmissionManager::Instance()->GetEffectsGroup(szEffectName));
 }
 
-extern "C" void fn_801BA034()
+void KillWindups()
 {
     static unsigned long sHashBallShotWindup0 =
         nlStringLowerHash("ball_shot_windup_0");
@@ -1370,32 +1264,32 @@ extern "C" void fn_801BA034()
         nlStringLowerHash("ball_sts_windup");
 
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup0));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindup0));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround0));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGround0));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup1));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindup1));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround1));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGround1));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup2));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindup2));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround2));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGround2));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindup3));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindup3));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGround3));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGround3));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupMax));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupMax));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGroundMax));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGroundMax));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashShootToScoreWindup));
+        fxGetGroup(EmissionManager::Instance(), sHashShootToScoreWindup));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallStsWindup));
+        fxGetGroup(EmissionManager::Instance(), sHashBallStsWindup));
 }
 
-extern "C" void fn_801BA358()
+void KillBallGlow()
 {
     static unsigned long sHashBallShotWindupGlow0 =
         nlStringLowerHash("ball_shot_windup_glow_0");
@@ -1409,33 +1303,28 @@ extern "C" void fn_801BA358()
         nlStringLowerHash("ball_shot_windup_glow_max");
 
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow0));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGlow0));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow1));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGlow1));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow2));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGlow2));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlow3));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGlow3));
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), sHashBallShotWindupGlowMax));
+        fxGetGroup(EmissionManager::Instance(), sHashBallShotWindupGlowMax));
     g_pBall->m_CurrentGlowEffect = 0;
 }
 
-extern "C" void fn_801BA4C8(const char* szName)
+void KillWindup(const char* szEffectName)
 {
     EmissionManager::Instance()->Destroy(
-        fn_802E7D54(EmissionManager::Instance(), nlStringLowerHash(szName)));
+        fxGetGroup(EmissionManager::Instance(), nlStringLowerHash(szEffectName)));
 }
 
-extern "C" void fn_801BA510(cFielder* pFielder)
+void CreateMushroomEffect(cFielder* pFielder)
 {
-    const char* groupName = "mushroom";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pFielder->AttachEffect(pController);
+    const char* szEffectName = "mushroom";
+    EmissionController* pController = EmitGeneric(pFielder, szEffectName, 0);
     {
         Function1<void, EmissionController&> update2(
             UpdateEmitterFromCharacter);
@@ -1444,15 +1333,10 @@ extern "C" void fn_801BA510(cFielder* pFielder)
     PlayRumbleAction(1, pFielder->GetGlobalPad());
 }
 
-void EmitMushroom(cFielder* pFielder, bool bParam)
+void EmitMushroom(cFielder* pFielder, bool bReinitialize)
 {
-    const char* groupName = "mushroom";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pFielder->AttachEffect(pController);
+    const char* szEffectName = "mushroom";
+    EmissionController* pController = EmitGeneric(pFielder, szEffectName, 0);
     {
         Function1<void, EmissionController&> update2(
             UpdateEmitterFromCharacter);
@@ -1464,7 +1348,7 @@ void EmitMushroom(cFielder* pFielder, bool bParam)
         pFielder->m_pPhysicsCharacter,
         0.0f,
         0);
-    if (!bParam)
+    if (!bReinitialize)
     {
         PowerupBase::PlayPowerupSound(POWER_UP_MUSHROOM,
             PowerupBase::PWRUP_SOUND_IN_EFFECT,
@@ -1490,7 +1374,7 @@ void KillMushroom(cFielder* pFielder)
     tDebugPrintManager::Print(DC_SOUND, "***KillMushroom()***\n");
 }
 
-void EmitStar(cFielder* pFielder, bool bParam)
+void EmitStar(cFielder* pFielder, bool bReinitialize)
 {
     PowerupBase::PlayPowerupSound(POWER_UP_STAR,
         PowerupBase::PWRUP_SOUND_ACTIVATE,
@@ -1498,15 +1382,10 @@ void EmitStar(cFielder* pFielder, bool bParam)
         0.0f,
         0);
 
-    if (!bParam)
+    if (!bReinitialize)
     {
-        const char* groupName = "star";
-        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-        EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-        SetDefaultVelocity(pController);
-        pController->m_fGround = 0.02f;
-        SetPoseUpdateCallback(pController);
-        pFielder->AttachEffect(pController);
+        const char* szEffectName = "star";
+        EmissionController* pController = EmitGeneric(pFielder, szEffectName, 0);
         {
             Function1<void, EmissionController&> update2(
                 UpdateEmitterFromCharacter);
@@ -1535,29 +1414,25 @@ void KillStar(cFielder* pFielder)
     tDebugPrintManager::Print(DC_SOUND, "***KillStar()***\n");
 }
 
-extern "C" void fn_801BAA94(cCharacter* pCharacter)
+void EmitPullHeadOut(cCharacter* pPlayer)
 {
-    const char* groupName = "pull_head_out";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    const char* szEffectName = "pull_head_out";
+    EmissionController* pController = EmitGeneric(pPlayer, szEffectName, 0);
     {
         Function1<void, EmissionController&> update2(
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, ((cPlayer*)pCharacter)->GetGlobalPad());
+    PlayRumbleAction(1, ((cPlayer*)pPlayer)->GetGlobalPad());
 }
 
-extern "C" void fn_801BABEC(cPlayer* pPlayer)
+void EmitPushHeadIn(cPlayer* pPlayer)
 {
-    fn_801B7E4C("push_head_in", pPlayer);
+    EmissionController* pController = EmitGeneric(pPlayer, "push_head_in", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801BAD30(cCharacter* pCharacter)
+void EmitLanding(cCharacter* pCharacter)
 {
     if (pCharacter->m_eClassType == FIELDER)
     {
@@ -1565,28 +1440,18 @@ extern "C" void fn_801BAD30(cCharacter* pCharacter)
         {
             PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
 
-            const char* groupName = "landing_big";
-            EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-            EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-            SetDefaultVelocity(pController);
-            pController->m_fGround = 0.02f;
-            SetPoseUpdateCallback(pController);
-            pCharacter->AttachEffect(pController);
+            const char* szEffectName = "landing_big";
+            EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
         }
         else
         {
-            const char* groupName = "landing";
-            EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-            EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-            SetDefaultVelocity(pController);
-            pController->m_fGround = 0.02f;
-            SetPoseUpdateCallback(pController);
-            pCharacter->AttachEffect(pController);
+            const char* szEffectName = "landing";
+            EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
         }
     }
 }
 
-extern "C" void fn_801BAF0C(cPlayer* pCharacter)
+void EmitTackleImpact(cPlayer* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(
         EmissionManager::Instance()->GetEffectsGroup("tackle_impact"), 3, true, 0);
@@ -1595,18 +1460,19 @@ extern "C" void fn_801BAF0C(cPlayer* pCharacter)
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BAF98(cFielder* pFielder)
+void EmitDKSuperCharge(cFielder* pFielder)
 {
-    fn_801B7E4C("dk_super_charge", pFielder);
+    EmissionController* pController = EmitGeneric(pFielder, "dk_super_charge", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801BB0DC(cFielder* pFielder)
+void KillDKSuperCharge(cFielder* pFielder)
 {
     const EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dk_super_charge");
     pFielder->EndEffect(pGroup);
 }
 
-extern "C" void fn_801BB120(cFielder* pFielder)
+void EmitDKSuperHit(cFielder* pFielder)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(
         EmissionManager::Instance()->GetEffectsGroup("dk_superhit_shockwave"), 0, true, 0);
@@ -1621,35 +1487,26 @@ extern "C" void fn_801BB120(cFielder* pFielder)
     pGroundController->SetPosition(v3Position);
 }
 
-extern "C" void fn_801BB20C(cCharacter* pCharacter)
+void EmitBowserExplode(cCharacter* pCharacter)
 {
-    const char* groupName = "bowser_explode";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    const char* szEffectName = "bowser_explode";
+    EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
     pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BB318(cCharacter* pCharacter)
+void EmitSlideTackleTrail(cCharacter* pCharacter)
 {
-    fn_801B7E4C("slide_tackle_trail", pCharacter);
+    EmissionController* pController = EmitGeneric(pCharacter, "slide_tackle_trail", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801BB45C(cCharacter* pCharacter)
+void EmitHitTrail(cCharacter* pCharacter)
 {
     if (pCharacter->m_eClassType == FIELDER && !((cFielder*)pCharacter)->fn_800344B0())
     {
-        const char* groupName = "hit_trail";
-        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-        EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-        SetDefaultVelocity(pController);
-        pController->m_fGround = 0.02f;
-        SetPoseUpdateCallback(pController);
-        pCharacter->AttachEffect(pController);
+        const char* szEffectName = "hit_trail";
+        EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
         {
             Function1<void, EmissionController&> update2(
                 UpdateEmitterFromCharacter);
@@ -1663,10 +1520,10 @@ extern "C" void fn_801BB45C(cCharacter* pCharacter)
     }
 }
 
-extern "C" void fn_801BB5DC(cFielder* pFielder, int nParam)
+void KillSlideTackleTrail(cFielder* pFielder, int nKill)
 {
     const EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("slide_tackle_trail");
-    if (nParam == 0)
+    if (nKill == 0)
     {
         pFielder->EndEffect(pGroup);
     }
@@ -1676,10 +1533,10 @@ extern "C" void fn_801BB5DC(cFielder* pFielder, int nParam)
     }
 }
 
-extern "C" void fn_801BB640(cFielder* pFielder, int nParam)
+void KillHitTrail(cFielder* pFielder, int nKill)
 {
     const EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("hit_trail");
-    if (nParam == 0)
+    if (nKill == 0)
     {
         pFielder->EndEffect(pGroup);
     }
@@ -1689,7 +1546,7 @@ extern "C" void fn_801BB640(cFielder* pFielder, int nParam)
     }
 }
 
-extern "C" void fn_801BB6A4(cCharacter* pCharacter, int nIcon)
+void EmitPowerupIcon(cCharacter* pCharacter, int nIcon)
 {
     char szIconName[0x20];
 
@@ -1760,12 +1617,7 @@ extern "C" void fn_801BB6A4(cCharacter* pCharacter, int nIcon)
         break;
     }
 
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szIconName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    EmissionController* pController = EmitGeneric(pCharacter, szIconName, 0);
 
     nlVector3 v3Position = pCharacter->GetJointPosition(pCharacter->m_nHeadJointIndex);
     v3Position.z += 0.1f;
@@ -1773,7 +1625,7 @@ extern "C" void fn_801BB6A4(cCharacter* pCharacter, int nIcon)
     pController->SetVelocity(pCharacter->mUnidentified024.m_v3Velocity);
 }
 
-extern "C" void fn_801BBE80(cCharacter* pCharacter)
+void EmitSuperGrow(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
@@ -1790,7 +1642,7 @@ extern "C" void fn_801BBE80(cCharacter* pCharacter)
     pController->SetUpdateCallback(update2);
 }
 
-extern "C" void fn_801BC094(cCharacter* pCharacter)
+void EmitSuperShrink(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
@@ -1807,7 +1659,7 @@ extern "C" void fn_801BC094(cCharacter* pCharacter)
     pController->SetUpdateCallback(update2);
 }
 
-extern "C" void fn_801BC2A8(cCharacter* pCharacter, bool bRight)
+void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
 {
     EmissionController* pController;
 
@@ -1864,7 +1716,7 @@ extern "C" void fn_801BC2A8(cCharacter* pCharacter, bool bRight)
         pController->SetUpdateCallback(update2);
     }
 
-    const nlVector3 v3Shake = { 0.1f, 0.08f, 0.0f };
+    nlVector3 v3Shake = { 0.1f, 0.08f, 0.0f };
 
     for (int nTeam = 0; nTeam < 2; nTeam++)
     {
@@ -1879,51 +1731,48 @@ extern "C" void fn_801BC2A8(cCharacter* pCharacter, bool bRight)
         }
     }
 
-    fn_800F026C(v3Shake, 30.0f, 1.0f);
+    FireCameraNoiseFilter(v3Shake, 30.0f, 1.0f);
 }
 
-extern "C" void fn_801BC6E4(cFielder* pFielder)
+void EmitKoopaShellShow(cFielder* pFielder)
 {
-    fn_801B7E4C("koopa_shell_show", pFielder);
+    EmissionController* pController = EmitGeneric(pFielder, "koopa_shell_show", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801BC828(cCharacter* pCharacter)
+void EmitBirdoEggShow(cCharacter* pCharacter)
 {
-    fn_801B7E4C("birdo_egg_show", pCharacter);
+    EmissionController* pController = EmitGeneric(pCharacter, "birdo_egg_show", 0);
+    pController->SetUpdateCallback(UpdateEmitterFromCharacter);
 }
 
-extern "C" void fn_801BC96C(const nlVector3& v3Position)
+void EmitKoopaShellBurst(const nlVector3& v3Position)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("koopa_shell_burst"), 3, true, 0);
     pController->SetPosition(v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BC9E4(const nlVector3& v3Position)
+void EmitBirdoEggBurst(const nlVector3& v3Position)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("birdo_egg_burst"), 3, true, 0);
     pController->SetPosition(v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BCA5C(const nlVector3& v3Position)
+void EmitHammerDestroy(const nlVector3& v3Position)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("hammer_destroy"), 3, true, 0);
     pController->SetPosition(v3Position);
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BCAD4(cCharacter* pCharacter)
+void EmitSkillshotHandFire(cCharacter* pCharacter)
 {
     if (!pCharacter->IsPlayingEffect(EmissionManager::Instance()->GetEffectsGroup("skillshot_hand_fire")))
     {
-        const char* szName = "skillshot_hand_fire";
-        EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szName);
-        EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-        SetDefaultVelocity(pController);
-        pController->m_fGround = 0.02f;
-        SetPoseUpdateCallback(pController);
-        pCharacter->AttachEffect(pController);
+        const char* szEffectName = "skillshot_hand_fire";
+        EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
         {
             Function1<void, EmissionController&> update2(UpdateEmitterFromCharacter);
             pController->SetUpdateCallback(update2);
@@ -1931,7 +1780,7 @@ extern "C" void fn_801BCAD4(cCharacter* pCharacter)
     }
 }
 
-extern "C" void fn_801BCC38(cCharacter* pCharacter)
+void KillSkillshotHandFire(cCharacter* pCharacter)
 {
     const EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("skillshot_hand_fire");
     if (pCharacter->IsPlayingEffect(pGroup))
@@ -1940,18 +1789,18 @@ extern "C" void fn_801BCC38(cCharacter* pCharacter)
     }
 }
 
-extern "C" void fn_801BCC9C(cCharacter* pCharacter)
+void EmitSkillshotPlayerOnFire(cCharacter* pCharacter)
 {
     EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("skillshot_player_on_fire");
-    if (pCharacter->fn_8001E2C0(pGroup))
+    if (pCharacter->IsEffectDying(pGroup))
     {
         EmissionManager::Instance()->Destroy((unsigned long)pCharacter, pGroup);
     }
 
     if (!pCharacter->IsPlayingEffect(pGroup))
     {
-        const char* szName = "skillshot_player_on_fire";
-        EffectsGroup* pGroup2 = EmissionManager::Instance()->GetEffectsGroup(szName);
+        const char* szEffectName = "skillshot_player_on_fire";
+        EffectsGroup* pGroup2 = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
         EmissionController* pController = EmissionManager::Instance()->Create(pGroup2, 3, true, 0);
         SetDefaultVelocity(pController);
         pController->m_fGround = 0.02f;
@@ -1964,7 +1813,7 @@ extern "C" void fn_801BCC9C(cCharacter* pCharacter)
     }
 }
 
-extern "C" void fn_801BCE2C(cCharacter* pCharacter)
+void KillSkillshotPlayerOnFire(cCharacter* pCharacter)
 {
     const EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("skillshot_player_on_fire");
     if (pCharacter->IsPlayingEffect(pGroup))
@@ -1973,7 +1822,7 @@ extern "C" void fn_801BCE2C(cCharacter* pCharacter)
     }
 }
 
-extern "C" void fn_801BCE90(cCharacter* pCharacter)
+void EmitDeke(cCharacter* pCharacter)
 {
     if (pCharacter->m_eAnimID == 0x50)
     {
@@ -1983,31 +1832,33 @@ extern "C" void fn_801BCE90(cCharacter* pCharacter)
         {
             if (pCharacter->mUnidentified024.m_eCharacterClass == 0xB)
             {
-                fn_801B7E4C("petey_deke", pCharacter);
+                EmissionController* pController = EmitGeneric(pCharacter, "petey_deke", 0);
+                pController->SetUpdateCallback(UpdateEmitterFromCharacter);
             }
             else if (pCharacter->mUnidentified024.m_eCharacterClass == 0xC)
             {
-                fn_801B7E4C("birdo_deke", pCharacter);
+                EmissionController* pController = EmitGeneric(pCharacter, "birdo_deke", 0);
+                pController->SetUpdateCallback(UpdateEmitterFromCharacter);
             }
         }
     }
 }
 
-extern "C" void fn_801BD144(cCharacter* pCharacter)
+void KillDeke(cCharacter* pCharacter)
 {
     if (pCharacter->mUnidentified024.m_eCharacterClass == 11)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
-        fn_802E83C4(EmissionManager::Instance(), pGroup);
+        EmissionManager::Instance()->Kill(pGroup);
     }
     else if (pCharacter->mUnidentified024.m_eCharacterClass == 12)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
-        fn_802E83C4(EmissionManager::Instance(), pGroup);
+        EmissionManager::Instance()->Kill(pGroup);
     }
 }
 
-extern "C" void fn_801BD1C0(cFielder* pFielder)
+void BeginDeke(cFielder* pFielder)
 {
     if (pFielder->GetCharacterClass() == 7
         || pFielder->GetCharacterClass() == 9
@@ -2019,48 +1870,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
         pFielder->muInvincibleStatus |= 1;
     }
 
-    if (pFielder->m_eAnimID == 0x50)
-    {
-        cPN_SAnimController* pAnimController = pFielder->m_pCurrentAnimController;
-        if (pAnimController->m_fTime
-            < 15.0f / (float)pAnimController->m_pSAnim->m_nNumKeys)
-        {
-            if (pFielder->GetCharacterClass() == 11)
-            {
-                const char* groupName = "petey_deke";
-                EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-                EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-                SetDefaultVelocity(pController);
-                pController->m_fGround = 0.02f;
-                {
-                    Function1<void, EmissionController&> update(UpdateEmitterPoseFromCharacter);
-                    pController->SetUpdateCallback(update);
-                }
-                pFielder->AttachEffect(pController);
-                {
-                    Function1<void, EmissionController&> update2(UpdateEmitterFromCharacter);
-                    pController->SetUpdateCallback(update2);
-                }
-            }
-            else if (pFielder->GetCharacterClass() == 12)
-            {
-                const char* groupName = "birdo_deke";
-                EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-                EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-                SetDefaultVelocity(pController);
-                pController->m_fGround = 0.02f;
-                {
-                    Function1<void, EmissionController&> update(UpdateEmitterPoseFromCharacter);
-                    pController->SetUpdateCallback(update);
-                }
-                pFielder->AttachEffect(pController);
-                {
-                    Function1<void, EmissionController&> update2(UpdateEmitterFromCharacter);
-                    pController->SetUpdateCallback(update2);
-                }
-            }
-        }
-    }
+    EmitDeke(pFielder);
 
     if (pFielder->GetCharacterClass() == 13 || pFielder->GetCharacterClass() == 7
         || pFielder->GetCharacterClass() == 9)
@@ -2069,7 +1879,7 @@ extern "C" void fn_801BD1C0(cFielder* pFielder)
     }
 }
 
-extern "C" void fn_801BD4EC(cFielder* pFielder)
+void EndDeke(cFielder* pFielder)
 {
     fn_80038158(pFielder, 0);
 
@@ -2099,21 +1909,21 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
         {
             CharacterImpactEvent event;
             event.v3Position = pFielder->mUnidentified024.m_v3Position;
-            event.fMagnitude = lbl_806DD1C0;
+            event.fRadius = sWarioGroundPoundRadius;
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
-            PlaySound(pFielder->mUnidentified318, 0x5BF8E132, 0, 0);
+            PlaySound(pFielder->m_uSoundSlotId, 0x5BF8E132, 0, 0);
         }
         else if (pFielder->mUnidentified024.m_eCharacterClass == 9)
         {
             CharacterImpactEvent event;
             event.v3Position = pFielder->mUnidentified024.m_v3Position;
-            event.fMagnitude = lbl_806DD1C4;
+            event.fRadius = sBowserJrGroundPoundRadius;
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
-            PlaySound(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
+            PlaySound(pFielder->m_uSoundSlotId, 0x560BD5F9, 0, 0);
         }
         else if (pFielder->mUnidentified024.m_eCharacterClass == 13)
         {
@@ -2125,10 +1935,13 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
             event.v3Position = pFielder->GetJointPosition(nNodeIndex);
             event.v3Position.z = 0.0f;
             nlPolarToCartesian(v3Offset.x, v3Offset.y,
-                pFielder->mUnidentified024.m_aActualFacingDirection, lbl_806DD1CC);
+                pFielder->mUnidentified024.m_aActualFacingDirection, sHammerBroHammerForwardOffset);
             v3Offset.z = 0.0f;
-            nlVec3Add(event.v3Position, event.v3Position, v3Offset);
-            event.fMagnitude = lbl_806DD1C8;
+            float z = event.v3Position.z + v3Offset.z;
+            float y = event.v3Position.y + v3Offset.y;
+            float x = event.v3Position.x + v3Offset.x;
+            nlVec3Set(event.v3Position, x, y, z);
+            event.fRadius = sHammerBroHammerRadius;
             event.pCharacter = pFielder;
             fn_80060FF4(g_pGame, &event);
 
@@ -2136,12 +1949,12 @@ extern "C" void fn_801BD4EC(cFielder* pFielder)
             EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
             pController->SetPosition(event.v3Position);
             pController->SetVelocity(v3Zero);
-            PlaySound(pFielder->mUnidentified318, 0x560BD5F9, 0, 0);
+            PlaySound(pFielder->m_uSoundSlotId, 0x560BD5F9, 0, 0);
         }
     }
 }
 
-extern "C" void fn_801BDC1C(const nlVector3& v3Position, const nlVector3& v3Direction,
+void EmitWind(const nlVector3& v3Position, const nlVector3& v3Direction,
     const nlVector3& v3Velocity)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(
@@ -2151,28 +1964,27 @@ extern "C" void fn_801BDC1C(const nlVector3& v3Position, const nlVector3& v3Dire
     pController->SetVelocity(v3Velocity);
 }
 
-extern "C" void fn_801BDCB4(bool bParam)
+void KillWind(bool bReallyKill)
 {
-    if (bParam)
+    if (bReallyKill)
     {
         EmissionManager::Instance()->Destroy(
             EmissionManager::Instance()->GetEffectsGroup("wind_dry"));
     }
     else
     {
-        fn_802E83C4(EmissionManager::Instance(),
-            EmissionManager::Instance()->GetEffectsGroup("wind_dry"));
+        EmissionManager::Instance()->Kill(EmissionManager::Instance()->GetEffectsGroup("wind_dry"));
     }
 }
 
-extern "C" void fn_801BDD24(const char* name, nlVector3 v3Position, bool bParam)
+void EmitLightning(const char* szEffectName, nlVector3 v3Position, bool bStrong)
 {
     cBall* pBall = g_pBall;
-    unsigned long uHash = nlStringLowerHash(name);
-    EffectsGroup* pGroup = fn_802E7D54(EmissionManager::Instance(), uHash);
+    unsigned long uHash = nlStringLowerHash(szEffectName);
+    EffectsGroup* pGroup = fxGetGroup(EmissionManager::Instance(), uHash);
     EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pController->m_uUserData = (unsigned long)pBall;
-    nlVector3 vel = lbl_80515478;
+    nlVector3 vel = sBallEffectVelocity;
     pController->SetVelocity(vel);
     pController->m_fGround = 0.02f;
     pController->SetPosition(v3Position);
@@ -2183,7 +1995,7 @@ extern "C" void fn_801BDDE0(bool bParam)
 {
 }
 
-extern "C" void fn_801BDDE4()
+void EmitLightningBall()
 {
     static unsigned long sHashWeatherLightningBall =
         nlStringLowerHash("weather_lightning_ball");
@@ -2193,10 +2005,10 @@ extern "C" void fn_801BDDE4()
     EffectsGroup* pGroup;
 
     pBall = g_pBall;
-    pGroup = fn_802E7D54(EmissionManager::Instance(), sHashWeatherLightningBall);
+    pGroup = fxGetGroup(EmissionManager::Instance(), sHashWeatherLightningBall);
     pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pController->m_uUserData = (unsigned long)pBall;
-    nlVector3 vel = lbl_80515478;
+    nlVector3 vel = sBallEffectVelocity;
     pController->SetVelocity(vel);
     pController->m_fGround = 0.02f;
     pController->SetPosition(g_pBall->m_v3Position);
@@ -2209,15 +2021,10 @@ extern "C" void fn_801BDF08(cCharacter* pCharacter)
 {
 }
 
-extern "C" void fn_801BDF0C(cCharacter* pCharacter)
+void EmitDKDeke(cCharacter* pCharacter)
 {
-    const char* groupName = "dk_deke";
-    EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(groupName);
-    EmissionController* pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    SetDefaultVelocity(pController);
-    pController->m_fGround = 0.02f;
-    SetPoseUpdateCallback(pController);
-    pCharacter->AttachEffect(pController);
+    const char* szEffectName = "dk_deke";
+    EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
     {
         Function1<void, EmissionController&> update2(
             UpdateEmitterFromCharacter);
@@ -2244,7 +2051,7 @@ void SetEffectsGroupFountainLife(EffectsGroup* group, float life)
     }
 }
 
-extern "C" const char* fn_801BE09C(cCharacter* pCharacter)
+const char* GetCharacterEffectsName(cCharacter* pCharacter)
 {
     return pCharacter->m_szEffectsName;
 }
@@ -2259,57 +2066,57 @@ extern "C" void fn_801BE0AC(cCharacter* pCharacter, bool bValue)
     *(bool*)((char*)pCharacter + 0x182) = bValue;
 }
 
-extern "C" bool fn_801BE0B4(cCharacter* pCharacter)
+bool IsCharacterGoalie(cCharacter* pCharacter)
 {
     return pCharacter->m_eClassType == GOALIE;
 }
 
-extern "C" void fn_801BE0C8(cCharacter* pCharacter, bool bValue)
+void SetCharacterLeftPropAnimated(cCharacter* pCharacter, bool bAnimated)
 {
-    *(bool*)((char*)pCharacter + 0x17E) = bValue;
+    *(bool*)((char*)pCharacter + 0x17E) = bAnimated;
 }
 
-extern "C" void fn_801BE0D0(cCharacter* pCharacter, bool bValue)
+void SetCharacterRightPropAnimated(cCharacter* pCharacter, bool bAnimated)
 {
-    *(bool*)((char*)pCharacter + 0x17F) = bValue;
+    *(bool*)((char*)pCharacter + 0x17F) = bAnimated;
 }
 
-extern "C" cSAnim* fn_801BE0D8(cPN_SAnimController* pController)
+cSAnim* GetControllerSAnim(cPN_SAnimController* pController)
 {
     return pController->m_pSAnim;
 }
 
-extern "C" bool fn_801BE0E0(cPN_SAnimController* pController)
+bool IsControllerMirrored(cPN_SAnimController* pController)
 {
     return pController->m_bMirror;
 }
 
-extern "C" bool fn_801BE0EC(cPlayer* pPlayer)
+bool HasGlobalPad(cPlayer* pPlayer)
 {
     return pPlayer->GetGlobalPad() != 0;
 }
 
-extern "C" cPlayer* fn_801BE118(cBall* pBall)
+cPlayer* GetBallOwner(cBall* pBall)
 {
     return pBall->m_pOwner;
 }
 
-extern "C" void fn_801BE120(cBall* pBall, bool bVisible)
+void SetBallVisible(cBall* pBall, bool bVisible)
 {
     pBall->m_bVisible = bVisible;
 }
 
-extern "C" bool fn_801BE128(Desire* pDesire)
+bool IsDesireActive(Desire* pDesire)
 {
     return pDesire->UnidentifiedIsActive();
 }
 
-extern "C" int fn_801BE130(cFielder* pFielder)
+int GetFielderActionState(cFielder* pFielder)
 {
     return pFielder->m_eActionState;
 }
 
-extern "C" float fn_801BE138(TweakFloatBinding* pTweak)
+float GetTweakFloatValue(TweakFloatBinding* pTweak)
 {
     return *pTweak->m_pValue;
 }

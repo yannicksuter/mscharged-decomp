@@ -118,8 +118,8 @@ void ChallengeSelectScene::UpdateRow(int index)
 {
     int challenge = mTutorial ? index + mChallengeOffset : index + mChallengeOffset + 10;
     const CharacterInfo& character = GetCharacterInfo(
-        GetCharacterIndexFromCaptain(fn_801CA670()->GetCaptain(challenge)));
-    const char* config = fn_801CA670()->GetConfigPath(challenge);
+        GetCharacterIndexFromCaptain(GetStrikerChallenge()->GetCaptain(challenge)));
+    const char* difficultyName = GetStrikerChallenge()->GetDifficulty(challenge);
     TLInstance* off = FEFinder<TLInstance, 5>::FindOrDefault(
         mChallengeSlides[index], "off", "CHALLENGE_0");
     TLInstance* over = FEFinder<TLInstance, 5>::FindOrDefault(
@@ -163,8 +163,8 @@ void ChallengeSelectScene::UpdateRow(int index)
     {
         backgroundOff->SetVisible(false);
         backgroundOver->SetVisible(false);
-        completedOff->SetVisible(fn_801CA670()->IsUnlocked(challenge));
-        completedOver->SetVisible(fn_801CA670()->IsUnlocked(challenge));
+        completedOff->SetVisible(GetStrikerChallenge()->IsUnlocked(challenge));
+        completedOver->SetVisible(GetStrikerChallenge()->IsUnlocked(challenge));
         lockedOff->SetVisible(false);
         lockedOver->SetVisible(false);
     }
@@ -181,11 +181,11 @@ void ChallengeSelectScene::UpdateRow(int index)
     static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "NAMES"))->SetActiveSlide(name, true, false);
     static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "NAMES"))->SetActiveSlide(name, true, false);
 
-    const char* difficulty = fn_801CA670()->GetDifficulty(challenge);
+    const char* titleStringId = GetStrikerChallenge()->GetTitle(challenge);
     TLComponentInstance* title = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "CHALLENGE_TITLE"));
-    FEFinder<TLTextInstance, 3>::FindOrDefault(title->GetActiveSlide(), "CHALLENGE_TITLE")->SetStringId(difficulty);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(title->GetActiveSlide(), "CHALLENGE_TITLE")->SetStringId(titleStringId);
     title = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "CHALLENGE_TITLE"));
-    FEFinder<TLTextInstance, 3>::FindOrDefault(title->GetActiveSlide(), "CHALLENGE_TITLE")->SetStringId(difficulty);
+    FEFinder<TLTextInstance, 3>::FindOrDefault(title->GetActiveSlide(), "CHALLENGE_TITLE")->SetStringId(titleStringId);
 
     TLComponentInstance* difficultyOff = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "DIFFICULTY"));
     TLComponentInstance* difficultyOver = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "DIFFICULTY"));
@@ -198,8 +198,8 @@ void ChallengeSelectScene::UpdateRow(int index)
     }
     else
     {
-        difficultyOff->SetActiveSlide(config, true, false);
-        difficultyOver->SetActiveSlide(config, true, false);
+        difficultyOff->SetActiveSlide(difficultyName, true, false);
+        difficultyOver->SetActiveSlide(difficultyName, true, false);
     }
 
     unsigned short number[4];
@@ -242,7 +242,7 @@ void ChallengeSelectScene::Update(float dt)
         {
             SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(
                 GameSceneManager::Instance()->Push((SceneList)0x4D, SCREEN_NOTHING, true));
-            g_pStrikerChallenge->mUnidentified6C = mChallengeOffset;
+            g_pStrikerChallenge->mChallengeOffset = mChallengeOffset;
             if (scene != 0)
             {
                 scene->SetDisplayMode(8);

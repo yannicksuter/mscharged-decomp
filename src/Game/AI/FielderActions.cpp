@@ -87,17 +87,12 @@ extern "C" void fn_800978E8(cPlayer* pPlayer, int nParam);
 extern bool lbl_806DB5A8;
 extern "C" void fn_8005F03C(void* pParam, cFielder** ppFielder);
 extern "C" void fn_8005CBF0(void* pParam);
-extern "C" void fn_801B9C90(const char* pName);
-extern "C" void fn_801B75C8(cFielder* pFielder, int, int, int, int);
-extern "C" void fn_800395C0(cFielder* pFielder);
 
 extern "C" void fn_8005CDD0(void* pParam);
 extern "C" float fn_80030750(cFielder* pFielder);
 extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
 extern "C" bool fn_8003E8A0(cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
-extern "C" void fn_80038158(cFielder* pFielder, int nParam);
-extern "C" void fn_80039CF0(cFielder* pFielder, int nParam);
 extern "C" void fn_80147F2C(void* pParam);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
@@ -106,7 +101,6 @@ extern "C" void fn_8005EBF8(void* pParam, void* pNode);
 extern "C" void fn_8005ED64(void* pParam, void* pNode);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 extern "C" bool fn_8003E99C(cFielder* pFielder);
-extern "C" void fn_801B7E4C(const char* pName, cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
 extern "C" void fn_8002E798(cFielder* pFielder);
 extern "C" void fn_8002E39C(cFielder* pFielder);
@@ -168,7 +162,6 @@ struct UnidentifiedSkillshotNode
 extern BasicSlotPool<UnidentifiedSkillshotNode> lbl_805712F8;
 
 extern AvoidablePolygon* lbl_806E0C74;
-extern "C" void fn_801B968C(cFielder* pFielder);
 
 static int gHitReactAnims[3][4] = {
     { 0x6A, 0x6D, 0x6C, 0x6B },
@@ -623,7 +616,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
                 ->fn_801743A8(6, this, mUnidentified024.m_v3Position, v3Zero,
                     lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
                 ->fn_80173B08(lbl_806E3578);
-            PlaySound(mUnidentified318, 0xA9AF871E, 0, 0);
+            PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
         }
     }
 }
@@ -791,9 +784,9 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         SetPlayerAudioController(this);
 
         unsigned long soundID;
-        if (pAttacker->fn_8001E168())
+        if (pAttacker->IsCaptain())
         {
-            bool bUnidentified = fn_8001E168();
+            bool bUnidentified = IsCaptain();
             soundID = 0xE606A2;
             if (bUnidentified)
             {
@@ -802,14 +795,14 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         }
         else
         {
-            bool bUnidentified = fn_8001E168();
+            bool bUnidentified = IsCaptain();
             soundID = 0xBDD19FFF;
             if (bUnidentified)
             {
                 soundID = 0xBD539FB8;
             }
         }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -950,15 +943,15 @@ void cFielder::InitActionLateOneTimerFromVolley()
         fn_8005C830(g_pGame);
     }
 
-    fn_801B75C8(this, 2, 0, 0, bShotNormally);
+    EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, 0, bShotNormally);
 
-    bool bUnidentified = fn_8001E168();
+    bool bUnidentified = IsCaptain();
     unsigned long soundID = 0x1CEC5A02;
     if (bUnidentified)
     {
         soundID = 0xFDE0C69B;
     }
-    PlaySound(mUnidentified318, soundID, 0, 0);
+    PlaySound(m_uSoundSlotId, soundID, 0, 0);
 }
 
 void cFielder::ActionLateOneTimerFromVolley(float fDeltaT)
@@ -1259,13 +1252,13 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             bIsModified = false;
             SetNoPickUpTime(3.0f);
 
-            bool bUnidentified = fn_8001E168();
+            bool bUnidentified = IsCaptain();
             unsigned long soundID = 0x1CEC5A02;
             if (bUnidentified)
             {
                 soundID = 0xFDE0C69B;
             }
-            PlaySound(mUnidentified318, soundID, 0, 0);
+            PlaySound(m_uSoundSlotId, soundID, 0, 0);
         }
     }
     else if (DoCommonInitActionLooseBall(finalPassTarget->mUnidentified024.m_v3Position, true))
@@ -1311,13 +1304,13 @@ void cFielder::InitActionLooseBallShot(bool bIsChipShot)
         bIsModified = bIsChipShot;
         SetNoPickUpTime(lbl_806E35E0);
 
-        bool bUnidentified = fn_8001E168();
+        bool bUnidentified = IsCaptain();
         unsigned long soundID = 0x1CEC5A02;
         if (bUnidentified)
         {
             soundID = 0xFDE0C69B;
         }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 }
 
@@ -1469,14 +1462,14 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
 
     if (g_pGame->m_eGameState == 3 || bNearGoal)
     {
-        fn_801BA4C8("ball_sts_windup");
+        KillWindup("ball_sts_windup");
         fn_8004B86C(false, false);
         bDidWindup = true;
     }
 
     if (!bDidWindup)
     {
-        fn_801BA4C8("ball_sts_windup");
+        KillWindup("ball_sts_windup");
         SetAction(ACTION_SHOOT_TO_SCORE);
 
         if (m_eAnimID == 0x52)
@@ -1965,13 +1958,13 @@ void cFielder::InitActionOneTimer(int animID, nlVector3& targetPos,
 
     fn_800978E8(this, 0);
 
-    bool bUnidentified = fn_8001E168();
+    bool bUnidentified = IsCaptain();
     unsigned long soundID = 0x1CEC5A02;
     if (bUnidentified)
     {
         soundID = 0xFDE0C69B;
     }
-    PlaySound(mUnidentified318, soundID, 0, 0);
+    PlaySound(m_uSoundSlotId, soundID, 0, 0);
 }
 
 void cFielder::fn_80049EA0(float fDeltaT)
@@ -3071,13 +3064,13 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         break;
     }
 
-    bool bUnidentified = fn_8001E168();
+    bool bUnidentified = IsCaptain();
     unsigned long soundID = 0xDEA5F49B;
     if (bUnidentified)
     {
         soundID = 0xA91D4914;
     }
-    PlaySound(mUnidentified318, soundID, 0, 0);
+    PlaySound(m_uSoundSlotId, soundID, 0, 0);
 
     bool bUnidentified2 = false;
     if (g_pGame->GetGameState() == 5
@@ -3330,21 +3323,21 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
             v3EffectPos.x = wallPosition.x;
             v3EffectPos.y = wallPosition.y;
             v3EffectPos.z = jointPos.z;
-            fn_801B94EC(this, v3EffectPos, wallNormal);
+            CharacterElectrocutionEffect(this, v3EffectPos, wallNormal);
         }
         else
         {
             mUnidentified348 = true;
-            fn_801B968C(this);
+            EmitElectrocution(this);
         }
 
-        bool bUnidentified = fn_8001E168();
+        bool bUnidentified = IsCaptain();
         unsigned long soundID = 0xBADF0EF9;
         if (bUnidentified)
         {
             soundID = 0x1602CA52;
         }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 }
 
@@ -3400,17 +3393,17 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
     mUnidentified340 = lbl_806DB994 + nlRandomf(lbl_806DB998);
     mUnidentified344 = lbl_806DB99C;
     mUnidentified348 = true;
-    fn_801B968C(this);
+    EmitElectrocution(this);
 
     PlayRumbleAction(4, GetGlobalPad());
 
-    bool bUnidentified = fn_8001E168();
+    bool bUnidentified = IsCaptain();
     unsigned long soundID = 0xBADF0EF9;
     if (bUnidentified)
     {
         soundID = 0x1602CA52;
     }
-    PlaySound(mUnidentified318, soundID, 0, 0);
+    PlaySound(m_uSoundSlotId, soundID, 0, 0);
 }
 
 void cFielder::fn_80043ADC()
@@ -3470,13 +3463,13 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
         m_pPhysicsCharacter->m_CanCollideWithWall = 0;
     }
 
-    bool bUnidentified = fn_8001E168();
+    bool bUnidentified = IsCaptain();
     unsigned long soundID = 0x1CF82176;
     if (bUnidentified)
     {
         soundID = 0xFDEC8E0F;
     }
-    PlaySound(mUnidentified318, soundID, 0, 0);
+    PlaySound(m_uSoundSlotId, soundID, 0, 0);
 }
 
 void cFielder::ActionElectrocution(float dt)
@@ -3521,7 +3514,7 @@ void cFielder::ActionElectrocution(float dt)
 
                 if (!mUnidentified348)
                 {
-                    fn_801B7E4C("electrocution_explosion", this);
+                    EmitElectrocutionExplosion("electrocution_explosion", this);
                 }
             }
             else
@@ -3529,7 +3522,7 @@ void cFielder::ActionElectrocution(float dt)
                 SetAnimState(0x7A, true, 0.2f, false, false);
             }
 
-            fn_801B93E8(this);
+            EndElectrocution(this);
             InitMovementCoast();
             PlayRumbleAction(1, GetGlobalPad());
         }
@@ -3559,18 +3552,18 @@ void cFielder::ActionElectrocution(float dt)
                 SetAnimState(0x7B, true, 0.2f, false, false);
             }
             InitMovementFromAnim(0, v3Zero, 0.0f, false);
-            fn_801B968C(this);
+            EmitElectrocution(this);
             PlayRumbleAction(1, GetGlobalPad());
         }
         else
         {
             if (m_pCurrentAnimController->TestTrigger(lbl_806DB9A4))
             {
-                fn_801B968C(this);
+                EmitElectrocution(this);
             }
             if (m_pCurrentAnimController->TestTrigger(lbl_806DB9A8))
             {
-                fn_801B93E8(this);
+                EndElectrocution(this);
             }
         }
         break;
@@ -3580,17 +3573,17 @@ void cFielder::ActionElectrocution(float dt)
     {
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9AC))
         {
-            fn_801B93E8(this);
+            EndElectrocution(this);
             PlayRumbleAction(1, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B0))
         {
-            fn_801B968C(this);
+            EmitElectrocution(this);
             PlayRumbleAction(1, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B4))
         {
-            fn_801B93E8(this);
+            EndElectrocution(this);
             PlayRumbleAction(1, GetGlobalPad());
         }
 
@@ -3667,9 +3660,9 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
         mUnidentified34C = lbl_806DB90C;
         mUnidentified350 = pObject->GetPosition();
 
-        fn_801BB5DC(this, 1);
-        fn_801BB640(this, 1);
-        fn_801BA034();
+        KillSlideTackleTrail(this, 1);
+        KillHitTrail(this, 1);
+        KillWindups();
 
         bool bHasPad = GetGlobalPad() != 0;
         if (bHasPad)
@@ -3677,13 +3670,13 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
             SwapController(false);
         }
 
-        bool bUnidentified = fn_8001E168();
+        bool bUnidentified = IsCaptain();
         unsigned long soundID = 0x1CF82176;
         if (bUnidentified)
         {
             soundID = 0xFDEC8E0F;
         }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 }
 
@@ -3867,9 +3860,9 @@ void cFielder::fn_80046244()
         mUnidentified34C = InterpolateRangeClamped(lbl_806DB8BC,
             lbl_806DB8C0, lbl_806E35E0, 0.0f, fn_800A6388(m_pTeam));
 
-        fn_801BB5DC(this, 1);
-        fn_801BB640(this, 1);
-        fn_801BA034();
+        KillSlideTackleTrail(this, 1);
+        KillHitTrail(this, 1);
+        KillWindups();
 
         bool bHasPad = GetGlobalPad() != 0;
         if (bHasPad)
@@ -3883,13 +3876,13 @@ void cFielder::fn_80046244()
             m_pPhysicsCharacter->m_CanCollideWithWall = 0;
         }
 
-        bool bUnidentified = fn_8001E168();
+        bool bUnidentified = IsCaptain();
         unsigned long soundID = 0x1CF82176;
         if (bUnidentified)
         {
             soundID = 0xFDEC8E0F;
         }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 }
 
@@ -3931,13 +3924,13 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
     {
         if (!IsFallenDown())
         {
-            bool bUnidentified = fn_8001E168();
+            bool bUnidentified = IsCaptain();
             unsigned long soundID = 0x00E606A2;
             if (bUnidentified)
             {
                 soundID = 0x3642C41B;
             }
-            PlaySound(mUnidentified318, soundID, 0, 0);
+            PlaySound(m_uSoundSlotId, soundID, 0, 0);
         }
 
         InitDesire(
@@ -3970,13 +3963,13 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
 
     if (!IsFallenDown())
     {
-        bool bUnidentified = fn_8001E168();
+        bool bUnidentified = IsCaptain();
         unsigned long soundID = 0x00E606A2;
         if (bUnidentified)
         {
             soundID = 0x3642C41B;
         }
-        PlaySound(mUnidentified318, soundID, 0, 0);
+        PlaySound(m_uSoundSlotId, soundID, 0, 0);
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -4168,30 +4161,30 @@ void cFielder::fn_8004B658()
 
         PlaySound(0, 0x900862AC, "Windup", this);
 
-        if (fn_800155A0(g_pBall, 0) < 1.0f)
+        if (GetBallChargeValue(g_pBall, 0) < 1.0f)
         {
-            fn_801B9C90("ball_shot_windup_0");
-            fn_801B9C90("ball_shot_windup_ground_0");
+            EmitWindupAtBall("ball_shot_windup_0");
+            EmitWindupAtBall("ball_shot_windup_ground_0");
         }
-        else if (fn_800155A0(g_pBall, 0) < 2.0f)
+        else if (GetBallChargeValue(g_pBall, 0) < 2.0f)
         {
-            fn_801B9C90("ball_shot_windup_1");
-            fn_801B9C90("ball_shot_windup_ground_1");
+            EmitWindupAtBall("ball_shot_windup_1");
+            EmitWindupAtBall("ball_shot_windup_ground_1");
         }
-        else if (fn_800155A0(g_pBall, 0) < lbl_806E35E0)
+        else if (GetBallChargeValue(g_pBall, 0) < lbl_806E35E0)
         {
-            fn_801B9C90("ball_shot_windup_2");
-            fn_801B9C90("ball_shot_windup_ground_2");
+            EmitWindupAtBall("ball_shot_windup_2");
+            EmitWindupAtBall("ball_shot_windup_ground_2");
         }
-        else if (fn_800155A0(g_pBall, 0) < 4.0f)
+        else if (GetBallChargeValue(g_pBall, 0) < 4.0f)
         {
-            fn_801B9C90("ball_shot_windup_3");
-            fn_801B9C90("ball_shot_windup_ground_3");
+            EmitWindupAtBall("ball_shot_windup_3");
+            EmitWindupAtBall("ball_shot_windup_ground_3");
         }
         else
         {
-            fn_801B9C90("ball_shot_windup_max");
-            fn_801B9C90("ball_shot_windup_ground_max");
+            EmitWindupAtBall("ball_shot_windup_max");
+            EmitWindupAtBall("ball_shot_windup_ground_max");
         }
     }
 }
@@ -4277,7 +4270,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
             float fFraction
                 = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fValue);
             float fCharge = Interpolate(lbl_806DB980, lbl_806DB984, fFraction);
-            fn_800154FC(g_pBall, fCharge + fn_800155A0(g_pBall, 0));
+            fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
         }
 
         InitMovementRunning(fn_8002C0AC(this->GetTweaks()),
@@ -4285,7 +4278,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
             0.0f);
         InitDesire(
             (eFielderDesireState)0x14, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        fn_801B75C8(this, 0, 0, 0, 0);
+        EmitBallShot(this, BALL_EFFECT_S2S_SUPER_SHOT, 0, 0, 0);
     }
 
     if (ShouldStartCrossBlend(4))
@@ -4527,7 +4520,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
         lbl_806E0C74 = 0;
     }
 
-    fn_801BA034();
+    KillWindups();
     StopSound(0x900862AC, this);
 
     if (eNewAction != ACTION_UNKNOWN_15)
@@ -4648,15 +4641,15 @@ void cFielder::fn_8004C02C(float fDeltaT)
             {
                 if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
                 {
-                    fn_801B75C8(this, 4, 0, 0, 1);
+                    EmitBallShot(this, BALL_EFFECT_REGULAR_SHOT, 0, 0, 1);
                 }
                 else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0F)
                 {
-                    fn_801B75C8(this, 3, 0, 0, 1);
+                    EmitBallShot(this, BALL_EFFECT_PERFECT_PASS, 0, 0, 1);
                 }
                 else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
                 {
-                    fn_801B75C8(this, 5, 0, 0, 1);
+                    EmitBallShot(this, BALL_EFFECT_ONETIMER_SHOT, 0, 0, 1);
                 }
             }
             else
@@ -4664,18 +4657,18 @@ void cFielder::fn_8004C02C(float fDeltaT)
                 if (mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() < 0.1f
                     || m_pShotMeter->m_fSpeedValue < 0.1f)
                 {
-                    fn_801B75C8(this, 2, 0, 0, 1);
+                    EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, 0, 1);
                 }
                 else
                 {
-                    fn_801B75C8(this, 1, 0, 0, 1);
+                    EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 1);
                 }
             }
         }
         else
         {
             DoClearBall();
-            fn_801B75C8(this, 1, 0, 0, 0);
+            EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
         }
 
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -4909,7 +4902,7 @@ void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
 
         if (fn_8003E8A0(this))
         {
-            fn_801B98A0(this);
+            EndBowserSmoke(this);
         }
     }
 }
@@ -5033,23 +5026,23 @@ void cFielder::fn_8004E438()
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        PlayOwnedSound(mUnidentified318, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
+        PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
             "Skillshot", this);
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        PlayOwnedSound(mUnidentified318, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
+        PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC,
             "Skillshot", this);
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
-        mUnidentified420->Show(this);
+        m_pBulletBill->Show(this);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        fn_801B8FF8(this);
-        PlaySound(mUnidentified318, 0x1D6C8D56, 0, 0);
+        EmitShyGuyBulletStart(this);
+        PlaySound(m_uSoundSlotId, 0x1D6C8D56, 0, 0);
     }
 
     bool bUnidentified = g_pGame->IsGameplayOrOvertime();
@@ -5068,7 +5061,7 @@ void cFielder::ActionSquishReact(float fDeltaT)
     }
 }
 
-void cFielder::fn_8004E6B4()
+void cFielder::ReleaseHammerProjectile()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
@@ -5091,10 +5084,10 @@ void cFielder::fn_8004E6B4()
             nlVector3 v3Delta;
             nlVec3Sub(v3Delta, v3Target, mUnidentified024.m_v3Position);
 
-            float fSpeed = pProjectile->mPhysics->m_gravity;
-            float fGravity = pProjectile->GetPosition()->z;
+            float fGravity = pProjectile->mPhysics->m_gravity;
+            float fStartHeight = pProjectile->GetPosition()->z;
 
-            float fHeight
+            float fVerticalSpeed
                 = lbl_806DB8A4
                 * nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
                     true);
@@ -5102,20 +5095,20 @@ void cFielder::fn_8004E6B4()
             int nNumRoots;
             float fX1, fX2;
             SolveQuadratic(
-                0.5f * fSpeed, fHeight, fGravity, nNumRoots, fX1, fX2);
+                0.5f * fGravity, fVerticalSpeed, fStartHeight, nNumRoots, fX1, fX2);
 
-            float fRoot;
+            float fFlightTime;
             if (fX1 > fZero)
             {
-                fRoot = fX1;
+                fFlightTime = fX1;
             }
             else if (fX2 > fZero)
             {
-                fRoot = fX2;
+                fFlightTime = fX2;
             }
-            float fScale = 1.0f / fRoot;
-            nlVec3Scale(v3Delta, fScale);
-            v3Delta.z = fHeight;
+            float fInverseFlightTime = 1.0f / fFlightTime;
+            nlVec3Scale(v3Delta, fInverseFlightTime);
+            v3Delta.z = fVerticalSpeed;
             pProjectile->SetVelocity(v3Delta);
         }
     }
@@ -5128,8 +5121,8 @@ void cFielder::fn_8004E8B8()
         muInvincibleStatus |= 1;
         if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
         {
-            fn_801B90F8(this);
-            PlayOwnedSound(mUnidentified318, 0x3D267BDF,
+            EmitShyGuyBulletShoot(this);
+            PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF,
                 (XSoundOwner*)g_pBall->mUnidentifiedEC, "Skillshot", this);
         }
     }
@@ -5168,12 +5161,12 @@ void cFielder::fn_8004E92C()
                 {
                     ReleaseBall(0);
                 }
-                fn_801B75C8(this, 1, 0, 0, 0);
+                EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
             }
             else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0D)
             {
                 DoRegularShooting(false);
-                fn_801B75C8(this, 1, 0, 0, 0);
+                EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
             }
         }
     }
@@ -5190,8 +5183,8 @@ void cFielder::fn_8004EAB4(float fDeltaT)
 {
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
-        mUnidentified420->position = GetJointPosition(m_nBallJointIndex);
-        mUnidentified420->velocity = mUnidentified024.m_v3Velocity;
+        m_pBulletBill->position = GetJointPosition(m_nBallJointIndex);
+        m_pBulletBill->velocity = mUnidentified024.m_v3Velocity;
     }
 
     if (ShouldStartCrossBlend(4))
@@ -5216,12 +5209,12 @@ void cFielder::fn_8004EC40()
     {
         fn_80038158(this, 0);
 
-        if (mUnidentified420->active)
+        if (m_pBulletBill->active)
         {
             CollisionBulletBillData* pNode = 0;
             g_CollisionBulletBillDataPool.Allocate(pNode);
             pNode->player = this;
-            pNode->bulletBill = mUnidentified420;
+            pNode->bulletBill = m_pBulletBill;
             fn_80147F2C(pNode);
         }
 
@@ -5279,7 +5272,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
         mUnidentified410.mUnidentified0C = false;
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
-        fn_801B75C8(this, 1, 0, 0, 0);
+        EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
         SetNoPickUpTime(0.2f);
 
         Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();

@@ -11,6 +11,12 @@
 bool gEnableWiiRemotePad = true;
 bool gEnableWiiFreestylePad = true;
 bool gEnableWiiClassicPad = true;
+
+SwappablePadChangedEvent::SwappablePadChangedEvent()
+    : UnidentifiedStaticEvent<void(int), 5>("SwappablePadChanged", -1)
+{
+}
+
 SwappablePadChangedEvent gSwappablePadChanged;
 
 bool UpdatePadBackend(PadBackend* pad)
@@ -24,21 +30,34 @@ bool UpdatePadBackend(PadBackend* pad)
     }
 
     int oldType;
-    if (pad->GetClassID() == gWiiRemotePadClassID)
+    int classID = pad->GetClassID();
+    if (classID == gWiiRemotePadClassID)
     {
         oldType = 1;
     }
-    else if (pad->GetClassID() == gWiiFreestylePadClassID)
+    else
     {
-        oldType = 2;
-    }
-    else if (pad->GetClassID() == gWiiClassicPadClassID)
-    {
-        oldType = 3;
-    }
-    else if (pad->GetClassID() == gPlatPadClassID)
-    {
-        oldType = 0;
+        classID = pad->GetClassID();
+        if (classID == gWiiFreestylePadClassID)
+        {
+            oldType = 2;
+        }
+        else
+        {
+            classID = pad->GetClassID();
+            if (classID == gWiiClassicPadClassID)
+            {
+                oldType = 3;
+            }
+            else
+            {
+                classID = pad->GetClassID();
+                if (classID == gPlatPadClassID)
+                {
+                    oldType = 0;
+                }
+            }
+        }
     }
 
     if (oldType != type)

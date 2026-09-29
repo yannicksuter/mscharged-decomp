@@ -12,7 +12,7 @@
 class WorldObject_80129EE0 : public WorldObject
 {
 public:
-    virtual nlMatrix4* GetWorldMatrix();
+    virtual nlMatrix4* GetWorldMatrix() { return &mWorldMatrix; }
     virtual void SetWorldMatrix(const nlMatrix4& transform);
 
     /* 0x04 */ unsigned char mUnidentified004[0x1C];

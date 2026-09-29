@@ -71,7 +71,7 @@ void UnidentifiedOnlineRankingScene::Update(float dt)
         TLSlide* slide = mPresentation->GetActiveSlide();
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
-            fn_801EDC90(true);
+            ContinuePostGame(true);
             g_pOverlayManager->Pop();
         }
         return;
@@ -107,7 +107,7 @@ void UnidentifiedOnlineRankingScene::fn_801F05D4()
     TLInstance* screen = FEFinder<TLInstance, TLAT_UNKNOWN>::Find<TLSlide>(presentation->GetActiveSlide(), "Layer", "screen");
     FEFinder<TLTextInstance, TLAT_TEXT>::FindChecked(screen, "TimerText")->SetVisible(false);
     TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->GetTimer());
-    GetNavigationScene()->fn_801CA9E0(true);
+    GetNavigationScene()->SetTimerVisible(true);
     char countdown[12];
     nlSNPrintf(countdown, 12, "%d", mUnidentified1A8);
     nlStrToWcs(countdown, mTimerText, 12);

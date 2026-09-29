@@ -1,4 +1,5 @@
 #include "Game/Render/ChainChomp.h"
+#include "Game/CharacterTriggers.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"

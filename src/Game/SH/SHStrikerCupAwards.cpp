@@ -22,7 +22,6 @@
 #include "NL/nlBind.h"
 #include "Game/FE/feDPD.h"
 
-extern "C" void fn_80207724(int);
 
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation,
     const char* name)
@@ -86,7 +85,7 @@ void StrikerCupAwardsScene::SceneCreated()
     else
     {
         StatsTracker::Instance()->GetSortedStats(
-            stats, teamCount, mAwardTeamIndices, teamCount, STATS_0C, SORT_ASCENDING);
+            stats, teamCount, mAwardTeamIndices, teamCount, STATS_GOALS_AGAINST, SORT_ASCENDING);
     }
 
     for (int row = 0; row < 4; ++row)
@@ -133,7 +132,7 @@ void StrikerCupAwardsScene::SceneCreated()
     }
 
     mBackButton.SetButtonInstance(backButton);
-    fn_80207724(mCupPage);
+    UpdateCupBreadcrumbs(mCupPage);
 
     TLComponentInstance* scrollBar = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
         presentation->m_currentSlide, "Layer", "award_screen", "scrollbar");
@@ -176,7 +175,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
             if (!mPointerButtonsInitialized)
             {
                 GetNavigationScene()->SetButtons(0x1F, false);
-                fn_802088B4();
+                UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
@@ -194,7 +193,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
                 CycleCupPage(mCupPage, true);
                 return;
             }
-            fn_80207060(false);
+            AdvanceCupFlow(false);
             return;
         }
         else if (state == 3)
@@ -335,7 +334,7 @@ bool StrikerCupAwardsScene::PopulateTeamRow(int row, int teamPosition)
     }
     else
     {
-        statValue = playerStats.unknown_0x12;
+        statValue = playerStats.mNumGoalsAgainst;
     }
 
     TLImageInstance* captainImage = FEFinder<TLImageInstance, 2>::FindOrDefault(

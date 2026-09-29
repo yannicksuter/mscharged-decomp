@@ -72,7 +72,7 @@ public:
     /* 0x3E4 */ TweakFloatBinding mUnidentified3E4;
     /* 0x3F4 */ TweakFloatBinding fGreenShellSpeed;
     /* 0x404 */ TweakFloatBinding mUnidentified404;
-    /* 0x414 */ TweakFloatBinding mUnidentified414;
+    /* 0x414 */ TweakFloatBinding fBowserExplodeRadius;
     /* 0x424 */ TweakFloatBinding mUnidentified424;
     /* 0x434 */ TweakFloatBinding mUnidentified434;
     /* 0x444 */ TweakFloatBinding mUnidentified444;

@@ -153,7 +153,7 @@ void BulletBillObject::Show(cFielder* fielder)
     controller->m_uUserData = (unsigned long)this;
     controller->SetUpdateCallback(Function<EmissionController&>(UpdateBulletBillEmitter));
 
-    fn_801B8FF8(fielder);
+    EmitShyGuyBulletStart(fielder);
     g_pBall->m_bVisible = false;
     g_pBall->m_pPhysicsBall->DisableCollisions();
 }
@@ -176,7 +176,7 @@ void BulletBillObject::Hide(bool destroyEffect)
                 target->InitActionSlideAttackReact(target, false);
                 target->m_pCurrentAnimController->m_fPlaybackSpeedScale = lbl_806DCD80;
             }
-            fn_801B91F8(target);
+            EmitShyGuyBulletEnd(target);
             fn_800367B4(target);
         }
         position = lbl_804DCDC4;

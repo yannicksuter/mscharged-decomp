@@ -598,10 +598,10 @@ EffectsGroup* EmissionManager::GetEffectsGroup(const char* name)
     return 0;
 }
 
-extern "C" EffectsGroup* fn_802E7D54(EmissionManager*, unsigned long hash)
+EffectsGroup* fxGetGroup(EmissionManager*, unsigned long hashID)
 {
     EffectsGroup** group;
-    if (!lbl_8057F6B8.FindGet(hash, &group))
+    if (!lbl_8057F6B8.FindGet(hashID, &group))
     {
         return 0;
     }

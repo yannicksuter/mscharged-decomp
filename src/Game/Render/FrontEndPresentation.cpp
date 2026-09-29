@@ -183,7 +183,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         bool alternate = false;
         if (side == -1 && GameInfoManager::Instance()->mCurrentMode == 3)
         {
-            side = g_pCupManager->unknown_0x8A28;
+            side = g_pCupManager->mPendingCupTeam;
         }
         else
         {

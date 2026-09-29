@@ -86,7 +86,7 @@ extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
     fPlayerDistance = PlayerShotDistance(pFielder);
     PlayerTweaks* pTweaks = pFielder->GetTweaks();
     float fShooting = pTweaks->fShooting;
-    fChargedValue = fn_800155A0(g_pBall, 0);
+    fChargedValue = GetBallChargeValue(g_pBall, 0);
     fChargedValue *= 0.25f;
     float fGoalieOut = GoalieOutOfPosition(pFielder);
 
@@ -267,7 +267,7 @@ void ShotMeter::Update(float fDeltaT)
             float fValue = Interpolate(fDelta * lbl_806DBE58,
                 fDelta * lbl_806DBE5C,
                 fRange);
-            fValue += fn_800155A0(g_pBall, 0);
+            fValue += GetBallChargeValue(g_pBall, 0);
             fn_800154FC(g_pBall, fValue);
         }
 

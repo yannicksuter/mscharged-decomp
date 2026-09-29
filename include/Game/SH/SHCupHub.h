@@ -32,28 +32,28 @@ public:
     void OnRulesPointerPress(unsigned int index, void* context);
     void BuildMatchupStates();
 
-    /* 0x01C */ TLComponentInstance* mUnidentified1C;
-    /* 0x020 */ TLComponentInstance* mUnidentified20[4];
+    /* 0x01C */ TLComponentInstance* mMovingHighlight;
+    /* 0x020 */ TLComponentInstance* mRowInstances[4];
     /* 0x030 */ FEPointerButton mMatchupComponents[4];
-    /* 0x300 */ bool mUnidentified300;
-    /* 0x304 */ int mUnidentified304;
+    /* 0x300 */ bool mInitialized;
+    /* 0x304 */ int mScrollOffset;
     /* 0x308 */ FEScrollBar mScrollWidget;
     /* 0x4BC */ u16 mTextBuffers[4][16];
-    /* 0x53C */ u16 mUnidentified53C[4][16];
-    /* 0x5BC */ u16 mUnidentified5BC[64];
-    /* 0x63C */ u16 mUnidentified63C[4][2][4];
-    /* 0x67C */ bool mUnidentified67C;
-    /* 0x67D */ bool mUnidentified67D;
-    /* 0x67E */ bool mUnidentified67E;
-    /* 0x67F */ bool mUnidentified67F;
-    /* 0x680 */ int mUnidentified680[4];
+    /* 0x53C */ u16 mGameText[4][16];
+    /* 0x5BC */ u16 mTitleBuffer[64];
+    /* 0x63C */ u16 mScoreText[4][2][4];
+    /* 0x67C */ bool mSuppressInput;
+    /* 0x67D */ bool mPagingEnabled;
+    /* 0x67E */ bool mPreviousPagePressed;
+    /* 0x67F */ bool mNextPagePressed;
+    /* 0x680 */ int mHoverCounts[4];
     /* 0x690 */ FEBackButton mNavigationComponent;
-    /* 0x768 */ FEPageControls* mUnidentified768;
+    /* 0x768 */ FEPageControls* mPageControls;
     /* 0x76C */ FEPointerButton mRulesComponent;
     /* 0x820 */ TLComponentInstance* mRulesButton;
     /* 0x824 */ s8 mMatchupStates[54][2];
-    /* 0x890 */ u8 mUnidentified890;
-    /* 0x894 */ int mUnidentified894;
+    /* 0x890 */ u8 mEntryCount;
+    /* 0x894 */ int mState;
 }; // size 0x898
 
 #endif // GAME_SH_SH_CUP_HUB_H

@@ -22,6 +22,7 @@
 #include "types.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/Camera/CameraMan.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -61,7 +62,6 @@ struct UnidentifiedAbilityEvent
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
-extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 extern "C" bool fn_80319FEC(void* pParam, int nAction);
 extern "C" void fn_80319E58(void* pParam, int nAction);
 extern "C" void fn_80319E84(void* pParam, int nAction, int nParam1, int nParam2);
@@ -70,8 +70,6 @@ extern "C" void fn_8005FC1C(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);
 extern "C" void fn_80060210(cGame* pGame, void* pEvent);
 
-extern "C" void fn_800F026C(float* pParams, float fParam1, float fParam2);
-extern "C" void fn_801B897C(cFielder* pFielder);
 bool IsNetworkOrRecordedGame(void);
 
 void cFielder::fn_8004F828()
@@ -85,13 +83,13 @@ void cFielder::fn_8004F828()
     Unknown8(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
-    fn_801BAF98(this);
+    EmitDKSuperCharge(this);
 }
 
 void cFielder::fn_8004F8E8()
 {
-    fn_801BB120(this);
-    fn_800F026C(gUnidentified804FAD80, lbl_806DB9D0, lbl_806DB9D4);
+    EmitDKSuperHit(this);
+    FireCameraNoiseFilter(*(nlVector3*)gUnidentified804FAD80, lbl_806DB9D0, lbl_806DB9D4);
     fn_80061B1C(1, lbl_806DBA10 * mUnidentified024.m_v3Position.y,
         lbl_806DBA10 * mUnidentified024.m_v3Position.x);
     CreateHitShockwave(
@@ -105,7 +103,7 @@ void cFielder::fn_8004F974(float fDeltaT)
 
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB9CC))
     {
-        fn_801BB0DC(this);
+        KillDKSuperCharge(this);
         mUnidentified024.m_fActualSpeed = 0.0f;
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
@@ -229,12 +227,12 @@ void cFielder::fn_8004FC90(float fDeltaT)
 
         if (lbl_806E0C7C)
         {
-            fn_801B897C(this);
+            EmitPeachPhoto(this);
         }
 
         if (m_pBall == 0)
         {
-            PlaySound(mUnidentified318, 0x7997624D, 0, 0);
+            PlaySound(m_uSoundSlotId, 0x7997624D, 0, 0);
         }
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(
@@ -407,11 +405,11 @@ bool cFielder::fn_80050284()
     {
         if (mUnidentified024.m_eCharacterClass == YOSHI)
         {
-            PlaySound(mUnidentified318, 0x8A9FCF66, 0, 0);
+            PlaySound(m_uSoundSlotId, 0x8A9FCF66, 0, 0);
         }
         else
         {
-            PlaySound(mUnidentified318, 0x8A9FCF66, "TankOn", this);
+            PlaySound(m_uSoundSlotId, 0x8A9FCF66, "TankOn", this);
         }
         mUnidentified3DC = true;
         mUnidentified3DD = false;

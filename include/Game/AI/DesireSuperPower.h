@@ -10,7 +10,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
 extern "C" bool fn_800C9F4C(DesireSuperPower*, void*);
 extern "C" bool fn_800CAC8C(DesireSuperPower*, void*);
 extern "C" void fn_800C9D74(DesireSuperPower*, int);
-extern "C" void fn_800C9DB4(DesireSuperPower*);
+void EmitBowserJrShriek(DesireSuperPower*);
 
 class DesireSuperPower : public Desire
 {
@@ -18,7 +18,7 @@ class DesireSuperPower : public Desire
     friend bool fn_800C9F4C(DesireSuperPower*, void*);
     friend bool fn_800CAC8C(DesireSuperPower*, void*);
     friend void fn_800C9D74(DesireSuperPower*, int);
-    friend void fn_800C9DB4(DesireSuperPower*);
+    friend void EmitBowserJrShriek(DesireSuperPower*);
 
 public:
     DesireSuperPower();
@@ -64,7 +64,7 @@ extern "C" void fn_800D1140(void*);
 extern "C" void fn_800D12E8(void*);
 extern "C" eCharacterClass fn_800D1440(const cCharacter*);
 extern "C" unsigned short fn_800D1448(const cCharacter*);
-extern "C" const nlVector3* fn_800D1450(const cCharacter*);
+const nlVector3* GetCharacterPosition(const cCharacter*);
 extern "C" bool fn_800D1458(const cGame*);
 extern "C" nlVector3* fn_800D1C4C(nlVector3*, const nlVector3*, const nlVector3*);
 extern "C" float fn_800D1C80(const nlVector2*, const nlVector2*);

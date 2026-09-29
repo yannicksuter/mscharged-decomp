@@ -196,8 +196,8 @@ void DrawableCharacter::Grab(cCharacter& source)
     headPosition = source.GetJointPosition(source.m_nHeadJointIndex);
     height = bip01Position.z;
     scale = source.mUnidentified024.m_fPlayerScale;
-    flag2 = source.mUnidentified17E;
-    flag3 = source.mUnidentified17F;
+    flag2 = source.m_bLeftPropAnimated;
+    flag3 = source.m_bRightPropAnimated;
     megaEnabled = source.mUnidentified180;
     if (megaEnabled)
     {

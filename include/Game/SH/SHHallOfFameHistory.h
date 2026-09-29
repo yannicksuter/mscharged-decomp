@@ -28,7 +28,7 @@ public:
     /* 0x2AC */ CupHistoryRecord mHistory[12];
     /* 0x30C */ int mSelectedHistoryIndex;
     /* 0x310 */ int mHistoryCount;
-    /* 0x314 */ int mUnidentified314[4];
+    /* 0x314 */ int mHoverCounts[4];
     /* 0x324 */ bool mUnidentified324;
     /* 0x325 */ unsigned char mPadding325[3];
     /* 0x328 */ int mState;

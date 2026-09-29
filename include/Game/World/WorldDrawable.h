@@ -15,8 +15,11 @@ class WorldDrawable : public WorldObject
 public:
     virtual ~WorldDrawable() { }
     virtual nlMatrix4* GetWorldMatrix();
-    virtual void ReleaseResources();
-    virtual void SetWorldMatrix(const nlMatrix4& transform);
+    virtual void ReleaseResources() { }
+    virtual void SetWorldMatrix(const nlMatrix4& transform)
+    {
+        mWorldMatrix = transform;
+    }
     virtual void Draw();
     virtual bool IsVisibleInFrustum(const nlVector4* planes) const;
     virtual void UpdateModelMaterials(glModel* model);

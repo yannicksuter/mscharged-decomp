@@ -10,6 +10,7 @@
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlSlotPool.h"
 #include "ode/objects.h"
+#include "Game/CharacterTriggers.h"
 
 extern "C"
 {
@@ -31,8 +32,6 @@ extern "C"
 
     nlVector4 sHammerForward = { 1.0f, 0.0f, 0.0f, 0.0f };
 
-    extern void fn_801B8C7C(const nlVector3&);
-    extern void fn_801BCA5C(const nlVector3*);
     extern void fn_802B5444(nlQuaternion&, unsigned short);
 }
 
@@ -189,8 +188,8 @@ void HammerObject::OnLanding()
     if (mLandedTimer <= sHammerZero)
     {
         mLandedTimer = gHammerLandedDuration;
-        fn_801B8C7C(mPhysics->GetPosition());
-        PlaySound(mOwner->mUnidentified318, 0x85EA466C, 0, 0);
+        EmitHammerGround(mPhysics->GetPosition());
+        PlaySound(mOwner->m_uSoundSlotId, 0x85EA466C, 0, 0);
 
         if (mLandedTimer <= sHammerZero)
         {
@@ -310,7 +309,7 @@ void HammerObject::Update(float dt)
         object->mLandedTimer -= dt;
         if (object->mLandedTimer <= sHammerZero)
         {
-            fn_801BCA5C(&object->mPhysics->GetPosition());
+            EmitHammerDestroy(object->mPhysics->GetPosition());
             ::Reset(object);
             return;
         }
@@ -478,7 +477,7 @@ void HammerObject::Deactivate(bool emitEffect)
         object->mPendingReset = true;
         if (emitEffect)
         {
-            fn_801BCA5C(&object->mPhysics->GetPosition());
+            EmitHammerDestroy(object->mPhysics->GetPosition());
         }
     }
 }

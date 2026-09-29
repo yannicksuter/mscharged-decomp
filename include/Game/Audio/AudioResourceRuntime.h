@@ -7,7 +7,7 @@
 class AudioConfigNode;
 class AudioBundleManager;
 class AudioEffectFactory;
-class UnidentifiedAudioScriptRuntime;
+class AudioScriptRuntime;
 
 // Sub-object the runtime holds so that destroying the runtime returns both
 // shared sound pools' blocks. Only its position (0x1C) and the two frees its
@@ -38,7 +38,7 @@ public:
 
     /* 0x1C */ UnidentifiedAudioPoolOwner m_Pools;
     /* 0x20 */ AudioConfigNode* m_ConfigRoot;
-    /* 0x24 */ UnidentifiedAudioScriptRuntime* m_Script;
+    /* 0x24 */ AudioScriptRuntime* m_Script;
     /* 0x28 */ AudioEffectFactory* m_EffectFactory;
 }; // size: 0x2C
 

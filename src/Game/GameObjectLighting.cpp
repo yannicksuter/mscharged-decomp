@@ -620,7 +620,8 @@ void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mv
 
     if (pLight->unknown01)
     {
-        s32 var3 = (s32)(lbl_806E4CD0 * pLight->intensity * lbl_806DCC44);
+        f32 brightness = lbl_806E4CD0 * pLight->intensity;
+        s32 var3 = (s32)(brightness * lbl_806DCC44);
         if (var3 > 255)
             var3 = 255;
 
@@ -633,7 +634,8 @@ void fn_80182F74(s32 lightId, const GameObjectLight* pLight, const nlMatrix4& mv
     }
     else
     {
-        s32 var3 = (s32)(lbl_806E4CD0 * pLight->intensity * lbl_806DCC44);
+        f32 brightness = lbl_806E4CD0 * pLight->intensity;
+        s32 var3 = (s32)(brightness * lbl_806DCC44);
         if (var3 > 255)
             var3 = 255;
 

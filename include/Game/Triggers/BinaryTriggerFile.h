@@ -22,6 +22,7 @@ public:
         /* 0x6 */ u16 TriggerOffset;
 
         operator unsigned long() const { return hash; }
+        bool operator==(const unsigned long& key) const { return hash == key; }
     }; // total size: 0x8
 
     struct TRIGGER_RECORD

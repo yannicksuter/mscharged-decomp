@@ -257,7 +257,7 @@ public:
     bool CanDoCaptainShootToScore();
     bool CanReceivePass();
     void SetSlideAttackSuccessFlag();
-    void fn_80036A38(int nParam, float fAmount);
+    void IncrementPowerupMeter(int nParam, float fAmount);
     bool fn_8003E8F4() const;
     bool fn_8003E74C() const;
     bool CollideWithFreezeCallback();
@@ -444,7 +444,7 @@ public:
     void fn_8004E228();
     void fn_8004E8B8();
     void fn_8004EA9C();
-    void fn_8004E6B4();
+    void ReleaseHammerProjectile();
     void fn_8004E92C();
     void fn_8004EAB4(float fDeltaT);
     void fn_8004EC40();
@@ -604,7 +604,7 @@ public:
     /* 0x410 */ UnidentifiedFielderAction410 mUnidentified410;
 
 public:
-    /* 0x420 */ BulletBillObject* mUnidentified420;
+    /* 0x420 */ BulletBillObject* m_pBulletBill;
 
 public:
     /* 0x424 */ bool mUnidentified424;
@@ -741,5 +741,13 @@ extern float lbl_806E3420;
 extern float lbl_806E3424;
 extern float lbl_806E3428;
 extern float lbl_806E342C;
+
+extern "C" void fn_80038158(cFielder* pFielder, int nParam);
+
+extern "C" bool fn_8003877C(cFielder* pFielder);
+
+extern "C" void fn_800395C0(cFielder* pFielder);
+
+extern "C" void fn_80039CF0(cFielder* pFielder, int nParam);
 
 #endif // GAME_AI_FIELDER_H

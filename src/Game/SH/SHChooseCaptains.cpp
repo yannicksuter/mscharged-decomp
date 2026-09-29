@@ -39,54 +39,54 @@ extern int gCaptainSelectionOrder[12];
  * Offset/Address/Size: 0x0 | 0x80222098 | size: 0x468
  */
 ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement movement)
-    : mUnidentified1C(false)
+    : mPopupActive(false)
     , mSceneType(sceneType)
     , mMovement(movement)
-    , mUnidentified4A(false)
-    , mUnidentified4B(false)
-    , mUnidentified4C(false)
-    , mUnidentified4D(false)
-    , mUnidentified4E(false)
-    , mUnidentified1314(0)
-    , mUnidentified137C(false)
-    , mUnidentified1380(0)
+    , mCaptainButtonsInitialized(false)
+    , mPointerButtonsInitialized(false)
+    , mCaptainsShown(false)
+    , mBothConfirmed(false)
+    , mInputSuppressed(false)
+    , mDoneButtonInstance(0)
+    , mDraftExitDone(false)
+    , mState(0)
 {
-    mUnidentified28[0] = -1;
-    mUnidentified28[1] = -1;
-    mUnidentified132C[0] = 0;
-    mUnidentified132C[1] = 0;
+    mSidePads[0] = -1;
+    mSidePads[1] = -1;
+    mSelectDisplays[0] = 0;
+    mSelectDisplays[1] = 0;
 
-    mUnidentified920[0].mContext = (void*)0;
-    mUnidentified920[0].mSpeakerEnabled = false;
-    mUnidentified920[1].mContext = (void*)1;
-    mUnidentified920[1].mSpeakerEnabled = false;
+    mSelectButtons[0].mContext = (void*)0;
+    mSelectButtons[0].mSpeakerEnabled = false;
+    mSelectButtons[1].mContext = (void*)1;
+    mSelectButtons[1].mSpeakerEnabled = false;
 
-    mUnidentifiedBF0.mSpeakerEnabled = false;
+    mDoneButton.mSpeakerEnabled = false;
 
-    mUnidentifiedA88[0].mContext = (void*)0;
-    mUnidentifiedA88[0].Disable();
-    mUnidentifiedA88[1].mContext = (void*)1;
-    mUnidentifiedA88[1].Disable();
+    mReadyButtons[0].mContext = (void*)0;
+    mReadyButtons[0].Disable();
+    mReadyButtons[1].mContext = (void*)1;
+    mReadyButtons[1].Disable();
 
-    mUnidentified30[0] = -1;
-    mUnidentified30[1] = -1;
-    mUnidentified38[0] = false;
+    mSelectedCaptains[0] = -1;
+    mSelectedCaptains[1] = -1;
+    mConfirmed[0] = false;
     if (GameInfoManager::Instance()->IsInMode3() || GameInfoManager::Instance()->mIsOnlineMode != 0)
     {
-        mUnidentified38[1] = true;
+        mConfirmed[1] = true;
     }
     else
     {
-        mUnidentified38[1] = false;
+        mConfirmed[1] = false;
     }
-    mUnidentified3A[0] = false;
-    mUnidentified3A[1] = false;
-    mUnidentified3C[0] = false;
-    mUnidentified3C[1] = false;
-    mUnidentified40[0] = -1;
-    mUnidentified40[1] = -1;
-    mUnidentified48[0] = movement == SCREEN_BACK;
-    mUnidentified48[1] = movement == SCREEN_BACK;
+    mReadyPressed[0] = false;
+    mReadyPressed[1] = false;
+    mChangeTextShown[0] = false;
+    mChangeTextShown[1] = false;
+    mCaptainIds[0] = -1;
+    mCaptainIds[1] = -1;
+    mSideJoined[0] = movement == SCREEN_BACK;
+    mSideJoined[1] = movement == SCREEN_BACK;
 
     mBackButton.SetPopScene(false);
     if (mSceneType == ST_STRIKER_CUP)
@@ -98,19 +98,19 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
     {
         if (mSceneType == ST_STRIKER_CUP)
         {
-            int team = g_pCupManager->unknown_0x8A28;
-            mUnidentified38[0] = true;
-            mUnidentified40[0] = team;
+            int team = g_pCupManager->mPendingCupTeam;
+            mConfirmed[0] = true;
+            mCaptainIds[0] = team;
         }
         else
         {
-            mUnidentified40[0] = GameInfoManager::Instance()->GetTeam(0);
-            mUnidentified38[0] = true;
+            mCaptainIds[0] = GameInfoManager::Instance()->GetTeam(0);
+            mConfirmed[0] = true;
             if (GameInfoManager::Instance()->mIsOnlineMode == 0)
             {
                 int team = GameInfoManager::Instance()->GetTeam(1);
-                mUnidentified38[1] = true;
-                mUnidentified40[1] = team;
+                mConfirmed[1] = true;
+                mCaptainIds[1] = team;
             }
         }
     }
@@ -120,13 +120,13 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
         mCaptainButtons[i].mContext = (void*)i;
         mCaptainButtons[i].mSpeakerEnabled = false;
 
-        if (mUnidentified40[0] == lbl_8051CE60[i])
+        if (mCaptainIds[0] == lbl_8051CE60[i])
         {
-            mUnidentified30[0] = i;
+            mSelectedCaptains[0] = i;
         }
-        else if (mUnidentified40[1] == lbl_8051CE60[i])
+        else if (mCaptainIds[1] == lbl_8051CE60[i])
         {
-            mUnidentified30[1] = i;
+            mSelectedCaptains[1] = i;
         }
     }
 }
@@ -142,28 +142,28 @@ ChooseCaptainsSceneV2::~ChooseCaptainsSceneV2()
 
 void ChooseCaptainsSceneV2::SceneCreated()
 {
-    mUnidentified1320 = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "CAPTAINS");
-    mUnidentified1320->SetVisible(false);
+    mCaptainsLayer = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "CAPTAINS");
+    mCaptainsLayer->SetVisible(false);
 
-    TLInstance* captains = FEFinder<TLInstance, -1>::Find<TLSlide>(mUnidentified1320->GetActiveSlide(), "captains");
+    TLInstance* captains = FEFinder<TLInstance, -1>::Find<TLSlide>(mCaptainsLayer->GetActiveSlide(), "captains");
     for (int i = 0; i < 12; ++i)
     {
         char name[16];
         nlSNPrintf(name, sizeof(name), "captain%d", i);
-        mUnidentified12D4[i] = (TLComponentInstance*)FEFinder<TLInstance, TLAT_COMPONENT>::Find(captains, name);
+        mCaptainInstances[i] = (TLComponentInstance*)FEFinder<TLInstance, TLAT_COMPONENT>::Find(captains, name);
     }
 
-    mUnidentified1324[0] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA left");
-    mUnidentified1324[1] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA right");
-    mUnidentified132C[0] = mUnidentified1324[0];
-    mUnidentified132C[1] = mUnidentified1324[1];
+    mPDALayers[0] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA left");
+    mPDALayers[1] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA right");
+    mSelectDisplays[0] = mPDALayers[0];
+    mSelectDisplays[1] = mPDALayers[1];
 
-    mUnidentified1304[0] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mUnidentified1324[0]->GetActiveSlide(), "select button");
-    mUnidentified130C[0] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mUnidentified1324[0]->GetActiveSlide(), "button_ok");
-    mUnidentified130C[0]->SetVisible(false);
-    TLComponentInstance* screens = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mUnidentified1324[0]->GetActiveSlide(), "pda_screens");
-    mUnidentified1318[0] = FEFinder<TLInstance, TLAT_COMPONENT>::Find(screens, "empty", "green_arrow");
-    mUnidentified1318[0]->SetVisible(false);
+    mSelectButtonInstances[0] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mPDALayers[0]->GetActiveSlide(), "select button");
+    mOkButtonInstances[0] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mPDALayers[0]->GetActiveSlide(), "button_ok");
+    mOkButtonInstances[0]->SetVisible(false);
+    TLComponentInstance* screens = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mPDALayers[0]->GetActiveSlide(), "pda_screens");
+    mGreenArrows[0] = FEFinder<TLInstance, TLAT_COMPONENT>::Find(screens, "empty", "green_arrow");
+    mGreenArrows[0]->SetVisible(false);
 
     TLComponentInstance* back = 0;
     SHNavigation* navigation = GetNavigationScene();
@@ -171,45 +171,45 @@ void ChooseCaptainsSceneV2::SceneCreated()
     {
         navigation->HideButtons();
         back = navigation->GetButton(4);
-        mUnidentified1314 = navigation->GetButton(0x20);
+        mDoneButtonInstance = navigation->GetButton(0x20);
     }
-    mUnidentified1314->SetActiveSlide("off", true, false);
+    mDoneButtonInstance->SetActiveSlide("off", true, false);
 
     TLComponentInstance* cupPda = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA right RTSC");
-    mUnidentified1334 = cupPda;
+    mCupPDALayer = cupPda;
     if (mSceneType != ST_STRIKER_CUP)
     {
-        mUnidentified1304[1] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mUnidentified1324[1]->GetActiveSlide(), "select button");
-        mUnidentified130C[1] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mUnidentified1324[1]->GetActiveSlide(), "button_ok");
-        mUnidentified130C[1]->SetVisible(false);
-        screens = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mUnidentified1324[1]->GetActiveSlide(), "pda_screens");
-        mUnidentified1318[1] = FEFinder<TLInstance, TLAT_COMPONENT>::Find(screens, "empty", "green_arrow");
-        mUnidentified1318[1]->SetVisible(false);
+        mSelectButtonInstances[1] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mPDALayers[1]->GetActiveSlide(), "select button");
+        mOkButtonInstances[1] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mPDALayers[1]->GetActiveSlide(), "button_ok");
+        mOkButtonInstances[1]->SetVisible(false);
+        screens = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(mPDALayers[1]->GetActiveSlide(), "pda_screens");
+        mGreenArrows[1] = FEFinder<TLInstance, TLAT_COMPONENT>::Find(screens, "empty", "green_arrow");
+        mGreenArrows[1]->SetVisible(false);
         cupPda->SetVisible(false);
-        mCaptainComponents[1].Initialize(mUnidentified1324[1], 1, 0);
+        mCaptainComponents[1].Initialize(mPDALayers[1], 1, 0);
     }
     else
     {
         mCaptainComponents[1].Initialize(cupPda, 1, 0);
-        mUnidentified1324[1]->SetVisible(false);
+        mPDALayers[1]->SetVisible(false);
         TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(cupPda->GetActiveSlide(), "scrollbar");
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(scrollbar->GetActiveSlide(), "up_arrow")->SetActiveSlide("unused", true, false);
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(scrollbar->GetActiveSlide(), "down_arrow")->SetActiveSlide("unused", true, false);
         FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault<TLSlide>(scrollbar->GetActiveSlide(), "track", "btn_scroll_minmax")->SetVisible(false);
     }
 
-    mCaptainComponents[0].Initialize(mUnidentified1324[0], 0, 0);
+    mCaptainComponents[0].Initialize(mPDALayers[0], 0, 0);
     for (int side = 0; side < 2; ++side)
     {
         mCaptainComponents[side].SetDisplayMode(0);
         mCaptainComponents[side].SetReadyPromptVisible(false);
-        mCaptainComponents[side].SetCaptainInfo(mUnidentified40[side], 0, 1);
+        mCaptainComponents[side].SetCaptainInfo(mCaptainIds[side], 0, 1);
     }
     mCaptainComponents[0].ShowSlideIn();
-    fn_80227BCC(0);
-    mUnidentified1304[0]->SetVisible(false);
+    UpdateSelectText(0);
+    mSelectButtonInstances[0]->SetVisible(false);
 
-    TLComponentInstance* in = (TLComponentInstance*)FEFinder<TLInstance, TLAT_COMPONENT>::Find(mUnidentified1324[0], "in", "pda_screens");
+    TLComponentInstance* in = (TLComponentInstance*)FEFinder<TLInstance, TLAT_COMPONENT>::Find(mPDALayers[0], "in", "pda_screens");
     TLInstance* attributes = FEFinder<TLInstance, TLAT_COMPONENT>::Find(in, "Slide1", "attributes_captains");
     TLComponentInstance* title = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(((TLComponentInstance*)attributes)->GetActiveSlide(), "attributes_captains", "TITLE");
     if (GameInfoManager::Instance()->IsOnline())
@@ -217,7 +217,7 @@ void ChooseCaptainsSceneV2::SceneCreated()
         title->SetActiveSlide("captain", true, false);
         mCaptainComponents[1].ShowSlideIn();
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA right", "OFF", "clickable_AWAY", "CHOOSE AWAY CAPTAIN")->SetVisible(false);
-        mUnidentified1304[1]->SetVisible(false);
+        mSelectButtonInstances[1]->SetVisible(false);
     }
     else if (mSceneType == ST_STRIKER_CUP)
     {
@@ -227,39 +227,39 @@ void ChooseCaptainsSceneV2::SceneCreated()
     else
     {
         mCaptainComponents[1].ShowSlideIn();
-        mUnidentified1304[1]->SetVisible(false);
-        fn_80227BCC(1);
+        mSelectButtonInstances[1]->SetVisible(false);
+        UpdateSelectText(1);
         FEMusic::StartStreamIfDifferent(2);
     }
 
-    fn_80224814();
-    fn_80227608();
+    LoadCaptainTextures();
+    RefreshCaptainImages();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
     if (NetworkDraft::Instance()->fn_8022819C())
     {
-        mUnidentified1368 = NetworkDraft::Instance()->fn_802281B0();
-        fn_80223B98(mUnidentified1368);
+        mDraftCountdown = NetworkDraft::Instance()->fn_802281B0();
+        UpdateDraftTimer(mDraftCountdown);
         mBackButton.Disable();
         back->SetVisible(false);
     }
     else
     {
-        fn_80223B98(-1);
+        UpdateDraftTimer(-1);
         mBackButton.SetButtonInstance(back);
     }
 
     if (mMovement == SCREEN_BACK)
     {
-        mUnidentified132C[0] = mUnidentified1304[0];
-        mUnidentified1304[0]->SetVisible(true);
+        mSelectDisplays[0] = mSelectButtonInstances[0];
+        mSelectButtonInstances[0]->SetVisible(true);
         if (!GameInfoManager::Instance()->IsInMode3() && !GameInfoManager::Instance()->IsOnline())
         {
-            mCaptainComponents[0].ApplyCaptainColours(mUnidentified40[0], mUnidentified40[1]);
-            mCaptainComponents[1].ApplyCaptainColours(mUnidentified40[1], mUnidentified40[0]);
-            mUnidentified132C[1] = mUnidentified1304[1];
-            mUnidentified1304[1]->SetVisible(true);
+            mCaptainComponents[0].ApplyCaptainColours(mCaptainIds[0], mCaptainIds[1]);
+            mCaptainComponents[1].ApplyCaptainColours(mCaptainIds[1], mCaptainIds[0]);
+            mSelectDisplays[1] = mSelectButtonInstances[1];
+            mSelectButtonInstances[1]->SetVisible(true);
         }
     }
 
@@ -293,7 +293,7 @@ void ChooseCaptainsSceneV2::SceneCreated()
 /**
  * Offset/Address/Size: 0x1B00 | 0x80223B98 | size: 0x170
  */
-void ChooseCaptainsSceneV2::fn_80223B98(int value)
+void ChooseCaptainsSceneV2::UpdateDraftTimer(int value)
 {
     TLSlide* slide = mPresentation->GetActiveSlide();
 
@@ -319,7 +319,7 @@ void ChooseCaptainsSceneV2::fn_80223B98(int value)
 /**
  * Offset/Address/Size: 0x1C70 | 0x80223D08 | size: 0x80
  */
-bool fn_80223D08(int pad)
+bool IsLocalDraftPad(int pad)
 {
     if (IsOnlineRankedMatch())
     {
@@ -336,7 +336,7 @@ bool fn_80223D08(int pad)
 
 void ChooseCaptainsSceneV2::Update(float dt)
 {
-    if (mUnidentified1C && !g_pFEInput->HasInputLock(this))
+    if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
     if (GameInfoManager::Instance()->IsOnline())
     {
@@ -359,10 +359,10 @@ void ChooseCaptainsSceneV2::Update(float dt)
     BaseSceneHandler::Update(dt);
     mCaptainComponents[0].Update(dt);
     mCaptainComponents[1].Update(dt);
-    if (mUnidentified1380 == 0 || mUnidentified1380 == 2 || mUnidentified1380 == 3)
+    if (mState == 0 || mState == 2 || mState == 3)
     {
-        TLSlide* leftSlide = mUnidentified1324[0]->GetActiveSlide();
-        TLSlide* rightSlide = mUnidentified1324[1]->GetActiveSlide();
+        TLSlide* leftSlide = mPDALayers[0]->GetActiveSlide();
+        TLSlide* rightSlide = mPDALayers[1]->GetActiveSlide();
         if (leftSlide->GetCurrentTime() < leftSlide->GetStartTime() + leftSlide->GetDuration()
             || rightSlide->GetCurrentTime() < rightSlide->GetStartTime() + rightSlide->GetDuration())
         {
@@ -370,30 +370,30 @@ void ChooseCaptainsSceneV2::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mUnidentified1380 == 0)
+        if (mState == 0)
         {
             if (GameInfoManager::Instance()->IsOnline())
                 GetNavigationScene()->SetButtons(0x20, true);
             else
                 GetNavigationScene()->SetButtons(0x24, true);
-            fn_80227988();
-            if (!mUnidentified48[0])
-                mUnidentified1324[0]->SetActiveSlide("off", true, false);
-            if (!mUnidentified48[1])
-                mUnidentified1324[1]->SetActiveSlide("off", true, false);
+            UpdateDoneButton();
+            if (!mSideJoined[0])
+                mPDALayers[0]->SetActiveSlide("off", true, false);
+            if (!mSideJoined[1])
+                mPDALayers[1]->SetActiveSlide("off", true, false);
             for (int i = 0; i < 4; ++i)
                 GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             if (mMovement == SCREEN_BACK && mSceneType == ST_STRIKER_CUP)
             {
-                int captain = g_pCupManager->fn_8022ED7C();
+                int captain = g_pCupManager->GetPendingCupTeam();
                 mCaptainComponents[1].SetDisplayMode(6);
                 mCaptainComponents[1].SetCaptainInfo(captain, 0, 1);
             }
-            mUnidentified1380 = 1;
+            mState = 1;
             InitializePointerButtons();
-            mUnidentified4B = true;
+            mPointerButtonsInitialized = true;
         }
-        else if (mUnidentified1380 == 2)
+        else if (mState == 2)
         {
             if (mSceneType == ST_STRIKER_CUP)
                 GameSceneManager::Instance()->Push((SceneList)7, SCREEN_FORWARD, true);
@@ -405,7 +405,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
             }
             return;
         }
-        else if (mUnidentified1380 == 3)
+        else if (mState == 3)
         {
             if (GameInfoManager::Instance()->IsOnline())
                 GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
@@ -414,7 +414,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
             if (mSceneType == ST_STRIKER_CUP)
             {
                 GameSceneManager::Instance()->Pop();
-                g_pCupManager->fn_8010C52C(-1);
+                g_pCupManager->SetMode(-1);
                 FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
                 FrontEndPresentation::GetInstance()->Call("TransitionStrikerCupToMainMenu");
             }
@@ -423,25 +423,25 @@ void ChooseCaptainsSceneV2::Update(float dt)
             return;
         }
     }
-    if (!mUnidentified4A)
+    if (!mCaptainButtonsInitialized)
     {
         InitializeCaptainButtons();
-        mUnidentified4A = true;
+        mCaptainButtonsInitialized = true;
         return;
     }
-    if (mUnidentified4E)
+    if (mInputSuppressed)
         return;
     for (int i = 0; i < 4; ++i)
     {
-        if (g_pNetworkSessionBase->GetSessionMode() != 0 && !fn_80223D08(i))
+        if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
         {
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             continue;
         }
         if (mSceneType == ST_STRIKER_CUP && i != gFEControllerIndex)
         {
-            if (mUnidentified28[0] == i || mUnidentified28[1] == i)
-                fn_80227DA8(i);
+            if (mSidePads[0] == i || mSidePads[1] == i)
+                ReleaseController(i);
             continue;
         }
         u8 valid = true;
@@ -452,54 +452,54 @@ void ChooseCaptainsSceneV2::Update(float dt)
         for (int button = 0; button < 12; ++button)
             mCaptainButtons[button].HandlePointerEvent(&event);
         for (int side = 0; side < 2; ++side)
-            mUnidentified920[side].HandlePointerEvent(&event);
-        mUnidentifiedBF0.HandlePointerEvent(&event);
-        if (mUnidentified4E)
+            mSelectButtons[side].HandlePointerEvent(&event);
+        mDoneButton.HandlePointerEvent(&event);
+        if (mInputSuppressed)
             return;
         if (!NetworkDraft::Instance()->fn_8022819C())
         {
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                mUnidentified1380 = 3;
+                mState = 3;
                 GetNavigationScene()->HideButtons();
-                mUnidentified1324[0]->SetActiveSlide("out", true, false);
-                mUnidentified1324[1]->SetActiveSlide("out", true, false);
-                mUnidentified1334->SetActiveSlide("out", true, false);
-                if (mUnidentified4C)
-                    mUnidentified1320->SetActiveSlide("out", true, false);
+                mPDALayers[0]->SetActiveSlide("out", true, false);
+                mPDALayers[1]->SetActiveSlide("out", true, false);
+                mCupPDALayer->SetActiveSlide("out", true, false);
+                if (mCaptainsShown)
+                    mCaptainsLayer->SetActiveSlide("out", true, false);
                 return;
             }
         }
-        if ((mUnidentified28[0] == i || mUnidentified28[1] == i) && !g_pFEInput->IsConnected((eFEINPUT_PAD)i))
-            fn_80227DA8(i);
+        if ((mSidePads[0] == i || mSidePads[1] == i) && !g_pFEInput->IsConnected((eFEINPUT_PAD)i))
+            ReleaseController(i);
     }
-    fn_80227988();
-    fn_80227308();
-    fn_80227608();
+    UpdateDoneButton();
+    UpdatePointerCursors();
+    RefreshCaptainImages();
     if (NetworkDraft::Instance()->fn_8022819C())
     {
         int countdown = NetworkDraft::Instance()->fn_802281B0();
-        if (mUnidentified1368 != countdown)
+        if (mDraftCountdown != countdown)
         {
-            mUnidentified1368 = countdown;
-            fn_80223B98(countdown);
+            mDraftCountdown = countdown;
+            UpdateDraftTimer(countdown);
         }
-        if (countdown == 0 && !mUnidentified137C)
+        if (countdown == 0 && !mDraftExitDone)
         {
             int captain;
-            if (mUnidentified28[0] != -1 && mUnidentified30[0] != -1
-                && !NetworkDraft::Instance()->IsCaptainTaken(lbl_8051CE60[mUnidentified30[0]]))
-                captain = lbl_8051CE60[mUnidentified30[0]];
-            else if (mUnidentified38[0] == true)
-                captain = mUnidentified40[0];
+            if (mSidePads[0] != -1 && mSelectedCaptains[0] != -1
+                && !NetworkDraft::Instance()->IsCaptainTaken(lbl_8051CE60[mSelectedCaptains[0]]))
+                captain = lbl_8051CE60[mSelectedCaptains[0]];
+            else if (mConfirmed[0] == true)
+                captain = mCaptainIds[0];
             else
                 captain = NetworkDraft::Instance()->GetRandomAvailableCaptain();
             GameInfoManager::Instance()->SetTeam(0, captain);
-            mUnidentified1380 = 2;
+            mState = 2;
             GetNavigationScene()->HideButtons();
-            mUnidentified1324[0]->SetActiveSlide("out", true, false);
-            mUnidentified1324[1]->SetActiveSlide("out", true, false);
-            mUnidentified137C = true;
+            mPDALayers[0]->SetActiveSlide("out", true, false);
+            mPDALayers[1]->SetActiveSlide("out", true, false);
+            mDraftExitDone = true;
         }
     }
 }
@@ -507,7 +507,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
 /**
  * Offset/Address/Size: 0x277C | 0x80224814 | size: 0x168
  */
-void ChooseCaptainsSceneV2::fn_80224814()
+void ChooseCaptainsSceneV2::LoadCaptainTextures()
 {
     FEPresentation* presentation = mPresentation;
     for (int i = 0; i < 12; ++i)
@@ -520,10 +520,10 @@ void ChooseCaptainsSceneV2::fn_80224814()
 
         TLImageInstance* selectedImage = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
             presentation, "art", "Layer", selected);
-        mUnidentified50[i][1] = selectedImage->m_pTextureResource;
+        mCaptainTextures[i][1] = selectedImage->m_pTextureResource;
         TLImageInstance* disabledImage = FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
             presentation, "art", "Layer", disabled);
-        mUnidentified50[i][0] = disabledImage->m_pTextureResource;
+        mCaptainTextures[i][0] = disabledImage->m_pTextureResource;
     }
 }
 
@@ -546,7 +546,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
     {
         return;
     }
-    if (mUnidentified30[other] == which && mUnidentified38[other])
+    if (mSelectedCaptains[other] == which && mConfirmed[other])
     {
         return;
     }
@@ -556,25 +556,25 @@ void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
         return;
     }
 
-    mUnidentified38[side] = true;
-    mUnidentified28[side] = -1;
-    mUnidentified40[side] = lbl_8051CE60[mUnidentified30[side]];
-    mUnidentified132C[side]->SetActiveSlide("off", true, false);
-    mUnidentified920[side].SetPointerState(0, index);
+    mConfirmed[side] = true;
+    mSidePads[side] = -1;
+    mCaptainIds[side] = lbl_8051CE60[mSelectedCaptains[side]];
+    mSelectDisplays[side]->SetActiveSlide("off", true, false);
+    mSelectButtons[side].SetPointerState(0, index);
     for (int i = 0; i < 4; ++i)
     {
         mCaptainButtons[which].SetPointerState(0, i);
     }
-    mUnidentified1318[side]->m_bVisible = false;
+    mGreenArrows[side]->m_bVisible = false;
 
-    int selectedCaptain = lbl_8051CE60[mUnidentified30[side]];
+    int selectedCaptain = lbl_8051CE60[mSelectedCaptains[side]];
     FEAudio::PlayAnimAudioEvent(FECharacterSound::GetCaptainAcceptSound((eTeamID)selectedCaptain), 0, 0, 1);
 
-    if (!mUnidentified3C[side])
+    if (!mChangeTextShown[side])
     {
-        fn_80227BCC(side);
+        UpdateSelectText(side);
     }
-    mUnidentified1304[side]->m_bVisible = true;
+    mSelectButtonInstances[side]->m_bVisible = true;
 }
 
 /**
@@ -590,7 +590,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerInside(int index, void* context)
         return;
     }
 
-    if (mUnidentified30[side] == which)
+    if (mSelectedCaptains[side] == which)
     {
         return;
     }
@@ -620,7 +620,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
         return;
     }
 
-    if (mUnidentified30[other] == which && mUnidentified38[other])
+    if (mSelectedCaptains[other] == which && mConfirmed[other])
     {
         return;
     }
@@ -631,7 +631,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
         return;
     }
 
-    mUnidentified30[side] = which;
+    mSelectedCaptains[side] = which;
     int selectedCaptain = lbl_8051CE60[which];
 
     if (mSceneType == ST_STRIKER_CUP)
@@ -644,7 +644,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
 
     if (!mCaptainButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified12D4[which]->SetActiveSlide("over", true, false);
+        mCaptainInstances[which]->SetActiveSlide("over", true, false);
     }
 
     mCaptainButtons[which].SetPointerState(1, index);
@@ -681,7 +681,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerLeave(int index, void* context)
 
     if (!mCaptainButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified12D4[which]->SetActiveSlide("off", true, false);
+        mCaptainInstances[which]->SetActiveSlide("off", true, false);
     }
 
     mCaptainButtons[which].SetPointerState(0, index);
@@ -690,35 +690,35 @@ void ChooseCaptainsSceneV2::OnCaptainPointerLeave(int index, void* context)
 void ChooseCaptainsSceneV2::OnSelectPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
-    if (mUnidentified28[which] != -1 || GetSide(index) != -1)
+    if (mSidePads[which] != -1 || GetSide(index) != -1)
         return;
-    mUnidentified28[which] = index;
-    mUnidentified38[which] = false;
-    mUnidentified3A[which] = false;
+    mSidePads[which] = index;
+    mConfirmed[which] = false;
+    mReadyPressed[which] = false;
     mCaptainComponents[which].SetReadyPromptVisible(false);
-    if (!mUnidentified4C)
+    if (!mCaptainsShown)
     {
-        mUnidentified1320->m_bVisible = true;
-        mUnidentified1320->SetActiveSlide("in", true, false);
-        mUnidentified4C = true;
+        mCaptainsLayer->m_bVisible = true;
+        mCaptainsLayer->SetActiveSlide("in", true, false);
+        mCaptainsShown = true;
         FEAudio::PlayAnimAudioEvent(0xDF52130F, 0, 0, true);
-        mCaptainComponents[0].ApplyCaptainColours(mUnidentified40[0], -1);
-        mCaptainComponents[1].ApplyCaptainColours(mUnidentified40[1], -1);
+        mCaptainComponents[0].ApplyCaptainColours(mCaptainIds[0], -1);
+        mCaptainComponents[1].ApplyCaptainColours(mCaptainIds[1], -1);
     }
-    if (!mUnidentified48[which])
+    if (!mSideJoined[which])
     {
-        mUnidentified132C[which] = mUnidentified1304[which];
-        mUnidentified48[which] = true;
+        mSelectDisplays[which] = mSelectButtonInstances[which];
+        mSideJoined[which] = true;
         SetSelectButtonBounds(which);
-        TLSlide* slide = FEFinder<TLSlide, TLAT_SLIDE>::Find(mUnidentified1324[which], "in");
+        TLSlide* slide = FEFinder<TLSlide, TLAT_SLIDE>::Find(mPDALayers[which], "in");
         slide->m_time = slide->GetStartTime() + slide->GetDuration();
-        mUnidentified1324[which]->SetActiveSlide(slide, false, true);
+        mPDALayers[which]->SetActiveSlide(slide, false, true);
     }
-    mUnidentified132C[which]->SetActiveSlide("down", true, false);
-    mUnidentified920[which].ResetPointerStates();
-    mUnidentifiedA88[which].ResetPointerStates();
-    mUnidentifiedBF0.ResetPointerStates();
-    if (mUnidentified48[which])
+    mSelectDisplays[which]->SetActiveSlide("down", true, false);
+    mSelectButtons[which].ResetPointerStates();
+    mReadyButtons[which].ResetPointerStates();
+    mDoneButton.ResetPointerStates();
+    if (mSideJoined[which])
         FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, true);
     else
         FEAudio::PlayAnimAudioEvent(0x50204AFA, 0, 0, true);
@@ -731,16 +731,16 @@ void ChooseCaptainsSceneV2::OnSelectPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
-    if (mUnidentified28[which] != -1 || GetSide(index) != -1)
+    if (mSidePads[which] != -1 || GetSide(index) != -1)
     {
         return;
     }
 
-    if (!mUnidentified920[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified132C[which]->SetActiveSlide("over", true, false);
+        mSelectDisplays[which]->SetActiveSlide("over", true, false);
 
-        if (mUnidentified48[which])
+        if (mSideJoined[which])
         {
             FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
         }
@@ -750,8 +750,8 @@ void ChooseCaptainsSceneV2::OnSelectPointerEnter(int index, void* context)
         }
     }
 
-    mUnidentified920[which].SetPointerState(1, index);
-    mUnidentified920[which].PlayHoverFeedback(index);
+    mSelectButtons[which].SetPointerState(1, index);
+    mSelectButtons[which].PlayHoverFeedback(index);
 }
 
 /**
@@ -761,17 +761,17 @@ void ChooseCaptainsSceneV2::OnSelectPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
-    if (mUnidentified28[which] != -1 || GetSide(index) != -1)
+    if (mSidePads[which] != -1 || GetSide(index) != -1)
     {
         return;
     }
 
-    if (!mUnidentified920[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified132C[which]->SetActiveSlide("off", true, false);
+        mSelectDisplays[which]->SetActiveSlide("off", true, false);
     }
 
-    mUnidentified920[which].SetPointerState(0, index);
+    mSelectButtons[which].SetPointerState(0, index);
 }
 
 /**
@@ -781,18 +781,18 @@ void ChooseCaptainsSceneV2::OnSelectPointerInside(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
-    if (mUnidentified28[which] != -1 || GetSide(index) != -1)
+    if (mSidePads[which] != -1 || GetSide(index) != -1)
     {
         return;
     }
 
-    if (mUnidentified920[which].GetPointerState(index) == 0 && mUnidentified28[which] == -1 && GetSide(index) == -1)
+    if (mSelectButtons[which].GetPointerState(index) == 0 && mSidePads[which] == -1 && GetSide(index) == -1)
     {
-        if (!mUnidentified920[which].HasOtherPointerState(1, index))
+        if (!mSelectButtons[which].HasOtherPointerState(1, index))
         {
-            mUnidentified132C[which]->SetActiveSlide("over", true, false);
+            mSelectDisplays[which]->SetActiveSlide("over", true, false);
 
-            if (mUnidentified48[which])
+            if (mSideJoined[which])
             {
                 FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
             }
@@ -802,8 +802,8 @@ void ChooseCaptainsSceneV2::OnSelectPointerInside(int index, void* context)
             }
         }
 
-        mUnidentified920[which].SetPointerState(1, index);
-        mUnidentified920[which].PlayHoverFeedback(index);
+        mSelectButtons[which].SetPointerState(1, index);
+        mSelectButtons[which].PlayHoverFeedback(index);
     }
 }
 
@@ -815,19 +815,19 @@ void ChooseCaptainsSceneV2::OnReadyPointerPress(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified28[which] != -1 || side != -1 || !mUnidentified38[which] || mUnidentified3A[which])
+    if (mSidePads[which] != -1 || side != -1 || !mConfirmed[which] || mReadyPressed[which])
     {
         return;
     }
 
-    mUnidentified130C[which]->SetActiveSlide("down", true, false);
+    mOkButtonInstances[which]->SetActiveSlide("down", true, false);
 
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentifiedA88[which].SetPointerState(0, i);
+        mReadyButtons[which].SetPointerState(0, i);
     }
 
-    mUnidentified3A[which] = true;
+    mReadyPressed[which] = true;
     mCaptainComponents[which].SetReadyPromptVisible(true);
 }
 
@@ -836,18 +836,18 @@ void ChooseCaptainsSceneV2::OnReadyPointerPress(int index, void* context)
  */
 void ChooseCaptainsSceneV2::OnReadyPointerEnter(int index, void* context)
 {
-    if (mUnidentified28[(unsigned long)context] != -1 || GetSide(index) != -1
-        || !mUnidentified38[(unsigned long)context] || mUnidentified3A[(unsigned long)context])
+    if (mSidePads[(unsigned long)context] != -1 || GetSide(index) != -1
+        || !mConfirmed[(unsigned long)context] || mReadyPressed[(unsigned long)context])
     {
         return;
     }
 
-    if (!mUnidentifiedA88[(unsigned long)context].HasOtherPointerState(1, index))
+    if (!mReadyButtons[(unsigned long)context].HasOtherPointerState(1, index))
     {
-        mUnidentified130C[(unsigned long)context]->SetActiveSlide("over", true, false);
+        mOkButtonInstances[(unsigned long)context]->SetActiveSlide("over", true, false);
     }
 
-    mUnidentifiedA88[(unsigned long)context].SetPointerState(1, index);
+    mReadyButtons[(unsigned long)context].SetPointerState(1, index);
 }
 
 /**
@@ -857,17 +857,17 @@ void ChooseCaptainsSceneV2::OnReadyPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
 
-    if (mUnidentified28[which] != -1 || GetSide(index) != -1 || !mUnidentified38[which] || mUnidentified3A[which])
+    if (mSidePads[which] != -1 || GetSide(index) != -1 || !mConfirmed[which] || mReadyPressed[which])
     {
         return;
     }
 
-    if (!mUnidentifiedA88[which].HasOtherPointerState(1, index))
+    if (!mReadyButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified130C[which]->SetActiveSlide("off", true, false);
+        mOkButtonInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mUnidentifiedA88[which].SetPointerState(0, index);
+    mReadyButtons[which].SetPointerState(0, index);
 }
 
 /**
@@ -875,13 +875,13 @@ void ChooseCaptainsSceneV2::OnReadyPointerLeave(int index, void* context)
  */
 void ChooseCaptainsSceneV2::OnReadyPointerInside(int index, void* context)
 {
-    if (mUnidentified28[(unsigned long)context] != -1 || GetSide(index) != -1
-        || !mUnidentified38[(unsigned long)context] || mUnidentified3A[(unsigned long)context])
+    if (mSidePads[(unsigned long)context] != -1 || GetSide(index) != -1
+        || !mConfirmed[(unsigned long)context] || mReadyPressed[(unsigned long)context])
     {
         return;
     }
 
-    if (mUnidentifiedA88[(unsigned long)context].GetPointerState(index) == 0)
+    if (mReadyButtons[(unsigned long)context].GetPointerState(index) == 0)
     {
         OnReadyPointerEnter(index, context);
     }
@@ -892,41 +892,41 @@ void ChooseCaptainsSceneV2::OnReadyPointerInside(int index, void* context)
  */
 void ChooseCaptainsSceneV2::OnDonePointerPress(int index, void* context)
 {
-    if (!mUnidentified38[0] || !mUnidentified38[1])
+    if (!mConfirmed[0] || !mConfirmed[1])
     {
         return;
     }
 
-    mUnidentified1314->SetActiveSlide("down", true, false);
+    mDoneButtonInstance->SetActiveSlide("down", true, false);
 
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentifiedBF0.SetPointerState(0, i);
+        mDoneButton.SetPointerState(0, i);
     }
 
-    mUnidentifiedBF0.Disable();
-    mUnidentified4E = true;
+    mDoneButton.Disable();
+    mInputSuppressed = true;
 
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
     FEAudio::PlayAnimAudioEvent(0x2A10C1C3, 0, 0, 1);
 
-    mUnidentified1380 = 2;
+    mState = 2;
     GetNavigationScene()->HideButtons();
 
-    mUnidentified1324[0]->SetActiveSlide("out", true, false);
-    mUnidentified1324[1]->SetActiveSlide("out", true, false);
-    mUnidentified1334->SetActiveSlide("out", true, false);
+    mPDALayers[0]->SetActiveSlide("out", true, false);
+    mPDALayers[1]->SetActiveSlide("out", true, false);
+    mCupPDALayer->SetActiveSlide("out", true, false);
 
     if (mSceneType == ST_STRIKER_CUP)
     {
-        g_pCupManager->unknown_0x8A28 = mUnidentified40[0];
+        g_pCupManager->mPendingCupTeam = mCaptainIds[0];
     }
     else
     {
-        GameInfoManager::Instance()->SetTeam(0, mUnidentified40[0]);
+        GameInfoManager::Instance()->SetTeam(0, mCaptainIds[0]);
         if (GameInfoManager::Instance()->mIsOnlineMode == 0)
         {
-            GameInfoManager::Instance()->SetTeam(1, mUnidentified40[1]);
+            GameInfoManager::Instance()->SetTeam(1, mCaptainIds[1]);
         }
     }
 }
@@ -936,19 +936,19 @@ void ChooseCaptainsSceneV2::OnDonePointerPress(int index, void* context)
  */
 void ChooseCaptainsSceneV2::OnDonePointerEnter(int index, void* context)
 {
-    if (!mUnidentified38[0] || !mUnidentified38[1])
+    if (!mConfirmed[0] || !mConfirmed[1])
     {
         return;
     }
 
-    if (!mUnidentifiedBF0.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(1, index))
     {
-        mUnidentified1314->SetActiveSlide("over", true, false);
+        mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mUnidentifiedBF0.SetPointerState(1, index);
-    mUnidentifiedBF0.PlayHoverFeedback(index);
+    mDoneButton.SetPointerState(1, index);
+    mDoneButton.PlayHoverFeedback(index);
 }
 
 /**
@@ -956,17 +956,17 @@ void ChooseCaptainsSceneV2::OnDonePointerEnter(int index, void* context)
  */
 void ChooseCaptainsSceneV2::OnDonePointerLeave(int index, void* context)
 {
-    if (!mUnidentified38[0] || !mUnidentified38[1])
+    if (!mConfirmed[0] || !mConfirmed[1])
     {
         return;
     }
 
-    if (!mUnidentifiedBF0.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(1, index))
     {
-        mUnidentified1314->SetActiveSlide("off", true, false);
+        mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mUnidentifiedBF0.SetPointerState(0, index);
+    mDoneButton.SetPointerState(0, index);
 }
 
 /**
@@ -974,12 +974,12 @@ void ChooseCaptainsSceneV2::OnDonePointerLeave(int index, void* context)
  */
 void ChooseCaptainsSceneV2::OnDonePointerInside(int index, void* context)
 {
-    if (!mUnidentified38[0] || !mUnidentified38[1])
+    if (!mConfirmed[0] || !mConfirmed[1])
     {
         return;
     }
 
-    if (mUnidentifiedBF0.GetPointerState(index) == 0)
+    if (mDoneButton.GetPointerState(index) == 0)
     {
         OnDonePointerEnter(index, context);
     }
@@ -995,18 +995,18 @@ void ChooseCaptainsSceneV2::InitializeCaptainButtons()
     FEPointerListener::Callback inside(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnCaptainPointerInside), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback press(PointerBinding(MemFun(&ChooseCaptainsSceneV2::OnCaptainPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
-    TLInstance* captains = FEFinder<TLInstance, 4>::Find(mUnidentified1320, "in", "captains");
-    feVector3 scale = mUnidentified1320->GetAssetScale();
-    feVector3 position = mUnidentified1320->GetAssetPosition();
+    TLInstance* captains = FEFinder<TLInstance, 4>::Find(mCaptainsLayer, "in", "captains");
+    feVector3 scale = mCaptainsLayer->GetAssetScale();
+    feVector3 position = mCaptainsLayer->GetAssetPosition();
     feVector3 captainPosition = captains->GetAssetPosition();
     for (int i = 0; i < 12; ++i)
     {
-        feVector3 itemPosition = mUnidentified12D4[i]->GetAssetPosition();
+        feVector3 itemPosition = mCaptainInstances[i]->GetAssetPosition();
         float x = position.f.x + captainPosition.f.x;
         float y = position.f.y + captainPosition.f.y;
         x += itemPosition.f.x * scale.f.x;
         y += itemPosition.f.y * scale.f.y;
-        mCaptainButtons[i].SetInstanceBounds(mUnidentified1338[i], false, x, y, 1.0f, 1.0f);
+        mCaptainButtons[i].SetInstanceBounds(mCaptainImages[i], false, x, y, 1.0f, 1.0f);
         mCaptainButtons[i].SetPointerEnterCallback(enter);
         mCaptainButtons[i].SetPointerLeaveCallback(leave);
         mCaptainButtons[i].SetPointerInsideCallback(inside);
@@ -1039,26 +1039,26 @@ void ChooseCaptainsSceneV2::InitializePointerButtons()
 
         SetSelectButtonBounds(side);
 
-        mUnidentified920[side].SetPointerEnterCallback(selectEnter);
-        mUnidentified920[side].SetPointerLeaveCallback(selectLeave);
-        mUnidentified920[side].SetPointerInsideCallback(selectInside);
-        mUnidentified920[side].SetPointerPressCallback(selectPress);
+        mSelectButtons[side].SetPointerEnterCallback(selectEnter);
+        mSelectButtons[side].SetPointerLeaveCallback(selectLeave);
+        mSelectButtons[side].SetPointerInsideCallback(selectInside);
+        mSelectButtons[side].SetPointerPressCallback(selectPress);
     }
 
-    SetDoneButtonBounds(&mUnidentifiedBF0, mUnidentified1314, 0);
-    mUnidentifiedBF0.SetPointerEnterCallback(doneEnter);
-    mUnidentifiedBF0.SetPointerLeaveCallback(doneLeave);
-    mUnidentifiedBF0.SetPointerInsideCallback(doneInside);
-    mUnidentifiedBF0.SetPointerPressCallback(donePress);
+    SetDoneButtonBounds(&mDoneButton, mDoneButtonInstance, 0);
+    mDoneButton.SetPointerEnterCallback(doneEnter);
+    mDoneButton.SetPointerLeaveCallback(doneLeave);
+    mDoneButton.SetPointerInsideCallback(doneInside);
+    mDoneButton.SetPointerPressCallback(donePress);
 }
 
-void ChooseCaptainsSceneV2::fn_80227308()
+void ChooseCaptainsSceneV2::UpdatePointerCursors()
 {
     bool idle[2] = { true, true };
     for (int i = 0; i < 4; ++i)
     {
         TLComponentInstance* pointer = GetPointerInstance(i);
-        if (mUnidentified28[0] != -1 && mUnidentified28[0] != i && mUnidentified28[1] != -1 && mUnidentified28[1] != i)
+        if (mSidePads[0] != -1 && mSidePads[0] != i && mSidePads[1] != -1 && mSidePads[1] != i)
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
@@ -1066,19 +1066,19 @@ void ChooseCaptainsSceneV2::fn_80227308()
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
-        else if (g_pNetworkSessionBase->GetSessionMode() != 0 && !fn_80223D08(i))
+        else if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
         else
         {
             pointer->SetActiveSlide("cursor", true, false);
-            bool overButton = mUnidentifiedBF0.GetPointerState(i) == 1;
+            bool overButton = mDoneButton.GetPointerState(i) == 1;
             if (!overButton)
             {
                 for (int side = 0; side < 2; ++side)
                 {
-                    if (mUnidentifiedA88[side].GetPointerState(i) == 1 || mUnidentified920[side].GetPointerState(i) == 1)
+                    if (mReadyButtons[side].GetPointerState(i) == 1 || mSelectButtons[side].GetPointerState(i) == 1)
                     {
                         overButton = true;
                         break;
@@ -1091,9 +1091,9 @@ void ChooseCaptainsSceneV2::fn_80227308()
                 {
                     if (mCaptainButtons[j].GetPointerState(i) == 1)
                     {
-                        if (mUnidentified28[0] == i)
+                        if (mSidePads[0] == i)
                             idle[0] = false;
-                        else if (mUnidentified28[1] == i)
+                        else if (mSidePads[1] == i)
                             idle[1] = false;
                         break;
                     }
@@ -1103,13 +1103,13 @@ void ChooseCaptainsSceneV2::fn_80227308()
     }
     for (int side = 0; side < 2; ++side)
     {
-        if (mUnidentified28[side] != -1 && idle[side] == true)
+        if (mSidePads[side] != -1 && idle[side] == true)
         {
-            mUnidentified30[side] = -1;
-            mCaptainComponents[side].SetCaptainInfo(-1, mUnidentified28[side], 1);
+            mSelectedCaptains[side] = -1;
+            mCaptainComponents[side].SetCaptainInfo(-1, mSidePads[side], 1);
             if (mSceneType == ST_STRIKER_CUP)
             {
-                mCaptainComponents[1].SetCaptainInfo(-1, mUnidentified28[side], 1);
+                mCaptainComponents[1].SetCaptainInfo(-1, mSidePads[side], 1);
                 mCaptainComponents[1].SetDisplayMode(0);
             }
         }
@@ -1117,11 +1117,11 @@ void ChooseCaptainsSceneV2::fn_80227308()
     for (int i = 0; i < 12; ++i)
     {
         if (!mCaptainButtons[i].HasOtherPointerState(1, -1))
-            mUnidentified12D4[i]->SetActiveSlide("off", true, false);
+            mCaptainInstances[i]->SetActiveSlide("off", true, false);
     }
 }
 
-void ChooseCaptainsSceneV2::fn_80227608()
+void ChooseCaptainsSceneV2::RefreshCaptainImages()
 {
     for (int i = 0; i < 12; ++i)
     {
@@ -1130,17 +1130,17 @@ void ChooseCaptainsSceneV2::fn_80227608()
         char texture[32];
         nlSNPrintf(name, sizeof(name), "%d", i);
         nlSNPrintf(texture, sizeof(texture), "%02d_dummy_texture", i);
-        TLInstance* group = FEFinder<TLInstance, -1>::Find<TLSlide>(mUnidentified12D4[i]->GetActiveSlide(), name);
-        mUnidentified1338[i] = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(group, texture);
+        TLInstance* group = FEFinder<TLInstance, -1>::Find<TLSlide>(mCaptainInstances[i]->GetActiveSlide(), name);
+        mCaptainImages[i] = FEFinder<TLImageInstance, TLAT_IMAGE>::Find(group, texture);
         TLInstance* noise = FEFinder<TLInstance, -1>::Find(group, "noise");
         noise->m_bVisible = false;
-        if ((mUnidentified38[0] && mUnidentified30[0] == i) || (mUnidentified38[1] && mUnidentified30[1] == i))
+        if ((mConfirmed[0] && mSelectedCaptains[0] == i) || (mConfirmed[1] && mSelectedCaptains[1] == i))
         {
-            mUnidentified1338[i]->SetTextureResource(mUnidentified50[i][0]);
+            mCaptainImages[i]->SetTextureResource(mCaptainTextures[i][0]);
         }
         else if (NetworkDraft::Instance()->fn_8022819C() && NetworkDraft::Instance()->IsCaptainTaken(captain))
         {
-            mUnidentified1338[i]->SetTextureResource(mUnidentified50[i][0]);
+            mCaptainImages[i]->SetTextureResource(mCaptainTextures[i][0]);
         }
         else if ((captain == 9 && !IsBowserJrUnlocked()) || (captain == 10 && !IsDiddyKongUnlocked())
                  || (captain == 11 && !IsPeteyUnlocked()))
@@ -1149,39 +1149,39 @@ void ChooseCaptainsSceneV2::fn_80227608()
         }
         else
         {
-            mUnidentified1338[i]->SetTextureResource(mUnidentified50[i][1]);
+            mCaptainImages[i]->SetTextureResource(mCaptainTextures[i][1]);
         }
     }
 }
 
-void ChooseCaptainsSceneV2::fn_80227988()
+void ChooseCaptainsSceneV2::UpdateDoneButton()
 {
-    TLSlide* slide = mUnidentified1314->GetActiveSlide();
-    if (mUnidentifiedBF0.mDisabled && mUnidentified4D
+    TLSlide* slide = mDoneButtonInstance->GetActiveSlide();
+    if (mDoneButton.mDisabled && mBothConfirmed
         && slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration()
         && nlStrNCmp<char>(slide->m_szName, "in", 4) == 0)
     {
-        mCaptainComponents[0].ApplyCaptainColours(mUnidentified40[0], mUnidentified40[1]);
-        mCaptainComponents[1].ApplyCaptainColours(mUnidentified40[1], mUnidentified40[0]);
-        mUnidentifiedBF0.Enable();
+        mCaptainComponents[0].ApplyCaptainColours(mCaptainIds[0], mCaptainIds[1]);
+        mCaptainComponents[1].ApplyCaptainColours(mCaptainIds[1], mCaptainIds[0]);
+        mDoneButton.Enable();
     }
-    if (mUnidentified38[0] && mUnidentified38[1] && !mUnidentified4D)
+    if (mConfirmed[0] && mConfirmed[1] && !mBothConfirmed)
     {
-        mUnidentified4D = true;
-        mUnidentified1314->m_bVisible = true;
-        mUnidentified1314->SetActiveSlide("in", true, false);
+        mBothConfirmed = true;
+        mDoneButtonInstance->m_bVisible = true;
+        mDoneButtonInstance->SetActiveSlide("in", true, false);
         FEAudio::PlayAnimAudioEvent(0x2AB04562, 0, 0, true);
     }
-    else if (!mUnidentified38[0] || !mUnidentified38[1])
+    else if (!mConfirmed[0] || !mConfirmed[1])
     {
-        mUnidentified4D = false;
-        mUnidentified1314->m_bVisible = false;
-        mUnidentifiedBF0.Disable();
+        mBothConfirmed = false;
+        mDoneButtonInstance->m_bVisible = false;
+        mDoneButton.Disable();
     }
-    if (mUnidentified4D && mUnidentified4C)
+    if (mBothConfirmed && mCaptainsShown)
     {
-        mUnidentified4C = false;
-        mUnidentified1320->SetActiveSlide("out", true, false);
+        mCaptainsShown = false;
+        mCaptainsLayer->SetActiveSlide("out", true, false);
         FEAudio::PlayAnimAudioEvent(0x0B8C09FA, 0, 0, true);
     }
 }
@@ -1189,57 +1189,57 @@ void ChooseCaptainsSceneV2::fn_80227988()
 /**
  * Offset/Address/Size: 0x5B34 | 0x80227BCC | size: 0x1DC
  */
-void ChooseCaptainsSceneV2::fn_80227BCC(int which)
+void ChooseCaptainsSceneV2::UpdateSelectText(int which)
 {
-    TLTextInstance* offText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified1304[which],
+    TLTextInstance* offText = FEFinder<TLTextInstance, 3>::FindOrDefault(mSelectButtonInstances[which],
         "off",
         "Group",
         "select text");
-    TLTextInstance* overText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified1304[which],
+    TLTextInstance* overText = FEFinder<TLTextInstance, 3>::FindOrDefault(mSelectButtonInstances[which],
         "over",
         "Group",
         "select text");
-    TLTextInstance* downText = FEFinder<TLTextInstance, 3>::FindOrDefault(mUnidentified1304[which],
+    TLTextInstance* downText = FEFinder<TLTextInstance, 3>::FindOrDefault(mSelectButtonInstances[which],
         "down",
         "Group",
         "select text");
 
-    if (!mUnidentified3C[which])
+    if (!mChangeTextShown[which])
     {
         offText->SetStringId("CHANGE_CAPTAIN");
         overText->SetStringId("CHANGE_CAPTAIN");
         downText->SetStringId("CHANGE_CAPTAIN");
-        mUnidentified3C[which] = true;
+        mChangeTextShown[which] = true;
     }
     else
     {
         offText->SetStringId("SELECT");
         overText->SetStringId("SELECT");
         downText->SetStringId("SELECT");
-        mUnidentified3C[which] = false;
+        mChangeTextShown[which] = false;
     }
 }
 
-void ChooseCaptainsSceneV2::fn_80227DA8(int index)
+void ChooseCaptainsSceneV2::ReleaseController(int index)
 {
     eTeamSide side;
-    if (mUnidentified28[0] == index)
+    if (mSidePads[0] == index)
         side = HOME;
     else
         side = AWAY;
-    mUnidentified132C[side]->SetActiveSlide("off", true, false);
-    mUnidentified920[side].SetPointerState(0, index);
+    mSelectDisplays[side]->SetActiveSlide("off", true, false);
+    mSelectButtons[side].SetPointerState(0, index);
     mCaptainComponents[side].SetCaptainInfo(-1, index, 1);
-    mUnidentified1318[side]->m_bVisible = false;
-    mUnidentified28[side] = -1;
-    mUnidentified132C[side] = mUnidentified1324[side];
-    mUnidentified1324[side]->SetActiveSlide("off", true, false);
-    mUnidentified1304[side]->m_bVisible = false;
-    mUnidentified48[side] = false;
+    mGreenArrows[side]->m_bVisible = false;
+    mSidePads[side] = -1;
+    mSelectDisplays[side] = mPDALayers[side];
+    mPDALayers[side]->SetActiveSlide("off", true, false);
+    mSelectButtonInstances[side]->m_bVisible = false;
+    mSideJoined[side] = false;
     SetSelectButtonBounds(side);
     if (mSceneType == ST_STRIKER_CUP)
     {
-        mCaptainComponents[1].SetCaptainInfo(-1, mUnidentified28[side], 1);
+        mCaptainComponents[1].SetCaptainInfo(-1, mSidePads[side], 1);
         mCaptainComponents[1].SetDisplayMode(0);
     }
 }
@@ -1247,21 +1247,21 @@ void ChooseCaptainsSceneV2::fn_80227DA8(int index)
 /**
  * Offset/Address/Size: 0x60A8 | 0x80228140 | size: 0x5C
  */
-void ChooseCaptainsSceneV2::fn_80228140()
+void ChooseCaptainsSceneV2::OnDisconnectDismissed()
 {
-    mUnidentified1C = false;
+    mPopupActive = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
     GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
 }
 
 int ChooseCaptainsSceneV2::GetSide(unsigned long pad)
 {
-    if (mUnidentified28[0] == pad)
+    if (mSidePads[0] == pad)
     {
         return 0;
     }
 
-    if (mUnidentified28[1] == pad)
+    if (mSidePads[1] == pad)
     {
         return 1;
     }
@@ -1271,23 +1271,23 @@ int ChooseCaptainsSceneV2::GetSide(unsigned long pad)
 
 void ChooseCaptainsSceneV2::SetSelectButtonBounds(int side)
 {
-    if (mUnidentified48[side])
+    if (mSideJoined[side])
     {
-        TLInstance* button = FEFinder<TLInstance, 4>::Find(mUnidentified1304[side], "off", "Group", "button_select");
-        feVector3 position = mUnidentified1304[side]->GetAssetPosition();
-        mUnidentified920[side].SetInstanceBounds(button, false, position.f.x - 157.0f, position.f.y + 159.0f, 0.75f, 0.5f);
+        TLInstance* button = FEFinder<TLInstance, 4>::Find(mSelectButtonInstances[side], "off", "Group", "button_select");
+        feVector3 position = mSelectButtonInstances[side]->GetAssetPosition();
+        mSelectButtons[side].SetInstanceBounds(button, false, position.f.x - 157.0f, position.f.y + 159.0f, 0.75f, 0.5f);
     }
     else
     {
-        feVector3 position = mUnidentified132C[side]->GetAssetPosition();
+        feVector3 position = mSelectDisplays[side]->GetAssetPosition();
         TLInstance* clickable;
         if (side == 0)
-            clickable = FEFinder<TLInstance, 4>::Find(mUnidentified132C[side], "off", "clickable");
+            clickable = FEFinder<TLInstance, 4>::Find(mSelectDisplays[side], "off", "clickable");
         else
-            clickable = FEFinder<TLInstance, 4>::Find(mUnidentified132C[side], "off", "clickable_AWAY");
+            clickable = FEFinder<TLInstance, 4>::Find(mSelectDisplays[side], "off", "clickable_AWAY");
         feVector3 clickablePosition = clickable->GetAssetPosition();
         TLInstance* button = FEFinder<TLInstance, 4>::Find(clickable, "attributes_frame2");
-        mUnidentified920[side].SetInstanceBounds(button, true, position.f.x + clickablePosition.f.x, position.f.y + clickablePosition.f.y, 1.0f, 1.0f);
+        mSelectButtons[side].SetInstanceBounds(button, true, position.f.x + clickablePosition.f.x, position.f.y + clickablePosition.f.y, 1.0f, 1.0f);
     }
 }
 
@@ -1298,7 +1298,7 @@ inline void ChooseCaptainsSceneV2::ShowDisconnectedError()
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseCaptainsSceneV2::fn_80228140), this)));
-        mUnidentified1C = true;
+        popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseCaptainsSceneV2::OnDisconnectDismissed), this)));
+        mPopupActive = true;
     }
 }

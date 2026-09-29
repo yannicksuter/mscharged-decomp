@@ -511,7 +511,7 @@ void MoviePlayerControl::Start(const char* filename)
     {
         nlStrNCpy<char>(mMovieFilename, filename, sizeof(mMovieFilename));
         mMovieStarted = MovieStart(mMovieFilename, mWithSound, mLoopMovie, SCGetSoundMode() == 0);
-        fn_80370E90(false);
+        SetSyncedDecode(false);
 
         const char* streamName;
         if (strstr(mMovieFilename, "nlg"))
@@ -541,7 +541,7 @@ const char* gMovieTextureName = "movie";
 
 void MoviePlayerControl::Update(float)
 {
-    if (fn_803713C4())
+    if (IsMovieActive())
     {
         if (!mMovieStarted)
         {
@@ -558,10 +558,10 @@ void MoviePlayerControl::Update(float)
                 }
                 mSwappedTexture = true;
             }
-            if (fn_803713CC())
+            if (IsMovieFinished())
             {
                 ++mEndFrameCount;
-                fn_803713D4();
+                ClearMovieFinished();
                 if (mEndFrameCount >= 5)
                 {
                     Stop();

@@ -530,7 +530,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
-            scene->fn_801CA9E0(false);
+            scene->SetTimerVisible(false);
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         mPopup.pMessage = new (8, false) WStr(Format<WStr>(message, gOnlineErrorCode));
         mPopup.numOptions = 1;
@@ -589,7 +589,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     case 39:
     {
         int value = 0;
-        CupManager::Instance()->fn_8010DE2C(&value);
+        CupManager::Instance()->GetGoalsAgainstLeader(&value);
         char number[8];
         unsigned short wideNumber[8];
         nlSNPrintf(number, sizeof(number), "%d", value);
@@ -605,7 +605,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     case 40:
     {
         int value = 0;
-        CupManager::Instance()->fn_8010D9C4(&value);
+        CupManager::Instance()->GetGoalsForLeader(&value);
         char number[8];
         unsigned short wideNumber[8];
         nlSNPrintf(number, sizeof(number), "%d", value);
@@ -620,7 +620,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     }
     case 47:
     {
-        int captain = fn_801CA670()->fn_801CAA18();
+        int captain = GetStrikerChallenge()->GetCurrentCaptain();
         const char* captainName = GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).GetName();
         char key[64];
         nlSNPrintf(key, sizeof(key), "POPUP_CHALLENGE_UNLOCK_%s", captainName);
@@ -652,7 +652,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
-                scene->fn_801CA9E0(false);
+                scene->SetTimerVisible(false);
             break;
         }
         }

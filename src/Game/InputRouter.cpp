@@ -102,7 +102,7 @@ void InputRouter::Reset(int)
         &sDetermDataDispatcher.callbacks.m_Allocator;
     callbackPool->FreeBlocks();
 
-    sDetermDataEventQueue.UnidentifiedRemoveAll();
+    sDetermDataEventQueue.RemoveAll();
     BasicSlotPool<DLListEntry<UnidentifiedListener<DetermDataEvent> > >*
         listenerPool = &sDetermDataEventQueue.mListeners.m_Allocator;
     listenerPool->FreeBlocks();

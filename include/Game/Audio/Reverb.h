@@ -4,10 +4,13 @@
 #include "Game/Audio/AudioEffect.h"
 #include "NL/nlSlotPool.h"
 
+struct AXFX_REVERBHI;
+
 class ReverbParameter : public AudioEffectParameter
 {
 public:
     ReverbParameter();
+    void ApplySettings(AXFX_REVERBHI* reverb);
     virtual ~ReverbParameter() { }
 
     static void* operator new(unsigned long)
@@ -38,7 +41,6 @@ class Reverb : public AudioEffectBase
 {
 public:
     Reverb();
-    virtual ~Reverb() { }
     virtual void CreateParameter(unsigned int, void*, bool, AudioEffectParameter**);
     virtual void BeginBlend()
     {

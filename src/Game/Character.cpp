@@ -190,7 +190,7 @@ bool cCharacter::IsPlayingEffect(const EffectsGroup* effectGroup) const
         (unsigned long)this, effectGroup);
 }
 
-bool cCharacter::fn_8001E2C0(const EffectsGroup* effectGroup) const
+bool cCharacter::IsEffectDying(const EffectsGroup* effectGroup) const
 {
     return EmissionManager::Instance()->IsDying(
         (unsigned long)this, effectGroup);
@@ -362,8 +362,8 @@ void cCharacter::Unknown10(const nlVector3& v3Position, unsigned short aDirectio
     m_pPoseAccumulator->Pose(*m_pPoseTree, m_m4WorldMatrix);
     m_pPhysicsCharacter->UpdatePose(m_pPoseAccumulator, 0.0f, false);
     m_pPhysicsCharacter->UpdatePose(m_pPoseAccumulator, 0.0f, false);
-    mUnidentified17E = false;
-    mUnidentified17F = false;
+    m_bLeftPropAnimated = false;
+    m_bRightPropAnimated = false;
     mUnidentified180 = false;
     mUnidentified181 = false;
     mUnidentified182 = false;
@@ -713,8 +713,8 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     , mUnidentified178(1.0f)
     , mUnidentified17C(true)
     , mUnidentified17D(false)
-    , mUnidentified17E(false)
-    , mUnidentified17F(false)
+    , m_bLeftPropAnimated(false)
+    , m_bRightPropAnimated(false)
     , mUnidentified180(false)
     , mUnidentified181(false)
     , mUnidentified182(false)
@@ -1088,7 +1088,7 @@ extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData)
 extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
 {
     ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->egg->mShooter != NULL);
-    PlaySound(pEventData->egg->mShooter->mUnidentified318, 0x16BA5AE9UL, NULL, NULL);
+    PlaySound(pEventData->egg->mShooter->m_uSoundSlotId, 0x16BA5AE9UL, NULL, NULL);
 }
 extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
 {
@@ -1275,15 +1275,15 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                             pEventData->v3Position.y - pFielder->mUnidentified024.m_v3Position.y,
                             pEventData->v3Position.z - pFielder->mUnidentified024.m_v3Position.z);
                         float fDistance = nlVec3Length(v3Delta);
-                        if (fDistance < pEventData->fMagnitude)
+                        if (fDistance < pEventData->fRadius)
                         {
-                            if (fDistance >= pEventData->fMagnitude * lbl_806DB5F0)
+                            if (fDistance >= pEventData->fRadius * lbl_806DB5F0)
                             {
                                 pFielder->fn_800470B4(pFielder, (cPlayer*)pEventData->pCharacter);
                             }
                             else
                             {
-                                pFielder->CollideWithBobombCallback(pEventData->v3Position, pEventData->fMagnitude);
+                                pFielder->CollideWithBobombCallback(pEventData->v3Position, pEventData->fRadius);
                             }
                         }
                     }
@@ -1293,7 +1293,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                 nlVec3Set(v3Delta, pEventData->v3Position.x - pGoalie->mUnidentified024.m_v3Position.x,
                             pEventData->v3Position.y - pGoalie->mUnidentified024.m_v3Position.y,
                             pEventData->v3Position.z - pGoalie->mUnidentified024.m_v3Position.z);
-                if (nlVec3LengthSquared(v3Delta) < pEventData->fMagnitude * pEventData->fMagnitude)
+                if (nlVec3LengthSquared(v3Delta) < pEventData->fRadius * pEventData->fRadius)
                 {
                     pGoalie->fn_8008EC2C();
                 }
@@ -1323,9 +1323,9 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                             pEventData->v3Position.y - pFielder->mUnidentified024.m_v3Position.y,
                             pEventData->v3Position.z - pFielder->mUnidentified024.m_v3Position.z);
                         float fDistance = nlVec3Length(v3Delta);
-                        if (fDistance < pEventData->fMagnitude)
+                        if (fDistance < pEventData->fRadius)
                         {
-                            if (fDistance >= pEventData->fMagnitude * lbl_806DB5EC)
+                            if (fDistance >= pEventData->fRadius * lbl_806DB5EC)
                             {
                                 pFielder->fn_800470B4(pFielder, (cPlayer*)pEventData->pCharacter);
                             }
@@ -1432,7 +1432,7 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
             }
             else if (pUnidentified0->fn_800470B4(pUnidentified0, pUnidentified1))
             {
-                PlayOwnedSound(pUnidentified0->mUnidentified318, 0xFD0DC03DUL,
+                PlayOwnedSound(pUnidentified0->m_uSoundSlotId, 0xFD0DC03DUL,
                     (XSoundOwner*)g_pBall->mUnidentifiedEC, NULL, NULL);
             }
         }
@@ -1453,7 +1453,7 @@ extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData)
     {
         CreateBulletBillShockwave(pEventData->bulletBill);
         pEventData->bulletBill->Hide(false);
-        PlayOwnedSound(pEventData->bulletBill->target->mUnidentified318,
+        PlayOwnedSound(pEventData->bulletBill->target->m_uSoundSlotId,
             0xFD0DC03DUL, (XSoundOwner*)g_pBall->mUnidentifiedEC, NULL, NULL);
     }
 }
@@ -1473,8 +1473,8 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
         && pEventData->pTarget != NULL && pEventData->pAttacker != NULL
         && !pEventData->mUnidentified10)
     {
-        if (pEventData->pAttacker->fn_8001E168()
-            && pEventData->pTarget->fn_8001E168())
+        if (pEventData->pAttacker->IsCaptain()
+            && pEventData->pTarget->IsCaptain())
         {
             PlayCrowdReaction(0x3648CBA4UL);
         }
@@ -1495,7 +1495,7 @@ extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
         {
             pFielder->fn_8004D480(v3Zero);
         }
-        PlaySound(pEventData->pFielder->mUnidentified318, 0x52641B7BUL, NULL, NULL);
+        PlaySound(pEventData->pFielder->m_uSoundSlotId, 0x52641B7BUL, NULL, NULL);
     }
     else if (pCharacter->m_eClassType == GOALIE)
     {
@@ -1503,7 +1503,7 @@ extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
         if (pGoalie->mGoalieActionState != GOALIEACTION_UNIDENTIFIED_32)
         {
             pGoalie->fn_80090320(0.0f);
-            PlaySound(pEventData->pFielder->mUnidentified318, 0xFD0DC03DUL, NULL, NULL);
+            PlaySound(pEventData->pFielder->m_uSoundSlotId, 0xFD0DC03DUL, NULL, NULL);
         }
     }
 }
@@ -1512,13 +1512,12 @@ extern "C" void fn_80022B04(UnidentifiedEventData24* pEventData)
     pEventData->mUnidentified0C->fn_80099074(pEventData);
 }
 float lbl_806DB5F4 = 1.5f;
-extern "C" void fn_80060FF4(cGame*, const CharacterImpactEvent*);
 extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
 {
     CharacterImpactEvent event;
     event.v3Position = pEventData->v3Position;
     event.v3Position.z = 0.0f;
-    event.fMagnitude = lbl_806DB5F4;
+    event.fRadius = lbl_806DB5F4;
     event.pCharacter = pEventData->pFielder;
     fn_80060FF4(g_pGame, &event);
     fn_800367B4(pEventData->pFielder);
@@ -1548,7 +1547,7 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
                 || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == 13))
             {
                 pFielder->InitActionBombReact(pEventData->mUnidentified08->mPosition, 0.0f);
-                fn_801BAF0C(pFielder);
+                EmitTackleImpact(pFielder);
             }
             else
             {
@@ -1983,8 +1982,8 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     SetAnimID(animID);
     if (m_eClassType == FIELDER && mUnidentified024.m_eCharacterClass == 13)
     {
-        mUnidentified17E = false;
-        mUnidentified17F = false;
+        m_bLeftPropAnimated = false;
+        m_bRightPropAnimated = false;
         SetHammerTransformFrozen(false);
     }
 }
@@ -2002,7 +2001,7 @@ void cCharacter::SetHammerTransformFrozen(bool frozen)
         CaptureHammerTransform();
     }
     if (destroyHammer)
-        fn_801B8CF4(mUnidentified194);
+        EmitHammerDestroyBig(mUnidentified194);
 }
 
 void cCharacter::CaptureHammerTransform()
@@ -2168,7 +2167,7 @@ void cCharacter::UnidentifiedVirtual1C()
     InitMovementNone(0.0f, 0.0f);
 }
 
-void cCharacter::fn_8001C510(int modelType)
+void cCharacter::SetModelType(int modelType)
 {
     if (modelType == 0 || m_pSkinMesh[modelType] != NULL)
     {
@@ -2221,7 +2220,7 @@ bool cCharacter::fn_8001E160()
     return mUnidentified024.m_bOnScreen;
 }
 
-bool cCharacter::fn_8001E168() const
+bool cCharacter::IsCaptain() const
 {
     return mUnidentified11C->mCaptainId != -1;
 }

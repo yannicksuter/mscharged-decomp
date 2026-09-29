@@ -3,17 +3,11 @@
 
 #include "Game/SH/SHStrikerTimesBase.h"
 #include "Game/FE/MatchSummary.h"
+#include "Game/NetTournManager.h"
 
 class TLTextInstance;
 
 class BasicGameInfo;
-
-struct UnidentifiedGameClock
-{
-    /* 0x000 */ u8 mUnidentified00[0x138];
-    /* 0x138 */ int mUnidentified138;
-    /* 0x13C */ int mUnidentified13C;
-}; // size unknown
 
 class GameResultsScene : public SHStrikerTimesBase
 {
@@ -24,14 +18,14 @@ public:
     virtual void SceneCreated();
     virtual void OnDoneTransitionComplete();
 
-    void fn_8020A494(BasicGameInfo* data, BaseSceneHandler* listener, UnidentifiedGameClock* clock);
+    void SetResultsData(BasicGameInfo* data, BaseSceneHandler* listener, NetworkTournamentGame* game);
 
     /* 0x5D4 */ TLTextInstance* mTitleText;
     /* 0x5D8 */ bool mUnidentified5D8;
     /* 0x5DC */ MatchSummary mSummary;
-    /* 0xA10 */ BasicGameInfo* mUnidentifiedA10;
-    /* 0xA14 */ BaseSceneHandler* mUnidentifiedA14;
-    /* 0xA18 */ UnidentifiedGameClock* mUnidentifiedA18;
+    /* 0xA10 */ BasicGameInfo* mGameData;
+    /* 0xA14 */ BaseSceneHandler* mListener;
+    /* 0xA18 */ NetworkTournamentGame* mTournamentGame;
     /* 0xA1C */ u16 mTitleBuffer[0x20];
 }; // size 0xA5C
 

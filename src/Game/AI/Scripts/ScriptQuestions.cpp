@@ -291,7 +291,7 @@ float Captain(cFielder* fielder)
         return 0.0f;
     }
 
-    if (fielder->fn_8001E168())
+    if (fielder->IsCaptain())
     {
         return 1.0f;
     }
@@ -950,7 +950,7 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
     if (pFielder == NULL)
         return 0.0f;
     float fScore = 0.0f;
-    if (pFielder->fn_8001E168() && !pFielder->fn_8003E6EC())
+    if (pFielder->IsCaptain() && !pFielder->fn_8003E6EC())
     {
         int powerup = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
         if (fn_80099CE8(powerup) && fn_8002EDC8(pFielder, powerup))
@@ -971,7 +971,7 @@ extern "C" float fn_800D85F8(cFielder* pFielder)
         return 0.0f;
     int first = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
     int second = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
-    if (pFielder->fn_8001E168())
+    if (pFielder->IsCaptain())
     {
         if (first != -1 || (pFielder->m_pTeam->fn_800A6560() && second != -1))
             return (fn_8002EDC8(pFielder, first) || fn_8002EDC8(pFielder, second)) ? 1.0f : 0.0f;
@@ -2808,7 +2808,7 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
     if (pFielder->m_pTeam->m_nSide == AWAY)
         nlVec2Scale(aiPos, aiPos, -1.0f);
     float fScore = 0.0f;
-    if (!pFielder->fn_8001E168() && aiPos.x > 0.0f)
+    if (!pFielder->IsCaptain() && aiPos.x > 0.0f)
     {
         Goalie* pGoalie = fn_800D66C4(pFielder);
         nlVector2 diff;

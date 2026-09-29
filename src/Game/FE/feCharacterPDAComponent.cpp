@@ -405,7 +405,7 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
     {
         if (GameInfoManager::Instance()->IsInMode3())
         {
-            TintInstanceForCaptain(mSidekickAttributeImages[i], g_pCupManager->unknown_0x8A28, 180);
+            TintInstanceForCaptain(mSidekickAttributeImages[i], g_pCupManager->mPendingCupTeam, 180);
         }
         else
         {

@@ -105,7 +105,7 @@ void ChallengePreviewOverlay::SceneCreated()
 {
     BaseSceneHandler::SceneCreated();
 
-    StrikerChallenge* challenge = fn_801CA670();
+    StrikerChallenge* challenge = GetStrikerChallenge();
     int currentChallenge = challenge->GetCurrentChallenge();
     TLSlide* slide = GetPresentation()->GetActiveSlide();
     TLInstance* preview = FEFinder<TLInstance, 5>::FindOrDefault<TLSlide>(slide, "Layer", "PREVIEW");
@@ -127,18 +127,18 @@ void ChallengePreviewOverlay::SceneCreated()
 
     TLTextInstance* text
         = FEFinder<TLTextInstance, 3>::FindOrDefault<TLInstance>(preview, "TITLE");
-    text->SetStringId(challenge->GetDifficulty());
+    text->SetStringId(challenge->GetTitle());
 
     TLInstance* options
         = FEFinder<TLInstance, 5>::FindOrDefault<TLInstance>(preview, "OPTIONS");
     char objective[64];
     if (currentChallenge < 10)
     {
-        nlSNPrintf(objective, sizeof(objective), "tutorial_objective_%s", challenge->GetTitle());
+        nlSNPrintf(objective, sizeof(objective), "tutorial_objective_%s", challenge->GetName());
     }
     else
     {
-        nlSNPrintf(objective, sizeof(objective), "objective_%s", challenge->GetTitle());
+        nlSNPrintf(objective, sizeof(objective), "objective_%s", challenge->GetName());
     }
 
     text = FEFinder<TLTextInstance, 3>::Find<TLInstance>(options, "OPTION_0");

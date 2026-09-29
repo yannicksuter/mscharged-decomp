@@ -44,8 +44,6 @@ WorldVisibilityNode* FindWorldVisibilityNode(
     WorldVertexAnimDrawable_80343E3C*, WorldVisibilityNode*);
 
 extern "C" void fn_80342170(WorldPhysicsOwner_80342170* pOwner);
-extern "C" EffectsGroup* fn_802E7D54(
-    EmissionManager*, unsigned long);
 
 extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
     WorldObjectLoadContext* pContext)
@@ -462,7 +460,7 @@ extern "C" void fn_80344798(EmissionController& controller);
 void WorldEffect::Emit()
 {
     EffectsGroup* pGroup
-        = fn_802E7D54(EmissionManager::Instance(),
+        = fxGetGroup(EmissionManager::Instance(),
             m_uEffectHash);
     if (pGroup != 0)
     {

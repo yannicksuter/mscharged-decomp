@@ -22,7 +22,7 @@ struct KoopaShellObject;
 struct CharacterImpactEvent
 {
     nlVector3 v3Position;
-    float fMagnitude;
+    float fRadius;
     cCharacter* pCharacter;
 };
 

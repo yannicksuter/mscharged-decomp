@@ -54,7 +54,7 @@ void DrawableBall::Grab()
     mOrientation = g_pBall->m_qOrientation;
     mPosition = g_pBall->m_v3Position;
     mVelocity = g_pBall->m_v3Velocity;
-    mScale = fn_800155A0(g_pBall, 0);
+    mScale = GetBallChargeValue(g_pBall, 0);
 
     mFlags.bits.ownerIndex
         = GetCharacterIndex((cCharacter*)g_pBall->m_pOwner);

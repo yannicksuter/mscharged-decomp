@@ -25,23 +25,23 @@ public:
     void OnSelectPopupYESFORFEIT();
     void OnSelectRESUME(TLComponentInstance* instance);
     void TransitionOut(TransitionType newtype);
-    void fn_8023A85C();
-    void fn_8023AB94(unsigned int index, void* context);
-    void fn_8023AC58(unsigned int index, void* context);
-    void fn_8023AD04(unsigned int index, void* context);
+    void InitializePointerButtons();
+    void OnOptionPointerEnter(unsigned int index, void* context);
+    void OnOptionPointerLeave(unsigned int index, void* context);
+    void OnOptionPointerPress(unsigned int index, void* context);
 
     /* 0x01C */ bool mGameIsOver;
     /* 0x020 */ float mQuitDelay;
     /* 0x024 */ eFEINPUT_PAD mQuittingController;
-    /* 0x028 */ TLComponentInstance* mUnidentified028[7];
-    /* 0x044 */ FEPointerButton mUnidentified044[7];
-    /* 0x530 */ bool mUnidentified530;
-    /* 0x534 */ int mUnidentified534[4];
+    /* 0x028 */ TLComponentInstance* mOptionInstances[7];
+    /* 0x044 */ FEPointerButton mOptionButtons[7];
+    /* 0x530 */ bool mInitialized;
+    /* 0x534 */ int mHoverCounts[4];
     /* 0x544 */ TransitionType mTransitionTo;
     /* 0x548 */ bool mIsInTransition;
     /* 0x549 */ bool mStartAnimAtEnd;
-    /* 0x54A */ bool mUnidentified54A;
-    /* 0x54B */ bool mUnidentified54B;
+    /* 0x54A */ bool mSelectionMade;
+    /* 0x54B */ bool mIntroSoundPlayed;
     /* 0x54C */ ButtonComponent mButtons;
     /* 0x570 */ ButtonComponent mButtons2;
 

@@ -142,9 +142,9 @@ static inline void AddStatValue(
         stats.mNumGoalsFor += amount;
         stats.mNumGoalsFor = stats.mNumGoalsFor <= 999U ? stats.mNumGoalsFor : 999U;
         break;
-    case STATS_0C:
-        stats.unknown_0x12 += amount;
-        stats.unknown_0x12 = stats.unknown_0x12 <= 999U ? stats.unknown_0x12 : 999U;
+    case STATS_GOALS_AGAINST:
+        stats.mNumGoalsAgainst += amount;
+        stats.mNumGoalsAgainst = stats.mNumGoalsAgainst <= 999U ? stats.mNumGoalsAgainst : 999U;
         break;
     case STATS_04:
         stats.unknown_0x14 += amount;
@@ -595,9 +595,9 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
             Track(STATS_07, homeaway, playerindex, param2, param3, 0, 0);
         if (param0 >= 0)
             Track(STATS_08, homeaway, param0, 0, 0, 0, 0);
-        Track(STATS_0C, homeaway == 0, playerindex, param2, 0, 0, 0);
+        Track(STATS_GOALS_AGAINST, homeaway == 0, playerindex, param2, 0, 0, 0);
         break;
-    case STATS_0C:
+    case STATS_GOALS_AGAINST:
         AddStat(stat, homeaway, -1, param0);
         for (unsigned int i = 0; i < 5; i++)
             fn_80101E0C(stat, homeaway, i, param0);
@@ -715,13 +715,13 @@ void StatsTracker::GetSortedStats(PlayerStats* source, int numsource,
                     doswap = false;
                 break;
             }
-            case STATS_0C:
+            case STATS_GOALS_AGAINST:
             {
                 bool human = CupManager::Instance()->mCurrentCup->IsHumanTeam(
                     source[tempsorted[nexti]].mRecordType.mTeamID);
                 int comparison = CompareInt(sortOrder,
-                    source[tempsorted[i]].unknown_0x12,
-                    source[tempsorted[nexti]].unknown_0x12);
+                    source[tempsorted[i]].mNumGoalsAgainst,
+                    source[tempsorted[nexti]].mNumGoalsAgainst);
                 if (comparison == 1)
                     doswap = true;
                 else if (comparison == 0)
@@ -861,7 +861,7 @@ static inline void AccumulateUserStats(PlayerStats* total, const PlayerStats& cu
     total->unknown_0x0C += current.unknown_0x0C;
     total->unknown_0x0E += current.unknown_0x0E;
     total->mNumGoalsFor += current.mNumGoalsFor;
-    total->unknown_0x12 = current.unknown_0x12;
+    total->mNumGoalsAgainst = current.mNumGoalsAgainst;
     total->unknown_0x14 += current.unknown_0x14;
     total->unknown_0x16 += current.unknown_0x16;
     total->unknown_0x18 += current.unknown_0x18;
@@ -898,7 +898,7 @@ void StatsTracker::CompileEndOfGameStats()
         int homeTeam = mBasicGameInfo->mTeamIndex[0];
         int awayTeam = mBasicGameInfo->mTeamIndex[1];
         int numTeams = cup->GetNumPlayingTeams();
-        int previousTeam = cup->fn_8010AFA4();
+        int previousTeam = cup->GetFinalOpponentTeam();
         if (cup->GetCurrentRoundType() == 2)
         {
             if (homeTeam == previousTeam)
@@ -928,10 +928,10 @@ void StatsTracker::CompileEndOfGameStats()
                     cumulative->mPlayerTotalStats.mNumGoalsFor += tempStat;
                     if (cumulative->mPlayerTotalStats.mNumGoalsFor > 999)
                         cumulative->mPlayerTotalStats.mNumGoalsFor = 999;
-                    tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x12;
-                    cumulative->mPlayerTotalStats.unknown_0x12 += tempStat;
-                    if (cumulative->mPlayerTotalStats.unknown_0x12 > 999)
-                        cumulative->mPlayerTotalStats.unknown_0x12 = 999;
+                    tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.mNumGoalsAgainst;
+                    cumulative->mPlayerTotalStats.mNumGoalsAgainst += tempStat;
+                    if (cumulative->mPlayerTotalStats.mNumGoalsAgainst > 999)
+                        cumulative->mPlayerTotalStats.mNumGoalsAgainst = 999;
                 }
                 tempStat = mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x0E;
                 cumulative->mPlayerTotalStats.unknown_0x0E += tempStat;
@@ -977,8 +977,8 @@ void StatsTracker::CompileEndOfGameStats()
                 if (cup->GetCurrentRoundType() == 0)
                 {
                     u16 otherGoals = mCumulativeTeamStats[otherSide]->mPlayerTotalStats.mNumGoalsFor;
-                    mCumulativeTeamStats[side]->mPlayerTotalStats.unknown_0x12 = otherGoals;
-                    cumulative->mPlayerTotalStats.unknown_0x12 += otherGoals;
+                    mCumulativeTeamStats[side]->mPlayerTotalStats.mNumGoalsAgainst = otherGoals;
+                    cumulative->mPlayerTotalStats.mNumGoalsAgainst += otherGoals;
                 }
                 mCumulativeTeamStats[side]->mPlayerTotalStats.mNumShotsOnGoal = 0;
                 mCumulativeTeamStats[side]->mPlayerTotalStats.mNumGoalsFor = 0;
@@ -1030,7 +1030,7 @@ void StatsTracker::AddStat(
 {
     switch (stat)
     {
-    case STATS_0C:
+    case STATS_GOALS_AGAINST:
     {
         int start = (player == -1) ? 0 : player;
         int end = (player == -1) ? 5 : start + 1;
@@ -1139,9 +1139,9 @@ void StatsTracker::fn_80101E0C(
         mCurrentUserStats[pad].mNumGoalsFor += amount;
         mCurrentUserStats[pad].mNumGoalsFor = mCurrentUserStats[pad].mNumGoalsFor <= 999U ? mCurrentUserStats[pad].mNumGoalsFor : 999U;
         break;
-    case STATS_0C:
-        mCurrentUserStats[pad].unknown_0x12 += amount;
-        mCurrentUserStats[pad].unknown_0x12 = mCurrentUserStats[pad].unknown_0x12 <= 999U ? mCurrentUserStats[pad].unknown_0x12 : 999U;
+    case STATS_GOALS_AGAINST:
+        mCurrentUserStats[pad].mNumGoalsAgainst += amount;
+        mCurrentUserStats[pad].mNumGoalsAgainst = mCurrentUserStats[pad].mNumGoalsAgainst <= 999U ? mCurrentUserStats[pad].mNumGoalsAgainst : 999U;
         break;
     case STATS_04:
         mCurrentUserStats[pad].unknown_0x14 += amount;
@@ -1258,9 +1258,9 @@ void StatsTracker::fn_80101E0C(
         mCumulativeUserStats[pad].mNumGoalsFor += amount;
         mCumulativeUserStats[pad].mNumGoalsFor = mCumulativeUserStats[pad].mNumGoalsFor <= 999U ? mCumulativeUserStats[pad].mNumGoalsFor : 999U;
         break;
-    case STATS_0C:
-        mCumulativeUserStats[pad].unknown_0x12 += amount;
-        mCumulativeUserStats[pad].unknown_0x12 = mCumulativeUserStats[pad].unknown_0x12 <= 999U ? mCumulativeUserStats[pad].unknown_0x12 : 999U;
+    case STATS_GOALS_AGAINST:
+        mCumulativeUserStats[pad].mNumGoalsAgainst += amount;
+        mCumulativeUserStats[pad].mNumGoalsAgainst = mCumulativeUserStats[pad].mNumGoalsAgainst <= 999U ? mCumulativeUserStats[pad].mNumGoalsAgainst : 999U;
         break;
     case STATS_04:
         mCumulativeUserStats[pad].unknown_0x14 += amount;
@@ -1387,9 +1387,9 @@ void StatsTracker::AddUserStatByPad(
         mCurrentUserStats[pad].mNumGoalsFor += amount;
         mCurrentUserStats[pad].mNumGoalsFor = mCurrentUserStats[pad].mNumGoalsFor <= 999U ? mCurrentUserStats[pad].mNumGoalsFor : 999U;
         break;
-    case STATS_0C:
-        mCurrentUserStats[pad].unknown_0x12 += amount;
-        mCurrentUserStats[pad].unknown_0x12 = mCurrentUserStats[pad].unknown_0x12 <= 999U ? mCurrentUserStats[pad].unknown_0x12 : 999U;
+    case STATS_GOALS_AGAINST:
+        mCurrentUserStats[pad].mNumGoalsAgainst += amount;
+        mCurrentUserStats[pad].mNumGoalsAgainst = mCurrentUserStats[pad].mNumGoalsAgainst <= 999U ? mCurrentUserStats[pad].mNumGoalsAgainst : 999U;
         break;
     case STATS_04:
         mCurrentUserStats[pad].unknown_0x14 += amount;
@@ -1506,9 +1506,9 @@ void StatsTracker::AddUserStatByPad(
         mCumulativeUserStats[pad].mNumGoalsFor += amount;
         mCumulativeUserStats[pad].mNumGoalsFor = mCumulativeUserStats[pad].mNumGoalsFor <= 999U ? mCumulativeUserStats[pad].mNumGoalsFor : 999U;
         break;
-    case STATS_0C:
-        mCumulativeUserStats[pad].unknown_0x12 += amount;
-        mCumulativeUserStats[pad].unknown_0x12 = mCumulativeUserStats[pad].unknown_0x12 <= 999U ? mCumulativeUserStats[pad].unknown_0x12 : 999U;
+    case STATS_GOALS_AGAINST:
+        mCumulativeUserStats[pad].mNumGoalsAgainst += amount;
+        mCumulativeUserStats[pad].mNumGoalsAgainst = mCumulativeUserStats[pad].mNumGoalsAgainst <= 999U ? mCumulativeUserStats[pad].mNumGoalsAgainst : 999U;
         break;
     case STATS_04:
         mCumulativeUserStats[pad].unknown_0x14 += amount;
@@ -1644,7 +1644,7 @@ void StatsTracker::TrackWinner(int forfeitSide)
                     homeScore, awayScore, 0, 0);
                 if (GameInfoManager::Instance()->IsInMode3())
                 {
-                    g_pCupManager->fn_8010BCB8(true, winningSide);
+                    g_pCupManager->SetRoundResult(true, winningSide);
                 }
             }
             else
@@ -1653,7 +1653,7 @@ void StatsTracker::TrackWinner(int forfeitSide)
                     homeScore, awayScore, 0, 0);
                 if (GameInfoManager::Instance()->IsInMode3())
                 {
-                    g_pCupManager->fn_8010BCB8(false, winningSide);
+                    g_pCupManager->SetRoundResult(false, winningSide);
                 }
             }
 
@@ -1848,7 +1848,7 @@ static int GetStatValue(const PlayerStats& stats, ePlayerStats stat)
     case STATS_07: value = stats.unknown_0x0C; break;
     case STATS_08: value = stats.unknown_0x0E; break;
     case STATS_GOALS_FOR: value = stats.mNumGoalsFor; break;
-    case STATS_0C: value = stats.unknown_0x12; break;
+    case STATS_GOALS_AGAINST: value = stats.mNumGoalsAgainst; break;
     case STATS_04: value = stats.unknown_0x14; break;
     case STATS_09: value = stats.unknown_0x16; break;
     case STATS_0A: value = stats.unknown_0x18; break;

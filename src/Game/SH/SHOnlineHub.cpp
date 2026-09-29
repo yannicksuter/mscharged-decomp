@@ -58,22 +58,22 @@ static inline void UpdateOnlineHubMiiIcon(SHOnlineHub* hub)
 }
 
 SHOnlineHub::SHOnlineHub()
-    : mUnidentified4B4(false)
-    , mUnidentified588(0.0f)
-    , mUnidentified58C(false)
-    , mUnidentified58D(false)
-    , mUnidentified890(0)
-    , mUnidentified894(0)
+    : mInitialized(false)
+    , mRefreshTimer(0.0f)
+    , mPopupActive(false)
+    , mHasStrikerOfTheDay(false)
+    , mState(0)
+    , mPressedItem(0)
 {
     for (int i = 0; i < 4; ++i)
         mButtons[i].mContext = (void*)i;
     mHelpButton.mContext = (void*)4;
-    mUnidentified590.Reset();
-    mUnidentified5A8.Reset();
-    mUnidentified5C0.mName[0] = 0;
-    mUnidentified5C0.mProfileId = 0;
-    memset(mUnidentified5C0.mData, 0, sizeof(mUnidentified5C0.mData));
-    mUnidentified628.Reset();
+    mPointsStats.Reset();
+    mRankStats.Reset();
+    mStrikerOfTheDay.mName[0] = 0;
+    mStrikerOfTheDay.mProfileId = 0;
+    memset(mStrikerOfTheDay.mData, 0, sizeof(mStrikerOfTheDay.mData));
+    mStrikerOfTheDayStats.Reset();
     mBackButton.SetPushBackScene(false);
     mBackButton.SetPopScene(false);
     SetOnlineTwoLocalPlayers(false);
@@ -90,7 +90,7 @@ void SHOnlineHub::SceneCreated()
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-        mUnidentified4B8[i] = 0;
+        mHoverCounts[i] = 0;
     }
     for (int i = 0; i < 4; ++i)
     {
@@ -119,9 +119,9 @@ void SHOnlineHub::SceneCreated()
 void SHOnlineHub::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
-    if (mUnidentified58C && !g_pFEInput->HasInputLock(this))
+    if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
-    if (mUnidentified890 == 0 || mUnidentified890 == 2 || mUnidentified890 == 3)
+    if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -130,7 +130,7 @@ void SHOnlineHub::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mUnidentified890 == 0)
+        if (mState == 0)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
@@ -139,16 +139,16 @@ void SHOnlineHub::Update(float dt)
                 scene->SetBackButtonText(1);
             }
             InitializeButtons();
-            mUnidentified4B4 = true;
+            mInitialized = true;
             for (int i = 0; i < 4; ++i)
                 GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             UpdateOnlineHubMiiIcon(this);
             UpdateStrikerOfTheDay();
-            mUnidentified890 = 1;
+            mState = 1;
         }
-        else if (mUnidentified890 == 2)
+        else if (mState == 2)
         {
-            switch (mUnidentified894)
+            switch (mPressedItem)
             {
             case 0:
                 if (g_pNetworkSessionBase->GetSessionMode() == 2)
@@ -160,7 +160,7 @@ void SHOnlineHub::Update(float dt)
             }
             return;
         }
-        else if (mUnidentified890 == 3)
+        else if (mState == 3)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
             GameSceneManager::Instance()->Pop();
@@ -198,12 +198,12 @@ void SHOnlineHub::Update(float dt)
         }
         for (int j = 0; j < 4; ++j)
             mButtons[j].HandlePointerEvent(&event);
-        if (mUnidentified890 != 1)
+        if (mState != 1)
             return;
         mHelpButton.HandlePointerEvent(&event);
         if (mBackButton.UpdateBackButton(event, dt))
         {
-            mUnidentified890 = 3;
+            mState = 3;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->HideButtons();
@@ -212,14 +212,14 @@ void SHOnlineHub::Update(float dt)
             return;
         }
     }
-    mUnidentified588 += dt;
-    if (mUnidentified588 >= 1.0f)
+    mRefreshTimer += dt;
+    if (mRefreshTimer >= 1.0f)
     {
         UpdateFriendAndSeasonText();
         UpdateLocalStats();
         UpdateStrikerOfTheDay();
         UpdateOnlineHubMiiIcon(this);
-        mUnidentified588 = 0.0f;
+        mRefreshTimer = 0.0f;
     }
 }
 
@@ -256,8 +256,8 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     nlSNPrintf(onlineText, 4, (const u16*)L"%d", online);
     nlSNPrintf(friendsText, 4, (const u16*)L"%d", friends);
     WideString friendString = Format(WideString(LookupLocString("ONLINE_HUB_FRIENDS")), onlineText, friendsText);
-    memcpy(mUnidentified4C8, friendString.c_str(), sizeof(mUnidentified4C8));
-    text->SetString(mUnidentified4C8);
+    memcpy(mFriendsText, friendString.c_str(), sizeof(mFriendsText));
+    text->SetString(mFriendsText);
     DWCDate date;
     DWCTime time;
     GetAdjustedNetworkDate(&date, &time);
@@ -280,28 +280,28 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     }
     text = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide, "Layer", "subheading");
     WideString string = Format(WideString(LookupLocString("ONLINE_HUB_DAYS_REMAIN")), days, hours, minutes);
-    memcpy(mUnidentified528, string.c_str(), sizeof(mUnidentified528));
-    text->SetString(mUnidentified528);
+    memcpy(mDaysRemainText, string.c_str(), sizeof(mDaysRemainText));
+    text->SetString(mDaysRemainText);
 }
 
 void SHOnlineHub::UpdateLocalStats()
 {
     if (NetworkStatsManager::Instance()->GetLocalStats(0) != 0)
-        mUnidentified5A8 = *NetworkStatsManager::Instance()->GetLocalStats(0);
+        mRankStats = *NetworkStatsManager::Instance()->GetLocalStats(0);
     if (NetworkStatsManager::Instance()->GetLocalStats(1) != 0)
-        mUnidentified590 = *NetworkStatsManager::Instance()->GetLocalStats(1);
+        mPointsStats = *NetworkStatsManager::Instance()->GetLocalStats(1);
     TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation->m_currentSlide, "Layer", "summary");
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(summary, "name");
-    nlStrNCpy(mUnidentified640, gNetworkMiiNameWide, 24);
-    text->SetString(mUnidentified640);
+    nlStrNCpy(mPlayerNameText, gNetworkMiiNameWide, 24);
+    text->SetString(mPlayerNameText);
     text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord");
-    WideString points = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS_TODAY")), mUnidentified590.mScore);
-    nlStrNCpy(mUnidentified6D0, points.c_str(), 48);
-    text->SetString(mUnidentified6D0);
+    WideString points = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS_TODAY")), mPointsStats.mScore);
+    nlStrNCpy(mTodayPointsText, points.c_str(), 48);
+    text->SetString(mTodayPointsText);
     text = FEFinder<TLTextInstance, 3>::Find<>(summary, "Rank");
-    WideString rank = Format(WideString(LookupLocString("ONLINE_HUB_CURRENT_RANK")), mUnidentified5A8.mDisplayRank);
-    nlStrNCpy(mUnidentified670, rank.c_str(), 48);
-    text->SetString(mUnidentified670);
+    WideString rank = Format(WideString(LookupLocString("ONLINE_HUB_CURRENT_RANK")), mRankStats.mDisplayRank);
+    nlStrNCpy(mRankText, rank.c_str(), 48);
+    text->SetString(mRankText);
 }
 
 void SHOnlineHub::UpdateStrikerOfTheDay()
@@ -311,46 +311,46 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     {
         if (category->mCount >= 1 && category->mMetadata[0].mScore > 0)
         {
-            mUnidentified5C0.CopyFrom(category->mPlayers[0]);
-            mUnidentified628 = category->mMetadata[0];
-            mUnidentified58D = true;
+            mStrikerOfTheDay.CopyFrom(category->mPlayers[0]);
+            mStrikerOfTheDayStats = category->mMetadata[0];
+            mHasStrikerOfTheDay = true;
         }
         else
         {
-            mUnidentified5C0.mName[0] = 0;
-            mUnidentified5C0.mProfileId = 0;
-            memset(mUnidentified5C0.mData, 0, sizeof(mUnidentified5C0.mData));
-            mUnidentified628.Reset();
-            mUnidentified58D = false;
+            mStrikerOfTheDay.mName[0] = 0;
+            mStrikerOfTheDay.mProfileId = 0;
+            memset(mStrikerOfTheDay.mData, 0, sizeof(mStrikerOfTheDay.mData));
+            mStrikerOfTheDayStats.Reset();
+            mHasStrikerOfTheDay = false;
         }
     }
     TLComponentInstance* summary = FEFinder<TLComponentInstance, 4>::Find<>(mPresentation->m_currentSlide, "Layer", "summary");
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord2");
-    if (mUnidentified58D)
+    if (mHasStrikerOfTheDay)
     {
-        WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS")), mUnidentified628.mScore);
-        nlStrNCpy(mUnidentified730, string.c_str(), 48);
-        text->SetString(mUnidentified730);
+        WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS")), mStrikerOfTheDayStats.mScore);
+        nlStrNCpy(mStrikerPointsText, string.c_str(), 48);
+        text->SetString(mStrikerPointsText);
         text->m_bVisible = true;
     }
     else
         text->m_bVisible = false;
     text = FEFinder<TLTextInstance, 3>::Find<>(summary, "sotd description");
-    if (mUnidentified58D)
+    if (mHasStrikerOfTheDay)
     {
-        WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_DESCRIPTION")), mUnidentified5C0.mName);
-        nlStrNCpy(mUnidentified790, string.c_str(), 128);
-        text->SetString(mUnidentified790);
+        WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_DESCRIPTION")), mStrikerOfTheDay.mName);
+        nlStrNCpy(mStrikerDescriptionText, string.c_str(), 128);
+        text->SetString(mStrikerDescriptionText);
         text->m_bVisible = true;
     }
     else
         text->m_bVisible = false;
     bool valid = false;
-    if (mUnidentified58D)
-        valid = g_pMiiManager->CreateIcon((const RFLStoreData*)mUnidentified5C0.mData, 1, (RFLExpression)0);
+    if (mHasStrikerOfTheDay)
+        valid = g_pMiiManager->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mData, 1, (RFLExpression)0);
     TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn2", "Mii");
     unsigned long texture = g_pMiiManager->mIconTextureIds[1];
-    image->SetAssetVisible(valid && mUnidentified4B4);
+    image->SetAssetVisible(valid && mInitialized);
     image->m_pTextureResource->SetTextureHandle(texture);
 }
 
@@ -410,10 +410,10 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
     }
     if (change)
     {
-        mUnidentified894 = item;
+        mPressedItem = item;
         for (int i = 0; i < 4; ++i)
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-        mUnidentified890 = 2;
+        mState = 2;
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
             scene->HideButtons();
@@ -425,12 +425,12 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
 void SHOnlineHub::OnDialogDismissed()
 {
     g_pFriendManager->SetOwnStatusInitial(1);
-    mUnidentified58C = false;
+    mPopupActive = false;
 }
 
 void SHOnlineHub::OnErrorDismissed()
 {
-    mUnidentified58C = false;
+    mPopupActive = false;
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
     FrontEndPresentation::GetInstance()->Call("TransitionOnlineMatchToMainMenu");
@@ -439,7 +439,7 @@ void SHOnlineHub::OnErrorDismissed()
 void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    ++mUnidentified4B8[index];
+    ++mHoverCounts[index];
     if (item < 4)
     {
         if (!mButtons[item].HasOtherPointerState(1, index))
@@ -460,7 +460,7 @@ void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
 void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    --mUnidentified4B8[index];
+    --mHoverCounts[index];
     if (item < 4)
     {
         if (!mButtons[item].HasOtherPointerState(1, index))
@@ -482,7 +482,7 @@ static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
         popup->Create(type, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), hub));
-        hub->mUnidentified58C = true;
+        hub->mPopupActive = true;
     }
 }
 
@@ -493,6 +493,6 @@ inline void SHOnlineHub::ShowError(int error)
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineHub::OnErrorDismissed), this)));
-        mUnidentified58C = true;
+        mPopupActive = true;
     }
 }

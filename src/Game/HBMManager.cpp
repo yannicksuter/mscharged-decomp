@@ -10,6 +10,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/GameSceneManager.h"
 #include "Game/Event.h"
+#include "Game/UnidentifiedStaticEvent.h"
 #include "Game/EventDataTypes.h"
 #include "Game/GameInfo.h"
 #include "Game/Game.h"

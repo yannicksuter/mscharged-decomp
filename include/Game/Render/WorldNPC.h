@@ -40,10 +40,7 @@ public:
 
     void Clear()
     {
-        EntryCallback callback = &WorldNPCModelList::DeleteModelEntry;
-        nlWalkList(m_Head, this, callback);
-        m_Head = 0;
-        m_Tail = 0;
+        ClearWithCallback(this, &WorldNPCModelList::DeleteModelEntry);
     }
 
     void DeleteModelEntry(ListEntry<ImpostorModel*>* entry);
@@ -59,6 +56,7 @@ public:
 
     void LoadTemplates(const char* filename);
     void AddTemplate(TweakNode* entry, const char* name);
+    void CollectSelectedTemplates();
     void BeginModelLoading();
     bool UpdateModelLoading();
     void Render(GLView* view);

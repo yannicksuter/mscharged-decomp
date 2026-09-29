@@ -42,85 +42,85 @@ static void fn_8022E18C();
  * Offset/Address/Size: 0x0 | 0x802284B8 | size: 0x3F0
  */
 ChooseSidekicksSceneV2::ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::SceneType sceneType, ScreenMovement movement)
-    : mUnidentified1C(false)
+    : mPopupActive(false)
     , mMovement(movement)
     , mSceneType(sceneType)
-    , mUnidentified4A(false)
-    , mUnidentified4B(false)
-    , mUnidentified4C(false)
-    , mUnidentified4D(false)
-    , mUnidentified1918(0)
-    , mUnidentified1950(false)
-    , mUnidentified1954(0)
-    , mUnidentified19F8(false)
+    , mPointerButtonsInitialized(false)
+    , mSidekickButtonsInitialized(false)
+    , mSidekicksShown(false)
+    , mSelectionMade(false)
+    , mDoneButtonInstance(0)
+    , mDraftExitDone(false)
+    , mState(0)
+    , mImagesLoaded(false)
 {
     int i;
 
-    mUnidentified20[0] = -1;
-    mUnidentified20[1] = -1;
+    mSidePads[0] = -1;
+    mSidePads[1] = -1;
 
     for (i = 0; i < 8; ++i)
     {
-        mUnidentifiedE8[i].mContext = (void*)i;
-        mUnidentifiedE8[i].mSpeakerEnabled = false;
+        mSidekickButtons[i].mContext = (void*)i;
+        mSidekickButtons[i].mSpeakerEnabled = false;
     }
 
     for (int side = 0; side < 2; ++side)
     {
         for (i = 0; i < 3; ++i)
         {
-            mUnidentified688[side][i].mContext = (void*)(side * 3 + i);
-            mUnidentified688[side][i].mSpeakerEnabled = false;
-            mUnidentifiedAC0[side][i].mContext = (void*)(side * 3 + i);
-            mUnidentifiedAC0[side][i].mSpeakerEnabled = false;
+            mSlotButtons[side][i].mContext = (void*)(side * 3 + i);
+            mSlotButtons[side][i].mSpeakerEnabled = false;
+            mSlotClickButtons[side][i].mContext = (void*)(side * 3 + i);
+            mSlotClickButtons[side][i].mSpeakerEnabled = false;
             mUnidentifiedA0[side][i] = false;
         }
     }
 
-    mUnidentifiedEF8[0].mContext = (void*)0;
-    mUnidentifiedEF8[1].mContext = (void*)1;
-    mUnidentifiedEF8[0].mSpeakerEnabled = false;
-    mUnidentifiedEF8[1].mSpeakerEnabled = false;
+    mSelectButtons[0].mContext = (void*)0;
+    mSelectButtons[1].mContext = (void*)1;
+    mSelectButtons[0].mSpeakerEnabled = false;
+    mSelectButtons[1].mSpeakerEnabled = false;
 
-    mUnidentified1060[0].mContext = (void*)0;
-    mUnidentified1060[1].mContext = (void*)1;
-    mUnidentified1060[0].mSpeakerEnabled = false;
-    mUnidentified1060[1].mSpeakerEnabled = false;
+    mRandomButtons[0].mContext = (void*)0;
+    mRandomButtons[1].mContext = (void*)1;
+    mRandomButtons[0].mSpeakerEnabled = false;
+    mRandomButtons[1].mSpeakerEnabled = false;
 
     mUnidentified28[0] = -1;
     mUnidentified28[1] = -1;
-    mUnidentified30[0] = -1;
-    mUnidentified30[1] = -1;
+    mSelectedSlots[0] = -1;
+    mSelectedSlots[1] = -1;
     mUnidentified48[0] = false;
     mUnidentified48[1] = false;
-    mUnidentified11C8.mSpeakerEnabled = false;
+    mDoneButton.mSpeakerEnabled = false;
 
     mBackButton.SetPopScene(false);
 
     if (GameInfoManager::Instance()->IsInMode3())
     {
-        mUnidentified40[0] = g_pCupManager->unknown_0x8A28;
-        mUnidentified40[1] = -1;
+        mTeams[0] = g_pCupManager->mPendingCupTeam;
+        mTeams[1] = -1;
     }
     else if (GameInfoManager::Instance()->mIsOnlineMode != 0)
     {
-        mUnidentified40[0] = GameInfoManager::Instance()->GetTeam(0);
-        mUnidentified40[1] = -1;
+        mTeams[0] = GameInfoManager::Instance()->GetTeam(0);
+        mTeams[1] = -1;
     }
     else
     {
-        mUnidentified40[0] = GameInfoManager::Instance()->GetTeam(0);
-        mUnidentified40[1] = GameInfoManager::Instance()->GetTeam(1);
+        mTeams[0] = GameInfoManager::Instance()->GetTeam(0);
+        mTeams[1] = GameInfoManager::Instance()->GetTeam(1);
     }
 
     for (int side = 0; side < 2; ++side)
     {
         for (i = 0; i < 8; ++i)
         {
-            mUnidentified1958[side][i] = 0;
-            mUnidentified1998[side][i] = 0;
-            mUnidentified19D8[side][i] = true;
-            mUnidentified19E8[side][i] = true;
+            mAttributeImages[side][i] = 0;
+            mPositionImages[side][i] = 0;
+            mAttributesLoaded[side][i] = true;
+            mPositionsLoaded[side][i] = true;
         }
     }
 }
@@ -137,16 +137,16 @@ ChooseSidekicksSceneV2::~ChooseSidekicksSceneV2()
     {
         for (int side = 0; side < 2; ++side)
         {
-            if (mUnidentified1958[side][i] != 0)
+            if (mAttributeImages[side][i] != 0)
             {
-                delete mUnidentified1958[side][i];
-                mUnidentified1958[side][i] = 0;
+                delete mAttributeImages[side][i];
+                mAttributeImages[side][i] = 0;
             }
 
-            if (mUnidentified1998[side][i] != 0)
+            if (mPositionImages[side][i] != 0)
             {
-                delete mUnidentified1998[side][i];
-                mUnidentified1998[side][i] = 0;
+                delete mPositionImages[side][i];
+                mPositionImages[side][i] = 0;
             }
         }
     }
@@ -154,12 +154,12 @@ ChooseSidekicksSceneV2::~ChooseSidekicksSceneV2()
 
 int ChooseSidekicksSceneV2::GetSide(unsigned long pad)
 {
-    if (mUnidentified20[0] == pad)
+    if (mSidePads[0] == pad)
     {
         return 0;
     }
 
-    if (mUnidentified20[1] == pad)
+    if (mSidePads[1] == pad)
     {
         return 1;
     }
@@ -180,14 +180,14 @@ void ChooseSidekicksSceneV2::SceneCreated()
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
         FrontEndPresentation::GetInstance()->Call("StartStrikerCupCaptainHologramSequence");
-        mUnidentified1914 = cupSidekicks;
+        mSidekicksLayer = cupSidekicks;
     }
     else if (GameInfoManager::Instance()->IsOnline())
-        mUnidentified1914 = cupSidekicks;
+        mSidekicksLayer = cupSidekicks;
     else
-        mUnidentified1914 = sidekicks;
+        mSidekicksLayer = sidekicks;
 
-    TLInstance* sidekick = FEFinder<TLInstance, -1>::Find<TLSlide>(mUnidentified1914->GetActiveSlide(), "SIDEKICK");
+    TLInstance* sidekick = FEFinder<TLInstance, -1>::Find<TLSlide>(mSidekicksLayer->GetActiveSlide(), "SIDEKICK");
     TLComponentInstance* pda[2];
     pda[0] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA left");
     pda[1] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "PDA right");
@@ -195,7 +195,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
     {
         char name[16];
         nlSNPrintf(name, sizeof(name), "SIDEKICK%d", i);
-        mUnidentified18AC[i] = (TLComponentInstance*)FEFinder<TLInstance, 4>::Find(sidekick, name);
+        mSidekickInstances[i] = (TLComponentInstance*)FEFinder<TLInstance, 4>::Find(sidekick, name);
     }
     for (int side = 0; side < 2; ++side)
     {
@@ -222,22 +222,22 @@ void ChooseSidekicksSceneV2::SceneCreated()
             default:
                 continue;
             }
-            mUnidentified18CC[side][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", texture);
-            mUnidentified18E4[side][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", click);
-            mUnidentified190C[side] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "green_arrow");
-            mUnidentified190C[side]->SetVisible(false);
+            mSlotInstances[side][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", texture);
+            mSlotClickInstances[side][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", click);
+            mGreenArrows[side] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "green_arrow");
+            mGreenArrows[side]->SetVisible(false);
         }
         if (side == 0 && (GameInfoManager::Instance()->IsOnline() || mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP))
         {
             FEFinder<TLComponentInstance, 4>::Find<TLSlide>(positions->GetActiveSlide(), "positions", "TITLE")->SetActiveSlide("team", true, false);
         }
     }
-    mUnidentified1904[0] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[0]->GetActiveSlide(), "select button");
-    mUnidentified18FC[0] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[0]->GetActiveSlide(), "random button");
-    mUnidentified50[0].fn_801DA198(pda[0], 0);
-    mUnidentified1904[1] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[1]->GetActiveSlide(), "select button");
-    mUnidentified18FC[1] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[1]->GetActiveSlide(), "random button");
-    mUnidentified50[1].fn_801DA198(pda[1], 1);
+    mRandomButtonInstances[0] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[0]->GetActiveSlide(), "select button");
+    mSelectButtonInstances[0] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[0]->GetActiveSlide(), "random button");
+    mUnidentified50[0].Initialize(pda[0], 0);
+    mRandomButtonInstances[1] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[1]->GetActiveSlide(), "select button");
+    mSelectButtonInstances[1] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[1]->GetActiveSlide(), "random button");
+    mUnidentified50[1].Initialize(pda[1], 1);
     FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[0]->GetActiveSlide(), "button_ok")->SetVisible(false);
     FEFinder<TLComponentInstance, 4>::Find<TLSlide>(pda[1]->GetActiveSlide(), "button_ok")->SetVisible(false);
     FEFinder<TLComponentInstance, 4>::Find<TLSlide>(GetPresentation()->GetActiveSlide(), "Layer", "SCREEN_TITLES")->SetActiveSlide("SIDEKICKS", true, false);
@@ -248,10 +248,10 @@ void ChooseSidekicksSceneV2::SceneCreated()
     {
         navigation->HideButtons();
         back = navigation->GetButton(4);
-        mUnidentified1918 = navigation->GetButton(0x20);
+        mDoneButtonInstance = navigation->GetButton(0x20);
     }
-    mUnidentified50[0].fn_801DCCEC();
-    mUnidentified50[1].fn_801DCCEC();
+    mUnidentified50[0].ReloadSidekicks();
+    mUnidentified50[1].ReloadSidekicks();
     for (int side = 0; side < 2; ++side)
     {
         mCaptainComponents[side].Initialize(pda[side], side, 0);
@@ -261,40 +261,40 @@ void ChooseSidekicksSceneV2::SceneCreated()
     }
     int captain;
     if (GameInfoManager::Instance()->IsInMode3())
-        captain = CupManager::Instance()->fn_8022ED7C();
+        captain = CupManager::Instance()->GetPendingCupTeam();
     else
         captain = GameInfoManager::Instance()->GetTeam(0);
-    mUnidentified50[0].fn_801DA88C();
-    mUnidentified50[0].fn_801DCD84(captain);
+    mUnidentified50[0].Show();
+    mUnidentified50[0].SetCaptain(captain);
     mCaptainComponents[0].ShowSlideIn();
     if (GameInfoManager::Instance()->IsOnline() || mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
         mCaptainComponents[1].SetVisible(false);
         mCaptainComponents[1].SetDisplayMode(5);
-        fn_8022E258(captain, -1);
+        LoadSidekickImages(captain, -1);
     }
     else
     {
-        mUnidentified50[1].fn_801DA88C();
-        mUnidentified50[1].fn_801DCD84(GameInfoManager::Instance()->GetTeam(1));
+        mUnidentified50[1].Show();
+        mUnidentified50[1].SetCaptain(GameInfoManager::Instance()->GetTeam(1));
         mCaptainComponents[1].ShowSlideIn();
-        fn_8022E258(captain, GameInfoManager::Instance()->GetTeam(1));
+        LoadSidekickImages(captain, GameInfoManager::Instance()->GetTeam(1));
         FEMusic::StartStreamIfDifferent(2);
     }
-    fn_8022D8A4();
-    fn_8022DA2C();
+    LoadSidekickTextures();
+    ApplySidekickTextures();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     if (NetworkDraft::Instance()->fn_8022819C())
     {
-        mUnidentified193C = NetworkDraft::Instance()->fn_8022ED88();
-        fn_802299C4(mUnidentified193C);
+        mDraftCountdown = NetworkDraft::Instance()->fn_8022ED88();
+        UpdateDraftTimer(mDraftCountdown);
         mBackButton.Disable();
         back->SetVisible(false);
     }
     else
     {
-        fn_802299C4(-1);
+        UpdateDraftTimer(-1);
         mBackButton.SetButtonInstance(back);
     }
 }
@@ -302,7 +302,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
 /**
  * Offset/Address/Size: 0x150C | 0x802299C4 | size: 0x160
  */
-void ChooseSidekicksSceneV2::fn_802299C4(int value)
+void ChooseSidekicksSceneV2::UpdateDraftTimer(int value)
 {
     TLSlide* slide = mPresentation->GetActiveSlide();
     FEFinder<TLInstance, 3>::Find<TLSlide>(slide,
@@ -330,12 +330,12 @@ void ChooseSidekicksSceneV2::fn_802299C4(int value)
  */
 void ChooseSidekicksSceneV2::Update(float dt)
 {
-    if (!fn_8022EBB8())
+    if (!AreImagesLoaded())
     {
-        fn_8022EACC();
+        UpdateAsyncImages();
         return;
     }
-    if (mUnidentified1C && !g_pFEInput->HasInputLock(this))
+    if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
     if (GameInfoManager::Instance()->IsOnline())
     {
@@ -360,16 +360,16 @@ void ChooseSidekicksSceneV2::Update(float dt)
     mCaptainComponents[1].Update(dt);
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
         UpdateCharacterIdleAnimations(dt);
-    if (mUnidentified1954 == 0 || mUnidentified1954 == 2 || mUnidentified1954 == 3)
+    if (mState == 0 || mState == 2 || mState == 3)
     {
         TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA left");
         TLComponentInstance* right = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA right");
         TLSlide* leftSlide = left->GetActiveSlide();
         TLSlide* rightSlide = right->GetActiveSlide();
-        if (mUnidentified1954 == 0 && !mUnidentified4A)
+        if (mState == 0 && !mPointerButtonsInitialized)
         {
-            mUnidentified50[0].fn_801DB69C(dt);
-            mUnidentified50[1].fn_801DB69C(dt);
+            mUnidentified50[0].LoadSlotImages(dt);
+            mUnidentified50[1].LoadSlotImages(dt);
         }
         if (leftSlide->GetCurrentTime() < leftSlide->GetStartTime() + leftSlide->GetDuration()
             || rightSlide->GetCurrentTime() < rightSlide->GetStartTime() + rightSlide->GetDuration())
@@ -378,11 +378,11 @@ void ChooseSidekicksSceneV2::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mUnidentified1954 == 0)
+        if (mState == 0)
         {
-            if (!mUnidentified4A)
+            if (!mPointerButtonsInitialized)
             {
-                fn_8022DDB0();
+                UpdateSlotButtons();
                 if (GameInfoManager::Instance()->IsOnline())
                     GetNavigationScene()->SetButtons(0x20, true);
                 else
@@ -390,16 +390,16 @@ void ChooseSidekicksSceneV2::Update(float dt)
                 for (int i = 0; i < 4; ++i)
                     GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
                 InitializePointerButtons();
-                mUnidentified4A = true;
-                mUnidentified1954 = 1;
+                mPointerButtonsInitialized = true;
+                mState = 1;
             }
         }
-        else if (mUnidentified1954 == 2)
+        else if (mState == 2)
         {
-            fn_8022DC68();
+            SubmitSidekickChoice();
             return;
         }
-        else if (mUnidentified1954 == 3)
+        else if (mState == 3)
         {
             if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
             {
@@ -411,23 +411,23 @@ void ChooseSidekicksSceneV2::Update(float dt)
             return;
         }
     }
-    if (!mUnidentified4B)
+    if (!mSidekickButtonsInitialized)
     {
         InitializeSidekickButtons();
-        mUnidentified4B = true;
+        mSidekickButtonsInitialized = true;
     }
-    if (mUnidentified4D)
+    if (mSelectionMade)
         return;
     for (int i = 0; i < 4; ++i)
     {
-        if (g_pNetworkSessionBase->GetSessionMode() != 0 && !fn_80223D08(i))
+        if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
         {
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             continue;
         }
         if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP && i != gFEControllerIndex)
         {
-            if (mUnidentified20[0] == i || mUnidentified20[1] == i)
+            if (mSidePads[0] == i || mSidePads[1] == i)
             {
                 ReleaseController(i);
             }
@@ -439,66 +439,66 @@ void ChooseSidekicksSceneV2::Update(float dt)
         event.mPosition = GetPointerPosition(i, &valid);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)i, 0x1E, true, 0);
         for (int button = 0; button < 8; ++button)
-            mUnidentifiedE8[button].HandlePointerEvent(&event);
+            mSidekickButtons[button].HandlePointerEvent(&event);
         for (int side = 0; side < 2; ++side)
         {
-            mUnidentifiedEF8[side].HandlePointerEvent(&event);
-            mUnidentified1060[side].HandlePointerEvent(&event);
+            mSelectButtons[side].HandlePointerEvent(&event);
+            mRandomButtons[side].HandlePointerEvent(&event);
             for (int slot = 0; slot < 3; ++slot)
             {
-                mUnidentified688[side][slot].HandlePointerEvent(&event);
-                mUnidentifiedAC0[side][slot].HandlePointerEvent(&event);
+                mSlotButtons[side][slot].HandlePointerEvent(&event);
+                mSlotClickButtons[side][slot].HandlePointerEvent(&event);
             }
         }
-        mUnidentified11C8.HandlePointerEvent(&event);
-        if (mUnidentified4D)
+        mDoneButton.HandlePointerEvent(&event);
+        if (mSelectionMade)
             return;
         if (!NetworkDraft::Instance()->fn_8022819C())
         {
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                mUnidentified1954 = 3;
+                mState = 3;
                 GetNavigationScene()->HideButtons();
                 TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA left");
                 TLComponentInstance* right = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA right");
                 left->SetActiveSlide("out", true, false);
                 right->SetActiveSlide("out", true, false);
-                if (mUnidentified4C)
-                    mUnidentified1914->SetActiveSlide("out", true, false);
+                if (mSidekicksShown)
+                    mSidekicksLayer->SetActiveSlide("out", true, false);
                 FEAudio::PlayAnimAudioEvent(0x9478C856, 0, 0, true);
                 return;
             }
         }
-        if ((mUnidentified20[0] == i || mUnidentified20[1] == i) && !g_pFEInput->IsConnected((eFEINPUT_PAD)i))
+        if ((mSidePads[0] == i || mSidePads[1] == i) && !g_pFEInput->IsConnected((eFEINPUT_PAD)i))
         {
             ReleaseController(i);
         }
     }
-    mUnidentified50[0].fn_801DB69C(dt);
-    mUnidentified50[1].fn_801DB69C(dt);
-    fn_8022DDB0();
-    fn_8022D5F8();
-    fn_8022DA2C();
+    mUnidentified50[0].LoadSlotImages(dt);
+    mUnidentified50[1].LoadSlotImages(dt);
+    UpdateSlotButtons();
+    UpdatePointerCursors();
+    ApplySidekickTextures();
     if (NetworkDraft::Instance()->fn_8022819C())
     {
         int countdown = NetworkDraft::Instance()->fn_8022ED88();
-        if (mUnidentified193C != countdown)
+        if (mDraftCountdown != countdown)
         {
-            mUnidentified193C = countdown;
-            fn_802299C4(countdown);
+            mDraftCountdown = countdown;
+            UpdateDraftTimer(countdown);
         }
-        if (countdown == 0 && !mUnidentified1950)
+        if (countdown == 0 && !mDraftExitDone)
         {
-            fn_8022DB70();
-            mUnidentified1954 = 2;
+            CommitSidekickChoices();
+            mState = 2;
             GetNavigationScene()->HideButtons();
             TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA left");
             TLComponentInstance* right = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA right");
             left->SetActiveSlide("out", true, false);
             right->SetActiveSlide("out", true, false);
-            if (mUnidentified4C)
-                mUnidentified1914->SetActiveSlide("out", true, false);
-            mUnidentified1950 = true;
+            if (mSidekicksShown)
+                mSidekicksLayer->SetActiveSlide("out", true, false);
+            mDraftExitDone = true;
         }
     }
 }
@@ -509,25 +509,25 @@ void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
-    if (side == -1 || mUnidentified30[side] == -1)
+    if (side == -1 || mSelectedSlots[side] == -1)
     {
         return;
     }
 
-    int slot = mUnidentified30[side];
-    mUnidentified50[side].fn_801DCD8C(slot, lbl_8051D198[which]);
-    mUnidentified18CC[side][slot]->SetActiveSlide("off", true, false);
+    int slot = mSelectedSlots[side];
+    mUnidentified50[side].SetSidekick(slot, lbl_8051D198[which]);
+    mSlotInstances[side][slot]->SetActiveSlide("off", true, false);
 
     for (int i = 0; i < 3; ++i)
     {
-        mUnidentified688[side][i].ResetPointerStates();
+        mSlotButtons[side][i].ResetPointerStates();
     }
-    mUnidentifiedE8[which].SetPointerState(0, index);
+    mSidekickButtons[which].SetPointerState(0, index);
     mCaptainComponents[side].SetDisplayMode(1);
-    mUnidentified190C[side]->m_bVisible = false;
-    mUnidentified50[side].fn_801DABAC(mUnidentified30[side], 1);
-    mUnidentified30[side] = -1;
-    mUnidentified20[side] = -1;
+    mGreenArrows[side]->m_bVisible = false;
+    mUnidentified50[side].SetRecycleState(mSelectedSlots[side], 1);
+    mSelectedSlots[side] = -1;
+    mSidePads[side] = -1;
     FEAudio::PlayAnimAudioEvent(FECharacterSound::GetSidekickAcceptSound((eSidekickID)lbl_8051D198[which]), 0, 0, 1);
     GameInfoManager::Instance()->mRulesTable[GetTeam(side)].mValues[slot] = (eSidekickID)lbl_8051D198[which];
 }
@@ -539,7 +539,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerEnter(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
-    if (side == -1 || mUnidentified30[side] == -1)
+    if (side == -1 || mSelectedSlots[side] == -1)
     {
         return;
     }
@@ -548,13 +548,13 @@ void ChooseSidekicksSceneV2::OnSidekickPointerEnter(int index, void* context)
     int sidekick = lbl_8051D198[which];
     mCaptainComponents[side].SetDisplayMode(3);
     mCaptainComponents[side].SetSidekickInfo(sidekick, index, 0);
-    mUnidentified190C[side]->m_bVisible = false;
-    if (!mUnidentifiedE8[which].HasOtherPointerState(1, index))
+    mGreenArrows[side]->m_bVisible = false;
+    if (!mSidekickButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified18AC[which]->SetActiveSlide("over", true, false);
+        mSidekickInstances[which]->SetActiveSlide("over", true, false);
     }
-    mUnidentifiedE8[which].SetPointerState(1, index);
-    mUnidentifiedE8[which].PlayHoverFeedback(index);
+    mSidekickButtons[which].SetPointerState(1, index);
+    mSidekickButtons[which].PlayHoverFeedback(index);
 
     switch (index)
     {
@@ -580,16 +580,16 @@ void ChooseSidekicksSceneV2::OnSidekickPointerLeave(int index, void* context)
 {
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
-    if (side == -1 || mUnidentified30[side] == -1)
+    if (side == -1 || mSelectedSlots[side] == -1)
     {
         return;
     }
 
-    if (!mUnidentifiedE8[which].HasOtherPointerState(1, index))
+    if (!mSidekickButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified18AC[which]->SetActiveSlide("off", true, false);
+        mSidekickInstances[which]->SetActiveSlide("off", true, false);
     }
-    mUnidentifiedE8[which].SetPointerState(0, index);
+    mSidekickButtons[which].SetPointerState(0, index);
 }
 
 /**
@@ -601,64 +601,64 @@ void ChooseSidekicksSceneV2::OnSlotPointerPress(int index, void* context)
     bool group = which >= 3;
     int slot = !group ? which : which - 3;
     int side = GetSide(index);
-    if (mUnidentified20[group] != -1 || side != -1)
+    if (mSidePads[group] != -1 || side != -1)
     {
         return;
     }
 
     mUnidentified48[group] = false;
     mCaptainComponents[group].SetReadyPromptVisible(false);
-    if (!mUnidentified4C)
+    if (!mSidekicksShown)
     {
-        mUnidentified1914->m_bVisible = true;
-        mUnidentified1914->SetActiveSlide("in", true, false);
+        mSidekicksLayer->m_bVisible = true;
+        mSidekicksLayer->SetActiveSlide("in", true, false);
         FEAudio::PlayAnimAudioEvent(0xDF52130F, 0, 0, 1);
-        mUnidentified4C = true;
+        mSidekicksShown = true;
     }
 
     for (int i = 0; i < 3; ++i)
     {
         if (i == slot)
         {
-            mUnidentified18CC[group][i]->SetActiveSlide("down", true, false);
-            mUnidentified18E4[group][i]->SetActiveSlide("down", true, false);
+            mSlotInstances[group][i]->SetActiveSlide("down", true, false);
+            mSlotClickInstances[group][i]->SetActiveSlide("down", true, false);
         }
         else
         {
-            mUnidentified18CC[group][i]->SetActiveSlide("off", true, false);
-            mUnidentified18E4[group][i]->SetActiveSlide("off", true, false);
+            mSlotInstances[group][i]->SetActiveSlide("off", true, false);
+            mSlotClickInstances[group][i]->SetActiveSlide("off", true, false);
         }
     }
     for (int i = 0; i < 3; ++i)
     {
         for (int j = 0; j < 4; ++j)
         {
-            mUnidentified688[group][i].SetPointerState(2, j);
+            mSlotButtons[group][i].SetPointerState(2, j);
         }
         for (int j = 0; j < 4; ++j)
         {
-            mUnidentifiedAC0[group][i].SetPointerState(2, j);
+            mSlotClickButtons[group][i].SetPointerState(2, j);
         }
     }
-    mUnidentified18FC[group]->SetActiveSlide("off", true, false);
-    mUnidentified1904[group]->SetActiveSlide("off", true, false);
+    mSelectButtonInstances[group]->SetActiveSlide("off", true, false);
+    mRandomButtonInstances[group]->SetActiveSlide("off", true, false);
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentifiedEF8[group].SetPointerState(0, i);
+        mSelectButtons[group].SetPointerState(0, i);
     }
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified1060[group].SetPointerState(0, i);
+        mRandomButtons[group].SetPointerState(0, i);
     }
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified11C8.SetPointerState(0, i);
+        mDoneButton.SetPointerState(0, i);
     }
-    mUnidentified190C[group]->m_bVisible = true;
-    mUnidentified20[group] = index;
-    mUnidentified30[group] = slot;
+    mGreenArrows[group]->m_bVisible = true;
+    mSidePads[group] = index;
+    mSelectedSlots[group] = slot;
     mUnidentifiedA0[group][slot] = false;
-    mUnidentified50[group].fn_801DABAC(slot, 0);
+    mUnidentified50[group].SetRecycleState(slot, 0);
     FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
 }
 
@@ -672,21 +672,21 @@ void ChooseSidekicksSceneV2::OnSlotPointerEnter(int index, void* context)
     int slot = !group ? which : which - 3;
     int side = GetSide(index);
 
-    if (mUnidentified20[group] != -1 || side != -1)
+    if (mSidePads[group] != -1 || side != -1)
     {
         return;
     }
 
-    if (!mUnidentified688[group][slot].HasOtherPointerState(1, index))
+    if (!mSlotButtons[group][slot].HasOtherPointerState(1, index))
     {
         if (mUnidentifiedA0[group][slot])
         {
-            mUnidentified18E4[group][slot]->SetActiveSlide("over", true, false);
+            mSlotClickInstances[group][slot]->SetActiveSlide("over", true, false);
         }
         else
         {
-            mUnidentified18CC[group][slot]->SetActiveSlide("over", true, false);
-            FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified18CC[group][slot],
+            mSlotInstances[group][slot]->SetActiveSlide("over", true, false);
+            FEFinder<TLComponentInstance, 4>::FindOrDefault(mSlotInstances[group][slot],
                 nlStringLowerHash("over"), nlStringLowerHash("CHANGE"), 0, 0, 0, 0)
                 ->SetActiveSlide("Slide1", true, false);
         }
@@ -694,9 +694,9 @@ void ChooseSidekicksSceneV2::OnSlotPointerEnter(int index, void* context)
         FEAudio::PlayAnimAudioEvent(0x23628A1D, 0, 0, 1);
     }
 
-    mUnidentified688[group][slot].SetPointerState(1, index);
-    mUnidentifiedAC0[group][slot].SetPointerState(1, index);
-    mUnidentified688[group][slot].PlayHoverFeedback(index);
+    mSlotButtons[group][slot].SetPointerState(1, index);
+    mSlotClickButtons[group][slot].SetPointerState(1, index);
+    mSlotButtons[group][slot].PlayHoverFeedback(index);
 }
 
 /**
@@ -709,13 +709,13 @@ void ChooseSidekicksSceneV2::OnSlotPointerLeave(int index, void* context)
     int slot = !group ? which : which - 3;
     int side = GetSide(index);
 
-    if (mUnidentified20[group] != -1 || side != -1)
+    if (mSidePads[group] != -1 || side != -1)
     {
         return;
     }
 
-    mUnidentified688[group][slot].SetPointerState(0, index);
-    mUnidentifiedAC0[group][slot].SetPointerState(0, index);
+    mSlotButtons[group][slot].SetPointerState(0, index);
+    mSlotClickButtons[group][slot].SetPointerState(0, index);
 }
 
 /**
@@ -728,12 +728,12 @@ void ChooseSidekicksSceneV2::OnSlotPointerInside(int index, void* context)
     int slot = !group ? which : which - 3;
     int side = GetSide(index);
 
-    if (mUnidentified20[group] != -1 || side != -1)
+    if (mSidePads[group] != -1 || side != -1)
     {
         return;
     }
 
-    if (mUnidentified688[group][slot].GetPointerState(index) != 0)
+    if (mSlotButtons[group][slot].GetPointerState(index) != 0)
     {
         return;
     }
@@ -749,20 +749,20 @@ void ChooseSidekicksSceneV2::OnSelectPointerPress(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified20[which] != -1 || side != -1)
+    if (mSidePads[which] != -1 || side != -1)
     {
         return;
     }
 
-    mUnidentified18FC[which]->SetActiveSlide("over", true, false);
+    mSelectButtonInstances[which]->SetActiveSlide("over", true, false);
     FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
 
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentifiedEF8[which].SetPointerState(2, i);
+        mSelectButtons[which].SetPointerState(2, i);
     }
 
-    mUnidentified50[which].fn_801DCB28();
+    mUnidentified50[which].RandomizeSidekicks();
 }
 
 /**
@@ -773,19 +773,19 @@ void ChooseSidekicksSceneV2::OnSelectPointerEnter(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified20[which] != -1 || side != -1)
+    if (mSidePads[which] != -1 || side != -1)
     {
         return;
     }
 
-    if (!mUnidentifiedEF8[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified18FC[which]->SetActiveSlide("over", true, false);
+        mSelectButtonInstances[which]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
     }
 
-    mUnidentifiedEF8[which].PlayHoverFeedback(index);
-    mUnidentifiedEF8[which].SetPointerState(1, index);
+    mSelectButtons[which].PlayHoverFeedback(index);
+    mSelectButtons[which].SetPointerState(1, index);
 }
 
 /**
@@ -796,17 +796,17 @@ void ChooseSidekicksSceneV2::OnSelectPointerLeave(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified20[which] != -1 || side != -1)
+    if (mSidePads[which] != -1 || side != -1)
     {
         return;
     }
 
-    if (!mUnidentifiedEF8[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified18FC[which]->SetActiveSlide("off", true, false);
+        mSelectButtonInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mUnidentifiedEF8[which].SetPointerState(0, index);
+    mSelectButtons[which].SetPointerState(0, index);
 }
 
 /**
@@ -817,22 +817,22 @@ void ChooseSidekicksSceneV2::OnRandomPointerPress(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified20[which] != -1 || side != -1)
+    if (mSidePads[which] != -1 || side != -1)
     {
         return;
     }
 
-    mUnidentified1904[which]->SetActiveSlide("over", true, false);
+    mRandomButtonInstances[which]->SetActiveSlide("over", true, false);
     FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
 
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified1060[which].SetPointerState(2, i);
+        mRandomButtons[which].SetPointerState(2, i);
     }
 
     mCaptainComponents[which].SetReadyPromptVisible(false);
     mUnidentified48[which] = false;
-    mUnidentified50[which].fn_801DCC28();
+    mUnidentified50[which].ResetSidekicks();
 }
 
 /**
@@ -843,19 +843,19 @@ void ChooseSidekicksSceneV2::OnRandomPointerEnter(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified20[which] != -1 || side != -1)
+    if (mSidePads[which] != -1 || side != -1)
     {
         return;
     }
 
-    if (!mUnidentified1060[which].HasOtherPointerState(1, index))
+    if (!mRandomButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified1904[which]->SetActiveSlide("over", true, false);
+        mRandomButtonInstances[which]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
     }
 
-    mUnidentified1060[which].PlayHoverFeedback(index);
-    mUnidentified1060[which].SetPointerState(1, index);
+    mRandomButtons[which].PlayHoverFeedback(index);
+    mRandomButtons[which].SetPointerState(1, index);
 }
 
 /**
@@ -866,17 +866,17 @@ void ChooseSidekicksSceneV2::OnRandomPointerLeave(int index, void* context)
     unsigned long which = (unsigned long)context;
     int side = GetSide(index);
 
-    if (mUnidentified20[which] != -1 || side != -1)
+    if (mSidePads[which] != -1 || side != -1)
     {
         return;
     }
 
-    if (!mUnidentified1060[which].HasOtherPointerState(1, index))
+    if (!mRandomButtons[which].HasOtherPointerState(1, index))
     {
-        mUnidentified1904[which]->SetActiveSlide("off", true, false);
+        mRandomButtonInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mUnidentified1060[which].SetPointerState(0, index);
+    mRandomButtons[which].SetPointerState(0, index);
 }
 
 /**
@@ -884,20 +884,20 @@ void ChooseSidekicksSceneV2::OnRandomPointerLeave(int index, void* context)
  */
 void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
 {
-    if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
+    if (mSidePads[0] != -1 || mSidePads[1] != -1)
     {
         return;
     }
 
-    mUnidentified1918->SetActiveSlide("down", true, false);
+    mDoneButtonInstance->SetActiveSlide("down", true, false);
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentified11C8.SetPointerState(0, i);
+        mDoneButton.SetPointerState(0, i);
     }
-    mUnidentified11C8.Disable();
-    mUnidentified4D = true;
-    mUnidentified1954 = 2;
+    mDoneButton.Disable();
+    mSelectionMade = true;
+    mState = 2;
     GetNavigationScene()->HideButtons();
     TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide,
         "Layer", "PDA left");
@@ -905,10 +905,10 @@ void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
         "Layer", "PDA right");
     left->SetActiveSlide("out", true, false);
     right->SetActiveSlide("out", true, false);
-    fn_8022DB70();
-    if (mUnidentified4C)
+    CommitSidekickChoices();
+    if (mSidekicksShown)
     {
-        mUnidentified1914->SetActiveSlide("out", true, false);
+        mSidekicksLayer->SetActiveSlide("out", true, false);
     }
     if (GameInfoManager::Instance()->mIsOnlineMode == 0 && !GameInfoManager::Instance()->IsInMode3())
     {
@@ -925,19 +925,19 @@ void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
  */
 void ChooseSidekicksSceneV2::OnDonePointerEnter(int index, void* context)
 {
-    if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
+    if (mSidePads[0] != -1 || mSidePads[1] != -1)
     {
         return;
     }
 
-    if (!mUnidentified11C8.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(1, index))
     {
-        mUnidentified1918->SetActiveSlide("over", true, false);
+        mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mUnidentified11C8.SetPointerState(1, index);
-    mUnidentified11C8.PlayHoverFeedback(index);
+    mDoneButton.SetPointerState(1, index);
+    mDoneButton.PlayHoverFeedback(index);
 }
 
 /**
@@ -945,17 +945,17 @@ void ChooseSidekicksSceneV2::OnDonePointerEnter(int index, void* context)
  */
 void ChooseSidekicksSceneV2::OnDonePointerLeave(int index, void* context)
 {
-    if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
+    if (mSidePads[0] != -1 || mSidePads[1] != -1)
     {
         return;
     }
 
-    if (!mUnidentified11C8.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(1, index))
     {
-        mUnidentified1918->SetActiveSlide("off", true, false);
+        mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mUnidentified11C8.SetPointerState(0, index);
+    mDoneButton.SetPointerState(0, index);
 }
 
 /**
@@ -963,12 +963,12 @@ void ChooseSidekicksSceneV2::OnDonePointerLeave(int index, void* context)
  */
 void ChooseSidekicksSceneV2::OnDonePointerInside(int index, void* context)
 {
-    if (mUnidentified20[0] != -1 || mUnidentified20[1] != -1)
+    if (mSidePads[0] != -1 || mSidePads[1] != -1)
     {
         return;
     }
 
-    if (mUnidentified11C8.GetPointerState(index) == 0)
+    if (mDoneButton.GetPointerState(index) == 0)
     {
         OnDonePointerEnter(index, context);
     }
@@ -1000,17 +1000,17 @@ void ChooseSidekicksSceneV2::InitializeSidekickButtons()
         nlSNPrintf(name, sizeof(name), "%d", i);
         char imageName[32];
         nlSNPrintf(imageName, sizeof(imageName), "%02d_dummy_texture", i);
-        TLInstance* layer = FEFinder<TLInstance, 1>::Find(mUnidentified18AC[i], "off", name);
+        TLInstance* layer = FEFinder<TLInstance, 1>::Find(mSidekickInstances[i], "off", name);
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(layer, imageName);
-        feVector3 itemPosition = mUnidentified18AC[i]->GetAssetPosition();
+        feVector3 itemPosition = mSidekickInstances[i]->GetAssetPosition();
         float x = position.f.x + sidekickPosition.f.x;
         float y = position.f.y + sidekickPosition.f.y;
         x += itemPosition.f.x * scale.f.x;
         y += itemPosition.f.y * scale.f.y;
-        mUnidentifiedE8[i].SetInstanceBounds(image, false, x, y, 1.0f, 1.0f);
-        mUnidentifiedE8[i].SetPointerEnterCallback(enter);
-        mUnidentifiedE8[i].SetPointerLeaveCallback(leave);
-        mUnidentifiedE8[i].SetPointerPressCallback(press);
+        mSidekickButtons[i].SetInstanceBounds(image, false, x, y, 1.0f, 1.0f);
+        mSidekickButtons[i].SetPointerEnterCallback(enter);
+        mSidekickButtons[i].SetPointerLeaveCallback(leave);
+        mSidekickButtons[i].SetPointerPressCallback(press);
     }
 }
 
@@ -1036,40 +1036,40 @@ void ChooseSidekicksSceneV2::InitializePointerButtons()
     FEPointerListener::Callback slotLeave(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback slotInside(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerInside), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback slotPress(PointerBinding(MemFun(&ChooseSidekicksSceneV2::OnSlotPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    SetDoneButtonBounds(&mUnidentified11C8, mUnidentified1918, 0);
-    mUnidentified11C8.SetPointerEnterCallback(doneEnter);
-    mUnidentified11C8.SetPointerLeaveCallback(doneLeave);
-    mUnidentified11C8.SetPointerInsideCallback(doneInside);
-    mUnidentified11C8.SetPointerPressCallback(donePress);
+    SetDoneButtonBounds(&mDoneButton, mDoneButtonInstance, 0);
+    mDoneButton.SetPointerEnterCallback(doneEnter);
+    mDoneButton.SetPointerLeaveCallback(doneLeave);
+    mDoneButton.SetPointerInsideCallback(doneInside);
+    mDoneButton.SetPointerPressCallback(donePress);
     for (int side = 0; side < 2; ++side)
     {
         if ((GameInfoManager::Instance()->mIsOnlineMode || mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP) && side == 1)
             continue;
-        mUnidentifiedEF8[side].SetInstanceBounds(mUnidentified18FC[side], true, -157.0f, 159.0f, 0.7f, 0.7f);
-        mUnidentifiedEF8[side].SetPointerEnterCallback(selectEnter);
-        mUnidentifiedEF8[side].SetPointerLeaveCallback(selectLeave);
-        mUnidentifiedEF8[side].SetPointerPressCallback(selectPress);
-        mUnidentified1060[side].SetInstanceBounds(mUnidentified1904[side], true, -157.0f, 159.0f, 0.8f, 0.7f);
-        mUnidentified1060[side].SetPointerEnterCallback(randomEnter);
-        mUnidentified1060[side].SetPointerLeaveCallback(randomLeave);
-        mUnidentified1060[side].SetPointerPressCallback(randomPress);
+        mSelectButtons[side].SetInstanceBounds(mSelectButtonInstances[side], true, -157.0f, 159.0f, 0.7f, 0.7f);
+        mSelectButtons[side].SetPointerEnterCallback(selectEnter);
+        mSelectButtons[side].SetPointerLeaveCallback(selectLeave);
+        mSelectButtons[side].SetPointerPressCallback(selectPress);
+        mRandomButtons[side].SetInstanceBounds(mRandomButtonInstances[side], true, -157.0f, 159.0f, 0.8f, 0.7f);
+        mRandomButtons[side].SetPointerEnterCallback(randomEnter);
+        mRandomButtons[side].SetPointerLeaveCallback(randomLeave);
+        mRandomButtons[side].SetPointerPressCallback(randomPress);
         for (int i = 0; i < 3; ++i)
         {
-            TLInstance* instance = FEFinder<TLInstance, 4>::Find(mUnidentified18CC[side][i], mUnidentified18CC[side][i]->m_szName);
-            float x = mUnidentified18CC[side][i]->GetAssetPosition().f.x;
-            float y = mUnidentified18CC[side][i]->GetAssetPosition().f.y;
-            mUnidentified688[side][i].SetInstanceBounds(instance, true,
+            TLInstance* instance = FEFinder<TLInstance, 4>::Find(mSlotInstances[side][i], mSlotInstances[side][i]->m_szName);
+            float x = mSlotInstances[side][i]->GetAssetPosition().f.x;
+            float y = mSlotInstances[side][i]->GetAssetPosition().f.y;
+            mSlotButtons[side][i].SetInstanceBounds(instance, true,
                 x + lbl_804E8530[side].x, y + lbl_804E8530[side].y, 1.0f, 1.0f);
-            mUnidentified688[side][i].SetPointerEnterCallback(slotEnter);
-            mUnidentified688[side][i].SetPointerLeaveCallback(slotLeave);
-            mUnidentified688[side][i].SetPointerPressCallback(slotPress);
-            mUnidentified688[side][i].SetPointerInsideCallback(slotInside);
-            mUnidentifiedAC0[side][i].SetInstanceBounds(mUnidentified18E4[side][i], true,
+            mSlotButtons[side][i].SetPointerEnterCallback(slotEnter);
+            mSlotButtons[side][i].SetPointerLeaveCallback(slotLeave);
+            mSlotButtons[side][i].SetPointerPressCallback(slotPress);
+            mSlotButtons[side][i].SetPointerInsideCallback(slotInside);
+            mSlotClickButtons[side][i].SetInstanceBounds(mSlotClickInstances[side][i], true,
                 lbl_804E8530[side].x, lbl_804E8530[side].y, 1.0f, 1.0f);
-            mUnidentifiedAC0[side][i].SetPointerEnterCallback(slotEnter);
-            mUnidentifiedAC0[side][i].SetPointerLeaveCallback(slotLeave);
-            mUnidentifiedAC0[side][i].SetPointerPressCallback(slotPress);
-            mUnidentifiedAC0[side][i].SetPointerInsideCallback(slotInside);
+            mSlotClickButtons[side][i].SetPointerEnterCallback(slotEnter);
+            mSlotClickButtons[side][i].SetPointerLeaveCallback(slotLeave);
+            mSlotClickButtons[side][i].SetPointerPressCallback(slotPress);
+            mSlotClickButtons[side][i].SetPointerInsideCallback(slotInside);
         }
     }
 }
@@ -1077,13 +1077,13 @@ void ChooseSidekicksSceneV2::InitializePointerButtons()
 /**
  * Offset/Address/Size: 0x5140 | 0x8022D5F8 | size: 0x2AC
  */
-void ChooseSidekicksSceneV2::fn_8022D5F8()
+void ChooseSidekicksSceneV2::UpdatePointerCursors()
 {
     bool idle[2] = { true, true };
     for (int i = 0; i < 4; ++i)
     {
         TLComponentInstance* pointer = GetPointerInstance(i);
-        if (mUnidentified20[0] != -1 && mUnidentified20[0] != i && mUnidentified20[1] != -1 && mUnidentified20[1] != i)
+        if (mSidePads[0] != -1 && mSidePads[0] != i && mSidePads[1] != -1 && mSidePads[1] != i)
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
@@ -1091,7 +1091,7 @@ void ChooseSidekicksSceneV2::fn_8022D5F8()
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
-        else if (g_pNetworkSessionBase->GetSessionMode() != 0 && !fn_80223D08(i))
+        else if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
@@ -1100,13 +1100,13 @@ void ChooseSidekicksSceneV2::fn_8022D5F8()
             pointer->SetActiveSlide("cursor", true, false);
             for (int j = 0; j < 8; ++j)
             {
-                if (mUnidentifiedE8[j].GetPointerState(i) == 1)
+                if (mSidekickButtons[j].GetPointerState(i) == 1)
                 {
-                    if (mUnidentified20[0] == i)
+                    if (mSidePads[0] == i)
                     {
                         idle[0] = false;
                     }
-                    else if (mUnidentified20[1] == i)
+                    else if (mSidePads[1] == i)
                     {
                         idle[1] = false;
                     }
@@ -1117,26 +1117,26 @@ void ChooseSidekicksSceneV2::fn_8022D5F8()
     }
     for (int side = 0; side < 2; ++side)
     {
-        if (mUnidentified20[side] != -1 && idle[side])
+        if (mSidePads[side] != -1 && idle[side])
         {
             mUnidentified28[side] = -1;
             mCaptainComponents[side].SetDisplayMode(1);
-            mUnidentified190C[side]->m_bVisible = true;
+            mGreenArrows[side]->m_bVisible = true;
         }
         for (int i = 0; i < 3; ++i)
         {
-            if (!mUnidentified688[side][i].HasOtherPointerState(1, -1) && !mUnidentified688[side][i].HasOtherPointerState(2, -1))
+            if (!mSlotButtons[side][i].HasOtherPointerState(1, -1) && !mSlotButtons[side][i].HasOtherPointerState(2, -1))
             {
-                mUnidentified18CC[side][i]->SetActiveSlide("off", true, false);
-                mUnidentified18E4[side][i]->SetActiveSlide("off", true, false);
+                mSlotInstances[side][i]->SetActiveSlide("off", true, false);
+                mSlotClickInstances[side][i]->SetActiveSlide("off", true, false);
             }
         }
     }
     for (int i = 0; i < 8; ++i)
     {
-        if (!mUnidentifiedE8[i].HasOtherPointerState(1, -1))
+        if (!mSidekickButtons[i].HasOtherPointerState(1, -1))
         {
-            mUnidentified18AC[i]->SetActiveSlide("off", true, false);
+            mSidekickInstances[i]->SetActiveSlide("off", true, false);
         }
     }
 }
@@ -1144,7 +1144,7 @@ void ChooseSidekicksSceneV2::fn_8022D5F8()
 /**
  * Offset/Address/Size: 0x53EC | 0x8022D8A4 | size: 0x188
  */
-void ChooseSidekicksSceneV2::fn_8022D8A4()
+void ChooseSidekicksSceneV2::LoadSidekickTextures()
 {
     for (int i = 0; i < 8; ++i)
     {
@@ -1158,24 +1158,24 @@ void ChooseSidekicksSceneV2::fn_8022D8A4()
             "art", "Layer", selected);
         TLImageInstance* disabledImage = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation,
             "art", "Layer", disabled);
-        mUnidentifiedA8[i][0] = selectedImage->m_pTextureResource;
-        mUnidentifiedA8[i][1] = disabledImage->m_pTextureResource;
+        mSidekickTextures[i][0] = selectedImage->m_pTextureResource;
+        mSidekickTextures[i][1] = disabledImage->m_pTextureResource;
     }
 }
 
 /**
  * Offset/Address/Size: 0x5574 | 0x8022DA2C | size: 0x144
  */
-void ChooseSidekicksSceneV2::fn_8022DA2C()
+void ChooseSidekicksSceneV2::ApplySidekickTextures()
 {
     for (int i = 0; i < 8; ++i)
     {
-        FETextureResource* texture = mUnidentifiedA8[i][0];
+        FETextureResource* texture = mSidekickTextures[i][0];
         char name[64];
         char index[8];
         nlSNPrintf(name, 64, "%02d_dummy_texture", i);
         nlSNPrintf(index, 8, "%d", i);
-        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mUnidentified18AC[i]->GetActiveSlide(),
+        TLImageInstance* image = FEFinder<TLImageInstance, 2>::Find(mSidekickInstances[i]->GetActiveSlide(),
             index, name);
         if (image != 0 && texture != 0)
         {
@@ -1187,14 +1187,14 @@ void ChooseSidekicksSceneV2::fn_8022DA2C()
 /**
  * Offset/Address/Size: 0x56B8 | 0x8022DB70 | size: 0xF8
  */
-void ChooseSidekicksSceneV2::fn_8022DB70()
+void ChooseSidekicksSceneV2::CommitSidekickChoices()
 {
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
         GameRules rules;
-        rules.mValues[0] = (eSidekickID)mUnidentified50[0].fn_801DCD74(0);
-        rules.mValues[1] = (eSidekickID)mUnidentified50[0].fn_801DCD74(1);
-        rules.mValues[2] = (eSidekickID)mUnidentified50[0].fn_801DCD74(2);
+        rules.mValues[0] = (eSidekickID)mUnidentified50[0].GetSidekick(0);
+        rules.mValues[1] = (eSidekickID)mUnidentified50[0].GetSidekick(1);
+        rules.mValues[2] = (eSidekickID)mUnidentified50[0].GetSidekick(2);
         g_pCupManager->SetSidekicks(rules);
     }
     else
@@ -1203,7 +1203,7 @@ void ChooseSidekicksSceneV2::fn_8022DB70()
         {
             for (int slot = 0; slot < 3; ++slot)
             {
-                int sidekick = mUnidentified50[side].fn_801DCD74(slot);
+                int sidekick = mUnidentified50[side].GetSidekick(slot);
                 GameInfoManager::Instance()->SetSidekick(side, sidekick, slot);
             }
         }
@@ -1213,7 +1213,7 @@ void ChooseSidekicksSceneV2::fn_8022DB70()
 /**
  * Offset/Address/Size: 0x57B0 | 0x8022DC68 | size: 0x148
  */
-void ChooseSidekicksSceneV2::fn_8022DC68()
+void ChooseSidekicksSceneV2::SubmitSidekickChoice()
 {
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->IsOnline())
@@ -1236,40 +1236,40 @@ void ChooseSidekicksSceneV2::fn_8022DC68()
 /**
  * Offset/Address/Size: 0x58F8 | 0x8022DDB0 | size: 0x310
  */
-void ChooseSidekicksSceneV2::fn_8022DDB0()
+void ChooseSidekicksSceneV2::UpdateSlotButtons()
 {
     for (int side = 0; side < 2; ++side)
     {
         for (int i = 0; i < 3; ++i)
         {
-            TLComponentInstance* recycle = FEFinder<TLComponentInstance, 4>::FindOrDefault(mUnidentified18CC[side][i],
+            TLComponentInstance* recycle = FEFinder<TLComponentInstance, 4>::FindOrDefault(mSlotInstances[side][i],
                 "off", "recycle");
             if (mUnidentifiedA0[side][i])
             {
-                mUnidentifiedAC0[side][i].Enable();
-                mUnidentified18E4[side][i]->m_bVisible = true;
-                mUnidentified688[side][i].Disable();
+                mSlotClickButtons[side][i].Enable();
+                mSlotClickInstances[side][i]->m_bVisible = true;
+                mSlotButtons[side][i].Disable();
                 recycle->m_bVisible = false;
             }
             else
             {
-                mUnidentifiedAC0[side][i].Disable();
-                mUnidentified18E4[side][i]->m_bVisible = false;
-                mUnidentified688[side][i].Enable();
+                mSlotClickButtons[side][i].Disable();
+                mSlotClickInstances[side][i]->m_bVisible = false;
+                mSlotButtons[side][i].Enable();
                 recycle->m_bVisible = true;
             }
         }
     }
 
-    if (mUnidentified20[0] == -1 && mUnidentified20[1] == -1)
+    if (mSidePads[0] == -1 && mSidePads[1] == -1)
     {
-        mUnidentified11C8.Enable();
-        mUnidentified1918->m_bVisible = true;
+        mDoneButton.Enable();
+        mDoneButtonInstance->m_bVisible = true;
     }
     else
     {
-        mUnidentified11C8.Disable();
-        mUnidentified1918->m_bVisible = false;
+        mDoneButton.Disable();
+        mDoneButtonInstance->m_bVisible = false;
     }
 }
 
@@ -1278,8 +1278,8 @@ void ChooseSidekicksSceneV2::fn_8022DDB0()
  */
 static void fn_8022E0C0()
 {
-    g_pCupManager->mUnidentified869D = false;
-    g_pCupManager->fn_8010CBE4();
+    g_pCupManager->mForceHighestSkillLevel = false;
+    g_pCupManager->StartCupSeries();
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
@@ -1299,8 +1299,8 @@ static void fn_8022E0C0()
  */
 static void fn_8022E18C()
 {
-    g_pCupManager->mUnidentified869D = true;
-    g_pCupManager->fn_8010CBE4();
+    g_pCupManager->mForceHighestSkillLevel = true;
+    g_pCupManager->StartCupSeries();
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
@@ -1318,7 +1318,7 @@ static void fn_8022E18C()
 /**
  * Offset/Address/Size: 0x5DA0 | 0x8022E258 | size: 0x874
  */
-void ChooseSidekicksSceneV2::fn_8022E258(int firstCaptain, int secondCaptain)
+void ChooseSidekicksSceneV2::LoadSidekickImages(int firstCaptain, int secondCaptain)
 {
     FEPresentation* presentation = GameSceneManager::Instance()->GetCurrentScene()->GetPresentation();
     bool firstAlt = false;
@@ -1338,7 +1338,7 @@ void ChooseSidekicksSceneV2::fn_8022E258(int firstCaptain, int secondCaptain)
 
     for (int i = 0; i < 8; ++i)
     {
-        mUnidentified1998[0][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
+        mPositionImages[0][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
         const CharacterInfo& sidekick = GetCharacterInfo(GetCharacterIndexFromSidekick(i));
         const CharacterInfo& captain = GetCharacterInfo(GetCharacterIndexFromCaptain(firstCaptain));
         char positionName[64];
@@ -1349,26 +1349,26 @@ void ChooseSidekicksSceneV2::fn_8022E258(int firstCaptain, int secondCaptain)
             nlSNPrintf(positionPath, sizeof(positionPath), "fe/sidekick_images/position_%s_%s_alt", sidekick.mName, captain.mName);
         else
             nlSNPrintf(positionPath, sizeof(positionPath), "fe/sidekick_images/position_%s_%s", sidekick.mName, captain.mName);
-        mUnidentified1998[0][i]->SetImageInstance(image);
-        mUnidentified1998[0][i]->QueueLoad(positionPath, false);
-        mUnidentified19E8[0][i] = false;
+        mPositionImages[0][i]->SetImageInstance(image);
+        mPositionImages[0][i]->QueueLoad(positionPath, false);
+        mPositionsLoaded[0][i] = false;
 
         char attributeName[32];
         nlSNPrintf(attributeName, sizeof(attributeName), "attributes_%s_mario", sidekick.mName);
-        mUnidentified1958[0][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
+        mAttributeImages[0][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
         TLImageInstance* attributeImage = FEFinder<TLImageInstance, 2>::Find(firstPda, sidekick.mName, attributeName);
         char attributePath[64];
         if (firstAlt)
             nlSNPrintf(attributePath, sizeof(attributePath), "fe/sidekick_images/attributes_%s_%s_alt", sidekick.mName, captain.mName);
         else
             nlSNPrintf(attributePath, sizeof(attributePath), "fe/sidekick_images/attributes_%s_%s", sidekick.mName, captain.mName);
-        mUnidentified1958[0][i]->SetImageInstance(attributeImage);
-        mUnidentified1958[0][i]->QueueLoad(attributePath, false);
-        mUnidentified19D8[0][i] = false;
+        mAttributeImages[0][i]->SetImageInstance(attributeImage);
+        mAttributeImages[0][i]->QueueLoad(attributePath, false);
+        mAttributesLoaded[0][i] = false;
 
         if (secondCaptain != -1)
         {
-            mUnidentified1998[1][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
+            mPositionImages[1][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
             const CharacterInfo& sidekick = GetCharacterInfo(GetCharacterIndexFromSidekick(i));
             const CharacterInfo& captain = GetCharacterInfo(GetCharacterIndexFromCaptain(secondCaptain));
             char positionName[64];
@@ -1379,22 +1379,22 @@ void ChooseSidekicksSceneV2::fn_8022E258(int firstCaptain, int secondCaptain)
                 nlSNPrintf(positionPath, sizeof(positionPath), "fe/sidekick_images/position_%s_%s_alt", sidekick.mName, captain.mName);
             else
                 nlSNPrintf(positionPath, sizeof(positionPath), "fe/sidekick_images/position_%s_%s", sidekick.mName, captain.mName);
-            mUnidentified1998[1][i]->SetImageInstance(image);
-            mUnidentified1998[1][i]->QueueLoad(positionPath, false);
-            mUnidentified19E8[1][i] = false;
+            mPositionImages[1][i]->SetImageInstance(image);
+            mPositionImages[1][i]->QueueLoad(positionPath, false);
+            mPositionsLoaded[1][i] = false;
 
             char attributeName[32];
             nlSNPrintf(attributeName, sizeof(attributeName), "attributes_%s_luigi", sidekick.mName);
-            mUnidentified1958[1][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
+            mAttributeImages[1][i] = new (8, false) AsyncImage("art/fe/sidekicksui.res", 0);
             TLImageInstance* attributeImage = FEFinder<TLImageInstance, 2>::Find(secondPda, sidekick.mName, attributeName);
             char attributePath[64];
             if (secondAlt)
                 nlSNPrintf(attributePath, sizeof(attributePath), "fe/sidekick_images/attributes_%s_%s_alt", sidekick.mName, captain.mName);
             else
                 nlSNPrintf(attributePath, sizeof(attributePath), "fe/sidekick_images/attributes_%s_%s", sidekick.mName, captain.mName);
-            mUnidentified1958[1][i]->SetImageInstance(attributeImage);
-            mUnidentified1958[1][i]->QueueLoad(attributePath, false);
-            mUnidentified19D8[1][i] = false;
+            mAttributeImages[1][i]->SetImageInstance(attributeImage);
+            mAttributeImages[1][i]->QueueLoad(attributePath, false);
+            mAttributesLoaded[1][i] = false;
         }
     }
 }
@@ -1402,25 +1402,25 @@ void ChooseSidekicksSceneV2::fn_8022E258(int firstCaptain, int secondCaptain)
 /**
  * Offset/Address/Size: 0x6614 | 0x8022EACC | size: 0xEC
  */
-void ChooseSidekicksSceneV2::fn_8022EACC()
+void ChooseSidekicksSceneV2::UpdateAsyncImages()
 {
     for (int i = 0; i < 8; ++i)
     {
-        if (!mUnidentified19E8[0][i] && mUnidentified1998[0][i] != 0)
+        if (!mPositionsLoaded[0][i] && mPositionImages[0][i] != 0)
         {
-            mUnidentified19E8[0][i] = mUnidentified1998[0][i]->Update(true);
+            mPositionsLoaded[0][i] = mPositionImages[0][i]->Update(true);
         }
-        if (!mUnidentified19D8[0][i] && mUnidentified1958[0][i] != 0)
+        if (!mAttributesLoaded[0][i] && mAttributeImages[0][i] != 0)
         {
-            mUnidentified19D8[0][i] = mUnidentified1958[0][i]->Update(true);
+            mAttributesLoaded[0][i] = mAttributeImages[0][i]->Update(true);
         }
-        if (!mUnidentified19E8[1][i] && mUnidentified1998[1][i] != 0)
+        if (!mPositionsLoaded[1][i] && mPositionImages[1][i] != 0)
         {
-            mUnidentified19E8[1][i] = mUnidentified1998[1][i]->Update(true);
+            mPositionsLoaded[1][i] = mPositionImages[1][i]->Update(true);
         }
-        if (!mUnidentified19D8[1][i] && mUnidentified1958[1][i] != 0)
+        if (!mAttributesLoaded[1][i] && mAttributeImages[1][i] != 0)
         {
-            mUnidentified19D8[1][i] = mUnidentified1958[1][i]->Update(true);
+            mAttributesLoaded[1][i] = mAttributeImages[1][i]->Update(true);
         }
     }
 }
@@ -1428,9 +1428,9 @@ void ChooseSidekicksSceneV2::fn_8022EACC()
 /**
  * Offset/Address/Size: 0x6700 | 0x8022EBB8 | size: 0x168
  */
-bool ChooseSidekicksSceneV2::fn_8022EBB8()
+bool ChooseSidekicksSceneV2::AreImagesLoaded()
 {
-    if (mUnidentified19F8)
+    if (mImagesLoaded)
     {
         return true;
     }
@@ -1438,13 +1438,13 @@ bool ChooseSidekicksSceneV2::fn_8022EBB8()
     {
         for (int i = 0; i < 8; ++i)
         {
-            if (!mUnidentified19E8[side][i] || !mUnidentified19D8[side][i])
+            if (!mPositionsLoaded[side][i] || !mAttributesLoaded[side][i])
             {
                 return false;
             }
         }
     }
-    mUnidentified19F8 = true;
+    mImagesLoaded = true;
     FEAudio::PlayAnimAudioEvent(0x902BD189, 0, 0, 1);
     return true;
 }
@@ -1452,26 +1452,26 @@ bool ChooseSidekicksSceneV2::fn_8022EBB8()
 /**
  * Offset/Address/Size: 0x6868 | 0x8022ED20 | size: 0x5C
  */
-void ChooseSidekicksSceneV2::fn_8022ED20()
+void ChooseSidekicksSceneV2::OnDisconnectDismissed()
 {
-    mUnidentified1C = false;
+    mPopupActive = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
     GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
 }
 
 void ChooseSidekicksSceneV2::ReleaseController(int index)
 {
-    bool side = mUnidentified20[0] != index;
-    mUnidentified18CC[side][mUnidentified30[side]]->SetActiveSlide("off", true, false);
+    bool side = mSidePads[0] != index;
+    mSlotInstances[side][mSelectedSlots[side]]->SetActiveSlide("off", true, false);
     for (int slot = 0; slot < 3; ++slot)
     {
-        mUnidentified688[side][slot].ResetPointerStates();
+        mSlotButtons[side][slot].ResetPointerStates();
     }
     mCaptainComponents[side].SetDisplayMode(1);
-    mUnidentified190C[side]->m_bVisible = false;
-    mUnidentified50[side].fn_801DABAC(mUnidentified30[side], 1);
-    mUnidentified30[side] = -1;
-    mUnidentified20[side] = -1;
+    mGreenArrows[side]->m_bVisible = false;
+    mUnidentified50[side].SetRecycleState(mSelectedSlots[side], 1);
+    mSelectedSlots[side] = -1;
+    mSidePads[side] = -1;
 }
 
 inline void ChooseSidekicksSceneV2::ShowDisconnectedError()
@@ -1481,7 +1481,7 @@ inline void ChooseSidekicksSceneV2::ShowDisconnectedError()
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseSidekicksSceneV2::fn_8022ED20), this)));
-        mUnidentified1C = true;
+        popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseSidekicksSceneV2::OnDisconnectDismissed), this)));
+        mPopupActive = true;
     }
 }

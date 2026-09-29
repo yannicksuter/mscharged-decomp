@@ -6,9 +6,8 @@
 class DesireWindupShot : public Desire
 {
 public:
-    DesireWindupShot(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireWindupShot(int state)
+        : Desire(state, ScriptTransitionFunc("TransDesireWindup"))
     {
     }
 

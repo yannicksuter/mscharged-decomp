@@ -53,7 +53,7 @@ public:
     /* 0x08A8 */ FEOnlinePlayerRow mFriendRows[64];
     /* 0x2EA8 */ FEOnlinePlayerRow* mSortedFriendRows[64];
     /* 0x2FA8 */ bool mPopupActive;
-    /* 0x2FAC */ int mUnidentified2FAC;
+    /* 0x2FAC */ int mState;
 }; // size 0x2FB0
 
 #endif // GAME_SH_SHONLINEFRIENDS_H

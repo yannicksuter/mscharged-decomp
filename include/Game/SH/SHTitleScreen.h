@@ -16,11 +16,11 @@ public:
     virtual void Update(float dt);
     virtual void SceneCreated();
 
-    void fn_801D1F6C();
-    void fn_801D22C8(int index, void* context);
-    void fn_801D2478(int index, void* context);
-    void fn_801D24EC(int index, void* context);
-    void UnidentifiedInitializeControls();
+    void StartDemoMatch();
+    void OnControllerPointerPress(int index, void* context);
+    void OnControllerPointerEnter(int index, void* context);
+    void OnControllerPointerLeave(int index, void* context);
+    void InitializePointerButtons();
 
     /* 0x01C */ float m_fTimeElapsed;
     /* 0x020 */ u8 mUnidentified20[4];
@@ -28,7 +28,7 @@ public:
     /* 0x0D8 */ TLComponentInstance* mTextPressStart;
     /* 0x0DC */ bool mStartedDemo;
     /* 0x0DD */ bool mStartedMovie;
-    /* 0x0DE */ bool mUnidentifiedDE;
+    /* 0x0DE */ bool mInitialized;
     /* 0x0DF */ bool mUnidentifiedDF;
     /* 0x0E0 */ ScreenMovement mMovement;
     /* 0x0E4 */ int mControllerDefaults[9];

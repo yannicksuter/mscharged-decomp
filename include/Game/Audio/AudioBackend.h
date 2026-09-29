@@ -66,6 +66,9 @@ public:
     void SetOutputMode(unsigned int mode);
     void InitializeAuxEffects();
 
+    AXFX_REVERBHI* GetReverb() { return &m_Unknown454.m_Reverb; }
+    AXFX_REVERBHI_DPL2* GetReverbDpl2() { return &m_Unknown454.m_ReverbDpl2; }
+
     /* 0x004 */ nlListSlotPool<AudioSource*> m_Unknown004;
     /* 0x024 */ UnidentifiedAudioReadList m_Unknown024;
     /* 0x434 */ MemoryAllocator m_Unknown434;

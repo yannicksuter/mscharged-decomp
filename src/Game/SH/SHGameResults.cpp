@@ -25,9 +25,9 @@ static inline TLTextInstance* AsTextInstance(void* instance)
 GameResultsScene::GameResultsScene()
     : mTitleText(0)
     , mUnidentified5D8(false)
-    , mUnidentifiedA10(0)
-    , mUnidentifiedA14(0)
-    , mUnidentifiedA18(0)
+    , mGameData(0)
+    , mListener(0)
+    , mTournamentGame(0)
 {
     mTitleBuffer[0] = 0;
     g_pFEInput->PushExclusiveInputLock(this, -1);
@@ -41,17 +41,17 @@ GameResultsScene::~GameResultsScene()
         scene->RestoreButtonVisibility();
 }
 
-void GameResultsScene::fn_8020A494(BasicGameInfo* data, BaseSceneHandler* listener, UnidentifiedGameClock* clock)
+void GameResultsScene::SetResultsData(BasicGameInfo* data, BaseSceneHandler* listener, NetworkTournamentGame* game)
 {
-    mUnidentifiedA10 = data;
-    mUnidentifiedA14 = listener;
-    mUnidentifiedA18 = clock;
+    mGameData = data;
+    mListener = listener;
+    mTournamentGame = game;
 }
 
 void GameResultsScene::OnDoneTransitionComplete()
 {
     SHStrikerTimesBase::OnDoneTransitionComplete();
-    mUnidentifiedA14->SetVisible(true);
+    mListener->SetVisible(true);
     GameSceneManager::Instance()->Pop();
 }
 
@@ -79,20 +79,20 @@ void GameResultsScene::SceneCreated()
 void GameResultsScene::Update(float dt)
 {
     SHStrikerTimesBase::Update(dt);
-    if (!mUnidentified5D8 && mUnidentifiedA10 != 0)
+    if (!mUnidentified5D8 && mGameData != 0)
     {
         FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-        mSummary.DisplayMatchSummary(mUnidentifiedA10->mSides[0], mUnidentifiedA10->mSides[1], presentation);
+        mSummary.DisplayMatchSummary(mGameData->mSides[0], mGameData->mSides[1], presentation);
     }
-    UnidentifiedGameClock* clock = mUnidentifiedA18;
-    if (clock != 0)
+    NetworkTournamentGame* tournamentGame = mTournamentGame;
+    if (tournamentGame != 0)
     {
-        switch (clock->mUnidentified138)
+        switch (tournamentGame->mHomeUpdate)
         {
         case 2:
         {
             char buffer[0x20];
-            int seconds = clock->mUnidentified13C;
+            int seconds = tournamentGame->mAwayUpdate;
             int minutes = seconds / 60;
             int remainder = seconds % 60;
             if (remainder < 10)

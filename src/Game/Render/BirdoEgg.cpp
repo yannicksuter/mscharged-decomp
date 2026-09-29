@@ -183,7 +183,7 @@ void BirdoEggObject::Show(cFielder* shooter)
     controller->m_uUserData = (unsigned long)this;
     controller->SetUpdateCallback(Function<EmissionController&>(UpdateBirdoEggEmitter));
 
-    fn_801BC828(shooter);
+    EmitBirdoEggShow(shooter);
     g_pBall->m_bVisible = false;
     g_pBall->ClearBallBlur();
     g_pBall->m_pPhysicsBall->DisableCollisions();
@@ -197,7 +197,7 @@ void BirdoEggObject::Hide(bool destroyEffect)
         fn_8013F854("BirdoEggHide SetVis(false)\n");
         if (!destroyEffect)
         {
-            PlaySound(mShooter->mUnidentified318, 0x52641B7B, 0, 0);
+            PlaySound(mShooter->m_uSoundSlotId, 0x52641B7B, 0, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("birdo_egg_trail");
         if (!destroyEffect)
@@ -210,7 +210,7 @@ void BirdoEggObject::Hide(bool destroyEffect)
         }
         if (!destroyEffect)
         {
-            fn_801BC9E4(mPosition);
+            EmitBirdoEggBurst(mPosition);
         }
         SetPosition(lbl_804DCD9C);
         mPhysics->SetPosition(lbl_804DCD9C, PhysicsObject::WORLD_COORDINATES);

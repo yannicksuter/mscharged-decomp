@@ -41,7 +41,7 @@ static bool LooseBallCallback(float fTime, float fDuration,
     return true;
 }
 
-inline void LooseBallInfo::InitInstance(cPlayer* pPlayer, int nAnimID,
+void LooseBallInfo::InitInstance(cPlayer* pPlayer, int nAnimID,
     eLooseBallAnimType eAnimType)
 {
     mfAnimDuration = 0.0f;
@@ -50,46 +50,14 @@ inline void LooseBallInfo::InitInstance(cPlayer* pPlayer, int nAnimID,
     mAnimType = eAnimType;
     GetAnimTriggerInfo(pPlayer, nAnimID, LooseBallCallback, this);
     pPlayer->GetJointPositionFuture(&mv3PickupPos, nAnimID, pPlayer->m_nBallJointIndex, GetPickupTime(), true, true, false, true);
-    mfPickupDistance = nlSqrt(
-        mv3PickupPos.e[0] * mv3PickupPos.e[0]
-            + mv3PickupPos.e[1] * mv3PickupPos.e[1],
-        true);
+    const float* pPos = mv3PickupPos.e;
+    mfPickupDistance = nlSqrt(pPos[0] * pPos[0] + pPos[1] * pPos[1], true);
     maPickupAngle = nlVector3ToAngle(mv3PickupPos);
 }
 
-const LooseBallInfo* LooseBallAnims::FindLooseBallAnim(
-    const nlVector3& v3LocalBallPosition, bool bFrontOnly, float fParam2)
+LooseBallInfo* LooseBallAnims::GetLooseBallAnim(unsigned int uIndex)
 {
-    float fClosestDistSq = 1000000.0f;
-    float fDistFromOrigSq = 0.2f
-                          + (v3LocalBallPosition.x * v3LocalBallPosition.x
-                              + v3LocalBallPosition.y * v3LocalBallPosition.y
-                              + v3LocalBallPosition.z * v3LocalBallPosition.z);
-    const LooseBallInfo* pInfo = 0;
-
-    for (unsigned int i = 0; i < muNumLooseBallAnims; i++)
-    {
-        if ((!bFrontOnly || GetLooseBallAnim(i)->mv3PickupPos.x >= 0.0f)
-            && (fParam2 - GetLooseBallAnim(i)->mv3PickupPos.z) < 0.0f)
-        {
-            nlVector3 v3Delta;
-            nlVec3Sub(v3Delta, v3LocalBallPosition, GetLooseBallAnim(i)->mv3PickupPos);
-            float fDist2D = nlVec3Length(v3Delta);
-
-            if (fDist2D < fClosestDistSq)
-            {
-                float fPickupDistSq = GetLooseBallAnim(i)->mfPickupDistance
-                                    * GetLooseBallAnim(i)->mfPickupDistance;
-                if (fDistFromOrigSq > fPickupDistSq || pInfo == 0)
-                {
-                    fClosestDistSq = fDist2D;
-                    pInfo = &mpLooseBallInfo[i];
-                }
-            }
-        }
-    }
-
-    return pInfo;
+    return &mpLooseBallInfo[uIndex];
 }
 
 void LooseBallAnims::Init(cPlayer* pPlayer)
@@ -130,9 +98,39 @@ void LooseBallAnims::Destroy()
     muNumLooseBallAnims = 0;
 }
 
-inline LooseBallInfo* LooseBallAnims::GetLooseBallAnim(unsigned int uIndex)
+const LooseBallInfo* LooseBallAnims::FindLooseBallAnim(
+    const nlVector3& v3LocalBallPosition, bool bFrontOnly, float fParam2)
 {
-    return &mpLooseBallInfo[uIndex];
+    float fClosestDistSq = 1000000.0f;
+    float fDistFromOrigSq = 0.2f
+                          + (v3LocalBallPosition.x * v3LocalBallPosition.x
+                              + v3LocalBallPosition.y * v3LocalBallPosition.y
+                              + v3LocalBallPosition.z * v3LocalBallPosition.z);
+    const LooseBallInfo* pInfo = 0;
+
+    for (unsigned int i = 0; i < muNumLooseBallAnims; i++)
+    {
+        if ((!bFrontOnly || GetLooseBallAnim(i)->mv3PickupPos.x >= 0.0f)
+            && (fParam2 - GetLooseBallAnim(i)->mv3PickupPos.z) < 0.0f)
+        {
+            nlVector3 v3Delta;
+            nlVec3Sub(v3Delta, v3LocalBallPosition, GetLooseBallAnim(i)->mv3PickupPos);
+            float fDist2D = nlVec3Length(v3Delta);
+
+            if (fDist2D < fClosestDistSq)
+            {
+                float fPickupDistSq = GetLooseBallAnim(i)->mfPickupDistance
+                                    * GetLooseBallAnim(i)->mfPickupDistance;
+                if (fDistFromOrigSq > fPickupDistSq || pInfo == 0)
+                {
+                    fClosestDistSq = fDist2D;
+                    pInfo = &mpLooseBallInfo[i];
+                }
+            }
+        }
+    }
+
+    return pInfo;
 }
 
 const LooseBallInfo* LooseBallAnims::GetDesperationInfo(unsigned int type)

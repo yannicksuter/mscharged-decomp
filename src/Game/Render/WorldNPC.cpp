@@ -388,7 +388,7 @@ void WorldNPCManager::AddTemplate(
     }
 }
 
-void WorldNPCManager::BeginModelLoading()
+inline void WorldNPCManager::CollectSelectedTemplates()
 {
     for (int i = 0; i < mNumTemplates; ++i)
     {
@@ -398,7 +398,11 @@ void WorldNPCManager::BeginModelLoading()
             ++mNumLoadTemplates;
         }
     }
+}
 
+void WorldNPCManager::BeginModelLoading()
+{
+    CollectSelectedTemplates();
     mModelCollection->Initialize(mLoadTemplates, mNumLoadTemplates);
     if (mModelCollection->HasMoreModels())
     {

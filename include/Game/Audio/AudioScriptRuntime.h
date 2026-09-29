@@ -1,48 +1,47 @@
-#ifndef GAME_AUDIO_UNIDENTIFIED_AUDIO_SCRIPT_RUNTIME_H
-#define GAME_AUDIO_UNIDENTIFIED_AUDIO_SCRIPT_RUNTIME_H
+#ifndef GAME_AUDIO_AUDIO_SCRIPT_RUNTIME_H
+#define GAME_AUDIO_AUDIO_SCRIPT_RUNTIME_H
 
 #include "Game/InterpreterCore.h"
 #include "Game/Audio/AudioEffect.h"
 #include "NL/nlAVLTree.h"
 #include "types.h"
 
-// State object AudioResourceRuntime allocates for the script-dispatch unit.
-// The original runtime and packed-record type names are unidentified.
+// Selects effect bindings for sound instances from the audio bundle script.
 
 class AudioEffectBase;
-class UnidentifiedAudioTransitionState;
+class AudioBindingNode;
 
 // Callback used when an effect is first created for a binding. The middle
 // field is left uninitialised by the construction retail emits.
-extern "C" inline bool fn_802F68F0(u32 key, AudioEffectBase* effect)
+inline bool NotifyNewEffectSoundStarted(u32 key, AudioEffectBase* effect)
 {
     effect->OnSoundStarted((void*)key);
     return true;
 }
 
-struct UnidentifiedAudioInstanceVisitor
+struct AudioEffectSoundStartedVisitor
 {
-    UnidentifiedAudioInstanceVisitor(AudioEffectBase* effect)
-        : mUnidentified00(fn_802F68F0)
+    AudioEffectSoundStartedVisitor(AudioEffectBase* effect)
+        : mCallback(NotifyNewEffectSoundStarted)
         , mEffect(effect)
     {
     }
 
     bool operator()(const u32& key, bool*) const
     {
-        return mUnidentified00(key, mEffect);
+        return mCallback(key, mEffect);
     }
 
-    /* 0x00 */ bool (*mUnidentified00)(u32, AudioEffectBase*);
+    /* 0x00 */ bool (*mCallback)(u32, AudioEffectBase*);
     /* 0x04 */ bool mUnidentified04;
     /* 0x08 */ AudioEffectBase* mEffect;
 }; // size: 0x0C
 
 // Bytecode interpreter embedded by the runtime.
-class UnidentifiedAudioInterpreter : public InterpreterCore
+class AudioScriptInterpreter : public InterpreterCore
 {
 public:
-    UnidentifiedAudioInterpreter(unsigned int size)
+    AudioScriptInterpreter(unsigned int size)
         : InterpreterCore(size)
     {
     }
@@ -103,39 +102,40 @@ public:
         DefaultKeyCompare<u32> > mEffects;
 }; // size: 0x48
 
-class UnidentifiedAudioTransitionState
+class AudioBindingNode
 {
 public:
     AudioEffectBinding* mBinding;
-    UnidentifiedAudioTransitionState* m_next;
-    UnidentifiedAudioTransitionState* m_prev;
+    AudioBindingNode* m_next;
+    AudioBindingNode* m_prev;
 };
 
-struct UnidentifiedAudioScriptEntry
+struct AudioScriptEntry
 {
-    u32 mUnidentified00;
+    u32 mHash;
     void* mData;
 
-    operator u32() const { return mUnidentified00; }
+    operator u32() const { return mHash; }
+    bool operator==(const u32& key) const { return mHash == key; }
 };
 
-struct UnidentifiedAudioScriptList
+struct AudioScriptBindingList
 {
-    bool UnidentifiedContains(const u32& key) const;
+    bool Contains(const u32& key) const;
 
     u16 mCount;
     u16 mUnidentified02;
     u32* mValues;
 };
 
-struct UnidentifiedAudioScriptSelection
+struct AudioScriptSelection
 {
     u16 mCount;
     u16 mConditionCount;
     u32 mValues[1];
 };
 
-struct UnidentifiedAudioScriptCondition
+struct AudioScriptCondition
 {
     u32 mKey;
     u16 mFunction;
@@ -143,47 +143,50 @@ struct UnidentifiedAudioScriptCondition
     u32 mArguments[1];
 };
 
-struct UnidentifiedAudioScriptUpdate
+struct AudioScriptUpdateState
 {
     u32 mKeys[8];
     float mDeltaTime;
     u32 mCount;
 };
 
-class UnidentifiedAudioScriptRuntime
+class AudioScriptRuntime
 {
 public:
-    UnidentifiedAudioScriptRuntime()
+    AudioScriptRuntime()
         : mBindings(16, 16)
-        , mTransitions(16, 16)
-        , mEffectSets(16, 16)
+        , mInstanceBindings(16, 16)
+        , mContextValues(16, 16)
         , mInterpreter(100)
     {
     }
 
-    void Unidentified6BC4();
-    void Unidentified6DF8(const u32&, AudioEffectBinding*);
-    bool Unidentified6E00(void* data, unsigned int size);
-    int Unidentified6E98(u32 hash, int value);
-    void Unidentified6F00(u32 hash, u32 instance);
-    bool Unidentified77C8(u32 instance);
-    void Unidentified78C0(float deltaTime);
+    void Shutdown();
+    void DestroyBinding(const u32&, AudioEffectBinding*);
+    bool LoadScriptData(void* data, unsigned int size);
+    int SetEffectContext(u32 hash, int value);
+    void OnSoundStarted(u32 hash, u32 instance);
+    bool OnSoundStopped(u32 instance);
+    void Update(float deltaTime);
 
     AudioEffectBinding* GetBinding(const u32& key)
     {
         return mBindings.UnidentifiedAddOrGet(key);
     }
 
-    /* 0x00 */ UnidentifiedAudioScriptEntry* mUnidentified00;
-    /* 0x04 */ u32 mUnidentified04;
-    /* 0x08 */ UnidentifiedAudioScriptList* mUnidentified08;
+    /* 0x00 */ AudioScriptEntry* mEntries;
+    /* 0x04 */ u32 mEntryCount;
+    /* 0x08 */ AudioScriptBindingList* mDefaultBindings;
     /* 0x0C */ nlAVLTreeSlotPool<u32, AudioEffectBinding,
         DefaultKeyCompare<u32> > mBindings;
-    /* 0x30 */ nlAVLTreeSlotPool<u32, UnidentifiedAudioTransitionState*,
-        DefaultKeyCompare<u32> > mTransitions;
+    /* 0x30 */ nlAVLTreeSlotPool<u32, AudioBindingNode*,
+        DefaultKeyCompare<u32> > mInstanceBindings;
     /* 0x54 */ nlAVLTreeSlotPool<u32, int,
-        DefaultKeyCompare<u32> > mEffectSets;
-    /* 0x78 */ UnidentifiedAudioInterpreter mInterpreter;
+        DefaultKeyCompare<u32> > mContextValues;
+    /* 0x78 */ AudioScriptInterpreter mInterpreter;
 }; // size: 0xA0
 
-#endif // GAME_AUDIO_UNIDENTIFIED_AUDIO_SCRIPT_RUNTIME_H
+bool UpdateAudioScriptBinding(const u32& key, AudioEffectBinding* binding,
+    AudioScriptUpdateState* update);
+
+#endif // GAME_AUDIO_AUDIO_SCRIPT_RUNTIME_H

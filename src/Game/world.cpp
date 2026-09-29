@@ -274,6 +274,11 @@ bool World::LoadObjects(
     return true;
 }
 
+void World::HandleUnknownChunk(nlChunk* pChunk)
+{
+    nlPrintf("Unknown Chunk = 0x%08x\n", pChunk->GetID());
+}
+
 DrawableObject* World::CreateObject(
     unsigned long uType, WorldObjectLoadContext* pContext)
 {
@@ -359,11 +364,6 @@ bool World::ResolveModel(glModel*& pMaterial) const
         return false;
     }
     return true;
-}
-
-void World::HandleUnknownChunk(nlChunk* pChunk)
-{
-    nlPrintf("Unknown Chunk = 0x%08x\n", pChunk->GetID());
 }
 
 void World::InitializeObjects()
@@ -480,7 +480,9 @@ void World::ResetEffects()
         pEffect->m_fPreviousEmissionTime = 0.0f;
         if (pEffect->m_nTimingMode == 0)
         {
-            pEffect->m_fEmissionTime = 1.0f + pEffect->m_fEmissionInterval;
+            float fEmissionTime = pEffect->m_fEmissionInterval;
+            fEmissionTime = 1.0f + fEmissionTime;
+            pEffect->m_fEmissionTime = fEmissionTime;
         }
         iterator.Next();
     }
@@ -496,7 +498,9 @@ void World::TriggerEffects(unsigned long uType)
         if (uType == pEffect->m_nTimingMode)
         {
             pEffect->m_nRemainingEmissions = pEffect->m_nEmissionCount;
-            pEffect->m_fEmissionTime = 1.0f + pEffect->m_fEmissionInterval;
+            float fEmissionTime = pEffect->m_fEmissionInterval;
+            fEmissionTime = 1.0f + fEmissionTime;
+            pEffect->m_fEmissionTime = fEmissionTime;
         }
         iterator.Next();
     }

@@ -41,7 +41,7 @@ enum ePlayerStats
     STATS_09 = 0x09,
     STATS_0A = 0x0A,
     STATS_GOALS_FOR = 0x0B,
-    STATS_0C = 0x0C,
+    STATS_GOALS_AGAINST = 0x0C,
     STATS_PASSES_MADE = 0x0D,
     STATS_0E = 0x0E,
     STATS_0F = 0x0F,
@@ -95,7 +95,7 @@ struct PlayerStats
     /* 0x0C */ u16 unknown_0x0C;
     /* 0x0E */ u16 unknown_0x0E;
     /* 0x10 */ u16 mNumGoalsFor;
-    /* 0x12 */ u16 unknown_0x12;
+    /* 0x12 */ u16 mNumGoalsAgainst;
     /* 0x14 */ u16 unknown_0x14;
     /* 0x16 */ u16 unknown_0x16;
     /* 0x18 */ u16 unknown_0x18;
@@ -150,7 +150,7 @@ struct TeamStats
         mSidekicks.mValues[0] = (eSidekickID)0;
         mSidekicks.mValues[1] = (eSidekickID)0;
         mSidekicks.mValues[2] = (eSidekickID)0;
-        mUnidentified18 = 1;
+        mSkillLevel = 1;
     }
 
     TeamStats()
@@ -166,7 +166,7 @@ struct TeamStats
     /* 0x12 */ u16 unknown_0x12;
     /* 0x14 */ u16 unknown_0x14;
     /* 0x16 */ u16 unknown_0x16;
-    /* 0x18 */ int mUnidentified18;
+    /* 0x18 */ int mSkillLevel;
     /* 0x1C */ PlayerStats mPlayerTotalStats;
 };
 

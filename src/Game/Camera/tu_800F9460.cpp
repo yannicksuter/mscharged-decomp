@@ -228,7 +228,7 @@ void UnidentifiedCameraEffects::OnGoalieSave(
     {
         return;
     }
-    if (!(fn_800155A0(g_pBall, 0) > lbl_806DC58C))
+    if (!(GetBallChargeValue(g_pBall, 0) > lbl_806DC58C))
     {
         return;
     }
@@ -328,7 +328,7 @@ void UnidentifiedCameraEffects::OnShotPresentationEnd()
 {
     if (g_pGame->m_eGameState != 3 && IsTransitionActive()
         && mPrimaryPlayer != 0
-        && fn_800155A0(g_pBall, 0) >= 4.0f)
+        && GetBallChargeValue(g_pBall, 0) >= 4.0f)
     {
         FireCameraRumbleFilter(
             lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
@@ -559,7 +559,7 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
     cPlayer* passTarget = g_pBall->m_pPassTarget;
     float minimumDistanceSq = lbl_806DC558 * lbl_806DC558;
     if (owner != 0 || passTarget == 0
-        || fn_800155A0(g_pBall, 0) < lbl_806DC554)
+        || GetBallChargeValue(g_pBall, 0) < lbl_806DC554)
     {
         return false;
     }

@@ -30,8 +30,6 @@ extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
     const nlMatrix4*);
 extern "C" void fn_803438FC(WorldAnimObject_803437C8*);
 extern "C" void fn_803439A4(WorldAnimObject_803437C8*);
-extern "C" EffectsGroup* fn_802E7D54(
-    EmissionManager*, unsigned long);
 
 struct WorldPhysicsOwner_80342170
 {

@@ -70,7 +70,6 @@ extern "C" void fn_8005E9FC(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8003C5D8(
     cFielder* pFielder, bool bParam, unsigned short aDirection);
-extern "C" bool fn_8003877C(cFielder* pFielder);
 extern "C" void fn_8005DB7C();
 extern "C" void fn_8007F534(Goalie* pGoalie);
 class UnidentifiedFuzzyRuntimeBase;
@@ -573,7 +572,7 @@ void Goalie::MakeSaveEvent(bool bIsSTS)
         PlaySound(9, 0x528D7B6A, 0, 0);
     }
 
-    if (fn_800155A0(g_pBall, 0) >= 4.0f
+    if (GetBallChargeValue(g_pBall, 0) >= 4.0f
         && GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
     {
         unsigned long uParam = 0x3ACB01E9;
@@ -957,7 +956,7 @@ void Goalie::CleanGoalieAction()
         mUnidentified1E4.m_bSkipAnimUpdate = false;
         mUnidentified1E4.m_fSkipTimer = 0.0f;
         mUnidentified1E4.m_bForceFeatherUpdate = false;
-        fn_801B93E8(this);
+        EndElectrocution(this);
         break;
 
     case GOALIEACTION_UNIDENTIFIED_28:
@@ -1048,7 +1047,7 @@ void Goalie::fn_8007F44C()
             {
                 fn_8003C5D8(mpMonty, true,
                     mUnidentified024.m_aActualFacingDirection + 0x9FF6);
-                PlaySound(mUnidentified318, 0x4AE0B399, 0, 0);
+                PlaySound(m_uSoundSlotId, 0x4AE0B399, 0, 0);
             }
             else
             {
@@ -1544,7 +1543,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
 
     pFielder->fn_80047240(
         pFielder, mUnidentified024.m_aActualFacingDirection, 2, true, false);
-    PlaySound(pFielder->mUnidentified318, 0x3642C41B, 0, 0);
+    PlaySound(pFielder->m_uSoundSlotId, 0x3642C41B, 0, 0);
 
     mbDoHeadTrack = false;
 
@@ -3044,7 +3043,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             {
                 if (mpSkillShooter != NULL)
                 {
-                    mfBallCharge = fn_800155A0(pBall, 0);
+                    mfBallCharge = GetBallChargeValue(pBall, 0);
                     fn_80090958(false);
                 }
                 else if (pBall->mbBallOnFire)
@@ -3154,7 +3153,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             }
             if (mpSkillShooter != NULL && mpSaveData != NULL)
             {
-                mfBallCharge = fn_800155A0(pBall, 0);
+                mfBallCharge = GetBallChargeValue(pBall, 0);
                 if (fn_80090958(false))
                     break;
             }
@@ -3340,7 +3339,7 @@ void Goalie::fn_80080638(cFielder* pFielder, bool bParam)
             }
             nlVec3Scale(v3Velocity, fScale);
             pFielder->fn_80044148(v3Velocity);
-            fn_801BAF0C(pFielder);
+            EmitTackleImpact(pFielder);
             PlayRumbleAction(3, pFielder->GetGlobalPad());
         }
         if (bReleased)
@@ -3488,7 +3487,7 @@ void Goalie::DoPassRelease()
         float fPassSpeedMax = m_pTweaks->fPassGroundSpeedMax;
         DoRegularPassing(mpPassTarget, bLob, true, false, false, fPassSpeedMin, fPassSpeedMax);
         if (bIsKick)
-            fn_801B74C8(this);
+            EmitBallPass(this);
         return;
     }
 
@@ -3543,7 +3542,7 @@ void Goalie::DoPassRelease()
     SetNoPickUpTime(0.25f);
     g_pBall->m_tNoPickupTimer.SetSeconds(0.15f);
     if (bIsKick)
-        fn_801B73B8(this, false);
+        EmitBallImpact(this, false);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(

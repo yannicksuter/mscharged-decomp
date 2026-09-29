@@ -40,6 +40,7 @@
 #include "Game/NetworkInput.h"
 
 #include <stdlib.h>
+#include "Game/CharacterTriggers.h"
 
 cTeam* g_pTeams[2] = { NULL, NULL };
 cTeam* g_pCurrentlyUpdatingTeam;
@@ -124,7 +125,6 @@ extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" bool fn_8003E99C(const cFielder* pFielder);
 extern "C" bool fn_8003E6EC(cFielder* pFielder);
-extern "C" void fn_801BB6A4(cFielder* pFielder, int nPowerupIndex);
 
 extern "C" void fn_800A2290(
     SkillTweaks* pTweaks, int difficulty, int param2, bool param3);
@@ -455,7 +455,7 @@ bool cTeam::IncrementPowerupMeter(
         int nPowerupIndex = PowerupBase::AwardPowerup(this, pFielder, param3);
         if (nPowerupIndex != -1)
         {
-            fn_801BB6A4(pFielder, nPowerupIndex);
+            EmitPowerupIcon(pFielder, nPowerupIndex);
             return true;
         }
     }

@@ -127,4 +127,6 @@ extern GLInventory* gEffectsModelInventory;
 void fxSetTerrain(unsigned long terrainID);
 u32 fxGetTerrain();
 
+EffectsGroup* fxGetGroup(EmissionManager* pManager, unsigned long hashID);
+
 #endif // GAME_EFFECTS_EMISSION_MANAGER_H

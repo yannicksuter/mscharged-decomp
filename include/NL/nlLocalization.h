@@ -21,6 +21,7 @@ public:
         unsigned long StringOffset;
 
         operator unsigned long() const { return hash; }
+        bool operator==(const unsigned long& key) const { return hash == key; }
     };
 
     // Charged inserts the two North American variants between UKEnglish and

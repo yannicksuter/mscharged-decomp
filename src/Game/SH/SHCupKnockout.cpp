@@ -30,7 +30,6 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 
-extern "C" void fn_80207724(int);
 
 CupKnockoutScene::CupKnockoutScene()
     : mUnidentified2DC(true)
@@ -77,7 +76,7 @@ void CupKnockoutScene::SceneCreated()
     TLComponentInstance* title =
         FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
             presentation->GetActiveSlide(), "Layer", "tournament_screens", "TITLE2");
-    fn_80208950(title, mTitleText, 64);
+    UpdateCupTitleText(title, mTitleText, 64);
 
     if (mNetworkTournament)
     {
@@ -146,7 +145,7 @@ void CupKnockoutScene::SceneCreated()
     }
     else
     {
-        fn_80207724(2);
+        UpdateCupBreadcrumbs(2);
     }
 
     mUnidentified2E8 = 0.0f;
@@ -173,7 +172,7 @@ void CupKnockoutScene::Update(float fDeltaT)
             {
                 SHNavigation* navigation = GetNavigationScene();
                 navigation->SetButtons(0x1F, false);
-                fn_802088B4();
+                UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
@@ -191,7 +190,7 @@ void CupKnockoutScene::Update(float fDeltaT)
                 CycleCupPage(2, true);
                 return;
             }
-            fn_80207060(false);
+            AdvanceCupFlow(false);
             return;
         }
         else if (mTransitionState == 3)
@@ -263,9 +262,9 @@ void CupKnockoutScene::PopulateMatchup(
     short awayScore = game->mFinalScore[1];
     int userTeam = g_pCupManager->GetUserSelectedCupTeam();
     TeamStats homeStats = g_pCupManager->GetTeamStats(teams[0]);
-    int homeType = homeStats.mUnidentified18;
+    int homeType = homeStats.mSkillLevel;
     TeamStats awayStats = g_pCupManager->GetTeamStats(teams[1]);
-    int awayType = awayStats.mUnidentified18;
+    int awayType = awayStats.mSkillLevel;
     if (teams[0] == userTeam)
         homeType = 6;
     else if (teams[1] == userTeam)
@@ -725,13 +724,13 @@ void CupKnockoutScene::OnMatchupPointerPress(unsigned int, void* context)
             (SceneList)0x21, SCREEN_NOTHING, false);
         if (mNetworkTournament)
         {
-            results->fn_8020A494(game, this,
-                (UnidentifiedGameClock*)mTournament->GetTournamentGame(1, matchup));
+            results->SetResultsData(game, this,
+                mTournament->GetTournamentGame(1, matchup));
             results->SetDisplayMode(0xD);
         }
         else
         {
-            results->fn_8020A494(game, this, 0);
+            results->SetResultsData(game, this, 0);
             results->SetDisplayMode(0xD);
         }
     }

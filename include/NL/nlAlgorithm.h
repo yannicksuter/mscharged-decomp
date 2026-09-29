@@ -11,18 +11,16 @@ T* nlBSearch(const Key& key, T* array, int size)
     while (high - low > 1)
     {
         int probe = (high + low) / 2;
-        if ((unsigned long)array[probe] > (unsigned long)key)
+        if (array[probe] > key)
             high = probe;
         else
             low = probe;
     }
-    unsigned long highValue = (unsigned long)array[high];
-    if (highValue == (unsigned long)key)
+    if (array[high] == key)
         return &array[high];
     if (low == -1)
         return NULL;
-    unsigned long lowValue = (unsigned long)array[low];
-    if (lowValue == (unsigned long)key)
+    if (array[low] == key)
         return &array[low];
     return NULL;
 }

@@ -2,6 +2,7 @@
 #define _DRAWABLECHARACTER_H_
 
 #include "Game/CharacterEffects.h"
+#include "Game/CharacterQueries.h"
 #include "NL/nlMath.h"
 
 struct glModel;
@@ -177,9 +178,6 @@ void Replayable(SaveFrame& frame, char typeId, cPoseNode*& poseNode)
     }
 }
 
-extern "C" bool fn_8019464C(cCharacter* character);
-extern "C" bool fn_80194660(cCharacter* character);
-extern "C" bool fn_80194674(cCharacter* character);
 
 template <typename T>
 struct ReplayFrameTraits;
@@ -222,10 +220,10 @@ void DrawableCharacter::Replay(T& frame)
         Replayable<1>(frame, FloatCompressor<0, 7, 5>(state40));
         Replayable<1>(frame, FloatCompressor<0, 1, 7>(shadowLevel));
         Replayable<1>(frame, typeIsOne);
-        if (fn_8019464C(character))
+        if (IsCharacterFielder(character))
         {
             cCharacter* current = character;
-            if (fn_80194660(current))
+            if (IsCharacterHammerBro(current))
             {
                 Replayable<1>(frame, megaEnabled);
                 if (megaEnabled)

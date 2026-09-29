@@ -88,6 +88,5 @@ public:
     /* 0x14 */ unsigned long m_userSpecs;
     /* 0x18 */ UserEffectSource* mUserSpecSources;
 };
-void SetEffectsGroupFountainLife(EffectsGroup* group, float life);
 
 #endif // GAME_EFFECTS_EFFECTS_GROUP_H

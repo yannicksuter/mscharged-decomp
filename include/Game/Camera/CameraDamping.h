@@ -1,7 +1,7 @@
 #ifndef GAME_CAMERA_CAMERA_DAMPING_H
 #define GAME_CAMERA_CAMERA_DAMPING_H
 
-static inline void Dampen(float& current, const float& target,
+static inline float Dampen(const float& current, const float& target,
     float& currentVelocity, float smoothTime, float deltaTime)
 {
     float omega = 2.0f / smoothTime;
@@ -10,7 +10,7 @@ static inline void Dampen(float& current, const float& target,
     float change = current - target;
     float temp = deltaTime * (omega * change + currentVelocity);
     currentVelocity = exp * (currentVelocity - omega * temp);
-    current = exp * (change + temp) + target;
+    return exp * (change + temp) + target;
 }
 
 #endif // GAME_CAMERA_CAMERA_DAMPING_H

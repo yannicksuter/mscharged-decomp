@@ -3,8 +3,10 @@
 #include "Game/TweakRegistry.h"
 
 #include "Game/GameSceneManager.h"
+#include "Game/SH/SHMainMenu.h"
 #include "Game/FE/fePopupMenu.h"
 #include "Game/GameInfo.h"
+#include "Game/GameInfo.inl"
 #include "Game/Task/ResetTask.h"
 #include "Game/main.h"
 
@@ -219,16 +221,13 @@ void SaveLoad::CancelSave()
 
 void SaveLoad::ContinueWithoutSaving()
 {
-    struct SceneState
-    {
-        u8 unused[0x684];
-        bool enabled;
-    };
-
-    SceneState* scene = (SceneState*)GameSceneManager::Instance()->GetScene((SceneList)1);
+    BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene(SCENE_MAIN_MENU);
     if (scene != 0)
     {
-        scene->enabled = false;
+        if (SHMainMenu* mainMenu = static_cast<SHMainMenu*>(scene))
+        {
+            mainMenu->mWaitingForLoad = false;
+        }
     }
     ResetTask::s_resetPaused = false;
     OnlineSaveLoaded = false;
@@ -605,7 +604,7 @@ void SaveLoad::WriteSaveData()
     unsigned long alignedSize = Align32(dataSize);
     SaveBuffer = nlMalloc(alignedSize, 0x20, true);
 
-    GameInfoManager::GetInstance()->mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
+    GameInfoManager::GetInstance()->GetUserInfo().mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
     if (OnlineMode)
     {
         GameInfoManager::GetInstance()->GetMemoryCardData((u8*)SaveBuffer + sizeof(SaveFileHeader));

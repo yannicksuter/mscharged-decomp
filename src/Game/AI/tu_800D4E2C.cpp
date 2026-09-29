@@ -155,8 +155,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireInterceptBall* interceptBall = new (nlMalloc(
         sizeof(DesireInterceptBall), 8, false))
-        DesireInterceptBall(
-            7, ScriptTransitionFunc("TransDesireInterceptBall"));
+        DesireInterceptBall(7);
     UnidentifiedAddState(7, interceptBall, false);
 
     TransitionFunc markTransition;
@@ -167,8 +166,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireMegaStrike* megaStrike = new (nlMalloc(
         sizeof(DesireMegaStrike), 8, false))
-        DesireMegaStrike(
-            32, ScriptTransitionFunc("TransDesireMegastrikeMeter"));
+        DesireMegaStrike(32);
     UnidentifiedAddState(32, megaStrike, false);
 
     TransitionFunc passTransition;
@@ -190,7 +188,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireRunToNet* runToNet = new (nlMalloc(
         sizeof(DesireRunToNet), 8, false))
-        DesireRunToNet(ScriptTransitionFunc("TransDesireRunToNet"));
+        DesireRunToNet();
     UnidentifiedAddState(9, runToNet, false);
 
     TransitionFunc runUpfieldTransition;
@@ -243,7 +241,7 @@ void UnidentifiedFielderDesireMachine::UnidentifiedVirtual2()
 
     DesireWindupShot* windupShot = new (nlMalloc(
         sizeof(DesireWindupShot), 8, false))
-        DesireWindupShot(19, ScriptTransitionFunc("TransDesireWindup"));
+        DesireWindupShot(19);
     UnidentifiedAddState(19, windupShot, false);
 
     DesireStar* star = new (nlMalloc(sizeof(DesireStar), 8, false))

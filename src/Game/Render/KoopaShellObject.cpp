@@ -62,7 +62,7 @@ static inline void Deactivate(KoopaShellObject* object, bool destroyEffect)
 
         if (!destroyEffect)
         {
-            fn_801BC96C(object->mPosition);
+            EmitKoopaShellBurst(object->mPosition);
         }
 
         SetPosition(object, sHiddenPosition);
@@ -210,7 +210,7 @@ void KoopaShellObject::Activate(cFielder* owner)
     controller->SetUpdateCallback(
         Function1<void, EmissionController&>(UpdateTrailEffect));
 
-    fn_801BC6E4(owner);
+    EmitKoopaShellShow(owner);
     g_pBall->m_bVisible = false;
     g_pBall->m_pPhysicsBall->DisableCollisions();
 }

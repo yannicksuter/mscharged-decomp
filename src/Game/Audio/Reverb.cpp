@@ -37,12 +37,12 @@ inline ReverbParameter::ReverbParameter()
 
 static void ProcessReverb(void* channels, void*)
 {
-    AXFXReverbHiCallback(channels, &g_pAudioBackend->m_Unknown454.m_Reverb);
+    AXFXReverbHiCallback(channels, g_pAudioBackend->GetReverb());
 }
 
 static void ProcessReverbDpl2(void* channels, void*)
 {
-    AXFXReverbHiCallbackDpl2(channels, &g_pAudioBackend->m_Unknown454.m_ReverbDpl2);
+    AXFXReverbHiCallbackDpl2(channels, g_pAudioBackend->GetReverbDpl2());
 }
 
 Reverb::Reverb()
@@ -53,7 +53,7 @@ Reverb::Reverb()
     AXAuxCallback callback;
     void* context = 0;
     AudioBackend* platform = g_pAudioBackend;
-    void* reverb = &platform->m_Unknown454;
+    AXFX_REVERBHI* reverb = platform->GetReverb();
     switch (g_pAuxEffectMap->GetAuxiliary(1))
     {
     case 0:
@@ -140,6 +140,22 @@ void SetDefaultReverbSettings(AXFX_REVERBHI* reverb)
     reverb->mix = sReverbMix;
 }
 
+void ReverbParameter::ApplySettings(AXFX_REVERBHI* reverb)
+{
+    float value = time >= 0.0f ? time : 0.0f;
+    reverb->time = value <= 10.0f ? value : 10.0f;
+    value = preDelay >= 0.0f ? preDelay : 0.0f;
+    reverb->preDelay = value <= 0.1f ? value : 0.1f;
+    value = damping >= 0.0f ? damping : 0.0f;
+    reverb->damping = value <= 1.0f ? value : 1.0f;
+    value = coloration >= 0.0f ? coloration : 0.0f;
+    reverb->coloration = value <= 1.0f ? value : 1.0f;
+    value = crosstalk >= 0.0f ? crosstalk : 0.0f;
+    reverb->crosstalk = value <= 1.0f ? value : 1.0f;
+    value = mix >= 0.0f ? mix : 0.0f;
+    reverb->mix = value <= 1.0f ? value : 1.0f;
+}
+
 void Reverb::ApplyToSound(void* handle)
 {
     AudioSource* voices[8];
@@ -153,37 +169,15 @@ void Reverb::ApplyToSound(void* handle)
 
 void Reverb::OnSoundStarted(void*)
 {
-    AXFX_REVERBHI* reverb = &g_pAudioBackend->m_Unknown454.m_Reverb;
+    AXFX_REVERBHI* reverb = g_pAudioBackend->GetReverb();
     if (g_pAudioBackend->m_OutputMode == 3)
     {
-        float value = m_Final.time >= 0.0f ? m_Final.time : 0.0f;
-        reverb->time = value <= 10.0f ? value : 10.0f;
-        value = m_Final.preDelay >= 0.0f ? m_Final.preDelay : 0.0f;
-        reverb->preDelay = value <= 0.1f ? value : 0.1f;
-        value = m_Final.damping >= 0.0f ? m_Final.damping : 0.0f;
-        reverb->damping = value <= 1.0f ? value : 1.0f;
-        value = m_Final.coloration >= 0.0f ? m_Final.coloration : 0.0f;
-        reverb->coloration = value <= 1.0f ? value : 1.0f;
-        value = m_Final.crosstalk >= 0.0f ? m_Final.crosstalk : 0.0f;
-        reverb->crosstalk = value <= 1.0f ? value : 1.0f;
-        value = m_Final.mix >= 0.0f ? m_Final.mix : 0.0f;
-        reverb->mix = value <= 1.0f ? value : 1.0f;
+        m_Final.ApplySettings(reverb);
         AXFXReverbHiSettingsDpl2((AXFX_REVERBHI_DPL2*)reverb);
     }
     else
     {
-        float value = m_Final.time >= 0.0f ? m_Final.time : 0.0f;
-        reverb->time = value <= 10.0f ? value : 10.0f;
-        value = m_Final.preDelay >= 0.0f ? m_Final.preDelay : 0.0f;
-        reverb->preDelay = value <= 0.1f ? value : 0.1f;
-        value = m_Final.damping >= 0.0f ? m_Final.damping : 0.0f;
-        reverb->damping = value <= 1.0f ? value : 1.0f;
-        value = m_Final.coloration >= 0.0f ? m_Final.coloration : 0.0f;
-        reverb->coloration = value <= 1.0f ? value : 1.0f;
-        value = m_Final.crosstalk >= 0.0f ? m_Final.crosstalk : 0.0f;
-        reverb->crosstalk = value <= 1.0f ? value : 1.0f;
-        value = m_Final.mix >= 0.0f ? m_Final.mix : 0.0f;
-        reverb->mix = value <= 1.0f ? value : 1.0f;
+        m_Final.ApplySettings(reverb);
         AXFXReverbHiSettings(reverb);
     }
 }

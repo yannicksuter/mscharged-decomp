@@ -800,8 +800,8 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
             LANPeerMessageInfo& info = message->mUnidentified24[entry];
             nlStrNCpy(mPeerInfoList[peer].mName, info.mUnidentified06, 11);
             mPeerInfoList[peer].mUnidentified0B = info.mUnidentified12;
-            memcpy(&mPeerInfoList[peer].mUnidentified0C, info.mUnidentified13, info.mUnidentified12);
-            *(u32*)mPeerInfoList[peer].mUnidentified14 = *(u32*)info.mUnidentified00;
+            memcpy(&mPeerInfoList[peer].mUnidentified0C, message->mUnidentified24[entry].mUnidentified13, info.mUnidentified12);
+            mPeerInfoList[peer].mAddressWord = *(u32*)info.mUnidentified00;
             mPeerInfoList[peer].mUnidentified20 = info.mUnidentified04;
             mPeerInfoList[peer].mUnidentified1C = -1;
             mPeerInfoList[peer].mUnidentified18 = 0;

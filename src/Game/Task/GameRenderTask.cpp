@@ -63,7 +63,7 @@
 
 #include <string.h>
 
-extern const nlVector3 lbl_804DCBE8;
+const nlVector3 gRenderUpVector = { 0.0f, 0.0f, 1.0f };
 extern void* gpChainChompShadowView;
 
 GameRenderTask* GameRenderTask::sInstance;
@@ -431,7 +431,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     }
     else
     {
-        nlVector3 up = lbl_804DCBE8;
+        nlVector3 up = gRenderUpVector;
         cCameraManager::m_UpVectorStack[cCameraManager::m_UpVectorStackSize] = up;
     }
 

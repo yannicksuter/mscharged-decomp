@@ -3,8 +3,8 @@
 
 #include "Game/Camera/BaseCam.h"
 
-extern float lbl_806DC510[2];
-extern u8 lbl_806E0F18[8];
+extern float gMatrixEffectCameraDistance[2];
+extern u8 gMatrixEffectCameraFrozen[8];
 
 enum ReplayCameraPosition
 {
@@ -46,58 +46,58 @@ public:
     virtual const nlVector3& GetCameraPosition() const { return mPosition; }
 
     static void UpdateTweakMode();
-    void ManualUpdate(float deltaTime);
-    void SetSideOfInterest(int sideOfInterest);
-    void CutTo(ReplayCameraPosition camPos);
-    void fn_800F6EF8(ReplayCameraPosition camPos);
+    void ManualUpdate(float deltaT);
+    void SetSideOfInterest(int side);
+    void CutTo(ReplayCameraPosition position);
+    void MoveTo(ReplayCameraPosition position);
     float GetFov(ReplayCameraPosition position) const;
     nlVector3 GetPosition(ReplayCameraPosition position, float direction) const;
 
-    void fn_800F8F20(const float& value);
-    void fn_800F8F2C(const float& value);
-    void fn_800F8F38(const nlVector3& value);
-    void fn_800F8F54(float value0, float value1, float value2, float value3, float value4);
-    void fn_800F8F7C(float value0, float value1, float value2);
+    void SetLookAtDampingTime(const float& dampingTime);
+    void SetPositionDampingTime(const float& dampingTime);
+    void SetPositionOffset(const nlVector3& offset);
+    void SetAutoFov(float minFov, float maxFov, float minDistance, float maxDistance, float maxChangeRate);
+    void SetPositionLimits(float maxBehindGoalLine, float maxBeyondSideLine, float maxHeight);
 
 private:
-    nlVector3 fn_800F63F8(const nlVector3& position, const nlVector3& lookAt,
-        const nlVector3& previousLookAt, unsigned int width, unsigned int height,
+    nlVector3 GetClampedFocusPosition(const nlVector3& position, const nlVector3& lookAt,
+        const nlVector3& secondaryLookAt, unsigned int width, unsigned int height,
         float fov) const;
-    nlVector3 fn_800F6B40(int focus) const;
+    nlVector3 GetFocusPosition(int focus) const;
 
 public:
     /* 0x020 */ float mDeltaFov;
-    /* 0x024 */ float mUnidentified024;
+    /* 0x024 */ float mTargetFov;
     /* 0x028 */ float mFov;
     /* 0x02C */ int mSideOfInterest;
-    /* 0x030 */ nlVector3 mUnidentified030;
-    /* 0x03C */ nlVector3 mUnidentified03C;
-    /* 0x048 */ nlVector3 mUnidentified048;
-    /* 0x054 */ nlVector3 mUnidentified054;
+    /* 0x030 */ nlVector3 mPositionVelocity;
+    /* 0x03C */ nlVector3 mLookAtVelocity;
+    /* 0x048 */ nlVector3 mLookAtOffsetVelocity;
+    /* 0x054 */ nlVector3 mLookAtOffset;
     /* 0x060 */ bool mNoDampenForOneUpdate;
-    /* 0x061 */ bool mUnidentified061;
+    /* 0x061 */ bool mNoDampenLookAtForOneUpdate;
     /* 0x062 */ bool mFrozen;
-    /* 0x063 */ bool mUnidentified063;
+    /* 0x063 */ bool mPositionFrozen;
     /* 0x064 */ int mFocus;
-    /* 0x068 */ int mUnidentified068;
+    /* 0x068 */ int mSecondaryFocus;
     /* 0x06C */ ReplayCameraPosition mCamPos;
     /* 0x070 */ nlVector3 mPosition;
     /* 0x07C */ nlVector3 mLookAt;
     /* 0x088 */ mutable nlMatrix4 mViewMatrix;
-    /* 0x0C8 */ nlVector3 mUnidentified0C8;
-    /* 0x0D4 */ bool mUnidentified0D4;
+    /* 0x0C8 */ nlVector3 mPositionOffset;
+    /* 0x0D4 */ bool mAutoFov;
     /* 0x0D5 */ u8 mPadding0D5[3];
-    /* 0x0D8 */ float mUnidentified0D8;
-    /* 0x0DC */ float mUnidentified0DC;
-    /* 0x0E0 */ float mUnidentified0E0;
-    /* 0x0E4 */ float mUnidentified0E4;
-    /* 0x0E8 */ float mUnidentified0E8;
-    /* 0x0EC */ bool mUnidentified0EC;
+    /* 0x0D8 */ float mAutoFovMin;
+    /* 0x0DC */ float mAutoFovMax;
+    /* 0x0E0 */ float mAutoFovMinDistance;
+    /* 0x0E4 */ float mAutoFovMaxDistance;
+    /* 0x0E8 */ float mAutoFovMaxChangeRate;
+    /* 0x0EC */ bool mUsePositionLimits;
     /* 0x0ED */ u8 mPadding0ED[3];
-    /* 0x0F0 */ float mUnidentified0F0;
-    /* 0x0F4 */ float mUnidentified0F4;
-    /* 0x0F8 */ float mUnidentified0F8;
-    /* 0x0FC */ float mUnidentified0FC;
+    /* 0x0F0 */ float mMaxBehindGoalLine;
+    /* 0x0F4 */ float mMaxBeyondSideLine;
+    /* 0x0F8 */ float mMaxHeight;
+    /* 0x0FC */ float mBallToGoalRotationDegrees;
 }; // total size: 0x100
 
 #endif // GAME_CAMERA_REPLAY_CAMERA_H
