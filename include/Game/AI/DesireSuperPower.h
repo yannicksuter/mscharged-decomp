@@ -22,14 +22,13 @@ class DesireSuperPower : public Desire
 
 public:
     DesireSuperPower();
-    virtual ~DesireSuperPower();
 
     virtual bool UnidentifiedInitialize(void*);
     virtual void UnidentifiedCleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
     void fn_800CAB18();
 
@@ -66,15 +65,7 @@ extern "C" eCharacterClass fn_800D1440(const cCharacter*);
 extern "C" unsigned short fn_800D1448(const cCharacter*);
 const nlVector3* GetCharacterPosition(const cCharacter*);
 extern "C" bool fn_800D1458(const cGame*);
-extern "C" nlVector3* fn_800D1C4C(nlVector3*, const nlVector3*, const nlVector3*);
-extern "C" float fn_800D1C80(const nlVector2*, const nlVector2*);
-extern "C" unsigned short fn_800D1CCC(float, float);
-extern "C" short fn_800D1D04(unsigned short, unsigned short);
-extern "C" unsigned short fn_800D1D10(short);
-extern "C" int fn_800D1D24(int);
-extern "C" int fn_800D1D34(const shdStateMachine*);
-extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
-extern "C" float fn_800D1D44(const DesireRunInDirection*);
-extern "C" float fn_800D1D4C(const DesireRunInDirection*);
+
+extern const nlVector3 lbl_804DC388;
 
 #endif // GAME_AI_DESIRE_SUPER_POWER_H

@@ -119,11 +119,7 @@ public:
         bool Call(DLListEntry<T>* entry) { return m_Callback(entry->entry); }
     };
 
-    bool Walk(const Function1<bool, T&>& callback)
-    {
-        WalkCallback adapter(callback);
-        return nlWalkRing(m_Head, &adapter, &WalkCallback::Call);
-    }
+    bool Walk(const Function1<bool, T&>& callback);
 
     void DeleteEntry(DLListEntry<T>* entry);
 
@@ -327,6 +323,13 @@ public:
         this->m_Allocator.Initialize(initial, delta);
     }
 };
+
+template <typename T, typename Adapter>
+bool DLListContainerBase<T, Adapter>::Walk(const Function1<bool, T&>& callback)
+{
+    WalkCallback adapter(callback);
+    return nlWalkRing(m_Head, &adapter, &WalkCallback::Call);
+}
 
 template <typename T, typename Adapter>
 void DLListContainerBase<T, Adapter>::DeleteEntry(

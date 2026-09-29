@@ -110,9 +110,9 @@ void AudioSource::SetSpatialParameters(Plat3dSoundSrc* source)
 {
     if (HasVoice())
     {
-        SetPan(source->m_Unknown20);
-        SetSurroundPan(source->m_Unknown24);
-        SetInterauralDelay((int)source->m_Unknown44 >> 24);
+        SetPan(source->m_Pan);
+        SetSurroundPan(source->m_SurroundPan);
+        SetInterauralDelay((int)source->m_SpatialBits >> 24);
     }
 }
 

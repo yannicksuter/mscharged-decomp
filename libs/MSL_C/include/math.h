@@ -111,7 +111,7 @@ long labs(long n);
     {
         return (float)fmax((double)x, (double)y);
     }
-    _MATH_INLINE float fabsf(float x)
+    inline float fabsf(float x)
     {
         return (float)fabs((double)x);
     }

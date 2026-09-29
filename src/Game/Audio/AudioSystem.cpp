@@ -13,15 +13,18 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/Audio/AudioResourceRuntime.inl"
 
-int lbl_806E2018;
+int AllocatedCueCount;
 AudioSystem* g_pAudioSystem;
 AudioBackend* g_pAudioBackend;
 
-static TweakIntBinding lbl_8057F938(
-    "AllocatedCueCount", "audio/Stats", &lbl_806E2018, true);
+static TweakIntBinding sAllocatedCueCountTweak(
+    "AllocatedCueCount", "audio/Stats", &AllocatedCueCount, true);
 
 AudioSystem::AudioSystem()
-    : m_Unknown48(false), m_AsyncLoading(true), m_BundleManager(0), m_Unknown2E0(0)
+    : m_Unknown48(false)
+    , m_AsyncLoading(true)
+    , m_BundleManager(0)
+    , m_OwnedSoundCount(0)
 {
     m_ResourcePath[0] = '\0';
     g_pAudioSystem = this;
@@ -66,23 +69,33 @@ XSoundCueHandle* CreateAudioSoundHandle(AudioSystem* audio, int slotId, XSoundOw
     u32 cueIndex = FindAudioResourceCue(resource, cueId, value1, value2, value3);
     if (cueIndex == 0xFFFF)
         return 0;
-    ++lbl_806E2018;
+    ++AllocatedCueCount;
     XSoundCueHandle* handle = new XSoundCueHandle(resource, owner, cueIndex,
         (XSoundHitMarkerCallback)callback, (void*)context);
     if (owner != 0)
-        ++audio->m_Unknown2E0;
+        ++audio->m_OwnedSoundCount;
     if (handle != 0)
         audio->m_ActiveSoundList.AddEnd(handle);
     if (handle != 0)
-        fn_802F499C(audio->GetBundleManager()->GetResourceRuntime(),
-            (value3 ^ value1) ^ (value2 ^ cueId), reinterpret_cast<u32>(handle));
+        NotifyAudioSoundStarted(audio->GetBundleManager()->GetResourceRuntime(),
+            (value3 ^ value1) ^ (value2 ^ cueId),
+            reinterpret_cast<u32>(handle));
     return handle;
 }
 
 void UpdateAudioSystem(AudioSystem* audio, float dt)
 {
     if (!audio->IsInitialized())
+    {
+        // R4QE01 keeps this early return as a block of its own, a bne over an
+        // unconditional branch to the epilogue, where the same guard in
+        // LoadSoundBank is a single beq. The compiler does that only when the
+        // block still holds a statement that emits no code, such as a
+        // discarded floating-point read. What the original evaluated here is
+        // not recoverable from a stripped executable.
+        (void)dt;
         return;
+    }
     StaticCircularQueue<XSoundHandle*, 128>& pending = audio->m_UnknownD0;
     while (pending.GetCount() > 0)
         pending.Pop()->IsValid();
@@ -90,8 +103,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
     {
         audio->m_Listener->Update(dt);
         audio->m_SoundInstancePool.Walk(
-            Function<bool(Plat3dSoundSrc&)>(Bind<bool>(MemFun(&AudioSystem::fn_802ECDC8), audio, dt, placeholder0)));
-        unsigned int count = audio->m_Unknown2E0;
+            Function<bool(Plat3dSoundSrc&)>(Bind<bool>(MemFun(&AudioSystem::UpdateSoundSource), audio, dt, placeholder0)));
+        unsigned int count = audio->m_OwnedSoundCount;
         nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
         while (it.hasNext() && count != 0)
         {
@@ -100,13 +113,13 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
             {
                 XSoundOwner* owner = handle->m_Owner;
                 AudioSliderSet* sliders = ((XSoundCueHandle*)handle)->GetLocalSliders();
-                float value1 = owner->m_Unknown10;
-                float value2 = owner->m_Unknown14;
+                float distance = owner->m_Distance;
+                float pan = owner->m_ScaledPan;
                 float value3 = owner->m_Unknown18;
                 if (sliders != 0)
                 {
-                    sliders->sliders[5].SetTarget(value1, 0.0f);
-                    sliders->sliders[0].SetTarget(value2, 0.0f);
+                    sliders->sliders[5].SetTarget(distance, 0.0f);
+                    sliders->sliders[0].SetTarget(pan, 0.0f);
                     sliders->sliders[1].SetTarget(value3, 0.0f);
                 }
                 --count;
@@ -122,12 +135,12 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         handle->Update(dt);
         if (handle->m_State == 9)
         {
-            fn_802F49A4(audio->GetBundleManager()->GetResourceRuntime(), reinterpret_cast<u32>(handle));
+            NotifyAudioSoundStopped(audio->GetBundleManager()->GetResourceRuntime(), reinterpret_cast<u32>(handle));
             if (handle->m_Owner != 0)
-                --audio->m_Unknown2E0;
+                --audio->m_OwnedSoundCount;
             audio->m_ActiveSoundList.Remove(&it);
             delete handle;
-            --lbl_806E2018;
+            --AllocatedCueCount;
         }
         it.next();
     }
@@ -147,26 +160,26 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
     }
 }
 
-void FlushAudio(AudioSystem* audio, int param2, bool param3)
+void FlushAudio(AudioSystem* audio, int callbackEnabled, bool force)
 {
     nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
     while (it.hasNext())
     {
         XSoundHandle* handle = *it;
         int state = handle->m_State;
-        if ((param3 && state == 7) || (unsigned int)(state - 2) <= 3)
+        if ((force && state == 7) || (unsigned int)(state - 2) <= 3)
         {
-            if (param2 == 2)
-                param2 = handle->IsCallbackEnabled();
-            handle->Stop(param2 != 0, (void*)param3);
+            if (callbackEnabled == 2)
+                callbackEnabled = handle->IsCallbackEnabled();
+            handle->Stop(callbackEnabled != 0, (void*)force);
         }
-        else if (state == 8 && param2 == 1)
+        else if (state == 8 && callbackEnabled == 1)
             handle->Release();
         it.Step();
     }
 }
 
-extern "C" void fn_802EC9D0(AudioSystem* audio)
+void PrintAudioSystem(AudioSystem* audio)
 {
     nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
     while (it.hasNext())
@@ -193,7 +206,7 @@ void DumpAudioSystem(AudioSystem* audio, const char* path)
     }
 }
 
-extern "C" Plat3dSoundSrc* fn_802ECB68(AudioSystem* audio)
+Plat3dSoundSrc* CreateAudioSoundOwner(AudioSystem* audio)
 {
     return audio->m_SoundInstancePool.AllocateAtEnd(0);
 }
@@ -213,7 +226,7 @@ UnidentifiedAudioBundleManager_802ECD34::~UnidentifiedAudioBundleManager_802ECD3
 {
 }
 
-bool AudioSystem::fn_802ECDC8(float dt, Plat3dSoundSrc& source)
+bool AudioSystem::UpdateSoundSource(float dt, Plat3dSoundSrc& source)
 {
     source.Update((PlatAudioListener*)m_Listener, dt);
     return true;
@@ -229,4 +242,7 @@ void XSoundHandle::Update(float dt)
 }
 
 int XSoundHandle::IsCallbackEnabled() { return m_CallbackEnabled; }
-Plat3dSoundSrc::~Plat3dSoundSrc() { }
+
+inline Plat3dSoundSrc::~Plat3dSoundSrc()
+{
+}

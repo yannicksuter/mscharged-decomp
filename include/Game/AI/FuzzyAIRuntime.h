@@ -1,7 +1,7 @@
 #ifndef GAME_AI_FUZZY_AI_RUNTIME_H
 #define GAME_AI_FUZZY_AI_RUNTIME_H
 
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/InterpreterCore.h"
 #include "NL/nlList.h"
 #include "NL/nlString.h"

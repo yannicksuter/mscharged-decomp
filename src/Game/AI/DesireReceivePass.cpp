@@ -6,9 +6,8 @@
 
 #include <stddef.h>
 
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/AIContext.h"
-#include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIPad.h"
 #include "Game/AI/AiUtil.h"
@@ -100,7 +99,6 @@ extern "C" void fn_80016DF8(
 extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" void fn_80316968(void*);
 extern "C" void fn_8005C650(cGame*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     InterpreterCore*, void*, int, cPlayer*, cPlayer*);

@@ -19,11 +19,6 @@
 #include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-void UpdateAudioSystem(AudioSystem*, float);
-XSoundCueHandle* CreateAudioSoundHandle(
-    AudioSystem*, int, XSoundOwner*, unsigned long,
-    int, int, int, int, int);
-
 extern void* gExclusiveAudioContext;
 extern XSoundHandle* g_pLastAudioHandle;
 extern unsigned long gResidentVoiceDropCount;
@@ -591,12 +586,12 @@ void AudioListener::SetTransformValid(bool valid)
     m_TransformValid = valid;
 }
 
-bool AudioSystem::IsInitialized()
+inline bool AudioSystem::IsInitialized()
 {
     return m_BundleManager != 0 && m_BundleManager->IsInitialized();
 }
 
-bool AudioSystem::IsAsyncLoading()
+inline bool AudioSystem::IsAsyncLoading()
 {
     return m_AsyncLoading;
 }

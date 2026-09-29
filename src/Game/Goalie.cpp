@@ -9,7 +9,7 @@
 #include "Game/AI/AIPad.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/FielderActions.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/FilteredRandom.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -1628,7 +1628,7 @@ extern "C" void GoalieOnGameOver()
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_800821B0(
-    UnidentifiedFuzzyRuntimeBase*, const unsigned int&, cPlayer*);
+    InterpreterCore*, const unsigned int&, cPlayer*);
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80082150(
     UnidentifiedFuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
@@ -1904,7 +1904,12 @@ bool Goalie::IsLooseBallTowardNet()
     }
 
     v3BallVel = g_pBall->m_v3Velocity;
-    if (nlVec3LengthSquared(v3BallVel) < 0.01f)
+    // R4QE01 loads this threshold into the register left over after the
+    // length terms (f2), which the compiler does only when the constant is
+    // bound to a float variable before the comparison. What held it is not
+    // recoverable from a stripped executable.
+    float fMinSpeedSq = 0.01f;
+    if (nlVec3LengthSquared(v3BallVel) < fMinSpeedSq)
     {
         return false;
     }
@@ -2016,10 +2021,16 @@ bool Goalie::fn_800779D0()
             || (pScorer != 0 && !pScorer->IsOnSameTeam(this)
                 && pScorer->m_eClassType == FIELDER))
         {
-            float fSpeedSquared = nlVec3LengthSquared(g_pBall->m_v3Velocity);
+            // R4QE01 keeps the ball in r4 and its shot timer in r5 here. The
+            // compiler assigns them that way only when the chip-shot test reads
+            // the ball through a local set before the speed check while the
+            // timer test reloads g_pBall. The original spelling is not
+            // recoverable from a stripped executable.
+            cBall* pBall = g_pBall;
+            float fSpeedSquared = nlVec3LengthSquared(pBall->m_v3Velocity);
             float fLimitSquared = nlGetLengthSquared1D(lbl_806DBB20);
             if (bUnidentified
-                || (!g_pBall->UnidentifiedState7Shot()
+                || (!pBall->UnidentifiedState7Shot()
                         && g_pBall->m_tLightningTimer.m_uPackedTime != 0
                         && pScorer == g_pBall->m_pShooter
                         && fSpeedSquared > fLimitSquared
@@ -2475,14 +2486,10 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
     if (!fn_8007B9A0(v3BallPos, lbl_806DBB28))
         return false;
     bool bBallIsLoose = true;
-    bool bPass = false;
-    if ((g_pBall->meBallState == 5 || g_pBall->meBallState == 3)
-        && g_pBall->m_pPassTarget != NULL)
-        bPass = true;
-    if (bPass)
+    if (g_pBall->HasActivePassTarget())
     {
         cBall* pBall = g_pBall;
-        cPlayer* pPassTarget = pBall->m_pPassTarget;
+        cPlayer* pPassTarget = pBall->fn_800C2EC0();
         if (!IsLooseBallTowardNet()
             || nlVec3DistanceSquared2D(mUnidentified024.m_v3Position, pBall->m_v3PassIntercept)
                 > nlVec3DistanceSquared2D(pPassTarget->mUnidentified024.m_v3Position, pBall->m_v3PassIntercept))
@@ -2499,8 +2506,8 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
         if (absBallX > goalLineX - 2.0f && absBallY < penaltyY)
             return true;
         cTeam* pOtherTeam = m_pTeam->GetOtherTeam();
-        cFielder* pOtherInterceptor = pOtherTeam->mpBestBallInterceptor;
-        cFielder* pInterceptor = m_pTeam->mpBestBallInterceptor;
+        cFielder* pInterceptor = m_pTeam->GetBestBallInterceptor();
+        cFielder* pOtherInterceptor = pOtherTeam->GetBestBallInterceptor();
         bool bInterceptorDown = pInterceptor->IsFallenDown() || fn_8003877C(pInterceptor);
         bool bOtherInterceptorDown = pOtherInterceptor->IsFallenDown() || fn_8003877C(pOtherInterceptor);
         if (bInterceptorDown && bOtherInterceptorDown)
@@ -2680,7 +2687,12 @@ bool Goalie::ShouldReposition()
         }
         if (bCalcIntersect)
         {
-            if ((float)fabs(v3ContactVel.x) > 0.5f)
+            // R4QE01 loads this threshold into the register after the absolute
+            // value (f1), which the compiler does only when the constant is bound
+            // to a float variable before the comparison. What held it is not
+            // recoverable from a stripped executable.
+            float fMinVelX = 0.5f;
+            if ((float)fabs(v3ContactVel.x) > fMinVelX)
             {
                 float ballX = pBall->m_v3Position.x;
                 mv3NavTarget.y = pBall->m_v3Position.y + (fTargetX - ballX)
@@ -3549,8 +3561,9 @@ extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 
 extern "C" UnidentifiedVariant_80054AB8 fn_800821B0(
-    UnidentifiedFuzzyRuntimeBase* runtime, const unsigned int& hash, cPlayer* player)
+    InterpreterCore* interpreter, const unsigned int& hash, cPlayer* player)
 {
+    UnidentifiedFuzzyRuntimeBase* runtime = static_cast<UnidentifiedFuzzyRuntimeBase*>(interpreter);
     unsigned int functionHash = hash;
     return UnidentifiedVariant_80054AB8(fn_80312360(
         runtime, runtime->FindFunctionEntryPoint(functionHash), 1, player, NULL));
@@ -3730,6 +3743,22 @@ inline unsigned char Goalie::ClampToGoalCone(nlVector3& v3Position, float fDistF
     return false;
 }
 
+// Branch-returning max/min for the net-width clamp in
+// FindDesiredGoaliePosition; see the comment there.
+static inline float MaxOf(float a, float b)
+{
+    if (a >= b)
+        return a;
+    return b;
+}
+
+static inline float MinOf(float a, float b)
+{
+    if (a <= b)
+        return a;
+    return b;
+}
+
 void Goalie::FindDesiredGoaliePosition(nlVector3& pos, nlVector3& dir, nlVector3& focus, unsigned short& ang, const nlVector3* pThreatPos)
 {
     float fMinDist = 0.5f;
@@ -3817,7 +3846,12 @@ void Goalie::FindDesiredGoaliePosition(nlVector3& pos, nlVector3& dir, nlVector3
     {
         float fNetWidth = cNet::GetNetWidth();
         fNetY = 0.5f * fNetWidth - 1.0f;
-        desiredPos.y = nlMinEquals(nlMaxEquals(desiredPos.y, -fNetY), fNetY);
+        // R4QE01 keeps this clamp in f5 and desiredVec.x in f6. The compiler
+        // assigns them that way only when the clamp returns through branches;
+        // the shared nlMaxEquals/nlMinEquals bodies swap them, and changing
+        // those regresses other units. The original form of this clamp is not
+        // recoverable from a stripped executable.
+        desiredPos.y = MinOf(MaxOf(desiredPos.y, -fNetY), fNetY);
         desiredPos.x = goalLine * pNet->m_fDirection;
         nlVec3Sub(desiredVec, desiredPos, mUnidentified024.m_v3Position);
     }
@@ -3827,7 +3861,11 @@ void Goalie::FindDesiredGoaliePosition(nlVector3& pos, nlVector3& dir, nlVector3
     desiredPos.x = nlMinEquals(nlMaxEquals(desiredPos.x, -goalLine), goalLine);
 
     const nlVector3& rPos = mUnidentified024.m_v3Position;
-    nlVec3WeightedSum(pos, 0.8f, desiredPos, 0.2f, rPos);
+    // R4QE01 loads this weight into f6, after the 0.2f weight (f4), which the
+    // compiler does only when the constant is bound to a float variable before
+    // the call. What held it is not recoverable from a stripped executable.
+    float fWeight = 0.8f;
+    nlVec3WeightedSum(pos, fWeight, desiredPos, 0.2f, rPos);
     dir = desiredVec;
     focus = targetPos;
 }
@@ -4403,9 +4441,9 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         break;
     case GOALIEACTION_MOVE:
     {
+        int nHeadJoint = m_nHeadJointIndex;
         int nJoint = m_nRightFootJointIndex;
-        float fHeadHeight = 0.4f + GetJointPosition(m_nHeadJointIndex).z;
-        if (pPlayer->GetJointPosition(nJoint).z > fHeadHeight)
+        if (pPlayer->GetJointPosition(nJoint).z > 0.4f + GetJointPosition(nHeadJoint).z)
             return;
     }
     case GOALIEACTION_SAVE:

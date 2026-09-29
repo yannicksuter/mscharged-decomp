@@ -24,8 +24,8 @@ private:
 class DesireShoot : public Desire
 {
 public:
-    DesireShoot(int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireShoot(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 

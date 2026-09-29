@@ -1,7 +1,7 @@
 #ifndef GAME_AI_TRANSITION_FUNC_H
 #define GAME_AI_TRANSITION_FUNC_H
 
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "types.h"
 
 class AIContext;
@@ -47,9 +47,11 @@ struct ScriptTransitionFunc : public TransitionFunc
     ScriptTransitionFunc(const char* name);
 };
 
-// Binds a compiled function that takes the AI context and returns the desire
-// update to the transition, and returns the transition.
-TransitionFunc* BindNativeTransitionFunc(
-    TransitionFunc* transition, void* function);
+// A transition bound to a compiled function that takes the AI context and
+// returns the desire update.
+struct NativeTransitionFunc : public TransitionFunc
+{
+    NativeTransitionFunc(void* function);
+};
 
 #endif // GAME_AI_TRANSITION_FUNC_H

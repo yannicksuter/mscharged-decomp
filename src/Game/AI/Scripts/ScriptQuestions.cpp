@@ -128,7 +128,7 @@ extern "C" cFielder* fn_800D671C(cTeam* team)
 {
     if (team != NULL)
     {
-        return team->mpBestBallInterceptor;
+        return team->GetBestBallInterceptor();
     }
     return NULL;
 }
@@ -517,7 +517,7 @@ float StrategicBallOwner(cFielder* pFielder)
     {
         float fPassValid
             = g_pBall->UnidentifiedHasPassTarget() ? 1.0f : 0.0f;
-        if (!fPassValid && pFielder == pFielder->m_pTeam->mpBestBallInterceptor)
+        if (!fPassValid && pFielder == pFielder->m_pTeam->GetBestBallInterceptor())
         {
             fScore = InterpolateClamped(0.7f, 0.95f, AbleToInterceptBall(pFielder));
         }
@@ -3603,8 +3603,8 @@ extern "C" float fn_800DF888(cTeam* team)
     if (team == NULL)
         return 0.0f;
     cFielder* players[2];
-    players[0] = team->mpBestBallInterceptor;
-    players[1] = team->GetOtherTeam()->mpBestBallInterceptor;
+    players[0] = team->GetBestBallInterceptor();
+    players[1] = team->GetOtherTeam()->GetBestBallInterceptor();
     float score[2];
     float fOwner;
     float fReceiving;

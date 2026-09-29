@@ -17,7 +17,7 @@
 #include "NL/nlString.h"
 #include "NL/nlSlotPool.h"
 
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/Ball.h"
 #include "Game/Render/BulletBill.h"
@@ -49,12 +49,7 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/CharacterTriggers.h"
 
-extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
-extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
-extern "C" shdStateMachine* fn_80319E84(
-    UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
-extern "C" void fn_80316968(shdStateMachine*);
 extern "C" float fn_800DDF54(cPlayer*, cPlayer*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
@@ -239,7 +234,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
 
     m_pShotMeter = new (8, false) ShotMeter();
     mUnidentified428 = new (8, false) AIContext(this,
-        new (8, false) UnidentifiedFielderDesireMachine(),
+        new (8, false) FielderDesireMachine(),
         new (8, false) UnidentifiedFuzzyRuntime());
     mUnidentified428->mScriptMachine->UnidentifiedVirtual2();
 

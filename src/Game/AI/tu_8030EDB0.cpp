@@ -1,4 +1,4 @@
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 
 UnidentifiedFuzzyVariantData lbl_805841D8;
 SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200(16, 16);

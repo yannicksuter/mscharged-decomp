@@ -4,7 +4,7 @@
 #include "Game/DetInput.h"
 
 #include "Game/AI/DesireSteering.h"
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/Ball.h"

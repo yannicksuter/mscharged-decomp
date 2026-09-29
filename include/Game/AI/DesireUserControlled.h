@@ -7,8 +7,8 @@
 class DesireUserControlled : public Desire
 {
 public:
-    DesireUserControlled(TransitionFunc transition)
-        : Desire(20, transition)
+    DesireUserControlled()
+        : Desire(20, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 

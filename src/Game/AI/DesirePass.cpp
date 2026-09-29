@@ -1,7 +1,7 @@
 #include "Game/AI/DesirePass.h"
 
 #include "Game/AI/AiUtil.h"
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/FuzzyAIRuntime.h"

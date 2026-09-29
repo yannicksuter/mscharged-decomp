@@ -89,8 +89,8 @@ private:
 class UnidentifiedDesire35 : public Desire
 {
 public:
-    UnidentifiedDesire35(TransitionFunc transition)
-        : Desire(35, transition)
+    UnidentifiedDesire35()
+        : Desire(35, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 

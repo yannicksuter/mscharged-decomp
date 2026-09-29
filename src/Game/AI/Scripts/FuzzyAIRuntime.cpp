@@ -7,7 +7,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/FuzzyAIRuntime.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Variant.h"
 #include "Game/InterpreterCore.h"

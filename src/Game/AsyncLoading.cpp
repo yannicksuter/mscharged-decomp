@@ -135,7 +135,6 @@ bool IsNetworkOrRecordedGame();
 extern "C" void fn_8013DB18();
 void ShutdownWarbleRendering(void*);
 extern "C" void fn_8013DDD4();
-extern "C" void fn_802EC9D0(void*);
 extern "C" bool fn_802773B8(bool stadiumViewer);
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
@@ -1652,7 +1651,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
 
         if (OSTicksToMilliseconds(OSGetTick() - startTick) > 400)
         {
-            fn_802EC9D0(g_pAudioSystem);
+            PrintAudioSystem(g_pAudioSystem);
             nlBreak();
         }
     }
@@ -2013,7 +2012,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
         if (OSTicksToMilliseconds(OSGetTick() - startTick) > 400)
         {
-            fn_802EC9D0(g_pAudioSystem);
+            PrintAudioSystem(g_pAudioSystem);
             nlBreak();
         }
     }

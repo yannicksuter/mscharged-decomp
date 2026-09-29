@@ -45,6 +45,7 @@ bool IsTournamentTrophyLoaded();
 void FinishLoadTournamentTrophy();
 
 DrawableObject* FindStadiumDrawableObject(unsigned long uHashID);
+void fn_802772A4(DrawableObject* pObject);
 DrawableObject* GetBallRenderObject(unsigned int index);
 DrawableObject** GetNumberRenderObjects();
 bool ShouldLoadStadiumModel(const StadiumModelEntry* entry);

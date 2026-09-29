@@ -3,7 +3,7 @@
 #include "Game/Sys/debug.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Variant.h"
 #include <stddef.h>
@@ -523,7 +523,7 @@ void DesireGetInPosition::Update(DesireUpdate* update, float)
         position = m_pFielder->mUnidentified024.m_v3Position;
     }
     m_pFielder->AddDesiredPosition(position, 0.8f, 1.0f);
-    if (m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder
+    if (m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder
         && update->mData.i == DESIRE_CONTINUE)
     {
         *update = 4;
@@ -578,7 +578,7 @@ void DesireRunUpfield::Update(DesireUpdate* update, float)
         position.x += distance * AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
     }
     m_pFielder->AddDesiredPosition(position, 1.25f, 1.0f);
-    if (m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder
+    if (m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder
         && update->mData.i == DESIRE_CONTINUE)
     {
         *update = 4;
@@ -637,7 +637,7 @@ void DesireRunDownfield::Update(DesireUpdate* update, float)
         position.x += distance * AIsgn(m_pFielder->m_pTeam->m_pNet->m_v3NetLocation.x);
     }
     m_pFielder->AddDesiredPosition(position, 1.25f, 1.0f);
-    if (m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder
+    if (m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder
         && update->mData.i == DESIRE_CONTINUE)
     {
         *update = 4;

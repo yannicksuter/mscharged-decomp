@@ -431,6 +431,7 @@ Game/AI/DesireSuperPower.cpp:
 	.ctors      start:0x804DB584 end:0x804DB588
 	.rodata     start:0x804DC338 end:0x804DC398
 	.data       start:0x80502848 end:0x80502AF8
+	.bss        start:0x8056DB08 end:0x8056DB20
 	.sdata      start:0x806DC240 end:0x806DC398
 	.sdata2     start:0x806E40F8 end:0x806E4178
 
@@ -448,11 +449,16 @@ Game/AI/DesireUserControlled.cpp:
 	.sdata      start:0x806DC3A8 end:0x806DC3B0
 	.sdata2     start:0x806E4190 end:0x806E4198
 
-Game/AI/tu_800D4E2C.cpp:
-	.text       start:0x800D4E2C end:0x800D645C
+Game/AI/FielderDesireMachine.cpp:
+	.text       start:0x800D4E2C end:0x800D6298
 	.data       start:0x80502C28 end:0x80502D08
-	.sdata      start:0x806DC3B0 end:0x806DC3D8
-	.sdata2     start:0x806E4198 end:0x806E41B0
+	.sdata      start:0x806DC3B0 end:0x806DC3C0
+	.sdata2     start:0x806E4198 end:0x806E41A8
+
+Game/AI/FielderDesireTransitions.cpp:
+	.text       start:0x800D6298 end:0x800D645C
+	.sdata      start:0x806DC3C0 end:0x806DC3D8
+	.sdata2     start:0x806E41A8 end:0x806E41B0
 
 Game/AI/Scripts/ScriptDefines.cpp:
 	.text       start:0x800D645C end:0x800D6624
@@ -463,7 +469,7 @@ Game/AI/Scripts/ScriptQuestions.cpp:
 	.text       start:0x800D6624 end:0x800E0CF0
 	.ctors      start:0x804DB594 end:0x804DB598
 	.data       start:0x80502D08 end:0x80502DD8
-	.bss        start:0x8056DB08 end:0x8056DBA0
+	.bss        start:0x8056DB20 end:0x8056DBA0
 	.sdata      start:0x806DC3D8 end:0x806DC3F0
 	.sdata2     start:0x806E41B0 end:0x806E42C0
 

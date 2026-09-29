@@ -10,6 +10,7 @@ extern void* g_pAudioSilenceBuffer;
 extern unsigned long gAudioSourceListCount;
 extern float sSpeedOfSound;
 
+void ReleaseAudioSoundOwner(void* value, void* owner);
 void SetControllerSpeakerEnabled(bool enabled);
 void SetAudioEffectContext(unsigned long* hash, int index);
 

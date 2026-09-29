@@ -135,6 +135,7 @@ public:
     }
 
     inline int GetGameState() const { return m_eGameState; }
+    inline bool IsLastTeamToScore(int side) const { return m_nLastTeamToScore == side; }
     inline bool IsCaptainShotToScoreOn() const { return mbCaptainShotToScoreOn; }
     inline u32 GetMegaStrikeSaveMask() const { return mUnidentified038; }
 

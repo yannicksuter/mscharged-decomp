@@ -12,10 +12,12 @@
 #include "Game/Ball.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/ChainChomp.h"
+#include "Game/Camera/CameraMan.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/EventDataTypes.h"
+#include "Game/Field.h"
 #include "Game/GameTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/Game.h"
@@ -36,12 +38,9 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C" void fn_802772A4(DrawableObject*);
 extern "C" void fn_800EDCE8(cPlayer*);
 extern "C" bool fn_8019C988(void*);
 extern "C" void fn_8009F1B8(EmissionController&);
-extern "C" bool fn_8002D2C4(nlVector3*, bool, float);
-extern "C" void fn_800F0240(float, float, float, float);
 
 enum eGameState
 {
@@ -88,7 +87,7 @@ static int gBobombAnticipationVoiceID = -1;
 
 static int lbl_806E0DA8;
 
-unsigned long uPowerupTexID[NUM_POWER_UPS] = {
+unsigned long uPowerupTexID[21] = {
     nlStringLowerHash("fe/shell_green"),
     nlStringLowerHash("fe/shell_red"),
     nlStringLowerHash("fe/shell_spike"),
@@ -818,6 +817,64 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
     return true;
 }
 
+static inline PowerupBase* FindPowerUpImpl(unsigned long hashOfDrawable)
+{
+    const Pair* entry = powerupRegistry.registry;
+    for (int i = 0; i < 25; ++i)
+    {
+        if (hashOfDrawable == entry->hashId)
+        {
+            return const_cast<PowerupBase*>(powerupRegistry.registry[i].powerup);
+        }
+        ++entry;
+    }
+    return 0;
+}
+
+/**
+ * Offset/Address/Size: 0x15FC | 0x8009AC5C | size: 0x4C
+ */
+PowerupBase* FindPowerUp(unsigned long hashOfDrawable)
+{
+    return FindPowerUpImpl(hashOfDrawable);
+}
+
+inline void PowerupModelPool::Initialize(int type, unsigned long objHashName)
+{
+    DrawableObject* obj;
+    int i;
+    char name[32];
+
+    obj = FindStadiumDrawableObject(objHashName);
+    i = 0;
+
+    obj->m_uObjectFlags &= ~1;
+
+    for (; i < 25; i++)
+    {
+        nlSNPrintf(name, sizeof(name), "powerup_generated_%d", mNum);
+        mObjs[type][i] = obj->Clone(nlStringLowerHash(name));
+        mObjs[type][i]->m_uObjectFlags &= ~1;
+        fn_802772A4(mObjs[type][i]);
+        mFree[type][i] = true;
+        mNum++;
+    }
+}
+
+/**
+ * Offset/Address/Size: 0x1648 | 0x8009ACA8 | size: 0x404
+ */
+void InitializePowerups()
+{
+    powerupModelPool.mNum = 0;
+    powerupModelPool.Initialize(POWER_UP_FREEZE_SHELL, uFREEZE_SHELL_MASTER_OBJECT);
+    powerupModelPool.Initialize(POWER_UP_SPINY_SHELL, uSPINY_SHELL_MASTER_OBJECT);
+    powerupModelPool.Initialize(POWER_UP_GREEN_SHELL, uGREEN_SHELL_MASTER_OBJECT);
+    powerupModelPool.Initialize(POWER_UP_RED_SHELL, uRED_SHELL_MASTER_OBJECT);
+    powerupModelPool.Initialize(POWER_UP_BANANA, uBANANA_MASTER_OBJECT);
+    powerupModelPool.Initialize(POWER_UP_BOBOMB, uBOBOMB_MASTER_OBJECT);
+}
+
 /**
  * Offset/Address/Size: 0x1A50 | 0x8009B0AC | size: 0xB4
  */
@@ -1528,8 +1585,11 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     PhysicsObject* pObjB, const nlVector3& v3Pos, void* pParam)
 {
     PowerupBase* pObj = (PowerupBase*)pParam;
-    cCharacter* pCharacter = 0;
-    cPlayer* pPlayerTarget = 0;
+    cPlayer* pPlayerTarget;
+    cCharacter* pCharacter;
+
+    pCharacter = 0;
+    pPlayerTarget = 0;
 
     if (pObj->m_unk44.m_uPackedTime != 0)
     {
@@ -1636,12 +1696,14 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         break;
     }
     default:
+    {
+        Bobomb* pBobomb = (Bobomb*)pObj;
         if (pObj->m_eType == POWER_UP_BOBOMB
             && pObjB->GetObjectType() == 0x12
-            && !((Bobomb*)pObj)->mbIsMine)
+            && !pBobomb->mbIsMine)
         {
-            ((Bobomb*)pObj)->mbIsMine = true;
-            ((Bobomb*)pObj)->m_unkAC = lbl_806DBDE0;
+            pBobomb->mbIsMine = true;
+            pBobomb->m_unkAC = lbl_806DBDE0;
             pObj->m_v3Velocity = v3Zero;
             pObj->m_pPhysicsObject->SetLinearVelocity(v3Zero);
 
@@ -1662,6 +1724,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
             pController->SetUpdateCallback(callback);
         }
         break;
+    }
     }
 
     if (pCharacter != 0)
@@ -1826,12 +1889,8 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
     if (lbl_806DBDA0 || pThrower->GetGlobalPad() == 0)
     {
         nlVector3 v3Direction;
-        float fDirectionY = v3TargetPos.y - m_v3Position.y;
-        float fDirectionX = v3TargetPos.x - m_v3Position.x;
-        float fDirectionZ = v3TargetPos.z - m_v3Position.z;
-        nlVec3Set(v3Direction, fDirectionX, fDirectionY, fDirectionZ);
-        float fInvDistance = nlRecipSqrt(v3Direction.GetLengthSq3D(), true);
-        nlVec3Scale(v3Direction, fInvDistance);
+        nlVec3Sub(v3Direction, v3TargetPos, m_v3Position);
+        nlVec3Normalize(v3Direction, v3Direction);
 
         int nNumSolutions;
         float pSolutions[2];
@@ -1909,18 +1968,11 @@ void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
 
             const nlVector3& v3Velocity = m_v3Velocity;
             float fVerticalVelocity = -v3Velocity.z;
-            float fDirectionY = m_v3Position.y - v3Unidentified.y;
-            float fDirectionX = m_v3Position.x - v3Unidentified.x;
-            float fDirectionZ = m_v3Position.z - v3Unidentified.z;
-            nlVec3Set(v3Direction, fDirectionX, fDirectionY, fDirectionZ);
+            nlVec3Sub(v3Direction, m_v3Position, v3Unidentified);
 
             if (nlVec3DotProduct(v3Direction, v3Velocity) < 0.0f)
             {
-                float fVelocityProjection = nlVec3DotProduct(
-                    v3Velocity, v3Direction);
-                float fDirectionLengthSquared = nlVec3LengthSquared(v3Direction);
-                float fProjection = fVelocityProjection / fDirectionLengthSquared;
-                nlVec3Scale(v3NewVelocity, v3Direction, fProjection);
+                nlVec3Project(v3NewVelocity, v3Velocity, v3Direction);
                 nlVec3ScaleAdd(v3NewVelocity, -2.0f,
                     v3NewVelocity, v3Velocity);
             }
@@ -2016,7 +2068,7 @@ void PowerupBase::Destroy(bool bSilent)
             case POWERUPSIZE_LARGE:
                 pExplosionGroup = pManager->GetEffectsGroup("bobomb_explode_big");
                 pGroundGroup = pManager->GetEffectsGroup("bobomb_explode_ground_big");
-                fn_800F0240(0.0f, 0.2f, 5000.0f, 10.0f);
+                FireCameraRumbleFilter(0.0f, 0.2f, 5000.0f, 10.0f);
                 break;
             case POWERUPSIZE_MEDIUM:
                 pExplosionGroup = pManager->GetEffectsGroup("bobomb_explode_med");
@@ -2299,20 +2351,6 @@ void PowerupBase::UpdateTransform()
     }
 }
 
-static inline PowerupBase* FindPowerUpImpl(unsigned long hashOfDrawable)
-{
-    const Pair* entry = powerupRegistry.registry;
-    for (int i = 0; i < 25; ++i)
-    {
-        if (hashOfDrawable == entry->hashId)
-        {
-            return const_cast<PowerupBase*>(powerupRegistry.registry[i].powerup);
-        }
-        ++entry;
-    }
-    return 0;
-}
-
 static inline void RegisterPowerup(unsigned long hashID, PowerupBase* powerup)
 {
     int j = 0;
@@ -2329,35 +2367,33 @@ static inline void RegisterPowerup(unsigned long hashID, PowerupBase* powerup)
     nlBreak();
 }
 
+static inline DrawableObject* AcquirePowerupModel(int type)
+{
+    for (int i = 0; i < 25; i++)
+    {
+        if (powerupModelPool.mFree[type][i])
+        {
+            powerupModelPool.mFree[type][i] = false;
+            return powerupModelPool.mObjs[type][i];
+        }
+    }
+
+    return 0;
+}
+
+inline void PowerupBase::InitVisuals()
+{
+    m_pDrawableObj = AcquirePowerupModel(m_eType);
+    m_pDrawableObj->m_uObjectFlags |= 2;
+    RegisterPowerup(m_pDrawableObj->GetHashID(), this);
+}
+
 /**
  * Offset/Address/Size: 0x3A44 | 0x8009DADC | size: 0x158
  */
 void PowerupBase::Init(cFielder* pFielder)
 {
-    int type = m_eType;
-    DrawableObject* pObj;
-    int i;
-
-    for (i = 0; i < 25; i++)
-    {
-        if (powerupModelPool.mFree[type][i])
-        {
-            powerupModelPool.mFree[type][i] = false;
-            pObj = powerupModelPool.mObjs[type][i];
-            goto found1;
-        }
-    }
-    pObj = 0;
-
-found1:
-    m_pDrawableObj = pObj;
-
-    {
-        DrawableObject* pD = m_pDrawableObj;
-        pD->m_uObjectFlags |= 2;
-        unsigned long hashID = m_pDrawableObj->GetHashID();
-        RegisterPowerup(hashID, this);
-    }
+    InitVisuals();
 
     PreThrow(pFielder);
 
@@ -2429,6 +2465,17 @@ void PowerupBase::StopPowerupInEffectSound(ePowerUpType type, PowerupSound power
 }
 
 /**
+ * Offset/Address/Size: 0x41DC | 0x8009DC7C | size: 0xE8
+ */
+void PowerupBase::PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
+    const nlVector3& v3Pos, float fVol, void* pParam)
+{
+    PhysicsShell dummyShell(1.0f);
+    dummyShell.SetPosition(v3Pos, PhysicsObject::WORLD_COORDINATES);
+    PlayPowerupSound(type, powerupSnd, &dummyShell, fVol, pParam);
+}
+
+/**
  * Offset/Address/Size: 0x4320 | 0x8009DDC0 | size: 0x74
  */
 void PowerupBase::PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
@@ -2452,17 +2499,6 @@ void PowerupBase::PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
     {
         PlaySound(0x10, soundID, 0, 0);
     }
-}
-
-/**
- * Offset/Address/Size: 0x41DC | 0x8009DC7C | size: 0xE8
- */
-void PowerupBase::PlayPowerupSound(ePowerUpType type, PowerupSound powerupSnd,
-    const nlVector3& v3Pos, float fVol, void* pParam)
-{
-    PhysicsShell dummyShell(1.0f);
-    dummyShell.SetPosition(v3Pos, PhysicsObject::WORLD_COORDINATES);
-    PlayPowerupSound(type, powerupSnd, &dummyShell, fVol, pParam);
 }
 
 /**
@@ -2621,34 +2657,19 @@ void RedShell::SeekTarget()
 
     nlVec2Length(v2Delta);
 
-    float invDist = 1.0f / nlVec2Length(v2Delta);
-    nlVec2Set(v2Direction,
-        invDist * v2Delta.x, invDist * v2Delta.y);
-
-    float velX = m_v3Velocity.y;
-    float velY = m_v3Velocity.x;
-    float xx = velY * velY;
-    float yy = velX * velX;
-    const float lengthSquared = xx + yy;
-
-    float turnRate = lbl_806DBDA4;
-    nlVec2Set(v2Delta,
-        turnRate * v2Direction.x, turnRate * v2Direction.y);
-
-    fCurrSpeed = nlSqrt(lengthSquared, true);
+    nlVec2Scale(v2Direction, v2Delta, 1.0f / nlVec2Length(v2Delta));
+    nlVec2Scale(v2Delta, v2Direction, lbl_806DBDA4);
+    fCurrSpeed = nlSqrt(nlGetLengthSquared1D(m_v3Velocity.x)
+            + nlGetLengthSquared1D(m_v3Velocity.y),
+        true);
 
     nlVector2 v2NewVelocity;
     v2NewVelocity.x = v2Delta.x + m_v3Velocity.x;
     v2NewVelocity.y = v2Delta.y + m_v3Velocity.y;
-
-    float newSpeed = nlVec2Length(v2NewVelocity);
-    float invNewSpeed = 1.0f / newSpeed;
     nlVector2 v2NormalizedVelocity;
-    v2NormalizedVelocity.y = invNewSpeed * v2NewVelocity.y;
-    v2NormalizedVelocity.x = invNewSpeed * v2NewVelocity.x;
-
-    v2NewVelocity.x = fCurrSpeed * v2NormalizedVelocity.x;
-    v2NewVelocity.y = fCurrSpeed * v2NormalizedVelocity.y;
+    nlVec2Scale(v2NormalizedVelocity, v2NewVelocity,
+        1.0f / nlVec2Length(v2NewVelocity));
+    nlVec2Scale(v2NewVelocity, v2NormalizedVelocity, fCurrSpeed);
 
     v3NewVelocity.x = v2NewVelocity.x;
     v3NewVelocity.y = v2NewVelocity.y;
@@ -2720,9 +2741,10 @@ void Banana::Update(float dt)
     nlVector3 v3Unidentified = m_v3Position;
     float fUnidentified =
         ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
-    if (fn_8002D2C4(&v3Unidentified, false,
+    if (cField::FixOutOfBoundsPosition(v3Unidentified,
             ((PhysicsSphere*)m_pPhysicsObject)->GetRadius()
-                - 0.85f * fUnidentified))
+                - 0.85f * fUnidentified,
+            false))
     {
         m_bShouldDestroy = true;
     }
@@ -2972,17 +2994,20 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
         }
         else
         {
-            float invLength = nlRecipSqrt(v3TargetVel.GetLengthSq3D(), true);
-            v3TargetVel.x = invLength * v3TargetVel.x;
-            v3TargetVel.y = invLength * v3TargetVel.y;
-            v3TargetVel.z = invLength * v3TargetVel.z;
+            nlVec3Normalize(v3TargetVel, v3TargetVel);
             nlVec3Scale(v3TargetVel, v3TargetVel, lbl_806DBDDC);
         }
     }
 
     nlVec3ScaleAdd(v3TargetPos, t, v3TargetVel, v3TargetPos);
-    float height = -(t * t * (0.5f * m_pPhysicsObject->m_gravity));
-    v3TargetPos.z = height + -lbl_806DBDB0 * t;
+    // R4QE01 multiplies t * t by the half-gravity product in that operand
+    // order, which the compiler keeps only when the 0.5 is a named constant;
+    // with the literal it puts 0.5f * fGravity first. The constant folds to
+    // the same pooled literal, so what named it is not recoverable from a
+    // stripped executable.
+    const float fHalf = 0.5f;
+    float fGravity = m_pPhysicsObject->m_gravity;
+    v3TargetPos.z = -(t * t * (fHalf * fGravity)) + -lbl_806DBDB0 * t;
 
     float radius = 0.0f;
     switch (meSize)
@@ -2998,7 +3023,7 @@ void Bobomb::fn_8009F454(PowerupBase*, int nThrowOrder)
         break;
     }
 
-    fn_8002D2C4(&v3TargetPos, true, radius);
+    cField::FixOutOfBoundsPosition(v3TargetPos, radius, true);
 
     m_v3Position = v3TargetPos;
     m_pPhysicsObject->SetPosition(m_v3Position, PhysicsObject::WORLD_COORDINATES);
@@ -3058,48 +3083,4 @@ void Bobomb::Destroy(bool bSilent)
     }
 
     PowerupBase::Destroy(bSilent);
-}
-
-/**
- * Offset/Address/Size: 0x15FC | 0x8009AC5C | size: 0x4C
- */
-PowerupBase* FindPowerUp(unsigned long hashOfDrawable)
-{
-    return FindPowerUpImpl(hashOfDrawable);
-}
-
-inline void PowerupModelPool::Initialize(int type, unsigned long objHashName)
-{
-    DrawableObject* obj;
-    int i;
-    char name[32];
-
-    obj = FindStadiumDrawableObject(objHashName);
-    i = 0;
-
-    obj->m_uObjectFlags &= ~1;
-
-    for (; i < 25; i++)
-    {
-        nlSNPrintf(name, sizeof(name), "powerup_generated_%d", mNum);
-        mObjs[type][i] = obj->Clone(nlStringLowerHash(name));
-        mObjs[type][i]->m_uObjectFlags &= ~1;
-        fn_802772A4(mObjs[type][i]);
-        mFree[type][i] = true;
-        mNum++;
-    }
-}
-
-/**
- * Offset/Address/Size: 0x1648 | 0x8009ACA8 | size: 0x404
- */
-void InitializePowerups()
-{
-    powerupModelPool.mNum = 0;
-    powerupModelPool.Initialize(POWER_UP_FREEZE_SHELL, uFREEZE_SHELL_MASTER_OBJECT);
-    powerupModelPool.Initialize(POWER_UP_SPINY_SHELL, uSPINY_SHELL_MASTER_OBJECT);
-    powerupModelPool.Initialize(POWER_UP_GREEN_SHELL, uGREEN_SHELL_MASTER_OBJECT);
-    powerupModelPool.Initialize(POWER_UP_RED_SHELL, uRED_SHELL_MASTER_OBJECT);
-    powerupModelPool.Initialize(POWER_UP_BANANA, uBANANA_MASTER_OBJECT);
-    powerupModelPool.Initialize(POWER_UP_BOBOMB, uBOBOMB_MASTER_OBJECT);
 }

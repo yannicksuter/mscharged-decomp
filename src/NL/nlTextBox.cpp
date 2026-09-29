@@ -173,11 +173,7 @@ void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVe
 
     const Row* pIter = DrawInfo.Rows;
     CurrentPos.y += (float)(yDir * (int)pFont->m_Metrics.Ascent - ascentAdj);
-    nlColour overridecolour;
-    overridecolour.c[0] = Color.c[0];
-    overridecolour.c[1] = Color.c[1];
-    overridecolour.c[2] = Color.c[2];
-    overridecolour.c[3] = Color.c[3];
+    nlColour overridecolour = Color;
     unsigned long hMatrix;
 
     overridecolour.c[3] = 0;
@@ -193,7 +189,7 @@ void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVe
         if (pMatrix)
         {
             h = glAllocMatrix();
-            if (h + 0x10000 != 0xFFFF)
+            if (h != 0xFFFFFFFF)
             {
                 glSetMatrix(h, *pMatrix);
             }
@@ -201,23 +197,21 @@ void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVe
         }
 
         unsigned short startIdx = CurrentRow.FirstChar;
+        const unsigned short* pString = DrawInfo.String + startIdx;
         unsigned long* matArg = DrawInfo.pMatrix ? &hMatrix : 0;
         {
             FontCharString fontCharStr;
+            fontCharStr.m_pString = (unsigned short*)pString;
             fontCharStr.m_InternalBuffer = 0;
-            fontCharStr.m_pString = (unsigned short*)(DrawInfo.String + startIdx);
 
-            int length = (&CurrentRow + 1)->FirstChar - startIdx;
+            int length = pIter[1].FirstChar - startIdx;
 
             DrawInfo.pFont->DrawString(View, fontCharStr, CurrentPos, Color, Color, length, nlFont::PASS_TextAndEffect, (DrawInfo.DrawOptions & FlipY) != 0, matArg, &overridecolour);
         }
 
         if (overridecolour.c[3] == 0)
         {
-            overridecolour.c[0] = Color.c[0];
-            overridecolour.c[1] = Color.c[1];
-            overridecolour.c[2] = Color.c[2];
-            overridecolour.c[3] = Color.c[3];
+            overridecolour = Color;
         }
 
         pIter++;

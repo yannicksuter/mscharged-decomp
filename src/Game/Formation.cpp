@@ -4,7 +4,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Ball.h"
 #include "Game/Field.h"
@@ -913,7 +913,7 @@ cPlayer* FormationEval::GetKeyPlayer()
         }
         else
         {
-            pKeyPlayer = team->mpBestBallInterceptor;
+            pKeyPlayer = team->GetBestBallInterceptor();
         }
     }
 

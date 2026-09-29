@@ -7,7 +7,7 @@
 #include "Game/Physics/PhysicsShockwave.h"
 
 #include "Game/AI/Fuzzy.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/Field.h"
@@ -62,9 +62,7 @@ struct UnidentifiedAbilityEvent
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
-extern "C" bool fn_80319FEC(void* pParam, int nAction);
 extern "C" void fn_80319E58(void* pParam, int nAction);
-extern "C" void fn_80319E84(void* pParam, int nAction, int nParam1, int nParam2);
 extern "C" void fn_80060014(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FC1C(cGame* pGame, void* pEvent);
 extern "C" void fn_8005FE18(cGame* pGame, void* pEvent);

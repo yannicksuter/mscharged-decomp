@@ -2,8 +2,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
-#include "Game/AI/DesireUpdate.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/AI/SkillTweaks.h"

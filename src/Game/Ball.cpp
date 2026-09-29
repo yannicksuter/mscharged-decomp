@@ -137,10 +137,8 @@ extern "C" void fn_80036594(cFielder*, cFielder*, int);
 float ReceivingPass(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void Hide(BirdoEggObject*, bool);
-void ReleaseAudioSoundOwner(void*, void*);
 extern "C" void fn_802B5370(
     nlQuaternion&, const nlVector3&, unsigned short);
-extern "C" Plat3dSoundSrc* fn_802ECB68(AudioSystem*);
 float Exp(float);
 
 cBall* g_pBall = NULL;
@@ -333,8 +331,8 @@ cBall::cBall()
     m_pPhysicsBall->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsBall->SetAngularVelocity(v3Zero);
 
-    mUnidentifiedEC = fn_802ECB68(g_pAudioSystem);
-    mUnidentifiedEC->m_Unknown44 |= 0x00800000;
+    mUnidentifiedEC = CreateAudioSoundOwner(g_pAudioSystem);
+    mUnidentifiedEC->m_SpatialBits |= 0x00800000;
     mUnidentifiedEC->SetPosition(&m_v3Position);
 }
 
@@ -2202,7 +2200,7 @@ void cBall::Update(float fDeltaT)
             m_iConsecutiveVolleyPasses = 0;
         }
 
-        mUnidentifiedEC->count.field_2000
+        mUnidentifiedEC->count.zeroVelocity
             = !g_pGame->IsGameplayOrOvertime();
     }
 }

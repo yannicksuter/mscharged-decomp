@@ -4,12 +4,10 @@
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "NL/nlString.h"
 
-TransitionFunc* BindNativeTransitionFunc(
-    TransitionFunc* transition, void* function)
+NativeTransitionFunc::NativeTransitionFunc(void* function)
 {
-    transition->mFuncHash = -1;
-    transition->mNativeFunc = function;
-    return transition;
+    mFuncHash = -1;
+    mNativeFunc = function;
 }
 
 ScriptTransitionFunc::ScriptTransitionFunc(const char* name)

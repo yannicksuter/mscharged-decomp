@@ -1,7 +1,7 @@
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Desire.h"
 
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/DB/GameProgress.h"
 #include "Game/GameInfo.h"
 #include "NL/nlMemory.h"

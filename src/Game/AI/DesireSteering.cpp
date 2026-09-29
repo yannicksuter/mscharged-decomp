@@ -2,10 +2,9 @@
 #include "Game/AI/AvoidController.h"
 
 #include "Game/AI/AiUtil.h"
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/Fielder.h"
-#include "Game/AI/FuzzyVariant.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"

@@ -605,4 +605,11 @@ inline void nlMakeQuat(nlQuaternion& out, const nlVector3& v3RotationAxis, float
     fn_802B5370(out, v3RotationAxis, (unsigned short)(int)(10430.378f * ang_rad));
 }
 
+extern "C" nlVector3* fn_800D1C4C(nlVector3*, const nlVector3*, const nlVector3*);
+extern "C" float fn_800D1C80(const nlVector2*, const nlVector2*);
+extern "C" unsigned short fn_800D1CCC(float, float);
+extern "C" short fn_800D1D04(unsigned short, unsigned short);
+extern "C" unsigned short fn_800D1D10(short);
+extern "C" int fn_800D1D24(int);
+
 #endif

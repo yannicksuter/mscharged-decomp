@@ -3,11 +3,11 @@
 
 #include "Game/AI/TeamPlayMachine.h"
 
-class UnidentifiedFielderDesireMachine : public UnidentifiedScriptMachine
+class FielderDesireMachine : public UnidentifiedScriptMachine
 {
 public:
-    UnidentifiedFielderDesireMachine();
-    virtual ~UnidentifiedFielderDesireMachine();
+    FielderDesireMachine();
+    virtual ~FielderDesireMachine();
 
     virtual void UnidentifiedVirtual2();
     virtual void Update(float deltaTime);

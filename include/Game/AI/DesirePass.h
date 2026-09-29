@@ -8,9 +8,8 @@ class UnidentifiedFuzzyRuntimeValue;
 class DesirePreparePass : public Desire
 {
 public:
-    DesirePreparePass(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesirePreparePass(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -30,8 +29,8 @@ private:
 class DesirePass : public Desire
 {
 public:
-    DesirePass(int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesirePass(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 

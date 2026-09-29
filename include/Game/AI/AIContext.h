@@ -2,7 +2,7 @@
 #define GAME_AI_AI_CONTEXT_H
 
 #include "Game/AI/FuzzyAIRuntime.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TeamPlayMachine.h"
 
 float GetTickerMilliseconds();

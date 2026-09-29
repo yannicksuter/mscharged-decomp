@@ -3,7 +3,7 @@
 #include "Game/Sys/debug.h"
 #include "Game/AI/AIContext.h"
 
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/InterpreterCore.h"
 #include "NL/nlMath.h"
@@ -37,15 +37,11 @@ public:
 extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311744(void*);
 extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
     UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
-extern "C" void fn_80316980(shdStateMachine*, bool);
 extern "C" bool fn_803169DC(
     shdStateMachine*, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80316A84(
     shdStateMachine*, UnidentifiedVariantCollection*, bool);
-extern "C" void fn_80317010(
-    shdStateMachine*, UnidentifiedVariant_80054AB8*, bool, float);
 extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
-extern "C" bool fn_80319FEC(UnidentifiedScriptMachine*, int);
 
 extern float (*lbl_806DF560)();
 
@@ -233,9 +229,6 @@ void UnidentifiedScriptMachine::Reset(bool param)
         }
     }
 }
-
-extern "C" shdStateMachine* fn_80319E84(
-    UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 
 void UnidentifiedScriptMachine::Update(float deltaTime)
 {
@@ -444,8 +437,6 @@ extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine)
 {
     machine->UnidentifiedVirtual6();
 }
-
-extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine*, int);
 
 extern "C" void fn_80319904(
     UnidentifiedScriptMachine* machine, shdStateMachine* state)

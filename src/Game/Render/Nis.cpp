@@ -126,7 +126,8 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 mUnidentified10C[i]->mVisible = true;
                 mUnidentified10C[i]->mModelCallback = fn_80183F78;
                 mUnidentified12C[i] = npcTemplate->mName;
-                mUnidentified14C[i] = anim->m_szName[nlStrLen(anim->m_szName) - 1];
+                int lastIndex = nlStrLen(anim->m_szName) - 1;
+                mUnidentified14C[i] = anim->m_szName[lastIndex];
                 char textureName[256];
                 if (nlStrCmp(npcTemplate->mName, "vice_image_plane_top") == 0
                     || nlStrCmp(npcTemplate->mName, "vice_image_plane_bottom") == 0)

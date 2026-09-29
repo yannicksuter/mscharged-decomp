@@ -20,7 +20,7 @@
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AnimInventory.h"
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -79,8 +79,6 @@ extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8003E948(cFielder* pFielder);
 extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
-extern "C" void* fn_80319FC0(void* pParam, int nParam);
-extern "C" void fn_80316968(void* pParam);
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern "C" void fn_800978E8(cPlayer* pPlayer, int nParam);

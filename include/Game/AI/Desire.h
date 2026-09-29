@@ -1,7 +1,7 @@
 #ifndef GAME_AI_DESIRE_H
 #define GAME_AI_DESIRE_H
 
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "Game/AI/TransitionFunc.h"
 #include "Game/DebugWriteCache.h"
 #include "NL/nlMath.h"
@@ -66,6 +66,10 @@ public:
     float mUnidentified084;
 };
 
+extern "C" void fn_80316968(shdStateMachine* machine);
+extern "C" void fn_80316980(shdStateMachine* machine, bool cleanup);
+extern "C" void fn_80317010(shdStateMachine* machine, UnidentifiedVariant_80054AB8* update, bool runUpdate, float deltaTime);
+
 class Desire : public shdStateMachine
 {
 public:
@@ -92,9 +96,8 @@ protected:
 class DesireFinishAction : public Desire
 {
 public:
-    DesireFinishAction(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireFinishAction(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -107,8 +110,8 @@ public:
 class DesireWait : public Desire
 {
 public:
-    DesireWait(int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireWait(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -121,9 +124,8 @@ public:
 class DesireCutAndBreak : public Desire
 {
 public:
-    DesireCutAndBreak(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireCutAndBreak(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -142,8 +144,8 @@ private:
 class DesireDeke : public Desire
 {
 public:
-    DesireDeke(int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireDeke(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -162,8 +164,8 @@ private:
 class DesireHit : public Desire
 {
 public:
-    DesireHit(int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireHit(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -195,11 +197,13 @@ private:
     u8 mUnidentifiedA4[0x08];
 };
 
+extern "C" DesireUpdate fn_800B4DC0(AIContext* input);
+
 class DesireGetOpen : public Desire
 {
 public:
-    DesireGetOpen(int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireGetOpen(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -215,12 +219,13 @@ private:
     void* mUnidentifiedA4;
 };
 
+extern "C" DesireUpdate fn_800B38AC(AIContext* input, UnidentifiedFuzzyRuntimeValue* context);
+
 class DesireRunToTarget : public Desire
 {
 public:
-    DesireRunToTarget(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireRunToTarget(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -250,9 +255,8 @@ class DesireRunInDirection : public Desire
 public:
     float GetMaxDistance() const { return m_fMaxDistance; }
     float GetDistanceTravelled() const { return m_fDistTravelled; }
-    DesireRunInDirection(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireRunInDirection(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -276,9 +280,8 @@ private:
 class DesireRunDownfield : public Desire
 {
 public:
-    DesireRunDownfield(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireRunDownfield(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -293,9 +296,8 @@ public:
 class DesireRunUpfield : public Desire
 {
 public:
-    DesireRunUpfield(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireRunUpfield(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -310,9 +312,8 @@ public:
 class DesireGetInPosition : public Desire
 {
 public:
-    DesireGetInPosition(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireGetInPosition(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -327,8 +328,8 @@ public:
 class DesireMark : public Desire
 {
 public:
-    DesireMark(int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireMark(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -338,12 +339,13 @@ public:
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
+extern "C" DesireUpdate fn_800B7B1C(AIContext* input);
+
 class DesireDefendPos : public Desire
 {
 public:
-    DesireDefendPos(
-        int state, const TransitionFunc& transition)
-        : Desire(state, transition)
+    DesireDefendPos(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
     {
     }
 
@@ -383,8 +385,8 @@ private:
 class DesireStar : public Desire
 {
 public:
-    DesireStar(int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireStar(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -401,9 +403,8 @@ public:
 class DesireMushroom : public Desire
 {
 public:
-    DesireMushroom(
-        int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireMushroom(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -420,9 +421,8 @@ public:
 class DesireSlippery : public Desire
 {
 public:
-    DesireSlippery(
-        int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireSlippery(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -463,8 +463,8 @@ private:
 class DesireShrink : public Desire
 {
 public:
-    DesireShrink(int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireShrink(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -487,8 +487,8 @@ class DesireFrozen : public Desire
     friend class cFielder;
 
 public:
-    DesireFrozen(int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireFrozen(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -521,9 +521,8 @@ private:
 class DesireConfused : public Desire
 {
 public:
-    DesireConfused(
-        int state, TransitionFunc transition)
-        : Desire(state, transition)
+    DesireConfused(int state)
+        : Desire(state, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
@@ -549,5 +548,10 @@ inline void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");
     cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
 }
+
+extern "C" int fn_800D1D34(const shdStateMachine*);
+extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
+extern "C" float fn_800D1D44(const DesireRunInDirection*);
+extern "C" float fn_800D1D4C(const DesireRunInDirection*);
 
 #endif // GAME_AI_DESIRE_H

@@ -7,8 +7,8 @@
 class DesireSlideAttack : public Desire
 {
 public:
-    DesireSlideAttack(TransitionFunc transition)
-        : Desire(16, transition)
+    DesireSlideAttack()
+        : Desire(16, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 

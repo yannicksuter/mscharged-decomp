@@ -83,7 +83,7 @@ static inline float clamp_le(float x, float limit)
 static inline float MeterPosition(float position)
 {
     float oneMinusPosition = 1.0f - position;
-    position *= 180.0f;
+    position *= lbl_806DD0CC;
     return oneMinusPosition * sfMeterStart + position;
 }
 

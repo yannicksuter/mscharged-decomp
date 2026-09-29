@@ -6,8 +6,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 
-void ReleaseAudioSoundOwner(void* audioSystem, void* value);
-
 static char sHitMarkerWarning[]
     = "Warning: hit marker (%d) with no callback\n";
 static char sStateFormat[]

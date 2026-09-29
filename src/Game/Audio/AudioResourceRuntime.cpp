@@ -141,7 +141,7 @@ extern "C" void fn_802F4958(AudioResourceRuntime* runtime)
 /**
  * Address/Size: 0x802F499C | size: 0x8
  */
-extern "C" void fn_802F499C(AudioResourceRuntime* runtime, u32 hash, u32 instance)
+void NotifyAudioSoundStarted(AudioResourceRuntime* runtime, u32 hash, u32 instance)
 {
     runtime->m_Script->OnSoundStarted(hash, instance);
 }
@@ -149,7 +149,7 @@ extern "C" void fn_802F499C(AudioResourceRuntime* runtime, u32 hash, u32 instanc
 /**
  * Address/Size: 0x802F49A4 | size: 0x8
  */
-extern "C" void fn_802F49A4(AudioResourceRuntime* runtime, u32 instance)
+void NotifyAudioSoundStopped(AudioResourceRuntime* runtime, u32 instance)
 {
     runtime->m_Script->OnSoundStopped(instance);
 }

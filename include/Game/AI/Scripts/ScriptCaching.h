@@ -1,7 +1,7 @@
 #ifndef GAME_AI_SCRIPTS_SCRIPT_CACHING_H
 #define GAME_AI_SCRIPTS_SCRIPT_CACHING_H
 
-#include "Game/AI/FuzzyVariant.h"
+#include "Game/AI/DesireUpdate.h"
 #include "NL/nlAVLTree.h"
 
 extern unsigned char lbl_806DF568;

@@ -2,7 +2,7 @@
 #include "Game/AI/TeamPlayMachine.h"
 
 #include "Game/AI/AiUtil.h"
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -62,7 +62,7 @@ bool DesireMark::UnidentifiedInitialize(void* context)
  */
 void DesireMark::Update(DesireUpdate* update, float fDeltaT)
 {
-    bool bBestBallInterceptor = m_pFielder->m_pTeam->mpBestBallInterceptor == m_pFielder;
+    bool bBestBallInterceptor = m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder;
     cFielder* pMark = m_pFielder->GetMark();
     if (pMark == 0 || pMark->fn_800344B0()
         || m_pFielder == g_pBall->m_pOwner

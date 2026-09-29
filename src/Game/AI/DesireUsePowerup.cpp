@@ -5,8 +5,7 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
-#include "Game/AI/FuzzyVariant.h"
-#include "Game/AI/DesireUpdate.h"
+#include "Game/AI/DesireUpdate.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
@@ -19,8 +18,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" shdStateMachine* fn_80319E84(
-    UnidentifiedScriptMachine*, int, UnidentifiedVariantCollection*, bool);
 extern "C" DesireUpdate fn_80041B6C(
     void*, const unsigned int&, cFielder*);
 extern "C" void fn_8009A5D8(
@@ -361,8 +358,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mFuncHash));
             fn_80319E84(pDesire->mUnidentified018, 23, &params, false);
-            TransitionFunc transition;
-            BindNativeTransitionFunc(&transition, (void*)fn_800D2074);
+            NativeTransitionFunc transition((void*)fn_800D2074);
             pDesire->mOverrideTransition.mFuncHash
                 = transition.mFuncHash;
             pDesire->mOverrideTransition.mNativeFunc

@@ -117,6 +117,7 @@ public:
     void fn_8009D500();
     void fn_8009D74C(float seconds, bool bEnableCollisions);
     void SpeedManagement();
+    void InitVisuals();
     void UpdateTransform();
     static int AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool);
     static void CollisionCallback(PhysicsObject* pObjA,
@@ -160,6 +161,88 @@ public:
     /* 0xA8 */ bool mbExploder;
 }; // total size: 0xAC
 
+class GreenShell : public PowerupBase
+{
+public:
+    GreenShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~GreenShell();
+    static void operator delete(void* ptr)
+    {
+        m_GreenShellSlotPool.Free((GreenShell*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+
+    static SlotPool<GreenShell> m_GreenShellSlotPool;
+}; // total size: 0xAC
+
+class RedShell : public PowerupBase
+{
+public:
+    RedShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~RedShell();
+    static void operator delete(void* ptr)
+    {
+        m_RedShellSlotPool.Free((RedShell*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+    void SeekTarget();
+
+    static SlotPool<RedShell> m_RedShellSlotPool;
+}; // total size: 0xAC
+
+class SpinyShell : public PowerupBase
+{
+public:
+    SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~SpinyShell();
+    static void operator delete(void* ptr)
+    {
+        m_SpinyShellSlotPool.Free((SpinyShell*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+
+    static SlotPool<SpinyShell> m_SpinyShellSlotPool;
+}; // total size: 0xAC
+
+class FreezeShell : public PowerupBase
+{
+public:
+    FreezeShell(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~FreezeShell();
+    static void operator delete(void* ptr)
+    {
+        m_FreezeShellSlotPool.Free((FreezeShell*)ptr);
+    }
+    virtual void Update(float fDeltaT);
+    void Destroy(bool bSilent);
+
+    static SlotPool<FreezeShell> m_FreezeShellSlotPool;
+}; // total size: 0xAC
+
+class Banana : public PowerupBase
+{
+public:
+    Banana(cFielder* pTarget, int nIndex, float fRadius,
+        ePowerupSize eSize, bool bExplode);
+    virtual ~Banana();
+    static void operator delete(void* ptr)
+    {
+        m_BananaSlotPool.Free((Banana*)ptr);
+    }
+    virtual void Update(float dt);
+    void Destroy(bool bSilent);
+    virtual void ThrowAt(cFielder* pThrower);
+
+    static SlotPool<Banana> m_BananaSlotPool;
+}; // total size: 0xAC
+
 class Bobomb : public PowerupBase
 {
 public:
@@ -183,88 +266,6 @@ public:
 
     static SlotPool<Bobomb> m_BobombSlotPool;
 }; // total size: 0xB4
-
-class FreezeShell : public PowerupBase
-{
-public:
-    FreezeShell(cFielder* pTarget, int nIndex, float fRadius,
-        ePowerupSize eSize, bool bExplode);
-    virtual ~FreezeShell();
-    static void operator delete(void* ptr)
-    {
-        m_FreezeShellSlotPool.Free((FreezeShell*)ptr);
-    }
-    virtual void Update(float fDeltaT);
-    void Destroy(bool bSilent);
-
-    static SlotPool<FreezeShell> m_FreezeShellSlotPool;
-}; // total size: 0xAC
-
-class SpinyShell : public PowerupBase
-{
-public:
-    SpinyShell(cFielder* pTarget, int nIndex, float fRadius,
-        ePowerupSize eSize, bool bExplode);
-    virtual ~SpinyShell();
-    static void operator delete(void* ptr)
-    {
-        m_SpinyShellSlotPool.Free((SpinyShell*)ptr);
-    }
-    virtual void Update(float dt);
-    void Destroy(bool bSilent);
-
-    static SlotPool<SpinyShell> m_SpinyShellSlotPool;
-}; // total size: 0xAC
-
-class Banana : public PowerupBase
-{
-public:
-    Banana(cFielder* pTarget, int nIndex, float fRadius,
-        ePowerupSize eSize, bool bExplode);
-    virtual ~Banana();
-    static void operator delete(void* ptr)
-    {
-        m_BananaSlotPool.Free((Banana*)ptr);
-    }
-    virtual void Update(float dt);
-    void Destroy(bool bSilent);
-    virtual void ThrowAt(cFielder* pThrower);
-
-    static SlotPool<Banana> m_BananaSlotPool;
-}; // total size: 0xAC
-
-class RedShell : public PowerupBase
-{
-public:
-    RedShell(cFielder* pTarget, int nIndex, float fRadius,
-        ePowerupSize eSize, bool bExplode);
-    virtual ~RedShell();
-    static void operator delete(void* ptr)
-    {
-        m_RedShellSlotPool.Free((RedShell*)ptr);
-    }
-    virtual void Update(float dt);
-    void Destroy(bool bSilent);
-    void SeekTarget();
-
-    static SlotPool<RedShell> m_RedShellSlotPool;
-}; // total size: 0xAC
-
-class GreenShell : public PowerupBase
-{
-public:
-    GreenShell(cFielder* pTarget, int nIndex, float fRadius,
-        ePowerupSize eSize, bool bExplode);
-    virtual ~GreenShell();
-    static void operator delete(void* ptr)
-    {
-        m_GreenShellSlotPool.Free((GreenShell*)ptr);
-    }
-    virtual void Update(float dt);
-    void Destroy(bool bSilent);
-
-    static SlotPool<GreenShell> m_GreenShellSlotPool;
-}; // total size: 0xAC
 
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType);
