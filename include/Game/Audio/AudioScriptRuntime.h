@@ -89,6 +89,14 @@ public:
     }
 
     void Unidentified8418(u32 key);
+    bool UnidentifiedStartEffect(u32 definition, void* parameterData,
+        bool immediate, float value);
+    bool UnidentifiedStartEffect(u32 definition, void* parameterData,
+        bool immediate, void* owner);
+    void UnidentifiedApplyEffectSet(u32 effectSetKey, bool inverted,
+        void* owner);
+    void UnidentifiedApplyEffectSet(u32 effectSetKey, bool inverted,
+        float duration);
     void OnSoundStarted(u32 instance);
     void OnSoundStopped(u32 instance);
     void Update(float deltaTime);
@@ -173,6 +181,12 @@ public:
     {
         return mBindings.UnidentifiedAddOrGet(key);
     }
+    bool UnidentifiedStartEffect(const u32& key, u32 definition,
+        void* parameterData, bool immediate, float value);
+    void UnidentifiedApplyEffectSet(u32 key, u32 effectSetKey, bool inverted,
+        void* owner);
+    void UnidentifiedApplyEffectSet(u32 key, u32 effectSetKey, bool inverted,
+        float duration);
 
     /* 0x00 */ AudioScriptEntry* mEntries;
     /* 0x04 */ u32 mEntryCount;

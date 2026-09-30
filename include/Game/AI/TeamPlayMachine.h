@@ -50,6 +50,7 @@ public:
     }
 
     shdStateMachine* fn_800C2F20() const { return mUnidentified004; }
+    FuzzyRuntimeBase* GetFuzzyRuntime();
 
     shdStateMachine* mUnidentified004;
     shdStateMachine* mUnidentified008;

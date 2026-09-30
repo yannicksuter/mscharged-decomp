@@ -33,7 +33,8 @@ public:
 
     float GetBlendTime(int i)
     {
-        return m_pAnimProperties[i].blendAmount;
+        float fBlendTime = m_pAnimProperties[i].blendAmount;
+        return fBlendTime;
     }
 
     bool GetMirrored(int i)

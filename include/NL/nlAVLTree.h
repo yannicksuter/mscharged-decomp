@@ -138,7 +138,8 @@ public:
         AVLTreeNode* existingNode;
         AVLTreeNode* node = AddAVLNode(
             (AVLTreeNode**)&m_Root, (void*)&key, 0, &existingNode);
-        return &((Entry*)node)->value;
+        ValueType* value = &((Entry*)node)->value;
+        return value;
     }
 
     ValueType* Add(const KeyType& key, const ValueType& value)

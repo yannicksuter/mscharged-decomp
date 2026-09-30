@@ -1565,8 +1565,6 @@ void cPlayer::InitActionPostWhistle()
 {
 }
 
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
-    FuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 extern "C" UnidentifiedVariant_80054AB8 fn_800996D0(
     FuzzyRuntimeBase*, const unsigned int&, cPlayer*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80099670(

@@ -55,6 +55,7 @@ public:
     }
 
     virtual void Place(nlVector4 point);
+    void UpdateBounds(const nlVector4& worldPoint);
 
     /* 0x08 */ bool mFirst;
     /* 0x09 */ u8 mPadding009[3];
@@ -339,6 +340,51 @@ void CrowdImpostorManager::ReleaseCrowdImpostors()
     }
 }
 
+inline u16 CrowdLayoutObject::GetFacingAngle(int numAngles)
+{
+    nlVector4 facing = { 0.0f, -1.0f, 0.0f, 0.0f };
+    nlMultVectorMatrix(facing, *GetWorldMatrix());
+    return QuantizeImpostorAngle(nlVector3ToAngle(*(nlVector3*)&facing),
+        numAngles);
+}
+
+inline void CrowdPointCallback::UpdateBounds(const nlVector4& worldPoint)
+{
+    CrowdLayoutRecord* layout = mLayout;
+
+    nlVector3 center = *(const nlVector3*)&worldPoint;
+    nlVector3 boundsMin;
+    nlVector3 boundsMax;
+    boundsMin = center;
+    boundsMin.x -= sfImpostorWidth.value;
+    boundsMin.y -= sfImpostorWidth.value;
+    boundsMax = center;
+    boundsMax.x += sfImpostorWidth.value;
+    boundsMax.y += sfImpostorWidth.value;
+    boundsMax.z += sfImpostorHeight.value;
+
+    if (mFirst)
+    {
+        layout->mBoundsMin = boundsMin;
+        layout->mBoundsMax = boundsMax;
+        mFirst = false;
+        return;
+    }
+
+    if (boundsMin.x < layout->mBoundsMin.x)
+        layout->mBoundsMin.x = boundsMin.x;
+    if (boundsMin.y < layout->mBoundsMin.y)
+        layout->mBoundsMin.y = boundsMin.y;
+    if (boundsMin.z < layout->mBoundsMin.z)
+        layout->mBoundsMin.z = boundsMin.z;
+    if (boundsMax.x > layout->mBoundsMax.x)
+        layout->mBoundsMax.x = boundsMax.x;
+    if (boundsMax.y > layout->mBoundsMax.y)
+        layout->mBoundsMax.y = boundsMax.y;
+    if (boundsMax.z > layout->mBoundsMax.z)
+        layout->mBoundsMax.z = boundsMax.z;
+}
+
 void CrowdPointCallback::Place(
     nlVector4 point)
 {
@@ -372,13 +418,7 @@ void CrowdPointCallback::Place(
         GetCrowdImpostorManager()->mNumAngles = character->mNumAngles;
 
     int numAngles = GetCrowdImpostorManager()->mNumAngles;
-    nlVector4 transformedFacing;
-    nlVector4 facing = { 0.0f, -1.0f, 0.0f, 0.0f };
-    nlMultVectorMatrix(transformedFacing, facing,
-        *mObject->GetWorldMatrix());
-    facing = transformedFacing;
-    u16 angle = QuantizeImpostorAngle(nlVector3ToAngle(*(nlVector3*)&facing),
-        numAngles);
+    u16 angle = mObject->GetFacingAngle(numAngles);
 
     int impostorIndex = -1;
     Impostor* impostor
@@ -398,37 +438,5 @@ void CrowdPointCallback::Place(
         mLayout->mNumImpostors = 0;
     }
     ++mLayout->mNumImpostors;
-    CrowdLayoutRecord* layout = mLayout;
-
-    nlVector3 boundsMax;
-    nlVector3 boundsMin;
-    nlVector3 center = *(const nlVector3*)&worldPoint;
-    boundsMin = center;
-    boundsMin.x -= sfImpostorWidth.value;
-    boundsMin.y -= sfImpostorWidth.value;
-    boundsMax = center;
-    boundsMax.x += sfImpostorWidth.value;
-    boundsMax.y += sfImpostorWidth.value;
-    boundsMax.z += sfImpostorHeight.value;
-
-    if (mFirst)
-    {
-        layout->mBoundsMin = boundsMin;
-        layout->mBoundsMax = boundsMax;
-        mFirst = false;
-        return;
-    }
-
-    if (boundsMin.x < layout->mBoundsMin.x)
-        layout->mBoundsMin.x = boundsMin.x;
-    if (boundsMin.y < layout->mBoundsMin.y)
-        layout->mBoundsMin.y = boundsMin.y;
-    if (boundsMin.z < layout->mBoundsMin.z)
-        layout->mBoundsMin.z = boundsMin.z;
-    if (boundsMax.x > layout->mBoundsMax.x)
-        layout->mBoundsMax.x = boundsMax.x;
-    if (boundsMax.y > layout->mBoundsMax.y)
-        layout->mBoundsMax.y = boundsMax.y;
-    if (boundsMax.z > layout->mBoundsMax.z)
-        layout->mBoundsMax.z = boundsMax.z;
+    UpdateBounds(worldPoint);
 }

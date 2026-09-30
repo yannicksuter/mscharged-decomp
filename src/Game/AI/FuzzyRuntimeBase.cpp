@@ -14,18 +14,6 @@
 #include "NL/nlPrint.h"
 
 
-struct UnidentifiedTransitionOwner
-{
-    u8 mPadding000[0x0C];
-    TransitionFunc mTransition;
-};
-
-struct UnidentifiedTransitionReference
-{
-    u8 mPadding000[0x18];
-    UnidentifiedTransitionOwner* mOwner;
-};
-
 struct FuzzyRuntimeList
 {
     FuzzyRuntimeList(
@@ -61,16 +49,14 @@ FuzzyRuntimeBase* shdStateMachine::GetFuzzyRuntime()
     return mUnidentified018->mAIContext->mRuntime;
 }
 
-extern "C" FuzzyRuntimeBase* fn_80311744(
-    FuzzyRuntimeBase* runtime)
+FuzzyRuntimeBase* UnidentifiedScriptMachine::GetFuzzyRuntime()
 {
-    return runtime->mCurrentContext->mRuntime;
+    return mAIContext->mRuntime;
 }
 
-extern "C" FuzzyRuntimeBase* fn_80311750(
-    UnidentifiedFuzzyRuntimeValue* value)
+FuzzyRuntimeBase* UnidentifiedFuzzyRuntimeValue::GetRuntime()
 {
-    return value->mRuntime;
+    return mRuntime;
 }
 
 FuzzyRuntimeBase::FuzzyRuntimeBase(
@@ -549,10 +535,9 @@ void FuzzyRuntimeBase::AddAction(
     if (value != 0)
     {
         float confidence;
-        if (value->ExtraData.IsSet(4))
+        if (value->fn_800C2C10(4))
         {
-            FuzzyVariant* parameter = value->ExtraData.Get(4);
-            confidence = parameter->mData.f;
+            confidence = value->fn_800C2C00(4)->mData.f;
         }
         else
         {
@@ -665,7 +650,7 @@ extern "C" float fn_80314444(void*, float value, bool)
     return value;
 }
 
-extern "C" float fn_80314448(
+extern "C" float FuzzyNormalize(
     float value, float minimum, float maximum)
 {
     if (minimum == maximum)
@@ -677,20 +662,20 @@ extern "C" float fn_80314448(
     return result <= 1.0f ? result : 1.0f;
 }
 
-extern "C" float fn_80314494(
+extern "C" float FuzzyClamp(
     float value, float minimum, float maximum)
 {
     value = value >= minimum ? value : minimum;
     return value <= maximum ? value : maximum;
 }
 
-extern "C" float fn_803144BC(
+extern "C" float FuzzyInterpolate(
     float first, float second, float amount)
 {
     return first + amount * (second - first);
 }
 
-extern "C" float fn_803144C8(
+extern "C" float FuzzyInterpolateClamped(
     float first, float second, float amount)
 {
     amount = amount >= 0.0f ? amount : 0.0f;
@@ -698,7 +683,7 @@ extern "C" float fn_803144C8(
     return first + amount * (second - first);
 }
 
-extern "C" float fn_80314504(
+extern "C" float FuzzyInterpolateRange(
     float first, float second, float minimum,
     float maximum, float value)
 {
@@ -710,7 +695,7 @@ extern "C" float fn_80314504(
     return first + (value - minimum) / range * (second - first);
 }
 
-extern "C" float fn_80314538(
+extern "C" float FuzzyInterpolateRangeClamped(
     float first, float second, float minimum,
     float maximum, float value)
 {
@@ -734,30 +719,30 @@ extern "C" float fn_80314538(
 extern "C" bool FuzzyIsTimerRunning(
     FuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
-    AIContext* value = runtime->mAIContext;
-    unsigned long key = value->GetTimerKey(
+    AIContext* context = runtime->mAIContext;
+    unsigned long key = context->GetTimerKey(
         runtime->mFunctionHash, concurrent);
-    Timer* timer = value->FindTimer(key);
+    Timer* timer = context->FindTimer(key);
     return timer != 0 && timer->m_uPackedTime != 0;
 }
 
 extern "C" bool FuzzyWasTimerRunning(
     FuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
-    AIContext* value = runtime->mAIContext;
-    unsigned long key = value->GetTimerKey(
+    AIContext* context = runtime->mAIContext;
+    unsigned long key = context->GetTimerKey(
         runtime->mFunctionHash, concurrent);
-    Timer* timer = value->FindTimer(key);
+    Timer* timer = context->FindTimer(key);
     return timer != 0 && timer->m_uWasRunning != 0;
 }
 
 extern "C" float FuzzyGetTimerSeconds(
     FuzzyRuntimeBase* runtime, unsigned long concurrent)
 {
-    AIContext* value = runtime->mAIContext;
-    unsigned long key = value->GetTimerKey(
+    AIContext* context = runtime->mAIContext;
+    unsigned long key = context->GetTimerKey(
         runtime->mFunctionHash, concurrent);
-    Timer* timer = value->FindTimer(key);
+    Timer* timer = context->FindTimer(key);
     return timer != 0 ? timer->GetSeconds() : 0.0f;
 }
 
@@ -765,10 +750,10 @@ extern "C" float FuzzySetTimerSeconds(
     FuzzyRuntimeBase* runtime, unsigned long concurrent,
     float seconds)
 {
-    AIContext* value = runtime->mAIContext;
-    unsigned long key = value->GetTimerKey(
+    AIContext* context = runtime->mAIContext;
+    unsigned long key = context->GetTimerKey(
         runtime->mFunctionHash, concurrent);
-    return value->SetTimer(key, seconds)->GetSeconds();
+    return context->SetTimer(key, seconds)->GetSeconds();
 }
 
 extern "C" void fn_80314740(void*, bool)
@@ -782,12 +767,10 @@ extern "C" void FuzzySetActionSelection(
 }
 
 extern "C" void FuzzySetTransition(
-    void*, UnidentifiedTransitionReference* reference,
-    const char* name)
+    void*, shdStateMachine* state, const char* name)
 {
-    UnidentifiedTransitionOwner* owner = reference->mOwner;
-    ScriptTransitionFunc transition(name);
-    owner->mTransition = transition;
+    UnidentifiedScriptMachine* machine = state->mUnidentified018;
+    machine->SetTransition(name);
 }
 
 extern "C" bool fn_80314798(void*)
@@ -801,7 +784,7 @@ extern "C" UnidentifiedFuzzyRuntimeValue* FuzzyGetCurrentContext(
     return runtime->mCurrentContext;
 }
 
-extern "C" int fn_803147A4(
+extern "C" int FuzzyGetCurrentContextType(
     FuzzyRuntimeBase* runtime)
 {
     return runtime->mCurrentContext != 0

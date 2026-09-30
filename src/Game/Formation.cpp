@@ -25,7 +25,6 @@ extern "C" float fn_8002E1B0(cFielder*);
 extern "C" cFielder* fn_800A8800(cTeam*);
 extern "C" cFielder* fn_800A8808(cTeam*);
 extern "C" cFielder* fn_800A8884(cTeam*);
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(InterpreterCore*, void*, int, cTeam*, int);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const float lbl_804DBF28[4][4] = {
@@ -1651,5 +1650,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(
 {
     unsigned int localHash = hash;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        context, context->FindFunctionEntryPoint(localHash), 1, team, 0));
+        static_cast<FuzzyRuntimeBase*>(context),
+        context->FindFunctionEntryPoint(localHash), 1, team, 0));
 }

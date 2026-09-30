@@ -1752,7 +1752,7 @@ Game/FE/feOptionsSubMenus.cpp:
 	.sdata      start:0x806DD418 end:0x806DD460
 	.sdata2     start:0x806E55F0 end:0x806E5618
 
-Game/FE/tu_801D87C4.cpp:
+Game/FE/SHCrossFader.cpp:
 	.text       start:0x801D87C4 end:0x801D90C0
 	.data       start:0x805192A0 end:0x80519310
 	.sdata      start:0x806DD460 end:0x806DD480
@@ -4022,7 +4022,7 @@ Game/AI/tu_803115F4.cpp:
 	.ctors      start:0x804DBAB0 end:0x804DBAB4
 	.bss        start:0x80584240 end:0x805842E0
 
-Game/AI/tu_80311734.cpp:
+Game/AI/FuzzyRuntimeBase.cpp:
 	.text       start:0x80311734 end:0x80315A14
 	.ctors      start:0x804DBAB4 end:0x804DBAB8
 	.data       start:0x80530148 end:0x80530248

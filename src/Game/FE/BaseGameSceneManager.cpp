@@ -19,6 +19,7 @@
 #include "Game/FE/fePopupMenu.h"
 #include "Game/SH/SHOptions.h"
 #include "Game/FE/feOptionsSubMenus.h"
+#include "Game/FE/SHCrossFader.h"
 #include "Game/SH/SHLoading.h"
 #include "Game/SH/SHBootLoading.h"
 #include "Game/SH/SHMoviePlayer.h"
@@ -341,7 +342,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(0);
         break;
     case (SceneList)16:
-        newHandler = new (nlMalloc(sizeof(Class_801D87C4), 8, false)) Class_801D87C4();
+        newHandler = new (nlMalloc(sizeof(CrossFaderScene), 8, false)) CrossFaderScene();
         break;
     case SCENE_SUPER_LOADING:
         newHandler = new (nlMalloc(sizeof(SuperLoadingScene), 8, false)) SuperLoadingScene();

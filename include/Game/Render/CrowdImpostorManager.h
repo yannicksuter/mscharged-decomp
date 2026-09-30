@@ -23,6 +23,7 @@ public:
 
     void Initialize();
     void GetCorners(nlVector4* corners);
+    u16 GetFacingAngle(int numAngles);
     bool ContainsLocalPoint(const nlVector3* point);
     int PlacePoints(CrowdPointCallback* callback, float rowSpacing, float memberSpacing);
 

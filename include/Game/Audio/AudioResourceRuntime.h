@@ -34,6 +34,10 @@ public:
     virtual ~AudioResourceRuntime();
 
     void LoadScriptData(void* data, unsigned int size);
+    void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
+        bool inverted, void* owner);
+    void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
+        bool inverted, float duration);
     AudioConfigNode* GetConfigRoot() const { return m_ConfigRoot; }
 
     /* 0x1C */ UnidentifiedAudioPoolOwner m_Pools;

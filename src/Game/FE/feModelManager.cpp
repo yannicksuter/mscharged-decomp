@@ -573,9 +573,9 @@ void FEImpostorModel::Update(float dt)
             angle += DegreesToRadians(72.0f * i);
             float x = radius * nlSin(RadToAng16(angle) + 0x4000);
             float z = radius * nlSin(RadToAng16(angle));
-            position.x = mPosition.x + x;
-            position.y = mPosition.y;
-            position.z = mPosition.z + z + lbl_80515D18[mModelData->mUnidentified00].mOffsetZ;
+            x = mPosition.x + x;
+            nlVec3Set(position, x, mPosition.y,
+                mPosition.z + z + lbl_80515D18[mModelData->mUnidentified00].mOffsetZ);
         }
         else
         {

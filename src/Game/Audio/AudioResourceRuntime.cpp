@@ -48,62 +48,69 @@ static inline RegistryValue GetRegistryIteratorValue(
     return iterator->GetValue();
 }
 
-static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
-    RegistryIteratorBase* parameter, void* parameterData,
-    bool inverted, void* owner)
+static inline u32 GetRegistryIteratorHash(RegistryIteratorBase* iterator)
 {
-    u32 definition = parameter->GetHash();
-    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
-
-    AudioEffectBase* effect;
-    AudioEffectBase** found;
-    bool foundEffect = binding->mEffects.FindGet(effectId, &found);
-    if (foundEffect)
-    {
-        effect = *found;
-    }
-    if (!foundEffect)
-    {
-        effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
-        binding->mEffects.Add(effectId, effect);
-        binding->mInstances.Walk(
-            Function<bool(const u32&, bool*)>(
-                AudioEffectSoundStartedVisitor(effect)));
-    }
-
-    AudioEffectParameter* effectParameter = 0;
-    effect->CreateParameter(
-        definition, parameterData, inverted, &effectParameter);
-    effect->AddParameter(effectParameter, owner);
+    return iterator->GetHash();
 }
 
-static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
-    RegistryIteratorBase* parameter, void* parameterData,
-    bool inverted, float duration)
+// Looks up the live effect a binding already runs for an effect id.
+static inline bool UnidentifiedFindEffect(AudioEffectBinding* binding,
+    const u32& effectId, AudioEffectBase** effect)
 {
-    u32 definition = parameter->GetHash();
-    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
-
-    AudioEffectBase* effect;
     AudioEffectBase** found;
     bool foundEffect = binding->mEffects.FindGet(effectId, &found);
     if (foundEffect)
     {
-        effect = *found;
+        *effect = *found;
     }
+    return foundEffect;
+}
+
+// Starts one effect of a definition on a binding: resolves the effect id from
+// the configuration tree, creates the effect through the factory the first
+// time the binding asks for it, tells every instance already running on the
+// binding about the new effect, then pushes the parameter the caller wants.
+inline bool AudioEffectBinding::UnidentifiedStartEffect(u32 definition,
+    void* parameterData, bool immediate, float value)
+{
+    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
+
+    AudioEffectBase* effect;
+    bool foundEffect = UnidentifiedFindEffect(this, effectId, &effect);
     if (!foundEffect)
     {
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
-        binding->mEffects.Add(effectId, effect);
-        binding->mInstances.Walk(
+        mEffects.Add(effectId, effect);
+        mInstances.Walk(
             Function<bool(const u32&, bool*)>(
                 AudioEffectSoundStartedVisitor(effect)));
     }
 
-    AudioEffectParameter* effectParameter = 0;
-    effect->CreateParameter(
-        definition, parameterData, inverted, &effectParameter);
-    effect->AddParameter(effectParameter, duration);
+    AudioEffectParameter* parameter = 0;
+    effect->CreateParameter(definition, parameterData, immediate, &parameter);
+    return effect->AddParameter(parameter, value);
+}
+
+// Owner-bound form: the parameter follows its owner instead of a time.
+inline bool AudioEffectBinding::UnidentifiedStartEffect(u32 definition,
+    void* parameterData, bool immediate, void* owner)
+{
+    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
+
+    AudioEffectBase* effect;
+    bool foundEffect = UnidentifiedFindEffect(this, effectId, &effect);
+    if (!foundEffect)
+    {
+        effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
+        mEffects.Add(effectId, effect);
+        mInstances.Walk(
+            Function<bool(const u32&, bool*)>(
+                AudioEffectSoundStartedVisitor(effect)));
+    }
+
+    AudioEffectParameter* parameter = 0;
+    effect->CreateParameter(definition, parameterData, immediate, &parameter);
+    return effect->AddParameter(parameter, owner);
 }
 
 AudioResourceRuntime::AudioResourceRuntime()
@@ -164,51 +171,12 @@ void SetAudioEffectContext(unsigned long* hash, int index)
     g_pAudioResourceRuntime->m_Script->SetEffectContext(*hash, index);
 }
 
-// Looks up the live effect a binding already runs for an effect id.
-static inline bool UnidentifiedFindEffect(AudioEffectBinding* binding,
-    const u32& effectId, AudioEffectBase** effect)
-{
-    AudioEffectBase** found;
-    bool foundEffect = binding->mEffects.FindGet(effectId, &found);
-    if (foundEffect)
-    {
-        *effect = *found;
-    }
-    return foundEffect;
-}
-
-// Starts one effect of a definition on a binding: resolves the effect id from
-// the configuration tree, creates the effect through the factory the first
-// time the binding asks for it, tells every instance already running on the
-// binding about the new effect, then pushes the parameter the caller wants.
-static inline bool UnidentifiedStartEffect(AudioEffectBinding* binding,
+// Starts the effect on the binding registered under a script key.
+inline bool AudioScriptRuntime::UnidentifiedStartEffect(const u32& key,
     u32 definition, void* parameterData, bool immediate, float value)
 {
-    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
-
-    AudioEffectBase* effect;
-    bool foundEffect = UnidentifiedFindEffect(binding, effectId, &effect);
-    if (!foundEffect)
-    {
-        effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
-        binding->mEffects.Add(effectId, effect);
-        binding->mInstances.Walk(
-            Function<bool(const u32&, bool*)>(
-                AudioEffectSoundStartedVisitor(effect)));
-    }
-
-    AudioEffectParameter* parameter = 0;
-    effect->CreateParameter(definition, parameterData, immediate, &parameter);
-    return effect->AddParameter(parameter, value);
-}
-
-// Starts the effect on the binding registered under a script key.
-static inline bool UnidentifiedStartBindingEffect(const u32& key, u32 definition,
-    void* parameterData, bool immediate, float value)
-{
-    return UnidentifiedStartEffect(
-        g_pAudioResourceRuntime->m_Script->GetBinding(key), definition,
-        parameterData, immediate, value);
+    return GetBinding(key)->UnidentifiedStartEffect(
+        definition, parameterData, immediate, value);
 }
 
 /**
@@ -219,15 +187,14 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
 {
     u32 key = *bindingKey;
     u32 definition = *definitionKey;
-    return UnidentifiedStartBindingEffect(
+    return g_pAudioResourceRuntime->m_Script->UnidentifiedStartEffect(
         key, definition, parameterData, immediate, value);
 }
 
-static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
-    bool inverted, void* owner)
+// Applies every parameter of an effect set to a binding.
+inline void AudioEffectBinding::UnidentifiedApplyEffectSet(
+    u32 effectSetKey, bool inverted, void* owner)
 {
-    AudioEffectBinding* binding
-        = g_pAudioResourceRuntime->m_Script->GetBinding(bindingKey);
     RegistryContainer* effectSet = UnidentifiedGetEffectSet(effectSetKey);
     if (effectSet == 0)
     {
@@ -244,16 +211,32 @@ static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
         RegistryValue value = GetRegistryIteratorValue(&parameterStorage);
         RegistryValue parameterData = value;
         void* context = &parameterData;
-        UnidentifiedApplyEffect(
-            binding, &parameterStorage, context, inverted, owner);
+        UnidentifiedStartEffect(
+            GetRegistryIteratorHash(&parameterStorage), context,
+            inverted, owner);
     }
 }
 
-static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
-    bool inverted, float duration)
+// Applies an effect set to the binding registered under a script key.
+inline void AudioScriptRuntime::UnidentifiedApplyEffectSet(u32 key,
+    u32 effectSetKey, bool inverted, void* owner)
 {
-    AudioEffectBinding* binding
-        = g_pAudioResourceRuntime->m_Script->GetBinding(bindingKey);
+    AudioEffectBinding* binding = GetBinding(key);
+    binding->UnidentifiedApplyEffectSet(effectSetKey, inverted, owner);
+}
+
+// Runtime entry: applies an effect set to the binding under a script key.
+inline void AudioResourceRuntime::UnidentifiedApplyEffectSet(u32 bindingKey,
+    u32 effectSetKey, bool inverted, void* owner)
+{
+    m_Script->UnidentifiedApplyEffectSet(
+        bindingKey, effectSetKey, inverted, owner);
+}
+
+// Applies every parameter of an effect set to a binding.
+inline void AudioEffectBinding::UnidentifiedApplyEffectSet(
+    u32 effectSetKey, bool inverted, float duration)
+{
     RegistryContainer* effectSet = UnidentifiedGetEffectSet(effectSetKey);
     if (effectSet == 0)
     {
@@ -270,9 +253,26 @@ static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,
         RegistryValue value = GetRegistryIteratorValue(&parameterStorage);
         RegistryValue parameterData = value;
         void* context = &parameterData;
-        UnidentifiedApplyEffect(
-            binding, &parameterStorage, context, inverted, duration);
+        UnidentifiedStartEffect(
+            GetRegistryIteratorHash(&parameterStorage), context,
+            inverted, duration);
     }
+}
+
+// Applies an effect set to the binding registered under a script key.
+inline void AudioScriptRuntime::UnidentifiedApplyEffectSet(u32 key,
+    u32 effectSetKey, bool inverted, float duration)
+{
+    AudioEffectBinding* binding = GetBinding(key);
+    binding->UnidentifiedApplyEffectSet(effectSetKey, inverted, duration);
+}
+
+// Runtime entry: applies an effect set to the binding under a script key.
+inline void AudioResourceRuntime::UnidentifiedApplyEffectSet(u32 bindingKey,
+    u32 effectSetKey, bool inverted, float duration)
+{
+    m_Script->UnidentifiedApplyEffectSet(
+        bindingKey, effectSetKey, inverted, duration);
 }
 
 /**
@@ -320,12 +320,12 @@ extern "C" bool fn_802F4E84(const u32* hash, bool invert, void* owner)
             u32 bindingKey = (u32)bindingValue.mData;
             if (owner != 0)
             {
-                UnidentifiedApplyEffectSet(
+                g_pAudioResourceRuntime->UnidentifiedApplyEffectSet(
                     bindingKey, effectSet, inverted, owner);
             }
             else
             {
-                UnidentifiedApplyEffectSet(
+                g_pAudioResourceRuntime->UnidentifiedApplyEffectSet(
                     bindingKey, effectSet, inverted, duration);
             }
         }

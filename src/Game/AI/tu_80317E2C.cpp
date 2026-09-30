@@ -34,9 +34,6 @@ public:
     u32 mUnidentified090;
 };
 
-extern "C" FuzzyRuntimeBase* fn_80311744(void*);
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
-    FuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 extern "C" bool fn_803169DC(
     shdStateMachine*, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80316A84(
@@ -165,7 +162,7 @@ UnidentifiedScriptMachine::~UnidentifiedScriptMachine()
 
 void UnidentifiedScriptMachine::UnidentifiedVirtual2()
 {
-    FuzzyRuntimeBase* runtime = fn_80311744(this);
+    FuzzyRuntimeBase* runtime = GetFuzzyRuntime();
     if (runtime == 0)
     {
         return;
@@ -174,12 +171,12 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual2()
     char functionName[0x48];
     nlSNPrintf(functionName, 63, lbl_806DF5B8, mUnidentified078);
     u32 hash = nlStringHash(functionName);
-    runtime = fn_80311744(this);
+    runtime = GetFuzzyRuntime();
     u32 localHash = hash;
     bool hasFunction = runtime->FindFunctionEntryPoint(localHash) != 0;
     if (hasFunction)
     {
-        runtime = fn_80311744(this);
+        runtime = GetFuzzyRuntime();
         u32 callHash = hash;
         runtime->ExecuteFunction(
             runtime->FindFunctionEntryPoint(callHash), 1, (u32)this, 0, 0, 0);
@@ -584,7 +581,7 @@ extern "C" bool fn_8031A04C()
 {
     if (lbl_806DF5B0[0] > lbl_806E6890)
     {
-        float chance = fn_80314538(lbl_806E6894, lbl_806E6898[0],
+        float chance = FuzzyInterpolateRangeClamped(lbl_806E6894, lbl_806E6898[0],
             lbl_806DF5B0[0], lbl_806E6890, lbl_806E20C0);
         if (nlRandomf(lbl_806E6898[0], &nlDefaultSeed) > chance)
         {

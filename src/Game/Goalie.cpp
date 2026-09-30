@@ -4566,9 +4566,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80082150(
     return fn_800821B0(runtime, functionHash, player);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
-    FuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
-
 extern "C" UnidentifiedVariant_80054AB8 fn_800821B0(
     InterpreterCore* interpreter, const unsigned int& hash, cPlayer* player)
 {

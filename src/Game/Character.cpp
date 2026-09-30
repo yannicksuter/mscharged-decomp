@@ -1300,7 +1300,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                             }
                             else
                             {
-                                pFielder->CollideWithBobombCallback(pEventData->v3Position, pEventData->fRadius);
+                                pFielder->CollideWithBobombCallback(pEventData->v3Position, pEventData->GetRadius());
                             }
                         }
                     }

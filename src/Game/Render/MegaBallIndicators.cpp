@@ -406,13 +406,13 @@ float TestMegaBallIndicatorCollision(MegaBallIndicator* pState1,
     }
 
     nlVector2 v2Centre;
-    nlVec2Set(v2Centre, pState2->mX, pState2->mY + gMegaBallCollisionYOffset);
+    nlVec2Set(v2Centre, pState2->GetX(), pState2->GetY() + gMegaBallCollisionYOffset);
     nlVector2 v2Left;
     nlVec2Set(v2Left, -gMegaBallCollisionHalfWidth, gMegaBallCollisionYOffset);
     nlVector2 v2Right;
     nlVec2Set(v2Right, gMegaBallCollisionHalfWidth, gMegaBallCollisionYOffset);
     nlVector2 v2Position;
-    nlVec2Set(v2Position, pState1->mX, pState1->mY);
+    nlVec2Set(v2Position, pState1->GetX(), pState1->GetY());
 
     float fSin;
     float fCos;
@@ -425,21 +425,17 @@ float TestMegaBallIndicatorCollision(MegaBallIndicator* pState1,
     nlVector2 v2Rotated;
     v2Rotated.x = fCos * fDeltaX + fSin * fDeltaY;
     v2Rotated.y = fCos * fDeltaY - fSin * fDeltaX;
-    float fTargetWidth = pState2->mWidth * pState2->mScale;
-    float fIndicatorWidth = pState1->mWidth * pState1->mScale;
     nlVector2 v2LeftDelta;
     nlVec2Sub(v2LeftDelta, v2Left, v2Rotated);
+    float fLeftDistanceSquared = nlVec2LengthSquared(v2LeftDelta);
     nlVector2 v2RightDelta;
     nlVec2Sub(v2RightDelta, v2Right, v2Rotated);
+    float fRightDistanceSquared = nlVec2LengthSquared(v2RightDelta);
 
-    float fIndicatorRadius;
-    float fTargetRadius;
-    fTargetRadius = gMegaBallCollisionRadiusScale * fTargetWidth;
-    fIndicatorRadius = 0.5f * fIndicatorWidth;
+    float fTargetRadius = gMegaBallCollisionRadiusScale * pState2->GetScaledWidth();
+    float fIndicatorRadius = 0.5f * pState1->GetScaledWidth();
     float fRadius = fTargetRadius + fIndicatorRadius;
     float fRadiusSquared = fRadius * fRadius;
-    float fLeftDistanceSquared = nlVec2LengthSquared(v2LeftDelta);
-    float fRightDistanceSquared = nlVec2LengthSquared(v2RightDelta);
     if (fLeftDistanceSquared < fRadiusSquared
         || fRightDistanceSquared < fRadiusSquared)
     {

@@ -18,7 +18,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
-static unsigned long sTextureParameterHashes[10] = {
+static const unsigned long sTextureParameterHashes[10] = {
     nlStringLowerHash("NLG_DIFFUSE"),
     nlStringLowerHash("NLG_DETAIL"),
 };

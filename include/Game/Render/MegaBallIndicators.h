@@ -33,6 +33,21 @@ struct MegaBallIndicator
 {
     MegaBallIndicator();
 
+    float GetX() const
+    {
+        return mX;
+    }
+
+    float GetY() const
+    {
+        return mY;
+    }
+
+    float GetScaledWidth() const
+    {
+        return mWidth * mScale;
+    }
+
     bool IsActive() const
     {
         return mActive;

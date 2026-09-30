@@ -1324,7 +1324,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CEA20(
     fn_8002E08C(fielder.mFielder, 23);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
-    float danger = fn_80041B0C(fn_80311750((UnidentifiedFuzzyRuntimeValue*)&value),
+    float danger = fn_80041B0C(((UnidentifiedFuzzyRuntimeValue*)&value)->GetRuntime(),
         fielder.mFielder, "InDangerForMegastrike").mData.f;
     float question = fn_800DBB0C(fielder.mFielder);
     bool good = ((1.0f - danger) / 2.0f + question / 2.0f) > 0.75f;

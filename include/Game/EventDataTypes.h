@@ -24,6 +24,11 @@ struct CharacterImpactEvent
     nlVector3 v3Position;
     float fRadius;
     cCharacter* pCharacter;
+
+    float GetRadius() const
+    {
+        return fRadius;
+    }
 };
 
 struct GoalieSaveData

@@ -1,6 +1,8 @@
 #ifndef _VARIANT_H_
 #define _VARIANT_H_
 
+#include <stddef.h>
+
 #include "NL/nlBasicString.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -176,15 +178,15 @@ protected:
         }
         else
         {
-            mData.vector = other.mData.vector;
+            *(nlVector3*)((char*)this + offsetof(Variant, mData)) = other.mData.vector;
         }
     }
 
     void UnidentifiedCopyString(
         char* destination, const char* source, unsigned long length)
     {
-        mData.string = destination;
-        nlStrNCpy(destination, source, length);
+        *(char**)((char*)this + offsetof(Variant, mData)) = destination;
+        nlStrNCpy(*(char**)((char*)this + offsetof(Variant, mData)), source, length);
     }
 
 public:

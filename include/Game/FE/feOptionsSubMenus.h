@@ -131,25 +131,4 @@ public:
     /* 0x6F4 */ int mBackupSettings[2];
 }; // size 0x6FC
 
-class Class_801D87C4 : public BaseSceneHandler
-{
-public:
-    Class_801D87C4();
-    virtual ~Class_801D87C4();
-    virtual void Update(float dt);
-    virtual void SceneCreated();
-
-    /* 0x1C */ int mScreenCount;
-    /* 0x20 */ int mCurrentScreen;
-    /* 0x24 */ TLInstance** mScreens;
-    /* 0x28 */ TLInstance* mBackground;
-    /* 0x2C */ TLComponentInstance* mHomeMessage;
-    /* 0x30 */ bool mWidescreen;
-    /* 0x31 */ u8 mPadding31[3];
-    /* 0x34 */ float mScreenTime;
-    /* 0x38 */ float mFadeAlpha;
-    /* 0x3C */ int mState;
-    /* 0x40 */ float mEndTime;
-}; // size 0x44
-
 #endif // _FEOPTIONSSUBMENUS_H_

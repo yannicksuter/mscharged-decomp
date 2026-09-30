@@ -10,7 +10,7 @@ class FuzzyRuntimeBase;
 class ScriptQuestionCache;
 struct FuzzyFielderIterator;
 struct FuzzyFielderReference;
-struct UnidentifiedTransitionReference;
+class shdStateMachine;
 
 struct FuzzyActionQueueEntry
 {
@@ -69,6 +69,8 @@ struct FuzzyParameterList
 class UnidentifiedFuzzyRuntimeValue : public FuzzyVariant
 {
 public:
+    FuzzyRuntimeBase* GetRuntime();
+
     FuzzyRuntimeBase* mRuntime;
     u32 mUnidentified018;
     UnidentifiedVariantCollection ExtraData;
@@ -227,8 +229,8 @@ extern "C" bool FuzzyAITryCachedTeamQuestion(FuzzyRuntimeBase*, cTeam*);
 extern "C" void FuzzyAISetTransition(UnidentifiedScriptMachine*, const char*);
 
 
-extern "C" FuzzyRuntimeBase* fn_80311750( UnidentifiedFuzzyRuntimeValue* value);
 extern "C" void LoadFuzzyByteCode(const char* filename, bool async);
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(FuzzyRuntimeBase* runtime, FunctionEntryPoint* function, int argumentCount, void* arg1, void* arg2);
 extern "C" bool ApplyFuzzyByteCode();
 extern "C" char fn_80312358(void*, char value);
 extern "C" float FuzzyGetQueueConfidence( FuzzyRuntimeBase* runtime);
@@ -236,18 +238,18 @@ extern "C" void fn_80314434(void*, UnidentifiedVariant_80054AB8*, float);
 extern "C" void fn_80314438(void*, UnidentifiedVariant_80054AB8*);
 extern "C" void* fn_8031443C(void*, void* value, bool);
 extern "C" float fn_80314444(void*, float value, bool);
-extern "C" float fn_80314448( float value, float minimum, float maximum);
-extern "C" float fn_80314494( float value, float minimum, float maximum);
-extern "C" float fn_803144BC( float first, float second, float amount);
-extern "C" float fn_803144C8( float first, float second, float amount);
-extern "C" float fn_80314504( float first, float second, float minimum, float maximum, float value);
-extern "C" float fn_80314538( float first, float second, float minimum, float maximum, float value);
+extern "C" float FuzzyNormalize(float value, float minimum, float maximum);
+extern "C" float FuzzyClamp(float value, float minimum, float maximum);
+extern "C" float FuzzyInterpolate(float first, float second, float amount);
+extern "C" float FuzzyInterpolateClamped(float first, float second, float amount);
+extern "C" float FuzzyInterpolateRange(float first, float second, float minimum, float maximum, float value);
+extern "C" float FuzzyInterpolateRangeClamped(float first, float second, float minimum, float maximum, float value);
 extern "C" void fn_80314740(void*, bool);
 extern "C" void FuzzySetActionSelection( FuzzyRuntimeBase* runtime, int selection);
-extern "C" void FuzzySetTransition( void*, UnidentifiedTransitionReference* reference, const char* name);
+extern "C" void FuzzySetTransition(void*, shdStateMachine* state, const char* name);
 extern "C" bool fn_80314798(void*);
 extern "C" UnidentifiedFuzzyRuntimeValue* FuzzyGetCurrentContext( void*, FuzzyRuntimeBase* runtime);
-extern "C" int fn_803147A4( FuzzyRuntimeBase* runtime);
+extern "C" int FuzzyGetCurrentContextType(FuzzyRuntimeBase* runtime);
 extern "C" void FuzzyPrintFloat(float value);
 extern "C" void FuzzyPrintString(void*, const char* value);
 

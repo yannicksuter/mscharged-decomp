@@ -551,7 +551,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-2];
         float arg0 = ((float*)m_SP)[-3];
         m_SP -= 2;
-        ((float*)m_SP)[-1] = fn_80314494(arg0, arg1, arg2);
+        ((float*)m_SP)[-1] = FuzzyClamp(arg0, arg1, arg2);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1641,7 +1641,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 160:
     {
         ++m_SP;
-        m_SP[-1] = (u32)fn_803147A4(this);
+        m_SP[-1] = (u32)FuzzyGetCurrentContextType(this);
         break;
     }
     case 161:
@@ -1944,7 +1944,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-2];
         float arg0 = ((float*)m_SP)[-3];
         m_SP -= 2;
-        ((float*)m_SP)[-1] = fn_803144BC(arg0, arg1, arg2);
+        ((float*)m_SP)[-1] = FuzzyInterpolate(arg0, arg1, arg2);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1957,7 +1957,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-2];
         float arg0 = ((float*)m_SP)[-3];
         m_SP -= 2;
-        ((float*)m_SP)[-1] = fn_803144C8(arg0, arg1, arg2);
+        ((float*)m_SP)[-1] = FuzzyInterpolateClamped(arg0, arg1, arg2);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1972,7 +1972,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-4];
         float arg0 = ((float*)m_SP)[-5];
         m_SP -= 4;
-        ((float*)m_SP)[-1] = fn_80314504(arg0, arg1, arg2, arg3, arg4);
+        ((float*)m_SP)[-1] = FuzzyInterpolateRange(arg0, arg1, arg2, arg3, arg4);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1987,7 +1987,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-4];
         float arg0 = ((float*)m_SP)[-5];
         m_SP -= 4;
-        ((float*)m_SP)[-1] = fn_80314538(arg0, arg1, arg2, arg3, arg4);
+        ((float*)m_SP)[-1] = FuzzyInterpolateRangeClamped(arg0, arg1, arg2, arg3, arg4);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -2298,7 +2298,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-2];
         float arg0 = ((float*)m_SP)[-3];
         m_SP -= 2;
-        ((float*)m_SP)[-1] = fn_80314448(arg0, arg1, arg2);
+        ((float*)m_SP)[-1] = FuzzyNormalize(arg0, arg1, arg2);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -2749,7 +2749,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 268:
     {
         const char* arg1 = (const char*)m_SP[-1];
-        UnidentifiedTransitionReference* arg0 = (UnidentifiedTransitionReference*)m_SP[-2];
+        shdStateMachine* arg0 = (shdStateMachine*)m_SP[-2];
         m_SP -= 2;
         FuzzySetTransition(this, arg0, arg1);
         break;
