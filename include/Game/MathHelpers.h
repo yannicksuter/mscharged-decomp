@@ -23,7 +23,11 @@ static inline float nlMaxEquals(float a, float b)
 
 static inline float nlMinEquals(float a, float b)
 {
-    return (a <= b) ? a : b;
+    if (a <= b)
+    {
+        return a;
+    }
+    return b;
 }
 
 static inline s32 abs_s16(s16 x)

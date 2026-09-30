@@ -16,6 +16,7 @@ public:
     void Initialize(NetworkPeer* peer, s8 channelIndex, int globalPadIndex);
     DetInput* GetNetworkPeerChannelInput();
     s8 GetNetworkPeerChannelId();
+    int GetGlobalPadIndex() const { return mGlobalPadIndex; }
     cGlobalPad* GetLocalChannelPad();
     void CaptureNetworkPeerChannelInput();
     void ApplyNetworkPeerChannelInput(PackedDetInput* record, u16 tick, u8 connected);

@@ -145,7 +145,11 @@ template <typename T, int Count>
 void UnidentifiedStaticEvent<T, Count>::Add(
     const Callback& callback, unsigned int value, int flags)
 {
-    Listener* listener = mListeners.AllocateAtEnd(0);
+    ListenerEntry* entry;
+    mListeners.m_Allocator.Allocate(entry);
+    new (entry) ListenerEntry;
+    nlDLRingAddEnd(&mListeners.m_Head, entry);
+    Listener* listener = &entry->entry;
 
     void* target = listener->callback.UnidentifiedTransfer(callback);
     RegisterEventConnection(this, listener, value, flags, target);

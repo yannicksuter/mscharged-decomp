@@ -15,7 +15,6 @@ public:
     virtual ~FrontEndPresentation();
     virtual void DoFunctionCall(unsigned int function);
 
-    static FrontEndPresentation& Instance();
     static FrontEndPresentation* GetInstance();
 
     void Update(float deltaTime);

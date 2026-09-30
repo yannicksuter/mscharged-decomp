@@ -163,6 +163,17 @@ static inline bool IsCupPersonaWinner()
         && NetTournManager::Instance()->IsCupWinningGame(winnerTeam);
 }
 
+static inline void DrawPresentationOverlay()
+{
+    RLView* view = GetLayerView(eCLV_FrontEnd);
+    RLView* previous = (RLView*)g_ShapeRenderer.m_eView;
+    g_ShapeRenderer.m_eView = (GLView*)view;
+    nlColour colour = sLetterBoxColour;
+    g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
+        glGetOrthographicHeight(), -2.0f, colour, 0);
+    g_ShapeRenderer.m_eView = (GLView*)previous;
+}
+
 /**
  * Address/Size: 0x80284A58 | size: 0x64
  */
@@ -265,7 +276,7 @@ void Presentation::UpdateAllowedToSkip()
     for (i = 0; i < (int)peer->mPlayerCount; i++)
     {
         channel = peer->GetNetworkPeerChannel(i);
-        pad = channel->mGlobalPadIndex;
+        pad = channel->GetGlobalPadIndex();
         info = nlSingleton<GameInfoManager>::Instance();
         int side = NisPlayer::Instance()->mWinnerSide[NIS_GAME_WINNER];
         if (side
@@ -487,7 +498,25 @@ void Presentation::Update(float deltaTime)
         }
     }
 
-    if (!IsDuringGamePauseState())
+    bool bDuringGamePauseState;
+    bool bGameFrameUnlocked;
+    bDuringGamePauseState = false;
+    bGameFrameUnlocked = false;
+    if (!FrontEnd::m_bGameOver)
+    {
+        bool bFrameLocked
+            = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
+        if (!bFrameLocked)
+        {
+            bGameFrameUnlocked = true;
+        }
+    }
+    if (bGameFrameUnlocked
+        && nlTaskManager::m_pInstance->mCurrentState == 1)
+    {
+        bDuringGamePauseState = true;
+    }
+    if (!bDuringGamePauseState)
     {
         if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
         {
@@ -570,13 +599,7 @@ void Presentation::Update(float deltaTime)
 
     if (mUnidentified163 == true)
     {
-        RLView* view = GetLayerView(eCLV_FrontEnd);
-        RLView* previous = (RLView*)g_ShapeRenderer.m_eView;
-        g_ShapeRenderer.m_eView = (GLView*)view;
-        nlColour colour = sLetterBoxColour;
-        g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
-            glGetOrthographicHeight(), -2.0f, colour, 0);
-        g_ShapeRenderer.m_eView = (GLView*)previous;
+        DrawPresentationOverlay();
     }
 
     if (IsDuringGamePauseState())
@@ -1074,7 +1097,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* data)
             == 1)
         {
             teamScore
-                = g_pTeams[data->pPlayer->m_pTeam->m_nSide]->m_nScore;
+                = g_pTeams[data->pPlayer->m_pTeam->m_nSide]->GetScore();
             if (data->goals + teamScore
                 >= nlSingleton<GameInfoManager>::Instance()
                        ->GetCurrentSettings()
@@ -1090,8 +1113,8 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* data)
             }
         }
 
-        const char* functionName = "MegastrikeEnd";
         const char* filter = "high";
+        const char* functionName = "MegastrikeEnd";
         bool hasGoals = data->goals != 0;
         mUnidentified156 = false;
         mUnidentified158 = hasGoals;
@@ -1118,7 +1141,7 @@ setupSkipVotes:
     for (int i = 0; i < (int)peer->mPlayerCount; i++)
     {
         NetworkPeerChannel* channel = peer->GetNetworkPeerChannel(i);
-        pad = channel->mGlobalPadIndex;
+        pad = channel->GetGlobalPadIndex();
         info = nlSingleton<GameInfoManager>::Instance();
         if (scoringSide
             == info->GetPlayingSide(channel->GetNetworkPeerChannelId()))

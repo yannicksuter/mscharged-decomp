@@ -22,7 +22,7 @@ Replace with your Discord server's ID and invite URL.
 [discord]: https://discord.gg/hKx3FJJgrV
 
 > [!IMPORTANT]
-> This repository does **not** provide a new way to play *Mario Strikers Charged*. It is not a modern recompilation ("recomp") or a port. Its 100% code and linking status refers to a high-fidelity reconstruction of what the original source code may have looked like—one that compiles into an executable byte-for-byte identical to the original retail GameCube release.
+> This repository does **not** provide a new way to play *Mario Strikers Charged*. It is not a modern recompilation ("recomp") or a port. Its 100% code and linking status refers to a high-fidelity reconstruction of what the original source code may have looked like—one that compiles into an executable byte-for-byte identical to the original retail Nintendo Wii release.
 >
 > Recompilations and ports may emerge elsewhere from this work—and we look forward to seeing them—but they are outside the scope of this repository. Please do not ask for recompilations or ports in the decompilation Discord, as producing and supporting them is not the focus of this community.
 

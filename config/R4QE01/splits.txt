@@ -3553,14 +3553,18 @@ Game/World/WorldVisibility.cpp:
 	.ctors      start:0x804DBA14 end:0x804DBA18
 	.sbss       start:0x806E1F88 end:0x806E1F90
 
-Game/Render/WorldNPC.cpp:
-	.text       start:0x802DCDB4 end:0x802DE284
-	.ctors      start:0x804DBA18 end:0x804DBA1C
+Game/Render/Frustum.cpp:
+	.text       start:0x802DCDB4 end:0x802DD4F0
 	.rodata     start:0x804EB320 end:0x804EB340
+	.sdata2     start:0x806E6480 end:0x806E6488
+
+Game/Render/WorldNPC.cpp:
+	.text       start:0x802DD4F0 end:0x802DE284
+	.ctors      start:0x804DBA18 end:0x804DBA1C
 	.data       start:0x8052ECF0 end:0x8052EDC8
 	.sdata      start:0x806DF450 end:0x806DF460
 	.sbss       start:0x806E1F90 end:0x806E1F98
-	.sdata2     start:0x806E6480 end:0x806E6490
+	.sdata2     start:0x806E6488 end:0x806E6490
 
 Game/InterpreterOperations.cpp:
 	.text       start:0x802DE284 end:0x802DECB8

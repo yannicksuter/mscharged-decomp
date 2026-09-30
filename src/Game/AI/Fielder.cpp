@@ -1494,8 +1494,8 @@ bool cFielder::fn_800345EC(cFielder* pOtherFielder) const
     nlVector3 v3Unidentified0, v3Unidentified1;
     m_pPhysicsCharacter->GetBonePositions(
         PHYSBONE_FIELDER_HEAD, v3Unidentified0, v3Unidentified1);
-    leftFootZ = nlMinEquals(nlMinEquals(leftFootZ, rightFootZ), v3Unidentified0.z)
-        - 0.15f;
+    float headZ = v3Unidentified0.z;
+    leftFootZ = nlMinEquals(nlMinEquals(leftFootZ, rightFootZ), headZ) - 0.15f;
     if (leftFootZ < 0.0f)
         leftFootZ = 0.0f;
 

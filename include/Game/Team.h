@@ -47,6 +47,7 @@ class cTeam
 {
 public:
     cTeam(int nSide);
+    int GetScore() const { return m_nScore; }
     ~cTeam();
     void ClearAllPowerUps();
     void ClearCurrentPowerUp();

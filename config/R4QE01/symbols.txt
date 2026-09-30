@@ -8458,7 +8458,7 @@ __dt__Q212Function0<v>91FunctorImpl<76BindExp1<v,Q26Detail37MemFunImpl<v,M12Pres
 __dt__Q230Function1<v,P14GoalieSaveData>126FunctorImpl<110BindExp2<v,Q26Detail54MemFunImpl<v,M12PresentationFPCvPvP14GoalieSaveData_v>,P12Presentation,14Placeholder<0>>>Fv = .text:0x8028A80C; // type:function size:0x44
 __dt__Q230Function1<v,P14GoalScoredData>126FunctorImpl<110BindExp2<v,Q26Detail54MemFunImpl<v,M12PresentationFPCvPvP14GoalScoredData_v>,P12Presentation,14Placeholder<0>>>Fv = .text:0x8028A850; // type:function size:0x44
 __sinit_\Presentation_cpp = .text:0x8028A894; // type:function size:0xF0 scope:local
-"@40@ProcessMessage__12PresentationFP14NetworkMessage" = .text:0x8028A984; // type:function size:0x8
+@40@ProcessMessage__12PresentationFP14NetworkMessage = .text:0x8028A984; // type:function size:0x8
 glxConfigureCharacterSkinCustomLighting = .text:0x8028A98C; // type:function size:0x3BC
 Activate__61GXMaterialProgramImpl<36GXCharacterSkinCustomMaterialProgram>FP6GLView = .text:0x8028AD48; // type:function size:0x8C
 Deactivate__61GXMaterialProgramImpl<36GXCharacterSkinCustomMaterialProgram>Fv = .text:0x8028ADD4; // type:function size:0x70
@@ -12659,7 +12659,7 @@ nlCancelAsyncRead__FP10AsyncEntryPFP6nlFilePvUiUlPFP6nlFilePvUiUl_v_v = .text:0x
 CheckDVDStatus__Fv = .text:0x80367F1C; // type:function size:0x1EC
 __sinit_\nlFileGC_cpp = .text:0x80368108; // type:function size:0x20C scope:local
 __ct__Q222@unnamed@nlFileGC_cpp@23AsyncToVirMemBufferLoadFv = .text:0x80368314; // type:function size:0xC
-__dt__29DolphinFileAllocator_80589450Fv = .text:0x80368320; // type:function size:0x40
+__dt__40nlStaticArrayAllocator<11DolphinFile,96>Fv = .text:0x80368320; // type:function size:0x40
 nlQuatSlerp__FR12nlQuaternionRC12nlQuaternionRC12nlQuaternionf = .text:0x80368360; // type:function size:0x14 scope:global
 nlQuatToMatrix__FR9nlMatrix4RC12nlQuaternionb = .text:0x80368374; // type:function size:0xDC scope:global
 nlMatrixToQuat__FR12nlQuaternionRC9nlMatrix4 = .text:0x80368450; // type:function size:0x284 scope:global

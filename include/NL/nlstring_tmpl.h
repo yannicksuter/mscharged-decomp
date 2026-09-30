@@ -32,10 +32,7 @@ loop:
 test:
     if (n-- == 0)
         goto done;
-    if (sizeof(CharT) == 1)
-        c = *(const unsigned char*)&str2[p];
-    else
-        c = str2[p];
+    c = str2[p];
     if ((str1[p] = c) != 0)
         goto loop;
 done:

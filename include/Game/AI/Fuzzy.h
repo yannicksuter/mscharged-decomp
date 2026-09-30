@@ -31,7 +31,11 @@ inline float FMIN(float f1, float f2)
 
 inline float FMAX(float f1, float f2)
 {
-    return (f1 >= f2) ? f1 : f2;
+    if (f1 >= f2)
+    {
+        return f1;
+    }
+    return f2;
 }
 
 float FLESS(float f1, float f2);

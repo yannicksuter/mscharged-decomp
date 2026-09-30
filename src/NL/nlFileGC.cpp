@@ -12,7 +12,6 @@
 #include <string.h>
 
 class DolphinFile;
-class DolphinFileAllocator_80589450;
 class AsyncManager;
 struct AsyncEntry;
 
@@ -51,23 +50,7 @@ public:
     /* 0x10 */ unsigned long mStartAddress;
     /* 0x14 */ unsigned long mLength;
 
-    static DolphinFileAllocator_80589450 sAllocator;
-};
-
-class DolphinFileAllocator_80589450 : public nlArrayAllocator<DolphinFile>
-{
-public:
-    DolphinFileAllocator_80589450()
-    {
-        m_pFree = 0;
-        m_Unknown04 = 0;
-        Init((DolphinFile*)mStorage, 96);
-    }
-
-    ~DolphinFileAllocator_80589450() { }
-
-private:
-    unsigned char mStorage[sizeof(DolphinFile) * 96];
+    static nlStaticArrayAllocator<DolphinFile, 96> sAllocator;
 };
 
 inline void* DolphinFile::operator new(unsigned long)
@@ -80,7 +63,7 @@ inline void DolphinFile::operator delete(void* ptr)
     sAllocator.DeleteEntry((DolphinFile*)ptr);
 }
 
-DolphinFileAllocator_80589450 DolphinFile::sAllocator;
+nlStaticArrayAllocator<DolphinFile, 96> DolphinFile::sAllocator;
 
 enum AsyncReadPhase
 {
@@ -108,12 +91,24 @@ struct AsyncEntry
 class AsyncManager
 {
 public:
+    void Init()
+    {
+        m_activeEntryList = m_freeEntryList = 0;
+        mTailBuffers = (unsigned char*)nlMalloc(64 * 32, 32, true);
+
+        for (s32 i = 0; i < 64; i++)
+        {
+            m_asyncEntries[i].mTailBuffer = mTailBuffers + i * 32;
+            m_asyncEntries[i].m_pFile = 0;
+            nlDLRingAddStart<AsyncEntry>(&m_freeEntryList, &m_asyncEntries[i]);
+        }
+    }
+
     AsyncEntry* AddEntry(DolphinFile* pFile, ReadAsyncCallback pFunc, void* pBuffer,
         unsigned long position, unsigned long uSize, unsigned long uParam, AsyncReadPhase phase);
     void Service();
     void CancelPendingReads(DolphinFile* pFile, CancelAsyncCallback callback);
     bool Contains(AsyncEntry* entry);
-    bool Cancel(AsyncEntry* entry, CancelAsyncCallback callback);
 
     /* 0x0000 */ AsyncEntry* mCurrent;
     /* 0x0004 */ AsyncEntry* m_freeEntryList;
@@ -127,64 +122,7 @@ static bool sServicingReads;
 
 bool IsAsyncReadBusy(AsyncEntry* entry);
 
-static unsigned char CheckDVDStatus()
-{
-    long Status;
-    unsigned char WasAProblem = 0;
-
-    do
-    {
-        Status = DVDGetDriveStatus();
-        u32 statusPlusOne = (u32)(Status + 1);
-
-        switch (statusPlusOne)
-        {
-        case DVD_STATE_FATAL + 1:
-        case DVD_STATE_NO_DISK + 1:
-        case DVD_STATE_COVER_OPENED + 1:
-        case DVD_STATE_WRONG_DISK_ID + 1:
-        case DVD_STATE_DISK_ERROR + 1:
-            g_HandleDVDMessageCallback(Status);
-            WasAProblem = 1;
-
-            while (Status == DVDGetDriveStatus())
-            {
-                OSYieldThread();
-                if (g_CheckForResetCB)
-                {
-                    g_CheckForResetCB();
-                }
-            }
-            break;
-
-        case DVD_STATE_BUSY + 1:
-            WasAProblem = 1;
-            if (!g_HandleDVDRetryCB.Empty())
-            {
-                g_HandleDVDRetryCB(1);
-            }
-            while (DVDGetDriveStatus() == DVD_STATE_BUSY)
-            {
-                OSYieldThread();
-                if (g_CheckForResetCB)
-                {
-                    g_CheckForResetCB();
-                }
-            }
-            break;
-
-        default:
-            break;
-        }
-
-    } while ((Status != DVD_STATE_IDLE) && (Status != DVD_STATE_FATAL));
-
-    if (WasAProblem && !g_HandleDVDAllClearCallback.Empty())
-    {
-        g_HandleDVDAllClearCallback(0);
-    }
-    return WasAProblem;
-}
+static unsigned char CheckDVDStatus();
 
 void nlRegHandleDVDMessageCB(const Function<void(int)>& cb)
 {
@@ -426,6 +364,7 @@ void AsyncManager::Service()
 
 bool AsyncManager::Contains(AsyncEntry* wanted)
 {
+    AsyncEntry* head;
     AsyncEntry* entry = nlDLRingGetStart(m_activeEntryList);
     if (entry == 0)
     {
@@ -439,27 +378,9 @@ bool AsyncManager::Contains(AsyncEntry* wanted)
             return true;
         }
         entry = entry->m_next;
-    } while (!nlDLRingIsStart(m_activeEntryList, entry));
+        head = m_activeEntryList;
+    } while (!nlDLRingIsStart(head, entry));
     return false;
-}
-
-bool AsyncManager::Cancel(AsyncEntry* entry, CancelAsyncCallback callback)
-{
-    if (!Contains(entry))
-    {
-        return false;
-    }
-
-    --entry->m_pFile->PendingAsync;
-    mCurrent = entry;
-    if (callback != 0)
-    {
-        callback(entry->m_pFile, entry->m_pBuffer, entry->m_uSize, entry->m_uParam, entry->m_pFunc);
-    }
-    nlDLRingRemove(&m_activeEntryList, entry);
-    nlDLRingAddEnd(&m_freeEntryList, entry);
-    DVDClose(&entry->mFileInfo);
-    return true;
 }
 
 AsyncEntry* nlGetCurrentAsyncRead()
@@ -477,15 +398,7 @@ void nlInitFileSystem()
         pManager = (AsyncManager*)nlMalloc(sizeof(AsyncManager), 8, false);
         if (pManager != 0)
         {
-            pManager->m_activeEntryList = pManager->m_freeEntryList = 0;
-            pManager->mTailBuffers = (unsigned char*)nlMalloc(64 * 32, 32, true);
-
-            for (s32 i = 0; i < 64; i++)
-            {
-                pManager->m_asyncEntries[i].mTailBuffer = pManager->mTailBuffers + i * 32;
-                pManager->m_asyncEntries[i].m_pFile = 0;
-                nlDLRingAddStart<AsyncEntry>(&pManager->m_freeEntryList, &pManager->m_asyncEntries[i]);
-            }
+            pManager->Init();
         }
 
         s_pAsyncManager = pManager;
@@ -635,7 +548,81 @@ void nlCancelPendingAsyncReads(nlFile* pFile, CancelAsyncCallback callback)
 
 bool nlCancelAsyncRead(AsyncEntry* entry, CancelAsyncCallback callback)
 {
-    return s_pAsyncManager->Cancel(entry, callback);
+    AsyncManager* pMgr = s_pAsyncManager;
+    if (!pMgr->Contains(entry))
+    {
+        return false;
+    }
+
+    --entry->m_pFile->PendingAsync;
+    pMgr->mCurrent = entry;
+    if (callback != 0)
+    {
+        callback(entry->m_pFile, entry->m_pBuffer, entry->m_uSize, entry->m_uParam, entry->m_pFunc);
+    }
+    nlDLRingRemove(&pMgr->m_activeEntryList, entry);
+    nlDLRingAddEnd(&pMgr->m_freeEntryList, entry);
+    DVDClose(&entry->mFileInfo);
+    return true;
+}
+
+static unsigned char CheckDVDStatus()
+{
+    long Status;
+    unsigned char WasAProblem = 0;
+
+    do
+    {
+        Status = DVDGetDriveStatus();
+        u32 statusPlusOne = (u32)(Status + 1);
+
+        switch (statusPlusOne)
+        {
+        case DVD_STATE_FATAL + 1:
+        case DVD_STATE_NO_DISK + 1:
+        case DVD_STATE_COVER_OPENED + 1:
+        case DVD_STATE_WRONG_DISK_ID + 1:
+        case DVD_STATE_DISK_ERROR + 1:
+            g_HandleDVDMessageCallback(Status);
+            WasAProblem = 1;
+
+            while (Status == DVDGetDriveStatus())
+            {
+                OSYieldThread();
+                if (g_CheckForResetCB)
+                {
+                    g_CheckForResetCB();
+                }
+            }
+            break;
+
+        case DVD_STATE_BUSY + 1:
+            WasAProblem = 1;
+            if (!g_HandleDVDRetryCB.Empty())
+            {
+                g_HandleDVDRetryCB(1);
+            }
+            while (DVDGetDriveStatus() == DVD_STATE_BUSY)
+            {
+                OSYieldThread();
+                if (g_CheckForResetCB)
+                {
+                    g_CheckForResetCB();
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
+
+    } while ((Status != DVD_STATE_IDLE) && (Status != DVD_STATE_FATAL));
+
+    if (WasAProblem && !g_HandleDVDAllClearCallback.Empty())
+    {
+        g_HandleDVDAllClearCallback(0);
+    }
+    return WasAProblem;
 }
 
 namespace

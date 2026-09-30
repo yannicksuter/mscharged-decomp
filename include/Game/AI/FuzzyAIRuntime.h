@@ -97,6 +97,13 @@ public:
         UnidentifiedVariant_80054AB8*, int, const Variant&);
     virtual void UnidentifiedVirtual15();
 
+    // Build a native-call result and record its confidence and continuation.
+    template <typename T>
+    UnidentifiedVariant_80054AB8* UnidentifiedCreateReturnValue(
+        eVariantType type, T value, float confidence);
+    UnidentifiedVariant_80054AB8* UnidentifiedCreateReturnValue(
+        UnidentifiedVariant_80054AB8* value, float confidence);
+
     UnidentifiedFuzzyRuntimeBase* next;
     AIContext* mValue;
     UnidentifiedRuntimeActionQueueList mCollection;
@@ -222,5 +229,29 @@ extern "C" UnidentifiedFuzzyRuntimeValue* fn_8031479C( void*, UnidentifiedFuzzyR
 extern "C" int fn_803147A4( UnidentifiedFuzzyRuntimeBase* runtime);
 extern "C" void fn_803148C4(float value);
 extern "C" void fn_803148D0(void*, const char* value);
+
+template <typename T>
+inline UnidentifiedVariant_80054AB8*
+UnidentifiedFuzzyRuntimeBase::UnidentifiedCreateReturnValue(
+    eVariantType type, T value, float confidence)
+{
+    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
+        UnidentifiedVariant_80054AB8(type, value);
+    result->SetParameter(4, FuzzyVariant(confidence));
+    mUnidentified058 = GetInstructionOffset() + 1;
+    return UnidentifiedReturn(result, confidence);
+}
+
+inline UnidentifiedVariant_80054AB8*
+UnidentifiedFuzzyRuntimeBase::UnidentifiedCreateReturnValue(
+    UnidentifiedVariant_80054AB8* value, float confidence)
+{
+    UnidentifiedVariant_80054AB8* result;
+    lbl_805842C8.Allocate(result);
+    result = new (result) UnidentifiedVariant_80054AB8(value);
+    result->SetParameter(4, FuzzyVariant(confidence));
+    mUnidentified058 = GetInstructionOffset() + 1;
+    return UnidentifiedReturn(result, confidence);
+}
 
 #endif // GAME_AI_FUZZY_AI_RUNTIME_H

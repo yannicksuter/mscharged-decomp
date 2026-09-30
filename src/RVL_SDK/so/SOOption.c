@@ -118,6 +118,7 @@ int SOGetInterfaceOpt(IPInterface* interface, int level, int optname,
     int isTempRm;
     int length;
     IPCIOVector* vectors;
+    u8* buffer;
     s32* option;
     s32* returnedLength;
     u8* value;
@@ -135,19 +136,20 @@ int SOGetInterfaceOpt(IPInterface* interface, int level, int optname,
         {
             length = optlen == NULL || *optlen < 0 ? 0 : *optlen;
             bufferSize = OSRoundUp32B(length + 96);
-            vectors = SOiAlloc(12, bufferSize);
-            if (vectors == NULL)
+            buffer = SOiAlloc(12, bufferSize);
+            if (buffer == NULL)
             {
                 result = SO_ENOMEM;
             }
             else
             {
-                option = (s32*)((u8*)vectors + 32);
+                vectors = (IPCIOVector*)buffer;
+                option = (s32*)(buffer + 32);
                 returnedLength = (s32*)((u8*)option + 32);
                 value = (u8*)returnedLength + 32;
 
-                option[0] = level;
-                option[1] = optname;
+                ((s32*)(buffer + 32))[0] = level;
+                ((s32*)(buffer + 32))[1] = optname;
                 *returnedLength = optlen == NULL || *optlen < 0 ? 0 : *optlen;
 
                 vectors[0].base = option;
@@ -174,7 +176,7 @@ int SOGetInterfaceOpt(IPInterface* interface, int level, int optname,
                         result = SO_EINVAL;
                     }
                 }
-                SOiFree(12, vectors, bufferSize);
+                SOiFree(12, buffer, bufferSize);
             }
         }
         result = SOiConcludeTempRm(NULL, result, isTempRm);

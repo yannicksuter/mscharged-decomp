@@ -961,8 +961,8 @@ void DesireSuperPower::fn_800CCC0C(DesireUpdate* update, float fDeltaT)
 {
     m_pFielder->mUnidentified40C += fDeltaT;
     m_pFielder->mUnidentified408 += lbl_806DC2B0 * fDeltaT;
-    m_pFielder->mUnidentified408 = FMIN(
-        FMAX(m_pFielder->mUnidentified408, lbl_806DC2A8), lbl_806DC2AC);
+    m_pFielder->mUnidentified408 = nlMinEquals(
+        nlMaxEquals(m_pFielder->mUnidentified408, lbl_806DC2A8), lbl_806DC2AC);
     if (update->mData.i == 3)
     {
         if (update->ExtraData.Get(11)->mData.b)

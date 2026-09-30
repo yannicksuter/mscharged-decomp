@@ -42,8 +42,7 @@ inline void nlDLRingInsert(T** head, T* afterNode, T* newNode)
 template <typename T>
 inline void nlDLRingAddStart(T** head, T* newNode)
 {
-    T* current = *head;
-    if (current == 0)
+    if (*head == 0)
     {
         *head = newNode;
         newNode->m_next = newNode;
@@ -51,6 +50,7 @@ inline void nlDLRingAddStart(T** head, T* newNode)
         return;
     }
 
+    T* current = *head;
     current->m_next->m_prev = newNode;
     newNode->m_next = current->m_next;
     newNode->m_prev = current;

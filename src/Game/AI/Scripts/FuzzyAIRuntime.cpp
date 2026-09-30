@@ -269,41 +269,25 @@ float UnidentifiedFuzzyRuntime::fn_800E34F4(unsigned long hash)
 extern "C" UnidentifiedVariant_80054AB8* fn_800E35D4(
     UnidentifiedFuzzyRuntime* runtime, int value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_INT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_INT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E3700(
     UnidentifiedFuzzyRuntime* runtime, int value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_INT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_INT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E382C(
     UnidentifiedFuzzyRuntime* runtime, int value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_INT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_INT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E3958(
     UnidentifiedFuzzyRuntime* runtime, int value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_INT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_INT, value, confidence);
 }
 
 extern "C" void fn_800E3A84(
@@ -527,11 +511,7 @@ extern "C" float fn_800E7EEC(void*, Variant* value)
 extern "C" UnidentifiedVariant_80054AB8* fn_800E7F60(
     UnidentifiedFuzzyRuntime* runtime, bool value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_BOOL, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_BOOL, value, confidence);
 }
 
 extern "C" float fn_800E7F48(bool value)
@@ -548,63 +528,38 @@ UnidentifiedVariant_80054AB8* UnidentifiedFuzzyRuntimeBase::UnidentifiedReturn(
 extern "C" UnidentifiedVariant_80054AB8* fn_800E8090(
     UnidentifiedFuzzyRuntime* runtime, int value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_INT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_INT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E81BC(
     UnidentifiedFuzzyRuntime* runtime, int value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_INT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_INT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E82E8(
     UnidentifiedFuzzyRuntime* runtime, float value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_FLOAT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_FLOAT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E8414(
     UnidentifiedFuzzyRuntime* runtime, float value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_FLOAT, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_FLOAT, value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E8540(
     UnidentifiedFuzzyRuntime* runtime,
     UnidentifiedVariant_80054AB8* value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result;
-    lbl_805842C8.Allocate(result);
-    result = new (result) UnidentifiedVariant_80054AB8(value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(value, confidence);
 }
 
 extern "C" UnidentifiedVariant_80054AB8* fn_800E8B80(
     UnidentifiedFuzzyRuntime* runtime, unsigned long value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(FT_U32, value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mUnidentified058 = runtime->GetInstructionOffset() + 1;
-    return runtime->UnidentifiedReturn(result, confidence);
+    return runtime->UnidentifiedCreateReturnValue(FT_U32, value, confidence);
 }
 
 extern "C" unsigned long fn_800E8CB0(void*, Variant* value)

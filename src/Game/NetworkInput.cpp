@@ -112,13 +112,13 @@ s8 NetworkPeerChannel::GetNetworkPeerChannelId()
 
 cGlobalPad* NetworkPeerChannel::GetLocalChannelPad()
 {
-    if (mGlobalPadIndex == -1)
+    if (GetGlobalPadIndex() == -1)
     {
         return 0;
     }
     cGlobalPad* pad;
     if (mPeer == g_pNetworkSessionBase->GetLocalPeer())
-        pad = g_pPadManager->GetPad(mGlobalPadIndex);
+        pad = g_pPadManager->GetPad(GetGlobalPadIndex());
     else
         pad = 0;
     return pad;

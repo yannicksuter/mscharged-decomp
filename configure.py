@@ -825,7 +825,7 @@ config.libs = [
             Object(Matching, "Game/Render/ElectricFence.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/FlareHandler.cpp", cflags=cflags_game),
             Object(NonMatching, "Game/Render/FlyingCamera.cpp", cflags=cflags_game),
-            Object(NonMatching, "Game/Render/FrontEndPresentation.cpp"),
+            Object(Matching, "Game/Render/FrontEndPresentation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/HammerObject.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/HighRange.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/HomeButtonFade.cpp"),
@@ -870,7 +870,8 @@ config.libs = [
             Object(NonMatching, "Game/Render/tu_80283D9C.cpp"),
             Object(NonMatching, "Game/Render/Warble.cpp"),
             Object(NonMatching, "Game/Render/Wiper.cpp", cflags=cflags_game),
-            Object(NonMatching, "Game/Render/WorldNPC.cpp"),
+            Object(Matching, "Game/Render/Frustum.cpp"),
+            Object(Matching, "Game/Render/WorldNPC.cpp"),
             Object(Matching, "Game/Render/YoshiEggObject.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
 
             # Game/SAnim
@@ -1000,7 +1001,7 @@ config.libs = [
             Object(Matching, "NL/nlEndian.cpp"),
             Object(NonMatching, "NL/nlEvent.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlFile.cpp", extra_cflags=["-i src/zlib"]),
-            Object(NonMatching, "NL/nlFileGC.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
+            Object(Matching, "NL/nlFileGC.cpp", extra_cflags=["-inline nobottomup", "-ipa file", "-sym on"]),
             Object(NonMatching, "NL/nlFont.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlFunctionMemory.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "NL/nlInit.cpp"),
@@ -1713,7 +1714,7 @@ config.libs = [
             Object(NonMatching, "RVL_SDK/so/soBasic.c"),
             Object(Matching, "RVL_SDK/so/soCommon.c"),
             Object(Matching, "RVL_SDK/so/SOInformation.c"),
-            Object(Equivalent, "RVL_SDK/so/SOOption.c"),
+            Object(Matching, "RVL_SDK/so/SOOption.c"),
 
             # RVL_SDK/sp
             Object(Matching, "RVL_SDK/sp/sp.c"),

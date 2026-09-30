@@ -29,16 +29,22 @@ public:
 
     T* Allocate()
     {
-        T* entry = m_pFree;
-        if (entry == 0)
-            return 0;
-        m_pFree = *(T**)entry;
+        T* entry;
+        Allocate(entry);
         return entry;
     }
 
     void Allocate(T*& out)
     {
-        out = Allocate();
+        if (m_pFree == 0)
+        {
+            out = 0;
+        }
+        else
+        {
+            out = m_pFree;
+            m_pFree = *(T**)out;
+        }
     }
 
     void Free(T* entry)
@@ -74,6 +80,7 @@ public:
     nlStaticArrayAllocator()
     {
         this->m_pFree = 0;
+        this->m_Unknown04 = 0;
         this->Init(reinterpret_cast<T*>(m_Memory), N);
     }
 

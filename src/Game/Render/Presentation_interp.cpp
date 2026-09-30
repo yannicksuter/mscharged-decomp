@@ -3,6 +3,7 @@
  */
 void Presentation::DoFunctionCall(unsigned int function)
 {
+    cCharacter* character;
     switch (function)
     {
     case 0:
@@ -463,7 +464,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         bool direction = m_SP[-2] != 0;
         m_SP -= 3;
         int side = NisPlayer::Instance()->mUnidentified34238 == 0 ? 0 : 4;
-        cCharacter* character = g_pCharacters[side];
+        character = g_pCharacters[side];
         character->fn_80022D3C(value, direction ? 1.0f : 0.0f);
         switch (character->mUnidentified024.m_eCharacterClass)
         {

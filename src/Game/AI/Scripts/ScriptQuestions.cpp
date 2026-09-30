@@ -895,7 +895,7 @@ float AbleToInterceptBall(cPlayer* pPlayer)
             float fClosenessScore = NormalizeVal(fDistance,
                 g_pGame->m_pFuzzyTweaks->mUnidentified484, g_pGame->m_pFuzzyTweaks->mUnidentified494);
             fScore = fInterceptScore * g_pGame->m_pFuzzyTweaks->mUnidentified454
-                + fClosenessScore * (1.0f - g_pGame->m_pFuzzyTweaks->mUnidentified454);
+                + fClosenessScore * (1.0f - g_pGame->m_pFuzzyTweaks->mUnidentified454.GetValue());
             bool bHasGlobalPad = pFielder->GetGlobalPad() != NULL;
             if (bHasGlobalPad)
             {
@@ -1438,7 +1438,7 @@ extern "C" float fn_800D9A38(cFielder* pFielder)
     float fMagnitude = nlVec3Length(vRepulsion);
     float fScore = NormalizeVal(fMagnitude, g_pGame->m_pFuzzyTweaks->mUnidentified4B4,
         g_pGame->m_pFuzzyTweaks->mUnidentified4C4);
-    lbl_806DC3E8 = FMIN(fMagnitude, lbl_806DC3E8);
+    lbl_806DC3E8 = nlMinEquals(fMagnitude, lbl_806DC3E8);
     lbl_806DC3EC = FMAX(fMagnitude, lbl_806DC3EC);
     return fScore;
 }
@@ -1670,24 +1670,24 @@ float GoalieOutOfPosition(cFielder* pFielder)
     }
 
     pGoalie = (cPlayer*)pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-    float halfNetWidth = 0.5f * cNet::GetNetWidth();
     goalieNetPos = pGoalie->mUnidentified024.m_v3Position;
     goalieNetPos.x = pGoalie->m_pTeam->m_pNet->m_v3NetLocation.x;
 
-    float goalieY = goalieNetPos.y;
-    if (goalieY < -halfNetWidth)
+    if (goalieNetPos.y < -(0.5f * cNet::GetNetWidth()))
     {
-        goalieNetPos.y = -halfNetWidth;
+        goalieNetPos.y = -(0.5f * cNet::GetNetWidth());
     }
-    else if (goalieY > halfNetWidth)
+    else if (goalieNetPos.y > (0.5f * cNet::GetNetWidth()))
     {
-        goalieNetPos.y = halfNetWidth;
+        goalieNetPos.y = (0.5f * cNet::GetNetWidth());
     }
 
     const nlVector3& offNetLocation = pFielder->GetAIOffNetLocation(NULL);
 
-    float fielderDistance = nlSqrt(
-        nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, offNetLocation), true);
+    nlVector2 fielderDelta;
+    fielderDelta.x = pFielder->mUnidentified024.m_v3Position.x - offNetLocation.x;
+    fielderDelta.y = pFielder->mUnidentified024.m_v3Position.y - offNetLocation.y;
+    float fielderDistance = nlSqrt(nlVec2LengthSquared(fielderDelta), true);
 
     nlVector2 goalieDelta;
     nlVec2Sub(goalieDelta, *(const nlVector2*)&pGoalie->GetPosition(),
@@ -1957,9 +1957,9 @@ extern "C" float fn_800DAD84(const nlVector3& vFrom, const nlVector3& vTo,
     s16 aAbsDelta = abs_ang16(aDelta);
     float fAngleScore = NormalizeVal((float)aAbsDelta, *pAngleRange);
     if (bRequireInRange
-        && (fDistance < FMIN(pDistanceRange->x, pDistanceRange->y)
+        && (fDistance < nlMinEquals(pDistanceRange->x, pDistanceRange->y)
             || fDistance > FMAX(pDistanceRange->x, pDistanceRange->y)
-            || (float)aAbsDelta < FMIN(pAngleRange->x, pAngleRange->y)
+            || (float)aAbsDelta < nlMinEquals(pAngleRange->x, pAngleRange->y)
             || (float)aAbsDelta > FMAX(pAngleRange->x, pAngleRange->y)))
     {
         return 0.0f;
@@ -3953,9 +3953,11 @@ extern "C" float fn_800E06F4(cPlayer* pPlayer)
         return 0.0f;
     float fMaxDistance;
     float fMinDistance;
+    float fMaxDistanceForPlayer = lbl_806E42B0.y;
+    float fMinDistanceForPlayer = lbl_806E42B0.x;
+    float fPlayerDistance = g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120];
     float fTotal = 0.0f;
-    float fClose = NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
-        lbl_806E42B0.x, lbl_806E42B0.y);
+    float fClose = NormalizeVal(fPlayerDistance, fMinDistanceForPlayer, fMaxDistanceForPlayer);
     if (fClose < 1.0f)
     {
         fMaxDistance = lbl_806E42B0.y;
