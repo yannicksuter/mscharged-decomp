@@ -275,4 +275,16 @@ FuzzyRuntimeBase::CreateReturnValue(
     return ReturnValue(result, confidence);
 }
 
+extern "C" inline UnidentifiedVariant_80054AB8* FuzzyReturnVariantCopy(
+    FuzzyRuntimeBase* runtime,
+    UnidentifiedVariant_80054AB8 value, float confidence)
+{
+    UnidentifiedVariant_80054AB8* result =
+        new (lbl_805842C8.Allocate())
+            UnidentifiedVariant_80054AB8(value);
+    result->SetParameter(4, FuzzyVariant(confidence));
+    runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
+    return runtime->ReturnValue(result, confidence);
+}
+
 #endif // GAME_AI_FUZZY_AI_RUNTIME_H

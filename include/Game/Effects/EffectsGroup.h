@@ -36,11 +36,11 @@ struct EffectsSpec
     /* 0x24 */ unsigned long m_bLight;
     /* 0x28 */ float m_fOffset;
     /* 0x2C */ nlVector3 m_vLocalOffset;
-    /* 0x38 */ unsigned long mUnidentified038;
+    /* 0x38 */ unsigned long m_uTerrainID;
     /* 0x3C */ float m_fLingerStart;
     /* 0x40 */ float m_fLingerEnd;
     /* 0x44 */ unsigned long m_uLayer;
-    /* 0x48 */ int mUnidentified048;
+    /* 0x48 */ int m_nForwardAxis;
     /* 0x4C */ unsigned char mPadding04C[0x0C];
 }; // size: 0x58
 
@@ -83,7 +83,7 @@ public:
     /* 0x00 */ unsigned long m_hashID;
     /* 0x04 */ EffectsSpec* m_specs;
     /* 0x08 */ unsigned long m_numSpecs;
-    /* 0x0C */ unsigned long mUnidentified0C;
+    /* 0x0C */ unsigned long m_bIsLingering;
     /* 0x10 */ UserEffectSpec** m_userSpecsPtr;
     /* 0x14 */ unsigned long m_userSpecs;
     /* 0x18 */ UserEffectSource* mUserSpecSources;

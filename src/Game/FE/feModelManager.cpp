@@ -1,6 +1,11 @@
 #include "Game/FE/feModelManager.h"
+#include <assert.h>
 #include "Game/CharacterTemplate.h"
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DB/GameProgress.h"
+#include "Game/GameInfo.h"
+#include "Game/GL/GLSkinMesh.h"
+#include "Game/MathHelpers.h"
 
 #include "Game/Render/CrowdImpostors.h"
 
@@ -13,10 +18,14 @@
 #include "NL/gl/gl.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlFile.h"
+#include "NL/nlFileGC.h"
 #include "Game/Render/SkinAnimatedNPC.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glState.h"
+#include "NL/gl/glModel.h"
+#include "NL/gl/glMaterialParameters.h"
+#include "NL/gl/glTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -99,6 +108,46 @@ public:
 }; // size: 0xDC
 
 
+struct FEModelObject
+{
+    /* 0x00 */ u8 mUnidentified00[0x60];
+    /* 0x60 */ int mUnidentified60;
+};
+
+struct UnidentifiedFEImpostorParams
+{
+    float mOffsetZ;
+    float mWidth;
+    float mHeight;
+    int mTextureWidth;
+    int mTextureHeight;
+};
+
+static UnidentifiedFEImpostorParams lbl_80515D18[12] = {
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 384, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 256, 256 },
+    { -0.5f, 3.0f, 3.0f, 384, 256 },
+};
+
+static float lbl_806DD240 = 0.35f;
+static float lbl_806DD244 = 0.4f;
+static float lbl_806DD248 = 0.45f;
+static float lbl_806DD24C = 0.9f;
+static float lbl_806DD250 = 0.2f;
+static float lbl_806DD254 = 0.03f;
+static float lbl_806DD258 = 1.0f;
+static float lbl_806DD25C = 0.5f;
+static int lbl_806DD260 = 8;
+static int lbl_806E17F4;
 static char sDefaultAnimation[] = "fe_idle";
 
 FEModel::FEModel(tCharacterTemplateInfo* modelData)
@@ -284,77 +333,6 @@ FEModelHandle::FEModelHandle(FEModelType type, const char* name,
     mUnidentified5A = unidentified5A;
 }
 
-void FEModelManager::Update(float dt)
-{
-    nlDLListIterator<FEModelHandle*> danglingModels = mDanglingModels.Begin();
-    while (danglingModels.hasNext())
-    {
-        FEModelHandle* handle = *danglingModels;
-        if (!handle->mModel->mLoadQueued)
-        {
-            delete handle;
-            mDanglingModels.Remove(&danglingModels);
-        }
-        else
-        {
-            danglingModels.Step();
-        }
-    }
-
-    BeginLoadModels();
-
-    nlDLListIterator<FEModelHandle*> pendingModels = mPendingModels.Begin();
-    while (pendingModels.hasNext())
-    {
-        FEModelHandle* handle = *pendingModels;
-        if (handle->CanDestroy())
-        {
-            delete handle;
-            mPendingModels.Remove(&pendingModels);
-        }
-        else
-        {
-            pendingModels.Step();
-        }
-    }
-
-    ListEntry<FEModelHandle*>* entry = mHandles.m_Head;
-    while (entry != 0)
-    {
-        if (!entry->entry->mModel->mLoaded)
-        {
-            if (entry->entry->mModel->mPendingLoads == 0)
-            {
-                FinishLoadModel(entry->entry);
-                if (entry->entry->mModel->GetCurrentAnimation() == 0)
-                {
-                    entry->entry->PlayAnimation(entry->entry->mDefaultAnimation,
-                        PM_CYCLIC, 0.2f, 0.0f, false);
-                }
-            }
-            else
-            {
-                entry = entry->next;
-                continue;
-            }
-        }
-
-        entry->entry->mModel->Update(dt);
-        if (entry->entry->mModel->IsAnimationFinished())
-        {
-            FEModelHandle* handle = entry->entry;
-            if (handle->mAnimationCompleteCallback != 0)
-            {
-                handle->mAnimationCompleteCallback(handle);
-            }
-            handle->mAnimationCompleteCallback = 0;
-        }
-        entry = entry->next;
-    }
-
-    ImpostorManager::GetInstance()->UpdateAnimations(dt);
-}
-
 bool FEModelHandle::IsAnimationFinished()
 {
     return mModel->IsAnimationFinished();
@@ -473,6 +451,45 @@ FESkinnedModel::~FESkinnedModel()
     delete mModel;
 }
 
+void FESkinnedModel::Initialize()
+{
+    if (mTextureFileData != 0)
+    {
+        ::operator delete(mTextureFileData);
+        mTextureFileData = 0;
+    }
+    if (mModelFileData != 0)
+    {
+        ::operator delete(mModelFileData);
+        mModelFileData = 0;
+    }
+    if (mModel != 0)
+    {
+        delete mModel;
+        mModel = 0;
+    }
+    if (mAnimations != 0)
+    {
+        delete mAnimations;
+        mAnimations = 0;
+    }
+    mAnimations = new (8, false) cInventory<cSAnim>;
+    if (mHierarchies != 0)
+    {
+        delete mHierarchies;
+        mHierarchies = 0;
+    }
+    mHierarchies = new (8, false) cInventory<cSHierarchy>;
+    mLoader->ReleaseResource(mLoaderHandle);
+    mLoaderHandle = mLoader->MarkResource();
+    mModelData = 0;
+    mPendingLoads = 0;
+    mLoaded = false;
+    mSynchronousLoad = false;
+    mLoadQueued = false;
+    mModelID = -1;
+}
+
 cSAnim* FESkinnedModel::GetCurrentAnimation()
 {
     if (mModel != 0 && mModel->mpAnimController != 0)
@@ -543,6 +560,37 @@ bool FEImpostorModel::IsAnimationFinished()
     return false;
 }
 
+void FEImpostorModel::Update(float dt)
+{
+    for (int i = 0; i < 6; ++i)
+    {
+        nlVector3 position;
+        if (i > 0)
+        {
+            mTime += dt;
+            float angle = mTime * lbl_806DD258;
+            float radius = lbl_806DD254 * nlSin(RadToAng16(lbl_806DD25C * mTime) + 0x4000);
+            angle += DegreesToRadians(72.0f * i);
+            float x = radius * nlSin(RadToAng16(angle) + 0x4000);
+            float z = radius * nlSin(RadToAng16(angle));
+            position.x = mPosition.x + x;
+            position.y = mPosition.y;
+            position.z = mPosition.z + z + lbl_80515D18[mModelData->mUnidentified00].mOffsetZ;
+        }
+        else
+        {
+            position = mPosition;
+            position.z += lbl_80515D18[mModelData->mUnidentified00].mOffsetZ;
+        }
+        Impostor* impostor = mModels[i];
+        nlVec3Set(impostor->mPosition, position.x, position.y, position.z);
+    }
+    if (mModel != 0)
+    {
+        mModel->Update(dt);
+    }
+}
+
 void FEImpostorModel::Render()
 {
 }
@@ -550,6 +598,221 @@ void FEImpostorModel::Render()
 FEModelManager::FEModelManager()
     : mResource(0)
 {
+}
+
+void FEModelManager::DestroyDanglingModels()
+{
+    nlDLListIterator<FEModelHandle*> danglingModels = mDanglingModels.Begin();
+    while (danglingModels.hasNext())
+    {
+        FEModelHandle* handle = *danglingModels;
+        if (!handle->mModel->mLoadQueued)
+        {
+            delete handle;
+            mDanglingModels.Remove(&danglingModels);
+        }
+        else
+        {
+            danglingModels.Step();
+        }
+    }
+}
+
+void FEModelManager::DestroyPendingModels()
+{
+    nlDLListIterator<FEModelHandle*> pendingModels = mPendingModels.Begin();
+    while (pendingModels.hasNext())
+    {
+        FEModelHandle* handle = *pendingModels;
+        if (handle->CanDestroy())
+        {
+            delete *pendingModels;
+            mPendingModels.Remove(&pendingModels);
+        }
+        else
+        {
+            pendingModels.Step();
+        }
+    }
+}
+
+FEModelManager::~FEModelManager()
+{
+    if (mResource != 0)
+    {
+        glGetCurrentResourcePool()->ReleaseResource(mResource);
+        mResource = 0;
+    }
+
+    while (mHandles.GetHead() != 0)
+    {
+        DestroyModel(*mHandles.GetHead());
+    }
+
+    nlDLListIterator<FEModelHandle*> loadedModels = mLoadedModels.Begin();
+    while (loadedModels.hasNext())
+    {
+        delete *loadedModels;
+        mLoadedModels.Remove(&loadedModels);
+    }
+
+    while (mPendingModels.CountElements() != 0)
+    {
+        nlServiceFileSystem();
+        DestroyPendingModels();
+        DestroyDanglingModels();
+    }
+}
+
+void FEModelManager::Update(float dt)
+{
+    DestroyDanglingModels();
+
+    BeginLoadModels();
+
+    DestroyPendingModels();
+
+    ListEntry<FEModelHandle*>* entry = mHandles.m_Head;
+    while (entry != 0)
+    {
+        if (!entry->entry->mModel->mLoaded)
+        {
+            if (entry->entry->mModel->mPendingLoads == 0)
+            {
+                FinishLoadModel(entry->entry);
+                if (entry->entry->mModel->GetCurrentAnimation() == 0)
+                {
+                    entry->entry->PlayAnimation(entry->entry->mDefaultAnimation,
+                        PM_CYCLIC, 0.2f, 0.0f, false);
+                }
+            }
+            else
+            {
+                entry = entry->next;
+                continue;
+            }
+        }
+
+        entry->entry->mModel->Update(dt);
+        if (entry->entry->mModel->IsAnimationFinished())
+        {
+            FEModelHandle* handle = entry->entry;
+            if (handle->mAnimationCompleteCallback != 0)
+            {
+                handle->mAnimationCompleteCallback(handle);
+            }
+            handle->mAnimationCompleteCallback = 0;
+        }
+        entry = entry->next;
+    }
+
+    ImpostorManager::GetInstance()->UpdateAnimations(dt);
+}
+
+void FEModelManager::FinishLoadModel(FEModelHandle* handle)
+{
+    FEModel* model = handle->mModel;
+    if (model->mSynchronousLoad)
+    {
+        return;
+    }
+
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
+    CurrentAllocator = &VirtualAllocator;
+    glEndLoadTextureBundle(model->mTextureFileData,
+        model->mTextureFileDataSize, model->mLoader, 0);
+    ::operator delete(model->mTextureFileData);
+    model->mTextureFileData = 0;
+    if (handle->mUnidentified5A)
+    {
+        glEndLoadTextureBundle(model->mAlternateTextureFileData,
+            model->mAlternateTextureFileDataSize, model->mLoader, 0);
+        ::operator delete(model->mAlternateTextureFileData);
+        model->mAlternateTextureFileData = 0;
+    }
+
+    unsigned long numModels = 0;
+    model->mModelID = glEndLoadModel(model->mModelFileData,
+        model->mModelFileDataSize, &numModels, model->mLoader)->id;
+    ::operator delete(model->mModelFileData);
+    model->mModelFileData = 0;
+
+    model->mHierarchies->AddFile((char*)model->mHierarchyFileData,
+        model->mHierarchyFileDataSize);
+    cInventory<cSHierarchy>* hierarchies = model->mHierarchies;
+    model->mUnidentified1C = hierarchies->Find(nlStringHash(model->mModelData->szHierarchy));
+    model->mAnimations->AddFile((char*)model->mAnimationFileData,
+        model->mAnimationFileDataSize);
+
+    switch (model->mType)
+    {
+    case FE_MODEL_SKINNED:
+    {
+        FESkinnedModel* skinnedModel = (FESkinnedModel*)handle->mModel;
+        skinnedModel->mModel = new (8, false) SkinAnimatedNPC(
+            *(cSHierarchy*)handle->mModel->mUnidentified1C,
+            handle->mModel->mModelID, handle->mModel->mLoader);
+        break;
+    }
+    case FE_MODEL_IMPOSTOR:
+    {
+        FEModelManager* manager = FEModelManager::Instance();
+        if (manager->mResource == 0)
+        {
+            manager->mResource = glGetCurrentResourcePool()->MarkResource();
+            // R4QE01 queries the pool's free memory here and discards the
+            // result: r3 from the virtual call is overwritten by the next load
+            // without being read. No print or assertion survives around it,
+            // and what enclosed the query is not recoverable from a stripped
+            // executable.
+            glGetCurrentResourcePool()->GetFreeMemory();
+        }
+        const CharacterInfo& characterInfo = GetCharacterInfo(model->mModelData->mUnidentified00);
+        FEImpostorModel* impostorModel = (FEImpostorModel*)handle->mModel;
+        impostorModel->mModel = new (8, false) ImpostorModel(
+            *(cSHierarchy*)model->mUnidentified1C, model->mModelID,
+            model->mAnimations, model->mLoader);
+        impostorModel->mModel->mSkinMesh->m_Unknown0C = 0;
+
+        ImpostorCharacterParams params;
+        int character = handle->mModel->mModelData->mUnidentified00;
+        params.mWidth = lbl_80515D18[character].mTextureWidth;
+        params.mHeight = lbl_80515D18[character].mTextureHeight;
+        params.mUseAdditiveBlend = 1;
+        params.mUseIntensityAlpha = 0;
+        params.mBaseAngle = 0xc000;
+        enum ModelType { Default, InitialCup, Cup };
+        ModelType modelType = Default;
+        if (GameInfoManager::Instance()->IsInMode3())
+        {
+            modelType = g_pCupManager->GetCurrentMode() == -1 ? InitialCup : Cup;
+        }
+        impostorModel->mCharacter = new (8, false) FEImpostorCharacter(
+            characterInfo.mName, impostorModel->mModel,
+            (void*)handle->mDefaultAnimation, 30, handle->mUnidentified59,
+            handle->mUnidentified5A, &params, modelType);
+        for (int i = 0; i < 6; ++i)
+        {
+            int slot;
+            impostorModel->mModels[i] = ImpostorManager::GetInstance()->AllocImpostor(&slot);
+            int width = lbl_80515D18[impostorModel->mModelData->mUnidentified00].mWidth;
+            int height = lbl_80515D18[impostorModel->mModelData->mUnidentified00].mHeight;
+            impostorModel->mModels[i]->Set(impostorModel->mCharacter,
+                handle->mPosition, width, height, 0xc000);
+        }
+        impostorModel->mPosition = handle->mPosition;
+        break;
+    }
+    }
+
+    if (handle->mUnidentified4C != 0)
+    {
+        ((void (*)(FEModelHandle*, void*))handle->mUnidentified4C)(handle, handle->mUnidentified50);
+    }
+    handle->mModel->mLoaded = true;
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 }
 
 void FEModelManager::Render()
@@ -577,12 +840,6 @@ void FEModelManager::Render()
         ImpostorManager::GetInstance()->Render(GetLayerView(eCLV_ImpostorOut), false);
     }
 }
-
-struct FEModelObject
-{
-    /* 0x00 */ u8 mUnidentified00[0x60];
-    /* 0x60 */ int mUnidentified60;
-};
 
 void FEModelManager::RegisterObject(void* model)
 {
@@ -622,8 +879,27 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
     const char* name, tCharacterTemplateInfo* modelData, bool unidentified59,
     void* unidentified4C, void* unidentified50, bool alternate)
 {
-    unsigned int nameHash = nlStringLowerHash(name);
+    {
+        unsigned int nameHash = nlStringLowerHash(name);
+        nlDLListIterator<FEModelHandle*> queued = mLoadedModels.Begin();
+        while (queued.hasNext())
+        {
+            assert((*queued)->mNameHash != nameHash);
+            queued.Step();
+        }
+    }
+    {
+        unsigned int nameHash = nlStringLowerHash(name);
+        nlListIterator<FEModelHandle*> active = mHandles.Begin();
+        while (active.IsValid())
+        {
+            assert(active.Current()->mNameHash != nameHash);
+            active.Next();
+        }
+    }
+
     FEModelHandle* handle = 0;
+    unsigned int nameHash = nlStringLowerHash(name);
     nlDLListIterator<FEModelHandle*> pending = mPendingModels.Begin();
     while (pending.hasNext())
     {
@@ -670,6 +946,55 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
     return handle;
 }
 
+bool FEModelManager::DestroyModel(FEModelHandle* handle)
+{
+    nlDLListIterator<FEModelHandle*> iterator = mLoadedModels.Begin();
+    while (iterator.hasNext())
+    {
+        if (*iterator == handle)
+        {
+            delete *iterator;
+            mLoadedModels.Remove(&iterator);
+            return true;
+        }
+        iterator.Step();
+    }
+
+    mHandles.RemoveEntry(handle);
+    mPendingModels.AddEnd(handle);
+    return true;
+}
+
+void FEModelManager::BeginLoadModels()
+{
+    CurrentAllocator = &VirtualAllocator;
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
+
+    nlDLListIterator<FEModelHandle*> iterator = mLoadedModels.Begin();
+    while (iterator.hasNext())
+    {
+        FEModelHandle* handle = *iterator;
+        FEModel* model = handle->mModel;
+        tCharacterTemplateInfo* modelData = model->mModelData;
+        model->mPendingLoads = 0xf;
+        if (handle->mUnidentified5A)
+        {
+            handle->mUnidentified5A = glBeginLoadTextureBundle(
+                modelData->pUnidentified18, FEModel::OnAlternateTexturesLoaded,
+                model, model->mLoader);
+        }
+        glBeginLoadTextureBundle(modelData->szTextureFilename,
+            FEModel::OnTexturesLoaded, model, model->mLoader);
+        mHandles.AddEnd(handle);
+        mLoadedModels.Remove(&iterator);
+        break;
+    }
+
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+}
+
 FEModelHandle* FEModelManager::GetModel(const char* name)
 {
     u32 hash = nlStringLowerHash(name);
@@ -683,6 +1008,22 @@ FEModelHandle* FEModelManager::GetModel(const char* name)
         entry = entry->next;
     }
     return 0;
+}
+
+void FEModelManager::ReleaseImpostors()
+{
+    ImpostorManager::GetInstance()->ResetImpostors();
+    nlDLListSlotPool<ImpostorCharacter*>& characters = ImpostorManager::GetInstance()->mCharacters;
+    characters.Free();
+    BasicSlotPool<DLListEntry<ImpostorCharacter*> >* pool =
+        &ImpostorManager::GetInstance()->mCharacters.m_Allocator;
+    pool->FreeBlocks();
+    unsigned long resource = mResource;
+    if (resource != 0)
+    {
+        glGetCurrentResourcePool()->ReleaseResource(resource);
+        mResource = 0;
+    }
 }
 
 FEImpostorCharacter::FEImpostorCharacter(
@@ -723,6 +1064,48 @@ FEImpostorCharacter::FEImpostorCharacter(
         "mfCameraLookatZCup", 1.2f, category, true, 0.0f, 10.0f, 0.01f);
     mfCameraDistanceCup.BindWithDefault(
         "mfCameraDistanceCup", 2.3f, category, true, 0.0f, 40.0f, 0.01f);
+}
+
+void FEImpostorCharacter::Render(GLView* target, int texture)
+{
+    nlDLListIterator<ImpostorSprite*> iterator = mSprites.Begin();
+    while (iterator.hasNext())
+    {
+        ImpostorSprite* sprite = *iterator;
+        int numSlots = sprite->mNumImpostorSlots;
+        int* slots = sprite->mImpostorSlots;
+        bool dim = nlRandomf(0.0f, 1.0f, &nlDefaultSeed) < lbl_806DD250;
+        float shade = dim ? 196 : 255;
+        for (int i = 0; i < numSlots; ++i)
+        {
+            int slot = slots[i];
+            Impostor* impostor = &ImpostorManager::GetInstance()->mImpostors[slot];
+            if (impostor->mpCharacter == this)
+            {
+                shade *= mEnabled ? lbl_806DD24C : 1.0f - lbl_806DD24C;
+                nlColourSet(impostor->mColour,
+                    lbl_806DD240 * shade, lbl_806DD244 * shade, lbl_806DD248 * shade, 255);
+            }
+        }
+        iterator.Step();
+    }
+
+    mModels[texture]->Render(target, 0);
+    if (nlStrNCmp(mName, "diddykong", 16) == 0)
+    {
+        int numPackets = mModels[texture]->mLastModel->numPackets;
+        glModel* model = mModels[texture]->mLastModel;
+        if (lbl_806E17F4 < numPackets)
+        {
+            static unsigned long alphaValue = nlStringLowerHash("alphaValue");
+            glSetMaterialFloatParameter(&model->packets[lbl_806E17F4], alphaValue, 0.0f);
+        }
+        if (lbl_806DD260 < numPackets)
+        {
+            static unsigned long alphaValue = nlStringLowerHash("alphaValue");
+            glSetMaterialFloatParameter(&model->packets[lbl_806DD260], alphaValue, 0.0f);
+        }
+    }
 }
 
 void FEImpostorCharacter::SetScale(float scale)

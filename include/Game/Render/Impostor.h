@@ -16,7 +16,7 @@ public:
 
     void Reset();
     void Set(ImpostorCharacter* character, const nlVector3& position,
-        u16 angle, float width, float height);
+        float width, float height, u16 angle);
     void Release();
 
     /* 0x04 */ ImpostorCharacter* mpCharacter;

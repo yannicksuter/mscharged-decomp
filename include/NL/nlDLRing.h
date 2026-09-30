@@ -67,15 +67,13 @@ inline void nlDLRingAddEnd(T** head, T* newNode)
 template <typename T>
 inline void nlDLRingRemove(T** head, T* current)
 {
-    T* next = current->m_next;
-
-    if (next == current)
+    if (current->m_next == current)
     {
         *head = 0;
         return;
     }
 
-    current->m_prev->m_next = next;
+    current->m_prev->m_next = current->m_next;
     current->m_next->m_prev = current->m_prev;
 
     if (*head == current)

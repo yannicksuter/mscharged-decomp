@@ -107,3 +107,6 @@ bool AIContext::IsTimerRunning(unsigned long key)
     Timer* timer = FindTimer(key);
     return timer != 0 && timer->m_uPackedTime != 0;
 }
+
+float (*lbl_806DF560)() = GetTickerMilliseconds;
+float (*lbl_806DF564)() = GetTickerMilliseconds;

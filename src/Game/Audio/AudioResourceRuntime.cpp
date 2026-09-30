@@ -18,9 +18,9 @@ AudioResourceRuntime* g_pAudioResourceRuntime;
 #define AUDIO_EFFECT_KEY 0xFE7BE6FB
 #define AUDIO_EFFECT_SET_KEY 0xECBAFA4B
 
-static inline u32 UnidentifiedGetEffectId(u32 definition)
+// Reads one property value of a definition node by property key.
+static inline u32 UnidentifiedGetDefinitionValue(u32 definition, u32 key)
 {
-    u32 key = AUDIO_EFFECT_KEY;
     return ConfigFindDefinition(definition)->Get(key).m_Words.m_Value;
 }
 
@@ -53,7 +53,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
     bool inverted, void* owner)
 {
     u32 definition = parameter->GetHash();
-    u32 effectId = UnidentifiedGetEffectId(definition);
+    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
 
     AudioEffectBase* effect;
     AudioEffectBase** found;
@@ -71,8 +71,9 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
                 AudioEffectSoundStartedVisitor(effect)));
     }
 
-    AudioEffectParameter* effectParameter
-        = effect->CreateParameter(definition, parameterData, inverted);
+    AudioEffectParameter* effectParameter = 0;
+    effect->CreateParameter(
+        definition, parameterData, inverted, &effectParameter);
     effect->AddParameter(effectParameter, owner);
 }
 
@@ -81,7 +82,7 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
     bool inverted, float duration)
 {
     u32 definition = parameter->GetHash();
-    u32 effectId = UnidentifiedGetEffectId(definition);
+    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
 
     AudioEffectBase* effect;
     AudioEffectBase** found;
@@ -99,8 +100,9 @@ static inline void UnidentifiedApplyEffect(AudioEffectBinding* binding,
                 AudioEffectSoundStartedVisitor(effect)));
     }
 
-    AudioEffectParameter* effectParameter
-        = effect->CreateParameter(definition, parameterData, inverted);
+    AudioEffectParameter* effectParameter = 0;
+    effect->CreateParameter(
+        definition, parameterData, inverted, &effectParameter);
     effect->AddParameter(effectParameter, duration);
 }
 
@@ -162,31 +164,30 @@ void SetAudioEffectContext(unsigned long* hash, int index)
     g_pAudioResourceRuntime->m_Script->SetEffectContext(*hash, index);
 }
 
-/**
- * Address/Size: 0x802F49C0 | size: 0x4C4
- *
- * Starts one effect of a definition on a binding: resolves the effect id from
- * the configuration tree, creates the effect through the factory the first
- * time the binding asks for it, tells every instance already running on the
- * binding about the new effect, then pushes the parameter the caller wants.
- */
-extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
-    void* parameterData, bool immediate, float value)
+// Looks up the live effect a binding already runs for an effect id.
+static inline bool UnidentifiedFindEffect(AudioEffectBinding* binding,
+    const u32& effectId, AudioEffectBase** effect)
 {
-    u32 key = *bindingKey;
-    u32 definition = *definitionKey;
-    AudioEffectBinding* binding
-        = g_pAudioResourceRuntime->m_Script->GetBinding(key);
-
-    u32 effectId = UnidentifiedGetEffectId(definition);
-
-    AudioEffectBase* effect;
     AudioEffectBase** found;
     bool foundEffect = binding->mEffects.FindGet(effectId, &found);
     if (foundEffect)
     {
-        effect = *found;
+        *effect = *found;
     }
+    return foundEffect;
+}
+
+// Starts one effect of a definition on a binding: resolves the effect id from
+// the configuration tree, creates the effect through the factory the first
+// time the binding asks for it, tells every instance already running on the
+// binding about the new effect, then pushes the parameter the caller wants.
+static inline bool UnidentifiedStartEffect(AudioEffectBinding* binding,
+    u32 definition, void* parameterData, bool immediate, float value)
+{
+    u32 effectId = UnidentifiedGetDefinitionValue(definition, AUDIO_EFFECT_KEY);
+
+    AudioEffectBase* effect;
+    bool foundEffect = UnidentifiedFindEffect(binding, effectId, &effect);
     if (!foundEffect)
     {
         effect = g_pAudioResourceRuntime->m_EffectFactory->CreateEffect(effectId);
@@ -196,9 +197,30 @@ extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
                 AudioEffectSoundStartedVisitor(effect)));
     }
 
-    AudioEffectParameter* parameter
-        = effect->CreateParameter(definition, parameterData, immediate);
+    AudioEffectParameter* parameter = 0;
+    effect->CreateParameter(definition, parameterData, immediate, &parameter);
     return effect->AddParameter(parameter, value);
+}
+
+// Starts the effect on the binding registered under a script key.
+static inline bool UnidentifiedStartBindingEffect(const u32& key, u32 definition,
+    void* parameterData, bool immediate, float value)
+{
+    return UnidentifiedStartEffect(
+        g_pAudioResourceRuntime->m_Script->GetBinding(key), definition,
+        parameterData, immediate, value);
+}
+
+/**
+ * Address/Size: 0x802F49C0 | size: 0x4C4
+ */
+extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
+    void* parameterData, bool immediate, float value)
+{
+    u32 key = *bindingKey;
+    u32 definition = *definitionKey;
+    return UnidentifiedStartBindingEffect(
+        key, definition, parameterData, immediate, value);
 }
 
 static inline void UnidentifiedApplyEffectSet(u32 bindingKey, u32 effectSetKey,

@@ -840,6 +840,12 @@ extern "C" float fn_800D7AB8(cFielder* pFielder)
     return 0.0f;
 }
 
+static float UnidentifiedFacingAdjustedConfidence(float fScore, cPlayer* pFielder, cPlayer* pOwner)
+{
+    return InterpolateRangeClamped(fScore, 0.33f * fScore, 1.0f, 0.0f,
+        fn_800DDF54(pFielder, pOwner));
+}
+
 extern "C" float fn_800D7B00(cFielder* pFielder)
 {
     if (pFielder == NULL)
@@ -865,8 +871,14 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         fScore = NormalizeVal(fDistance / fSpeed, 4.3f * fDuration, 0.08f);
     }
     if (pOwner != NULL && pOwner->fn_8003E74C() && !pFielder->fn_8003E74C())
-        fScore = InterpolateRangeClamped(fScore, 0.33f * fScore, 1.0f, 0.0f, fn_800DDF54(pFielder, pOwner));
+        fScore = UnidentifiedFacingAdjustedConfidence(fScore, pFielder, pOwner);
     return fScore;
+}
+
+static float UnidentifiedBallApproachConfidence(float fClosingScore, cPlayer* pPlayer)
+{
+    float fFacingScore = fn_800DE0A8(pPlayer);
+    return fClosingScore / 2.0f + fFacingScore / 2.0f;
 }
 
 float AbleToInterceptBall(cPlayer* pPlayer)
@@ -896,9 +908,8 @@ float AbleToInterceptBall(cPlayer* pPlayer)
             if (bHasGlobalPad)
             {
                 float fClosingScore = ClosingTo(pFielder, g_pBall);
-                float fFacingScore = fn_800DE0A8(pFielder);
                 fScore = FMIN(1.0f, fScore * InterpolateClamped(1.0f, 1.6f,
-                    fClosingScore / 2.0f + fFacingScore / 2.0f));
+                    UnidentifiedBallApproachConfidence(fClosingScore, pFielder)));
             }
         }
         else if (pPlayer->m_eClassType == GOALIE)
@@ -1391,6 +1402,16 @@ extern "C" float fn_800D9480(cFielder* pFielder)
     return FMIN(FMAX(fScore, 0.0f), 1.0f);
 }
 
+static float UnidentifiedOpponentAttackConfidence(cFielder* pFielder, cPlayer* pOpponent,
+    float fAngleWeight, float fClosingWeight)
+{
+    float fFacing = fn_800DDF54(pOpponent, pFielder);
+    float fClosing = ClosingTo(pFielder, pOpponent);
+    fClosing = FMIN(NearTo(pFielder, pOpponent), fClosing);
+    fClosing = FMAX(CloseTo(pFielder, pOpponent), fClosing);
+    return fFacing * fAngleWeight + fClosing * fClosingWeight;
+}
+
 extern "C" float fn_800D96F4(cFielder* pFielder)
 {
     if (pFielder == NULL)
@@ -1414,13 +1435,7 @@ extern "C" float fn_800D96F4(cFielder* pFielder)
         }
         if (bAttacking)
         {
-            float fFacing = fn_800DDF54(pOpponent, pFielder);
-            float fClosing = ClosingTo(pFielder, pOpponent);
-            fClosing = FMIN(NearTo(pFielder, pOpponent), fClosing);
-            fClosing = FMAX(CloseTo(pFielder, pOpponent), fClosing);
-            float fAngleWeight = 0.2f;
-            float fClosingWeight = 0.8f;
-            fScore += fFacing * fAngleWeight + fClosing * fClosingWeight;
+            fScore += UnidentifiedOpponentAttackConfidence(pFielder, pOpponent, 0.2f, 0.8f);
         }
     }
     return FMIN(FMAX(fScore, 0.0f), 1.0f);
@@ -2848,15 +2863,17 @@ static float Facing(unsigned short facingAngle, const nlVector3& direction)
     nlPolar p;
     nlCartesianToPolar(p, direction);
     s16 nFacingDelta = nlAngleDiff(facingAngle, p.a);
-    nFacingDelta = (u16)(nFacingDelta < 0 ? -nFacingDelta : nFacingDelta);
-    int nFullConfidence = g_pGame->m_pFuzzyTweaks->nFacingFullConfidenceAngle;
+    nFacingDelta = (u16)abs_s16(nFacingDelta);
+    int nFullConfidence = g_pGame->m_pFuzzyTweaks->nFacingFullConfidenceAngle.GetValue();
     if (nFacingDelta < nFullConfidence)
         return 1.0f;
-    if (nFacingDelta > g_pGame->m_pFuzzyTweaks->nFacingNoConfidenceAngle)
+    int nNoConfidence = g_pGame->m_pFuzzyTweaks->nFacingNoConfidenceAngle.GetValue();
+    if (nFacingDelta > nNoConfidence)
         return 0.0f;
-    float fRange = (float)(g_pGame->m_pFuzzyTweaks->nFacingNoConfidenceAngle
-        - nFullConfidence);
-    return 1.0f - (float)(nFacingDelta - nFullConfidence) / fRange;
+    int nOffset = nFacingDelta;
+    nOffset -= nFullConfidence;
+    float fOffset = (float)nOffset;
+    return 1.0f - fOffset / (float)(nNoConfidence - nFullConfidence);
 }
 
 extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder)
@@ -3594,6 +3611,11 @@ extern "C" float fn_800DF838(cPlayer* pPlayer)
     return fScore;
 }
 
+static float UnidentifiedConfidenceAverage(float fClosing, float fNear, float fAble)
+{
+    return (fNear + (fAble + fClosing)) / 3.0f;
+}
+
 extern "C" float fn_800DF888(cTeam* team)
 {
     if (team == NULL)
@@ -3603,29 +3625,16 @@ extern "C" float fn_800DF888(cTeam* team)
     players[1] = team->GetOtherTeam()->GetBestBallInterceptor();
     float score[2];
     float fOwner;
-    float fReceiving;
-    float fClosing;
-    float fNear;
-    float fAble;
-    float fIntercept;
 
     fOwner = BallOwner(players[0]);
-    fReceiving = ReceivingPass(players[0]);
-    fClosing = ClosingTo(players[0], g_pBall);
-    fNear = NearToBall(players[0]);
-    fAble = AbleToInterceptBall(players[0]);
-    fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
-    fIntercept = FMIN(fn_800DED80(players[0]), fIntercept);
-    score[0] = FMAX(fOwner, FMAX(fReceiving, fIntercept));
+    score[0] = FMAX(fOwner, FMAX(ReceivingPass(players[0]),
+        FMIN(fn_800DED80(players[0]), UnidentifiedConfidenceAverage(
+            ClosingTo(players[0], g_pBall), NearToBall(players[0]), AbleToInterceptBall(players[0])))));
 
     fOwner = BallOwner(players[1]);
-    fReceiving = ReceivingPass(players[1]);
-    fClosing = ClosingTo(players[1], g_pBall);
-    fNear = NearToBall(players[1]);
-    fAble = AbleToInterceptBall(players[1]);
-    fIntercept = (fNear + (fAble + fClosing)) / 3.0f;
-    fIntercept = FMIN(fn_800DED80(players[1]), fIntercept);
-    score[1] = FMAX(fOwner, FMAX(fReceiving, fIntercept));
+    score[1] = FMAX(fOwner, FMAX(ReceivingPass(players[1]),
+        FMIN(fn_800DED80(players[1]), UnidentifiedConfidenceAverage(
+            ClosingTo(players[1], g_pBall), NearToBall(players[1]), AbleToInterceptBall(players[1])))));
     return score[0] / FMAX(0.1f, score[0] + score[1]);
 }
 

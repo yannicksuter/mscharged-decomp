@@ -117,8 +117,7 @@ void ImpostorManager::Uninitialize()
         mImpostors = 0;
     }
 
-    mCharacters.Clear();
-    mCharacters.m_Allocator.FreeBlocks();
+    mCharacters.Free();
 
     BasicSlotPool<DLListEntry<ImpostorCharacter*> >* pool =
         &mCharacters.m_Allocator;
@@ -431,7 +430,7 @@ void ImpostorManager::UpdatePositions(const nlVector3* direction, const nlVector
 void ImpostorManager::StaggerAnimations()
 {
     float phase = 0.0f;
-    int count = nlDLRingCountElements(mCharacters.m_Head);
+    int count = mCharacters.CountElements();
     float step = 1.0f / (4.0f * (float)count);
 
     nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();

@@ -202,6 +202,7 @@ public:
     unsigned int* fn_80052034();
     bool CalculateFielderPosition(nlVector3& v3DestPosition, cFielder* pFielder,
         bool bInPosition, float fBallPosFormationWeight);
+    void ClearFormationEvaluators();
     static void LoadFormationSets();
     static void UnloadFormationSets();
     static FormationSpec* GetFormationSpec(eFormation specType);

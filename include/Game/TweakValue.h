@@ -214,6 +214,11 @@ public:
 
     bool BindWithDefault(const char*, int, const char*, bool, float, float, float);
 
+    const int& GetValue() const
+    {
+        return *m_pValue;
+    }
+
     operator int() const
     {
         return *m_pValue;

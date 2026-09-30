@@ -1747,10 +1747,16 @@ Game/SH/SHOptions.cpp:
 	.sdata2     start:0x806E55E0 end:0x806E55F0
 
 Game/FE/feOptionsSubMenus.cpp:
-	.text       start:0x801D3674 end:0x801D90C0
-	.data       start:0x80518FA8 end:0x80519310
-	.sdata      start:0x806DD418 end:0x806DD480
-	.sdata2     start:0x806E55F0 end:0x806E5648
+	.text       start:0x801D3674 end:0x801D87C4
+	.data       start:0x80518FA8 end:0x805192A0
+	.sdata      start:0x806DD418 end:0x806DD460
+	.sdata2     start:0x806E55F0 end:0x806E5618
+
+Game/FE/tu_801D87C4.cpp:
+	.text       start:0x801D87C4 end:0x801D90C0
+	.data       start:0x805192A0 end:0x80519310
+	.sdata      start:0x806DD460 end:0x806DD480
+	.sdata2     start:0x806E5618 end:0x806E5648
 
 Game/SH/SHMoviePlayer.cpp:
 	.text       start:0x801D90C0 end:0x801DA134
@@ -3998,7 +4004,11 @@ Game/AI/tu_8030EDB0.cpp:
 Game/AI/AIContext.cpp:
 	.text       start:0x8030F5DC end:0x8030FD40
 	.data       start:0x805300C8 end:0x805300D8
+	.sdata      start:0x806DF560 end:0x806DF568
 	.sdata2     start:0x806E6848 end:0x806E6860
+
+Game/AI/Scripts/ScriptCaching.cpp:
+	.sdata      start:0x806DF568 end:0x806DF570
 
 Game/AI/tu_8030F5DC.cpp:
 	.text       start:0x8030FD40 end:0x803115F4
@@ -4017,7 +4027,7 @@ Game/AI/tu_80311734.cpp:
 	.ctors      start:0x804DBAB4 end:0x804DBAB8
 	.data       start:0x80530148 end:0x80530248
 	.bss        start:0x805842E0 end:0x80584340
-	.sdata      start:0x806DF560 end:0x806DF5A0
+	.sdata      start:0x806DF570 end:0x806DF5A0
 	.sbss       start:0x806E20A0 end:0x806E20B8
 	.sdata2     start:0x806E6870 end:0x806E6880
 

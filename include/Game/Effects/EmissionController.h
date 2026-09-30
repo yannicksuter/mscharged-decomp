@@ -17,14 +17,14 @@ struct EffectsSpec;
 class EmissionController
 {
 public:
-    EmissionController(EffectsGroup* pEffectsGroup, EmissionManager* arg5, unsigned short id, void* arg7, int view);
+    EmissionController(EffectsGroup* pGroup, EmissionManager* pManager, unsigned short id, void* pContext, int glView);
     ~EmissionController();
     void InitializeSystemsFromGroup();
-    void SetPosition(const nlVector3& pos);
-    void SetDirection(const nlVector3& dir);
+    void SetPosition(const nlVector3& position);
+    void SetDirection(const nlVector3& direction);
     void SetVelocity(const nlVector3& velocity);
-    void SetPoseAccumulator(const cPoseAccumulator& pose);
-    void SetAnimController(const cPN_SAnimController& animController);
+    void SetPoseAccumulator(const cPoseAccumulator& pPose);
+    void SetAnimController(const cPN_SAnimController& animc);
     void ClearParticles();
     void Die();
     const nlVector3& GetPosition() const
@@ -33,20 +33,20 @@ public:
     }
     float GetRemainingTime() const;
     bool IsLingering() const;
-    void fn_802E4DF8(EffectsSpec& spec, nlVector3& pos, nlVector3& vel);
-    void fn_802E5164(EffectsSpec* pSpec, ParticleSystem* pSys);
+    void ComputePositionAndVelocity(EffectsSpec& spec, nlVector3& pos, nlVector3& vel);
+    void UpdateParticleSystemDirection(EffectsSpec* pSpec, ParticleSystem* pSys);
     bool Update(float dt);
     int Render();
     float GetBoundingRadius() const;
-    void SetUpdateCallback(const Function1<void, EmissionController&>& callback);
-    void SetFinishedCallback(const Function2<void, EmissionController&, int>& callback);
+    void SetUpdateCallback(const Function1<void, EmissionController&>& ucb);
+    void SetFinishedCallback(const Function2<void, EmissionController&, int>& fcb);
 
     /* 0x00 */ EffectsGroup* m_pGroup;
     /* 0x04 */ nlDLListContainer<ParticleSystem*> m_Systems;
     /* 0x0C */ Function<void(EmissionController&)> mUpdateCallback;
     /* 0x14 */ Function<void(EmissionController&, int)> mFinishedCallback;
     /* 0x1C */ void* m_pContext;
-    /* 0x20 */ Function<nlVector3(EmissionController&, EffectsSpec&)> mUnidentified020;
+    /* 0x20 */ Function<nlVector3(EmissionController&, EffectsSpec&)> mPositionCallback;
     /* 0x28 */ bool m_Replaying;
     /* 0x29 */ u8 unknown_0x29[0x03];
     /* 0x2C */ float m_Age;
@@ -83,6 +83,9 @@ public:
     /* 0x8C */ u32 m_View;
 };
 
+void ComputeAscendingJointPosition(nlVector3& out, const cPoseAccumulator* pPose,
+    u32 uJointID, float fVelocity, float fcurrentTime);
+bool fxUpdateParticleSystem(EmissionController* controller, ParticleSystem* pSys, int& numSys, float dt);
 void* fxLoadEntireFileHigh(const char* filename, unsigned long* fileSize);
 
 #endif // GAME_EFFECTS_EMISSION_CONTROLLER_H

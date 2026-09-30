@@ -78,35 +78,15 @@ FormationManager::FormationManager(cTeam* pTeam)
 
 FormationManager::~FormationManager()
 {
-    s32 j;
-    FormationEval** pp = (FormationEval**)this;
-    for (j = 0; j < 3; j++)
-    {
-        FormationEval* pEval = pp[1];
-        delete pEval;
-        *++pp = 0;
-    }
+    ClearFormationEvaluators();
 }
 
-static inline void ClearFormationEvaluators()
+void FormationManager::ClearFormationEvaluators()
 {
-    if (g_pTeams[0] != 0 && g_pTeams[1] != 0)
+    for (int i = 0; i < 3; i++)
     {
-        FormationEval** pp;
-        cTeam** ppTeam = g_pTeams;
-        s32 i;
-        s32 j;
-        for (i = 0; i < 2; i++)
-        {
-            pp = (FormationEval**)(*ppTeam)->m_pFormationManager;
-            for (j = 0; j < 3; j++)
-            {
-                FormationEval* pEval = pp[1];
-                delete pEval;
-                *++pp = 0;
-            }
-            ppTeam++;
-        }
+        delete m_pFormations[i];
+        m_pFormations[i] = 0;
     }
 }
 
@@ -138,12 +118,7 @@ void FormationManager::LoadFormationSets()
         return;
     }
 
-    if (g_pGame != 0)
-    {
-        ClearFormationEvaluators();
-    }
-
-    delete[] m_FormationSetArray;
+    UnloadFormationSets();
     m_FormationSetArray = pFormationSets;
     m_NumFormationSets = numSets;
 
@@ -151,39 +126,25 @@ void FormationManager::LoadFormationSets()
     {
         if (g_pTeams[0] != 0 && g_pTeams[1] != 0)
         {
-            s32 i_team;
-            cTeam** ppTeam = g_pTeams;
-            for (i_team = 0; i_team < 2; i_team++)
+            for (int i_team = 0; i_team < 2; i_team++)
             {
-                (*ppTeam)->m_pFormationManager->ChooseNewFormations();
-                ppTeam++;
+                g_pTeams[i_team]->m_pFormationManager->ChooseNewFormations();
             }
         }
     }
 }
 
-static inline void ClearFormationEvals(FormationEval** pp)
-{
-    for (s32 j = 0; j < 3; j++)
-    {
-        FormationEval* pEval = pp[1];
-        delete pEval;
-        *++pp = 0;
-    }
-}
-
 void FormationManager::UnloadFormationSets()
 {
-    s32 i;
+    int i_team;
 
     if (g_pGame != 0)
     {
         if (g_pTeams[0] != 0 && g_pTeams[1] != 0)
         {
-            for (i = 0; i < 2; i++)
+            for (i_team = 0; i_team < 2; i_team++)
             {
-                ClearFormationEvals(
-                    (FormationEval**)g_pTeams[i]->m_pFormationManager);
+                g_pTeams[i_team]->m_pFormationManager->ClearFormationEvaluators();
             }
         }
     }

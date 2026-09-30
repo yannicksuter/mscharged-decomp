@@ -9,10 +9,7 @@ extern unsigned char lbl_806DF568;
 class ScriptQuestionCache
 {
 public:
-    ScriptQuestionCache()
-        : mQuestionCacheMap(16, 16)
-    {
-    }
+    ScriptQuestionCache();
 
     ~ScriptQuestionCache()
     {

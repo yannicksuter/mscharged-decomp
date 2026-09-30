@@ -1,7 +1,7 @@
+#include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/AIContext.h"
-#include "Game/AI/Scripts/ScriptCaching.h"
 
 #include "Game/AI/Desire.h"
 #include "Game/AI/TransitionFunc.h"
@@ -44,6 +44,11 @@ struct FuzzyRuntimeList
     FuzzyRuntimeBase* mHead;
     FuzzyRuntimeBase* mTail;
 };
+
+ScriptQuestionCache::ScriptQuestionCache()
+    : mQuestionCacheMap(16, 16)
+{
+}
 
 void* g_pFuzzyByteCode;
 FuzzyRuntimeList g_FuzzyRuntimes(0, 0);
@@ -543,9 +548,17 @@ void FuzzyRuntimeBase::AddAction(
         entry->mQueue->fn_80310040(action);
     if (value != 0)
     {
-        float confidence = GetActionFloatParameter(value, 4, 0.0f);
-        entry->mConfidence =
-            nlMaxEquals(entry->mConfidence, confidence);
+        float confidence;
+        if (value->ExtraData.IsSet(4))
+        {
+            FuzzyVariant* parameter = value->ExtraData.Get(4);
+            confidence = parameter->mData.f;
+        }
+        else
+        {
+            confidence = 0.0f;
+        }
+        entry->mConfidence = nlMaxEquals(entry->mConfidence, confidence);
     }
     mReturnInstructionOffset = -1;
 }
@@ -828,16 +841,4 @@ extern "C" void FuzzyPrintFloat(float value)
 extern "C" void FuzzyPrintString(void*, const char* value)
 {
     nlPrintf(value);
-}
-
-extern "C" UnidentifiedVariant_80054AB8* FuzzyReturnVariantCopy(
-    FuzzyRuntimeBase* runtime,
-    UnidentifiedVariant_80054AB8 value, float confidence)
-{
-    UnidentifiedVariant_80054AB8* result =
-        new (lbl_805842C8.Allocate())
-            UnidentifiedVariant_80054AB8(value);
-    result->SetParameter(4, FuzzyVariant(confidence));
-    runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
-    return runtime->ReturnValue(result, confidence);
 }

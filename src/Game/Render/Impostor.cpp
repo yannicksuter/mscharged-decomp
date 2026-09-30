@@ -40,7 +40,7 @@ void Impostor::Reset()
 }
 
 void Impostor::Set(ImpostorCharacter* character, const nlVector3& position,
-    u16 angle, float width, float height)
+    float width, float height, u16 angle)
 {
     mpCharacter = character;
     mpSprite = 0;

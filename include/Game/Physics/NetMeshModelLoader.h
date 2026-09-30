@@ -34,7 +34,7 @@ public:
 
         const nlVector3* GetPosition() const;
         void GetNormal(nlVector3& normal) const;
-        void GetTextureCoord(nlVector2& txtCoord) const;
+        void GetTextureCoord(nlVector2& texCoord) const;
 
         bool operator==(const NetMeshVertex& o) const
         {
@@ -119,8 +119,8 @@ public:
 
     void LoadGeometryFromModel();
     void ReadVerticesFromGeometryPacket(const glModelPacket& packet);
-    void AddEdge(const glModelPacket& packet, unsigned short idx1,
-        unsigned short idx2);
+    void AddEdge(const glModelPacket& packet, unsigned short vertexIndex1,
+        unsigned short vertexIndex2);
     void AddTriangleFromGeometry(
         const glModelPacket& packet, unsigned short* vertexIndices);
     void ReadEdgesFromGeometryPacket(const glModelPacket& packet);

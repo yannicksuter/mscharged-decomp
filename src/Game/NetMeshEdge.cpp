@@ -72,7 +72,7 @@ void NetMeshModelLoader::NetMeshVertex::GetNormal(nlVector3& normal) const
 }
 
 void NetMeshModelLoader::NetMeshVertex::GetTextureCoord(
-    nlVector2& txtCoord) const
+    nlVector2& texCoord) const
 {
     const glModelStream* layout = GetStream(mpPacket, 4);
 
@@ -80,20 +80,20 @@ void NetMeshModelLoader::NetMeshVertex::GetTextureCoord(
     {
         s16 texCoordX = *(const s16*)((const u8*)layout->address
                                       + mIndex * layout->stride);
-        txtCoord.x = (float)texCoordX;
-        txtCoord.x *= 0.0009765625f;
+        texCoord.x = (float)texCoordX;
+        texCoord.x *= 0.0009765625f;
         s16 texCoordY = *(const s16*)((const u8*)layout->address
                                       + mIndex * layout->stride + 2);
-        txtCoord.y = (float)texCoordY;
-        txtCoord.y *= 0.0009765625f;
+        texCoord.y = (float)texCoordY;
+        texCoord.y *= 0.0009765625f;
     }
     else if (layout->stride == 8)
     {
         float f = 1.0f;
-        txtCoord.x = *(const float*)((const u8*)layout->address
+        texCoord.x = *(const float*)((const u8*)layout->address
                                      + mIndex * layout->stride)
                    / f;
-        txtCoord.y = *(const float*)((const u8*)layout->address
+        texCoord.y = *(const float*)((const u8*)layout->address
                                      + mIndex * layout->stride + 4)
                    / f;
     }

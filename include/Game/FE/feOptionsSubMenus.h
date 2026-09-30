@@ -30,22 +30,23 @@ public:
 class OptionsAudioMenuV2 : public OptionsSubMenu
 {
 public:
-    OptionsAudioMenuV2(int value);
+    OptionsAudioMenuV2(int mode);
     virtual ~OptionsAudioMenuV2();
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void fn_801D474C();
-    void fn_801D4E9C(int setting);
-    void fn_801D4F70(int index, void* context);
-    void fn_801D5108(int index, void* context);
-    void fn_801D5278(int index, void* context);
-    void fn_801D575C(int index, void* context);
-    void fn_801D57D8(int index, void* context);
-    void fn_801D583C(int index, void* context);
-    void fn_801D58EC(int setting);
+    void InitializePointerButtons();
+    void UpdateVolumeBars(int setting);
+    void OnVolumeButtonPointerEnter(int index, void* context);
+    void OnVolumeButtonPointerLeave(int index, void* context);
+    void OnVolumeButtonPointerPress(int index, void* context);
+    void OnSaveButtonPointerEnter(int index, void* context);
+    void OnSaveButtonPointerLeave(int index, void* context);
+    void OnSaveButtonPointerPress(int index, void* context);
+    void UpdateVolumeLevelText(int setting);
+    void MarkUnusedVolumeButtons();
 
-    bool UnidentifiedVolumeButtonEnabled(unsigned int item) const
+    bool IsVolumeButtonEnabled(unsigned int item) const
     {
         bool enabled;
         switch (item)
@@ -75,16 +76,16 @@ public:
         return enabled;
     }
 
-    /* 0x028 */ int mUnidentified28;
+    /* 0x028 */ int mOverlayMode;
     /* 0x02C */ FEBackButton mNavigation;
     /* 0x104 */ TLComponentInstance* mButtons[6];
     /* 0x11C */ TLComponentInstance* mSaveButton;
     /* 0x120 */ TLInstance* mVolumeBars[3][10];
     /* 0x198 */ FEPointerButton mButtonComponents[6];
     /* 0x5D0 */ FEPointerButton mSaveButtonComponent;
-    /* 0x684 */ bool mUnidentified684;
-    /* 0x685 */ bool mUnidentified685;
-    /* 0x686 */ bool mUnidentified686;
+    /* 0x684 */ bool mPointerButtonsInitialized;
+    /* 0x685 */ bool mIntroSoundPlayed;
+    /* 0x686 */ bool mSaveStarted;
     /* 0x687 */ u8 mPadding687;
     /* 0x688 */ int mSettings[3];
     /* 0x694 */ int mBackupSettings[3];
@@ -95,24 +96,24 @@ public:
 class OptionsVisualMenuV2 : public OptionsSubMenu
 {
 public:
-    OptionsVisualMenuV2(int value);
+    OptionsVisualMenuV2(int mode);
     virtual ~OptionsVisualMenuV2();
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    void fn_801D6E80();
+    void InitializePointerButtons();
     void UpdateZoomLevelText(TLTextInstance* text, const u16 (&number)[4], const u16* localized);
-    void fn_801D7948(int index, void* context);
-    void fn_801D7A0C(int index, void* context);
-    void fn_801D7AA8(int index, void* context);
-    void fn_801D7EC8(int index, void* context);
-    void fn_801D7F9C(int index, void* context);
-    void fn_801D8048(int index, void* context);
-    void fn_801D8458(int index, void* context);
-    void fn_801D84D4(int index, void* context);
-    void fn_801D8538(int index, void* context);
+    void OnZoomLevelPointerEnter(int index, void* context);
+    void OnZoomLevelPointerLeave(int index, void* context);
+    void OnZoomLevelPointerPress(int index, void* context);
+    void OnZoomModePointerEnter(int index, void* context);
+    void OnZoomModePointerLeave(int index, void* context);
+    void OnZoomModePointerPress(int index, void* context);
+    void OnSaveButtonPointerEnter(int index, void* context);
+    void OnSaveButtonPointerLeave(int index, void* context);
+    void OnSaveButtonPointerPress(int index, void* context);
 
-    /* 0x028 */ int mUnidentified28;
+    /* 0x028 */ int mOverlayMode;
     /* 0x02C */ FEBackButton mNavigation;
     /* 0x104 */ TLComponentInstance* mButtons[5];
     /* 0x118 */ TLComponentInstance* mZoomButtons[2];
@@ -120,9 +121,9 @@ public:
     /* 0x124 */ FEPointerButton mButtonComponents[5];
     /* 0x4A8 */ FEPointerButton mZoomButtonComponents[2];
     /* 0x610 */ FEPointerButton mSaveButtonComponent;
-    /* 0x6C4 */ bool mUnidentified6C4;
-    /* 0x6C5 */ bool mUnidentified6C5;
-    /* 0x6C6 */ bool mUnidentified6C6;
+    /* 0x6C4 */ bool mPointerButtonsInitialized;
+    /* 0x6C5 */ bool mIntroSoundPlayed;
+    /* 0x6C6 */ bool mSaveStarted;
     /* 0x6C7 */ u8 mPadding6C7;
     /* 0x6C8 */ int mSettings[2];
     /* 0x6D0 */ u16 mFormattedZoomLevel[16];

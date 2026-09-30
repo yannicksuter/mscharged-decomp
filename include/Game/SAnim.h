@@ -90,6 +90,11 @@ public:
         return m_pCallbackList;
     }
 
+    float UnidentifiedGetLinearSpeed() const
+    {
+        return m_fLinearSpeed;
+    }
+
     float GetDuration() const
     {
         float fNumKeys = m_nNumKeys;

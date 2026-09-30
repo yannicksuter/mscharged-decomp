@@ -12,9 +12,25 @@
 
 static int numLingeringSystems;
 
-EmissionController::EmissionController(EffectsGroup* pEffectsGroup, EmissionManager* arg5, unsigned short id, void* arg7, int view)
-    : m_pGroup(pEffectsGroup)
-    , m_pContext(arg7)
+void EmissionController::ClearParticles()
+{
+    nlDLListIterator<ParticleSystem*> iterator = m_Systems.Begin();
+    while (iterator.hasNext())
+    {
+        ParticleSystem* p = *iterator;
+        p->ClearParticles();
+        iterator.Step();
+    }
+
+    if (mFinishedCallback)
+    {
+        mFinishedCallback(*this, 0);
+    }
+}
+
+EmissionController::EmissionController(EffectsGroup* pGroup, EmissionManager* pManager, unsigned short id, void* pContext, int glView)
+    : m_pGroup(pGroup)
+    , m_pContext(pContext)
     , m_Replaying(false)
     , m_Age(0.0f)
     , m_TimeScale(1.0f)
@@ -22,10 +38,10 @@ EmissionController::EmissionController(EffectsGroup* pEffectsGroup, EmissionMana
     , m_bDying(false)
     , m_Id(id)
     , m_bPoseErrorDisplayed(false)
-    , m_pManager(arg5)
-    , m_View(view)
+    , m_pManager(pManager)
+    , m_View(glView)
 {
-    m_bLingering = m_pGroup->mUnidentified0C != 0;
+    m_bLingering = m_pGroup->m_bIsLingering != 0;
     m_uUserData = 0;
 
     InitializeSystemsFromGroup();
@@ -68,7 +84,7 @@ void EmissionController::InitializeSystemsFromGroup()
             continue;
         }
 
-        if (pSpec->mUnidentified038 == 0 || pSpec->mUnidentified038 == fxGetTerrain())
+        if (pSpec->m_uTerrainID == 0 || pSpec->m_uTerrainID == fxGetTerrain())
         {
             ParticleSystem* pSys = new (nlMalloc(sizeof(ParticleSystem), 8, false))
                 ParticleSystem(pSpec->m_pTemplate, &m_pManager->mParticles, pSpec, m_View);
@@ -116,22 +132,6 @@ void EmissionController::InitializeSystemsFromGroup()
     }
 }
 
-void EmissionController::ClearParticles()
-{
-    nlDLListIterator<ParticleSystem*> iterator = m_Systems.Begin();
-    while (iterator.hasNext())
-    {
-        ParticleSystem* p = *iterator;
-        p->ClearParticles();
-        iterator.Step();
-    }
-
-    if (mFinishedCallback)
-    {
-        mFinishedCallback(*this, 0);
-    }
-}
-
 EmissionController::~EmissionController()
 {
     if (mFinishedCallback)
@@ -165,14 +165,14 @@ EmissionController::~EmissionController()
     }
 }
 
-void EmissionController::SetPosition(const nlVector3& pos)
+void EmissionController::SetPosition(const nlVector3& position)
 {
-    m_vPosition = pos;
+    m_vPosition = position;
 }
 
-void EmissionController::SetDirection(const nlVector3& dir)
+void EmissionController::SetDirection(const nlVector3& direction)
 {
-    m_vDirection = dir;
+    m_vDirection = direction;
 }
 
 void EmissionController::SetVelocity(const nlVector3& velocity)
@@ -181,15 +181,15 @@ void EmissionController::SetVelocity(const nlVector3& velocity)
 }
 
 void EmissionController::SetPoseAccumulator(
-    const cPoseAccumulator& pose)
+    const cPoseAccumulator& pPose)
 {
-    m_pPose = &pose;
+    m_pPose = &pPose;
 }
 
 void EmissionController::SetAnimController(
-    const cPN_SAnimController& animController)
+    const cPN_SAnimController& animc)
 {
-    m_pAnimController = &animController;
+    m_pAnimController = &animc;
 }
 
 void EmissionController::Die()
@@ -234,12 +234,7 @@ float EmissionController::GetRemainingTime() const
     return maxRemainingTime;
 }
 
-bool EmissionController::IsLingering() const
-{
-    return m_bLingering;
-}
-
-extern "C" void fn_802E4C78(nlVector3& out, const cPoseAccumulator* pPose,
+void ComputeAscendingJointPosition(nlVector3& out, const cPoseAccumulator* pPose,
     u32 uJointID, float fVelocity, float fcurrentTime)
 {
     float fsetDistance = fVelocity * fcurrentTime;
@@ -257,8 +252,8 @@ extern "C" void fn_802E4C78(nlVector3& out, const cPoseAccumulator* pPose,
 
         if (dist >= fsetDistance)
         {
-            float ratio = fsetDistance / dist;
-            nlVecLerp(out, jointMat.GetTranslation(), parentMat.GetTranslation(), ratio);
+            float fInterp = fsetDistance / dist;
+            nlVecLerp(out, jointMat.GetTranslation(), parentMat.GetTranslation(), fInterp);
             break;
         }
 
@@ -274,40 +269,19 @@ extern "C" void fn_802E4C78(nlVector3& out, const cPoseAccumulator* pPose,
     }
 }
 
-extern "C" bool fn_802E502C(
-    EmissionController* controller, ParticleSystem* pSys, int& numSys, float dt)
+bool EmissionController::IsLingering() const
 {
-    pSys->m_aFacing = controller->m_aFacing;
-    EffectsSpec* pSpec = pSys->m_pSpec;
-
-    if (pSpec->mUnidentified038 != 0 && pSpec->mUnidentified038 != fxGetTerrain())
-    {
-        return true;
-    }
-
-    numSys++;
-    pSys->m_uLayer = pSpec->m_uLayer;
-
-    nlVector3 pos = controller->m_vPosition;
-    nlVector3 vel = controller->m_vVelocity;
-    controller->fn_802E4DF8(*pSpec, pos, vel);
-    pSys->m_vPosition = pos;
-    pSys->m_vVelocity = vel;
-    controller->fn_802E5164(pSpec, pSys);
-
-    pSys->UpdateCoordSys();
-    pSys->m_bVisible = controller->m_bVisible;
-    return pSys->Update(dt);
+    return m_bLingering;
 }
 
-void EmissionController::fn_802E4DF8(EffectsSpec& spec, nlVector3& pos, nlVector3& vel)
+void EmissionController::ComputePositionAndVelocity(EffectsSpec& spec, nlVector3& pos, nlVector3& vel)
 {
     pos = m_vPosition;
     vel = m_vVelocity;
 
-    if (mUnidentified020)
+    if (mPositionCallback)
     {
-        pos = mUnidentified020(*this, spec);
+        pos = mPositionCallback(*this, spec);
     }
     else if (spec.m_eAttach == FXBind_Joint || spec.m_eAttach == 3)
     {
@@ -317,7 +291,7 @@ void EmissionController::fn_802E4DF8(EffectsSpec& spec, nlVector3& pos, nlVector
             vel.y = 0.0f;
             vel.z = 0.0f;
 
-            fn_802E4C78(pos, m_pPose,
+            ComputeAscendingJointPosition(pos, m_pPose,
                 m_uJointIDOverride == 0 ? spec.m_uJointID : m_uJointIDOverride,
                 spec.m_fJointVelocity, m_Age);
         }
@@ -349,16 +323,42 @@ void EmissionController::fn_802E4DF8(EffectsSpec& spec, nlVector3& pos, nlVector
     pos.z += spec.m_fOffset;
 }
 
-void EmissionController::fn_802E5164(EffectsSpec* pSpec, ParticleSystem* pSys)
+bool fxUpdateParticleSystem(
+    EmissionController* controller, ParticleSystem* pSys, int& numSys, float dt)
 {
-    if (pSpec->mUnidentified048 == 0 || m_pPose == 0)
+    pSys->m_aFacing = controller->m_aFacing;
+    EffectsSpec* pSpec = pSys->m_pSpec;
+
+    if (pSpec->m_uTerrainID != 0 && pSpec->m_uTerrainID != fxGetTerrain())
+    {
+        return true;
+    }
+
+    numSys++;
+    pSys->m_uLayer = pSpec->m_uLayer;
+
+    nlVector3 pos = controller->m_vPosition;
+    nlVector3 vel = controller->m_vVelocity;
+    controller->ComputePositionAndVelocity(*pSpec, pos, vel);
+    pSys->m_vPosition = pos;
+    pSys->m_vVelocity = vel;
+    controller->UpdateParticleSystemDirection(pSpec, pSys);
+
+    pSys->UpdateCoordSys();
+    pSys->m_bVisible = controller->m_bVisible;
+    return pSys->Update(dt);
+}
+
+void EmissionController::UpdateParticleSystemDirection(EffectsSpec* pSpec, ParticleSystem* pSys)
+{
+    if (pSpec->m_nForwardAxis == 0 || m_pPose == 0)
     {
         pSys->m_vForward = m_vDirection;
         return;
     }
 
     nlVector4 dir;
-    switch (pSpec->mUnidentified048)
+    switch (pSpec->m_nForwardAxis)
     {
     case 1:
         nlVec4Set(dir, 1.0f, 0.0f, 0.0f, 0.0f);
@@ -445,7 +445,7 @@ bool EmissionController::Update(float dt)
     while (iterator.hasNext())
     {
         ParticleSystem* pSys = *iterator;
-        if (!fn_802E502C(this, pSys, numSys, dt))
+        if (!fxUpdateParticleSystem(this, pSys, numSys, dt))
         {
             m_Systems.Remove(&iterator);
             delete pSys;
@@ -483,21 +483,21 @@ bool EmissionController::Update(float dt)
 void* fxLoadEntireFileHigh(const char* filename, unsigned long* fileSize)
 {
     void* buffer = 0;
-    u32 datasize = 0;
+    u32 size = 0;
 
     nlFile* file = nlOpen(filename);
     if (file != 0)
     {
-        unsigned int size;
-        datasize = nlFileSize(file, &size);
-        buffer = nlMalloc(size, 0x20, true);
-        nlRead(file, buffer, datasize, 0);
+        unsigned int allocSize;
+        size = nlFileSize(file, &allocSize);
+        buffer = nlMalloc(allocSize, 0x20, true);
+        nlRead(file, buffer, size, 0);
         nlClose(file);
     }
 
     if (fileSize != 0)
     {
-        *fileSize = datasize;
+        *fileSize = size;
     }
 
     return buffer;
@@ -515,9 +515,9 @@ int EmissionController::Render()
 
     while (iterator.hasNext())
     {
-        ParticleSystem* sys = *iterator;
+        ParticleSystem* pSys = *iterator;
         GLView* view = (GLView*)m_pContext;
-        numParticles += sys->m_bVisible ? sys->RenderAllParticles(view) : 0;
+        numParticles += pSys->m_bVisible ? pSys->RenderAllParticles(view) : 0;
         iterator.Step();
     }
 
@@ -540,32 +540,32 @@ int EmissionController::Render()
 }
 
 void EmissionController::SetUpdateCallback(
-    const Function1<void, EmissionController&>& callback)
+    const Function1<void, EmissionController&>& ucb)
 {
-    mUpdateCallback = callback;
+    mUpdateCallback = ucb;
 }
 
 void EmissionController::SetFinishedCallback(
-    const Function2<void, EmissionController&, int>& callback)
+    const Function2<void, EmissionController&, int>& fcb)
 {
-    mFinishedCallback = callback;
+    mFinishedCallback = fcb;
 }
 
 float EmissionController::GetBoundingRadius() const
 {
-    float maxTime = 0.0f;
+    float maxRadius = 0.0f;
     nlDLListIterator<ParticleSystem*> node = m_Systems.Begin();
 
     while (node.hasNext())
     {
         ParticleSystem* system = *node;
-        float remainingTime = system->m_pTemplate->GetBoundingRadius();
-        if (remainingTime > maxTime)
+        float radius = system->m_pTemplate->GetBoundingRadius();
+        if (radius > maxRadius)
         {
-            maxTime = remainingTime;
+            maxRadius = radius;
         }
         node.Step();
     }
 
-    return maxTime;
+    return maxRadius;
 }

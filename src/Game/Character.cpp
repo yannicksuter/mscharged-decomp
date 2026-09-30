@@ -592,7 +592,7 @@ void cCharacter::Unknown11(void* context, DebugWriteCache* cache)
     state.m_nHS = anim->m_nHierarchySignature;
     state.m_fDuration = anim->GetDuration();
     state.m_nNumRootKeys = (unsigned int)(float)anim->m_nNumKeys;
-    state.m_fLinearSpeed = anim->m_fLinearSpeed;
+    state.m_fLinearSpeed = anim->UnidentifiedGetLinearSpeed();
 
     if (lbl_806DB602 == 0xFFFF)
     {
@@ -793,6 +793,24 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     for (int i = 0; i < 4; ++i)
     {
         unknown_0x018[i] = false;
+    }
+}
+
+inline float ClampMin(float speedRatio, const float min);
+inline float ClampMax(float speedRatio, const float max);
+
+void cCharacter::MatchAnimSpeedToCharacterSpeed(unsigned int nParam,
+    cPN_SAnimController* pController)
+{
+    cCharacter* pChar = (cCharacter*)nParam;
+    if (pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM
+        && pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM_SEEK)
+    {
+        float min = 0.6f;
+        float max = 1.4f;
+        pController->m_fPlaybackSpeedScale = ClampMax(ClampMin(
+            pChar->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->UnidentifiedGetLinearSpeed(),
+            min), max);
     }
 }
 
@@ -1637,8 +1655,6 @@ cCharacter::~cCharacter()
     mUnidentified1C0.GetAllocator()->FreeBlocks();
 }
 
-unsigned int lbl_806E0C24;
-
 void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
     int nJointIndex, float fTime, bool bAddRootTrans, bool bAddRootRot,
     bool bUsePrevPosition, bool bParam4)
@@ -1673,8 +1689,9 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
         nlVector3* unidentifiedValue;
         if (mUnidentified1C0.FindGet(unidentifiedKey.UnidentifiedGet(), &unidentifiedValue))
         {
-            ++lbl_806E0C24;
+            static unsigned int lbl_806E0C24;
             *v3Out = *unidentifiedValue;
+            ++lbl_806E0C24;
             unidentifiedPose = false;
         }
     }
@@ -1731,7 +1748,8 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
     unidentifiedRotation.e2[2][0] = m4RootMat.e2[2][0];
     unidentifiedRotation.e2[2][1] = m4RootMat.e2[2][1];
     unidentifiedRotation.e2[2][2] = m4RootMat.e2[2][2];
-    nlVec3Scale(*v3Out, mUnidentified024.m_fDesiredPlayerScale);
+    float desiredScale = mUnidentified024.m_fDesiredPlayerScale;
+    nlVec3Scale(*v3Out, desiredScale);
     nlMultVectorMatrix(*v3Out, *v3Out, unidentifiedRotation);
     nlVec3Add(*v3Out, *v3Out, m4RootMat.GetTranslation());
 }
@@ -1806,24 +1824,6 @@ s16 cCharacter::CalcAnimTurnAdjust(unsigned short aFacingDirection,
     unsigned short aFinalFacingDirection = aFacingDirection + aAnimRot;
     delete pAnimController;
     return (signed short)(aDesiredFacingDirection - aFinalFacingDirection);
-}
-
-inline float ClampMin(float speedRatio, const float min);
-inline float ClampMax(float speedRatio, const float max);
-
-void cCharacter::MatchAnimSpeedToCharacterSpeed(unsigned int nParam,
-    cPN_SAnimController* pController)
-{
-    cCharacter* pChar = (cCharacter*)nParam;
-    if (pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM
-        && pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM_SEEK)
-    {
-        float min = 0.6f;
-        float max = 1.4f;
-        pController->m_fPlaybackSpeedScale = ClampMax(ClampMin(
-            pChar->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->m_fLinearSpeed,
-            min), max);
-    }
 }
 
 cPN_SAnimController* cCharacter::NewAnimController(int animID, bool bRestartCyclic, bool bForceMirrorSwap, void (*funcPlaybackSpeedCallback)(unsigned int, cPN_SAnimController*), unsigned int nPlaybackSpeedCallbackParam)
@@ -2088,8 +2088,9 @@ void cCharacter::Update(float fDeltaT)
             {
                 float unidentifiedFraction = fDeltaT / mUnidentified024.m_tScaleTimer.GetSeconds();
                 unidentifiedFraction = nlMinEquals(unidentifiedFraction, 1.0f);
-                UnidentifiedSetScale(Interpolate(mUnidentified024.m_fPlayerScale,
-                    mUnidentified024.m_fDesiredPlayerScale, unidentifiedFraction));
+                float unidentifiedScale = Interpolate(mUnidentified024.m_fPlayerScale,
+                    mUnidentified024.m_fDesiredPlayerScale, unidentifiedFraction);
+                UnidentifiedSetScale(unidentifiedScale);
                 mUnidentified024.m_fMovementScale = Interpolate(mUnidentified024.m_fMovementScale,
                     mUnidentified024.m_fDesiredMovementScale, unidentifiedFraction);
             }
@@ -2308,7 +2309,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
 
         if (adjustTime > 0.0f)
         {
-            float smoothStep1 = CharacterAnimSmoothStep((m_pCurrentAnimController->m_fTime - mUnidentified024.m_fAnimAdjustBeginTime) / adjustTime);
+            float smoothStep1 = CharacterAnimSmoothStep((m_pCurrentAnimController->get_fTime() - mUnidentified024.m_fAnimAdjustBeginTime) / adjustTime);
             smoothStep1 = (smoothStep1 <= 1.0f) ? smoothStep1 : 1.0f;
 
             float smoothStep2 = CharacterAnimSmoothStep((m_pCurrentAnimController->m_fPrevTime - mUnidentified024.m_fAnimAdjustBeginTime) / adjustTime);

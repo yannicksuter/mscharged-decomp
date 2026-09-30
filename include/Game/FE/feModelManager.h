@@ -120,17 +120,22 @@ public:
     FEModelHandle* CreateModel(FEModelType type, const char* name,
         tCharacterTemplateInfo* modelData, bool unidentified59, void* unidentified4C,
         void* unidentified50, bool alternate);
-    void DestroyModel(FEModelHandle* handle);
+    bool DestroyModel(FEModelHandle* handle);
     void BeginLoadModels();
     FEModelHandle* GetModel(const char* name);
     void ReleaseImpostors();
 
+private:
+    inline void DestroyDanglingModels();
+    inline void DestroyPendingModels();
+
+public:
     /* 0x04 */ nlListContainer<FEModelHandle*> mHandles;
     /* 0x10 */ nlListContainer<void*> mModels;
     /* 0x1C */ nlDLListContainer<FEModelHandle*> mPendingModels;
     /* 0x24 */ nlDLListContainer<FEModelHandle*> mLoadedModels;
     /* 0x2C */ nlDLListContainer<FEModelHandle*> mDanglingModels;
-    /* 0x34 */ void* mResource;
+    /* 0x34 */ unsigned long mResource;
 }; // size: 0x38
 
 #endif // GAME_FE_FE_MODEL_MANAGER_H

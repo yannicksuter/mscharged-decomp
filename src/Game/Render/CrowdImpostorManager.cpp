@@ -386,8 +386,8 @@ void CrowdPointCallback::Place(
     if (impostor == 0)
         return;
 
-    impostor->Set(character, *(nlVector3*)&worldPoint, angle,
-        sfImpostorWidth, sfImpostorHeight);
+    impostor->Set(character, *(nlVector3*)&worldPoint,
+        sfImpostorWidth, sfImpostorHeight, angle);
 
     if (GetCrowdImpostorManager()->IsObjectEnabled(mObject))
         impostor->mUnidentified02C = true;

@@ -110,6 +110,13 @@ public:
         return m_Head == 0;
     }
 
+    // Not const: a const read of m_Head here would be shared with the read in
+    // a following Begin(), which retail performs separately.
+    u32 CountElements()
+    {
+        return nlDLRingCountElements(m_Head);
+    }
+
     T* AllocateAtEnd(unsigned long* outEntry);
 
     struct WalkCallback
@@ -299,6 +306,12 @@ class nlDLListSlotPool
     : public DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >
 {
 public:
+    void Free()
+    {
+        DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >::Clear();
+        this->m_Allocator.FreeBlocks();
+    }
+
     nlDLListSlotPool()
         : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
     {

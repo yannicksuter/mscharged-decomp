@@ -67,15 +67,15 @@ void NetMeshModelLoader::LoadGeometryFromModel()
     m_VertexList = new (nlMalloc(sizeof(VertexTree), 8, false))
         VertexTree(0x10, 0x10);
 
-    DrawableModel* pDrawable = (DrawableModel*)FindStadiumDrawableObject(m_NetMeshDrawableObjectID);
-    u16 numPackets = (u16)pDrawable->m_pModel->numPackets;
+    DrawableModel* pObject = (DrawableModel*)FindStadiumDrawableObject(m_NetMeshDrawableObjectID);
+    u16 numPackets = (u16)pObject->m_pModel->numPackets;
 
     m_NumTriStripIndices = 0;
     m_CurrentTriStripIndex = 0;
 
-    for (int packetSumIndex = 0; packetSumIndex < numPackets; ++packetSumIndex)
+    for (int iPacket = 0; iPacket < numPackets; ++iPacket)
     {
-        m_NumTriStripIndices += pDrawable->m_pModel->packets[packetSumIndex].numVertices;
+        m_NumTriStripIndices += pObject->m_pModel->packets[iPacket].numVertices;
     }
 
     m_TriStripIndices = (u16*)nlMalloc(
@@ -83,11 +83,11 @@ void NetMeshModelLoader::LoadGeometryFromModel()
     for (int i = 0; i < m_NumTriStripIndices; ++i)
         m_TriStripIndices[i] = 0xFFFF;
 
-    for (int packetIndex = 0; packetIndex < numPackets; ++packetIndex)
+    for (int iPacket = 0; iPacket < numPackets; ++iPacket)
     {
-        glModelPacket& pPacket = pDrawable->m_pModel->packets[packetIndex];
-        ReadVerticesFromGeometryPacket(pPacket);
-        ReadEdgesFromGeometryPacket(pPacket);
+        glModelPacket& packet = pObject->m_pModel->packets[iPacket];
+        ReadVerticesFromGeometryPacket(packet);
+        ReadEdgesFromGeometryPacket(packet);
     }
 
     CreateNetMeshFromVertexList();
@@ -96,34 +96,30 @@ void NetMeshModelLoader::LoadGeometryFromModel()
 void NetMeshModelLoader::ReadVerticesFromGeometryPacket(
     const glModelPacket& packet)
 {
-    u16 vertexOffset = (u16)m_NumParticles;
+    u16 baseIndex = (u16)m_NumParticles;
     DisplayList* pList = packet.displayList;
 
-    struct TriStripIV
-    {
-        int index;
-    };
-    TriStripIV iv;
-    iv.index = 0;
-    while (iv.index < packet.numVertices)
+    int i = 0;
+    while (i < packet.numVertices)
     {
         u16* ptr;
         if (pList->hasColorStream != 0)
         {
             u16 ns = pList->numStreams;
             int stride = (ns - 1) * 2 + 1;
-            ptr = (u16*)((u8*)pList->list + stride * iv.index + 4);
+            ptr = (u16*)((u8*)pList->list + 4 + stride * i);
         }
         else
         {
             u16 ns = pList->numStreams;
             int stride = ns * 2;
-            ptr = (u16*)((u8*)pList->list + iv.index * stride + 3);
+            ptr = (u16*)((u8*)pList->list + 3 + i * stride);
         }
 
-        m_TriStripIndices[m_CurrentTriStripIndex] = *ptr + vertexOffset;
+        unsigned short vertexIndex = *ptr;
+        m_TriStripIndices[m_CurrentTriStripIndex] = vertexIndex + baseIndex;
         ++m_CurrentTriStripIndex;
-        ++iv.index;
+        ++i;
     }
 
     m_NetMesh.SetTexture(glGetMaterialUnsignedParameter(&packet, gDiffuseTextureSemantic));
@@ -140,35 +136,35 @@ void NetMeshModelLoader::ReadVerticesFromGeometryPacket(
 }
 
 inline void NetMeshModelLoader::AddEdge(
-    const glModelPacket& packet, unsigned short idx1, unsigned short idx2)
+    const glModelPacket& packet, unsigned short vertexIndex1, unsigned short vertexIndex2)
 {
     NetMeshEdge edge;
     NetMeshVertex vertex1;
     NetMeshVertex vertex2;
 
-    NetMeshVertex* pVertex1;
-    NetMeshVertex* pVertex2;
+    NetMeshVertex* pVertex1Copy;
+    NetMeshVertex* pVertex2Copy;
     int* pValue;
 
     vertex1.mpPacket = &packet;
-    vertex1.mIndex = idx1;
+    vertex1.mIndex = vertexIndex1;
     vertex2.mpPacket = &packet;
-    vertex2.mIndex = idx2;
+    vertex2.mIndex = vertexIndex2;
 
-    m_VertexList->Find(vertex1, &pValue, &pVertex1);
-    m_VertexList->Find(vertex2, &pValue, &pVertex2);
+    m_VertexList->Find(vertex1, &pValue, &pVertex1Copy);
+    m_VertexList->Find(vertex2, &pValue, &pVertex2Copy);
 
     edge.mpPacket = &packet;
-    NetMeshVertex* v2 = pVertex2;
-    if (pVertex1->mIndex < v2->mIndex)
+    NetMeshVertex* v2 = pVertex2Copy;
+    if (pVertex1Copy->mIndex < v2->mIndex)
     {
-        edge.mpVertex1 = pVertex1;
+        edge.mpVertex1 = pVertex1Copy;
         edge.mpVertex2 = v2;
     }
     else
     {
         edge.mpVertex1 = v2;
-        edge.mpVertex2 = pVertex1;
+        edge.mpVertex2 = pVertex1Copy;
     }
 
     int* pRefCount = m_EdgeList->Add(edge, s_initialEdgeCount);
