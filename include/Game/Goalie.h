@@ -12,7 +12,7 @@ class AnimRetargetList;
 class GoalieTweaks;
 class cSHierarchy;
 class CharacterPhysicsData;
-class cBaseCamera;
+class cShootToScoreCamera;
 
 class PhysicsGoalie;
 struct dContact;
@@ -130,6 +130,7 @@ public:
         CollisionPlayerPlayerData* pData);
     virtual void InitActionPostWhistle();
     virtual void fn_80099074(const UnidentifiedEventData24*);
+    void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
 
     void SetGoalieAction(eGoalieActionState newGoalieState, int newSubstate);
     static void SaveBlendCallback(
@@ -415,7 +416,7 @@ public:
     /* 0x424 */ SaveData* mpSaveData;
     /* 0x428 */ SaveBlendInfo mBlendInfo;
     /* 0x4B8 */ GoalieFatigue mFatigue;
-    /* 0x4C8 */ cBaseCamera* mUnidentified4C8;
+    /* 0x4C8 */ cShootToScoreCamera* mUnidentified4C8;
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
     /* 0x4D0 */ int mUnidentified4D0[10];
     /* 0x4F8 */ float mUnidentified4F8[10];

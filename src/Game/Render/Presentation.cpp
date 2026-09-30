@@ -1021,7 +1021,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
 /**
  * Address/Size: 0x80287278 | size: 0x370
  */
-void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* data)
+void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
 {
     ReplayManager::Instance()->fn_801895B0();
 
@@ -1030,28 +1030,14 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* data)
         return;
     }
 
-    s8 goalValue;
-    s8 defendingSide;
-    s8 goals;
-    s8 attempts;
-    cPlayer* player;
-    u32 unknown;
-
-    unknown = data->unknown_08;
-    goalValue = data->goalValue;
-    defendingSide = data->defendingSide;
-    goals = data->goals;
-    bool noGoals = goals == 0;
-    attempts = data->attempts;
-    player = data->pPlayer;
-
-    mMegaStrikeResult.pPlayer = player;
-    mMegaStrikeResult.attempts = attempts;
-    mMegaStrikeResult.goals = goals;
-    mMegaStrikeResult.defendingSide = defendingSide;
-    mMegaStrikeResult.goalValue = goalValue;
-    mMegaStrikeResult.unknown_08 = unknown;
-    mUnidentified159 = noGoals;
+    // The caller's packet is separate from this Presentation's cached result.
+    mMegaStrikeResult.pPlayer = data->pPlayer;
+    mMegaStrikeResult.attempts = data->attempts;
+    mMegaStrikeResult.goals = data->goals;
+    mMegaStrikeResult.defendingSide = data->defendingSide;
+    mMegaStrikeResult.goalValue = data->goalValue;
+    mMegaStrikeResult.unknown_08 = data->unknown_08;
+    mUnidentified159 = mMegaStrikeResult.goals == 0;
 
     if (IsNetworkOrRecordedGame())
     {
@@ -1115,8 +1101,8 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* data)
 
         const char* filter = "high";
         const char* functionName = "MegastrikeEnd";
-        bool hasGoals = data->goals != 0;
         mUnidentified156 = false;
+        bool hasGoals = data->goals != 0;
         mUnidentified158 = hasGoals;
         mUnidentified157 = !hasGoals;
         if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
