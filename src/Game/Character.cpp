@@ -829,7 +829,6 @@ extern "C" void fn_80020B8C(cFielder* pFielder)
         (unsigned short)(pFielder->mUnidentified024.m_aActualFacingDirection + 0x8000),
         0, false, false);
 }
-extern "C" void GoalieOnGameOver();
 extern "C" void fn_8002276C()
 {
     for (int i = 0; i < 2; i++)

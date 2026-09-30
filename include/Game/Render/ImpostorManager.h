@@ -33,7 +33,7 @@ public:
     int GetNumImpostors();
     void Render(void* target, bool skipCapture);
     void AddCharacter(ImpostorCharacter* character);
-    void UpdateCharacters(float dt, const char* unidentified);
+    void UpdateCharacters(float blendTime, const char* name);
     void UpdateAnimations(float dt);
     void UpdateSprites();
     void UpdatePositions(const nlVector3* direction, const nlVector3* up);

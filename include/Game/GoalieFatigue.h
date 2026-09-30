@@ -21,7 +21,7 @@ public:
     }
     void Update(float dt);
     void RegisterShot(float fLevel);
-    void UnidentifiedSyncLog(void* context, DebugWriteCache* cache);
+    void SyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ f32 mfEnergyLevel;
     /* 0x04 */ f32 mfRecoverRate;

@@ -43,6 +43,26 @@ enum eScriptFielderDesire
     edWait = 28,
 };
 
+extern "C" Goalie* fn_800D66A0(cFielder* pFielder);
+extern "C" Goalie* fn_800D66C4(cFielder* pFielder);
+extern "C" cFielder* fn_800D674C(cPlayer* player);
+extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder);
+extern "C" float fn_800DED80(cPlayer* pPlayer);
+extern "C" cFielder* fn_800DF790(cTeam* pTeam);
+
+float CloseToFormationPosition(cFielder* pFielder);
+float CloseToMyGoalie(cPlayer*);
+float DoingS2S(cFielder*);
+float FarToFormationPosition(cFielder* pFielder);
+float FarToMyGoalie(cPlayer*);
+float FielderType(cPlayer*);
+float InFrontOfMyNet(cFielder*);
+float NearToMyGoalie(cPlayer*);
+float ReallyCloseToBall(cPlayer*);
+float ReallyHigh(cBall*);
+
+float SeparatingFrom(cPlayer*, cBall*);
+
 float InOffensiveZoneOfPlayer(cBall* pBall, cPlayer* pPlayer);
 float InDefensiveZoneOfPlayer(cBall* pBall, cPlayer* pPlayer);
 float InOffensiveZone(cPlayer* pPlayer);

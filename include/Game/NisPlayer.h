@@ -32,7 +32,7 @@ public:
     void fn_8028041C(const char* param1, const char* param2, NisTarget target, NisUseStadiumOffset useStadiumOffset, NisWinnerType winnerType, bool param5, int param6);
     void LoadTriggers(Nis& nis);
     const char* GetTargetFilter(NisTarget target, NisWinnerType winnerType) const;
-    void fn_8027F4B0(NisTarget target, NisWinnerType winnerType);
+    void SetTeamLogo(NisTarget target, NisWinnerType winnerType);
 
     bool HasUnidentifiedPacket(const glModelPacket* packet) const
     {
@@ -70,16 +70,16 @@ public:
     void fn_8027BD60();
     void fn_8027BD64();
     void fn_8027ED70();
-    void fn_8027EDCC(unsigned long param1);
+    void PrepareNisCue(unsigned long cue);
     void Reset();
     void Play();
     void fn_8027DA28();
     void fn_8027E054();
-    void fn_8027ED08();
-    void fn_8027CCEC();
+    void PreserveNisCueOnReset();
+    void ClearLoadQueue();
     void fn_8027D11C();
     void fn_8027DF70(GoalScoredData* goalScoredData);
-    void fn_8027D994();
+    void RandomizeBeginPositions();
     void fn_8027DFE0(GoalieSaveData*);
     void fn_8027D1EC();
     void fn_8027DFE4(cPlayer* param1);
@@ -94,7 +94,7 @@ public:
     float TimeLeft() const;
     float fn_8027C064(int param1) const;
     cAnimCamera* fn_8027E708();
-    void fn_8027EE38();
+    void StartNisCue();
     void Render(int pass) const;
     void HideAllActors() const;
     void fn_8027EEA0(float param1);
@@ -103,7 +103,7 @@ public:
     void fn_8027EF8C();
     void fn_8027E5D0();
     void fn_8027E714();
-    void fn_8027ED18();
+    void StopNisCue();
     int fn_8027E284(NisWinnerType winnerType) const;
     bool IsMirrored(NisTarget target, const char* name, NisWinnerType winnerType) const;
     bool fn_8027E0AC();
@@ -134,7 +134,7 @@ public:
     /* 0x340C4 */ cAnimCamera mCamera[2];
     /* 0x3422C */ Nis* mNisForTriggerLoading;
     /* 0x34230 */ int mWinnerSide[NIS_NUM_WINNER_TYPES];
-    /* 0x34238 */ int mUnidentified34238;
+    /* 0x34238 */ int mMegaStrikeSide;
     /* 0x3423C */ nlVector3 mBeginPositions[10];
     /* 0x342B4 */ char mExtraNameFilter[128];
     /* 0x34334 */ void* mUnidentified34334;
@@ -158,7 +158,7 @@ public:
     /* 0x34438 */ unsigned long mUnidentified34438;
     /* 0x3443C */ unsigned long mUnidentified3443C;
     /* 0x34440 */ glModelPacket* mUnidentified34440[10];
-    /* 0x34468 */ float mUnidentified34468;
+    /* 0x34468 */ float mCameraOverrun;
 };
 
 #endif // GAME_NIS_PLAYER_H

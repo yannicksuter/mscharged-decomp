@@ -43,6 +43,15 @@ public:
     void SetReplacementTexture(unsigned long texture);
     void PlayAnimation(const char* name, float blendTime, ePlayMode playMode);
 
+    // Bounded fit, not recovered source: R4QE01's Nis::Render keeps the skin
+    // mesh it reads here in a register allocated ahead of the impostor loop's
+    // strength-reduced array walker. Under GC/3.0a5 every caller-scope local
+    // is allocated after that walker, so the value came out of an inline
+    // function. That function's owner and name are not recoverable - Render is
+    // the only reader outside this class and the DOL keeps no out-of-line copy
+    // - so it sits with the field it reads.
+    GLSkinMesh* GetSkinMesh() const { return mSkinMesh; }
+
     /* 0x04 */ nlMatrix4 mWorldMatrix;
     /* 0x44 */ cPN_SAnimController* mAnimController;
     /* 0x48 */ cPoseAccumulator* mPoseAccumulator;

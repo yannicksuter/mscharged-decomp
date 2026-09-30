@@ -5,58 +5,24 @@
 #include "Game/DebugWriteCache.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/EventDataTypes.h"
+#include "Game/Game.h"
 #include "Game/Physics/NetMeshModelLoader.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBall.h"
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/glx/glxTexture.h"
+#include "NL/nlMain.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSlotPool.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/NetworkSync.h"
+#include "Game/Task/FixedUpdateTask.h"
 
 #include <math.h>
 #include <string.h>
 
-struct DebugTypeState
-{
-    unsigned short type;
-    unsigned short padding;
-};
-
-class NetMeshFrameProvider
-{
-public:
-    virtual void V0();
-    virtual void V1();
-    virtual void V2();
-    virtual void V3();
-    virtual void V4();
-    virtual void V5();
-    virtual void V6();
-    virtual void V7();
-    virtual void V8();
-    virtual void V9();
-    virtual void V10();
-    virtual void V11();
-    virtual void V12();
-    virtual unsigned int GetFrame();
-};
-
-struct NetMeshGameState
-{
-    u8 padding[0xAC];
-    nlVector3 upVector;
-};
-
-extern "C" unsigned int fn_802AAC88(const void*, unsigned int);
-NetMeshFrameProvider* GetFixedUpdateTask();
-extern "C" PlatTexture* fn_802D064C(unsigned long);
-
-extern NetMeshGameState* g_pGame;
-extern float lbl_806DC7B8;
-DebugTypeState s_DetMeshType = { 0xFFFF, 0 };
+unsigned short s_DetMeshType = 0xFFFF;
 float NetMesh::s_fReboundForceCoefficient = 6.0f;
 float NetMesh::s_fVelocityDampingCoefficient = 0.7f;
 float NetMesh::s_fBallRadiusExaggerationFactor = 2.0f;
@@ -69,7 +35,7 @@ float NetMesh::s_fIsBallMovingThreshold = 0.01f;
 float NetMesh::s_fDampening = 1.0f;
 float NetMesh::s_fNetStretchLimit = 1.0f;
 float s_fNetMeshLogTimeScale = 2.5f;
-DebugTypeState s_GenDetNetMeshType = { 0xFFFF, 0 };
+unsigned short s_GenDetNetMeshType = 0xFFFF;
 static float fDeltaZero = 0.001f;
 static float fGroundHeight = 0.01f;
 char sJoltName[] = "mfJolt";
@@ -236,7 +202,7 @@ void NetMesh::Reset(bool usePhysicsBall)
         DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
         if (output != 0)
         {
-            NetMeshFrameProvider* frameProvider = GetFixedUpdateTask();
+            FixedUpdateTask* frameProvider = GetFixedUpdateTask();
             unsigned int frame = frameProvider->GetFrame();
             char buffer[256];
             nlSNPrintf(buffer, sizeof(buffer), sResetFormat, mbPositiveEnd, mbUsePhysicsBall, frame);
@@ -255,18 +221,18 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
         unsigned int restPosition;
     } crcs;
 
-    crcs.position = fn_802AAC88(
+    crcs.position = nlChecksum32(
         m_v3Position, m_NumParticles * sizeof(nlVector3));
-    crcs.previousPosition = fn_802AAC88(
+    crcs.previousPosition = nlChecksum32(
         m_v3PrevPosition, m_NumParticles * sizeof(nlVector3));
-    crcs.accel = fn_802AAC88(
+    crcs.accel = nlChecksum32(
         m_v3Accel, m_NumParticles * sizeof(nlVector3));
-    crcs.restPosition = fn_802AAC88(
+    crcs.restPosition = nlChecksum32(
         m_v3RestPosition, m_NumParticles * sizeof(nlVector3));
 
-    if (s_GenDetNetMeshType.type == 0xFFFF)
+    if (s_GenDetNetMeshType == 0xFFFF)
     {
-        s_GenDetNetMeshType.type = cache->BeginType(sGenDetNetMeshName);
+        s_GenDetNetMeshType = cache->BeginType(sGenDetNetMeshName);
         cache->AddField(2, gDebugFieldTypes[2].size, 0, sPosCRCName);
         cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.previousPosition - (unsigned char*)&crcs, sPrevPosCRCName);
         cache->AddField(2, gDebugFieldTypes[2].size, (unsigned char*)&crcs.accel - (unsigned char*)&crcs, sAccelCRCName);
@@ -274,12 +240,12 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
         cache->EndType();
     }
 
-    cache->ChecksumData(s_GenDetNetMeshType.type, &crcs, context);
-    cache->WriteData(s_GenDetNetMeshType.type, &crcs, sizeof(crcs));
+    cache->ChecksumData(s_GenDetNetMeshType, &crcs, context);
+    cache->WriteData(s_GenDetNetMeshType, &crcs, sizeof(crcs));
 
-    if (s_DetMeshType.type == 0xFFFF)
+    if (s_DetMeshType == 0xFFFF)
     {
-        s_DetMeshType.type = cache->BeginType(sDetMeshName);
+        s_DetMeshType = cache->BeginType(sDetMeshName);
         cache->AddField(16, gDebugFieldTypes[16].size, 0, sPositiveEndName);
         cache->AddField(8, gDebugFieldTypes[8].size, (unsigned char*)&m_NumParticles - (unsigned char*)&mbPositiveEnd, sNumParticlesName);
         cache->AddField(17, gDebugFieldTypes[17].size, (unsigned char*)&mfMinX - (unsigned char*)&mbPositiveEnd, sMinXName);
@@ -299,13 +265,13 @@ void NetMesh::SyncLog(void* context, DebugWriteCache* cache)
         cache->EndType();
     }
 
-    cache->ChecksumData(s_DetMeshType.type, &mbPositiveEnd, context);
-    cache->WriteData(s_DetMeshType.type, &mbPositiveEnd, 0x44);
+    cache->ChecksumData(s_DetMeshType, &mbPositiveEnd, context);
+    cache->WriteData(s_DetMeshType, &mbPositiveEnd, 0x44);
 }
 
 inline static void AccumForces(NetMesh* self, nlVector3& newPos)
 {
-    nlVector3* upVector = &g_pGame->upVector;
+    const nlVector3* upVector = &g_pGame->GetTiltDirection();
     float gravityMagnitude = -NetMesh::s_fNetGravityMagnitude;
     nlVec3Set(newPos, gravityMagnitude * upVector->x, gravityMagnitude * upVector->y, gravityMagnitude * upVector->z);
 
@@ -419,7 +385,7 @@ void NetMesh::Update(float dt, const nlVector3& ballPosition,
         DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
         if (output != 0)
         {
-            NetMeshFrameProvider* frameProvider = GetFixedUpdateTask();
+            FixedUpdateTask* frameProvider = GetFixedUpdateTask();
             unsigned int frame = frameProvider->GetFrame();
             char buffer[256];
             nlSNPrintf(buffer, sizeof(buffer), sUpdateFormat, mbPositiveEnd, logTimeScale, appliedForces, mbFirstUpdate, frame);
@@ -448,11 +414,7 @@ void NetMesh::SatisfyConstraints(
 
             nlVector3 d;
             nlVec3Sub(d, x1, x2);
-            float dy = d.y;
-            float dyy = dy * dy;
-            float dx = d.x;
-            float dz = d.z;
-            float length = nlSqrt(dyy + (dx * dx) + (dz * dz), true);
+            float length = nlVec3Length(d);
 
             if ((float)fabs(length) > fDeltaZero)
             {
@@ -497,16 +459,10 @@ void NetMesh::SatisfyConstraints(
                         radius = s_fBallRadiusExaggerationFactor2 * g_pBall->m_pPhysicsBall->GetRadius();
                     }
 
-                    const float ballY = ballPosition.y;
-                    const float particleY = particlePosition.y;
-                    float dy = ballY - particleY;
-                    float dx = ballPosition.x - particlePosition.x;
-                    float dz = ballPosition.z - particlePosition.z;
-                    float dot = (dx * particleNormal.x)
-                              + (dy * particleNormal.y)
-                              + (dz * particleNormal.z);
                     nlVector3 perp;
-                    nlVec3Set(perp, (-dot * particleNormal.x) + dx, (-dot * particleNormal.y) + dy, (-dot * particleNormal.z) + dz);
+                    nlVec3Sub(perp, ballPosition, particlePosition);
+                    float dot = nlVec3DotProduct(perp, particleNormal);
+                    nlVec3ScaleAdd(perp, -dot, particleNormal, perp);
                     float perpDistSq = nlVec3LengthSquared(perp);
 
                     if ((perpDistSq < closestParticleDistSq) || (i == 0))
@@ -543,8 +499,7 @@ void NetMesh::SatisfyConstraints(
                                 m_v3BallPenetrationNormal = particleNormal;
                             }
 
-                            float displacementMag = penetration * falloffFactor;
-                            nlVec3ScaleAdd(particlePosition, displacementMag, particleNormal, particlePosition);
+                            nlVec3ScaleAdd(particlePosition, penetration * falloffFactor, particleNormal, particlePosition);
                         }
                     }
                 }
@@ -568,8 +523,7 @@ void NetMesh::SatisfyConstraints(
         for (i = 0; i < m_NumPositionConstraints; ++i)
         {
             cPositionConstraint& c = m_aPositionConstraints[i];
-            int particle = c.nParticle;
-            nlVector3& x = m_v3Position[particle];
+            nlVector3& x = m_v3Position[c.nParticle];
             nlVec3Set(x, c.v3Position.x, c.v3Position.y, c.v3Position.z);
         }
 
@@ -604,15 +558,9 @@ void NetMesh::AddForcesToBall(
         {
             nlVector3& v3LinearVelocity = sphere->GetLinearVelocity();
 
-            forceMagnitude
-                = (m_v3BallPenetrationNormal.x * v3LinearVelocity.x)
-                + (m_v3BallPenetrationNormal.y * v3LinearVelocity.y)
-                + (m_v3BallPenetrationNormal.z * v3LinearVelocity.z);
+            forceMagnitude = nlVec3DotProduct(m_v3BallPenetrationNormal, v3LinearVelocity);
 
-            nlVec3Set(vel,
-                forceMagnitude * m_v3BallPenetrationNormal.x,
-                forceMagnitude * m_v3BallPenetrationNormal.y,
-                forceMagnitude * m_v3BallPenetrationNormal.z);
+            nlVec3Scale(vel, m_v3BallPenetrationNormal, forceMagnitude);
 
             nlVector3& v3CurrentVelocity = sphere->GetLinearVelocity();
             nlVec3Set(vel, v3CurrentVelocity.x - vel.x, v3CurrentVelocity.y - vel.y, v3CurrentVelocity.z - vel.z);
@@ -620,8 +568,7 @@ void NetMesh::AddForcesToBall(
             sphere->SetLinearVelocity(vel);
         }
 
-        float forceMagnitude
-            = m_fBallPenetrationDepth * s_fReboundForceCoefficient;
+        forceMagnitude = m_fBallPenetrationDepth * s_fReboundForceCoefficient;
         force = m_v3BallPenetrationNormal;
         nlVec3Scale(force, force, -forceMagnitude);
 
@@ -634,18 +581,9 @@ void NetMesh::AddForcesToBall(
             }
             sphere->AddForceAtCentreOfMass(force);
             velocity = sphere->GetLinearVelocity();
-            if (((velocity.x * m_v3BallPenetrationNormal.x)
-                    + (velocity.y * m_v3BallPenetrationNormal.y)
-                    + (velocity.z * m_v3BallPenetrationNormal.z))
-                > 0.0f)
+            if (nlVec3DotProduct(velocity, m_v3BallPenetrationNormal) > 0.0f)
             {
-                float dampedZ
-                    = s_fVelocityDampingCoefficient * velocity.z;
-                float dampedY
-                    = s_fVelocityDampingCoefficient * velocity.y;
-                float dampedX
-                    = s_fVelocityDampingCoefficient * velocity.x;
-                nlVec3Set(velocity, dampedX, dampedY, dampedZ);
+                nlVec3Scale(velocity, velocity, s_fVelocityDampingCoefficient);
                 sphere->SetLinearVelocity(velocity);
             }
 
@@ -668,6 +606,22 @@ void NetMesh::AddForcesToBall(
         eventData->collisionVelocity = g_pBall->m_v3Velocity;
         fn_80146424(eventData, sphere == 0);
     }
+}
+
+inline void NetMesh::UpdateUntilRelaxed()
+{
+    mbIsActive = true;
+    mbRelaxing = true;
+    while (mbIsActive)
+    {
+        Update(g_fFixedUpdateTick, v3Zero, v3Zero, false, 0);
+    }
+
+    for (int i = 0; i < m_NumParticles; i++)
+    {
+        m_v3RestPosition[i] = m_v3Position[i];
+    }
+    mbRelaxing = false;
 }
 
 void NetMesh::Initialize(unsigned long netMeshDrawableObjectID)
@@ -706,18 +660,7 @@ void NetMesh::Initialize(unsigned long netMeshDrawableObjectID)
         nlVec3Set(m_v3Accel[i], 0.0f, 0.0f, 0.0f);
     }
 
-    mbIsActive = true;
-    mbRelaxing = true;
-    while (mbIsActive)
-    {
-        Update(lbl_806DC7B8, v3Zero, v3Zero, false, 0);
-    }
-
-    for (i = 0; i < m_NumParticles; i++)
-    {
-        m_v3RestPosition[i] = m_v3Position[i];
-    }
-    mbRelaxing = false;
+    UpdateUntilRelaxed();
     mbInitialized = true;
 }
 
@@ -781,7 +724,7 @@ void NetMesh::SetTexture(unsigned long texture)
     sNetTextureHandle = texture;
     if (sbDontUseLowestNetTextureLOD)
     {
-        PlatTexture* tex = fn_802D064C(texture);
+        PlatTexture* tex = glx_GetTex(texture);
         tex->m_MaxLevel = tex->m_Levels - 1;
         tex->Prepare();
     }

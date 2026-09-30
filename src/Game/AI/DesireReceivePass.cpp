@@ -100,7 +100,7 @@ extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 extern "C" void fn_8005C650(cGame*);
-extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
     InterpreterCore*, void*, int, cPlayer*, cPlayer*);
 extern "C" UnidentifiedVariant_80054AB8 fn_800C33C8(
     InterpreterCore*, const char*, cPlayer*, cPlayer*);
@@ -1693,7 +1693,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800C3448(
     cPlayer* pPlayer, cPlayer* pTarget)
 {
     unsigned int localHash = functionHash;
-    return UnidentifiedVariant_80054AB8(fn_80312360(
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
         pInterpreter, pInterpreter->FindFunctionEntryPoint(localHash),
         2, pPlayer, pTarget));
 }

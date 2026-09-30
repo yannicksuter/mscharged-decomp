@@ -13,7 +13,7 @@ class cGlobalPad;
 class Goalie;
 class FormationManager;
 class AIContext;
-class UnidentifiedFuzzyRuntimeBase;
+class FuzzyRuntimeBase;
 class UnidentifiedScriptMachine;
 
 enum eTeamSide
@@ -150,7 +150,7 @@ public:
 };
 
 extern cTeam* g_pTeams[];
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_800A695C(cTeam*);
+extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam*);
 extern "C" UnidentifiedScriptMachine* fn_800A6968(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
 

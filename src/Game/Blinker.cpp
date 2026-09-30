@@ -11,7 +11,7 @@
 
 extern "C"
 {
-    bool lbl_806DCD60 = true;
+    bool gBlinkingEnabled = true;
 }
 
 const float BlinkTimes[4] = {
@@ -39,7 +39,7 @@ void Blinker::Blink(glModel* model)
 
 void Blinker::Update(float fDeltaT)
 {
-    if (!lbl_806DCD60 || fDeltaT < 0.0f)
+    if (!gBlinkingEnabled || fDeltaT < 0.0f)
     {
         m_State = Blink_Open;
         m_fTime = 0.0f;

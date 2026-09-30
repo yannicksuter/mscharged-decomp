@@ -59,6 +59,5 @@ public:
     int mCacheHits;
 };
 
-extern ScriptQuestionCache lbl_805842EC;
 
 #endif // GAME_AI_SCRIPTS_SCRIPT_CACHING_H

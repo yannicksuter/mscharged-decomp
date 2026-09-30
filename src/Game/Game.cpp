@@ -1,4 +1,5 @@
 #include "Game/NetworkMessageRegistry.h"
+#include "Game/DetInput.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/Game.h"
 #include "Game/Weather.h"
@@ -86,7 +87,6 @@ extern PowerupBase* g_pPowerups[];
 extern float (*lbl_806DF560)();
 extern float (*lbl_806DF564)();
 extern "C" const nlVector3 lbl_804DBFE8;
-bool fn_80287B7C(Presentation* state);
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 
 struct UnidentifiedGameStatic
@@ -369,8 +369,8 @@ cGame::cGame(void* param1, int param2, bool param3)
 
     mUnidentified014 = new (nlMalloc(sizeof(AIContext), 8, false))
         AIContext(
-            this, 0, new (nlMalloc(sizeof(UnidentifiedFuzzyRuntime), 8, false))
-                         UnidentifiedFuzzyRuntime());
+            this, 0, new (nlMalloc(sizeof(FuzzyAIRuntime), 8, false))
+                         FuzzyAIRuntime());
     gNetworkMessageRegistry->RegisterReceiver(34, this);
     gNetworkMessageRegistry->RegisterReceiver(35, this);
 
@@ -698,7 +698,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     }
     else
     {
-        GetPresentation()->PlayHighlights();
+        GetPresentation()->PlayGameBegin();
     }
 
     --lbl_806E2130;
@@ -988,7 +988,7 @@ void cGame::fn_80059B70(void* param1)
     }
 }
 
-void cGame::fn_80059D80(u8 param1)
+void cGame::SendNISLoadedCustomDeterm(u8 param1)
 {
     struct Message
     {
@@ -1287,7 +1287,7 @@ void cGame::InitGameState(int state)
         break;
 
     case 3:
-        if (!fn_80287B7C(GetPresentation()))
+        if (!DuringMegaStrikeEndPresentation(GetPresentation()))
         {
             PlaySound(10, 0x42F55573, 0, 0);
         }
@@ -1468,8 +1468,8 @@ extern "C" int fn_8005B45C(
 
 void cGame::fn_8005B508()
 {
-    lbl_805842EC.Clear();
-    fn_8031A02C(&lbl_805842EC);
+    g_FuzzyQuestionCache.Clear();
+    fn_8031A02C(&g_FuzzyQuestionCache);
 
     float fBallRadius = g_pBall->m_pPhysicsBall->GetRadius();
     for (int i = 0; i < 10; i++)

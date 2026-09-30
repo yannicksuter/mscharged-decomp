@@ -52,7 +52,6 @@ extern "C"
     extern char lbl_805222F0[0x11];
     extern char lbl_80522304[9];
     extern bool lbl_806E1960;
-    extern bool lbl_806E1961;
     extern int lbl_806E1968;
     extern StadiumTweaks* lbl_806E196C;
     extern DrawableObject* lbl_8057AB20[12];
@@ -538,7 +537,7 @@ void UpdateHighRange()
     {
         bDisable = true;
     }
-    else if (lbl_806E1961)
+    else if (gDisableHighRange)
     {
         bDisable = true;
     }

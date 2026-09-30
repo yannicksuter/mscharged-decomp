@@ -53,11 +53,13 @@ public:
     void Reset();
     void Finish();
     void FlushHighlights();
-    void Update(float deltaTime);
+    void Update(float deltaT);
     bool Done(float param) const;
-    void SaveHighlight(HighlightQuality quality);
+    void SaveHighlight(int quality);
     int NumHighlights() const;
-    int fn_80195CBC() const;
+    int GetHighlightNumber() const;
+    void StartAutoReplay(bool highlight);
+    void LoadNextHighlight();
 
     /* 0x028 */ int mNumScripts[3][3][8];
     /* 0x148 */ char scriptName[0x40];

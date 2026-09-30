@@ -12,7 +12,7 @@ class AIContext : public FuzzyVariant
 public:
     AIContext(cPlayer* value,
         UnidentifiedScriptMachine* machine,
-        UnidentifiedFuzzyRuntimeBase* runtime)
+        FuzzyRuntimeBase* runtime)
         : FuzzyVariant(value)
         , mTimers(16, 16)
     {
@@ -24,13 +24,13 @@ public:
         }
         if (mRuntime != 0)
         {
-            mRuntime->mValue = this;
+            mRuntime->mAIContext = this;
         }
     }
 
     AIContext(cGame* value,
         UnidentifiedScriptMachine* machine,
-        UnidentifiedFuzzyRuntimeBase* runtime)
+        FuzzyRuntimeBase* runtime)
         : FuzzyVariant(value)
         , mTimers(16, 16)
     {
@@ -42,13 +42,13 @@ public:
         }
         if (mRuntime != 0)
         {
-            mRuntime->mValue = this;
+            mRuntime->mAIContext = this;
         }
     }
 
     AIContext(cTeam* value,
         UnidentifiedScriptMachine* machine,
-        UnidentifiedFuzzyRuntimeBase* runtime)
+        FuzzyRuntimeBase* runtime)
         : FuzzyVariant(value)
         , mTimers(16, 16)
     {
@@ -60,7 +60,7 @@ public:
         }
         if (mRuntime != 0)
         {
-            mRuntime->mValue = this;
+            mRuntime->mAIContext = this;
         }
     }
 
@@ -73,7 +73,7 @@ public:
     Timer* SetTimer(unsigned long key, float seconds);
     bool IsTimerRunning(unsigned long key);
 
-    UnidentifiedFuzzyRuntimeBase* mRuntime;
+    FuzzyRuntimeBase* mRuntime;
     UnidentifiedScriptMachine* mScriptMachine;
     nlAVLTreeSlotPool<unsigned long, Timer,
         DefaultKeyCompare<unsigned long> > mTimers;

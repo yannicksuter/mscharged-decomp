@@ -127,7 +127,7 @@ int ReplayChoreo::NumHighlights() const
     return count;
 }
 
-int ReplayChoreo::fn_80195CBC() const
+int ReplayChoreo::GetHighlightNumber() const
 {
     Highlight* highlight = mUnidentified3EC;
     int index = 1;

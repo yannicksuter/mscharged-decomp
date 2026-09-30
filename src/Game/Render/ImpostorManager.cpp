@@ -266,7 +266,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
     for (; drawIt.hasNext(); drawIt.next())
     {
         character = *drawIt;
-        if (character->mUnidentified034 != 0)
+        if (character->mUseAdditiveBlend != 0)
         {
             glSetRasterState(GLS_DepthTest, 1);
             glSetRasterState(GLS_DepthWrite, 0);
@@ -333,14 +333,14 @@ void ImpostorManager::AddCharacter(ImpostorCharacter* character)
     }
 }
 
-void ImpostorManager::UpdateCharacters(float dt, const char* unidentified)
+void ImpostorManager::UpdateCharacters(float blendTime, const char* name)
 {
     nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        entry->entry->PlayAnimation(dt, unidentified);
+        entry->entry->PlayAnimation(blendTime, name);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;

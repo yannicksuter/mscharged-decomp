@@ -38,15 +38,15 @@ struct shortVector2
 class NetMesh
 {
 public:
-    static NetMesh* fn_801919C0()
+    static NetMesh* GetPositiveXNetMesh()
     {
         return spPositiveXNetMesh;
     }
-    static NetMesh* fn_801919C8()
+    static NetMesh* GetNegativeXNetMesh()
     {
         return spNegativeXNetMesh;
     }
-    static bool fn_801919B8()
+    static bool IsAnimatedNetMeshEnabled()
     {
         return s_bAnimatedNetMeshEnabled;
     }
@@ -80,6 +80,7 @@ public:
         int nParticleA, int nParticleB, float fDistance);
     void Reset(bool usePhysicsBall);
     void SyncLog(void* context, DebugWriteCache* cache);
+    void UpdateUntilRelaxed();
     void Update(float dt, const nlVector3& ballPosition,
         const nlVector3& ballPrevPosition, bool bExaggerateBallSize,
         PhysicsSphere* sphere);

@@ -19,8 +19,6 @@
 
 extern "C" nlVector3* fn_80040234(cFielder*);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
-float ReceivingPass(cFielder*);
-extern "C" cPlayer* fn_800DF790(cTeam*);
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
 extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
 

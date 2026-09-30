@@ -33,7 +33,6 @@
 #include "Game/Sys/tweak.h"
 
 extern "C" {
-extern bool lbl_806DCCA1;
 void GXPokeARGB(u16 x, u16 y, u32 color);
 void GXCopyDisp(void* dest, u8 clear);
 void GXDrawDone();
@@ -69,12 +68,12 @@ static TweakValueBool g_bDisplayFrameRate(
 static TweakValueBool g_bDisplayFrameTicker(
     "g_bDisplayFrameTicker", gLastTweakCategory, false);
 
-float fn_80112E0C()
+float GetStandardAspectRatio()
 {
     return 1.25f;
 }
 
-float fn_80112E14()
+float GetWidescreenAspectRatio()
 {
     return 1.666f;
 }
@@ -136,7 +135,7 @@ void SetupMatrices(cBaseCamera* pCamera, const nlMatrix4* pOverride)
             unsigned short angle = (int)(65536.0f * (0.5f * fFOVRad)) / 360;
             fFOVRad = 2.0f
                 * RadiansToDegrees(
-                    nlATan(nlTan(angle) * fn_80112E14() / fn_80112E0C()));
+                    nlATan(nlTan(angle) * GetWidescreenAspectRatio() / GetStandardAspectRatio()));
         }
     }
 
@@ -479,7 +478,7 @@ void BeginFrameTask::Run(float dt)
     SetupMatrices(NisPlayer::Instance()->fn_8027E708(), pOverride);
     SetupRenderInfo();
 
-    if (!lbl_806DCCA1)
+    if (!g_bProjectedShadows)
     {
         DrawCoPlanarReference();
     }

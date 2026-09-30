@@ -64,10 +64,6 @@ float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
 extern "C" float fn_80030750(cFielder*);
 
-float CloseToFormationPosition(cFielder* pFielder);
-float FarToFormationPosition(cFielder* pFielder);
-extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder);
-extern "C" float fn_800DED80(cPlayer* pPlayer);
 
 float GenerateFilteredRandom()
 {

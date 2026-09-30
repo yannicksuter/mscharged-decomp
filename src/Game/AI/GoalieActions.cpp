@@ -145,7 +145,6 @@ extern unsigned char lbl_806E0D18;
 extern unsigned char lbl_806E0D19;
 extern unsigned char lbl_806E0D1A;
 extern unsigned char lbl_806E0D22;
-float Difficult(cTeam* pTeam);
 extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
@@ -160,10 +159,6 @@ extern "C" float fn_8007ECB4(Goalie* pGoalie, float fTimeToContact,
     unsigned int uSaveType, bool bFromTakeoff, bool bFindFailSave);
 extern "C" bool fn_8007B9EC(
     Goalie* pGoalie, const nlVector3& v3Position);
-extern "C" float fn_8007ACB8(Goalie* pGoalie,
-    const nlVector3& v3TargetPosition, float fParam1, float fParam2);
-extern "C" void fn_8003C5D8(
-    cFielder* pFielder, bool bParam, unsigned short aParam);
 extern "C" void fn_8005E408(
     void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E604(
@@ -181,7 +176,6 @@ extern "C" void fn_8008CED8(Goalie* pGoalie, float fTargetTime,
     const nlVector3& v3TargetVelocity);
 extern "C" void fn_8008685C(Goalie* pGoalie, float fDeltaT);
 
-float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder);
 
 inline void Goalie::InitActionPassInterceptSave()
 {
@@ -2083,7 +2077,7 @@ void Goalie::ActionMove(float deltaTime)
         return;
     }
 
-    if (fn_8007B9A0(g_pBall->m_v3Position, lbl_806DBC9C))
+    if (IsCloseToNet(g_pBall->m_v3Position, lbl_806DBC9C))
     {
         if (mUrgency == URGENCY_LOW)
         {
@@ -2873,7 +2867,7 @@ bool Goalie::fn_80090958(bool bParam)
 
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
         mbIsDown = true;
-        fn_8007EB5C();
+        StartStunEffect();
         SetGoalieAction(GOALIEACTION_UNIDENTIFIED_25, 0);
         m_pPhysicsCharacter->m_CanCollideWithGoalLine = false;
     }
@@ -3563,7 +3557,7 @@ void Goalie::fn_8008A610(float fDeltaT)
 {
     if (mnOffplayPending != GOALIE_OFFPLAY_NONE
         || (mpTarget->m_pBall != 0
-            && !fn_8007B9A0(mpTarget->mUnidentified024.m_v3Position, lbl_806DBC98)))
+            && !IsCloseToNet(mpTarget->mUnidentified024.m_v3Position, lbl_806DBC98)))
     {
         InitActionMove(false);
         return;
@@ -4508,7 +4502,7 @@ void Goalie::InitActionLooseBallSetup()
     {
         if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && bInCone
             && fBallSpeed > 0.25f
-            && fn_8007B9A0(v3BallPosition, 5.0f))
+            && IsCloseToNet(v3BallPosition, 5.0f))
         {
             nlVector3 v3GuessBallPos;
             nlVector3 v3GuessBallVel;
@@ -4898,7 +4892,7 @@ void Goalie::InitActionLooseBallSetup()
 
             if (fHeightTime >= 0.0f)
             {
-                if (fn_8007B9A0(v3IntPos, 8.0f))
+                if (IsCloseToNet(v3IntPos, 8.0f))
                 {
                     if (fTargetHeight < 3.0f)
                     {
@@ -6550,7 +6544,7 @@ void Goalie::fn_8008ED44(bool bParam)
             PlayNewAnim(mpSaveData->mnAnimID);
             if (bUseSTSSpinMiss)
             {
-                fn_8007EB5C();
+                StartStunEffect();
             }
         }
 

@@ -237,36 +237,36 @@ class NetworkMessageType30 : public NetworkMessage
 {
 public:
     NetworkMessageType30()
-        : mUnidentified08(0)
+        : mByPassNumber(0)
     {
     }
-    NetworkMessageType30(u32 value)
-        : mUnidentified08(value)
+    NetworkMessageType30(u32 byPassNumber)
+        : mByPassNumber(byPassNumber)
     {
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual int GetType() { return 30; }
 
-    /* 0x08 */ u32 mUnidentified08;
+    /* 0x08 */ u32 mByPassNumber;
 };
 
 class NetworkMessageType31 : public NetworkMessage
 {
 public:
     NetworkMessageType31()
-        : mUnidentified08(0)
+        : mByPassNumber(0)
     {
     }
-    NetworkMessageType31(u32 value)
-        : mUnidentified08(value)
+    NetworkMessageType31(u32 byPassNumber)
+        : mByPassNumber(byPassNumber)
     {
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual int GetType() { return 31; }
 
-    /* 0x08 */ u32 mUnidentified08;
+    /* 0x08 */ u32 mByPassNumber;
 };
 
 // Periodic state for one game in the online tournament bracket. The message

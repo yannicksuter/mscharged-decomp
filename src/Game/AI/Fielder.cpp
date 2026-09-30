@@ -1,3 +1,4 @@
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/DetInput.h"
@@ -50,7 +51,6 @@
 #include "Game/CharacterTriggers.h"
 
 extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
-extern "C" float fn_800DDF54(cPlayer*, cPlayer*);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
@@ -235,7 +235,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     m_pShotMeter = new (8, false) ShotMeter();
     mUnidentified428 = new (8, false) AIContext(this,
         new (8, false) FielderDesireMachine(),
-        new (8, false) UnidentifiedFuzzyRuntime());
+        new (8, false) FuzzyAIRuntime());
     mUnidentified428->mScriptMachine->UnidentifiedVirtual2();
 
     bIsModified = false;
@@ -538,7 +538,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(
 cFielder* cFielder::DoFindBestHitTarget()
 {
     UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
-        fn_800E30A8(this), "BestHitTarget", this);
+        FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
     if (vBestTarget.IsPointerType())
     {
         return (cFielder*)vBestTarget.mData.pPlayer;
@@ -556,7 +556,7 @@ void cFielder::SetSlideAttackSuccessFlag()
     bAttackSucceeded = true;
 }
 
-UnidentifiedFuzzyRuntimeBase* cFielder::fn_8002E198() const
+FuzzyRuntimeBase* cFielder::GetFuzzyRuntime() const
 {
     return mUnidentified428->mRuntime;
 }

@@ -51,7 +51,7 @@ public:
 struct SaveBlendInfo
 {
     void fn_80091704();
-    void UnidentifiedSyncLog(void* context, DebugWriteCache* cache);
+    void SyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ float mfStartTime;
     /* 0x04 */ float mfMilestoneTime[5];

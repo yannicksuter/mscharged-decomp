@@ -139,7 +139,7 @@ inline void TransportConnection::PrepareMessage(
 inline void TransportConnection::Send(
     TransportMessage& message)
 {
-    mSocket->SendMessage(&message, mAddress, mPort, &mSocketError);
+    mSocket->SendMessage(&message, mAddress.bytes, mPort, &mSocketError);
 }
 
 TransportConnection::TransportConnection(
@@ -170,7 +170,7 @@ TransportConnection::TransportConnection(
     mConnectStartTime = now;
     mKeepAliveReceiveTime = now;
     mKeepAliveSendTime = now;
-    *(u32*)mAddress = *(const u32*)address;
+    mAddress.word = *(const u32*)address;
     memset(mExpectedChallengeResponse, 0, sizeof(mExpectedChallengeResponse));
     if (outgoing)
     {
@@ -380,7 +380,7 @@ void TransportConnection::UpdateKeepAlive()
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Submitted Keep Alive For Send after %d ms conn %d.%d\n",
-                elapsed, mAddress[2], mAddress[3]);
+                elapsed, mAddress.bytes[2], mAddress.bytes[3]);
         }
         mKeepAliveSendTime = now;
     }
@@ -926,7 +926,7 @@ void TransportConnection::Deliver(
         {
             mState = STATE_5;
             GetCallback()->OnConnectionRequest(
-                (u32)this, mAddress, 0, 0, 0);
+                (u32)this, mAddress.bytes, 0, 0, 0);
         }
         break;
     }
@@ -969,8 +969,8 @@ void TransportConnection::Deliver(
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Received keep alive message after %d MS conn %d.%d\n",
-                (int)nlGetTimeDifference(mKeepAliveReceiveTime, now), mAddress[2],
-                mAddress[3]);
+                (int)nlGetTimeDifference(mKeepAliveReceiveTime, now), mAddress.bytes[2],
+                mAddress.bytes[3]);
         }
         mKeepAliveReceiveTime = now;
         break;

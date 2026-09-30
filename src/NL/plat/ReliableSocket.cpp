@@ -307,8 +307,8 @@ void ReliableSocket::Update()
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Deleting connection address %d.%d.%d.%d state %d host %d",
-                mConnections[i]->mAddress[0], mConnections[i]->mAddress[1],
-                mConnections[i]->mAddress[2], mConnections[i]->mAddress[3],
+                mConnections[i]->mAddress.bytes[0], mConnections[i]->mAddress.bytes[1],
+                mConnections[i]->mAddress.bytes[2], mConnections[i]->mAddress.bytes[3],
                 mConnections[i]->GetState(), mConnections[i]->mIncoming);
             delete mConnections[i];
             mConnections[i] = 0;
@@ -462,7 +462,7 @@ void* ReliableSocket::FindConnection(const u8* address)
 {
     for (int i = 0; i < mConnectionCount; i++)
     {
-        if (memcmp(mConnections[i]->mAddress,
+        if (memcmp(mConnections[i]->mAddress.bytes,
                 address, 4)
             == 0)
         {

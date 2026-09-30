@@ -126,7 +126,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         if (player->m_eClassType == 3)
         {
             cFielder* goalie = (cFielder*)player;
-            ((Goalie*)goalie)->fn_8007CB78(true, mID);
+            ((Goalie*)goalie)->SetWallBlock(true, mID);
             return FielderContact(goalie);
         }
         return ONE_WAY_CONTACT_OTHER;

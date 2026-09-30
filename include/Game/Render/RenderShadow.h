@@ -21,6 +21,8 @@ struct ProjectedShadowParams
     /* 0x34 */ int nInvisibleInterval;
 }; // size: 0x38
 
+extern bool g_bProjectedShadows;
+
 float GetCoPlanarZ();
 void SetCoPlanarZ(float z);
 void SetPlanarShadowOpacity(float opacity);

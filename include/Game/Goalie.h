@@ -171,10 +171,10 @@ public:
     void ChooseSwatAnim(int nParam);
     void DoPassRelease();
     void DoNavigation(float fDeltaT, float fIdleDistance, eNaviMode naviMode);
-    static void fn_8007FE28(int nTeamSide);
+    static void HandleGoalScored(int nTeamSide);
     void fn_8007EA90();
     bool fn_8007EB10();
-    void fn_8007EB5C();
+    void StartStunEffect();
     float CalcSaveParameters(float fTimeToContact,
         unsigned int uSaveType, bool bFromTakeoff,
         bool bFindFailSave);
@@ -198,15 +198,15 @@ public:
     bool IsWithinPounceRange();
     bool IsOpponentBallCarrierInRange();
     bool IsLooseBallTowardNet();
-    bool fn_8007B9A0(const nlVector3& v3Position, float fRange);
-    void fn_8007CB78(bool bBlocked, unsigned int uWallID);
-    bool UnidentifiedWallBlocked() const { return mfWallBlock > 0.0f; }
+    bool IsCloseToNet(const nlVector3& v3Position, float fRange);
+    void SetWallBlock(bool bBlocked, unsigned int uWallID);
+    bool IsWallBlocked() const { return mfWallBlock > 0.0f; }
     void ChooseDesperationAnim(float fFudgeDist);
     float CalcTimeToPlane(float fPlaneOffset);
     void UpdateActionState(float fDeltaTime);
     void fn_80084EB0(float fDeltaTime);
-    bool fn_800779D0();
-    void fn_80080EFC();
+    bool CheckForDaze();
+    void InitActionSTSRecover();
     bool PreCollideWithBallCallback(const dContact& contact);
     bool InitiatePickup();
     void InitiatePanicGrab(cPlayer* pPlayer);
@@ -416,7 +416,7 @@ public:
     /* 0x424 */ SaveData* mpSaveData;
     /* 0x428 */ SaveBlendInfo mBlendInfo;
     /* 0x4B8 */ GoalieFatigue mFatigue;
-    /* 0x4C8 */ cShootToScoreCamera* mUnidentified4C8;
+    /* 0x4C8 */ cShootToScoreCamera* mpShootToScoreCamera;
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
     /* 0x4D0 */ int mUnidentified4D0[10];
     /* 0x4F8 */ float mUnidentified4F8[10];
@@ -424,5 +424,9 @@ public:
     /* 0x528 */ bool mUnidentified528;
     /* 0x529 */ bool mUnidentified529;
 }; // total size: at least 0x52A
+
+extern "C" float fn_8007ACB8(Goalie* pGoalie,
+    const nlVector3& v3TargetPosition, float fParam1, float fParam2);
+extern "C" void GoalieOnGameOver();
 
 #endif // GAME_GOALIE_H

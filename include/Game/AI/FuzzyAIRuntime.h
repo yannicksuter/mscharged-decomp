@@ -6,151 +6,172 @@
 #include "NL/nlList.h"
 #include "NL/nlString.h"
 
-class UnidentifiedFuzzyRuntimeBase;
-struct UnidentifiedFielderIterator;
-struct UnidentifiedRuntimeFielderReference;
+class FuzzyRuntimeBase;
+class ScriptQuestionCache;
+struct FuzzyFielderIterator;
+struct FuzzyFielderReference;
 struct UnidentifiedTransitionReference;
 
-struct UnidentifiedRuntimeActionQueue
+struct FuzzyActionQueueEntry
 {
     UnidentifiedActionQueue* mQueue;
     bool mOwnsQueue;
     u8 mPadding005[3];
-    int mUnidentified008;
+    int mQuestionHash;
     float mConfidence;
-    UnidentifiedRuntimeActionQueue* next;
+    FuzzyActionQueueEntry* next;
 };
 
-struct UnidentifiedRuntimeActionQueueList
+struct FuzzyActionQueueList
 {
-    UnidentifiedRuntimeActionQueueList(
-        UnidentifiedRuntimeActionQueue* head,
-        UnidentifiedRuntimeActionQueue* tail)
+    FuzzyActionQueueList(
+        FuzzyActionQueueEntry* head,
+        FuzzyActionQueueEntry* tail)
     {
         mTail = tail;
         mHead = head;
     }
 
-    UnidentifiedRuntimeActionQueue* mHead;
-    UnidentifiedRuntimeActionQueue* mTail;
+    FuzzyActionQueueEntry* mHead;
+    FuzzyActionQueueEntry* mTail;
 };
 
-struct UnidentifiedRuntimeTypeEntry
+struct FuzzyParameterEntry
 {
-    UnidentifiedRuntimeTypeEntry(const char* name, int type)
-        : mType(type)
+    FuzzyParameterEntry(const char* name, int index)
+        : mIndex(index)
         , mHash(nlStringLowerHash(name))
     {
     }
 
-    int mType;
+    int mIndex;
     unsigned long mHash;
-    UnidentifiedRuntimeTypeEntry* next;
+    FuzzyParameterEntry* next;
 };
 
-struct UnidentifiedRuntimeTypeList
+struct FuzzyParameterList
 {
-    UnidentifiedRuntimeTypeList()
+    FuzzyParameterList()
     {
         mTail = 0;
         mHead = 0;
     }
 
-    void AddEnd(UnidentifiedRuntimeTypeEntry* entry)
+    void AddEnd(FuzzyParameterEntry* entry)
     {
         nlListAddEnd(&mHead, &mTail, entry);
     }
 
-    UnidentifiedRuntimeTypeEntry* mHead;
-    UnidentifiedRuntimeTypeEntry* mTail;
+    FuzzyParameterEntry* mHead;
+    FuzzyParameterEntry* mTail;
 };
 
 class UnidentifiedFuzzyRuntimeValue : public FuzzyVariant
 {
 public:
-    UnidentifiedFuzzyRuntimeBase* mRuntime;
+    FuzzyRuntimeBase* mRuntime;
     u32 mUnidentified018;
     UnidentifiedVariantCollection ExtraData;
 };
 
-class UnidentifiedFuzzyRuntimeBase : public InterpreterCore
+class FuzzyRuntimeBase : public InterpreterCore
 {
 public:
-    UnidentifiedFuzzyRuntimeBase(AIContext*);
-    virtual ~UnidentifiedFuzzyRuntimeBase();
+    FuzzyRuntimeBase(AIContext*);
+    virtual ~FuzzyRuntimeBase();
     virtual void DoFunctionCall(unsigned int) = 0;
     virtual bool ExecuteFunction(
         FunctionEntryPoint*, unsigned int, u32, u32, u32, u32);
-    virtual float UnidentifiedVirtual3(float, float);
-    virtual float UnidentifiedVirtual4(float, float);
-    virtual float UnidentifiedVirtual5(float);
+    virtual float FuzzyEqual(float, float);
+    virtual float FLESS(float, float);
+    virtual float FuzzyNot(float);
     virtual float UnidentifiedVirtual6(float);
     virtual float UnidentifiedVirtual7(float, float, float, bool);
-    virtual float UnidentifiedVirtual8();
-    virtual UnidentifiedVariant_80054AB8* UnidentifiedVirtual9();
-    virtual float UnidentifiedVirtual10(float);
-    virtual float UnidentifiedVirtual11();
-    virtual void UnidentifiedVirtual12(UnidentifiedVariant_80054AB8*);
-    virtual UnidentifiedVariant_80054AB8* UnidentifiedReturn(
+    virtual float BeginActionQueue();
+    virtual UnidentifiedVariant_80054AB8* EndActionQueue();
+    virtual float BeginConfidenceScope(float);
+    virtual float EndConfidenceScope();
+    virtual void AddAction(UnidentifiedVariant_80054AB8*);
+    virtual UnidentifiedVariant_80054AB8* ReturnValue(
         UnidentifiedVariant_80054AB8*, float);
-    virtual void UnidentifiedVirtual14(
-        UnidentifiedVariant_80054AB8*, int, const Variant&);
-    virtual void UnidentifiedVirtual15();
+    virtual void SetActionParameter(
+        UnidentifiedVariant_80054AB8*, int, Variant&);
+    virtual void RegisterParameters();
 
-    // Build a native-call result and record its confidence and continuation.
+    // Build a native-call result and record its confidence and instruction offset.
     template <typename T>
-    UnidentifiedVariant_80054AB8* UnidentifiedCreateReturnValue(
+    UnidentifiedVariant_80054AB8* CreateReturnValue(
         eVariantType type, T value, float confidence);
-    UnidentifiedVariant_80054AB8* UnidentifiedCreateReturnValue(
+    UnidentifiedVariant_80054AB8* CreateReturnValue(
         UnidentifiedVariant_80054AB8* value, float confidence);
 
-    UnidentifiedFuzzyRuntimeBase* next;
-    AIContext* mValue;
-    UnidentifiedRuntimeActionQueueList mCollection;
-    nlListSlotPool<UnidentifiedVariant_80054AB8*> mUnidentified038;
-    int mUnidentified058;
-    unsigned long mUnidentified05C;
-    bool mUnidentified060;
+    FuzzyRuntimeBase* next;
+    AIContext* mAIContext;
+    FuzzyActionQueueList mActionQueues;
+    nlListSlotPool<UnidentifiedVariant_80054AB8*> mReturnValues;
+    int mReturnInstructionOffset;
+    unsigned long mFunctionHash;
+    bool mCaptureReturnValue;
     u8 mPadding061[3];
-    UnidentifiedFuzzyRuntimeValue* mUnidentified064;
+    UnidentifiedFuzzyRuntimeValue* mCurrentContext;
 };
 
-class UnidentifiedFuzzyRuntime : public UnidentifiedFuzzyRuntimeBase
+class FuzzyAIRuntime : public FuzzyRuntimeBase
 {
 public:
-    UnidentifiedFuzzyRuntime();
-    float fn_800E34F4(unsigned long hash);
-    virtual ~UnidentifiedFuzzyRuntime();
+    FuzzyAIRuntime();
+    float GetSkillValue(unsigned long hash);
+    virtual ~FuzzyAIRuntime();
     virtual void DoFunctionCall(unsigned int);
-    virtual float UnidentifiedVirtual8();
-    virtual UnidentifiedVariant_80054AB8* UnidentifiedVirtual9();
-    virtual void UnidentifiedVirtual12(UnidentifiedVariant_80054AB8*);
-    virtual void UnidentifiedVirtual15();
+    virtual float BeginActionQueue();
+    virtual UnidentifiedVariant_80054AB8* EndActionQueue();
+    virtual void AddAction(UnidentifiedVariant_80054AB8*);
+    virtual void RegisterParameters();
 };
 
-extern UnidentifiedRuntimeTypeList lbl_806E20B0;
+extern FuzzyParameterList g_FuzzyParameters;
+extern ScriptQuestionCache g_FuzzyQuestionCache;
+extern char g_FuzzyAIScriptFilename[];
+extern char* g_pFuzzyAIScriptFilename;
 
-extern "C" int fn_80312208(unsigned long hash);
+extern "C" void FuzzyByteCodeLoaded(void* byteCode, unsigned long, void*);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyReturnVariantCopy(
+    FuzzyRuntimeBase* runtime, UnidentifiedVariant_80054AB8 value, float confidence);
+extern "C" bool FuzzyTryCachedQuestion(FuzzyRuntimeBase* runtime, const Variant& value);
+extern "C" void FuzzySetBoolParameter(FuzzyRuntimeBase*, bool, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzySetStringParameter(FuzzyRuntimeBase*, const char*, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzySetFloatParameter(FuzzyRuntimeBase*, float, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzySetIntParameter(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzySetVariantParameter(FuzzyRuntimeBase*, Variant&, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzySetU32Parameter(FuzzyRuntimeBase*, unsigned long, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" bool FuzzyHasContextParameter(FuzzyRuntimeBase*, unsigned long);
+extern "C" Variant* FuzzyGetContextParameter(FuzzyRuntimeBase*, unsigned long);
+extern "C" bool FuzzyIsTimerRunning(FuzzyRuntimeBase*, unsigned long);
+extern "C" bool FuzzyWasTimerRunning(FuzzyRuntimeBase*, unsigned long);
+extern "C" float FuzzyGetTimerSeconds(FuzzyRuntimeBase*, unsigned long);
+extern "C" float FuzzySetTimerSeconds(FuzzyRuntimeBase*, unsigned long, float);
+
+extern "C" int FuzzyFindParameterIndex(unsigned long hash);
 // Executes the script function named by hash through the runtime for its
 // current value and returns the result variant it leaves on the stack.
 UnidentifiedVariant_80054AB8* ExecuteScriptFunction(
-    UnidentifiedFuzzyRuntimeBase* runtime, u32 hash,
+    FuzzyRuntimeBase* runtime, u32 hash,
     UnidentifiedFuzzyRuntimeValue* action);
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30A8(cFielder*);
+extern "C" FuzzyRuntimeBase* FuzzyAIGetFielderRuntime(cFielder*);
 
 
 // Shared functions and data from Game/AI/Scripts/FuzzyAIRuntime.cpp.
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_800E30AC(cTeam*);
-extern "C" const char* fn_800E3198();
-extern "C" cPlayer* fn_800E34D8();
-extern "C" cBall* fn_800E34E4();
-extern "C" void* fn_800E34EC();
-extern "C" UnidentifiedVariant_80054AB8* fn_800E35D4(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E3700(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E382C(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E3958(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" void fn_800E3A84(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E3B34(void*, cBall*, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" FuzzyRuntimeBase* FuzzyAIGetTeamRuntime(cTeam*);
+extern "C" const char* GetFuzzyAIScriptFilename();
+extern "C" cPlayer* FuzzyAIGetBallOwner();
+extern "C" cBall* FuzzyAIGetBall();
+extern "C" void* FuzzyAIGetGame();
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E35D4(FuzzyAIRuntime*, int, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E3700(FuzzyAIRuntime*, int, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E382C(FuzzyAIRuntime*, int, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E3958(FuzzyAIRuntime*, int, float);
+extern "C" void FuzzyAISetPlayerParameter_800E3A84(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetBallParameter(void*, cBall*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void* fn_800E3BE4(void*, void*);
 extern "C" void* fn_800E3BEC(void*, void*);
 extern "C" void* fn_800E3BF4(void*, void*);
@@ -161,56 +182,56 @@ extern "C" void* fn_800E3C14(void*, Variant*);
 extern "C" void* fn_800E3C2C(void*, Variant*);
 extern "C" void* fn_800E3C44(void*, Variant*);
 extern "C" void* fn_800E3C5C(void*, Variant*);
-extern "C" UnidentifiedFielderIterator* fn_800E3C74(void*, cTeam*);
-extern "C" UnidentifiedFielderIterator* fn_800E3D00(void*, cFielder*);
-extern "C" UnidentifiedFielderIterator* fn_800E3D98(void*, cFielder*);
-extern "C" UnidentifiedFielderIterator* fn_800E3E68(void*, UnidentifiedFielderIterator*);
-extern "C" bool fn_800E3EDC(void*, UnidentifiedFielderIterator*);
-extern "C" void fn_800E3EF8(void*, UnidentifiedFielderIterator*);
-extern "C" cFielder* fn_800E3F10(void*, UnidentifiedFielderIterator*);
-extern "C" cFielder* fn_800E3F1C(void*, UnidentifiedFielderIterator*);
-extern "C" AIContext* fn_800E3F28(void*, UnidentifiedFielderIterator*);
-extern "C" unsigned long fn_800E3FDC(const char*);
+extern "C" FuzzyFielderIterator* FuzzyAICreateTeamFielderIterator(void*, cTeam*);
+extern "C" FuzzyFielderIterator* FuzzyAICreateOpponentFielderIterator(void*, cFielder*);
+extern "C" FuzzyFielderIterator* FuzzyAICreateTeammateIterator(void*, cFielder*);
+extern "C" FuzzyFielderIterator* FuzzyAIAdvanceFielderIterator(void*, FuzzyFielderIterator*);
+extern "C" bool FuzzyAIHasNextFielder(void*, FuzzyFielderIterator*);
+extern "C" void FuzzyAIDestroyFielderIterator(void*, FuzzyFielderIterator*);
+extern "C" cFielder* FuzzyAIGetIteratorFielder_800E3F10(void*, FuzzyFielderIterator*);
+extern "C" cFielder* FuzzyAIGetIteratorFielder_800E3F1C(void*, FuzzyFielderIterator*);
+extern "C" AIContext* FuzzyAIGetIteratorAIContext(void*, FuzzyFielderIterator*);
+extern "C" unsigned long FuzzyAIStringHash(const char*);
 extern "C" float fn_800E3FE0();
 extern "C" float fn_800E3FE4();
 extern "C" float fn_800E3FE8();
 extern "C" float fn_800E3FEC();
-extern "C" bool fn_800E7EB4(InterpreterCore*);
+extern "C" bool FuzzyAIIsUndoingCall(InterpreterCore*);
 extern "C" float fn_800E7ECC(void*, Variant*);
 extern "C" unsigned long fn_800E7ED4(void*, Variant*);
 extern "C" unsigned long fn_800E7EDC(void*, Variant*);
 extern "C" unsigned long fn_800E7EE4(void*, Variant*);
 extern "C" float fn_800E7EEC(void*, Variant*);
-extern "C" float fn_800E7EF4(void*, UnidentifiedVariant_80054AB8*);
-extern "C" float fn_800E7F48(bool);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E7F60(UnidentifiedFuzzyRuntime*, bool, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8090(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E81BC(UnidentifiedFuzzyRuntime*, int, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E82E8(UnidentifiedFuzzyRuntime*, float, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8414(UnidentifiedFuzzyRuntime*, float, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8540(UnidentifiedFuzzyRuntime*, UnidentifiedVariant_80054AB8*, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8B80(UnidentifiedFuzzyRuntime*, unsigned long, float);
+extern "C" float FuzzyAIGetConfidence(void*, UnidentifiedVariant_80054AB8*);
+extern "C" float FuzzyAIBoolToFloat(bool);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnBool(FuzzyAIRuntime*, bool, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E8090(FuzzyAIRuntime*, int, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E81BC(FuzzyAIRuntime*, int, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E82E8(FuzzyAIRuntime*, float, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E8414(FuzzyAIRuntime*, float, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnVariant(FuzzyAIRuntime*, UnidentifiedVariant_80054AB8*, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnU32(FuzzyAIRuntime*, unsigned long, float);
 extern "C" float fn_800E8CAC(void*, float, bool);
 extern "C" unsigned long fn_800E8CB0(void*, Variant*);
-extern "C" void fn_800E8CB8(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D68(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D6C(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D70(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D74(UnidentifiedFuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" void fn_800E8D78(void*, UnidentifiedRuntimeFielderReference*, unsigned long, UnidentifiedVariant_80054AB8*);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8E38(UnidentifiedFuzzyRuntime*, cPlayer*, float);
-extern "C" UnidentifiedVariant_80054AB8* fn_800E8F8C(UnidentifiedFuzzyRuntime*, UnidentifiedRuntimeFielderReference*, float);
-extern "C" bool fn_800E90EC(void*, cPlayer*);
-extern "C" bool fn_800E9194(void*, cPlayer*);
-extern "C" bool fn_800E923C(void*, cTeam*);
-extern "C" void fn_800E92E4(UnidentifiedScriptMachine*, const char*);
+extern "C" void FuzzyAISetPlayerParameter_800E8CB8(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetIntParameter_800E8D6C(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetIntParameter_800E8D70(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetIntParameter_800E8D74(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" void FuzzyAISetFielderParameter(void*, FuzzyFielderReference*, unsigned long, UnidentifiedVariant_80054AB8*);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnPlayer(FuzzyAIRuntime*, cPlayer*, float);
+extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(FuzzyAIRuntime*, FuzzyFielderReference*, float);
+extern "C" bool FuzzyAITryCachedPlayerQuestion_800E90EC(FuzzyRuntimeBase*, cPlayer*);
+extern "C" bool FuzzyAITryCachedPlayerQuestion_800E9194(FuzzyRuntimeBase*, cPlayer*);
+extern "C" bool FuzzyAITryCachedTeamQuestion(FuzzyRuntimeBase*, cTeam*);
+extern "C" void FuzzyAISetTransition(UnidentifiedScriptMachine*, const char*);
 
 
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311750( UnidentifiedFuzzyRuntimeValue* value);
-extern "C" void fn_80311AFC(const char* filename, bool async);
-extern "C" bool fn_80311C5C();
+extern "C" FuzzyRuntimeBase* fn_80311750( UnidentifiedFuzzyRuntimeValue* value);
+extern "C" void LoadFuzzyByteCode(const char* filename, bool async);
+extern "C" bool ApplyFuzzyByteCode();
 extern "C" char fn_80312358(void*, char value);
-extern "C" float fn_80314428( UnidentifiedFuzzyRuntimeBase* runtime);
+extern "C" float FuzzyGetQueueConfidence( FuzzyRuntimeBase* runtime);
 extern "C" void fn_80314434(void*, UnidentifiedVariant_80054AB8*, float);
 extern "C" void fn_80314438(void*, UnidentifiedVariant_80054AB8*);
 extern "C" void* fn_8031443C(void*, void* value, bool);
@@ -222,36 +243,36 @@ extern "C" float fn_803144C8( float first, float second, float amount);
 extern "C" float fn_80314504( float first, float second, float minimum, float maximum, float value);
 extern "C" float fn_80314538( float first, float second, float minimum, float maximum, float value);
 extern "C" void fn_80314740(void*, bool);
-extern "C" void fn_80314744( UnidentifiedFuzzyRuntimeBase* runtime, int selection);
-extern "C" void fn_80314750( void*, UnidentifiedTransitionReference* reference, const char* name);
+extern "C" void FuzzySetActionSelection( FuzzyRuntimeBase* runtime, int selection);
+extern "C" void FuzzySetTransition( void*, UnidentifiedTransitionReference* reference, const char* name);
 extern "C" bool fn_80314798(void*);
-extern "C" UnidentifiedFuzzyRuntimeValue* fn_8031479C( void*, UnidentifiedFuzzyRuntimeBase* runtime);
-extern "C" int fn_803147A4( UnidentifiedFuzzyRuntimeBase* runtime);
-extern "C" void fn_803148C4(float value);
-extern "C" void fn_803148D0(void*, const char* value);
+extern "C" UnidentifiedFuzzyRuntimeValue* FuzzyGetCurrentContext( void*, FuzzyRuntimeBase* runtime);
+extern "C" int fn_803147A4( FuzzyRuntimeBase* runtime);
+extern "C" void FuzzyPrintFloat(float value);
+extern "C" void FuzzyPrintString(void*, const char* value);
 
 template <typename T>
 inline UnidentifiedVariant_80054AB8*
-UnidentifiedFuzzyRuntimeBase::UnidentifiedCreateReturnValue(
+FuzzyRuntimeBase::CreateReturnValue(
     eVariantType type, T value, float confidence)
 {
     UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
         UnidentifiedVariant_80054AB8(type, value);
     result->SetParameter(4, FuzzyVariant(confidence));
-    mUnidentified058 = GetInstructionOffset() + 1;
-    return UnidentifiedReturn(result, confidence);
+    mReturnInstructionOffset = GetInstructionOffset() + 1;
+    return ReturnValue(result, confidence);
 }
 
 inline UnidentifiedVariant_80054AB8*
-UnidentifiedFuzzyRuntimeBase::UnidentifiedCreateReturnValue(
+FuzzyRuntimeBase::CreateReturnValue(
     UnidentifiedVariant_80054AB8* value, float confidence)
 {
     UnidentifiedVariant_80054AB8* result;
     lbl_805842C8.Allocate(result);
     result = new (result) UnidentifiedVariant_80054AB8(value);
     result->SetParameter(4, FuzzyVariant(confidence));
-    mUnidentified058 = GetInstructionOffset() + 1;
-    return UnidentifiedReturn(result, confidence);
+    mReturnInstructionOffset = GetInstructionOffset() + 1;
+    return ReturnValue(result, confidence);
 }
 
 #endif // GAME_AI_FUZZY_AI_RUNTIME_H

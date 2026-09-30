@@ -83,20 +83,20 @@ struct NisHeader
     /* 0x05C */ nlVector3 minBounds;
     /* 0x068 */ nlVector3 maxBounds;
     /* 0x074 */ nlVector3 beginPositions[4];
-    /* 0x0A4 */ int mUnidentified0A4;
-    /* 0x0A8 */ char mUnidentified0A8[8][16];
-    /* 0x128 */ nlVector2 mUnidentified128[8];
-    /* 0x168 */ u16 mUnidentified168[8];
+    /* 0x0A4 */ int numAnimProxies;
+    /* 0x0A8 */ char animProxyNames[8][16];
+    /* 0x128 */ nlVector2 animProxyPositions[8];
+    /* 0x168 */ u16 animProxyDirections[8];
     /* 0x178 */ NisTarget target;
     /* 0x17C */ NisWinnerType winnerType;
     /* 0x180 */ u32 unknown_0x180;
     /* 0x184 */ nlVector3 stadiumOffset;
     /* 0x190 */ float mTime;
     /* 0x194 */ bool mUnidentified194;
-    /* 0x195 */ bool mUnidentified195;
+    /* 0x195 */ bool mirrored;
     /* 0x196 */ u8 unknown_0x196[0x02];
-    /* 0x198 */ char* unknown_0x198;
-    /* 0x19C */ u32 unknown_0x19C;
+    /* 0x198 */ char* buffer;
+    /* 0x19C */ u32 bufferSize;
 };
 
 class Nis : public InterpreterCore
@@ -123,47 +123,47 @@ public:
         /* 0x10 */ TriggerParams params;
 
         void Fire(Nis& nis) const;
-        void FireEffect(Nis& nis) const;
+        void FireEffect(const Nis& nis) const;
     };
 
-    struct Unidentified864
+    struct PendingAnimation
     {
-        /* 0x00 */ const char* mUnidentified00;
-        /* 0x04 */ int mUnidentified04;
-        /* 0x08 */ bool mUnidentified08;
+        /* 0x00 */ const char* name;
+        /* 0x04 */ int characterIndex;
+        /* 0x08 */ bool loaded;
         /* 0x09 */ u8 unknown_0x09[0x03];
-        /* 0x0C */ unsigned int mUnidentified0C;
-        /* 0x10 */ void* mUnidentified10;
-        /* 0x14 */ unsigned long mUnidentified14;
-        /* 0x18 */ void* mUnidentified18;
+        /* 0x0C */ unsigned int loadHandle;
+        /* 0x10 */ void* data;
+        /* 0x14 */ unsigned long size;
+        /* 0x18 */ void* request;
     };
 
     Nis(NisHeader& header, char* data, int size);
     virtual ~Nis();
-    virtual void DoFunctionCall(unsigned int param1);
+    virtual void DoFunctionCall(unsigned int function);
 
     char* Name() const;
-    void fn_802815E0();
-    void fn_802816CC();
+    void StartScript();
+    void ApplyLoadedAnimations();
     void Update(float dt);
     void UpdateTriggers(float oldTime, float newTime, float duration);
     void SelectCamera(cAnimCamera& camera, int cameraIndex);
-    void fn_80281C70(cAnimCamera& camera);
+    void SelectRandomCamera(cAnimCamera& camera);
     void Render(int param1);
     nlVector3 Offset() const;
     void AddTrigger(NisTriggerType triggerType, float frameNumber,
         const char* name, const char* target, TriggerParams* trigParams);
-    bool fn_80282474(nlVector3& param1) const;
-    int fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) const;
-    void fn_802834A0();
-    ImpostorModel* fn_8028350C(eCharacterClass param1, const char* param2,
-        const char* param3, DrawableCharacter** param4);
-    ImpostorModel* fn_80283884(const char* name);
-    void fn_80283670(glModel* model, DrawableCharacter* character);
-    bool fn_80283930();
-    void fn_80283A40(const char* param1, int param2);
-    void fn_80283200(const char* param1, const char* param2,
-        NisTarget param3, NisWinnerType param4, bool param5);
+    bool GetMainCharacterHeadPosition(nlVector3& position) const;
+    int TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvailableSidekick) const;
+    void AttachHeadImpostors();
+    ImpostorModel* AttachImpostorToCharacter(eCharacterClass characterClass, const char* impostorName,
+        const char* textureName, DrawableCharacter** outCharacter);
+    ImpostorModel* FindImpostor(const char* name);
+    void ApplyDamageEffects(glModel* model, DrawableCharacter* character);
+    bool IsLoading();
+    void LoadCharacterAnimation(const char* animName, int characterIndex);
+    void PlayAnimProxy(const char* animName, const char* proxyName,
+        NisTarget target, NisWinnerType winnerType, bool force);
 
     /* 0x028 */ NisHeader* mHeader;
     /* 0x02C */ NisTarget mTarget;
@@ -173,31 +173,33 @@ public:
     /* 0x03C */ int mSize;
     /* 0x040 */ int mBallId[MAX_NUM_CHARACTERS];
     /* 0x068 */ cPN_SAnimController* mCharacterControllers[MAX_NUM_CHARACTERS];
-    /* 0x090 */ int mUnidentified090[MAX_NUM_CHARACTERS];
-    /* 0x0B8 */ nlVector2 mUnidentified0B8[8];
-    /* 0x0F8 */ u16 mUnidentified0F8[8];
+    /* 0x090 */ int mCharacterAnimProxy[MAX_NUM_CHARACTERS];
+    /* 0x0B8 */ nlVector2 mAnimProxyPositions[8];
+    /* 0x0F8 */ u16 mAnimProxyDirections[8];
     /* 0x108 */ bool mMirrored;
-    /* 0x10C */ ImpostorModel* mUnidentified10C[8];
-    /* 0x12C */ const char* mUnidentified12C[8];
-    /* 0x14C */ char mUnidentified14C[8];
+    /* 0x10C */ ImpostorModel* mImpostors[8];
+    /* 0x12C */ const char* mImpostorNames[8];
+    /* 0x14C */ char mImpostorSuffixes[8];
     /* 0x154 */ cAnimCamera* mCamera;
-    /* 0x158 */ cCameraData* mUnidentified158[10];
+    /* 0x158 */ cCameraData* mCameraData[10];
     /* 0x180 */ int mNumCameras;
     /* 0x184 */ int mNumTriggers;
     /* 0x188 */ Trigger mTriggers[MAX_NUM_TRIGGERS];
     /* 0x848 */ int mMainCharacterIndex;
     /* 0x84C */ int mAudioCharacterIndex;
     /* 0x850 */ u32 mUnidentified850;
-    /* 0x854 */ ImpostorModel* mUnidentified854;
-    /* 0x858 */ DrawableCharacter* mUnidentified858;
-    /* 0x85C */ ImpostorModel* mUnidentified85C;
-    /* 0x860 */ DrawableCharacter* mUnidentified860;
-    /* 0x864 */ Unidentified864 mUnidentified864[MAX_NUM_CHARACTERS];
-    /* 0x97C */ cInventory<cSAnim> mUnidentified97C[20];
-    /* 0xBAC */ bool mUnidentifiedBAC;
+    /* 0x854 */ ImpostorModel* mDryBonesHead;
+    /* 0x858 */ DrawableCharacter* mDryBonesHeadCharacter;
+    /* 0x85C */ ImpostorModel* mShyGuyMask;
+    /* 0x860 */ DrawableCharacter* mShyGuyMaskCharacter;
+    /* 0x864 */ PendingAnimation mPendingAnimations[MAX_NUM_CHARACTERS];
+    /* 0x97C */ cInventory<cSAnim> mAnimInventories[20];
+    /* 0xBAC */ bool mScriptStarted;
 };
 
 
 extern GLView* g_pNisRenderView;
+
+void ClearNisAnimatedCharacters();
 
 #endif // GAME_RENDER_NIS_H

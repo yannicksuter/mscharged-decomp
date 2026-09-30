@@ -35,7 +35,7 @@ struct ImpostorCharacterParams
 {
     /* 0x00 */ int mWidth;
     /* 0x04 */ int mHeight;
-    /* 0x08 */ u8 mUnidentified008;
+    /* 0x08 */ u8 mUseAdditiveBlend;
     /* 0x09 */ u8 mUseIntensityAlpha;
     /* 0x0A */ u16 mBaseAngle;
 }; // size: 0x0C
@@ -59,14 +59,13 @@ public:
     virtual void EvaluatePose(int texture) = 0;
     virtual void Render(GLView* target, int texture) = 0;
     virtual void UpdateAnimation(float dt) = 0;
-    virtual void PlayAnimation(
-        float dt, const char* unidentified) = 0;
+    virtual void PlayAnimation(float blendTime, const char* name) = 0;
     virtual void UpdateView(const nlVector3* direction, const nlVector3* up);
 
     void Acquire(Impostor* impostor);
     void EnableSprites(bool enable);
     void ReleaseSprites();
-    void RegisterSprites(GLView* registry);
+    void RegisterSprites(GLView* parentView);
     void UpdateSprites(int period, int slot);
 
     /* 0x04 */ int mNumAngles;
@@ -76,7 +75,7 @@ public:
     /* 0x10 */ nlDLListSlotPool<ImpostorSprite*> mSprites;
     /* 0x2C */ int mWidth;
     /* 0x30 */ int mHeight;
-    /* 0x34 */ u8 mUnidentified034;
+    /* 0x34 */ u8 mUseAdditiveBlend;
     /* 0x35 */ u8 mUseIntensityAlpha;
     /* 0x36 */ u16 mBaseAngle;
     /* 0x38 */ const char* mName;
@@ -90,7 +89,7 @@ class AnimatedImpostorCharacter : public ImpostorCharacter
 {
 public:
     AnimatedImpostorCharacter(const char* name,
-        ImpostorModel* model, void* animations, int budget,
+        ImpostorModel* model, void* animation, int budget,
         int numAngles, int numTextures, const ImpostorCharacterParams* params);
     virtual ~AnimatedImpostorCharacter();
 
@@ -98,7 +97,7 @@ public:
     virtual void EvaluatePose(int texture);
     virtual void Render(GLView* target, int texture);
     virtual void UpdateAnimation(float dt);
-    virtual void PlayAnimation(float dt, const char* unidentified);
+    virtual void PlayAnimation(float blendTime, const char* name);
 
     /* 0x6C */ ImpostorModel** mModels;
     /* 0x70 */ int mNumModels;
@@ -115,8 +114,7 @@ public:
     virtual void EvaluatePose(int texture);
     virtual void Render(GLView* target, int texture);
     virtual void UpdateAnimation(float dt);
-    virtual void PlayAnimation(
-        float dt, const char* unidentified);
+    virtual void PlayAnimation(float blendTime, const char* name);
     virtual void UpdateView(
         const nlVector3* direction, const nlVector3* up);
 

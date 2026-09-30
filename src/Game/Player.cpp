@@ -64,7 +64,7 @@ extern FuzzyVariant fvNotSet;
 extern "C" float fn_800DAD84(const nlVector3&, const nlVector3&, unsigned short,
                              float, const nlVector2&, const nlVector2&, bool, bool);
 extern "C" UnidentifiedVariant_80054AB8 fn_80099660(
-    UnidentifiedFuzzyRuntimeBase*, const char*, cPlayer*);
+    FuzzyRuntimeBase*, const char*, cPlayer*);
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
 extern "C" bool fn_8003E99C(const cFielder*);
@@ -253,12 +253,12 @@ u8 cPlayer::SwapController(bool bParam)
                         {
                             if (fSwapScore < 0.0f)
                             {
-                                fSwapScore = fn_80099660(fn_800E30AC(m_pTeam),
+                                fSwapScore = fn_80099660(FuzzyAIGetTeamRuntime(m_pTeam),
                                                          "AssignControllerScore",
                                                          pSwapPlayer)
                                                  .mData.f;
                             }
-                            float fPotentialScore = fn_80099660(fn_800E30AC(m_pTeam),
+                            float fPotentialScore = fn_80099660(FuzzyAIGetTeamRuntime(m_pTeam),
                                                                 "AssignControllerScore",
                                                                 pPotentialSwapPlayer)
                                                         .mData.f;
@@ -1565,30 +1565,30 @@ void cPlayer::InitActionPostWhistle()
 {
 }
 
-extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
-    UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
+    FuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 extern "C" UnidentifiedVariant_80054AB8 fn_800996D0(
-    UnidentifiedFuzzyRuntimeBase*, const unsigned int&, cPlayer*);
+    FuzzyRuntimeBase*, const unsigned int&, cPlayer*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80099670(
-    UnidentifiedFuzzyRuntimeBase*, cPlayer*, const char*);
+    FuzzyRuntimeBase*, cPlayer*, const char*);
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80099660(
-    UnidentifiedFuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
+    FuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
 {
     return fn_80099670(runtime, player, name);
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80099670(
-    UnidentifiedFuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
+    FuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
 {
     unsigned int functionHash = nlStringHash(name);
     return fn_800996D0(runtime, functionHash, player);
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_800996D0(
-    UnidentifiedFuzzyRuntimeBase* runtime, const unsigned int& functionHash, cPlayer* player)
+    FuzzyRuntimeBase* runtime, const unsigned int& functionHash, cPlayer* player)
 {
     unsigned int localHash = functionHash;
     FunctionEntryPoint* entry = runtime->FindFunctionEntryPoint(localHash);
-    return UnidentifiedVariant_80054AB8(fn_80312360(runtime, entry, 1, player, NULL));
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(runtime, entry, 1, player, NULL));
 }

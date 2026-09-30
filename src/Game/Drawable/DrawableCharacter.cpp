@@ -218,8 +218,8 @@ void DrawableCharacter::Grab(cCharacter& source)
     headTilt = (unsigned short)source.m_pHeadTrack->m_fHeadTilt;
     visible = true;
     useObject = source.m_pPoseAccumulator->m_bUseObject;
-    damage1 = source.m_Dirt;
-    damage2 = source.m_MinDirt;
+    damage1 = source.GetDirt();
+    damage2 = source.GetMinDirt();
     damageType = source.mUnidentified16C;
     if (!useObject)
     {
@@ -742,10 +742,8 @@ void DrawableCharacter::EvaluateFrom(const cPoseNode& poseNode, const nlVector3&
     typeIsOne = false;
     blendAmount = 1.0f;
     state40 = 0.0f;
-    float dirt = character->m_Dirt;
-    damage1 = dirt;
-    float minDirt = character->m_MinDirt;
-    damage2 = minDirt;
+    damage1 = character->GetDirt();
+    damage2 = character->GetMinDirt();
     damageType = character->mUnidentified16C;
     shadowLevel = 1.0f;
 

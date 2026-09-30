@@ -28,10 +28,10 @@ public:
     void UpdateAllowedToSkip();
     bool DetectSkipPress();
     void Finish();
-    void Update(float deltaTime);
+    void Update(float deltaT);
     void fn_80285E1C();
     void Call(const char* functionName, const char* nisFilter);
-    void PlayHighlights();
+    void PlayGameBegin();
     void RegisterEventListeners();
     void OnGoalScored(GoalScoredData* data);
     void OnGoalieSave(GoalieSaveData* data);
@@ -77,9 +77,9 @@ public:
     /* 0x11C */ char mQueuedFilter[32];
     /* 0x13C */ bool mIsAllowedToSkip[4];
     /* 0x140 */ u8 mNisLoadedBits;
-    /* 0x141 */ bool mUnidentified141;
-    /* 0x142 */ bool mUnidentified142;
-    /* 0x143 */ bool mUnidentified143;
+    /* 0x141 */ bool mNisLoadedSent;
+    /* 0x142 */ bool mSkipPermissionsUpdated;
+    /* 0x143 */ bool mChargeShadowsVisible;
     /* 0x144 */ u32 mRandomSeed;
     /* 0x148 */ int mHighlightsLeft;
     /* 0x14C */ int mByPassNumber;
@@ -90,26 +90,29 @@ public:
     /* 0x158 */ bool mUnidentified158;
     /* 0x159 */ bool mUnidentified159;
     /* 0x15A */ u8 mUnidentified15A[0x2];
-    /* 0x15C */ float mUnidentified15C;
+    /* 0x15C */ float mWaitTimeRemaining;
     /* 0x160 */ bool mUnidentified160;
     /* 0x161 */ bool mUnidentified161;
     /* 0x162 */ bool mUnidentified162;
-    /* 0x163 */ bool mUnidentified163;
+    /* 0x163 */ bool mDrawBlackOverlay;
     /* 0x164 */ bool mUnidentified164;
     /* 0x165 */ u8 mUnidentified165[0x3];
     /* 0x168 */ MegaStrikeEndData mMegaStrikeResult;
 }; // total size: 0x174
 
 Presentation* GetPresentation();
-u32* fn_80287B2C(Presentation* state);
-bool fn_80287B34(Presentation* state);
+u32* GetPresentationRandomSeed(Presentation* presentation);
+bool DuringGoalCelebration(Presentation* presentation);
+bool DuringMegaStrikeEndPresentation(Presentation* presentation);
 bool IsIdleAndNoShotInProgress(Presentation* presentation);
-void fn_80285714(Presentation* state, u32 from, u32 to);
-bool fn_80287AB0(Presentation* state);
+void HandlePresentationStateTransition(Presentation* presentation, u32 from, u32 to);
+bool IsNisLoadedOnAllMachines(Presentation* presentation);
 
 extern "C" bool DuringEndOfGamePresentation(
     Presentation* presentation);
 extern "C" void RestoreWorldRendering(
     Presentation* presentation);
+
+extern float lbl_806DEF98;
 
 #endif // GAME_RENDER_PRESENTATION_H

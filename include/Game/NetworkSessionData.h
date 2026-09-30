@@ -8,6 +8,20 @@
 class NetworkSessionData
 {
 public:
+    class MachineIterator
+    {
+    public:
+        MachineIterator(NetworkSessionData& session)
+            : mCount(session.GetNumMachines()), mMachine(0)
+        {
+        }
+        bool HasNext() const { return mMachine < mCount; }
+        s8 Current() const { return mMachine; }
+        void Next() { mMachine++; }
+    private:
+        int mCount;
+        s8 mMachine;
+    };
     ~NetworkSessionData();
 
     int GetNumMachines();

@@ -1,4 +1,6 @@
 #include "Game/Render/Presentation.h"
+#include "Game/DetInput.h"
+#include "Game/Blinker.h"
 
 #include "Game/Ball.h"
 #include "Game/CharacterTriggers.h"
@@ -61,17 +63,11 @@
 #include "NL/nlTask.h"
 #include "Game/Render/MegastrikeBackgroundOverlay.h"
 
-extern "C"
-{
-    void fn_801E2564(void* manager);
-    void fn_80195868(ReplayChoreo* choreo, float deltaTime);
-    void fn_801955E8(ReplayChoreo* choreo, bool alternate);
-    void fn_8019571C(ReplayChoreo* choreo);
-    void fn_801959F0(ReplayChoreo* choreo, int quality);
-    void fn_801E2230(void* manager, int value);
-    extern bool lbl_806DCD60;
-    extern bool lbl_806E1961;
-}
+static inline bool IsDuringGamePauseState();
+static inline bool IsCupWinner();
+static inline bool IsCupPersonaWinner();
+
+#include "src/Game/Render/Presentation_interp.cpp"
 
 static inline bool IsNumberDisplayCounting()
 {
@@ -80,12 +76,13 @@ static inline bool IsNumberDisplayCounting()
 }
 
 static const char* idleFun = "Idle";
-static bool sLoopPresentation;
+static float lbl_806DEF94 = 0.22f;
+float lbl_806DEF98 = 0.1f;
+static bool loopPresentation;
 static bool sUseCupTrophy;
 static int sCupTrophy;
 static bool sUseCupPersonaTrophy;
 static int sCupPersonaTrophy;
-static nlColour sLetterBoxColour = { { 0x00, 0x00, 0x00, 0xFF } };
 
 static inline bool IsDuringGamePauseState()
 {
@@ -112,18 +109,11 @@ static inline bool IsDuringGamePauseState()
 
 static inline void SendSkipNisToAll(u8* buffer, int size)
 {
-    int machines = g_pNetworkSessionBase->GetNumMachines();
-    for (s8 machine = 0; machine < machines; machine++)
+    NetworkSessionData::MachineIterator machine(*g_pNetworkSessionBase);
+    for (; machine.HasNext(); machine.Next())
     {
-        g_pNetworkSessionBase->Send(machine, buffer, size, true);
+        g_pNetworkSessionBase->Send(machine.Current(), buffer, size, true);
     }
-}
-
-static inline void SendSkipNisToAll(
-    NetworkMessageType30* message, u8* buffer)
-{
-    int size = gNetworkMessageRegistry->Serialize(message, buffer, 10);
-    SendSkipNisToAll(buffer, size);
 }
 
 static inline void SendSkipNisToHost(
@@ -163,16 +153,7 @@ static inline bool IsCupPersonaWinner()
         && NetTournManager::Instance()->IsCupWinningGame(winnerTeam);
 }
 
-static inline void DrawPresentationOverlay()
-{
-    RLView* view = GetLayerView(eCLV_FrontEnd);
-    RLView* previous = (RLView*)g_ShapeRenderer.m_eView;
-    g_ShapeRenderer.m_eView = (GLView*)view;
-    nlColour colour = sLetterBoxColour;
-    g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
-        glGetOrthographicHeight(), -2.0f, colour, 0);
-    g_ShapeRenderer.m_eView = (GLView*)previous;
-}
+static inline void DrawPresentationOverlay(RLView* view, RLView* previous);
 
 /**
  * Address/Size: 0x80284A58 | size: 0x64
@@ -210,9 +191,9 @@ Presentation::Presentation()
     mOverlayDisplayed = false;
     mOverlayToDisplay = -2;
     mNisLoadedBits = 0;
-    mUnidentified141 = false;
-    mUnidentified142 = false;
-    mUnidentified143 = true;
+    mNisLoadedSent = false;
+    mSkipPermissionsUpdated = false;
+    mChargeShadowsVisible = true;
     mRandomSeed = nlDefaultSeed;
     mHighlightsLeft = 0;
     mByPassNumber = 0;
@@ -223,7 +204,7 @@ Presentation::Presentation()
     mUnidentified160 = false;
     mUnidentified161 = true;
     mUnidentified162 = false;
-    mUnidentified163 = false;
+    mDrawBlackOverlay = false;
     mUnidentified164 = true;
     mQueuedFunction[0] = '\0';
     mQueuedFilter[0] = '\0';
@@ -250,7 +231,7 @@ Presentation::Presentation()
  */
 void Presentation::UpdateAllowedToSkip()
 {
-    mUnidentified142 = true;
+    mSkipPermissionsUpdated = true;
 
     NetworkSessionControl& session = *g_pNetworkSessionBase;
     if (session.GetSessionMode() == 0)
@@ -352,7 +333,7 @@ void Presentation::Finish()
     bool playHighlight = false;
     bool fadeToStrikerTimes = false;
 
-    if (strcmp("PlayHighlight", mCurrentFunction) == 0 || sLoopPresentation)
+    if (strcmp("PlayHighlight", mCurrentFunction) == 0 || loopPresentation)
     {
         fadeToStrikerTimes = true;
         if (g_pNetworkSessionBase->GetSessionMode() != 0)
@@ -413,7 +394,7 @@ void Presentation::Finish()
         {
             if (DuringEndOfGamePresentation(this))
             {
-                NisPlayer::Instance()->fn_8027ED18();
+                NisPlayer::Instance()->StopNisCue();
                 g_pGame->mUnidentified49C.mEvent02.Queue(
                     Function<FnVoidVoid>());
                 nlTaskManager::SetNextState(1);
@@ -453,7 +434,7 @@ void Presentation::Finish()
 /**
  * Address/Size: 0x80285714 | size: 0x44
  */
-void fn_80285714(Presentation* state, u32 from, u32 to)
+void HandlePresentationStateTransition(Presentation* presentation, u32 from, u32 to)
 {
     if (to == 1)
     {
@@ -464,35 +445,35 @@ void fn_80285714(Presentation* state, u32 from, u32 to)
 /**
  * Address/Size: 0x80285758 | size: 0x6C4
  */
-void Presentation::Update(float deltaTime)
+void Presentation::Update(float deltaT)
 {
     if (nlSingleton<UnidentifiedCameraEffects>::s_pInstance != 0)
     {
-        nlSingleton<UnidentifiedCameraEffects>::s_pInstance->Update(deltaTime);
+        nlSingleton<UnidentifiedCameraEffects>::s_pInstance->Update(deltaT);
     }
 
     if (gpNumberDisplay != 0)
     {
-        gpNumberDisplay->Update(deltaTime);
+        gpNumberDisplay->Update(deltaT);
     }
 
     NisPlayer::Instance()->fn_8027CA44();
 
-    mUnidentified15C -= deltaTime;
-    if (mUnidentified15C < 0.0f)
+    mWaitTimeRemaining -= deltaT;
+    if (mWaitTimeRemaining < 0.0f)
     {
-        mUnidentified15C = 0.0f;
+        mWaitTimeRemaining = 0.0f;
     }
 
-    mTimeInFunction += deltaTime;
+    mTimeInFunction += deltaT;
 
     if (mDisplayLetterBox > 0.0f)
     {
-        mDisplayLetterBox -= deltaTime;
+        mDisplayLetterBox -= deltaT;
         if (mDisplayLetterBox <= 0.0f)
         {
             int replayTime = -30;
-            fn_801959F0(&ReplayChoreo::Instance(),
+            ReplayChoreo::Instance().SaveHighlight(
                 ReplayManager::Instance()->fn_8018A16C(replayTime));
             mDisplayLetterBox = 0.0f;
         }
@@ -531,7 +512,7 @@ void Presentation::Update(float deltaTime)
             Run();
         }
 
-        fn_80195868(&ReplayChoreo::Instance(), deltaTime);
+        ReplayChoreo::Instance().Update(deltaT);
         ReplayCamera::UpdateTweakMode();
 
         bool skipPastByPass = false;
@@ -597,12 +578,30 @@ void Presentation::Update(float deltaTime)
     Wiper::Instance().Render();
     UpdateAndRenderLetterBox();
 
-    if (mUnidentified163 == true)
+    if (mDrawBlackOverlay == true)
     {
-        DrawPresentationOverlay();
+        RLView* view = GetLayerView(eCLV_FrontEnd);
+        RLView* previous = (RLView*)g_ShapeRenderer.m_eView;
+        DrawPresentationOverlay(view, previous);
     }
 
-    if (IsDuringGamePauseState())
+    bDuringGamePauseState = false;
+    bGameFrameUnlocked = false;
+    if (!FrontEnd::m_bGameOver)
+    {
+        bool bFrameLocked
+            = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
+        if (!bFrameLocked)
+        {
+            bGameFrameUnlocked = true;
+        }
+    }
+    if (bGameFrameUnlocked
+        && nlTaskManager::m_pInstance->mCurrentState == 1)
+    {
+        bDuringGamePauseState = true;
+    }
+    if (bDuringGamePauseState)
     {
         return;
     }
@@ -614,13 +613,13 @@ void Presentation::Update(float deltaTime)
 
     if (!mOverlayDisplayed)
     {
-        mOverlayDelay -= deltaTime;
+        mOverlayDelay -= deltaT;
         if (mOverlayDelay <= 0.0)
         {
             static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)mOverlayToDisplay, true, true);
             if (mOverlayToDisplay == 0x5F)
             {
-                fn_801E2564(g_pOverlayManager);
+                RestartGoalOverlay(g_pOverlayManager);
             }
             mOverlayDisplayed = true;
             mOverlayDelay = 0.0f;
@@ -628,7 +627,7 @@ void Presentation::Update(float deltaTime)
     }
     else if (mOverlayDisplayLength != -15.0f)
     {
-        mOverlayDisplayLength -= deltaTime;
+        mOverlayDisplayLength -= deltaT;
         if (mOverlayDisplayLength <= 0.0)
         {
             if (mOverlayDisplayed)
@@ -719,9 +718,9 @@ void Presentation::Call(
 /**
  * Address/Size: 0x80286288 | size: 0x10
  */
-void Presentation::PlayHighlights()
+void Presentation::PlayGameBegin()
 {
-    Call("PlayHighlight", "");
+    Call("GameBegin", "");
 }
 
 /**
@@ -847,7 +846,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
 
     if (!suddenDeath && !mUnidentified161
         && !nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && nlRandomf(1.0f, &mRandomSeed) < 0.22f)
+        && nlRandomf(1.0f, &mRandomSeed) < lbl_806DEF94)
     {
         mUnidentified161 = true;
         mUnidentified156 = true;
@@ -1158,7 +1157,7 @@ void Presentation::OnMegaStrikeEnd(MegaStrikeEndData* data)
  */
 void RestoreWorldRendering(Presentation* presentation)
 {
-    presentation->mUnidentified143 = true;
+    presentation->mChargeShadowsVisible = true;
     SetRenderWorldEffects(1);
     SetWorldNPCsVisible(true);
 
@@ -1166,7 +1165,7 @@ void RestoreWorldRendering(Presentation* presentation)
     stadium->m_pHighRangeTweaks = stadium->m_pStadiumHighRangeTweaks;
 
     gMegastrikeBackgroundOverlay.Start(
-        0.0f, 0.0f, NisPlayer::Instance()->mUnidentified34238);
+        0.0f, 0.0f, NisPlayer::Instance()->mMegaStrikeSide);
 }
 
 /**
@@ -1235,6 +1234,7 @@ void Presentation::SendSkipNis()
  */
 int Presentation::ProcessMessage(NetworkMessage* message)
 {
+    int size;
     NetworkMessage* receivedMessage = message;
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     s8 machine = roster->MachineIdxFromConnection(receivedMessage->mSource);
@@ -1264,9 +1264,9 @@ int Presentation::ProcessMessage(NetworkMessage* message)
     case 30:
         tDebugPrintManager::Print(DC_NETWORK,
             "Received SkipNIS message from machine %d bypass# %d\n", machine,
-            ((NetworkMessageType30*)receivedMessage)->mUnidentified08);
+            ((NetworkMessageType30*)receivedMessage)->mByPassNumber);
         mSkipPastByPass
-            = ((NetworkMessageType30*)receivedMessage)->mUnidentified08;
+            = ((NetworkMessageType30*)receivedMessage)->mByPassNumber;
         break;
 
     case 31:
@@ -1275,12 +1275,13 @@ int Presentation::ProcessMessage(NetworkMessage* message)
             tDebugPrintManager::Print(DC_NETWORK,
                 "Host relaying origin machine %d sending NetworkSkipNIS message bypass# %d to all\n",
                 machine,
-                ((NetworkMessageType31*)receivedMessage)->mUnidentified08);
+                ((NetworkMessageType31*)receivedMessage)->mByPassNumber);
 
             u8 buffer[10];
             NetworkMessageType30 relay(
-                ((NetworkMessageType31*)receivedMessage)->mUnidentified08);
-            SendSkipNisToAll(&relay, buffer);
+                ((NetworkMessageType31*)receivedMessage)->mByPassNumber);
+            size = gNetworkMessageRegistry->Serialize(&relay, buffer, 10);
+            SendSkipNisToAll(buffer, size);
         }
         break;
     }
@@ -1291,14 +1292,14 @@ int Presentation::ProcessMessage(NetworkMessage* message)
 /**
  * Address/Size: 0x80287AB0 | size: 0x7C
  */
-bool fn_80287AB0(Presentation* state)
+bool IsNisLoadedOnAllMachines(Presentation* presentation)
 {
     if (IsNetworkOrRecordedGame())
     {
         int machines = g_pNetworkSessionBase->GetNumMachines();
         for (int machine = 0; machine < machines; machine++)
         {
-            if ((state->mNisLoadedBits & (1 << machine)) == 0)
+            if ((presentation->mNisLoadedBits & (1 << machine)) == 0)
             {
                 return false;
             }
@@ -1312,26 +1313,26 @@ bool fn_80287AB0(Presentation* state)
 /**
  * Address/Size: 0x80287B2C | size: 0x8
  */
-u32* fn_80287B2C(Presentation* state)
+u32* GetPresentationRandomSeed(Presentation* presentation)
 {
-    return &state->mRandomSeed;
+    return &presentation->mRandomSeed;
 }
 
 /**
  * Address/Size: 0x80287B34 | size: 0x48
  */
-bool fn_80287B34(Presentation* state)
+bool DuringGoalCelebration(Presentation* presentation)
 {
-    return nlStrCmp<char>("GoalCelebration", state->mCurrentFunction) == 0;
+    return nlStrCmp<char>("GoalCelebration", presentation->mCurrentFunction) == 0;
 }
 
 /**
  * Address/Size: 0x80287B7C | size: 0x94
  */
-bool fn_80287B7C(Presentation* state)
+bool DuringMegaStrikeEndPresentation(Presentation* presentation)
 {
-    return nlStrCmp<char>("MegastrikeEnd", state->mCurrentFunction) == 0
-        || nlStrCmp<char>("GameEndMegaStrike", state->mCurrentFunction) == 0;
+    return nlStrCmp<char>("MegastrikeEnd", presentation->mCurrentFunction) == 0
+        || nlStrCmp<char>("GameEndMegaStrike", presentation->mCurrentFunction) == 0;
 }
 
 static inline bool IsSynchronizedNisFunction(Presentation* state)
@@ -1372,7 +1373,7 @@ void Presentation::WaitForNisLoaded()
 
             if (loaded)
             {
-                NisPlayer::Instance()->fn_8027CCEC();
+                NisPlayer::Instance()->ClearLoadQueue();
             }
         }
         else
@@ -1419,7 +1420,7 @@ void Presentation::PlayNis()
 
             if (loaded)
             {
-                NisPlayer::Instance()->fn_8027CCEC();
+                NisPlayer::Instance()->ClearLoadQueue();
             }
         }
         else
@@ -1432,7 +1433,7 @@ void Presentation::PlayNis()
         if (IsNetworkOrRecordedGame() && IsSynchronizedNisFunction(this))
         {
             int machines = g_pNetworkSessionBase->GetNumMachines();
-            if (!mUnidentified141)
+            if (!mNisLoadedSent)
             {
                 if (nlStrCmp<char>(mCurrentFunction, mInterruptWipe) == 0)
                 {
@@ -1447,8 +1448,8 @@ void Presentation::PlayNis()
                     s8 machine
                         = g_pNetworkSessionBase->GetLocalMachineId();
                     u8 machineBit = 1 << machine;
-                    g_pGame->fn_80059D80(machineBit);
-                    mUnidentified141 = true;
+                    g_pGame->SendNISLoadedCustomDeterm(machineBit);
+                    mNisLoadedSent = true;
                 }
             }
 
@@ -1480,7 +1481,7 @@ void Presentation::PlayNis()
         NisPlayer::Instance()->Play();
         nlTaskManager::SetNextState(0x10);
         mNisLoadedBits = 0;
-        mUnidentified141 = false;
+        mNisLoadedSent = false;
         tDebugPrintManager::Print(
             DC_NETWORK, "Resetting NIS Loaded bitfield\n");
     }
@@ -1622,7 +1623,7 @@ void Presentation::PlayOverlay(
         mOverlayDisplayed = false;
         GoalOverlay* scene = static_cast<GoalOverlay*>(
             g_pOverlayManager->GetScene((SceneList)0x5F));
-        scene->SetHighlightNumber(ReplayChoreo::Instance().fn_80195CBC());
+        scene->SetHighlightNumber(ReplayChoreo::Instance().GetHighlightNumber());
         return;
     }
 
@@ -1693,11 +1694,12 @@ void Presentation::UpdateAndRenderLetterBox()
 
     float height = glGetOrthographicHeight();
 
-    static signed char letterBoxSizeValid;
     static float letterBoxSize;
+    static signed char letterBoxSizeValid;
+    static float depth = -2.0f;
     if (!letterBoxSizeValid)
     {
-        letterBoxSize = 0.5f * (height - height * (fn_80112E0C() / fn_80112E14()));
+        letterBoxSize = 0.5f * (height - height * (GetStandardAspectRatio() / GetWidescreenAspectRatio()));
         letterBoxSizeValid = true;
     }
 
@@ -1729,11 +1731,11 @@ void Presentation::UpdateAndRenderLetterBox()
         nlColour colour = black;
         g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f,
             glGetOrthographicWidth(), letterBoxSize * mLetterBoxDuration,
-            -2.0f, colour, 0);
+            depth, colour, 0);
         g_ShapeRenderer.DrawRectangle2D(0.0f,
             height - letterBoxSize * mLetterBoxDuration,
             glGetOrthographicWidth(), letterBoxSize * mLetterBoxDuration,
-            -2.0f, colour, 0);
+            depth, colour, 0);
         g_ShapeRenderer.m_eView = previous;
     }
 }
@@ -1751,12 +1753,12 @@ void Presentation::Reset()
     Call(idleFun, "");
 
     mNisLoadedBits = 0;
-    mUnidentified141 = false;
+    mNisLoadedSent = false;
     mHighlightsLeft = 0;
     mByPassNumber = 0;
     mSkipPastByPass = -1;
-    mUnidentified142 = false;
-    mUnidentified143 = true;
+    mSkipPermissionsUpdated = false;
+    mChargeShadowsVisible = true;
     mUnidentified156 = false;
     mUnidentified157 = false;
     mUnidentified159 = false;
@@ -1778,7 +1780,7 @@ void Presentation::Reset()
     ReplayChoreo::Instance().Reset();
     ReplayManager::Instance()->Flush();
 
-    mUnidentified163 = false;
+    mDrawBlackOverlay = false;
     mUnidentified164 = true;
 }
 
@@ -1884,7 +1886,7 @@ void Presentation::PlayGoalEffects(const char* effects)
     }
 }
 
-inline void Presentation::WaitForAutoReplayCompletion(const char* wipe)
+void Presentation::WaitForAutoReplayCompletion(const char* wipe)
 {
     float cutTime;
     if (ScreenTransitionManager::Instance()->m_SelectedTransition == 0)
@@ -1903,7 +1905,7 @@ inline void Presentation::WaitForAutoReplayCompletion(const char* wipe)
     }
 }
 
-inline void Presentation::WaitForNisCompletion(const char* wipe)
+void Presentation::WaitForNisCompletion(const char* wipe)
 {
     float cutTime = 0.0f;
     if (ScreenTransitionManager::Instance()->m_SelectedTransition == 0)
@@ -1925,4 +1927,13 @@ inline void Presentation::WaitForNisCompletion(const char* wipe)
     }
 }
 
-#include "src/Game/Render/Presentation_interp.cpp"
+static inline void DrawPresentationOverlay(RLView* view, RLView* previous)
+{
+    static float depth = -2.0f;
+    static nlColour sLetterBoxColour = { { 0x00, 0x00, 0x00, 0xFF } };
+    g_ShapeRenderer.m_eView = (GLView*)view;
+    nlColour colour = sLetterBoxColour;
+    g_ShapeRenderer.DrawRectangle2D(0.0f, 0.0f, glGetOrthographicWidth(),
+        glGetOrthographicHeight(), depth, colour, 0);
+    g_ShapeRenderer.m_eView = (GLView*)previous;
+}

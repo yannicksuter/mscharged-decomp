@@ -54,7 +54,7 @@ inline float DegreesToRadians(float degrees)
     return 3.1415927f * degrees / 180.0f;
 }
 
-inline int DegreesToAngle(float degrees)
+inline unsigned short DegreesToAngle(float degrees)
 {
     return (int)(degrees * 65536.0f) / 360;
 }

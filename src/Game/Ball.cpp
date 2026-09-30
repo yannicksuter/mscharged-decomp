@@ -1,3 +1,4 @@
+#include "Game/AI/Scripts/ScriptQuestions.h"
 #include <stddef.h>
 #include "Game/CharacterTriggers.h"
 #include <stdlib.h>
@@ -134,7 +135,6 @@ private:
 extern "C" LiveBallTrail lbl_8056B518[];
 extern "C" unsigned int lbl_806E0C10;
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
-float ReceivingPass(cFielder*);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void Hide(BirdoEggObject*, bool);
 extern "C" void fn_802B5370(

@@ -187,6 +187,8 @@ public:
     int mNumSelectionWeights;
 };
 
+extern UnidentifiedVariant_80054AB8 lbl_80584250;
+
 extern SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
 extern SlotPool<UnidentifiedActionQueue> lbl_80584228;
 extern SlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;

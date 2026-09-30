@@ -34,12 +34,12 @@ extern "C"
     };
 
     float gNumberDigitSpacing = -0.0f;
-    float lbl_806DD044 = 0.6f;
-    float lbl_806DD048 = 1.0f;
-    float lbl_806DD04C = 0.4f;
-    float lbl_806DD050 = 0.4f;
+    float gScoreCollapseTime = 0.6f;
+    float gGoalCountExpandTime = 1.0f;
+    float gScoreIncrementInterval = 0.4f;
+    float gAccumulatedScoreIncrementInterval = 0.4f;
     float gNumberWidescreenWidthScale = 0.8f;
-    float lbl_806DD058 = 1.05f;
+    float gNumberWidescreenDepthScale = 1.05f;
     float gScoreCompactScale = 140.0f;
     float gScoreCompactY = 50.0f;
     float gScoreCompactSeparation = 60.0f;
@@ -55,22 +55,16 @@ extern "C"
     float gGoalCountStartScale = 50.0f;
     float gGoalCountEndScale = 800.0f;
     float gGoalCountOpacity = 0.6f;
-    float lbl_806DD098[2] = { 90.0f, 0.0f };
+    float gNumberRotationX[2] = { 90.0f, 0.0f };
 
     NumberDisplay* gpNumberDisplay;
-    bool lbl_806E162C;
+    bool gScoreForceExpanded;
     bool gScoreUseAlternateSeparator;
-    float lbl_806E1630;
-    float lbl_806E1634;
-    float lbl_806E1638;
-    float lbl_806E163C;
-    float lbl_806E1640;
-}
-
-static inline float NumberDisplayLerp(
-    float first, float second, float amount)
-{
-    return (second - first) * amount + first;
+    float gNumberPositionZ;
+    float gScoreExpandTime;
+    float gScoreExpandedHoldTime;
+    float gNumberRotationY;
+    float gNumberRotationZ;
 }
 
 NumberDisplay::NumberDisplay()
@@ -118,9 +112,9 @@ void NumberDisplay::Update(float deltaTime)
     if (mShowGoalCount)
     {
         float amount = 1.0f;
-        if (lbl_806DD048 != 0.0f)
+        if (gGoalCountExpandTime != 0.0f)
         {
-            amount = deltaTime / lbl_806DD048;
+            amount = deltaTime / gGoalCountExpandTime;
         }
         mExpansion += amount;
         mExpansion
@@ -134,12 +128,12 @@ void NumberDisplay::Update(float deltaTime)
         return;
     }
 
-    if (mExpanded || lbl_806E162C)
+    if (mExpanded || gScoreForceExpanded)
     {
         float amount = 1.0f;
-        if (lbl_806E1634 != 0.0f)
+        if (gScoreExpandTime != 0.0f)
         {
-            amount = deltaTime / lbl_806E1634;
+            amount = deltaTime / gScoreExpandTime;
         }
         mExpansion += amount;
         mExpansion
@@ -148,9 +142,9 @@ void NumberDisplay::Update(float deltaTime)
     else
     {
         float amount = 1.0f;
-        if (lbl_806DD044 != 0.0f)
+        if (gScoreCollapseTime != 0.0f)
         {
-            amount = deltaTime / lbl_806DD044;
+            amount = deltaTime / gScoreCollapseTime;
         }
         mExpansion -= amount;
         mExpansion
@@ -178,11 +172,11 @@ void NumberDisplay::Update(float deltaTime)
             {
                 if (mShowAccumulatedScore)
                 {
-                    mScoreUpdateTimer = lbl_806DD050;
+                    mScoreUpdateTimer = gAccumulatedScoreIncrementInterval;
                 }
                 else
                 {
-                    mScoreUpdateTimer = lbl_806DD04C;
+                    mScoreUpdateTimer = gScoreIncrementInterval;
                 }
             }
         }
@@ -234,8 +228,8 @@ void NumberDisplay::Render()
     if (mShowGoalCount)
     {
         float centerX = 320.0f;
-        float scale = NumberDisplayLerp(
-            gGoalCountStartScale, gGoalCountEndScale, mExpansion);
+        float scaleRange = gGoalCountEndScale - gGoalCountStartScale;
+        float scale = scaleRange * mExpansion + gGoalCountStartScale;
         if (IsWidescreen())
         {
             centerX = 320.0f;
@@ -250,75 +244,27 @@ void NumberDisplay::Render()
     }
 }
 
-static inline void RenderNumber(NumberDisplay* display, int value,
-    float scale, float opacity, float digitScale, float edge,
-    bool rightAligned, nlVector2& position)
-{
-    int remaining = value;
-    float totalWidth = 0.0f;
-    do
-    {
-        int digit = remaining % 10;
-        totalWidth += digitScale * gNumberDigitWidths[digit];
-        if (remaining < 10)
-        {
-            break;
-        }
-        totalWidth += gNumberDigitSpacing * digitScale;
-        remaining /= 10;
-    } while (true);
-
-    if (rightAligned)
-    {
-        totalWidth = 0.0f;
-    }
-    do
-    {
-        int digit = value % 10;
-        float digitWidth = digitScale * gNumberDigitWidths[digit];
-        if (rightAligned)
-        {
-            position.x = edge - totalWidth - digitWidth / 2.0f;
-        }
-        else
-        {
-            position.x = totalWidth + edge - digitWidth / 2.0f;
-        }
-        display->RenderGlyph(digit, scale, opacity, position);
-        if (rightAligned)
-        {
-            totalWidth += digitWidth + gNumberDigitSpacing * digitScale;
-        }
-        else
-        {
-            totalWidth -= digitWidth + gNumberDigitSpacing * digitScale;
-        }
-        if (value >= 10)
-        {
-            value /= 10;
-        }
-        else
-        {
-            break;
-        }
-    } while (true);
-}
-
 void NumberDisplay::RenderScores()
 {
-    float positionY = (gScoreExpandedY - gScoreCompactY) * mExpansion + gScoreCompactY;
-    float separation = (gScoreExpandedSeparation - gScoreCompactSeparation) * mExpansion + gScoreCompactSeparation;
-    float scale = (gScoreExpandedScale - gScoreCompactScale) * mExpansion + gScoreCompactScale;
-    float opacity = (gScoreExpandedOpacity - gScoreCompactOpacity) * mExpansion + gScoreCompactOpacity;
+    float positionYRange = gScoreExpandedY - gScoreCompactY;
+    float separationRange = gScoreExpandedSeparation - gScoreCompactSeparation;
+    float scaleRange = gScoreExpandedScale - gScoreCompactScale;
+    float opacityRange = gScoreExpandedOpacity - gScoreCompactOpacity;
+
+    float positionY = positionYRange * mExpansion + gScoreCompactY;
+    float separation = separationRange * mExpansion + gScoreCompactSeparation;
+    float scale = scaleRange * mExpansion + gScoreCompactScale;
+    float opacity = opacityRange * mExpansion + gScoreCompactOpacity;
 
     if (IsWidescreen())
     {
-        separation = (gScoreExpandedWideSeparation - gScoreCompactWideSeparation) * mExpansion + gScoreCompactWideSeparation;
+        separationRange = gScoreExpandedWideSeparation - gScoreCompactWideSeparation;
+        separation = separationRange * mExpansion + gScoreCompactWideSeparation;
     }
 
     if (mLeftScore >= 100 || mRightScore >= 100)
     {
-        float scaleRange = IsWidescreen()
+        scaleRange = IsWidescreen()
             ? gScoreExpandedThreeDigitWideScale - gScoreCompactScale
             : gScoreExpandedThreeDigitScale - gScoreCompactScale;
         scale = scaleRange * mExpansion + gScoreCompactScale;
@@ -338,10 +284,70 @@ void NumberDisplay::RenderScores()
     }
     position.y = positionY + 0.2f * scale / 2.0f;
 
-    RenderNumber(this, mLeftScore, scale, opacity, digitScale,
-        centerX - separation, true, position);
-    RenderNumber(this, mRightScore, scale, opacity, digitScale,
-        centerX + separation, false, position);
+    float width = 0.0f;
+    int remaining = mLeftScore;
+    do
+    {
+        int digit = remaining % 10;
+        width += digitScale * gNumberDigitWidths[digit];
+        if (remaining < 10)
+        {
+            break;
+        }
+        width += gNumberDigitSpacing * digitScale;
+        remaining /= 10;
+    } while (true);
+
+    width = 0.0f;
+    int value = mLeftScore;
+    do
+    {
+        int digit = value % 10;
+        float digitWidth = digitScale * gNumberDigitWidths[digit];
+        position.x = centerX - separation - width - digitWidth / 2.0f;
+        RenderGlyph(digit, scale, opacity, position);
+        width += digitWidth + gNumberDigitSpacing * digitScale;
+        if (value >= 10)
+        {
+            value /= 10;
+        }
+        else
+        {
+            break;
+        }
+    } while (true);
+
+    width = 0.0f;
+    remaining = mRightScore;
+    do
+    {
+        int digit = remaining % 10;
+        width += digitScale * gNumberDigitWidths[digit];
+        if (remaining < 10)
+        {
+            break;
+        }
+        width += gNumberDigitSpacing * digitScale;
+        remaining /= 10;
+    } while (true);
+
+    value = mRightScore;
+    do
+    {
+        int digit = value % 10;
+        float digitWidth = digitScale * gNumberDigitWidths[digit];
+        position.x = width + (centerX + separation) - digitWidth / 2.0f;
+        RenderGlyph(digit, scale, opacity, position);
+        width -= digitWidth + gNumberDigitSpacing * digitScale;
+        if (value >= 10)
+        {
+            value /= 10;
+        }
+        else
+        {
+            break;
+        }
+    } while (true);
 
     if (mExpansion == 1.0f)
     {
@@ -369,42 +375,42 @@ void NumberDisplay::RenderGlyph(
     if (IsWidescreen())
     {
         nlMakeScaleMatrix(transform,
-            scale * gNumberWidescreenWidthScale, scale, scale * lbl_806DD058);
+            scale * gNumberWidescreenWidthScale, scale, scale * gNumberWidescreenDepthScale);
     }
     else
     {
         nlMakeScaleMatrix(transform, scale, scale, scale);
     }
 
-    if (lbl_806DD098[0] != 0.0f)
+    if (gNumberRotationX[0] != 0.0f)
     {
         nlMatrix4 rotation;
         rotation.SetIdentity();
         nlVector3 axis = { 1.0f, 0.0f, 0.0f };
         nlMakeRotationMatrixAxisAngle(rotation, axis,
-            DegreesToRadians(lbl_806DD098[0]));
+            DegreesToRadians(gNumberRotationX[0]));
         nlMultMatrices(transform, rotation);
     }
-    if (lbl_806E163C != 0.0f)
+    if (gNumberRotationY != 0.0f)
     {
         nlMatrix4 rotation;
         rotation.SetIdentity();
         nlVector3 axis = { 0.0f, 1.0f, 0.0f };
         nlMakeRotationMatrixAxisAngle(rotation, axis,
-            DegreesToRadians(lbl_806E163C));
+            DegreesToRadians(gNumberRotationY));
         nlMultMatrices(transform, rotation);
     }
-    if (lbl_806E1640 != 0.0f)
+    if (gNumberRotationZ != 0.0f)
     {
         nlMatrix4 rotation;
         rotation.SetIdentity();
         nlVector3 axis = { 0.0f, 0.0f, 1.0f };
         nlMakeRotationMatrixAxisAngle(rotation, axis,
-            DegreesToRadians(lbl_806E1640));
+            DegreesToRadians(gNumberRotationZ));
         nlMultMatrices(transform, rotation);
     }
 
-    transform.SetRow4_(3, position.x, position.y, lbl_806E1630, 1.0f);
+    transform.SetRow4_(3, position.x, position.y, gNumberPositionZ, 1.0f);
 
     glModel* model = glModelDupNoStreams(source->m_pModel, false, 0);
     glModelSetMatrix(model, transform);
@@ -454,9 +460,9 @@ void NumberDisplay::Reset()
 void NumberDisplay::BeginScoreUpdate()
 {
     mExpanded = true;
-    mScoreUpdateTimer = lbl_806DD04C;
+    mScoreUpdateTimer = gScoreIncrementInterval;
     mHoldUntilKickoff = true;
-    mExpandedHoldTimer = lbl_806E1638;
+    mExpandedHoldTimer = gScoreExpandedHoldTime;
 }
 
 void NumberDisplay::IncrementGoalCount()
@@ -490,8 +496,8 @@ void NumberDisplay::ShowAccumulatedScore()
     {
         mExpanded = true;
         mGoalCount = 0;
-        mScoreUpdateTimer = lbl_806DD04C;
+        mScoreUpdateTimer = gScoreIncrementInterval;
         mHoldUntilKickoff = true;
-        mExpandedHoldTimer = lbl_806E1638;
+        mExpandedHoldTimer = gScoreExpandedHoldTime;
     }
 }

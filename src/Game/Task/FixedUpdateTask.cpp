@@ -302,7 +302,7 @@ void FixedUpdateTask::DecrementFrameLock(float fDeltaT)
 void FixedUpdateTask::Run(float dt)
 {
     bool runFixedUpdate = true;
-    if (fn_80287AB0(GetPresentation()))
+    if (IsNisLoadedOnAllMachines(GetPresentation()))
     {
         runFixedUpdate = false;
     }
@@ -364,7 +364,7 @@ void FixedUpdateTask::Run(float dt)
                     CallFixedUpdateTasks();
                     updated = true;
                 }
-                if (fn_80287AB0(GetPresentation()))
+                if (IsNisLoadedOnAllMachines(GetPresentation()))
                 {
                     break;
                 }
@@ -379,7 +379,7 @@ void FixedUpdateTask::Run(float dt)
                 mUnidentified28 = g_fFixedUpdateTick;
             }
 
-            if (fn_80287AB0(GetPresentation()))
+            if (IsNisLoadedOnAllMachines(GetPresentation()))
             {
                 break;
             }

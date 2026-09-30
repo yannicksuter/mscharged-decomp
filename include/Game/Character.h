@@ -243,6 +243,8 @@ public:
     void fn_80022D3C(float fParam0, float fParam1);
     void fn_8001EF78(float fParam);
     void AddRandomDirt();
+    float GetDirt() const { return m_Dirt; }
+    float GetMinDirt() const { return m_MinDirt; }
     void fn_8001F1C0(int nParam);
     void fn_8001EE74(float fParam0, float fParam1, float fParam2);
     void fn_8001E304(float fSpeed, float fDeltaT);

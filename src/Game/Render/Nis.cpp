@@ -44,17 +44,19 @@
 
 GLView* g_pNisRenderView;
 
-bool lbl_8057AB68[Nis::MAX_NUM_CHARACTERS];
+bool g_bNisAnimatedCharacters[Nis::MAX_NUM_CHARACTERS];
 
-struct Unidentified83B88
+struct PendingAnimationRequest
 {
-    Nis::Unidentified864* mUnidentified00;
-    bool mUnidentified04;
+    Nis::PendingAnimation* animation;
+    bool active;
 };
 
-SlotPool<Unidentified83B88> lbl_8057AB80(16, 16);
+SlotPool<PendingAnimationRequest> lbl_8057AB80(16, 16);
 
-void fn_80283C00(void* data, unsigned long size, void* userData);
+void OnCharacterAnimationLoaded(void* data, unsigned long size, void* userData);
+
+#include "src/Game/Render/Nis_interp.cpp"
 
 Nis::Nis(NisHeader& header, char* data, int size)
     : InterpreterCore(100)
@@ -64,45 +66,45 @@ Nis::Nis(NisHeader& header, char* data, int size)
     , unknown_0x034(header.unknown_0x180)
     , mData(data)
     , mSize(size)
-    , mMirrored(header.mUnidentified195)
+    , mMirrored(header.mirrored)
     , mCamera(0)
     , mNumCameras(0)
     , mNumTriggers(0)
     , mMainCharacterIndex(-1)
     , mAudioCharacterIndex(-1)
     , mUnidentified850(0)
-    , mUnidentified854(0)
-    , mUnidentified858(0)
-    , mUnidentified85C(0)
-    , mUnidentified860(0)
-    , mUnidentifiedBAC(false)
+    , mDryBonesHead(0)
+    , mDryBonesHeadCharacter(0)
+    , mShyGuyMask(0)
+    , mShyGuyMaskCharacter(0)
+    , mScriptStarted(false)
 {
     int i;
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
-        mUnidentified864[i].mUnidentified00 = 0;
-        mUnidentified864[i].mUnidentified08 = false;
-        mUnidentified864[i].mUnidentified04 = -1;
-        mUnidentified864[i].mUnidentified0C = 0;
-        mUnidentified864[i].mUnidentified10 = 0;
-        mUnidentified864[i].mUnidentified14 = 0;
-        mUnidentified864[i].mUnidentified18 = 0;
+        mPendingAnimations[i].name = 0;
+        mPendingAnimations[i].loaded = false;
+        mPendingAnimations[i].characterIndex = -1;
+        mPendingAnimations[i].loadHandle = 0;
+        mPendingAnimations[i].data = 0;
+        mPendingAnimations[i].size = 0;
+        mPendingAnimations[i].request = 0;
     }
     g_pNisRenderView = GetLayerView(eCLV_WorldShadowed);
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
         mCharacterControllers[i] = 0;
         mBallId[i] = -1;
-        mUnidentified090[i] = -1;
+        mCharacterAnimProxy[i] = -1;
     }
     for (int i = 0; i < 8; ++i)
     {
-        mUnidentified10C[i] = 0;
-        mUnidentified12C[i] = 0;
+        mImpostors[i] = 0;
+        mImpostorNames[i] = 0;
     }
     for (int i = 0; i < 10; ++i)
     {
-        mUnidentified158[i] = new (8, false) cCameraData();
+        mCameraData[i] = new (8, false) cCameraData();
     }
     nlChunk* chunk = (nlChunk*)data;
     nlChunk* end = (nlChunk*)(data + size);
@@ -118,16 +120,16 @@ Nis::Nis(NisHeader& header, char* data, int size)
             {
                 for (i = 0; i < 8; ++i)
                 {
-                    if (mUnidentified10C[i] == 0)
+                    if (mImpostors[i] == 0)
                         break;
                 }
-                mUnidentified10C[i] = new (8, false) ImpostorModel(*npcTemplate->hierarchy, npcTemplate->modelID, npcTemplate->mResourcePool);
-                mUnidentified10C[i]->PlayAnimation(*anim, PM_HOLD, 0);
-                mUnidentified10C[i]->mVisible = true;
-                mUnidentified10C[i]->mModelCallback = fn_80183F78;
-                mUnidentified12C[i] = npcTemplate->mName;
+                mImpostors[i] = new (8, false) ImpostorModel(*npcTemplate->hierarchy, npcTemplate->modelID, npcTemplate->mResourcePool);
+                mImpostors[i]->PlayAnimation(*anim, PM_HOLD, 0);
+                mImpostors[i]->mVisible = true;
+                mImpostors[i]->mModelCallback = fn_80183F78;
+                mImpostorNames[i] = npcTemplate->mName;
                 int lastIndex = nlStrLen(anim->m_szName) - 1;
-                mUnidentified14C[i] = anim->m_szName[lastIndex];
+                mImpostorSuffixes[i] = anim->m_szName[lastIndex];
                 char textureName[256];
                 if (nlStrCmp(npcTemplate->mName, "vice_image_plane_top") == 0
                     || nlStrCmp(npcTemplate->mName, "vice_image_plane_bottom") == 0)
@@ -136,21 +138,21 @@ Nis::Nis(NisHeader& header, char* data, int size)
                     unsigned long texture = nlStringLowerHash(textureName);
                     if (glTextureLoad(texture))
                     {
-                        mUnidentified10C[i]->SetReplacementTexture(texture);
+                        mImpostors[i]->SetReplacementTexture(texture);
                         nlSNPrintf(textureName, sizeof(textureName), "%s/%s", npcTemplate->mName, npcTemplate->mName);
-                        mUnidentified10C[i]->mOriginalTexture = nlStringLowerHash(textureName);
+                        mImpostors[i]->mOriginalTexture = nlStringLowerHash(textureName);
                     }
                 }
                 else if (nlStrCmp(npcTemplate->mName, "mario_mega_orange_bg") == 0)
                 {
-                    int charIdx = fn_80282DD8(mTarget, mWinnerType, true);
+                    int charIdx = TargetToIndex(mTarget, mWinnerType, true);
                     int captain = GameInfoManager::Instance()->GetTeam((short)((charIdx < 4 || charIdx == 8) == false));
                     nlSNPrintf(textureName, sizeof(textureName), "%s/mega_cone_colour", GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).mName);
                     unsigned long texture = nlStringLowerHash(textureName);
                     if (glTextureLoad(texture))
                     {
-                        mUnidentified10C[i]->SetReplacementTexture(texture);
-                        mUnidentified10C[i]->mOriginalTexture = nlStringLowerHash("mario_mega_orange_bg/mega_cone_colour");
+                        mImpostors[i]->SetReplacementTexture(texture);
+                        mImpostors[i]->mOriginalTexture = nlStringLowerHash("mario_mega_orange_bg/mega_cone_colour");
                     }
                 }
                 else if (nlStrCmp(npcTemplate->mName, "NIS_ball") == 0)
@@ -158,20 +160,20 @@ Nis::Nis(NisHeader& header, char* data, int size)
                     ++numBalls;
                     if (numBalls >= NisPlayer::Instance()->mMaxNumBallsVisible)
                     {
-                        mUnidentified10C[i]->mVisible = false;
+                        mImpostors[i]->mVisible = false;
                     }
                 }
             }
             else if (mTarget != NIS_TARGET_NONE && mTarget != NIS_TARGET_STADIUM)
             {
-                i = fn_80282DD8(mTarget, mWinnerType, true);
+                i = TargetToIndex(mTarget, mWinnerType, true);
                 if (mCharacterControllers[i] != 0)
                 {
-                    i = fn_80282DD8(NIS_TARGET_HOME_CAPTAIN, mWinnerType, true);
+                    i = TargetToIndex(NIS_TARGET_HOME_CAPTAIN, mWinnerType, true);
                 }
                 if (mCharacterControllers[i] != 0)
                 {
-                    i = fn_80282DD8(NIS_TARGET_AWAY_CAPTAIN, mWinnerType, true);
+                    i = TargetToIndex(NIS_TARGET_AWAY_CAPTAIN, mWinnerType, true);
                 }
                 if (mCharacterControllers[i] != 0)
                 {
@@ -185,7 +187,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 {
                     mBallId[i] = numAnimations;
                     cPN_SAnimController* controller = new cPN_SAnimController(anim, 0, PM_HOLD, 0, 0, false);
-                    lbl_8057AB68[i] = true;
+                    g_bNisAnimatedCharacters[i] = true;
                     mCharacterControllers[i] = controller;
                     if (mAudioCharacterIndex < 0)
                     {
@@ -201,7 +203,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
             nlSNPrintf(name, sizeof(name), "%s_%d", mHeader->name, mNumCameras);
             nlChunk* cameraBegin = (nlChunk*)chunk->GetData();
             nlChunk* cameraEnd = chunk->GetLastChunk();
-            if (LoadAnimCameraData(cameraBegin, cameraEnd, mUnidentified158[mNumCameras], false)
+            if (LoadAnimCameraData(cameraBegin, cameraEnd, mCameraData[mNumCameras], false)
                 && mNumCameras < 10)
             {
                 ++mNumCameras;
@@ -212,28 +214,28 @@ Nis::Nis(NisHeader& header, char* data, int size)
     NisPlayer* player = NisPlayer::Instance();
     LoadByteCode(player->mUnidentified34334);
 }
-void Nis::fn_802815E0()
+void Nis::StartScript()
 {
-    mUnidentifiedBAC = true;
+    mScriptStarted = true;
     char name[64];
     nlStrNCpy(name, mHeader->name, sizeof(name));
     *nlStrChr(name, '.') = '\0';
     CallFunction(nlStringHash(name));
 }
 
-void Nis::fn_802816CC()
+void Nis::ApplyLoadedAnimations()
 {
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
-        if (mUnidentified864[i].mUnidentified00 != 0
-            && mUnidentified864[i].mUnidentified04 != -1)
+        if (mPendingAnimations[i].name != 0
+            && mPendingAnimations[i].characterIndex != -1)
         {
-            cInventory<cSAnim>& inventory = mUnidentified97C[mUnidentified864[i].mUnidentified04];
-            inventory.AddFile((char*)mUnidentified864[i].mUnidentified10,
-                mUnidentified864[i].mUnidentified14);
-            mUnidentified864[i].mUnidentified10 = 0;
-            cSAnim* anim = inventory.Find(nlStringHash(mUnidentified864[i].mUnidentified00));
-            mCharacterControllers[mUnidentified864[i].mUnidentified04] =
+            cInventory<cSAnim>& inventory = mAnimInventories[mPendingAnimations[i].characterIndex];
+            inventory.AddFile((char*)mPendingAnimations[i].data,
+                mPendingAnimations[i].size);
+            mPendingAnimations[i].data = 0;
+            cSAnim* anim = inventory.Find(nlStringHash(mPendingAnimations[i].name));
+            mCharacterControllers[mPendingAnimations[i].characterIndex] =
                 new cPN_SAnimController(anim, 0, PM_CYCLIC, 0, 0, false);
         }
     }
@@ -248,37 +250,37 @@ Nis::~Nis()
 {
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
-        if (mUnidentified864[i].mUnidentified0C != 0)
+        if (mPendingAnimations[i].loadHandle != 0)
         {
-            if (nlAsyncReadBusy((AsyncEntry*)mUnidentified864[i].mUnidentified0C))
+            if (nlAsyncReadBusy((AsyncEntry*)mPendingAnimations[i].loadHandle))
             {
-                ((Unidentified83B88*)mUnidentified864[i].mUnidentified18)->mUnidentified04 = false;
-                ((Unidentified83B88*)mUnidentified864[i].mUnidentified18)->mUnidentified00 = 0;
+                ((PendingAnimationRequest*)mPendingAnimations[i].request)->active = false;
+                ((PendingAnimationRequest*)mPendingAnimations[i].request)->animation = 0;
             }
             else
             {
-                nlCancelEntireFileLoad(mUnidentified864[i].mUnidentified0C, 0);
-                lbl_8057AB80.Free((Unidentified83B88*)mUnidentified864[i].mUnidentified18);
+                nlCancelEntireFileLoad(mPendingAnimations[i].loadHandle, 0);
+                lbl_8057AB80.Free((PendingAnimationRequest*)mPendingAnimations[i].request);
             }
         }
-        if (mUnidentified864[i].mUnidentified10 != 0)
+        if (mPendingAnimations[i].data != 0)
         {
-            ::operator delete(mUnidentified864[i].mUnidentified10);
+            ::operator delete(mPendingAnimations[i].data);
         }
-        mUnidentified864[i].mUnidentified0C = 0;
-        mUnidentified864[i].mUnidentified00 = 0;
-        mUnidentified864[i].mUnidentified08 = false;
-        mUnidentified864[i].mUnidentified04 = -1;
-        mUnidentified864[i].mUnidentified10 = 0;
-        mUnidentified864[i].mUnidentified14 = 0;
-        mUnidentified864[i].mUnidentified18 = 0;
+        mPendingAnimations[i].loadHandle = 0;
+        mPendingAnimations[i].name = 0;
+        mPendingAnimations[i].loaded = false;
+        mPendingAnimations[i].characterIndex = -1;
+        mPendingAnimations[i].data = 0;
+        mPendingAnimations[i].size = 0;
+        mPendingAnimations[i].request = 0;
     }
 
     for (int i = 0; i < 8; ++i)
     {
-        if (mUnidentified10C[i] != 0)
+        if (mImpostors[i] != 0)
         {
-            delete mUnidentified10C[i];
+            delete mImpostors[i];
         }
     }
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
@@ -290,8 +292,8 @@ Nis::~Nis()
     }
     for (int i = 0; i < 10; ++i)
     {
-        delete mUnidentified158[i];
-        mUnidentified158[i] = 0;
+        delete mCameraData[i];
+        mCameraData[i] = 0;
     }
     if (mCamera != 0)
     {
@@ -314,7 +316,7 @@ void Nis::Update(float dt)
 
     for (int i = 0; i < 8; ++i)
     {
-        ImpostorModel* pModel = mUnidentified10C[i];
+        ImpostorModel* pModel = mImpostors[i];
         if (pModel != 0)
         {
             pModel->Update(dt);
@@ -340,7 +342,7 @@ void Nis::UpdateTriggers(float oldTime, float newTime, float duration)
 void Nis::SelectCamera(cAnimCamera& camera, int cameraIndex)
 {
     int index = cameraIndex % mNumCameras;
-    camera.m_pActiveCameraData = mUnidentified158[index];
+    camera.m_pActiveCameraData = mCameraData[index];
     if (mMirrored)
     {
         camera.m_Mirror = (nlVector3){ -1.0f, 1.0f, 1.0f };
@@ -354,15 +356,14 @@ void Nis::SelectCamera(cAnimCamera& camera, int cameraIndex)
     mCamera = &camera;
 }
 
-void Nis::fn_80281C70(cAnimCamera& camera)
+void Nis::SelectRandomCamera(cAnimCamera& camera)
 {
-    int randomIndex = nlRandom(mNumCameras, fn_80287B2C(GetPresentation()));
+    int randomIndex = nlRandom(mNumCameras, GetPresentationRandomSeed(GetPresentation()));
     SelectCamera(camera, randomIndex);
 }
 
 void Nis::Render(int param1)
 {
-    GLSkinMesh* skinMesh;
     DrawableCharacter* pDC;
     RenderSnapshot& snapshot = ReplayManager::Instance()->GetMutableRenderSnapshot();
     int numBalls = 0;
@@ -377,16 +378,16 @@ void Nis::Render(int param1)
 
         nlVector3 rootTrans = { 0.0f, 0.0f, 0.0f };
         u16 angle = 0;
-        int index = mUnidentified090[i];
+        int index = mCharacterAnimProxy[i];
         if (index >= 0)
         {
-            mCharacterControllers[i]->GetRootTrans(&rootTrans, mUnidentified0F8[index], 1.0f);
-            nlVec2Add(mUnidentified0B8[index], mUnidentified0B8[index],
+            mCharacterControllers[i]->GetRootTrans(&rootTrans, mAnimProxyDirections[index], 1.0f);
+            nlVec2Add(mAnimProxyPositions[index], mAnimProxyPositions[index],
                 *(const nlVector2*)&rootTrans);
-            nlVec3Set(rootTrans, mUnidentified0B8[index].x, mUnidentified0B8[index].y, 0.0f);
+            nlVec3Set(rootTrans, mAnimProxyPositions[index].x, mAnimProxyPositions[index].y, 0.0f);
             mCharacterControllers[i]->GetRootRot(&angle);
-            mUnidentified0F8[index] += angle;
-            angle = mUnidentified0F8[index];
+            mAnimProxyDirections[index] += angle;
+            angle = mAnimProxyDirections[index];
         }
         else
         {
@@ -418,31 +419,31 @@ void Nis::Render(int param1)
 
     for (int i = 0; i < 8; ++i)
     {
-        if (mUnidentified10C[i] == 0)
+        if (mImpostors[i] == 0)
             continue;
         nlVector3 rootTrans = { 0.0f, 0.0f, 0.0f };
         u16 angle = 0;
-        float fTime = mUnidentified10C[i]->mAnimController->get_fTime();
-        mUnidentified10C[i]->mAnimController->m_pSAnim->GetRootTrans(fTime, &rootTrans);
-        fTime = mUnidentified10C[i]->mAnimController->get_fTime();
-        mUnidentified10C[i]->mAnimController->m_pSAnim->GetRootRot(fTime, &angle);
+        float fTime = mImpostors[i]->mAnimController->get_fTime();
+        mImpostors[i]->mAnimController->m_pSAnim->GetRootTrans(fTime, &rootTrans);
+        fTime = mImpostors[i]->mAnimController->get_fTime();
+        mImpostors[i]->mAnimController->m_pSAnim->GetRootRot(fTime, &angle);
         if (mMirrored)
         {
-            mUnidentified10C[i]->mAnimController->m_bMirror = true;
+            mImpostors[i]->mAnimController->m_bMirror = true;
             rootTrans.x *= -1.0f;
             angle = angle + (0x4000 - angle) * 2;
         }
         nlMatrix4 matrix;
         nlMakeRotationMatrixZ(matrix, AngUnitsToRad_fromUnsignedShort(angle));
         matrix.SetTranslation(rootTrans);
-        mUnidentified10C[i]->mWorldMatrix = matrix;
+        mImpostors[i]->mWorldMatrix = matrix;
 
         GLView* view = GetLayerView(eCLV_MoreCharacters);
         if (param1 == 1 && (unknown_0x034 == 1 || unknown_0x034 == 2))
         {
             view = GetLayerView(eCLV_PictureInPicture);
         }
-        skinMesh = mUnidentified10C[i]->mSkinMesh;
+        GLSkinMesh* skinMesh = mImpostors[i]->GetSkinMesh();
         if (skinMesh != 0)
         {
             static const u32 hash1 = nlStringLowerHash("peachwingleft/peachwingleft");
@@ -460,19 +461,19 @@ void Nis::Render(int param1)
         }
         if (view == GetLayerView(eCLV_MoreCharacters))
         {
-            mUnidentified10C[i]->Render(view, GetLayerView(eCLV_WorldAlphaBlended));
+            mImpostors[i]->Render(view, GetLayerView(eCLV_WorldAlphaBlended));
         }
         else
         {
-            mUnidentified10C[i]->Render(view, 0);
+            mImpostors[i]->Render(view, 0);
         }
-        if (mUnidentified10C[i] == mUnidentified854)
+        if (mImpostors[i] == mDryBonesHead)
         {
-            fn_80283670(mUnidentified10C[i]->mLastModel, mUnidentified858);
+            ApplyDamageEffects(mImpostors[i]->mLastModel, mDryBonesHeadCharacter);
         }
-        if (mUnidentified10C[i] == mUnidentified85C)
+        if (mImpostors[i] == mShyGuyMask)
         {
-            fn_80283670(mUnidentified10C[i]->mLastModel, mUnidentified860);
+            ApplyDamageEffects(mImpostors[i]->mLastModel, mShyGuyMaskCharacter);
         }
     }
 }
@@ -509,7 +510,7 @@ void Nis::AddTrigger(NisTriggerType triggerType, float frameNumber,
     mNumTriggers++;
 }
 
-bool Nis::fn_80282474(nlVector3& param1) const
+bool Nis::GetMainCharacterHeadPosition(nlVector3& position) const
 {
     int charIdx;
     if (mMainCharacterIndex >= 0)
@@ -518,17 +519,17 @@ bool Nis::fn_80282474(nlVector3& param1) const
     }
     else
     {
-        charIdx = fn_80282DD8(mTarget, mWinnerType, false);
+        charIdx = TargetToIndex(mTarget, mWinnerType, false);
     }
     if (charIdx >= 0 && charIdx < MAX_NUM_CHARACTERS)
     {
-        param1 = GetReplayDrawableCharacter(g_pCharacters[charIdx])->headPosition;
+        position = GetReplayDrawableCharacter(g_pCharacters[charIdx])->headPosition;
         return true;
     }
     return false;
 }
 
-void Nis::Trigger::FireEffect(Nis& nis) const
+void Nis::Trigger::FireEffect(const Nis& nis) const
 {
     NisPlayer* player = 0;
     if (params.param1 == 0)
@@ -536,7 +537,6 @@ void Nis::Trigger::FireEffect(Nis& nis) const
         player = NisPlayer::Instance();
     }
     int charIdx = -1;
-    void* context;
     if (nlStrICmp(target, "ball") == 0)
     {
         EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
@@ -564,15 +564,15 @@ void Nis::Trigger::FireEffect(Nis& nis) const
         }
         else
         {
-            charIdx = nis.fn_80282DD8(nis.mTarget, nis.mWinnerType, false);
+            charIdx = nis.TargetToIndex(nis.mTarget, nis.mWinnerType, false);
         }
     }
     else
     {
         int idx = -1;
-        for (int i = 0; i < nis.mHeader->mUnidentified0A4; ++i)
+        for (int i = 0; i < nis.mHeader->numAnimProxies; ++i)
         {
-            if (nlStrICmp(nis.mHeader->mUnidentified0A8[i], target) == 0)
+            if (nlStrICmp(nis.mHeader->animProxyNames[i], target) == 0)
             {
                 idx = i;
                 break;
@@ -582,7 +582,7 @@ void Nis::Trigger::FireEffect(Nis& nis) const
         {
             for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
             {
-                if (idx == nis.mUnidentified090[i])
+                if (idx == nis.mCharacterAnimProxy[i])
                 {
                     charIdx = i;
                     break;
@@ -592,7 +592,7 @@ void Nis::Trigger::FireEffect(Nis& nis) const
     }
     if (charIdx >= 0 && charIdx < MAX_NUM_CHARACTERS)
     {
-        context = g_pCharacters[charIdx];
+        void* context = g_pCharacters[charIdx];
         EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
         if (ctrl == 0)
             return;
@@ -606,22 +606,21 @@ void Nis::Trigger::FireEffect(Nis& nis) const
     {
         for (int i = 0; i < 8; ++i)
         {
-            if (nis.mUnidentified12C[i] != 0
-                && nlStrNICmp(target, nis.mUnidentified12C[i], nlStrLen(nis.mUnidentified12C[i])) == 0
-                && nis.mUnidentified14C[i] == target[nlStrLen(target) - 1])
+            if (nis.mImpostorNames[i] != 0
+                && nlStrNICmp(target, nis.mImpostorNames[i], nlStrLen(nis.mImpostorNames[i])) == 0
+                && nis.mImpostorSuffixes[i] == target[nlStrLen(target) - 1])
             {
                 EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
                 if (ctrl == 0)
                     return;
-                ctrl->SetAnimController(*nis.mUnidentified10C[i]->mAnimController);
-                context = nis.mUnidentified10C[i];
+                ctrl->SetAnimController(*nis.mImpostors[i]->mAnimController);
                 ctrl->m_uUserData = (u32)player;
                 {
                     Function<void(EmissionController&)> callback(
-                        Bind<void>(UpdateEmitterFromImpostorModel, placeholder0, context));
+                        Bind<void>(UpdateEmitterFromImpostorModel, placeholder0, (void*)nis.mImpostors[i]));
                     ctrl->SetUpdateCallback(callback);
                 }
-                ctrl->m_bVisible = nis.mUnidentified10C[i]->mVisible;
+                ctrl->m_bVisible = nis.mImpostors[i]->mVisible;
                 break;
             }
         }
@@ -650,7 +649,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         }
         else
         {
-            charIdx = nis.fn_80282DD8(nis.mTarget, nis.mWinnerType, false);
+            charIdx = nis.TargetToIndex(nis.mTarget, nis.mWinnerType, false);
         }
         if (charIdx >= 0 && charIdx < MAX_NUM_CHARACTERS)
         {
@@ -718,7 +717,7 @@ static inline int FindAvailableSidekickIndex(int firstIndex)
     int index;
     for (index = 0; index < 3; ++index)
     {
-        if (!lbl_8057AB68[index + firstIndex])
+        if (!g_bNisAnimatedCharacters[index + firstIndex])
         {
             break;
         }
@@ -726,7 +725,7 @@ static inline int FindAvailableSidekickIndex(int firstIndex)
     return index + firstIndex;
 }
 
-int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) const
+int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvailableSidekick) const
 {
     if (target == NIS_TARGET_HOME_CAPTAIN)
     {
@@ -738,7 +737,7 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) co
     }
     if (target == NIS_TARGET_HOME_SIDEKICK)
     {
-        if (param3)
+        if (findAvailableSidekick)
         {
             return FindAvailableSidekickIndex(1);
         }
@@ -758,7 +757,7 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) co
     }
     if (target == NIS_TARGET_AWAY_SIDEKICK)
     {
-        if (param3)
+        if (findAvailableSidekick)
         {
             return FindAvailableSidekickIndex(5);
         }
@@ -792,13 +791,13 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) co
     {
         if (NisPlayer::Instance()->fn_8027E284(winnerType) == 0)
         {
-            if (param3)
+            if (findAvailableSidekick)
             {
                 return FindAvailableSidekickIndex(5);
             }
             return 5;
         }
-        if (param3)
+        if (findAvailableSidekick)
         {
             return FindAvailableSidekickIndex(1);
         }
@@ -808,13 +807,13 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) co
     {
         if (NisPlayer::Instance()->fn_8027E284(winnerType) == 0)
         {
-            if (param3)
+            if (findAvailableSidekick)
             {
                 return FindAvailableSidekickIndex(1);
             }
             return 1;
         }
-        if (param3)
+        if (findAvailableSidekick)
         {
             return FindAvailableSidekickIndex(5);
         }
@@ -838,47 +837,47 @@ int Nis::fn_80282DD8(NisTarget target, NisWinnerType winnerType, bool param3) co
     }
     if (target == NIS_TARGET_UNIDENTIFIED_21)
     {
-        return (NisPlayer::Instance()->mUnidentified34238 == 0) ? 0 : 4;
+        return (NisPlayer::Instance()->mMegaStrikeSide == 0) ? 0 : 4;
     }
     if (target == NIS_TARGET_UNIDENTIFIED_22)
     {
-        return (NisPlayer::Instance()->mUnidentified34238 == 0) ? 9 : 8;
+        return (NisPlayer::Instance()->mMegaStrikeSide == 0) ? 9 : 8;
     }
     return (target == NIS_TARGET_NONE) ? 0 : -1;
 }
 
-void Nis::fn_80283200(const char* param1, const char* param2,
-    NisTarget param3, NisWinnerType param4, bool param5)
+void Nis::PlayAnimProxy(const char* animName, const char* proxyName,
+    NisTarget target, NisWinnerType winnerType, bool force)
 {
-    if (param4 == (NisWinnerType)4)
+    if (winnerType == (NisWinnerType)4)
     {
-        param4 = mHeader->winnerType;
+        winnerType = mHeader->winnerType;
     }
-    for (int j = 0; j < mHeader->mUnidentified0A4; ++j)
+    for (int j = 0; j < mHeader->numAnimProxies; ++j)
     {
-        if (nlStrICmp(mHeader->mUnidentified0A8[j], param2) == 0)
+        if (nlStrICmp(mHeader->animProxyNames[j], proxyName) == 0)
         {
-            int i = fn_80282DD8(param3, param4, true);
-            mUnidentified090[i] = j;
-            mUnidentified0B8[j] = mHeader->mUnidentified128[j];
-            mUnidentified0F8[j] = mHeader->mUnidentified168[j];
+            int i = TargetToIndex(target, winnerType, true);
+            mCharacterAnimProxy[i] = j;
+            mAnimProxyPositions[j] = mHeader->animProxyPositions[j];
+            mAnimProxyDirections[j] = mHeader->animProxyDirections[j];
             cCharacter* character = g_pCharacters[i];
-            cSAnim* anim = character->GetAnimInventory()->m_pSAnimInventory->Find(nlStringLowerHash(param1));
+            cSAnim* anim = character->GetAnimInventory()->m_pSAnimInventory->Find(nlStringLowerHash(animName));
             if (anim != 0)
             {
-                if (param5 == true || !lbl_8057AB68[i])
+                if (force == true || !g_bNisAnimatedCharacters[i])
                 {
                     cPN_SAnimController* controller = new cPN_SAnimController(anim, 0, PM_CYCLIC, 0, 0, false);
-                    lbl_8057AB68[i] = true;
+                    g_bNisAnimatedCharacters[i] = true;
                     mCharacterControllers[i] = controller;
                 }
             }
             else
             {
-                if (param5 == true || !lbl_8057AB68[i])
+                if (force == true || !g_bNisAnimatedCharacters[i])
                 {
-                    lbl_8057AB68[i] = true;
-                    fn_80283A40(param1, i);
+                    g_bNisAnimatedCharacters[i] = true;
+                    LoadCharacterAnimation(animName, i);
                 }
             }
             break;
@@ -886,33 +885,33 @@ void Nis::fn_80283200(const char* param1, const char* param2,
     }
 }
 
-void fn_8028346C()
+void ClearNisAnimatedCharacters()
 {
     for (int i = 0; i < Nis::MAX_NUM_CHARACTERS; ++i)
     {
-        lbl_8057AB68[i] = false;
+        g_bNisAnimatedCharacters[i] = false;
     }
 }
 
-void Nis::fn_802834A0()
+void Nis::AttachHeadImpostors()
 {
-    mUnidentified854 = fn_8028350C((eCharacterClass)17, "DryBonesHead",
-        "dryboneshead/drybones_mario", &mUnidentified858);
-    mUnidentified85C = fn_8028350C((eCharacterClass)19, "ShyGuyMask",
-        "shyguymask/shyguy_mario", &mUnidentified860);
+    mDryBonesHead = AttachImpostorToCharacter((eCharacterClass)17, "DryBonesHead",
+        "dryboneshead/drybones_mario", &mDryBonesHeadCharacter);
+    mShyGuyMask = AttachImpostorToCharacter((eCharacterClass)19, "ShyGuyMask",
+        "shyguymask/shyguy_mario", &mShyGuyMaskCharacter);
 }
 
-ImpostorModel* Nis::fn_8028350C(eCharacterClass param1, const char* param2,
-    const char* param3, DrawableCharacter** param4)
+ImpostorModel* Nis::AttachImpostorToCharacter(eCharacterClass characterClass, const char* impostorName,
+    const char* textureName, DrawableCharacter** outCharacter)
 {
     ImpostorModel* model = 0;
-    *param4 = 0;
+    *outCharacter = 0;
 
     for (int i = 0; i < 8; ++i)
     {
-        if (mUnidentified10C[i] != 0 && nlStrCmp(mUnidentified12C[i], param2) == 0)
+        if (mImpostors[i] != 0 && nlStrCmp(mImpostorNames[i], impostorName) == 0)
         {
-            model = mUnidentified10C[i];
+            model = mImpostors[i];
         }
     }
 
@@ -924,12 +923,12 @@ ImpostorModel* Nis::fn_8028350C(eCharacterClass param1, const char* param2,
             DrawableCharacter* pDC = &snapshot.GetCharacter(i);
             cCharacter* character = pDC->character;
             if (character->m_eClassType == FIELDER
-                && param1 == character->mUnidentified024.m_eCharacterClass
+                && characterClass == character->mUnidentified024.m_eCharacterClass
                 && mCharacterControllers[i] != 0)
             {
                 model->SetReplacementTexture(character->mUnidentified104);
-                model->mOriginalTexture = glGetTexture(param3);
-                *param4 = pDC;
+                model->mOriginalTexture = glGetTexture(textureName);
+                *outCharacter = pDC;
                 break;
             }
         }
@@ -938,7 +937,7 @@ ImpostorModel* Nis::fn_8028350C(eCharacterClass param1, const char* param2,
     return model;
 }
 
-void Nis::fn_80283670(glModel* model, DrawableCharacter* character)
+void Nis::ApplyDamageEffects(glModel* model, DrawableCharacter* character)
 {
     glModelPacket* packet;
     static u32 hash1 = nlStringLowerHash("damage1Enabled");
@@ -960,18 +959,18 @@ void Nis::fn_80283670(glModel* model, DrawableCharacter* character)
         damageTexture = glGetTexture("global/scorch");
     }
 
-    if (character->character->m_Dirt > 0.0f || character->character->m_MinDirt > 0.0f)
+    if (character->character->GetDirt() > 0.0f || character->character->GetMinDirt() > 0.0f)
     {
         for (packet = model->packets; packet < model->packets + model->numPackets; ++packet)
         {
-            if (glHasMaterialParameter(packet, hash1) && character->character->m_Dirt > 0.0f)
+            if (glHasMaterialParameter(packet, hash1) && character->character->GetDirt() > 0.0f)
             {
                 glSetMaterialUnsignedParameter(packet, hash1, 1);
                 glTextureBinding* texture = (glTextureBinding*)packet->materialParameters;
                 texture[4].texture = damageTexture;
                 texture[4].textureIndex = 0xFFFF;
             }
-            if (glHasMaterialParameter(packet, hash2) && character->character->m_MinDirt > 0.0f)
+            if (glHasMaterialParameter(packet, hash2) && character->character->GetMinDirt() > 0.0f)
             {
                 glSetMaterialUnsignedParameter(packet, hash2, 1);
             }
@@ -979,29 +978,29 @@ void Nis::fn_80283670(glModel* model, DrawableCharacter* character)
     }
 }
 
-ImpostorModel* Nis::fn_80283884(const char* name)
+ImpostorModel* Nis::FindImpostor(const char* name)
 {
     for (int i = 0; i < 8; ++i)
     {
-        if (mUnidentified12C[i] != 0 && nlStrICmp(name, mUnidentified12C[i]) == 0)
+        if (mImpostorNames[i] != 0 && nlStrICmp(name, mImpostorNames[i]) == 0)
         {
-            return mUnidentified10C[i];
+            return mImpostors[i];
         }
     }
     return 0;
 }
 
-bool Nis::fn_80283930()
+bool Nis::IsLoading()
 {
-    if (!mUnidentifiedBAC)
+    if (!mScriptStarted)
     {
         return true;
     }
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
-        if (mUnidentified864[i].mUnidentified00 != 0
-            && mUnidentified864[i].mUnidentified04 != -1
-            && !mUnidentified864[i].mUnidentified08)
+        if (mPendingAnimations[i].name != 0
+            && mPendingAnimations[i].characterIndex != -1
+            && !mPendingAnimations[i].loaded)
         {
             return true;
         }
@@ -1009,99 +1008,52 @@ bool Nis::fn_80283930()
     return false;
 }
 
-void Nis::fn_80283A40(const char* param1, int param2)
+void Nis::LoadCharacterAnimation(const char* animName, int characterIndex)
 {
-    cCharacter* character = g_pCharacters[param2];
-    Unidentified864* entry = 0;
+    cCharacter* character = g_pCharacters[characterIndex];
+    PendingAnimation* entry = 0;
     for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
     {
-        if (mUnidentified864[i].mUnidentified00 == 0
-            && mUnidentified864[i].mUnidentified04 == -1)
+        if (mPendingAnimations[i].name == 0
+            && mPendingAnimations[i].characterIndex == -1)
         {
-            entry = &mUnidentified864[i];
+            entry = &mPendingAnimations[i];
         }
     }
 
     if (entry != 0)
     {
         eCharacterClass characterClass = character->mUnidentified024.m_eCharacterClass;
-        entry->mUnidentified00 = param1;
-        entry->mUnidentified04 = param2;
-        entry->mUnidentified08 = false;
+        entry->name = animName;
+        entry->characterIndex = characterIndex;
+        entry->loaded = false;
         tCharacterTemplateInfo* info = GetCharacterTemplateInfo(characterClass);
         char filename[100];
-        nlSNPrintf(filename, sizeof(filename) - 1, "Art/Animation/%s/%s.sanim", info->szHierarchy, param1);
+        nlSNPrintf(filename, sizeof(filename) - 1, "Art/Animation/%s/%s.sanim", info->szHierarchy, animName);
 
-        Unidentified83B88* callback = lbl_8057AB80.Allocate();
-        callback->mUnidentified04 = true;
-        callback->mUnidentified00 = entry;
-        entry->mUnidentified18 = callback;
-        entry->mUnidentified0C = nlLoadEntireFileAsync(filename, fn_80283C00, callback,
+        PendingAnimationRequest* request = lbl_8057AB80.Allocate();
+        request->active = true;
+        request->animation = entry;
+        entry->request = request;
+        entry->loadHandle = nlLoadEntireFileAsync(filename, OnCharacterAnimationLoaded, request,
             32, AllocateEnd, 0, 0, &VirtualAllocator);
     }
 }
 
-void fn_80283C00(void* data, unsigned long size, void* userData)
+void OnCharacterAnimationLoaded(void* data, unsigned long size, void* userData)
 {
-    Unidentified83B88* callback = (Unidentified83B88*)userData;
-    if (callback->mUnidentified04 == true)
+    PendingAnimationRequest* request = (PendingAnimationRequest*)userData;
+    if (request->active == true)
     {
-        Nis::Unidentified864* entry = callback->mUnidentified00;
-        entry->mUnidentified0C = 0;
-        entry->mUnidentified10 = data;
-        entry->mUnidentified14 = size;
-        entry->mUnidentified08 = true;
+        Nis::PendingAnimation* entry = request->animation;
+        entry->loadHandle = 0;
+        entry->data = data;
+        entry->size = size;
+        entry->loaded = true;
     }
     else
     {
         ::operator delete(data);
     }
-    lbl_8057AB80.Free(callback);
-}
-
-void Nis::DoFunctionCall(unsigned int param1)
-{
-    switch (param1)
-    {
-    case 0:
-    {
-        NisPlayer* player = NisPlayer::Instance();
-        player->mUnidentified343E0 = true;
-        break;
-    }
-    case 1:
-    {
-        int param2 = m_SP[-1];
-        m_SP[-1] = GameInfoManager::Instance()->GetStadium() == param2;
-        if (m_RunState == 3)
-        {
-            m_SP[-1] = param2;
-        }
-        break;
-    }
-    case 2:
-    {
-        bool param6 = m_SP[-1] != 0;
-        NisWinnerType param5 = (NisWinnerType)m_SP[-2];
-        NisTarget param4 = (NisTarget)m_SP[-3];
-        const char* param3 = (const char*)m_SP[-4];
-        const char* param2 = (const char*)m_SP[-5];
-        m_SP -= 5;
-        fn_80283200(param2, param3, param4, param5, param6);
-        break;
-    }
-    case 3:
-    {
-        float param3 = *(float*)(m_SP - 1);
-        float param2 = *(float*)(m_SP - 2);
-        m_SP -= 2;
-        NisPlayer* player = NisPlayer::Instance();
-        player->mUnidentified343E4 = param2;
-        player->mUnidentified343EC = param3;
-        break;
-    }
-    default:
-        nlBreak();
-        break;
-    }
+    lbl_8057AB80.Free(request);
 }

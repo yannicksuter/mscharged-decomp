@@ -36,8 +36,8 @@ public:
 };
 
 
-float fn_80112E0C();
-float fn_80112E14();
+float GetStandardAspectRatio();
+float GetWidescreenAspectRatio();
 glModel* fn_80112E1C(glModel* model);
 
 #endif // GAME_BEGIN_FRAME_TASK_H

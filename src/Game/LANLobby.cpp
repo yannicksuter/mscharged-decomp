@@ -130,7 +130,7 @@ int LANLobby::CreateGame(int value)
     nlStrNCpy(mPeerInfoList[0].mName, mLocalPlayerName, 11);
     mPeerInfoList[0].mUnidentified0B = mUserMatchDataSize;
     memcpy(&mPeerInfoList[0].mUnidentified0C, mUserMatchData, mUserMatchDataSize);
-    *(u32*)mPeerInfoList[0].mUnidentified14 = *(u32*)address;
+    mPeerInfoList[0].mUnidentified14.word = *(u32*)address;
     mPeerInfoList[0].mUnidentified20 = mSocket->GetLocalPort();
     mPeerInfoList[0].mUnidentified18 = 0;
     mPeerInfoList[0].mUnidentified22 = false;
@@ -286,7 +286,7 @@ void LANLobby::DumpPeerInfo()
     tDebugPrintManager::Print(DC_NETWORK, "Dumping %d entries in PeerInfoList\n", mPeerCount);
     for (int index = 0; index < mPeerCount; ++index)
     {
-        tDebugPrintManager::Print(DC_NETWORK, "Peer %d address %d.%d.%d.%d port %d hoststate %d connInd %d connConf %d\n", index, mPeerInfoList[index].mUnidentified14[0], mPeerInfoList[index].mUnidentified14[1], mPeerInfoList[index].mUnidentified14[2], mPeerInfoList[index].mUnidentified14[3], mPeerInfoList[index].mUnidentified20, mPeerInfoList[index].mUnidentified18, mPeerInfoList[index].mUnidentified1C, mPeerInfoList[index].mUnidentified22);
+        tDebugPrintManager::Print(DC_NETWORK, "Peer %d address %d.%d.%d.%d port %d hoststate %d connInd %d connConf %d\n", index, mPeerInfoList[index].mUnidentified14.bytes[0], mPeerInfoList[index].mUnidentified14.bytes[1], mPeerInfoList[index].mUnidentified14.bytes[2], mPeerInfoList[index].mUnidentified14.bytes[3], mPeerInfoList[index].mUnidentified20, mPeerInfoList[index].mUnidentified18, mPeerInfoList[index].mUnidentified1C, mPeerInfoList[index].mUnidentified22);
     }
     tDebugPrintManager::Print(DC_NETWORK, "Dumping ConnectionPool contents\n");
     for (int index = 0; index < 8; ++index)
@@ -295,7 +295,7 @@ void LANLobby::DumpPeerInfo()
         if (connection == 0)
             tDebugPrintManager::Print(DC_NETWORK, "ConnPool %d Status %d\n", index, m_ConnectionPool[index].mUnidentified04);
         else
-            tDebugPrintManager::Print(DC_NETWORK, "ConnPool %d Status %d ConnAddr %d.%d.%d.%d\n", index, m_ConnectionPool[index].mUnidentified04, connection->mAddress[0], connection->mAddress[1], connection->mAddress[2], connection->mAddress[3]);
+            tDebugPrintManager::Print(DC_NETWORK, "ConnPool %d Status %d ConnAddr %d.%d.%d.%d\n", index, m_ConnectionPool[index].mUnidentified04, connection->mAddress.bytes[0], connection->mAddress.bytes[1], connection->mAddress.bytes[2], connection->mAddress.bytes[3]);
     }
 }
 
@@ -327,7 +327,7 @@ int LANLobby::MachineIdxFromConnection(unsigned int connection)
     int connectionIndex = GetConnectionIndex(entry);
     if (connectionIndex == -1)
     {
-        tDebugPrintManager::Print(DC_NETWORK, "Failed to get connection index from conn addr %d.%d.%d.%d\n", entry->mAddress[0], entry->mAddress[1], entry->mAddress[2], entry->mAddress[3]);
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to get connection index from conn addr %d.%d.%d.%d\n", entry->mAddress.bytes[0], entry->mAddress.bytes[1], entry->mAddress.bytes[2], entry->mAddress.bytes[3]);
         return -1;
     }
     for (int index = 0; index < mPeerCount; ++index)
@@ -335,7 +335,7 @@ int LANLobby::MachineIdxFromConnection(unsigned int connection)
         if (mPeerInfoList[index].mUnidentified1C == connectionIndex)
             return index;
     }
-    tDebugPrintManager::Print(DC_NETWORK, "Failed to get peer index from connectionIndex %d conn addr %d.%d.%d.%d\n", connectionIndex, entry->mAddress[0], entry->mAddress[1], entry->mAddress[2], entry->mAddress[3]);
+    tDebugPrintManager::Print(DC_NETWORK, "Failed to get peer index from connectionIndex %d conn addr %d.%d.%d.%d\n", connectionIndex, entry->mAddress.bytes[0], entry->mAddress.bytes[1], entry->mAddress.bytes[2], entry->mAddress.bytes[3]);
     DumpPeerInfo();
     return -1;
 }
@@ -441,7 +441,7 @@ int LANLobby::ShouldAcceptConnection(unsigned int connection, u8* address)
         int count = mPeerCount;
         for (int peer = 1; peer < count; ++peer)
         {
-            if (memcmp(mPeerInfoList[peer].mUnidentified14, address, 4) == 0)
+            if (memcmp(mPeerInfoList[peer].mUnidentified14.bytes, address, 4) == 0)
             {
                 tDebugPrintManager::Print(DC_NETWORK, "Connection attempt accepted by client.  Address %d.%d.%d.%d assigned to connection pool %d\n", address[0], address[1], address[2], address[3], index);
                 m_ConnectionPool[index].m_Connection = (TransportConnection*)connection;
@@ -497,6 +497,20 @@ void LANLobby::OnConnectionClosed(unsigned int connection, int)
         mListener->OnGameJoined(7);
 }
 
+void LANLobby::SendFindGame()
+{
+    NetMessageFindGame message;
+    u32 first = NetworkRandom();
+    u32 second = NetworkRandom();
+    message.mUnidentified08[1] = second;
+    message.mUnidentified08[0] = first;
+    memcpy(mFindGameToken, message.mUnidentified08, 8);
+    u8 buffer[200];
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
+    mSocket->SendBroadcast(buffer, size);
+    mFindGameElapsedTime = 0.0f;
+}
+
 void LANLobby::SendFoundGame(const void* data)
 {
     NetMessageFoundGame message;
@@ -540,16 +554,7 @@ void LANLobby::Update(float dt)
         mFindGameElapsedTime += dt;
         if (mFindGameElapsedTime >= g_fBroadCastFindGameTime)
         {
-            NetMessageFindGame message;
-            u32 first = NetworkRandom();
-            u32 second = NetworkRandom();
-            message.mUnidentified08[1] = second;
-            message.mUnidentified08[0] = first;
-            memcpy(mFindGameToken, message.mUnidentified08, 8);
-            u8 buffer[200];
-            int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
-            mSocket->SendBroadcast(buffer, size);
-            mFindGameElapsedTime = 0.0f;
+            SendFindGame();
         }
     }
     if (mState == 1)
@@ -590,23 +595,7 @@ void LANLobby::Update(float dt)
     }
     if (mLaunchConfirmationPending && ArePeerConnectionsReady())
     {
-        NetMessageReadyToLaunchConfirm message;
-        message.mUnidentified08 = 1;
-        u8 buffer[8];
-        int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
-        int index = mPeerInfoList[0].mUnidentified1C;
-        if (index != -1)
-        {
-            if (m_ConnectionPool[index].m_Connection != 0)
-            {
-                mSocket->Send((u32)m_ConnectionPool[index].m_Connection, buffer, size, true);
-                tDebugPrintManager::Print(DC_NETWORK, "Sent ready to launch confirm\n");
-            }
-            else
-                tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
-        }
-        else
-            tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, no connection to host!\n");
+        SendReadyToLaunchConfirm();
         mLaunchConfirmationPending = false;
     }
 }
@@ -666,6 +655,71 @@ void LANLobby::SendReadyToLaunchRequest()
     }
 }
 
+void LANLobby::ProcessReadyToLaunchRequest()
+{
+    if (!mIsHost)
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "Received ready to launch request\n");
+        if (ArePeerConnectionsReady())
+        {
+            SendReadyToLaunchConfirm();
+            mLaunchConfirmationPending = false;
+        }
+        else
+            mLaunchConfirmationPending = true;
+    }
+}
+
+void LANLobby::ProcessReadyToLaunchConfirm(int peer, NetMessageReadyToLaunchConfirm* message)
+{
+    mPeerInfoList[peer].mUnidentified22 = message->mUnidentified08;
+    tDebugPrintManager::Print(DC_NETWORK, "Received ready to launch confirm from peer %d\n", peer);
+}
+
+bool LANLobby::ArePeerConnectionsReady()
+{
+    if (GetTopology() == 0)
+    {
+        bool ready = true;
+        for (int peer = 1; peer < mPeerCount; ++peer)
+        {
+            if (peer == mLocalMachineIndex)
+                continue;
+            int index = mPeerInfoList[peer].mUnidentified1C;
+            if (index == -1)
+            {
+                ready = false;
+                continue;
+            }
+            if (m_ConnectionPool[index].mUnidentified04 != 2)
+                ready = false;
+        }
+        return ready;
+    }
+    return true;
+}
+
+void LANLobby::SendReadyToLaunchConfirm()
+{
+    NetMessageReadyToLaunchConfirm message;
+    message.mUnidentified08 = 1;
+    u8 buffer[8];
+    int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
+    int index = mPeerInfoList[0].mUnidentified1C;
+    if (index != -1)
+    {
+        if (m_ConnectionPool[index].m_Connection != 0)
+        {
+            mSocket->Send((u32)m_ConnectionPool[index].m_Connection, buffer, size, true);
+            tDebugPrintManager::Print(DC_NETWORK, "Sent ready to launch confirm\n");
+        }
+        else
+            tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
+    }
+    else
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, no connection to host!\n");
+}
+
 void LANLobby::EnumerateGames()
 {
     for (int index = 0; index < mFoundGameCount; ++index)
@@ -700,7 +754,7 @@ void LANLobby::ProcessFoundGame(NetMessageFoundGame* message)
 void LANLobby::SendGamePeerAdded(int index)
 {
     NetMessageGamePeerAdded message;
-    *(u32*)message.mUnidentified08.mUnidentified00 = *(u32*)mPeerInfoList[index].mUnidentified14;
+    *(u32*)message.mUnidentified08.mUnidentified00 = mPeerInfoList[index].mUnidentified14.word;
     message.mUnidentified08.mUnidentified04 = mPeerInfoList[index].mUnidentified20;
     nlStrNCpy(message.mUnidentified08.mUnidentified06, mPeerInfoList[index].mName, 11);
     message.mUnidentified08.mUnidentified12 = mPeerInfoList[index].mUnidentified0B;
@@ -731,7 +785,7 @@ void LANLobby::SendJoinResponse(TransportConnection* connection, bool accepted)
     {
         for (int peer = 1; peer < mPeerCount - 1; ++peer)
         {
-            message.mUnidentified24[peer - 1].mAddressWord = mPeerInfoList[peer].mAddressWord;
+            message.mUnidentified24[peer - 1].mAddressWord = mPeerInfoList[peer].mUnidentified14.word;
             message.mUnidentified24[peer - 1].mUnidentified04 = mPeerInfoList[peer].mUnidentified20;
             nlStrNCpy(message.mUnidentified24[peer - 1].mUnidentified06, mPeerInfoList[peer].mName, 11);
             message.mUnidentified24[peer - 1].mUnidentified12 = mPeerInfoList[peer].mUnidentified0B;
@@ -753,7 +807,7 @@ void LANLobby::ProcessJoinRequest(int index, NetMessageJoinRequest* message)
         nlStrNCpy(mPeerInfoList[mPeerCount].mName, message->mUnidentified0E, 11);
         mPeerInfoList[mPeerCount].mUnidentified0B = message->mUnidentified19;
         memcpy(&mPeerInfoList[mPeerCount].mUnidentified0C, message->mUnidentified1A, message->mUnidentified19);
-        *(u32*)mPeerInfoList[mPeerCount].mUnidentified14 = *(u32*)connection->mAddress;
+        mPeerInfoList[mPeerCount].mUnidentified14 = connection->mAddress;
         mPeerInfoList[mPeerCount].mUnidentified20 = connection->mPort;
         if (GetTopology() == 0)
             mPeerInfoList[mPeerCount].mUnidentified18 = 2;
@@ -789,7 +843,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
         nlStrNCpy(mPeerInfoList[0].mName, message->mUnidentified0F, 11);
         mPeerInfoList[0].mUnidentified0B = message->mUnidentified1A;
         memcpy(&mPeerInfoList[0].mUnidentified0C, message->mUnidentified1B, message->mUnidentified1A);
-        *(u32*)mPeerInfoList[0].mUnidentified14 = *(u32*)message->mUnidentified08;
+        mPeerInfoList[0].mUnidentified14.word = *(u32*)message->mUnidentified08;
         mPeerInfoList[0].mUnidentified20 = message->mUnidentified0C;
         mPeerInfoList[0].mUnidentified1C = index;
         mPeerInfoList[0].mUnidentified18 = 0;
@@ -797,12 +851,11 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
         int peer = 1;
         for (int entry = 0; entry < message->mUnidentified23; ++peer, ++entry)
         {
-            LANPeerMessageInfo& info = message->mUnidentified24[entry];
-            nlStrNCpy(mPeerInfoList[peer].mName, info.mUnidentified06, 11);
-            mPeerInfoList[peer].mUnidentified0B = info.mUnidentified12;
-            memcpy(&mPeerInfoList[peer].mUnidentified0C, message->mUnidentified24[entry].mUnidentified13, info.mUnidentified12);
-            mPeerInfoList[peer].mAddressWord = *(u32*)info.mUnidentified00;
-            mPeerInfoList[peer].mUnidentified20 = info.mUnidentified04;
+            nlStrNCpy(mPeerInfoList[peer].mName, message->mUnidentified24[entry].mUnidentified06, 11);
+            mPeerInfoList[peer].mUnidentified0B = message->mUnidentified24[entry].mUnidentified12;
+            memcpy(&mPeerInfoList[peer].mUnidentified0C, message->mUnidentified24[entry].mUnidentified13, message->mUnidentified24[entry].mUnidentified12);
+            mPeerInfoList[peer].mUnidentified14.word = message->mUnidentified24[entry].mAddressWord;
+            mPeerInfoList[peer].mUnidentified20 = message->mUnidentified24[entry].mUnidentified04;
             mPeerInfoList[peer].mUnidentified1C = -1;
             mPeerInfoList[peer].mUnidentified18 = 0;
             mPeerInfoList[peer].mUnidentified22 = false;
@@ -810,7 +863,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
         nlStrNCpy(mPeerInfoList[peer].mName, mLocalPlayerName, 11);
         mPeerInfoList[peer].mUnidentified0B = mUserMatchDataSize;
         memcpy(&mPeerInfoList[peer].mUnidentified0C, mUserMatchData, mUserMatchDataSize);
-        *(u32*)mPeerInfoList[peer].mUnidentified14 = *(u32*)mSocket->GetLocalAddress();
+        mPeerInfoList[peer].mUnidentified14.word = *(u32*)mSocket->GetLocalAddress();
         mPeerInfoList[peer].mUnidentified20 = mSocket->GetLocalPort();
         mPeerInfoList[peer].mUnidentified1C = -1;
         mPeerInfoList[peer].mUnidentified18 = 0;
@@ -852,7 +905,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
 void LANLobby::ProcessGamePeerAdded(NetMessageGamePeerAdded* message)
 {
     s8 peer = message->mUnidentified08.mUnidentified11;
-    *(u32*)mPeerInfoList[peer].mUnidentified14 = *(u32*)message->mUnidentified08.mUnidentified00;
+    mPeerInfoList[peer].mUnidentified14.word = *(u32*)message->mUnidentified08.mUnidentified00;
     mPeerInfoList[peer].mUnidentified20 = message->mUnidentified08.mUnidentified04;
     nlStrNCpy(mPeerInfoList[peer].mName, message->mUnidentified08.mUnidentified06, 11);
     mPeerInfoList[peer].mUnidentified0B = message->mUnidentified08.mUnidentified12;
@@ -934,43 +987,14 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
         }
         break;
     case 10:
-        if (!mIsHost)
-        {
-            tDebugPrintManager::Print(DC_NETWORK, "Received ready to launch request\n");
-            if (ArePeerConnectionsReady())
-            {
-                NetMessageReadyToLaunchConfirm response;
-                response.mUnidentified08 = 1;
-                u8 buffer[8];
-                int size = gNetworkMessageRegistry->Serialize(&response, buffer, sizeof(buffer));
-                int index = mPeerInfoList[0].mUnidentified1C;
-                if (index != -1)
-                {
-                    if (m_ConnectionPool[index].m_Connection != 0)
-                    {
-                        mSocket->Send((u32)m_ConnectionPool[index].m_Connection, buffer, size, true);
-                        tDebugPrintManager::Print(DC_NETWORK, "Sent ready to launch confirm\n");
-                    }
-                    else
-                        tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, m_ConnectionPool[connectionIndex].m_Connection is NULL\n");
-                }
-                else
-                    tDebugPrintManager::Print(DC_NETWORK, "Failed to send ready to launch confirm, no connection to host!\n");
-                mLaunchConfirmationPending = false;
-            }
-            else
-                mLaunchConfirmationPending = true;
-        }
+        ProcessReadyToLaunchRequest();
         break;
     case 11:
         if (mIsHost)
         {
             int peer = MachineIdxFromConnection(message->mSource);
             if (peer > 0 && peer < mPeerCount)
-            {
-                mPeerInfoList[peer].mUnidentified22 = static_cast<NetMessageReadyToLaunchConfirm*>(message)->mUnidentified08;
-                tDebugPrintManager::Print(DC_NETWORK, "Received ready to launch confirm from peer %d\n", peer);
-            }
+                ProcessReadyToLaunchConfirm(peer, static_cast<NetMessageReadyToLaunchConfirm*>(message));
             else
                 tDebugPrintManager::Print(DC_NETWORK, "Ignored Ready To Launch Confirm because did not find peer it's from\n");
         }
@@ -992,27 +1016,6 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
         break;
     }
     return 1;
-}
-
-bool LANLobby::ArePeerConnectionsReady()
-{
-    if (GetTopology() == 0)
-    {
-        bool ready = true;
-        for (int peer = 1; peer < mPeerCount; ++peer)
-        {
-            if (peer != mLocalMachineIndex)
-            {
-                int index = mPeerInfoList[peer].mUnidentified1C;
-                if (index == -1)
-                    ready = false;
-                else if (m_ConnectionPool[index].mUnidentified04 != 2)
-                    ready = false;
-            }
-        }
-        return ready;
-    }
-    return true;
 }
 
 int LANLobby::GetTopology()

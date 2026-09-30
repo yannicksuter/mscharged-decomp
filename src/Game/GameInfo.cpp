@@ -314,12 +314,6 @@ const CheatSettings* GameInfoManager::GetActiveRules() const
     return &mUserInfo.mCheatOptions;
 }
 
-void GameInfoManager::ResetUnknown0xA0()
-{
-    mUseCurGameSettings = 0;
-    mUserInfo.mAudioOptions.ApplySettings();
-}
-
 static char kDefaultTeam[] = "mario";
 static char kDefaultHomeSidekick[] = "toad";
 static char kDefaultAwaySidekick[] = "koopa";
@@ -430,6 +424,12 @@ void GameInfoManager::SetupGameFromConfig()
         GetCurrentGameInfo()->mFinalScore[0] = 0;
         GetCurrentGameInfo()->mFinalScore[1] = 0;
     }
+}
+
+void GameInfoManager::ResetUnknown0xA0()
+{
+    mUseCurGameSettings = 0;
+    mUserInfo.mAudioOptions.ApplySettings();
 }
 
 void GameInfoManager::ApplyDifficultySettings()
@@ -793,18 +793,18 @@ void GameInfoManager::ValidateSaveSlot(int index)
     }
 }
 
-int GameInfoManager::GetMappedRule0x0() const
+int GameInfoManager::GetMappedRule0x0()
 {
-    int table[6] = { 0, 1, 2, 3, 4, 5 };
-    int index;
+    int skillToDifficulty[6] = { 0, 1, 2, 3, 4, 5 };
+    GameplaySettings::eSkillLevel level;
 
     if (mIsInStrikers101Mode) {
-        index = 0;
+        level = GameplaySettings::TRAINING;
     } else {
-        index = GetCurrentSettings()->SkillLevel;
+        level = GetCurrentSettings()->SkillLevel;
     }
 
-    return table[index];
+    return skillToDifficulty[level];
 }
 
 int GameInfoManager::GetRule0x0() const

@@ -16,10 +16,9 @@ struct WorldObjectLoadContext;
 class CrowdLayoutObject : public WorldObject
 {
 public:
-    virtual ~CrowdLayoutObject() {}
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix() { return &mTransform; }
-    virtual void SetWorldMatrix(const nlMatrix4& transform);
+    virtual void SetWorldMatrix(const nlMatrix4& transform) { mTransform = transform; }
     virtual void UnidentifiedVirtual1C(WorldObjectLoadContext* context);
 
     void Initialize();

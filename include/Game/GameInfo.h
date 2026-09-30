@@ -128,7 +128,7 @@ public:
     bool HasSaveSlot(u64 id) const;
     int GetSaveSlotName(int index) const;
     void ValidateSaveSlot(int index);
-    int GetMappedRule0x0() const;
+    int GetMappedRule0x0();
     int GetRule0x0() const;
     void ResetRules(int index);
     void SetRules(int index, GameRules rules) { mRulesTable[index] = rules; }

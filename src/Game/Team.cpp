@@ -129,7 +129,6 @@ extern "C" bool fn_8003E6EC(cFielder* pFielder);
 extern "C" void fn_800A2290(
     SkillTweaks* pTweaks, int difficulty, int param2, bool param3);
 extern "C" bool fn_800381B4(cFielder*, nlVector3*);
-extern "C" cPlayer* fn_800DF790(cTeam*);
 
 /**
  * Offset/Address/Size: 0x32AC | 0x800A8FE0 | size: 0x70
@@ -315,7 +314,7 @@ cTeam::cTeam(int nSide)
     m_pFormationManager = new (8, false) FormationManager(this);
     mUnidentified0F0 = new (8, false) AIContext(this,
         new (8, false) TeamPlayMachine(),
-        new (8, false) UnidentifiedFuzzyRuntime());
+        new (8, false) FuzzyAIRuntime());
     mUnidentified0F0->mScriptMachine->UnidentifiedVirtual2();
 }
 
@@ -546,7 +545,7 @@ Goalie* cTeam::GetGoalie()
     return (Goalie*)m_pPlayers[4];
 }
 
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_800A695C(cTeam* pTeam)
+extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam* pTeam)
 {
     return pTeam->mUnidentified0F0->mRuntime;
 }

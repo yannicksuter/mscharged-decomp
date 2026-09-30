@@ -21,6 +21,7 @@
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Event.h"
 #include "Game/Game.h"
+#include "Game/Goalie.h"
 #include "Game/MathHelpers.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
@@ -47,13 +48,9 @@
 
 extern "C" cGame* g_pGame;
 extern "C" const nlVector3* fn_80040234(cFielder*);
-extern "C" cFielder* fn_800D66A0(cFielder*);
-extern "C" cPlayer* fn_800D674C(cFielder*);
-extern "C" float fn_800DDF54(cFielder*, cPlayer*);
 extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_800DAFCC(const nlVector3*, const nlVector3*, cFielder*,
     int, float, float, float, float);
-extern "C" cFielder* fn_800D66C4(cFielder*);
 extern "C" void fn_803198F4();
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" void fn_8002E340(cFielder*);
@@ -943,11 +940,6 @@ void DesireSuperPower::fn_800CC720(DesireUpdate* update, float fDeltaT)
     }
 }
 
-static inline unsigned short UnidentifiedAngleRange_800CD060(float degrees)
-{
-    return (int)(65536.0f * degrees) / 360;
-}
-
 inline bool DesireSuperPower::fn_800CCF90() const
 {
     bool fire = false;
@@ -1005,7 +997,7 @@ void DesireSuperPower::fn_800CCC0C(DesireUpdate* update, float fDeltaT)
                     nlPolar polar;
                     nlCartesianToPolar(polar, direction);
                     unsigned short angle = polar.a;
-                    unsigned short range = UnidentifiedAngleRange_800CD060(lbl_806DC2A4);
+                    unsigned short range = DegreesToAngle(lbl_806DC2A4);
                     angle += nlRandom(range) - 0.5f * range;
                     direction.x = m_pFielder->mUnidentified408 * nlSin(angle + 0x4000);
                     direction.y = m_pFielder->mUnidentified408 * nlSin(angle);

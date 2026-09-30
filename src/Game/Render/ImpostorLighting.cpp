@@ -48,26 +48,6 @@ LightingLookup::~LightingLookup()
     }
 }
 
-CrowdModelArray::~CrowdModelArray()
-{
-    delete[] data;
-}
-
-CrowdCharacterArray::~CrowdCharacterArray()
-{
-    delete[] data;
-}
-
-CrowdDefinitionArray::~CrowdDefinitionArray()
-{
-    delete[] data;
-}
-
-void CrowdLayoutObject::SetWorldMatrix(const nlMatrix4& matrix)
-{
-    mTransform = matrix;
-}
-
 nlColour GetImpostorLightingColour(const nlVector3* position)
 {
     nlColour colour;

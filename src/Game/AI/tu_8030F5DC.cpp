@@ -7,7 +7,6 @@
 #include "NL/nlTicker.h"
 #include "NL/nlPrint.h"
 
-extern UnidentifiedVariant_80054AB8 lbl_80584250;
 
 static inline float UnidentifiedGetExtraFloat(
     UnidentifiedVariant_80054AB8* pAction, int index,

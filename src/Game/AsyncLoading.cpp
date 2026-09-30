@@ -20,6 +20,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/TrophyInfo.h"
 #include "Game/GameTweaks.h"
+#include "Game/Goalie.h"
 #include "NL/nlFunctionMemory.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Event.h"
@@ -139,7 +140,6 @@ extern "C" bool fn_802773B8(bool stadiumViewer);
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
-extern "C" void GoalieOnGameOver();
 extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
     void* parameterData, bool immediate, float value);
 extern "C" void fn_8013D8DC();
@@ -481,7 +481,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 22:
         SetLoadingComment("AsyncFinalizeLoadingAI");
-        FinishLoadingStepOrUndo(this, fn_80311C5C());
+        FinishLoadingStepOrUndo(this, ApplyFuzzyByteCode());
         break;
     case 23:
         if (lbl_806E1060 == 0)
@@ -586,7 +586,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 40:
         SetLoadingComment("AsyncStartLoadingAI");
-        fn_80311AFC(fn_800E3198(), true);
+        LoadFuzzyByteCode(GetFuzzyAIScriptFilename(), true);
         FinishLoadingStep(this);
         break;
     case 41:
@@ -1937,7 +1937,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FESceneManager::Instance()->ForceImmediateStackProcessing();
 
     FlareHandler::instance.Cleanup();
-    NisPlayer::Instance()->fn_8027ED18();
+    NisPlayer::Instance()->StopNisCue();
     NisPlayer::Instance()->Reset();
     NisPlayer::Instance()->fn_8027E5D4();
     ReplayChoreo::Instance().Reset();

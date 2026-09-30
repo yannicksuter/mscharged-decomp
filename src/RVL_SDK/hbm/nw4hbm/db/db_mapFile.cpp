@@ -97,29 +97,31 @@ bool MapFile_Exists(void) { return sMapFileList ? true : false; }
 
 static u8 GetCharOnMem_(u8 const* buf) { return *buf; }
 
-static s32 GetSize(s32 offset, u32 length) {
-    if (offset + ARRAY_COUNT(sMapBuf) >= length) {
-        return ROUND_UP(length - offset, 32);
-    }
-
-    return ARRAY_COUNT(sMapBuf);
-}
-
 static u8 GetCharOnDvd_(u8 const* buf) {
+    u32 endOffset;
+    s32 blockOffset;
+    const s32 bufferOffset = sMapBufOffset;
     s32 address = (s32)(reinterpret_cast<u32>(buf) & ~0x80000000);
-    s32 offset = address - sMapBufOffset;
+    s32 offset = address - bufferOffset;
 
     if ((u32)address < sFileLength == false) {
         return false;
     }
 
-    if (sMapBufOffset < 0 || offset < 0 || ARRAY_COUNT(sMapBuf) <= offset) {
+    if (bufferOffset < 0 || offset < 0 || ARRAY_COUNT(sMapBuf) <= offset) {
         s32 len;
         s32 size;
 
-        sMapBufOffset = ROUNDDOWN(address, 32);
-        offset = address - sMapBufOffset;
-        size = GetSize(sMapBufOffset, sFileLength);
+        blockOffset = ROUNDDOWN(address, 32);
+        endOffset = (sMapBufOffset = blockOffset) + ARRAY_COUNT(sMapBuf);
+        offset = address - blockOffset;
+
+        u32 length = sFileLength;
+        if (endOffset >= length) {
+            size = ROUND_UP(length - blockOffset, 32);
+        } else {
+            size = ARRAY_COUNT(sMapBuf);
+        }
 
         int intrStatus = OSEnableInterrupts();
 

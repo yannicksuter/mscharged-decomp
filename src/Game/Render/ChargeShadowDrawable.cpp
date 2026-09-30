@@ -161,7 +161,7 @@ void ChargeShadowDrawable::Draw()
         view->AttachModel(m_pChargeModels[level], 1);
     }
 
-    if (!GetPresentation()->mUnidentified143)
+    if (!GetPresentation()->mChargeShadowsVisible)
         return;
 
     bool visible = true;

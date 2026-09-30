@@ -18,6 +18,7 @@
 #include "Game/FE/feSceneManager.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
+#include "Game/Goalie.h"
 #include "Game/MathHelpers.h"
 #include "Game/NetworkSession.h"
 #include "Game/Render/ShootToScoreArrow.h"
@@ -47,7 +48,6 @@ extern "C"
 {
     void RestoreWorldRendering(Presentation* presentation);
     bool DuringEndOfGamePresentation(Presentation* presentation);
-    void GoalieOnGameOver();
 
     extern float g_AllActorsHidden;
 }

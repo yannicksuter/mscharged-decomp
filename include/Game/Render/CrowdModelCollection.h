@@ -62,6 +62,4 @@ public:
     /* 0x4C */ cInventory<cSAnim>** mAnimationInventories;
 }; // size: 0x50
 
-extern CrowdModelCollection gCrowdModelCollection;
-
 #endif // GAME_RENDER_CROWD_MODEL_COLLECTION_H

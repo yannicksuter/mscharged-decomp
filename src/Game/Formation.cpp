@@ -22,12 +22,10 @@
 #include <mem.h>
 
 extern "C" float fn_8002E1B0(cFielder*);
-float ReceivingPass(cFielder*);
-extern "C" cPlayer* fn_800DF790(cTeam*);
 extern "C" cFielder* fn_800A8800(cTeam*);
 extern "C" cFielder* fn_800A8808(cTeam*);
 extern "C" cFielder* fn_800A8884(cTeam*);
-extern "C" UnidentifiedVariant_80054AB8* fn_80312360(InterpreterCore*, void*, int, cTeam*, int);
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(InterpreterCore*, void*, int, cTeam*, int);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const float lbl_804DBF28[4][4] = {
@@ -304,7 +302,7 @@ void FormationManager::ChooseNewFormations()
     int offensiveFormation;
     unsigned int ballFormationSet;
 
-    InterpreterCore* context = fn_800A695C(m_pTeam);
+    InterpreterCore* context = GetTeamFuzzyRuntime(m_pTeam);
     UnidentifiedVariant_80054AB8 result = fn_80054AB8(context, "BestDefensiveFormation", m_pTeam);
     defensiveFormation = result.GetInt();
 
@@ -886,7 +884,7 @@ cPlayer* FormationEval::GetKeyPlayer()
     cPlayer* otherCarrier;
     cPlayer* pKeyPlayer;
 
-    fn_800A695C(team);
+    GetTeamFuzzyRuntime(team);
     cPlayer* strategicBallCarrier = fn_800DF790(team);
     pKeyPlayer = strategicBallCarrier;
 
@@ -1691,6 +1689,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(
     InterpreterCore* context, const unsigned int& hash, cTeam* team)
 {
     unsigned int localHash = hash;
-    return UnidentifiedVariant_80054AB8(fn_80312360(
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
         context, context->FindFunctionEntryPoint(localHash), 1, team, 0));
 }

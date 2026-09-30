@@ -2,6 +2,7 @@
 #define GAME_OVERLAY_MANAGER_H
 
 #include "Game/BaseGameSceneManager.h"
+#include "Game/OverlayHandlerInGameText.h"
 
 struct UnidentifiedEventData_8006701C;
 struct GoalScoredData;
@@ -63,5 +64,8 @@ public:
 private:
     void SlideHUDOut();
 }; // size 0x124
+
+extern "C" void RestartGoalOverlay(BaseGameSceneManager* manager);
+extern "C" void SetCurrentTextOverlaySlide(OverlayManager* manager, OverlaySlideName slideName);
 
 #endif // GAME_OVERLAY_MANAGER_H

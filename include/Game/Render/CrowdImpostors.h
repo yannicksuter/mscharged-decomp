@@ -5,62 +5,29 @@
 #include "Game/Render/ImpostorCharacter.h"
 #include "NL/nlMemory.h"
 
-class CrowdModelArray
+class CrowdImpostorCharacter
+    : public AnimatedImpostorCharacter
 {
 public:
-    CrowdModelArray(int count)
+    CrowdImpostorCharacter(const char* name,
+        ImpostorModel* model, void* animation, int budget,
+        int numAngles, int numTextures,
+        const ImpostorCharacterParams* params)
+        : AnimatedImpostorCharacter(name, model, animation, budget,
+            numAngles, numTextures, params)
     {
-        data = new (8, false) ImpostorModel*[count];
-        capacity = count;
     }
-    ~CrowdModelArray();
-
-    ImpostorModel*& operator[](unsigned int index) { return data[index]; }
-
-    ImpostorModel** data;
-    int capacity;
+    virtual ~CrowdImpostorCharacter();
 };
 
-class CrowdCharacterArray
-{
-public:
-    CrowdCharacterArray(int count)
-    {
-        data = new (8, false) AnimatedImpostorCharacter*[count];
-        capacity = count;
-    }
-    ~CrowdCharacterArray();
-
-    AnimatedImpostorCharacter*& operator[](unsigned int index)
-    {
-        return data[index];
-    }
-
-    AnimatedImpostorCharacter** data;
-    int capacity;
-};
-
-class CrowdDefinitionArray
-{
-public:
-    CrowdDefinitionArray(int count)
-    {
-        data = new (8, false) CrowdCharacterDefinition[count];
-        capacity = count;
-    }
-    ~CrowdDefinitionArray();
-
-    CrowdCharacterDefinition* data;
-    int capacity;
-};
-
+extern CrowdModelCollection gCrowdModelCollection;
 
 void UpdateImpostorPositions();
 void LoadCrowdCharacterList();
 void InitializeCrowdImpostors(bool alternateView);
 void UninitializeCrowdImpostors();
 void CreateCrowdLayoutObject();
-void SetCrowdModelTexture(unsigned int hash, unsigned long texture);
+void SetCrowdModelTexture(unsigned int textureHash, unsigned long texture);
 void SetCrowdImpostorsExcited();
 void SetCrowdImpostorsIdle();
 void UpdateCrowdImpostorAnimation(float value);

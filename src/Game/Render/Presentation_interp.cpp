@@ -23,7 +23,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         m_SP -= 3;
         NisPlayer* nisPlayer = NisPlayer::Instance();
         gMegastrikeBackgroundOverlay.Start(
-            rate, target, nisPlayer->mUnidentified34238);
+            rate, target, nisPlayer->mMegaStrikeSide);
         break;
     }
     case 2:
@@ -74,10 +74,10 @@ void Presentation::DoFunctionCall(unsigned int function)
         NisPlayer::Instance()->fn_8027EF8C();
         break;
     case 6:
-        lbl_806DCD60 = false;
+        gBlinkingEnabled = false;
         break;
     case 7:
-        NisPlayer::Instance()->fn_8027ED08();
+        NisPlayer::Instance()->PreserveNisCueOnReset();
         break;
     case 8:
         ++m_SP;
@@ -87,14 +87,14 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         bool value = m_SP[-1] != 0;
         --m_SP;
-        mUnidentified163 = value;
+        mDrawBlackOverlay = value;
         break;
     }
     case 10:
     {
         bool value = m_SP[-1] != 0;
         --m_SP;
-        mUnidentified143 = value;
+        mChargeShadowsVisible = value;
         break;
     }
     case 11:
@@ -117,7 +117,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 12:
-        lbl_806DCD60 = true;
+        gBlinkingEnabled = true;
         break;
     case 13:
         ReplayChoreo::Instance().Finish();
@@ -146,7 +146,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         m_SP -= 3;
         NisPlayer* nisPlayer = NisPlayer::Instance();
         gMegastrikeBackgroundOverlay.Start(
-            rate, target, nisPlayer->mUnidentified34238);
+            rate, target, nisPlayer->mMegaStrikeSide);
         break;
     }
     case 17:
@@ -199,7 +199,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 26:
     {
         int original = m_SP[-1];
-        int side = NisPlayer::Instance()->mUnidentified34238;
+        int side = NisPlayer::Instance()->mMegaStrikeSide;
         int team = GameInfoManager::Instance()
                        ->GetCurrentGameInfo()
                        ->GetTeam((short)side);
@@ -226,7 +226,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 29:
         ++m_SP;
-        m_SP[-1] = NisPlayer::Instance()->mUnidentified34238 == 0;
+        m_SP[-1] = NisPlayer::Instance()->mMegaStrikeSide == 0;
         break;
     case 30:
         ++m_SP;
@@ -252,7 +252,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 34:
-        fn_8019571C(&ReplayChoreo::Instance());
+        ReplayChoreo::Instance().LoadNextHighlight();
         break;
     case 35:
     {
@@ -296,13 +296,13 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             mWaitingForCharacterDirectionSince
                 = GetFixedUpdateTask()->mSimulationTime;
-            NisPlayer::Instance()->fn_8027D994();
+            NisPlayer::Instance()->RandomizeBeginPositions();
         }
         break;
     case 42:
         break;
     case 43:
-        if (ReplayManager::Instance()->fn_8018A4B4() == true)
+        if (ReplayManager::Instance()->IsSavingReplay() == true)
         {
             StopWithUndo();
         }
@@ -313,8 +313,9 @@ void Presentation::DoFunctionCall(unsigned int function)
             {
                 nlTaskManager::SetNextState(8);
             }
-            fn_801955E8(&ReplayChoreo::Instance(), false);
-            fn_801E2230(g_pOverlayManager, 7);
+            ReplayChoreo::Instance().StartAutoReplay(false);
+            SetCurrentTextOverlaySlide(static_cast<OverlayManager*>(g_pOverlayManager),
+                SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, true, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
@@ -329,7 +330,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     case 45:
-        if (ReplayManager::Instance()->fn_8018A4BC() == true)
+        if (ReplayManager::Instance()->IsLoadingReplay() == true)
         {
             StopWithUndo();
         }
@@ -340,8 +341,9 @@ void Presentation::DoFunctionCall(unsigned int function)
             {
                 nlTaskManager::SetNextState(8);
             }
-            fn_801955E8(&ReplayChoreo::Instance(), true);
-            fn_801E2230(g_pOverlayManager, 7);
+            ReplayChoreo::Instance().StartAutoReplay(true);
+            SetCurrentTextOverlaySlide(static_cast<OverlayManager*>(g_pOverlayManager),
+                SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, false, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
@@ -374,8 +376,8 @@ void Presentation::DoFunctionCall(unsigned int function)
         --m_SP;
         if (!g_e3_Build || cue != 0x625F1997)
         {
-            NisPlayer::Instance()->fn_8027EDCC(cue);
-            NisPlayer::Instance()->fn_8027EE38();
+            NisPlayer::Instance()->PrepareNisCue(cue);
+            NisPlayer::Instance()->StartNisCue();
         }
         break;
     }
@@ -405,7 +407,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 53:
     {
         NisPlayer* nisPlayer = NisPlayer::Instance();
-        nisPlayer->mUnidentified34468 = 0.0f;
+        nisPlayer->mCameraOverrun = 0.0f;
         break;
     }
     case 54:
@@ -423,7 +425,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 56:
     {
         int replayTime = -30;
-        fn_801959F0(&ReplayChoreo::Instance(),
+        ReplayChoreo::Instance().SaveHighlight(
             ReplayManager::Instance()->fn_8018A16C(replayTime));
         break;
     }
@@ -463,7 +465,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         float value = *(float*)&m_SP[-1];
         bool direction = m_SP[-2] != 0;
         m_SP -= 3;
-        int side = NisPlayer::Instance()->mUnidentified34238 == 0 ? 0 : 4;
+        int side = NisPlayer::Instance()->mMegaStrikeSide == 0 ? 0 : 4;
         character = g_pCharacters[side];
         character->fn_80022D3C(value, direction ? 1.0f : 0.0f);
         switch (character->mUnidentified024.m_eCharacterClass)
@@ -471,7 +473,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         case 5:
         case 6:
         case 8:
-            lbl_806E1961 = direction;
+            gDisableHighRange = direction;
             break;
         }
         break;
@@ -495,7 +497,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         float value = *(float*)&m_SP[-1];
         --m_SP;
-        mUnidentified15C = value;
+        mWaitTimeRemaining = value;
         break;
     }
     case 65:
@@ -503,7 +505,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         NisWinnerType winner = (NisWinnerType)m_SP[-1];
         NisTarget target = (NisTarget)m_SP[-2];
         m_SP -= 2;
-        NisPlayer::Instance()->fn_8027F4B0(target, winner);
+        NisPlayer::Instance()->SetTeamLogo(target, winner);
         break;
     }
     case 66:
@@ -566,7 +568,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 74:
         ++m_SP;
-        m_SP[-1] = nlRandomf(1.0f, &mRandomSeed) <= 0.1f;
+        m_SP[-1] = nlRandomf(1.0f, &mRandomSeed) <= lbl_806DEF98;
         break;
     case 75:
         ++m_SP;
@@ -579,7 +581,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         }
         break;
     case 77:
-        NisPlayer::Instance()->fn_8027ED18();
+        NisPlayer::Instance()->StopNisCue();
         break;
     case 78:
         StopOverlay();
@@ -621,13 +623,13 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 84:
-        if (ReplayManager::Instance()->fn_8018A4B4() == true)
+        if (ReplayManager::Instance()->IsSavingReplay() == true)
         {
             StopWithUndo();
         }
         break;
     case 85:
-        if (ReplayManager::Instance()->fn_8018A4BC() == true)
+        if (ReplayManager::Instance()->IsLoadingReplay() == true)
         {
             StopWithUndo();
         }
@@ -644,7 +646,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 87:
-        if (mUnidentified15C > 0.0f)
+        if (mWaitTimeRemaining > 0.0f)
         {
             StopWithUndo();
         }
@@ -661,7 +663,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         m_SP = stack;
         if (!mByPassing)
         {
-            mUnidentified163 = false;
+            mDrawBlackOverlay = false;
             Wiper::Instance().DoWipe(wipe);
             if (!Wiper::Instance().CutHasOccured()
                 && Wiper::Instance().WipeInProgress())

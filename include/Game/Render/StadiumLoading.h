@@ -74,4 +74,6 @@ extern bool gStadiumNonResidentEffectsRequested;
 extern void* gStadiumLoadBuffers[2];
 extern StadiumLoadResult gStadiumModelLoadResults[2][22];
 
+extern "C" bool gDisableHighRange;
+
 #endif // GAME_RENDER_STADIUM_LOADING_H

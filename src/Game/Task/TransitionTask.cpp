@@ -96,7 +96,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         }
     }
 
-    fn_80285714(GetPresentation(), from, to);
+    HandlePresentationStateTransition(GetPresentation(), from, to);
 
     if (to == 2)
     {

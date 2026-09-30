@@ -30,4 +30,6 @@ public:
     /* 0x39 */ u8 unknown_0x39[3];
 };
 
+extern "C" bool gBlinkingEnabled;
+
 #endif // GAME_BLINKER_H

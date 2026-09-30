@@ -3,11 +3,11 @@
 void NetworkMessageType30::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
+    serializer->Transfer(&mByPassNumber, sizeof(mByPassNumber));
 }
 
 void NetworkMessageType31::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
+    serializer->Transfer(&mByPassNumber, sizeof(mByPassNumber));
 }

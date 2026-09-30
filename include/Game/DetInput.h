@@ -6,6 +6,8 @@
 
 class cGlobalPad;
 
+extern int lbl_806E2130;
+
 class DetInput
 {
 public:

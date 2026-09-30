@@ -28,7 +28,6 @@ extern "C" bool fn_8003E948(cFielder*);
 extern "C" void fn_8006040C(cGame*, cFielder*);
 extern "C" void fn_80060608(cGame*, cFielder*);
 extern "C" void fn_80060804(cGame*, cFielder*);
-extern "C" float fn_800DED80(cFielder*);
 
 extern float lbl_806DC230;
 extern bool lbl_806E0E58;

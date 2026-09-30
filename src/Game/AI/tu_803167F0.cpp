@@ -15,9 +15,9 @@ extern "C" AIContext* fn_80317E2C(
     UnidentifiedScriptMachine*);
 extern "C" bool fn_80317E88(shdStateMachine*);
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
-    UnidentifiedFuzzyRuntimeBase*, const u32&, void*);
+    FuzzyRuntimeBase*, const u32&, void*);
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
-    UnidentifiedFuzzyRuntimeBase*, const u32&, void*, float);
+    FuzzyRuntimeBase*, const u32&, void*, float);
 
 extern float (*lbl_806DF560)();
 extern float (*lbl_806DF564)();

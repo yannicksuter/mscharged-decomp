@@ -3,6 +3,12 @@
 
 #include "types.h"
 
+union TransportAddress
+{
+    u8 bytes[4];
+    u32 word;
+};
+
 struct TransportSocket
 {
     int socket;

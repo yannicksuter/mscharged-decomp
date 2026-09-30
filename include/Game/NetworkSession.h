@@ -227,11 +227,7 @@ struct LANGameInfo
 
 struct NetworkTransportPeer : public TransportPlayerInfo
 {
-    union
-    {
-        /* 0x14 */ u8 mUnidentified14[4];
-        /* 0x14 */ u32 mAddressWord;
-    };
+    /* 0x14 */ TransportAddress mUnidentified14;
     /* 0x18 */ int mUnidentified18;
     /* 0x1C */ int mUnidentified1C;
     /* 0x20 */ u16 mUnidentified20;
@@ -245,6 +241,7 @@ struct NetworkTransportConnectionSlot
 };
 
 
+class NetMessageReadyToLaunchConfirm;
 class NetMessageFoundGame;
 class NetMessageJoinRequest;
 class NetMessageJoinResponse;
@@ -316,6 +313,11 @@ public:
     virtual int ProcessMessage(NetworkMessage* message);
 
 private:
+    void SendFindGame();
+    void SendReadyToLaunchConfirm();
+    void ProcessReadyToLaunchRequest();
+    void ProcessReadyToLaunchConfirm(int peer, NetMessageReadyToLaunchConfirm* message);
+
     bool CheckPeerStates()
     {
         if (mPeerCount < 2)

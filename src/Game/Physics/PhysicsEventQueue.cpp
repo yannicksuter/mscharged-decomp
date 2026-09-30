@@ -291,7 +291,6 @@ extern "C" void fn_8014545C(void* data)
 }
 
 extern "C" void fn_800ED92C(unsigned long soundID);
-extern "C" void fn_80080EFC(cPlayer*);
 
 float lbl_806DCA90 = 1.0f;
 
@@ -470,7 +469,7 @@ extern "C" void HandleCollisionShockwave(CollisionShockwaveData* data)
             {
                 cPlayer* pGoalie = pBall->GetOwnerGoalie();
                 pGoalie->ReleaseBall(0);
-                static_cast<Goalie*>(pGoalie)->fn_80080EFC();
+                static_cast<Goalie*>(pGoalie)->InitActionSTSRecover();
             }
         }
 

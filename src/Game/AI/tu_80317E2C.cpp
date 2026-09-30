@@ -34,9 +34,9 @@ public:
     u32 mUnidentified090;
 };
 
-extern "C" UnidentifiedFuzzyRuntimeBase* fn_80311744(void*);
-extern "C" UnidentifiedVariant_80054AB8* fn_80312360(
-    UnidentifiedFuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
+extern "C" FuzzyRuntimeBase* fn_80311744(void*);
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
+    FuzzyRuntimeBase*, FunctionEntryPoint*, int, void*, void*);
 extern "C" bool fn_803169DC(
     shdStateMachine*, UnidentifiedVariantCollection*, bool);
 extern "C" bool fn_80316A84(
@@ -103,20 +103,20 @@ extern const float lbl_806E6888 = -99999.0f;
 extern const float lbl_806E688C = 10.0f;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
-    UnidentifiedFuzzyRuntimeBase* runtime, const u32& hash, void* argument)
+    FuzzyRuntimeBase* runtime, const u32& hash, void* argument)
 {
     u32 localHash = hash;
-    return UnidentifiedVariant_80054AB8(fn_80312360(
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(localHash), 1, argument, 0));
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
-    UnidentifiedFuzzyRuntimeBase* runtime, const u32& hash, void* argument,
+    FuzzyRuntimeBase* runtime, const u32& hash, void* argument,
     float value)
 {
     u32 localHash = hash;
     u32 valueBits = *(u32*)&value;
-    return UnidentifiedVariant_80054AB8(fn_80312360(
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(localHash), 2, argument, (void*)valueBits));
 }
 
@@ -165,7 +165,7 @@ UnidentifiedScriptMachine::~UnidentifiedScriptMachine()
 
 void UnidentifiedScriptMachine::UnidentifiedVirtual2()
 {
-    UnidentifiedFuzzyRuntimeBase* runtime = fn_80311744(this);
+    FuzzyRuntimeBase* runtime = fn_80311744(this);
     if (runtime == 0)
     {
         return;

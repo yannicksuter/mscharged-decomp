@@ -22,7 +22,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     , mUnidentified00C(false)
     , mWidth(0x40)
     , mHeight(0x40)
-    , mUnidentified034(false)
+    , mUseAdditiveBlend(false)
     , mUseIntensityAlpha(false)
     , mBaseAngle(0)
     , mName(name)
@@ -31,7 +31,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     {
         mWidth = params->mWidth;
         mHeight = params->mHeight;
-        mUnidentified034 = params->mUnidentified008;
+        mUseAdditiveBlend = params->mUseAdditiveBlend;
         mUseIntensityAlpha = params->mUseIntensityAlpha;
         mBaseAngle = params->mBaseAngle;
     }
@@ -46,13 +46,14 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     glBeginResource("ImpostorCharacter");
 
     float angleDegrees = 360.0f / (float)mNumAngles;
-    u16 angleStep = (u16)DegreesToAngle(angleDegrees);
+    u16 angleStep = DegreesToAngle(angleDegrees);
+    int j;
     for (int i = 0; i < mNumTextures; ++i)
     {
         // Retail computes this per-texture stagger value and discards it; the
         // integer conversion it forces is part of the retained object.
         float stagger = nlRandomf(0.0f, 5.0f, &nlDefaultSeed) + (float)i;
-        for (int j = 0; j < mNumAngles; ++j)
+        for (j = 0; j < mNumAngles; ++j)
         {
             ImpostorSprite* sprite = new ImpostorSprite(
                 this, i, budget / (mNumAngles * mNumTextures), mWidth, mHeight);
@@ -251,14 +252,14 @@ void ImpostorCharacter::EnableSprites(bool enable)
     }
 }
 
-void ImpostorCharacter::RegisterSprites(GLView* registry)
+void ImpostorCharacter::RegisterSprites(GLView* parentView)
 {
     nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
     {
-        registry->AddChild(entry->entry->mView);
+        parentView->AddChild(entry->entry->mView);
         if (nlDLRingIsEnd(head, entry) || entry == 0)
         {
             entry = 0;
@@ -288,7 +289,7 @@ void AnimatedImpostorCharacter::Render(GLView* target,
 }
 
 AnimatedImpostorCharacter::AnimatedImpostorCharacter(
-    const char* name, ImpostorModel* model, void* animations,
+    const char* name, ImpostorModel* model, void* animation,
     int budget, int numAngles, int numTextures,
     const ImpostorCharacterParams* params)
     : ImpostorCharacter(name, budget, numAngles, numTextures, params)
@@ -302,7 +303,7 @@ AnimatedImpostorCharacter::AnimatedImpostorCharacter(
     }
     for (int i = 0; i < numTextures; ++i)
     {
-        mModels[i]->PlayAnimation((const char*)animations, 0.0f, PM_CYCLIC);
+        mModels[i]->PlayAnimation((const char*)animation, 0.0f, PM_CYCLIC);
     }
 }
 
@@ -323,12 +324,13 @@ void AnimatedImpostorCharacter::UpdateAnimation(float dt)
     }
 }
 
-void AnimatedImpostorCharacter::PlayAnimation(float dt,
-    const char* unidentified)
+void AnimatedImpostorCharacter::PlayAnimation(float blendTime,
+    const char* name)
 {
     for (int i = 0; i < mNumModels; ++i)
     {
-        float value = nlRandomf(0.25f * dt, dt, &nlDefaultSeed);
-        mModels[i]->PlayAnimation(unidentified, value, PM_CYCLIC);
+        float modelBlendTime
+            = nlRandomf(0.25f * blendTime, blendTime, &nlDefaultSeed);
+        mModels[i]->PlayAnimation(name, modelBlendTime, PM_CYCLIC);
     }
 }

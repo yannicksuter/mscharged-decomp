@@ -15,7 +15,7 @@ class cBall;
 class Desire;
 class SpaceSearch;
 class UnidentifiedScriptMachine;
-class UnidentifiedFuzzyRuntimeBase;
+class FuzzyRuntimeBase;
 typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 extern "C" Desire* fn_8002E08C(cFielder*, int);
@@ -33,7 +33,7 @@ public:
     virtual void UnidentifiedReset(bool);
     virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
 
-    UnidentifiedFuzzyRuntimeBase* GetFuzzyRuntime();
+    FuzzyRuntimeBase* GetFuzzyRuntime();
 
     int UnidentifiedGetState() const
     {

@@ -97,8 +97,8 @@ static void ResetCameraFilters()
 extern "C" float fn_800F2410(float fFOV)
 {
     float fTan = nlTan((u16)(((int)(65536.0f * (0.5f * fFOV))) / 360));
-    float fUnidentified0 = fn_80112E14();
-    float fUnidentified1 = fn_80112E0C();
+    float fUnidentified0 = GetWidescreenAspectRatio();
+    float fUnidentified1 = GetStandardAspectRatio();
     float fResult = nlATan((fTan * fUnidentified1) / fUnidentified0);
     return 2.0f * ((180.0f * fResult) / 3.1415927f);
 }

@@ -71,14 +71,14 @@ void OverlayManager::Pop()
     BaseGameSceneManager::Pop();
 }
 
-extern "C" void fn_801E2230(void* p, int arg)
+extern "C" void SetCurrentTextOverlaySlide(OverlayManager* manager, OverlaySlideName slideName)
 {
-    void* q = *(void**)((char*)p + 264);
-    if (q == 0)
+    void* overlay = *(void**)((char*)manager + 264);
+    if (overlay == 0)
     {
         return;
     }
-    ((InGameTextOverlay*)q)->SetSlide((OverlaySlideName)arg);
+    ((InGameTextOverlay*)overlay)->SetSlide(slideName);
 }
 
 inline void OverlayManager::SlideHUDOut()
@@ -207,9 +207,9 @@ void OverlayManager::ShowDemoSlide()
     }
 }
 
-extern "C" void fn_801E2564(BaseGameSceneManager* mgr)
+extern "C" void RestartGoalOverlay(BaseGameSceneManager* manager)
 {
-    ((GoalOverlay*)mgr->GetScene((SceneList)95))->Restart();
+    ((GoalOverlay*)manager->GetScene((SceneList)95))->Restart();
 }
 
 void OverlayManager::fn_801E258C()

@@ -28,6 +28,7 @@ public:
     void Initialize(WorldObjectLoadContext* context);
 
     unsigned long GetHashID() const { return m_uHashID; }
+    glModel* GetModel() const { return m_pModel; }
 
     /* 0x04 */ unsigned long m_uHashID;
     /* 0x08 */ unsigned long m_uRenderLayer;

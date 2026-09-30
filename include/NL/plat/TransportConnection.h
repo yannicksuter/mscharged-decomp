@@ -3,6 +3,7 @@
 
 #include "NL/CircularQueue.h"
 #include "types.h"
+#include "NL/plat/TransportSocket.h"
 #include "NL/plat/TransportPacket.h"
 #include "NL/plat/ReliableSocket.h"
 #include "NL/plat/TransportMessage.h"
@@ -79,7 +80,7 @@ private:
 public:
     /* 0x000 */ u8 mExpectedChallengeResponse[0x20];
     /* 0x020 */ ReliableSocket* mSocket;
-    /* 0x024 */ u8 mAddress[4];
+    /* 0x024 */ TransportAddress mAddress;
     /* 0x028 */ u32 mPingSendTick;
     /* 0x02C */ u32 mPingReceiveTick;
     /* 0x030 */ u32 mPongTimestamp;

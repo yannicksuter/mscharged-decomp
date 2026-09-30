@@ -26,7 +26,6 @@ extern "C" float fn_80030750(cFielder*);
 extern "C" bool fn_8003E8A0(cFielder*);
 extern "C" bool fn_8003E948(cFielder*);
 extern "C" bool fn_8003E99C(cFielder*);
-extern "C" float fn_800DED80(cFielder*);
 // The desire queried by the fielder strength rule carries its target fielder
 // at 0xB8; the concrete desire class is not reconstructed yet.
 struct UnidentifiedDesire_8000D62C
