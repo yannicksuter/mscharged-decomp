@@ -250,6 +250,11 @@ LiveBallTrail lbl_8056B518[10];
 
 static unsigned short lbl_806DB5C0 = 0xFFFF;
 
+static inline float FullBallCharge()
+{
+    return 4.0f;
+}
+
 cBall::cBall()
     : m_tLightningTimer(0.0f)
     , m_tShotTimer(0.0f)
@@ -1339,7 +1344,7 @@ extern "C" void fn_800154FC(cBall* pBall, float fParam)
         pBall->mfChargeValue = fParam;
     }
 
-    float fMaxCharge = lbl_806DB510 * 4.0f;
+    float fMaxCharge = lbl_806DB510 * FullBallCharge();
     float fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
