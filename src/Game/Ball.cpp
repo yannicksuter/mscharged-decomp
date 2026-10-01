@@ -184,36 +184,57 @@ static const char szWarioShootToScoreBallBlurTexture[]
     = "global/warioshoottoscorestreak";
 static const char szYoshiShootToScoreBallBlurTexture[]
     = "global/yoshishoottoscorestreak";
-extern const nlVector3 lbl_804DBE30;
+extern const nlVector3 lbl_804DBE30 = { 12.5f, 0.0f, 0.18f };
 static const nlVector3 lbl_804DBE48 = { 0.0f, 1.0f, 0.0f };
 static nlMatrix3 m3Ident
     = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
-static float lbl_806DB514 = 2.5f;
-static float fShootToScoreBallBlurWidth = 2.2f;
-static int nShootToScoreBallBlurLength = 150;
-extern float lbl_806DB518;
-extern float lbl_806DB51C;
-extern float lbl_806DB520;
-extern float lbl_806DB524;
-extern float lbl_806DB528;
-extern float lbl_806DB52C;
-extern float lbl_806DB530;
-extern float lbl_806DB534;
-extern float lbl_806DB538;
-extern float lbl_806DB53C;
-extern float lbl_806DB540;
-extern unsigned char lbl_806DB544;
 bool lbl_806DB500 = true;
 bool lbl_806DB501 = true;
-extern float lbl_806DB504;
-extern float lbl_806DB508;
-extern float lbl_806DB50C;
-extern float lbl_806DB510;
-extern float lbl_806DB548;
-extern float lbl_806DB54C;
+float lbl_806DB504 = .55f;
+float lbl_806DB508 = .55f;
+float lbl_806DB50C = 6.0f;
+float lbl_806DB510 = 1.1f;
+static float lbl_806DB514 = 2.5f;
+float lbl_806DB518 = .075f;
+float lbl_806DB51C = .105f;
+float lbl_806DB520 = .05f;
+float lbl_806DB524 = 1.33f;
+float lbl_806DB528 = 1.0f;
+float lbl_806DB52C = 35.0f;
+float lbl_806DB530 = 8.0f;
+float lbl_806DB534 = 12.5f;
+float lbl_806DB538 = 35.0f;
+float lbl_806DB53C = .85f;
+float lbl_806DB540 = 1.75f;
+unsigned char lbl_806DB544 = 1;
+float lbl_806DB548 = 2.0f;
+float lbl_806DB54C = .1f;
+float lbl_806DB550 = 2.2f;
+int lbl_806DB554 = 150;
 float lbl_806DB558 = 10.0f;
 float lbl_806DB55C = 10.0f;
+float lbl_806DB560 = .8f;
+float lbl_806DB564 = 7.5f;
+float lbl_806DB568 = 22.5f;
+float lbl_806DB56C = 11.5f;
+float lbl_806DB570 = 24.0f;
+float lbl_806DB574 = 15.0f;
+float lbl_806DB578 = 30.0f;
+float lbl_806DB57C = 40.0f;
+float lbl_806DB580 = 50.0f;
+float lbl_806DB584 = 1.0f;
+float lbl_806DB588 = 1.025f;
+float lbl_806DB58C = .5f;
+float lbl_806DB590 = -3.0f;
+float lbl_806DB594 = 1.0f;
+float lbl_806DB598 = 18.0f;
+float lbl_806DB59C = 9.0f;
+float lbl_806DB5A0 = .2f;
+float lbl_806DB5A4 = .8f;
+bool lbl_806DB5A8 = true;
+float lbl_806DB5AC = .33f;
+float lbl_806DB5B0 = .33f;
 
 static TweakBoolBinding sUnidentifiedTweak_8056B478(
     "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &lbl_806DB500, true);
@@ -227,25 +248,6 @@ static TweakBoolBinding sUnidentifiedTweak_8056B4F8(
     "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
 LiveBallTrail lbl_8056B518[10];
 
-extern float lbl_806DB560;
-extern float lbl_806DB564;
-extern float lbl_806DB568;
-extern float lbl_806DB56C;
-extern float lbl_806DB578;
-extern float lbl_806DB57C;
-extern float lbl_806DB580;
-extern float lbl_806DB584;
-extern float lbl_806DB588;
-extern float lbl_806DB58C;
-extern float lbl_806DB590;
-extern float lbl_806DB594;
-extern float lbl_806DB598;
-extern float lbl_806DB59C;
-extern float lbl_806DB5A0;
-extern float lbl_806DB5A4;
-extern bool lbl_806DB5A8;
-extern float lbl_806DB5AC;
-extern float lbl_806DB5B0;
 extern float lbl_806E31C0;
 extern float lbl_806E31C4;
 extern float lbl_806E31C8;
@@ -3669,8 +3671,8 @@ extern "C" void fn_8001AD24(
 
     pBallTrail->mUnidentified038 = BlurManager::GetNewHandler(
         textureName,
-        0.18f * fShootToScoreBallBlurWidth * 0.925f,
-        nShootToScoreBallBlurLength,
+        0.18f * lbl_806DB550 * 0.925f,
+        lbl_806DB554,
         true);
 }
 
