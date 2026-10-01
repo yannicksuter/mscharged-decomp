@@ -3228,12 +3228,18 @@ extern "C" void fn_80019814(UnidentifiedEventData34*)
     fn_80015C38(pBall, 0);
 }
 
+// The reference keeps the reset inlines from reusing the predicate's ball load.
+static inline cBall*& GetPatchBall()
+{
+    return g_pBall;
+}
+
 extern "C" void fn_80019910(PhysicsPatch* pPatch)
 {
     if (pPatch->m_Type == 1 && g_pBall->m_pOwner == NULL
         && !fn_800167A8(g_pBall))
     {
-        fn_80015B38(g_pBall, false);
+        fn_80015B38(GetPatchBall(), false);
 
         nlVector3 v3Velocity;
         float fLengthSquared = pPatch->m_Velocity.GetLengthSq3D();
@@ -3259,7 +3265,7 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
     }
     else if (pPatch->m_Type == 10)
     {
-        fn_800154FC(g_pBall, 4.0f);
+        SetBallChargeWithScale(g_pBall, 4.0f);
     }
 
     if (pPatch->GetPosition().z != 0.0f)
@@ -3307,8 +3313,8 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
         return;
     }
 
-    fn_80015B38(g_pBall, false);
-    fn_800154FC(g_pBall, 4.0f);
+    fn_80015B38(GetPatchBall(), false);
+    SetBallChargeWithScale(g_pBall, 4.0f);
 
     nlVector3 v3Velocity;
     g_pBall->m_pPhysicsBall->GetLinearVelocity(&v3Velocity);
