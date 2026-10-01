@@ -2140,7 +2140,8 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
         if (pBall->m_tShotTimer.m_uPackedTime != 0
             && pBall->m_tShotTimer.Countdown(fDeltaT, 0.0f))
         {
-            if (pBall->meBallState == 9)
+            int& ballState = pBall->meBallState;
+            if (ballState == 9)
             {
                 fn_80014494(pBall);
             }
