@@ -2057,6 +2057,15 @@ void cBall::ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
     CalculateFastShotVelocity(this, v3Vel, v3Target, fDesiredTime);
 }
 
+// Separate products preserve the original rounding before summing the speed.
+static inline float BallVelocityLength(float x, float y, float z)
+{
+    float xSquared = x * x;
+    float ySquared = y * y;
+    float zSquared = z * z;
+    return nlSqrt(xSquared + ySquared + zSquared, true);
+}
+
 extern "C" void fn_80017114(cBall* pBall)
 {
     if (nlAbs(pBall->m_v3Position.y) - lbl_806DB56C < 0.0f)
@@ -2082,7 +2091,7 @@ extern "C" void fn_80017114(cBall* pBall)
         nlRecipSqrt(v3Direction.GetLengthSq3D(), true));
     nlVec3Scale(v3Direction, lbl_806DB560);
 
-    float fSpeed = nlVec3Length(pBall->m_v3Velocity);
+    float fSpeed = BallVelocityLength(pBall->m_v3Velocity.x, pBall->m_v3Velocity.y, pBall->m_v3Velocity.z);
     if (fSpeed < lbl_806DB564)
     {
         fSpeed = lbl_806DB564;
