@@ -3797,3 +3797,5 @@ TweakValueBase* TweakFloatBinding::CreateValue(const char* name, void* entry)
     AddTweakValue((TweakEntry*)entry, created);
     return created;
 }
+
+extern "C" unsigned int lbl_806E0C10 = 0;
