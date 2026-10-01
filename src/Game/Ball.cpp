@@ -1294,6 +1294,34 @@ extern "C" void fn_800153FC(cBall* pBall, bool bParam)
     UpdateBallGlow(pBall);
 }
 
+// A named scale keeps the multiply operand order used by the state-change
+// inline without changing fn_800154FC or its other callers.
+static inline void SetBallChargeWithScale(cBall* pBall, float fParam)
+{
+    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
+    {
+        pBall->mfChargeValue = 4.0f;
+    }
+    else
+    {
+        pBall->mfChargeValue = fParam;
+    }
+
+    float fMaxChargeScale = 4.0f;
+    float fMaxCharge = lbl_806DB510 * fMaxChargeScale;
+    float fValue = pBall->mfChargeValue;
+    if (fValue >= fMaxCharge)
+    {
+        pBall->mfChargeValue = fMaxCharge;
+    }
+    else if (pBall->mfChargeValue < 0.0f)
+    {
+        pBall->mfChargeValue = 0.0f;
+    }
+
+    UpdateBallGlow(pBall);
+}
+
 extern "C" void fn_800154FC(cBall* pBall, float fParam)
 {
     if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
@@ -1551,11 +1579,9 @@ static inline void UpdateBallShotClock(cBall* pBall)
 
 extern "C" void fn_80015C38(cBall* pBall, int nBallState)
 {
-    int previousState = pBall->meBallState;
     UnidentifiedEvent2View<int, int>* event
-        = (UnidentifiedEvent2View<int, int>*)
-            &g_pGame->mUnidentified49C.mEvent14;
-    event->Deliver(previousState, nBallState);
+        = (UnidentifiedEvent2View<int, int>*)&g_pGame->mUnidentified49C.mEvent14;
+    event->Deliver(pBall->meBallState, nBallState);
 
     if (pBall->meBallState == 9)
     {
@@ -1601,7 +1627,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         pBall->m_pPhysicsBall->m_gravity = 0.0f;
         pBall->m_tShotTimer.SetSeconds(0.5f);
 
-        fn_800154FC(pBall, 4.0f);
+        SetBallChargeWithScale(pBall, 4.0f);
 
         if (pBall->m_pBlurHandler != NULL)
         {
