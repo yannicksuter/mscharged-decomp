@@ -2292,31 +2292,34 @@ static inline void CalcBallRotationFromVelocity(
     float fVel = nlSqrt(v3Velocity.GetLengthSq3D(), true);
     if (fVel > 0.0001f)
     {
+        float angle = fDeltaT * (fVel / 0.18f);
+
         nlVector3 v3NormalizedVelocity = v3Velocity;
         nlVector3 v3Up;
         nlVector3 v3RotationAxis;
 
-        nlVec3Set(v3Up, 0.0f, 0.0f, 1.0f);
-
-        v3NormalizedVelocity.x /= fVel;
+        float velocityX = v3NormalizedVelocity.x;
+        v3NormalizedVelocity.x = velocityX / fVel;
         v3NormalizedVelocity.y /= fVel;
         v3NormalizedVelocity.z /= fVel;
+
+        v3Up.x = 0.0f;
+        v3Up.y = 0.0f;
+        v3Up.z = 1.0f;
 
         float fAxisX;
         float fAxisY;
         float fAxisZ;
 
         fAxisX = v3Up.y * v3NormalizedVelocity.z
-            - v3Up.z * v3NormalizedVelocity.y;
+               - v3Up.z * v3NormalizedVelocity.y;
         fAxisY = -v3Up.x * v3NormalizedVelocity.z
-            + v3Up.z * v3NormalizedVelocity.x;
+               + v3Up.z * v3NormalizedVelocity.x;
         fAxisZ = v3Up.x * v3NormalizedVelocity.y
-            - v3Up.y * v3NormalizedVelocity.x;
+               - v3Up.y * v3NormalizedVelocity.x;
         nlVec3Set(v3RotationAxis, fAxisX, fAxisY, fAxisZ);
 
-        fn_802B5370(qOrientationDelta, v3RotationAxis,
-            (unsigned short)(int)(10430.378f
-                * (fDeltaT * (fVel / 0.18f))));
+        fn_802B5370(qOrientationDelta, v3RotationAxis, (unsigned short)(int)(10430.378f * angle));
     }
 }
 
@@ -2330,27 +2333,26 @@ void cBall::UpdateOrientation(float fDeltaT)
     if (m_pOwner == NULL)
     {
         u8 bUseAngularVel = 0;
-        if (m_pPhysicsBall->mbUseAngularVel != 0
-            || m_pPhysicsBall->mfSpinTimer > 0.0f)
+        PhysicsBall* physics = m_pPhysicsBall;
+        if (physics->mbUseAngularVel != 0
+            || physics->mfSpinTimer > 0.0f)
         {
             bUseAngularVel = 1;
         }
 
         if (bUseAngularVel != 0)
         {
-            m_pPhysicsBall->GetAngularVelocity(&v3AngVel);
+            physics->GetAngularVelocity(&v3AngVel);
 
             float fAng = nlSqrt(v3AngVel.x * v3AngVel.x
-                    + v3AngVel.y * v3AngVel.y
-                    + v3AngVel.z * v3AngVel.z,
+                                    + v3AngVel.y * v3AngVel.y
+                                    + v3AngVel.z * v3AngVel.z,
                 true);
             if (fAng > 0.01f)
             {
                 fInvAng = 1.0f / fAng;
                 nlVec3Scale(v3AngVel, fInvAng);
-                fn_802B5370(qOrientationDelta, v3AngVel,
-                    (unsigned short)(int)(10430.378f
-                        * (fAng * fDeltaT)));
+                fn_802B5370(qOrientationDelta, v3AngVel, (unsigned short)(int)(10430.378f * (fAng * fDeltaT)));
             }
             else
             {
