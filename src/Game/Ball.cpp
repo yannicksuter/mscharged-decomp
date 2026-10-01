@@ -2498,7 +2498,7 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
         }
         else
         {
-            return -10000.0f;
+            return -9999.9f;
         }
 
         float airResistance = m_pPhysicsBall->mfBallAirResistance;
