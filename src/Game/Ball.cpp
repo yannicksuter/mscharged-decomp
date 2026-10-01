@@ -3236,7 +3236,8 @@ static inline cBall*& GetPatchBall()
 
 extern "C" void fn_80019910(PhysicsPatch* pPatch)
 {
-    if (pPatch->m_Type == 1 && g_pBall->m_pOwner == NULL
+    int patchType = pPatch->GetType();
+    if (patchType == 1 && g_pBall->m_pOwner == NULL
         && !fn_800167A8(g_pBall))
     {
         fn_80015B38(GetPatchBall(), false);
@@ -3263,7 +3264,7 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
         pPhysicsBall->mbUseMagnusEffect = false;
         pPhysicsBall->mfChargeBonus = 0.0f;
     }
-    else if (pPatch->m_Type == 10)
+    else if (patchType == 10)
     {
         SetBallChargeWithScale(g_pBall, 4.0f);
     }
