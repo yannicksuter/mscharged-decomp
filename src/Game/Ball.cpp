@@ -1908,7 +1908,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 
     SetVelocity(v3Dir, spinType, &v3Spin);
     m_tNoPickupTimer.SetSeconds(0.1f);
-    m_tLightningTimer.SetSeconds(1.5f);
+    m_tLightningTimer.SetSeconds(2.0f);
     fn_80015C38(this, nBallState);
     m_pShooter = pShooter;
 
