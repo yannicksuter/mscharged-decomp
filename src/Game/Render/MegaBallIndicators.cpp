@@ -824,7 +824,6 @@ void UpdateMegaBallIndicators(float fDeltaT)
 void SetMegaBallTimerCount(unsigned int nCount)
 {
     float fY;
-    float fX;
     float fLeftCapWidth;
     float fRightCapWidth;
     gMegaBallTimerCount = nCount;
@@ -846,23 +845,23 @@ void SetMegaBallTimerCount(unsigned int nCount)
                            * gMegaBallTimerSegments[0].mScale)
                    - 1.0f;
     float fHalfWidth = 0.5f * fSpacing;
+    float fRowHalfWidth
+        = fHalfWidth * (float)(gMegaBallTimerCount - 1);
+    float fOuterHalfWidth = fRowHalfWidth + fHalfWidth;
+    gMegaBallTimerEndCaps[0].mActive = true;
+    gMegaBallTimerEndCaps[0].mVisible = true;
+    gMegaBallTimerEndCaps[0].mScale = gMegaBallTimerScale;
     fLeftCapWidth
         = gMegaBallTimerEndCaps[0].mWidth * gMegaBallTimerScale;
     fRightCapWidth
         = gMegaBallTimerEndCaps[1].mWidth * gMegaBallTimerScale;
-    float fRowHalfWidth
-        = fHalfWidth * (float)(gMegaBallTimerCount - 1);
-    fHalfWidth += fRowHalfWidth;
-    float fLeftCapX = gMegaBallScreenCenterX - fHalfWidth
+    float fLeftCapX = gMegaBallScreenCenterX - fOuterHalfWidth
                     - 0.5f * (fAspectScale * fLeftCapWidth) + 1.0f;
-    float fRightCapX = gMegaBallScreenCenterX + fHalfWidth
-                     + 0.5f * (fAspectScale * fRightCapWidth) - 1.0f;
     fY = gMegaBallTimerY + gMegaBallTimerYOffset;
-    fX = gMegaBallScreenCenterX - fRowHalfWidth;
+    float fRightCapX = gMegaBallScreenCenterX + fOuterHalfWidth
+                     + 0.5f * (fAspectScale * fRightCapWidth) - 1.0f;
+    float fX = gMegaBallScreenCenterX - fRowHalfWidth;
 
-    gMegaBallTimerEndCaps[0].mActive = true;
-    gMegaBallTimerEndCaps[0].mVisible = true;
-    gMegaBallTimerEndCaps[0].mScale = gMegaBallTimerScale;
     gMegaBallTimerEndCaps[0].mX = fLeftCapX;
     gMegaBallTimerEndCaps[0].mY = fY;
 
