@@ -1,6 +1,7 @@
 #include "Game/World/WorldVisibility.h"
 #include "Game/World/worldanim.h"
 #include "Game/World/WorldPhysicsDescription.h"
+#include "Game/World/WorldAnimObjects.h"
 
 #include "Game/Physics/PhysicsBox.h"
 #include "Game/Physics/PhysicsCapsule.h"
@@ -28,14 +29,6 @@
 
 extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
     const nlMatrix4*);
-extern "C" void fn_803438FC(WorldAnimObject_803437C8*);
-extern "C" void fn_803439A4(WorldAnimObject_803437C8*);
-
-struct WorldPhysicsOwner_80342170
-{
-    u8 m_pad00[0x80];
-    PhysicsObject* m_pPhysicsObject;
-};
 
 class WorldAnimBinder_80342BDC
 {
@@ -108,9 +101,7 @@ PhysicsObject* CreatePhysicsPrimitive(
     return pPhysicsObject;
 }
 
-extern "C" void fn_80342170(WorldPhysicsOwner_80342170* pOwner);
-
-extern "C" void fn_80342170(WorldPhysicsOwner_80342170* pOwner)
+void ReleaseWorldPhysicsObject(WorldPhysicsDrawable* pOwner)
 {
     if (pOwner->m_pPhysicsObject != 0)
     {
@@ -238,7 +229,7 @@ void WorldAnimManager::BindObjects()
 void WorldAnimBinder_80342BDC::BindControllerObjects(const unsigned long&,
     WorldAnimController** ppController)
 {
-    fn_803438FC((*ppController)->m_pWorldAnimObject);
+    BindWorldAnimObjectDrawables((*ppController)->m_pWorldAnimObject);
 }
 
 void WorldAnimManager::Update(float fDeltaT)
@@ -268,7 +259,7 @@ void WorldAnimUpdate::Update(const unsigned long&,
         if (pController->m_pPoseTree->UnidentifiedAtEnd()
             && pController->m_pWorldAnimObject != 0)
         {
-            fn_803439A4(pController->m_pWorldAnimObject);
+            SelectRandomWorldAnimation(pController->m_pWorldAnimObject);
         }
         spCurrentWorldAnimController = 0;
     }

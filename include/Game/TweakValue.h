@@ -44,7 +44,7 @@ public:
     virtual void BindValueAddress(void* value) = 0;
 
     bool Bind(const char* path);
-    bool Bind(const char*, float, const char*, bool, float, float);
+    bool Bind(const char*, const char*, bool, float, float, float);
 
     static void operator delete(void* pointer)
     {
@@ -114,7 +114,7 @@ public:
     bool Bind(const char* name, T value, const char* group,
         bool reload, T min, T max)
     {
-        bool found = TweakBindingBase::Bind(name, value, group, reload, min, max);
+        bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
         if (!found)
         {
             *m_pValue = GetDefaultValue();
@@ -214,7 +214,7 @@ public:
     bool Bind(const char* name, float value,
         const char* group, bool reload, float min, float max)
     {
-        bool found = TweakBindingBase::Bind(name, value, group, reload, min, max);
+        bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
         if (!found)
         {
             *m_pValue = GetDefault();
@@ -298,7 +298,7 @@ public:
     bool Bind(const char* name, float value,
         const char* group, bool reload, float min, float max)
     {
-        bool found = TweakBindingBase::Bind(name, value, group, reload, min, max);
+        bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
         if (!found)
         {
             *m_pValue = GetDefault();

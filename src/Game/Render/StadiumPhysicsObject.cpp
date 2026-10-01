@@ -61,15 +61,15 @@ void StadiumPhysicsObject::ReleaseResources()
 {
     g_StaticPhysicsPrimitives.RemoveEntry(m_pPhysicsObject);
     g_NetPhysicsObjects.RemoveEntry(m_pPhysicsObject);
-    fn_8034417C(this);
+    ReleaseWorldPhysicsDrawableResources(this);
 }
 
-void WorldPhysicsDrawable_80534448::SetWorldMatrix(const nlMatrix4& transform)
+void WorldPhysicsDrawable::SetWorldMatrix(const nlMatrix4& transform)
 {
     m_Description.matLocalToParent = transform;
 }
 
-nlMatrix4* WorldPhysicsDrawable_80534448::GetWorldMatrix()
+nlMatrix4* WorldPhysicsDrawable::GetWorldMatrix()
 {
     return &m_Description.matLocalToParent;
 }

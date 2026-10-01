@@ -17,7 +17,7 @@ public:
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);
-    virtual void UnidentifiedVirtual1C(WorldObjectLoadContext* context);
+    virtual void Initialize(WorldObjectLoadContext* context);
 
     void Update(float fDeltaT);
     void Emit();
@@ -46,5 +46,8 @@ public:
 };
 
 typedef char WorldEffect_size_check[sizeof(WorldEffect) == 0xA0 ? 1 : -1];
+
+void UpdateAnimatedWorldEffectController(EmissionController& controller);
+void UpdateWorldEffectControllerVisibility(EmissionController& controller);
 
 #endif // GAME_WORLD_WORLD_EFFECT_H

@@ -11,6 +11,16 @@ class cPlayer;
 
 struct AudioHandleState
 {
+    void Set(int slotId, unsigned long cueId,
+        void* context, bool restartable)
+    {
+        m_CueId = cueId;
+        m_Context = context;
+        m_FlagsHi16 = slotId;
+        m_FlagsBit15 = restartable;
+        m_FlagsBits12_14 = 0;
+    }
+
     unsigned long m_CueId;
     void* m_Context;
     unsigned long m_FlagsHi16 : 16;

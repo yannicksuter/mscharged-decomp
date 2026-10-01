@@ -13,6 +13,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AnimInventory.h"
+#include "Game/AI/Fielder.inl"
 #include "Game/Ball.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
@@ -136,8 +137,6 @@ float lbl_806DC1F0 = 0.02f;
 extern float lbl_806E4008;
 extern float lbl_806E4018;
 extern float lbl_806E4024;
-extern float lbl_806E4030;
-extern float lbl_806E4034;
 extern float lbl_806E4038;
 extern float lbl_806E403C;
 extern float lbl_806E4040;
@@ -780,6 +779,16 @@ void DesireReceivePass::fn_800C0F14()
     input->SetTimer(input->GetTimerKey(transition.mFuncHash, 1), fDuration);
 }
 
+float DesireReceivePass::UnidentifiedContactHeight(int receiveAnimType)
+{
+    int nNumAnims;
+    const LooseBallContactAnimInfo* pAnimInfo = fn_800C1FA4(receiveAnimType, nNumAnims);
+    nlVector3 v3ContactOffsetWorld;
+    m_pFielder->GetReceivePassBallContactOffset(v3ContactOffsetWorld,
+        m_pFielder->mUnidentified024.m_aActualFacingDirection, pAnimInfo);
+    return v3ContactOffsetWorld.z;
+}
+
 bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 {
     if (mEstimated.bLocked)
@@ -790,33 +799,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     Estimated estimated = mEstimated;
     bool bUseGroundIntercept = true;
     int nNumIntercepts;
-    float fCos;
-    float fSin;
-    int nNumAnims;
-    const LooseBallContactAnimInfo* pAnimInfo =
-        fn_800C1FA4(receiveAnimType, nNumAnims);
-    float fAnimContactFrame = pAnimInfo->fAnimContactFrame;
-
-    cSAnim* pAnim = m_pFielder->m_pAnimInventory
-                        ->GetAnim(pAnimInfo->nAnimID);
-    nlVector3 v3ContactOffsetLocal;
-    unsigned short aFacingDirection =
-        m_pFielder->mUnidentified024.m_aActualFacingDirection;
-    m_pFielder->GetJointPositionFuture(
-        &v3ContactOffsetLocal, pAnimInfo->nAnimID,
-        m_pFielder->m_nBallJointIndex,
-        fAnimContactFrame / (float)pAnim->m_nNumKeys,
-        true, true, false, true);
-
-    nlSinCos(&fSin, &fCos, aFacingDirection);
-
-    nlVector3 v3ContactOffsetWorld;
-    float fContactHeight = v3ContactOffsetLocal.z;
-    v3ContactOffsetWorld.z = fContactHeight;
-    v3ContactOffsetWorld.x =
-        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin;
-    v3ContactOffsetWorld.y =
-        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin;
+    float fContactHeight = UnidentifiedContactHeight(receiveAnimType);
 
     float fInterceptTimes[2];
     float fDesiredScale =
@@ -831,7 +814,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
         if (nNumIntercepts == 2)
         {
-            float fClosestDistanceSq = lbl_806E4030;
+            float fClosestDistanceSq = 1.0e17f;
             for (int i = 0; i < 2; ++i)
             {
                 nlVector3 v3BallPosition;
@@ -868,13 +851,11 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
     if (bUseGroundIntercept)
     {
-        cFielder* pFielder = m_pFielder;
         cBall* pBall = g_pBall;
-        float fRadius = pFielder->mUnidentified320->GetRadius();
-        float fMaxCatchupSpeed = fn_8002E1B0(m_pFielder);
-        CalcInterceptXY(pFielder->mUnidentified024.m_v3Position,
-            fMaxCatchupSpeed, fRadius, pBall->m_v3Position,
-            pBall->m_v3Velocity, nNumIntercepts, fInterceptTimes);
+        CalcInterceptXY(m_pFielder->GetPosition(),
+            fn_8002E1B0(m_pFielder), m_pFielder->mUnidentified320->GetRadius(),
+            pBall->GetPosition(), pBall->m_v3Velocity,
+            nNumIntercepts, fInterceptTimes);
 
         if (nNumIntercepts == 0)
         {
@@ -900,7 +881,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
 
         nlVector3 v3FirstBallPosition;
         fn_800180F4(
-            g_pBall, &v3FirstBallPosition, fInterceptTime);
+            g_pBall, &v3FirstBallPosition, fInterceptTimes[0]);
 
         if (mbValidPassIntercept)
         {
@@ -959,14 +940,14 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
                 v3ClosestPoint = GetClosestPointOnLineABFromPointC(
                     v3FirstBallPosition, v3SecondBallPosition,
                     m_pFielder->mUnidentified024.m_v3Position);
-                float fBlend = NormalizeVal(
-                    nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity)
-                        / mUnidentifiedB4,
-                    lbl_806E4024, lbl_806E4018);
-                nlVecLerp(estimated.v3BallContactPos,
-                    v3FirstBallPosition, v3ClosestPoint, fBlend);
-                goto BallContactPositionReady;
             }
+            float fBlend = NormalizeVal(
+                nlVec2Length(*(nlVector2*)&g_pBall->m_v3Velocity)
+                    / mUnidentifiedB4,
+                lbl_806E4024, lbl_806E4018);
+            nlVecLerp(estimated.v3BallContactPos,
+                v3FirstBallPosition, v3ClosestPoint, fBlend);
+            goto BallContactPositionReady;
         }
         estimated.v3BallContactPos = v3FirstBallPosition;
     BallContactPositionReady:
@@ -986,7 +967,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     if (mEstimated.fBallContactTime > 0.0f
         && (float)fabs(mEstimated.fBallContactTime
             - estimated.fBallContactTime)
-            > lbl_806E4034)
+            > 0.4f)
     {
         tDebugPrintManager::Print(DC_AI,
             "DesireReceivePass::CalcRoughEstimates - the ball got deflected too much, pass aborted\n");
@@ -997,8 +978,10 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
         m_pFielder->mUnidentified320->GetRadius(), true);
 
     nlVector3 v3FacingDirection;
-    nlVec3Sub(v3FacingDirection, estimated.v3BallContactPos,
-        m_pFielder->mUnidentified024.m_v3Position);
+    nlVec3Set(v3FacingDirection,
+        estimated.v3BallContactPos.x - m_pFielder->mUnidentified024.m_v3Position.x,
+        estimated.v3BallContactPos.y - m_pFielder->mUnidentified024.m_v3Position.y,
+        estimated.v3BallContactPos.z - m_pFielder->mUnidentified024.m_v3Position.z);
     if (!fn_800C0E74())
     {
         nlVec3Sub(v3FacingDirection, g_pBall->m_v3Position,
@@ -1167,10 +1150,11 @@ void DesireReceivePass::fn_800C1A08()
     float fCos;
     nlSinCos(&fSin, &fCos, aDesiredFacingDirection);
 
-    nlVec3Set(v3ContactOffsetWorld,
-        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin,
-        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin,
-        v3ContactOffsetLocal.z);
+    v3ContactOffsetWorld.x =
+        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin;
+    v3ContactOffsetWorld.y =
+        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin;
+    v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
 
     nlVec3Sub(mEstimated.v3AnimStartPos,
         mEstimated.v3BallContactPos, v3ContactOffsetWorld);
@@ -1179,12 +1163,11 @@ void DesireReceivePass::fn_800C1A08()
     mEstimated.fAnimStartOffset =
         nlSqrt(v3ContactOffsetWorld.GetLengthSq3D(), true);
 
-    unsigned int nNumKeys = pBestContactAnim->m_nNumKeys;
-    float fAnimDuration = (float)nNumKeys / 30.0f;
-    float fAnimContactTime = pBestBallContactAnimInfo->fAnimContactFrame
-        / (float)nNumKeys;
+    float fAnimDuration = pBestContactAnim->GetDuration();
     mEstimated.fAnimStartTime = mEstimated.fBallContactTime
-        - fAnimContactTime * fAnimDuration;
+        - GetNormalizedContactTime(
+            pBestContactAnim, pBestBallContactAnimInfo->fAnimContactFrame)
+            * fAnimDuration;
 }
 
 bool DesireReceivePass::StartPickupAnimation()

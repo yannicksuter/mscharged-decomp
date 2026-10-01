@@ -758,15 +758,27 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
     char szArtPath[64];
     char szPlayerPath[64];
 
+    eCharacterClass captain0;
+    eCharacterClass captain1;
+    const char* szCaptainName;
+
     Entry* pEntry = mCurrent;
     eCharacterClass captaincc = captain[pEntry->nTeamID];
     eCharacterClass cc = pEntry->cc;
     const char* szName = GetCharacterInfo(cc).mName;
-    const char* szCaptainName = GetCharacterInfo(captaincc).mName;
-    const char* szTexName = (cc == 13) ? "hammer" : szName;
+    szCaptainName = GetCharacterInfo(captaincc).mName;
+    const char* szTexName;
+    if (cc == 13)
+    {
+        szTexName = "hammer";
+    }
+    else
+    {
+        szTexName = szName;
+    }
 
-    eCharacterClass captain0 = captain[0];
-    eCharacterClass captain1 = captain[1];
+    captain0 = captain[0];
+    captain1 = captain[1];
     if (captain0 == captain1)
     {
         if (mCurrent->nTeamID == 1)
@@ -782,7 +794,8 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
     }
     else
     {
-        if (GetAlternateCaptain(captain0, captain1) == captaincc)
+        eCharacterClass altcaptain = GetAlternateCaptain(captain0, captain1);
+        if (altcaptain == captaincc)
         {
             nlSNPrintf(szArtPath, 64, "art/characters/%s/%s_%s_alt.rlt", szName, szTexName, szCaptainName);
             nlSNPrintf(szPlayerPath, 64, "%s_%s_alt/%s_%s_alt", szTexName, szCaptainName, szTexName, szCaptainName);

@@ -475,7 +475,7 @@ void EmissionManager::Update(float dt)
         }
         else
         {
-            mControllers.Remove(&iterator);
+            mControllers.RemoveEntry(iterator.next());
             delete p;
         }
     }

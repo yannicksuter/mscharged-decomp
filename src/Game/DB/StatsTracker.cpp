@@ -819,32 +819,59 @@ void StatsTracker::GetSortedStats(PlayerStats* source, int numsource,
 void StatsTracker::GetSortedTeamStats(
     TeamStats* source, int numsource, int* dest, int numelements)
 {
-    if (numelements > numsource)
-    {
-        numelements = numsource;
-    }
+    int tempsorted[10];
 
     for (int i = 0; i < numsource; i++)
     {
-        dest[i] = i;
+        tempsorted[i] = i;
     }
 
-    for (int i = 0; i < numsource - 1; i++)
+    unsigned char swapped;
+    do
     {
-        for (int j = 0; j < numsource - i - 1; j++)
+        swapped = 0;
+        for (int i = 0; i < numsource; i++)
         {
-            if (MoveTeamBUp(source[dest[j]], source[dest[j + 1]]))
+            if (i + 1 >= numsource)
+                break;
+
+            int a = source[tempsorted[i]].unknown_0x16;
+            int b = source[tempsorted[i + 1]].unknown_0x16;
+            int aGoalDiff = source[tempsorted[i]].mPlayerTotalStats.mNumGoalsFor
+                - source[tempsorted[i]].mPlayerTotalStats.mNumGoalsAgainst;
+            int bGoalDiff = source[tempsorted[i + 1]].mPlayerTotalStats.mNumGoalsFor
+                - source[tempsorted[i + 1]].mPlayerTotalStats.mNumGoalsAgainst;
+            unsigned int humanA = CupManager::Instance()->mCurrentCup->IsHumanTeam(
+                source[tempsorted[i]].mTeamIndex);
+            unsigned int humanB = CupManager::Instance()->mCurrentCup->IsHumanTeam(
+                source[tempsorted[i + 1]].mTeamIndex);
+
+            if (a < b
+                || (a == b && aGoalDiff < bGoalDiff)
+                || (a == b && a != 0 && !humanA && humanB && aGoalDiff == bGoalDiff)
+                || (a == b && a == 0 && humanA && !humanB && aGoalDiff == bGoalDiff))
             {
-                int temp = dest[j];
-                dest[j] = dest[j + 1];
-                dest[j + 1] = temp;
+                int temp = tempsorted[i + 1];
+                tempsorted[i + 1] = tempsorted[i];
+                tempsorted[i] = temp;
+                swapped = 1;
+            }
+            else if (a == b && humanA && humanB)
+            {
+                if (MoveTeamBUp(source[tempsorted[i]], source[tempsorted[i + 1]]))
+                {
+                    int temp = tempsorted[i + 1];
+                    tempsorted[i + 1] = tempsorted[i];
+                    tempsorted[i] = temp;
+                    swapped = 1;
+                }
             }
         }
-    }
+    } while (swapped);
 
-    for (int i = numelements; i < numsource; i++)
+    for (int i = 0; i < numelements; i++)
     {
-        dest[i] = -1;
+        dest[i] = tempsorted[i];
     }
 }
 

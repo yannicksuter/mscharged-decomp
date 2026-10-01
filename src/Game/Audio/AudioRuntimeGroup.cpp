@@ -20,7 +20,7 @@ void AudioEffectBase::Update(float dt)
         if (state->IsFinished())
         {
             OnParameterFinished(state);
-            m_Parameters.Remove(&iterator);
+            m_Parameters.RemoveEntry(iterator.next());
             ReleaseParameter(state);
         }
         iterator.Step();

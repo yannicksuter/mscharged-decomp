@@ -14,7 +14,8 @@ CharT* nlStrNCat(CharT* dest, const CharT* a, const CharT* b, unsigned long maxs
     while (*a)
     {
         dest[n] = *a++;
-        if (++n >= maxsize)
+        n++;
+        if (n >= maxsize)
         {
             dest[maxsize - 1] = 0;
             return dest;
@@ -23,7 +24,8 @@ CharT* nlStrNCat(CharT* dest, const CharT* a, const CharT* b, unsigned long maxs
     while (*b)
     {
         dest[n] = *b++;
-        if (++n >= maxsize)
+        n++;
+        if (n >= maxsize)
         {
             dest[maxsize - 1] = 0;
             return dest;

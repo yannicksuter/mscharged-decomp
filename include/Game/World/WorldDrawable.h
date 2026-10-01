@@ -6,6 +6,7 @@
 #include "types.h"
 
 class GLView;
+class GLVertexAnim;
 class glModel;
 class WorldAnimController;
 
@@ -26,6 +27,7 @@ public:
     virtual void DrawToView(GLView* view);
 
     void Initialize(WorldObjectLoadContext* context);
+    inline bool ResolveVertexAnim(GLVertexAnim*& pVertexAnim);
 
     unsigned long GetHashID() const { return m_uHashID; }
     glModel* GetModel() const { return m_pModel; }

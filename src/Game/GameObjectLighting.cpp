@@ -176,8 +176,6 @@ extern const f32 lbl_806E4D40;
 extern Mtx lbl_80511490;
 extern nlMatrix4 lbl_80570C18;
 
-bool fn_80183C54();
-
 bool fn_80183C54()
 {
     if (!lbl_806DCC58)
@@ -1021,10 +1019,12 @@ nlColour fn_80183C9C(const nlVector2* arg0, bool arg1)
         return var0;
     }
 
-    f32 var0 = arg0->x * gShadowLookupScaleX.value;
-    var0 += gShadowLookupTransX.value;
-    f32 var1 = arg0->y * gShadowLookupScaleY.value;
-    var1 += gShadowLookupTransY.value;
+    f32 var0 = arg0->x;
+    var0 *= gShadowLookupScaleX.value;
+    var0 = var0 + gShadowLookupTransX.value;
+    f32 var1 = arg0->y;
+    var1 *= gShadowLookupScaleY.value;
+    var1 = var1 + gShadowLookupTransY.value;
     var0 = lbl_806E4D2C * var0 + lbl_806E4D2C;
     var1 = lbl_806E4D40 * var1 + lbl_806E4D2C;
     var0 *= (f32)gpShadowLightingLookup->mWidth;

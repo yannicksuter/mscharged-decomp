@@ -235,17 +235,14 @@ void cDebugCamera::fn_800F2BD0(float dt, float controlSpeed)
     }
 
     nlVector3 offset;
-    float t = 0.0f;
-    float amount = dt * (x * controlSpeed);
-    float x0 = amount * m_matView.m11;
-    float y0 = amount * m_matView.m21;
-    nlVec3Set(offset, x0, y0, t);
+    m_matView.GetColumn_(0, offset);
+    nlVec3Scale(offset, offset, dt * (x * controlSpeed));
+    offset.z = 0.0f;
     nlVec3Add(m_vecTarget, m_vecTarget, offset);
 
-    amount = dt * (-y * controlSpeed);
-    float x1 = amount * m_matView.m13;
-    float y1 = amount * m_matView.m23;
-    nlVec3Set(offset, x1, y1, t);
+    m_matView.GetColumn_(2, offset);
+    nlVec3Scale(offset, offset, dt * (-y * controlSpeed));
+    offset.z = 0.0f;
     nlVec3Add(m_vecTarget, m_vecTarget, offset);
 }
 

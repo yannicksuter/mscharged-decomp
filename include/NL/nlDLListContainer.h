@@ -87,7 +87,15 @@ public:
     {
         DLListEntry<T>* entry = position->next();
         nlDLRingRemove(&m_Head, entry);
+        Deallocate(entry, 0);
+    }
+
+    T RemoveEntry(DLListEntry<T>* entry)
+    {
+        T data = entry->entry;
+        nlDLRingRemove(&m_Head, entry);
         m_Allocator.DeleteEntry(entry);
+        return data;
     }
 
     nlDLListIterator<T> Begin() const

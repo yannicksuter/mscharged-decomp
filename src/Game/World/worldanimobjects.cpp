@@ -28,101 +28,85 @@
 
 #include <math.h>
 
-struct WorldPhysicsOwner_80342170
-{
-    u8 m_pad00[0x80];
-    PhysicsObject* m_pPhysicsObject;
-};
-
-struct WorldAnimBinding_803438FC
-{
-    unsigned long m_uDrawableHash;
-    unsigned long m_uNodeHash;
-};
-
-WorldVisibilityNode* FindWorldVisibilityNode(
-    WorldVertexAnimDrawable_80343E3C*, WorldVisibilityNode*);
-
-extern "C" void fn_80342170(WorldPhysicsOwner_80342170* pOwner);
-
-extern "C" void fn_803437C8(WorldAnimObject_803437C8* pObject,
+void InitializeWorldAnimObject(WorldAnimObject* pAnimObject,
     WorldObjectLoadContext* pContext)
 {
     WorldAnimManager* pManager
         = &pContext->m_pWorld->mWorldAnimManager;
-    pObject->m_pAnimController
-        = pManager->GetOrCreateController(pObject->m_uHashID);
+    pAnimObject->m_pAnimController
+        = pManager->GetOrCreateController(pAnimObject->m_uHashID);
 
     u8* pData = pContext->GetParentData();
-    pObject->m_pAnimationHashes = (unsigned long*)(pData
-        + pObject->m_nBindings * sizeof(WorldAnimBinding_803438FC));
-    pObject->m_pAnimController->m_pWorldAnimObject = pObject;
+    pAnimObject->m_pAnimationHashes = (unsigned long*)(pData
+        + pAnimObject->m_nBindings * sizeof(WorldAnimBinding));
+    pAnimObject->m_pAnimController->m_pWorldAnimObject = pAnimObject;
 
     pManager->BindHierarchy(
-        pObject->m_pAnimController, pObject->m_uHierarchyHash);
-    pObject->m_pAnimController->SetWorldMatrix(
-        *((DrawableObject*)pObject)->GetWorldMatrix());
+        pAnimObject->m_pAnimController, pAnimObject->m_uHierarchyHash);
+    pAnimObject->m_pAnimController->SetWorldMatrix(
+        *((DrawableObject*)pAnimObject)->GetWorldMatrix());
 
-    if (pObject->m_nAnimations == 0)
+    if (pAnimObject->m_nAnimations == 0)
     {
-        pObject->m_pAnimController->SetAnimation(
-            nlStringLowerHash("idle"), pObject->m_ePlayMode);
+        pAnimObject->m_pAnimController->SetAnimation(
+            nlStringLowerHash("idle"), pAnimObject->m_ePlayMode);
     }
-    else if (pObject->m_nAnimations == 1)
+    else if (pAnimObject->m_nAnimations == 1)
     {
-        pObject->m_pAnimController->SetAnimation(
-            pObject->m_pAnimationHashes[0], pObject->m_ePlayMode);
+        pAnimObject->m_pAnimController->SetAnimation(
+            pAnimObject->m_pAnimationHashes[0], pAnimObject->m_ePlayMode);
     }
     else
     {
-        unsigned long nAnimation
-            = nlRandom(pObject->m_nAnimations, &nlDefaultSeed) - 1;
-        pObject->m_pAnimController->SetAnimation(
-            pObject->m_pAnimationHashes[nAnimation], PM_HOLD);
+        unsigned long animationIndex
+            = nlRandom(pAnimObject->m_nAnimations, &nlDefaultSeed) - 1;
+        pAnimObject->m_pAnimController->SetAnimation(
+            pAnimObject->m_pAnimationHashes[animationIndex], PM_HOLD);
     }
 
-    pObject->m_pAnimController->SetAnimationSpeed(
-        pObject->m_fAnimationSpeed);
-    pObject->m_pAnimController->SetAnimationTime(
-        pObject->m_fAnimationTime);
-    pObject->m_pBindings
-        = (WorldAnimBinding_803438FC*)pContext->GetParentData();
+    pAnimObject->m_pAnimController->SetAnimationSpeed(
+        pAnimObject->m_fAnimationSpeed);
+    pAnimObject->m_pAnimController->SetAnimationTime(
+        pAnimObject->m_fAnimationTime);
+    pAnimObject->m_pBindings
+        = (WorldAnimBinding*)pContext->GetParentData();
 }
 
-extern "C" void fn_803438FC(WorldAnimObject_803437C8* pObject)
+void BindWorldAnimObjectDrawables(WorldAnimObject* pAnimObject)
 {
-    if (pObject->m_pBindings != 0)
+    if (pAnimObject->m_pBindings != 0)
     {
-        for (int i = 0; i < pObject->m_nBindings; ++i)
+        for (int bindingIndex = 0; bindingIndex < pAnimObject->m_nBindings;
+             ++bindingIndex)
         {
             WorldDrawable* pDrawable
-                = (WorldDrawable*)pObject->m_pWorld
+                = (WorldDrawable*)pAnimObject->m_pWorld
                       ->FindDrawableObject(
-                          pObject->m_pBindings[i].m_uDrawableHash);
+                          pAnimObject->m_pBindings[bindingIndex].m_uDrawableHash);
             if (pDrawable != 0)
             {
                 pDrawable->m_nAnimNode
-                    = pObject->m_pAnimController->GetNodeIndexByID(
-                        pObject->m_pBindings[i].m_uNodeHash);
+                    = pAnimObject->m_pAnimController->GetNodeIndexByID(
+                        pAnimObject->m_pBindings[bindingIndex].m_uNodeHash);
                 pDrawable->m_pAnimController
-                    = pObject->m_pAnimController;
+                    = pAnimObject->m_pAnimController;
             }
         }
     }
 }
 
-extern "C" void fn_803439A4(WorldAnimObject_803437C8* pObject)
+void SelectRandomWorldAnimation(WorldAnimObject* pAnimObject)
 {
-    if (pObject->m_nAnimations > 1)
+    if (pAnimObject->m_nAnimations > 1)
     {
-        unsigned long nAnimation
-            = nlRandom(pObject->m_nAnimations, &nlDefaultSeed) - 1;
-        pObject->m_pAnimController->SetAnimation(
-            pObject->m_pAnimationHashes[nAnimation], PM_HOLD);
+        unsigned long animationIndex
+            = nlRandom(pAnimObject->m_nAnimations, &nlDefaultSeed) - 1;
+        pAnimObject->m_pAnimController->SetAnimation(
+            pAnimObject->m_pAnimationHashes[animationIndex], PM_HOLD);
     }
 }
 
-extern "C" void* fn_80343A00(void* pObject, int shouldDelete)
+void* DestroyWorldAnimObject(void* pObject, int shouldDelete)
 {
     if (pObject != 0 && shouldDelete > 0)
     {
@@ -131,28 +115,28 @@ extern "C" void* fn_80343A00(void* pObject, int shouldDelete)
     return pObject;
 }
 
-extern "C" nlMatrix4* fn_80343A40(
+nlMatrix4* GetWorldAnimObjectMatrix(
     WorldDrawable* pObject)
 {
     return &pObject->mWorldMatrix;
 }
 
-extern "C" void fn_80343A48(WorldDrawable* pObject,
+void SetWorldAnimObjectMatrix(WorldDrawable* pObject,
     const nlMatrix4* pTransform)
 {
     pObject->mWorldMatrix = *pTransform;
 }
 
-extern "C" void fn_80343ADC(void*)
+void ReleaseWorldAnimObjectResources(void*)
 {
 }
 
-static nlMatrix4 s_worldAnimIdentityMatrix;
+static nlMatrix4 s_worldVisibilityIdentityMatrix;
 
-extern "C" nlMatrix4* fn_80343AE0(void*)
+nlMatrix4* GetWorldVisibilityDrawableMatrix(void*)
 {
-    s_worldAnimIdentityMatrix.SetIdentity();
-    return &s_worldAnimIdentityMatrix;
+    s_worldVisibilityIdentityMatrix.SetIdentity();
+    return &s_worldVisibilityIdentityMatrix;
 }
 
 nlMatrix4* WorldDrawable::GetWorldMatrix()
@@ -175,18 +159,18 @@ bool WorldDrawable::IsVisibleInFrustum(const nlVector4* pCullData) const
         }
 
         float fRadius = m_fBoundingRadius;
-        nlMatrix4& matrix
+        nlMatrix4& worldMatrix
             = m_pAnimController->GetNodeMatrix(m_nAnimNode);
         result = ClassifySphereInFrustum(pCullData,
-            (const nlVector3*)&matrix.e2[3][0], fRadius);
+            (const nlVector3*)&worldMatrix.e2[3][0], fRadius);
     }
     else
     {
         float fRadius = m_fBoundingRadius;
-        nlMatrix4& matrix
+        nlMatrix4& worldMatrix
             = *const_cast<WorldDrawable*>(this)->GetWorldMatrix();
         result = ClassifySphereInFrustum(pCullData,
-            (const nlVector3*)&matrix.e2[3][0], fRadius);
+            (const nlVector3*)&worldMatrix.e2[3][0], fRadius);
     }
     return result != FRUSTUM_OUTSIDE;
 }
@@ -196,23 +180,33 @@ void WorldDrawable::Draw()
     DrawToView(0);
 }
 
+inline bool WorldDrawable::ResolveVertexAnim(GLVertexAnim*& pVertexAnim)
+{
+    unsigned long uAnimationHash = m_pModel->id;
+    GLResourcePool* pPool = glGetCurrentResourcePool();
+    pVertexAnim = pPool->m_inventory->GetVertexAnim(uAnimationHash);
+    return pVertexAnim != 0;
+}
+
+inline float WorldAnimManager::GetFrame(int nFrames, int nFrameRate) const
+{
+    float fFrameRate = (float)nFrameRate;
+    float fTime = m_fTime;
+    float fDuration = (float)nFrames / fFrameRate;
+    float fFrameTime = fTime / fDuration;
+    float fFrame = (float)nFrames * (fFrameTime - floorf(fFrameTime));
+    return fFrame;
+}
+
 void WorldDrawable::DrawToView(GLView* pView)
 {
     glModel* pModel = m_pModel;
-    unsigned long uAnimationHash = pModel->id;
-    GLVertexAnim* pVertexAnim
-        = glGetCurrentResourcePool()->m_inventory->GetVertexAnim(uAnimationHash);
-    if (pVertexAnim != 0)
+    GLVertexAnim* pVertexAnim;
+    if (ResolveVertexAnim(pVertexAnim))
     {
-        int nFrames = (int)pVertexAnim->m_nNumFrames;
-        float fDuration = (float)nFrames / 30.0f;
-        float fFrameTime
-            = m_pWorldContext->mWorldAnimManager.m_fTime
-            / fDuration;
-        float fFrameFraction
-            = fFrameTime - (float)floor(fFrameTime);
-        int nFrame = (int)((float)nFrames * fFrameFraction);
-        pModel = pVertexAnim->GetModel(nFrame);
+        float fFrame = m_pWorldContext->mWorldAnimManager.GetFrame(
+            (int)pVertexAnim->m_nNumFrames, 30);
+        pModel = pVertexAnim->GetModel((int)fFrame);
         UpdateModelMaterials(pModel);
     }
 
@@ -233,9 +227,10 @@ void WorldDrawable::DrawToView(GLView* pView)
         pAlphaView = pView;
     }
 
-    for (unsigned long i = 0; i < pModel->numPackets; ++i)
+    for (unsigned long packetIndex = 0; packetIndex < pModel->numPackets;
+         ++packetIndex)
     {
-        glModelPacket* pPacket = &pModel->packets[i];
+        glModelPacket* pPacket = &pModel->packets[packetIndex];
         if (pView != 0)
         {
             pView->AttachPacket(pPacket, 0);
@@ -255,45 +250,45 @@ void WorldDrawable::DrawToView(GLView* pView)
 
 void WorldDrawable::Initialize(WorldObjectLoadContext* pContext)
 {
-    glModel*& pMaterial = m_pModel;
-    pContext->m_pWorld->ResolveModel(pMaterial);
+    glModel*& pModel = m_pModel;
+    pContext->m_pWorld->ResolveModel(pModel);
     m_pModel = glModelDupNoStreams(
         (glModel*)m_pModel, true,
         pContext->m_pWorld->m_pResource);
 }
 
-void CreateWorldVertexAnimDrawable(
-    WorldVertexAnimDrawable_80343E3C* pObject,
+void InitializeWorldVisibilityDrawable(
+    WorldVisibilityDrawable* pDrawable,
     WorldObjectLoadContext* pContext)
 {
-    glModel*& pMaterial = pObject->m_pModel;
-    pContext->m_pWorld->ResolveModel(pMaterial);
-    pObject->m_pModel = glModelDupNoStreams(pObject->GetModel(),
+    glModel*& pModel = pDrawable->m_pModel;
+    pContext->m_pWorld->ResolveModel(pModel);
+    pDrawable->m_pModel = glModelDupNoStreams(pDrawable->GetModel(),
         true, pContext->m_pWorld->m_pResource);
 
-    pObject->m_pVertexAnimNode = FindWorldVisibilityNode(
-        pObject, pContext->m_pWorld->m_pVisibilityTree);
+    pDrawable->m_pVisibilityNode = FindWorldVisibilityNode(
+        pDrawable, pContext->m_pWorld->m_pVisibilityTree);
 }
 
 WorldVisibilityNode* FindWorldVisibilityNode(
-    WorldVertexAnimDrawable_80343E3C* pObject,
+    WorldVisibilityDrawable* pDrawable,
     WorldVisibilityNode* pNode)
 {
-    int i;
-    for (i = 0; i < pNode->mNumModelHashes; ++i)
+    int index;
+    for (index = 0; index < pNode->mNumModelHashes; ++index)
     {
-        if (pNode->mModelHashes[i] == pObject->GetModel()->id)
+        if (pNode->mModelHashes[index] == pDrawable->GetModel()->id)
         {
             return pNode;
         }
     }
 
-    for (i = 0; i < 2; ++i)
+    for (index = 0; index < 2; ++index)
     {
-        if (pNode->mChildren[i] != 0)
+        if (pNode->mChildren[index] != 0)
         {
             WorldVisibilityNode* pFound = FindWorldVisibilityNode(
-                pObject, pNode->mChildren[i]);
+                pDrawable, pNode->mChildren[index]);
             if (pFound != 0)
             {
                 return pFound;
@@ -303,19 +298,20 @@ WorldVisibilityNode* FindWorldVisibilityNode(
     return 0;
 }
 
-extern "C" void fn_80344088(
-    WorldVertexAnimDrawable_80343E3C* pObject)
+void DrawWorldVisibilityDrawable(
+    WorldVisibilityDrawable* pDrawable)
 {
-    GLView* pOpaqueView = pObject->m_pWorld->m_pOpaqueView;
-    GLView* pAlphaView = pObject->m_pWorld->m_pAlphaView;
+    GLView* pOpaqueView = pDrawable->m_pWorld->m_pOpaqueView;
+    GLView* pAlphaView = pDrawable->m_pWorld->m_pAlphaView;
     if (pAlphaView == 0)
     {
         pAlphaView = pOpaqueView;
     }
 
-    for (unsigned long i = 0; i < pObject->GetModel()->numPackets; ++i)
+    for (unsigned long packetIndex = 0;
+         packetIndex < pDrawable->GetModel()->numPackets; ++packetIndex)
     {
-        glModelPacket* pPacket = &pObject->GetModel()->packets[i];
+        glModelPacket* pPacket = &pDrawable->GetModel()->packets[packetIndex];
         if (glGetRasterState(
                 pPacket->rasterState, GLS_AlphaBlend)
             == 0)
@@ -329,26 +325,26 @@ extern "C" void fn_80344088(
     }
 }
 
-bool IsWorldVertexAnimDrawableVisible(
-    WorldVertexAnimDrawable_80343E3C* pObject)
+bool IsWorldVisibilityDrawableVisible(
+    WorldVisibilityDrawable* pDrawable)
 {
-    return pObject->m_pVertexAnimNode->mVisible == 1;
+    return pDrawable->m_pVisibilityNode->mVisible == 1;
 }
 
-extern "C" void fn_80344144(
-    WorldPhysicsDrawable_80534448* pObject,
+void InitializeWorldPhysicsDrawable(
+    WorldPhysicsDrawable* pDrawable,
     WorldObjectLoadContext*)
 {
-    pObject->m_pPhysicsObject = CreatePhysicsPrimitive(
-        &pObject->m_Description, 0);
+    pDrawable->m_pPhysicsObject = CreatePhysicsPrimitive(
+        &pDrawable->m_Description, 0);
 }
 
-extern "C" void fn_8034417C(WorldPhysicsDrawable_80534448* pObject)
+void ReleaseWorldPhysicsDrawableResources(WorldPhysicsDrawable* pDrawable)
 {
-    fn_80342170((WorldPhysicsOwner_80342170*)pObject);
+    ReleaseWorldPhysicsObject(pDrawable);
 }
 
-extern "C" void* fn_80344180(void* pObject, int shouldDelete)
+void* DestroyWorldVisibilityDrawable(void* pObject, int shouldDelete)
 {
     if (pObject != 0 && shouldDelete > 0)
     {
@@ -357,17 +353,17 @@ extern "C" void* fn_80344180(void* pObject, int shouldDelete)
     return pObject;
 }
 
-extern "C" void fn_803441C0(void*)
+void SetWorldVisibilityDrawableMatrix(void*)
 {
 }
 
-extern "C" void fn_803441C4(void*)
+void ReleaseWorldVisibilityDrawableResources(void*)
 {
 }
 
 static bool s_drawEffectBounds;
 
-extern "C" void fn_803441C8(WorldEffect* pEffect,
+void InitializeWorldEffect(WorldEffect* pEffect,
     WorldObjectLoadContext* pContext)
 {
     pEffect->m_bActive = true;
@@ -386,27 +382,27 @@ extern "C" void fn_803441C8(WorldEffect* pEffect,
     pContext->m_pWorld->AddEffect(pEffect);
 }
 
-extern "C" void fn_80344218(WorldEffect* pEffect)
+void ReleaseWorldEffectResources(WorldEffect* pEffect)
 {
-    nlDLListIterator<EmissionController*> iterator
+    nlDLListIterator<EmissionController*> controllerIterator
         = EmissionManager::Instance()->GetContainer()->Begin();
-    DLListEntry<EmissionController*>* head = iterator.m_Head;
-    DLListEntry<EmissionController*>* current = iterator.m_Curr;
-    while (current != 0)
+    DLListEntry<EmissionController*>* pHead = controllerIterator.m_Head;
+    DLListEntry<EmissionController*>* pCurrent = controllerIterator.m_Curr;
+    while (pCurrent != 0)
     {
-        EmissionController* pController = current->entry;
+        EmissionController* pController = pCurrent->entry;
         if (pController->m_uUserData == (u32)pEffect)
         {
             pController->ClearParticles();
             pController->mUpdateCallback.Clear();
         }
-        if (nlDLRingIsEnd(head, current) || current == 0)
+        if (nlDLRingIsEnd(pHead, pCurrent) || pCurrent == 0)
         {
-            current = 0;
+            pCurrent = 0;
         }
         else
         {
-            current = current->m_next;
+            pCurrent = pCurrent->m_next;
         }
     }
 }
@@ -454,9 +450,6 @@ void WorldEffect::Update(float fDeltaT)
     }
 }
 
-extern "C" void fn_8034470C(EmissionController& controller);
-extern "C" void fn_80344798(EmissionController& controller);
-
 void WorldEffect::Emit()
 {
     EffectsGroup* pGroup
@@ -486,13 +479,15 @@ void WorldEffect::Emit()
         if (m_pAnimController != 0)
         {
             pController->SetUpdateCallback(
-                Function1<void, EmissionController&>(fn_8034470C));
+                Function1<void, EmissionController&>(
+                    UpdateAnimatedWorldEffectController));
             pController->m_uUserData = (u32)this;
         }
         else
         {
             pController->SetUpdateCallback(
-                Function1<void, EmissionController&>(fn_80344798));
+                Function1<void, EmissionController&>(
+                    UpdateWorldEffectControllerVisibility));
             pController->m_uUserData = (u32)this;
         }
         m_nEmissionID = pController->m_Id;
@@ -511,23 +506,23 @@ void WorldEffect::Emit()
     }
 }
 
-extern "C" void fn_8034470C(EmissionController& controller)
+void UpdateAnimatedWorldEffectController(EmissionController& controller)
 {
     WorldEffect* pEffect
         = (WorldEffect*)controller.m_uUserData;
     if (pEffect != 0
         && pEffect->m_pAnimController->GetAnimationTime() != 0.0f)
     {
-        nlMatrix4& matrix
+        nlMatrix4& nodeMatrix
             = pEffect->m_pAnimController->GetNodeMatrix(
                 pEffect->m_nAnimNode);
-        controller.SetPosition(*(nlVector3*)&matrix.e2[3][0]);
-        controller.SetDirection(*(nlVector3*)&matrix.e2[2][0]);
+        controller.SetPosition(*(nlVector3*)&nodeMatrix.e2[3][0]);
+        controller.SetDirection(*(nlVector3*)&nodeMatrix.e2[2][0]);
         pEffect->UpdateVisibility(&controller);
     }
 }
 
-extern "C" void fn_80344798(EmissionController& controller)
+void UpdateWorldEffectControllerVisibility(EmissionController& controller)
 {
     WorldEffect* pEffect
         = (WorldEffect*)controller.m_uUserData;
@@ -575,7 +570,7 @@ void WorldEffect::UpdateVisibility(EmissionController* pController)
     }
 }
 
-extern "C" void* fn_803447B4(void* pObject, int shouldDelete)
+void* DestroyWorldEffect(void* pObject, int shouldDelete)
 {
     if (pObject != 0 && shouldDelete > 0)
     {

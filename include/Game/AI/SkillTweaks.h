@@ -33,7 +33,7 @@ public:
     }
 
     void ParseCurve(const char* text, int length);
-    float GetValue();
+    float GetValue() const;
 
 public:
     /* 0x00 */ char mNameInFile[0x20];
@@ -59,6 +59,57 @@ public:
     bool GetSkillValue(unsigned long key, float* value, cPlayer* pPlayer);
     float* GetDecisionWeights();
     float GetReaction(cPlayer* pPlayer);
+
+    float GetSkillRating(unsigned int index) const
+    {
+        float result = -9999.9f;
+        switch (index)
+        {
+        case 1:
+            result = mDifficulty[0];
+            break;
+        case 2:
+            result = mDifficulty[1];
+            break;
+        case 3:
+            result = mDifficulty[2];
+            break;
+        case 4:
+            result = mDifficulty[3];
+            break;
+        case 5:
+            result = mDifficulty[4];
+            break;
+        case 6:
+            result = mDifficulty[5];
+            break;
+        case 7:
+            result = mDifficulty[6];
+            break;
+        case 8:
+            result = mDifficulty[7];
+            break;
+        case 9:
+            result = mDifficulty[8];
+            break;
+        case 10:
+            result = mDifficulty[9];
+            break;
+        case 11:
+            result = mDifficulty[10];
+            break;
+        case 12:
+            result = mDifficulty[11];
+            break;
+        case 13:
+            result = mDifficulty[12];
+            break;
+        case 14:
+            result = mDifficulty[13];
+            break;
+        }
+        return result;
+    }
 
 public:
     /* 0x000 */ SkillTweak* Decision_Choice[4];

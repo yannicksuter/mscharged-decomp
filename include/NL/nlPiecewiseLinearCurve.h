@@ -43,8 +43,9 @@ public:
 
     int FindUpperPoint(float x) const
     {
+        int i;
         int upper = -1;
-        for (int i = 1; i < mCount; ++i)
+        for (i = 1; i < mCount; ++i)
         {
             if (x <= mData[i].x)
             {

@@ -454,7 +454,7 @@ config.libs = [
             Object(Matching, "Game/LANDiscoveryMessages.cpp"),
             Object(Matching, "Game/LANLobby.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/LANMessageRegistry.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/main.cpp"),
+            Object(Matching, "Game/main.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/MiiManager.cpp"),
             Object(Matching, "Game/Net.cpp"),
             Object(Matching, "Game/NetMeshEdge.cpp"),
@@ -503,7 +503,7 @@ config.libs = [
             Object(Matching, "Game/Terrain.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/TerrainTweaks.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/TrophyInfo.cpp"),
-            Object(NonMatching, "Game/tu_80009B34.cpp"),
+            Object(NonMatching, "Game/tu_80009B34.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/tu_8013E2EC.cpp"),
             Object(Matching, "Game/TweakCallback.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/TweakConfig.cpp", extra_cflags=["-ipa file"]),
@@ -576,7 +576,7 @@ config.libs = [
             Object(Matching, "Game/AnimProps/goalieanimproperties.cpp"),
 
             # Game/Audio
-            Object(NonMatching, "Game/Audio/audio.cpp", extra_cflags=["-inline auto,nobottomup,depth=5"]),
+            Object(NonMatching, "Game/Audio/audio.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Audio/AudioBackend.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Audio/AudioBankLoader.cpp"),
             Object(Matching, "Game/Audio/AudioBankTable.cpp"),
@@ -617,7 +617,7 @@ config.libs = [
             Object(Matching, "Game/Camera/AnimViewerCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/BaseCam.cpp"),
             Object(NonMatching, "Game/Camera/CameraMan.cpp", cflags=cflags_game_deferred),
-            Object(NonMatching, "Game/Camera/DebugCam.cpp", cflags=cflags_game),
+            Object(NonMatching, "Game/Camera/DebugCam.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Camera/FaceCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/FollowCam.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/Camera/GameplayCam.cpp", cflags=cflags_game_deferred),
@@ -648,7 +648,7 @@ config.libs = [
             # Game/Debug
             Object(Matching, "Game/Debug/FrameCounter.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Debug/Histogram.cpp"),
-            Object(NonMatching, "Game/Debug/ShapeRender.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Debug/ShapeRender.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Debug/TimeRegions.cpp", cflags=cflags_game),
 
             # Game/Drawable
@@ -877,7 +877,7 @@ config.libs = [
             Object(Matching, "Game/Render/YoshiEggObject.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
 
             # Game/SAnim
-            Object(NonMatching, "Game/SAnim/AnimRetargeter.cpp"),
+            Object(Matching, "Game/SAnim/AnimRetargeter.cpp", extra_cflags=["-ipa file", "-inline noauto"]),
             Object(Matching, "Game/SAnim/pnBlender.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/SAnim/pnFeather.cpp", extra_cflags=["-inline auto,depth=3", "-ipa file", "-sym on"]),
             Object(Matching, "Game/SAnim/pnSAnimController.cpp", extra_cflags=["-inline deferred", "-sym on"]),
@@ -1891,7 +1891,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/nhttp/NHTTP_response.c"),
             Object(Matching, "RVL_SDK/nhttp/NHTTP_socket_RVL.c"),
             Object(Matching, "RVL_SDK/nhttp/NHTTP_stdlib_RVL.c"),
-            Object(NonMatching, "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp),
+            Object(Matching, "RVL_SDK/nhttp/NHTTP_thread.c", cflags=cflags_rvl_nhttp),
         ],
     },
     {

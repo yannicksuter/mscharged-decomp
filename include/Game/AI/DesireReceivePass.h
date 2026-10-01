@@ -82,6 +82,7 @@ private:
 
     static int UnidentifiedAddReceiveFlags(int, bool);
     bool UnidentifiedCanOneTouch();
+    float UnidentifiedContactHeight(int);
     bool fn_800C0E74();
     const LooseBallContactAnimInfo* fn_800C1FA4(
         int, int&);

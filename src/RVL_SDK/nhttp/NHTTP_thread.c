@@ -1367,18 +1367,18 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
         && req_p->proxyAuthorizationLength > 0)
     {
         sendStatus = NHTTPi_SendProxyAuthorization(threadData_p);
-    }
-    if (sendStatus != 0)
-    {
-        return sendStatus;
+        if (sendStatus != 0)
+        {
+            return sendStatus;
+        }
     }
     if (req_p->authorizationLength > 0)
     {
         sendStatus = NHTTPi_SendBasicAuthorization(threadData_p);
-    }
-    if (sendStatus != 0)
-    {
-        return sendStatus;
+        if (sendStatus != 0)
+        {
+            return sendStatus;
+        }
     }
     sendStatus = NHTTPi_SendHeaderList(threadData_p);
     if (sendStatus != 0)

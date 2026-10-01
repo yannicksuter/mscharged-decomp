@@ -349,13 +349,14 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
     int nRing;
     int angle;
     int angle90;
+    float ringScale;
+    float segmentFactor;
     float z0;
     float z1;
     float x0;
     float y0;
     float x1;
     float y1;
-    float invLen;
 
     prim.vertCount = 0x40;
     prim.position = (nlVector3*)glResourceAlloc(
@@ -369,8 +370,8 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
     ndst = prim.normal;
     tdst = prim.texcoord;
 
-    float ringScale = 0.5f;
-    float segmentFactor = 0.41887903f;
+    ringScale = 0.5f;
+    segmentFactor = 0.41887903f;
 
     for (nRing = 0; nRing < 2; nRing++)
     {
@@ -403,10 +404,9 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
             vNormal.y = y0;
             vNormal.z = z0;
 
-            invLen = nlRecipSqrt(nlVec3LengthSquared(vNormal), true);
+            nlVec3Normalize(vNormal, vNormal);
 
             pdst->x = x0;
-            nlVec3Scale(vNormal, invLen);
             pdst->y = y0;
             pdst->z = z0;
             *ndst = vNormal;
@@ -418,10 +418,9 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
             vNormal.y = y1;
             vNormal.z = z1;
 
-            invLen = nlRecipSqrt(nlVec3LengthSquared(vNormal), true);
+            nlVec3Normalize(vNormal, vNormal);
 
             pdst[1].x = x1;
-            nlVec3Scale(vNormal, invLen);
             pdst[1].y = y1;
             pdst[1].z = z1;
             ndst[1] = vNormal;

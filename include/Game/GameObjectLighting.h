@@ -35,6 +35,7 @@ bool AlwaysUseCameraRelativeCharacterLighting();
 // Shared lighting hooks used by the material programs.
 extern "C"
 {
+    bool fn_80183C54();
     int IsGameObjectLightingEnabled();
     int ShouldUseGameObjectLightTexture(int character);
     int ShouldDoubleGameObjectLighting();

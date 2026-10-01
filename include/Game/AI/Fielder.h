@@ -192,6 +192,7 @@ class cFielder : public cPlayer
     friend bool fn_800D0DB0(class DesireSuperPower*, void*);
 
 public:
+    void GetReceivePassBallContactOffset(nlVector3&, unsigned short, const LooseBallContactAnimInfo*);
     PlayerTweaks* GetTweaks() const;
     void AddDesiredPosition(const nlVector3& position, float urgency, float weight);
     float GetDistanceToDesiredPos();

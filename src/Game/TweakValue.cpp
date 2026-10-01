@@ -10,11 +10,11 @@ bool TweakBindingBase::Bind(const char* path)
     const char* name;
     char group[0x100];
     SplitTweakPath(path, &name, group);
-    return Bind(name, 0.0f, group, false, 0.0f, 0.0f);
+    return Bind(name, group, false, 0.0f, 0.0f, 0.0f);
 }
 
-bool TweakBindingBase::Bind(const char* name, float value,
-    const char* group, bool reload, float min, float max)
+bool TweakBindingBase::Bind(const char* name, const char* group,
+    bool reload, float value, float min, float max)
 {
     if (reload)
     {
@@ -29,7 +29,7 @@ bool TweakBindingBase::Bind(const char* name, float value,
             {
                 resolved = FormatTweakName(name, 0);
             }
-            return Bind(resolved, value, group, false, min, max);
+            return Bind(resolved, group, false, value, min, max);
         }
     }
     if (nlStrChr(name, '/') != 0)
@@ -39,7 +39,7 @@ bool TweakBindingBase::Bind(const char* name, float value,
         char combined[0x100];
         SplitTweakPath(name, &leaf, path);
         JoinTweakPath(group, path, combined);
-        return Bind(leaf, value, combined, false, min, max);
+        return Bind(leaf, combined, false, value, min, max);
     }
     {
         TweakEntry* entry = FindOrCreateTweakPath(GetTweakRoot(), group, 0);

@@ -519,7 +519,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         {
             float distance = fMoveDistance / fTimeRange;
 
-            float fMidTime = fTimeRange * 0.5f + fStartTime;
+            float fMidTime = fTimeRange / 2.0f + fStartTime;
 
             nlVector3 targetVelocity = pTarget->mUnidentified024.m_v3Velocity;
 
@@ -529,22 +529,15 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
                 targetVelocity = v3Zero;
             }
 
-            int nInterceptResult = 0;
-
             nlVector3 interceptPos;
-            interceptPos.z
-                = fMidTime * targetVelocity.z + pTarget->mUnidentified024.m_v3Position.z;
-            interceptPos.y
-                = fMidTime * targetVelocity.y + pTarget->mUnidentified024.m_v3Position.y;
-            interceptPos.x
-                = fMidTime * targetVelocity.x + pTarget->mUnidentified024.m_v3Position.x;
+            nlVec3ScaleAdd(interceptPos, fMidTime, targetVelocity,
+                pTarget->mUnidentified024.m_v3Position);
 
-            float fThisRadius = mUnidentified024.m_fPlayerScale;
-            float fTargetRadius = pTarget->mUnidentified024.m_fPlayerScale;
+            int nInterceptResult = 0;
             float fInterceptTimes[2];
             float combinedRadius
-                = fn_8002BFA8(this->GetTweaks(), fThisRadius)
-                + fn_8002BFA8(pTarget->GetTweaks(), fTargetRadius);
+                = fn_8002BFA8(this->GetTweaks(), GetPlayerScale())
+                + fn_8002BFA8(pTarget->GetTweaks(), pTarget->GetPlayerScale());
             CalcInterceptXY(mUnidentified024.m_v3Position, distance, combinedRadius,
                 pTarget->mUnidentified024.m_v3Position, targetVelocity, nInterceptResult,
                 fInterceptTimes);
@@ -568,17 +561,11 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
                 fTime = 0.5f * fStartTime + 0.5f * fEndTime;
             }
 
-            interceptPos.y
-                = (fTime * targetVelocity.y) + pTarget->mUnidentified024.m_v3Position.y;
-            interceptPos.x
-                = (fTime * targetVelocity.x) + pTarget->mUnidentified024.m_v3Position.x;
-            interceptPos.z
-                = (fTime * targetVelocity.z) + pTarget->mUnidentified024.m_v3Position.z;
+            nlVec3ScaleAdd(interceptPos, fTime, targetVelocity,
+                pTarget->mUnidentified024.m_v3Position);
 
             nlVector3 v3Delta;
-            v3Delta.x = interceptPos.x - mUnidentified024.m_v3Position.x;
-            v3Delta.y = interceptPos.y - mUnidentified024.m_v3Position.y;
-            v3Delta.z = interceptPos.z - mUnidentified024.m_v3Position.z;
+            nlVec3Sub(v3Delta, interceptPos, mUnidentified024.m_v3Position);
             Unknown8(nlVector3ToAngle(v3Delta), false);
             SetFacingDirection(mUnidentified024.m_aDesiredFacingDirection, true);
         }
@@ -3251,92 +3238,85 @@ void cFielder::fn_80044BEC(float fDeltaT)
 void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
     const nlVector3& wallNormal, bool bParam)
 {
-    if (m_eActionState == ACTION_ELECTROCUTION)
+    if (m_eActionState == ACTION_ELECTROCUTION || IsShattered() == true)
     {
         return;
     }
-    if (this->IsShattered() != true)
+
+    fn_8002E3F8(this);
+    fn_8009750C();
+
+    float fElectrocutionTime;
+    m_pCurrentAnimController->m_pSAnim->UnidentifiedGetRemainingTime(
+        m_pCurrentAnimController->m_fTime, fElectrocutionTime);
+    fElectrocutionTime += lbl_806DB920;
+
+    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    SetAction(ACTION_ELECTROCUTION);
+
+    if (m_pBall != 0)
     {
+        ReleaseBall(0);
 
-        fn_8002E3F8(this);
-        fn_8009750C();
-
-        float fElectrocutionTime = 1.0f - m_pCurrentAnimController->m_fTime;
-        fElectrocutionTime *= m_pCurrentAnimController->m_pSAnim->GetDuration();
-        fElectrocutionTime += lbl_806DB920;
-
-        InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction(ACTION_ELECTROCUTION);
-
-        if (m_pBall != 0)
-        {
-            ReleaseBall(0);
-
-            nlVector3 v3BallVelocity;
-            nlVec3Set(v3BallVelocity, 0.4f * mUnidentified024.m_v3Velocity.x,
-                0.5f * -mUnidentified024.m_v3Position.y, 6.0f);
-            g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
-            SetNoPickUpTime(0.5f);
-        }
-
-        SetFacingDirection(nlVector3ToAngle(wallNormal, 0x8000), true);
-        SetAnimState(0x76, true, 0.2f, false, false);
-        InitMovementNone(0.0f, 0.0f);
-
-        nlVector3 jointPos = GetJointPosition(m_nBip01JointIndex_0xA4);
-
-        nlVector3 futureJointPos;
-        GetJointPositionFuture(&futureJointPos, 0, m_nBip01JointIndex_0xA4,
-            0.0f, false, false, false, true);
-
-        futureJointPos.z += 0.25f;
-        jointPos.z = (jointPos.z >= futureJointPos.z) ? jointPos.z
-                                                      : futureJointPos.z;
-
-        float fNetWidth = cNet::m_fNetWidth;
-        if ((float)fabs(jointPos.y) < 0.5f * fNetWidth)
-        {
-            float fAdjust = mUnidentified024.m_fPlayerScale;
-            float fMaxY
-                = fn_8002BFA8(this->GetTweaks(), fAdjust) + 0.5f * fNetWidth;
-            float fMinY = -fMaxY;
-            float fY = jointPos.y;
-            fY = (fY >= fMinY) ? fY : fMinY;
-            fY = (fY <= fMaxY) ? fY : fMaxY;
-            jointPos.y = fY;
-        }
-
-        SetPosition(jointPos);
-
-        mUnidentified340 = fElectrocutionTime;
-        mUnidentified348 = false;
-        if (fElectrocutionTime < 0.3f)
-        {
-            mUnidentified340 = 0.3f;
-        }
-
-        if (bParam)
-        {
-            nlVector3 v3EffectPos;
-            v3EffectPos.x = wallPosition.x;
-            v3EffectPos.y = wallPosition.y;
-            v3EffectPos.z = jointPos.z;
-            CharacterElectrocutionEffect(this, v3EffectPos, wallNormal);
-        }
-        else
-        {
-            mUnidentified348 = true;
-            EmitElectrocution(this);
-        }
-
-        bool bUnidentified = IsCaptain();
-        unsigned long soundID = 0xBADF0EF9;
-        if (bUnidentified)
-        {
-            soundID = 0x1602CA52;
-        }
-        PlaySound(m_uSoundSlotId, soundID, 0, 0);
+        nlVector3 v3BallVelocity;
+        nlVec3Set(v3BallVelocity, 0.4f * mUnidentified024.m_v3Velocity.x,
+            0.5f * -mUnidentified024.m_v3Position.y, 6.0f);
+        g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
+        SetNoPickUpTime(0.5f);
     }
+
+    SetFacingDirection(nlVector3ToAngle(wallNormal, 0x8000), true);
+    SetAnimState(0x76, true, 0.2f, false, false);
+    InitMovementNone(0.0f, 0.0f);
+
+    nlVector3 newPosition = GetJointPosition(m_nBip01JointIndex_0xA4);
+
+    nlVector3 safeBip01Position;
+    GetJointPositionFuture(&safeBip01Position, 0, m_nBip01JointIndex_0xA4,
+        0.0f, false, false, false, true);
+
+    safeBip01Position.z += 0.25f;
+    newPosition.z = (newPosition.z >= safeBip01Position.z) ? newPosition.z : safeBip01Position.z;
+
+    float fNetWidth = cNet::m_fNetWidth;
+    if ((float)fabs(newPosition.y) < 0.5f * fNetWidth)
+    {
+        float fAdjust = mUnidentified024.m_fPlayerScale;
+        float fMaxY
+            = fn_8002BFA8(this->GetTweaks(), fAdjust) + 0.5f * fNetWidth;
+        newPosition.y = nlMinEquals(nlMaxEquals(newPosition.y, -fMaxY), fMaxY);
+    }
+
+    SetPosition(newPosition);
+
+    mUnidentified340 = fElectrocutionTime;
+    mUnidentified348 = false;
+    if (fElectrocutionTime < 0.3f)
+    {
+        mUnidentified340 = 0.3f;
+    }
+
+    if (bParam)
+    {
+        nlVector3 effectWallPosition;
+        effectWallPosition.x = wallPosition.x;
+        effectWallPosition.y = wallPosition.y;
+        effectWallPosition.z = newPosition.z;
+        CharacterElectrocutionEffect(this, effectWallPosition, wallNormal);
+    }
+    else
+    {
+        mUnidentified348 = true;
+        EmitElectrocution(this);
+    }
+
+    bool bUnidentified = IsCaptain();
+    unsigned long soundID = 0xBADF0EF9;
+    if (bUnidentified)
+    {
+        soundID = 0x1602CA52;
+    }
+    PlaySound(m_uSoundSlotId, soundID, 0, 0);
 }
 
 void cFielder::fn_800451B0(const nlVector3& v3Position)
@@ -4306,30 +4286,27 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
         if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
         {
             g_pBall->m_uGoalType = 2;
-            if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
+            if (GetCharacterClass() == (eCharacterClass)0x10)
             {
                 fn_800395C0(this);
             }
             else
             {
-                switch (mUnidentified024.m_eCharacterClass)
+                if (GetCharacterClass() == (eCharacterClass)0x0D
+                    || GetCharacterClass() == (eCharacterClass)0x12
+                    || GetCharacterClass() == (eCharacterClass)0x13)
                 {
-                case (eCharacterClass)0x0D:
-                case (eCharacterClass)0x12:
-                case (eCharacterClass)0x13:
                     fn_8004E438();
                     return true;
-                default:
-                    break;
                 }
-                if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0E)
+                if (GetCharacterClass() == (eCharacterClass)0x0E)
                 {
                     if (gNPCManager->mUnidentified02C != 0)
                     {
                         gNPCManager->mUnidentified02C->Activate(this);
                     }
                 }
-                else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x0C)
+                else if (GetCharacterClass() == (eCharacterClass)0x0C)
                 {
                     if (gNPCManager->mpBirdoEgg != 0)
                     {

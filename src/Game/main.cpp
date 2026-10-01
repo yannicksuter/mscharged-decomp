@@ -35,6 +35,7 @@
 #include "Game/Sys/clock.h"
 #include "Game/Sys/debug.h"
 #include "Game/GameInfo.h"
+#include "Game/GameObjectLighting.h"
 #include "Game/NisPlayer.h"
 #include "Game/ReplayManager.h"
 #include "Game/ReplayChoreo.h"
@@ -99,8 +100,11 @@
 class AudioUpdateTask : public nlTask
 {
 public:
-    virtual void Run(float dt);
     virtual const char* GetName() { return "Audio"; }
+    virtual void Run(float dt)
+    {
+        static_cast<GameAudio*>(g_pAudioSystem)->Update(dt);
+    }
 };
 
 class UnidentifiedMemCheckTask : public nlTask
@@ -132,8 +136,6 @@ extern "C"
     void fn_80184ADC();
 }
 
-bool fn_80183C54();
-
 void nlRegHandleDVDMessageCB(const Function<void(int)>&);
 void nlRegHandleDVDAllClearCB(const Function<void(int)>&);
 void nlRegHandleDVDRetryingCB(const Function<void(int)>&);
@@ -145,7 +147,6 @@ extern u8 lbl_806E1458;
 
 
 volatile int g_Region = 3;
-static u32 sPreviousTaskState = 1;
 
 static u32 sCountryCode;
 GameAudio* g_pGameAudio;
@@ -167,10 +168,6 @@ static float sUnidentifiedMemoryMetric0;
 static float sUnidentifiedMemoryMetric1;
 static float sUnidentifiedMemoryMetric2;
 int g_BuildNumber;
-static u32 sPreviousVirtualFree;
-static bool sDateTimeLoaded;
-static u32 sWarbleTexture;
-static char sWarbleTextureCached;
 
 FrameCounter g_FrameCounter("frame", "send");
 
@@ -279,6 +276,9 @@ bool IsAlternateOnlineCountryGroup()
 
 void UnidentifiedMemCheckTask::Run(float)
 {
+    static u32 sPreviousVirtualFree;
+    static u32 sPreviousTaskState = 1;
+
     const float bytesPerMiB = 1048576.0f;
     const u32 currentVirtualFree = VirtualAllocator.m_04;
 
@@ -317,6 +317,10 @@ void UnidentifiedMemCheckTask::Run(float)
 
     sPreviousTaskState = nlTaskManager::m_pInstance->mCurrentState;
 }
+
+static bool sDateTimeLoaded;
+static u32 sWarbleTexture;
+static char sWarbleTextureCached;
 
 static void PreInitFS()
 {
@@ -783,11 +787,6 @@ extern "C" void fn_8011D5B0(glShadowedTexturedColourModelWriter* writer,
         textureState->SetWrapT(false);
         textureState->unknown07 = 0;
     }
-}
-
-void AudioUpdateTask::Run(float dt)
-{
-    static_cast<GameAudio*>(g_pAudioSystem)->Update(dt);
 }
 
 int main()

@@ -123,7 +123,7 @@ void SkillTweak::ParseCurve(const char* text, int length)
     mCurve.mCount = count;
 }
 
-float SkillTweak::GetValue()
+float SkillTweak::GetValue() const
 {
     if (mpCurvePoints == 0)
         return mOverride;
@@ -135,54 +135,9 @@ float SkillTweak::GetValue()
     }
     else if (mpSkillTweaks != 0 && mModifier != 0)
     {
-        float skill = -9999.9f;
         float weightedSkill = 0.0f;
         float totalWeight = 0.0f;
-        switch (mModifier)
-        {
-        case 1:
-            skill = mpSkillTweaks->mDifficulty[0];
-            break;
-        case 2:
-            skill = mpSkillTweaks->mDifficulty[1];
-            break;
-        case 3:
-            skill = mpSkillTweaks->mDifficulty[2];
-            break;
-        case 4:
-            skill = mpSkillTweaks->mDifficulty[3];
-            break;
-        case 5:
-            skill = mpSkillTweaks->mDifficulty[4];
-            break;
-        case 6:
-            skill = mpSkillTweaks->mDifficulty[5];
-            break;
-        case 7:
-            skill = mpSkillTweaks->mDifficulty[6];
-            break;
-        case 8:
-            skill = mpSkillTweaks->mDifficulty[7];
-            break;
-        case 9:
-            skill = mpSkillTweaks->mDifficulty[8];
-            break;
-        case 10:
-            skill = mpSkillTweaks->mDifficulty[9];
-            break;
-        case 11:
-            skill = mpSkillTweaks->mDifficulty[10];
-            break;
-        case 12:
-            skill = mpSkillTweaks->mDifficulty[11];
-            break;
-        case 13:
-            skill = mpSkillTweaks->mDifficulty[12];
-            break;
-        case 14:
-            skill = mpSkillTweaks->mDifficulty[13];
-            break;
-        }
+        float skill = mpSkillTweaks->GetSkillRating(mModifier);
         float characterWeight = mpSkillTweaks->mCharacterWeight;
         weightedSkill += skill * (1.0f - characterWeight);
         totalWeight += 1.0f - characterWeight;
@@ -449,6 +404,8 @@ void SkillTweakCopier::Copy(const unsigned long& key, SkillTweak** value)
         *tweak = **value;
         tweak->mpSkillTweaks = mTweaks;
         tweak->mOwnsCurve = false;
+        // The release path discards this rating before loading the override.
+        mTweaks->GetSkillRating(tweak->mModifier);
         {
             char name[0x40];
             Config* cfg = mConfig;

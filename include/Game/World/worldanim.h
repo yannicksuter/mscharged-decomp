@@ -8,17 +8,18 @@
 #include "Game/World/WorldObject.h"
 #include "NL/nlAVLTree.h"
 
-struct WorldAnimBinding_803438FC;
+struct WorldAnimBinding;
 struct WorldPhysicsDescription;
 class CollisionSpace;
 class PhysicsObject;
 class WorldAnimController;
+class WorldPhysicsDrawable;
 
-class WorldAnimObject_803437C8 : public WorldObject
+class WorldAnimObject : public WorldObject
 {
 public:
-    virtual ~WorldAnimObject_803437C8();
-    virtual void UnidentifiedVirtual1C(WorldObjectLoadContext* context);
+    virtual ~WorldAnimObject();
+    virtual void Initialize(WorldObjectLoadContext* context);
 
     /* 0x04 */ unsigned long m_uHashID;
     /* 0x08 */ u8 m_pad08[0x08];
@@ -28,7 +29,7 @@ public:
     /* 0x1C */ u8 m_pad1C[0x44];
     /* 0x60 */ int m_nBindings;
     /* 0x64 */ unsigned long m_uHierarchyHash;
-    /* 0x68 */ WorldAnimBinding_803438FC* m_pBindings;
+    /* 0x68 */ WorldAnimBinding* m_pBindings;
     /* 0x6C */ u8 m_pad6C[0x04];
     /* 0x70 */ int m_nAnimations;
     /* 0x74 */ unsigned long* m_pAnimationHashes;
@@ -92,7 +93,7 @@ public:
     /* 0x08 */ AnimationSet* m_pAnimationSet;
     /* 0x0C */ nlMatrix4 m_worldMatrix;
     /* 0x4C */ void* mUnidentified4C;
-    /* 0x50 */ WorldAnimObject_803437C8* m_pWorldAnimObject;
+    /* 0x50 */ WorldAnimObject* m_pWorldAnimObject;
 };
 
 class WorldAnimManager
@@ -119,6 +120,7 @@ public:
     AnimationSet* LoadHierarchy(nlChunk* pChunk);
     void LoadAnimationSet(AnimationSet* pAnimationSet, nlChunk* pChunk);
     void BindObjects();
+    inline float GetFrame(int nFrames, int nFrameRate) const;
     void Update(float fDeltaT);
 
     /* 0x00 */ cInventory<cSHierarchy>* m_pHierarchyInventory;
@@ -131,6 +133,7 @@ public:
 
 PhysicsObject* CreatePhysicsPrimitive(
     WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
+void ReleaseWorldPhysicsObject(WorldPhysicsDrawable* pOwner);
 
 typedef char AnimationSet_size_check[sizeof(AnimationSet) == 0x20 ? 1 : -1];
 typedef char WorldAnimController_size_check[

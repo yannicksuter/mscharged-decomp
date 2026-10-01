@@ -904,10 +904,9 @@ bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
     if (bUnidentifiedCollision)
     {
         const nlVector3& v3Normal = context.mUnidentified044;
-        float fDot = -context.UnidentifiedGetAlignment();
         context.mUnidentified014 = 2;
         nlVec3Scale(context.mUnidentified000, v3Normal, context.mUnidentified01C);
-        if (!(fDot >= 0.7f))
+        if (!(-nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054) >= 0.7f))
         {
             nlVector3 v3Repulsion;
             UnidentifiedTurn(v3Repulsion, context.mUnidentified054, v3Normal, false);
@@ -975,10 +974,9 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
     if (bUnidentifiedCollision)
     {
         const nlVector3& v3Normal = context.mUnidentified044;
-        float fDot = -context.UnidentifiedGetAlignment();
         context.mUnidentified014 = 2;
         nlVec3Scale(context.mUnidentified000, v3Normal, context.mUnidentified01C);
-        if (fDot >= 0.0f)
+        if (-nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054) >= 0.0f)
         {
             nlVector3 v3Repulsion;
             UnidentifiedTurn(v3Repulsion, context.mUnidentified054, v3Normal, false);

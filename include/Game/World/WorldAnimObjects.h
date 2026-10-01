@@ -11,12 +11,19 @@ class GLView;
 class glModel;
 class PhysicsObject;
 class WorldAnimController;
+class WorldAnimObject;
 struct WorldVisibilityNode;
 
-class WorldVertexAnimDrawable_80343E3C : public WorldObject
+struct WorldAnimBinding
+{
+    unsigned long m_uDrawableHash;
+    unsigned long m_uNodeHash;
+};
+
+class WorldVisibilityDrawable : public WorldObject
 {
 public:
-    virtual ~WorldVertexAnimDrawable_80343E3C();
+    virtual ~WorldVisibilityDrawable();
     virtual void Draw();
     virtual bool IsVisible();
 
@@ -26,7 +33,7 @@ public:
     /* 0x10 */ World* m_pWorld;
     /* 0x14 */ u8 m_pad14[0x0C];
     /* 0x20 */ glModel* m_pModel;
-    /* 0x24 */ WorldVisibilityNode* m_pVertexAnimNode;
+    /* 0x24 */ WorldVisibilityNode* m_pVisibilityNode;
     /* 0x28 */ u8 m_pad28[0x08];
 };
 
@@ -39,10 +46,10 @@ public:
     /* 0x0C */ unsigned long m_uObjectCreationFlags;
 }; // size: 0x10
 
-class WorldPhysicsDrawable_80534448 : public WorldObjectBase_803416DC
+class WorldPhysicsDrawable : public WorldObjectBase_803416DC
 {
 public:
-    virtual ~WorldPhysicsDrawable_80534448() { }
+    virtual ~WorldPhysicsDrawable() { }
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);
@@ -54,11 +61,19 @@ public:
     /* 0x84 */ u8 m_pad84[0x0C];
 }; // size: 0x90
 
-extern "C" void fn_8034417C(WorldPhysicsDrawable_80534448* pObject);
+void BindWorldAnimObjectDrawables(WorldAnimObject* pAnimObject);
+void SelectRandomWorldAnimation(WorldAnimObject* pAnimObject);
+void InitializeWorldVisibilityDrawable(WorldVisibilityDrawable* pDrawable,
+    WorldObjectLoadContext* pContext);
+WorldVisibilityNode* FindWorldVisibilityNode(WorldVisibilityDrawable* pDrawable,
+    WorldVisibilityNode* pNode);
+void InitializeWorldPhysicsDrawable(WorldPhysicsDrawable* pDrawable,
+    WorldObjectLoadContext* pContext);
+void ReleaseWorldPhysicsDrawableResources(WorldPhysicsDrawable* pDrawable);
 
 typedef char WorldDrawable_size_check[
     sizeof(WorldDrawable) == 0x70 ? 1 : -1];
-typedef char WorldPhysicsDrawable_80534448_size_check[
-    sizeof(WorldPhysicsDrawable_80534448) == 0x90 ? 1 : -1];
+typedef char WorldPhysicsDrawable_size_check[
+    sizeof(WorldPhysicsDrawable) == 0x90 ? 1 : -1];
 
 #endif // GAME_WORLD_WORLD_ANIM_OBJECTS_H

@@ -533,7 +533,7 @@ void FEModelManager::DestroyDanglingModels()
         if (!handle->mModel->mLoadQueued)
         {
             delete handle;
-            mDanglingModels.Remove(&danglingModels);
+            mDanglingModels.RemoveEntry(danglingModels.next());
         }
         else
         {
@@ -551,7 +551,7 @@ void FEModelManager::DestroyPendingModels()
         if (handle->CanDestroy())
         {
             delete *pendingModels;
-            mPendingModels.Remove(&pendingModels);
+            mPendingModels.RemoveEntry(pendingModels.next());
         }
         else
         {

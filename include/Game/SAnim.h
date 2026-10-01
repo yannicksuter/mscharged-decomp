@@ -101,6 +101,12 @@ public:
         return fNumKeys / 30.0f;
     }
 
+    void UnidentifiedGetRemainingTime(float normalizedTime, float& remainingTime) const
+    {
+        remainingTime = 1.0f - normalizedTime;
+        remainingTime *= GetDuration();
+    }
+
     unsigned int m_nNumKeys;
     unsigned int m_nNumNodes;
     unsigned int m_nNumMorphChannels;

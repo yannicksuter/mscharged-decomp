@@ -28,11 +28,6 @@ public:
     virtual void Update(float fDeltaT);
 };
 
-void CreateWorldVertexAnimDrawable(
-    WorldVertexAnimDrawable_80343E3C*, WorldObjectLoadContext*);
-extern "C" void fn_80344144(
-    WorldPhysicsDrawable_80534448*, WorldObjectLoadContext*);
-
 u8* WorldObjectLoadContext::GetParentData()
 {
     if (m_pParent == 0)
@@ -297,16 +292,16 @@ DrawableObject* World::CreateObject(
         break;
     case 0x102:
         pObject = (DrawableObject*)pContext->m_pObject;
-        new (pObject) WorldVertexAnimDrawable_80343E3C;
-        CreateWorldVertexAnimDrawable(
-            (WorldVertexAnimDrawable_80343E3C*)pObject, pContext);
+        new (pObject) WorldVisibilityDrawable;
+        InitializeWorldVisibilityDrawable(
+            (WorldVisibilityDrawable*)pObject, pContext);
         pContext->m_pObject += 0x30;
         ++pContext->m_uNumObjectsLoaded;
         break;
     case 0x103:
         pObject = (DrawableObject*)pContext->m_pObject;
-        new (pObject) WorldPhysicsDrawable_80534448;
-        fn_80344144((WorldPhysicsDrawable_80534448*)pObject, pContext);
+        new (pObject) WorldPhysicsDrawable;
+        InitializeWorldPhysicsDrawable((WorldPhysicsDrawable*)pObject, pContext);
         pContext->m_pObject += 0x90;
         ++pContext->m_uNumObjectsLoaded;
         break;
@@ -319,8 +314,8 @@ DrawableObject* World::CreateObject(
         break;
     case 0x106:
         pObject = (DrawableObject*)pContext->m_pObject;
-        new (pObject) WorldAnimObject_803437C8;
-        ((WorldAnimObject_803437C8*)pObject)->UnidentifiedVirtual1C(pContext);
+        new (pObject) WorldAnimObject;
+        ((WorldAnimObject*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x90;
         ++pContext->m_uNumObjectsLoaded;
         break;
@@ -341,7 +336,7 @@ DrawableObject* World::CreateObject(
     case 0x109:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldEffect;
-        ((WorldEffect*)pObject)->UnidentifiedVirtual1C(pContext);
+        ((WorldEffect*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0xA0;
         ++pContext->m_uNumObjectsLoaded;
         break;
@@ -352,11 +347,11 @@ DrawableObject* World::CreateObject(
     return pObject;
 }
 
-bool World::ResolveModel(glModel*& pMaterial) const
+bool World::ResolveModel(glModel*& pModel) const
 {
-    unsigned long uHashID = (unsigned long)pMaterial;
-    pMaterial = m_pResource->m_inventory->GetModel(uHashID);
-    if (pMaterial == 0)
+    unsigned long uHashID = (unsigned long)pModel;
+    pModel = m_pResource->m_inventory->GetModel(uHashID);
+    if (pModel == 0)
     {
         nlPrintf(
             "Warning: Failed to find GL model to match world object 0x%08x\n",

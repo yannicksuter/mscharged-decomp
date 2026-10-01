@@ -63,19 +63,6 @@ static inline XSoundHandle** FindAudioHandleSlot(
     return slot;
 }
 
-static inline void AddAudioHandleState(int slotId, unsigned long cueId,
-    void* context, bool restartable)
-{
-    AudioHandleState state;
-    state.m_CueId = cueId;
-    state.m_Context = context;
-    state.m_FlagsHi16 = slotId;
-    state.m_FlagsBit15 = restartable;
-    state.m_FlagsBits12_14 = 0;
-    unsigned long key = MakeAudioHandleKey(cueId, context);
-    sAudioHandleStates.Add(key, state);
-}
-
 GameAudio::GameAudio()
     : AudioSystem()
     , m_PlayRequestCount(0)
@@ -311,7 +298,10 @@ bool PlayTrackedSound(int slotId, unsigned long cueId,
 
     if (played)
     {
-        AddAudioHandleState(slotId, cueId, context, restartable);
+        AudioHandleState state;
+        state.Set(slotId, cueId, context, restartable);
+        unsigned long key = MakeAudioHandleKey(cueId, context);
+        sAudioHandleStates.Add(key, state);
         return true;
     }
     return false;
@@ -323,7 +313,10 @@ bool PlayTrackedOwnedSound(int slotId, unsigned long cueId,
 {
     if (PlayOwnedSound(slotId, cueId, owner, debugName, context))
     {
-        AddAudioHandleState(slotId, cueId, context, restartable);
+        AudioHandleState state;
+        state.Set(slotId, cueId, context, restartable);
+        unsigned long key = MakeAudioHandleKey(cueId, context);
+        sAudioHandleStates.Add(key, state);
         return true;
     }
     return false;
@@ -409,37 +402,40 @@ void AudioSystem::ResumeTrackedSound(
 
 void ResumeSound(unsigned long cueId, void* context)
 {
-    if (cueId != 0xFFFFFFFF)
+    if (cueId == 0xFFFFFFFF)
     {
-        unsigned long key = MakeAudioHandleKey(cueId, context);
-        XSoundHandle** slot = 0;
-        if (sAudioHandles.FindGet(key, &slot))
+        return;
+    }
+    unsigned long key = MakeAudioHandleKey(cueId, context);
+    XSoundHandle** slot = 0;
+    if (!sAudioHandles.FindGet(key, &slot))
+    {
+        return;
+    }
+    AudioHandleState* state;
+    sAudioHandleStates.FindGet(key, &state);
+    if (state->m_FlagsBits12_14 < sAudioPauseDepth)
+    {
+        return;
+    }
+    if (state->m_FlagsBit15 != 0)
+    {
+        if (*slot != 0)
         {
-            AudioHandleState* state;
-            sAudioHandleStates.FindGet(key, &state);
-            if (state->m_FlagsBits12_14 >= sAudioPauseDepth)
-            {
-                if (state->m_FlagsBit15 != 0)
-                {
-                    if (*slot != 0)
-                    {
-                        (*slot)->Resume();
-                    }
-                }
-                else
-                {
-                    *slot = CreateSoundHandle(state->m_FlagsHi16,
-                        state->m_CueId,
-                        0,
-                        sResumedCue,
-                        context,
-                        true);
-                    (*slot)->Play(false);
-                }
-                state->m_FlagsBits12_14 = 0;
-            }
+            (*slot)->Resume();
         }
     }
+    else
+    {
+        *slot = CreateSoundHandle(state->m_FlagsHi16,
+            state->m_CueId,
+            0,
+            sResumedCue,
+            context,
+            true);
+        (*slot)->Play(false);
+    }
+    state->m_FlagsBits12_14 = 0;
 }
 
 void SetLastSoundParameter(unsigned long parameter, float value)
@@ -491,7 +487,10 @@ bool PrepareTrackedSound(int slotId, unsigned long cueId,
         slotId, cueId, owner, debugName, context, false);
     if (handle != 0)
     {
-        AddAudioHandleState(slotId, cueId, context, restartable);
+        AudioHandleState state;
+        state.Set(slotId, cueId, context, restartable);
+        unsigned long key = MakeAudioHandleKey(cueId, context);
+        sAudioHandleStates.Add(key, state);
     }
     if (handle != 0)
     {

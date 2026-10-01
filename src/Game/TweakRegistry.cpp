@@ -274,7 +274,7 @@ void BindPendingTweaks(void)
                 }
             }
             if (!((TweakBindingBase*)value)
-                    ->Bind(value->mName, 0.0f, pending->m_Category, false, 0.0f, 0.0f))
+                    ->Bind(value->mName, pending->m_Category, false, 0.0f, 0.0f, 0.0f))
             {
                 TweakFloatBinding* impl = (TweakFloatBinding*)value;
                 switch (type)

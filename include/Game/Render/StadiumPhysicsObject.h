@@ -31,7 +31,7 @@ public:
 }; // size: 0x70
 
 // Builds its static physics primitive when loaded and removes it on release.
-class StadiumPhysicsObject : public WorldPhysicsDrawable_80534448
+class StadiumPhysicsObject : public WorldPhysicsDrawable
 {
 public:
     virtual ~StadiumPhysicsObject();
