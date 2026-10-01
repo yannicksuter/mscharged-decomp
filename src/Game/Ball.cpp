@@ -1994,10 +1994,35 @@ void cBall::ShootRelease(const nlVector3& v3Velocity, eSpinType SpinType)
     pPhysicsBall->mfChargeBonus = 0.0f;
 }
 
+// Keep this inline separate: fn_800156F8 needs a different local order
+// to preserve its floating-point register allocation.
+static inline void CalculateFastShotVelocity(cBall* pBall, nlVector3& v3Vel,
+    const nlVector3& v3Target, float fDesiredTime)
+{
+    float gravity = pBall->m_pPhysicsBall->m_gravity;
+    float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
+    float g;
+    float k;
+    k = lbl_806DB584 * airResistance;
+    g = lbl_806DB588 * gravity;
+    float eToTheNegativeKT = Exp(-k * fDesiredTime);
+    float kSquaredOverOneMinusEToTheNegativeKT
+        = (k * k) / (1.0f - eToTheNegativeKT);
+    float oneOverK = 1.0f / k;
+
+    v3Vel.x = kSquaredOverOneMinusEToTheNegativeKT
+            * (oneOverK * (v3Target.x - pBall->m_v3Position.x));
+    v3Vel.y = kSquaredOverOneMinusEToTheNegativeKT
+            * (oneOverK * (v3Target.y - pBall->m_v3Position.y));
+    v3Vel.z = kSquaredOverOneMinusEToTheNegativeKT
+                * (oneOverK * (v3Target.z - pBall->m_v3Position.z - g * fDesiredTime / k))
+            + g / k;
+}
+
 void cBall::ShootAtFast(nlVector3& v3Vel, const nlVector3& v3Target,
     float fDesiredTime)
 {
-    ShootAtFastImpl(this, v3Vel, v3Target, fDesiredTime);
+    CalculateFastShotVelocity(this, v3Vel, v3Target, fDesiredTime);
 }
 
 extern "C" void fn_80017114(cBall* pBall)
@@ -2353,8 +2378,10 @@ extern "C" void fn_800180F4(
 {
     float airResistance = pBall->m_pPhysicsBall->mfBallAirResistance;
     float gravity = pBall->m_pPhysicsBall->m_gravity;
-    float k = lbl_806DB584 * airResistance;
-    float g = lbl_806DB588 * gravity;
+    float g;
+    float k;
+    k = lbl_806DB584 * airResistance;
+    g = lbl_806DB588 * gravity;
     float eToTheNegativeKT = Exp(-k * fTime);
     float oneMinusEToTheNegativeKTOverK
         = (1.0f / k) * (1.0f - eToTheNegativeKT);
