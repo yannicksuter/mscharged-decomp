@@ -2830,7 +2830,7 @@ extern "C" void fn_80017F18(cBall* pBall)
     }
 
     float fValue = pBall->mfChargeValue;
-    float fChargeLoss = g_fSimulationTick / lbl_806DB50C / 2.0f;
+    float fChargeLoss = (g_fSimulationTick / lbl_806DB50C) * FullBallCharge();
     if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
     {
         pBall->mfChargeValue = 4.0f;
@@ -2840,7 +2840,7 @@ extern "C" void fn_80017F18(cBall* pBall)
         pBall->mfChargeValue = fValue - fChargeLoss;
     }
 
-    float fMaxCharge = lbl_806DB510 * 4.0f;
+    float fMaxCharge = lbl_806DB510 * FullBallCharge();
     fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
