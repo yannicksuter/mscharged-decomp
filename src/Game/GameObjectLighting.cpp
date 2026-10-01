@@ -214,7 +214,7 @@ void PrepareStadiumLight(StadiumLight* pLight)
     const nlMatrix4& matrix = *pLight->GetWorldMatrix();
     ConvertColour(light.colour, pLight->m_colour);
     light.worldPosition = matrix.GetTranslation();
-    light.intensity = pLight->m_fIntensity;
+    light.intensity = pLight->GetIntensity();
 }
 
 void InitializeGameObjectLighting()

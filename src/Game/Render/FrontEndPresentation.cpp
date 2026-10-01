@@ -7,6 +7,7 @@
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/Render/StadiumLoading.h"
+#include "Game/Render/StadiumPhysicsObject.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/FE/feCupFlow.h"
 
@@ -53,16 +54,6 @@ extern "C" bool IsTournamentTrophyLoaded();
 extern "C" void FinishLoadTournamentTrophy();
 extern "C" void SetWorldAnimation(unsigned int, unsigned int, unsigned int);
 extern "C" void TriggerEffects(BasicStadium*, unsigned int);
-
-
-class PresentationLookupResult
-{
-public:
-    virtual ~PresentationLookupResult();
-    virtual void UnidentifiedVirtual1() = 0;
-    virtual void* GetValue() = 0;
-};
-
 
 inline FrontEndPresentation::FrontEndPresentation()
     : InterpreterCore(100)

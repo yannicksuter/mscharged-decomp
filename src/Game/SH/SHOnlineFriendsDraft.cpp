@@ -2,7 +2,7 @@
 
 #include "Game/GameSceneManager.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 #include "Game/FE/feDPD.h"
 #include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinder_impl.h"
@@ -139,12 +139,12 @@ void SHOnlineFriendsDraft::SceneCreated()
         TLComponentInstance* instance = FEFinder<TLComponentInstance, 4>::Find<>(
             mPresentation->GetActiveSlide(), "Layer", buffer);
         if (instance == 0)
-            instance = &UnidentifiedTLComponentDefault::sInstance;
+            instance = &TLComponentDefault::sInstance;
         mPlayerRowInstances[i] = instance;
     }
     TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer", "scrollbar");
-    mScrollBar.SetComponent(scrollbar == 0 ? &UnidentifiedTLComponentDefault::sInstance : scrollbar);
+    mScrollBar.SetComponent(scrollbar == 0 ? &TLComponentDefault::sInstance : scrollbar);
     mScrollBar.SetRange(0);
     mScrollBar.SetValue(0);
     GetNavigationScene()->SetButtons(0, true);

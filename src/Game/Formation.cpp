@@ -22,20 +22,17 @@
 #include <mem.h>
 
 extern "C" float fn_8002E1B0(cFielder*);
-extern "C" cFielder* fn_800A8800(cTeam*);
-extern "C" cFielder* fn_800A8808(cTeam*);
-extern "C" cFielder* fn_800A8884(cTeam*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
-static const float lbl_804DBF28[4][4] = {
+static const float sFielderPositionBonus[4][4] = {
     { 5.0f, 3.0f, 1.0f, 1.0f },
     { 1.8f, 3.0f, 1.2f, 1.0f },
     { 1.0f, 1.2f, 2.5f, 1.2f },
     { 1.0f, 1.0f, 1.2f, 2.5f },
 };
-static const float lbl_804DBF68[4] = { 0.6f, 0.2f, 0.1f, 0.1f };
-static const int lbl_804DBF78[4] = { 0, 1, 2, 3 };
-static const int lbl_804DBF88[4] = { 3, 2, 1, 0 };
+static const float sFielderCenterWeights[4] = { 0.6f, 0.2f, 0.1f, 0.1f };
+static const int sAscendingFielderOrder[4] = { 0, 1, 2, 3 };
+static const int sDescendingFielderOrder[4] = { 3, 2, 1, 0 };
 
 struct FormationPositionThresholds
 {
@@ -52,7 +49,7 @@ static const FormationPositionThresholds g_aDefensiveFormationThresholds[4] = {
     { 0.6f, 3.0f, 1.0f, 2.0f },
 };
 
-bool lbl_806DBA20 = true;
+bool g_bUseFielderPositionBonuses = true;
 
 int FormationManager::m_NumFormationSets = 0;
 FormationSet* FormationManager::m_FormationSetArray = 0;
@@ -69,8 +66,8 @@ FormationManager::FormationManager(cTeam* pTeam)
     m_CachedPositions[3].bCacheIsValid = false;
     m_v2AIFielderCenter.x = 0.0f;
     m_v2AIFielderCenter.y = 0.0f;
-    field_0x18.x = 0.0f;
-    field_0x18.y = 0.0f;
+    m_v2WeightedFielderCenter.x = 0.0f;
+    m_v2WeightedFielderCenter.y = 0.0f;
     m_tSelectFormationsTimer.m_uWasRunning = m_tSelectFormationsTimer.m_uPackedTime != 0;
     m_tSelectFormationsTimer.m_uPackedTime = 0;
 }
@@ -177,20 +174,20 @@ inline void FormationManager::AccumulateWeightedFielderCenter(const float*& pWei
     int i;
     for (i = 0; i < 4; i++)
     {
-        pFielder = m_pTeam->mUnidentified0D8[i];
+        pFielder = m_pTeam->m_pFieldersByTeamRelativeX[i];
         bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
         if (!bIgnoreFielder)
         {
-            float newY = field_0x18.y + *pWeight * pFielder->mUnidentified024.m_v3Position.y;
-            float newX = field_0x18.x + *pWeight * pFielder->mUnidentified024.m_v3Position.x;
-            field_0x18.y = newY;
-            field_0x18.x = newX;
+            float newY = m_v2WeightedFielderCenter.y + *pWeight * pFielder->mUnidentified024.m_v3Position.y;
+            float newX = m_v2WeightedFielderCenter.x + *pWeight * pFielder->mUnidentified024.m_v3Position.x;
+            m_v2WeightedFielderCenter.y = newY;
+            m_v2WeightedFielderCenter.x = newX;
             pWeight++;
         }
     }
 }
 
-void FormationManager::Update(float dt)
+void FormationManager::Update(float fDeltaT)
 {
     if (!g_pGame->IsGameplayOrOvertime())
     {
@@ -202,7 +199,7 @@ void FormationManager::Update(float dt)
     m_CachedPositions[2].bCacheIsValid = false;
     m_CachedPositions[3].bCacheIsValid = false;
 
-    m_tSelectFormationsTimer.Countdown(dt, 0.0f);
+    m_tSelectFormationsTimer.Countdown(fDeltaT, 0.0f);
 
     if (m_tSelectFormationsTimer.m_uPackedTime == 0 && g_pBall->GetOwnerGoalie() == 0)
     {
@@ -210,30 +207,30 @@ void FormationManager::Update(float dt)
         m_tSelectFormationsTimer.SetSeconds(2.0f + nlRandomf(0.2f));
     }
 
-    fn_80051F00(&m_v2AIFielderCenter);
+    CalculateAIFielderCenter(&m_v2AIFielderCenter);
 
-    field_0x18.x = 0.0f;
-    field_0x18.y = 0.0f;
+    m_v2WeightedFielderCenter.x = 0.0f;
+    m_v2WeightedFielderCenter.y = 0.0f;
 
-    const float* pWeight = lbl_804DBF68;
+    const float* pWeight = sFielderCenterWeights;
     AccumulateWeightedFielderCenter(pWeight);
 
     if (m_pTeam->m_nSide == 1)
     {
-        field_0x18.x = -field_0x18.x;
-        field_0x18.y = -field_0x18.y;
+        m_v2WeightedFielderCenter.x = -m_v2WeightedFielderCenter.x;
+        m_v2WeightedFielderCenter.y = -m_v2WeightedFielderCenter.y;
     }
 
     for (int i = 0; i < 3; i++)
     {
         if (m_pFormations[i] != 0)
         {
-            m_pFormations[i]->Update(dt);
+            m_pFormations[i]->Update(fDeltaT);
         }
     }
 }
 
-void FormationManager::fn_80050D24()
+void FormationManager::ResetToDefaults()
 {
     s32 j;
     FormationEval** pp = (FormationEval**)this;
@@ -252,8 +249,8 @@ void FormationManager::fn_80050D24()
     m_CachedPositions[3].bCacheIsValid = false;
     m_v2AIFielderCenter.x = 0.0f;
     m_v2AIFielderCenter.y = 0.0f;
-    field_0x18.x = 0.0f;
-    field_0x18.y = 0.0f;
+    m_v2WeightedFielderCenter.x = 0.0f;
+    m_v2WeightedFielderCenter.y = 0.0f;
 }
 
 void FormationManager::ChooseNewFormations()
@@ -263,13 +260,13 @@ void FormationManager::ChooseNewFormations()
     unsigned int ballFormationSet;
 
     InterpreterCore* context = GetTeamFuzzyRuntime(m_pTeam);
-    UnidentifiedVariant_80054AB8 result = fn_80054AB8(context, "BestDefensiveFormation", m_pTeam);
+    UnidentifiedVariant_80054AB8 result = EvaluateTeamFuzzyFunction(context, "BestDefensiveFormation", m_pTeam);
     defensiveFormation = result.GetInt();
 
-    result = fn_80054AB8(context, "BestOffensiveFormation", m_pTeam);
+    result = EvaluateTeamFuzzyFunction(context, "BestOffensiveFormation", m_pTeam);
     offensiveFormation = result.GetInt();
 
-    result = fn_80054AB8(context, "BestBallFormationSet", m_pTeam);
+    result = EvaluateTeamFuzzyFunction(context, "BestBallFormationSet", m_pTeam);
     ballFormationSet = result.GetInt();
 
     if (defensiveFormation == 0)
@@ -316,7 +313,7 @@ void FormationManager::ChooseNewFormations()
     }
 }
 
-void FormationManager::fn_80051F00(nlVector2* pCenter)
+void FormationManager::CalculateAIFielderCenter(nlVector2* pCenter)
 {
     pCenter->x = 0.0f;
     pCenter->y = 0.0f;
@@ -351,14 +348,14 @@ void FormationManager::fn_80051F00(nlVector2* pCenter)
     }
 }
 
-unsigned int* FormationManager::fn_80052034()
+unsigned int* FormationManager::GetHighestWeightFielderOrder()
 {
     float fBestWeight = 0.0f;
     unsigned int* pFielderFormationPos = 0;
     float fBallFormationWeight = 0.0f;
 
     if (m_pFormations[FTYPE_BALLPOSITION] != 0
-        && m_pFormations[FTYPE_BALLPOSITION]->fn_80054A20())
+        && m_pFormations[FTYPE_BALLPOSITION]->HasActiveFormation())
     {
         fBallFormationWeight = m_pFormations[FTYPE_BALLPOSITION]->GetWeight(0);
     }
@@ -366,7 +363,7 @@ unsigned int* FormationManager::fn_80052034()
     for (int i = 0; i < NUM_FORMATION_TYPES; i++)
     {
         FormationEval* pFormation = m_pFormations[i];
-        if (pFormation != 0 && pFormation->fn_80054A20())
+        if (pFormation != 0 && pFormation->HasActiveFormation())
         {
             float fWeight;
             if (pFormation->m_eFormationType == FTYPE_BALLPOSITION)
@@ -410,7 +407,7 @@ bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
     for (int i = 0; i < 3; i++)
     {
         FormationEval* pFormation = m_pFormations[i];
-        if (pFormation != 0 && pFormation->fn_80054A20())
+        if (pFormation != 0 && pFormation->HasActiveFormation())
         {
             fWeights[i] = pFormation->GetWeight(0);
             pFormation->CalculateDesiredLocation(v3FormationPosition[1][i], pFielder, true);
@@ -443,7 +440,7 @@ bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
     for (int i = 0; i < 3; i++)
     {
         FormationEval* pFormation = m_pFormations[i];
-        if (pFormation != 0 && pFormation->fn_80054A20())
+        if (pFormation != 0 && pFormation->HasActiveFormation())
         {
             nlVector3 pos = v3FormationPosition[0][i];
             float weight = fWeights[i];
@@ -487,7 +484,7 @@ static inline const FormationSpec* GetFormationSpecInline(int id)
     return spec;
 }
 
-static inline FormationSet* UnidentifiedFormationSetLookup(eFormationSet id)
+static inline FormationSet* FindFormationSetByID(eFormationSet id)
 {
     int i;
     for (i = 0; i < FormationManager::m_NumFormationSets; i++)
@@ -510,7 +507,7 @@ FormationEval* FormationEval::Create(FormationManager* pManager, eFormationType 
 
     if ((unsigned int)formSetID != (unsigned int)-1)
     {
-        formSet = UnidentifiedFormationSetLookup(formSetID);
+        formSet = FindFormationSetByID(formSetID);
     }
 
     if ((unsigned int)formType != (unsigned int)-1)
@@ -546,7 +543,7 @@ FormationEval* FormationEval::Create(FormationManager* pManager, eFormationType 
 
 void FormationEval::Update(float fDeltaT)
 {
-    fn_80052978();
+    ResetKeyPlayer();
 
     if (m_SortTimer.Countdown(fDeltaT, 0.0f))
     {
@@ -560,7 +557,7 @@ float FormationEval::GetWeight(const nlVector2* v2AIBallLoc)
 {
     float fWeight = 1.0f;
 
-    if (!fn_80054A20())
+    if (!HasActiveFormation())
     {
         fWeight = 0.0f;
     }
@@ -590,7 +587,7 @@ float FormationEval::GetWeight(const nlVector2* v2AIBallLoc)
     return fWeight;
 }
 
-void FormationEval::fn_80052978()
+void FormationEval::ResetKeyPlayer()
 {
     m_pKeyPlayer = 0;
 }
@@ -655,7 +652,7 @@ void FormationEval::AssignPositionsToFielders(
                     float fCaptainPosScore = 0.0f;
                     float fCaptainPosCount = fCaptainPosScore;
                     int* piAssignedPos = aiAssignedPos;
-                    const float* pCaptainPosBonus = lbl_804DBF28[0];
+                    const float* pCaptainPosBonus = sFielderPositionBonus[0];
 
                     for (int iFielder = 0; iFielder < 4; iFielder++)
                     {
@@ -666,7 +663,7 @@ void FormationEval::AssignPositionsToFielders(
                             fCaptainPosScore += 25.0f;
                             fCaptainPosCount += 5.0f;
                         }
-                        else if (lbl_806DBA20)
+                        else if (g_bUseFielderPositionBonuses)
                         {
                             float fCaptainPosBonus = pCaptainPosBonus[*piAssignedPos];
                             if (fCaptainPosBonus > 0.0f)
@@ -737,6 +734,8 @@ static inline cTeam* GetFormationTeam(FormationManager* manager)
     return manager->m_pTeam;
 }
 
+extern const float g_fFielderOrderPenalty = 10.0f;
+
 void FormationEval::SortPlayers(const nlVector2* v2Center)
 {
     cFielder* pFielder;
@@ -749,7 +748,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     cFielder* pFielder2;
     int i_pos;
 
-    if (!fn_80054A20())
+    if (!HasActiveFormation())
     {
         return;
     }
@@ -802,10 +801,10 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
             m_pFormationSpec->m_Positions[i].m_Location, v2CenterOfPlayers);
     }
 
-    const int* pFielderOrder = lbl_804DBF78;
+    const int* pFielderOrder = sAscendingFielderOrder;
     if (m_pFormationManager->m_pTeam->mpCurrentSituation == 0)
     {
-        pFielderOrder = lbl_804DBF88;
+        pFielderOrder = sDescendingFielderOrder;
     }
 
     for (i_fielder = 0; i_fielder < 4; i_fielder++)
@@ -824,8 +823,9 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
 
             if (bApplyFielderOrder)
             {
+                const float& fFielderOrderPenalty = g_fFielderOrderPenalty;
                 fFielderToPositionDistance[i_fielder][i_pos]
-                    += 10.0f * (float)pFielderOrder[i_pos];
+                    += fFielderOrderPenalty * (float)pFielderOrder[i_pos];
             }
         }
     }
@@ -892,15 +892,15 @@ cPlayer* FormationEval::GetKeyPlayer()
     {
         if (m_eFormationType == FTYPE_DEFENSIVE)
         {
-            pKeyPlayer = fn_800A8884(team);
+            pKeyPlayer = team->GetRearMostFielder();
         }
         else if (m_eFormationType == FTYPE_OFFENSIVE)
         {
-            pKeyPlayer = fn_800A8808(team);
+            pKeyPlayer = team->GetFrontMostFielder();
         }
         else
         {
-            pKeyPlayer = fn_800A8800(team);
+            pKeyPlayer = team->GetStriker();
         }
     }
 
@@ -1074,7 +1074,7 @@ void FormationEval::CalculateDesiredLocation(
 float FormationEval::IsFielderInPosition(
     cFielder* pFielder, nlVector3 v3Pos, bool bExtended)
 {
-    if (!fn_80054A20())
+    if (!HasActiveFormation())
     {
         return 0.0f;
     }
@@ -1092,7 +1092,7 @@ float FormationEval::IsFielderInPosition(
     offset.y = dy;
     float distToDesiredSquared
         = offset.x * offset.x + offset.y * offset.y;
-    float distToDesired = nlSqrt(distToDesiredSquared, true);
+    float desiredDistance = nlSqrt(distToDesiredSquared, true);
 
     nlVector2 offset2;
     float dx2;
@@ -1102,7 +1102,10 @@ float FormationEval::IsFielderInPosition(
     dy2 = pFielder->mUnidentified024.m_v3Position.y - v3Pos.y;
     offset2.x = dx2;
     offset2.y = dy2;
-    float distToTarget = nlVec2Length(offset2);
+    float distToTargetSquared = offset2.x * offset2.x + offset2.y * offset2.y;
+    desiredDistance = desiredDistance;
+    float distToDesired = desiredDistance;
+    float distToTarget = nlSqrt(distToTargetSquared, true);
 
     float normalizedDist = NormalizeVal(distToDesired,
         gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistX,
@@ -1136,7 +1139,7 @@ void FormationDefensive::Update(float fDeltaT)
 {
     nlVector3 v3AIBallLoc;
 
-    fn_80052978();
+    ResetKeyPlayer();
 
     if (m_SortTimer.Countdown(fDeltaT, 0.0f))
     {
@@ -1147,7 +1150,7 @@ void FormationDefensive::Update(float fDeltaT)
             *(nlVector2*)&v3AIBallLoc = m_pFormationManager->m_pTeam
                                             ->GetOtherTeam()
                                             ->m_pFormationManager
-                                            ->field_0x18;
+                                            ->m_v2WeightedFielderCenter;
             v3AIBallLoc.y = 0.0f;
             v3AIBallLoc.z = 0.0f;
 
@@ -1282,7 +1285,7 @@ void FormationDefensive::GetKeyPositions(cFielder* pFielder,
     }
     else
     {
-        v3KeyAIPosition.x = pOtherTeam->m_pFormationManager->field_0x18.x;
+        v3KeyAIPosition.x = pOtherTeam->m_pFormationManager->m_v2WeightedFielderCenter.x;
         v3KeyAIPosition.y = 0.0f;
         v3KeyAIPosition.z = 0.0f;
 
@@ -1394,21 +1397,21 @@ float FormationOffensive::GetWeight(const nlVector2* v2AIBallLoc)
 
 FormationBallPosition::~FormationBallPosition()
 {
-    while (field_0x34 != 0)
+    while (m_pActiveBallFormationsHead != 0)
     {
-        FormationEval* pEval = nlListRemoveStart(&field_0x34, &field_0x38);
+        FormationEval* pEval = nlListRemoveStart(&m_pActiveBallFormationsHead, &m_pActiveBallFormationsTail);
         delete pEval;
     }
 }
 
-void FormationBallPosition::fn_80052978()
+void FormationBallPosition::ResetKeyPlayer()
 {
     m_pKeyPlayer = 0;
 
-    FormationEval* pEval = field_0x34;
+    FormationEval* pEval = m_pActiveBallFormationsHead;
     while (pEval != 0)
     {
-        pEval->fn_80052978();
+        pEval->ResetKeyPlayer();
         pEval = pEval->next;
     }
 }
@@ -1442,7 +1445,7 @@ void FormationBallPosition::Update(float fDeltaT)
 {
     nlVector2 vAIBallLoc;
 
-    fn_80052978();
+    ResetKeyPlayer();
 
     CalcBallPosition(vAIBallLoc);
 
@@ -1452,7 +1455,7 @@ void FormationBallPosition::Update(float fDeltaT)
 
         if (m_SortTimer.Countdown(fDeltaT, 0.0f))
         {
-            FormationEval* pEval = field_0x34;
+            FormationEval* pEval = m_pActiveBallFormationsHead;
             while (pEval != 0)
             {
                 pEval->SortPlayers((const nlVector2*)&v3Zero);
@@ -1476,7 +1479,7 @@ bool FormationBallPosition::SelectClosestBallFormations(const nlVector2& v2AIBal
     FormationSpec* pClosest[4];
     FormationSpec* pSpec;
     FormationSpec** ppClosest = pClosest;
-    FormationEval* pEval = field_0x34;
+    FormationEval* pEval = m_pActiveBallFormationsHead;
     bool bChanged = false;
     int numClosest = 0;
 
@@ -1495,8 +1498,8 @@ bool FormationBallPosition::SelectClosestBallFormations(const nlVector2& v2AIBal
 
         if (dist > pSpec->m_OutRadius)
         {
-            field_0x3C--;
-            nlListRemoveElement(&field_0x34, pEval, &field_0x38);
+            m_NumActiveBallFormations--;
+            nlListRemoveElement(&m_pActiveBallFormationsHead, pEval, &m_pActiveBallFormationsTail);
             delete pEval;
             bChanged = true;
         }
@@ -1509,7 +1512,7 @@ bool FormationBallPosition::SelectClosestBallFormations(const nlVector2& v2AIBal
         pEval = pNextEval;
     }
 
-    for (int i = 0; i < m_pFormationSet->m_NumFormationDefs && field_0x3C < 4; i++)
+    for (int i = 0; i < m_pFormationSet->m_NumFormationDefs && m_NumActiveBallFormations < 4; i++)
     {
         FormationSpec* pSpec = m_pFormationSet->GetFormationSpec(i);
         if (!pSpec->field_0x04)
@@ -1543,11 +1546,11 @@ bool FormationBallPosition::SelectClosestBallFormations(const nlVector2& v2AIBal
 
         if (dist < pSpec->m_OutRadius)
         {
-            field_0x3C++;
+            m_NumActiveBallFormations++;
             FormationEval* pNewEval = new (nlMalloc(sizeof(FormationEval), 8, false))
                 FormationEval(m_pFormationManager, FTYPE_BALLPOSITION, pSpec);
             pNewEval->SortPlayers((const nlVector2*)&v3Zero);
-            nlListAddEnd(&field_0x34, &field_0x38, pNewEval);
+            nlListAddEnd(&m_pActiveBallFormationsHead, &m_pActiveBallFormationsTail, pNewEval);
             bChanged = true;
         }
     }
@@ -1558,7 +1561,7 @@ bool FormationBallPosition::SelectClosestBallFormations(const nlVector2& v2AIBal
 void FormationBallPosition::CalculateDesiredLocation(
     nlVector3& destPosition, cFielder* pFielder, bool bExtrapolate)
 {
-    if (!fn_80054A20())
+    if (!HasActiveFormation())
     {
         destPosition = pFielder->mUnidentified024.m_v3Position;
         return;
@@ -1572,7 +1575,7 @@ void FormationBallPosition::CalculateDesiredLocation(
     nlVector3 v3DesiredPosition = v3Zero;
     float fTotalWeight = 0.0f;
 
-    FormationEval* pEval = field_0x34;
+    FormationEval* pEval = m_pActiveBallFormationsHead;
     while (pEval != 0)
     {
         pEval->CalculateDesiredLocation(
@@ -1601,7 +1604,7 @@ float FormationBallPosition::GetWeight(const nlVector2* v2AIBallLoc)
 
     CalcBallPosition(vAIBallPos);
 
-    FormationEval* pEval = field_0x34;
+    FormationEval* pEval = m_pActiveBallFormationsHead;
     while (pEval != 0)
     {
         fWeight = nlMaxEquals(fWeight, pEval->GetWeight(&vAIBallPos));
@@ -1611,14 +1614,18 @@ float FormationBallPosition::GetWeight(const nlVector2* v2AIBallLoc)
     return fWeight;
 }
 
-bool FormationEval::fn_80054A20()
+FormationEval::~FormationEval()
+{
+}
+
+bool FormationEval::HasActiveFormation()
 {
     return m_pFormationSpec != 0;
 }
 
-bool FormationBallPosition::fn_80054A20()
+bool FormationBallPosition::HasActiveFormation()
 {
-    return field_0x3C > 0;
+    return m_NumActiveBallFormations > 0;
 }
 
 FormationSet::~FormationSet()
@@ -1629,27 +1636,24 @@ FormationSet::~FormationSet()
     }
 }
 
-extern "C" UnidentifiedVariant_80054AB8 fn_80054AC8(InterpreterCore*, cTeam*, const char*);
-extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(InterpreterCore*, const unsigned int&, cTeam*);
-
-extern "C" UnidentifiedVariant_80054AB8 fn_80054AB8(
+extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(
     InterpreterCore* context, const char* name, cTeam* team)
 {
-    return fn_80054AC8(context, team, name);
+    return EvaluateTeamFuzzyFunctionByName(context, team, name);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 fn_80054AC8(
+extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(
     InterpreterCore* context, cTeam* team, const char* name)
 {
     unsigned int hash = nlStringHash(name);
-    return fn_80054B28(context, hash, team);
+    return EvaluateTeamFuzzyFunctionByHash(context, hash, team);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 fn_80054B28(
+extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(
     InterpreterCore* context, const unsigned int& hash, cTeam* team)
 {
+    FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(context);
     unsigned int localHash = hash;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        static_cast<FuzzyRuntimeBase*>(context),
-        context->FindFunctionEntryPoint(localHash), 1, team, 0));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 1, team, 0));
 }

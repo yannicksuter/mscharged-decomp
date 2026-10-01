@@ -55,6 +55,7 @@
 #include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "NL/nlFunction.inl"
 
 struct UnidentifiedGameState
 {
@@ -2659,10 +2660,8 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
             return -9999.9f;
         }
 
-        float airResistance = m_pPhysicsBall->mfBallAirResistance;
-        float gravity = m_pPhysicsBall->m_gravity;
-        float k = lbl_806DB584 * airResistance;
-        float g = lbl_806DB588 * gravity;
+        float k = lbl_806DB584 * m_pPhysicsBall->GetBallAirResistance();
+        float g = lbl_806DB588 * m_pPhysicsBall->GetGravity();
         float eToTheNegativeKT = Exp(-k * fTime);
         float oneOverK = 1.0f / k;
         float oneMinusEToTheNegativeKTOverK

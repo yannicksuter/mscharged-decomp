@@ -9,7 +9,11 @@
 #include "NL/nlSingleton.h"
 #include "types.h"
 
+class FEImpostorCharacter;
 class FEModelManager;
+class Impostor;
+class ImpostorModel;
+class StadiumFEModelMarker;
 struct tCharacterTemplateInfo;
 class GLResourcePool;
 class SkinAnimatedNPC;
@@ -67,6 +71,50 @@ public:
     /* 0x53 */ u8 mPadding53;
 }; // size: 0x54
 
+class FEImpostorModel : public FEModel
+{
+public:
+    FEImpostorModel(tCharacterTemplateInfo* modelData)
+        : FEModel(modelData)
+        , mModel(0)
+        , mCharacter(0)
+    {
+    }
+
+    virtual void Update(float dt);
+    virtual void Render();
+    virtual void Initialize();
+    virtual cSAnim* GetCurrentAnimation();
+    virtual bool IsAnimationFinished();
+    virtual ~FEImpostorModel();
+
+    /* 0x54 */ ImpostorModel* mModel;
+    /* 0x58 */ u32 mUnidentified58;
+    /* 0x5C */ FEImpostorCharacter* mCharacter;
+    /* 0x60 */ nlVector3 mPosition;
+    /* 0x6C */ float mTime;
+    /* 0x70 */ Impostor* mModels[6];
+}; // size: 0x88
+
+class FESkinnedModel : public FEModel
+{
+public:
+    FESkinnedModel(tCharacterTemplateInfo* modelData)
+        : FEModel(modelData)
+        , mModel(0)
+    {
+    }
+
+    virtual void Update(float dt);
+    virtual void Render();
+    virtual void Initialize();
+    virtual cSAnim* GetCurrentAnimation();
+    virtual bool IsAnimationFinished();
+    virtual ~FESkinnedModel();
+
+    /* 0x54 */ SkinAnimatedNPC* mModel;
+}; // size: 0x58
+
 class FEModelHandle
 {
 public:
@@ -112,8 +160,8 @@ public:
     void Update(float dt);
     void Render();
     void FinishLoadModel(FEModelHandle* handle);
-    void RegisterObject(void* object);
-    void* GetObject(int id);
+    void RegisterObject(StadiumFEModelMarker* object);
+    StadiumFEModelMarker* GetObject(int id);
     FEModelHandle* CreateModel(FEModelType type, const char* name,
         int captain, bool unidentified59, void* unidentified4C,
         void* unidentified50, bool alternate);
@@ -131,7 +179,7 @@ private:
 
 public:
     /* 0x04 */ nlListContainer<FEModelHandle*> mHandles;
-    /* 0x10 */ nlListContainer<void*> mModels;
+    /* 0x10 */ nlListContainer<StadiumFEModelMarker*> mModels;
     /* 0x1C */ nlDLListContainer<FEModelHandle*> mPendingModels;
     /* 0x24 */ nlDLListContainer<FEModelHandle*> mLoadedModels;
     /* 0x2C */ nlDLListContainer<FEModelHandle*> mDanglingModels;

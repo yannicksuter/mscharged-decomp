@@ -94,10 +94,11 @@
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
-#include "Game/SAnim/tu_8030E550.h"
+#include "Game/SAnim/pnScaleBlender.h"
 #include "Game/Task/ParticleUpdateTask.h"
 #include "Game/Transitions/ScreenTransitionManager.h"
 #include "Game/TweakValue.h"
+#include "NL/nlFunction.inl"
 #include "Game/TweakRegistry.h"
 #include "Game/Task/TweakerTask.h"
 #include "NL/gl/gl.h"
@@ -1397,7 +1398,7 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
     cPN_Blender::m_BlenderSlotPool.FreeBlocks();
     cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
     cPN_Feather::m_FeatherSlotPool.FreeBlocks();
-    cPN_8030E550::mSlotPool.FreeBlocks();
+    cPN_ScaleBlender::m_ScaleBlenderSlotPool.FreeBlocks();
     lbl_805840D8.FreeBlocks();
     if (g_bTweaking)
     {
@@ -1672,7 +1673,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     cPN_Blender::m_BlenderSlotPool.FreeBlocks();
     cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
     cPN_Feather::m_FeatherSlotPool.FreeBlocks();
-    cPN_8030E550::mSlotPool.FreeBlocks();
+    cPN_ScaleBlender::m_ScaleBlenderSlotPool.FreeBlocks();
     lbl_805840D8.FreeBlocks();
     if (g_bTweaking)
     {
@@ -2053,7 +2054,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     cPN_Blender::m_BlenderSlotPool.FreeBlocks();
     cPN_SingleAxisBlender::m_SingleAxisBlenderSlotPool.FreeBlocks();
     cPN_Feather::m_FeatherSlotPool.FreeBlocks();
-    cPN_8030E550::mSlotPool.FreeBlocks();
+    cPN_ScaleBlender::m_ScaleBlenderSlotPool.FreeBlocks();
     lbl_805840D8.FreeBlocks();
 
     if (g_bTweaking)

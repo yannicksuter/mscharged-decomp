@@ -15,7 +15,7 @@
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/SAnim/pnSingleAxisBlender.h"
-#include "Game/SAnim/tu_8030E550.h"
+#include "Game/SAnim/pnScaleBlender.h"
 #include "Game/DB/SaveLoad.h"
 #include "Game/Render/Presentation.h"
 #include "NL/plat/nlFlash.h"

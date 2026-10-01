@@ -121,15 +121,14 @@ public:
     ~Goalie();
     virtual void UnidentifiedVirtual1C();
     virtual void Update(float dt);
-    virtual void Unknown10(
-        const nlVector3& v3Position, unsigned short aDirection);
-    virtual void Unknown11(void* context, DebugWriteCache* cache);
+    virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
+    virtual void SyncLog(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
     void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
 
     void SetGoalieAction(eGoalieActionState newGoalieState, int newSubstate);
@@ -184,7 +183,7 @@ public:
     bool IsCloseToPlane(const nlVector3& rPos1,
         const nlVector3& rPos2, float fThreshold);
     bool IsInsideNetArea(const nlVector3& v3Target);
-    bool UnidentifiedOffplayState() const
+    bool IsInOffplay() const
     {
         return mGoalieActionState == GOALIEACTION_OFFPLAY;
     }
@@ -194,7 +193,7 @@ public:
     bool CanInterceptPass();
     bool CheckForSTSAttack();
     bool IsOpponentInSTS();
-    bool UnidentifiedOpponentShooting();
+    bool IsOpponentShooting();
     bool IsWithinPounceRange();
     bool IsOpponentBallCarrierInRange();
     bool IsLooseBallTowardNet();
@@ -428,5 +427,8 @@ public:
 extern "C" float fn_8007ACB8(Goalie* pGoalie,
     const nlVector3& v3TargetPosition, float fParam1, float fParam2);
 extern "C" void GoalieOnGameOver();
+
+extern float gfRepositionThreshold;
+extern bool gbEnableBallGoalieSweepTest;
 
 #endif // GAME_GOALIE_H

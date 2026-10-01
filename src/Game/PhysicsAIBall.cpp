@@ -24,8 +24,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Physics/Physics.h"
 
-extern bool gbEnableBallGoalieSweepTest;
-
 extern "C" void fn_8013F854(const char*, ...);
 
 static unsigned short sPhysicsAIBallType = 0xFFFF;

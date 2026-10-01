@@ -128,6 +128,11 @@ public:
     }
 };
 
+inline bool nlNear(const nlVector2& first, const nlVector2& second)
+{
+    return nlNear(first.x, second.x) && nlNear(first.y, second.y);
+}
+
 inline bool nlNear(const nlVector3& first, const nlVector3& second)
 {
     return nlNear(first.x, second.x)
@@ -387,6 +392,20 @@ inline void nlVec4Set(nlVector4& v0, float _x, float _y, float _z, float _w)
     v0.y = _y;
     v0.z = _z;
     v0.w = _w;
+}
+
+inline void nlVec4Scale(nlVector4& result, const nlVector4& v, float scale)
+{
+    nlVec4Set(result, scale * v.x, scale * v.y, scale * v.z, scale * v.w);
+}
+
+inline void nlVec4ScaleAdd(nlVector4& result, float scale, const nlVector4& dir, const nlVector4& origin)
+{
+    nlVec4Set(result,
+        scale * dir.x + origin.x,
+        scale * dir.y + origin.y,
+        scale * dir.z + origin.z,
+        scale * dir.w + origin.w);
 }
 
 float nlPlaneDot(const nlVector2& point, const nlVector4& plane);

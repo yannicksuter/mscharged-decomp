@@ -333,7 +333,7 @@ void SHHallOfFameHistory::UpdateTitle()
             nlStringLowerHash("Layer"), historyHash, titleHash, titlesHash, 0, 0);
     if (titleText == 0)
     {
-        titleText = &UnidentifiedTLTextDefault::sInstance;
+        titleText = &TLTextDefault::sInstance;
     }
 
     switch (mMode)
@@ -380,7 +380,7 @@ void SHHallOfFameHistory::UpdateCupRecordText()
             nlStringLowerHash("Layer"), historyHash, recordHash, 0, 0, 0);
     if (recordText == 0)
     {
-        recordText = &UnidentifiedTLTextDefault::sInstance;
+        recordText = &TLTextDefault::sInstance;
     }
 
     char monthString[4];
@@ -443,7 +443,7 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
                 nlStringLowerHash("Layer"), historyHash, goalsAgainstHash, 0, 0, 0);
         if (goalsText == 0)
         {
-            goalsText = &UnidentifiedTLTextDefault::sInstance;
+            goalsText = &TLTextDefault::sInstance;
         }
         break;
     }
@@ -465,7 +465,7 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
                 nlStringLowerHash("Layer"), historyHash, goalsForHash, 0, 0, 0);
         if (goalsText == 0)
         {
-            goalsText = &UnidentifiedTLTextDefault::sInstance;
+            goalsText = &TLTextDefault::sInstance;
         }
         break;
     }
@@ -492,7 +492,7 @@ void SHHallOfFameHistory::UpdateDateText()
             nlStringLowerHash("Layer"), historyHash, dateHash, 0, 0, 0);
     if (dateText == 0)
     {
-        dateText = &UnidentifiedTLTextDefault::sInstance;
+        dateText = &TLTextDefault::sInstance;
     }
 
     WideBasicString unformatted;
@@ -657,7 +657,7 @@ void SHHallOfFamePlayerCard::SceneCreated()
             nlStringLowerHash("Layer"), nlStringLowerHash("player card"), 0, 0, 0, 0);
     if (playerCard == 0)
     {
-        playerCard = &UnidentifiedTLComponentDefault::sInstance;
+        playerCard = &TLComponentDefault::sInstance;
     }
 
     if (mIsUnlocked)
@@ -896,7 +896,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     }
     if (image0 == 0)
     {
-        image0 = &UnidentifiedTLImageDefault::sInstance;
+        image0 = &TLImageDefault::sInstance;
     }
 
     {
@@ -907,7 +907,7 @@ void SHHallOfFamePlayerCard::UpdateImages()
     }
     if (image1 == 0)
     {
-        image1 = &UnidentifiedTLImageDefault::sInstance;
+        image1 = &TLImageDefault::sInstance;
     }
 
     const char* name0 = 0;

@@ -7,9 +7,12 @@
 void CalcHeadTrackMatrix(unsigned short spin, unsigned short tilt,
     cPoseAccumulator* cPoseAccumulator, int headNodeIndex);
 
+class DebugWriteCache;
+
 class cHeadTrack
 {
 public:
+    void SyncLog(void* context, DebugWriteCache* cache);
     cHeadTrack()
     {
         UnidentifiedReset();

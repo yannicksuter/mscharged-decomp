@@ -1,28 +1,28 @@
 #include <revolution/base/PPCArch.h>
 #include <revolution/os/OSCache.h>
 
-#include "NL/gl/tu_802A12E4.h"
+#include "NL/gl/glShadowedTexturedColourModelWriter.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 #include "Game/GL/glModelBuilder.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 
-State_802A12E4::State_802A12E4()
+glShadowedTexturedColourModelWriter::glShadowedTexturedColourModelWriter()
     : count(0)
     , model(0)
     , resource(0)
-    , value_0C(0)
-    , value_10(0)
-    , value_14(0)
+    , position(0)
+    , texcoord(0)
+    , colour(0)
 {
 }
 
-State_802A12E4::~State_802A12E4()
+glShadowedTexturedColourModelWriter::~glShadowedTexturedColourModelWriter()
 {
 }
 
-bool State_802A12E4::fn_802A1344(
+bool glShadowedTexturedColourModelWriter::Begin(
     int vertexCount, int primitive, void* allocator)
 {
     glModel* newModel;
@@ -62,59 +62,59 @@ bool State_802A12E4::fn_802A1344(
                 positionCount * sizeof(float), GLM_VertexData);
         }
     }
-    value_0C = positionData;
-    glSetModelStream(streams, 0, value_0C,
+    position = positionData;
+    glSetModelStream(streams, 0, position,
         sizeof(float) * 3, 1);
 
-    int value_10Count = vertexCount * 2;
-    short* value_10Data;
-    if (value_10Count == 0)
+    int texcoordCount = vertexCount * 2;
+    short* texcoordData;
+    if (texcoordCount == 0)
     {
-        value_10Data = 0;
+        texcoordData = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_10Data = (short*)glResourceAlloc(
-                value_10Count * sizeof(short), GLM_VertexData, allocator);
+            texcoordData = (short*)glResourceAlloc(
+                texcoordCount * sizeof(short), GLM_VertexData, allocator);
         }
         else
         {
-            value_10Data = (short*)glFrameAlloc(
-                value_10Count * sizeof(short), GLM_VertexData);
+            texcoordData = (short*)glFrameAlloc(
+                texcoordCount * sizeof(short), GLM_VertexData);
         }
     }
-    value_10 = value_10Data;
-    glSetModelStream(streams + 1, 1, value_10,
+    texcoord = texcoordData;
+    glSetModelStream(streams + 1, 1, texcoord,
         sizeof(short) * 2, 4);
 
-    u32* value_14Data;
+    u32* colourData;
     if (vertexCount == 0)
     {
-        value_14Data = 0;
+        colourData = 0;
     }
     else
     {
         if (allocator != 0)
         {
-            value_14Data = (u32*)glResourceAlloc(
+            colourData = (u32*)glResourceAlloc(
                 vertexCount * sizeof(u32), GLM_VertexData, allocator);
         }
         else
         {
-            value_14Data =
+            colourData =
                 (u32*)glFrameAlloc(vertexCount * sizeof(u32), GLM_VertexData);
         }
     }
-    value_14 = value_14Data;
-    glSetModelStream(streams + 2, 2, value_14,
+    colour = colourData;
+    glSetModelStream(streams + 2, 2, colour,
         sizeof(u32), 3);
 
     return true;
 }
 
-bool State_802A12E4::fn_802A14F0()
+bool glShadowedTexturedColourModelWriter::End()
 {
     for (u32 i = 0; i < model->numPackets; ++i)
     {

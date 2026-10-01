@@ -21,7 +21,7 @@
 #include "Game/SH/SHNavigation.h"
 #include <stdlib.h>
 #include "Game/FE/feDPD.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 SHOnlineLogin::SHOnlineLogin()
     : mPopupActive(false)

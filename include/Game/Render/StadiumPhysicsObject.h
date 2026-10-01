@@ -15,7 +15,8 @@ public:
     virtual void ReleaseResources();
     virtual void Initialize(WorldObjectLoadContext* context);
 
-    /* 0x60 */ unsigned char mUnidentified060[0x10];
+    /* 0x60 */ int mUnidentified060;
+    /* 0x64 */ unsigned char mUnidentified064[0xC];
 }; // size: 0x70
 
 // Sets the current stadium's shadow height to the z of its world position.

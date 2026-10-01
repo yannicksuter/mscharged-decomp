@@ -4,6 +4,7 @@
 
 #include "Game/GameInfo.h"
 #include "Game/GameSceneManager.h"
+#include "Game/FE/CaptainSelectionOrder.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/NetworkSession.h"
 #include "Game/OnlineMatchmaking.h"
@@ -15,9 +16,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-
-extern int gCaptainSelectionOrder[12];
 
 static NetworkDraft* sNetworkDraft;
 

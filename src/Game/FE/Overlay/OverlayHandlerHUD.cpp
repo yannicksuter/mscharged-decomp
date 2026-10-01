@@ -704,7 +704,7 @@ void UnidentifiedHUD_801EB108::fn_801EB108(FEPresentation* presentation)
             presentation->m_currentSlide, LAYER_NAME, POWERBAR_CONTAINER_NAMES[i]);
         if (pPowerBarContainer == 0)
         {
-            pPowerBarContainer = &UnidentifiedTLComponentDefault::sInstance;
+            pPowerBarContainer = &TLComponentDefault::sInstance;
         }
         mUnidentified08[i] = (TLComponentInstance*)pPowerBarContainer;
         TLComponentInstance* pComp = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
@@ -738,7 +738,7 @@ void UnidentifiedHUD_801EB108::fn_801EB108(FEPresentation* presentation)
             presentation, HUD_SLIDE_OUT_NAME, LAYER_NAME, POWERBAR_NAMES[i]);
         if (pPowerBar == 0)
         {
-            pPowerBar = &UnidentifiedTLComponentDefault::sInstance;
+            pPowerBar = &TLComponentDefault::sInstance;
         }
         pPowerBar->m_bVisible = false;
         if (mUnidentified00[i])
@@ -774,7 +774,7 @@ void UnidentifiedHUD_801E9198::fn_801EB5CC(FEPresentation* presentation, Unident
                         pPulsar->GetActiveSlide(), "powerupimage");
                     if (pPowerUpImage == 0)
                     {
-                        pPowerUpImage = &UnidentifiedTLImageDefault::sInstance;
+                        pPowerUpImage = &TLImageDefault::sInstance;
                     }
                     m_pImagePowerUps[1][team][i] = (TLImageInstance*)pPowerUpImage;
                 }

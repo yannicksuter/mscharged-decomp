@@ -196,7 +196,7 @@ bool PackedRegistryContainer::Has(const u32& hash) const
 {
     u16 count = mNamedCount;
     const PackedRegistryEntry* entries
-        = RegistryNamedEntries(mWords, count, mUnnamedCount);
+        = RegistryNamedEntries(NamedTypes(), count, mUnnamedCount);
     u32 key = hash;
     return FindPackedRegistryEntry(key, entries, count) != 0;
 }
@@ -204,7 +204,7 @@ bool PackedRegistryContainer::Has(const u32& hash) const
 RegistryValue PackedRegistryContainer::Get(
     const u32& hash) const
 {
-    const u32* types = mWords;
+    const u32* types = NamedTypes();
     const PackedRegistryEntry* entries
         = RegistryNamedEntries(types, mNamedCount, mUnnamedCount);
     u32 key = hash;

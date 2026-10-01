@@ -10,7 +10,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 
 FEScrollBar::FEScrollBar()
@@ -115,11 +115,11 @@ void FEScrollBar::SetComponent(TLComponentInstance* instance)
     mComponent = (TLComponentInstance*)instance;
     mAssetPosition = instance->GetAssetPosition();
     TLComponentInstance* up = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "up_arrow");
-    mButtonInstances[0] = up == 0 ? &UnidentifiedTLComponentDefault::sInstance : up;
+    mButtonInstances[0] = up == 0 ? &TLComponentDefault::sInstance : up;
     TLComponentInstance* down = FEFinder<TLComponentInstance, 4>::Find<>(mComponent->GetActiveSlide(), "down_arrow");
-    mButtonInstances[1] = down == 0 ? &UnidentifiedTLComponentDefault::sInstance : down;
+    mButtonInstances[1] = down == 0 ? &TLComponentDefault::sInstance : down;
     TLImageInstance* found = FEFinder<TLImageInstance, 2>::Find<>(mComponent->GetActiveSlide(), "track", "btn_scroll_minmax");
-    mThumb = found == 0 ? &UnidentifiedTLImageDefault::sInstance : found;
+    mThumb = found == 0 ? &TLImageDefault::sInstance : found;
 }
 
 void FEScrollBar::Initialize()

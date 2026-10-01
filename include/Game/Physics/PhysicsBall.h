@@ -31,6 +31,7 @@ public:
     void AddResistanceForces();
     void CloneBall(const PhysicsBall& other);
 
+    float GetBallAirResistance() const { return mfBallAirResistance; }
     static float GetBallMaxVelocity();
 
     /* 0x38 */ nlVector3 mv3TiltForce;

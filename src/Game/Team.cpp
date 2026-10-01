@@ -204,14 +204,14 @@ void cTeam::fn_800A6248()
         mfBallInTimes[i] = 0.0f;
     }
 
-    m_pFormationManager->fn_80050D24();
+    m_pFormationManager->ResetToDefaults();
     mUnidentified0F0->mScriptMachine->Reset(false);
 
     for (int i = 0; i < 4; i++)
     {
         m_pAIOrderedFielders[i] = (cFielder*)m_pPlayers[i];
         m_pBallInterceptOrderedFielders[i] = (cFielder*)m_pPlayers[i];
-        mUnidentified0D8[i] = (cFielder*)m_pPlayers[i];
+        m_pFieldersByTeamRelativeX[i] = (cFielder*)m_pPlayers[i];
     }
 }
 
@@ -225,14 +225,14 @@ void cTeam::fn_800A607C()
         mfBallInTimes[i] = 0.0f;
     }
 
-    m_pFormationManager->fn_80050D24();
+    m_pFormationManager->ResetToDefaults();
     mUnidentified0F0->mScriptMachine->Reset(false);
 
     for (int i = 0; i < 4; i++)
     {
         m_pAIOrderedFielders[i] = (cFielder*)m_pPlayers[i];
         m_pBallInterceptOrderedFielders[i] = (cFielder*)m_pPlayers[i];
-        mUnidentified0D8[i] = (cFielder*)m_pPlayers[i];
+        m_pFieldersByTeamRelativeX[i] = (cFielder*)m_pPlayers[i];
     }
 
     int nScore = m_nScore;
@@ -306,7 +306,7 @@ cTeam::cTeam(int nSide)
     {
         m_pAIOrderedFielders[i] = NULL;
         m_pBallInterceptOrderedFielders[i] = NULL;
-        mUnidentified0D8[i] = NULL;
+        m_pFieldersByTeamRelativeX[i] = NULL;
     }
     mUnidentified0F4 = 0;
 
@@ -525,7 +525,7 @@ void cTeam::SetPlayer(cPlayer* pPlayer, int nIndex)
     {
         m_pAIOrderedFielders[nIndex] = (cFielder*)pPlayer;
         m_pBallInterceptOrderedFielders[nIndex] = (cFielder*)pPlayer;
-        mUnidentified0D8[nIndex] = (cFielder*)pPlayer;
+        m_pFieldersByTeamRelativeX[nIndex] = (cFielder*)pPlayer;
     }
 }
 
@@ -1025,7 +1025,7 @@ void cTeam::ResetCharacters()
             v3NewPosition.y = -v3NewPosition.y;
         }
 
-        pFielder->Unknown10(v3NewPosition, aNewFacingDirection);
+        pFielder->Reset(v3NewPosition, aNewFacingDirection);
     }
 
     s32 side = m_nSide;
@@ -1295,7 +1295,7 @@ void cTeam::UpdateTeamAI(float fDeltaT)
         mtTeamStyleTimer.SetSeconds(1.0f);
     }
 
-    qsort(mUnidentified0D8, 4, 4, fn_800A7EA8);
+    qsort(m_pFieldersByTeamRelativeX, 4, 4, fn_800A7EA8);
 
     bool bSituationChanged = AssignSituation();
     if (bSituationChanged)
@@ -1449,7 +1449,7 @@ extern "C" void fn_800A83CC(cTeam* pTeam, bool bSituationChanged)
     if (pTeam->mtRoleTimer.m_uPackedTime == 0 || bSituationChanged)
     {
         unsigned int* pFielderFormationPos
-            = pTeam->m_pFormationManager->fn_80052034();
+            = pTeam->m_pFormationManager->GetHighestWeightFielderOrder();
         if (pFielderFormationPos != NULL)
         {
             switch (pTeam->mpCurrentSituation)
@@ -1737,7 +1737,7 @@ void cTeam::fn_800A8900(void* context, DebugWriteCache* cache)
 
     for (int i = 0; i < 5; i++)
     {
-        m_pPlayers[i]->Unknown11(context, cache);
+        m_pPlayers[i]->SyncLog(context, cache);
         char buffer[32];
         nlSNPrintf(buffer, sizeof(buffer), lbl_80500A10,
             i + m_nSide * 5);

@@ -1,11 +1,10 @@
-#include "Game/Audio/AudioResourceRuntime.h"
 #include "NL/nlFunction.inl"
+#include "Game/Audio/AudioResourceRuntime.h"
 
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/AudioScriptRuntime.h"
 #include "Game/Audio/RegistryPools.h"
-#include "Game/Audio/AudioResourceRuntime.inl"
 #include "NL/nlFunction.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -111,6 +110,12 @@ inline bool AudioEffectBinding::UnidentifiedStartEffect(u32 definition,
     AudioEffectParameter* parameter = 0;
     effect->CreateParameter(definition, parameterData, immediate, &parameter);
     return effect->AddParameter(parameter, owner);
+}
+
+AudioEffectBinding::AudioEffectBinding()
+    : mInstances(16, 16)
+    , mEffects(16, 16)
+{
 }
 
 AudioResourceRuntime::AudioResourceRuntime()
@@ -333,51 +338,4 @@ extern "C" bool fn_802F4E84(const u32* hash, bool invert, void* owner)
     return true;
 }
 
-/**
- * Address/Size: 0x802F6704 | size: 0x68
- */
-RegistryContainer* AudioResourceRuntime::AllocContainer()
-{
-    return RegistryAllocContainer();
-}
-
-/**
- * Address/Size: 0x802F676C | size: 0x68
- */
-RegistryNode* AudioResourceRuntime::AllocNode()
-{
-    return RegistryAllocNode();
-}
-
-/**
- * Address/Size: 0x802F67D4 | size: 0x10
- */
-void* AudioResourceRuntime::AllocItem(unsigned int size)
-{
-    return nlMalloc(size, 8, true);
-}
-
-/**
- * Address/Size: 0x802F67E4 | size: 0x18
- */
-void AudioResourceRuntime::FreeContainer(void* container)
-{
-    RegistryFreeContainer(
-        (ScopedRegistryContainer*)container);
-}
-
-/**
- * Address/Size: 0x802F67FC | size: 0x18
- */
-void AudioResourceRuntime::FreeNode(void* node)
-{
-    RegistryFreeNode((RegistryNode*)node);
-}
-
-/**
- * Address/Size: 0x802F6814 | size: 0x8
- */
-void AudioResourceRuntime::FreeItem(void* data)
-{
-    nlFree(data);
-}
+#include "Game/Audio/AudioScriptInterpreter.inl"

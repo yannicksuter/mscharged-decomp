@@ -21,7 +21,7 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "Game/FE/feOnlineError.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 SHOnlineInviteStatus::SHOnlineInviteStatus()
     : mStatus(0)

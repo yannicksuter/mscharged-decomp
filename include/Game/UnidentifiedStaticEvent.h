@@ -151,8 +151,8 @@ void UnidentifiedStaticEvent<T, Count>::Add(
     nlDLRingAddEnd(&mListeners.m_Head, entry);
     Listener* listener = &entry->entry;
 
-    void* target = listener->callback.UnidentifiedTransfer(callback);
-    RegisterEventConnection(this, listener, value, flags, target);
+    listener->callback.UnidentifiedTransfer(callback);
+    RegisterEventConnection(this, listener, value, flags);
 }
 
 #endif // GAME_UNIDENTIFIED_STATIC_EVENT_H

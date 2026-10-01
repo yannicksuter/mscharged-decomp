@@ -1,3 +1,4 @@
+#include "Game/FE/feImpostorCharacter.h"
 #include "Game/FE/feModelManager.h"
 #include <assert.h>
 #include "Game/CharacterTemplate.h"
@@ -20,6 +21,7 @@
 #include "NL/nlFile.h"
 #include "NL/nlFileGC.h"
 #include "Game/Render/SkinAnimatedNPC.h"
+#include "Game/Render/StadiumPhysicsObject.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/TweakValue.h"
 #include "NL/gl/glState.h"
@@ -33,86 +35,8 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/TweakValue.inl"
 
-class FESkinnedModel : public FEModel
-{
-public:
-    FESkinnedModel(tCharacterTemplateInfo* modelData)
-        : FEModel(modelData)
-        , mModel(0)
-    {
-    }
-
-    virtual void Update(float dt);
-    virtual void Render();
-    virtual void Initialize();
-    virtual cSAnim* GetCurrentAnimation();
-    virtual bool IsAnimationFinished();
-    virtual ~FESkinnedModel();
-
-    /* 0x54 */ SkinAnimatedNPC* mModel;
-}; // size: 0x58
-
-class FEImpostorCharacter;
-
-class FEImpostorModel : public FEModel
-{
-public:
-    FEImpostorModel(tCharacterTemplateInfo* modelData)
-        : FEModel(modelData)
-        , mModel(0)
-        , mCharacter(0)
-    {
-    }
-
-    virtual void Update(float dt);
-    virtual void Render();
-    virtual void Initialize();
-    virtual cSAnim* GetCurrentAnimation();
-    virtual bool IsAnimationFinished();
-    virtual ~FEImpostorModel();
-
-    /* 0x54 */ ImpostorModel* mModel;
-    /* 0x58 */ u32 mUnidentified58;
-    /* 0x5C */ FEImpostorCharacter* mCharacter;
-    /* 0x60 */ nlVector3 mPosition;
-    /* 0x6C */ float mTime;
-    /* 0x70 */ Impostor* mModels[6];
-}; // size: 0x88
-
-class FEImpostorCharacter
-    : public AnimatedImpostorCharacter
-{
-public:
-    FEImpostorCharacter(const char* name,
-        ImpostorModel* model, void* animations, int budget,
-        bool animationFlag, bool alternate,
-        const ImpostorCharacterParams* params, int modelType);
-    virtual ~FEImpostorCharacter();
-
-    virtual void SetScale(float scale);
-    virtual float GetScale();
-    virtual float GetCameraDistance();
-    virtual float GetCameraLookatZ();
-    virtual void Render(GLView* target, int texture);
-    virtual void UpdateAnimation(float dt);
-
-    /* 0x74 */ bool mEnabled;
-    /* 0x75 */ u8 mPadding75[3];
-    /* 0x78 */ int mModelType;
-    /* 0x7C */ TweakFloatBinding mfScaleInitialCup;
-    /* 0x8C */ TweakFloatBinding mfScaleCup;
-    /* 0x9C */ TweakFloatBinding mfCameraLookatZInitialCup;
-    /* 0xAC */ TweakFloatBinding mfCameraLookatZCup;
-    /* 0xBC */ TweakFloatBinding mfCameraDistanceInitialCup;
-    /* 0xCC */ TweakFloatBinding mfCameraDistanceCup;
-}; // size: 0xDC
-
-
-struct FEModelObject
-{
-    /* 0x00 */ u8 mUnidentified00[0x60];
-    /* 0x60 */ int mUnidentified60;
-};
+template <>
+FEModelManager* nlSingleton<FEModelManager>::s_pInstance = 0;
 
 struct UnidentifiedFEImpostorParams
 {
@@ -401,16 +325,16 @@ void FEModelHandle::PlayAnimation(const char* name, ePlayMode playMode,
         {
             ((FESkinnedModel*)mModel)->mModel->SetAnimState(
                 *animation, blendTime, playMode);
-            ((FESkinnedModel*)mModel)->mModel->mpAnimController->m_bMirror
-                = mUnidentified59;
+            ((FESkinnedModel*)mModel)->mModel->mpAnimController->SetMirror(
+                mUnidentified59);
             break;
         }
         case FE_MODEL_IMPOSTOR:
         {
             ((FEImpostorModel*)mModel)->mModel->PlayAnimation(
                 name, blendTime, playMode);
-            ((FEImpostorModel*)mModel)->mModel->mAnimController->m_bMirror
-                = mUnidentified59;
+            ((FEImpostorModel*)mModel)->mModel->mAnimController->SetMirror(
+                mUnidentified59);
             ((FEImpostorModel*)mModel)->mModel->mAnimController->SetTime(speed);
             break;
         }
@@ -841,18 +765,18 @@ void FEModelManager::Render()
     }
 }
 
-void FEModelManager::RegisterObject(void* model)
+void FEModelManager::RegisterObject(StadiumFEModelMarker* model)
 {
     mModels.AddStart(model);
 }
 
-void* FEModelManager::GetObject(int id)
+StadiumFEModelMarker* FEModelManager::GetObject(int id)
 {
-    nlListIterator<void*> iterator = mModels.Begin();
+    nlListIterator<StadiumFEModelMarker*> iterator = mModels.Begin();
     while (iterator.IsValid())
     {
-        FEModelObject* model = (FEModelObject*)iterator.Current();
-        if (id == model->mUnidentified60)
+        StadiumFEModelMarker* model = iterator.Current();
+        if (id == model->mUnidentified060)
         {
             return model;
         }
@@ -1162,25 +1086,3 @@ float FEImpostorCharacter::GetCameraLookatZ()
         return ImpostorCharacter::GetCameraLookatZ();
     }
 }
-
-void FreeFEModelHandleListEntry(void*, void* entry)
-{
-    ::operator delete(entry);
-}
-
-void FreeFEModelDataListEntry(void*, void* entry)
-{
-    ::operator delete(entry);
-}
-
-void FreeFEModelHandleRingEntry(void*, void* entry)
-{
-    ::operator delete(entry);
-}
-
-void FEImpostorCharacter::UpdateAnimation(float)
-{
-}
-
-template <>
-FEModelManager* nlSingleton<FEModelManager>::s_pInstance = 0;

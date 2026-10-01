@@ -588,34 +588,17 @@ bool cFielder::fn_8003E73C() const
 
 bool cFielder::fn_8003E74C() const
 {
-    bool result = true;
-    if (fn_8003E7F8() == false && fn_8003E84C() == false)
-    {
-        result = false;
-    }
-    return result;
+    return fn_8003E7F8() || fn_8003E84C();
 }
 
 bool cFielder::fn_8003E7F8() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    return GetCharacterClass() == (eCharacterClass)0 && fn_8003E6EC();
 }
 
 bool cFielder::fn_8003E84C() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)4
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    return GetCharacterClass() == (eCharacterClass)4 && fn_8003E6EC();
 }
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder)
@@ -1202,7 +1185,7 @@ bool cFielder::IsStuck() const
                ->IsUnidentifiedState(2);
 }
 
-void cFielder::fn_80099074(const UnidentifiedEventData24* eventData)
+void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData)
 {
     int type = eventData->mUnidentified10->m_Type;
     if (type == 1)
@@ -1777,9 +1760,10 @@ void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
 
     nlVector3 v3ReleaseVelocity;
     nlVec3Add(v3ReleaseVelocity, v3IncomingVelocity, mUnidentified024.m_v3Velocity);
-    if (nlVec3LengthSquared(v3IncomingVelocity) < 0.001f * 0.001f
-        || nlVec3LengthSquared(mUnidentified024.m_v3Velocity) < 0.001f * 0.001f
-        || nlVec3LengthSquared(v3ReleaseVelocity) < 0.001f * 0.001f)
+    float fMinSpeedSquared = 0.001f * 0.001f;
+    if (nlVec3LengthSquared(v3IncomingVelocity) < fMinSpeedSquared
+        || nlVec3LengthSquared(mUnidentified024.m_v3Velocity) < fMinSpeedSquared
+        || nlVec3LengthSquared(v3ReleaseVelocity) < fMinSpeedSquared)
     {
         nlVector3 v3ReleaseVelocity;
         nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
@@ -1790,7 +1774,9 @@ void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
     }
 
     nlVec3Normalize(v3ReleaseVelocity, v3ReleaseVelocity);
-    nlVec3Scale(v3ReleaseVelocity, v3ReleaseVelocity, 2.0f + mUnidentified024.m_fActualSpeed);
+    float fSpeed = mUnidentified024.m_fActualSpeed;
+    fSpeed = 2.0f + fSpeed;
+    nlVec3Scale(v3ReleaseVelocity, v3ReleaseVelocity, fSpeed);
     v3ReleaseVelocity.z = 0.5f;
     g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
 }
@@ -2800,7 +2786,7 @@ void cFielder::Update(float fDeltaT)
     m_bHasBeenUpdated = true;
 }
 
-ePowerUpType cFielder::GetPowerupType() const
+ePowerUpType cFielder::GetPowerupType()
 {
     return ((DesireUsePowerup*)fn_80319FC0(
         mUnidentified428->mScriptMachine, 0x11))->GetPowerupType();
@@ -3421,10 +3407,9 @@ void cFielder::UpdateController(float fDeltaT)
     }
 }
 
-void cFielder::Unknown10(
-    const nlVector3& v3Position, unsigned short aDirection)
+void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
-    cPlayer::Unknown10(v3Position, aDirection);
+    cPlayer::Reset(v3Position, aDirection);
     mUnidentified428->mScriptMachine->Reset(false);
     CleanUpAction(ACTION_NEED_ACTION);
     mtPowerupThrowTime.UnidentifiedClear();
@@ -3565,9 +3550,9 @@ struct UnidentifiedFielderDesireState
     cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
-void cFielder::Unknown11(void* context, DebugWriteCache* cache)
+void cFielder::SyncLog(void* context, DebugWriteCache* cache)
 {
-    cPlayer::Unknown11(context, cache);
+    cPlayer::SyncLog(context, cache);
 
     if (lbl_806DB842 == 0xFFFF)
     {

@@ -211,6 +211,7 @@ typedef nlAVLTreeSlotPool<u32,
     UnidentifiedAvoidanceTree;
 
 struct sCornerSegment;
+struct sSideLinePlane;
 
 class AvoidController
 {
@@ -227,6 +228,7 @@ public:
     void Update(float fDeltaT);
     bool AvoidSidelines(nlVector3&);
     bool CalcDesiredVelocityToAvoidCorner(nlVector2&, const sCornerSegment&, const nlVector2&, const nlVector2&);
+    bool CalcDesiredVelocityToAvoidSideline(nlVector2&, const sSideLinePlane&, const nlVector2&, const nlVector2&);
     bool CalcDesiredVelocityToAvoidSideline(nlVector2&, const nlVector2&, const nlVector2&, const nlVector2&, const nlVector2&);
     void ApplyRepulsionVector(nlVector3 v3Repulsion);
     void RegisterDebugFields(u16*, DebugWriteCache*);

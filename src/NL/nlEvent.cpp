@@ -117,7 +117,7 @@ void UnregisterEvent(void* eventPtr)
 }
 
 void RegisterEventConnection(void* event, void* connectionPtr,
-    unsigned int owner, int group, void*)
+    unsigned int owner, int group)
 {
     UnidentifiedConnection* connection
         = (UnidentifiedConnection*)connectionPtr;

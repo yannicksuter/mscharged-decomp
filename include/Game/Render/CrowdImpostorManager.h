@@ -58,13 +58,7 @@ struct CrowdLayoutRecord
 class CrowdImpostorManager
 {
 public:
-    CrowdImpostorManager()
-    {
-        mLayouts = 0;
-        mPrimaryObjectCount = 0;
-        mNumLayouts = 0;
-        mNumAngles = 0;
-    }
+    CrowdImpostorManager();
     ~CrowdImpostorManager();
 
     void AddObject(CrowdLayoutObject* object, bool enabled);

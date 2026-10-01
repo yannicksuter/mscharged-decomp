@@ -34,6 +34,8 @@ public:
     virtual void ReleaseResources();
     virtual void Initialize(WorldObjectLoadContext* context);
 
+    float GetIntensity() const { return m_fIntensity; }
+
     /* 0x60 */ u8 mUnidentified60[0x04];
     /* 0x64 */ float m_fIntensity;
     /* 0x68 */ u8 mUnidentified68[0x08];

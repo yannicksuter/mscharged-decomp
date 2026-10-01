@@ -29,7 +29,7 @@
 #include "NL/nlstring_tmpl.h"
 
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 const char* gOnlineSideGroupNames[2] = { "home_group", "away_group" };
 int gOnlineSideSelectionSeconds = 30;

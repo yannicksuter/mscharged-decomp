@@ -3,6 +3,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/DB/CharacterInfo.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/FE/CaptainSelectionOrder.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/feFinder.h"
@@ -33,7 +34,6 @@
 #include "NL/nlFunction.inl"
 
 static int lbl_8051CE60[12] = { 0, 5, 3, 6, 4, 7, 1, 8, 2, 9, 10, 11 };
-extern int gCaptainSelectionOrder[12];
 
 /**
  * Offset/Address/Size: 0x0 | 0x80222098 | size: 0x468

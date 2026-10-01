@@ -2,7 +2,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/FlyingCamera.h"
 #include "Game/Render/tu_801B43F8.h"
-#include "Game/Render/tu_801B532C.h"
+#include "Game/Render/WindDebrisConfig.h"
 #include "Game/AsyncLoading.h"
 #include "Game/Drawable/RenderObject.h"
 
@@ -236,15 +236,15 @@ void NPCManager::fn_801A9DF0()
 {
     for (long i = 0; i < 3; ++i)
     {
-        UnidentifiedNPCConfig_801B532C* pConfig = fn_801B532C(i);
+        WindDebrisConfig* pConfig = GetWindDebrisConfig(i);
         NPCTemplate* pTemplate
             = fn_801ABBDC_inline(pConfig->mName);
 
         PhysicsNPC* pPhysics = new (8, false) PhysicsNPC(
-            pConfig->mUnidentified008);
+            pConfig->mRadius);
         UnidentifiedNPC_801B43F8* pObject = new (8, false) UnidentifiedNPC_801B43F8(
             *pTemplate->hierarchy, pTemplate->modelID,
-            pConfig->mUnidentified00C, pConfig->mUnidentified010,
+            pConfig->mCueId, pConfig->mUnidentified010,
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
         mUnidentified0CC[i] = pObject;

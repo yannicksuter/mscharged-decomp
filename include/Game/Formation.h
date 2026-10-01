@@ -9,6 +9,8 @@ class cFielder;
 class cPlayer;
 class cTeam;
 class FormationManager;
+class InterpreterCore;
+class UnidentifiedVariant_80054AB8;
 
 enum eFormationType
 {
@@ -94,13 +96,13 @@ public:
     }
     static FormationEval* Create(FormationManager* pManager, eFormationType formType,
         eFormationSet formSetID, eFormation formID);
-    virtual ~FormationEval() { }
+    virtual ~FormationEval();
     virtual void CalculateDesiredLocation(nlVector3& destPosition, cFielder* pFielder, bool bExtrapolate);
     virtual cPlayer* GetKeyPlayer();
-    virtual void fn_80052978();
+    virtual void ResetKeyPlayer();
     virtual void GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPosition, nlVector3* pKeyFormationAIPosition, bool bExtrapolate);
     virtual float GetWeight(const nlVector2* v2AIBallLoc);
-    virtual bool fn_80054A20();
+    virtual bool HasActiveFormation();
     virtual float IsFielderInPosition(cFielder* pFielder, nlVector3 v3Pos, bool bExtended);
     virtual void SortPlayers(const nlVector2* v2Center);
     virtual void Update(float fDeltaT);
@@ -129,31 +131,18 @@ public:
     /* 0x20 */ unsigned int m_iFielderFormationPos[4];
 };
 
-class FormationBallPosition : public FormationEval
+class FormationDefensive : public FormationEval
 {
 public:
-    FormationBallPosition(FormationManager* pMgr, eFormationType type, const FormationSet* set)
-        : FormationEval(pMgr, type, 0)
+    FormationDefensive(FormationManager* pMgr, eFormationType type, const FormationSpec* spec)
+        : FormationEval(pMgr, type, spec)
     {
-        field_0x38 = 0;
-        field_0x34 = 0;
-        field_0x3C = 0;
-        m_pFormationSet = set;
     }
-    virtual ~FormationBallPosition();
-    virtual void CalculateDesiredLocation(nlVector3& destPosition, cFielder* pFielder, bool bExtrapolate);
-    virtual void fn_80052978();
+    virtual void GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPosition,
+        nlVector3* pKeyFormationAIPosition, bool bExtrapolate);
     virtual float GetWeight(const nlVector2* v2AIBallLoc);
-    virtual bool fn_80054A20();
+    virtual float IsFielderInPosition(cFielder* pFielder, nlVector3 v3Pos, bool bExtended);
     virtual void Update(float fDeltaT);
-
-    bool SelectClosestBallFormations(const nlVector2& v2AIBallLoc);
-    void CalcBallPosition(nlVector2& v2DestAIBallPos);
-
-    /* 0x30 */ const FormationSet* m_pFormationSet;
-    /* 0x34 */ FormationEval* field_0x34;
-    /* 0x38 */ FormationEval* field_0x38;
-    /* 0x3C */ int field_0x3C;
 };
 
 class FormationOffensive : public FormationEval
@@ -167,18 +156,31 @@ public:
     virtual float IsFielderInPosition(cFielder* pFielder, nlVector3 v3Pos, bool bExtended);
 };
 
-class FormationDefensive : public FormationEval
+class FormationBallPosition : public FormationEval
 {
 public:
-    FormationDefensive(FormationManager* pMgr, eFormationType type, const FormationSpec* spec)
-        : FormationEval(pMgr, type, spec)
+    FormationBallPosition(FormationManager* pMgr, eFormationType type, const FormationSet* set)
+        : FormationEval(pMgr, type, 0)
     {
+        m_pActiveBallFormationsTail = 0;
+        m_pActiveBallFormationsHead = 0;
+        m_NumActiveBallFormations = 0;
+        m_pFormationSet = set;
     }
-    virtual void GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPosition,
-        nlVector3* pKeyFormationAIPosition, bool bExtrapolate);
+    virtual ~FormationBallPosition();
+    virtual void CalculateDesiredLocation(nlVector3& destPosition, cFielder* pFielder, bool bExtrapolate);
+    virtual void ResetKeyPlayer();
     virtual float GetWeight(const nlVector2* v2AIBallLoc);
-    virtual float IsFielderInPosition(cFielder* pFielder, nlVector3 v3Pos, bool bExtended);
+    virtual bool HasActiveFormation();
     virtual void Update(float fDeltaT);
+
+    bool SelectClosestBallFormations(const nlVector2& v2AIBallLoc);
+    void CalcBallPosition(nlVector2& v2DestAIBallPos);
+
+    /* 0x30 */ const FormationSet* m_pFormationSet;
+    /* 0x34 */ FormationEval* m_pActiveBallFormationsHead;
+    /* 0x38 */ FormationEval* m_pActiveBallFormationsTail;
+    /* 0x3C */ int m_NumActiveBallFormations;
 };
 
 struct CachedPosition
@@ -194,12 +196,12 @@ class FormationManager
 public:
     FormationManager(cTeam* pTeam);
     ~FormationManager();
-    void Update(float dt);
+    void Update(float fDeltaT);
     void ChooseNewFormations();
-    void fn_80050D24();
-    void fn_80051F00(nlVector2* pCenter);
+    void ResetToDefaults();
+    void CalculateAIFielderCenter(nlVector2* pCenter);
     void AccumulateWeightedFielderCenter(const float*& pWeight);
-    unsigned int* fn_80052034();
+    unsigned int* GetHighestWeightFielderOrder();
     bool CalculateFielderPosition(nlVector3& v3DestPosition, cFielder* pFielder,
         bool bInPosition, float fBallPosFormationWeight);
     void ClearFormationEvaluators();
@@ -210,12 +212,17 @@ public:
     /* 0x00 */ cTeam* m_pTeam;
     /* 0x04 */ FormationEval* m_pFormations[3];
     /* 0x10 */ nlVector2 m_v2AIFielderCenter;
-    /* 0x18 */ nlVector2 field_0x18;
+    /* 0x18 */ nlVector2 m_v2WeightedFielderCenter;
     /* 0x20 */ Timer m_tSelectFormationsTimer;
     /* 0x28 */ CachedPosition m_CachedPositions[4];
 
     static FormationSet* m_FormationSetArray;
     static int m_NumFormationSets;
 };
+
+extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(InterpreterCore*, const char*, cTeam*);
+extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(InterpreterCore*, cTeam*, const char*);
+extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(InterpreterCore*, const unsigned int&, cTeam*);
+extern const float g_fFielderOrderPenalty;
 
 #endif // _FORMATION_H_

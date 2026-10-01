@@ -33,7 +33,7 @@ bool DesireSlideAttack::UnidentifiedInitialize(void* context)
 
     if (mpTarget == NULL)
     {
-        m_pFielder->InitActionSlideAttack(NULL, 0, -1.0f);
+        m_pFielder->InitActionSlideAttack(NULL, -1.0f, 0);
         meDesireSubState = 1;
     }
     else
@@ -65,7 +65,7 @@ void DesireSlideAttack::Update(
 
         if (fn_800D7B00(pFielder) >= 0.5f)
         {
-            pFielder->InitActionSlideAttack(mpTarget, 0, -1.0f);
+            pFielder->InitActionSlideAttack(mpTarget, -1.0f, 0);
             meDesireSubState = 1;
             break;
         }

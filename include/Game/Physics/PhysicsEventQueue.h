@@ -9,7 +9,9 @@ extern "C" PhysicsEventQueue* lbl_806E11F0;
 
 extern SlotPool<UnidentifiedEventData26> lbl_80570110;
 extern SlotPool<UnidentifiedEventData24> lbl_80570138;
+extern SlotPool<UnidentifiedEventData30> lbl_80570160;
 extern SlotPool<UnidentifiedEventData34> lbl_80570188;
+extern SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool;
 
 void QueueCollisionBallChain(CollisionBallChainData* data);
 void QueueCollisionChainCrowd(UnidentifiedEventData28* data);

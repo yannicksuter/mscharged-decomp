@@ -64,7 +64,6 @@ struct UnidentifiedFESceneState
 };
 
 extern UnidentifiedGoalieActionState* g_pGame;
-extern float lbl_806DBB08;
 extern float lbl_806DBBE0;
 extern float lbl_806DBBE4;
 extern float lbl_806DBBE8;
@@ -84,7 +83,6 @@ extern float lbl_806DBC38;
 extern float lbl_806DBC60;
 extern float lbl_806DBC64;
 extern float lbl_806DBC68;
-extern float gfRepositionThreshold;
 extern float lbl_806DBC6C;
 extern float lbl_806DBC70;
 extern float lbl_806DBC74;
@@ -145,7 +143,6 @@ extern unsigned char lbl_806E0D18;
 extern unsigned char lbl_806E0D19;
 extern unsigned char lbl_806E0D1A;
 extern unsigned char lbl_806E0D22;
-extern nlVector4 lbl_8056D3B0;
 extern unsigned char lbl_806E0D20;
 extern unsigned char lbl_806E0D21;
 extern "C" void fn_8005DB44(

@@ -13,7 +13,7 @@
 #include "Game/Effects/EmissionController.h"
 #include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Render/NPCManager.h"
-#include "Game/Render/tu_801B532C.h"
+#include "Game/Render/WindDebrisConfig.h"
 #include "math.h"
 #include "Game/Render/tu_8027AE14.h"
 #include "Game/AI/Fielder.h"
@@ -644,7 +644,7 @@ void Windy::Start()
                 npc = gNPCManager->fn_801A9DE0(eDebrisType);
                 i++;
             }
-            UnidentifiedNPCConfig_801B532C* config = fn_801B532C(eDebrisType);
+            WindDebrisConfig* config = GetWindDebrisConfig(eDebrisType);
             if (!npc->mbIsVisible)
             {
                 nlVector3 debrisVelocity = GetDebrisVelocity(direction);
@@ -654,7 +654,7 @@ void Windy::Start()
                 nlVector3 offset;
                 nlVec3Scale(offset, debrisVelocity, distance);
                 nlVec3Sub(debrisPosition, v3Zero, offset);
-                nlVector3 displacement = CalculateDebrisDisplacement(debrisPosition, debrisVelocity, distance, config->mUnidentified008);
+                nlVector3 displacement = CalculateDebrisDisplacement(debrisPosition, debrisVelocity, distance, config->mRadius);
                 nlVec3Set(debrisPosition, debrisPosition.x + displacement.x, debrisPosition.y + displacement.y, 0.0f);
                 debrisPosition.x = nlMinEquals(nlMaxEquals(debrisPosition.x, -127.0f), 127.0f);
                 debrisPosition.y = nlMinEquals(nlMaxEquals(debrisPosition.y, -127.0f), 127.0f);

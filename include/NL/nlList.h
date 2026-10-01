@@ -194,12 +194,18 @@ inline void nlDeleteList(T** head)
 }
 
 template <typename T>
+inline void nlDeleteList(T** head, T** tail)
+{
+    while (*head != 0)
+    {
+        delete nlListRemoveStart<T>(head, tail);
+    }
+}
+
+template <typename T>
 inline void nlDeleteList(nlList<T>& list)
 {
-    while (list.m_pStart != 0)
-    {
-        delete nlListRemoveStart<T>(&list.m_pStart, &list.m_pEnd);
-    }
+    nlDeleteList(&list.m_pStart, &list.m_pEnd);
 }
 
 #include "NL/nlListContainer.h"

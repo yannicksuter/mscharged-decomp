@@ -9,7 +9,7 @@
 class TLComponentInstance;
 class TLImageInstance;
 class TLInstance;
-struct UnidentifiedTLGroupInstance;
+struct TLGroupInstance;
 
 struct FEAttributeBar
 {
@@ -51,14 +51,14 @@ public:
     /* 0x080 */ TLComponentInstance* mPositions;
     /* 0x084 */ TLComponentInstance* mJoinPrompt;
     /* 0x088 */ TLComponentInstance* mReadyPrompt;
-    /* 0x08C */ UnidentifiedTLGroupInstance* mPositionsGroup;
+    /* 0x08C */ TLGroupInstance* mPositionsGroup;
     /* 0x090 */ TLComponentInstance* mSidekickAttributes;
     /* 0x094 */ TLComponentInstance* mTeamLogos;
     /* 0x098 */ TLImageInstance* mSidekickAttributeImages[7];
     /* 0x0B4 */ TLImageInstance* mCaptainAttributeImages[7];
     /* 0x0D0 */ TLComponentInstance* mDescriptions;
     /* 0x0D4 */ TLComponentInstance* mScrollArrows;
-    /* 0x0D8 */ UnidentifiedTLGroupInstance* mContinueGroup;
+    /* 0x0D8 */ TLGroupInstance* mContinueGroup;
     /* 0x0DC */ FEScrollBar mScrollBar;
     /* 0x290 */ int mUnidentified290;
     /* 0x294 */ int mSelectedCaptain;

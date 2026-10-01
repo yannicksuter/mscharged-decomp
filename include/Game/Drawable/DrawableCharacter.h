@@ -100,7 +100,7 @@ class LoadFrame;
 class cPN_Blender;
 class cPN_Feather;
 class cPN_SingleAxisBlender;
-class cPN_8030E550;
+class cPN_ScaleBlender;
 
 void nlBreak();
 
@@ -135,7 +135,7 @@ void Replayable(LoadFrame& frame, char typeId, cPoseNode*& poseNode)
         }
         else if (typeId == 4)
         {
-            cPN_8030E550* node = new cPN_8030E550;
+            cPN_ScaleBlender* node = new cPN_ScaleBlender;
             node->Replay(frame);
             poseNode = node;
         }
@@ -172,7 +172,7 @@ void Replayable(SaveFrame& frame, char typeId, cPoseNode*& poseNode)
         }
         else if (typeId == 4)
         {
-            cPN_8030E550* pn = (cPN_8030E550*)poseNode;
+            cPN_ScaleBlender* pn = (cPN_ScaleBlender*)poseNode;
             pn->Replay(frame);
         }
     }

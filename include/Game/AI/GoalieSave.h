@@ -109,4 +109,7 @@ public:
     static float mfCrouchDuration;
 };
 
+extern nlVector3 lbl_8056D3B0;
+extern unsigned short lbl_806DBD58;
+
 #endif // GAME_AI_GOALIE_SAVE_H

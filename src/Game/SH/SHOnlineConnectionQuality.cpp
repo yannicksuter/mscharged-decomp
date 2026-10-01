@@ -30,7 +30,7 @@ const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
 #include "NL/plat/TransportConnection.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/FEAudio.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 static inline void UpdateConnectionQualityTimerText(
     OnlineConnectionQualityScene* scene, TLTextInstance* timer)

@@ -1,7 +1,6 @@
 #include "Game/Task/DispatchEventsTask.h"
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/BulletBill.h"
-#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/EventDispatcher.inl"
 
@@ -39,8 +38,7 @@
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-
+#include "Game/Physics/PhysicsEventQueue.inl"
 
 class PhysicsEventQueue
 {
@@ -120,6 +118,59 @@ public:
     UnidentifiedQueuedEvent<CollisionShockwaveData> mCollisionShockwaveEvent;
 };
 
+static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
+float lbl_806DCA90 = 1.0f;
+
+SlotPool<UnidentifiedEventData26> lbl_80570110(16, 16);
+SlotPool<UnidentifiedEventData24> lbl_80570138(16, 16);
+SlotPool<UnidentifiedEventData30> lbl_80570160(16, 16);
+SlotPool<UnidentifiedEventData34> lbl_80570188(16, 16);
+SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool(16, 16);
+
+PhysicsEventQueue* lbl_806E11F0;
+
+extern "C" void fn_80143FD4()
+{
+    lbl_80570110.FreeBlocks();
+    lbl_80570138.FreeBlocks();
+    lbl_80570160.FreeBlocks();
+    lbl_80570188.FreeBlocks();
+    gCollisionShockwaveDataPool.FreeBlocks();
+}
+
+extern "C" void fn_80144070()
+{
+    if (lbl_806E11F0 == 0)
+    {
+        lbl_806E11F0 = new (nlMalloc(sizeof(PhysicsEventQueue), 8, false))
+            PhysicsEventQueue;
+        InitializeShockwaves();
+    }
+}
+
+extern "C" void fn_801440BC()
+{
+    if (lbl_806E11F0 != 0)
+    {
+        EventDispatcher& dispatcher = lbl_806E11F0->mDispatcher;
+        dispatcher.Clear();
+
+        BasicSlotPool<DLListEntry<EventCallback> >* pool =
+            &dispatcher.callbacks.m_Allocator;
+        fn_802B467C(pool);
+        SlotPoolBase::BaseFreeBlocks(
+            pool, sizeof(DLListEntry<EventCallback>));
+
+        delete lbl_806E11F0;
+        lbl_806E11F0 = 0;
+        ShutdownShockwaves();
+    }
+}
+
+extern "C" void fn_80144130(PhysicsEventQueue* dispatcher)
+{
+    dispatcher->Dispatch(true);
+}
 
 PhysicsEventQueue::PhysicsEventQueue()
     : mDispatcher("PhysicsEventQueue")
@@ -194,16 +245,32 @@ PhysicsEventQueue::~PhysicsEventQueue()
 {
 }
 
-struct UnidentifiedMemberFunction
-{
-    long thisDelta;
-    long vtableOffset;
-    void* function;
-};
+extern "C" void fn_801452F4(void*);
+extern "C" void fn_80145300(void*);
+extern "C" void fn_80145318(void*);
+extern "C" void fn_80145370(void*);
+extern "C" void fn_801453B8(void*);
+extern "C" void fn_801453DC(void*);
+extern "C" void fn_801453E0(void*);
+extern "C" void fn_801453FC(void*);
+extern "C" void fn_8014545C(void*);
+extern "C" void fn_80145C3C(void*);
+extern "C" void HandleCollisionShockwave(CollisionShockwaveData*);
 
-extern "C" long __ptmf_test(UnidentifiedMemberFunction*);
-extern "C" UnidentifiedMemberFunction lbl_8050F58C;
-extern "C" const nlVector3 lbl_804DCC60;
+extern "C" void fn_80144AB8()
+{
+    UnidentifiedFindEvent<void>("CollisionPatchPowerup", -1)->Add(Function<void*>(fn_801453DC), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionHammerPowerup", -1)->Add(Function<void*>(fn_801453B8), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionFireballPowerup", -1)->Add(Function<void*>(fn_801452F4), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionCrackEgg", -1)->Add(Function<void*>(fn_801453E0), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionShockwave", -1)->Add(Function<void*>((void (*)(void*))HandleCollisionShockwave), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionKoopaShellEnd", -1)->Add(Function<void*>(fn_801453FC), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionBirdoEggEnd", -1)->Add(Function<void*>(fn_8014545C), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionPatchPatch", -1)->Add(Function<void*>(fn_80145C3C), 0, -1);
+    UnidentifiedFindEvent<void>("DestroyPowerup", -1)->Add(Function<void*>(fn_80145300), 0, -1);
+    UnidentifiedFindEvent<void>("DestroyHammer", -1)->Add(Function<void*>(fn_80145370), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionWaluigiWall", -1)->Add(Function<void*>(fn_80145318), 0, -1);
+}
 
 extern "C" void fn_800156F8(void*, void*);
 extern "C" void fn_80015B38(void*, int);
@@ -227,12 +294,12 @@ extern "C" void fn_80145318(void* object)
     nlVector3 direction;
     nlPolarToCartesian(direction.x, direction.y, *(unsigned short*)((unsigned char*)object + 0x62), 1.0f);
     direction.z = 0.0f;
-    ((cFielder*)object)->InitActionShellReact(direction, lbl_804DCC60);
+    ((cFielder*)object)->InitActionShellReact(direction, v3Zero);
 }
 
 extern "C" void fn_80145370(void* object)
 {
-    if (__ptmf_test(&lbl_8050F58C))
+    if (&HammerObject::fn_8016A650)
     {
         ((HammerObject*)object)->Reset(false);
     }
@@ -291,8 +358,6 @@ extern "C" void fn_8014545C(void* data)
 }
 
 extern "C" void fn_800ED92C(unsigned long soundID);
-
-float lbl_806DCA90 = 1.0f;
 
 extern "C" void HandleCollisionShockwave(CollisionShockwaveData* data)
 {
@@ -589,25 +654,7 @@ extern "C" void fn_80145C3C(void* data)
     }
 }
 
-extern "C" void fn_80144AB8()
-{
-    UnidentifiedFindEvent<void>("CollisionPatchPowerup", -1)->Add(Function<void*>(fn_801453DC), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionHammerPowerup", -1)->Add(Function<void*>(fn_801453B8), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionFireballPowerup", -1)->Add(Function<void*>(fn_801452F4), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionCrackEgg", -1)->Add(Function<void*>(fn_801453E0), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionShockwave", -1)->Add(Function<void*>((void (*)(void*))HandleCollisionShockwave), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionKoopaShellEnd", -1)->Add(Function<void*>(fn_801453FC), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionBirdoEggEnd", -1)->Add(Function<void*>(fn_8014545C), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionPatchPatch", -1)->Add(Function<void*>(fn_80145C3C), 0, -1);
-    UnidentifiedFindEvent<void>("DestroyPowerup", -1)->Add(Function<void*>(fn_80145300), 0, -1);
-    UnidentifiedFindEvent<void>("DestroyHammer", -1)->Add(Function<void*>(fn_80145370), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionWaluigiWall", -1)->Add(Function<void*>(fn_80145318), 0, -1);
-}
-
 extern "C" void fn_800721AC(CollisionPlayerWallData*);
-void FreeCollisionBallChainData(CollisionBallChainData*);
-void FreeCollisionChainPowerupData(CollisionChainPowerupData*);
-extern "C" void FreeCollisionShockwaveData(void*);
 
 extern "C" void fn_80145C9C()
 {
@@ -940,217 +987,6 @@ extern "C" void QueueCollisionShockwave(CollisionShockwaveData* data)
     lbl_806E11F0->mCollisionShockwaveEvent.Queue(
         data, Function<CollisionShockwaveData*>(
                   (void (*)(CollisionShockwaveData*))FreeCollisionShockwaveData));
-}
-
-EventDispatcher::EventDispatcher(const char*)
-    : EventDispatcherBase<EventCallback>()
-{
-}
-
-struct UnidentifiedPooledData08
-{
-    unsigned char data[0x08];
-};
-
-SlotPool<UnidentifiedEventData26> lbl_80570110(16, 16);
-SlotPool<UnidentifiedEventData24> lbl_80570138(16, 16);
-static SlotPool<UnidentifiedPooledData08> lbl_80570160(16, 16);
-SlotPool<UnidentifiedEventData34> lbl_80570188(16, 16);
-SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool(16, 16);
-
-PhysicsEventQueue* lbl_806E11F0;
-
-extern "C" void fn_80143FD4()
-{
-    lbl_80570110.FreeBlocks();
-    lbl_80570138.FreeBlocks();
-    lbl_80570160.FreeBlocks();
-    lbl_80570188.FreeBlocks();
-    gCollisionShockwaveDataPool.FreeBlocks();
-}
-
-extern "C" void fn_80144070()
-{
-    if (lbl_806E11F0 == 0)
-    {
-        lbl_806E11F0 = new (nlMalloc(sizeof(PhysicsEventQueue), 8, false))
-            PhysicsEventQueue;
-        InitializeShockwaves();
-    }
-}
-
-extern "C" void fn_801440BC()
-{
-    if (lbl_806E11F0 != 0)
-    {
-        EventDispatcher& dispatcher = lbl_806E11F0->mDispatcher;
-        dispatcher.Clear();
-
-        BasicSlotPool<DLListEntry<EventCallback> >* pool =
-            &dispatcher.callbacks.m_Allocator;
-        fn_802B467C(pool);
-        SlotPoolBase::BaseFreeBlocks(
-            pool, sizeof(DLListEntry<EventCallback>));
-
-        delete lbl_806E11F0;
-        lbl_806E11F0 = 0;
-        ShutdownShockwaves();
-    }
-}
-
-extern "C" void fn_80144130(PhysicsEventQueue* dispatcher)
-{
-    dispatcher->Dispatch(true);
-}
-
-extern "C" unsigned char fn_8016A650(void* object)
-{
-    return ((unsigned char*)object)[0x24];
-}
-
-extern "C" void fn_8016A658(void* data)
-{
-    g_CollisionPlayerPlayerDataPool.Free((CollisionPlayerPlayerData*)data);
-}
-
-extern "C" void fn_8016A670(void* data)
-{
-    lbl_80570138.Free((UnidentifiedEventData24*)data);
-}
-
-extern "C" void fn_8016A688(CollisionPlayerBallData* data)
-{
-    g_CollisionPlayerBallDataPool.Free(data);
-}
-
-extern "C" void fn_8016A6A0(void* data)
-{
-    g_BallNetmeshEventDataPool.Free((BallNetmeshEventData*)data);
-}
-
-extern "C" void fn_8016A6B8(CollisionBallGroundData* data)
-{
-    g_CollisionBallGroundDataPool.Free(data);
-}
-
-extern "C" void fn_8016A6D0(CollisionBallWallData* data)
-{
-    g_CollisionBallWallDataPool.Free(data);
-}
-
-extern "C" void fn_8016A6E8(CollisionBallGoalpostData* data)
-{
-    g_CollisionBallGoalpostDataPool.Free(data);
-}
-
-extern "C" void fn_8016A700(CollisionBallShellData* data)
-{
-    g_CollisionBallShellDataPool.Free(data);
-}
-
-void FreeCollisionBallChainData(CollisionBallChainData* data)
-{
-    g_CollisionBallChainDataPool.Free(data);
-}
-
-extern "C" void fn_8016A730(CollisionKoopaShotBallPlayerData* data)
-{
-    g_CollisionKoopaShotBallPlayerDataPool.Free(data);
-}
-
-extern "C" void fn_8016A748(CollisionKoopaShellGoalieData* data)
-{
-    g_CollisionKoopaShellGoalieDataPool.Free(data);
-}
-
-extern "C" void fn_8016A760(void* data)
-{
-    g_CollisionKoopaShellEndDataPool.Free((CollisionKoopaShellEndData*)data);
-}
-
-extern "C" void fn_8016A778(CollisionBirdoShotBallPlayerData* data)
-{
-    g_CollisionBirdoShotBallPlayerDataPool.Free(data);
-}
-
-extern "C" void fn_8016A790(CollisionBirdoEggGoalieData* data)
-{
-    g_CollisionBirdoEggGoalieDataPool.Free(data);
-}
-
-extern "C" void fn_8016A7A8(void* data)
-{
-    g_CollisionBirdoEggEndDataPool.Free((CollisionBirdoEggEndData*)data);
-}
-
-extern "C" void fn_8016A7C0(void* data)
-{
-    g_CollisionPowerupGroundDataPool.Free((CollisionPowerupGroundData*)data);
-}
-
-extern "C" void fn_8016A7D8(CollisionPowerupWallData* data)
-{
-    g_CollisionPowerupWallDataPool.Free(data);
-}
-
-extern "C" void fn_8016A7F0(void* data)
-{
-    g_PowerupHitPlayerEventDataPool.Free((PowerupHitPlayerEventData*)data);
-}
-
-extern "C" void fn_8016A808(CollisionPlayerBananaData* data)
-{
-    g_CollisionPlayerBananaDataPool.Free(data);
-}
-
-extern "C" void fn_8016A820(CollisionPlayerShellData* data)
-{
-    g_CollisionPlayerShellDataPool.Free(data);
-}
-
-extern "C" void fn_8016A838(CollisionPlayerFreezeData* data)
-{
-    g_CollisionPlayerFreezeDataPool.Free(data);
-}
-
-extern "C" void fn_8016A850(CollisionBulletBillData* data)
-{
-    g_CollisionBulletBillDataPool.Free(data);
-}
-
-extern "C" void fn_8016A868(void* data)
-{
-    g_PowerupUsedEventDataPool.Free((PowerupUsedEventData*)data);
-}
-
-void FreeCollisionChainPowerupData(CollisionChainPowerupData* data)
-{
-    g_CollisionChainPowerupDataPool.Free(data);
-}
-
-extern "C" void fn_8016A898(void* data)
-{
-    lbl_80570160.Free((UnidentifiedPooledData08*)data);
-}
-
-extern "C" void fn_8016A8B0(UnidentifiedEventData26* data)
-{
-    lbl_80570110.Free(data);
-}
-
-extern "C" void fn_8016A8C8(CollisionThwompPlayerData* data)
-{
-    g_CollisionThwompPlayerDataPool.Free(data);
-}
-
-extern "C" void fn_8016A8E0(UnidentifiedEventData34* data)
-{
-    lbl_80570188.Free(data);
-}
-
-extern "C" void FreeCollisionShockwaveData(void* data)
-{
-    gCollisionShockwaveDataPool.Free((CollisionShockwaveData*)data);
 }
 
 #include "NL/nlBind_impl.h"

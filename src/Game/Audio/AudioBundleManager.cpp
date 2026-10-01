@@ -18,7 +18,7 @@ AudioBundleManager::AudioBundleManager()
     , m_Chunk13400(0)
     , m_Chunk13500(0)
 {
-    m_LoadState.m_Loaded = false;
+    m_Loaded = false;
     m_Backend = new (8, false) AudioBackend;
 }
 
@@ -32,7 +32,7 @@ void AudioBundleManager::OnBundleLoaded(
 {
     nlChunk* chunk = (nlChunk*)data;
     AudioBundleManager* self = (AudioBundleManager*)manager;
-    self->m_LoadState.m_LoadedData = data;
+    self->m_LoadedData = data;
 
     nlChunk* end = chunk->GetLastChunk();
     chunk = chunk->GetFirstChunk();
@@ -61,17 +61,17 @@ void AudioBundleManager::ParseChunk(nlChunk* chunk)
         m_Chunk13100 = ParseAudioSliderTable(chunk);
         break;
     case 0x1200:
-        if (m_LoadState.m_Runtime.Load(
+        if (m_Runtime.m_Registry.Load(
                 chunk->GetData(),
                 chunk->GetDataSize(),
                 false))
         {
-            m_LoadState.m_Runtime.m_ConfigRoot
-                = (AudioConfigNode*)m_LoadState.m_Runtime.GetRoot();
+            m_Runtime.m_ConfigRoot
+                = (AudioConfigNode*)m_Runtime.m_Registry.GetRoot();
         }
         break;
     case 0x23704:
-        m_LoadState.m_Runtime.LoadScriptData(
+        m_Runtime.LoadScriptData(
             chunk->GetData(),
             chunk->GetDataSize());
         break;

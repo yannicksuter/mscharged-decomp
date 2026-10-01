@@ -62,6 +62,14 @@ public:
     /* 0x0C */ CrowdLayoutRecord* mLayout;
 }; // size: 0x10
 
+CrowdImpostorManager::CrowdImpostorManager()
+{
+    mLayouts = 0;
+    mPrimaryObjectCount = 0;
+    mNumLayouts = 0;
+    mNumAngles = 0;
+}
+
 CrowdImpostorManager* GetCrowdImpostorManager()
 {
     static CrowdImpostorManager manager;
@@ -174,16 +182,6 @@ void CrowdImpostorManager::Clear()
         delete mInverseMatrices;
 }
 
-static inline void InterpolateCrowdPoint(const nlVector4& first,
-    const nlVector4& second, float amount, nlVector4& result)
-{
-    nlVec4Set(result,
-        (1.0f - amount) * first.x + amount * second.x,
-        (1.0f - amount) * first.y + amount * second.y,
-        (1.0f - amount) * first.z + amount * second.z,
-        (1.0f - amount) * first.w + amount * second.w);
-}
-
 int CrowdLayoutObject::PlacePoints(CrowdPointCallback* callback, float rowSpacing, float memberSpacing)
 {
     nlVector4 corners[4];
@@ -194,17 +192,21 @@ int CrowdLayoutObject::PlacePoints(CrowdPointCallback* callback, float rowSpacin
 
     for (int row = 0; row < numRows; ++row)
     {
-        float rowStep = rowSpacing / mLength;
+        float rowStep = mLength;
+        rowStep = rowSpacing / rowStep;
         float occupiedLength = (numRows - 1) * rowSpacing;
         float rowOffset = 0.5f
             * (mLength - occupiedLength)
             / mLength;
-        float rowAmount
-            = row * rowStep + rowOffset;
+        float rowAmount[1] = { row * rowStep + rowOffset };
         nlVector4 right;
         nlVector4 left;
-        InterpolateCrowdPoint(corners[3], corners[0], rowAmount, left);
-        InterpolateCrowdPoint(corners[2], corners[1], rowAmount, right);
+        nlVec4Scale(left, corners[0], rowAmount[0]);
+        nlVec4ScaleAdd(left, 1.0f - rowAmount[0],
+            corners[3], left);
+        nlVec4Scale(right, corners[1], rowAmount[0]);
+        nlVec4ScaleAdd(right, 1.0f - rowAmount[0],
+            corners[2], right);
 
         float rowLength = nlSqrt(
             CalculateDistanceSquared(*(const nlVector3*)&left,
@@ -219,11 +221,11 @@ int CrowdLayoutObject::PlacePoints(CrowdPointCallback* callback, float rowSpacin
             float memberOffset
                 = 0.5f * (rowLength - occupiedWidth)
                 / rowLength;
-            float memberAmount
-                = member * memberStep + memberOffset;
+            float memberAmount[1] = { member * memberStep + memberOffset };
             nlVector4 point;
-            InterpolateCrowdPoint(
-                right, left, memberAmount, point);
+            nlVec4Scale(point, left, memberAmount[0]);
+            nlVec4ScaleAdd(point, 1.0f - memberAmount[0],
+                right, point);
             callback->Place(point);
             ++total;
         }
@@ -388,10 +390,11 @@ inline void CrowdPointCallback::UpdateBounds(const nlVector4& worldPoint)
 void CrowdPointCallback::Place(
     nlVector4 point)
 {
-    float horizontalJitter = sfDistanceBetweenCrowdMembers.value
-        * sfHorizontalJitterFraction.value;
-    float verticalJitter = sfDistanceBetweenCrowdRows.value
-        * sfVerticalJitterFraction.value;
+    float horizontalJitter;
+    float verticalJitter = (
+        horizontalJitter = sfDistanceBetweenCrowdMembers.value
+            * sfHorizontalJitterFraction.value,
+        sfDistanceBetweenCrowdRows.value * sfVerticalJitterFraction.value);
 
     nlVector4 localPoint;
     localPoint.x = point.x

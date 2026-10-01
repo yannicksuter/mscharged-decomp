@@ -9,7 +9,7 @@
 class TLComponentInstance;
 class TLImageInstance;
 class TLInstance;
-struct UnidentifiedTLGroupInstance;
+struct TLGroupInstance;
 struct CharacterInfo;
 
 class FECaptainComponent

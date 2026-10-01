@@ -85,7 +85,7 @@ public:
     virtual RegistryContainer* AddUnnamedChild() = 0;
     virtual void UnidentifiedVirtual34() = 0;
     virtual void UnidentifiedVirtual38() = 0;
-    virtual void GetIterator(RegistryIteratorBase* iterator, int which) = 0;
+    virtual void GetIterator(RegistryIteratorBase* iterator, int which) const = 0;
     virtual RegistryNode* Find(const u32& hash) = 0;
 };
 
@@ -229,7 +229,7 @@ public:
     virtual void UnidentifiedVirtual34();
     virtual void UnidentifiedVirtual38();
     virtual RegistryNode* UnidentifiedVirtual44(const u32& hash);
-    virtual void GetIterator(RegistryIteratorBase* iterator, int which);
+    virtual void GetIterator(RegistryIteratorBase* iterator, int which) const;
     virtual RegistryNode* Find(const u32& hash);
 
     RegistryNode* Tail(int which) { return which ? mNamed : mUnnamed; }
@@ -330,8 +330,8 @@ public:
     virtual void** GetValueSlot();
 };
 
-// Read-only container image: named and unnamed counts, the two packed
-// type-word arrays, the hash-sorted named entries, then the unnamed pointers.
+// Packed container header. The two type-word arrays follow this header,
+// then the hash-sorted named entries and the unnamed pointers.
 class PackedRegistryContainer : public RegistryContainer
 {
 public:
@@ -349,28 +349,34 @@ public:
     virtual void UnidentifiedVirtual28();
     virtual void UnidentifiedVirtual38();
     virtual void UnidentifiedVirtual34();
-    virtual void GetIterator(RegistryIteratorBase* iterator, int which);
+    virtual void GetIterator(RegistryIteratorBase* iterator, int which) const;
 
+    const u32* NamedTypes() const
+    {
+        return (const u32*)((const u8*)this + sizeof(PackedRegistryContainer));
+    }
     const u32* UnnamedTypes() const
     {
-        return RegistryUnnamedTypes(mWords, mNamedCount);
+        return RegistryUnnamedTypes(
+            (const u32*)((const u8*)this + sizeof(PackedRegistryContainer)), mNamedCount);
     }
     const PackedRegistryEntry* NamedEntries() const
     {
-        return RegistryNamedEntries(mWords, mNamedCount, mUnnamedCount);
+        return RegistryNamedEntries(
+            (const u32*)((const u8*)this + sizeof(PackedRegistryContainer)),
+            mNamedCount, mUnnamedCount);
     }
     void* const* UnnamedEntries() const { return (void* const*)(NamedEntries() + mNamedCount); }
 
     /* 0x04 */ u16 mNamedCount;
     /* 0x06 */ u16 mUnnamedCount;
-    /* 0x08 */ u32 mWords[1];
-};
+}; // size: 0x08
 
 inline void PackedNamedRegistryIterator::Construct(
     const PackedRegistryContainer* packed, RegistryIteratorBase* iterator)
 {
     new (iterator) PackedNamedRegistryIterator(
-        packed->mWords, packed->mNamedCount, packed->NamedEntries());
+        packed->NamedTypes(), packed->mNamedCount, packed->NamedEntries());
 }
 
 inline void PackedUnnamedRegistryIterator::Construct(

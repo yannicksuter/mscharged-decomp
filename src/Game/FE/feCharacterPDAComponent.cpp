@@ -74,7 +74,7 @@ void FECharacterPDAComponent::Initialize(TLComponentInstance* component, int sid
     mJoinPrompt = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPDAScreens->GetActiveSlide(), "A to join");
     mReadyPrompt = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPDAScreens->GetActiveSlide(), "ready_prompt");
     mSidekickAttributes = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mRootComponent->GetActiveSlide(), "attributes_sidekicks");
-    mPositionsGroup = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(mPositions->GetActiveSlide(), "positions");
+    mPositionsGroup = FEFinder<TLGroupInstance, TLAT_GROUP>::FindOrDefault(mPositions->GetActiveSlide(), "positions");
     mTeamLogos = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPositions->GetActiveSlide(), "team_logos");
 
     mSidekickAttributeImages[0] = FEFinder<TLImageInstance, 2>::FindOrDefault(mSidekickAttributes->GetActiveSlide(), "attributes_sidekicks", "white_8x8");
@@ -127,7 +127,7 @@ void FECharacterPDAComponent::Initialize(TLComponentInstance* component, int sid
 
     mDescriptions = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPDAScreens->GetActiveSlide(), "descriptions");
     mScrollArrows = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPDAScreens->GetActiveSlide(), "scroll arrows");
-    mContinueGroup = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(mPDAScreens->GetActiveSlide(), "cONTINUE");
+    mContinueGroup = FEFinder<TLGroupInstance, TLAT_GROUP>::FindOrDefault(mPDAScreens->GetActiveSlide(), "cONTINUE");
     SetVisible(false);
     SetCupIconsVisible(false, false, false);
 }

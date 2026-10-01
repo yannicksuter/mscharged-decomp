@@ -250,7 +250,7 @@ void StatsTracker::SetBasicGameInfoPointer(
     eTeamID homeid;
     eTeamID awayid;
     eCharacterClass characterClass;
-    u32 i;
+    int i;
     int j;
 
     mBasicGameInfo = pGameInfo;
@@ -287,10 +287,8 @@ void StatsTracker::SetBasicGameInfoPointer(
     i = 1;
     do
     {
-        homesk =
-            (eSidekickID)mBasicGameInfo->mSidekickIndex[0][i - 1];
-        awaysk =
-            (eSidekickID)mBasicGameInfo->mSidekickIndex[1][i - 1];
+        homesk = mBasicGameInfo->GetSidekick(0, i - 1);
+        awaysk = mBasicGameInfo->GetSidekick(1, i - 1);
         characterClass = (eCharacterClass)ConvertToCharacterClass(homesk);
         InitializePlayerStats(mCurrentPlayerStats[0][i],
             characterClass, TYPE_CHARACTER);
@@ -298,7 +296,7 @@ void StatsTracker::SetBasicGameInfoPointer(
         InitializePlayerStats(mCurrentPlayerStats[1][i],
             characterClass, TYPE_CHARACTER);
         i++;
-    } while (i < 5);
+    } while (i < sizeof(mCurrentPlayerStats[0]) / sizeof(mCurrentPlayerStats[0][0]));
 
     j = 0;
     do

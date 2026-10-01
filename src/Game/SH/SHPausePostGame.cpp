@@ -26,6 +26,7 @@
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/nlFunction.inl"
 
 int lbl_806DD818 = 10;
 

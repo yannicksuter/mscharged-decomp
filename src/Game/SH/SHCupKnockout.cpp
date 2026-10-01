@@ -543,14 +543,14 @@ void CupKnockoutScene::PopulateBracket()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     int numGames = mTournament->GetNumGames(1);
     int firstGame = 7 - numGames;
-    UnidentifiedTLGroupInstance* groups[2] = { 0, 0 };
+    TLGroupInstance* groups[2] = { 0, 0 };
     for (int i = 0; i < 7; ++i)
     {
         char gameName[4];
         nlSNPrintf(gameName, sizeof(gameName), "g_%d", i);
-        groups[0] = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(
+        groups[0] = FEFinder<TLGroupInstance, TLAT_GROUP>::FindOrDefault(
             mMatchupInstances[i], "off", gameName);
-        groups[1] = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(
+        groups[1] = FEFinder<TLGroupInstance, TLAT_GROUP>::FindOrDefault(
             mMatchupInstances[i], "over", gameName);
 
         for (int j = 0; j < 2; ++j)

@@ -80,7 +80,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glState.h"
-#include "NL/gl/tu_802A12E4.h"
+#include "NL/gl/glShadowedTexturedColourModelWriter.h"
 #include "NL/glx/GXShadowedDiffuseMaterialProgram.h"
 #include "Game/FE/feDPD.h"
 #include "NL/plat/nlFlash.h"
@@ -225,7 +225,7 @@ extern "C" bool fn_8011D1BC(ParticleSystem*, GLView*,
 extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter*, ParticleSystem*,
     nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
     const nlMatrix4*);
-extern "C" void fn_8011D5B0(State_802A12E4*, ParticleSystem*,
+extern "C" void fn_8011D5B0(glShadowedTexturedColourModelWriter*, ParticleSystem*,
     nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
     const nlMatrix4*);
 
@@ -675,7 +675,7 @@ extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
     bool isWarble = sWarbleTexture == source->m_pTemplate->m_hTexture;
     if (fn_80183C54() && !isWarble)
     {
-        State_802A12E4 writer;
+        glShadowedTexturedColourModelWriter writer;
         fn_8011D5B0(&writer, source, vertices, viewRight, viewUp, pCoordSys);
 
         GXShadowedDiffuseParameters* parameters =
@@ -683,7 +683,7 @@ extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
                 writer.GetModel()->packets->materialParameters);
         parameters->receiveShadows = source->m_pTemplate->m_eBlend == EfBlend_Normal;
 
-        if (writer.fn_802A14F0())
+        if (writer.End())
         {
             view->AttachModel(writer.GetModel(), source->m_uLayer);
         }
@@ -752,13 +752,13 @@ extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter* writer,
     }
 }
 
-extern "C" void fn_8011D5B0(State_802A12E4* writer,
+extern "C" void fn_8011D5B0(glShadowedTexturedColourModelWriter* writer,
     ParticleSystem* source, nlDLListSlotPool<Particle*>* vertices,
     const nlVector3& viewRight, const nlVector3& viewUp,
     const nlMatrix4* pCoordSys)
 {
     ParticleReturn ret;
-    if (writer->fn_802A1344(source->mUnidentified0BC * 4, 3, 0))
+    if (writer->Begin(source->mUnidentified0BC * 4, 3, 0))
     {
         nlDLListIterator<Particle*> iterator = vertices->Begin();
         while (iterator.hasNext())

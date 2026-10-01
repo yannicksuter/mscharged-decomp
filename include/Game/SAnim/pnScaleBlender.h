@@ -1,21 +1,24 @@
-#ifndef GAME_SANIM_TU_8030E550_H
-#define GAME_SANIM_TU_8030E550_H
+#ifndef GAME_SANIM_PN_SCALE_BLENDER_H
+#define GAME_SANIM_PN_SCALE_BLENDER_H
 
 #include "Game/PoseNode.h"
 #include "NL/nlSlotPool.h"
 
-enum BlendMode_8030E550
+enum eScaleBlendMode
 {
-    BLEND_MODE_8030E550_IN = 0,
-    BLEND_MODE_8030E550_OUT = 1,
+    SCALE_BLEND_IN = 0,
+    SCALE_BLEND_OUT = 1,
 };
 
 // Pose-node type 4 overlays the second child's animated scale onto the first
-// child's evaluated pose. Its original class name is not yet established.
-class cPN_8030E550 : public cPoseNode
+// child's evaluated pose: Evaluate runs child 0 at full weight, then drives
+// child 1 through EvaluateScale on every node with the smoothstep blend
+// factor, while BlendRootTrans/Rot stay empty. cPN_ScaleBlender is a
+// reconstruction name; the original class name is not established.
+class cPN_ScaleBlender : public cPoseNode
 {
 public:
-    virtual ~cPN_8030E550();
+    virtual ~cPN_ScaleBlender();
     virtual void Evaluate(
         int nodeIndex, float weight, cPoseAccumulator* accumulator) const;
     virtual void Evaluate(float weight, cPoseAccumulator* accumulator) const;
@@ -40,21 +43,21 @@ public:
 
     static void* operator new(unsigned long)
     {
-        cPN_8030E550* node = 0;
-        mSlotPool.Allocate(node);
+        cPN_ScaleBlender* node = 0;
+        m_ScaleBlenderSlotPool.Allocate(node);
         return node;
     }
 
     static void operator delete(void* pointer)
     {
-        mSlotPool.Free((cPN_8030E550*)pointer);
+        m_ScaleBlenderSlotPool.Free((cPN_ScaleBlender*)pointer);
     }
 
     float m_fBlendTime;
     float m_fBlendDuration;
-    BlendMode_8030E550 m_eBlendMode;
+    eScaleBlendMode m_eScaleBlendMode;
 
-    static SlotPool<cPN_8030E550> mSlotPool;
+    static SlotPool<cPN_ScaleBlender> m_ScaleBlenderSlotPool;
 };
 
-#endif // GAME_SANIM_TU_8030E550_H
+#endif // GAME_SANIM_PN_SCALE_BLENDER_H

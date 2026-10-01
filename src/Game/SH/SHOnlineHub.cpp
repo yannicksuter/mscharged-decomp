@@ -36,7 +36,7 @@
 #include "Game/SH/SHHallOfFame.h"
 #include "Game/FE/feOnlineError.h"
 #include "Game/MiiManager.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 #include "Game/SH/SHOnlineHub.h"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;

@@ -587,7 +587,7 @@ void DesireReceivePass::fn_800C0704()
             if (fn_80036C8C(m_pFielder, &aDirection))
             {
                 m_pFielder->InitActionSlideAttack(
-                    0, aDirection, -1.0f);
+                    0, -1.0f, aDirection);
                 fn_80316968(this);
             }
         }

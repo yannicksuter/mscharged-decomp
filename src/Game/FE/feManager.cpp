@@ -43,6 +43,7 @@
 #include "Game/InputManager.h"
 #include "Game/OverlayManager.h"
 #include "Game/EventRegistry.h"
+#include "NL/nlFunction.inl"
 
 extern "C"
 {

@@ -67,7 +67,6 @@ extern "C" void fn_8007F534(Goalie* pGoalie);
 class FuzzyRuntimeBase;
 extern "C" UnidentifiedVariant_80054AB8 fn_80082140(
     FuzzyRuntimeBase*, const char*, cPlayer*);
-extern nlVector4 lbl_8056D3B0;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -418,7 +417,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
 {
     cPlayer::CollideWithBallCallback(pBall);
     if (g_pGame->mUnidentified020 || g_pGame->GetGameState() == 3
-        || mnOffplayPending != GOALIE_OFFPLAY_NONE || UnidentifiedOffplayState())
+        || mnOffplayPending != GOALIE_OFFPLAY_NONE || IsInOffplay())
     {
         mbBallImpacted = true;
         return;
@@ -845,7 +844,7 @@ bool Goalie::PreCollideWithBallCallback(const dContact& contact)
 }
 
 
-void Goalie::fn_80099074(const UnidentifiedEventData24* pData)
+void Goalie::CollideWithPatchCallback(const UnidentifiedEventData24* pData)
 {
     PhysicsPatch* pPatch = pData->mUnidentified10;
     int type = pPatch->m_Type;
@@ -2674,7 +2673,7 @@ bool Goalie::IsPassThreat()
     return false;
 }
 
-inline bool Goalie::UnidentifiedOpponentShooting()
+inline bool Goalie::IsOpponentShooting()
 {
     cFielder* pShooter = g_pBall->GetOwnerFielder();
     if (pShooter != NULL && !IsOnSameTeam(pShooter)
@@ -2690,7 +2689,7 @@ float Goalie::IsSoloBreakaway()
     cFielder* pFldr = g_pBall->GetOwnerFielder();
     if (pFldr != NULL && !IsOnSameTeam(pFldr))
     {
-        if (UnidentifiedOpponentShooting())
+        if (IsOpponentShooting())
             return fScore;
         float fDirection = pFldr->m_pTeam->m_pNet->m_v3NetLocation.x < 0.0f ? 1.0f : -1.0f;
         fScore = InterpolateRangeClamped(0.4f, 1.0f, -2.0f, 8.0f,
@@ -4322,9 +4321,9 @@ void Goalie::InitActionSTSRecover()
     UnidentifiedStunResponse();
 }
 
-void Goalie::Unknown10(const nlVector3& v3Position, unsigned short aDirection)
+void Goalie::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
-    cPlayer::Unknown10(v3Position, aDirection);
+    cPlayer::Reset(v3Position, aDirection);
     m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
     m_pPhysicsCharacter->m_CanCollideWithWall = true;
     CleanupStun();
@@ -4338,7 +4337,6 @@ void Goalie::Unknown10(const nlVector3& v3Position, unsigned short aDirection)
 
 u16 lbl_806DBBD0 = 0xFFFF;
 extern u16 lbl_806DBD50;
-extern u16 lbl_806DBD58;
 
 #define REGISTER_GOALIE_FIELD(type, base, field, name) \
     cache->AddField(type, gDebugFieldTypes[type].size, \
@@ -4464,9 +4462,9 @@ inline void Goalie::RegisterDebugFields(unsigned short* type, DebugWriteCache* c
     cache->EndType();
 }
 
-void Goalie::Unknown11(void* context, DebugWriteCache* cache)
+void Goalie::SyncLog(void* context, DebugWriteCache* cache)
 {
-    cPlayer::Unknown11(context, cache);
+    cPlayer::SyncLog(context, cache);
     if (lbl_806DBBD0 == 0xFFFF)
     {
         RegisterDebugFields(&lbl_806DBBD0, cache);

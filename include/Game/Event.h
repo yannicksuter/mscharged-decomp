@@ -9,7 +9,7 @@
 unsigned int HashEventName(const char*, int);
 void RegisterEvent(void*, void*);
 void UnregisterEvent(void*);
-void RegisterEventConnection(void*, void*, unsigned int, int, void*);
+void RegisterEventConnection(void*, void*, unsigned int, int);
 void* FindEventConnection(void*, void*);
 void UnregisterEventConnection(void*, void*);
 
@@ -145,11 +145,7 @@ public:
         RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
     }
 
-    virtual ~UnidentifiedEvent()
-    {
-        RemoveAll();
-        UnregisterEvent(this);
-    }
+    virtual ~UnidentifiedEvent();
 
     void RemoveAll()
     {
@@ -159,12 +155,12 @@ public:
         }
     }
 
-    virtual void Disconnect(void* owner);
-
     virtual void Add(const Callback& callback, unsigned int value, int flags)
     {
         UnidentifiedAddListener(callback, value, flags);
     }
+
+    virtual void Disconnect(void* owner);
 
     void Deliver(T* data)
     {
@@ -222,32 +218,6 @@ public:
         this->mCurrentConnection = 0;
     }
 
-    void Dispatch(T* data, Function<T*> disposer, unsigned char deliver)
-    {
-        if (deliver)
-        {
-            Deliver(data);
-        }
-
-        if (disposer)
-        {
-            disposer(data);
-        }
-    }
-
-    void Dispatch(Callback disposer, unsigned char deliver)
-    {
-        if (deliver)
-        {
-            Deliver();
-        }
-
-        if (disposer)
-        {
-            disposer();
-        }
-    }
-
 protected:
     // Add hands the listener its callback by reference: retail's copies
     // clear the caller's Function instead of cloning it.
@@ -256,8 +226,8 @@ protected:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        void* target = listener->callback.UnidentifiedTransfer(callback);
-        RegisterEventConnection(this, listener, value, flags, target);
+        listener->callback.UnidentifiedTransfer(callback);
+        RegisterEventConnection(this, listener, value, flags);
     }
 
     void Remove(Listener* listener);
@@ -272,6 +242,13 @@ public:
     // SlotPool level, like EventDispatcher's callback list.
     DLListContainerBase<Listener, SlotPool<ListenerEntry> > mListeners;
 };
+
+template <typename T>
+UnidentifiedEvent<T>::~UnidentifiedEvent()
+{
+    RemoveAll();
+    UnregisterEvent(this);
+}
 
 // The callback may have changed the list while it ran, so the walk is
 // re-anchored on the current list head before it continues past the entry
@@ -371,6 +348,40 @@ public:
 
     virtual ~UnidentifiedQueuedEventBase() { }
 
+    typedef typename UnidentifiedEvent<T>::Callback Callback;
+
+    virtual void Add(const typename UnidentifiedEvent<T>::Callback& callback,
+        unsigned int value, int flags)
+    {
+        this->UnidentifiedAddListener(callback, value, flags);
+    }
+
+    void Dispatch(T* data, Function<T*> disposer, unsigned char deliver)
+    {
+        if (deliver)
+        {
+            this->Deliver(data);
+        }
+
+        if (disposer)
+        {
+            disposer(data);
+        }
+    }
+
+    void Dispatch(Callback disposer, unsigned char deliver)
+    {
+        if (deliver)
+        {
+            this->Deliver();
+        }
+
+        if (disposer)
+        {
+            disposer();
+        }
+    }
+
 protected:
     EventDispatcher* mDispatcher;
 };
@@ -381,15 +392,12 @@ class UnidentifiedQueuedEvent : public UnidentifiedQueuedEventBase<T>
 public:
     typedef typename UnidentifiedEvent<T>::Callback Callback;
 
-    UnidentifiedQueuedEvent(EventDispatcher*, const char*, int);
-
-    virtual ~UnidentifiedQueuedEvent();
-
-    virtual void Add(const typename UnidentifiedEvent<T>::Callback& callback,
-        unsigned int value, int flags)
+    UnidentifiedQueuedEvent(EventDispatcher* dispatcher, const char* name, int length)
+        : UnidentifiedQueuedEventBase<T>(dispatcher, name, length)
     {
-        this->UnidentifiedAddListener(callback, value, flags);
     }
+
+    virtual ~UnidentifiedQueuedEvent() { }
 
     void Queue(T* data, const Function<T*>& disposer);
     void Queue(const Callback& disposer);
@@ -397,24 +405,12 @@ public:
 };
 
 template <typename T>
-UnidentifiedQueuedEvent<T>::UnidentifiedQueuedEvent(
-    EventDispatcher* dispatcher, const char* name, int length)
-    : UnidentifiedQueuedEventBase<T>(dispatcher, name, length)
-{
-}
-
-template <typename T>
-UnidentifiedQueuedEvent<T>::~UnidentifiedQueuedEvent()
-{
-}
-
-template <typename T>
 void UnidentifiedQueuedEvent<T>::Queue(T* data, const Function<T*>& disposer)
 {
-    typedef void (UnidentifiedEvent<T>::*DispatchFunction)(
+    typedef void (UnidentifiedQueuedEventBase<T>::*DispatchFunction)(
         T*, Function<T*>, unsigned char);
     Function<bool> callback(
-        Bind<void>(MemFun((DispatchFunction)&UnidentifiedEvent<T>::Dispatch),
+        Bind<void>(MemFun((DispatchFunction)&UnidentifiedQueuedEventBase<T>::Dispatch),
             this, data, disposer, placeholder0));
     this->mDispatcher->Add(callback);
 }
@@ -422,10 +418,10 @@ void UnidentifiedQueuedEvent<T>::Queue(T* data, const Function<T*>& disposer)
 template <typename T>
 void UnidentifiedQueuedEvent<T>::Queue(const Callback& disposer)
 {
-    typedef void (UnidentifiedEvent<T>::*DispatchFunction)(
+    typedef void (UnidentifiedQueuedEventBase<T>::*DispatchFunction)(
         Callback, unsigned char);
     Function<bool> callback(
-        Bind<void>(MemFun((DispatchFunction)&UnidentifiedEvent<T>::Dispatch),
+        Bind<void>(MemFun((DispatchFunction)&UnidentifiedQueuedEventBase<T>::Dispatch),
             this, disposer, placeholder0));
     this->mDispatcher->Add(callback);
 }

@@ -139,9 +139,9 @@ cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
         mUnidentified320 = NULL;
 }
 
-void cPlayer::Unknown10(const nlVector3& v3Position, unsigned short aDirection)
+void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
-    cCharacter::Unknown10(v3Position, aDirection);
+    cCharacter::Reset(v3Position, aDirection);
     mUnidentified1E4.UnidentifiedReset();
     mUnidentified1E4.m_ResetBaseBallOrientation = true;
     FieldLocToAILoc(mUnidentified1E4.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
@@ -1342,7 +1342,7 @@ extern "C" void fn_80099030(UnidentifiedEventData00*)
     }
 }
 
-void cPlayer::fn_80099074(const UnidentifiedEventData24*)
+void cPlayer::CollideWithPatchCallback(const UnidentifiedEventData24*)
 {
 }
 
@@ -1511,9 +1511,9 @@ u16 lbl_806DBD96 = 0xFFFF;
 #define REGISTER_PLAYER_FIELD(type, field) \
     cache->AddField(type, gDebugFieldTypes[type].size, (u8*)&mUnidentified1E4.field - (u8*)&mUnidentified1E4.m_ID, #field)
 
-void cPlayer::Unknown11(void* context, DebugWriteCache* cache)
+void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
 {
-    cCharacter::Unknown11(context, cache);
+    cCharacter::SyncLog(context, cache);
     if (lbl_806DBD96 == 0xFFFF)
     {
         lbl_806DBD96 = cache->BeginType("DetPlayer");

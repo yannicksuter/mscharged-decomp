@@ -100,11 +100,7 @@ FuzzyRuntimeBase::~FuzzyRuntimeBase()
         g_FuzzyActionQueuePool.FreeBlocks();
         lbl_805842C8.FreeBlocks();
 
-        while (g_FuzzyParameters.mHead != 0)
-        {
-            delete nlListRemoveStart(
-                &g_FuzzyParameters.mHead, &g_FuzzyParameters.mTail);
-        }
+        nlDeleteList(&g_FuzzyParameters.mHead, &g_FuzzyParameters.mTail);
     }
 
     while (mActionQueues.mHead != 0)

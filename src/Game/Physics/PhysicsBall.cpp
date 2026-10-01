@@ -26,7 +26,7 @@ float lbl_806DCA84 = 0.07f;
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 extern "C" void fn_8013F854(const char*, ...);
-extern float lbl_806E11E8;
+float lbl_806E11E8;
 
 PhysicsBall::PhysicsBall(
     CollisionSpace* space, PhysicsWorld* world, float radius)

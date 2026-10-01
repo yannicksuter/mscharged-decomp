@@ -3622,8 +3622,7 @@ void cFielder::fn_80045930()
     v3Position.x = nlRandomf(4.0f) - 2.0f;
     v3Position.y = nlRandomf(4.0f) - 2.0f;
 
-    float fRecipLength = nlRecipSqrt(v3Direction.GetLengthSq3D(), true);
-    nlVec3Scale(v3Direction, v3Direction, fRecipLength);
+    nlVec3Normalize(v3Direction, v3Direction);
     nlVec3Scale(v3Direction, v3Direction, 40.0f);
     nlVec3Sub(v3Position, v3Position, v3Direction);
     SetPosition(v3Position);
@@ -4382,7 +4381,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
 }
 
 void cFielder::InitActionSlideAttack(
-    cFielder* pTarget, int nParam, float fTime)
+    cFielder* pTarget, float fTime, int nParam)
 {
     if (!IsStuck())
     {
@@ -5063,51 +5062,54 @@ void cFielder::ReleaseHammerProjectile()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        float fZero = 0.0f;
-        HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
-        if (pProjectile != 0)
+        for (int i = 0; i < 1; i++)
         {
-            pProjectile->Activate(this);
-            pProjectile->SetPosition(GetJointPosition(m_nLeftHandJointIndex));
-
-            float fDistance = lbl_806DB89C
-                + lbl_806DB8A0
-                    * (float)(pProjectile->mIndex % 5);
-
-            nlVector3 v3Target;
-            m_m4WorldMatrix.GetRow_(0, v3Target);
-            nlVec3ScaleAdd(v3Target, fDistance, v3Target,
-                mUnidentified024.m_v3Position);
-
-            nlVector3 v3Delta;
-            nlVec3Sub(v3Delta, v3Target, mUnidentified024.m_v3Position);
-
-            float fGravity = pProjectile->mPhysics->m_gravity;
-            float fStartHeight = pProjectile->GetPosition()->z;
-
-            float fVerticalSpeed
-                = lbl_806DB8A4
-                * nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
-                    true);
-
-            int nNumRoots;
-            float fX1, fX2;
-            SolveQuadratic(
-                0.5f * fGravity, fVerticalSpeed, fStartHeight, nNumRoots, fX1, fX2);
-
-            float fFlightTime;
-            if (fX1 > fZero)
+            HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
+            if (pProjectile != 0)
             {
-                fFlightTime = fX1;
+                pProjectile->Activate(this);
+                pProjectile->SetPosition(GetJointPosition(m_nLeftHandJointIndex));
+
+                float fDistance = lbl_806DB89C
+                    + lbl_806DB8A0
+                        * (float)(int)(pProjectile->mIndex % 5);
+
+                nlVector3 v3Target;
+                nlVec3Set(v3Target, m_m4WorldMatrix.m11,
+                    m_m4WorldMatrix.m12, m_m4WorldMatrix.m13);
+                nlVec3ScaleAdd(v3Target, fDistance, v3Target,
+                    mUnidentified024.m_v3Position);
+
+                nlVector3 v3Delta;
+                nlVec3Sub(v3Delta, v3Target, mUnidentified024.m_v3Position);
+
+                float fGravity = pProjectile->mPhysics->m_gravity;
+                float fStartHeight = pProjectile->GetPosition()->z;
+
+                float fVerticalSpeed
+                    = lbl_806DB8A4
+                    * nlSqrt(v3Delta.x * v3Delta.x + v3Delta.y * v3Delta.y,
+                        true);
+
+                int nNumRoots;
+                float fX1, fX2;
+                SolveQuadratic(
+                    0.5f * fGravity, fVerticalSpeed, fStartHeight, nNumRoots, fX1, fX2);
+
+                float fFlightTime;
+                if (fX1 > 0.0f)
+                {
+                    fFlightTime = fX1;
+                }
+                else if (fX2 > 0.0f)
+                {
+                    fFlightTime = fX2;
+                }
+                float fInverseFlightTime = 1.0f / fFlightTime;
+                nlVec3Scale(v3Delta, fInverseFlightTime);
+                v3Delta.z = fVerticalSpeed;
+                pProjectile->SetVelocity(v3Delta);
             }
-            else if (fX2 > fZero)
-            {
-                fFlightTime = fX2;
-            }
-            float fInverseFlightTime = 1.0f / fFlightTime;
-            nlVec3Scale(v3Delta, fInverseFlightTime);
-            v3Delta.z = fVerticalSpeed;
-            pProjectile->SetVelocity(v3Delta);
         }
     }
 }

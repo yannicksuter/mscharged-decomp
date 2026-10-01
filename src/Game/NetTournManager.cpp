@@ -6,7 +6,7 @@
 
 #include "Game/BasicStadium.h"
 #include "Game/Drawable/DrawableObj.h"
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/Render/StadiumPhysicsObject.h"
 #include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/Game.h"
@@ -1254,8 +1254,7 @@ void NetTournManager::AttachTournamentTrophy(void* presentation)
 {
     mTrophyPresentation = presentation;
     glModel* model;
-    WorldObject_80129EE0* object
-        = (WorldObject_80129EE0*)FEModelManager::Instance()->GetObject(4);
+    StadiumFEModelMarker* object = FEModelManager::Instance()->GetObject(4);
     model = ((DrawableObject*)mTrophyPresentation)->m_pModel;
     glModelSetMatrix(model, *object->GetWorldMatrix());
     ((DrawableObject*)mTrophyPresentation)

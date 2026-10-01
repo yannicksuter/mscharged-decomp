@@ -72,6 +72,20 @@ public:
     }
 
     void UpdateSynchronized(float time, bool looped);
+    // Bounded fit, not recovered source: at both mirror stores of R4QE01's
+    // FEModelHandle::PlayAnimation the controller pointer is allocated ahead
+    // of the handle's flag byte. GC/3.0a5 evaluates the value of a bit-field
+    // assignment before its address, so the pointer was bound first - as an
+    // inline function's receiver, since the impostor branch evaluates it
+    // again for SetTime - and a conditional on the flag kept that binding out
+    // of the store's own flow node. The function's owner, name and exact
+    // conditional are not recoverable: PlayAnimation is the only consumer and
+    // the DOL keeps no out-of-line copy. It sits beside SetTime, with the
+    // field it writes.
+    void SetMirror(bool mirror)
+    {
+        m_bMirror = mirror ? true : false;
+    }
     void SetTime(float time)
     {
         m_fPrevTime = m_fTime;

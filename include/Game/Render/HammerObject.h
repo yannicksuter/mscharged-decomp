@@ -26,6 +26,8 @@ struct HammerObject
     void Reset(bool);
     void Deactivate(bool emitEffect);
 
+    bool fn_8016A650() const { return mActive; }
+
     /* 0x00 */ nlQuaternion mOrientation;
     /* 0x10 */ float mBaseRadius;
     /* 0x14 */ float mRadiusScale;

@@ -62,7 +62,7 @@ inline RegistryNode* DynamicRegistryContainer::UnidentifiedVirtual44(
 }
 
 inline void DynamicRegistryContainer::GetIterator(
-    RegistryIteratorBase* iterator, int which)
+    RegistryIteratorBase* iterator, int which) const
 {
     new (iterator) RegistryListIterator(Tail(which), First(which));
 }
@@ -162,7 +162,7 @@ inline void PackedRegistryContainer::UnidentifiedVirtual38() {}
 inline void PackedRegistryContainer::UnidentifiedVirtual34() {}
 
 inline void PackedRegistryContainer::GetIterator(
-    RegistryIteratorBase* iterator, int which)
+    RegistryIteratorBase* iterator, int which) const
 {
     if (which != 0)
     {

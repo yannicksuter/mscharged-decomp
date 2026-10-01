@@ -140,31 +140,6 @@ BOOL NHTTPi_ThreadParseHeaderProc(NHTTPThreadData* threadData_p);
 BOOL NHTTPi_ThreadRecvBodyProc(NHTTPThreadData* threadData_p);
 void NHTTPi_CommThreadProcMain(void* argument);
 
-#define NHTTPi_SEND(threadData_p, data, length, err)                                  \
-    do                                                                        \
-    {                                                                         \
-        const char* sendData;                                                 \
-        s32 sendLength;                                                       \
-        void* system;                                                        \
-        s32 result;                                                          \
-        sendLength = (length);                                               \
-        sendData = (data);                                                   \
-        system = NHTTPi_GetSystemInfoP();                                    \
-        result = NHTTPi_SaveBuf(                                             \
-            NHTTPi_GetReqInfoP(system)->reqQueue->request,                    \
-            NHTTPi_GetThreadInfoP(system)->commBuf,                        \
-            NHTTPi_GetBgnEndInfoP(system)->socket, &(threadData_p)->sendBufwp,       \
-            sendData, sendLength);                                            \
-        if (result < 0)                                                       \
-        {                                                                     \
-            (err) = 1;                                                        \
-        }                                                                     \
-        else                                                                  \
-        {                                                                     \
-            (err) = (result == 0) ? 2 : 0;                                    \
-        }                                                                     \
-    } while (0)
-
 void NHTTPi_InitThreadInfo(NHTTPThreadInfo* info)
 {
     info->isCreateCommThreadMessageQueue = FALSE;
@@ -418,6 +393,33 @@ BOOL NHTTPi_BufFull(void* mutexInfo, NHTTPResponseInfo* response)
     return result;
 }
 
+static inline int NHTTPi_SendData(NHTTPThreadData* threadData_p,
+    const char* src_p, int srclen)
+{
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    NHTTPBgnEndInfo* bgnEndInfo_p = NHTTPi_GetBgnEndInfoP(sysInfo_p);
+    NHTTPThreadInfo* threadInfo_p = NHTTPi_GetThreadInfoP(sysInfo_p);
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
+    char* commBuf_p = &threadInfo_p->commBuf[0];
+    int stat = 0;
+
+    stat = NHTTPi_SaveBuf(req_p, commBuf_p, bgnEndInfo_p->socket,
+        &threadData_p->sendBufwp, src_p, srclen);
+    if (stat < 0)
+    {
+        return 1;
+    }
+    else if (stat == 0)
+    {
+        return 2;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 static inline s32 NHTTPi_SendProxyAuthorization(NHTTPThreadData* threadData_p)
 {
     void* sysInfo_p = NHTTPi_GetSystemInfoP();
@@ -425,18 +427,19 @@ static inline s32 NHTTPi_SendProxyAuthorization(NHTTPThreadData* threadData_p)
     NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
     s32 sendStatus;
 
-    NHTTPi_SEND(threadData_p, "Proxy-Authorization: Basic ", 27, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        "Proxy-Authorization: Basic ", 27);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, req_p->proxyAuthorization,
-        req_p->proxyAuthorizationLength, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        req_p->proxyAuthorization, req_p->proxyAuthorizationLength);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
@@ -451,18 +454,18 @@ static inline s32 NHTTPi_SendBasicAuthorization(NHTTPThreadData* threadData_p)
     NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
     s32 sendStatus;
 
-    NHTTPi_SEND(threadData_p, "Authorization: Basic ", 21, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "Authorization: Basic ", 21);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, req_p->authorization,
-        req_p->authorizationLength, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        req_p->authorization, req_p->authorizationLength);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
@@ -483,57 +486,58 @@ s32 NHTTPi_SendProxyConnectMethod(NHTTPThreadData* threadData_p)
     s32 portLength;
     portLength = NHTTPi_intToStr(portString, request->port);
 
-    NHTTPi_SEND(threadData_p, "CONNECT ", 8, err);
+    err = NHTTPi_SendData(threadData_p, "CONNECT ", 8);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, request->url + 8, request->hostEnd - 8, err);
+    err = NHTTPi_SendData(threadData_p, request->url + 8, request->hostEnd - 8);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, ":", 1, err);
+    err = NHTTPi_SendData(threadData_p, ":", 1);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, portString, portLength, err);
+    err = NHTTPi_SendData(threadData_p, portString, portLength);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, " HTTP/1.1\r\n", 11, err);
+    err = NHTTPi_SendData(threadData_p, " HTTP/1.1\r\n", 11);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, "Host: ", 6, err);
+    err = NHTTPi_SendData(threadData_p, "Host: ", 6);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, request->url + 8, request->hostEnd - 8, err);
+    err = NHTTPi_SendData(threadData_p, request->url + 8, request->hostEnd - 8);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, ":", 1, err);
+    err = NHTTPi_SendData(threadData_p, ":", 1);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, portString, portLength, err);
+    err = NHTTPi_SendData(threadData_p, portString, portLength);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, err);
+    err = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (err != 0)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, "Content-Length: 0\r\nPragma: no-cache\r\n", 37, err);
+    err = NHTTPi_SendData(threadData_p,
+        "Content-Length: 0\r\nPragma: no-cache\r\n", 37);
     if (err != 0)
     {
         return err;
@@ -543,7 +547,7 @@ s32 NHTTPi_SendProxyConnectMethod(NHTTPThreadData* threadData_p)
     {
         return err;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, err);
+    err = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (threadData_p->sendBufwp > 0)
     {
         s32 sent = NHTTPi_SocSend(request, bgnEndInfo->socket, buffer,
@@ -642,24 +646,24 @@ static int NHTTPi_SendHeaderList(NHTTPThreadData* threadData_p)
     for (datalist_p = NHTTPi_getHdrFromList(&req_p->headers); datalist_p;
          datalist_p = NHTTPi_getHdrFromList(&req_p->headers))
     {
-        NHTTPi_SEND(threadData_p, datalist_p->name,
-            NHTTPi_strlen(datalist_p->name), sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            datalist_p->name, NHTTPi_strlen(datalist_p->name));
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, ": ", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, ": ", 2);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, datalist_p->value,
-            NHTTPi_strlen(datalist_p->value), sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            datalist_p->value, NHTTPi_strlen(datalist_p->value));
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
         if (sendStatus != 0)
         {
             return sendStatus;
@@ -671,23 +675,24 @@ static int NHTTPi_SendHeaderList(NHTTPThreadData* threadData_p)
     return 0;
 }
 
+#define TMP_CONTENT_LENGTH_BUF_SIZE (12)
+
 s32 NHTTPi_SendProcPostDataRaw(NHTTPThreadData* threadData_p)
 {
-    s32 contentLength;
-    char numString[0xC];
-    s32 numLength;
-    s32 err;
-    void* system = NHTTPi_GetSystemInfoP();
-    void* mutexInfo = NHTTPi_GetMutexInfoP(system);
-    NHTTPRequestInfo* request =
-        NHTTPi_GetReqInfoP(system)->reqQueue->request;
-    NHTTPThreadInfo* threadInfo = NHTTPi_GetThreadInfoP(system);
-    NHTTPBgnEndInfo* bgnEndInfo = NHTTPi_GetBgnEndInfoP(system);
-    char* buffer = threadInfo->commBuf;
-    contentLength = 0;
-    if (request->postBuffer == NULL)
+    void* sysInfo_p = NHTTPi_GetSystemInfoP();
+    void* mutexInfo_p = NHTTPi_GetMutexInfoP(sysInfo_p);
+    NHTTPReqInfo* reqInfo_p = NHTTPi_GetReqInfoP(sysInfo_p);
+    NHTTPRequestInfo* req_p = reqInfo_p->reqQueue->request;
+    NHTTPThreadInfo* threadInfo_p = NHTTPi_GetThreadInfoP(sysInfo_p);
+    NHTTPBgnEndInfo* bgnEndInfo_p = NHTTPi_GetBgnEndInfoP(sysInfo_p);
+    char* commBuf_p = threadInfo_p->commBuf;
+    s32 contentLength = 0;
+    int contentLengthBufLen = 0;
+    char contentLengthBuf[TMP_CONTENT_LENGTH_BUF_SIZE];
+    int sendStatus;
+    if (req_p->postBuffer == NULL)
     {
-        if (!NHTTPi_GetPostContentlength(mutexInfo, request, NULL,
+        if (!NHTTPi_GetPostContentlength(mutexInfo_p, req_p, NULL,
                 &contentLength, 0))
         {
             return 3;
@@ -695,33 +700,34 @@ s32 NHTTPi_SendProcPostDataRaw(NHTTPThreadData* threadData_p)
     }
     else
     {
-        contentLength = request->postBufferSize;
+        contentLength = req_p->postBufferSize;
     }
-    numLength = NHTTPi_intToStr(numString, contentLength);
-    NHTTPi_SEND(threadData_p, "Content-Length: ", 16, err);
-    if (err != 0)
+    contentLengthBufLen = NHTTPi_intToStr(contentLengthBuf, contentLength);
+    sendStatus = NHTTPi_SendData(threadData_p, "Content-Length: ", 16);
+    if (sendStatus != 0)
     {
-        return err;
+        return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, numString, numLength, err);
-    if (err != 0)
+    sendStatus = NHTTPi_SendData(threadData_p,
+        contentLengthBuf, contentLengthBufLen);
+    if (sendStatus != 0)
     {
-        return err;
+        return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, err);
-    if (err != 0)
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
+    if (sendStatus != 0)
     {
-        return err;
+        return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, err);
-    if (err != 0)
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
+    if (sendStatus != 0)
     {
-        return err;
+        return sendStatus;
     }
-    if (request->postBuffer == NULL)
+    if (req_p->postBuffer == NULL)
     {
-        s32 result = NHTTPi_SendPostData(mutexInfo, request, buffer, NULL,
-            bgnEndInfo->socket, &threadData_p->sendBufwp, 0);
+        s32 result = NHTTPi_SendPostData(mutexInfo_p, req_p, commBuf_p, NULL,
+            bgnEndInfo_p->socket, &threadData_p->sendBufwp, 0);
         if (result != 0)
         {
             return result;
@@ -729,10 +735,11 @@ s32 NHTTPi_SendProcPostDataRaw(NHTTPThreadData* threadData_p)
     }
     else
     {
-        NHTTPi_SEND(threadData_p, request->postBuffer, request->postBufferSize, err);
-        if (err != 0)
+        sendStatus = NHTTPi_SendData(threadData_p,
+            req_p->postBuffer, req_p->postBufferSize);
+        if (sendStatus != 0)
         {
-            return err;
+            return sendStatus;
         }
     }
     return 0;
@@ -748,7 +755,6 @@ static const char NHTTPi_strContentTypeAscii[] =
 static const char NHTTPi_strContentTypeMultipart[] =
     "Content-Type: multipart/form-data; boundary=";
 
-#define TMP_CONTENT_LENGTH_BUF_SIZE (12)
 #define TMP_HEADER_BUF_SIZE (14)
 
 s32 NHTTPi_SendProcPostDataBinary(NHTTPThreadData* threadData_p)
@@ -797,84 +803,84 @@ s32 NHTTPi_SendProcPostDataBinary(NHTTPThreadData* threadData_p)
     }
     contentLength += sizeof(req_p->multipartBoundary) + 2 + 2;
     contentLengthBufLen = NHTTPi_intToStr(contentLengthBuf, contentLength);
-    NHTTPi_SEND(threadData_p, NHTTPi_strContentTypeMultipart,
-        sizeof(NHTTPi_strContentTypeMultipart) - 1, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        NHTTPi_strContentTypeMultipart, sizeof(NHTTPi_strContentTypeMultipart) - 1);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, req_p->multipartBoundary + 2,
-        sizeof(req_p->multipartBoundary) - 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        req_p->multipartBoundary + 2, sizeof(req_p->multipartBoundary) - 2);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "Content-Length: ", 16, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "Content-Length: ", 16);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(
-        threadData_p, contentLengthBuf, contentLengthBufLen, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        contentLengthBuf, contentLengthBufLen);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
     for (datalist_p = req_p->postData; datalist_p != NULL;)
     {
-        NHTTPi_SEND(threadData_p, req_p->multipartBoundary,
-            sizeof(req_p->multipartBoundary), sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            req_p->multipartBoundary, sizeof(req_p->multipartBoundary));
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, NHTTPi_strContentDisposition,
-            sizeof(NHTTPi_strContentDisposition) - 1, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            NHTTPi_strContentDisposition, sizeof(NHTTPi_strContentDisposition) - 1);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, datalist_p->name,
-            NHTTPi_strlen(datalist_p->name), sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            datalist_p->name, NHTTPi_strlen(datalist_p->name));
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, "\"\r\n", 3, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\"\r\n", 3);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
         if (datalist_p->_unk14 != 0)
         {
-            NHTTPi_SEND(threadData_p, NHTTPi_strContentTypeBinary,
-                sizeof(NHTTPi_strContentTypeBinary) - 1, sendStatus);
+            sendStatus = NHTTPi_SendData(threadData_p,
+                NHTTPi_strContentTypeBinary, sizeof(NHTTPi_strContentTypeBinary) - 1);
             if (sendStatus != 0)
             {
                 return sendStatus;
             }
         }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
         if (sendStatus != 0)
         {
             return sendStatus;
@@ -891,14 +897,14 @@ s32 NHTTPi_SendProcPostDataBinary(NHTTPThreadData* threadData_p)
         }
         else
         {
-            NHTTPi_SEND(threadData_p, datalist_p->value, datalist_p->length,
-                sendStatus);
+            sendStatus = NHTTPi_SendData(threadData_p,
+                datalist_p->value, datalist_p->length);
             if (sendStatus != 0)
             {
                 return sendStatus;
             }
         }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
         if (sendStatus != 0)
         {
             return sendStatus;
@@ -909,13 +915,13 @@ s32 NHTTPi_SendProcPostDataBinary(NHTTPThreadData* threadData_p)
         }
         datalist_p = datalist_p->prev;
     }
-    NHTTPi_SEND(threadData_p, req_p->multipartBoundary,
-        sizeof(req_p->multipartBoundary), sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        req_p->multipartBoundary, sizeof(req_p->multipartBoundary));
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "--\r\n", 4, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "--\r\n", 4);
     if (sendStatus != 0)
     {
         return sendStatus;
@@ -961,28 +967,28 @@ s32 NHTTPi_SendProcPostDataAscii(NHTTPThreadData* threadData_p)
         datalist_p = datalist_p->prev;
     }
     tmpBufLen = NHTTPi_intToStr(tmpBuf, contentLength);
-    NHTTPi_SEND(threadData_p, NHTTPi_strContentTypeAscii,
-        sizeof(NHTTPi_strContentTypeAscii) - 1, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p,
+        NHTTPi_strContentTypeAscii, sizeof(NHTTPi_strContentTypeAscii) - 1);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "Content-Length: ", 16, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "Content-Length: ", 16);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, tmpBuf, tmpBufLen, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, tmpBuf, tmpBufLen);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
-    NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
     if (sendStatus != 0)
     {
         return sendStatus;
@@ -995,13 +1001,13 @@ s32 NHTTPi_SendProcPostDataAscii(NHTTPThreadData* threadData_p)
             {
                 tmpBufLen =
                     NHTTPi_encodeUrlChar(tmpBuf, datalist_p->name[p]);
-                NHTTPi_SEND(threadData_p, tmpBuf, tmpBufLen, sendStatus);
+                sendStatus = NHTTPi_SendData(threadData_p, tmpBuf, tmpBufLen);
                 if (sendStatus != 0)
                 {
                     return sendStatus;
                 }
             }
-            NHTTPi_SEND(threadData_p, "=", 1, sendStatus);
+            sendStatus = NHTTPi_SendData(threadData_p, "=", 1);
             if (sendStatus != 0)
             {
                 return sendStatus;
@@ -1022,7 +1028,8 @@ s32 NHTTPi_SendProcPostDataAscii(NHTTPThreadData* threadData_p)
                 {
                     tmpBufLen =
                         NHTTPi_encodeUrlChar(tmpBuf, datalist_p->value[p]);
-                    NHTTPi_SEND(threadData_p, tmpBuf, tmpBufLen, sendStatus);
+                    sendStatus = NHTTPi_SendData(threadData_p,
+                        tmpBuf, tmpBufLen);
                     if (sendStatus != 0)
                     {
                         return sendStatus;
@@ -1033,7 +1040,7 @@ s32 NHTTPi_SendProcPostDataAscii(NHTTPThreadData* threadData_p)
             {
                 break;
             }
-            NHTTPi_SEND(threadData_p, "&", 1, sendStatus);
+            sendStatus = NHTTPi_SendData(threadData_p, "&", 1);
             if (sendStatus != 0)
             {
                 return sendStatus;
@@ -1292,13 +1299,13 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     switch (req_p->method)
     {
     case NHTTP_REQMETHOD_GET:
-        NHTTPi_SEND(threadData_p, "GET ", 4, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "GET ", 4);
         break;
     case NHTTP_REQMETHOD_POST:
-        NHTTPi_SEND(threadData_p, "POST ", 5, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "POST ", 5);
         break;
     case NHTTP_REQMETHOD_HEAD:
-        NHTTPi_SEND(threadData_p, "HEAD ", 5, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "HEAD ", 5);
         break;
     default:
         break;
@@ -1309,7 +1316,7 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     }
     if (req_p->proxyEnabled != 0 && req_p->secure == 0)
     {
-        NHTTPi_SEND(threadData_p, req_p->url, urlLength, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, req_p->url, urlLength);
         if (sendStatus != 0)
         {
             return sendStatus;
@@ -1317,8 +1324,8 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     }
     else if (urlLength > req_p->pathStart)
     {
-        NHTTPi_SEND(threadData_p, req_p->url + req_p->pathStart,
-            urlLength - req_p->pathStart, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            req_p->url + req_p->pathStart, urlLength - req_p->pathStart);
         if (sendStatus != 0)
         {
             return sendStatus;
@@ -1326,31 +1333,31 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     }
     else
     {
-        NHTTPi_SEND(threadData_p, "/", 1, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "/", 1);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
     }
-    NHTTPi_SEND(threadData_p, " HTTP/1.1\r\n", 11, sendStatus);
+    sendStatus = NHTTPi_SendData(threadData_p, " HTTP/1.1\r\n", 11);
     if (sendStatus != 0)
     {
         return sendStatus;
     }
     {
         s32 n = req_p->secure ? 8 : 7;
-        NHTTPi_SEND(threadData_p, "Host: ", 6, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "Host: ", 6);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, req_p->url + n, req_p->hostEnd - n,
-            sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p,
+            req_p->url + n, req_p->hostEnd - n);
         if (sendStatus != 0)
         {
             return sendStatus;
         }
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
         if (sendStatus != 0)
         {
             return sendStatus;
@@ -1433,7 +1440,7 @@ s32 NHTTPi_ThreadSendProc(NHTTPThreadData* threadData_p)
     }
     else
     {
-        NHTTPi_SEND(threadData_p, "\r\n", 2, sendStatus);
+        sendStatus = NHTTPi_SendData(threadData_p, "\r\n", 2);
         if (sendStatus != 0)
         {
             return sendStatus;

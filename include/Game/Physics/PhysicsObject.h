@@ -52,6 +52,7 @@ public:
     void CloneObject(const PhysicsObject&);
     void MakeStatic();
     void SetMass(float);
+    float GetGravity() const { return m_gravity; }
     void Reconnect(dSpaceID);
     dSpaceID Disconnect();
     bool AreCollisionsEnabled();

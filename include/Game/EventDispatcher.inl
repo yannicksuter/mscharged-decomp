@@ -3,6 +3,11 @@
 
 #include "Game/Task/DispatchEventsTask.h"
 
+inline EventDispatcher::EventDispatcher(const char*)
+    : EventDispatcherBase<EventCallback>()
+{
+}
+
 inline EventDispatcher::EventDispatcher()
 {
 }

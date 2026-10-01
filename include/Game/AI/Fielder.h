@@ -217,9 +217,8 @@ public:
     virtual void Unknown8(unsigned short aParam, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
-    virtual void Unknown10(
-        const nlVector3& v3Position, unsigned short aDirection);
-    virtual void Unknown11(void* context, DebugWriteCache* cache);
+    virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
+    virtual void SyncLog(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithCharacterCallback(
@@ -227,11 +226,11 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void fn_80099074(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
 
     void ClearPassTargetIfAmThePassTarget();
     void CleanUpAction(eFielderActionState actionState);
-    ePowerUpType GetPowerupType() const;
+    ePowerUpType GetPowerupType();
     void UseTeamPowerup(cFielder* pTarget);
     void UpdateActionState(float dt);
     void UpdateHeadTracking(float fDeltaT);
@@ -435,7 +434,7 @@ public:
     void fn_8004B2E4(float fDeltaT);
     bool fn_8004B86C(bool bIsChipShot, bool bParam);
     void fn_8004BF58(eFielderActionState eNewAction);
-    void InitActionSlideAttack(cFielder* pTarget, int nParam, float fTime);
+    void InitActionSlideAttack(cFielder* pTarget, float fTime, int nParam);
     void fn_8004BB80(float fDeltaT);
     void fn_8004C02C(float fDeltaT);
     void fn_8004C88C(float fDeltaT);

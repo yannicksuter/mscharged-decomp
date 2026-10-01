@@ -118,17 +118,50 @@ SaveInfo gSaveInfo[89] = {
     { 134, -1, -1, 0x00000001, { -1, -1, -1, -1 }, "Grab Above" },
     { -1, 0, 0, 0x00000000, { -1, -1, -1, -1 }, "Empty" },
 };
-extern unsigned int lbl_806E0D4C;
-extern unsigned int lbl_806E0D50;
-extern nlVector3 lbl_8056D3B0;
+
+unsigned short lbl_806DBD58 = 0xFFFF;
+
+float GoalieSave::mfCatchAllowDistSq = 0.25f;
+
+SaveData* GoalieSave::mpSaveTable;
+unsigned char GoalieSave::mbInitialized;
+unsigned int GoalieSave::muNumSaveEntries;
+SavePositionData* GoalieSave::mpPositionTable;
+unsigned int GoalieSave::muNumPositionEntries;
+unsigned int lbl_806E0D4C;
+unsigned int lbl_806E0D50;
+unsigned int GoalieSave::muMissChipIndexStart;
+unsigned int GoalieSave::muMissChipCount;
+unsigned int GoalieSave::muSTSMissIndexStart;
+unsigned int GoalieSave::muSTSMissCount;
+float GoalieSave::mfCrouchDuration;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 static nlAVLTree<int, SaveData*, DefaultKeyCompare<int> > gSaveMap;
 nlListContainer<SaveData*> gSaveGrid[6][4];
+nlVector3 lbl_8056D3B0;
 static float fDefaultMilestoneValues[2] = { 0.4f, 0.7f };
 
-float GoalieSave::mfCatchAllowDistSq = 0.25f;
+void SavePositionData::Init(Goalie* pGoalie, int animID)
+{
+    mnAnimID = animID;
+
+    cPN_SAnimController* pController = new cPN_SAnimController(
+        pGoalie->GetAnimInventory()->GetAnim(animID), 0, PM_HOLD, 0, 0,
+        pGoalie->GetAnimInventory()->GetMirrored(animID));
+
+    pController->SetTime(1.0f);
+
+    nlVector3 v3RootTrans;
+    pController->GetRootTrans(&v3RootTrans, 0);
+
+    mfAnimDistance = v3RootTrans.y;
+    mfAnimTime = (float)pController->m_pSAnim->m_nNumKeys / 30.0f;
+    mfAnimVelocity = mfAnimDistance / mfAnimTime;
+
+    delete pController;
+}
 
 void SaveBlendInfo::fn_80091704()
 {
@@ -217,37 +250,6 @@ inline void SaveData::PostInit(const SaveInfo& info)
         mpConnectedSaveData[i] =
             GoalieSave::FindSaveData(info.mConnectedSaveID[i]);
     }
-}
-
-inline void SavePositionData::Init(Goalie* pGoalie, int animID)
-{
-    mnAnimID = animID;
-
-    cPN_SAnimController* pController = new cPN_SAnimController(
-        pGoalie->GetAnimInventory()->GetAnim(animID), 0, PM_HOLD, 0, 0,
-        pGoalie->GetAnimInventory()->GetMirrored(animID));
-
-    pController->SetTime(1.0f);
-
-    nlVector3 v3RootTrans;
-    pController->GetRootTrans(&v3RootTrans, 0);
-
-    mfAnimDistance = v3RootTrans.y;
-    mfAnimTime = (float)pController->m_pSAnim->m_nNumKeys / 30.0f;
-    mfAnimVelocity = mfAnimDistance / mfAnimTime;
-
-    delete pController;
-}
-
-SaveData* GoalieSave::FindSaveData(int animID)
-{
-    SaveData** ppSaveData;
-    if (animID >= 0 && gSaveMap.FindGet(animID, &ppSaveData))
-    {
-        return *ppSaveData;
-    }
-
-    return 0;
 }
 
 void GoalieSave::ClearData()
@@ -389,216 +391,6 @@ void GoalieSave::InitData(Goalie* pGoalie)
     mbInitialized = 1;
 }
 
-SaveData* GoalieSave::GetMissChipSaveData(bool bLeft, bool bFar)
-{
-    unsigned int farFlag = bFar != 0;
-    int index = muMissChipIndexStart + (farFlag ? 0 : 2) + (int)bLeft;
-    return &mpSaveTable[index];
-}
-
-SaveData* GoalieSave::GetSTSSpinMissData(bool bLeft)
-{
-    unsigned int index = muSTSMissIndexStart + ((!bLeft) ? 1 : 0);
-    return &mpSaveTable[index];
-}
-
-SaveData* GoalieSave::GetRandomSTSMissData(bool bCatchAnimOnly)
-{
-    int index = muSTSMissIndexStart + (bCatchAnimOnly ? 2 : 3);
-    return &mpSaveTable[index];
-}
-
-bool GoalieSave::TriggerCallback(float fTime, float fDuration,
-    unsigned long uEventID, float fIntensity, void* pUserData)
-{
-    SaveData* pSaveData = (SaveData*)pUserData;
-
-    if ((uEventID + 0x307C0000) == 0xE7CD)
-    {
-        pSaveData->mfMilestonePercent[2] = fTime;
-        pSaveData->mfDuration = fDuration;
-    }
-    else if ((uEventID - 0x56260000) == 0x4BBE)
-    {
-        pSaveData->mfMilestonePercent[0] = fTime;
-    }
-    else if ((uEventID - 0x0F950000) == 0x24BA)
-    {
-        pSaveData->mfMilestonePercent[1] = fTime;
-    }
-    else if ((uEventID - 0x04540000) == 0x24B9)
-    {
-        pSaveData->mfMilestonePercent[3] = fTime;
-    }
-    return true;
-}
-
-static inline void AddPointToGrid(
-    SaveData* pSaveData, const nlVector3& v3Point)
-{
-    float y;
-    float z;
-    z = v3Point.z;
-    y = v3Point.y;
-
-    float netWidth = cField::GetNet(1.0f)->GetNetWidth();
-    float netHeight = cField::GetNet(1.0f)->GetNetHeight();
-
-    int i = (int)(6.0f * (0.5f * netWidth + y) / netWidth);
-    if (i < 0)
-        i = 0;
-    else if (i >= 6)
-        i = 5;
-
-    int j = (int)(4.0f * z / netHeight);
-    if (j < 0)
-        j = 0;
-    else if (j >= 4)
-        j = 3;
-
-    nlListContainer<SaveData*>& cell = gSaveGrid[i][j];
-
-    nlListIterator<SaveData*> iterator = cell.Begin();
-    if (iterator.IsValid())
-    {
-        while (iterator.IsValid())
-        {
-            if (iterator.Current() == pSaveData)
-                return;
-            iterator.Next();
-        }
-    }
-
-    {
-        ListEntry<SaveData*>* newEntry =
-            (ListEntry<SaveData*>*)nlMalloc(
-                sizeof(ListEntry<SaveData*>), 8, false);
-        if (newEntry != 0)
-        {
-            newEntry->next = 0;
-            newEntry->entry = pSaveData;
-        }
-        nlListAddStart<ListEntry<SaveData*> >(
-            &cell.m_Head, newEntry, &cell.m_Tail);
-    }
-}
-
-extern "C" void fn_80092B48(SaveBlendInfo& blendInfo)
-{
-    SaveData* pConnected;
-    int segment;
-    int anim;
-    float fLastTime;
-    float fThisTime;
-    unsigned char bEmptySpot;
-    float fInvSegTime;
-
-    bEmptySpot = 0;
-
-    {
-        for (anim = 0; anim < 4; anim++)
-        {
-            pConnected = blendInfo.mpSaveData[anim];
-            if (pConnected == 0)
-                continue;
-
-            {
-                fLastTime = 0.0f;
-
-                for (segment = 0; segment < 5; segment++)
-                {
-                    fThisTime = pConnected->mfMilestonePercent[segment]
-                        * pConnected->mfDuration;
-                    if (fThisTime > 0.0f)
-                    {
-                        blendInfo.mfMilestoneScale[anim][segment] =
-                            fThisTime - fLastTime;
-                        fLastTime = fThisTime;
-                    }
-                    else
-                    {
-                        blendInfo.mfMilestoneScale[anim][segment] = -1.0f;
-                        bEmptySpot = 1;
-                    }
-                }
-            }
-        }
-    }
-
-    {
-        fLastTime = 0.0f;
-        for (segment = 0; segment < 5; segment++)
-        {
-            fThisTime = blendInfo.mfMilestoneTime[segment];
-            if (fThisTime > 0.0f)
-            {
-                fInvSegTime = 1.0f / (fThisTime - fLastTime);
-                fLastTime = fThisTime;
-
-                for (anim = 0; anim < 4; anim++)
-                {
-                    if (blendInfo.mpSaveData[anim])
-                    {
-                        blendInfo.mfMilestoneScale[anim][segment] *=
-                            fInvSegTime;
-                    }
-                }
-            }
-        }
-    }
-
-    if ((unsigned char)bEmptySpot)
-    {
-        for (segment = 3; segment >= 0; segment--)
-        {
-            if (blendInfo.mfMilestoneTime[segment] <= 0.0f)
-            {
-                for (anim = 0; anim < 4; anim++)
-                {
-                    blendInfo.mfMilestoneScale[anim][segment] =
-                        blendInfo.mfMilestoneScale[anim][segment + 1];
-                }
-            }
-        }
-    }
-}
-
-extern "C" unsigned int lbl_806E0D4C;
-
-extern "C" SaveData* fn_800925C0(
-    SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
-{
-    SaveData* pSaveData;
-    if (v3TargetPos.y > 0.0f)
-    {
-        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C];
-    }
-    else
-    {
-        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C + 4];
-    }
-
-    SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
-        blendInfo, v3TargetPos, pSaveData);
-    if (pClosest != 0)
-    {
-        fn_80092B48(blendInfo);
-    }
-    return pClosest;
-}
-
-extern "C" SaveData* fn_80092644(SaveData* pSaveData,
-    SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
-{
-    SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
-        blendInfo, v3TargetPos, pSaveData);
-    if (pClosest != 0)
-    {
-        fn_80092B48(blendInfo);
-    }
-    return pClosest;
-}
-
 struct MyMiniData
 {
     int dist;
@@ -711,6 +503,42 @@ SaveData* GoalieSave::FindBestSave(SaveBlendInfo& blendInfo,
     }
 
     return pSaveData;
+}
+
+extern "C" void fn_80092B48(SaveBlendInfo& blendInfo);
+
+extern "C" SaveData* fn_800925C0(
+    SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
+{
+    SaveData* pSaveData;
+    if (v3TargetPos.y > 0.0f)
+    {
+        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C];
+    }
+    else
+    {
+        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C + 4];
+    }
+
+    SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
+        blendInfo, v3TargetPos, pSaveData);
+    if (pClosest != 0)
+    {
+        fn_80092B48(blendInfo);
+    }
+    return pClosest;
+}
+
+extern "C" SaveData* fn_80092644(SaveData* pSaveData,
+    SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
+{
+    SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
+        blendInfo, v3TargetPos, pSaveData);
+    if (pClosest != 0)
+    {
+        fn_80092B48(blendInfo);
+    }
+    return pClosest;
 }
 
 SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
@@ -878,6 +706,91 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
     return pClosest;
 }
 
+extern "C" void fn_80092B48(SaveBlendInfo& blendInfo)
+{
+    SaveData* pConnected;
+    int segment;
+    int anim;
+    float fLastTime;
+    float fThisTime;
+    unsigned char bEmptySpot;
+    float fInvSegTime;
+
+    bEmptySpot = 0;
+
+    {
+        for (anim = 0; anim < 4; anim++)
+        {
+            pConnected = blendInfo.mpSaveData[anim];
+            if (pConnected == 0)
+                continue;
+
+            {
+                fLastTime = 0.0f;
+
+                for (segment = 0; segment < 5; segment++)
+                {
+                    fThisTime = pConnected->mfMilestonePercent[segment]
+                        * pConnected->mfDuration;
+                    if (fThisTime > 0.0f)
+                    {
+                        blendInfo.mfMilestoneScale[anim][segment] =
+                            fThisTime - fLastTime;
+                        fLastTime = fThisTime;
+                    }
+                    else
+                    {
+                        blendInfo.mfMilestoneScale[anim][segment] = -1.0f;
+                        bEmptySpot = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    {
+        fLastTime = 0.0f;
+        for (segment = 0; segment < 5; segment++)
+        {
+            fThisTime = blendInfo.mfMilestoneTime[segment];
+            if (fThisTime > 0.0f)
+            {
+                fInvSegTime = 1.0f / (fThisTime - fLastTime);
+                fLastTime = fThisTime;
+
+                for (anim = 0; anim < 4; anim++)
+                {
+                    if (blendInfo.mpSaveData[anim])
+                    {
+                        blendInfo.mfMilestoneScale[anim][segment] *=
+                            fInvSegTime;
+                    }
+                }
+            }
+        }
+    }
+
+    if ((unsigned char)bEmptySpot)
+    {
+        for (segment = 3; segment >= 0; segment--)
+        {
+            if (blendInfo.mfMilestoneTime[segment] <= 0.0f)
+            {
+                for (anim = 0; anim < 4; anim++)
+                {
+                    blendInfo.mfMilestoneScale[anim][segment] =
+                        blendInfo.mfMilestoneScale[anim][segment + 1];
+                }
+            }
+        }
+    }
+}
+
+static inline float GetBlendScale(float fValue, float fMin, float fMax)
+{
+    return (fValue - fMin) / (fMax - fMin);
+}
+
 SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
     const nlVector3& v3TargetPos, SaveData* pSaveData)
 {
@@ -955,18 +868,14 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
 
                     if (pLeft != pLeftUp)
                     {
-                        fScaleLeft =
-                            (v3TargetPos.z - pLeft->mv3SavePos.z)
-                            / (pLeftUp->mv3SavePos.z
-                                - pLeft->mv3SavePos.z);
+                        fScaleLeft = GetBlendScale(v3TargetPos.z,
+                            pLeft->mv3SavePos.z, pLeftUp->mv3SavePos.z);
                     }
 
                     if (pRight != pRightUp)
                     {
-                        fScaleRight =
-                            (v3TargetPos.z - pRight->mv3SavePos.z)
-                            / (pRightUp->mv3SavePos.z
-                                - pRight->mv3SavePos.z);
+                        fScaleRight = GetBlendScale(v3TargetPos.z,
+                            pRight->mv3SavePos.z, pRightUp->mv3SavePos.z);
                     }
 
                     float fLefty = Interpolate(pLeft->mv3SavePos.y,
@@ -1170,14 +1079,16 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
         blendInfo.mpSaveData[3] = 0;
         blendInfo.mpSaveData[2] = 0;
 
+        const nlVector3& v3DownPos = pDown->mv3SavePos;
+        const nlVector3& v3UpPos = pUp->mv3SavePos;
+
         if (pDown != pUp)
         {
-            float fPrimary =
-                (v3TargetPos.z - pDown->mv3SavePos.z)
-                / (pUp->mv3SavePos.z - pDown->mv3SavePos.z);
+            float fPrimary = GetBlendScale(
+                v3TargetPos.z, v3DownPos.z, v3UpPos.z);
             if (fPrimary >= 0.999f)
             {
-                blendInfo.mv3BlendedSavePos = pUp->mv3SavePos;
+                blendInfo.mv3BlendedSavePos = v3UpPos;
                 blendInfo.mpSaveData[0] = pUp;
                 for (milestone = 0; milestone < 5; milestone++)
                 {
@@ -1187,7 +1098,7 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
             }
             else if (fPrimary <= 0.001f)
             {
-                blendInfo.mv3BlendedSavePos = pDown->mv3SavePos;
+                blendInfo.mv3BlendedSavePos = v3DownPos;
                 for (milestone = 0; milestone < 5; milestone++)
                 {
                     blendInfo.mfMilestoneTime[milestone] =
@@ -1197,11 +1108,9 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
             else
             {
                 blendInfo.mfSaveBlendPrimary = fPrimary;
-                blendInfo.mv3BlendedSavePos.x =
-                    pDown->mv3SavePos.x;
+                blendInfo.mv3BlendedSavePos.x = v3DownPos.x;
                 blendInfo.mv3BlendedSavePos.y =
-                    Interpolate(pDown->mv3SavePos.y,
-                        pUp->mv3SavePos.y, fPrimary);
+                    Interpolate(v3DownPos.y, v3UpPos.y, fPrimary);
                 blendInfo.mv3BlendedSavePos.z = v3TargetPos.z;
                 blendInfo.mpSaveData[1] = pUp;
 
@@ -1220,7 +1129,7 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
         }
         else
         {
-            blendInfo.mv3BlendedSavePos = pDown->mv3SavePos;
+            blendInfo.mv3BlendedSavePos = v3DownPos;
             for (milestone = 0; milestone < 5; milestone++)
             {
                 blendInfo.mfMilestoneTime[milestone] =
@@ -1232,12 +1141,12 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
             {
                 const float fNudge = 0.1f;
 
-                if (fabsf(pDown->mv3SavePos.y - v3TargetPos.y)
+                if (fabsf(v3DownPos.y - v3TargetPos.y)
                     < fNudge)
                 {
                     blendInfo.mv3BlendedSavePos.y = v3TargetPos.y;
                 }
-                else if (pDown->mv3SavePos.y > v3TargetPos.y)
+                else if (v3DownPos.y > v3TargetPos.y)
                 {
                     blendInfo.mv3BlendedSavePos.y -= fNudge;
                 }
@@ -1246,12 +1155,12 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
                     blendInfo.mv3BlendedSavePos.y += fNudge;
                 }
 
-                if (fabsf(pDown->mv3SavePos.z - v3TargetPos.z)
+                if (fabsf(v3DownPos.z - v3TargetPos.z)
                     < fNudge)
                 {
                     blendInfo.mv3BlendedSavePos.z = v3TargetPos.z;
                 }
-                else if (pDown->mv3SavePos.z > v3TargetPos.z)
+                else if (v3DownPos.z > v3TargetPos.z)
                 {
                     blendInfo.mv3BlendedSavePos.z -= fNudge;
                 }
@@ -1270,6 +1179,173 @@ SaveData* GoalieSave::GetClosestBlendedPos(SaveBlendInfo& blendInfo,
 
     blendInfo.mv3BlendedSavePos.x = pClosest->mv3SavePos.x;
     return pClosest;
+}
+
+SaveData* GoalieSave::FindSaveData(int animID)
+{
+    SaveData** ppSaveData;
+    if (animID >= 0 && gSaveMap.FindGet(animID, &ppSaveData))
+    {
+        return *ppSaveData;
+    }
+
+    return 0;
+}
+
+SaveData* GoalieSave::GetMissChipSaveData(bool bLeft, bool bFar)
+{
+    unsigned int farFlag = bFar != 0;
+    int index = muMissChipIndexStart + (farFlag ? 0 : 2) + (int)bLeft;
+    return &mpSaveTable[index];
+}
+
+SaveData* GoalieSave::GetSTSSpinMissData(bool bLeft)
+{
+    unsigned int index = muSTSMissIndexStart + ((!bLeft) ? 1 : 0);
+    return &mpSaveTable[index];
+}
+
+SaveData* GoalieSave::GetRandomSTSMissData(bool bCatchAnimOnly)
+{
+    int index = muSTSMissIndexStart + (bCatchAnimOnly ? 2 : 3);
+    return &mpSaveTable[index];
+}
+
+bool GoalieSave::TriggerCallback(float fTime, float fDuration,
+    unsigned long uEventID, float fIntensity, void* pUserData)
+{
+    SaveData* pSaveData = (SaveData*)pUserData;
+
+    if ((uEventID + 0x307C0000) == 0xE7CD)
+    {
+        pSaveData->mfMilestonePercent[2] = fTime;
+        pSaveData->mfDuration = fDuration;
+    }
+    else if ((uEventID - 0x56260000) == 0x4BBE)
+    {
+        pSaveData->mfMilestonePercent[0] = fTime;
+    }
+    else if ((uEventID - 0x0F950000) == 0x24BA)
+    {
+        pSaveData->mfMilestonePercent[1] = fTime;
+    }
+    else if ((uEventID - 0x04540000) == 0x24B9)
+    {
+        pSaveData->mfMilestonePercent[3] = fTime;
+    }
+    return true;
+}
+
+static inline void AddPointToGrid(
+    SaveData* pSaveData, const nlVector3& v3Point)
+{
+    float y;
+    float z;
+    z = v3Point.z;
+    y = v3Point.y;
+
+    float netWidth = cField::GetNet(1.0f)->GetNetWidth();
+    float netHeight = cField::GetNet(1.0f)->GetNetHeight();
+
+    int i = (int)(6.0f * (0.5f * netWidth + y) / netWidth);
+    if (i < 0)
+        i = 0;
+    else if (i >= 6)
+        i = 5;
+
+    int j = (int)(4.0f * z / netHeight);
+    if (j < 0)
+        j = 0;
+    else if (j >= 4)
+        j = 3;
+
+    nlListContainer<SaveData*>& cell = gSaveGrid[i][j];
+
+    nlListIterator<SaveData*> iterator = cell.Begin();
+    if (iterator.IsValid())
+    {
+        while (iterator.IsValid())
+        {
+            if (iterator.Current() == pSaveData)
+                return;
+            iterator.Next();
+        }
+    }
+
+    {
+        ListEntry<SaveData*>* newEntry =
+            (ListEntry<SaveData*>*)nlMalloc(
+                sizeof(ListEntry<SaveData*>), 8, false);
+        if (newEntry != 0)
+        {
+            newEntry->next = 0;
+            newEntry->entry = pSaveData;
+        }
+        nlListAddStart<ListEntry<SaveData*> >(
+            &cell.m_Head, newEntry, &cell.m_Tail);
+    }
+}
+
+static inline bool IsCellEmpty(const nlListContainer<SaveData*>& cell)
+{
+    return cell.m_Head == 0;
+}
+
+static inline void AddSinglePointToGrid(
+    SaveData* pSaveData, const nlVector3& v3Point)
+{
+    float y;
+    float z;
+    z = v3Point.z;
+    y = v3Point.y;
+
+    float netWidth = cField::GetNet(1.0f)->GetNetWidth();
+    float netHeight = cField::GetNet(1.0f)->GetNetHeight();
+
+    int i = (int)(6.0f * (0.5f * netWidth + y) / netWidth);
+    if (i < 0)
+        i = 0;
+    else if (i >= 6)
+        i = 5;
+
+    int j = (int)(4.0f * z / netHeight);
+    if (j < 0)
+        j = 0;
+    else if (j >= 4)
+        j = 3;
+
+    nlListContainer<SaveData*>& cell = gSaveGrid[i][j];
+
+    if (!IsCellEmpty(cell))
+    {
+        nlListIterator<SaveData*> iterator = cell.Begin();
+        while (iterator.IsValid())
+        {
+            if (iterator.Current() == pSaveData)
+                return;
+            iterator.Next();
+        }
+    }
+
+    {
+        ListEntry<SaveData*>* newEntry =
+            (ListEntry<SaveData*>*)nlMalloc(
+                sizeof(ListEntry<SaveData*>), 8, false);
+        if (newEntry != 0)
+        {
+            newEntry->next = 0;
+            newEntry->entry = pSaveData;
+        }
+        nlListAddStart<ListEntry<SaveData*> >(
+            &cell.m_Head, newEntry, &cell.m_Tail);
+    }
+}
+
+static inline float GetDistSqYZ(const nlVector3& a, const nlVector3& b)
+{
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    return nlGetLengthSquared2D(dy, dz);
 }
 
 void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
@@ -1422,16 +1498,12 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
                     pCurRight, v3CurColPos, &pCurRight, &pCurRightUp);
 
                 {
-                    float dy = pCurLeft->mv3SavePos.y - v3CurColPos.y;
-                    float dz = pCurLeft->mv3SavePos.z - v3CurColPos.z;
-                    fCloseDist = nlGetLengthSquared2D(dy, dz);
+                    fCloseDist = GetDistSqYZ(pCurLeft->mv3SavePos, v3CurColPos);
                     pClosest = pCurLeft;
 
                     if (pCurLeft != pCurUp)
                     {
-                        float upDy = pCurUp->mv3SavePos.y - v3CurColPos.y;
-                        float upDz = pCurUp->mv3SavePos.z - v3CurColPos.z;
-                        float d = nlGetLengthSquared2D(upDy, upDz);
+                        float d = GetDistSqYZ(pCurUp->mv3SavePos, v3CurColPos);
                         if (d < fCloseDist)
                         {
                             fCloseDist = d;
@@ -1441,9 +1513,7 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
 
                     if (pCurLeft != pCurRight)
                     {
-                        float rightDy = pCurRight->mv3SavePos.y - v3CurColPos.y;
-                        float rightDz = pCurRight->mv3SavePos.z - v3CurColPos.z;
-                        float d = nlGetLengthSquared2D(rightDy, rightDz);
+                        float d = GetDistSqYZ(pCurRight->mv3SavePos, v3CurColPos);
                         if (d < fCloseDist)
                         {
                             fCloseDist = d;
@@ -1451,11 +1521,7 @@ void GoalieSave::AddAreaToGrid(SaveData* pSaveData)
                         }
                         if (pCurRight != pCurRightUp)
                         {
-                            float upRightDy = pCurRightUp->mv3SavePos.y
-                                            - v3CurColPos.y;
-                            float upRightDz = pCurRightUp->mv3SavePos.z
-                                            - v3CurColPos.z;
-                            float fUpRightDistSq = nlGetLengthSquared2D(upRightDy, upRightDz);
+                            float fUpRightDistSq = GetDistSqYZ(pCurRightUp->mv3SavePos, v3CurColPos);
                             if (fUpRightDistSq < fCloseDist)
                             {
                                 fCloseDist = fUpRightDistSq;
@@ -1523,12 +1589,8 @@ void GoalieSave::AddSegmentToGrid(
     {
         while (count <= divisions)
         {
-            if (nlGetLengthSquared2D(
-                    pSaveData1->mv3SavePos.y - v3CurPos.y,
-                    pSaveData1->mv3SavePos.z - v3CurPos.z)
-                < nlGetLengthSquared2D(
-                    pSaveData2->mv3SavePos.y - v3CurPos.y,
-                    pSaveData2->mv3SavePos.z - v3CurPos.z))
+            if (GetDistSqYZ(pSaveData1->mv3SavePos, v3CurPos)
+                < GetDistSqYZ(pSaveData2->mv3SavePos, v3CurPos))
                 pCurSaveData = pSaveData1;
             else
                 pCurSaveData = pSaveData2;
@@ -1629,7 +1691,7 @@ void GoalieSave::AddToGrid(SaveData* pSaveData)
         return;
     }
 
-    AddPointToGrid(pSaveData, pSaveData->mv3SavePos);
+    AddSinglePointToGrid(pSaveData, pSaveData->mv3SavePos);
     pSaveData->mv3GroupMinCoords = pSaveData->mv3SavePos;
     pSaveData->mv3GroupMaxCoords = pSaveData->mv3SavePos;
 }

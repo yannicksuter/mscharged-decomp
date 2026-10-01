@@ -142,7 +142,7 @@ public:
     /* 0xA4 */ cPlayer* m_pPlayers[5];
     /* 0xB8 */ cFielder* m_pAIOrderedFielders[4];
     /* 0xC8 */ cFielder* m_pBallInterceptOrderedFielders[4];
-    /* 0xD8 */ cFielder* mUnidentified0D8[4];
+    /* 0xD8 */ cFielder* m_pFieldersByTeamRelativeX[4];
     /* 0xE8 */ cNet* m_pNet;
     /* 0xEC */ FormationManager* m_pFormationManager;
     /* 0xF0 */ AIContext* mUnidentified0F0;

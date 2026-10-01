@@ -28,7 +28,7 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 int gOnlineLocalControllerIndices[2] = { -1, -1 };
 u8 gOnlineStartMatchmaking;
@@ -214,13 +214,13 @@ void SHOnlineMatchmakingDraft::SceneCreated()
             mPresentation->GetActiveSlide(), "Layer",
             buffer);
         if (instance == 0)
-            instance = &UnidentifiedTLComponentDefault::sInstance;
+            instance = &TLComponentDefault::sInstance;
         mPlayerInstances[i] = instance;
     }
     TLComponentInstance* scrollbar = FEFinder<TLComponentInstance, 4>::Find<>(
         mPresentation->GetActiveSlide(), "Layer",
         "scrollbar");
-    mScrollWidget.SetComponent(scrollbar == 0 ? &UnidentifiedTLComponentDefault::sInstance : scrollbar);
+    mScrollWidget.SetComponent(scrollbar == 0 ? &TLComponentDefault::sInstance : scrollbar);
     if (mScrollingEnabled)
     {
         mScrollWidget.SetRange(mScrollRange);

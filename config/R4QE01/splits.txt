@@ -222,7 +222,7 @@ Game/AI/GoalieActions.cpp:
 	.rodata     start:0x804DC030 end:0x804DC088
 	.data       start:0x804FE2A0 end:0x804FE3C0
 	.bss        start:0x8056CF60 end:0x8056D008
-	.sdata      start:0x806DBBE0 end:0x806DBD5C
+	.sdata      start:0x806DBBE0 end:0x806DBD58
 	.sbss       start:0x806E0D18 end:0x806E0D30
 	.sdata2     start:0x806E3998 end:0x806E3B00
 
@@ -243,12 +243,13 @@ Game/AI/GoalieSave.cpp:
 	.rodata     start:0x804DC0B8 end:0x804DC0C8
 	.data       start:0x804FE3C0 end:0x804FF4E0
 	.bss        start:0x8056D260 end:0x8056D3C0
-	.sdata      start:0x806DBD5C end:0x806DBD70 align:4
+	.sdata      start:0x806DBD58 end:0x806DBD68
 	.sbss       start:0x806E0D38 end:0x806E0D68
 	.sdata2     start:0x806E3B18 end:0x806E3B70
 
 Game/AI/HeadTrack.cpp:
 	.text       start:0x80094A2C end:0x80094FB4
+	.sdata      start:0x806DBD68 end:0x806DBD70
 	.sdata2     start:0x806E3B70 end:0x806E3B98
 
 Game/Net.cpp:
@@ -988,6 +989,7 @@ Game/Physics/PhysicsBall.cpp:
 	.rodata     start:0x804DCC40 end:0x804DCC50
 	.data       start:0x8050E4C8 end:0x8050E5E8
 	.sdata      start:0x806DCA60 end:0x806DCA88
+	.sbss       start:0x806E11E8 end:0x806E11F0
 	.sdata2     start:0x806E4840 end:0x806E4890
 
 Game/Physics/PhysicsBanana.cpp:
@@ -1023,7 +1025,7 @@ Game/Physics/PhysicsEventQueue.cpp:
 	.data       start:0x8050EE30 end:0x80510590
 	.bss        start:0x80570100 end:0x805701C8
 	.sdata      start:0x806DCA90 end:0x806DCA98
-	.sbss       start:0x806E11E8 end:0x806E1280
+	.sbss       start:0x806E11F0 end:0x806E1280
 	.sdata2     start:0x806E4900 end:0x806E4928
 
 Game/Physics/PhysicsFakeBall.cpp:
@@ -1601,7 +1603,7 @@ Game/Render/tu_801B43F8.cpp:
 	.sbss       start:0x806E16E8 end:0x806E16F0
 	.sdata2     start:0x806E53E8 end:0x806E5400
 
-Game/Render/tu_801B532C.cpp:
+Game/Render/WindDebrisConfig.cpp:
 	.text       start:0x801B532C end:0x801B535C
 	.data       start:0x80514830 end:0x80514898
 
@@ -1778,7 +1780,7 @@ Game/FE/feCharacterPDAComponent.cpp:
 	.sdata      start:0x806DD508 end:0x806DD568
 	.sdata2     start:0x806E5668 end:0x806E5698
 
-Game/FE/tu_80519920.cpp:
+Game/FE/CaptainSelectionOrder.cpp:
 	.data       start:0x80519920 end:0x80519950
 
 Game/OverlayManager.cpp:
@@ -2804,7 +2806,7 @@ Game/GL/GLFourTextureAddMeshWriter.cpp:
 	.text       start:0x802A0F04 end:0x802A12E4
 	.ctors      start:0x804DB8DC end:0x804DB8E0
 
-NL/gl/tu_802A12E4.cpp:
+NL/gl/glShadowedTexturedColourModelWriter.cpp:
 	.text       start:0x802A12E4 end:0x802A15D4
 	.ctors      start:0x804DB8E0 end:0x804DB8E4
 
@@ -3154,7 +3156,7 @@ NL/utility.cpp:
 	.text       start:0x802B5FD8 end:0x802B6568
 	.sdata2     start:0x806E60F8 end:0x806E6128
 
-NL/tu_802B6568.cpp:
+NL/nlRandom.cpp:
 	.text       start:0x802B6568 end:0x802B66D8
 	.sdata      start:0x806DF248 end:0x806DF24C
 	.sdata2     start:0x806E6128 end:0x806E6138
@@ -3877,7 +3879,7 @@ Game/FE/tlTextInstance_runtime.cpp:
 	.text       start:0x803025A4 end:0x80302A98
 	.sdata2     start:0x806E6708 end:0x806E6718
 
-Game/FE/tu_80302A98.cpp:
+Game/FE/tlDefault.cpp:
 	.text       start:0x80302A98 end:0x80302D04
 	.ctors      start:0x804DBA84 end:0x804DBA88
 	.bss        start:0x8057FFB0 end:0x80580720
@@ -3982,7 +3984,7 @@ Game/SAnim/pnFeather.cpp:
 	.bss        start:0x80584178 end:0x805841A0
 	.sdata2     start:0x806E6808 end:0x806E6820
 
-Game/SAnim/tu_8030E550.cpp:
+Game/SAnim/pnScaleBlender.cpp:
 	.text       start:0x8030E550 end:0x8030E940
 	.ctors      start:0x804DBAA4 end:0x804DBAA8
 	.data       start:0x805300A0 end:0x805300C8

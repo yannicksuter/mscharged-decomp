@@ -4,6 +4,7 @@
 #include "Game/BaseSceneHandler.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFunction.h"
+#include "NL/nlFunction.inl"
 #include "Game/FE/fePointerButton.h"
 #include "types.h"
 #include "NL/nlColour.h"

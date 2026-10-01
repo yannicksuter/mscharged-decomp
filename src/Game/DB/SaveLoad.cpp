@@ -27,6 +27,7 @@
 #include <wchar.h>
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/BaseGameSceneManager.h"
+#include "NL/nlFunction.inl"
 
 #define NAND_BANNER_SIZE(frames) (0x60A0 + (0x1200 * (frames)))
 #define NAND_BANNER_ICON_SIZE    0x1200

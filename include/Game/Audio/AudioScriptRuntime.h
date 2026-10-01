@@ -37,35 +37,13 @@ struct AudioEffectSoundStartedVisitor
     /* 0x08 */ AudioEffectBase* mEffect;
 }; // size: 0x0C
 
-// Bytecode interpreter embedded by the runtime.
-class AudioScriptInterpreter : public InterpreterCore
-{
-public:
-    AudioScriptInterpreter(unsigned int size)
-        : InterpreterCore(size)
-    {
-    }
-
-    virtual void DoFunctionCall(unsigned int index)
-    {
-        u32 value = m_SP[-1];
-        ((u8*)m_SP)[-1] = value != 0;
-        if (m_RunState == 3)
-            m_SP[-1] = value;
-    }
-};
-
 // Per-definition binding: the set of playing sound instances and the live
 // effects, keyed by instance handle and effect id. The instance set stores a
 // one-byte value that no reader uses.
 class AudioEffectBinding
 {
 public:
-    AudioEffectBinding()
-        : mInstances(16, 16)
-        , mEffects(16, 16)
-    {
-    }
+    AudioEffectBinding();
 
     struct UpdateState
     {
@@ -157,6 +135,8 @@ struct AudioScriptUpdateState
     float mDeltaTime;
     u32 mCount;
 };
+
+#include "Game/Audio/AudioScriptInterpreter.h"
 
 class AudioScriptRuntime
 {

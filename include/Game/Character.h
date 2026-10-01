@@ -78,6 +78,7 @@ enum eCharacterModelType
 
 struct UnidentifiedCharacterState_024
 {
+    void SyncLog(void* context, DebugWriteCache* cache);
     UnidentifiedCharacterState_024()
     {
         UnidentifiedReset();
@@ -169,9 +170,8 @@ public:
     virtual void Unknown8(unsigned short aDirection, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
-    virtual void Unknown10(
-        const nlVector3& v3Position, unsigned short aDirection);
-    virtual void Unknown11(void* context, DebugWriteCache* cache);
+    virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
+    virtual void SyncLog(void* context, DebugWriteCache* cache);
     virtual void Unknown12(RunningChecksum* pChecksum);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,

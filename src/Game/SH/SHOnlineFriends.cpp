@@ -35,7 +35,7 @@
 #include "Game/FE/feOnlineError.h"
 
 #include <stdlib.h>
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 

@@ -29,7 +29,8 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHChallengeSelect.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
+#include "NL/nlFunction.inl"
 
 /**
  * Offset/Address/Size: 0x0 | 0x802337F4 | size: 0x84

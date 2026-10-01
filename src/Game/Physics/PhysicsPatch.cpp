@@ -38,8 +38,6 @@ class EffectsGroup;
 
 extern "C" void fn_8017472C(void*);
 
-extern SlotPool<UnidentifiedEventData30> lbl_80570160;
-
 static const nlVector3 lbl_804DCCAC = { -2.0f, 0.0f, -5.0f };
 
 unsigned short lbl_806DCAB8 = 0xFFFF;

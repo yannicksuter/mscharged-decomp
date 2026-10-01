@@ -72,11 +72,11 @@ void CupFinalRoundsScene::SceneCreated()
         nlSNPrintf(matchupName, sizeof(matchupName), "game_%d", i);
         mMatchupInstances[i] = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
             presentation->m_currentSlide, "Layer", matchupName);
-        UnidentifiedTLGroupInstance* group =
-            FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(
+        TLGroupInstance* group =
+            FEFinder<TLGroupInstance, TLAT_GROUP>::FindOrDefault(
                 mMatchupInstances[i], "Slide1", matchupName);
         PopulateMatchup(game, group, i);
-        group = FEFinder<UnidentifiedTLGroupInstance, TLAT_GROUP>::FindOrDefault(
+        group = FEFinder<TLGroupInstance, TLAT_GROUP>::FindOrDefault(
             mMatchupInstances[i], "Slide2", matchupName);
         PopulateMatchup(game, group, i);
     }

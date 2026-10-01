@@ -185,10 +185,10 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         FEModelHandle* object = FEModelManager::Instance()->GetModel((const char*)objectName);
         if (object != 0)
         {
-            PresentationLookupResult* child = (PresentationLookupResult*)FEModelManager::Instance()->GetObject(childName);
+            StadiumFEModelMarker* child = FEModelManager::Instance()->GetObject(childName);
             if (child != 0)
             {
-                object->SetTransform(*(nlMatrix4*)child->GetValue());
+                object->SetTransform(*child->GetWorldMatrix());
             }
         }
         break;
@@ -285,10 +285,10 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         FEModelHandle* object = FEModelManager::Instance()->GetModel(name);
         if (object != 0)
         {
-            PresentationLookupResult* child = (PresentationLookupResult*)FEModelManager::Instance()->GetObject(childName);
+            StadiumFEModelMarker* child = FEModelManager::Instance()->GetObject(childName);
             if (child != 0)
             {
-                object->SetPosition(*(nlVector3*)((char*)child->GetValue() + 0x30));
+                object->SetPosition(*(nlVector3*)((char*)child->GetWorldMatrix() + 0x30));
             }
         }
         break;

@@ -19,6 +19,7 @@
 #include "NL/nlPrint.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "NL/nlString.h"
+#include "NL/nlFunction.inl"
 
 bool gNetworkStartWaitingForDialog;
 bool gNetworkStartResetRequested;

@@ -110,15 +110,13 @@ public:
 
     // Transfers the callable out of the source, which the caller
     // holds by const reference while handing over ownership.
-    void* UnidentifiedTransfer(const Function0& other)
+    void UnidentifiedTransfer(const Function0& other)
     {
         Function0& source = const_cast<Function0&>(other);
-        void* target = (void*)source.mFreeFunction;
         mTag = source.mTag;
-        mFunctor = (FunctorBase*)target;
+        mFreeFunction = source.mFreeFunction;
         source.mTag = FUNCTION_EMPTY;
         source.mFreeFunction = 0;
-        return target;
     }
 
     operator bool() const
@@ -278,15 +276,13 @@ public:
 
     // Transfers the callable out of the source, which the caller
     // holds by const reference while handing over ownership.
-    void* UnidentifiedTransfer(const Function1& other)
+    void UnidentifiedTransfer(const Function1& other)
     {
         Function1& source = const_cast<Function1&>(other);
-        void* target = (void*)source.mFreeFunction;
         mTag = source.mTag;
-        mFunctor = (FunctorBase*)target;
+        mFreeFunction = source.mFreeFunction;
         source.mTag = FUNCTION_EMPTY;
         source.mFreeFunction = 0;
-        return target;
     }
 
     operator bool() const
@@ -357,10 +353,6 @@ public:
     {
     }
 
-    Function(void (*function)(P1))
-        : Base(function)
-    {
-    }
     template <typename Callable>
     Function(Callable callable)
         : Base(callable)
@@ -390,10 +382,6 @@ public:
     {
     }
 
-    Function(void (*function)())
-        : Base(function)
-    {
-    }
 
     template <typename Callable>
     Function(Callable callable);
@@ -489,148 +477,7 @@ public:
     }
 };
 
-template <typename ReturnType, typename P1, typename P2>
-class Function2
-{
-public:
-    struct FunctorBase
-    {
-        void* operator new(unsigned long size) { return AllocateFunctionMemory(size); }
-        void operator delete(void* ptr, unsigned long size)
-        {
-            FreeFunctionMemory(ptr, size);
-        }
-
-        virtual ~FunctorBase() { }
-        virtual ReturnType operator()(P1, P2) = 0;
-        virtual FunctorBase* Clone() const = 0;
-    };
-
-    template <typename Callable>
-    struct FunctorImpl : public FunctorBase
-    {
-    private:
-        Callable mFunctor;
-
-    public:
-        FunctorImpl(const Callable& callable)
-            : mFunctor(callable)
-        {
-        }
-
-        virtual ReturnType operator()(P1 p1, P2 p2);
-        virtual FunctorBase* Clone() const;
-
-    private:
-        ReturnType Call(P1 p1, P2 p2, BoolToType<false>)
-        {
-            return mFunctor(p1, p2);
-        }
-
-        void Call(P1 p1, P2 p2, BoolToType<true>)
-        {
-            mFunctor(p1, p2);
-        }
-    };
-
-    Function2()
-        : mTag(FUNCTION_EMPTY)
-    {
-    }
-
-    template <typename Callable>
-    Function2(const Callable& callable)
-        : mTag(FUNCTION_FUNCTOR)
-    {
-        typedef FunctorImpl<Callable> Impl;
-        mFunctor = new Impl(callable);
-    }
-
-    Function2(ReturnType (*function)(P1, P2))
-        : mTag(FUNCTION_FREE)
-        , mFreeFunction(function)
-    {
-    }
-
-    Function2(const Function2& other)
-        : mTag(other.mTag)
-    {
-        if (mTag == FUNCTION_FREE)
-        {
-            mFreeFunction = other.mFreeFunction;
-        }
-        else if (mTag == FUNCTION_FUNCTOR)
-        {
-            mFunctor = other.mFunctor->Clone();
-        }
-    }
-
-    ~Function2()
-    {
-        Clear();
-    }
-
-    Function2& operator=(const Function2& other)
-    {
-        Clear();
-        mTag = other.mTag;
-        if (mTag == FUNCTION_FREE)
-        {
-            mFreeFunction = other.mFreeFunction;
-        }
-        else if (mTag == FUNCTION_FUNCTOR)
-        {
-            mFunctor = other.mFunctor->Clone();
-        }
-        return *this;
-    }
-
-    void Clear()
-    {
-        if (mTag == FUNCTION_FUNCTOR)
-        {
-            delete mFunctor;
-        }
-        mTag = FUNCTION_EMPTY;
-    }
-
-    operator bool() const
-    {
-        return mTag != FUNCTION_EMPTY;
-    }
-
-    ReturnType operator()(P1 p0, P2 p1) const
-    {
-        if (mTag == FUNCTION_FREE)
-        {
-            return mFreeFunction(p0, p1);
-        }
-        return (*mFunctor)(p0, p1);
-    }
-
-private:
-    FunctionTag mTag;
-    union
-    {
-        ReturnType (*mFreeFunction)(P1, P2);
-        FunctorBase* mFunctor;
-    };
-};
-
-template <typename ReturnType, typename P1, typename P2>
-template <typename Callable>
-inline ReturnType Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::operator()(P1 p1, P2 p2)
-{
-    return Call(p1, p2, BoolToType<IsVoid<ReturnType>::value>());
-}
-
-template <typename ReturnType, typename P1, typename P2>
-template <typename Callable>
-inline typename Function2<ReturnType, P1, P2>::FunctorBase*
-Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::Clone() const
-{
-    return new FunctorImpl(*this);
-}
+#include "NL/nlFunction2.h"
 
 template <typename ReturnType, typename P1, typename P2>
 class Function<ReturnType(P1, P2)> : public Function2<ReturnType, P1, P2>
@@ -638,6 +485,8 @@ class Function<ReturnType(P1, P2)> : public Function2<ReturnType, P1, P2>
     typedef Function2<ReturnType, P1, P2> Base;
 
 public:
+    inline ~Function();
+
     Function()
         : Base()
     {
@@ -781,14 +630,12 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void* UnidentifiedTransfer(Function3& other)
+    void UnidentifiedTransfer(Function3& other)
     {
-        void* target = (void*)other.mFreeFunction;
         mTag = other.mTag;
-        mFunctor = (FunctorBase*)target;
+        mFreeFunction = other.mFreeFunction;
         other.mTag = FUNCTION_EMPTY;
         other.mFreeFunction = 0;
-        return target;
     }
 
     operator bool() const
@@ -848,5 +695,32 @@ public:
         return *this;
     }
 };
+
+template <typename ReturnType, typename P1, typename P2>
+template <typename Callable>
+inline Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::FunctorImpl(const Callable& callable)
+    : mFunctor(callable)
+{
+}
+
+template <typename ReturnType, typename P1, typename P2>
+template <typename Callable>
+inline ReturnType Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::operator()(P1 p1, P2 p2)
+{
+    return Call(p1, p2, BoolToType<IsVoid<ReturnType>::value>());
+}
+
+template <typename ReturnType, typename P1, typename P2>
+template <typename Callable>
+inline typename Function2<ReturnType, P1, P2>::FunctorBase*
+Function2<ReturnType, P1, P2>::FunctorImpl<Callable>::Clone() const
+{
+    return new FunctorImpl(*this);
+}
+
+template <typename ReturnType, typename P1, typename P2>
+inline Function<ReturnType(P1, P2)>::~Function()
+{
+}
 
 #endif // NL_FUNCTION_H

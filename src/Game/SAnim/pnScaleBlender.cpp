@@ -1,14 +1,14 @@
-#include "Game/SAnim/tu_8030E550.h"
+#include "Game/SAnim/pnScaleBlender.h"
 
-SlotPool<cPN_8030E550> cPN_8030E550::mSlotPool(16, 16);
+SlotPool<cPN_ScaleBlender> cPN_ScaleBlender::m_ScaleBlenderSlotPool(16, 16);
 
-cPN_8030E550::~cPN_8030E550()
+cPN_ScaleBlender::~cPN_ScaleBlender()
 {
 }
 
-void cPN_8030E550::BeginBlendIn(float duration)
+void cPN_ScaleBlender::BeginBlendIn(float duration)
 {
-    m_eBlendMode = BLEND_MODE_8030E550_IN;
+    m_eScaleBlendMode = SCALE_BLEND_IN;
     if (duration > 0.0f)
     {
         m_fBlendTime = 0.0f;
@@ -21,9 +21,9 @@ void cPN_8030E550::BeginBlendIn(float duration)
     }
 }
 
-void cPN_8030E550::BeginBlendOut(float duration)
+void cPN_ScaleBlender::BeginBlendOut(float duration)
 {
-    m_eBlendMode = BLEND_MODE_8030E550_OUT;
+    m_eScaleBlendMode = SCALE_BLEND_OUT;
     if (duration > 0.0f)
     {
         m_fBlendDuration = duration;
@@ -41,7 +41,7 @@ void cPN_8030E550::BeginBlendOut(float duration)
     }
 }
 
-cPoseNode* cPN_8030E550::Update(float dt)
+cPoseNode* cPN_ScaleBlender::Update(float dt)
 {
     if (GetChild(0))
     {
@@ -54,16 +54,16 @@ cPoseNode* cPN_8030E550::Update(float dt)
 
     if (GetChild(1))
     {
-        switch (m_eBlendMode)
+        switch (m_eScaleBlendMode)
         {
-        case BLEND_MODE_8030E550_IN:
+        case SCALE_BLEND_IN:
             m_fBlendTime += dt / m_fBlendDuration;
             if (m_fBlendTime > 1.0f)
             {
                 m_fBlendTime = 1.0f;
             }
             break;
-        case BLEND_MODE_8030E550_OUT:
+        case SCALE_BLEND_OUT:
             m_fBlendTime -= dt / m_fBlendDuration;
             if (m_fBlendTime <= 0.0f)
             {
@@ -81,7 +81,7 @@ cPoseNode* cPN_8030E550::Update(float dt)
     return this;
 }
 
-void cPN_8030E550::Evaluate(
+void cPN_ScaleBlender::Evaluate(
     float weight, cPoseAccumulator* accumulator) const
 {
     if (GetChild(0) != 0)
@@ -105,15 +105,15 @@ void cPN_8030E550::Evaluate(
     }
 }
 
-void cPN_8030E550::Evaluate(
+void cPN_ScaleBlender::Evaluate(
     int, float, cPoseAccumulator*) const
 {
 }
 
-void cPN_8030E550::BlendRootTrans(nlVector3*, float, float*)
+void cPN_ScaleBlender::BlendRootTrans(nlVector3*, float, float*)
 {
 }
 
-void cPN_8030E550::BlendRootRot(u16*, float, float*)
+void cPN_ScaleBlender::BlendRootRot(u16*, float, float*)
 {
 }

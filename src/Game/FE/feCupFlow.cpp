@@ -22,6 +22,7 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlstring_tmpl.h"
+#include "NL/nlFunction.inl"
 
 bool gMainMenuInputResetPending;
 int gCupAwardModelCount;

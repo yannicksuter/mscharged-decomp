@@ -627,14 +627,32 @@ bool AvoidController::CalcDesiredVelocityToAvoidCorner(
     return bHitSideline;
 }
 
+inline bool AvoidController::CalcDesiredVelocityToAvoidSideline(
+    nlVector2& vNewDesiredVelDir,
+    const sSideLinePlane& sideline,
+    const nlVector2& vCurrentDesiredVelDir,
+    const nlVector2& vCurrentVelDir)
+{
+    nlVector2 vSidelinePos = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
+    nlVector2 vSidelineNormal;
+    nlVec2Sub(vSidelineNormal, v2Zero, sideline.vNormal);
+    if (vSidelineNormal.x == 0.0f)
+        vSidelinePos.y = sideline.fDistance * sideline.vNormal.y;
+    else
+        vSidelinePos.x = sideline.fDistance * sideline.vNormal.x;
+    bool bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir,
+        vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
+    return bHitSideline;
+}
+
 bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
 {
+    u16 aDesiredMovementDir;
     bool bHitSideline;
     bool bTurboAllowed;
     nlVector2 vCurrentVelDir;
     nlVector2 vCurrentDesiredVelDir;
     nlVector2 vNewDesiredVelDir;
-    sCornerSegment corner;
 
     mUnidentified028 = v3Zero;
     if (m_pFielder->GetDistanceToDesiredPos() <= 0.25f)
@@ -652,15 +670,9 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         nlPolarToCartesian(vCurrentDesiredVelDir.x, vCurrentDesiredVelDir.y, m_pFielder->mUnidentified024.m_aDesiredMovementDirection, 1.0f);
     vNewDesiredVelDir = vCurrentDesiredVelDir;
     {
-        u8* pBase = (u8*)cField::mCorners;
-        int i = 0;
-        for (; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
-            u32* pSrc = (u32*)(pBase + i * sizeof(sCornerSegment));
-            ((u32*)&corner)[0] = pSrc[0];
-            ((u32*)&corner)[1] = pSrc[1];
-            ((u32*)&corner)[2] = pSrc[2];
-            ((u32*)&corner)[3] = pSrc[3];
+            sCornerSegment corner = cField::GetCorner(i);
             bHitSideline = CalcDesiredVelocityToAvoidCorner(vNewDesiredVelDir, corner, vCurrentDesiredVelDir, vCurrentVelDir);
             if (bHitSideline)
                 break;
@@ -668,28 +680,17 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     }
     if (!bHitSideline)
     {
-        u8* pBase = (u8*)cField::mSidelines;
-        int i = 0;
-        for (; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
-            sSideLinePlane* pSide = (sSideLinePlane*)(pBase + i * sizeof(sSideLinePlane));
-            nlVector2 vSidelineNormal;
-            nlVector2 vSidelinePos = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
-            float normY = v2Zero.y - pSide->vNormal.y;
-            vSidelineNormal.x = v2Zero.x - pSide->vNormal.x;
-            vSidelineNormal.y = normY;
-            if (vSidelineNormal.x == 0.0f)
-                vSidelinePos.y = pSide->fDistance * pSide->vNormal.y;
-            else
-                vSidelinePos.x = pSide->fDistance * pSide->vNormal.x;
-            bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir, vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
+            bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir,
+                cField::GetSideline(i), vCurrentDesiredVelDir, vCurrentVelDir);
             if (bHitSideline)
                 break;
         }
     }
     if (bHitSideline)
     {
-        bool isZero = nlNear(v2Zero.x, vNewDesiredVelDir.x) && nlNear(v2Zero.y, vNewDesiredVelDir.y);
+        bool isZero = nlNear(v2Zero, vNewDesiredVelDir);
         if (isZero)
             bTurboAllowed = false;
         else
@@ -697,7 +698,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
             float fDot = nlVec2DotProduct(vNewDesiredVelDir, vCurrentVelDir);
             if (fDot < 0.99f)
                 bTurboAllowed = false;
-            u16 aDesiredMovementDir = nlVector3ToAngle(
+            aDesiredMovementDir = nlVector3ToAngle(
                 *(const nlVector3*)&vNewDesiredVelDir);
             m_pFielder->fn_8001DCE0(aDesiredMovementDir);
             m_pFielder->Unknown8(aDesiredMovementDir, false);
@@ -706,7 +707,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
     {
         f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->mUnidentified024.m_fDesiredSpeed, m_pFielder->GetTweaks()->GetRunningSpeed());
-        u16 aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
+        aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(aDesiredMovementDir);
         m_pFielder->Unknown8(aDesiredMovementDir, false);

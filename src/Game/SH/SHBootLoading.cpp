@@ -23,7 +23,7 @@
 #include "NL/nlString.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/Render/RLViewLayers.h"
-#include "Game/FE/UnidentifiedTLDefault.h"
+#include "Game/FE/tlDefault.h"
 
 BootLoadingScene::BootLoadingScene()
     : mElapsedTime(0.0f)
