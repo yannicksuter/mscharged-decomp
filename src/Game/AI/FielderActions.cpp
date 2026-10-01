@@ -4723,7 +4723,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
     }
 
     if (g_pBall->m_pOwner == 0 && !fn_80014E20(g_pBall)
-        && g_pBall->m_tLightningTimer.m_uPackedTime == 0
+        && g_pBall->m_tShotTimer.m_uPackedTime == 0
         && !(g_pBall->m_tNoPickupTimer.m_uPackedTime != 0
             && g_pBall->m_pPrevOwner != 0
             && g_pBall->m_pPrevOwner->m_eClassType == GOALIE))

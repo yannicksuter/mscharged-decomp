@@ -77,7 +77,7 @@ static bool IsDuringAutoreplay()
 
 static bool IsShotInProgress()
 {
-    return g_pBall->m_tLightningTimer.m_uPackedTime != 0;
+    return g_pBall->m_tShotTimer.m_uPackedTime != 0;
 }
 
 inline TimeRegion::TimeRegion(

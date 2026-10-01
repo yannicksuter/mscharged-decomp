@@ -256,12 +256,12 @@ static inline float FullBallCharge()
 }
 
 cBall::cBall()
-    : m_tLightningTimer(0.0f)
-    , m_tShotTimer(0.0f)
+    : m_tShotTimer(0.0f)
+    , m_tLightningTimer(0.0f)
     , m_tNoPickupTimer(0.0f)
     , m_tPassTargetTimer(0.0f)
-    , mtStuckInRiotTimer(0.0f)
     , mtNoChargeLossTimer(0.0f)
+    , mtStuckInRiotTimer(0.0f)
     , mtShotClockTimer(0.0f)
 {
     m_bVisible = true;
@@ -284,11 +284,11 @@ cBall::cBall()
     m_iConsecutiveVolleyPasses = 0;
 
     m_tNoPickupTimer.SetSeconds(0.0f);
-    m_tLightningTimer.SetSeconds(0.0f);
     m_tShotTimer.SetSeconds(0.0f);
+    m_tLightningTimer.SetSeconds(0.0f);
     m_tPassTargetTimer.SetSeconds(0.0f);
-    mtNoChargeLossTimer.SetSeconds(0.0f);
     mtStuckInRiotTimer.SetSeconds(0.0f);
+    mtNoChargeLossTimer.SetSeconds(0.0f);
     mtShotClockTimer.SetSeconds(0.0f);
 
     mnShotClockTeam = -1;
@@ -596,7 +596,7 @@ void cBall::CollideWithCharacterCallback(
         }
     }
 
-    if (m_tLightningTimer.m_uPackedTime != 0
+    if (m_tShotTimer.m_uPackedTime != 0
         || UnidentifiedHasPassTarget())
     {
         if (pCharacter->m_eClassType == FIELDER)
@@ -1045,7 +1045,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
 
     UpdateOrientation(fDeltaT);
 
-    bool bUnidentified = m_tLightningTimer.m_uPackedTime != 0
+    bool bUnidentified = m_tShotTimer.m_uPackedTime != 0
         && meBallState == 8 && m_pShooter != NULL
         && m_pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10;
     if (bUnidentified)
@@ -1553,7 +1553,7 @@ extern "C" void fn_80015B38(cBall* pBall, bool bParam)
 
 static inline void ClearBallStateTargets(cBall* pBall)
 {
-    pBall->m_tLightningTimer.UnidentifiedClear();
+    pBall->m_tShotTimer.UnidentifiedClear();
     pBall->mpDamageTarget = NULL;
     if (pBall->m_pPassTarget != NULL)
     {
@@ -1598,7 +1598,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     {
         pBall->m_pPhysicsBall->m_gravity = -22.5f;
         fn_801BDF08(0);
-        pBall->m_tShotTimer.UnidentifiedClear();
+        pBall->m_tLightningTimer.UnidentifiedClear();
     }
 
     if ((pBall->meBallState == 6 || pBall->meBallState == 7)
@@ -1636,7 +1636,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         EmitLightningBall();
         pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
         pBall->m_pPhysicsBall->m_gravity = 0.0f;
-        pBall->m_tShotTimer.SetSeconds(0.5f);
+        pBall->m_tLightningTimer.SetSeconds(0.5f);
 
         SetBallChargeWithScale(pBall, 4.0f);
 
@@ -1796,7 +1796,7 @@ void cBall::ClearBallBlur()
 
 extern "C" bool fn_80016768(cBall* pBall)
 {
-    return pBall->m_tLightningTimer.m_uPackedTime != 0
+    return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
         && pBall->m_pShooter->mUnidentified024.m_eCharacterClass
         == (eCharacterClass)0x11;
@@ -1804,7 +1804,7 @@ extern "C" bool fn_80016768(cBall* pBall)
 
 extern "C" bool fn_800167A8(cBall* pBall)
 {
-    return pBall->m_tLightningTimer.m_uPackedTime != 0
+    return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
         && pBall->m_pShooter->mUnidentified024.m_eCharacterClass
         == (eCharacterClass)0x10;
@@ -1812,7 +1812,7 @@ extern "C" bool fn_800167A8(cBall* pBall)
 
 extern "C" bool fn_800167E8(cBall* pBall)
 {
-    return pBall->m_tLightningTimer.m_uPackedTime != 0;
+    return pBall->m_tShotTimer.m_uPackedTime != 0;
 }
 
 void cBall::SetOwner(cPlayer* pOwner)
@@ -1908,7 +1908,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 
     SetVelocity(v3Dir, spinType, &v3Spin);
     m_tNoPickupTimer.SetSeconds(0.1f);
-    m_tLightningTimer.SetSeconds(2.0f);
+    m_tShotTimer.SetSeconds(2.0f);
     fn_80015C38(this, nBallState);
     m_pShooter = pShooter;
 
@@ -2151,8 +2151,8 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
 
         pBall->m_tNoPickupTimer.Countdown(fDeltaT, 0.0f);
 
-        if (pBall->m_tShotTimer.m_uPackedTime != 0
-            && pBall->m_tShotTimer.Countdown(fDeltaT, 0.0f))
+        if (pBall->m_tLightningTimer.m_uPackedTime != 0
+            && pBall->m_tLightningTimer.Countdown(fDeltaT, 0.0f))
         {
             int& ballState = pBall->meBallState;
             if (ballState == 9)
@@ -2165,8 +2165,8 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
             }
         }
 
-        if (pBall->m_tLightningTimer.m_uPackedTime != 0
-            && pBall->m_tLightningTimer.Countdown(fDeltaT, 0.0f))
+        if (pBall->m_tShotTimer.m_uPackedTime != 0
+            && pBall->m_tShotTimer.Countdown(fDeltaT, 0.0f))
         {
             fn_80014494(pBall);
         }
@@ -2177,15 +2177,15 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
             pBall->m_fTotalPassTime = 0.0f;
         }
 
-        if (pBall->mtNoChargeLossTimer.m_uPackedTime != 0
-            && pBall->mtNoChargeLossTimer.Countdown(fDeltaT, 0.0f))
+        if (pBall->mtStuckInRiotTimer.m_uPackedTime != 0
+            && pBall->mtStuckInRiotTimer.Countdown(fDeltaT, 0.0f))
         {
             pBall->mbStuckInRiotDone = true;
         }
 
-        if (pBall->mtStuckInRiotTimer.m_uPackedTime != 0)
+        if (pBall->mtNoChargeLossTimer.m_uPackedTime != 0)
         {
-            pBall->mtStuckInRiotTimer.Countdown(fDeltaT, 0.0f);
+            pBall->mtNoChargeLossTimer.Countdown(fDeltaT, 0.0f);
         }
 
         if (pBall->mtShotClockTimer.m_uPackedTime != 0
@@ -2570,11 +2570,11 @@ extern "C" void fn_8001847C(cBall* pBall, bool bParam)
     pBall->m_iConsecutiveVolleyPasses = 0;
 
     pBall->m_tNoPickupTimer.SetSeconds(0.0f);
-    pBall->m_tLightningTimer.SetSeconds(0.0f);
     pBall->m_tShotTimer.SetSeconds(0.0f);
+    pBall->m_tLightningTimer.SetSeconds(0.0f);
     pBall->m_tPassTargetTimer.SetSeconds(0.0f);
-    pBall->mtNoChargeLossTimer.SetSeconds(0.0f);
     pBall->mtStuckInRiotTimer.SetSeconds(0.0f);
+    pBall->mtNoChargeLossTimer.SetSeconds(0.0f);
     pBall->mtShotClockTimer.SetSeconds(0.0f);
 
     pBall->m_v3Position.x = 0.0f;
@@ -2652,10 +2652,10 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
             (u8*)&m_bBallDeflectCount - (u8*)this,
             "m_bBallDeflectCount");
         cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&m_tShotTimer - (u8*)this, "m_tShotTimer");
+            (u8*)&m_tLightningTimer - (u8*)this, "m_tLightningTimer");
         cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&m_tLightningTimer - (u8*)this,
-            "m_tLightningTimer");
+            (u8*)&m_tShotTimer - (u8*)this,
+            "m_tShotTimer");
         cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&m_tNoPickupTimer - (u8*)this,
             "m_tNoPickupTimer");
@@ -2663,11 +2663,11 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
             (u8*)&m_tPassTargetTimer - (u8*)this,
             "m_tPassTargetTimer");
         cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&mtNoChargeLossTimer - (u8*)this,
-            "mtNoChargeLossTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtStuckInRiotTimer - (u8*)this,
             "mtStuckInRiotTimer");
+        cache->AddField(20, gDebugFieldTypes[20].size,
+            (u8*)&mtNoChargeLossTimer - (u8*)this,
+            "mtNoChargeLossTimer");
         cache->AddField(20, gDebugFieldTypes[20].size,
             (u8*)&mtShotClockTimer - (u8*)this,
             "mtShotClockTimer");
@@ -2787,7 +2787,7 @@ cFielder* cBall::GetOwnerFielder()
 
 extern "C" void fn_80017F18(cBall* pBall)
 {
-    if (pBall->mtStuckInRiotTimer.m_uPackedTime != 0)
+    if (pBall->mtNoChargeLossTimer.m_uPackedTime != 0)
     {
         return;
     }

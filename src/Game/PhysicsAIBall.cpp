@@ -158,7 +158,7 @@ ContactType PhysicsAIBall::Contact(
             if (m_pAIBall->m_tNoPickupTimer.m_uPackedTime != 0)
             {
                 if (m_pAIBall->HasActivePassTarget()
-                    || m_pAIBall->m_tLightningTimer.m_uPackedTime != 0
+                    || m_pAIBall->m_tShotTimer.m_uPackedTime != 0
                     || m_pAIBall->meBallState == 1)
                 {
                     return NO_CONTACT;
@@ -213,7 +213,7 @@ ContactType PhysicsAIBall::Contact(
                     pEventData->bIsPerfect = false;
                     float speedSq = nlVec3LengthSquared(ballVelocity);
                     pEventData->bIsShot
-                        = m_pAIBall->m_tLightningTimer.m_uPackedTime != 0;
+                        = m_pAIBall->m_tShotTimer.m_uPackedTime != 0;
                     nlVec3Set(pEventData->position, contactPos.x, contactPos.y,
                         contactPos.z);
                     nlVec3Set(pEventData->normal, info->geom.normal[0],
@@ -261,7 +261,7 @@ ContactType PhysicsAIBall::Contact(
                 CollisionBallGroundData* pEventData
                     = g_CollisionBallGroundDataPool.Allocate();
                 pEventData->pBall = g_pBall;
-                if (g_pBall->m_tLightningTimer.m_uPackedTime != 0)
+                if (g_pBall->m_tShotTimer.m_uPackedTime != 0)
                 {
                     pEventData->bIsShot = true;
                 }

@@ -517,7 +517,7 @@ float StrategicBallOwner(cFielder* pFielder)
         {
             fScore = InterpolateClamped(0.7f, 0.95f, AbleToInterceptBall(pFielder));
         }
-        else if (g_pBall->m_tLightningTimer.m_uPackedTime != 0 && pFielder == g_pBall->m_pPrevOwner)
+        else if (g_pBall->m_tShotTimer.m_uPackedTime != 0 && pFielder == g_pBall->m_pPrevOwner)
         {
             fScore = 0.4f;
         }
@@ -628,7 +628,7 @@ extern "C" float fn_800D74D8(cFielder* pFielder)
     if (pFielder == NULL)
         return 0.0f;
     cBall* pBall = g_pBall;
-    if (pBall->m_tLightningTimer.m_uPackedTime == 0)
+    if (pBall->m_tShotTimer.m_uPackedTime == 0)
         return 0.0f;
     if (pBall->m_pPrevOwner == NULL)
         return 0.0f;
@@ -3766,7 +3766,7 @@ extern "C" float fn_800E0034()
     // Retail evaluates the shot distance without assigning it to the result.
     float fScore = 0.0f;
     cBall* pBall = g_pBall;
-    if (pBall->m_tLightningTimer.m_uPackedTime != 0)
+    if (pBall->m_tShotTimer.m_uPackedTime != 0)
     {
         cPlayer* pPrevOwner = pBall->m_pPrevOwner;
         if (pPrevOwner != NULL && pPrevOwner->m_eClassType == FIELDER)

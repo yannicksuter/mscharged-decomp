@@ -1724,7 +1724,7 @@ void Goalie::ActionSave(float fDeltaT)
                    < cField::GetGoalLineX(1U))
         {
             bool bBallThreat = true;
-            if (g_pBall->m_tLightningTimer.m_uPackedTime == 0)
+            if (g_pBall->m_tShotTimer.m_uPackedTime == 0)
             {
                 bBallThreat = false;
                 if ((g_pBall->meBallState == 5
@@ -1740,7 +1740,7 @@ void Goalie::ActionSave(float fDeltaT)
                 && !fn_80016768(g_pBall))
             {
                 bool bState8Shot = false;
-                if (g_pBall->m_tLightningTimer.m_uPackedTime != 0
+                if (g_pBall->m_tShotTimer.m_uPackedTime != 0
                     && g_pBall->meBallState == 8)
                 {
                     bState8Shot = true;
@@ -2769,7 +2769,7 @@ bool Goalie::fn_80090958(bool bParam)
     {
         pBall = g_pBall;
         bState8Shot = false;
-        if (pBall->m_tLightningTimer.m_uPackedTime != 0
+        if (pBall->m_tShotTimer.m_uPackedTime != 0
             && pBall->meBallState == 8)
         {
             bState8Shot = true;
@@ -2875,7 +2875,7 @@ bool Goalie::fn_80090958(bool bParam)
     {
         pBall = g_pBall;
         bState8Shot = false;
-        if (pBall->m_tLightningTimer.m_uPackedTime != 0
+        if (pBall->m_tShotTimer.m_uPackedTime != 0
             && pBall->meBallState == 8)
         {
             bState8Shot = true;
@@ -3495,7 +3495,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
 
         float pickupTime = mpLooseBallInfo->mfPickupTime;
         if (animTime < pickupTime
-            && g_pBall->m_tLightningTimer.m_uPackedTime == 0)
+            && g_pBall->m_tShotTimer.m_uPackedTime == 0)
         {
             bool bWallBlock = mfWallBlock > 0.0f;
             if (!bWallBlock)
@@ -6348,7 +6348,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
 
         float fShotMeter = fn_800DEB04(mpShooter);
         if (!(fShotMeter > 0.0f && fShotMeter <= 1.0f)
-            && g_pBall->m_tLightningTimer.m_uPackedTime != 0)
+            && g_pBall->m_tShotTimer.m_uPackedTime != 0)
         {
             InitActionMove(false);
             return;
@@ -6448,7 +6448,7 @@ void Goalie::InitActionMove(bool bParam)
     }
 
     mbIsDown = false;
-    if (g_pBall->m_tLightningTimer.m_uPackedTime != 0)
+    if (g_pBall->m_tShotTimer.m_uPackedTime != 0)
     {
         if (!g_pBall->meBallState == true)
         {
@@ -6522,7 +6522,7 @@ void Goalie::fn_8008ED44(bool bParam)
             cBall* pBall;
             pBall = g_pBall;
             bState8Shot = false;
-            if (pBall->m_tLightningTimer.m_uPackedTime != 0
+            if (pBall->m_tShotTimer.m_uPackedTime != 0
                 && pBall->meBallState == 8)
             {
                 bState8Shot = true;
@@ -6721,7 +6721,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
 
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
     {
-        bool bState7Shot = g_pBall->m_tLightningTimer.m_uPackedTime != 0
+        bool bState7Shot = g_pBall->m_tShotTimer.m_uPackedTime != 0
                         && g_pBall->meBallState == 7;
         if (bState7Shot)
         {
@@ -6730,7 +6730,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         else
         {
             bool bState8Shot
-                = g_pBall->m_tLightningTimer.m_uPackedTime != 0
+                = g_pBall->m_tShotTimer.m_uPackedTime != 0
                && g_pBall->meBallState == 8;
             if (!bState8Shot
                 && fTargetVelocitySq
@@ -6760,7 +6760,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         {
             cBall* pBall = g_pBall;
             bool bState7Shot
-                = pBall->m_tLightningTimer.m_uPackedTime != 0
+                = pBall->m_tShotTimer.m_uPackedTime != 0
                && pBall->meBallState == 7;
             if (bState7Shot)
             {

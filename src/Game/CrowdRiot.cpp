@@ -310,24 +310,24 @@ void fn_800297B8(cBall* ball, CrowdRiot* crowdRiot)
         MakeRandomDirection2D(velocity, 10.0f);
         velocity.z = 10.0f + nlRandomf(5.0f);
         ball->SetVelocity(velocity, SPINTYPE_NONE, 0);
-        u32 packedTime = ball->mtNoChargeLossTimer.m_uPackedTime;
+        u32 packedTime = ball->mtStuckInRiotTimer.m_uPackedTime;
         bool wasRunning = packedTime != 0;
-        ball->mtNoChargeLossTimer.m_uPackedTime = 0;
-        ball->mtNoChargeLossTimer.m_uWasRunning = wasRunning;
+        ball->mtStuckInRiotTimer.m_uPackedTime = 0;
+        ball->mtStuckInRiotTimer.m_uWasRunning = wasRunning;
         ball->mbStuckInRiotDone = false;
     }
-    else if (ball->mtNoChargeLossTimer.m_uPackedTime == 0)
+    else if (ball->mtStuckInRiotTimer.m_uPackedTime == 0)
     {
         if (ball->m_tNoPickupTimer.m_uPackedTime == 0)
         {
-            ball->mtNoChargeLossTimer.SetSeconds(1.0f);
+            ball->mtStuckInRiotTimer.SetSeconds(1.0f);
             ball->mbStuckInRiotDone = false;
             ball->m_tNoPickupTimer.SetSeconds(1.25f);
         }
     }
     else
     {
-        float time = ball->mtNoChargeLossTimer.GetSeconds();
+        float time = ball->mtStuckInRiotTimer.GetSeconds();
         nlVector3 position;
         position.x = (1.0f - time) * crowdRiot->mv3Position.x
                    + time * ball->m_v3Position.x;

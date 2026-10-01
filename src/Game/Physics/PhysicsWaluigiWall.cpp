@@ -147,7 +147,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
                 return FielderContact((cFielder*)player);
             return ONE_WAY_CONTACT_OTHER;
         }
-        if (ball->m_tLightningTimer.m_uPackedTime != 0 || ball->HasActivePassTarget())
+        if (ball->m_tShotTimer.m_uPackedTime != 0 || ball->HasActivePassTarget())
         {
             if (fn_800167A8(ball))
                 return NO_CONTACT;

@@ -382,7 +382,7 @@ bool Goalie::CheckForDaze()
             float fLimitSquared = nlGetLengthSquared1D(lbl_806DBB20);
             if (bStunGoalieCheat
                 || (!pBall->UnidentifiedState7Shot()
-                        && g_pBall->m_tLightningTimer.m_uPackedTime != 0
+                        && g_pBall->m_tShotTimer.m_uPackedTime != 0
                         && pScorer == g_pBall->m_pShooter
                         && fSpeedSquared > fLimitSquared
                         && mFatigue.GetEnergyLevel() < lbl_806DBB24))
@@ -649,7 +649,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                         fn_8008DEF4(1.0f);
                 }
             }
-            else if (pBall->m_tLightningTimer.m_uPackedTime == 0 && mpSaveData != NULL
+            else if (pBall->m_tShotTimer.m_uPackedTime == 0 && mpSaveData != NULL
                 && !(mpSaveData->muSaveType & 0x80003))
             {
                 nlVector3 v3Forward;

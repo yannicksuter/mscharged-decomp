@@ -201,7 +201,7 @@ ContactType PhysicsBanana::Contact(
             }
         }
 
-        if (ball->m_tLightningTimer.m_uPackedTime != 0 && fn_800167A8(ball))
+        if (ball->m_tShotTimer.m_uPackedTime != 0 && fn_800167A8(ball))
         {
             return NO_CONTACT;
         }

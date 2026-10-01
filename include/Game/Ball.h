@@ -115,24 +115,24 @@ public:
 
     bool UnidentifiedState8Shot()
     {
-        return m_tLightningTimer.m_uPackedTime != 0 && meBallState == 8;
+        return m_tShotTimer.m_uPackedTime != 0 && meBallState == 8;
     }
 
     bool UnidentifiedState7Shot()
     {
-        return m_tLightningTimer.m_uPackedTime != 0 && meBallState == 7;
+        return m_tShotTimer.m_uPackedTime != 0 && meBallState == 7;
     }
 
     /* 0x00 */ bool m_bVisible;
     /* 0x01 */ u8 mPadding001[0x03];
     /* 0x04 */ u32 m_bBallPathChangeCount;
     /* 0x08 */ u32 m_bBallDeflectCount;
-    /* 0x0C */ Timer m_tLightningTimer;
-    /* 0x14 */ Timer m_tShotTimer;
+    /* 0x0C */ Timer m_tShotTimer;
+    /* 0x14 */ Timer m_tLightningTimer;
     /* 0x1C */ Timer m_tNoPickupTimer;
     /* 0x24 */ Timer m_tPassTargetTimer;
-    /* 0x2C */ Timer mtStuckInRiotTimer;
-    /* 0x34 */ Timer mtNoChargeLossTimer;
+    /* 0x2C */ Timer mtNoChargeLossTimer;
+    /* 0x34 */ Timer mtStuckInRiotTimer;
     /* 0x3C */ Timer mtShotClockTimer;
     /* 0x44 */ int mnShotClockTeam;
     /* 0x48 */ bool mbStuckInRiotDone;
