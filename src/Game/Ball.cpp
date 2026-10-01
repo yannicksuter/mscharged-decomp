@@ -185,7 +185,6 @@ static const char szWarioShootToScoreBallBlurTexture[]
 static const char szYoshiShootToScoreBallBlurTexture[]
     = "global/yoshishoottoscorestreak";
 extern const nlVector3 lbl_804DBE30 = { 12.5f, 0.0f, 0.18f };
-static const nlVector3 lbl_804DBE48 = { 0.0f, 1.0f, 0.0f };
 static nlMatrix3 m3Ident
     = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -247,8 +246,6 @@ static TweakFloatBinding sUnidentifiedTweak_8056B4D8(
 static TweakBoolBinding sUnidentifiedTweak_8056B4F8(
     "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
 LiveBallTrail lbl_8056B518[10];
-
-static unsigned short lbl_806DB5C0 = 0xFFFF;
 
 static inline float FullBallCharge()
 {
@@ -1171,6 +1168,91 @@ bool IsBallEffectPlaying(
         (unsigned long)pBall, pEffectsGroup);
 }
 
+static inline cFielder* GetOwnerFielderImpl(cBall* pBall)
+{
+    cPlayer* player = pBall->m_pOwner;
+    if ((player != NULL) && (player->m_eClassType == FIELDER))
+    {
+        return (cFielder*)player;
+    }
+    return NULL;
+}
+
+static inline cFielder* GetPassTargetFielderImpl(const cBall* pBall)
+{
+    cPlayer* player = pBall->m_pPassTarget;
+    if ((player != NULL) && (player->m_eClassType == FIELDER))
+    {
+        return (cFielder*)player;
+    }
+    return NULL;
+}
+
+nlVector3* cBall::GetAIVelocity() const
+{
+    cPlayer* temp_r4 = m_pOwner;
+    if (temp_r4 != NULL)
+    {
+        return &(temp_r4->mUnidentified024.m_v3Velocity);
+    }
+    return (nlVector3*)&(m_v3Velocity);
+}
+
+nlVector3* cBall::GetDrawablePosition() const
+{
+    const nlMatrix4& mtx = *m_pDrawableBall->GetWorldMatrix();
+    return (nlVector3*)&(mtx.e2[3][0]);
+}
+
+float cBall::fn_80014F38(float fScale) const
+{
+    return fScale * (0.18f * lbl_806DB514);
+}
+
+cFielder* cBall::GetOwnerFielder()
+{
+    return GetOwnerFielderImpl(this);
+}
+
+cPlayer* cBall::GetOwnerGoalie()
+{
+    cPlayer* player = m_pOwner;
+    if ((player == NULL) || (player->m_eClassType != GOALIE))
+    {
+        return NULL;
+    }
+    return player;
+}
+
+cFielder* cBall::GetPassTargetFielder() const
+{
+    return GetPassTargetFielderImpl(this);
+}
+
+bool cBall::GetInNet(int& nSide)
+{
+    UnidentifiedGameState* gameState
+        = (UnidentifiedGameState*)g_pGame;
+    if (gameState->mUnidentified40 == 0)
+    {
+        if (m_pPhysicsBall->mbIsInsideNet)
+        {
+            float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
+            nSide = !(m_v3Position.x * fDirection > 1.0f);
+            return true;
+        }
+    }
+    else if (gameState->mUnidentified2C > gameState->mUnidentified28
+             && gameState->mUnidentified30 != 0)
+    {
+        float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
+        nSide = !(m_v3Position.x * fDirection > 1.0f);
+        return true;
+    }
+
+    return false;
+}
+
 void cBall::InitiateBallBlur(
     eBallShotEffectType effectType, cPlayer* pPlayer)
 {
@@ -1356,6 +1438,33 @@ extern "C" void fn_800154FC(cBall* pBall, float fParam)
     }
 
     UpdateBallGlow(pBall);
+}
+
+float GetBallChargeValue(cBall* pBall, int nParam)
+{
+    if (nParam != 0)
+    {
+        if (!pBall->m_bVisible)
+        {
+            return 0.0f;
+        }
+
+        if (pBall->GetOwnerFielder() != NULL
+            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == MYSTERY)
+        {
+            return 0.0f;
+        }
+
+        if (pBall->GetOwnerFielder() != NULL
+            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass
+                == (eCharacterClass)0x13
+            && pBall->GetOwnerFielder()->m_eActionState == ACTION_UNKNOWN_32)
+        {
+            return 0.0f;
+        }
+    }
+
+    return pBall->mfChargeValue;
 }
 
 extern "C" float fn_800156A8(cBall* pBall)
@@ -2007,7 +2116,7 @@ extern "C" void fn_80016DF8(cBall* pBall, cPlayer* pPlayer,
             pBall->mfChargeValue = fCharge + fCurrentCharge;
         }
 
-        float fMaxCharge = lbl_806DB510 * 4.0f;
+        float fMaxCharge = lbl_806DB510 * FullBallCharge();
         fValue = pBall->mfChargeValue;
         if (fValue >= fMaxCharge)
         {
@@ -2116,26 +2225,6 @@ extern "C" void fn_80017114(cBall* pBall)
     pBall->m_pPhysicsBall->GetAngularVelocity(&v3AngularVelocity);
     pBall->SetVelocity(
         v3Velocity, SPINTYPE_PARAMETER, &v3AngularVelocity);
-}
-
-static inline cFielder* GetOwnerFielderImpl(cBall* pBall)
-{
-    cPlayer* player = pBall->m_pOwner;
-    if ((player != NULL) && (player->m_eClassType == FIELDER))
-    {
-        return (cFielder*)player;
-    }
-    return NULL;
-}
-
-static inline cFielder* GetPassTargetFielderImpl(const cBall* pBall)
-{
-    cPlayer* player = pBall->m_pPassTarget;
-    if ((player != NULL) && (player->m_eClassType == FIELDER))
-    {
-        return (cFielder*)player;
-    }
-    return NULL;
 }
 
 extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
@@ -2421,6 +2510,75 @@ void cBall::SetPassTargetTimer(float seconds)
     }
 }
 
+extern "C" void fn_80017F18(cBall* pBall)
+{
+    if (pBall->mtNoChargeLossTimer.m_uPackedTime != 0)
+    {
+        return;
+    }
+
+    bool bLoseCharge = false;
+    switch (pBall->meBallState)
+    {
+    case 0:
+    case 1:
+    case 4:
+        bLoseCharge = true;
+        break;
+    case 2:
+        if (pBall->GetOwnerFielder() != NULL)
+        {
+            cFielder* pOwnerFielder = pBall->GetOwnerFielder();
+            bool bIsShotActive = true;
+            eShotMeterState state
+                = pOwnerFielder->m_pShotMeter->m_eShotMeterState;
+            if (state != SHOT_METER_ACTIVE
+                && state != SHOT_METER_STS_ACTIVE)
+            {
+                bIsShotActive = false;
+            }
+            if (!bIsShotActive)
+            {
+                bLoseCharge = true;
+            }
+        }
+        else
+        {
+            bLoseCharge = true;
+        }
+        break;
+    }
+
+    if (!bLoseCharge)
+    {
+        return;
+    }
+
+    float fValue = pBall->mfChargeValue;
+    float fChargeLoss = (g_fSimulationTick / lbl_806DB50C) * FullBallCharge();
+    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
+    {
+        pBall->mfChargeValue = 4.0f;
+    }
+    else
+    {
+        pBall->mfChargeValue = fValue - fChargeLoss;
+    }
+
+    float fMaxCharge = lbl_806DB510 * FullBallCharge();
+    fValue = pBall->mfChargeValue;
+    if (fValue >= fMaxCharge)
+    {
+        pBall->mfChargeValue = fMaxCharge;
+    }
+    else if (fValue < 0.0f)
+    {
+        pBall->mfChargeValue = 0.0f;
+    }
+
+    UpdateBallGlow(pBall);
+}
+
 void cBall::KillBlurHandler()
 {
     if (m_pBlurHandler != NULL)
@@ -2638,288 +2796,6 @@ extern "C" void fn_800189C4(cBall* pBall)
     pBall->mUnidentifiedF0 = 0;
 }
 
-void cBall::SyncLog(void* context, DebugWriteCache* cache)
-{
-    if (lbl_806DB5C0 == 0xFFFF)
-    {
-        lbl_806DB5C0 = cache->BeginType("DetBall");
-        cache->AddField(16, gDebugFieldTypes[16].size, 0,
-            "m_bVisible");
-        cache->AddField(9, gDebugFieldTypes[9].size,
-            (u8*)&m_bBallPathChangeCount - (u8*)this,
-            "m_bBallPathChangeCount");
-        cache->AddField(9, gDebugFieldTypes[9].size,
-            (u8*)&m_bBallDeflectCount - (u8*)this,
-            "m_bBallDeflectCount");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&m_tLightningTimer - (u8*)this, "m_tLightningTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&m_tShotTimer - (u8*)this,
-            "m_tShotTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&m_tNoPickupTimer - (u8*)this,
-            "m_tNoPickupTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&m_tPassTargetTimer - (u8*)this,
-            "m_tPassTargetTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&mtStuckInRiotTimer - (u8*)this,
-            "mtStuckInRiotTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&mtNoChargeLossTimer - (u8*)this,
-            "mtNoChargeLossTimer");
-        cache->AddField(20, gDebugFieldTypes[20].size,
-            (u8*)&mtShotClockTimer - (u8*)this,
-            "mtShotClockTimer");
-        cache->AddField(8, gDebugFieldTypes[8].size,
-            (u8*)&mnShotClockTeam - (u8*)this, "mnShotClockTeam");
-        cache->AddField(16, gDebugFieldTypes[16].size,
-            (u8*)&mbStuckInRiotDone - (u8*)this,
-            "mbStuckInRiotDone");
-        cache->AddField(16, gDebugFieldTypes[16].size,
-            (u8*)&mbBallOnFire - (u8*)this, "mbBallOnFire");
-        cache->AddField(16, gDebugFieldTypes[16].size,
-            (u8*)&mbBallFrozen - (u8*)this, "mbBallFrozen");
-        cache->AddField(17, gDebugFieldTypes[17].size,
-            (u8*)&m_fTotalPassTime - (u8*)this, "m_fTotalPassTime");
-        cache->AddField(8, gDebugFieldTypes[8].size,
-            (u8*)&m_iConsecutiveVolleyPasses - (u8*)this,
-            "m_iConsecutiveVolleyPasses");
-        cache->AddField(22, gDebugFieldTypes[22].size,
-            (u8*)&m_v3Position - (u8*)this, "m_v3Position");
-        cache->AddField(22, gDebugFieldTypes[22].size,
-            (u8*)&m_v3PrevPosition - (u8*)this, "m_v3PrevPosition");
-        cache->AddField(22, gDebugFieldTypes[22].size,
-            (u8*)&m_v3Velocity - (u8*)this, "m_v3Velocity");
-        cache->AddField(22, gDebugFieldTypes[22].size,
-            (u8*)&m_v3PassIntercept - (u8*)this, "m_v3PassIntercept");
-        cache->AddField(24, gDebugFieldTypes[24].size,
-            (u8*)&m_qOrientation - (u8*)this, "m_qOrientation");
-        cache->AddField(22, gDebugFieldTypes[22].size,
-            (u8*)&m_v3ShotTarget - (u8*)this, "m_v3ShotTarget");
-        cache->AddField(22, gDebugFieldTypes[22].size,
-            (u8*)&m_v3ShotOrigin - (u8*)this, "m_v3ShotOrigin");
-        cache->AddField(2, gDebugFieldTypes[2].size,
-            (u8*)&m_uGoalType - (u8*)this, "m_uGoalType");
-        cache->AddField(2, gDebugFieldTypes[2].size,
-            (u8*)&m_uVoiceID - (u8*)this, "m_uVoiceID");
-        cache->AddField(2, gDebugFieldTypes[2].size,
-            (u8*)&m_CurrentGlowEffect - (u8*)this,
-            "m_CurrentGlowEffect");
-        cache->AddField(17, gDebugFieldTypes[17].size,
-            (u8*)&mfChargeValue - (u8*)this, "mfChargeValue");
-        cache->AddField(17, gDebugFieldTypes[17].size,
-            (u8*)&mfSkillShotTime - (u8*)this, "mfSkillShotTime");
-        cache->AddField(14, gDebugFieldTypes[14].size,
-            (u8*)&meBallState - (u8*)this, "meBallState");
-        cache->AddField(14, gDebugFieldTypes[14].size,
-            (u8*)&mePrevBallState - (u8*)this, "mePrevBallState");
-        cache->AddField(15, gDebugFieldTypes[15].size,
-            (u8*)&m_pOwner - (u8*)this, "m_pOwner");
-        cache->AddField(15, gDebugFieldTypes[15].size,
-            (u8*)&m_pPrevOwner - (u8*)this, "m_pPrevOwner");
-        cache->AddField(15, gDebugFieldTypes[15].size,
-            (u8*)&m_pLastTouch - (u8*)this, "m_pLastTouch");
-        cache->AddField(15, gDebugFieldTypes[15].size,
-            (u8*)&m_pPassTarget - (u8*)this, "m_pPassTarget");
-        cache->AddField(15, gDebugFieldTypes[15].size,
-            (u8*)&m_pShooter - (u8*)this, "m_pShooter");
-        cache->AddField(15, gDebugFieldTypes[15].size,
-            (u8*)&mpDamageTarget - (u8*)this, "mpDamageTarget");
-        cache->EndType();
-    }
-
-    cBall* copy = (cBall*)cache->WriteData(lbl_806DB5C0, this, offsetof(cBall, m_pBlurHandler));
-    if (copy != NULL)
-    {
-        *(int*)&copy->m_pOwner
-            = m_pOwner == NULL ? -1 : m_pOwner->mUnidentified120;
-        *(int*)&copy->m_pPrevOwner
-            = m_pPrevOwner == NULL ? -1 : m_pPrevOwner->mUnidentified120;
-        *(int*)&copy->m_pLastTouch
-            = m_pLastTouch == NULL ? -1 : m_pLastTouch->mUnidentified120;
-        *(int*)&copy->m_pPassTarget
-            = m_pPassTarget == NULL ? -1 : m_pPassTarget->mUnidentified120;
-        *(int*)&copy->m_pShooter
-            = m_pShooter == NULL ? -1 : m_pShooter->mUnidentified120;
-        *(int*)&copy->mpDamageTarget
-            = mpDamageTarget == NULL ? -1 : mpDamageTarget->mUnidentified120;
-        cache->ChecksumData(lbl_806DB5C0, copy, context);
-    }
-}
-
-void cBall::fn_8001A898(RunningChecksum* runningChecksum)
-{
-    runningChecksum->ChecksumData(&m_v3Position, sizeof(m_v3Position));
-    runningChecksum->ChecksumData(&m_v3Velocity, sizeof(m_v3Velocity));
-    runningChecksum->ChecksumData(&m_qOrientation, sizeof(m_qOrientation));
-    runningChecksum->ChecksumData(&meBallState, sizeof(meBallState));
-    runningChecksum->ChecksumData(&mfChargeValue, sizeof(mfChargeValue));
-    runningChecksum->ChecksumData(
-        &mfSkillShotTime, sizeof(mfSkillShotTime));
-}
-
-nlVector3* cBall::GetAIVelocity() const
-{
-    cPlayer* temp_r4 = m_pOwner;
-    if (temp_r4 != NULL)
-    {
-        return &(temp_r4->mUnidentified024.m_v3Velocity);
-    }
-    return (nlVector3*)&(m_v3Velocity);
-}
-
-nlVector3* cBall::GetDrawablePosition() const
-{
-    const nlMatrix4& mtx = *m_pDrawableBall->GetWorldMatrix();
-    return (nlVector3*)&(mtx.e2[3][0]);
-}
-
-float cBall::fn_80014F38(float fScale) const
-{
-    return fScale * (0.18f * lbl_806DB514);
-}
-
-cFielder* cBall::GetOwnerFielder()
-{
-    return GetOwnerFielderImpl(this);
-}
-
-extern "C" void fn_80017F18(cBall* pBall)
-{
-    if (pBall->mtNoChargeLossTimer.m_uPackedTime != 0)
-    {
-        return;
-    }
-
-    bool bLoseCharge = false;
-    switch (pBall->meBallState)
-    {
-    case 0:
-    case 1:
-    case 4:
-        bLoseCharge = true;
-        break;
-    case 2:
-        if (pBall->GetOwnerFielder() != NULL)
-        {
-            cFielder* pOwnerFielder = pBall->GetOwnerFielder();
-            bool bIsShotActive = true;
-            eShotMeterState state
-                = pOwnerFielder->m_pShotMeter->m_eShotMeterState;
-            if (state != SHOT_METER_ACTIVE
-                && state != SHOT_METER_STS_ACTIVE)
-            {
-                bIsShotActive = false;
-            }
-            if (!bIsShotActive)
-            {
-                bLoseCharge = true;
-            }
-        }
-        else
-        {
-            bLoseCharge = true;
-        }
-        break;
-    }
-
-    if (!bLoseCharge)
-    {
-        return;
-    }
-
-    float fValue = pBall->mfChargeValue;
-    float fChargeLoss = (g_fSimulationTick / lbl_806DB50C) * FullBallCharge();
-    if (lbl_806E0BCC || GameInfoManager::Instance()->IsRule0x4Equal5())
-    {
-        pBall->mfChargeValue = 4.0f;
-    }
-    else
-    {
-        pBall->mfChargeValue = fValue - fChargeLoss;
-    }
-
-    float fMaxCharge = lbl_806DB510 * FullBallCharge();
-    fValue = pBall->mfChargeValue;
-    if (fValue >= fMaxCharge)
-    {
-        pBall->mfChargeValue = fMaxCharge;
-    }
-    else if (fValue < 0.0f)
-    {
-        pBall->mfChargeValue = 0.0f;
-    }
-
-    UpdateBallGlow(pBall);
-}
-
-float GetBallChargeValue(cBall* pBall, int nParam)
-{
-    if (nParam != 0)
-    {
-        if (!pBall->m_bVisible)
-        {
-            return 0.0f;
-        }
-
-        if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == MYSTERY)
-        {
-            return 0.0f;
-        }
-
-        if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass
-                == (eCharacterClass)0x13
-            && pBall->GetOwnerFielder()->m_eActionState == ACTION_UNKNOWN_32)
-        {
-            return 0.0f;
-        }
-    }
-
-    return pBall->mfChargeValue;
-}
-
-cPlayer* cBall::GetOwnerGoalie()
-{
-    cPlayer* player = m_pOwner;
-    if ((player == NULL) || (player->m_eClassType != GOALIE))
-    {
-        return NULL;
-    }
-    return player;
-}
-
-cFielder* cBall::GetPassTargetFielder() const
-{
-    return GetPassTargetFielderImpl(this);
-}
-
-bool cBall::GetInNet(int& nSide)
-{
-    UnidentifiedGameState* gameState
-        = (UnidentifiedGameState*)g_pGame;
-    if (gameState->mUnidentified40 == 0)
-    {
-        if (m_pPhysicsBall->mbIsInsideNet)
-        {
-            float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
-            nSide = !(m_v3Position.x * fDirection > 1.0f);
-            return true;
-        }
-    }
-    else if (gameState->mUnidentified2C > gameState->mUnidentified28
-             && gameState->mUnidentified30 != 0)
-    {
-        float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
-        nSide = !(m_v3Position.x * fDirection > 1.0f);
-        return true;
-    }
-
-    return false;
-}
-
 template <typename P1, typename P2>
 static inline UnidentifiedTypedEvent2<P1, P2>* UnidentifiedFindEvent2(
     const char* name, int length)
@@ -2929,6 +2805,8 @@ static inline UnidentifiedTypedEvent2<P1, P2>* UnidentifiedFindEvent2(
     g_pEventRegistry->Find(hash, &value, 0);
     return value != 0 ? (UnidentifiedTypedEvent2<P1, P2>*)value->event : 0;
 }
+
+static const nlVector3 lbl_804DBE48 = { 0.0f, 1.0f, 0.0f };
 
 extern "C" void fn_80018A00()
 {
@@ -3497,6 +3375,135 @@ extern "C" void fn_8001A108(int previousState, int currentState)
     }
 }
 
+static unsigned short lbl_806DB5C0 = 0xFFFF;
+char gTweakFloatBindingFormat[] __attribute__((aligned(4))) = "%.3f";
+
+inline void RegisterBallDebugFields(cBall* ball, DebugWriteCache* cache)
+{
+    cache->AddField(16, gDebugFieldTypes[16].size, 0,
+        "m_bVisible");
+    cache->AddField(9, gDebugFieldTypes[9].size,
+        (u8*)&ball->m_bBallPathChangeCount - (u8*)ball,
+        "m_bBallPathChangeCount");
+    cache->AddField(9, gDebugFieldTypes[9].size,
+        (u8*)&ball->m_bBallDeflectCount - (u8*)ball,
+        "m_bBallDeflectCount");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->m_tLightningTimer - (u8*)ball, "m_tLightningTimer");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->m_tShotTimer - (u8*)ball,
+        "m_tShotTimer");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->m_tNoPickupTimer - (u8*)ball,
+        "m_tNoPickupTimer");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->m_tPassTargetTimer - (u8*)ball,
+        "m_tPassTargetTimer");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->mtStuckInRiotTimer - (u8*)ball,
+        "mtStuckInRiotTimer");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->mtNoChargeLossTimer - (u8*)ball,
+        "mtNoChargeLossTimer");
+    cache->AddField(20, gDebugFieldTypes[20].size,
+        (u8*)&ball->mtShotClockTimer - (u8*)ball,
+        "mtShotClockTimer");
+    cache->AddField(8, gDebugFieldTypes[8].size,
+        (u8*)&ball->mnShotClockTeam - (u8*)ball, "mnShotClockTeam");
+    cache->AddField(16, gDebugFieldTypes[16].size,
+        (u8*)&ball->mbStuckInRiotDone - (u8*)ball,
+        "mbStuckInRiotDone");
+    cache->AddField(16, gDebugFieldTypes[16].size,
+        (u8*)&ball->mbBallOnFire - (u8*)ball, "mbBallOnFire");
+    cache->AddField(16, gDebugFieldTypes[16].size,
+        (u8*)&ball->mbBallFrozen - (u8*)ball, "mbBallFrozen");
+    cache->AddField(17, gDebugFieldTypes[17].size,
+        (u8*)&ball->m_fTotalPassTime - (u8*)ball, "m_fTotalPassTime");
+    cache->AddField(8, gDebugFieldTypes[8].size,
+        (u8*)&ball->m_iConsecutiveVolleyPasses - (u8*)ball,
+        "m_iConsecutiveVolleyPasses");
+    cache->AddField(22, gDebugFieldTypes[22].size,
+        (u8*)&ball->m_v3Position - (u8*)ball, "m_v3Position");
+    cache->AddField(22, gDebugFieldTypes[22].size,
+        (u8*)&ball->m_v3PrevPosition - (u8*)ball, "m_v3PrevPosition");
+    cache->AddField(22, gDebugFieldTypes[22].size,
+        (u8*)&ball->m_v3Velocity - (u8*)ball, "m_v3Velocity");
+    cache->AddField(22, gDebugFieldTypes[22].size,
+        (u8*)&ball->m_v3PassIntercept - (u8*)ball, "m_v3PassIntercept");
+    cache->AddField(24, gDebugFieldTypes[24].size,
+        (u8*)&ball->m_qOrientation - (u8*)ball, "m_qOrientation");
+    cache->AddField(22, gDebugFieldTypes[22].size,
+        (u8*)&ball->m_v3ShotTarget - (u8*)ball, "m_v3ShotTarget");
+    cache->AddField(22, gDebugFieldTypes[22].size,
+        (u8*)&ball->m_v3ShotOrigin - (u8*)ball, "m_v3ShotOrigin");
+    cache->AddField(2, gDebugFieldTypes[2].size,
+        (u8*)&ball->m_uGoalType - (u8*)ball, "m_uGoalType");
+    cache->AddField(2, gDebugFieldTypes[2].size,
+        (u8*)&ball->m_uVoiceID - (u8*)ball, "m_uVoiceID");
+    cache->AddField(2, gDebugFieldTypes[2].size,
+        (u8*)&ball->m_CurrentGlowEffect - (u8*)ball,
+        "m_CurrentGlowEffect");
+    cache->AddField(17, gDebugFieldTypes[17].size,
+        (u8*)&ball->mfChargeValue - (u8*)ball, "mfChargeValue");
+    cache->AddField(17, gDebugFieldTypes[17].size,
+        (u8*)&ball->mfSkillShotTime - (u8*)ball, "mfSkillShotTime");
+    cache->AddField(14, gDebugFieldTypes[14].size,
+        (u8*)&ball->meBallState - (u8*)ball, "meBallState");
+    cache->AddField(14, gDebugFieldTypes[14].size,
+        (u8*)&ball->mePrevBallState - (u8*)ball, "mePrevBallState");
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&ball->m_pOwner - (u8*)ball, "m_pOwner");
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&ball->m_pPrevOwner - (u8*)ball, "m_pPrevOwner");
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&ball->m_pLastTouch - (u8*)ball, "m_pLastTouch");
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&ball->m_pPassTarget - (u8*)ball, "m_pPassTarget");
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&ball->m_pShooter - (u8*)ball, "m_pShooter");
+    cache->AddField(15, gDebugFieldTypes[15].size,
+        (u8*)&ball->mpDamageTarget - (u8*)ball, "mpDamageTarget");
+}
+
+void cBall::SyncLog(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DB5C0 == 0xFFFF)
+    {
+        lbl_806DB5C0 = cache->BeginType("DetBall");
+        RegisterBallDebugFields(this, cache);
+        cache->EndType();
+    }
+
+    cBall* copy = (cBall*)cache->WriteData(lbl_806DB5C0, this, offsetof(cBall, m_pBlurHandler));
+    if (copy != NULL)
+    {
+        *(int*)&copy->m_pOwner
+            = m_pOwner == NULL ? -1 : m_pOwner->mUnidentified120;
+        *(int*)&copy->m_pPrevOwner
+            = m_pPrevOwner == NULL ? -1 : m_pPrevOwner->mUnidentified120;
+        *(int*)&copy->m_pLastTouch
+            = m_pLastTouch == NULL ? -1 : m_pLastTouch->mUnidentified120;
+        *(int*)&copy->m_pPassTarget
+            = m_pPassTarget == NULL ? -1 : m_pPassTarget->mUnidentified120;
+        *(int*)&copy->m_pShooter
+            = m_pShooter == NULL ? -1 : m_pShooter->mUnidentified120;
+        *(int*)&copy->mpDamageTarget
+            = mpDamageTarget == NULL ? -1 : mpDamageTarget->mUnidentified120;
+        cache->ChecksumData(lbl_806DB5C0, copy, context);
+    }
+}
+
+void cBall::fn_8001A898(RunningChecksum* runningChecksum)
+{
+    runningChecksum->ChecksumData(&m_v3Position, sizeof(m_v3Position));
+    runningChecksum->ChecksumData(&m_v3Velocity, sizeof(m_v3Velocity));
+    runningChecksum->ChecksumData(&m_qOrientation, sizeof(m_qOrientation));
+    runningChecksum->ChecksumData(&meBallState, sizeof(meBallState));
+    runningChecksum->ChecksumData(&mfChargeValue, sizeof(mfChargeValue));
+    runningChecksum->ChecksumData(
+        &mfSkillShotTime, sizeof(mfSkillShotTime));
+}
+
 LiveBallTrail::LiveBallTrail()
 {
     drawable = NULL;
@@ -3518,11 +3525,6 @@ LiveBallTrail::~LiveBallTrail()
         mUnidentified038->Die(lbl_806DB54C);
         mUnidentified038 = NULL;
     }
-}
-
-LiveBallTrail* fn_8001B284(unsigned int nIndex)
-{
-    return &lbl_8056B518[nIndex];
 }
 
 extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam)
@@ -3703,6 +3705,11 @@ extern "C" void fn_8001AD24(
         true);
 }
 
+LiveBallTrail* fn_8001B284(unsigned int nIndex)
+{
+    return &lbl_8056B518[nIndex];
+}
+
 extern "C" void fn_8001B298(float fParam)
 {
     LiveBallTrail* pBallTrail = lbl_8056B518;
@@ -3741,73 +3748,6 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
         LiveBallTrail* pBallTrail = &lbl_8056B518[i];
         fn_8001AA0C(pBallTrail, false);
     }
-}
-
-int TweakFloatBinding::GetValueType()
-{
-    return 5;
-}
-
-int TweakFloatBinding::GetStorageKind()
-{
-    return 2;
-}
-
-float TweakFloatBinding::GetDefault()
-{
-    return 0.0f;
-}
-
-void* TweakFloatBinding::GetValueAddress()
-{
-    return m_pValue;
-}
-
-int TweakFloatBinding::IsBound()
-{
-    return m_pValue != 0;
-}
-
-void TweakFloatBinding::BindValueAddress(void* value)
-{
-    m_pValue = (float*)value;
-}
-
-void TweakFloatBinding::UnidentifiedVirtual14(float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-void TweakFloatBinding::FormatValue(char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, "%.3f", *m_pValue);
-}
-
-void TweakFloatBinding::ParseValue(const char* string)
-{
-    *m_pValue = (float)atof(string);
-}
-
-void TweakFloatBinding::CopyValueFrom(TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        *m_pValue = ((TweakValueFloat*)other)->value;
-        break;
-    case 2:
-        *m_pValue = *((TweakFloatBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-TweakValueBase* TweakFloatBinding::CreateValue(const char* name, void* entry)
-{
-    TweakValueFloat* created = new (gTweakValueAllocator->Allocate(sizeof(TweakValueFloat))) TweakValueFloat(name, 0.0f);
-    AddTweakValue((TweakEntry*)entry, created);
-    return created;
 }
 
 extern "C" unsigned int lbl_806E0C10 = 0;

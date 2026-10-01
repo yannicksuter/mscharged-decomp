@@ -19,7 +19,9 @@ class cPlayer;
 class cFielder;
 class cBall;
 class Desire;
-class TweakFloatBinding;
+template <typename T>
+class TweakBinding;
+typedef TweakBinding<float> TweakFloatBinding;
 class cPN_SAnimController;
 class EmissionController;
 class cSAnim;

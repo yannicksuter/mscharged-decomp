@@ -7,7 +7,8 @@ inline TweakIntBinding::~TweakIntBinding()
 {
 }
 
-inline TweakFloatBinding::TweakFloatBinding(float* value)
+template <>
+inline TweakBinding<float>::TweakBinding(float* value)
     : m_pValue(value)
 {
 }

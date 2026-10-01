@@ -30,13 +30,14 @@ extern TweakValueAllocator3* gTweakValueAllocator;
 extern TweakValueAllocator2* gTweakBindingAllocator;
 
 // Shared base of the pool-allocated pointer-backed values. Retail keeps no
-// vtable for it: its constructor and destructor are implicit, so every derived
-// constructor elides its vtable store and every derived destructor inlines it.
+// vtable for it: derived constructors elide its vtable store, and derived
+// destructors inline its empty destructor.
 // It owns the type-independent registration entry points, which only use the
 // base fields and the virtuals below.
 class TweakBindingBase : public TweakValueBase
 {
 public:
+    virtual ~TweakBindingBase() { }
     virtual int IsBound() = 0;
     virtual TweakValueBase* CreateValue(const char* name,
         void* entry) = 0;
@@ -51,11 +52,14 @@ public:
     }
 };
 
-class TweakFloatBinding : public TweakBindingBase
+// The float binding reproduces the template code and data emission order.
+// Only its float value operations have been reconstructed so far.
+template <typename T>
+class TweakBinding : public TweakBindingBase
 {
 public:
-    TweakFloatBinding(float* value = 0);
-    TweakFloatBinding(const char* path, float defaultValue)
+    inline TweakBinding(T* value = 0);
+    TweakBinding(const char* path, T defaultValue)
         : m_pValue(0)
     {
         mName = 0;
@@ -64,7 +68,7 @@ public:
             *m_pValue = defaultValue;
         }
     }
-    TweakFloatBinding(const char* name, const char* category, float* value,
+    TweakBinding(const char* name, const char* category, T* value,
         bool formatName = false)
     {
         m_pValue = value;
@@ -92,21 +96,23 @@ public:
     }
     virtual int GetValueType();
     virtual int GetStorageKind();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
+    virtual T GetDefault();
+    virtual TweakValueBase* CreateValue(const char* name, void* entry);
+    virtual void CopyValueFrom(TweakValueBase*);
     virtual void* GetValueAddress();
     virtual void FormatValue(char*, unsigned long);
     virtual void ParseValue(const char*);
-    virtual void CopyValueFrom(TweakValueBase*);
     virtual int IsBound();
-    virtual TweakValueBase* CreateValue(const char* name,
-        void* entry);
+    virtual void UnidentifiedVirtual14(float*, float*, float*);
     virtual void BindValueAddress(void* value);
-    virtual float GetDefault();
 
-    using TweakBindingBase::Bind;
+    bool Bind(const char* path)
+    {
+        return TweakBindingBase::Bind(path);
+    }
 
-    bool Bind(const char* name, float value, const char* group,
-        bool reload, float min, float max)
+    bool Bind(const char* name, T value, const char* group,
+        bool reload, T min, T max)
     {
         bool found = TweakBindingBase::Bind(name, value, group, reload, min, max);
         if (!found)
@@ -117,8 +123,8 @@ public:
         return found;
     }
 
-    bool BindWithDefault(const char* name, float defaultValue,
-        const char* group, bool reload, float value, float min, float max)
+    bool BindWithDefault(const char* name, T defaultValue,
+        const char* group, bool reload, T value, T min, T max)
     {
         bool found = Bind(name, value, group, reload, min, max);
         if (!found)
@@ -128,32 +134,37 @@ public:
         return found;
     }
 
-    const float& operator=(const float& value)
+    const T& operator=(const T& value)
     {
         *m_pValue = value;
         return *m_pValue;
     }
 
-    float GetDefaultValue()
+    T GetDefaultValue()
     {
         return GetDefault();
     }
 
-    const float& GetValue() const
+    const T& GetValue() const
     {
         return *m_pValue;
     }
 
-    operator float() const
+    operator T() const
     {
         return *m_pValue;
     }
 
 public:
-    /* 0x0C */ float* m_pValue;
+    /* 0x0C */ T* m_pValue;
 
     friend class InterpreterCore;
 }; // total size: 0x10
+
+template <>
+inline TweakBinding<float>::TweakBinding(float* value);
+
+typedef TweakBinding<float> TweakFloatBinding;
 
 class TweakIntBinding : public TweakBindingBase
 {
