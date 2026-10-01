@@ -248,15 +248,6 @@ static TweakBoolBinding sUnidentifiedTweak_8056B4F8(
     "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
 LiveBallTrail lbl_8056B518[10];
 
-extern float lbl_806E31C0;
-extern float lbl_806E31C4;
-extern float lbl_806E31C8;
-extern float lbl_806E31CC;
-extern float lbl_806E31D0;
-extern float lbl_806E31D4;
-extern float lbl_806E31D8;
-extern float lbl_806E31DC;
-extern float lbl_806E31E0;
 static unsigned short lbl_806DB5C0 = 0xFFFF;
 
 cBall::cBall()
@@ -374,6 +365,26 @@ void cBall::ClearBallEffects()
     KillBallShot("skillshot_ball_boo", 0);
 }
 
+static inline bool IsClass15BallShot(cBall* pBall, cPlayer* pShooter)
+{
+    // Keep declaration and initialization order distinct for the nested inline.
+    bool bState8ShotWithShooter;
+    bool bClassShot;
+    bClassShot = false;
+    bState8ShotWithShooter = false;
+    bool bState8Shot = pBall->UnidentifiedState8Shot();
+    if (bState8Shot && pShooter != NULL)
+    {
+        bState8ShotWithShooter = true;
+    }
+    if (bState8ShotWithShooter
+        && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xF)
+    {
+        bClassShot = true;
+    }
+    return bClassShot;
+}
+
 void cBall::CollideWithCharacterCallback(
     cPlayer* pCharacter, const nlVector3& v3PreBallVelocity)
 {
@@ -405,7 +416,7 @@ void cBall::CollideWithCharacterCallback(
         nlVec3Sub(v3BallDirection, m_v3Position,
             m_pPrevOwner->mUnidentified024.m_v3Position);
         unsigned short aBallDirection
-            = (unsigned short)(int)(lbl_806E31C4
+            = (unsigned short)(int)(10430.378f
                 * nlATan2f(v3BallDirection.y, v3BallDirection.x));
         bool bReactToHit = true;
         bool bDeflectBall = true;
@@ -420,21 +431,9 @@ void cBall::CollideWithCharacterCallback(
             }
 
             cPlayer* pShooter = m_pShooter;
-            bool bClassShot = false;
-            bool bState8ShotWithShooter = false;
-            bool bState8Shot = UnidentifiedState8Shot();
-            if (bState8Shot && pShooter != NULL)
+            if (IsClass15BallShot(this, pShooter))
             {
-                bState8ShotWithShooter = true;
-            }
-            if (bState8ShotWithShooter
-                && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xF)
-            {
-                bClassShot = true;
-            }
-            if (bClassShot)
-            {
-                fn_80097358(pCharacter, lbl_806E31C8);
+                fn_80097358(pCharacter, 9999.9f);
             }
             else if (fn_80016768(this))
             {
@@ -455,7 +454,7 @@ void cBall::CollideWithCharacterCallback(
             }
             else if (mbBallOnFire)
             {
-                fn_80097358(pCharacter, lbl_806E31C8);
+                fn_80097358(pCharacter, 9999.9f);
             }
 
             if (bReactToHit)
@@ -475,7 +474,7 @@ void cBall::CollideWithCharacterCallback(
         }
         else
         {
-            pCharacter->SetNoPickUpTime(lbl_806E31CC);
+            pCharacter->SetNoPickUpTime(0.3f);
         }
 
         if (bDeflectBall)
@@ -523,22 +522,22 @@ void cBall::CollideWithCharacterCallback(
             nlVector3 v3AngularVelocity;
             if (nlVec3DotProduct(v3BallDirection, m_v3Velocity) > 0.0f)
             {
-                nlVec3Scale(v3Velocity, m_v3Velocity, lbl_806E31D0);
+                nlVec3Scale(v3Velocity, m_v3Velocity, -0.1f);
                 nlVector3 v3CharacterToBall;
-                nlVec3Sub(v3CharacterToBall, m_v3Position,
-                    pCharacter->mUnidentified024.m_v3Position);
+                nlVec3Sub(v3CharacterToBall, m_v3Position, pCharacter->mUnidentified024.m_v3Position);
                 if (nlVec3DotProduct(v3CharacterToBall, v3Velocity) < 0.0f)
                 {
-                    SetPosition(m_v3PrevPosition);
+                    const nlVector3& previousPosition = m_v3PrevPosition;
+                    SetPosition(previousPosition);
                 }
             }
             else
             {
-                nlVec3Scale(v3Velocity, m_v3Velocity, lbl_806E31D4);
+                nlVec3Scale(v3Velocity, m_v3Velocity, 0.1f);
             }
 
-            v3Velocity.z += lbl_806E31C0 + nlRandomf(lbl_806E31D8);
-            v3Velocity.y += lbl_806E31DC + nlRandomf(lbl_806E31E0);
+            v3Velocity.z += 4.0f + nlRandomf(3.0f);
+            v3Velocity.y += -4.0f + nlRandomf(8.0f);
 
             m_pPhysicsBall->GetAngularVelocity(&v3AngularVelocity);
             SetVelocity(v3Velocity, SPINTYPE_PARAMETER,
@@ -663,7 +662,7 @@ void cBall::CollideWithCharacterCallback(
                 nlVector3 v3PhysicsRadialSpot;
                 float fPlayerScale
                     = pCharacter->mUnidentified024.m_fPlayerScale;
-                unsigned short aActualFacingDirection
+                const unsigned short aActualFacingDirection
                     = pCharacter->mUnidentified024.m_aActualFacingDirection;
                 float fRadius = fn_8002BFA8(
                     pCharacterFielder->GetTweaks(), fPlayerScale);
@@ -714,20 +713,24 @@ void cBall::CollideWithCharacterCallback(
                                         pOwnerFielder, false);
                                 pOwnerFielder->SetSlideAttackSuccessFlag();
                             }
-                            else if (pOwnerFielder->mUnidentified024.m_fActualSpeed
-                                < pCharacterFielder->mUnidentified024.m_fActualSpeed)
-                            {
-                                pOwnerFielder->InitActionSlideAttackReact(
-                                    pCharacterFielder, false);
-                                pCharacterFielder->SetSlideAttackSuccessFlag();
-                                pCharacterFielder->PickupBall(g_pBall);
-                            }
                             else
                             {
-                                pCharacterFielder
-                                    ->InitActionSlideAttackReact(
-                                        pOwnerFielder, false);
-                                pOwnerFielder->SetSlideAttackSuccessFlag();
+                                float hitterSpeed = pCharacterFielder->mUnidentified024.m_fActualSpeed;
+                                float hitteeSpeed = pOwnerFielder->mUnidentified024.m_fActualSpeed;
+                                if (hitteeSpeed < hitterSpeed)
+                                {
+                                    pOwnerFielder->InitActionSlideAttackReact(
+                                        pCharacterFielder, false);
+                                    pCharacterFielder->SetSlideAttackSuccessFlag();
+                                    pCharacterFielder->PickupBall(g_pBall);
+                                }
+                                else
+                                {
+                                    pCharacterFielder
+                                        ->InitActionSlideAttackReact(
+                                            pOwnerFielder, false);
+                                    pOwnerFielder->SetSlideAttackSuccessFlag();
+                                }
                             }
                         }
                         else
