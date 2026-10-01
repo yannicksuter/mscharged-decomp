@@ -1291,7 +1291,7 @@ extern "C" void fn_800153FC(cBall* pBall, bool bParam)
         pBall->mfChargeValue = 0.0f;
     }
 
-    float fMaxCharge = lbl_806DB510 * 4.0f;
+    float fMaxCharge = lbl_806DB510 * FullBallCharge();
     float fValue = pBall->mfChargeValue;
     if (fValue >= fMaxCharge)
     {
