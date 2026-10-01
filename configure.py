@@ -507,7 +507,7 @@ config.libs = [
             Object(Matching, "Game/tu_8013E2EC.cpp"),
             Object(Matching, "Game/TweakCallback.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/TweakConfig.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/TweakEntry.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/TweakEntry.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/TweakFileLoader.cpp"),
             Object(Matching, "Game/TweakNameRecycler.cpp"),
             Object(NonMatching, "Game/TweakNode.cpp", cflags=[*cflags_game_common, "-inline level=4"]),

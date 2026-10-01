@@ -20,11 +20,6 @@ TweakEntry::~TweakEntry()
     ClearTweakChildren(this);
 }
 
-TweakEntry* TweakEntry::UnidentifiedVirtual18()
-{
-    return this;
-}
-
 void InsertTweakChildSorted(TweakEntry* entry, TweakNode* child)
 {
     TweakNode* current = entry->m_ChildHead;
@@ -166,9 +161,4 @@ void RemoveDynamicTweakChildren(TweakEntry* entry)
         }
         child = next;
     }
-}
-
-int TweakEntry::UnidentifiedVirtual0C()
-{
-    return 1;
 }

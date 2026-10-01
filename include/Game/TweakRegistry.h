@@ -87,7 +87,7 @@ public:
     virtual ~TweakNode();
     virtual int UnidentifiedVirtual0C();
     virtual int UnidentifiedVirtual10() { return 1; }
-    virtual int UnidentifiedVirtual14() { return 0; }
+    virtual TweakNode* UnidentifiedVirtual14() { return 0; }
     virtual TweakEntry* UnidentifiedVirtual18();
 
     TweakNode* GetNext() const { return m_Next; }
@@ -109,9 +109,9 @@ public:
     TweakEntry();
     virtual ~TweakEntry();
     virtual int UnidentifiedVirtual0C();
-    virtual int UnidentifiedVirtual14();
     virtual TweakEntry* UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
+    virtual int UnidentifiedVirtual1C();
+    virtual TweakNode* UnidentifiedVirtual14();
 
     static void operator delete(void* ptr) { gTweakEntryPool.Free(ptr); }
 
@@ -121,6 +121,23 @@ public:
     /* 0x29 */ bool m_SortChildren;
     /* 0x2A */ u8 m_Pad2A[2];
 }; // size: 0x2C
+
+inline int TweakEntry::UnidentifiedVirtual0C()
+{
+    return 1;
+}
+inline TweakEntry* TweakEntry::UnidentifiedVirtual18()
+{
+    return this;
+}
+inline TweakNode* TweakEntry::UnidentifiedVirtual14()
+{
+    return this;
+}
+inline int TweakEntry::UnidentifiedVirtual1C()
+{
+    return 0;
+}
 
 struct TweakPendingValue
 {
