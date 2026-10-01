@@ -2164,11 +2164,17 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
 
 static bool sUnidentifiedUpdateActive;
 
+static inline void RestoreFrozenBallPosition(cBall* pBall)
+{
+    const nlVector3& position = pBall->m_v3PrevPosition;
+    pBall->SetPosition(position);
+}
+
 void cBall::Update(float fDeltaT)
 {
     if (mbBallFrozen)
     {
-        SetPosition(m_v3PrevPosition);
+        RestoreFrozenBallPosition(this);
     }
     else
     {
@@ -2220,7 +2226,9 @@ void cBall::Update(float fDeltaT)
             tUnidentifiedUpdateTimer.SetSeconds(lbl_806DB5B0);
         }
 
-        if (meBallState != 5)
+        if (meBallState != 5
+            || (meBallState == 2 && m_pOwner != NULL
+                && m_pOwner->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() > 0.1f))
         {
             m_iConsecutiveVolleyPasses = 0;
         }
