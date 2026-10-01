@@ -22,6 +22,7 @@
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Event.h"
+#include "Game/EventDataTypes.h"
 #include "Game/EventRegistry.h"
 #include "Game/Field.h"
 #include "Game/Task/FixedUpdateTask.h"
@@ -2916,7 +2917,7 @@ extern "C" void fn_80018A00()
     UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(fn_800194A4), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8001929C), 0, -1);
     UnidentifiedFindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(fn_80019718), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionEggBall", -1)->Add(Function<void*>(fn_80019814), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(fn_80019814), 0, -1);
     UnidentifiedFindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(fn_80019F10), 0, -1);
     UnidentifiedFindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(fn_80019910), 0, -1);
     UnidentifiedFindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(fn_8001A00C), 0, -1);
@@ -3165,7 +3166,7 @@ extern "C" void fn_80019718(void*)
     fn_80015C38(pBall, 0);
 }
 
-extern "C" void fn_80019814(void*)
+extern "C" void fn_80019814(UnidentifiedEventData34*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
