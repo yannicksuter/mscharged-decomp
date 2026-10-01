@@ -1660,7 +1660,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
             && pBall->m_pPrevOwner->m_eClassType == FIELDER)
         {
             pBall->m_pPhysicsBall->mfBallAirResistance
-                = pBall->m_pPhysicsBall->fn_80140C3C() * 15.0f;
+                = pBall->m_pPhysicsBall->fn_80140C3C() * lbl_806DB574;
         }
         break;
     case 6:
@@ -1673,7 +1673,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
             PlayerTweaks* tweaks
                 = ((cFielder*)pPrevOwner)->GetTweaks();
             pBall->m_pPhysicsBall->mfBallAirResistance
-                = resistance * Interpolate(24.0f, 1.0f,
+                = resistance * Interpolate(lbl_806DB570, 1.0f,
                     (float)tweaks->fShooting);
         }
         break;
