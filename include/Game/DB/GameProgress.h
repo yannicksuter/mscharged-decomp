@@ -169,6 +169,7 @@ public:
     int GetUserTeamRank();
     void AwardGoalTrophies();
     void ForfeitCurrentGame();
+    CupProgressRecord& fn_8010383C() { return mCupRecord; }
     u32 GetUnlockFlags() const { return mCupRecord.mUnlockFlags; }
     bool HasUnlockFlag(int flag) const { return (mCupRecord.mUnlockFlags & flag) != 0; }
 

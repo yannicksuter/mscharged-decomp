@@ -86,22 +86,38 @@ public:
         return mUnidentified028 - mUnidentified018[mUnidentified010] > mUnidentified004;
     }
 
-    void UnidentifiedAdd(const nlVector3& value, float dt)
+    void UnidentifiedAdvance()
     {
-        mUnidentified014[mUnidentified00C] = value;
-        mUnidentified018[mUnidentified00C] = dt;
-        nlVec3ScaleAdd(mUnidentified01C, dt, value, mUnidentified01C);
-        mUnidentified028 += dt;
         mUnidentified00C = (mUnidentified00C + 1) % mUnidentified008;
         if (mUnidentified00C == mUnidentified010)
             UnidentifiedRemoveOldest();
+    }
+
+    void UnidentifiedTrim()
+    {
         while (UnidentifiedCanTrim() && mUnidentified00C != mUnidentified010)
             UnidentifiedRemoveOldest();
     }
 
-    void Update(nlVector3& value, const nlVector3& sample, float dt)
+    void Update(nlVector3& value, const nlVector3& sample, float dt,
+        float decayDuration = 0.0f, const Timer* timer = 0)
     {
-        UnidentifiedAdd(sample, dt);
+        nlVector3 faded;
+        const nlVector3* pSample = &sample;
+        if (decayDuration > 0.0f)
+        {
+            faded = sample;
+            float scale = timer->GetSeconds() / decayDuration;
+            nlVec3Set(faded, scale * faded.x, scale * faded.y, scale * faded.z);
+            pSample = &faded;
+        }
+
+        mUnidentified014[mUnidentified00C] = *pSample;
+        mUnidentified018[mUnidentified00C] = dt;
+        nlVec3ScaleAdd(mUnidentified01C, dt, *pSample, mUnidentified01C);
+        mUnidentified028 += dt;
+        UnidentifiedAdvance();
+        UnidentifiedTrim();
         if (mUnidentified00C != mUnidentified010)
         {
             nlVector3 input = mUnidentified01C;

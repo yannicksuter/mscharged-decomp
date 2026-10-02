@@ -18,7 +18,7 @@ public:
     void SetSeconds(float seconds);
     void UnidentifiedClear()
     {
-        m_uWasRunning = m_uPackedTime != 0;
+        m_uWasRunning = m_uPackedTime ? 1 : 0;
         m_uPackedTime = 0;
     }
 

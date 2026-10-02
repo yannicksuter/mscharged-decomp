@@ -1381,8 +1381,8 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
 
     nlVector3 v3PassPosition = pPassTarget->mUnidentified024.m_v3Position;
     nlVector2 v2BallToTarget = {
-        pPassTarget->mUnidentified024.m_v3Position.x - g_pBall->m_v3Position.x,
-        pPassTarget->mUnidentified024.m_v3Position.y - g_pBall->m_v3Position.y,
+        pPassTarget->mUnidentified024.m_v3Position.x - g_pBall->GetPosition().x,
+        pPassTarget->mUnidentified024.m_v3Position.y - g_pBall->GetPosition().y,
     };
     float fPassSpeed = DoCalculatePassSpeed(v2BallToTarget,
         fMinPassSpeed, fMaxPassSpeed, lbl_806DC1AC, lbl_806DC1B0);
@@ -1428,7 +1428,7 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
         v3PassPosition.y - g_pBall->m_v3Position.y,
     };
     float fPassDistance =
-        nlVec2Length(v2BallToPassPosition);
+        nlGetLength2D(v2BallToPassPosition.x, v2BallToPassPosition.y);
     float fPassTime = nlMaxEquals(
         0.04f, fPassDistance / fPassSpeed);
 
@@ -1460,13 +1460,13 @@ void DesireReceivePass::fn_800C22CC(cPlayer* pPasser, bool bVolleyPass, bool bFi
             true, true, false, true);
 
         nlSinCos(&fSin, &fCos, aFacingDirection);
-        v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
         v3ContactOffsetWorld.x =
             v3ContactOffsetLocal.x * fCos
             - v3ContactOffsetLocal.y * fSin;
         v3ContactOffsetWorld.y =
             v3ContactOffsetLocal.y * fCos
             + v3ContactOffsetLocal.x * fSin;
+        v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
 
         v3PassPosition.z = v3ContactOffsetWorld.z;
         g_pBall->ShootAtFast(

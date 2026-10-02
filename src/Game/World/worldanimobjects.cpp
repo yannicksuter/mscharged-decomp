@@ -182,7 +182,7 @@ void WorldDrawable::Draw()
 
 inline bool WorldDrawable::ResolveVertexAnim(GLVertexAnim*& pVertexAnim)
 {
-    unsigned long uAnimationHash = m_pModel->id;
+    unsigned long uAnimationHash = GetModel()->GetID();
     GLResourcePool* pPool = glGetCurrentResourcePool();
     pVertexAnim = pPool->m_inventory->GetVertexAnim(uAnimationHash);
     return pVertexAnim != 0;
@@ -200,12 +200,13 @@ inline float WorldAnimManager::GetFrame(int nFrames, int nFrameRate) const
 
 void WorldDrawable::DrawToView(GLView* pView)
 {
-    glModel* pModel = m_pModel;
+    GLView* pAlphaView;
+    glModel* pModel = GetModel();
     GLVertexAnim* pVertexAnim;
     if (ResolveVertexAnim(pVertexAnim))
     {
         float fFrame = m_pWorldContext->mWorldAnimManager.GetFrame(
-            (int)pVertexAnim->m_nNumFrames, 30);
+            pVertexAnim->GetNumFrames(), 30);
         pModel = pVertexAnim->GetModel((int)fFrame);
         UpdateModelMaterials(pModel);
     }
@@ -221,7 +222,7 @@ void WorldDrawable::DrawToView(GLView* pView)
     }
 
     GLView* pOpaqueView = m_pWorldContext->m_pOpaqueView;
-    GLView* pAlphaView = m_pWorldContext->m_pAlphaView;
+    pAlphaView = m_pWorldContext->m_pAlphaView;
     if (pAlphaView == 0)
     {
         pAlphaView = pView;
@@ -277,7 +278,7 @@ WorldVisibilityNode* FindWorldVisibilityNode(
     int index;
     for (index = 0; index < pNode->mNumModelHashes; ++index)
     {
-        if (pNode->mModelHashes[index] == pDrawable->GetModel()->id)
+        if (pNode->mModelHashes[index] == pDrawable->GetModel()->GetID())
         {
             return pNode;
         }

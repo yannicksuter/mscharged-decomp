@@ -829,7 +829,8 @@ void cCharacter::PostPhysicsUpdate()
 
     float velY = mUnidentified024.m_v3Velocity.y;
     float velX = mUnidentified024.m_v3Velocity.x;
-    mUnidentified024.m_fActualSpeed = nlGetLength2D(velX, velY);
+    mUnidentified024.m_fActualSpeed =
+        nlSqrt(nlGetLengthSquared1D(velX) + nlGetLengthSquared1D(velY), true);
 
     CreateWorldMatrix();
 

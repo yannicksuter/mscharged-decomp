@@ -178,9 +178,7 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
     radius = RandomizedValue(0.0f, radius);
 
     nlVector3 localPos;
-    localPos.x = cosVal * radius;
-    localPos.y = -sinVal * radius;
-    localPos.z = 0.0f;
+    nlVec3Set(localPos, cosVal * radius, -sinVal * radius, 0.0f);
 
     if (pSpec != 0)
     {
@@ -752,7 +750,6 @@ int ParticleSystem::RenderAllParticles(GLView* view)
 {
     static int _tris[6] = { 0, 1, 2, 0, 2, 3 };
     ParticleReturn ret;
-    u32 hMatrix;
 
     if (!m_bVisible)
         return 0;
@@ -778,9 +775,9 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     {
         nlMatrix4 viewMatrix;
         view->m_Interface->GetViewMatrix(viewMatrix);
-        nlVec3Set(viewRight, viewMatrix.e[0], viewMatrix.e[4], viewMatrix.e[8]);
-        nlVec3Set(viewUp, viewMatrix.e[1], viewMatrix.e[5], viewMatrix.e[9]);
-        nlVec3Set(viewForward, viewMatrix.e[2], viewMatrix.e[6], viewMatrix.e[10]);
+        viewMatrix.GetColumn_(0, viewRight);
+        viewMatrix.GetColumn_(1, viewUp);
+        viewMatrix.GetColumn_(2, viewForward);
         nlVec3Scale(viewRight, m_fAspect);
     }
     else if (m_pTemplate->m_eBillboard == EfBill_Groundboard)
@@ -904,9 +901,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
             m.e[13] = ret.position[0].y;
             m.e[14] = ret.position[0].z;
 
-            hMatrix = glAllocMatrix();
-            if (hMatrix != 0xFFFFFFFF)
-                glSetMatrix(hMatrix, m);
+            u32 hMatrix = glAllocSetMatrix(m);
 
             float meshRateScale = 1.0f;
             if (pAnim != 0)

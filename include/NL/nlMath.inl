@@ -23,15 +23,18 @@ extern "C" inline nlVector3* fn_800D1C4C(
 
 /**
  * Offset/Address/Size: 0x9584 | 0x800D1C80 | size: 0x4C
+ *
+ * nlVec2Length(delta) gives the same out-of-line body but different inlined
+ * code in GoalieOutOfPosition().
  */
 extern "C" inline float fn_800D1C80(
-    const nlVector2* first, const nlVector2* second)
+    const nlVector3& first, const nlVector3& second)
 {
     nlVector2 delta = {
-        first->x - second->x,
-        first->y - second->y,
+        first.x - second.x,
+        first.y - second.y,
     };
-    return nlVec2Length(delta);
+    return nlSqrt(nlVec2LengthSquared(delta), true);
 }
 
 /**

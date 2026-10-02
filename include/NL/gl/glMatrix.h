@@ -13,6 +13,16 @@ u32 glAllocMatrix();
 unsigned long glGetIdentityMatrix();
 void gl_MatrixStartup();
 
+static inline u32 glAllocSetMatrix(const nlMatrix4& matrix)
+{
+    u32 handle = glAllocMatrix();
+    if (handle != 0xFFFFFFFF)
+    {
+        glSetMatrix(handle, matrix);
+    }
+    return handle;
+}
+
 class GLMatrix
 {
 public:

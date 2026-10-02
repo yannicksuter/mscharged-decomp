@@ -13,17 +13,7 @@ UnidentifiedVariantCollection::UnidentifiedVariantCollection()
 
 UnidentifiedVariantCollection::~UnidentifiedVariantCollection()
 {
-    int i;
-    UnidentifiedFuzzyVariantData** slot = mData;
-    for (i = 0; i < 19; i++, slot++)
-    {
-        UnidentifiedFuzzyVariantData* entry = *slot;
-        if (entry != 0)
-        {
-            delete entry;
-            *slot = 0;
-        }
-    }
+    Remove(-1);
 }
 
 void UnidentifiedVariantCollection::Remove(int index)
@@ -64,7 +54,7 @@ FuzzyVariant* UnidentifiedVariantCollection::Get(int index)
     return &lbl_805841D8;
 }
 
-void UnidentifiedVariantCollection::Set(int index, const Variant& value)
+void UnidentifiedVariantCollection::Set(int index, FuzzyVariant value)
 {
     if (IsSet(index))
     {
@@ -74,6 +64,6 @@ void UnidentifiedVariantCollection::Set(int index, const Variant& value)
     else
     {
         mData[index] = new (lbl_80584200.Allocate())
-            UnidentifiedFuzzyVariantData(index, FuzzyVariant(value));
+            UnidentifiedFuzzyVariantData(index, value);
     }
 }

@@ -192,10 +192,7 @@ inline float nlGetLengthSquared2D(float x, float y)
 
 inline float nlGetLength2D(float x, float y)
 {
-    float xx = x * x;
-    float yy = y * y;
-    const float lengthSquared = xx + yy;
-    return nlSqrt(lengthSquared, true);
+    return nlSqrt(nlGetLengthSquared2D(x, y), true);
 }
 
 inline float nlGetLengthSquared3D(float x, float y, float z)
@@ -222,12 +219,6 @@ inline float nlVec2LengthSquared(const nlVector2& v)
     return nlGetLengthSquared2D(v.x, v.y);
 }
 
-/**
- * Vector-reference length. The single-expression form below is required by
- * R4QE01 and is not interchangeable with nlGetLength2D()/nlGetLength3D():
- * those keep their named per-component temporaries, which CodeWarrior
- * schedules differently. Do not "unify" the two bodies.
- */
 inline float nlVec2Length(const nlVector2& v)
 {
     return nlSqrt(v.x * v.x + v.y * v.y, true);
@@ -625,7 +616,7 @@ inline void nlMakeQuat(nlQuaternion& out, const nlVector3& v3RotationAxis, float
 }
 
 extern "C" nlVector3* fn_800D1C4C(nlVector3*, const nlVector3*, const nlVector3*);
-extern "C" float fn_800D1C80(const nlVector2*, const nlVector2*);
+extern "C" float fn_800D1C80(const nlVector3&, const nlVector3&);
 extern "C" unsigned short fn_800D1CCC(float, float);
 extern "C" short fn_800D1D04(unsigned short, unsigned short);
 extern "C" unsigned short fn_800D1D10(short);

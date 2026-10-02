@@ -208,10 +208,7 @@ extern "C" void FuzzyAISetPlayerParameter_800E3A84(
     UnidentifiedVariant_80054AB8* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
-    FuzzyVariant variant;
-    variant.mType = FT_PLAYER;
-    variant.mData.pPlayer = value;
-    action->ExtraData.Set(index, variant);
+    action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
 extern "C" void FuzzyAISetBallParameter(
@@ -219,10 +216,7 @@ extern "C" void FuzzyAISetBallParameter(
     UnidentifiedVariant_80054AB8* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
-    FuzzyVariant variant;
-    variant.mType = FT_BALL;
-    variant.mData.pointer = value;
-    action->ExtraData.Set(index, variant);
+    action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
 extern "C" void* fn_800E3BE4(void*, void* value)

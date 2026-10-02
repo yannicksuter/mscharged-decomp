@@ -1285,7 +1285,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::fn_800CE588(
             pos.Set(current.x, current.y, 0.0f);
             nlVector3 delta;
             fn_800D1C4C(&delta, &pos, GetCharacterPosition(fielder));
-            float distance = fn_800D1C80((const nlVector2*)&oldPos, (const nlVector2*)&pos);
+            float distance = fn_800D1C80(oldPos, pos);
             unsigned short angle = fn_800D1CCC(delta.y, delta.x);
             result = 3;
             result.SetParameter(8, FuzzyVariant(lbl_806DC360));

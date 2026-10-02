@@ -2091,10 +2091,7 @@ bool IsControllerMirrored(cPN_SAnimController* pController)
     return pController->m_bMirror;
 }
 
-bool HasGlobalPad(cPlayer* pPlayer)
-{
-    return pPlayer->GetGlobalPad() != 0;
-}
+#include "Game/CharacterTriggers.inl"
 
 cPlayer* GetBallOwner(cBall* pBall)
 {

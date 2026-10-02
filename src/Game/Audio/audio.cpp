@@ -280,23 +280,7 @@ XSoundHandle* FindSoundHandle(
 bool PlayTrackedSound(int slotId, unsigned long cueId,
     const void* debugName, void* context, bool restartable)
 {
-    bool played;
-    if (cueId == 0xFFFFFFFF)
-    {
-        played = true;
-    }
-    else
-    {
-        XSoundHandle* handle = CreateSoundHandle(
-            slotId, cueId, 0, debugName, context, false);
-        if (handle != 0)
-        {
-            handle->Play(context == 0);
-        }
-        played = handle != 0;
-    }
-
-    if (played)
+    if (PlaySound(slotId, cueId, debugName, context))
     {
         AudioHandleState state;
         state.Set(slotId, cueId, context, restartable);
@@ -548,8 +532,8 @@ void PauseAllAudio()
 
 void ResumeAllAudio()
 {
-    sAudioHandleStates.Walk(
-        g_pAudioSystem, &AudioSystem::ResumeTrackedSound);
+    AudioSystem* audio = g_pAudioSystem;
+    sAudioHandleStates.Walk(audio, &AudioSystem::ResumeTrackedSound);
     --sAudioPauseDepth;
 }
 

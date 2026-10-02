@@ -48,21 +48,18 @@ public:
     bool IsSet(int index) const;
     FuzzyVariant* Get(int index);
     void Remove(int index);
-    void Set(int index, const Variant& value);
+    void Set(int index, FuzzyVariant value);
     void Set(int index, const unsigned long& value)
     {
-        FuzzyVariant variant(value);
-        Set(index, (const Variant&)variant);
+        Set(index, FuzzyVariant(value));
     }
     void Set(int index, const int& value)
     {
-        FuzzyVariant variant(value);
-        Set(index, (const Variant&)variant);
+        Set(index, FuzzyVariant(value));
     }
     void Set(int index, float value)
     {
-        FuzzyVariant variant(value);
-        Set(index, (const Variant&)variant);
+        Set(index, FuzzyVariant(value));
     }
 
     UnidentifiedVariantCollection& operator=(

@@ -32,6 +32,7 @@ struct BasicGameInfo
         eSidekickID sidekick = (eSidekickID)mSidekickIndex[side][slot];
         return sidekick;
     }
+    void fn_801037B0(int side, short score) { mFinalScore[side] = score; }
     short GetFinalScore(short side) const { return mFinalScore[side]; }
     int GetWinningSide() const
     {

@@ -15,6 +15,8 @@ struct NetworkLobbyPlayer : public TransportPlayerInfo
 class NetworkLobby : public NetworkMachineRoster,
                      public NetworkMessageReceiver
 {
+    void InitializeReceiveBuffers();
+
 public:
     void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
 

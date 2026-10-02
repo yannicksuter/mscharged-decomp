@@ -399,13 +399,7 @@ void ApplyGameObjectShadowLighting(s32 arg0, u32 arg1)
         gxSetTevColourIn(numTevStages, 15, 0, 8, 15);
         gxSetTevAlphaIn(numTevStages, 7, 7, 7, 0);
 
-        glTextureBinding textureState;
-        textureState.texture = lbl_806DCC6C;
-        textureState.textureIndex = 0xFFFF;
-        textureState.flags = 0;
-        textureState.SetWrapS(!lbl_806E1413);
-        textureState.SetWrapT(!lbl_806E1413);
-        textureState.unknown07 = 0;
+        glTextureBinding textureState(lbl_806DCC6C, !lbl_806E1413, !lbl_806E1413);
         glx_BindTexture(numTexGens, &textureState);
 
         nlMatrix4 transform;
@@ -448,27 +442,20 @@ void fn_80183764(u32 textureHandle)
     }
 }
 
-void SetGameObjectAmbientLightingEnabled(s32 arg0)
+void SetGameObjectAmbientLightingEnabled(s32 enabled)
 {
-    if (arg0)
+    if (enabled)
     {
-        nlColour ambient = {
+        gxSetChanAmbColour(0, (nlColour){
             (u8)lbl_806DCC4C,
             (u8)lbl_806DCC50,
             (u8)lbl_806DCC54,
             0,
-        };
-        gxSetChanAmbColour(0, ambient);
+        });
     }
     else
     {
-        nlColour ambient = {
-            0,
-            0,
-            0,
-            0,
-        };
-        gxSetChanAmbColour(0, ambient);
+        gxSetChanAmbColour(0, (nlColour){ 0, 0, 0, 0 });
     }
 }
 

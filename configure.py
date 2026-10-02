@@ -556,7 +556,7 @@ config.libs = [
             Object(NonMatching, "Game/AI/tu_800BC0C4.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/FielderDesireMachine.cpp"),
             Object(Matching, "Game/AI/FielderDesireTransitions.cpp"),
-            Object(NonMatching, "Game/AI/tu_8030EDB0.cpp", cflags=[*cflags_game, "-char signed"]),
+            Object(Matching, "Game/AI/tu_8030EDB0.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/AIContext.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(NonMatching, "Game/AI/tu_8030F5DC.cpp", cflags=[*cflags_game, "-char signed"], extra_cflags=["-ipa file", "-inline noauto"]),
             Object(Matching, "Game/AI/tu_803115F4.cpp", cflags=[*cflags_game, "-char signed"]),
@@ -569,14 +569,14 @@ config.libs = [
             Object(Equivalent, "Game/AI/Variant.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/Scripts/FuzzyAIRuntime.cpp", cflags=[*cflags_game_deferred, "-char signed"], extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/Scripts/ScriptDefines.cpp", cflags=cflags_game_deferred),
-            Object(NonMatching, "Game/AI/Scripts/ScriptQuestions.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/AI/Scripts/ScriptQuestions.cpp", extra_cflags=["-ipa file"]),
 
             # Game/AnimProps
             Object(Matching, "Game/AnimProps/globalanimproperties.cpp"),
             Object(Matching, "Game/AnimProps/goalieanimproperties.cpp"),
 
             # Game/Audio
-            Object(NonMatching, "Game/Audio/audio.cpp", extra_cflags=["-ipa file"]),
+            Object(NonMatching, "Game/Audio/audio.cpp", extra_cflags=["-inline auto,nobottomup,depth=5", "-ipa file"]),
             Object(NonMatching, "Game/Audio/AudioBackend.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Audio/AudioBankLoader.cpp"),
             Object(Matching, "Game/Audio/AudioBankTable.cpp"),

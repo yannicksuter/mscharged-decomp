@@ -4671,9 +4671,9 @@ void cFielder::fn_8004C88C(float fDeltaT)
         v2Delta.y = lbl_806E3620 * v2Direction.y;
         v2Delta.x = lbl_806E3620 * v2Direction.x;
 
-        float velY = mUnidentified024.m_v3Velocity.y;
-        float velX = mUnidentified024.m_v3Velocity.x;
-        fCurrSpeed = nlGetLength2D(velX, velY);
+        fCurrSpeed = nlSqrt(nlGetLengthSquared1D(mUnidentified024.m_v3Velocity.x)
+                + nlGetLengthSquared1D(mUnidentified024.m_v3Velocity.y),
+            true);
 
         nlVector2 v2NewVelocity;
         v2NewVelocity.x = v2Delta.x + mUnidentified024.m_v3Velocity.x;

@@ -13,11 +13,13 @@ struct glTextureBinding
     /* 0x06 */ u8 flags;
     /* 0x07 */ u8 unknown07;
 
-    glTextureBinding(u32 handle = 0)
+    glTextureBinding(u32 handle = 0, unsigned char wrapS = 0, unsigned char wrapT = 0)
     {
         texture = handle;
-        textureIndex = 0xFFFF;
         flags = 0;
+        SetWrapS(wrapS);
+        textureIndex = 0xFFFF;
+        SetWrapT(wrapT);
         unknown07 = 0;
     }
 
@@ -63,6 +65,7 @@ struct glModelPacket
 
 struct glModel
 {
+    unsigned long GetID() const { return id; }
     u32 GetNumPackets() const { return numPackets; }
 
     /* 0x00 */ u32 id;

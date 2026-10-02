@@ -831,6 +831,14 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
 {
     char szBundlePath[64];
     char szPlayerPath[64];
+    eCharacterClass captain0;
+    eCharacterClass altcaptain;
+    const char* szName;
+    const char* szCaptainName;
+    const char* szTexName;
+    cCharacter* pChar;
+    eCharacterClass cc;
+    eCharacterClass captaincc;
 
     if (mSidekickTextureData == 0)
     {
@@ -838,21 +846,28 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
     }
 
     Entry* pEntry = mCurrent;
-    eCharacterClass captaincc = captain[pEntry->nTeamID];
-    eCharacterClass cc = pEntry->cc;
+    captaincc = captain[pEntry->nTeamID];
+    cc = pEntry->cc;
 
     glEndLoadTextureBundle(mSidekickTextureData, mSidekickTextureSize, glGetCurrentResourcePool(), false);
     nlFree(mSidekickTextureData);
     mSidekickTextureData = 0;
 
-    cCharacter* pChar = g_pCharacters[mCurrent->nCharIdx];
-    const char* szName = GetCharacterInfo(cc).mName;
-    const char* szCaptainName = GetCharacterInfo(captaincc).mName;
-    const char* szTexName = (cc == 13) ? "hammer" : szName;
+    pChar = g_pCharacters[mCurrent->nCharIdx];
+    szName = GetCharacterInfo(cc).mName;
+    szCaptainName = GetCharacterInfo(captaincc).mName;
+    if (cc == 13)
+    {
+        szTexName = "hammer";
+    }
+    else
+    {
+        szTexName = szName;
+    }
 
-    eCharacterClass captain0 = captain[0];
-    eCharacterClass captain1 = captain[1];
-    if (captain0 == captain1)
+    captain0 = captain[0];
+    altcaptain = captain[1];
+    if (captain0 == altcaptain)
     {
         if (mCurrent->nTeamID == 1)
         {
@@ -865,7 +880,8 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
     }
     else
     {
-        if (GetAlternateCaptain(captain0, captain1) == captaincc)
+        altcaptain = GetAlternateCaptain(captain0, altcaptain);
+        if (altcaptain == captaincc)
         {
             nlSNPrintf(szPlayerPath, 64, "%s_%s_alt/%s_%s_alt", szTexName, szCaptainName, szTexName, szCaptainName);
         }

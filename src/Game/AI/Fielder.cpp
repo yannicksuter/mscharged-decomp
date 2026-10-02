@@ -315,53 +315,20 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
         return 2;
 
     attackIntensity -= 0.5f;
-    float fUnidentified2 = fUnidentified1 - fUnidentified0 + attackIntensity;
+    float fUnidentified2 = fUnidentified1 - fUnidentified0;
+    fUnidentified2 += attackIntensity;
     if (fUnidentified2 <= lbl_806DB800)
         nUnidentified = 0;
     else if (fUnidentified2 >= lbl_806DB804)
         nUnidentified = 2;
 
-    if (fn_80319FEC(pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x19))
+    if (pFielderCollidedWith->fn_8003E71C()
+        || pFielderCollidedWith->IsInvincible()
+        || pFielderCollidedWith->IsInvincibleChars()
+        || fn_800344DC(pFielderCollidedWith, &pFielder->GetPosition())
+        || pFielderCollidedWith->fn_8003E74C())
     {
         nUnidentified = 2;
-    }
-    else
-    {
-        bool bUnidentified0 = false;
-        bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                           pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
-                          ->IsUnidentifiedState(1)
-            || ((DesireFrozen*)fn_80319FC0(
-                    pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
-                   ->IsUnidentifiedState(2);
-        if (!bFrozen && (pFielderCollidedWith->muInvincibleStatus & 0x1F) == 0x1F)
-            bUnidentified0 = true;
-        if (bUnidentified0)
-        {
-            nUnidentified = 2;
-        }
-        else
-        {
-            bool bUnidentified1 = false;
-            bool bFrozen = ((DesireFrozen*)fn_80319FC0(
-                               pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
-                              ->IsUnidentifiedState(1)
-                || ((DesireFrozen*)fn_80319FC0(
-                        pFielderCollidedWith->mUnidentified428->mScriptMachine, 0x1D))
-                       ->IsUnidentifiedState(2);
-            if (!bFrozen && (pFielderCollidedWith->muInvincibleStatus & 1))
-                bUnidentified1 = true;
-            if (bUnidentified1)
-            {
-                nUnidentified = 2;
-            }
-            else
-            {
-                if (fn_800344DC(pFielderCollidedWith, &pFielder->mUnidentified024.m_v3Position)
-                    || pFielderCollidedWith->fn_8003E74C())
-                    nUnidentified = 2;
-            }
-        }
     }
     return nUnidentified;
 }

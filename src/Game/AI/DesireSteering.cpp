@@ -8,6 +8,7 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
+#include "Game/CharacterTriggers.inl"
 #include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
@@ -203,6 +204,7 @@ void DesireSteering::Update(
 
 extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
 {
+    bool bHasGlobalPad;
     float fRepulsionMult = desire->m_fAvoidanceMult;
     int nThingsToAvoid = desire->m_ThingsToAvoid;
 
@@ -212,8 +214,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     }
     else
     {
-        bool bHasGlobalPad
-            = desire->m_pFielder->GetGlobalPad() != NULL;
+        bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
         if (bHasGlobalPad)
         {
             if ((fn_8003E8A0(desire->m_pFielder)
@@ -248,8 +249,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         }
     }
 
-    bool bHasGlobalPad
-        = desire->m_pFielder->GetGlobalPad() != NULL;
+    bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
     if (!bHasGlobalPad && desire->m_pFielder->fn_8003EA6C())
     {
         nThingsToAvoid &= ~(AVOID_FIELDERS | AVOID_POWERUPS);
@@ -258,7 +258,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     if (nThingsToAvoid & AVOID_SIDELINES)
     {
         float fInterceptScore = fn_800DED80(desire->m_pFielder);
-        bool bHasBall = desire->m_pFielder->m_pBall != NULL;
+        bool bHasBall = desire->m_pFielder->HasBall();
         float fCloseToTheirNet
             = CloseToTheirNet(desire->m_pFielder);
         float fCloseToMyNet
@@ -267,8 +267,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
             = (float)fabs(desire->m_pFielder
                               ->mUnidentified024.m_v3Position.y)
             <= 0.5f * cNet::GetNetWidth() + cNet::GetPostRadius();
-        bool bHasGlobalPad
-            = desire->m_pFielder->GetGlobalPad() != NULL;
+        bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
 
         if (bHasGlobalPad)
         {
@@ -312,11 +311,10 @@ extern "C" void fn_800C60C4(DesireSteering* desire,
     if (desire->m_fTotalWeight >= 0.0f)
     {
         desire->m_fTotalWeight += fWeight;
-        nlVec3Set(desire->m_v3DesiredPos,
-            fWeight * v3Position.x + desire->m_v3DesiredPos.x,
-            fWeight * v3Position.y + desire->m_v3DesiredPos.y,
-            0.0f);
         desire->m_fUrgency += fUrgency * fWeight;
+        nlVec3ScaleAdd(desire->m_v3DesiredPos, fWeight,
+            v3Position, desire->m_v3DesiredPos);
+        desire->m_v3DesiredPos.z = 0.0f;
     }
 }
 
@@ -666,11 +664,18 @@ extern "C" float fn_800C6EB0(cFielder* pFielder)
     return result;
 }
 
+static float ShouldIStrafeMark(cFielder* TheFielder)
+{
+    cFielder* mark = fn_800D6734(TheFielder);
+    float inBetween = InBetweenMyNetAnd(TheFielder, mark);
+    return inBetween;
+}
+
 extern "C" void fn_800C6FDC(DesireSteering* desire, float)
 {
     bool bCanFaceBall = desire->m_pFielder->m_pBall == NULL
                      && !desire->m_pFielder->fn_8003E70C()
-                     && desire->m_pFielder->GetGlobalPad() == NULL
+                     && !HasGlobalPad(desire->m_pFielder)
                      && !(fn_8003E948(desire->m_pFielder)
                           && desire->m_pFielder->mUnidentified3DC)
                      && !desire->m_pFielder->fn_8003EA6C()
@@ -695,9 +700,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
         else
         {
             float fFacingWeight = fn_800C6EB0(desire->m_pFielder);
-            cFielder* pFielder = desire->m_pFielder;
-            float fMarkWeight = InBetweenMyNetAnd(pFielder,
-                fn_800D6734(pFielder));
+            float fMarkWeight = ShouldIStrafeMark(desire->m_pFielder);
             float fTotalWeight = fFacingWeight + fMarkWeight;
             bool bTurning = true;
             bool bStrafing = true;

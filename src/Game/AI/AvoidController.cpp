@@ -94,11 +94,6 @@ inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
     mTimer.SetSeconds(sUnidentifiedMemorySeconds);
 }
 
-inline UnidentifiedAvoidanceValue::UnidentifiedAvoidanceValue()
-{
-    UnidentifiedInitialize(0, 0);
-}
-
 inline void AvoidController::RegisterDebugFields(u16* type, DebugWriteCache* cache)
 {
     *type = cache->BeginType("AvoidController");
@@ -134,9 +129,7 @@ inline void AvoidController::RegisterDebugFields(u16* type, DebugWriteCache* cac
 
 inline bool AvoidController::UnidentifiedCanAvoid(int things)
 {
-    bool bCanAvoid = false;
-    if ((m_ThingsToAvoid & things) && Incapacitated(m_pFielder) == 0.0f)
-        bCanAvoid = true;
+    bool bCanAvoid = (m_ThingsToAvoid & things) && !Incapacitated(m_pFielder);
     bool result = bCanAvoid;
     switch (things)
     {
@@ -781,6 +774,11 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
 }
 
+UnidentifiedAvoidanceValue::UnidentifiedAvoidanceValue()
+{
+    UnidentifiedInitialize(0, 0);
+}
+
 void UnidentifiedAvoidanceValue::Update(float fDeltaT)
 {
     float fUnidentifiedPrevious = mUnidentified018 > 0.0f;
@@ -843,9 +841,8 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
         }
         else
         {
-            nlVector3 value = mUnidentified02C.UnidentifiedLast();
-            nlVec3Scale(value, mUnidentified024.GetSeconds() / 0.3f);
-            mUnidentified02C.Update(mUnidentified00C, value, fDeltaT);
+            mUnidentified02C.Update(mUnidentified00C,
+                mUnidentified02C.UnidentifiedLast(), fDeltaT, 0.3f, &mUnidentified024);
         }
     }
     if (!fUnidentifiedPrevious && mUnidentified018)

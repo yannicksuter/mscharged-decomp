@@ -103,14 +103,7 @@ inline float RandomizedValue(float base, float range)
     float randomOffset = nlRandomf(halfRange, &uSeed);
     unsigned int randomSign = nlRandom(0x7FFFFFFF, &uSeed);
 
-    if (randomSign & 1)
-    {
-        return result + randomOffset;
-    }
-    else
-    {
-        return result - randomOffset;
-    }
+    return (randomSign & 1) ? result + randomOffset : result - randomOffset;
 }
 
 inline float RandomizedValue(float value)

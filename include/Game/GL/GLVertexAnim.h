@@ -17,6 +17,7 @@ public:
     GLVertexAnim(const void* data, const void* extraData);
     ~GLVertexAnim();
 
+    int GetNumFrames() const { return m_nNumFrames; }
     glModel* GetModel(int frame);
     void Update(float dt);
 

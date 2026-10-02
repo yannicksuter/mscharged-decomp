@@ -725,6 +725,7 @@ void NetworkStatsManager::ReportGameResult(int result,
         for (int category = 0; category < categoryCount; ++category)
         {
             int oldPoints = mLocalStats[category].mScore;
+            NetworkRankingMeta* localStats = &mLocalStats[category];
             int pointsScored = details.mPoints;
             bool startFresh = false;
 
@@ -736,7 +737,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                     startFresh = true;
                 }
             }
-            else if (IsNewNetworkSeason(&mLocalStats[category]))
+            else if (IsNewNetworkSeason(localStats))
             {
                 tDebugPrintManager::Print(DC_NETWORK, "New season starting score fresh\n");
                 startFresh = true;
@@ -824,7 +825,7 @@ void NetworkStatsManager::ReportGameResult(int result,
                 mLocalStats[category].mLosses,
                 mLocalStats[category].mUnidentified14);
 
-            mLocalStats[category].LoadLocal();
+            localStats->LoadLocal();
         }
 
         if (categoryCount == 2)

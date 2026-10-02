@@ -3228,10 +3228,7 @@ extern "C" void FuzzyAISetPlayerParameter_800E8CB8(
     UnidentifiedVariant_80054AB8* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
-    FuzzyVariant variant;
-    variant.mType = FT_PLAYER;
-    variant.mData.pPlayer = value;
-    action->ExtraData.Set(index, variant);
+    action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
 extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
@@ -3260,10 +3257,7 @@ extern "C" void FuzzyAISetFielderParameter(
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mIndex);
     int index = FuzzyFindParameterIndex(parameterHash);
-    FuzzyVariant variant;
-    variant.mType = FT_PLAYER;
-    variant.mData.pPlayer = fielder;
-    action->ExtraData.Set(index, variant);
+    action->ExtraData.Set(index, FuzzyVariant((cPlayer*)fielder));
 }
 
 extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnPlayer(

@@ -227,16 +227,6 @@ bool ModeledScreenTransition::ConsumeScreenGrabRequest()
     return false;
 }
 
-static inline u32 glAllocSetMatrix(const nlMatrix4& matrix)
-{
-    u32 handle = glAllocMatrix();
-    if (handle != 0xFFFFFFFF)
-    {
-        glSetMatrix(handle, matrix);
-    }
-    return handle;
-}
-
 void ModeledScreenTransition::Render(GLView* view)
 {
     for (unsigned long i = 0; i < m_nModels; i++)

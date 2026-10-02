@@ -39,12 +39,17 @@ static void NewClientCallback(int index, void* param);
 static void FriendMatchCallback(DWCError error, BOOL cancelled, BOOL self,
     BOOL isServer, int index, void* param);
 
-NetworkLobby::NetworkLobby()
+void NetworkLobby::InitializeReceiveBuffers()
 {
     for (int i = 0; i < 4; ++i)
     {
         mReceiveBuffers[i] = nlMalloc(0x4000, 8, false);
     }
+}
+
+NetworkLobby::NetworkLobby()
+{
+    InitializeReceiveBuffers();
 
     mReceiverRegistered = false;
     Reset();

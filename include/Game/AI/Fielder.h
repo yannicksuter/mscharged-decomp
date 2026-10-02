@@ -315,9 +315,7 @@ public:
     }
     bool UnidentifiedInvincibleStatus2() const
     {
-        bool result = false;
-        if (!IsStuck() && (muInvincibleStatus & 2))
-            result = true;
+        bool result = !IsStuck() && (muInvincibleStatus & 2);
         return result;
     }
     bool IsInvincibleChars() const

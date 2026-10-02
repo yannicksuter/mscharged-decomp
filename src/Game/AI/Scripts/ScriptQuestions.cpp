@@ -28,6 +28,7 @@
 #include "Game/Sys/debug.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "types.h"
+#include "NL/nlMath.inl"
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
@@ -1695,15 +1696,8 @@ float GoalieOutOfPosition(cFielder* pFielder)
 
     const nlVector3& offNetLocation = pFielder->GetAIOffNetLocation(NULL);
 
-    nlVector2 fielderDelta;
-    fielderDelta.x = pFielder->mUnidentified024.m_v3Position.x - offNetLocation.x;
-    fielderDelta.y = pFielder->mUnidentified024.m_v3Position.y - offNetLocation.y;
-    float fielderDistance = nlSqrt(nlVec2LengthSquared(fielderDelta), true);
-
-    nlVector2 goalieDelta;
-    nlVec2Sub(goalieDelta, *(const nlVector2*)&pGoalie->GetPosition(),
-        *(const nlVector2*)&goalieNetPos);
-    float goalieDistance = nlVec2Length(goalieDelta);
+    float fielderDistance = fn_800D1C80(pFielder->mUnidentified024.m_v3Position, offNetLocation);
+    float goalieDistance = fn_800D1C80(pGoalie->mUnidentified024.m_v3Position, goalieNetPos);
 
     if (!((double)fielderDistance > 0.0))
     {

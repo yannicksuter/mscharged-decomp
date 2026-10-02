@@ -548,8 +548,7 @@ void FuzzyRuntimeBase::SetActionParameter(
     UnidentifiedVariant_80054AB8* action, int index,
     Variant& value)
 {
-    FuzzyVariant variant(value);
-    action->ExtraData.Set(index, variant);
+    action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
 extern "C" void FuzzySetBoolParameter(
