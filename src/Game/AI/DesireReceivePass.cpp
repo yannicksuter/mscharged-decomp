@@ -425,12 +425,12 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             {
                 if (meReceiveAnimType & 4)
                 {
-                    float fMinPassSpeed = fn_8002CFC4(m_pFielder->GetTweaks());
-                    float fMaxPassSpeed = fn_8002C730(m_pFielder->GetTweaks());
+                    float fMinPassSpeed = GetSlowestVolleyPassSpeed(m_pFielder->GetTweaks());
+                    float fMaxPassSpeed = GetFastestVolleyPassSpeed(m_pFielder->GetTweaks());
                     if (!mbOneTouchVolley)
                     {
-                        fMinPassSpeed = fn_8002C6E8(m_pFielder->GetTweaks());
-                        fMaxPassSpeed = fn_8002C678(m_pFielder->GetTweaks());
+                        fMinPassSpeed = GetSlowestGroundPassSpeed(m_pFielder->GetTweaks());
+                        fMaxPassSpeed = GetFastestGroundPassSpeed(m_pFielder->GetTweaks());
                     }
                     m_pFielder->DoRegularPassing(mpOneTouchPassTarget,
                         mbOneTouchVolley, true, false, false, fMinPassSpeed, fMaxPassSpeed);

@@ -21,6 +21,7 @@ struct CharacterImpactEvent;
 struct GoalieSaveData;
 struct PlayerAttackData;
 struct CollisionPlayerWallData;
+struct UnidentifiedEventData_800673FC;
 class cFielder;
 class cPlayer;
 
@@ -266,6 +267,10 @@ extern "C" void fn_8005E9FC(void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 
 extern "C" void fn_8005FA2C(cGame* pGame);
+extern "C" void fn_8005FC1C(cGame* pGame, UnidentifiedEventData_800673FC* pEventData);
+extern "C" void fn_8005FE18(cGame* pGame, UnidentifiedEventData_800673FC* pEventData);
+extern "C" void fn_80060014(cGame* pGame, UnidentifiedEventData_800673FC* pEventData);
+extern "C" void fn_80060210(cGame* pGame, UnidentifiedEventData_800673FC* pEventData);
 extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder);
 extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData);
 

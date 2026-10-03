@@ -133,6 +133,7 @@ bool HasTransitionFunc(const TransitionFunc* transition);
 extern "C" void fn_80318D34( UnidentifiedScriptMachine* machine, int state, const char* name, bool secondary);
 extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
 extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
+extern "C" void fn_80319E58(UnidentifiedScriptMachine* machine, int state);
 extern "C" shdStateMachine* fn_80319E84(UnidentifiedScriptMachine* machine, int state, UnidentifiedVariantCollection* parameters, bool reinitialize);
 extern "C" shdStateMachine* fn_80319F94( UnidentifiedScriptMachine* machine, int state);
 extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine* machine, int state);

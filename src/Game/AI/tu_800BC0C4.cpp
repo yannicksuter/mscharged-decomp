@@ -47,7 +47,7 @@ static nlVector2 lbl_806DC188 = { 0.1f, 0.0f };
 bool DesireStar::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    mMaxDuration = fn_8002CFD8(m_pFielder->GetTweaks());
+    mMaxDuration = GetStarEffectTime(m_pFielder->GetTweaks());
     m_pFielder->muInvincibleStatus |= 0x1F;
     EmitStar(m_pFielder, false);
     return result;
@@ -61,7 +61,7 @@ bool DesireStar::Reinitialize(void* context)
     mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
     mAgeTimer.m_uPackedTime = 0;
     bool result = Desire::Initialize(context);
-    mMaxDuration = fn_8002CFD8(m_pFielder->GetTweaks());
+    mMaxDuration = GetStarEffectTime(m_pFielder->GetTweaks());
     EmitStar(m_pFielder, true);
     return result;
 }
@@ -118,7 +118,7 @@ void DesireStar::Cleanup()
 bool DesireMushroom::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    mMaxDuration = fn_8002C7D0(m_pFielder->GetTweaks());
+    mMaxDuration = GetMushroomEffectTime(m_pFielder->GetTweaks());
     fn_8002E340(m_pFielder);
     if (!m_pFielder->fn_8003E74C())
     {
@@ -312,7 +312,7 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->fn_8003063C(source->mUnidentified328);
     m_pFielder->m_pTweaks->mUnidentified004
         = m_pFielder->mUnidentified32C->mUnidentified004.GetValue();
-    m_pFielder->m_pTweaks->mUnidentified014
+    m_pFielder->m_pTweaks->fWidth
         = fn_8002BFA8(m_pFielder->mUnidentified32C, 1.0f);
     CreateMushroomEffect(m_pFielder);
 

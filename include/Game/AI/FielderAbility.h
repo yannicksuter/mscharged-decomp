@@ -3,9 +3,9 @@
 
 class WaluigiWallManager;
 
-struct UnidentifiedFielderAbility3E8
+struct ActBowserSuper
 {
-    UnidentifiedFielderAbility3E8()
+    ActBowserSuper()
         : nextFireballTime(0.0f)
         , fireballStageTime(0.0f)
         , fireballStageNum(0)
@@ -19,9 +19,9 @@ struct UnidentifiedFielderAbility3E8
     /* 0x08 */ int fireballStageNum;
 }; // size: 0xC
 
-struct UnidentifiedAbilityEffect
+struct WaluigiWallState
 {
-    UnidentifiedAbilityEffect()
+    WaluigiWallState()
         : mUnidentified00(0.0f)
         , mUnidentified04(0.0f)
     {
@@ -35,6 +35,6 @@ struct UnidentifiedAbilityEffect
 }; // size: 0xC
 
 
-extern float lbl_806DB9D8;
+extern float gDKSuperShockwaveRadius;
 
 #endif // GAME_AI_FIELDER_ABILITY_H

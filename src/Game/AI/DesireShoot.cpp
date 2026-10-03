@@ -156,7 +156,7 @@ bool DesireShoot::Initialize(void* context)
 
     if (fn_8003C180(m_pFielder))
     {
-        float fRange = fn_8002C7E8(m_pFielder->GetTweaks()) - 0.2f;
+        float fRange = GetShootingWindupTime(m_pFielder->GetTweaks()) - 0.2f;
         m_pFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)fRange);
     }
 

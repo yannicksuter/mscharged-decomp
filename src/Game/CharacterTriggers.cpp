@@ -340,7 +340,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xAC352365:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                ((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_8004F8E8();
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->DoDKSuperHit();
             }
             break;
 

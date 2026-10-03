@@ -669,7 +669,7 @@ void HUDCaptainMeter::Update(float fDeltaT)
             m_pPowerBarContainer[i]->m_bVisible = false;
             m_pPowerUpPad[i]->SetActiveSlide("tank", false, true);
             mMeterShown[i] = true;
-            float fScale = mMeterFullScale[i] * pCaptain->fn_8004FFF8();
+            float fScale = mMeterFullScale[i] * pCaptain->GetSuperPowerTankFraction();
             feVector3 scale = m_pMeterFill[i]->GetScale();
             if (fScale > mMeterFullScale[i])
             {

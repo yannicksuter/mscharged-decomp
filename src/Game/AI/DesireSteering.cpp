@@ -563,11 +563,11 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         case PSS_NEAR_SEEKING:
             fMinSpeed = fMinimumSpeedScale
                       * fn_8002CE14(desire->m_pFielder->GetTweaks());
-            fMaxSpeed = fn_8002BFB8(desire->m_pFielder->GetTweaks());
+            fMaxSpeed = GetRunSpeed(desire->m_pFielder->GetTweaks());
             fMinSpeed = nlMinEquals(fMinSpeed, fMaxSpeed);
             break;
         case PSS_FAR_SEEKING:
-            fMinSpeed = fn_8002BFB8(desire->m_pFielder->GetTweaks());
+            fMinSpeed = GetRunSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = fn_8002C254(desire->m_pFielder->GetTweaks());
             break;
         default:
@@ -576,7 +576,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
 
         if (turboRequest == TR_FORCED_OFF)
         {
-            float fRunningSpeed = fn_8002BFB8(desire->m_pFielder->GetTweaks());
+            float fRunningSpeed = GetRunSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = nlMinEquals(fMaxSpeed, fRunningSpeed);
         }
         else if (turboRequest == TR_FORCED_ON
@@ -792,8 +792,8 @@ extern "C" eStrafeDirection fn_800C7348(DesireSteering* desire,
 
     float fRunThreshold
         = 0.5f * (fn_8002C254(desire->m_pFielder->GetTweaks())
-              - fn_8002BFB8(pFielder->GetTweaks()))
-        + fn_8002BFB8(desire->m_pFielder->GetTweaks());
+              - GetRunSpeed(pFielder->GetTweaks()))
+        + GetRunSpeed(desire->m_pFielder->GetTweaks());
     float fDesiredSpeed = desire->m_pFielder->mUnidentified024.m_fDesiredSpeed;
 
     if (fDesiredSpeed < 0.1f)

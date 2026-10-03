@@ -47,6 +47,9 @@ Decompilation
 
 Decompilation is the process of reverse-engineering compiled machine code back into human-readable source code. Unlike disassembly, which produces assembly language, decompilation aims to reconstruct high-level code (like C or C++) that closely matches what the original developers wrote. This process involves analyzing the binary executable, understanding its structure and behavior, and translating it back into source code that compiles to produce identical machine code. In this project, the goal is not just a close match, but a **100% match**—the decompiled source code must compile to produce byte-for-byte identical machine code to the original. This is why diffing (see the [Diffing](#diffing) section below) is an essential piece of the process, as it allows us to verify that our decompiled code produces exactly the same binary output as the original game. Decompilation projects like this one enable deeper understanding of game mechanics, facilitate modding and preservation, and serve as valuable learning resources for understanding how games were built.
 
+> [!NOTE]
+> **On the use of AI.** *Mario Strikers Charged* shipped without any debug information. After finishing the [*Super Mario Strikers* decompilation](https://github.com/yannicksuter/smstrikers-decomp), I was fairly certain that a large part of its code had been carried over into the sequel. AI was used mainly to correlate this game's translation units with likely donor classes from the predecessor, and to review the matches found this way. This gave the project a substantial head start and allowed it to progress quickly.
+
 Progress
 ========
 

@@ -201,7 +201,7 @@ bool DesireSuperPower::Initialize(void* context)
         mpTarget = 0;
         fn_8002E3F8(m_pFielder);
         mMaxDuration = gBowserSuperPowerTimeLimit;
-        m_pFielder->fn_800501F0(
+        m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         EmitBowserSmoke(m_pFielder);
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
@@ -236,8 +236,8 @@ bool DesireSuperPower::Initialize(void* context)
         mpDKShockAvoidable = new (nlMalloc(sizeof(AvoidablePoint), 8, false))
             AvoidablePoint(AVOID_BOWSER,
                 (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
-                4.0f + lbl_806DB9D8);
-        m_pFielder->fn_8004F828();
+                4.0f + gDKSuperShockwaveRadius);
+        m_pFielder->InitActionDKSuper();
         mMaxDuration = gDKSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
@@ -258,7 +258,7 @@ bool DesireSuperPower::Initialize(void* context)
         result = true;
         break;
     case LUIGI:
-        m_pFielder->fn_8004FB04();
+        m_pFielder->InitActionPeachSuper();
         mMaxDuration = gPeachSuperPowerTimeLimit;
         result = m_pFielder->m_eActionState == (eFielderActionState)29;
         break;
@@ -267,7 +267,7 @@ bool DesireSuperPower::Initialize(void* context)
         mpTarget = 0;
         fn_8002E3F8(m_pFielder);
         mMaxDuration = gPeteySuperPowerTimeLimit;
-        m_pFielder->fn_800501F0(
+        m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         m_pFielder->mUnidentified408 = 0.0f;
         m_pFielder->mUnidentified40C = 0.0f;
@@ -285,7 +285,7 @@ bool DesireSuperPower::Initialize(void* context)
     case MARIO:
         mpTarget = 0;
         mMaxDuration = gWaluigiWarioSuperPowerTimeLimit;
-        m_pFielder->fn_800501F0(
+        m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         result = true;
         break;
@@ -293,7 +293,7 @@ bool DesireSuperPower::Initialize(void* context)
     {
         mpTarget = 0;
         mMaxDuration = gWaluigiWarioSuperPowerTimeLimit;
-        m_pFielder->fn_800501F0(
+        m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
         bool userControlled = (bool)m_pFielder->GetGlobalPad();
         if (!userControlled
@@ -407,7 +407,7 @@ void DesireSuperPower::Cleanup()
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
-        m_pFielder->fn_80050008();
+        m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         EndBowserSmoke(m_pFielder);
         break;
@@ -449,14 +449,14 @@ void DesireSuperPower::Cleanup()
         EmitSuperShrink(m_pFielder);
         break;
     case LUIGI:
-        m_pFielder->fn_8004FA34();
+        m_pFielder->CleanUpPeachSuper();
         SetFlyingCameraTarget((cFielder*)0);
         break;
     case YOSHI:
         fn_80038158(m_pFielder, 0);
         m_pFielder->mUnidentified404 = 0.0f;
         m_pFielder->mUnidentified408 = 0.0f;
-        m_pFielder->fn_80050008();
+        m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         if (m_pFielder->m_eAnimID == 104)
         {
@@ -469,11 +469,11 @@ void DesireSuperPower::Cleanup()
         {
             m_pFielder->EndDesire();
         }
-        m_pFielder->fn_80050008();
+        m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         break;
     case PEACH:
-        m_pFielder->fn_80050008();
+        m_pFielder->ClearSuperPowerTank();
         m_pFielder->m_pTeam->ClearCurrentPowerUp();
         if (m_pFielder->m_eAnimID == 104)
         {
@@ -513,7 +513,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
             if (!m_pFielder->mUnidentified3DC)
             {
-                m_pFielder->fn_80050284();
+                m_pFielder->TurnOnSuperPowerTank();
             }
         }
         else if (m_pFielder->mUnidentified3DC)
@@ -812,7 +812,7 @@ void DesireSuperPower::UpdateDiddy(DesireUpdate* update, float fDeltaT)
  */
 void DesireSuperPower::UpdateDK(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->fn_8004F974(fDeltaT);
+    m_pFielder->ActionDKSuper(fDeltaT);
 
     if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
@@ -918,7 +918,7 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
  */
 void DesireSuperPower::UpdatePeach(DesireUpdate* update, float fDeltaT)
 {
-    m_pFielder->fn_8004FC90(fDeltaT);
+    m_pFielder->ActionPeachSuper(fDeltaT);
 
     if (m_pFielder->IsActionDone() || !g_pGame->IsGameplayOrOvertime())
     {
@@ -953,7 +953,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
             if (!m_pFielder->mUnidentified3DC)
             {
-                m_pFielder->fn_80050284();
+                m_pFielder->TurnOnSuperPowerTank();
             }
         }
         else if (m_pFielder->mUnidentified3DC)
@@ -1158,7 +1158,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                     bool active = m_pFielder->mUnidentified3E0 > 0.0f;
                     if (active && fn_8002EDC8(m_pFielder, -1))
                     {
-                        m_pFielder->fn_80050284();
+                        m_pFielder->TurnOnSuperPowerTank();
                         m_pFielder->fn_8003057C(0);
                     }
                 }
@@ -1516,7 +1516,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
         {
             mpTarget = (cFielder*)update->ExtraData.Get(14)->mData.pointer;
             if (!m_pFielder->mUnidentified3DC)
-                m_pFielder->fn_80050284();
+                m_pFielder->TurnOnSuperPowerTank();
         }
         else if (m_pFielder->mUnidentified3DC)
             m_pFielder->fn_8005001C(false);

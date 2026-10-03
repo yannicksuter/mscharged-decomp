@@ -391,18 +391,18 @@ public:
     bool InitActionPass(
         cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bIsOneTouchPass);
     void ActionPass(float fDeltaT);
-    void fn_8004F828();
-    void fn_8004F8E8();
-    void fn_8004F974(float fDeltaT);
-    void fn_8004FA34();
-    void fn_8004FB04();
-    void fn_8004FC90(float fDeltaT);
+    void InitActionDKSuper();
+    void DoDKSuperHit();
+    void ActionDKSuper(float fDeltaT);
+    void CleanUpPeachSuper();
+    void InitActionPeachSuper();
+    void ActionPeachSuper(float fDeltaT);
     void fn_8004FF40();
-    float fn_8004FFF8();
-    void fn_80050008();
+    float GetSuperPowerTankFraction();
+    void ClearSuperPowerTank();
     void fn_8005001C(bool bForce);
-    void fn_800501F0(bool bParam);
-    bool fn_80050284();
+    void InitSuperPowerTank(bool bTurnOn);
+    bool TurnOnSuperPowerTank();
     void fn_80045AEC(PhysicsObject* pObject);
     void ActionPostWhistle(float fDeltaT);
     void ShootBallDueToContact(const nlVector3& v3IncomingVelocity);
@@ -586,9 +586,9 @@ private:
 public:
     /* 0x3E0 */ float mUnidentified3E0;
     /* 0x3E4 */ float mUnidentified3E4;
-    /* 0x3E8 */ UnidentifiedFielderAbility3E8 mUnidentified3E8;
+    /* 0x3E8 */ ActBowserSuper mUnidentified3E8;
     /* 0x3F4 */ float mUnidentified3F4;
-    /* 0x3F8 */ UnidentifiedAbilityEffect mUnidentified3F8;
+    /* 0x3F8 */ WaluigiWallState mUnidentified3F8;
 
 private:
     /* 0x404 */ float mUnidentified404;

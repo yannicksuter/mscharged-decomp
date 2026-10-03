@@ -1230,7 +1230,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
                 || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
             && !pCaptain->mUnidentified3DC)
         {
-            pCaptain->fn_80050284();
+            pCaptain->TurnOnSuperPowerTank();
         }
         bool bCaptainPowerup = pSelf->UnidentifiedPowerupPredicate();
         if (bCaptainPowerup)

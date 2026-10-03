@@ -255,7 +255,7 @@ void cFielder::asmRunning()
     s16 nAbsActualToDesiredMovementDirection = (s16)(u16)abs_s16(
         (s16)(mUnidentified024.m_aDesiredMovementDirection - mUnidentified024.m_aActualMovementDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
+        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->fMovementSpeed);
     bool bFirstTime;
 
     do
@@ -283,7 +283,7 @@ void cFielder::asmRunning()
                 }
                 else
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BA94(this, lbl_806E3538[0]);
                 }
             }
@@ -303,7 +303,7 @@ void cFielder::asmRunning()
             case 0:
             case 3:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredFacingDirection >= 0x3A98)
                     {
@@ -434,7 +434,7 @@ void cFielder::asmRunning()
             case 0:
             case 1:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B664(this);
                 }
@@ -463,7 +463,7 @@ void cFielder::asmRunning()
             case 0:
             case 2:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B5FC(this);
                 }
@@ -513,7 +513,7 @@ void cFielder::asmRunning()
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
+                        < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
                     }
@@ -555,7 +555,7 @@ void cFielder::asmRunning()
             case 0:
                 mUnidentified024.m_fDesiredSpeed = 0.0f;
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -568,7 +568,7 @@ void cFielder::asmRunning()
                 break;
             case 3:
                 if (mUnidentified024.m_fActualSpeed
-                    < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
+                    < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003A2D0(this, -1);
                 }
@@ -592,7 +592,7 @@ void cFielder::asmRunning()
                     < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                        > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
                     }
@@ -616,7 +616,7 @@ void cFielder::asmRunning()
             {
             case 0:
                 if (mUnidentified024.m_fActualSpeed
-                    > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                    > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
                     fn_8003B54C(this);
                 }
@@ -629,7 +629,7 @@ void cFielder::asmRunning()
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        < fSpeedFactor * fn_8002BFB8(this->GetTweaks()))
+                        < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003A2D0(this, -1);
                     }
@@ -696,7 +696,7 @@ void cFielder::asmRunning()
             {
                 if (mUnidentified024.m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BA94(this, lbl_806E3538[0]);
                 }
                 else
@@ -725,7 +725,7 @@ void cFielder::asmRunningWB(float fDeltaT)
     s16 nAbsActualToDesiredFacingDirection = (s16)(u16)abs_s16(
         (s16)(mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection));
     float fSpeedFactor = InterpolateRangeClamped(
-        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->mUnidentified034);
+        0.96f, 0.6f, 0.0f, 0.5f, this->GetTweaks()->fMovementSpeed);
     bool bFirstTime;
 
     do
@@ -768,7 +768,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 }
                 else
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BE14(this, lbl_806E3538[0]);
                 }
             }
@@ -845,7 +845,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                     < fn_8002CE14(this->GetTweaks()) - 0.15f)
                 {
                     if (mUnidentified024.m_fActualSpeed
-                        > 0.6f * fn_8002BFB8(this->GetTweaks()))
+                        > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
                         fn_8003B54C(this);
                     }
@@ -937,7 +937,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 else if (mUnidentified024.m_fDesiredSpeed
                          >= fn_8002CE14(this->GetTweaks()))
                 {
-                    mUnidentified024.m_fActualSpeed = fn_8002BFB8(this->GetTweaks());
+                    mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
                     fn_8003BE14(this, lbl_806E3538[0]);
                 }
                 else
@@ -1018,8 +1018,8 @@ void cFielder::fn_80043C18(float fDeltaT)
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
                 mUnidentified024.m_aDesiredFacingDirection,
-                fn_8002CF88(this->GetTweaks()),
-                fn_8002CF9C(this->GetTweaks()),
+                GetShotWindupTurnSpeed(this->GetTweaks()),
+                GetShotWindupTurnFalloff(this->GetTweaks()),
                 fDeltaT),
             true);
 
@@ -1210,8 +1210,8 @@ void cFielder::fn_80044290(float fDeltaT)
             SetFacingDirection(
                 SeekDirection(mUnidentified024.m_aActualFacingDirection,
                     mUnidentified024.m_aDesiredFacingDirection,
-                    fn_8002CF88(this->GetTweaks()),
-                    fn_8002CF9C(this->GetTweaks()),
+                    GetShotWindupTurnSpeed(this->GetTweaks()),
+                    GetShotWindupTurnFalloff(this->GetTweaks()),
                     fDeltaT),
                 true);
         }
@@ -1801,8 +1801,8 @@ void cFielder::fn_80045C74(float fDeltaT)
         SetFacingDirection(
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
                 mUnidentified024.m_aDesiredFacingDirection,
-                fn_8002CF88(this->GetTweaks()),
-                fn_8002CF9C(this->GetTweaks()),
+                GetShotWindupTurnSpeed(this->GetTweaks()),
+                GetShotWindupTurnFalloff(this->GetTweaks()),
                 fDeltaT),
             true);
 
@@ -3674,7 +3674,7 @@ void cFielder::InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam)
     InitMovementFromAnim(
         (s16)(nTurnAdjust + facingDelta2), v3Zero, 0.6f, false);
 
-    DoRegularPassing(pPlayer, bParam, true, true, bParam, fn_8002CFC4(this->GetTweaks()), fn_8002C730(this->GetTweaks()));
+    DoRegularPassing(pPlayer, bParam, true, true, bParam, GetSlowestVolleyPassSpeed(this->GetTweaks()), GetFastestVolleyPassSpeed(this->GetTweaks()));
 
     mUnidentified371 = true;
 }
@@ -3769,12 +3769,12 @@ void cFielder::ActionPass(float fDeltaT)
 {
     if (m_pBall != 0 && m_pCurrentAnimController->TestFrameTrigger(1.0f))
     {
-        float fA = fn_8002CFC4(this->GetTweaks());
-        float fB = fn_8002C730(this->GetTweaks());
+        float fA = GetSlowestVolleyPassSpeed(this->GetTweaks());
+        float fB = GetFastestVolleyPassSpeed(this->GetTweaks());
         if (!bIsModified)
         {
-            fA = fn_8002C6E8(this->GetTweaks());
-            fB = fn_8002C678(this->GetTweaks());
+            fA = GetSlowestGroundPassSpeed(this->GetTweaks());
+            fB = GetFastestGroundPassSpeed(this->GetTweaks());
         }
         DoRegularPassing(mUnidentified36C, bIsModified, mUnidentified370, false, false, fA, fB);
     }
@@ -4051,9 +4051,9 @@ void cFielder::fn_8004B148()
         }
     }
 
-    if (mUnidentified024.m_fActualSpeed < fn_8002C5A4(this->GetTweaks()))
+    if (mUnidentified024.m_fActualSpeed < GetTurboWBSpeed(this->GetTweaks()))
     {
-        float fMinSpeed = fn_8002C5A4(this->GetTweaks());
+        float fMinSpeed = GetTurboWBSpeed(this->GetTweaks());
         mUnidentified024.m_fActualSpeed = fMinSpeed;
         mUnidentified024.m_fDesiredSpeed = fMinSpeed;
     }
@@ -4111,7 +4111,7 @@ void cFielder::fn_8004B2E4(float fDeltaT)
 
         if (gbUseTurboCharging != 0)
         {
-            float fValue = this->GetTweaks()->mUnidentified034;
+            float fValue = this->GetTweaks()->fMovementSpeed;
             float fFraction
                 = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fValue);
             float fCharge = Interpolate(lbl_806DB980, lbl_806DB984, fFraction);
@@ -4144,7 +4144,7 @@ void cFielder::fn_8004B658()
         SetAction(ACTION_UNKNOWN_30);
         DoResetShotMeter(0.0f);
         fn_8003A544(this);
-        InitMovementRunningNoTurn(0.0f, fn_8002CFB0(this->GetTweaks()));
+        InitMovementRunningNoTurn(0.0f, GetShotWindupDecel(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         if (mUnidentified024.m_fActualSpeed > this->GetTweaks()->GetRunningSpeed())
         {
@@ -4267,7 +4267,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
         }
 
         float fSpeed = mUnidentified024.m_fActualSpeed;
-        InitMovementRunningNoTurn(0.0f, fSpeed / fn_8002C7E8(this->GetTweaks()));
+        InitMovementRunningNoTurn(0.0f, fSpeed / GetShootingWindupTime(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
 
         nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
@@ -4288,11 +4288,11 @@ void cFielder::fn_8004BB80(float fDeltaT)
     mUnidentified024.m_aDesiredFacingDirection = nlVector3ToAngle(v3Delta);
 
     SetFacingDirection(
-        SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, fn_8002CF88(this->GetTweaks()), fn_8002CF9C(this->GetTweaks()), fDeltaT),
+        SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, GetShotWindupTurnSpeed(this->GetTweaks()), GetShotWindupTurnFalloff(this->GetTweaks()), fDeltaT),
         false);
 
     float fChargeTime = m_pShotMeter->m_fTime;
-    fChargeTime = fn_8002C7E8(this->GetTweaks()) - fChargeTime;
+    fChargeTime = GetShootingWindupTime(this->GetTweaks()) - fChargeTime;
     if (fChargeTime < 0.01f)
     {
         fChargeTime = 0.01f;
@@ -4389,7 +4389,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
             SeekDirection(mUnidentified024.m_aActualFacingDirection,
                 mUnidentified024.m_aDesiredFacingDirection,
                 200000.0f,
-                fn_8002CF9C(this->GetTweaks()),
+                GetShotWindupTurnFalloff(this->GetTweaks()),
                 fDeltaT),
             false);
     }
@@ -4455,7 +4455,7 @@ void cFielder::InitActionSlideAttack(
         SetAction(ACTION_SLIDE_ATTACK);
         SetAnimState(0x5E, true, 0.2f, false, false);
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(this->GetTweaks()), fn_8002CF24(this->GetTweaks()));
-        mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(fn_8002C800(this->GetTweaks()));
+        mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(GetSlideTime(this->GetTweaks()));
 
         mUnidentified388 = 0;
         bAttackSucceeded = false;
@@ -4700,7 +4700,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         {
             PlayRumbleAction(1, GetGlobalPad());
             mUnidentified388 = 1;
-            mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(fn_8002C8D4(this->GetTweaks()));
+            mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(GetSlideDecelTime(this->GetTweaks()));
         }
         break;
     }

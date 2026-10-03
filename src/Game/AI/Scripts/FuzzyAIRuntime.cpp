@@ -27,13 +27,6 @@ struct FuzzyFielderIterator
     cFielder* mSkip;
 };
 
-struct FuzzyFielderReference
-{
-    int mIndex;
-    u8 mUnidentified004[0x04];
-    cTeam* mTeam;
-};
-
 
 SlotPool<FuzzyFielderIterator> g_FuzzyFielderIteratorPool(16, 16);
 
@@ -219,52 +212,52 @@ extern "C" void FuzzyAISetBallParameter(
     action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
-extern "C" void* fn_800E3BE4(void*, void* value)
+extern "C" void* FuzzyAIPassThrough_800E3BE4(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* fn_800E3BEC(void*, void* value)
+extern "C" void* FuzzyAIPassThrough_800E3BEC(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* fn_800E3BF4(void*, void* value)
+extern "C" void* FuzzyAIPassThrough_800E3BF4(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* fn_800E3BFC(void*, void* value)
+extern "C" void* FuzzyAIPassThrough_800E3BFC(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* fn_800E3C04(void*, void* value)
+extern "C" void* FuzzyAIPassThrough_800E3C04(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* fn_800E3C0C(void*, void* value)
+extern "C" void* FuzzyAIPassThrough_800E3C0C(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* fn_800E3C14(void*, Variant* value)
+extern "C" void* FuzzyAIGetVariantPointer_800E3C14(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
 
-extern "C" void* fn_800E3C2C(void*, Variant* value)
+extern "C" void* FuzzyAIGetVariantPointer_800E3C2C(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
 
-extern "C" void* fn_800E3C44(void*, Variant* value)
+extern "C" void* FuzzyAIGetVariantPointer_800E3C44(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
 
-extern "C" void* fn_800E3C5C(void*, Variant* value)
+extern "C" void* FuzzyAIGetVariantPointer_800E3C5C(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }

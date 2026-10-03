@@ -371,7 +371,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
     }
     else
     {
-        fAttribute = fn_8002BFB8(pFielder->GetTweaks());
+        fAttribute = GetRunSpeed(pFielder->GetTweaks());
     }
 
     float fInterpolated = Interpolate(fBaseSpeed, fAttribute, 0.3f);
@@ -401,7 +401,7 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
     }
     else
     {
-        fAttribute = fn_8002BFB8(pFielder->GetTweaks());
+        fAttribute = GetRunSpeed(pFielder->GetTweaks());
     }
 
     float fSecondary = fn_8002C254(pFielder->GetTweaks());
@@ -684,7 +684,7 @@ extern "C" float fn_800D7734(cFielder* pFielder)
 
     if (pFielder->m_eClassType == FIELDER)
     {
-        return FMIN(FMAX(pFielder->GetTweaks()->mUnidentified074,
+        return FMIN(FMAX(pFielder->GetTweaks()->fDefenseHittingDistance,
             0.0f), 1.0f);
     }
 
@@ -700,7 +700,7 @@ extern "C" float fn_800D77B0(cFielder* pFielder)
 
     if (pFielder->m_eClassType == FIELDER)
     {
-        return FMIN(FMAX(pFielder->GetTweaks()->mUnidentified054,
+        return FMIN(FMAX(pFielder->GetTweaks()->fDefenseSlideTackle,
             0.0f), 1.0f);
     }
 
@@ -715,7 +715,7 @@ extern "C" float fn_800D782C(cFielder* fielder)
     }
 
     PlayerTweaks* pTweaks = fielder->GetTweaks();
-    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE64(pTweaks));
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetPlaymakerRating(pTweaks));
 }
 
 extern "C" float fn_800D7878(cFielder* fielder)
@@ -737,7 +737,7 @@ extern "C" float fn_800D78C4(cFielder* fielder)
     }
 
     PlayerTweaks* pTweaks = fielder->GetTweaks();
-    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, fn_8002BE18(pTweaks));
+    return InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetOffensiveRating(pTweaks));
 }
 
 extern "C" float fn_800D7910(cFielder* fielder)
@@ -861,7 +861,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->mUnidentified1E4.m_ID);
     if (pFielder->m_eActionState != ACTION_SLIDE_ATTACK && vTarget.z <= 0.35f)
     {
-        float fDuration = fn_8002C800(pFielder->GetTweaks());
+        float fDuration = GetSlideTime(pFielder->GetTweaks());
         float fSpeed = fn_8003C40C(pFielder, pFielder->mUnidentified024.m_aActualFacingDirection);
         float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, vTarget), true);
         float fRadius = pFielder->mUnidentified320->GetRadius();

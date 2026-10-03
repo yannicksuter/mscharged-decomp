@@ -178,7 +178,7 @@ float cTeam::fn_800A8EC0()
     for (int i = 0; i < 4; i++)
     {
         fMovementRating += GetFielder(i)->UnidentifiedGetTweaks()
-                               ->mUnidentified034;
+                               ->fMovementSpeed;
     }
     return fMovementRating / 4.0f;
 }

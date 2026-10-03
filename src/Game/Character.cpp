@@ -1348,7 +1348,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
             unidentifiedSlide = 1.0f;
         }
         float unidentifiedBlend = InterpolateClamped(0.0f,
-            gGameTweaks.mFielderTweaks->mUnidentified464, unidentifiedSlide);
+            gGameTweaks.mFielderTweaks->fTerrainMaxSlipperyMomentum, unidentifiedSlide);
         nlVector2 unidentifiedDelta;
         nlVec2Sub(unidentifiedDelta, *(const nlVector2*)&mUnidentified024.m_v3PrevVelocity,
             *(const nlVector2*)&mUnidentified024.m_v3Velocity);

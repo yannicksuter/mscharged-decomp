@@ -21,7 +21,9 @@
 #include "Game/UnidentifiedTweakAction.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-struct UnidentifiedDebugCameraTarget
+static void ApplyDebugCameraFOV();
+
+struct DebugCameraTarget
 {
     u8 mUnidentified00[0x20];
     nlVector3 mPosition;
@@ -61,7 +63,7 @@ static TweakValueFloat gDebugCameraSensitivity(
 
 static float sDebugCamFOVTweak = sfDebugCamFOV;
 static UnidentifiedTweakAction sDebugCamFOVAction(
-    "Fov", gLastTweakCategory, Function0<void>(fn_800F2504));
+    "Fov", gLastTweakCategory, Function0<void>(ApplyDebugCameraFOV));
 static TweakFloatBinding sSpeed0(
     "Speed 0", "Controller Config/DPD", &sControlTweakValues.speed0);
 static TweakFloatBinding sWeight0(
@@ -78,22 +80,21 @@ static TweakFloatBinding sWeight2(
 static u32 sSightTexture = nlStringLowerHash("global/sight");
 static u32 sLightBlobTexture = nlStringLowerHash("global/light_blob");
 
-
-extern "C" void fn_800F2504()
+static void ApplyDebugCameraFOV()
 {
     sfDebugCamFOV = sDebugCamFOVTweak;
 }
 
-cDebugCamera::cDebugCamera(bool bUnidentified)
+cDebugCamera::cDebugCamera(bool)
     : m_fRadius(10.0f)
     , m_fAzimuth(215.0f)
     , m_fTheta(25.0f)
     , m_fHeight(0.0f)
     , m_pPad(0)
-    , mUnidentified8C(false)
+    , m_bUseWiiControls(false)
     , m_bEnableControls(true)
     , mUnidentified8E(false)
-    , m_bRenderTarget(false)
+    , m_bUpdateTargets(false)
     , m_pTarget(0)
 {
     nlVec3Set(m_vecTarget, 0.0f, 0.0f, 0.0f);
@@ -111,14 +112,14 @@ cDebugCamera::cDebugCamera(bool bUnidentified)
     mUnidentified8E = true;
 }
 
-static inline void ClearTargetEntries(nlDLListContainer<UnidentifiedDebugCameraTarget*>& targets)
+static inline void ClearTargetEntries(nlDLListContainer<DebugCameraTarget*>& targets)
 {
     targets.Clear();
 }
 
 cDebugCamera::~cDebugCamera()
 {
-    nlDLListIterator<UnidentifiedDebugCameraTarget*> iterator = m_Targets.Begin();
+    nlDLListIterator<DebugCameraTarget*> iterator = m_Targets.Begin();
     while (iterator.hasNext())
     {
         delete *iterator;
@@ -126,23 +127,23 @@ cDebugCamera::~cDebugCamera()
     }
     ClearTargetEntries(m_Targets);
 
-    if (mUnidentified8C)
+    if (m_bUseWiiControls)
     {
         g_pPlatPadManager->SetDPDEnabled(m_pPad->m_padIndex, false);
     }
 }
 
-void cDebugCamera::RenderTarget() const
+void cDebugCamera::UpdateTargetPositions()
 {
-    if (!m_bRenderTarget)
+    if (!m_bUpdateTargets)
     {
         return;
     }
 
-    nlDLListIterator<UnidentifiedDebugCameraTarget*> iterator = m_Targets.Begin();
+    nlDLListIterator<DebugCameraTarget*> iterator = m_Targets.Begin();
     iterator.Step();
 
-    UnidentifiedDebugCameraTarget* target;
+    DebugCameraTarget* target;
     for (int i = 0; i < 10; i++)
     {
         target = *iterator;
@@ -170,11 +171,13 @@ void cDebugCamera::RenderTarget() const
         }
     }
 
-    iterator.Step();
-    iterator.Step();
+    for (int i = 0; i < 2; i++)
+    {
+        iterator.Step();
+    }
     if (target != 0)
     {
-        UnidentifiedDebugCameraTarget* ballTarget = *iterator;
+        DebugCameraTarget* ballTarget = *iterator;
         nlVector3 position = { 0.0f, 0.0f, 0.0f };
         if (ReplayManager::Instance()->mRender != 0)
         {
@@ -184,12 +187,12 @@ void cDebugCamera::RenderTarget() const
     }
 }
 
-void cDebugCamera::fn_800F2A8C(float dt)
+void cDebugCamera::UpdateOrbitControls(float dt)
 {
     float x = 0.0f;
     float y = 0.0f;
 
-    if (!mUnidentified8C)
+    if (!m_bUseWiiControls)
     {
         x = m_pPad->AnalogRightX();
         y = m_pPad->AnalogRightY();
@@ -213,7 +216,7 @@ void cDebugCamera::fn_800F2A8C(float dt)
     }
 }
 
-void cDebugCamera::fn_800F2BD0(float dt, float controlSpeed)
+void cDebugCamera::UpdatePanControls(float dt, float controlSpeed)
 {
     float x = 0.0f;
     float y = 0.0f;
@@ -251,9 +254,9 @@ void cDebugCamera::fn_800F2BD0(float dt, float controlSpeed)
     nlVec3Add(m_vecTarget, m_vecTarget, offset);
 }
 
-void cDebugCamera::fn_800F2DA8(float dt, float controlSpeed)
+void cDebugCamera::UpdateRadiusAndHeightControls(float dt, float controlSpeed)
 {
-    bool heightControls = mUnidentified8C
+    bool heightControls = m_bUseWiiControls
         ? m_pPad->IsPressed(0x400, false)
         : m_pPad->IsPressed(12, true);
 
@@ -313,7 +316,7 @@ void cDebugCamera::Update(float dt)
     {
         m_pPad = g_pPadManager->GetPad(0);
         int classID = m_pPad->mBackend->GetClassID();
-        mUnidentified8C = classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
+        m_bUseWiiControls = classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
 
         float yPressure = m_pPad->GetPressure(3, true);
         float xPressure = m_pPad->GetPressure(2, true);
@@ -325,7 +328,7 @@ void cDebugCamera::Update(float dt)
 
         if (m_Targets.m_Head != 0)
         {
-            DLListEntry<UnidentifiedDebugCameraTarget*>* entry = m_pTargetEntry;
+            DLListEntry<DebugCameraTarget*>* entry = m_pTargetEntry;
             if (m_pPad->PlatJustPressed(13, true))
             {
                 if (entry != 0)
@@ -347,13 +350,13 @@ void cDebugCamera::Update(float dt)
 
         if (m_bEnableControls)
         {
-            fn_800F2A8C(dt);
-            fn_800F2BD0(dt, controlSpeed);
-            fn_800F2DA8(dt, controlSpeed);
+            UpdateOrbitControls(dt);
+            UpdatePanControls(dt, controlSpeed);
+            UpdateRadiusAndHeightControls(dt, controlSpeed);
         }
     }
 
-    RenderTarget();
+    UpdateTargetPositions();
 
     if (m_pTarget != 0)
     {

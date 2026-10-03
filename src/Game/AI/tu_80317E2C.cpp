@@ -19,7 +19,6 @@ inline bool ScriptState::Reinitialize(void* context)
     return Initialize(context);
 }
 
-extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 
 char lbl_805302A0[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";

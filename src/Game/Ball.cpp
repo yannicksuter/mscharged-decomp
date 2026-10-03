@@ -2102,7 +2102,7 @@ extern "C" void fn_80016DF8(cBall* pBall, cPlayer* pPlayer,
 
     if (lbl_806DB500 && pPlayer->m_eClassType == FIELDER)
     {
-        float fValue = fn_8002BE64(((cFielder*)pPlayer)->GetTweaks());
+        float fValue = GetPlaymakerRating(((cFielder*)pPlayer)->GetTweaks());
         float fPercent = InterpolateRangeClamped(
             0.0f, 1.0f, 0.5f, 1.0f, fValue);
         float fCharge = Interpolate(lbl_806DB504, lbl_806DB508, fPercent);

@@ -53,25 +53,30 @@ void MiiManager::ResourceLoaded(void* buffer, unsigned long size, void* userData
     g_pMiiManager->LoadResources(buffer);
 }
 
-MiiManager::MiiManager()
-    : mResourcesLoaded(false)
-    , mInitialized(false)
+static inline void InitializeIconTextures(MiiManager& manager)
 {
     for (int i = 0; i < 10; ++i)
     {
         char name[12];
         nlSNPrintf(name, sizeof(name), "mii icon %d", i);
-        mIconTextureIds[i] = glGetTexture(name);
+        manager.mIconTextureIds[i] = glGetTexture(name);
 
         GLResourcePool* resource = glGetCurrentResourcePool();
-        mIconTextures[i] = glx_CreatePlatTexture((MemoryAllocator*)resource);
-        glRegisterTexture(mIconTextureIds[i], mIconTextures[i], resource);
+        manager.mIconTextures[i] = glx_CreatePlatTexture((MemoryAllocator*)resource);
+        glRegisterTexture(manager.mIconTextureIds[i], manager.mIconTextures[i], resource);
 
-        mIconBuffers[i] = nlMalloc(0x8000, 32, false);
-        mIconTextures[i]->CreateWithMemory(
-            128, 128, GXTex_RGB5A3, 1, mIconBuffers[i]);
-        mIconTextures[i]->Prepare();
+        manager.mIconBuffers[i] = nlMalloc(0x8000, 32, false);
+        manager.mIconTextures[i]->CreateWithMemory(
+            128, 128, GXTex_RGB5A3, 1, manager.mIconBuffers[i]);
+        manager.mIconTextures[i]->Prepare();
     }
+}
+
+MiiManager::MiiManager()
+    : mResourcesLoaded(false)
+    , mInitialized(false)
+{
+    InitializeIconTextures(*this);
 
     mMiddleDBBuffer = VirtualAllocator.Allocate(RFLGetMiddleDBBufferSize(1), 32, false);
     RFLInitMiddleDB(&mMiddleDB, RFLMiddleDBType_UserSet, mMiddleDBBuffer, 1);

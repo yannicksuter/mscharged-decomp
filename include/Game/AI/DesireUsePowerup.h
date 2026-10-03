@@ -9,12 +9,12 @@ class AIContext;
 DesireUpdate TransDesireUsePowerup(
     AIContext*);
 extern "C" void fn_800D38D0(DesireUsePowerup*);
-extern "C" void fn_800D3CBC(DesireUsePowerup*);
+void ThrowPowerup(DesireUsePowerup*);
 
 class DesireUsePowerup : public Desire
 {
     friend void fn_800D38D0(DesireUsePowerup*);
-    friend void fn_800D3CBC(DesireUsePowerup*);
+    friend void ThrowPowerup(DesireUsePowerup*);
 public:
     DesireUsePowerup()
         : Desire(17, UnsetTransitionFunc(g_UnsetTransitionFunc))
@@ -34,8 +34,8 @@ public:
     void fn_800D3968(cFielder*, ePowerUpType, bool);
 
 private:
-    void fn_800D3A50(ePowerUpType, int, cFielder*);
-    inline void UnidentifiedResetPowerupState();
+    void SetPowerup(ePowerUpType, int, cFielder*);
+    inline void ResetPowerupState();
 
     cFielder* mpTarget;
     bool mbThrowingPowerup;
