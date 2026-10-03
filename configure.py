@@ -576,7 +576,7 @@ config.libs = [
             Object(Matching, "Game/AnimProps/goalieanimproperties.cpp"),
 
             # Game/Audio
-            Object(NonMatching, "Game/Audio/audio.cpp", extra_cflags=["-inline auto,nobottomup,depth=5", "-ipa file"]),
+            Object(Matching, "Game/Audio/audio.cpp", extra_cflags=["-inline auto,nobottomup,depth=5", "-ipa file", "-sym on"]),
             Object(NonMatching, "Game/Audio/AudioBackend.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/Audio/AudioBankLoader.cpp"),
             Object(Matching, "Game/Audio/AudioBankTable.cpp"),

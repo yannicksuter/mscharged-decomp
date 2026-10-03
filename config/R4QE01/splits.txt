@@ -519,7 +519,7 @@ Game/Audio/audio.cpp:
 	.text       start:0x800EB6AC end:0x800ED8C0
 	.ctors      start:0x804DB5A8 end:0x804DB5AC
 	.data       start:0x80504040 end:0x805041B0
-	.bss        start:0x8056DC00 end:0x8056DC90
+	.bss        start:0x8056DC00 end:0x8056DCA8
 	.sdata      start:0x806DC450 end:0x806DC460
 	.sdata2     start:0x806E42E8 end:0x806E42F8
 
@@ -527,7 +527,7 @@ Game/Audio/GameStreams.cpp:
 	.text       start:0x800ED8C0 end:0x800EDE54
 	.ctors      start:0x804DB5AC end:0x804DB5B0
 	.data       start:0x805041B0 end:0x80504228
-	.bss        start:0x8056DC90 end:0x8056DCD0
+	.bss        start:0x8056DCA8 end:0x8056DCD0
 	.sbss       start:0x806E0E80 end:0x806E0E90
 
 Game/Camera/BaseCam.cpp:
