@@ -13,6 +13,7 @@
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/FuzzyAIRuntime.h"
+#include "Game/AI/FuzzyRuntimeCall.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/SpaceSearch.h"
@@ -62,35 +63,39 @@ extern "C" cPlayer* fn_80096514(
 extern "C" void fn_8002E3F8(cFielder*);
 extern FuzzyVariant fvNotSet;
 extern "C" float fn_800DAD84(const nlVector3&, const nlVector3&, unsigned short,
-                             float, const nlVector2&, const nlVector2&, bool, bool);
-extern "C" UnidentifiedVariant_80054AB8 fn_80099660(
-    FuzzyRuntimeBase*, const char*, cPlayer*);
+    float, const nlVector2&, const nlVector2&, bool, bool);
+
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
 extern "C" bool fn_8003E99C(const cFielder*);
 extern "C" void fn_80015B38(cBall*, bool);
 
-static u16 g_aOOIConstraint = (u16)DegreesToAngle(180.0f);
+float lbl_806DBD80 = 0.75f;
+float lbl_806DBD84 = 0.4f;
+float lbl_806DBD88 = 6.5f;
+bool lbl_806DBD8C = true;
+
 static u8 sbNoBallPickups;
-static int g_nHeadTiltMax = DegreesToAngle(45.0f);
-static int g_nHeadSpinMax = DegreesToAngle(85.0f);
-static int lbl_806E0D7C = DegreesToAngle(65.0f);
-static int lbl_806E0D80 = DegreesToAngle(65.0f);
-static int lbl_806E0D84 = DegreesToAngle(70.0f);
-static int lbl_806E0D88 = DegreesToAngle(10.0f);
-static int lbl_806E0D8C = DegreesToAngle(30.0f);
-static int lbl_806E0D90 = DegreesToAngle(45.0f);
-static int lbl_806E0D94 = DegreesToAngle(10.0f);
-static int lbl_806E0D98 = DegreesToAngle(45.0f);
-static int lbl_806E0D9C = DegreesToAngle(75.0f);
-static int lbl_806E0DA0 = DegreesToAngle(85.0f);
+static const u16 g_aOOIConstraint = (u16)DegreesToAngle(180.0f);
+static const int g_nHeadTiltMax = DegreesToAngle(45.0f);
+static const int g_nHeadSpinMax = DegreesToAngle(85.0f);
+static const int lbl_806E0D7C = DegreesToAngle(65.0f);
+static const int lbl_806E0D80 = DegreesToAngle(65.0f);
+static const int lbl_806E0D84 = DegreesToAngle(70.0f);
+static const int lbl_806E0D88 = DegreesToAngle(10.0f);
+static const int lbl_806E0D8C = DegreesToAngle(30.0f);
+static const int lbl_806E0D90 = DegreesToAngle(45.0f);
+static const int lbl_806E0D94 = DegreesToAngle(10.0f);
+static const int lbl_806E0D98 = DegreesToAngle(45.0f);
+static const int lbl_806E0D9C = DegreesToAngle(75.0f);
+static const int lbl_806E0DA0 = DegreesToAngle(85.0f);
 
 cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
-                 const int* nModelID, cSHierarchy* hierarchy, cAnimInventory* animInventory,
-                 const CharacterPhysicsData* physData, float fPhysCapsuleHeight, float fPhysCapsuleRadius,
-                 AnimRetargetList* animRetargetList, int nIndex, eClassTypes classType)
+    const int* nModelID, cSHierarchy* hierarchy, cAnimInventory* animInventory,
+    const CharacterPhysicsData* physData, float fPhysCapsuleHeight, float fPhysCapsuleRadius,
+    AnimRetargetList* animRetargetList, int nIndex, eClassTypes classType)
     : cCharacter(characterClass, nModelID, hierarchy, animInventory, physData,
-                 fPhysCapsuleHeight, fPhysCapsuleRadius, animRetargetList, nIndex, classType)
+          fPhysCapsuleHeight, fPhysCapsuleRadius, animRetargetList, nIndex, classType)
 {
     mUnidentified1E4.m_ID = nPlayerID;
     m_pController = NULL;
@@ -137,18 +142,6 @@ cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
         mUnidentified320 = new (nlMalloc(sizeof(AvoidableGoalie), 8, false)) AvoidableGoalie(this);
     else
         mUnidentified320 = NULL;
-}
-
-void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
-{
-    cCharacter::Reset(v3Position, aDirection);
-    mUnidentified1E4.UnidentifiedReset();
-    mUnidentified1E4.m_ResetBaseBallOrientation = true;
-    FieldLocToAILoc(mUnidentified1E4.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
-    ClearSwapControllerTimer();
-    if (m_pBall == NULL)
-        mUnidentified1E4.m_tBallUnPossessionTimer.SetSeconds(2.5f);
-    InitActionPostWhistle();
 }
 
 cPlayer::~cPlayer()
@@ -254,13 +247,13 @@ u8 cPlayer::SwapController(bool bParam)
                             if (fSwapScore < 0.0f)
                             {
                                 fSwapScore = fn_80099660(FuzzyAIGetTeamRuntime(m_pTeam),
-                                                         "AssignControllerScore",
-                                                         pSwapPlayer)
+                                    "AssignControllerScore",
+                                    pSwapPlayer)
                                                  .mData.f;
                             }
                             float fPotentialScore = fn_80099660(FuzzyAIGetTeamRuntime(m_pTeam),
-                                                                "AssignControllerScore",
-                                                                pPotentialSwapPlayer)
+                                "AssignControllerScore",
+                                pPotentialSwapPlayer)
                                                         .mData.f;
                             if (fPotentialScore > fSwapScore)
                             {
@@ -328,23 +321,6 @@ u8 cPlayer::SwapController(bool bParam)
         }
     }
     return 0;
-}
-
-void cPlayer::Update(float fDeltaT)
-{
-    if (m_pController != NULL)
-    {
-        mUnidentified1E4.m_UserControlledTime += fDeltaT;
-    }
-    else
-    {
-        mUnidentified1E4.m_UserControlledTime = 0.0f;
-    }
-
-    fn_80095DF4(fDeltaT);
-
-    FieldLocToAILoc(
-        mUnidentified1E4.m_v3AIPosition, mUnidentified024.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
 }
 
 void cPlayer::fn_80095DF4(float fDeltaT)
@@ -416,7 +392,22 @@ void cPlayer::fn_80095DF4(float fDeltaT)
     }
 }
 
-extern "C" void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
+void cPlayer::Update(float fDeltaT)
+{
+    if (m_pController != NULL)
+    {
+        mUnidentified1E4.m_UserControlledTime += fDeltaT;
+    }
+    else
+    {
+        mUnidentified1E4.m_UserControlledTime = 0.0f;
+    }
+
+    fn_80095DF4(fDeltaT);
+
+    FieldLocToAILoc(
+        mUnidentified1E4.m_v3AIPosition, mUnidentified024.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
+}
 
 void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
 {
@@ -452,6 +443,8 @@ void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
     nlMultQuat(qRetval, qOrient, mUnidentified1E4.m_BaseBallOrientation);
 }
 
+extern "C" void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
+
 void cPlayer::SetAnimID(int animID)
 {
     cCharacter::SetAnimID(animID);
@@ -472,12 +465,9 @@ void cPlayer::SetAnimID(int animID)
     }
 }
 
-float lbl_806DBD80 = 0.75f;
-float lbl_806DBD84 = 0.4f;
-
 float cPlayer::DoFlashLight(const nlVector3& Position, unsigned short aDirection,
-                            float fAngleWeighting, float fIgnoreObjectCloserThanThis,
-                            float fIgnoreObjectFartherThanThis)
+    float fAngleWeighting, float fIgnoreObjectCloserThanThis,
+    float fIgnoreObjectFartherThanThis)
 {
     nlVector2 v2Difference;
     nlVec2Sub(v2Difference, *(const nlVector2*)&Position, *(const nlVector2*)&mUnidentified024.m_v3Position);
@@ -513,7 +503,7 @@ void cPlayer::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 }
 
 extern "C" cPlayer* fn_80096514(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
-                                nlVector3* pPosition, bool bParam)
+    nlVector3* pPosition, bool bParam)
 {
     cPlayer* pClosestPlayer = NULL;
     float fClosestDistSquared = FLT_MAX;
@@ -543,13 +533,22 @@ extern "C" cPlayer* fn_80096514(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     return pClosestPlayer;
 }
 
-bool cPlayer::IsOnSameTeam(cPlayer* other)
+cFielder* cPlayer::GetClosestOpponentFielder(
+    nlVector3* pPosition, bool bParam)
 {
-    if ((other != NULL) && (other->m_pTeam == m_pTeam))
-    {
-        return true;
-    }
-    return false;
+    return (cFielder*)::fn_80096514(
+        this, m_pTeam->GetOtherTeam(), 4, pPosition, bParam);
+}
+
+cPlayer* cPlayer::fn_800966AC(nlVector3* pPosition, bool bParam)
+{
+    return ::fn_80096514(
+        this, m_pTeam->GetOtherTeam(), 5, pPosition, bParam);
+}
+
+cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
+{
+    return ::fn_80096514(this, m_pTeam, 5, pPosition, bParam);
 }
 
 void cPlayer::PickupBall(cBall* pBall)
@@ -579,11 +578,11 @@ void cPlayer::PickupBall(cBall* pBall)
                             player->mUnidentified024.m_v3Position,
                             mUnidentified024.m_v3Position);
                         bool bPassTarget = g_pBall->UnidentifiedPassState()
-                            && g_pBall->m_pPassTarget != NULL;
+                                        && g_pBall->m_pPassTarget != NULL;
                         if ((bPassTarget && closest == g_pBall->m_pPrevOwner) || distSq < bestDistSq)
                         {
                             bool bPlayerPassTarget = g_pBall->UnidentifiedPassState()
-                                && g_pBall->m_pPassTarget != NULL;
+                                                  && g_pBall->m_pPassTarget != NULL;
                             if (!bPlayerPassTarget || player != g_pBall->m_pPrevOwner)
                             {
                                 bestDistSq = distSq;
@@ -658,103 +657,6 @@ void cPlayer::PickupBall(cBall* pBall)
     mUnidentified1E4.m_ResetBaseBallOrientation = true;
 }
 
-extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
-{
-    float fBestScore = 0.0f;
-    cPlayer* pBestTarget = NULL;
-    float fPassing = pSelf->m_eClassType == FIELDER
-                       ? ((cFielder*)pSelf)->GetTweaks()->fPassing.GetValue()
-                       : 0.5f;
-    cFielder* pTarget;
-    float fDistanceWeight;
-    nlVector2 v2Distance;
-    nlVector2 v2Angle;
-    if (bVolleyPass)
-    {
-        fDistanceWeight = gGameTweaks.m_pGameTweaks->fVolleyPassDistanceWeight;
-        v2Distance.x = InterpolateClamped(gGameTweaks.m_pGameTweaks->fVolleyPassIdealMinDistance,
-                                          gGameTweaks.m_pGameTweaks->fVolleyPassIdealMaxDistance,
-                                          fPassing);
-        v2Distance.y = InterpolateClamped(gGameTweaks.m_pGameTweaks->fVolleyPassIdealMinRange,
-                                          gGameTweaks.m_pGameTweaks->fVolleyPassIdealMaxRange,
-                                          fPassing);
-        v2Angle.x = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nVolleyPassMaximumAngle) / 360);
-        v2Angle.y = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nVolleyPassMinimumAngle) / 360);
-    }
-    else
-    {
-        fDistanceWeight = gGameTweaks.m_pGameTweaks->fPassDistanceWeight;
-        v2Distance.x = InterpolateClamped(gGameTweaks.m_pGameTweaks->fPassIdealMinDistance,
-                                          gGameTweaks.m_pGameTweaks->fPassIdealMaxDistance,
-                                          fPassing);
-        v2Distance.y = InterpolateClamped(gGameTweaks.m_pGameTweaks->fPassIdealMinRange,
-                                          gGameTweaks.m_pGameTweaks->fPassIdealMaxRange,
-                                          fPassing);
-        v2Angle.x = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nPassMaximumAngle) / 360);
-        v2Angle.y = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nPassMinimumAngle) / 360);
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        pTarget = pSelf->m_pTeam->GetAIOrderedFielder(i);
-        if (pTarget == pSelf || !pTarget->CanReceivePass())
-        {
-            continue;
-        }
-        unsigned short aDirection = pSelf->mUnidentified024.m_aActualFacingDirection;
-        if (pSelf->m_pController != NULL
-            && pSelf->m_pController->GetMovementStickMagnitude() > 0.01f)
-        {
-            aDirection = pSelf->m_pController->GetMovementStickDirection();
-        }
-        float fScore = fn_800DAD84(pSelf->mUnidentified024.m_v3Position,
-                                   pTarget->mUnidentified024.m_v3Position,
-                                   aDirection,
-                                   fDistanceWeight,
-                                   v2Distance,
-                                   v2Angle,
-                                   true,
-                                   false);
-        if (pBestTarget == NULL || fScore > fBestScore)
-        {
-            pBestTarget = pTarget;
-            fBestScore = fScore;
-        }
-    }
-    return pBestTarget;
-}
-
-DetInput* cPlayer::GetGlobalPad()
-{
-    if (m_pController != NULL)
-    {
-        return m_pController->m_pGlobalPad;
-    }
-    return NULL;
-}
-
-cGlobalPad* cPlayer::fn_800972CC()
-{
-    DetInput* pGlobalPad
-        = m_pController != NULL ? m_pController->m_pGlobalPad : NULL;
-    cGlobalPad* pResult = NULL;
-    if (pGlobalPad != NULL)
-    {
-        pResult = ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
-    }
-    return pResult;
-}
-
-void cPlayer::ReleaseBall(int nParam)
-{
-    m_pPhysicsCharacter->ReleaseObject();
-    g_pBall->ClearOwner();
-    fn_80015C38(g_pBall, nParam);
-    if (!g_pBall->m_bVisible)
-    {
-        g_pBall->m_bVisible = true;
-    }
-}
-
 void cPlayer::PlayAttackReactionSounds(float fScale)
 {
 }
@@ -823,6 +725,112 @@ void cPlayer::SetAIPad(cAIPad* pPad)
     }
 }
 
+bool cPlayer::IsOnSameTeam(cPlayer* other)
+{
+    if ((other != NULL) && (other->m_pTeam == m_pTeam))
+    {
+        return true;
+    }
+    return false;
+}
+
+extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
+{
+    float fBestScore = 0.0f;
+    cPlayer* pBestTarget = NULL;
+    float fPassing = pSelf->m_eClassType == FIELDER
+                       ? ((cFielder*)pSelf)->GetTweaks()->fPassing.GetValue()
+                       : 0.5f;
+    cFielder* pTarget;
+    float fDistanceWeight;
+    nlVector2 v2Distance;
+    nlVector2 v2Angle;
+    if (bVolleyPass)
+    {
+        fDistanceWeight = gGameTweaks.m_pGameTweaks->fVolleyPassDistanceWeight;
+        v2Distance.x = InterpolateClamped(gGameTweaks.m_pGameTweaks->fVolleyPassIdealMinDistance,
+            gGameTweaks.m_pGameTweaks->fVolleyPassIdealMaxDistance,
+            fPassing);
+        v2Distance.y = InterpolateClamped(gGameTweaks.m_pGameTweaks->fVolleyPassIdealMinRange,
+            gGameTweaks.m_pGameTweaks->fVolleyPassIdealMaxRange,
+            fPassing);
+        v2Angle.x = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nVolleyPassMaximumAngle) / 360);
+        v2Angle.y = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nVolleyPassMinimumAngle) / 360);
+    }
+    else
+    {
+        fDistanceWeight = gGameTweaks.m_pGameTweaks->fPassDistanceWeight;
+        v2Distance.x = InterpolateClamped(gGameTweaks.m_pGameTweaks->fPassIdealMinDistance,
+            gGameTweaks.m_pGameTweaks->fPassIdealMaxDistance,
+            fPassing);
+        v2Distance.y = InterpolateClamped(gGameTweaks.m_pGameTweaks->fPassIdealMinRange,
+            gGameTweaks.m_pGameTweaks->fPassIdealMaxRange,
+            fPassing);
+        v2Angle.x = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nPassMaximumAngle) / 360);
+        v2Angle.y = (unsigned short)((int)(65536.0f * (float)(int)gGameTweaks.m_pGameTweaks->nPassMinimumAngle) / 360);
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        pTarget = pSelf->m_pTeam->GetAIOrderedFielder(i);
+        if (pTarget == pSelf || !pTarget->CanReceivePass())
+        {
+            continue;
+        }
+        unsigned short aDirection = pSelf->mUnidentified024.m_aActualFacingDirection;
+        if (pSelf->m_pController != NULL
+            && pSelf->m_pController->GetMovementStickMagnitude() > 0.01f)
+        {
+            aDirection = pSelf->m_pController->GetMovementStickDirection();
+        }
+        float fScore = fn_800DAD84(pSelf->mUnidentified024.m_v3Position,
+            pTarget->mUnidentified024.m_v3Position,
+            aDirection,
+            fDistanceWeight,
+            v2Distance,
+            v2Angle,
+            true,
+            false);
+        if (pBestTarget == NULL || fScore > fBestScore)
+        {
+            pBestTarget = pTarget;
+            fBestScore = fScore;
+        }
+    }
+    return pBestTarget;
+}
+
+DetInput* cPlayer::GetGlobalPad()
+{
+    if (m_pController != NULL)
+    {
+        return m_pController->m_pGlobalPad;
+    }
+    return NULL;
+}
+
+cGlobalPad* cPlayer::fn_800972CC()
+{
+    DetInput* pGlobalPad
+        = m_pController != NULL ? m_pController->m_pGlobalPad : NULL;
+    cGlobalPad* pResult = NULL;
+    if (pGlobalPad != NULL)
+    {
+        pResult = ((NetworkPeerChannel*)pGlobalPad->m_pMyUser)->GetLocalChannelPad();
+    }
+    return pResult;
+}
+
+void cPlayer::ReleaseBall(int nParam)
+{
+    m_pPhysicsCharacter->ReleaseObject();
+    g_pBall->ClearOwner();
+    fn_80015C38(g_pBall, nParam);
+    if (!g_pBall->m_bVisible)
+    {
+        g_pBall->m_bVisible = true;
+    }
+}
+
 extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
 {
     float fRemaining = pPlayer->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
@@ -857,11 +865,6 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
             PlaySound(pPlayer->m_uSoundSlotId, sound, NULL, NULL);
         }
     }
-}
-
-void cPlayer::ClearPowerupAnimState(bool bIsEndGame)
-{
-    m_pPowerupLayer->BeginBlendOut(0.25f);
 }
 
 void cPlayer::fn_800974B0()
@@ -950,6 +953,11 @@ void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
     pDesire->fn_800C22CC(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 
+void cPlayer::ClearPowerupAnimState(bool bIsEndGame)
+{
+    m_pPowerupLayer->BeginBlendOut(0.25f);
+}
+
 void cPlayer::SetPowerupAnimState(int animID)
 {
     int nodeIndex;
@@ -972,36 +980,6 @@ void cPlayer::SetPowerupAnimState(int animID)
     }
     m_pPowerupLayer->SetChild(1, pController);
     m_pPowerupLayer->BeginBlendIn(0.133f);
-}
-
-cFielder* cPlayer::GetClosestOpponentFielder(
-    nlVector3* pPosition, bool bParam)
-{
-    return (cFielder*)::fn_80096514(
-        this, m_pTeam->GetOtherTeam(), 4, pPosition, bParam);
-}
-
-cPlayer* cPlayer::fn_800966AC(nlVector3* pPosition, bool bParam)
-{
-    return ::fn_80096514(
-        this, m_pTeam->GetOtherTeam(), 5, pPosition, bParam);
-}
-
-cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
-{
-    return ::fn_80096514(this, m_pTeam, 5, pPosition, bParam);
-}
-
-nlVector3 cPlayer::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
-{
-    return m_pTeam->GetAIOffNetLocation(
-        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
-}
-
-nlVector3 cPlayer::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
-{
-    return m_pTeam->GetAIDefNetLocation(
-        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
 }
 
 void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
@@ -1071,26 +1049,8 @@ cPN_SingleAxisBlender* cPlayer::CreateSingleAxisBlender(
     return pSAB;
 }
 
-void cPlayer::PostPhysicsUpdate()
-{
-    cCharacter::PostPhysicsUpdate();
-
-    if (m_pBall != NULL)
-    {
-        nlVector3 jointPos = GetJointPosition(m_nBallJointIndex);
-        float scale = mUnidentified024.m_fPlayerScale;
-        if (scale > 1.0f)
-        {
-            float radius = g_pBall->m_pPhysicsBall->GetRadius();
-            jointPos.z -= radius * (scale - 1.0f);
-        }
-        m_pPhysicsCharacter->m_SubObject.SetSubObjectPosition(
-            jointPos, PhysicsObject::WORLD_COORDINATES);
-    }
-}
-
 void cPlayer::PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
-                                      cPoseAccumulator* pPoseAccumulator, unsigned int nJointIndex, int nParentIndex)
+    cPoseAccumulator* pPoseAccumulator, unsigned int nJointIndex, int nParentIndex)
 {
     cPlayer& self = *(cPlayer*)nSelf;
     nlMatrix4& m4HeadMatrix = pPoseAccumulator->GetNodeMatrix(nJointIndex);
@@ -1140,10 +1100,22 @@ void cPlayer::PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
     }
 }
 
-void cPlayer::PreUpdate(float dt)
+void cPlayer::PostPhysicsUpdate()
 {
-    cCharacter::PreUpdate(dt);
-    mUnidentified1E4.m_bCanTestController = true;
+    cCharacter::PostPhysicsUpdate();
+
+    if (m_pBall != NULL)
+    {
+        nlVector3 jointPos = GetJointPosition(m_nBallJointIndex);
+        float scale = mUnidentified024.m_fPlayerScale;
+        if (scale > 1.0f)
+        {
+            float radius = g_pBall->m_pPhysicsBall->GetRadius();
+            jointPos.z -= radius * (scale - 1.0f);
+        }
+        m_pPhysicsCharacter->m_SubObject.SetSubObjectPosition(
+            jointPos, PhysicsObject::WORLD_COORDINATES);
+    }
 }
 
 void cPlayer::Unknown7(float)
@@ -1155,6 +1127,12 @@ void cPlayer::Unknown7(float)
         m_pBall->m_pPhysicsBall->EnableCollisions();
         m_pPhysicsCharacter->ContainObject(m_pBall->m_pPhysicsBall);
     }
+}
+
+void cPlayer::PreUpdate(float dt)
+{
+    cCharacter::PreUpdate(dt);
+    mUnidentified1E4.m_bCanTestController = true;
 }
 
 void cPlayer::PrePhysicsUpdate()
@@ -1206,25 +1184,16 @@ bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
     return result;
 }
 
-void cPlayer::SetNoPickUpTime(float NewNoPickUpTime)
+nlVector3 cPlayer::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
 {
-    m_pPhysicsCharacter->m_CanCollideWithBall = (NewNoPickUpTime <= 0.0f);
-    mUnidentified1E4.m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
+    return m_pTeam->GetAIOffNetLocation(
+        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
 }
 
-inline bool cPlayer::UnidentifiedPowerupPredicate()
+nlVector3 cPlayer::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
 {
-    if (GetGlobalPad() != NULL)
-    {
-        if (m_pTeam->GetPowerUpByIndex(0).eType >= 9
-            && m_pTeam->GetPowerUpByIndex(0).eType <= 20)
-            return true;
-        if (m_pTeam->GetPowerUpByIndex(0).eType == POWER_UP_NONE
-            && m_pTeam->GetPowerUpByIndex(1).eType >= 9
-            && m_pTeam->GetPowerUpByIndex(1).eType <= 20)
-            return true;
-    }
-    return false;
+    return m_pTeam->GetAIDefNetLocation(
+        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
 }
 
 extern "C" void fn_80098098(cPlayer* pSelf)
@@ -1259,7 +1228,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-             || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
+                || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
             && !pCaptain->mUnidentified3DC)
         {
             pCaptain->fn_80050284();
@@ -1303,6 +1272,27 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     }
 }
 
+void cPlayer::SetNoPickUpTime(float NewNoPickUpTime)
+{
+    m_pPhysicsCharacter->m_CanCollideWithBall = (NewNoPickUpTime <= 0.0f);
+    mUnidentified1E4.m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
+}
+
+inline bool cPlayer::UnidentifiedPowerupPredicate()
+{
+    if (GetGlobalPad() != NULL)
+    {
+        if (m_pTeam->GetPowerUpByIndex(0).eType >= 9
+            && m_pTeam->GetPowerUpByIndex(0).eType <= 20)
+            return true;
+        if (m_pTeam->GetPowerUpByIndex(0).eType == POWER_UP_NONE
+            && m_pTeam->GetPowerUpByIndex(1).eType >= 9
+            && m_pTeam->GetPowerUpByIndex(1).eType <= 20)
+            return true;
+    }
+    return false;
+}
+
 void cPlayer::UnidentifiedVirtual1C()
 {
     cCharacter::UnidentifiedVirtual1C();
@@ -1311,6 +1301,43 @@ void cPlayer::UnidentifiedVirtual1C()
         m_pPowerupLayer->BeginBlendOut(-1.0f);
     }
 }
+
+void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
+{
+    cCharacter::Reset(v3Position, aDirection);
+    mUnidentified1E4.UnidentifiedReset();
+    mUnidentified1E4.m_ResetBaseBallOrientation = true;
+    FieldLocToAILoc(mUnidentified1E4.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
+    ClearSwapControllerTimer();
+    if (m_pBall == NULL)
+        mUnidentified1E4.m_tBallUnPossessionTimer.SetSeconds(2.5f);
+    InitActionPostWhistle();
+}
+
+extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC*);
+extern "C" void fn_80098A68(UnidentifiedEventData_800673FC*);
+extern "C" void fn_80098A84(UnidentifiedEventData_800673FC*);
+extern "C" void fn_80099030(UnidentifiedEventData00*);
+
+extern "C" void fn_80098750()
+{
+    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachFlash", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098AA0), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasDown", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A68), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasAway", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A84), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(fn_80099030), 0, -1);
+}
+
+static nlVector3 lbl_804FF5C8[] = {
+    { 0.156f, 0.973f, 0.0f },
+    { 0.156f, 0.555f, 0.0f },
+    { 0.004f, 0.223f, 0.0f },
+    { 0.492f, 0.012f, 0.0f },
+    { 0.508f, 0.055f, 0.0f },
+    { 0.989f, 0.121f, 0.0f },
+    { 0.910f, 0.640f, 0.0f },
+    { 0.824f, 0.632f, 0.0f },
+    { 0.824f, 0.972f, 0.0f },
+};
 
 extern "C" void fn_80098A68(UnidentifiedEventData_800673FC* pData)
 {
@@ -1329,46 +1356,6 @@ extern "C" void fn_80098A84(UnidentifiedEventData_800673FC* pData)
         NULL,
         NULL);
 }
-
-extern "C" void fn_80099030(UnidentifiedEventData00*)
-{
-    if (gNPCManager != NULL)
-    {
-        gNPCManager->fn_801AA348();
-        if (gNPCManager->mUnidentified024 != NULL)
-        {
-            gNPCManager->mUnidentified024->Deactivate(true);
-        }
-    }
-}
-
-void cPlayer::CollideWithPatchCallback(const UnidentifiedEventData24*)
-{
-}
-
-extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC*);
-
-extern "C" void fn_80098750()
-{
-    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachFlash", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098AA0), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasDown", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A68), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_800673FC>("PeachCamerasAway", -1)->Add(Function<UnidentifiedEventData_800673FC*>(fn_80098A84), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(fn_80099030), 0, -1);
-}
-
-float lbl_806DBD88 = 6.5f;
-bool lbl_806DBD8C = true;
-static nlVector3 lbl_804FF5C8[] = {
-    { 0.156f, 0.973f, 0.0f },
-    { 0.156f, 0.555f, 0.0f },
-    { 0.004f, 0.223f, 0.0f },
-    { 0.492f, 0.012f, 0.0f },
-    { 0.508f, 0.055f, 0.0f },
-    { 0.989f, 0.121f, 0.0f },
-    { 0.910f, 0.640f, 0.0f },
-    { 0.824f, 0.632f, 0.0f },
-    { 0.824f, 0.972f, 0.0f },
-};
 
 extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
 {
@@ -1506,14 +1493,31 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
     }
 }
 
+extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC*);
+
+extern "C" void fn_80099030(UnidentifiedEventData00*)
+{
+    if (gNPCManager != NULL)
+    {
+        gNPCManager->fn_801AA348();
+        if (gNPCManager->mUnidentified024 != NULL)
+        {
+            gNPCManager->mUnidentified024->Deactivate(true);
+        }
+    }
+}
+
+void cPlayer::CollideWithPatchCallback(const UnidentifiedEventData24*)
+{
+}
+
 u16 lbl_806DBD96 = 0xFFFF;
 
 #define REGISTER_PLAYER_FIELD(type, field) \
-    cache->AddField(type, gDebugFieldTypes[type].size, (u8*)&mUnidentified1E4.field - (u8*)&mUnidentified1E4.m_ID, #field)
+    cache->AddField(type, gDebugFieldTypes[type].size, (u8*)&field - (u8*)&m_ID, #field)
 
-void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
+inline void UnidentifiedPlayerState_1E4::SyncLog(void* context, DebugWriteCache* cache)
 {
-    cCharacter::SyncLog(context, cache);
     if (lbl_806DBD96 == 0xFFFF)
     {
         lbl_806DBD96 = cache->BeginType("DetPlayer");
@@ -1543,8 +1547,14 @@ void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
         REGISTER_PLAYER_FIELD(17, m_UserControlledTime);
         cache->EndType();
     }
-    cache->ChecksumData(lbl_806DBD96, &mUnidentified1E4.m_ID, context);
-    cache->WriteData(lbl_806DBD96, &mUnidentified1E4.m_ID, offsetof(cPlayer, m_tSwapControllerTimer) - offsetof(cPlayer, mUnidentified1E4.m_ID));
+    cache->ChecksumData(lbl_806DBD96, &m_ID, context);
+    cache->WriteData(lbl_806DBD96, &m_ID, sizeof(*this));
+}
+
+void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
+{
+    cCharacter::SyncLog(context, cache);
+    mUnidentified1E4.SyncLog(context, cache);
 }
 
 #undef REGISTER_PLAYER_FIELD
@@ -1559,34 +1569,4 @@ void cPlayer::Unknown12(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&mUnidentified1E4.m_fShotStrengthTime, sizeof(mUnidentified1E4.m_fShotStrengthTime));
     pChecksum->ChecksumData(&mUnidentified1E4.m_tSlideAttackTimer, sizeof(mUnidentified1E4.m_tSlideAttackTimer));
     pChecksum->ChecksumData(&mUnidentified1E4.m_UserControlledTime, sizeof(mUnidentified1E4.m_UserControlledTime));
-}
-
-void cPlayer::InitActionPostWhistle()
-{
-}
-
-extern "C" UnidentifiedVariant_80054AB8 fn_800996D0(
-    FuzzyRuntimeBase*, const unsigned int&, cPlayer*);
-extern "C" UnidentifiedVariant_80054AB8 fn_80099670(
-    FuzzyRuntimeBase*, cPlayer*, const char*);
-
-extern "C" UnidentifiedVariant_80054AB8 fn_80099660(
-    FuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
-{
-    return fn_80099670(runtime, player, name);
-}
-
-extern "C" UnidentifiedVariant_80054AB8 fn_80099670(
-    FuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
-{
-    unsigned int functionHash = nlStringHash(name);
-    return fn_800996D0(runtime, functionHash, player);
-}
-
-extern "C" UnidentifiedVariant_80054AB8 fn_800996D0(
-    FuzzyRuntimeBase* runtime, const unsigned int& functionHash, cPlayer* player)
-{
-    unsigned int localHash = functionHash;
-    FunctionEntryPoint* entry = runtime->FindFunctionEntryPoint(localHash);
-    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(runtime, entry, 1, player, NULL));
 }
