@@ -79,14 +79,19 @@ struct GameObjectLightArray
     GameObjectLight lights[2];
 }; // total size: 0x48
 
+static inline const char* GetLastTweakCategory()
+{
+    return gLastTweakCategory;
+}
+
 TweakValueFloat gShadowLookupScaleX(
     "Scale X", "/Rendering/Lighting/Shadow Lookup", 0.042f, false);
 TweakValueFloat gShadowLookupScaleY(
-    "Scale Y", gLastTweakCategory, 0.073f, false);
+    "Scale Y", GetLastTweakCategory(), 0.073f, false);
 TweakValueFloat gShadowLookupTransX(
-    "Trans X", gLastTweakCategory, 0.0f, false);
+    "Trans X", GetLastTweakCategory(), 0.0f, false);
 TweakValueFloat gShadowLookupTransY(
-    "Trans Y", gLastTweakCategory, 0.0f, false);
+    "Trans Y", GetLastTweakCategory(), 0.0f, false);
 
 u32 lbl_806E1414 = glGetTexture("global/lightramp");
 u32 lbl_806E1418 = glGetTexture("global/black");
@@ -903,7 +908,8 @@ GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
             s32 var1 = lbl_80570B70.value;
             if (arg0 < var1)
                 return &lbl_805709D8[arg0];
-            return &lbl_805709D8[arg0 - var1 + lbl_806DCC64];
+            var1 = arg0 - var1;
+            return &lbl_805709D8[var1 + lbl_806DCC64];
         }
         return &lbl_805709D8[arg0];
 
