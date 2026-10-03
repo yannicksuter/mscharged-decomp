@@ -29,7 +29,10 @@ enum eDEBUG_CHANNEL
 namespace tDebugPrintManager
 {
 
-int Print(eDEBUG_CHANNEL channel, const char* format, ...);
+inline int Print(eDEBUG_CHANNEL channel, const char* format, ...)
+{
+    return channel;
+}
 
 } // namespace tDebugPrintManager
 

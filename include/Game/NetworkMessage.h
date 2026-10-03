@@ -18,9 +18,9 @@ public:
     {
     }
 
-    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual void Serialize(NetworkMessageSerializer* serializer) = 0;
     virtual ~NetworkMessage() { }
-    virtual int GetType();
+    virtual int GetType() = 0;
 
     /* 0x04 */ u32 mSource;
 };

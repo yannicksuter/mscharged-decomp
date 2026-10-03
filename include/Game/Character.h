@@ -275,6 +275,10 @@ public:
     {
         return mUnidentified024.m_aActualFacingDirection;
     }
+    float GetActualSpeed() const
+    {
+        return mUnidentified024.m_fActualSpeed;
+    }
     float GetPlayerScale() const
     {
         return mUnidentified024.m_fPlayerScale;

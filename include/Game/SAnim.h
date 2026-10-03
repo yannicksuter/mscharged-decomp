@@ -95,6 +95,12 @@ public:
         return m_fLinearSpeed;
     }
 
+    float GetNormalizedTime(float frame) const
+    {
+        float numKeys = m_nNumKeys;
+        return frame / numKeys;
+    }
+
     float GetDuration() const
     {
         float fNumKeys = m_nNumKeys;
