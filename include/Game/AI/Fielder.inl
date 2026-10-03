@@ -15,8 +15,7 @@ extern "C" inline bool fn_800D1C34(const cFielder* fielder)
 static inline float GetNormalizedContactTime(
     const cSAnim* anim, float contactFrame)
 {
-    float numKeys = anim->m_nNumKeys;
-    return contactFrame / numKeys;
+    return contactFrame / anim->GetNumFrames();
 }
 
 inline void cFielder::GetReceivePassBallContactOffset(nlVector3& v3Offset,

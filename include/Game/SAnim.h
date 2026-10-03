@@ -95,6 +95,11 @@ public:
         return m_fLinearSpeed;
     }
 
+    float GetNumFrames() const
+    {
+        return m_nNumKeys;
+    }
+
     float GetNormalizedTime(float frame) const
     {
         float numKeys = m_nNumKeys;
@@ -103,8 +108,7 @@ public:
 
     float GetDuration() const
     {
-        float fNumKeys = m_nNumKeys;
-        return fNumKeys / 30.0f;
+        return GetNumFrames() / 30.0f;
     }
 
     void UnidentifiedGetRemainingTime(float normalizedTime, float& remainingTime) const

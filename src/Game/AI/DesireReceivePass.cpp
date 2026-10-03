@@ -1130,25 +1130,8 @@ void DesireReceivePass::fn_800C1A08()
             pBestContactAnim, pBestBallContactAnimInfo->fAnimContactFrame);
 
     nlVector3 v3ContactOffsetWorld;
-    nlVector3 v3ContactOffsetLocal;
-    m_pFielder->GetJointPositionFuture(
-        &v3ContactOffsetLocal, pBestBallContactAnimInfo->nAnimID,
-        m_pFielder->m_nBallJointIndex,
-        GetNormalizedContactTime(
-            m_pFielder->m_pAnimInventory
-                ->GetAnim(pBestBallContactAnimInfo->nAnimID),
-            pBestBallContactAnimInfo->fAnimContactFrame),
-        true, true, false, true);
-
-    float fSin;
-    float fCos;
-    nlSinCos(&fSin, &fCos, aDesiredFacingDirection);
-
-    v3ContactOffsetWorld.x =
-        v3ContactOffsetLocal.x * fCos - v3ContactOffsetLocal.y * fSin;
-    v3ContactOffsetWorld.y =
-        v3ContactOffsetLocal.y * fCos + v3ContactOffsetLocal.x * fSin;
-    v3ContactOffsetWorld.z = v3ContactOffsetLocal.z;
+    m_pFielder->GetReceivePassBallContactOffset(v3ContactOffsetWorld,
+        aDesiredFacingDirection, pBestBallContactAnimInfo);
 
     nlVec3Sub(mEstimated.v3AnimStartPos,
         mEstimated.v3BallContactPos, v3ContactOffsetWorld);
@@ -1157,11 +1140,10 @@ void DesireReceivePass::fn_800C1A08()
     mEstimated.fAnimStartOffset =
         nlSqrt(v3ContactOffsetWorld.GetLengthSq3D(), true);
 
-    float fAnimDuration = pBestContactAnim->GetDuration();
     mEstimated.fAnimStartTime = mEstimated.fBallContactTime
         - GetNormalizedContactTime(
             pBestContactAnim, pBestBallContactAnimInfo->fAnimContactFrame)
-            * fAnimDuration;
+            * pBestContactAnim->GetDuration();
 }
 
 bool DesireReceivePass::StartPickupAnimation()
