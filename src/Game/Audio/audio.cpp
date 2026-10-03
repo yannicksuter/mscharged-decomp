@@ -19,6 +19,8 @@
 #include "Game/Audio/RegistryPools.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
+#include "Game/Audio/AudioListener.inl"
+
 extern void* gExclusiveAudioContext;
 extern XSoundHandle* g_pLastAudioHandle;
 extern unsigned long gResidentVoiceDropCount;
@@ -378,12 +380,6 @@ void PauseSound(unsigned long cueId, void* context)
     }
 }
 
-void AudioSystem::ResumeTrackedSound(
-    const unsigned long&, AudioHandleState* state)
-{
-    ResumeSound(state->m_CueId, state->m_Context);
-}
-
 void ResumeSound(unsigned long cueId, void* context)
 {
     if (cueId == 0xFFFFFFFF)
@@ -463,6 +459,15 @@ void SetSoundCallbackEnabled(unsigned long cueId, void* context,
     }
 }
 
+static inline void AddAudioHandleState(int slotId, unsigned long cueId,
+    void* context, bool restartable)
+{
+    AudioHandleState state;
+    state.Set(slotId, cueId, context, restartable);
+    unsigned long key = MakeAudioHandleKey(cueId, context);
+    sAudioHandleStates.Add(key, state);
+}
+
 bool PrepareTrackedSound(int slotId, unsigned long cueId,
     XSoundOwner* owner, const void* debugName,
     void* context, bool restartable)
@@ -471,10 +476,7 @@ bool PrepareTrackedSound(int slotId, unsigned long cueId,
         slotId, cueId, owner, debugName, context, false);
     if (handle != 0)
     {
-        AudioHandleState state;
-        state.Set(slotId, cueId, context, restartable);
-        unsigned long key = MakeAudioHandleKey(cueId, context);
-        sAudioHandleStates.Add(key, state);
+        AddAudioHandleState(slotId, cueId, context, restartable);
     }
     if (handle != 0)
     {
@@ -558,23 +560,10 @@ void AudioSystem::PauseTrackedSound(
     sPausedAudioHandles.Add(*(unsigned long*)handle, false);
 }
 
-
-void AudioListener::SetEnabled(bool enabled)
+void AudioSystem::ResumeTrackedSound(
+    const unsigned long&, AudioHandleState* state)
 {
-    m_Enabled = enabled;
+    ResumeSound(state->m_CueId, state->m_Context);
 }
 
-void AudioListener::SetTransformValid(bool valid)
-{
-    m_TransformValid = valid;
-}
-
-inline bool AudioSystem::IsInitialized()
-{
-    return m_BundleManager != 0 && m_BundleManager->IsInitialized();
-}
-
-inline bool AudioSystem::IsAsyncLoading()
-{
-    return m_AsyncLoading;
-}
+#include "Game/Audio/AudioSystem.inl"
