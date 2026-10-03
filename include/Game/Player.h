@@ -66,6 +66,8 @@ struct UnidentifiedPlayerState_1E4
         m_tFireTimer.UnidentifiedClear();
         m_tSwapFacingTimer.UnidentifiedClear();
     }
+    void SyncLog(void* context, DebugWriteCache* cache);
+
     /* 0x00 */ int m_ID;
 
     /* 0x04 */ int m_nFeatherAnimID;
@@ -105,10 +107,10 @@ class cPlayer : public cCharacter
 {
 public:
     cPlayer(int nPlayerID, eCharacterClass characterClass,
-            const int* nModelID, cSHierarchy* hierarchy,
-            cAnimInventory* animInventory, const CharacterPhysicsData* physData,
-            float fPhysCapsuleHeight, float fPhysCapsuleRadius,
-            AnimRetargetList* animRetargetList, int nIndex, eClassTypes classType);
+        const int* nModelID, cSHierarchy* hierarchy,
+        cAnimInventory* animInventory, const CharacterPhysicsData* physData,
+        float fPhysCapsuleHeight, float fPhysCapsuleRadius,
+        AnimRetargetList* animRetargetList, int nIndex, eClassTypes classType);
     virtual ~cPlayer();
     virtual void PostPhysicsUpdate();
     virtual void PrePhysicsUpdate();
@@ -126,7 +128,7 @@ public:
         CollisionPlayerPlayerData* pData);
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
-    virtual void InitActionPostWhistle();
+    virtual void InitActionPostWhistle() { }
     virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
 
     void ClearSwapControllerTimer()
@@ -167,8 +169,8 @@ public:
         return m_pTeam;
     }
     float DoFlashLight(const nlVector3& Position, unsigned short aDirection,
-                       float fAngleWeighting, float fIgnoreObjectCloserThanThis,
-                       float fIgnoreObjectFartherThanThis);
+        float fAngleWeighting, float fIgnoreObjectCloserThanThis,
+        float fIgnoreObjectFartherThanThis);
     nlVector3 GetAIDefNetLocation(const nlVector3* v3ReferencePos);
     nlVector3 GetAIOffNetLocation(const nlVector3* v3ReferencePos);
     void fn_800974B0();
@@ -178,7 +180,7 @@ public:
     void SetPowerupAnimState(int nodeIndex, int animID, float blendTime);
     void SetPowerupAnimState(int animID);
     static void PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
-                                        cPoseAccumulator* pPoseAccumulator, unsigned int nJointIndex, int nParentIndex);
+        cPoseAccumulator* pPoseAccumulator, unsigned int nJointIndex, int nParentIndex);
     bool IsCharacterInAir(float fParam) const;
     cPN_SingleAxisBlender* CreateSingleAxisBlender(
         const int* pSABAnims, int nNumSABAnims, int nPrimaryAnim,
@@ -219,8 +221,6 @@ public:
 }; // total size: 0x324
 
 extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration);
-
-
 extern "C" void fn_80098098(cPlayer* pSelf);
 extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam);
 extern "C" void fn_80095870(cPlayer* pPlayer);

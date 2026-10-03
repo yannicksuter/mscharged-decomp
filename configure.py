@@ -487,7 +487,7 @@ config.libs = [
             Object(Matching, "Game/PadMonkey.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/Physics.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/PhysicsAIBall.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Player.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Player.cpp", extra_cflags=["-inline deferred", "-ipa file", "-sym on"]),
             Object(NonMatching, "Game/PoseAccumulator.cpp", extra_cflags=["-inline auto", "-inline deferred"]),
             Object(Matching, "Game/PoseNode.cpp"),
             Object(NonMatching, "Game/RenderSnapshot.cpp", cflags=cflags_game),
