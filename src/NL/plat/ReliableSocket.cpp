@@ -39,14 +39,14 @@ int s_nConnectServerTimeoutMS = 10000;
 int s_nClosingTimeoutMS = 500;
 int s_nSendEveryNthFrame = 1;
 int s_nBWWindowMS = 200;
-u32 lbl_806DF6E8 = 0x544C4159;
+u32 sTransportChecksumKey = 0x544C4159;
 bool s_bLogTL = false;
 bool s_bLogTLUseCache = false;
 bool s_bDisplayBW = false;
 bool s_bDisplayScreenPrinter = false;
-float lbl_806E20EC;
-float lbl_806E20F0;
-int lbl_806E20F4;
+float sSendBytesPerSecond;
+float sReceiveBytesPerSecond;
+int sLoggedMessageCount;
 
 int sPayloadRedundancySteps[10] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
@@ -98,8 +98,8 @@ void ReliableSocket::LogMessage(int size, TransportMessage* message)
             nlBufferedWriterWriteText(&mLogWriter, text);
         }
         nlBufferedWriterWriteText(&mLogWriter, "\n");
-        lbl_806E20F4++;
-        if (lbl_806E20F4 % 10 == 0)
+        sLoggedMessageCount++;
+        if (sLoggedMessageCount % 10 == 0)
         {
             nlBufferedWriterFlushIfNeeded(&mLogWriter);
         }
@@ -213,7 +213,7 @@ void ReliableSocket::Send(int connection,
     }
 }
 
-void ReliableSocket::SocketVirtual34(u8 connection,
+void ReliableSocket::SendVoice(u8 connection,
     void* buffer, int size)
 {
     ((TransportConnection*)connection)
@@ -225,9 +225,9 @@ void ReliableSocket::DebugDraw(int column, int* row, bool showBandwidth)
     if (showBandwidth)
     {
         glFontPrintf(GetDebugFontView(), column, (*row)++,
-            "Recv %d bytes/s", (int)lbl_806E20F0);
+            "Recv %d bytes/s", (int)sReceiveBytesPerSecond);
         glFontPrintf(GetDebugFontView(), column, (*row)++,
-            "Send %d bytes/s", (int)lbl_806E20EC);
+            "Send %d bytes/s", (int)sSendBytesPerSecond);
     }
     for (int i = 0; i < mConnectionCount; i++)
     {
@@ -236,20 +236,20 @@ void ReliableSocket::DebugDraw(int column, int* row, bool showBandwidth)
     }
 }
 
-int lbl_806DF6F0 = 5;
-int lbl_806DF6F4 = 5;
+int sScreenPrinterRow = 5;
+int sScreenPrinterColumn = 5;
 inline void TransportScreenPrinter::Draw()
 {
     for (int i = 0; i < 10; i++)
     {
         if (mLines[i][0] != '\0')
         {
-            nlScreenPrintf(lbl_806DF6F4, i + lbl_806DF6F0, true, 0, mLines[i]);
+            nlScreenPrintf(sScreenPrinterColumn, i + sScreenPrinterRow, true, 0, mLines[i]);
         }
     }
 }
 
-void ReliableSocket::SocketVirtual48()
+void ReliableSocket::DrawScreenPrinter()
 {
     if (s_bDisplayScreenPrinter)
     {
@@ -286,8 +286,8 @@ inline void ReliableSocket::UpdateBandwidth()
     float elapsed = nlGetTickerDifference(mLastUpdateTick, tick);
     if ((int)elapsed > s_nBWWindowMS)
     {
-        lbl_806E20F0 = 1000.0f * mReceivedBytes / elapsed;
-        lbl_806E20EC = 1000.0f * mSentBytes / elapsed;
+        sReceiveBytesPerSecond = 1000.0f * mReceivedBytes / elapsed;
+        sSendBytesPerSecond = 1000.0f * mSentBytes / elapsed;
         mLastUpdateTick = tick;
         mSentBytes = 0;
         mReceivedBytes = 0;
@@ -344,7 +344,7 @@ void ReliableSocket::SendMessage(TransportMessage* message, const u8* address,
     if (payloadSize > 0)
     {
         u32 checksum = nlChecksum32(mSendBuffer + sizeof(u32), payloadSize);
-        checksum ^= lbl_806DF6E8;
+        checksum ^= sTransportChecksumKey;
         memcpy(mSendBuffer, &checksum, sizeof(checksum));
     }
     mSentBytes += size + 28;
@@ -428,7 +428,7 @@ static inline bool CheckTransportChecksum(const void* buffer, int size)
     u32 checksum;
     memcpy(&checksum, buffer, sizeof(checksum));
     u32 calculated = nlChecksum32((const u8*)buffer + sizeof(u32), size - sizeof(u32));
-    calculated ^= lbl_806DF6E8;
+    calculated ^= sTransportChecksumKey;
     return checksum == calculated;
 }
 
@@ -482,47 +482,47 @@ void ReliableSocket::RejectConnection(unsigned int connection)
     ((TransportConnection*)connection)->Reject();
 }
 
-static TweakIntBinding lbl_80584530(
+static TweakIntBinding sTransportLayerLogTweak(
     "g_TransportLayerLog", "Network/TransportLayer", &g_TransportLayerLog, false);
-static TweakBoolBinding lbl_80584550(
+static TweakBoolBinding sDisplayScreenPrinterTweak(
     "s_bDisplayScreenPrinter", "Network/TransportLayer", &s_bDisplayScreenPrinter, false);
-static TweakBoolBinding lbl_80584570(
+static TweakBoolBinding sDisplayBWTweak(
     "s_bDisplayBW", "Network/TransportLayer", &s_bDisplayBW, false);
-static TweakIntBinding lbl_80584590(
+static TweakIntBinding sPayloadRedundancyTweak(
     "s_nPayloadRedundancy", "Network/TransportLayer", &s_nPayloadRedundancy, false);
-static TweakIntBinding lbl_805845B0(
+static TweakIntBinding sPacketRedundancyTweak(
     "s_nPacketRedundancy", "Network/TransportLayer", &s_nPacketRedundancy, false);
-static TweakIntBinding lbl_805845D0(
+static TweakIntBinding sSendKeepAliveMSTweak(
     "s_nSendKeepAliveMS", "Network/TransportLayer", &s_nSendKeepAliveMS, false);
-static TweakIntBinding lbl_805845F0(
+static TweakIntBinding sExpireKeepAliveMSTweak(
     "s_nExpireKeepAliveMS", "Network/TransportLayer", &s_nExpireKeepAliveMS, false);
-static TweakBoolBinding lbl_80584610(
+static TweakBoolBinding sExpireKeepAliveEnabledTweak(
     "s_bExpireKeepAliveEnabled", "Network/TransportLayer", &s_bExpireKeepAliveEnabled, false);
-static TweakIntBinding lbl_80584630(
+static TweakIntBinding sSendVoiceMSTweak(
     "s_nSendVoiceMS", "Network/TransportLayer", &s_nSendVoiceMS, false);
-static TweakIntBinding lbl_80584650(
+static TweakIntBinding sSendVoiceHighwaterNumTweak(
     "s_nSendVoiceHighwaterNum", "Network/TransportLayer", &s_nSendVoiceHighwaterNum, false);
-static TweakIntBinding lbl_80584670(
+static TweakIntBinding sSendPendingAckMSTweak(
     "s_nSendPendingAckMS", "Network/TransportLayer", &s_nSendPendingAckMS, false);
-static TweakIntBinding lbl_80584690(
+static TweakIntBinding sResendNormalMSTweak(
     "s_nResendNormalMS", "Network/TransportLayer", &s_nResendNormalMS, false);
-static TweakBoolBinding lbl_805846B0(
+static TweakBoolBinding sResendNormalAggressiveTweak(
     "s_nResendNormalAggressive", "Network/TransportLayer", &s_nResendNormalAggressive, false);
-static TweakIntBinding lbl_805846D0(
+static TweakIntBinding sResendGroupMSTweak(
     "s_nResendGroupMS", "Network/TransportLayer", &s_nResendGroupMS, false);
-static TweakIntBinding lbl_805846F0(
+static TweakIntBinding sSendPingMSTweak(
     "s_nSendPingMS", "Network/TransportLayer", &s_nSendPingMS, false);
-static TweakIntBinding lbl_80584710(
+static TweakIntBinding sConnectClientTimeoutMSTweak(
     "s_nConnectClientTimeoutMS", "Network/TransportLayer", &s_nConnectClientTimeoutMS, false);
-static TweakIntBinding lbl_80584730(
+static TweakIntBinding sConnectServerTimeoutMSTweak(
     "s_nConnectServerTimeoutMS", "Network/TransportLayer", &s_nConnectServerTimeoutMS, false);
-static TweakIntBinding lbl_80584750(
+static TweakIntBinding sClosingTimeoutMSTweak(
     "s_nClosingTimeoutMS", "Network/TransportLayer", &s_nClosingTimeoutMS, false);
-static TweakIntBinding lbl_80584770(
+static TweakIntBinding sSendEveryNthFrameTweak(
     "s_nSendEveryNthFrame", "Network/TransportLayer", &s_nSendEveryNthFrame, false);
-static TweakBoolBinding lbl_80584790(
+static TweakBoolBinding sLogTLTweak(
     "s_bLogTL", "Network/TransportLayer", &s_bLogTL, false);
-static TweakBoolBinding lbl_805847B0(
+static TweakBoolBinding sLogTLUseCacheTweak(
     "s_bLogTLUseCache", "Network/TransportLayer", &s_bLogTLUseCache, false);
-static TweakIntBinding lbl_805847D0(
+static TweakIntBinding sBWWindowMSTweak(
     "s_nBWWindowMS", "Network/TransportLayer", &s_nBWWindowMS, false);

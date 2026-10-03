@@ -108,11 +108,11 @@ void cFielder::CleanUpPeachSuper()
             * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
         < gPeachCamerasAwayFrame)
     {
-        UnidentifiedEventData_800673FC event;
-        event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = gPeachPhotoHalfWidth;
-        event.mUnidentified14 = gPeachPhotoHalfHeight;
-        event.mUnidentified00 = this;
+        PeachPhotoData event;
+        event.v3Position = mUnidentified024.m_v3Position;
+        event.fHalfWidth = gPeachPhotoHalfWidth;
+        event.fHalfHeight = gPeachPhotoHalfHeight;
+        event.pPlayer = this;
         fn_80060210(g_pGame, &event);
     }
 
@@ -145,11 +145,11 @@ void cFielder::InitActionPeachSuper()
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
 
-    UnidentifiedEventData_800673FC event;
-    event.mUnidentified04 = mUnidentified024.m_v3Position;
-    event.mUnidentified10 = gPeachPhotoHalfWidth;
-    event.mUnidentified14 = gPeachPhotoHalfHeight;
-    event.mUnidentified00 = this;
+    PeachPhotoData event;
+    event.v3Position = mUnidentified024.m_v3Position;
+    event.fHalfWidth = gPeachPhotoHalfWidth;
+    event.fHalfHeight = gPeachPhotoHalfHeight;
+    event.pPlayer = this;
     fn_80060014(g_pGame, &event);
 
     float fParam = FMAX(gPeachPhotoHalfWidth, gPeachPhotoHalfHeight);
@@ -191,21 +191,21 @@ void cFielder::ActionPeachSuper(float fDeltaT)
 
     if (m_pCurrentAnimController->TestFrameTrigger(gPeachCameraFlashFrame))
     {
-        UnidentifiedEventData_800673FC event;
-        event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = gPeachPhotoHalfWidth;
-        event.mUnidentified14 = gPeachPhotoHalfHeight;
-        event.mUnidentified00 = this;
+        PeachPhotoData event;
+        event.v3Position = mUnidentified024.m_v3Position;
+        event.fHalfWidth = gPeachPhotoHalfWidth;
+        event.fHalfHeight = gPeachPhotoHalfHeight;
+        event.pPlayer = this;
         fn_8005FE18(g_pGame, &event);
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(gPeachFlashFrame))
     {
-        UnidentifiedEventData_800673FC event;
-        event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = gPeachPhotoHalfWidth;
-        event.mUnidentified14 = gPeachPhotoHalfHeight;
-        cField::FixOutOfBoundsPosition(event.mUnidentified04, gPeachPhotoHalfWidth, true);
-        event.mUnidentified00 = this;
+        PeachPhotoData event;
+        event.v3Position = mUnidentified024.m_v3Position;
+        event.fHalfWidth = gPeachPhotoHalfWidth;
+        event.fHalfHeight = gPeachPhotoHalfHeight;
+        cField::FixOutOfBoundsPosition(event.v3Position, gPeachPhotoHalfWidth, true);
+        event.pPlayer = this;
         fn_8005FC1C(g_pGame, &event);
 
         if (gPeachPhotoEmitEnabled)
@@ -231,11 +231,11 @@ void cFielder::ActionPeachSuper(float fDeltaT)
     {
         SetFlyingCameraTarget(0);
 
-        UnidentifiedEventData_800673FC event;
-        event.mUnidentified04 = mUnidentified024.m_v3Position;
-        event.mUnidentified10 = gPeachPhotoHalfWidth;
-        event.mUnidentified14 = gPeachPhotoHalfHeight;
-        event.mUnidentified00 = this;
+        PeachPhotoData event;
+        event.v3Position = mUnidentified024.m_v3Position;
+        event.fHalfWidth = gPeachPhotoHalfWidth;
+        event.fHalfHeight = gPeachPhotoHalfHeight;
+        event.pPlayer = this;
         fn_80060210(g_pGame, &event);
     }
 

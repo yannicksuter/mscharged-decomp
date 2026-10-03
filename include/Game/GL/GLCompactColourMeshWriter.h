@@ -30,9 +30,13 @@ public:
 
     void Texcoord(const nlVector2& uv)
     {
-        short u = (short)(uv.x * 1024.0f);
-        short v = (short)(uv.y * 1024.0f);
-        Texcoord(u, v);
+        Texcoord(uv.x, uv.y);
+    }
+
+    void Texcoord(float u, float v)
+    {
+        *texcoord++ = (short)(u * 1024.0f);
+        *texcoord++ = (short)(v * 1024.0f);
     }
 
     void Texcoord(short u, short v)
@@ -51,6 +55,17 @@ public:
         *position++ = (short)(x * 64.0f);
         *position++ = (short)(y * 64.0f);
         *position++ = (short)(z * 64.0f);
+    }
+
+    void Texture(int index, u32 texture)
+    {
+        glTextureBinding* binding
+            = (glTextureBinding*)model->packets->materialParameters + index;
+        binding->texture = texture;
+        binding->textureIndex = 0xFFFF;
+        binding->SetWrapS(true);
+        binding->SetWrapT(true);
+        binding->unknown07 = 0;
     }
 
     int count;

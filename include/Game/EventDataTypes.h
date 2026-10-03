@@ -63,7 +63,7 @@ struct MegaStrikeEndData
     /* 0x08 */ u32 unknown_08;
 }; // total size: 0x0C
 
-struct UnidentifiedEventData_8006701C
+struct MegaStrikeMeterData
 {
     /* 0x00 */ cFielder* pFielder;
     /* 0x04 */ float fMeterValue;
@@ -147,13 +147,12 @@ struct CollisionBallWallData
     /* 0x20 */ float fCollisionVecLen;
 }; // total size: 0x24
 
-struct UnidentifiedEventData_80066B08
+struct CollisionCrowdData
 {
-    /* 0x00 */ nlVector3 mUnidentified00;
-    /* 0x0C */ PhysicsObject* mUnidentified0C;
-    /* 0x10 */ CrowdRiot* mUnidentified10;
+    /* 0x00 */ nlVector3 v3Position;
+    /* 0x0C */ PhysicsObject* pObject;
+    /* 0x10 */ CrowdRiot* pCrowdRiot;
 }; // total size: 0x14
-typedef UnidentifiedEventData_80066B08 CollisionCrowdData;
 
 struct CollisionPowerupGroundData
 {
@@ -266,14 +265,13 @@ struct CollisionPlayerBananaData
     /* 0x0C */ nlVector3 v3CollisionLocation;
 }; // total size: 0x18
 
-struct UnidentifiedEventData_80066A04
+struct CollisionPowerupStatsData
 {
-    /* 0x00 */ cPlayer* mUnidentified00;
-    /* 0x04 */ int mUnidentified04;
-    /* 0x08 */ cPlayer* mUnidentified08;
-    /* 0x0C */ int mUnidentified0C;
+    /* 0x00 */ cPlayer* pPlayer;
+    /* 0x04 */ int nPlayerPadID;
+    /* 0x08 */ cPlayer* pThrower;
+    /* 0x0C */ int nThrowerPadID;
 }; // total size: 0x10
-typedef UnidentifiedEventData_80066A04 CollisionPowerupStatsData;
 
 struct CollisionBallGoalpostData
 {
@@ -354,19 +352,19 @@ extern SlotPool<NISData> g_NISDataPool;
 extern SlotPool<PowerupUsedEventData> g_PowerupUsedEventDataPool;
 extern SlotPool<PowerupHitPlayerEventData> g_PowerupHitPlayerEventDataPool;
 
-extern "C" inline void fn_80025A14(CollisionPowerupStatsData* data)
+inline void FreeCollisionPowerupStatsData(CollisionPowerupStatsData* data)
 {
     g_CollisionPowerupStatsDataPool.Free(data);
 }
 
 void FreeEventDataPools();
 
-struct UnidentifiedEventData_800673FC
+struct PeachPhotoData
 {
-    /* 0x00 */ cPlayer* mUnidentified00;
-    /* 0x04 */ nlVector3 mUnidentified04;
-    /* 0x10 */ float mUnidentified10;
-    /* 0x14 */ float mUnidentified14;
+    /* 0x00 */ cPlayer* pPlayer;
+    /* 0x04 */ nlVector3 v3Position;
+    /* 0x10 */ float fHalfWidth;
+    /* 0x14 */ float fHalfHeight;
 }; // total size: 0x18
 
 struct UnidentifiedEventData00;
@@ -397,7 +395,6 @@ struct UnidentifiedEventData26
 }; // total size: 0x20
 struct UnidentifiedEventData27;
 struct UnidentifiedEventData28;
-struct UnidentifiedEventData29;
 struct UnidentifiedEventData30
 {
     /* 0x00 */ PowerupBase* mUnidentified00;
@@ -416,8 +413,6 @@ struct UnidentifiedEventData34
     /* 0x10 */ u32 mUnidentified10;
 }; // total size: 0x14
 struct UnidentifiedEventData35;
-struct UnidentifiedEventData36;
-struct UnidentifiedEventData37;
 
 struct CollisionShockwaveData
 {

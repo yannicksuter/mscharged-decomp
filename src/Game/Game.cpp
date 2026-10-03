@@ -648,7 +648,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
         static_cast<World*>(BasicStadium::GetCurrentStadium())->Update(lbl_806E3774, true);
         EmissionManager::Instance()->Update(lbl_806E3774);
     }
-    gNPCManager->fn_801ABF8C();
+    gNPCManager->ResetNPCs();
 
     m_pGameClock->Reset(kGameTweakZero, lbl_806E3750, lbl_806E3748);
     m_pGameClock->Stop();
@@ -818,7 +818,7 @@ void cGame::fn_80058748()
     mUnidentified49C.mEvent11.Queue();
 
     fn_80061B1C(0, 0.0f, 0.0f);
-    gNPCManager->fn_801ABF8C();
+    gNPCManager->ResetNPCs();
     ResetCharacters();
 
     fn_8001847C(g_pBall, false);

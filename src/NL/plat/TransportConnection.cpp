@@ -817,7 +817,7 @@ void TransportConnection::HandleTransportMessage(
         for (u8 i = 0; i < count; i++)
         {
             TransportPacket* packet = message->GetVoicePacket(i);
-            GetCallback()->ReliableCallbackVirtual10(
+            GetCallback()->OnVoiceReceived(
                 (u32)this, packet->mPayload, packet->mSize);
             delete packet;
         }

@@ -953,22 +953,22 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         gNPCManager->CreateChainChomp();
         break;
     case 112:
-        gNPCManager->fn_801A9C3C();
+        gNPCManager->CreateDaisyFists();
         break;
     case 113:
-        gNPCManager->fn_801AA2C0();
+        gNPCManager->CreateHammers();
         break;
     case 114:
-        gNPCManager->fn_801A9BD0();
+        gNPCManager->CreateKoopaShell();
         break;
     case 115:
         gNPCManager->CreateThwomps();
         break;
     case 116:
-        gNPCManager->fn_801A9DF0();
+        gNPCManager->CreateWindDebris();
         break;
     case 117:
-        gNPCManager->fn_801A9AF8();
+        gNPCManager->CreateYoshiEgg();
         break;
     case 118:
         fn_80111664();

@@ -260,7 +260,7 @@ void UnidentifiedCameraEffects::OnMegaStrikeMeterEnd()
 }
 
 void UnidentifiedCameraEffects::OnMegaStrikeMeterStart(
-    UnidentifiedEventData_8006701C*)
+    MegaStrikeMeterData*)
 {
     mCameraFlags |= 8;
 }
@@ -758,7 +758,7 @@ void UnidentifiedCameraEffects::RegisterEventListeners()
     UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnCaptainClashPresentationEnd), this)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnWindupPresentation), this)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnWindupPresentationEnd), this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(Function<UnidentifiedEventData_8006701C*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterStart), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterStart), this, placeholder0)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnMegaStrikeMeterEnd), this)), 0, -1);
     GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnGoalieSave), this, placeholder0)), 0, -1);
     UnidentifiedFindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(Bind<void>(MemFun(&UnidentifiedCameraEffects::OnCollisionThwompPlayer), this, placeholder0)), 0, -1);

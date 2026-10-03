@@ -4,7 +4,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/OverlayHandlerInGameText.h"
 
-struct UnidentifiedEventData_8006701C;
+struct MegaStrikeMeterData;
 struct GoalScoredData;
 struct MegaStrikeEndData;
 class InGameTextOverlay;
@@ -27,10 +27,10 @@ public:
     void fn_801E258C();
     void fn_801E2590();
     void fn_801E2608();
-    void fn_801E2784(UnidentifiedEventData_8006701C* eventData);
+    void fn_801E2784(MegaStrikeMeterData* eventData);
     void fn_801E281C();
-    void fn_801E28A8(UnidentifiedEventData_8006701C* eventData);
-    void fn_801E28E4(UnidentifiedEventData_8006701C* eventData);
+    void fn_801E28A8(MegaStrikeMeterData* eventData);
+    void fn_801E28E4(MegaStrikeMeterData* eventData);
     void fn_801E2920();
     void fn_801E2988(MegaStrikeEndData* eventData);
     void fn_801E29C0(nlVector3 position);

@@ -3091,7 +3091,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     if (g_pGame->m_eGameState == 3 || bNearGoal)
     {
         KillWindup("ball_sts_windup");
-        fn_8004B86C(false, false);
+        InitActionShot(false, false);
         bDidWindup = true;
     }
 
@@ -3128,7 +3128,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
             PlaySound(0, 0xC4534945, 0, 0);
         }
 
-        UnidentifiedEventData_8006701C event;
+        MegaStrikeMeterData event;
         event.pFielder = this;
         event.fMeterValue = mUnidentified3BC;
         nlVector3 v3Column;
@@ -3381,7 +3381,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     PlayRumbleAction(1, GetGlobalPad());
 
-    UnidentifiedEventData_8006701C event;
+    MegaStrikeMeterData event;
     event.pFielder = this;
     event.fMeterValue = mUnidentified3BC;
     nlVector3 v3Column;
@@ -3454,7 +3454,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
         }
     }
 
-    UnidentifiedEventData_8006701C event;
+    MegaStrikeMeterData event;
     event.pFielder = this;
     event.fMeterValue = mUnidentified3C0;
     nlVector3 v3Column;
@@ -4185,7 +4185,7 @@ void cFielder::fn_8004B658()
     }
 }
 
-bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
+bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 {
     if (m_pBall == 0)
     {
@@ -4194,7 +4194,7 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
     }
     else
     {
-        if (bParam)
+        if (bIsOneTimer)
         {
             DoResetShotMeter(0.0f);
             m_pShotMeter->CalcOneTimerValue(this, false);
@@ -4222,9 +4222,9 @@ bool cFielder::fn_8004B86C(bool bIsChipShot, bool bParam)
                 }
                 if (GetCharacterClass() == (eCharacterClass)0x0E)
                 {
-                    if (gNPCManager->mUnidentified02C != 0)
+                    if (gNPCManager->mpKoopaShell != 0)
                     {
-                        gNPCManager->mUnidentified02C->Activate(this);
+                        gNPCManager->mpKoopaShell->Activate(this);
                     }
                 }
                 else if (GetCharacterClass() == (eCharacterClass)0x0C)
@@ -5060,7 +5060,7 @@ void cFielder::ReleaseHammerProjectile()
     {
         for (int i = 0; i < 1; i++)
         {
-            HammerObject* pProjectile = gNPCManager->fn_801AA3AC(-1);
+            HammerObject* pProjectile = gNPCManager->GetHammer(-1);
             if (pProjectile != 0)
             {
                 pProjectile->Activate(this);

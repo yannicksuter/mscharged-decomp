@@ -13,7 +13,7 @@ struct CollisionThwompPlayerData;
 struct GoalScoredData;
 struct GoalieSaveData;
 struct PlayerAttackData;
-struct UnidentifiedEventData_8006701C;
+struct MegaStrikeMeterData;
 
 class UnidentifiedCameraEffects
     : public nlSingleton<UnidentifiedCameraEffects>
@@ -45,7 +45,7 @@ public:
     void OnWindupPresentation();
     void OnWindupPresentationEnd();
     void OnMegaStrikeMeterStart(
-        UnidentifiedEventData_8006701C* eventData);
+        MegaStrikeMeterData* eventData);
     void OnMegaStrikeMeterEnd();
     void OnGoalieSave(GoalieSaveData* eventData);
     void OnCollisionThwompPlayer(CollisionThwompPlayerData* eventData);

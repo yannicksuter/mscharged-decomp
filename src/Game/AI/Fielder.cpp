@@ -624,13 +624,9 @@ bool cFielder::fn_8003E84C() const
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder)
 {
-    bool result = false;
-    if (pFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)1
-        && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(pFielder, (eCharacterClass)1, active);
+    return active;
 }
 
 bool cFielder::fn_8003E8F4() const
@@ -1565,6 +1561,18 @@ bool cFielder::IsRunning() const
     return bRunning;
 }
 
+static inline void ClearPhysicsPatchesOfType(int type)
+{
+    for (int i = 0; i < 60; ++i)
+    {
+        PhysicsPatch* pPatch = lbl_806E12C8->fn_801745B8(i);
+        if (pPatch != 0 && pPatch->GetType() == type)
+        {
+            pPatch->Unknown0();
+        }
+    }
+}
+
 void cFielder::CleanUpAction(eFielderActionState actionState)
 {
     switch (m_eActionState)
@@ -1577,14 +1585,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         if (mUnidentified024.m_eCharacterClass == (eCharacterClass)8)
         {
             m_pHeadTrack->UnidentifiedReset();
-            for (int i = 0; i < 60; ++i)
-            {
-                PhysicsPatch* pPatch = lbl_806E12C8->fn_801745B8(i);
-                if (pPatch != 0 && pPatch->m_Type == 6)
-                {
-                    pPatch->Unknown0();
-                }
-            }
+            ClearPhysicsPatchesOfType(6);
         }
         break;
 

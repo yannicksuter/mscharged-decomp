@@ -432,7 +432,7 @@ public:
 
     void fn_8004B148();
     void fn_8004B2E4(float fDeltaT);
-    bool fn_8004B86C(bool bIsChipShot, bool bParam);
+    bool InitActionShot(bool bIsChipShot, bool bIsOneTimer);
     void fn_8004BF58(eFielderActionState eNewAction);
     void InitActionSlideAttack(cFielder* pTarget, float fTime, int nParam);
     void fn_8004BB80(float fDeltaT);

@@ -170,15 +170,15 @@ bool cField::FixCornerPosition(nlVector3& v, float fMinDistanceFromWall)
 
     for (int i = 0; i < 4; i++)
     {
-        sCornerSegment corner = GetCorner(i);
+        const sCornerSegment corner = GetCorner(i);
         nlVector2 vFromCorner;
         nlVector2 vToCorner;
         nlVec2Set(vToCorner, corner.vCenter.x - v.x, corner.vCenter.y - v.y);
         float fDistanceToCorner = nlVec2Length(vToCorner);
         float fLimitRadius = corner.fRadius - fMinDistanceFromWall;
 
-        if ((float)fabs(v.x) > (float)fabs(corner.vCenter.x)
-            && (float)fabs(v.y) > (float)fabs(corner.vCenter.y))
+        if (fabsf(v.x) > fabsf(corner.vCenter.x)
+            && fabsf(v.y) > fabsf(corner.vCenter.y))
         {
             vFromCorner.x = v.x - corner.vCenter.x;
             vFromCorner.y = v.y - corner.vCenter.y;

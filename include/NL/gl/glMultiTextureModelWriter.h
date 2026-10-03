@@ -30,7 +30,12 @@ public:
 
     void Texcoord0(const nlVector2& value)
     {
-        Texcoord0(value.x, value.y);
+        float u;
+        float v;
+
+        v = value.y;
+        u = value.x;
+        Texcoord0(u, v);
     }
 
     void Texcoord0(float u, float v)

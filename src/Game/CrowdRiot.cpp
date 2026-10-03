@@ -355,10 +355,10 @@ void fn_80029AB0(void*)
 
 void fn_80029B9C(void* param)
 {
-    UnidentifiedEventData_80066B08* event
-        = (UnidentifiedEventData_80066B08*)param;
-    CrowdRiot* crowdRiot = event->mUnidentified10;
-    PhysicsObject* object = event->mUnidentified0C;
+    CollisionCrowdData* event
+        = (CollisionCrowdData*)param;
+    CrowdRiot* crowdRiot = event->pCrowdRiot;
+    PhysicsObject* object = event->pObject;
 
     switch (object->GetObjectType())
     {
@@ -422,11 +422,11 @@ void fn_80029C80(PhysicsObject*, PhysicsObject* other,
         CrowdRiot* crowdRiot = (CrowdRiot*)context;
         if (crowdRiot->meState != 1)
         {
-            UnidentifiedEventData_80066B08* event = 0;
+            CollisionCrowdData* event = 0;
             g_CollisionCrowdDataPool.Allocate(event);
-            event->mUnidentified0C = other;
-            event->mUnidentified00 = position;
-            event->mUnidentified10 = crowdRiot;
+            event->pObject = other;
+            event->v3Position = position;
+            event->pCrowdRiot = crowdRiot;
             fn_8005E29C(g_pGame, event);
         }
         break;

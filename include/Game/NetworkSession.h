@@ -187,7 +187,7 @@ public:
     virtual void ReliableCallbackVirtual08();
     virtual void OnMessageReceived(
         u32 connection, void* buffer, int size, bool reliable);
-    virtual void ReliableCallbackVirtual10(
+    virtual void OnVoiceReceived(
         u32 connection, void* buffer, int size);
     virtual void OnConnectionRequest(
         u32 connection, u8* address, int a, int b, int c);

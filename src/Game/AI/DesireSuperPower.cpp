@@ -487,7 +487,7 @@ void DesireSuperPower::Cleanup()
         fn_80039CF0(m_pFielder, 0);
         m_pFielder->bYoshiInWindup = false;
         EmitYoshiShellBreak(m_pFielder);
-        gNPCManager->mUnidentified024->Break();
+        gNPCManager->mpYoshiEgg->Break();
         break;
     }
 
@@ -714,7 +714,7 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
         unsigned short angle = m_pFielder->mUnidentified024.m_aActualFacingDirection;
         for (int i = 0; i < gDaisyFistCount; i++)
         {
-            DaisyFistObject* fist = gNPCManager->fn_801A9CA4(-1);
+            DaisyFistObject* fist = gNPCManager->GetDaisyFist(-1);
             if (fist != 0)
             {
                 fist->Spawn(m_pFielder, angle);
@@ -1622,7 +1622,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
  */
 extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
 {
-    gNPCManager->mUnidentified024->Activate(self->m_pFielder);
+    gNPCManager->mpYoshiEgg->Activate(self->m_pFielder);
     self->m_pFielder->m_pTweaks
         = self->m_pFielder->mUnidentified328;
     fn_8002E52C(self->m_pFielder);

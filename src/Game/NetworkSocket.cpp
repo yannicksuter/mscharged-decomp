@@ -89,7 +89,7 @@ void NetworkSocket::OnMessageReceived(
     mListener->OnMessageReceived(connection, buffer, size, reliable);
 }
 
-void NetworkSocket::ReliableCallbackVirtual10(
+void NetworkSocket::OnVoiceReceived(
     u32 connection, void* buffer, int size)
 {
     mListener->ListenerVirtual18();
@@ -277,7 +277,7 @@ void NetworkSocket::Receive(void* buffer, int size)
 void NetworkSocket::SocketVirtual34(
     u8 aid, void* buffer, int size)
 {
-    mReliableSocket.SocketVirtual34(aid, buffer, size);
+    mReliableSocket.SendVoice(aid, buffer, size);
 }
 
 void NetworkSocket::Update(float)
@@ -357,7 +357,7 @@ void NetworkSocket::SocketVirtual48()
             "LocAddr %d.%d.%d.%d", mLocalAddress[0], mLocalAddress[1],
             mLocalAddress[2], mLocalAddress[3]);
     }
-    mReliableSocket.SocketVirtual48();
+    mReliableSocket.DrawScreenPrinter();
 }
 
 u8* NetworkSocket::GetLocalAddress()

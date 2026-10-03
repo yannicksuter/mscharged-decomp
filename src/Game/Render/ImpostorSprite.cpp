@@ -74,6 +74,11 @@ public:
 
 struct ImpostorQuad
 {
+    const nlVector3& GetPosition(int index) const
+    {
+        return position[index];
+    }
+
     nlVector2 texcoord[4];
     nlVector3 position[4];
 }; // size: 0x50
@@ -303,7 +308,7 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
         mMesh = 0;
     }
 
-    int count = mNumRenderSlots;
+    int count = GetNumRenderSlots();
     rendered = 0;
     if (count == 0)
     {
@@ -346,20 +351,16 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
 
     if (began)
     {
-        unsigned long texture =
-            glGetTargetTexture(mView->GetRenderPair());
+        const unsigned long texture = GetTexture();
 
         nlMatrix4 viewMatrix;
         target->m_Interface->GetViewMatrix(viewMatrix);
         nlVector3 right;
         nlVector3 up;
         nlVector3 forward;
-        nlVec3Set(right,
-            viewMatrix.m11, viewMatrix.m21, viewMatrix.m31);
-        nlVec3Set(up,
-            viewMatrix.m12, viewMatrix.m22, viewMatrix.m32);
-        nlVec3Set(forward,
-            viewMatrix.m13, viewMatrix.m23, viewMatrix.m33);
+        viewMatrix.GetColumn_(0, right);
+        viewMatrix.GetColumn_(1, up);
+        viewMatrix.GetColumn_(2, forward);
 
         float aspect =
             (float)mWidth / (float)mHeight;
@@ -389,23 +390,14 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
                     int index = sImpostorTriangleIndices[vertex];
                     writer->Texcoord(quad.texcoord[index]);
                     writer->Colour(impostor->mColour);
-                    writer->Vertex(quad.position[index]);
+                    writer->Vertex(quad.GetPosition(index));
                 }
             }
             ++rendered;
         }
 
-        if (gDrawImpostorCheckers)
-        {
-            texture = checkerTexture;
-        }
-        glTextureBinding* textureState =
-            (glTextureBinding*)writer->GetModel()->packets->materialParameters;
-        textureState->texture = texture;
-        textureState->textureIndex = 0xFFFF;
-        textureState->SetWrapS(true);
-        textureState->SetWrapT(true);
-        textureState->unknown07 = 0;
+        unsigned long renderTexture = gDrawImpostorCheckers ? checkerTexture : texture;
+        writer->Texture(0, renderTexture);
 
         if (writer->End())
         {

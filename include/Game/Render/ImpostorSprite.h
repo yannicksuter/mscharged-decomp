@@ -26,6 +26,11 @@ public:
     void ResumeCapture();
     void CreateRenderTarget(const char* name);
     int Render(GLView* target, Impostor* impostors, bool cached, bool skipCapture);
+    int GetNumRenderSlots() const
+    {
+        return mNumRenderSlots;
+    }
+
     void ClearRenderSlots();
     void QueueAllSlots();
     void QueueSlot(int slot);

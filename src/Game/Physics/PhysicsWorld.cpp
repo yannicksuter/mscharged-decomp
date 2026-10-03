@@ -69,12 +69,14 @@ void PhysicsWorld::DoCollide(CollisionSpace* collisionSpace)
     collisionSpace->DoCollide(this, SpaceCollideCallback);
 }
 
-extern PhysicsWorld::PhysicsObjectCallback s_PreCollideObjectCallback;
-extern PhysicsWorld::CollisionSpaceCallback s_PreCollideSpaceCallback;
-extern PhysicsWorld::CollisionSpaceCallback s_DoCollideCallback;
-extern PhysicsWorld::CollisionSpaceCallback s_PreUpdateSpaceCallback;
-extern PhysicsWorld::PhysicsObjectCallback s_PreUpdateObjectCallback;
-extern PhysicsWorld::PhysicsObjectCallback s_PostUpdateObjectCallback;
+PhysicsWorld::PhysicsObjectCallback s_PreCollideObjectCallback = &PhysicsWorld::PreCollide;
+PhysicsWorld::CollisionSpaceCallback s_PreCollideSpaceCallback = &PhysicsWorld::PreCollide;
+PhysicsWorld::CollisionSpaceCallback s_DoCollideCallback = &PhysicsWorld::DoCollide;
+PhysicsWorld::CollisionSpaceCallback s_PreUpdateSpaceCallback = &PhysicsWorld::PreUpdate;
+PhysicsWorld::PhysicsObjectCallback s_PreUpdateObjectCallback = &PhysicsWorld::PreUpdate;
+PhysicsWorld::PhysicsObjectCallback s_PostUpdateObjectCallback = &PhysicsWorld::PostUpdate;
+PhysicsWorld::PhysicsObjectCallback s_LogBodyCallback = &PhysicsWorld::LogBody;
+PhysicsWorld::CollisionSpaceCallback s_LogSpaceCallback = &PhysicsWorld::LogSpace;
 
 void PhysicsWorld::Collide()
 {
@@ -169,7 +171,7 @@ void PhysicsWorld::SpaceCollideCallback(void* data, dxGeom* geom1, dxGeom* geom2
         return;
     }
 
-    int numContacts = dCollide(geom1, geom2, 20, (dContactGeom*)((unsigned char*)contacts + 0x2C), sizeof(dContact));
+    int numContacts = dCollide(geom1, geom2, 20, &contacts[0].geom, sizeof(dContact));
     if (numContacts <= 0)
     {
         return;
@@ -251,23 +253,20 @@ void PhysicsWorld::LogSpace(CollisionSpace* collisionSpace)
     collisionSpace->SyncLogSpace();
 }
 
-extern PhysicsWorld::PhysicsObjectCallback s_LogBodyCallback;
-extern PhysicsWorld::CollisionSpaceCallback s_LogSpaceCallback;
-
 struct GenGeomTypeState
 {
     unsigned short type;
     unsigned short padding;
 };
 
-extern GenGeomTypeState s_GenGeomType;
-extern char s_CollideBitsName[12];
-extern char s_CategoryBitsName[12];
-extern char s_GeomFlagsName[9];
-extern char s_RotationName[4];
-extern char s_PositionName[8];
-extern char s_TypeName[8];
-extern char s_GenGeomName[8];
+GenGeomTypeState s_GenGeomType = { 0xFFFF, 0 };
+char s_CollideBitsName[12] = "m_collBits";
+char s_CategoryBitsName[12] = "m_catBits";
+char s_GeomFlagsName[9] = "m_gflags";
+char s_RotationName[4] = "m_R";
+char s_PositionName[8] = "m_pos";
+char s_TypeName[8] = "m_type";
+char s_GenGeomName[8] = "GenGeom";
 
 void PhysicsWorld::LogGeom(PhysicsObject* object)
 {
@@ -349,21 +348,3 @@ void PhysicsWorld::DoCollisions(
         dGeomCollideAABBs(geom, entry->entry->m_geomID, this, SpaceCollideCallback);
     }
 }
-
-PhysicsWorld::PhysicsObjectCallback s_PreCollideObjectCallback = &PhysicsWorld::PreCollide;
-PhysicsWorld::CollisionSpaceCallback s_PreCollideSpaceCallback = &PhysicsWorld::PreCollide;
-PhysicsWorld::CollisionSpaceCallback s_DoCollideCallback = &PhysicsWorld::DoCollide;
-PhysicsWorld::CollisionSpaceCallback s_PreUpdateSpaceCallback = &PhysicsWorld::PreUpdate;
-PhysicsWorld::PhysicsObjectCallback s_PreUpdateObjectCallback = &PhysicsWorld::PreUpdate;
-PhysicsWorld::PhysicsObjectCallback s_PostUpdateObjectCallback = &PhysicsWorld::PostUpdate;
-PhysicsWorld::PhysicsObjectCallback s_LogBodyCallback = &PhysicsWorld::LogBody;
-PhysicsWorld::CollisionSpaceCallback s_LogSpaceCallback = &PhysicsWorld::LogSpace;
-
-GenGeomTypeState s_GenGeomType = { 0xFFFF, 0 };
-char s_CollideBitsName[12] = "m_collBits";
-char s_CategoryBitsName[12] = "m_catBits";
-char s_GeomFlagsName[9] = "m_gflags";
-char s_RotationName[4] = "m_R";
-char s_PositionName[8] = "m_pos";
-char s_TypeName[8] = "m_type";
-char s_GenGeomName[8] = "GenGeom";

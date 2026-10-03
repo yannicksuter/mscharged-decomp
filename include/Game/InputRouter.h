@@ -121,6 +121,9 @@ public:
     /* 0x0480 */ NetworkInputMessageQueue mInputQueues[4];
     /* 0xE5C0 */ volatile u32 mQueueCursor;
     /* 0xE5C4 */ u32 mQueueLimit;
+
+private:
+    void RecordEmptyInputHeader(s8 machine, int frame);
 }; // size: 0xE5C8
 
 extern u32 gNetworkRandomSeed;

@@ -1091,7 +1091,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             m_v3Position, m_v3Velocity);
     }
 
-    KoopaShellObject* pKoopaShell = gNPCManager->mUnidentified02C;
+    KoopaShellObject* pKoopaShell = gNPCManager->mpKoopaShell;
     if (pKoopaShell != NULL && pKoopaShell->mVisible)
     {
         pKoopaShell->mVelocity = m_v3Velocity;
@@ -3347,7 +3347,7 @@ extern "C" void fn_8001A108(int previousState, int currentState)
         }
 
         KoopaShellObject* pKoopaShell
-            = gNPCManager->mUnidentified02C;
+            = gNPCManager->mpKoopaShell;
         if (pKoopaShell != NULL && pKoopaShell->mVisible)
         {
             pKoopaShell->Deactivate(false);

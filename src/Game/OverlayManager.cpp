@@ -47,10 +47,10 @@ void OverlayManager::fn_801E1514()
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E258C)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E2590)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E2608)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterStart", -1)->Add(Function<UnidentifiedEventData_8006701C*>(BindMember(this, &OverlayManager::fn_801E2784)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::fn_801E2784)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E281C)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterFirst", -1)->Add(Function<UnidentifiedEventData_8006701C*>(BindMember(this, &OverlayManager::fn_801E28A8)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_8006701C>("MegaStrikeMeterSecond", -1)->Add(Function<UnidentifiedEventData_8006701C*>(BindMember(this, &OverlayManager::fn_801E28E4)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterFirst", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::fn_801E28A8)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterSecond", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::fn_801E28E4)), 0, -1);
     UnidentifiedFindEvent<UnidentifiedEventNoData>("MegastrikeStart", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E2920)), 0, -1);
     UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(BindMember(this, &OverlayManager::fn_801E2988)), 0, -1);
     UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &OverlayManager::fn_801E2A28)), 0, -1);
@@ -254,7 +254,7 @@ void OverlayManager::fn_801E2608()
     static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->ResetScores();
 }
 
-void OverlayManager::fn_801E2784(UnidentifiedEventData_8006701C* eventData)
+void OverlayManager::fn_801E2784(MegaStrikeMeterData* eventData)
 {
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
@@ -272,13 +272,13 @@ void OverlayManager::fn_801E281C()
     }
 }
 
-void OverlayManager::fn_801E28A8(UnidentifiedEventData_8006701C* eventData)
+void OverlayManager::fn_801E28A8(MegaStrikeMeterData* eventData)
 {
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetFirstResult(eventData->fMeterValue);
 }
 
-void OverlayManager::fn_801E28E4(UnidentifiedEventData_8006701C* eventData)
+void OverlayManager::fn_801E28E4(MegaStrikeMeterData* eventData)
 {
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetSecondResult(eventData->fMeterValue);

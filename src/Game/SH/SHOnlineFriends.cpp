@@ -130,7 +130,7 @@ void SHOnlineFriends::UpdateFriend(int index)
     if (player != -1)
     {
         row->mStats = category->mMetadata[player];
-        memcpy(row->mMiiData, category->mPlayers[player].mData, sizeof(row->mMiiData));
+        memcpy(row->mMiiData, category->mPlayers[player].mMiiData, sizeof(row->mMiiData));
     }
     else
         row->mStats.Reset();

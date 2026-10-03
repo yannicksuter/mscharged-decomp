@@ -182,8 +182,8 @@ ContactType PhysicsShell::Contact(
         }
         else
         {
-            if (gNPCManager->mUnidentified02C != 0
-                && gNPCManager->mUnidentified02C->mVisible)
+            if (gNPCManager->mpKoopaShell != 0
+                && gNPCManager->mpKoopaShell->mVisible)
             {
                 return NO_CONTACT;
             }

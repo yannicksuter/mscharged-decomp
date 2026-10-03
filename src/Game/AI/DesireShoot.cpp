@@ -162,7 +162,7 @@ bool DesireShoot::Initialize(void* context)
 
     if (m_pFielder->m_pBall != NULL)
     {
-        m_pFielder->fn_8004B86C(mbLobShot, false);
+        m_pFielder->InitActionShot(mbLobShot, false);
     }
     else if (m_pFielder->CanContactLooseBall(false))
     {

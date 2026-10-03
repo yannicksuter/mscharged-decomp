@@ -39,10 +39,10 @@ NetworkStatsReporter::NetworkStatsReporter()
     mLeaderboardMetadata = 0;
     mHomePlayer.mName[0] = 0;
     mHomePlayer.mProfileId = 0;
-    memset(mHomePlayer.mData, 0, sizeof(mHomePlayer.mData));
+    memset(mHomePlayer.mMiiData, 0, sizeof(mHomePlayer.mMiiData));
     mAwayPlayer.mName[0] = 0;
     mAwayPlayer.mProfileId = 0;
-    memset(mAwayPlayer.mData, 0, sizeof(mAwayPlayer.mData));
+    memset(mAwayPlayer.mMiiData, 0, sizeof(mAwayPlayer.mMiiData));
     mReportHome = false;
     mHomeScore = -1;
     mAwayScore = -1;
@@ -53,7 +53,7 @@ void NetworkStatsPlayer::CopyFrom(const NetworkStatsPlayer& other)
 {
     nlStrNCpy(mName, other.mName, 11);
     mProfileId = other.mProfileId;
-    memcpy(mData, other.mData, sizeof(mData));
+    memcpy(mMiiData, other.mMiiData, sizeof(mMiiData));
 }
 
 void NetworkStatsReporter::Reset()
@@ -66,10 +66,10 @@ void NetworkStatsReporter::Reset()
     mLeaderboardMetadata = 0;
     mHomePlayer.mName[0] = 0;
     mHomePlayer.mProfileId = 0;
-    memset(mHomePlayer.mData, 0, sizeof(mHomePlayer.mData));
+    memset(mHomePlayer.mMiiData, 0, sizeof(mHomePlayer.mMiiData));
     mAwayPlayer.mName[0] = 0;
     mAwayPlayer.mProfileId = 0;
-    memset(mAwayPlayer.mData, 0, sizeof(mAwayPlayer.mData));
+    memset(mAwayPlayer.mMiiData, 0, sizeof(mAwayPlayer.mMiiData));
     mReportHome = false;
     mHomeScore = -1;
     mAwayScore = -1;
@@ -111,7 +111,7 @@ bool NetworkStatsReporter::ReportGameResult(int,
     if (!reportHome)
     {
         tDebugPrintManager::Print(DC_NETWORK,
-            "ReportGameResult returning true, but did not really report this game...only home team should do that for now\n");
+            "ReportGameResult returning true, but did not really report this game..only home team should do that for now\n");
         return true;
     }
 
@@ -352,16 +352,16 @@ NetworkRanking::NetworkRanking()
 
 void NetworkRanking::Reset()
 {
-    mRequestComplete = false;
+    mRequestFailed = false;
     mOperation = 0;
     mListener = 0;
     mSubmission.mWins = 0;
     mSubmission.mLosses = 0;
-    mSubmission.mUnidentified0C = 0;
+    mSubmission.mOnlineRegion = 0;
     mSubmission.mName[0] = 0;
-    memset(mSubmission.mData, 0, sizeof(mSubmission.mData));
+    memset(mSubmission.mMiiData, 0, sizeof(mSubmission.mMiiData));
     memset(mSubmission.mDigest, 0, sizeof(mSubmission.mDigest));
-    mReportGame = false;
+    mSubmittingScore = false;
     mLimit = mFilter = 0;
     mLeaderboardPlayers = 0;
     mLeaderboardMetadata = 0;
@@ -425,14 +425,14 @@ bool NetworkRanking::ReportGameResult(int category,
 {
     mSubmission.mWins = fallback->mWins;
     mSubmission.mLosses = fallback->mLosses;
-    mSubmission.mUnidentified0C = fallback->mPlayerId;
+    mSubmission.mOnlineRegion = fallback->mOnlineRegion;
     nlStrNCpy(mSubmission.mName, gNetworkMiiNameWide, 11);
-    memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
+    memcpy(mSubmission.mMiiData, &gNetworkMiiData, sizeof(mSubmission.mMiiData));
     mSubmission.mDay = fallback->mDay;
     mSubmission.mMonth = fallback->mMonth;
     mSubmission.mYear = fallback->mYear;
     mCategory = category;
-    mReportGame = false;
+    mSubmittingScore = false;
 
     NETHMACContext context;
     NETHMACInit(&context, NETGetMD5Interface(), sRankingHmacKey,
@@ -496,13 +496,13 @@ bool NetworkRanking::SubmitScore(int category,
     const NetworkRankingMeta* submission)
 {
     nlStrNCpy(mSubmission.mName, gNetworkMiiNameWide, 11);
-    memcpy(mSubmission.mData, &gNetworkMiiData, sizeof(mSubmission.mData));
+    memcpy(mSubmission.mMiiData, &gNetworkMiiData, sizeof(mSubmission.mMiiData));
 
     if (submission == 0)
     {
         mSubmission.mWins = 0;
         mSubmission.mLosses = 0;
-        mSubmission.mUnidentified0C = (u16)GetOnlineRegion();
+        mSubmission.mOnlineRegion = (u16)GetOnlineRegion();
         DWCTime time;
         DWCDate date;
         GetAdjustedNetworkDate(&date, &time);
@@ -514,13 +514,13 @@ bool NetworkRanking::SubmitScore(int category,
     {
         mSubmission.mWins = submission->mWins;
         mSubmission.mLosses = submission->mLosses;
-        mSubmission.mUnidentified0C = (u16)submission->mUnidentified14;
+        mSubmission.mOnlineRegion = (u16)submission->mUnidentified14;
         mSubmission.mDay = submission->mDay;
         mSubmission.mMonth = submission->mMonth;
         mSubmission.mYear = submission->mYear;
     }
     mCategory = category;
-    mReportGame = true;
+    mSubmittingScore = true;
 
     NETHMACContext context;
     NETHMACInit(&context, NETGetMD5Interface(), sRankingHmacKey,
@@ -787,14 +787,14 @@ void NetworkRanking::ProcessLeaderboardResults()
             {
                 mLeaderboardMetadata[retained].mWins = submission->mWins;
                 mLeaderboardMetadata[retained].mLosses = submission->mLosses;
-                mLeaderboardMetadata[retained].mUnidentified14 = submission->mUnidentified0C;
+                mLeaderboardMetadata[retained].mUnidentified14 = submission->mOnlineRegion;
                 mLeaderboardMetadata[retained].mDay = submission->mDay;
                 mLeaderboardMetadata[retained].mMonth = submission->mMonth;
                 mLeaderboardMetadata[retained].mYear = submission->mYear;
                 nlStrNCpy(mLeaderboardPlayers[retained].mName,
                     submission->mName, 11);
-                memcpy(mLeaderboardPlayers[retained].mData,
-                    submission->mData, sizeof(mLeaderboardPlayers[retained].mData));
+                memcpy(mLeaderboardPlayers[retained].mMiiData,
+                    submission->mMiiData, sizeof(mLeaderboardPlayers[retained].mMiiData));
             }
             else
             {
@@ -804,8 +804,8 @@ void NetworkRanking::ProcessLeaderboardResults()
                 mLeaderboardMetadata[retained].mDay = 1;
                 mLeaderboardMetadata[retained].mMonth = 1;
                 mLeaderboardMetadata[retained].mYear = 2000;
-                memset(mLeaderboardPlayers[retained].mData, 0,
-                    sizeof(mLeaderboardPlayers[retained].mData));
+                memset(mLeaderboardPlayers[retained].mMiiData, 0,
+                    sizeof(mLeaderboardPlayers[retained].mMiiData));
             }
             mLeaderboardMetadata[retained].mScore = row.score;
             mLeaderboardMetadata[retained].mDisplayRank = row.order;
@@ -992,7 +992,7 @@ void NetworkRanking::Update()
     {
         return;
     }
-    if (mRequestComplete)
+    if (mRequestFailed)
     {
         return;
     }
@@ -1010,12 +1010,12 @@ void NetworkRanking::Update()
     if (result == DWC_RNK_IN_ERROR)
     {
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkProcesss() returned error %d\n", result);
-        mRequestComplete = true;
+        mRequestFailed = true;
         switch (mOperation)
         {
         case 1:
             tDebugPrintManager::Print(DC_NETWORK, "Putting Score failed!\n");
-            if (mReportGame)
+            if (mSubmittingScore)
             {
                 mListener->OnSubmitScoreResult(false, mCategory);
             }
@@ -1038,7 +1038,7 @@ void NetworkRanking::Update()
         {
         case 1:
             tDebugPrintManager::Print(DC_NETWORK, "Putting Score succeeded!\n");
-            if (mReportGame)
+            if (mSubmittingScore)
             {
                 mListener->OnSubmitScoreResult(true, mCategory);
             }

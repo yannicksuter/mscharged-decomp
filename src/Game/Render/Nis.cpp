@@ -115,7 +115,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
         if (chunk->GetID() == 0x80017000)
         {
             cSAnim* anim = cSAnim::Initialize(chunk);
-            NPCTemplate* npcTemplate = gNPCManager->fn_801ABBDC(anim->m_szName);
+            NPCTemplate* npcTemplate = gNPCManager->FindNPCTemplate(anim->m_szName);
             if (npcTemplate != 0)
             {
                 for (i = 0; i < 8; ++i)

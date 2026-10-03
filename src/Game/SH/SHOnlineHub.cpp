@@ -72,7 +72,7 @@ SHOnlineHub::SHOnlineHub()
     mRankStats.Reset();
     mStrikerOfTheDay.mName[0] = 0;
     mStrikerOfTheDay.mProfileId = 0;
-    memset(mStrikerOfTheDay.mData, 0, sizeof(mStrikerOfTheDay.mData));
+    memset(mStrikerOfTheDay.mMiiData, 0, sizeof(mStrikerOfTheDay.mMiiData));
     mStrikerOfTheDayStats.Reset();
     mBackButton.SetPushBackScene(false);
     mBackButton.SetPopScene(false);
@@ -319,7 +319,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
         {
             mStrikerOfTheDay.mName[0] = 0;
             mStrikerOfTheDay.mProfileId = 0;
-            memset(mStrikerOfTheDay.mData, 0, sizeof(mStrikerOfTheDay.mData));
+            memset(mStrikerOfTheDay.mMiiData, 0, sizeof(mStrikerOfTheDay.mMiiData));
             mStrikerOfTheDayStats.Reset();
             mHasStrikerOfTheDay = false;
         }
@@ -347,7 +347,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
         text->m_bVisible = false;
     bool valid = false;
     if (mHasStrikerOfTheDay)
-        valid = g_pMiiManager->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mData, 1, (RFLExpression)0);
+        valid = g_pMiiManager->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);
     TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn2", "Mii");
     unsigned long texture = g_pMiiManager->mIconTextureIds[1];
     image->SetAssetVisible(valid && mInitialized);

@@ -456,7 +456,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             {
                 if (meReceiveAnimType & 4)
                 {
-                    m_pFielder->fn_8004B86C(mbOneTouchVolley, true);
+                    m_pFielder->InitActionShot(mbOneTouchVolley, true);
                 }
                 else if (fn_800C0E54())
                 {
@@ -477,7 +477,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                         }
                         else
                         {
-                            m_pFielder->fn_8004B86C(mbOneTouchVolley, true);
+                            m_pFielder->InitActionShot(mbOneTouchVolley, true);
                         }
                     }
                 }
@@ -491,7 +491,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                 }
                 else
                 {
-                    m_pFielder->fn_8004B86C(mbOneTouchVolley, true);
+                    m_pFielder->InitActionShot(mbOneTouchVolley, true);
                 }
             }
             else if (!mbOneTouchShot && fn_800C2F6C())

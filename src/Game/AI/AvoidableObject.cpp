@@ -157,7 +157,7 @@ float AvoidableFielder::GetRadius()
     float fRadius = 0.0f;
     if (m_pFielder->fn_8003EA6C())
     {
-        fRadius = gNPCManager->mUnidentified024->mPhysics->GetRadius();
+        fRadius = gNPCManager->mpYoshiEgg->mPhysics->GetRadius();
     }
     else
     {

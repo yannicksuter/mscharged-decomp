@@ -15,11 +15,11 @@
 #include "Game/Task/FixedUpdateTask.h"
 
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" bool fn_8003E948(cFielder*);
+extern "C" bool fn_8003E948(const cFielder*);
 
 
 static unsigned short sDesireUserControlledType = 0xFFFF;
-static unsigned int lbl_806DC3AC = 0x20;
+static unsigned int sMegaStrikeDesireState = 0x20;
 
 /**
  * Offset/Address/Size: 0x0 | 0x800D448C | size: 0x100
@@ -36,9 +36,9 @@ bool DesireUserControlled::Initialize(void* context)
 
     mMaxDuration = -1.0f;
 
-    UnidentifiedVariant_80054AB8 update;
+    DesireUpdate update;
     Update(
-        (DesireUpdate*)&update, g_fSimulationTick);
+        &update, g_fSimulationTick);
 
     return result;
 }
@@ -74,7 +74,7 @@ void DesireUserControlled::Update(
             m_pFielder->StartRunning();
         }
 
-        fn_80095870(m_pFielder);
+        SetDesiredFacingDirection(m_pFielder);
         if (m_pFielder->m_eActionState == ACTION_RUNNING)
         {
             float fMaxSpeed = fn_8002C254(
@@ -120,7 +120,7 @@ void DesireUserControlled::Update(
             {
                 if (!m_pFielder->GetGlobalPad()->IsPressed(0x1C, true))
                 {
-                    m_pFielder->fn_8004B86C(
+                    m_pFielder->InitActionShot(
                         m_pFielder->bIsModified,
                         false);
                 }
@@ -131,7 +131,7 @@ void DesireUserControlled::Update(
                 || pShotMeter->m_eShotMeterState
                     == SHOT_METER_STS_RELEASED)
             {
-                m_pFielder->fn_8004B86C(
+                m_pFielder->InitActionShot(
                     m_pFielder->bIsModified,
                     false);
                 return;
@@ -141,7 +141,7 @@ void DesireUserControlled::Update(
                 == SHOT_METER_STS_TRANSISTION)
             {
                 *update = 3;
-                update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC3AC));
+                update->SetParameter(8, FuzzyVariant(FT_INT, sMegaStrikeDesireState));
             }
             return;
         }

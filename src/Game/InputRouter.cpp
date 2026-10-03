@@ -502,6 +502,14 @@ void NetworkInputRouter::OnInputCaptured()
     }
 }
 
+inline void NetworkInputRouter::RecordEmptyInputHeader(s8 machine, int frame)
+{
+    NetworkInputRecording* recording = gNetworkInputRecording;
+    u32 seed = GetNetworkRandomSeed();
+    recording->WriteNetworkInputPacketHeader(machine,
+        mNetworkTicks[machine], mCurrentCRC, frame, seed, 0, 0);
+}
+
 void NetworkInputRouter::OnInputReady()
 {
     bool congested = false;
@@ -515,11 +523,8 @@ void NetworkInputRouter::OnInputReady()
             NetworkPeer* peer = mSession->GetPeer(machine);
             if (gNetworkInputRecording->mRecording)
             {
-                int frame = gInputManager->mFrameProvider->GetFrame();
-                NetworkInputRecording* recording = gNetworkInputRecording;
-                u32 seed = GetNetworkRandomSeed();
-                recording->WriteNetworkInputPacketHeader(machine,
-                    mNetworkTicks[machine], mCurrentCRC, frame, seed, 0, 0);
+                RecordEmptyInputHeader(
+                    machine, gInputManager->mFrameProvider->GetFrame());
             }
 
             for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
@@ -527,15 +532,15 @@ void NetworkInputRouter::OnInputReady()
                 NetworkPeerChannel* channel
                     = peer->GetNetworkPeerChannel(player);
                 s8 playerId = GetNetworkPlayerId(player, machine);
-                u8* state = &mInputStates[playerId];
-                PackedDetInput* input = &mInputRecords[playerId];
                 channel->ApplyNetworkPeerChannelInput(
-                    input, mNetworkTicks[machine], *state);
+                    &mInputRecords[playerId], mNetworkTicks[machine],
+                    mInputStates[playerId]);
 
                 if (gNetworkInputRecording->mRecording)
                 {
                     gNetworkInputRecording->WriteNetworkInputRecord(
-                        player, input, *state);
+                        player, &mInputRecords[playerId],
+                        mInputStates[playerId]);
                 }
             }
         }
@@ -566,7 +571,7 @@ void NetworkInputRouter::OnInputReady()
             NetworkMessageSerializer serializer(
                 1, serializedData, sizeof(serializedData));
             message->Serialize(&serializer);
-            int serializedLength = serializer.GetLength();
+            u32 serializedLength = serializer.GetLength();
 
             if (gNetworkInputRecording->mRecording)
             {
@@ -603,17 +608,19 @@ void NetworkInputRouter::OnInputReady()
                 NetworkPeerChannel* channel
                     = peer->GetNetworkPeerChannel(player);
                 s8 playerId = GetNetworkPlayerId(player, machine);
-                PackedDetInput* input = &mInputRecords[playerId];
-                message->ApplyNetworkInputMessageRecord(player, input);
+                message->ApplyNetworkInputMessageRecord(
+                    player, &mInputRecords[playerId]);
                 mInputStates[playerId]
                     = message->GetNetworkInputMessagePlayerState(player);
                 channel->ApplyNetworkPeerChannelInput(
-                    input, mNetworkTicks[machine], mInputStates[playerId]);
+                    &mInputRecords[playerId], mNetworkTicks[machine],
+                    mInputStates[playerId]);
 
                 if (gNetworkInputRecording->mRecording)
                 {
                     gNetworkInputRecording->WriteNetworkInputRecord(
-                        player, input, mInputStates[playerId]);
+                        player, &mInputRecords[playerId],
+                        mInputStates[playerId]);
                 }
             }
         }

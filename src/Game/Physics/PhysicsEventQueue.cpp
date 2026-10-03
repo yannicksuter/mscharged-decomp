@@ -374,7 +374,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         }
     }
 
-    UnidentifiedEventData_80066A04* pStats;
+    CollisionPowerupStatsData* pStats;
     bool bInvincible;
     cBall* pBall;
     eSpinType spinType;
@@ -430,15 +430,15 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                 {
                     pStats = 0;
                     g_CollisionPowerupStatsDataPool.Allocate(pStats);
-                    pStats->mUnidentified08 = (cPlayer*)pShockwave->mOwner;
-                    pStats->mUnidentified0C = pShockwave->mSourceIndex;
-                    pStats->mUnidentified00 = pFielder;
+                    pStats->pThrower = (cPlayer*)pShockwave->mOwner;
+                    pStats->nThrowerPadID = pShockwave->mSourceIndex;
+                    pStats->pPlayer = pFielder;
                     bool bHasPad = pFielder->GetGlobalPad() != 0;
-                    pStats->mUnidentified04 =
+                    pStats->nPlayerPadID =
                         bHasPad ? pFielder->GetGlobalPad()->GetPadID() : -1;
                     g_pGame->mUnidentified49C.mEvent31.Queue(pStats,
-                        Function<UnidentifiedEventData_80066A04*>(
-                            fn_80025A14));
+                        Function<CollisionPowerupStatsData*>(
+                            FreeCollisionPowerupStatsData));
                 }
                 break;
             case SHOCKWAVE_LIGHTNING:

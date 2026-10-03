@@ -37,7 +37,7 @@ public:
         *texcoord++ = v;
     }
 
-    void Texcoord(short u, short v)
+    void Texcoord(int u, int v)
     {
         *texcoord++ = u;
         *texcoord++ = v;

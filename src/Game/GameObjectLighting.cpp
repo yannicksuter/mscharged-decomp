@@ -905,11 +905,12 @@ GameObjectLight* GetGameObjectLight(s32 arg0, bool arg1)
         {
             if (arg0 == 0)
                 return &lbl_80570B80;
-            s32 var1 = lbl_80570B70.value;
-            if (arg0 < var1)
-                return &lbl_805709D8[arg0];
-            var1 = arg0 - var1;
-            return &lbl_805709D8[var1 + lbl_806DCC64];
+            s32 characterLightCount = lbl_80570B70.value;
+            s32 lightIndex = arg0;
+            if (lightIndex < characterLightCount)
+                return &lbl_805709D8[lightIndex];
+            lightIndex -= characterLightCount;
+            return &lbl_805709D8[lightIndex + lbl_806DCC64];
         }
         return &lbl_805709D8[arg0];
 

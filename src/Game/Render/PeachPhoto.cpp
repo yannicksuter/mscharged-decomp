@@ -322,8 +322,7 @@ void RenderPeachPhoto(PeachPhotoState* photo)
     {
         for (int i = 0; i < 4; ++i)
         {
-            writer.Texcoord0(photo->projectedCorners[i].x,
-                photo->projectedCorners[i].y);
+            writer.Texcoord0(photo->projectedCorners[i]);
 
             const nlVector2& tex = texture[(i + gPeachPhotoTextureRotation) % 4];
             writer.Texcoord1(tex);

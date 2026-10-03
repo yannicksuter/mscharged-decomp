@@ -332,8 +332,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         fn_8013F854("PhysChar Not fielder\n");
-        if (gNPCManager->mUnidentified02C != 0
-            && gNPCManager->mUnidentified02C->mVisible)
+        if (gNPCManager->mpKoopaShell != 0
+            && gNPCManager->mpKoopaShell->mVisible)
         {
             fn_8013F854("PhysChar KoopaShell->IsVisible\n");
             return NO_CONTACT;

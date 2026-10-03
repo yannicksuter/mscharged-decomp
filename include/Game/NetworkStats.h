@@ -13,14 +13,14 @@ struct NetworkStatsPlayer
     {
         mName[0] = 0;
         mProfileId = 0;
-        memset(mData, 0, sizeof(mData));
+        memset(mMiiData, 0, sizeof(mMiiData));
     }
 
     void CopyFrom(const NetworkStatsPlayer& other);
 
     /* 0x00 */ int mProfileId;
     /* 0x04 */ u16 mName[11];
-    /* 0x1A */ u8 mData[0x4C];
+    /* 0x1A */ u8 mMiiData[0x4C];
     /* 0x66 */ u8 mPadding66[2];
 }; // size: 0x68
 
@@ -64,7 +64,7 @@ struct NetworkScoreSubmission
     /* 0x08 */ int mUnidentified08;
     /* 0x0C */ int mWins;
     /* 0x10 */ int mLosses;
-    /* 0x14 */ int mPlayerId;
+    /* 0x14 */ int mOnlineRegion;
 }; // size: 0x18
 
 class NetworkStatsListener
@@ -154,10 +154,10 @@ struct NetworkRankingSubmission
         , mYear(2000)
         , mWins(0)
         , mLosses(0)
-        , mUnidentified0C(0)
+        , mOnlineRegion(0)
     {
         mName[0] = 0;
-        memset(mData, 0, sizeof(mData));
+        memset(mMiiData, 0, sizeof(mMiiData));
         memset(mDigest, 0, sizeof(mDigest));
     }
 
@@ -166,9 +166,9 @@ struct NetworkRankingSubmission
     /* 0x02 */ u16 mYear;
     /* 0x04 */ int mWins;
     /* 0x08 */ int mLosses;
-    /* 0x0C */ u16 mUnidentified0C;
+    /* 0x0C */ u16 mOnlineRegion;
     /* 0x0E */ u16 mName[11];
-    /* 0x24 */ u8 mData[0x4C];
+    /* 0x24 */ u8 mMiiData[0x4C];
     /* 0x70 */ u8 mDigest[0x10];
 }; // size: 0x80
 
@@ -214,12 +214,12 @@ public:
     virtual void Update();
 
     /* 0x004 */ bool mInitialized;
-    /* 0x005 */ bool mRequestComplete;
+    /* 0x005 */ bool mRequestFailed;
     /* 0x006 */ u8 mPadding006[2];
     /* 0x008 */ int mOperation;
     /* 0x00C */ NetworkStatsListener* mListener;
     /* 0x010 */ NetworkRankingSubmission mSubmission;
-    /* 0x090 */ bool mReportGame;
+    /* 0x090 */ bool mSubmittingScore;
     /* 0x091 */ u8 mPadding091[3];
     /* 0x094 */ int mFilter;
     /* 0x098 */ int mLimit;

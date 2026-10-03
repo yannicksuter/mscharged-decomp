@@ -2840,7 +2840,7 @@ bool Goalie::fn_80090958(bool bParam)
             ReleaseBall(false);
         }
 
-        KoopaShellObject* pPowerup = gNPCManager->mUnidentified02C;
+        KoopaShellObject* pPowerup = gNPCManager->mpKoopaShell;
         if (pPowerup != 0 && pPowerup->mVisible)
         {
             fn_800156F8(g_pBall, mpSkillShooter);

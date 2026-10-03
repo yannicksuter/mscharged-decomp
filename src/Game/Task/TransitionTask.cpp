@@ -152,7 +152,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
             ClearCharacterEffectsTexturing();
 
             g_pGame->ResetPowerups(false);
-            gNPCManager->fn_801ABF8C();
+            gNPCManager->ResetNPCs();
             lbl_806E12C8->ResetEffects();
         }
     }
@@ -167,7 +167,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
             ClearCharacterEffectsTexturing();
 
             g_pGame->ResetPowerups(false);
-            gNPCManager->fn_801ABF8C();
+            gNPCManager->ResetNPCs();
             lbl_806E12C8->ResetEffects();
         }
         else if (to == 1)
