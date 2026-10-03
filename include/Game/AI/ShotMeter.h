@@ -48,6 +48,10 @@ public:
     {
         return m_fTime;
     }
+    float GetSpeedValue() const
+    {
+        return m_fSpeedValue;
+    }
     float UnidentifiedGetShotDuration() const
     {
         return mUnidentified008;

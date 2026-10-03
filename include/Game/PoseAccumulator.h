@@ -74,6 +74,10 @@ public:
         m_Scale = scale;
     }
     void InitAccumulators();
+    cSHierarchy* GetBaseHierarchy() const
+    {
+        return m_BaseSHierarchy;
+    }
     void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
     void BlendRot(int nNode, const nlQuaternion* pRot, float fWeight,
         bool bMirror);
