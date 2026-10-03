@@ -12,9 +12,6 @@ struct NHTTPBgnEndInfo
 typedef s32 (*NHTTPPostSend)(const char* label, char** value_p,
     u32* length_p, s32 offset, void* userParam);
 
-void* NHTTPi_GetSystemInfoP(void);
-NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(void* systemInfo);
-void* NHTTPi_GetMutexInfoP(void* systemInfo);
 BOOL NHTTPi_Startup(void* systemInfo, NHTTPAlloc alloc, NHTTPFree free,
     u32 priority);
 void NHTTPi_CleanupAsync(void* systemInfo, NHTTPCleanupCallback callback);
@@ -33,23 +30,6 @@ s32 NHTTPGetBodyBuffer(NHTTPConnectionInfo* connection, void** buffer,
     u32* bufferSize);
 void* NHTTPGetUserParam(NHTTPConnectionInfo* connection);
 s32 NHTTPGetConnectionError(NHTTPConnectionInfo* connection);
-NHTTPConnectionInfo* NHTTPi_GetConnection(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-NHTTPRequestInfo* NHTTPi_Connection2Request(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-NHTTPResponseInfo* NHTTPi_Connection2Response(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-NHTTPConnectionInfo* NHTTPi_Request2Connection(void* mutexInfo,
-    NHTTPRequestInfo* request);
-NHTTPConnectionInfo* NHTTPi_Response2Connection(void* mutexInfo,
-    NHTTPResponseInfo* response);
-NHTTPRequestInfo* NHTTPi_GetRequest(void* mutexInfo,
-    NHTTPRequestInfo* request);
-NHTTPResponseInfo* NHTTPi_GetResponse(void* mutexInfo,
-    NHTTPResponseInfo* response);
-s32 NHTTPi_OmitConnectionList(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-u32 NHTTPi_GetVirtualContentLength(NHTTPConnectionInfo* connection);
 BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
     const char* name, const char* value);
 BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
@@ -72,7 +52,7 @@ void NHTTPCleanupAsync(NHTTPCleanupCallback callback)
 
 s32 NHTTPSSLGetError(void)
 {
-    return NHTTPi_GetSSLError(NHTTPi_GetSystemInfoP());
+    return NHTTPi_GetSSLError((NHTTPBgnEndInfo*)NHTTPi_GetSystemInfoP());
 }
 
 static s32 NHTTPi_PostSendCallbackWrap(void* mutexInfo_p,

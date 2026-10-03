@@ -1,4 +1,4 @@
-#include <revolution/nhttp.h>
+#include <private/nhttp.h>
 
 #include <revolution/ncd.h>
 #include <revolution/os.h>
@@ -20,22 +20,12 @@ typedef struct NHTTPBgnEndInfo
     void* threadStack;
 } NHTTPBgnEndInfo;
 
-NHTTPBgnEndInfo* NHTTPi_GetSystemInfoP(void);
-NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(void* systemInfo);
-void* NHTTPi_GetListInfoP(void* systemInfo);
-void* NHTTPi_GetReqInfoP(void* systemInfo);
-void* NHTTPi_GetMutexInfoP(void* systemInfo);
-void* NHTTPi_GetThreadInfoP(void* systemInfo);
-
-void NHTTPi_InitListInfo(void* listInfo);
-void NHTTPi_InitRequestInfo(void* reqInfo);
 void NHTTPi_initLockReqList(void* mutexInfo);
 void NHTTPi_exitLockReqList(void);
 BOOL NHTTPi_createCommThread(void* threadInfo, u32 priority, void* stack);
 void NHTTPi_destroyCommThread(void* threadInfo, NHTTPBgnEndInfo* bgnEndInfo);
 void NHTTPi_CheckCurrentThread(void* threadInfo, BOOL allowCommThread);
 void NHTTPi_cancelAllRequests(void* systemInfo);
-int NHTTPi_GetConnectionListLength(void);
 
 void NHTTPi_InitBgnEndInfo(NHTTPBgnEndInfo* info)
 {
@@ -51,7 +41,7 @@ void NHTTPi_InitBgnEndInfo(NHTTPBgnEndInfo* info)
 
 void* NHTTPi_alloc(u32 size, int align)
 {
-    NHTTPBgnEndInfo* info = NHTTPi_GetSystemInfoP();
+    NHTTPBgnEndInfo* info = (NHTTPBgnEndInfo*)NHTTPi_GetSystemInfoP();
 
     if (info->alloc != NULL)
     {
@@ -62,7 +52,7 @@ void* NHTTPi_alloc(u32 size, int align)
 
 void NHTTPi_free(void* buf)
 {
-    NHTTPBgnEndInfo* info = NHTTPi_GetSystemInfoP();
+    NHTTPBgnEndInfo* info = (NHTTPBgnEndInfo*)NHTTPi_GetSystemInfoP();
 
     if (info->free != NULL)
     {

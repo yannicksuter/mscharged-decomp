@@ -33,7 +33,6 @@
 extern "C"
 {
     void fn_80182164();
-    RLView* fn_8027261C();
     DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
     void fn_80278818(BasicStadium* stadium);
     float fn_802789A0(BasicStadium* stadium);
@@ -214,7 +213,7 @@ void BeginLoadStadium(const char* path, bool skipGameplayModels)
 
     GLResourcePool* context = glGetCurrentResourcePool();
     pBasicStadiumInstance = new (8, false) BasicStadium(context);
-    pBasicStadiumInstance->m_pOpaqueView = (GLView*)fn_8027261C();
+    pBasicStadiumInstance->m_pOpaqueView = (GLView*)GetShadowedView();
     pBasicStadiumInstance->m_pAlphaView = (GLView*)GetLayerView(eCLV_WorldAlphaBlended);
 
     nlSNPrintf(buffer, sizeof(buffer), StadiumResourcePathFormat, gStadiumResourcePath);

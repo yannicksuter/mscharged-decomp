@@ -32,7 +32,7 @@ public:
     unsigned long GetTexture();
     bool AddImpostorSlot(int slot);
     void ClearImpostorSlots();
-    void BuildQuad(ImpostorQuad* quad, const Impostor* impostor, const nlVector3* right, const nlVector3* up);
+    void BuildQuad(ImpostorQuad* quad, Impostor* impostor, const nlVector3* right, const nlVector3* up);
     int CalculateRenderChecksum();
 
     /* 0x00 */ bool mCaptureSuspended;

@@ -63,13 +63,13 @@ static int lbl_80502B10[4] = { 0x59, 0x5C, 0x5B, 0x5A };
 /**
  * Offset/Address/Size: 0xF48 | 0x800D2FBC | size: 0x128
  */
-bool DesireUsePowerup::UnidentifiedInitialize(void* context)
+bool DesireUsePowerup::Initialize(void* context)
 {
     bool result;
     ePowerUpType ePowerup;
     UnidentifiedVariantCollection* params;
 
-    result = Desire::UnidentifiedInitialize(context);
+    result = Desire::Initialize(context);
     params = (UnidentifiedVariantCollection*)context;
 
     mbThrowingPowerup = false;
@@ -80,7 +80,7 @@ bool DesireUsePowerup::UnidentifiedInitialize(void* context)
         = mtPowerupEffectTime.m_uPackedTime != 0;
     mtPowerupEffectTime.m_uPackedTime = 0;
     m_pFielder->m_nPowerupAnimID = -1;
-    mUnidentified078 = -1.0f;
+    mMaxDuration = -1.0f;
 
     if (params->IsSet(15))
     {
@@ -128,7 +128,7 @@ void DesireUsePowerup::Update(
 /**
  * Offset/Address/Size: 0x1820 | 0x800D3894 | size: 0x3C
  */
-void DesireUsePowerup::UnidentifiedCleanup()
+void DesireUsePowerup::Cleanup()
 {
     mbThrowingPowerup = false;
     mePowerup = POWER_UP_NONE;
@@ -150,9 +150,9 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
         return;
     }
 
-    if (!pDesire->mUnidentifiedActive)
+    if (!pDesire->mActive)
     {
-        fn_80319E84(pDesire->mUnidentified018, 17, NULL, false);
+        fn_80319E84(pDesire->mScriptMachine, 17, NULL, false);
     }
 
     cTeam* pTeam = pDesire->m_pFielder->m_pTeam;
@@ -171,9 +171,9 @@ void DesireUsePowerup::fn_800D3968(
         return;
     }
 
-    if (!mUnidentifiedActive && bActivate)
+    if (!mActive && bActivate)
     {
-        fn_80319E84(mUnidentified018, 17, NULL, false);
+        fn_80319E84(mScriptMachine, 17, NULL, false);
     }
 
     cTeam* pTeam = m_pFielder->m_pTeam;
@@ -353,29 +353,29 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             UnidentifiedVariantCollection params;
             TransitionFunc* pTransition
                 = !pDesire->mOverrideTransition.IsUnset()
-                ? &pDesire->mOverrideTransition
-                : &pDesire->mDefaultTransition;
+                ? &pDesire->mOverrideTransition.mValue
+                : &pDesire->mDefaultTransition.mValue;
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mFuncHash));
-            fn_80319E84(pDesire->mUnidentified018, 23, &params, false);
+            fn_80319E84(pDesire->mScriptMachine, 23, &params, false);
             NativeTransitionFunc transition((void*)fn_800D2074);
-            pDesire->mOverrideTransition.mFuncHash
-                = transition.mFuncHash;
-            pDesire->mOverrideTransition.mNativeFunc
-                = transition.mNativeFunc;
+            pDesire->mOverrideTransition.mValue.mFuncHash
+                = transition.mValue.mFuncHash;
+            pDesire->mOverrideTransition.mValue.mNativeFunc
+                = transition.mValue.mNativeFunc;
             pDesire->UnidentifiedResetPowerupState();
         }
         break;
     }
     case POWER_UP_STAR:
     {
-        fn_80319E84(pDesire->mUnidentified018, 24, NULL, true);
+        fn_80319E84(pDesire->mScriptMachine, 24, NULL, true);
         pDesire->UnidentifiedResetPowerupState();
         break;
     }
     case POWER_UP_MUSHROOM:
     {
-        fn_80319E84(pDesire->mUnidentified018, 25, NULL, true);
+        fn_80319E84(pDesire->mScriptMachine, 25, NULL, true);
         pDesire->UnidentifiedResetPowerupState();
         break;
     }
@@ -405,7 +405,7 @@ extern "C" void fn_800D3CBC(DesireUsePowerup* pDesire)
             event->Type = params.eType;
             event->Thrower = pDesire->m_pFielder;
             event->Target = pDesire->mpTarget;
-            fn_80148074(event);
+            QueuePowerupUsed(event);
         }
         pDesire->UnidentifiedResetPowerupState();
         break;

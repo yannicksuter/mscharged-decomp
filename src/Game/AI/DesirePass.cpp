@@ -36,7 +36,7 @@ static int sContinueDesire = DESIRE_CONTINUE;
 /**
  * Offset/Address/Size: 0x0 | 0x800BA57C | size: 0x188
  */
-bool DesirePreparePass::UnidentifiedInitialize(void* context)
+bool DesirePreparePass::Initialize(void* context)
 {
     UnidentifiedVariantCollection* params =
         (UnidentifiedVariantCollection*)context;
@@ -48,7 +48,7 @@ bool DesirePreparePass::UnidentifiedInitialize(void* context)
     }
 
     float fDuration = sPreparePassDuration;
-    mUnidentified078 = fDuration + 0.2f;
+    mMaxDuration = fDuration + 0.2f;
     if (mbVolleyPass)
     {
         mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
@@ -132,7 +132,7 @@ void DesirePreparePass::Update(DesireUpdate* update, float fDeltaT)
 /**
  * Offset/Address/Size: 0x828 | 0x800BADA4 | size: 0x50
  */
-void DesirePreparePass::UnidentifiedCleanup()
+void DesirePreparePass::Cleanup()
 {
     if (m_pSpaceSearch == m_pFielder->m_pSpaceSearch)
     {
@@ -144,7 +144,7 @@ void DesirePreparePass::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x878 | 0x800BADF4 | size: 0x164
  */
-bool DesirePass::UnidentifiedInitialize(void* context)
+bool DesirePass::Initialize(void* context)
 {
     bool result = true;
     UnidentifiedVariantCollection* params =
@@ -209,7 +209,7 @@ void DesirePass::Update(DesireUpdate*, float)
 /**
  * Offset/Address/Size: 0x9E0 | 0x800BAF5C | size: 0x4
  */
-void DesirePass::UnidentifiedCleanup()
+void DesirePass::Cleanup()
 {
 }
 

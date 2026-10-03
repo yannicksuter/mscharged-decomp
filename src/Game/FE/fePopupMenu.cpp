@@ -1,5 +1,4 @@
 #include "Game/HBMManager.h"
-#include "NL/nlFunction.inl"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/fePopupMenu.h"
 
@@ -201,26 +200,26 @@ static const PopupEntry PopupEntries[] = {
 
 FEPopupMenu::FEPopupMenu()
     : mMenuDisplayed(false)
-    , mUnidentified99D(false)
+    , mMessageAndOptionsShown(false)
     , mMenuCreated(false)
     , mRunCallBack(false)
-    , mUnknownA1F(false)
-    , mUnidentified9A1(false)
-    , mUnidentified9A2(false)
-    , mUnidentified9A3(false)
+    , mRunBackCallback(false)
+    , mAllPointersActive(false)
+    , mOptionPressed(false)
+    , mHBMWasBlocked(false)
     , mHighlightedOption(0)
-    , mUnidentified9A8(0)
+    , mShowLongButton(0)
     , mAcceptDelayTime(0.0f)
-    , mUnidentifiedC08(0)
-    , mUnidentifiedC0C(8)
-    , mUnknownA64()
+    , mUpdateCount(0)
+    , mControlInput(8)
+    , mBackCallback()
     , mType(INVALID_TYPE)
-    , mUnknownAA4(true)
-    , mUnknownAA5(false)
+    , mPlayIntroAnimation(true)
+    , mWideMessageBox(false)
     , mUnidentifiedC4C(false)
-    , mUnidentifiedC50(0.0f)
-    , mUnidentifiedC54(0.0f)
-    , mUnidentifiedC58(false)
+    , mBackgroundTargetScaleX(0.0f)
+    , mBackgroundTargetScaleY(0.0f)
+    , mBackgroundScaleDone(false)
 {
     mPopup.numOptions = 0;
     mPopup.pMessage = 0;
@@ -231,21 +230,21 @@ FEPopupMenu::FEPopupMenu()
     mControllerComponents[0].mContext = 0;
     mControllerComponents[0].mIgnoreInputLock = true;
     mOptionInstances[0] = 0;
-    mUnidentified9D0[0] = 0;
+    mOptionTextInstances[0] = 0;
 
     mControllerComponents[1].mContext = (void*)1;
     mControllerComponents[1].mIgnoreInputLock = true;
     mOptionInstances[1] = 0;
-    mUnidentified9D0[1] = 0;
+    mOptionTextInstances[1] = 0;
 
     mControllerComponents[2].mContext = (void*)2;
     mControllerComponents[2].mIgnoreInputLock = true;
     mOptionInstances[2] = 0;
-    mUnidentified9D0[2] = 0;
+    mOptionTextInstances[2] = 0;
 
     for (int i = 0; i < 4; ++i)
     {
-        mUnidentifiedBF8[i] = 0;
+        mPointerHoverCounts[i] = 0;
     }
 
     g_pFEInput->PushExclusiveInputLock(this, 10);
@@ -267,7 +266,7 @@ FEPopupMenu::~FEPopupMenu()
     g_pFEInput->PopExclusiveInputLock(this);
     FEAudio::EnableSounds(true);
 
-    if (!mUnidentified9A3)
+    if (!mHBMWasBlocked)
     {
         gpHBMManager->mBlocked = false;
     }
@@ -283,9 +282,9 @@ FEPopupMenu::~FEPopupMenu()
         Function<FnVoidVoid>& callback = callBacks[mHighlightedOption];
         callback();
     }
-    else if (mUnknownA1F != false)
+    else if (mRunBackCallback != false)
     {
-        mUnknownA64();
+        mBackCallback();
     }
 }
 
@@ -295,7 +294,7 @@ void FEPopupMenu::SceneCreated()
     TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find<FEPresentation>(
         presentation, "Slide1", "Layer", "Message");
     pText->SetString(mPopup.pMessage->begin());
-    if (mUnknownAA5)
+    if (mWideMessageBox)
     {
         nlVector2 boxSize = pText->fn_801CA5E8();
         boxSize.e[0] = 650.0f;
@@ -316,9 +315,9 @@ void FEPopupMenu::SceneCreated()
             mOptionInstances[optionIndex] = pOK;
             pOK->SetVisible(true);
         }
-        mUnidentified9D0[optionIndex] = FEFinder<TLTextInstance, 3>::Find<TLComponentInstance>(
+        mOptionTextInstances[optionIndex] = FEFinder<TLTextInstance, 3>::Find<TLComponentInstance>(
             mOptionInstances[optionIndex], "off", "Group", "btn_text");
-        mUnidentified9D0[optionIndex]->SetString(mPopup.pOptionLabels[optionIndex]->begin());
+        mOptionTextInstances[optionIndex]->SetString(mPopup.pOptionLabels[optionIndex]->begin());
         pText = FEFinder<TLTextInstance, 3>::Find<TLComponentInstance>(
             mOptionInstances[optionIndex], "over", "Group", "btn_text");
         pText->SetString(mPopup.pOptionLabels[optionIndex]->begin());
@@ -327,7 +326,7 @@ void FEPopupMenu::SceneCreated()
         pText->SetString(mPopup.pOptionLabels[optionIndex]->begin());
 
         if (optionIndex == 0)
-            mHighlightedOptionColour = mUnidentified9D0[optionIndex]->GetAssetColour();
+            mHighlightedOptionColour = mOptionTextInstances[optionIndex]->GetAssetColour();
     }
 
     for (int hiddenOptionIndex = mPopup.numOptions; hiddenOptionIndex < 3; ++hiddenOptionIndex)
@@ -335,16 +334,16 @@ void FEPopupMenu::SceneCreated()
         FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
             presentation, "Slide1", "Layer", optionNames[hiddenOptionIndex])->SetVisible(false);
     }
-    if (mUnidentified9A8 == 0)
+    if (mShowLongButton == 0)
     {
         FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
             presentation, "Slide1", "Layer", "button_LONG")->SetVisible(false);
     }
-    mUnidentifiedC48 = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
+    mHighlightInstance = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(
         presentation->GetActiveSlide(), "Layer", "HIGHLIGHT");
-    mUnidentifiedC48->SetVisible(false);
+    mHighlightInstance->SetVisible(false);
     FEAudio::EnableSounds(true);
-    fn_801CA644();
+    GetType();
     FEAudio::EnableSounds(false);
 
     TLInstance* bars = FEFinder<TLInstance, 4>::FindOrDefault<TLSlide>(
@@ -356,7 +355,7 @@ void FEPopupMenu::SceneCreated()
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
         scene->HideButtons();
-    fn_801C83AC(true);
+    SetMessageAndOptionsVisible(true);
 }
 
 void FEPopupMenu::Update(float fDeltaT)
@@ -366,15 +365,15 @@ void FEPopupMenu::Update(float fDeltaT)
     if (!mMenuDisplayed)
     {
         SetPositions();
-        if (!mUnknownAA4)
+        if (!mPlayIntroAnimation)
             mPresentation->m_fadeDuration = 999.9f;
     }
-    if (mUnidentifiedC08 < 2)
-        ++mUnidentifiedC08;
-    else if (mUnidentifiedC08 == 2)
+    if (mUpdateCount < 2)
+        ++mUpdateCount;
+    else if (mUpdateCount == 2)
     {
-        fn_801C8494();
-        ++mUnidentifiedC08;
+        InitializePointerButtons();
+        ++mUpdateCount;
     }
     BaseSceneHandler::Update(fDeltaT);
 
@@ -384,10 +383,10 @@ void FEPopupMenu::Update(float fDeltaT)
     TLSlide* pSlide = mPresentation->GetActiveSlide();
     if (pSlide->GetCurrentTime() < 1.0)
         return;
-    if (!mUnidentified99D)
+    if (!mMessageAndOptionsShown)
     {
-        fn_801C83AC(true);
-        mUnidentified99D = true;
+        SetMessageAndOptionsVisible(true);
+        mMessageAndOptionsShown = true;
     }
     if (pSlide->GetCurrentTime() < 1.5)
         return;
@@ -400,14 +399,14 @@ void FEPopupMenu::Update(float fDeltaT)
         event.mPosition = GetPointerPosition(index, &valid);
         event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)index, 30, true, 0);
         TLComponentInstance* pPointer = GetPointerInstance(index);
-        if (!mUnidentified9A1 && index != gFEControllerIndex)
+        if (!mAllPointersActive && index != gFEControllerIndex)
             pPointer->SetActiveSlide("waiting", true, false);
         else
         {
             pPointer->SetActiveSlide("cursor", true, false);
             for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
                 mControllerComponents[optionIndex].HandlePointerEvent(&event);
-            if (mUnidentified9A2)
+            if (mOptionPressed)
                 break;
         }
     }
@@ -415,16 +414,16 @@ void FEPopupMenu::Update(float fDeltaT)
 
 void FEPopupMenu::UpdateBackgroundScale(float fDeltaT)
 {
-    if (mMenuDisplayed && !mUnidentifiedC58)
+    if (mMenuDisplayed && !mBackgroundScaleDone)
     {
         TLImageInstance* pImage = FEFinder<TLImageInstance, 2>::FindOrDefault<TLSlide>(
             mPresentation->GetActiveSlide(), "Layer", "blackbox");
         const feVector3 scale = pImage->GetAssetScale();
-        if (scale.e[0] >= mUnidentifiedC50 && scale.e[1] >= mUnidentifiedC54)
-            mUnidentifiedC58 = true;
+        if (scale.e[0] >= mBackgroundTargetScaleX && scale.e[1] >= mBackgroundTargetScaleY)
+            mBackgroundScaleDone = true;
         else
-            pImage->SetAssetScale(scale.e[0] + mUnidentifiedC50 * fDeltaT / 0.75,
-                scale.e[1] + mUnidentifiedC54 * fDeltaT / 0.75, scale.e[2]);
+            pImage->SetAssetScale(scale.e[0] + mBackgroundTargetScaleX * fDeltaT / 0.75,
+                scale.e[1] + mBackgroundTargetScaleY * fDeltaT / 0.75, scale.e[2]);
     }
 }
 
@@ -579,7 +578,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         }
         mPopup.pMessage = new (8, false) WStr(Format<WStr>(message, optionsName));
         if (menu == 3)
-            mUnknownAA5 = true;
+            mWideMessageBox = true;
         mPopup.numOptions = 2;
         mPopup.pOptionLabels[0] = new (8, false) WStr(g_pLocalization->GetString(popupEntry->mOptions[0]));
         mPopup.pOptionLabels[1] = new (8, false) WStr(g_pLocalization->GetString(popupEntry->mOptions[1]));
@@ -673,7 +672,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     callBacks[0] = option1;
     callBacks[1] = option2;
     callBacks[2] = option3;
-    mUnknownA64 = option4;
+    mBackCallback = option4;
     mMenuCreated = true;
     mType = type;
     mHighlightedOption = popupEntry->mInitialHighlight;
@@ -721,7 +720,7 @@ void FEPopupMenu::SetPositions()
         pText->SetAssetColour(hiddenTextColour);
         for (int hiddenOptionIndex = 0; hiddenOptionIndex < mPopup.numOptions; ++hiddenOptionIndex)
         {
-            pText = mUnidentified9D0[hiddenOptionIndex];
+            pText = mOptionTextInstances[hiddenOptionIndex];
             hiddenTextColour = pText->GetAssetColour();
             hiddenTextColour.c[3] = 0;
             pText->SetAssetColour(hiddenTextColour);
@@ -737,7 +736,7 @@ void FEPopupMenu::SetPositions()
     float otherOptionSpacing = GetConfigFloat(Config::Global(), "popup_other_option_spacing", 12.5f);
     for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
     {
-        pText = mUnidentified9D0[optionIndex];
+        pText = mOptionTextInstances[optionIndex];
         nlColour optionColour = pText->GetAssetColour();
         optionColour.c[3] = 255;
         pText->SetAssetColour(optionColour);
@@ -767,16 +766,16 @@ void FEPopupMenu::SetPositions()
         mPresentation, "Slide1", "Layer", "Message");
     nlVector2 size = fn_801CC48C(pText);
     float width = size.e[0] > 630.0f ? size.e[0] : 630.0f;
-    mUnidentifiedC50 = (40.0f + width) / 120.0f;
-    mUnidentifiedC54 = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
+    mBackgroundTargetScaleX = (40.0f + width) / 120.0f;
+    mBackgroundTargetScaleY = (40.0f + (totalHeight + 15.0f * mPopup.numOptions)) / 100.0f;
     pImage->SetAssetScale(0.0f, 0.0f, 1.0f);
     feVector3 position = pImage->GetAssetPosition();
     pImage->SetAssetPosition(position.e[0], position.e[1], position.e[2]);
-    fn_801C83AC(false);
+    SetMessageAndOptionsVisible(false);
     mMenuDisplayed = true;
 }
 
-void FEPopupMenu::fn_801C83AC(bool visible)
+void FEPopupMenu::SetMessageAndOptionsVisible(bool visible)
 {
     unsigned char alpha = visible ? 255 : 0;
     TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find(
@@ -791,17 +790,17 @@ void FEPopupMenu::fn_801C83AC(bool visible)
     }
 }
 
-void FEPopupMenu::fn_801C8494()
+void FEPopupMenu::InitializePointerButtons()
 {
     typedef Detail::MemFunImpl<void, void (FEPopupMenu::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, FEPopupMenu*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
     FEPointerListener::Callback enterCallback(PointerBinding(
-        MemFun(&FEPopupMenu::fn_801C87E0), this, Placeholder<0>(), Placeholder<1>()));
+        MemFun(&FEPopupMenu::OnOptionPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback leaveCallback(PointerBinding(
-        MemFun(&FEPopupMenu::fn_801C88B4), this, Placeholder<0>(), Placeholder<1>()));
+        MemFun(&FEPopupMenu::OnOptionPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
     FEPointerListener::Callback pressCallback(PointerBinding(
-        MemFun(&FEPopupMenu::fn_801C8960), this, Placeholder<0>(), Placeholder<1>()));
+        MemFun(&FEPopupMenu::OnOptionPointerPress), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int optionIndex = 0; optionIndex < mPopup.numOptions; ++optionIndex)
     {
@@ -813,10 +812,10 @@ void FEPopupMenu::fn_801C8494()
     }
 }
 
-void FEPopupMenu::fn_801C87E0(unsigned int index, void* context)
+void FEPopupMenu::OnOptionPointerEnter(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
-    ++mUnidentifiedBF8[index];
+    ++mPointerHoverCounts[index];
     if (!mControllerComponents[optionIndex].HasOtherPointerState(1, index))
     {
         mOptionInstances[optionIndex]->SetActiveSlide("over", true, false);
@@ -827,10 +826,10 @@ void FEPopupMenu::fn_801C87E0(unsigned int index, void* context)
     mControllerComponents[optionIndex].SetPointerState(1, index);
 }
 
-void FEPopupMenu::fn_801C88B4(unsigned int index, void* context)
+void FEPopupMenu::OnOptionPointerLeave(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
-    --mUnidentifiedBF8[index];
+    --mPointerHoverCounts[index];
     if (!mControllerComponents[optionIndex].HasOtherPointerState(1, index))
     {
         mOptionInstances[optionIndex]->SetActiveSlide("off", true, false);
@@ -838,7 +837,7 @@ void FEPopupMenu::fn_801C88B4(unsigned int index, void* context)
     mControllerComponents[optionIndex].SetPointerState(0, index);
 }
 
-void FEPopupMenu::fn_801C8960(unsigned int index, void* context)
+void FEPopupMenu::OnOptionPointerPress(unsigned int index, void* context)
 {
     FEAudio::EnableSounds(true);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
@@ -860,7 +859,7 @@ void FEPopupMenu::fn_801C8960(unsigned int index, void* context)
 
     mRunCallBack = true;
     mHighlightedOption = (int)context;
-    mUnidentified9A2 = true;
-    mUnidentified9A3 = gpHBMManager->mBlocked;
+    mOptionPressed = true;
+    mHBMWasBlocked = gpHBMManager->mBlocked;
     gpHBMManager->mBlocked = true;
 }

@@ -21,9 +21,9 @@ enum eAvoidableThings
     AVOID_FIELDERS = 1,
     AVOID_POWERUPS = 2,
     AVOID_GOALIES = 4,
-    AVOID_UNIDENTIFIED_08 = 8,
+    AVOID_POLYGONS = 8,
     AVOID_BOWSER = 16,
-    AVOID_UNIDENTIFIED_20 = 32,
+    AVOID_PATCHES = 32,
     AVOID_SIDELINES = 64,
     AVOID_EVERYTHING = 127,
     NUM_AVOIDABLES = 8,
@@ -291,6 +291,6 @@ inline void UnidentifiedAvoidanceHistory::UnidentifiedGetValue(
 
 extern "C" void fn_8000F178(AvoidController* controller);
 extern "C" float fn_8000F558( AvoidController* controller, eAvoidableThings things);
-extern "C" void fn_8000F594(AvoidableObject* pObject);
+extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject);
 
 #endif // GAME_AI_AVOID_CONTROLLER_H

@@ -7,7 +7,7 @@
 #include "NL/nlPrint.h"
 
 template <int kBlockSize>
-class UnidentifiedSlotPoolFixedBase : public SlotPoolBase
+class SlotPoolFixedBase : public SlotPoolBase
 {
 public:
     struct SavedState
@@ -22,7 +22,7 @@ public:
         }
     };
 
-    ~UnidentifiedSlotPoolFixedBase()
+    ~SlotPoolFixedBase()
     {
         FreeBlocks();
     }
@@ -114,10 +114,10 @@ public:
 }; // size: 0x44
 
 template <int kBlockSize>
-class UnidentifiedSlotPoolFixedState : public UnidentifiedSlotPoolFixedBase<kBlockSize>
+class SlotPoolFixedState : public SlotPoolFixedBase<kBlockSize>
 {
 public:
-    ~UnidentifiedSlotPoolFixedState()
+    ~SlotPoolFixedState()
     {
         while (this->m_Depth > 0)
         {
@@ -128,7 +128,7 @@ public:
 };
 
 template <int kBlockSize>
-class nlSlotPoolFixed : public UnidentifiedSlotPoolFixedState<kBlockSize>
+class nlSlotPoolFixed : public SlotPoolFixedState<kBlockSize>
 {
 public:
     ~nlSlotPoolFixed();
@@ -282,6 +282,21 @@ public:
     {
     }
 
+    void* Allocate()
+    {
+        void* result = 0;
+        if (m_FreeList == 0)
+        {
+            BaseAddNewBlock(this, 0x40);
+        }
+        if (m_FreeList != 0)
+        {
+            result = m_FreeList;
+            m_FreeList = m_FreeList->next;
+        }
+        return result;
+    }
+
     ~TempStringSlotPool()
     {
         fn_802B467C(this);
@@ -350,15 +365,7 @@ public:
         void* result = 0;
         if (size <= 0x40)
         {
-            if (m_FreeList == 0)
-            {
-                BaseAddNewBlock(this, 0x40);
-            }
-            if (m_FreeList != 0)
-            {
-                result = m_FreeList;
-                m_FreeList = m_FreeList->next;
-            }
+            result = TempStringSlotPool::Allocate();
         }
         else if (size <= 0x8000)
         {

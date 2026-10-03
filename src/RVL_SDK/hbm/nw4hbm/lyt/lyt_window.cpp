@@ -168,6 +168,22 @@ void GetRBTexCoord(math::VEC2* texCds, const Size& polSize, const Size& texSize,
         polSize.height / ((flipInfo.coords[VERTEXCOLOR_RT][iy] - flipInfo.coords[VERTEXCOLOR_RB][iy]) * tSz[iy]);
 }
 
+inline void SetFrameTexOrigin(math::VEC2* texCds, int corner, int ix, int iy, u8 originX, u8 originY) {
+    // Corner bits select horizontal (1) and vertical (2) neighbors.
+    texCds[corner][ix] = texCds[corner ^ 2][ix] = originX;
+    texCds[corner][iy] = texCds[corner ^ 1][iy] = originY;
+}
+
+inline void SetFrameTexExtent(math::VEC2* texCds, const Size& polSize, const Size& texSize,
+                             const TextureFlipInfo& flipInfo, int corner, int ix, int iy,
+                             u8 originX, u8 originY) {
+    const math::VEC2 tSz(texSize.width, texSize.height);
+    texCds[corner ^ 3][ix] = texCds[corner ^ 1][ix] = originX +
+        polSize.width / ((flipInfo.coords[corner ^ 1][ix] - originX) * tSz[ix]);
+    texCds[corner ^ 3][iy] = texCds[corner ^ 2][iy] = originY +
+        polSize.height / ((flipInfo.coords[corner ^ 2][iy] - originY) * tSz[iy]);
+}
+
 } // unnamed namespace
 
 namespace nw4hbm {
@@ -388,7 +404,17 @@ void Window::DrawFrame(const math::VEC2& basePt, const Frame& frame, const Windo
         detail::DrawQuad(polPt, polSize, GX_TEXMAP1, texCds, bUseVtxCol ? vtxColors : NULL, alpha); \
     }
 
-    DRAW_QUAD_FOR_FRAME_1(LT, TEXTUREFLIP_NONE);
+    GetLTFrameSize(&polPt, &polSize, basePt, mSize, frameSize);
+    {
+        TextureFlipInfo& flipInfo = GetTexutreFlipInfo(TEXTUREFLIP_NONE);
+        int iy = flipInfo.idx[FLIPINDEX_Y];
+        int ix = flipInfo.idx[FLIPINDEX_X];
+        const u8 originX = flipInfo.coords[VERTEXCOLOR_LT][ix];
+        const u8 originY = flipInfo.coords[VERTEXCOLOR_LT][iy];
+        SetFrameTexOrigin(*texCds, VERTEXCOLOR_LT, ix, iy, originX, originY);
+        SetFrameTexExtent(*texCds, polSize, texSize, flipInfo, VERTEXCOLOR_LT, ix, iy, originX, originY);
+    }
+    detail::DrawQuad(polPt, polSize, GX_TEXMAP1, texCds, bUseVtxCol ? vtxColors : NULL, alpha);
     DRAW_QUAD_FOR_FRAME_1(RT, TEXTUREFLIP_H);
     DRAW_QUAD_FOR_FRAME_1(RB, TEXTUREFLIP_180);
     DRAW_QUAD_FOR_FRAME_1(LB, TEXTUREFLIP_V);

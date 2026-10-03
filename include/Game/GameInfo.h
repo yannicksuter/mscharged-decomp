@@ -225,6 +225,8 @@ bool IsOnlineFriendSelectionMode();
 
 void SetOnlineFriendSelectionContext(void* context);
 
+void FormatFriendKey(unsigned long long friendKey, u16* output);
+
 extern void* gOnlineFriendSelectionContext;
 
 #endif // GAME_GAMEINFO_H

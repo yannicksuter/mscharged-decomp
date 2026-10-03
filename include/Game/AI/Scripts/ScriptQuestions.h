@@ -248,6 +248,9 @@ extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition);
 extern "C" float fn_800DA91C(cFielder*);
 extern "C" float fn_800DACF4(cPlayer*);
 extern "C" float fn_800DAD3C(cBall*);
+extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
+    cPlayer* pIgnorePlayer1, cPlayer* pIgnorePlayer2, float fTeamWeight,
+    float fOpponentWeight, float fGoalieWeight, float fPredictionTime);
 extern "C" float fn_800DBB0C(cFielder*);
 extern "C" float fn_800DBB88(cFielder*);
 extern "C" float fn_800DBEF4(cFielder*, cFielder*);

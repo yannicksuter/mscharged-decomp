@@ -2,32 +2,25 @@
 #define GAME_WORLD_WORLD_EFFECT_H
 
 #include "types.h"
-#include "Game/World/WorldObject.h"
+#include "Game/World/WorldObject_80129EE0.h"
 
 class World;
 class WorldAnimController;
 class EmissionController;
 struct WorldObjectLoadContext;
 
-class WorldEffect : public WorldObject
+class WorldEffect : public WorldObject_80129EE0
 {
 public:
     WorldEffect() : m_bActive(1) { }
     virtual ~WorldEffect();
     virtual void ReleaseResources();
-    virtual nlMatrix4* GetWorldMatrix();
-    virtual void SetWorldMatrix(const nlMatrix4& transform);
     virtual void Initialize(WorldObjectLoadContext* context);
 
     void Update(float fDeltaT);
     void Emit();
     void UpdateVisibility(EmissionController* pController);
 
-    /* 0x04 */ u8 m_pad04[0x0C];
-    /* 0x10 */ World* m_pWorld;
-    /* 0x14 */ int m_nAnimNode;
-    /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ u8 m_pad1C[0x44];
     /* 0x60 */ float m_fEmissionInterval;
     /* 0x64 */ float mUnidentified064;
     /* 0x68 */ float m_fEmissionRadius;

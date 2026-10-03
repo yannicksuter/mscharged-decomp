@@ -193,7 +193,7 @@ ContactType PhysicsAIBall::Contact(
                     {
                         if (bOutsideSideline)
                         {
-                            fn_80145C9C();
+                            QueueBallFall();
                         }
                         return NO_CONTACT;
                     }
@@ -217,7 +217,7 @@ ContactType PhysicsAIBall::Contact(
                     nlVec3Set(pEventData->normal, info->geom.normal[0],
                         info->geom.normal[1], info->geom.normal[2]);
                     pEventData->fCollisionVecLen = nlSqrt(speedSq, true);
-                    fn_801466D4(pEventData);
+                    QueueCollisionBallWall(pEventData);
                     ScaleAngularVelocity(0.9f);
                 }
 
@@ -272,7 +272,7 @@ ContactType PhysicsAIBall::Contact(
                 pEventData->normal.y = 0.0f;
                 pEventData->normal.z = 1.0f;
                 pEventData->fVecZComponent = v3IncidentVel.z;
-                fn_8014658C(pEventData);
+                QueueCollisionBallGround(pEventData);
             }
         }
     }
@@ -447,7 +447,7 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
         pEventData->pBall = m_pAIBall;
         pEventData->velocity = v3Vel;
         pEventData->boneID = 0;
-        fn_801462DC(pEventData);
+        QueueCollisionPlayerBall(pEventData);
 
         m_pAIBall->ClearBallBlur();
         m_goalieContactFramesAgo = 0;

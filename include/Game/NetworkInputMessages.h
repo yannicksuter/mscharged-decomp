@@ -31,7 +31,7 @@ public:
     void GetNetworkInputMessageRemapAngle(u16* tick);
     void SetNetworkInputMessageSyncData(u32 checksum, u32 frame, u32 randomSeed);
     void SetNetworkInputMessageCongested(bool congested);
-    void AddNetworkInputMessageEvent(const DetermDataEvent* event);
+    void AddNetworkInputMessageEvent(DetermDataEvent* event);
     DetermDataEvent* GetNetworkInputMessageEvent(int index);
 
     virtual void Serialize(NetworkMessageSerializer* serializer);

@@ -11,12 +11,12 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Event.h"
 #include "Game/EventDataTypes.h"
+#include "Game/EventRegistry.h"
 #include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/Goalie.h"
 #include "Game/PassBallData.h"
 #include "Game/Team.h"
-#include "NL/nlAVLTree.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFormat.h"
 #include "NL/nlMath.h"
@@ -48,16 +48,12 @@ struct PenaltyStatsData
     /* 0x00 */ cPlayer* pPlayer;
 };
 
-typedef nlAVLTree<unsigned int, UnidentifiedEventBase*,
-    DefaultKeyCompare<unsigned int> >
-    StatsEventRegistry;
-
 template <typename P1, typename P2>
-class StatsTypedEvent2 : public UnidentifiedEventBase
+class StatsTypedEvent2 : public EventBase
 {
 public:
     StatsTypedEvent2(const char* name, int length)
-        : UnidentifiedEventBase(name, length)
+        : EventBase(name, length)
     {
     }
 
@@ -65,8 +61,6 @@ public:
     virtual void Disconnect(void*) = 0;
     virtual void Add(Function2<void, P1, P2>, unsigned int, int) = 0;
 };
-
-extern StatsEventRegistry* g_pEventRegistry;
 
 extern "C" void fn_801E2A14(BaseGameSceneManager* manager);
 extern "C" int fn_80380C34(FILE* file, long offset, int origin);
@@ -81,9 +75,9 @@ template <typename T>
 static inline UnidentifiedTypedEvent<T>* FindStatsEvent(const char* name)
 {
     unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
+    EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+    EventBase* event = foundEvent != 0 ? foundEvent->event : 0;
     return (UnidentifiedTypedEvent<T>*)event;
 }
 
@@ -91,9 +85,9 @@ template <typename P1, typename P2>
 static inline StatsTypedEvent2<P1, P2>* FindStatsEvent2(const char* name)
 {
     unsigned int hash = HashEventName(name, -1);
-    UnidentifiedEventBase** foundEvent = 0;
+    EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event = foundEvent != 0 ? *foundEvent : 0;
+    EventBase* event = foundEvent != 0 ? foundEvent->event : 0;
     return (StatsTypedEvent2<P1, P2>*)event;
 }
 

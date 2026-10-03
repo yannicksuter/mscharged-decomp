@@ -6,23 +6,10 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 
+#include "Game/Replay.h"
+
 #include <math.h>
 #include <string.h>
-
-struct LoadFrame
-{
-    char _000[8];
-    u8* position;
-    char _00C[4];
-    float deltaTime;
-};
-
-struct SaveFrame
-{
-    char _000[8];
-    u8* position;
-};
-
 
 const unsigned long LightTexture = glGetTexture("global/lightramp");
 const unsigned long BlackTexture = glGetTexture("global/black");
@@ -114,24 +101,20 @@ void WorldDarkening::Render()
 
 void WorldDarkening::Replay(SaveFrame& frame)
 {
-    memcpy(frame.position, &mActive, sizeof(mActive));
-    frame.position += sizeof(mActive);
+    Replayable<0>(frame, mActive);
     if (mActive)
     {
-        memcpy(frame.position, &mPos, sizeof(mPos));
-        frame.position += sizeof(mPos);
+        Replayable<0>(frame, mPos);
     }
 }
 
 void WorldDarkening::Replay(LoadFrame& frame)
 {
-    memcpy(&mActive, frame.position, sizeof(mActive));
-    frame.position += sizeof(mActive);
+    Replayable<0>(frame, mActive);
     if (mActive)
     {
-        memcpy(&mPos, frame.position, sizeof(mPos));
-        frame.position += sizeof(mPos);
-        float deltaTime = frame.deltaTime;
+        Replayable<0>(frame, mPos);
+        float deltaTime = frame.mNonBlendableAheadOfFrame;
         Update(deltaTime);
     }
 }

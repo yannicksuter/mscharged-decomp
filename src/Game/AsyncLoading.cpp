@@ -2,6 +2,7 @@
 #include "Game/MiiManager.h"
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/Physics/PhysicsEventQueue.h"
+#include "Game/Physics/Physics.h"
 #include "Game/HBMManager.h"
 #include "Game/ObjectBlur.h"
 
@@ -134,17 +135,13 @@
 
 bool IsNetworkOrRecordedGame();
 
-extern "C" void fn_8013DB18();
 void ShutdownWarbleRendering(void*);
-extern "C" void fn_8013DDD4();
 extern "C" bool fn_802773B8(bool stadiumViewer);
 extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
 extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
     void* parameterData, bool immediate, float value);
-extern "C" void fn_8013D8DC();
-extern "C" void fn_8013D85C();
 void fn_80056CF4(void*, int, bool);
 extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
@@ -470,7 +467,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 19:
         SetLoadingComment("AsyncFinalizeCameraLoading");
-        FinishLoadingStepOrUndo(this, fn_800F08A4());
+        FinishLoadingStepOrUndo(this, AsyncFinalizeCameraLoading());
         break;
     case 20:
         SetLoadingComment("AsyncFinalizeGameWorldLoading");
@@ -566,16 +563,16 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 36:
     {
-        bool stadiumViewer = m_SP[-1] != 0;
+        bool frontEnd = m_SP[-1] != 0;
         m_SP--;
         SetLoadingComment("AsyncStartCameraLoading");
-        fn_800F030C(stadiumViewer);
+        AsyncStartCameraLoading(frontEnd);
         FinishLoadingStep(this);
         break;
     }
     case 37:
         SetLoadingComment("AsyncStartCameraLoadingForStadiumViewer");
-        fn_800F06D4();
+        AsyncStartCameraLoadingForStadiumViewer();
         break;
     case 38:
         fn_8011A2E8(this);
@@ -861,7 +858,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 95:
         SetLoadingComment("PhysicsLoad");
-        fn_8013D8DC();
+        CreateStaticPhysicsPrimitives();
         FinishLoadingStep(this);
         break;
     case 96:
@@ -873,8 +870,8 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 97:
         SetLoadingComment("PhysicsPreGameLoad");
-        fn_80144070();
-        fn_8013D85C();
+        CreatePhysicsEventQueue();
+        CreatePhysicsWorld();
         FinishLoadingStep(this);
         break;
     case 98:
@@ -1746,7 +1743,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     InitializeGameStreams();
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
     StatsTracker::Instance()->CreateEventHandler();
-    ReplayManager::Instance()->fn_80188D88();
+    ReplayManager::Instance()->RegisterEventHandlers();
     fn_80194EF8(&ReplayChoreo::Instance());
     NisPlayer::Instance()->fn_8027DA28();
     GetPresentation()->RegisterEventListeners();
@@ -1980,8 +1977,8 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     DestroyStadium();
     fn_80115FB4();
     GetFixedUpdateTask()->Reset();
-    fn_801440BC();
-    fn_8013DB18();
+    DestroyPhysicsEventQueue();
+    DestroyStaticPhysicsPrimitives();
     FrontEnd::Destroy();
     Jumbotron::instance.Uninitialize();
     CrowdManager::instance.Uninitialize();
@@ -1997,7 +1994,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FreeElectricFence();
     DestroyGame();
     DestroyGameTweaks(&gGameTweaks);
-    fn_8013DDD4();
+    DestroyPhysicsWorld();
 
     fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
     SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
@@ -2070,7 +2067,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
     FreeEventDataPools();
-    fn_80143FD4();
+    FreePhysicsEventDataPools();
     fn_80111658(1);
 
     manager->mLoadingState = 0;

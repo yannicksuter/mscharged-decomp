@@ -140,7 +140,7 @@ void NetworkPeerChannel::CaptureNetworkPeerChannelInput()
         = gInputManager->mFrameProvider->GetInputRemapAngle();
 }
 
-void NetworkPeerChannel::ApplyNetworkPeerChannelInput(PackedDetInput* record, u16 tick, u8 connected)
+void NetworkPeerChannel::ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 tick, u8 connected)
 {
     mInput0.CopyState(mInput1);
     UnpackDetInput(record, &mInput1);
@@ -332,7 +332,7 @@ void NetMessageInput::SetNetworkInputMessageCongested(bool congested)
         mUnidentified008 &= ~8;
 }
 
-void NetMessageInput::AddNetworkInputMessageEvent(const DetermDataEvent* event)
+void NetMessageInput::AddNetworkInputMessageEvent(DetermDataEvent* event)
 {
     if (mUnidentified05C < 4)
     {

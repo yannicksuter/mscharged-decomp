@@ -15,6 +15,9 @@ inline unsigned long MB(unsigned long size)
     return KB(KB(size));
 }
 
+extern MemoryAllocator StandardAllocator;
+extern MemoryAllocator VirtualAllocator;
+extern MemoryAllocator* CurrentAllocator;
 extern MemoryAllocator* AllocatorStack[16];
 extern unsigned int AllocatorStackDepth;
 

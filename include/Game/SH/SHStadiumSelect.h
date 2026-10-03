@@ -53,7 +53,7 @@ public:
     /* 0x0B5 */ bool mPointerOverPlayButton;
     /* 0x0B6 */ bool mProceeding;
     /* 0x0B7 */ u8 mPaddingB7;
-    /* 0x0B8 */ UnidentifiedEventConnectionOwner mHBMHideConnection;
+    /* 0x0B8 */ EventConnectionOwner mHBMHideConnection;
     /* 0x0BC */ int mPreviewState;
     /* 0x0C0 */ int mPlayingStadiumIndex;
     /* 0x0C4 */ int mStadiumIndex;

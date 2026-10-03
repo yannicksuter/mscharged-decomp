@@ -75,7 +75,7 @@ extern "C" int fn_800B04A0(int index)
     return lbl_8056DA18[index];
 }
 
-Desire::Desire(int state, const TransitionFunc& transition)
+Desire::Desire(int state, TransitionFunc& transition)
     : shdStateMachine(state, transition)
     , mThinkTimer()
 {
@@ -84,13 +84,13 @@ Desire::Desire(int state, const TransitionFunc& transition)
     mvDesiredPosition.y = 0.0f;
     mvDesiredPosition.z = 0.0f;
     mTurboRequest = 0;
-    mUnidentified080 = 0.33f;
-    mUnidentified084 = 1.0f;
+    mDefaultMinDuration = 0.33f;
+    mDefaultMaxDuration = 1.0f;
 }
 
-void Desire::UnidentifiedSetContext(UnidentifiedScriptMachine* context)
+void Desire::SetContext(UnidentifiedScriptMachine* context)
 {
-    shdStateMachine::UnidentifiedSetContext(context);
+    shdStateMachine::SetContext(context);
     if (context != 0)
     {
         m_pFielder
@@ -102,21 +102,21 @@ void Desire::UnidentifiedSetContext(UnidentifiedScriptMachine* context)
     }
 }
 
-bool Desire::UnidentifiedInitialize(void*)
+bool Desire::Initialize(void*)
 {
     return true;
 }
 
-bool Desire::UnidentifiedReinitialize(void* context)
+bool Desire::Reinitialize(void* context)
 {
-    UnidentifiedCleanup();
-    mUnidentifiedTimer.SetSeconds(lbl_806DC054);
-    return UnidentifiedInitialize(context);
+    Cleanup();
+    mAgeTimer.SetSeconds(lbl_806DC054);
+    return Initialize(context);
 }
 
-bool DesireFinishAction::UnidentifiedInitialize(void*)
+bool DesireFinishAction::Initialize(void*)
 {
-    mUnidentified078 = lbl_806DC04C;
+    mMaxDuration = lbl_806DC04C;
     return true;
 }
 
@@ -126,14 +126,14 @@ void DesireFinishAction::Update(DesireUpdate* update, float)
     {
         tDebugPrintManager::Print(DC_AI,
             "** WARNING! DesireFinishAction has expired after %f seconds, probably a bug!\n",
-            mUnidentifiedTimer.GetSeconds());
+            mAgeTimer.GetSeconds());
     }
     fn_80098098(m_pFielder);
 }
 
-bool DesireWait::UnidentifiedInitialize(void*)
+bool DesireWait::Initialize(void*)
 {
-    mUnidentified078 = lbl_806DC050;
+    mMaxDuration = lbl_806DC050;
     return true;
 }
 
@@ -151,7 +151,7 @@ DesireWait::~DesireWait()
 {
 }
 
-void Desire::UnidentifiedCleanup()
+void Desire::Cleanup()
 {
 }
 
@@ -159,9 +159,9 @@ void Desire::Update(DesireUpdate*, float)
 {
 }
 
-bool DesireCutAndBreak::UnidentifiedInitialize(void* context)
+bool DesireCutAndBreak::Initialize(void* context)
 {
-    bool initialized = Desire::UnidentifiedInitialize(context);
+    bool initialized = Desire::Initialize(context);
     nlVector3 searchCenter;
     if (fn_800381B4(m_pFielder, &searchCenter))
     {
@@ -178,7 +178,7 @@ bool DesireCutAndBreak::UnidentifiedInitialize(void* context)
     return initialized;
 }
 
-void DesireCutAndBreak::UnidentifiedCleanup()
+void DesireCutAndBreak::Cleanup()
 {
     if (mUnidentifiedA4 == m_pFielder->m_pSpaceSearch)
     {
@@ -217,7 +217,7 @@ DesireDeke::~DesireDeke()
 {
 }
 
-bool DesireDeke::UnidentifiedInitialize(void* context)
+bool DesireDeke::Initialize(void* context)
 {
     mUnidentifiedA4 = 0;
     if (((UnidentifiedVariantCollection*)context)->IsSet(14))
@@ -401,7 +401,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     m_pFielder->fn_800447C0(direction);
 }
 
-void DesireDeke::UnidentifiedCleanup()
+void DesireDeke::Cleanup()
 {
     m_pFielder->mUnidentified1E4.m_eLastPadAction = 50;
 }
@@ -432,9 +432,9 @@ void DesireHit::Update(DesireUpdate*, float)
 {
 }
 
-bool DesireHit::UnidentifiedInitialize(void* context)
+bool DesireHit::Initialize(void* context)
 {
-    bool initialized = Desire::UnidentifiedInitialize(context);
+    bool initialized = Desire::Initialize(context);
     UserControlledT(m_pFielder->m_pTeam);
     m_pFielder->InitActionHit(
         (cFielder*)((UnidentifiedVariantCollection*)context)->Get(14)->mData.pPlayer,
@@ -473,7 +473,7 @@ void DesireGetOpen::Update(DesireUpdate*, float)
     m_pFielder->AddDesiredPosition(mvDesiredPosition, 1.2f, 1.0f);
 }
 
-void DesireGetOpen::UnidentifiedCleanup()
+void DesireGetOpen::Cleanup()
 {
     if (mUnidentifiedA4 == m_pFielder->m_pSpaceSearch)
     {
@@ -508,9 +508,9 @@ void DesireGetOpen::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
     cache->WriteData(lbl_806DC094, data, sizeof(DesireGetOpen) - offset);
 }
 
-bool DesireGetInPosition::UnidentifiedInitialize(void* context)
+bool DesireGetInPosition::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     m_pFielder->StartRunning();
     return result;
 }
@@ -556,9 +556,9 @@ void DesireGetInPosition::UnidentifiedVirtual7(void* context, DebugWriteCache* c
     cache->WriteData(lbl_806DC068, data, sizeof(DesireGetInPosition) - offset);
 }
 
-bool DesireRunUpfield::UnidentifiedInitialize(void* context)
+bool DesireRunUpfield::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     m_pFielder->StartRunning();
     return result;
 }
@@ -611,9 +611,9 @@ void DesireRunUpfield::UnidentifiedVirtual7(void* context, DebugWriteCache* cach
     cache->WriteData(lbl_806DC06A, data, sizeof(DesireRunUpfield) - offset);
 }
 
-bool DesireRunDownfield::UnidentifiedInitialize(void* context)
+bool DesireRunDownfield::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     m_pFielder->StartRunning();
     return result;
 }
@@ -670,11 +670,11 @@ void DesireRunDownfield::UnidentifiedVirtual7(void* context, DebugWriteCache* ca
     cache->WriteData(lbl_806DC06C, data, sizeof(DesireRunDownfield) - offset);
 }
 
-void DesireRunInDirection::UnidentifiedCleanup()
+void DesireRunInDirection::Cleanup()
 {
 }
 
-bool DesireRunInDirection::UnidentifiedInitialize(void* context)
+bool DesireRunInDirection::Initialize(void* context)
 {
     m_fSpeed = 1.0f;
     m_pTarget = 0;
@@ -717,7 +717,7 @@ bool DesireRunInDirection::UnidentifiedInitialize(void* context)
         if (parameters->IsSet(18))
         {
             m_fMaxDistance = parameters->Get(18)->mData.f;
-            mUnidentified078 = 0.5f + m_fMaxDistance / fn_8002E1B0(m_pFielder);
+            mMaxDuration = 0.5f + m_fMaxDistance / fn_8002E1B0(m_pFielder);
         }
         m_pFielder->StartRunning();
     }
@@ -807,7 +807,7 @@ void DesireRunInDirection::UnidentifiedVirtual7(void* context, DebugWriteCache* 
     }
 }
 
-void DesireRunToTarget::UnidentifiedCleanup()
+void DesireRunToTarget::Cleanup()
 {
 }
 

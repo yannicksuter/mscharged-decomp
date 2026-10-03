@@ -356,14 +356,14 @@ void StadiumWorldDrawable::UpdateBlend()
         }
     }
 
-    if (cCameraManager::m_pBeginFrameCameraType == eCameraType_Animated)
+    if (cCameraManager::m_BeginFrameCameraType == eCameraType_Animated)
     {
         SetObjectBlend(this, 1.0f);
         return;
     }
 
     bool hide = sForceBannerHidden;
-    int cameraType = cCameraManager::m_pBeginFrameCameraType;
+    int cameraType = cCameraManager::m_BeginFrameCameraType;
     if (cameraType == eCameraType_Gameplay
         || cameraType == eCameraType_ShootToScore
         || cameraType == eCameraType_Goal

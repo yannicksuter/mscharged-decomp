@@ -1,3 +1,3 @@
 #include "Game/AI/Scripts/ScriptCaching.h"
 
-unsigned char lbl_806DF568 = 1;
+unsigned char g_bScriptQuestionCachingOn = 1;

@@ -19,6 +19,8 @@ struct DebugWriteField;
 
 struct DebugWriteType
 {
+    void InitializeComposite(u16 type, const char* name);
+
     /* 0x00 */ u16 mType;
     /* 0x02 */ u16 mKind;
     /* 0x04 */ char mName[16];

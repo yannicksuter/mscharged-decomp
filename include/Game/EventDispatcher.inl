@@ -26,6 +26,12 @@ inline EventDispatcher::~EventDispatcher()
     pool->FreeBlocks();
 }
 
+inline void EventDispatcher::FreeBlocks()
+{
+    BasicSlotPool<DLListEntry<EventCallback> >* pool = &callbacks.m_Allocator;
+    pool->FreeBlocks();
+}
+
 template <typename T>
 void EventDispatcherBase<T>::Dispatch(bool flag)
 {

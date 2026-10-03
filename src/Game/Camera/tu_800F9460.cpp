@@ -97,7 +97,7 @@ GetGoalieSaveEvent(const char* name, int length)
     unsigned int hash = HashEventName(name, length);
     EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
-    UnidentifiedEventBase* event = foundEvent != 0 ? foundEvent->event : 0;
+    EventBase* event = foundEvent != 0 ? foundEvent->event : 0;
     return (UnidentifiedTypedEvent<GoalieSaveData>*)event;
 }
 

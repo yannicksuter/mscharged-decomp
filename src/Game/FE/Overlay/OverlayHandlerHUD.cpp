@@ -62,12 +62,12 @@ void HUDOverlay::Update(float fDeltaT)
     {
         SetVisible(false);
     }
-    mUnidentified1A8.fn_801EAD2C(fDeltaT);
-    mUnidentified028.fn_801EAF50(fDeltaT);
-    mUnidentified0AC.fn_801E9198(fDeltaT);
+    mScoreDisplay.Update(fDeltaT);
+    mCaptainMeter.Update(fDeltaT);
+    mPowerUpDisplay.DisplayPowerUps(fDeltaT);
     if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == 0)
     {
-        mUnidentified140.fn_801E9FEC(fDeltaT);
+        mClock.Update(fDeltaT);
     }
 }
 
@@ -96,19 +96,19 @@ void HUDOverlay::SceneCreated()
         leftOut->SetActiveSlide("4:3", true, false);
         rightOut->SetActiveSlide("4:3", true, false);
     }
-    mUnidentified140.fn_801E9AF0(presentation);
-    mUnidentified1A8.fn_801EA808(presentation);
-    mUnidentified028.fn_801EB108(presentation);
-    mUnidentified054.fn_801E8CD0(presentation);
-    mUnidentified0AC.fn_801EB5CC(presentation, &mUnidentified054);
+    mClock.Init(presentation);
+    mScoreDisplay.Init(presentation);
+    mCaptainMeter.Init(presentation);
+    mPowerUpTextures.LoadHUDTextures(presentation);
+    mPowerUpDisplay.Init(presentation, &mPowerUpTextures);
     SetTeamIcons();
     if (nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode)
     {
-        mUnidentified140.m_pTextInstanceClock[0]->m_bVisible = false;
-        mUnidentified140.m_pTextInstanceClock[1]->m_bVisible = false;
+        mClock.m_pTextInstanceClock[0]->m_bVisible = false;
+        mClock.m_pTextInstanceClock[1]->m_bVisible = false;
     }
     mPresentation->SetActiveSlide(HUD_SLIDE_OUT_NAME, true);
-    mUnidentified1A8.fn_801E99F0();
+    mScoreDisplay.ResetScores();
 }
 
 void HUDOverlay::SetSlideIn()
@@ -121,7 +121,7 @@ void HUDOverlay::SetSlideOut()
     mPresentation->SetActiveSlide(HUD_SLIDE_OUT_NAME, true);
 }
 
-void UnidentifiedHUD_801E8CD0::fn_801E8CD0(FEPresentation* presentation)
+void HUDPowerUpTextures::LoadHUDTextures(FEPresentation* presentation)
 {
     TLImageInstance* pImageInstance;
 
@@ -133,7 +133,7 @@ void UnidentifiedHUD_801E8CD0::fn_801E8CD0(FEPresentation* presentation)
     pImageInstance = FEFinder<TLImageInstance, 2>::Find<FEPresentation>(
         presentation, ART_SLIDE_NAME, "Layer", "mega");
     pImageInstance->m_bVisible = false;
-    mUnidentified04 = pImageInstance->m_pTextureResource;
+    m_pMega = pImageInstance->m_pTextureResource;
 
     pImageInstance = FEFinder<TLImageInstance, 2>::Find<FEPresentation>(
         presentation, ART_SLIDE_NAME, "Layer", "shell_green");
@@ -183,16 +183,16 @@ void UnidentifiedHUD_801E8CD0::fn_801E8CD0(FEPresentation* presentation)
             presentation, ART_SLIDE_NAME, "Layer", name);
         if (pImageInstance)
         {
-            mUnidentified28[i] = pImageInstance->m_pTextureResource;
+            m_pCaptainAbility[i] = pImageInstance->m_pTextureResource;
         }
         else
         {
-            mUnidentified28[i] = 0;
+            m_pCaptainAbility[i] = 0;
         }
     }
 }
 
-void UnidentifiedHUD_801E9198::fn_801E9198(float fDeltaT)
+void HUDPowerUpDisplay::DisplayPowerUps(float fDeltaT)
 {
     FETextureResource* pTextureResource[2];
     for (int team = 0; team < 2; team++)
@@ -207,67 +207,67 @@ void UnidentifiedHUD_801E9198::fn_801E9198(float fDeltaT)
                 pTextureResource[i] = 0;
                 break;
             case 0:
-                pTextureResource[i] = mUnidentified8C->m_pShellGreen;
+                pTextureResource[i] = m_pPowerUpTextures->m_pShellGreen;
                 break;
             case 2:
-                pTextureResource[i] = mUnidentified8C->m_pShellSpike;
+                pTextureResource[i] = m_pPowerUpTextures->m_pShellSpike;
                 break;
             case 3:
-                pTextureResource[i] = mUnidentified8C->m_pShellBlue;
+                pTextureResource[i] = m_pPowerUpTextures->m_pShellBlue;
                 break;
             case 1:
-                pTextureResource[i] = mUnidentified8C->m_pShellRed;
+                pTextureResource[i] = m_pPowerUpTextures->m_pShellRed;
                 break;
             case 7:
-                pTextureResource[i] = mUnidentified8C->m_pMushroom;
+                pTextureResource[i] = m_pPowerUpTextures->m_pMushroom;
                 break;
             case 4:
-                pTextureResource[i] = mUnidentified8C->m_pBanana;
+                pTextureResource[i] = m_pPowerUpTextures->m_pBanana;
                 break;
             case 5:
-                pTextureResource[i] = mUnidentified8C->m_pBobomb;
+                pTextureResource[i] = m_pPowerUpTextures->m_pBobomb;
                 break;
             case 8:
-                pTextureResource[i] = mUnidentified8C->m_pStar;
+                pTextureResource[i] = m_pPowerUpTextures->m_pStar;
                 break;
             case 6:
-                pTextureResource[i] = mUnidentified8C->m_pChomp;
+                pTextureResource[i] = m_pPowerUpTextures->m_pChomp;
                 break;
             case 9:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[0];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[0];
                 break;
             case 11:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[3];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[3];
                 break;
             case 10:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[5];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[5];
                 break;
             case 12:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[1];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[1];
                 break;
             case 13:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[4];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[4];
                 break;
             case 14:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[2];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[2];
                 break;
             case 15:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[7];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[7];
                 break;
             case 16:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[6];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[6];
                 break;
             case 17:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[9];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[9];
                 break;
             case 18:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[10];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[10];
                 break;
             case 19:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[8];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[8];
                 break;
             case 20:
-                pTextureResource[i] = mUnidentified8C->mUnidentified28[11];
+                pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[11];
                 break;
             }
             if (!pTextureResource[i])
@@ -275,8 +275,8 @@ void UnidentifiedHUD_801E9198::fn_801E9198(float fDeltaT)
                 m_pImagePowerUps[0][team][i]->m_bVisible = false;
                 m_pImagePowerUps[1][team][i]->m_bVisible = false;
                 mNumFlareCycles[team][i] = -1;
-                mUnidentified20[team][i]->m_bVisible = false;
-                mUnidentified50[team][i]->SetActiveSlide("no pup", true, false);
+                m_pImageFlares[team][i]->m_bVisible = false;
+                m_pPowerUpPads[team][i]->SetActiveSlide("no pup", true, false);
                 m_pPowerupTextComponents[team][i]->SetActiveSlide("1", true, false);
                 m_pPowerupTextComponents[team][i]->SetActiveSlide("1", true, false);
             }
@@ -285,8 +285,8 @@ void UnidentifiedHUD_801E9198::fn_801E9198(float fDeltaT)
                 numPowerUps++;
                 if (g_pTeams[team]->GetPowerUpByIndex(i).bIsNew && mNumFlareCycles[team][i] == -1)
                 {
-                    mUnidentified50[team][i]->SetActiveSlide("get pup", true, false);
-                    mUnidentified20[team][i]->m_bVisible = true;
+                    m_pPowerUpPads[team][i]->SetActiveSlide("get pup", true, false);
+                    m_pImageFlares[team][i]->m_bVisible = true;
                     mNumFlareCycles[team][i] = 20;
                 }
                 else if (mNumFlareCycles[team][i] != -1)
@@ -294,10 +294,10 @@ void UnidentifiedHUD_801E9198::fn_801E9198(float fDeltaT)
                     TLSlide* activeSlide = m_pComponentFlares[team][i]->GetActiveSlide();
                     if (activeSlide && activeSlide->GetCurrentTime() >= activeSlide->GetStartTime() + activeSlide->GetDuration() - 0.1f)
                     {
-                        mUnidentified50[team][i]->SetActiveSlide("no pup", true, false);
+                        m_pPowerUpPads[team][i]->SetActiveSlide("no pup", true, false);
                         m_pImagePowerUps[0][team][i]->m_bVisible = true;
                         m_pImagePowerUps[1][team][i]->m_bVisible = true;
-                        mUnidentified20[team][i]->m_bVisible = false;
+                        m_pImageFlares[team][i]->m_bVisible = false;
                         g_pTeams[team]->SetIsPowerUpNew(i, false);
                         mNumFlareCycles[team][i] = -1;
                     }
@@ -353,13 +353,13 @@ void UnidentifiedHUD_801E9198::fn_801E9198(float fDeltaT)
                 m_pComponentFlares[team][i]->SetActiveSlide("out", false, false);
             }
         }
-        mUnidentified88[team] = numPowerUps != 0;
-        mUnidentified70[team]->m_bVisible = mUnidentified88[team];
-        if (mUnidentified8A[team] && numPowerUps == 1)
+        mHasPowerUps[team] = numPowerUps != 0;
+        m_pBlinkers[team]->m_bVisible = mHasPowerUps[team];
+        if (mHasTwoPowerUps[team] && numPowerUps == 1)
         {
-            mUnidentified60[team][0]->SetActiveSlide("move", true, false);
+            m_pPowerUpComponents[team][0]->SetActiveSlide("move", true, false);
         }
-        mUnidentified8A[team] = numPowerUps == 2;
+        mHasTwoPowerUps[team] = numPowerUps == 2;
     }
 }
 
@@ -387,8 +387,8 @@ void HUDOverlay::SetTeamIcons()
 
 void HUDOverlay::UpdateScore()
 {
-    mUnidentified1A8.mNewScore[0] = g_pTeams[0]->m_nScore;
-    mUnidentified1A8.mNewScore[1] = g_pTeams[1]->m_nScore;
+    mScoreDisplay.mNewScore[0] = g_pTeams[0]->m_nScore;
+    mScoreDisplay.mNewScore[1] = g_pTeams[1]->m_nScore;
 }
 
 void HUDOverlay::DisplayNewScore()
@@ -397,9 +397,9 @@ void HUDOverlay::DisplayNewScore()
     {
         for (int flare = 0; flare < 2; flare++)
         {
-            if (mUnidentified0AC.mNumFlareCycles[team][flare] != -1)
+            if (mPowerUpDisplay.mNumFlareCycles[team][flare] != -1)
             {
-                mUnidentified0AC.mNumFlareCycles[team][flare] = 20;
+                mPowerUpDisplay.mNumFlareCycles[team][flare] = 20;
             }
         }
     }
@@ -407,10 +407,10 @@ void HUDOverlay::DisplayNewScore()
 
 void HUDOverlay::ResetScores()
 {
-    mUnidentified1A8.fn_801E99F0();
+    mScoreDisplay.ResetScores();
 }
 
-void UnidentifiedHUD_801E99F0::fn_801E99F0()
+void HUDScoreDisplay::ResetScores()
 {
     for (int i = 0; i < 2; i++)
     {
@@ -435,14 +435,14 @@ void HUDOverlay::SwapPowerUps(int homeAway)
 {
 }
 
-void UnidentifiedHUD_801E9AF0::fn_801E9AF0(FEPresentation* presentation)
+void HUDClock::Init(FEPresentation* presentation)
 {
     typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
     m_pTextInstanceClock[0] = FEFinder<TLTextInstance, 3>::Find<FEPresentation>(
         presentation, HUD_SLIDE_IN_NAME, LAYER_NAME, "clock elements", "clock");
     m_pTextInstanceClock[1] = FEFinder<TLTextInstance, 3>::Find<FEPresentation>(
         presentation, HUD_SLIDE_OUT_NAME, LAYER_NAME, "clock elements", "clock");
-    mUnidentified64 = FEFinder<TLTextInstance, 3>::Find<FEPresentation>(
+    m_pTextInstanceGameType = FEFinder<TLTextInstance, 3>::Find<FEPresentation>(
         presentation, HUD_SLIDE_IN_NAME, LAYER_NAME, "clock elements", "gametype");
     if (m_pTextInstanceClock[0])
     {
@@ -464,7 +464,7 @@ void UnidentifiedHUD_801E9AF0::fn_801E9AF0(FEPresentation* presentation)
         WideString unformatted(g_pLocalization->GetString("HUD_FIRST_TO"));
         WideString formatted = Format(unformatted, goalLimitWide);
         memcpy(mClockBuffer, formatted.c_str(), sizeof(mClockBuffer));
-        mUnidentified64->SetString(mClockBuffer);
+        m_pTextInstanceGameType->SetString(mClockBuffer);
         m_pTextInstanceClock[0]->m_bVisible = false;
         m_pTextInstanceClock[1]->m_bVisible = false;
     }
@@ -472,11 +472,11 @@ void UnidentifiedHUD_801E9AF0::fn_801E9AF0(FEPresentation* presentation)
     {
         m_pTextInstanceClock[0]->m_bVisible = true;
         m_pTextInstanceClock[1]->m_bVisible = true;
-        mUnidentified64->m_bVisible = false;
+        m_pTextInstanceGameType->m_bVisible = false;
     }
 }
 
-void UnidentifiedHUD_801E9AF0::fn_801E9FEC(float fDeltaT)
+void HUDClock::Update(float fDeltaT)
 {
     typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
     bool isOvertime = nlSingleton<StatsTracker>::Instance()->IsOvertime();
@@ -569,7 +569,7 @@ void UnidentifiedHUD_801E9AF0::fn_801E9FEC(float fDeltaT)
     }
 }
 
-void UnidentifiedHUD_801E99F0::fn_801EA808(FEPresentation* presentation)
+void HUDScoreDisplay::Init(FEPresentation* presentation)
 {
     mPresentation = presentation;
     TLComponentInstance* leftIn = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
@@ -611,7 +611,7 @@ void UnidentifiedHUD_801E99F0::fn_801EA808(FEPresentation* presentation)
     }
 }
 
-void UnidentifiedHUD_801E99F0::fn_801EAD2C(float fDeltaT)
+void HUDScoreDisplay::Update(float fDeltaT)
 {
     unsigned long slideInHash = HUD_SLIDE_IN_HASH;
     for (int i = 0; i < 2; i++)
@@ -657,7 +657,7 @@ void UnidentifiedHUD_801E99F0::fn_801EAD2C(float fDeltaT)
     }
 }
 
-void UnidentifiedHUD_801EB108::fn_801EAF50(float fDeltaT)
+void HUDCaptainMeter::Update(float fDeltaT)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -665,38 +665,38 @@ void UnidentifiedHUD_801EB108::fn_801EAF50(float fDeltaT)
         if (pCaptain && (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
                            || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0()))
         {
-            mUnidentified00[i]->m_bVisible = true;
-            mUnidentified08[i]->m_bVisible = false;
-            mUnidentified20[i]->SetActiveSlide("tank", false, true);
-            mUnidentified28[i] = true;
-            float fScale = mUnidentified18[i] * pCaptain->fn_8004FFF8();
-            feVector3 scale = mUnidentified10[i]->GetScale();
-            if (fScale > mUnidentified18[i])
+            m_pMeter[i]->m_bVisible = true;
+            m_pPowerBarContainer[i]->m_bVisible = false;
+            m_pPowerUpPad[i]->SetActiveSlide("tank", false, true);
+            mMeterShown[i] = true;
+            float fScale = mMeterFullScale[i] * pCaptain->fn_8004FFF8();
+            feVector3 scale = m_pMeterFill[i]->GetScale();
+            if (fScale > mMeterFullScale[i])
             {
-                fScale = mUnidentified18[i];
+                fScale = mMeterFullScale[i];
             }
             else if (fScale <= 0.0f)
             {
                 fScale = 0.01f;
-                mUnidentified20[i]->SetActiveSlide("no pup", true, false);
-                mUnidentified28[i] = false;
+                m_pPowerUpPad[i]->SetActiveSlide("no pup", true, false);
+                mMeterShown[i] = false;
             }
-            mUnidentified10[i]->SetAssetScale(fScale, scale.f.y, scale.f.z);
+            m_pMeterFill[i]->SetAssetScale(fScale, scale.f.y, scale.f.z);
         }
         else
         {
-            if (mUnidentified28[i])
+            if (mMeterShown[i])
             {
-                mUnidentified20[i]->SetActiveSlide("no pup", true, false);
-                mUnidentified28[i] = false;
+                m_pPowerUpPad[i]->SetActiveSlide("no pup", true, false);
+                mMeterShown[i] = false;
             }
-            mUnidentified00[i]->m_bVisible = false;
-            mUnidentified08[i]->m_bVisible = false;
+            m_pMeter[i]->m_bVisible = false;
+            m_pPowerBarContainer[i]->m_bVisible = false;
         }
     }
 }
 
-void UnidentifiedHUD_801EB108::fn_801EB108(FEPresentation* presentation)
+void HUDCaptainMeter::Init(FEPresentation* presentation)
 {
     for (int i = 0; i < 2; i++)
     {
@@ -706,14 +706,14 @@ void UnidentifiedHUD_801EB108::fn_801EB108(FEPresentation* presentation)
         {
             pPowerBarContainer = &TLComponentDefault::sInstance;
         }
-        mUnidentified08[i] = (TLComponentInstance*)pPowerBarContainer;
+        m_pPowerBarContainer[i] = (TLComponentInstance*)pPowerBarContainer;
         TLComponentInstance* pComp = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
             presentation->m_currentSlide, LAYER_NAME, HUD_TEAM_NAMES[i]);
-        mUnidentified20[i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+        m_pPowerUpPad[i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
             pComp->GetActiveSlide(), HUD_NAMES[i], PAD_NAMES[0]);
-        mUnidentified00[i] = FEFinder<TLComponentInstance, 4>::Find(
-            mUnidentified20[i], "tank", "the metre", "metre");
-        mUnidentified10[i] = FEFinder<TLImageInstance, 2>::Find(mUnidentified00[i], "white_8x8");
+        m_pMeter[i] = FEFinder<TLComponentInstance, 4>::Find(
+            m_pPowerUpPad[i], "tank", "the metre", "metre");
+        m_pMeterFill[i] = FEFinder<TLImageInstance, 2>::Find(m_pMeter[i], "white_8x8");
         nlColour colour;
         switch (nlSingleton<GameInfoManager>::Instance()->GetTeam(i))
         {
@@ -733,7 +733,7 @@ void UnidentifiedHUD_801EB108::fn_801EB108(FEPresentation* presentation)
             nlColourSet(colour, 0xFF, 0xFF, 0xFF, 0xFF);
             break;
         }
-        mUnidentified10[i]->SetAssetColour(colour);
+        m_pMeterFill[i]->SetAssetColour(colour);
         TLInstance* pPowerBar = FEFinder<TLComponentInstance, 4>::Find<FEPresentation>(
             presentation, HUD_SLIDE_OUT_NAME, LAYER_NAME, POWERBAR_NAMES[i]);
         if (pPowerBar == 0)
@@ -741,21 +741,21 @@ void UnidentifiedHUD_801EB108::fn_801EB108(FEPresentation* presentation)
             pPowerBar = &TLComponentDefault::sInstance;
         }
         pPowerBar->m_bVisible = false;
-        if (mUnidentified00[i])
+        if (m_pMeter[i])
         {
-            feVector3 scale = mUnidentified10[i]->GetScale();
-            mUnidentified18[i] = scale.f.x;
+            feVector3 scale = m_pMeterFill[i]->GetScale();
+            mMeterFullScale[i] = scale.f.x;
         }
         else
         {
-            mUnidentified18[i] = 0.0f;
+            mMeterFullScale[i] = 0.0f;
         }
     }
 }
 
-void UnidentifiedHUD_801E9198::fn_801EB5CC(FEPresentation* presentation, UnidentifiedHUD_801E8CD0* textures)
+void HUDPowerUpDisplay::Init(FEPresentation* presentation, HUDPowerUpTextures* textures)
 {
-    mUnidentified8C = textures;
+    m_pPowerUpTextures = textures;
     for (int team = 0; team < 2; team++)
     {
         for (int i = 0; i < 2; i++)
@@ -782,22 +782,22 @@ void UnidentifiedHUD_801E9198::fn_801EB5CC(FEPresentation* presentation, Unident
                 {
                     m_pImagePowerUps[1][team][i] = m_pImagePowerUps[0][team][i];
                 }
-                mUnidentified60[team][i] = pComp;
+                m_pPowerUpComponents[team][i] = pComp;
             }
-            mUnidentified70[team] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+            m_pBlinkers[team] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
                 pTeamComp->GetActiveSlide(), HUD_NAMES[team], "blinker");
-            mUnidentified70[team]->m_bVisible = false;
-            mUnidentified50[team][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
+            m_pBlinkers[team]->m_bVisible = false;
+            m_pPowerUpPads[team][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
                 pTeamComp->GetActiveSlide(), HUD_NAMES[team], PAD_NAMES[i]);
             TLComponentInstance* pElectric = FEFinder<TLComponentInstance, 4>::Find(
-                mUnidentified50[team][i], "get pup", "electric");
+                m_pPowerUpPads[team][i], "get pup", "electric");
             TLComponentInstance* pFlare = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
                 pElectric->GetActiveSlide(), "flare");
             if (pFlare)
             {
                 m_pComponentFlares[team][i] = pFlare;
-                mUnidentified20[team][i] = FEFinder<TLImageInstance, 2>::Find<TLSlide>(pFlare->GetActiveSlide(), "flare");
-                mUnidentified20[team][i]->m_bVisible = false;
+                m_pImageFlares[team][i] = FEFinder<TLImageInstance, 2>::Find<TLSlide>(pFlare->GetActiveSlide(), "flare");
+                m_pImageFlares[team][i]->m_bVisible = false;
             }
             m_pPowerupTextComponents[team][i] = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(
                 pTeamComp->GetActiveSlide(), HUD_NAMES[team], POWER_UP_TEXT_NAMES[team][i]);

@@ -474,7 +474,7 @@ void Presentation::Update(float deltaT)
         {
             int replayTime = -30;
             ReplayChoreo::Instance().SaveHighlight(
-                ReplayManager::Instance()->fn_8018A16C(replayTime));
+                ReplayManager::Instance()->GetReplayExcitement(replayTime));
             mDisplayLetterBox = 0.0f;
         }
     }
@@ -1022,7 +1022,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
  */
 void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
 {
-    ReplayManager::Instance()->fn_801895B0();
+    ReplayManager::Instance()->OnMegaStrikeResult();
 
     if (g_pGame == 0)
     {

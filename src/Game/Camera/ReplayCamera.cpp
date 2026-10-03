@@ -113,7 +113,7 @@ float ReplayCamera::GetFOV() const
     float fov = mFov;
     if (IsWidescreen())
     {
-        fov = fn_800F2410(mFov);
+        fov = AdjustFOVForWidescreen(mFov);
     }
     return fov;
 }

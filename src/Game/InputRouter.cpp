@@ -98,9 +98,7 @@ void InputRouter::Reset(int)
     m_OutgoingCustomDetermDataQ.mCount = 0;
 
     sDetermDataDispatcher.Clear();
-    BasicSlotPool<DLListEntry<EventCallback> >* callbackPool =
-        &sDetermDataDispatcher.callbacks.m_Allocator;
-    callbackPool->FreeBlocks();
+    sDetermDataDispatcher.FreeBlocks();
 
     sDetermDataEventQueue.RemoveAll();
     BasicSlotPool<DLListEntry<UnidentifiedListener<DetermDataEvent> > >*
@@ -332,7 +330,7 @@ void SimpleInputRouter::OnInputReady()
         channel->PackNetworkPeerChannelInput(&mInputRecords[playerId]);
         mInputStates[playerId]
             = channel->GetNetworkPeerChannelConnectionStatus();
-        PackedDetInput* input = &mInputRecords[playerId];
+        const PackedDetInput* input = &mInputRecords[playerId];
         channel->ApplyNetworkPeerChannelInput(
             input, mNetworkTicks[machine], mInputStates[playerId]);
 

@@ -20,6 +20,8 @@ enum NisUseFilter
     NIS_FILTER = 1,
 };
 
+extern bool g_ForceDoubleBallTransition;
+
 class NisPlayer : public InterpreterCore
 {
 public:
@@ -110,8 +112,6 @@ public:
     bool fn_8027E0AC(const char* name) const;
     static NisPlayer* Instance();
     static void AsyncLoad(nlFile* file, void* buffer, unsigned int size, unsigned long param);
-
-    static NisPlayer* sInstance;
 
     /* 0x00028 */ int unknown_0x00028;
     /* 0x0002C */ bool mActive;

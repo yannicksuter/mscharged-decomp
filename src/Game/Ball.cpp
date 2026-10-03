@@ -68,11 +68,11 @@ struct UnidentifiedGameState
 };
 
 template <typename P1, typename P2>
-class UnidentifiedTypedEvent2 : public UnidentifiedEventBase
+class UnidentifiedTypedEvent2 : public EventBase
 {
 public:
     UnidentifiedTypedEvent2(const char* name, int length)
-        : UnidentifiedEventBase(name, length)
+        : EventBase(name, length)
     {
     }
 
@@ -82,13 +82,13 @@ public:
 };
 
 template <typename P1, typename P2>
-struct UnidentifiedListener2 : public UnidentifiedConnection
+struct UnidentifiedListener2 : public EventConnection
 {
     Function<void(P1, P2)> callback;
 };
 
 template <typename P1, typename P2>
-class UnidentifiedEvent2View : public UnidentifiedEventBase
+class UnidentifiedEvent2View : public EventBase
 {
     typedef UnidentifiedListener2<P1, P2> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
@@ -507,7 +507,7 @@ void cBall::CollideWithCharacterCallback(
                     DesireReceivePass* pReceivePass
                         = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
                     if (pReceivePass == NULL
-                        || !pReceivePass->UnidentifiedIsActive()
+                        || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
                     {
                         fn_80015C38(this, 0);
@@ -580,7 +580,7 @@ void cBall::CollideWithCharacterCallback(
                         = (DesireReceivePass*)fn_8002E08C(
                             pPassTarget, 22);
                     if (pReceivePass == NULL
-                        || !pReceivePass->UnidentifiedIsActive()
+                        || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
                     {
                         fn_80015C38(this, 0);
@@ -627,7 +627,7 @@ void cBall::CollideWithCharacterCallback(
                 DesireReceivePass* pReceivePass
                     = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
                 if (pReceivePass == NULL
-                    || !pReceivePass->UnidentifiedIsActive()
+                    || !pReceivePass->IsActive()
                     || pReceivePass->meDesireSubState != 0)
                 {
                     fn_80015C38(this, 0);
@@ -841,7 +841,7 @@ static inline void fn_80014494Impl(cBall* pBall)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -908,7 +908,7 @@ extern "C" void fn_800145A4(cBall* pBall)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -1128,7 +1128,7 @@ static inline bool fn_80014D38Impl(cBall* pBall)
         DesireReceivePass* pReceivePass
             = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
         if (pReceivePass != NULL
-            && pReceivePass->UnidentifiedIsActive())
+            && pReceivePass->IsActive())
         {
             bPassLockedIn = pReceivePass->meDesireSubState != 0;
         }
@@ -1642,7 +1642,7 @@ static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
 
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
-            if (pReceivePass != NULL && pReceivePass->UnidentifiedIsActive()
+            if (pReceivePass != NULL && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -2877,7 +2877,7 @@ extern "C" void fn_8001929C()
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -2927,7 +2927,7 @@ extern "C" void fn_800193A0(void*)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -3051,7 +3051,7 @@ extern "C" void fn_80019718(void*)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -3096,7 +3096,7 @@ extern "C" void fn_80019814(UnidentifiedEventData34*)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -3254,7 +3254,7 @@ extern "C" void fn_80019F10(void*)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;
@@ -3299,7 +3299,7 @@ extern "C" void fn_8001A00C(void*)
             DesireReceivePass* pReceivePass
                 = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
             if (pReceivePass != NULL
-                && pReceivePass->UnidentifiedIsActive()
+                && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
                 return;

@@ -3,19 +3,12 @@
 
 #include "Game/AI/DesireUpdate.h"
 #include "Game/DB/GameProgress.h"
+#include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "NL/nlMemory.h"
 
-struct UnidentifiedGameState
-{
-    u8 mUnidentified000[0x18];
-    int mUnidentified018;
-};
-
-extern UnidentifiedGameState* g_pGame;
-
-float lbl_806DC448 = 1.1f;
-char lbl_80503FC0[] = "TeamPlayMachine";
+float gKickoffStateTimeLimit = 1.1f;
+char gTeamPlayMachineName[] = "TeamPlayMachine";
 
 TeamPlayMachine::~TeamPlayMachine()
 {
@@ -41,9 +34,9 @@ void TeamPlayMachine::UnidentifiedVirtual7()
     UnidentifiedVariantCollection values;
     int state = -1;
 
-    if (g_pGame->mUnidentified018 == 1)
+    if (g_pGame->m_eGameState == 1)
     {
-        values.Set(7, FuzzyVariant(lbl_806DC448));
+        values.Set(7, FuzzyVariant(gKickoffStateTimeLimit));
         state = 1;
     }
     else if (GameInfoManager::Instance()->IsInMode4()
@@ -63,7 +56,7 @@ void TeamPlayMachine::UnidentifiedVirtual7()
 }
 
 TeamPlayMachine::TeamPlayMachine()
-    : UnidentifiedScriptMachine(7, true, false, lbl_80503FC0)
+    : UnidentifiedScriptMachine(7, true, false, gTeamPlayMachineName)
 {
 }
 

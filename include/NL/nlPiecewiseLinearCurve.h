@@ -32,19 +32,19 @@ public:
         }
 
         int upper = FindUpperPoint(x);
-        const nlVector2& lowerPoint = mData[upper - 1];
-        const nlVector2& upperPoint = mData[upper];
-        float lowerX = lowerPoint.x;
-        float range = upperPoint.x - lowerX;
+        float lowerX = mData[upper - 1].x;
+        float range = mData[upper].x - lowerX;
         range = range >= 0.0001f ? range : 0.0001f;
         float percent = (x - lowerX) / range;
+        const nlVector2& lowerPoint = mData[upper - 1];
+        const nlVector2& upperPoint = mData[upper];
         value = (1.0f - percent) * lowerPoint.y + percent * upperPoint.y;
     }
 
     int FindUpperPoint(float x) const
     {
-        int i;
         int upper = -1;
+        int i;
         for (i = 1; i < mCount; ++i)
         {
             if (x <= mData[i].x)

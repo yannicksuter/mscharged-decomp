@@ -17,6 +17,7 @@ extern TweakValueFloat gShadowLookupScaleY;
 extern TweakValueFloat gShadowLookupTransX;
 extern TweakValueFloat gShadowLookupTransY;
 extern LightingLookup* gpShadowLightingLookup;
+extern u8 lbl_806E1458;
 
 class nlVector2;
 class nlVector3;
@@ -41,6 +42,7 @@ extern "C"
     int ShouldDoubleGameObjectLighting();
     int GetGameObjectLightCount(bool character, bool includeEffects);
     GameObjectLight* GetGameObjectLight(s32 index, bool character);
+    void SetGameObjectLightingMode(s32 mode);
     void SetGameObjectLightTexture(unsigned long texture);
     void LoadGameObjectSpecularLight(s32 index, GameObjectLight* light, f32 exponent, const nlMatrix4& viewMatrix);
     void SetGameObjectSpecularLightingEnabled(s32 enabled, s32 count);

@@ -7,6 +7,9 @@
 
 float GetTickerMilliseconds();
 
+extern float (*gAIProfilingClock)();
+extern float (*gAIActivityClock)();
+
 class AIContext : public FuzzyVariant
 {
 public:

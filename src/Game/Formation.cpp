@@ -1655,5 +1655,5 @@ extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(
     FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(context);
     unsigned int localHash = hash;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash), 1, team, 0));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(team), 0));
 }

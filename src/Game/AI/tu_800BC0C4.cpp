@@ -18,7 +18,6 @@ extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E3F8(cFielder*);
 extern "C" void fn_8002E718(cFielder*);
 extern "C" void fn_8002E798(cFielder*);
-extern "C" AIContext* fn_80316974(void*);
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
 
@@ -45,10 +44,10 @@ static nlVector2 lbl_806DC188 = { 0.1f, 0.0f };
 /**
  * Offset/Address/Size: 0x0 | 0x800BC0C4 | size: 0x68
  */
-bool DesireStar::UnidentifiedInitialize(void* context)
+bool DesireStar::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002CFD8(m_pFielder->GetTweaks());
+    bool result = Desire::Initialize(context);
+    mMaxDuration = fn_8002CFD8(m_pFielder->GetTweaks());
     m_pFielder->muInvincibleStatus |= 0x1F;
     EmitStar(m_pFielder, false);
     return result;
@@ -57,12 +56,12 @@ bool DesireStar::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x68 | 0x800BC12C | size: 0x74
  */
-bool DesireStar::UnidentifiedReinitialize(void* context)
+bool DesireStar::Reinitialize(void* context)
 {
-    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
-    mUnidentifiedTimer.m_uPackedTime = 0;
-    bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002CFD8(m_pFielder->GetTweaks());
+    mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
+    mAgeTimer.m_uPackedTime = 0;
+    bool result = Desire::Initialize(context);
+    mMaxDuration = fn_8002CFD8(m_pFielder->GetTweaks());
     EmitStar(m_pFielder, true);
     return result;
 }
@@ -80,7 +79,7 @@ void DesireStar::Update(
                 == SHOT_METER_STS_ACTIVE
             && !m_pFielder->IsCaptain()))
     {
-        mUnidentifiedTimer.Countup(
+        mAgeTimer.Countup(
             fDeltaT * lbl_806DC180 - fDeltaT, 10.0f);
     }
 
@@ -107,7 +106,7 @@ void DesireStar::Update(
 /**
  * Offset/Address/Size: 0x668 | 0x800BC72C | size: 0x3C
  */
-void DesireStar::UnidentifiedCleanup()
+void DesireStar::Cleanup()
 {
     KillStar(m_pFielder);
     fn_80038158(m_pFielder, true);
@@ -116,10 +115,10 @@ void DesireStar::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x6A4 | 0x800BC768 | size: 0x84
  */
-bool DesireMushroom::UnidentifiedInitialize(void* context)
+bool DesireMushroom::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = fn_8002C7D0(m_pFielder->GetTweaks());
+    bool result = Desire::Initialize(context);
+    mMaxDuration = fn_8002C7D0(m_pFielder->GetTweaks());
     fn_8002E340(m_pFielder);
     if (!m_pFielder->fn_8003E74C())
     {
@@ -132,11 +131,11 @@ bool DesireMushroom::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x728 | 0x800BC7EC | size: 0x64
  */
-bool DesireMushroom::UnidentifiedReinitialize(void* context)
+bool DesireMushroom::Reinitialize(void* context)
 {
-    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
-    mUnidentifiedTimer.m_uPackedTime = 0;
-    bool result = Desire::UnidentifiedInitialize(context);
+    mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
+    mAgeTimer.m_uPackedTime = 0;
+    bool result = Desire::Initialize(context);
     EmitMushroom(m_pFielder, true);
     return result;
 }
@@ -144,7 +143,7 @@ bool DesireMushroom::UnidentifiedReinitialize(void* context)
 /**
  * Offset/Address/Size: 0xC68 | 0x800BCD2C | size: 0x64
  */
-void DesireMushroom::UnidentifiedCleanup()
+void DesireMushroom::Cleanup()
 {
     KillMushroom(m_pFielder);
     if (!m_pFielder->fn_8003E74C()
@@ -157,10 +156,10 @@ void DesireMushroom::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0xCCC | 0x800BCD90 | size: 0x3C
  */
-bool DesireSlippery::UnidentifiedInitialize(void* context)
+bool DesireSlippery::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = lbl_806DC160;
+    bool result = Desire::Initialize(context);
+    mMaxDuration = lbl_806DC160;
     lbl_806E0E40 = lbl_806DC164;
     return result;
 }
@@ -168,17 +167,17 @@ bool DesireSlippery::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0xD08 | 0x800BCDCC | size: 0x20
  */
-bool DesireSlippery::UnidentifiedReinitialize(void* context)
+bool DesireSlippery::Reinitialize(void* context)
 {
-    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
-    mUnidentifiedTimer.m_uPackedTime = 0;
-    return Desire::UnidentifiedInitialize(context);
+    mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
+    mAgeTimer.m_uPackedTime = 0;
+    return Desire::Initialize(context);
 }
 
 /**
  * Offset/Address/Size: 0xFB0 | 0x800BD074 | size: 0x4
  */
-void DesireSlippery::UnidentifiedCleanup()
+void DesireSlippery::Cleanup()
 {
 }
 
@@ -186,7 +185,7 @@ void DesireSlippery::UnidentifiedCleanup()
  * Offset/Address/Size: 0xFB4 | 0x800BD078 | size: 0x78
  */
 DesireGooey::DesireGooey()
-    : Desire(27, TransitionFunc(g_UnsetTransitionFunc))
+    : Desire(27, UnsetTransitionFunc(g_UnsetTransitionFunc))
     , mfGooPercentage(1.0f)
     , mfMaxGooEffect(1.0f)
     , mUnidentifiedAC(-1.0f)
@@ -199,9 +198,9 @@ DesireGooey::DesireGooey()
 /**
  * Offset/Address/Size: 0x102C | 0x800BD0F0 | size: 0xD4
  */
-bool DesireGooey::UnidentifiedInitialize(void* context)
+bool DesireGooey::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     float fGooEffect = params->Get(0)->mData.f;
     if (fGooEffect < mfMaxGooEffect)
@@ -211,7 +210,7 @@ bool DesireGooey::UnidentifiedInitialize(void* context)
         mfGooTime = params->Get(1)->mData.f;
         mf_NotRunning_SpeedScale = params->Get(2)->mData.f;
         mf_NotRunning_MovementScale = params->Get(3)->mData.f;
-        mUnidentified078 = mfGooTime;
+        mMaxDuration = mfGooTime;
     }
     else
     {
@@ -224,11 +223,11 @@ bool DesireGooey::UnidentifiedInitialize(void* context)
 /**
  * Offset/Address/Size: 0x1100 | 0x800BD1C4 | size: 0x2C
  */
-bool DesireGooey::UnidentifiedReinitialize(void* context)
+bool DesireGooey::Reinitialize(void* context)
 {
-    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
-    mUnidentifiedTimer.m_uPackedTime = 0;
-    return UnidentifiedInitialize(context);
+    mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
+    mAgeTimer.m_uPackedTime = 0;
+    return Initialize(context);
 }
 
 /**
@@ -252,7 +251,7 @@ void DesireGooey::Update(
     }
 
     mfGooPercentage = 1.0f
-                    - (mUnidentifiedTimer.GetSeconds() / mUnidentified078);
+                    - (mAgeTimer.GetSeconds() / mMaxDuration);
     if (!m_pFielder->IsRunning())
     {
         m_pFielder->m_pCurrentAnimController
@@ -278,7 +277,7 @@ void DesireGooey::Update(
 /**
  * Offset/Address/Size: 0x1488 | 0x800BD54C | size: 0x48
  */
-void DesireGooey::UnidentifiedCleanup()
+void DesireGooey::Cleanup()
 {
     mfMaxGooEffect = 1.0f;
     m_pFielder->fn_8001EF6C(1.0f);
@@ -288,11 +287,11 @@ void DesireGooey::UnidentifiedCleanup()
 /**
  * Offset/Address/Size: 0x14D0 | 0x800BD594 | size: 0x1C8
  */
-bool DesireShrink::UnidentifiedInitialize(void* context)
+bool DesireShrink::Initialize(void* context)
 {
     cFielder* source;
-    bool result = Desire::UnidentifiedInitialize(context);
-    mUnidentified078 = lbl_806DC168;
+    bool result = Desire::Initialize(context);
+    mMaxDuration = lbl_806DC168;
     mfSlowPercentage = 1.0f;
 
     fn_8002E2E4(m_pFielder);
@@ -371,7 +370,7 @@ void DesireShrink::Update(DesireUpdate* update, float)
 /**
  * Offset/Address/Size: 0x1C40 | 0x800BDD04 | size: 0xAC
  */
-bool DesireFrozen::UnidentifiedReinitialize(void* context)
+bool DesireFrozen::Reinitialize(void* context)
 {
     if (meFrozenState == 3)
     {
@@ -379,22 +378,22 @@ bool DesireFrozen::UnidentifiedReinitialize(void* context)
     }
 
     mePrevFrozenState = meFrozenState;
-    mfPrevFrozenTime = mUnidentified078 - mUnidentifiedTimer.GetSeconds();
-    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
-    mUnidentifiedTimer.m_uPackedTime = 0;
+    mfPrevFrozenTime = mMaxDuration - mAgeTimer.GetSeconds();
+    mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
+    mAgeTimer.m_uPackedTime = 0;
 
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     fn_800BE1AC(params->Get(0)->mData.i);
     KillFreeze(m_pFielder);
-    return Desire::UnidentifiedInitialize(context);
+    return Desire::Initialize(context);
 }
 
 /**
  * Offset/Address/Size: 0x2234 | 0x800BE2F8 | size: 0x178
  */
-bool DesireConfused::UnidentifiedInitialize(void* context)
+bool DesireConfused::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     mfConfusedDirection = 16384.0f + nlRandomf(16384.0f);
     if (nlRandomf(1.0f) < 0.5f)
     {
@@ -435,18 +434,18 @@ bool DesireConfused::UnidentifiedInitialize(void* context)
 
     mvDesiredPosition = lbl_804DC1A0;
     mvDesiredPosition.x = 1.0f;
-    fn_80316974(this)->SetTimer(0xFF, 0.0f);
+    GetStateMachineAIContext(this)->SetTimer(0xFF, 0.0f);
     return result;
 }
 
 /**
  * Offset/Address/Size: 0x23AC | 0x800BE470 | size: 0xB8
  */
-bool DesireConfused::UnidentifiedReinitialize(void* context)
+bool DesireConfused::Reinitialize(void* context)
 {
-    mUnidentifiedTimer.m_uWasRunning = mUnidentifiedTimer.m_uPackedTime != 0;
-    mUnidentifiedTimer.m_uPackedTime = 0;
-    bool result = Desire::UnidentifiedInitialize(context);
+    mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
+    mAgeTimer.m_uPackedTime = 0;
+    bool result = Desire::Initialize(context);
     mfConfusedPercentage += lbl_806DC188.x;
     if (mfConfusedPercentage >= 1.0f)
     {
@@ -473,7 +472,7 @@ void DesireConfused::Update(
     DesireUpdate* update, float)
 {
     mfConfusedPercentage
-        += mUnidentifiedTimer.GetSeconds() / lbl_806DC184;
+        += mAgeTimer.GetSeconds() / lbl_806DC184;
     if (mfConfusedPercentage >= 1.0f)
     {
         mfConfusedPercentage = 1.0f;
@@ -496,9 +495,9 @@ void DesireConfused::Update(
     bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
     if (!hasGlobalPad)
     {
-        if (!fn_80316974(this)->IsTimerRunning(0xFF))
+        if (!GetStateMachineAIContext(this)->IsTimerRunning(0xFF))
         {
-            fn_80316974(this)->SetTimer(0xFF, 0.5f);
+            GetStateMachineAIContext(this)->SetTimer(0xFF, 0.5f);
             nlPolar polar;
             polar.r = 1.0f;
             polar.a = nlRandom(0xFFFF);
@@ -530,7 +529,7 @@ void DesireConfused::fn_800BED24(unsigned short* direction)
 /**
  * Offset/Address/Size: 0x2CD0 | 0x800BED94 | size: 0x8
  */
-void DesireConfused::UnidentifiedCleanup()
+void DesireConfused::Cleanup()
 {
     KillConfused(m_pFielder);
 }

@@ -25,6 +25,12 @@ public:
         *texcoord++ = v;
     }
 
+    void Texcoord(float u, float v)
+    {
+        *texcoord++ = (short)(u * 4096.0f);
+        *texcoord++ = (short)(v * 4096.0f);
+    }
+
     void Vertex(const nlVector3& value)
     {
         float x;

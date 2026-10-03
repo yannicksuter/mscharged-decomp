@@ -145,7 +145,7 @@ ContactType PhysicsShell::Contact(
             g_CollisionPowerupGroundDataPool.Allocate(eventData);
             GetPosition(&eventData->position);
             eventData->eType = m_pPowerupObject->GetType();
-            fn_801474EC(eventData);
+            QueueCollisionPowerupGoalie(eventData);
         }
         break;
     }
@@ -345,7 +345,7 @@ ContactType PhysicsShell::Contact(
                             GetPosition(&eventData->position);
                             eventData->fVecZComponent = v3IncidentVel.z;
                             eventData->eType = m_pPowerupObject->GetType();
-                            fn_801473A4(eventData);
+                            QueueCollisionPowerupGround(eventData);
                         }
                     }
                     break;
@@ -481,7 +481,7 @@ ContactType PhysicsShell::Contact(
                 eventData->eType = m_pPowerupObject->GetType();
                 nlVec3Set(eventData->position, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
                 nlVec3Set(eventData->normal, info->geom.normal[0], info->geom.normal[1], info->geom.normal[2]);
-                fn_80147634(eventData);
+                QueueCollisionPowerupWall(eventData);
 
                 if ((m_pPowerupObject->GetType() == POWER_UP_GREEN_SHELL
                         || m_pPowerupObject->GetType() == POWER_UP_RED_SHELL)

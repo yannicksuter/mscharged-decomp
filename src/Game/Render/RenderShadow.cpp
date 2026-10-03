@@ -28,8 +28,6 @@ struct BallShadowParams
 };
 
 extern "C" {
-RLView* fn_8027261C();
-void fn_80273A4C(eCLV, const glModel*, unsigned long);
 void fn_80186524(nlMatrix4& out, const nlMatrix4& in);
 void fn_80186650(const glModel* model, const nlMatrix4& transform,
     float* minX, float* maxX, float* minY, float* maxY,
@@ -148,7 +146,7 @@ void SetCoPlanarZ(float z)
     sfCoPlanarZ = z;
 }
 
-extern "C" void fn_80184ADC()
+void InitMaxProjectedShadows()
 {
     MaxProjectedShadows = 10;
 }
@@ -180,7 +178,7 @@ bool ShouldShadowBeUpdated(const ProjectedShadowParams& params)
     position.z += 0.625f * params.fHeight;
 
     float radius = 2.0f * params.fRadius;
-    RLView* view = fn_8027261C();
+    RLView* view = GetShadowedView();
     bool visible
         = ClassifySphereInFrustum(view->m_Interface->GetShadowMatrix(), &position, radius);
     unsigned long interval;
@@ -720,7 +718,7 @@ static void DrawBallShadow(
     glSetCurrentTextureState(glHandleizeTextureState());
 
     const glModel* pModel = quad.GetModel();
-    fn_80273A4C(eCLV_Particles, pModel, 0);
+    AttachModelToLayerView(eCLV_Particles, pModel, 0);
 }
 
 void fn_80186354(ChargeShadowDrawable* object)

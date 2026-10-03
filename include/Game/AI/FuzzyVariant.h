@@ -122,6 +122,8 @@ public:
     virtual bool IsPointerType() const;
 };
 
+extern FuzzyVariant fvNotSet;
+
 inline Variant::Variant(const FuzzyVariant& other)
     : mType(FT_UNSPECIFIED)
 {

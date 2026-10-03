@@ -61,7 +61,7 @@ void StadiumPhysicsObject::ReleaseResources()
 {
     g_StaticPhysicsPrimitives.RemoveEntry(m_pPhysicsObject);
     g_NetPhysicsObjects.RemoveEntry(m_pPhysicsObject);
-    ReleaseWorldPhysicsDrawableResources(this);
+    WorldPhysicsDrawable::ReleaseResources();
 }
 
 void WorldPhysicsDrawable::SetWorldMatrix(const nlMatrix4& transform)

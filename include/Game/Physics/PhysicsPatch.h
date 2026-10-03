@@ -34,12 +34,12 @@ public:
     static void* operator new(unsigned long)
     {
         PhysicsPatch* patch = 0;
-        lbl_805705D0.Allocate(patch);
+        m_PhysicsPatchSlotPool.Allocate(patch);
         return patch;
     }
     static void operator delete(void* ptr)
     {
-        lbl_805705D0.Free((PhysicsPatch*)ptr);
+        m_PhysicsPatchSlotPool.Free((PhysicsPatch*)ptr);
     }
 
     virtual void Unknown0();
@@ -50,26 +50,26 @@ public:
 
     int GetType() const { return m_Type; }
     int GetCurrentPathPoint() const { return m_CurrentPathPoint; }
-    inline void UnidentifiedKillEffect();
-    inline void UnidentifiedDestroyEffect();
+    inline void KillEffect();
+    inline void DestroyEffect();
 
-    void fn_80172EE0(const int* type);
+    void InitType(const int* type);
     void Update(float dt);
-    void fn_801739A4(const nlVector3& position);
-    void fn_80173A10(float duration);
+    void SetWorldPosition(const nlVector3& position);
+    void ClearMuckHole(float duration);
     void fn_80173AF4();
-    void fn_80173B08(float time);
-    void fn_80173B10(float time);
-    void fn_80173B18();
-    void fn_80173C9C(nlVector3* points, int pointCount, float speed);
+    void SetEndRadiusTime(float time);
+    void SetStartRadiusTime(float time);
+    void SeekTarget();
+    void SetPath(nlVector3* points, int pointCount, float speed);
     nlVector3 fn_80173CCC() const;
-    void fn_80173DA4(float dt);
+    void UpdatePath(float dt);
 
-    static SlotPool<PhysicsPatch> lbl_805705D0;
+    static SlotPool<PhysicsPatch> m_PhysicsPatchSlotPool;
 
-    /* 0x38 */ Function<PhysicsPatch*> mUnidentified38;
-    /* 0x40 */ nlVector3* mUnidentified40;
-    /* 0x44 */ AvoidableObject* mUnidentified44;
+    /* 0x38 */ Function<PhysicsPatch*> m_PathFinishedCallback;
+    /* 0x40 */ nlVector3* m_PathPoints;
+    /* 0x44 */ AvoidableObject* m_pAvoidable;
     /* 0x48 */ int m_Type;
     /* 0x4C */ cPlayer* m_pOwner;
     /* 0x50 */ float m_fStartRadius;
@@ -92,29 +92,29 @@ public:
     /* 0x90 */ float m_PathSpeed;
     /* 0x94 */ int m_CurrentPathPoint;
     /* 0x98 */ int m_PathPointCount;
-    /* 0x9C */ nlVector3 mUnidentified9C;
+    /* 0x9C */ nlVector3 m_SpawnPosition;
 }; // total size: 0xA8
 
-class PhysicsPatchManager_801740D0
+class PhysicsPatchManager
 {
 public:
-    PhysicsPatchManager_801740D0();
-    ~PhysicsPatchManager_801740D0();
+    PhysicsPatchManager();
+    ~PhysicsPatchManager();
 
-    PhysicsPatch* fn_801743A8(int type, cPlayer* owner,
+    PhysicsPatch* CreatePatch(int type, cPlayer* owner,
         const nlVector3& position, const nlVector3& velocity,
         float startRadius, float endRadius, float lifetime);
     PhysicsPatch* fn_801745B8(int index);
     void ResetEffects();
     void Update(float dt);
-    void fn_801748A0(void* context, DebugWriteCache* cache);
+    void SyncLog(void* context, DebugWriteCache* cache);
 
-    /* 0x00 */ PhysicsPatch* mUnidentified000[60];
-    /* 0xF0 */ UnidentifiedEventConnectionOwner mUnidentified0F0;
+    /* 0x00 */ PhysicsPatch* mPatches[60];
+    /* 0xF0 */ EventConnectionOwner mResetEffectsConnection;
     /* 0xF4 */ unsigned int mUnidentified0F4;
 }; // total size: 0xF8
 
-extern PhysicsPatchManager_801740D0* lbl_806E12C8;
+extern PhysicsPatchManager* lbl_806E12C8;
 
 inline void PhysicsPatch::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)
 {

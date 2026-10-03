@@ -1,5 +1,5 @@
 #include "Game/AI/TeamPlayMachine.h"
-#include "Game/AI/Desire.h"
+#include "Game/AI/ScriptState.h"
 #include "Game/Sys/debug.h"
 #include "Game/AI/AIContext.h"
 
@@ -14,33 +14,12 @@
 
 class ScriptQuestionCache;
 
-class UnidentifiedStateMachine_803171D0 : public shdStateMachine
+inline bool ScriptState::Reinitialize(void* context)
 {
-public:
-    UnidentifiedStateMachine_803171D0(
-        int, const char*, UnidentifiedScriptMachine*,
-        const TransitionFunc&);
-    virtual ~UnidentifiedStateMachine_803171D0();
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void* context)
-    {
-        return UnidentifiedInitialize(context);
-    }
-    virtual void UnidentifiedCleanup();
-    virtual void Update(DesireUpdate*, float);
+    return Initialize(context);
+}
 
-    u32 mUnidentified088;
-    u32 mUnidentified08C;
-    u32 mUnidentified090;
-};
-
-extern "C" bool fn_803169DC(
-    shdStateMachine*, UnidentifiedVariantCollection*, bool);
-extern "C" bool fn_80316A84(
-    shdStateMachine*, UnidentifiedVariantCollection*, bool);
 extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
-
-extern float (*lbl_806DF560)();
 
 char lbl_805302A0[]
     = "WARNING! shdStateMachine transition function returned nothing, funcHash=%d\n";
@@ -53,10 +32,6 @@ float lbl_806E20C4;
 int lbl_806E20C8;
 float lbl_806E20CC;
 
-extern const float lbl_806E6880;
-extern const float lbl_806E6884;
-extern const float lbl_806E6888;
-extern const float lbl_806E688C;
 extern const float lbl_806E6890;
 extern const float lbl_806E6894;
 extern const float lbl_806E6898[2];
@@ -83,10 +58,10 @@ bool HasTransitionFunc(
 extern "C" bool fn_80317E88(const shdStateMachine* machine)
 {
     bool result = false;
-    if (machine->mUnidentified078 >= lbl_806E6880)
+    if (machine->mMaxDuration >= lbl_806E6880)
     {
-        if (machine->mUnidentifiedTimer.GetSeconds()
-            > machine->mUnidentified078)
+        if (machine->mAgeTimer.GetSeconds()
+            > machine->mMaxDuration)
         {
             result = true;
         }
@@ -104,7 +79,7 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(
 {
     u32 localHash = hash;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash), 1, argument, 0));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(argument), 0));
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
@@ -112,9 +87,8 @@ extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(
     float value)
 {
     u32 localHash = hash;
-    u32 valueBits = *(u32*)&value;
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash), 2, argument, (void*)valueBits));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 2, FuzzyArgumentBits(argument), FuzzyArgumentBits(value)));
 }
 
 UnidentifiedScriptMachine::UnidentifiedScriptMachine(
@@ -187,11 +161,11 @@ extern "C" void fn_80318D34(
     UnidentifiedScriptMachine* machine, int state, const char* name,
     bool secondary)
 {
-    UnidentifiedStateMachine_803171D0* result
-        = new (nlMalloc(sizeof(UnidentifiedStateMachine_803171D0), 8, false))
-            UnidentifiedStateMachine_803171D0(
+    ScriptState* result
+        = new (nlMalloc(sizeof(ScriptState), 8, false))
+            ScriptState(
                 state, name, machine,
-                UnsetTransitionFunc(g_UnsetTransitionFunc));
+                TransitionFunc(g_UnsetTransitionFunc));
     machine->UnidentifiedAddState(state, result, secondary);
 }
 
@@ -206,7 +180,7 @@ void UnidentifiedScriptMachine::UnidentifiedAddState(
     {
         mUnidentified06C[state] = machine;
     }
-    machine->UnidentifiedSetContext(this);
+    machine->SetContext(this);
 }
 
 void UnidentifiedScriptMachine::Reset(bool param)
@@ -218,11 +192,11 @@ void UnidentifiedScriptMachine::Reset(bool param)
     {
         if (mUnidentified06C[i] != 0)
         {
-            mUnidentified06C[i]->UnidentifiedReset(param);
+            mUnidentified06C[i]->Reset(param);
         }
         if (mUnidentified070[i] != 0)
         {
-            mUnidentified070[i]->UnidentifiedReset(param);
+            mUnidentified070[i]->Reset(param);
         }
     }
 }
@@ -235,7 +209,7 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
 
     if (active != 0)
     {
-        fn_80317010(active, &update, true, deltaTime);
+        UpdateStateMachine(active, &update, true, deltaTime);
         if ((unsigned int)update.GetType() == FT_UNSPECIFIED)
         {
             update = 0;
@@ -277,8 +251,8 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
                 selectState = true;
                 break;
             case 4:
-                if (mUnidentified004->mUnidentifiedTimer.GetSeconds()
-                    >= mUnidentified004->mUnidentified07C)
+                if (mUnidentified004->mAgeTimer.GetSeconds()
+                    >= mUnidentified004->mMinDuration)
                 {
                     selectState = true;
                 }
@@ -297,12 +271,12 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
     for (int i = 0; i < mUnidentified074; i++)
     {
         shdStateMachine* machine = mUnidentified070[i];
-        if (machine == 0 || !machine->UnidentifiedIsActive())
+        if (machine == 0 || !machine->IsActive())
         {
             continue;
         }
 
-        fn_80317010(machine, &update, true, deltaTime);
+        UpdateStateMachine(machine, &update, true, deltaTime);
         if (update.mData.i == 0)
         {
             continue;
@@ -316,7 +290,6 @@ void UnidentifiedScriptMachine::Update(float deltaTime)
     }
 }
 
-
 void UnidentifiedScriptMachine::UnidentifiedVirtual7()
 {
     if (!fn_8031A04C())
@@ -328,16 +301,16 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual7()
         UnidentifiedVirtual8();
     }
 
-    if (IsTransitionFuncSet(&mTransition))
+    if (IsTransitionFuncSet(&mTransition.mValue))
     {
-        float start = lbl_806DF560();
+        float start = gAIProfilingClock();
         UnidentifiedVariant_80054AB8 result;
         mTransition.Execute(mAIContext, &result, 0);
-        fn_8031A0C8(start, lbl_806DF560());
+        fn_8031A0C8(start, gAIProfilingClock());
 
         if ((unsigned int)result.GetType() == FT_UNSPECIFIED)
         {
-            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mTransition.mFuncHash);
+            tDebugPrintManager::Print(DC_AI, lbl_805302A0, mTransition.mValue.mFuncHash);
             UnidentifiedVirtual6();
         }
         else if (result.ExtraData.Get(9)->mData.b)
@@ -365,7 +338,7 @@ void UnidentifiedScriptMachine::UnidentifiedVirtual6()
 {
     if (mUnidentified004 != 0)
     {
-        fn_80316980(mUnidentified004, true);
+        DeactivateStateMachine(mUnidentified004, true);
         mUnidentified008 = mUnidentified004;
     }
     mUnidentified004 = 0;
@@ -396,14 +369,14 @@ shdStateMachine* UnidentifiedScriptMachine::UnidentifiedVirtual5(
         return 0;
     }
 
-    if (machine->UnidentifiedIsActive())
+    if (machine->IsActive())
     {
         if (reinitialize)
         {
-            if (!fn_803169DC(machine, parameters, true)
+            if (!ReinitializeStateMachine(machine, parameters, true)
                 || mUnidentified004 != machine)
             {
-                machine->mUnidentifiedActive = false;
+                machine->mActive = false;
                 result = 0;
             }
         }
@@ -415,10 +388,10 @@ shdStateMachine* UnidentifiedScriptMachine::UnidentifiedVirtual5(
     else
     {
         UnidentifiedVirtual6();
-        if (!fn_80316A84(machine, parameters, true)
+        if (!InitializeStateMachine(machine, parameters, true)
             || mUnidentified004 != 0)
         {
-            machine->mUnidentifiedActive = false;
+            machine->mActive = false;
             result = 0;
         }
     }
@@ -444,9 +417,9 @@ extern "C" void fn_80319904(
         return;
     }
 
-    int index = state->mUnidentifiedState;
+    int index = state->mState;
     if (fn_80319FC0(machine, index) == state
-        && state->UnidentifiedIsActive())
+        && state->IsActive())
     {
         fn_80319E58(machine, index);
     }
@@ -480,9 +453,9 @@ extern "C" void fn_80319E58(
     UnidentifiedScriptMachine* machine, int state)
 {
     shdStateMachine* value = machine->mUnidentified070[state];
-    if (value != 0 && value->UnidentifiedIsActive())
+    if (value != 0 && value->IsActive())
     {
-        fn_80316980(value, true);
+        DeactivateStateMachine(value, true);
     }
 }
 
@@ -511,11 +484,11 @@ extern "C" shdStateMachine* fn_80319E84(
     }
 
     bool active;
-    if (value->UnidentifiedIsActive())
+    if (value->IsActive())
     {
         if (reinitialize)
         {
-            active = fn_803169DC(value, parameters, true);
+            active = ReinitializeStateMachine(value, parameters, true);
         }
         else
         {
@@ -524,7 +497,7 @@ extern "C" shdStateMachine* fn_80319E84(
     }
     else
     {
-        active = fn_80316A84(value, parameters, true);
+        active = InitializeStateMachine(value, parameters, true);
     }
     if (!active)
     {
@@ -563,7 +536,7 @@ extern "C" bool fn_80319FEC(
     }
     if (value != 0)
     {
-        return value->mUnidentifiedActive;
+        return value->mActive;
     }
     return false;
 }

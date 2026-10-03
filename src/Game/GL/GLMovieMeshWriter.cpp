@@ -1,13 +1,13 @@
 #include <revolution/base/PPCArch.h>
 #include <revolution/os/OSCache.h>
 
-#include "Game/GL/UnidentifiedMeshWriter_802A195C.h"
+#include "Game/GL/GLMovieMeshWriter.h"
 #include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-UnidentifiedMeshWriter_802A195C::UnidentifiedMeshWriter_802A195C()
+GLMovieMeshWriter::GLMovieMeshWriter()
     : count(0)
     , model(0)
     , resource(0)
@@ -16,11 +16,11 @@ UnidentifiedMeshWriter_802A195C::UnidentifiedMeshWriter_802A195C()
 {
 }
 
-UnidentifiedMeshWriter_802A195C::~UnidentifiedMeshWriter_802A195C()
+GLMovieMeshWriter::~GLMovieMeshWriter()
 {
 }
 
-bool UnidentifiedMeshWriter_802A195C::Begin(
+bool GLMovieMeshWriter::Begin(
     int vertexCount, int primitive, void* allocator)
 {
     glModel* newModel;
@@ -90,7 +90,7 @@ bool UnidentifiedMeshWriter_802A195C::Begin(
     return true;
 }
 
-bool UnidentifiedMeshWriter_802A195C::End()
+bool GLMovieMeshWriter::End()
 {
     for (u32 i = 0; i < model->numPackets; ++i)
     {

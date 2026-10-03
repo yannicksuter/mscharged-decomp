@@ -3,6 +3,7 @@
 
 #include "Game/CharacterEffects.h"
 #include "Game/CharacterQueries.h"
+#include "NL/nlDebug.h"
 #include "NL/nlMath.h"
 
 struct glModel;
@@ -16,7 +17,7 @@ enum eCharacterRenderPass
 {
     CRP_Default = 0,
     CRP_Scorch = 1,
-    CRP_Alternate = 2,
+    CRP_Shock = 2,
 };
 
 class DrawableCharacter
@@ -53,12 +54,12 @@ public:
 
     bool visible;
     bool useObject;
-    bool flag2;
-    bool flag3;
-    bool megaEnabled;
-    bool flag5;
-    bool flag6;
-    bool typeIsOne;
+    bool leftPropAnimated;
+    bool rightPropAnimated;
+    bool hammerTransformFrozen;
+    bool packetAVisible;
+    bool packetBVisible;
+    bool useShockModel;
     u16 facingDirection;
     u16 headSpin;
     u16 headTilt;
@@ -69,16 +70,16 @@ public:
     float height;
     float scale;
     float blendAmount;
-    float state40;
+    float megaBlend;
     float shadowLevel;
     nlVector3 velocity;
     cPoseNode* object;
     cPoseAccumulator* poseAccumulator;
     EffectsTexturing* effectsTexturing;
     cCharacter* character;
-    nlQuaternion megaBasis;
-    nlVector3 megaTranslation;
-    float megaScale;
+    nlQuaternion frozenHammerRotation;
+    nlVector3 frozenHammerTranslation;
+    float frozenHammerScale;
     float damage1;
     float damage2;
     u8 damageType;
@@ -101,8 +102,6 @@ class cPN_Blender;
 class cPN_Feather;
 class cPN_SingleAxisBlender;
 class cPN_ScaleBlender;
-
-void nlBreak();
 
 template <int N>
 void Replayable(LoadFrame& frame, char typeId, cPoseNode*& poseNode)
@@ -217,33 +216,33 @@ void DrawableCharacter::Replay(T& frame)
         if (ReplayFrameTraits<T>::IsLoadFrame)
             poseAccumulator->fn_801949E4(scale);
         Replayable<1>(frame, FloatCompressor<0, 1, 7>(blendAmount));
-        Replayable<1>(frame, FloatCompressor<0, 7, 5>(state40));
+        Replayable<1>(frame, FloatCompressor<0, 7, 5>(megaBlend));
         Replayable<1>(frame, FloatCompressor<0, 1, 7>(shadowLevel));
-        Replayable<1>(frame, typeIsOne);
+        Replayable<1>(frame, useShockModel);
         if (IsCharacterFielder(character))
         {
             cCharacter* current = character;
             if (IsCharacterHammerBro(current))
             {
-                Replayable<1>(frame, megaEnabled);
-                if (megaEnabled)
+                Replayable<1>(frame, hammerTransformFrozen);
+                if (hammerTransformFrozen)
                 {
-                    Replayable<1>(frame, FloatCompressor<-128, 128, 8>(megaTranslation.x));
-                    Replayable<1>(frame, FloatCompressor<-128, 128, 8>(megaTranslation.y));
-                    Replayable<1>(frame, FloatCompressor<-128, 128, 8>(megaTranslation.z));
-                    Replayable<1>(frame, UnidentifiedQuaternionCompressor(megaBasis));
-                    Replayable<1>(frame, FloatCompressor<0, 7, 5>(megaScale));
+                    Replayable<1>(frame, FloatCompressor<-128, 128, 8>(frozenHammerTranslation.x));
+                    Replayable<1>(frame, FloatCompressor<-128, 128, 8>(frozenHammerTranslation.y));
+                    Replayable<1>(frame, FloatCompressor<-128, 128, 8>(frozenHammerTranslation.z));
+                    Replayable<1>(frame, UnidentifiedQuaternionCompressor(frozenHammerRotation));
+                    Replayable<1>(frame, FloatCompressor<0, 7, 5>(frozenHammerScale));
                 }
                 else
                 {
-                    Replayable<1>(frame, flag3);
+                    Replayable<1>(frame, rightPropAnimated);
                 }
-                Replayable<1>(frame, flag2);
+                Replayable<1>(frame, leftPropAnimated);
             }
             else if (fn_80194674(current))
             {
-                Replayable<1>(frame, flag5);
-                Replayable<1>(frame, flag6);
+                Replayable<1>(frame, packetAVisible);
+                Replayable<1>(frame, packetBVisible);
             }
         }
         if (!usePoseAccumulator && frame.GetInterval() == 1)

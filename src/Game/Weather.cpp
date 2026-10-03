@@ -504,7 +504,7 @@ void Lightning::Stop(bool value)
     {
         WorldDarkening::Instance().Fade(2.0f * gLightningFadeTime, 0.0f);
     }
-    fn_801BDDE0(value);
+    KillLightning(value);
     mtLightingTimer.UnidentifiedClear();
     mnAmountOfStrikes = 0;
     Weather::Stop(value);
@@ -815,7 +815,7 @@ void SolarFlare::OnGetReadyForKickoff()
             for (int j = 0; j < 4; j++)
             {
                 cFielder* fielder = g_pTeams[i]->GetFielder(j);
-                fn_8002E1A4(fielder)->mUnidentified004->mUnidentified078 = duration;
+                fn_8002E1A4(fielder)->mUnidentified004->mMaxDuration = duration;
                 fielder->m_pPhysicsCharacter->m_CanCollideWithBall = false;
             }
         }
@@ -1078,7 +1078,7 @@ void OnLavaCollisionPatchGround(UnidentifiedEventData24* event)
             return;
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
-        lbl_806E12C8->fn_801743A8(9, 0, position, v3Zero, gLavaPoolRadius, gLavaPoolWidth, gLavaPoolLifetime)->fn_80173B10(gLavaPoolGrowthTime);
+        lbl_806E12C8->CreatePatch(9, 0, position, v3Zero, gLavaPoolRadius, gLavaPoolWidth, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
         event->mUnidentified10->Unknown0();
         PlaySound(11, 0xC15AA25B, 0, 0);
     }
@@ -1129,7 +1129,7 @@ void BubblingLava::Start()
         nlVector3 velocity = { 0.0f, 0.0f, 28.0f };
         GetPhysicsPatchInfo(8);
         float time = CalculateLavaTrajectory(position, velocity, gLavaGravity);
-        PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(8, 0, position, velocity, gLavaBallRadius, gLavaBallRadius, 999.0f);
+        PhysicsPatch* patch = lbl_806E12C8->CreatePatch(8, 0, position, velocity, gLavaBallRadius, gLavaBallRadius, 999.0f);
         patch->m_Gravity = gLavaGravity;
         maximum = nlMaxEquals(maximum, time);
         minimum = nlMinEquals(minimum, time);
@@ -1312,7 +1312,7 @@ void StormShipWeather::SyncLog(void* context, DebugWriteCache* cache)
 
 void StormShipWeather::CreateChainLightning(int index)
 {
-    PhysicsPatch* patch = lbl_806E12C8->fn_801743A8(10, 0, v3Zero, v3Zero, gStormChainRadius, gStormChainRadius, 10.0f);
+    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(10, 0, v3Zero, v3Zero, gStormChainRadius, gStormChainRadius, 10.0f);
     nlVector3* points;
     int count;
     if (m_bRightSide == true)
@@ -1325,8 +1325,8 @@ void StormShipWeather::CreateChainLightning(int index)
         points = fn_800B0464(index);
         count = fn_800B0478(index);
     }
-    patch->fn_801739A4(*points);
-    patch->fn_80173C9C(points, count, gStormChainSpeed);
+    patch->SetWorldPosition(*points);
+    patch->SetPath(points, count, gStormChainSpeed);
     float length = 0.0f;
     for (int i = 1; i < count; i++)
     {
@@ -1635,7 +1635,7 @@ void SandTombWeather::CreateSandPatches()
         {
             nlVector4 patch = fn_800B04BC(this, i, side == 1);
             nlVector3 position = { patch.x, patch.y, patch.z };
-            lbl_806E12C8->fn_801743A8(11, 0, position, v3Zero, patch.w, patch.w, 99999.0f);
+            lbl_806E12C8->CreatePatch(11, 0, position, v3Zero, patch.w, patch.w, 99999.0f);
         }
     }
     m_bSandPatchesCreated = true;

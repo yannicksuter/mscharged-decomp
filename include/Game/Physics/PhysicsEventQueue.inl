@@ -4,42 +4,42 @@
 #include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Physics/PhysicsShockwave.h"
 
-extern "C" inline void fn_8016A658(void* data)
+inline void FreeCollisionPlayerPlayerData(void* data)
 {
     g_CollisionPlayerPlayerDataPool.Free((CollisionPlayerPlayerData*)data);
 }
 
-extern "C" inline void fn_8016A670(void* data)
+inline void FreeUnidentifiedEventData24(void* data)
 {
-    lbl_80570138.Free((UnidentifiedEventData24*)data);
+    g_UnidentifiedEventData24Pool.Free((UnidentifiedEventData24*)data);
 }
 
-extern "C" inline void fn_8016A688(CollisionPlayerBallData* data)
+inline void FreeCollisionPlayerBallData(CollisionPlayerBallData* data)
 {
     g_CollisionPlayerBallDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A6A0(void* data)
+inline void FreeBallNetmeshEventData(void* data)
 {
     g_BallNetmeshEventDataPool.Free((BallNetmeshEventData*)data);
 }
 
-extern "C" inline void fn_8016A6B8(CollisionBallGroundData* data)
+inline void FreeCollisionBallGroundData(CollisionBallGroundData* data)
 {
     g_CollisionBallGroundDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A6D0(CollisionBallWallData* data)
+inline void FreeCollisionBallWallData(CollisionBallWallData* data)
 {
     g_CollisionBallWallDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A6E8(CollisionBallGoalpostData* data)
+inline void FreeCollisionBallGoalpostData(CollisionBallGoalpostData* data)
 {
     g_CollisionBallGoalpostDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A700(CollisionBallShellData* data)
+inline void FreeCollisionBallShellData(CollisionBallShellData* data)
 {
     g_CollisionBallShellDataPool.Free(data);
 }
@@ -49,72 +49,72 @@ inline void FreeCollisionBallChainData(CollisionBallChainData* data)
     g_CollisionBallChainDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A730(CollisionKoopaShotBallPlayerData* data)
+inline void FreeCollisionKoopaShotBallPlayerData(CollisionKoopaShotBallPlayerData* data)
 {
     g_CollisionKoopaShotBallPlayerDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A748(CollisionKoopaShellGoalieData* data)
+inline void FreeCollisionKoopaShellGoalieData(CollisionKoopaShellGoalieData* data)
 {
     g_CollisionKoopaShellGoalieDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A760(void* data)
+inline void FreeCollisionKoopaShellEndData(void* data)
 {
     g_CollisionKoopaShellEndDataPool.Free((CollisionKoopaShellEndData*)data);
 }
 
-extern "C" inline void fn_8016A778(CollisionBirdoShotBallPlayerData* data)
+inline void FreeCollisionBirdoShotBallPlayerData(CollisionBirdoShotBallPlayerData* data)
 {
     g_CollisionBirdoShotBallPlayerDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A790(CollisionBirdoEggGoalieData* data)
+inline void FreeCollisionBirdoEggGoalieData(CollisionBirdoEggGoalieData* data)
 {
     g_CollisionBirdoEggGoalieDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A7A8(void* data)
+inline void FreeCollisionBirdoEggEndData(void* data)
 {
     g_CollisionBirdoEggEndDataPool.Free((CollisionBirdoEggEndData*)data);
 }
 
-extern "C" inline void fn_8016A7C0(void* data)
+inline void FreeCollisionPowerupGroundData(void* data)
 {
     g_CollisionPowerupGroundDataPool.Free((CollisionPowerupGroundData*)data);
 }
 
-extern "C" inline void fn_8016A7D8(CollisionPowerupWallData* data)
+inline void FreeCollisionPowerupWallData(CollisionPowerupWallData* data)
 {
     g_CollisionPowerupWallDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A7F0(void* data)
+inline void FreePowerupHitPlayerEventData(void* data)
 {
     g_PowerupHitPlayerEventDataPool.Free((PowerupHitPlayerEventData*)data);
 }
 
-extern "C" inline void fn_8016A808(CollisionPlayerBananaData* data)
+inline void FreeCollisionPlayerBananaData(CollisionPlayerBananaData* data)
 {
     g_CollisionPlayerBananaDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A820(CollisionPlayerShellData* data)
+inline void FreeCollisionPlayerShellData(CollisionPlayerShellData* data)
 {
     g_CollisionPlayerShellDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A838(CollisionPlayerFreezeData* data)
+inline void FreeCollisionPlayerFreezeData(CollisionPlayerFreezeData* data)
 {
     g_CollisionPlayerFreezeDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A850(CollisionBulletBillData* data)
+inline void FreeCollisionBulletBillData(CollisionBulletBillData* data)
 {
     g_CollisionBulletBillDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A868(void* data)
+inline void FreePowerupUsedEventData(void* data)
 {
     g_PowerupUsedEventDataPool.Free((PowerupUsedEventData*)data);
 }
@@ -124,27 +124,27 @@ inline void FreeCollisionChainPowerupData(CollisionChainPowerupData* data)
     g_CollisionChainPowerupDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A898(void* data)
+inline void FreeUnidentifiedEventData30(void* data)
 {
-    lbl_80570160.Free((UnidentifiedEventData30*)data);
+    g_UnidentifiedEventData30Pool.Free((UnidentifiedEventData30*)data);
 }
 
-extern "C" inline void fn_8016A8B0(UnidentifiedEventData26* data)
+inline void FreeUnidentifiedEventData26(UnidentifiedEventData26* data)
 {
-    lbl_80570110.Free(data);
+    g_UnidentifiedEventData26Pool.Free(data);
 }
 
-extern "C" inline void fn_8016A8C8(CollisionThwompPlayerData* data)
+inline void FreeCollisionThwompPlayerData(CollisionThwompPlayerData* data)
 {
     g_CollisionThwompPlayerDataPool.Free(data);
 }
 
-extern "C" inline void fn_8016A8E0(UnidentifiedEventData34* data)
+inline void FreeUnidentifiedEventData34(UnidentifiedEventData34* data)
 {
-    lbl_80570188.Free(data);
+    g_UnidentifiedEventData34Pool.Free(data);
 }
 
-extern "C" inline void FreeCollisionShockwaveData(void* data)
+inline void FreeCollisionShockwaveData(void* data)
 {
     gCollisionShockwaveDataPool.Free((CollisionShockwaveData*)data);
 }

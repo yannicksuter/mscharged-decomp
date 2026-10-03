@@ -59,7 +59,7 @@ public:
     void SetOwnStatusReceivedInvitation(int index);
     void SetOwnStatusHostInvitingPlayer(int index,
         const GameplaySettings* gameplaySettings,
-        const CheatSettings* cheatSettings, u8 value);
+        const CheatSettings* cheatSettings, u8 stadium);
     void DeleteFriend(int index);
     int CountFriends();
     int CountBuddies();
@@ -86,6 +86,5 @@ extern FriendManager* g_pFriendManagerInstance;
 extern FriendManager* g_pFriendManager;
 
 FriendManager* GetFriendManager();
-void FormatFriendKey(unsigned long long friendKey, u16* output);
 
 #endif // GAME_FRIENDMANAGER_H

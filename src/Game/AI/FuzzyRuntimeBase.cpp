@@ -46,7 +46,7 @@ SlotPool<FuzzyActionQueueEntry> g_FuzzyActionQueuePool(16, 16);
 
 FuzzyRuntimeBase* shdStateMachine::GetFuzzyRuntime()
 {
-    return mUnidentified018->mAIContext->mRuntime;
+    return mScriptMachine->mAIContext->mRuntime;
 }
 
 FuzzyRuntimeBase* UnidentifiedScriptMachine::GetFuzzyRuntime()
@@ -285,7 +285,7 @@ bool FuzzyRuntimeBase::ExecuteFunction(
     return result;
 }
 
-extern "C" char fn_80312358(void*, char value)
+extern "C" char FuzzyPassThrough_80312358(void*, char value)
 {
     return value;
 }
@@ -293,7 +293,7 @@ extern "C" char fn_80312358(void*, char value)
 extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
     FuzzyRuntimeBase* runtime,
     FunctionEntryPoint* function, int argumentCount,
-    void* arg1, void* arg2)
+    u32 arg1, u32 arg2)
 {
     runtime->mCaptureReturnValue = true;
     switch (argumentCount)
@@ -304,11 +304,11 @@ extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
         break;
     case 1:
         runtime->ExecuteFunction(
-            function, 1, (u32)arg1, 0, 0, 0);
+            function, 1, arg1, 0, 0, 0);
         break;
     case 2:
         runtime->ExecuteFunction(
-            function, 2, (u32)arg1, (u32)arg2, 0, 0);
+            function, 2, arg1, arg2, 0, 0);
         break;
     }
 
@@ -430,7 +430,7 @@ FuzzyRuntimeBase::EndActionQueue()
     else if (entry->mQuestionHash != 0)
     {
         unsigned long hash = entry->mQuestionHash;
-        if (lbl_806DF568)
+        if (g_bScriptQuestionCachingOn)
         {
             g_FuzzyQuestionCache.mQuestionCacheMap.Add(hash, *selected);
         }
@@ -627,20 +627,20 @@ extern "C" float FuzzyGetQueueConfidence(
     return runtime->mActionQueues.mHead->mConfidence;
 }
 
-extern "C" void fn_80314434(void*, UnidentifiedVariant_80054AB8*, float)
+extern "C" void FuzzyNoOp_80314434(void*, UnidentifiedVariant_80054AB8*, float)
 {
 }
 
-extern "C" void fn_80314438(void*, UnidentifiedVariant_80054AB8*)
+extern "C" void FuzzyNoOp_80314438(void*, UnidentifiedVariant_80054AB8*)
 {
 }
 
-extern "C" void* fn_8031443C(void*, void* value, bool)
+extern "C" void* FuzzyPassThrough_8031443C(void*, void* value, bool)
 {
     return value;
 }
 
-extern "C" float fn_80314444(void*, float value, bool)
+extern "C" float FuzzyPassThrough_80314444(void*, float value, bool)
 {
     return value;
 }
@@ -751,7 +751,7 @@ extern "C" float FuzzySetTimerSeconds(
     return context->SetTimer(key, seconds)->GetSeconds();
 }
 
-extern "C" void fn_80314740(void*, bool)
+extern "C" void FuzzyNoOp_80314740(void*, bool)
 {
 }
 
@@ -764,7 +764,7 @@ extern "C" void FuzzySetActionSelection(
 extern "C" void FuzzySetTransition(
     void*, shdStateMachine* state, const char* name)
 {
-    UnidentifiedScriptMachine* machine = state->mUnidentified018;
+    UnidentifiedScriptMachine* machine = state->mScriptMachine;
     machine->SetTransition(name);
 }
 

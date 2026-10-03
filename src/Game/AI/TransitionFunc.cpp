@@ -6,14 +6,14 @@
 
 NativeTransitionFunc::NativeTransitionFunc(void* function)
 {
-    mFuncHash = -1;
-    mNativeFunc = function;
+    mValue.mFuncHash = -1;
+    mValue.mNativeFunc = function;
 }
 
 ScriptTransitionFunc::ScriptTransitionFunc(const char* name)
 {
-    mNativeFunc = 0;
-    mFuncHash = nlStringHash(name);
+    mValue.mNativeFunc = 0;
+    mValue.mFuncHash = nlStringHash(name);
 }
 
 typedef UnidentifiedVariant_80054AB8 (*NativeTransitionFuncPtr)(

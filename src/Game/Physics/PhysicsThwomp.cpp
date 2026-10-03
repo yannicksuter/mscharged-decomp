@@ -71,7 +71,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
                 return NO_CONTACT;
             }
         }
-        fn_80149984(thwomp, character);
+        QueueCollisionThwompPlayer(thwomp, character);
         return ONE_WAY_CONTACT_OTHER;
     }
     case 16:
@@ -86,7 +86,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
             }
             if (ball->meBallState != 10)
             {
-                fn_80149B30((UnidentifiedEventData33*)mThwomp);
+                QueueCollisionThwompBall((UnidentifiedEventData33*)mThwomp);
             }
         }
         ball = ((PhysicsAIBall*)other)->m_pAIBall;

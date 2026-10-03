@@ -1,8 +1,6 @@
 #include <private/nhttp.h>
 
 void NHTTPi_free(void* ptr);
-NHTTPConnectionInfo* NHTTPi_Response2Connection(void* mutexInfo_p,
-    NHTTPResponseInfo* res_p);
 s32 NHTTPi_findNextLineHdrRecvBuf(const NHTTPResponseInfo* res_p, s32 pos,
     s32 limit, s32* colon_pos_p, s32* return_code_size_p);
 s32 NHTTPi_compareTokenN_HdrRecvBuf(const NHTTPResponseInfo* res_p, s32 pos,

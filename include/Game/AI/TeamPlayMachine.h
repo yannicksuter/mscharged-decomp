@@ -34,8 +34,7 @@ public:
     void SetTransition(const char* name)
     {
         ScriptTransitionFunc transition(name);
-        mTransition.mFuncHash = transition.mFuncHash;
-        mTransition.mNativeFunc = transition.mNativeFunc;
+        mTransition = transition.mValue;
     }
 
     void UnidentifiedAddState(int, shdStateMachine*, bool);
@@ -78,38 +77,38 @@ public:
     virtual void UnidentifiedVirtual8();
 };
 
-class UnidentifiedTeamDesire : public shdStateMachine
+class TeamDesire : public shdStateMachine
 {
 public:
-    UnidentifiedTeamDesire(
-        int state, const TransitionFunc& transition);
-    virtual ~UnidentifiedTeamDesire()
+    TeamDesire(
+        int state, TransitionFunc& transition);
+    virtual ~TeamDesire()
     {
     }
 
-    virtual bool UnidentifiedInitialize(void*) = 0;
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*) = 0;
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
+    virtual void SetContext(UnidentifiedScriptMachine*);
 
 protected:
     cTeam* m_pTeam;
 };
 
-class TutorialMegastrikeDesire : public UnidentifiedTeamDesire
+class TutorialMegastrikeDesire : public TeamDesire
 {
 public:
     TutorialMegastrikeDesire(
         int state, TransitionFunc transition)
-        : UnidentifiedTeamDesire(state, transition)
+        : TeamDesire(state, transition)
     {
     }
 
     virtual ~TutorialMegastrikeDesire();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
 };
 
@@ -117,10 +116,23 @@ class cFielder;
 UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
 
+extern "C" void fn_80319904(UnidentifiedScriptMachine* machine, shdStateMachine* state);
+extern "C" AIContext* fn_80317E2C(UnidentifiedScriptMachine* machine);
+extern "C" bool fn_80317E88(const shdStateMachine* machine);
+extern "C" UnidentifiedVariant_80054AB8 fn_80317EFC(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
+extern "C" UnidentifiedVariant_80054AB8 fn_803184A8(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
+extern "C" void fn_8031998C(UnidentifiedScriptMachine* machine, int state, const UnidentifiedVariantCollection* parameters);
+
+extern const float lbl_806E6880;
+extern const float lbl_806E6884;
+extern const float lbl_806E6888;
+extern const float lbl_806E688C;
+
 bool IsTransitionFuncSet(const TransitionFunc* transition);
 bool HasTransitionFunc(const TransitionFunc* transition);
 extern "C" void fn_80318D34( UnidentifiedScriptMachine* machine, int state, const char* name, bool secondary);
 extern "C" void fn_80319DA0(UnidentifiedScriptMachine* machine);
+extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
 extern "C" shdStateMachine* fn_80319E84(UnidentifiedScriptMachine* machine, int state, UnidentifiedVariantCollection* parameters, bool reinitialize);
 extern "C" shdStateMachine* fn_80319F94( UnidentifiedScriptMachine* machine, int state);
 extern "C" shdStateMachine* fn_80319FC0(UnidentifiedScriptMachine* machine, int state);

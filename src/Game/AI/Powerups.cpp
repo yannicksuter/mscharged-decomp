@@ -1613,7 +1613,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 pData->pPowerup = pObj;
                 pData->pBall = pBall;
                 pData->v3CollisionVelocity = pObj->m_v3Velocity;
-                fn_80146964(pData);
+                QueueCollisionBallShell(pData);
             }
             else if (pBall->GetOwnerFielder() != 0)
             {
@@ -1756,7 +1756,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                     pData->pThrower = pObj->m_pThrower;
                     pData->nThrowerPadID = pObj->m_nThrowerPadID;
                     pData->v3CollisionLocation = v3Pos;
-                    fn_801478C4(pData);
+                    QueueCollisionPlayerBanana(pData);
                     pObj->m_bShouldDestroy = true;
                 }
                 else if (pObj->m_eType != POWER_UP_BOBOMB)
@@ -1781,7 +1781,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                             }
                             pData->v3CollisionLocation = v3Pos;
                             pData->v3CollisionVelocity = pObj->m_v3Velocity;
-                            fn_80147A0C(pData);
+                            QueueCollisionPlayerShell(pData);
                         }
                     }
                     else
@@ -1791,7 +1791,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                         pData->eSize = (int)pObj->meSize;
                         pData->pThrower = pObj->m_pThrower;
                         pData->nThrowerPadID = pObj->m_nThrowerPadID;
-                        fn_80147B54(pData);
+                        QueueCollisionPlayerFreeze(pData);
                     }
 
                     if (!bUnknown)
@@ -1825,7 +1825,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         pData->Type = pObj->m_eType;
         pData->Thrower = (cPlayer*)pObj->m_pThrower;
         pData->Target = pPlayerTarget;
-        fn_8014777C(pData);
+        QueuePowerupHit(pData);
     }
 }
 

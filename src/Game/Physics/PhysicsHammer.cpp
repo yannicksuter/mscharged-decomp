@@ -106,7 +106,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         }
 
         UnidentifiedEventData26* data = 0;
-        lbl_80570110.Allocate(data);
+        g_UnidentifiedEventData26Pool.Allocate(data);
         data->mUnidentified18 = character;
         data->pFielder = thrower;
         data->v3Position = GetPosition();
@@ -127,7 +127,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         if (!isLanded)
         {
             UnidentifiedEventData26* data = 0;
-            lbl_80570110.Allocate(data);
+            g_UnidentifiedEventData26Pool.Allocate(data);
             data->mUnidentified18 = 0;
             data->pFielder = thrower;
             data->v3Position = GetPosition();

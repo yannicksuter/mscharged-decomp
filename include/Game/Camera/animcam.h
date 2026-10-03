@@ -56,11 +56,16 @@ public:
         return 0.0f;
     }
 
+    static float CalculateTimeLeft(float animationTime, float duration)
+    {
+        return (1.0f - animationTime) * duration;
+    }
+
     float GetUnidentifiedTimeLeft() const
     {
         float animTime = GetUnidentifiedAnimationTime();
         float duration = GetUnidentifiedDuration();
-        return (1.0f - animTime) * duration;
+        return CalculateTimeLeft(animTime, duration);
     }
 
     float GetUnidentifiedAnimationTime() const

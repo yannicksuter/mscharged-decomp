@@ -6,26 +6,26 @@
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
 
-unsigned int HashEventName(const char*, int);
-void RegisterEvent(void*, void*);
-void UnregisterEvent(void*);
-void RegisterEventConnection(void*, void*, unsigned int, int);
-void* FindEventConnection(void*, void*);
-void UnregisterEventConnection(void*, void*);
+unsigned int HashEventName(const char* name, int length);
+void RegisterEvent(void* event, void* eventType);
+void UnregisterEvent(void* event);
+void RegisterEventConnection(void* event, void* connection, unsigned int owner, int group);
+void* FindEventConnection(void* event, void* owner);
+void UnregisterEventConnection(void* event, void* connection);
 
 void PushEventConnectionState();
 void PopEventConnectionState();
 void DisconnectEventOwner(void* owner);
 
-class UnidentifiedEventBase
+class EventBase
 {
 public:
-    UnidentifiedEventBase(const char* name, int length)
+    EventBase(const char* name, int length)
         : mHash(HashEventName(name, length))
     {
     }
 
-    virtual ~UnidentifiedEventBase() { }
+    virtual ~EventBase() { }
     virtual void Disconnect(void* owner) = 0;
 
     friend void RegisterEvent(void*, void*);
@@ -36,23 +36,30 @@ protected:
     void* mCurrentConnection;
 };
 
-struct UnidentifiedConnection
+struct EventConnection
 {
-    UnidentifiedConnection()
-        : mEvent(0)
-        , mTarget(0)
+    EventConnection()
+        : mOwner(0)
+        , mEvent(0)
     {
         mFlags |= 0xC0000000;
         mFlags &= ~0x20000000;
     }
 
-    ~UnidentifiedConnection();
+    ~EventConnection();
 
+    // The owner's first word holds the live connection pointer.
+    void* mOwner;
     void* mEvent;
-    void* mTarget;
     union
     {
         unsigned int mFlags;
+        struct
+        {
+            unsigned int : 2;
+            unsigned int mPendingRemoval : 1;
+            unsigned int : 29;
+        };
         struct
         {
             unsigned short mUnidentified08;
@@ -89,12 +96,12 @@ struct UnidentifiedEventCallback<UnidentifiedEventNoData>
 };
 
 template <typename T>
-struct UnidentifiedListener : public UnidentifiedConnection
+struct UnidentifiedListener : public EventConnection
 {
     typedef typename UnidentifiedEventCallback<T>::Type Callback;
 
     UnidentifiedListener(int = 0)
-        : UnidentifiedConnection()
+        : EventConnection()
         , callback()
     {
     }
@@ -103,13 +110,13 @@ struct UnidentifiedListener : public UnidentifiedConnection
 };
 
 template <typename T>
-class UnidentifiedTypedEvent : public UnidentifiedEventBase
+class UnidentifiedTypedEvent : public EventBase
 {
 public:
     typedef typename UnidentifiedEventCallback<T>::Type Callback;
 
     UnidentifiedTypedEvent(const char* name, int length)
-        : UnidentifiedEventBase(name, length)
+        : EventBase(name, length)
     {
         this->mCurrentConnection = 0;
         sType = *(void**)this;
@@ -267,7 +274,7 @@ void UnidentifiedEvent<T>::Remove(Listener* listener)
     UnregisterEventConnection(this, listener);
     if (this->mCurrentConnection == listener)
     {
-        listener->mFlags |= 0x20000000;
+        listener->mPendingRemoval = 1;
         return;
     }
 
@@ -297,10 +304,10 @@ void UnidentifiedEvent<T>::Disconnect(void* owner)
 }
 
 template <typename P1, typename P2, typename P3>
-struct UnidentifiedListener3 : public UnidentifiedConnection
+struct UnidentifiedListener3 : public EventConnection
 {
     UnidentifiedListener3(int = 0)
-        : UnidentifiedConnection()
+        : EventConnection()
         , callback()
     {
     }
@@ -309,13 +316,13 @@ struct UnidentifiedListener3 : public UnidentifiedConnection
 };
 
 template <typename P1, typename P2, typename P3>
-class UnidentifiedTypedEvent3 : public UnidentifiedEventBase
+class UnidentifiedTypedEvent3 : public EventBase
 {
 public:
     typedef Function<void(P1, P2, P3)> Callback;
 
     UnidentifiedTypedEvent3(const char* name, int length)
-        : UnidentifiedEventBase(name, length)
+        : EventBase(name, length)
     {
         this->mCurrentConnection = 0;
         sType = *(void**)this;

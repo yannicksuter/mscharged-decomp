@@ -26,9 +26,9 @@ extern "C" inline UnidentifiedVariant_80054AB8 fn_800996D0(
     FuzzyRuntimeBase* runtime, const unsigned int& functionHash, cPlayer* player)
 {
     unsigned int localHash = functionHash;
-    // Pass the pointer through the untyped argument marshaller by reference.
+    // Marshal the player pointer into one interpreter stack word.
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        runtime, runtime->FindFunctionEntryPoint(localHash), 1, *(void* const*)&player, NULL));
+        runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(player), 0));
 }
 
 #endif

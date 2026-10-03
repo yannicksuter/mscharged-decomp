@@ -19,7 +19,6 @@
 #include <math.h>
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_80147F2C(CollisionBulletBillData*);
 
 PhysicsBulletBill::PhysicsBulletBill(
     BulletBillObject* bulletBill, float radius, float)
@@ -59,7 +58,7 @@ ContactType PhysicsBulletBill::Contact(
                 g_CollisionBulletBillDataPool.Allocate(eventData);
                 eventData->player = character;
                 eventData->bulletBill = mBulletBill;
-                fn_80147C9C(eventData);
+                QueueCollisionBulletBillPlayer(eventData);
             }
         }
         else
@@ -68,7 +67,7 @@ ContactType PhysicsBulletBill::Contact(
             g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = character;
             eventData->bulletBill = mBulletBill;
-            fn_80147F2C(eventData);
+            QueueExplosionBulletBill(eventData);
         }
         break;
     }
@@ -96,7 +95,7 @@ ContactType PhysicsBulletBill::Contact(
                     g_CollisionBulletBillDataPool.Allocate(eventData);
                     eventData->player = owner;
                     eventData->bulletBill = mBulletBill;
-                    fn_80147C9C(eventData);
+                    QueueCollisionBulletBillPlayer(eventData);
                 }
             }
             else
@@ -105,7 +104,7 @@ ContactType PhysicsBulletBill::Contact(
                 g_CollisionBulletBillDataPool.Allocate(eventData);
                 eventData->player = owner;
                 eventData->bulletBill = mBulletBill;
-                fn_80147F2C(eventData);
+                QueueExplosionBulletBill(eventData);
             }
             break;
         }
@@ -135,7 +134,7 @@ ContactType PhysicsBulletBill::Contact(
             g_CollisionBulletBillDataPool.Allocate(eventData);
             eventData->player = mBulletBill->target;
             eventData->bulletBill = mBulletBill;
-            fn_80147DE4(eventData);
+            QueueCollisionBulletBillFreeze(eventData);
             powerup->m_bShouldDestroy = true;
             return NO_CONTACT;
         }
@@ -151,7 +150,7 @@ ContactType PhysicsBulletBill::Contact(
         g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = 0;
         eventData->bulletBill = mBulletBill;
-        fn_80147F2C(eventData);
+        QueueExplosionBulletBill(eventData);
         break;
     }
     case 0x17:
@@ -174,7 +173,7 @@ ContactType PhysicsBulletBill::Contact(
         g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = 0;
         eventData->bulletBill = mBulletBill;
-        fn_80147F2C(eventData);
+        QueueExplosionBulletBill(eventData);
         break;
     }
     default:
@@ -206,7 +205,7 @@ void PhysicsBulletBill::PreCollide()
         g_CollisionBulletBillDataPool.Allocate(eventData);
         eventData->player = mBulletBill->target;
         eventData->bulletBill = mBulletBill;
-        fn_80147F2C(eventData);
+        QueueExplosionBulletBill(eventData);
     }
 }
 

@@ -101,13 +101,30 @@ static inline float MapFromFieldPosToTargetPos(float fPos, const float* pFieldKn
     float fMin = pFieldKnots[0];
     float fMax = pFieldKnots[nNumKnots - 1] - 0.001f;
 
-    fPos = (fPos >= fMin) ? fPos : fMin;
-    fPos = (fPos <= fMax) ? fPos : fMax;
+    float lowerClampedPosition;
+    if (fPos >= fMin)
+    {
+        lowerClampedPosition = fPos;
+    }
+    else
+    {
+        lowerClampedPosition = fMin;
+    }
+
+    float clampedPosition;
+    if (lowerClampedPosition <= fMax)
+    {
+        clampedPosition = lowerClampedPosition;
+    }
+    else
+    {
+        clampedPosition = fMax;
+    }
 
     int nKnot;
     for (nKnot = 0; nKnot < nNumKnots - 1; nKnot++)
     {
-        if (fPos < pFieldKnots[nKnot + 1])
+        if (clampedPosition < pFieldKnots[nKnot + 1])
         {
             break;
         }
@@ -120,7 +137,7 @@ static inline float MapFromFieldPosToTargetPos(float fPos, const float* pFieldKn
     }
     else
     {
-        fKnotPercent = (fPos - pFieldKnots[nKnot]) / (pFieldKnots[nKnot + 1] - pFieldKnots[nKnot]);
+        fKnotPercent = (clampedPosition - pFieldKnots[nKnot]) / (pFieldKnots[nKnot + 1] - pFieldKnots[nKnot]);
     }
 
     return Interpolate(pTargetKnots[nKnot], pTargetKnots[nKnot + 1], fKnotPercent);
@@ -238,7 +255,6 @@ void GameplayCameraZoomLevel::CalcDesiredTarget()
     float fDampenedBlendRiser;
     float fAccumulatedWeight;
     float fBlendPercent;
-    float* pKnotTableBlendWeights;
     int i;
 
     if (!gGameplayCameraInReplay)
@@ -285,16 +301,15 @@ void GameplayCameraZoomLevel::CalcDesiredTarget()
     m_fDesiredTargetX = 0.0f;
     m_fDesiredTargetY = 0.0f;
 
-    pKnotTableBlendWeights = fKnotTableBlendWeights;
     i = 0;
-    for (; i < 3; pKnotTableBlendWeights++, i++)
+    for (; i < 3; i++)
     {
-        if (*pKnotTableBlendWeights > 0.0f)
+        if (fKnotTableBlendWeights[i] > 0.0f)
         {
-            fAccumulatedWeight += *pKnotTableBlendWeights;
+            fAccumulatedWeight += fKnotTableBlendWeights[i];
             float fMappedX = MapFromFieldPosToTargetPos(v3OOIPos.x, m_CameraData->fieldKnotsX[i], m_CameraData->targetKnotsX[i], m_CameraData->numKnotsX);
             float fMappedY = MapFromFieldPosToTargetPos(v3OOIPos.y, m_CameraData->fieldKnotsY[i], m_CameraData->targetKnotsY[i], m_CameraData->numKnotsY);
-            fBlendPercent = *pKnotTableBlendWeights / fAccumulatedWeight;
+            fBlendPercent = fKnotTableBlendWeights[i] / fAccumulatedWeight;
 
             m_fDesiredTargetX = Interpolate(m_fDesiredTargetX, fMappedX, fBlendPercent);
             m_fDesiredTargetY = Interpolate(m_fDesiredTargetY, fMappedY, fBlendPercent);

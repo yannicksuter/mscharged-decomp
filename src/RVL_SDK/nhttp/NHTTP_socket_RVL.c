@@ -3,10 +3,6 @@
 #include <revolution/so.h>
 #include <revolution/ssl.h>
 
-void NHTTPi_lockReqList(void* mutexInfo);
-void NHTTPi_unlockReqList(void* mutexInfo);
-NHTTPConnectionInfo* NHTTPi_Request2Connection(void* mutexInfo,
-    NHTTPRequestInfo* request);
 void NHTTPi_SetSSLError(NHTTPBgnEndInfo* info, s32 error);
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 void* NHTTPi_memclr(void* destination, u32 size);

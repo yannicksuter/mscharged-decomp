@@ -28,30 +28,58 @@ struct TransitionFunc
     void* mNativeFunc;
 };
 
-struct UnsetTransitionFunc : public TransitionFunc
+// Owns a transition record, initialized to the unset value.
+struct UnsetTransitionFunc
 {
     UnsetTransitionFunc()
     {
-        mNativeFunc = 0;
-        mFuncHash = (u32)-1;
+        mValue.mNativeFunc = 0;
+        mValue.mFuncHash = (u32)-1;
     }
+
+    operator TransitionFunc&() { return mValue; }
+    operator const TransitionFunc&() const { return mValue; }
+
+    UnsetTransitionFunc& operator=(UnsetTransitionFunc& other)
+    {
+        mValue = other.mValue;
+        return *this;
+    }
+
+    UnsetTransitionFunc& operator=(const TransitionFunc& transition)
+    {
+        mValue = transition;
+        return *this;
+    }
+
+    bool IsUnset() const { return mValue.IsUnset(); }
+    void Execute(AIContext* input, UnidentifiedVariant_80054AB8* result,
+        UnidentifiedFuzzyRuntimeValue* context)
+    {
+        mValue.Execute(input, result, context);
+    }
+
+    TransitionFunc mValue;
 };
 
-// The shared unset value; assigned to clear a transition.
 extern UnsetTransitionFunc g_UnsetTransitionFunc;
 
-// A transition bound to a script function by the hash of its name; the hash
-// is resolved through the fuzzy runtime's function table when it executes.
-struct ScriptTransitionFunc : public TransitionFunc
+// Constructs a script binding and exposes its record for state construction.
+struct ScriptTransitionFunc
 {
     ScriptTransitionFunc(const char* name);
+    operator TransitionFunc&() { return mValue; }
+    operator const TransitionFunc&() const { return mValue; }
+    TransitionFunc mValue;
 };
 
-// A transition bound to a compiled function that takes the AI context and
-// returns the desire update.
-struct NativeTransitionFunc : public TransitionFunc
+// Constructs a native binding and exposes its record for state construction.
+struct NativeTransitionFunc
 {
     NativeTransitionFunc(void* function);
+    operator TransitionFunc&() { return mValue; }
+    operator const TransitionFunc&() const { return mValue; }
+    TransitionFunc mValue;
 };
 
 #endif // GAME_AI_TRANSITION_FUNC_H

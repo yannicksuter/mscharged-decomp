@@ -3,18 +3,18 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-UnidentifiedTeamDesire::UnidentifiedTeamDesire(
-    int state, const TransitionFunc& transition)
+TeamDesire::TeamDesire(
+    int state, TransitionFunc& transition)
     : shdStateMachine(state, transition)
 {
-    mUnidentified080 = 0.33f;
-    mUnidentified084 = 1.0f;
+    mDefaultMinDuration = 0.33f;
+    mDefaultMaxDuration = 1.0f;
 }
 
-void UnidentifiedTeamDesire::UnidentifiedSetContext(
+void TeamDesire::SetContext(
     UnidentifiedScriptMachine* context)
 {
-    shdStateMachine::UnidentifiedSetContext(context);
+    shdStateMachine::SetContext(context);
     if (context != 0)
     {
         m_pTeam = (cTeam*)context->mAIContext->mData.pointer;
@@ -25,15 +25,15 @@ void UnidentifiedTeamDesire::UnidentifiedSetContext(
     }
 }
 
-bool UnidentifiedTeamDesire::UnidentifiedReinitialize(void*)
+bool TeamDesire::Reinitialize(void*)
 {
     return true;
 }
 
-void UnidentifiedTeamDesire::UnidentifiedCleanup()
+void TeamDesire::Cleanup()
 {
 }
 
-void UnidentifiedTeamDesire::Update(DesireUpdate*, float)
+void TeamDesire::Update(DesireUpdate*, float)
 {
 }

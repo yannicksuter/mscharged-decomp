@@ -1,16 +1,16 @@
-#ifndef GAME_GL_UNIDENTIFIED_MESH_WRITER_802A195C_H
-#define GAME_GL_UNIDENTIFIED_MESH_WRITER_802A195C_H
+#ifndef GAME_GL_GL_MOVIE_MESH_WRITER_H
+#define GAME_GL_GL_MOVIE_MESH_WRITER_H
 
 #include "NL/gl/glModel.h"
 #include "NL/nlMath.h"
 
-// Mesh writer variant at 0x802A195C with float texture coordinates. The
-// stripped DOL does not retain the original class name.
-class UnidentifiedMeshWriter_802A195C
+// Builds models for the movie material program (GXMovieMaterialProgram):
+// a position stream and a float texture-coordinate stream, no colours.
+class GLMovieMeshWriter
 {
 public:
-    UnidentifiedMeshWriter_802A195C();
-    ~UnidentifiedMeshWriter_802A195C();
+    GLMovieMeshWriter();
+    ~GLMovieMeshWriter();
     bool Begin(int count, int primitive, void* resource);
     bool End();
 
@@ -38,4 +38,4 @@ public:
     /* 0x10 */ float* texcoord;
 }; // size: 0x14
 
-#endif // GAME_GL_UNIDENTIFIED_MESH_WRITER_802A195C_H
+#endif // GAME_GL_GL_MOVIE_MESH_WRITER_H

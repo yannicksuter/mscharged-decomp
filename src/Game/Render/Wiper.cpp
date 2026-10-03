@@ -1,5 +1,6 @@
 #include "Game/Render/Wiper.h"
 
+#include "Game/NisPlayer.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/FE/feManager.h"
 #include "Game/Task/FixedUpdateTask.h"
@@ -16,8 +17,6 @@
 class MemoryAllocator;
 
 extern "C" bool fn_800EBBFC(int, unsigned long, const void*, void*);
-
-extern bool g_ForceDoubleBallTransition;
 
 namespace
 {

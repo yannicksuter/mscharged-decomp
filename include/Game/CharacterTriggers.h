@@ -46,7 +46,7 @@ void EmitBowserSmoke(cFielder*);
 void KillSlideTackleTrail(cFielder*, int);
 EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName, const char* characterName);
 
-extern "C" void fn_801BDDE0(bool bParam);
+void KillLightning(bool bReallyKill);
 
 void EmitWind(const nlVector3& v3Position, const nlVector3& v3Direction,
     const nlVector3& v3Velocity);
@@ -100,8 +100,8 @@ void EndDeke(cFielder* pFielder);
 void EmitLightningBall();
 void EmitDKDeke(cCharacter* pCharacter);
 const char* GetCharacterEffectsName(cCharacter* pCharacter);
-extern "C" void fn_801BE0A4(cCharacter* pCharacter, bool bValue);
-extern "C" void fn_801BE0AC(cCharacter* pCharacter, bool bValue);
+void SetCharacterPacketAVisible(cCharacter* pCharacter, bool bValue);
+void SetCharacterPacketBVisible(cCharacter* pCharacter, bool bValue);
 bool IsCharacterGoalie(cCharacter* pCharacter);
 void SetCharacterLeftPropAnimated(cCharacter* pCharacter, bool bAnimated);
 void SetCharacterRightPropAnimated(cCharacter* pCharacter, bool bAnimated);

@@ -2,41 +2,36 @@
 
 #include "Game/NetworkSession.h"
 #include "Game/TweakValueFloat.h"
-#include "NL/nlConfig.h"
-#include "NL/nlFormat.h"
 #include "Game/NetworkInput.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "NL/nlPrint.h"
-
-#include <stdlib.h>
 
 static float g_fMovementDeadZone = 0.3f;
 static float g_fCStickDeadZone = 0.5f;
-float lbl_806DB3C8 = 0.5f;
+float g_fAccelerationHistoryBlend = 0.5f;
 
-static TweakValueFloat sTweak_80568410(
+static TweakValueFloat sDPDSensitivity(
     "DPD_Sensitivity", "Controller Config/DPD", 1.8f);
-static TweakValueFloat sTweak_80568430(
+static TweakValueFloat sLeftShakeThreshold(
     "gfLeftShakeThreshold", "Controller Config", 2.5f);
-static TweakValueFloat sTweak_80568450(
+static TweakValueFloat sRightShakeThreshold(
     "gfRightShakeThreshold", "Controller Config", 1.33f);
 
 cAIPad AIPadManager::mAIPads[16];
 
 cAIPad::cAIPad()
 {
-    mUnidentified2D4 = 0;
-    mUnidentified2D8 = -1;
+    mAccelerationHistoryIndex = 0;
+    mLocalControllerIndex = -1;
     m_pGlobalPad = 0;
 
     for (int i = 0; i < 30; ++i)
     {
-        mUnidentified004[i].x = 1000.0f;
-        mUnidentified004[i].y = 0.0f;
-        mUnidentified004[i].z = 0.0f;
-        mUnidentified16C[i].x = 1000.0f;
-        mUnidentified16C[i].y = 0.0f;
-        mUnidentified16C[i].z = 0.0f;
+        mRemoteAccelerationHistory[i].x = 1000.0f;
+        mRemoteAccelerationHistory[i].y = 0.0f;
+        mRemoteAccelerationHistory[i].z = 0.0f;
+        mFreestyleAccelerationHistory[i].x = 1000.0f;
+        mFreestyleAccelerationHistory[i].y = 0.0f;
+        mFreestyleAccelerationHistory[i].z = 0.0f;
     }
 }
 
@@ -77,27 +72,30 @@ bool cAIPad::IsWiiController() const
     return false;
 }
 
+static float GetAccelerationHistoryLimit()
+{
+    return 999.0f;
+}
+
 bool cAIPad::DetectLeftShake(u16* direction)
 {
     float thresholdSq
-        = sTweak_80568430.value * sTweak_80568430.value;
+        = sLeftShakeThreshold.value * sLeftShakeThreshold.value;
     nlVector3 acceleration;
     if (GetMaxFreestyleAccelDelta(5, &acceleration) > 0)
     {
-        float z = acceleration.z;
-        float y = acceleration.y;
-        if (nlAbs(y) < nlAbs(z))
-            acceleration.y = z;
+        if (nlAbs(acceleration.y) < nlAbs(acceleration.z))
+            acceleration.y = acceleration.z;
         else
-            acceleration.y = -y;
+            acceleration.y = -acceleration.y;
 
-        if (nlGetLengthSquared2D(acceleration.x,
-                acceleration.y) > thresholdSq)
+        const nlVector3& projected = acceleration;
+        if (projected.GetLengthSq2D() > thresholdSq)
         {
             u16 remapAngle = m_pGlobalPad->m_aRemapAngle;
-            float angle = nlATan2f(acceleration.y, -acceleration.x);
+            float angle = nlATan2f(projected.y, -projected.x);
             *direction = (u16)(int)(angle * 10430.378f)
-                + remapAngle;
+                       + remapAngle;
             return true;
         }
     }
@@ -108,24 +106,22 @@ bool cAIPad::DetectLeftShake(u16* direction)
 bool cAIPad::DetectRightShake(u16* direction)
 {
     float thresholdSq
-        = sTweak_80568450.value * sTweak_80568450.value;
+        = sRightShakeThreshold.value * sRightShakeThreshold.value;
     nlVector3 acceleration;
     if (GetMaxRemoteAccelDelta(5, &acceleration) > 0)
     {
-        float z = acceleration.z;
-        float y = acceleration.y;
-        if (nlAbs(y) < nlAbs(z))
-            acceleration.y = z;
+        if (nlAbs(acceleration.y) < nlAbs(acceleration.z))
+            acceleration.y = acceleration.z;
         else
-            acceleration.y = -y;
+            acceleration.y = -acceleration.y;
 
-        if (nlGetLengthSquared2D(acceleration.x,
-                acceleration.y) > thresholdSq)
+        const nlVector3& projected = acceleration;
+        if (projected.GetLengthSq2D() > thresholdSq)
         {
             u16 remapAngle = m_pGlobalPad->m_aRemapAngle;
-            float angle = nlATan2f(acceleration.y, -acceleration.x);
+            float angle = nlATan2f(projected.y, -projected.x);
             *direction = (u16)(int)(angle * 10430.378f)
-                + remapAngle;
+                       + remapAngle;
             return true;
         }
     }
@@ -133,19 +129,19 @@ bool cAIPad::DetectRightShake(u16* direction)
     return false;
 }
 
-static const nlVector3 sZeroAccelDelta = {0.0f, 0.0f, 0.0f};
+static const nlVector3 sZeroAccelDelta = { 0.0f, 0.0f, 0.0f };
 
 int cAIPad::GetMaxRemoteAccelDelta(
-    unsigned int count, nlVector3* deltaOut)
+    unsigned int requestedSamples, nlVector3* deltaOut)
 {
-    unsigned int currentIndex = (mUnidentified2D4 + 30) % 30;
-    const nlVector3& current = mUnidentified004[currentIndex];
+    unsigned int currentIndex = (mAccelerationHistoryIndex + 30) % 30;
+    const nlVector3& current = mRemoteAccelerationHistory[currentIndex];
     *deltaOut = sZeroAccelDelta;
     float maximum = 0.0f;
     int bestOffset = 0;
-    if (current.x < 999.0f)
+    if (current.x < GetAccelerationHistoryLimit())
     {
-        unsigned int sampleCount = count > 30 ? 30 : count;
+        unsigned int sampleCount = requestedSamples > 30 ? 30 : requestedSamples;
 
         nlVector3 bestPrevious;
         for (unsigned int offset = 1; offset < sampleCount; ++offset)
@@ -153,9 +149,8 @@ int cAIPad::GetMaxRemoteAccelDelta(
             unsigned int cappedOffset = offset;
             if (cappedOffset >= 30)
                 cappedOffset = 29;
-            const nlVector3& previous = mUnidentified004[
-                (mUnidentified2D4 + 30 - cappedOffset) % 30];
-            if (previous.x > 999.0f)
+            const nlVector3& previous = mRemoteAccelerationHistory[(mAccelerationHistoryIndex + 30 - cappedOffset) % 30];
+            if (previous.x > GetAccelerationHistoryLimit())
                 break;
 
             nlVector3 candidate;
@@ -176,16 +171,16 @@ int cAIPad::GetMaxRemoteAccelDelta(
 }
 
 int cAIPad::GetMaxFreestyleAccelDelta(
-    unsigned int count, nlVector3* deltaOut)
+    unsigned int requestedSamples, nlVector3* deltaOut)
 {
-    unsigned int currentIndex = (mUnidentified2D4 + 30) % 30;
-    const nlVector3& current = mUnidentified16C[currentIndex];
+    unsigned int currentIndex = (mAccelerationHistoryIndex + 30) % 30;
+    const nlVector3& current = mFreestyleAccelerationHistory[currentIndex];
     *deltaOut = sZeroAccelDelta;
     float maximum = 0.0f;
     int bestOffset = 0;
-    if (current.x < 999.0f)
+    if (current.x < GetAccelerationHistoryLimit())
     {
-        unsigned int sampleCount = count > 30 ? 30 : count;
+        unsigned int sampleCount = requestedSamples > 30 ? 30 : requestedSamples;
 
         nlVector3 bestPrevious;
         for (unsigned int offset = 1; offset < sampleCount; ++offset)
@@ -193,9 +188,8 @@ int cAIPad::GetMaxFreestyleAccelDelta(
             unsigned int cappedOffset = offset;
             if (cappedOffset >= 30)
                 cappedOffset = 29;
-            const nlVector3& previous = mUnidentified16C[
-                (mUnidentified2D4 + 30 - cappedOffset) % 30];
-            if (previous.x > 999.0f)
+            const nlVector3& previous = mFreestyleAccelerationHistory[(mAccelerationHistoryIndex + 30 - cappedOffset) % 30];
+            if (previous.x > GetAccelerationHistoryLimit())
                 break;
 
             nlVector3 candidate;
@@ -219,12 +213,12 @@ void cAIPad::ResetAccelerationHistory()
 {
     for (int i = 0; i < 30; ++i)
     {
-        mUnidentified004[i].x = 1000.0f;
-        mUnidentified004[i].y = 0.0f;
-        mUnidentified004[i].z = 0.0f;
-        mUnidentified16C[i].x = 1000.0f;
-        mUnidentified16C[i].y = 0.0f;
-        mUnidentified16C[i].z = 0.0f;
+        mRemoteAccelerationHistory[i].x = 1000.0f;
+        mRemoteAccelerationHistory[i].y = 0.0f;
+        mRemoteAccelerationHistory[i].z = 0.0f;
+        mFreestyleAccelerationHistory[i].x = 1000.0f;
+        mFreestyleAccelerationHistory[i].y = 0.0f;
+        mFreestyleAccelerationHistory[i].z = 0.0f;
     }
 }
 
@@ -235,29 +229,29 @@ void AIPadManager::Startup()
         mAIPads[i].m_pGlobalPad = 0;
     }
 
-    int numGroups = g_pNetworkSessionBase->GetNumMachines();
-    for (s8 groupIndex = 0; groupIndex < numGroups; ++groupIndex)
+    int numMachines = g_pNetworkSessionBase->GetNumMachines();
+    for (s8 machineIndex = 0; machineIndex < numMachines; ++machineIndex)
     {
-        NetworkPeer* group = g_pNetworkSessionBase->GetPeer(groupIndex);
+        NetworkPeer* peer = g_pNetworkSessionBase->GetPeer(machineIndex);
         for (s8 controllerIndex = 0;
-            controllerIndex < (int)group->mPlayerCount;
+            controllerIndex < (int)peer->mPlayerCount;
             ++controllerIndex)
         {
-            NetworkPeerChannel* controller
-                = group->GetNetworkPeerChannel(controllerIndex);
-            s8 padIndex = GetNetworkPlayerId(controllerIndex, groupIndex);
-            DetInput* input = controller->GetNetworkPeerChannelInput();
+            NetworkPeerChannel* channel
+                = peer->GetNetworkPeerChannel(controllerIndex);
+            s8 padIndex = GetNetworkPlayerId(controllerIndex, machineIndex);
+            DetInput* input = channel->GetNetworkPeerChannelInput();
             mAIPads[padIndex].m_pGlobalPad = input;
 
-            if (groupIndex == g_pNetworkSessionBase->GetLocalMachineId())
+            if (machineIndex == g_pNetworkSessionBase->GetLocalMachineId())
             {
-                mAIPads[padIndex].mUnidentified2D8 = controllerIndex;
+                mAIPads[padIndex].mLocalControllerIndex = controllerIndex;
             }
         }
     }
 }
 
-extern "C" void StartupAIPads()
+void StartupAIPads()
 {
     AIPadManager::Startup();
 }
@@ -279,82 +273,34 @@ void AIPadManager::UpdateAccelerationHistory()
         nlVector3 remote;
         remote = *pad.m_pGlobalPad->GetRemoteAcceleration();
         freestyle = *pad.m_pGlobalPad->GetFreestyleAcceleration();
-        unsigned int previousIndex = pad.mUnidentified2D4;
-        pad.mUnidentified2D4 = previousIndex + 1;
-        if (pad.mUnidentified2D4 >= 30)
-            pad.mUnidentified2D4 = 0;
+        unsigned int previousIndex = pad.mAccelerationHistoryIndex;
+        pad.mAccelerationHistoryIndex = previousIndex + 1;
+        if (pad.mAccelerationHistoryIndex >= 30)
+            pad.mAccelerationHistoryIndex = 0;
 
-        nlVector3& previousRemote = pad.mUnidentified004[previousIndex];
-        nlVector3& previousFreestyle = pad.mUnidentified16C[previousIndex];
-        if (previousRemote.x < 999.0f)
+        nlVector3& previousRemote = pad.mRemoteAccelerationHistory[previousIndex];
+        nlVector3& previousFreestyle = pad.mFreestyleAccelerationHistory[previousIndex];
+        if (previousRemote.x < GetAccelerationHistoryLimit())
         {
-            float alpha = lbl_806DB3C8;
-            nlVecLerp(pad.mUnidentified004[pad.mUnidentified2D4],
-                previousRemote, remote, alpha);
-            nlVecLerp(pad.mUnidentified16C[pad.mUnidentified2D4],
-                previousFreestyle, freestyle, alpha);
+            float alpha = g_fAccelerationHistoryBlend;
+            nlVecLerp(pad.mRemoteAccelerationHistory[pad.mAccelerationHistoryIndex],
+                previousRemote,
+                remote,
+                alpha);
+            nlVecLerp(pad.mFreestyleAccelerationHistory[pad.mAccelerationHistoryIndex],
+                previousFreestyle,
+                freestyle,
+                alpha);
         }
         else
         {
-            pad.mUnidentified004[pad.mUnidentified2D4] = remote;
-            pad.mUnidentified16C[pad.mUnidentified2D4] = freestyle;
+            pad.mRemoteAccelerationHistory[pad.mAccelerationHistoryIndex] = remote;
+            pad.mFreestyleAccelerationHistory[pad.mAccelerationHistoryIndex] = freestyle;
         }
     }
 }
 
-TweakValueFloat::~TweakValueFloat()
+void* TweakValueBase::UnidentifiedVirtual1C()
 {
-}
-
-void TweakValueFloat::CopyValueFrom(
-    TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        value = ((TweakValueFloat*)other)->value;
-        break;
-    case 2:
-        value = *((TweakFloatBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-int TweakValueFloat::GetStorageKind()
-{
-    return 1;
-}
-
-int TweakValueFloat::GetValueType()
-{
-    return 5;
-}
-
-void* TweakValueFloat::GetValueAddress()
-{
-    return &value;
-}
-
-void TweakValueFloat::FormatValue(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, "%.3f", value);
-}
-
-void TweakValueFloat::ParseValue(
-    const char* string)
-{
-    value = (float)atof(string);
-}
-
-void TweakValueFloat::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-void TweakValueFloat::UnidentifiedVirtual18()
-{
+    return 0;
 }

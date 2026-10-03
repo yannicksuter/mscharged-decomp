@@ -363,7 +363,7 @@ void cAnimCamera::BuildAnimViewMatrix(nlMatrix4& mView)
         UnidentifiedCameraDisplayState* state = GetPresentation();
         if (state->field_0xC4)
         {
-            m_Fov = fn_800F2410(m_Fov);
+            m_Fov = AdjustFOVForWidescreen(m_Fov);
         }
     }
 

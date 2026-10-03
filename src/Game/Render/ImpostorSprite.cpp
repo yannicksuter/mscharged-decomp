@@ -474,28 +474,25 @@ void ImpostorSprite::ClearImpostorSlots()
     mNumImpostorSlots = 0;
 }
 
-void ImpostorSprite::BuildQuad(ImpostorQuad* quad, const Impostor* impostor, const nlVector3* right, const nlVector3* up)
+void ImpostorSprite::BuildQuad(ImpostorQuad* quad, Impostor* impostor, const nlVector3* right, const nlVector3* up)
 {
     float sizeScale =
         ImpostorManager::GetInstance()->GetImpostorSizeScale();
-    float width = sizeScale * impostor->mWidth;
-    float height = sizeScale * impostor->mHeight;
+    float width = sizeScale * impostor->GetWidth();
+    float height = sizeScale * impostor->GetHeight();
     nlVector3 position = impostor->mPosition;
 
-    quad->texcoord[0].x = 1.0f;
-    quad->texcoord[0].y = 0.0f;
-    quad->texcoord[1].x = 0.0f;
-    quad->texcoord[1].y = 0.0f;
-    quad->texcoord[2].x = 0.0f;
-    quad->texcoord[2].y = 1.0f;
-    quad->texcoord[3].x = 1.0f;
-    quad->texcoord[3].y = 1.0f;
+    float texMin = 0.0f;
+    float texMax = 1.0f;
+    nlVec2Set(quad->texcoord[0], texMax, texMin);
+    nlVec2Set(quad->texcoord[1], texMin, texMin);
+    nlVec2Set(quad->texcoord[2], texMin, texMax);
+    nlVec2Set(quad->texcoord[3], texMax, texMax);
 
     float sn;
     float cs;
     float angle = 0.0f;
     nlSinCos(&sn, &cs, DegreesToAngle(angle));
-    position.z += 0.5f * height;
 
     nlVector3 a;
     nlVector3 b;
@@ -505,10 +502,9 @@ void ImpostorSprite::BuildQuad(ImpostorQuad* quad, const Impostor* impostor, con
     b.x = -sn * right->x + cs * up->x;
     b.y = -sn * right->y + cs * up->y;
     b.z = -sn * right->z + cs * up->z;
-    float halfWidth = 0.5f * width;
-    float halfHeight = 0.5f * height;
-    nlVec3Scale(a, halfWidth);
-    nlVec3Scale(b, halfHeight);
+    nlVec3Scale(a, 0.5f * width);
+    nlVec3Scale(b, 0.5f * height);
+    position.z += 0.5f * height;
 
     quad->position[0].x = position.x + a.x + b.x;
     quad->position[0].y = position.y + a.y + b.y;

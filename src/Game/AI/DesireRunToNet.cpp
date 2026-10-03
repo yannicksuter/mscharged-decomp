@@ -20,9 +20,9 @@ static unsigned short sDesireRunToNetType = 0xFFFF;
 /**
  * Offset/Address/Size: 0x0 | 0x800C3D9C | size: 0x148
  */
-bool DesireRunToNet::UnidentifiedInitialize(void* context)
+bool DesireRunToNet::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
 
     m_pSpaceSearch = new (8, false) SSearchRunToNet(m_pFielder);
     m_pFielder->SetSpaceSearch(m_pSpaceSearch);
@@ -71,7 +71,7 @@ void DesireRunToNet::Update(
 /**
  * Offset/Address/Size: 0x1CC | 0x800C3F68 | size: 0x50
  */
-void DesireRunToNet::UnidentifiedCleanup()
+void DesireRunToNet::Cleanup()
 {
     if (m_pSpaceSearch == m_pFielder->m_pSpaceSearch)
     {

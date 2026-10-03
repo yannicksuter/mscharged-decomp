@@ -13,7 +13,8 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Effects/PhotoFlashEffect.h"
 #include "Game/FE/feRender.h"
-#include "Game/GL/UnidentifiedMeshWriter_802A195C.h"
+#include "Game/GL/GLMovieMeshWriter.h"
+#include "NL/glx/GXMovieMaterialProgram.h"
 #include "Game/Game.h"
 #include "Game/GameObjectLighting.h"
 #include "Game/NisPlayer.h"
@@ -141,7 +142,7 @@ static void RenderImageQuad(GLView* view, unsigned long texture,
     const nlFloatColour& colour, const nlVector2* positions,
     const nlVector2* texcoords)
 {
-    UnidentifiedMeshWriter_802A195C writer;
+    GLMovieMeshWriter writer;
     int* indices;
     int primitive;
 
@@ -158,10 +159,11 @@ static void RenderImageQuad(GLView* view, unsigned long texture,
 
     if (writer.Begin(4, primitive, 0))
     {
-        memcpy((u8*)writer.model->packets->materialParameters + 8, &colour, 0x10);
+        memcpy(&((GXMovieParameters*)writer.model->packets->materialParameters)->tint, &colour,
+            sizeof(nlFloatColour));
 
         glTextureBinding* state
-            = (glTextureBinding*)writer.model->packets->materialParameters;
+            = &((GXMovieParameters*)writer.model->packets->materialParameters)->texture;
         state->texture = texture;
         state->textureIndex = 0xFFFF;
         state->SetWrapS(1);

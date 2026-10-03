@@ -68,6 +68,7 @@ public:
 
     AXFX_REVERBHI* GetReverb() { return &m_Unknown454.m_Reverb; }
     AXFX_REVERBHI_DPL2* GetReverbDpl2() { return &m_Unknown454.m_ReverbDpl2; }
+    AXFX_DELAY* GetDelay() { return &m_DelayEffect.m_Delay; }
 
     /* 0x004 */ nlListSlotPool<AudioSource*> m_Unknown004;
     /* 0x024 */ UnidentifiedAudioReadList m_Unknown024;

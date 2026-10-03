@@ -72,7 +72,7 @@ void FielderDesireMachine::UnidentifiedVirtual2()
     UnidentifiedAddState(1, cutAndBreak, false);
 
     DesireDefendPos* defendPos
-        = new (8, false) DesireDefendPos(2, (void*)fn_800B7B1C);
+        = new (8, false) DesireDefendPos(2, (void*)TransDesireDefendPos);
     UnidentifiedAddState(2, defendPos, false);
 
     DesireDeke* deke
@@ -206,13 +206,13 @@ void FielderDesireMachine::Reset(bool param)
 void FielderDesireMachine::Update(float deltaTime)
 {
     Desire* frozen = fn_8002E08C(GetFielder(), 29);
-    if (frozen->UnidentifiedIsActive())
+    if (frozen->IsActive())
     {
         UnidentifiedVariant_80054AB8 result;
-        fn_80317010(frozen, &result, true, deltaTime);
+        UpdateStateMachine(frozen, &result, true, deltaTime);
         if (result.mData.pointer != 0)
         {
-            fn_80316968(frozen);
+            RequestStateMachineDeactivation(frozen);
         }
         return;
     }
@@ -309,7 +309,7 @@ void FielderDesireMachine::UnidentifiedVirtual7()
                 params.Set(13, FuzzyVariant(lbl_806DC3B4));
                 params.Set(2, FuzzyVariant(lbl_806DC3B8[0]));
 
-                nlVector3 position = lbl_804DC388;
+                nlVector3 position = gFielderDesireZeroVector;
                 position.x = GetFielder()->mUnidentified024.m_v3Position.x;
                 position.x -= 10.0f * AIsgn(position.x);
                 params.Set(14, FuzzyVariant(FT_VECTOR, position));
@@ -370,8 +370,8 @@ void FielderDesireMachine::UnidentifiedVirtual6()
 {
     if (mUnidentified004 != 0)
     {
-        fn_80316980(mUnidentified004, true);
-        if (mUnidentified004->UnidentifiedGetState() != 21)
+        DeactivateStateMachine(mUnidentified004, true);
+        if (mUnidentified004->GetState() != 21)
         {
             mUnidentified008 = mUnidentified004;
         }

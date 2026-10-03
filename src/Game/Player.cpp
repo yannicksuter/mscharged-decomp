@@ -61,7 +61,6 @@ extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 extern "C" void fn_8002E3F8(cFielder*);
-extern FuzzyVariant fvNotSet;
 extern "C" float fn_800DAD84(const nlVector3&, const nlVector3&, unsigned short,
     float, const nlVector2&, const nlVector2&, bool, bool);
 
@@ -1484,7 +1483,7 @@ extern "C" void fn_80098AA0(UnidentifiedEventData_800673FC* pData)
                     position.x = v3Position.x;
                     position.y = v3Position.y;
                     if (region.ContainsPoint2D(position))
-                        pPatch->fn_80173A10(lbl_806DBD88);
+                        pPatch->ClearMuckHole(lbl_806DBD88);
                 }
             }
         }

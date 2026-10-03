@@ -1,4 +1,4 @@
-#include <revolution/nhttp.h>
+#include <private/nhttp.h>
 
 #include <revolution/ncd.h>
 #include <revolution/os.h>

@@ -13,7 +13,7 @@ public:
     virtual void Run(float dt);
 };
 
-class UnidentifiedPingerUpdateTask : public nlTask
+class PingerUpdateTask : public nlTask
 {
 public:
     virtual const char* GetName()

@@ -8,6 +8,7 @@
 #include "Game/CharacterLoader.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/DB/CharacterInfo.h"
+#include "Game/DB/CharacterInfo.inl"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/GameInfo.h"
 #include "Game/Goalie.h"
@@ -51,11 +52,6 @@ static bool g_bLoadAnimsCached;
 
 static int sUnidentifiedEffectsLoadCount;
 
-static inline bool SameCharacterClass(eCharacterClass first, eCharacterClass second)
-{
-    return first == second;
-}
-
 static inline eCharacterClass GetAlternateCaptain(eCharacterClass captain0, eCharacterClass captain1)
 {
     eCharacterClass altcaptain = captain1;
@@ -87,7 +83,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
 {
     captain[0] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(0));
     captain[1] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(1));
-    for (short i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         sidekick[0][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, i));
         sidekick[1][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, i));
@@ -150,7 +146,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
             mEntries[n].nPlayerID = index;
             mEntries[n].cc = sidekick[plrindex][index - 1];
             mEntries[n].bGoalie = false;
-            if (SameCharacterClass(sidekick[plrindex][index - 1], captain[plrindex]))
+            if (sidekick[plrindex][index - 1] == captain[plrindex])
             {
                 mEntries[n].bCaptain = true;
                 mEntries[n].bSidekick = false;
@@ -407,6 +403,11 @@ static void fn_8000A668(void* data, unsigned long size, void* param)
     CharacterLoader_8056B290::sUnidentifiedInstance.mExtraTextureSize = size;
 }
 
+static inline void GetCharacterTexturePath(char* path, eCharacterClass cc, unsigned long capacity)
+{
+    nlStrNCpy(path, GetCharacterTemplateInfo(cc)->szTextureFilename, capacity);
+}
+
 bool CharacterLoader_8056B290::fn_8000A67C()
 {
     char szPath[128];
@@ -419,7 +420,7 @@ bool CharacterLoader_8056B290::fn_8000A67C()
         return false;
     }
 
-    nlStrNCpy(szPath, GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, sizeof(szPath));
+    GetCharacterTexturePath(szPath, pEntry->cc, sizeof(szPath));
     char* pEnd = &szPath[nlStrLen(szPath) - 1];
     while (*pEnd != '/')
     {
@@ -626,6 +627,12 @@ static void fn_8000AE7C(void* data, unsigned long size, void* param)
     CharacterLoader_8056B290::sUnidentifiedInstance.mAnimSize = size;
 }
 
+static inline void GetUncompressedAnimationPath(char* path, const char* filename, unsigned long capacity)
+{
+    nlStrNCpy(path, filename, capacity);
+    *strstr(path, ".zlib") = '\0';
+}
+
 void CharacterLoader_8056B290::fn_8000AE90()
 {
     char szPath[200];
@@ -641,8 +648,7 @@ void CharacterLoader_8056B290::fn_8000AE90()
     {
         if (g_bLoadAnimsCached)
         {
-            nlStrNCpy(szPath, szAnimFilename, sizeof(szPath));
-            *strstr(szPath, ".zlib") = '\0';
+            GetUncompressedAnimationPath(szPath, szAnimFilename, sizeof(szPath));
             nlLoadEntireCachedFileAsync(szPath, fn_8000AE7C, mCurrent, 0x20, AllocateStart, 0, 0, 0);
         }
         else
@@ -950,9 +956,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
     tCharacterTemplate* pTemplate = GetCharacterTemplate(mCurrent->cc, &bCreated);
     tCharacterTemplateInfo* pInfo = GetCharacterTemplateInfo(mCurrent->cc);
 
-    cInventory<cSHierarchy>* pHierInv = pTemplate->pHierarchyInventory;
-    u32 hash = nlStringHash(pInfo->szHierarchy);
-    cSHierarchy* pHierarchy = pHierInv->Find((unsigned int)hash);
+    cSHierarchy* pHierarchy = pTemplate->pHierarchyInventory->Find((char*)pInfo->szHierarchy);
 
     AnimRetargetList* pAnimRetargetList = 0;
     if (pTemplate->pAnimRetargetListInventory != 0)
@@ -981,7 +985,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
             char szTexPath[64];
             char szSwapPath[64];
             cCharacter* pChar = g_pCharacters[mCurrent->nCharIdx];
-            const char* szName = GetCharacterInfo(mCurrent->cc).mName;
+            const char* szName = GetCharacterInfo(mCurrent->cc).GetName();
             nlSNPrintf(szTexPath, 64, "mariogoalie/mariogoalie");
             nlSNPrintf(szSwapPath, 64, "%s/%s", szName, szName);
             pChar->fn_80022DAC(glGetTexture(szTexPath));

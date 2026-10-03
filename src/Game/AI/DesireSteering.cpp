@@ -56,7 +56,7 @@ static inline bool IsNearlyZero(float value, float zero)
 }
 
 DesireSteering::DesireSteering()
-    : Desire(34, TransitionFunc(g_UnsetTransitionFunc)),
+    : Desire(34, UnsetTransitionFunc(g_UnsetTransitionFunc)),
       m_AvoidanceHistory(lbl_806DC230)
 {
     m_pAvoidance = NULL;
@@ -67,9 +67,9 @@ DesireSteering::~DesireSteering()
     delete m_pAvoidance;
 }
 
-bool DesireSteering::UnidentifiedInitialize(void* context)
+bool DesireSteering::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     if (m_pAvoidance == NULL)
     {
         m_pAvoidance = new (8, false) AvoidController(m_pFielder);
@@ -94,11 +94,11 @@ bool DesireSteering::UnidentifiedInitialize(void* context)
     fn_8000F178(m_pAvoidance);
     m_fAvoidanceMult = 1.0f;
     m_ThingsToAvoid = AVOID_EVERYTHING;
-    mUnidentified078 = -1.0f;
+    mMaxDuration = -1.0f;
     return result;
 }
 
-void DesireSteering::UnidentifiedCleanup()
+void DesireSteering::Cleanup()
 {
     fn_8000F178(m_pAvoidance);
     m_AvoidanceHistory.UnidentifiedReset();
@@ -337,7 +337,7 @@ extern "C" const nlVector3* fn_800C61FC(DesireSteering* desire)
 
     if (g_pBall->UnidentifiedHasPassTarget()
         && g_pBall->m_pPassTarget == desire->m_pFielder
-        && receivePass != NULL && receivePass->UnidentifiedIsActive())
+        && receivePass != NULL && receivePass->IsActive())
     {
         desire->m_v3TempDesiredPos = receivePass->GetAnimStartPosition();
         desire->m_v3TempDesiredPos.z = 0.0f;
@@ -884,9 +884,9 @@ void DesireSteering::UnidentifiedVirtual7(
         sizeof(DesireSteering) - offset);
 }
 
-bool UnidentifiedDesire35::UnidentifiedInitialize(void*)
+bool UnidentifiedDesire35::Initialize(void*)
 {
-    mUnidentified078 = 10.0f;
+    mMaxDuration = 10.0f;
     fn_8006040C(g_pGame, m_pFielder);
     m_pFielder->mUnidentified3F8.mUnidentified00
         = m_pFielder->mUnidentified3F8.mUnidentified04;
@@ -965,7 +965,7 @@ void UnidentifiedDesire35::Update(
     m_pFielder->fn_8001E304(fSpeed, fDeltaT);
 }
 
-void UnidentifiedDesire35::UnidentifiedCleanup()
+void UnidentifiedDesire35::Cleanup()
 {
     fn_80060608(g_pGame, m_pFielder);
 }

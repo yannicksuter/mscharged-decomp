@@ -56,6 +56,8 @@ public:
 class EventDispatcher : public EventDispatcherBase<EventCallback>
 {
 public:
+    void FreeBlocks();
+
     EventDispatcher();
     EventDispatcher(const char*);
 

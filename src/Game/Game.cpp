@@ -30,6 +30,7 @@
 #include "Game/Formation.h"
 #include "Game/GameInfo.h"
 #include "Game/Audio/GameStreams.h"
+#include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/DB/GameProgress.h"
@@ -84,8 +85,6 @@
 #include "Game/DB/StadiumInfo.h"
 
 extern PowerupBase* g_pPowerups[];
-extern float (*lbl_806DF560)();
-extern float (*lbl_806DF564)();
 extern "C" const nlVector3 lbl_804DBFE8;
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 
@@ -138,18 +137,9 @@ extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
 extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
-extern "C" void fn_802F4E84(unsigned long* hash, int param2, int param3);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern void PlaySuddenDeathMusic();
 extern void StopSuddenDeathMusic();
-extern int gNextAvoidableObjectId;
-
-struct Unidentified0C74
-{
-    virtual ~Unidentified0C74();
-};
-
-extern Unidentified0C74* lbl_806E0C74;
 
 extern UnidentifiedGameStatic lbl_8056B9A0;
 extern cPlayer* lbl_806E0C9C;
@@ -226,9 +216,9 @@ void fn_80056CF4(void* param1, int param2, bool param3)
     }
     if (lbl_806E12C8 == 0)
     {
-        PhysicsPatchManager_801740D0* memory
-            = new (nlMalloc(sizeof(PhysicsPatchManager_801740D0), 8, false))
-                PhysicsPatchManager_801740D0();
+        PhysicsPatchManager* memory
+            = new (nlMalloc(sizeof(PhysicsPatchManager), 8, false))
+                PhysicsPatchManager();
         lbl_806E12C8 = memory;
     }
     if (UnidentifiedCameraEffects::Instance() == 0)
@@ -706,14 +696,14 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     if (IsNetworkOrRecordedGame())
     {
         fn_8031A0FC(lbl_806E3740);
-        lbl_806DF560 = fn_80056CA4;
-        lbl_806DF564 = fn_80056CA4;
+        gAIProfilingClock = fn_80056CA4;
+        gAIActivityClock = fn_80056CA4;
     }
     else
     {
         fn_8031A0FC(lbl_806E3748);
-        lbl_806DF560 = fn_80056CD0;
-        lbl_806DF564 = fn_80056CA4;
+        gAIProfilingClock = fn_80056CD0;
+        gAIActivityClock = fn_80056CA4;
     }
 }
 
@@ -770,7 +760,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
                 StopSound(soundID, g_pGame);
                 PlaySound(10, soundID, lbl_804FB284, g_pGame);
 
-                unsigned long hash = nlStringLowerHash(lbl_804FB294);
+                u32 hash = nlStringLowerHash(lbl_804FB294);
                 fn_802F4E84(&hash, 0, 0);
             }
 
@@ -1705,7 +1695,7 @@ extern "C" void fn_80072194(PlayerAttackData* node)
     g_PlayerAttackDataPool.Free(node);
 }
 
-extern "C" void fn_800721AC(CollisionPlayerWallData* node)
+void FreeCollisionPlayerWallData(CollisionPlayerWallData* node)
 {
     g_CollisionPlayerWallDataPool.Free(node);
 }

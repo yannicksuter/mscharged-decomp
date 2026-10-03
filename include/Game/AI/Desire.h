@@ -9,6 +9,7 @@
 #include "types.h"
 
 class DebugWriteCache;
+class AIContext;
 class cFielder;
 class cPlayer;
 class cBall;
@@ -23,66 +24,69 @@ extern "C" Desire* fn_8002E08C(cFielder*, int);
 class shdStateMachine
 {
 public:
-    shdStateMachine(int, const TransitionFunc&);
+    shdStateMachine(int, TransitionFunc&);
     virtual ~shdStateMachine();
 
-    virtual bool UnidentifiedInitialize(void*) = 0;
-    virtual bool UnidentifiedReinitialize(void*) = 0;
-    virtual void UnidentifiedCleanup() = 0;
+    virtual bool Initialize(void*) = 0;
+    virtual bool Reinitialize(void*) = 0;
+    virtual void Cleanup() = 0;
     virtual void Update(DesireUpdate*, float) = 0;
-    virtual void UnidentifiedReset(bool);
-    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
+    virtual void Reset(bool);
+    virtual void SetContext(UnidentifiedScriptMachine*);
 
     FuzzyRuntimeBase* GetFuzzyRuntime();
 
-    int UnidentifiedGetState() const
+    int GetState() const
     {
-        return mUnidentifiedState;
+        return mState;
     }
 
-    bool UnidentifiedIsActive() const
+    bool IsActive() const
     {
-        return mUnidentifiedActive;
+        return mActive;
     }
 
 public:
-    UnidentifiedScriptMachine* fn_800C2F28() const { return mUnidentified018; }
+    UnidentifiedScriptMachine* GetScriptMachine() const { return mScriptMachine; }
 
-    int mUnidentifiedState;
-    bool mUnidentifiedActive;
+    int mState;
+    bool mActive;
     u8 mPadding009[3];
-    Timer mUnidentifiedTimer;
-    float mUnidentified014;
-    UnidentifiedScriptMachine* mUnidentified018;
-    UnidentifiedVariantCollection mUnidentified01C;
+    Timer mAgeTimer;
+    float mLastActiveTime;
+    UnidentifiedScriptMachine* mScriptMachine;
+    UnidentifiedVariantCollection mParameters;
     // Copied from the constructor; executed when no override is set.
     UnsetTransitionFunc mDefaultTransition;
     // Supplied with the activation parameters (slot 10); takes precedence
     // over the default while set.
     UnsetTransitionFunc mOverrideTransition;
-    float mUnidentified078;
-    float mUnidentified07C;
-    float mUnidentified080;
-    float mUnidentified084;
+    float mMaxDuration;
+    float mMinDuration;
+    float mDefaultMinDuration;
+    float mDefaultMaxDuration;
 };
 
-extern "C" void fn_80316968(shdStateMachine* machine);
-extern "C" void fn_80316980(shdStateMachine* machine, bool cleanup);
-extern "C" void fn_80317010(shdStateMachine* machine, UnidentifiedVariant_80054AB8* update, bool runUpdate, float deltaTime);
+void RequestStateMachineDeactivation(shdStateMachine* machine);
+AIContext* GetStateMachineAIContext(shdStateMachine* machine);
+void DeactivateStateMachine(shdStateMachine* machine, bool cleanup);
+bool ReinitializeStateMachine(shdStateMachine* machine, UnidentifiedVariantCollection* parameters, bool reinitialize);
+bool InitializeStateMachine(shdStateMachine* machine, UnidentifiedVariantCollection* parameters, bool initialize);
+void UpdateStateMachine(shdStateMachine* machine, UnidentifiedVariant_80054AB8* update, bool runUpdate, float deltaTime);
 
 class Desire : public shdStateMachine
 {
 public:
-    Desire(int, const TransitionFunc&);
+    Desire(int, TransitionFunc&);
     virtual ~Desire()
     {
     }
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedSetContext(UnidentifiedScriptMachine*);
+    virtual void SetContext(UnidentifiedScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
@@ -103,7 +107,7 @@ public:
 
     virtual ~DesireFinishAction();
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
 };
 
@@ -117,7 +121,7 @@ public:
 
     virtual ~DesireWait();
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
 };
 
@@ -131,8 +135,8 @@ public:
 
     virtual ~DesireCutAndBreak();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -151,8 +155,8 @@ public:
 
     virtual ~DesireDeke();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -171,7 +175,7 @@ public:
 
     virtual ~DesireHit();
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -187,8 +191,8 @@ public:
 
     virtual ~DesireInterceptBall();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -209,8 +213,8 @@ public:
 
     virtual ~DesireGetOpen();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -231,8 +235,8 @@ public:
 
     virtual ~DesireRunToTarget();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -255,6 +259,7 @@ class DesireRunInDirection : public Desire
 public:
     float GetMaxDistance() const { return m_fMaxDistance; }
     float GetDistanceTravelled() const { return m_fDistTravelled; }
+    cFielder* GetTarget() const { return m_pTarget; }
     DesireRunInDirection(int state, void* function)
         : Desire(state, NativeTransitionFunc(function))
     {
@@ -262,8 +267,8 @@ public:
 
     virtual ~DesireRunInDirection();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -287,7 +292,7 @@ public:
 
     virtual ~DesireRunDownfield();
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -303,7 +308,7 @@ public:
 
     virtual ~DesireRunUpfield();
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -319,7 +324,7 @@ public:
 
     virtual ~DesireGetInPosition();
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -333,13 +338,13 @@ public:
     {
     }
 
-    virtual bool UnidentifiedInitialize(void*);
+    virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
     virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
-extern "C" DesireUpdate fn_800B7B1C(AIContext* input);
+DesireUpdate TransDesireDefendPos(AIContext* input);
 
 class DesireDefendPos : public Desire
 {
@@ -349,8 +354,8 @@ public:
     {
     }
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -366,8 +371,8 @@ public:
 
     virtual inline ~DesireMegaStrike();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -392,9 +397,9 @@ public:
 
     virtual ~DesireStar();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -410,9 +415,9 @@ public:
 
     virtual ~DesireMushroom();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -428,9 +433,9 @@ public:
 
     virtual ~DesireSlippery();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -442,9 +447,9 @@ public:
     DesireGooey();
     virtual ~DesireGooey();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -470,8 +475,8 @@ public:
 
     virtual ~DesireShrink();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -494,9 +499,9 @@ public:
 
     virtual ~DesireFrozen();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -505,7 +510,7 @@ public:
 
     bool IsUnidentifiedState(int nState) const
     {
-        return mUnidentifiedActive && meFrozenState == nState;
+        return mActive && meFrozenState == nState;
     }
 
 private:
@@ -528,9 +533,9 @@ public:
 
     virtual ~DesireConfused();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual bool UnidentifiedReinitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual bool Reinitialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -549,9 +554,9 @@ inline void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
     cache->AddField(20, gDebugFieldTypes[20].size, (u8*)&mThinkTimer - (u8*)&mvDesiredPosition, "mThinkTimer");
 }
 
-extern "C" int fn_800D1D34(const shdStateMachine*);
-extern "C" UnidentifiedVariantCollection* fn_800D1D3C(shdStateMachine*);
-extern "C" float fn_800D1D44(const DesireRunInDirection*);
-extern "C" float fn_800D1D4C(const DesireRunInDirection*);
+int GetStateMachineState(const shdStateMachine*);
+UnidentifiedVariantCollection* GetStateMachineParameters(shdStateMachine*);
+float GetRunInDirectionMaxDistance(const DesireRunInDirection*);
+float GetRunInDirectionDistanceTravelled(const DesireRunInDirection*);
 
 #endif // GAME_AI_DESIRE_H

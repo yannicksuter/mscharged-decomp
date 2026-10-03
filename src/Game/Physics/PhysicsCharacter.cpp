@@ -177,7 +177,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                     contacts->geom.normal[0],
                     contacts->geom.normal[1],
                     contacts->geom.normal[2]);
-                fn_80145F18(wallData);
+                QueueCollisionPlayerWall(wallData);
             }
         }
 
@@ -353,7 +353,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             ballData->velocity = other->GetLinearVelocity();
             ballData->boneID = GetBoneIDForSubObject(originalOther);
             m_HasCollidedWithBall = true;
-            fn_801462DC(ballData);
+            QueueCollisionPlayerBall(ballData);
         }
 
         fn_8013F854("PhysChar IncrementBallDeflectCount\n");
@@ -473,7 +473,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             data->player2 = (cPlayer*)collisionPlayer2;
             data->velocity1 = m_pAICharacter->mUnidentified024.m_v3Velocity;
             data->velocity2 = otherCharacter->m_pAICharacter->mUnidentified024.m_v3Velocity;
-            fn_80145DD0(data);
+            QueueCollisionPlayerPlayer(data);
         }
     }
     return contactType;

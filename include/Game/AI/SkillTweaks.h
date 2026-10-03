@@ -15,24 +15,15 @@ class SkillTweaks;
 class SkillTweak
 {
 public:
-    SkillTweak(const char* sNameInFile)
-    {
-        mOverride = -9999.9f;
-        mModifier = 0;
-        mpSkillTweaks = 0;
-        mHash = nlStringLowerHash(sNameInFile);
-        nlStrNCpy(mNameInFile, sNameInFile, sizeof(mNameInFile));
-        mOwnsCurve = false;
-        mpCurvePoints = 0;
-    }
+    SkillTweak(const char* sNameInFile);
+    ~SkillTweak();
 
-    ~SkillTweak()
-    {
-        if (mOwnsCurve)
-            delete[] mpCurvePoints;
-    }
-
+    void FormatOverrideName(char* name) const;
+    void LoadOverride(Config* config);
+    void Load(Config* curves, Config* modifiers);
+    void LoadModifier(Config* modifiers);
     void ParseCurve(const char* text, int length);
+    void Evaluate(float x, float& value) const;
     float GetValue() const;
 
 public:

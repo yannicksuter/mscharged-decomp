@@ -72,6 +72,8 @@ add_relocations:
   - { source: .text:0x802ACB6C, type: l, target: .data:0x8052B2A8 }
   - { source: .text:0x802ACB7C, type: l, target: .data:0x8052B2C8 }
 block_relocations:
+  # cField::mCorners[2] packs angles 0x8000 and 0xC000, not a code pointer.
+  - { source: 0x804F9D10 }
   # RLGReader chunk IDs 0x8001B200 and 0x8001B008 are switch values, not
   # references into the function at 0x8001AD24.
   - { source: 0x802CAE90 }

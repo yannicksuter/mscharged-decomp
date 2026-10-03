@@ -95,8 +95,7 @@ void FixedUpdateTask::Reset()
     mUnidentified38 = false;
 
     mEventDispatcher.Clear();
-    BasicSlotPool<DLListEntry<EventCallback> >* pool = &mEventDispatcher.callbacks.m_Allocator;
-    pool->FreeBlocks();
+    mEventDispatcher.FreeBlocks();
 }
 
 FixedUpdateTask::FixedUpdateTask()

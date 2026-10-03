@@ -155,7 +155,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
             ++ball->m_bBallDeflectCount;
             FakeBallWorld::InvalidateBallCache();
             ApplyDamage(Interpolate(gWaluigiWallMinBallDamage, gWaluigiWallMaxBallDamage, fn_800156A8(ball)));
-            fn_801461A8();
+            QueueCollisionBallTronWall();
             return ONE_WAY_CONTACT_OTHER;
         }
         return ONE_WAY_CONTACT_OTHER;
@@ -168,10 +168,10 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         else if (patch->m_Type == 6)
         {
             UnidentifiedEventData24* data = 0;
-            lbl_80570138.Allocate(data);
+            g_UnidentifiedEventData24Pool.Allocate(data);
             data->mUnidentified0C = patch->m_pOwner;
             data->mUnidentified10 = patch;
-            fn_80146060(data);
+            QueueCollisionTongue(data);
         }
         return NO_CONTACT;
     }
@@ -624,7 +624,7 @@ void OnWaluigiWallAbort(cPlayer* player)
     if (manager->mCurrentWall != 0)
     {
         manager->EndWall();
-        fn_8014A180(static_cast<cFielder*>(player));
+        QueueCollisionWaluigiWall(static_cast<cFielder*>(player));
     }
 }
 

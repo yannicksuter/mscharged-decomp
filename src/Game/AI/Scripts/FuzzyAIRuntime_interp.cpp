@@ -868,7 +868,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     {
         bool arg0 = m_SP[-1] != 0;
         m_SP -= 1;
-        fn_80314740(this, arg0);
+        FuzzyNoOp_80314740(this, arg0);
         break;
     }
     case 83:
@@ -1484,7 +1484,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     {
         UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
         m_SP -= 1;
-        fn_80314438(this, arg0);
+        FuzzyNoOp_80314438(this, arg0);
         break;
     }
     case 143:
@@ -1492,7 +1492,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-2];
         m_SP -= 2;
-        fn_80314434(this, arg0, arg1);
+        FuzzyNoOp_80314434(this, arg0, arg1);
         break;
     }
     case 144:
@@ -1500,7 +1500,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg1 = m_SP[-1] != 0;
         float arg0 = ((float*)m_SP)[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_800E8CAC(this, arg0, arg1);
+        ((float*)m_SP)[-1] = FuzzyAIPassThrough_800E8CAC(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1512,7 +1512,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg1 = m_SP[-1] != 0;
         float arg0 = ((float*)m_SP)[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = fn_80314444(this, arg0, arg1);
+        ((float*)m_SP)[-1] = FuzzyPassThrough_80314444(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1524,7 +1524,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg1 = m_SP[-1] != 0;
         void* arg0 = (void*)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)fn_8031443C(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyPassThrough_8031443C(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2933,7 +2933,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 287:
     {
         char arg0 = (char)m_SP[-1];
-        m_SP[-1] = (unsigned char)fn_80312358(this, arg0);
+        m_SP[-1] = (unsigned char)FuzzyPassThrough_80312358(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (unsigned char)arg0;
@@ -3213,9 +3213,9 @@ extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnU32(
     return runtime->CreateReturnValue(FT_U32, value, confidence);
 }
 
-extern "C" float fn_800E8CAC(void* runtime, float value, bool flag)
+extern "C" float FuzzyAIPassThrough_800E8CAC(void* runtime, float value, bool flag)
 {
-    return fn_80314444(runtime, value, flag);
+    return FuzzyPassThrough_80314444(runtime, value, flag);
 }
 
 extern "C" unsigned long fn_800E8CB0(void*, Variant* value)
@@ -3310,6 +3310,6 @@ extern "C" void FuzzyAISetTransition(
     UnidentifiedScriptMachine* state, const char* name)
 {
     ScriptTransitionFunc value(name);
-    state->mTransition.mFuncHash = value.mFuncHash;
-    state->mTransition.mNativeFunc = value.mNativeFunc;
+    state->mTransition.mValue.mFuncHash = value.mValue.mFuncHash;
+    state->mTransition.mValue.mNativeFunc = value.mValue.mNativeFunc;
 }

@@ -604,7 +604,7 @@ void NetMesh::AddForcesToBall(
         g_BallNetmeshEventDataPool.Allocate(eventData);
         eventData->netMesh = this;
         eventData->collisionVelocity = g_pBall->m_v3Velocity;
-        fn_80146424(eventData, sphere == 0);
+        QueueCollisionBallNetmesh(eventData, sphere == 0);
     }
 }
 

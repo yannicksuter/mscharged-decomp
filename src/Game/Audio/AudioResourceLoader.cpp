@@ -1,6 +1,7 @@
 #include "Game/Audio/AudioResourceLoader.h"
 
 #include "NL/MemAlloc.h"
+#include "NL/nlMemory.h"
 
 AudioResourceLoader::AudioResourceLoader(
     AudioResourceLoadOwner* owner)

@@ -21,15 +21,15 @@ class ReplayManager
 public:
     static ReplayManager* Instance();
     void Initialize();
-    void fn_80188D88();
+    void RegisterEventHandlers();
     void InitializeSnapshots();
-    void fn_801895B0();
-    void fn_801895C0(ReceiveBallData* event);
-    void fn_801895D0(UnidentifiedEventData_80066590* event);
-    void fn_801895E0(UnidentifiedEventData_800663A8* event);
-    void fn_801895F0(GoalScoredData* event);
-    void fn_80189610(GoalieSaveData* event);
-    void fn_80189620();
+    void OnMegaStrikeResult();
+    void OnReceiveBall(ReceiveBallData* event);
+    void OnShotAtGoal(UnidentifiedEventData_80066590* event);
+    void OnPassBall(UnidentifiedEventData_800663A8* event);
+    void OnGoalScored(GoalScoredData* event);
+    void OnGoalieSave(GoalieSaveData* event);
+    void OnKickoff();
     void Uninitialize();
     void GrabSnapshot();
     RenderSnapshot& GetMutableRenderSnapshot();
@@ -38,18 +38,18 @@ public:
     void PrepareForRecording();
     void SetCurrentTime(float time);
     void RenderSnapshotAt(float deltaTime);
-    int fn_8018A16C(float time) const;
+    int GetReplayExcitement(float time) const;
     bool IsSavingReplay() const;
     bool IsLoadingReplay() const;
-    bool fn_8018A4C4(int index);
-    bool fn_8018A5BC(int index);
+    bool SaveReplay(int index);
+    bool LoadReplay(int index);
 
     /* 0x0000 */ RenderSnapshot mSnapshots[3];
     /* 0x7554 */ RenderSnapshot* mCurrent;
     /* 0x7558 */ RenderSnapshot* mPrevious;
     /* 0x755C */ RenderSnapshot* mRender;
     /* 0x7560 */ cFollowCamera mDebugCamera;
-    /* 0x7604 */ cBaseCamera* mUnidentified7604;
+    /* 0x7604 */ cBaseCamera* mReplayDebugCamera;
     /* 0x7608 */ u32 mEvents;
     /* 0x760C */ f32 mSpeed;
     /* 0x7610 */ f32 mSpeedUp;

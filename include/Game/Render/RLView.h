@@ -77,6 +77,8 @@ public:
 
 RLView* GetLayerView(eCLV layer);
 
+RLView* GetShadowedView();
 RLView* GetUnshadowedView();
+void AttachModelToLayerView(eCLV layer, const glModel* model, unsigned long sortKey);
 
 #endif // GAME_RENDER_RL_VIEW_H

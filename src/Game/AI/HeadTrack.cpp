@@ -1,4 +1,7 @@
 #include "Game/AI/HeadTrack.h"
+#include "NL/nlMath.inl"
+
+u16 g_headTrackSyncLogType = 0xFFFF;
 
 void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
     const nlMatrix4& m4ConstraintMatrix, float fDeltaT,
@@ -24,11 +27,8 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
         nlVec3Scale(v3OOIConstraintSpace,
             nlRecipSqrt(nlVec3LengthSquared(v3OOIConstraintSpace), true));
 
-        nHeadSpin = ((int)(10430.378f
-                           * nlATan2f(v3OOIConstraintSpace.z,
-                               v3OOIConstraintSpace.y))
-                        << 16)
-                 >> 16;
+        nHeadSpin = ((int)nlATan2Angle(v3OOIConstraintSpace.z,
+                           v3OOIConstraintSpace.y) << 16) >> 16;
         nHeadTilt = 0x4000 - nlACos(-v3OOIConstraintSpace.x);
         nHeadTilt = (nHeadTilt << 16) >> 16;
 
@@ -91,13 +91,11 @@ void cHeadTrack::Update(const nlMatrix4& m4HeadMatrix,
         {
             nlVector3 v3Constrain;
             nlVector3 v3Head;
-            nlVec3Set(v3Constrain, m4Constrain.m21, m4Constrain.m22, m4Constrain.m23);
-            nlVec3Set(v3Head, m4HeadMatrix.m21, m4HeadMatrix.m22, m4HeadMatrix.m23);
-            nHeadSpin += (short)(
-                (unsigned short)(int)(10430.378f
-                    * nlATan2f(v3Constrain.y, v3Constrain.x))
-                - (unsigned short)(int)(10430.378f
-                    * nlATan2f(v3Head.y, v3Head.x)));
+            m4Constrain.GetRow_(1, v3Constrain);
+            m4HeadMatrix.GetRow_(1, v3Head);
+            unsigned short constraintSpin = nlATan2Angle(v3Constrain.y, v3Constrain.x);
+            unsigned short headSpin = nlATan2Angle(v3Head.y, v3Head.x);
+            nHeadSpin += nlAngleDelta(constraintSpin, headSpin);
         }
         m_fDesiredHeadSpin = nHeadSpin;
         m_fDesiredHeadTilt = nHeadTilt;

@@ -3,10 +3,10 @@
 
 #include "NL/nlTask.h"
 
-class UnidentifiedMovieRenderTask : public nlTask
+class MovieRenderTask : public nlTask
 {
 public:
-    UnidentifiedMovieRenderTask();
+    MovieRenderTask();
 
     virtual void Run(float dt);
     virtual const char* GetName()

@@ -117,6 +117,8 @@ public:
     u8 m_Padding[3];
 };
 
+extern "C" void fn_8030B9C8(cPoseAccumulator* pAccumulator, const nlMatrix4* pWorldMatrix);
+
 template <typename T>
 inline void cPoseAccumulator::Replay(T& frame)
 {

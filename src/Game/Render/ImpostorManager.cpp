@@ -2,6 +2,7 @@
 
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorCharacter.h"
+#include "Game/CharacterEffects.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/TweakConfig.h"
 #include "NL/gl/glMemory.h"
@@ -164,10 +165,10 @@ int ImpostorManager::GetNumImpostors()
     return mNumUsed;
 }
 
-inline u32 ImpostorManager::CalculateRenderChecksum()
+static inline u32 AccumulateRenderChecksums(
+    const nlDLListSlotPool<ImpostorCharacter*>& characters, u32 total)
 {
-    u32 total = 0;
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it = characters.Begin();
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     while (entry != 0)
@@ -221,7 +222,7 @@ void ImpostorManager::Render(void* target, bool skipCapture)
 
     if (cached)
     {
-        total = CalculateRenderChecksum();
+        total = AccumulateRenderChecksums(mCharacters, 0);
         if (total != mLastRenderChecksum)
         {
             cached = false;
@@ -269,12 +270,8 @@ void ImpostorManager::Render(void* target, bool skipCapture)
         {
             glSetRasterState(GLS_DepthTest, 1);
             glSetRasterState(GLS_DepthWrite, 0);
-            u32 blend = 2;
-            if (gDisableImpostorBlending != 0)
-            {
-                blend = 0;
-            }
-            glSetRasterState(GLS_AlphaBlend, blend);
+            glSetRasterState(GLS_AlphaBlend,
+                gDisableImpostorBlending != 0 ? GLB_None : GLB_Additive);
             glSetCurrentRasterState(glHandleizeRasterState());
         }
         else

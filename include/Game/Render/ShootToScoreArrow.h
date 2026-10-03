@@ -5,8 +5,8 @@
 #include "NL/nlColour.h"
 #include "types.h"
 
-struct LoadFrame;
-struct SaveFrame;
+class LoadFrame;
+class SaveFrame;
 
 class WorldDarkening
 {

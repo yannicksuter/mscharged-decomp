@@ -41,6 +41,19 @@ static inline DebugWriteField* AllocateDebugField(
     return field;
 }
 
+static inline void InitializeDebugField(
+    DebugWriteField* field, DebugWriteType* owner, int fieldType,
+    u16 size, unsigned int offset, const char* name, unsigned int count)
+{
+    field->mSize = size;
+    field->mOffset = offset;
+    field->mNext = 0;
+    field->mOwner = owner;
+    nlStrNCpy(field->mName, name, sizeof(field->mName));
+    field->mFieldType = fieldType;
+    field->mCount = count;
+}
+
 static inline void ResetDebugBuffer(
     DebugWriteBuffer* buffer, int frame)
 {
@@ -54,6 +67,36 @@ void DebugWriteCache::Reset()
     for (int i = 0; i < mBufferCount; ++i)
     {
         ResetDebugBuffer(&mBuffers[i], -1);
+    }
+}
+
+static inline void WriteDebugFloatData(DebugWriteCache* cache,
+    u16 recordType, const float* value)
+{
+    DebugWriteBuffer* buffer
+        = GetCurrentDebugBuffer(cache);
+    DebugWriteRecordHeader header;
+    header.mType = recordType;
+    header.mMarker = 0xDADA;
+    header.mSize = sizeof(*value);
+    header.mPaddedSize = header.mSize;
+    if (header.mPaddedSize % 4 != 0)
+    {
+        header.mPaddedSize += 4 - (header.mPaddedSize % 4);
+    }
+
+    if (buffer->mCurrent + sizeof(header) + sizeof(*value)
+        < buffer->mData + buffer->mSize)
+    {
+        memcpy(buffer->mCurrent, &header, sizeof(header));
+        buffer->mCurrent += sizeof(header);
+        memcpy(buffer->mCurrent, value, sizeof(*value));
+        buffer->mCurrent += sizeof(*value);
+
+        for (int i = header.mSize; i < header.mPaddedSize; ++i)
+        {
+            *buffer->mCurrent++ = 0;
+        }
     }
 }
 
@@ -81,32 +124,16 @@ void DebugWriteCache::WriteFloat(u16* type,
 
     checksum->ChecksumData(&value, sizeof(value));
 
-    u16 recordType = *type;
-    DebugWriteBuffer* buffer
-        = GetCurrentDebugBuffer(this);
-    DebugWriteRecordHeader header;
-    header.mType = recordType;
-    header.mMarker = 0xDADA;
-    header.mSize = sizeof(value);
-    header.mPaddedSize = header.mSize;
-    if (header.mPaddedSize % 4 != 0)
-    {
-        header.mPaddedSize += 4 - (header.mPaddedSize % 4);
-    }
+    WriteDebugFloatData(this, *type, &value);
+}
 
-    if (buffer->mCurrent + sizeof(header) + sizeof(value)
-        < buffer->mData + buffer->mSize)
-    {
-        memcpy(buffer->mCurrent, &header, sizeof(header));
-        buffer->mCurrent += sizeof(header);
-        memcpy(buffer->mCurrent, &value, sizeof(value));
-        buffer->mCurrent += sizeof(value);
-
-        for (int i = header.mSize; i < header.mPaddedSize; ++i)
-        {
-            *buffer->mCurrent++ = 0;
-        }
-    }
+inline void DebugWriteType::InitializeComposite(u16 type, const char* name)
+{
+    mKind = 1;
+    mType = type;
+    nlStrNCpy(mName, name, sizeof(mName));
+    mData.mComposite.mLastField = 0;
+    mData.mComposite.mFieldCount = 0;
 }
 
 u16 DebugWriteCache::BeginType(const char* name)
@@ -120,11 +147,7 @@ u16 DebugWriteCache::BeginType(const char* name)
     mCurrentType = type;
 
     DebugWriteType* entry = &mTypes[type];
-    entry->mKind = 1;
-    entry->mType = type;
-    nlStrNCpy(entry->mName, name, sizeof(entry->mName));
-    entry->mData.mComposite.mLastField = 0;
-    entry->mData.mComposite.mFieldCount = 0;
+    entry->InitializeComposite(type, name);
     return mCurrentType;
 }
 
@@ -140,13 +163,7 @@ void DebugWriteCache::AddField(int fieldType, u16 size,
         = &mTypes[mCurrentType];
     DebugWriteField* field = AllocateDebugField(this);
 
-    field->mSize = size;
-    field->mOffset = offset;
-    field->mNext = 0;
-    field->mOwner = owner;
-    nlStrNCpy(field->mName, name, sizeof(field->mName));
-    field->mFieldType = fieldType;
-    field->mCount = 0;
+    InitializeDebugField(field, owner, fieldType, size, offset, name, 0);
 
     if (owner->mData.mComposite.mLastField == 0)
     {
@@ -169,13 +186,7 @@ void DebugWriteCache::AddArrayField(int fieldType, u16 size,
         = &mTypes[mCurrentType];
     DebugWriteField* field = AllocateDebugField(this);
 
-    field->mSize = size;
-    field->mOffset = offset;
-    field->mNext = 0;
-    field->mOwner = owner;
-    nlStrNCpy(field->mName, name, sizeof(field->mName));
-    field->mFieldType = fieldType;
-    field->mCount = count;
+    InitializeDebugField(field, owner, fieldType, size, offset, name, count);
 
     if (owner->mData.mComposite.mLastField == 0)
     {

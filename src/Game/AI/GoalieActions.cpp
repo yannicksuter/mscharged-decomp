@@ -609,7 +609,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
             if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
                 && m_eAnimID != 2 && m_eAnimID != 3)
             {
-                fn_8007EB90();
+                FumbleBall();
                 InitActionMove(true);
                 return;
             }
@@ -756,7 +756,7 @@ void Goalie::fn_800838F8(float fDeltaT)
     SetVelocity(v3Zero);
     if (mFreezeTimer.Countdown(fDeltaT, 0.0f))
     {
-        fn_8007F430();
+        EndFreeze();
     }
 }
 
@@ -798,7 +798,7 @@ void Goalie::fn_80083960(float)
             v3BallPosition.z = 0.2f;
             g_pBall->SetPosition(v3BallPosition);
             g_pBall->m_bVisible = 1;
-            fn_8007EB90();
+            FumbleBall();
         }
 
         if (m_pCurrentAnimController->TestTrigger(
@@ -1298,7 +1298,7 @@ void Goalie::fn_80084C3C(bool bParam)
 
 void Goalie::fn_80084CE0()
 {
-    if (mUnidentified529)
+    if (mbDefensivePlayOverlayPushed)
     {
         BaseSceneHandler* pSceneHandler
             = g_pOverlayManager->GetScene((SceneList)0x69);
@@ -1318,7 +1318,7 @@ void Goalie::fn_80084CE0()
             if (bUnidentifiedCondition)
             {
                 g_pOverlayManager->Pop();
-                mUnidentified529 = false;
+                mbDefensivePlayOverlayPushed = false;
             }
         }
     }
@@ -1622,7 +1622,7 @@ void Goalie::fn_800883D4(bool& bAdjustY,
 void Goalie::ActionSave(float fDeltaT)
 {
     bool bState26
-        = mGoalieActionState == GOALIEACTION_UNIDENTIFIED_26;
+        = mGoalieActionState == GOALIEACTION_MEGA_STRIKE;
     CheckForLimbEndZoneCollision();
 
     SaveData* pSaveData = mpSaveData;
@@ -1900,7 +1900,7 @@ void Goalie::ActionMove(float deltaTime)
         ChooseSwatAnim(1);
     }
 
-    if (fn_8007EB10())
+    if (IsFireAnimPlaying())
     {
         if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
         {
@@ -1909,7 +1909,7 @@ void Goalie::ActionMove(float deltaTime)
     }
     else if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0 && !fn_800976C4())
     {
-        fn_8007EA90();
+        StartFireAnim();
     }
 
     if (g_pBall->m_pOwner != this && GetGlobalPad() != 0)
@@ -2064,7 +2064,7 @@ void Goalie::ActionMove(float deltaTime)
         return;
     }
 
-    if (fn_8007BC40())
+    if (CheckForDekeAttack())
     {
         return;
     }
@@ -2086,11 +2086,11 @@ void Goalie::ActionMove(float deltaTime)
         mUrgency = URGENCY_LOW;
     }
 
-    if (fn_8007C73C())
+    if (FindApproachingMonty())
     {
         CleanupStun();
         ChooseSwatAnim(1);
-        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_31, 0);
+        SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         mUnidentified024.m_fActualSpeed = 0.0f;
         SetVelocity(v3Zero);
@@ -2114,12 +2114,12 @@ void Goalie::ActionMove(float deltaTime)
         cFielder* pOwnerFielder = g_pBall->GetOwnerFielder();
         if (IsWithinPounceRange())
         {
-            if (!fn_8007D740())
+            if (!IsAttackDisabled())
             {
                 InitActionPursueBallCarrier();
             }
 
-            if (!fn_8007D740())
+            if (!IsAttackDisabled())
             {
                 InitActionPursueBallPounce();
 
@@ -2172,7 +2172,7 @@ void Goalie::ActionMove(float deltaTime)
             return;
         }
 
-        if (!fn_8007D740())
+        if (!IsAttackDisabled())
         {
             InitActionPursueBallCarrier();
         }
@@ -2209,7 +2209,7 @@ void Goalie::ActionMove(float deltaTime)
         return;
     }
 
-    if (!isPassThreat && !fn_8007BF68(true)
+    if (!isPassThreat && !CheckForLobSave(true)
         && IsLooseBallClose(*fn_800A636C(g_pCurrentlyUpdatingTeam)
                 ->fLooseBallChaseDistance.m_pValue))
     {
@@ -2300,11 +2300,11 @@ void Goalie::ActionMoveWB(float fDeltaT)
     {
         if (m_pBall != 0)
         {
-            fn_8007EB90();
+            FumbleBall();
         }
         if (!fn_800976C4())
         {
-            fn_8007EA90();
+            StartFireAnim();
         }
         SetNoPickUpTime(0.4f);
         mbDoHeadTrack = false;
@@ -2784,10 +2784,10 @@ bool Goalie::fn_80090958(bool bParam)
             fn_80097358(this, fParam);
             if (bParam)
             {
-                fn_8007EA90();
+                StartFireAnim();
                 if (m_pBall != 0)
                 {
-                    fn_8007EB90();
+                    FumbleBall();
                 }
                 SetNoPickUpTime(0.4f);
                 mbDoHeadTrack = false;
@@ -2812,7 +2812,7 @@ bool Goalie::fn_80090958(bool bParam)
         SetGoalieAction(GOALIEACTION_UNIDENTIFIED_32, 0);
         if (m_pBall != 0)
         {
-            fn_8007EB90();
+            FumbleBall();
         }
         SetAnimState(0xAE, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -2880,7 +2880,7 @@ bool Goalie::fn_80090958(bool bParam)
 
         if (bState8Shot)
         {
-            if (mGoalieActionState == GOALIEACTION_UNIDENTIFIED_27
+            if (mGoalieActionState == GOALIEACTION_ELECTROCUTION
                 && m_pCurrentAnimController->m_fTime < 0.2f)
             {
                 mpSkillShooter = 0;
@@ -3158,12 +3158,12 @@ void Goalie::ActionPreCrouch(float deltaTime)
             }
             else if (IsWithinPounceRange())
             {
-                if (!fn_8007D740())
+                if (!IsAttackDisabled())
                 {
                     InitActionPursueBallCarrier();
                 }
 
-                if (!fn_8007D740())
+                if (!IsAttackDisabled())
                 {
                     InitActionPursueBallPounce();
 
@@ -3238,7 +3238,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
 {
     if (!CheckForSTSAttack())
     {
-        if (fn_8007C73C())
+        if (FindApproachingMonty())
         {
             CleanupStun();
             ChooseSwatAnim(1);
@@ -3275,7 +3275,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
                 return;
             }
 
-            if (fn_8007BC40())
+            if (CheckForDekeAttack())
             {
                 return;
             }
@@ -3408,7 +3408,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
                 return;
             }
 
-            if (IsWithinPounceRange() && !fn_8007D740())
+            if (IsWithinPounceRange() && !IsAttackDisabled())
             {
                 InitActionPursueBallPounce();
 
@@ -3430,7 +3430,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
 
 void Goalie::ActionPursueBallPounce(float fDeltaT)
 {
-    if (fn_8007C73C())
+    if (FindApproachingMonty())
     {
         CleanupStun();
         ChooseSwatAnim(1);
@@ -3589,7 +3589,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             float animFrames
                 = (float)mpTarget->m_pCurrentAnimController->m_pSAnim
                       ->m_nNumKeys;
-            float fResult = fn_8007BEEC(mpTarget);
+            float fResult = GetDekeAttackWindowEnd(mpTarget);
             float threshold;
             threshold = fResult * animFrames;
             float pickupDuration = mpLooseBallInfo->mfPickupTime
@@ -3875,7 +3875,7 @@ void Goalie::fn_8008A610(float fDeltaT)
             < (mpLooseBallInfo->mfPickupDistance + radius + 0.8f)
                   * (mpLooseBallInfo->mfPickupDistance + radius + 0.8f))
         {
-            fn_800809D0(mpTarget, false);
+            HandleDekeAttackContact(mpTarget, false);
         }
     }
 }
@@ -4276,7 +4276,7 @@ void Goalie::InitActionPreCrouch(eGoalieCrouchType crouchType)
 void Goalie::fn_8008BBB0(
     cFielder* pTarget, int nPursueDekeType)
 {
-    if (fn_8007D740())
+    if (IsAttackDisabled())
     {
         return;
     }
@@ -4438,7 +4438,7 @@ void Goalie::InitActionLooseBallSetup()
         if (fAbsBallX < fAbsGoalieX - 1.5f)
         {
             float fTimeTilSave
-                = CalcTimeToPlane(fn_800776B4());
+                = CalcTimeToPlane(GetSavePlaneOffset());
 
             if (fTimeTilSave > 0.0f && fTimeTilSave < 2.0f)
             {
@@ -4486,7 +4486,7 @@ void Goalie::InitActionLooseBallSetup()
                     }
 
                     mbShouldMiss = false;
-                    if (fn_8007BF68(true))
+                    if (CheckForLobSave(true))
                     {
                         return;
                     }
@@ -4998,7 +4998,7 @@ void Goalie::fn_8008CED8(float fTargetTime,
     const nlVector3& v3TargetPosition,
     const nlVector3& v3TargetVelocity)
 {
-    SetGoalieAction(GOALIEACTION_UNIDENTIFIED_20, 0);
+    SetGoalieAction(GOALIEACTION_LOB_SAVE, 0);
     mfWaitTime = fTargetTime;
     mfTargetTime = fTargetTime;
     mv3TargetPosition = v3TargetPosition;
@@ -5046,7 +5046,7 @@ void Goalie::fn_8008CED8(float fTargetTime,
     {
         float fParam2 = nlMaxEquals(
             lbl_806DBCC4, 0.1f + lbl_806DBCC0);
-        fHeightRatio = fn_8007ACB8(this,
+        fHeightRatio = CalcOpponentProximity(this,
             mv3TargetPosition,
             lbl_806DBCC0,
             fParam2);
@@ -5172,7 +5172,7 @@ void Goalie::fn_8008D210(float fDeltaT)
         {
             float fParam2 = nlMaxEquals(
                 0.1f + lbl_806DBCC4, lbl_806DBCC0);
-            fHeightRatio = fn_8007ACB8(this,
+            fHeightRatio = CalcOpponentProximity(this,
                 mv3TargetPosition,
                 lbl_806DBCC0,
                 fParam2);
@@ -5537,7 +5537,7 @@ void Goalie::fn_8008DAB4(float fDeltaT)
             {
                 if (m_pBall != 0)
                 {
-                    fn_8007EB90();
+                    FumbleBall();
                 }
             }
             else
@@ -5661,11 +5661,11 @@ void Goalie::fn_8008E130()
 {
     switch (mGoalieActionState)
     {
-    case GOALIEACTION_UNIDENTIFIED_26:
+    case GOALIEACTION_MEGA_STRIKE:
         return;
     default:
     {
-        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_27, 0);
+        SetGoalieAction(GOALIEACTION_ELECTROCUTION, 0);
         m_pCurrentAnimController->m_fPlaybackSpeedScale
             = lbl_806DBC6C;
 
@@ -5701,7 +5701,7 @@ void Goalie::fn_8008E130()
 
         if (m_pBall != 0)
         {
-            fn_8007EB90();
+            FumbleBall();
 
             switch (mGoalieActionState)
             {
@@ -5730,13 +5730,13 @@ void Goalie::fn_8008E2D0()
 {
     switch (mGoalieActionState)
     {
-    case GOALIEACTION_UNIDENTIFIED_26:
+    case GOALIEACTION_MEGA_STRIKE:
         return;
     default:
         CleanupStun();
         ChooseSwatAnim(1);
         mPrevGoalieActionState = mGoalieActionState;
-        mGoalieActionState = GOALIEACTION_UNIDENTIFIED_28;
+        mGoalieActionState = GOALIEACTION_FROZEN;
         mFreezeTimer.SetSeconds(lbl_806DBCA0);
         mbIsDown = true;
         mUnidentified024.m_fDesiredSpeed = 0.0f;
@@ -5852,11 +5852,11 @@ void Goalie::InitActionSTSAttack()
 
 void Goalie::fn_8008E69C(float fDeltaT)
 {
-    if (fn_8007C73C())
+    if (FindApproachingMonty())
     {
         CleanupStun();
         ChooseSwatAnim(1);
-        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_31, 0);
+        SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         mUnidentified024.m_fActualSpeed = 0.0f;
         SetVelocity(v3Zero);
@@ -5876,7 +5876,7 @@ void Goalie::fn_8008E69C(float fDeltaT)
         return;
     }
 
-    if (fn_8007BC40())
+    if (CheckForDekeAttack())
     {
         return;
     }
@@ -6280,11 +6280,11 @@ void Goalie::fn_80088A94(float deltaTime)
 
 void Goalie::ActionSTSAttack(float deltaTime)
 {
-    if (fn_8007C73C())
+    if (FindApproachingMonty())
     {
         CleanupStun();
         ChooseSwatAnim(1);
-        SetGoalieAction(GOALIEACTION_UNIDENTIFIED_31, 0);
+        SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         mUnidentified024.m_fActualSpeed = 0.0f;
         SetVelocity(v3Zero);
@@ -6304,7 +6304,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
         return;
     }
 
-    if (fn_8007BC40())
+    if (CheckForDekeAttack())
     {
         return;
     }
@@ -6381,7 +6381,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
             float fTargetDistSq = nlGetLengthSquared1D(mfTargetDist);
             if (fDistanceSq < fTargetDistSq)
             {
-                fn_80080638(mpShooter, false);
+                HitAttackTarget(mpShooter, false);
                 fn_80080BFC(0.0f);
 
                 PlayerAttackData data;
@@ -6462,9 +6462,9 @@ void Goalie::fn_8008EC2C()
 {
     switch (mGoalieActionState)
     {
-    case GOALIEACTION_UNIDENTIFIED_31:
+    case GOALIEACTION_GRAB_MONTY:
         return;
-    case GOALIEACTION_UNIDENTIFIED_26:
+    case GOALIEACTION_MEGA_STRIKE:
         return;
     default:
         CleanupStun();
@@ -6496,9 +6496,9 @@ void Goalie::fn_8008ED44(bool bParam)
 {
     switch (mGoalieActionState)
     {
-    case GOALIEACTION_UNIDENTIFIED_31:
+    case GOALIEACTION_GRAB_MONTY:
         return;
-    case GOALIEACTION_UNIDENTIFIED_26:
+    case GOALIEACTION_MEGA_STRIKE:
         return;
     default:
         CleanupStun();
@@ -6624,8 +6624,8 @@ void Goalie::InitActionMoveWB()
 void Goalie::InitActionSaveSetup(bool bCanReposition)
 {
     if (mGoalieActionState == GOALIEACTION_STS_RECOVER
-        || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_27
-        || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_28
+        || mGoalieActionState == GOALIEACTION_ELECTROCUTION
+        || mGoalieActionState == GOALIEACTION_FROZEN
         || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_29
         || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_30
         || mGoalieActionState == GOALIEACTION_UNIDENTIFIED_32
@@ -6667,7 +6667,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         return;
     }
 
-    if (fn_8007BF68(false))
+    if (CheckForLobSave(false))
     {
         return;
     }
@@ -6702,7 +6702,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
     SetGoalieAction(GOALIEACTION_SAVE_SETUP, 0);
     m_pPhysicsCharacter->m_CanCollideWithBall = true;
 
-    float fTimeToContact = CalcTimeToPlane(fn_800776B4());
+    float fTimeToContact = CalcTimeToPlane(GetSavePlaneOffset());
     float fEnergyLevel = mFatigue.mfEnergyLevel;
     fEnergyLevel -= lbl_806DBCB4 * fn_800156A8(g_pBall);
     if (fEnergyLevel < lbl_806DBCB8)
@@ -6946,7 +6946,7 @@ void Goalie::fn_80090320(float fParam)
 
     if (m_pBall != 0)
     {
-        fn_8007EB90();
+        FumbleBall();
     }
 
     SetAnimState(0xAE, true, 0.2f, false, false);
@@ -7045,11 +7045,11 @@ void Goalie::InitActionDiveRecover()
         fn_80097358(this, -1.0f);
         if (mnOffplayPending == GOALIE_OFFPLAY_NONE)
         {
-            fn_8007EA90();
+            StartFireAnim();
         }
         if (m_pBall != 0)
         {
-            fn_8007EB90();
+            FumbleBall();
         }
         SetNoPickUpTime(0.4f);
         mbDoHeadTrack = false;

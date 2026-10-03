@@ -1,5 +1,6 @@
 #include "Game/AI/DesireShoot.h"
 
+#include "Game/AI/AIContext.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/DesireUpdate.inl"
@@ -19,17 +20,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-struct UnidentifiedDesireMachine
-{
-    u8 mUnidentified000[0x18];
-    void* mUnidentified018;
-};
-
-extern "C" UnidentifiedDesireMachine* fn_80316974(void*);
-extern "C" void fn_8031998C(
-    void*, int, const UnidentifiedVariantCollection*);
-
-
 static float lbl_806DC208 = 0.5f;
 static unsigned short sDesireWindupShotType = 0xFFFF;
 static unsigned short sDesireShootType = 0xFFFF;
@@ -42,13 +32,13 @@ static float lbl_806DC220 = 2.0f;
 /**
  * Offset/Address/Size: 0x0 | 0x800C4198 | size: 0x7C
  */
-bool DesireWindupShot::UnidentifiedInitialize(void*)
+bool DesireWindupShot::Initialize(void*)
 {
     bool result = true;
     if (m_pFielder->m_pBall != NULL)
     {
         m_pFielder->fn_8004B658();
-        mUnidentified078 = lbl_806DC208
+        mMaxDuration = lbl_806DC208
                          + m_pFielder->m_pShotMeter->GetTotalDuration();
         mbShotMeterActivated = true;
         lbl_806DC210 = true;
@@ -145,16 +135,16 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
 /**
  * Offset/Address/Size: 0xC28 | 0x800C4DC0 | size: 0x4
  */
-void DesireWindupShot::UnidentifiedCleanup()
+void DesireWindupShot::Cleanup()
 {
 }
 
 /**
  * Offset/Address/Size: 0xC2C | 0x800C4DC4 | size: 0x244
  */
-bool DesireShoot::UnidentifiedInitialize(void* context)
+bool DesireShoot::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
@@ -191,7 +181,7 @@ bool DesireShoot::UnidentifiedInitialize(void* context)
         transitionParams.Set(10,
             FuzzyVariant(FT_U32,
                 nlStringHash("TransDesireWindupSkillshot")));
-        fn_8031998C(fn_80316974(this)->mUnidentified018,
+        fn_8031998C(GetStateMachineAIContext(this)->mScriptMachine,
             13,
             &transitionParams);
     }

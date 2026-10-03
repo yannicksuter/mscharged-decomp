@@ -36,6 +36,8 @@
 #include "Game/Sys/debug.h"
 #include "Game/GameInfo.h"
 #include "Game/GameObjectLighting.h"
+#include "Game/AI/AIPad.h"
+#include "Game/Physics/Physics.h"
 #include "Game/NisPlayer.h"
 #include "Game/ReplayManager.h"
 #include "Game/ReplayChoreo.h"
@@ -95,6 +97,10 @@
 #include "NL/nlstring_tmpl.h"
 #include "NL/gl/glPlat.h"
 #include "Game/Audio/RegistryPools.h"
+#include "NL/nlDebugFile.h"
+#include "NL/nlFileGC.h"
+#include <revolution/sc_fwd.h>
+#include <revolution/os/OSThread_fwd.h>
 #include "Game/UnidentifiedStaticStorage.h"
 
 class AudioUpdateTask : public nlTask
@@ -107,10 +113,10 @@ public:
     }
 };
 
-class UnidentifiedMemCheckTask : public nlTask
+class MemCheckTask : public nlTask
 {
 public:
-    UnidentifiedMemCheckTask()
+    MemCheckTask()
         : mAccumulatedDelta(0)
         , mSampleCount(0)
     {
@@ -123,27 +129,6 @@ private:
     s32 mAccumulatedDelta;
     s32 mSampleCount;
 }; // size 0x28
-
-extern "C"
-{
-    u32 SCGetSimpleAddressID();
-    u8 SCGetLanguage();
-    u8 SCGetAspectRatio();
-    void fn_8013D7A0();
-    void fn_8013D7E0();
-    void OSYieldThread();
-    void StartupAIPads();
-    void fn_80184ADC();
-}
-
-void nlRegHandleDVDMessageCB(const Function<void(int)>&);
-void nlRegHandleDVDAllClearCB(const Function<void(int)>&);
-void nlRegHandleDVDRetryingCB(const Function<void(int)>&);
-void nlRegCheckForResetFromFSCB(const Function<FnVoidVoid>&);
-
-extern bool g_bDisableWriteOut;
-extern u8 lbl_806E1458;
-
 
 
 volatile int g_Region = 3;
@@ -181,13 +166,13 @@ static TweakBoolBinding sPrintMemoryLowWaterMarksTweak(
     &g_bPrintMemoryNewLowWaterMarks, true);
 
 static ComUpdateTask comUpdateTask;
-static UnidentifiedPingerUpdateTask pingerUpdateTask;
+static PingerUpdateTask pingerUpdateTask;
 static NetworkUpdateTask networkUpdateTask;
 static PlatPadUpdateTask platPadUpdateTask;
 static FrontEndTask frontEndTask;
 static WorldUpdateTask worldUpdateTask;
 static GameRenderTask gameRenderTask;
-static UnidentifiedMovieRenderTask movieRenderTask;
+static MovieRenderTask movieRenderTask;
 static ParticleUpdateTask particleUpdateTask;
 static BeginFrameTask beginFrameTask;
 static AudioUpdateTask audioUpdateTask;
@@ -195,7 +180,7 @@ static EndFrameTask endFrameTask;
 static TweakerTask tweakerTask;
 static ProfilerTask profilerTask;
 static ResetTask resetTask;
-static UnidentifiedMemCheckTask memCheckTask;
+static MemCheckTask memCheckTask;
 static TextWindowTask textWindowTask;
 static FEDPDTask feDPDTask;
 static FlashMemoryTask flashMemoryTask;
@@ -216,13 +201,13 @@ static TweakValueBool sUseCheckerTextureForWarble(
 static void PreInitFS();
 static void Initialize();
 static void AddTasks();
-extern "C" bool fn_8011D1BC(ParticleSystem*, GLView*,
+bool RenderParticleSystem(ParticleSystem*, GLView*,
     nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
     const nlMatrix4*);
-extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter*, ParticleSystem*,
+void BuildParticleQuads(GLTexturedColourMeshWriter*, ParticleSystem*,
     nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
     const nlMatrix4*);
-extern "C" void fn_8011D5B0(glShadowedTexturedColourModelWriter*, ParticleSystem*,
+void BuildParticleQuads(glShadowedTexturedColourModelWriter*, ParticleSystem*,
     nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
     const nlMatrix4*);
 
@@ -274,16 +259,16 @@ bool IsAlternateOnlineCountryGroup()
     return false;
 }
 
-void UnidentifiedMemCheckTask::Run(float)
+void MemCheckTask::Run(float)
 {
     static u32 sPreviousVirtualFree;
     static u32 sPreviousTaskState = 1;
 
     const float bytesPerMiB = 1048576.0f;
-    const u32 currentVirtualFree = VirtualAllocator.m_04;
+    const u32 virtualAllocationCount = VirtualAllocator.m_allocation_count;
 
-    sLastVirtualFreeDelta = currentVirtualFree - sPreviousVirtualFree;
-    sPreviousVirtualFree = currentVirtualFree;
+    sLastVirtualFreeDelta = virtualAllocationCount - sPreviousVirtualFree;
+    sPreviousVirtualFree = virtualAllocationCount;
     sVirtualFreeMiB = VirtualAllocator.TotalFreeMemory() / bytesPerMiB;
     sVirtualLargestFreeMiB =
         VirtualAllocator.LargestFreeBlock() / bytesPerMiB;
@@ -336,7 +321,7 @@ static void PreInitFS()
     }
 }
 
-extern "C" void fn_8011C4E8(int)
+void OnSwappablePadChanged(int)
 {
     const u32 state = nlTaskManager::m_pInstance->mCurrentState;
     if (state == 4 || state == 1)
@@ -380,7 +365,7 @@ void ConfigureTweakerButtons(int)
     }
 }
 
-extern "C" void fn_8011C610(const char* buildInfo)
+void ParseBuildNumber(const char* buildInfo)
 {
     char* copy;
     const u32 length = nlStrLen(buildInfo) + 1;
@@ -395,7 +380,7 @@ extern "C" void fn_8011C610(const char* buildInfo)
     nlFree(copy);
 }
 
-extern "C" void fn_8011C70C(
+void OnDateTimeLoaded(
     void* data, unsigned long size, void* destination)
 {
     void* destinationCopy = destination;
@@ -408,7 +393,7 @@ extern "C" void fn_8011C70C(
 
 class Config;
 
-extern "C" void fn_8011C748(Config*)
+void OnCommonConfigLoaded(Config*)
 {
 }
 
@@ -488,8 +473,8 @@ static void Initialize()
             &resetTask)));
 
     DisplayLoadingMessageFast();
-    fn_8013D7A0();
-    fn_8013D7E0();
+    InitializeODEAllocators();
+    RegisterUserGeomClasses();
     InitPads();
 
     unsigned int stringSizes[4];
@@ -511,8 +496,8 @@ static void Initialize()
 
     sDateTimeLoaded = false;
     Config::Global().LoadFromFileAsync(
-        "ini/common.ini", Function<Config*>(fn_8011C748));
-    nlLoadEntireFileAsync("ini/datetime.ini", fn_8011C70C,
+        "ini/common.ini", Function<Config*>(OnCommonConfigLoaded));
+    nlLoadEntireFileAsync("ini/datetime.ini", OnDateTimeLoaded,
         const_cast<char*>("/General/Build Info"), 0x20, AllocateStart, 0, 0,
         0);
     while (!sDateTimeLoaded)
@@ -526,7 +511,7 @@ static void Initialize()
         GetTweakString("/General/Build Info/BuildNumber", 0);
     if (buildInfo != 0)
     {
-        fn_8011C610(buildInfo);
+        ParseBuildNumber(buildInfo);
     }
 
     glxSetDrawSyncTimeout(1000.0f);
@@ -549,7 +534,7 @@ static void Initialize()
     gSwappablePadChanged.Add(Function<void(int)>(ConfigureTweakerButtons), 0, -1);
     g_pPadManager->Update(0.0f);
     FEInput::Initialize();
-    gSwappablePadChanged.Add(Function<void(int)>(fn_8011C4E8), 0, -1);
+    gSwappablePadChanged.Add(Function<void(int)>(OnSwappablePadChanged), 0, -1);
     FlickDetection::Initialize();
     networkUpdateTask.Initialize();
     StartupAIPads();
@@ -615,7 +600,7 @@ static void Initialize()
     HideLayerView(eCLV_ScreenBlur2);
     HideLayerView(eCLV_ShadowVolume);
     HideLayerView(eCLV_ShadowVolumeBlend);
-    ParticleSystem::m_Callback = fn_8011D1BC;
+    ParticleSystem::m_Callback = RenderParticleSystem;
     ModeledScreenTransition::s_3DView = GetLayerView(eCLV_Transitions3D);
     SetDebugFontView(GetLayerView(eCLV_Debug));
     SetDebugSquareView(GetLayerView(eCLV_DebugSquare));
@@ -627,7 +612,7 @@ static void Initialize()
     rlSetWidescreen(widescreen);
     g_ShapeRenderer.Initialize(resourcePool);
     g_ShapeRenderer.m_eView = GetLayerView(eCLV_Characters);
-    fn_80184ADC();
+    InitMaxProjectedShadows();
     SetCharacterShadowView(GetLayerView(eCLV_Characters));
     FESceneManager::s_pInstance->m_uDefaultRenderView =
         (unsigned long)GetLayerView(eCLV_Anark);
@@ -666,7 +651,7 @@ static void AddTasks()
     nlTaskManager::AddTask(&Wiper::Instance(), 13, (u32)-1);
 }
 
-extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
+bool RenderParticleSystem(ParticleSystem* source, GLView* view,
     nlDLListSlotPool<Particle*>* vertices, const nlVector3& viewRight,
     const nlVector3& viewUp, const nlMatrix4* pCoordSys)
 {
@@ -680,7 +665,7 @@ extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
     if (fn_80183C54() && !isWarble)
     {
         glShadowedTexturedColourModelWriter writer;
-        fn_8011D5B0(&writer, source, vertices, viewRight, viewUp, pCoordSys);
+        BuildParticleQuads(&writer, source, vertices, viewRight, viewUp, pCoordSys);
 
         GXShadowedDiffuseParameters* parameters =
             static_cast<GXShadowedDiffuseParameters*>(
@@ -695,7 +680,7 @@ extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
     else if (sAllowWarble)
     {
         GLTexturedColourMeshWriter writer;
-        fn_8011D3CC(&writer, source, vertices, viewRight, viewUp, pCoordSys);
+        BuildParticleQuads(&writer, source, vertices, viewRight, viewUp, pCoordSys);
 
         if (isWarble && fn_80115EB0())
         {
@@ -723,7 +708,7 @@ extern "C" bool fn_8011D1BC(ParticleSystem* source, GLView* view,
     return true;
 }
 
-extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter* writer,
+void BuildParticleQuads(GLTexturedColourMeshWriter* writer,
     ParticleSystem* source, nlDLListSlotPool<Particle*>* vertices,
     const nlVector3& viewRight, const nlVector3& viewUp,
     const nlMatrix4* pCoordSys)
@@ -756,7 +741,7 @@ extern "C" void fn_8011D3CC(GLTexturedColourMeshWriter* writer,
     }
 }
 
-extern "C" void fn_8011D5B0(glShadowedTexturedColourModelWriter* writer,
+void BuildParticleQuads(glShadowedTexturedColourModelWriter* writer,
     ParticleSystem* source, nlDLListSlotPool<Particle*>* vertices,
     const nlVector3& viewRight, const nlVector3& viewUp,
     const nlMatrix4* pCoordSys)

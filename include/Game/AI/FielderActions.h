@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+class AvoidablePolygon;
 class cFielder;
 class cPlayer;
 
@@ -19,6 +20,7 @@ struct PlayerAttackData
 template <typename T>
 class SlotPool;
 extern SlotPool<PlayerAttackData> g_PlayerAttackDataPool;
+extern AvoidablePolygon* lbl_806E0C74;
 
 void UnFreezeEveryoneButCaptain(cFielder* pCaptain);
 

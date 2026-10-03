@@ -13,6 +13,7 @@ int OSCreateThread(OSThread* thread, OSThreadFunc function, void* argument,
                    void* stackBegin, unsigned long stackSize,
                    long priority, unsigned short flags);
 long OSResumeThread(OSThread* thread);
+void OSYieldThread(void);
 
 #ifdef __cplusplus
 }

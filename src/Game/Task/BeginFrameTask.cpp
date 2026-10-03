@@ -145,7 +145,7 @@ void SetupMatrices(cBaseCamera* pCamera, const nlMatrix4* pOverride)
     ParticleSystem::m_LightingCallback = fn_80112E1C;
     if (cCameraManager::PeekCamera() != NULL)
     {
-        cCameraManager::m_pBeginFrameCameraType
+        cCameraManager::m_BeginFrameCameraType
             = cCameraManager::PeekCamera()->GetType();
     }
 }

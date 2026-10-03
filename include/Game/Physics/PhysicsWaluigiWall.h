@@ -81,10 +81,10 @@ public:
     /* 0x5C */ bool mEmitterStarted;
     /* 0x5D */ unsigned char mPadding05D[3];
     /* 0x60 */ float mHeightUpdateDelay;
-    /* 0x64 */ UnidentifiedEventConnectionOwner mStartConnection;
-    /* 0x68 */ UnidentifiedEventConnectionOwner mEndConnection;
-    /* 0x6C */ UnidentifiedEventConnectionOwner mAbortConnection;
-    /* 0x70 */ UnidentifiedEventConnectionOwner mMegastrikeConnection;
+    /* 0x64 */ EventConnectionOwner mStartConnection;
+    /* 0x68 */ EventConnectionOwner mEndConnection;
+    /* 0x6C */ EventConnectionOwner mAbortConnection;
+    /* 0x70 */ EventConnectionOwner mMegastrikeConnection;
 }; // size: 0x74
 
 #endif // GAME_PHYSICS_PHYSICS_WALUIGI_WALL_H

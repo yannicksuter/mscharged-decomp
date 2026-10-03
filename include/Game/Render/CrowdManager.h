@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-struct LoadFrame;
-struct SaveFrame;
+class LoadFrame;
+class SaveFrame;
 
 // Retail keeps the predecessor's CrowdManager object with its replay and
 // update entry points; the layout follows the predecessor header.

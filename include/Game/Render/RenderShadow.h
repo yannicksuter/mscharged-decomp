@@ -23,6 +23,7 @@ struct ProjectedShadowParams
 
 extern bool g_bProjectedShadows;
 
+void InitMaxProjectedShadows();
 float GetCoPlanarZ();
 void SetCoPlanarZ(float z);
 void SetPlanarShadowOpacity(float opacity);

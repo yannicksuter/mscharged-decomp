@@ -10,6 +10,7 @@
 #include "Game/CharacterQueries.h"
 #include "Game/CharacterEffects.h"
 #include "Game/CharacterTemplate.h"
+#include "Game/Triggers/AnimTrigger.h"
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Effects/EmissionManager.h"
@@ -152,13 +153,6 @@ EmissionController* EmitGeneric(cCharacter* pCharacter, const char* baseName,
 
 void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
 {
-    class AnimTriggerCallbackInfo
-    {
-    public:
-        long m_uEventID;
-        float m_fIntensity;
-    };
-
     AnimTriggerCallbackInfo* pAnimTriggerCallbackInfo = (AnimTriggerCallbackInfo*)uParam;
 
     GetCharacterEffectsName(g_pCurrentlyUpdatingCharacter);
@@ -257,17 +251,17 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xC79FF559:
             if (IsControllerMirrored(g_pCurrentlyUpdatingCharacter->GetCurrentAnimController()))
             {
-                fn_801BE0A4(g_pCurrentlyUpdatingCharacter, true);
+                SetCharacterPacketAVisible(g_pCurrentlyUpdatingCharacter, true);
             }
             else
             {
-                fn_801BE0AC(g_pCurrentlyUpdatingCharacter, true);
+                SetCharacterPacketBVisible(g_pCurrentlyUpdatingCharacter, true);
             }
             break;
 
         case 0x39CB7792:
-            fn_801BE0A4(g_pCurrentlyUpdatingCharacter, false);
-            fn_801BE0AC(g_pCurrentlyUpdatingCharacter, false);
+            SetCharacterPacketAVisible(g_pCurrentlyUpdatingCharacter, false);
+            SetCharacterPacketBVisible(g_pCurrentlyUpdatingCharacter, false);
             break;
 
         case 0x3A7ADECB:
@@ -283,7 +277,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
                 Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
                 if (IsDesireActive(pDesire))
                 {
-                    ((DesireSuperPower*)pDesire)->fn_800CAB18();
+                    ((DesireSuperPower*)pDesire)->EmitHeavenlyLight();
                 }
             }
             break;
@@ -1991,7 +1985,7 @@ void EmitLightning(const char* szEffectName, nlVector3 v3Position, bool bStrong)
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801BDDE0(bool bParam)
+void KillLightning(bool bReallyKill)
 {
 }
 
@@ -2056,12 +2050,12 @@ const char* GetCharacterEffectsName(cCharacter* pCharacter)
     return pCharacter->m_szEffectsName;
 }
 
-extern "C" void fn_801BE0A4(cCharacter* pCharacter, bool bValue)
+void SetCharacterPacketAVisible(cCharacter* pCharacter, bool bValue)
 {
     *(bool*)((char*)pCharacter + 0x181) = bValue;
 }
 
-extern "C" void fn_801BE0AC(cCharacter* pCharacter, bool bValue)
+void SetCharacterPacketBVisible(cCharacter* pCharacter, bool bValue)
 {
     *(bool*)((char*)pCharacter + 0x182) = bValue;
 }
@@ -2105,7 +2099,7 @@ void SetBallVisible(cBall* pBall, bool bVisible)
 
 bool IsDesireActive(Desire* pDesire)
 {
-    return pDesire->UnidentifiedIsActive();
+    return pDesire->IsActive();
 }
 
 int GetFielderActionState(cFielder* pFielder)

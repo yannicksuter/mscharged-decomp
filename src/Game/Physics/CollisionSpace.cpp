@@ -2,13 +2,6 @@
 
 #include "Game/Physics/PhysicsObject.h"
 
-class SimpleCollisionSpace : public CollisionSpace
-{
-public:
-    SimpleCollisionSpace(PhysicsWorld*, bool);
-    virtual ~SimpleCollisionSpace() { }
-};
-
 CollisionSpace::~CollisionSpace()
 {
     dSpaceDestroy(m_spaceID);

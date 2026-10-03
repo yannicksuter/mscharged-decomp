@@ -18,9 +18,9 @@ static unsigned short sDesireSlideAttackType = 0xFFFF;
 /**
  * Offset/Address/Size: 0x0 | 0x800C7DDC | size: 0xB8
  */
-bool DesireSlideAttack::UnidentifiedInitialize(void* context)
+bool DesireSlideAttack::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     UserControlledT(m_pFielder->m_pTeam);
 
     UnidentifiedVariantCollection* params
@@ -81,7 +81,7 @@ void DesireSlideAttack::Update(
     }
     case 1:
     {
-        mUnidentified078 = 5.0f;
+        mMaxDuration = 5.0f;
         if (pFielder->mUnidentified1E4.m_tSlideAttackTimer.m_uPackedTime != 0)
         {
             if (!pFielder->bAttackSucceeded)
@@ -129,7 +129,7 @@ void DesireSlideAttack::Update(
 /**
  * Offset/Address/Size: 0x6F0 | 0x800C84CC | size: 0x4
  */
-void DesireSlideAttack::UnidentifiedCleanup()
+void DesireSlideAttack::Cleanup()
 {
 }
 

@@ -11,6 +11,7 @@
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlSlotPool.h"
 #include "Game/Physics/PhysicsShockwave.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 #include "types.h"
@@ -20,8 +21,6 @@ class cFielder;
 class EffectsGroup;
 
 
-extern SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool;
-extern "C" void QueueCollisionShockwave(CollisionShockwaveData*);
 
 static const float sInitialShockwaveRadius = 0.5f;
 static const float sShockwaveRadiusOvershoot = 0.01f;

@@ -42,8 +42,8 @@ public:
     DesireSteering();
     virtual ~DesireSteering();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -95,8 +95,8 @@ public:
     }
 
     virtual ~UnidentifiedDesire35();
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
 };
 

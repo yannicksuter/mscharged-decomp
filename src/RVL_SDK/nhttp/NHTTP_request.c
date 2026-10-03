@@ -12,15 +12,6 @@ s32 NHTTPi_strnicmp(const char* left, const char* right, s32 size);
 s32 NHTTPi_strToHex(const char* string, s32 length);
 s32 NHTTPi_strtonum(const char* string, s32 length);
 
-NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(void* systemInfo);
-NHTTPListInfo* NHTTPi_GetListInfoP(void* systemInfo);
-NHTTPReqInfo* NHTTPi_GetReqInfoP(void* systemInfo);
-void* NHTTPi_GetMutexInfoP(void* systemInfo);
-void* NHTTPi_GetThreadInfoP(void* systemInfo);
-NHTTPConnectionInfo* NHTTPi_Request2Connection(void* mutexInfo,
-    NHTTPRequestInfo* request);
-void NHTTPi_lockReqList(void* mutexInfo);
-void NHTTPi_unlockReqList(void* mutexInfo);
 s32 NHTTPi_setReqQueue(NHTTPListInfo* listInfo, NHTTPRequestInfo* request);
 void NHTTPi_kickCommThread(void* threadInfo);
 void NHTTPi_SocCancel(void* mutexInfo, NHTTPRequestInfo* request, s32 socket);

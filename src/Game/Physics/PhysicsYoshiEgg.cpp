@@ -66,7 +66,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             }
 
             eventData = 0;
-            lbl_80570188.Allocate(eventData);
+            g_UnidentifiedEventData34Pool.Allocate(eventData);
             eventData->mUnidentified00 = fielder;
             eventData->mUnidentified04 = player;
             eventData->mUnidentified08 = mYoshiEgg;
@@ -82,7 +82,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         else if (!player->IsOnSameTeam((cPlayer*)character))
         {
             crackData = 0;
-            lbl_80570188.Allocate(crackData);
+            g_UnidentifiedEventData34Pool.Allocate(crackData);
             crackData->mUnidentified00 = (cPlayer*)character;
             crackData->mUnidentified04 = player;
             crackData->mUnidentified08 = mYoshiEgg;
@@ -119,7 +119,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
                 }
 
                 eventData = 0;
-                lbl_80570188.Allocate(eventData);
+                g_UnidentifiedEventData34Pool.Allocate(eventData);
                 eventData->mUnidentified00 = owner;
                 eventData->mUnidentified04 = player;
                 eventData->mUnidentified08 = mYoshiEgg;
@@ -130,7 +130,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             else if (!player->IsOnSameTeam(owner))
             {
                 crackData = 0;
-                lbl_80570188.Allocate(crackData);
+                g_UnidentifiedEventData34Pool.Allocate(crackData);
                 crackData->mUnidentified00 = owner;
                 crackData->mUnidentified04 = player;
                 crackData->mUnidentified08 = mYoshiEgg;
@@ -148,7 +148,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         if (!fn_800167A8(g_pBall))
         {
             eventData = 0;
-            lbl_80570188.Allocate(eventData);
+            g_UnidentifiedEventData34Pool.Allocate(eventData);
             eventData->mUnidentified00 = 0;
             eventData->mUnidentified04 = player;
             eventData->mUnidentified08 = mYoshiEgg;
@@ -169,7 +169,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         if (((PhysicsThwomp*)other)->mThwomp->mState == THWOMP_STATE_FALLING)
         {
             crackData = 0;
-            lbl_80570188.Allocate(crackData);
+            g_UnidentifiedEventData34Pool.Allocate(crackData);
             crackData->mUnidentified00 = 0;
             crackData->mUnidentified04 = mYoshiEgg->mFielder;
             crackData->mUnidentified08 = mYoshiEgg;
@@ -193,7 +193,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         if (patch->GetType() == 1 || patch->GetType() == 8 || patch->GetType() == 9)
         {
             crackData = 0;
-            lbl_80570188.Allocate(crackData);
+            g_UnidentifiedEventData34Pool.Allocate(crackData);
             crackData->mUnidentified00 = 0;
             crackData->mUnidentified04 = mYoshiEgg->mFielder;
             crackData->mUnidentified08 = mYoshiEgg;
@@ -204,7 +204,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         else if (info->mFriction != 0.0f)
         {
             patchData = 0;
-            lbl_80570138.Allocate(patchData);
+            g_UnidentifiedEventData24Pool.Allocate(patchData);
             patchData->mUnidentified0C = mYoshiEgg->mFielder;
             patchData->mUnidentified10 = patch;
             QueueCollisionPatchPlayer(patchData);
@@ -222,7 +222,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         }
 
         crackData = 0;
-        lbl_80570188.Allocate(crackData);
+        g_UnidentifiedEventData34Pool.Allocate(crackData);
         crackData->mUnidentified00 = 0;
         crackData->mUnidentified04 = mYoshiEgg->mFielder;
         crackData->mUnidentified08 = mYoshiEgg;
@@ -235,7 +235,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     case 0x1E:
     {
         crackData = 0;
-        lbl_80570188.Allocate(crackData);
+        g_UnidentifiedEventData34Pool.Allocate(crackData);
         crackData->mUnidentified00 = 0;
         crackData->mUnidentified04 = mYoshiEgg->mFielder;
         crackData->mUnidentified08 = mYoshiEgg;

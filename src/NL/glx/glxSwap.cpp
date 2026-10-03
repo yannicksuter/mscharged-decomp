@@ -4,6 +4,7 @@
 #include "NL/gl/glDrawSyncLog.h"
 #include "NL/glx/glxGX.h"
 #include "NL/MemAlloc.h"
+#include "NL/nlMemory.h"
 #include "NL/nlEndian.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTicker.h"

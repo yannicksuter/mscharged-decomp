@@ -48,6 +48,7 @@ struct fxCurveKey
 class fxAnimatedRange
 {
 public:
+    static fxAnimatedRange* LoadFromChunk(nlChunk* chunk);
     float Evaluate(float value) const;
     float GetMaximum() const;
 

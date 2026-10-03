@@ -59,6 +59,28 @@ public:
     Config* mConfig;
 };
 
+SkillTweak::SkillTweak(const char* sNameInFile)
+{
+    mOverride = -9999.9f;
+    mModifier = 0;
+    mpSkillTweaks = 0;
+    mHash = nlStringLowerHash(sNameInFile);
+    nlStrNCpy(mNameInFile, sNameInFile, sizeof(mNameInFile));
+    mOwnsCurve = false;
+    mpCurvePoints = 0;
+}
+
+SkillTweak::~SkillTweak()
+{
+    if (mOwnsCurve)
+        delete[] mpCurvePoints;
+}
+
+void SkillTweak::FormatOverrideName(char* name) const
+{
+    nlSNPrintf(name, 0x3F, "Override/%s", mNameInFile);
+}
+
 void SkillTweak::ParseCurve(const char* text, int length)
 {
     char* buffer;
@@ -123,12 +145,57 @@ void SkillTweak::ParseCurve(const char* text, int length)
     mCurve.mCount = count;
 }
 
+void SkillTweak::Load(Config* curves, Config* modifiers)
+{
+    mOverride = -9999.9f;
+    Config::String text = curves->Get<Config::String>(mNameInFile, Config::String("0.12345"));
+    ParseCurve(text.c_str(), text.size());
+    LoadModifier(modifiers);
+}
+
+void SkillTweak::LoadModifier(Config* modifiers)
+{
+    if (modifiers->Exists(mNameInFile))
+    {
+        const char* name = modifiers->Get<const char*>(mNameInFile, "None");
+        unsigned long hash = nlStringLowerHash(name);
+        SkillTweakModifier* modifier = sSkillTweakModifiers.m_pStart;
+        unsigned long id;
+        while (modifier != 0)
+        {
+            if (hash == modifier->mHash)
+            {
+                id = modifier->mModifier;
+                goto modifier_done;
+            }
+            modifier = modifier->next;
+        }
+        id = 0;
+    modifier_done:
+        mModifier = id;
+    }
+}
+
+void SkillTweak::LoadOverride(Config* config)
+{
+    char name[0x40];
+    FormatOverrideName(name);
+    mOverride = -9999.9f;
+    if (config->Exists(name))
+        mOverride = config->Get<float>(name, -9999.9f);
+}
+
+void SkillTweak::Evaluate(float x, float& value) const
+{
+    mCurve.Evaluate(x, value);
+}
+
 float SkillTweak::GetValue() const
 {
     if (mpCurvePoints == 0)
         return mOverride;
     float result;
-    mCurve.Evaluate(0.5f, result);
+    Evaluate(0.5f, result);
     if (mOverride != -9999.9f)
     {
         result = mOverride;
@@ -158,7 +225,7 @@ float SkillTweak::GetValue() const
                 x = weightedSkill / totalWeight;
             x = x >= 0.0f ? x : 0.0f;
             x = x <= 1.0f ? x : 1.0f;
-            mCurve.Evaluate(x, result);
+            Evaluate(x, result);
         }
     }
     return result;
@@ -316,34 +383,22 @@ SkillTweakLoader::SkillTweakLoader(Config* curves, Config* modifiers)
 {
 }
 
+static inline void LoadSkillTweakValues(SkillTweak* tweak, Config* curves, Config* modifiers)
+{
+    tweak->Load(curves, modifiers);
+}
+
+static inline void LoadSkillTweak(SkillTweakLoader* loader, SkillTweak** value)
+{
+    Config* modifiers = loader->mModifiers;
+    Config* curves = loader->mCurves;
+    SkillTweak* tweak = *value;
+    LoadSkillTweakValues(tweak, curves, modifiers);
+}
+
 void SkillTweakLoader::Load(const unsigned long& key, SkillTweak** value)
 {
-    SkillTweak* tweak;
-    Config* modifiers = mModifiers;
-    Config* curves = mCurves;
-    tweak = *value;
-    tweak->mOverride = -9999.9f;
-    Config::String text = curves->Get<Config::String>(tweak->mNameInFile, Config::String("0.12345"));
-    tweak->ParseCurve(text.c_str(), text.size());
-    if (modifiers->Exists(tweak->mNameInFile))
-    {
-        const char* name = modifiers->Get<const char*>(tweak->mNameInFile, "None");
-        unsigned long hash = nlStringLowerHash(name);
-        SkillTweakModifier* modifier = sSkillTweakModifiers.m_pStart;
-        unsigned long id;
-        while (modifier != 0)
-        {
-            if (hash == modifier->mHash)
-            {
-                id = modifier->mModifier;
-                goto modifier_done;
-            }
-            modifier = modifier->next;
-        }
-        id = 0;
-    modifier_done:
-        tweak->mModifier = id;
-    }
+    LoadSkillTweak(this, value);
 }
 
 void SkillTweaks::Init(int difficulty, bool blend, bool reload)
@@ -408,10 +463,7 @@ void SkillTweakCopier::Copy(const unsigned long& key, SkillTweak** value)
 {
     SkillTweak* tweak;
     unsigned long hash = (*value)->mHash;
-    SkillTweak** foundValue;
-    bool found = mTweaks->mSkillTweaksList.FindGet(hash, &foundValue);
-    if (found)
-        tweak = *foundValue;
+    bool found = mTweaks->mSkillTweaksList.FindGet(hash, tweak);
     if (found)
     {
         *tweak = **value;
@@ -419,15 +471,13 @@ void SkillTweakCopier::Copy(const unsigned long& key, SkillTweak** value)
         tweak->mOwnsCurve = false;
         // The release path discards this rating before loading the override.
         mTweaks->GetSkillRating(tweak->mModifier);
-        {
-            char name[0x40];
-            Config* cfg = mConfig;
-            nlSNPrintf(name, 0x3F, "Override/%s", tweak->mNameInFile);
-            tweak->mOverride = -9999.9f;
-            if (cfg->Exists(name))
-                tweak->mOverride = cfg->Get<float>(name, -9999.9f);
-        }
+        tweak->LoadOverride(mConfig);
     }
+}
+
+static inline bool FindDefaultSkillTweak(const unsigned long& hash, SkillTweak** tweak)
+{
+    return sDefaultSkillTweaks.FindGet(hash, *tweak);
 }
 
 SkillTweak* SkillTweaks::AddTweak(const char* name)
@@ -442,9 +492,7 @@ SkillTweak* SkillTweaks::AddTweak(const char* name)
     else
     {
         unsigned long hash = nlStringLowerHash(name);
-        SkillTweak** found;
-        if (sDefaultSkillTweaks.FindGet(hash, &found))
-            defaultTweak = *found;
+        FindDefaultSkillTweak(hash, &defaultTweak);
     }
     if (defaultTweak != 0)
     {
@@ -497,12 +545,7 @@ bool SkillTweaks::GetSkillValue(
 
     bool found = false;
     SkillTweak* pSkillTweak;
-    SkillTweak** ppSkillTweak;
-    bool tweakFound = mSkillTweaksList.FindGet(param1, &ppSkillTweak);
-    if (tweakFound)
-    {
-        pSkillTweak = *ppSkillTweak;
-    }
+    bool tweakFound = mSkillTweaksList.FindGet(param1, pSkillTweak);
     if (tweakFound)
     {
         *param2 = pSkillTweak->GetValue();

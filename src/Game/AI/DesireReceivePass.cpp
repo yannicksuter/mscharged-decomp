@@ -152,12 +152,6 @@ static TweakFloatBinding lbl_8056DAE8("sfSpeedAdjustChargeLevelMax",
     "Game/Gameplay/Charging/Pass", &lbl_806DC1F0, true);
 
 
-static inline float GetNormalizedContactTime(
-    const cSAnim* anim, float contactFrame)
-{
-    return contactFrame / (float)anim->m_nNumKeys;
-}
-
 static inline float DoCalculatePassSpeed(const nlVector2& distance,
     float passSpeedMin, float passSpeedMax,
     float passDistMin, float passDistMax)
@@ -192,9 +186,9 @@ DesireReceivePass::DesireReceivePass()
     mEstimated.Reset();
 }
 
-bool DesireReceivePass::UnidentifiedInitialize(void* context)
+bool DesireReceivePass::Initialize(void* context)
 {
-    Desire::UnidentifiedInitialize(context);
+    Desire::Initialize(context);
 
     DesireSteering* desire = (DesireSteering*)fn_8002E08C(
         m_pFielder, 34);
@@ -256,7 +250,7 @@ bool DesireReceivePass::UnidentifiedInitialize(void* context)
     if (result)
     {
         m_pFielder->SetNoPickUpTime(lbl_806DC190);
-        mUnidentified078 = lbl_806DC190;
+        mMaxDuration = lbl_806DC190;
     }
     return result;
 }
@@ -307,7 +301,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
 
     mvDesiredPosition = mEstimated.v3AnimStartPos;
     fn_800C0704();
-    if (fn_800C2F28()->fn_800C2F20() != this)
+    if (GetScriptMachine()->fn_800C2F20() != this)
     {
         *update = 1;
         return;
@@ -533,7 +527,7 @@ inline bool DesireReceivePass::UnidentifiedCanOneTouch()
         || m_pFielder->fn_8003E84C();
     if ((bSpecialReceive && m_pFielder->m_pBall != 0)
         || (fPassProgress < lbl_806DC1B4
-            && mUnidentifiedTimer.GetSeconds() < lbl_806DC1B8)
+            && mAgeTimer.GetSeconds() < lbl_806DC1B8)
         || (meDesireSubState == 4 && (mbOneTouchShot || mbOneTouchPass)))
     {
         return false;
@@ -587,7 +581,7 @@ void DesireReceivePass::fn_800C0704()
             {
                 m_pFielder->InitActionSlideAttack(
                     0, -1.0f, aDirection);
-                fn_80316968(this);
+                RequestStateMachineDeactivation(this);
             }
         }
     }
@@ -705,7 +699,7 @@ void DesireReceivePass::fn_800C0AE8(bool bVolleyPass, cPlayer* pPassTarget)
     meReceiveAnimType = eReceiveAnimType;
 }
 
-void DesireReceivePass::UnidentifiedCleanup()
+void DesireReceivePass::Cleanup()
 {
     if (m_pFielder->m_pBall == 0)
     {
@@ -775,7 +769,7 @@ void DesireReceivePass::fn_800C0F14()
     float fDuration = 0.5f + g_pBall->m_tPassTargetTimer.GetSeconds();
     const TransitionFunc& transition =
         !mOverrideTransition.IsUnset() ? mOverrideTransition : mDefaultTransition;
-    AIContext* input = mUnidentified018->mAIContext;
+    AIContext* input = mScriptMachine->mAIContext;
     input->SetTimer(input->GetTimerKey(transition.mFuncHash, 1), fDuration);
 }
 
@@ -1674,10 +1668,10 @@ extern "C" UnidentifiedVariant_80054AB8 fn_800C3448(
     cPlayer* pPlayer, cPlayer* pTarget)
 {
     unsigned int localHash = functionHash;
+    FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(pInterpreter);
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
-        static_cast<FuzzyRuntimeBase*>(pInterpreter),
-        pInterpreter->FindFunctionEntryPoint(localHash),
-        2, pPlayer, pTarget));
+        runtime, runtime->FindFunctionEntryPoint(localHash),
+        2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
 }
 
 DesireReceivePass::~DesireReceivePass()

@@ -1,23 +1,12 @@
 #include <private/nhttp.h>
 
-void* NHTTPi_GetSystemInfoP(void);
-NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(void* systemInfo);
-void* NHTTPi_GetMutexInfoP(void* systemInfo);
 void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* buffer);
 void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
 NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
     s32 method, void* buffer, u32 bufferSize, void* userParam,
     NHTTPResponseCallback responseCallback, NHTTPResponseCleanup cleanup);
-s32 NHTTPi_CommitConnectionList(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-void NHTTPi_SetVirtualContentLength(NHTTPConnectionInfo* connection,
-    u32 length);
-NHTTPConnectionInfo* NHTTPi_GetConnection(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
 s32 NHTTP_SendRequestAsync(void* systemInfo, NHTTPRequestInfo* request);
-NHTTPResponseInfo* NHTTPi_Connection2Response(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
 
 NHTTPConnectionInfo* NHTTPCreateConnection(const char* url_p, s32 method,
     void* buf_p, u32 len, NHTTPConnectionCallback callback,
@@ -46,8 +35,8 @@ NHTTPConnectionInfo* NHTTPCreateConnection(const char* url_p, s32 method,
     connection_p->response = connection_p->request->response;
     connection_p->started = FALSE;
     connection_p->callback = callback;
-    connection_p->_unk40 = 0;
-    connection_p->_unk44 = 0;
+    connection_p->postSendBuf = 0;
+    connection_p->postSendSize = 0;
     connection_p->requestId = -1;
     NHTTPi_CommitConnectionList(mutexInfo_p, connection_p);
     connection_p->state = NHTTP_ERROR_BUSY;

@@ -3,7 +3,7 @@
 #include "NL/nlSmallBlockAllocator.h"
 
 template <int BlockSize>
-class UnidentifiedFunctionMemoryPool : public UnidentifiedSlotPoolFixedState<BlockSize>
+class UnidentifiedFunctionMemoryPool : public SlotPoolFixedState<BlockSize>
 {
 public:
     UnidentifiedFunctionMemoryPool(const int initial, const int delta)

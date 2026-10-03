@@ -24,6 +24,9 @@ class WorldVisibilityDrawable : public WorldObject
 {
 public:
     virtual ~WorldVisibilityDrawable();
+    virtual void ReleaseResources();
+    virtual nlMatrix4* GetWorldMatrix();
+    virtual void SetWorldMatrix(const nlMatrix4& transform);
     virtual void Draw();
     virtual bool IsVisible();
 
@@ -69,7 +72,6 @@ WorldVisibilityNode* FindWorldVisibilityNode(WorldVisibilityDrawable* pDrawable,
     WorldVisibilityNode* pNode);
 void InitializeWorldPhysicsDrawable(WorldPhysicsDrawable* pDrawable,
     WorldObjectLoadContext* pContext);
-void ReleaseWorldPhysicsDrawableResources(WorldPhysicsDrawable* pDrawable);
 
 typedef char WorldDrawable_size_check[
     sizeof(WorldDrawable) == 0x70 ? 1 : -1];

@@ -14,8 +14,8 @@ public:
     DesireReceivePass();
     virtual ~DesireReceivePass();
 
-    virtual bool UnidentifiedInitialize(void*);
-    virtual void UnidentifiedCleanup();
+    virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
@@ -31,9 +31,9 @@ public:
     bool CalcExactEstimates(bool);
     bool StartPickupAnimation();
 
-    bool UnidentifiedIsActive() const
+    bool IsActive() const
     {
-        return mUnidentifiedActive;
+        return mActive;
     }
 
     bool IsOneTouchShot() const

@@ -12,6 +12,13 @@ extern "C" inline bool fn_800D1C34(const cFielder* fielder)
     return fielder->mUnidentified3DC;
 }
 
+static inline float GetNormalizedContactTime(
+    const cSAnim* anim, float contactFrame)
+{
+    float numKeys = anim->m_nNumKeys;
+    return contactFrame / numKeys;
+}
+
 inline void cFielder::GetReceivePassBallContactOffset(nlVector3& v3Offset,
     unsigned short aFacingDirection, const LooseBallContactAnimInfo* pBestBallContactAnimInfo)
 {
@@ -19,7 +26,7 @@ inline void cFielder::GetReceivePassBallContactOffset(nlVector3& v3Offset,
     float fAnimContactFrame = pBestBallContactAnimInfo->fAnimContactFrame;
     const cSAnim* guessContactAnim = m_pAnimInventory->GetAnim(pBestBallContactAnimInfo->nAnimID);
     GetJointPositionFuture(&v3ContactOffsetLocal, pBestBallContactAnimInfo->nAnimID,
-        m_nBallJointIndex, fAnimContactFrame / (float)guessContactAnim->m_nNumKeys,
+        m_nBallJointIndex, GetNormalizedContactTime(guessContactAnim, fAnimContactFrame),
         true, true, false, true);
     nlVec2Rotate(*(nlVector2*)&v3Offset,
         *(const nlVector2*)&v3ContactOffsetLocal, aFacingDirection);

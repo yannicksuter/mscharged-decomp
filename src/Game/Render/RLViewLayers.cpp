@@ -318,7 +318,7 @@ static RLViewLayerDesc sTransitions3DLayers[] = {
     { eCLV_Transitions3D, "eCLV_Transitions3D", true, GLViewSort_Texture },
 };
 
-extern "C" RLView* fn_8027261C()
+RLView* GetShadowedView()
 {
     return sLayerViews[eCLV_Shadowed];
 }
@@ -598,7 +598,7 @@ void HideLayerView(eCLV layer)
     sLayerViews[layer]->m_Visible = false;
 }
 
-extern "C" void fn_80273A4C(eCLV layer, const glModel* model, unsigned long key)
+void AttachModelToLayerView(eCLV layer, const glModel* model, unsigned long sortKey)
 {
     RLView* view;
     if (layer < eCLV_Num)
@@ -615,11 +615,11 @@ extern "C" void fn_80273A4C(eCLV layer, const glModel* model, unsigned long key)
         glModelPacket* packet = &model->packets[i];
         if (glGetRasterState(packet->rasterState, GLS_AlphaBlend) == 0)
         {
-            view->AttachPacket(packet, key);
+            view->AttachPacket(packet, sortKey);
         }
         else
         {
-            view->AttachPacket(packet, key + 1);
+            view->AttachPacket(packet, sortKey + 1);
         }
     }
 }

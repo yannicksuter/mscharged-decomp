@@ -14,6 +14,7 @@
 #include "Game/EventRegistry.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
+#include "Game/MathHelpers.h"
 #include "Game/Physics/PhysicsObject.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBanana.h"
@@ -177,8 +178,7 @@ void CrowdRiot::fn_80029320()
             velocity.y *= AIsgn(generator->v2Location.y);
             velocity.z = 0.0f;
             mv3Velocity = velocity;
-            maDesiredFacingDirection = (u16)(s32)(10430.378f
-                                                  * nlATan2f(velocity.y, velocity.x));
+            maDesiredFacingDirection = nlVector3ToAngle(velocity);
         }
     }
 }
@@ -387,7 +387,7 @@ void fn_80029B9C(void* param)
             }
             else
             {
-                static_cast<Goalie*>(player)->fn_8007EB90();
+                static_cast<Goalie*>(player)->FumbleBall();
             }
         }
         else

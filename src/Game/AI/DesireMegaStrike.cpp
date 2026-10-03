@@ -32,9 +32,9 @@ static unsigned short sDesireMegaStrikeType = 0xFFFF;
 /**
  * Offset/Address/Size: 0x0 | 0x800B93C4 | size: 0x384
  */
-bool DesireMegaStrike::UnidentifiedInitialize(void* context)
+bool DesireMegaStrike::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
     DetInput* pGlobalPad = m_pFielder->GetGlobalPad();
     if (pGlobalPad != 0)
     {
@@ -136,7 +136,7 @@ bool DesireMegaStrike::UnidentifiedInitialize(void* context)
 
     m_pFielder->InitActionMegaStrikeMeter(true);
     fn_8002E340(m_pFielder);
-    mUnidentified078 = lbl_806DC118;
+    mMaxDuration = lbl_806DC118;
 
     if (lbl_806E0E31 || GameInfoManager::Instance()->IsRule0x8Equal2())
     {
@@ -231,7 +231,7 @@ bool DesireMegaStrike::fn_800B9D84(
     if (update->mData.i == 3)
     {
         *update = 0;
-        if (mUnidentifiedTimer.GetSeconds() >= mUnidentifiedB0
+        if (mAgeTimer.GetSeconds() >= mUnidentifiedB0
             && mUnidentifiedB4 < 1)
         {
             mUnidentifiedB4 = 1;
@@ -239,8 +239,8 @@ bool DesireMegaStrike::fn_800B9D84(
         }
     }
 
-    mUnidentified01C.Set(0, FuzzyVariant(FT_INT, mUnidentifiedB4));
-    mUnidentified01C.Set(1, FuzzyVariant(fMeterPosition));
+    mParameters.Set(0, FuzzyVariant(FT_INT, mUnidentifiedB4));
+    mParameters.Set(1, FuzzyVariant(fMeterPosition));
 
     if (bButtonPressed)
     {
@@ -336,7 +336,7 @@ bool DesireMegaStrike::fn_800B9D84(
 /**
  * Offset/Address/Size: 0xFA0 | 0x800BA364 | size: 0x38
  */
-void DesireMegaStrike::UnidentifiedCleanup()
+void DesireMegaStrike::Cleanup()
 {
     fn_8005FA2C(g_pGame);
     fn_8003A0E4(m_pFielder);

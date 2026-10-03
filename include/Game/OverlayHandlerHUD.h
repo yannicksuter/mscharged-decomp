@@ -10,35 +10,35 @@ class TLComponentInstance;
 class TLImageInstance;
 class TLTextInstance;
 
-struct UnidentifiedHUD_801EB108
+struct HUDCaptainMeter
 {
-    UnidentifiedHUD_801EB108()
+    HUDCaptainMeter()
     {
         for (int i = 0; i < 2; i++)
         {
-            mUnidentified00[i] = 0;
-            mUnidentified18[i] = 0.0f;
-            mUnidentified28[i] = false;
+            m_pMeter[i] = 0;
+            mMeterFullScale[i] = 0.0f;
+            mMeterShown[i] = false;
         }
     }
 
-    void fn_801EAF50(float fDeltaT);
-    void fn_801EB108(FEPresentation* presentation);
+    void Update(float fDeltaT);
+    void Init(FEPresentation* presentation);
 
-    /* 0x00 */ TLComponentInstance* mUnidentified00[2];
-    /* 0x08 */ TLComponentInstance* mUnidentified08[2];
-    /* 0x10 */ TLImageInstance* mUnidentified10[2];
-    /* 0x18 */ float mUnidentified18[2];
-    /* 0x20 */ TLComponentInstance* mUnidentified20[2];
-    /* 0x28 */ bool mUnidentified28[2];
+    /* 0x00 */ TLComponentInstance* m_pMeter[2];
+    /* 0x08 */ TLComponentInstance* m_pPowerBarContainer[2];
+    /* 0x10 */ TLImageInstance* m_pMeterFill[2];
+    /* 0x18 */ float mMeterFullScale[2];
+    /* 0x20 */ TLComponentInstance* m_pPowerUpPad[2];
+    /* 0x28 */ bool mMeterShown[2];
 };
 
-struct UnidentifiedHUD_801E8CD0
+struct HUDPowerUpTextures
 {
-    void fn_801E8CD0(FEPresentation* presentation);
+    void LoadHUDTextures(FEPresentation* presentation);
 
     /* 0x00 */ FETextureResource* m_pStar;
-    /* 0x04 */ FETextureResource* mUnidentified04;
+    /* 0x04 */ FETextureResource* m_pMega;
     /* 0x08 */ FETextureResource* m_pShellGreen;
     /* 0x0C */ FETextureResource* m_pShellRed;
     /* 0x10 */ FETextureResource* m_pBanana;
@@ -47,12 +47,12 @@ struct UnidentifiedHUD_801E8CD0
     /* 0x1C */ FETextureResource* m_pBobomb;
     /* 0x20 */ FETextureResource* m_pShellSpike;
     /* 0x24 */ FETextureResource* m_pChomp;
-    /* 0x28 */ FETextureResource* mUnidentified28[12];
+    /* 0x28 */ FETextureResource* m_pCaptainAbility[12];
 };
 
-struct UnidentifiedHUD_801E9198
+struct HUDPowerUpDisplay
 {
-    UnidentifiedHUD_801E9198()
+    HUDPowerUpDisplay()
     {
         for (int i = 0; i < 2; i++)
         {
@@ -61,36 +61,36 @@ struct UnidentifiedHUD_801E9198
                 mNumFlareCycles[i][j] = -1;
                 m_pImagePowerUps[0][i][j] = 0;
                 m_pImagePowerUps[1][i][j] = 0;
-                mUnidentified20[i][j] = 0;
+                m_pImageFlares[i][j] = 0;
                 m_pComponentFlares[i][j] = 0;
                 m_pPowerupTextComponents[i][j] = 0;
-                mUnidentified60[i][j] = 0;
+                m_pPowerUpComponents[i][j] = 0;
             }
-            mUnidentified88[i] = false;
-            mUnidentified8A[i] = false;
+            mHasPowerUps[i] = false;
+            mHasTwoPowerUps[i] = false;
         }
-        mUnidentified8C = 0;
+        m_pPowerUpTextures = 0;
     }
 
-    void fn_801E9198(float fDeltaT);
-    void fn_801EB5CC(FEPresentation* presentation, UnidentifiedHUD_801E8CD0* textures);
+    void DisplayPowerUps(float fDeltaT);
+    void Init(FEPresentation* presentation, HUDPowerUpTextures* textures);
 
     /* 0x00 */ TLImageInstance* m_pImagePowerUps[2][2][2];
-    /* 0x20 */ TLImageInstance* mUnidentified20[2][2];
+    /* 0x20 */ TLImageInstance* m_pImageFlares[2][2];
     /* 0x30 */ TLComponentInstance* m_pComponentFlares[2][2];
     /* 0x40 */ TLComponentInstance* m_pPowerupTextComponents[2][2];
-    /* 0x50 */ TLComponentInstance* mUnidentified50[2][2];
-    /* 0x60 */ TLComponentInstance* mUnidentified60[2][2];
-    /* 0x70 */ TLComponentInstance* mUnidentified70[2];
+    /* 0x50 */ TLComponentInstance* m_pPowerUpPads[2][2];
+    /* 0x60 */ TLComponentInstance* m_pPowerUpComponents[2][2];
+    /* 0x70 */ TLComponentInstance* m_pBlinkers[2];
     /* 0x78 */ int mNumFlareCycles[2][2];
-    /* 0x88 */ bool mUnidentified88[2];
-    /* 0x8A */ bool mUnidentified8A[2];
-    /* 0x8C */ UnidentifiedHUD_801E8CD0* mUnidentified8C;
+    /* 0x88 */ bool mHasPowerUps[2];
+    /* 0x8A */ bool mHasTwoPowerUps[2];
+    /* 0x8C */ HUDPowerUpTextures* m_pPowerUpTextures;
 };
 
-struct UnidentifiedHUD_801E9AF0
+struct HUDClock
 {
-    UnidentifiedHUD_801E9AF0()
+    HUDClock()
     {
         mSeconds = -1;
         mMinutes = -1;
@@ -99,8 +99,8 @@ struct UnidentifiedHUD_801E9AF0
         mOvertimeSFXPlayed = false;
     }
 
-    void fn_801E9AF0(FEPresentation* presentation);
-    void fn_801E9FEC(float fDeltaT);
+    void Init(FEPresentation* presentation);
+    void Update(float fDeltaT);
 
     /* 0x00 */ unsigned long mSeconds;
     /* 0x04 */ unsigned long mMinutes;
@@ -111,12 +111,12 @@ struct UnidentifiedHUD_801E9AF0
     /* 0x55 */ bool mOvertimeSFXPlayed;
     /* 0x56 */ nlColour mOriginalClockColour;
     /* 0x5C */ TLComponentInstance* mSuddenDeath[2];
-    /* 0x64 */ TLTextInstance* mUnidentified64;
+    /* 0x64 */ TLTextInstance* m_pTextInstanceGameType;
 };
 
-struct UnidentifiedHUD_801E99F0
+struct HUDScoreDisplay
 {
-    UnidentifiedHUD_801E99F0()
+    HUDScoreDisplay()
     {
         for (int i = 0; i < 2; i++)
         {
@@ -130,9 +130,9 @@ struct UnidentifiedHUD_801E99F0
         }
     }
 
-    void fn_801E99F0();
-    void fn_801EA808(FEPresentation* presentation);
-    void fn_801EAD2C(float fDeltaT);
+    void ResetScores();
+    void Init(FEPresentation* presentation);
+    void Update(float fDeltaT);
 
     /* 0x00 */ int mScore[2];
     /* 0x08 */ int mNewScore[2];
@@ -159,12 +159,12 @@ public:
     void SwapPowerUps(int homeAway);
     void SetTeamIcons();
 
-    /* 0x028 */ UnidentifiedHUD_801EB108 mUnidentified028;
-    /* 0x054 */ UnidentifiedHUD_801E8CD0 mUnidentified054;
-    /* 0x0AC */ UnidentifiedHUD_801E9198 mUnidentified0AC;
+    /* 0x028 */ HUDCaptainMeter mCaptainMeter;
+    /* 0x054 */ HUDPowerUpTextures mPowerUpTextures;
+    /* 0x0AC */ HUDPowerUpDisplay mPowerUpDisplay;
     /* 0x13C */ unsigned char mUnidentified13C[4];
-    /* 0x140 */ UnidentifiedHUD_801E9AF0 mUnidentified140;
-    /* 0x1A8 */ UnidentifiedHUD_801E99F0 mUnidentified1A8;
+    /* 0x140 */ HUDClock mClock;
+    /* 0x1A8 */ HUDScoreDisplay mScoreDisplay;
     /* 0x258 */ AsyncImage* mAsyncImage[2];
 };
 

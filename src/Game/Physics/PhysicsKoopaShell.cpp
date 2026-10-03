@@ -170,7 +170,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
             QueueCollisionKoopaShellEnd(endData);
 
             UnidentifiedEventData34* crackData = 0;
-            lbl_80570188.Allocate(crackData);
+            g_UnidentifiedEventData34Pool.Allocate(crackData);
             crackData->mUnidentified00 = 0;
             crackData->mUnidentified04 = egg->mFielder;
             crackData->mUnidentified08 = egg;

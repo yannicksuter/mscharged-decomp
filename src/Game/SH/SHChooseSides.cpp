@@ -894,14 +894,14 @@ void SHChooseSides2::OnHelpPointerPress(unsigned int, void*)
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
-        popup->mUnidentified9A1 = true;
+        popup->mAllPointersActive = true;
     }
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
-        popup->mUnidentified9A1 = true;
+        popup->mAllPointersActive = true;
     }
 
     mHelpPressed = true;
@@ -1061,7 +1061,7 @@ bool SHChooseSides2::RemoveDisconnectedControllers(bool playSound)
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
             (SceneList)10, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3C, Function<FnVoidVoid>(FEPopupMenu::Nothing));
-        popup->mUnidentified9A1 = true;
+        popup->mAllPointersActive = true;
     }
     return removedController;
 }

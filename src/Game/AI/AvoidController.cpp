@@ -260,7 +260,7 @@ extern "C" float fn_8000F558(
     return controller->mUnidentified094[GetAvoidableIndex(things)];
 }
 
-extern "C" void fn_8000F594(AvoidableObject* pObject)
+extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
 {
     if (pObject->mType == AVOID_FIELDERS || pObject->mType == AVOID_GOALIES)
     {
@@ -288,7 +288,7 @@ extern "C" void fn_8000F594(AvoidableObject* pObject)
                 --controller->mUnidentified198;
                 AvoidableObject* object = value->mUnidentified008;
                 value = value->next;
-                tree.Remove(object->mUnidentified008);
+                tree.Remove(object->mId);
             }
         }
     }
@@ -339,23 +339,23 @@ void AvoidController::Update(float fDeltaT)
     for (AvoidableObject* pObject = gAvoidableObjects.m_pStart;
          pObject != 0 && mUnidentified198 < 99; pObject = pObject->next)
     {
-        bool bCanAvoid = !mUnidentified174.FindGet((u32)pObject->mUnidentified008, &value);
+        bool bCanAvoid = !mUnidentified174.FindGet((u32)pObject->mId, &value);
         if (bCanAvoid)
             bCanAvoid = UnidentifiedCanAvoid(pObject->mType);
         if (bCanAvoid)
             bCanAvoid = pSelf != pObject;
         if (bCanAvoid)
-            bCanAvoid = pSelf->UnidentifiedVirtual24(pObject) > 0.0f;
+            bCanAvoid = pSelf->GetAvoidanceWeight(pObject) > 0.0f;
         if (bCanAvoid)
-            bCanAvoid = pSelf->UnidentifiedVirtual20(pObject, -1.0f);
+            bCanAvoid = pSelf->IsWithinRange(pObject, -1.0f);
         if (bCanAvoid)
         {
             if (!UnidentifiedCanAvoid(AVOID_SIDELINES)
-                && pObject->mType == AVOID_UNIDENTIFIED_08
-                && ((AvoidablePolygon*)pObject)->mUnidentified014 == 1)
+                && pObject->mType == AVOID_POLYGONS
+                && ((AvoidablePolygon*)pObject)->mPolygonType == 1)
                 continue;
             ++mUnidentified198;
-            value = mUnidentified174.UnidentifiedAddOrGet((u32)pObject->mUnidentified008);
+            value = mUnidentified174.UnidentifiedAddOrGet((u32)pObject->mId);
             value->UnidentifiedInitialize(pSelf, pObject);
             value->Update(fDeltaT);
             float fWeight = value->UnidentifiedGetWeight();
@@ -380,7 +380,7 @@ void AvoidController::Update(float fDeltaT)
         --mUnidentified198;
         AvoidableObject* pObject = entry->mUnidentified008;
         entry = entry->next;
-        mUnidentified174.Remove((u32)pObject->mUnidentified008);
+        mUnidentified174.Remove((u32)pObject->mId);
     }
     list.m_pEnd = 0;
     list.m_pStart = 0;
@@ -393,7 +393,7 @@ void AvoidController::Update(float fDeltaT)
         if (fWeights[i] > 0.0f)
         {
             nlVec3Scale(v3Repulsion, v3Vectors[i], 1.0f / fWeights[i]);
-            float fWeight = (fWeights[i] / nCounts[i]) / sUnidentifiedTweaks[i][0];
+            float fWeight = (fWeights[i] / nCounts[i]) / gAvoidableTweaks[i][0];
             nCount += nCounts[i];
             eAvoidableThings things = (eAvoidableThings)GetAvoidableMask(i);
             m_CurrentlyAvoiding |= things;
@@ -783,7 +783,7 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
 {
     float fUnidentifiedPrevious = mUnidentified018 > 0.0f;
     nlVector3 v3Repulsion = v3Zero;
-    float fWeight = mUnidentified004->UnidentifiedVirtual24(mUnidentified008);
+    float fWeight = mUnidentified004->GetAvoidanceWeight(mUnidentified008);
     if (fWeight == 0.0f)
         mUnidentified018 = 0.0f;
     else
@@ -809,15 +809,15 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
                     break;
                 }
             }
-            case AVOID_UNIDENTIFIED_08:
+            case AVOID_POLYGONS:
             case AVOID_BOWSER:
-            case AVOID_UNIDENTIFIED_20:
-                bUnidentifiedResult = mUnidentified008->UnidentifiedVirtual2C()
+            case AVOID_PATCHES:
+                bUnidentifiedResult = mUnidentified008->IsMobile()
                     ? UnidentifiedResponse_800121D0(context, fDeltaT)
                     : UnidentifiedResponse_800123D8(context, fDeltaT);
                 break;
             }
-            context.mUnidentified00C *= mUnidentified004->UnidentifiedVirtual28(mUnidentified008);
+            context.mUnidentified00C *= mUnidentified004->GetAvoidanceStrength(mUnidentified008);
         }
         if (bUnidentifiedResult && context.mUnidentified00C >= 0.1f)
         {
@@ -853,9 +853,9 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
 void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     UnidentifiedAvoidanceContext& context, float fDeltaT)
 {
-    bool bUnidentifiedOther = mUnidentified008->UnidentifiedVirtual1C(
+    bool bUnidentifiedOther = mUnidentified008->GetClosestBoundaryPoint(
         mUnidentified004->GetPosition(), context.mUnidentified02C, context.mUnidentified044);
-    context.mUnidentified014 = mUnidentified004->UnidentifiedVirtual1C(
+    context.mUnidentified014 = mUnidentified004->GetClosestBoundaryPoint(
         context.mUnidentified02C, context.mUnidentified020, context.mUnidentified038) || bUnidentifiedOther;
     context.mUnidentified018 = nlSqrt(nlVec3DistanceSquared2D(context.mUnidentified020, context.mUnidentified02C), true);
     if (context.mUnidentified014)
@@ -864,7 +864,7 @@ void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
     if (mUnidentified008->mType == AVOID_FIELDERS
         && !((AvoidableFielder*)mUnidentified008)->m_pFielder->IsOnSameTeam(pFielder))
-        context.mUnidentified018 -= mUnidentified008->UnidentifiedVirtual18();
+        context.mUnidentified018 -= mUnidentified008->GetAttackReach();
     context.mUnidentified010 = NormalizeVal(context.mUnidentified018,
         mUnidentified008->mTweaks[2], mUnidentified008->mTweaks[1]);
     context.mUnidentified01C = GetClosingSpeed2D(
@@ -878,11 +878,11 @@ void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     else
         context.mUnidentified054 = v3Zero;
 
-    if (mUnidentified008->mType == AVOID_UNIDENTIFIED_08)
+    if (mUnidentified008->mType == AVOID_POLYGONS)
     {
         AvoidablePolygon* pPolygon = (AvoidablePolygon*)mUnidentified008;
-        if (pPolygon->mUnidentified014 == 2 && pPolygon->mUnidentified064 != 0
-            && !pPolygon->mUnidentified064->IsOnSameTeam(((AvoidableFielder*)mUnidentified004)->m_pFielder))
+        if (pPolygon->mPolygonType == 2 && pPolygon->mOwner != 0
+            && !pPolygon->mOwner->IsOnSameTeam(((AvoidableFielder*)mUnidentified004)->m_pFielder))
             nlVec3Scale(context.mUnidentified044, -1.0f);
     }
 }

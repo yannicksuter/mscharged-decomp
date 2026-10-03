@@ -33,7 +33,7 @@ public:
     /* 0x0A9 */ bool mLoopMovie;
     /* 0x0AA */ bool mPushWithPop;
     /* 0x0AC */ BaseGameSceneManager* mGameSceneManager;
-    /* 0x0B0 */ UnidentifiedEventConnectionOwner mHBMHideConnection;
+    /* 0x0B0 */ EventConnectionOwner mHBMHideConnection;
 }; // size 0xB4
 
 class LessonMoviePlayerScene : public MoviePlayerScene

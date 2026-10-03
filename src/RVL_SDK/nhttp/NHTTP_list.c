@@ -2,10 +2,7 @@
 
 void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* ptr);
-NHTTPConnectionInfo* NHTTPi_Request2Connection(void* mutexInfo,
-    NHTTPRequestInfo* request);
 void NHTTPi_destroyRequestObject(void* mutexInfo, NHTTPRequestInfo* request);
-void NHTTPi_CompleteCallback(void* mutexInfo, NHTTPConnectionInfo* connection);
 NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list);
 
 void NHTTPi_InitListInfo(NHTTPListInfo* info)

@@ -21,14 +21,6 @@ nlDLListSlotPool<BallCacheInfo*> FakeBallWorld::mBallCacheList;
 float FakeBallWorld::mfLastCacheTime = -1.0f;
 nlDLListIterator<BallCacheInfo*>* FakeBallWorld::mpCacheIterator;
 
-
-class SimpleCollisionSpace : public CollisionSpace
-{
-public:
-    SimpleCollisionSpace(PhysicsWorld*, bool);
-    virtual ~SimpleCollisionSpace() { }
-};
-
 void FakeBallWorld::Init(cBall* pBall)
 {
     if (mpPredictWorld == 0)

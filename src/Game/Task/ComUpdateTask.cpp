@@ -7,6 +7,6 @@ void ComUpdateTask::Run(float)
 {
 }
 
-void UnidentifiedPingerUpdateTask::Run(float)
+void PingerUpdateTask::Run(float)
 {
 }

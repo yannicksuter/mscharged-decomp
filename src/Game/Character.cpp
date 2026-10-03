@@ -83,7 +83,7 @@ struct UnidentifiedCharacterObject_8001C158
     u32 mUnidentified00;
 };
 
-extern u16 lbl_806DBD68;
+extern u16 g_headTrackSyncLogType;
 
 struct UnidentifiedCharacterAnimState
 {
@@ -1670,9 +1670,9 @@ inline void UnidentifiedCharacterState_024::SyncLog(void* context, DebugWriteCac
 
 inline void cHeadTrack::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DBD68 == 0xFFFF)
+    if (g_headTrackSyncLogType == 0xFFFF)
     {
-        lbl_806DBD68 = cache->BeginType("HeadTrack");
+        g_headTrackSyncLogType = cache->BeginType("HeadTrack");
         REGISTER_CHARACTER_FIELD(26, *this,
             m_m4HeadMatrix, "m_m4HeadMatrix");
         REGISTER_CHARACTER_FIELD(22, *this,
@@ -1695,8 +1695,8 @@ inline void cHeadTrack::SyncLog(void* context, DebugWriteCache* cache)
             m_fSmoothTime, "mfSmoothTime");
         cache->EndType();
     }
-    cache->ChecksumData(lbl_806DBD68, this, context);
-    cache->WriteData(lbl_806DBD68, this, sizeof(cHeadTrack));
+    cache->ChecksumData(g_headTrackSyncLogType, this, context);
+    cache->WriteData(g_headTrackSyncLogType, this, sizeof(cHeadTrack));
 }
 
 inline void UnidentifiedCharacterAnimState::SyncLog(void* context, DebugWriteCache* cache)

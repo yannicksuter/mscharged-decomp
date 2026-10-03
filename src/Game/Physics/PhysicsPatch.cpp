@@ -36,19 +36,19 @@
 class EffectsGroup;
 
 
-extern "C" void fn_8017472C(void*);
+void HandleResetEffects(void*);
 
-static const nlVector3 lbl_804DCCAC = { -2.0f, 0.0f, -5.0f };
+static const nlVector3 sInactivePatchPosition = { -2.0f, 0.0f, -5.0f };
 
-unsigned short lbl_806DCAB8 = 0xFFFF;
-float lbl_806DCABC = 0.25f;
+unsigned short sPhysicsPatchType = 0xFFFF;
+float gfPatchAirborneHeight = 0.25f;
 
-SlotPool<PhysicsPatch> PhysicsPatch::lbl_805705D0(16, 16);
-PhysicsPatchManager_801740D0* lbl_806E12C8;
+SlotPool<PhysicsPatch> PhysicsPatch::m_PhysicsPatchSlotPool(16, 16);
+PhysicsPatchManager* lbl_806E12C8;
 
-static void fn_8017498C(EmissionController& controller);
+static void UpdatePatchEffect(EmissionController& controller);
 
-inline void PhysicsPatch::UnidentifiedKillEffect()
+inline void PhysicsPatch::KillEffect()
 {
     if (m_Type != -1)
     {
@@ -69,7 +69,7 @@ inline void PhysicsPatch::UnidentifiedKillEffect()
     }
 }
 
-inline void PhysicsPatch::UnidentifiedDestroyEffect()
+inline void PhysicsPatch::DestroyEffect()
 {
     if (m_Type != -1)
     {
@@ -92,8 +92,8 @@ inline void PhysicsPatch::UnidentifiedDestroyEffect()
 
 PhysicsPatch::PhysicsPatch()
     : PhysicsSphere(g_CollisionSpace, 0, 0.5f)
-    , mUnidentified38()
-    , mUnidentified40(0)
+    , m_PathFinishedCallback()
+    , m_PathPoints(0)
     , m_Type(-1)
     , m_bVisible(false)
     , m_Gravity(0.0f)
@@ -113,13 +113,13 @@ PhysicsPatch::PhysicsPatch()
 
 PhysicsPatch::~PhysicsPatch()
 {
-    if (mUnidentified44 != 0)
+    if (m_pAvoidable != 0)
     {
-        delete mUnidentified44;
+        delete m_pAvoidable;
     }
 }
 
-void PhysicsPatch::fn_80172EE0(const int* type)
+void PhysicsPatch::InitType(const int* type)
 {
     int view;
     m_Type = *type;
@@ -152,7 +152,7 @@ void PhysicsPatch::fn_80172EE0(const int* type)
             controller->SetPosition(GetPosition());
             controller->m_uUserData = (unsigned long)this;
             controller->SetUpdateCallback(
-                Function1<void, EmissionController&>(fn_8017498C));
+                Function1<void, EmissionController&>(UpdatePatchEffect));
             controller->m_fGround = 0.02f;
         }
     }
@@ -166,19 +166,19 @@ void PhysicsPatch::fn_80172EE0(const int* type)
     case 8:
     case 9:
     case 10:
-        mUnidentified44
+        m_pAvoidable
             = new (nlMalloc(sizeof(AvoidablePatch), 8, false))
                 AvoidablePatch(this);
         break;
     default:
-        mUnidentified44 = 0;
+        m_pAvoidable = 0;
         break;
     }
 }
 
 void PhysicsPatch::Unknown0()
 {
-    UnidentifiedKillEffect();
+    KillEffect();
 
     m_Type = -1;
     m_pOwner = 0;
@@ -191,13 +191,13 @@ void PhysicsPatch::Unknown0()
     m_bVisible = false;
     SetRadius(0.5f);
     DisableCollisions();
-    SetPosition(lbl_804DCCAC, WORLD_COORDINATES);
+    SetPosition(sInactivePatchPosition, WORLD_COORDINATES);
     m_Velocity = v3Zero;
-    mUnidentified40 = 0;
+    m_PathPoints = 0;
     m_PathSpeed = 0.0f;
     m_PathPointCount = 0;
     m_CurrentPathPoint = 0;
-    mUnidentified38.Clear();
+    m_PathFinishedCallback.Clear();
 }
 
 ContactType PhysicsPatch::Contact(
@@ -232,7 +232,7 @@ ContactType PhysicsPatch::Contact(
             case 9:
             case 12:
             {
-                float height = lbl_806DCABC;
+                float height = gfPatchAirborneHeight;
                 if (fielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
                 {
                     height = 0.5f;
@@ -250,7 +250,7 @@ ContactType PhysicsPatch::Contact(
             }
         }
         eventData = 0;
-        lbl_80570138.Allocate(eventData);
+        g_UnidentifiedEventData24Pool.Allocate(eventData);
         eventData->mUnidentified0C = fielder;
         eventData->mUnidentified10 = this;
         QueueCollisionPatchPlayer(eventData);
@@ -258,42 +258,42 @@ ContactType PhysicsPatch::Contact(
     }
     case 16:
     {
-        fn_80148A9C((UnidentifiedEventData31*)this);
+        QueueCollisionPatchBall((UnidentifiedEventData31*)this);
         if (m_Type == 0 && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
         {
             eventData = 0;
-            lbl_80570138.Allocate(eventData);
+            g_UnidentifiedEventData24Pool.Allocate(eventData);
             eventData->mUnidentified0C = 0;
             eventData->mUnidentified10 = this;
-            fn_80148954(eventData);
+            QueueCollisionPatchPatch(eventData);
         }
         return NO_CONTACT;
     }
     case 18:
     {
         eventData = 0;
-        lbl_80570138.Allocate(eventData);
+        g_UnidentifiedEventData24Pool.Allocate(eventData);
         eventData->mUnidentified0C = 0;
         eventData->mUnidentified10 = this;
-        fn_80148588(eventData);
+        QueueCollisionPatchGround(eventData);
         return NO_CONTACT;
     }
     case 20:
     {
         UnidentifiedEventData30* data = 0;
-        lbl_80570160.Allocate(data);
+        g_UnidentifiedEventData30Pool.Allocate(data);
         data->mUnidentified00 = ((PhysicsShell*)other)->m_pPowerupObject;
         data->mUnidentified04 = this;
-        fn_801486D0(data);
+        QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
     case 21:
     {
         UnidentifiedEventData30* data = 0;
-        lbl_80570160.Allocate(data);
+        g_UnidentifiedEventData30Pool.Allocate(data);
         data->mUnidentified00 = ((PhysicsBanana*)other)->m_pPowerupObject;
         data->mUnidentified04 = this;
-        fn_801486D0(data);
+        QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
     case 24:
@@ -304,14 +304,14 @@ ContactType PhysicsPatch::Contact(
            == SkinAnimatedNPC_CHAIN_CHOMP;
         if (isChainChomp)
         {
-            fn_80148818((UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
+            QueueCollisionPatchChain((UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
         }
         return NO_CONTACT;
     }
     case 29:
         return m_Type == 1 ? ONE_WAY_CONTACT_THIS : NO_CONTACT;
     case 23:
-        fn_80148BD8((UnidentifiedEventData31*)this);
+        QueueCollisionPatchWall((UnidentifiedEventData31*)this);
         return NO_CONTACT;
     case 28:
         if (m_Type == 0 && !m_bKillMe)
@@ -323,10 +323,10 @@ ContactType PhysicsPatch::Contact(
             case 9:
             {
                 UnidentifiedEventData24* data = 0;
-                lbl_80570138.Allocate(data);
+                g_UnidentifiedEventData24Pool.Allocate(data);
                 data->mUnidentified0C = m_pOwner;
                 data->mUnidentified10 = this;
-                fn_80148954(data);
+                QueueCollisionPatchPatch(data);
                 break;
             }
             }
@@ -366,9 +366,9 @@ void PhysicsPatch::Update(float dt)
                 SetRadius(radius);
             }
 
-            if (mUnidentified40 != 0)
+            if (m_PathPoints != 0)
             {
-                fn_80173DA4(dt);
+                UpdatePath(dt);
                 return;
             }
 
@@ -376,7 +376,7 @@ void PhysicsPatch::Update(float dt)
             nlVec3Scale(m_Velocity, damping);
             if (m_pTarget != 0)
             {
-                fn_80173B18();
+                SeekTarget();
             }
             m_Velocity.z -= m_Gravity * dt;
 
@@ -409,7 +409,7 @@ void PhysicsPatch::Update(float dt)
     }
 }
 
-void PhysicsPatch::fn_801739A4(const nlVector3& position)
+void PhysicsPatch::SetWorldPosition(const nlVector3& position)
 {
     SetPosition(position, WORLD_COORDINATES);
 }
@@ -429,11 +429,11 @@ bool PhysicsPatch::SetContactInfo(
     return true;
 }
 
-void PhysicsPatch::fn_80173A10(float)
+void PhysicsPatch::ClearMuckHole(float)
 {
     if (m_Type == 4)
     {
-        UnidentifiedDestroyEffect();
+        DestroyEffect();
         Unknown0();
     }
 }
@@ -444,17 +444,17 @@ void PhysicsPatch::fn_80173AF4()
     m_TargetSeekSpeed = -1.0f;
 }
 
-void PhysicsPatch::fn_80173B08(float time)
+void PhysicsPatch::SetEndRadiusTime(float time)
 {
     m_fEndRadiusTime = time;
 }
 
-void PhysicsPatch::fn_80173B10(float time)
+void PhysicsPatch::SetStartRadiusTime(float time)
 {
     m_fStartRadiusTime = time;
 }
 
-void PhysicsPatch::fn_80173B18()
+void PhysicsPatch::SeekTarget()
 {
     nlVector3 newVelocity;
     nlVector2 delta;
@@ -482,10 +482,10 @@ void PhysicsPatch::fn_80173B18()
     m_Velocity = newVelocity;
 }
 
-void PhysicsPatch::fn_80173C9C(
+void PhysicsPatch::SetPath(
     nlVector3* points, int pointCount, float speed)
 {
-    mUnidentified40 = points;
+    m_PathPoints = points;
     m_PathPointCount = pointCount;
     m_PathSpeed = speed;
     m_CurrentPathPoint = 0;
@@ -498,23 +498,23 @@ void PhysicsPatch::fn_80173C9C(
 nlVector3 PhysicsPatch::fn_80173CCC() const
 {
     nlVector3 direction = { 0.0f, 0.0f, 0.0f };
-    if (mUnidentified40 != 0 && m_CurrentPathPoint > 0)
+    if (m_PathPoints != 0 && m_CurrentPathPoint > 0)
     {
-        nlVec3Sub(direction, mUnidentified40[m_CurrentPathPoint], m_position);
+        nlVec3Sub(direction, m_PathPoints[m_CurrentPathPoint], m_position);
         float scale = nlRecipSqrt(direction.GetLengthSq3D(), false);
         nlVec3Scale(direction, scale);
     }
     return direction;
 }
 
-void PhysicsPatch::fn_80173DA4(float dt)
+void PhysicsPatch::UpdatePath(float dt)
 {
     bool finished = false;
     float remaining = dt * (float)fabs(m_PathSpeed);
     nlVector3 position = GetPosition();
     nlVector3 delta;
     nlVector3 step;
-    nlVec3Sub(delta, mUnidentified40[m_CurrentPathPoint], position);
+    nlVec3Sub(delta, m_PathPoints[m_CurrentPathPoint], position);
     float distanceSquared = delta.GetLengthSq3D();
     if (distanceSquared > remaining * remaining)
     {
@@ -542,7 +542,7 @@ void PhysicsPatch::fn_80173DA4(float dt)
             {
                 nlVector3 nextDelta;
                 nlVector3 nextStep;
-                nlVec3Sub(nextDelta, mUnidentified40[m_CurrentPathPoint], mUnidentified40[previousPoint]);
+                nlVec3Sub(nextDelta, m_PathPoints[m_CurrentPathPoint], m_PathPoints[previousPoint]);
                 float scale = nlRecipSqrt(nextDelta.GetLengthSq3D(), true);
                 nlVec3Set(nextDelta, scale * nextDelta.x, scale * nextDelta.y, scale * nextDelta.z);
                 nlVec3Scale(nextStep, nextDelta, remaining);
@@ -552,7 +552,7 @@ void PhysicsPatch::fn_80173DA4(float dt)
         else
         {
             finished = true;
-            position = mUnidentified40[previousPoint];
+            position = m_PathPoints[previousPoint];
         }
     }
 
@@ -564,28 +564,28 @@ void PhysicsPatch::fn_80173DA4(float dt)
     }
     SetPosition(position, WORLD_COORDINATES);
 
-    if (finished == true && mUnidentified38)
+    if (finished == true && m_PathFinishedCallback)
     {
-        mUnidentified38(this);
+        m_PathFinishedCallback(this);
     }
 }
 
-PhysicsPatchManager_801740D0::PhysicsPatchManager_801740D0()
+PhysicsPatchManager::PhysicsPatchManager()
 {
     for (int i = 0; i < 60; ++i)
     {
-        mUnidentified000[i] = 0;
+        mPatches[i] = 0;
     }
 
-    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(fn_8017472C), (unsigned int)&mUnidentified0F0, -1);
+    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(HandleResetEffects), (unsigned int)&mResetEffectsConnection, -1);
 }
 
-PhysicsPatchManager_801740D0::~PhysicsPatchManager_801740D0()
+PhysicsPatchManager::~PhysicsPatchManager()
 {
     ResetEffects();
 }
 
-PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
+PhysicsPatch* PhysicsPatchManager::CreatePatch(
     int type, cPlayer* owner, const nlVector3& position,
     const nlVector3& velocity, float startRadius, float endRadius,
     float lifetime)
@@ -602,10 +602,10 @@ PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
     PhysicsPatch* patch = 0;
     for (int i = 0; i < 60; ++i)
     {
-        if (mUnidentified000[i] == 0)
+        if (mPatches[i] == 0)
         {
             patch = new PhysicsPatch();
-            mUnidentified000[i] = patch;
+            mPatches[i] = patch;
             patch->m_Index = i;
             break;
         }
@@ -615,8 +615,8 @@ PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
     {
         nlVector3 initialVelocity = velocity;
         patch->SetPosition(position, PhysicsObject::WORLD_COORDINATES);
-        patch->mUnidentified9C = position;
-        patch->fn_80172EE0(&type);
+        patch->m_SpawnPosition = position;
+        patch->InitType(&type);
         patch->m_Velocity = initialVelocity;
         patch->m_pOwner = owner;
         patch->m_fStartRadius = startRadius;
@@ -627,54 +627,54 @@ PhysicsPatch* PhysicsPatchManager_801740D0::fn_801743A8(
     return patch;
 }
 
-PhysicsPatch* PhysicsPatchManager_801740D0::fn_801745B8(int index)
+PhysicsPatch* PhysicsPatchManager::fn_801745B8(int index)
 {
     if (index >= 0 && index < 60)
     {
-        return mUnidentified000[index];
+        return mPatches[index];
     }
     return 0;
 }
 
-void PhysicsPatchManager_801740D0::ResetEffects()
+void PhysicsPatchManager::ResetEffects()
 {
     for (int i = 0; i < 60; ++i)
     {
-        if (mUnidentified000[i] != 0)
+        if (mPatches[i] != 0)
         {
-            mUnidentified000[i]->Unknown0();
-            delete mUnidentified000[i];
-            mUnidentified000[i] = 0;
+            mPatches[i]->Unknown0();
+            delete mPatches[i];
+            mPatches[i] = 0;
         }
     }
-    PhysicsPatch::lbl_805705D0.FreeBlocks();
+    PhysicsPatch::m_PhysicsPatchSlotPool.FreeBlocks();
 }
 
-void PhysicsPatchManager_801740D0::Update(float dt)
+void PhysicsPatchManager::Update(float dt)
 {
     for (int i = 0; i < 60; ++i)
     {
-        PhysicsPatch* patch = mUnidentified000[i];
+        PhysicsPatch* patch = mPatches[i];
         if (patch != 0)
         {
             if (patch->m_bKillMe == true)
             {
                 delete patch;
-                mUnidentified000[i] = 0;
+                mPatches[i] = 0;
             }
             patch->Update(dt);
         }
     }
 }
 
-extern "C" void fn_8017472C(void*)
+void HandleResetEffects(void*)
 {
     for (int i = 0; i < 60; ++i)
     {
         PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
         if (patch != 0)
         {
-            patch->UnidentifiedKillEffect();
+            patch->KillEffect();
         }
     }
 
@@ -693,26 +693,26 @@ extern "C" void fn_8017472C(void*)
     }
 }
 
-void PhysicsPatchManager_801740D0::fn_801748A0(
+void PhysicsPatchManager::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     PhysicsPatch* patch;
     unsigned int offset;
     for (int i = 0; i < 60; ++i)
     {
-        patch = mUnidentified000[i];
+        patch = mPatches[i];
         if (patch == 0)
         {
             continue;
         }
 
-        if (lbl_806DCAB8 == 0xFFFF)
+        if (sPhysicsPatchType == 0xFFFF)
         {
-            patch->RegisterDebugFields(&lbl_806DCAB8, cache);
+            patch->RegisterDebugFields(&sPhysicsPatchType, cache);
         }
 
         offset = (unsigned char*)&patch->m_Type - (unsigned char*)patch;
-        void* data = cache->WriteData(lbl_806DCAB8, (unsigned char*)patch + offset, sizeof(PhysicsPatch) - offset);
+        void* data = cache->WriteData(sPhysicsPatchType, (unsigned char*)patch + offset, sizeof(PhysicsPatch) - offset);
         if (data != 0)
         {
             PhysicsPatch* copy = (PhysicsPatch*)((unsigned char*)data - offset);
@@ -720,12 +720,12 @@ void PhysicsPatchManager_801740D0::fn_801748A0(
             copy->m_pOwner = (cPlayer*)(owner == 0 ? -1 : owner->mUnidentified120);
             cPlayer* target = patch->m_pTarget;
             copy->m_pTarget = (cPlayer*)(target == 0 ? -1 : target->mUnidentified120);
-            cache->ChecksumData(lbl_806DCAB8, data, context);
+            cache->ChecksumData(sPhysicsPatchType, data, context);
         }
     }
 }
 
-static void fn_8017498C(EmissionController& controller)
+static void UpdatePatchEffect(EmissionController& controller)
 {
     if (g_pGame == 0 || g_pGame->m_eGameState == 4)
     {
@@ -737,7 +737,7 @@ static void fn_8017498C(EmissionController& controller)
         PhysicsPatch* patch = (PhysicsPatch*)controller.m_uUserData;
         if (patch->m_bVisible == true)
         {
-            controller.SetPosition(patch->mUnidentified9C);
+            controller.SetPosition(patch->m_SpawnPosition);
             controller.SetVelocity(patch->m_Velocity);
         }
     }

@@ -112,7 +112,8 @@ void NetworkStatsManager::Reset(bool)
     bool european = GetRegion() == 1;
     if (european)
     {
-        int alternate = UsesEuropeanRankings() ? IsAlternateOnlineCountryGroup() : 0;
+        int alternate = UsesEuropeanRankings();
+        alternate = alternate == 0 ? alternate : IsAlternateOnlineCountryGroup();
         mPersistentCategories[0] =
             alternate == 1 ? NETWORK_PERSISTENT_CATEGORY_3 : NETWORK_PERSISTENT_CATEGORY_0;
         mPersistentCategories[1] =
@@ -312,18 +313,24 @@ void NetworkStatsManager::CommitPendingOnlineTotals(
 void NetworkStatsManager::UpdateFriendRankingNames(
     NetworkLeaderboardCategory* leaderboard)
 {
-    for (int i = 0; i < leaderboard->mCount; ++i)
+    int profileId;
+    DWCAccFriendData* friendData;
+    u16* name;
+    u8* region;
+    int i;
+    int friendIndex;
+
+    for (i = 0; i < leaderboard->mCount; ++i)
     {
-        int friendIndex;
-        int profileId = leaderboard->mPlayers[i].mProfileId;
+        profileId = leaderboard->mPlayers[i].mProfileId;
         for (friendIndex = 0; friendIndex < 64; ++friendIndex)
         {
-            DWCAccFriendData* friendData = reinterpret_cast<DWCAccFriendData*>(
+            friendData = reinterpret_cast<DWCAccFriendData*>(
                 GameInfoManager::GetInstance()->GetUnknown0x40(
                     gNetworkSaveSlotIndex, friendIndex));
-            u16* name = GameInfoManager::GetInstance()->GetSavedFriendName(
+            name = GameInfoManager::GetInstance()->GetSavedFriendName(
                 gNetworkSaveSlotIndex, friendIndex);
-            u8* region = static_cast<u8*>(
+            region = static_cast<u8*>(
                 GameInfoManager::GetInstance()->GetUnknown0xA40(
                     gNetworkSaveSlotIndex, friendIndex));
             if (friendData->gs_profile_id.id == profileId)

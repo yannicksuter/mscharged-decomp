@@ -432,6 +432,38 @@ bool cFielder::CanGetElectrocuted(
     return false;
 }
 
+static inline bool IsSidekick(const cFielder* pFielder)
+{
+    return !pFielder->IsCaptain();
+}
+
+static inline bool CanShootFromPosition(cFielder* pFielder, bool requireBall)
+{
+    float radius = 0.0f;
+    pFielder->m_pPhysicsCharacter->GetRadius(&radius);
+
+    float offset = lbl_806E342C + radius;
+    float maxX = offset + pFielder->GetPosition().x;
+    float minX = pFielder->GetPosition().x - offset;
+    bool maxXInHalf = maxX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+    bool inAttackingHalf = true;
+    if (!maxXInHalf)
+    {
+        bool minXInHalf = minX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+        if (!minXInHalf)
+        {
+            inAttackingHalf = false;
+        }
+    }
+
+    bool canShoot = !requireBall && inAttackingHalf;
+    if (pFielder->HasBall())
+    {
+        canShoot = inAttackingHalf;
+    }
+    return canShoot;
+}
+
 bool cFielder::CanDoCaptainShootToScore()
 {
     if (GameInfoManager::Instance()->IsRule0x8Equal4())
@@ -441,52 +473,29 @@ bool cFielder::CanDoCaptainShootToScore()
 
     if (g_pBall->GetOwnerFielder() != 0)
     {
-        bool bUnidentified0 = false;
+        bool homeMegastrikeEnabled = false;
         if (GameInfoManager::Instance()
                 ->GetCurrentSettings()
                 ->mHomeMegastrikeEnabled
-            && m_pTeam->m_nSide == 0)
+            && m_pTeam->m_nSide == HOME)
         {
-            bUnidentified0 = true;
+            homeMegastrikeEnabled = true;
         }
 
-        bool bUnidentified1 = false;
-        if (bUnidentified0
+        bool megastrikeEnabled = false;
+        if (homeMegastrikeEnabled
             || (GameInfoManager::Instance()
                     ->GetCurrentSettings()
                     ->mAwayMegastrikeEnabled
-                && m_pTeam->m_nSide == 1))
+                && m_pTeam->m_nSide == AWAY))
         {
-            bUnidentified1 = true;
+            megastrikeEnabled = true;
         }
 
-        bool bUnidentified2 = IsCaptain();
-        if (bUnidentified1 && bUnidentified2)
+        bool isCaptain = IsCaptain();
+        if (megastrikeEnabled && isCaptain)
         {
-            float fRadius = lbl_806E3420;
-            m_pPhysicsCharacter->GetRadius(&fRadius);
-
-            float fOffset = lbl_806E342C + fRadius;
-            float fMinX;
-            float fMaxX = fOffset + mUnidentified024.m_v3Position.x;
-            fMinX = mUnidentified024.m_v3Position.x - fOffset;
-            bool bUnidentified3
-                = fMaxX * m_pTeam->GetOtherNet()->m_fDirection
-                >= lbl_806E3420;
-            bool bUnidentified4 = true;
-            if (!bUnidentified3)
-            {
-                bool bUnidentified5
-                    = fMinX
-                        * m_pTeam->GetOtherNet()->m_fDirection
-                    >= lbl_806E3420;
-                if (!bUnidentified5)
-                {
-                    bUnidentified4 = false;
-                }
-            }
-
-            if (bUnidentified4)
+            if (CanShootFromPosition(this, false))
             {
                 return true;
             }
@@ -494,6 +503,36 @@ bool cFielder::CanDoCaptainShootToScore()
     }
 
     return false;
+}
+
+bool cFielder::CanDoSidekickShootToScore()
+{
+    bool canShoot = CanShootFromPosition(this, false);
+    if (!canShoot || !HasBall() || !IsSidekick(this) || bIsModified)
+    {
+        return false;
+    }
+
+    if (GameInfoManager::Instance()->IsRule0x8Equal4())
+    {
+        return false;
+    }
+
+    bool homeEnabled = false;
+    if (GameInfoManager::Instance()->GetCurrentSettings()->m_unk18
+        && m_pTeam->m_nSide == HOME)
+    {
+        homeEnabled = true;
+    }
+
+    bool enabled = false;
+    if (homeEnabled
+        || (GameInfoManager::Instance()->GetCurrentSettings()->m_unk19
+            && m_pTeam->m_nSide == AWAY))
+    {
+        enabled = true;
+    }
+    return enabled;
 }
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(
@@ -511,6 +550,21 @@ cFielder* cFielder::DoFindBestHitTarget()
         return (cFielder*)vBestTarget.mData.pPlayer;
     }
     return 0;
+}
+
+static inline void GetCharacterSpecialActive(
+    const cFielder* fielder, eCharacterClass character, bool& active)
+{
+    active = false;
+    if (fielder->GetCharacterClass() != character)
+    {
+        return;
+    }
+    if (!fielder->fn_8003E6EC())
+    {
+        return;
+    }
+    active = true;
 }
 
 bool cFielder::fn_8003E6EC() const
@@ -581,13 +635,9 @@ extern "C" bool fn_8003E8A0(const cFielder* pFielder)
 
 bool cFielder::fn_8003E8F4() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == LUIGI
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, LUIGI, active);
+    return active;
 }
 
 bool cFielder::fn_8003E9F0() const
@@ -614,13 +664,9 @@ bool cFielder::fn_8003EA44() const
 
 bool cFielder::fn_8003EA6C() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, TOAD, active);
+    return active;
 }
 
 bool cFielder::CanReceivePass()
@@ -668,8 +714,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition2)
     {
-        bool bExcluded = fn_8003EA6C();
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, TOAD, active);
+        if (!active)
         {
             bCondition3 = true;
         }
@@ -677,10 +724,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition3)
     {
-        bool bExcluded
-            = mUnidentified024.m_eCharacterClass == DONKEYKONG
-           && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, DONKEYKONG, active);
+        if (!active)
         {
             bCondition4 = true;
         }
@@ -688,10 +734,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition4)
     {
-        bool bExcluded
-            = mUnidentified024.m_eCharacterClass == WALUIGI
-           && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, WALUIGI, active);
+        if (!active)
         {
             bCondition5 = true;
         }
@@ -699,8 +744,9 @@ bool cFielder::CanReceivePass()
 
     if (bCondition5)
     {
-        bool bExcluded = fn_8003E8F4();
-        if (!bExcluded)
+        bool active;
+        GetCharacterSpecialActive(this, LUIGI, active);
+        if (!active)
         {
             bCondition6 = true;
         }
@@ -711,7 +757,7 @@ bool cFielder::CanReceivePass()
         DesireFrozen* pAction = (DesireFrozen*)
             fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
         bool bActionActive = false;
-        if (pAction != 0 && pAction->mUnidentifiedActive
+        if (pAction != 0 && pAction->mActive
             && pAction->meFrozenState != 0)
         {
             bActionActive = true;
@@ -1080,7 +1126,7 @@ void cFielder::CollideWithWallCallback(
     DesireFrozen* pAction = (DesireFrozen*)
         fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
-    if (pAction != 0 && pAction->mUnidentifiedActive
+    if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
     {
         bActionActive = true;
@@ -1605,7 +1651,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
             {
-                fn_80316968(fn_8002E08C(this, 0x17));
+                RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
             }
         }
         break;
@@ -1629,7 +1675,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
             {
-                fn_80316968(fn_8002E08C(this, 0x17));
+                RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
             }
         }
         break;
@@ -1890,7 +1936,7 @@ void cFielder::DoClearBall()
                     DesireFrozen* pAction = (DesireFrozen*)
                         fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D);
                     bool bActionActive = false;
-                    if (pAction != 0 && pAction->mUnidentifiedActive
+                    if (pAction != 0 && pAction->mActive
                         && pAction->meFrozenState != 0)
                     {
                         bActionActive = true;
@@ -2574,7 +2620,7 @@ bool cFielder::fn_80038918() const
     DesireFrozen* pAction = (DesireFrozen*)
         fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
-    if (pAction != 0 && pAction->mUnidentifiedActive
+    if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
     {
         bActionActive = true;
@@ -2693,7 +2739,7 @@ void cFielder::PrePhysicsUpdate()
     DesireFrozen* pAction = (DesireFrozen*)
         fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
-    if (pAction != 0 && pAction->mUnidentifiedActive
+    if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
     {
         bActionActive = true;
@@ -3829,7 +3875,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
     for (int i = 0; i < 36; i++)
     {
         Desire* desire = fn_8002E08C(this, i);
-        if (desire != 0 && desire->UnidentifiedIsActive())
+        if (desire != 0 && desire->IsActive())
         {
             UnidentifiedFielderDesireState state;
             const TransitionFunc& transition
@@ -3837,10 +3883,10 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
                 ? desire->mOverrideTransition
                 : desire->mDefaultTransition;
             state.m_nTransitionFuncHash = transition.mFuncHash;
-            state.m_nLastActiveTime = (u32)desire->mUnidentified014;
-            state.m_fMaxDuration = desire->mUnidentified078;
-            state.m_fMinDuration = desire->mUnidentified07C;
-            state.m_fAge = desire->mUnidentifiedTimer.GetSeconds();
+            state.m_nLastActiveTime = (u32)desire->mLastActiveTime;
+            state.m_fMaxDuration = desire->mMaxDuration;
+            state.m_fMinDuration = desire->mMinDuration;
+            state.m_fAge = desire->mAgeTimer.GetSeconds();
             if (lbl_806DC048 == 0xFFFF)
             {
                 lbl_806DC048 = cache->BeginType("FielderDesireShdState");
@@ -3881,7 +3927,7 @@ eFielderDesireState cFielder::fn_8002E060()
     UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0 && machine->mUnidentified004 != 0)
     {
-        return (eFielderDesireState)machine->mUnidentified004->mUnidentifiedState;
+        return (eFielderDesireState)machine->mUnidentified004->mState;
     }
     return (eFielderDesireState)-1;
 }
@@ -3957,7 +4003,7 @@ int cFielder::fn_8002E9D0() const
     UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0 && machine->mUnidentified008 != 0)
     {
-        return machine->mUnidentified008->mUnidentifiedState;
+        return machine->mUnidentified008->mState;
     }
     return -1;
 }
@@ -3970,7 +4016,7 @@ bool cFielder::fn_8003499C() const
         && mUnidentified428->mScriptMachine->mUnidentified004 != 0)
     {
         state = mUnidentified428->mScriptMachine->mUnidentified004
-                    ->UnidentifiedGetState();
+                    ->GetState();
     }
     else
     {

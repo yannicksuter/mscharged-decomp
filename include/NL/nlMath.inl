@@ -14,7 +14,7 @@ inline void nlVector3::Set(float x, float y, float z)
 /**
  * Offset/Address/Size: 0x9550 | 0x800D1C4C | size: 0x34
  */
-extern "C" inline nlVector3* fn_800D1C4C(
+inline nlVector3* nlVec3Difference(
     nlVector3* result, const nlVector3* first, const nlVector3* second)
 {
     nlVec3Sub(*result, *first, *second);
@@ -27,7 +27,7 @@ extern "C" inline nlVector3* fn_800D1C4C(
  * nlVec2Length(delta) gives the same out-of-line body but different inlined
  * code in GoalieOutOfPosition().
  */
-extern "C" inline float fn_800D1C80(
+inline float nlVec3Distance2D(
     const nlVector3& first, const nlVector3& second)
 {
     nlVector2 delta = {
@@ -40,7 +40,7 @@ extern "C" inline float fn_800D1C80(
 /**
  * Offset/Address/Size: 0x95D0 | 0x800D1CCC | size: 0x38
  */
-extern "C" inline unsigned short fn_800D1CCC(float y, float x)
+inline unsigned short nlATan2Angle(float y, float x)
 {
     return (unsigned short)(int)(10430.378f * nlATan2f(y, x));
 }
@@ -48,7 +48,7 @@ extern "C" inline unsigned short fn_800D1CCC(float y, float x)
 /**
  * Offset/Address/Size: 0x9608 | 0x800D1D04 | size: 0xC
  */
-extern "C" inline short fn_800D1D04(
+inline short nlAngleDelta(
     unsigned short first, unsigned short second)
 {
     return nlAngleDiff(first, second);
@@ -57,7 +57,7 @@ extern "C" inline short fn_800D1D04(
 /**
  * Offset/Address/Size: 0x9614 | 0x800D1D10 | size: 0x14
  */
-extern "C" inline unsigned short fn_800D1D10(short angle)
+inline unsigned short nlAbsAngle(short angle)
 {
     return angle < 0 ? -angle : angle;
 }
@@ -65,7 +65,7 @@ extern "C" inline unsigned short fn_800D1D10(short angle)
 /**
  * Offset/Address/Size: 0x9628 | 0x800D1D24 | size: 0x10
  */
-extern "C" inline int fn_800D1D24(int value)
+inline int nlAbsInt(int value)
 {
     return value < 0 ? -value : value;
 }

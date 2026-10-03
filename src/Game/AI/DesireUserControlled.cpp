@@ -24,9 +24,9 @@ static unsigned int lbl_806DC3AC = 0x20;
 /**
  * Offset/Address/Size: 0x0 | 0x800D448C | size: 0x100
  */
-bool DesireUserControlled::UnidentifiedInitialize(void* context)
+bool DesireUserControlled::Initialize(void* context)
 {
-    bool result = Desire::UnidentifiedInitialize(context);
+    bool result = Desire::Initialize(context);
 
     DesireSteering* desire = (DesireSteering*)fn_8002E08C(
         m_pFielder, 34);
@@ -34,7 +34,7 @@ bool DesireUserControlled::UnidentifiedInitialize(void* context)
     fn_800C574C(desire);
     fn_800C577C(desire);
 
-    mUnidentified078 = -1.0f;
+    mMaxDuration = -1.0f;
 
     UnidentifiedVariant_80054AB8 update;
     Update(
@@ -160,7 +160,7 @@ void DesireUserControlled::Update(
 /**
  * Offset/Address/Size: 0x7BC | 0x800D4C48 | size: 0x4
  */
-void DesireUserControlled::UnidentifiedCleanup()
+void DesireUserControlled::Cleanup()
 {
 }
 

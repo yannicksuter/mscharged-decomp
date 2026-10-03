@@ -3,22 +3,22 @@
 
 #include "Game/Event.h"
 
-struct UnidentifiedEventConnectionOwner
+struct EventConnectionOwner
 {
-    UnidentifiedEventConnectionOwner()
+    EventConnectionOwner()
         : mConnection(0)
     {
     }
 
-    ~UnidentifiedEventConnectionOwner()
+    ~EventConnectionOwner()
     {
         if (mConnection != 0 && ((mConnection->mFlags >> 30) & 1) != 0)
         {
-            ((UnidentifiedEventBase*)mConnection->mTarget)->Disconnect(this);
+            ((EventBase*)mConnection->mEvent)->Disconnect(this);
         }
     }
 
-    UnidentifiedConnection* mConnection;
+    EventConnection* mConnection;
 };
 
 #endif // GAME_EVENT_CONNECTION_H

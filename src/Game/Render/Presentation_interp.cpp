@@ -426,7 +426,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int replayTime = -30;
         ReplayChoreo::Instance().SaveHighlight(
-            ReplayManager::Instance()->fn_8018A16C(replayTime));
+            ReplayManager::Instance()->GetReplayExcitement(replayTime));
         break;
     }
     case 57:

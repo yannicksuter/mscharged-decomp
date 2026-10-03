@@ -60,31 +60,8 @@ s32 NHTTPi_encodeUrlChar(char* destination, char c);
 s32 NHTTPi_getUrlEncodedSize(const char* string);
 s32 NHTTPi_getUrlEncodedSize2(const char* string, s32 length);
 
-void* NHTTPi_GetSystemInfoP(void);
-NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(void* systemInfo);
-NHTTPListInfo* NHTTPi_GetListInfoP(void* systemInfo);
-NHTTPReqInfo* NHTTPi_GetReqInfoP(void* systemInfo);
-NHTTPThreadInfo* NHTTPi_GetThreadInfoP(void* systemInfo);
-void* NHTTPi_GetMutexInfoP(void* systemInfo);
-
-void NHTTPi_lockReqList(void* mutexInfo);
-void NHTTPi_unlockReqList(void* mutexInfo);
 NHTTPReqQueue* NHTTPi_getReqFromReqQueue(NHTTPListInfo* listInfo);
-NHTTPConnectionInfo* NHTTPi_Request2Connection(void* mutexInfo,
-    NHTTPRequestInfo* request);
-NHTTPConnectionInfo* NHTTPi_Response2Connection(void* mutexInfo,
-    NHTTPResponseInfo* response);
 void NHTTPi_destroyRequestObject(void* mutexInfo, NHTTPRequestInfo* request);
-void NHTTPi_SetVirtualContentLength(NHTTPConnectionInfo* connection,
-    u32 contentLength);
-s32 NHTTPi_PostSendCallback(void* mutexInfo, NHTTPConnectionInfo* connection,
-    void* value, u32 arg);
-void NHTTPi_BufferFullCallback(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-void NHTTPi_ReceivedCallback(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
-void NHTTPi_CompleteCallback(void* mutexInfo,
-    NHTTPConnectionInfo* connection);
 void NHTTPi_idleCommThread(NHTTPThreadInfo* info);
 
 s32 NHTTPi_GetSSLError(NHTTPBgnEndInfo* info);
@@ -241,21 +218,21 @@ BOOL NHTTPi_GetPostContentlength(void* mutexInfo, NHTTPRequestInfo* request,
     {
         return FALSE;
     }
-    connection->_unk40 = 0;
+    connection->postSendBuf = 0;
     for (;;)
     {
         if (request->cancel)
         {
             return FALSE;
         }
-        connection->_unk44 = 0;
+        connection->postSendSize = 0;
         if (NHTTPi_PostSendCallback(mutexInfo, connection, value, total) < 0)
         {
             return FALSE;
         }
         {
-            u32 size = connection->_unk44;
-            void* data = (void*)connection->_unk40;
+            u32 size = connection->postSendSize;
+            void* data = (void*)connection->postSendBuf;
             if (size == 0)
             {
                 break;
@@ -295,21 +272,21 @@ s32 NHTTPi_SendPostData(void* mutexInfo, NHTTPRequestInfo* request,
     {
         return 3;
     }
-    connection->_unk40 = 0;
+    connection->postSendBuf = 0;
     for (;;)
     {
         if (request->cancel)
         {
             return 3;
         }
-        connection->_unk44 = 0;
+        connection->postSendSize = 0;
         if (NHTTPi_PostSendCallback(mutexInfo, connection, value, total) < 0)
         {
             return 3;
         }
         {
-            size = connection->_unk44;
-            data = (char*)connection->_unk40;
+            size = connection->postSendSize;
+            data = (char*)connection->postSendBuf;
             if (size == 0)
             {
                 break;

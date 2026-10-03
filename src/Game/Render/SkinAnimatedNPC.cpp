@@ -46,7 +46,7 @@ SkinAnimatedNPC::SkinAnimatedNPC(
     {
         GLInventory* pInventory =
             static_cast<GLInventory*>(
-                static_cast<MemoryAllocator*>(resource)->m_0C);
+                static_cast<MemoryAllocator*>(resource)->m_memory);
         mpSkinMesh = pInventory->MakeSkinMesh(
             (unsigned long)nModelID, &pHierarchy);
     }

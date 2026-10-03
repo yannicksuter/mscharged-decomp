@@ -111,6 +111,11 @@ cDebugCamera::cDebugCamera(bool bUnidentified)
     mUnidentified8E = true;
 }
 
+static inline void ClearTargetEntries(nlDLListContainer<UnidentifiedDebugCameraTarget*>& targets)
+{
+    targets.Clear();
+}
+
 cDebugCamera::~cDebugCamera()
 {
     nlDLListIterator<UnidentifiedDebugCameraTarget*> iterator = m_Targets.Begin();
@@ -119,7 +124,7 @@ cDebugCamera::~cDebugCamera()
         delete *iterator;
         iterator.Step();
     }
-    m_Targets.Clear();
+    ClearTargetEntries(m_Targets);
 
     if (mUnidentified8C)
     {

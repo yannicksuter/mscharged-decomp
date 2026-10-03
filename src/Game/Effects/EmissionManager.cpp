@@ -308,8 +308,8 @@ static void DeallocateParticles(EmissionManager* manager)
     if (manager->mParticleMemory != 0)
     {
         delete[] manager->mParticleMemory;
+        manager->mParticleMemory = 0;
     }
-    manager->mParticleMemory = 0;
 }
 
 static void InitializeResourceStats()
@@ -555,12 +555,13 @@ void EmissionManager::Render()
     g_nNumLights = 0;
     sUnidentified_806E1FAC = 0;
 
+    int i;
     EmissionResourceStats* stats = Instance()->mResourceStats;
-    for (int i = 0; i < 8; ++i)
+    for (i = 0; i < 8; ++stats, ++i)
     {
-        if (stats[i].unknown_0x32_bit14)
+        if (stats->unknown_0x32_bit14)
         {
-            *stats[i].mCount->m_pValue = lbl_806DF4C0;
+            *stats->mCount = lbl_806DF4C0;
         }
     }
 
@@ -1146,11 +1147,9 @@ void EmissionManager::ConfigureResource(
 {
     if (resource != -1)
     {
-        EmissionResourceStats* stats
+        EmissionResourceStats* const stats
             = EmissionManager::Instance()->mResourceStats;
-        nlStrNCpy(stats[resource].mName, name, sizeof(stats[resource].mName));
-        stats[resource].mBudget = budget;
-        stats[resource].unknown_0x32_bit15 = budget != 0;
+        stats[resource].Configure(name, budget);
     }
 }
 

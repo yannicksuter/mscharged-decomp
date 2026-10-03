@@ -8,4 +8,6 @@ void nlWriteBuffer(void* file, const char* buffer, int size);
 void* nlOpenFileDebug(const char* fileName, bool bBinary, bool bAppend);
 bool nlDebugFileIsValid(void* fp);
 
+extern bool g_bDisableWriteOut;
+
 #endif // NL_DEBUG_FILE_H

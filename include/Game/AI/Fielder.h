@@ -255,6 +255,7 @@ public:
         const CollisionPlayerWallData* eventData);
     eFielderActionState GetActionState() const { return m_eActionState; }
     bool CanDoCaptainShootToScore();
+    bool CanDoSidekickShootToScore();
     bool CanReceivePass();
     void SetSlideAttackSuccessFlag();
     void IncrementPowerupMeter(int nParam, float fAmount);
@@ -687,7 +688,6 @@ extern "C" bool fn_80036A58(cFielder*, unsigned short*);
 extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
 extern "C" bool fn_80036F88(cFielder* pFielder);
 extern "C" bool fn_8003881C(cFielder* pFielder);
-extern "C" bool fn_80039148(cFielder*);
 extern "C" bool fn_800392D8(cFielder*);
 extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
 extern "C" float fn_800394A8(cFielder*, int);

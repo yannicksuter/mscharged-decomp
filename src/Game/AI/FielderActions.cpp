@@ -56,6 +56,7 @@
 #include "Game/GameInfo.h"
 #include "Game/DB/StatsTracker.h"
 #include "Game/EventDataTypes.h"
+#include "Game/Physics/PhysicsEventQueue.h"
 #include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
 #include "NL/utility.h"
@@ -152,14 +153,11 @@ static unsigned short gHitReactFacingOffsets[4] = {
 
 float lbl_806E0C68;
 float lbl_806E0C6C;
-extern AvoidablePolygon* lbl_806E0C74;
 
 extern const float lbl_806E3538[1] = { 0.1f };
 extern const float lbl_806E35D4[1];
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
-
-extern FuzzyVariant fvNotSet;
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8003E948(cFielder* pFielder);
@@ -176,7 +174,6 @@ extern "C" float fn_80030750(cFielder* pFielder);
 extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
 extern "C" bool fn_8003E8A0(cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
-extern "C" void fn_80147F2C(void* pParam);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
@@ -2217,8 +2214,8 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         if (mUnidentified024.m_eCharacterClass == TOAD)
         {
             lbl_806E12C8
-                ->fn_801743A8(6, this, mUnidentified024.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
-                ->fn_80173B08(0.33f);
+                ->CreatePatch(6, this, mUnidentified024.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
+                ->SetEndRadiusTime(0.33f);
             PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
         }
     }
@@ -2237,7 +2234,7 @@ void cFielder::ActionHit(float fDeltaT)
                 nlVector3 jointPos = GetJointPosition(
                     pHierarchy->GetNodeIndexByID(
                         nlStringLowerHash("bip01 Ponytail12")));
-                pEffect->fn_801739A4(jointPos);
+                pEffect->SetWorldPosition(jointPos);
             }
         }
     }
@@ -2999,7 +2996,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
             if (pCaptain != pFielder && fn_8003881C(pFielder)
                 && g_pGame->mUnidentified030 == 0)
             {
-                fn_80316968(fn_80319FC0(fn_8002E1A4(pFielder), 0x1D));
+                RequestStateMachineDeactivation(fn_80319FC0(fn_8002E1A4(pFielder), 0x1D));
             }
         }
     }
@@ -4317,7 +4314,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
             lbl_806E0C74 = new (nlMalloc(
                 sizeof(AvoidablePolygon), 8, false))
                 AvoidablePolygon(2, v3Dir, m_pTeam->GetOtherNet()->m_v3NetLocation, 3.5f);
-            lbl_806E0C74->mUnidentified064 = this;
+            lbl_806E0C74->mOwner = this;
         }
     }
 
@@ -4685,7 +4682,8 @@ void cFielder::fn_8004C88C(float fDeltaT)
     case 0:
     {
         nlVector3 v3Velocity = mUnidentified024.m_v3Velocity;
-        nlPolarToCartesian(v3Velocity.x, v3Velocity.y, GetActualFacing(), GetActualSpeed());
+        float fSpeed = GetActualSpeed();
+        nlPolarToCartesian(v3Velocity.x, v3Velocity.y, GetActualFacing(), fSpeed);
         v3Velocity.z = 0.0f;
         SetVelocity(v3Velocity);
 
@@ -5210,7 +5208,7 @@ void cFielder::fn_8004EC40()
             g_CollisionBulletBillDataPool.Allocate(pNode);
             pNode->player = this;
             pNode->bulletBill = m_pBulletBill;
-            fn_80147F2C(pNode);
+            QueueExplosionBulletBill(pNode);
         }
 
         SetVelocity(v3Zero);

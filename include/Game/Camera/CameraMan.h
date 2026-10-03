@@ -20,13 +20,12 @@ enum eCameraMessage
 };
 
 void FireCameraRumbleFilter(float fRumbleX, float fRumbleY, float fSpring, float fDamping);
-extern "C" float fn_800F2410(float fFOV);
-extern "C" void fn_800F02DC(void*, unsigned long, void*);
-extern "C" void fn_800F0990(float);
-extern "C" bool fn_800F08A4();
-extern "C" void fn_800F06D4();
-extern "C" void fn_800F030C(bool stadiumViewer);
-extern const float kCameraZero;
+float AdjustFOVForWidescreen(float fFOV);
+void CameraAnimationLoadCallback(void* fileData, unsigned long fileSize, void* context);
+void UpdateCameraTransition(float fDeltaT);
+bool AsyncFinalizeCameraLoading();
+void AsyncStartCameraLoadingForStadiumViewer();
+void AsyncStartCameraLoading(bool frontEnd);
 
 inline float BlendCameraValue(float start, float end, float blend)
 {
@@ -74,7 +73,7 @@ public:
     static float m_fTransitionTime;
     static float m_fPrevFOV;
     static float m_fFOV;
-    static int m_pBeginFrameCameraType;
+    static int m_BeginFrameCameraType;
 
     static nlVector3 m_UpVectorStack[2];
     static int m_UpVectorStackSize;

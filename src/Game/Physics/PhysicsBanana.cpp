@@ -122,7 +122,7 @@ ContactType PhysicsBanana::Contact(
                     GetPosition(&eventData->position);
                     eventData->fVecZComponent = linVel.z;
                     eventData->eType = m_pPowerupObject->m_eType;
-                    fn_801473A4(eventData);
+                    QueueCollisionPowerupGround(eventData);
                 }
 
                 if (m_pTriggerCallbackFunc != 0)
@@ -352,7 +352,7 @@ ContactType PhysicsBanana::Contact(
             eventData->eType = m_pPowerupObject->m_eType;
             nlVec3Set(eventData->position, contact->geom.pos[0], contact->geom.pos[1], contact->geom.pos[2]);
             nlVec3Set(eventData->normal, contact->geom.normal[0], contact->geom.normal[1], contact->geom.normal[2]);
-            fn_80147634(eventData);
+            QueueCollisionPowerupWall(eventData);
         }
     }
 

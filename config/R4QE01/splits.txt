@@ -1516,7 +1516,7 @@ Game/Effects/PhotoFlashEffect.cpp:
 	.sdata      start:0x806DD030 end:0x806DD038
 	.sdata2     start:0x806E5280 end:0x806E528C
 
-Game/Render/AttackSideIndicators_801AE0C4.cpp:
+Game/Render/AttackSideIndicators.cpp:
 	.text       start:0x801AE0C4 end:0x801AE530
 	.ctors      start:0x804DB72C end:0x804DB730
 	.data       start:0x80514480 end:0x805144A8
@@ -2814,7 +2814,7 @@ NL/gl/glMultiTextureModelWriter.cpp:
 	.text       start:0x802A15D4 end:0x802A195C
 	.ctors      start:0x804DB8E4 end:0x804DB8E8
 
-Game/GL/UnidentifiedMeshWriter_802A195C.cpp:
+Game/GL/GLMovieMeshWriter.cpp:
 	.text       start:0x802A195C end:0x802A1BF4
 	.ctors      start:0x804DB8E8 end:0x804DB8EC
 
@@ -4036,7 +4036,7 @@ Game/AI/FuzzyRuntimeBase.cpp:
 Game/AI/TransitionFunc.cpp:
 	.text       start:0x80315A14 end:0x803167F0
 
-Game/AI/tu_803167F0.cpp:
+Game/AI/shdStateMachine.cpp:
 	.text       start:0x803167F0 end:0x80317E2C
 	.ctors      start:0x804DBAB8 end:0x804DBABC
 	.data       start:0x80530248 end:0x805302A0
@@ -4325,13 +4325,18 @@ Game/World/worldanim.cpp:
 	.sdata2     start:0x806E69F0 end:0x806E6A00
 
 Game/World/worldanimobjects.cpp:
-	.text       start:0x803437C8 end:0x80344814
-	.ctors      start:0x804DBAF8 end:0x804DBAFC
-	.data       start:0x80534428 end:0x805344D8
+	.text       start:0x803437C8 end:0x803441C8
+	.data       start:0x80534428 end:0x805344B8
 	.bss        start:0x80584BC8 end:0x80584C08
 	.sdata      start:0x806DF868 end:0x806DF870
+	.sdata2     start:0x806E6A00 end:0x806E6A10
+
+Game/World/WorldEffect.cpp:
+	.text       start:0x803441C8 end:0x80344814
+	.ctors      start:0x804DBAF8 end:0x804DBAFC
+	.data       start:0x805344B8 end:0x805344D8
 	.sbss       start:0x806E2190 end:0x806E2198
-	.sdata2     start:0x806E6A00 end:0x806E6A20
+	.sdata2     start:0x806E6A10 end:0x806E6A20
 
 ode/collision_kernel.cpp:
 	.text       start:0x80344814 end:0x80345C44

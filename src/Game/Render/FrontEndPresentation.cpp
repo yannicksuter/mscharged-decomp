@@ -43,18 +43,6 @@ static char sIdleFunctionName[] = "Idle";
 static const char* idleFun = sIdleFunctionName;
 static char sIdleAnimation[] = "fe_idle";
 
-extern "C" void ShowRoundNews(void*);
-extern "C" void ShowCupRulesPopup();
-extern "C" void ShowCupBrickWallNews();
-extern "C" void ShowCupGoldenBootNews();
-extern "C" void ShowCupAwardRewardsPopup();
-extern "C" void SetCupTrophiesVisible(bool);
-extern "C" void BeginLoadTournamentTrophy();
-extern "C" bool IsTournamentTrophyLoaded();
-extern "C" void FinishLoadTournamentTrophy();
-extern "C" void SetWorldAnimation(unsigned int, unsigned int, unsigned int);
-extern "C" void TriggerEffects(BasicStadium*, unsigned int);
-
 inline FrontEndPresentation::FrontEndPresentation()
     : InterpreterCore(100)
     , mWaitTime(0.0f)

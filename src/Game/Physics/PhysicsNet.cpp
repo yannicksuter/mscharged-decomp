@@ -504,7 +504,7 @@ bool PhysicsNet::SweepTestForBallContact(const nlVector3& startPos, const nlVect
             pEventData->v3CollisionVelocity = ballLinearVelocity;
             pEventData->v3CollisionPosition = contactPos;
             pEventData->uTeamIndex = (g_pBall->m_v3Position.x < 0.0f) ? 0 : 1;
-            fn_8014681C(pEventData);
+            QueueCollisionBallGoalpost(pEventData);
         }
         return true;
     }

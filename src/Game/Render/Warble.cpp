@@ -41,13 +41,29 @@ static TweakValueFloat sWarbleFrequency(
 static TweakValueFloat sWarbleRate(
     "gfWarbleRate", gLastTweakCategory, 10.0f);
 
-static inline u8 ReadWarbleBlobValue(
-    const PlatTexture* texture, int x, int y)
+enum WarbleByteRow
 {
-    int block = (y >> 2) * (texture->m_Width >> 3) + (x >> 3);
-    int offset = (block << 5) + ((y & 3) << 3) + (x & 7);
-    u8 paletteIndex = ((u8*)texture->m_SwizzledData)[offset];
-    u16 colour = texture->m_PaletteData[paletteIndex];
+    WarbleByteRow0 = 0, WarbleByteRow1 = 8,
+    WarbleByteRow2 = 16, WarbleByteRow3 = 24
+};
+
+struct WarbleBlobRow
+{
+    const PlatTexture* texture;
+    int blockRow;
+    float* output;
+    int byteRow;
+
+    WarbleByteRow ByteRow() const { return (WarbleByteRow)byteRow; }
+};
+
+static inline u8 ReadWarbleBlobValue(const WarbleBlobRow& row, int x)
+{
+    int block = row.blockRow * (row.texture->m_Width >> 3) + (x >> 3);
+    const WarbleByteRow byteRow = row.ByteRow();
+    int offset = (block << 5) + byteRow + (x & 7);
+    u8 paletteIndex = ((u8*)row.texture->m_SwizzledData)[offset];
+    const u16 colour = row.texture->m_PaletteData[paletteIndex];
     if (colour & 0x8000)
     {
         unsigned int component = (colour >> 10) & 0x1F;
@@ -66,11 +82,13 @@ void LoadWarbleBlob()
 
     for (y = 0; y < 64; ++y)
     {
+        const WarbleBlobRow row = {
+            texture, y >> 2, sWarbleBlob[(unsigned int)y], (y & 3) << 3
+        };
         for (x = 0; x < 64; ++x)
         {
-            const u8 value = ReadWarbleBlobValue(texture, x, y);
-            sWarbleBlob[(unsigned int)y][(unsigned int)x] =
-                (float)value / 255.0f;
+            const u8 value = ReadWarbleBlobValue(row, x);
+            row.output[(unsigned int)x] = (float)value / 255.0f;
         }
     }
 

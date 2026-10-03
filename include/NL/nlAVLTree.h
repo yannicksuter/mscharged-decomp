@@ -108,6 +108,15 @@ public:
         return true;
     }
 
+    bool FindGet(const KeyType& key, ValueType& foundValue) const
+    {
+        ValueType* value;
+        bool found = FindGet(key, &value);
+        if (found)
+            foundValue = *value;
+        return found;
+    }
+
     void Find(const KeyType& key, ValueType** foundValue,
         KeyType** foundKey) const
     {

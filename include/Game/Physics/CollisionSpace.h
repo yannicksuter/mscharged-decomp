@@ -32,6 +32,13 @@ public:
     /* 0x0C */ PhysicsWorld* m_physicsWorld;
 }; // size: 0x10
 
+class SimpleCollisionSpace : public CollisionSpace
+{
+public:
+    SimpleCollisionSpace(PhysicsWorld*, bool);
+    virtual ~SimpleCollisionSpace() { }
+};
+
 extern CollisionSpace* g_CollisionSpace;
 
 #endif

@@ -105,7 +105,7 @@ protected:
         UnregisterEventConnection(this, listener);
         if (this->mCurrentConnection == listener)
         {
-            listener->mFlags |= 0x20000000;
+            listener->mPendingRemoval = 1;
             return;
         }
         DeleteListener(listener);

@@ -23,23 +23,13 @@
 
 
 extern "C" float fn_80030750(cFielder*);
-extern "C" bool fn_8003E8A0(cFielder*);
-extern "C" bool fn_8003E948(cFielder*);
-extern "C" bool fn_8003E99C(cFielder*);
-// The desire queried by the fielder strength rule carries its target fielder
-// at 0xB8; the concrete desire class is not reconstructed yet.
-struct UnidentifiedDesire_8000D62C
-{
-    /* 0x00 */ u8 mUnidentified000[0x8];
-    /* 0x08 */ bool mUnidentifiedActive;
-    /* 0x09 */ u8 mUnidentified009[0xAF];
-    /* 0xB8 */ cFielder* mUnidentified0B8;
-};
-
+extern "C" bool fn_8003E8A0(const cFielder* pFielder);
+extern "C" bool fn_8003E948(const cFielder* pFielder);
+extern "C" bool fn_8003E99C(const cFielder* pFielder);
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
-static const nlVector2 sUnidentifiedStrengthExtrema = { 0.5f, 1.0f };
+static const nlVector2 sAvoidanceStrengthRange = { 0.5f, 1.0f };
 
-float sUnidentifiedTweaks[7][7] = {
+float gAvoidableTweaks[7][7] = {
     { 1.0f, 1.0f, 3.0f, 0.0f, 5.0f, 6.5f, 5.5f },
     { 2.0f, 4.0f, 8.0f, 0.0f, 6.0f, 10.0f, 15.0f },
     { 3.0f, 3.0f, 5.0f, 0.0f, 4.0f, 6.5f, 5.0f },
@@ -73,16 +63,16 @@ static inline int AvoidableEnumToIndex(eAvoidableThings avoidable)
 AvoidableObject::AvoidableObject(int type)
 {
     int nIndex = AvoidableEnumToIndex((eAvoidableThings)type);
-    mTweaks = sUnidentifiedTweaks[nIndex];
+    mTweaks = gAvoidableTweaks[nIndex];
     mType = type;
     nlListAddEnd(&gAvoidableObjects.m_pStart, &gAvoidableObjects.m_pEnd, this);
-    mUnidentified008 = gNextAvoidableObjectId;
+    mId = gNextAvoidableObjectId;
     gNextAvoidableObjectId++;
 }
 
 AvoidableObject::~AvoidableObject()
 {
-    fn_8000F594(this);
+    RemoveFromAvoidControllers(this);
     nlListRemoveElement(&gAvoidableObjects.m_pStart, this, &gAvoidableObjects.m_pEnd);
 }
 
@@ -101,7 +91,7 @@ int GetAvoidableMask(int index)
     return avoidable;
 }
 
-bool AvoidableObject::UnidentifiedVirtual20(
+bool AvoidableObject::IsWithinRange(
     AvoidableObject* other, float range)
 {
     const nlVector3& v3OtherPos = other->GetPosition();
@@ -120,7 +110,7 @@ bool AvoidableObject::UnidentifiedVirtual20(
     return fGap <= range;
 }
 
-bool AvoidableObject::UnidentifiedVirtual1C(
+bool AvoidableObject::GetClosestBoundaryPoint(
     const nlVector3& target, nlVector3& point, nlVector3& dir)
 {
     bool bInside = false;
@@ -176,7 +166,7 @@ float AvoidableFielder::GetRadius()
     return fRadius;
 }
 
-float AvoidableFielder::UnidentifiedVirtual18()
+float AvoidableFielder::GetAttackReach()
 {
     float fRadius;
     if (fn_8003E8A0(m_pFielder))
@@ -200,7 +190,7 @@ float AvoidableFielder::UnidentifiedVirtual18()
     return fRadius;
 }
 
-bool AvoidableFielder::UnidentifiedVirtual20(
+bool AvoidableFielder::IsWithinRange(
     AvoidableObject* other, float range)
 {
     int nIndex = m_pFielder->mUnidentified120;
@@ -229,26 +219,26 @@ bool AvoidableFielder::UnidentifiedVirtual20(
         float fGap = fDist - (fRadius + fOtherRadius);
         if (!m_pFielder->IsOnSameTeam(pOther))
         {
-            fGap -= other->UnidentifiedVirtual18();
+            fGap -= other->GetAttackReach();
         }
         return fGap <= range;
     }
-    else if (otherType == AVOID_UNIDENTIFIED_08)
+    else if (otherType == AVOID_POLYGONS)
     {
-        return other->UnidentifiedVirtual20(this, range);
+        return other->IsWithinRange(this, range);
     }
     else
     {
-        return AvoidableObject::UnidentifiedVirtual20(other, range);
+        return AvoidableObject::IsWithinRange(other, range);
     }
 }
 
-float AvoidableFielder::UnidentifiedVirtual28(
+float AvoidableFielder::GetAvoidanceStrength(
     AvoidableObject* other)
 {
     float fSkill = fn_800A636C(g_pCurrentlyUpdatingTeam)->Off_Avoidance->GetValue();
-    float fMin = sUnidentifiedStrengthExtrema.x;
-    float fMax = sUnidentifiedStrengthExtrema.y;
+    float fMin = sAvoidanceStrengthRange.x;
+    float fMax = sAvoidanceStrengthRange.y;
     float fStrength = InterpolateClamped(fMin, fMax, fSkill);
     if (m_pFielder->m_pBall != 0)
     {
@@ -265,11 +255,11 @@ float AvoidableFielder::UnidentifiedVirtual28(
         }
         m_pFielder->fn_8003EA6C();
         break;
-    case AVOID_UNIDENTIFIED_08:
+    case AVOID_POLYGONS:
     {
         AvoidablePolygon* pPolygon
             = (AvoidablePolygon*)other;
-        if (pPolygon->mUnidentified014 == 4)
+        if (pPolygon->mPolygonType == 4)
         {
             if (fn_8003E948(m_pFielder) && m_pFielder->m_pBall == 0
                 && fn_800DED80(m_pFielder) > 0.7f)
@@ -281,11 +271,11 @@ float AvoidableFielder::UnidentifiedVirtual28(
                 fStrength *= 1.3f;
             }
         }
-        else if (pPolygon->mUnidentified014 == 1 && m_pFielder->fn_8003EA6C())
+        else if (pPolygon->mPolygonType == 1 && m_pFielder->fn_8003EA6C())
         {
             fStrength *= 0.3f;
         }
-        else if (pPolygon->mUnidentified014 != 3)
+        else if (pPolygon->mPolygonType != 3)
         {
             if (fn_800DED80(m_pFielder))
             {
@@ -318,11 +308,11 @@ float AvoidableFielder::UnidentifiedVirtual28(
             || fn_8003E99C(m_pFielder))
         {
             cFielder* pTarget = 0;
-            UnidentifiedDesire_8000D62C* pDesire
-                = (UnidentifiedDesire_8000D62C*)fn_8002E08C(m_pFielder, 12);
-            if (pDesire != 0 && pDesire->mUnidentifiedActive)
+            DesireRunInDirection* pDesire
+                = (DesireRunInDirection*)fn_8002E08C(m_pFielder, 12);
+            if (pDesire != 0 && pDesire->IsActive())
             {
-                pTarget = pDesire->mUnidentified0B8;
+                pTarget = pDesire->GetTarget();
             }
             if (pTarget == pOther)
             {
@@ -335,7 +325,7 @@ float AvoidableFielder::UnidentifiedVirtual28(
         }
         break;
     }
-    case AVOID_UNIDENTIFIED_20:
+    case AVOID_PATCHES:
     {
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
@@ -362,7 +352,7 @@ float AvoidableFielder::UnidentifiedVirtual28(
     return fStrength;
 }
 
-float AvoidableFielder::UnidentifiedVirtual24(
+float AvoidableFielder::GetAvoidanceWeight(
     AvoidableObject* other)
 {
     switch (other->mType)
@@ -441,7 +431,7 @@ float AvoidableFielder::UnidentifiedVirtual24(
         }
         m_pFielder->fn_8003EA6C();
         break;
-    case AVOID_UNIDENTIFIED_20:
+    case AVOID_PATCHES:
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
         case 4:
@@ -525,7 +515,7 @@ float AvoidablePowerup::GetRadius()
     return fRadius;
 }
 
-bool AvoidablePowerup::UnidentifiedVirtual2C()
+bool AvoidablePowerup::IsMobile()
 {
     if (m_pPowerup != 0 && m_pPowerup->m_eType == POWER_UP_BANANA)
     {
@@ -559,8 +549,8 @@ const nlVector3& AvoidablePatch::GetVelocity()
     if (m_pPatch->m_Type == 10)
     {
         float fSpeed = m_pPatch->m_PathSpeed;
-        nlVec3Scale(mUnidentified018, m_pPatch->fn_80173CCC(), fSpeed);
-        return mUnidentified018;
+        nlVec3Scale(mPathVelocity, m_pPatch->fn_80173CCC(), fSpeed);
+        return mPathVelocity;
     }
     return m_pPatch->m_Velocity;
 }
@@ -575,7 +565,7 @@ float AvoidablePatch::GetRadius()
     return fRadius;
 }
 
-bool AvoidablePatch::UnidentifiedVirtual2C()
+bool AvoidablePatch::IsMobile()
 {
     if (m_pPatch->m_Type == 8 || m_pPatch->m_Type == 10)
     {
@@ -591,26 +581,26 @@ static inline void InitPolygon(AvoidablePolygon* pPolygon)
         pPolygon->mPoints[i] = v2Zero;
         pPolygon->mNormals[i] = v2Zero;
     }
-    pPolygon->mUnidentified064 = 0;
+    pPolygon->mOwner = 0;
 }
 
 AvoidablePolygon::AvoidablePolygon(
-    int mode, const nlVector3& a, const nlVector3& b, float width)
-    : AvoidableObject(AVOID_UNIDENTIFIED_08)
+    int polygonType, const nlVector3& a, const nlVector3& b, float width)
+    : AvoidableObject(AVOID_POLYGONS)
 {
     InitPolygon(this);
-    mUnidentified014 = mode;
+    mPolygonType = polygonType;
     Update(*(const nlVector2*)&a, *(const nlVector2*)&b, width);
 }
 
 AvoidablePolygon::AvoidablePolygon(
-    int mode, const nlVector3& center, float length, float width)
-    : AvoidableObject(AVOID_UNIDENTIFIED_08)
+    int polygonType, const nlVector3& center, float length, float width)
+    : AvoidableObject(AVOID_POLYGONS)
 {
     nlVector2 b;
     nlVector2 a;
     InitPolygon(this);
-    mUnidentified014 = mode;
+    mPolygonType = polygonType;
     nlVec2Set(a, center.x, center.y - 0.5f * width);
     nlVec2Set(b, center.x, center.y + 0.5f * width);
     Update(a, b, length);
@@ -633,7 +623,7 @@ const nlVector3& AvoidablePolygon::GetPosition()
     return mCenter;
 }
 
-bool AvoidablePolygon::UnidentifiedVirtual1C(
+bool AvoidablePolygon::GetClosestBoundaryPoint(
     const nlVector3& target, nlVector3& point, nlVector3& dir)
 {
     int aFront[2] = { -1, -1 };
@@ -729,13 +719,13 @@ bool AvoidablePolygon::UnidentifiedVirtual1C(
     return bInside;
 }
 
-bool AvoidablePolygon::UnidentifiedVirtual20(
+bool AvoidablePolygon::IsWithinRange(
     AvoidableObject* other, float range)
 {
     nlVector3 v3Point;
     nlVector3 v3Dir;
     nlVector4 line;
-    bool bInside = UnidentifiedVirtual1C(other->GetPosition(), v3Point, v3Dir);
+    bool bInside = GetClosestBoundaryPoint(other->GetPosition(), v3Point, v3Dir);
     if (range <= 0.0f)
     {
         range = other->mTweaks[2];

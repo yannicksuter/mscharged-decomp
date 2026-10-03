@@ -157,10 +157,62 @@ struct NHTTPConnectionInfo
     s32 requestId;
     NHTTPConnectionCallback callback;
     NHTTPConnectionInfo* next;
-    u32 _unk40;
-    u32 _unk44;
+    u32 postSendBuf;
+    u32 postSendSize;
     u32 virtualContentLength;
     NHTTPReqCallback requestCallback;
 };
+
+typedef struct NHTTPSysInfo NHTTPSysInfo;
+typedef struct NHTTPMutexInfo NHTTPMutexInfo;
+typedef struct NHTTPThreadInfo NHTTPThreadInfo;
+
+void NHTTPi_InitBgnEndInfo(NHTTPBgnEndInfo* info);
+void NHTTPi_InitListInfo(NHTTPListInfo* info);
+void NHTTPi_InitRequestInfo(NHTTPReqInfo* info);
+void NHTTPi_InitThreadInfo(NHTTPThreadInfo* info);
+
+void NHTTPi_InitMutexInfo(NHTTPMutexInfo* info);
+void NHTTPi_lockReqList(NHTTPMutexInfo* info);
+void NHTTPi_unlockReqList(NHTTPMutexInfo* info);
+
+NHTTPConnectionInfo* NHTTPi_ControlConnectionList(void* mutexInfo,
+    void* handle, u32 mode);
+s32 NHTTPi_CommitConnectionList(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+s32 NHTTPi_OmitConnectionList(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+NHTTPRequestInfo* NHTTPi_Connection2Request(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+NHTTPResponseInfo* NHTTPi_Connection2Response(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+NHTTPConnectionInfo* NHTTPi_Request2Connection(void* mutexInfo,
+    NHTTPRequestInfo* request);
+NHTTPConnectionInfo* NHTTPi_Response2Connection(void* mutexInfo,
+    NHTTPResponseInfo* response);
+NHTTPConnectionInfo* NHTTPi_GetConnection(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+NHTTPRequestInfo* NHTTPi_GetRequest(void* mutexInfo,
+    NHTTPRequestInfo* request);
+NHTTPResponseInfo* NHTTPi_GetResponse(void* mutexInfo,
+    NHTTPResponseInfo* response);
+s32 NHTTPi_GetConnectionListLength(void);
+s32 NHTTPi_PostSendCallback(void* mutexInfo,
+    NHTTPConnectionInfo* connection, void* value, u32 arg);
+void NHTTPi_BufferFullCallback(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+void NHTTPi_ReceivedCallback(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+void NHTTPi_CompleteCallback(void* mutexInfo,
+    NHTTPConnectionInfo* connection);
+NHTTPSysInfo* NHTTPi_GetSystemInfoP(void);
+NHTTPBgnEndInfo* NHTTPi_GetBgnEndInfoP(NHTTPSysInfo* sysInfo_p);
+NHTTPListInfo* NHTTPi_GetListInfoP(NHTTPSysInfo* sysInfo_p);
+NHTTPReqInfo* NHTTPi_GetReqInfoP(NHTTPSysInfo* sysInfo_p);
+void* NHTTPi_GetThreadInfoP(NHTTPSysInfo* sysInfo_p);
+void* NHTTPi_GetMutexInfoP(NHTTPSysInfo* sysInfo_p);
+void NHTTPi_SetVirtualContentLength(NHTTPConnectionInfo* connection,
+    u32 length);
+u32 NHTTPi_GetVirtualContentLength(NHTTPConnectionInfo* connection);
 
 #endif // PRIVATE_NHTTP_H

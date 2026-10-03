@@ -23,10 +23,7 @@ public:
     virtual void UnidentifiedVirtual18()
     {
     }
-    virtual void* UnidentifiedVirtual1C()
-    {
-        return 0;
-    }
+    virtual void* UnidentifiedVirtual1C();
     virtual void* GetValueAddress() = 0;
     virtual void FormatValue(char* buffer, unsigned long size)
     {

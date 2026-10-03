@@ -112,7 +112,7 @@ void UnidentifiedNPC_801B43F8::fn_801B4830(
         }
         else if (pBall->meBallState != 10)
         {
-            fn_8014A044(pDebris);
+            QueueCollisionDebrisBall(pDebris);
         }
         break;
     }

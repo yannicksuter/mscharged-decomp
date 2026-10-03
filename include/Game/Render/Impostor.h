@@ -19,6 +19,16 @@ public:
         float width, float height, u16 angle);
     void Release();
 
+    float GetWidth() const
+    {
+        return mWidth;
+    }
+
+    float GetHeight() const
+    {
+        return mHeight;
+    }
+
     /* 0x04 */ ImpostorCharacter* mpCharacter;
     /* 0x08 */ ImpostorSprite* mpSprite;
     /* 0x0C */ nlVector3 mPosition;

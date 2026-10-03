@@ -12,10 +12,7 @@
 // RegisterAttackSideIndicator, and GameRenderTask drives the two sets from
 // each team's ball-carrier shot value once the match is running.
 
-extern "C"
-{
-    float gAttackSideIndicatorFullValue = 0.2f;
-}
+float gAttackSideIndicatorFullValue = 0.2f;
 
 class AttackSideIndicatorSet
 {
@@ -76,10 +73,7 @@ public:
     /* 0x18 */ bool mPositiveX;
 }; // total size: 0x1C
 
-extern "C"
-{
-    AttackSideIndicatorSet* gAttackSideIndicatorSets[2];
-}
+AttackSideIndicatorSet* gAttackSideIndicatorSets[2];
 
 void CreateAttackSideIndicators()
 {

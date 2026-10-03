@@ -8,9 +8,10 @@
 
 nlSlotPoolFixed<0x20> gTweakNodePool(0x20);
 
-inline const char* GetTweakNodeName(TweakNode* node)
+static inline void BuildTweakNodePath(const TweakNode* node, char* buffer, unsigned long size)
 {
-    return node->m_Value != 0 ? node->m_Value->mName : "ROOT";
+    nlStrNCpy(buffer, "", size);
+    GetTweakNodePath(node, buffer, size);
 }
 
 TweakNode::TweakNode()
@@ -45,25 +46,15 @@ TweakNode::~TweakNode()
         if (m_Unk1C == 0 && m_Value->mCreatedAfterRegistryInit && (m_State == 2 || (m_State == 1 && gDeletePersistentTweakValues)))
         {
             char buffer[0x100];
-            nlStrNCpy(buffer, "", sizeof(buffer));
-            TweakEntry* path = m_Parent;
-            if (path != 0)
-            {
-                nlStrNCpy(buffer, "", sizeof(buffer));
-                TweakEntry* grandparent = path->m_Parent;
-                if (grandparent != 0)
-                {
-                    nlStrNCpy(buffer, "", sizeof(buffer));
-                    GetTweakNodePath(grandparent, buffer, sizeof(buffer));
-                    nlStrNCat(buffer, buffer, "/", sizeof(buffer));
-                    nlStrNCat(buffer, buffer, GetTweakNodeName(path), sizeof(buffer));
-                }
-                nlStrNCat(buffer, buffer, "/", sizeof(buffer));
-                nlStrNCat(buffer, buffer, GetTweakNodeName(this), sizeof(buffer));
-            }
+            BuildTweakNodePath(this, buffer, sizeof(buffer));
             delete m_Value;
         }
     }
+}
+
+const char* GetTweakNodeName(const TweakNode* node)
+{
+    return node->m_Value != 0 ? node->m_Value->mName : "ROOT";
 }
 
 TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int noCreate)
@@ -75,13 +66,15 @@ TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int
     TweakEntry* folder = entry->UnidentifiedVirtual18();
     for (TweakNode* child = folder->m_ChildHead; child != 0; child = child->m_Next)
     {
-        if (child->UnidentifiedVirtual0C() != 0)
+        if (child->UnidentifiedVirtual0C() == 0)
         {
-            if (nlStrICmp(name, GetTweakNodeName(child)) == 0)
-            {
-                return child->UnidentifiedVirtual18();
-            }
+            continue;
         }
+        if (nlStrICmp(name, GetTweakNodeName(child)) != 0)
+        {
+            continue;
+        }
+        return child->UnidentifiedVirtual18();
     }
     if (noCreate == 0)
     {
@@ -94,22 +87,7 @@ TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int
 TweakNode* FindTweakNode(TweakNode* entry, const char* path)
 {
     char buffer[0x100];
-    nlStrNCpy(buffer, "", sizeof(buffer));
-    TweakEntry* parent = entry->m_Parent;
-    if (parent != 0)
-    {
-        nlStrNCpy(buffer, "", sizeof(buffer));
-        TweakEntry* grandparent = parent->m_Parent;
-        if (grandparent != 0)
-        {
-            nlStrNCpy(buffer, "", sizeof(buffer));
-            GetTweakNodePath(grandparent, buffer, sizeof(buffer));
-            nlStrNCat(buffer, buffer, "/", sizeof(buffer));
-            nlStrNCat(buffer, buffer, GetTweakNodeName(parent), sizeof(buffer));
-        }
-        nlStrNCat(buffer, buffer, "/", sizeof(buffer));
-        nlStrNCat(buffer, buffer, GetTweakNodeName(entry), sizeof(buffer));
-    }
+    BuildTweakNodePath(entry, buffer, sizeof(buffer));
 
     const char* full = buffer;
     if (buffer[0] == '/')
@@ -192,20 +170,11 @@ TweakEntry* FindOrCreateTweakPath(TweakEntry* entry, const char* path, int noCre
     return result;
 }
 
-void GetTweakNodePath(TweakNode* node, char* buffer, unsigned long size)
+void GetTweakNodePath(const TweakNode* node, char* buffer, unsigned long size)
 {
-    TweakEntry* parent = node->m_Parent;
-    if (parent != 0)
+    if (node->m_Parent != 0)
     {
-        nlStrNCpy(buffer, "", size);
-        TweakEntry* grandparent = parent->m_Parent;
-        if (grandparent != 0)
-        {
-            nlStrNCpy(buffer, "", size);
-            GetTweakNodePath(grandparent, buffer, size);
-            nlStrNCat(buffer, buffer, "/", size);
-            nlStrNCat(buffer, buffer, GetTweakNodeName(parent), size);
-        }
+        BuildTweakNodePath(node->m_Parent, buffer, size);
         nlStrNCat(buffer, buffer, "/", size);
         nlStrNCat(buffer, buffer, GetTweakNodeName(node), size);
     }
@@ -216,22 +185,7 @@ void UpdateTweakNodePathHash(TweakNode* node)
     if (node->m_Parent != GetTweakPriorityNode() && node->m_Parent != 0)
     {
         char buffer[0x200];
-        nlStrNCpy(buffer, "", sizeof(buffer));
-        TweakEntry* parent = node->m_Parent;
-        if (parent != 0)
-        {
-            nlStrNCpy(buffer, "", sizeof(buffer));
-            TweakEntry* grandparent = parent->m_Parent;
-            if (grandparent != 0)
-            {
-                nlStrNCpy(buffer, "", sizeof(buffer));
-                GetTweakNodePath(grandparent, buffer, sizeof(buffer));
-                nlStrNCat(buffer, buffer, "/", sizeof(buffer));
-                nlStrNCat(buffer, buffer, GetTweakNodeName(parent), sizeof(buffer));
-            }
-            nlStrNCat(buffer, buffer, "/", sizeof(buffer));
-            nlStrNCat(buffer, buffer, GetTweakNodeName(node), sizeof(buffer));
-        }
+        BuildTweakNodePath(node, buffer, sizeof(buffer));
         node->m_PathHash = nlStringLowerHash(buffer);
     }
 }

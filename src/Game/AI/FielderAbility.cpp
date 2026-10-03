@@ -50,8 +50,6 @@ float lbl_806DBA10 = 0.4f;
 float lbl_806E0C78;
 bool lbl_806E0C7C;
 
-extern const FuzzyVariant fvNotSet;
-
 struct UnidentifiedAbilityEvent
 {
     /* 0x00 */ cFielder* pFielder;

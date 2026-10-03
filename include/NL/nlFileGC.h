@@ -2,6 +2,7 @@
 #define NL_FILE_GC_H
 
 #include "NL/nlFile.h"
+#include "NL/nlFunctionCommon.h"
 
 struct AsyncEntry;
 
@@ -18,5 +19,10 @@ AsyncEntry* nlGetCurrentAsyncRead();
 bool nlAsyncReadBusy(AsyncEntry* entry);
 bool nlCancelAsyncRead(AsyncEntry* entry,
     void (*callback)(nlFile*, void*, unsigned int, unsigned long, void (*)(nlFile*, void*, unsigned int, unsigned long)));
+
+void nlRegHandleDVDMessageCB(const Function<void(int)>& cb);
+void nlRegHandleDVDAllClearCB(const Function<void(int)>& cb);
+void nlRegHandleDVDRetryingCB(const Function<void(int)>& cb);
+void nlRegCheckForResetFromFSCB(const Function<FnVoidVoid>& cb);
 
 #endif // NL_FILE_GC_H

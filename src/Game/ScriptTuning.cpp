@@ -8,147 +8,147 @@
 
 FuzzyTweaks::FuzzyTweaks(const char* name, const char* category)
     : TweaksBase(name)
-    , mUnidentified7B4(category)
+    , mCategory(category)
 {
     Init();
-    fn_800E1C98(true);
+    RegisterTweaks(true);
 }
 
 FuzzyTweaks::~FuzzyTweaks()
 {
 }
 
-void FuzzyTweaks::fn_800E1C98(bool registerTweaks)
+void FuzzyTweaks::RegisterTweaks(bool registerTweaks)
 {
     if (registerTweaks)
     {
-        gTweakFileLoader.LoadFileAsync(mszFileName, mUnidentified7B4);
+        gTweakFileLoader.LoadFileAsync(mszFileName, mCategory);
     }
     else
     {
-        LoadTweakConfigFile(mszFileName, mUnidentified7B4, true);
+        LoadTweakConfigFile(mszFileName, mCategory, true);
     }
 }
 
 void FuzzyTweaks::Init()
 {
-    mUnidentified044.BindWithDefault("Close 2 Teammate Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified054.BindWithDefault("Close 2 Teammate Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified064.BindWithDefault("Near 2 Teammate Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified074.BindWithDefault("Near 2 Teammate Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified084.BindWithDefault("Far 2 Teammate Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified094.BindWithDefault("Far 2 Teammate Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified0A4.BindWithDefault("Close 2 Opponent Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified0B4.BindWithDefault("Close 2 Opponent Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified0C4.BindWithDefault("Near 2 Opponent Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified0D4.BindWithDefault("Near 2 Opponent Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified0E4.BindWithDefault("Far 2 Opponent Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified0F4.BindWithDefault("Far 2 Opponent Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified104.BindWithDefault("ReallyClose 2 Ball Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified114.BindWithDefault("ReallyClose 2 Ball Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified124.BindWithDefault("Close 2 Ball Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified134.BindWithDefault("Close 2 Ball Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified144.BindWithDefault("Near 2 Ball Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified154.BindWithDefault("Near 2 Ball Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified164.BindWithDefault("Far 2 Ball Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified174.BindWithDefault("Far 2 Ball Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified184.BindWithDefault("Close 2 Net Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified194.BindWithDefault("Close 2 Net Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified1A4.BindWithDefault("Near 2 Net Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified1B4.BindWithDefault("Near 2 Net Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified1C4.BindWithDefault("Far 2 Net Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified1D4.BindWithDefault("Far 2 Net Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified1E4.BindWithDefault("Ball 2 Net Close Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified1F4.BindWithDefault("Ball 2 Net Close Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified204.BindWithDefault("Ball 2 Net Near Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified214.BindWithDefault("Ball 2 Net Near Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified224.BindWithDefault("Ball 2 Net Far Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified234.BindWithDefault("Ball 2 Net Far Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified244.BindWithDefault("Close 2 FormationPos Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified254.BindWithDefault("Close 2 FormationPos Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified264.BindWithDefault("Near 2 FormationPos Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified274.BindWithDefault("Near 2 FormationPos Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified284.BindWithDefault("Far 2 FormationPos Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified294.BindWithDefault("Far 2 FormationPos Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2A4.BindWithDefault("Close 2 Goalie Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2B4.BindWithDefault("Close 2 Goalie Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2C4.BindWithDefault("Near 2 Goalie Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2D4.BindWithDefault("Near 2 Goalie Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2E4.BindWithDefault("Far 2 Goalie Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2F4.BindWithDefault("Far 2 Goalie Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified304.BindWithDefault("Close 2 Sideline Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified314.BindWithDefault("Close 2 Sideline Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified324.BindWithDefault("Near 2 Sideline Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified334.BindWithDefault("Near 2 Sideline Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified344.BindWithDefault("Far 2 Sideline Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified354.BindWithDefault("Far 2 Sideline Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified364.BindWithDefault("Ball Height High Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified374.BindWithDefault("Ball Height High Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified384.BindWithDefault("Ball Height Really High Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified394.BindWithDefault("Ball Height Really High Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    nFacingFullConfidenceAngle.BindWithDefault("Facing Angle Max", -0x270F, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    nFacingNoConfidenceAngle.BindWithDefault("Facing Angle Min", -0x270F, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified3C4.BindWithDefault("Ball Control Distance From Owner Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified3D4.BindWithDefault("Ball Control Distance From Owner Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified3E4.BindWithDefault("Pass Lane Max Width", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified3F4.BindWithDefault("Shot Lane Max Width", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified404.BindWithDefault("Pass In Play Dist 2 Target Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified414.BindWithDefault("Shot In Play Dist 2 Target Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified424.BindWithDefault("Player OnGround Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified434.BindWithDefault("Player OnGround Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified444.BindWithDefault("InterceptBall SwapController Time Weight", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified454.BindWithDefault("InterceptBall Time Weight", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified464.BindWithDefault("InterceptBall Min Time", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified474.BindWithDefault("InterceptBall Max Time", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified484.BindWithDefault("InterceptBall Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified494.BindWithDefault("InterceptBall Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified4A4.BindWithDefault("Pressured Near Weight", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified4B4.BindWithDefault("Avoid Goalie Min Repulsion", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified4C4.BindWithDefault("Avoid Goalie Max Repulsion", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified4D4.BindWithDefault("Avoid Fielders Min Repulsion", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified4E4.BindWithDefault("Avoid Fielders Max Repulsion", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified4F4.BindWithDefault("Avoid Powerups Min Repulsion", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified504.BindWithDefault("Avoid Powerups Max Repulsion", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified514.BindWithDefault("Bad Shooter Distance Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified524.BindWithDefault("Bad Shooter Distance Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified534.BindWithDefault("Good Shooter Distance Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified544.BindWithDefault("Good Shooter Distance Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified554.BindWithDefault("Goalie Out Of Position Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified564.BindWithDefault("Goalie Out Of Position Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified574.BindWithDefault("OutOfNet Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified584.BindWithDefault("OutOfNet Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified594.BindWithDefault("Upfield Max Distance", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified5A4.BindWithDefault("Downfield Max Distance", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified5B4.BindWithDefault("Closing Max Speed", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified5C4.BindWithDefault("Separating Max Speed", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    fFrontOfNetMidAngle.BindWithDefault("InFrontOfNet Mid Angle", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    fFrontOfNetMaxAngle.BindWithDefault("InFrontOfNet Max Angle", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    fFrontOfNetMidScore.BindWithDefault("InFrontOfNet Mid Score", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified604.BindWithDefault("OpenToPosition Pass Lane Offset Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified614.BindWithDefault("OpenToPosition Pass Lane Offset Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified624.BindWithDefault("OpenToPosition Pass Lane Dist Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified634.BindWithDefault("OpenToPosition Pass Lane Dist Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified644.BindWithDefault("OpenPosition Radius Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified654.BindWithDefault("OpenPosition Radius Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified664.BindWithDefault("WideOpen Radius Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified674.BindWithDefault("WideOpen Radius Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified684.BindWithDefault("InBetween Intercept Range Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified694.BindWithDefault("InBetween Intercept Range Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified6A4.BindWithDefault("InBetween Cone Width Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified6B4.BindWithDefault("InBetween Cone Width Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified6C4.BindWithDefault("Pass Dead Thought Zone", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified6D4.BindWithDefault("Losing Score Delta", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified6E4.BindWithDefault("Winning Score Delta", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified6F4.BindWithDefault("Tied Score Delta", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified704.BindWithDefault("GameTime CloseTo Over", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified714.BindWithDefault("GameTime Nearly Over", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified724.BindWithDefault("GameTime FarFrom Over", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified734.BindWithDefault("Defensive Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified744.BindWithDefault("Defensive Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified754.BindWithDefault("Offensive Min Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified764.BindWithDefault("Offensive Max Dist", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified774.BindWithDefault("Stalling Time Easy Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified784.BindWithDefault("Stalling Time Easy Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified794.BindWithDefault("Stalling Time Hard Min", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified7A4.BindWithDefault("Stalling Time Hard Max", -9999.9f, mUnidentified7B4, false, 0.0f, 0.0f, 0.0f);
+    fCloseTeammateConfidenceDistanceMin.BindWithDefault("Close 2 Teammate Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseTeammateConfidenceDistanceMax.BindWithDefault("Close 2 Teammate Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearTeammateConfidenceDistanceMin.BindWithDefault("Near 2 Teammate Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearTeammateConfidenceDistanceMax.BindWithDefault("Near 2 Teammate Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarTeammateConfidenceDistanceMin.BindWithDefault("Far 2 Teammate Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarTeammateConfidenceDistanceMax.BindWithDefault("Far 2 Teammate Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseOpponentConfidenceDistanceMin.BindWithDefault("Close 2 Opponent Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseOpponentConfidenceDistanceMax.BindWithDefault("Close 2 Opponent Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearOpponentConfidenceDistanceMin.BindWithDefault("Near 2 Opponent Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearOpponentConfidenceDistanceMax.BindWithDefault("Near 2 Opponent Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarOpponentConfidenceDistanceMin.BindWithDefault("Far 2 Opponent Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarOpponentConfidenceDistanceMax.BindWithDefault("Far 2 Opponent Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fReallyCloseToBallDistanceConfidenceMin.BindWithDefault("ReallyClose 2 Ball Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fReallyCloseToBallDistanceConfidenceMax.BindWithDefault("ReallyClose 2 Ball Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseBallConfidenceDistanceMin.BindWithDefault("Close 2 Ball Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseBallConfidenceDistanceMax.BindWithDefault("Close 2 Ball Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearBallConfidenceDistanceMin.BindWithDefault("Near 2 Ball Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearBallConfidenceDistanceMax.BindWithDefault("Near 2 Ball Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarBallConfidenceDistanceMin.BindWithDefault("Far 2 Ball Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarBallConfidenceDistanceMax.BindWithDefault("Far 2 Ball Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseNetConfidenceDistanceMin.BindWithDefault("Close 2 Net Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseNetConfidenceDistanceMax.BindWithDefault("Close 2 Net Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearNetConfidenceDistanceMin.BindWithDefault("Near 2 Net Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearNetConfidenceDistanceMax.BindWithDefault("Near 2 Net Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarNetConfidenceDistanceMin.BindWithDefault("Far 2 Net Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarNetConfidenceDistanceMax.BindWithDefault("Far 2 Net Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseBallNetConfidenceDistanceMin.BindWithDefault("Ball 2 Net Close Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseBallNetConfidenceDistanceMax.BindWithDefault("Ball 2 Net Close Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearBallNetConfidenceDistanceMin.BindWithDefault("Ball 2 Net Near Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearBallNetConfidenceDistanceMax.BindWithDefault("Ball 2 Net Near Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarBallNetConfidenceDistanceMin.BindWithDefault("Ball 2 Net Far Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarBallNetConfidenceDistanceMax.BindWithDefault("Ball 2 Net Far Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseToFormationPositionDistanceMin.BindWithDefault("Close 2 FormationPos Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseToFormationPositionDistanceMax.BindWithDefault("Close 2 FormationPos Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearToFormationPositionDistanceMin.BindWithDefault("Near 2 FormationPos Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearToFormationPositionDistanceMax.BindWithDefault("Near 2 FormationPos Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarToFormationPositionDistanceMin.BindWithDefault("Far 2 FormationPos Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarToFormationPositionDistanceMax.BindWithDefault("Far 2 FormationPos Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseGoalieConfidenceDistanceMin.BindWithDefault("Close 2 Goalie Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseGoalieConfidenceDistanceMax.BindWithDefault("Close 2 Goalie Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearGoalieConfidenceDistanceMin.BindWithDefault("Near 2 Goalie Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearGoalieConfidenceDistanceMax.BindWithDefault("Near 2 Goalie Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarGoalieConfidenceDistanceMin.BindWithDefault("Far 2 Goalie Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarGoalieConfidenceDistanceMax.BindWithDefault("Far 2 Goalie Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseToSidelineDistanceConfidenceMin.BindWithDefault("Close 2 Sideline Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fCloseToSidelineDistanceConfidenceMax.BindWithDefault("Close 2 Sideline Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearToSidelineDistanceConfidenceMin.BindWithDefault("Near 2 Sideline Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fNearToSidelineDistanceConfidenceMax.BindWithDefault("Near 2 Sideline Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarFromSidelineDistanceConfidenceMin.BindWithDefault("Far 2 Sideline Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFarFromSidelineDistanceConfidenceMax.BindWithDefault("Far 2 Sideline Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fHighBallConfidenceDistanceMin.BindWithDefault("Ball Height High Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fHighBallConfidenceDistanceMax.BindWithDefault("Ball Height High Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fReallyHighBallConfidenceDistanceMin.BindWithDefault("Ball Height Really High Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fReallyHighBallConfidenceDistanceMax.BindWithDefault("Ball Height Really High Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    nFacingFullConfidenceAngle.BindWithDefault("Facing Angle Max", -0x270F, mCategory, false, 0.0f, 0.0f, 0.0f);
+    nFacingNoConfidenceAngle.BindWithDefault("Facing Angle Min", -0x270F, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fControlConfidenceDistanceMin.BindWithDefault("Ball Control Distance From Owner Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fControlConfidenceDistanceMax.BindWithDefault("Ball Control Distance From Owner Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fPassLaneDistance.BindWithDefault("Pass Lane Max Width", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fShotLaneDistance.BindWithDefault("Shot Lane Max Width", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fPassInPlayFullConfidenceDistance.BindWithDefault("Pass In Play Dist 2 Target Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fShotInPlayFullConfidenceDistance.BindWithDefault("Shot In Play Dist 2 Target Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOnGroundConfidenceDistanceMin.BindWithDefault("Player OnGround Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOnGroundConfidenceDistanceMax.BindWithDefault("Player OnGround Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInterceptBallSwapControlerScoreWeight.BindWithDefault("InterceptBall SwapController Time Weight", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInterceptBallScoreWeight.BindWithDefault("InterceptBall Time Weight", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInterceptBallConfidenceTimeMin.BindWithDefault("InterceptBall Min Time", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInterceptBallConfidenceTimeMax.BindWithDefault("InterceptBall Max Time", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInterceptBallConfidenceDistanceMin.BindWithDefault("InterceptBall Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInterceptBallConfidenceDistanceMax.BindWithDefault("InterceptBall Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fPressuredNearWeight.BindWithDefault("Pressured Near Weight", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fAvoidGoalieRepulsionConfidenceMin.BindWithDefault("Avoid Goalie Min Repulsion", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fAvoidGoalieRepulsionConfidenceMax.BindWithDefault("Avoid Goalie Max Repulsion", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fAvoidFieldersRepulsionConfidenceMin.BindWithDefault("Avoid Fielders Min Repulsion", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fAvoidFieldersRepulsionConfidenceMax.BindWithDefault("Avoid Fielders Max Repulsion", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fAvoidPowerupsRepulsionConfidenceMin.BindWithDefault("Avoid Powerups Min Repulsion", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fAvoidPowerupsRepulsionConfidenceMax.BindWithDefault("Avoid Powerups Max Repulsion", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fBadShooterDistanceMin.BindWithDefault("Bad Shooter Distance Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fBadShooterDistanceMax.BindWithDefault("Bad Shooter Distance Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGoodShooterDistanceMin.BindWithDefault("Good Shooter Distance Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGoodShooterDistanceMax.BindWithDefault("Good Shooter Distance Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGoalieOutOfPositionDistanceMin.BindWithDefault("Goalie Out Of Position Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGoalieOutOfPositionDistanceMax.BindWithDefault("Goalie Out Of Position Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOutOfNetConfidenceDistanceMin.BindWithDefault("OutOfNet Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOutOfNetConfidenceDistanceMax.BindWithDefault("OutOfNet Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fUpfieldMaxDistance.BindWithDefault("Upfield Max Distance", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fDownfieldMaxDistance.BindWithDefault("Downfield Max Distance", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fClosingSpeedMax.BindWithDefault("Closing Max Speed", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fSeparatingSpeedMax.BindWithDefault("Separating Max Speed", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFrontOfNetMidAngle.BindWithDefault("InFrontOfNet Mid Angle", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFrontOfNetMaxAngle.BindWithDefault("InFrontOfNet Max Angle", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fFrontOfNetMidScore.BindWithDefault("InFrontOfNet Mid Score", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGetOpenPassLaneOffsetMin.BindWithDefault("OpenToPosition Pass Lane Offset Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGetOpenPassLaneOffsetMax.BindWithDefault("OpenToPosition Pass Lane Offset Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGetOpenPassLaneDistMin.BindWithDefault("OpenToPosition Pass Lane Dist Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGetOpenPassLaneDistMax.BindWithDefault("OpenToPosition Pass Lane Dist Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOpenRadiusMin.BindWithDefault("OpenPosition Radius Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOpenRadiusMax.BindWithDefault("OpenPosition Radius Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fWideOpenRadiusMin.BindWithDefault("WideOpen Radius Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fWideOpenRadiusMax.BindWithDefault("WideOpen Radius Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInBetweenInterceptRangeMin.BindWithDefault("InBetween Intercept Range Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInBetweenInterceptRangeMax.BindWithDefault("InBetween Intercept Range Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInBetweenConeWidthMin.BindWithDefault("InBetween Cone Width Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fInBetweenConeWidthMax.BindWithDefault("InBetween Cone Width Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fPassDeadZone.BindWithDefault("Pass Dead Thought Zone", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fLosingScoreDelta.BindWithDefault("Losing Score Delta", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fWinningScoreDelta.BindWithDefault("Winning Score Delta", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fTiedScoreDelta.BindWithDefault("Tied Score Delta", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGameTimeCloseToOver.BindWithDefault("GameTime CloseTo Over", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGameTimeNearlyOver.BindWithDefault("GameTime Nearly Over", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fGameTimeFarFromOver.BindWithDefault("GameTime FarFrom Over", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fDefensiveConfidenceDistancesMin.BindWithDefault("Defensive Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fDefensiveConfidenceDistancesMax.BindWithDefault("Defensive Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOffensiveConfidenceDistancesMin.BindWithDefault("Offensive Min Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOffensiveConfidenceDistancesMax.BindWithDefault("Offensive Max Dist", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fStallingTimeEasyMin.BindWithDefault("Stalling Time Easy Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fStallingTimeEasyMax.BindWithDefault("Stalling Time Easy Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fStallingTimeHardMin.BindWithDefault("Stalling Time Hard Min", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fStallingTimeHardMax.BindWithDefault("Stalling Time Hard Max", -9999.9f, mCategory, false, 0.0f, 0.0f, 0.0f);
 }

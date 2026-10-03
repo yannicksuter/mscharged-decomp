@@ -92,8 +92,8 @@ void PauseMenuScene::OnSelectQUIT()
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push((SceneList)10, SCREEN_NOTHING, false);
-        popup->mUnidentifiedC0C = mQuittingController;
-        popup->mUnidentified9A1 = true;
+        popup->mControlInput = mQuittingController;
+        popup->mAllPointersActive = true;
         WorldDarkening::Instance().Fade(100.0f, 1.0f);
         if (GameInfoManager::Instance()->mIsInStrikers101Mode)
         {

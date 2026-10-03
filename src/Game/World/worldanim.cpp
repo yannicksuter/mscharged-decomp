@@ -42,7 +42,7 @@ void WorldObject_80129EE0::SetWorldMatrix(const nlMatrix4& transform)
 }
 
 PhysicsObject* CreatePhysicsPrimitive(
-    WorldPhysicsDescription* pDescription,
+    const WorldPhysicsDescription* pDescription,
     CollisionSpace* pCollisionSpace)
 {
     PhysicsObject* pPhysicsObject = 0;
@@ -70,28 +70,29 @@ PhysicsObject* CreatePhysicsPrimitive(
         break;
     case 4:
     {
-        const float* m = (const float*)&pDescription->matLocalToParent;
-        nlVector3 position = { m[12], m[13], m[14] };
-        nlVector3 axis0 = { 0.5f * pDescription->fWidth * m[0],
-            0.5f * pDescription->fWidth * m[1],
-            0.5f * pDescription->fWidth * m[2] };
-        nlVector3 axis1 = { 0.5f * pDescription->fLength * m[4],
-            0.5f * pDescription->fLength * m[5],
-            0.5f * pDescription->fLength * m[6] };
-        pPhysicsObject
-            = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false))
-                PhysicsFinitePlane(pCollisionSpace, position, axis0,
-                    axis1, true, -1.0f);
+        const nlMatrix4& transform = pDescription->matLocalToParent;
+        nlVector3 position;
+        nlVector3 axis0;
+        nlVector3 axis1;
+        nlVector3 normal;
+        transform.GetRow_(3, position);
+        transform.GetRow_(0, axis0);
+        transform.GetRow_(1, axis1);
+        transform.GetRow_(2, normal);
+        nlVec3Scale(axis0, 0.5f * pDescription->fWidth);
+        nlVec3Scale(axis1, 0.5f * pDescription->fLength);
+        pPhysicsObject = new (nlMalloc(sizeof(PhysicsFinitePlane), 8, false))
+            PhysicsFinitePlane(pCollisionSpace, position, axis0, axis1, true, -1.0f);
         break;
     }
     case 6:
     {
-        const float* m = (const float*)&pDescription->matLocalToParent;
-        float distance
-            = m[8] * m[12] + m[9] * m[13] + m[10] * m[14];
-        pPhysicsObject
-            = new (nlMalloc(sizeof(PhysicsPlane), 8, false)) PhysicsPlane(
-                pCollisionSpace, m[8], m[9], m[10], distance);
+        const nlMatrix4& transform = pDescription->matLocalToParent;
+        nlVector3 normal;
+        transform.GetRow_(2, normal);
+        float distance = nlVec3DotProduct(normal, transform.GetTranslation());
+        pPhysicsObject = new (nlMalloc(sizeof(PhysicsPlane), 8, false))
+            PhysicsPlane(pCollisionSpace, normal.x, normal.y, normal.z, distance);
         break;
     }
     }
@@ -187,12 +188,9 @@ WorldAnimController* WorldAnimManager::FindController(
     return 0;
 }
 
-AnimationSet* WorldAnimManager::LoadHierarchy(nlChunk* pChunk)
+inline AnimationSet* WorldAnimManager::GetOrCreateAnimationSet(
+    unsigned long uHierarchyHash)
 {
-    m_pHierarchyInventory->ParseChunk(pChunk);
-    cSHierarchy* pHierarchy = m_pHierarchyInventory->Find(0);
-    unsigned long uHierarchyHash = pHierarchy->GetHashID();
-
     AnimationSet** ppAnimationSet;
     AnimationSet* pAnimationSet;
     if (m_animationSetMap.FindGet(
@@ -209,6 +207,14 @@ AnimationSet* WorldAnimManager::LoadHierarchy(nlChunk* pChunk)
         pAnimationSet = pNewAnimationSet;
     }
 
+    return pAnimationSet;
+}
+
+AnimationSet* WorldAnimManager::LoadHierarchy(nlChunk* pChunk)
+{
+    m_pHierarchyInventory->ParseChunk(pChunk);
+    cSHierarchy* pHierarchy = m_pHierarchyInventory->Find(0);
+    AnimationSet* pAnimationSet = GetOrCreateAnimationSet(pHierarchy->GetHashID());
     pAnimationSet->m_pHierarchy = pHierarchy;
     return pAnimationSet;
 }

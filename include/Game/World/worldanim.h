@@ -7,6 +7,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/World/WorldObject.h"
 #include "NL/nlAVLTree.h"
+#include "NL/nlMath.h"
 
 struct WorldAnimBinding;
 struct WorldPhysicsDescription;
@@ -19,6 +20,9 @@ class WorldAnimObject : public WorldObject
 {
 public:
     virtual ~WorldAnimObject();
+    virtual void ReleaseResources();
+    virtual nlMatrix4* GetWorldMatrix();
+    virtual void SetWorldMatrix(const nlMatrix4& transform);
     virtual void Initialize(WorldObjectLoadContext* context);
 
     /* 0x04 */ unsigned long m_uHashID;
@@ -26,7 +30,8 @@ public:
     /* 0x10 */ World* m_pWorld;
     /* 0x14 */ int m_nAnimNode;
     /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ u8 m_pad1C[0x44];
+    /* 0x1C */ u8 m_pad1C[0x04];
+    /* 0x20 */ nlMatrix4 mWorldMatrix;
     /* 0x60 */ int m_nBindings;
     /* 0x64 */ unsigned long m_uHierarchyHash;
     /* 0x68 */ WorldAnimBinding* m_pBindings;
@@ -117,6 +122,7 @@ public:
     }
     WorldAnimController* GetOrCreateController(unsigned long uHashID);
     WorldAnimController* FindController(unsigned long uHashID);
+    AnimationSet* GetOrCreateAnimationSet(unsigned long uHierarchyHash);
     AnimationSet* LoadHierarchy(nlChunk* pChunk);
     void LoadAnimationSet(AnimationSet* pAnimationSet, nlChunk* pChunk);
     void BindObjects();
@@ -132,7 +138,7 @@ public:
 };
 
 PhysicsObject* CreatePhysicsPrimitive(
-    WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
+    const WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
 void ReleaseWorldPhysicsObject(WorldPhysicsDrawable* pOwner);
 
 typedef char AnimationSet_size_check[sizeof(AnimationSet) == 0x20 ? 1 : -1];

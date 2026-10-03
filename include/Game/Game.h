@@ -20,6 +20,7 @@ struct DetermDataEvent;
 struct CharacterImpactEvent;
 struct GoalieSaveData;
 struct PlayerAttackData;
+struct CollisionPlayerWallData;
 class cFielder;
 class cPlayer;
 
@@ -61,6 +62,7 @@ struct UnidentifiedCircularByteQueue
 
 void DestroyPowerups();
 void DestroyGame();
+void FreeCollisionPlayerWallData(CollisionPlayerWallData* node);
 extern "C" void fn_8005B330(nlVector3*, float, float);
 
 extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt);
@@ -263,6 +265,7 @@ extern "C" void fn_8005E9FC(void* pManager, const PlayerAttackData* pData);
 
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 
+extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder);
 extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData);
 
 extern "C" void fn_800611F0(cGame* pGame, const void* pEventData);

@@ -4,7 +4,7 @@
 #include "Game/AI/DesireUpdate.h"
 #include "NL/nlAVLTree.h"
 
-extern unsigned char lbl_806DF568;
+extern unsigned char g_bScriptQuestionCachingOn;
 
 class ScriptQuestionCache
 {
@@ -35,7 +35,7 @@ public:
     {
         UnidentifiedVariant_80054AB8* pValue;
 
-        if (!lbl_806DF568)
+        if (!g_bScriptQuestionCachingOn)
         {
             return 0;
         }

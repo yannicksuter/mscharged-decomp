@@ -6,7 +6,7 @@
 
 struct EventRegistryValue
 {
-    UnidentifiedEventBase* event;
+    EventBase* event;
     void* type;
 };
 

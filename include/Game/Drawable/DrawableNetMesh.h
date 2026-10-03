@@ -5,8 +5,8 @@
 #include "NL/nlMath.h"
 
 class NetMesh;
-struct LoadFrame;
-struct SaveFrame;
+class LoadFrame;
+class SaveFrame;
 
 class DrawableNetMesh
 {

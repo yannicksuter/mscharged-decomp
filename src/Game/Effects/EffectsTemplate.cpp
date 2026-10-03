@@ -70,6 +70,20 @@ float fxAnimatedRange::GetMaximum() const
     return base + 0.5f * range;
 }
 
+inline fxAnimatedRange* fxAnimatedRange::LoadFromChunk(nlChunk* chunk)
+{
+    nlChunk* valueChunk = chunk->GetFirstChunk();
+    fxAnimatedRange* value
+        = static_cast<fxAnimatedRange*>(valueChunk->GetData());
+    if (value->mUseCurve != 0)
+    {
+        nlChunk* keysChunk = valueChunk->GetNextChunk();
+        value->mKeys = static_cast<fxCurveKey*>(
+            keysChunk->GetData());
+    }
+    return value;
+}
+
 EffectsTemplate* EffectsTemplate::LoadFromChunk(nlChunk* chunk)
 {
     nlChunk* templateChunk = chunk->GetFirstChunk();
@@ -79,16 +93,7 @@ EffectsTemplate* EffectsTemplate::LoadFromChunk(nlChunk* chunk)
     for (int i = 0; i < 8; ++i)
     {
         templateChunk = templateChunk->GetNextChunk();
-        nlChunk* valueChunk = templateChunk->GetFirstChunk();
-        fxAnimatedRange* value
-            = static_cast<fxAnimatedRange*>(valueChunk->GetData());
-        if (value->mUseCurve != 0)
-        {
-            nlChunk* keysChunk = valueChunk->GetNextChunk();
-            value->mKeys = static_cast<fxCurveKey*>(
-                keysChunk->GetData());
-        }
-        result->mProperties[i] = value;
+        result->mProperties[i] = fxAnimatedRange::LoadFromChunk(templateChunk);
     }
 
     if (result->m_hTexture == 0xFFFFFFFF)

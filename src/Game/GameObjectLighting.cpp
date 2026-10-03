@@ -721,9 +721,9 @@ void LoadGameObjectLights(s32 arg0, GLView* arg1, bool arg2)
     }
 }
 
-void fn_80182EC8(s32 arg0)
+void SetGameObjectLightingMode(s32 mode)
 {
-    lbl_806E1428 = arg0;
+    lbl_806E1428 = mode;
 }
 
 void SetGameObjectLightTexture(u32 texture)

@@ -23,13 +23,6 @@
 
 extern "C" bool fn_8013E2E4();
 
-class SimpleCollisionSpace : public CollisionSpace
-{
-public:
-    SimpleCollisionSpace(PhysicsWorld*, bool);
-    virtual ~SimpleCollisionSpace() { }
-};
-
 static bool sbDisableCollisionDetection;
 static bool sbNonMovingAABBsInitialized;
 PhysicsMesh* g_TerrainMesh;
@@ -62,14 +55,14 @@ void ODEFree(void* ptr, unsigned long)
     nlFree(ptr);
 }
 
-extern "C" void fn_8013D7A0()
+void InitializeODEAllocators()
 {
     dSetAllocHandler(ODEAlloc);
     dSetReallocHandler(ODERealloc);
     dSetFreeHandler(ODEFree);
 }
 
-extern "C" void fn_8013D7E0()
+void RegisterUserGeomClasses()
 {
     dGeomDestroy(dCreateColumn(0, 1.0f));
     dGeomDestroy(dCreateCylinder(0, 1.0f, 1.0f));
@@ -77,7 +70,7 @@ extern "C" void fn_8013D7E0()
     dGeomDestroy(dCreateRoundedCorner(0, 1.0f, true, true));
 }
 
-extern "C" void fn_8013D85C()
+void CreatePhysicsWorld()
 {
     fn_8013E2E4();
 
@@ -89,7 +82,7 @@ extern "C" void fn_8013D85C()
     g_PhysicsWorld->SetERP(0.2f);
 }
 
-extern "C" void fn_8013D8DC()
+void CreateStaticPhysicsPrimitives()
 {
     g_StaticPhysicsPrimitives.AddEnd(
         new (nlMalloc(sizeof(PhysicsGroundPlane), 8, false)) PhysicsGroundPlane(g_CollisionSpace));
@@ -128,7 +121,7 @@ extern "C" void fn_8013D8DC()
     sbNonMovingAABBsInitialized = false;
 }
 
-extern "C" void fn_8013DB18()
+void DestroyStaticPhysicsPrimitives()
 {
     PhysicsNet::StaticDestroy();
 
@@ -150,7 +143,7 @@ extern "C" void fn_8013DB18()
     g_TerrainMesh = 0;
 }
 
-extern "C" void fn_8013DDD4()
+void DestroyPhysicsWorld()
 {
     delete g_CollisionSpace;
     g_CollisionSpace = 0;
@@ -208,6 +201,6 @@ void PhysicsUpdate(PhysicsWorld* world, float dt)
 
     if (world == g_PhysicsWorld)
     {
-        fn_80144130(lbl_806E11F0);
+        DispatchPhysicsEvents(gPhysicsEventQueue);
     }
 }

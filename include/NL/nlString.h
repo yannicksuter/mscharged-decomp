@@ -132,7 +132,10 @@ public:
     template <typename T>
     static T* New(int count, const char*)
     {
-        return (T*)Alloc(count * sizeof(T));
+        void* ptr = sTempStringAllocatorPool.allocator.pool.Allocate(count * sizeof(T) + 4);
+        unsigned long size = count * sizeof(T);
+        memcpy(ptr, &size, sizeof(size));
+        return (T*)((char*)ptr + 4);
     }
 
     template <typename T>

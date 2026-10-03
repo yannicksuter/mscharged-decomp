@@ -12,8 +12,6 @@
 class TLComponentInstance;
 class TLTextInstance;
 
-typedef Function<FnVoidVoid> _FEPopupMenuCB;
-
 enum ePopupMenu
 {
     INVALID_TYPE = -1,
@@ -37,12 +35,12 @@ public:
 
     void SetPositions();
     void CentrePopup(float totalHeight, float topOfMessageBox);
-    void fn_801C83AC(bool visible);
-    void fn_801C8494();
-    void fn_801C87E0(unsigned int index, void* context);
-    void fn_801C88B4(unsigned int index, void* context);
-    void fn_801C8960(unsigned int index, void* context);
-    ePopupMenu fn_801CA644() const { return mType; }
+    void SetMessageAndOptionsVisible(bool visible);
+    void InitializePointerButtons();
+    void OnOptionPointerEnter(unsigned int index, void* context);
+    void OnOptionPointerLeave(unsigned int index, void* context);
+    void OnOptionPointerPress(unsigned int index, void* context);
+    ePopupMenu GetType() const { return mType; }
 
     // Never called. R4QE01 keeps the implicit nlColour copy-assignment that
     // SceneCreated calls out of line in the position of an already-synthesized
@@ -58,7 +56,6 @@ public:
     {
         mHighlightedOptionColour = colour;
     }
-    void SetBackButtonCallback(_FEPopupMenuCB callback);
 
     void Create(ePopupMenu type)
     {
@@ -101,37 +98,37 @@ public:
     /* 0x01C */ unsigned short mMessageBuffer[1024];
     /* 0x81C */ unsigned short mOptionBuffers[4][48];
     /* 0x99C */ bool mMenuDisplayed;
-    /* 0x99D */ bool mUnidentified99D;
+    /* 0x99D */ bool mMessageAndOptionsShown;
     /* 0x99E */ bool mMenuCreated;
     /* 0x99F */ bool mRunCallBack;
-    /* 0x9A0 */ bool mUnknownA1F;
-    /* 0x9A1 */ bool mUnidentified9A1;
-    /* 0x9A2 */ bool mUnidentified9A2;
-    /* 0x9A3 */ bool mUnidentified9A3;
+    /* 0x9A0 */ bool mRunBackCallback;
+    /* 0x9A1 */ bool mAllPointersActive;
+    /* 0x9A2 */ bool mOptionPressed;
+    /* 0x9A3 */ bool mHBMWasBlocked;
     /* 0x9A4 */ int mHighlightedOption;
-    /* 0x9A8 */ int mUnidentified9A8;
+    /* 0x9A8 */ int mShowLongButton;
     /* 0x9AC */ float mAcceptDelayTime;
     /* 0x9B0 */ Popup mPopup;
     /* 0x9C4 */ TLComponentInstance* mOptionInstances[3];
-    /* 0x9D0 */ TLTextInstance* mUnidentified9D0[3];
+    /* 0x9D0 */ TLTextInstance* mOptionTextInstances[3];
     /* 0x9DC */ FEPointerButton mControllerComponents[3];
-    /* 0xBF8 */ unsigned int mUnidentifiedBF8[4];
-    /* 0xC08 */ int mUnidentifiedC08;
-    /* 0xC0C */ int mUnidentifiedC0C;
+    /* 0xBF8 */ unsigned int mPointerHoverCounts[4];
+    /* 0xC08 */ int mUpdateCount;
+    /* 0xC0C */ int mControlInput;
     /* 0xC10 */ Function<FnVoidVoid> callBacks[3];
-    /* 0xC28 */ Function<FnVoidVoid> mUnknownA64;
+    /* 0xC28 */ Function<FnVoidVoid> mBackCallback;
     /* 0xC30 */ nlColour mHighlightedOptionColour;
     /* 0xC34 */ unsigned char mUnidentifiedC34[0x0C];
     /* 0xC40 */ ePopupMenu mType;
-    /* 0xC44 */ bool mUnknownAA4;
-    /* 0xC45 */ bool mUnknownAA5;
+    /* 0xC44 */ bool mPlayIntroAnimation;
+    /* 0xC45 */ bool mWideMessageBox;
     /* 0xC46 */ unsigned char mUnidentifiedC46[2];
-    /* 0xC48 */ TLComponentInstance* mUnidentifiedC48;
+    /* 0xC48 */ TLComponentInstance* mHighlightInstance;
     /* 0xC4C */ bool mUnidentifiedC4C;
     /* 0xC4D */ unsigned char mUnidentifiedC4D[3];
-    /* 0xC50 */ float mUnidentifiedC50;
-    /* 0xC54 */ float mUnidentifiedC54;
-    /* 0xC58 */ bool mUnidentifiedC58;
+    /* 0xC50 */ float mBackgroundTargetScaleX;
+    /* 0xC54 */ float mBackgroundTargetScaleY;
+    /* 0xC58 */ bool mBackgroundScaleDone;
 
 private:
     void UpdateBackgroundScale(float fDeltaT);

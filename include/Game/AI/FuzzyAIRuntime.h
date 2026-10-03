@@ -213,7 +213,7 @@ extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E82E8(FuzzyAIRunt
 extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E8414(FuzzyAIRuntime*, float, float);
 extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnVariant(FuzzyAIRuntime*, UnidentifiedVariant_80054AB8*, float);
 extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnU32(FuzzyAIRuntime*, unsigned long, float);
-extern "C" float fn_800E8CAC(void*, float, bool);
+extern "C" float FuzzyAIPassThrough_800E8CAC(void*, float, bool);
 extern "C" unsigned long fn_800E8CB0(void*, Variant*);
 extern "C" void FuzzyAISetPlayerParameter_800E8CB8(void*, cPlayer*, unsigned long, UnidentifiedVariant_80054AB8*);
 extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase*, int, unsigned long, UnidentifiedVariant_80054AB8*);
@@ -230,21 +230,30 @@ extern "C" void FuzzyAISetTransition(UnidentifiedScriptMachine*, const char*);
 
 
 extern "C" void LoadFuzzyByteCode(const char* filename, bool async);
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(FuzzyRuntimeBase* runtime, FunctionEntryPoint* function, int argumentCount, void* arg1, void* arg2);
+
+// Script arguments occupy one stack word, including the bits of float values.
+template <typename T>
+inline u32 FuzzyArgumentBits(const T& value)
+{
+    typedef char ArgumentMustFitWord[sizeof(T) == sizeof(u32) ? 1 : -1];
+    return *reinterpret_cast<const u32*>(&value);
+}
+
+extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(FuzzyRuntimeBase* runtime, FunctionEntryPoint* function, int argumentCount, u32 arg1, u32 arg2);
 extern "C" bool ApplyFuzzyByteCode();
-extern "C" char fn_80312358(void*, char value);
+extern "C" char FuzzyPassThrough_80312358(void*, char value);
 extern "C" float FuzzyGetQueueConfidence( FuzzyRuntimeBase* runtime);
-extern "C" void fn_80314434(void*, UnidentifiedVariant_80054AB8*, float);
-extern "C" void fn_80314438(void*, UnidentifiedVariant_80054AB8*);
-extern "C" void* fn_8031443C(void*, void* value, bool);
-extern "C" float fn_80314444(void*, float value, bool);
+extern "C" void FuzzyNoOp_80314434(void*, UnidentifiedVariant_80054AB8*, float);
+extern "C" void FuzzyNoOp_80314438(void*, UnidentifiedVariant_80054AB8*);
+extern "C" void* FuzzyPassThrough_8031443C(void*, void* value, bool);
+extern "C" float FuzzyPassThrough_80314444(void*, float value, bool);
 extern "C" float FuzzyNormalize(float value, float minimum, float maximum);
 extern "C" float FuzzyClamp(float value, float minimum, float maximum);
 extern "C" float FuzzyInterpolate(float first, float second, float amount);
 extern "C" float FuzzyInterpolateClamped(float first, float second, float amount);
 extern "C" float FuzzyInterpolateRange(float first, float second, float minimum, float maximum, float value);
 extern "C" float FuzzyInterpolateRangeClamped(float first, float second, float minimum, float maximum, float value);
-extern "C" void fn_80314740(void*, bool);
+extern "C" void FuzzyNoOp_80314740(void*, bool);
 extern "C" void FuzzySetActionSelection( FuzzyRuntimeBase* runtime, int selection);
 extern "C" void FuzzySetTransition(void*, shdStateMachine* state, const char* name);
 extern "C" bool fn_80314798(void*);

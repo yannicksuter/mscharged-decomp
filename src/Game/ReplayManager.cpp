@@ -47,23 +47,20 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 
-extern "C"
-{
-    float fn_80189870();
-}
+float GetRemoteReplaySpeed();
 
-bool lbl_806E14B8;
-bool lbl_806E14B9;
+bool gbDebugReplayFixedStepMode;
+bool gbReplayFlashError;
 extern float lbl_806E14CC;
-extern bool lbl_806E14D0;
-extern bool lbl_806E14D1;
+extern bool gbSavingReplay;
+extern bool gbLoadingReplay;
 
 ReplayManager::ReplayManager()
     : mCurrent(mSnapshots)
     , mPrevious(mSnapshots + 1)
     , mRender(0)
     , mDebugCamera(cFollowCamera::FOLLOW_SELECTABLE)
-    , mUnidentified7604(0)
+    , mReplayDebugCamera(0)
     , mEvents(0)
     , mSpeed(1.0f)
     , mSpeedUp(0.0f)
@@ -84,9 +81,9 @@ ReplayManager* ReplayManager::Instance()
     return rm;
 }
 
-bool lbl_806E14C0;
-float lbl_806E14C4;
-nlVector3 lbl_80570CA0;
+bool gbNetMeshReplayResync;
+float gfLastAheadOfFrameTime;
+nlVector3 gLastReplayBallPosition;
 
 template <typename T>
 void RenderSnapshot::Replay(T& frame)
@@ -162,32 +159,32 @@ void RenderSnapshot::Replay(T& frame)
         if (ReplayFrameTraits<T>::IsLoadFrame
             && ((LoadFrame&)frame).GetInterval() == 1)
         {
-            if (lbl_806E14C0)
+            if (gbNetMeshReplayResync)
             {
-                lbl_806E14C0 = false;
+                gbNetMeshReplayResync = false;
                 NetMesh::GetPositiveXNetMesh()->Update(g_fFixedUpdateTick,
                     mBall.fn_801925BC(),
-                    lbl_80570CA0,
+                    gLastReplayBallPosition,
                     _2430,
                     0);
                 NetMesh::GetNegativeXNetMesh()->Update(g_fFixedUpdateTick,
                     mBall.fn_801925BC(),
-                    lbl_80570CA0,
+                    gLastReplayBallPosition,
                     _2431,
                     0);
-                lbl_80570CA0 = mBall.fn_801925BC();
+                gLastReplayBallPosition = mBall.fn_801925BC();
                 mpNetMeshPositiveX->Grab(*PhysicsNet::fn_801949D4()->fn_801949CC());
                 mpNetMeshNegativeX->Grab(*PhysicsNet::fn_801949DC()->fn_801949CC());
             }
             if (((LoadFrame&)frame).fn_801948B0() > 0.0f)
             {
-                if (((LoadFrame&)frame).fn_801948B0() < lbl_806E14C4)
+                if (((LoadFrame&)frame).fn_801948B0() < gfLastAheadOfFrameTime)
                 {
                     mpNetMeshPositiveX->Grab(*PhysicsNet::fn_801949D4()->fn_801949CC());
                     mpNetMeshNegativeX->Grab(*PhysicsNet::fn_801949DC()->fn_801949CC());
-                    lbl_806E14C0 = true;
+                    gbNetMeshReplayResync = true;
                 }
-                lbl_806E14C4 = ((LoadFrame&)frame).fn_801948B0();
+                gfLastAheadOfFrameTime = ((LoadFrame&)frame).fn_801948B0();
             }
         }
         Replayable<1>(frame, *mpNetMeshPositiveX);
@@ -237,14 +234,14 @@ UnidentifiedMakeReplayBinding(
     return CallbackBind(function, manager);
 }
 
-void ReplayManager::fn_80188D88()
+void ReplayManager::RegisterEventHandlers()
 {
-    UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895C0, this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_80066590>("ShotAtGoal", -1)->Add(Function<UnidentifiedEventData_80066590*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895D0, this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_800663A8>("PassBall", -1)->Add(Function<UnidentifiedEventData_800663A8*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895E0, this)), 0, -1);
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_801895F0, this)), 0, -1);
-    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_80189610, this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::fn_80189620, this)), 0, -1);
+    UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnReceiveBall, this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_80066590>("ShotAtGoal", -1)->Add(Function<UnidentifiedEventData_80066590*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData_800663A8>("PassBall", -1)->Add(Function<UnidentifiedEventData_800663A8*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
+    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
 }
 
 void ReplayManager::InitializeSnapshots()
@@ -255,27 +252,27 @@ void ReplayManager::InitializeSnapshots()
     }
 }
 
-void ReplayManager::fn_801895B0()
+void ReplayManager::OnMegaStrikeResult()
 {
     mEvents |= 0x40;
 }
 
-void ReplayManager::fn_801895C0(ReceiveBallData* event)
+void ReplayManager::OnReceiveBall(ReceiveBallData* event)
 {
     mEvents |= 4;
 }
 
-void ReplayManager::fn_801895D0(UnidentifiedEventData_80066590* event)
+void ReplayManager::OnShotAtGoal(UnidentifiedEventData_80066590* event)
 {
     mEvents |= 2;
 }
 
-void ReplayManager::fn_801895E0(UnidentifiedEventData_800663A8* event)
+void ReplayManager::OnPassBall(UnidentifiedEventData_800663A8* event)
 {
     mEvents |= 8;
 }
 
-void ReplayManager::fn_801895F0(GoalScoredData* event)
+void ReplayManager::OnGoalScored(GoalScoredData* event)
 {
     if (event->uGoalType != 6)
     {
@@ -283,12 +280,12 @@ void ReplayManager::fn_801895F0(GoalScoredData* event)
     }
 }
 
-void ReplayManager::fn_80189610(GoalieSaveData* event)
+void ReplayManager::OnGoalieSave(GoalieSaveData* event)
 {
     mEvents |= 0x11;
 }
 
-void ReplayManager::fn_80189620()
+void ReplayManager::OnKickoff()
 {
     mEvents |= 0x20;
 }
@@ -353,7 +350,7 @@ void ReplayManager::Flush()
 
 void ReplayManager::DoPotentialAutoReplay(float deltaTime)
 {
-    if (nlTaskManager::m_pInstance->mCurrentState == 8 && !lbl_806E14D1)
+    if (nlTaskManager::m_pInstance->mCurrentState == 8 && !gbLoadingReplay)
     {
         mSpeed = mSpeedUp * deltaTime + mSpeed;
         if (mSpeed < 0.1f)
@@ -366,14 +363,14 @@ void ReplayManager::DoPotentialAutoReplay(float deltaTime)
     }
 }
 
-extern "C" float fn_80189870()
+float GetRemoteReplaySpeed()
 {
     static TweakFloatBinding unidentifiedScale(
         "/Camera/Debug Cam/Revolution/Revolution Accelerometer Scale", 1.0f);
 
     float acceleration = g_pPlatPadManager->GetFreestyleStatus(0)->wpad.accX;
     float speed;
-    if (lbl_806E14B8 == 1)
+    if (gbDebugReplayFixedStepMode == 1)
     {
         speed = acceleration * unidentifiedScale;
         speed = nlMaxEquals(speed, -1.0f);
@@ -410,11 +407,11 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
         if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
         {
             nlTaskManager::SetNextState(2);
-            if (mUnidentified7604 != 0)
+            if (mReplayDebugCamera != 0)
             {
                 cCameraManager::PopCamera();
-                delete mUnidentified7604;
-                mUnidentified7604 = 0;
+                delete mReplayDebugCamera;
+                mReplayDebugCamera = 0;
             }
             return;
         }
@@ -430,13 +427,13 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
     {
         if (cCameraManager::PeekCamera()->GetType() != eCameraType_Debug)
         {
-            mUnidentified7604
+            mReplayDebugCamera
                 = new (nlMalloc(0xA0, 8, false)) cDebugCamera(true);
-            cCameraManager::PushCamera(mUnidentified7604);
+            cCameraManager::PushCamera(mReplayDebugCamera);
         }
 
         mDeltaTime = 0.0f;
-        if (lbl_806E14B8 == 1)
+        if (gbDebugReplayFixedStepMode == 1)
         {
             mDeltaTime = 0.02f * unidentifiedPad->GetPressure(5, true);
             if (unidentifiedPad->GetPressure(5, true))
@@ -462,7 +459,7 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
             && (unidentifiedClassID == gWiiRemotePadClassID
                 || unidentifiedClassID == gWiiFreestylePadClassID))
         {
-            mDeltaTime *= fn_80189870();
+            mDeltaTime *= GetRemoteReplaySpeed();
         }
 
         float time = mTime + mDeltaTime;
@@ -482,8 +479,8 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
 }
 
 float lbl_806E14CC;
-bool lbl_806E14D0;
-bool lbl_806E14D1;
+bool gbSavingReplay;
+bool gbLoadingReplay;
 
 void ReplayManager::ResetSnapshots()
 {
@@ -554,7 +551,7 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
     }
 }
 
-int ReplayManager::fn_8018A16C(float time) const
+int ReplayManager::GetReplayExcitement(float time) const
 {
     if (Instance()->IsSavingReplay() || Instance()->IsLoadingReplay())
     {
@@ -598,29 +595,29 @@ int ReplayManager::fn_8018A16C(float time) const
     return (unsigned short)count * (unsigned short)value;
 }
 
-static void fn_8018A43C(s32 result)
+static void OnReplayFileClosed(s32 result)
 {
 }
 
-static void fn_8018A440(s32 result)
+static void OnReplayWritten(s32 result)
 {
-    lbl_806E14D0 = false;
+    gbSavingReplay = false;
     if (result < 0)
     {
-        lbl_806E14B9 = true;
+        gbReplayFlashError = true;
     }
     else
     {
-        nlFlashClose(fn_8018A43C);
+        nlFlashClose(OnReplayFileClosed);
     }
 }
 
-static void fn_8018A46C(s32 result)
+static void OnReplayRead(s32 result)
 {
-    lbl_806E14D1 = false;
+    gbLoadingReplay = false;
     if (result < 0)
     {
-        lbl_806E14B9 = true;
+        gbReplayFlashError = true;
         GetPresentation()->SendSkipNis();
     }
     else
@@ -631,17 +628,17 @@ static void fn_8018A46C(s32 result)
 
 bool ReplayManager::IsSavingReplay() const
 {
-    return lbl_806E14D0;
+    return gbSavingReplay;
 }
 
 bool ReplayManager::IsLoadingReplay() const
 {
-    return lbl_806E14D1;
+    return gbLoadingReplay;
 }
 
-bool ReplayManager::fn_8018A4C4(int index)
+bool ReplayManager::SaveReplay(int index)
 {
-    if (SaveError == 1 || lbl_806E14B9 == 1)
+    if (SaveError == 1 || gbReplayFlashError == 1)
     {
         return false;
     }
@@ -667,14 +664,14 @@ bool ReplayManager::fn_8018A4C4(int index)
         return false;
     }
 
-    lbl_806E14D0 = true;
-    nlFlashWrite(mMemory, 0x100000, fn_8018A440);
-    return lbl_806E14D0;
+    gbSavingReplay = true;
+    nlFlashWrite(mMemory, 0x100000, OnReplayWritten);
+    return gbSavingReplay;
 }
 
-bool ReplayManager::fn_8018A5BC(int index)
+bool ReplayManager::LoadReplay(int index)
 {
-    if (SaveError == 1 || lbl_806E14B9 == 1)
+    if (SaveError == 1 || gbReplayFlashError == 1)
     {
         GetPresentation()->SendSkipNis();
         return false;
@@ -693,12 +690,12 @@ bool ReplayManager::fn_8018A5BC(int index)
         return false;
     }
 
-    lbl_806E14D1 = true;
+    gbLoadingReplay = true;
     u32 size = 0x100000;
-    if (nlFlashRead((void**)&mMemory, &size, fn_8018A46C, true) != 0)
+    if (nlFlashRead((void**)&mMemory, &size, OnReplayRead, true) != 0)
     {
         GetPresentation()->SendSkipNis();
         return false;
     }
-    return lbl_806E14D1;
+    return gbLoadingReplay;
 }

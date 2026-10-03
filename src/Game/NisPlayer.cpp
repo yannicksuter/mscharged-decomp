@@ -62,9 +62,6 @@ void fn_8027F12C(void*, unsigned long, void*);
 void fn_8027F174(glModel*);
 }
 
-NisPlayer* NisPlayer::sInstance;
-bool g_ForceDoubleBallTransition;
-
 namespace
 {
 static unsigned char useAsyncLoading = true;
@@ -134,6 +131,13 @@ bool NisPlayer::fn_8027E64C() const
     return false;
 }
 
+static inline float MaximumCameraTimeLeft(float first, float second)
+{
+    if (first >= second)
+        return first;
+    return second;
+}
+
 float NisPlayer::TimeLeft() const
 {
     float timeLeft = 0.0f;
@@ -144,7 +148,7 @@ float NisPlayer::TimeLeft() const
         {
             remaining = mCamera[i].GetUnidentifiedTimeLeft();
         }
-        timeLeft = timeLeft >= remaining ? timeLeft : remaining;
+        timeLeft = MaximumCameraTimeLeft(timeLeft, remaining);
     }
 
     cCameraData* pCameraData = mCamera[0].m_pActiveCameraData;
@@ -452,11 +456,12 @@ void NisPlayer::Reset()
 
 NisPlayer* NisPlayer::Instance()
 {
-    if (sInstance == 0)
+    static NisPlayer* instance;
+    if (instance == 0)
     {
-        sInstance = new NisPlayer;
+        instance = new NisPlayer;
     }
-    return sInstance;
+    return instance;
 }
 
 void NisPlayer::fn_8027E5D0()
@@ -681,6 +686,8 @@ namespace
 {
 static void* byteCode;
 }
+
+bool g_ForceDoubleBallTransition;
 
 void NisPlayer::fn_8027B630(char* data, unsigned long size)
 {
@@ -1750,6 +1757,23 @@ void NisPlayer::HideAllActors() const
     snapshot.mChainChomp.visible = false;
 }
 
+static inline void PrintPlayingNisInfo(const NisPlayer& player)
+{
+    int line = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        if (player.mPlaying[i] != NULL)
+        {
+            nlScreenPrintf(0, line++, false, 4, "Mirrored: %s", player.mPlaying[i]->mMirrored ? "True" : "False");
+            if (player.mPlaying[i]->mCamera != NULL && player.mPlaying[i]->mCamera->m_pActiveCameraData != NULL)
+            {
+                nlScreenPrintf(0, line++, false, 4, "Camera: %s", player.mPlaying[i]->mCamera->m_pActiveCameraData->field_0x0C);
+            }
+            nlScreenPrintf(0, line++, false, 4, "Name: %s", player.mPlaying[i]->Name());
+        }
+    }
+}
+
 void NisPlayer::Render(int pass) const
 {
     nlTaskManager* taskManager = nlTaskManager::m_pInstance;
@@ -1762,7 +1786,6 @@ void NisPlayer::Render(int pass) const
 
     HideAllActors();
 
-    int line;
     bool renderPass = false;
     if (fn_8027E64C() && pass == 0)
     {
@@ -1780,19 +1803,7 @@ void NisPlayer::Render(int pass) const
     }
     if (mUnidentified34359 && renderPass == 0)
     {
-        line = 0;
-        for (int i = 0; i < 8; i++)
-        {
-            if (mPlaying[i] != NULL)
-            {
-                nlScreenPrintf(0, line++, false, 4, "Mirrored: %s", mPlaying[i]->mMirrored ? "True" : "False");
-                if (mPlaying[i]->mCamera != NULL && mPlaying[i]->mCamera->m_pActiveCameraData != NULL)
-                {
-                    nlScreenPrintf(0, line++, false, 4, "Camera: %s", mPlaying[i]->mCamera->m_pActiveCameraData->field_0x0C);
-                }
-                nlScreenPrintf(0, line++, false, 4, "Name: %s", mPlaying[i]->Name());
-            }
-        }
+        PrintPlayingNisInfo(*this);
     }
     if (pass == 0 && fn_8027E64C())
     {

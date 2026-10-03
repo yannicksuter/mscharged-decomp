@@ -8,6 +8,12 @@ class CollisionSpace;
 class PhysicsMesh;
 class PhysicsObject;
 
+void InitializeODEAllocators();
+void RegisterUserGeomClasses();
+void CreatePhysicsWorld();
+void CreateStaticPhysicsPrimitives();
+void DestroyStaticPhysicsPrimitives();
+void DestroyPhysicsWorld();
 void PhysicsUpdate(PhysicsWorld*, float);
 void ODEFree(void*, unsigned long);
 void* ODERealloc(void*, unsigned long, unsigned long);

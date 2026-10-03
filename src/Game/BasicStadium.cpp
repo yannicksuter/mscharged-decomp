@@ -135,6 +135,16 @@ void fn_80278818(BasicStadium* pStadium, nlVector4* corners)
         corners);
 }
 
+static inline void SetWorldEffectsActive(
+    nlListIterator<WorldEffect*> iterator, int active)
+{
+    while (iterator.IsValid())
+    {
+        iterator.Current()->m_bActive = active;
+        iterator.Next();
+    }
+}
+
 /**
  * Address/Size: 0x80278860 | size: 0x5C
  */
@@ -145,11 +155,7 @@ void fn_80278860(BasicStadium* pStadium, int active)
         return;
     }
 
-    for (nlListIterator<WorldEffect*> iterator = pStadium->m_worldEffects.Begin();
-         iterator.IsValid(); iterator.Next())
-    {
-        iterator.Current()->m_bActive = active;
-    }
+    SetWorldEffectsActive(pStadium->m_worldEffects.Begin(), active);
 }
 
 /**

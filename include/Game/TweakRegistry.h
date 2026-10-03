@@ -53,7 +53,7 @@ void UnregisterTweakValue(TweakValueBase* value);
 
 // TU3: node and path management.
 TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int noCreate);
-const char* GetTweakNodeName(TweakNode* node);
+const char* GetTweakNodeName(const TweakNode* node);
 TweakNode* FindTweakNode(TweakNode* entry, const char* path);
 void UpdateTweakNodePathHash(TweakNode* node);
 
@@ -71,7 +71,7 @@ int IsTweakNameOnStack(const char* name);
 void RecycleTweakNames(void);
 
 // Node TU.
-void GetTweakNodePath(TweakNode* node, char* buffer, unsigned long size);
+void GetTweakNodePath(const TweakNode* node, char* buffer, unsigned long size);
 
 void InitializeTweakRegistry(int fromEnd, u8 flag, unsigned int* sizes);
 float GetTweakFloat(const char* path, float defaultValue);
