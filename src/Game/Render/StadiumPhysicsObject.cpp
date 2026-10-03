@@ -4,7 +4,7 @@
 #include "Game/FE/feModelManager.h"
 #include "Game/Physics/Physics.h"
 #include "Game/Physics/PhysicsFinitePlane.h"
-#include "Game/World/worldanim.h"
+#include "Game/World/WorldPhysics.h"
 #include "NL/nlList.h"
 #include "NL/nlListContainer.h"
 #include "NL/nlMemory.h"

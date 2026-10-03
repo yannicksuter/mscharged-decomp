@@ -378,13 +378,13 @@ public:
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
-    bool fn_800B9D84(DesireUpdate*, float);
+    bool UpdateAIButtonPress(DesireUpdate*, float);
 
-    int mUnidentifiedA4;
-    float mUnidentifiedA8;
-    float mUnidentifiedAC;
-    float mUnidentifiedB0;
-    int mUnidentifiedB4;
+    int mnRequestedBalls;
+    float mfAccuracyScore;
+    float mfPrevMeterPosition;
+    float mfFirstPressDelay;
+    int mnPressStage;
 };
 
 class DesireStar : public Desire

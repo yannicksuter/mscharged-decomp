@@ -11,7 +11,7 @@ public:
 
     virtual void UnidentifiedVirtual2();
     virtual void Update(float deltaTime);
-    virtual void Reset(bool param);
+    virtual void Reset(bool deleting);
     virtual shdStateMachine* UnidentifiedVirtual5(
         int state, UnidentifiedVariantCollection* params, bool force);
     virtual void UnidentifiedVirtual6();

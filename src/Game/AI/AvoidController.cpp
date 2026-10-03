@@ -303,6 +303,21 @@ void UnidentifiedAvoidanceCallback_8000F7FC::UnidentifiedCallback(
     }
 }
 
+static inline bool CanAddAvoidance(AvoidController& controller,
+    AvoidableObject* pSelf, AvoidableObject* pObject, bool alreadyTracked)
+{
+    bool bCanAvoid = !alreadyTracked;
+    if (bCanAvoid)
+        bCanAvoid = controller.UnidentifiedCanAvoid(pObject->mType);
+    if (bCanAvoid)
+        bCanAvoid = pSelf != pObject;
+    if (bCanAvoid)
+        bCanAvoid = pSelf->GetAvoidanceWeight(pObject) > 0.0f;
+    if (bCanAvoid)
+        bCanAvoid = pSelf->IsWithinRange(pObject, -1.0f);
+    return bCanAvoid;
+}
+
 void AvoidController::Update(float fDeltaT)
 {
     float fTotalWeight_v3 = 0.0f;
@@ -339,16 +354,8 @@ void AvoidController::Update(float fDeltaT)
     for (AvoidableObject* pObject = gAvoidableObjects.m_pStart;
          pObject != 0 && mUnidentified198 < 99; pObject = pObject->next)
     {
-        bool bCanAvoid = !mUnidentified174.FindGet((u32)pObject->mId, &value);
-        if (bCanAvoid)
-            bCanAvoid = UnidentifiedCanAvoid(pObject->mType);
-        if (bCanAvoid)
-            bCanAvoid = pSelf != pObject;
-        if (bCanAvoid)
-            bCanAvoid = pSelf->GetAvoidanceWeight(pObject) > 0.0f;
-        if (bCanAvoid)
-            bCanAvoid = pSelf->IsWithinRange(pObject, -1.0f);
-        if (bCanAvoid)
+        if (CanAddAvoidance(*this, pSelf, pObject,
+                mUnidentified174.FindGet((u32)pObject->mId, &value)))
         {
             if (!UnidentifiedCanAvoid(AVOID_SIDELINES)
                 && pObject->mType == AVOID_POLYGONS
@@ -392,9 +399,9 @@ void AvoidController::Update(float fDeltaT)
     {
         if (fWeights[i] > 0.0f)
         {
+            nCount += nCounts[i];
             nlVec3Scale(v3Repulsion, v3Vectors[i], 1.0f / fWeights[i]);
             float fWeight = (fWeights[i] / nCounts[i]) / gAvoidableTweaks[i][0];
-            nCount += nCounts[i];
             eAvoidableThings things = (eAvoidableThings)GetAvoidableMask(i);
             m_CurrentlyAvoiding |= things;
             UnidentifiedSetLast(things, v3Repulsion, fWeight);
@@ -420,10 +427,9 @@ void AvoidController::Update(float fDeltaT)
         if (bAverageWithLastRepulsion)
         {
             const float fLastRepulsionWeight = 0.8f;
-            nlVec3WeightedSum(v3SmoothedRepulsion,
-                1.0f - fLastRepulsionWeight,
+            nlVecLerp(v3SmoothedRepulsion,
                 m_LastRepulVec[GetAvoidableIndex(AVOID_EVERYTHING)],
-                fLastRepulsionWeight, v3FinalRepulsion);
+                v3FinalRepulsion, fLastRepulsionWeight);
         }
         ApplyRepulsionVector(v3SmoothedRepulsion);
     }

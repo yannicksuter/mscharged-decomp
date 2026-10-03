@@ -233,7 +233,7 @@ void StadiumSelectScene::Update(float deltaTime)
     case 2:
     {
         cAnimCamera* camera = (cAnimCamera*)cCameraManager::PeekCamera();
-        if (camera != 0 && camera->GetUnidentifiedAnimationTime() >= 1.0f)
+        if (camera != 0 && camera->GetAnimationTime() >= 1.0f)
         {
             mPreviewState = 4;
         }

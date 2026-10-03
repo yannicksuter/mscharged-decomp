@@ -20,14 +20,14 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-static float lbl_806DC208 = 0.5f;
+static float sWindupShotTimeLimitMargin = 0.5f;
 static unsigned short sDesireWindupShotType = 0xFFFF;
 static unsigned short sDesireShootType = 0xFFFF;
-static bool lbl_806DC210 = true;
-int lbl_806DC214 = 32;
-int lbl_806DC218 = 15;
-int lbl_806DC21C = 3;
-static float lbl_806DC220 = 2.0f;
+static bool sWindupSkillshotRollPending = true;
+int gWindupShotMegaStrikeState = 32;
+int gWindupShotShootState = 15;
+int gWindupShotDekeState = 3;
+static float sWindupSkillshotTimeLimit = 2.0f;
 
 /**
  * Offset/Address/Size: 0x0 | 0x800C4198 | size: 0x7C
@@ -38,10 +38,10 @@ bool DesireWindupShot::Initialize(void*)
     if (m_pFielder->m_pBall != NULL)
     {
         m_pFielder->fn_8004B658();
-        mMaxDuration = lbl_806DC208
+        mMaxDuration = sWindupShotTimeLimitMargin
                          + m_pFielder->m_pShotMeter->GetTotalDuration();
         mbShotMeterActivated = true;
-        lbl_806DC210 = true;
+        sWindupSkillshotRollPending = true;
     }
     else
     {
@@ -80,17 +80,17 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
         if (bMeterTransition)
         {
             *update = 3;
-            update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC214));
+            update->SetParameter(8, FuzzyVariant(FT_INT, gWindupShotMegaStrikeState));
         }
         else
         {
             *update = 3;
-            update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC218));
+            update->SetParameter(8, FuzzyVariant(FT_INT, gWindupShotShootState));
         }
         return;
     }
 
-    if (lbl_806DC210)
+    if (sWindupSkillshotRollPending)
     {
         switch (m_pFielder->mUnidentified024.m_eCharacterClass)
         {
@@ -118,11 +118,11 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
                     if (nlRandomf(1.0f) < fSkillshotChance)
                     {
                         *update = 3;
-                        update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC21C));
+                        update->SetParameter(8, FuzzyVariant(FT_INT, gWindupShotDekeState));
                     }
                     else
                     {
-                        lbl_806DC210 = false;
+                        sWindupSkillshotRollPending = false;
                     }
                 }
             }
@@ -176,7 +176,7 @@ bool DesireShoot::Initialize(void* context)
     {
         UnidentifiedVariantCollection transitionParams;
         transitionParams.Set(
-            7, FuzzyVariant(FT_FLOAT, lbl_806DC220));
+            7, FuzzyVariant(FT_FLOAT, sWindupSkillshotTimeLimit));
         transitionParams.Set(14, FuzzyVariant(g_pBall));
         transitionParams.Set(10,
             FuzzyVariant(FT_U32,

@@ -318,7 +318,7 @@ void EmissionController::ComputePositionAndVelocity(EffectsSpec& spec, nlVector3
 
     if (m_pManager->unknown_0x1F8 && spec.m_bGround)
     {
-        pos.z = m_fGround + m_pManager->GetUnidentified1F4();
+        pos.z = m_fGround + m_pManager->GetShadowHeight();
     }
     pos.z += spec.m_fOffset;
 }

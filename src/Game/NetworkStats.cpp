@@ -368,12 +368,20 @@ void NetworkRanking::Reset()
     mCategory = 0;
 }
 
+static inline void ShutdownRankingSession(bool& initialized)
+{
+    if (initialized)
+    {
+        DWC_RnkShutdown();
+        initialized = false;
+    }
+}
+
 void NetworkRanking::ShutdownRanking()
 {
     if (mInitialized)
     {
-        DWC_RnkShutdown();
-        mInitialized = false;
+        ShutdownRankingSession(mInitialized);
     }
 }
 
@@ -920,7 +928,7 @@ void NetworkRanking::SortLeaderboardResults(int count)
 {
     if (count > 1)
     {
-        NetworkRankingSortRow* rows = new NetworkRankingSortRow[count];
+        NetworkRankingSortRow* rows = new (8, false) NetworkRankingSortRow[count];
         for (int i = 0; i < count; ++i)
         {
             rows[i].mPlayer.CopyFrom(mLeaderboardPlayers[i]);
@@ -935,7 +943,43 @@ void NetworkRanking::SortLeaderboardResults(int count)
         }
         delete[] rows;
     }
-    AssignDisplayRanks(count, mLeaderboardMetadata, 1);
+    switch (mFilter)
+    {
+    case 0:
+    {
+        int rankedRow = -1;
+        for (int i = 0; i < count; ++i)
+        {
+            if (mLeaderboardMetadata[i].mDisplayRank > 0)
+            {
+                rankedRow = i;
+                break;
+            }
+        }
+        int score = mLeaderboardMetadata[rankedRow].mScore;
+        int firstRank = mLeaderboardMetadata[rankedRow].mDisplayRank;
+        for (int i = rankedRow; i >= 0; --i)
+        {
+            if (score != mLeaderboardMetadata[i].mScore)
+            {
+                --firstRank;
+            }
+        }
+        if (firstRank > 0)
+        {
+            AssignDisplayRanks(count, mLeaderboardMetadata, firstRank);
+        }
+        else
+        {
+            AssignDisplayRanks(count, mLeaderboardMetadata, 1);
+        }
+        break;
+    }
+    case 1:
+    case 2:
+        AssignDisplayRanks(count, mLeaderboardMetadata, 1);
+        break;
+    }
 }
 
 NetworkRankingSortRow::NetworkRankingSortRow()

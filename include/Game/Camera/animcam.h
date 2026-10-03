@@ -2,7 +2,7 @@
 #define GAME_CAMERA_ANIMCAM_H
 
 #include "Game/Camera/BaseCam.h"
-#include "Game/SAnim.h"
+#include "NL/nlChunk.h"
 
 class cCameraData
 {
@@ -13,7 +13,7 @@ public:
     /* 0x00 */ cCameraData* next;
     /* 0x04 */ unsigned long m_uHashID;
     /* 0x08 */ unsigned long m_uKeyCount;
-    /* 0x0C */ char* field_0x0C;
+    /* 0x0C */ char* m_szName;
     /* 0x10 */ nlVector3* cameraPos;
     /* 0x14 */ nlVector3* targetPos;
     /* 0x18 */ nlQuaternion* cameraRot;
@@ -30,15 +30,15 @@ public:
     cAnimCamera();
     virtual ~cAnimCamera();
 
-    virtual eCameraType GetType();
     virtual void Update(float dt);
-    virtual const nlMatrix4& GetViewMatrix() const;
-    virtual float GetFOV() const;
-    virtual const nlVector3& GetTargetPosition() const;
-    virtual const nlVector3& GetCameraPosition() const;
-    virtual float GetFocalLength() const;
+    virtual eCameraType GetType() { return eCameraType_Animated; }
+    virtual const nlVector3& GetTargetPosition() const { return m_vecTarget; }
+    virtual const nlVector3& GetCameraPosition() const { return m_vecCamera; }
+    virtual float GetFOV() const { return m_Fov; }
+    virtual float GetFocalLength() const { return m_FocalLength; }
+    virtual const nlMatrix4& GetViewMatrix() const { return m_matView; }
 
-    static bool LoadCameraAnimation(nlChunk* begin, unsigned long, const char* cameraName, bool ownsKeyData);
+    static bool LoadCameraAnimation(nlChunk* begin, unsigned long fileSize, const char* cameraName, bool ownsKeyData);
     static void FreeCameraAnimations();
 
     void SetAnimationTime(float fTime, bool bUpdateView);
@@ -47,7 +47,7 @@ public:
     void SelectCameraAnimation(const char* name);
     float ManualUpdate(float dt);
 
-    float GetUnidentifiedDuration() const
+    float GetDuration() const
     {
         if (m_pActiveCameraData != 0)
         {
@@ -61,14 +61,14 @@ public:
         return (1.0f - animationTime) * duration;
     }
 
-    float GetUnidentifiedTimeLeft() const
+    float GetTimeLeft() const
     {
-        float animTime = GetUnidentifiedAnimationTime();
-        float duration = GetUnidentifiedDuration();
+        float animTime = GetAnimationTime();
+        float duration = GetDuration();
         return CalculateTimeLeft(animTime, duration);
     }
 
-    float GetUnidentifiedAnimationTime() const
+    float GetAnimationTime() const
     {
         return m_fAnimationTime;
     }
@@ -78,7 +78,7 @@ public:
     /* 0x20 */ bool m_bCyclic;
     /* 0x21 */ bool m_bUseSimulationTime;
     /* 0x22 */ bool m_LetManagerDoUpdate;
-    /* 0x23 */ bool m_bUnusedPad;
+    /* 0x23 */ bool m_bUseLookAt;
     /* 0x24 */ nlMatrix4 m_matView;
     /* 0x64 */ nlVector3 m_vecCamera;
     /* 0x70 */ nlVector3 m_vecTarget;
@@ -93,35 +93,5 @@ public:
     /* 0xAC */ float m_FocalLength;
     /* 0xB0 */ void (*m_EndOfAnimationCallback)();
 }; // total size: 0xB4
-
-inline eCameraType cAnimCamera::GetType()
-{
-    return eCameraType_Animated;
-}
-
-inline const nlVector3& cAnimCamera::GetTargetPosition() const
-{
-    return m_vecTarget;
-}
-
-inline const nlVector3& cAnimCamera::GetCameraPosition() const
-{
-    return m_vecCamera;
-}
-
-inline float cAnimCamera::GetFOV() const
-{
-    return m_Fov;
-}
-
-inline float cAnimCamera::GetFocalLength() const
-{
-    return m_FocalLength;
-}
-
-inline const nlMatrix4& cAnimCamera::GetViewMatrix() const
-{
-    return m_matView;
-}
 
 #endif // GAME_CAMERA_ANIMCAM_H

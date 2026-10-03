@@ -1255,7 +1255,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
-        fn_801B8FF4(this);
+        EmitShyGuyDeke(this);
     }
 
     s16 sFacingDelta;
@@ -3170,20 +3170,20 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         float fHalfD = fSegmentD / 2.0f;
 
         mUnidentified3C4 = lbl_806DB970 + fHalfA;
-        ShootToScoreMeter::instance.fn_801B1004(mUnidentified3C4);
-        ShootToScoreMeter::instance.fn_801B1024(fSegmentA);
+        ShootToScoreMeter::instance.SetSegment1Position(mUnidentified3C4);
+        ShootToScoreMeter::instance.SetSegment1Width(fSegmentA);
 
         mUnidentified3C8 = fHalfB + (mUnidentified3C4 + fHalfA);
-        ShootToScoreMeter::instance.fn_801B1044(mUnidentified3C8);
-        ShootToScoreMeter::instance.fn_801B1064(fSegmentB);
+        ShootToScoreMeter::instance.SetSegment2Position(mUnidentified3C8);
+        ShootToScoreMeter::instance.SetSegment2Width(fSegmentB);
 
         mUnidentified3CC = fHalfC + (mUnidentified3C8 + fHalfB);
-        ShootToScoreMeter::instance.fn_801B1084(mUnidentified3CC);
-        ShootToScoreMeter::instance.fn_801B10A4(fSegmentC);
+        ShootToScoreMeter::instance.SetSegment3Position(mUnidentified3CC);
+        ShootToScoreMeter::instance.SetSegment3Width(fSegmentC);
 
         mUnidentified3D0 = fHalfD + (mUnidentified3CC + fHalfC);
-        ShootToScoreMeter::instance.fn_801B10C4(mUnidentified3D0);
-        ShootToScoreMeter::instance.fn_801B10E4(fSegmentD);
+        ShootToScoreMeter::instance.SetSegment4Position(mUnidentified3D0);
+        ShootToScoreMeter::instance.SetSegment4Width(fSegmentD);
 
         mUnidentified3D4 = mUnidentified3D0;
 
@@ -3261,9 +3261,9 @@ void cFielder::fn_80048FB0(float fDeltaT, bool bButtonPressed, int nParam)
             mUnidentified3AC = mUnidentified3B0;
             ShootToScoreMeter::instance.SetGreenRegionWidth(
                 mUnidentified3A4);
-            ShootToScoreMeter::instance.fn_801B0FE4(fSecondPhaseTime);
+            ShootToScoreMeter::instance.SetYellowRegionWidth(fSecondPhaseTime);
             ShootToScoreMeter::instance.SetGreenBarPosition(lbl_806DB93C);
-            ShootToScoreMeter::instance.mUnidentified2E = true;
+            ShootToScoreMeter::instance.mbShowGreenRegion = true;
         }
         else if (mUnidentified3A0 < 0.0f)
         {
@@ -3418,7 +3418,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
 {
     tDebugPrintManager::Print(DC_NETWORK, "DoMegaMeterSecondButtonPressEvent at time %f\n", mUnidentified3AC);
 
-    ShootToScoreMeter::instance.mUnidentified2C = true;
+    ShootToScoreMeter::instance.mbSecondButtonPressed = true;
     ShootToScoreMeter::instance.m_v3MeterPosition
         = ShootToScoreMeter::instance.m_v3OriginalMeterPosition;
 

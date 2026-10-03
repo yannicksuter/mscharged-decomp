@@ -2,6 +2,7 @@
 #include "Game/World/WorldVisibility.h"
 #include "Game/World/WorldAnimObjects.h"
 #include "Game/World/worldanim.h"
+#include "Game/World/WorldPhysics.h"
 #include "Game/World/WorldPhysicsDescription.h"
 
 #include "Game/Physics/PhysicsBox.h"

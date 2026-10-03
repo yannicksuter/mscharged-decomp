@@ -69,7 +69,7 @@ void EmitMontySquishExit(cCharacter* pCharacter);
 void EmitGoalieArmInGround(cPlayer* pPlayer);
 void EmitDekeEnter(cCharacter* pCharacter, const char* szEffectName);
 void EmitDekeExit(cCharacter* pCharacter, const char* szEffectName);
-extern "C" void fn_801B8FF4(cFielder* pFielder);
+void EmitShyGuyDeke(cFielder* pFielder);
 void EmitShyGuyBulletShoot(cFielder* pFielder);
 void EmitBooDekePuffStart(cCharacter* pCharacter);
 void EmitBooDekePuffEnd(cCharacter* pCharacter);

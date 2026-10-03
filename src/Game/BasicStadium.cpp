@@ -23,8 +23,8 @@
 
 extern "C"
 {
-    void fn_80184AF8(float timeScale);
-    void fn_80184B08();
+    float fn_80184AF8(float antiFlimmer);
+    float fn_80184B08();
 }
 
 /**
@@ -165,7 +165,7 @@ void SetStadiumShadowHeight(BasicStadium* pStadium, float fHeight)
 {
     pStadium->m_shadowHeight = fHeight;
     fn_80184AF8(pStadium->m_shadowHeight);
-    GetEmissionManager()->mTimeScale = pStadium->m_shadowHeight;
+    GetEmissionManager()->SetShadowHeight(pStadium->m_shadowHeight);
 }
 
 /**
@@ -236,7 +236,7 @@ BasicStadium::BasicStadium(GLResourcePool* pResource)
     m_shadowHeight = 0.0f;
     m_fTime = 0.0f;
 
-    GetEmissionManager()->mTimeScale = 0.0f;
+    GetEmissionManager()->SetShadowHeight(0.0f);
     fn_80184B08();
 
     m_shadowLightPosition.x = 10.0f;

@@ -265,6 +265,7 @@ extern "C" void fn_8005E9FC(void* pManager, const PlayerAttackData* pData);
 
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 
+extern "C" void fn_8005FA2C(cGame* pGame);
 extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder);
 extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData);
 

@@ -992,7 +992,7 @@ void EmitDekeExit(cCharacter* pCharacter, const char* szEffectName)
     pController->SetVelocity(v3Zero);
 }
 
-extern "C" void fn_801B8FF4(cFielder* pFielder)
+void EmitShyGuyDeke(cFielder* pFielder)
 {
 }
 

@@ -56,7 +56,6 @@ static TweakFloatBinding lbl_8056DB30("Ideal Distance", "Game/Player", &lbl_806D
 static TweakFloatBinding lbl_8056DB50("Ideal Range", gLastTweakCategory, &lbl_806DC3D8.y);
 static TweakFloatBinding lbl_8056DB70("Min Angle", gLastTweakCategory, &lbl_806DC3E0.x);
 static TweakFloatBinding lbl_8056DB90("Max Angle", gLastTweakCategory, &lbl_806DC3E0.y);
-extern "C" bool fn_80099CE8(int);
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" float fn_8003C40C(cFielder*, unsigned short);
 float lbl_806DC3E8 = 100000000000.0f;

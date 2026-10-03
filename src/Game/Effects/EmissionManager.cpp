@@ -275,7 +275,7 @@ EmissionManager::EmissionManager()
     , mParticles()
     , mUpdateEnabled(false)
     , mRenderPersistentOnly(false)
-    , mTimeScale(0.0f)
+    , mShadowHeight(0.0f)
     , unknown_0x1F8(true)
 {
 }

@@ -1965,7 +1965,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     lbl_806E12C8->ResetEffects();
     DestroyCharacters();
     g_pGame->mpWeatherManager->Stop(true);
-    ShootToScoreMeter::instance.fn_801AF97C();
+    ShootToScoreMeter::instance.TurnOffMeter();
     delete g_pBall;
     g_pBall = 0;
     FakeBallWorld::Destroy();

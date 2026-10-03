@@ -146,7 +146,7 @@ float NisPlayer::TimeLeft() const
         float remaining = 0.0f;
         if (mCamera[i].m_pActiveCameraData != 0)
         {
-            remaining = mCamera[i].GetUnidentifiedTimeLeft();
+            remaining = mCamera[i].GetTimeLeft();
         }
         timeLeft = MaximumCameraTimeLeft(timeLeft, remaining);
     }
@@ -154,7 +154,7 @@ float NisPlayer::TimeLeft() const
     cCameraData* pCameraData = mCamera[0].m_pActiveCameraData;
     if (pCameraData != 0)
     {
-        float remaining = mCamera[0].GetUnidentifiedTimeLeft();
+        float remaining = mCamera[0].GetTimeLeft();
         if (remaining < timeLeft)
         {
             timeLeft = remaining;
@@ -1082,12 +1082,12 @@ float NisPlayer::fn_8027C064(int param1) const
     cCameraData* pCameraData = mCamera[param1].m_pActiveCameraData;
     if (pCameraData != 0)
     {
-        float timeLeft = mCamera[param1].GetUnidentifiedTimeLeft();
+        float timeLeft = mCamera[param1].GetTimeLeft();
 
         cCameraData* pCameraData = mCamera[0].m_pActiveCameraData;
         if (pCameraData != 0)
         {
-            float remaining = mCamera[0].GetUnidentifiedTimeLeft();
+            float remaining = mCamera[0].GetTimeLeft();
             if (remaining < timeLeft)
             {
                 timeLeft = remaining;
@@ -1193,7 +1193,7 @@ void NisPlayer::Update(float deltaT)
         float animTime[2];
         for (int i = 0; i < 2; i++)
         {
-            animTime[i] = mCamera[i].GetUnidentifiedAnimationTime();
+            animTime[i] = mCamera[i].GetAnimationTime();
             if (mCamera[i].m_pActiveCameraData != 0)
             {
                 float overrun = mCamera[i].ManualUpdate(deltaT);
@@ -1217,8 +1217,8 @@ void NisPlayer::Update(float deltaT)
                 cameraIndex = 1;
             }
             mPlaying[i]->Update(deltaT);
-            float duration = mCamera[cameraIndex].GetUnidentifiedDuration();
-            mPlaying[i]->UpdateTriggers(animTime[cameraIndex], mCamera[cameraIndex].GetUnidentifiedAnimationTime(), duration);
+            float duration = mCamera[cameraIndex].GetDuration();
+            mPlaying[i]->UpdateTriggers(animTime[cameraIndex], mCamera[cameraIndex].GetAnimationTime(), duration);
             mCamera[cameraIndex].m_OffsetPos = mPlaying[i]->Offset();
         }
 
@@ -1767,7 +1767,7 @@ static inline void PrintPlayingNisInfo(const NisPlayer& player)
             nlScreenPrintf(0, line++, false, 4, "Mirrored: %s", player.mPlaying[i]->mMirrored ? "True" : "False");
             if (player.mPlaying[i]->mCamera != NULL && player.mPlaying[i]->mCamera->m_pActiveCameraData != NULL)
             {
-                nlScreenPrintf(0, line++, false, 4, "Camera: %s", player.mPlaying[i]->mCamera->m_pActiveCameraData->field_0x0C);
+                nlScreenPrintf(0, line++, false, 4, "Camera: %s", player.mPlaying[i]->mCamera->m_pActiveCameraData->m_szName);
             }
             nlScreenPrintf(0, line++, false, 4, "Name: %s", player.mPlaying[i]->Name());
         }

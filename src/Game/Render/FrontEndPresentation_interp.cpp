@@ -261,7 +261,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
     case 29:
     {
         cAnimCamera* camera = GetCurrentAnimatedCamera();
-        float time = camera->GetUnidentifiedDuration();
+        float time = camera->GetDuration();
         camera->SetAnimationTime(time, true);
         break;
     }

@@ -1,4 +1,5 @@
 #include "Game/AI/DesireSteering.h"
+#include "NL/nlMath.inl"
 #include "Game/AI/AvoidController.h"
 
 #include "Game/AI/AiUtil.h"
@@ -440,6 +441,13 @@ extern "C" void fn_800C6390(DesireSteering* desire,
     desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
 }
 
+static inline float GetSteeringSpeedScale(float distance)
+{
+    float scale = distance;
+    sSteeringSpeedScale.Evaluate(distance, scale);
+    return scale;
+}
+
 extern "C" void fn_800C66A4(DesireSteering* desire,
     const nlVector3& v3Pos, eTurboRequest turboRequest,
     float fDeltaT, float fUrgency)
@@ -453,11 +461,11 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
     nlVector3 v3DeltaFromDesired;
     nlVec3Sub(v3DeltaFromDesired, v3FixedPos,
         desire->m_v3LastDesiredPos);
-    float fDistance = nlSqrt(nlVec3DistanceSquared2D(v3FixedPos,
-        desire->m_pFielder->mUnidentified024.m_v3Position), true);
+    float fDistance = nlVec3Distance2D(v3FixedPos,
+        desire->m_pFielder->mUnidentified024.m_v3Position);
+    float fDesiredPositionRateOfChange = 0.0f;
     float fRadiusScale = fUrgency > 0.0f ? 1.0f / fUrgency : 1.0f;
     float fMinimumSpeedScale = 1.0f;
-    float fDesiredPositionRateOfChange = 0.0f;
 
     if (IsNearlyZero(fDistance, 0.0f))
     {
@@ -514,6 +522,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
                      * gGameTweaks.m_pGameTweaks->fArrivalInRadius)
         {
             fn_800C5784(desire);
+            desire->m_ePositionSeekState = PSS_ARRIVED;
         }
         break;
     }
@@ -533,6 +542,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
         else if (fDistance < fRadiusScale * gGameTweaks.m_pGameTweaks->fArrivalInRadius)
         {
             fn_800C5784(desire);
+            desire->m_ePositionSeekState = PSS_ARRIVED;
         }
         break;
     }
@@ -621,9 +631,7 @@ extern "C" void fn_800C66A4(DesireSteering* desire,
 
     float fDesiredSpeed = InterpolateClamped(
         fMinSpeed, fMaxSpeed, fSpeedPercent * fUrgency);
-    float fSteeringSpeedScale = fDistance;
-    sSteeringSpeedScale.Evaluate(fDistance, fSteeringSpeedScale);
-    fDesiredSpeed *= fSteeringSpeedScale;
+    fDesiredSpeed *= GetSteeringSpeedScale(fDistance);
     fDesiredSpeed = nlMinEquals(
         fDesiredSpeed, fn_8002E1B0(desire->m_pFielder));
     desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;

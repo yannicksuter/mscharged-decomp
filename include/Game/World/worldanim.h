@@ -10,11 +10,7 @@
 #include "NL/nlMath.h"
 
 struct WorldAnimBinding;
-struct WorldPhysicsDescription;
-class CollisionSpace;
-class PhysicsObject;
 class WorldAnimController;
-class WorldPhysicsDrawable;
 
 class WorldAnimObject : public WorldObject
 {
@@ -127,6 +123,7 @@ public:
     void LoadAnimationSet(AnimationSet* pAnimationSet, nlChunk* pChunk);
     void BindObjects();
     inline float GetFrame(int nFrames, int nFrameRate) const;
+    void UpdateControllers(float fDeltaT);
     void Update(float fDeltaT);
 
     /* 0x00 */ cInventory<cSHierarchy>* m_pHierarchyInventory;
@@ -136,10 +133,6 @@ public:
         DefaultKeyCompare<unsigned long> > m_animationControllerMap;
     /* 0x24 */ float m_fTime;
 };
-
-PhysicsObject* CreatePhysicsPrimitive(
-    const WorldPhysicsDescription* pDescription, CollisionSpace* pCollisionSpace);
-void ReleaseWorldPhysicsObject(WorldPhysicsDrawable* pOwner);
 
 typedef char AnimationSet_size_check[sizeof(AnimationSet) == 0x20 ? 1 : -1];
 typedef char WorldAnimController_size_check[

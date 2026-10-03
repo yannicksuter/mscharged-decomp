@@ -278,7 +278,11 @@ void CompactPowerups();
 void InitializePowerups();
 
 
+extern "C" int fn_80099C80(ePowerUpType eType);
 extern "C" bool fn_80099C94(ePowerUpType eType);
 extern "C" bool fn_80099CC4(ePowerUpType eType);
+extern "C" bool fn_80099CE8(int nUnidentified);
+extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
+    int nnumOfPowerups, unk_8009A5D8* pUnidentified);
 
 #endif // GAME_AI_POWERUPS_H

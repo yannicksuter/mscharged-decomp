@@ -2484,7 +2484,7 @@ extern "C" void fn_80022908()
 {
     if (g_pGame != NULL)
     {
-        ShootToScoreMeter::instance.fn_801AF97C();
+        ShootToScoreMeter::instance.TurnOffMeter();
         if (g_pGame->IsGameplayOrOvertime())
         {
             g_pGame->fn_800586C0();

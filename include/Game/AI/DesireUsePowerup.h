@@ -6,7 +6,7 @@
 
 class DesireUsePowerup;
 class AIContext;
-extern "C" DesireUpdate fn_800D2074(
+DesireUpdate TransDesireUsePowerup(
     AIContext*);
 extern "C" void fn_800D38D0(DesireUsePowerup*);
 extern "C" void fn_800D3CBC(DesireUsePowerup*);

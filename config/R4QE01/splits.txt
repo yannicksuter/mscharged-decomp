@@ -4318,11 +4318,16 @@ Game/world.cpp:
 	.data       start:0x80534268 end:0x80534340
 	.sdata2     start:0x806E69E8 end:0x806E69F0
 
+Game/World/WorldPhysics.cpp:
+	.text       start:0x80341EE8 end:0x803421C8
+	.data       start:0x80534340 end:0x80534360
+	.sdata2     start:0x806E69F0 end:0x806E69F8
+
 Game/World/worldanim.cpp:
-	.text       start:0x80341EE8 end:0x803437C8
-	.data       start:0x80534340 end:0x80534428
+	.text       start:0x803421C8 end:0x803437C8
+	.data       start:0x80534360 end:0x80534428
 	.sbss       start:0x806E2188 end:0x806E2190
-	.sdata2     start:0x806E69F0 end:0x806E6A00
+	.sdata2     start:0x806E69F8 end:0x806E6A00
 
 Game/World/worldanimobjects.cpp:
 	.text       start:0x803437C8 end:0x803441C8

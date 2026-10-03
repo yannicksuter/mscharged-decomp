@@ -19,14 +19,13 @@
 
 extern "C" void fn_8002E340(cFielder*);
 extern "C" void fn_8002E39C(cFielder*);
-extern "C" void fn_8005FA2C(cGame*);
-bool lbl_806E0E30;
-bool lbl_806E0E31;
+bool gMegaStrikeUsePassButton;
+bool gMegaStrikeInvincible;
 
-static float lbl_806DC118 = 10.0f;
-static float lbl_806DC11C = 0.5f;
-static float lbl_806DC120 = 0.9f;
-static float lbl_806DC124 = 0.3f;
+static float sMegaStrikeMaxDuration = 10.0f;
+static float sMegaStrikeFirstPressDelayMin = 0.5f;
+static float sMegaStrikeFirstPressDelayMax = 0.9f;
+static float sMegaStrikeFirstPressDelayJitter = 0.3f;
 static unsigned short sDesireMegaStrikeType = 0xFFFF;
 
 /**
@@ -42,14 +41,14 @@ bool DesireMegaStrike::Initialize(void* context)
     }
     else
     {
-        mUnidentifiedB0 = InterpolateClamped(lbl_806DC11C, lbl_806DC120,
+        mfFirstPressDelay = InterpolateClamped(sMegaStrikeFirstPressDelayMin, sMegaStrikeFirstPressDelayMax,
             1.0f - Difficult(fn_800D6670(m_pFielder)));
-        float fDelay = mUnidentifiedB0;
+        float fDelay = mfFirstPressDelay;
 
-        float fRange = fDelay * lbl_806DC124;
-        mUnidentifiedB0 =
+        float fRange = fDelay * sMegaStrikeFirstPressDelayJitter;
+        mfFirstPressDelay =
             fDelay + (nlRandomf(fRange) - (0.5f * fRange));
-        mUnidentifiedB4 = 0;
+        mnPressStage = 0;
 
         float probabilities[4];
         int i;
@@ -83,10 +82,10 @@ bool DesireMegaStrike::Initialize(void* context)
         {
             nRequestedBalls = 0;
         }
-        mUnidentifiedA4 = nRequestedBalls;
+        mnRequestedBalls = nRequestedBalls;
 
-        mUnidentifiedA4 = (int)(
-            (float)mUnidentifiedA4 + m_pFielder->fn_800489C4());
+        mnRequestedBalls = (int)(
+            (float)mnRequestedBalls + m_pFielder->fn_800489C4());
 
         if (g_pGame->GetNormalizedGameTime() > 0.75f)
         {
@@ -96,15 +95,15 @@ bool DesireMegaStrike::Initialize(void* context)
                 - pOtherTeam->m_nScore;
             if (nScoreDifference < 0)
             {
-                if ((unsigned int)mUnidentifiedA4
+                if ((unsigned int)mnRequestedBalls
                         < (unsigned int)_abs(nScoreDifference)
                     && (float)(unsigned int)_abs(nScoreDifference)
                         < m_pFielder->fn_80048A08())
                 {
-                    mUnidentifiedA4 = _abs(nScoreDifference);
+                    mnRequestedBalls = _abs(nScoreDifference);
                     if (nlRandomf(1.0f) < 0.33f)
                     {
-                        ++mUnidentifiedA4;
+                        ++mnRequestedBalls;
                     }
                 }
             }
@@ -113,32 +112,32 @@ bool DesireMegaStrike::Initialize(void* context)
         float fAccuracyRange = InterpolateRangeClamped(
             0.49f, 0.98f, 1.0f, 0.2f,
             Difficult(fn_800D6670(m_pFielder)));
-        mUnidentifiedA8 = nlRandomf(1.0f);
+        mfAccuracyScore = nlRandomf(1.0f);
 
         float fAccuracy = fn_800A636C(g_pCurrentlyUpdatingTeam)
-                              ->MegaGoalAccuracy[(int)((float)mUnidentifiedA4
+                              ->MegaGoalAccuracy[(int)((float)mnRequestedBalls
                                   - m_pFielder->fn_800489C4())]
                               ->GetValue();
-        if (mUnidentifiedA8 < fAccuracy)
+        if (mfAccuracyScore < fAccuracy)
         {
-            mUnidentifiedA8 = 1.0f - nlRandomf(fAccuracyRange);
+            mfAccuracyScore = 1.0f - nlRandomf(fAccuracyRange);
         }
         else
         {
-            mUnidentifiedA8 = -0.01f - nlRandomf(fAccuracyRange);
+            mfAccuracyScore = -0.01f - nlRandomf(fAccuracyRange);
         }
 
-        mUnidentifiedAC = 0.0f;
+        mfPrevMeterPosition = 0.0f;
         nlPrintf(
             "\nMegaStrike AI requested %d balls with accuracy score = %.2f.\n\n",
-            mUnidentifiedA4, mUnidentifiedA8);
+            mnRequestedBalls, mfAccuracyScore);
     }
 
     m_pFielder->InitActionMegaStrikeMeter(true);
     fn_8002E340(m_pFielder);
-    mMaxDuration = lbl_806DC118;
+    mMaxDuration = sMegaStrikeMaxDuration;
 
-    if (lbl_806E0E31 || GameInfoManager::Instance()->IsRule0x8Equal2())
+    if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsRule0x8Equal2())
     {
         m_pFielder->muInvincibleStatus |= 0x1F;
     }
@@ -166,7 +165,7 @@ void DesireMegaStrike::Update(
         return;
     }
 
-    if (lbl_806E0E31 || GameInfoManager::Instance()->IsRule0x8Equal2())
+    if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsRule0x8Equal2())
     {
         if (!m_pFielder->IsInvincible())
         {
@@ -189,7 +188,7 @@ void DesireMegaStrike::Update(
             }
             if (pInputPad != 0)
             {
-                if (lbl_806E0E30)
+                if (gMegaStrikeUsePassButton)
                 {
                     bButtonPressed =
                         pInputPad->PlatJustPressed(0x1B, true);
@@ -205,7 +204,7 @@ void DesireMegaStrike::Update(
         else
         {
             nParam = 1;
-            bButtonPressed = fn_800B9D84(update, fDeltaT);
+            bButtonPressed = UpdateAIButtonPress(update, fDeltaT);
         }
         m_pFielder->fn_8004923C(
             fDeltaT, bButtonPressed, nParam);
@@ -221,7 +220,7 @@ void DesireMegaStrike::Update(
 /**
  * Offset/Address/Size: 0x9C0 | 0x800B9D84 | size: 0x5E0
  */
-bool DesireMegaStrike::fn_800B9D84(
+bool DesireMegaStrike::UpdateAIButtonPress(
     DesireUpdate* update, float)
 {
     bool bButtonPressed = false;
@@ -231,15 +230,15 @@ bool DesireMegaStrike::fn_800B9D84(
     if (update->mData.i == 3)
     {
         *update = 0;
-        if (mAgeTimer.GetSeconds() >= mUnidentifiedB0
-            && mUnidentifiedB4 < 1)
+        if (mAgeTimer.GetSeconds() >= mfFirstPressDelay
+            && mnPressStage < 1)
         {
-            mUnidentifiedB4 = 1;
+            mnPressStage = 1;
             bButtonPressed = true;
         }
     }
 
-    mParameters.Set(0, FuzzyVariant(FT_INT, mUnidentifiedB4));
+    mParameters.Set(0, FuzzyVariant(FT_INT, mnPressStage));
     mParameters.Set(1, FuzzyVariant(fMeterPosition));
 
     if (bButtonPressed)
@@ -248,19 +247,19 @@ bool DesireMegaStrike::fn_800B9D84(
     }
 
     int nMeterResult = (int)fMeterResult;
-    switch (mUnidentifiedB4)
+    switch (mnPressStage)
     {
     case 0:
     {
         bool bAtRequestedValue = false;
         if (Difficult(m_pFielder->m_pTeam) < 0.25f
-            && (float)mUnidentifiedA4
+            && (float)mnRequestedBalls
                 == m_pFielder->fn_800489C4())
         {
             bAtRequestedValue = true;
         }
 
-        if (nMeterResult >= mUnidentifiedA4 && !bAtRequestedValue
+        if (nMeterResult >= mnRequestedBalls && !bAtRequestedValue
             && m_pFielder->fn_8002E058() > 0.225f)
         {
             float fChance = InterpolateRangeClamped(
@@ -271,57 +270,57 @@ bool DesireMegaStrike::fn_800B9D84(
                 bButtonPressed = true;
                 if (m_pFielder->fn_8002E058() <= 0.225f)
                 {
-                    mUnidentifiedB4 = 2;
+                    mnPressStage = 2;
                 }
                 else if (nlRandomf(1.0f) < 0.5f)
                 {
-                    mUnidentifiedB4 = 1;
+                    mnPressStage = 1;
                 }
                 else
                 {
-                    mUnidentifiedB4 = 2;
+                    mnPressStage = 2;
                 }
             }
-            else if (nMeterResult > mUnidentifiedA4)
+            else if (nMeterResult > mnRequestedBalls)
             {
                 bButtonPressed = true;
                 if (nlRandomf(1.0f) < 0.5f)
-                    mUnidentifiedB4 = 1;
+                    mnPressStage = 1;
                 else
-                    mUnidentifiedB4 = 2;
+                    mnPressStage = 2;
             }
         }
         break;
     }
     case 1:
-        if (mUnidentifiedAC > fMeterPosition)
+        if (mfPrevMeterPosition > fMeterPosition)
         {
-            if (mUnidentifiedA8 >= 0.0f)
+            if (mfAccuracyScore >= 0.0f)
                 bButtonPressed = true;
             else
-                mUnidentifiedB4 = 2;
+                mnPressStage = 2;
         }
-        else if (mUnidentifiedA8 < 0.0f && fMeterPosition < 0.0f)
+        else if (mfAccuracyScore < 0.0f && fMeterPosition < 0.0f)
         {
-            if (fMeterPosition >= mUnidentifiedA8)
+            if (fMeterPosition >= mfAccuracyScore)
                 bButtonPressed = true;
         }
-        else if (mUnidentifiedA8 >= 0.0f && fMeterPosition >= 0.0f
-            && fMeterPosition >= mUnidentifiedA8)
+        else if (mfAccuracyScore >= 0.0f && fMeterPosition >= 0.0f
+            && fMeterPosition >= mfAccuracyScore)
         {
             bButtonPressed = true;
         }
         break;
     case 2:
-        if (fMeterPosition < mUnidentifiedAC)
+        if (fMeterPosition < mfPrevMeterPosition)
         {
-            if (mUnidentifiedA8 < 0.0f && fMeterPosition < 0.0f)
+            if (mfAccuracyScore < 0.0f && fMeterPosition < 0.0f)
             {
-                if (mUnidentifiedA8 >= fMeterPosition)
+                if (mfAccuracyScore >= fMeterPosition)
                     bButtonPressed = true;
             }
-            else if (mUnidentifiedA8 >= 0.0f && fMeterPosition >= 0.0f
-                && mUnidentifiedA8 >= fMeterPosition)
+            else if (mfAccuracyScore >= 0.0f && fMeterPosition >= 0.0f
+                && mfAccuracyScore >= fMeterPosition)
             {
                 bButtonPressed = true;
             }
@@ -329,7 +328,7 @@ bool DesireMegaStrike::fn_800B9D84(
         break;
     }
 
-    mUnidentifiedAC = fMeterPosition;
+    mfPrevMeterPosition = fMeterPosition;
     return bButtonPressed;
 }
 

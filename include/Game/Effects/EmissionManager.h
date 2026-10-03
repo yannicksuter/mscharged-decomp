@@ -52,9 +52,14 @@ public:
     static EmissionManager* Instance();
     static EmissionManager& InstanceForReplayOnly();
 
-    float GetUnidentified1F4() const
+    void SetShadowHeight(float height)
     {
-        return mTimeScale;
+        mShadowHeight = height;
+    }
+
+    float GetShadowHeight() const
+    {
+        return mShadowHeight;
     }
 
     EffectsGroup* GetEffectsGroup(const char* name);
@@ -111,7 +116,7 @@ public:
     /* 0x1F0 */ bool mUpdateEnabled;
     /* 0x1F1 */ bool mRenderPersistentOnly;
     /* 0x1F2 */ u8 unknown_0x1F2[0x02];
-    /* 0x1F4 */ float mTimeScale;
+    /* 0x1F4 */ float mShadowHeight;
     /* 0x1F8 */ bool unknown_0x1F8;
     /* 0x1F9 */ u8 unknown_0x1F9[0x03];
 };

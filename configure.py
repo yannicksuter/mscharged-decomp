@@ -420,7 +420,7 @@ config.libs = [
             Object(Matching, "Game/AnimInventory.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AsyncLoading.cpp", extra_cflags=["-sym on"]),
             Object(Matching, "Game/Ball.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/BasicStadium.cpp"),
+            Object(NonMatching, "Game/BasicStadium.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Blinker.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Character.cpp", extra_cflags=["-inline deferred", "-ipa file", "-sym on"]),
             Object(Matching, "Game/CharacterEffects.cpp"),
@@ -613,7 +613,7 @@ config.libs = [
             Object(Matching, "Game/Audio/XSoundHandle.cpp"),
 
             # Game/Camera
-            Object(NonMatching, "Game/Camera/animcam.cpp", cflags=cflags_game),
+            Object(Matching, "Game/Camera/animcam.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Camera/AnimViewerCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/BaseCam.cpp"),
             Object(Matching, "Game/Camera/CameraMan.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
@@ -979,7 +979,8 @@ config.libs = [
             Object(Matching, "Game/Triggers/SebringAnimScript.cpp", cflags=cflags_game_deferred),
 
             # Game/World
-            Object(NonMatching, "Game/World/worldanim.cpp", extra_cflags=["-inline auto,depth=3", "-ipa file"]),
+            Object(Matching, "Game/World/WorldPhysics.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/World/worldanim.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/World/worldanimobjects.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
             Object(Matching, "Game/World/WorldEffect.cpp", extra_cflags=["-inline nobottomup", "-ipa file"]),
 

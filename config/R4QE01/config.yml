@@ -135,7 +135,3 @@ force_active:
   - __init_cpp_exceptions_reference
   - __destroy_global_chain_reference
   - __fini_cpp_exceptions_reference
-  # Game/tu_8013E2EC.cpp is a code-less unit whose only content is its static
-  # initializer; nothing references its globals, so the linker would drop the
-  # compiled object although retail retains it. Root it through one of them.
-  - lbl_806E11D8

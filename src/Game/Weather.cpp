@@ -81,8 +81,8 @@ float gLavaMinXSpeed = 4.0f;
 float gLavaMaxXSpeed = 8.0f;
 float gLavaMinYSpeed = 4.0f;
 float gLavaMaxYSpeed = 8.0f;
-float gLavaPoolRadius = 3.0f;
-float gLavaPoolWidth = 3.0f;
+float gLavaPoolStartRadius = 3.0f;
+float gLavaPoolEndRadius = 3.0f;
 float gLavaPoolGrowthTime = 0.5f;
 float gLavaPoolLifetime = 7.5f;
 float gLavaGoalClearance = 11.0f;
@@ -1078,7 +1078,7 @@ void OnLavaCollisionPatchGround(UnidentifiedEventData24* event)
             return;
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
-        lbl_806E12C8->CreatePatch(9, 0, position, v3Zero, gLavaPoolRadius, gLavaPoolWidth, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
+        lbl_806E12C8->CreatePatch(9, 0, position, v3Zero, gLavaPoolStartRadius, gLavaPoolEndRadius, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
         event->mUnidentified10->Unknown0();
         PlaySound(11, 0xC15AA25B, 0, 0);
     }
@@ -1146,8 +1146,8 @@ float BubblingLava::CalculateLavaTrajectory(nlVector3& outputPosition, nlVector3
     float length = cField::GetGoalLineX(0U);
     float width = 2.0f * cField::mv3FieldPosition.y;
     float halfWidth = 0.5f * width;
-    float xRange = length - gLavaPoolRadius;
-    float yRange = halfWidth - gLavaPoolRadius;
+    float xRange = length - gLavaPoolStartRadius;
+    float yRange = halfWidth - gLavaPoolStartRadius;
     float minX, maxX, minY, maxY, minZ, maxZ, margin;
     minX = gLavaMinXSpeed;
     maxX = gLavaMaxXSpeed;
@@ -1159,7 +1159,7 @@ float BubblingLava::CalculateLavaTrajectory(nlVector3& outputPosition, nlVector3
     rightGoal.x = length;
     nlVector3 leftGoal = { 0.0f, 0.0f, 0.0f };
     leftGoal.x = -1.0f * length;
-    margin = 3.0f * gLavaPoolRadius;
+    margin = 3.0f * gLavaPoolStartRadius;
     float goalDistance = gLavaGoalClearance * gLavaGoalClearance;
     position.x = nlRandomf(2.0f * xRange) - xRange;
     position.y = nlRandomf(2.0f * yRange) - yRange;

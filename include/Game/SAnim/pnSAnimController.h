@@ -106,6 +106,11 @@ public:
         return m_fTime;
     }
 
+    float GetPreviousTime() const
+    {
+        return m_fPrevTime;
+    }
+
     cSAnim* m_pSAnim;
     float m_fTime;
     const AnimRetarget* m_pAnimRetarget;

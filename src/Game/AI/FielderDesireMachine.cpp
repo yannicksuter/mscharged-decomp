@@ -25,19 +25,19 @@
 char gKickoffNeutralName[] = "Kickoff Neutral";
 char gKickoffAdvantageName[] = "Kickoff Advantage";
 
-float lbl_806DC3B0 = 2.0f;
-float lbl_806DC3B4 = 2.0f;
-float lbl_806DC3B8[2] = { 0.4f, 0.0f };
+float gBehindGoalLineRunTimeLimit = 2.0f;
+float gBehindGoalLineRunSpeed = 2.0f;
+float gBehindGoalLineRunAvoidanceCoeff[2] = { 0.4f, 0.0f };
 
-class UnidentifiedDesire33 : public Desire
+class DesireDoNothing : public Desire
 {
 public:
-    UnidentifiedDesire33()
+    DesireDoNothing()
         : Desire(33, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }
 
-    virtual ~UnidentifiedDesire33();
+    virtual ~DesireDoNothing();
 };
 
 inline cFielder* FielderDesireMachine::GetFielder() const
@@ -79,8 +79,8 @@ void FielderDesireMachine::UnidentifiedVirtual2()
         = new (8, false) DesireDeke(3, (void*)TransDesireActionDone);
     UnidentifiedAddState(3, deke, false);
 
-    UnidentifiedDesire33* desire33 = new (8, false) UnidentifiedDesire33();
-    UnidentifiedAddState(33, desire33, false);
+    DesireDoNothing* doNothing = new (8, false) DesireDoNothing();
+    UnidentifiedAddState(33, doNothing, false);
 
     DesireFinishAction* finishAction
         = new (8, false) DesireFinishAction(21, (void*)TransDesireActionDone);
@@ -191,10 +191,10 @@ void FielderDesireMachine::UnidentifiedVirtual2()
 /**
  * Offset/Address/Size: 0xCB8 | 0x800D5AE4 | size: 0x54
  */
-void FielderDesireMachine::Reset(bool param)
+void FielderDesireMachine::Reset(bool deleting)
 {
-    UnidentifiedScriptMachine::Reset(param);
-    if (!param)
+    UnidentifiedScriptMachine::Reset(deleting);
+    if (!deleting)
     {
         fn_80319E84(this, 34, 0, false);
     }
@@ -217,11 +217,11 @@ void FielderDesireMachine::Update(float deltaTime)
         return;
     }
 
-    bool kickoffOverride = lbl_806E0C50
+    bool forceUserControl = lbl_806E0C50
         || (lbl_806E0C51 && GetFielder()->m_pTeam->m_nSide == HOME)
         || (lbl_806E0C52 && GetFielder()->m_pTeam->m_nSide == AWAY);
     bool waitForController = false;
-    if (kickoffOverride)
+    if (forceUserControl)
     {
         bool hasController = GetFielder()->GetGlobalPad();
         if (!hasController)
@@ -240,7 +240,7 @@ void FielderDesireMachine::Update(float deltaTime)
         && !fn_80319FEC(this, 17) && fn_800D85F8(GetFielder()))
     {
         UnidentifiedVariantCollection params;
-        params.Set(10, FuzzyVariant(FT_POINTER, (void*)fn_800D2074));
+        params.Set(10, FuzzyVariant(FT_POINTER, (void*)TransDesireUsePowerup));
         fn_80319E84(this, 17, &params, false);
     }
 
@@ -305,9 +305,9 @@ void FielderDesireMachine::UnidentifiedVirtual7()
             if (shouldRunToTarget)
             {
                 state = 13;
-                params.Set(7, FuzzyVariant(lbl_806DC3B0));
-                params.Set(13, FuzzyVariant(lbl_806DC3B4));
-                params.Set(2, FuzzyVariant(lbl_806DC3B8[0]));
+                params.Set(7, FuzzyVariant(gBehindGoalLineRunTimeLimit));
+                params.Set(13, FuzzyVariant(gBehindGoalLineRunSpeed));
+                params.Set(2, FuzzyVariant(gBehindGoalLineRunAvoidanceCoeff[0]));
 
                 nlVector3 position = gFielderDesireZeroVector;
                 position.x = GetFielder()->mUnidentified024.m_v3Position.x;
@@ -390,6 +390,6 @@ void FielderDesireMachine::UnidentifiedVirtual8()
 /**
  * Offset/Address/Size: 0x1410 | 0x800D623C | size: 0x5C
  */
-UnidentifiedDesire33::~UnidentifiedDesire33()
+DesireDoNothing::~DesireDoNothing()
 {
 }
