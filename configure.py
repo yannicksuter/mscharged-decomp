@@ -826,7 +826,7 @@ config.libs = [
             Object(Matching, "Game/Render/DiddyBanana.cpp", cflags=cflags_game, extra_cflags=["-sym on"]),
             Object(Matching, "Game/Render/ElectricFence.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/FlareHandler.cpp", cflags=cflags_game),
-            Object(NonMatching, "Game/Render/FlyingCamera.cpp", cflags=cflags_game),
+            Object(NonMatching, "Game/Render/FlyingCamera.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/FrontEndPresentation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/HammerObject.cpp", cflags=cflags_game),
             Object(Matching, "Game/Render/HighRange.cpp", cflags=cflags_game),

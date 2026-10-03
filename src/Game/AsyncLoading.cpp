@@ -2256,22 +2256,12 @@ GLResourcePool* AsyncLoadingManager::GetPersistentResourcePool()
     return sPersistentResourcePool;
 }
 
-extern "C" UnidentifiedOwnerHandle* fn_8011B858(
-    UnidentifiedOwnerHandle* handle, int shouldDelete)
+UnidentifiedOwnerConnection::~UnidentifiedOwnerConnection()
 {
-    if (handle != 0)
+    if (mOwner != 0 && ((mOwner->mFlags >> 30) & 1) != 0)
     {
-        if (handle->mOwner != 0
-            && ((handle->mOwner->mFlags >> 30) & 1) != 0)
-        {
-            handle->mOwner->mTarget->Release(handle);
-        }
-        if (shouldDelete > 0)
-        {
-            delete handle;
-        }
+        mOwner->mTarget->Release(this);
     }
-    return handle;
 }
 
 PersistentResourceRequirements gPersistentResourceRequirements = {
