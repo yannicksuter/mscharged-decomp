@@ -92,12 +92,6 @@ char sMegaStrikeMeterEndEventName[] = "MegaStrikeMeterEnd";
 void OnPeachCameraFlash(void*);
 void OnResetFlyingCameras(void*);
 
-// Retail's .sdata2 opens with this block's constants (0.006, 0.2, 3.5, 1, 4.5)
-// ahead of UpdateFlyingCamera's, so with -ipa file a function compiled before
-// UpdateFlyingCamera used them first. It is not in the image: the linker dropped
-// it as unreferenced once SetFlyingCameraCount had inlined it. It must keep
-// external linkage, because a static copy is never compiled on its own. Its real
-// name and extent are unrecoverable from a stripped DOL.
 void UnidentifiedRandomizeFlyingCamera(FlyingCamera* camera)
 {
     camera->mPositionGain = lbl_806DCE18 + nlRandomf(0.006f, &nlDefaultSeed);
@@ -107,9 +101,6 @@ void UnidentifiedRandomizeFlyingCamera(FlyingCamera* camera)
     camera->mHeightOffset = 4.5f + nlRandomf(1.0f, &nlDefaultSeed);
 }
 
-// Same results as nlMaxEquals/nlMinEquals, but the shared nlMaxEquals is a
-// conditional expression, and only this if/return shape colours the integral
-// clamp in UpdateFlyingCamera the way R4QE01 does (cf. Goalie.cpp).
 static inline float MaxOf(float a, float b)
 {
     if (a >= b)

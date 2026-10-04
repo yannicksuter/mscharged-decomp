@@ -24,9 +24,6 @@ struct UnidentifiedOwnerHandle
     /* 0x00 */ UnidentifiedOwnerRecord* mOwner;
 };
 
-// Same layout as UnidentifiedOwnerHandle, but with a destructor that releases
-// the connection. Retail keeps that destructor out of line in AsyncLoading.cpp,
-// and Render/FlyingCamera.cpp registers three global instances against it.
 struct UnidentifiedOwnerConnection
 {
     UnidentifiedOwnerConnection()
