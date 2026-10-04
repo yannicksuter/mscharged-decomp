@@ -24,15 +24,6 @@ namespace
 static WiperCallback wiperCallback;
 }
 
-void WiperCallback::TransitionFinished()
-{
-    mTransitionActive = false;
-}
-
-void WiperCallback::TransitionProgressed(float fDeltaT)
-{
-}
-
 void Wiper::Reset()
 {
     wiperCallback.mTransitionActive = false;
@@ -103,6 +94,11 @@ void Wiper::DoWipe(const char* wipe)
     }
 }
 
+void WiperCallback::TransitionFinished()
+{
+    mTransitionActive = false;
+}
+
 void Wiper::Run(float dt)
 {
     if (!FrontEnd::m_bGameOver)
@@ -124,14 +120,10 @@ void Wiper::Render()
     ScreenTransitionManager::Instance()->Render();
 }
 
+void WiperCallback::TransitionProgressed(float fDeltaT)
+{
+}
+
 void ScreenTransitionCallback::fn_80188764()
-{
-}
-
-void ScreenTransitionCallback::Cut()
-{
-}
-
-void ScreenTransitionCallback::SequenceSwitch()
 {
 }

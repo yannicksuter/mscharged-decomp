@@ -29,11 +29,11 @@ public:
 class ScreenTransitionCallback
 {
 public:
-    virtual inline void fn_80188764();
+    virtual void fn_80188764();
     virtual void TransitionFinished();
     virtual void TransitionProgressed(float);
-    virtual inline void Cut();
-    virtual inline void SequenceSwitch();
+    virtual void Cut() { }
+    virtual void SequenceSwitch() { }
 };
 
 class ScreenTransitionManager : public nlSingleton<ScreenTransitionManager>

@@ -5,19 +5,6 @@
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
 
-struct WiperCallback : public ScreenTransitionCallback
-{
-    WiperCallback()
-        : mTransitionActive(false)
-    {
-    }
-
-    virtual inline void TransitionFinished();
-    virtual inline void TransitionProgressed(float fDeltaT);
-
-    /* 0x04 */ bool mTransitionActive;
-}; // total size: 0x8
-
 class Wiper : public nlTask
 {
 public:
@@ -43,5 +30,18 @@ public:
         return "NIS Transition Wiper";
     }
 };
+
+struct WiperCallback : public ScreenTransitionCallback
+{
+    WiperCallback()
+        : mTransitionActive(false)
+    {
+    }
+
+    virtual void TransitionFinished();
+    virtual void TransitionProgressed(float fDeltaT);
+
+    /* 0x04 */ bool mTransitionActive;
+}; // total size: 0x8
 
 #endif // GAME_RENDER_WIPER_H
