@@ -114,7 +114,7 @@ int NetworkSocket::SendDatagram(
     if (!sent)
     {
         tDebugPrintManager::Print(DC_NETWORK,
-            "Failed to send message of size %d to aid %d.\n", size, aid);
+            "Failed to send message of size %d to aid %d\n", size, aid);
         return -1;
     }
     return size;
@@ -157,6 +157,28 @@ void NetworkSocket::Initialize(
 
     mReliableSocket.Initialize(static_cast<ReliableSocketCallback*>(this));
     mInitialized = true;
+}
+
+void NetworkSocket::AcquireLocalAddress()
+{
+    if (mHasLocalAddress)
+    {
+        return;
+    }
+
+    *(u32*)mLocalAddress = 0;
+    *(u32*)mLocalAddress = SOGetHostID();
+    if (*(u32*)mLocalAddress != 0)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Acquired local IP address %d.%d.%d.%d\n", mLocalAddress[0],
+            mLocalAddress[1], mLocalAddress[2], mLocalAddress[3]);
+        mHasLocalAddress = true;
+    }
+    else
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to get local IP address\n");
+    }
 }
 
 void NetworkSocket::Shutdown()
@@ -360,28 +382,6 @@ void NetworkSocket::SocketVirtual48()
     mReliableSocket.DrawScreenPrinter();
 }
 
-inline void NetworkSocket::AcquireLocalAddress()
-{
-    if (mHasLocalAddress)
-    {
-        return;
-    }
-
-    *(u32*)mLocalAddress = 0;
-    *(u32*)mLocalAddress = SOGetHostID();
-    if (*(u32*)mLocalAddress != 0)
-    {
-        tDebugPrintManager::Print(DC_NETWORK,
-            "Acquired local IP address %d.%d.%d.%d\n", mLocalAddress[0],
-            mLocalAddress[1], mLocalAddress[2], mLocalAddress[3]);
-        mHasLocalAddress = true;
-    }
-    else
-    {
-        tDebugPrintManager::Print(DC_NETWORK, "Failed to get local IP address\n");
-    }
-}
-
 u8* NetworkSocket::GetLocalAddress()
 {
     if (!mHasLocalAddress)
@@ -405,4 +405,3 @@ TweakValueBool g_bDisplayLocAddr(
     "g_bDisplayLocAddr", "Network", true);
 static TweakIntBinding sLocalDirectPortTweak(
     "g_nLocalDirectPort", "Network", &g_nLocalDirectPort, true);
-

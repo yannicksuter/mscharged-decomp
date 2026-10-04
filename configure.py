@@ -476,7 +476,7 @@ config.libs = [
             Object(Matching, "Game/NetworkRandomSeed.cpp"),
             Object(NonMatching, "Game/NetworkSession.cpp", extra_cflags=[flag for flag in cflags_rvl_dwc if flag.startswith("-i ")] + ["-ipa file"]),
             Object(Matching, "Game/NetworkSessionData.cpp"),
-            Object(NonMatching, "Game/NetworkSocket.cpp"),
+            Object(Matching, "Game/NetworkSocket.cpp"),
             Object(Matching, "Game/NetworkStats.cpp", extra_cflags=["-ipa file"]),
             Object(NonMatching, "Game/NetworkStatsManager.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/NetworkSync.cpp"),
