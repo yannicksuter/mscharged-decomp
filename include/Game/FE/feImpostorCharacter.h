@@ -15,7 +15,7 @@ class FEImpostorCharacter
 public:
     FEImpostorCharacter(const char* name,
         ImpostorModel* model, void* animations, int budget,
-        bool animationFlag, bool alternate,
+        bool mirror, bool alternate,
         const ImpostorCharacterParams* params, int modelType);
     virtual ~FEImpostorCharacter();
 

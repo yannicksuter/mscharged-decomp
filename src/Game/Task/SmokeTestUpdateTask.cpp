@@ -10,9 +10,9 @@
 
 #include <stdarg.h>
 
-bool lbl_806E1DF0;
-void (*lbl_806E1DF4)();
-void (*lbl_806E1DF8)(float);
+bool g_bSmokeTestEnabled;
+void (*g_pSmokeTestFinishedCallback)();
+void (*g_pSmokeTestUpdateCallback)(float);
 
 extern char sSmokeLogPathString[];
 extern char sSmokeTestCompleted[];
@@ -29,7 +29,7 @@ const char* sSmokeLogPath = sSmokeLogPathString;
 
 void SmokeTestUpdateTask::Run(float dt)
 {
-    if (!lbl_806E1DF0)
+    if (!g_bSmokeTestEnabled)
     {
         return;
     }
@@ -43,11 +43,11 @@ void SmokeTestUpdateTask::Run(float dt)
     if (mElapsed > mDuration)
     {
         const char* smokeTestName = GetTweakString(sSmokeTestNamePath, sNotFound);
-        fn_802BD644(sSmokeTestNameFormat, smokeTestName);
+        SmokeTestLog(sSmokeTestNameFormat, smokeTestName);
 
-        if (lbl_806E1DF4 != 0)
+        if (g_pSmokeTestFinishedCallback != 0)
         {
-            lbl_806E1DF4();
+            g_pSmokeTestFinishedCallback();
         }
 
         void* file = nlOpenFileDebug(sProfilePath, false, false);
@@ -60,22 +60,22 @@ void SmokeTestUpdateTask::Run(float dt)
     nlScreenPrintf(0, 0, 0, 4, sSmokeTestRunning, mDuration - mElapsed);
     mElapsed += dt;
 
-    if (lbl_806E1DF8 != 0)
+    if (g_pSmokeTestUpdateCallback != 0)
     {
-        lbl_806E1DF8(dt);
+        g_pSmokeTestUpdateCallback(dt);
     }
 }
 
-bool fn_802BD63C()
+bool IsSmokeTestEnabled()
 {
-    return lbl_806E1DF0;
+    return g_bSmokeTestEnabled;
 }
 
-void fn_802BD644(const char* format, ...)
+void SmokeTestLog(const char* format, ...)
 {
     va_list args;
 
-    if (lbl_806E1DF0)
+    if (g_bSmokeTestEnabled)
     {
         va_start(args, format);
         nlVSNPrintf(sSmokeLogBuffer, sizeof(sSmokeLogBuffer), format, args);
@@ -87,7 +87,7 @@ void fn_802BD644(const char* format, ...)
     }
 }
 
-void fn_802BD718(const char* name, const char* units, float value)
+void SmokeTestLogGraphValue(const char* name, const char* units, float value)
 {
     char output[0x400];
     char unitsOutput[0x100];
@@ -102,7 +102,7 @@ void fn_802BD718(const char* name, const char* units, float value)
     }
 
     nlStrNCat(output, output, "\n", sizeof(output));
-    fn_802BD644(output);
+    SmokeTestLog(output);
 }
 
 char sSmokeLogPathString[] = "..\\smokelog.txt";

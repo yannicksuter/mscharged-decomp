@@ -27,13 +27,13 @@ enum SoundInstanceState
 
 struct SoundInstance
 {
-    SoundInstance(XSoundHandle* owner, AudioVoiceDefinition* definition);
+    SoundInstance(XSoundHandle* handle, AudioVoiceDefinition* voiceDefinition);
     ~SoundInstance() { Destroy(); }
 
     void Play(float time);
     void Prepare();
     void SetVolume(bool releaseAfterTransition, float target, float duration);
-    void Stop(void* value);
+    void Stop(void* force);
     void Pause();
     void Resume();
     void GetSources(AudioSource** sources, unsigned int* count);

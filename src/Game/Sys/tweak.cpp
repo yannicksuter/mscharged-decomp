@@ -31,7 +31,7 @@ int nlScreenPrint(eGLView view, int x, int y, bool bFromTop,
     glFontSetFont(font);
     if (!bFromTop)
     {
-        y = fn_802C9CC8(GetDebugFontView()) - y;
+        y = glFontGetScreenHeight(GetDebugFontView()) - y;
     }
 
     nlVSNPrintf(printbuf, sizeof(printbuf), format, args);

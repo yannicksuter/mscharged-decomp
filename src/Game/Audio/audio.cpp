@@ -425,21 +425,7 @@ void SetLastSoundParameter(unsigned long parameter, float value)
         return;
     }
 
-    AudioParameter* audioParameter
-        = GetSoundParameter(g_pLastAudioHandle, parameter);
-    if (value < audioParameter->m_Min)
-    {
-        audioParameter->m_Value = audioParameter->m_Min;
-    }
-    else if (value > audioParameter->m_Max)
-    {
-        audioParameter->m_Value = audioParameter->m_Max;
-    }
-    else
-    {
-        audioParameter->m_Value = value;
-    }
-    audioParameter->m_Time = 0.0f;
+    GetSoundParameter(g_pLastAudioHandle, parameter)->SetTarget(value, 0.0f);
 }
 
 int GetSoundState(

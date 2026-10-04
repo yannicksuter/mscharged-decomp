@@ -93,10 +93,12 @@ inline void FloatCompressor<MIN, MAX, BITS>::Transfer(SaveFrame& frame, unsigned
     }
     else
     {
+        unsigned int remaining = value;
         char* p = frame.mStream.mStorage;
-        *p++ = (char)(value & 0xFF);
-        *p++ = value >> 8;
-        *p++ = (char)((value >> 16) & 0xFF);
+        *p++ = (char)(remaining & 0xFF);
+        remaining >>= 8;
+        *p++ = remaining;
+        *p++ = (char)((remaining >> 8) & 0xFF);
         frame.mStream.mStorage = p;
     }
 }

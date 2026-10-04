@@ -11,6 +11,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/Ball.h"
+#include "Game/Camera/CameraMan.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Field.h"
@@ -39,8 +40,6 @@
 #include "Game/NetworkSync.h"
 
 #include <math.h>
-
-extern u16 m_aJoystickRemap__14cCameraManager;
 
 float g_fFixedUpdateTick = 0.02f;
 bool g_bRunSimAndRenderInLockStep;
@@ -87,12 +86,12 @@ void FixedUpdateTask::Reset()
     UnidentifiedDispatcherHeaderScope headerScope;
     UnidentifiedDispatcherInlineScope inlineScope;
 
-    mUnidentified28 = mAccumulatedDeltaT = g_fFixedUpdateTick;
+    mInterpolationDeltaT = mAccumulatedDeltaT = g_fFixedUpdateTick;
     mSimulationTime = 0.0f;
     mTimeScale = 1.0f;
     mfFrameLockTime = 0.0f;
     mFrame = 0;
-    mUnidentified38 = false;
+    mSimulationStarted = false;
 
     mEventDispatcher.Clear();
     mEventDispatcher.FreeBlocks();
@@ -100,12 +99,12 @@ void FixedUpdateTask::Reset()
 
 FixedUpdateTask::FixedUpdateTask()
 {
-    mUnidentified28 = mAccumulatedDeltaT = g_fFixedUpdateTick;
+    mInterpolationDeltaT = mAccumulatedDeltaT = g_fFixedUpdateTick;
     mSimulationTime = 0.0f;
     mTimeScale = 1.0f;
     mfFrameLockTime = 0.0f;
     mFrame = 0;
-    mUnidentified38 = false;
+    mSimulationStarted = false;
 
     mEventDispatcher.Clear();
     BasicSlotPool<DLListEntry<EventCallback> >* pool = &mEventDispatcher.callbacks.m_Allocator;
@@ -134,7 +133,7 @@ u32 FixedUpdateTask::CalculateChecksum()
 #define PAD_FIELD_OFFSET(pad, field) \
     ((unsigned char*)&(pad)->field - (unsigned char*)(pad))
 
-inline void fn_801118C0(DebugWriteCache* cache, DetInput* pad)
+inline void RegisterDetInputDebugFields(DebugWriteCache* cache, DetInput* pad)
 {
     lbl_806DF740 = cache->BeginType("DetInput");
     cache->AddField(17, gDebugFieldTypes[17].size, 0, "m_AnalogLeftX");
@@ -186,7 +185,7 @@ u32 FixedUpdateTask::WriteSyncLog()
             DetInput* pad = (group->GetNetworkPeerChannel(controllerIndex))->GetNetworkPeerChannelInput();
             if (lbl_806DF740 == 0xFFFF)
             {
-                fn_801118C0(cache, pad);
+                RegisterDetInputDebugFields(cache, pad);
             }
 
             DetInput* copy =
@@ -236,7 +235,7 @@ void FixedUpdateTask::OnInputQueueOverflow()
 
 u16 FixedUpdateTask::GetInputRemapAngle()
 {
-    return m_aJoystickRemap__14cCameraManager - 0x4000;
+    return cCameraManager::m_aJoystickRemap - 0x4000;
 }
 
 bool FixedUpdateTask::IsInPauseMenu()
@@ -305,7 +304,7 @@ void FixedUpdateTask::Run(float dt)
     {
         runFixedUpdate = false;
     }
-    if (!mUnidentified38)
+    if (!mSimulationStarted)
     {
         runFixedUpdate = false;
     }
@@ -335,7 +334,7 @@ void FixedUpdateTask::Run(float dt)
         }
 
         mAccumulatedDeltaT += dt * mTimeScale;
-        mUnidentified28 = mAccumulatedDeltaT;
+        mInterpolationDeltaT = mAccumulatedDeltaT;
 
         while (g_bRunSimAndRenderInLockStep
             || mAccumulatedDeltaT >= g_fFixedUpdateTick)
@@ -371,11 +370,11 @@ void FixedUpdateTask::Run(float dt)
 
             if (updated)
             {
-                mUnidentified28 = mAccumulatedDeltaT;
+                mInterpolationDeltaT = mAccumulatedDeltaT;
             }
             else
             {
-                mUnidentified28 = g_fFixedUpdateTick;
+                mInterpolationDeltaT = g_fFixedUpdateTick;
             }
 
             if (IsNisLoadedOnAllMachines(GetPresentation()))

@@ -19,7 +19,7 @@ public:
     virtual ~XSoundCueHandle();
     virtual bool Play(bool callbackEnabled);
     virtual bool Prepare(bool callbackEnabled);
-    virtual void Stop(u8 callbackEnabled, void* value);
+    virtual void Stop(u8 callbackEnabled, void* force);
     virtual void Pause();
     virtual void Resume();
     virtual void Release();

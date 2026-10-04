@@ -1380,9 +1380,9 @@ void StormShipWeather::Update(float value)
             {
                 EmissionController* controller;
                 if (m_bRightSide == false)
-                    controller = fn_802E7DC4(EmissionManager::Instance(), "weather_lightning_left", 2, true, 0);
+                    controller = EmissionManager::Instance()->Create("weather_lightning_left", 2, true, 0);
                 else
-                    controller = fn_802E7DC4(EmissionManager::Instance(), "weather_lightning", 2, true, 0);
+                    controller = EmissionManager::Instance()->Create("weather_lightning", 2, true, 0);
                 controller->SetPosition(v3Zero);
                 controller->SetVelocity(v3Zero);
                 m_StartChainTrainTimer = gStormElectrocuteDelay;

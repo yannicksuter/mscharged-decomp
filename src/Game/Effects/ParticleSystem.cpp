@@ -15,15 +15,16 @@
 #include "NL/gl/glView.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "Game/TweakValueFloat.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 
 struct TextureFrame
 {
-    float mUnidentified000;
-    float mUnidentified004;
-    float mUnidentified008;
+    float u;
+    float v;
+    float increment;
 }; // size: 0x0C
 
 static TweakValueFloat sfParticleRedScale(
@@ -35,47 +36,47 @@ static TweakValueFloat sfParticleBlueScale(
 
 static TextureFrame* textureFrames[36];
 
-static bool sUnidentified_806DF470 = true;
+static bool sRenderParticles = true;
 float ParticleSystem::m_fAspect = 1.0f;
 bool ParticleSystem::m_AllowInFront = true;
 
-static bool sUnidentified_806E1F98;
-static bool sUnidentified_806E1F99;
+static bool sUseWhiteParticleTexture;
+static bool sDisableParticleDepthTest;
 int ParticleSystem::m_NumInstances;
 bool (*ParticleSystem::m_Callback)(ParticleSystem*, GLView*,
     nlDLListSlotPool<Particle*>*, const nlVector3&, const nlVector3&,
     const nlMatrix4*);
 glModel* (*ParticleSystem::m_LightingCallback)(glModel*);
 static int MaxNumParticles;
-int sUnidentified_806E1FAC;
+int gNumRenderedParticles;
 static unsigned short hackyFacingAngle;
 
 ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,
     nlDLListSlotPool<Particle*>* pFreeParticles, EffectsSpec* spec,
     unsigned long resourceID)
-    : mUnidentified000(resourceID)
+    : m_uResourceID(resourceID)
     , m_Particles()
-    , mUnidentified0C0(pFreeParticles)
+    , m_pFreeParticles(pFreeParticles)
 {
     ++m_NumInstances;
-    mUnidentified0BC = 0;
+    m_NumParticles = 0;
     m_pTemplate = pTemplate;
     m_pSpec = spec;
     m_fElapsedTime = 0.0f;
-    mUnidentified014 = 0.0f;
+    m_fNormalizedTime = 0.0f;
     m_fNumParticlesToCreate = 0.0f;
     m_fDelay = 0.0f;
     m_uLayer = 0;
-    mUnidentified020 = 0.0f;
+    m_fRotationOffset = 0.0f;
     nlVec3Set(m_vVelocity, 0.0f, 0.0f, 0.0f);
     nlVec3Set(m_vPosition, 0.0f, 0.0f, 0.0f);
     nlVec3Set(m_vForward, 0.0f, 1.0f, 0.0f);
     nlVec3Set(m_vSourcePosition, 0.0f, 0.0f, 0.0f);
-    mUnidentified058.SetIdentity();
+    m_mCoordSys.SetIdentity();
     m_aFacing = 0;
     m_bAmDying = false;
     m_bVisible = false;
-    mUnidentified09C = glGetTextureIndex(m_pTemplate->m_hTexture);
+    m_uTextureIndex = glGetTextureIndex(m_pTemplate->m_hTexture);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -91,14 +92,14 @@ ParticleSystem::~ParticleSystem()
     {
         Particle* particle;
         m_Particles.RemoveStart(&particle);
-        mUnidentified0C0->AddEnd(particle);
+        m_pFreeParticles->AddEnd(particle);
     }
-    mUnidentified0BC = 0;
+    m_NumParticles = 0;
 }
 
 void ParticleSystem::UpdateCoordSys()
 {
-    UpdateCoordSys(mUnidentified058);
+    UpdateCoordSys(m_mCoordSys);
 }
 
 void ParticleSystem::UpdateCoordSys(nlMatrix4& mCoordSys)
@@ -145,7 +146,7 @@ static void EmitCircularPosition(nlVector3& pos, nlVector3& dir,
     nlSinCos(&sinVal, &cosVal,
         (unsigned short)(int)(10430.378f * randomAngle));
 
-    float radius = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+    float radius = pTemplate->EvaluateProperty(4, pSystem->m_fNormalizedTime);
     nlVector3 localPos;
     nlVec3Set(localPos, cosVal * radius, -sinVal * radius, 0.0f);
 
@@ -174,7 +175,7 @@ static void EmitDiscPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->m_fNormalizedTime);
     radius = RandomizedValue(0.0f, radius);
 
     nlVector3 localPos;
@@ -213,7 +214,7 @@ static void EmitSphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->m_fNormalizedTime);
     nlVec3Set(localDir, x, y, z);
     nlVec3Scale(localPos, localDir, radius);
 
@@ -256,7 +257,7 @@ static void EmitHemisphericalPosition(nlVector3& pos, nlVector3& dir,
     float y = xyRadius * sinVal;
     float z = randomZ;
     float radius
-        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->m_fNormalizedTime);
     nlVec3Set(localDir, x, y, z);
     nlVec3Scale(localPos, localDir, radius);
 
@@ -307,10 +308,10 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         (unsigned short)(int)(10430.378f * randomAngle));
 
     float radius
-        = pTemplate->EvaluateProperty(4, pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(4, pSystem->m_fNormalizedTime);
     nlVec3Set(localPos, cos * radius, -sin * radius, 0.0f);
 
-    float tilt = pTemplate->EvaluateProperty(6, pSystem->mUnidentified014);
+    float tilt = pTemplate->EvaluateProperty(6, pSystem->m_fNormalizedTime);
     if (tilt <= -90.0f)
         tilt = -89.9f;
     else if (tilt >= 90.0f)
@@ -327,7 +328,7 @@ static void EmitSpindularPosition(nlVector3& pos, nlVector3& dir,
         length * localDir.z);
 
     float tiltRotation
-        = pTemplate->EvaluateProperty(7, pSystem->mUnidentified014);
+        = pTemplate->EvaluateProperty(7, pSystem->m_fNormalizedTime);
     tiltRotation = -tiltRotation * 3.14159265f / 180.0f;
     if (tiltRotation != 0.0f)
     {
@@ -372,7 +373,7 @@ void ParticleSystem::CreateNewParticles(int numParticles)
     nlVector3 baseDir;
     nlVector3 dir;
     int i;
-    nlMatrix4& mCoordSys = mUnidentified058;
+    nlMatrix4& mCoordSys = m_mCoordSys;
 
     if (m_pTemplate->IsLocalSpace())
         nlVec3Set(baseDir, 0.0f, 0.0f, -1.0f);
@@ -405,8 +406,8 @@ void ParticleSystem::CreateNewParticles(int numParticles)
     for (i = 0; i < numParticles; ++i)
     {
         Particle* removed;
-        Particle* pPart = mUnidentified0C0->m_Head == 0 ? 0
-            : (mUnidentified0C0->RemoveStart(&removed), removed);
+        Particle* pPart = m_pFreeParticles->m_Head == 0 ? 0
+            : (m_pFreeParticles->RemoveStart(&removed), removed);
         if (pPart == 0)
             break;
 
@@ -417,27 +418,27 @@ void ParticleSystem::CreateNewParticles(int numParticles)
         }
 
         m_Particles.AddStart(pPart);
-        ++mUnidentified0BC;
+        ++m_NumParticles;
 
         dir = baseDir;
-        pPart->mUnidentified000 = m_pTemplate;
-        emit(pPart->mUnidentified010, dir, this, m_pSpec, mCoordSys);
-        pPart->position.x = pPart->mUnidentified010.x + m_vSourcePosition.x;
-        pPart->position.y = pPart->mUnidentified010.y + m_vSourcePosition.y;
-        pPart->position.z = pPart->mUnidentified010.z + m_vSourcePosition.z;
+        pPart->pTemplate = m_pTemplate;
+        emit(pPart->initialPosition, dir, this, m_pSpec, mCoordSys);
+        pPart->position.x = pPart->initialPosition.x + m_vSourcePosition.x;
+        pPart->position.y = pPart->initialPosition.y + m_vSourcePosition.y;
+        pPart->position.z = pPart->initialPosition.z + m_vSourcePosition.z;
 
         pPart->lifeSpan = RandomizedValue(m_pTemplate->m_rParticleLife);
-        pPart->mUnidentified05C
+        pPart->initialRotation
             = RandomizedValue(m_pTemplate->m_rRotation);
-        pPart->rot = pPart->mUnidentified05C + mUnidentified020;
+        pPart->rot = pPart->initialRotation + m_fRotationOffset;
         pPart->dRot
             = m_pTemplate->mProperties[3]->Evaluate(0.0f);
         pPart->mass = RandomizedValue(m_pTemplate->m_rMass);
         pPart->size
             = m_pTemplate->mProperties[1]->Evaluate(0.0f);
-        pPart->mUnidentified040
+        pPart->sizeScale
             = m_pTemplate->mProperties[2]->Evaluate(0.0f);
-        pPart->mUnidentified060
+        pPart->flipTexcoords
             = nlRandomf(100.0f, &uSeed) < m_pTemplate->mUnidentified030;
 
         float inheritVelocity
@@ -461,7 +462,7 @@ void ParticleSystem::CreateNewParticles(int numParticles)
         pPart->frame = 0.0f;
         pPart->FPS = RandomizedValue(m_pTemplate->m_rFPS);
         pPart->timeElapsed = 0.0f;
-        pPart->mUnidentified008 = 0.0f;
+        pPart->timeFraction = 0.0f;
     }
 }
 
@@ -473,7 +474,7 @@ void ParticleSystem::UpdateAllParticles(float dt,
     {
         Particle* p = *iterator;
         p->timeElapsed += dt;
-        p->mUnidentified008 = p->timeElapsed / p->lifeSpan;
+        p->timeFraction = p->timeElapsed / p->lifeSpan;
         if (p->timeElapsed >= p->lifeSpan)
         {
             if (m_pTemplate->mUnidentified048 != 0)
@@ -482,13 +483,13 @@ void ParticleSystem::UpdateAllParticles(float dt,
                     m_pTemplate->mUnidentified048);
             }
             m_Particles.Remove(&iterator);
-            --mUnidentified0BC;
-            mUnidentified0C0->AddEnd(p);
+            --m_NumParticles;
+            m_pFreeParticles->AddEnd(p);
         }
         else
         {
             iterator.Step();
-            fn_802E1EC0(p, pCoordSys);
+            UpdateParticleMotion(p, pCoordSys);
         }
     }
 }
@@ -498,21 +499,21 @@ void ParticleSystem::UpdateLight(EffectsLight* pLight, Particle* pPart,
     const nlVector3& viewUp,
     const nlMatrix4* pCoordSys)
 {
-    int colourIndex = (int)(24.5f * pPart->mUnidentified008);
+    int colourIndex = (int)(24.5f * pPart->timeFraction);
     pLight->m_Colour = pTemplate->m_cColour[colourIndex];
 
     float size;
-    if (pPart->mUnidentified000->mProperties[1]->mUseCurve != 0)
-        size = pPart->mUnidentified000->mProperties[1]->Evaluate(
-            pPart->mUnidentified008);
+    if (pPart->pTemplate->mProperties[1]->mUseCurve != 0)
+        size = pPart->pTemplate->mProperties[1]->Evaluate(
+            pPart->timeFraction);
     else
         size = pPart->size;
 
-    if (pPart->mUnidentified000->mProperties[2]->mUseCurve != 0)
-        size *= pPart->mUnidentified000->mProperties[2]->Evaluate(
-            mUnidentified014);
+    if (pPart->pTemplate->mProperties[2]->mUseCurve != 0)
+        size *= pPart->pTemplate->mProperties[2]->Evaluate(
+            m_fNormalizedTime);
     else
-        size *= pPart->mUnidentified040;
+        size *= pPart->sizeScale;
     pLight->m_fRadius = 0.5f * size;
 
     pLight->m_v3Position = pPart->position;
@@ -524,33 +525,33 @@ void ParticleSystem::UpdateLight(EffectsLight* pLight, Particle* pPart,
     }
 }
 
-void ParticleSystem::fn_802E1EC0(Particle* pPart,
+void ParticleSystem::UpdateParticleMotion(Particle* pPart,
     const nlMatrix4* pCoordSys)
 {
     float velocityCurve = 0.0f;
-    if (pPart->mUnidentified000->mProperties[5]->mUseCurve != 0)
+    if (pPart->pTemplate->mProperties[5]->mUseCurve != 0)
     {
         velocityCurve
-            = pPart->mUnidentified000->mProperties[5]->Evaluate(
-                pPart->mUnidentified008);
+            = pPart->pTemplate->mProperties[5]->Evaluate(
+                pPart->timeFraction);
     }
 
     float rotationDelta;
-    if (pPart->mUnidentified000->mProperties[3]->mUseCurve != 0)
+    if (pPart->pTemplate->mProperties[3]->mUseCurve != 0)
     {
         rotationDelta
-            = pPart->mUnidentified000->mProperties[3]->Evaluate(
-                pPart->mUnidentified008);
+            = pPart->pTemplate->mProperties[3]->Evaluate(
+                pPart->timeFraction);
     }
     else
     {
         rotationDelta = pPart->dRot;
     }
-    pPart->rot += mUnidentified010 * rotationDelta;
+    pPart->rot += m_fDeltaTime * rotationDelta;
 
     float velocity = pPart->velocity + velocityCurve
         + pPart->acceleration * pPart->timeElapsed;
-    float distance = mUnidentified010 * velocity;
+    float distance = m_fDeltaTime * velocity;
     nlVec3ScaleAdd(
         pPart->position, distance, pPart->velDir, pPart->position);
 
@@ -559,12 +560,12 @@ void ParticleSystem::fn_802E1EC0(Particle* pPart,
         pCoordSys->GetColumn_(2, gravity);
 
     float gravityDistance
-        = pPart->mass * mUnidentified010 * pPart->timeElapsed;
+        = pPart->mass * m_fDeltaTime * pPart->timeElapsed;
     nlVec3ScaleAdd(
         pPart->position, gravityDistance, gravity, pPart->position);
 }
 
-static nlColour fn_802E2034(Particle* pPart,
+static nlColour EvaluateParticleColour(Particle* pPart,
     const EffectsTemplate* pTemplate)
 {
     float frame = 24.0f * (pPart->timeElapsed / pPart->lifeSpan);
@@ -614,20 +615,20 @@ void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
     const nlVector3& viewRight, const nlVector3& viewUp,
     const nlMatrix4* pCoordSys)
 {
-    pReturn->c = fn_802E2034(pPart, pTemplate);
+    pReturn->c = EvaluateParticleColour(pPart, pTemplate);
 
     float rot = pPart->rot;
     float size;
-    if (pPart->mUnidentified000->mProperties[1]->mUseCurve != 0)
-        size = pPart->mUnidentified000->mProperties[1]->Evaluate(
-            pPart->mUnidentified008);
+    if (pPart->pTemplate->mProperties[1]->mUseCurve != 0)
+        size = pPart->pTemplate->mProperties[1]->Evaluate(
+            pPart->timeFraction);
     else
         size = pPart->size;
-    if (pPart->mUnidentified000->mProperties[2]->mUseCurve != 0)
-        size *= pPart->mUnidentified000->mProperties[2]->Evaluate(
-            mUnidentified014);
+    if (pPart->pTemplate->mProperties[2]->mUseCurve != 0)
+        size *= pPart->pTemplate->mProperties[2]->Evaluate(
+            m_fNormalizedTime);
     else
-        size *= pPart->mUnidentified040;
+        size *= pPart->sizeScale;
 
     nlVector3 position = pPart->position;
     nlVector3 a;
@@ -656,10 +657,10 @@ void ParticleSystem::UpdateParticle(ParticleReturn* pReturn,
     float v0;
     float u0;
     float increment;
-    u0 = frame->mUnidentified000;
-    v0 = frame->mUnidentified004;
-    increment = frame->mUnidentified008;
-    if (pPart->mUnidentified060)
+    u0 = frame->u;
+    v0 = frame->v;
+    increment = frame->increment;
+    if (pPart->flipTexcoords)
     {
         nlVec2Set(pReturn->texcoord[1], u0 + increment, v0);
         nlVec2Set(pReturn->texcoord[0], u0, v0);
@@ -718,8 +719,7 @@ static void RenderLightOnField(GLView* view, const EffectsLight& light)
     glSetRasterState(GLS_DepthWrite, 0);
     glSetCurrentRasterState(glHandleizeRasterState());
 
-    float dim = (2.0f * light.m_fRadius) * (heightFrac * heightFrac);
-    dim = 1.4f * dim;
+    float dim = 1.4f * ((2.0f * light.m_fRadius) * (heightFrac * heightFrac));
     nlMatrix4 mRot;
     mRot.SetIdentity();
     glQuad3 q;
@@ -741,8 +741,8 @@ void ParticleSystem::ClearParticles()
     {
         Particle* pPart = *iterator;
         m_Particles.Remove(&iterator);
-        --mUnidentified0BC;
-        mUnidentified0C0->AddEnd(pPart);
+        --m_NumParticles;
+        m_pFreeParticles->AddEnd(pPart);
     }
 }
 
@@ -753,19 +753,19 @@ int ParticleSystem::RenderAllParticles(GLView* view)
 
     if (!m_bVisible)
         return 0;
-    if (!sUnidentified_806DF470)
+    if (!sRenderParticles)
         return 0;
 
-    int numParticles = mUnidentified0BC;
+    int numParticles = m_NumParticles;
     if (numParticles == 0)
         return 0;
 
-    const nlMatrix4* pCoord = &mUnidentified058;
-    EmissionManager::RecordRenderedParticles(mUnidentified000, numParticles);
-    if ((unsigned int)sUnidentified_806E1FAC
+    const nlMatrix4* pCoord = &m_mCoordSys;
+    EmissionManager::RecordRenderedParticles(m_uResourceID, numParticles);
+    if ((unsigned int)gNumRenderedParticles
         > (unsigned int)MaxNumParticles)
         return 0;
-    sUnidentified_806E1FAC += numParticles;
+    gNumRenderedParticles += numParticles;
 
     nlVector3 viewRight;
     nlVector3 viewUp;
@@ -803,7 +803,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     glSetDefaultState(true);
     glSetRasterState(GLS_DepthWrite, 0);
     glSetRasterState(GLS_Culling, cullBackFaces ? 1 : 0);
-    if (sUnidentified_806E1F99)
+    if (sDisableParticleDepthTest)
         glSetRasterState(GLS_DepthTest, 0);
     if (m_AllowInFront
         && (m_pTemplate->IsInFront()
@@ -811,7 +811,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     {
         glSetRasterState(GLS_DepthTest, 0);
     }
-    if (sUnidentified_806E1F98)
+    if (sUseWhiteParticleTexture)
     {
         glSetRasterState(GLS_AlphaBlend, 3);
     }
@@ -927,19 +927,19 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 }
             }
 
-            static unsigned long constantColourHash_806E1FBC
+            static unsigned long constantColourHash
                 = nlStringLowerHash("constantcolour");
             glModelPacket* pPacket = pModel->packets;
             while (pPacket < pModel->packets + pModel->numPackets)
             {
-                if (glHasMaterialParameter(pPacket, constantColourHash_806E1FBC))
+                if (glHasMaterialParameter(pPacket, constantColourHash))
                 {
                     nlVector4 colour;
                     colour.x = (float)ret.c.c[0] * (1.0f / 255.0f);
                     colour.y = (float)ret.c.c[1] * (1.0f / 255.0f);
                     colour.z = (float)ret.c.c[2] * (1.0f / 255.0f);
                     colour.w = (float)ret.c.c[3] * (1.0f / 255.0f);
-                    glSetMaterialParameterArray(pPacket, constantColourHash_806E1FBC,
+                    glSetMaterialParameterArray(pPacket, constantColourHash,
                         &colour, 4);
                 }
                 glSetRasterState(pPacket->rasterState, GLS_Culling, 0);
@@ -965,11 +965,11 @@ int ParticleSystem::RenderAllParticles(GLView* view)
         bool began;
         if (bQuads)
         {
-            began = mesh.Begin(mUnidentified0BC * 4, GLP_QuadList, 0);
+            began = mesh.Begin(m_NumParticles * 4, GLP_QuadList, 0);
         }
         else
         {
-            began = mesh.Begin(mUnidentified0BC * 6, GLP_TriList, 0);
+            began = mesh.Begin(m_NumParticles * 6, GLP_TriList, 0);
         }
         if (began)
         {
@@ -1002,7 +1002,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 iterator.Step();
             }
 
-            if (sUnidentified_806E1F98)
+            if (sUseWhiteParticleTexture)
             {
                 glTextureBinding* textureState
                     = (glTextureBinding*)mesh.GetModel()
@@ -1018,7 +1018,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                 glTextureBinding* textureState
                     = (glTextureBinding*)mesh.GetModel()
                         ->packets->materialParameters;
-                textureState->textureIndex = mUnidentified09C;
+                textureState->textureIndex = m_uTextureIndex;
                 textureState->SetWrapS(false);
                 textureState->SetWrapT(false);
                 textureState->unknown07 = 0;
@@ -1066,7 +1066,7 @@ bool ParticleSystem::Update(float dt)
         return true;
     }
 
-    mUnidentified010 = dt;
+    m_fDeltaTime = dt;
     m_fElapsedTime += dt;
     if (m_pSpec != 0 && m_pSpec->m_fLingerEnd >= 0.0f
         && !m_bAmDying && m_fElapsedTime > m_pSpec->m_fLingerEnd)
@@ -1090,15 +1090,15 @@ bool ParticleSystem::Update(float dt)
         {
             m_bAmDying = true;
         }
-        mUnidentified014
+        m_fNormalizedTime
             = m_fElapsedTime / m_pTemplate->m_fFountainLife;
-        if (mUnidentified014 > 1.0f)
-            mUnidentified014 = 1.0f;
+        if (m_fNormalizedTime > 1.0f)
+            m_fNormalizedTime = 1.0f;
         if (m_fElapsedTime < m_pTemplate->m_fFountainLife)
         {
             m_fNumParticlesToCreate += dt
                 * m_pTemplate->mProperties[0]->Evaluate(
-                    mUnidentified014);
+                    m_fNormalizedTime);
         }
     }
 
@@ -1110,7 +1110,7 @@ bool ParticleSystem::Update(float dt)
         CreateNewParticles(numParticles);
 
     UpdateAllParticles(dt,
-        m_pTemplate->IsLocalSpace() ? &mUnidentified058 : 0);
+        m_pTemplate->IsLocalSpace() ? &m_mCoordSys : 0);
     if (m_bAmDying && m_Particles.m_Head == 0)
         return false;
     return true;
@@ -1130,9 +1130,9 @@ static TextureFrame* BuildFrameLookup(int numFrames, float inc)
     float v = 0.0f;
     for (int i = 0; i < numFrames; ++i, ++q)
     {
-        q->mUnidentified000 = u;
-        q->mUnidentified004 = v;
-        q->mUnidentified008 = inc;
+        q->u = u;
+        q->v = v;
+        q->increment = inc;
         u += inc;
         if (u >= 0.999f)
         {
@@ -1147,9 +1147,9 @@ bool fxParticleStartup(int maxNumParticles)
 {
     textureFrames[0]
         = (TextureFrame*)nlMalloc(sizeof(TextureFrame), 8, false);
-    textureFrames[0]->mUnidentified000 = 0.0f;
-    textureFrames[0]->mUnidentified004 = 0.0f;
-    textureFrames[0]->mUnidentified008 = 1.0f;
+    textureFrames[0]->u = 0.0f;
+    textureFrames[0]->v = 0.0f;
+    textureFrames[0]->increment = 1.0f;
     textureFrames[3] = BuildFrameLookup(4, 0.5f);
     textureFrames[8] = BuildFrameLookup(9, 1.0f / 3.0f);
     textureFrames[15] = BuildFrameLookup(16, 0.25f);

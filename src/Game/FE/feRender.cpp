@@ -168,7 +168,7 @@ void FERender::RenderTimeLineAsset(TLInstance* pTLInstance, float fCurrentTime, 
         textInstance->SetMatrix(&textMatrix);
         nlColour colour;
         ConvertColour(colour, s_currentAssetColour);
-        textInstance->Render((eGLView)m_pRenderScene->m_uRenderView, colour);
+        textInstance->Render((GLView*)m_pRenderScene->m_uRenderView, colour);
         break;
     }
     case TLAT_COMPONENT:

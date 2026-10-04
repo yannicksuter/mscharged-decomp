@@ -100,8 +100,8 @@ public:
     static int CompareDraftTeams(const void* left, const void* right);
     bool HasDisconnectedPlayer(int team) const;
     void Update(float dt);
-    bool fn_8022819C() const { return mState != NET_DRAFT_IDLE; }
-    int fn_802281B0()
+    bool IsDraftActive() const { return mState != NET_DRAFT_IDLE; }
+    int GetCaptainDraftCountdown()
     {
         if (mState != NET_DRAFT_CAPTAINS)
             return -1;
@@ -110,7 +110,7 @@ public:
             countdown = 0;
         return countdown;
     }
-    int fn_8022ED88()
+    int GetSidekickDraftCountdown()
     {
         if (mState != NET_DRAFT_SIDEKICKS)
             return -1;

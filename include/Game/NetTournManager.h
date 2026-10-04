@@ -37,8 +37,8 @@ struct NetworkTournamentGame
         mMachines[0] = -1;
         mMachines[1] = -1;
         mBracketIndex = bracketIndex;
-        mHomeUpdate = 0;
-        mAwayUpdate = 0;
+        mGameStatus = 0;
+        mGameTimeDelta = 0;
         mGameInfo.Reset(true);
     }
 
@@ -46,8 +46,8 @@ struct NetworkTournamentGame
     /* 0x004 */ int mMachines[2];
     /* 0x00C */ int mBracketIndex;
     /* 0x010 */ BasicGameInfo mGameInfo;
-    /* 0x138 */ int mHomeUpdate;
-    /* 0x13C */ int mAwayUpdate;
+    /* 0x138 */ int mGameStatus;
+    /* 0x13C */ int mGameTimeDelta;
 }; // size: 0x140
 
 class NetTournManager : public CupInterface,
@@ -70,7 +70,7 @@ public:
     // came out of an inline function. That function's owner and name are not
     // recoverable - SceneCreated is its only reader and the DOL keeps no
     // out-of-line copy - so it sits with the two fields it reads.
-    int UnidentifiedStartSeconds() const
+    int GetSecondsToStartGames() const
     {
         if (!mWaitingToStartGames)
             return -1;

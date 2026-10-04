@@ -4,6 +4,7 @@
 #include "Game/Audio/AudioRpc.h"
 #include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/RegistryPools.h"
+#include "Game/Audio/SoundInstance.h"
 #include "NL/nlChunk.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlMemory.h"
@@ -53,8 +54,8 @@ static inline float EvaluateAudioRpcCurve(
 
 static inline void UpdateAudioRpcRuntimeNode(AudioRpcRuntimeNode* node)
 {
-    XSoundHandle* localOwner = node->owner != 0
-                                ? node->owner->soundHandle
+    XSoundHandle* localOwner = node->soundInstance != 0
+                                ? node->soundInstance->owner
                                 : 0;
     AudioSlider* slider = GetAudioSlider(
         GetAudioSliderTable(), node->definition->sliderIndex, localOwner);
@@ -153,7 +154,7 @@ extern "C" void InitializeAudioRpcController(AudioRpcController* controller)
                 {
                     node->definition = 0;
                     node->value = 0.0f;
-                    node->owner = 0;
+                    node->soundInstance = 0;
                 }
                 node->definition = definition;
                 definition->runtimeNode = node;
@@ -187,7 +188,7 @@ extern "C" void UpdateAudioRpcController(
 
 extern "C" AudioRpcRuntimeNode* AddAudioRpcRuntimeNode(
     AudioRpcController* controller,
-    AudioRpcDefinition* definition, AudioRpcOwner* owner)
+    AudioRpcDefinition* definition, SoundInstance* owner)
 {
     AudioRpcRuntimeNode* node = 0;
     sAudioRpcRuntimeNodePool.Allocate(node);
@@ -195,22 +196,22 @@ extern "C" AudioRpcRuntimeNode* AddAudioRpcRuntimeNode(
     {
         node->definition = 0;
         node->value = 0.0f;
-        node->owner = 0;
+        node->soundInstance = 0;
     }
     node->definition = definition;
-    node->owner = owner;
+    node->soundInstance = owner;
     controller->dynamicNodes->AddEnd(node);
     return node;
 }
 
 extern "C" void RemoveAudioRpcRuntimeNodes(
-    AudioRpcController* controller, AudioRpcOwner* owner)
+    AudioRpcController* controller, SoundInstance* owner)
 {
     nlDLListIterator<AudioRpcRuntimeNode*> iterator =
         controller->dynamicNodes->Begin();
     while (iterator.hasNext())
     {
-        if (owner == (*iterator)->owner)
+        if (owner == (*iterator)->soundInstance)
         {
             AudioRpcRuntimeNode* node = *iterator;
             if (node != 0)

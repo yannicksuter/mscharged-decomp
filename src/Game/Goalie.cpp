@@ -192,7 +192,7 @@ inline void Goalie::ResetGoalieState()
     mpMonty = 0;
     mpSkillShooter = 0;
     mpSaveData = 0;
-    mBlendInfo.fn_80091704();
+    mBlendInfo.Reset();
     mFatigue.Reset();
 }
 
@@ -229,7 +229,7 @@ Goalie::Goalie(eCharacterClass gcc, const int* pTemplate,
     GoalieSave::InitData(this);
     LooseBallAnims::Init(this);
     InitGoalieActionData();
-    mBlendInfo.fn_80091704();
+    mBlendInfo.Reset();
     mFatigue.Reset();
     mFatigue.mfRecoverRate = pTweaks->fFatigueRecoverRate;
     m_pHeadTrack->m_bTrackOOI = true;
@@ -1747,7 +1747,7 @@ bool Goalie::ShouldReposition()
         if (mbTryLobSave)
         {
             fDistance = gfLobRepositionDist;
-            fHeight = lbl_8056D3B0.z;
+            fHeight = gLobJumpSavePos.z;
         }
         nlVector3 v3ContactVel;
         float fTargetHeight;
@@ -4344,11 +4344,11 @@ extern u16 lbl_806DBD50;
 
 inline void SaveBlendInfo::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DBD58 == 0xFFFF)
+    if (gSaveBlendInfoType == 0xFFFF)
     {
         int milestone;
         int blend;
-        lbl_806DBD58 = cache->BeginType("SaveBlendInfo");
+        gSaveBlendInfoType = cache->BeginType("SaveBlendInfo");
         REGISTER_GOALIE_FIELD(17, mfStartTime, mfStartTime, "mfStartTime");
         for (int milestone = 0; milestone < 5; milestone++)
         {
@@ -4368,12 +4368,12 @@ inline void SaveBlendInfo::SyncLog(void* context, DebugWriteCache* cache)
         REGISTER_GOALIE_FIELD(22, mfStartTime, mv3BlendedSavePos, "mv3BlendedSavePos");
         cache->EndType();
     }
-    SaveBlendInfo* data = (SaveBlendInfo*)cache->WriteData(lbl_806DBD58, &mfStartTime, sizeof(SaveBlendInfo));
+    SaveBlendInfo* data = (SaveBlendInfo*)cache->WriteData(gSaveBlendInfoType, &mfStartTime, sizeof(SaveBlendInfo));
     if (data != NULL)
     {
         for (int blend = 0; blend < 4; blend++)
             ((int*)data->mpSaveData)[blend] = mpSaveData[blend] == NULL ? -1 : mpSaveData[blend]->mnAnimID;
-        cache->ChecksumData(lbl_806DBD58, data, context);
+        cache->ChecksumData(gSaveBlendInfoType, data, context);
     }
 }
 

@@ -213,8 +213,8 @@ void NetTournManager::BuildInitialBracket()
         game.mMachines[0] = -1;
         game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
-        game.mHomeUpdate = 0;
-        game.mAwayUpdate = 0;
+        game.mGameStatus = 0;
+        game.mGameTimeDelta = 0;
         BasicGameInfo& gameInfo = game.mGameInfo;
         gameInfo.Reset(true);
         game.mState = NET_TOURN_GAME_READY;
@@ -260,8 +260,8 @@ void NetTournManager::AdvanceBracket()
         game.mMachines[0] = -1;
         game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
-        game.mHomeUpdate = 0;
-        game.mAwayUpdate = 0;
+        game.mGameStatus = 0;
+        game.mGameTimeDelta = 0;
         BasicGameInfo& gameInfo = game.mGameInfo;
         gameInfo.Reset(true);
         game.mState = NET_TOURN_GAME_READY;
@@ -1078,8 +1078,8 @@ void NetTournManager::HandleTournamentGameUpdate(
         case NET_TOURN_GAME_IN_PROGRESS:
         {
             int status = message->mGameStatus;
-            game.mHomeUpdate = status;
-            game.mAwayUpdate = message->mGameTimeDelta;
+            game.mGameStatus = status;
+            game.mGameTimeDelta = message->mGameTimeDelta;
             switch (status)
             {
             case 2:
@@ -1120,8 +1120,8 @@ void NetTournManager::HandleTournamentGameUpdate(
             break;
         case NET_TOURN_GAME_READY:
         case NET_TOURN_GAME_IN_PROGRESS:
-            game.mHomeUpdate = message->mGameStatus;
-            game.mAwayUpdate = message->mGameTimeDelta;
+            game.mGameStatus = message->mGameStatus;
+            game.mGameTimeDelta = message->mGameTimeDelta;
             if (message->mIsHomeMachine)
             {
                 game.mState = NET_TOURN_GAME_STATE_3;
@@ -1140,8 +1140,8 @@ void NetTournManager::HandleTournamentGameUpdate(
                     "Ignoring NetworkTournamentGameUpdate because already have HOME results\n");
                 break;
             }
-            game.mHomeUpdate = message->mGameStatus;
-            game.mAwayUpdate = message->mGameTimeDelta;
+            game.mGameStatus = message->mGameStatus;
+            game.mGameTimeDelta = message->mGameTimeDelta;
             bool gameInfoMatches;
             if (memcmp(&game.mGameInfo, &message->mGameInfo,
                     sizeof(game.mGameInfo)) == 0)
@@ -1172,8 +1172,8 @@ void NetTournManager::HandleTournamentGameUpdate(
                     "Ignoring NetworkTournamentGameUpdate because already have AWAY results\n");
                 break;
             }
-            game.mHomeUpdate = message->mGameStatus;
-            game.mAwayUpdate = message->mGameTimeDelta;
+            game.mGameStatus = message->mGameStatus;
+            game.mGameTimeDelta = message->mGameTimeDelta;
             bool gameInfoMatches;
             if (memcmp(&game.mGameInfo, &message->mGameInfo,
                     sizeof(game.mGameInfo)) == 0)

@@ -25,7 +25,6 @@
 #include "Game/Physics/Physics.h"
 
 
-extern "C" void fn_8013F854(const char*, ...);
 extern "C" int strcmpi(const char*, const char*);
 extern "C" bool fn_8003E948(cFielder*);
 
@@ -113,17 +112,17 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     cBall* ball;
     eFielderActionState actionState;
     int objectType = other->GetObjectType();
-    fn_8013F854(
+    DebugPrintf(
         "PhysChar Contact objID %d numContacts %d\n", objectType, numContacts);
 
     if (objectType == 0x13)
     {
-        fn_8013F854("PhysChar PHYSOBJ_TRIGGER_VOLUME\n");
+        DebugPrintf("PhysChar PHYSOBJ_TRIGGER_VOLUME\n");
         return NO_CONTACT;
     }
     if (objectType == 0x07)
     {
-        fn_8013F854("PhysChar PHYSOBJ_FINITEPLANE\n");
+        DebugPrintf("PhysChar PHYSOBJ_FINITEPLANE\n");
         return NO_CONTACT;
     }
     if (objectType == 0x1D)
@@ -131,10 +130,10 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         if (m_pAICharacter->m_eClassType == FIELDER
             && !((cFielder*)m_pAICharacter)->mbTangible)
         {
-            fn_8013F854("PhysChar PHYSOBJ_TRON_WALL IsTangible\n");
+            DebugPrintf("PhysChar PHYSOBJ_TRON_WALL IsTangible\n");
             return NO_CONTACT;
         }
-        fn_8013F854("PhysChar PHYSOBJ_TRON_WALL\n");
+        DebugPrintf("PhysChar PHYSOBJ_TRON_WALL\n");
         return ONE_WAY_CONTACT_THIS;
     }
     if (objectType == 0x1F && m_pAICharacter->m_eClassType == GOALIE)
@@ -143,12 +142,12 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         bool onGround = hammer->mLandedTimer > 0.0f;
         if (onGround)
         {
-            fn_8013F854("PhysChar PHYSOBJ_HAMMER OnGround\n");
+            DebugPrintf("PhysChar PHYSOBJ_HAMMER OnGround\n");
             Goalie* goalie = (Goalie*)m_pAICharacter;
             if (goalie->mGoalieActionState != GOALIEACTION_UNIDENTIFIED_32
                 && goalie->mGoalieActionState != GOALIEACTION_SAVE)
             {
-                fn_8013F854("PhysChar PHYSOBJ_HAMMER Goalie return\n");
+                DebugPrintf("PhysChar PHYSOBJ_HAMMER Goalie return\n");
                 return ONE_WAY_CONTACT_THIS;
             }
         }
@@ -159,7 +158,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         nlVector3 contactPosition;
         nlVec3Set(contactPosition, contacts->geom.pos[0], contacts->geom.pos[1], contacts->geom.pos[2]);
         bool sidelineCollision = fabsf(contactPosition.x) < cField::GetGoalLineX(1U) - 1.0f;
-        fn_8013F854("PhysChar WALL or corner %d conpos %f %f %f\n",
+        DebugPrintf("PhysChar WALL or corner %d conpos %f %f %f\n",
             sidelineCollision,
             contacts->geom.pos[0],
             contacts->geom.pos[1],
@@ -183,7 +182,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
 
         if (!m_CanCollideWithWall)
         {
-            fn_8013F854("!m_CanCollideWithWall\n");
+            DebugPrintf("!m_CanCollideWithWall\n");
             return NO_CONTACT;
         }
 
@@ -197,7 +196,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             {
                 actionState = fielder->m_eActionState;
                 bool superWall = fn_8003E948(fielder);
-                fn_8013F854(
+                DebugPrintf(
                     "bSidelineCollision action state %d superwal %d\n",
                     actionState,
                     superWall);
@@ -211,7 +210,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             && (m_pAICharacter->m_eClassType == FIELDER
                 || !m_CanCollideWithGoalLine))
         {
-            fn_8013F854(
+            DebugPrintf(
                 "Goal check radius %f x %f y %f GetCanCollideWithGoalLine %d\n",
                 radius,
                 contactPosition.x,
@@ -225,17 +224,17 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 || contactPosition.z
                        >= cNet::GetNetHeight() - cNet::GetPostRadius())
             {
-                fn_8013F854("UseClipping\n");
+                DebugPrintf("UseClipping\n");
                 if (m_bInsideNet)
                 {
-                    fn_8013F854("IsInsideNet\n");
+                    DebugPrintf("IsInsideNet\n");
                     m_bWasInsideNet = true;
                     return NO_CONTACT;
                 }
             }
             else
             {
-                fn_8013F854("SetInsideNet true\n");
+                DebugPrintf("SetInsideNet true\n");
                 m_bInsideNet = true;
                 cFielder* fielder = (cFielder*)m_pAICharacter;
                 if (fielder->m_pBall != 0)
@@ -245,7 +244,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
         else
         {
-            fn_8013F854("SetInsideNet false\n");
+            DebugPrintf("SetInsideNet false\n");
             m_bInsideNet = false;
             m_bWasInsideNet = false;
         }
@@ -255,20 +254,20 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     {
         if (!m_CanCollideWithBall)
         {
-            fn_8013F854("PhysChar Ball !m_CanCollideWithBall\n");
+            DebugPrintf("PhysChar Ball !m_CanCollideWithBall\n");
             return NO_CONTACT;
         }
         if (m_pAICharacter->m_eClassType == FIELDER
             && !((cFielder*)m_pAICharacter)->mbTangible)
         {
-            fn_8013F854("PhysChar Ball !IsTangible\n");
+            DebugPrintf("PhysChar Ball !IsTangible\n");
             return NO_CONTACT;
         }
 
         if (contacts->geom.normal[2] > contacts->geom.normal[0]
             && contacts->geom.normal[2] > contacts->geom.normal[1])
         {
-            fn_8013F854("PhysChar Ball m_bSupportingBallThisFrame\n");
+            DebugPrintf("PhysChar Ball m_bSupportingBallThisFrame\n");
             m_bSupportingBallThisFrame = true;
         }
 
@@ -280,7 +279,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             || (!physicsBall->mbCanCollideGoalie
                 && character->m_eClassType == GOALIE))
         {
-            fn_8013F854("PhysChar Ball NoContactS2S\n");
+            DebugPrintf("PhysChar Ball NoContactS2S\n");
             return NO_CONTACT;
         }
 
@@ -290,57 +289,57 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         if (ball->GetOwnerFielder() != 0
             && m_pAICharacter->m_eClassType == FIELDER)
         {
-            fn_8013F854("PhysChar Fielder\n");
+            DebugPrintf("PhysChar Fielder\n");
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->IsFallenDown()
                 && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
             {
-                fn_8013F854("PhysChar Fallen down not on fire\n");
+                DebugPrintf("PhysChar Fallen down not on fire\n");
                 if (ball->GetOwnerFielder()->fn_800345EC(fielder)
                     || fielder->m_eAnimID == 0x76)
                 {
-                    fn_8013F854("PhysChar Electro1200\n");
+                    DebugPrintf("PhysChar Electro1200\n");
                     return NO_CONTACT;
                 }
                 if (fn_8003E948(ball->GetOwnerFielder())
                     && ball->GetOwnerFielder()->mUnidentified3DC)
                 {
-                    fn_8013F854("PhysChar SuperWal\n");
+                    DebugPrintf("PhysChar SuperWal\n");
                     return ONE_WAY_CONTACT_THIS;
                 }
-                fn_8013F854("PhysChar Other\n");
+                DebugPrintf("PhysChar Other\n");
                 return ONE_WAY_CONTACT_OTHER;
             }
 
             if (fielder->IsInvincibleChars())
             {
-                fn_8013F854("PhysChar IsInvincibleChars\n");
+                DebugPrintf("PhysChar IsInvincibleChars\n");
                 return ONE_WAY_CONTACT_THIS;
             }
             if (fn_800344DC(fielder, &ball->m_v3Position))
             {
-                fn_8013F854("PhysChar IsInvincibleCharsDirect\n");
+                DebugPrintf("PhysChar IsInvincibleCharsDirect\n");
                 return ONE_WAY_CONTACT_THIS;
             }
             if (fielder->IsStuck())
             {
-                fn_8013F854("PhysChar IsStuck\n");
+                DebugPrintf("PhysChar IsStuck\n");
                 return ONE_WAY_CONTACT_OTHER;
             }
-            fn_8013F854("PhysChar Other2\n");
+            DebugPrintf("PhysChar Other2\n");
             return TWO_WAY_CONTACT;
         }
 
-        fn_8013F854("PhysChar Not fielder\n");
+        DebugPrintf("PhysChar Not fielder\n");
         if (gNPCManager->mpKoopaShell != 0
             && gNPCManager->mpKoopaShell->mVisible)
         {
-            fn_8013F854("PhysChar KoopaShell->IsVisible\n");
+            DebugPrintf("PhysChar KoopaShell->IsVisible\n");
             return NO_CONTACT;
         }
         if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
         {
-            fn_8013F854("PhysChar Egg->IsVisible\n");
+            DebugPrintf("PhysChar Egg->IsVisible\n");
             return NO_CONTACT;
         }
 
@@ -356,7 +355,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             QueueCollisionPlayerBall(ballData);
         }
 
-        fn_8013F854("PhysChar IncrementBallDeflectCount\n");
+        DebugPrintf("PhysChar IncrementBallDeflectCount\n");
         ++ball->m_bBallDeflectCount;
         ++ball->m_bBallPathChangeCount;
         return ONE_WAY_CONTACT_OTHER;

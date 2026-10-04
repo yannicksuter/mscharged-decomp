@@ -41,7 +41,7 @@ const unsigned short* TLTextInstance::GetString() const
     return pWideTextString;
 }
 
-void TLTextInstance::Render(eGLView view, const nlColour& colour) const
+void TLTextInstance::Render(GLView* view, const nlColour& colour) const
 {
     nlVector2 drawAt;
     const nlFont* pFont;

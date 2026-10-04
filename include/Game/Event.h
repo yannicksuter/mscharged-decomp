@@ -1,7 +1,6 @@
 #ifndef GAME_EVENT_H
 #define GAME_EVENT_H
 
-#include "Game/Task/DispatchEventsTask.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlBind.h"
 #include "NL/nlDLListContainer.h"
@@ -35,6 +34,8 @@ protected:
     unsigned int mHash;
     void* mCurrentConnection;
 };
+
+#include "Game/Task/DispatchEventsTask.h"
 
 struct EventConnection
 {
@@ -122,7 +123,6 @@ public:
         sType = *(void**)this;
     }
 
-    virtual ~UnidentifiedTypedEvent() { }
     virtual void Disconnect(void* owner) = 0;
     virtual void Add(const Callback&, unsigned int, int) = 0;
 

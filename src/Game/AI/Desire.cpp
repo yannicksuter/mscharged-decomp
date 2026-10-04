@@ -15,6 +15,7 @@
 #include "Game/Ball.h"
 #include "Game/Goalie.h"
 #include "Game/MathHelpers.h"
+#include "NL/nlMath.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "NL/nlMemory.h"
 #include "Game/DebugWriteCache.h"
@@ -248,7 +249,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
             nlVector3 delta;
             nlVec3Sub(delta, target->mUnidentified024.m_v3Position,
                 m_pFielder->mUnidentified024.m_v3Position);
-            direction = (u16)(s32)(nlATan2f(delta.y, delta.x) * 10430.378f);
+            direction = nlATan2Angle(delta.y, delta.x);
             break;
         }
         // Without an explicit target, use the nearest opponent below.
@@ -267,23 +268,20 @@ void DesireDeke::Update(DesireUpdate* update, float)
         }
         Goalie* goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
         nlVector3 opponentPosition = opponent->mUnidentified024.m_v3Position;
-        direction = opponent->mUnidentified024.m_aActualMovementDirection;
-        nlVector3 opponentDelta;
-        nlVec3Sub2D(opponentDelta, opponent->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Position);
-        nlVector3 goalieDelta;
-        nlVec3Sub2D(goalieDelta, goalie->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Position);
-        if (goalieDelta.GetLengthSq2D() < opponentDelta.GetLengthSq2D())
+        int opponentDirection = opponent->mUnidentified024.m_aActualMovementDirection;
+        if (nlVec3DistanceSquared2D(goalie->mUnidentified024.m_v3Position,
+                m_pFielder->mUnidentified024.m_v3Position)
+            < nlVec3DistanceSquared2D(opponent->mUnidentified024.m_v3Position,
+                m_pFielder->mUnidentified024.m_v3Position))
         {
             opponentPosition = goalie->mUnidentified024.m_v3Position;
-            direction = goalie->mUnidentified024.m_aActualFacingDirection;
+            opponentDirection = goalie->mUnidentified024.m_aActualFacingDirection;
         }
         nlVector3 delta;
         nlVec3Sub(delta, m_pFielder->mUnidentified024.m_v3Position, opponentPosition);
-        unsigned short away = (u16)(s32)(nlATan2f(delta.y, delta.x) * 10430.378f);
-        direction += 0x8000;
-        direction = direction + (s16)(s32)(0.5f * (s16)(away - direction));
+        unsigned short away = nlATan2Angle(delta.y, delta.x);
+        unsigned short reverseDirection = (opponentDirection += 0x8000);
+        direction = reverseDirection + (s16)(s32)(0.5f * (s16)(away - opponentDirection));
         break;
     }
 
@@ -301,17 +299,15 @@ void DesireDeke::Update(DesireUpdate* update, float)
         nlVector3 opponentDelta;
         nlVec3Sub(opponentDelta, opponent->mUnidentified024.m_v3Position,
             m_pFielder->mUnidentified024.m_v3Position);
-        unsigned short opponentAngle = (u16)(s32)(nlATan2f(opponentDelta.y, opponentDelta.x) * 10430.378f);
+        unsigned short opponentAngle = nlATan2Angle(opponentDelta.y, opponentDelta.x);
         Goalie* goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
         nlVector3 goalieDelta;
         nlVec3Sub(goalieDelta, goalie->mUnidentified024.m_v3Position,
             m_pFielder->mUnidentified024.m_v3Position);
-        unsigned short goalieAngle = (u16)(s32)(nlATan2f(goalieDelta.y, goalieDelta.x) * 10430.378f);
-        nlVector3 distance;
-        nlVec3Sub2D(distance, goalie->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Position);
+        unsigned short goalieAngle = nlATan2Angle(goalieDelta.y, goalieDelta.x);
         float blend = InterpolateRangeClamped(1.0f, 0.0f, 2.5f, 0.66f,
-            nlSqrt(distance.GetLengthSq2D(), true));
+            nlSqrt(nlVec3DistanceSquared2D(goalie->mUnidentified024.m_v3Position,
+                m_pFielder->mUnidentified024.m_v3Position), true));
         direction = goalieAngle + (s16)(s32)(blend * (s16)(opponentAngle - goalieAngle));
         break;
     }
@@ -322,29 +318,28 @@ void DesireDeke::Update(DesireUpdate* update, float)
     {
         float dekeDistance = fn_80039574(m_pFielder);
         cNet* net = m_pFielder->m_pTeam->GetOtherNet();
-        Goalie* goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
+        cFielder* fielder = m_pFielder;
         nlVector3 goalieDelta;
-        nlVec3Sub(goalieDelta, goalie->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Position);
-        unsigned short goalieAngle = (u16)(s32)(nlATan2f(goalieDelta.y, goalieDelta.x) * 10430.378f);
+        nlVec3Sub(goalieDelta,
+            fielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position,
+            fielder->mUnidentified024.m_v3Position);
+        unsigned short goalieAngle = nlATan2Angle(goalieDelta.y, goalieDelta.x);
+        nlVector3 goalDelta;
         nlVector3 goalLine = m_pFielder->mUnidentified024.m_v3Position;
         goalLine.x = cField::GetGoalLineX(1U);
         goalLine.x *= AIsgn(net->m_v3NetLocation.x);
-        nlVector3 goalDelta;
         nlVec3Sub(goalDelta, goalLine, m_pFielder->mUnidentified024.m_v3Position);
-        unsigned short goalAngle = (u16)(s32)(nlATan2f(goalDelta.y, goalDelta.x) * 10430.378f);
-        nlVector3 goalDistance;
-        nlVec3Sub2D(goalDistance, goalLine, m_pFielder->mUnidentified024.m_v3Position);
+        unsigned short goalAngle = nlATan2Angle(goalDelta.y, goalDelta.x);
         AvoidableObject* playerObject = m_pFielder->mUnidentified320;
-        float goalDistanceLength = nlSqrt(goalDistance.GetLengthSq2D(), true);
+        float goalDistanceLength = nlSqrt(nlVec3DistanceSquared2D(goalLine,
+            m_pFielder->mUnidentified024.m_v3Position), true);
         float goalRange = goalDistanceLength - playerObject->GetRadius();
         float blend = InterpolateRangeClamped(1.0f, 0.0f,
             0.8f * dekeDistance, 2.0f * dekeDistance, goalRange);
-        goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-        nlVector3 distance;
-        nlVec3Sub2D(distance, m_pFielder->mUnidentified024.m_v3Position,
-            goalie->mUnidentified024.m_v3Position);
-        float goalieRange = nlSqrt(distance.GetLengthSq2D(), true);
+        Goalie* goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
+        float goalieRange = nlSqrt(nlVec3DistanceSquared2D(
+            m_pFielder->mUnidentified024.m_v3Position,
+            goalie->mUnidentified024.m_v3Position), true);
         goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
         playerObject = m_pFielder->mUnidentified320;
         float goalieRadius = goalie->mUnidentified320->GetRadius();
@@ -379,7 +374,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         nlVector3 delta;
         nlVec3Sub(delta, opponent->mUnidentified024.m_v3Position,
             m_pFielder->mUnidentified024.m_v3Position);
-        direction = (u16)(s32)(nlATan2f(delta.y, delta.x) * 10430.378f);
+        direction = nlATan2Angle(delta.y, delta.x);
         break;
     }
     }
@@ -389,7 +384,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         nlVector2 sidelineDirection;
         if (CloseToSideline(m_pFielder->mUnidentified024.m_v3Position, 0, false, &sidelineDirection) > 0.2f)
         {
-            unsigned short sidelineAngle = (u16)(s32)(nlATan2f(sidelineDirection.y, sidelineDirection.x) * 10430.378f);
+            unsigned short sidelineAngle = nlATan2Angle(sidelineDirection.y, sidelineDirection.x);
             short delta = sidelineAngle - direction;
             unsigned short angleDistance = delta < 0 ? -delta : delta;
             if (angleDistance < 0x2000)

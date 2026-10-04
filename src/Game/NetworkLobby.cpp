@@ -630,7 +630,7 @@ void NetworkLobby::OnMatchmakingResult(
             mPlayers[aid].mUnidentified18[0] = aid;
             mPlayers[aid].mConnection = 0;
             mPlayers[aid].mName[0] = 0;
-            mPlayers[aid].mUnidentified0B = 0;
+            mPlayers[aid].mUserMatchDataSize = 0;
             mPlayers[aid].mConnectionState = 0;
             if (aid != DWC_GetMyAID())
             {
@@ -788,7 +788,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
                 mPlayers[mMachineCount].mUnidentified18[0] = mMachineCount;
                 mPlayers[mMachineCount].mConnection = 0;
                 mPlayers[mMachineCount].mName[0] = 0;
-                mPlayers[mMachineCount].mUnidentified0B = 0;
+                mPlayers[mMachineCount].mUserMatchDataSize = 0;
                 mPlayers[mMachineCount].mConnectionState = 0;
                 if (mMachineCount != DWC_GetMyAID())
                 {

@@ -120,6 +120,11 @@ public:
         return (*mFunctor)(p0, p1);
     }
 
+    ReturnType (*GetFreeFunction() const)(P1, P2)
+    {
+        return mTag == FUNCTION_FREE ? mFreeFunction : 0;
+    }
+
 private:
     FunctionTag mTag;
     union

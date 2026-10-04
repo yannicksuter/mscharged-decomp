@@ -82,9 +82,6 @@ extern "C" const nlVector3& fn_80040234(cFielder*);
 
 bool lbl_806E0BB9;
 
-extern "C" void fn_802BCE50(
-    const ShapeRender*, const nlVector3&, float, float, float,
-    const nlColour&, bool);
 
 
 
@@ -549,7 +546,7 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
                     vSidelinePos.x + vSidelineNormal.x,
                     vSidelinePos.y + vSidelineNormal.y, 0.0f);
                 nlColourSet(colour, 255, 0, 0, 255);
-                fn_802BCE50(&g_ShapeRenderer, vUnidentified034,
+                g_ShapeRenderer.DrawEllipse2D(vUnidentified034,
                     0.2f, 1.0f, 1.0f, colour, true);
                 nlColourSet(colour, 0, 0, 255, 255);
                 g_ShapeRenderer.DrawLine3D(vUnidentified034, vUnidentified028, colour, true);

@@ -87,12 +87,12 @@ void GameResultsScene::Update(float dt)
     NetworkTournamentGame* tournamentGame = mTournamentGame;
     if (tournamentGame != 0)
     {
-        switch (tournamentGame->mHomeUpdate)
+        switch (tournamentGame->mGameStatus)
         {
         case 2:
         {
             char buffer[0x20];
-            int seconds = tournamentGame->mAwayUpdate;
+            int seconds = tournamentGame->mGameTimeDelta;
             int minutes = seconds / 60;
             int remainder = seconds % 60;
             if (remainder < 10)

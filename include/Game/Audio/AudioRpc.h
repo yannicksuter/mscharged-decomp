@@ -4,7 +4,7 @@
 #include "NL/nlDLListContainer.h"
 
 class nlChunk;
-class XSoundHandle;
+struct SoundInstance;
 
 struct AudioRpcCurvePoint
 {
@@ -38,18 +38,13 @@ struct AudioRpcGroup
     AudioRpcDefinition* dynamicDefinitions;
 };
 
-struct AudioRpcOwner
-{
-    XSoundHandle* soundHandle;
-};
-
 struct AudioRpcRuntimeNode
 {
     AudioRpcDefinition* definition;
     float value;
     u8 valid;
     u8 pad_09[3];
-    AudioRpcOwner* owner;
+    SoundInstance* soundInstance;
 };
 
 typedef DLListEntry<AudioRpcRuntimeNode*> AudioRpcListEntry;
@@ -74,8 +69,8 @@ extern "C" void UpdateAudioRpcController(
 extern "C" AudioRpcRuntimeNode* AddAudioRpcRuntimeNode(
     AudioRpcController* controller,
     AudioRpcDefinition* definition,
-    AudioRpcOwner* owner);
+    SoundInstance* owner);
 extern "C" void RemoveAudioRpcRuntimeNodes(
-    AudioRpcController* controller, AudioRpcOwner* owner);
+    AudioRpcController* controller, SoundInstance* owner);
 
 #endif // GAME_AUDIO_AUDIO_RPC_H

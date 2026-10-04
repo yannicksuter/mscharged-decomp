@@ -332,7 +332,7 @@ bool DesireSuperPower::Initialize(void* context)
         {
             PlayCaptainPowerupStream(18, sound, m_pFielder);
             u32 hash = nlStringLowerHash("MarioPowerup");
-            fn_802F4E84(&hash, 0, 0);
+            ApplyAudioTransition(&hash, 0, 0);
             PauseSuddenDeathMusic();
         }
         else
@@ -500,7 +500,7 @@ void DesireSuperPower::Cleanup()
     {
         ResumeSuddenDeathMusic();
         u32 hash = nlStringLowerHash("MarioPowerup");
-        fn_802F4E84(&hash, 1, 0);
+        ApplyAudioTransition(&hash, 1, 0);
     }
 }
 

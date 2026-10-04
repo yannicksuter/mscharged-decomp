@@ -29,22 +29,22 @@
 #include <math.h>
 
 static float s_fOverheadSize = 35.0f;
-static float lbl_806DCED4 = 15.0f;
-static float lbl_806DCED8 = 20.0f;
-static float lbl_806DCEDC = -20.0f;
+static float s_fArrowSize = 15.0f;
+static float s_fHomeArrowOffsetX = 20.0f;
+static float s_fAwayArrowOffsetX = -20.0f;
 static float s_fAdditiveBlendingIntensity = 0.55f;
 static float s_fAdditiveTextureScale = 1.25f;
 static unsigned char s_bPulseGlowTexture = 1;
 static float s_fPulseRate = 2.0f;
-static float lbl_806DCEF0 = 30.0f;
-static float lbl_806DCEF4 = 0.3f;
+static float s_fIndicatorDistInPixels = 30.0f;
+static float s_fRemoteIndicatorOpacity = 0.3f;
 float fMaxAlpha = 0.9f;
 float fOpacityFadePerSecond = 1.2f;
 
 static float s_fGlowIntensityScale;
 static unsigned char s_bGlowIsRising;
-static float lbl_806E1578;
-static float lbl_806E157C;
+static float s_fHomeArrowOffsetY;
+static float s_fAwayArrowOffsetY;
 
 class IndicatorInfo
 {
@@ -114,7 +114,7 @@ static inline nlColour GetIndicatorColour(cPlayer* pCharacter)
     return GetTeamColour(*pInfo, *pOtherInfo, true);
 }
 
-extern "C" int fn_801A323C(cPlayer* pCharacter, bool* pSameMachine)
+int GetIndicatorControllerIndex(cPlayer* pCharacter, bool* pSameMachine)
 {
     if (g_pNetworkSessionBase->GetNumMachines() > 1)
     {
@@ -228,13 +228,13 @@ static void DrawIndicator(int xCentre, int yCentre, float fPixelWidth,
 static inline unsigned long GetCharacterTexID(
     cPlayer* pCharacter, bool* pSameMachine)
 {
-    return uIndicatorTexID[fn_801A323C(pCharacter, pSameMachine)];
+    return uIndicatorTexID[GetIndicatorControllerIndex(pCharacter, pSameMachine)];
 }
 
 static inline unsigned long GetCharacterGlowTexID(
     cPlayer* pCharacter, bool* pSameMachine)
 {
-    return uGlowTexID[fn_801A323C(pCharacter, pSameMachine)];
+    return uGlowTexID[GetIndicatorControllerIndex(pCharacter, pSameMachine)];
 }
 
 static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
@@ -265,7 +265,7 @@ static void DrawOffscreenIndicator(const nlVector3& v3NormalizedScreenPos,
     float opacityScale = 1.0f;
     if (!sameMachine)
     {
-        opacityScale = lbl_806DCEF4;
+        opacityScale = s_fRemoteIndicatorOpacity;
     }
     nlColour colour = GetIndicatorColour(pCharacter);
 
@@ -316,7 +316,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
         ((cPlayer*)g_pCharacters[i])->m_v3ScreenPosition = projectedPos;
 
         bool sameMachine = false;
-        if (fn_801A323C((cPlayer*)g_pCharacters[i], &sameMachine) == -1)
+        if (GetIndicatorControllerIndex((cPlayer*)g_pCharacters[i], &sameMachine) == -1)
         {
             continue;
         }
@@ -358,7 +358,7 @@ static void UpdateAndRenderPlayerIndicators(float)
         }
 
         bool sameMachine = false;
-        if (fn_801A323C((cPlayer*)g_pCharacters[i], &sameMachine) == -1)
+        if (GetIndicatorControllerIndex((cPlayer*)g_pCharacters[i], &sameMachine) == -1)
         {
             continue;
         }
@@ -377,7 +377,7 @@ static void UpdateAndRenderPlayerIndicators(float)
         float opacityScale = 1.0f;
         if (!sameMachine)
         {
-            opacityScale = lbl_806DCEF4;
+            opacityScale = s_fRemoteIndicatorOpacity;
         }
 
         ReplayManager* pReplay = ReplayManager::Instance();
@@ -404,7 +404,7 @@ static void UpdateAndRenderPlayerIndicators(float)
             }
         }
 
-        screenOffset = lbl_806DCEF0;
+        screenOffset = s_fIndicatorDistInPixels;
         nlColour colour = GetIndicatorColour((cPlayer*)g_pCharacters[i]);
         v3Position.z += fVerticalOffset;
         nlVector3 v3ScreenPosition;
@@ -460,21 +460,21 @@ static void UpdateAndRenderPlayerIndicators(float)
             if (((cPlayer*)g_pCharacters[i])->m_pTeam->m_nSide == HOME)
             {
                 rotationDegrees = 180.0f;
-                xOffset = lbl_806DCED8;
-                yOffset = lbl_806E1578;
+                xOffset = s_fHomeArrowOffsetX;
+                yOffset = s_fHomeArrowOffsetY;
             }
             else
             {
                 rotationDegrees = 0.0f;
-                xOffset = lbl_806DCEDC;
-                yOffset = lbl_806E157C;
+                xOffset = s_fAwayArrowOffsetX;
+                yOffset = s_fAwayArrowOffsetY;
             }
 
             float rotationAngle
                 = 3.1415927f * rotationDegrees / 180.0f;
             DrawIndicator((int)(v3ScreenPosition.x + xOffset),
-                (int)(v3ScreenPosition.y - yOffset), lbl_806DCED4,
-                lbl_806DCED4, fOpacity * opacityScale,
+                (int)(v3ScreenPosition.y - yOffset), s_fArrowSize,
+                s_fArrowSize, fOpacity * opacityScale,
                 directionArrowTexID, colour, rotationAngle, false);
         }
         else

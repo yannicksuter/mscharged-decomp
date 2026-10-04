@@ -4,7 +4,6 @@
 #include "NL/nlDLListContainer.h"
 #include "NL/nlMath.h"
 #include "types.h"
-struct AXFX_DELAY;
 struct AXFX_REVERBHI;
 
 class AudioEffectParameter
@@ -138,7 +137,6 @@ inline void AudioEffectParameter::Update(float dt)
 }
 
 extern AuxEffectMap* g_pAuxEffectMap;
-void SetDefaultDelaySettings(AXFX_DELAY* delay);
 void SetDefaultReverbSettings(AXFX_REVERBHI* reverb);
 
 #endif // GAME_AUDIO_AUDIOEFFECT_H

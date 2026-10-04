@@ -150,7 +150,7 @@ void nlTextBox::ProcessString(const FontCharString* pString, const nlFont* pFont
     }
 }
 
-void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVector2& DrawAt, const nlColour& Color, eGLView View)
+void nlTextBox::DrawString(const nlTextBox::StringDrawInfo& DrawInfo, const nlVector2& DrawAt, const nlColour& Color, GLView* View)
 {
     int yDir = 1;
     const nlFont* pFont = DrawInfo.pFont;

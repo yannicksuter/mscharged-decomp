@@ -10,21 +10,21 @@ struct LightningStrikeData;
 class ExcitementSystem : public InterpreterCore
 {
 public:
-    static ExcitementSystem& fn_80196644();
+    static ExcitementSystem& Instance();
 
-    void fn_801967DC();
-    void fn_80196924();
-    void fn_80196D30(PlayerAttackData*);
-    void fn_80196D64(LightningStrikeData*);
-    void fn_80196D8C(CollisionBallGoalpostData*);
+    void ClearExcitementValues();
+    void RegisterEventHandlers();
+    void OnAttackSuccess(PlayerAttackData*);
+    void OnLightningStrike(LightningStrikeData*);
+    void OnCollisionBallGoalpost(CollisionBallGoalpostData*);
     virtual void DoFunctionCall(unsigned int);
 
-    /* 0x028 */ float mUnidentified028;
-    /* 0x02C */ u16 mUnidentified02C;
-    /* 0x02E */ u16 mUnidentified02E;
-    /* 0x030 */ u8 mUnidentified030[130];
-    /* 0x0B2 */ u8 mUnidentified0B2[178];
-    /* 0x164 */ u8 mUnidentified164[4];
+    /* 0x028 */ float mMaxBallDistanceSq;
+    /* 0x02C */ u16 mExcitement;
+    /* 0x02E */ u16 mExcitementCount;
+    /* 0x030 */ u8 mFielderAnimExcitement[130];
+    /* 0x0B2 */ u8 mGoalieAnimExcitement[178];
+    /* 0x164 */ u8 mEventExcitement[4];
     /* 0x168 */ void* mByteCode;
 
 private:

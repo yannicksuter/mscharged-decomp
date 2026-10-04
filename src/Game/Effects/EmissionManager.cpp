@@ -1,14 +1,20 @@
 #include "Game/Effects/EmissionManager.h"
 
 #include "Game/Effects/EmissionController.h"
+#include "Game/Effects/EffectsBundleData.h"
+#include "Game/Inventory.h"
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/ParticleSystem.h"
 #include "Game/TweakValue.h"
+#include "Game/TweakIntBindingInline.h"
+#include "Game/Replay.h"
 #include "Game/Sys/debug.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glMemory.h"
+#include "NL/gl/glResourceLoader.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlFile.h"
+#include "NL/nlChunk.h"
 #include "NL/nlCompressedFile.h"
 #include "NL/nlMemory.h"
 #include "NL/MemAlloc.h"
@@ -24,64 +30,33 @@ static unsigned long fx_sTerrain;
 static unsigned int sResourceIdCounter;
 static const char* sDefaultResourceNames[2] = { "Default", "World" };
 
-struct EffectsBundleData
-{
-    unsigned char unknown_0x00[8];
-    unsigned int mNumTemplates;
-    EffectsTemplate** mTemplates;
-    int mNumGroups;
-    EffectsGroup** mGroups;
-};
-
-extern "C" void fn_802EB294(EffectsBundleData*);
-
-class EffectsBundlePayload
-{
-public:
-    void Cleanup()
-    {
-        for (ListEntry<EffectsBundleData*>* entry = mEntries.m_Head;
-             entry != 0; entry = entry->next)
-        {
-            fn_802EB294(entry->entry);
-        }
-        mEntries.Clear();
-
-        while (mAllocations.m_Head != 0)
-        {
-            char* allocation;
-            mAllocations.RemoveStart(&allocation);
-            delete allocation;
-        }
-        mNumEntries = 0;
-    }
-
-    ~EffectsBundlePayload()
-    {
-        Cleanup();
-    }
-
-    /* 0x00 */ nlListContainer<EffectsBundleData*> mEntries;
-    /* 0x0C */ nlListContainer<char*> mAllocations;
-    /* 0x18 */ int mNumEntries;
-};
-
 class EffectsBundle
 {
 public:
+    EffectsBundle()
+        : m_next(0)
+        , m_prev(0)
+        , mData(0)
+        , mInventory()
+        , mExternallyOwnedData(false)
+    {
+    }
+
     ~EffectsBundle()
     {
-        mPayload.Cleanup();
+        mInventory.Clear();
         if (mData != 0 && !mExternallyOwnedData)
         {
             ::operator delete(mData);
         }
     }
 
+    inline void Load(nlChunk* bundle);
+
     /* 0x00 */ EffectsBundle* m_next;
     /* 0x04 */ EffectsBundle* m_prev;
     /* 0x08 */ void* mData;
-    /* 0x0C */ EffectsBundlePayload mPayload;
+    /* 0x0C */ cInventory<EffectsBundleData> mInventory;
     /* 0x28 */ bool mExternallyOwnedData;
 };
 
@@ -99,9 +74,23 @@ typedef nlAVLTreeIterator<unsigned long, LingerMessage*,
 
 static LingerTree* lingerers;
 
+static nlAVLTree<unsigned long, EffectsGroup*,
+    DefaultKeyCompare<unsigned long> > sEffectsGroups;
+
 class EffectsBundleManager
 {
 public:
+    EffectsBundleManager()
+        : mDefaultBundles(0)
+        , mAdditionalBundles(0)
+        , mResourcePool(0)
+    {
+    }
+
+    ~EffectsBundleManager()
+    {
+    }
+
     void Load(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
     inline void ClearAdditional();
 
@@ -110,7 +99,7 @@ public:
     GLResourcePool* mResourcePool;
 };
 
-extern EffectsBundleManager gEffectsBundleManager;
+EffectsBundleManager gEffectsBundleManager;
 extern void* gEffectsData;
 extern void* gEffectsNonResidentData;
 extern void* lbl_806E1FF0;
@@ -119,7 +108,6 @@ extern void* gEffectsTextureData;
 extern int lbl_806E1FD8;
 extern int lbl_806DF4C0;
 static int lbl_806E1FDC;
-extern nlAVLTree<unsigned long, EffectsGroup*, DefaultKeyCompare<unsigned long> > lbl_8057F6B8;
 
 inline void EffectsBundleManager::ClearAdditional()
 {
@@ -128,14 +116,15 @@ inline void EffectsBundleManager::ClearAdditional()
         EffectsBundle* bundle = mAdditionalBundles;
         nlDLRingRemove(&mAdditionalBundles, bundle);
 
-        for (ListEntry<EffectsBundleData*>* entry = bundle->mPayload.mEntries.m_Head;
-             entry != 0; entry = entry->next)
+        for (nlListIterator<EffectsBundleData*> iterator
+                 = bundle->mInventory.Begin();
+             iterator.IsValid(); iterator.Next())
         {
-            EffectsBundleData* data = entry->entry;
+            EffectsBundleData* data = iterator.Current();
             for (int i = 0; i < data->mNumGroups; ++i)
             {
                 unsigned long hash = data->mGroups[i]->GetHashID();
-                lbl_8057F6B8.Remove(hash);
+                sEffectsGroups.Remove(hash);
             }
         }
 
@@ -145,6 +134,101 @@ inline void EffectsBundleManager::ClearAdditional()
 
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
+
+inline void EffectsBundle::Load(nlChunk* bundle)
+{
+    mInventory.ParseChunks(bundle, bundle->GetLastChunk());
+
+    EffectsBundleData* data = mInventory.Find(0);
+    for (int i = 0; i < data->mNumGroups; ++i)
+    {
+        EffectsGroup* group = data->mGroups[i];
+        if (sEffectsGroups.Add(group->GetHashID(), group) != 0)
+        {
+            sEffectsGroups.Remove(group->GetHashID());
+            sEffectsGroups.Add(group->GetHashID(), group);
+        }
+    }
+}
+
+class EffectsBundleChunkLoader : public GLResourceChunkLoader
+{
+public:
+    EffectsBundleChunkLoader(GLResourcePool* resourcePool, EffectsBundle* bundle)
+        : GLResourceChunkLoader(resourcePool, 1)
+        , mBundle(bundle)
+    {
+    }
+
+    bool LoadChunk(nlChunk* chunk)
+    {
+        if (EffectsBundleData::IsValidChunkID(chunk->GetID()))
+        {
+            mBundle->Load(chunk);
+            return true;
+        }
+        return GLResourceChunkLoader::LoadChunk(chunk);
+    }
+
+private:
+    /* 0x0C */ EffectsBundle* mBundle;
+};
+
+/**
+ * Offset/Address/Size: 0x40 | 0x802E5BA0 | size: 0x89C
+ */
+void EffectsBundleManager::Load(void* data, void* nonResidentData,
+    GLResourcePool* context, int bundleType)
+{
+    EffectsBundle* bundle
+        = new (nlMalloc(sizeof(EffectsBundle), 8, false)) EffectsBundle;
+    EffectsBundleChunkLoader loader(context, bundle);
+
+    if (bundleType == 2)
+    {
+        loader.LoadChunk((nlChunk*)data);
+    }
+    else
+    {
+        if (data != 0)
+        {
+            nlChunk* end = ((nlChunk*)data)->GetLastChunk();
+            nlChunk* chunk = ((nlChunk*)data)->GetFirstChunk();
+            while (chunk != end)
+            {
+                loader.LoadChunk(chunk);
+                chunk = chunk->GetNextChunk();
+            }
+        }
+
+        if (nonResidentData != 0)
+        {
+            nlChunk* end = ((nlChunk*)nonResidentData)->GetLastChunk();
+            nlChunk* chunk = ((nlChunk*)nonResidentData)->GetFirstChunk();
+            while (chunk != end)
+            {
+                loader.LoadChunk(chunk);
+                chunk = chunk->GetNextChunk();
+            }
+        }
+    }
+
+    bundle->mData = data;
+    if (bundleType == 0)
+    {
+        nlDLRingAddEnd(&mDefaultBundles, bundle);
+    }
+    else
+    {
+        nlDLRingAddEnd(&mAdditionalBundles, bundle);
+    }
+
+    if (mResourcePool == 0)
+    {
+        mResourcePool = context;
+    }
+}
+
 
 inline void EmissionResourceStats::Configure(const char* name, int budget)
 {
@@ -174,6 +258,22 @@ void OnEffectsDataLoaded(
     void* data, unsigned long size, void* userData)
 {
     *(void**)userData = data;
+}
+
+/**
+ * Offset/Address/Size: 0x8E4 | 0x802E6444 | size: 0x188
+ */
+void OnEffectsGeometryLoaded(void* data, unsigned long, void*)
+{
+    nlChunk* bundle = (nlChunk*)data;
+    nlChunk* chunk = bundle->GetFirstChunk();
+    while (chunk != bundle->GetLastChunk())
+    {
+        unsigned long numModels = 0;
+        glEndLoadModel(chunk, chunk->GetDataSize(), &numModels,
+            glGetCurrentResourcePool());
+        chunk = chunk->GetNextChunk();
+    }
 }
 
 /**
@@ -553,7 +653,7 @@ void EmissionManager::AddEffectsLight(const EffectsLight& light)
 void EmissionManager::Render()
 {
     g_nNumLights = 0;
-    sUnidentified_806E1FAC = 0;
+    gNumRenderedParticles = 0;
 
     int i;
     EmissionResourceStats* stats = Instance()->mResourceStats;
@@ -592,7 +692,7 @@ EffectsGroup* EmissionManager::GetEffectsGroup(const char* name)
 {
     unsigned long hash = nlStringLowerHash(name);
     EffectsGroup** group;
-    if (lbl_8057F6B8.FindGet(hash, &group))
+    if (sEffectsGroups.FindGet(hash, &group))
     {
         return *group;
     }
@@ -602,11 +702,52 @@ EffectsGroup* EmissionManager::GetEffectsGroup(const char* name)
 EffectsGroup* fxGetGroup(EmissionManager*, unsigned long hashID)
 {
     EffectsGroup** group;
-    if (!lbl_8057F6B8.FindGet(hashID, &group))
+    if (!sEffectsGroups.FindGet(hashID, &group))
     {
         return 0;
     }
     return *group;
+}
+
+/**
+ * Offset/Address/Size: 0x2264 | 0x802E7DC4 | size: 0x220
+ */
+EmissionController* EmissionManager::Create(
+    const char* name, int view, bool addToEnd, int id)
+{
+    EffectsGroup* group = GetEffectsGroup(name);
+    EmissionController* controller = 0;
+    if (group != 0)
+    {
+        MemoryAllocator* allocator = mMemoryContext;
+        AllocatorStack[AllocatorStackDepth++] = allocator;
+        CurrentAllocator = allocator;
+
+        if (id == 0)
+        {
+            id = (unsigned short)mNextControllerId++;
+        }
+        if (mNextControllerId > 0x7E16)
+        {
+            mNextControllerId = 1;
+        }
+
+        controller = new (nlMalloc(sizeof(EmissionController), 8, false))
+            EmissionController(group, this, id, mContext, view);
+        if (addToEnd)
+        {
+            mControllers.AddEnd(controller);
+        }
+        else
+        {
+            mControllers.AddStart(controller);
+        }
+
+        --AllocatorStackDepth;
+        AllocatorStack[AllocatorStackDepth] = 0;
+        CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+    }
+    return controller;
 }
 
 EmissionController* EmissionManager::Create(EffectsGroup* group, int view, bool addToEnd, unsigned short id)
@@ -999,6 +1140,275 @@ void EmissionManager::AddError(const char* format, ...)
 {
 }
 
+// Expanded only through Replayable<0>(LoadFrame&, EmissionController&) in this
+// unit; retail keeps no standalone copy.
+inline void EmissionController::Replay(LoadFrame& frame)
+{
+    ::Replayable<0>(frame, (unsigned int&)m_pPose);
+    ::Replayable<0>(frame, (unsigned int&)m_pAnimController);
+    frame.Replayable<0>(m_uUserData);
+    ::Replayable<0>(frame, m_fGround);
+    ::Replayable<0>(frame, m_aFacing);
+    ::Replayable<0>(frame, m_View);
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.x));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.y));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.z));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vDirection.x));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vDirection.y));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vDirection.z));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vVelocity.x));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vVelocity.y));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vVelocity.z));
+
+    m_Replaying = true;
+
+    float age = 0.0f;
+    ::Replayable<0>(frame, age);
+    age = frame.mNonBlendableAheadOfFrame + age;
+    m_ReplayDeltaTime = age - m_Age;
+    m_Age = age;
+
+    bool dying = false;
+    ::Replayable<0>(frame, dying);
+    if (dying == true)
+    {
+        Die();
+    }
+
+    unsigned int updateCallback = 0;
+    ::Replayable<0>(frame, updateCallback);
+    mUpdateCallback.Clear();
+    if (updateCallback != 0)
+    {
+        mUpdateCallback = (void (*)(EmissionController&))updateCallback;
+    }
+
+    // Retail clears the position callback while restoring the finished one,
+    // and the finished callback while restoring the position one.
+    unsigned int finishedCallback = 0;
+    ::Replayable<0>(frame, finishedCallback);
+    mPositionCallback.Clear();
+    if (finishedCallback != 0)
+    {
+        mFinishedCallback
+            = (void (*)(EmissionController&, int))finishedCallback;
+    }
+
+    unsigned int positionCallback
+        = (unsigned int)mPositionCallback.GetFreeFunction();
+    ::Replayable<0>(frame, positionCallback);
+    mFinishedCallback.Clear();
+    if (positionCallback != 0)
+    {
+        mPositionCallback
+            = (nlVector3 (*)(EmissionController&, EffectsSpec&))positionCallback;
+    }
+}
+
+inline void EmissionController::Replay(SaveFrame& frame)
+{
+    ::Replayable<0>(frame, (unsigned int&)m_pPose);
+    ::Replayable<0>(frame, (unsigned int&)m_pAnimController);
+    frame.Replayable<0>(m_uUserData);
+    ::Replayable<0>(frame, m_fGround);
+    ::Replayable<0>(frame, m_aFacing);
+    ::Replayable<0>(frame, m_View);
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.x));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.y));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 8>(m_vPosition.z));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vDirection.x));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vDirection.y));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vDirection.z));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vVelocity.x));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vVelocity.y));
+    ::Replayable<0>(frame, FloatCompressor<-1024, 1024, 6>(m_vVelocity.z));
+
+    m_Replaying = false;
+    m_ReplayDeltaTime = 0.0f;
+    ::Replayable<0>(frame, m_Age);
+    ::Replayable<0>(frame, m_bDying);
+
+    unsigned int updateCallback = (unsigned int)mUpdateCallback.GetFreeFunction();
+    ::Replayable<0>(frame, updateCallback);
+
+    unsigned int finishedCallback
+        = (unsigned int)mFinishedCallback.GetFreeFunction();
+    ::Replayable<0>(frame, finishedCallback);
+
+    unsigned int positionCallback
+        = (unsigned int)mPositionCallback.GetFreeFunction();
+    ::Replayable<0>(frame, positionCallback);
+}
+
+/**
+ * Offset/Address/Size: 0x314C | 0x802E8CAC | size: 0x210
+ */
+void EmissionManager::Replay(LoadFrame& frame)
+{
+    if (m_bRecording)
+    {
+        if (unknown_0x1B0)
+        {
+            DestroyAll(true);
+        }
+        else
+        {
+            PrepareForReplay();
+        }
+        m_bRecording = false;
+    }
+
+    int numEffects = 0;
+    Replayable<0>(frame, numEffects);
+
+    nlDLListContainer<EmissionController*> oldControllers(0);
+    oldControllers.Copy(mControllers);
+    mControllers.Clear();
+
+    for (int i = 0; i < numEffects; ++i)
+    {
+        unsigned short id;
+        unsigned int view;
+        EffectsGroup* group = 0;
+        Replayable<0>(frame, id);
+        Replayable<0>(frame, view);
+        Replayable<0>(frame, (unsigned int&)group);
+
+        bool found = false;
+        nlDLListIterator<EmissionController*> iterator
+            = oldControllers.Begin();
+        while (!iterator.IsDone())
+        {
+            EmissionController* controller = *iterator;
+            if (id == controller->GetId())
+            {
+                Replayable<0>(frame, *controller);
+                oldControllers.Remove(&iterator);
+                mControllers.AddStart(controller);
+                found = true;
+                break;
+            }
+            iterator.Step();
+        }
+
+        if (!found)
+        {
+            EmissionController* controller
+                = Create(group, view, true, id);
+            Replayable<0>(frame, *controller);
+        }
+    }
+
+    nlDLListIterator<EmissionController*> iterator
+        = oldControllers.Begin();
+    while (!iterator.IsDone())
+    {
+        EmissionController* controller = *iterator;
+        if (controller->GetContext() != mContext)
+        {
+            mControllers.AddStart(controller);
+        }
+        else
+        {
+            delete controller;
+        }
+        iterator.Step();
+    }
+    oldControllers.Clear();
+}
+
+// Replay drops the controllers created while recording so the stashed ones
+// can be restored.
+static inline void DestroyReplayedControllers(EmissionManager* manager)
+{
+    nlDLListIterator<EmissionController*> iterator = manager->mControllers.Begin();
+    DLListEntry<EmissionController*>* head = iterator.m_Head;
+    DLListEntry<EmissionController*>* current = iterator.m_Curr;
+    while (current != 0)
+    {
+        EmissionController* controller = current->entry;
+        if (controller->m_pContext == manager->mContext
+            && !controller->m_pGroup->IsPersistent())
+        {
+            DLListEntry<EmissionController*>* entry = current;
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
+            nlDLRingRemove(&manager->mControllers.m_Head, entry);
+            delete entry;
+            delete controller;
+        }
+        else
+        {
+            if (nlDLRingIsEnd(head, current) || current == 0)
+            {
+                current = 0;
+            }
+            else
+            {
+                current = current->m_next;
+            }
+        }
+    }
+}
+
+// Replay restores the controllers stashed by PrepareForReplay and discards
+// the ones created while replaying.
+static void RestoreRecordedControllers(EmissionManager* manager)
+{
+    DLListEntry<EmissionController*>* head = manager->mReplayControllers.m_Head;
+    manager->mReplayControllers.m_Head = manager->mControllers.m_Head;
+    manager->mControllers.m_Head = head;
+
+    while (manager->mReplayControllers.m_Head != 0)
+    {
+        EmissionController* controller;
+        manager->mReplayControllers.RemoveStart(&controller);
+        delete controller;
+    }
+}
+
+/**
+ * Offset/Address/Size: 0x335C | 0x802E8EBC | size: 0x794
+ */
+void EmissionManager::Replay(SaveFrame& frame)
+{
+    if (!m_bRecording)
+    {
+        if (unknown_0x1B0)
+        {
+            DestroyReplayedControllers(this);
+        }
+        else
+        {
+            RestoreRecordedControllers(this);
+        }
+        m_bRecording = true;
+    }
+
+    int numEffects = nlDLRingCountElements(mControllers.m_Head);
+    Replayable<0>(frame, numEffects);
+
+    nlDLListIterator<EmissionController*> iterator
+        = mControllers.Begin();
+    while (!iterator.IsDone())
+    {
+        EmissionController* controller = *iterator;
+        unsigned short id = controller->m_Id;
+        unsigned int group = (unsigned int)controller->m_pGroup;
+        Replayable<0>(frame, id);
+        Replayable<0>(frame, controller->m_View);
+        Replayable<0>(frame, group);
+        Replayable<0>(frame, *controller);
+        iterator.Step();
+    }
+}
+
 /**
  * Offset/Address/Size: 0x0 | 0x802E9650 | size: 0x8
  */
@@ -1124,6 +1534,45 @@ void EmissionManager::SetContext(void* context)
             current = current->m_next;
         }
     }
+}
+
+/**
+ * Offset/Address/Size: 0x3E64 | 0x802E99C4 | size: 0x448
+ */
+void EmissionResourceStats::Initialize()
+{
+    if (!unknown_0x32_bit15)
+    {
+        return;
+    }
+
+    mCount = new (gTweakBindingAllocator->Allocate(sizeof(TweakIntBinding)))
+        TweakIntBinding;
+    mHighWaterMark
+        = new (gTweakBindingAllocator->Allocate(sizeof(TweakIntBinding)))
+            TweakIntBinding;
+    mBudgetTweak
+        = new (gTweakBindingAllocator->Allocate(sizeof(TweakIntBinding)))
+            TweakIntBinding;
+
+    char category[32];
+    char name[32];
+    nlSNPrintf(category, sizeof(category), "Effects/Stats/%s", mName);
+    char* suffix = name + nlSNPrintf(name, sizeof(name), "%s", mName);
+    int suffixLength = sizeof(name) - (suffix - name);
+
+    nlStrNCpy(suffix, " Count", suffixLength);
+    mCount->BindWithDefault(name, 0, category, false, 0.0f, 0.0f, 0.0f);
+
+    nlStrNCpy(suffix, " HWM", suffixLength);
+    mHighWaterMark->BindWithDefault(
+        name, 0, category, false, 0.0f, 0.0f, 0.0f);
+
+    nlStrNCpy(suffix, " Budget", suffixLength);
+    mBudgetTweak->BindWithDefault(
+        name, 0, category, false, 0.0f, 0.0f, 0.0f);
+    *mBudgetTweak = mBudget;
+    unknown_0x32_bit14 = 1;
 }
 
 /**

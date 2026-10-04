@@ -907,27 +907,27 @@ void cCharacter::SetAnimID(int animID)
     if (m_eAnimID != animID)
     {
         m_eAnimID = animID;
-        ExcitementSystem& unidentifiedSystem = ExcitementSystem::fn_80196644();
-        nlVector3 unidentifiedDelta;
-        nlVec3Sub(unidentifiedDelta, mUnidentified024.m_v3Position, g_pBall->m_v3Position);
-        if (nlVec3LengthSquared(unidentifiedDelta) < unidentifiedSystem.mUnidentified028)
+        ExcitementSystem& excitementSystem = ExcitementSystem::Instance();
+        nlVector3 toBall;
+        nlVec3Sub(toBall, mUnidentified024.m_v3Position, g_pBall->m_v3Position);
+        if (nlVec3LengthSquared(toBall) < excitementSystem.mMaxBallDistanceSq)
         {
             if (m_eClassType == GOALIE)
             {
-                u8 unidentifiedValue = unidentifiedSystem.mUnidentified0B2[(u16)m_eAnimID];
-                if (unidentifiedValue != 0)
+                u8 value = excitementSystem.mGoalieAnimExcitement[(u16)m_eAnimID];
+                if (value != 0)
                 {
-                    unidentifiedSystem.mUnidentified02C += unidentifiedValue;
-                    unidentifiedSystem.mUnidentified02E++;
+                    excitementSystem.mExcitement += value;
+                    excitementSystem.mExcitementCount++;
                 }
             }
             else if (m_eClassType == FIELDER)
             {
-                u8 unidentifiedValue = unidentifiedSystem.mUnidentified030[(u16)m_eAnimID];
-                if (unidentifiedValue != 0)
+                u8 value = excitementSystem.mFielderAnimExcitement[(u16)m_eAnimID];
+                if (value != 0)
                 {
-                    unidentifiedSystem.mUnidentified02C += unidentifiedValue;
-                    unidentifiedSystem.mUnidentified02E++;
+                    excitementSystem.mExcitement += value;
+                    excitementSystem.mExcitementCount++;
                 }
             }
         }

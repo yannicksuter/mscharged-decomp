@@ -1,3 +1,4 @@
+#include "Game/NetworkEvents.h"
 #include "Game/InputRouter.h"
 #include "Game/NetworkDebug.h"
 #include "Game/Sys/debug.h"
@@ -8,7 +9,6 @@
 
 #include <string.h>
 
-#include "Game/NetworkEvents.h"
 #include "Game/MathHelpers.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -44,10 +44,7 @@ static EventDispatcher sDetermDataDispatcher;
 static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
     &sDetermDataDispatcher, "DetermDataEventQueue", -1);
 
-void fn_803353DC(DetermDataEvent* event)
-{
-    delete event;
-}
+inline void FreeDetermDataEvent(DetermDataEvent* event);
 
 void InitializeInputRouters()
 {
@@ -86,7 +83,7 @@ void InputRouter::Reset(int)
 
     for (int machine = 0; machine < 4; ++machine)
     {
-        mNetworkTicks[machine] = 0;
+        mRemapAngles[machine] = 0;
         mNetworkCRCs[machine] = 0;
         mRemoteTicks[machine] = 0;
         mRandomSeeds[machine] = 0;
@@ -110,7 +107,7 @@ void InputRouter::Reset(int)
 
     mSyncMismatch = false;
     mSyncMismatchReported = false;
-    mOutgoingQueueOverflowed = false;
+    mQueueOverflowed = false;
     mStarvedForInput = false;
 }
 
@@ -184,7 +181,7 @@ bool InputRouter::ProcessPlaybackFrame()
         int eventCount = 0;
         u32 dataSize = 0;
         if (!gNetworkInputRecording->ReadNetworkInputPacketHeader(machine,
-                &mNetworkTicks[machine], &mNetworkCRCs[machine],
+                &mRemapAngles[machine], &mNetworkCRCs[machine],
                 (u32*)&mRemoteTicks[machine], &mRandomSeeds[machine],
                 (u32*)&eventCount, &dataSize))
         {
@@ -200,7 +197,7 @@ bool InputRouter::ProcessPlaybackFrame()
                 return false;
             }
 
-            Function<DetermDataEvent*> disposer(fn_803353DC);
+            Function<DetermDataEvent*> disposer(FreeDetermDataEvent);
             sDetermDataEventQueue.Queue(event, disposer);
         }
 
@@ -221,7 +218,7 @@ bool InputRouter::ProcessPlaybackFrame()
                 return false;
             }
             channel->ApplyNetworkPeerChannelInput(
-                &mInputRecords[playerId], mNetworkTicks[machine],
+                &mInputRecords[playerId], mRemapAngles[machine],
                 mInputStates[playerId]);
         }
     }
@@ -249,7 +246,7 @@ void InputRouter::QueueDetermData(const void* data, u32 size)
     else
     {
         tDebugPrintManager::Print(DC_NETWORK, "m_OutgoingCustomDetermDataQ overflowed\n");
-        mOutgoingQueueOverflowed = true;
+        mQueueOverflowed = true;
     }
 }
 
@@ -297,7 +294,7 @@ void SimpleInputRouter::OnInputReady()
     s8 machine = mSession->GetLocalMachineId();
     int playerCount = peer->mPlayerCount;
 
-    mNetworkTicks[machine]
+    mRemapAngles[machine]
         = peer->GetNetworkPeerChannel(0)->GetNetworkPeerChannelRemapAngle();
 
     int eventCount = m_OutgoingCustomDetermDataQ.GetCount();
@@ -307,7 +304,7 @@ void SimpleInputRouter::OnInputReady()
         NetworkInputRecording* recording = gNetworkInputRecording;
         u32 seed = GetNetworkRandomSeed();
         recording->WriteNetworkInputPacketHeader(machine,
-            mNetworkTicks[machine], mCurrentCRC, frame, seed, eventCount, 0);
+            mRemapAngles[machine], mCurrentCRC, frame, seed, eventCount, 0);
     }
 
     for (int i = 0; i < eventCount; ++i)
@@ -318,7 +315,7 @@ void SimpleInputRouter::OnInputReady()
             gNetworkInputRecording->WriteNetworkInputEvent(event);
         }
 
-        Function<DetermDataEvent*> disposer(fn_803353DC);
+        Function<DetermDataEvent*> disposer(FreeDetermDataEvent);
         sDetermDataEventQueue.Queue(event, disposer);
     }
 
@@ -332,7 +329,7 @@ void SimpleInputRouter::OnInputReady()
             = channel->GetNetworkPeerChannelConnectionStatus();
         const PackedDetInput* input = &mInputRecords[playerId];
         channel->ApplyNetworkPeerChannelInput(
-            input, mNetworkTicks[machine], mInputStates[playerId]);
+            input, mRemapAngles[machine], mInputStates[playerId]);
 
         if (gNetworkInputRecording->mRecording)
         {
@@ -358,13 +355,13 @@ void NetworkInputRouter::Reset(int resetQueues)
     mCongestionMultiplier = fDefCongestionMultiplier;
     mWasCongested = false;
     mCurrentMessage.Reset(true, true);
-    mUnidentified290 = 0;
-    mUnidentified294 = 0;
+    mMessageHeld = 0;
+    mBundledMessageCount = 0;
 
     for (int machine = 0; machine < 4; ++machine)
     {
-        mInputQueues[machine].mHead = 0;
-        mInputQueues[machine].mCount = 0;
+        m_InputQueue[machine].mHead = 0;
+        m_InputQueue[machine].mCount = 0;
     }
     mQueueCursor = 0;
     mQueueLimit = 4;
@@ -373,7 +370,7 @@ void NetworkInputRouter::Reset(int resetQueues)
 void NetworkInputRouter::CheckCongestion()
 {
     mCongested = false;
-    if (mQueueLimit > mQueueCursor)
+    if (mQueueLimit > GetQueueCursor())
     {
         mCongested = false;
     }
@@ -382,7 +379,7 @@ void NetworkInputRouter::CheckCongestion()
         int machineCount = mSession->GetNumMachines();
         for (s8 machine = 0; machine < machineCount; ++machine)
         {
-            if (mInputQueues[machine].mCount <= 1)
+            if (m_InputQueue[machine].mCount <= 1)
             {
                 mCongested = true;
             }
@@ -396,7 +393,7 @@ void NetworkInputRouter::CheckCongestion()
 
 bool NetworkInputRouter::HasInput()
 {
-    if (mQueueLimit > mQueueCursor)
+    if (mQueueLimit > GetQueueCursor())
     {
         return true;
     }
@@ -404,7 +401,7 @@ bool NetworkInputRouter::HasInput()
     int machineCount = mSession->GetNumMachines();
     for (s8 machine = 0; machine < machineCount; ++machine)
     {
-        if (mInputQueues[machine].mCount == 0)
+        if (m_InputQueue[machine].mCount == 0)
         {
             return false;
         }
@@ -423,8 +420,8 @@ void NetworkInputRouter::OnInputCaptured()
         mLastGameFrame = frame;
     }
 
-    mCurrentMessage.Reset(false, !mUnidentified290);
-    mUnidentified290 = false;
+    mCurrentMessage.Reset(false, !mMessageHeld);
+    mMessageHeld = false;
 
     NetworkPeer* peer = mSession->GetLocalPeer();
     for (s8 player = 0; player < (int)peer->mPlayerCount; ++player)
@@ -456,9 +453,9 @@ void NetworkInputRouter::OnInputCaptured()
     mCurrentMessage.SetNetworkInputMessageCongested(mWasCongested);
     mWasCongested = false;
 
-    if (mQueueLimit < mQueueCursor && (frame & 1) != 0)
+    if (mQueueLimit < GetQueueCursor() && (frame & 1) != 0)
     {
-        mUnidentified290 = true;
+        mMessageHeld = true;
         --mQueueCursor;
         return;
     }
@@ -479,12 +476,12 @@ void NetworkInputRouter::OnInputCaptured()
     }
     case 2:
     {
-        if (mUnidentified294 == 0)
+        if (mBundledMessageCount == 0)
         {
             mBundledMessage.mMessage0.CopyFrom(&mCurrentMessage);
-            ++mUnidentified294;
+            ++mBundledMessageCount;
         }
-        else if (mUnidentified294 == 1)
+        else if (mBundledMessageCount == 1)
         {
             mBundledMessage.mMessage1.CopyFrom(&mCurrentMessage);
             u8 buffer[400];
@@ -495,7 +492,7 @@ void NetworkInputRouter::OnInputCaptured()
             {
                 g_pNetworkSessionBase->Send(machine, buffer, size, true);
             }
-            mUnidentified294 = 0;
+            mBundledMessageCount = 0;
         }
         break;
     }
@@ -507,14 +504,14 @@ inline void NetworkInputRouter::RecordEmptyInputHeader(s8 machine, int frame)
     NetworkInputRecording* recording = gNetworkInputRecording;
     u32 seed = GetNetworkRandomSeed();
     recording->WriteNetworkInputPacketHeader(machine,
-        mNetworkTicks[machine], mCurrentCRC, frame, seed, 0, 0);
+        mRemapAngles[machine], mCurrentCRC, frame, seed, 0, 0);
 }
 
 void NetworkInputRouter::OnInputReady()
 {
     bool congested = false;
 
-    if (mQueueLimit > mQueueCursor)
+    if (mQueueLimit > GetQueueCursor())
     {
         ++mQueueCursor;
         int machineCount = mSession->GetNumMachines();
@@ -533,7 +530,7 @@ void NetworkInputRouter::OnInputReady()
                     = peer->GetNetworkPeerChannel(player);
                 s8 playerId = GetNetworkPlayerId(player, machine);
                 channel->ApplyNetworkPeerChannelInput(
-                    &mInputRecords[playerId], mNetworkTicks[machine],
+                    &mInputRecords[playerId], mRemapAngles[machine],
                     mInputStates[playerId]);
 
                 if (gNetworkInputRecording->mRecording)
@@ -551,10 +548,10 @@ void NetworkInputRouter::OnInputReady()
         for (s8 machine = 0; machine < machineCount; ++machine)
         {
             NetworkPeer* peer = mSession->GetPeer(machine);
-            NetMessageInput* message = &mInputQueues[machine].Pop();
+            NetMessageInput* message = &m_InputQueue[machine].Pop();
 
             message->GetNetworkInputMessageRemapAngle(
-                &mNetworkTicks[machine]);
+                &mRemapAngles[machine]);
             if ((message->mUnidentified008 & 4) != 0)
             {
                 mNetworkCRCs[machine] = message->mUnidentified00C;
@@ -579,7 +576,7 @@ void NetworkInputRouter::OnInputReady()
                 NetworkInputRecording* recording = gNetworkInputRecording;
                 u32 seed = GetNetworkRandomSeed();
                 recording->WriteNetworkInputPacketHeader(machine,
-                    mNetworkTicks[machine], mCurrentCRC, frame, seed,
+                    mRemapAngles[machine], mCurrentCRC, frame, seed,
                     eventCount, serializedLength);
             }
 
@@ -592,7 +589,7 @@ void NetworkInputRouter::OnInputReady()
                     gNetworkInputRecording->WriteNetworkInputEvent(event);
                 }
 
-                Function<DetermDataEvent*> disposer(fn_803353DC);
+                Function<DetermDataEvent*> disposer(FreeDetermDataEvent);
                 sDetermDataEventQueue.Queue(event, disposer);
             }
 
@@ -613,7 +610,7 @@ void NetworkInputRouter::OnInputReady()
                 mInputStates[playerId]
                     = message->GetNetworkInputMessagePlayerState(player);
                 channel->ApplyNetworkPeerChannelInput(
-                    &mInputRecords[playerId], mNetworkTicks[machine],
+                    &mInputRecords[playerId], mRemapAngles[machine],
                     mInputStates[playerId]);
 
                 if (gNetworkInputRecording->mRecording)
@@ -724,14 +721,14 @@ void NetworkInputRouter::CheckPeerSynchronization()
 void NetworkInputRouter::ReceiveInput(
     s8 machine, NetMessageInput* message)
 {
-    if (!mInputQueues[machine].IsFull())
+    if (!m_InputQueue[machine].IsFull())
     {
-        mInputQueues[machine].PushSlot()->CopyFrom(message);
+        m_InputQueue[machine].PushSlot()->CopyFrom(message);
     }
     else
     {
         tDebugPrintManager::Print(DC_NETWORK, "m_InputQueue[%d] overflowed\n", machine);
-        mOutgoingQueueOverflowed = true;
+        mQueueOverflowed = true;
     }
 }
 
@@ -747,7 +744,7 @@ void NetworkInputRouter::DebugDraw(int column, int* row)
     char output[100];
     for (int machine = 0; machine < machineCount; ++machine)
     {
-        int inputCount = mInputQueues[machine].GetCount();
+        int inputCount = m_InputQueue[machine].GetCount();
         char queueText[100];
         int maxTextLength = nlMin(inputCount, 99);
         int queueTextLength = 0;
@@ -783,58 +780,6 @@ NetworkInputMessageQueue::NetworkInputMessageQueue()
 
 NetworkInputMessageQueue::~NetworkInputMessageQueue()
 {
-}
-
-NetMessageInputBundle::~NetMessageInputBundle()
-{
-}
-
-void NetworkInputRouter::ReceiveAllInputs(
-    s8, NetMessageAllInputs*)
-{
-}
-
-bool NetworkInputRouter::CanCaptureInput()
-{
-    return !mStarvedForInput;
-}
-
-int NetworkInputRouter::GetUpdateCount()
-{
-    return 1;
-}
-
-void SimpleInputRouter::DebugDraw(int column, int* row)
-{
-}
-
-void SimpleInputRouter::ReceiveAllInputs(
-    s8, NetMessageAllInputs*)
-{
-}
-
-void SimpleInputRouter::ReceiveInput(
-    s8, NetMessageInput*)
-{
-}
-
-void SimpleInputRouter::CheckCongestion()
-{
-}
-
-bool SimpleInputRouter::CanCaptureInput()
-{
-    return true;
-}
-
-bool SimpleInputRouter::HasInput()
-{
-    return true;
-}
-
-int SimpleInputRouter::GetUpdateCount()
-{
-    return 1;
 }
 
 static TweakIntBinding sTransmitSyncDataEvery(
@@ -893,4 +838,5 @@ typedef char VerifyInputQueueSize[
 typedef char VerifyNetworkInputRouterSize[
     (sizeof(NetworkInputRouter) == 0xE5C8) ? 1 : -1];
 
+#include "Game/InputRouter.inl"
 #include "NL/nlBind_impl.h"

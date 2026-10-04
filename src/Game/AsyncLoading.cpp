@@ -57,6 +57,7 @@
 #include "Game/SH/SHBootLoading.h"
 
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -136,14 +137,9 @@
 bool IsNetworkOrRecordedGame();
 
 void ShutdownWarbleRendering(void*);
-extern "C" bool fn_802773B8(bool stadiumViewer);
-extern "C" bool fn_80277DD4(ImpostorModel*);
 extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
-extern "C" bool fn_802F49C0(const u32* bindingKey, const u32* definitionKey,
-    void* parameterData, bool immediate, float value);
 void fn_80056CF4(void*, int, bool);
-extern "C" void fn_8030753C(FontManager*, GLResourcePool*);
 
 void FreeImpostorLighting();
 
@@ -371,7 +367,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         {
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
         }
-        fn_8030753C(FontManager::Instance(), GetFEResourcePool());
+        FontManager::Instance()->SetResourcePool(GetFEResourcePool());
         gLoadInGameFonts = false;
         BeginFontLoading(&gLoadInGameFonts);
         FinishLoadingStep(this);
@@ -470,11 +466,11 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         break;
     case 20:
         SetLoadingComment("AsyncFinalizeGameWorldLoading");
-        FinishLoadingStepOrUndo(this, fn_802773B8(false));
+        FinishLoadingStepOrUndo(this, FinishLoadStadium(false));
         break;
     case 21:
         SetLoadingComment("AsyncFinalizeGameWorldLoadingForStadiumViewer");
-        FinishLoadingStepOrUndo(this, fn_802773B8(true));
+        FinishLoadingStepOrUndo(this, FinishLoadStadium(true));
         break;
     case 22:
         SetLoadingComment("AsyncFinalizeLoadingAI");
@@ -503,7 +499,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         {
             nlSingleton<FontManager>::s_pInstance = new (8, false) FontManager;
         }
-        fn_8030753C(FontManager::Instance(), GetFEResourcePool());
+        FontManager::Instance()->SetResourcePool(GetFEResourcePool());
         gLoadInGameFonts = true;
         BeginFontLoading(&gLoadInGameFonts);
         FinishLoadingStep(this);
@@ -1317,7 +1313,7 @@ extern "C" u32 fn_80118B7C(AsyncLoadingManager* manager)
         char buffer[200];
         nlSNPrintf(buffer, sizeof(buffer), "Total Load Time %f MS\n", lbl_806E105C);
         tDebugPrintManager::Print(DC_LOADER, buffer);
-        fn_802BD718("Total Load Time", "seconds", lbl_806E105C / 1000.0f);
+        SmokeTestLogGraphValue("Total Load Time", "seconds", lbl_806E105C / 1000.0f);
     }
     return result;
 }
@@ -1550,7 +1546,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker1");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1560,7 +1556,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker2");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1570,7 +1566,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker3");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1580,7 +1576,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker4");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
 
     GameInfoManager::Instance()->unknown_0x71C8 = 0;
@@ -1730,7 +1726,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     lbl_806E1050 = new (8, false) WorldNPCManager;
     lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
     lbl_806E1050->mModelCallback = SetImpostorShadowLevel;
-    lbl_806E1050->mRenderFilter = fn_80277DD4;
+    lbl_806E1050->mRenderFilter = ShouldRenderStadiumNPC;
     FinishLoadingStep(manager);
 }
 
@@ -1747,7 +1743,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     NisPlayer::Instance()->RegisterEventHandlers();
     GetPresentation()->RegisterEventListeners();
     GetPresentation()->fn_80285E1C();
-    ExcitementSystem::fn_80196644().fn_80196924();
+    ExcitementSystem::Instance().RegisterEventHandlers();
     fn_8001FE80();
     fn_80018A00();
     UnidentifiedCameraEffects::Instance()->RegisterEventListeners();
@@ -1793,7 +1789,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker1");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1803,7 +1799,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker2");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1813,7 +1809,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker3");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
     {
         int parameter[2];
@@ -1823,7 +1819,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
         u32 definition;
         definition = nlStringLowerHash("SendToSpeaker");
         binding = nlStringLowerHash("ControllerSpeaker4");
-        fn_802F49C0(&binding, &definition, parameter, false, 0.0f);
+        StartAudioEffect(&binding, &definition, parameter, false, 0.0f);
     }
 
     FinishLoadingStep(manager);
@@ -1890,11 +1886,11 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
         totalMemFree, totalMemFree / 1024.0f,
         totalMemFree / 1048576.0f);
 
-    fn_802BD718(
+    SmokeTestLogGraphValue(
         "MEM1 Free at end of InitializeGameState", "bytes", mem1Free);
-    fn_802BD718(
+    SmokeTestLogGraphValue(
         "MEM2 Free at end of InitializeGameState", "bytes", mem2Free);
-    fn_802BD718(
+    SmokeTestLogGraphValue(
         "Total Free Memory at end of InitializeGameState", "bytes",
         totalMemFree);
 
@@ -1912,13 +1908,13 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     fn_80056EA8();
 
-    if (fn_802BD63C())
+    if (IsSmokeTestEnabled())
     {
-        fn_802BD718("FrameTime_GamePlay", "ms",
+        SmokeTestLogGraphValue("FrameTime_GamePlay", "ms",
             pGamePlayTimeRegion->m_fThreshold / (float)pGamePlayTimeRegion->m_unk10);
-        fn_802BD718("FrameTime_NIS", "ms",
+        SmokeTestLogGraphValue("FrameTime_NIS", "ms",
             pNISTimeRegion->m_fThreshold / (float)pNISTimeRegion->m_unk10);
-        fn_802BD718("FrameTime_AutoReplay", "ms",
+        SmokeTestLogGraphValue("FrameTime_AutoReplay", "ms",
             pAutoReplayTimeRegion->m_fThreshold / (float)pAutoReplayTimeRegion->m_unk10);
         g_FrameCounter.fn_802B80C4();
     }

@@ -40,4 +40,7 @@ public:
     /* 0x82 */ unsigned char mPadding082[2];
 }; // total size: 0x84
 
+// Variadic debug print whose release body is empty.
+void DebugPrintf(const char* format, ...);
+
 #endif // GAME_PHYSICS_PHYSICS_AI_BALL_H

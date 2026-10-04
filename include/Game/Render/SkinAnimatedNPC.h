@@ -35,6 +35,11 @@ public:
     virtual void RenderFromReplay(
         const cPoseAccumulator& poseAccumulator,
         const nlMatrix4* pWorldMatrix);
+    const nlVector3& GetPosition() const
+    {
+        return mv3Position;
+    }
+
     virtual void SetPosition(const nlVector3& pos)
     {
         mv3Position = pos;

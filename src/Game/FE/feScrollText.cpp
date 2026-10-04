@@ -129,7 +129,7 @@ void FEScrollText::RefreshText()
     }
     else
     {
-        m_messageWidth = m_textFont->fn_80305278(BasicString<unsigned short, Detail::TempStringAllocator>(text),
+        m_messageWidth = m_textFont->GetStringHeight(BasicString<unsigned short, Detail::TempStringAllocator>(text),
             (unsigned long)((m_controlText->m_OverloadFlags & 0x4)
                     ? m_controlText->m_OverloadedAttributes.BoxSize
                     : ((FEText*)m_controlText->m_component)->m_TextAttributes.BoxSize).x,

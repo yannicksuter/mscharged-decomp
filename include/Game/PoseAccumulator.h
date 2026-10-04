@@ -69,9 +69,9 @@ public:
     cPoseAccumulator& operator=(const cPoseAccumulator& other);
     template <typename T>
     void Replay(T& frame);
-    void fn_801949E4(float scale)
+    void SetScale(float fScale)
     {
-        m_Scale = scale;
+        m_Scale = fScale;
     }
     void InitAccumulators();
     cSHierarchy* GetBaseHierarchy() const
@@ -79,6 +79,7 @@ public:
         return m_BaseSHierarchy;
     }
     void BuildNodeMatrices(const nlMatrix4& pWorldMatrix);
+    void BuildNodeMatricesFromQuaternions(const nlMatrix4& pWorldMatrix);
     void BlendRot(int nNode, const nlQuaternion* pRot, float fWeight,
         bool bMirror);
     void BlendRotAroundZ(int nNode, unsigned short rot, float fWeight);
@@ -98,6 +99,7 @@ public:
     nlMatrix4& GetNodeMatrixByHashID(unsigned int nHashID) const;
     s32 GetNumNodes() const;
     void Pose(const cPoseNode& pPoseTree, const nlMatrix4& pWorldMatrix);
+    void Pose(const cPoseNode* pPoseTree, const nlMatrix4* pWorldMatrix);
     void SetBuildNodeMatrixCallback(int nNode,
         BuildNodeMatrixFn funcCallback, unsigned int nParam1,
         unsigned int nParam2);
@@ -111,23 +113,21 @@ public:
     TransAccum* m_trans;
     cBuildNodeMatrixCallbackInfo* m_cb;
     MorphWeightAccum m_MorphWeights;
-    u32 m_Unknown70;
+    u32 m_nNumNodes;
     float m_Scale;
     bool m_bUseObject;
     u8 m_Padding[3];
 };
 
-extern "C" void fn_8030B9C8(cPoseAccumulator* pAccumulator, const nlMatrix4* pWorldMatrix);
-
 template <typename T>
 inline void cPoseAccumulator::Replay(T& frame)
 {
-    for (unsigned int i = 0; i < m_Unknown70; i++)
+    for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
         const UnidentifiedQuaternionCompressor quaternion(m_pQuaternions[i]);
         frame.template Replayable<0>(quaternion);
     }
-    for (unsigned int i = 0; i < m_Unknown70; i++)
+    for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
         if (!m_BaseSHierarchy->PreserveBoneLength(i))
         {
@@ -140,7 +140,7 @@ inline void cPoseAccumulator::Replay(T& frame)
             }
         }
     }
-    for (unsigned int i = 0; i < m_Unknown70; i++)
+    for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
         Replayable<0>(frame, m_scale[i].bIdentity);
         if (!m_trans[i].bIdentity)

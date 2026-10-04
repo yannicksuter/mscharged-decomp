@@ -564,7 +564,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(1);
         break;
     case (SceneList)93:
-        newHandler = new (nlMalloc(sizeof(UnidentifiedOnlineRankingScene), 8, false)) UnidentifiedOnlineRankingScene();
+        newHandler = new (nlMalloc(sizeof(OnlineRankingOverlay), 8, false)) OnlineRankingOverlay();
         break;
     case (SceneList)94:
         newHandler = new (nlMalloc(sizeof(StrikerTimesOverlay), 8, false)) StrikerTimesOverlay();

@@ -86,7 +86,7 @@ void CupKnockoutScene::SceneCreated()
                 presentation->GetActiveSlide(), "Layer", "scroll_horizontal");
         scroll->m_bVisible = false;
 
-        int startSeconds = NetTournManager::Instance()->UnidentifiedStartSeconds();
+        int startSeconds = NetTournManager::Instance()->GetSecondsToStartGames();
         mStartSeconds = startSeconds;
 
         TLSlide* slide = mPresentation->GetActiveSlide();
@@ -469,7 +469,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
         break;
     case NET_TOURN_GAME_READY:
     case NET_TOURN_GAME_IN_PROGRESS:
-        switch (tournamentGame->mHomeUpdate)
+        switch (tournamentGame->mGameStatus)
         {
         case 1:
             timer->SetActiveSlide("loading", true, false);
@@ -478,7 +478,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
         case 2:
         case 3:
         {
-            int seconds = tournamentGame->mAwayUpdate;
+            int seconds = tournamentGame->mGameTimeDelta;
             int minutes = seconds / 60;
             int remainder = seconds % 60;
             char time[32];
@@ -486,7 +486,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
                 nlSNPrintf(time, sizeof(time), "%d:0%d", minutes, remainder);
             else
                 nlSNPrintf(time, sizeof(time), "%d:%d", minutes, remainder);
-            if (tournamentGame->mHomeUpdate == 3)
+            if (tournamentGame->mGameStatus == 3)
                 timer->SetActiveSlide("Slide1", true, false);
             else
                 timer->SetActiveSlide("time_remaining", true, false);
@@ -721,7 +721,7 @@ void CupKnockoutScene::OnMatchupPointerPress(unsigned int, void* context)
     {
         BasicGameInfo* game = mTournament->GetGameInfo(1, matchup);
         GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(
-            (SceneList)0x21, SCREEN_NOTHING, false);
+            SCENE_GAME_RESULTS, SCREEN_NOTHING, false);
         if (mNetworkTournament)
         {
             results->SetResultsData(game, this,
@@ -737,7 +737,7 @@ void CupKnockoutScene::OnMatchupPointerPress(unsigned int, void* context)
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)0xA, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
     }
 }

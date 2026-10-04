@@ -33,7 +33,7 @@ public:
 
     void SetStringId(const char* id);
     const unsigned short* GetString() const;
-    void Render(eGLView view, const nlColour& colour) const;
+    void Render(GLView* view, const nlColour& colour) const;
     void SetString(const unsigned short* utf16);
     void SetScissorBox(u16 left, u16 top, u16 width, u16 height);
 

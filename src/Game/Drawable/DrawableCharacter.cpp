@@ -285,7 +285,7 @@ void DrawableCharacter::BuildNpcMatrix()
     float angle = 0.0000958738f * (float)facingDirection;
     nlMakeRotationMatrixZ(worldMatrix, angle);
     worldMatrix.SetTranslation(position);
-    fn_8030B9C8(poseAccumulator, &worldMatrix);
+    poseAccumulator->BuildNodeMatricesFromQuaternions(worldMatrix);
 }
 
 void DrawableCharacter::Render(cCharacter& source)

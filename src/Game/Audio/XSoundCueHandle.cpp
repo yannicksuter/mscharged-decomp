@@ -82,9 +82,9 @@ XSoundCueHandle::~XSoundCueHandle()
         delete instance;
 }
 
-AudioParameter* GetSoundParameter(XSoundHandle* handle, unsigned long index)
+AudioSlider* GetSoundParameter(XSoundHandle* handle, unsigned long index)
 {
-    return (AudioParameter*)(((XSoundCueHandle*)handle)->GetLocalSliders()->sliders + index);
+    return ((XSoundCueHandle*)handle)->GetLocalSliders()->sliders + index;
 }
 
 void GetSoundSources(void* handle, AudioSource** sources, unsigned int* output)
@@ -130,18 +130,18 @@ bool XSoundCueHandle::Prepare(bool callbackEnabled)
     return true;
 }
 
-void XSoundCueHandle::Stop(u8 callbackEnabled, void* value)
+void XSoundCueHandle::Stop(u8 callbackEnabled, void* force)
 {
     switch (m_State)
     {
     case 7:
-        if (value != 0)
-            this->instance->Stop(value);
+        if (force != 0)
+            this->instance->Stop(force);
         break;
     case 8:
         break;
     default:
-        this->instance->Stop(value);
+        this->instance->Stop(force);
         break;
     }
     m_CallbackEnabled = callbackEnabled;

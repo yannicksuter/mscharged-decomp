@@ -87,7 +87,7 @@ void NetworkInputManager::CaptureInputs()
     }
 
     InputRouter* router = GetInputRouter();
-    if (!router->mOutgoingQueueOverflowed)
+    if (!router->mQueueOverflowed)
     {
         if (!router->CanCaptureInput())
         {
@@ -121,7 +121,7 @@ bool NetworkInputManager::PrepareUpdate()
             return true;
         }
     }
-    else if (!router->mOutgoingQueueOverflowed)
+    else if (!router->mQueueOverflowed)
     {
         router->CheckCongestion();
         if (router->HasInput())

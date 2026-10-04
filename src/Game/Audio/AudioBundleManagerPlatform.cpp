@@ -36,7 +36,7 @@ void UnidentifiedAudioBundleManager_802ECD34::Shutdown()
     fn_802B467C(&sAudioRpcRuntimeNodePool);
     SlotPoolBase::BaseFreeBlocks(
         &sAudioRpcRuntimeNodePool, sizeof(AudioRpcRuntimeNode));
-    fn_802F4958(&m_Runtime);
+    ShutdownAudioResourceRuntime(&m_Runtime);
 
     m_Backend->Shutdown();
 }
@@ -60,7 +60,7 @@ void UnidentifiedAudioBundleManager_802ECD34::Update(float dt)
     {
         ((AudioSliderTable*)m_Chunk13100)->Update(dt);
         UpdateAudioRpcController(m_RpcController, dt);
-        fn_802F4904(&m_Runtime, dt);
+        UpdateAudioResourceRuntime(&m_Runtime, dt);
         ((AudioCalculationTable*)m_Chunk13400)->Update(dt);
     }
     m_Backend->ServiceReadQueue(dt);

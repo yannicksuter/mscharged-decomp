@@ -50,6 +50,7 @@ struct XSoundOwner
 };
 
 class XSoundHandle;
+class AudioSlider;
 struct AudioSliderSet;
 typedef void (*XSoundHitMarkerCallback)(
     void*, XSoundHandle*, void*);
@@ -91,16 +92,6 @@ public:
     void* m_CallbackContext;
 };
 
-struct AudioParameter
-{
-    u8 m_Unknown00[0xC];
-    float m_Value;
-    float m_Time;
-    u8 m_Unknown14[0x4];
-    float m_Min;
-    float m_Max;
-};
-
-AudioParameter* GetSoundParameter(XSoundHandle* handle, unsigned long index);
+AudioSlider* GetSoundParameter(XSoundHandle* handle, unsigned long index);
 
 #endif // GAME_AUDIO_XSOUND_HANDLE_H

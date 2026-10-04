@@ -16,7 +16,7 @@ class ImpostorSprite
 {
 public:
     ImpostorSprite(ImpostorCharacter* character, int texture,
-        int budget, int width, int height);
+        int capacity, int width, int height);
     ~ImpostorSprite();
 
     void Initialize(const char* name);

@@ -17,11 +17,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 
-static int sImpostorTriangleIndices[6] = { 0, 1, 2, 0, 2, 3 };
-static char sImpostorCheckerTextureName[] = "global/checkers";
-static char sImpostorMeshEndError[] = "couldn't end mMesh built by sprites\n";
-static char sImpostorMeshBeginError[] = "could not begin a mMesh for sprites\n";
-
 float gImpostorAngleJitterDegrees = 10.0f;
 unsigned long gImpostorRenderLayer = 1;
 float gImpostorFieldOfViewDegrees = 38.0f;
@@ -72,14 +67,18 @@ public:
 
 struct ImpostorQuad
 {
-    const nlVector3& GetPosition(int index) const
-    {
-        return position[index];
-    }
-
     nlVector2 texcoord[4];
     nlVector3 position[4];
 }; // size: 0x50
+
+static inline void WriteImpostorVertex(GLCompactColourMeshWriter* writer,
+    const nlVector2& texcoord, const nlVector3* positions, const int* corner,
+    const nlColour& colour)
+{
+    writer->Texcoord(texcoord.x, texcoord.y);
+    writer->Colour(colour);
+    writer->Vertex(positions[*corner]);
+}
 
 ImpostorSprite::ImpostorSprite(
     ImpostorCharacter* character, int texture, int capacity, int width,
@@ -283,6 +282,7 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
 
 int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, bool skipCapture)
 {
+    static int triangleIndices[6] = { 0, 1, 2, 0, 2, 3 };
     int rendered;
     GLCompactColourMeshWriter* writer;
     int i;
@@ -323,7 +323,7 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
     }
 
     bool hasQuads = glHasQuads();
-    static unsigned long checkerTexture = glGetTexture(sImpostorCheckerTextureName);
+    static unsigned long checkerTexture = glGetTexture("global/checkers");
 
     void* allocator;
     if (skipCapture)
@@ -384,10 +384,9 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
             {
                 for (vertex = 0; vertex < 6; ++vertex)
                 {
-                    int index = sImpostorTriangleIndices[vertex];
-                    writer->Texcoord(quad.texcoord[index]);
-                    writer->Colour(impostor->mColour);
-                    writer->Vertex(quad.GetPosition(index));
+                    const int* corner = &triangleIndices[vertex];
+                    WriteImpostorVertex(writer, quad.texcoord[*corner],
+                        quad.position, corner, impostor->mColour);
                 }
             }
             ++rendered;
@@ -402,12 +401,12 @@ int ImpostorSprite::Render(GLView* target, Impostor* impostors, bool cached, boo
         }
         else
         {
-            tDebugPrintManager::Print(DC_RENDER, sImpostorMeshEndError);
+            tDebugPrintManager::Print(DC_RENDER, "couldn't end mMesh built by sprites\n");
         }
     }
     else
     {
-        tDebugPrintManager::Print(DC_RENDER, sImpostorMeshBeginError);
+        tDebugPrintManager::Print(DC_RENDER, "could not begin a mMesh for sprites\n");
     }
 
     if (skipCapture)

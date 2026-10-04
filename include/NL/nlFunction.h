@@ -309,6 +309,11 @@ public:
         return (void*)mFreeFunction;
     }
 
+    ReturnType (*GetFreeFunction() const)(P1)
+    {
+        return mTag == FUNCTION_FREE ? mFreeFunction : 0;
+    }
+
 private:
     FunctionTag mTag;
     union

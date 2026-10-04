@@ -6,7 +6,7 @@ NetMessageFindGame::NetMessageFindGame()
 
 void NetMessageFindGame::Serialize(NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(mUnidentified08, sizeof(mUnidentified08));
+    serializer->Transfer(mToken, sizeof(mToken));
 }
 
 NetMessageFoundGame::NetMessageFoundGame()
@@ -15,11 +15,11 @@ NetMessageFoundGame::NetMessageFoundGame()
 
 void NetMessageFoundGame::Serialize(NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(mUnidentified08, sizeof(mUnidentified08));
-    serializer->Transfer(&mUnidentified10, sizeof(mUnidentified10));
-    serializer->Transfer(mUnidentified14, sizeof(mUnidentified14));
-    serializer->Transfer(&mUnidentified18, sizeof(mUnidentified18));
-    serializer->Transfer(mUnidentified1A, 11);
+    serializer->Transfer(mToken, sizeof(mToken));
+    serializer->Transfer(&mGameType, sizeof(mGameType));
+    serializer->Transfer(mAddress, sizeof(mAddress));
+    serializer->Transfer(&mPort, sizeof(mPort));
+    serializer->Transfer(mHostName, 11);
 }
 
 int NetMessageFoundGame::GetType()

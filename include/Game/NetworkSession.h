@@ -91,14 +91,16 @@ struct TransportPlayerInfo
 {
     TransportPlayerInfo()
     {
-        mUnidentified0B = 0;
+        mUserMatchDataSize = 0;
     }
 
     /* 0x00 */ char mName[11];
-    /* 0x0B */ u8 mUnidentified0B;
-    /* 0x0C */ u32 mUnidentified0C;
-    /* 0x10 */ u16 mUnidentified10;
-    /* 0x12 */ u16 mUnidentified12;
+    /* 0x0B */ u8 mUserMatchDataSize;
+    // 0x0C-0x13 hold the user match data blob (up to 8 bytes) that
+    // NetworkSession reads back as rank, wins and losses.
+    /* 0x0C */ u32 mDisplayRank;
+    /* 0x10 */ u16 mWins;
+    /* 0x12 */ u16 mLosses;
 }; // size: 0x14
 
 
@@ -221,26 +223,26 @@ struct LANGameInfo
 {
     LANGameInfo() { }
 
-    /* 0x00 */ char mUnidentified00[12];
-    /* 0x0C */ u8 mUnidentified0C[4];
-    /* 0x10 */ int mUnidentified10;
-    /* 0x14 */ float mUnidentified14;
-    /* 0x18 */ u16 mUnidentified18;
+    /* 0x00 */ char mHostName[12];
+    /* 0x0C */ u8 mAddress[4];
+    /* 0x10 */ int mGameType;
+    /* 0x14 */ float mTimeSinceSeen;
+    /* 0x18 */ u16 mPort;
 }; // size: 0x1C
 
 struct NetworkTransportPeer : public TransportPlayerInfo
 {
-    /* 0x14 */ TransportAddress mUnidentified14;
-    /* 0x18 */ int mUnidentified18;
-    /* 0x1C */ int mUnidentified1C;
-    /* 0x20 */ u16 mUnidentified20;
-    /* 0x22 */ u8 mUnidentified22;
+    /* 0x14 */ TransportAddress mAddress;
+    /* 0x18 */ int mHostState;
+    /* 0x1C */ int mConnectionIndex;
+    /* 0x20 */ u16 mPort;
+    /* 0x22 */ u8 mConnectionConfirmed;
 }; // size: 0x24
 
 struct NetworkTransportConnectionSlot
 {
     TransportConnection* m_Connection;
-    int mUnidentified04;
+    int mStatus;
 };
 
 
@@ -253,9 +255,9 @@ class NetMessageGamePeerAdded;
 class NetworkTransportInterface : public NetworkMachineRoster
 {
 public:
-    virtual int CreateGame(int value) = 0;
+    virtual int CreateGame(int gameType) = 0;
     virtual int AbortCreateGame() = 0;
-    virtual int JoinGame(LANGameInfo* game, int value) = 0;
+    virtual int JoinGame(LANGameInfo* game, int gameType) = 0;
     virtual int StartGame() = 0;
     virtual void EnumerateGames() = 0;
     virtual void SetLobbyListener(LANLobbyListener* listener) = 0;
@@ -275,7 +277,7 @@ public:
     void UnregisterMessageReceivers();
     int AbortCreateGame(int result);
     void DumpPeerInfo();
-    void SendFoundGame(const void* data);
+    void SendFoundGame(const void* token);
     void CompleteLaunch();
     void SendReadyToLaunchRequest();
     bool ArePeerConnectionsReady();
@@ -289,9 +291,9 @@ public:
     virtual unsigned int GetMachineAid(int index);
     virtual int MachineIdxFromConnection(unsigned int connection);
     virtual int GetTopology();
-    virtual void SetTopology(int value);
+    virtual void SetTopology(int topology);
     virtual int GetMaxMachineCount();
-    virtual void SetMaxMachineCount(int value);
+    virtual void SetMaxMachineCount(int count);
     virtual int GetMachineCount();
     virtual TransportPlayerInfo* GetPlayerInfo(int index);
     virtual int GetLocalMachineIndex();
@@ -306,9 +308,9 @@ public:
     virtual void OnConnectionClosed(unsigned int connection, int reason);
     virtual void OnGameStarted();
     virtual void Shutdown(bool reset);
-    virtual int CreateGame(int value);
+    virtual int CreateGame(int gameType);
     virtual int AbortCreateGame();
-    virtual int JoinGame(LANGameInfo* game, int value);
+    virtual int JoinGame(LANGameInfo* game, int gameType);
     virtual int StartGame();
     virtual void EnumerateGames();
     virtual void SetLobbyListener(LANLobbyListener* listener);
@@ -327,7 +329,7 @@ private:
             return false;
         for (int peer = 1; peer < mPeerCount; ++peer)
         {
-            if (mPeerInfoList[peer].mUnidentified18 != 3)
+            if (mPeerInfoList[peer].mHostState != 3)
                 return false;
         }
         return true;
@@ -349,7 +351,7 @@ private:
     {
         for (int index = 0; index < 8; ++index)
         {
-            if (m_ConnectionPool[index].mUnidentified04 == 0)
+            if (m_ConnectionPool[index].mStatus == 0)
                 return index;
         }
         return -1;
@@ -361,7 +363,7 @@ public:
     /* 0x010 */ int mMaxMachineCount;
     /* 0x014 */ NetworkTransportConnectionSlot m_ConnectionPool[8];
     /* 0x054 */ LANLobbyListener* mListener;
-    /* 0x058 */ LANLobbyPlayerListener* mRosterListener;
+    /* 0x058 */ LANLobbyPlayerListener* mPlayerListener;
     /* 0x05C */ LANGameInfo* mFoundGames;
     /* 0x060 */ int mFoundGameCount;
     /* 0x064 */ char mLocalPlayerName[12];
@@ -371,7 +373,7 @@ public:
     /* 0x07D */ bool mIsHost;
     /* 0x080 */ int mHostState;
     /* 0x084 */ int mGameType;
-    /* 0x088 */ int mState;
+    /* 0x088 */ int mLaunchState;
     /* 0x08C */ unsigned int mLaunchRequestTicker;
     /* 0x090 */ int mJoinState;
     /* 0x094 */ bool mLaunchConfirmationPending;

@@ -388,12 +388,14 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
             }
             else
             {
+                PadMonkey* monkey;
+                GameCubePad* gameCube;
                 classID = backend->GetClassID();
                 if (classID == gGameCubePadClassID)
                 {
                     m_nConnected = 3;
-                    PadBackend* gameCube = pad->mBackend;
-                    PADStatus* status = static_cast<GameCubePad*>(gameCube)->mCurrentStatus;
+                    gameCube = static_cast<GameCubePad*>(pad->mBackend);
+                    PADStatus* status = gameCube->mCurrentStatus;
                     m_ButtonBitfield = status->button;
                     m_LeftTrigger = (u8)(255.0f * gameCube->GetPressure(0x40, false));
                     m_RightTrigger = (u8)(255.0f * gameCube->GetPressure(0x20, false));
@@ -413,7 +415,7 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
                     if (classID == PadMonkey::sClassID)
                     {
                         m_nConnected = 3;
-                        PadMonkey* monkey = static_cast<PadMonkey*>(pad->mBackend);
+                        monkey = static_cast<PadMonkey*>(pad->mBackend);
                         m_ButtonBitfield = 0;
                         for (int button = 1; button < (1 << monkey->GetButtonCount()); button <<= 1)
                         {

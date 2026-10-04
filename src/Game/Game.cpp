@@ -33,7 +33,7 @@
 #include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/DB/StatsTracker.h"
-#include "Game/DB/GameProgress.h"
+#include "Game/DB/GameProgress.inl"
 #include "Game/Goalie.h"
 #include "Game/Net.h"
 #include "Game/NetworkSession.h"
@@ -615,6 +615,14 @@ inline void cGame::ResetCharacters()
     }
 }
 
+static inline void InitializeChallengeTeamScore(cTeam* team, int side)
+{
+    team->m_nScore = 0;
+    int score = g_pStrikerChallenge->GetScore(side);
+    score += team->m_nScore;
+    team->m_nScore = score;
+}
+
 void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
 {
     ++lbl_806E2130;
@@ -664,10 +672,8 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     else
     {
         gpNumberDisplay->SetScores(g_pStrikerChallenge->mScore[0], g_pStrikerChallenge->mScore[1]);
-        g_pTeams[0]->m_nScore = 0;
-        g_pTeams[0]->m_nScore += g_pStrikerChallenge->mScore[0];
-        g_pTeams[1]->m_nScore = 0;
-        g_pTeams[1]->m_nScore += g_pStrikerChallenge->mScore[1];
+        InitializeChallengeTeamScore(g_pTeams[0], 0);
+        InitializeChallengeTeamScore(g_pTeams[1], 1);
     }
     for (int i = 0; i < 10; i++)
     {
@@ -684,7 +690,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     {
         ChangeGameState(1);
         FixedUpdateTask* task = GetFixedUpdateTask();
-        task->mUnidentified38 = true;
+        task->mSimulationStarted = true;
     }
     else
     {
@@ -761,7 +767,7 @@ void cGame::fn_80058528(float timeScale, float transitionTime)
                 PlaySound(10, soundID, lbl_804FB284, g_pGame);
 
                 u32 hash = nlStringLowerHash(lbl_804FB294);
-                fn_802F4E84(&hash, 0, 0);
+                ApplyAudioTransition(&hash, 0, 0);
             }
 
             g_pOverlayManager->GetScene((SceneList)89)->SetVisible(false);

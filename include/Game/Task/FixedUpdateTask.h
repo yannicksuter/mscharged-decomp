@@ -42,11 +42,11 @@ public:
     void CallFixedUpdateTasks();
 
     /* 0x24 */ float mAccumulatedDeltaT;
-    /* 0x28 */ float mUnidentified28;
+    /* 0x28 */ float mInterpolationDeltaT;
     /* 0x2C */ float mSimulationTime;
     /* 0x30 */ float mfFrameLockTime;
     /* 0x34 */ u32 mFrame;
-    /* 0x38 */ bool mUnidentified38;
+    /* 0x38 */ bool mSimulationStarted;
     /* 0x3C */ EventDispatcher mEventDispatcher;
     /* 0x60 */ float mTimeScale;
     /* 0x64 */ float mTimeScaleTransitionTime;

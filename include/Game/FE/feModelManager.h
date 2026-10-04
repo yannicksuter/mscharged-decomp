@@ -52,7 +52,7 @@ public:
     /* 0x10 */ GLResourcePool* mLoader;
     /* 0x14 */ unsigned long mLoaderHandle;
     /* 0x18 */ int mModelID;
-    /* 0x1C */ void* mUnidentified1C;
+    /* 0x1C */ cSHierarchy* mHierarchy;
     /* 0x20 */ tCharacterTemplateInfo* mModelData;
     /* 0x24 */ void* mTextureFileData;
     /* 0x28 */ u32 mTextureFileDataSize;
@@ -93,7 +93,7 @@ public:
     /* 0x5C */ FEImpostorCharacter* mCharacter;
     /* 0x60 */ nlVector3 mPosition;
     /* 0x6C */ float mTime;
-    /* 0x70 */ Impostor* mModels[6];
+    /* 0x70 */ Impostor* mImpostors[6];
 }; // size: 0x88
 
 class FESkinnedModel : public FEModel
@@ -119,8 +119,8 @@ class FEModelHandle
 {
 public:
     FEModelHandle(FEModelType type, const char* name, tCharacterTemplateInfo* modelData,
-        bool unidentified59, void* unidentified4C, void* unidentified50,
-        bool unidentified5A);
+        bool mirror, void* loadedCallback, void* loadedCallbackData,
+        bool alternate);
     ~FEModelHandle() { delete mModel; }
 
     bool IsAnimationFinished();
@@ -141,12 +141,12 @@ public:
     /* 0x04 */ FEModel* mModel;
     /* 0x08 */ char mName[64];
     /* 0x48 */ const char* mDefaultAnimation;
-    /* 0x4C */ void* mUnidentified4C;
-    /* 0x50 */ void* mUnidentified50;
+    /* 0x4C */ void* mLoadedCallback;
+    /* 0x50 */ void* mLoadedCallbackData;
     /* 0x54 */ void (*mAnimationCompleteCallback)(FEModelHandle*);
     /* 0x58 */ bool mEnabled;
-    /* 0x59 */ bool mUnidentified59;
-    /* 0x5A */ bool mUnidentified5A;
+    /* 0x59 */ bool mMirror;
+    /* 0x5A */ bool mUseAlternateTextures;
     /* 0x5B */ u8 mPadding5B;
     /* 0x5C */ nlVector3 mPosition;
 }; // size: 0x68
@@ -163,11 +163,11 @@ public:
     void RegisterObject(StadiumFEModelMarker* object);
     StadiumFEModelMarker* GetObject(int id);
     FEModelHandle* CreateModel(FEModelType type, const char* name,
-        int captain, bool unidentified59, void* unidentified4C,
-        void* unidentified50, bool alternate);
+        int captain, bool mirror, void* loadedCallback,
+        void* loadedCallbackData, bool alternate);
     FEModelHandle* CreateModel(FEModelType type, const char* name,
-        tCharacterTemplateInfo* modelData, bool unidentified59, void* unidentified4C,
-        void* unidentified50, bool alternate);
+        tCharacterTemplateInfo* modelData, bool mirror, void* loadedCallback,
+        void* loadedCallbackData, bool alternate);
     bool DestroyModel(FEModelHandle* handle);
     void BeginLoadModels();
     FEModelHandle* GetModel(const char* name);
@@ -175,13 +175,13 @@ public:
 
 private:
     inline void DestroyDanglingModels();
-    inline void DestroyPendingModels();
+    inline void DestroyReleasedModels();
 
 public:
-    /* 0x04 */ nlListContainer<FEModelHandle*> mHandles;
-    /* 0x10 */ nlListContainer<StadiumFEModelMarker*> mModels;
-    /* 0x1C */ nlDLListContainer<FEModelHandle*> mPendingModels;
-    /* 0x24 */ nlDLListContainer<FEModelHandle*> mLoadedModels;
+    /* 0x04 */ nlListContainer<FEModelHandle*> mActiveModels;
+    /* 0x10 */ nlListContainer<StadiumFEModelMarker*> mObjects;
+    /* 0x1C */ nlDLListContainer<FEModelHandle*> mReleasedModels;
+    /* 0x24 */ nlDLListContainer<FEModelHandle*> mQueuedModels;
     /* 0x2C */ nlDLListContainer<FEModelHandle*> mDanglingModels;
     /* 0x34 */ unsigned long mResource;
 }; // size: 0x38

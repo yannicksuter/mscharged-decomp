@@ -214,7 +214,7 @@ void DrawableCharacter::Replay(T& frame)
         Replayable<1>(frame, (unsigned long&)effectsTexturing);
         Replayable<1>(frame, FloatCompressor<0, 7, 13>(scale));
         if (ReplayFrameTraits<T>::IsLoadFrame)
-            poseAccumulator->fn_801949E4(scale);
+            poseAccumulator->SetScale(scale);
         Replayable<1>(frame, FloatCompressor<0, 1, 7>(blendAmount));
         Replayable<1>(frame, FloatCompressor<0, 7, 5>(megaBlend));
         Replayable<1>(frame, FloatCompressor<0, 1, 7>(shadowLevel));

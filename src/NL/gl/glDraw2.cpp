@@ -23,9 +23,9 @@ static int QuadMap[4] = { 0, 1, 2, 3 };
 static int TriListMap[6] = { 0, 1, 2, 3, 0, 2 };
 
 
-extern "C" glModel* fn_802C834C(glPoly2* pPolys,
+glModel* glBuildPoly2Model(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured);
-extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
+glModel* glBuildPoly2ModelFloatUV(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured);
 
 bool glPoly2::Attach(
@@ -35,13 +35,13 @@ bool glPoly2::Attach(
         return false;
 
     GLTexturedColourMeshWriter writer;
-    glModel* model = fn_802C834C(this, 1, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig != 0);
+    glModel* model = glBuildPoly2Model(this, 1, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig != 0);
     if (model != 0)
         view->AttachModel(model, layer);
     return model != 0;
 }
 
-extern "C" glModel* fn_802C834C(glPoly2* pPolys,
+glModel* glBuildPoly2Model(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured)
 {
     GLTexturedColourMeshWriter writer;
@@ -139,7 +139,7 @@ extern "C" glModel* fn_802C834C(glPoly2* pPolys,
 bool glAttachPoly2(GLView* view, unsigned long numPolys, glPoly2* pPolys,
     unsigned long* pMatrixHandle)
 {
-    glModel* model = fn_802C834C(pPolys, numPolys, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig == 1);
+    glModel* model = glBuildPoly2Model(pPolys, numPolys, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig == 1);
     if (model == 0)
         return false;
     view->AttachModel(model, 0);
@@ -149,7 +149,7 @@ bool glAttachPoly2(GLView* view, unsigned long numPolys, glPoly2* pPolys,
 bool glAttachPoly2(GLView* view, int layer, unsigned long numPolys,
     glPoly2* pPolys, unsigned long* pMatrixHandle)
 {
-    glModel* model = fn_802C834C(pPolys, numPolys, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig == 1);
+    glModel* model = glBuildPoly2Model(pPolys, numPolys, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig == 1);
     if (model == 0)
         return false;
     view->AttachModel(model, layer);
@@ -160,7 +160,7 @@ bool glAttachPoly2(GLView* view, int layer, unsigned long numPolys,
     glPoly2* pPolys, const void* pUserData, unsigned long* pMatrixHandle)
 {
     static unsigned long scissorbox = nlStringHash("scissorbox");
-    glModel* model = fn_802C89F4(pPolys, numPolys, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig == 1);
+    glModel* model = glBuildPoly2ModelFloatUV(pPolys, numPolys, pMatrixHandle, gl_GetCurrentStateBundle()->texconfig == 1);
     if (model == 0)
         return false;
 
@@ -176,7 +176,7 @@ bool glAttachPoly2(GLView* view, int layer, unsigned long numPolys,
     return true;
 }
 
-extern "C" glModel* fn_802C89F4(glPoly2* pPolys,
+glModel* glBuildPoly2ModelFloatUV(glPoly2* pPolys,
     unsigned long numPolys, unsigned long* pMatrixHandle, bool textured)
 {
     GLFloatTexturedColourMeshWriter writer;

@@ -77,21 +77,26 @@ static inline void WriteDebugFloatData(DebugWriteCache* cache,
         = GetCurrentDebugBuffer(cache);
     DebugWriteRecordHeader header;
     header.mType = recordType;
-    header.mMarker = 0xDADA;
     header.mSize = sizeof(*value);
-    header.mPaddedSize = header.mSize;
-    if (header.mPaddedSize % 4 != 0)
+    header.mMarker = 0xDADA;
+    unsigned int dataSize = header.mSize;
+    u16 remainder = dataSize % 4;
+    if (remainder == 0)
     {
-        header.mPaddedSize += 4 - (header.mPaddedSize % 4);
+        header.mPaddedSize = dataSize;
+    }
+    else
+    {
+        header.mPaddedSize = dataSize + (4 - remainder);
     }
 
-    if (buffer->mCurrent + sizeof(header) + sizeof(*value)
+    if (buffer->mCurrent + sizeof(header) + dataSize
         < buffer->mData + buffer->mSize)
     {
         memcpy(buffer->mCurrent, &header, sizeof(header));
         buffer->mCurrent += sizeof(header);
-        memcpy(buffer->mCurrent, value, sizeof(*value));
-        buffer->mCurrent += sizeof(*value);
+        memcpy(buffer->mCurrent, value, dataSize);
+        buffer->mCurrent += dataSize;
 
         for (int i = header.mSize; i < header.mPaddedSize; ++i)
         {

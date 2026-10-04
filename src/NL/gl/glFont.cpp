@@ -1,4 +1,3 @@
-#include "NL/gl/glTexture.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glFont.h"
@@ -28,39 +27,38 @@ char sLargeFontName[] __attribute__((aligned(4))) = "font/fixedWidthLarge";
 char sMediumFontName[] __attribute__((aligned(4))) = "font/fixedWidthMedium";
 char sSmallFontName[] __attribute__((aligned(4))) = "font/fixedWidthSmall";
 
-const char* lbl_806DF3D0 = sLargeFontName;
-const char* lbl_806DF3D4 = sMediumFontName;
-const char* lbl_806DF3D8 = sSmallFontName;
+const char* sLargeFontTextureName = sLargeFontName;
+const char* sMediumFontTextureName = sMediumFontName;
+const char* sSmallFontTextureName = sSmallFontName;
 
 #include "NL/gl/font_data.h"
-#include "NL/gl/glTexture.h"
 
-int lbl_8052E1C8[3] = { 8, 9, 11 };
-int lbl_8052E1D4[3] = { 12, 15, 18 };
-int lbl_8052E1E0[3] = { 9, 10, 12 };
-int lbl_8052E1EC[3] = { 13, 16, 20 };
-int lbl_8052E1F8[3] = { 128, 128, 128 };
-int lbl_8052E204[3] = { 256, 256, 256 };
-int lbl_8052E210[4] = { 14, 12, 10, 0 };
+int sFontCharacterWidth[3] = { 8, 9, 11 };
+int sFontCharacterHeight[3] = { 12, 15, 18 };
+int sFontCellWidth[3] = { 9, 10, 12 };
+int sFontCellHeight[3] = { 13, 16, 20 };
+int sFontTextureWidth[3] = { 128, 128, 128 };
+int sFontTextureHeight[3] = { 256, 256, 256 };
+int sFontCharactersPerRow[4] = { 14, 12, 10, 0 };
 
-const char* lbl_8057C798[4] = { lbl_806DF3D8, lbl_806DF3D4, lbl_806DF3D0 };
-glPoly2 lbl_8057C7A8[128];
+const char* sFontTextureNames[4] = { sSmallFontTextureName, sMediumFontTextureName, sLargeFontTextureName };
+glPoly2 sFontPolys[128];
 
-float lbl_806DF3DC = 0.5f;
-float lbl_806DF3E0 = 0.5f;
-char lbl_806DF3E4[] = "RLFont";
+float sFontOffsetX = 0.5f;
+float sFontOffsetY = 0.5f;
+char sFontResourceName[] = "RLFont";
 
-int lbl_806E1EB8;
-float lbl_806E1EBC;
-float lbl_806E1EC0;
-int lbl_806E1EC4;
-float lbl_806E1EC8;
-bool lbl_806E1ECC;
-bool lbl_806E1ECD;
-bool lbl_806E1ECE;
-bool lbl_806E1ECF;
+int sDefaultFont;
+float sFontExtraWidth;
+float sFontExtraHeight;
+int sCurrentFont;
+float sFontZ;
+bool sFontInsideBegin;
+bool sFontDropShadow;
+bool sFontEnabled;
+bool sFontVirtualCoords;
 
-void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageWidth, int font)
+void glFontBlitCharacter(int x, int y, char character, unsigned short* image, int imageWidth, int font)
 {
     unsigned short* characterData;
 
@@ -80,8 +78,8 @@ void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageW
         break;
     }
 
-    const int endX = x + lbl_8052E1C8[font];
-    const int endY = y + lbl_8052E1D4[font];
+    const int endX = x + sFontCharacterWidth[font];
+    const int endY = y + sFontCharacterHeight[font];
 
     for (int imageY = y; imageY < endY; ++imageY)
     {
@@ -110,13 +108,13 @@ void fn_802C9A0C(int x, int y, char character, unsigned short* image, int imageW
 
 void gl_FontStartup()
 {
-    glBeginResource(lbl_806DF3E4);
+    glBeginResource(sFontResourceName);
 
     for (eGLFont font = GLFONT_Small; font < GLFONT_Count; font = (eGLFont)(font + 1))
     {
-        unsigned long texture = glGetTexture(lbl_8057C798[font]);
-        int width = lbl_8052E1F8[font];
-        int height = lbl_8052E204[font];
+        unsigned long texture = glGetTexture(sFontTextureNames[font]);
+        int width = sFontTextureWidth[font];
+        int height = sFontTextureHeight[font];
         unsigned long imageSize = width * height * sizeof(unsigned short);
         unsigned short* image = (unsigned short*)nlMalloc(imageSize, 8, false);
         nlZeroMemory(image, imageSize);
@@ -125,12 +123,12 @@ void gl_FontStartup()
         int y = 0;
         for (int character = 0; character < 0x5E; ++character)
         {
-            fn_802C9A0C(x, y, character + 0x20, image, width, font);
-            x += lbl_8052E1E0[font];
-            if (x + lbl_8052E1E0[font] >= width)
+            glFontBlitCharacter(x, y, character + 0x20, image, width, font);
+            x += sFontCellWidth[font];
+            if (x + sFontCellWidth[font] >= width)
             {
                 x = 0;
-                y += lbl_8052E1EC[font];
+                y += sFontCellHeight[font];
             }
         }
 
@@ -141,67 +139,67 @@ void gl_FontStartup()
         delete[] image;
     }
 
-    lbl_806E1ECC = false;
-    lbl_806E1ECE = true;
-    lbl_806E1ECD = false;
-    lbl_806E1ECF = true;
+    sFontInsideBegin = false;
+    sFontEnabled = true;
+    sFontDropShadow = false;
+    sFontVirtualCoords = true;
     glEndResource();
 }
 
 int glFontSetFont(int font)
 {
-    int previous = lbl_806E1EC4;
+    int previous = sCurrentFont;
     if (font == 4)
     {
-        font = lbl_806E1EB8;
+        font = sDefaultFont;
     }
-    lbl_806E1EC4 = font;
+    sCurrentFont = font;
     return previous;
 }
 
-int fn_802C9CC8(GLView* renderView)
+int glFontGetScreenHeight(GLView* renderView)
 {
-    return ((int)glViewGetOrthographicHeight(renderView) - 100) / lbl_8052E1EC[lbl_806E1EC4];
+    return ((int)glViewGetOrthographicHeight(renderView) - 100) / sFontCellHeight[sCurrentFont];
 }
 
 void glFontVirtualPosToScreenCoordPos(float x, float y, float& outX, float& outY)
 {
-    int font = lbl_806E1EC4;
-    outX = x * lbl_8052E1E0[font] + 45.0f;
-    outY = y * lbl_8052E1EC[font] + 50.0f;
+    int font = sCurrentFont;
+    outX = x * sFontCellWidth[font] + 45.0f;
+    outY = y * sFontCellHeight[font] + 50.0f;
 }
 
 void glFontBegin(bool drop)
 {
-    if (lbl_806E1ECE)
+    if (sFontEnabled)
     {
-        unsigned long texture = glGetTexture(lbl_8057C798[lbl_806E1EC4]);
+        unsigned long texture = glGetTexture(sFontTextureNames[sCurrentFont]);
         glSetDefaultState(false);
         glSetCurrentTexture(texture, GLTT_Diffuse);
         glSetRasterState(GLS_AlphaTest, 1);
         glSetCurrentRasterState(glHandleizeRasterState());
-        lbl_806E1ECD = drop;
-        lbl_806E1ECC = true;
+        sFontDropShadow = drop;
+        sFontInsideBegin = true;
     }
 }
 
 void glFontEnd()
 {
-    if (lbl_806E1ECE)
+    if (sFontEnabled)
     {
-        lbl_806E1ECC = false;
+        sFontInsideBegin = false;
     }
 }
 
 static void _Putchar(glPoly2& poly, void*, float sx, float sy, int characterIndex, const nlColour& colour, int font)
 {
-    const int charactersPerRow = lbl_8052E210[font];
-    float s = (float)((characterIndex % charactersPerRow) * lbl_8052E1E0[font]);
-    float t = (float)((characterIndex / charactersPerRow) * lbl_8052E1EC[font]);
-    float inverseTextureWidth = 1.0f / (float)lbl_8052E1F8[font];
-    float inverseTextureHeight = 1.0f / (float)lbl_8052E204[font];
-    float characterWidth = (float)lbl_8052E1C8[font];
-    float characterHeight = (float)lbl_8052E1D4[font];
+    const int charactersPerRow = sFontCharactersPerRow[font];
+    float s = (float)((characterIndex % charactersPerRow) * sFontCellWidth[font]);
+    float t = (float)((characterIndex / charactersPerRow) * sFontCellHeight[font]);
+    float inverseTextureWidth = 1.0f / (float)sFontTextureWidth[font];
+    float inverseTextureHeight = 1.0f / (float)sFontTextureHeight[font];
+    float characterWidth = (float)sFontCharacterWidth[font];
+    float characterHeight = (float)sFontCharacterHeight[font];
 
     poly.m_uv[0].x = s * inverseTextureWidth;
     poly.m_uv[0].y = t * inverseTextureHeight;
@@ -213,14 +211,14 @@ static void _Putchar(glPoly2& poly, void*, float sx, float sy, int characterInde
     poly.m_uv[3].y = t * inverseTextureHeight;
 
     float y;
-    float x = sx + lbl_806DF3DC;
-    y = sy + lbl_806DF3E0;
+    float x = sx + sFontOffsetX;
+    y = sy + sFontOffsetY;
     nlVec2Set(poly.m_pos[0], x, y);
-    nlVec2Set(poly.m_pos[1], x, y + (float)lbl_8052E1D4[font] + lbl_806E1EC0);
-    nlVec2Set(poly.m_pos[2], x + (float)lbl_8052E1C8[font] + lbl_806E1EBC, y + (float)lbl_8052E1D4[font] + lbl_806E1EC0);
-    nlVec2Set(poly.m_pos[3], x + (float)lbl_8052E1C8[font] + lbl_806E1EBC, y);
+    nlVec2Set(poly.m_pos[1], x, y + (float)sFontCharacterHeight[font] + sFontExtraHeight);
+    nlVec2Set(poly.m_pos[2], x + (float)sFontCharacterWidth[font] + sFontExtraWidth, y + (float)sFontCharacterHeight[font] + sFontExtraHeight);
+    nlVec2Set(poly.m_pos[3], x + (float)sFontCharacterWidth[font] + sFontExtraWidth, y);
 
-    poly.depth = lbl_806E1EC8;
+    poly.depth = sFontZ;
     poly.m_colour[0] = colour;
     poly.m_colour[1] = colour;
     poly.m_colour[2] = colour;
@@ -229,22 +227,22 @@ static void _Putchar(glPoly2& poly, void*, float sx, float sy, int characterInde
 
 int glFontPrint(void* renderView, eGLView view, int virtualX, int virtualY, const nlColour& colour, const char* str)
 {
-    int font = lbl_806E1EC4;
+    int font = sCurrentFont;
     if (nlStrLen(str) == 0)
     {
         return 0;
     }
-    if (!lbl_806E1ECE)
+    if (!sFontEnabled)
     {
         return 0;
     }
 
     int screenX;
     int screenY;
-    if (lbl_806E1ECF)
+    if (sFontVirtualCoords)
     {
-        screenX = virtualX * lbl_8052E1E0[font] + 45;
-        screenY = virtualY * lbl_8052E1EC[font] + 50;
+        screenX = virtualX * sFontCellWidth[font] + 45;
+        screenY = virtualY * sFontCellHeight[font] + 50;
     }
     else
     {
@@ -254,28 +252,28 @@ int glFontPrint(void* renderView, eGLView view, int virtualX, int virtualY, cons
 
     nlStrLen(str);
     int numChars = 0;
-    glPoly2* poly = lbl_8057C7A8;
+    glPoly2* poly = sFontPolys;
     const char* current = str;
     while (*current != '\0')
     {
         if (*current >= 0x20 && *current <= 0x7E)
         {
-            _Putchar(*poly, renderView, (float)screenX, (float)screenY, *current - 0x20, colour, lbl_806E1EC4);
+            _Putchar(*poly, renderView, (float)screenX, (float)screenY, *current - 0x20, colour, sCurrentFont);
             ++poly;
             ++numChars;
         }
         else if (*current == '\n')
         {
-            screenY += lbl_8052E1EC[font];
-            screenX = 45 - lbl_8052E1E0[font];
+            screenY += sFontCellHeight[font];
+            screenX = 45 - sFontCellWidth[font];
         }
-        screenX += lbl_8052E1E0[font];
+        screenX += sFontCellWidth[font];
         ++current;
     }
 
-    if (lbl_806E1ECD)
+    if (sFontDropShadow)
     {
-        poly = lbl_8057C7A8;
+        poly = sFontPolys;
         for (int i = 0; i < numChars; ++i)
         {
             for (int j = 0; j < 4; ++j)
@@ -290,9 +288,9 @@ int glFontPrint(void* renderView, eGLView view, int virtualX, int virtualY, cons
             poly[i].depth += -0.001f;
         }
 
-        glAttachPoly2((GLView*)renderView, view, numChars, lbl_8057C7A8, 0);
+        glAttachPoly2((GLView*)renderView, view, numChars, sFontPolys, 0);
 
-        poly = lbl_8057C7A8;
+        poly = sFontPolys;
         for (int i = 0; i < numChars; ++i)
         {
             for (int j = 0; j < 4; ++j)
@@ -301,11 +299,11 @@ int glFontPrint(void* renderView, eGLView view, int virtualX, int virtualY, cons
                 poly[i].m_pos[j].x -= 3.0f;
                 poly[i].m_pos[j].y -= 3.0f;
             }
-            poly[i].depth = lbl_806E1EC8;
+            poly[i].depth = sFontZ;
         }
     }
 
-    glAttachPoly2((GLView*)renderView, view, numChars, lbl_8057C7A8, 0);
+    glAttachPoly2((GLView*)renderView, view, numChars, sFontPolys, 0);
     return numChars;
 }
 
@@ -329,7 +327,7 @@ int glFontPrintf(void* renderView, int x, int y, const char* format, ...)
     FontStringBuffer string;
     va_list args;
 
-    if (!lbl_806E1ECE)
+    if (!sFontEnabled)
     {
         return 0;
     }
@@ -351,7 +349,7 @@ int glFontPrintf(void* renderView, int x, int y, const nlColour& colour, const c
     va_list args;
     char string[0x84];
 
-    if (!lbl_806E1ECE)
+    if (!sFontEnabled)
     {
         return 0;
     }
@@ -368,7 +366,7 @@ int glFontPrintf(void* renderView, eGLView view, int x, int y, const nlColour& c
     va_list args;
     char string[0x84];
 
-    if (!lbl_806E1ECE)
+    if (!sFontEnabled)
     {
         return 0;
     }
@@ -382,8 +380,8 @@ int glFontPrintf(void* renderView, eGLView view, int x, int y, const nlColour& c
 
 bool glFontVirtualCoordinates(bool virtualCoordinates)
 {
-    bool previous = lbl_806E1ECF;
-    lbl_806E1ECF = virtualCoordinates;
+    bool previous = sFontVirtualCoords;
+    sFontVirtualCoords = virtualCoordinates;
     return previous;
 }
 

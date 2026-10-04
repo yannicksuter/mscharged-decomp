@@ -21,26 +21,26 @@
 #include "NL/nlstring_tmpl.h"
 #include "NL/nlFunction.h"
 
-int lbl_806DD830 = 10;
+int gOnlineRankingCountdownSeconds = 10;
 
-UnidentifiedOnlineRankingScene::UnidentifiedOnlineRankingScene()
+OnlineRankingOverlay::OnlineRankingOverlay()
     : BaseOverlayHandler(0xFFFFFFFF, POSITION_ALL)
-    , mUnidentified188(1.0f,
+    , mCountdownTimer(1.0f,
           Function<FETimer*>(Bind<void>(
-              MemFun(&UnidentifiedOnlineRankingScene::fn_801F048C), this, Placeholder<0>())))
+              MemFun(&OnlineRankingOverlay::OnCountdownTick), this, Placeholder<0>())))
 {
-    mUnidentified1A4 = false;
-    mUnidentified1A5 = false;
-    mUnidentified1A6 = false;
-    mUnidentified1A8 = lbl_806DD830;
-    mUnidentified188.SetEnabled(true);
+    mCountdownTicked = false;
+    mPlayingOutSlide = false;
+    mResultsDisplayed = false;
+    mCountdownSeconds = gOnlineRankingCountdownSeconds;
+    mCountdownTimer.SetEnabled(true);
 }
 
-UnidentifiedOnlineRankingScene::~UnidentifiedOnlineRankingScene()
+OnlineRankingOverlay::~OnlineRankingOverlay()
 {
 }
 
-void UnidentifiedOnlineRankingScene::SceneCreated()
+void OnlineRankingOverlay::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
     for (int i = 0; i < 4; ++i)
@@ -49,24 +49,24 @@ void UnidentifiedOnlineRankingScene::SceneCreated()
     }
     NetworkStatsManager* stats = NetworkStatsManager::Instance();
     mTotalPoints = stats->mCurrentJob;
-    mUnidentified1B0 = stats->mUnidentifiedC430;
-    mUnidentified1B1 = stats->mUnidentifiedC431;
+    mWon = stats->mUnidentifiedC430;
+    mTied = stats->mUnidentifiedC431;
     mScorePoints = stats->mUnidentifiedC434;
     mGoalPoints = stats->mUnidentifiedC438;
-    mUnidentified1BC = stats->mUnidentifiedC43C;
+    mBonusPoints = stats->mUnidentifiedC43C;
     FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation, "out", "Layer", "screen", "TimerText")->SetVisible(false);
 }
 
-void UnidentifiedOnlineRankingScene::fn_801F048C(FETimer* timer)
+void OnlineRankingOverlay::OnCountdownTick(FETimer* timer)
 {
-    mUnidentified1A4 = true;
-    --mUnidentified1A8;
+    mCountdownTicked = true;
+    --mCountdownSeconds;
 }
 
-void UnidentifiedOnlineRankingScene::Update(float dt)
+void OnlineRankingOverlay::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
-    if (mUnidentified1A5)
+    if (mPlayingOutSlide)
     {
         TLSlide* slide = mPresentation->GetActiveSlide();
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
@@ -76,22 +76,22 @@ void UnidentifiedOnlineRankingScene::Update(float dt)
         }
         return;
     }
-    mUnidentified188.Update(dt);
-    if (!mUnidentified1A6 || mUnidentified1A4)
+    mCountdownTimer.Update(dt);
+    if (!mResultsDisplayed || mCountdownTicked)
     {
-        fn_801F05D4();
-        mUnidentified1A6 = true;
-        if (mUnidentified1A4)
-            mUnidentified1A4 = false;
+        UpdateResultsDisplay();
+        mResultsDisplayed = true;
+        if (mCountdownTicked)
+            mCountdownTicked = false;
     }
-    if (mUnidentified1A8 <= 0)
+    if (mCountdownSeconds <= 0)
     {
         GetNavigationScene()->GetTimer()->SetVisible(false);
         SetPointerEnabled(false);
         if (GameInfoManager::Instance()->mCurrentMode == 0)
         {
             mPresentation->SetActiveSlide("out", true);
-            mUnidentified1A5 = true;
+            mPlayingOutSlide = true;
         }
         else
         {
@@ -101,7 +101,7 @@ void UnidentifiedOnlineRankingScene::Update(float dt)
     }
 }
 
-void UnidentifiedOnlineRankingScene::fn_801F05D4()
+void OnlineRankingOverlay::UpdateResultsDisplay()
 {
     FEPresentation* presentation = mFEScene->GetPackage()->GetPresentation();
     TLInstance* screen = FEFinder<TLInstance, TLAT_UNKNOWN>::Find<TLSlide>(presentation->GetActiveSlide(), "Layer", "screen");
@@ -109,7 +109,7 @@ void UnidentifiedOnlineRankingScene::fn_801F05D4()
     TLTextInstance* timer = static_cast<TLTextInstance*>(GetNavigationScene()->GetTimer());
     GetNavigationScene()->SetTimerVisible(true);
     char countdown[12];
-    nlSNPrintf(countdown, 12, "%d", mUnidentified1A8);
+    nlSNPrintf(countdown, 12, "%d", mCountdownSeconds);
     nlStrToWcs(countdown, mTimerText, 12);
     timer->SetString(mTimerText);
 

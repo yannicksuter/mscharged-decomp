@@ -539,7 +539,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
     int charIdx = -1;
     if (nlStrICmp(target, "ball") == 0)
     {
-        EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+        EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
         if (ctrl != 0)
         {
             ctrl->m_uUserData = (u32)player;
@@ -549,7 +549,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
     }
     if (nlStrICmp(target, "ballpos") == 0)
     {
-        EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+        EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
         if (ctrl != 0)
         {
             ReplayManager* manager = ReplayManager::Instance();
@@ -593,7 +593,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
     if (charIdx >= 0 && charIdx < MAX_NUM_CHARACTERS)
     {
         void* context = g_pCharacters[charIdx];
-        EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+        EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
         if (ctrl == 0)
             return;
         ctrl->SetAnimController(*nis.mCharacterControllers[charIdx]);
@@ -610,7 +610,7 @@ void Nis::Trigger::FireEffect(const Nis& nis) const
                 && nlStrNICmp(target, nis.mImpostorNames[i], nlStrLen(nis.mImpostorNames[i])) == 0
                 && nis.mImpostorSuffixes[i] == target[nlStrLen(target) - 1])
             {
-                EmissionController* ctrl = fn_802E7DC4(EmissionManager::Instance(), name, 0, true, 0);
+                EmissionController* ctrl = EmissionManager::Instance()->Create(name, 0, true, 0);
                 if (ctrl == 0)
                     return;
                 ctrl->SetAnimController(*nis.mImpostors[i]->mAnimController);

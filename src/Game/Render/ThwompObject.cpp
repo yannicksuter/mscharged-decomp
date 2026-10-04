@@ -325,8 +325,7 @@ void ThwompObject::SetState(eThwompState state)
     {
         mLandingTimer = gThwompLandingTime;
         mState = THWOMP_STATE_LANDED;
-        EmissionController* controller = fn_802E7DC4(
-            EmissionManager::Instance(), gThwompLandingEffectName, 2, true, false);
+        EmissionController* controller = EmissionManager::Instance()->Create(gThwompLandingEffectName, 2, true, false);
         controller->SetPosition(mPhysics->GetPosition());
         controller->SetVelocity(v3Zero);
     }

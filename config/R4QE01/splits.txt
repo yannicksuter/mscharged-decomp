@@ -2314,16 +2314,17 @@ Game/Render/RLViewLayers.cpp:
 Game/Render/StadiumLoading.cpp:
 	.text       start:0x80276264 end:0x80277E28
 	.ctors      start:0x804DB7CC end:0x804DB7D0
-	.data       start:0x80521CA0 end:0x80522310
+	.data       start:0x80521CA0 end:0x80522330
 	.bss        start:0x8057A698 end:0x8057AB50
 	.sdata      start:0x806DEE30 end:0x806DEE70
 	.sbss       start:0x806E1960 end:0x806E19A8
+	.sdata2     start:0x806E5C48 end:0x806E5C58
 
 Game/BasicStadium.cpp:
 	.text       start:0x80277E28 end:0x80278EA4
 	.ctors      start:0x804DB7D0 end:0x804DB7D4
-	.data       start:0x80522310 end:0x80522428
-	.sdata2     start:0x806E5C48 end:0x806E5C70
+	.data       start:0x80522330 end:0x80522428
+	.sdata2     start:0x806E5C58 end:0x806E5C70
 
 Game/Render/StadiumTweaks.cpp:
 	.text       start:0x80278EA4 end:0x8027944C
@@ -3621,13 +3622,17 @@ Game/Effects/EmissionController.cpp:
 	.sdata2     start:0x806E6558 end:0x806E6570
 
 Game/Effects/EmissionManager.cpp:
-	.text       start:0x802E5B60 end:0x802EB344
-	.ctors      start:0x804DBA30 end:0x804DBA38
+	.text       start:0x802E5B60 end:0x802EAF64
+	.ctors      start:0x804DBA30 end:0x804DBA34
 	.data       start:0x8052F0E8 end:0x8052F3A0
 	.bss        start:0x8057F6A8 end:0x8057F928
 	.sdata      start:0x806DF488 end:0x806DF4C8
 	.sbss       start:0x806E1FD4 end:0x806E2010 align:4
 	.sdata2     start:0x806E6570 end:0x806E65A0
+
+Game/Effects/EffectsBundleData.cpp:
+	.text       start:0x802EAF64 end:0x802EB344
+	.ctors      start:0x804DBA34 end:0x804DBA38
 
 Game/Task/ParticleUpdateTask.cpp:
 	.text       start:0x802EB344 end:0x802EB5BC
@@ -3928,8 +3933,7 @@ Game/Font/fontmanager.cpp:
 	.ctors      start:0x804DBA8C end:0x804DBA90
 	.data       start:0x8052FF40 end:0x8052FFA8
 	.bss        start:0x80580748 end:0x80584048
-	.sbss       start:0x806E2090 end:0x806E2098
-	.sdata2     start:0x806E676C end:0x806E6770 align:4
+	.sbss       start:0x806E2090 end:0x806E2094
 
 NL/PointerEntryTable.cpp:
 	.text       start:0x80307620 end:0x803077B4
@@ -4250,7 +4254,7 @@ Game/NetworkRandomSeed.cpp:
 Game/InputRouter.cpp:
 	.text       start:0x80332EDC end:0x80336B6C
 	.ctors      start:0x804DBAE4 end:0x804DBAE8
-	.data       start:0x80533508 end:0x80533BB8
+	.data       start:0x80533508 end:0x80533B68
 	.bss        start:0x80584900 end:0x80584B68 align:4
 	.sdata      start:0x806DF750 end:0x806DF7A8
 	.sbss       start:0x806E2150 end:0x806E2160
@@ -4258,7 +4262,7 @@ Game/InputRouter.cpp:
 Game/NetworkInput.cpp:
 	.text       start:0x80336B6C end:0x80338898
 	.ctors      start:0x804DBAE8 end:0x804DBAEC
-	.data       start:0x80533BB8 end:0x80533C00
+	.data       start:0x80533B68 end:0x80533C00
 	.bss        start:0x80584B68 end:0x80584B88
 	.sdata      start:0x806DF7A8 end:0x806DF7B0
 	.sbss       start:0x806E2160 end:0x806E2168

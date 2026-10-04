@@ -3,6 +3,7 @@
 #include "Game/Audio/AudioResourcePlatform.h"
 
 #include "Game/Audio/AudioEffect.h"
+#include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioSystem.h"
 #include "NL/nlMemory.h"
 #include "NL/nlFileGC.h"
@@ -16,10 +17,6 @@
 #include "Game/Audio/RegistryPools.h"
 
 static bool sDoubleMixUpdate = true;
-static const int sDpl2ReverbAuxiliary = 1;
-static const int sDpl2DelayAuxiliary = 0;
-static const int sReverbAuxiliary = 1;
-static const int sDelayAuxiliary = 0;
 
 AudioSource* g_pAudioSourceList;
 u32 gAudioSourceListCount;
@@ -338,22 +335,26 @@ void AudioBackend::InitializeAuxEffects()
 {
     AXFXSetHooks(AllocateAudioEffectMemory, FreeAudioEffectMemory);
     if (g_pAuxEffectMap == 0)
-        g_pAuxEffectMap = new (8, false) AuxEffectMap;
+    {
+        void* storage = nlMalloc(sizeof(AuxEffectMap), 8, false);
+        new (storage) AuxEffectMap;
+        g_pAuxEffectMap = static_cast<AuxEffectMap*>(storage);
+    }
     if (m_OutputMode == 3)
     {
-        g_pAuxEffectMap->AssignAuxiliary(sDpl2ReverbAuxiliary);
+        g_pAuxEffectMap->AssignAuxiliary(1);
         SetDefaultReverbSettings(&m_Unknown454.m_Reverb);
         AXFXReverbHiInitDpl2(&m_Unknown454.m_ReverbDpl2);
-        g_pAuxEffectMap->AssignAuxiliary(sDpl2DelayAuxiliary);
+        g_pAuxEffectMap->AssignAuxiliary(0);
         SetDefaultDelaySettings(&m_DelayEffect.m_Delay);
         AXFXDelayExpInitDpl2(&m_DelayEffect.m_DelayDpl2);
     }
     else
     {
-        g_pAuxEffectMap->AssignAuxiliary(sReverbAuxiliary);
+        g_pAuxEffectMap->AssignAuxiliary(1);
         SetDefaultReverbSettings(&m_Unknown454.m_Reverb);
         AXFXReverbHiInit(&m_Unknown454.m_Reverb);
-        g_pAuxEffectMap->AssignAuxiliary(sDelayAuxiliary);
+        g_pAuxEffectMap->AssignAuxiliary(0);
         SetDefaultDelaySettings(&m_DelayEffect.m_Delay);
         AXFXDelayInit(&m_DelayEffect.m_Delay);
     }

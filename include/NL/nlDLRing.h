@@ -260,6 +260,8 @@ public:
 
     bool hasNext() const { return m_Curr != 0; }
 
+    bool IsDone() const { return m_Curr == 0; }
+
     bool IsStart() const { return nlDLRingIsStart(m_Head, m_Curr); }
 
     bool IsEnd() const { return nlDLRingIsEnd(m_Head, m_Curr); }

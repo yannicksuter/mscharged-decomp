@@ -25,8 +25,8 @@ private:
     float mDuration;
 };
 
-bool fn_802BD63C();
-void fn_802BD644(const char* format, ...);
-void fn_802BD718(const char* name, const char* units, float value);
+bool IsSmokeTestEnabled();
+void SmokeTestLog(const char* format, ...);
+void SmokeTestLogGraphValue(const char* name, const char* units, float value);
 
 #endif // GAME_TASK_SMOKE_TEST_UPDATE_TASK_H

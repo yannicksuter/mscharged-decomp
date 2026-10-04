@@ -64,6 +64,7 @@ public:
 
     EffectsGroup* GetEffectsGroup(const char* name);
     EmissionController* Create(EffectsGroup* pEffectsGroup, int view, bool addToEnd, unsigned short id);
+    EmissionController* Create(const char* name, int view, bool addToEnd, int id);
 
     void Startup(void* context, int numParticles, int maxRenderedParticles);
     void Shutdown();
@@ -120,9 +121,6 @@ public:
     /* 0x1F8 */ bool unknown_0x1F8;
     /* 0x1F9 */ u8 unknown_0x1F9[0x03];
 };
-
-extern "C" EmissionController* fn_802E7DC4(
-    EmissionManager*, const char*, int, bool, unsigned short);
 
 extern "C" void Startup(EmissionManager*, void*, int, int);
 EmissionManager* GetEmissionManager();

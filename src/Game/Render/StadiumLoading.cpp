@@ -29,32 +29,30 @@
 #include "Game/Render/HighRange.h"
 #include "Game/Render/PlanarShadowDrawable.h"
 #include "Game/GameObjectLighting.h"
+#include "Game/AI/Powerups.h"
+#include "Game/Field.h"
+#include "Game/Physics/PhysicsNet.h"
+#include "Game/Render/ImpostorLighting.h"
+#include "Game/TweakFileLoader.h"
+#include "Game/Render/RenderShadow.h"
+#include "NL/gl/glState.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 extern "C"
 {
-    DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
-    void fn_80278818(BasicStadium* stadium);
-    float fn_802789A0(BasicStadium* stadium);
-    void fn_8027313C();
-
-    extern char StadiumExcludedMetalShellModel[];
-    extern char StadiumModelCloneNameFormat[];
-    extern char StadiumResourcePathFormat[];
-    extern char StadiumTextureBundlePathFormat[7];
-    extern char StadiumModelBundlePathFormat[7];
-    extern char StadiumTextureResourceLabel[4];
-    extern char StadiumModelResourceLabel[6];
-    extern StadiumLoadResult gTournamentTrophyLoadResults[3];
     extern bool lbl_806DEE60;
-    extern char lbl_806DEE64[6];
-    extern char lbl_805222F0[0x11];
-    extern char lbl_80522304[9];
-    extern bool lbl_806E1960;
-    extern int lbl_806E1968;
-    extern StadiumTweaks* lbl_806E196C;
-    extern DrawableObject* lbl_8057AB20[12];
+    bool lbl_806E1960;
+    bool gDisableHighRange;
+    BasicStadium* pBasicStadiumInstance;
+    int lbl_806E1968;
+    StadiumTweaks* lbl_806E196C;
+    unsigned long lbl_806DEE30 = -1;
+    unsigned long lbl_806DEE34 = -1;
 }
+DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
+void fn_80278818(BasicStadium* stadium, nlVector4* corners);
+float fn_802789A0(BasicStadium* stadium);
+float fn_8027313C();
 void fn_802785FC(BasicStadium* stadium, float fDeltaT);
 void fn_8027876C(BasicStadium* stadium, DrawableObject* object);
 
@@ -70,7 +68,44 @@ unsigned int gStadiumEffectsRequest;
 void* gStadiumNonResidentEffectsData;
 bool gStadiumNonResidentEffectsRequested;
 void* gStadiumLoadBuffers[2];
+char gStadiumName[32];
+char gStadiumResourcePath[256];
 StadiumLoadResult gStadiumModelLoadResults[2][22];
+StadiumLoadResult gTournamentTrophyLoadResults[2];
+DrawableObject* gStadiumSingleModelInstances[22];
+DrawableObject* gStadiumCameraInstances[10];
+DrawableObject* gStadiumBallInstances[10];
+DrawableObject* gStadiumBulletBillInstances[6];
+DrawableObject* gStadiumHammerInstances[15];
+DrawableObject* gStadiumDaisyFistInstances[8];
+DrawableObject* gStadiumThwompInstances[8];
+DrawableObject* gStadiumNumberInstances[12];
+
+StadiumModelEntry gStadiumModelEntries[22] =
+{
+    { 0, "art/objects/gameplay/ball", 10, gStadiumBallInstances, -1, -1, -1 },
+    { 1, "art/objects/gameplay/bulletbill", 6, gStadiumBulletBillInstances, -1, 7, -1 },
+    { 2, "art/objects/gameplay/hammer", 15, gStadiumHammerInstances, -1, 2, -1 },
+    { 3, "art/objects/gameplay/yoshi_egg", 1, &gStadiumSingleModelInstances[3], 8, -1, -1 },
+    { 4, "art/objects/gameplay/birdo_egg", 1, &gStadiumSingleModelInstances[4], -1, 3, -1 },
+    { 5, "art/objects/gameplay/koopa_shell", 1, &gStadiumSingleModelInstances[5], -1, 1, -1 },
+    { 6, "art/objects/gameplay/daisy_fist", 8, gStadiumDaisyFistInstances, 2, -1, -1 },
+    { 7, "art/objects/cameras/flyingcamera3", 10, gStadiumCameraInstances, 5, -1, -1 },
+    { 8, "art/objects/gameplay/thwomp", 8, gStadiumThwompInstances, -1, -1, 15 },
+    { 9, "art/objects/gameplay/Number0", 1, &gStadiumNumberInstances[0], -1, -1, -1 },
+    { 10, "art/objects/gameplay/Number1", 1, &gStadiumNumberInstances[1], -1, -1, -1 },
+    { 11, "art/objects/gameplay/Number2", 1, &gStadiumNumberInstances[2], -1, -1, -1 },
+    { 12, "art/objects/gameplay/Number3", 1, &gStadiumNumberInstances[3], -1, -1, -1 },
+    { 13, "art/objects/gameplay/Number4", 1, &gStadiumNumberInstances[4], -1, -1, -1 },
+    { 14, "art/objects/gameplay/Number5", 1, &gStadiumNumberInstances[5], -1, -1, -1 },
+    { 15, "art/objects/gameplay/Number6", 1, &gStadiumNumberInstances[6], -1, -1, -1 },
+    { 16, "art/objects/gameplay/Number7", 1, &gStadiumNumberInstances[7], -1, -1, -1 },
+    { 17, "art/objects/gameplay/Number8", 1, &gStadiumNumberInstances[8], -1, -1, -1 },
+    { 18, "art/objects/gameplay/Number9", 1, &gStadiumNumberInstances[9], -1, -1, -1 },
+    { 19, "art/objects/gameplay/NumberDash", 1, &gStadiumNumberInstances[10], -1, -1, -1 },
+    { 20, "art/objects/gameplay/NumberColon", 1, &gStadiumNumberInstances[11], -1, -1, -1 },
+    { 21, "art/objects/gameplay/powerups", 1, 0, -1, -1, -1 },
+};
 
 bool CreatePowerupDrawables(glModel* models, unsigned long numModels)
 {
@@ -80,7 +115,7 @@ bool CreatePowerupDrawables(glModel* models, unsigned long numModels)
         = (WorldObjectLoadContext*)nlMalloc(sizeof(WorldObjectLoadContext), 8, true);
     new (context) WorldObjectLoadContext(pBasicStadiumInstance);
 
-    unsigned long uExcluded = nlStringHash(StadiumExcludedMetalShellModel);
+    unsigned long uExcluded = nlStringHash("gameplay/metalshell");
     for (; model < end; model++)
     {
         if (uExcluded == model->id)
@@ -113,7 +148,7 @@ DrawableObject* GetRenderObject(int entry, int instance)
 
 DrawableObject** GetNumberRenderObjects()
 {
-    return lbl_8057AB20;
+    return gStadiumNumberInstances;
 }
 
 DrawableObject* GetBallRenderObject(unsigned int index)
@@ -152,7 +187,7 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
     for (; (unsigned long)instance < (unsigned long)gStadiumModelEntries[entry].mNumInstances;
          instance++)
     {
-        nlSNPrintf(name, sizeof(name), StadiumModelCloneNameFormat, entry, instance);
+        nlSNPrintf(name, sizeof(name), "npc%dclone%d", entry, instance);
         DrawableObject* pClone = pObject->Clone(nlStringLowerHash(name));
         pClone->m_uObjectFlags &= ~1;
         fn_8027876C(pBasicStadiumInstance, pClone);
@@ -216,7 +251,7 @@ void BeginLoadStadium(const char* path, bool skipGameplayModels)
     pBasicStadiumInstance->m_pOpaqueView = (GLView*)GetShadowedView();
     pBasicStadiumInstance->m_pAlphaView = (GLView*)GetLayerView(eCLV_WorldAlphaBlended);
 
-    nlSNPrintf(buffer, sizeof(buffer), StadiumResourcePathFormat, gStadiumResourcePath);
+    nlSNPrintf(buffer, sizeof(buffer), "%s/gameworld.res.zlib", gStadiumResourcePath);
     nlLoadCompressedFileAsync(buffer, OnStadiumResourceLoaded, 0, 32, AllocateStart,
         0x40000, gStadiumLoadBuffers[0], gStadiumLoadBuffers[1], 0, 0, 0);
 }
@@ -335,7 +370,7 @@ bool FinishLoadStadiumResources()
                     if (gStadiumModelLoadResults[0][i].mData != 0
                         && gStadiumModelLoadResults[1][i].mData != 0)
                     {
-                        glBeginResource(StadiumTextureResourceLabel);
+                        glBeginResource("Tex");
                         glEndLoadTextureBundle(gStadiumModelLoadResults[0][i].mData,
                             gStadiumModelLoadResults[0][i].mSize,
                             glGetCurrentResourcePool(), 1);
@@ -344,7 +379,7 @@ bool FinishLoadStadiumResources()
                         gStadiumModelLoadResults[0][i].mData = 0;
                         gStadiumModelLoadResults[0][i].mProcessed = true;
 
-                        glBeginResource(StadiumModelResourceLabel);
+                        glBeginResource("Model");
                         unsigned long numModels = 0;
                         glModel* models = glEndLoadModel(
                             gStadiumModelLoadResults[1][i].mData,
@@ -431,10 +466,10 @@ void BeginLoadTournamentTrophy()
     GLResourcePool* context = glGetCurrentResourcePool();
     const char* resource = NetTournManager::Instance()->GetTournamentTrophyResource();
 
-    nlSNPrintf(path, sizeof(path), StadiumTextureBundlePathFormat, resource);
+    nlSNPrintf(path, sizeof(path), "%s.rlt", resource);
     glBeginLoadTextureBundle(path, OnStadiumModelResourceLoaded,
         &gTournamentTrophyLoadResults[0], context);
-    nlSNPrintf(path, sizeof(path), StadiumModelBundlePathFormat, resource);
+    nlSNPrintf(path, sizeof(path), "%s.rlg", resource);
     glBeginLoadModel(path, OnStadiumModelResourceLoaded,
         &gTournamentTrophyLoadResults[1], context);
 }
@@ -449,7 +484,7 @@ void FinishLoadTournamentTrophy()
 {
     NetTournManager::Instance()->mTrophyResource = (void*)glGetCurrentResourcePool()->MarkResource();
 
-    glBeginResource(StadiumTextureResourceLabel);
+    glBeginResource("Tex");
     glEndLoadTextureBundle(gTournamentTrophyLoadResults[0].mData,
         gTournamentTrophyLoadResults[0].mSize, glGetCurrentResourcePool(), 0);
     glEndResource();
@@ -457,7 +492,7 @@ void FinishLoadTournamentTrophy()
     gTournamentTrophyLoadResults[0].mData = 0;
     gTournamentTrophyLoadResults[0].mProcessed = true;
 
-    glBeginResource(StadiumModelResourceLabel);
+    glBeginResource("Model");
     unsigned long numModels = 0;
     glModel* models = glEndLoadModel(gTournamentTrophyLoadResults[1].mData,
         gTournamentTrophyLoadResults[1].mSize, &numModels, glGetCurrentResourcePool());
@@ -492,6 +527,8 @@ void DestroyStadium()
         UninitializeCrowdImpostors();
     }
 }
+
+extern "C" bool lbl_806DEE60 = true;
 
 void UpdateStadium(float fDeltaT)
 {
@@ -623,6 +660,24 @@ static inline void SetStadiumName(const char* name)
     nlStrNCpy(gStadiumName, name, sizeof(gStadiumName));
 }
 
+void InitializeStadiumLighting()
+{
+    char name[64];
+    nlSNPrintf(name, sizeof(name), "_%s/lightramp", gStadiumName);
+    unsigned long lightRamp = glGetTexture(name);
+    nlSNPrintf(name, sizeof(name), "_%s/playerlightramp", gStadiumName);
+    glGetTexture(name);
+    if (glTextureLoad(lightRamp))
+    {
+        lbl_806DEE30 = lightRamp;
+    }
+    lbl_806DEE34 = glGetTexture("global/lightramp_sts");
+    nlSNPrintf(name, sizeof(name), "_%s/shadowlookup", gStadiumName);
+    SetImpostorLightingTexture(glGetTexture(name));
+    nlSNPrintf(name, sizeof(name), "_%s/shadowlookup", gStadiumName);
+    LoadShadowLightingLookup(glGetTexture(name));
+}
+
 void fn_802772D0(const char* name, bool)
 {
     char path[255];
@@ -632,12 +687,120 @@ void fn_802772D0(const char* name, bool)
     CreateAttackSideIndicators();
     lbl_806E1968 = 1;
 
-    nlSNPrintf(path, sizeof(path), lbl_806DEE64, lbl_805222F0, name);
+    nlSNPrintf(path, sizeof(path), "%s/%s", "art/environments", name);
     SetStadiumName(name);
     BeginLoadStadium(path, false);
 
     lbl_806E196C = new (nlMalloc(sizeof(StadiumTweaks), 8, true))
-        StadiumTweaks(lbl_80522304, name);
+        StadiumTweaks("/Stadium", name);
+}
+
+static inline void SetPhysicsNetDimensions(float width, float height, float depth)
+{
+    PhysicsNet::sfPhysicsNetWidth = width;
+    PhysicsNet::sfPhysicsNetHeight = height;
+    PhysicsNet::sfPhysicsNetDepth = depth;
+}
+
+static inline DrawableObject* FindStadiumDrawableObject(const char* name)
+{
+    return FindStadiumDrawableObject(nlStringLowerHash(name));
+}
+
+static inline bool HasSoftnessOverride(const StadiumTweaks& tweaks)
+{
+    return tweaks.fSoftness >= 0.0f;
+}
+
+static inline void SetNetSoftness(float softness)
+{
+    // Stadium softness overrides are disabled.
+}
+
+bool FinishLoadStadium(bool stadiumViewer)
+{
+    if (lbl_806E1968 == 1)
+    {
+        if (IsStadiumResourceDataLoaded())
+        {
+            lbl_806E1968 = 2;
+            BeginLoadStadiumTemporaryResources();
+        }
+        return false;
+    }
+    if (lbl_806E1968 == 2)
+    {
+        if (FinishLoadStadiumResources())
+        {
+            lbl_806E1968 = 3;
+            BeginLoadStadiumEffects();
+        }
+        return false;
+    }
+    if (!FinishLoadStadiumEffects())
+    {
+        return false;
+    }
+    if (!gTweakFileLoader.ProcessLoadedFiles())
+    {
+        return false;
+    }
+    if (!stadiumViewer)
+    {
+        InitializePowerups();
+    }
+
+    InitializeStadiumLighting();
+
+    DrawableObject* fieldCorner = FindStadiumDrawableObject("FieldCorner");
+    if (fieldCorner != 0)
+    {
+        float y = fieldCorner->GetWorldMatrix()->m42;
+        cField::SetFieldDimensions(fieldCorner->GetWorldMatrix()->m41, y, 0.0f);
+    }
+    DrawableObject* penaltyCorner = FindStadiumDrawableObject("PenaltyCorner");
+    if (penaltyCorner != 0)
+    {
+        float y = penaltyCorner->GetWorldMatrix()->m42;
+        cField::mfPenaltyBoxX = penaltyCorner->GetWorldMatrix()->m41;
+        cField::mfPenaltyBoxY = y;
+    }
+
+    cNet::SetNetDimensions(lbl_806E196C->fNetWidth, lbl_806E196C->fNetHeight,
+        lbl_806E196C->fGoalpostRadius, lbl_806E196C->fGoalpostOffset);
+    SetPhysicsNetDimensions(lbl_806E196C->fPhysNetWidth,
+        lbl_806E196C->fPhysNetHeight, lbl_806E196C->fPhysNetDepth);
+    if (HasSoftnessOverride(*lbl_806E196C))
+    {
+        SetNetSoftness(lbl_806E196C->fSoftness);
+    }
+    NetMesh::SetDontUseLowestNetTextureLOD(lbl_806E196C->bDontUseLowest);
+    NetMesh::s_bAnimatedNetMeshEnabled = true;
+    SetCoPlanarZ(lbl_806E196C->fShadowHeight);
+    SetPlanarShadowOpacity(lbl_806E196C->fShadowOpacity);
+    delete lbl_806E196C;
+    lbl_806E196C = 0;
+    return true;
+}
+
+void StadiumScreenToWorldPosition(nlVector3& result, float screenX, float screenY, float distance)
+{
+    fn_802785FC(pBasicStadiumInstance, 0.0f);
+    nlVector4 corners[8];
+    fn_80278818(pBasicStadiumInstance, corners);
+    nlVector3 point = *(nlVector3*)&corners[0];
+    nlVector3 horizontal;
+    nlVector3 vertical;
+    nlVec3Sub(horizontal, *(nlVector3*)&corners[1], point);
+    nlVec3Sub(vertical, *(nlVector3*)&corners[3], point);
+    nlVec3ScaleAdd(point, (-screenX + 1.0f) / 2.0f, horizontal, point);
+    nlVec3ScaleAdd(point, (screenY + 1.0f) / 2.0f, vertical, point);
+    nlVector3 cameraPosition = cCameraManager::PeekCamera()->GetCameraPosition();
+    float scale = distance / fn_8027313C();
+    nlVector3 offset;
+    nlVec3Sub(offset, point, cameraPosition);
+    nlVec3Scale(offset, offset, scale);
+    nlVec3Add(result, offset, cameraPosition);
 }
 
 void fn_80277BB0()
@@ -701,4 +864,14 @@ float GetStadiumTime()
 HighRangeTweaks* GetHighRangeTweaks()
 {
     return pBasicStadiumInstance->m_pHighRangeTweaks;
+}
+
+bool ShouldRenderStadiumNPC(ImpostorModel* model)
+{
+    if (cCameraManager::m_BeginFrameCameraType == 1
+        || cCameraManager::m_BeginFrameCameraType == 6)
+    {
+        return model->mWorldMatrix.m42 > 0.0f;
+    }
+    return true;
 }

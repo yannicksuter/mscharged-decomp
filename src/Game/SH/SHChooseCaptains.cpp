@@ -237,9 +237,9 @@ void ChooseCaptainsSceneV2::SceneCreated()
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
-    if (NetworkDraft::Instance()->fn_8022819C())
+    if (NetworkDraft::Instance()->IsDraftActive())
     {
-        mDraftCountdown = NetworkDraft::Instance()->fn_802281B0();
+        mDraftCountdown = NetworkDraft::Instance()->GetCaptainDraftCountdown();
         UpdateDraftTimer(mDraftCountdown);
         mBackButton.Disable();
         back->SetVisible(false);
@@ -456,7 +456,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
         mDoneButton.HandlePointerEvent(&event);
         if (mInputSuppressed)
             return;
-        if (!NetworkDraft::Instance()->fn_8022819C())
+        if (!NetworkDraft::Instance()->IsDraftActive())
         {
             if (mBackButton.UpdateBackButton(event, dt))
             {
@@ -476,9 +476,9 @@ void ChooseCaptainsSceneV2::Update(float dt)
     UpdateDoneButton();
     UpdatePointerCursors();
     RefreshCaptainImages();
-    if (NetworkDraft::Instance()->fn_8022819C())
+    if (NetworkDraft::Instance()->IsDraftActive())
     {
-        int countdown = NetworkDraft::Instance()->fn_802281B0();
+        int countdown = NetworkDraft::Instance()->GetCaptainDraftCountdown();
         if (mDraftCountdown != countdown)
         {
             mDraftCountdown = countdown;
@@ -1138,7 +1138,7 @@ void ChooseCaptainsSceneV2::RefreshCaptainImages()
         {
             mCaptainImages[i]->SetTextureResource(mCaptainTextures[i][0]);
         }
-        else if (NetworkDraft::Instance()->fn_8022819C() && NetworkDraft::Instance()->IsCaptainTaken(captain))
+        else if (NetworkDraft::Instance()->IsDraftActive() && NetworkDraft::Instance()->IsCaptainTaken(captain))
         {
             mCaptainImages[i]->SetTextureResource(mCaptainTextures[i][0]);
         }

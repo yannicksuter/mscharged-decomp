@@ -3,20 +3,12 @@
 #include "revolution/ax.h"
 #include "revolution/axfx.h"
 
-#include "Game/Audio/AudioEffect.h"
+#include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioBackend.h"
 #include "Game/UnidentifiedStaticStorage.h"
-#include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 
 #include <float.h>
-
-struct DelaySettings
-{
-    u32 m_Delay[3];
-    u32 m_Feedback[3];
-    u32 m_Output[3];
-};
 
 static u32 sDelayLeft = 300;
 static u32 sDelayRight = 300;
@@ -28,82 +20,19 @@ static u32 sDelayOutputLeft = 100;
 static u32 sDelayOutputRight = 100;
 static u32 sDelayOutputSurround = 100;
 
-class DelayParameter : public AudioEffectParameter
-{
-public:
-    DelayParameter();
-    virtual ~DelayParameter() { }
-    void ApplySettings(AXFX_DELAY* delay);
-
-    static void* operator new(unsigned long)
-    {
-        DelayParameter* parameter = 0;
-        s_Pool.Allocate(parameter);
-        return parameter;
-    }
-
-    static void operator delete(void* pointer)
-    {
-        s_Pool.Free((DelayParameter*)pointer);
-    }
-
-    DelaySettings m_Settings;
-    float m_AuxVolume;
-
-    static SlotPool<DelayParameter> s_Pool;
-};
-
 inline DelayParameter::DelayParameter()
     : m_AuxVolume(0.0f)
 {
-    m_Settings.m_Delay[0] = sDelayLeft;
-    m_Settings.m_Delay[1] = sDelayRight;
-    m_Settings.m_Delay[2] = sDelaySurround;
-    m_Settings.m_Feedback[0] = sDelayFeedbackLeft;
-    m_Settings.m_Feedback[1] = sDelayFeedbackRight;
-    m_Settings.m_Feedback[2] = sDelayFeedbackSurround;
-    m_Settings.m_Output[0] = sDelayOutputLeft;
-    m_Settings.m_Output[1] = sDelayOutputRight;
-    m_Settings.m_Output[2] = sDelayOutputSurround;
+    m_Delay[0] = sDelayLeft;
+    m_Delay[1] = sDelayRight;
+    m_Delay[2] = sDelaySurround;
+    m_Feedback[0] = sDelayFeedbackLeft;
+    m_Feedback[1] = sDelayFeedbackRight;
+    m_Feedback[2] = sDelayFeedbackSurround;
+    m_Output[0] = sDelayOutputLeft;
+    m_Output[1] = sDelayOutputRight;
+    m_Output[2] = sDelayOutputSurround;
 }
-
-class Delay : public AudioEffectBase
-{
-public:
-    Delay();
-    virtual ~Delay() { }
-    virtual void CreateParameter(unsigned int definition, const void* context, bool negate,
-        AudioEffectParameter** output);
-    virtual void BeginBlend()
-    {
-        m_Final = m_Initial;
-    }
-    virtual void BlendParameter(AudioEffectParameter* destination,
-        AudioEffectParameter* source);
-    virtual void EndBlend();
-    virtual void OnParameterFinished(AudioEffectParameter*) { }
-    virtual void OnSoundStarted(void*);
-    virtual void ApplyToSound(void* handle);
-
-    static void* operator new(unsigned long)
-    {
-        Delay* effect = 0;
-        s_Pool.Allocate(effect);
-        return effect;
-    }
-
-    static void operator delete(void* pointer)
-    {
-        s_Pool.Free((Delay*)pointer);
-    }
-
-    DelayParameter m_Initial;
-    DelayParameter m_Final;
-
-    static SlotPool<Delay> s_Pool;
-};
-
-static const int sDelaySendEffectId = 0;
 
 SlotPool<DelayParameter> DelayParameter::s_Pool(16, 16);
 SlotPool<Delay> Delay::s_Pool(16, 16);
@@ -137,9 +66,8 @@ Delay::Delay()
         AXGetAuxACallback(&callback, &context);
         if (platform->m_OutputMode == 3)
         {
-            if (callback != (AXAuxCallback)ProcessDelayDpl2)
-                AXRegisterAuxACallback(
-                    (AXAuxCallback)ProcessDelayDpl2, delayEffect);
+            if (callback != ProcessDelayDpl2)
+                AXRegisterAuxACallback(ProcessDelayDpl2, delayEffect);
         }
         else if (callback != ProcessDelay)
         {
@@ -150,9 +78,8 @@ Delay::Delay()
         AXGetAuxBCallback(&callback, &context);
         if (platform->m_OutputMode == 3)
         {
-            if (callback != (AXAuxCallback)ProcessDelayDpl2)
-                AXRegisterAuxBCallback(
-                    (AXAuxCallback)ProcessDelayDpl2, delayEffect);
+            if (callback != ProcessDelayDpl2)
+                AXRegisterAuxBCallback(ProcessDelayDpl2, delayEffect);
         }
         else if (callback != ProcessDelay)
         {
@@ -175,30 +102,30 @@ void Delay::CreateParameter(unsigned int definition, const void*, bool negate,
 
     if (gDelayOverrideEnabled)
     {
-        m_Final.m_Settings.m_Delay[0] = sDelayLeft;
-        m_Final.m_Settings.m_Delay[1] = sDelayRight;
-        m_Final.m_Settings.m_Delay[2] = sDelaySurround;
-        m_Final.m_Settings.m_Feedback[0] = sDelayFeedbackLeft;
-        m_Final.m_Settings.m_Feedback[1] = sDelayFeedbackRight;
-        m_Final.m_Settings.m_Feedback[2] = sDelayFeedbackSurround;
-        m_Final.m_Settings.m_Output[0] = sDelayOutputLeft;
-        m_Final.m_Settings.m_Output[1] = sDelayOutputRight;
-        m_Final.m_Settings.m_Output[2] = sDelayOutputSurround;
+        m_Final.m_Delay[0] = sDelayLeft;
+        m_Final.m_Delay[1] = sDelayRight;
+        m_Final.m_Delay[2] = sDelaySurround;
+        m_Final.m_Feedback[0] = sDelayFeedbackLeft;
+        m_Final.m_Feedback[1] = sDelayFeedbackRight;
+        m_Final.m_Feedback[2] = sDelayFeedbackSurround;
+        m_Final.m_Output[0] = sDelayOutputLeft;
+        m_Final.m_Output[1] = sDelayOutputRight;
+        m_Final.m_Output[2] = sDelayOutputSurround;
         m_Final.m_AuxVolume = gDelayOverrideVolume;
 
         *parameter = m_Final;
         return;
     }
 
-    parameter->m_Settings.m_Delay[0] = node->Get(nlStringLowerHash("delayL")).m_Words.m_Value;
-    parameter->m_Settings.m_Delay[1] = node->Get(nlStringLowerHash("delayR")).m_Words.m_Value;
-    parameter->m_Settings.m_Delay[2] = node->Get(nlStringLowerHash("delayS")).m_Words.m_Value;
-    parameter->m_Settings.m_Feedback[0] = node->Get(nlStringLowerHash("feedbackL")).m_Words.m_Value;
-    parameter->m_Settings.m_Feedback[1] = node->Get(nlStringLowerHash("feedbackR")).m_Words.m_Value;
-    parameter->m_Settings.m_Feedback[2] = node->Get(nlStringLowerHash("feedbackS")).m_Words.m_Value;
-    parameter->m_Settings.m_Output[0] = node->Get(nlStringLowerHash("outputL")).m_Words.m_Value;
-    parameter->m_Settings.m_Output[1] = node->Get(nlStringLowerHash("outputR")).m_Words.m_Value;
-    parameter->m_Settings.m_Output[2] = node->Get(nlStringLowerHash("outputS")).m_Words.m_Value;
+    parameter->m_Delay[0] = node->Get(nlStringLowerHash("delayL")).m_Words.m_Value;
+    parameter->m_Delay[1] = node->Get(nlStringLowerHash("delayR")).m_Words.m_Value;
+    parameter->m_Delay[2] = node->Get(nlStringLowerHash("delayS")).m_Words.m_Value;
+    parameter->m_Feedback[0] = node->Get(nlStringLowerHash("feedbackL")).m_Words.m_Value;
+    parameter->m_Feedback[1] = node->Get(nlStringLowerHash("feedbackR")).m_Words.m_Value;
+    parameter->m_Feedback[2] = node->Get(nlStringLowerHash("feedbackS")).m_Words.m_Value;
+    parameter->m_Output[0] = node->Get(nlStringLowerHash("outputL")).m_Words.m_Value;
+    parameter->m_Output[1] = node->Get(nlStringLowerHash("outputR")).m_Words.m_Value;
+    parameter->m_Output[2] = node->Get(nlStringLowerHash("outputS")).m_Words.m_Value;
     parameter->m_AuxVolume = node->Get(nlStringLowerHash("auxvol")).m_Float;
     parameter->m_AuxVolume = negate ? 1.0f - parameter->m_AuxVolume : parameter->m_AuxVolume;
 }
@@ -212,12 +139,12 @@ void Delay::BlendParameter(AudioEffectParameter* destination,
         = (DelayParameter*)source;
     for (u32 i = 0; i < 3; ++i)
     {
-        destinationParameter->m_Settings.m_Delay[i]
-            = sourceParameter->m_Settings.m_Delay[i];
-        destinationParameter->m_Settings.m_Feedback[i]
-            = sourceParameter->m_Settings.m_Feedback[i];
-        destinationParameter->m_Settings.m_Output[i]
-            = sourceParameter->m_Settings.m_Output[i];
+        destinationParameter->m_Delay[i]
+            = sourceParameter->m_Delay[i];
+        destinationParameter->m_Feedback[i]
+            = sourceParameter->m_Feedback[i];
+        destinationParameter->m_Output[i]
+            = sourceParameter->m_Output[i];
     }
     destinationParameter->m_AuxVolume = sourceParameter->m_AuxVolume;
 }
@@ -242,7 +169,7 @@ void Delay::ApplyToSound(void* handle)
     GetSoundSources(handle, voices, &count);
 
     int volume = (int)(-960.0f * (1.0f - m_Final.m_AuxVolume));
-    int auxIndex = g_pAuxEffectMap->GetAuxiliary(sDelaySendEffectId);
+    int auxIndex = g_pAuxEffectMap->GetAuxiliary(0);
     for (u32 i = 0; i < count; ++i)
         voices[i]->SetAuxiliaryVolume(auxIndex, volume);
 }
@@ -251,12 +178,12 @@ inline void DelayParameter::ApplySettings(AXFX_DELAY* delay)
 {
     for (u16 i = 0; i < 3; ++i)
     {
-        u32 value = m_Settings.m_Delay[i];
+        u32 value = m_Delay[i];
         value = value >= 1 ? value : 1;
         delay->delay[i] = value <= 750 ? value : 750;
-        value = m_Settings.m_Feedback[i];
+        value = m_Feedback[i];
         delay->feedback[i] = value <= 99 ? value : 99;
-        value = m_Settings.m_Output[i];
+        value = m_Output[i];
         delay->output[i] = value <= 100 ? value : 100;
     }
 }

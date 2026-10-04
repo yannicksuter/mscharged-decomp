@@ -33,8 +33,6 @@ static float sWarbleTop;
 static int sWarbleInputExtent;
 bool gWarbleEnabled;
 static float sWarblePhase;
-static u32 sWarbleColourHandle;
-static char sWarbleColourLoaded;
 
 static TweakValueFloat sWarbleFrequency(
     "gfWarbleFreq", "/Rendering/Effects/Warble", 60.0f);
@@ -57,13 +55,46 @@ struct WarbleBlobRow
     WarbleByteRow ByteRow() const { return (WarbleByteRow)byteRow; }
 };
 
+struct WarbleCI8Column
+{
+    const u8* data;
+    u8 Pixel(int block, WarbleByteRow row) const
+    {
+        return (data + row)[block << 5];
+    }
+};
+
+static inline WarbleCI8Column WarbleColumn(const PlatTexture* texture, int x)
+{
+    WarbleCI8Column result = {
+        static_cast<const u8*>(texture->m_SwizzledData) + (x & 7)
+    };
+    return result;
+}
+
+struct WarblePalette
+{
+    u16* data;
+    u16& Colour(u8 index) const
+    {
+        return data[index];
+    }
+};
+
+static inline WarblePalette BlobPalette(const PlatTexture* texture)
+{
+    WarblePalette result = {texture->m_PaletteData};
+    return result;
+}
+
 static inline u8 ReadWarbleBlobValue(const WarbleBlobRow& row, int x)
 {
+    const WarblePalette palette = BlobPalette(row.texture);
     int block = row.blockRow * (row.texture->m_Width >> 3) + (x >> 3);
     const WarbleByteRow byteRow = row.ByteRow();
-    int offset = (block << 5) + byteRow + (x & 7);
-    u8 paletteIndex = ((u8*)row.texture->m_SwizzledData)[offset];
-    const u16 colour = row.texture->m_PaletteData[paletteIndex];
+    const WarbleCI8Column column = WarbleColumn(row.texture, x);
+    u8 paletteIndex = column.Pixel(block, byteRow);
+    const u16 colour = palette.Colour(paletteIndex);
     if (colour & 0x8000)
     {
         unsigned int component = (colour >> 10) & 0x1F;
@@ -109,13 +140,15 @@ static inline int SwizzledIA8Offset(int x, int y)
 void GenerateWarbleTexture(
     float phase, float frequency, float amplitude)
 {
+    int y;
+    int x;
     PlatTexture* texture = glx_GetTex(glGetTexture(sWarbleTexture));
     u8* output = static_cast<u8*>(texture->m_SwizzledData);
 
-    for (int y = 0; y < 32; ++y)
+    for (y = 0; y < 32; ++y)
     {
         const float dy = (float)y * (1.0f / 64.0f) - 0.5f;
-        for (int x = 0; x < 32; ++x)
+        for (x = 0; x < 32; ++x)
         {
             const float source = sWarbleBlob[y][x];
             int displacement;
@@ -146,9 +179,9 @@ void GenerateWarbleTexture(
         }
     }
 
-    for (int y = 0; y < 32; ++y)
+    for (y = 0; y < 32; ++y)
     {
-        for (int x = 0; x < 32; ++x)
+        for (x = 0; x < 32; ++x)
         {
             const int source = SwizzledIA8Offset(x, y);
             const int mirrorX = SwizzledIA8Offset(63 - x, y);
@@ -180,11 +213,7 @@ void UpdateWarblePhase(bool*, float dt)
 
 void RenderWarbleQuad(bool*)
 {
-    if (!sWarbleColourLoaded)
-    {
-        sWarbleColourHandle = glGetTexture(sWarbleColourTexture);
-        sWarbleColourLoaded = true;
-    }
+    static u32 sWarbleColourHandle = glGetTexture(sWarbleColourTexture);
 
     GLWarbleMeshWriter writer;
     glSetDefaultState(false);
@@ -205,7 +234,6 @@ void RenderWarbleQuad(bool*)
         writer.Position(left, bottom, 0.0f);
 
         writer.Colour(0xFF, 0xFF, 0xFF, 0xFF);
-        const u32 colourHandle = sWarbleColourHandle;
         writer.Texcoord(0x400, 0x400);
         writer.Position(right, bottom, 0.0f);
 
@@ -213,7 +241,7 @@ void RenderWarbleQuad(bool*)
         writer.Texcoord(0x400, 0);
         writer.Position(right, top, 0.0f);
 
-        writer.Texture(0, colourHandle);
+        writer.Texture(0, sWarbleColourHandle);
 
         if (writer.End())
             GetLayerView(eCLV_WarbleBlend)->AttachModel(writer.model, 0);

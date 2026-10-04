@@ -8,6 +8,7 @@
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Game.h"
 #include "Game/Physics/PhysicsFakeBall.h"
+#include "Game/Physics/PhysicsAIBall.h"
 #include "math.h"
 #include "types.h"
 #include "Game/UnidentifiedStaticStorage.h"
@@ -25,7 +26,6 @@ float lbl_806DCA84 = 0.07f;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
-extern "C" void fn_8013F854(const char*, ...);
 float lbl_806E11E8;
 
 PhysicsBall::PhysicsBall(
@@ -239,7 +239,7 @@ ContactType PhysicsBall::Contact(
     nlVector3 pos;
 
     int objID = other->GetObjectType();
-    fn_8013F854(
+    DebugPrintf(
         "Ball Contact objID %d numContacts %d\n", objID, numContacts);
     GetPosition(&myPos);
 
@@ -267,7 +267,7 @@ ContactType PhysicsBall::Contact(
         {
             if (mbCanFreeFall)
             {
-                fn_8013F854("Ball Contact IsFreeFall\n");
+                DebugPrintf("Ball Contact IsFreeFall\n");
                 return NO_CONTACT;
             }
 
@@ -283,7 +283,7 @@ ContactType PhysicsBall::Contact(
 
                 if (contact->geom.normal[2] > 0.95f)
                 {
-                    fn_8013F854("Ball Contact normal[2] > 0.95\n");
+                    DebugPrintf("Ball Contact normal[2] > 0.95\n");
                     return NO_CONTACT;
                 }
 
@@ -298,7 +298,7 @@ ContactType PhysicsBall::Contact(
                 contact->geom.normal[2] = normal.z;
                 contact->geom.depth -= zPosAdjust;
             }
-            fn_8013F854(
+            DebugPrintf(
                 "Ball contact call parent depth %f\n", contact->geom.depth);
         }
         return m_parentObject->Contact(other, contact, numContacts);
@@ -308,7 +308,7 @@ ContactType PhysicsBall::Contact(
     {
         if (objID == 0x16)
         {
-            fn_8013F854("Ball contact PHYSOBJ_GOALIE_PLANE\n");
+            DebugPrintf("Ball contact PHYSOBJ_GOALIE_PLANE\n");
             return TWO_WAY_CONTACT;
         }
 
@@ -321,14 +321,14 @@ ContactType PhysicsBall::Contact(
             if (absX > cField::GetGoalLineX(1U) - 0.4f
                 && absY < cField::GetSidelineY(1U) - 2.2f)
             {
-                fn_8013F854(
+                DebugPrintf(
                     "Ball contact PHYSOBJ_WALL %f %f\n", absX, absY);
                 return TWO_WAY_CONTACT;
             }
         }
 
         FakeBallWorld::InvalidateBallCache();
-        fn_8013F854("Ball contact IncrementBall\n");
+        DebugPrintf("Ball contact IncrementBall\n");
         ++g_pBall->m_bBallPathChangeCount;
         ++g_pBall->m_bBallDeflectCount;
     }

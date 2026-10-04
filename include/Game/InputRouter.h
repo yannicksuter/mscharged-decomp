@@ -40,17 +40,17 @@ public:
 
     /* 0x004 */ PackedDetInput mInputRecords[16];
     /* 0x104 */ u8 mInputStates[16];
-    /* 0x114 */ u16 mNetworkTicks[4];
+    /* 0x114 */ u16 mRemapAngles[4];
     /* 0x11C */ u32 mNetworkCRCs[4];
     /* 0x12C */ s32 mRemoteTicks[4];
     /* 0x13C */ u32 mRandomSeeds[4];
     /* 0x14C */ bool mSyncMismatch;
     /* 0x14D */ bool mSyncMismatchReported;
-    /* 0x14E */ bool mOutgoingQueueOverflowed;
+    /* 0x14E */ bool mQueueOverflowed;
     /* 0x14F */ bool mStarvedForInput;
     /* 0x150 */ u32 mCurrentCRC;
     /* 0x154 */ s32 mLastGameFrame;
-    /* 0x158 */ u32 mPadding158;
+    /* 0x158 */ u32 mUnidentified158;
     /* 0x15C */ StaticCircularQueue<DetermDataEvent*, 10> m_OutgoingCustomDetermDataQ;
     /* 0x194 */ NetworkSessionBase* mSession;
 }; // size: 0x198
@@ -74,17 +74,17 @@ public:
 
     virtual ~SimpleInputRouter();
     virtual void Reset(int resetQueues);
-    virtual int GetUpdateCount();
-    virtual bool HasInput();
-    virtual bool CanCaptureInput();
+    virtual int GetUpdateCount() { return 1; }
+    virtual bool HasInput() { return true; }
+    virtual bool CanCaptureInput() { return true; }
     virtual void OnInputCaptured();
     virtual void OnInputReady();
-    virtual void CheckCongestion();
+    virtual void CheckCongestion() { }
     virtual void ReceiveInput(
-        s8 machine, NetMessageInput* message);
+        s8 machine, NetMessageInput* message) { }
     virtual void ReceiveAllInputs(
-        s8 machine, NetMessageAllInputs* message);
-    virtual void DebugDraw(int column, int* row);
+        s8 machine, NetMessageAllInputs* message) { }
+    virtual void DebugDraw(int column, int* row) { }
 };
 
 class NetworkInputRouter : public InputRouter
@@ -97,16 +97,16 @@ public:
     virtual ~NetworkInputRouter();
     void CheckPeerSynchronization();
     virtual void Reset(int resetQueues);
-    virtual int GetUpdateCount();
+    virtual int GetUpdateCount() { return 1; }
     virtual bool HasInput();
-    virtual bool CanCaptureInput();
+    virtual bool CanCaptureInput() { return !mStarvedForInput; }
     virtual void OnInputCaptured();
     virtual void OnInputReady();
     virtual void CheckCongestion();
     virtual void ReceiveInput(
         s8 machine, NetMessageInput* message);
     virtual void ReceiveAllInputs(
-        s8 machine, NetMessageAllInputs* message);
+        s8 machine, NetMessageAllInputs* message) { }
     virtual void DebugDraw(int column, int* row);
 
     /* 0x0198 */ bool mCongested;
@@ -114,15 +114,20 @@ public:
     /* 0x019A */ u8 mPadding19A[2];
     /* 0x019C */ float mCongestionMultiplier;
     /* 0x01A0 */ NetMessageInput mCurrentMessage;
-    /* 0x0290 */ u8 mUnidentified290;
+    /* 0x0290 */ u8 mMessageHeld;
     /* 0x0291 */ u8 mPadding291[3];
-    /* 0x0294 */ s32 mUnidentified294;
+    /* 0x0294 */ s32 mBundledMessageCount;
     /* 0x0298 */ NetMessageInputBundle mBundledMessage;
-    /* 0x0480 */ NetworkInputMessageQueue mInputQueues[4];
-    /* 0xE5C0 */ volatile u32 mQueueCursor;
+    /* 0x0480 */ NetworkInputMessageQueue m_InputQueue[4];
+    /* 0xE5C0 */ u32 mQueueCursor;
     /* 0xE5C4 */ u32 mQueueLimit;
 
 private:
+    u32 GetQueueCursor() const
+    {
+        return mQueueCursor;
+    }
+
     void RecordEmptyInputHeader(s8 machine, int frame);
 }; // size: 0xE5C8
 

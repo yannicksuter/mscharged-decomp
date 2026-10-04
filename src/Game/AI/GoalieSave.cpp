@@ -119,7 +119,7 @@ SaveInfo gSaveInfo[89] = {
     { -1, 0, 0, 0x00000000, { -1, -1, -1, -1 }, "Empty" },
 };
 
-unsigned short lbl_806DBD58 = 0xFFFF;
+unsigned short gSaveBlendInfoType = 0xFFFF;
 
 float GoalieSave::mfCatchAllowDistSq = 0.25f;
 
@@ -128,8 +128,8 @@ unsigned char GoalieSave::mbInitialized;
 unsigned int GoalieSave::muNumSaveEntries;
 SavePositionData* GoalieSave::mpPositionTable;
 unsigned int GoalieSave::muNumPositionEntries;
-unsigned int lbl_806E0D4C;
-unsigned int lbl_806E0D50;
+unsigned int GoalieSave::muLobCatchIndexStart;
+unsigned int GoalieSave::muLobCatchCount;
 unsigned int GoalieSave::muMissChipIndexStart;
 unsigned int GoalieSave::muMissChipCount;
 unsigned int GoalieSave::muSTSMissIndexStart;
@@ -140,7 +140,7 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 static nlAVLTree<int, SaveData*, DefaultKeyCompare<int> > gSaveMap;
 nlListContainer<SaveData*> gSaveGrid[6][4];
-nlVector3 lbl_8056D3B0;
+nlVector3 gLobJumpSavePos;
 static float fDefaultMilestoneValues[2] = { 0.4f, 0.7f };
 
 void SavePositionData::Init(Goalie* pGoalie, int animID)
@@ -163,7 +163,7 @@ void SavePositionData::Init(Goalie* pGoalie, int animID)
     delete pController;
 }
 
-void SaveBlendInfo::fn_80091704()
+void SaveBlendInfo::Reset()
 {
     mfStartTime = 0.0f;
     for (int milestone = 0; milestone < 5; ++milestone)
@@ -284,9 +284,9 @@ void GoalieSave::InitData(Goalie* pGoalie)
     mpSaveTable = (SaveData*)__construct_new_array(
         nlMalloc(0x2C10, 8, false), 0, 0, 0x80, 0x58);
 
-    lbl_806E0D4C = 0;
-    lbl_806E0D50 = 0;
-    lbl_8056D3B0 = v3Zero;
+    muLobCatchIndexStart = 0;
+    muLobCatchCount = 0;
+    gLobJumpSavePos = v3Zero;
     muMissChipIndexStart = 0;
     muMissChipCount = 0;
     muSTSMissIndexStart = 0;
@@ -318,10 +318,10 @@ void GoalieSave::InitData(Goalie* pGoalie)
         }
         else if (mpSaveTable[i].muSaveType & 0x00080000)
         {
-            lbl_806E0D50++;
-            if (lbl_806E0D50 == 1)
+            muLobCatchCount++;
+            if (muLobCatchCount == 1)
             {
-                lbl_806E0D4C = i;
+                muLobCatchIndexStart = i;
             }
         }
 
@@ -379,14 +379,14 @@ void GoalieSave::InitData(Goalie* pGoalie)
         nCount--;
     }
 
-    SaveData* pUnidentified1 = &mpSaveTable[lbl_806E0D4C + 2];
-    SaveData* pUnidentified0 = &mpSaveTable[lbl_806E0D4C];
-    lbl_8056D3B0.x = 0.5f * pUnidentified0->mv3SavePos.x
-        + 0.5f * pUnidentified1->mv3SavePos.x;
-    lbl_8056D3B0.y = 0.5f * pUnidentified0->mv3SavePos.y
-        + 0.5f * pUnidentified1->mv3SavePos.y;
-    lbl_8056D3B0.z = 0.5f * pUnidentified0->mv3SavePos.z
-        + 0.5f * pUnidentified1->mv3SavePos.z;
+    SaveData* pLobJumpSide = &mpSaveTable[muLobCatchIndexStart + 2];
+    SaveData* pLobJump = &mpSaveTable[muLobCatchIndexStart];
+    gLobJumpSavePos.x = 0.5f * pLobJump->mv3SavePos.x
+        + 0.5f * pLobJumpSide->mv3SavePos.x;
+    gLobJumpSavePos.y = 0.5f * pLobJump->mv3SavePos.y
+        + 0.5f * pLobJumpSide->mv3SavePos.y;
+    gLobJumpSavePos.z = 0.5f * pLobJump->mv3SavePos.z
+        + 0.5f * pLobJumpSide->mv3SavePos.z;
 
     mbInitialized = 1;
 }
@@ -505,38 +505,38 @@ SaveData* GoalieSave::FindBestSave(SaveBlendInfo& blendInfo,
     return pSaveData;
 }
 
-extern "C" void fn_80092B48(SaveBlendInfo& blendInfo);
+void CalcMilestoneScales(SaveBlendInfo& blendInfo);
 
-extern "C" SaveData* fn_800925C0(
+SaveData* GetBlendedLobSave(
     SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
 {
     SaveData* pSaveData;
     if (v3TargetPos.y > 0.0f)
     {
-        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C];
+        pSaveData = &GoalieSave::mpSaveTable[GoalieSave::muLobCatchIndexStart];
     }
     else
     {
-        pSaveData = &GoalieSave::mpSaveTable[lbl_806E0D4C + 4];
+        pSaveData = &GoalieSave::mpSaveTable[GoalieSave::muLobCatchIndexStart + 4];
     }
 
     SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
         blendInfo, v3TargetPos, pSaveData);
     if (pClosest != 0)
     {
-        fn_80092B48(blendInfo);
+        CalcMilestoneScales(blendInfo);
     }
     return pClosest;
 }
 
-extern "C" SaveData* fn_80092644(SaveData* pSaveData,
+SaveData* GetBlendedSave(SaveData* pSaveData,
     SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos)
 {
     SaveData* pClosest = GoalieSave::GetClosestBlendedPos(
         blendInfo, v3TargetPos, pSaveData);
     if (pClosest != 0)
     {
-        fn_80092B48(blendInfo);
+        CalcMilestoneScales(blendInfo);
     }
     return pClosest;
 }
@@ -567,7 +567,7 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
         if (uSaveType & pCur->muSaveType)
         {
             SaveBlendInfo candidateBlendInfo;
-            candidateBlendInfo.fn_80091704();
+            candidateBlendInfo.Reset();
             fSaveTime = pCur->mfDuration * pCur->mfMilestonePercent[2];
             {
                 float fMilestoneVal = pCur->mfMilestonePercent[milestone];
@@ -701,12 +701,12 @@ SaveData* GoalieSave::FindBestInList(SaveBlendInfo& blendInfo,
     }
 
     if (pClosest != 0)
-        fn_80092B48(blendInfo);
+        CalcMilestoneScales(blendInfo);
 
     return pClosest;
 }
 
-extern "C" void fn_80092B48(SaveBlendInfo& blendInfo)
+void CalcMilestoneScales(SaveBlendInfo& blendInfo)
 {
     SaveData* pConnected;
     int segment;

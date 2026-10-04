@@ -19,10 +19,6 @@ ShapeRender g_ShapeRenderer;
 static unsigned char g_bWire;
 const u32 WhiteTexture = glGetTexture("global/white");
 
-extern "C" void fn_802BC83C(const ShapeRender*, const PrimitiveShape&,
-    const nlMatrix4&, bool, const nlColour&);
-extern "C" void fn_802BD2C8(PrimitiveShape*, int, void*);
-
 void ShapeRender::CreateBoxGeometry(PrimitiveShape& prim)
 {
     static int ind_vert[24] = {
@@ -127,11 +123,11 @@ void ShapeRender::CreateBoxGeometry(PrimitiveShape& prim)
     static int tri_map[6] = { 0, 1, 2, 3, 0, 2 };
 
     prim.position = (nlVector3*)glResourceAlloc(
-        36 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        36 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        36 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        36 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        36 * sizeof(nlVector2), GLM_VertexData, m_Unknown00);
+        36 * sizeof(nlVector2), GLM_VertexData, m_pResource);
     prim.vertCount = 36;
 
     int i;
@@ -188,11 +184,11 @@ void ShapeRender::CreateHemisphereGeometry(PrimitiveShape& prim)
 
     prim.vertCount = 150;
     prim.position = (nlVector3*)glResourceAlloc(
-        150 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        150 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        150 * sizeof(nlVector3), GLM_VertexData, m_Unknown00);
+        150 * sizeof(nlVector3), GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        150 * sizeof(nlVector2), GLM_VertexData, m_Unknown00);
+        150 * sizeof(nlVector2), GLM_VertexData, m_pResource);
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -279,11 +275,11 @@ void ShapeRender::CreateFlatCylinderEndGeometry(PrimitiveShape& prim)
 
     prim.vertCount = 0x20;
     prim.position = (nlVector3*)glResourceAlloc(
-        0x180, GLM_VertexData, m_Unknown00);
+        0x180, GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        0x180, GLM_VertexData, m_Unknown00);
+        0x180, GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        0x100, GLM_VertexData, m_Unknown00);
+        0x100, GLM_VertexData, m_pResource);
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -360,11 +356,11 @@ void ShapeRender::CreateCylinderGeometry(PrimitiveShape& prim)
 
     prim.vertCount = 0x40;
     prim.position = (nlVector3*)glResourceAlloc(
-        0x300, GLM_VertexData, m_Unknown00);
+        0x300, GLM_VertexData, m_pResource);
     prim.normal = (nlVector3*)glResourceAlloc(
-        0x300, GLM_VertexData, m_Unknown00);
+        0x300, GLM_VertexData, m_pResource);
     prim.texcoord = (nlVector2*)glResourceAlloc(
-        0x200, GLM_VertexData, m_Unknown00);
+        0x200, GLM_VertexData, m_pResource);
 
     pdst = prim.position;
     ndst = prim.normal;
@@ -462,8 +458,8 @@ void ShapeRender::DrawWireBox(
     DrawLine3D(points[3], points[7], colour, true);
 }
 
-extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
-    const nlMatrix4& mat_world, bool, const nlColour& colour)
+void ShapeRender::DrawPrimitive(const PrimitiveShape& prim,
+    const nlMatrix4& mat_world, bool, const nlColour& colour) const
 {
     unsigned long matrix = glAllocMatrix();
     if (matrix != (unsigned long)-1)
@@ -473,11 +469,11 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
 
     unsigned long offset;
     glModel* pModel = glModelDupNoStreams(prim.model, false, 0);
-    nlFloatColour local_08;
-    local_08.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
-    local_08.c[1] = (float)colour.c[1] * (1.0f / 255.0f);
-    local_08.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
-    local_08.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
+    nlFloatColour floatColour;
+    floatColour.c[0] = (float)colour.c[0] * (1.0f / 255.0f);
+    floatColour.c[1] = (float)colour.c[1] * (1.0f / 255.0f);
+    floatColour.c[2] = (float)colour.c[2] * (1.0f / 255.0f);
+    floatColour.c[3] = (float)colour.c[3] * (1.0f / 255.0f);
 
     unsigned long index;
     index = 0;
@@ -487,8 +483,8 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
         glModelPacket* packet = (glModelPacket*)((u8*)pModel->packets + offset);
         packet->matrix = matrix;
         memcpy((u8*)packet->materialParameters + sizeof(glTextureBinding),
-            &local_08,
-            sizeof(local_08));
+            &floatColour,
+            sizeof(floatColour));
 
         if (colour.c[3] != 255)
         {
@@ -506,9 +502,9 @@ extern "C" void fn_802BC83C(const ShapeRender* arg0, const PrimitiveShape& prim,
         ++index;
     }
 
-    if (arg0->m_eView != 0)
+    if (m_eView != 0)
     {
-        arg0->m_eView->AttachModel(pModel, 1);
+        m_eView->AttachModel(pModel, 1);
     }
 }
 
@@ -536,8 +532,8 @@ void ShapeRender::DrawSpherePrimitive(const nlMatrix4& mat_world,
     nlMultMatrices(mat_hemiTop, mat_world);
     nlMultMatrices(mat_hemiBottom, mat_world);
 
-    fn_802BC83C(this, m_Hemisphere, mat_hemiTop, true, colour);
-    fn_802BC83C(this, m_Hemisphere, mat_hemiBottom, true, colour);
+    DrawPrimitive(m_Hemisphere, mat_hemiTop, true, colour);
+    DrawPrimitive(m_Hemisphere, mat_hemiBottom, true, colour);
 }
 
 void ShapeRender::DrawLine3D(const nlVector3& p0, const nlVector3& p1,
@@ -573,9 +569,8 @@ void ShapeRender::DrawLine3D(const nlVector3& p0, const nlVector3& p1,
     }
 }
 
-extern "C" void fn_802BCE50(const ShapeRender* arg0, const nlVector3& p0,
-    float fRadius, float fScaleX, float fScaleY,
-    const nlColour& colour, bool bWithDepth)
+void ShapeRender::DrawEllipse2D(const nlVector3& p0, float fRadius,
+    float fScaleX, float fScaleY, const nlColour& colour, bool bWithDepth) const
 {
     GLColourMeshWriter mesh;
     glSetDefaultState(bWithDepth);
@@ -609,9 +604,9 @@ extern "C" void fn_802BCE50(const ShapeRender* arg0, const nlVector3& p0,
             return;
         }
 
-        if (arg0->m_eView != 0)
+        if (m_eView != 0)
         {
-            arg0->m_eView->AttachModel(mesh.GetModel(), 2);
+            m_eView->AttachModel(mesh.GetModel(), 2);
         }
     }
 }
@@ -665,37 +660,37 @@ void ShapeRender::Initialize(void* resource)
 {
     if (!m_Initialized)
     {
-        m_Unknown00 = resource;
+        m_pResource = resource;
         m_Initialized = true;
         glBeginResource("ShapeRender");
         CreateBoxGeometry(m_Box);
         CreateCylinderGeometry(m_Cylinder);
         CreateHemisphereGeometry(m_Hemisphere);
         CreateFlatCylinderEndGeometry(m_FlatCylinderEnd);
-        fn_802BD2C8(&m_Box, GLP_TriStrip, m_Unknown00);
-        fn_802BD2C8(&m_Cylinder, GLP_TriStrip, m_Unknown00);
-        fn_802BD2C8(&m_Hemisphere, GLP_TriStrip, m_Unknown00);
-        fn_802BD2C8(&m_FlatCylinderEnd, GLP_TriStrip, m_Unknown00);
+        m_Box.MakeModel(GLP_TriStrip, m_pResource);
+        m_Cylinder.MakeModel(GLP_TriStrip, m_pResource);
+        m_Hemisphere.MakeModel(GLP_TriStrip, m_pResource);
+        m_FlatCylinderEnd.MakeModel(GLP_TriStrip, m_pResource);
         m_pLightUserData = 0;
         glEndResource();
         m_eView = 0;
     }
 }
 
-extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
+void PrimitiveShape::MakeModel(int primType, void* resource)
 {
     MeshWriter mesh;
-    shape->model = 0;
+    model = 0;
     nlFloatColour colour = { { 1.0f, 1.0f, 1.0f, 1.0f } };
-    nlVector3* pPosition = shape->position;
-    nlVector2* pTexcoord = shape->texcoord;
+    nlVector3* pPosition = position;
+    nlVector2* pTexcoord = texcoord;
 
     glSetDefaultState(true);
 
-    if (mesh.Begin(shape->vertCount, arg1, arg2))
+    if (mesh.Begin(vertCount, primType, resource))
     {
         int index = 0;
-        while (index < shape->vertCount)
+        while (index < vertCount)
         {
             mesh.Texcoord(*pTexcoord);
             mesh.Vertex(*pPosition);
@@ -717,7 +712,7 @@ extern "C" void fn_802BD2C8(PrimitiveShape* shape, int arg1, void* arg2)
 
         if (mesh.End())
         {
-            shape->model = mesh.GetModel();
+            model = mesh.GetModel();
         }
     }
 }

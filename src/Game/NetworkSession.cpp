@@ -563,7 +563,7 @@ void NetworkSession::Update()
         NetworkDraft::Instance()->Update(dt);
         mStatsReporter->Update();
 
-        if (mTransport->mState == 3)
+        if (mTransport->mLaunchState == 3)
         {
             mTransport->CompleteLaunch();
             if (mTransport->GetPlayerCount() >= 2)
@@ -583,11 +583,11 @@ void NetworkSession::Update()
                     entries[player].mStats.mLosses = 0;
                     entries[player].mStats.mUnidentified14 = 0;
                     entries[player].mStats.mDisplayRank =
-                        info->mUnidentified0C;
+                        info->mDisplayRank;
                     entries[player].mStats.mWins =
-                        info->mUnidentified10;
+                        info->mWins;
                     entries[player].mStats.mLosses =
-                        info->mUnidentified12;
+                        info->mLosses;
                 }
                 SendDraftToEveryone(mTransport->GetPlayerCount(), entries,
                                     false, 0);

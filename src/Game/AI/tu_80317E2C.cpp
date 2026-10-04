@@ -119,16 +119,21 @@ UnidentifiedScriptMachine::UnidentifiedScriptMachine(
     }
 }
 
-UnidentifiedScriptMachine::~UnidentifiedScriptMachine()
+static inline void DeleteOwnedStates(UnidentifiedScriptMachine* machine)
 {
-    if (mUnidentified068)
+    if (machine->mUnidentified068)
     {
-        for (int i = 0; i < mUnidentified074; i++)
+        for (int i = 0; i < machine->mUnidentified074; i++)
         {
-            delete mUnidentified06C[i];
-            delete mUnidentified070[i];
+            delete machine->mUnidentified06C[i];
+            delete machine->mUnidentified070[i];
         }
     }
+}
+
+UnidentifiedScriptMachine::~UnidentifiedScriptMachine()
+{
+    DeleteOwnedStates(this);
     delete[] mUnidentified06C;
     delete[] mUnidentified070;
 }

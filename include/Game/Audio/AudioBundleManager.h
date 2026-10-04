@@ -63,6 +63,8 @@ public:
 
 private:
     void* m_Unknown4C;
+
+public:
     AudioRpcController* m_RpcController;
 };
 

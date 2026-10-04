@@ -197,7 +197,7 @@ void FrameCounter::fn_802B80C4()
             float threshold = data->GetBinBoundary(index);
             int count = data->GetCumulativePercentage(index);
             nlSNPrintf(name, sizeof(name), "percent of gameplay frames below %0.0f ms", threshold);
-            fn_802BD718(name, 0, (float)count);
+            SmokeTestLogGraphValue(name, 0, (float)count);
         }
     }
 }

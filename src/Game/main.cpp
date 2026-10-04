@@ -593,7 +593,7 @@ static void Initialize()
     ReplayChoreo::Instance();
     GetPresentation();
     FrontEndPresentation::GetInstance();
-    ExcitementSystem::fn_80196644();
+    ExcitementSystem::Instance();
     AddTasks();
     SetupViews();
     HideLayerView(eCLV_ScreenBlur);
@@ -714,7 +714,7 @@ void BuildParticleQuads(GLTexturedColourMeshWriter* writer,
     const nlMatrix4* pCoordSys)
 {
     ParticleReturn ret;
-    if (writer->Begin(source->mUnidentified0BC * 4, GLP_QuadList, 0))
+    if (writer->Begin(source->m_NumParticles * 4, GLP_QuadList, 0))
     {
         nlDLListIterator<Particle*> iterator = vertices->Begin();
         while (iterator.hasNext())
@@ -734,7 +734,7 @@ void BuildParticleQuads(GLTexturedColourMeshWriter* writer,
         glTextureBinding* textureState =
             static_cast<glTextureBinding*>(
                 writer->GetModel()->packets->materialParameters);
-        textureState->textureIndex = source->mUnidentified09C;
+        textureState->textureIndex = source->m_uTextureIndex;
         textureState->SetWrapS(false);
         textureState->SetWrapT(false);
         textureState->unknown07 = 0;
@@ -747,7 +747,7 @@ void BuildParticleQuads(glShadowedTexturedColourModelWriter* writer,
     const nlMatrix4* pCoordSys)
 {
     ParticleReturn ret;
-    if (writer->Begin(source->mUnidentified0BC * 4, 3, 0))
+    if (writer->Begin(source->m_NumParticles * 4, 3, 0))
     {
         nlDLListIterator<Particle*> iterator = vertices->Begin();
         while (iterator.hasNext())
@@ -767,7 +767,7 @@ void BuildParticleQuads(glShadowedTexturedColourModelWriter* writer,
         glTextureBinding* textureState =
             static_cast<glTextureBinding*>(
                 writer->GetModel()->packets->materialParameters);
-        textureState->textureIndex = source->mUnidentified09C;
+        textureState->textureIndex = source->m_uTextureIndex;
         textureState->SetWrapS(false);
         textureState->SetWrapT(false);
         textureState->unknown07 = 0;

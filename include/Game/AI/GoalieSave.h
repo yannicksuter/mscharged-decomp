@@ -50,7 +50,7 @@ public:
 
 struct SaveBlendInfo
 {
-    void fn_80091704();
+    void Reset();
     void SyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ float mfStartTime;
@@ -102,6 +102,8 @@ public:
     static unsigned int muNumSaveEntries;
     static SavePositionData* mpPositionTable;
     static unsigned int muNumPositionEntries;
+    static unsigned int muLobCatchIndexStart;
+    static unsigned int muLobCatchCount;
     static unsigned int muMissChipIndexStart;
     static unsigned int muMissChipCount;
     static unsigned int muSTSMissIndexStart;
@@ -109,7 +111,11 @@ public:
     static float mfCrouchDuration;
 };
 
-extern nlVector3 lbl_8056D3B0;
-extern unsigned short lbl_806DBD58;
+SaveData* GetBlendedLobSave(SaveBlendInfo& blendInfo, const nlVector3& v3TargetPos);
+SaveData* GetBlendedSave(SaveData* pSaveData, SaveBlendInfo& blendInfo,
+    const nlVector3& v3TargetPos);
+
+extern nlVector3 gLobJumpSavePos;
+extern unsigned short gSaveBlendInfoType;
 
 #endif // GAME_AI_GOALIE_SAVE_H

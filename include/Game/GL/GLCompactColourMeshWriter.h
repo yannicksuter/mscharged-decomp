@@ -35,8 +35,10 @@ public:
 
     void Texcoord(float u, float v)
     {
-        *texcoord++ = (short)(u * 1024.0f);
-        *texcoord++ = (short)(v * 1024.0f);
+        short su = (short)(u * 1024.0f);
+        *texcoord++ = su;
+        short sv = (short)(v * 1024.0f);
+        *texcoord++ = sv;
     }
 
     void Texcoord(short u, short v)

@@ -4,10 +4,9 @@
 #include "NL/nlChunk.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-static nlChunk* spWorldVisibilityChunk;
-
 WorldVisibilityNode* LoadWorldVisibilityNode(nlChunk* chunk)
 {
+    static nlChunk* spWorldVisibilityChunk;
     int i;
     WorldVisibilityNode* node;
 

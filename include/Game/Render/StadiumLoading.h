@@ -4,6 +4,8 @@
 class BasicStadium;
 class DrawableObject;
 struct glModel;
+class nlVector3;
+class ImpostorModel;
 
 struct StadiumModelEntry
 {
@@ -27,6 +29,9 @@ char* fn_802772C4();
 void fn_802772D0(const char* name, bool stadiumViewer);
 
 void BeginLoadStadium(const char* path, bool skipGameplayModels);
+bool FinishLoadStadium(bool stadiumViewer);
+void StadiumScreenToWorldPosition(nlVector3& result, float screenX, float screenY, float distance);
+bool ShouldRenderStadiumNPC(ImpostorModel* model);
 bool IsStadiumResourceDataLoaded();
 void BeginLoadStadiumTemporaryResources();
 void SetStadiumBannerTextures();

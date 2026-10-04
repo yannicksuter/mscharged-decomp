@@ -40,6 +40,19 @@ public:
         m_Head = 0;
     }
 
+    // Not const: a const source lets the compiler hoist its head read above
+    // this list's clearing store, which retail keeps below it.
+    void Copy(DLListContainerBase& other)
+    {
+        Clear();
+        nlDLListIterator<T> iterator = other.Begin();
+        while (!iterator.IsDone())
+        {
+            AddEnd(*iterator);
+            iterator.Step();
+        }
+    }
+
     DLListEntry<T>* Allocate(const T& data)
     {
         DLListEntry<T> value(data);
@@ -304,6 +317,13 @@ class nlDLListContainer
 {
 public:
     nlDLListContainer()
+        : DLListContainerBase<T, NewAdapter<DLListEntry<T> > >()
+    {
+    }
+
+    // Mirrors the nlDLListSlotPool(int initial) form; a NewAdapter list has
+    // no pool to size, so the count is accepted and ignored.
+    nlDLListContainer(int initial)
         : DLListContainerBase<T, NewAdapter<DLListEntry<T> > >()
     {
     }

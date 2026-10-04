@@ -3,6 +3,7 @@
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioCalculation.h"
 #include "Game/Audio/AudioRpc.h"
+#include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "Game/Audio/AudioSystem.h"
@@ -10,35 +11,20 @@
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
-#include <NMWException.h>
-
-class AudioSource;
-
-struct AudioBundleManagerSoundInstanceView
+static inline AudioRpcController* GetAudioRpcController()
 {
-    u8 pad_00[0x50];
-    AudioRpcController* rpcController;
-};
-
-static inline AudioRpcController* GetSoundInstanceRpcController()
-{
-    return ((AudioBundleManagerSoundInstanceView*)GetAudioBundleManager())
-        ->rpcController;
+    return static_cast<UnidentifiedAudioBundleManager_802ECD34*>(
+        GetAudioBundleManager())->m_RpcController;
 }
 
 SlotPool<SoundInstance> sSoundInstancePool(32, 16);
 
-static inline SlotPool<AudioRpcListEntry>& GetSoundInstanceRpcEntryPool()
-{
-    return sAudioRpcListEntryPool;
-}
-
 SoundInstance::SoundInstance(
-    XSoundHandle* owner, AudioVoiceDefinition* definition)
-    : owner(owner)
-    , definition(definition)
+    XSoundHandle* handle, AudioVoiceDefinition* voiceDefinition)
+    : owner(handle)
+    , definition(voiceDefinition)
     , voices(0)
-    , rpcEntries(GetSoundInstanceRpcEntryPool())
+    , rpcEntries(sAudioRpcListEntryPool)
     , state(SOUND_INSTANCE_STATE_INITIAL)
     , previousTime(-1.0f)
     , currentTime(0.0f)
@@ -48,25 +34,16 @@ SoundInstance::SoundInstance(
     , releaseTime(-1.0f)
     , nextInstance(0)
 {
-    SoundInstance* instance = this;
-    instance->volume.target = 0.0f;
-    instance->volume.value = 0.0f;
-    instance->volume.minimum = -96.0f;
-    instance->volume.maximum = 6.0f;
-    instance->volume.valid = true;
-    instance->pitch.target = 0.0f;
-    instance->pitch.value = 0.0f;
-    instance->pitch.minimum = -12.0f;
-    instance->pitch.maximum = 12.0f;
-    instance->pitch.valid = true;
+    volume.Reset(0.0f, -96.0f, 6.0f);
+    pitch.Reset(0.0f, -12.0f, 12.0f);
 
     AudioSequenceInstance* previous = 0;
-    for (u32 i = 0; i < instance->definition->sequenceCount; i++)
+    for (u32 i = 0; i < definition->sequenceCount; i++)
     {
         AudioSequenceInstance* voice = new AudioSequenceInstance(
-            instance, instance->definition->sequences[i]);
+            this, definition->sequences[i]);
         if (previous == 0)
-            instance->voices = voice;
+            voices = voice;
         else
             previous->next = voice;
         previous = voice;
@@ -75,18 +52,17 @@ SoundInstance::SoundInstance(
 
 void SoundInstance::Play(float)
 {
-    SoundInstance* instance = this;
-    instance->volume.Update(0.0f, 1.0f);
-    instance->pitch.Update(0.0f, 1.0f);
-    if (instance->voices != 0)
-        instance->voices->Play();
-    instance->state = SOUND_INSTANCE_STATE_PLAYING;
+    volume.Update(0.0f, 1.0f);
+    pitch.Update(0.0f, 1.0f);
+    if (voices != 0)
+        voices->Play();
+    state = SOUND_INSTANCE_STATE_PLAYING;
 }
 
 static inline void PrepareSoundInstanceRpcNodes(SoundInstance* instance)
 {
     AudioRpcGroup* group;
-    AudioRpcController* controller = GetSoundInstanceRpcController();
+    AudioRpcController* controller = GetAudioRpcController();
     for (u32 groupIndex = 0;
         groupIndex < instance->definition->rpcGroupCount;
         groupIndex++)
@@ -100,7 +76,7 @@ static inline void PrepareSoundInstanceRpcNodes(SoundInstance* instance)
             AudioRpcDefinition* rpcDefinition =
                 &group->dynamicDefinitions[definitionIndex];
             AudioRpcRuntimeNode* node = AddAudioRpcRuntimeNode(
-                controller, rpcDefinition, (AudioRpcOwner*)instance);
+                controller, rpcDefinition, instance);
             instance->activeRpc = rpcDefinition->sliderIndex == 2 ? node : 0;
             instance->rpcEntries.AddEnd(node);
         }
@@ -126,23 +102,21 @@ void SoundInstance::Prepare()
 void SoundInstance::SetVolume(
     bool releaseAfterTransition, float target, float duration)
 {
-    SoundInstance* instance = this;
-    instance->volume.SetTarget(target, duration);
+    volume.SetTarget(target, duration);
     if (releaseAfterTransition)
-        instance->releaseTime = duration;
+        releaseTime = duration;
 }
 
-void SoundInstance::Stop(void* value)
+void SoundInstance::Stop(void* force)
 {
-    SoundInstance* instance = this;
-    if (instance->state != SOUND_INSTANCE_STATE_PLAYING
-        || value != 0 || instance->activeRpc == 0)
+    if (state != SOUND_INSTANCE_STATE_PLAYING
+        || force != 0 || activeRpc == 0)
     {
-        instance->activeRpc = 0;
-        if (instance->voices != 0)
-            instance->voices->Stop();
+        activeRpc = 0;
+        if (voices != 0)
+            voices->Stop();
     }
-    instance->state = SOUND_INSTANCE_STATE_STOPPING;
+    state = SOUND_INSTANCE_STATE_STOPPING;
 }
 
 void SoundInstance::Pause()
@@ -167,74 +141,73 @@ void SoundInstance::GetSources(AudioSource** sources, unsigned int* count)
 
 void SoundInstance::Update(float dt)
 {
-    SoundInstance* instance = this;
-    if (instance->state == SOUND_INSTANCE_STATE_PLAYING || instance->state == SOUND_INSTANCE_STATE_STOPPING)
+    if (state == SOUND_INSTANCE_STATE_PLAYING || state == SOUND_INSTANCE_STATE_STOPPING)
     {
-        instance->volume.Update(dt, 1.0f);
-        instance->pitch.Update(dt, 1.0f);
-        instance->previousTime = instance->currentTime;
-        instance->currentTime += dt;
+        volume.Update(dt, 1.0f);
+        pitch.Update(dt, 1.0f);
+        previousTime = currentTime;
+        currentTime += dt;
     }
 
-    if (instance->activeRpc != 0 && instance->state == SOUND_INSTANCE_STATE_STOPPING)
+    if (activeRpc != 0 && state == SOUND_INSTANCE_STATE_STOPPING)
     {
-        instance->transitionTime += dt;
-        Transition* slider = (Transition*)GetSoundParameter((XSoundHandle*)instance->owner, 2);
-        slider->SetTarget(instance->transitionTime, 0.0f);
-        if (instance->activeRpc->value < -94.0f)
+        transitionTime += dt;
+        AudioSlider* slider = GetSoundParameter(owner, 2);
+        slider->SetTarget(transitionTime, 0.0f);
+        if (activeRpc->value < -94.0f)
         {
-            instance->voices->Stop();
-            instance->activeRpc = 0;
+            voices->Stop();
+            activeRpc = 0;
         }
     }
 
-    int voiceState = instance->voices != 0
-                       ? instance->voices->Update(dt)
-                       : 8;
-    switch (instance->state)
+    int voiceState = voices != 0
+                       ? voices->Update(dt)
+                       : SOUND_INSTANCE_STATE_STOPPED;
+    switch (state)
     {
     case SOUND_INSTANCE_STATE_PLAYING:
         if (voiceState == SOUND_INSTANCE_STATE_STOPPED)
         {
             RemoveAudioRpcRuntimeNodes(
-                GetSoundInstanceRpcController(),
-                (AudioRpcOwner*)instance);
-            instance->rpcEntries.Clear();
-            AudioSequenceInstance* voice = instance->voices;
+                GetAudioRpcController(),
+                this);
+            rpcEntries.Clear();
+            AudioSequenceInstance* voice = voices;
             while (voice != 0)
             {
                 AudioSequenceInstance* next = voice->next;
                 delete voice;
                 voice = next;
             }
-            instance->voices = 0;
-            instance->state = SOUND_INSTANCE_STATE_STOPPED;
+            voices = 0;
+            state = SOUND_INSTANCE_STATE_STOPPED;
         }
         break;
     case SOUND_INSTANCE_STATE_STOPPING:
         if (voiceState == SOUND_INSTANCE_STATE_STOPPED)
         {
             RemoveAudioRpcRuntimeNodes(
-                GetSoundInstanceRpcController(),
-                (AudioRpcOwner*)instance);
-            instance->rpcEntries.Clear();
-            AudioSequenceInstance* voice = instance->voices;
+                GetAudioRpcController(),
+                this);
+            rpcEntries.Clear();
+            AudioSequenceInstance* voice = voices;
             while (voice != 0)
             {
                 AudioSequenceInstance* next = voice->next;
                 delete voice;
                 voice = next;
             }
-            instance->voices = 0;
-            instance->state = SOUND_INSTANCE_STATE_STOPPED;
+            voices = 0;
+            state = SOUND_INSTANCE_STATE_STOPPED;
         }
         break;
     case SOUND_INSTANCE_STATE_PREPARING:
         if (voiceState == SOUND_INSTANCE_STATE_PREPARED)
-            instance->state = SOUND_INSTANCE_STATE_PREPARED;
+            state = SOUND_INSTANCE_STATE_PREPARED;
         break;
     case SOUND_INSTANCE_STATE_FAILED:
-        instance->state = SOUND_INSTANCE_STATE_STOPPED;
+        state = SOUND_INSTANCE_STATE_STOPPED;
         break;
     case SOUND_INSTANCE_STATE_INITIAL:
     case SOUND_INSTANCE_STATE_PENDING:
@@ -244,32 +217,31 @@ void SoundInstance::Update(float dt)
         break;
     }
 
-    if (instance->releaseTime >= 0.0f)
+    if (releaseTime >= 0.0f)
     {
-        instance->releaseTime -= dt;
-        if (instance->releaseTime < 0.0f)
+        releaseTime -= dt;
+        if (releaseTime < 0.0f)
         {
-            if (instance->state != SOUND_INSTANCE_STATE_PLAYING || instance->activeRpc == 0)
+            if (state != SOUND_INSTANCE_STATE_PLAYING || activeRpc == 0)
             {
-                instance->activeRpc = 0;
-                if (instance->voices != 0)
-                    instance->voices->Stop();
+                activeRpc = 0;
+                if (voices != 0)
+                    voices->Stop();
             }
-            instance->state = SOUND_INSTANCE_STATE_STOPPING;
+            state = SOUND_INSTANCE_STATE_STOPPING;
         }
     }
 }
 
 float SoundInstance::GetVolume()
 {
-    SoundInstance* instance = this;
-    float volume = instance->volume.value;
+    float currentVolume = volume.value;
     AudioCalculationTable* table = (AudioCalculationTable*)
-        g_pAudioSystem->GetBundleManager()->GetCalculationTable();
+        GetAudioBundleManager()->GetCalculationTable();
     AudioCalculationSlider* entry =
-        table->sliders + instance->definition->sliderIndex;
-    float value = entry->GetValue();
-    return instance->volumeOffset + (value + volume);
+        table->sliders + definition->sliderIndex;
+    float sliderValue = entry->GetValue();
+    return volumeOffset + (sliderValue + currentVolume);
 }
 
 float SoundInstance::GetPitch()
@@ -280,6 +252,6 @@ float SoundInstance::GetPitch()
 void SoundInstance::Destroy()
 {
     RemoveAudioRpcRuntimeNodes(
-        GetSoundInstanceRpcController(), (AudioRpcOwner*)this);
+        GetAudioRpcController(), this);
     rpcEntries.Clear();
 }

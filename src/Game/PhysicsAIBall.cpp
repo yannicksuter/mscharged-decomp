@@ -24,7 +24,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Physics/Physics.h"
 
-extern "C" void fn_8013F854(const char*, ...);
 
 static unsigned short sPhysicsAIBallType = 0xFFFF;
 float lbl_806DCA0C = 0.05f;
@@ -83,7 +82,7 @@ ContactType PhysicsAIBall::Contact(
     PhysicsObject* obj, dContact* info, int numContacts)
 {
     int objID = obj->GetObjectType();
-    fn_8013F854(
+    DebugPrintf(
         "AIBall Contact objID %d numContacts %d\n", objID, numContacts);
 
     if (objID == 0x1D)
@@ -647,7 +646,7 @@ bool PhysicsAIBall::IsBallOutsideNet(const nlVector3& ballPosition)
          < cField::GetGoalLineX(1U) + radius - 0.08f;
 }
 
-void fn_8013F854(const char*, ...)
+void DebugPrintf(const char*, ...)
 {
 }
 

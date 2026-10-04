@@ -22,29 +22,26 @@
 #include "types.h"
 #include <math.h>
 
-extern "C" void fn_8013F854(const char*, ...);
-extern "C" void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
-
-static const nlVector3 lbl_804DCD90 = { 0.0f, 0.0f, 0.0f };
-static const nlVector3 lbl_804DCD9C = { 0.0f, 20.0f, -15.0f };
-static float lbl_806DCD68 = 1.05f;
-static float lbl_806DCD6C = 0.35f;
-static float lbl_806DCD70 = 27.5f;
-static float lbl_806DCD74 = 0.02f;
-static float lbl_806DCD78 = 1.25f;
-static float lbl_806DCD7C = 0.3f;
+static const nlVector3 sInitialVelocity = { 0.0f, 0.0f, 0.0f };
+static const nlVector3 sHiddenPosition = { 0.0f, 20.0f, -15.0f };
+static float sActiveTime = 1.05f;
+static float sRadiusTransitionTime = 0.35f;
+static float sSpinSpeed = 27.5f;
+static float sInitialRadius = 0.02f;
+static float sActiveRadius = 1.25f;
+static float sDefaultRadius = 0.3f;
 
 BirdoEggObject::BirdoEggObject(RenderObject* drawable)
 {
-    mRadius = lbl_806DCD7C;
-    mTargetRadius = lbl_806DCD7C;
+    mRadius = sDefaultRadius;
+    mTargetRadius = sDefaultRadius;
     mDrawable = drawable;
     mRadiusTimer = 0.0f;
     mActiveTimer = 0.0f;
     mVisible = false;
     mShooter = 0;
-    mVelocity = lbl_804DCD90;
-    mPosition = lbl_804DCD9C;
+    mVelocity = sInitialVelocity;
+    mPosition = sHiddenPosition;
     mSpinSpeed = 0.0f;
     mOrientation.z = 0.0f;
     mOrientation.y = 0.0f;
@@ -52,9 +49,9 @@ BirdoEggObject::BirdoEggObject(RenderObject* drawable)
     mOrientation.w = 1.0f;
 
     mPhysics = new (8, false) PhysicsBirdoEgg(
-        this, lbl_806DCD7C);
+        this, sDefaultRadius);
     mPhysics->SetPosition(
-        lbl_804DCD9C, PhysicsObject::WORLD_COORDINATES);
+        sHiddenPosition, PhysicsObject::WORLD_COORDINATES);
     mPhysics->DisableCollisions();
 }
 
@@ -150,21 +147,21 @@ void BirdoEggObject::SetPosition(const nlVector3& position)
 
 void BirdoEggObject::Show(cFielder* shooter)
 {
-    fn_8013F854("BirdoEggShow\n");
+    DebugPrintf("BirdoEggShow\n");
     mShooter = shooter;
     cNet* net = shooter->m_pTeam->GetOtherNet();
     float x = shooter->mUnidentified024.m_v3Position.x - net->m_v3NetLocation.x;
     float y = shooter->mUnidentified024.m_v3Position.y - net->m_v3NetLocation.y;
     float angle = nlATan2f(y, x);
     fn_802B549C(mOrientation, (unsigned short)(int)(10430.378f * angle));
-    mSpinSpeed = lbl_806DCD70;
-    mTargetRadius = lbl_806DCD74;
+    mSpinSpeed = sSpinSpeed;
+    mTargetRadius = sInitialRadius;
     mRadiusTimer = 0.0f;
     mRadius = mTargetRadius;
     mPhysics->SetRadius(mRadius);
 
-    float time = lbl_806DCD6C;
-    float radius = lbl_806DCD78;
+    float time = sRadiusTransitionTime;
+    float radius = sActiveRadius;
     mTargetRadius = radius;
     mRadiusTimer = time;
     if (time <= 0.0f)
@@ -172,8 +169,8 @@ void BirdoEggObject::Show(cFielder* shooter)
         mRadius = radius;
         mPhysics->SetRadius(mRadius);
     }
-    mActiveTimer = lbl_806DCD68;
-    fn_8013F854("BirdoEggSetActive\n");
+    mActiveTimer = sActiveTime;
+    DebugPrintf("BirdoEggSetActive\n");
     mVisible = true;
     mPhysics->EnableCollisions();
 
@@ -191,10 +188,10 @@ void BirdoEggObject::Show(cFielder* shooter)
 
 void BirdoEggObject::Hide(bool destroyEffect)
 {
-    fn_8013F854("BirdoEggHide\n");
+    DebugPrintf("BirdoEggHide\n");
     if (mVisible)
     {
-        fn_8013F854("BirdoEggHide SetVis(false)\n");
+        DebugPrintf("BirdoEggHide SetVis(false)\n");
         if (!destroyEffect)
         {
             PlaySound(mShooter->m_uSoundSlotId, 0x52641B7B, 0, 0);
@@ -212,8 +209,8 @@ void BirdoEggObject::Hide(bool destroyEffect)
         {
             EmitBirdoEggBurst(mPosition);
         }
-        SetPosition(lbl_804DCD9C);
-        mPhysics->SetPosition(lbl_804DCD9C, PhysicsObject::WORLD_COORDINATES);
+        SetPosition(sHiddenPosition);
+        mPhysics->SetPosition(sHiddenPosition, PhysicsObject::WORLD_COORDINATES);
         mVisible = false;
     }
     mPhysics->DisableCollisions();
@@ -224,7 +221,7 @@ void BirdoEggObject::Hide(bool destroyEffect)
 
 float BirdoEggObject::GetScale() const
 {
-    return mRadius / lbl_806DCD7C;
+    return mRadius / sDefaultRadius;
 }
 
 void BirdoEggObject::Reset()
@@ -232,7 +229,7 @@ void BirdoEggObject::Reset()
     Hide(true);
 
     mSpinSpeed = 0.0f;
-    mPosition = lbl_804DCD9C;
+    mPosition = sHiddenPosition;
     mOrientation.z = 0.0f;
     mOrientation.y = 0.0f;
     mOrientation.x = 0.0f;

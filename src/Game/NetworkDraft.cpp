@@ -265,40 +265,46 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     GameSceneManager::Instance()->Push((SceneList)0x32, SCREEN_FORWARD, true);
 }
 
-void NetworkDraft::AssignDraftSides()
+struct DraftSidePlayer
 {
-    struct SidePlayer
+    DraftSidePlayer() : machine(-1), guest(false) { }
+
+    s8 machine;
+    bool guest;
+};
+
+static inline void CollectDraftSidePlayers(const NetMessageDraft& message,
+    int sideCounts[2], DraftSidePlayer sidePlayers[2][3])
+{
+    for (int machine = 0; machine < message.mMachineCount; ++machine)
     {
-        SidePlayer() : machine(-1), guest(false) { }
-
-        s8 machine;
-        bool guest;
-    };
-
-    bool usedMachines[4] = { false };
-    int sideCounts[2] = { 0, 0 };
-    SidePlayer sidePlayers[2][3];
-
-    for (int machine = 0; machine < mDraftMessage.mMachineCount; ++machine)
-    {
-        int side = mDraftMessage.mPlayerSides.mData[machine][0];
+        int side = message.mPlayerSides.mData[machine][0];
         if (side != -1)
         {
             int count = sideCounts[side]++;
-            SidePlayer& player = sidePlayers[side][count];
+            DraftSidePlayer& player = sidePlayers[side][count];
             player.machine = machine;
             player.guest = false;
         }
 
-        side = mDraftMessage.mPlayerSides.mData[machine][1];
+        side = message.mPlayerSides.mData[machine][1];
         if (side != -1)
         {
             int count = sideCounts[side]++;
-            SidePlayer& player = sidePlayers[side][count];
+            DraftSidePlayer& player = sidePlayers[side][count];
             player.machine = machine;
             player.guest = true;
         }
     }
+}
+
+void NetworkDraft::AssignDraftSides()
+{
+    bool usedMachines[4] = { false };
+    int sideCounts[2] = { 0, 0 };
+    DraftSidePlayer sidePlayers[2][3];
+
+    CollectDraftSidePlayers(mDraftMessage, sideCounts, sidePlayers);
 
     int side = 0;
     if (sideCounts[1] == 1 && sideCounts[0] > 1)

@@ -3,9 +3,6 @@
 
 #include "NL/nlMemory.h"
 
-extern "C" void fn_8030B038(cPoseAccumulator*, const cPoseNode*,
-    const nlMatrix4*);
-
 class WorldAnimBinder
 {
 public:
@@ -166,7 +163,7 @@ void WorldAnimUpdate::Update(const unsigned long&,
         if (pController->m_pPoseTree->get_fTime()
             != pController->m_pPoseTree->GetPreviousTime())
         {
-            fn_8030B038(pController->m_pPoseAccumulator,
+            pController->m_pPoseAccumulator->Pose(
                 pController->m_pPoseTree, &pController->m_worldMatrix);
         }
         if (pController->m_pPoseTree->UnidentifiedAtEnd()

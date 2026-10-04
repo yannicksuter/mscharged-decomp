@@ -405,7 +405,7 @@ void Presentation::Finish()
                 {
                     g_pGame->ChangeGameState(1);
                     FixedUpdateTask* task = GetFixedUpdateTask();
-                    task->mUnidentified38 = true;
+                    task->mSimulationStarted = true;
                 }
                 nlTaskManager::SetNextState(2);
             }

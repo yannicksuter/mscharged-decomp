@@ -14,44 +14,44 @@
 
 namespace
 {
-char lbl_80511AD8[] = "art/Scripts/ExcitementSystem.byte_code";
-const char lbl_806E4EA0[] = "Main";
+char sExcitementSystemByteCode[] = "art/Scripts/ExcitementSystem.byte_code";
+const char sMainFunctionName[] = "Main";
 } // namespace
 
 inline ExcitementSystem::ExcitementSystem()
     : InterpreterCore(100)
-    , mUnidentified028(200.0f)
-    , mUnidentified02C(0)
-    , mUnidentified02E(0)
+    , mMaxBallDistanceSq(200.0f)
+    , mExcitement(0)
+    , mExcitementCount(0)
     , mByteCode(0)
 {
-    fn_801967DC();
+    ClearExcitementValues();
     LoadScript();
 }
 
-ExcitementSystem& ExcitementSystem::fn_80196644()
+ExcitementSystem& ExcitementSystem::Instance()
 {
     static ExcitementSystem instance;
     return instance;
 }
 
-void ExcitementSystem::fn_801967DC()
+void ExcitementSystem::ClearExcitementValues()
 {
     for (int i = 0; i < 130; i++)
     {
-        mUnidentified030[i] = 0;
+        mFielderAnimExcitement[i] = 0;
     }
     for (int i = 0; i < 178; i++)
     {
-        mUnidentified0B2[i] = 0;
+        mGoalieAnimExcitement[i] = 0;
     }
     for (int i = 0; i < 4; i++)
     {
-        mUnidentified164[i] = 0;
+        mEventExcitement[i] = 0;
     }
 }
 
-void ExcitementSystem::fn_80196924()
+void ExcitementSystem::RegisterEventHandlers()
 {
     typedef BindExp2<void,
         Detail::MemFunImpl<void, void (ExcitementSystem::*)(PlayerAttackData*)>,
@@ -63,36 +63,36 @@ void ExcitementSystem::fn_80196924()
         Detail::MemFunImpl<void, void (ExcitementSystem::*)(CollisionBallGoalpostData*)>,
         ExcitementSystem*, Placeholder<0> > GoalpostBinding;
 
-    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(AttackBinding(MemFun(&ExcitementSystem::fn_80196D30), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(LightningBinding(MemFun(&ExcitementSystem::fn_80196D64), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(GoalpostBinding(MemFun(&ExcitementSystem::fn_80196D8C), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(AttackBinding(MemFun(&ExcitementSystem::OnAttackSuccess), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(LightningBinding(MemFun(&ExcitementSystem::OnLightningStrike), this, placeholder0)), 0, -1);
+    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(GoalpostBinding(MemFun(&ExcitementSystem::OnCollisionBallGoalpost), this, placeholder0)), 0, -1);
 }
 
-void ExcitementSystem::fn_80196D30(
+void ExcitementSystem::OnAttackSuccess(
     PlayerAttackData* event)
 {
-    if (event->mUnidentified10 == 1 && mUnidentified164[1] != 0)
+    if (event->mUnidentified10 == 1 && mEventExcitement[1] != 0)
     {
-        mUnidentified02C += mUnidentified164[1];
-        mUnidentified02E++;
+        mExcitement += mEventExcitement[1];
+        mExcitementCount++;
     }
 }
 
-void ExcitementSystem::fn_80196D64(LightningStrikeData*)
+void ExcitementSystem::OnLightningStrike(LightningStrikeData*)
 {
-    if (mUnidentified164[3] != 0)
+    if (mEventExcitement[3] != 0)
     {
-        mUnidentified02C += mUnidentified164[3];
-        mUnidentified02E++;
+        mExcitement += mEventExcitement[3];
+        mExcitementCount++;
     }
 }
 
-void ExcitementSystem::fn_80196D8C(CollisionBallGoalpostData*)
+void ExcitementSystem::OnCollisionBallGoalpost(CollisionBallGoalpostData*)
 {
-    if (mUnidentified164[0] != 0)
+    if (mEventExcitement[0] != 0)
     {
-        mUnidentified02C += mUnidentified164[0];
-        mUnidentified02E++;
+        mExcitement += mEventExcitement[0];
+        mExcitementCount++;
     }
 }
 
@@ -104,7 +104,7 @@ void ExcitementSystem::DoFunctionCall(unsigned int function)
     {
         float value = *(float*)(m_SP - 1);
         m_SP--;
-        mUnidentified028 = value * value;
+        mMaxBallDistanceSq = value * value;
         break;
     }
     case 1:
@@ -112,7 +112,7 @@ void ExcitementSystem::DoFunctionCall(unsigned int function)
         unsigned int value = m_SP[-1];
         unsigned int index = m_SP[-2];
         m_SP -= 2;
-        mUnidentified030[index] = value;
+        mFielderAnimExcitement[index] = value;
         break;
     }
     case 2:
@@ -120,7 +120,7 @@ void ExcitementSystem::DoFunctionCall(unsigned int function)
         unsigned int value = m_SP[-1];
         unsigned int index = m_SP[-2];
         m_SP -= 2;
-        mUnidentified0B2[index] = value;
+        mGoalieAnimExcitement[index] = value;
         break;
     }
     case 3:
@@ -128,7 +128,7 @@ void ExcitementSystem::DoFunctionCall(unsigned int function)
         unsigned int value = m_SP[-1];
         unsigned int index = m_SP[-2];
         m_SP -= 2;
-        mUnidentified164[index] = value;
+        mEventExcitement[index] = value;
         break;
     }
     default:
@@ -146,7 +146,7 @@ void ExcitementSystem::LoadScript()
     }
 
     unsigned long fileSize = 0;
-    mByteCode = nlLoadEntireFile(lbl_80511AD8,
+    mByteCode = nlLoadEntireFile(sExcitementSystemByteCode,
         &fileSize,
         0x20,
         AllocateStart,
@@ -154,5 +154,5 @@ void ExcitementSystem::LoadScript()
         0,
         0);
     LoadByteCode(mByteCode);
-    CallFunction(nlStringHash(lbl_806E4EA0));
+    CallFunction(nlStringHash(sMainFunctionName));
 }
