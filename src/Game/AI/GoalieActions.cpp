@@ -432,13 +432,11 @@ void Goalie::ActionLooseBallCatch(float deltaTime)
 void Goalie::ActionLooseBallDesperate(float fDeltaT)
 {
     cBall* pBall = g_pBall;
-    const nlVector3& v3BallPosition = pBall->m_v3Position;
+    const nlVector3& v3BallPosition = pBall->GetPosition();
     int animID = m_eAnimID;
     const LooseBallInfo* pInfo = mpLooseBallInfo;
     nlVector3 v3GuessBallPos;
     nlVector3 v3GuessBallPosElse;
-    nlVector2 v2CurrentDelta;
-    nlVector2 v2GuessDelta;
 
     if (pInfo->mnAnimID == animID)
     {
@@ -503,13 +501,9 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
                     }
                     if (fabsf(v3BallPosition.x) < fLimit)
                     {
-                        float fBallX = v3BallPosition.x;
-                        float fBallY = v3BallPosition.y;
-                        float fDX = fBallX - fClampedX;
-                        float fDY = fBallY - v3GuessBallPos.y;
-                        float fDXOrig = fBallX - v3GuessBallPos.x;
-                        float fNewY = fBallY - (fDX * fDY) / fDXOrig;
-                        v3GuessBallPos.y = fNewY;
+                        v3GuessBallPos.y = v3BallPosition.y
+                                         - ((v3BallPosition.x - fClampedX) * (v3BallPosition.y - v3GuessBallPos.y))
+                                               / (v3BallPosition.x - v3GuessBallPos.x);
                     }
                     v3GuessBallPos.x = fClampedX;
                 }
@@ -521,7 +515,7 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
             const nlVector3& v3BallJoint
                 = GetJointPosition(m_nBallJointIndex);
             if (CalculateDistanceSquared(
-                    pBall->m_v3Position, v3BallJoint)
+                    pBall->GetPosition(), v3BallJoint)
                 < 0.25f)
             {
                 InitiatePanicGrab(NULL);
@@ -553,24 +547,16 @@ void Goalie::ActionLooseBallDesperate(float fDeltaT)
 
     const LooseBallInfo* pInfoE = mpLooseBallInfo;
     cBall* pBallE = g_pBall;
-    float fCatchRadSq;
-    float fCatchRadius = 0.5f + pInfoE->mfPickupDistance;
+    float fCatchRadSq = nlGetLengthSquared1D(0.5f + pInfoE->mfPickupDistance);
     float fTimeProduct = pInfoE->mfPickupTime * pInfoE->mfAnimDuration;
-    fCatchRadSq = fCatchRadius * fCatchRadius;
     nlVec3ScaleAdd(v3GuessBallPosElse, fTimeProduct, pBallE->m_v3Velocity, v3BallPosition);
 
     if (mfTargetTime < 0.02f
         || fabsf(v3BallPosition.x)
                > cField::GetGoalLineX(1U) - 1.0f
-        || (nlVec2Set(v2CurrentDelta,
-                mUnidentified024.m_v3Position.x - pBall->m_v3Position.x,
-                mUnidentified024.m_v3Position.y - pBall->m_v3Position.y),
-               nlVec2LengthSquared(v2CurrentDelta))
+        || nlVec3DistanceSquared2D(GetPosition(), pBall->GetPosition())
                < fCatchRadSq
-        || (nlVec2Set(v2GuessDelta,
-                mUnidentified024.m_v3Position.x - v3GuessBallPosElse.x,
-                mUnidentified024.m_v3Position.y - v3GuessBallPosElse.y),
-               nlVec2LengthSquared(v2GuessDelta))
+        || nlVec3DistanceSquared2D(GetPosition(), v3GuessBallPosElse)
                < fCatchRadSq)
     {
         PlayNewAnim(mpLooseBallInfo->mnAnimID);
@@ -980,9 +966,9 @@ void Goalie::fn_80083960(float)
     }
     else
     {
-        if (g_pBall->GetOwnerFielder() != mpMonty
+        if (g_pBall->GetOwnerFielder() != GetMonty()
             || mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
-            || mpMonty->fn_8003E6FC()
+            || GetMonty()->fn_8003E6FC()
             || mpMonty->mbTangible
             || mpMonty->m_eActionState != ACTION_UNKNOWN_32
             || mpMonty->m_pCurrentAnimController->m_fTime > 0.55f)
@@ -2184,10 +2170,10 @@ void Goalie::ActionMove(float deltaTime)
 
         if (pWall != 0)
         {
-            v3WallNormal.Set(pWall->mStartPoint.y - pWall->mEndPoint.y,
-                pWall->mEndPoint.x - pWall->mStartPoint.x,
-                0.0f);
-            MakePerpendicularPlane(pWall->mStartPoint,
+            const nlVector3& start = pWall->GetStartPoint();
+            const nlVector3& end = pWall->GetEndPoint();
+            v3WallNormal.Set(start.y - end.y, end.x - start.x, 0.0f);
+            MakePerpendicularPlane(start,
                 v3WallNormal,
                 wallPlane,
                 0.0f);
@@ -2566,7 +2552,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
             float posY = mUnidentified024.m_v3Position.y;
             u16 dir = mUnidentified024.m_aDesiredFacingDirection;
 
-            if ((float)fabs(posX) < penaltyBoxX)
+            if (fabsf(posX) < penaltyBoxX)
             {
                 if (posX > 0.0f)
                 {
@@ -2592,7 +2578,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
                     dir += 0x8000;
                 }
             }
-            else if ((float)fabs(posX) > goalLineX)
+            else if (fabsf(posX) > goalLineX)
             {
                 if (posX < 0.0f)
                 {
@@ -2619,7 +2605,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
                 }
             }
 
-            if ((float)fabs(posY) > penaltyBoxY)
+            if (fabsf(posY) > penaltyBoxY)
             {
                 if (posY < 0.0f)
                 {
@@ -2666,7 +2652,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
         {
             bool bClamped = false;
 
-            float fAbsX = (float)fabs(mUnidentified024.m_v3Position.x);
+            float fAbsX = fabsf(mUnidentified024.m_v3Position.x);
             if (fAbsX
                 < cField::GetPenaltyBoxX(1U) - lbl_806DBD44)
             {
@@ -2685,7 +2671,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
             else
             {
                 float fAbsGoalLineX
-                    = (float)fabs(mUnidentified024.m_v3Position.x);
+                    = fabsf(mUnidentified024.m_v3Position.x);
                 if (fAbsGoalLineX
                     > cField::GetGoalLineX(1U) - lbl_806DBD40)
                 {
@@ -2703,7 +2689,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
                 }
             }
 
-            float fAbsY = (float)fabs(mUnidentified024.m_v3Position.y);
+            float fAbsY = fabsf(mUnidentified024.m_v3Position.y);
             if (fAbsY
                 > cField::GetPenaltyBoxY() + lbl_806DBD44)
             {
@@ -2720,8 +2706,8 @@ void Goalie::ActionMoveWB(float fDeltaT)
                 if (bClamped)
                 {
                     u16 currentDir = mUnidentified024.m_aDesiredFacingDirection;
-                    s16 diff = (s16)(yDir - currentDir);
-                    s16 scaledDiff = (s16)(diff * 0.5f);
+                    s16 diff = nlAngleDelta(yDir, currentDir);
+                    s16 scaledDiff = (s16)(s32)(diff * 0.5f);
                     currentDir = (u16)(currentDir + scaledDiff);
                     mUnidentified024.m_aDesiredFacingDirection = currentDir;
                 }
@@ -2760,12 +2746,10 @@ void Goalie::ActionMoveWB(float fDeltaT)
         {
             nlVector3 v3Facing;
             nlVec3Set(v3Facing, m_m4WorldMatrix.e2[0][0], m_m4WorldMatrix.e2[0][1], m_m4WorldMatrix.e2[0][2]);
-            nlVector3 v3Center = mUnidentified024.m_v3Position;
-            float dist = nlSqrt(nlVec3LengthSquared(mUnidentified024.m_v3Position), true);
-            float invDist = -1.0f / dist;
-            v3Center.x = invDist * mUnidentified024.m_v3Position.x;
-            v3Center.y = invDist * mUnidentified024.m_v3Position.y;
-            v3Center.z = invDist * mUnidentified024.m_v3Position.z;
+            nlVector3 v3Center = GetPosition();
+            const nlVector3& position = GetPosition();
+            float dist = nlVec3Length(position);
+            nlVec3Scale(v3Center, position, -1.0f / dist);
 
             float dot = nlVec3DotProduct(v3Facing, v3Center);
             if (dot > 0.5)
@@ -4117,7 +4101,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
 
     if (m_pBall == 0)
     {
-        cPlayer* pOwner = g_pBall->m_pOwner;
+        cPlayer* pOwner = g_pBall->GetOwner();
         const nlVector3& ballPosition = g_pBall->GetPosition();
 
         if (pOwner == 0)
@@ -6192,7 +6176,7 @@ void Goalie::fn_8008DEF4(float fParam)
         fn_80015C38(g_pBall, 4);
     }
 
-    unsigned short aActualFacingDirection = mUnidentified024.m_aActualFacingDirection;
+    unsigned short aActualFacingDirection = GetActualFacing();
     unsigned short aAngleRange = DegreesToAngle((float)lbl_806DBCF0);
     unsigned int aLaunchDirection = (unsigned short)(aActualFacingDirection
                                                      + (nlRandom(2 * DegreesToAngle((float)lbl_806DBCF0)) - aAngleRange));
@@ -6461,8 +6445,8 @@ void Goalie::fn_8008E69C(float fDeltaT)
     }
 
     if (mnOffplayPending != GOALIE_OFFPLAY_NONE
-        || mpShooter != g_pBall->GetOwnerFielder()
-        || FindSTSMissData(mpShooter->GetPosition()))
+        || GetShooter() != g_pBall->GetOwnerFielder()
+        || FindSTSMissData(GetShooter()->GetPosition()))
     {
         InitActionMove(false);
         return;
@@ -6838,15 +6822,15 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     mUnidentified524 = 0.0f;
 
     char texture[128];
-    const CharacterInfo& teamInfo = *m_pTeam->GetCaptain()->mUnidentified11C;
+    const CharacterInfo& teamInfo = *m_pTeam->GetCaptain()->GetCharacterInfoData();
     cFielder* opponent = m_pTeam->GetOtherTeam()->GetCaptain();
-    if (NeedsAlternateColour(teamInfo, *opponent->mUnidentified11C))
+    if (NeedsAlternateColour(teamInfo, *opponent->GetCharacterInfoData()))
     {
-        nlSNPrintf(texture, sizeof(texture), "%s/mega_hand_alt", m_pTeam->GetCaptain()->mUnidentified11C->mName);
+        nlSNPrintf(texture, sizeof(texture), "%s/mega_hand_alt", m_pTeam->GetCaptain()->GetCharacterInfoData()->mName);
     }
     else
     {
-        nlSNPrintf(texture, sizeof(texture), "%s/mega_hand", m_pTeam->GetCaptain()->mUnidentified11C->mName);
+        nlSNPrintf(texture, sizeof(texture), "%s/mega_hand", m_pTeam->GetCaptain()->GetCharacterInfoData()->mName);
     }
     unsigned int catchTexture = nlStringLowerHash(texture);
     nlStrNCat(texture, texture, "1", sizeof(texture));

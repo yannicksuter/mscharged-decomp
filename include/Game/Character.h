@@ -253,6 +253,7 @@ public:
     bool fn_8001E160();
     bool IsCaptain() const;
     bool fn_8001E184();
+    const CharacterInfo* GetCharacterInfoData() const { return mUnidentified11C; }
     cPN_SAnimController* GetCurrentAnimController() const { return m_pCurrentAnimController; }
 
     cAnimInventory* GetAnimInventory() const

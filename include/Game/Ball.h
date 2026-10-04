@@ -48,6 +48,7 @@ public:
     void KillBlurHandler();
     void ClearBallBlur();
     void SetOwner(cPlayer* pOwner);
+    cPlayer* GetOwner() const { return m_pOwner; }
     const nlVector3& GetPosition() const
     {
         return m_v3Position;

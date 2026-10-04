@@ -148,6 +148,8 @@ public:
     void InitActionMove(bool bParam);
     void InitActionMoveWB();
     void InitActionMegaStrike(float numBalls, float accuracy);
+    cFielder* GetMonty() const { return mpMonty; }
+    cFielder* GetShooter() const { return mpShooter; }
     void InitMegaStrikeTargets();
     void HideMegaStrikeBall();
     void SwapMegaStrikeController(cPlayer* player);
