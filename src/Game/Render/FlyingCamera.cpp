@@ -288,7 +288,7 @@ void UpdateFlyingCameras(float dt)
 
 static inline void ResetCameraIntegral(FlyingCamera* camera)
 {
-    nlVec3Set(camera->mPositionIntegral, lbl_806E5034, lbl_806E5034, lbl_806E5034);
+    nlVec3Set(camera->mPositionIntegral, 0.0f, 0.0f, 0.0f);
 }
 
 void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)

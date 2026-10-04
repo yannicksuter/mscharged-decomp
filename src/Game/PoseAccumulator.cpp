@@ -19,12 +19,6 @@ static inline void PoseAccumulatorMultiplyScale(
     result.z = parent.z * scale.z;
 }
 
-static inline void PoseAccumulatorNormalizeWorldAxis(nlVector3& result,
-    const nlVector3& axis, const float& scale)
-{
-    nlVec3Scale(result, axis, 1.0f / scale);
-}
-
 /**
  * Offset/Address/Size: 0x0 | 0x8030A9D0 | size: 0x228
  */
@@ -258,8 +252,14 @@ void cPoseAccumulator::InitAccumulators()
 /**
  * Offset/Address/Size: 0x948 | 0x8030B318 | size: 0x6B0
  */
+// Preserve the shared scalar lifetimes used to remove world scale.
+#pragma opt_lifetimes off
 void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
 {
+    float scratch0, scratch1, scratch2, scratch3, scratch4, scratch5, scratch6, scratch7, scratch8, scaledX, rightZ, rightY, rightX, forwardZ, forwardY, forwardX;
+    register float fWorldScaleY, fWorldScaleX;
+    float scaleUpper, scaleLower, weightEpsilon;
+
     if (m_PrevNodeMatrices != NULL)
     {
         nlMatrix4* pTemp = m_PrevNodeMatrices;
@@ -299,21 +299,20 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
             else
             {
                 float fTotalWeight = m_rot[i].rotAroundZAccumulatedWeight
-                    + m_rot[i].quatAccumulatedWeight;
-                if (fabsf(fTotalWeight) > 0.0001f)
+                                   + m_rot[i].quatAccumulatedWeight;
+                weightEpsilon = 0.0001f;
+                if (fabsf(fTotalWeight) > weightEpsilon)
                 {
                     nlQuaternion quatAroundZ;
                     fn_802B549C(quatAroundZ, m_rot[i].rotAroundZ);
-                    nlQuatNLerp(m_rot[i].q, m_rot[i].q, quatAroundZ,
-                        m_rot[i].rotAroundZAccumulatedWeight / fTotalWeight);
+                    nlQuatNLerp(m_rot[i].q, m_rot[i].q, quatAroundZ, m_rot[i].rotAroundZAccumulatedWeight / fTotalWeight);
                 }
                 *pLocalQuaternion = m_rot[i].q;
             }
         }
         else
         {
-            pLocalQuaternion->x = pLocalQuaternion->y =
-                pLocalQuaternion->z = 0.0f;
+            pLocalQuaternion->x = pLocalQuaternion->y = pLocalQuaternion->z = 0.0f;
             pLocalQuaternion->w = 1.0f;
         }
 
@@ -339,10 +338,8 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
         {
             nParentIndex = ParentStack[nStackIndex];
             nScaleIndex = nStackIndex + 1;
-            nlMultQuat(m_pQuaternions[i], m_pQuaternions[nParentIndex],
-                *pLocalQuaternion);
-            nlMultPosVectorMatrix(v3Position, pLocalMatrix->GetTranslation(),
-                m_NodeMatrices[nParentIndex]);
+            nlMultQuat(m_pQuaternions[i], m_pQuaternions[nParentIndex], *pLocalQuaternion);
+            nlMultPosVectorMatrix(v3Position, pLocalMatrix->GetTranslation(), m_NodeMatrices[nParentIndex]);
 
             ScaleAccum& s = m_scale[i];
             if (s.bIdentity)
@@ -364,7 +361,8 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
                 else
                 {
                     PoseAccumulatorMultiplyScale(ScaleStack[nScaleIndex],
-                        ScaleStack[nStackIndex], s.s);
+                        ScaleStack[nStackIndex],
+                        s.s);
                 }
             }
         }
@@ -373,39 +371,84 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
             nlQuaternion qWorld;
             nlVector3 v3WorldScaleSquared;
             v3WorldScaleSquared.x = pWorldMatrix.m11 * pWorldMatrix.m11
-                + pWorldMatrix.m12 * pWorldMatrix.m12
-                + pWorldMatrix.m13 * pWorldMatrix.m13;
+                                  + pWorldMatrix.m12 * pWorldMatrix.m12
+                                  + pWorldMatrix.m13 * pWorldMatrix.m13;
             v3WorldScaleSquared.y = pWorldMatrix.m21 * pWorldMatrix.m21
-                + pWorldMatrix.m22 * pWorldMatrix.m22
-                + pWorldMatrix.m23 * pWorldMatrix.m23;
+                                  + pWorldMatrix.m22 * pWorldMatrix.m22
+                                  + pWorldMatrix.m23 * pWorldMatrix.m23;
             v3WorldScaleSquared.z = pWorldMatrix.m31 * pWorldMatrix.m31
-                + pWorldMatrix.m32 * pWorldMatrix.m32
-                + pWorldMatrix.m33 * pWorldMatrix.m33;
+                                  + pWorldMatrix.m32 * pWorldMatrix.m32
+                                  + pWorldMatrix.m33 * pWorldMatrix.m33;
 
-            if (v3WorldScaleSquared.x < 0.9999f || v3WorldScaleSquared.x > 1.0001f
-                || v3WorldScaleSquared.y < 0.9999f || v3WorldScaleSquared.y > 1.0001f
-                || v3WorldScaleSquared.z < 0.9999f || v3WorldScaleSquared.z > 1.0001f)
+            scaleLower = 0.9999f;
+            scaleUpper = 1.0001f;
+            if (v3WorldScaleSquared.x < scaleLower || v3WorldScaleSquared.x > scaleUpper
+                || v3WorldScaleSquared.y < scaleLower || v3WorldScaleSquared.y > scaleUpper
+                || v3WorldScaleSquared.z < scaleLower || v3WorldScaleSquared.z > scaleUpper)
             {
-                float fWorldScaleX = nlSqrt(v3WorldScaleSquared.x, true);
-                float fWorldScaleY = nlSqrt(v3WorldScaleSquared.y, true);
+                // Capture the floating-point return value before the next call.
+                nlSqrt(v3WorldScaleSquared.x, true);
+                // clang-format off
+                asm { fmr fWorldScaleX, f1; }
+                // clang-format on
+                nlSqrt(v3WorldScaleSquared.y, true);
+                // clang-format off
+                asm { fmr fWorldScaleY, f1; }
+                // clang-format on
                 float fWorldScaleZ = nlSqrt(v3WorldScaleSquared.z, true);
 
                 nlMatrix4 mWorldNoScale;
-                mWorldNoScale.m14 = 0.0f;
-                mWorldNoScale.m24 = 0.0f;
-                mWorldNoScale.m34 = 0.0f;
-                PoseAccumulatorNormalizeWorldAxis(*(nlVector3*)&mWorldNoScale.e2[0][0],
-                    *(const nlVector3*)&pWorldMatrix.e2[0][0], fWorldScaleX);
-                nlVec3Scale(*(nlVector3*)&mWorldNoScale.e2[2][0],
-                    *(const nlVector3*)&pWorldMatrix.e2[2][0], 1.0f / fWorldScaleZ);
+
                 ScaleIdentityStack[0] = false;
-                ScaleStack[0].z *= fWorldScaleZ;
-                ScaleStack[0].y *= fWorldScaleY;
-                ScaleStack[0].x *= fWorldScaleX;
-                nlVec3CrossProduct(*(nlVector3*)&mWorldNoScale.e2[1][0],
-                    *(const nlVector3*)&mWorldNoScale.e2[2][0],
-                    *(const nlVector3*)&mWorldNoScale.e2[0][0]);
-                mWorldNoScale.SetTranslation(pWorldMatrix.GetTranslation());
+                mWorldNoScale.m14 = 0.0f;
+                scratch7 = 1.0f / fWorldScaleX;
+                scratch5 = pWorldMatrix.m12;
+                scratch0 = pWorldMatrix.m11;
+                scratch6 = pWorldMatrix.m13;
+                rightX = scratch7 * scratch0;
+                scratch3 = pWorldMatrix.m33;
+                scratch4 = 1.0f / fWorldScaleZ;
+                scratch2 = pWorldMatrix.m32;
+                scratch0 = pWorldMatrix.m31;
+                scratch8 = ScaleStack[0].y;
+                scaledX = ScaleStack[0].x;
+                forwardZ = scratch4 * scratch3;
+                scratch3 = pWorldMatrix.m41;
+                rightY = scratch7 * scratch5;
+                rightZ = scratch7 * scratch6;
+                scratch6 = ScaleStack[0].z;
+                forwardY = scratch4 * scratch2;
+                scratch2 = pWorldMatrix.m42;
+                forwardX = scratch4 * scratch0;
+                scratch0 = pWorldMatrix.m43;
+                scratch6 = scratch6 * fWorldScaleZ;
+                mWorldNoScale.m24 = 0.0f;
+                scratch7 = scratch8 * fWorldScaleY;
+                mWorldNoScale.m34 = 0.0f;
+                scratch5 = forwardZ * rightY;
+                scaledX = scaledX * fWorldScaleX;
+                ScaleStack[0].z = scratch6;
+                scratch4 = forwardY * rightX;
+                scratch8 = forwardY * rightZ - scratch5;
+                ScaleStack[0].y = scratch7;
+                scratch1 = forwardZ * rightX;
+                scratch5 = forwardX * rightY - scratch4;
+                ScaleStack[0].x = scaledX;
+                scratch4 = -forwardX;
+                mWorldNoScale.m11 = rightX;
+                scratch1 = scratch4 * rightZ + scratch1;
+                mWorldNoScale.m12 = rightY;
+                mWorldNoScale.m13 = rightZ;
+                mWorldNoScale.m31 = forwardX;
+                mWorldNoScale.m32 = forwardY;
+                mWorldNoScale.m33 = forwardZ;
+                mWorldNoScale.m21 = scratch8;
+                mWorldNoScale.m22 = scratch1;
+                mWorldNoScale.m23 = scratch5;
+                mWorldNoScale.m41 = scratch3;
+                mWorldNoScale.m42 = scratch2;
+                mWorldNoScale.m43 = scratch0;
+                mWorldNoScale.m44 = 1.0f;
                 nlMatrixToQuat(qWorld, mWorldNoScale);
             }
             else
@@ -413,8 +456,7 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
                 nlMatrixToQuat(qWorld, pWorldMatrix);
             }
             nlMultQuat(m_pQuaternions[i], qWorld, *pLocalQuaternion);
-            nlMultPosVectorMatrix(v3Position, pLocalMatrix->GetTranslation(),
-                pWorldMatrix);
+            nlMultPosVectorMatrix(v3Position, pLocalMatrix->GetTranslation(), pWorldMatrix);
         }
 
         nlQuatToMatrix(m_NodeMatrices[i], m_pQuaternions[i], false);
@@ -444,11 +486,13 @@ void cPoseAccumulator::BuildNodeMatrices(const nlMatrix4& pWorldMatrix)
         cBuildNodeMatrixCallbackInfo* pCallback = &m_cb[i];
         if (pCallback->funcCallback != NULL)
         {
-            pCallback->funcCallback(pCallback->nParam1, pCallback->nParam2,
-                this, i, nParentIndex);
+            pCallback->funcCallback(pCallback->nParam1, pCallback->nParam2, this, i, nParentIndex);
         }
     }
 }
+
+#pragma opt_lifetimes reset
+
 
 /**
  * Offset/Address/Size: 0xFF8 | 0x8030B9C8 | size: 0x350

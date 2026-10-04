@@ -725,7 +725,7 @@ bool DesireRunInDirection::Initialize(void* context)
 
 void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
 {
-    if (m_pFielder->fn_8003EA6C() && Incapacitated(m_pTarget) != 0.0f)
+    if (m_pFielder->fn_8003EA6C() && Incapacitated(m_pTarget))
     {
         update->SetDesireFinished();
         return;
@@ -749,7 +749,7 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
         {
             nlVec3Scale(direction, -1.0f);
         }
-        m_aDirection = (u16)(s32)(nlATan2f(direction.y, direction.x) * 10430.378f);
+        m_aDirection = nlATan2Angle(direction.y, direction.x);
     }
 
     nlVector3 direction;

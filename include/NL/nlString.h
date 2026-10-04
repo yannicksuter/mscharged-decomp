@@ -161,9 +161,10 @@ public:
 private:
     static unsigned long ReadSize(const void* ptr)
     {
-        unsigned long size;
+        // The prefix reader uses a byte-sized local for a four-byte copy.
+        char size;
         memcpy(&size, (const char*)ptr - 4, 4);
-        return size;
+        return *(unsigned long*)&size;
     }
 };
 

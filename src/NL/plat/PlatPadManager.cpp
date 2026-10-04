@@ -87,7 +87,7 @@ void PlatPadManager::UpdateChannel(int channel)
     WPADCLStatus classicStatus;
     KPADStatus kpadStatus[KPAD_MAX_SAMPLES];
 
-    int newType = type[channel];
+    int newType = GetType(channel);
 
     switch (WPADProbe(channel, &deviceType))
     {
@@ -192,7 +192,7 @@ void PlatPadManager::UpdateChannel(int channel)
         break;
     }
 
-    if (newType != type[channel])
+    if (newType != GetType(channel))
     {
         int& currentType = type[channel];
         deviceChanged.Deliver(channel, currentType, newType);

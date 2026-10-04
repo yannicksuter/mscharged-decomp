@@ -54,24 +54,24 @@ inline void FloatCompressor<MIN, MAX, BITS>::Transfer(LoadFrame& frame, unsigned
 {
     if ((MAX - MIN) * (1 << BITS) <= 255)
     {
-        const char* cursor = frame.mStream.mStorage;
-        value = (unsigned int)(unsigned char)*cursor++;
-        frame.mStream.mStorage = cursor;
+        const unsigned char* cursor = (const unsigned char*)frame.mStream.mStorage;
+        value = (unsigned int)*cursor++;
+        frame.mStream.mStorage = (const char*)cursor;
     }
     else if ((MAX - MIN) * (1 << BITS) <= 65535)
     {
-        const char* cursor = frame.mStream.mStorage;
-        unsigned char lo = (unsigned char)*cursor++;
-        value = (unsigned int)lo | ((unsigned int)(unsigned char)*cursor++ << 8);
-        frame.mStream.mStorage = cursor;
+        const unsigned char* cursor = (const unsigned char*)frame.mStream.mStorage;
+        unsigned char lo = *cursor++;
+        value = (unsigned int)lo | ((unsigned int)*cursor++ << 8);
+        frame.mStream.mStorage = (const char*)cursor;
     }
     else
     {
-        const char* cursor = frame.mStream.mStorage;
-        value = (unsigned int)(unsigned char)*cursor++;
-        value |= (unsigned int)(unsigned char)*cursor++ << 8;
-        value |= (unsigned int)(unsigned char)*cursor++ << 16;
-        frame.mStream.mStorage = cursor;
+        const unsigned char* cursor = (const unsigned char*)frame.mStream.mStorage;
+        value = (unsigned int)*cursor++;
+        value |= (unsigned int)*cursor++ << 8;
+        value |= (unsigned int)*cursor++ << 16;
+        frame.mStream.mStorage = (const char*)cursor;
     }
 }
 

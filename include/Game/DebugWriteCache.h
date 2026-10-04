@@ -8,10 +8,61 @@ class RunningChecksum;
 typedef void (*DebugFieldWriter)(
     const void* value, void* context, char* buffer, unsigned long size);
 
+// Indices into gDebugFieldTypes, named after each entry's writer.
+enum DebugFieldTypeId
+{
+    DEBUG_FIELD_U8 = 0,
+    DEBUG_FIELD_U16 = 1,
+    DEBUG_FIELD_U32 = 2,
+    DEBUG_FIELD_U64 = 3,
+    DEBUG_FIELD_CHAR = 4,
+    DEBUG_FIELD_S16 = 5,
+    DEBUG_FIELD_S32 = 6,
+    DEBUG_FIELD_S64 = 7,
+    DEBUG_FIELD_INT = 8,
+    DEBUG_FIELD_UNSIGNED_INT = 9,
+    DEBUG_FIELD_SHORT = 10,
+    DEBUG_FIELD_UNSIGNED_SHORT = 11,
+    DEBUG_FIELD_LONG = 12,
+    DEBUG_FIELD_UNSIGNED_LONG = 13,
+    DEBUG_FIELD_ENUM = 14,
+    DEBUG_FIELD_POINTER = 15,
+    DEBUG_FIELD_BOOL = 16,
+    DEBUG_FIELD_FLOAT = 17,
+    DEBUG_FIELD_DOUBLE = 18,
+    DEBUG_FIELD_ANGLE = 19,
+    DEBUG_FIELD_TIMER = 20,
+    DEBUG_FIELD_VECTOR2 = 21,
+    DEBUG_FIELD_VECTOR3 = 22,
+    DEBUG_FIELD_VECTOR4 = 23,
+    DEBUG_FIELD_QUATERNION = 24,
+    DEBUG_FIELD_MATRIX3 = 25,
+    DEBUG_FIELD_MATRIX4 = 26,
+    DEBUG_FIELD_ODE_VECTOR3 = 27,
+    DEBUG_FIELD_ODE_VECTOR4 = 28,
+    DEBUG_FIELD_ODE_QUATERNION = 29,
+    DEBUG_FIELD_ODE_MATRIX3 = 30,
+    DEBUG_FIELD_ODE_MATRIX4 = 31,
+    DEBUG_FIELD_TYPE_COUNT = 32
+};
+
+// DebugWriteType::mKind values.
+enum DebugWriteTypeKind
+{
+    DEBUG_KIND_COMPOSITE = 1,
+    DEBUG_KIND_SCALAR = 2
+};
+
+// Reserved type ids.
+enum DebugReservedTypeId
+{
+    DEBUG_TYPE_TEXT = 0xFFFE,
+    DEBUG_TYPE_NONE = 0xFFFF
+};
+
 struct DebugFieldType
 {
     /* 0x0 */ u16 size;
-    /* 0x2 */ u16 unknown;
     /* 0x4 */ DebugFieldWriter writer;
 }; // size: 0x8
 
@@ -89,7 +140,7 @@ public:
     /* 0x20 */ DebugWriteBuffer* mBuffers;
 }; // size: 0x24
 
-extern DebugFieldType gDebugFieldTypes[32];
+extern DebugFieldType gDebugFieldTypes[DEBUG_FIELD_TYPE_COUNT];
 
 inline void DebugWriteCache::AddField(const char* name, int fieldType, unsigned int offset)
 {

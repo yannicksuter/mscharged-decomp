@@ -17,6 +17,11 @@ struct DebugWriteRecordHeader
     /* 0x6 */ u16 mMarker;
 }; // size: 0x8
 
+enum DebugRecordMarker
+{
+    DEBUG_RECORD_MARKER = 0xDADA
+};
+
 static inline DebugWriteBuffer* GetCurrentDebugBuffer(
     DebugWriteCache* cache)
 {
@@ -70,7 +75,7 @@ void DebugWriteCache::Reset()
     }
 }
 
-static inline void WriteDebugFloatData(DebugWriteCache* cache,
+static inline void WriteFloatRecord(DebugWriteCache* cache,
     u16 recordType, const float* value)
 {
     DebugWriteBuffer* buffer
@@ -78,8 +83,8 @@ static inline void WriteDebugFloatData(DebugWriteCache* cache,
     DebugWriteRecordHeader header;
     header.mType = recordType;
     header.mSize = sizeof(*value);
-    header.mMarker = 0xDADA;
-    unsigned int dataSize = header.mSize;
+    header.mMarker = DEBUG_RECORD_MARKER;
+    u16 dataSize = header.mSize;
     u16 remainder = dataSize % 4;
     if (remainder == 0)
     {
@@ -108,9 +113,9 @@ static inline void WriteDebugFloatData(DebugWriteCache* cache,
 void DebugWriteCache::WriteFloat(u16* type,
     const char* name, RunningChecksum* checksum, float value)
 {
-    if (*type == 0xFFFF)
+    if (*type == DEBUG_TYPE_NONE)
     {
-        u16 fieldSize = gDebugFieldTypes[17].size;
+        u16 fieldSize = gDebugFieldTypes[DEBUG_FIELD_FLOAT].size;
         if (mTypeCount >= mTypeCapacity)
         {
             nlBreak();
@@ -119,22 +124,22 @@ void DebugWriteCache::WriteFloat(u16* type,
         u16 newType = mTypeCount++;
         *type = newType;
         DebugWriteType* entry = &mTypes[newType];
-        entry->mKind = 2;
+        entry->mKind = DEBUG_KIND_SCALAR;
         entry->mType = newType;
         nlStrNCpy(entry->mName, name, sizeof(entry->mName));
-        entry->mData.mScalar.mFieldType = 17;
+        entry->mData.mScalar.mFieldType = DEBUG_FIELD_FLOAT;
         entry->mData.mScalar.mSize = fieldSize;
         entry->mData.mScalar.mCount = 0;
     }
 
     checksum->ChecksumData(&value, sizeof(value));
 
-    WriteDebugFloatData(this, *type, &value);
+    WriteFloatRecord(this, *type, &value);
 }
 
 inline void DebugWriteType::InitializeComposite(u16 type, const char* name)
 {
-    mKind = 1;
+    mKind = DEBUG_KIND_COMPOSITE;
     mType = type;
     nlStrNCpy(mName, name, sizeof(mName));
     mData.mComposite.mLastField = 0;
@@ -158,7 +163,7 @@ u16 DebugWriteCache::BeginType(const char* name)
 
 void DebugWriteCache::EndType()
 {
-    mCurrentType = 0xFFFF;
+    mCurrentType = DEBUG_TYPE_NONE;
 }
 
 void DebugWriteCache::AddField(int fieldType, u16 size,
@@ -218,9 +223,9 @@ void DebugWriteCache::WriteText(const char* value)
 
     unsigned long length = nlStrLen(value);
     DebugWriteRecordHeader header;
-    header.mType = 0xFFFE;
+    header.mType = DEBUG_TYPE_TEXT;
     header.mSize = length + 1;
-    header.mMarker = 0xDADA;
+    header.mMarker = DEBUG_RECORD_MARKER;
     u16 dataSize = length + 1;
     u16 remainder = dataSize % 4;
     if (remainder == 0)
@@ -254,7 +259,7 @@ void* DebugWriteCache::WriteData(u16 type, void* value, unsigned int size)
     DebugWriteRecordHeader header;
     header.mType = type;
     header.mSize = size;
-    header.mMarker = 0xDADA;
+    header.mMarker = DEBUG_RECORD_MARKER;
     u16 dataSize = size;
     u16 remainder = dataSize % 4;
     if (remainder == 0)
@@ -292,7 +297,7 @@ void DebugWriteCache::ChecksumData(u16 type,
     void* value, void* context)
 {
     DebugWriteType* entry = &mTypes[type];
-    if (entry->mKind == 1)
+    if (entry->mKind == DEBUG_KIND_COMPOSITE)
     {
         u16 count = entry->mData.mComposite.mFieldCount;
         DebugWriteField* field;
@@ -316,7 +321,7 @@ void DebugWriteCache::ChecksumData(u16 type,
             --count;
         }
     }
-    else if (entry->mKind == 2)
+    else if (entry->mKind == DEBUG_KIND_SCALAR)
     {
         u16 size = entry->mData.mScalar.mCount == 0
             ? entry->mData.mScalar.mSize
@@ -565,37 +570,37 @@ void WriteDebugODEMatrix4(
     WriteDebugFloatArray(value, buffer, size, 16);
 }
 
-DebugFieldType gDebugFieldTypes[32] = {
-    { 1, 0, WriteDebugU8 },
-    { 2, 0, WriteDebugU16 },
-    { 4, 0, WriteDebugU32 },
-    { 8, 0, WriteDebugU64 },
-    { 1, 0, WriteDebugChar },
-    { 2, 0, WriteDebugS16 },
-    { 4, 0, WriteDebugS32 },
-    { 8, 0, WriteDebugS64 },
-    { 4, 0, WriteDebugInt },
-    { 4, 0, WriteDebugUnsignedInt },
-    { 2, 0, WriteDebugShort },
-    { 2, 0, WriteDebugUnsignedShort },
-    { 4, 0, WriteDebugLong },
-    { 4, 0, WriteDebugUnsignedLong },
-    { 4, 0, WriteDebugEnum },
-    { 4, 0, WriteDebugPointer },
-    { 1, 0, WriteDebugBool },
-    { 4, 0, WriteDebugFloat },
-    { 8, 0, WriteDebugDouble },
-    { 2, 0, WriteDebugAngle },
-    { 8, 0, WriteDebugTimer },
-    { 8, 0, WriteDebugVector2 },
-    { 12, 0, WriteDebugVector3 },
-    { 16, 0, WriteDebugVector4 },
-    { 16, 0, WriteDebugQuaternion },
-    { 36, 0, WriteDebugMatrix3 },
-    { 64, 0, WriteDebugMatrix4 },
-    { 12, 0, WriteDebugODEVector3 },
-    { 16, 0, WriteDebugODEVector4 },
-    { 16, 0, WriteDebugODEQuaternion },
-    { 48, 0, WriteDebugODEMatrix3 },
-    { 64, 0, WriteDebugODEMatrix4 },
+DebugFieldType gDebugFieldTypes[DEBUG_FIELD_TYPE_COUNT] = {
+    { 1, WriteDebugU8 },
+    { 2, WriteDebugU16 },
+    { 4, WriteDebugU32 },
+    { 8, WriteDebugU64 },
+    { 1, WriteDebugChar },
+    { 2, WriteDebugS16 },
+    { 4, WriteDebugS32 },
+    { 8, WriteDebugS64 },
+    { 4, WriteDebugInt },
+    { 4, WriteDebugUnsignedInt },
+    { 2, WriteDebugShort },
+    { 2, WriteDebugUnsignedShort },
+    { 4, WriteDebugLong },
+    { 4, WriteDebugUnsignedLong },
+    { 4, WriteDebugEnum },
+    { 4, WriteDebugPointer },
+    { 1, WriteDebugBool },
+    { 4, WriteDebugFloat },
+    { 8, WriteDebugDouble },
+    { 2, WriteDebugAngle },
+    { 8, WriteDebugTimer },
+    { 8, WriteDebugVector2 },
+    { 12, WriteDebugVector3 },
+    { 16, WriteDebugVector4 },
+    { 16, WriteDebugQuaternion },
+    { 36, WriteDebugMatrix3 },
+    { 64, WriteDebugMatrix4 },
+    { 12, WriteDebugODEVector3 },
+    { 16, WriteDebugODEVector4 },
+    { 16, WriteDebugODEQuaternion },
+    { 48, WriteDebugODEMatrix3 },
+    { 64, WriteDebugODEMatrix4 },
 };

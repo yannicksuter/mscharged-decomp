@@ -6,6 +6,7 @@
 
 WorldVisibilityNode* LoadWorldVisibilityNode(nlChunk* chunk)
 {
+    // Recursive loads advance this cursor to the last chunk in each subtree.
     static nlChunk* spWorldVisibilityChunk;
     int i;
     WorldVisibilityNode* node;
@@ -36,14 +37,14 @@ WorldVisibilityNode* LoadWorldVisibilityTree(nlChunk* chunk)
 
 void UpdateWorldVisibilityNode(WorldVisibilityNode* node,
     const nlVector4* pPlanes, WorldVisibilityCallback callback,
-    unsigned long planeMask, int state)
+    unsigned long planeMask, int parentResult)
 {
     FrustumResult result;
-    if (state == 0)
+    if (parentResult == FRUSTUM_OUTSIDE)
     {
         result = FRUSTUM_OUTSIDE;
     }
-    else if (state == 1)
+    else if (parentResult == FRUSTUM_INSIDE)
     {
         result = FRUSTUM_INSIDE;
     }
@@ -54,7 +55,7 @@ void UpdateWorldVisibilityNode(WorldVisibilityNode* node,
             &node->mBoundsMax, &planeMask);
     }
 
-    if (result)
+    if (result != FRUSTUM_OUTSIDE)
     {
         node->mVisible = 1;
         if (callback != 0)
@@ -80,5 +81,5 @@ void UpdateWorldVisibilityNode(WorldVisibilityNode* node,
 void UpdateWorldVisibility(WorldVisibilityNode* node,
     const nlVector4* pPlanes, WorldVisibilityCallback callback)
 {
-    UpdateWorldVisibilityNode(node, pPlanes, callback, 0, 2);
+    UpdateWorldVisibilityNode(node, pPlanes, callback, 0, FRUSTUM_INTERSECTING);
 }

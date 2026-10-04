@@ -51,14 +51,15 @@ public:
             if ((listener->mFlags >> 31) != 0)
             {
                 listener->callback(p1, p2, p3);
-                iterator = mListeners.Begin();
-                iterator.m_Curr = currentEntry;
+                RestartAt(iterator, currentEntry);
             }
 
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                ListenerEntry* entry = GetEntry(listener);
+                nlDLListIterator<Listener> position = mListeners.Begin(
+                    (ListenerEntry*)((char*)listener - 8));
+                ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
                 entry->~ListenerEntry();
                 mListeners.m_Allocator.Free(entry);
@@ -68,6 +69,12 @@ public:
     }
 
 protected:
+    void RestartAt(nlDLListIterator<Listener>& iterator, ListenerEntry* current)
+    {
+        iterator = mListeners.Begin();
+        iterator.m_Curr = current;
+    }
+
     void Remove(Listener* listener)
     {
         UnregisterEventConnection(this, listener);
@@ -140,6 +147,11 @@ struct PlatPadManager
         , disableClassic(false)
         , deviceChanged()
     {
+    }
+
+    int GetType(unsigned int channel) const
+    {
+        return type[channel];
     }
 
     void Initialize();

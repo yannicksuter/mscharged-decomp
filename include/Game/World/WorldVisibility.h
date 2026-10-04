@@ -22,7 +22,7 @@ WorldVisibilityNode* LoadWorldVisibilityNode(nlChunk* chunk);
 WorldVisibilityNode* LoadWorldVisibilityTree(nlChunk* chunk);
 void UpdateWorldVisibilityNode(WorldVisibilityNode* node,
     const nlVector4* pPlanes, WorldVisibilityCallback callback,
-    unsigned long planeMask, int state);
+    unsigned long planeMask, int parentResult);
 void UpdateWorldVisibility(WorldVisibilityNode* node,
     const nlVector4* pPlanes, WorldVisibilityCallback callback);
 

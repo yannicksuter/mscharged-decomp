@@ -111,6 +111,11 @@ public:
         return data;
     }
 
+    nlDLListIterator<T> Begin()
+    {
+        return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
+    }
+
     nlDLListIterator<T> Begin() const
     {
         return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
@@ -121,19 +126,17 @@ public:
         return nlDLListIterator<T>(m_Head, current);
     }
 
-    nlDLListIterator<T> End() const
+    nlDLListIterator<T> End()
     {
         return nlDLListIterator<T>(m_Head, nlDLRingGetEnd(m_Head));
     }
 
-    bool IsEmpty() const
+    bool IsEmpty()
     {
         return m_Head == 0;
     }
 
-    // Not const: a const read of m_Head here would be shared with the read in
-    // a following Begin(), which retail performs separately.
-    u32 CountElements()
+    u32 CountElements() const
     {
         return nlDLRingCountElements(m_Head);
     }
