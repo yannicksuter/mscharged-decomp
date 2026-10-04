@@ -701,7 +701,7 @@ config.libs = [
             Object(Matching, "Game/FE/feLibObject.cpp"),
             Object(Matching, "Game/FE/feManager.cpp", extra_cflags=["-ipa file"]),
             # Retained menu template copies; the emitting source unit is unidentified.
-            Object(NonMatching, "Game/FE/MenuListComponentInstantiations.cpp"),
+            Object(Matching, "Game/FE/MenuListComponentInstantiations.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/feModelManager.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FE/feMusic.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/FE/feOptionsSubMenus.cpp", extra_cflags=["-ipa file"]),
