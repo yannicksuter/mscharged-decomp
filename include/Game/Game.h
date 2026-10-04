@@ -113,7 +113,7 @@ public:
     void fn_80059DEC(int param1, int param2, float param3, float param4);
     void fn_80059E78();
     void fn_80059EDC();
-    void fn_80059F40(u8 param1, u8 param2, float param3);
+    void fn_80059F40(unsigned int param1, unsigned int param2, float param3);
     void fn_80059FC4();
     void PreUpdate(float deltaTime);
     void RandomizePlayerUpdateOrder();
@@ -165,7 +165,7 @@ private:
 public:
     /* 0x24 */ int m_nLastTeamToScore;
 
-private:
+public:
     /* 0x28 */ u32 mUnidentified028;
     /* 0x2C */ u32 mUnidentified02C;
 
@@ -174,6 +174,8 @@ public:
 
 private:
     /* 0x34 */ int mUnidentified034;
+
+public:
     /* 0x38 */ u32 mUnidentified038;
 
 public:
@@ -266,6 +268,8 @@ extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005D550(void* pManager, const GoalieSaveData* pData);
 extern "C" void fn_8005D948(void* pGame, const GoalieSaveData* pData);
 extern "C" void fn_8005DB7C();
+extern "C" void fn_8005E408(void* pManager, const PlayerAttackData* pData);
+extern "C" void fn_8005E800(void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E604(void* pManager, const PlayerAttackData* pData);
 extern "C" void fn_8005E9FC(void* pManager, const PlayerAttackData* pData);
 

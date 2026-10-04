@@ -147,12 +147,22 @@ public:
         float fXLimit, float fYLimit);
     void InitActionMove(bool bParam);
     void InitActionMoveWB();
+    void InitActionMegaStrike(float numBalls, float accuracy);
+    void InitMegaStrikeTargets();
+    void HideMegaStrikeBall();
+    void SwapMegaStrikeController(cPlayer* player);
+    void UpdateMegaStrikeFade(float deltaTime);
+    void UpdateMegaStrikePointer();
+    void PopDefensivePlayOverlay();
+    void CheckMegaStrikeGoals();
+    void InitActionMegaStrikeWait();
     void InitActionChipShotStumble(float fTargetTime);
     void InitActionDiveRecover();
     void InitActionOffplay(eGoalieOffplayType offplayType);
     void InitActionPass(bool useTarget);
     void InitActionPreCrouch(eGoalieCrouchType crouchType);
     void fn_8008BBB0(cFielder* pTarget, int nPursueDekeType);
+    void StartLooseBallPickup(float fDistance);
     void InitActionLooseBallPickup(float fDistance, bool bStartPickup);
     void InitActionSaveSetup(bool bCanReposition);
     void InitActionSave();
@@ -259,6 +269,7 @@ public:
     bool IsLooseBallClose(float fDistFromBox);
     bool IsPassThreat();
     void InitActionSaveReposition();
+    void StartSaveReposition();
     void InitActionLooseBallPursueRolling();
     void InitActionLooseBallSetup();
     void fn_8008CD08();
@@ -420,7 +431,8 @@ public:
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
     /* 0x4D0 */ int mUnidentified4D0[10];
     /* 0x4F8 */ float mUnidentified4F8[10];
-    /* 0x520 */ u8 mUnidentified520[8];
+    /* 0x520 */ unsigned int mUnidentified520;
+    /* 0x524 */ float mUnidentified524;
     /* 0x528 */ bool mbFirstMegaStrike;
     /* 0x529 */ bool mbDefensivePlayOverlayPushed;
 }; // total size: at least 0x52A

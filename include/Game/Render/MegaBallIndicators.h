@@ -62,13 +62,16 @@ struct MegaBallIndicator
     /* 0x18 */ float mAngle;
     /* 0x1C */ unsigned int mIndex;
     /* 0x20 */ unsigned int mTextureId;
-    /* 0x24 */ unsigned int mTextureIndex;
+    /* 0x24 */ int mTextureIndex;
     /* 0x28 */ bool mVisible;
     /* 0x29 */ bool mActive;
     /* 0x2C */ MegaBallIndicatorTween mScaleTween;
     /* 0x4C */ MegaBallIndicatorTween mOpacityTween;
     /* 0x6C */ MegaBallIndicatorTween mVisibilityTween;
 }; // size: 0x8C
+
+extern MegaBallIndicator gMegaBallPointer;
+extern bool gMegaBallTimerVisible;
 
 void ResetMegaBallIndicator(
     MegaBallIndicator* pIndicator, unsigned int textureIndex);

@@ -4336,7 +4336,6 @@ void Goalie::Reset(const nlVector3& v3Position, unsigned short aDirection)
 
 
 u16 sDetGoalieType = 0xFFFF;
-extern u16 lbl_806DBD50;
 
 #define REGISTER_GOALIE_FIELD(type, base, field, name) \
     cache->AddField(type, gDebugFieldTypes[type].size, \
@@ -4379,17 +4378,17 @@ inline void SaveBlendInfo::SyncLog(void* context, DebugWriteCache* cache)
 
 inline void GoalieFatigue::SyncLog(void* context, DebugWriteCache* cache)
 {
-    if (lbl_806DBD50 == 0xFFFF)
+    if (gGoalieFatigueSyncLogType == 0xFFFF)
     {
-        lbl_806DBD50 = cache->BeginType("GoalieFatigue");
+        gGoalieFatigueSyncLogType = cache->BeginType("GoalieFatigue");
         REGISTER_GOALIE_FIELD(17, mfEnergyLevel, mfEnergyLevel, "mfEnergyLevel");
         REGISTER_GOALIE_FIELD(17, mfEnergyLevel, mfRecoverRate, "mfRecoverRate");
         REGISTER_GOALIE_FIELD(17, mfEnergyLevel, mfTimeSinceLastSave, "mfTimeSinceLastSave");
         REGISTER_GOALIE_FIELD(17, mfEnergyLevel, mfHotStreakTimer, "mfHotStreakTimer");
         cache->EndType();
     }
-    cache->ChecksumData(lbl_806DBD50, &mfEnergyLevel, context);
-    cache->WriteData(lbl_806DBD50, &mfEnergyLevel, sizeof(GoalieFatigue));
+    cache->ChecksumData(gGoalieFatigueSyncLogType, &mfEnergyLevel, context);
+    cache->WriteData(gGoalieFatigueSyncLogType, &mfEnergyLevel, sizeof(GoalieFatigue));
 }
 
 inline void Goalie::RegisterDebugFields(unsigned short* type, DebugWriteCache* cache)

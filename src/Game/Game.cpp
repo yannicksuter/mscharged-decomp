@@ -136,7 +136,6 @@ extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
 extern "C" void fn_801E999C(BaseSceneHandler* scene);
-extern "C" void fn_8008EFE8(Goalie* pGoalie, float param2, float param3);
 extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern void PlaySuddenDeathMusic();
 extern void StopSuddenDeathMusic();
@@ -577,7 +576,7 @@ void cGame::fn_8005830C()
     float param3 = mUnidentified03C->mUnidentified394;
     float param2 = mUnidentified03C->mUnidentified390;
     Goalie* pGoalie = mUnidentified03C->m_pTeam->GetOtherTeam()->GetGoalie();
-    fn_8008EFE8(pGoalie, param2, param3);
+    pGoalie->InitActionMegaStrike(param2, param3);
     mUnidentified03C->EndAction();
     fn_80038158(mUnidentified03C, 0);
 }
@@ -1041,7 +1040,7 @@ void cGame::fn_80059EDC()
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 
-void cGame::fn_80059F40(u8 param1, u8 param2, float param3)
+void cGame::fn_80059F40(unsigned int param1, unsigned int param2, float param3)
 {
     struct Message
     {

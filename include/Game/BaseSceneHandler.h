@@ -2,6 +2,7 @@
 #define GAME_BASE_SCENE_HANDLER_H
 
 #include "types.h"
+#include "Game/FE/feScene.h"
 
 class FEPresentation;
 class FEScene;
@@ -44,6 +45,13 @@ public:
     virtual void SetVisible(bool visible) { mVisible = visible; }
 
     FEPresentation* GetPresentation();
+
+    bool IsSceneReady() const
+    {
+        if (mFEScene != 0 && mFEScene->mState == 6)
+            return true;
+        return false;
+    }
 
     /* 0x04 */ u32 mHashID;
     /* 0x08 */ bool mVisible;

@@ -1,5 +1,7 @@
 #include "Game/GoalieFatigue.h"
 
+u16 gGoalieFatigueSyncLogType = 0xFFFF;
+
 void GoalieFatigue::Update(float dt)
 {
     if (mfEnergyLevel < 100.0f)

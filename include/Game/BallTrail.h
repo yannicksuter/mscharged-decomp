@@ -4,6 +4,7 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+class cFielder;
 class BlurHandler;
 class DrawableModel;
 
@@ -20,5 +21,8 @@ struct LiveBallTrail
     /* 0x38 */ BlurHandler* mUnidentified038;
     /* 0x3C */ bool visible;
 };
+
+extern "C" void fn_8001AD24(LiveBallTrail* pBallTrail, cFielder* pFielder);
+extern "C" void fn_8001B298(float deltaTime);
 
 #endif // GAME_BALL_TRAIL_H

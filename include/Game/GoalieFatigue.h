@@ -5,6 +5,8 @@
 
 class DebugWriteCache;
 
+extern u16 gGoalieFatigueSyncLogType;
+
 class GoalieFatigue
 {
 public:
