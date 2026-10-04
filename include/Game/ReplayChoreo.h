@@ -6,8 +6,11 @@
 #include "Game/Camera/noisefilter.h"
 #include "Game/InterpreterCore.h"
 #include "Game/ReplayManager.h"
+#include "NL/nlList.h"
 
 class cPlayer;
+struct GoalScoredData;
+struct GoalieSaveData;
 
 class ReplayChoreo : public InterpreterCore
 {
@@ -33,15 +36,26 @@ public:
 
     struct Highlight
     {
-        /* 0x00 */ int mUnidentified000;
+        Highlight()
+            : mQuality(HIGHLIGHT_QUALITY_EMPTY)
+            , mTime(0.0f)
+            , mReplayPad(-1)
+            , mSlot(-1)
+            , mBegin(0)
+            , mEnd(0)
+            , mCurrent(0)
+        {
+        }
+
+        /* 0x00 */ int mQuality;
         /* 0x04 */ float mTime;
         /* 0x08 */ int mReplayPad;
         /* 0x0C */ UnidentifiedReplayGoalData mGoalScoredData;
-        /* 0x20 */ int mUnidentified020;
-        /* 0x24 */ void* mUnidentified024;
-        /* 0x28 */ void* mUnidentified028;
-        /* 0x2C */ void* mUnidentified02C;
-        /* 0x30 */ Highlight* mUnidentified030;
+        /* 0x20 */ int mSlot;
+        /* 0x24 */ Replay::Frame* mBegin;
+        /* 0x28 */ Replay::Frame* mEnd;
+        /* 0x2C */ Replay::Frame* mCurrent;
+        /* 0x30 */ Highlight* next;
     }; // total size: 0x34
 
     ReplayChoreo();
@@ -50,7 +64,11 @@ public:
 
     static ReplayChoreo& Instance();
     void LoadScript();
+    void RegisterEventHandlers();
+    void OnGoalScored(GoalScoredData* data);
+    void OnGoalieSave(GoalieSaveData* data);
     void Reset();
+    void StartScript(const UnidentifiedReplayGoalData& data);
     void Finish();
     void FlushHighlights();
     void Update(float deltaT);
@@ -66,19 +84,18 @@ public:
     /* 0x188 */ mutable ReplayManager* mReplayManager;
     /* 0x18C */ mutable Replay* mReplay;
     /* 0x190 */ ReplayCamera mCamera;
-    /* 0x290 */ cRumbleFilter mUnidentified290;
+    /* 0x290 */ cRumbleFilter mRumbleFilter;
     /* 0x2CC */ cNoiseFilter mNoiseFilter;
     /* 0x32C */ float mRunForTimeLeft;
     /* 0x330 */ bool mRunningFor;
     /* 0x331 */ u8 mPadding331[3];
     /* 0x334 */ void* mByteCode;
-    /* 0x338 */ bool mUnidentified338;
+    /* 0x338 */ bool mIsHighlightReel;
     /* 0x339 */ u8 mPadding339[3];
     /* 0x33C */ mutable UnidentifiedReplayGoalData mGoalScoredData;
     /* 0x350 */ Highlight mHighlights[3];
-    /* 0x3EC */ Highlight* mUnidentified3EC;
-    /* 0x3F0 */ Highlight* mUnidentified3F0;
-    /* 0x3F4 */ Highlight* mUnidentified3F4;
+    /* 0x3EC */ nlList<Highlight> mHighlightList;
+    /* 0x3F4 */ Highlight* mCurrentHighlight;
 }; // total size: 0x3F8
 
 #endif // GAME_REPLAY_CHOREO_H

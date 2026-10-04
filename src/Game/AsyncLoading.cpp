@@ -137,7 +137,6 @@
 bool IsNetworkOrRecordedGame();
 
 void ShutdownWarbleRendering(void*);
-extern "C" void fn_80194EF8(ReplayChoreo*);
 extern "C" void fn_8001FE80();
 void fn_80056CF4(void*, int, bool);
 
@@ -1739,7 +1738,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
     StatsTracker::Instance()->CreateEventHandler();
     ReplayManager::Instance()->RegisterEventHandlers();
-    fn_80194EF8(&ReplayChoreo::Instance());
+    ReplayChoreo::Instance().RegisterEventHandlers();
     NisPlayer::Instance()->RegisterEventHandlers();
     GetPresentation()->RegisterEventListeners();
     GetPresentation()->fn_80285E1C();

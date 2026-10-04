@@ -492,7 +492,7 @@ config.libs = [
             Object(Matching, "Game/PoseNode.cpp"),
             Object(NonMatching, "Game/RenderSnapshot.cpp", cflags=cflags_game),
             Object(Matching, "Game/Replay.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/ReplayChoreo.cpp", cflags=cflags_game_deferred),
+            Object(Matching, "Game/ReplayChoreo.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/ReplayManager.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/RumbleActions.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/SAnim.cpp", extra_cflags=["-ipa file"]),

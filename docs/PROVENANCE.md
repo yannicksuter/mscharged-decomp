@@ -455,6 +455,18 @@ presentation paths, cup-flow calls, record formatting and four pointer targets
 establish the scene, helper and field roles. `RoadToStrikersCupHubScene` and its
 descriptive member names identify that R4QE01 behavior; they do not claim
 original Charged spellings.
+
+`Game/ReplayChoreo.cpp` follows the predecessor's
+[replay choreography](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/ReplayChoreo.cpp)
+for the zone-based script choice (0.33/0.66 field thirds, fallback search,
+`cameraPick` override) and its
+[interpreter](https://github.com/yannicksuter/smstrikers-decomp/blob/c62fc6a0ed90f4eacc8cca9b231f1d4aaf16ad0b/src/Game/ReplayChoreo_interp.cpp)
+for the run-for, run-till and rewind calls. R4QE01 supplies the
+`GoalScored`/`GoalieSave` handlers, the highlight list kept sorted by quality,
+the 32-call dispatcher and the camera, rumble and replay-speed bindings.
+`RegisterEventHandlers`, `OnGoalScored`, `OnGoalieSave`, `StartScript`, the
+zone helpers and the highlight field names describe that behavior; they do not
+claim original Charged spellings.
 ## MSL integer absolute value
 
 The `_abs` inline helper in `libs/MSL_C/include/stdlib.h` follows the
