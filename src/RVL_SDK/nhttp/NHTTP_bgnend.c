@@ -2,10 +2,9 @@
 
 #include <revolution/ncd.h>
 #include <revolution/os.h>
+#include <revolution/so_fwd.h>
 
 #include <stdio.h>
-
-int SOClose(int s);
 
 typedef struct NHTTPBgnEndInfo
 {

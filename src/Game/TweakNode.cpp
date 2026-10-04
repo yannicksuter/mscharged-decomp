@@ -182,10 +182,12 @@ void GetTweakNodePath(const TweakNode* node, char* buffer, unsigned long size)
 
 void UpdateTweakNodePathHash(TweakNode* node)
 {
-    if (node->m_Parent != GetTweakPriorityNode() && node->m_Parent != 0)
+    if (node->m_Parent == GetTweakPriorityNode() || node->m_Parent == 0)
     {
-        char buffer[0x200];
-        BuildTweakNodePath(node, buffer, sizeof(buffer));
-        node->m_PathHash = nlStringLowerHash(buffer);
+        return;
     }
+
+    char buffer[0x200];
+    BuildTweakNodePath(node, buffer, sizeof(buffer));
+    node->m_PathHash = nlStringLowerHash(buffer);
 }

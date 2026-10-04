@@ -5,7 +5,7 @@ void Nis::DoFunctionCall(unsigned int function)
     case 0:
     {
         NisPlayer* player = NisPlayer::Instance();
-        player->mUnidentified343E0 = true;
+        player->mSuppressBlinking = true;
         break;
     }
     case 1:
@@ -35,8 +35,8 @@ void Nis::DoFunctionCall(unsigned int function)
         float fogStart = *(float*)(m_SP - 2);
         m_SP -= 2;
         NisPlayer* player = NisPlayer::Instance();
-        player->mUnidentified343E4 = fogStart;
-        player->mUnidentified343EC = fogEnd;
+        player->mRequestedFogStart = fogStart;
+        player->mRequestedFogEnd = fogEnd;
         break;
     }
     default:

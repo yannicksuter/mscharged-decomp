@@ -38,7 +38,7 @@ public:
 class CategoryVolume : public AudioEffectBase
 {
 public:
-    virtual void CreateParameter(u32 definition, void* context, bool negate,
+    virtual void CreateParameter(u32 definition, const void* context, bool negate,
         AudioEffectParameter** output);
     virtual void BeginBlend();
     virtual void BlendParameter(AudioEffectParameter* destination,
@@ -126,7 +126,7 @@ CategoryVolumeParameter::CategoryVolumeParameter()
 {
 }
 
-void CategoryVolume::CreateParameter(u32 definition, void*, bool negate,
+void CategoryVolume::CreateParameter(u32 definition, const void*, bool negate,
     AudioEffectParameter** output)
 {
     CategoryVolumeParameter* parameter

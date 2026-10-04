@@ -31,7 +31,7 @@ public:
 class LowPassFilter : public AudioEffectBase
 {
 public:
-    virtual void CreateParameter(unsigned int definition, void* context,
+    virtual void CreateParameter(unsigned int definition, const void* context,
         bool disabled, AudioEffectParameter** output);
     virtual void BeginBlend();
     virtual void BlendParameter(AudioEffectParameter* destination,
@@ -74,7 +74,7 @@ LowPassFilterParameter::LowPassFilterParameter()
 {
 }
 
-void LowPassFilter::CreateParameter(unsigned int definition, void*, bool disabled,
+void LowPassFilter::CreateParameter(unsigned int definition, const void*, bool disabled,
     AudioEffectParameter** output)
 {
     LowPassFilterParameter* parameter

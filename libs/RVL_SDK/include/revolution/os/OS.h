@@ -3,6 +3,7 @@
 
 #include <revolution/os/OSContext.h>
 #include <revolution/os/OSExec.h>
+#include <revolution/os/OS_fwd.h>
 #include <revolution/types.h>
 
 #ifdef __cplusplus
@@ -74,7 +75,6 @@ extern const char* __OSVersion;
 void __OSFPRInit(void);
 u32 __OSGetHollywoodRev(void);
 void __OSGetIOSRev(OSIOSRev* rev);
-u32 OSGetConsoleType(void);
 void OSInit(void);
 OSExceptionHandler __OSSetExceptionHandler(u8 type, OSExceptionHandler handler);
 OSExceptionHandler __OSGetExceptionHandler(u8 type);

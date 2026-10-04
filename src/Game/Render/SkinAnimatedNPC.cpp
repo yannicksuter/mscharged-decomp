@@ -141,7 +141,7 @@ void SkinAnimatedNPC::SendToGL() const
         skinMesh->GetModel(), false, 0);
 
     static u32 shadowLevelHash = nlStringLowerHash(ShadowLevelName);
-    nlColour shadowColour = fn_80183C9C(
+    nlColour shadowColour = SampleShadowLookup(
         reinterpret_cast<const nlVector2*>(
             &mWorldMatrix.GetTranslation()),
         true);

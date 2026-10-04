@@ -31,7 +31,7 @@ public:
         return m_fNetDepth;
     }
 
-    const nlVector3& fn_800C2F30() const { return m_v3NetLocation; }
+    const nlVector3& GetNetLocation() const { return m_v3NetLocation; }
 
     /* 0x00 */ int m_nIndex;
     /* 0x04 */ float m_fDirection;

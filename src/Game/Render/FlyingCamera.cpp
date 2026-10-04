@@ -7,6 +7,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/WorldTriggers.h"
 #include "NL/nlMath.h"
+#include "NL/nlMath.inl"
 #include "NL/nlSlotPool.h"
 
 struct FlyingCameraPool
@@ -84,6 +85,58 @@ char sMegaStrikeMeterEndEventName[] = "MegaStrikeMeterEnd";
 void OnPeachCameraFlash(void*);
 void OnResetFlyingCameras(void*);
 
+static inline float ClampCameraComponent(float value, float minimum, float maximum)
+{
+    return nlMinEquals(nlMaxEquals(value, minimum), maximum);
+}
+
+static inline void CalculateCameraPositionCorrection(nlVector3& correction, const nlVector3& error, float scale)
+{
+    float z = scale * error.z;
+    nlVec3Set(correction, scale * error.x, scale * error.y, z);
+}
+
+static inline void CalculateCameraDisplacement(nlVector3& displacement, const nlVector3& from, const nlVector3& to)
+{
+    nlVec3Difference(&displacement, &from, &to);
+}
+
+static inline void ApplyCameraDamping(FlyingCamera* camera, const nlVector3& previousDelta, float rate)
+{
+    float previousBlend = camera->mPositionDamping * rate;
+    nlVec3ScaleAdd(camera->mPosition, previousBlend, previousDelta, camera->mPosition);
+}
+
+static inline void UpdateCameraVelocity(FlyingCamera* camera, const nlVector3& previousDelta, float rate)
+{
+    ApplyCameraDamping(camera, previousDelta, rate);
+}
+
+static inline void AccumulateCameraCorrection(nlVector3& position, const nlVector3& correction)
+{
+    float x, y, z;
+    z = position.z + correction.z;
+    y = position.y + correction.y;
+    x = position.x + correction.x;
+    nlVec3Set(position, x, y, z);
+}
+
+static inline void ApplyCameraIntegral(nlVector3& position, const nlVector3& correction)
+{
+    AccumulateCameraCorrection(position, correction);
+}
+
+static inline float CalculateCameraIntegralScale(FlyingCamera* camera, float rate)
+{
+    float accumulatedScale = camera->mIntegralGain * rate * lbl_806E5038;
+    return accumulatedScale;
+}
+
+static inline float GetCameraIntegralScale(FlyingCamera* camera, float rate)
+{
+    return CalculateCameraIntegralScale(camera, rate);
+}
+
 void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 {
     nlQuaternion facing;
@@ -130,33 +183,26 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
     targetPosition.x = cosine * camera->mOrbitRadius + camera->mTargetPosition.x;
     targetPosition.y = sine * camera->mOrbitRadius + camera->mTargetPosition.y;
     targetPosition.z = camera->mTargetPosition.z + camera->mHeightOffset;
-    nlVec3Sub(delta, targetPosition, camera->mPosition);
+    CalculateCameraDisplacement(delta, targetPosition, camera->mPosition);
     float rate = lbl_806E503C * dt;
     float directScale = camera->mPositionGain * rate;
+    CalculateCameraPositionCorrection(directChange, delta, directScale);
     nlVec3Add(camera->mPositionIntegral, camera->mPositionIntegral, delta);
-
-    nlVec3Scale(directChange, delta, directScale);
 
     float minAccumulatedChange = lbl_806DCE24;
     float maxAccumulatedChange = lbl_806DCE28;
-    camera->mPositionIntegral.x = nlMinEquals(
-        nlMaxEquals(camera->mPositionIntegral.x, minAccumulatedChange),
-        maxAccumulatedChange);
-    camera->mPositionIntegral.y = nlMinEquals(
-        nlMaxEquals(camera->mPositionIntegral.y, minAccumulatedChange),
-        maxAccumulatedChange);
-    camera->mPositionIntegral.z = nlMinEquals(
-        nlMaxEquals(camera->mPositionIntegral.z, minAccumulatedChange),
-        maxAccumulatedChange);
+    camera->mPositionIntegral.x = ClampCameraComponent(
+        camera->mPositionIntegral.x, minAccumulatedChange, maxAccumulatedChange);
+    camera->mPositionIntegral.y = ClampCameraComponent(
+        camera->mPositionIntegral.y, minAccumulatedChange, maxAccumulatedChange);
+    camera->mPositionIntegral.z = ClampCameraComponent(
+        camera->mPositionIntegral.z, minAccumulatedChange, maxAccumulatedChange);
 
-    float previousBlend = camera->mPositionDamping * rate;
-    float accumulatedScale = camera->mIntegralGain * rate * lbl_806E5038;
-    nlVec3Sub(previousDelta, camera->mPreviousPosition, camera->mPosition);
-    nlVec3Scale(accumulatedChange, camera->mPositionIntegral, accumulatedScale);
+    nlVec3Scale(accumulatedChange, camera->mPositionIntegral, GetCameraIntegralScale(camera, rate));
+    CalculateCameraDisplacement(previousDelta, camera->mPreviousPosition, camera->mPosition);
     camera->mPreviousPosition = camera->mPosition;
-    nlVec3ScaleAdd(
-        camera->mPosition, previousBlend, previousDelta, camera->mPosition);
-    nlVec3Add(camera->mPosition, camera->mPosition, accumulatedChange);
+    UpdateCameraVelocity(camera, previousDelta, rate);
+    ApplyCameraIntegral(camera->mPosition, accumulatedChange);
     nlVec3Add(camera->mPosition, camera->mPosition, directChange);
 
     camera->mPosition.x = nlMinEquals(

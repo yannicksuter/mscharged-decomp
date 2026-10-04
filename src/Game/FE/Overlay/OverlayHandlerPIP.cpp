@@ -28,7 +28,7 @@ void PIPOverlay::SceneCreated()
 void PIPOverlay::Update(float dt)
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    if (NisPlayer::Instance()->fn_8027E64C()
+    if (NisPlayer::Instance()->HasSecondaryNis()
         && NisPlayer::Instance()->IsPIPOverlayMode() == true)
     {
         if (mInactive == true)
@@ -39,7 +39,7 @@ void PIPOverlay::Update(float dt)
                 presentation->SetActiveSlide("16:9", true);
             else
                 presentation->SetActiveSlide("4:3", true);
-            mTimeRemaining = NisPlayer::Instance()->fn_8027C064(1);
+            mTimeRemaining = NisPlayer::Instance()->GetCameraTimeLeft(1);
         }
         else if (mTimeRemaining > 0.0f)
         {

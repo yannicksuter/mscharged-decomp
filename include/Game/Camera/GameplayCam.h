@@ -45,6 +45,7 @@ public:
     {
     }
 
+    float GetFOV() const { return m_CameraData->fov; }
     void CalcDesiredTarget();
     void Update(float fDeltaT, bool forceNeutral);
 

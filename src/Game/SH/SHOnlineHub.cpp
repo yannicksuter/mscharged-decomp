@@ -46,12 +46,12 @@ static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type);
 static inline void UpdateOnlineHubMiiIcon(SHOnlineHub* hub)
 {
     TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(hub->mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn", "Mii");
-    unsigned long texture = g_pMiiManager->mIconTextureIds[0];
+    unsigned long texture = MiiManager::s_pInstance->mIconTextureIds[0];
     image->SetAssetVisible(true);
     int profile = GameInfoManager::Instance()->GetSaveSlotName(gNetworkSaveSlotIndex);
     if (profile >= 0)
     {
-        bool valid = g_pMiiManager->CreateIcon(profile, 0, (RFLExpression)0);
+        bool valid = MiiManager::s_pInstance->CreateIcon(profile, 0, (RFLExpression)0);
         image->m_pTextureResource->SetTextureHandle(texture);
         image->SetAssetVisible(valid);
     }
@@ -347,9 +347,9 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
         text->m_bVisible = false;
     bool valid = false;
     if (mHasStrikerOfTheDay)
-        valid = g_pMiiManager->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);
+        valid = MiiManager::s_pInstance->CreateIcon((const RFLStoreData*)mStrikerOfTheDay.mMiiData, 1, (RFLExpression)0);
     TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "summary", "Mii_btn2", "Mii");
-    unsigned long texture = g_pMiiManager->mIconTextureIds[1];
+    unsigned long texture = MiiManager::s_pInstance->mIconTextureIds[1];
     image->SetAssetVisible(valid && mInitialized);
     image->m_pTextureResource->SetTextureHandle(texture);
 }

@@ -4,6 +4,7 @@
 #include "types.h"
 
 extern bool g_bRenderParticles;
+extern u8 lbl_806E1458;
 
 void ParticleUpdateNoOp(u8* state);
 void InitializeParticleUpdateCallbacks();

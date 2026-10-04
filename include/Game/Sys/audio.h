@@ -9,6 +9,8 @@
 
 class cPlayer;
 
+extern bool gAudioEnabled;
+
 struct AudioHandleState
 {
     void Set(int slotId, unsigned long cueId,

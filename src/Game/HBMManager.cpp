@@ -60,6 +60,15 @@ public:
 
 static HBMHideEvent sHBMHideEvent;
 
+static inline void OnHBMHidden()
+{
+    HomeButtonFade::Instance()->FadeIn();
+    gxInit();
+    GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+    sHBMHideEvent.Deliver();
+}
+
 HBMManager* gpHBMManager;
 
 void HBMManager::OnFileLoaded(
@@ -339,11 +348,7 @@ void HBMManager::Update()
             {
                 FEMusic::ResumeStream();
             }
-            HomeButtonFade::Instance()->FadeIn();
-            gxInit();
-            GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            sHBMHideEvent.Deliver();
+            OnHBMHidden();
         }
         nlTaskManager::SetNextState(mPreviousTaskState);
         break;
@@ -354,11 +359,7 @@ void HBMManager::Update()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            HomeButtonFade::Instance()->FadeIn();
-            gxInit();
-            GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            sHBMHideEvent.Deliver();
+            OnHBMHidden();
         }
         ResetTask::s_ResetMode = 3;
         ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
@@ -372,11 +373,7 @@ void HBMManager::Update()
         if (gpHBMManager->mActive)
         {
             gpHBMManager->mActive = false;
-            HomeButtonFade::Instance()->FadeIn();
-            gxInit();
-            GXSetChanCtrl(GX_COLOR0A0, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            GXSetChanCtrl(GX_COLOR1A1, false, GX_SRC_REG, GX_SRC_VTX, (GXLightID)0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-            sHBMHideEvent.Deliver();
+            OnHBMHidden();
         }
         ResetTask::s_ResetMode = 0;
         ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING

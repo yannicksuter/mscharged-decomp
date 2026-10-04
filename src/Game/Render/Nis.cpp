@@ -63,7 +63,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
     , mHeader(&header)
     , mTarget(header.target)
     , mWinnerType(header.winnerType)
-    , unknown_0x034(header.unknown_0x180)
+    , mRenderMode(header.renderMode)
     , mData(data)
     , mSize(size)
     , mMirrored(header.mirrored)
@@ -126,7 +126,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
                 mImpostors[i] = new (8, false) ImpostorModel(*npcTemplate->hierarchy, npcTemplate->modelID, npcTemplate->mResourcePool);
                 mImpostors[i]->PlayAnimation(*anim, PM_HOLD, 0);
                 mImpostors[i]->mVisible = true;
-                mImpostors[i]->mModelCallback = fn_80183F78;
+                mImpostors[i]->mModelCallback = SetImpostorPacketShadowLevels;
                 mImpostorNames[i] = npcTemplate->mName;
                 int lastIndex = nlStrLen(anim->m_szName) - 1;
                 mImpostorSuffixes[i] = anim->m_szName[lastIndex];
@@ -212,7 +212,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
         chunk = chunk->GetNextChunk();
     }
     NisPlayer* player = NisPlayer::Instance();
-    LoadByteCode(player->mUnidentified34334);
+    LoadByteCode(player->mAnimProxyByteCode);
 }
 void Nis::StartScript()
 {
@@ -439,7 +439,7 @@ void Nis::Render(int param1)
         mImpostors[i]->mWorldMatrix = matrix;
 
         GLView* view = GetLayerView(eCLV_MoreCharacters);
-        if (param1 == 1 && (unknown_0x034 == 1 || unknown_0x034 == 2))
+        if (param1 == 1 && (mRenderMode == 1 || mRenderMode == 2))
         {
             view = GetLayerView(eCLV_PictureInPicture);
         }
@@ -668,7 +668,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         break;
     }
     case NIS_TRIGGER_TYPE_PLAY_SOUND:
-        if (nis.unknown_0x034 == 0)
+        if (nis.mRenderMode == 0)
         {
             PlaySound(params.param1, params.param2, 0, 0);
         }
@@ -743,15 +743,15 @@ int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvai
         }
         return 1;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_5)
+    if (target == NIS_TARGET_HOME_SIDEKICK_1)
     {
         return 1;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_6)
+    if (target == NIS_TARGET_HOME_SIDEKICK_2)
     {
         return 2;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_7)
+    if (target == NIS_TARGET_HOME_SIDEKICK_3)
     {
         return 3;
     }
@@ -763,15 +763,15 @@ int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvai
         }
         return 5;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_9)
+    if (target == NIS_TARGET_AWAY_SIDEKICK_1)
     {
         return 5;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_10)
+    if (target == NIS_TARGET_AWAY_SIDEKICK_2)
     {
         return 6;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_11)
+    if (target == NIS_TARGET_AWAY_SIDEKICK_3)
     {
         return 7;
     }
@@ -783,13 +783,13 @@ int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvai
     {
         return 9;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_14)
+    if (target == NIS_TARGET_SCORER)
     {
         return NisPlayer::Instance()->mGoalScorerCharIndex;
     }
     if (target == NIS_TARGET_LOSER_SIDEKICK)
     {
-        if (NisPlayer::Instance()->fn_8027E284(winnerType) == 0)
+        if (NisPlayer::Instance()->GetWinnerSide(winnerType) == 0)
         {
             if (findAvailableSidekick)
             {
@@ -805,7 +805,7 @@ int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvai
     }
     if (target == NIS_TARGET_WINNER_SIDEKICK)
     {
-        if (NisPlayer::Instance()->fn_8027E284(winnerType) == 0)
+        if (NisPlayer::Instance()->GetWinnerSide(winnerType) == 0)
         {
             if (findAvailableSidekick)
             {
@@ -821,25 +821,25 @@ int Nis::TargetToIndex(NisTarget target, NisWinnerType winnerType, bool findAvai
     }
     if (target == NIS_TARGET_LOSER_GOALIE)
     {
-        return (NisPlayer::Instance()->fn_8027E284(winnerType) == 0) ? 9 : 8;
+        return (NisPlayer::Instance()->GetWinnerSide(winnerType) == 0) ? 9 : 8;
     }
     if (target == NIS_TARGET_WINNER_GOALIE)
     {
-        return (NisPlayer::Instance()->fn_8027E284(winnerType) == 0) ? 8 : 9;
+        return (NisPlayer::Instance()->GetWinnerSide(winnerType) == 0) ? 8 : 9;
     }
     if (target == NIS_TARGET_WINNER_CAPTAIN)
     {
-        return (NisPlayer::Instance()->fn_8027E284(winnerType) == 0) ? 0 : 4;
+        return (NisPlayer::Instance()->GetWinnerSide(winnerType) == 0) ? 0 : 4;
     }
     if (target == NIS_TARGET_LOSER_CAPTAIN)
     {
-        return (NisPlayer::Instance()->fn_8027E284(winnerType) == 0) ? 4 : 0;
+        return (NisPlayer::Instance()->GetWinnerSide(winnerType) == 0) ? 4 : 0;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_21)
+    if (target == NIS_TARGET_MEGASTRIKE_CAPTAIN)
     {
         return (NisPlayer::Instance()->mMegaStrikeSide == 0) ? 0 : 4;
     }
-    if (target == NIS_TARGET_UNIDENTIFIED_22)
+    if (target == NIS_TARGET_MEGASTRIKE_DEFENDING_GOALIE)
     {
         return (NisPlayer::Instance()->mMegaStrikeSide == 0) ? 9 : 8;
     }

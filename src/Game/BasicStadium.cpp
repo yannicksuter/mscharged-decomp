@@ -45,6 +45,11 @@ void BasicStadium::Update(float fDeltaT, bool bUpdateState, bool bUpdateNPCs)
     glGetCurrentResourcePool()->m_inventory->Update(fDeltaT);
 }
 
+static inline float GetWorldEffectBaseInterval(const WorldEffect* pEffect)
+{
+    return pEffect->m_fEmissionInterval;
+}
+
 /**
  * Address/Size: 0x802785FC | size: 0x170
  */
@@ -80,12 +85,12 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
                     pEffect->Emit();
                     if (-1.0f != pEffect->mUnidentified064)
                     {
-                        fNextTime = pEffect->m_fEmissionInterval
-                            + pEffect->mUnidentified064;
+                        float fBaseInterval = GetWorldEffectBaseInterval(pEffect);
+                        fNextTime = fBaseInterval + pEffect->mUnidentified064;
                     }
                     else
                     {
-                        fNextTime = pEffect->m_fEmissionInterval;
+                        fNextTime = GetWorldEffectBaseInterval(pEffect);
                     }
                 }
             }

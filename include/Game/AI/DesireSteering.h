@@ -11,27 +11,30 @@ enum ePositionSeekState
     PSS_ARRIVED = 0,
     PSS_NEAR_SEEKING = 1,
     PSS_FAR_SEEKING = 2,
-    PSS_UNIDENTIFIED_3 = 3,
+    PSS_TIMED_SEEKING = 3,
     PSS_UNIDENTIFIED_4 = 4,
 };
 
 class DesireSteering;
 
-extern "C" void fn_800C574C(DesireSteering*);
-extern "C" void fn_800C577C(DesireSteering*);
-extern "C" void fn_800C5784(DesireSteering*);
+extern float gSteeringHistoryDuration;
+extern bool gForceSidelineAvoidance;
+
+void ResetSteeringHistory(DesireSteering*);
+void ResetSteeringAvoidance(DesireSteering*);
+void ResetSteeringTargets(DesireSteering*);
 extern "C" void fn_800C5DBC(DesireSteering*, float);
-extern "C" void fn_800C60C4(
+void AddSteeringTarget(
     DesireSteering*, const nlVector3&, float, float);
-extern "C" void fn_800C61A4(
+void SetTimedSteeringTarget(
     DesireSteering*, const nlVector3&, unsigned short, float, float);
-extern "C" const nlVector3* fn_800C61FC(DesireSteering*);
-extern "C" void fn_800C6390(
+const nlVector3* GetSteeringTargetPosition(DesireSteering*);
+void SeekTimedSteeringTarget(
     DesireSteering*, const nlVector3&, float, float);
-extern "C" void fn_800C66A4(
+void SeekSteeringTarget(
     DesireSteering*, const nlVector3&, eTurboRequest, float, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
-extern "C" eStrafeDirection fn_800C7348(
+eStrafeDirection GetSteeringStrafeDirection(
     DesireSteering*, unsigned short, unsigned short);
 
 class DesireSteering : public Desire
@@ -45,27 +48,27 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-    void fn_800C2F48(float fAvoidanceMult) { m_fAvoidanceMult = fAvoidanceMult; }
+    void SetAvoidanceMultiplier(float fAvoidanceMult) { m_fAvoidanceMult = fAvoidanceMult; }
 
 private:
-    friend void fn_800C574C(DesireSteering*);
-    friend void fn_800C577C(DesireSteering*);
-    friend void fn_800C5784(DesireSteering*);
+    friend void ResetSteeringHistory(DesireSteering*);
+    friend void ResetSteeringAvoidance(DesireSteering*);
+    friend void ResetSteeringTargets(DesireSteering*);
     friend void fn_800C5DBC(DesireSteering*, float);
-    friend void fn_800C60C4(
+    friend void AddSteeringTarget(
         DesireSteering*, const nlVector3&, float, float);
-    friend void fn_800C61A4(DesireSteering*, const nlVector3&,
+    friend void SetTimedSteeringTarget(DesireSteering*, const nlVector3&,
         unsigned short, float, float);
-    friend const nlVector3* fn_800C61FC(DesireSteering*);
-    friend void fn_800C6390(
+    friend const nlVector3* GetSteeringTargetPosition(DesireSteering*);
+    friend void SeekTimedSteeringTarget(
         DesireSteering*, const nlVector3&, float, float);
-    friend void fn_800C66A4(DesireSteering*, const nlVector3&,
+    friend void SeekSteeringTarget(DesireSteering*, const nlVector3&,
         eTurboRequest, float, float);
     friend void fn_800C6FDC(DesireSteering*, float);
-    friend eStrafeDirection fn_800C7348(
+    friend eStrafeDirection GetSteeringStrafeDirection(
         DesireSteering*, unsigned short, unsigned short);
 
     ePositionSeekState m_ePositionSeekState;
@@ -94,7 +97,6 @@ public:
     {
     }
 
-    virtual ~UnidentifiedDesire35();
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);

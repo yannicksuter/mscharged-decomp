@@ -17,7 +17,7 @@ BlurHandler* BlurManager::m_activeBlurHandler = 0;
 
 SlotPool<BlurHandler> BlurHandler::m_BlurHandlerSlotPool(0x10, 0x10);
 
-static float fFlimmerOffset = 0.01f;
+static float sBlurZOffset = 0.01f;
 
 static inline void SetTextureBinding(glTextureBinding* binding, u32 texture)
 {
@@ -50,13 +50,13 @@ bool BlurHandler::ConstructViewOrientedPoints(
     nlVector3 normalizedForward;
     nlVector3 perpendicular;
 
-    float sLen1 = nlVec3LengthSquared(forwardVector);
-    if (sLen1 < 0.5f)
+    float forwardLengthSquared = nlVec3LengthSquared(forwardVector);
+    if (forwardLengthSquared < 0.5f)
     {
         return false;
     }
 
-    float invLen = nlRecipSqrt(sLen1, 1);
+    float invLen = nlRecipSqrt(forwardLengthSquared, 1);
     nlVec3Scale(normalizedForward, forwardVector, invLen);
 
     cCameraManager::GetViewVector(viewVector);
@@ -170,7 +170,7 @@ void BlurHandler::RenderMesh(unsigned long uTexID)
 
     nlMatrix4 matWorld;
     matWorld.SetIdentity();
-    matWorld.m43 += fFlimmerOffset;
+    matWorld.m43 += sBlurZOffset;
 
     matHandle = glAllocMatrix();
     if (matHandle != (u32)-1)

@@ -20,8 +20,7 @@ struct CharacterValuePair
  * captains, eight sidekicks, twelve goalies and one INVALID fallback that every
  * out-of-range lookup returns.
  *
- * Only the fields the retained lookups actually read are named; the rest keep
- * offset-derived names because the stripped DOL does not preserve them.
+ * Fields are named where their roles are established by their consumers.
  */
 struct CharacterInfo
 {
@@ -35,7 +34,7 @@ struct CharacterInfo
     /* 0x10 */ int mCaptainId;
     /* 0x14 */ int unknown_0x14;
     /* 0x18 */ int mSidekickId;
-    /* 0x1C */ int unknown_0x1C;
+    /* 0x1C */ int mSoundBankId;
     /* 0x20 */ int unknown_0x20;
     /* 0x24 */ int unknown_0x24;
     /* 0x28 */ int unknown_0x28;

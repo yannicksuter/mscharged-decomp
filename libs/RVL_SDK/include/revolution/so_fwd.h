@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+int SOClose(int s);
 long SOGetHostID(void);
 
 #ifdef __cplusplus

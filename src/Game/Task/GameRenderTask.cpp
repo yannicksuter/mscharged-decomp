@@ -211,7 +211,7 @@ void GameRenderTask::Run(float fDeltaT)
         TimedObjectManager::Instance()->Update(fDeltaT);
     }
 
-    if (NisPlayer::Instance()->fn_8027E64C())
+    if (NisPlayer::Instance()->HasSecondaryNis())
     {
         void* save14F8;
         GLView* save19D8;
@@ -248,7 +248,7 @@ void GameRenderTask::Run(float fDeltaT)
 
         NisPlayer::Instance()->Render(0);
 
-        if (NisPlayer::Instance()->mUnidentified34338 == 4)
+        if (NisPlayer::Instance()->mOverlayMode == 4)
         {
             ReplayManager::Instance()->RenderSnapshotAt(0.0f);
         }

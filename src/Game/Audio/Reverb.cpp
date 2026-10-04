@@ -85,7 +85,7 @@ Reverb::Reverb()
     m_ResultParameter = &m_Final;
 }
 
-void Reverb::CreateParameter(unsigned int definition, void*, bool negate,
+void Reverb::CreateParameter(unsigned int definition, const void*, bool negate,
     AudioEffectParameter** output)
 {
     AudioConfigNode* node = ConfigFindDefinition(definition);

@@ -255,7 +255,6 @@ u32 SOHtoNl(u32 hostlong);
 u16 SOHtoNs(u16 hostshort);
 
 int SOSocket(int pf, int type, int protocol);
-int SOClose(int s);
 int SOListen(int s, int backlog);
 int SOAccept(int s, void* sockAddr);
 int SOBind(int s, const void* sockAddr);

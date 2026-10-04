@@ -211,7 +211,7 @@ static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutra
 
     if (pBallOwner == NULL)
     {
-        pBallOwner = g_pBall->fn_800C2EC0();
+        pBallOwner = g_pBall->GetPassTarget();
     }
 
     int nNewKnotTable;
@@ -393,7 +393,7 @@ void GameplayCamera::Update(float deltaTime)
         {
             m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
             m_fDesiredZoom = m_fDesiredZoom - lbl_806DC4FC;
-            m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->mZoomScale;
+            m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->GetZoomScale();
             m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, lbl_806DC4F8), 1.2f * lbl_806DC4F4);
         }
 
@@ -431,7 +431,7 @@ void GameplayCamera::Update(float deltaTime)
     m_v3Camera.y = (inverseZoom * m_nearZoom.m_v3Camera.y) + (zoom * m_farZoom.m_v3Camera.y);
     m_v3Camera.z = (inverseZoom * m_nearZoom.m_v3Camera.z) + (zoom * m_farZoom.m_v3Camera.z);
 
-    m_fFOV = Interpolate(m_nearZoom.m_CameraData->fov, m_farZoom.m_CameraData->fov, m_fZoom);
+    m_fFOV = Interpolate(m_nearZoom.GetFOV(), m_farZoom.GetFOV(), m_fZoom);
 
     float clampedZoom = nlMinEquals(nlMaxEquals(m_fZoom, lbl_806DC4F8), lbl_806DC4F4);
     m_v3Camera.x = Interpolate(m_nearZoom.m_v3Camera.x, m_farZoom.m_v3Camera.x, clampedZoom);

@@ -126,8 +126,8 @@ void SetupMatrices(cBaseCamera* pCamera, const nlMatrix4* pOverride)
     fFOV = fFOV <= 179.999f ? fFOV : 179.999f;
     float fFOVRad = DegreesToRadians(fFOV);
 
-    if (NisPlayer::Instance()->fn_8027E64C()
-        && NisPlayer::Instance()->mUnidentified34338 == 4)
+    if (NisPlayer::Instance()->HasSecondaryNis()
+        && NisPlayer::Instance()->mOverlayMode == 4)
     {
         fAspect = 1.666f;
         if (IsWidescreen() && GetPresentation()->mLetterBoxEnabled)
@@ -473,9 +473,9 @@ void BeginFrameTask::Run(float dt)
 
     NisPlayer* pNis = NisPlayer::Instance();
     const nlMatrix4* pOverride
-        = pNis->mUnidentified3435A ? &pNis->mUnidentified3435C : NULL;
+        = pNis->mUseViewMatrixOverride ? &pNis->mViewMatrixOverride : NULL;
 
-    SetupMatrices(NisPlayer::Instance()->fn_8027E708(), pOverride);
+    SetupMatrices(NisPlayer::Instance()->GetSecondaryCamera(), pOverride);
     SetupRenderInfo();
 
     if (!g_bProjectedShadows)

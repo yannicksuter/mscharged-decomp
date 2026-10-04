@@ -2508,7 +2508,7 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
     if (g_pBall->HasActivePassTarget())
     {
         cBall* pBall = g_pBall;
-        cPlayer* pPassTarget = pBall->fn_800C2EC0();
+        cPlayer* pPassTarget = pBall->GetPassTarget();
         if (!IsLooseBallTowardNet()
             || nlVec3DistanceSquared2D(mUnidentified024.m_v3Position, pBall->m_v3PassIntercept)
                 > nlVec3DistanceSquared2D(pPassTarget->mUnidentified024.m_v3Position, pBall->m_v3PassIntercept))

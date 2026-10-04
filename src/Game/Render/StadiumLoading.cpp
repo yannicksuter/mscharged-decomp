@@ -28,11 +28,11 @@
 #include "NL/nlTask.h"
 #include "Game/Render/HighRange.h"
 #include "Game/Render/PlanarShadowDrawable.h"
+#include "Game/GameObjectLighting.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 extern "C"
 {
-    void fn_80182164();
     DrawableObject* fn_802787AC(BasicStadium* stadium, unsigned long uHashID);
     void fn_80278818(BasicStadium* stadium);
     float fn_802789A0(BasicStadium* stadium);
@@ -618,6 +618,11 @@ char* fn_802772C4()
     return gStadiumName;
 }
 
+static inline void SetStadiumName(const char* name)
+{
+    nlStrNCpy(gStadiumName, name, sizeof(gStadiumName));
+}
+
 void fn_802772D0(const char* name, bool)
 {
     char path[255];
@@ -628,7 +633,7 @@ void fn_802772D0(const char* name, bool)
     lbl_806E1968 = 1;
 
     nlSNPrintf(path, sizeof(path), lbl_806DEE64, lbl_805222F0, name);
-    nlStrNCpy(gStadiumName, name, sizeof(gStadiumName));
+    SetStadiumName(name);
     BeginLoadStadium(path, false);
 
     lbl_806E196C = new (nlMalloc(sizeof(StadiumTweaks), 8, true))

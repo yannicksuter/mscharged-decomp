@@ -142,6 +142,8 @@ public:
     inline bool IsLastTeamToScore(int side) const { return m_nLastTeamToScore == side; }
     inline bool IsCaptainShotToScoreOn() const { return mbCaptainShotToScoreOn; }
     inline u32 GetMegaStrikeSaveMask() const { return mUnidentified038; }
+    float GetXAxisTilt() const { return mUnidentified080; }
+    float GetYAxisTilt() const { return mUnidentified084; }
     const nlVector3& GetTiltDirection() const { return mTiltDirection; }
 
     /* 0x04 */ FuzzyTweaks* m_pFuzzyTweaks;
@@ -255,6 +257,9 @@ public:
 };
 
 extern cGame* g_pGame;
+
+extern "C" void fn_8006040C(cGame*, cFielder*);
+extern "C" void fn_80060804(cGame*, cFielder*);
 
 extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
 extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData);

@@ -81,7 +81,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (to == 0x10)
     {
-        NisPlayer::Instance()->fn_8027D11C();
+        NisPlayer::Instance()->SetupNisPlayback();
     }
 
     if (BasicStadium::GetCurrentStadium() != NULL)

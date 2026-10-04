@@ -662,7 +662,7 @@ bool RenderParticleSystem(ParticleSystem* source, GLView* view,
     }
 
     bool isWarble = sWarbleTexture == source->m_pTemplate->m_hTexture;
-    if (fn_80183C54() && !isWarble)
+    if (IsShadowLookupActive() && !isWarble)
     {
         glShadowedTexturedColourModelWriter writer;
         BuildParticleQuads(&writer, source, vertices, viewRight, viewUp, pCoordSys);

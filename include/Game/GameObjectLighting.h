@@ -17,43 +17,41 @@ extern TweakValueFloat gShadowLookupScaleY;
 extern TweakValueFloat gShadowLookupTransX;
 extern TweakValueFloat gShadowLookupTransY;
 extern LightingLookup* gpShadowLightingLookup;
-extern u8 lbl_806E1458;
 
 class nlVector2;
 class nlVector3;
 struct glModel;
 u32 GetGameObjectLightRamp();
-nlColour fn_80183C9C(const nlVector2* arg0, bool arg1);
-int fn_80183DEC(const nlVector3*);
-void fn_80183E4C();
-void fn_80183E8C(ImpostorModel*, glModel*);
-void fn_80183F78(ImpostorModel*, glModel*);
+nlColour SampleShadowLookup(const nlVector2* arg0, bool arg1);
+int GetShadowLookupLevel(const nlVector3*);
+void ReleaseShadowLightingLookup();
+void SetImpostorShadowLevel(ImpostorModel*, glModel*);
+void SetImpostorPacketShadowLevels(ImpostorModel*, glModel*);
 void UpdateGameObjectLighting();
 void InitializeGameObjectLighting();
 void PrepareStadiumLight(StadiumLight* light);
 bool AlwaysUseCameraRelativeCharacterLighting();
 
 // Shared lighting hooks used by the material programs.
-extern "C"
-{
-    bool fn_80183C54();
-    int IsGameObjectLightingEnabled();
-    int ShouldUseGameObjectLightTexture(int character);
-    int ShouldDoubleGameObjectLighting();
-    int GetGameObjectLightCount(bool character, bool includeEffects);
-    GameObjectLight* GetGameObjectLight(s32 index, bool character);
-    void SetGameObjectLightingMode(s32 mode);
-    void SetGameObjectLightTexture(unsigned long texture);
-    void LoadGameObjectSpecularLight(s32 index, GameObjectLight* light, f32 exponent, const nlMatrix4& viewMatrix);
-    void SetGameObjectSpecularLightingEnabled(s32 enabled, s32 count);
-    unsigned long GetGameObjectLightTexture();
-    void LoadGameObjectLights(s32 count, GLView* view, bool character);
-    void SetGameObjectLightingEnabled(bool enabled, s32 count, bool useVertexColour);
-    void SetGameObjectAmbientLightingEnabled(s32 enabled);
-    void ApplyGameObjectShadowLighting(s32 skinned, u32 shadowLevel);
-    void RestoreGameObjectShadowLighting();
-    void SetGameObjectShadowModelMatrix(u32 matrix);
-    void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix);
-}
+bool IsShadowLookupActive();
+int IsGameObjectLightingEnabled();
+int ShouldUseGameObjectLightTexture(int character);
+int ShouldDoubleGameObjectLighting();
+int GetGameObjectLightCount(bool character, bool includeEffects);
+GameObjectLight* GetGameObjectLight(int index, bool character);
+void SetGameObjectLightingMode(int mode);
+void SetGameObjectLightTexture(unsigned long texture);
+void LoadGameObjectSpecularLight(int index, GameObjectLight* light, float exponent, const nlMatrix4& viewMatrix);
+void SetGameObjectSpecularLightingEnabled(int enabled, int count);
+unsigned long GetGameObjectLightTexture();
+void LoadGameObjectLights(int count, GLView* view, bool character);
+void SetGameObjectLightingEnabled(bool enabled, int count, bool useVertexColour);
+void SetGameObjectAmbientLightingEnabled(int enabled);
+void ApplyGameObjectShadowLighting(int skinned, unsigned long shadowLevel);
+void RestoreGameObjectShadowLighting();
+void SetGameObjectShadowModelMatrix(unsigned long matrix);
+void SetGameObjectShadowViewMatrix(const nlMatrix4* matrix);
+void fn_80182164();
+void LoadShadowLightingLookup(unsigned long texture);
 
 #endif // _GAMEOBJECTLIGHTING_H_

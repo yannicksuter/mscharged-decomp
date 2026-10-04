@@ -3,7 +3,10 @@
 
 struct __va_list_struct;
 
-int nlPrintf(const char* format, ...);
+inline int nlPrintf(const char* format, ...)
+{
+    return 0;
+}
 
 int nlVSNPrintf(char* buffer, unsigned long size, const char* format, __va_list_struct* args);
 int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);

@@ -37,7 +37,6 @@ extern TweakValueAllocator2* gTweakBindingAllocator;
 class TweakBindingBase : public TweakValueBase
 {
 public:
-    virtual ~TweakBindingBase() { }
     virtual int IsBound() = 0;
     virtual TweakValueBase* CreateValue(const char* name,
         void* entry) = 0;
@@ -52,8 +51,76 @@ public:
     }
 };
 
-// The float binding reproduces the template code and data emission order.
-// Only its float value operations have been reconstructed so far.
+inline void* AllocateTweakValue(unsigned long size)
+{
+    return gTweakValueAllocator->Allocate(size);
+}
+
+inline bool TweakValueStringEquals(const char* value, const char* expected)
+{
+    return nlStrICmp(value, expected) == 0;
+}
+
+inline void FormatTweakBindingValue(char* buffer, unsigned long size, bool* value)
+{
+    nlSNPrintf(buffer, size, *value ? "true" : "false");
+}
+
+inline void ParseTweakBindingValue(bool*& result, const char* value)
+{
+    if (TweakValueStringEquals(value, "true"))
+    {
+        *result = true;
+    }
+    if (TweakValueStringEquals(value, "false"))
+    {
+        *result = false;
+    }
+}
+
+inline void FormatBooleanTweakValue(char* buffer, unsigned long size, bool value)
+{
+    nlSNPrintf(buffer, size, value ? "true" : "false");
+}
+
+extern char gTweakFloatBindingFormat[];
+inline void FormatTweakBindingValue(char* buffer, unsigned long size, float* value)
+{
+    nlSNPrintf(buffer, size, gTweakFloatBindingFormat, *value);
+}
+inline void ParseTweakBindingValue(float*& result, const char* value)
+{
+    *result = (float)atof(value);
+}
+
+template <typename T>
+class TweakBinding;
+template <typename T>
+class TweakValue;
+typedef TweakValue<bool> TweakValueBool;
+class TweakValueFloat;
+template <typename T>
+struct TweakType;
+template <>
+struct TweakType<bool>
+{
+    enum
+    {
+        ID = 2
+    };
+    typedef TweakValueBool OwnedValue;
+    static bool ReadOwned(TweakValueBase* value);
+};
+template <>
+struct TweakType<float>
+{
+    enum
+    {
+        ID = 5
+    };
+    typedef TweakValueFloat OwnedValue;
+    static float ReadOwned(TweakValueBase* value);
+};
 template <typename T>
 class TweakBinding : public TweakBindingBase
 {
@@ -68,10 +135,10 @@ public:
             *m_pValue = defaultValue;
         }
     }
-    TweakBinding(const char* name, const char* category, T* value,
-        bool formatName = false)
+    TweakBinding(const char* name, const char* category,
+        T* value, bool formatName = false)
+        : m_pValue(value)
     {
-        m_pValue = value;
         mName = name;
         mFormatName = formatName;
 
@@ -94,25 +161,78 @@ public:
             }
         }
     }
-    virtual int GetValueType();
-    virtual int GetStorageKind();
-    virtual T GetDefault();
-    virtual TweakValueBase* CreateValue(const char* name, void* entry);
-    virtual void CopyValueFrom(TweakValueBase*);
-    virtual void* GetValueAddress();
-    virtual void FormatValue(char*, unsigned long);
-    virtual void ParseValue(const char*);
-    virtual int IsBound();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void BindValueAddress(void* value);
+    virtual ~TweakBinding()
+    {
+    }
+    virtual int GetValueType()
+    {
+        return TweakType<T>::ID;
+    }
+    virtual int GetStorageKind()
+    {
+        return 2;
+    }
+    virtual T GetDefault()
+    {
+        return T();
+    }
+    virtual TweakValueBase* CreateValue(
+        const char* name, void* entry)
+    {
+        typedef typename TweakType<T>::OwnedValue Value;
+        Value* created = new (AllocateTweakValue(sizeof(Value))) Value(name, T());
+        AddTweakValue((TweakEntry*)entry, created);
+        return created;
+    }
+    virtual void CopyValueFrom(
+        TweakValueBase* other)
+    {
+        switch (other->GetStorageKind())
+        {
+        case 1:
+            *m_pValue = TweakType<T>::ReadOwned(other);
+            break;
+        case 2:
+            *m_pValue = *((TweakBinding<T>*)other)->m_pValue;
+            break;
+        }
+    }
+    virtual void* GetValueAddress()
+    {
+        return m_pValue;
+    }
+    virtual void FormatValue(
+        char* buffer, unsigned long size)
+    {
+        FormatTweakBindingValue(buffer, size, m_pValue);
+    }
+    virtual void ParseValue(const char* value)
+    {
+        ParseTweakBindingValue(m_pValue, value);
+    }
+    virtual int IsBound()
+    {
+        return m_pValue != 0;
+    }
+    virtual void UnidentifiedVirtual14(
+        float* minimum, float* maximum, float* increment)
+    {
+        *minimum = 0.0f;
+        *maximum = 0.0f;
+        *increment = 0.0f;
+    }
+    virtual void BindValueAddress(void* value)
+    {
+        m_pValue = (T*)value;
+    }
 
     bool Bind(const char* path)
     {
         return TweakBindingBase::Bind(path);
     }
 
-    bool Bind(const char* name, T value, const char* group,
-        bool reload, T min, T max)
+    bool Bind(const char* name, float value,
+        const char* group, bool reload, float min, float max)
     {
         bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
         if (!found)
@@ -124,7 +244,7 @@ public:
     }
 
     bool BindWithDefault(const char* name, T defaultValue,
-        const char* group, bool reload, T value, T min, T max)
+        const char* group, bool reload, float value, float min, float max)
     {
         bool found = Bind(name, value, group, reload, min, max);
         if (!found)
@@ -160,12 +280,8 @@ public:
 
     friend class InterpreterCore;
 }; // total size: 0x10
-
-template <>
-inline TweakBinding<float>::TweakBinding(float* value);
-
+typedef TweakBinding<bool> TweakBoolBinding;
 typedef TweakBinding<float> TweakFloatBinding;
-
 class TweakIntBinding : public TweakBindingBase
 {
 public:
@@ -247,304 +363,11 @@ public:
     friend class InterpreterCore;
 }; // total size: 0x10
 
-class TweakBoolBinding : public TweakBindingBase
+#include "Game/TweakBindingInline.h"
+#include "Game/TweakValueBool.h"
+#include "Game/TweakValueFloat.h"
+inline bool TweakType<bool>::ReadOwned(TweakValueBase* value)
 {
-public:
-    TweakBoolBinding(bool* value = 0)
-        : m_pValue(value)
-    {
-    }
-    TweakBoolBinding(const char* name, const char* category,
-        bool* value, bool formatName)
-        : m_pValue(value)
-    {
-        mName = name;
-        mFormatName = formatName;
-
-        if (IsTweakRegistryInitialized() == 0)
-        {
-            void* entry = nlMalloc(0x18, 8, true);
-            if (entry != 0)
-            {
-                QueueTweakValue((TweakPendingValue*)entry, this, category);
-            }
-            gLastTweakCategory = category;
-        }
-        else
-        {
-            TweakEntry* config = GetTweakRoot();
-            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
-            if (entry != 0)
-            {
-                AddTweakValue(entry, this);
-            }
-        }
-    }
-    virtual int GetValueType();
-    virtual int GetStorageKind();
-    virtual bool GetDefault();
-    virtual TweakValueBase* CreateValue(const char* name,
-        void* entry);
-    virtual void CopyValueFrom(TweakValueBase*);
-    virtual void* GetValueAddress();
-    virtual void FormatValue(char*, unsigned long);
-    virtual void ParseValue(const char*);
-    virtual int IsBound();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void BindValueAddress(void* value);
-
-    using TweakBindingBase::Bind;
-
-    bool Bind(const char* name, float value,
-        const char* group, bool reload, float min, float max)
-    {
-        bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
-        if (!found)
-        {
-            *m_pValue = GetDefault();
-            return found;
-        }
-        return found;
-    }
-
-    bool BindWithDefault(const char* name, bool defaultValue,
-        const char* group, bool reload, float value, float min, float max)
-    {
-        bool found = Bind(name, value, group, reload, min, max);
-        if (!found)
-        {
-            *m_pValue = defaultValue;
-        }
-        return found;
-    }
-
-public:
-    /* 0x0C */ bool* m_pValue;
-
-    friend class InterpreterCore;
-}; // total size: 0x10
-
-class TweakValueBool : public TweakValueBase
-{
-public:
-    virtual void CopyValueFrom(TweakValueBase*);
-    virtual int GetStorageKind();
-    virtual int GetValueType();
-    virtual void* GetValueAddress();
-    virtual void FormatValue(char*, unsigned long);
-    virtual void ParseValue(const char*);
-    virtual ~TweakValueBool();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void UnidentifiedVirtual18();
-
-    static void operator delete(void* pointer)
-    {
-        gTweakValueAllocator->m_Pool1.Free(pointer);
-    }
-
-    TweakValueBool(const char* name, const char* category, bool value,
-        bool formatName = true)
-    {
-        mValue = value;
-        mName = name;
-        mFormatName = formatName;
-        if (IsTweakRegistryInitialized() == 0)
-        {
-            void* entry = nlMalloc(0x18, 8, true);
-            if (entry != 0)
-            {
-                QueueTweakValue((TweakPendingValue*)entry, this, category);
-            }
-        }
-        else
-        {
-            TweakEntry* config = GetTweakRoot();
-            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
-            if (entry != 0)
-            {
-                AddTweakValue(entry, this);
-            }
-        }
-        gLastTweakCategory = category;
-    }
-
-    TweakValueBool(const char* name, bool value)
-    {
-        mValue = value;
-        mName = name;
-    }
-
-    bool GetValue() const
-    {
-        return mValue;
-    }
-
-    operator bool() const
-    {
-        return mValue;
-    }
-
-    const bool& operator=(const bool& value)
-    {
-        mValue = value;
-        return mValue;
-    }
-
-    /* 0x0A */ bool mValue;
-}; // total size: 0x0C
-
-// Retail Game/tu_80009B34.cpp keeps the bool family's virtual bodies as a
-// weak block behind its static initializer, in the order below, and no unit
-// defines them out of line.
-
-inline int TweakBoolBinding::GetValueType()
-{
-    return 2;
+    return ((OwnedValue*)value)->mValue;
 }
-
-inline int TweakBoolBinding::GetStorageKind()
-{
-    return 2;
-}
-
-inline bool TweakBoolBinding::GetDefault()
-{
-    return false;
-}
-
-inline TweakValueBase* TweakBoolBinding::CreateValue(
-    const char* name, void* entry)
-{
-    TweakValueBool* created = new (
-        gTweakValueAllocator->Allocate(sizeof(TweakValueBool)))
-        TweakValueBool(name, false);
-    AddTweakValue((TweakEntry*)entry, created);
-    return created;
-}
-
-inline void TweakBoolBinding::CopyValueFrom(
-    TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        *m_pValue = ((TweakValueBool*)other)->mValue;
-        break;
-    case 2:
-        *m_pValue = *((TweakBoolBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-inline void* TweakBoolBinding::GetValueAddress()
-{
-    return m_pValue;
-}
-
-inline void TweakBoolBinding::FormatValue(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, *m_pValue ? "true" : "false");
-}
-
-inline void TweakBoolBinding::ParseValue(const char* value)
-{
-    if (nlStrICmp(value, "true") == 0)
-    {
-        *m_pValue = true;
-    }
-    if (nlStrICmp(value, "false") == 0)
-    {
-        *m_pValue = false;
-    }
-}
-
-inline int TweakBoolBinding::IsBound()
-{
-    return m_pValue != 0;
-}
-
-inline void TweakBoolBinding::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-inline void TweakBoolBinding::BindValueAddress(void* value)
-{
-    m_pValue = (bool*)value;
-}
-
-inline void TweakValueBool::CopyValueFrom(
-    TweakValueBase* other)
-{
-    switch (other->GetStorageKind())
-    {
-    case 1:
-        mValue = ((TweakValueBool*)other)->mValue;
-        break;
-    case 2:
-        mValue = *((TweakBoolBinding*)other)->m_pValue;
-        break;
-    }
-}
-
-inline int TweakValueBool::GetStorageKind()
-{
-    return 1;
-}
-
-inline int TweakValueBool::GetValueType()
-{
-    return 2;
-}
-
-inline void* TweakValueBool::GetValueAddress()
-{
-    return &mValue;
-}
-
-inline void TweakValueBool::FormatValue(
-    char* buffer, unsigned long size)
-{
-    nlSNPrintf(buffer, size, mValue ? "true" : "false");
-}
-
-inline void TweakValueBool::ParseValue(const char* value)
-{
-    if (nlStrICmp(value, "true") == 0 || nlStrICmp(value, "triggered") == 0
-        || nlStrICmp(value, "on") == 0)
-    {
-        mValue = true;
-    }
-    if (nlStrICmp(value, "false") == 0 || nlStrICmp(value, "off") == 0)
-    {
-        mValue = false;
-    }
-}
-
-inline TweakValueBool::~TweakValueBool()
-{
-}
-
-inline void TweakValueBool::UnidentifiedVirtual14(
-    float* minimum, float* maximum, float* increment)
-{
-    *minimum = 0.0f;
-    *maximum = 0.0f;
-    *increment = 0.0f;
-}
-
-inline void TweakValueBool::UnidentifiedVirtual18()
-{
-}
-
-// NOTE: removed stale GXMaterialFloatTweak_804F4190 / TweakValueImpl_804F4DC8 tail
-// (origin/main 30bf4de2) - superseded by TweakValueFloat.h (TweakValueFloat)
-// and TweakFloatBinding renames above; remote detail preserved in symbols.txt
-// (__sinit_Ball_cpp, __arraydtor, full UnidentifiedVirtual set) and in the
-// full TweakFloatBinding vtable declaration.
-
 #endif // GAME_TWEAK_VALUE_H

@@ -30,9 +30,9 @@ bool DesireUserControlled::Initialize(void* context)
 
     DesireSteering* desire = (DesireSteering*)fn_8002E08C(
         m_pFielder, 34);
-    fn_800C5784(desire);
-    fn_800C574C(desire);
-    fn_800C577C(desire);
+    ResetSteeringTargets(desire);
+    ResetSteeringHistory(desire);
+    ResetSteeringAvoidance(desire);
 
     mMaxDuration = -1.0f;
 

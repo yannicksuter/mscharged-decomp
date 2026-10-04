@@ -666,7 +666,7 @@ void cPlayer::fn_80096CDC(cBall* pBall)
     {
         DesireSteering* pDesire
             = (DesireSteering*)fn_8002E08C((cFielder*)this, 34);
-        fn_800C574C(pDesire);
+        ResetSteeringHistory(pDesire);
     }
     m_pBall = pBall;
 }
@@ -949,7 +949,7 @@ void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
     float fMinPassSpeed, float fMaxPassSpeed)
 {
     DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C((cFielder*)pTeammate, 22);
-    pDesire->fn_800C22CC(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
+    pDesire->ExecutePass(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 
 void cPlayer::ClearPowerupAnimState(bool bIsEndGame)

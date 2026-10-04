@@ -35,12 +35,12 @@ Game/AI/AISandbox.cpp:
 	.sbss       start:0x806E0B88 end:0x806E0B90
 
 Game/AnimInventory.cpp:
-	.text       start:0x80009648 end:0x80009B34
+	.text       start:0x80009648 end:0x80009B88
 	.data       start:0x804F42A0 end:0x804F4330
 	.sbss       start:0x806E0B90 end:0x806E0B98
 
-Game/tu_80009B34.cpp:
-	.text       start:0x80009B34 end:0x8000CD44
+Game/CharacterLoader.cpp:
+	.text       start:0x80009B88 end:0x8000CD44
 	.ctors      start:0x804DB4EC end:0x804DB4F0
 	.data       start:0x804F4330 end:0x804F4688
 	.bss        start:0x8056B260 end:0x8056B468
@@ -1247,13 +1247,14 @@ Game/GameObjectLighting.cpp:
 	.data       start:0x80511450 end:0x80511610
 	.bss        start:0x80570958 end:0x80570C58
 	.sdata      start:0x806DCC40 end:0x806DCC98
-	.sbss       start:0x806E1410 end:0x806E1460
+	.sbss       start:0x806E1410 end:0x806E1458
 	.sdata2     start:0x806E4CD0 end:0x806E4D50
 
 Game/Task/ParticleUpdateCallbacks.cpp:
 	.text       start:0x8018480C end:0x80184ACC
 	.ctors      start:0x804DB6BC end:0x804DB6C0
 	.sdata      start:0x806DCC98 end:0x806DCCA0
+	.sbss       start:0x806E1458 end:0x806E1460
 
 Game/Render/RenderShadow.cpp:
 	.text       start:0x80184ACC end:0x80186D0C
@@ -2384,7 +2385,7 @@ Game/Render/Nis.cpp:
 	.sbss       start:0x806E19D8 end:0x806E1A20
 	.sdata2     start:0x806E5CF8 end:0x806E5D18
 
-Game/Render/tu_80283D9C.cpp:
+Game/Render/NisPlayerOverlay.cpp:
 	.text       start:0x8028400C end:0x80284A58
 	.ctors      start:0x804DB7F0 end:0x804DB7F4
 	.data       start:0x805237F0 end:0x805238B8

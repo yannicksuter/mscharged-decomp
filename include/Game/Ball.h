@@ -102,8 +102,8 @@ public:
         return bResult;
     }
 
-    cPlayer* fn_800C2EC0() const { return m_pPassTarget; }
-    float fn_800C2EC8() const
+    cPlayer* GetPassTarget() const { return m_pPassTarget; }
+    float GetPassProgress() const
     {
         if (m_fTotalPassTime > 0.0f)
         {
@@ -111,7 +111,7 @@ public:
         }
         return 0.0f;
     }
-    const nlVector3& fn_800C2F18() const { return m_v3PassIntercept; }
+    const nlVector3& GetPassIntercept() const { return m_v3PassIntercept; }
 
     bool UnidentifiedState8Shot()
     {

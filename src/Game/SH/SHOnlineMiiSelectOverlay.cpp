@@ -423,7 +423,7 @@ void SHOnlineMiiSelectOverlay::Update(float fDeltaT)
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(
             mPresentation->m_currentSlide, "Layer", "PLAYER_BOX", "Mii");
 
-        unsigned long textureReference = g_pMiiManager->mIconTextureIds[mIconIndex];
+        unsigned long textureReference = MiiManager::s_pInstance->mIconTextureIds[mIconIndex];
         image->m_pTextureResource->SetTextureHandle(textureReference);
         image->SetAssetVisible(true);
 

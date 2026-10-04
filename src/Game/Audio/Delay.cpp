@@ -72,7 +72,7 @@ class Delay : public AudioEffectBase
 public:
     Delay();
     virtual ~Delay() { }
-    virtual void CreateParameter(unsigned int definition, void* context, bool negate,
+    virtual void CreateParameter(unsigned int definition, const void* context, bool negate,
         AudioEffectParameter** output);
     virtual void BeginBlend()
     {
@@ -165,7 +165,7 @@ Delay::Delay()
     m_ResultParameter = &m_Final;
 }
 
-void Delay::CreateParameter(unsigned int definition, void*, bool negate,
+void Delay::CreateParameter(unsigned int definition, const void*, bool negate,
     AudioEffectParameter** output)
 {
     AudioConfigNode* node = ConfigFindDefinition(definition);

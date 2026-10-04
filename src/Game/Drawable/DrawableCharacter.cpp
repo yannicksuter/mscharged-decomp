@@ -907,7 +907,7 @@ void DrawableCharacter::ApplyDamageEffects(const cCharacter& source, glModel* mo
     glModelPacket* pPacket;
     static u32 shadowLevelHash = nlStringLowerHash("shadowLevel");
 
-    int shadowAlpha = fn_80183DEC(&bip01Position);
+    int shadowAlpha = GetShadowLookupLevel(&bip01Position);
     float fade = 1.0f;
     if (bip01Position.z > fade)
     {

@@ -591,6 +591,9 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
 {
     cFielder* owner = (cFielder*)g_pBall->m_pOwner;
     bool clear = false;
+    float dy;
+    float dx;
+    float dz;
     float minimumDistanceSq = lbl_806DC5F0 * lbl_806DC5F0;
     if (owner != 0 && owner->m_eClassType == FIELDER)
     {
@@ -623,9 +626,9 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
                 }
             }
 
-            float dy = fielder->mUnidentified024.m_v3Position.y - owner->mUnidentified024.m_v3Position.y;
-            float dx = fielder->mUnidentified024.m_v3Position.x - owner->mUnidentified024.m_v3Position.x;
-            float dz = fielder->mUnidentified024.m_v3Position.z - owner->mUnidentified024.m_v3Position.z;
+            dy = fielder->mUnidentified024.m_v3Position.y - owner->mUnidentified024.m_v3Position.y;
+            dx = fielder->mUnidentified024.m_v3Position.x - owner->mUnidentified024.m_v3Position.x;
+            dz = fielder->mUnidentified024.m_v3Position.z - owner->mUnidentified024.m_v3Position.z;
             nlVector3 delta;
             delta.x = dx;
             delta.y = dy;
@@ -677,7 +680,7 @@ facingGoalKnown:
     else
         mCameraFlags &= ~0x20;
 
-    if (g_pGame->mUnidentified080 || g_pGame->mUnidentified084)
+    if (g_pGame->GetXAxisTilt() != 0.0f || g_pGame->GetYAxisTilt() != 0.0f)
         mCameraFlags |= 0x40;
 }
 

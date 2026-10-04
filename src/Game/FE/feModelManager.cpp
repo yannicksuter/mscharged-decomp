@@ -207,7 +207,7 @@ void FEModel::OnHierarchyLoaded(void* data, unsigned long size, void* userData)
     }
     else
     {
-        nlLoadEntireFileAsync(model->mModelData->pUnidentified38, OnAnimationsLoaded, model, 32, AllocateEnd, 0, 0, 0);
+        nlLoadEntireFileAsync(model->mModelData->szFEAnimFilename, OnAnimationsLoaded, model, 32, AllocateEnd, 0, 0, 0);
         model->mLoadQueued = true;
     }
 
@@ -499,12 +499,12 @@ void FEImpostorModel::Update(float dt)
             float z = radius * nlSin(RadToAng16(angle));
             x = mPosition.x + x;
             nlVec3Set(position, x, mPosition.y,
-                mPosition.z + z + lbl_80515D18[mModelData->mUnidentified00].mOffsetZ);
+                mPosition.z + z + lbl_80515D18[mModelData->cc].mOffsetZ);
         }
         else
         {
             position = mPosition;
-            position.z += lbl_80515D18[mModelData->mUnidentified00].mOffsetZ;
+            position.z += lbl_80515D18[mModelData->cc].mOffsetZ;
         }
         Impostor* impostor = mModels[i];
         nlVec3Set(impostor->mPosition, position.x, position.y, position.z);
@@ -691,7 +691,7 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
             // executable.
             glGetCurrentResourcePool()->GetFreeMemory();
         }
-        const CharacterInfo& characterInfo = GetCharacterInfo(model->mModelData->mUnidentified00);
+        const CharacterInfo& characterInfo = GetCharacterInfo(model->mModelData->cc);
         FEImpostorModel* impostorModel = (FEImpostorModel*)handle->mModel;
         impostorModel->mModel = new (8, false) ImpostorModel(
             *(cSHierarchy*)model->mUnidentified1C, model->mModelID,
@@ -699,7 +699,7 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
         impostorModel->mModel->mSkinMesh->m_Unknown0C = 0;
 
         ImpostorCharacterParams params;
-        int character = handle->mModel->mModelData->mUnidentified00;
+        int character = handle->mModel->mModelData->cc;
         params.mWidth = lbl_80515D18[character].mTextureWidth;
         params.mHeight = lbl_80515D18[character].mTextureHeight;
         params.mUseAdditiveBlend = 1;
@@ -719,8 +719,8 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
         {
             int slot;
             impostorModel->mModels[i] = ImpostorManager::GetInstance()->AllocImpostor(&slot);
-            int width = lbl_80515D18[impostorModel->mModelData->mUnidentified00].mWidth;
-            int height = lbl_80515D18[impostorModel->mModelData->mUnidentified00].mHeight;
+            int width = lbl_80515D18[impostorModel->mModelData->cc].mWidth;
+            int height = lbl_80515D18[impostorModel->mModelData->cc].mHeight;
             impostorModel->mModels[i]->Set(impostorModel->mCharacter,
                 handle->mPosition, width, height, 0xc000);
         }
@@ -904,7 +904,7 @@ void FEModelManager::BeginLoadModels()
         if (handle->mUnidentified5A)
         {
             handle->mUnidentified5A = glBeginLoadTextureBundle(
-                modelData->pUnidentified18, FEModel::OnAlternateTexturesLoaded,
+                modelData->szAlternateTextureFilename, FEModel::OnAlternateTexturesLoaded,
                 model, model->mLoader);
         }
         glBeginLoadTextureBundle(modelData->szTextureFilename,

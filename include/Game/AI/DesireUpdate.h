@@ -130,9 +130,9 @@ public:
 
     void SetParameter(int index, const Variant& value);
 
-    Variant* fn_800C2C00(int index) { return ExtraData.Get(index); }
-    UnidentifiedVariantCollection* fn_800C2C08() { return &ExtraData; }
-    bool fn_800C2C10(int index) const { return ExtraData.IsSet(index); }
+    Variant* GetParameter(int index) { return ExtraData.Get(index); }
+    UnidentifiedVariantCollection* GetParameters() { return &ExtraData; }
+    bool IsParameterSet(int index) const { return ExtraData.IsSet(index); }
 
     int GetInt() const
     {

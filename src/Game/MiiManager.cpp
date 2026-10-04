@@ -14,9 +14,9 @@
 #include <RVLFaceLib/RFL_Icon.h>
 #include <RVLFaceLib/RFL_System.h>
 #include <revolution/arc.h>
-#include "NL/gl/glTexture.h"
 
-MiiManager* g_pMiiManager;
+template <>
+MiiManager* nlSingleton<MiiManager>::s_pInstance = 0;
 
 inline void MiiManager::LoadResources(void* buffer)
 {
@@ -50,7 +50,7 @@ inline void MiiManager::LoadResources(void* buffer)
 
 void MiiManager::ResourceLoaded(void* buffer, unsigned long size, void* userData)
 {
-    g_pMiiManager->LoadResources(buffer);
+    MiiManager::s_pInstance->LoadResources(buffer);
 }
 
 static inline void InitializeIconTextures(MiiManager& manager)
@@ -61,9 +61,9 @@ static inline void InitializeIconTextures(MiiManager& manager)
         nlSNPrintf(name, sizeof(name), "mii icon %d", i);
         manager.mIconTextureIds[i] = glGetTexture(name);
 
-        GLResourcePool* resource = glGetCurrentResourcePool();
-        manager.mIconTextures[i] = glx_CreatePlatTexture((MemoryAllocator*)resource);
-        glRegisterTexture(manager.mIconTextureIds[i], manager.mIconTextures[i], resource);
+        GLResourcePool* resourcePool = glGetCurrentResourcePool();
+        manager.mIconTextures[i] = glx_CreatePlatTexture(resourcePool);
+        glRegisterTexture(manager.mIconTextureIds[i], manager.mIconTextures[i], resourcePool);
 
         manager.mIconBuffers[i] = nlMalloc(0x8000, 32, false);
         manager.mIconTextures[i]->CreateWithMemory(
@@ -103,15 +103,15 @@ void MiiManager::LoadResources()
     nlLoadEntireFileAsync(filename, ResourceLoaded, 0, 32, AllocateStart, 0, 0, &VirtualAllocator);
 }
 
-bool MiiManager::CreateIcon(int index, int slot, RFLExpression value)
+bool MiiManager::CreateIcon(int officialIndex, int iconSlot, RFLExpression expression)
 {
-    if (index < 0)
+    if (officialIndex < 0)
     {
         return false;
     }
 
     gxInit();
-    if (RFLIsAvailableOfficialData(index))
+    if (RFLIsAvailableOfficialData(officialIndex))
     {
         GXColor bgColor = { 0, 0, 0, 0 };
         RFLIconSetting setting;
@@ -121,8 +121,8 @@ bool MiiManager::CreateIcon(int index, int slot, RFLExpression value)
         setting.width = 128;
         setting.height = 128;
 
-        if (RFLMakeIcon(mIconBuffers[slot], RFLDataSource_Official,
-                0, index, value, &setting) == RFLErrcode_Success)
+        if (RFLMakeIcon(mIconBuffers[iconSlot], RFLDataSource_Official,
+                0, officialIndex, expression, &setting) == RFLErrcode_Success)
         {
             gxInit();
             return true;
@@ -132,7 +132,7 @@ bool MiiManager::CreateIcon(int index, int slot, RFLExpression value)
     return false;
 }
 
-bool MiiManager::CreateIcon(const RFLStoreData* data, int slot, RFLExpression value)
+bool MiiManager::CreateIcon(const RFLStoreData* data, int iconSlot, RFLExpression expression)
 {
     RFLUpdateMiddleDBAsync(&mMiddleDB);
     if (RFLAddMiddleDBStoreData(&mMiddleDB, data) == RFLErrcode_Success)
@@ -146,8 +146,8 @@ bool MiiManager::CreateIcon(const RFLStoreData* data, int slot, RFLExpression va
         setting.width = 128;
         setting.height = 128;
 
-        if (RFLMakeIcon(mIconBuffers[slot], RFLDataSource_Middle,
-                &mMiddleDB, 0, value, &setting) == RFLErrcode_Success)
+        if (RFLMakeIcon(mIconBuffers[iconSlot], RFLDataSource_Middle,
+                &mMiddleDB, 0, expression, &setting) == RFLErrcode_Success)
         {
             gxInit();
             return true;

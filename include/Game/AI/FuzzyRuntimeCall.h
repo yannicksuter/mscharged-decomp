@@ -2,6 +2,7 @@
 #define GAME_AI_FUZZYRUNTIMECALL_H
 
 #include "Game/AI/FuzzyAIRuntime.h"
+#include "Game/InterpreterCore.h"
 #include "NL/nlString.h"
 
 extern "C" inline UnidentifiedVariant_80054AB8 fn_800996D0(
@@ -29,6 +30,39 @@ extern "C" inline UnidentifiedVariant_80054AB8 fn_800996D0(
     // Marshal the player pointer into one interpreter stack word.
     return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(player), 0));
+}
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_800C3448(
+    InterpreterCore*, const unsigned int&, cPlayer*, cPlayer*);
+extern "C" inline UnidentifiedVariant_80054AB8 fn_800C33D8(
+    InterpreterCore*, cPlayer*, const char*, cPlayer*);
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_800C33C8(
+    InterpreterCore* pInterpreter, const char* pFunctionName,
+    cPlayer* pPlayer, cPlayer* pTarget)
+{
+    return fn_800C33D8(
+        pInterpreter, pPlayer, pFunctionName, pTarget);
+}
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_800C33D8(
+    InterpreterCore* pInterpreter, cPlayer* pPlayer,
+    const char* pFunctionName, cPlayer* pTarget)
+{
+    unsigned int functionHash = nlStringHash(pFunctionName);
+    return fn_800C3448(
+        pInterpreter, functionHash, pPlayer, pTarget);
+}
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_800C3448(
+    InterpreterCore* pInterpreter, const unsigned int& functionHash,
+    cPlayer* pPlayer, cPlayer* pTarget)
+{
+    unsigned int localHash = functionHash;
+    FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(pInterpreter);
+    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
+        runtime, runtime->FindFunctionEntryPoint(localHash),
+        2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
 }
 
 #endif

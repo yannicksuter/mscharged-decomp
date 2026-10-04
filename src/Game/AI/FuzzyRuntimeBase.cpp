@@ -531,9 +531,9 @@ void FuzzyRuntimeBase::AddAction(
     if (value != 0)
     {
         float confidence;
-        if (value->fn_800C2C10(4))
+        if (value->IsParameterSet(4))
         {
-            confidence = value->fn_800C2C00(4)->mData.f;
+            confidence = value->GetParameter(4)->mData.f;
         }
         else
         {

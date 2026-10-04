@@ -47,7 +47,7 @@ public:
     AudioEffectBase(const char*);
 
     virtual ~AudioEffectBase() { }
-    virtual void CreateParameter(unsigned int, void*, bool,
+    virtual void CreateParameter(unsigned int, const void*, bool,
         AudioEffectParameter**);
     virtual void BeginBlend() { }
     virtual void BlendParameter(AudioEffectParameter*,
@@ -60,7 +60,7 @@ public:
     virtual void Update(float);
     virtual void ReleaseParameter(AudioEffectParameter* state) { delete state; }
 
-    AudioEffectParameter* CreateParameter(unsigned int definition, void* data,
+    AudioEffectParameter* CreateParameter(unsigned int definition, const void* data,
         bool immediate)
     {
         AudioEffectParameter* parameter = 0;
@@ -109,7 +109,7 @@ public:
 };
 
 inline void AudioEffectBase::CreateParameter(
-    unsigned int, void*, bool, AudioEffectParameter** state)
+    unsigned int, const void*, bool, AudioEffectParameter** state)
 {
     static AudioEffectParameter value;
     *state = &value;

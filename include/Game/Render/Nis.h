@@ -36,24 +36,24 @@ enum NisTarget
     NIS_TARGET_HOME_CAPTAIN = 2,
     NIS_TARGET_AWAY_CAPTAIN = 3,
     NIS_TARGET_HOME_SIDEKICK = 4,
-    NIS_TARGET_UNIDENTIFIED_5 = 5,
-    NIS_TARGET_UNIDENTIFIED_6 = 6,
-    NIS_TARGET_UNIDENTIFIED_7 = 7,
+    NIS_TARGET_HOME_SIDEKICK_1 = 5,
+    NIS_TARGET_HOME_SIDEKICK_2 = 6,
+    NIS_TARGET_HOME_SIDEKICK_3 = 7,
     NIS_TARGET_AWAY_SIDEKICK = 8,
-    NIS_TARGET_UNIDENTIFIED_9 = 9,
-    NIS_TARGET_UNIDENTIFIED_10 = 10,
-    NIS_TARGET_UNIDENTIFIED_11 = 11,
+    NIS_TARGET_AWAY_SIDEKICK_1 = 9,
+    NIS_TARGET_AWAY_SIDEKICK_2 = 10,
+    NIS_TARGET_AWAY_SIDEKICK_3 = 11,
     NIS_TARGET_HOME_GOALIE = 12,
     NIS_TARGET_AWAY_GOALIE = 13,
-    NIS_TARGET_UNIDENTIFIED_14 = 14,
+    NIS_TARGET_SCORER = 14,
     NIS_TARGET_LOSER_CAPTAIN = 15,
     NIS_TARGET_WINNER_CAPTAIN = 16,
     NIS_TARGET_LOSER_SIDEKICK = 17,
     NIS_TARGET_WINNER_SIDEKICK = 18,
     NIS_TARGET_LOSER_GOALIE = 19,
     NIS_TARGET_WINNER_GOALIE = 20,
-    NIS_TARGET_UNIDENTIFIED_21 = 21,
-    NIS_TARGET_UNIDENTIFIED_22 = 22,
+    NIS_TARGET_MEGASTRIKE_CAPTAIN = 21,
+    NIS_TARGET_MEGASTRIKE_DEFENDING_GOALIE = 22,
     NIS_NUM_TARGETS = 23,
 };
 
@@ -89,7 +89,7 @@ struct NisHeader
     /* 0x168 */ u16 animProxyDirections[8];
     /* 0x178 */ NisTarget target;
     /* 0x17C */ NisWinnerType winnerType;
-    /* 0x180 */ u32 unknown_0x180;
+    /* 0x180 */ u32 renderMode;
     /* 0x184 */ nlVector3 stadiumOffset;
     /* 0x190 */ float mTime;
     /* 0x194 */ bool mUnidentified194;
@@ -168,7 +168,7 @@ public:
     /* 0x028 */ NisHeader* mHeader;
     /* 0x02C */ NisTarget mTarget;
     /* 0x030 */ NisWinnerType mWinnerType;
-    /* 0x034 */ int unknown_0x034;
+    /* 0x034 */ int mRenderMode;
     /* 0x038 */ char* mData;
     /* 0x03C */ int mSize;
     /* 0x040 */ int mBallId[MAX_NUM_CHARACTERS];

@@ -30,8 +30,6 @@ float gImpostorFarPlane = 512.0f;
 char gImpostorSpriteNameFormat[] = "%s";
 
 bool gDrawImpostorCheckers;
-int gNextImpostorSpriteID;
-int gImpostorClearColourChannel;
 
 
 class ImpostorView : public GLViewInterface
@@ -110,14 +108,11 @@ ImpostorSprite::ImpostorSprite(
         new (8, false) ImpostorView;
     mAngleJitter = nlRandomf(-1.0f, 1.0f, &nlDefaultSeed);
 
-    unsigned long allocationSize = capacity * sizeof(int);
-    mImpostorSlots = (int*)nlMalloc(allocationSize, 8, false);
-    int* renderSlots = (int*)nlMalloc(allocationSize, 8, false);
+    mImpostorSlots = new (8, false) int[capacity];
+    mRenderSlots = new (8, false) int[capacity];
 
-    int id = gNextImpostorSpriteID;
-    mRenderSlots = renderSlots;
-    mID = id;
-    gNextImpostorSpriteID = id + 1;
+    static int nextID;
+    mID = nextID++;
 }
 
 ImpostorSprite::~ImpostorSprite()
@@ -233,6 +228,8 @@ void ImpostorSprite::ResumeCapture()
             enabled ? GLViewTarget_Mode9 : GLViewTarget_None;
     }
 }
+
+int gImpostorClearColourChannel;
 
 void ImpostorSprite::CreateRenderTarget(const char* name)
 {

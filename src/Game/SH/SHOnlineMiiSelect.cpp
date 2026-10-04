@@ -400,9 +400,9 @@ void SHOnlineMiiSelect::UpdatePage()
         logo = FEFinder<TLImageInstance, 2>::FindOrDefault(over, "logo_32x32");
         logo->SetAssetVisible(hasSaveSlot);
 
-        unsigned long textureReference = g_pMiiManager->mIconTextureIds[i];
+        unsigned long textureReference = MiiManager::s_pInstance->mIconTextureIds[i];
         bool imageReady
-            = g_pMiiManager->CreateIcon(officialIndex, i, RFLExp_Normal);
+            = MiiManager::s_pInstance->CreateIcon(officialIndex, i, RFLExp_Normal);
 
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(off, "Mii");
         image->m_pTextureResource->SetTextureHandle(textureReference);

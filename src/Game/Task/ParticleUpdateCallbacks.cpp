@@ -5,6 +5,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 bool g_bRenderParticles = true;
+u8 lbl_806E1458;
 
 ParticleUpdateTask* GetParticleUpdateTask();
 

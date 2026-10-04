@@ -19,7 +19,7 @@
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
 #include "Game/Triggers/SebringAnimScript.h"
-#include "Game/TweakRegistry.h"
+#include "Game/TweakQuery.h"
 #include "Game/TweakValue.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
@@ -38,19 +38,11 @@
 
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
-
-extern "C" bool nlLoadCompressedFileAsync(const char* path, LoadAsyncCallback callback,
-    void* userData, unsigned int alignment, int allocType,
-    unsigned int chunkSize, void* readBuffer0, void* readBuffer1, void*,
-    unsigned long param, MemoryAllocator* allocator);
-extern "C" void LoadBundle(void* data, void* nonResidentData,
-    GLResourcePool* allocator, bool);
-
-extern bool gAudioEnabled;
+#include "NL/nlstring_impl.h"
 
 static bool g_bLoadAnimsCached;
 
-static int sUnidentifiedEffectsLoadCount;
+static int sPendingEffectsLoadCount;
 
 static inline eCharacterClass GetAlternateCaptain(eCharacterClass captain0, eCharacterClass captain1)
 {
@@ -75,32 +67,32 @@ static inline eCharacterClass GetAlternateCaptain(eCharacterClass captain0, eCha
     return altcaptain;
 }
 
-CharacterLoader_8056B290::~CharacterLoader_8056B290()
+CharacterLoader::~CharacterLoader()
 {
 }
 
-void CharacterLoader_8056B290::fn_80009BC8()
+void CharacterLoader::BuildCharacterList()
 {
-    captain[0] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(0));
-    captain[1] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(1));
+    mCaptain[0] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(0));
+    mCaptain[1] = (eCharacterClass)ConvertToCharacterClass((eTeamID)GameInfoManager::Instance()->GetTeam(1));
     for (int i = 0; i < 3; i++)
     {
-        sidekick[0][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, i));
-        sidekick[1][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, i));
+        mSidekick[0][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(0, i));
+        mSidekick[1][i] = (eCharacterClass)ConvertToCharacterClass((eSidekickID)GameInfoManager::Instance()->GetSidekick(1, i));
     }
 
-    goalie[0] = (eCharacterClass)GetGoalieCharacterIndex(GetCharacterInfo(captain[0]));
-    goalie[1] = (eCharacterClass)GetGoalieCharacterIndex(GetCharacterInfo(captain[1]));
+    mGoalie[0] = (eCharacterClass)GetGoalieCharacterIndex(GetCharacterInfo(mCaptain[0]));
+    mGoalie[1] = (eCharacterClass)GetGoalieCharacterIndex(GetCharacterInfo(mCaptain[1]));
 
     bool allcaptains = GetTweakBool("/user/allcaptains", false);
     if (allcaptains)
     {
-        sidekick[0][0] = captain[0];
-        sidekick[1][0] = captain[1];
-        sidekick[0][1] = captain[0];
-        sidekick[1][1] = captain[1];
-        sidekick[0][2] = captain[0];
-        sidekick[1][2] = captain[1];
+        mSidekick[0][0] = mCaptain[0];
+        mSidekick[1][0] = mCaptain[1];
+        mSidekick[0][1] = mCaptain[0];
+        mSidekick[1][1] = mCaptain[1];
+        mSidekick[0][2] = mCaptain[0];
+        mSidekick[1][2] = mCaptain[1];
     }
 
     GetAnimScriptInterpreter();
@@ -111,13 +103,13 @@ void CharacterLoader_8056B290::fn_80009BC8()
 
     for (int teami = 0; teami < 2; teami++)
     {
-        plrindex = (captain[0] > captain[1]) ? !teami : teami;
+        plrindex = (mCaptain[0] > mCaptain[1]) ? !teami : teami;
 
         int idx = plrindex * 4;
         mEntries[n].nTeamID = plrindex;
         mEntries[n].nCharIdx = idx;
         mEntries[n].nPlayerID = 0;
-        mEntries[n].cc = captain[plrindex];
+        mEntries[n].cc = mCaptain[plrindex];
         mEntries[n].bCaptain = true;
         mEntries[n].bGoalie = false;
         mEntries[n].bSidekick = false;
@@ -126,7 +118,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
         mEntries[n].nTeamID = plrindex;
         mEntries[n].nCharIdx = plrindex + 8;
         mEntries[n].nPlayerID = 4;
-        mEntries[n].cc = goalie[plrindex];
+        mEntries[n].cc = mGoalie[plrindex];
         mEntries[n].bCaptain = false;
         mEntries[n].bGoalie = true;
         mEntries[n].bSidekick = false;
@@ -135,7 +127,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
 
     for (int teami = 0; teami < 2; teami++)
     {
-        plrindex = (sidekick[0][0] > sidekick[1][0]) ? !teami : teami;
+        plrindex = (mSidekick[0][0] > mSidekick[1][0]) ? !teami : teami;
 
         charIdx = plrindex * 4 + 1;
 
@@ -144,9 +136,9 @@ void CharacterLoader_8056B290::fn_80009BC8()
             mEntries[n].nTeamID = plrindex;
             mEntries[n].nCharIdx = charIdx;
             mEntries[n].nPlayerID = index;
-            mEntries[n].cc = sidekick[plrindex][index - 1];
+            mEntries[n].cc = mSidekick[plrindex][index - 1];
             mEntries[n].bGoalie = false;
-            if (sidekick[plrindex][index - 1] == captain[plrindex])
+            if (mSidekick[plrindex][index - 1] == mCaptain[plrindex])
             {
                 mEntries[n].bCaptain = true;
                 mEntries[n].bSidekick = false;
@@ -167,7 +159,7 @@ void CharacterLoader_8056B290::fn_80009BC8()
     mTemplateInfo = 0;
 }
 
-bool CharacterLoader_8056B290::fn_80009EFC()
+bool CharacterLoader::NextCharacter()
 {
     mCurrentIndex++;
     if (mCurrentIndex < 10)
@@ -183,27 +175,27 @@ bool CharacterLoader_8056B290::fn_80009EFC()
     return false;
 }
 
-bool CharacterLoader_8056B290::fn_80009F48()
+bool CharacterLoader::NeedsCharacterTextures()
 {
     Entry* pEntry = mCurrent;
     if (pEntry->bGoalie)
     {
-        return !GetGoalieTemplateInfo(pEntry->cc - 20)->bLoaded;
+        return !GetGoalieTemplateInfo(pEntry->cc - 20)->bTexturesLoaded;
     }
     if (pEntry->bCaptain)
     {
         return true;
     }
-    return !GetCharacterTemplateInfo(pEntry->cc)->bUnidentified58;
+    return !GetCharacterTemplateInfo(pEntry->cc)->bTexturesLoaded;
 }
 
-static void fn_80009FB8(void* data, unsigned long size, void* param)
+static void TextureBundleLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mTextureData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mTextureSize = size;
+    CharacterLoader::sInstance.mTextureData = data;
+    CharacterLoader::sInstance.mTextureSize = size;
 }
 
-void CharacterLoader_8056B290::fn_80009FCC()
+void CharacterLoader::StartLoadingCharacterTextures()
 {
     Entry* pEntry = mCurrent;
     mTextureData = 0;
@@ -213,29 +205,29 @@ void CharacterLoader_8056B290::fn_80009FCC()
     if (pEntry->bGoalie)
     {
         s32 goalieIdx = pEntry->cc - 20;
-        glBeginLoadTextureBundle(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename, fn_80009FB8,
+        glBeginLoadTextureBundle(GetGoalieTemplateInfo(goalieIdx)->szTextureFilename, TextureBundleLoaded_cb,
             mCurrent, glGetCurrentResourcePool());
-        GetGoalieTemplateInfo(goalieIdx)->bLoaded = 1;
+        GetGoalieTemplateInfo(goalieIdx)->bTexturesLoaded = 1;
     }
     else
     {
-        glBeginLoadTextureBundle(GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, fn_80009FB8,
+        glBeginLoadTextureBundle(GetCharacterTemplateInfo(pEntry->cc)->szTextureFilename, TextureBundleLoaded_cb,
             pEntry, glGetCurrentResourcePool());
-        GetCharacterTemplateInfo(mCurrent->cc)->bUnidentified58 = 1;
+        GetCharacterTemplateInfo(mCurrent->cc)->bTexturesLoaded = 1;
     }
 }
 
-static const char* sUnidentifiedShockTextureName = "mario_shock/shock_tex";
+static const char* sShockTextureName = "mario_shock/shock_tex";
 static s32 skiptexture = 0xFFFFFFFF;
 
-void CharacterLoader_8056B290::fn_8000A0A8()
+void CharacterLoader::StartLoadingShockTextures()
 {
     mTextureData = 0;
     mTextureSize = 0;
-    if (!glTextureLoad(glGetTexture(sUnidentifiedShockTextureName)))
+    if (!glTextureLoad(glGetTexture(sShockTextureName)))
     {
         const char* szFilename = "art/characters/mario/mario_shock.rlt";
-        glBeginLoadTextureBundle(szFilename, fn_80009FB8, mCurrent, glGetCurrentResourcePool());
+        glBeginLoadTextureBundle(szFilename, TextureBundleLoaded_cb, mCurrent, glGetCurrentResourcePool());
     }
     else
     {
@@ -253,7 +245,7 @@ static unsigned long SidekickTexture_cb(unsigned long textureId)
     return result;
 }
 
-bool CharacterLoader_8056B290::fn_8000A144()
+bool CharacterLoader::FinalizeLoadingCharacterTextures()
 {
     char szTexPath[64];
 
@@ -286,7 +278,7 @@ bool CharacterLoader_8056B290::fn_8000A144()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000A224()
+bool CharacterLoader::FinalizeLoadingShockTexture()
 {
     if (mTextureSize == 0 && mTextureData == 0)
     {
@@ -302,7 +294,7 @@ bool CharacterLoader_8056B290::fn_8000A224()
     mTextureSize = 0;
 
     cCharacter* pChar = g_pCharacters[mCurrent->nCharIdx];
-    unsigned long texture = glGetTexture(sUnidentifiedShockTextureName);
+    unsigned long texture = glGetTexture(sShockTextureName);
     if (glTextureLoad(texture))
     {
         pChar->fn_80022E24(texture);
@@ -314,9 +306,9 @@ bool CharacterLoader_8056B290::fn_8000A224()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000A2FC()
+bool CharacterLoader::NeedsSharedTextures()
 {
-    if (captain[0] == 0 || captain[1] == 0)
+    if (mCaptain[0] == 0 || mCaptain[1] == 0)
     {
         return false;
     }
@@ -326,15 +318,15 @@ bool CharacterLoader_8056B290::fn_8000A2FC()
     }
 }
 
-void CharacterLoader_8056B290::fn_8000A324()
+void CharacterLoader::StartLoadingSharedTextures()
 {
     mTextureData = 0;
     mTextureSize = 0;
-    glBeginLoadTextureBundle("art/characters/mariogoalie/mariogoalie.rlt", fn_80009FB8,
+    glBeginLoadTextureBundle("art/characters/mariogoalie/mariogoalie.rlt", TextureBundleLoaded_cb,
         mCurrent, glGetCurrentResourcePool());
 }
 
-bool CharacterLoader_8056B290::fn_8000A378()
+bool CharacterLoader::FinalizeLoadingSharedTextures()
 {
     if (mTextureData == 0)
     {
@@ -351,16 +343,16 @@ bool CharacterLoader_8056B290::fn_8000A378()
     return true;
 }
 
-static void fn_8000A410(void* data, unsigned long size, void* param)
+static void EffectsBundleLoaded_cb(void* data, unsigned long size, void* param)
 {
     *(void**)param = data;
 }
 
-void CharacterLoader_8056B290::fn_8000A418()
+void CharacterLoader::StartLoadingCharacterEffects()
 {
     char szPath[128];
 
-    sUnidentifiedEffectsLoadCount++;
+    sPendingEffectsLoadCount++;
     mEffectsData = 0;
     mEffectsLoad = 0;
     mEffectsNonResData = 0;
@@ -370,18 +362,18 @@ void CharacterLoader_8056B290::fn_8000A418()
     const char* szEffectsName = GetCharacterTemplateInfo(mCurrent->cc)->szEffectsName;
     nlStrNCat(szPath, szPath, szEffectsName, sizeof(szPath));
     nlStrNCat(szPath, szPath, "Effects.bun", sizeof(szPath));
-    mEffectsLoad = nlLoadEntireFileAsync(szPath, fn_8000A410, &mEffectsData,
+    mEffectsLoad = nlLoadEntireFileAsync(szPath, EffectsBundleLoaded_cb, &mEffectsData,
         0x20, AllocateStart, 0, 0, 0);
 
     nlStrNCpy(szPath, "art/effects/", sizeof(szPath));
     szEffectsName = GetCharacterTemplateInfo(mCurrent->cc)->szEffectsName;
     nlStrNCat(szPath, szPath, szEffectsName, sizeof(szPath));
     nlStrNCat(szPath, szPath, "EffectsNonRes.bun.zlib", sizeof(szPath));
-    mEffectsNonResLoad = nlLoadCompressedFileAsync(szPath, fn_8000A410, &mEffectsNonResData,
+    mEffectsNonResLoad = nlLoadCompressedFileAsync(szPath, EffectsBundleLoaded_cb, &mEffectsNonResData,
         0x20, AllocateEnd, 0x20000, 0, 0, 0, 0, 0);
 }
 
-bool CharacterLoader_8056B290::fn_8000A5D8()
+bool CharacterLoader::FinalizeLoadingCharacterEffects()
 {
     if (mEffectsData == 0 && mEffectsLoad != 0)
     {
@@ -393,14 +385,14 @@ bool CharacterLoader_8056B290::fn_8000A5D8()
     }
 
     EmissionManager::LoadBundle(mEffectsData, mEffectsNonResData, glGetCurrentResourcePool(), true);
-    sUnidentifiedEffectsLoadCount--;
+    sPendingEffectsLoadCount--;
     return true;
 }
 
-static void fn_8000A668(void* data, unsigned long size, void* param)
+static void ExtraTexturesLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mExtraTextureData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mExtraTextureSize = size;
+    CharacterLoader::sInstance.mExtraTextureData = data;
+    CharacterLoader::sInstance.mExtraTextureSize = size;
 }
 
 static inline void GetCharacterTexturePath(char* path, eCharacterClass cc, unsigned long capacity)
@@ -408,7 +400,7 @@ static inline void GetCharacterTexturePath(char* path, eCharacterClass cc, unsig
     nlStrNCpy(path, GetCharacterTemplateInfo(cc)->szTextureFilename, capacity);
 }
 
-bool CharacterLoader_8056B290::fn_8000A67C()
+bool CharacterLoader::StartLoadingExtraTextures()
 {
     char szPath[128];
 
@@ -428,10 +420,10 @@ bool CharacterLoader_8056B290::fn_8000A67C()
     }
     *pEnd = '\0';
     nlStrNCat(szPath, szPath, "/ExtraTextures.rlt", sizeof(szPath));
-    return glBeginLoadTextureBundle(szPath, fn_8000A668, mCurrent, glGetCurrentResourcePool());
+    return glBeginLoadTextureBundle(szPath, ExtraTexturesLoaded_cb, mCurrent, glGetCurrentResourcePool());
 }
 
-bool CharacterLoader_8056B290::fn_8000A790()
+bool CharacterLoader::FinalizeLoadingExtraTextures()
 {
     char szTexPath[64];
 
@@ -464,7 +456,7 @@ bool CharacterLoader_8056B290::fn_8000A790()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000A870()
+bool CharacterLoader::AcquireCurrentTemplate()
 {
     bool bCreated = false;
     mTemplate = GetCharacterTemplate(mCurrent->cc, &bCreated);
@@ -472,13 +464,13 @@ bool CharacterLoader_8056B290::fn_8000A870()
     return bCreated;
 }
 
-static void fn_8000A8C8(void* data, unsigned long size, void* param)
+static void ModelLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mModelData[(int)param] = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mModelSize[(int)param] = size;
+    CharacterLoader::sInstance.mModelData[(int)param] = data;
+    CharacterLoader::sInstance.mModelSize[(int)param] = size;
 }
 
-void CharacterLoader_8056B290::fn_8000A8E4(int nModel)
+void CharacterLoader::StartLoadingCharacterModel(int nModel)
 {
     mModelData[nModel] = 0;
     mModelSize[nModel] = 0;
@@ -489,22 +481,22 @@ void CharacterLoader_8056B290::fn_8000A8E4(int nModel)
         szFilename = mTemplateInfo->szModelFilename;
         break;
     case 1:
-        szFilename = mTemplateInfo->pUnidentified08;
+        szFilename = mTemplateInfo->szShockModelFilename;
         break;
     case 2:
-        szFilename = mTemplateInfo->pUnidentified0C;
+        szFilename = mTemplateInfo->szLowPolyModelFilename;
         break;
     case 3:
-        szFilename = mTemplateInfo->pUnidentified10;
+        szFilename = mTemplateInfo->szShadowModelFilename;
         break;
     }
     if (szFilename != 0)
     {
-        glBeginLoadModel(szFilename, fn_8000A8C8, (void*)nModel, glGetCurrentResourcePool());
+        glBeginLoadModel(szFilename, ModelLoaded_cb, (void*)nModel, glGetCurrentResourcePool());
     }
 }
 
-bool CharacterLoader_8056B290::fn_8000A9A4(int nModel)
+bool CharacterLoader::FinalizeLoadingCharacterModel(int nModel)
 {
     const char* szFilename = 0;
     switch (nModel)
@@ -513,13 +505,13 @@ bool CharacterLoader_8056B290::fn_8000A9A4(int nModel)
         szFilename = mTemplateInfo->szModelFilename;
         break;
     case 1:
-        szFilename = mTemplateInfo->pUnidentified08;
+        szFilename = mTemplateInfo->szShockModelFilename;
         break;
     case 2:
-        szFilename = mTemplateInfo->pUnidentified0C;
+        szFilename = mTemplateInfo->szLowPolyModelFilename;
         break;
     case 3:
-        szFilename = mTemplateInfo->pUnidentified10;
+        szFilename = mTemplateInfo->szShadowModelFilename;
         break;
     }
     if (szFilename == 0)
@@ -541,23 +533,23 @@ bool CharacterLoader_8056B290::fn_8000A9A4(int nModel)
     return true;
 }
 
-static void fn_8000AAA4(void* data, unsigned long size, void* param)
+static void HierarchyLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mHierarchyData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mHierarchySize = size;
+    CharacterLoader::sInstance.mHierarchyData = data;
+    CharacterLoader::sInstance.mHierarchySize = size;
 }
 
-unsigned int CharacterLoader_8056B290::fn_8000AAB8()
+unsigned int CharacterLoader::StartLoadingHierarchy()
 {
     mHierarchyData = 0;
     mHierarchySize = 0;
     CurrentAllocator = &StandardAllocator;
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
-    return nlLoadEntireFileAsync(mTemplateInfo->szHierarchyFilename, fn_8000AAA4,
+    return nlLoadEntireFileAsync(mTemplateInfo->szHierarchyFilename, HierarchyLoaded_cb,
         mCurrent, 0x20, AllocateStart, 0, 0, 0);
 }
 
-bool CharacterLoader_8056B290::fn_8000AB18()
+bool CharacterLoader::FinalizeLoadingHierarchy()
 {
     if (mHierarchyData == 0)
     {
@@ -573,23 +565,23 @@ bool CharacterLoader_8056B290::fn_8000AB18()
     return true;
 }
 
-static void fn_8000ACD8(void* data, unsigned long size, void* param)
+static void PhysicsElementsLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mPhysicsData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mPhysicsSize = size;
+    CharacterLoader::sInstance.mPhysicsData = data;
+    CharacterLoader::sInstance.mPhysicsSize = size;
 }
 
-unsigned int CharacterLoader_8056B290::fn_8000ACEC()
+unsigned int CharacterLoader::StartLoadingCharacterPhysicsElements()
 {
     mPhysicsData = 0;
     mPhysicsSize = 0;
     CurrentAllocator = &StandardAllocator;
     AllocatorStack[AllocatorStackDepth++] = &StandardAllocator;
-    return nlLoadEntireFileAsync(mTemplateInfo->szPhysicsFilename, fn_8000ACD8,
+    return nlLoadEntireFileAsync(mTemplateInfo->szPhysicsFilename, PhysicsElementsLoaded_cb,
         mCurrent, 0x20, AllocateEnd, 0, 0, 0);
 }
 
-bool CharacterLoader_8056B290::fn_8000AD4C()
+bool CharacterLoader::FinalizeLoadingCharacterPhysicsElements()
 {
     if (mPhysicsData == 0)
     {
@@ -607,7 +599,7 @@ bool CharacterLoader_8056B290::fn_8000AD4C()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000AE04()
+bool CharacterLoader::ShareDuplicateAnimInventory()
 {
     mTemplate->uAnimInventoryHashID = nlStringLowerHash(mTemplateInfo->szAnimFilename);
 
@@ -621,10 +613,10 @@ bool CharacterLoader_8056B290::fn_8000AE04()
     return false;
 }
 
-static void fn_8000AE7C(void* data, unsigned long size, void* param)
+static void AnimationsLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAnimData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAnimSize = size;
+    CharacterLoader::sInstance.mAnimData = data;
+    CharacterLoader::sInstance.mAnimSize = size;
 }
 
 static inline void GetUncompressedAnimationPath(char* path, const char* filename, unsigned long capacity)
@@ -633,7 +625,7 @@ static inline void GetUncompressedAnimationPath(char* path, const char* filename
     *strstr(path, ".zlib") = '\0';
 }
 
-void CharacterLoader_8056B290::fn_8000AE90()
+void CharacterLoader::StartLoadingCharacterAnimations()
 {
     char szPath[200];
 
@@ -649,22 +641,22 @@ void CharacterLoader_8056B290::fn_8000AE90()
         if (g_bLoadAnimsCached)
         {
             GetUncompressedAnimationPath(szPath, szAnimFilename, sizeof(szPath));
-            nlLoadEntireCachedFileAsync(szPath, fn_8000AE7C, mCurrent, 0x20, AllocateStart, 0, 0, 0);
+            nlLoadEntireCachedFileAsync(szPath, AnimationsLoaded_cb, mCurrent, 0x20, AllocateStart, 0, 0, 0);
         }
         else
         {
-            nlLoadCompressedFileAsync(szAnimFilename, fn_8000AE7C, mCurrent, 0x20,
+            nlLoadCompressedFileAsync(szAnimFilename, AnimationsLoaded_cb, mCurrent, 0x20,
                 AllocateStart, 0x40000, 0, 0, 0, 0, 0);
         }
     }
     else
     {
-        nlLoadEntireFileAsync(szAnimFilename, fn_8000AE7C, mCurrent, 0x20,
+        nlLoadEntireFileAsync(szAnimFilename, AnimationsLoaded_cb, mCurrent, 0x20,
             AllocateStart, 0, 0, 0);
     }
 }
 
-bool CharacterLoader_8056B290::fn_8000B00C()
+bool CharacterLoader::FinalizeLoadingCharacterAnimations()
 {
     if (mAnimData == 0)
     {
@@ -683,22 +675,22 @@ bool CharacterLoader_8056B290::fn_8000B00C()
     return true;
 }
 
-static void fn_8000B0D4(void* data, unsigned long size, void* param)
+static void TriggersLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mTriggerData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mTriggerSize = size;
+    CharacterLoader::sInstance.mTriggerData = data;
+    CharacterLoader::sInstance.mTriggerSize = size;
 }
 
-void CharacterLoader_8056B290::fn_8000B0E8()
+void CharacterLoader::StartLoadingCharacterTriggers()
 {
     Entry* pEntry = mCurrent;
     mTriggerData = 0;
     mTriggerSize = 0;
-    nlLoadEntireFileAsync(GetCharacterTemplateInfo(pEntry->cc)->szTriggerFilename, fn_8000B0D4,
+    nlLoadEntireFileAsync(GetCharacterTemplateInfo(pEntry->cc)->szTriggerFilename, TriggersLoaded_cb,
         pEntry, 0x20, AllocateEnd, 0, 0, 0);
 }
 
-bool CharacterLoader_8056B290::fn_8000B14C()
+bool CharacterLoader::FinalizeLoadingCharacterTriggers()
 {
     void* pData = mTriggerData;
     if (pData == 0)
@@ -712,7 +704,7 @@ bool CharacterLoader_8056B290::fn_8000B14C()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000B1B8()
+bool CharacterLoader::HasAnimRetarget()
 {
     if (mTemplateInfo->szAnimRetargetFilename != 0)
     {
@@ -722,21 +714,21 @@ bool CharacterLoader_8056B290::fn_8000B1B8()
     return false;
 }
 
-static void fn_8000B1E4(void* data, unsigned long size, void* param)
+static void AnimRetargetLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAnimRetargetData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAnimRetargetSize = size;
+    CharacterLoader::sInstance.mAnimRetargetData = data;
+    CharacterLoader::sInstance.mAnimRetargetSize = size;
 }
 
-unsigned int CharacterLoader_8056B290::fn_8000B1F8()
+unsigned int CharacterLoader::StartLoadingAnimRetarget()
 {
     mAnimRetargetData = 0;
     mAnimRetargetSize = 0;
-    return nlLoadEntireFileAsync(mTemplateInfo->szAnimRetargetFilename, fn_8000B1E4,
+    return nlLoadEntireFileAsync(mTemplateInfo->szAnimRetargetFilename, AnimRetargetLoaded_cb,
         mCurrent, 0x20, AllocateStart, 0, 0, 0);
 }
 
-bool CharacterLoader_8056B290::fn_8000B230()
+bool CharacterLoader::FinalizeLoadingAnimRetarget()
 {
     if (mAnimRetargetData == 0)
     {
@@ -748,18 +740,18 @@ bool CharacterLoader_8056B290::fn_8000B230()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000B3C0()
+bool CharacterLoader::NeedsSidekickSwapTexture()
 {
     return mCurrent->bSidekick;
 }
 
-static void fn_8000B3CC(void* data, unsigned long size, void* param)
+static void SidekickSwapTextureLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mSidekickTextureData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mSidekickTextureSize = size;
+    CharacterLoader::sInstance.mSidekickTextureData = data;
+    CharacterLoader::sInstance.mSidekickTextureSize = size;
 }
 
-bool CharacterLoader_8056B290::fn_8000B3E0()
+bool CharacterLoader::StartLoadingSidekickSwapTexture()
 {
     char szArtPath[64];
     char szPlayerPath[64];
@@ -769,7 +761,7 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
     const char* szCaptainName;
 
     Entry* pEntry = mCurrent;
-    eCharacterClass captaincc = captain[pEntry->nTeamID];
+    eCharacterClass captaincc = mCaptain[pEntry->nTeamID];
     eCharacterClass cc = pEntry->cc;
     const char* szName = GetCharacterInfo(cc).mName;
     szCaptainName = GetCharacterInfo(captaincc).mName;
@@ -783,8 +775,8 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
         szTexName = szName;
     }
 
-    captain0 = captain[0];
-    captain1 = captain[1];
+    captain0 = mCaptain[0];
+    captain1 = mCaptain[1];
     if (captain0 == captain1)
     {
         if (mCurrent->nTeamID == 1)
@@ -824,7 +816,7 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
         return false;
     }
 
-    if (!glBeginLoadTextureBundle(szArtPath, fn_8000B3CC, mCurrent, glGetCurrentResourcePool()))
+    if (!glBeginLoadTextureBundle(szArtPath, SidekickSwapTextureLoaded_cb, mCurrent, glGetCurrentResourcePool()))
     {
         pChar->fn_80022DAC((unsigned long)-1);
         pChar->fn_80022DE8((unsigned long)-1);
@@ -833,7 +825,7 @@ bool CharacterLoader_8056B290::fn_8000B3E0()
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000B6C4()
+bool CharacterLoader::FinalizeLoadingSidekickSwapTexture()
 {
     char szBundlePath[64];
     char szPlayerPath[64];
@@ -852,7 +844,7 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
     }
 
     Entry* pEntry = mCurrent;
-    captaincc = captain[pEntry->nTeamID];
+    captaincc = mCaptain[pEntry->nTeamID];
     cc = pEntry->cc;
 
     glEndLoadTextureBundle(mSidekickTextureData, mSidekickTextureSize, glGetCurrentResourcePool(), false);
@@ -871,8 +863,8 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
         szTexName = szName;
     }
 
-    captain0 = captain[0];
-    altcaptain = captain[1];
+    captain0 = mCaptain[0];
+    altcaptain = mCaptain[1];
     if (captain0 == altcaptain)
     {
         if (mCurrent->nTeamID == 1)
@@ -903,38 +895,38 @@ bool CharacterLoader_8056B290::fn_8000B6C4()
     return true;
 }
 
-void CharacterLoader_8056B290::fn_8000B8E8()
+void CharacterLoader::StartLoadingCharINIFiles()
 {
     if (mCurrent->bGoalie)
     {
-        mTemplate->pUnidentified30 = new (nlMalloc(sizeof(GoalieTweaks), 8, false))
-            GoalieTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->pUnidentified48);
-        mTemplate->pUnidentified28 = 0;
-        mTemplate->pUnidentified2C = 0;
+        mTemplate->pGoalieTweaks = new (nlMalloc(sizeof(GoalieTweaks), 8, false))
+            GoalieTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->szTweaksCategory);
+        mTemplate->pPlayerTweaks = 0;
+        mTemplate->pSuperPlayerTweaks = 0;
     }
     else
     {
-        mTemplate->pUnidentified28 = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
-            PlayerTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->pUnidentified48);
-        if (mTemplateInfo->pUnidentified4C != 0)
+        mTemplate->pPlayerTweaks = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
+            PlayerTweaks(mTemplateInfo->szTweaksFilename, mTemplateInfo->szTweaksCategory);
+        if (mTemplateInfo->szSuperTweaksFilename != 0)
         {
-            mTemplate->pUnidentified2C = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
-                PlayerTweaks(mTemplateInfo->pUnidentified4C, mTemplateInfo->pUnidentified50);
+            mTemplate->pSuperPlayerTweaks = new (nlMalloc(sizeof(PlayerTweaks), 8, false))
+                PlayerTweaks(mTemplateInfo->szSuperTweaksFilename, mTemplateInfo->szSuperTweaksCategory);
         }
         else
         {
-            mTemplate->pUnidentified2C = 0;
+            mTemplate->pSuperPlayerTweaks = 0;
         }
-        mTemplate->pUnidentified30 = 0;
+        mTemplate->pGoalieTweaks = 0;
     }
 }
 
-bool CharacterLoader_8056B290::fn_8000B9F4()
+bool CharacterLoader::FinalizeLoadingCharINIFiles()
 {
     return gTweakFileLoader.ProcessLoadedFiles();
 }
 
-void CharacterLoader_8056B290::fn_8000BA00()
+void CharacterLoader::CreateCharacterInstance()
 {
     static nlVector3 pos[8] = {
         { 1.5f, 1.5f, 0.0f },
@@ -969,7 +961,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
         s32 goalieIdx = mCurrent->cc - 20;
         Goalie* pGoalie = new (nlMalloc(sizeof(Goalie), 8, false)) Goalie(
             mCurrent->cc, (const int*)pTemplate, pHierarchy, pTemplate->pAnimInventory,
-            pTemplate->pPhysicsData, pTemplate->pUnidentified30, pAnimRetargetList,
+            pTemplate->pPhysicsData, pTemplate->pGoalieTweaks, pAnimRetargetList,
             mCurrent->nCharIdx);
         pGoalie->m_szEffectsName = pInfo->szEffectsName;
         pGoalie->fn_80022DAC(GetHashFromTextureFile(pInfo->szTextureFilename));
@@ -997,7 +989,7 @@ void CharacterLoader_8056B290::fn_8000BA00()
         cFielder* pFielder = new (nlMalloc(sizeof(cFielder), 8, false)) cFielder(
             mCurrent->nPlayerID, mCurrent->nTeamID, mCurrent->cc, (const int*)pTemplate,
             pHierarchy, pTemplate->pAnimInventory, pTemplate->pPhysicsData,
-            pTemplate->pUnidentified28, pTemplate->pUnidentified2C, pAnimRetargetList,
+            pTemplate->pPlayerTweaks, pTemplate->pSuperPlayerTweaks, pAnimRetargetList,
             mCurrent->nCharIdx);
         pFielder->m_szEffectsName = pInfo->szEffectsName;
 
@@ -1008,23 +1000,23 @@ void CharacterLoader_8056B290::fn_8000BA00()
     }
 }
 
-void CharacterLoader_8056B290::fn_8000BD70()
+void CharacterLoader::fn_8000BD70()
 {
 }
 
-static void fn_8000BD74(void* data, unsigned long size, void* param)
+static void AlternateSwapTextureLoaded_cb(void* data, unsigned long size, void* param)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAltTextureData = data;
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAltTextureSize = size;
+    CharacterLoader::sInstance.mAltTextureData = data;
+    CharacterLoader::sInstance.mAltTextureSize = size;
 }
 
-bool CharacterLoader_8056B290::fn_8000BD88()
+bool CharacterLoader::HasAlternateSwapTexture()
 {
     Entry* pEntry = mCurrent;
     if (pEntry->bCaptain || pEntry->bGoalie)
     {
-        eCharacterClass captain0 = captain[0];
-        eCharacterClass captain1 = captain[1];
+        eCharacterClass captain0 = mCaptain[0];
+        eCharacterClass captain1 = mCaptain[1];
         eCharacterClass altcaptain = CHARACTER_CLASS_INVALID;
         if (captain0 == captain1)
         {
@@ -1042,7 +1034,7 @@ bool CharacterLoader_8056B290::fn_8000BD88()
         {
             if (altcaptain != CHARACTER_CLASS_INVALID && mCurrent->cc == altcaptain)
             {
-                const char* szFilename = GetCharacterTemplateInfo(altcaptain)->pUnidentified18;
+                const char* szFilename = GetCharacterTemplateInfo(altcaptain)->szAlternateTextureFilename;
                 if (szFilename != 0 && nlFileExists(szFilename))
                 {
                     return true;
@@ -1052,9 +1044,9 @@ bool CharacterLoader_8056B290::fn_8000BD88()
         else if (mCurrent->bGoalie)
         {
             if (altcaptain != CHARACTER_CLASS_INVALID
-                && mCurrent->nTeamID == (captain[0] != altcaptain))
+                && mCurrent->nTeamID == (mCaptain[0] != altcaptain))
             {
-                const char* szFilename = GetGoalieTemplateInfo(mCurrent->cc - 20)->pUnidentified08;
+                const char* szFilename = GetGoalieTemplateInfo(mCurrent->cc - 20)->szAlternateTextureFilename;
                 if (szFilename != 0 && nlFileExists(szFilename))
                 {
                     return true;
@@ -1065,7 +1057,7 @@ bool CharacterLoader_8056B290::fn_8000BD88()
     return false;
 }
 
-bool CharacterLoader_8056B290::fn_8000BF04()
+bool CharacterLoader::StartLoadingCaptainOrGoalieAlternateSwapTexture()
 {
     Entry* pEntry = mCurrent;
     mAltTextureData = 0;
@@ -1073,17 +1065,17 @@ bool CharacterLoader_8056B290::fn_8000BF04()
     const char* szFilename = 0;
     if (pEntry->bCaptain)
     {
-        szFilename = GetCharacterTemplateInfo(pEntry->cc)->pUnidentified18;
+        szFilename = GetCharacterTemplateInfo(pEntry->cc)->szAlternateTextureFilename;
     }
     else if (pEntry->bGoalie)
     {
-        szFilename = GetGoalieTemplateInfo(pEntry->cc - 20)->pUnidentified08;
+        szFilename = GetGoalieTemplateInfo(pEntry->cc - 20)->szAlternateTextureFilename;
     }
-    glBeginLoadTextureBundle(szFilename, fn_8000BD74, mCurrent, glGetCurrentResourcePool());
+    glBeginLoadTextureBundle(szFilename, AlternateSwapTextureLoaded_cb, mCurrent, glGetCurrentResourcePool());
     return true;
 }
 
-bool CharacterLoader_8056B290::fn_8000BFA0()
+bool CharacterLoader::FinalizeLoadingCaptainOrGoalieAlternateSwapTexture()
 {
     char szTexPath[64];
     char szSwapPath[64];
@@ -1117,55 +1109,55 @@ bool CharacterLoader_8056B290::fn_8000BFA0()
     return true;
 }
 
-static void fn_8000C0EC(AudioResourceLoadOwner* handle, void* context)
+static void AudioBankLoaded_cb(AudioResourceLoadOwner* handle, void* context)
 {
-    CharacterLoader_8056B290::sUnidentifiedInstance.mAudioCompletedCount = (int)context;
+    CharacterLoader::sInstance.mAudioCompletedCount = (int)context;
 }
 
-void CharacterLoader_8056B290::fn_8000C0FC()
+void CharacterLoader::StartLoadingAudioBank0()
 {
     mAudioRequestCount += gAudioEnabled;
-    LoadSoundBank((GameAudio*)g_pAudioSystem, 0, 0, fn_8000C0EC,
+    LoadSoundBank((GameAudio*)g_pAudioSystem, 0, 0, AudioBankLoaded_cb,
         (void*)mAudioRequestCount);
 }
 
-bool CharacterLoader_8056B290::fn_8000C124()
+bool CharacterLoader::NeedsCaptainAudio()
 {
     return mCurrent->bCaptain;
 }
 
-void CharacterLoader_8056B290::fn_8000C130()
+void CharacterLoader::StartLoadingCaptainAudio()
 {
-    int nBank = GetCharacterInfo(mCurrent->cc).unknown_0x1C;
+    int nBank = GetCharacterInfo(mCurrent->cc).mSoundBankId;
     mAudioRequestCount += gAudioEnabled;
     LoadSoundBank((GameAudio*)g_pAudioSystem, nBank,
-        (mCurrent->nTeamID == 0) ? 1 : 5, fn_8000C0EC, (void*)mAudioRequestCount);
+        (mCurrent->nTeamID == 0) ? 1 : 5, AudioBankLoaded_cb, (void*)mAudioRequestCount);
 }
 
-bool CharacterLoader_8056B290::fn_8000C1A4()
+bool CharacterLoader::NeedsSidekickAudio()
 {
     return mCurrent->bSidekick;
 }
 
-void CharacterLoader_8056B290::fn_8000C1B0()
+void CharacterLoader::StartLoadingSidekickAudio()
 {
-    int nBank = GetCharacterInfo(mCurrent->cc).unknown_0x1C;
+    int nBank = GetCharacterInfo(mCurrent->cc).mSoundBankId;
     mAudioRequestCount += gAudioEnabled;
     Entry* pEntry = mCurrent;
     int nSlot = (pEntry->nTeamID == 0) ? 1 : 5;
     nSlot += pEntry->nPlayerID;
-    LoadSoundBank((GameAudio*)g_pAudioSystem, nBank, nSlot, fn_8000C0EC,
+    LoadSoundBank((GameAudio*)g_pAudioSystem, nBank, nSlot, AudioBankLoaded_cb,
         (void*)mAudioRequestCount);
 }
 
-void CharacterLoader_8056B290::fn_8000C22C()
+void CharacterLoader::StartLoadingAudioBank13()
 {
     mAudioRequestCount += gAudioEnabled;
-    LoadSoundBank((GameAudio*)g_pAudioSystem, 13, 9, fn_8000C0EC,
+    LoadSoundBank((GameAudio*)g_pAudioSystem, 13, 9, AudioBankLoaded_cb,
         (void*)mAudioRequestCount);
 }
 
-bool CharacterLoader_8056B290::fn_8000C254()
+bool CharacterLoader::FinalizeAudio()
 {
     if (mAudioCompletedCount >= mAudioRequestCount)
     {
@@ -1176,14 +1168,7 @@ bool CharacterLoader_8056B290::fn_8000C254()
     return false;
 }
 
-static TweakBoolBinding sUnidentifiedLoadAnimsCachedTweak(
+static TweakBoolBinding sLoadAnimsCachedTweak(
     "g_bLoadAnimsCached", "FileCache", &g_bLoadAnimsCached, true);
 
-CharacterLoader_8056B290 CharacterLoader_8056B290::sUnidentifiedInstance;
-
-#include "NL/nlstring_impl.h"
-
-int nlPrintf(const char* format, ...)
-{
-    return 0;
-}
+CharacterLoader CharacterLoader::sInstance;

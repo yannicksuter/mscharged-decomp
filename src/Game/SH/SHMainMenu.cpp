@@ -343,7 +343,7 @@ void SHMainMenu::SelectItem(unsigned int index, void* context)
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x46);
         }
-        else if (!g_pMiiManager->mInitialized)
+        else if (!MiiManager::s_pInstance->mInitialized)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87, Bind<void>(MemFun(&SHMainMenu::ReturnToWiiMenu), this));

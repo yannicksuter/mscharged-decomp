@@ -209,6 +209,24 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
     GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_NOTHING, true);
 }
 
+struct DraftMachineCursor
+{
+    const NetworkDraftMachineInfo* mEntry;
+};
+
+static inline void CopyDraftPlayerName(NetworkDraftPlayer& player, const u16* name)
+{
+    nlStrNCpy(player.mName, name, sizeof(player.mName) / sizeof(player.mName[0]));
+}
+
+static inline void CopyDraftMachineInfo(NetworkDraftPlayer& player, const NetworkDraftMachineInfo& entry)
+{
+    player.mHead = entry.mStats;
+    CopyDraftPlayerName(player, entry.mName);
+    memcpy(player.mData, entry.mMiiData, sizeof(player.mData));
+    player.mPeerIndex = (s8)entry.mMachineIndex;
+}
+
 void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 {
     gNetworkMessageRegistry->RegisterReceiver(23, this);
@@ -223,23 +241,20 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     mTeams[0].Reset();
     mTeams[1].Reset();
 
-    const NetworkDraftMachineInfo* entry = message->mEntries;
+    DraftMachineCursor cursor = { message->mEntries };
     for (int entryIndex = 0; entryIndex < message->mMachineCount; ++entryIndex)
     {
-        int playerCount = entry->mGuestEnabled ? 2 : 1;
+        int playerCount = cursor.mEntry->mGuestEnabled ? 2 : 1;
         for (int playerIndex = 0; playerIndex < playerCount; ++playerIndex)
         {
             int teamIndex = message->mPlayerSides.mData[entryIndex][playerIndex];
             NetworkDraftPlayer& player =
                 mTeams[teamIndex].mPlayers[mTeams[teamIndex].mPlayerCount];
-            player.mHead = entry->mStats;
-            nlStrNCpy(player.mName, entry->mName, 11);
-            memcpy(player.mData, entry->mMiiData, sizeof(player.mData));
-            player.mPeerIndex = (s8)entry->mMachineIndex;
+            CopyDraftMachineInfo(player, *cursor.mEntry);
             player.mGuest = playerIndex == 1;
             ++mTeams[teamIndex].mPlayerCount;
         }
-        ++entry;
+        ++cursor.mEntry;
     }
     AssignDraftSides();
     mNextDraftingTeam = -1;

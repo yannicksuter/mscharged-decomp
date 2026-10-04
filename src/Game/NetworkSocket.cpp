@@ -360,23 +360,33 @@ void NetworkSocket::SocketVirtual48()
     mReliableSocket.DrawScreenPrinter();
 }
 
+inline void NetworkSocket::AcquireLocalAddress()
+{
+    if (mHasLocalAddress)
+    {
+        return;
+    }
+
+    *(u32*)mLocalAddress = 0;
+    *(u32*)mLocalAddress = SOGetHostID();
+    if (*(u32*)mLocalAddress != 0)
+    {
+        tDebugPrintManager::Print(DC_NETWORK,
+            "Acquired local IP address %d.%d.%d.%d\n", mLocalAddress[0],
+            mLocalAddress[1], mLocalAddress[2], mLocalAddress[3]);
+        mHasLocalAddress = true;
+    }
+    else
+    {
+        tDebugPrintManager::Print(DC_NETWORK, "Failed to get local IP address\n");
+    }
+}
+
 u8* NetworkSocket::GetLocalAddress()
 {
     if (!mHasLocalAddress)
     {
-        *(u32*)mLocalAddress = 0;
-        *(u32*)mLocalAddress = SOGetHostID();
-        if (*(u32*)mLocalAddress != 0)
-        {
-            tDebugPrintManager::Print(DC_NETWORK,
-                "Acquired local IP address %d.%d.%d.%d\n", mLocalAddress[0],
-                mLocalAddress[1], mLocalAddress[2], mLocalAddress[3]);
-            mHasLocalAddress = true;
-        }
-        else
-        {
-            tDebugPrintManager::Print(DC_NETWORK, "Failed to get local IP address\n");
-        }
+        AcquireLocalAddress();
     }
 
     if (mHasLocalAddress)

@@ -83,33 +83,36 @@ void SoundInstance::Play(float)
     instance->state = SOUND_INSTANCE_STATE_PLAYING;
 }
 
-void SoundInstance::Prepare()
+static inline void PrepareSoundInstanceRpcNodes(SoundInstance* instance)
 {
-    volume.SetTarget(definition->volume, 0.0f);
-    pitch.SetTarget(definition->pitch, 0.0f);
-
-    AudioRpcController* controller = GetSoundInstanceRpcController();
     AudioRpcGroup* group;
-    u32 definitionIndex;
-    AudioRpcRuntimeNode* node;
+    AudioRpcController* controller = GetSoundInstanceRpcController();
     for (u32 groupIndex = 0;
-        groupIndex < definition->rpcGroupCount;
+        groupIndex < instance->definition->rpcGroupCount;
         groupIndex++)
     {
         group = &controller->groups[
-            definition->rpcGroupIndices[groupIndex]];
-        for (definitionIndex = 0;
+            instance->definition->rpcGroupIndices[groupIndex]];
+        for (u32 definitionIndex = 0;
             definitionIndex < group->dynamicDefinitionCount;
             definitionIndex++)
         {
             AudioRpcDefinition* rpcDefinition =
                 &group->dynamicDefinitions[definitionIndex];
-            node = AddAudioRpcRuntimeNode(
-                controller, rpcDefinition, (AudioRpcOwner*)this);
-            activeRpc = rpcDefinition->sliderIndex == 2 ? node : 0;
-            rpcEntries.AddEnd(node);
+            AudioRpcRuntimeNode* node = AddAudioRpcRuntimeNode(
+                controller, rpcDefinition, (AudioRpcOwner*)instance);
+            instance->activeRpc = rpcDefinition->sliderIndex == 2 ? node : 0;
+            instance->rpcEntries.AddEnd(node);
         }
     }
+}
+
+void SoundInstance::Prepare()
+{
+    volume.SetTarget(definition->volume, 0.0f);
+    pitch.SetTarget(definition->pitch, 0.0f);
+
+    PrepareSoundInstanceRpcNodes(this);
 
     if (voices != 0)
     {

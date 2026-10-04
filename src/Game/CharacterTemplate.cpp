@@ -698,13 +698,13 @@ void DestroyCharacters()
             {
                 delete g_aCharacterTemplates[i]->pAnimRetargetListInventory;
             }
-            if (g_aCharacterTemplates[i]->pUnidentified28 != NULL)
+            if (g_aCharacterTemplates[i]->pPlayerTweaks != NULL)
             {
-                delete g_aCharacterTemplates[i]->pUnidentified28;
+                delete g_aCharacterTemplates[i]->pPlayerTweaks;
             }
-            if (g_aCharacterTemplates[i]->pUnidentified2C != NULL)
+            if (g_aCharacterTemplates[i]->pSuperPlayerTweaks != NULL)
             {
-                delete g_aCharacterTemplates[i]->pUnidentified2C;
+                delete g_aCharacterTemplates[i]->pSuperPlayerTweaks;
             }
             delete g_aCharacterTemplates[i];
             g_aCharacterTemplates[i] = NULL;
@@ -725,9 +725,9 @@ void DestroyCharacters()
         {
             delete g_GoalieTemplate->pAnimRetargetListInventory;
         }
-        if (g_GoalieTemplate->pUnidentified30 != NULL)
+        if (g_GoalieTemplate->pGoalieTweaks != NULL)
         {
-            delete g_GoalieTemplate->pUnidentified30;
+            delete g_GoalieTemplate->pGoalieTweaks;
         }
         delete g_GoalieTemplate;
         g_GoalieTemplate = NULL;
@@ -735,11 +735,11 @@ void DestroyCharacters()
 
     for (i = 0; i < 12; i++)
     {
-        g_GoalieTextureInfo[i].bLoaded = 0;
+        g_GoalieTextureInfo[i].bTexturesLoaded = 0;
     }
     for (i = 0; i < 20; i++)
     {
-        g_aCharacterTemplateInfo[i].bUnidentified58 = 0;
+        g_aCharacterTemplateInfo[i].bTexturesLoaded = 0;
     }
 
     AnimTriggerCallbackInfo::m_AnimTriggerCallbackInfoSlotPool.FreeBlocks();

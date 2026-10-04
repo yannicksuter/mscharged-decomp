@@ -9,8 +9,8 @@
 #include "revolution/os/OSInterrupt.h"
 
 static bool sControllerSpeakerEnabled = true;
-static unsigned int sPauseOnZeroKey = nlStringLowerHash("PauseOnZero");
-static unsigned int sStopOnZeroKey = nlStringLowerHash("StopOnZero");
+static const unsigned int sPauseOnZeroKey = nlStringLowerHash("PauseOnZero");
+static const unsigned int sStopOnZeroKey = nlStringLowerHash("StopOnZero");
 
 SlotPool<VolumeParameter> VolumeParameter::s_Pool(16, 16);
 SlotPool<Volume> Volume::s_Pool(16, 16);
@@ -90,11 +90,11 @@ void ControllerSpeaker::BeginBlend()
 {
 }
 
-void ControllerSpeaker::CreateParameter(unsigned int, void* context, bool,
+void ControllerSpeaker::CreateParameter(unsigned int, const void* context, bool,
     AudioEffectParameter** output)
 {
     *output = &m_Parameter;
-    m_Unknown3C = *(int*)context - 1;
+    m_Unknown3C = *(const int*)context - 1;
 }
 
 void Volume::ApplyToSound(void* handle)
@@ -143,12 +143,12 @@ void Volume::BeginBlend()
     m_Final = m_Initial;
 }
 
-void Volume::CreateParameter(unsigned int definition, void* context, bool negate,
+void Volume::CreateParameter(unsigned int definition, const void* context, bool negate,
     AudioEffectParameter** output)
 {
     AudioConfigNode* node = ConfigFindDefinition(definition);
     VolumeParameter* parameter = new VolumeParameter;
-    RegistryValue* argument = (RegistryValue*)context;
+    const RegistryValue* argument = (const RegistryValue*)context;
     int type = argument->mType;
     *output = parameter;
     if (type == 2)
@@ -160,7 +160,7 @@ void Volume::CreateParameter(unsigned int definition, void* context, bool negate
     {
         float value;
         if (type == 1)
-            value = *(float*)&argument->mData;
+            value = *(const float*)&argument->mData;
         else
             value = (float)(int)argument->mData;
         parameter->m_Unknown10 = value;

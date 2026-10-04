@@ -17,7 +17,11 @@ inline void nlVector3::Set(float x, float y, float z)
 inline nlVector3* nlVec3Difference(
     nlVector3* result, const nlVector3* first, const nlVector3* second)
 {
-    nlVec3Sub(*result, *first, *second);
+    float x, y, z;
+    z = first->z - second->z;
+    y = first->y - second->y;
+    x = first->x - second->x;
+    nlVec3Set(*result, x, y, z);
     return result;
 }
 

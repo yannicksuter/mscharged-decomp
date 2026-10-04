@@ -48,7 +48,7 @@ class Volume : public AudioEffectBase
 public:
     Volume();
     virtual ~Volume();
-    virtual void CreateParameter(unsigned int, void*, bool, AudioEffectParameter**);
+    virtual void CreateParameter(unsigned int, const void*, bool, AudioEffectParameter**);
     virtual void BeginBlend();
     virtual void BlendParameter(AudioEffectParameter*, AudioEffectParameter*);
     virtual void OnParameterFinished(AudioEffectParameter*);
@@ -83,7 +83,7 @@ class ControllerSpeaker : public AudioEffectBase
 public:
     ControllerSpeaker();
     virtual ~ControllerSpeaker();
-    virtual void CreateParameter(unsigned int, void*, bool, AudioEffectParameter**);
+    virtual void CreateParameter(unsigned int, const void*, bool, AudioEffectParameter**);
     virtual void BeginBlend();
     virtual void BlendParameter(AudioEffectParameter*, AudioEffectParameter*);
     virtual void OnParameterFinished(AudioEffectParameter*);

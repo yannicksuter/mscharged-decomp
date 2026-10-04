@@ -212,6 +212,9 @@ public:
     /* 0xFF5 */ bool mHasLocalAddress;
     /* 0xFF6 */ u8 mPaddingFF6[2];
     /* 0xFF8 */ u8 mLocalAddress[4];
+
+private:
+    void AcquireLocalAddress();
 }; // size: 0xFFC
 
 struct LANGameInfo

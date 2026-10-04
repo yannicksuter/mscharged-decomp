@@ -41,7 +41,7 @@ class Reverb : public AudioEffectBase
 {
 public:
     Reverb();
-    virtual void CreateParameter(unsigned int, void*, bool, AudioEffectParameter**);
+    virtual void CreateParameter(unsigned int, const void*, bool, AudioEffectParameter**);
     virtual void BeginBlend()
     {
         m_Final = m_Initial;

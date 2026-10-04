@@ -32,7 +32,7 @@ public:
 class Pitch : public AudioEffectBase
 {
 public:
-    virtual void CreateParameter(unsigned int definition, void* context,
+    virtual void CreateParameter(unsigned int definition, const void* context,
         bool negate, AudioEffectParameter** output);
     virtual void BeginBlend();
     virtual void BlendParameter(AudioEffectParameter* destination,
@@ -72,7 +72,7 @@ PitchParameter::PitchParameter()
 {
 }
 
-void Pitch::CreateParameter(unsigned int definition, void*, bool negate,
+void Pitch::CreateParameter(unsigned int definition, const void*, bool negate,
     AudioEffectParameter** output)
 {
     PitchParameter* parameter = new PitchParameter;

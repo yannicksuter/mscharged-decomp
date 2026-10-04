@@ -38,7 +38,7 @@
 #include "Game/Render/CrowdImpostors.h"
 #include "Game/Render/Jumbotron.h"
 #include "Game/Render/StadiumLoading.h"
-#include "Game/Render/tu_80283D9C.h"
+#include "Game/Render/NisPlayerOverlay.h"
 #include "Game/Render/Wiper.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/debug.h"
@@ -457,7 +457,7 @@ void Presentation::Update(float deltaT)
         gpNumberDisplay->Update(deltaT);
     }
 
-    NisPlayer::Instance()->fn_8027CA44();
+    NisPlayer::Instance()->StartLoadedScripts();
 
     mWaitTimeRemaining -= deltaT;
     if (mWaitTimeRemaining < 0.0f)
@@ -1378,10 +1378,10 @@ void Presentation::WaitForNisLoaded()
         }
         else
         {
-            loaded = NisPlayer::Instance()->fn_8027CB44();
+            loaded = NisPlayer::Instance()->IsReadyToPlay();
         }
     }
-    else if (NisPlayer::Instance()->fn_8027CB44())
+    else if (NisPlayer::Instance()->IsReadyToPlay())
     {
         loaded = true;
     }
@@ -1425,10 +1425,10 @@ void Presentation::PlayNis()
         }
         else
         {
-            loaded = NisPlayer::Instance()->fn_8027CB44();
+            loaded = NisPlayer::Instance()->IsReadyToPlay();
         }
     }
-    else if (NisPlayer::Instance()->fn_8027CB44())
+    else if (NisPlayer::Instance()->IsReadyToPlay())
     {
         if (IsNetworkOrRecordedGame() && IsSynchronizedNisFunction(this))
         {
@@ -1921,7 +1921,7 @@ void Presentation::WaitForNisCompletion(const char* wipe)
     }
 
     if (NisPlayer::Instance()->TimeLeft() > cutTime
-        || !NisPlayer::Instance()->fn_8027CB44())
+        || !NisPlayer::Instance()->IsReadyToPlay())
     {
         StopWithUndo();
     }
@@ -1937,3 +1937,5 @@ static inline void DrawPresentationOverlay(RLView* view, RLView* previous)
         glGetOrthographicHeight(), depth, colour, 0);
     g_ShapeRenderer.m_eView = (GLView*)previous;
 }
+
+#include "Game/Render/NisPlayerOverlay.inl"

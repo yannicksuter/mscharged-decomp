@@ -3,17 +3,7 @@
 
 #include "types.h"
 
-struct FunctionHash
-{
-    FunctionHash(unsigned int hash)
-        : hash(hash)
-    {
-    }
-
-    operator unsigned int() const { return hash; }
-
-    unsigned int hash;
-};
+#include "Game/FunctionHash.h"
 
 struct FunctionEntryPoint
 {

@@ -28,6 +28,7 @@ public:
     void UpdateCameraFlags();
     bool AreFieldersClear() const;
     bool IsPassTargetClear() const;
+    float GetZoomScale() const { return mZoomScale; }
     float CalculateZoomScale(float deltaTime) const;
     void UpdateTransition(float deltaTime);
     bool IsTransitionActive() const;

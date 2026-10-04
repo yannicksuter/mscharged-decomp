@@ -9,8 +9,6 @@
 const char* __SOCKET_VERSION = "<< RVL_SDK - SOCKET \trelease build: Dec 10 "
                                "2007 10:02:35 (0x4199_60831) >>";
 
-// static int SO_Initialized = 0;
-
 enum
 {
     NET_SO_ACCEPT = 1,
@@ -279,7 +277,7 @@ int SOGetSockName(int s, void* sockAddr)
 
         args[0] = s;
         addrBuffer = (SOSockAddr*)((u8*)args + 32);
-        memcpy(addrBuffer, addr, addr->len);
+        memcpy((u8*)args + 32, addr, addr->len);
         result = IOS_Ioctl(rmId, NET_SO_GETSOCKNAME, args, 4, addrBuffer, addr->len);
         if (result >= 0)
         {

@@ -5,7 +5,7 @@
 
 inline MiiManager* MiiManager::Instance()
 {
-    return g_pMiiManager;
+    return MiiManager::s_pInstance;
 }
 
 #endif // GAME_MII_MANAGER_INL
