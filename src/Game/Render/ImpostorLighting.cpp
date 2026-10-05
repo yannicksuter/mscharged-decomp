@@ -1,21 +1,14 @@
 #include "Game/Render/ImpostorLighting.h"
-#include "Game/GameObjectLighting.h"
-#include "Game/Render/CrowdImpostorManager.h"
 #include "Game/Render/Impostor.h"
-#include "Game/Render/ImpostorCharacter.h"
 #include "Game/Render/ImpostorManager.h"
+#include "Game/Render/LightingLookup.h"
 #include "Game/TweakValue.h"
 #include "Game/TweakValueInt.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlColour.h"
-#include "NL/nlMath.h"
 #include "NL/nlMemory.h"
-#include "Game/Render/LightingLookup.h"
-#include "Game/Render/CrowdImpostors.h"
-#include "Game/TweakValueFloat.h"
-
 
 static TweakValueInt g_ShadowRed(
     "g_ShadowRed", "/Render/Impostor/Lookup/Tint", 0);
@@ -31,7 +24,7 @@ static TweakValueInt g_HighlightBlue(
     "g_HighlightBlue", gLastTweakCategory, 255);
 
 static u32 sImpostorLightingTexture = -1;
-LightingLookup* spImpostorLightingLookup;
+LightingLookup* gpImpostorLightingLookup;
 
 void UpdateImpostorLighting()
 {
@@ -40,8 +33,8 @@ void UpdateImpostorLighting()
         return;
     }
 
-    ImpostorManager* impostors = ImpostorManager::GetInstance();
-    int count = impostors->GetNumImpostors();
+    ImpostorManager* manager = ImpostorManager::GetInstance();
+    int count = manager->GetNumImpostors();
     Impostor* entry = ImpostorManager::GetInstance()->mImpostors;
     for (int i = 0; i < count; ++i, ++entry)
     {
@@ -62,19 +55,19 @@ void SetImpostorLightingTexture(u32 textureHandle)
                          : (u32)-1;
     }
 
-    if (sImpostorLightingTexture != (u32)-1 && spImpostorLightingLookup == 0)
+    if (sImpostorLightingTexture != (u32)-1 && gpImpostorLightingLookup == 0)
     {
-        spImpostorLightingLookup = new (8, false) LightingLookup;
-        spImpostorLightingLookup->LoadTexture(textureHandle);
+        gpImpostorLightingLookup = new (8, false) LightingLookup;
+        gpImpostorLightingLookup->LoadTexture(textureHandle);
     }
 }
 
 void FreeImpostorLighting()
 {
-    if (spImpostorLightingLookup != 0)
+    if (gpImpostorLightingLookup != 0)
     {
-        delete spImpostorLightingLookup;
-        spImpostorLightingLookup = 0;
+        delete gpImpostorLightingLookup;
+        gpImpostorLightingLookup = 0;
     }
 }
 

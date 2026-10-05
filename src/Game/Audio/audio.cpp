@@ -487,7 +487,8 @@ void PauseAllAudio()
     ++sAudioPauseDepth;
     sAudioHandles.Walk(
         g_pAudioSystem, &AudioSystem::PauseTrackedSound);
-    nlDLListIterator<XSoundHandle*> sounds = g_pAudioSystem->m_ActiveSoundList.Begin();
+    nlDLListIterator<XSoundHandle*> sounds;
+    sounds = g_pAudioSystem->m_ActiveSoundList.Begin();
     while (sounds.hasNext())
     {
         unsigned long key = (unsigned long)*sounds;

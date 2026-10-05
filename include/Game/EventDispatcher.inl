@@ -64,7 +64,8 @@ void EventDispatcherBase<T>::Clear()
 {
     if (!state.fields.dispatching)
     {
-        nlDLListIterator<T> iterator = callbacks.Begin();
+        nlDLListIterator<T> iterator;
+        iterator = callbacks.Begin();
         while (iterator.hasNext())
         {
             (*iterator)(false);

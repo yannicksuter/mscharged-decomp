@@ -578,11 +578,11 @@ int ReplayManager::GetReplayExcitement(float time) const
              frame != 0 && frame != begin; frame = frame->mNext)
         {
             if (frame->mTime > beginTime && frame->mTime <= mReplay->EndTime()
-                && frame->mTime != lastTime && frame->mUnidentifiedState != 0)
+                && frame->mTime != lastTime && frame->mExcitement != 0)
             {
                 lastTime = frame->mTime;
-                value += frame->mUnidentifiedState >> 16;
-                count += frame->mUnidentifiedState & 0xFFFF;
+                value += frame->mExcitement >> 16;
+                count += frame->mExcitement & 0xFFFF;
             }
         }
     }

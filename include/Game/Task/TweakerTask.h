@@ -15,16 +15,15 @@ public:
 
 extern bool g_bTweaking;
 
-void fn_802BDA28();
+void ToggleTweaking();
 
-
-extern s32 lbl_806DF2E0;
-extern s32 lbl_806DF2E4;
-extern s32 lbl_806DF2E8;
-extern s32 lbl_806DF2EC;
-extern s32 lbl_806DF2F0;
-extern s32 lbl_806DF2F4;
-extern s32 lbl_806DF2F8;
-extern s32 lbl_806DF2FC;
+extern s32 gTweakerButton_806DF2E0;
+extern s32 gTweakerButton_806DF2E4;
+extern s32 gTweakerButton_806DF2E8;
+extern s32 gTweakerButton_806DF2EC;
+extern s32 gTweakerButton_806DF2F0;
+extern s32 gTweakerButton_806DF2F4;
+extern s32 gTweakerButton_806DF2F8;
+extern s32 gTweakerButton_806DF2FC;
 
 #endif // GAME_TWEAKER_TASK_H

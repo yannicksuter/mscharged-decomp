@@ -314,12 +314,12 @@ void Presentation::DoFunctionCall(unsigned int function)
                 nlTaskManager::SetNextState(8);
             }
             ReplayChoreo::Instance().StartAutoReplay(false);
-            SetCurrentTextOverlaySlide(static_cast<OverlayManager*>(g_pOverlayManager),
-                SLIDE_NAME_TEXT_REPLAY);
+            static_cast<OverlayManager*>(g_pOverlayManager)
+                ->SetCurrentTextOverlaySlide(SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, true, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
-                ->mUnidentified10E = false;
+                ->mIsInHighlights = false;
         }
         break;
     case 44:
@@ -342,12 +342,12 @@ void Presentation::DoFunctionCall(unsigned int function)
                 nlTaskManager::SetNextState(8);
             }
             ReplayChoreo::Instance().StartAutoReplay(true);
-            SetCurrentTextOverlaySlide(static_cast<OverlayManager*>(g_pOverlayManager),
-                SLIDE_NAME_TEXT_REPLAY);
+            static_cast<OverlayManager*>(g_pOverlayManager)
+                ->SetCurrentTextOverlaySlide(SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetVisible((SceneList)0x5A, false, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
-                ->mUnidentified10E = true;
+                ->mIsInHighlights = true;
             StopOverlay();
             PlayOverlay("highlight", 0.5f, 30.0f);
         }

@@ -7,6 +7,7 @@
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
+#include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -315,12 +316,12 @@ cTeam::cTeam(int nSide)
     mUnidentified0F0 = new (8, false) AIContext(this,
         new (8, false) TeamPlayMachine(),
         new (8, false) FuzzyAIRuntime());
-    mUnidentified0F0->mScriptMachine->UnidentifiedVirtual2();
+    mUnidentified0F0->mScriptMachine->Initialize();
 }
 
 SkillTweaks* fn_800A636C(cTeam* pTeam)
 {
-    return gGameTweaks.mUnidentified18[pTeam->m_nSide];
+    return gGameTweaks.mSkillTweaks[pTeam->m_nSide];
 }
 
 /**
@@ -550,7 +551,7 @@ extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam* pTeam)
     return pTeam->mUnidentified0F0->mRuntime;
 }
 
-extern "C" UnidentifiedScriptMachine* fn_800A6968(cTeam* pTeam)
+extern "C" ScriptMachine* fn_800A6968(cTeam* pTeam)
 {
     return pTeam->mUnidentified0F0->mScriptMachine;
 }

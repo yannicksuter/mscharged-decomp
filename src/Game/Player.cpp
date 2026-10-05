@@ -442,7 +442,6 @@ void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
     nlMultQuat(qRetval, qOrient, mUnidentified1E4.m_BaseBallOrientation);
 }
 
-extern "C" void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
 
 void cPlayer::SetAnimID(int animID)
 {

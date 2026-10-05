@@ -11,7 +11,8 @@ AudioEffectBase::AudioEffectBase(const char*)
 void AudioEffectBase::Update(float dt)
 {
     BeginBlend();
-    nlDLListIterator<AudioEffectParameter*> iterator = m_Parameters.Begin();
+    nlDLListIterator<AudioEffectParameter*> iterator;
+    iterator = m_Parameters.Begin();
     while (iterator.hasNext())
     {
         AudioEffectParameter* state = *iterator;

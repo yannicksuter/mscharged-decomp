@@ -12,7 +12,7 @@ TeamDesire::TeamDesire(
 }
 
 void TeamDesire::SetContext(
-    UnidentifiedScriptMachine* context)
+    ScriptMachine* context)
 {
     shdStateMachine::SetContext(context);
     if (context != 0)

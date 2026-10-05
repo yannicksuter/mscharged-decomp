@@ -46,13 +46,7 @@ GLView* g_pNisRenderView;
 
 bool g_bNisAnimatedCharacters[Nis::MAX_NUM_CHARACTERS];
 
-struct PendingAnimationRequest
-{
-    Nis::PendingAnimation* animation;
-    bool active;
-};
-
-SlotPool<PendingAnimationRequest> lbl_8057AB80(16, 16);
+SlotPool<PendingAnimationRequest> g_PendingAnimationRequestPool(16, 16);
 
 void OnCharacterAnimationLoaded(void* data, unsigned long size, void* userData);
 
@@ -260,7 +254,7 @@ Nis::~Nis()
             else
             {
                 nlCancelEntireFileLoad(mPendingAnimations[i].loadHandle, 0);
-                lbl_8057AB80.Free((PendingAnimationRequest*)mPendingAnimations[i].request);
+                g_PendingAnimationRequestPool.Free((PendingAnimationRequest*)mPendingAnimations[i].request);
             }
         }
         if (mPendingAnimations[i].data != 0)
@@ -637,10 +631,10 @@ void Nis::Trigger::Fire(Nis& nis) const
     case NIS_TRIGGER_TYPE_EFFECT:
         FireEffect(nis);
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_6:
+    case NIS_TRIGGER_TYPE_STADIUM_EFFECTS:
         fn_802789A8(BasicStadium::GetCurrentStadium(), params.param1);
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_7:
+    case NIS_TRIGGER_TYPE_CHARACTER_DIRT:
     {
         int charIdx;
         if (nis.mMainCharacterIndex >= 0)
@@ -673,7 +667,7 @@ void Nis::Trigger::Fire(Nis& nis) const
             PlaySound(params.param1, params.param2, 0, 0);
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_4:
+    case NIS_TRIGGER_TYPE_RUMBLE:
         for (int i = 0; i < MAX_NUM_CHARACTERS; ++i)
         {
             cPlayer* player = (cPlayer*)g_pCharacters[i];
@@ -683,7 +677,7 @@ void Nis::Trigger::Fire(Nis& nis) const
             }
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_5:
+    case NIS_TRIGGER_TYPE_CROWD_EXCITEMENT:
         if (params.param1 != 0)
         {
             SetCrowdImpostorsExcited();
@@ -693,7 +687,7 @@ void Nis::Trigger::Fire(Nis& nis) const
             SetCrowdImpostorsIdle();
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_8:
+    case NIS_TRIGGER_TYPE_DEPTH_OF_FIELD:
         if (params.param1 != 0)
         {
             DepthOfFieldManager::instance.TurnOff();
@@ -703,10 +697,10 @@ void Nis::Trigger::Fire(Nis& nis) const
             DepthOfFieldManager::instance.TurnOn();
         }
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_9:
+    case NIS_TRIGGER_TYPE_SHOW_ELECTRIC_FENCE:
         DisplayElectricFence();
         break;
-    case NIS_TRIGGER_TYPE_UNIDENTIFIED_10:
+    case NIS_TRIGGER_TYPE_HIDE_ELECTRIC_FENCE:
         StopDisplayingElectricFence();
         break;
     }
@@ -1031,7 +1025,7 @@ void Nis::LoadCharacterAnimation(const char* animName, int characterIndex)
         char filename[100];
         nlSNPrintf(filename, sizeof(filename) - 1, "Art/Animation/%s/%s.sanim", info->szHierarchy, animName);
 
-        PendingAnimationRequest* request = lbl_8057AB80.Allocate();
+        PendingAnimationRequest* request = g_PendingAnimationRequestPool.Allocate();
         request->active = true;
         request->animation = entry;
         entry->request = request;
@@ -1055,5 +1049,5 @@ void OnCharacterAnimationLoaded(void* data, unsigned long size, void* userData)
     {
         ::operator delete(data);
     }
-    lbl_8057AB80.Free(request);
+    g_PendingAnimationRequestPool.Free(request);
 }

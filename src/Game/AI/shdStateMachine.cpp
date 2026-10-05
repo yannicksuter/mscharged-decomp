@@ -1,6 +1,6 @@
 #include "Game/AI/ScriptState.h"
 #include "Game/AI/AIContext.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 
 #include "Game/AI/FuzzyAIRuntime.h"
 #include "Game/InterpreterCore.h"
@@ -12,14 +12,14 @@ UnsetTransitionFunc g_UnsetTransitionFunc;
 
 shdStateMachine::shdStateMachine(
     int state, TransitionFunc& transition)
-    : mAgeTimer(lbl_806E6880)
+    : mAgeTimer(gStateMachineZeroDuration)
     , mParameters()
 {
     mState = state;
     mDefaultTransition = transition;
     mScriptMachine = 0;
-    mDefaultMinDuration = lbl_806E6880;
-    mDefaultMaxDuration = lbl_806E6884;
+    mDefaultMinDuration = gStateMachineZeroDuration;
+    mDefaultMaxDuration = gStateMachineUnsetDuration;
     Reset(0);
 }
 
@@ -28,14 +28,14 @@ void shdStateMachine::Reset(bool)
     mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
     mAgeTimer.m_uPackedTime = 0;
     mActive = false;
-    mMaxDuration = lbl_806E6884;
-    mMinDuration = lbl_806E6884;
-    mLastActiveTime = lbl_806E6888;
+    mMaxDuration = gStateMachineUnsetDuration;
+    mMinDuration = gStateMachineUnsetDuration;
+    mLastActiveTime = gStateMachineNeverActiveTime;
     mOverrideTransition = g_UnsetTransitionFunc;
 }
 
 void shdStateMachine::SetContext(
-    UnidentifiedScriptMachine* context)
+    ScriptMachine* context)
 {
     mScriptMachine = context;
 }
@@ -46,7 +46,7 @@ shdStateMachine::~shdStateMachine()
 
 void RequestStateMachineDeactivation(shdStateMachine* machine)
 {
-    fn_80319904(machine->mScriptMachine, machine);
+    DeactivateScriptMachineState(machine->mScriptMachine, machine);
 }
 
 AIContext* GetStateMachineAIContext(
@@ -94,8 +94,8 @@ bool InitializeStateMachine(
     shdStateMachine* machine, UnidentifiedVariantCollection* parameters,
     bool initialize)
 {
-    machine->mMaxDuration = lbl_806E6884;
-    machine->mMinDuration = lbl_806E6884;
+    machine->mMaxDuration = gStateMachineUnsetDuration;
+    machine->mMinDuration = gStateMachineUnsetDuration;
     machine->mOverrideTransition = g_UnsetTransitionFunc;
 
     if (parameters->IsSet(10))
@@ -129,11 +129,11 @@ bool InitializeStateMachine(
     {
         machine->mMaxDuration = parameters->Get(7)->mData.f;
     }
-    if (lbl_806E6884 == machine->mMaxDuration)
+    if (gStateMachineUnsetDuration == machine->mMaxDuration)
     {
         machine->mMaxDuration = machine->mDefaultMaxDuration;
     }
-    if (lbl_806E6884 == machine->mMinDuration)
+    if (gStateMachineUnsetDuration == machine->mMinDuration)
     {
         machine->mMinDuration = machine->mDefaultMinDuration;
     }
@@ -160,7 +160,7 @@ void UpdateStateMachine(
     bool runUpdate, float deltaTime)
 {
     *update = 0;
-    machine->mAgeTimer.Countup(deltaTime, lbl_806E688C);
+    machine->mAgeTimer.Countup(deltaTime, gStateMachineAgeThreshold);
     machine->mLastActiveTime = gAIActivityClock();
 
     float start = gAIProfilingClock();
@@ -169,7 +169,7 @@ void UpdateStateMachine(
         if (HasTransitionFunc(&machine->mOverrideTransition.mValue))
         {
             machine->mOverrideTransition.Execute(
-                fn_80317E2C(machine->mScriptMachine),
+                GetScriptMachineAIContext(machine->mScriptMachine),
                 update,
                 (UnidentifiedFuzzyRuntimeValue*)machine);
         }
@@ -178,17 +178,17 @@ void UpdateStateMachine(
              && HasTransitionFunc(&machine->mDefaultTransition.mValue))
     {
         machine->mDefaultTransition.Execute(
-            fn_80317E2C(machine->mScriptMachine),
+            GetScriptMachineAIContext(machine->mScriptMachine),
             update,
             (UnidentifiedFuzzyRuntimeValue*)machine);
     }
-    fn_8031A0C8(start, gAIProfilingClock());
+    AccumulateScriptExecutionTime(start, gAIProfilingClock());
 
     if ((unsigned int)update->GetType() == FT_UNSPECIFIED)
     {
         *update = 0;
     }
-    if (fn_80317E88(machine) && update->fn_800C2BD4() != 1)
+    if (HasStateMachineTimedOut(machine) && update->fn_800C2BD4() != 1)
     {
         *update = 2;
     }
@@ -200,7 +200,7 @@ void UpdateStateMachine(
 }
 
 ScriptState::ScriptState(
-    int state, const char* name, UnidentifiedScriptMachine* context,
+    int state, const char* name, ScriptMachine* context,
     TransitionFunc transition)
     : shdStateMachine(state, transition)
 {
@@ -245,9 +245,9 @@ bool ScriptState::Initialize(void*)
         void* context = mScriptMachine->mAIContext->mData.pointer;
         u32 hash = mInitFunctionHash;
         UnidentifiedVariant_80054AB8 result
-            = fn_80317EFC(GetFuzzyRuntime(), hash, context);
+            = ExecuteScriptStateFunction(GetFuzzyRuntime(), hash, context);
         initialized = result.mData.b;
-        fn_8031A0C8(start, gAIProfilingClock());
+        AccumulateScriptExecutionTime(start, gAIProfilingClock());
     }
     return initialized;
 }
@@ -268,11 +268,11 @@ void ScriptState::Update(
     void* context = mScriptMachine->mAIContext->mData.pointer;
     u32 hash = mUpdateFunctionHash;
     {
-        UnidentifiedVariant_80054AB8 result = fn_803184A8(
+        UnidentifiedVariant_80054AB8 result = ExecuteScriptStateFunction(
             GetFuzzyRuntime(), hash, context, deltaTime);
         *update = result;
     }
-    fn_8031A0C8(start, gAIProfilingClock());
+    AccumulateScriptExecutionTime(start, gAIProfilingClock());
 }
 
 void ScriptState::Cleanup()
@@ -285,8 +285,8 @@ void ScriptState::Cleanup()
     float start = gAIProfilingClock();
     void* context = mScriptMachine->mAIContext->mData.pointer;
     u32 hash = mCleanupFunctionHash;
-    fn_80317EFC(GetFuzzyRuntime(), hash, context);
-    fn_8031A0C8(start, gAIProfilingClock());
+    ExecuteScriptStateFunction(GetFuzzyRuntime(), hash, context);
+    AccumulateScriptExecutionTime(start, gAIProfilingClock());
 }
 
 ScriptState::~ScriptState()

@@ -619,7 +619,7 @@ void Presentation::Update(float deltaT)
             static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)mOverlayToDisplay, true, true);
             if (mOverlayToDisplay == 0x5F)
             {
-                RestartGoalOverlay(g_pOverlayManager);
+                static_cast<OverlayManager*>(g_pOverlayManager)->RestartGoalOverlay();
             }
             mOverlayDisplayed = true;
             mOverlayDelay = 0.0f;
@@ -1047,7 +1047,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
     int teamScore;
     const char* gameEndFunction;
     ((GoalOverlay*)g_pOverlayManager->GetScene((SceneList)0x5F))
-        ->fn_801F17D0(scoringSide);
+        ->UpdateCaptainS2SGoalInfo(scoringSide);
     NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] = scoringSide;
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()

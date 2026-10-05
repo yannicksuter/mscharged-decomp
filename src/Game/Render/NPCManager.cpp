@@ -111,8 +111,8 @@ bool NPCManager::SelectNextNPCTemplate()
     mPendingTemplate = 0;
     for (int i = 0; i < 2; ++i)
     {
-        nlDLListIterator<NPCTemplate*> iterator
-            = i == 0 ? mPersistentTemplates.Begin()
+        nlDLListIterator<NPCTemplate*> iterator;
+        iterator = i == 0 ? mPersistentTemplates.Begin()
                      : mTransientTemplates.Begin();
         while (iterator.hasNext())
         {
@@ -437,8 +437,8 @@ bool NPCManager::FinishLoadNPCTemplate()
 
 void NPCManager::UnloadTransientNPCTemplates()
 {
-    nlDLListIterator<NPCTemplate*> iterator
-        = mTransientTemplates.Begin();
+    nlDLListIterator<NPCTemplate*> iterator;
+    iterator = mTransientTemplates.Begin();
     while (iterator.hasNext())
     {
         delete *iterator;
@@ -525,8 +525,8 @@ NPCManager::~NPCManager()
 {
     for (int i = 0; i < 2; ++i)
     {
-        nlDLListIterator<NPCTemplate*> iterator
-            = i == 0 ? mPersistentTemplates.Begin()
+        nlDLListIterator<NPCTemplate*> iterator;
+        iterator = i == 0 ? mPersistentTemplates.Begin()
                      : mTransientTemplates.Begin();
         while (iterator.hasNext())
         {
@@ -552,8 +552,8 @@ NPCTemplate* NPCManager::FindNPCTemplate(const char* pName)
 {
     for (int i = 0; i < 2; ++i)
     {
-        nlDLListIterator<NPCTemplate*> iterator
-            = i == 0 ? mPersistentTemplates.Begin()
+        nlDLListIterator<NPCTemplate*> iterator;
+        iterator = i == 0 ? mPersistentTemplates.Begin()
                      : mTransientTemplates.Begin();
         while (iterator.hasNext())
         {

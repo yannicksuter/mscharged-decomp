@@ -14,8 +14,8 @@
 
 extern "C"
 {
-    extern float gHammerGrowScale;
-    extern float gHammerGrowDuration;
+    float gHammerGrowScale = 1.4f;
+    float gHammerGrowDuration = 0.15f;
     float gHammerSpinSpeed = 25.0f;
     float gHammerLandedDuration = 5.0f;
     float gHammerMinLandingAngle = 105.0f;

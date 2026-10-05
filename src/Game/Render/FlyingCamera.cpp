@@ -8,71 +8,22 @@
 #include "Game/ReplayManager.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/WorldTriggers.h"
+#include "NL/nlArrayAllocator.h"
 #include "NL/nlMath.h"
-#include "NL/nlSlotPool.h"
-
-struct FlyingCameraPool
-{
-    FlyingCameraPool(void* entries)
-        : mFreeList((SlotPoolEntry*)entries)
-        , mEntries((FlyingCamera*)entries)
-    {
-        Reset();
-    }
-
-    ~FlyingCameraPool()
-    {
-    }
-
-    void Reset()
-    {
-        for (int i = 0; i < 10 - 1; ++i)
-        {
-            ((SlotPoolEntry*)&mEntries[i])->next
-                = (SlotPoolEntry*)(&mEntries[i] + 1);
-        }
-        ((SlotPoolEntry*)&mEntries[10 - 1])->next = 0;
-    }
-
-    void Free(FlyingCamera* camera)
-    {
-        SlotPoolEntry* entry = (SlotPoolEntry*)camera;
-        entry->next = mFreeList;
-        mFreeList = entry;
-    }
-
-    void Allocate(FlyingCamera*& camera)
-    {
-        if (mFreeList == 0)
-        {
-            camera = 0;
-        }
-        else
-        {
-            camera = (FlyingCamera*)mFreeList;
-            mFreeList = mFreeList->next;
-        }
-    }
-
-    SlotPoolEntry* mFreeList;
-    FlyingCamera* mEntries;
-};
 
 FlyingCamera* gFlyingCameras[10];
 nlVector3 gFlyingCameraTargetPosition;
 
-float lbl_806DCE18 = 0.03f;
-float lbl_806DCE1C = -0.88f;
-float lbl_806DCE20 = 1.0f;
-float lbl_806DCE24 = -1.0f;
-float lbl_806DCE28 = 1.0f;
-float lbl_806DCE2C = 40.0f;
-float lbl_806DCE30 = 3.0f;
-float lbl_806DCE34 = 10.0f;
-float lbl_806DCE38 = 10.0f;
+float gFlyingCameraPositionGain = 0.03f;
+float gFlyingCameraPositionDamping = -0.88f;
+float gFlyingCameraIntegralGain = 1.0f;
+float gFlyingCameraIntegralMin = -1.0f;
+float gFlyingCameraIntegralMax = 1.0f;
+float gFlyingCameraOrientationRate = 40.0f;
+float gFlyingCameraOrbitSpeed = 3.0f;
+float gFlyingCameraSpawnHeight = 10.0f;
+float gFlyingCameraExitHeight = 10.0f;
 int gNextFlyingCameraFlashIndex = 100;
-float gHammerGrowScale = 1.4f;
-float gHammerGrowDuration = 0.15f;
 
 unsigned int gFlyingCameraCount;
 cFielder* gFlyingCameraTarget;
@@ -83,7 +34,7 @@ UnidentifiedOwnerConnection gPeachCameraFlashConnection;
 UnidentifiedOwnerConnection gResetEffectsConnection;
 UnidentifiedOwnerConnection gMegaStrikeMeterEndConnection;
 FlyingCamera gFlyingCameraStorage[10];
-FlyingCameraPool gFlyingCameraPool(gFlyingCameraStorage);
+nlArrayAllocator<FlyingCamera> gFlyingCameraAllocator(gFlyingCameraStorage, 10);
 
 char sPeachCameraFlashEventName[] = "PeachCameraFlash";
 char sResetEffectsEventName[] = "ResetEffects";
@@ -92,11 +43,11 @@ char sMegaStrikeMeterEndEventName[] = "MegaStrikeMeterEnd";
 void OnPeachCameraFlash(void*);
 void OnResetFlyingCameras(void*);
 
-void UnidentifiedRandomizeFlyingCamera(FlyingCamera* camera)
+void RandomizeFlyingCamera(FlyingCamera* camera)
 {
-    camera->mPositionGain = lbl_806DCE18 + nlRandomf(0.006f, &nlDefaultSeed);
-    camera->mPositionDamping = lbl_806DCE1C + nlRandomf(0.006f, &nlDefaultSeed);
-    camera->mIntegralGain = lbl_806DCE20 + nlRandomf(0.2f, &nlDefaultSeed);
+    camera->mPositionGain = gFlyingCameraPositionGain + nlRandomf(0.006f, &nlDefaultSeed);
+    camera->mPositionDamping = gFlyingCameraPositionDamping + nlRandomf(0.006f, &nlDefaultSeed);
+    camera->mIntegralGain = gFlyingCameraIntegralGain + nlRandomf(0.2f, &nlDefaultSeed);
     camera->mOrbitRadius = 3.5f + nlRandomf(1.0f, &nlDefaultSeed);
     camera->mHeightOffset = 4.5f + nlRandomf(1.0f, &nlDefaultSeed);
 }
@@ -104,13 +55,6 @@ void UnidentifiedRandomizeFlyingCamera(FlyingCamera* camera)
 static inline float MaxOf(float a, float b)
 {
     if (a >= b)
-        return a;
-    return b;
-}
-
-static inline float MinOf(float a, float b)
-{
-    if (a <= b)
         return a;
     return b;
 }
@@ -135,10 +79,7 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 
     fn_802B549C(facing, camera->mAngle);
 
-    if (flatDirection.x * flatDirection.x
-            + flatDirection.y * flatDirection.y
-            + flatDirection.z * flatDirection.z
-        < 0.001f)
+    if (flatDirection.GetLengthSq3D() < 0.001f)
     {
         fn_802B549C(targetOrientation, 0x4000);
     }
@@ -150,10 +91,7 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
 
     nlMultQuat(targetOrientation, targetOrientation, facing);
 
-    float orientationBlend = lbl_806DCE2C * dt;
-    orientationBlend = orientationBlend <= 1.0f
-                         ? orientationBlend
-                         : 1.0f;
+    float orientationBlend = nlMinEquals(gFlyingCameraOrientationRate * dt, 1.0f);
     nlQuatNLerp(camera->mOrientation, targetOrientation, camera->mOrientation, orientationBlend);
 
     nlSinCos(&sine, &cosine, camera->mAngle);
@@ -166,17 +104,17 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
     nlVec3Scale(directChange, delta, camera->mPositionGain * rate);
     nlVec3Add(camera->mPositionIntegral, camera->mPositionIntegral, delta);
 
-    float minAccumulatedChange = lbl_806DCE24;
-    float maxAccumulatedChange = lbl_806DCE28;
-    camera->mPositionIntegral.x = MinOf(
-        MaxOf(camera->mPositionIntegral.x, minAccumulatedChange),
-        maxAccumulatedChange);
-    camera->mPositionIntegral.y = MinOf(
-        MaxOf(camera->mPositionIntegral.y, minAccumulatedChange),
-        maxAccumulatedChange);
-    camera->mPositionIntegral.z = MinOf(
-        MaxOf(camera->mPositionIntegral.z, minAccumulatedChange),
-        maxAccumulatedChange);
+    float minIntegral = gFlyingCameraIntegralMin;
+    float maxIntegral = gFlyingCameraIntegralMax;
+    camera->mPositionIntegral.x = nlMinEquals(
+        MaxOf(camera->mPositionIntegral.x, minIntegral),
+        maxIntegral);
+    camera->mPositionIntegral.y = nlMinEquals(
+        MaxOf(camera->mPositionIntegral.y, minIntegral),
+        maxIntegral);
+    camera->mPositionIntegral.z = nlMinEquals(
+        MaxOf(camera->mPositionIntegral.z, minIntegral),
+        maxIntegral);
 
     nlVec3Scale(accumulatedChange, camera->mPositionIntegral, camera->mIntegralGain * rate * 0.001f);
     nlVec3Sub(previousDelta, camera->mPreviousPosition, camera->mPosition);
@@ -185,11 +123,11 @@ void UpdateFlyingCamera(FlyingCamera* camera, float dt)
     nlVec3Add(camera->mPosition, camera->mPosition, accumulatedChange);
     nlVec3Add(camera->mPosition, camera->mPosition, directChange);
 
-    camera->mPosition.x = MinOf(
+    camera->mPosition.x = nlMinEquals(
         MaxOf(camera->mPosition.x, -30.0f), 30.0f);
-    camera->mPosition.y = MinOf(
+    camera->mPosition.y = nlMinEquals(
         MaxOf(camera->mPosition.y, -30.0f), 30.0f);
-    camera->mPosition.z = MinOf(
+    camera->mPosition.z = nlMinEquals(
         MaxOf(camera->mPosition.z, -30.0f), 30.0f);
 }
 
@@ -201,6 +139,11 @@ void ResetFlyingCameras()
 static inline DrawableFlyingCamera* GetDrawableFlyingCamera(int index)
 {
     return &ReplayManager::Instance()->mRender->_2298[index];
+}
+
+static inline float GetFlyingCameraResetHeight()
+{
+    return gFlyingCameraExitHeight - 0.5f;
 }
 
 void UpdateFlyingCameras(float dt)
@@ -217,7 +160,7 @@ void UpdateFlyingCameras(float dt)
     if (gFlyingCameraTarget == 0)
     {
         nlVec3Set(targetPosition, gFlyingCameraTargetPosition.x,
-            gFlyingCameraTargetPosition.y, lbl_806DCE38);
+            gFlyingCameraTargetPosition.y, gFlyingCameraExitHeight);
     }
     else
     {
@@ -263,8 +206,7 @@ void UpdateFlyingCameras(float dt)
         }
     }
 
-    float angleAdvance = 6553.6f * dt;
-    gFlyingCameraAngle += (s32)(angleAdvance * lbl_806DCE30);
+    gFlyingCameraAngle += (s32)(6553.6f * dt * gFlyingCameraOrbitSpeed);
 
     for (unsigned int i = 0; i < gFlyingCameraCount; ++i)
     {
@@ -273,8 +215,7 @@ void UpdateFlyingCameras(float dt)
         gFlyingCameras[i]->mTargetPosition = targetPosition;
         UpdateFlyingCamera(gFlyingCameras[i], dt);
 
-        float resetHeightThreshold = lbl_806DCE38 - 0.5f;
-        if (gFlyingCameras[i]->mPosition.z < resetHeightThreshold)
+        if (gFlyingCameras[i]->mPosition.z < GetFlyingCameraResetHeight())
         {
             shouldReset = false;
         }
@@ -298,23 +239,22 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     {
         if (*slot != 0)
         {
-            gFlyingCameraPool.Free(*slot);
+            gFlyingCameraAllocator.Free(*slot);
         }
         *slot = 0;
     }
 
     FlyingCamera* camera;
-    unsigned int oldCount = gFlyingCameraCount;
-    for (unsigned int i = oldCount; i < (unsigned int)count; ++i)
+    for (unsigned int i = gFlyingCameraCount; i < (unsigned int)count; ++i)
     {
-        gFlyingCameraPool.Allocate(camera);
+        gFlyingCameraAllocator.Allocate(camera);
 
         if (camera != 0)
         {
             camera->mIndex = i;
             camera->mAngle = 0;
             camera->mVisible = true;
-            UnidentifiedRandomizeFlyingCamera(camera);
+            RandomizeFlyingCamera(camera);
 
             camera->mOrientation.z = 0.0f;
             camera->mOrientation.y = 0.0f;
@@ -337,8 +277,7 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
         gFlyingCameras[i] = camera;
     }
 
-    nlVector3 initialPosition = { 0.0f, 0.0f, 0.0f };
-    initialPosition.z = lbl_806DCE34;
+    nlVector3 initialPosition = { 0.0f, 0.0f, gFlyingCameraSpawnHeight };
 
     SetFlyingCameraTarget(fielder);
 

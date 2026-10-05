@@ -17,24 +17,26 @@ public:
     virtual ~OverlayManager();
     virtual BaseSceneHandler* Push(SceneList scene, ScreenMovement movement, bool popfirst);
     virtual void Pop();
+    void SetCurrentTextOverlaySlide(OverlaySlideName slideName);
 
     void ShowDemoSlide();
+    void RestartGoalOverlay();
     void Update(float deltaTime);
     void SetVisible(SceneList scene, bool visibility, bool overrideStateSettings);
     void HandleStateTransition(u32 from, u32 to);
-    void fn_801E1514();
-    void fn_801E2498(float delay);
-    void fn_801E258C();
-    void fn_801E2590();
-    void fn_801E2608();
-    void fn_801E2784(MegaStrikeMeterData* eventData);
-    void fn_801E281C();
-    void fn_801E28A8(MegaStrikeMeterData* eventData);
-    void fn_801E28E4(MegaStrikeMeterData* eventData);
-    void fn_801E2920();
-    void fn_801E2988(MegaStrikeEndData* eventData);
-    void fn_801E29C0(nlVector3 position);
-    void fn_801E2A28(GoalScoredData* eventData);
+    void RegisterEventHandlers();
+    void SlideHUDIn(float delay);
+    void OnGetReadyForKickoff();
+    void OnKickoff();
+    void OnGameOver();
+    void OnMegaStrikeMeterStart(MegaStrikeMeterData* eventData);
+    void OnMegaStrikeMeterEnd();
+    void OnMegaStrikeMeterFirst(MegaStrikeMeterData* eventData);
+    void OnMegaStrikeMeterSecond(MegaStrikeMeterData* eventData);
+    void OnMegastrikeStart();
+    void OnMegastrikeEnd(MegaStrikeEndData* eventData);
+    void SetMegaStrikeMeterPosition(nlVector3 position);
+    void OnGoalScored(GoalScoredData* eventData);
 
     void GetStrikerTimesVariants(int* story, int* headline, int* image)
     {
@@ -50,10 +52,12 @@ public:
         mStrikerTimesImageVariant = image;
     }
 
+    void ResetStrikerTimesVariants();
+
     /* 0x108 */ InGameTextOverlay* mInGameTextOverlay;
     /* 0x10C */ bool mIsHUDSlideIn;
     /* 0x10D */ bool mDoHUDSlideIn;
-    /* 0x10E */ u8 mUnidentified10E;
+    /* 0x10E */ bool mIsInHighlights;
     /* 0x10F */ bool mIsDemoSlideVisible;
     /* 0x110 */ float mHUDDelay;
     /* 0x114 */ int mStrikerTimesStoryVariant;
@@ -64,8 +68,5 @@ public:
 private:
     void SlideHUDOut();
 }; // size 0x124
-
-extern "C" void RestartGoalOverlay(BaseGameSceneManager* manager);
-extern "C" void SetCurrentTextOverlaySlide(OverlayManager* manager, OverlaySlideName slideName);
 
 #endif // GAME_OVERLAY_MANAGER_H

@@ -37,8 +37,10 @@ public:
 template <int N, typename T>
 inline void LoadFrame::Replayable(T& current)
 {
-    typename ReplayableCategory<T>::Type category;
-    Replayable<N>(current, category);
+    if (N == 0 || mInterval == N)
+    {
+        ReplayFrameValue<N>(*this, current, ReplayableCategoryOf(current));
+    }
 }
 
 template <int N, typename T>

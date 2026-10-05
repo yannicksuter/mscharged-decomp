@@ -119,7 +119,8 @@ static inline void ClearTargetEntries(nlDLListContainer<DebugCameraTarget*>& tar
 
 cDebugCamera::~cDebugCamera()
 {
-    nlDLListIterator<DebugCameraTarget*> iterator = m_Targets.Begin();
+    nlDLListIterator<DebugCameraTarget*> iterator;
+    iterator = m_Targets.Begin();
     while (iterator.hasNext())
     {
         delete *iterator;
@@ -140,7 +141,8 @@ void cDebugCamera::UpdateTargetPositions()
         return;
     }
 
-    nlDLListIterator<DebugCameraTarget*> iterator = m_Targets.Begin();
+    nlDLListIterator<DebugCameraTarget*> iterator;
+    iterator = m_Targets.Begin();
     iterator.Step();
 
     DebugCameraTarget* target;

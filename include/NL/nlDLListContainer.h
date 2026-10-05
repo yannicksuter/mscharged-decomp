@@ -6,6 +6,62 @@
 #include "NL/nlFunction.h"
 #include "NL/nlSlotPool.h"
 
+template <typename T>
+class nlDLListIterator
+{
+public:
+    typedef DLListEntry<T>* Pointer;
+    typedef T& Reference;
+
+    void Copy(const nlDLListIterator& other);
+
+    Reference operator*() const { return m_Curr->entry; }
+
+    Pointer CurrentEntry() const { return m_Curr; }
+
+    bool hasNext() const { return m_Curr != 0; }
+
+    bool IsDone() const { return m_Curr == 0; }
+
+    bool IsStart() const { return nlDLRingIsStart(m_Head, m_Curr); }
+
+    bool IsEnd() const { return nlDLRingIsEnd(m_Head, m_Curr); }
+
+    void Step()
+    {
+        if (nlDLRingIsEnd(m_Head, m_Curr) || m_Curr == 0)
+        {
+            m_Curr = 0;
+        }
+        else
+        {
+            m_Curr = m_Curr->m_next;
+        }
+    }
+
+    Pointer next()
+    {
+        Pointer result = m_Curr;
+        Step();
+        return result;
+    }
+
+    void Retreat()
+    {
+        if (nlDLRingIsStart(m_Head, m_Curr))
+        {
+            m_Curr = 0;
+        }
+        else
+        {
+            m_Curr = m_Curr->m_prev;
+        }
+    }
+
+    Pointer m_Head;
+    Pointer m_Curr;
+};
+
 template <typename T, typename Adapter>
 class DLListContainerBase
 {
@@ -45,7 +101,8 @@ public:
     void Copy(DLListContainerBase& other)
     {
         Clear();
-        nlDLListIterator<T> iterator = other.Begin();
+        nlDLListIterator<T> iterator;
+        iterator = other.Begin();
         while (!iterator.IsDone())
         {
             AddEnd(*iterator);
@@ -100,7 +157,14 @@ public:
     {
         DLListEntry<T>* entry = position->next();
         nlDLRingRemove(&m_Head, entry);
-        Deallocate(entry, 0);
+        m_Allocator.DeleteEntry(entry);
+    }
+
+    void Remove(nlDLListIterator<T>* position, T* outData)
+    {
+        DLListEntry<T>* entry = position->next();
+        nlDLRingRemove(&m_Head, entry);
+        Deallocate(entry, outData);
     }
 
     T RemoveEntry(DLListEntry<T>* entry)
@@ -113,22 +177,34 @@ public:
 
     nlDLListIterator<T> Begin()
     {
-        return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
+        nlDLListIterator<T> result;
+        result.m_Curr = nlDLRingGetStart(m_Head);
+        result.m_Head = m_Head;
+        return result;
     }
 
     nlDLListIterator<T> Begin() const
     {
-        return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
+        nlDLListIterator<T> result;
+        result.m_Curr = nlDLRingGetStart(m_Head);
+        result.m_Head = m_Head;
+        return result;
     }
 
     nlDLListIterator<T> Begin(DLListEntry<T>* current) const
     {
-        return nlDLListIterator<T>(m_Head, current);
+        nlDLListIterator<T> result;
+        result.m_Curr = current;
+        result.m_Head = m_Head;
+        return result;
     }
 
     nlDLListIterator<T> End()
     {
-        return nlDLListIterator<T>(m_Head, nlDLRingGetEnd(m_Head));
+        nlDLListIterator<T> result;
+        result.m_Curr = nlDLRingGetEnd(m_Head);
+        result.m_Head = m_Head;
+        return result;
     }
 
     bool IsEmpty()
@@ -238,17 +314,26 @@ public:
 
     nlDLListIterator<T> Begin() const
     {
-        return nlDLListIterator<T>(m_Head, nlDLRingGetStart(m_Head));
+        nlDLListIterator<T> result;
+        result.m_Curr = nlDLRingGetStart(m_Head);
+        result.m_Head = m_Head;
+        return result;
     }
 
     nlDLListIterator<T> Begin(DLListEntry<T>* current) const
     {
-        return nlDLListIterator<T>(m_Head, current);
+        nlDLListIterator<T> result;
+        result.m_Curr = current;
+        result.m_Head = m_Head;
+        return result;
     }
 
     nlDLListIterator<T> End() const
     {
-        return nlDLListIterator<T>(m_Head, nlDLRingGetEnd(m_Head));
+        nlDLListIterator<T> result;
+        result.m_Curr = nlDLRingGetEnd(m_Head);
+        result.m_Head = m_Head;
+        return result;
     }
 
     bool IsEmpty() const
@@ -384,6 +469,13 @@ void DLListContainerBase<T, Adapter>::DeleteEntry(
         entry->entry.~T();
     }
     m_Allocator.DeleteEntry(entry);
+}
+
+template <typename T>
+void nlDLListIterator<T>::Copy(const nlDLListIterator& other)
+{
+    m_Head = other.m_Head;
+    m_Curr = other.m_Curr;
 }
 
 // The list borrows its node pool and does not free the pool's blocks.

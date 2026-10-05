@@ -31,8 +31,8 @@ void WorldEffect::Initialize(WorldObjectLoadContext* pContext)
 
 void WorldEffect::ReleaseResources()
 {
-    nlDLListIterator<EmissionController*> controllerIterator
-        = EmissionManager::Instance()->GetContainer()->Begin();
+    nlDLListIterator<EmissionController*> controllerIterator;
+    controllerIterator = EmissionManager::Instance()->GetContainer()->Begin();
     DLListEntry<EmissionController*>* pHead = controllerIterator.m_Head;
     DLListEntry<EmissionController*>* pCurrent = controllerIterator.m_Curr;
     while (pCurrent != 0)

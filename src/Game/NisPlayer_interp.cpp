@@ -15,7 +15,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         params.param3 = -1;
         params.param4 = -1;
         params.param1 = triggerParam1;
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_8, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_DEPTH_OF_FIELD, frame, "", "", &params);
         break;
     }
     case 1:
@@ -29,7 +29,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         params.param2 = -1;
         params.param3 = -1;
         params.param4 = -1;
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_9, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_SHOW_ELECTRIC_FENCE, frame, "", "", &params);
         break;
     }
     case 2:
@@ -99,7 +99,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         {
             params.float1 = 0.0f;
         }
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_7, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_CHARACTER_DIRT, frame, "", "", &params);
         break;
     }
     case 6:
@@ -115,7 +115,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         params.param3 = -1;
         params.param4 = -1;
         params.param1 = triggerParam1;
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_5, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_CROWD_EXCITEMENT, frame, "", "", &params);
         break;
     }
     case 7:
@@ -131,7 +131,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         params.param3 = -1;
         params.param4 = -1;
         params.param1 = triggerParam1;
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_4, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_RUMBLE, frame, "", "", &params);
         break;
     }
     case 8:
@@ -147,7 +147,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         params.param3 = -1;
         params.param4 = -1;
         params.param1 = triggerParam1;
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_6, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_STADIUM_EFFECTS, frame, "", "", &params);
         break;
     }
     case 9:
@@ -161,7 +161,7 @@ void NisPlayer::DoFunctionCall(unsigned int functionId)
         params.param2 = -1;
         params.param3 = -1;
         params.param4 = -1;
-        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_UNIDENTIFIED_10, frame, "", "", &params);
+        mNisForTriggerLoading->AddTrigger(NIS_TRIGGER_TYPE_HIDE_ELECTRIC_FENCE, frame, "", "", &params);
         break;
     }
     case 10:

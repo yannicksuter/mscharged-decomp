@@ -469,7 +469,8 @@ void ParticleSystem::CreateNewParticles(int numParticles)
 void ParticleSystem::UpdateAllParticles(float dt,
     const nlMatrix4* pCoordSys)
 {
-    nlDLListIterator<Particle*> iterator = m_Particles.Begin();
+    nlDLListIterator<Particle*> iterator;
+    iterator = m_Particles.Begin();
     while (iterator.hasNext())
     {
         Particle* p = *iterator;
@@ -482,7 +483,7 @@ void ParticleSystem::UpdateAllParticles(float dt,
                 tDebugPrintManager::Print(DC_RENDER, "OnParticleDeath: %d\n",
                     m_pTemplate->mUnidentified048);
             }
-            m_Particles.Remove(&iterator);
+            m_Particles.Remove(&iterator, 0);
             --m_NumParticles;
             m_pFreeParticles->AddEnd(p);
         }
@@ -736,7 +737,8 @@ static void RenderLightOnField(GLView* view, const EffectsLight& light)
 
 void ParticleSystem::ClearParticles()
 {
-    nlDLListIterator<Particle*> iterator = m_Particles.Begin();
+    nlDLListIterator<Particle*> iterator;
+    iterator = m_Particles.Begin();
     while (iterator.hasNext())
     {
         Particle* pPart = *iterator;
@@ -834,7 +836,8 @@ int ParticleSystem::RenderAllParticles(GLView* view)
     if (m_pSpec != 0 && m_pSpec->m_bLight)
     {
         pCoord = m_pTemplate->IsLocalSpace() ? pCoord : 0;
-        nlDLListIterator<Particle*> iterator = m_Particles.Begin();
+        nlDLListIterator<Particle*> iterator;
+        iterator = m_Particles.Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
@@ -873,7 +876,8 @@ int ParticleSystem::RenderAllParticles(GLView* view)
         }
 
         pCoord = m_pTemplate->IsLocalSpace() ? pCoord : 0;
-        nlDLListIterator<Particle*> iterator = m_Particles.Begin();
+        nlDLListIterator<Particle*> iterator;
+        iterator = m_Particles.Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
@@ -974,7 +978,8 @@ int ParticleSystem::RenderAllParticles(GLView* view)
         if (began)
         {
             pCoord = m_pTemplate->IsLocalSpace() ? pCoord : 0;
-            nlDLListIterator<Particle*> iterator = m_Particles.Begin();
+            nlDLListIterator<Particle*> iterator;
+            iterator = m_Particles.Begin();
             while (iterator.hasNext())
             {
                 Particle* pPart = *iterator;

@@ -1,6 +1,6 @@
 #include "Game/AI/Scripts/ScriptCaching.h"
 #include "Game/AI/FuzzyAIRuntime.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/AIContext.h"
 
 #include "Game/AI/Desire.h"
@@ -49,7 +49,7 @@ FuzzyRuntimeBase* shdStateMachine::GetFuzzyRuntime()
     return mScriptMachine->mAIContext->mRuntime;
 }
 
-FuzzyRuntimeBase* UnidentifiedScriptMachine::GetFuzzyRuntime()
+FuzzyRuntimeBase* ScriptMachine::GetFuzzyRuntime()
 {
     return mAIContext->mRuntime;
 }
@@ -764,13 +764,13 @@ extern "C" void FuzzySetActionSelection(
 extern "C" void FuzzySetTransition(
     void*, shdStateMachine* state, const char* name)
 {
-    UnidentifiedScriptMachine* machine = state->mScriptMachine;
+    ScriptMachine* machine = state->mScriptMachine;
     machine->SetTransition(name);
 }
 
 extern "C" bool fn_80314798(void*)
 {
-    return fn_8031A04C();
+    return CheckScriptTimeBudget();
 }
 
 extern "C" UnidentifiedFuzzyRuntimeValue* FuzzyGetCurrentContext(

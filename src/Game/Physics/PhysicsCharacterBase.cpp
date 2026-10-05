@@ -1,4 +1,5 @@
 #include "Game/Physics/PhysicsCharacterBase.h"
+#include "Game/Physics/PhysicsCharacterBaseData.h"
 
 #include "Game/DebugWriteCache.h"
 #include "Game/Physics/CharacterPhysicsElement.h"
@@ -8,10 +9,7 @@
 #include "Game/SHierarchy.h"
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
-
-void dBodySetUpdateMode(dBodyID, int, int);
-dJointID dJointCreateCharacter(dWorldID, dJointGroupID);
-void dJointSetCharacterNoMotionDirection(dJointID, float*);
+#include "ode/NLGAdditions.h"
 
 struct BoneVolumeTypeState
 {
@@ -22,10 +20,6 @@ struct BoneVolumeTypeState
 extern BoneVolumeTypeState s_BoneVolumeType;
 extern char s_BoneIDName[5];
 extern char s_BoneVolumeName[8];
-extern char s_PrevPositionName[15];
-extern char s_TransformHandleName[18];
-extern char s_TransformName[12];
-extern char s_BoneIndexName[12];
 
 PhysicsCharacterBase::PhysicsCharacterBase(
     CollisionSpace*, PhysicsWorld* world, float centreOfMassHeight)

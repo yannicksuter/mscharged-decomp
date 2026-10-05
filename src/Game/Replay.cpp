@@ -9,7 +9,7 @@ const int kFrameCount = 2000;
 bool renderMemoryLayout;
 } // namespace
 
-UnidentifiedReplayFramePool* lbl_806E1E9C;
+ReplayFramePool* g_pReplayFramePool;
 
 Replay::Replay(char* memory, int memorySize, int maxFrameSize)
     : mReels()
@@ -19,11 +19,11 @@ Replay::Replay(char* memory, int memorySize, int maxFrameSize)
     , mMaxFrameSize(maxFrameSize)
     , mActualMaxFrameSize(0)
 {
-    lbl_806E1E9C
-        = new (nlMalloc(sizeof(UnidentifiedReplayFramePool), 8, false))
-            UnidentifiedReplayFramePool(memory);
+    g_pReplayFramePool
+        = new (nlMalloc(sizeof(ReplayFramePool), 8, false))
+            ReplayFramePool(memory);
 
-    Frame* frame = new (lbl_806E1E9C->Allocate())
+    Frame* frame = new (g_pReplayFramePool->Allocate())
         Frame(memory + kFrameCount * sizeof(Frame),
             memorySize - kFrameCount * sizeof(Frame),
             0);
@@ -37,8 +37,8 @@ Replay::Replay(char* memory, int memorySize, int maxFrameSize)
 
 Replay::~Replay()
 {
-    lbl_806E1E9C->Reset();
-    delete lbl_806E1E9C;
+    g_pReplayFramePool->Reset();
+    delete g_pReplayFramePool;
 }
 
 Replay::Frame::Frame(char* begin, int size, Frame* next)
@@ -48,7 +48,7 @@ Replay::Frame::Frame(char* begin, int size, Frame* next)
     mSize = size;
     mInterval = 0;
     mEvents = 0;
-    mUnidentifiedState = 0;
+    mExcitement = 0;
     mReelIdx = -1;
     mNext = next;
 }
@@ -131,7 +131,7 @@ void Replay::NewFrame()
                 mFree->mSize += nextFrame->mSize;
                 mFree->mNext = nextFrame->mNext;
                 mFree->mReelIdx = -1;
-                lbl_806E1E9C->Free(nextFrame);
+                g_pReplayFramePool->Free(nextFrame);
             }
             else
             {
@@ -174,7 +174,7 @@ float Replay::EndTime() const
     return mReels[mReelIdx].mLast->mTime;
 }
 
-extern "C" void fn_802C7FA4(Replay* replay,
+void GetRecordingFrames(Replay* replay,
     Replay::Frame** begin, Replay::Frame** last, Replay::Frame** free)
 {
     *begin = replay->mReels[0].mBegin;
@@ -182,7 +182,7 @@ extern "C" void fn_802C7FA4(Replay* replay,
     *free = replay->mFree;
 }
 
-extern "C" void fn_802C7FC0(Replay* replay,
+void SetRecordingFrames(Replay* replay,
     Replay::Frame* begin, Replay::Frame* last, Replay::Frame* free)
 {
     replay->mReels[0].mBegin = begin;

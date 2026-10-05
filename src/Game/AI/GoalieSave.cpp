@@ -400,7 +400,8 @@ struct MyMiniData
 static inline void InsertSorted(
     nlDLListContainer<MyMiniData*>& list, MyMiniData* data)
 {
-    nlDLListIterator<MyMiniData*> iterator = list.Begin();
+    nlDLListIterator<MyMiniData*> iterator;
+    iterator = list.Begin();
     while (iterator.hasNext())
     {
         if ((*iterator)->dist > data->dist)
@@ -480,7 +481,8 @@ SaveData* GoalieSave::FindBestSave(SaveBlendInfo& blendInfo,
             }
         }
 
-        nlDLListIterator<MyMiniData*> iterator = mylist.Begin();
+        nlDLListIterator<MyMiniData*> iterator;
+        iterator = mylist.Begin();
         iterator.next();
 
         while (iterator.hasNext())

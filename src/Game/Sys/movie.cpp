@@ -25,40 +25,40 @@
 static THPVideoInfo videoInfo;
 static PlatTexture* pTex[4];
 
-static unsigned int lbl_806DFAC0 = -1;
+static unsigned int g_uLastDecodeRenderTick = -1;
 static bool g_bSyncedDecode = true;
 
 static bool g_bActive;
 static bool lbl_806E2419;
-static bool lbl_806E241A;
+static bool g_bTHPInitialized;
 static unsigned char* buffer;
 static bool start;
-static unsigned int lbl_806E2424;
-static unsigned int lbl_806E2428;
-static unsigned int lbl_806E242C;
-static unsigned int lbl_806E2430;
-static bool lbl_806E2434;
-static unsigned int lbl_806E2438;
+static unsigned int g_uCurrentFrame;
+static unsigned int g_uNextDecodeFrame;
+static unsigned int g_uDecodeCount;
+static unsigned int g_uRenderTickCount;
+static bool g_bFinished;
+static unsigned int g_uStartFrame;
 static bool g_bMovieMustStop;
 static unsigned long resourceMarker;
-static unsigned int lbl_806E2444;
+static unsigned int g_uLastPlayFrame;
 
-bool fn_80370E20()
+bool MovieInit()
 {
-    if (lbl_806E241A)
+    if (g_bTHPInitialized)
     {
         return true;
     }
 
     THPSimpleInit(1);
-    lbl_806E241A = true;
+    g_bTHPInitialized = true;
     return true;
 }
 
-bool fn_80370E64()
+bool MovieQuit()
 {
     THPSimpleQuit();
-    lbl_806E241A = false;
+    g_bTHPInitialized = false;
     return true;
 }
 
@@ -129,9 +129,9 @@ bool MovieStart(
     THPSimpleSetBuffer(buffer);
 
     unsigned int frame = glxGetFrameCount();
-    lbl_806E2428 = frame;
-    lbl_806E2438 = frame;
-    lbl_806E242C = 0;
+    g_uNextDecodeFrame = frame;
+    g_uStartFrame = frame;
+    g_uDecodeCount = 0;
 
     if (!THPSimplePreLoad(bLoopMovie != false))
     {
@@ -141,10 +141,10 @@ bool MovieStart(
     }
 
     fn_80372970(bMono);
-    lbl_806E2434 = false;
+    g_bFinished = false;
     start = true;
     g_bActive = true;
-    lbl_806E2424 = 0;
+    g_uCurrentFrame = 0;
     return true;
 }
 
@@ -159,7 +159,7 @@ bool MovieStop()
     lbl_806E2419 = false;
 
     int lastFrame = THPSimpleGetTotalFrame() - 1;
-    int currentFrame = (int)(unsigned int)lbl_806E2424;
+    int currentFrame = (int)(unsigned int)g_uCurrentFrame;
     if ((unsigned int)currentFrame != (unsigned int)lastFrame)
     {
         tDebugPrintManager::Print(DC_RENDER, "MOVIE did not finish playback.\n");
@@ -184,9 +184,9 @@ bool MovieStop()
     return true;
 }
 
-void fn_80371254()
+void MovieRenderTick()
 {
-    ++lbl_806E2430;
+    ++g_uRenderTickCount;
 }
 
 bool MoviePlay()
@@ -198,33 +198,33 @@ bool MoviePlay()
 
     if (g_bMovieMustStop)
     {
-        lbl_806E2434 = true;
+        g_bFinished = true;
         return false;
     }
 
     unsigned int frame = glxGetFrameCount();
-    if (lbl_806E2444 != frame)
+    if (g_uLastPlayFrame != frame)
     {
-        lbl_806E2444 = frame;
+        g_uLastPlayFrame = frame;
     }
 
     bool decode = false;
     if (g_bSyncedDecode)
     {
-        if (frame >= lbl_806E2428)
+        if (frame >= g_uNextDecodeFrame)
         {
             decode = true;
         }
     }
-    else if (lbl_806E2430 != lbl_806DFAC0)
+    else if (g_uRenderTickCount != g_uLastDecodeRenderTick)
     {
         decode = true;
-        lbl_806DFAC0 = lbl_806E2430;
+        g_uLastDecodeRenderTick = g_uRenderTickCount;
     }
 
     if (decode)
     {
-        ++lbl_806E242C;
+        ++g_uDecodeCount;
 
         if (g_bSyncedDecode)
         {
@@ -242,7 +242,7 @@ bool MoviePlay()
         int error = THPSimpleDecode(0);
         if (error == 1 || error == 2)
         {
-            lbl_806E2434 = true;
+            g_bFinished = true;
             return false;
         }
 
@@ -252,8 +252,8 @@ bool MoviePlay()
             start = false;
         }
 
-        ++lbl_806E2424;
-        lbl_806E2428 = frame + 2;
+        ++g_uCurrentFrame;
+        g_uNextDecodeFrame = frame + 2;
 
         GXInvalidateTexAll();
         pTex[0]->Prepare();
@@ -275,15 +275,15 @@ bool IsMovieActive()
 
 bool IsMovieFinished()
 {
-    return lbl_806E2434;
+    return g_bFinished;
 }
 
 void ClearMovieFinished()
 {
-    lbl_806E2434 = false;
+    g_bFinished = false;
 }
 
 unsigned int GetMovieFrame()
 {
-    return lbl_806E2424;
+    return g_uCurrentFrame;
 }

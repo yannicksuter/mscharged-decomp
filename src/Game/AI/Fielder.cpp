@@ -2,7 +2,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Fielder.inl"
 #include "Game/PoseAccumulator.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/DetInput.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/RumbleActions.h"
@@ -55,7 +55,6 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/CharacterTriggers.h"
 
-extern "C" void fn_80319E58(UnidentifiedScriptMachine*, int);
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
@@ -239,7 +238,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     mUnidentified428 = new (8, false) AIContext(this,
         new (8, false) FielderDesireMachine(),
         new (8, false) FuzzyAIRuntime());
-    mUnidentified428->mScriptMachine->UnidentifiedVirtual2();
+    mUnidentified428->mScriptMachine->Initialize();
 
     bIsModified = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6)
@@ -294,10 +293,10 @@ float cFielder::fn_8002E058()
 extern "C" Desire* fn_8002E08C(cFielder* pFielder, int nAction)
 {
     shdStateMachine* pAction
-        = fn_80319F94(pFielder->mUnidentified428->mScriptMachine, nAction);
+        = GetScriptMachineState(pFielder->mUnidentified428->mScriptMachine, nAction);
     if (pAction == 0)
     {
-        pAction = fn_80319FC0(
+        pAction = GetConcurrentState(
             pFielder->mUnidentified428->mScriptMachine, nAction);
     }
     return (Desire*)pAction;
@@ -390,7 +389,7 @@ bool cFielder::CanGetElectrocuted(
         {
             bool bUnidentified = false;
             if (mUnidentified024.m_eCharacterClass == MARIO
-                && fn_80319FEC(
+                && IsConcurrentStateActive(
                     mUnidentified428->mScriptMachine, 0x17))
             {
                 bUnidentified = true;
@@ -646,7 +645,7 @@ static inline void GetCharacterSpecialActive(
 
 bool cFielder::fn_8003E6EC() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x17);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17);
 }
 
 void cFielder::SetSlideAttackSuccessFlag()
@@ -661,27 +660,27 @@ FuzzyRuntimeBase* cFielder::GetFuzzyRuntime() const
 
 bool cFielder::fn_8003E6FC() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x18);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x18);
 }
 
 bool cFielder::fn_8003E70C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E);
 }
 
 bool cFielder::fn_8003E71C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x19);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x19);
 }
 
 bool cFielder::fn_8003E72C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1A);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1A);
 }
 
 bool cFielder::fn_8003E73C() const
 {
-    return fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C);
+    return IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C);
 }
 
 bool cFielder::fn_8003E74C() const
@@ -717,7 +716,7 @@ bool cFielder::fn_8003E9F0() const
 {
     bool result = false;
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0xB
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
     {
         result = true;
     }
@@ -828,7 +827,7 @@ bool cFielder::CanReceivePass()
     if (bCondition6)
     {
         DesireFrozen* pAction = (DesireFrozen*)
-            fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+            GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
         bool bActionActive = false;
         if (pAction != 0 && pAction->mActive
             && pAction->meFrozenState != 0)
@@ -846,13 +845,13 @@ bool cFielder::CanReceivePass()
 
 void cFielder::Unknown8(unsigned short aParam, bool bParam)
 {
-    if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E))
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E))
     {
         DesireConfused* pAction = (DesireConfused*)
-            fn_80319F94(mUnidentified428->mScriptMachine, 0x1E);
+            GetScriptMachineState(mUnidentified428->mScriptMachine, 0x1E);
         if (pAction == 0)
         {
-            pAction = (DesireConfused*)fn_80319FC0(
+            pAction = (DesireConfused*)GetConcurrentState(
                 mUnidentified428->mScriptMachine, 0x1E);
         }
         pAction->fn_800BED24(&aParam);
@@ -864,10 +863,10 @@ void cFielder::Unknown8(unsigned short aParam, bool bParam)
 void cFielder::fn_8003057C(int nParam)
 {
     DesireSteering* pAction = (DesireSteering*)
-        fn_80319F94(mUnidentified428->mScriptMachine, 0x22);
+        GetScriptMachineState(mUnidentified428->mScriptMachine, 0x22);
     if (pAction == 0)
     {
-        pAction = (DesireSteering*)fn_80319FC0(
+        pAction = (DesireSteering*)GetConcurrentState(
             mUnidentified428->mScriptMachine, 0x22);
     }
     pAction->m_ThingsToAvoid = nParam;
@@ -876,10 +875,10 @@ void cFielder::fn_8003057C(int nParam)
 void cFielder::fn_800305DC(float fParam)
 {
     DesireSteering* pAction = (DesireSteering*)
-        fn_80319F94(mUnidentified428->mScriptMachine, 0x22);
+        GetScriptMachineState(mUnidentified428->mScriptMachine, 0x22);
     if (pAction == 0)
     {
-        pAction = (DesireSteering*)fn_80319FC0(
+        pAction = (DesireSteering*)GetConcurrentState(
             mUnidentified428->mScriptMachine, 0x22);
     }
     pAction->m_fAvoidanceMult = fParam;
@@ -1195,7 +1194,7 @@ extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenT
 {
     bool bHasEgg = false;
     if (pFielder->mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17))
+        && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17))
     {
         bHasEgg = true;
     }
@@ -1246,7 +1245,7 @@ extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenT
         }
     }
 
-    ((DesireFrozen*)fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D))
+    ((DesireFrozen*)GetConcurrentState(pFielder->mUnidentified428->mScriptMachine, 0x1D))
         ->fn_800BE0BC(fFrozenTime, nFrozenState);
 }
 
@@ -1256,7 +1255,7 @@ void cFielder::CollideWithWallCallback(
     cPlayer::CollideWithWallCallback(eventData);
 
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+        GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
@@ -1324,9 +1323,9 @@ void cFielder::CollideWithWallCallback(
 
 bool cFielder::IsStuck() const
 {
-    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
+    return ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(1)
-        || ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
+        || ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))
                ->IsUnidentifiedState(2);
 }
 
@@ -1361,8 +1360,8 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
         {
             UnidentifiedVariantCollection params;
             params.Set(7, FuzzyVariant(lbl_806DB750));
-            fn_80319E84(mUnidentified428->mScriptMachine, 0x1E, &params,
-                fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E));
+            ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x1E, &params,
+                IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E));
         }
     }
     else if (type == 2)
@@ -1412,8 +1411,8 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 AddRandomDirt();
                 fn_8001F1C0(1);
             }
-            fn_80319E84(mUnidentified428->mScriptMachine, 0x1B, &params,
-                fn_80319FEC(mUnidentified428->mScriptMachine, 0x1B));
+            ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x1B, &params,
+                IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1B));
         }
     }
     else if (type == 3)
@@ -1451,13 +1450,13 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 return;
             }
             fn_800470B4(this, eventData->mUnidentified10->m_pOwner);
-            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C))
+            if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C))
             {
                 return;
             }
             UnidentifiedVariantCollection params;
             params.Set(14, FuzzyVariant(pOwner));
-            fn_80319E84(mUnidentified428->mScriptMachine, 0x1C, &params, false);
+            ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x1C, &params, false);
         }
     }
     else if (type == 6)
@@ -1490,7 +1489,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 12)
     {
-        fn_80319E84(mUnidentified428->mScriptMachine, 0x19, 0, true);
+        ActivateConcurrentState(mUnidentified428->mScriptMachine, 0x19, 0, true);
     }
     else if (type == 8 || type == 9)
     {
@@ -1786,7 +1785,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_tMoveToTurboTimer.UnidentifiedClear();
         if (fn_8003EA6C())
         {
-            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+            if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
             {
                 RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
             }
@@ -1810,7 +1809,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         mUnidentified1E4.m_eLastPadAction = 50;
         if (fn_8003EA6C())
         {
-            if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+            if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
             {
                 RequestStateMachineDeactivation(fn_8002E08C(this, 0x17));
             }
@@ -2011,7 +2010,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         {
             bool bExcluded
                 = pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG
-               && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
+               && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17);
             if (!bExcluded)
             {
                 bCondition4 = true;
@@ -2022,7 +2021,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         {
             bool bExcluded
                 = pFielder->mUnidentified024.m_eCharacterClass == WALUIGI
-               && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17);
+               && IsConcurrentStateActive(pFielder->mUnidentified428->mScriptMachine, 0x17);
             if (!bExcluded)
             {
                 bCondition5 = true;
@@ -2392,9 +2391,9 @@ void cFielder::DoRegularShooting(bool bParam)
     if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
     {
         nBallState = 8;
-        if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1C))
+        if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1C))
         {
-            fn_80319E58(mUnidentified428->mScriptMachine, 0x1C);
+            DeactivateConcurrentState(mUnidentified428->mScriptMachine, 0x1C);
         }
         if (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12)
         {
@@ -2760,7 +2759,7 @@ bool cFielder::IsFallenDown() const
 bool cFielder::fn_80038918() const
 {
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+        GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
     return pAction != 0 && pAction->mActive && pAction->meFrozenState != 0;
 }
 
@@ -2827,7 +2826,7 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
 
     bool bUnidentified = false;
     if (mUnidentified024.m_eCharacterClass == TOAD
-        && fn_80319FEC(mUnidentified428->mScriptMachine, 0x17))
+        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
     {
         bUnidentified = true;
     }
@@ -2850,7 +2849,7 @@ bool cFielder::InitDesire(eFielderDesireState eDesireType, float fConfidence,
     params.Set(1, FuzzyVariant(opt2));
 
     bool bDesireInitSuccess = mUnidentified428->mScriptMachine
-        ->UnidentifiedVirtual5(eDesireType, &params, true) != 0;
+        ->ActivateState(eDesireType, &params, true) != 0;
     return bDesireInitSuccess;
 }
 
@@ -2866,7 +2865,7 @@ void cFielder::PrePhysicsUpdate()
     cPlayer::PrePhysicsUpdate();
 
     DesireFrozen* pAction = (DesireFrozen*)
-        fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
+        GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D);
     bool bActionActive = false;
     if (pAction != 0 && pAction->mActive
         && pAction->meFrozenState != 0)
@@ -2930,13 +2929,13 @@ void cFielder::Update(float fDeltaT)
 
 ePowerUpType cFielder::GetPowerupType()
 {
-    return ((DesireUsePowerup*)fn_80319FC0(
+    return ((DesireUsePowerup*)GetConcurrentState(
         mUnidentified428->mScriptMachine, 0x11))->GetPowerupType();
 }
 
 void cFielder::UseTeamPowerup(cFielder* pTarget)
 {
-    ((DesireUsePowerup*)fn_80319FC0(
+    ((DesireUsePowerup*)GetConcurrentState(
         mUnidentified428->mScriptMachine, 0x11))->fn_800D3968(
         pTarget, POWER_UP_NONE, true);
 }
@@ -3262,7 +3261,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         return;
     }
 
-    if (fn_80319FEC(mUnidentified428->mScriptMachine, 0x1E)
+    if (IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x1E)
         && !IsFallenDown()
         && (mUnidentified024.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
     {
@@ -4067,17 +4066,17 @@ void cFielder::Unknown12(RunningChecksum* pChecksum)
     pChecksum->ChecksumData(&m_eRole, sizeof(m_eRole));
 }
 
-UnidentifiedScriptMachine* fn_8002E1A4(cFielder* pFielder)
+ScriptMachine* fn_8002E1A4(cFielder* pFielder)
 {
     return pFielder->mUnidentified428->mScriptMachine;
 }
 
 eFielderDesireState cFielder::fn_8002E060()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
-    if (machine != 0 && machine->mUnidentified004 != 0)
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
+    if (machine != 0 && machine->mActiveState != 0)
     {
-        return (eFielderDesireState)machine->mUnidentified004->mState;
+        return (eFielderDesireState)machine->mActiveState->mState;
     }
     return (eFielderDesireState)-1;
 }
@@ -4096,14 +4095,13 @@ PlayerTweaks* cFielder::GetTweaks() const
     return m_pTweaks;
 }
 
-extern "C" void fn_803198F4(UnidentifiedScriptMachine* machine);
 
 void cFielder::EndDesire()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0)
     {
-        fn_803198F4(machine);
+        DeactivateScriptMachine(machine);
     }
 }
 
@@ -4140,20 +4138,20 @@ void cFielder::IncrementPowerupMeter(int nParam, float fAmount)
 
 void cFielder::fn_8002E0FC()
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
     if (machine != 0)
     {
-        fn_803198F4(machine);
-        fn_80319DA0(mUnidentified428->mScriptMachine);
+        DeactivateScriptMachine(machine);
+        DeactivateConcurrentStates(mUnidentified428->mScriptMachine);
     }
 }
 
 int cFielder::fn_8002E9D0() const
 {
-    UnidentifiedScriptMachine* machine = mUnidentified428->mScriptMachine;
-    if (machine != 0 && machine->mUnidentified008 != 0)
+    ScriptMachine* machine = mUnidentified428->mScriptMachine;
+    if (machine != 0 && machine->mPreviousState != 0)
     {
-        return machine->mUnidentified008->mState;
+        return machine->mPreviousState->mState;
     }
     return -1;
 }
@@ -4163,9 +4161,9 @@ bool cFielder::fn_8003499C() const
     bool result = false;
     int state;
     if (mUnidentified428->mScriptMachine != 0
-        && mUnidentified428->mScriptMachine->mUnidentified004 != 0)
+        && mUnidentified428->mScriptMachine->mActiveState != 0)
     {
-        state = mUnidentified428->mScriptMachine->mUnidentified004
+        state = mUnidentified428->mScriptMachine->mActiveState
                     ->GetState();
     }
     else
@@ -4175,7 +4173,7 @@ bool cFielder::fn_8003499C() const
     if (state == 0x16)
     {
         result = ((DesireReceivePass*)
-            mUnidentified428->mScriptMachine->mUnidentified004)->fn_800C0E54();
+            mUnidentified428->mScriptMachine->mActiveState)->fn_800C0E54();
     }
     return result;
 }

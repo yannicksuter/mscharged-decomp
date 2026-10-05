@@ -10,13 +10,12 @@
 #include "NL/nlString.h"
 #include "Game/TweakValue.inl"
 
-extern const char sUnidentifiedHomeSkillCategory[];
-extern const char sUnidentifiedAwaySkillCategory[];
-extern char sTerrainTweakCategory[];
+extern const char sHomeSkillTweakCategory[];
+extern const char sAwaySkillTweakCategory[];
 
 static const char* sSkillTweakCategories[2] = {
-    sUnidentifiedHomeSkillCategory,
-    sUnidentifiedAwaySkillCategory,
+    sHomeSkillTweakCategory,
+    sAwaySkillTweakCategory,
 };
 
 TweakFileLoader gTweakFileLoader;
@@ -37,7 +36,7 @@ void InitializeGameTweaks(GameTweaksManager* state)
         TerrainTweaks(terrainName, sTerrainTweakCategory);
     state->mTerrainTweaks = terrainTweaks;
 
-    state->mUnidentified08 = GetStadiumUnknown0x0C(stadium);
+    state->mWeatherType = GetStadiumUnknown0x0C(stadium);
     state->mUnidentified0C = GetStadiumUnknown0x11(stadium);
 
     GameTweaks* gameTweaks = new (8, false)
@@ -48,10 +47,10 @@ void InitializeGameTweaks(GameTweaksManager* state)
         new (nlMalloc(sizeof(FielderTweaks), 8, false))
             FielderTweaks("/ini/CharTweaks.ini", "/Game/Characters");
 
-    state->mUnidentified18[0] =
+    state->mSkillTweaks[0] =
         new (nlMalloc(sizeof(SkillTweaks), 8, false))
             SkillTweaks(sSkillTweakCategories[0]);
-    state->mUnidentified18[1] =
+    state->mSkillTweaks[1] =
         new (nlMalloc(sizeof(SkillTweaks), 8, false))
             SkillTweaks(sSkillTweakCategories[1]);
 
@@ -115,8 +114,8 @@ void InitializeGameTweaks(GameTweaksManager* state)
         GameInfoManager::Instance()->mCurrentDifficulty[0] = difficulties[0];
         GameInfoManager::Instance()->mCurrentDifficulty[1] = difficulties[1];
     }
-    state->mUnidentified18[0]->Init(difficulties[0], true, false);
-    state->mUnidentified18[1]->Init(difficulties[1], true, false);
+    state->mSkillTweaks[0]->Init(difficulties[0], true, false);
+    state->mSkillTweaks[1]->Init(difficulties[1], true, false);
 }
 
 bool UpdateGameTweaksLoading(GameTweaksManager*)
@@ -144,16 +143,16 @@ void DestroyGameTweaks(GameTweaksManager* state)
         state->mFielderTweaks = 0;
     }
 
-    if (state->mUnidentified18[0] != 0)
+    if (state->mSkillTweaks[0] != 0)
     {
-        delete state->mUnidentified18[0];
-        state->mUnidentified18[0] = 0;
+        delete state->mSkillTweaks[0];
+        state->mSkillTweaks[0] = 0;
     }
 
-    if (state->mUnidentified18[1] != 0)
+    if (state->mSkillTweaks[1] != 0)
     {
-        delete state->mUnidentified18[1];
-        state->mUnidentified18[1] = 0;
+        delete state->mSkillTweaks[1];
+        state->mSkillTweaks[1] = 0;
     }
 }
 

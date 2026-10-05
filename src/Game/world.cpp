@@ -110,8 +110,8 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
 
     if (uFlags & 2)
     {
-        nlDLListIterator<WorldListObject0_80340AC8*> iterator
-            = m_objectList0.Begin();
+        nlDLListIterator<WorldListObject0_80340AC8*> iterator;
+        iterator = m_objectList0.Begin();
         while (iterator.hasNext())
         {
             if (*iterator == (WorldListObject0_80340AC8*)pObject)
@@ -125,8 +125,8 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
 
     if (uFlags & 4)
     {
-        nlDLListIterator<WorldListObject1_80340AC8*> iterator
-            = m_objectList1.Begin();
+        nlDLListIterator<WorldListObject1_80340AC8*> iterator;
+        iterator = m_objectList1.Begin();
         while (iterator.hasNext())
         {
             if (*iterator == (WorldListObject1_80340AC8*)pObject)
@@ -139,8 +139,8 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
 
         if (pObject->m_uObjectCreationFlags & 4)
         {
-            nlDLListIterator<WorldUpdateObject_80341BC8*> updateIterator
-                = m_updateObjects.Begin();
+            nlDLListIterator<WorldUpdateObject_80341BC8*> updateIterator;
+            updateIterator = m_updateObjects.Begin();
             while (updateIterator.hasNext())
             {
                 if (*updateIterator
@@ -388,8 +388,8 @@ void World::Render()
 
     if (m_bRenderingEnabled)
     {
-        nlDLListIterator<WorldListObject0_80340AC8*> iterator
-            = m_objectList0.Begin();
+        nlDLListIterator<WorldListObject0_80340AC8*> iterator;
+        iterator = m_objectList0.Begin();
         while (iterator.hasNext())
         {
             if (((DrawableObject*)*iterator)
@@ -425,8 +425,8 @@ void World::Update(float fDeltaT, bool bUpdateState)
         }
     }
 
-    nlDLListIterator<WorldUpdateObject_80341BC8*> iterator
-        = m_updateObjects.Begin();
+    nlDLListIterator<WorldUpdateObject_80341BC8*> iterator;
+    iterator = m_updateObjects.Begin();
     while (iterator.hasNext())
     {
         (*iterator)->Update(fDeltaT);

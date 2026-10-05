@@ -89,7 +89,8 @@ static inline void DestroyImpostorSprites(
 
 ImpostorCharacter::~ImpostorCharacter()
 {
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     DestroyImpostorSprites(mSprites, it);
 }
 
@@ -122,7 +123,8 @@ void ImpostorCharacter::Acquire(Impostor* impostor)
     DLListEntry<ImpostorSprite*>* entry;
     int index = (int)pick;
     int current = 0;
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     head = it.m_Head;
     entry = it.m_Curr;
     while (entry != 0)
@@ -153,7 +155,8 @@ void ImpostorCharacter::Acquire(Impostor* impostor)
 
 void ImpostorCharacter::ReleaseSprites()
 {
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
@@ -173,7 +176,8 @@ void ImpostorCharacter::ReleaseSprites()
 void ImpostorCharacter::UpdateView(const nlVector3* direction,
     const nlVector3* up)
 {
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
@@ -196,7 +200,8 @@ void ImpostorCharacter::UpdateSprites(int period, int slot)
     DLListEntry<ImpostorSprite*>* entry;
     int lastTexture = -1;
 
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     head = it.m_Head;
     entry = it.m_Curr;
     while (entry != 0)
@@ -233,7 +238,8 @@ void ImpostorCharacter::UpdateSprites(int period, int slot)
 
 void ImpostorCharacter::EnableSprites(bool enable)
 {
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)
@@ -254,7 +260,8 @@ void ImpostorCharacter::EnableSprites(bool enable)
 
 void ImpostorCharacter::RegisterSprites(GLView* parentView)
 {
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)

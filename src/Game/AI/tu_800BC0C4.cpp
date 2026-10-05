@@ -66,31 +66,35 @@ bool DesireStar::Reinitialize(void* context)
     return result;
 }
 
+static inline bool IsSidekick(const cFielder* fielder)
+{
+    return !fielder->IsCaptain();
+}
+
 /**
  * Offset/Address/Size: 0xDC | 0x800BC1A0 | size: 0x58C
  */
-void DesireStar::Update(
-    DesireUpdate* update, float fDeltaT)
+void DesireStar::Update(DesireUpdate* update, float fDeltaT)
 {
     eFielderActionState action = m_pFielder->m_eActionState;
     if (action == ACTION_SHOOT_TO_SCORE
         || (action == ACTION_UNKNOWN_30
             && m_pFielder->m_pShotMeter->m_eShotMeterState
                 == SHOT_METER_STS_ACTIVE
-            && !m_pFielder->IsCaptain()))
+            && IsSidekick(m_pFielder)))
     {
-        mAgeTimer.Countup(
-            fDeltaT * lbl_806DC180 - fDeltaT, 10.0f);
+        float scaledDeltaT = fDeltaT * lbl_806DC180;
+        mAgeTimer.Countup(scaledDeltaT - fDeltaT, 10.0f);
     }
 
-    action = m_pFielder->m_eActionState;
-    if (action == ACTION_SHOT || action == ACTION_UNKNOWN_32
-        || action == (eFielderActionState)0x21)
+    switch (m_pFielder->m_eActionState)
     {
+    case ACTION_SHOT:
+    case ACTION_UNKNOWN_32:
+    case (eFielderActionState)0x21:
         *update = 1;
-    }
-    else
-    {
+        break;
+    default:
         if (!m_pFielder->IsInvincible())
         {
             m_pFielder->muInvincibleStatus |= 0x1F;
@@ -100,6 +104,7 @@ void DesireStar::Update(
         {
             *update = 1;
         }
+        break;
     }
 }
 

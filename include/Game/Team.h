@@ -14,7 +14,7 @@ class Goalie;
 class FormationManager;
 class AIContext;
 class FuzzyRuntimeBase;
-class UnidentifiedScriptMachine;
+class ScriptMachine;
 
 enum eTeamSide
 {
@@ -151,7 +151,7 @@ public:
 
 extern cTeam* g_pTeams[];
 extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam*);
-extern "C" UnidentifiedScriptMachine* fn_800A6968(cTeam*);
+extern "C" ScriptMachine* fn_800A6968(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
 
 class SkillTweaks;

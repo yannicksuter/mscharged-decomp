@@ -8,7 +8,7 @@
 
 #include "Game/AI/Fuzzy.h"
 #include "Game/AI/DesireUpdate.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/Field.h"
 #include "Game/Game.h"
@@ -316,9 +316,9 @@ void cFielder::fn_8005001C(bool bForce)
                     }
                 }
                 fn_8002FE54(this);
-                if (fn_80319FEC(fn_8002E1A4(this), 0x23))
+                if (IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
                 {
-                    fn_80319E58(fn_8002E1A4(this), 0x23);
+                    DeactivateConcurrentState(fn_8002E1A4(this), 0x23);
                 }
                 StopSound(0x8A9FCF66, this);
             }
@@ -425,9 +425,9 @@ bool cFielder::TurnOnSuperPowerTank()
         }
         InitMovementCoast();
         mUnidentified024.m_fLeanAmount = 0.0f;
-        if (!fn_80319FEC(fn_8002E1A4(this), 0x23))
+        if (!IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
         {
-            fn_80319E84(fn_8002E1A4(this), 0x23, 0, 0);
+            ActivateConcurrentState(fn_8002E1A4(this), 0x23, 0, 0);
         }
     }
     else if (mUnidentified024.m_eCharacterClass == PEACH)

@@ -32,16 +32,14 @@ void ShowCupStartOptions();
 
 void StartNewCup();
 
-
-// Shared functions and data from Game/FE/feCupFlow.cpp.
-extern "C" void AdvanceCupFlow(bool);
-extern "C" void UpdateCupBreadcrumbs(int);
-extern "C" void ExitCupToMainMenu();
-extern "C" void ShowNewCupPrompt();
-extern "C" void ShowCupSavePrompt();
-extern "C" void ContinueStrikerCup();
-extern "C" void UpdatePlayButtonText();
-extern "C" void UpdateCupTitleText(TLComponentInstance*, unsigned short*, unsigned long);
-extern "C" void ResetCupFlow();
+void AdvanceCupFlow(bool pad);
+void UpdateCupBreadcrumbs(int currentPage);
+void ExitCupToMainMenu();
+void ShowNewCupPrompt();
+void ShowCupSavePrompt();
+void ContinueStrikerCup();
+void UpdatePlayButtonText();
+void UpdateCupTitleText(TLComponentInstance* component, unsigned short* buffer, unsigned long capacity);
+void ResetCupFlow();
 
 #endif // GAME_SH_CUP_SCENE_HELPERS_H

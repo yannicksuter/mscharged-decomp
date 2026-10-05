@@ -41,7 +41,8 @@ public:
 
     void Deliver(P1 p1, P2 p2, P3 p3)
     {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
         while (iterator.hasNext())
         {
             Listener* listener = &*iterator;
@@ -57,7 +58,8 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
                     (ListenerEntry*)((char*)listener - 8));
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);

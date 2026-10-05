@@ -130,10 +130,10 @@ static inline float FormationMax(float current, float value)
     return value;
 }
 
-void FormationSpec::Init(int id, int iKeyIndex, const char* name, bool field_0x04)
+void FormationSpec::Init(int id, int iKeyIndex, const char* name, bool bEnabled)
 {
     m_ID = id;
-    this->field_0x04 = field_0x04;
+    this->m_bEnabled = bEnabled;
     m_iKeyIndex = iKeyIndex;
     if (name != 0)
     {
@@ -200,11 +200,11 @@ void FormationSet::Init(int id, FormationSpec* formationArray, int numFormations
 
     if (name != 0)
     {
-        nlStrNCpy(field_0x10, name, 32);
+        nlStrNCpy(m_Name, name, 32);
     }
     else
     {
-        field_0x10[0] = 0;
+        m_Name[0] = 0;
     }
 
     if (bCreateCopy)
@@ -226,7 +226,7 @@ void FormationSet::Init(int id, FormationSpec* formationArray, int numFormations
 FormationSpec::FormationSpec()
 {
     m_ID = -1;
-    field_0x04 = true;
+    m_bEnabled = true;
 }
 
 FormationSet::FormationSet()

@@ -1515,7 +1515,7 @@ bool FormationBallPosition::SelectClosestBallFormations(const nlVector2& v2AIBal
     for (int i = 0; i < m_pFormationSet->m_NumFormationDefs && m_NumActiveBallFormations < 4; i++)
     {
         FormationSpec* pSpec = m_pFormationSet->GetFormationSpec(i);
-        if (!pSpec->field_0x04)
+        if (!pSpec->m_bEnabled)
         {
             continue;
         }
@@ -1636,20 +1636,20 @@ FormationSet::~FormationSet()
     }
 }
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(
+UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(
     InterpreterCore* context, const char* name, cTeam* team)
 {
     return EvaluateTeamFuzzyFunctionByName(context, team, name);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(
+UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(
     InterpreterCore* context, cTeam* team, const char* name)
 {
     unsigned int hash = nlStringHash(name);
     return EvaluateTeamFuzzyFunctionByHash(context, hash, team);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(
+UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(
     InterpreterCore* context, const unsigned int& hash, cTeam* team)
 {
     FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(context);

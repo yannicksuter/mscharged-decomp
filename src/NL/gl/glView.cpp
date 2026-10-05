@@ -54,8 +54,8 @@ public:
 
 static DefaultGLViewInterface gDefaultViewInterface;
 
-class UnidentifiedPacketSorterTree_8052E504
-    : public nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
+class GLPacketSorterTree
+    : public nlAVLTreeSlotPool<long, GLPacketSorter*,
           DefaultKeyCompare<long> >
 {
 public:
@@ -64,8 +64,8 @@ public:
         return nlMalloc(size, 8, false);
     }
 
-    UnidentifiedPacketSorterTree_8052E504(int initial, int delta)
-        : nlAVLTreeSlotPool<long, UnidentifiedPacketSorter*,
+    GLPacketSorterTree(int initial, int delta)
+        : nlAVLTreeSlotPool<long, GLPacketSorter*,
               DefaultKeyCompare<long> >(initial, delta)
     {
     }
@@ -167,12 +167,12 @@ void gl_ViewStartup()
 {
 }
 
-class UnidentifiedPacketSorterIterator
+class GLPacketSorterIterator
 {
 public:
-    typedef AVLTreeEntry<long, UnidentifiedPacketSorter*> Entry;
+    typedef AVLTreeEntry<long, GLPacketSorter*> Entry;
 
-    UnidentifiedPacketSorterIterator()
+    GLPacketSorterIterator()
         : m_NumStackEntries(0)
     {
     }
@@ -209,7 +209,7 @@ public:
     unsigned int m_NumStackEntries;
 };
 
-inline void UnidentifiedPacketSorterIterator::PushLeft(Entry* entry)
+inline void GLPacketSorterIterator::PushLeft(Entry* entry)
 {
     while (entry->node.left != 0)
     {
@@ -223,29 +223,29 @@ inline void UnidentifiedPacketSorterIterator::PushLeft(Entry* entry)
 
 static const char* s_UninitializedViewName = "<uninitialized>";
 
-UnidentifiedPacketSorter* fn_802CEF1C()
+GLPacketSorter* CreateTexturePacketSorter()
 {
-    return new UnidentifiedPacketSorter_8052E2D8;
+    return new GLTexturePacketSorter;
 }
 
-UnidentifiedPacketSorter* fn_802CEF74()
+GLPacketSorter* CreateReversePacketSorter()
 {
-    return new UnidentifiedPacketSorter_8052E540;
+    return new GLReversePacketSorter;
 }
 
-UnidentifiedPacketSorter* fn_802CEFC0()
+GLPacketSorter* CreateUnsortedPacketSorter()
 {
-    return new UnidentifiedPacketSorter_8052E554;
+    return new GLUnsortedPacketSorter;
 }
 
-UnidentifiedPacketSorter* fn_802CF00C()
+GLPacketSorter* CreateTransformedMatrixDepthPacketSorter()
 {
-    return new UnidentifiedPacketSorter_8052E2A8;
+    return new GLTransformedMatrixDepthPacketSorter;
 }
 
-UnidentifiedPacketSorter* fn_802CF068()
+GLPacketSorter* CreateTransformedDepthPacketSorter()
 {
-    return new UnidentifiedPacketSorter_8052E2C0;
+    return new GLTransformedDepthPacketSorter;
 }
 
 GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
@@ -260,29 +260,29 @@ GLView::GLView(GLViewInterface* interface, const GLRenderPair& renderPair,
     m_Interface = interface;
     m_Parent = 0;
 
-    UnidentifiedPacketSorterFactory createSorter;
+    GLPacketSorterFactory createSorter;
 
     switch (sortMode)
     {
     case GLViewSort_TransformedDepth:
-        createSorter = fn_802CF068;
+        createSorter = CreateTransformedDepthPacketSorter;
         break;
     case GLViewSort_TransformedMatrixDepth:
-        createSorter = fn_802CF00C;
+        createSorter = CreateTransformedMatrixDepthPacketSorter;
         break;
     case GLViewSort_None:
-        createSorter = fn_802CEFC0;
+        createSorter = CreateUnsortedPacketSorter;
         break;
     case GLViewSort_Reverse:
-        createSorter = fn_802CEF74;
+        createSorter = CreateReversePacketSorter;
         break;
     default:
-        createSorter = fn_802CEF1C;
+        createSorter = CreateTexturePacketSorter;
         break;
     }
 
     m_CreateSorter = createSorter;
-    m_Sorters = new UnidentifiedPacketSorterTree_8052E504(16, 16);
+    m_Sorters = new GLPacketSorterTree(16, 16);
     m_Viewport.x = 0;
     m_Viewport.y = 0;
     m_Viewport.width = glGetScreenWidth();
@@ -305,8 +305,8 @@ inline GLView::GLView()
     m_TriangleCount = 0;
     m_Interface = &gDefaultViewInterface;
     m_Parent = 0;
-    m_CreateSorter = fn_802CEF1C;
-    m_Sorters = new UnidentifiedPacketSorterTree_8052E504(16, 16);
+    m_CreateSorter = CreateTexturePacketSorter;
+    m_Sorters = new GLPacketSorterTree(16, 16);
     m_Viewport.x = 0;
     m_Viewport.y = 0;
     m_Viewport.width = glGetScreenWidth();
@@ -319,16 +319,16 @@ inline GLView::GLView()
     m_Visible = true;
 }
 
-inline UnidentifiedPacketSorter* GLView::GetSorter(long sortKey)
+inline GLPacketSorter* GLView::GetSorter(long layer)
 {
-    UnidentifiedPacketSorter* sorter;
-    UnidentifiedPacketSorter** foundSorter;
+    GLPacketSorter* sorter;
+    GLPacketSorter** foundSorter;
     AVLTreeNode* existingNode;
-    if (!m_Sorters->FindGet(sortKey, &foundSorter))
+    if (!m_Sorters->FindGet(layer, &foundSorter))
     {
         sorter = m_CreateSorter();
         m_Sorters->AddAVLNode((AVLTreeNode**)&m_Sorters->m_Root,
-            &sortKey,
+            &layer,
             &sorter,
             &existingNode);
         return sorter;
@@ -347,20 +347,20 @@ GLView::~GLView()
     delete m_Sorters;
 }
 
-void GLView::AttachPacket(const glModelPacket* packet, unsigned long sortKey)
+void GLView::AttachPacket(const glModelPacket* packet, unsigned long layer)
 {
-    GetSorter(sortKey)->fn_10(this, packet);
+    GetSorter(layer)->AttachPacket(this, packet);
 }
 
-void GLView::AttachModel(const glModel* model, unsigned long sortKey)
+void GLView::AttachModel(const glModel* model, unsigned long layer)
 {
-    UnidentifiedPacketSorter& sorter = *GetSorter(sortKey);
+    GLPacketSorter& sorter = *GetSorter(layer);
     unsigned long packetOffset;
     unsigned long index;
     for (index = 0, packetOffset = 0; index < model->numPackets;
          packetOffset += sizeof(glModelPacket), ++index)
     {
-        sorter.fn_10(this,
+        sorter.AttachPacket(this,
             (const glModelPacket*)((const u8*)model->packets + packetOffset));
     }
 }
@@ -374,7 +374,7 @@ void GLView::Iterate(GLViewPacketCallback callback)
     BeginRender();
 
     PacketCallbackManager callbackManager(this, callback);
-    UnidentifiedPacketSorterIterator iterator;
+    GLPacketSorterIterator iterator;
     iterator.Initialize(m_Sorters->m_Root);
 
     if (iterator.IsValid())
@@ -382,8 +382,8 @@ void GLView::Iterate(GLViewPacketCallback callback)
 
     while (iterator.IsValid())
     {
-        UnidentifiedPacketSorter* sorter = iterator.Current()->value;
-        const glModelPacket* packet = sorter->fn_08();
+        GLPacketSorter* sorter = iterator.Current()->value;
+        const glModelPacket* packet = sorter->First();
         while (packet != 0)
         {
             m_TriangleCount += glGetNumTriangles(
@@ -391,7 +391,7 @@ void GLView::Iterate(GLViewPacketCallback callback)
             BeginPacket(packet);
             callbackManager.DoCallback(packet, 1);
             EndPacket(packet);
-            packet = sorter->fn_0C();
+            packet = sorter->Next();
         }
         iterator.Next();
     }

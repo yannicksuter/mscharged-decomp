@@ -4,9 +4,6 @@
 
 #include <math.h>
 
-extern int __float_nan[];
-extern int __float_huge[];
-
 struct nlATanCoefficients
 {
     float values[8];

@@ -207,8 +207,8 @@ extern "C" AudioRpcRuntimeNode* AddAudioRpcRuntimeNode(
 extern "C" void RemoveAudioRpcRuntimeNodes(
     AudioRpcController* controller, SoundInstance* owner)
 {
-    nlDLListIterator<AudioRpcRuntimeNode*> iterator =
-        controller->dynamicNodes->Begin();
+    nlDLListIterator<AudioRpcRuntimeNode*> iterator;
+    iterator = controller->dynamicNodes->Begin();
     while (iterator.hasNext())
     {
         if (owner == (*iterator)->soundInstance)

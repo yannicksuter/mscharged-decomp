@@ -179,13 +179,13 @@ struct GameTweaksManager
     GameTweaksManager()
         : mTerrainType(1)
         , mTerrainTweaks(0)
-        , mUnidentified08(0)
+        , mWeatherType(0)
         , mUnidentified0C(false)
         , m_pGameTweaks(0)
         , mFielderTweaks(0)
     {
-        mUnidentified18[0] = 0;
-        mUnidentified18[1] = 0;
+        mSkillTweaks[0] = 0;
+        mSkillTweaks[1] = 0;
     }
 
 public:
@@ -193,7 +193,7 @@ public:
 
     /* 0x04 */ TerrainTweaks* mTerrainTweaks;
 
-    /* 0x08 */ int mUnidentified08;
+    /* 0x08 */ int mWeatherType;
     /* 0x0C */ bool mUnidentified0C;
     /* 0x0D */ u8 mPadding0D[3];
 
@@ -201,10 +201,11 @@ public:
     /* 0x14 */ FielderTweaks* mFielderTweaks;
 
 public:
-    /* 0x18 */ SkillTweaks* mUnidentified18[2];
+    /* 0x18 */ SkillTweaks* mSkillTweaks[2];
 }; // total size: 0x20
 
 extern GameTweaksManager gGameTweaks;
+extern char sTerrainTweakCategory[];
 
 void InitializeGameTweaks(GameTweaksManager* state);
 bool UpdateGameTweaksLoading(GameTweaksManager* state);

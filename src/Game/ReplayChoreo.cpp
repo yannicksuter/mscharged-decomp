@@ -186,7 +186,7 @@ void ReplayChoreo::Reset()
 // StartScript inlines both zone helpers. Compiling them first, depth before
 // width, creates the 0.33/0.66/2.0 literals in retail's .sdata2 order; the
 // linker drops the unreferenced out-of-line copies.
-int GetZoneDepth(const ReplayChoreo::UnidentifiedReplayGoalData& data)
+int GetZoneDepth(const ReplayChoreo::ReplayShotData& data)
 {
     float length;
     float distance;
@@ -208,7 +208,7 @@ int GetZoneDepth(const ReplayChoreo::UnidentifiedReplayGoalData& data)
     return zoneDepth;
 }
 
-int GetZoneInWidth(const ReplayChoreo::UnidentifiedReplayGoalData& data)
+int GetZoneInWidth(const ReplayChoreo::ReplayShotData& data)
 {
     int zoneInWidth = 0;
     float shotY = data.v3ShotPosition.y;
@@ -225,7 +225,7 @@ int GetZoneInWidth(const ReplayChoreo::UnidentifiedReplayGoalData& data)
     return zoneInWidth;
 }
 
-void ReplayChoreo::StartScript(const UnidentifiedReplayGoalData& data)
+void ReplayChoreo::StartScript(const ReplayShotData& data)
 {
     if (!mReplay->DidOccurInLastNumSeconds(2, 6.0f))
     {
@@ -340,7 +340,7 @@ void ReplayChoreo::LoadNextHighlight()
         mCurrentHighlight = highlight;
         if (mReplayManager->LoadReplay(highlight->mSlot) == true)
         {
-            fn_802C7FC0(mReplayManager->mReplay, mCurrentHighlight->mBegin, mCurrentHighlight->mEnd, mCurrentHighlight->mCurrent);
+            SetRecordingFrames(mReplayManager->mReplay, mCurrentHighlight->mBegin, mCurrentHighlight->mEnd, mCurrentHighlight->mCurrent);
             mCamera.SetSideOfInterest(mCurrentHighlight->mReplayPad);
             mGoalScoredData = mCurrentHighlight->mGoalScoredData;
         }
@@ -508,7 +508,7 @@ void ReplayChoreo::SaveHighlight(int quality)
                 }
             }
 
-            fn_802C7FA4(mReplayManager->mReplay, &highlight->mBegin, &highlight->mEnd, &highlight->mCurrent);
+            GetRecordingFrames(mReplayManager->mReplay, &highlight->mBegin, &highlight->mEnd, &highlight->mCurrent);
         }
     }
 }

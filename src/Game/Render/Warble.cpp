@@ -137,6 +137,16 @@ static inline int SwizzledIA8Offset(int x, int y)
     return (yOffset | xOffset) << 1;
 }
 
+static inline int IA8TilePixelIndex(unsigned int x, unsigned int y)
+{
+    return ((y & 3) << 2) | (x & 3);
+}
+
+static inline int IA8TileRowIndex(int y, int pixel)
+{
+    return ((y & ~3) << 6) | pixel;
+}
+
 void GenerateWarbleTexture(
     float phase, float frequency, float amplitude)
 {
@@ -169,9 +179,9 @@ void GenerateWarbleTexture(
                 displacement = (int)(amplitude * scaledWave + 128.0f);
             }
 
-            const int pixel = ((y & 3) << 2) | (x & 3);
-            const int tile = ((y & ~3) << 6) | ((x >> 2) << 4);
-            const int offset = (pixel | tile) << 1;
+            const int pixel = IA8TilePixelIndex(x, y);
+            const int rowPixel = IA8TileRowIndex(y, pixel);
+            const int offset = (rowPixel | ((x >> 2) << 4)) << 1;
             const float normalized = (float)(u8)(int)source / 255.0f;
             const int mapped = (int)((float)sWarbleInputExtent + normalized * (float)(sWarbleOutputExtent - sWarbleInputExtent));
             output[offset] = (u8)mapped;
@@ -186,11 +196,11 @@ void GenerateWarbleTexture(
             const int source = SwizzledIA8Offset(x, y);
             const int mirrorX = SwizzledIA8Offset(63 - x, y);
             const int mirrorY = SwizzledIA8Offset(x, 63 - y);
-            const int mirrorXY = SwizzledIA8Offset(63 - x, 63 - y);
             output[mirrorX] = output[source];
             output[mirrorX + 1] = output[source + 1];
             output[mirrorY] = output[source];
             output[mirrorY + 1] = output[source + 1];
+            const int mirrorXY = SwizzledIA8Offset(63 - x, 63 - y);
             output[mirrorXY] = output[source];
             output[mirrorXY + 1] = output[source + 1];
         }

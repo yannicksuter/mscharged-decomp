@@ -220,9 +220,9 @@ public:
     static int m_NumFormationSets;
 };
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(InterpreterCore*, const char*, cTeam*);
-extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(InterpreterCore*, cTeam*, const char*);
-extern "C" UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(InterpreterCore*, const unsigned int&, cTeam*);
+UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(InterpreterCore*, const char*, cTeam*);
+UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(InterpreterCore*, cTeam*, const char*);
+UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(InterpreterCore*, const unsigned int&, cTeam*);
 extern const float g_fFielderOrderPenalty;
 
 #endif // _FORMATION_H_

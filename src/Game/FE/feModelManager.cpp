@@ -526,7 +526,8 @@ FEModelManager::FEModelManager()
 
 void FEModelManager::DestroyDanglingModels()
 {
-    nlDLListIterator<FEModelHandle*> danglingModels = mDanglingModels.Begin();
+    nlDLListIterator<FEModelHandle*> danglingModels;
+    danglingModels = mDanglingModels.Begin();
     while (danglingModels.hasNext())
     {
         FEModelHandle* handle = *danglingModels;
@@ -544,7 +545,8 @@ void FEModelManager::DestroyDanglingModels()
 
 void FEModelManager::DestroyReleasedModels()
 {
-    nlDLListIterator<FEModelHandle*> pendingModels = mReleasedModels.Begin();
+    nlDLListIterator<FEModelHandle*> pendingModels;
+    pendingModels = mReleasedModels.Begin();
     while (pendingModels.hasNext())
     {
         FEModelHandle* handle = *pendingModels;
@@ -573,7 +575,8 @@ FEModelManager::~FEModelManager()
         DestroyModel(*mActiveModels.GetHead());
     }
 
-    nlDLListIterator<FEModelHandle*> loadedModels = mQueuedModels.Begin();
+    nlDLListIterator<FEModelHandle*> loadedModels;
+    loadedModels = mQueuedModels.Begin();
     while (loadedModels.hasNext())
     {
         delete *loadedModels;
@@ -805,7 +808,8 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
 {
     {
         unsigned int nameHash = nlStringLowerHash(name);
-        nlDLListIterator<FEModelHandle*> queued = mQueuedModels.Begin();
+        nlDLListIterator<FEModelHandle*> queued;
+        queued = mQueuedModels.Begin();
         while (queued.hasNext())
         {
             assert((*queued)->mNameHash != nameHash);
@@ -824,7 +828,8 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
 
     FEModelHandle* handle = 0;
     unsigned int nameHash = nlStringLowerHash(name);
-    nlDLListIterator<FEModelHandle*> pending = mReleasedModels.Begin();
+    nlDLListIterator<FEModelHandle*> pending;
+    pending = mReleasedModels.Begin();
     while (pending.hasNext())
     {
         FEModelHandle* current = *pending;
@@ -872,7 +877,8 @@ FEModelHandle* FEModelManager::CreateModel(FEModelType type,
 
 bool FEModelManager::DestroyModel(FEModelHandle* handle)
 {
-    nlDLListIterator<FEModelHandle*> iterator = mQueuedModels.Begin();
+    nlDLListIterator<FEModelHandle*> iterator;
+    iterator = mQueuedModels.Begin();
     while (iterator.hasNext())
     {
         if (*iterator == handle)
@@ -894,7 +900,8 @@ void FEModelManager::BeginLoadModels()
     CurrentAllocator = &VirtualAllocator;
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
 
-    nlDLListIterator<FEModelHandle*> iterator = mQueuedModels.Begin();
+    nlDLListIterator<FEModelHandle*> iterator;
+    iterator = mQueuedModels.Begin();
     while (iterator.hasNext())
     {
         FEModelHandle* handle = *iterator;
@@ -992,7 +999,8 @@ FEImpostorCharacter::FEImpostorCharacter(
 
 void FEImpostorCharacter::Render(GLView* target, int texture)
 {
-    nlDLListIterator<ImpostorSprite*> iterator = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> iterator;
+    iterator = mSprites.Begin();
     while (iterator.hasNext())
     {
         ImpostorSprite* sprite = *iterator;

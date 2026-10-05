@@ -105,7 +105,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         audio->m_SoundInstancePool.Walk(
             Function<bool(Plat3dSoundSrc&)>(Bind<bool>(MemFun(&AudioSystem::UpdateSoundSource), audio, dt, placeholder0)));
         unsigned int count = audio->m_OwnedSoundCount;
-        nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
+        nlDLListIterator<XSoundHandle*> it;
+        it = audio->m_ActiveSoundList.Begin();
         while (it.hasNext() && count != 0)
         {
             XSoundHandle* handle = *it;
@@ -128,7 +129,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         }
     }
     audio->GetBundleManager()->Update(dt);
-    nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
+    nlDLListIterator<XSoundHandle*> it;
+    it = audio->m_ActiveSoundList.Begin();
     while (it.hasNext())
     {
         XSoundHandle* handle = *it;
@@ -144,7 +146,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         }
         it.next();
     }
-    nlDLListIterator<XSoundOwner*> owners = audio->m_SoundOwnerPool.Begin();
+    nlDLListIterator<XSoundOwner*> owners;
+    owners = audio->m_SoundOwnerPool.Begin();
     while (owners.hasNext())
     {
         XSoundOwner* owner = *owners;
@@ -152,7 +155,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
         {
             audio->m_SoundOwnerPool.Remove(&owners);
             DLListEntry<Plat3dSoundSrc>* entry = (DLListEntry<Plat3dSoundSrc>*)((u8*)owner - 8);
-            nlDLListIterator<Plat3dSoundSrc> instance = audio->m_SoundInstancePool.Begin(entry);
+            nlDLListIterator<Plat3dSoundSrc> instance;
+            instance = audio->m_SoundInstancePool.Begin(entry);
             audio->m_SoundInstancePool.Remove(&instance);
         }
         else
@@ -162,7 +166,8 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
 
 void FlushAudio(AudioSystem* audio, int callbackEnabled, bool force)
 {
-    nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
+    nlDLListIterator<XSoundHandle*> it;
+    it = audio->m_ActiveSoundList.Begin();
     while (it.hasNext())
     {
         XSoundHandle* handle = *it;
@@ -181,7 +186,8 @@ void FlushAudio(AudioSystem* audio, int callbackEnabled, bool force)
 
 void PrintAudioSystem(AudioSystem* audio)
 {
-    nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
+    nlDLListIterator<XSoundHandle*> it;
+    it = audio->m_ActiveSoundList.Begin();
     while (it.hasNext())
     {
         (*it)->PrintState();
@@ -194,7 +200,8 @@ void DumpAudioSystem(AudioSystem* audio, const char* path)
     void* file = nlOpenFileDebug(path, false, false);
     if (file != 0)
     {
-        nlDLListIterator<XSoundHandle*> it = audio->m_ActiveSoundList.Begin();
+        nlDLListIterator<XSoundHandle*> it;
+        it = audio->m_ActiveSoundList.Begin();
         while (it.hasNext())
         {
             char buffer[256];

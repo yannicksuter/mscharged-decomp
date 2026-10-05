@@ -20,13 +20,13 @@ enum NisTriggerType
     NIS_TRIGGER_TYPE_TIME_DILATION = 1,
     NIS_TRIGGER_TYPE_RAISE_EVENT = 2,
     NIS_TRIGGER_TYPE_PLAY_SOUND = 3,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_4 = 4,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_5 = 5,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_6 = 6,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_7 = 7,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_8 = 8,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_9 = 9,
-    NIS_TRIGGER_TYPE_UNIDENTIFIED_10 = 10,
+    NIS_TRIGGER_TYPE_RUMBLE = 4,
+    NIS_TRIGGER_TYPE_CROWD_EXCITEMENT = 5,
+    NIS_TRIGGER_TYPE_STADIUM_EFFECTS = 6,
+    NIS_TRIGGER_TYPE_CHARACTER_DIRT = 7,
+    NIS_TRIGGER_TYPE_DEPTH_OF_FIELD = 8,
+    NIS_TRIGGER_TYPE_SHOW_ELECTRIC_FENCE = 9,
+    NIS_TRIGGER_TYPE_HIDE_ELECTRIC_FENCE = 10,
 };
 
 enum NisTarget
@@ -197,8 +197,17 @@ public:
     /* 0xBAC */ bool mScriptStarted;
 };
 
+template <typename T>
+class SlotPool;
+
+struct PendingAnimationRequest
+{
+    Nis::PendingAnimation* animation;
+    bool active;
+};
 
 extern GLView* g_pNisRenderView;
+extern SlotPool<PendingAnimationRequest> g_PendingAnimationRequestPool;
 
 void ClearNisAnimatedCharacters();
 

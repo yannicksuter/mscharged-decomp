@@ -6,7 +6,7 @@
 class LightingLookup;
 class nlVector3;
 
-extern LightingLookup* spImpostorLightingLookup;
+extern LightingLookup* gpImpostorLightingLookup;
 
 nlColour GetImpostorLightingColour(const nlVector3* position);
 void UpdateImpostorLighting();

@@ -43,7 +43,7 @@ public:
     /* 0x004 */ FEAttributeBar* mCaptainAttributeBars[4];
     /* 0x014 */ FEAttributeBar* mSidekickAttributeBars[4];
     /* 0x024 */ u32 mUnidentified24;
-    /* 0x028 */ UnidentifiedTimerList_80306294 mTimers;
+    /* 0x028 */ FETimerList mTimers;
     /* 0x034 */ FEScrollText mScrollText;
     /* 0x074 */ TLComponentInstance* mRootComponent;
     /* 0x078 */ TLComponentInstance* mPDAScreens;

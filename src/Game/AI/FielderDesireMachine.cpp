@@ -1,6 +1,6 @@
 #include "Game/AI/FielderDesireMachine.h"
 #include "Game/AI/FielderDesireTransitions.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/AIContext.h"
 
 #include "Game/AI/AiUtil.h"
@@ -49,7 +49,7 @@ inline cFielder* FielderDesireMachine::GetFielder() const
  * Offset/Address/Size: 0x0 | 0x800D4E2C | size: 0x4C
  */
 FielderDesireMachine::FielderDesireMachine()
-    : UnidentifiedScriptMachine(36, true, false, 0)
+    : ScriptMachine(36, true, false, 0)
 {
 }
 
@@ -63,129 +63,129 @@ FielderDesireMachine::~FielderDesireMachine()
 /**
  * Offset/Address/Size: 0xA4 | 0x800D4ED0 | size: 0xC14
  */
-void FielderDesireMachine::UnidentifiedVirtual2()
+void FielderDesireMachine::Initialize()
 {
-    UnidentifiedScriptMachine::UnidentifiedVirtual2();
+    ScriptMachine::Initialize();
 
     DesireCutAndBreak* cutAndBreak
         = new (8, false) DesireCutAndBreak(1, (void*)TransDesireBallOwner);
-    UnidentifiedAddState(1, cutAndBreak, false);
+    AddState(1, cutAndBreak, false);
 
     DesireDefendPos* defendPos
         = new (8, false) DesireDefendPos(2, (void*)TransDesireDefendPos);
-    UnidentifiedAddState(2, defendPos, false);
+    AddState(2, defendPos, false);
 
     DesireDeke* deke
         = new (8, false) DesireDeke(3, (void*)TransDesireActionDone);
-    UnidentifiedAddState(3, deke, false);
+    AddState(3, deke, false);
 
     DesireDoNothing* doNothing = new (8, false) DesireDoNothing();
-    UnidentifiedAddState(33, doNothing, false);
+    AddState(33, doNothing, false);
 
     DesireFinishAction* finishAction
         = new (8, false) DesireFinishAction(21, (void*)TransDesireActionDone);
-    UnidentifiedAddState(21, finishAction, false);
+    AddState(21, finishAction, false);
 
     DesireGetInPosition* getInPosition
         = new (8, false) DesireGetInPosition(4, (void*)TransDesireBallOwner);
-    UnidentifiedAddState(4, getInPosition, false);
+    AddState(4, getInPosition, false);
 
     DesireGetOpen* getOpen
         = new (8, false) DesireGetOpen(5, (void*)fn_800B4DC0);
-    UnidentifiedAddState(5, getOpen, false);
+    AddState(5, getOpen, false);
 
     DesireHit* hit = new (8, false) DesireHit(6, (void*)TransDesireActionDone);
-    UnidentifiedAddState(6, hit, false);
+    AddState(6, hit, false);
 
     DesireInterceptBall* interceptBall = new (8, false) DesireInterceptBall(7);
-    UnidentifiedAddState(7, interceptBall, false);
+    AddState(7, interceptBall, false);
 
     DesireMark* mark
         = new (8, false) DesireMark(8, (void*)TransDesireBallOwner);
-    UnidentifiedAddState(8, mark, false);
+    AddState(8, mark, false);
 
     DesireMegaStrike* megaStrike = new (8, false) DesireMegaStrike(32);
-    UnidentifiedAddState(32, megaStrike, false);
+    AddState(32, megaStrike, false);
 
     DesirePass* pass
         = new (8, false) DesirePass(14, (void*)TransDesireActionDone);
-    UnidentifiedAddState(14, pass, false);
+    AddState(14, pass, false);
 
     DesirePreparePass* preparePass
         = new (8, false) DesirePreparePass(18, (void*)TransDesireNotBallOwner);
-    UnidentifiedAddState(18, preparePass, false);
+    AddState(18, preparePass, false);
 
     DesireReceivePass* receivePass = new (8, false) DesireReceivePass();
-    UnidentifiedAddState(22, receivePass, false);
+    AddState(22, receivePass, false);
 
     DesireRunToNet* runToNet = new (8, false) DesireRunToNet();
-    UnidentifiedAddState(9, runToNet, false);
+    AddState(9, runToNet, false);
 
     DesireRunUpfield* runUpfield
         = new (8, false) DesireRunUpfield(10, (void*)TransDesireBallOwner);
-    UnidentifiedAddState(10, runUpfield, false);
+    AddState(10, runUpfield, false);
 
     DesireRunDownfield* runDownfield
         = new (8, false) DesireRunDownfield(11, (void*)TransDesireBallOwner);
-    UnidentifiedAddState(11, runDownfield, false);
+    AddState(11, runDownfield, false);
 
     DesireRunInDirection* runInDirection
         = new (8, false) DesireRunInDirection(12, (void*)TransDesireBallOwner);
-    UnidentifiedAddState(12, runInDirection, false);
+    AddState(12, runInDirection, false);
 
     DesireRunToTarget* runToTarget
         = new (8, false) DesireRunToTarget(13, (void*)fn_800B38AC);
-    UnidentifiedAddState(13, runToTarget, false);
+    AddState(13, runToTarget, false);
 
     DesireShoot* shoot
         = new (8, false) DesireShoot(15, (void*)TransDesireNotBallOwner);
-    UnidentifiedAddState(15, shoot, false);
+    AddState(15, shoot, false);
 
     DesireSlideAttack* slideAttack = new (8, false) DesireSlideAttack();
-    UnidentifiedAddState(16, slideAttack, false);
+    AddState(16, slideAttack, false);
 
     DesireUserControlled* userControlled
         = new (8, false) DesireUserControlled();
-    UnidentifiedAddState(20, userControlled, false);
+    AddState(20, userControlled, false);
 
     DesireWait* wait = new (8, false) DesireWait(31);
-    UnidentifiedAddState(31, wait, false);
+    AddState(31, wait, false);
 
     DesireWindupShot* windupShot = new (8, false) DesireWindupShot(19);
-    UnidentifiedAddState(19, windupShot, false);
+    AddState(19, windupShot, false);
 
     DesireStar* star = new (8, false) DesireStar(24);
-    UnidentifiedAddState(24, star, true);
+    AddState(24, star, true);
 
     DesireMushroom* mushroom = new (8, false) DesireMushroom(25);
-    UnidentifiedAddState(25, mushroom, true);
+    AddState(25, mushroom, true);
 
     DesireSlippery* slippery = new (8, false) DesireSlippery(26);
-    UnidentifiedAddState(26, slippery, true);
+    AddState(26, slippery, true);
 
     DesireGooey* gooey = new (8, false) DesireGooey();
-    UnidentifiedAddState(27, gooey, true);
+    AddState(27, gooey, true);
 
     DesireShrink* shrink = new (8, false) DesireShrink(28);
-    UnidentifiedAddState(28, shrink, true);
+    AddState(28, shrink, true);
 
     DesireFrozen* frozen = new (8, false) DesireFrozen(29);
-    UnidentifiedAddState(29, frozen, true);
+    AddState(29, frozen, true);
 
     DesireConfused* confused = new (8, false) DesireConfused(30);
-    UnidentifiedAddState(30, confused, true);
+    AddState(30, confused, true);
 
     DesireSuperPower* superPower = new (8, false) DesireSuperPower();
-    UnidentifiedAddState(23, superPower, true);
+    AddState(23, superPower, true);
 
     DesireUsePowerup* usePowerup = new (8, false) DesireUsePowerup();
-    UnidentifiedAddState(17, usePowerup, true);
+    AddState(17, usePowerup, true);
 
     DesireSteering* steering = new (8, false) DesireSteering();
-    UnidentifiedAddState(34, steering, true);
+    AddState(34, steering, true);
 
     UnidentifiedDesire35* desire35 = new (8, false) UnidentifiedDesire35();
-    UnidentifiedAddState(35, desire35, true);
+    AddState(35, desire35, true);
 }
 
 /**
@@ -193,10 +193,10 @@ void FielderDesireMachine::UnidentifiedVirtual2()
  */
 void FielderDesireMachine::Reset(bool deleting)
 {
-    UnidentifiedScriptMachine::Reset(deleting);
+    ScriptMachine::Reset(deleting);
     if (!deleting)
     {
-        fn_80319E84(this, 34, 0, false);
+        ActivateConcurrentState(this, 34, 0, false);
     }
 }
 
@@ -230,21 +230,21 @@ void FielderDesireMachine::Update(float deltaTime)
         }
     }
 
-    if (!fn_80319FEC(this, 34))
+    if (!IsConcurrentStateActive(this, 34))
     {
-        fn_80319E84(this, 34, 0, false);
+        ActivateConcurrentState(this, 34, 0, false);
     }
 
     if (!waitForController && g_pGame->IsGameplayOrOvertime()
         && !UserControlledT(GetFielder()->m_pTeam)
-        && !fn_80319FEC(this, 17) && fn_800D85F8(GetFielder()))
+        && !IsConcurrentStateActive(this, 17) && fn_800D85F8(GetFielder()))
     {
         UnidentifiedVariantCollection params;
         params.Set(10, FuzzyVariant(FT_POINTER, (void*)TransDesireUsePowerup));
-        fn_80319E84(this, 17, &params, false);
+        ActivateConcurrentState(this, 17, &params, false);
     }
 
-    UnidentifiedScriptMachine::Update(deltaTime);
+    ScriptMachine::Update(deltaTime);
     if (GetFielder()->m_eActionState == ACTION_NEED_ACTION)
     {
         GetFielder()->StartRunning();
@@ -254,7 +254,7 @@ void FielderDesireMachine::Update(float deltaTime)
 /**
  * Offset/Address/Size: 0xFCC | 0x800D5DF8 | size: 0x3C4
  */
-void FielderDesireMachine::UnidentifiedVirtual7()
+void FielderDesireMachine::SelectState()
 {
     int state = 0;
     UnidentifiedVariantCollection params;
@@ -267,7 +267,7 @@ void FielderDesireMachine::UnidentifiedVirtual7()
         bool hasController = fielder->GetGlobalPad();
         if (!hasController)
         {
-            fn_80319DA0(this);
+            DeactivateConcurrentStates(this);
             state = 31;
         }
         else
@@ -341,48 +341,48 @@ void FielderDesireMachine::UnidentifiedVirtual7()
 
     if (state != 0)
     {
-        UnidentifiedVirtual5(state, &params, true);
+        ActivateState(state, &params, true);
     }
     else
     {
-        UnidentifiedScriptMachine::UnidentifiedVirtual7();
+        ScriptMachine::SelectState();
     }
 }
 
 /**
  * Offset/Address/Size: 0x1390 | 0x800D61BC | size: 0x18
  */
-shdStateMachine* FielderDesireMachine::UnidentifiedVirtual5(
+shdStateMachine* FielderDesireMachine::ActivateState(
     int state, UnidentifiedVariantCollection* params, bool force)
 {
     if (state == 17)
     {
         return 0;
     }
-    return UnidentifiedScriptMachine::UnidentifiedVirtual5(
+    return ScriptMachine::ActivateState(
         state, params, force);
 }
 
 /**
  * Offset/Address/Size: 0x13A8 | 0x800D61D4 | size: 0x5C
  */
-void FielderDesireMachine::UnidentifiedVirtual6()
+void FielderDesireMachine::DeactivateState()
 {
-    if (mUnidentified004 != 0)
+    if (mActiveState != 0)
     {
-        DeactivateStateMachine(mUnidentified004, true);
-        if (mUnidentified004->GetState() != 21)
+        DeactivateStateMachine(mActiveState, true);
+        if (mActiveState->GetState() != 21)
         {
-            mUnidentified008 = mUnidentified004;
+            mPreviousState = mActiveState;
         }
     }
-    mUnidentified004 = 0;
+    mActiveState = 0;
 }
 
 /**
  * Offset/Address/Size: 0x1404 | 0x800D6230 | size: 0xC
  */
-void FielderDesireMachine::UnidentifiedVirtual8()
+void FielderDesireMachine::OnBudgetCheckFailed()
 {
     GetFielder()->StartRunning();
 }

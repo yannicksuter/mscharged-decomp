@@ -6,7 +6,7 @@
 #include "NL/gl/glView.h"
 #include "NL/nlAVLTree.h"
 
-class UnidentifiedPacketSorter
+class GLPacketSorter
 {
 public:
     static void* operator new(unsigned long size)
@@ -14,16 +14,16 @@ public:
         return glFrameAlloc(size, GLM_Header);
     }
 
-    virtual const glModelPacket* fn_08() = 0;
-    virtual const glModelPacket* fn_0C() = 0;
-    virtual void fn_10(GLView*, const glModelPacket*) = 0;
+    virtual const glModelPacket* First() = 0;
+    virtual const glModelPacket* Next() = 0;
+    virtual void AttachPacket(GLView*, const glModelPacket*) = 0;
 };
 
-typedef unsigned long long UnidentifiedPacketSortKey;
-typedef AVLTreeEntry<UnidentifiedPacketSortKey, const glModelPacket*> UnidentifiedPacketTreeEntry;
+typedef unsigned long long GLPacketSortKey;
+typedef AVLTreeEntry<GLPacketSortKey, const glModelPacket*> GLPacketTreeEntry;
 
 template <typename T>
-class UnidentifiedFrameAllocator
+class GLFrameAllocator
 {
 public:
     T* Allocate()
@@ -42,69 +42,69 @@ public:
     }
 };
 
-class UnidentifiedPacketTree_8052E568
-    : public AVLTreeBase<UnidentifiedPacketSortKey, const glModelPacket*,
-          UnidentifiedFrameAllocator<UnidentifiedPacketTreeEntry>,
-          DefaultKeyCompare<UnidentifiedPacketSortKey> >
+class GLPacketTree
+    : public AVLTreeBase<GLPacketSortKey, const glModelPacket*,
+          GLFrameAllocator<GLPacketTreeEntry>,
+          DefaultKeyCompare<GLPacketSortKey> >
 {
 };
 
-class UnidentifiedPacketSorter_802CCBBC : public UnidentifiedPacketSorter
+class GLTreePacketSorter : public GLPacketSorter
 {
 public:
-    virtual const glModelPacket* fn_08();
-    virtual const glModelPacket* fn_0C();
-    virtual void fn_10(GLView*, const glModelPacket*);
-    virtual unsigned long fn_14(GLView*, const glModelPacket*) = 0;
+    virtual const glModelPacket* First();
+    virtual const glModelPacket* Next();
+    virtual void AttachPacket(GLView*, const glModelPacket*);
+    virtual unsigned long GetSortKey(GLView*, const glModelPacket*) = 0;
 
-    UnidentifiedPacketTree_8052E568 m_Tree;
-    nlAVLTreeIterator<UnidentifiedPacketSortKey, const glModelPacket*,
-        DefaultKeyCompare<UnidentifiedPacketSortKey> >
+    GLPacketTree m_Tree;
+    nlAVLTreeIterator<GLPacketSortKey, const glModelPacket*,
+        DefaultKeyCompare<GLPacketSortKey> >
         m_Iterator;
 };
 
-class UnidentifiedPacketSorter_8052E2D8 : public UnidentifiedPacketSorter_802CCBBC
+class GLTexturePacketSorter : public GLTreePacketSorter
 {
 public:
-    virtual unsigned long fn_14(GLView*, const glModelPacket*);
+    virtual unsigned long GetSortKey(GLView*, const glModelPacket*);
 };
 
-class UnidentifiedPacketSorter_8052E2C0 : public UnidentifiedPacketSorter_802CCBBC
+class GLTransformedDepthPacketSorter : public GLTreePacketSorter
 {
 public:
-    virtual unsigned long fn_14(GLView*, const glModelPacket*);
+    virtual unsigned long GetSortKey(GLView*, const glModelPacket*);
 };
 
-class UnidentifiedPacketSorter_8052E2A8 : public UnidentifiedPacketSorter_802CCBBC
+class GLTransformedMatrixDepthPacketSorter : public GLTreePacketSorter
 {
 public:
-    UnidentifiedPacketSorter_8052E2A8()
+    GLTransformedMatrixDepthPacketSorter()
         : m_Sequence(0)
     {
     }
 
-    virtual unsigned long fn_14(GLView*, const glModelPacket*);
+    virtual unsigned long GetSortKey(GLView*, const glModelPacket*);
 
     unsigned long m_Sequence;
 };
 
-class UnidentifiedPacketSorter_802D033C : public UnidentifiedPacketSorter
+class GLListPacketSorter : public GLPacketSorter
 {
 public:
-    UnidentifiedPacketSorter_802D033C()
+    GLListPacketSorter()
         : m_Head(0)
         , m_Tail(0)
         , m_Current(0)
     {
     }
 
-    virtual const glModelPacket* fn_08()
+    virtual const glModelPacket* First()
     {
         m_Current = m_Head;
-        return fn_0C();
+        return Next();
     }
 
-    virtual const glModelPacket* fn_0C()
+    virtual const glModelPacket* Next()
     {
         if (m_Current == 0)
             return 0;
@@ -120,10 +120,10 @@ protected:
     ListEntry<const glModelPacket*>* m_Current;
 };
 
-class UnidentifiedPacketSorter_8052E554 : public UnidentifiedPacketSorter_802D033C
+class GLUnsortedPacketSorter : public GLListPacketSorter
 {
 public:
-    virtual void fn_10(GLView*, const glModelPacket* packet)
+    virtual void AttachPacket(GLView*, const glModelPacket* packet)
     {
         ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
             sizeof(ListEntry<const glModelPacket*>), GLM_Header);
@@ -133,10 +133,10 @@ public:
     }
 };
 
-class UnidentifiedPacketSorter_8052E540 : public UnidentifiedPacketSorter_802D033C
+class GLReversePacketSorter : public GLListPacketSorter
 {
 public:
-    virtual void fn_10(GLView*, const glModelPacket* packet)
+    virtual void AttachPacket(GLView*, const glModelPacket* packet)
     {
         ListEntry<const glModelPacket*>* entry = (ListEntry<const glModelPacket*>*)glFrameAlloc(
             sizeof(ListEntry<const glModelPacket*>), GLM_Header);

@@ -22,14 +22,14 @@
 #include "NL/nlFunctionMemory.h"
 
 BaseGameSceneManager* g_pOverlayManager;
-bool lbl_806E1864;
+bool g_bGoalScored;
 
 OverlayManager::OverlayManager()
 {
     mInGameTextOverlay = 0;
     mIsHUDSlideIn = false;
     mDoHUDSlideIn = false;
-    mUnidentified10E = 0;
+    mIsInHighlights = false;
     mIsDemoSlideVisible = false;
     mHUDDelay = 0.0f;
     mUnidentified120 = 0;
@@ -42,18 +42,18 @@ OverlayManager::~OverlayManager()
 {
 }
 
-void OverlayManager::fn_801E1514()
+void OverlayManager::RegisterEventHandlers()
 {
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E258C)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E2590)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E2608)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::fn_801E2784)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E281C)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterFirst", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::fn_801E28A8)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterSecond", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::fn_801E28E4)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegastrikeStart", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::fn_801E2920)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(BindMember(this, &OverlayManager::fn_801E2988)), 0, -1);
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &OverlayManager::fn_801E2A28)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnGetReadyForKickoff)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnKickoff)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnGameOver)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::OnMegaStrikeMeterStart)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnMegaStrikeMeterEnd)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterFirst", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::OnMegaStrikeMeterFirst)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterSecond", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::OnMegaStrikeMeterSecond)), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegastrikeStart", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnMegastrikeStart)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(BindMember(this, &OverlayManager::OnMegastrikeEnd)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &OverlayManager::OnGoalScored)), 0, -1);
 }
 
 BaseSceneHandler* OverlayManager::Push(SceneList scene, ScreenMovement movement, bool popfirst)
@@ -71,14 +71,12 @@ void OverlayManager::Pop()
     BaseGameSceneManager::Pop();
 }
 
-extern "C" void SetCurrentTextOverlaySlide(OverlayManager* manager, OverlaySlideName slideName)
+void OverlayManager::SetCurrentTextOverlaySlide(OverlaySlideName slideName)
 {
-    void* overlay = *(void**)((char*)manager + 264);
-    if (overlay == 0)
+    if (mInGameTextOverlay != 0)
     {
-        return;
+        mInGameTextOverlay->SetSlide(slideName);
     }
-    ((InGameTextOverlay*)overlay)->SetSlide(slideName);
 }
 
 inline void OverlayManager::SlideHUDOut()
@@ -86,7 +84,7 @@ inline void OverlayManager::SlideHUDOut()
     mHUDDelay = 0.0f;
     if (mIsHUDSlideIn == true)
     {
-        static_cast<HUDOverlay*>(GetScene((SceneList)89))->SetSlideOut();
+        static_cast<HUDOverlay*>(GetScene(OVERLAY_HUD))->SetSlideOut();
         mIsHUDSlideIn = false;
         gpNumberDisplay->mVisible = false;
     }
@@ -102,7 +100,7 @@ void OverlayManager::Update(float deltaTime)
             mHUDDelay = 0.0f;
             if (mDoHUDSlideIn)
             {
-                fn_801E2498(0.0f);
+                SlideHUDIn(0.0f);
             }
             else
             {
@@ -157,7 +155,7 @@ void OverlayManager::HandleStateTransition(u32 from, u32 to)
             continue;
         }
 
-        if (sceneType == 90 && mUnidentified10E)
+        if (sceneType == 90 && mIsInHighlights)
         {
             continue;
         }
@@ -179,7 +177,7 @@ void OverlayManager::HandleStateTransition(u32 from, u32 to)
     }
 }
 
-void OverlayManager::fn_801E2498(float delay)
+void OverlayManager::SlideHUDIn(float delay)
 {
     mHUDDelay = delay;
     if (0.0f != delay)
@@ -188,7 +186,7 @@ void OverlayManager::fn_801E2498(float delay)
     }
     else if (!mIsHUDSlideIn)
     {
-        static_cast<HUDOverlay*>(GetScene((SceneList)89))->SetSlideIn();
+        static_cast<HUDOverlay*>(GetScene(OVERLAY_HUD))->SetSlideIn();
         mIsHUDSlideIn = true;
         gpNumberDisplay->mVisible = true;
     }
@@ -207,21 +205,21 @@ void OverlayManager::ShowDemoSlide()
     }
 }
 
-extern "C" void RestartGoalOverlay(BaseGameSceneManager* manager)
+void OverlayManager::RestartGoalOverlay()
 {
-    ((GoalOverlay*)manager->GetScene((SceneList)95))->Restart();
+    ((GoalOverlay*)GetScene((SceneList)95))->Restart();
 }
 
-void OverlayManager::fn_801E258C()
+void OverlayManager::OnGetReadyForKickoff()
 {
 }
 
-void OverlayManager::fn_801E2590()
+void OverlayManager::OnKickoff()
 {
     static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)90, false, false);
 }
 
-void OverlayManager::fn_801E2608()
+void OverlayManager::OnGameOver()
 {
     if (GetTweakBool("/user/dosoak", false)
         || (g_e3_Build && GameInfoManager::Instance()->IsInMode2()))
@@ -251,10 +249,10 @@ void OverlayManager::fn_801E2608()
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
     GetPresentation()->StopOverlay();
-    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->ResetScores();
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->ResetScores();
 }
 
-void OverlayManager::fn_801E2784(MegaStrikeMeterData* eventData)
+void OverlayManager::OnMegaStrikeMeterStart(MegaStrikeMeterData* eventData)
 {
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
@@ -262,35 +260,35 @@ void OverlayManager::fn_801E2784(MegaStrikeMeterData* eventData)
     overlay->Start(eventData->pFielder);
 }
 
-void OverlayManager::fn_801E281C()
+void OverlayManager::OnMegaStrikeMeterEnd()
 {
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetVisible(false);
     if (!overlay->mMegaStrikeStarted)
     {
-        static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(0.0f);
+        static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDIn(0.0f);
     }
 }
 
-void OverlayManager::fn_801E28A8(MegaStrikeMeterData* eventData)
+void OverlayManager::OnMegaStrikeMeterFirst(MegaStrikeMeterData* eventData)
 {
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetFirstResult(eventData->fMeterValue);
 }
 
-void OverlayManager::fn_801E28E4(MegaStrikeMeterData* eventData)
+void OverlayManager::OnMegaStrikeMeterSecond(MegaStrikeMeterData* eventData)
 {
     MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     overlay->SetSecondResult(eventData->fMeterValue);
 }
 
-void OverlayManager::fn_801E2920()
+void OverlayManager::OnMegastrikeStart()
 {
-    lbl_806E1864 = false;
+    g_bGoalScored = false;
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
 }
 
-void OverlayManager::fn_801E2988(MegaStrikeEndData* eventData)
+void OverlayManager::OnMegastrikeEnd(MegaStrikeEndData* eventData)
 {
     if (eventData->goals == 0)
     {
@@ -299,26 +297,26 @@ void OverlayManager::fn_801E2988(MegaStrikeEndData* eventData)
     static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->UpdateScore();
 }
 
-void OverlayManager::fn_801E29C0(nlVector3 position)
+void OverlayManager::SetMegaStrikeMeterPosition(nlVector3 position)
 {
     MegaStrikeMeterOverlay* ov = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
     ov->SetPosition(position);
 }
 
-extern "C" void fn_801E2A14(void* p)
+void OverlayManager::ResetStrikerTimesVariants()
 {
-    *(int*)((char*)p + 276) = -1;
-    *(int*)((char*)p + 280) = -1;
-    *(int*)((char*)p + 284) = -1;
+    mStrikerTimesStoryVariant = -1;
+    mStrikerTimesHeadlineVariant = -1;
+    mStrikerTimesImageVariant = -1;
 }
 
-void OverlayManager::fn_801E2A28(GoalScoredData* eventData)
+void OverlayManager::OnGoalScored(GoalScoredData* eventData)
 {
-    lbl_806E1864 = true;
+    g_bGoalScored = true;
     if (eventData->uGoalType != 6)
     {
         static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
         gpNumberDisplay->mVisible = true;
     }
-    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->UpdateScore();
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->UpdateScore();
 }

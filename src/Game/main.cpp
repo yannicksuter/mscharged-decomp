@@ -348,20 +348,20 @@ void ConfigureTweakerButtons(int)
     const bool isWiiRemote =
         classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
 
-    lbl_806DF2E0 = 9;
-    lbl_806DF2E4 = 10;
-    lbl_806DF2E8 = 8;
-    lbl_806DF2F0 = 11;
-    lbl_806DF2F4 = 12;
-    lbl_806DF2F8 = 13;
-    lbl_806DF2FC = 14;
+    gTweakerButton_806DF2E0 = 9;
+    gTweakerButton_806DF2E4 = 10;
+    gTweakerButton_806DF2E8 = 8;
+    gTweakerButton_806DF2F0 = 11;
+    gTweakerButton_806DF2F4 = 12;
+    gTweakerButton_806DF2F8 = 13;
+    gTweakerButton_806DF2FC = 14;
     if (!tweakerEnabled && !isWiiRemote)
     {
-        lbl_806DF2EC = 23;
+        gTweakerButton_806DF2EC = 23;
     }
     else
     {
-        lbl_806DF2EC = -1;
+        gTweakerButton_806DF2EC = -1;
     }
 }
 
@@ -716,7 +716,8 @@ void BuildParticleQuads(GLTexturedColourMeshWriter* writer,
     ParticleReturn ret;
     if (writer->Begin(source->m_NumParticles * 4, GLP_QuadList, 0))
     {
-        nlDLListIterator<Particle*> iterator = vertices->Begin();
+        nlDLListIterator<Particle*> iterator;
+        iterator = vertices->Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;
@@ -749,7 +750,8 @@ void BuildParticleQuads(glShadowedTexturedColourModelWriter* writer,
     ParticleReturn ret;
     if (writer->Begin(source->m_NumParticles * 4, 3, 0))
     {
-        nlDLListIterator<Particle*> iterator = vertices->Begin();
+        nlDLListIterator<Particle*> iterator;
+        iterator = vertices->Begin();
         while (iterator.hasNext())
         {
             Particle* pPart = *iterator;

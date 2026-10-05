@@ -11,7 +11,7 @@
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/ShotMeter.h"
 #include "Game/AI/SkillTweaks.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AI/Fuzzy.h"
 #include "Game/Game.h"
@@ -815,7 +815,7 @@ extern "C" float fn_800D7A70(cFielder* pFielder)
         return 0.0f;
     }
 
-    shdStateMachine* pState = fn_8002E1A4(pFielder)->mUnidentified004;
+    shdStateMachine* pState = fn_8002E1A4(pFielder)->mActiveState;
     if (pState != NULL)
     {
         pState->mAgeTimer.GetSeconds();

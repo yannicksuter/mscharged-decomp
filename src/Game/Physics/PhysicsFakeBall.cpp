@@ -49,8 +49,8 @@ static void ClearBallCache()
 {
     if (!FakeBallWorld::mBallCacheList.IsEmpty())
     {
-        nlDLListIterator<BallCacheInfo*> iter
-            = FakeBallWorld::mBallCacheList.Begin();
+        nlDLListIterator<BallCacheInfo*> iter;
+        iter = FakeBallWorld::mBallCacheList.Begin();
         while (iter.hasNext())
         {
             BallCacheInfo::mBallCacheInfoSlotPool.Free(*iter);
@@ -126,7 +126,8 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     else if (!mBallCacheList.IsEmpty())
     {
         BallCacheInfo* pLast = 0;
-        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        nlDLListIterator<BallCacheInfo*> iter;
+        iter = mBallCacheList.Begin();
         while (iter.hasNext())
         {
             BallCacheInfo* pCur = *iter;
@@ -188,7 +189,8 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     BallCacheInfo* pNext;
     if (fDeltaTime < overshoot)
     {
-        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        nlDLListIterator<BallCacheInfo*> iter;
+        iter = mBallCacheList.Begin();
         pNext = *iter;
         pPrev = pNext;
         while (!nlDLRingIsEnd(iter.m_Head, iter.m_Curr)
@@ -201,7 +203,8 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     }
     else
     {
-        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.End();
+        nlDLListIterator<BallCacheInfo*> iter;
+        iter = mBallCacheList.End();
         pNext = *iter;
         pPrev = pNext;
         while (!nlDLRingIsStart(iter.m_Head, iter.m_Curr)
@@ -271,7 +274,8 @@ float FakeBallWorld::GetPredictedPlaneIntersectTime(
 
     if (!mBallCacheList.IsEmpty())
     {
-        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        nlDLListIterator<BallCacheInfo*> iter;
+        iter = mBallCacheList.Begin();
         BallCacheInfo* pPrev;
         BallCacheInfo* pNext = *iter;
 
@@ -331,7 +335,8 @@ float FakeBallWorld::GetPredictedPlaneIntersectTime(
     }
 
     BallCacheInfo* pLastCache;
-    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.End();
+    nlDLListIterator<BallCacheInfo*> iter;
+    iter = mBallCacheList.End();
     BallCacheInfo* pCurCache = *iter;
 
     float fDistanceCur = pCurCache->mv3Position.x * v4Plane.x
@@ -433,7 +438,8 @@ float FakeBallWorld::GetPredictedHeightLimitTime(float fHeight,
     float fTestTime = fSimulationTime + fMinTime;
     float fLastZVel = 0.0f;
     fTargetHeight = 0.0f;
-    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+    nlDLListIterator<BallCacheInfo*> iter;
+    iter = mBallCacheList.Begin();
     while (iter.hasNext())
     {
         BallCacheInfo* pCur = *iter;
@@ -569,7 +575,8 @@ float FakeBallWorld::GetPredictedPosAtDistance(float fDistance,
 
     if (!mBallCacheList.IsEmpty())
     {
-        nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
+        nlDLListIterator<BallCacheInfo*> iter;
+        iter = mBallCacheList.Begin();
         BallCacheInfo* pPrev;
         BallCacheInfo* pNext = *iter;
         float fDistanceNextSq
@@ -608,7 +615,8 @@ float FakeBallWorld::GetPredictedPosAtDistance(float fDistance,
     }
 
     BallCacheInfo* pLastCache;
-    nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.End();
+    nlDLListIterator<BallCacheInfo*> iter;
+    iter = mBallCacheList.End();
     BallCacheInfo* pCurCache = *iter;
     float fDistanceCurSq
         = CalculateDistanceSquared(pCurCache->mv3Position, pBall->m_v3Position);
@@ -689,15 +697,25 @@ FakeBallWorld::~FakeBallWorld()
     delete mpPhysicsWorld;
 }
 
+struct BallCacheCursor
+{
+    BallCacheCursor(const nlDLListIterator<BallCacheInfo*>& initial)
+    {
+        iterator = initial;
+    }
+
+    nlDLListIterator<BallCacheInfo*> iterator;
+};
+
 void FakeBallWorld::ResetBallIterator()
 {
     nlVector3 v3Position;
     nlVector3 v3Velocity;
     GetPredictedBallPosition(0.0f, v3Position, v3Velocity);
 
-    static nlDLListIterator<BallCacheInfo*> iter = mBallCacheList.Begin();
-    iter = mBallCacheList.Begin();
-    mpCacheIterator = &iter;
+    static BallCacheCursor iter(mBallCacheList.Begin());
+    iter.iterator = mBallCacheList.Begin();
+    mpCacheIterator = &iter.iterator;
 
     if (mpCacheIterator->m_Curr != 0)
     {

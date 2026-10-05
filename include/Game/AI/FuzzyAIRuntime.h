@@ -225,7 +225,7 @@ extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(FuzzyAIRuntime*, F
 extern "C" bool FuzzyAITryCachedPlayerQuestion_800E90EC(FuzzyRuntimeBase*, cPlayer*);
 extern "C" bool FuzzyAITryCachedPlayerQuestion_800E9194(FuzzyRuntimeBase*, cPlayer*);
 extern "C" bool FuzzyAITryCachedTeamQuestion(FuzzyRuntimeBase*, cTeam*);
-extern "C" void FuzzyAISetTransition(UnidentifiedScriptMachine*, const char*);
+extern "C" void FuzzyAISetTransition(ScriptMachine*, const char*);
 
 
 extern "C" void LoadFuzzyByteCode(const char* filename, bool async);

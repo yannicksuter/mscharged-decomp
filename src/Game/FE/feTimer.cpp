@@ -40,27 +40,26 @@ void FETimer::Update(float dt)
     }
 }
 
-UnidentifiedTimerList_80306294::UnidentifiedTimerList_80306294()
+FETimerList::FETimerList()
     : mCurrent(0)
     , mTimers(0, 0)
 {
 }
 
-UnidentifiedTimerList_80306294::~UnidentifiedTimerList_80306294()
+FETimerList::~FETimerList()
 {
     mCurrent = 0;
     nlDeleteList(mTimers);
 }
 
-FETimer* UnidentifiedTimerList_80306294::fn_8030639C(
-    float duration, const Function<FETimer*>& callback)
+FETimer* FETimerList::AddTimer(float duration, const Function<FETimer*>& callback)
 {
     FETimer* timer = new (8, false) FETimer(duration, callback);
     nlListAddStart(&mTimers.m_pStart, timer, &mTimers.m_pEnd);
     return timer;
 }
 
-void UnidentifiedTimerList_80306294::fn_8030648C(FETimer* timer)
+void FETimerList::RemoveTimer(FETimer* timer)
 {
     if (mCurrent == timer)
     {
@@ -71,13 +70,13 @@ void UnidentifiedTimerList_80306294::fn_8030648C(FETimer* timer)
     delete timer;
 }
 
-void UnidentifiedTimerList_80306294::fn_80306524()
+void FETimerList::RemoveAllTimers()
 {
     mCurrent = 0;
     nlDeleteList(mTimers);
 }
 
-void UnidentifiedTimerList_80306294::fn_803065F0(float dt)
+void FETimerList::Update(float dt)
 {
     mCurrent = mTimers.m_pStart;
     while (mCurrent != 0)

@@ -25,7 +25,7 @@ public:
         NUM_QUALITY_LEVELS = 5,
     };
 
-    struct UnidentifiedReplayGoalData
+    struct ReplayShotData
     {
         /* 0x00 */ unsigned int uTeamIndex : 8;
         /* 0x00 */ unsigned int uGoalType : 16;
@@ -50,7 +50,7 @@ public:
         /* 0x00 */ int mQuality;
         /* 0x04 */ float mTime;
         /* 0x08 */ int mReplayPad;
-        /* 0x0C */ UnidentifiedReplayGoalData mGoalScoredData;
+        /* 0x0C */ ReplayShotData mGoalScoredData;
         /* 0x20 */ int mSlot;
         /* 0x24 */ Replay::Frame* mBegin;
         /* 0x28 */ Replay::Frame* mEnd;
@@ -68,7 +68,7 @@ public:
     void OnGoalScored(GoalScoredData* data);
     void OnGoalieSave(GoalieSaveData* data);
     void Reset();
-    void StartScript(const UnidentifiedReplayGoalData& data);
+    void StartScript(const ReplayShotData& data);
     void Finish();
     void FlushHighlights();
     void Update(float deltaT);
@@ -92,7 +92,7 @@ public:
     /* 0x334 */ void* mByteCode;
     /* 0x338 */ bool mIsHighlightReel;
     /* 0x339 */ u8 mPadding339[3];
-    /* 0x33C */ mutable UnidentifiedReplayGoalData mGoalScoredData;
+    /* 0x33C */ mutable ReplayShotData mGoalScoredData;
     /* 0x350 */ Highlight mHighlights[3];
     /* 0x3EC */ nlList<Highlight> mHighlightList;
     /* 0x3F4 */ Highlight* mCurrentHighlight;

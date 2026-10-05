@@ -31,8 +31,11 @@ public:
 template <int N, typename T>
 inline void SaveFrame::Replayable(T& current)
 {
-    typename ReplayableCategory<T>::Type category;
-    Replayable<N>(current, category);
+    if (N == 0 || mInterval == N)
+    {
+        typename ReplayableCategory<T>::Type category;
+        Replayable<N>(current, category);
+    }
 }
 
 template <int N, typename T>

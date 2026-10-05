@@ -146,7 +146,8 @@ FontManager::FontManager()
 
 FontManager::~FontManager()
 {
-    nlDLListIterator<nlFont*> it = m_fonts.Begin();
+    nlDLListIterator<nlFont*> it;
+    it = m_fonts.Begin();
     DLListEntry<nlFont*>* head = it.m_Head;
     DLListEntry<nlFont*>* current = it.m_Curr;
 
@@ -169,7 +170,8 @@ FontManager::~FontManager()
 
 nlFont* FontManager::GetFontByHashID(unsigned long uHashID)
 {
-    nlDLListIterator<nlFont*> it = m_fonts.Begin();
+    nlDLListIterator<nlFont*> it;
+    it = m_fonts.Begin();
     DLListEntry<nlFont*>* head = it.m_Head;
     DLListEntry<nlFont*>* entry = it.m_Curr;
 
@@ -193,7 +195,8 @@ nlFont* FontManager::GetFontByHashID(unsigned long uHashID)
 
     nlPrintf("FontManager: Warning, failed to find font 0x%08x\n", uHashID);
 
-    nlDLListIterator<nlFont*> start = m_fonts.Begin();
+    nlDLListIterator<nlFont*> start;
+    start = m_fonts.Begin();
     if (start.hasNext())
     {
         return *start;

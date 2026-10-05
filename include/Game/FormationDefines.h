@@ -28,13 +28,13 @@ class FormationSpec
 public:
     FormationSpec();
 
-    void Init(int id, int iKeyIndex, const char* name, bool field_0x04);
+    void Init(int id, int iKeyIndex, const char* name, bool bEnabled);
     void SetName(const char* name);
     nlVector2& GetKeyLocation() const;
     void CalculateExtents(nlVector2& minOut, nlVector2& maxOut, const nlVector2& input) const;
 
     /* 0x00 */ u32 m_ID;
-    /* 0x04 */ bool field_0x04;
+    /* 0x04 */ bool m_bEnabled;
     /* 0x08 */ s32 m_iKeyIndex;
     /* 0x0C */ f32 m_InRadius;
     /* 0x10 */ f32 m_OutRadius;
@@ -62,7 +62,7 @@ public:
     /* 0x04 */ int m_ID;
     /* 0x08 */ int m_NumFormationDefs;
     /* 0x0C */ FormationSpec* m_FormationDefArray;
-    /* 0x10 */ char field_0x10[0x20];
+    /* 0x10 */ char m_Name[32];
 };
 
 #endif // _FORMATIONDEFINES_H_

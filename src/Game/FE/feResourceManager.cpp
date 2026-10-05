@@ -293,7 +293,8 @@ static inline void InsertSorted(
     nlDLListSlotPool<PendingResourceLoad>& list,
     PendingResourceLoad pendingResource)
 {
-    nlDLListIterator<PendingResourceLoad> insertAfter = list.End();
+    nlDLListIterator<PendingResourceLoad> insertAfter;
+    insertAfter = list.End();
     if (pendingResource.pHandle->m_uFileBlock > (*insertAfter).pHandle->m_uFileBlock)
     {
         list.AddEnd(pendingResource);

@@ -95,8 +95,8 @@ public:
     {
         for (int i = 0; i < 2; ++i)
         {
-            nlDLListIterator<NPCTemplate*> iterator
-                = i == 0 ? mPersistentTemplates.Begin()
+            nlDLListIterator<NPCTemplate*> iterator;
+            iterator = i == 0 ? mPersistentTemplates.Begin()
                          : mTransientTemplates.Begin();
             while (iterator.hasNext())
             {

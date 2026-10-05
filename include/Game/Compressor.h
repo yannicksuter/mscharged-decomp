@@ -256,7 +256,7 @@ public:
     {
         unsigned int value = 0;
         Read(frame, value);
-        Replayable<N>(frame, value);
+        frame.template Replayable<N>(value);
         Apply(frame, value);
     }
 

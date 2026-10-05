@@ -19,7 +19,6 @@ static const char* sTerrainConfigNames[6] = {
 };
 
 static char sTerrainConfigPathFormat[] = "ini/Terrain/%s";
-extern char sTerrainTweakCategory[];
 
 static void LoadSelectedTerrain();
 

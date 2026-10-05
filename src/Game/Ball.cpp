@@ -96,7 +96,8 @@ class UnidentifiedEvent2View : public EventBase
 public:
     void Deliver(P1 p1, P2 p2)
     {
-        nlDLListIterator<Listener> iterator = mListeners.Begin();
+        nlDLListIterator<Listener> iterator;
+        iterator = mListeners.Begin();
         while (iterator.hasNext())
         {
             Listener* listener = &*iterator;
@@ -112,7 +113,8 @@ public:
             iterator.next();
             if (((listener->mFlags >> 29) & 1) != 0)
             {
-                nlDLListIterator<Listener> position = mListeners.Begin(
+                nlDLListIterator<Listener> position;
+                position = mListeners.Begin(
                     (ListenerEntry*)((char*)listener - 8));
                 ListenerEntry* entry = position.CurrentEntry();
                 nlDLRingRemove(&mListeners.m_Head, entry);
@@ -139,8 +141,6 @@ extern "C" unsigned int lbl_806E0C10;
 extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 extern "C" void Hide(BirdoEggObject*, bool);
-extern "C" void fn_802B5370(
-    nlQuaternion&, const nlVector3&, unsigned short);
 float Exp(float);
 
 cBall* g_pBall = NULL;

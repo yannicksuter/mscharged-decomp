@@ -7,13 +7,13 @@
 #include "NL/platvmath.h"
 #include "Game/MathHelpers.h"
 
-unsigned long UnidentifiedPacketSorter_8052E2D8::fn_14(
+unsigned long GLTexturePacketSorter::GetSortKey(
     GLView*, const glModelPacket* pPacket)
 {
     return ((GLMaterialProgram*)pPacket->materialProgram)->programHash;
 }
 
-unsigned long UnidentifiedPacketSorter_8052E2C0::fn_14(
+unsigned long GLTransformedDepthPacketSorter::GetSortKey(
     GLView* view, const glModelPacket* pPacket)
 {
     nlMatrix4 packetMatrix;
@@ -26,7 +26,7 @@ unsigned long UnidentifiedPacketSorter_8052E2C0::fn_14(
     return (unsigned long)(int)(-pos.z * 2147483648.0f);
 }
 
-unsigned long UnidentifiedPacketSorter_8052E2A8::fn_14(
+unsigned long GLTransformedMatrixDepthPacketSorter::GetSortKey(
     GLView* view, const glModelPacket* pPacket)
 {
     nlMatrix4 packetMatrix;
@@ -38,13 +38,13 @@ unsigned long UnidentifiedPacketSorter_8052E2A8::fn_14(
         | (m_Sequence++ & 0xFFF);
 }
 
-const glModelPacket* UnidentifiedPacketSorter_802CCBBC::fn_08()
+const glModelPacket* GLTreePacketSorter::First()
 {
     m_Iterator.Initialize(m_Tree.m_Root);
-    return fn_0C();
+    return Next();
 }
 
-const glModelPacket* UnidentifiedPacketSorter_802CCBBC::fn_0C()
+const glModelPacket* GLTreePacketSorter::Next()
 {
     if (m_Iterator.m_NumStackEntries == 0)
         return 0;
@@ -55,11 +55,11 @@ const glModelPacket* UnidentifiedPacketSorter_802CCBBC::fn_0C()
     return pPacket;
 }
 
-void UnidentifiedPacketSorter_802CCBBC::fn_10(
+void GLTreePacketSorter::AttachPacket(
     GLView* view, const glModelPacket* pPacket)
 {
-    UnidentifiedPacketSortKey sortKey =
-        ((UnidentifiedPacketSortKey)fn_14(view, pPacket) << 32)
+    GLPacketSortKey sortKey =
+        ((GLPacketSortKey)GetSortKey(view, pPacket) << 32)
         | (unsigned long)pPacket;
     m_Tree.Add(sortKey, pPacket);
 }

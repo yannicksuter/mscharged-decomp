@@ -44,7 +44,7 @@ void GoalOverlay::Update(float fDeltaT)
     }
 }
 
-void GoalOverlay::fn_801F178C(GoalScoredData* data)
+void GoalOverlay::OnGoalScored(GoalScoredData* data)
 {
     int playerIndex;
     if (data->uGoalType == 5)
@@ -58,7 +58,7 @@ void GoalOverlay::fn_801F178C(GoalScoredData* data)
     UpdateGoalInfo(data->uTeamIndex, playerIndex, false, data->uNumGoalsScored);
 }
 
-void GoalOverlay::fn_801F17D0(int homeAway)
+void GoalOverlay::UpdateCaptainS2SGoalInfo(int homeAway)
 {
     if (g_pGame->mbCaptainShotToScoreOn)
     {
@@ -66,7 +66,7 @@ void GoalOverlay::fn_801F17D0(int homeAway)
     }
 }
 
-void GoalOverlay::fn_801F17F4(MegaStrikeEndData*)
+void GoalOverlay::OnMegastrikeEnd(MegaStrikeEndData*)
 {
 }
 
@@ -145,8 +145,8 @@ MakeGoalBinding(void (GoalOverlay::*callback)(), GoalOverlay* goalOverlay)
 static inline void CreateGoalEventHandler(GoalOverlay* goalOverlay)
 {
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(MakeGoalBinding(&GoalOverlay::Reset, goalOverlay)), 0, -1);
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(MakeGoalBinding(&GoalOverlay::fn_801F178C, goalOverlay)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(MakeGoalBinding(&GoalOverlay::fn_801F17F4, goalOverlay)), 0, -1);
+    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(MakeGoalBinding(&GoalOverlay::OnGoalScored, goalOverlay)), 0, -1);
+    UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(MakeGoalBinding(&GoalOverlay::OnMegastrikeEnd, goalOverlay)), 0, -1);
 }
 
 void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2S, int numGoals)

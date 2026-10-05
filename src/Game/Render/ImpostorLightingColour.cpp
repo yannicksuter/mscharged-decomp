@@ -36,13 +36,13 @@ static inline nlColour SampleImpostorLighting(LightingLookup* lookup, const nlVe
 nlColour GetImpostorLightingColour(const nlVector3* position)
 {
     nlColour colour;
-    if (spImpostorLightingLookup == 0)
+    if (gpImpostorLightingLookup == 0)
     {
         nlColourSet(colour, 255, 255, 255, 255);
     }
     else
     {
-        LightingLookup* lookup = spImpostorLightingLookup;
+        LightingLookup* lookup = gpImpostorLightingLookup;
         nlVector2 coordinate;
         GetImpostorLightingCoordinate(coordinate, position);
         colour = SampleImpostorLighting(lookup, coordinate);

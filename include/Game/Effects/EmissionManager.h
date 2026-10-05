@@ -38,8 +38,8 @@ struct EmissionResourceStats
     /* 0x0C */ char mName[0x20];
     /* 0x2C */ int mBudget;
     /* 0x30 */ u16 mId;
-    /* 0x32 */ u16 unknown_0x32_bit15 : 1;
-    /*      */ u16 unknown_0x32_bit14 : 1;
+    /* 0x32 */ u16 mEnabled : 1;
+    /*      */ u16 mInitialized : 1;
     /*      */ u16 unknown_0x32_low : 14;
 }; // size: 0x34
 
@@ -97,7 +97,8 @@ public:
     static void SetResourceBudget(int resource, int budget);
     static void ConfigureResource(int resource, const char* name, int budget);
     static void RecordRenderedParticles(unsigned long resource, int numParticles);
-    static void StartLoading(bool first, bool second, bool third, bool fourth);
+    static void StartLoading(bool allocateAtStart,
+        bool allocateNonResidentAtStart, bool, bool compressedNonResident);
     static bool FinishLoading(GLResourcePool* context);
     static void LoadBundle(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
 
@@ -107,11 +108,11 @@ public:
     /* 0x1A8 */ bool m_bRecording;
     /* 0x1A9 */ u8 unknown_0x1A9[0x03];
     /* 0x1AC */ void* mContext;
-    /* 0x1B0 */ bool unknown_0x1B0;
+    /* 0x1B0 */ bool mDiscardOnReplay;
     /* 0x1B1 */ u8 unknown_0x1B1[0x03];
     /* 0x1B4 */ nlDLListContainer<EmissionController*> mReplayControllers;
     /* 0x1BC */ nlDLListContainer<EmissionController*> mControllers;
-    /* 0x1C4 */ nlDLListContainer<char*> mUnidentifiedControllers;
+    /* 0x1C4 */ nlDLListContainer<char*> mErrors;
     /* 0x1CC */ int mNumParticles;
     /* 0x1D0 */ Particle* mParticleMemory;
     /* 0x1D4 */ nlDLListSlotPool<Particle*> mParticles;
@@ -119,11 +120,10 @@ public:
     /* 0x1F1 */ bool mRenderPersistentOnly;
     /* 0x1F2 */ u8 unknown_0x1F2[0x02];
     /* 0x1F4 */ float mShadowHeight;
-    /* 0x1F8 */ bool unknown_0x1F8;
+    /* 0x1F8 */ bool mSnapToGround;
     /* 0x1F9 */ u8 unknown_0x1F9[0x03];
 };
 
-extern "C" void Startup(EmissionManager*, void*, int, int);
 EmissionManager* GetEmissionManager();
 
 extern GLInventory* gEffectsModelInventory;

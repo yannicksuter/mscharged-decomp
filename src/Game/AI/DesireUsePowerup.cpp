@@ -1,5 +1,5 @@
 #include "Game/AI/DesireUsePowerup.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Physics/PhysicsEventQueue.h"
 
@@ -43,7 +43,7 @@ DesireUpdate TransDesireUsePowerup(
     {
         result = 1;
     }
-    else if (fn_8031A04C() && !input->IsTimerRunning(key)
+    else if (CheckScriptTimeBudget() && !input->IsTimerRunning(key)
         && !fn_800E0034())
     {
         input->SetTimer(key, 0.4f);
@@ -148,7 +148,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 
     if (!pDesire->mActive)
     {
-        fn_80319E84(pDesire->mScriptMachine, 17, NULL, false);
+        ActivateConcurrentState(pDesire->mScriptMachine, 17, NULL, false);
     }
 
     cTeam* pTeam = pDesire->m_pFielder->m_pTeam;
@@ -169,7 +169,7 @@ void DesireUsePowerup::fn_800D3968(
 
     if (!mActive && bActivate)
     {
-        fn_80319E84(mScriptMachine, 17, NULL, false);
+        ActivateConcurrentState(mScriptMachine, 17, NULL, false);
     }
 
     cTeam* pTeam = m_pFielder->m_pTeam;
@@ -353,7 +353,7 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
                 : &pDesire->mDefaultTransition.mValue;
             params.Set(10, FuzzyVariant(FT_U32,
                 pTransition->mFuncHash));
-            fn_80319E84(pDesire->mScriptMachine, 23, &params, false);
+            ActivateConcurrentState(pDesire->mScriptMachine, 23, &params, false);
             NativeTransitionFunc transition((void*)TransDesireUsePowerup);
             pDesire->mOverrideTransition.mValue.mFuncHash
                 = transition.mValue.mFuncHash;
@@ -365,13 +365,13 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     }
     case POWER_UP_STAR:
     {
-        fn_80319E84(pDesire->mScriptMachine, 24, NULL, true);
+        ActivateConcurrentState(pDesire->mScriptMachine, 24, NULL, true);
         pDesire->ResetPowerupState();
         break;
     }
     case POWER_UP_MUSHROOM:
     {
-        fn_80319E84(pDesire->mScriptMachine, 25, NULL, true);
+        ActivateConcurrentState(pDesire->mScriptMachine, 25, NULL, true);
         pDesire->ResetPowerupState();
         break;
     }

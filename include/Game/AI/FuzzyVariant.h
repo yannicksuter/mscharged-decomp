@@ -12,7 +12,7 @@ class cBall;
 class cFielder;
 class cGame;
 class InterpreterCore;
-class UnidentifiedScriptMachine;
+class ScriptMachine;
 class AIContext;
 
 class FuzzyVariant : public Variant

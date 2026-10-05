@@ -8,7 +8,7 @@
 
 class AIContext;
 class FuzzyRuntimeBase;
-class UnidentifiedScriptMachine;
+class ScriptMachine;
 typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 class shdStateMachine
@@ -22,7 +22,7 @@ public:
     virtual void Cleanup() = 0;
     virtual void Update(DesireUpdate*, float) = 0;
     virtual void Reset(bool);
-    virtual void SetContext(UnidentifiedScriptMachine*);
+    virtual void SetContext(ScriptMachine*);
 
     FuzzyRuntimeBase* GetFuzzyRuntime();
 
@@ -37,14 +37,14 @@ public:
     }
 
 public:
-    UnidentifiedScriptMachine* GetScriptMachine() const { return mScriptMachine; }
+    ScriptMachine* GetScriptMachine() const { return mScriptMachine; }
 
     int mState;
     bool mActive;
     u8 mPadding009[3];
     Timer mAgeTimer;
     float mLastActiveTime;
-    UnidentifiedScriptMachine* mScriptMachine;
+    ScriptMachine* mScriptMachine;
     UnidentifiedVariantCollection mParameters;
     // Copied from the constructor; executed when no override is set.
     UnsetTransitionFunc mDefaultTransition;

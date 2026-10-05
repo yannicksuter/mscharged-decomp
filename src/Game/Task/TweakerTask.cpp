@@ -7,31 +7,31 @@
 #include "types.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-s32 lbl_806DF2E0 = -1;
-s32 lbl_806DF2E4 = -1;
-s32 lbl_806DF2E8 = -1;
-s32 lbl_806DF2EC = -1;
-s32 lbl_806DF2F0 = -1;
-s32 lbl_806DF2F4 = -1;
-s32 lbl_806DF2F8 = -1;
-s32 lbl_806DF2FC = -1;
+s32 gTweakerButton_806DF2E0 = -1;
+s32 gTweakerButton_806DF2E4 = -1;
+s32 gTweakerButton_806DF2E8 = -1;
+s32 gTweakerButton_806DF2EC = -1;
+s32 gTweakerButton_806DF2F0 = -1;
+s32 gTweakerButton_806DF2F4 = -1;
+s32 gTweakerButton_806DF2F8 = -1;
+s32 gTweakerButton_806DF2FC = -1;
 
 bool g_bTweaking;
 
-void fn_802BDA28()
+void ToggleTweaking()
 {
     g_bTweaking = !g_bTweaking;
 }
 
 void TweakerTask::Run(float)
 {
-    if (lbl_806DF2E0 == -1
-        || lbl_806DF2E4 == -1
-        || lbl_806DF2E8 == -1
-        || lbl_806DF2F0 == -1
-        || lbl_806DF2F4 == -1
-        || lbl_806DF2F8 == -1
-        || lbl_806DF2FC == -1)
+    if (gTweakerButton_806DF2E0 == -1
+        || gTweakerButton_806DF2E4 == -1
+        || gTweakerButton_806DF2E8 == -1
+        || gTweakerButton_806DF2F0 == -1
+        || gTweakerButton_806DF2F4 == -1
+        || gTweakerButton_806DF2F8 == -1
+        || gTweakerButton_806DF2FC == -1)
     {
         return;
     }

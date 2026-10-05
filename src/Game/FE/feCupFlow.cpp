@@ -34,7 +34,7 @@ extern const int sCupPageOrder[3] = { 4, 5, 6 };
 extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
 extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
 
-struct CupTrophyUnlock_8051B770
+struct CupTrophyUnlock
 {
     unsigned long key;
     unsigned int flag;
@@ -43,7 +43,7 @@ struct CupTrophyUnlock_8051B770
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 
-CupTrophyUnlock_8051B770 lbl_8051B770[] = {
+CupTrophyUnlock gCupTrophyUnlockFlags[] = {
     { nlStringHash("0"), 0x001 },
     { nlStringHash("1"), 0x008 },
     { nlStringHash("2"), 0x010 },
@@ -55,13 +55,13 @@ CupTrophyUnlock_8051B770 lbl_8051B770[] = {
     { nlStringHash("8"), 0x100 },
 };
 
-static void fn_80206CF8(int currentPage, bool advance);
+static void CycleCupStatsPage(int currentPage, bool advance);
 
 void CycleCupPage(int currentPage, bool advance)
 {
     if ((unsigned int)(currentPage - 4) <= 2)
     {
-        fn_80206CF8(currentPage, advance);
+        CycleCupStatsPage(currentPage, advance);
     }
     else
     {
@@ -69,7 +69,7 @@ void CycleCupPage(int currentPage, bool advance)
     }
 }
 
-static void fn_80206CF8(int currentPage, bool advance)
+static void CycleCupStatsPage(int currentPage, bool advance)
 {
     int currentIndex = 0;
     for (int i = 0; i < 3; ++i)
@@ -202,7 +202,7 @@ void ShowCurrentCupRoundPage()
     GameSceneManager::Instance()->Push((SceneList)scene, SCREEN_NOTHING, true);
 }
 
-extern "C" void AdvanceCupFlow(bool pad)
+void AdvanceCupFlow(bool pad)
 {
     CupManager* cupManager = g_pCupManager;
     if (cupManager->GetCurrentRoundNumber() == -5)
@@ -328,7 +328,7 @@ void HandleCupBack(int fromSubPage)
     }
 }
 
-extern "C" void UpdateCupBreadcrumbs(int currentPage)
+void UpdateCupBreadcrumbs(int currentPage)
 {
     int currentIndex = 0;
     int pageCount = 0;
@@ -381,7 +381,7 @@ extern "C" void UpdateCupBreadcrumbs(int currentPage)
     }
 }
 
-extern "C" void ExitCupToMainMenu()
+void ExitCupToMainMenu()
 {
     FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
     GameSceneManager::Instance()->Pop();
@@ -399,7 +399,7 @@ void ShowCupStartOptions()
                   Function<FnVoidVoid>(RequestMainMenuInputReset));
 }
 
-extern "C" void ShowNewCupPrompt()
+void ShowNewCupPrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
@@ -408,7 +408,7 @@ extern "C" void ShowNewCupPrompt()
                   Function<FnVoidVoid>(ShowCupStartOptions));
 }
 
-extern "C" void ShowCupSavePrompt()
+void ShowCupSavePrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
@@ -450,7 +450,7 @@ void StartNewCup()
     gNextFETransition = "TransitionMainMenuToNewStrikerCup";
 }
 
-extern "C" void ContinueStrikerCup()
+void ContinueStrikerCup()
 {
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
@@ -681,7 +681,7 @@ void ShowCupTrophyRewardsPopup()
     }
 }
 
-extern "C" void UpdatePlayButtonText()
+void UpdatePlayButtonText()
 {
     CupManager* cupManager = g_pCupManager;
     SHNavigation* navigation = GetNavigationScene();
@@ -702,8 +702,7 @@ extern "C" void UpdatePlayButtonText()
     }
 }
 
-extern "C" void UpdateCupTitleText(TLComponentInstance* component,
-                              unsigned short* buffer, unsigned long capacity)
+void UpdateCupTitleText(TLComponentInstance* component, unsigned short* buffer, unsigned long capacity)
 {
     TLTextInstance* title = FEFinder<TLTextInstance, 3>::Find<>(
         component->GetActiveSlide(), "TITLE");
@@ -773,9 +772,9 @@ void SetLockedTrophyVisibility(bool visible)
         unsigned int flag = 0x200000;
         for (int j = 0; j < gCupAwardModelCount; ++j)
         {
-            if (lbl_8051B770[j].key == gCupAwardModels[i]->m_uCupTrophyKey)
+            if (gCupTrophyUnlockFlags[j].key == gCupAwardModels[i]->m_uCupTrophyKey)
             {
-                flag = lbl_8051B770[j].flag;
+                flag = gCupTrophyUnlockFlags[j].flag;
                 break;
             }
         }
@@ -792,7 +791,7 @@ void SetLockedTrophyVisibility(bool visible)
     }
 }
 
-extern "C" void ResetCupFlow()
+void ResetCupFlow()
 {
     CupManager* cupManager = g_pCupManager;
     cupManager->mState = -1;

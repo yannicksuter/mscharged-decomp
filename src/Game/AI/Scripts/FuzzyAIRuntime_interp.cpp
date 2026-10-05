@@ -116,9 +116,9 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg3 = m_SP[-1] != 0;
         const char* arg2 = (const char*)m_SP[-2];
         int arg1 = (int)m_SP[-3];
-        UnidentifiedScriptMachine* arg0 = (UnidentifiedScriptMachine*)m_SP[-4];
+        ScriptMachine* arg0 = (ScriptMachine*)m_SP[-4];
         m_SP -= 4;
-        fn_80318D34(arg0, arg1, arg2, arg3);
+        AddScriptState(arg0, arg1, arg2, arg3);
         break;
     }
     case 9:
@@ -2757,7 +2757,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 269:
     {
         const char* arg1 = (const char*)m_SP[-1];
-        UnidentifiedScriptMachine* arg0 = (UnidentifiedScriptMachine*)m_SP[-2];
+        ScriptMachine* arg0 = (ScriptMachine*)m_SP[-2];
         m_SP -= 2;
         FuzzyAISetTransition(arg0, arg1);
         break;
@@ -3307,7 +3307,7 @@ extern "C" bool FuzzyAITryCachedTeamQuestion(FuzzyRuntimeBase* runtime, cTeam* v
 }
 
 extern "C" void FuzzyAISetTransition(
-    UnidentifiedScriptMachine* state, const char* name)
+    ScriptMachine* state, const char* name)
 {
     ScriptTransitionFunc value(name);
     state->mTransition.mValue.mFuncHash = value.mValue.mFuncHash;

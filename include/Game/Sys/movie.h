@@ -5,10 +5,10 @@ bool MoviePlay();
 bool MovieStop();
 bool MovieStart(const char* szFilename, bool bSound, bool bLoopMovie, bool bMono);
 
-bool fn_80370E20();
-bool fn_80370E64();
+bool MovieInit();
+bool MovieQuit();
 void SetSyncedDecode(bool value);
-void fn_80371254();
+void MovieRenderTick();
 bool IsMovieActive();
 bool IsMovieFinished();
 void ClearMovieFinished();

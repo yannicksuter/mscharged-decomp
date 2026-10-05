@@ -18,7 +18,7 @@
 #include "Game/Render/tu_8027AE14.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Player.h"
-#include "Game/AI/TeamPlayMachine.h"
+#include "Game/AI/ScriptMachine.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/GameplayCam.h"
 #include "Game/Physics/PhysicsCharacter.h"
@@ -219,7 +219,8 @@ Weather* WeatherManager::GetWeather(int value)
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             Weather* state = *it;
@@ -237,7 +238,8 @@ void WeatherManager::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             (*it)->SyncLog(context, cache);
@@ -250,7 +252,8 @@ void WeatherManager::Update(float value)
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             (*it)->Update(value);
@@ -263,7 +266,8 @@ void WeatherManager::Clear()
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             Weather* state = *it;
@@ -279,7 +283,8 @@ void WeatherManager::Stop(bool value)
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             (*it)->Stop(value);
@@ -292,7 +297,8 @@ void WeatherManager::Reset()
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             (*it)->Reset();
@@ -305,7 +311,8 @@ void WeatherManager::Pause()
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             (*it)->mbPaused = 1;
@@ -318,7 +325,8 @@ void WeatherManager::Resume()
 {
     if (!mWeather.IsEmpty())
     {
-        nlDLListIterator<Weather*> it = mWeather.Begin();
+        nlDLListIterator<Weather*> it;
+        it = mWeather.Begin();
         while (it.hasNext())
         {
             (*it)->mbPaused = 0;
@@ -815,7 +823,7 @@ void SolarFlare::OnGetReadyForKickoff()
             for (int j = 0; j < 4; j++)
             {
                 cFielder* fielder = g_pTeams[i]->GetFielder(j);
-                fn_8002E1A4(fielder)->mUnidentified004->mMaxDuration = duration;
+                fn_8002E1A4(fielder)->mActiveState->mMaxDuration = duration;
                 fielder->m_pPhysicsCharacter->m_CanCollideWithBall = false;
             }
         }

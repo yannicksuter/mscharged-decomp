@@ -700,13 +700,13 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     ReplayManager::Instance()->ResetSnapshots();
     if (IsNetworkOrRecordedGame())
     {
-        fn_8031A0FC(lbl_806E3740);
+        SetScriptTimeBudget(lbl_806E3740);
         gAIProfilingClock = fn_80056CA4;
         gAIActivityClock = fn_80056CA4;
     }
     else
     {
-        fn_8031A0FC(lbl_806E3748);
+        SetScriptTimeBudget(lbl_806E3748);
         gAIProfilingClock = fn_80056CD0;
         gAIActivityClock = fn_80056CA4;
     }
@@ -1464,7 +1464,7 @@ extern "C" int fn_8005B45C(
 void cGame::fn_8005B508()
 {
     g_FuzzyQuestionCache.Clear();
-    fn_8031A02C(&g_FuzzyQuestionCache);
+    ResetScriptFrameTime(&g_FuzzyQuestionCache);
 
     float fBallRadius = g_pBall->m_pPhysicsBall->GetRadius();
     for (int i = 0; i < 10; i++)
@@ -1559,7 +1559,7 @@ void cGame::fn_8005DF38()
     ResumeSuddenDeathMusic();
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_HUD, true, true);
-    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E2498(lbl_806E3770);
+    static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDIn(lbl_806E3770);
     static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->DisplayNewScore();
 
     if (mpWeatherManager != 0)

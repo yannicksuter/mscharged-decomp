@@ -3,6 +3,9 @@
 
 #include "NL/nlMath.h"
 
-void EmitCameraFlash(const nlVector3& position, void* transform = 0);
+class cSAnim;
+
+void CharacterAnimTriggerCallback(cSAnim* anim, unsigned int uParam);
+void EmitCameraFlash(const nlVector3& position, void* flyingCamera = 0);
 
 #endif // GAME_WORLD_TRIGGERS_H

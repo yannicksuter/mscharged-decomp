@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "types.h"
+#include "NL/nlDebug.h"
 #include "NL/nlMath.h"
 
 class LoadFrame;
@@ -139,8 +140,6 @@ inline void Replayable(FrameType& frame, T& current)
     }
 }
 
-void nlBreak();
-
 class cPoseNode;
 template <int N>
 void Replayable(SaveFrame& frame, char typeId, cPoseNode*& poseNode);
@@ -188,7 +187,7 @@ public:
         /* 0x08 */ int mSize;
         /* 0x0C */ int mInterval;
         /* 0x10 */ unsigned int mEvents;
-        /* 0x14 */ unsigned int mUnidentifiedState;
+        /* 0x14 */ unsigned int mExcitement;
         /* 0x18 */ int mReelIdx;
         /* 0x1C */ Frame* mNext;
     }; // total size: 0x20
@@ -219,7 +218,7 @@ public:
     float EndTime() const;
 
     template <typename T>
-    void Record(float time, T& snapshot, unsigned int events, unsigned int unidentifiedState);
+    void Record(float time, T& snapshot, unsigned int events, unsigned int excitement);
 
     template <typename T>
     void Play(float time, T& previous, T& current, float* blend) const;
@@ -233,7 +232,7 @@ public:
     /* 0x44 */ int mActualMaxFrameSize;
 };
 
-class UnidentifiedReplayFramePool
+class ReplayFramePool
 {
 public:
     union Entry
@@ -242,14 +241,14 @@ public:
         unsigned char storage[sizeof(Replay::Frame)];
     };
 
-    UnidentifiedReplayFramePool(void* entries)
+    ReplayFramePool(void* entries)
         : mFree((Entry*)entries)
         , mEntries((Entry*)entries)
     {
         Reset();
     }
 
-    ~UnidentifiedReplayFramePool()
+    ~ReplayFramePool()
     {
     }
 
@@ -284,7 +283,7 @@ public:
     Entry* mEntries;
 };
 
-extern "C" UnidentifiedReplayFramePool* lbl_806E1E9C;
+extern ReplayFramePool* g_pReplayFramePool;
 
 template <typename T>
 void Replay::Play(
@@ -359,7 +358,7 @@ void Replay::Play(
 }
 
 template <typename T>
-void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int unidentifiedState)
+void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int excitement)
 {
     for (int interval = 1; interval <= 3; interval++)
     {
@@ -385,9 +384,9 @@ void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int u
             mFree->mTime = time;
             mFree->mInterval = interval;
             mFree->mEvents = events;
-            mFree->mUnidentifiedState = unidentifiedState;
+            mFree->mExcitement = excitement;
 
-            mFree->mNext = new (lbl_806E1E9C->Allocate()) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
+            mFree->mNext = new (g_pReplayFramePool->Allocate()) Frame(mFree->mBegin + frameSize, mFree->mSize - frameSize, mFree->mNext);
             mFree->mSize = frameSize;
             mFree = mFree->mNext;
         }
@@ -396,9 +395,7 @@ void Replay::Record(float time, T& snapshot, unsigned int events, unsigned int u
     mTick++;
 }
 
-extern "C" void fn_802C7FA4(Replay*, Replay::Frame**, Replay::Frame**,
-    Replay::Frame**);
-extern "C" void fn_802C7FC0(
-    Replay*, Replay::Frame*, Replay::Frame*, Replay::Frame*);
+void GetRecordingFrames(Replay* replay, Replay::Frame** begin, Replay::Frame** last, Replay::Frame** free);
+void SetRecordingFrames(Replay* replay, Replay::Frame* begin, Replay::Frame* last, Replay::Frame* free);
 
 #endif // _REPLAY_H_

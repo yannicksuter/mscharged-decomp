@@ -177,6 +177,7 @@ extern "C" float fn_80030750(cFielder* pFielder);
 class PhysicsObject;
 class ShotMeter;
 class AIContext;
+class ScriptMachine;
 class FuzzyRuntimeBase;
 struct BulletBillObject;
 
@@ -750,5 +751,7 @@ extern "C" bool fn_8003877C(cFielder* pFielder);
 extern "C" void fn_800395C0(cFielder* pFielder);
 
 extern "C" void fn_80039CF0(cFielder* pFielder, int nParam);
+
+ScriptMachine* fn_8002E1A4(cFielder* pFielder);
 
 #endif // GAME_AI_FIELDER_H

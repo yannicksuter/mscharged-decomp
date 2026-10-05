@@ -189,7 +189,7 @@ inline void FECharacterPDAComponent::ResetAttributes()
 
 void FECharacterPDAComponent::Update(float dt)
 {
-    mTimers.fn_803065F0(dt);
+    mTimers.Update(dt);
     bool animating = 2.0f + mRootComponent->GetActiveSlide()->GetCurrentTime() < mRootComponent->GetActiveSlide()->GetDuration();
     if (mSlideAnimating && !animating && mDisplayMode == 0)
     {
@@ -255,7 +255,7 @@ void FECharacterPDAComponent::StepAttributeBar(FETimer* timer, FEAttributeBar* c
     }
     else
     {
-        mTimers.fn_8030648C(timer);
+        mTimers.RemoveTimer(timer);
     }
 }
 
@@ -296,7 +296,7 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
         }
         return;
     }
-    mTimers.fn_80306524();
+    mTimers.RemoveAllTimers();
     const CharacterInfo& info = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     if (flag == 1)
     {
@@ -306,7 +306,7 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
             component->SetActiveSlide(GetTeamName((eTeamID)captain), true, false);
         }
     }
-    mTimers.fn_80306524();
+    mTimers.RemoveAllTimers();
     if (!mSlideAnimating)
     {
         StartAttributeAnimation(this, mCaptainAttributeBars[0], info.unknown_0x38);
@@ -343,7 +343,7 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
 static void StartAttributeAnimation(FECharacterPDAComponent* owner, FEAttributeBar* component, float value)
 {
     Function<FETimer*> callback(Bind<void>(MemFun(&FECharacterPDAComponent::StepAttributeBar), owner, placeholder0, component, (int)(0.5 + value * 10.0f)));
-    owner->mTimers.fn_8030639C(0.07f, callback);
+    owner->mTimers.AddTimer(0.07f, callback);
 }
 
 void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
@@ -353,7 +353,7 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
         return;
     }
     mSidekickNeedsRefresh = false;
-    mTimers.fn_80306524();
+    mTimers.RemoveAllTimers();
     mSelectedSidekick = sidekick;
     if (sidekick == -1)
     {
@@ -369,7 +369,7 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
     {
         component->SetActiveSlide(GetSidekickName((eSidekickID)sidekick), true, false);
     }
-    mTimers.fn_80306524();
+    mTimers.RemoveAllTimers();
     StartAttributeAnimation(this, mSidekickAttributeBars[0], info.unknown_0x38);
     StartAttributeAnimation(this, mSidekickAttributeBars[1], info.unknown_0x3C);
     StartAttributeAnimation(this, mSidekickAttributeBars[2], info.unknown_0x40);

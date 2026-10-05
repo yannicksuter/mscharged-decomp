@@ -7,7 +7,7 @@ class ScriptState : public shdStateMachine
 {
 public:
     ScriptState(
-        int state, const char* name, UnidentifiedScriptMachine* context,
+        int state, const char* name, ScriptMachine* context,
         TransitionFunc transition);
     virtual ~ScriptState();
 

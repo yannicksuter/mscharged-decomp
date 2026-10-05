@@ -290,7 +290,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
 
     mvDesiredPosition = mEstimated.v3AnimStartPos;
     ProcessUserInput();
-    if (GetScriptMachine()->fn_800C2F20() != this)
+    if (GetScriptMachine()->GetActiveState() != this)
     {
         *update = 1;
         return;

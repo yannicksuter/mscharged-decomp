@@ -122,8 +122,8 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
     mInverseMatrices
         = new (8, false) nlMatrix4[mOcclusionObjectCount];
 
-    nlDLListIterator<CrowdLayoutObject*> occlusionIt
-        = mOcclusionObjects.Begin();
+    nlDLListIterator<CrowdLayoutObject*> occlusionIt;
+    occlusionIt = mOcclusionObjects.Begin();
     while (occlusionIt.m_Curr != 0)
     {
         CrowdLayoutObject* object
@@ -133,8 +133,8 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
         occlusionIt.Step();
     }
 
-    nlDLListIterator<CrowdLayoutObject*> objectIt
-        = mPrimaryObjects.Begin();
+    nlDLListIterator<CrowdLayoutObject*> objectIt;
+    objectIt = mPrimaryObjects.Begin();
     while (objectIt.m_Curr != 0)
     {
         CrowdLayoutObject* object = objectIt.m_Curr->entry;
@@ -288,8 +288,8 @@ void CrowdImpostorManager::UpdateCrowdVisibility(GLView* view)
 
 inline bool CrowdImpostorManager::IsObjectEnabled(CrowdLayoutObject* object)
 {
-    nlDLListIterator<CrowdLayoutObject*> objectIt
-        = mEnabledObjects.Begin();
+    nlDLListIterator<CrowdLayoutObject*> objectIt;
+    objectIt = mEnabledObjects.Begin();
     while (objectIt.hasNext())
     {
         if (object == *objectIt)
@@ -302,8 +302,8 @@ inline bool CrowdImpostorManager::IsObjectEnabled(CrowdLayoutObject* object)
 inline bool CrowdImpostorManager::IsPointOccluded(
     const nlVector4& worldPoint, nlVector4& localPoint)
 {
-    nlDLListIterator<CrowdLayoutObject*> occlusionIt
-        = mOcclusionObjects.Begin();
+    nlDLListIterator<CrowdLayoutObject*> occlusionIt;
+    occlusionIt = mOcclusionObjects.Begin();
     while (occlusionIt.hasNext())
     {
         CrowdLayoutObject* object = *occlusionIt;
@@ -317,7 +317,8 @@ inline bool CrowdImpostorManager::IsPointOccluded(
 
 inline ImpostorCharacter* CrowdImpostorManager::GetCharacter(int index)
 {
-    nlDLListIterator<ImpostorCharacter*> characterIt = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> characterIt;
+    characterIt = mCharacters.Begin();
     while (index-- > 0)
         characterIt.Step();
     return characterIt.m_Curr->entry;

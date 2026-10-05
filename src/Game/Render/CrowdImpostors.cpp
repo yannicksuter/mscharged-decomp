@@ -463,8 +463,8 @@ void CreateCrowdLayoutObject()
 
 void SetCrowdModelTexture(u32 textureHash, unsigned long texture)
 {
-    nlDLListIterator<WorldListObject0_80340AC8*> iterator
-        = BasicStadium::GetCurrentStadium()->m_objectList0.Begin();
+    nlDLListIterator<WorldListObject0_80340AC8*> iterator;
+    iterator = BasicStadium::GetCurrentStadium()->m_objectList0.Begin();
     const unsigned long& textureIndex = glGetTextureManager()->GetTextureIndex(texture);
 
     for (; iterator.hasNext(); iterator.next())

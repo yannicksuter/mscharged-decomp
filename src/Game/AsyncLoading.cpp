@@ -42,6 +42,7 @@
 #include "Game/Render/Presentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feModelManager.h"
+#include "Game/Render/ImpostorLighting.h"
 #include "Game/Render/ImpostorManager.h"
 #include "Game/FE/feResourceManager.h"
 #include "Game/Render/CrowdManager.h"
@@ -140,13 +141,10 @@ void ShutdownWarbleRendering(void*);
 extern "C" void fn_8001FE80();
 void fn_80056CF4(void*, int, bool);
 
-void FreeImpostorLighting();
-
 void fn_80056EA8();
 void DestroyCharacters();
 
 extern SlotPool<cSAnimCallback> lbl_805840D8;
-extern SlotPoolBase lbl_8057AB80;
 
 bool g_VerboseAudio;
 bool g_bDumpMemoryStatsOnLoad;
@@ -400,7 +398,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         }
         else if (lbl_806E106A)
         {
-            fn_80370E20();
+            MovieInit();
             if (FEMusic::IsEnabled())
             {
                 PlayTrackedSound(0x17, 0x6AF33AC2,
@@ -779,7 +777,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         nlFileCache* fileCache = nlGetFileCache();
         fileCache->mCacheWritesEnabled = true;
-        fn_80370E20();
+        MovieInit();
         break;
     }
     case 82:
@@ -875,7 +873,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         SetLoadingComment("InitializeStadiumViewer2");
         fn_80056CF4((void*)gGameTweaks.mTerrainType,
-            gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
+            gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
         ParticleUpdateTask* particleUpdateTask = ParticleUpdateTask::sInstance;
         RLView* particleView = GetLayerView(eCLV_Particles);
         particleUpdateTask->Initialize(particleView, 0x5F6, 0x2FB);
@@ -1393,12 +1391,11 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
     lbl_805840D8.FreeBlocks();
     if (g_bTweaking)
     {
-        fn_802BDA28();
+        ToggleTweaking();
     }
     ResetDynamicTweaks();
     glCompact();
-    fn_802B467C(&lbl_8057AB80);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+    g_PendingAnimationRequestPool.FreeBlocks();
 
     fn_80111658(2);
     manager->mLoadingState = 0;
@@ -1656,7 +1653,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     }
     g_pAudioSystem->Shutdown();
 
-    fn_80370E64();
+    MovieQuit();
     DestroyPadBackends();
     fn_802B467C(&Detail::sTempStringAllocatorPool.allocator.pool);
     SlotPoolBase::BaseFreeBlocks(&Detail::sTempStringAllocatorPool.allocator.pool, 0x40);
@@ -1668,12 +1665,11 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     lbl_805840D8.FreeBlocks();
     if (g_bTweaking)
     {
-        fn_802BDA28();
+        ToggleTweaking();
     }
     ResetDynamicTweaks();
     glCompact();
-    fn_802B467C(&lbl_8057AB80);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+    g_PendingAnimationRequestPool.FreeBlocks();
 
     glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
     glDestroyResourcePool(glGetCurrentResourcePool());
@@ -1732,8 +1728,8 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameState2");
-    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mUnidentified08, gGameTweaks.mUnidentified0C);
-    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E1514();
+    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
+    static_cast<OverlayManager*>(g_pOverlayManager)->RegisterEventHandlers();
     InitializeGameStreams();
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
     StatsTracker::Instance()->CreateEventHandler();
@@ -2050,12 +2046,11 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
 
     if (g_bTweaking)
     {
-        fn_802BDA28();
+        ToggleTweaking();
     }
     ResetDynamicTweaks();
     glCompact();
-    fn_802B467C(&lbl_8057AB80);
-    SlotPoolBase::BaseFreeBlocks(&lbl_8057AB80, 8);
+    g_PendingAnimationRequestPool.FreeBlocks();
     FreeFunctionMemoryPools();
     glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
     glDestroyResourcePool(glGetCurrentResourcePool());
@@ -2092,7 +2087,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
     }
 
     GameSceneManager::Instance()->Push((SceneList)0x10, SCREEN_NOTHING, false);
-    fn_80370E20();
+    MovieInit();
     FinishLoadingStep(manager);
 }
 

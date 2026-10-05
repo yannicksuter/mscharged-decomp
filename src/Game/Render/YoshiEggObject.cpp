@@ -25,8 +25,6 @@ extern "C"
     float gYoshiEggStartRadius = 0.5f;
     float gYoshiEggExpandedRadius = 1.4f;
     float gYoshiEggHeightOffset;
-
-    void fn_802B5370(nlQuaternion&, const nlVector3&, unsigned short);
 }
 
 YoshiEggObject::YoshiEggObject(RenderObject* drawable)

@@ -14,9 +14,9 @@ public:
     virtual void SceneCreated();
     virtual void Update(float fDeltaT);
 
-    void fn_801F178C(GoalScoredData* data);
-    void fn_801F17D0(int homeAway);
-    void fn_801F17F4(MegaStrikeEndData* data);
+    void OnGoalScored(GoalScoredData* data);
+    void UpdateCaptainS2SGoalInfo(int homeAway);
+    void OnMegastrikeEnd(MegaStrikeEndData* data);
     void Restart();
     void Reset();
     void UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2S, int numGoals);

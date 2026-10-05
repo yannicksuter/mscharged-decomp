@@ -385,7 +385,7 @@ void ShootToScoreMeter::DrawMeter()
     glViewProjectPoint(GetLayerView(eCLV_UnsortedSquareOrtho), screenPosition, projectedPosition);
     glViewUnprojectOrthographicPoint(GetLayerView(eCLV_Anark), &projectedPosition,
         &projectedPosition);
-    static_cast<OverlayManager*>(g_pOverlayManager)->fn_801E29C0(projectedPosition);
+    static_cast<OverlayManager*>(g_pOverlayManager)->SetMegaStrikeMeterPosition(projectedPosition);
 
     glQuad3 quad;
     quad.SetupRotatedRectangle(

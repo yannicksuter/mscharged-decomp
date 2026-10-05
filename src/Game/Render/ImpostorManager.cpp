@@ -94,7 +94,8 @@ void ImpostorManager::InvalidateCapture()
 
 void ImpostorManager::ResetImpostors()
 {
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     while (it.hasNext())
     {
         (*it)->ReleaseSprites();
@@ -131,11 +132,12 @@ void ImpostorManager::Uninitialize()
 
 void ImpostorManager::ResetSpriteSlots()
 {
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     while (it.hasNext())
     {
-        nlDLListIterator<ImpostorSprite*> sprites =
-            (*it)->mSprites.Begin();
+        nlDLListIterator<ImpostorSprite*> sprites;
+        sprites = (*it)->mSprites.Begin();
         while (sprites.hasNext())
         {
             ImpostorSprite* sprite = *sprites;
@@ -168,13 +170,14 @@ int ImpostorManager::GetNumImpostors()
 static inline u32 AccumulateRenderChecksums(
     const nlDLListSlotPool<ImpostorCharacter*>& characters, u32 total)
 {
-    nlDLListIterator<ImpostorCharacter*> it = characters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = characters.Begin();
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     while (entry != 0)
     {
-        nlDLListIterator<ImpostorSprite*> sprites =
-            entry->entry->mSprites.Begin();
+        nlDLListIterator<ImpostorSprite*> sprites;
+        sprites = entry->entry->mSprites.Begin();
         DLListEntry<ImpostorSprite*>* spriteEntry = sprites.m_Curr;
         DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
         while (spriteEntry != 0)
@@ -262,7 +265,8 @@ void ImpostorManager::Render(void* target, bool skipCapture)
     int rendered;
     DLListEntry<ImpostorSprite*>* spriteEntry;
     ImpostorCharacter* character;
-    nlDLListIterator<ImpostorCharacter*> drawIt = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> drawIt;
+    drawIt = mCharacters.Begin();
     for (; drawIt.hasNext(); drawIt.next())
     {
         character = *drawIt;
@@ -281,8 +285,8 @@ void ImpostorManager::Render(void* target, bool skipCapture)
             glSetCurrentRasterState(glHandleizeRasterState());
         }
 
-        nlDLListIterator<ImpostorSprite*> sprites =
-            character->mSprites.Begin();
+        nlDLListIterator<ImpostorSprite*> sprites;
+        sprites = character->mSprites.Begin();
         DLListEntry<ImpostorSprite*>* spriteHead = sprites.m_Head;
         spriteEntry = sprites.m_Curr;
         while (spriteEntry != 0)
@@ -331,7 +335,8 @@ void ImpostorManager::AddCharacter(ImpostorCharacter* character)
 
 void ImpostorManager::UpdateCharacters(float blendTime, const char* name)
 {
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
@@ -350,7 +355,8 @@ void ImpostorManager::UpdateCharacters(float blendTime, const char* name)
 
 void ImpostorManager::UpdateAnimations(float dt)
 {
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
@@ -371,7 +377,8 @@ void ImpostorManager::UpdateSprites()
 {
     static int sUpdateSlot;
 
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
@@ -407,7 +414,8 @@ void ImpostorManager::SetImpostorSizeScale(float scale)
 
 void ImpostorManager::UpdatePositions(const nlVector3* direction, const nlVector3* up)
 {
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
@@ -430,7 +438,8 @@ void ImpostorManager::StaggerAnimations()
     int count = mCharacters.CountElements();
     float step = 1.0f / (4.0f * (float)count);
 
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     DLListEntry<ImpostorCharacter*>* head = it.m_Head;
     DLListEntry<ImpostorCharacter*>* entry = it.m_Curr;
     while (entry != 0)
@@ -462,7 +471,8 @@ void ImpostorManager::StaggerAnimations()
 void ImpostorManager::SetEnabled(bool enable)
 {
     mEnabled = enable;
-    nlDLListIterator<ImpostorCharacter*> it = mCharacters.Begin();
+    nlDLListIterator<ImpostorCharacter*> it;
+    it = mCharacters.Begin();
     while (it.hasNext())
     {
         (*it)->EnableSprites(enable);

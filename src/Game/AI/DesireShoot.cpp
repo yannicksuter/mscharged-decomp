@@ -181,7 +181,7 @@ bool DesireShoot::Initialize(void* context)
         transitionParams.Set(10,
             FuzzyVariant(FT_U32,
                 nlStringHash("TransDesireWindupSkillshot")));
-        fn_8031998C(GetStateMachineAIContext(this)->mScriptMachine,
+        QueueScriptMachineState(GetStateMachineAIContext(this)->mScriptMachine,
             13,
             &transitionParams);
     }

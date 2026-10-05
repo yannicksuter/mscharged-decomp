@@ -6,8 +6,8 @@
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
 
-class UnidentifiedPacketSorter;
-class UnidentifiedPacketSorterTree_8052E504;
+class GLPacketSorter;
+class GLPacketSorterTree;
 class GLView;
 
 typedef void (*GLViewPacketCallback)(
@@ -38,7 +38,7 @@ public:
     }
 };
 
-typedef UnidentifiedPacketSorter* (*UnidentifiedPacketSorterFactory)();
+typedef GLPacketSorter* (*GLPacketSorterFactory)();
 
 struct GLViewViewport
 {
@@ -72,7 +72,7 @@ public:
     void Iterate(GLViewPacketCallback);
     void RemoveChild(GLView*);
     GLRenderPair GetRenderPair() const;
-    inline UnidentifiedPacketSorter* GetSorter(long);
+    inline GLPacketSorter* GetSorter(long);
 
     bool HasChildren() const
     {
@@ -121,8 +121,8 @@ public:
     }
 
     nlListContainer<GLView*> m_Children;
-    UnidentifiedPacketSorterFactory m_CreateSorter;
-    UnidentifiedPacketSorterTree_8052E504* m_Sorters;
+    GLPacketSorterFactory m_CreateSorter;
+    GLPacketSorterTree* m_Sorters;
     GLViewViewport m_Viewport;
     GLRenderPair m_RenderPair;
     bool m_Enabled;

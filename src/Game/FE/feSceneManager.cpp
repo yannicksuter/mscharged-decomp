@@ -29,7 +29,8 @@ FESceneManager::FESceneManager()
 
 bool FESceneManager::AreAllScenesValid()
 {
-    nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
+    nlDLListIterator<BaseSceneHandler*> sceneIterator;
+    sceneIterator = m_sceneHandlerStack.Begin();
     DLListEntry<BaseSceneHandler*>* headEntry = sceneIterator.m_Head;
     DLListEntry<BaseSceneHandler*>* currentEntry = sceneIterator.m_Curr;
 
@@ -55,7 +56,8 @@ bool FESceneManager::AreAllScenesValid()
 
 bool FESceneManager::IsObjectQueuedForPop(BaseSceneHandler* pSceneHandler)
 {
-    nlDLListIterator<PackagePushPopMessage*> msgIterator = m_pushPopMessageQueue.Begin();
+    nlDLListIterator<PackagePushPopMessage*> msgIterator;
+    msgIterator = m_pushPopMessageQueue.Begin();
 
     while (msgIterator.hasNext())
     {
@@ -77,7 +79,8 @@ void FESceneManager::ForceImmediateStackProcessing()
 
 BaseSceneHandler* FESceneManager::GetSceneHandler(unsigned long hashID)
 {
-    nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
+    nlDLListIterator<BaseSceneHandler*> sceneIterator;
+    sceneIterator = m_sceneHandlerStack.Begin();
 
     while (sceneIterator.hasNext())
     {
@@ -142,7 +145,8 @@ void FESceneManager::ProcessPushPopQueue()
         }
         else
         {
-            nlDLListIterator<BaseSceneHandler*> sceneIterator = pSceneManager->m_sceneHandlerStack.Begin();
+            nlDLListIterator<BaseSceneHandler*> sceneIterator;
+            sceneIterator = pSceneManager->m_sceneHandlerStack.Begin();
 
             while (sceneIterator.hasNext())
             {
@@ -195,7 +199,8 @@ void FESceneManager::QueueScenePop()
     msg->m_pSceneHandler = 0;
     msg->m_bPush = false;
 
-    nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
+    nlDLListIterator<BaseSceneHandler*> sceneIterator;
+    sceneIterator = m_sceneHandlerStack.Begin();
 
     while (sceneIterator.hasNext())
     {
@@ -229,7 +234,8 @@ void FESceneManager::RenderActiveScenes()
         }
     }
 
-    nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
+    nlDLListIterator<BaseSceneHandler*> sceneIterator;
+    sceneIterator = m_sceneHandlerStack.Begin();
 
     while (sceneIterator.hasNext())
     {
@@ -271,7 +277,8 @@ void FESceneManager::Update(float dt)
         return;
     }
 
-    nlDLListIterator<BaseSceneHandler*> sceneIterator = m_sceneHandlerStack.Begin();
+    nlDLListIterator<BaseSceneHandler*> sceneIterator;
+    sceneIterator = m_sceneHandlerStack.Begin();
     currentEntry = sceneIterator.m_Curr;
     headEntry = sceneIterator.m_Head;
 

@@ -33,8 +33,8 @@ ImpostorCluster::ImpostorCluster(const char* name,
 
 unsigned long ImpostorCluster::GetTexture()
 {
-    nlDLListIterator<ImpostorSprite*> it =
-        mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     return it.m_Curr->entry->GetTexture();
 }
 
@@ -44,7 +44,8 @@ void ImpostorCluster::UpdateView(
     const nlVector3 direction = { 0.0f, 1.0f, 0.0f };
     const nlVector3 up = { 0.0f, 0.0f, 1.0f };
 
-    nlDLListIterator<ImpostorSprite*> it = mSprites.Begin();
+    nlDLListIterator<ImpostorSprite*> it;
+    it = mSprites.Begin();
     DLListEntry<ImpostorSprite*>* head = it.m_Head;
     DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
     while (entry != 0)

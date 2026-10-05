@@ -22,17 +22,16 @@ public:
     /* 0x18 */ FETimer* next;
 }; // size 0x1C
 
-class UnidentifiedTimerList_80306294
+class FETimerList
 {
 public:
-    UnidentifiedTimerList_80306294();
-    ~UnidentifiedTimerList_80306294();
+    FETimerList();
+    ~FETimerList();
 
-    FETimer* fn_8030639C(
-        float duration, const Function<FETimer*>& callback);
-    void fn_8030648C(FETimer* timer);
-    void fn_80306524();
-    void fn_803065F0(float dt);
+    FETimer* AddTimer(float duration, const Function<FETimer*>& callback);
+    void RemoveTimer(FETimer* timer);
+    void RemoveAllTimers();
+    void Update(float dt);
 
     /* 0x00 */ FETimer* mCurrent;
     /* 0x04 */ nlList<FETimer> mTimers;

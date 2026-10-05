@@ -138,7 +138,7 @@ class GoalieTweaks : public TweaksBase
 public:
     GoalieTweaks(const char* name, const char* category);
     virtual ~GoalieTweaks();
-    void fn_800277A0();
+    void CalculateShotFatigueMax();
     virtual void Init();
 
     /* 0x044 */ TweakFloatBinding fJoggingSpeed;
@@ -197,7 +197,7 @@ public:
     /* 0x348 */ TweakFloatBinding fRunningDirectionSeekFalloff;
 
 private:
-    /* 0x358 */ const char* mUnidentified358;
+    /* 0x358 */ const char* mCategory;
 };
 
 

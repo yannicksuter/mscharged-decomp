@@ -14,22 +14,22 @@ TeamPlayMachine::~TeamPlayMachine()
 {
 }
 
-void TeamPlayMachine::UnidentifiedVirtual2()
+void TeamPlayMachine::Initialize()
 {
-    UnidentifiedScriptMachine::UnidentifiedVirtual2();
+    ScriptMachine::Initialize();
 
     TutorialMegastrikeDesire* desire =
         new (nlMalloc(sizeof(TutorialMegastrikeDesire), 8, false))
             TutorialMegastrikeDesire(5, TransitionFunc(g_UnsetTransitionFunc));
-    UnidentifiedAddState(5, desire, false);
+    AddState(5, desire, false);
 }
 
 void TeamPlayMachine::Update(float deltaTime)
 {
-    UnidentifiedScriptMachine::Update(deltaTime);
+    ScriptMachine::Update(deltaTime);
 }
 
-void TeamPlayMachine::UnidentifiedVirtual7()
+void TeamPlayMachine::SelectState()
 {
     UnidentifiedVariantCollection values;
     int state = -1;
@@ -47,19 +47,15 @@ void TeamPlayMachine::UnidentifiedVirtual7()
 
     if (state != -1)
     {
-        UnidentifiedVirtual5(state, &values, true);
+        ActivateState(state, &values, true);
     }
     else
     {
-        UnidentifiedScriptMachine::UnidentifiedVirtual7();
+        ScriptMachine::SelectState();
     }
 }
 
 TeamPlayMachine::TeamPlayMachine()
-    : UnidentifiedScriptMachine(7, true, false, gTeamPlayMachineName)
-{
-}
-
-void TeamPlayMachine::UnidentifiedVirtual8()
+    : ScriptMachine(7, true, false, gTeamPlayMachineName)
 {
 }

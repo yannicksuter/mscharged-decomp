@@ -21,7 +21,8 @@ public:
     {
         DLListEntry<PhysicsTransform*>* current;
         DLListEntry<PhysicsTransform*>* head;
-        nlDLListIterator<PhysicsTransform*> iterator = m_Components.Begin();
+        nlDLListIterator<PhysicsTransform*> iterator;
+        iterator = m_Components.Begin();
 
         head = iterator.m_Head;
         current = iterator.m_Curr;

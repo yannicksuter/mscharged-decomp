@@ -35,7 +35,8 @@ void PhysicsCompositeObject::Unknown0()
 
 PhysicsCompositeObject::~PhysicsCompositeObject()
 {
-    nlDLListIterator<PhysicsTransform*> iterator = m_Components.Begin();
+    nlDLListIterator<PhysicsTransform*> iterator;
+    iterator = m_Components.Begin();
     DLListEntry<PhysicsTransform*>* head = iterator.m_Head;
     DLListEntry<PhysicsTransform*>* current = iterator.m_Curr;
 

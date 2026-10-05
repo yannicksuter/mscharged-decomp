@@ -224,7 +224,7 @@ Goalie::Goalie(eCharacterClass gcc, const int* pTemplate,
     mpLooseBallInfo = 0;
     mbFirstMegaStrike = true;
     mbDefensivePlayOverlayPushed = false;
-    m_pTweaks->fn_800277A0();
+    m_pTweaks->CalculateShotFatigueMax();
     InitActionMove(false);
     GoalieSave::InitData(this);
     LooseBallAnims::Init(this);
