@@ -1,5 +1,7 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Fielder.inl"
+#include "Game/PoseAccumulator.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/DetInput.h"
 #include "Game/Audio/GameStreams.h"
@@ -39,6 +41,9 @@
 #include "Game/Physics/PhysicsPatch.h"
 #include "Game/Sys/audio.h"
 #include "Game/Render/NPCManager.h"
+#include "Game/Render/YoshiEggObject.h"
+#include "Game/Render/BirdoEgg.h"
+#include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/ChainChomp.h"
 #include "Game/SAnim/pnFeather.h"
 #include "Game/SAnim/pnSAnimController.h"
@@ -358,7 +363,7 @@ bool cFielder::CanGetElectrocuted(
             float netPostRadius = cNet::GetPostRadius();
             float netWidth = m_pTeam->m_pNet->GetNetWidth();
             float minYElectrocutionPosition
-                = netWidth * lbl_806E3424 + netPostRadius;
+                = netWidth / 2.0f + netPostRadius;
             float netHeight = m_pTeam->m_pNet->GetNetHeight();
             nlVector3 jointPos
                 = GetJointPosition(m_nBip01JointIndex_0xA4);
@@ -376,7 +381,7 @@ bool cFielder::CanGetElectrocuted(
         float netPostRadius = cNet::GetPostRadius();
         float netWidth = m_pTeam->m_pNet->GetNetWidth();
         float minYElectrocutionPosition
-            = netWidth * lbl_806E3424 + netPostRadius;
+            = netWidth / 2.0f + netPostRadius;
         float netHeight = m_pTeam->m_pNet->GetNetHeight();
         nlVector3 jointPos
             = GetJointPosition(m_nBip01JointIndex_0xA4);
@@ -404,8 +409,8 @@ bool cFielder::CanGetElectrocuted(
                     || mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
                 && m_eActionState == (eFielderActionState)1)
             {
-                if (m_pCurrentAnimController->m_fTime > lbl_806E3428
-                    || mUnidentified024.m_v3Position.z > lbl_806E3418)
+                if (m_pCurrentAnimController->m_fTime > 0.7f
+                    || mUnidentified024.m_v3Position.z > 1.0f)
                 {
                     return true;
                 }
@@ -441,14 +446,14 @@ static inline bool CanShootFromPosition(cFielder* pFielder, bool requireBall)
     float radius = 0.0f;
     pFielder->m_pPhysicsCharacter->GetRadius(&radius);
 
-    float offset = lbl_806E342C + radius;
+    float offset = 0.1f + radius;
     float maxX = offset + pFielder->GetPosition().x;
     float minX = pFielder->GetPosition().x - offset;
-    bool maxXInHalf = maxX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+    bool maxXInHalf = maxX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= 0.0f;
     bool inAttackingHalf = true;
     if (!maxXInHalf)
     {
-        bool minXInHalf = minX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= lbl_806E3420;
+        bool minXInHalf = minX * pFielder->m_pTeam->GetOtherNet()->m_fDirection >= 0.0f;
         if (!minXInHalf)
         {
             inAttackingHalf = false;
@@ -501,6 +506,80 @@ bool cFielder::CanDoCaptainShootToScore()
         }
     }
 
+    return false;
+}
+
+bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
+{
+    nlVector3 v3BallPos;
+    nlVector3 v3ContactPos;
+    if (mfAirInterceptHeight[0] < 0.0f)
+    {
+        const LooseBallContactAnimInfo* pLeadAnimInfo = gOneTimerLeadGroundContactAnims;
+        float fAnimContactFrame = pLeadAnimInfo->fAnimContactFrame;
+        const cSAnim* pLeadAnim = m_pAnimInventory->GetAnim(pLeadAnimInfo->nAnimID);
+        GetJointPositionFuture(&v3ContactPos, pLeadAnimInfo->nAnimID, m_nBallJointIndex,
+            GetNormalizedContactTime(pLeadAnim, fAnimContactFrame), true, true, false, true);
+        mfAirInterceptHeight[0] = v3ContactPos.z;
+    }
+
+    float fInterceptHeight = mfAirInterceptHeight[0] * GetPlayerScale();
+    if (g_pBall->m_v3Position.z > 3.0f * fInterceptHeight)
+    {
+        return false;
+    }
+
+    if (g_pBall->m_pOwner == 0 && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0)
+    {
+        bool bPassInFlight = false;
+        if ((g_pBall->meBallState == 5 || g_pBall->meBallState == 3) && g_pBall->m_pPassTarget != 0)
+        {
+            bPassInFlight = true;
+        }
+
+        if (!(bPassInFlight && requireBestInterceptor) && !fn_80014E20(g_pBall))
+        {
+            bool bHasGlobalPad = GetGlobalPad() != 0;
+            if (bHasGlobalPad && fn_8002E060() >= 0x14)
+            {
+                return true;
+            }
+
+            float fGroundContactFrame = gOneTimerIdleGroundContactAnims[0].fAnimContactFrame;
+            const cSAnim* pGroundAnim = m_pAnimInventory->GetAnim(gOneTimerIdleGroundContactAnims[0].nAnimID);
+            float fGroundContactTime = GetNormalizedContactTime(pGroundAnim, fGroundContactFrame);
+            const cSAnim* pVolleyAnim = m_pAnimInventory->GetAnim(gOneTimerIdleVolleyContactAnims[0].nAnimID);
+            float fVolleyContactTime = GetNormalizedContactTime(pVolleyAnim, gOneTimerIdleVolleyContactAnims[0].fAnimContactFrame);
+
+            for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
+            {
+                fn_800180F4(g_pBall, &v3BallPos, fTime);
+                u16 aMoveDirection = mUnidentified024.m_aActualMovementDirection;
+                float fDeltaX = v3BallPos.x - mUnidentified024.m_v3Position.x;
+                float fDeltaY = v3BallPos.y - mUnidentified024.m_v3Position.y;
+                u16 aBallDirection = RadToAng16(nlATan2f(fDeltaY, fDeltaX));
+                u16 aDelta = abs_s16((s16)(aBallDirection - aMoveDirection));
+                float fReachScale = InterpolateRangeClamped(1.25f, 3.0f, 32768.0f, 0.0f, aDelta);
+                nlVector2 v2Delta;
+                v2Delta.x = v3BallPos.x - mUnidentified024.m_v3Position.x;
+                v2Delta.y = v3BallPos.y - mUnidentified024.m_v3Position.y;
+                if (nlVec2Length(v2Delta) <= fReachScale * mUnidentified024.m_fPlayerScale)
+                {
+                    if (requireBestInterceptor)
+                    {
+                        if (m_pTeam->GetGoalie()->fn_8009670C(&v3BallPos, true) == this)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
     return false;
 }
 
@@ -855,6 +934,36 @@ bool cFielder::fn_800306F4(cFielder* pParam)
     return false;
 }
 
+extern "C" float fn_80030750(cFielder* pFielder)
+{
+    if (pFielder->mUnidentified35C < 0.0001f)
+    {
+        cSAnim* pAnim = pFielder->m_pAnimInventory->GetAnim(0x67);
+        nlVector3 v3Start;
+        nlVector3 v3End;
+        if (pFielder->mUnidentified024.m_eCharacterClass != TOAD)
+        {
+            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D020(pFielder->m_pTweaks)), &v3Start);
+            pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D050(pFielder->m_pTweaks)), &v3End);
+        }
+        else
+        {
+            int nJointIndex = pFielder->m_pPoseAccumulator->GetBaseHierarchy()->GetNodeIndexByID(
+                nlStringLowerHash("bip01 Ponytail12"));
+            pFielder->GetJointPositionFuture(&v3Start, 0x67, nJointIndex, 2.0f / pAnim->GetNumFrames(),
+                true, true, true, true);
+            pFielder->GetJointPositionFuture(&v3End, 0x67, nJointIndex, 6.0f / pAnim->GetNumFrames(),
+                true, true, true, true);
+        }
+        nlVector3 v3Delta;
+        nlVec3Set(v3Delta, v3End.x - v3Start.x, v3End.y - v3Start.y, v3End.z - v3Start.z);
+        pFielder->mUnidentified35C = nlVec3Length(v3Delta);
+    }
+    float fReach = pFielder->mUnidentified35C * pFielder->mUnidentified024.m_fMovementScale;
+    fReach += fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale());
+    return fReach;
+}
+
 static inline u8 IsHittingForCollision(const cFielder* fielder)
 {
     return fielder->IsHitting();
@@ -876,9 +985,28 @@ static inline int HasBallForCollision(const cFielder* fielder)
     return fielder->HasBall();
 }
 
+static inline void ResolveSlideAttack(cFielder* pWinner, cFielder* pLoser)
+{
+    int bHadBall = HasBallForCollision(pLoser);
+    bool bBallTooHigh = g_pBall->m_v3Position.z > 0.66f;
+    pLoser->InitActionSlideAttackReact(pWinner, false);
+    pWinner->bAttackSucceeded = true;
+    if (bHadBall && !bBallTooHigh)
+    {
+        pWinner->PickupBall(g_pBall);
+        fn_80036594(pWinner, pLoser, 2);
+    }
+    else
+    {
+        fn_80036594(pWinner, pLoser, 3);
+    }
+}
+
 void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 {
     cPlayer* pPlayerCollidedWith = pData->player2;
+    // Never read: only emits 0.75f here so the .sdata2 literal order matches retail.
+    float fUnused = 0.75f;
     if (pPlayerCollidedWith->m_eClassType != FIELDER)
         return;
 
@@ -998,85 +1126,25 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 if (m_pTweaks->mUnidentified064
                     < pFielderCollidedWith->m_pTweaks->mUnidentified064)
                 {
-                    int bHadBall = HasBallForCollision(this);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    InitActionSlideAttackReact(pFielderCollidedWith, false);
-                    pFielderCollidedWith->bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        pFielderCollidedWith->PickupBall(g_pBall);
-                        fn_80036594(pFielderCollidedWith, this, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(pFielderCollidedWith, this, 3);
-                    }
+                    ResolveSlideAttack(pFielderCollidedWith, this);
                 }
                 else if (m_pTweaks->mUnidentified064
                     > pFielderCollidedWith->m_pTweaks->mUnidentified064)
                 {
-                    int bHadBall = HasBallForCollision(pFielderCollidedWith);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    pFielderCollidedWith->InitActionSlideAttackReact(this, false);
-                    bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        PickupBall(g_pBall);
-                        fn_80036594(this, pFielderCollidedWith, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(this, pFielderCollidedWith, 3);
-                    }
+                    ResolveSlideAttack(this, pFielderCollidedWith);
                 }
                 else if (GetActualSpeed() < pFielderCollidedWith->GetActualSpeed())
                 {
-                    int bHadBall = HasBallForCollision(this);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    InitActionSlideAttackReact(pFielderCollidedWith, false);
-                    pFielderCollidedWith->bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        pFielderCollidedWith->PickupBall(g_pBall);
-                        fn_80036594(pFielderCollidedWith, this, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(pFielderCollidedWith, this, 3);
-                    }
+                    ResolveSlideAttack(pFielderCollidedWith, this);
                 }
                 else
                 {
-                    int bHadBall = HasBallForCollision(pFielderCollidedWith);
-                    bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                    pFielderCollidedWith->InitActionSlideAttackReact(this, false);
-                    bAttackSucceeded = true;
-                    if (bHadBall && !bUnidentified)
-                    {
-                        PickupBall(g_pBall);
-                        fn_80036594(this, pFielderCollidedWith, 2);
-                    }
-                    else
-                    {
-                        fn_80036594(this, pFielderCollidedWith, 3);
-                    }
+                    ResolveSlideAttack(this, pFielderCollidedWith);
                 }
             }
             else
             {
-                int bHadBall = HasBallForCollision(this);
-                bool bUnidentified = g_pBall->m_v3Position.z > 0.66f;
-                InitActionSlideAttackReact(pFielderCollidedWith, false);
-                pFielderCollidedWith->bAttackSucceeded = true;
-                if (bHadBall && !bUnidentified)
-                {
-                    pFielderCollidedWith->PickupBall(g_pBall);
-                    fn_80036594(pFielderCollidedWith, this, 2);
-                }
-                else
-                {
-                    fn_80036594(pFielderCollidedWith, this, 3);
-                }
+                ResolveSlideAttack(pFielderCollidedWith, this);
             }
         }
         else if (m_eActionState == ACTION_LOOSE_BALL_PASS
@@ -1122,6 +1190,65 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         if (!pFielderCollidedWith->IsInvincibleChars())
             pFielderCollidedWith->fn_8004D238();
     }
+}
+
+extern "C" void fn_80031A30(cFielder* pFielder, int nFrozenState, float fFrozenTime)
+{
+    bool bHasEgg = false;
+    if (pFielder->mUnidentified024.m_eCharacterClass == TOAD
+        && fn_80319FEC(pFielder->mUnidentified428->mScriptMachine, 0x17))
+    {
+        bHasEgg = true;
+    }
+
+    if (bHasEgg)
+    {
+        gNPCManager->mpYoshiEgg->Suspend(false, fFrozenTime);
+    }
+    else if (pFielder->m_pBall != 0)
+    {
+        pFielder->ReleaseBall(0);
+        if ((pFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xE
+                || pFielder->mUnidentified024.m_eCharacterClass == MYSTERY)
+            && pFielder->m_eActionState == (eFielderActionState)0x15)
+        {
+            if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
+            {
+                gNPCManager->mpKoopaShell->Deactivate(false);
+            }
+            if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
+            {
+                gNPCManager->mpBirdoEgg->Hide(false);
+            }
+        }
+
+        if (pFielder->mUnidentified024.m_eCharacterClass == DAISY
+            && pFielder->m_eActionState == (eFielderActionState)1)
+        {
+            nlVector3 v3WarpPos = pFielder->mUnidentified024.m_v3Position;
+            v3WarpPos.z = 0.18f;
+            nlVector3 v3Offset;
+            u16 aFacing = pFielder->mUnidentified024.m_aActualFacingDirection;
+            nlPolarToCartesian(v3Offset.x, v3Offset.y, aFacing,
+                fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale()));
+            v3Offset.z = 0.18f;
+            nlVec3Add(v3WarpPos, v3WarpPos, v3Offset);
+            g_pBall->WarpTo(v3WarpPos);
+        }
+
+        if (nFrozenState != 2)
+        {
+            nlVector3 v3ReleaseVelocity;
+            nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
+                pFielder->mUnidentified024.m_aActualFacingDirection,
+                2.0f + pFielder->GetActualSpeed());
+            v3ReleaseVelocity.z = 0.5f;
+            g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
+        }
+    }
+
+    ((DesireFrozen*)fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D))
+        ->fn_800BE0BC(fFrozenTime, nFrozenState);
 }
 
 void cFielder::CollideWithWallCallback(
@@ -1188,8 +1315,8 @@ void cFielder::CollideWithWallCallback(
              && GameInfoManager::Instance()->GetStadium() == 0x0B)
     {
         float distance = (float)fabs(mUnidentified024.m_v3Position.y);
-        distance -= fn_8002BFA8(m_pTweaks, lbl_806E3418);
-        if (distance > cField::GetSidelineY(1) + lbl_806E3424)
+        distance -= fn_8002BFA8(m_pTweaks, 1.0f);
+        if (distance > cField::GetSidelineY(1) + 0.5f)
         {
             fn_80046244();
         }
@@ -2635,39 +2762,29 @@ bool cFielder::fn_80038918() const
 {
     DesireFrozen* pAction = (DesireFrozen*)
         fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D);
-    bool bActionActive = false;
-    if (pAction != 0 && pAction->mActive
-        && pAction->meFrozenState != 0)
-    {
-        bActionActive = true;
-    }
-    return bActionActive;
+    return pAction != 0 && pAction->mActive && pAction->meFrozenState != 0;
+}
+
+static inline bool CanStartHit(const cFielder* fielder)
+{
+    return fielder->GetCharacterClass() != TOAD && !fielder->fn_80038918();
+}
+
+static inline bool IsInHitAction(const cFielder* fielder)
+{
+    return CanStartHit(fielder) && fielder->m_eActionState == ACTION_HIT;
+}
+
+static inline bool HasHitWindowStarted(const cFielder* fielder, float fAnimTime)
+{
+    return IsInHitAction(fielder) && fAnimTime >= fn_8002D020(fielder->m_pTweaks);
 }
 
 bool cFielder::IsHitting() const
 {
     const float fAnimTime
         = m_pCurrentAnimController->m_fTime * m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
-
-    bool isHitting, hitStarted, hitAction, canHit;
-    canHit = hitAction = hitStarted = isHitting = false;
-    if (mUnidentified024.m_eCharacterClass != TOAD && !fn_80038918())
-    {
-        canHit = true;
-    }
-    if (canHit && m_eActionState == ACTION_HIT)
-    {
-        hitAction = true;
-    }
-    if (hitAction && fAnimTime >= fn_8002D020(m_pTweaks))
-    {
-        hitStarted = true;
-    }
-    if (hitStarted && fAnimTime <= fn_8002D050(m_pTweaks))
-    {
-        isHitting = true;
-    }
-    return isHitting;
+    return HasHitWindowStarted(this, fAnimTime) && fAnimTime <= fn_8002D050(m_pTweaks);
 }
 
 bool cFielder::fn_80038660() const

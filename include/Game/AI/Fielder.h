@@ -173,6 +173,7 @@ extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
 extern "C" bool fn_800D1C34(const cFielder*);
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
+extern "C" float fn_80030750(cFielder* pFielder);
 class PhysicsObject;
 class ShotMeter;
 class AIContext;
@@ -190,6 +191,7 @@ class cFielder : public cPlayer
     friend class DesireShrink;
     friend bool fn_800D1C34(const cFielder*);
     friend bool fn_800D0DB0(class DesireSuperPower*, void*);
+    friend float fn_80030750(cFielder*);
 
 public:
     void GetReceivePassBallContactOffset(nlVector3&, unsigned short, const LooseBallContactAnimInfo*);
