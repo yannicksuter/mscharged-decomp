@@ -39,6 +39,8 @@ public:
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 protected:
+    cFielder* GetFielder() const { return m_pFielder; }
+
     cFielder* m_pFielder;
     nlVector3 mvDesiredPosition;
     int mTurboRequest;

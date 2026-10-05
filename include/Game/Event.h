@@ -268,7 +268,7 @@ template <typename T>
 void UnidentifiedEvent<T>::RestartAt(
     nlDLListIterator<Listener>& iterator, ListenerEntry* current)
 {
-    iterator = mListeners.Begin();
+    iterator.Copy(mListeners.Begin());
     iterator.m_Curr = current;
 }
 

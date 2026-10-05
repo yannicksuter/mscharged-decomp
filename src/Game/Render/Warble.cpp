@@ -130,13 +130,6 @@ void LoadWarbleBlob()
     sWarbleBlob[y >> 1][x >> 1] = 0.0f;
 }
 
-static inline int SwizzledIA8Offset(int x, int y)
-{
-    const int yOffset = ((y & 3) << 2) | ((y & ~3) << 6);
-    const int xOffset = (x & 3) | ((x >> 2) << 4);
-    return (yOffset | xOffset) << 1;
-}
-
 static inline int IA8TilePixelIndex(unsigned int x, unsigned int y)
 {
     return ((y & 3) << 2) | (x & 3);
@@ -147,17 +140,66 @@ static inline int IA8TileRowIndex(int y, int pixel)
     return ((y & ~3) << 6) | pixel;
 }
 
-void GenerateWarbleTexture(
-    float phase, float frequency, float amplitude)
+struct WarbleIA8Pixel
 {
-    int y;
-    int x;
-    PlatTexture* texture = glx_GetTex(glGetTexture(sWarbleTexture));
-    u8* output = static_cast<u8*>(texture->m_SwizzledData);
-
-    for (y = 0; y < 32; ++y)
+    u8 channels[2];
+    WarbleIA8Pixel& operator=(const WarbleIA8Pixel& source)
     {
-        const float dy = (float)y * (1.0f / 64.0f) - 0.5f;
+        for (int channel = 0; channel < 2; ++channel)
+            channels[channel] = source.channels[channel];
+        return *this;
+    }
+};
+
+static inline WarbleIA8Pixel& IA8PixelAt(u8* output, int offset)
+{
+    return *reinterpret_cast<WarbleIA8Pixel*>(output + offset);
+}
+
+union IA8PackedRow
+{
+    unsigned int word;
+    struct
+    {
+        unsigned int block : 24;
+        unsigned int blockX : 4;
+        unsigned int pixel : 2;
+        unsigned int pixelX : 2;
+    } fields;
+};
+
+static inline int IA8RowBits(int y)
+{
+    IA8PackedRow row;
+    row.word = (y & ~3) << 6;
+    row.fields.pixel = y;
+    return row.word;
+}
+
+static inline int IA8ColumnBits(int x)
+{
+    return (x & 3) | ((x >> 2) << 4);
+}
+
+static inline void MirrorWarblePixel(u8* output, int x, int y)
+{
+    const int row = IA8RowBits(y);
+    const int reflectedRow = IA8RowBits(63 - y);
+    const int column = IA8ColumnBits(x);
+    const int reflectedColumn = IA8ColumnBits(63 - x);
+    const WarbleIA8Pixel& source = IA8PixelAt(output, (row | column) << 1);
+    const int mirrorX = (row | reflectedColumn) << 1;
+    const int mirrorY = (reflectedRow | column) << 1;
+    IA8PixelAt(output, mirrorX) = source;
+    IA8PixelAt(output, mirrorY) = source;
+    const int mirrorXY = (reflectedRow | reflectedColumn) << 1;
+    IA8PixelAt(output, mirrorXY) = source;
+}
+
+struct WarbleRowGenerator
+{
+    static void Apply(u8* output, int& x, const int& y, float dy, float phase, float frequency, float amplitude)
+    {
         for (x = 0; x < 32; ++x)
         {
             const float source = sWarbleBlob[y][x];
@@ -188,23 +230,38 @@ void GenerateWarbleTexture(
             output[offset + 1] = (u8)displacement;
         }
     }
+};
 
-    for (y = 0; y < 32; ++y)
+struct WarbleRowMirror
+{
+    static void Apply(u8* output, int& x, int y)
     {
         for (x = 0; x < 32; ++x)
-        {
-            const int source = SwizzledIA8Offset(x, y);
-            const int mirrorX = SwizzledIA8Offset(63 - x, y);
-            const int mirrorY = SwizzledIA8Offset(x, 63 - y);
-            output[mirrorX] = output[source];
-            output[mirrorX + 1] = output[source + 1];
-            output[mirrorY] = output[source];
-            output[mirrorY + 1] = output[source + 1];
-            const int mirrorXY = SwizzledIA8Offset(63 - x, 63 - y);
-            output[mirrorXY] = output[source];
-            output[mirrorXY + 1] = output[source + 1];
-        }
+            MirrorWarblePixel(output, x, y);
     }
+};
+
+static inline void ProcessWarbleQuadrant(u8* output, int& x, int& y,
+    float phase, float frequency, float amplitude, bool generate)
+{
+    for (y = 0; y < 32; ++y)
+    {
+        const float dy = (float)y * (1.0f / 64.0f) - 0.5f;
+        if (generate)
+            WarbleRowGenerator::Apply(output, x, y, dy, phase, frequency, amplitude);
+        else
+            WarbleRowMirror::Apply(output, x, y);
+    }
+}
+
+void GenerateWarbleTexture(float phase, float frequency, float amplitude)
+{
+    int y;
+    int x;
+    PlatTexture* texture = glx_GetTex(glGetTexture(sWarbleTexture));
+    u8* output = static_cast<u8*>(texture->m_SwizzledData);
+    ProcessWarbleQuadrant(output, x, y, phase, frequency, amplitude, true);
+    ProcessWarbleQuadrant(output, x, y, phase, frequency, amplitude, false);
 }
 
 void UpdateWarbleTexture(bool*)

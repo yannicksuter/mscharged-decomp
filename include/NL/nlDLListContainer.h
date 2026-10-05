@@ -228,7 +228,7 @@ public:
 
     bool Walk(const Function1<bool, T&>& callback);
 
-    void DeleteEntry(DLListEntry<T>* entry);
+    inline void DeleteEntry(DLListEntry<T>* entry);
 
     /* 0x00 */ Adapter m_Allocator;
     /* 0x04 */ DLListEntry<T>* m_Head;

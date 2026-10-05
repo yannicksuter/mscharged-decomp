@@ -433,7 +433,7 @@ bool DesireHit::Initialize(void* context)
     UserControlledT(m_pFielder->m_pTeam);
     m_pFielder->InitActionHit(
         (cFielder*)((UnidentifiedVariantCollection*)context)->Get(14)->mData.pPlayer,
-        m_pFielder->mUnidentified024.m_aActualFacingDirection);
+        GetFielder()->GetActualFacing());
     return initialized;
 }
 

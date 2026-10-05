@@ -204,7 +204,7 @@ public:
     FuzzyRuntimeBase* GetFuzzyRuntime() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 
-    unsigned int IsFrozen();
+    unsigned int IsFrozen() const;
     unsigned int IsShattered();
 
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,

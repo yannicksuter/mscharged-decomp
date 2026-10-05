@@ -3,7 +3,7 @@
 
 #include "Game/HBMManager.h"
 
-inline HBMManager* fn_801FA19C()
+inline HBMManager* GetHBMManager()
 {
     return gpHBMManager;
 }

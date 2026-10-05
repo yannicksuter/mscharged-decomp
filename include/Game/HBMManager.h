@@ -38,6 +38,6 @@ public:
 }; // size 0x98
 
 extern HBMManager* gpHBMManager;
-HBMManager* fn_801FA19C();
+HBMManager* GetHBMManager();
 
 #endif // GAME_HBM_MANAGER_H

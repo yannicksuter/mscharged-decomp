@@ -184,7 +184,7 @@ void ChallengePreviewOverlay::SceneCreated()
     memcpy(mTextBuffers[2], string.c_str(), sizeof(mTextBuffers[2]));
     text->SetString(mTextBuffers[2]);
 
-    fn_801FA19C()->Unblock();
+    GetHBMManager()->Unblock();
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }
 void ChallengePreviewOverlay::OnContinuePointerEnter(int index, void*)

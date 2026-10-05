@@ -833,13 +833,9 @@ extern "C" bool fn_8003E948(const cFielder* pFielder)
 
 bool cFielder::fn_8003E9F0() const
 {
-    bool result = false;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0xB
-        && IsConcurrentStateActive(mUnidentified428->mScriptMachine, 0x17))
-    {
-        result = true;
-    }
-    return result;
+    bool active;
+    GetCharacterSpecialActive(this, YOSHI, active);
+    return active;
 }
 
 bool cFielder::fn_8003EA44() const
@@ -2989,16 +2985,14 @@ bool cFielder::IsDefense() const
     return m_eRole == ROLE_DEFENCE;
 }
 
-unsigned int cFielder::IsFrozen()
+unsigned int cFielder::IsFrozen() const
 {
-    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
-        ->IsUnidentifiedState(2);
+    return ((DesireFrozen*)GetConcurrentState(mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(2);
 }
 
 extern "C" bool fn_8003877C(const cFielder* pFielder)
 {
-    return ((DesireFrozen*)fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D))
-        ->IsUnidentifiedState(1);
+    return ((DesireFrozen*)GetConcurrentState(pFielder->mUnidentified428->mScriptMachine, 0x1D))->IsUnidentifiedState(1);
 }
 
 bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
