@@ -545,9 +545,9 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
             }
 
             float fGroundContactFrame = gOneTimerIdleGroundContactAnims[0].fAnimContactFrame;
-            const cSAnim* pGroundAnim = m_pAnimInventory->GetAnim(gOneTimerIdleGroundContactAnims[0].nAnimID);
+            const cSAnim* pGroundAnim = m_pAnimInventory->m_pSAnims[gOneTimerIdleGroundContactAnims[0].nAnimID];
             float fGroundContactTime = GetNormalizedContactTime(pGroundAnim, fGroundContactFrame);
-            const cSAnim* pVolleyAnim = m_pAnimInventory->GetAnim(gOneTimerIdleVolleyContactAnims[0].nAnimID);
+            const cSAnim* pVolleyAnim = m_pAnimInventory->m_pSAnims[gOneTimerIdleVolleyContactAnims[0].nAnimID];
             float fVolleyContactTime = GetNormalizedContactTime(pVolleyAnim, gOneTimerIdleVolleyContactAnims[0].fAnimContactFrame);
 
             for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
