@@ -13,7 +13,7 @@ class shdStateMachine;
 
 struct FuzzyActionQueueEntry
 {
-    UnidentifiedActionQueue* mQueue;
+    ScriptActionQueue* mQueue;
     bool mOwnsQueue;
     u8 mPadding005[3];
     int mQuestionHash;

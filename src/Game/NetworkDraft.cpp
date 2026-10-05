@@ -267,32 +267,40 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 
 struct DraftSidePlayer
 {
-    DraftSidePlayer() : machine(-1), guest(false) { }
+    void Reset() { machine = -1; guest = false; }
 
     s8 machine;
     bool guest;
 };
 
+struct DraftSideCursor
+{
+    int GetMachineIndex() const { return mMachineIndex; }
+    void Advance() { ++mMachineIndex; }
+    int mMachineIndex;
+};
+
 static inline void CollectDraftSidePlayers(const NetMessageDraft& message,
     int sideCounts[2], DraftSidePlayer sidePlayers[2][3])
 {
-    for (int machine = 0; machine < message.mMachineCount; ++machine)
+    DraftSideCursor cursor = DraftSideCursor();
+    for (; cursor.GetMachineIndex() < message.mMachineCount; cursor.Advance())
     {
-        int side = message.mPlayerSides.mData[machine][0];
+        int side = message.mPlayerSides.mData[cursor.GetMachineIndex()][0];
         if (side != -1)
         {
             int count = sideCounts[side]++;
             DraftSidePlayer& player = sidePlayers[side][count];
-            player.machine = machine;
+            player.machine = cursor.GetMachineIndex();
             player.guest = false;
         }
 
-        side = message.mPlayerSides.mData[machine][1];
+        side = message.mPlayerSides.mData[cursor.GetMachineIndex()][1];
         if (side != -1)
         {
             int count = sideCounts[side]++;
             DraftSidePlayer& player = sidePlayers[side][count];
-            player.machine = machine;
+            player.machine = cursor.GetMachineIndex();
             player.guest = true;
         }
     }
@@ -303,6 +311,9 @@ void NetworkDraft::AssignDraftSides()
     bool usedMachines[4] = { false };
     int sideCounts[2] = { 0, 0 };
     DraftSidePlayer sidePlayers[2][3];
+    for (int side = 0; side < 2; ++side)
+        for (int player = 0; player < 3; ++player)
+            sidePlayers[side][player].Reset();
 
     CollectDraftSidePlayers(mDraftMessage, sideCounts, sidePlayers);
 

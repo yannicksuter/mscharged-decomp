@@ -552,18 +552,18 @@ void NetworkInputRouter::OnInputReady()
 
             message->GetNetworkInputMessageRemapAngle(
                 &mRemapAngles[machine]);
-            if ((message->mUnidentified008 & 4) != 0)
+            if ((message->mFlags & 4) != 0)
             {
-                mNetworkCRCs[machine] = message->mUnidentified00C;
-                mRemoteTicks[machine] = message->mUnidentified010;
-                mRandomSeeds[machine] = message->mUnidentified014;
+                mNetworkCRCs[machine] = message->mChecksum;
+                mRemoteTicks[machine] = message->mFrame;
+                mRandomSeeds[machine] = message->mRandomSeed;
             }
-            if ((message->mUnidentified008 & 8) != 0)
+            if ((message->mFlags & 8) != 0)
             {
                 congested = true;
             }
 
-            int eventCount = message->mUnidentified05C;
+            int eventCount = message->mEventCount;
             u8 serializedData[300];
             NetworkMessageSerializer serializer(
                 1, serializedData, sizeof(serializedData));

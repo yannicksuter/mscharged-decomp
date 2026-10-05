@@ -19,7 +19,7 @@ public:
     int GetGlobalPadIndex() const { return mGlobalPadIndex; }
     cGlobalPad* GetLocalChannelPad();
     void CaptureNetworkPeerChannelInput();
-    void ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 tick, u8 connected);
+    void ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 remapAngle, u8 connected);
     void PackNetworkPeerChannelInput(PackedDetInput* record);
     u16 GetNetworkPeerChannelRemapAngle();
     u8 GetNetworkPeerChannelConnectionStatus();
@@ -31,10 +31,10 @@ public:
     /* 0x008 */ int mGlobalPadIndex;
     /* 0x00C */ bool mUnidentified00C;
     /* 0x00D */ u8 mPadding00D[3];
-    /* 0x010 */ DetInput mInput0;
-    /* 0x09C */ DetInput mInput1;
-    /* 0x128 */ DetInput mInput2;
-    /* 0x1B4 */ DetInput mInput3;
+    /* 0x010 */ DetInput mPrevInput;
+    /* 0x09C */ DetInput mInput;
+    /* 0x128 */ DetInput mPrevLocalInput;
+    /* 0x1B4 */ DetInput mLocalInput;
 };
 
 class NetworkPeer

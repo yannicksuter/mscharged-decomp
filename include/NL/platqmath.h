@@ -14,7 +14,6 @@ public:
     union
     {
         float e[4]; // offset 0x0, size 0x10
-        u32 as_u32[4];
         struct
         {
             float x; // offset 0x0, size 0x4
@@ -39,8 +38,7 @@ void nlQuatScale(nlQuaternion& out, const nlQuaternion& in, float scale);
 f32 nlQuatDot(const nlQuaternion& q1, const nlQuaternion& q2);
 void nlMultQuat(nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2);
 void nlMatrixToQuat(nlQuaternion& out, const nlMatrix4& in);
-void nlQuatToMatrix(nlMatrix4& out, const nlQuaternion& quat);
-void nlQuatToMatrix(nlMatrix4& out, const nlQuaternion& quat, bool setRemainingRows);
+void nlQuatToMatrix(nlMatrix4& out, const nlQuaternion& quat, bool setFourthColumn);
 void nlQuatSlerp(nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2, float t);
 
 #endif // _PLATQMATH_H_

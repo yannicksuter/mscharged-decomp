@@ -61,6 +61,14 @@ void CrowdManager::Update(float)
 {
 }
 
+static inline void SetPeachPhotoCellCorner(nlVector3& point,
+    const nlVector3& origin, float xStep, float yStep,
+    int x, int y, float z)
+{
+    nlVec3Set(point, origin.x + xStep * (float)x,
+        origin.y + yStep * (float)y, z);
+}
+
 void StartPeachPhoto(PeachPhotoState* photo,
     const nlVector3* centre, float delay, float halfWidth,
     float halfHeight)
@@ -77,33 +85,31 @@ void StartPeachPhoto(PeachPhotoState* photo,
     const float z = photoCentre.z;
     const float bottom = photoCentre.y + negativeHalfHeight;
     const float right = photoCentre.x + halfWidth;
-    const float top = photoCentre.y + halfHeight;
-    const float left = photoCentre.x + negativeHalfWidth;
+    float top = photoCentre.y + halfHeight;
+    float left = photoCentre.x + negativeHalfWidth;
 
     photo->delay = delay;
     nlVec3Set(photo->corners[0], left, bottom, z);
     nlVec3Set(photo->corners[1], right, bottom, z);
     nlVec3Set(photo->corners[2], right, top, z);
     nlVec3Set(photo->corners[3], left, top, z);
-    nlVec2Set(*(nlVector2*)&topLeft, photo->centre.x - halfWidth,
-        photo->centre.y - negativeHalfHeight);
+    left = photo->centre.x - halfWidth;
+    top = photo->centre.y - negativeHalfHeight;
+    topLeft.x = left;
+    topLeft.y = top;
 
     for (int x = 0; x < 3; ++x)
     {
         for (int y = 0; y < 3; ++y)
         {
-            nlVec3Set(photo->cells[x][y].world[0],
-                topLeft.x + xStep * (float)x,
-                topLeft.y + yStep * (float)(y + 1), cellZ);
-            nlVec3Set(photo->cells[x][y].world[1],
-                topLeft.x + xStep * (float)(x + 1),
-                topLeft.y + yStep * (float)(y + 1), cellZ);
-            nlVec3Set(photo->cells[x][y].world[2],
-                topLeft.x + xStep * (float)(x + 1),
-                topLeft.y + yStep * (float)y, cellZ);
-            nlVec3Set(photo->cells[x][y].world[3],
-                topLeft.x + xStep * (float)x,
-                topLeft.y + yStep * (float)y, cellZ);
+            SetPeachPhotoCellCorner(photo->cells[x][y].world[0],
+                topLeft, xStep, yStep, x, (y + 1), cellZ);
+            SetPeachPhotoCellCorner(photo->cells[x][y].world[1],
+                topLeft, xStep, yStep, (x + 1), (y + 1), cellZ);
+            SetPeachPhotoCellCorner(photo->cells[x][y].world[2],
+                topLeft, xStep, yStep, (x + 1), y, cellZ);
+            SetPeachPhotoCellCorner(photo->cells[x][y].world[3],
+                topLeft, xStep, yStep, x, y, cellZ);
         }
     }
 

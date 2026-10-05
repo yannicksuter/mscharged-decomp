@@ -96,7 +96,7 @@ FuzzyRuntimeBase::~FuzzyRuntimeBase()
 
         g_FuzzyQuestionCache.FreeBlocks();
         lbl_80584200.FreeBlocks();
-        lbl_80584228.FreeBlocks();
+        g_ScriptActionQueuePool.FreeBlocks();
         g_FuzzyActionQueuePool.FreeBlocks();
         lbl_805842C8.FreeBlocks();
 
@@ -399,8 +399,8 @@ float FuzzyRuntimeBase::UnidentifiedVirtual7(
 
 float FuzzyRuntimeBase::BeginActionQueue()
 {
-    UnidentifiedActionQueue* queue =
-        new (lbl_80584228.Allocate()) UnidentifiedActionQueue;
+    ScriptActionQueue* queue =
+        new (g_ScriptActionQueuePool.Allocate()) ScriptActionQueue;
     FuzzyActionQueueEntry* entry =
         g_FuzzyActionQueuePool.Allocate();
     if (entry != 0)
@@ -420,7 +420,7 @@ FuzzyRuntimeBase::EndActionQueue()
 {
     FuzzyActionQueueEntry* entry =
         nlListRemoveStart(&mActionQueues.mHead, &mActionQueues.mTail);
-    UnidentifiedActionQueue* queue = entry->mQueue;
+    ScriptActionQueue* queue = entry->mQueue;
     UnidentifiedVariant_80054AB8* selected = queue->SelectAction();
     if (queue->m_pSelectedAction == 0)
     {
@@ -436,7 +436,7 @@ FuzzyRuntimeBase::EndActionQueue()
         }
     }
     mReturnValues.AddEnd(selected);
-    queue->fn_8030FF6C(true);
+    queue->ClearQueuedActions(true);
     if (entry != 0)
     {
         if (entry->mOwnsQueue)
@@ -527,7 +527,7 @@ void FuzzyRuntimeBase::AddAction(
 {
     FuzzyActionQueueEntry* entry = mActionQueues.mHead;
     UnidentifiedVariant_80054AB8* value =
-        entry->mQueue->fn_80310040(action);
+        entry->mQueue->QueueAction(action);
     if (value != 0)
     {
         float confidence;
@@ -758,7 +758,7 @@ extern "C" void FuzzyNoOp_80314740(void*, bool)
 extern "C" void FuzzySetActionSelection(
     FuzzyRuntimeBase* runtime, int selection)
 {
-    runtime->mActionQueues.mHead->mQueue->fn_8031002C(selection);
+    runtime->mActionQueues.mHead->mQueue->SetActionSelection(selection);
 }
 
 extern "C" void FuzzySetTransition(

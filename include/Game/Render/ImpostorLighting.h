@@ -3,7 +3,10 @@
 
 #include "NL/nlColour.h"
 
+class LightingLookup;
 class nlVector3;
+
+extern LightingLookup* spImpostorLightingLookup;
 
 nlColour GetImpostorLightingColour(const nlVector3* position);
 void UpdateImpostorLighting();

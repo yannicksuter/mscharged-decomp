@@ -3,7 +3,6 @@
 
 #include "NL/plat/WiiPad.h"
 #include "NL/plat/PlatPadStatus.h"
-#include "NL/plat/WiiPad.h"
 #include "NL/platpad.h"
 #include "NL/plat/DPDData.h"
 

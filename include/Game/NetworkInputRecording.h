@@ -14,19 +14,19 @@ struct NetworkInputRecording
     void StartNetworkInputRecording(int localMachine, int machineCount, u32 randomSeed, const void* config, int configSize);
     bool ReadNetworkInputRecordingHeader();
     int GetNetworkInputPlaybackExtraUpdates();
-    void WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 value);
+    void WriteNetworkInputPacketHeader(s8 machine, u16 remapAngle, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 dataSize);
     void WriteNetworkInputEvent(const DetermDataEvent* event);
     void WriteData(const void* data, int size);
-    void WriteNetworkInputRecord(s8 machine, const PackedDetInput* record, u8 connected);
+    void WriteNetworkInputRecord(s8 player, const PackedDetInput* record, u8 connected);
     void Flush();
-    bool ReadNetworkInputPacketHeader(s8 machine, u16* tick, u32* checksum, u32* frame, u32* randomSeed, u32* eventCount, u32* value);
+    bool ReadNetworkInputPacketHeader(s8 machine, u16* remapAngle, u32* checksum, u32* frame, u32* randomSeed, u32* eventCount, u32* dataSize);
     bool ReadNetworkInputEvent(DetermDataEvent* event);
     bool ReadNetworkInputData(int size, void* data);
-    bool ReadNetworkInputRecord(s8 machine, PackedDetInput* record, u8* connected);
+    bool ReadNetworkInputRecord(s8 player, PackedDetInput* record, u8* connected);
 
     /* 0x00 */ bool mRecordingEnabled;
     /* 0x01 */ bool mRecording;
-    /* 0x02 */ bool mUnidentified02;
+    /* 0x02 */ bool mBufferedWrites;
     /* 0x03 */ bool mPlaybackEnabled;
     /* 0x04 */ bool mPlaybackReady;
     /* 0x05 */ char mFileName[0x64];

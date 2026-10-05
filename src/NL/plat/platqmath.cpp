@@ -1,14 +1,6 @@
+#include <revolution/mtx.h>
+
 #include "NL/nlMath.h"
-
-struct Quaternion;
-
-extern "C"
-{
-    void PSQUATScale(const Quaternion* q, Quaternion* r, float scale);
-    f32 PSQUATDotProduct(const Quaternion* p, const Quaternion* q);
-    void C_QUATSlerp(const Quaternion* p, const Quaternion* q,
-        Quaternion* r, float t);
-}
 
 void nlQuatSlerp(
     nlQuaternion& out, const nlQuaternion& q1, const nlQuaternion& q2, float t)
@@ -18,7 +10,7 @@ void nlQuatSlerp(
 }
 
 void nlQuatToMatrix(
-    nlMatrix4& out, const nlQuaternion& quat, bool setRemainingRows)
+    nlMatrix4& out, const nlQuaternion& quat, bool setFourthColumn)
 {
     f32 xx = 2.0f * (quat.x * quat.x);
     f32 yy = 2.0f * (quat.y * quat.y);
@@ -43,7 +35,7 @@ void nlQuatToMatrix(
     out.e2[2][2] = 1.0f - xx - yy;
     out.e2[3][2] = 0.0f;
 
-    if (setRemainingRows)
+    if (setFourthColumn)
     {
         out.e2[0][3] = 0.0f;
         out.e2[1][3] = 0.0f;

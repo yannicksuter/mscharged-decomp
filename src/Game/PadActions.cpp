@@ -13,7 +13,6 @@
 #include "NL/nlFormat.h"
 #include "NL/nlMemory.h"
 #include "NL/platpad.h"
-#include "NL/plat/WiiPad.h"
 #include "types.h"
 
 

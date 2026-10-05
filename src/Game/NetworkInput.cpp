@@ -1,45 +1,11 @@
 #include "Game/NetworkInput.h"
-#include "Game/NetworkDiagnostics.h"
 
 #include <string.h>
 
+#include "Game/InputManager.h"
 #include "Game/NetworkSession.h"
-#include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/PackedDetInput.h"
 #include "NL/globalpad.h"
-#include "NL/nlDebugFile.h"
-#include "NL/nlFile.h"
-#include "NL/nlMemory.h"
-#include "NL/nlPrint.h"
-#include "NL/nlString.h"
-#include "Game/InputRouter.h"
-#include "Game/TweakValue.inl"
-
-struct NetworkRecordedFrameHeader
-{
-    u32 mChecksum;
-    u32 mFrame;
-    u32 mRandomSeed;
-    u16 mTick;
-    u16 mEventCount;
-    u32 mValue;
-};
-
-struct NetworkRecordingHeader
-{
-    int mType;
-    u32 mConfigSize;
-    u32 mRandomSeed;
-    int mLocalMachine;
-    int mMachineCount;
-    int mPlayerCounts[4];
-};
-
-int g_numPacketPlaybackTurbo;
-NetworkInputRecording* gNetworkInputRecording;
-
-static TweakIntBinding sPacketPlaybackTurboTweak(
-    "g_numPacketPlaybackTurbo", "Network", &g_numPacketPlaybackTurbo, true);
 
 NetworkPeerChannel* NetworkPeer::GetNetworkPeerChannel(int channel)
 {
@@ -62,16 +28,16 @@ void NetworkPeer::ResetNetworkPeerInputs()
     for (int channel = 0; channel < (int)mPlayerCount; ++channel)
     {
         NetworkPeerChannel* entry = &mChannels[channel];
-        entry->mInput0.Reset();
-        entry->mInput1.Reset();
-        entry->mInput2.Reset();
-        entry->mInput3.Reset();
-        mChannels[channel].mInput0.m_pMyUser = entry;
-        mChannels[channel].mInput1.m_pMyUser = entry;
-        mChannels[channel].mInput2.m_pMyUser = entry;
-        mChannels[channel].mInput3.m_pMyUser = entry;
-        mChannels[channel].mInput1.m_pPrevInput = &entry->mInput0;
-        mChannels[channel].mInput3.m_pPrevInput = &entry->mInput2;
+        entry->mPrevInput.Reset();
+        entry->mInput.Reset();
+        entry->mPrevLocalInput.Reset();
+        entry->mLocalInput.Reset();
+        mChannels[channel].mPrevInput.m_pMyUser = entry;
+        mChannels[channel].mInput.m_pMyUser = entry;
+        mChannels[channel].mPrevLocalInput.m_pMyUser = entry;
+        mChannels[channel].mLocalInput.m_pMyUser = entry;
+        mChannels[channel].mInput.m_pPrevInput = &entry->mPrevInput;
+        mChannels[channel].mLocalInput.m_pPrevInput = &entry->mPrevLocalInput;
     }
 }
 
@@ -80,16 +46,16 @@ NetworkPeerChannel::NetworkPeerChannel()
     , mChannelIndex(-1)
     , mGlobalPadIndex(0)
 {
-    mInput0.Reset();
-    mInput1.Reset();
-    mInput2.Reset();
-    mInput3.Reset();
-    mInput0.m_pMyUser = this;
-    mInput1.m_pMyUser = this;
-    mInput2.m_pMyUser = this;
-    mInput3.m_pMyUser = this;
-    mInput1.m_pPrevInput = &mInput0;
-    mInput3.m_pPrevInput = &mInput2;
+    mPrevInput.Reset();
+    mInput.Reset();
+    mPrevLocalInput.Reset();
+    mLocalInput.Reset();
+    mPrevInput.m_pMyUser = this;
+    mInput.m_pMyUser = this;
+    mPrevLocalInput.m_pMyUser = this;
+    mLocalInput.m_pMyUser = this;
+    mInput.m_pPrevInput = &mPrevInput;
+    mLocalInput.m_pPrevInput = &mPrevLocalInput;
 }
 
 void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int globalPadIndex)
@@ -102,7 +68,7 @@ void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int glob
 
 DetInput* NetworkPeerChannel::GetNetworkPeerChannelInput()
 {
-    return &mInput1;
+    return &mInput;
 }
 
 s8 NetworkPeerChannel::GetNetworkPeerChannelId()
@@ -126,43 +92,43 @@ cGlobalPad* NetworkPeerChannel::GetLocalChannelPad()
 
 void NetworkPeerChannel::CaptureNetworkPeerChannelInput()
 {
-    mInput2.CopyState(mInput3);
+    mPrevLocalInput.CopyState(mLocalInput);
     cGlobalPad* pad = this->GetLocalChannelPad();
     if (pad != 0 && !gInputManager->mFrameProvider->IsInPauseMenu())
     {
-        mInput3.ReadFromPad(pad);
+        mLocalInput.ReadFromPad(pad);
     }
     else
     {
-        mInput3.Reset();
+        mLocalInput.Reset();
     }
-    mInput3.m_aRemapAngle
+    mLocalInput.m_aRemapAngle
         = gInputManager->mFrameProvider->GetInputRemapAngle();
 }
 
-void NetworkPeerChannel::ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 tick, u8 connected)
+void NetworkPeerChannel::ApplyNetworkPeerChannelInput(const PackedDetInput* record, u16 remapAngle, u8 connected)
 {
-    mInput0.CopyState(mInput1);
-    UnpackDetInput(record, &mInput1);
-    mInput1.m_aRemapAngle = tick;
-    mInput1.m_nConnected = connected;
-    mInput1.UpdatePolarAnalog();
-    mInput1.UpdateButtonStateTicks();
+    mPrevInput.CopyState(mInput);
+    UnpackDetInput(record, &mInput);
+    mInput.m_aRemapAngle = remapAngle;
+    mInput.m_nConnected = connected;
+    mInput.UpdatePolarAnalog();
+    mInput.UpdateButtonStateTicks();
 }
 
 void NetworkPeerChannel::PackNetworkPeerChannelInput(PackedDetInput* record)
 {
-    PackDetInput(record, &mInput3);
+    PackDetInput(record, &mLocalInput);
 }
 
 u16 NetworkPeerChannel::GetNetworkPeerChannelRemapAngle()
 {
-    return mInput3.m_aRemapAngle;
+    return mLocalInput.m_aRemapAngle;
 }
 
 u8 NetworkPeerChannel::GetNetworkPeerChannelConnectionStatus()
 {
-    return mInput3.GetConnectionStatus();
+    return mLocalInput.GetConnectionStatus();
 }
 
 s8 GetNetworkPlayerId(s8 player, s8 machine)
@@ -172,54 +138,54 @@ s8 GetNetworkPlayerId(s8 player, s8 machine)
 
 NetMessageInput::NetMessageInput()
 {
-    mUnidentified00C = 0;
-    mUnidentified010 = 0;
-    mUnidentified014 = 0;
-    mUnidentified00A = 0;
-    memset(mUnidentified018, 0, sizeof(mUnidentified018));
-    mUnidentified05C = 0;
-    mUnidentified008 = 0;
-    mUnidentified009 = 0;
-    memset(mUnidentified01C, 0, sizeof(mUnidentified01C));
+    mChecksum = 0;
+    mFrame = 0;
+    mRandomSeed = 0;
+    mPlayerStates = 0;
+    memset(mRecordChanges, 0, sizeof(mRecordChanges));
+    mEventCount = 0;
+    mFlags = 0;
+    mRemapAngleHigh = 0;
+    memset(mRecords, 0, sizeof(mRecords));
 }
 
 void NetMessageInput::Reset(bool clearInputs, bool clearHeader)
 {
-    mUnidentified00C = 0;
-    mUnidentified010 = 0;
-    mUnidentified014 = 0;
-    mUnidentified00A = 0;
+    mChecksum = 0;
+    mFrame = 0;
+    mRandomSeed = 0;
+    mPlayerStates = 0;
     if (clearHeader)
     {
-        memset(mUnidentified018, 0,
-            sizeof(mUnidentified018));
-        mUnidentified05C = 0;
-        mUnidentified008 = 0;
+        memset(mRecordChanges, 0,
+            sizeof(mRecordChanges));
+        mEventCount = 0;
+        mFlags = 0;
     }
     else
     {
-        mUnidentified008 &= 1;
+        mFlags &= 1;
     }
     if (clearInputs)
     {
-        mUnidentified009 = 0;
-        memset(mUnidentified01C, 0,
-            sizeof(mUnidentified01C));
+        mRemapAngleHigh = 0;
+        memset(mRecords, 0,
+            sizeof(mRecords));
     }
 }
 
 void NetMessageInput::CopyFrom(const NetMessageInput* source)
 {
-    mUnidentified008 = source->mUnidentified008;
-    mUnidentified009 = source->mUnidentified009;
-    mUnidentified00A = source->mUnidentified00A;
-    mUnidentified00C = source->mUnidentified00C;
-    mUnidentified010 = source->mUnidentified010;
-    mUnidentified014 = source->mUnidentified014;
-    mUnidentified05C = source->mUnidentified05C;
-    memcpy(mUnidentified018, source->mUnidentified018, 4);
-    memcpy(mUnidentified01C, source->mUnidentified01C, 0x40);
-    memcpy(mDetermData, source->mDetermData, 0x90);
+    mFlags = source->mFlags;
+    mRemapAngleHigh = source->mRemapAngleHigh;
+    mPlayerStates = source->mPlayerStates;
+    mChecksum = source->mChecksum;
+    mFrame = source->mFrame;
+    mRandomSeed = source->mRandomSeed;
+    mEventCount = source->mEventCount;
+    memcpy(mRecordChanges, source->mRecordChanges, 4);
+    memcpy(mRecords, source->mRecords, 0x40);
+    memcpy(mEvents, source->mEvents, 0x90);
 }
 
 void NetMessageInput::SetNetworkInputMessagePlayerState(s8 player, u8 state)
@@ -227,64 +193,64 @@ void NetMessageInput::SetNetworkInputMessagePlayerState(s8 player, u8 state)
     u8 shift = (player & 0x7F) * 2;
     u32 mask = 3 << shift;
     u8 inverse = ~mask;
-    u8 value = mUnidentified00A & inverse;
-    mUnidentified00A = value | (state << shift);
+    u8 value = mPlayerStates & inverse;
+    mPlayerStates = value | (state << shift);
 }
 
 u8 NetMessageInput::GetNetworkInputMessagePlayerState(s8 player)
 {
-    return (mUnidentified00A >> ((player & 0x7F) * 2)) & 3;
+    return (mPlayerStates >> ((player & 0x7F) * 2)) & 3;
 }
 
 void NetMessageInput::SetNetworkInputMessageRecord(s8 player, const PackedDetInput* record)
 {
     const u8* source = (const u8*)record;
 
-    if (*(const u16*)(source + 0) != *(u16*)(mUnidentified01C[player].mData + 0))
-        mUnidentified018[player] |= 2;
-    if ((s8)source[12] != (s8)mUnidentified01C[player].mData[12]
-        || (s8)source[13] != (s8)mUnidentified01C[player].mData[13])
-        mUnidentified018[player] |= 4;
-    if ((s8)source[14] != (s8)mUnidentified01C[player].mData[14]
-        || (s8)source[15] != (s8)mUnidentified01C[player].mData[15])
-        mUnidentified018[player] |= 8;
-    if ((s8)source[3] != (s8)mUnidentified01C[player].mData[3]
-        || (s8)source[4] != (s8)mUnidentified01C[player].mData[4]
-        || (s8)source[5] != (s8)mUnidentified01C[player].mData[5])
-        mUnidentified018[player] |= 0x10;
-    if ((s8)source[6] != (s8)mUnidentified01C[player].mData[6]
-        || (s8)source[7] != (s8)mUnidentified01C[player].mData[7]
-        || (s8)source[8] != (s8)mUnidentified01C[player].mData[8])
-        mUnidentified018[player] |= 0x20;
+    if (*(const u16*)(source + 0) != *(u16*)(mRecords[player].mData + 0))
+        mRecordChanges[player] |= 2;
+    if ((s8)source[12] != (s8)mRecords[player].mData[12]
+        || (s8)source[13] != (s8)mRecords[player].mData[13])
+        mRecordChanges[player] |= 4;
+    if ((s8)source[14] != (s8)mRecords[player].mData[14]
+        || (s8)source[15] != (s8)mRecords[player].mData[15])
+        mRecordChanges[player] |= 8;
+    if ((s8)source[3] != (s8)mRecords[player].mData[3]
+        || (s8)source[4] != (s8)mRecords[player].mData[4]
+        || (s8)source[5] != (s8)mRecords[player].mData[5])
+        mRecordChanges[player] |= 0x10;
+    if ((s8)source[6] != (s8)mRecords[player].mData[6]
+        || (s8)source[7] != (s8)mRecords[player].mData[7]
+        || (s8)source[8] != (s8)mRecords[player].mData[8])
+        mRecordChanges[player] |= 0x20;
 
-    if (mUnidentified018[player] != 0)
-        mUnidentified008 |= 0x10 << player;
-    memcpy(mUnidentified01C[player].mData, source, 0x10);
+    if (mRecordChanges[player] != 0)
+        mFlags |= 0x10 << player;
+    memcpy(mRecords[player].mData, source, 0x10);
 }
 
 void NetMessageInput::ApplyNetworkInputMessageRecord(s8 player, PackedDetInput* record)
 {
-    if (mUnidentified018[player] & 2)
-        record->mButtonBitfield = *(u16*)mUnidentified01C[player].mData;
-    if (mUnidentified018[player] & 4)
+    if (mRecordChanges[player] & 2)
+        record->mButtonBitfield = *(u16*)mRecords[player].mData;
+    if (mRecordChanges[player] & 4)
     {
-        const u8* source = mUnidentified01C[player].mData + 12;
+        const u8* source = mRecords[player].mData + 12;
         s8 leftX = *source++;
         s8 leftY = *source;
         record->mAnalogAxes[0] = leftX;
         record->mAnalogAxes[1] = leftY;
     }
-    if (mUnidentified018[player] & 8)
+    if (mRecordChanges[player] & 8)
     {
-        const u8* source = mUnidentified01C[player].mData + 14;
+        const u8* source = mRecords[player].mData + 14;
         s8 rightX = *source++;
         s8 rightY = *source;
         record->mAnalogAxes[2] = rightX;
         record->mAnalogAxes[3] = rightY;
     }
-    if (mUnidentified018[player] & 0x10)
+    if (mRecordChanges[player] & 0x10)
     {
-        const u8* source = mUnidentified01C[player].mData + 3;
+        const u8* source = mRecords[player].mData + 3;
         s8 x = *source++;
         s8 y = *source++;
         s8 z = *source;
@@ -292,9 +258,9 @@ void NetMessageInput::ApplyNetworkInputMessageRecord(s8 player, PackedDetInput* 
         record->mRemoteAccel[1] = y;
         record->mRemoteAccel[2] = z;
     }
-    if (mUnidentified018[player] & 0x20)
+    if (mRecordChanges[player] & 0x20)
     {
-        const u8* source = mUnidentified01C[player].mData + 6;
+        const u8* source = mRecords[player].mData + 6;
         s8 x = *source++;
         s8 y = *source++;
         s8 z = *source;
@@ -304,106 +270,106 @@ void NetMessageInput::ApplyNetworkInputMessageRecord(s8 player, PackedDetInput* 
     }
 }
 
-void NetMessageInput::SetNetworkInputMessageRemapAngle(u16 tick)
+void NetMessageInput::SetNetworkInputMessageRemapAngle(u16 remapAngle)
 {
-    u8 value = tick >> 8;
-    if (mUnidentified009 != value)
+    u8 value = remapAngle >> 8;
+    if (mRemapAngleHigh != value)
     {
-        mUnidentified009 = value;
-        mUnidentified008 |= 1;
+        mRemapAngleHigh = value;
+        mFlags |= 1;
     }
 }
 
-void NetMessageInput::GetNetworkInputMessageRemapAngle(u16* tick)
+void NetMessageInput::GetNetworkInputMessageRemapAngle(u16* remapAngle)
 {
-    if (mUnidentified008 & 1)
-        *tick = mUnidentified009 << 8;
+    if (mFlags & 1)
+        *remapAngle = mRemapAngleHigh << 8;
 }
 
 void NetMessageInput::SetNetworkInputMessageSyncData(u32 checksum, u32 frame, u32 randomSeed)
 {
-    mUnidentified00C = checksum;
-    mUnidentified010 = frame;
-    mUnidentified014 = randomSeed;
-    mUnidentified008 |= 4;
+    mChecksum = checksum;
+    mFrame = frame;
+    mRandomSeed = randomSeed;
+    mFlags |= 4;
 }
 
 void NetMessageInput::SetNetworkInputMessageCongested(bool congested)
 {
     if (congested)
-        mUnidentified008 |= 8;
+        mFlags |= 8;
     else
-        mUnidentified008 &= ~8;
+        mFlags &= ~8;
 }
 
 void NetMessageInput::AddNetworkInputMessageEvent(DetermDataEvent* event)
 {
-    if (mUnidentified05C < 4)
+    if (mEventCount < 4)
     {
-        mDetermData[mUnidentified05C] = *event;
-        ++mUnidentified05C;
+        mEvents[mEventCount] = *event;
+        ++mEventCount;
     }
 }
 
 DetermDataEvent* NetMessageInput::GetNetworkInputMessageEvent(int index)
 {
-    return &mDetermData[index];
+    return &mEvents[index];
 }
 
 void NetMessageInput::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified008, 1);
-    serializer->Transfer(&mUnidentified00A, 1);
-    if (mUnidentified008 & 1)
-        serializer->Transfer(&mUnidentified009, 1);
-    if (mUnidentified008 & 4)
+    serializer->Transfer(&mFlags, 1);
+    serializer->Transfer(&mPlayerStates, 1);
+    if (mFlags & 1)
+        serializer->Transfer(&mRemapAngleHigh, 1);
+    if (mFlags & 4)
     {
-        serializer->Transfer(&mUnidentified00C, 4);
-        serializer->Transfer(&mUnidentified010, 4);
-        serializer->Transfer(&mUnidentified014, 4);
+        serializer->Transfer(&mChecksum, 4);
+        serializer->Transfer(&mFrame, 4);
+        serializer->Transfer(&mRandomSeed, 4);
     }
-    else if (mUnidentified008 & 2)
+    else if (mFlags & 2)
     {
-        serializer->Transfer(&mUnidentified010, 4);
+        serializer->Transfer(&mFrame, 4);
     }
-    serializer->Transfer(&mUnidentified05C, 1);
-    for (int i = 0; i < mUnidentified05C; ++i)
-        mDetermData[i].Serialize(serializer);
+    serializer->Transfer(&mEventCount, 1);
+    for (int i = 0; i < mEventCount; ++i)
+        mEvents[i].Serialize(serializer);
     if (serializer->mDirection == 0)
     {
         for (s8 i = 0; i < 4; ++i)
         {
-            if (mUnidentified008 & (0x10 << i))
-                serializer->Transfer(&mUnidentified018[i], 1);
+            if (mFlags & (0x10 << i))
+                serializer->Transfer(&mRecordChanges[i], 1);
         }
     }
     else
     {
         for (s8 i = 0; i < 4; ++i)
         {
-            if (mUnidentified008 & (0x10 << i))
-                serializer->Transfer(&mUnidentified018[i], 1);
+            if (mFlags & (0x10 << i))
+                serializer->Transfer(&mRecordChanges[i], 1);
         }
     }
     for (s8 i = 0; i < 4; ++i)
     {
-        if (mUnidentified018[i] & 2)
-            serializer->Transfer(mUnidentified01C[i].mData + 0, 2);
-        if (mUnidentified018[i] & 4)
+        if (mRecordChanges[i] & 2)
+            serializer->Transfer(mRecords[i].mData + 0, 2);
+        if (mRecordChanges[i] & 4)
         {
-            serializer->Transfer(mUnidentified01C[i].mData + 12, 1);
-            serializer->Transfer(mUnidentified01C[i].mData + 13, 1);
+            serializer->Transfer(mRecords[i].mData + 12, 1);
+            serializer->Transfer(mRecords[i].mData + 13, 1);
         }
-        if (mUnidentified018[i] & 8)
+        if (mRecordChanges[i] & 8)
         {
-            serializer->Transfer(mUnidentified01C[i].mData + 14, 1);
-            serializer->Transfer(mUnidentified01C[i].mData + 15, 1);
+            serializer->Transfer(mRecords[i].mData + 14, 1);
+            serializer->Transfer(mRecords[i].mData + 15, 1);
         }
-        if (mUnidentified018[i] & 0x10)
-            serializer->Transfer(mUnidentified01C[i].mData + 3, 3);
-        if (mUnidentified018[i] & 0x20)
-            serializer->Transfer(mUnidentified01C[i].mData + 6, 3);
+        if (mRecordChanges[i] & 0x10)
+            serializer->Transfer(mRecords[i].mData + 3, 3);
+        if (mRecordChanges[i] & 0x20)
+            serializer->Transfer(mRecords[i].mData + 6, 3);
     }
 }
 
@@ -424,286 +390,7 @@ int NetMessageInput::GetType()
     return 0;
 }
 
-NetMessageAllInputs::NetMessageAllInputs()
-{
-    mUnidentified008[0] = 0;
-    memset(mPadding3CC, 0, sizeof(mPadding3CC));
-}
-
-void NetMessageAllInputs::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mUnidentified008[0], 1);
-    for (int i = 0; i < 4; ++i)
-    {
-        if (mUnidentified008[0] & (1 << i))
-            mMessages[i].Serialize(serializer);
-    }
-    if (mUnidentified008[0] & 0x80)
-    {
-        serializer->Transfer(mPadding3CC + 0, 4);
-        serializer->Transfer(mPadding3CC + 4, 4);
-        serializer->Transfer(mPadding3CC + 8, 4);
-    }
-}
-
-void NetMessageAllInputsBundle::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    mMessage0.Serialize(serializer);
-    mMessage1.Serialize(serializer);
-}
-
-int NetMessageAllInputsBundle::GetType()
-{
-    return 9;
-}
-
-int NetMessageAllInputs::GetType()
-{
-    return 8;
-}
-
-void InitializeNetworkInputRecording()
-{
-    NetworkInputRecording* state
-        = (NetworkInputRecording*)nlMalloc(
-            sizeof(NetworkInputRecording), 8, false);
-    if (state != 0)
-    {
-        nlBufferedWriterInitialize(&state->mWriter);
-        nlAsyncFileBufferInitialize(&state->mReader);
-        state->mConfigSize = 0;
-        state->mConfig = 0;
-        state->mRandomSeed = 0;
-        state->mMachineCount = 0;
-        state->mLocalMachine = 0;
-        state->mPlayerCounts[0] = 0;
-        state->mPlayerCounts[1] = 0;
-        state->mPlayerCounts[2] = 0;
-        state->mPlayerCounts[3] = 0;
-        state->Reset(true);
-    }
-    gNetworkInputRecording = state;
-}
-
-void NetworkInputRecording::Reset(bool constructing)
-{
-    if (constructing)
-    {
-        mUnidentified02 = 0;
-        mRecordingEnabled = false;
-        mRecording = false;
-        mPlaybackEnabled = false;
-        mPlaybackReady = false;
-        mFileName[0] = '\0';
-        mDebugFile = 0;
-        mFile = 0;
-    }
-    else
-    {
-        nlBufferedWriterFinish(&mWriter);
-        if (nlDebugFileIsValid(mDebugFile))
-        {
-            nlCloseFileDebug(mDebugFile);
-            mDebugFile = 0;
-        }
-        nlAsyncFileBufferFinish(&mReader);
-        if (mFile != 0)
-        {
-            nlClose((nlFile*)mFile);
-            mFile = 0;
-        }
-        if (mConfig != 0)
-        {
-            nlFree(mConfig);
-            mConfig = 0;
-        }
-        if (mRecordingEnabled)
-            mFileName[0] = '\0';
-        mRecording = false;
-        mPlaybackReady = false;
-        mPlaybackEnabled = false;
-    }
-
-    mConfigSize = 0;
-    mConfig = 0;
-    mRandomSeed = 0;
-    mMachineCount = 0;
-    mLocalMachine = 0;
-    mPlayerCounts[0] = 0;
-    mPlayerCounts[1] = 0;
-    mPlayerCounts[2] = 0;
-    mPlayerCounts[3] = 0;
-}
-
-static inline void BuildNetworkRecordingPath(char* path, unsigned long size, const char* fileName)
-{
-    nlStrNCpy(path, "GameLog/", size);
-    nlStrNCat(path, path, fileName, size);
-}
-
-void NetworkInputRecording::StartNetworkInputRecording(int localMachine, int machineCount, u32 randomSeed, const void* config, int configSize)
-{
-    mRecording = true;
-    if ((s8)mFileName[0] == 0)
-    {
-        char suffix[100];
-        FormatNetworkTimestamp(suffix, sizeof(suffix), 0);
-        nlSNPrintf(mFileName, sizeof(mFileName),
-            "netpackrec_%s__%d_%d.bin", suffix, localMachine, machineCount);
-    }
-
-    char path[256];
-    BuildNetworkRecordingPath(path, sizeof(path), mFileName);
-    mDebugFile = nlOpenFileDebug(path, true, false);
-    nlBufferedWriterAttach(&mWriter, mDebugFile,
-        mUnidentified02, 2000, 1800);
-
-    NetworkSessionData* session = g_pNetworkSessionBase;
-    NetworkRecordingHeader header;
-    header.mType = 13;
-    header.mConfigSize = configSize;
-    header.mRandomSeed = randomSeed;
-    header.mLocalMachine = localMachine;
-    header.mMachineCount = machineCount;
-    for (int machine = 0; machine < 4; ++machine)
-    {
-        if (machine < machineCount)
-            header.mPlayerCounts[machine]
-                = session->GetPeer((s8)machine)->mPlayerCount;
-        else
-            header.mPlayerCounts[machine] = 0;
-    }
-    nlBufferedWriterWrite(&mWriter, &header, sizeof(header));
-    nlBufferedWriterWrite(&mWriter, config, configSize);
-    nlBufferedWriterFlushIfNeeded(&mWriter);
-}
-
-bool NetworkInputRecording::ReadNetworkInputRecordingHeader()
-{
-    NetworkRecordingHeader header;
-    nlAsyncFileBufferRead(&mReader, &header, sizeof(header));
-    if (header.mType != 13)
-        return false;
-
-    mRandomSeed = header.mRandomSeed;
-    mMachineCount = header.mMachineCount;
-    mLocalMachine = header.mLocalMachine;
-    for (int machine = 0; machine < 4; ++machine)
-        mPlayerCounts[machine] = header.mPlayerCounts[machine];
-    mConfigSize = header.mConfigSize;
-    mConfig = nlMalloc(header.mConfigSize, 8, false);
-    nlAsyncFileBufferRead(&mReader, mConfig, header.mConfigSize);
-    mPlaybackReady = true;
-    return true;
-}
-
-int NetworkInputRecording::GetNetworkInputPlaybackExtraUpdates()
-{
-    return mPlaybackReady ? g_numPacketPlaybackTurbo : 0;
-}
-
-void NetworkInputRecording::WriteNetworkInputPacketHeader(s8 machine, u16 tick, u32 checksum, u32 frame, u32 randomSeed, u32 eventCount, u32 value)
-{
-    NetworkRecordedFrameHeader header;
-    header.mChecksum = checksum;
-    header.mFrame = frame;
-    header.mRandomSeed = randomSeed;
-    header.mTick = tick;
-    header.mEventCount = eventCount;
-    header.mValue = value;
-    nlBufferedWriterWrite(&mWriter, &header, sizeof(header));
-}
-
-void NetworkInputRecording::WriteNetworkInputEvent(const DetermDataEvent* event)
-{
-    nlBufferedWriterWrite(&mWriter, &event->mSize, 1);
-    nlBufferedWriterWrite(&mWriter, event->mData, event->mSize);
-}
-
-void NetworkInputRecording::WriteData(const void* data, int size)
-{
-    if (size > 0)
-        nlBufferedWriterWrite(&mWriter, data, size);
-}
-
-void NetworkInputRecording::WriteNetworkInputRecord(s8 machine, const PackedDetInput* record, u8 connected)
-{
-    struct RecordedInput
-    {
-        PackedDetInput mRecord;
-        u8 mConnected;
-        u8 mPadding[3];
-    } input;
-    input.mRecord = *record;
-    input.mConnected = connected;
-    input.mPadding[0] = 0;
-    input.mPadding[1] = 0;
-    input.mPadding[2] = 0;
-    nlBufferedWriterWrite(&mWriter, &input, sizeof(input));
-}
-
-void NetworkInputRecording::Flush()
-{
-    nlBufferedWriterFlushIfNeeded(&mWriter);
-}
-
-bool NetworkInputRecording::ReadNetworkInputPacketHeader(s8 machine, u16* tick, u32* checksum, u32* frame, u32* randomSeed, u32* eventCount, u32* value)
-{
-    if (nlAsyncFileBufferGetRemaining(&mReader) < sizeof(NetworkRecordedFrameHeader))
-        return false;
-    NetworkRecordedFrameHeader header;
-    nlAsyncFileBufferRead(&mReader, &header, sizeof(header));
-    *checksum = header.mChecksum;
-    *frame = header.mFrame;
-    *randomSeed = header.mRandomSeed;
-    *tick = header.mTick;
-    *eventCount = header.mEventCount;
-    *value = header.mValue;
-    return true;
-}
-
-bool NetworkInputRecording::ReadNetworkInputEvent(DetermDataEvent* event)
-{
-    if ((u32)nlAsyncFileBufferGetRemaining(&mReader) < 1)
-        return false;
-    nlAsyncFileBufferRead(&mReader, &event->mSize, 1);
-    if (nlAsyncFileBufferGetRemaining(&mReader) < event->mSize)
-        return false;
-    nlAsyncFileBufferRead(&mReader, event->mData, event->mSize);
-    return true;
-}
-
-bool NetworkInputRecording::ReadNetworkInputData(int size, void* data)
-{
-    if (size == 0)
-        return true;
-    if (nlAsyncFileBufferGetRemaining(&mReader) < size)
-        return false;
-    nlAsyncFileBufferRead(&mReader, data, size);
-    return true;
-}
-
-bool NetworkInputRecording::ReadNetworkInputRecord(s8 machine, PackedDetInput* record, u8* connected)
-{
-    struct RecordedInput
-    {
-        PackedDetInput mRecord;
-        u8 mConnected;
-        u8 mPadding[3];
-    } input;
-    if (nlAsyncFileBufferGetRemaining(&mReader) < sizeof(input))
-        return false;
-    nlAsyncFileBufferRead(&mReader, &input, sizeof(input));
-    *record = input.mRecord;
-    *connected = input.mConnected;
-    return true;
-}
-
 typedef char VerifyNetworkPeerChannelSize[
     sizeof(NetworkPeerChannel) == 0x240 ? 1 : -1];
 typedef char VerifyNetworkPeerSize[
     sizeof(NetworkPeer) == 0x908 ? 1 : -1];
-typedef char VerifyNetGameStateSize[
-    sizeof(NetworkInputRecording) == 0xF0 ? 1 : -1];

@@ -396,53 +396,68 @@ void NetworkStatsManager::BuildFriendsLeaderboard()
     NetworkRanking::AssignDisplayRanks(write, friends.mMetadata, 1);
 }
 
-void NetworkStatsManager::OnLeaderboardResult(bool success,
-    int category, int filter, int count, NetworkStatsPlayer*,
-    NetworkRankingMeta*)
+struct LeaderboardResultView
 {
-    mOperation = 0;
-    mLeaderboardRequestComplete = true;
-    mLeaderboardCategory = mRequestedCategory;
-    if ((int)success != 1)
+    const bool& mSucceeded;
+    int mCategory;
+    int mFilter;
+    const int& mCount;
+};
+
+static inline void FinishLeaderboardRequest(NetworkStatsManager* manager,
+    const LeaderboardResultView& result)
+{
+    manager->mOperation = 0;
+    manager->mLeaderboardRequestComplete = true;
+    manager->mLeaderboardCategory = manager->mRequestedCategory;
+    if ((int)result.mSucceeded != 1)
     {
-        mStatsError = true;
-        mLeaderboardRequestSucceeded = false;
-        mCategories[mRequestedCategory].mAvailable = false;
-        mCategories[mRequestedCategory].mCount = 0;
-        mCategories[mRequestedCategory].mFirstRank = -1;
+        manager->mStatsError = true;
+        manager->mLeaderboardRequestSucceeded = false;
+        manager->mCategories[manager->mRequestedCategory].mAvailable = false;
+        manager->mCategories[manager->mRequestedCategory].mCount = 0;
+        manager->mCategories[manager->mRequestedCategory].mFirstRank = -1;
         tDebugPrintManager::Print(DC_NETWORK,
             "Unavailable Leaderboard Stats cat %d filter %d\n",
-            category,
-            filter);
-        if (mRequestedCategory == 4)
+            result.mCategory,
+            result.mFilter);
+        if (manager->mRequestedCategory == 4)
         {
-            mCategories[5].mAvailable = false;
-            mCategories[5].mCount = 0;
-            mCategories[5].mFirstRank = -1;
+            manager->mCategories[5].mAvailable = false;
+            manager->mCategories[5].mCount = 0;
+            manager->mCategories[5].mFirstRank = -1;
         }
     }
     else
     {
-        mLeaderboardRequestSucceeded = true;
+        manager->mLeaderboardRequestSucceeded = true;
         tDebugPrintManager::Print(DC_NETWORK,
             "Sucessfully got leaderboard stats cat %d filter %d\n",
-            category,
-            filter);
-        mCategories[mRequestedCategory].mAvailable = true;
-        mCategories[mRequestedCategory].mCount = count;
-        mCategories[mRequestedCategory].mFirstRank = -1;
-        if (filter == 1)
+            result.mCategory,
+            result.mFilter);
+        manager->mCategories[manager->mRequestedCategory].mAvailable = true;
+        manager->mCategories[manager->mRequestedCategory].mCount = result.mCount;
+        manager->mCategories[manager->mRequestedCategory].mFirstRank = -1;
+        if (result.mFilter == 1)
         {
             GetRegion();
-            UpdateFriendRankingNames(&mCategories[mRequestedCategory]);
+            manager->UpdateFriendRankingNames(&manager->mCategories[manager->mRequestedCategory]);
         }
-        ApplyLeaderboardToSave(&mCategories[mRequestedCategory], true);
-        if (mRequestedCategory == 4)
+        manager->ApplyLeaderboardToSave(&manager->mCategories[manager->mRequestedCategory], true);
+        if (manager->mRequestedCategory == 4)
         {
-            BuildFriendsLeaderboard();
-            ApplyLeaderboardToSave(&mCategories[5], false);
+            manager->BuildFriendsLeaderboard();
+            manager->ApplyLeaderboardToSave(&manager->mCategories[5], false);
         }
     }
+}
+
+void NetworkStatsManager::OnLeaderboardResult(bool success,
+    int category, int filter, int count, NetworkStatsPlayer*,
+    NetworkRankingMeta*)
+{
+    const LeaderboardResultView result = { success, category, filter, count };
+    FinishLeaderboardRequest(this, result);
 }
 
 bool NetworkStatsManager::PostResetMyPlayerStats(

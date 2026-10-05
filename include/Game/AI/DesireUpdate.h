@@ -159,21 +159,21 @@ public:
     bool mTemporary;
 };
 
-class UnidentifiedActionQueue
+class ScriptActionQueue
 {
 public:
-    UnidentifiedActionQueue();
-    ~UnidentifiedActionQueue();
+    ScriptActionQueue();
+    ~ScriptActionQueue();
 
     static void operator delete(void* entry);
 
-    void fn_8030FF6C(bool preserveSelected);
-    void fn_8031002C(int actionSelection);
-    void fn_80310034(float* weights, int count);
-    UnidentifiedVariant_80054AB8* fn_80310040(
+    void ClearQueuedActions(bool preserveSelected);
+    void SetActionSelection(int actionSelection);
+    void SetSelectionWeights(float* weights, int count);
+    UnidentifiedVariant_80054AB8* QueueAction(
         UnidentifiedVariant_80054AB8* pNewAction);
-    UnidentifiedVariant_80054AB8* fn_80310B80(
-        UnidentifiedVariant_80054AB8* pAction);
+    UnidentifiedVariant_80054AB8* FindQueuedAction(
+        UnidentifiedVariant_80054AB8* pFind);
     UnidentifiedVariant_80054AB8* SelectAction();
 
     UnidentifiedVariant_80054AB8* m_pLastQueuedAction;
@@ -187,7 +187,7 @@ public:
 extern UnidentifiedVariant_80054AB8 lbl_80584250;
 
 extern SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
-extern SlotPool<UnidentifiedActionQueue> lbl_80584228;
+extern SlotPool<ScriptActionQueue> g_ScriptActionQueuePool;
 extern SlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
 extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(InterpreterCore*, const char*, cFielder*);
@@ -241,9 +241,9 @@ inline void UnidentifiedVariant_80054AB8::operator delete(void* entry)
     lbl_805842C8.DeleteEntry((UnidentifiedVariant_80054AB8*)entry);
 }
 
-inline void UnidentifiedActionQueue::operator delete(void* entry)
+inline void ScriptActionQueue::operator delete(void* entry)
 {
-    lbl_80584228.DeleteEntry((UnidentifiedActionQueue*)entry);
+    g_ScriptActionQueuePool.DeleteEntry((ScriptActionQueue*)entry);
 }
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(

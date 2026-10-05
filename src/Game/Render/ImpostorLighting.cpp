@@ -31,57 +31,7 @@ static TweakValueInt g_HighlightBlue(
     "g_HighlightBlue", gLastTweakCategory, 255);
 
 static u32 sImpostorLightingTexture = -1;
-static LightingLookup* spImpostorLightingLookup;
-
-LightingLookup::LightingLookup()
-    : mValues(0)
-    , mWidth(0)
-    , mHeight(0)
-{
-}
-
-LightingLookup::~LightingLookup()
-{
-    if (mValues != 0)
-    {
-        delete[] mValues;
-    }
-}
-
-nlColour GetImpostorLightingColour(const nlVector3* position)
-{
-    nlColour colour;
-    if (spImpostorLightingLookup == 0)
-    {
-        nlColourSet(colour, 255, 255, 255, 255);
-    }
-    else
-    {
-        LightingLookup* lookup = spImpostorLightingLookup;
-        nlVector2 coordinate;
-        float x = position->x * gShadowLookupScaleX.value;
-        x += gShadowLookupTransX.value;
-        x = 0.5f * x + 0.5f;
-        float y = position->y * gShadowLookupScaleY.value;
-        y += gShadowLookupTransY.value;
-        y = -0.5f * y + 0.5f;
-        nlVec2Set(coordinate, x, y);
-        int width = lookup->mWidth;
-        int height = lookup->mHeight;
-        int lookupX = (int)(coordinate.x * (width - 1));
-        int lookupY = (int)(coordinate.y * (height - 1));
-        if (lookupX >= width)
-        {
-            lookupX = width - 1;
-        }
-        if (lookupY >= height)
-        {
-            lookupY = height - 1;
-        }
-        colour = lookup->SampleColour(lookupX, lookupY, true);
-    }
-    return colour;
-}
+LightingLookup* spImpostorLightingLookup;
 
 void UpdateImpostorLighting()
 {
@@ -125,6 +75,21 @@ void FreeImpostorLighting()
     {
         delete spImpostorLightingLookup;
         spImpostorLightingLookup = 0;
+    }
+}
+
+LightingLookup::LightingLookup()
+    : mValues(0)
+    , mWidth(0)
+    , mHeight(0)
+{
+}
+
+LightingLookup::~LightingLookup()
+{
+    if (mValues != 0)
+    {
+        delete[] mValues;
     }
 }
 
@@ -269,8 +234,13 @@ nlColour LightingLookup::SampleFilteredColour(
 u8 LightingLookup::ReadTextureIntensity(
     const PlatTexture* texture, int x, int y) const
 {
-    int block = (y >> 2) * (texture->m_Width >> 3) + (x >> 3);
-    int offset = (block << 5) + ((y & 3) << 3) + (x & 7);
+    int tileX = x >> 3;
+    int tileY = y >> 2;
+    int tilesPerRow = texture->m_Width >> 3;
+    int tile = tileY * tilesPerRow + tileX;
+    int texelX = x & 7;
+    int texelY = y & 3;
+    int offset = (tile << 5) + (texelY << 3) + texelX;
     u8 paletteIndex = ((u8*)texture->m_SwizzledData)[offset];
     u16 value = texture->m_PaletteData[paletteIndex];
     if (value & 0x8000)
@@ -278,7 +248,9 @@ u8 LightingLookup::ReadTextureIntensity(
         int component = (value >> 10) & 0x1F;
         return component * 255 / 31;
     }
-
-    int component = (value >> 8) & 0x0F;
-    return component * 255 / 15;
+    else
+    {
+        int component = (value >> 8) & 0x0F;
+        return component * 255 / 15;
+    }
 }

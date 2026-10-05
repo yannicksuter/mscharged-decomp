@@ -5,10 +5,9 @@
 #include "Game/MathHelpers.h"
 #include "NL/nlMath.h"
 #include "NL/nlTicker.h"
-#include "NL/nlPrint.h"
 
 
-static inline float UnidentifiedGetExtraFloat(
+static inline float GetActionFloatParameter(
     UnidentifiedVariant_80054AB8* pAction, int index,
     float defaultValue)
 {
@@ -19,7 +18,7 @@ static inline float UnidentifiedGetExtraFloat(
     return defaultValue;
 }
 
-int fn_8030FD40(
+int CompareActionConfidence(
     UnidentifiedVariant_80054AB8*& first,
     UnidentifiedVariant_80054AB8*& second)
 {
@@ -36,7 +35,7 @@ int fn_8030FD40(
     return 1;
 }
 
-static inline void InsertNonHead(UnidentifiedActionQueue* queue,
+static inline void InsertNonHead(ScriptActionQueue* queue,
     UnidentifiedVariant_80054AB8* prev,
     UnidentifiedVariant_80054AB8* pInsertionNode)
 {
@@ -53,9 +52,9 @@ static inline void InsertNonHead(UnidentifiedActionQueue* queue,
     }
 }
 
-SlotPool<UnidentifiedActionQueue> lbl_80584228(16, 16);
+SlotPool<ScriptActionQueue> g_ScriptActionQueuePool(16, 16);
 
-UnidentifiedActionQueue::UnidentifiedActionQueue()
+ScriptActionQueue::ScriptActionQueue()
 {
     m_lQueuedActions.m_pEnd = 0;
     m_lQueuedActions.m_pStart = 0;
@@ -66,7 +65,7 @@ UnidentifiedActionQueue::UnidentifiedActionQueue()
     mNumSelectionWeights = 0;
 }
 
-UnidentifiedActionQueue::~UnidentifiedActionQueue()
+ScriptActionQueue::~ScriptActionQueue()
 {
     UnidentifiedVariant_80054AB8* pNext;
     UnidentifiedVariant_80054AB8* pAction
@@ -84,7 +83,7 @@ UnidentifiedActionQueue::~UnidentifiedActionQueue()
     m_pSelectedAction = 0;
 }
 
-void UnidentifiedActionQueue::fn_8030FF6C(bool preserveSelected)
+void ScriptActionQueue::ClearQueuedActions(bool preserveSelected)
 {
     UnidentifiedVariant_80054AB8* pAction
         = m_lQueuedActions.m_pStart;
@@ -104,47 +103,47 @@ void UnidentifiedActionQueue::fn_8030FF6C(bool preserveSelected)
     m_pSelectedAction = 0;
 }
 
-void UnidentifiedActionQueue::fn_8031002C(int actionSelection)
+void ScriptActionQueue::SetActionSelection(int actionSelection)
 {
     mActionSelection = actionSelection;
 }
 
-void UnidentifiedActionQueue::fn_80310034(
+void ScriptActionQueue::SetSelectionWeights(
     float* weights, int count)
 {
     m_pSelectionWeights = weights;
     mNumSelectionWeights = count;
 }
 
-UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310040(
+UnidentifiedVariant_80054AB8* ScriptActionQueue::QueueAction(
     UnidentifiedVariant_80054AB8* pNewAction)
 {
     if (pNewAction->ExtraData.IsSet(5)
-        && UnidentifiedGetExtraFloat(pNewAction, 4, 0.0f)
+        && GetActionFloatParameter(pNewAction, 4, 0.0f)
                < pNewAction->ExtraData.Get(5)->mData.f)
     {
         delete pNewAction;
         return 0;
     }
 
-    if (UnidentifiedGetExtraFloat(pNewAction, 6, 1.0f) == 0.0f)
+    if (GetActionFloatParameter(pNewAction, 6, 1.0f) == 0.0f)
     {
         delete pNewAction;
         return 0;
     }
 
-    if (UnidentifiedGetExtraFloat(pNewAction, 4, 0.0f) == 0.0f)
+    if (GetActionFloatParameter(pNewAction, 4, 0.0f) == 0.0f)
     {
         nlPrintf("This should never happen!.\n");
     }
 
-    UnidentifiedVariant_80054AB8* pAction = fn_80310B80(pNewAction);
+    UnidentifiedVariant_80054AB8* pAction = FindQueuedAction(pNewAction);
     if (pAction != 0)
     {
-        float oldValue = UnidentifiedGetExtraFloat(pAction, 4, 0.0f)
-                       * UnidentifiedGetExtraFloat(pAction, 6, 1.0f);
-        float newValue = UnidentifiedGetExtraFloat(pNewAction, 4, 0.0f)
-                       * UnidentifiedGetExtraFloat(pNewAction, 6, 1.0f);
+        float oldValue = GetActionFloatParameter(pAction, 4, 0.0f)
+                       * GetActionFloatParameter(pAction, 6, 1.0f);
+        float newValue = GetActionFloatParameter(pNewAction, 4, 0.0f)
+                       * GetActionFloatParameter(pNewAction, 6, 1.0f);
         if (oldValue < newValue)
         {
             nlListRemoveElement(&m_lQueuedActions.m_pStart, pAction,
@@ -178,7 +177,7 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310040(
         {
             for (; cur != 0; prev = cur, cur = cur->next)
             {
-                if (fn_8030FD40(cur, pQueuedAction) > 0)
+                if (CompareActionConfidence(cur, pQueuedAction) > 0)
                 {
                     if (prev == 0)
                     {
@@ -212,7 +211,7 @@ static inline bool EqualParameterValue(const FuzzyVariant& value,
     return value == other;
 }
 
-UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310B80(
+UnidentifiedVariant_80054AB8* ScriptActionQueue::FindQueuedAction(
     UnidentifiedVariant_80054AB8* pFind)
 {
     if (m_lQueuedActions.m_pStart == 0)
@@ -250,7 +249,7 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310B80(
     return 0;
 }
 
-UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
+UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
 {
     UnidentifiedVariant_80054AB8* pSelectedAction;
     int count;
@@ -281,9 +280,9 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
                 weight = m_pSelectionWeights[weightIndex];
             }
 
-            float chance = UnidentifiedGetExtraFloat(pAction, 6, 1.0f);
+            float chance = GetActionFloatParameter(pAction, 6, 1.0f);
             chance = weight * chance;
-            float confidence = UnidentifiedGetExtraFloat(
+            float confidence = GetActionFloatParameter(
                 pAction, 4, 0.0f);
             chances[count] = chance * confidence;
             total += chances[count];
@@ -323,7 +322,7 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
         int index = 0;
         for (; pAction != 0; pAction = pAction->next, ++index)
         {
-            float chance = UnidentifiedGetExtraFloat(pAction, 6, 1.0f);
+            float chance = GetActionFloatParameter(pAction, 6, 1.0f);
             if (m_pSelectionWeights != 0)
             {
                 int weightIndex = nlMin(mNumSelectionWeights - 1, index);
@@ -345,8 +344,8 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::SelectAction()
                  pBest != 0; pBest = pBest->next)
             {
                 if (pSelectedAction == 0
-                    || UnidentifiedGetExtraFloat(pBest, 6, 1.0f)
-                           > UnidentifiedGetExtraFloat(
+                    || GetActionFloatParameter(pBest, 6, 1.0f)
+                           > GetActionFloatParameter(
                                pSelectedAction, 6, 1.0f))
                 {
                     pSelectedAction = pBest;

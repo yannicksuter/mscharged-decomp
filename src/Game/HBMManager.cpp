@@ -184,7 +184,7 @@ void HBMManager::LoadResources()
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 
-    memset(messageBuffer, 0, messageBufferSize);
+    memset(messageBuffer, 0, messageSize);
     nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.msgBuf, 32,
         AllocateStart, messageBuffer, messageBufferSize, 0);
 
@@ -204,7 +204,7 @@ void HBMManager::LoadResources()
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 
-    memset(configBuffer, 0, configBufferSize);
+    memset(configBuffer, 0, configSize);
     nlLoadEntireFileAsync(path, OnFileLoaded, &mDataInfo.configBuf, 32,
         AllocateStart, configBuffer, configBufferSize, 0);
 

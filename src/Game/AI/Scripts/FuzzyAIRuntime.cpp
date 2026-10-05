@@ -107,8 +107,8 @@ float FuzzyAIRuntime::BeginActionQueue()
 
     if (value != 0)
     {
-        UnidentifiedActionQueue* collection = mActionQueues.mHead->mQueue;
-        collection->fn_80310034(value->GetDecisionWeights(), 4);
+        ScriptActionQueue* queue = mActionQueues.mHead->mQueue;
+        queue->SetSelectionWeights(value->GetDecisionWeights(), 4);
     }
 
     return result;

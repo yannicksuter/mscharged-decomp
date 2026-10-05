@@ -24,12 +24,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlDebugViews.h"
 
-static EffectsLight g_EffectsLights[3];
-static int g_nNumLights;
-static unsigned long fx_sTerrain;
-static unsigned int sResourceIdCounter;
-static const char* sDefaultResourceNames[2] = { "Default", "World" };
-
 class EffectsBundle
 {
 public:
@@ -52,7 +46,6 @@ public:
     }
 
     inline void Load(nlChunk* bundle);
-    inline EffectsBundleData* ParseData(nlChunk* bundle, nlChunk* end);
 
     /* 0x00 */ EffectsBundle* m_next;
     /* 0x04 */ EffectsBundle* m_prev;
@@ -73,7 +66,11 @@ typedef nlAVLTree<unsigned long, LingerMessage*,
 typedef nlAVLTreeIterator<unsigned long, LingerMessage*,
     DefaultKeyCompare<unsigned long> > LingerTreeIterator;
 
+static int lbl_806E1FD8;
+static int lbl_806E1FDC;
 static LingerTree* lingerers;
+static unsigned int sResourceIdCounter;
+static const char* sDefaultResourceNames[2] = { "Default", "World" };
 
 static nlAVLTree<unsigned long, EffectsGroup*,
     DefaultKeyCompare<unsigned long> > sEffectsGroups;
@@ -88,9 +85,7 @@ public:
     {
     }
 
-    ~EffectsBundleManager()
-    {
-    }
+    ~EffectsBundleManager();
 
     void Load(void* data, void* nonResidentData, GLResourcePool* context, int bundleType);
     inline void ClearAdditional();
@@ -101,14 +96,16 @@ public:
 };
 
 EffectsBundleManager gEffectsBundleManager;
-extern void* gEffectsData;
-extern void* gEffectsNonResidentData;
-extern void* lbl_806E1FF0;
-extern void* gEffectsGeometryData;
-extern void* gEffectsTextureData;
-extern int lbl_806E1FD8;
-extern int lbl_806DF4C0;
-static int lbl_806E1FDC;
+void* gEffectsData;
+void* gEffectsNonResidentData;
+void* lbl_806E1FF0;
+void* gEffectsGeometryData;
+void* gEffectsTextureData;
+GLInventory* gEffectsModelInventory;
+
+EffectsBundleManager::~EffectsBundleManager()
+{
+}
 
 inline void EffectsBundleManager::ClearAdditional()
 {
@@ -124,7 +121,7 @@ inline void EffectsBundleManager::ClearAdditional()
             EffectsBundleData* data = iterator.Current();
             for (int i = 0; i < data->mNumGroups; ++i)
             {
-                unsigned long hash = data->mGroups[i]->GetHashID();
+                unsigned long hash = data->GetGroup(i)->GetHashID();
                 sEffectsGroups.Remove(hash);
             }
         }
@@ -136,15 +133,8 @@ inline void EffectsBundleManager::ClearAdditional()
 void OnEffectsGeometryLoaded(
     void* data, unsigned long size, void* userData);
 
-inline EffectsBundleData* EffectsBundle::ParseData(nlChunk* bundle, nlChunk* end)
+static inline void RegisterBundleGroups(EffectsBundleData* data)
 {
-    mInventory.ParseChunks(bundle, end);
-    return mInventory.Find(0);
-}
-
-inline void EffectsBundle::Load(nlChunk* bundle)
-{
-    EffectsBundleData* data = ParseData(bundle, bundle->GetLastChunk());
     for (int i = 0; i < data->mNumGroups; ++i)
     {
         EffectsGroup* group = data->GetGroup(i);
@@ -156,23 +146,11 @@ inline void EffectsBundle::Load(nlChunk* bundle)
     }
 }
 
-class EffectsBundleChunkIterator
+inline void EffectsBundle::Load(nlChunk* bundle)
 {
-public:
-    EffectsBundleChunkIterator(nlChunk* container)
-        : mEnd(container->GetLastChunk())
-        , mCurrent(container->GetFirstChunk())
-    {
-    }
-
-    bool IsValid() const { return mCurrent != mEnd; }
-    nlChunk* Current() const { return mCurrent; }
-    void Next() { mCurrent = mCurrent->GetNextChunk(); }
-
-private:
-    nlChunk* mEnd;
-    nlChunk* mCurrent;
-};
+    mInventory.ParseChunks(bundle, bundle->GetNextChunk());
+    RegisterBundleGroups(mInventory.Find(0));
+}
 
 class EffectsBundleChunkLoader : public GLResourceChunkLoader
 {
@@ -183,9 +161,15 @@ public:
     {
     }
 
-    bool LoadChunk(void* data)
+    void Load(nlChunk* bundle)
     {
-        return LoadChunk((nlChunk*)data);
+        nlChunk* end = bundle->GetLastChunk();
+        nlChunk* chunk = bundle->GetFirstChunk();
+        while (chunk != end)
+        {
+            LoadChunk(chunk);
+            chunk = chunk->GetNextChunk();
+        }
     }
 
     bool LoadChunk(nlChunk* chunk)
@@ -214,28 +198,17 @@ void EffectsBundleManager::Load(void* data, void* nonResidentData,
 
     if (bundleType == 2)
     {
-        loader.LoadChunk(data);
+        loader.LoadChunk((nlChunk*)data);
     }
     else
     {
         if (data != 0)
         {
-            EffectsBundleChunkIterator iterator((nlChunk*)data);
-            while (iterator.IsValid())
-            {
-                loader.LoadChunk(iterator.Current());
-                iterator.Next();
-            }
+            loader.Load((nlChunk*)data);
         }
-
         if (nonResidentData != 0)
         {
-            EffectsBundleChunkIterator iterator((nlChunk*)nonResidentData);
-            while (iterator.IsValid())
-            {
-                loader.LoadChunk(iterator.Current());
-                iterator.Next();
-            }
+            loader.Load((nlChunk*)nonResidentData);
         }
     }
 
@@ -552,20 +525,20 @@ void EmissionManager::Shutdown()
 }
 
 /**
+ * Offset/Address/Size: 0x0 | 0x802E75F4 | size: 0x64
+ */
+EmissionManager* GetEmissionManager()
+{
+    return EmissionManager::Instance();
+}
+
+/**
  * Offset/Address/Size: 0x0 | 0x802E7658 | size: 0x64
  */
 EmissionManager* EmissionManager::Instance()
 {
     static EmissionManager instance;
     return &instance;
-}
-
-/**
- * Offset/Address/Size: 0x0 | 0x802E75F4 | size: 0x64
- */
-EmissionManager* GetEmissionManager()
-{
-    return EmissionManager::Instance();
 }
 
 /**
@@ -641,6 +614,9 @@ void EmissionManager::Update(float dt)
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
 }
 
+static EffectsLight g_EffectsLights[3];
+static int g_nNumLights;
+
 /**
  * Offset/Address/Size: 0x0 | 0x802E7A90 | size: 0x8
  */
@@ -685,10 +661,7 @@ void EmissionManager::Render()
     EmissionResourceStats* stats = Instance()->mResourceStats;
     for (i = 0; i < 8; ++stats, ++i)
     {
-        if (stats->unknown_0x32_bit14)
-        {
-            *stats->mCount = lbl_806DF4C0;
-        }
+        stats->ResetCount();
     }
 
     int renderedParticles = 0;
@@ -1435,6 +1408,8 @@ void EmissionManager::Replay(SaveFrame& frame)
     }
 }
 
+static unsigned long fx_sTerrain;
+
 /**
  * Offset/Address/Size: 0x0 | 0x802E9650 | size: 0x8
  */
@@ -1599,6 +1574,14 @@ void EmissionResourceStats::Initialize()
         name, 0, category, false, 0.0f, 0.0f, 0.0f);
     *mBudgetTweak = mBudget;
     unknown_0x32_bit14 = 1;
+}
+
+inline void EmissionResourceStats::ResetCount()
+{
+    if (unknown_0x32_bit14)
+    {
+        *mCount = 0;
+    }
 }
 
 /**

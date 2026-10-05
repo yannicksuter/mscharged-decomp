@@ -1,5 +1,6 @@
 #include "NL/plat/WiiPad.h"
 #include "NL/nlMath.h"
+#include "NL/nlMath.inl"
 
 #include <math.h>
 
@@ -78,12 +79,11 @@ unsigned short MapWiiStickToDPad(float normalizedX, float normalizedY,
     {
         float filteredX = fabsf(normalizedX) >= 0.6f ? normalizedX : 0.0f;
         float filteredY = fabsf(normalizedY) >= 0.6f ? normalizedY : 0.0f;
-        float angle = nlATan2f(filteredY, filteredX);
-        unsigned short angleU16 = (unsigned short)(int)(angle * 10430.378f);
-        float degrees = (float)angleU16 * 0.005493164f;
-        int roundedDeg = (int)degrees;
-        roundedDeg = (roundedDeg / 45) * 45;
-        switch (roundedDeg)
+        unsigned short angle = nlATan2Angle(filteredY, filteredX);
+        float degrees = (float)angle * 0.005493164f;
+        int sectorDeg = (int)degrees;
+        sectorDeg = (sectorDeg / 45) * 45;
+        switch (sectorDeg)
         {
         case 0: button = right; break;
         case 45: button = right | up; break;
