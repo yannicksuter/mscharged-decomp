@@ -276,7 +276,7 @@ void MemCheckTask::Run(float)
     sStandardLargestFreeMiB =
         StandardAllocator.LargestFreeBlock() / bytesPerMiB;
 
-    // AudioBackend::m_Unknown434.
+    // AudioBackend::m_AudioAllocator.
     MemoryAllocator* audioAllocator =
         reinterpret_cast<MemoryAllocator*>(
             reinterpret_cast<u8*>(g_pAudioBackend) + 0x434);

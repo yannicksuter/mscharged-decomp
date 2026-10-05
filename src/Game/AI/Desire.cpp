@@ -263,7 +263,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)
         {
-            update->SetDesireFinished();
+            *update = DESIRE_FINISHED;
             return;
         }
         Goalie* goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
@@ -293,7 +293,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)
         {
-            update->SetDesireFinished();
+            *update = DESIRE_FINISHED;
             return;
         }
         nlVector3 opponentDelta;
@@ -368,7 +368,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)
         {
-            update->SetDesireFinished();
+            *update = DESIRE_FINISHED;
             return;
         }
         nlVector3 delta;
@@ -727,7 +727,7 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
 {
     if (m_pFielder->fn_8003EA6C() && Incapacitated(m_pTarget))
     {
-        update->SetDesireFinished();
+        *update = DESIRE_FINISHED;
         return;
     }
     if (update->mData.i != DESIRE_CONTINUE)
@@ -736,7 +736,7 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
     }
     if (m_fMaxDistance > 0.0f && m_fDistTravelled >= m_fMaxDistance)
     {
-        update->SetDesireFinished();
+        *update = DESIRE_FINISHED;
         return;
     }
 
@@ -862,13 +862,13 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
         {
         case 15:
             m_pFielder->InitActionLooseBallShot(update->ExtraData.Get(16)->mData.b);
-            update->SetDesireFinished();
+            *update = DESIRE_FINISHED;
             return;
         case 14:
         {
             cFielder* target = static_cast<cFielder*>(update->ExtraData.Get(14)->mData.pPlayer);
             m_pFielder->InitActionLooseBallPass(target, OpenTo(m_pFielder, target) < 0.5f);
-            update->SetDesireFinished();
+            *update = DESIRE_FINISHED;
             return;
         }
         }
@@ -877,7 +877,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     if (Offensive(fn_800D6670(m_pFielder))
         || fn_800DAD3C(g_pBall) || BallOwner(m_pFielder))
     {
-        update->SetDesireFinished();
+        *update = DESIRE_FINISHED;
         return;
     }
 
@@ -928,6 +928,6 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     avoidance->m_fRepulsionMult = 0.5f;
     if (g_pBall->m_pOwner != NULL && g_pBall->m_pOwner->m_eClassType == GOALIE)
     {
-        update->SetDesireFinished();
+        *update = DESIRE_FINISHED;
     }
 }

@@ -1,5 +1,4 @@
 #include "NL/plat/PlatPadManager.h"
-#include "Game/PadMonkey.h"
 #include "NL/nlMemory.h"
 
 #include <string.h>
@@ -30,15 +29,15 @@ static void PadConnectChanged(WPADChannel channel, WPADResult result)
     }
 }
 
-static void* AllocPadMemory(unsigned long size)
+static void* AllocPadMemory(u32 size)
 {
     return nlMalloc(size);
 }
 
-static int FreePadMemory(void* memory)
+static BOOL FreePadMemory(void* memory)
 {
     nlFree(memory);
-    return true;
+    return TRUE;
 }
 
 void PlatPadManager::Initialize()
@@ -59,7 +58,7 @@ void PlatPadManager::Initialize()
         KPADSetAccParam(channel, 0.0f, 1.0f);
         KPADSetBtnRepeat(channel, 0.75f, 0.25f);
 
-        type[channel] = 0;
+        type[channel] = PLAT_PAD_NONE;
         connected[channel] = false;
         dpdEnabled[channel] = false;
         dpdActive[channel] = false;
@@ -93,7 +92,7 @@ void PlatPadManager::UpdateChannel(int channel)
     {
     case WPAD_ERR_NO_CONTROLLER:
         connected[channel] = false;
-        newType = 0;
+        newType = PLAT_PAD_NONE;
         dpdActive[channel] = false;
         dataFormatSet[channel] = false;
         break;
@@ -152,7 +151,7 @@ void PlatPadManager::UpdateChannel(int channel)
                 if (coreStatus.err == WPAD_ERR_OK)
                 {
                     status[channel].core.wpad = coreStatus;
-                    newType = 1;
+                    newType = PLAT_PAD_REMOTE;
                     if (KPADRead(channel, kpadStatus, 1) > 0)
                     {
                         status[channel].core.kpad = kpadStatus[0];
@@ -164,7 +163,7 @@ void PlatPadManager::UpdateChannel(int channel)
                 if (freestyleStatus.err == WPAD_ERR_OK)
                 {
                     status[channel].freestyle.wpad = freestyleStatus;
-                    newType = 2;
+                    newType = PLAT_PAD_FREESTYLE;
                     if (KPADRead(channel, kpadStatus, 1) > 0)
                     {
                         status[channel].freestyle.kpad
@@ -177,7 +176,7 @@ void PlatPadManager::UpdateChannel(int channel)
                 if (classicStatus.err == WPAD_ERR_OK)
                 {
                     status[channel].classic.wpad = classicStatus;
-                    newType = 3;
+                    newType = PLAT_PAD_CLASSIC;
                     if (KPADRead(channel, kpadStatus, 1) > 0)
                     {
                         status[channel].classic.kpad = kpadStatus[0];
@@ -254,20 +253,4 @@ WiiFreestylePadStatus* PlatPadManager::GetFreestyleStatus(int channel)
 WiiClassicPadStatus* PlatPadManager::GetClassicStatus(int channel)
 {
     return &status[channel].classic;
-}
-
-WiiPadMonkey::WiiPadMonkey(int padIndex)
-    : PadMonkey(padIndex)
-{
-    m_prevPressurePtr = &m_prevPressure[0];
-    m_currPressurePtr = &m_currPressure[0];
-    m_buttonChance = &m_buttonChances[0];
-
-    memset(m_prevPressurePtr, 0, GetButtonCount() * sizeof(float));
-    memset(m_currPressurePtr, 0, GetButtonCount() * sizeof(float));
-
-    for (int i = 0; i < GetButtonCount(); ++i)
-    {
-        m_buttonChance[i] = 0.0f;
-    }
 }

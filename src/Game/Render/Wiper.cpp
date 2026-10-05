@@ -124,6 +124,6 @@ void WiperCallback::TransitionProgressed(float fDeltaT)
 {
 }
 
-void ScreenTransitionCallback::fn_80188764()
+void ScreenTransitionCallback::ScreenGrabRequested()
 {
 }

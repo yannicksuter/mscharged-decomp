@@ -25,9 +25,6 @@ ScreenTransitionManager::ScreenTransitionManager()
     , m_SelectedTransition(0)
     , m_fCurrentTime(0.0f)
 {
-    m_Transitions.mData = 0;
-    m_Transitions.mSize = 0;
-    m_Transitions.mCapacity = 0;
     m_Cut = false;
     m_Transitions.reserve(16);
 }
@@ -92,7 +89,7 @@ void ScreenTransitionManager::Render()
 
         if (m_pCallback != 0 && m_pActiveTransition->ConsumeScreenGrabRequest())
         {
-            m_pCallback->fn_80188764();
+            m_pCallback->ScreenGrabRequested();
         }
     }
 }
@@ -142,9 +139,6 @@ void ScreenTransitionManager::EnableRandomTransition(const char* filter)
 void ScreenTransitionManager::SelectRandomTransition(const char* filter)
 {
     Vector<BasicString<char, Detail::TempStringAllocator>, DefaultAllocator> candidates;
-    candidates.mData = 0;
-    candidates.mSize = 0;
-    candidates.mCapacity = 0;
     candidates.reserve(8);
 
     for (int i = 0; i < m_Transitions.mSize; ++i)
@@ -213,31 +207,31 @@ void ScreenTransitionManager::AddTransitions(char* loadedData, unsigned long fil
         if (nlStrCmp<char>(pToken, "colourblend") == 0)
         {
             pToken = parser.NextTokenOnLine(true);
-            nlStrNCpy<char>(szNameBuffer, pToken, 0x40);
+            nlStrNCpy<char>(szNameBuffer, pToken, sizeof(szNameBuffer));
             AddTransitionToMap(szNameBuffer, ColourBlendScreenTransition::GetFromParser(&parser));
         }
         else if (nlStrCmp<char>(pToken, "sequence") == 0)
         {
-            nlStrNCpy<char>(szNameBuffer, parser.NextTokenOnLine(true), 0x40);
+            nlStrNCpy<char>(szNameBuffer, parser.NextTokenOnLine(true), sizeof(szNameBuffer));
             TransitionSequence* transitionSequence = new (8, false) TransitionSequence();
             transitionSequence->Initialize(&parser);
             AddTransitionToMap(szNameBuffer, transitionSequence);
         }
         else if (nlStrCmp<char>(pToken, "transition") == 0)
         {
-            nlStrNCpy<char>(szNameBuffer, parser.NextTokenOnLine(true), 0x40);
+            nlStrNCpy<char>(szNameBuffer, parser.NextTokenOnLine(true), sizeof(szNameBuffer));
             ScriptedScreenTransition* scriptedTransition = new (8, false) ScriptedScreenTransition();
             scriptedTransition->InitializeFromParser(&parser);
             AddTransitionToMap(szNameBuffer, scriptedTransition);
         }
         else if (nlStrCmp<char>(pToken, "model") == 0)
         {
-            nlStrNCpy<char>(szNameBuffer, parser.NextTokenOnLine(true), 0x40);
+            nlStrNCpy<char>(szNameBuffer, parser.NextTokenOnLine(true), sizeof(szNameBuffer));
             ModeledScreenTransition* modeledTransition = new (8, false) ModeledScreenTransition();
             modeledTransition->LoadFromParser(&parser);
             AddTransitionToMap(szNameBuffer, modeledTransition);
         }
-        else if (*pToken == 0x23)
+        else if (*pToken == '#')
         {
             while (pToken != 0)
             {

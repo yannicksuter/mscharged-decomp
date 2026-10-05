@@ -4779,10 +4779,14 @@ NL/plat/TransportSocket.cpp:
 	.sdata2     start:0x806E6DD8 end:0x806E6E00
 
 NL/plat/PlatPadManager.cpp:
-	.text       start:0x803751D4 end:0x80376054
-	.data       start:0x80535EB0 end:0x80535F08
+	.text       start:0x803751D4 end:0x80375EEC
 	.sbss       start:0x806E2478 end:0x806E2480
-	.sdata2     start:0x806E6E00 end:0x806E6E20
+	.sdata2     start:0x806E6E00 end:0x806E6E18
+
+NL/plat/WiiPadMonkey.cpp:
+	.text       start:0x80375EEC end:0x80376054
+	.data       start:0x80535EB0 end:0x80535F08
+	.sdata2     start:0x806E6E18 end:0x806E6E20
 
 NL/glx/glxMemory.cpp:
 	.text       start:0x80376054 end:0x80376888

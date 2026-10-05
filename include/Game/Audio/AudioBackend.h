@@ -17,21 +17,21 @@ struct XSoundOwner;
 class AudioReadState;
 struct AudioSourceInfo;
 
-struct AudioRead
+struct AudioReadRequest
 {
-    nlFile* m_Unknown00;
-    unsigned int m_Unknown04;
-    void* m_Unknown08;
-    ReadAsyncCallback m_Unknown0C;
-    unsigned long m_Unknown10;
-    AudioReadState* m_Unknown14;
-    unsigned int m_Unknown18 : 31;
-    bool m_Unknown1B : 1;
+    nlFile* m_File;
+    unsigned int m_Offset;
+    void* m_Buffer;
+    ReadAsyncCallback m_Callback;
+    unsigned long m_UserParam;
+    AudioReadState* m_State;
+    unsigned int m_Size : 31;
+    bool m_Cancel : 1;
 };
 
-class UnidentifiedAudioReadList
-    : public ListContainerBase<AudioRead,
-          nlStaticArrayAllocator<ListEntry<AudioRead>, 32> >
+class AudioReadQueue
+    : public ListContainerBase<AudioReadRequest,
+          nlStaticArrayAllocator<ListEntry<AudioReadRequest>, 32> >
 {
 };
 
@@ -66,29 +66,29 @@ public:
     void SetOutputMode(unsigned int mode);
     void InitializeAuxEffects();
 
-    AXFX_REVERBHI* GetReverb() { return &m_Unknown454.m_Reverb; }
-    AXFX_REVERBHI_DPL2* GetReverbDpl2() { return &m_Unknown454.m_ReverbDpl2; }
+    AXFX_REVERBHI* GetReverb() { return &m_ReverbEffect.m_Reverb; }
+    AXFX_REVERBHI_DPL2* GetReverbDpl2() { return &m_ReverbEffect.m_ReverbDpl2; }
     AXFX_DELAY* GetDelay() { return &m_DelayEffect.m_Delay; }
 
-    /* 0x004 */ nlListSlotPool<AudioSource*> m_Unknown004;
-    /* 0x024 */ UnidentifiedAudioReadList m_Unknown024;
-    /* 0x434 */ MemoryAllocator m_Unknown434;
+    /* 0x004 */ nlListSlotPool<AudioSource*> m_Sources;
+    /* 0x024 */ AudioReadQueue m_ReadQueue;
+    /* 0x434 */ MemoryAllocator m_AudioAllocator;
     /* 0x44C */ u32 m_OutputMode;
-    /* 0x450 */ bool m_Unknown450;
+    /* 0x450 */ bool m_MixControllerSpeakersToMain;
     /* 0x451 */ u8 m_Pad451[3];
     /* 0x454 */ union
     {
         AXFX_REVERBHI m_Reverb;
         AXFX_REVERBHI_DPL2 m_ReverbDpl2;
-    } m_Unknown454;
+    } m_ReverbEffect;
     /* 0x5E4 */ union
     {
         AXFX_DELAY m_Delay;
         AXFX_DELAY_EXP_DPL2 m_DelayDpl2;
     } m_DelayEffect;
-    /* 0x668 */ OSAlarm m_Unknown668;
-    /* 0x698 */ u32 m_Unknown698[4];
-    /* 0x6A8 */ WENCInfo m_Unknown6A8[4];
+    /* 0x668 */ OSAlarm m_ControllerSpeakerAlarm;
+    /* 0x698 */ u32 m_ControllerSpeakerFlags[4];
+    /* 0x6A8 */ WENCInfo m_ControllerSpeakerEncoders[4];
 };
 
 inline AudioBackendBase::AudioBackendBase()

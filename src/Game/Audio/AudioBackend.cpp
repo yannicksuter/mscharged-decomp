@@ -1,5 +1,5 @@
 #include "Game/Audio/AudioBackend.h"
-#include "Game/Audio/AudioStreamSource.h"
+#include "Game/Audio/AudioSource.h"
 #include "Game/Audio/AudioResourcePlatform.h"
 
 #include "Game/Audio/AudioEffect.h"
@@ -7,6 +7,8 @@
 #include "Game/Audio/AudioSystem.h"
 #include "NL/nlMemory.h"
 #include "NL/nlFileGC.h"
+#include "NL/plat/PlatPadManager.h"
+#include "revolution/ai.h"
 #include "revolution/ax.h"
 #include "revolution/mix.h"
 #include "revolution/os.h"
@@ -18,30 +20,21 @@
 
 static bool sDoubleMixUpdate = true;
 
-AudioSource* g_pAudioSourceList;
-u32 gAudioSourceListCount;
+AudioSource* g_pLastCreatedAudioSource;
+u32 gAudioMemorySize;
 void* g_pAudioSilenceBuffer;
 
 void OnControllerSpeakerEnabled(WPADChannel chan, WPADResult result);
 void OnControllerSpeakerReady(WPADChannel chan, WPADResult result);
+void OnAudioControllerConnection(int chan, int deviceType, int state);
 void ServiceControllerSpeakers(OSAlarm*, OSContext*);
 
-void* AllocateAudioEffectMemory(unsigned long size)
-{
-    return nlMalloc(size, 8, false);
-}
-
-void FreeAudioEffectMemory(void* pointer)
-{
-    nlFree(pointer);
-}
-
 AudioBackend::AudioBackend()
-    : m_Unknown004(64, 16)
+    : m_Sources(64, 16)
     , m_OutputMode(-1)
-    , m_Unknown450(true)
+    , m_MixControllerSpeakersToMain(true)
 {
-    memset(m_Unknown698, 0, sizeof(m_Unknown698));
+    memset(m_ControllerSpeakerFlags, 0, sizeof(m_ControllerSpeakerFlags));
 }
 
 AudioBackend::~AudioBackend()
@@ -53,21 +46,58 @@ AudioBackend::~AudioBackend()
     }
     if (m_OutputMode == 3)
     {
-        AXFXReverbHiShutdownDpl2(&m_Unknown454.m_ReverbDpl2);
+        AXFXReverbHiShutdownDpl2(&m_ReverbEffect.m_ReverbDpl2);
         AXFXDelayExpShutdownDpl2(&m_DelayEffect.m_DelayDpl2);
     }
     else
     {
-        AXFXReverbHiShutdown(&m_Unknown454.m_Reverb);
+        AXFXReverbHiShutdown(&m_ReverbEffect.m_Reverb);
         AXFXDelayShutdown(&m_DelayEffect.m_Delay);
     }
 }
 
+static inline void* CreateSilenceBuffer()
+{
+    void* buffer = nlMalloc(0x500, 32, false);
+    memset(buffer, 0, 0x500);
+    return buffer;
+}
+
+bool AudioBackend::Initialize()
+{
+    AIInit(0);
+    AXInit();
+    MIXInit();
+    AXRegisterCallback(UpdateAudioSources);
+
+    g_pAudioSilenceBuffer = CreateSilenceBuffer();
+
+    AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
+    CurrentAllocator = &VirtualAllocator;
+    void* memory = nlMalloc(gAudioMemorySize, 8, false);
+    --AllocatorStackDepth;
+    AllocatorStack[AllocatorStackDepth] = 0;
+    CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
+    m_AudioAllocator.Initialize(memory, gAudioMemorySize);
+    InitializeAudioStreamBlockPool();
+    SetOutputMode(1);
+
+    OSCreateAlarm(&m_ControllerSpeakerAlarm);
+    u32 ticks = OSNanosecondsToTicks(6666667);
+    OSSetPeriodicAlarm(&m_ControllerSpeakerAlarm, ticks, ticks, ServiceControllerSpeakers);
+    memset(m_ControllerSpeakerEncoders, 0, sizeof(m_ControllerSpeakerEncoders));
+    for (int chan = 0; chan < 4; ++chan)
+        OnAudioControllerConnection(chan, 0, 0);
+    g_pPlatPadManager->deviceChanged.Add(OnAudioControllerConnection, 0, -1);
+    InitializeAuxEffects();
+    return true;
+}
+
 void AudioBackend::SuspendControllerSpeakers()
 {
-    OSCancelAlarm(&m_Unknown668);
+    OSCancelAlarm(&m_ControllerSpeakerAlarm);
     for (int i = 0; i < 4; ++i)
-        m_Unknown698[i] = (m_Unknown698[i] & 0x7FFFFFFF) | 0x40000000;
+        m_ControllerSpeakerFlags[i] = (m_ControllerSpeakerFlags[i] & 0x7FFFFFFF) | 0x40000000;
 }
 
 void AudioBackend::ResumeControllerSpeakers()
@@ -77,12 +107,12 @@ void AudioBackend::ResumeControllerSpeakers()
         if (WPADProbe(i, 0) == WPAD_ERR_OK)
             WPADControlSpeaker(i, 1, OnControllerSpeakerEnabled);
     }
-    OSCreateAlarm(&m_Unknown668);
+    OSCreateAlarm(&m_ControllerSpeakerAlarm);
     u32 ticks = OSNanosecondsToTicks(6666667);
-    OSSetPeriodicAlarm(&m_Unknown668, ticks, ticks, ServiceControllerSpeakers);
+    OSSetPeriodicAlarm(&m_ControllerSpeakerAlarm, ticks, ticks, ServiceControllerSpeakers);
 }
 
-void OnAudioControllerConnection(WPADChannel chan, int, int state)
+void OnAudioControllerConnection(int chan, int, int state)
 {
     AudioBackend* self = g_pAudioBackend;
     if (state == 1 || state == 2)
@@ -91,8 +121,8 @@ void OnAudioControllerConnection(WPADChannel chan, int, int state)
     }
     else
     {
-        self->m_Unknown698[chan] = (self->m_Unknown698[chan] & 0x7FFFFFFF) | 0x40000000;
-        memset(&self->m_Unknown6A8[chan], 0, sizeof(WENCInfo));
+        self->m_ControllerSpeakerFlags[chan] = (self->m_ControllerSpeakerFlags[chan] & 0x7FFFFFFF) | 0x40000000;
+        memset(&self->m_ControllerSpeakerEncoders[chan], 0, sizeof(WENCInfo));
     }
 }
 
@@ -107,14 +137,34 @@ void OnControllerSpeakerReady(WPADChannel chan, WPADResult result)
     AudioBackend* self = g_pAudioBackend;
     if (result == WPAD_ERR_OK)
     {
-        self->m_Unknown698[chan] |= 0xC0000000;
+        self->m_ControllerSpeakerFlags[chan] |= 0xC0000000;
         WPADControlSpeaker(chan, 2, 0);
     }
 }
 
+void AudioBackend::Shutdown()
+{
+    gAudioSampleSourcePool.FreeBlocks();
+    gAudioMonoStreamSourcePool.FreeBlocks();
+    gAudioStereoStreamSourcePool.FreeBlocks();
+    gAudioReadQueueEntryPool.FreeBlocks();
+    if (m_OutputMode == 3)
+    {
+        AXFXReverbHiShutdownDpl2(&m_ReverbEffect.m_ReverbDpl2);
+        AXFXDelayExpShutdownDpl2(&m_DelayEffect.m_DelayDpl2);
+    }
+    else
+    {
+        AXFXReverbHiShutdown(&m_ReverbEffect.m_Reverb);
+        AXFXDelayShutdown(&m_DelayEffect.m_Delay);
+    }
+    BasicSlotPool<ListEntry<AudioSource*> >* sourcePool = &m_Sources.m_Allocator;
+    sourcePool->FreeBlocks();
+}
+
 void* AudioBackend::AllocateAudioMemory(unsigned long size)
 {
-    void* pointer = m_Unknown434.Allocate(size, 32, false);
+    void* pointer = m_AudioAllocator.Allocate(size, 32, false);
     if (pointer == 0)
     {
         DumpAudioBankMemory("BankUsage.txt");
@@ -125,43 +175,26 @@ void* AudioBackend::AllocateAudioMemory(unsigned long size)
 
 void AudioBackend::FreeAudioMemory(void* pointer)
 {
-    m_Unknown434.Free(pointer);
-}
-
-void AudioReadState::SetInputVolume(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    AudioStreamChannel* channel = GetChannelIterator();
-    while ((channel = GetNextChannel(channel)) != 0)
-    {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceInputVolume(channel->m_Unknown04, value);
-    }
-    OSRestoreInterrupts(enabled);
+    m_AudioAllocator.Free(pointer);
 }
 
 void AudioBackend::ServiceReadQueue(float)
 {
     bool enabled = OSDisableInterrupts();
-    while (m_Unknown024.m_Head != 0)
+    while (m_ReadQueue.m_Head != 0)
     {
-        AudioRead* request = m_Unknown024.GetHead();
-        if (request->m_Unknown1B)
+        AudioReadRequest* request = m_ReadQueue.GetHead();
+        if (request->m_Cancel)
         {
-            CancelAudioReads(request->m_Unknown14);
+            CancelAudioReads(request->m_State);
         }
         else
         {
-            nlSeek(request->m_Unknown00, request->m_Unknown04, 0);
-            AsyncEntry* result = nlReadAsync(request->m_Unknown00, request->m_Unknown08, request->m_Unknown18, request->m_Unknown0C, request->m_Unknown10, 0);
-            TrackAudioRead(request->m_Unknown14, result);
+            nlSeek(request->m_File, request->m_Offset, 0);
+            AsyncEntry* result = nlReadAsync(request->m_File, request->m_Buffer, request->m_Size, request->m_Callback, request->m_UserParam, 0);
+            TrackAudioRead(request->m_State, result);
         }
-        m_Unknown024.Deallocate(m_Unknown024.RemoveStart(), 0);
+        m_ReadQueue.DeleteEntry(m_ReadQueue.RemoveStart());
     }
     OSRestoreInterrupts(enabled);
 }
@@ -172,7 +205,7 @@ void UpdateAudioSources()
     MIXUpdateSettings();
     if (sDoubleMixUpdate)
         MIXUpdateSettings();
-    for (ListEntry<AudioSource*>* entry = self->m_Unknown004.m_Head;
+    for (ListEntry<AudioSource*>* entry = self->m_Sources.m_Head;
         entry != 0;
         entry = entry->next)
     {
@@ -183,12 +216,12 @@ void UpdateAudioSources()
 AudioSource* AudioBackend::CreateSource(AudioSourceInfo* info, XSoundOwner*)
 {
     AudioSource* source = 0;
-    if (info->m_Unknown18->m_Chunk23200->m_Unknown08 != 0)
+    if (info->m_BankLoader->m_Chunk23200->m_IsStream != 0)
     {
-        if (info->m_Unknown10 == 1)
-            source = new AudioReadState_8035D154;
-        else if (info->m_Unknown10 == 2)
-            source = new AudioReadState_80361920;
+        if (info->m_ChannelCount == 1)
+            source = new AudioMonoStreamSource;
+        else if (info->m_ChannelCount == 2)
+            source = new AudioStereoStreamSource;
     }
     else
     {
@@ -196,35 +229,18 @@ AudioSource* AudioBackend::CreateSource(AudioSourceInfo* info, XSoundOwner*)
     }
     source->Initialize(info);
     bool enabled = OSDisableInterrupts();
-    m_Unknown004.AddEnd(source);
+    m_Sources.AddEnd(source);
     OSRestoreInterrupts(enabled);
-    g_pAudioSourceList = source;
+    g_pLastCreatedAudioSource = source;
     return source;
 }
 
 void AudioBackend::ReleaseSource(AudioSource* source)
 {
     bool enabled = OSDisableInterrupts();
-    m_Unknown004.RemoveEntry(source);
+    m_Sources.RemoveEntry(source);
     OSRestoreInterrupts(enabled);
     delete source;
-}
-
-void AudioReadState::SetPitch(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    AudioStreamChannel* channel = GetChannelIterator();
-    while ((channel = GetNextChannel(channel)) != 0)
-    {
-        if (channel->m_Unknown04 != 0)
-            SetVoicePitch(channel->m_Unknown04, m_Unknown0C, value);
-        OSRestoreInterrupts(enabled);
-    }
 }
 
 void AudioBackend::QueueRead(nlFile* file, unsigned int offset,
@@ -232,58 +248,24 @@ void AudioBackend::QueueRead(nlFile* file, unsigned int offset,
     unsigned long userParam, AudioReadState* state)
 {
     bool enabled = OSDisableInterrupts();
-    AudioRead* request = m_Unknown024.AllocateAtEnd(0);
-    request->m_Unknown00 = file;
-    request->m_Unknown04 = offset;
-    request->m_Unknown08 = buffer;
-    request->m_Unknown18 = size;
-    request->m_Unknown0C = callback;
-    request->m_Unknown10 = userParam;
-    request->m_Unknown14 = state;
-    request->m_Unknown1B = false;
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioReadState::SetMixVolume(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    AudioStreamChannel* channel = GetChannelIterator();
-    while ((channel = GetNextChannel(channel)) != 0)
-    {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceMixVolume(channel->m_Unknown04, value);
-    }
+    AudioReadRequest* request = m_ReadQueue.AllocateAtEnd(0);
+    request->m_File = file;
+    request->m_Offset = offset;
+    request->m_Buffer = buffer;
+    request->m_Size = size;
+    request->m_Callback = callback;
+    request->m_UserParam = userParam;
+    request->m_State = state;
+    request->m_Cancel = false;
     OSRestoreInterrupts(enabled);
 }
 
 void AudioBackend::QueueReadCancellation(AudioReadState* state)
 {
     bool enabled = OSDisableInterrupts();
-    AudioRead* request = m_Unknown024.AllocateAtEnd(0);
-    request->m_Unknown1B = true;
-    request->m_Unknown14 = state;
-    OSRestoreInterrupts(enabled);
-}
-
-void AudioReadState::SetLowPassFilter(bool on, unsigned int frequency, bool unchanged)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    AudioStreamChannel* channel = GetChannelIterator();
-    while ((channel = GetNextChannel(channel)) != 0)
-    {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceLowPassFilter(channel->m_Unknown04, on, frequency, unchanged);
-    }
+    AudioReadRequest* request = m_ReadQueue.AllocateAtEnd(0);
+    request->m_Cancel = true;
+    request->m_State = state;
     OSRestoreInterrupts(enabled);
 }
 
@@ -314,23 +296,6 @@ void AudioBackend::SetOutputMode(unsigned int mode)
     MIXSetSoundMode(mixMode);
 }
 
-void AudioReadState::SetSurroundPan(float value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    AudioStreamChannel* channel = GetChannelIterator();
-    while ((channel = GetNextChannel(channel)) != 0)
-    {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceSurroundPan(channel->m_Unknown04, value);
-    }
-    OSRestoreInterrupts(enabled);
-}
-
 void AudioBackend::InitializeAuxEffects()
 {
     AXFXSetHooks(AllocateAudioEffectMemory, FreeAudioEffectMemory);
@@ -343,8 +308,8 @@ void AudioBackend::InitializeAuxEffects()
     if (m_OutputMode == 3)
     {
         g_pAuxEffectMap->AssignAuxiliary(1);
-        SetDefaultReverbSettings(&m_Unknown454.m_Reverb);
-        AXFXReverbHiInitDpl2(&m_Unknown454.m_ReverbDpl2);
+        SetDefaultReverbSettings(&m_ReverbEffect.m_Reverb);
+        AXFXReverbHiInitDpl2(&m_ReverbEffect.m_ReverbDpl2);
         g_pAuxEffectMap->AssignAuxiliary(0);
         SetDefaultDelaySettings(&m_DelayEffect.m_Delay);
         AXFXDelayExpInitDpl2(&m_DelayEffect.m_DelayDpl2);
@@ -352,8 +317,8 @@ void AudioBackend::InitializeAuxEffects()
     else
     {
         g_pAuxEffectMap->AssignAuxiliary(1);
-        SetDefaultReverbSettings(&m_Unknown454.m_Reverb);
-        AXFXReverbHiInit(&m_Unknown454.m_Reverb);
+        SetDefaultReverbSettings(&m_ReverbEffect.m_Reverb);
+        AXFXReverbHiInit(&m_ReverbEffect.m_Reverb);
         g_pAuxEffectMap->AssignAuxiliary(0);
         SetDefaultDelaySettings(&m_DelayEffect.m_Delay);
         AXFXDelayInit(&m_DelayEffect.m_Delay);
@@ -365,8 +330,8 @@ void ServiceControllerSpeakers(OSAlarm*, OSContext*)
     AudioBackend* self = g_pAudioBackend;
     s16 samples[40] = { 0 };
     u8 encoded[20];
-    u32* speakerState = self->m_Unknown698;
-    WENCInfo* encoder = self->m_Unknown6A8;
+    u32* speakerState = self->m_ControllerSpeakerFlags;
+    WENCInfo* encoder = self->m_ControllerSpeakerEncoders;
     int chan;
     bool advance = false;
     for (chan = 0; chan < 4; ++chan, ++speakerState, ++encoder)
@@ -394,36 +359,4 @@ void DumpAudioMemory()
 {
     DumpAudioBankMemory("BankUsage.txt");
     DumpAudioSystem(g_pAudioSystem, "AudioDump.txt");
-}
-
-bool AudioSource::IsResident()
-{
-    return true;
-}
-
-bool AudioSource::IsStream()
-{
-    return false;
-}
-
-bool AudioSource::IsLooping()
-{
-    return m_Unknown14_00 == 0xFFFF;
-}
-
-void AudioReadState::SetAuxiliaryVolume(int auxiliary, int value)
-{
-    bool enabled = OSDisableInterrupts();
-    if (!HasVoice())
-    {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-    AudioStreamChannel* channel = GetChannelIterator();
-    while ((channel = GetNextChannel(channel)) != 0)
-    {
-        if (channel->m_Unknown04 != 0)
-            SetVoiceAuxiliaryVolume(channel->m_Unknown04, auxiliary, value);
-    }
-    OSRestoreInterrupts(enabled);
 }

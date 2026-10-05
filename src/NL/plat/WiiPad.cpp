@@ -76,9 +76,9 @@ unsigned short MapWiiStickToDPad(float normalizedX, float normalizedY,
     unsigned short button = 0;
     if (fabsf(normalizedX) >= 0.6f || fabsf(normalizedY) >= 0.6f)
     {
-        normalizedX = fabsf(normalizedX) >= 0.6f ? normalizedX : 0.0f;
-        normalizedY = fabsf(normalizedY) >= 0.6f ? normalizedY : 0.0f;
-        float angle = nlATan2f(normalizedY, normalizedX);
+        float filteredX = fabsf(normalizedX) >= 0.6f ? normalizedX : 0.0f;
+        float filteredY = fabsf(normalizedY) >= 0.6f ? normalizedY : 0.0f;
+        float angle = nlATan2f(filteredY, filteredX);
         unsigned short angleU16 = (unsigned short)(int)(angle * 10430.378f);
         float degrees = (float)angleU16 * 0.005493164f;
         int roundedDeg = (int)degrees;

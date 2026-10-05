@@ -16,6 +16,7 @@ struct EffectsBundleData
 
     static EffectsBundleData* Initialize(nlChunk* bundle);
     void Destroy();
+    EffectsGroup* GetGroup(int index) const { return mGroups[index]; }
 
     /* 0x00 */ unsigned char unknown_0x00[8];
     /* 0x08 */ unsigned int mNumTemplates;

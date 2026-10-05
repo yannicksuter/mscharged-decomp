@@ -3,6 +3,11 @@
 #include "NL/nlChunk.h"
 #include "types.h"
 
+static inline AudioSourceInfo* GetSourceInfos(nlChunk* chunk)
+{
+    return (AudioSourceInfo*)chunk->GetData();
+}
+
 void AudioBankLoader::ParseChunk(nlChunk* chunk)
 {
     switch (chunk->GetID())
@@ -13,10 +18,10 @@ void AudioBankLoader::ParseChunk(nlChunk* chunk)
         return;
     }
 
-    nlChunk* header = (nlChunk*)chunk->GetData();
+    nlChunk* header = chunk->GetFirstChunk();
     m_Chunk23200 = (AudioSourceData*)header->GetData();
     nlChunk* definitions = header->GetLastChunk();
-    AudioSourceInfo* entries = (AudioSourceInfo*)definitions->GetData();
+    AudioSourceInfo* entries = GetSourceInfos(definitions);
     m_Chunk23200Entries = entries;
     u32 i = 0;
     u32 entryOffset = 0;
@@ -24,7 +29,7 @@ void AudioBankLoader::ParseChunk(nlChunk* chunk)
     {
         AudioSourceInfo* entry = (AudioSourceInfo*)(
             (u8*)m_Chunk23200Entries + entryOffset);
-        entry->m_Unknown18 = this;
+        entry->m_BankLoader = this;
         i++;
         entryOffset += sizeof(AudioSourceInfo);
     }

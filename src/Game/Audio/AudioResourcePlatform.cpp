@@ -79,8 +79,8 @@ static inline void WriteAudioBankMemory()
     sResidentTotal = 0;
     sAudioBankTree.Walk(PrintAudioBankMemory);
 
-    unsigned long freeMemory = GetAudioBundleManager()->GetBackend()->m_Unknown434.TotalFreeMemory() >> 10;
-    unsigned long totalMemory = GetAudioBundleManager()->GetBackend()->m_Unknown434.m_memory_size >> 10;
+    unsigned long freeMemory = GetAudioBundleManager()->GetBackend()->m_AudioAllocator.TotalFreeMemory() >> 10;
+    unsigned long totalMemory = GetAudioBundleManager()->GetBackend()->m_AudioAllocator.m_memory_size >> 10;
 
     sReport.Print(
         "<resident total>           %dk\n", 0, sResidentTotal);

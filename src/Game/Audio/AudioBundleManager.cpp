@@ -5,6 +5,7 @@
 #include "Game/Audio/AudioSlider.h"
 
 #include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/RegistryPools.h"
 
 #include "NL/nlChunk.h"
 #include "NL/nlFile.h"
@@ -20,6 +21,23 @@ AudioBundleManager::AudioBundleManager()
 {
     m_Loaded = false;
     m_Backend = new (8, false) AudioBackend;
+}
+
+void AudioBundleManager::Load(const char* path)
+{
+    char fileName[128];
+    nlSNPrintf(fileName, sizeof(fileName), "%s%s", path, "nlxgs.bun");
+
+    if (g_pAudioSystem->IsAsyncLoading())
+    {
+        nlLoadEntireFileAsync(fileName, OnBundleLoaded, this, 0x20, AllocateStart, 0, 0, 0);
+        return;
+    }
+
+    unsigned long size;
+    void* data = nlLoadEntireFile(
+        fileName, &size, 0x20, AllocateStart, 0, 0, 0);
+    OnBundleLoaded(data, size, this);
 }
 
 bool AudioBundleManager::Initialize()
@@ -76,21 +94,4 @@ void AudioBundleManager::ParseChunk(nlChunk* chunk)
             chunk->GetDataSize());
         break;
     }
-}
-
-void AudioBundleManager::Load(const char* path)
-{
-    char fileName[128];
-    nlSNPrintf(fileName, sizeof(fileName), "%s%s", path, "nlxgs.bun");
-
-    if (g_pAudioSystem->IsAsyncLoading())
-    {
-        nlLoadEntireFileAsync(fileName, OnBundleLoaded, this, 0x20, AllocateStart, 0, 0, 0);
-        return;
-    }
-
-    unsigned long size;
-    void* data = nlLoadEntireFile(
-        fileName, &size, 0x20, AllocateStart, 0, 0, 0);
-    OnBundleLoaded(data, size, this);
 }

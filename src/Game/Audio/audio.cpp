@@ -75,7 +75,7 @@ bool GameAudio::Initialize()
 {
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
     CurrentAllocator = &VirtualAllocator;
-    gAudioSourceListCount = 0x800000;
+    gAudioMemorySize = 0x800000;
 
     s_AudioInInit__9ResetTask = true;
     SetResourcePath(gAudioResourcePath);

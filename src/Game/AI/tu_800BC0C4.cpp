@@ -388,6 +388,11 @@ bool DesireFrozen::Reinitialize(void* context)
     return Desire::Initialize(context);
 }
 
+static inline int GetFacingDirection(cFielder* fielder)
+{
+    return fielder->GetActualFacing();
+}
+
 /**
  * Offset/Address/Size: 0x2234 | 0x800BE2F8 | size: 0x178
  */
@@ -416,11 +421,11 @@ bool DesireConfused::Initialize(void* context)
                  && m_pFielder->m_eActionState
                         == ACTION_UNKNOWN_32)
         {
-            unsigned short direction = m_pFielder->mUnidentified024.m_aActualFacingDirection;
+            int direction = GetFacingDirection(m_pFielder);
             bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
             if (hasGlobalPad)
             {
-                direction += (int)(mfConfusedDirection * mfConfusedPercentage);
+                direction = (unsigned short)(direction + (int)(mfConfusedDirection * mfConfusedPercentage));
             }
             m_pFielder->SetFacingDirection(direction, true);
         }

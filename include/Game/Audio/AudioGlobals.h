@@ -7,7 +7,7 @@ class AudioBackend;
 extern AudioSystem* g_pAudioSystem;
 extern AudioBackend* g_pAudioBackend;
 extern void* g_pAudioSilenceBuffer;
-extern unsigned long gAudioSourceListCount;
+extern unsigned long gAudioMemorySize;
 extern float sSpeedOfSound;
 
 void ReleaseAudioSoundOwner(void* value, void* owner);

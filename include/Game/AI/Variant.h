@@ -150,9 +150,7 @@ public:
                 bEqual = mData.pointer == other.mData.pointer;
                 break;
             case FT_VECTOR:
-                bEqual = nlNear(other.mData.vector.x, mData.vector.x)
-                      && nlNear(other.mData.vector.y, mData.vector.y)
-                      && nlNear(other.mData.vector.z, mData.vector.z);
+                bEqual = nlNear(other.mData.vector, mData.vector);
                 break;
             case FT_STRING:
                 bEqual = nlStrCmp(mData.string, other.mData.string) == 0;

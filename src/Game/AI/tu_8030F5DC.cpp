@@ -206,6 +206,12 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310040(
     return pAction;
 }
 
+static inline bool EqualParameterValue(const FuzzyVariant& value,
+    const FuzzyVariant& other)
+{
+    return value == other;
+}
+
 UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310B80(
     UnidentifiedVariant_80054AB8* pFind)
 {
@@ -227,8 +233,7 @@ UnidentifiedVariant_80054AB8* UnidentifiedActionQueue::fn_80310B80(
                 {
                     continue;
                 }
-                if (!(*pAction->ExtraData.Get(i)
-                      == *pFind->ExtraData.Get(i)))
+                if (!EqualParameterValue(*pAction->ExtraData.Get(i), *pFind->ExtraData.Get(i)))
                 {
                     bEqual = false;
                     break;

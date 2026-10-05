@@ -1,6 +1,5 @@
 #include "Game/Audio/AudioSource.h"
 #include "Game/Audio/AudioResourcePlatform.h"
-#include "Game/Audio/AudioStreamSource.h"
 
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
@@ -21,8 +20,8 @@ unsigned int gAudioStreamChannelCount;
 AXPBLPF sVoiceLowPassFilter;
 
 SlotPool<AudioSampleSource> gAudioSampleSourcePool(64, 16);
-SlotPool<AudioReadState_8035D154> lbl_80585C48(16, 16);
-SlotPool<AudioReadState_80361920> lbl_80585C70(16, 16);
+SlotPool<AudioMonoStreamSource> gAudioMonoStreamSourcePool(16, 16);
+SlotPool<AudioStereoStreamSource> gAudioStereoStreamSourcePool(16, 16);
 SlotPool<AudioReadQueueEntry> gAudioReadQueueEntryPool(32, 16);
 
 struct AudioReadCallbackEntry
@@ -157,13 +156,13 @@ AudioSampleSource::AudioSampleSource()
 
 void AudioSampleSource::Initialize(AudioSourceInfo* info)
 {
-    m_Unknown08 = info;
-    m_Unknown20 = SPGetSoundEntry(((AudioMemoryLoader*)info->m_Unknown18)->m_SoundTable, info->m_Unknown00);
+    m_SourceInfo = info;
+    m_Unknown20 = SPGetSoundEntry(((AudioMemoryLoader*)info->m_BankLoader)->m_SoundTable, info->m_Unknown00);
     m_Unknown1C = AXAcquireVoice(15, OnVoiceDropped, (unsigned long)this);
     if (m_Unknown1C == 0)
         DumpAudioMemory();
     SPPrepareSound(m_Unknown20, m_Unknown1C, m_Unknown20->sampleRate);
-    m_Unknown0C = (float)m_Unknown20->sampleRate / 32000.0f;
+    m_SampleRateRatio = (float)m_Unknown20->sampleRate / 32000.0f;
     MIXInitChannel(m_Unknown1C, 0, 0, -960, -960, -960, 64, 127, 0);
     m_Unknown10 = 1;
     m_Unknown04 = 1;
@@ -186,7 +185,7 @@ void AudioSampleSource::Update()
     switch (m_Unknown10)
     {
     case 5:
-        if (m_Unknown14_00 == 1)
+        if (m_PlayCount == 1)
         {
             AXSetVoiceLoop(m_Unknown1C, false);
         }
@@ -210,7 +209,7 @@ void AudioSampleSource::Update()
             if (address < m_Unknown18)
             {
                 ++m_Unknown14_0C;
-                bool canLoop = m_Unknown14_0C < m_Unknown14_00 || m_Unknown14_00 == 0xFFFF;
+                bool canLoop = m_Unknown14_0C < m_PlayCount || m_PlayCount == 0xFFFF;
                 if (!canLoop)
                 {
                     AXSetVoiceLoop(m_Unknown1C, false);
@@ -234,7 +233,7 @@ void AudioSampleSource::Update()
 
 bool AudioSampleSource::Play(unsigned int value)
 {
-    m_Unknown14_00 = value;
+    m_PlayCount = value;
     m_Unknown10 = 5;
     return true;
 }
@@ -276,7 +275,7 @@ bool AudioSampleSource::Resume()
 {
     AXSetVoiceCurrentAddr(m_Unknown1C, m_Unknown24);
     AXSetVoiceEndAddr(m_Unknown1C, m_Unknown20->endAddr);
-    AXSetVoiceLoop(m_Unknown1C, m_Unknown14_0C < m_Unknown14_00 || m_Unknown14_00 == 0xFFFF);
+    AXSetVoiceLoop(m_Unknown1C, m_Unknown14_0C < m_PlayCount || m_PlayCount == 0xFFFF);
     AXSetVoiceSrcRatio(m_Unknown1C, (float)m_Unknown20->sampleRate / 32000.0f);
     AXSetVoiceState(m_Unknown1C, AX_VOICE_RUN);
     m_Unknown10 = 4;
@@ -312,24 +311,24 @@ AudioStreamChannel::AudioStreamChannel()
     m_Unknown08 = 0;
     m_Unknown14 = 0;
     m_Unknown10_00 = 0;
-    m_Unknown10_1F = 0;
+    m_VoiceDropped = 0;
 }
 
 AudioStreamChannel::~AudioStreamChannel()
 {
-    if (m_Unknown04 != 0)
+    if (m_Voice != 0)
     {
-        AXSetVoiceState(m_Unknown04, AX_VOICE_STOP);
-        MIXReleaseChannel(m_Unknown04);
-        AXFreeVoice(m_Unknown04);
-        m_Unknown04 = 0;
+        AXSetVoiceState(m_Voice, AX_VOICE_STOP);
+        MIXReleaseChannel(m_Voice);
+        AXFreeVoice(m_Voice);
+        m_Voice = 0;
     }
     g_pAudioBackend->FreeAudioMemory(m_Unknown08);
 }
 
 void AudioStreamChannel::PrepareVoice(AudioStreamHeader* header)
 {
-    unsigned int size = m_Unknown00->m_Unknown08->m_Unknown18->m_Chunk23200->m_Unknown04 * 2;
+    unsigned int size = m_Unknown00->m_SourceInfo->m_BankLoader->m_Chunk23200->m_StreamBlockSize * 2;
     unsigned int start = (m_Unknown14 + 1) * 2;
     unsigned int end = (m_Unknown14 + size - 1) * 2;
     AXPBADDR addr;
@@ -352,11 +351,11 @@ void AudioStreamChannel::PrepareVoice(AudioStreamHeader* header)
     adpcm.pred_scale = header->ps;
     adpcm.yn1 = header->yn1;
     adpcm.yn2 = header->yn2;
-    AXSetVoiceSrcType(m_Unknown04, AX_SRC_TYPE_LINEAR);
-    AXSetVoiceSrcRatio(m_Unknown04, m_Unknown00->m_Unknown0C);
-    AXSetVoiceType(m_Unknown04, AX_VOICE_STREAM);
-    AXSetVoiceAddr(m_Unknown04, &addr);
-    AXSetVoiceAdpcm(m_Unknown04, &adpcm);
+    AXSetVoiceSrcType(m_Voice, AX_SRC_TYPE_LINEAR);
+    AXSetVoiceSrcRatio(m_Voice, m_Unknown00->m_SampleRateRatio);
+    AXSetVoiceType(m_Voice, AX_VOICE_STREAM);
+    AXSetVoiceAddr(m_Voice, &addr);
+    AXSetVoiceAdpcm(m_Voice, &adpcm);
 }
 
 void OnAudioStreamReadComplete(nlFile*, void*, unsigned int, unsigned long userParam)
@@ -373,25 +372,25 @@ void AudioStreamChannel::OnVoiceDropped(void* pointer)
 {
     AXVPB* voice = (AXVPB*)pointer;
     AudioStreamChannel* channel = (AudioStreamChannel*)voice->userContext;
-    channel->m_Unknown10_1F = 1;
-    if (channel->m_Unknown04 != 0)
+    channel->m_VoiceDropped = 1;
+    if (channel->m_Voice != 0)
     {
-        AXSetVoiceState(channel->m_Unknown04, AX_VOICE_STOP);
-        MIXReleaseChannel(channel->m_Unknown04);
-        channel->m_Unknown04 = 0;
+        AXSetVoiceState(channel->m_Voice, AX_VOICE_STOP);
+        MIXReleaseChannel(channel->m_Voice);
+        channel->m_Voice = 0;
     }
     channel->m_Unknown00->Stop();
 }
 
 void AudioStreamChannel::ReleaseVoice(bool release)
 {
-    if (m_Unknown04 != 0)
+    if (m_Voice != 0)
     {
-        AXSetVoiceState(m_Unknown04, AX_VOICE_STOP);
-        MIXReleaseChannel(m_Unknown04);
+        AXSetVoiceState(m_Voice, AX_VOICE_STOP);
+        MIXReleaseChannel(m_Voice);
         if (release)
-            AXFreeVoice(m_Unknown04);
-        m_Unknown04 = 0;
+            AXFreeVoice(m_Voice);
+        m_Voice = 0;
     }
 }
 
@@ -416,16 +415,16 @@ AudioReadState::~AudioReadState()
 
 void AudioReadState::Initialize(AudioSourceInfo* info)
 {
-    m_Unknown08 = info;
+    m_SourceInfo = info;
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
         channel->m_Unknown00 = this;
-        channel->m_Unknown08 = g_pAudioBackend->AllocateAudioMemory(m_Unknown08->m_Unknown18->m_Chunk23200->m_Unknown04 * 2);
+        channel->m_Unknown08 = g_pAudioBackend->AllocateAudioMemory(m_SourceInfo->m_BankLoader->m_Chunk23200->m_StreamBlockSize * 2);
         if (channel->m_Unknown08 == 0)
             DumpAudioMemory();
-        channel->m_Unknown04 = AXAcquireVoice(31, AudioStreamChannel::OnVoiceDropped, (unsigned long)channel);
-        MIXInitChannel(channel->m_Unknown04, 0, 0, -960, -960, -960, 64, 127, 0);
+        channel->m_Voice = AXAcquireVoice(31, AudioStreamChannel::OnVoiceDropped, (unsigned long)channel);
+        MIXInitChannel(channel->m_Voice, 0, 0, -960, -960, -960, 64, 127, 0);
         channel->m_Unknown14 = (unsigned int)channel->m_Unknown08;
     }
     SetPan(0.0f);
@@ -434,7 +433,7 @@ void AudioReadState::Initialize(AudioSourceInfo* info)
 
 bool AudioReadState::Play(unsigned int value)
 {
-    m_Unknown14_00 = value;
+    m_PlayCount = value;
     switch (m_Unknown10)
     {
     case 1:
@@ -446,7 +445,7 @@ bool AudioReadState::Play(unsigned int value)
     {
         AudioStreamChannel* channel = GetChannelIterator();
         while ((channel = GetNextChannel(channel)) != 0)
-            AXSetVoiceState(channel->m_Unknown04, AX_VOICE_RUN);
+            AXSetVoiceState(channel->m_Voice, AX_VOICE_RUN);
         m_Unknown10 = 4;
         break;
     }
@@ -467,8 +466,8 @@ void AudioReadState::Stop()
         while ((channel = GetNextChannel(channel)) != 0)
         {
             enabled = OSDisableInterrupts();
-            if (channel->m_Unknown04 != 0)
-                AXSetVoiceState(channel->m_Unknown04, AX_VOICE_STOP);
+            if (channel->m_Voice != 0)
+                AXSetVoiceState(channel->m_Voice, AX_VOICE_STOP);
             OSRestoreInterrupts(enabled);
         }
     }
@@ -494,8 +493,8 @@ bool AudioReadState::Pause()
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        channel->m_Unknown0C = (channel->m_Unknown04->pb.addr.currentAddressHi << 16) | channel->m_Unknown04->pb.addr.currentAddressLo;
-        AXSetVoiceState(channel->m_Unknown04, AX_VOICE_STOP);
+        channel->m_Unknown0C = (channel->m_Voice->pb.addr.currentAddressHi << 16) | channel->m_Voice->pb.addr.currentAddressLo;
+        AXSetVoiceState(channel->m_Voice, AX_VOICE_STOP);
     }
     m_Unknown10 = 7;
     return true;
@@ -508,8 +507,8 @@ bool AudioReadState::Resume()
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
     {
-        AXSetVoiceCurrentAddr(channel->m_Unknown04, channel->m_Unknown0C);
-        AXSetVoiceState(channel->m_Unknown04, AX_VOICE_RUN);
+        AXSetVoiceCurrentAddr(channel->m_Voice, channel->m_Unknown0C);
+        AXSetVoiceState(channel->m_Voice, AX_VOICE_RUN);
     }
     m_Unknown10 = 4;
     return true;
@@ -624,7 +623,7 @@ void AudioSampleSource::SetPitch(float value)
         OSRestoreInterrupts(enabled);
         return;
     }
-    SetVoicePitch(m_Unknown1C, m_Unknown0C, value);
+    SetVoicePitch(m_Unknown1C, m_SampleRateRatio, value);
     OSRestoreInterrupts(enabled);
 }
 
@@ -650,7 +649,7 @@ void AudioSampleSource::SetInputVolume(float value)
     }
     if (m_Unknown14_18)
         MIXRmtSetFader(m_Unknown1C, m_Unknown14_19, (int)(10.0f * value));
-    if (g_pAudioBackend->m_Unknown450 || !m_Unknown14_18)
+    if (g_pAudioBackend->m_MixControllerSpeakersToMain || !m_Unknown14_18)
         SetVoiceInputVolume(m_Unknown1C, value);
     OSRestoreInterrupts(enabled);
 }

@@ -525,7 +525,7 @@ config.libs = [
             Object(Matching, "Game/AI/AiUtil.cpp"),
             Object(Matching, "Game/AI/AvoidableObject.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/AI/AvoidController.cpp", extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/AI/Desire.cpp", extra_cflags=["-inline noauto"]),
+            Object(NonMatching, "Game/AI/Desire.cpp", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(Matching, "Game/AI/DesireMark.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesireMegaStrike.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/AI/DesirePass.cpp", extra_cflags=["-ipa file"]),
@@ -577,10 +577,10 @@ config.libs = [
 
             # Game/Audio
             Object(Matching, "Game/Audio/audio.cpp", extra_cflags=["-inline auto,nobottomup,depth=5", "-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/Audio/AudioBackend.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Audio/AudioBankLoader.cpp"),
+            Object(Matching, "Game/Audio/AudioBackend.cpp", extra_cflags=["-ipa file", "-sym on"]),
+            Object(Matching, "Game/Audio/AudioBankLoader.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Audio/AudioBankTable.cpp"),
-            Object(NonMatching, "Game/Audio/AudioBundleManager.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Audio/AudioBundleManager.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioBundleManagerPlatform.cpp"),
             Object(Matching, "Game/Audio/AudioCalculation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Audio/AudioEffectBinding.cpp", extra_cflags=["-ipa file", "-sym on"]),
@@ -969,7 +969,7 @@ config.libs = [
             # Game/Transitions
             Object(Matching, "Game/Transitions/ColourBlendScreenTransition.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Transitions/ModelTransition.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Transitions/ScreenTransitionManager.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file"]),
+            Object(Matching, "Game/Transitions/ScreenTransitionManager.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file", "-sym on"]),
             Object(Matching, "Game/Transitions/ScriptedTransition.cpp", extra_cflags=["-inline auto", "-inline deferred", "-ipa file", "-sym on"]),
             Object(Matching, "Game/Transitions/TransitionSequence.cpp"),
 
@@ -1366,9 +1366,10 @@ config.libs = [
             Object(Matching, "NL/plat/nlFileCache.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"], mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/nlFlash.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/nlMemory.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
-            Object(NonMatching, "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5", extra_cflags=["-inline noauto", "-ipa file"]),
+            Object(Matching, "NL/plat/PlatPadManager.cpp", cflags=cflags_game, mw_version="GC/3.0a5", extra_cflags=["-inline noauto", "-ipa file"]),
             Object(Matching, "NL/plat/SocketNetwork.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
             Object(Matching, "NL/plat/TransportSocket.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
+            Object(Matching, "NL/plat/WiiPadMonkey.cpp", cflags=cflags_game, mw_version="GC/3.0a5"),
 
             # RVL_SDK/ai
             Object(Matching, "RVL_SDK/ai/ai.c"),

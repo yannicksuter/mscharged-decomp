@@ -139,4 +139,14 @@ inline void AudioEffectParameter::Update(float dt)
 extern AuxEffectMap* g_pAuxEffectMap;
 void SetDefaultReverbSettings(AXFX_REVERBHI* reverb);
 
+inline void* AllocateAudioEffectMemory(unsigned long size)
+{
+    return nlMalloc(size, 8, false);
+}
+
+inline void FreeAudioEffectMemory(void* pointer)
+{
+    nlFree(pointer);
+}
+
 #endif // GAME_AUDIO_AUDIOEFFECT_H

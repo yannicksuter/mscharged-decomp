@@ -140,6 +140,15 @@ public:
     virtual ~PadDeviceChangedEvent() { }
 };
 
+// Device type stored per channel in PlatPadManager::type.
+enum PlatPadType
+{
+    PLAT_PAD_NONE = 0,
+    PLAT_PAD_REMOTE = 1,
+    PLAT_PAD_FREESTYLE = 2,
+    PLAT_PAD_CLASSIC = 3
+};
+
 struct PlatPadManager
 {
     PlatPadManager()

@@ -20,33 +20,27 @@ void nlQuatSlerp(
 void nlQuatToMatrix(
     nlMatrix4& out, const nlQuaternion& quat, bool setRemainingRows)
 {
-    f32 x = quat.x;
-    f32 y = quat.y;
-    f32 z = quat.z;
-    f32 w = quat.w;
-
-    f32 xx = 2.0f * (x * x);
-    f32 yy = 2.0f * (y * y);
-    f32 zz = 2.0f * (z * z);
-    f32 xy = 2.0f * (x * y);
-    f32 xz = 2.0f * (x * z);
-    f32 yz = 2.0f * (y * z);
-    f32 wx = 2.0f * (w * x);
-    f32 wy = 2.0f * (w * y);
-    f32 wz = 2.0f * (w * z);
-    f32 oneMinusXX = 1.0f - xx;
+    f32 xx = 2.0f * (quat.x * quat.x);
+    f32 yy = 2.0f * (quat.y * quat.y);
+    f32 zz = 2.0f * (quat.z * quat.z);
+    f32 xy = 2.0f * (quat.x * quat.y);
+    f32 xz = 2.0f * (quat.x * quat.z);
+    f32 yz = 2.0f * (quat.y * quat.z);
+    f32 wx = 2.0f * (quat.x * quat.w);
+    f32 wy = 2.0f * (quat.y * quat.w);
+    f32 wz = 2.0f * (quat.z * quat.w);
 
     out.e2[0][0] = 1.0f - yy - zz;
     out.e2[1][0] = xy - wz;
     out.e2[2][0] = xz + wy;
     out.e2[3][0] = 0.0f;
     out.e2[0][1] = xy + wz;
-    out.e2[1][1] = oneMinusXX - zz;
+    out.e2[1][1] = 1.0f - xx - zz;
     out.e2[2][1] = yz - wx;
     out.e2[3][1] = 0.0f;
     out.e2[0][2] = xz - wy;
     out.e2[1][2] = yz + wx;
-    out.e2[2][2] = oneMinusXX - yy;
+    out.e2[2][2] = 1.0f - xx - yy;
     out.e2[3][2] = 0.0f;
 
     if (setRemainingRows)

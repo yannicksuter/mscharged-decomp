@@ -98,16 +98,7 @@ public:
         {
             if (mType >= NUM_V_TYPES)
             {
-                switch (mType)
-                {
-                case FT_PLAYER:
-                    break;
-                case FT_TEAM:
-                case FT_GAME:
-                case FT_BALL:
-                    bEqual = mData.pointer == other.mData.pointer;
-                    break;
-                }
+                bEqual = EqualExtendedValue(other);
             }
             else
             {
@@ -120,6 +111,25 @@ public:
     virtual unsigned long GetHash() const;
     virtual NLString ToString() const;
     virtual bool IsPointerType() const;
+
+private:
+    bool EqualExtendedValue(const FuzzyVariant& other) const
+    {
+        bool equal = mType == other.mType;
+        if (equal)
+        {
+            switch (mType)
+            {
+            case FT_PLAYER:
+            case FT_TEAM:
+            case FT_GAME:
+            case FT_BALL:
+                equal = mData.pointer == other.mData.pointer;
+                break;
+            }
+        }
+        return equal;
+    }
 };
 
 extern FuzzyVariant fvNotSet;
