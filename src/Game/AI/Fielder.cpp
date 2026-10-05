@@ -740,17 +740,6 @@ extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(
     return fn_80041B0C(runtime, fielder, name);
 }
 
-cFielder* cFielder::DoFindBestHitTarget()
-{
-    UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
-        FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
-    if (vBestTarget.IsPointerType())
-    {
-        return (cFielder*)vBestTarget.mData.pPlayer;
-    }
-    return 0;
-}
-
 static inline void GetCharacterSpecialActive(
     const cFielder* fielder, eCharacterClass character, bool& active)
 {
@@ -1087,7 +1076,8 @@ extern "C" float fn_80030750(cFielder* pFielder)
         nlVec3Set(v3Delta, v3End.x - v3Start.x, v3End.y - v3Start.y, v3End.z - v3Start.z);
         pFielder->mUnidentified35C = nlVec3Length(v3Delta);
     }
-    float fReach = pFielder->mUnidentified35C * pFielder->mUnidentified024.m_fMovementScale;
+    float fScale = pFielder->mUnidentified024.m_fMovementScale;
+    float fReach = pFielder->mUnidentified35C * fScale;
     fReach += fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale());
     return fReach;
 }
@@ -1317,6 +1307,33 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     {
         if (!pFielderCollidedWith->IsInvincibleChars())
             pFielderCollidedWith->fn_8004D238();
+    }
+}
+
+extern "C" void fn_800318F8(cFielder* pFielder)
+{
+    if (pFielder->m_pBall != 0 && pFielder->mUnidentified1E4.m_eLastPadAction == 0x1B)
+    {
+        cPlayer* pPassTarget;
+        if (pFielder->GetGlobalPad() == 0)
+        {
+            UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
+                FuzzyAIGetFielderRuntime(pFielder), "BestPassTarget", pFielder);
+            pPassTarget = vBestTarget.GetPlayer();
+        }
+        else
+        {
+            pPassTarget = fn_80096F54(pFielder,
+                pFielder->GetGlobalPad() != 0 ? pFielder->GetGlobalPad()->IsPressed(0x17, true) : false);
+        }
+
+        if (pPassTarget != 0)
+        {
+            pFielder->DoRegularPassing(pPassTarget, pFielder->bIsModified, true, false, false,
+                GetSlowestVolleyPassSpeed(pFielder->GetTweaks()),
+                GetFastestVolleyPassSpeed(pFielder->GetTweaks()));
+        }
+        pFielder->mUnidentified1E4.m_eLastPadAction = 0x32;
     }
 }
 
@@ -2315,6 +2332,17 @@ void cFielder::DoClearBall()
     g_pBall->ShootAtFast(v3ClearBallVelocity, v3Target, fDesiredTime);
     g_pBall->ShootRelease(v3ClearBallVelocity, SPINTYPE_BACK);
     SetNoPickUpTime(0.2f);
+}
+
+cFielder* cFielder::DoFindBestHitTarget()
+{
+    UnidentifiedVariant_80054AB8 vBestTarget = fn_80041AFC(
+        FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
+    if (vBestTarget.IsPointerType())
+    {
+        return (cFielder*)vBestTarget.mData.pPlayer;
+    }
+    return 0;
 }
 
 void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed, int nParam)
