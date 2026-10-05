@@ -52,7 +52,9 @@ void DBInitComm(u8** flagOut, OSInterruptHandler handler) {
     OSRestoreInterrupts(enabled);
 }
 
-// Non-matching
+#pragma push
+#pragma optimization_level 0
+
 void DBInitInterrupts(void) {
     __OSMaskInterrupts(OS_INTR_MASK(OS_INTR_EXI_2_EXI) |
                        OS_INTR_MASK(OS_INTR_EXI_2_TC));
@@ -61,6 +63,8 @@ void DBInitInterrupts(void) {
     __OSSetInterruptHandler(OS_INTR_PI_DEBUG, __DBIntrHandler);
     __OSUnmaskInterrupts(OS_INTR_MASK(OS_INTR_PI_DEBUG));
 }
+
+#pragma pop
 
 u32 DBQueryData(void) {
     __DBEXIInputFlag = FALSE;

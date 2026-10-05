@@ -1656,7 +1656,7 @@ config.libs = [
             Object(Matching, "RVL_SDK/ncd/ncdsystem.c"),
 
             # RVL_SDK/ndev
-            Object(NonMatching, "RVL_SDK/ndev/DebuggerDriver.c"),
+            Object(Matching, "RVL_SDK/ndev/DebuggerDriver.c"),
             Object(Matching, "RVL_SDK/ndev/exi2.c"),
 
             # RVL_SDK/nwc24
