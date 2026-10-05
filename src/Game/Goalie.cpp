@@ -3663,7 +3663,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
         DrawableCharacter::RenderAllCharacters();
         if (g_pGame->mbCaptainShotToScoreOn)
         {
-            fn_8005DB7C();
+            fn_8005DB7C(g_pGame);
         }
         SetRenderWorldEffects(1);
         g_pGame->fn_800586C0();
@@ -3697,7 +3697,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
     WorldDarkening::Instance().Fade(100.0f, 0.0f);
     if (g_pGame->mbCaptainShotToScoreOn)
     {
-        fn_8005DB7C();
+        fn_8005DB7C(g_pGame);
     }
     g_pGame->mpWeatherManager->Resume();
     SetRenderWorldEffects(1);

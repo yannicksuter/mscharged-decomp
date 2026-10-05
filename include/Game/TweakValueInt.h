@@ -32,11 +32,12 @@ public:
     }
 
     TweakValueInt(
-        const char* name, const char* category, int initialValue)
+        const char* name, const char* category, int initialValue,
+        bool formatName = true)
         : value(initialValue)
     {
         mName = name;
-        mFormatName = true;
+        mFormatName = formatName;
 
         if (IsTweakRegistryInitialized() == 0)
         {

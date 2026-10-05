@@ -68,9 +68,15 @@ extern "C" void fn_8005B330(nlVector3*, float, float);
 
 extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt);
 
+class cGame;
+// MegastrikeEnd: retail passes g_pGame in r3, so this is a cGame member in
+// all but name.
+extern "C" void fn_8005DB7C(cGame* pGame);
+
 class cGame : public NetworkMessageReceiver
 {
     friend void fn_80061B1C(int relative, float xTilt, float yTilt);
+    friend void fn_8005DB7C(cGame* pGame);
 
 public:
     virtual int ProcessMessage(NetworkMessage* message);
@@ -89,6 +95,7 @@ public:
     void ResetGameFields();
     void RegisterEventListeners();
     void BeginGame(bool bRematch, bool bStraightToKickoff);
+    void CheckForGoal();
     void fn_8005A028(DetermDataEvent* data);
     void OnSuddenDeath();
     void OnGameOver();
@@ -265,13 +272,12 @@ extern "C" void fn_80060804(cGame*, cFielder*);
 
 extern "C" void fn_8005D210(cGame*, LightningStrikeData*);
 extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData);
-extern "C" void fn_8005D550(void* pManager, const GoalieSaveData* pData);
-extern "C" void fn_8005D948(void* pGame, const GoalieSaveData* pData);
-extern "C" void fn_8005DB7C();
-extern "C" void fn_8005E408(void* pManager, const PlayerAttackData* pData);
-extern "C" void fn_8005E800(void* pManager, const PlayerAttackData* pData);
-extern "C" void fn_8005E604(void* pManager, const PlayerAttackData* pData);
-extern "C" void fn_8005E9FC(void* pManager, const PlayerAttackData* pData);
+extern "C" void fn_8005D550(cGame* pGame, const GoalieSaveData* pData);
+extern "C" void fn_8005D948(cGame* pGame, const GoalieSaveData* pData);
+extern "C" void fn_8005E408(cGame* pGame, const PlayerAttackData* pData);
+extern "C" void fn_8005E800(cGame* pGame, const PlayerAttackData* pData);
+extern "C" void fn_8005E604(cGame* pGame, const PlayerAttackData* pData);
+extern "C" void fn_8005E9FC(cGame* pGame, const PlayerAttackData* pData);
 
 extern "C" void fn_8005D74C(cGame* game, const GoalieSaveData* pSaveData);
 

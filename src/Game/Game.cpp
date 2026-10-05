@@ -48,6 +48,17 @@
 #include "Game/ReplayChoreo.h"
 #include "Game/ReplayManager.h"
 #include "Game/Render/Presentation.h"
+#include "Game/NisPlayer.h"
+#include "Game/Render/MegaBallIndicators.h"
+#include "Game/NetTournManager.h"
+#include "Game/Render/NetMesh.h"
+#include "Game/Audio/RegistryPools.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/AI/AiUtil.h"
+#include "Game/AI/AIPad.h"
+#include "Game/AI/Scripts/ScriptDefines.h"
+#include "Game/Physics/PhysicsShockwave.h"
+#include "Game/InputManager.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Camera/GameplayCam.h"
 #include "Game/Sys/audio.h"
@@ -87,12 +98,8 @@
 extern PowerupBase* g_pPowerups[];
 extern "C" const nlVector3 lbl_804DBFE8;
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
-
-struct UnidentifiedGameStatic
-{
-    u8 mUnidentified000[0x0C];
-    int mUnidentified00C;
-};
+extern "C" bool fn_800167E8(cBall* pBall);
+extern "C" void fn_800406B0(cFielder* pFielder, float numBalls, float accuracy);
 
 struct UnidentifiedGameSnapshot
 {
@@ -101,37 +108,17 @@ struct UnidentifiedGameSnapshot
     float mUnidentified1F4[10];
 };
 
-class UnidentifiedCallbackTarget
-{
-};
-
-typedef void (UnidentifiedCallbackTarget::*UnidentifiedCallbackWithArg)(
-    void* value);
-typedef void (UnidentifiedCallbackTarget::*UnidentifiedCallbackNoArg)();
-
-struct UnidentifiedCallbackWithArgBinding
-{
-    virtual void UnidentifiedVirtual();
-
-    UnidentifiedCallbackWithArg mCallback;
-    UnidentifiedCallbackTarget* mTarget;
-};
-
-struct UnidentifiedCallbackNoArgBinding
-{
-    virtual void UnidentifiedVirtual();
-
-    UnidentifiedCallbackNoArg mCallback;
-    UnidentifiedCallbackTarget* mTarget;
-};
-
 struct UnidentifiedRegistrationNode
 {
     UnidentifiedRegistrationNode* mNext;
 };
 
 extern "C" EventDispatcher* fn_800721C4();
+extern "C" void fn_80072134(LightningStrikeData* node);
 extern "C" void fn_8007214C(ShotAtGoalData* node);
+extern "C" void fn_80072164(UnidentifiedRegistrationNode* node);
+extern "C" void fn_8007217C(UnidentifiedRegistrationNode* node);
+extern "C" void fn_80072194(PlayerAttackData* node);
 extern "C" int GetAudioPauseDepth();
 extern "C" void ResumeAllAudio();
 extern "C" void fn_800EDC2C();
@@ -140,8 +127,9 @@ extern "C" void fn_80058ABC(unsigned long param1, unsigned long param2);
 extern void PlaySuddenDeathMusic();
 extern void StopSuddenDeathMusic();
 
-extern UnidentifiedGameStatic lbl_8056B9A0;
-extern cPlayer* lbl_806E0C9C;
+// Tweak "Megastrike/Score differential": when positive, it overrides the
+// mega strike shot count (fn_80058498).
+TweakValueInt lbl_8056B9A0("Score differential", "Megastrike", -1, false);
 extern "C" char lbl_804FB2F4[];
 extern "C" char lbl_804FB318[];
 extern "C" char lbl_804FB364[];
@@ -154,10 +142,17 @@ extern "C" char lbl_804FB294[];
 extern "C" char lbl_804FB238[];
 extern "C" char lbl_804FB060[];
 extern "C" char lbl_804FB66C[];
+extern "C" char lbl_804FB428[];
+extern "C" char lbl_804FB454[];
+extern "C" char lbl_804FB4A4[];
+extern "C" char lbl_804FB4D0[];
+extern "C" char lbl_804FB4FC[];
+extern "C" char lbl_804FB544[];
+extern "C" char lbl_804FB568[];
+extern "C" char lbl_804FB598[];
+extern "C" char lbl_804FB5C4[];
+extern "C" char lbl_804FB604[];
 
-extern "C" float lbl_806DBA6C;
-extern "C" float lbl_806DBA80;
-extern "C" float lbl_806DBA84;
 extern "C" const float lbl_806E3798;
 extern "C" const float lbl_806E379C;
 extern "C" const float kGameTweakZero;
@@ -175,9 +170,54 @@ extern "C" const float lbl_806E375C;
 extern "C" const float lbl_806E3760;
 extern "C" const float lbl_806E3764;
 extern "C" const float lbl_806E3768;
-extern bool lbl_806E0C98;
-extern int lbl_806DBA68;
-extern "C" int lbl_806DBAAC;
+extern "C" const float lbl_806E3778;
+extern "C" const float lbl_806E377C;
+extern "C" const float lbl_806E3780;
+extern "C" const float lbl_806E3784;
+extern "C" const float lbl_806E3788;
+extern "C" const float lbl_806E378C;
+
+// Game tuning values (.sdata), in retail order.
+// Countdown beeps played before the end of a match.
+int lbl_806DBA68 = 5;
+// Field tilt force scale (fn_80061B1C).
+extern "C" float lbl_806DBA6C = 0.8f;
+// Time the field takes to level out, and the hold before it starts.
+extern "C" float lbl_806DBA70 = 3.0f;
+extern "C" float lbl_806DBA74 = 3.0f;
+// Weather tilt range scale on each axis.
+extern "C" float lbl_806DBA78 = 0.5f;
+extern "C" float lbl_806DBA7C = 8.0f;
+extern "C" float lbl_806DBA80 = 4.0f;
+extern "C" float lbl_806DBA84 = 10.0f;
+// Weather tilt ramp-up period.
+extern "C" float lbl_806DBA88 = 12.0f;
+// Score-difference tilt: clamp and scale.
+extern "C" float lbl_806DBA8C = 6.0f;
+extern "C" float lbl_806DBA90 = 1.0f;
+// Weather tilt target speed range.
+extern "C" float lbl_806DBA94 = 12.0f;
+extern "C" float lbl_806DBA98 = 1.0f;
+// Weather tilt direction jitter.
+extern "C" int lbl_806DBA9C = 1000;
+// Seek speeds: weather tilt, levelling during shoot-to-score, score tilt.
+extern "C" float lbl_806DBAA0 = 1.0f;
+extern "C" float lbl_806DBAA4 = 2.0f;
+extern "C" float lbl_806DBAA8 = 2.0f;
+extern "C" int lbl_806DBAAC = 3;
+// Sync log type ids, registered on first use (fn_8005B840).
+extern "C" u16 lbl_806DBAB2 = 0xFFFF;
+extern "C" u16 lbl_806DBAB4 = 0xFFFF;
+
+// .sbss, in retail order. The first two are debug overrides that force the
+// weather and score field tilt on.
+extern "C" {
+bool lbl_806E0C90;
+bool lbl_806E0C91;
+}
+cGame* g_pGame;
+bool lbl_806E0C98;
+cPlayer* lbl_806E0C9C;
 
 static inline int GetUnidentifiedPlayerIndex(cPlayer* pPlayer)
 {
@@ -712,15 +752,170 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     }
 }
 
+void cGame::CheckForGoal()
+{
+    struct GoalScoredDataExt
+    {
+        GoalScoredData data;
+        int sideOfInterest;
+    };
+
+    int nSide;
+
+    if (g_pBall->GetInNet(nSide) && !mUnidentified020)
+    {
+        nSide = (nSide + 1) % 2;
+        m_nLastTeamToScore = nSide;
+        g_pTeams[nSide]->m_nScore += 1;
+        int score;
+
+        if (GameInfoManager::Instance()->IsInMode4()
+            && g_pStrikerChallenge->mCondition == 2 && nSide == 1)
+        {
+            ChangeGameState(3);
+        }
+        else if (m_eGameState == 6)
+        {
+            ChangeGameState(3);
+        }
+        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+            && (score = g_pTeams[nSide]->m_nScore,
+                score >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit))
+        {
+            ChangeGameState(3);
+        }
+        else
+        {
+            ChangeGameState(2);
+        }
+
+        if (g_pBall->m_pLastTouch == NULL)
+        {
+            g_pBall->m_pLastTouch = g_pTeams[nSide]->GetCaptain();
+        }
+
+        if (m_pScorer == NULL)
+        {
+            m_pScorer = g_pTeams[nSide]->GetCaptain();
+        }
+
+        if (m_pScorer != NULL && m_pScorer != g_pBall->m_pLastTouch
+            && g_pBall->m_pLastTouch->m_eClassType != GOALIE)
+        {
+            float fDirection = g_pBall->m_pLastTouch->m_pTeam->m_pNet->m_v3NetLocation.x
+                * g_pBall->m_v3Position.x;
+            if (fDirection >= kGameTweakZero)
+            {
+                g_pBall->m_uGoalType = 5;
+            }
+            else
+            {
+                g_pBall->m_uGoalType = 3;
+            }
+
+            cPlayer* pPlayer = g_pBall->m_pLastTouch;
+            if (m_pScorer != NULL && pPlayer != NULL && m_pScorer != pPlayer
+                && m_pScorer->IsOnSameTeam(pPlayer))
+            {
+                m_pAssister = m_pScorer;
+            }
+            else
+            {
+                m_pAssister = NULL;
+            }
+
+            m_pScorer = pPlayer;
+
+            if (pPlayer != NULL && pPlayer->m_eClassType == FIELDER)
+            {
+                m_pTeamTouch[pPlayer->m_pTeam->m_nSide] = pPlayer;
+            }
+        }
+        else if (m_pScorer != NULL)
+        {
+            if (nSide != m_pScorer->m_pTeam->m_nSide)
+            {
+                g_pBall->m_uGoalType = 5;
+            }
+        }
+
+        // A scorer still holding the ball (a captain carried in) lets go of it.
+        if (m_pScorer != NULL && m_pScorer->m_pBall != NULL)
+        {
+            m_pScorer->ReleaseBall(0);
+            if (m_pScorer->m_eClassType == FIELDER)
+            {
+                ((cFielder*)m_pScorer)->ShootBallDueToContact(m_pScorer->mUnidentified024.m_v3Velocity);
+                g_pBall->m_uGoalType = 7;
+            }
+        }
+
+        GoalScoredDataExt goalScored;
+        goalScored.data.uNumGoalsScored = 1;
+        goalScored.data.uTeamIndex = nSide;
+        goalScored.data.uGoalType = g_pBall->m_uGoalType;
+        goalScored.data.v3ShotPosition = g_pBall->m_v3ShotOrigin;
+        goalScored.data.pScorer = m_pScorer;
+        goalScored.data.pAssister = m_pAssister;
+
+        if (m_pScorer != NULL && m_pScorer->GetGlobalPad() != NULL)
+        {
+            goalScored.sideOfInterest = m_pScorer->GetGlobalPad()->GetPadID();
+        }
+        else
+        {
+            goalScored.sideOfInterest = -1;
+        }
+
+        goalScored.data.pLastTouch[0] = m_pTeamTouch[0];
+        goalScored.data.pLastTouch[1] = m_pTeamTouch[1];
+        mUnidentified020 = true;
+
+        cGame* game = g_pGame;
+        if (game->m_eGameState != 4)
+        {
+            game->mUnidentified49C.mEvent06.Deliver(&goalScored.data);
+        }
+
+        if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+        {
+            unsigned long soundID;
+            if (g_pTeams[nSide]->m_nScore - g_pTeams[nSide]->GetOtherTeam()->m_nScore == 0)
+            {
+                soundID = 0x9D796D7D;
+            }
+            else if (g_pTeams[nSide]->m_nScore - g_pTeams[nSide]->GetOtherTeam()->m_nScore == 1)
+            {
+                soundID = 0xC272152B;
+                if (nSide == 0)
+                {
+                    soundID = 0x04F9F242;
+                }
+            }
+            else
+            {
+                soundID = 0xB8511A3D;
+                if (nSide == 0)
+                {
+                    soundID = 0x3E363074;
+                }
+            }
+            PlayCrowdReaction(soundID);
+        }
+
+        Goalie::HandleGoalScored(nSide);
+    }
+}
+
 void cGame::fn_80058498(bool param1, int param2, int param3)
 {
     mbCaptainShotToScoreOn = param1;
     if (param1)
     {
         mUnidentified041 = g_pTeams[param2]->m_pNet->m_v3NetLocation.x > 0.0f;
-        if (lbl_8056B9A0.mUnidentified00C > 0)
+        if (lbl_8056B9A0.value > 0)
         {
-            mUnidentified028 = lbl_8056B9A0.mUnidentified00C;
+            mUnidentified028 = lbl_8056B9A0.value;
         }
         else
         {
@@ -1070,6 +1265,182 @@ void cGame::fn_80059FC4()
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 
+// Receives the custom deterministic data queued by the Send* helpers above.
+void cGame::fn_8005A028(DetermDataEvent* pEvent)
+{
+    u8 type = pEvent->mData[0];
+
+    DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
+    if (output != 0)
+    {
+        char buffer[256];
+        nlSNPrintf(buffer, sizeof(buffer), lbl_804FB428, type, pEvent->mSize,
+            GetFixedUpdateTask()->GetFrame());
+        output->WriteText(buffer);
+    }
+
+    switch (type)
+    {
+    case 5:
+    {
+        // Which players are on screen, one bit per player.
+        for (int i = 0; i < 2; i++)
+        {
+            cTeam* pTeam = g_pTeams[i];
+            u8 flags = pEvent->mData[1 + i];
+            for (int j = 0; j < 5; j++)
+            {
+                pTeam->GetPlayer(j)->mUnidentified024.m_bOnScreen = (flags & (u8)(1 << j)) != 0;
+            }
+        }
+        break;
+    }
+
+    case 29:
+        GetPresentation()->ReceiveNisLoaded(pEvent->mData[1]);
+        break;
+
+    case 181:
+    {
+        cFielder* pFielder = g_pTeams[pEvent->mData[1]]->GetFielder(pEvent->mData[2]);
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB454, pEvent->mData[1],
+            pEvent->mData[2], *(float*)&pEvent->mData[4], *(float*)&pEvent->mData[8],
+            gInputManager->mFrameProvider->GetFrame());
+        fn_800406B0(pFielder, *(float*)&pEvent->mData[4], *(float*)&pEvent->mData[8]);
+        break;
+    }
+
+    case 183:
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB4A4,
+            gInputManager->mFrameProvider->GetFrame());
+        mUnidentified042 = true;
+        break;
+
+    case 185:
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB4D0,
+            gInputManager->mFrameProvider->GetFrame());
+        ResetMegaBallPointer();
+        break;
+
+    case 182:
+    {
+        Goalie* pGoalie = g_pTeams[pEvent->mData[1]]->GetGoalie();
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB4FC, pEvent->mData[1],
+            pEvent->mData[2], *(float*)&pEvent->mData[4],
+            gInputManager->mFrameProvider->GetFrame());
+        pGoalie->fn_80084D70(pEvent->mData[2], *(float*)&pEvent->mData[4]);
+        break;
+    }
+
+    case 222:
+        // SlowDownEnd: back to full speed after a captain hit.
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB544,
+            gInputManager->mFrameProvider->GetFrame());
+        if (g_pGame->m_eGameState != 4)
+        {
+            StopSound(0xCE5CBAC7, g_pGame);
+            if (FixedUpdateTask::GetTargetTimeScale() < lbl_806E3748)
+            {
+                FixedUpdateTask::SetTimeScale(lbl_806E3748);
+                ParticleUpdateTask::sInstance->SetTimeScale(lbl_806E3748);
+                if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+                {
+                    m_pGameClock->Start();
+                }
+
+                PlaySound(10, 0x54A8A6A0, 0, 0);
+                u32 hash = nlStringLowerHash(lbl_804FB294);
+                ApplyAudioTransition(&hash, true, 0);
+                g_pOverlayManager->GetScene((SceneList)89)->SetVisible(true);
+                gpNumberDisplay->mVisible = true;
+            }
+        }
+        break;
+
+    case 188:
+    {
+        // CleanupMegastrikeGameplay
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB568,
+            gInputManager->mFrameProvider->GetFrame());
+        Goalie* pGoalie = mUnidentified03C->m_pTeam->GetOtherTeam()->GetGoalie();
+        if (mUnidentified030 != 0)
+        {
+            pGoalie->InitActionMove(false);
+        }
+        else
+        {
+            if (pGoalie->m_pBall == 0 && g_pBall->m_pOwner != 0)
+            {
+                g_pBall->m_pOwner->ReleaseBall(0);
+            }
+            pGoalie->PickupBall(g_pBall);
+            pGoalie->InitActionMoveWB();
+        }
+        break;
+    }
+
+    default:
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB598, type);
+        break;
+    }
+}
+
+int cGame::ProcessMessage(NetworkMessage* message)
+{
+    NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
+    s8 machine = roster->MachineIdxFromConnection(message->mSource);
+    if (machine < 0 || machine >= roster->GetMachineCount())
+    {
+        tDebugPrintManager::Print(DC_NETWORK, lbl_804FB5C4,
+            (u8)message->GetType(), message->mSource);
+        return 1;
+    }
+
+    if (NetTournManager::Instance()->mTournamentMachineMappingActive)
+    {
+        s8 tournamentIndex = NetTournManager::Instance()->TournamentIdxToMachineIdx(machine);
+        if (tournamentIndex < 0 || tournamentIndex >= g_pNetworkSessionBase->GetNumMachines())
+        {
+            tDebugPrintManager::Print(DC_NETWORK, lbl_804FB604,
+                (u8)message->GetType(), machine, tournamentIndex);
+            return 1;
+        }
+    }
+
+    switch ((u8)message->GetType())
+    {
+    case 34:
+        if (mbCaptainShotToScoreOn)
+        {
+            ReceiveMegaBallPointerUpdate(message);
+        }
+        break;
+
+    case 35:
+    {
+        NetworkMessageType35* pMessage = (NetworkMessageType35*)message;
+        for (int i = 0; i < pMessage->mCount; i++)
+        {
+            u8* ptr;
+            if (mUnidentified0C0.mCapacity <= mUnidentified0C0.mSize)
+            {
+                ptr = 0;
+            }
+            else
+            {
+                ptr = (u8*)mUnidentified0C0.mData
+                    + ((mUnidentified0C0.mStart + mUnidentified0C0.mSize++)
+                        % mUnidentified0C0.mCapacity);
+            }
+            *ptr = pMessage->mValues[i];
+        }
+        break;
+    }
+    }
+
+    return 1;
+}
+
 void cGame::PreUpdate(float deltaTime)
 {
     for (int i = 0; i < 2; i++)
@@ -1134,6 +1505,290 @@ extern "C" void fn_8005A7E8()
     ++lbl_806E2130;
 }
 
+// cGame::Update: one fixed-update step of the match.
+void cGame::fn_8005A8FC(float fDeltaT)
+{
+    if (m_eGameState == 4)
+    {
+        return;
+    }
+
+    AIPadManager::UpdateAccelerationHistory();
+    fn_8005A7E8();
+    fn_8005B508();
+    UpdateShockwaves(fDeltaT);
+
+    // Retail calls this here and drops the result.
+    IsNetworkOrRecordedGame();
+
+    // Time is up once fewer than a tenth of a second remain.
+    if ((unsigned int)(lbl_806E3778 * (m_fGameDuration - m_pGameClock->m_fTimer)) == 0
+        && !fn_800167E8(g_pBall))
+    {
+        if (g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
+        {
+            if (m_eGameState == 5)
+            {
+                if (GameInfoManager::Instance()->IsInMode4()
+                    && g_pStrikerChallenge->mCurrentChallenge == 2
+                    && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
+                {
+                    ChangeGameState(3);
+                    StatsTracker::Instance()->TrackWinner(-1);
+                }
+                else
+                {
+                    ChangeGameState(6);
+                    StatsTracker::Instance()->mIsOvertime = true;
+                }
+            }
+        }
+        else if (m_eGameState != 3)
+        {
+            ChangeGameState(3);
+            StatsTracker::Instance()->TrackWinner(-1);
+        }
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+        FuzzyScriptSetCurrentTeam(g_pTeams[i]);
+        g_pTeams[i]->Update(fDeltaT);
+        FuzzyScriptClearGlobals();
+    }
+
+    mUnidentified014->Update(true, fDeltaT);
+
+    for (int i = 0; i < 10; i++)
+    {
+        g_pCurrentlyUpdatingCharacter = m_pRandomPlayersArray[i];
+
+        if (m_pRandomPlayersArray[i]->m_eClassType == FIELDER)
+        {
+            FuzzyScriptSetCurrentFielder((cFielder*)m_pRandomPlayersArray[i]);
+        }
+        else
+        {
+            FuzzyScriptSetCurrentTeam(m_pRandomPlayersArray[i]->m_pTeam);
+        }
+
+        g_pCurrentlyUpdatingTeam = m_pRandomPlayersArray[i]->m_pTeam;
+        m_pRandomPlayersArray[i]->Update(fDeltaT);
+        FuzzyScriptClearGlobals();
+    }
+
+    g_pCurrentlyUpdatingCharacter = 0;
+    g_pBall->Update(fDeltaT);
+    mpWeatherManager->Update(fDeltaT);
+    lbl_806E12C8->Update(fDeltaT);
+
+    if (IsGameplayOrOvertime())
+    {
+        CheckForGoal();
+
+        // Countdown beeps over the last seconds of the match.
+        if (mUnidentified0B8 != 0)
+        {
+            float fBeepTime = lbl_806E377C - (float)(int)(lbl_806DBA68 - mUnidentified0B8);
+            if (m_fGameDuration - m_pGameClock->m_fTimer < fBeepTime)
+            {
+                mUnidentified0B8--;
+                PlaySound(15, 0x97E84AE4, 0, 0);
+            }
+        }
+    }
+
+    for (int i = 0; i < 25; i++)
+    {
+        if (g_pPowerups[i] != 0)
+        {
+            g_pPowerups[i]->Update(fDeltaT);
+        }
+    }
+
+    // Field tilt.
+    int homeCaptainAction = g_pTeams[0]->GetCaptain()->m_eActionState;
+    int awayCaptainAction = g_pTeams[1]->GetCaptain()->m_eActionState;
+
+    if (mbCaptainShotToScoreOn || homeCaptainAction == 12 || homeCaptainAction == 11
+        || awayCaptainAction == 11 || awayCaptainAction == 12)
+    {
+        // Level the field out while a captain shoots to score.
+        mUnidentified0A4 = 0;
+        mUnidentified07C = kGameTweakZero;
+        mUnidentified098 = kGameTweakZero;
+        mUnidentified09C = kGameTweakZero;
+        mUnidentified0A6 = 0;
+        mUnidentified0A8 = 0;
+        mUnidentified080 = cCharacter::SeekSpeedExponential(
+            mUnidentified080, kGameTweakZero, lbl_806DBAA4, fDeltaT);
+        mUnidentified084 = cCharacter::SeekSpeedExponential(
+            mUnidentified084, kGameTweakZero, lbl_806DBAA4, fDeltaT);
+        fn_80061B1C(0, mUnidentified080, mUnidentified084);
+    }
+    else if (GameInfoManager::Instance()->IsRule0x4Equal4() || lbl_806E0C91)
+    {
+        // The field tilts towards the side that is behind.
+        float fMax = lbl_806DBA8C;
+        float fDiff = (float)(g_pTeams[1]->m_nScore - g_pTeams[0]->m_nScore);
+        fDiff = (fDiff >= -fMax) ? fDiff : -fMax;
+        fDiff = (fDiff <= fMax) ? fDiff : fMax;
+
+        mUnidentified080 = cCharacter::SeekSpeedExponential(
+            mUnidentified080, kGameTweakZero, lbl_806DBAA8, fDeltaT);
+        mUnidentified084 = cCharacter::SeekSpeedExponential(
+            mUnidentified084, fDiff * lbl_806DBA90, lbl_806DBAA8, fDeltaT);
+        fn_80061B1C(0, mUnidentified080, mUnidentified084);
+    }
+    else if ((GameInfoManager::Instance()->GetStadium() == 9 || lbl_806E0C90)
+        && !GetConfigBool(Config::Global(), "no_weather", false)
+        && !GameInfoManager::Instance()->IsRule0x4Equal1())
+    {
+        // Weather tilt: wander towards random targets, ramping up over time.
+        mUnidentified0A0 += fDeltaT;
+        if (mUnidentified0A0 > lbl_806DBA88)
+        {
+            mUnidentified0A0 = kGameTweakZero;
+        }
+
+        if (++mUnidentified0A8 >= 15)
+        {
+            mUnidentified0A8 = 0;
+
+            float fRamp = lbl_806E3748;
+            float fFraction = mUnidentified0A0 / lbl_806DBA88;
+            fRamp = (fRamp <= fFraction) ? fRamp : fFraction;
+
+            float fHalfRamp = lbl_806E3744 * fRamp;
+            float fRangeX = fHalfRamp * lbl_806DBA78;
+            float fRangeY = fHalfRamp * lbl_806DBA7C;
+
+            if (fRangeX > kGameTweakZero)
+            {
+                mUnidentified088 = -fRangeX - nlRandomf(fRangeX);
+                mUnidentified08C = fRangeX + nlRandomf(fRangeX);
+            }
+            else
+            {
+                mUnidentified088 = kGameTweakZero;
+                mUnidentified08C = kGameTweakZero;
+            }
+
+            mUnidentified090 = -fRangeY - nlRandomf(fRangeY);
+            mUnidentified094 = fRangeY + nlRandomf(fRangeY);
+            mUnidentified09C = nlRandomf(Interpolate(lbl_806DBA94, lbl_806DBA98, fRamp));
+            mUnidentified0A6 = mUnidentified0A4 + nlRandom(lbl_806DBA9C) - lbl_806DBA9C / 2;
+        }
+
+        // Turn back once the tilt leaves its range.
+        if (mUnidentified080 < mUnidentified088 || mUnidentified080 > mUnidentified08C)
+        {
+            u16 aAway = (mUnidentified080 < kGameTweakZero) ? 0 : 0x8000;
+            s16 aDiff = mUnidentified0A6 - aAway;
+            if (aDiff < 0)
+            {
+                aDiff = -aDiff;
+            }
+            if ((u16)aDiff > 0x4000)
+            {
+                mUnidentified0A6 = 0x8000 - mUnidentified0A6;
+            }
+            mUnidentified09C = lbl_806E3780 * lbl_806DBA98;
+        }
+
+        if (mUnidentified084 < mUnidentified090 || mUnidentified084 > mUnidentified094)
+        {
+            u16 aAway = (mUnidentified084 < kGameTweakZero) ? 0x4000 : 0xC000;
+            s16 aDiff = mUnidentified0A6 - aAway;
+            if (aDiff < 0)
+            {
+                aDiff = -aDiff;
+            }
+            if ((u16)aDiff > 0x4000)
+            {
+                mUnidentified0A6 = -mUnidentified0A6;
+            }
+            mUnidentified09C = lbl_806E3780 * lbl_806DBA98;
+        }
+
+        mUnidentified0A4 = SeekDirection(
+            mUnidentified0A4, mUnidentified0A6, lbl_806E3784, lbl_806E3788, fDeltaT);
+        mUnidentified098 = cCharacter::SeekSpeedExponential(
+            mUnidentified098, mUnidentified09C, lbl_806DBAA0, fDeltaT);
+
+        float fDX;
+        float fDY;
+        nlPolarToCartesian(fDX, fDY, mUnidentified0A4, mUnidentified098);
+        mUnidentified080 = fDX * fDeltaT + mUnidentified080;
+        mUnidentified084 = fDY * fDeltaT + mUnidentified084;
+        fn_80061B1C(0, mUnidentified080, mUnidentified084);
+    }
+    else if (fabsf(mUnidentified080) > lbl_806E378C || fabsf(mUnidentified084) > lbl_806E378C)
+    {
+        // No tilt source: hold, then level the field out.
+        float fTimer = mUnidentified07C;
+        float fZero = kGameTweakZero;
+        if (fTimer < fZero)
+        {
+            mUnidentified07C = fTimer - fDeltaT;
+            if (mUnidentified07C < -lbl_806DBA74)
+            {
+                mUnidentified07C = fZero;
+            }
+        }
+        else
+        {
+            float fNewTimer = fTimer + fDeltaT;
+            float fX;
+            float fY = fZero;
+            if (fNewTimer >= lbl_806DBA70 - fDeltaT)
+            {
+                fNewTimer = fZero;
+                fX = fZero;
+            }
+            else
+            {
+                float fStep = fDeltaT / (lbl_806DBA70 - fNewTimer);
+                fStep = (fStep >= fZero) ? fStep : fZero;
+                fStep = (fStep <= lbl_806E3748) ? fStep : lbl_806E3748;
+                fX = Interpolate(mUnidentified080, kGameTweakZero, fStep);
+                fY = Interpolate(mUnidentified084, kGameTweakZero, fStep);
+            }
+            fn_80061B1C(0, fX, fY);
+            mUnidentified07C = fNewTimer;
+        }
+    }
+
+    // EnterPostGame
+    if (m_pPostGameDoneClock->m_clockState == CLOCK_DONE)
+    {
+        m_pPostGameDoneClock->Reset(kGameTweakZero, lbl_806E3754, lbl_806E3748);
+
+        int nWinner = g_pTeams[1]->m_nScore > g_pTeams[0]->m_nScore;
+        if ((GameInfoManager::Instance()->IsInMode4()
+                && g_pStrikerChallenge->mCondition == 2
+                && g_pTeams[1]->m_nScore > 0)
+            || (g_pStrikerChallenge->mCurrentChallenge == 2
+                && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
+        {
+            NisPlayer::Instance()->mWinnerSide[0] = 1;
+        }
+        else
+        {
+            NisPlayer::Instance()->mWinnerSide[0] = nWinner;
+        }
+
+        UnidentifiedCameraEffects::Instance()->ResetForPresentation((void*)nWinner);
+        if (!DuringEndOfGamePresentation(GetPresentation()))
+        {
+            GetPresentation()->PlayGoalEffects("Goal_endgame");
+            GetPresentation()->Call("GameEndNoSuddenDeath", "");
+        }
+    }
+
+    UnidentifiedCameraEffects::Instance()->UnidentifiedNoOp();
+}
+
 float cGame::fn_8005B748(int param1, int param2)
 {
     if (param1 > param2)
@@ -1168,6 +1823,103 @@ void cGame::SetPotentialScorer(cPlayer* pPlayer)
     {
         m_pTeamTouch[pPlayer->m_pTeam->m_nSide] = pPlayer;
     }
+}
+
+static inline int GetSyncPlayerIndex(cPlayer* pPlayer)
+{
+    return pPlayer == 0 ? -1 : GetUnidentifiedPlayerIndex(pPlayer);
+}
+
+// Writes the deterministic game state to the network sync log.
+void cGame::fn_8005B840(void* context, DebugWriteCache* cache)
+{
+    if (lbl_806DBAB4 == 0xFFFF)
+    {
+        lbl_806DBAB4 = cache->BeginType("DetermGameData");
+        cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, 0, "m_eGameState");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&m_fGameDuration - (u8*)&m_eGameState, "m_fGameDuration");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mUnidentified020 - (u8*)&m_eGameState, "m_bBallInNet");
+        cache->AddField(DEBUG_FIELD_INT, gDebugFieldTypes[DEBUG_FIELD_INT].size, (u8*)&m_nLastTeamToScore - (u8*)&m_eGameState, "m_nLastTeamToScore");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified028 - (u8*)&m_eGameState, "m_uMegastrikeNumShots");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified02C - (u8*)&m_eGameState, "m_uMegastrikeCurShot");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified030 - (u8*)&m_eGameState, "m_uMegastrikeGoals");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified034 - (u8*)&m_eGameState, "m_uMegastrikeDefendingTeam");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified038 - (u8*)&m_eGameState, "m_uMegastrikeResults");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbCaptainShotToScoreOn - (u8*)&m_eGameState, "mbMegaStrikeGameplay");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mUnidentified041 - (u8*)&m_eGameState, "mbMegaStrikePositiveNet");
+        cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mUnidentified042 - (u8*)&m_eGameState, "mbMegaStrikePlayerReady");
+        cache->AddField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, (u8*)&m_pScorer - (u8*)&m_eGameState, "m_pScorer");
+        cache->AddField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, (u8*)&m_pAssister - (u8*)&m_eGameState, "m_pAssister");
+        cache->AddArrayField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, 2, (u8*)m_pTeamTouch - (u8*)&m_eGameState, "m_pTeamTouch");
+        cache->AddArrayField(DEBUG_FIELD_POINTER, gDebugFieldTypes[DEBUG_FIELD_POINTER].size, 10, (u8*)m_pRandomPlayersArray - (u8*)&m_eGameState, "m_pRandomPlayersArray");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified07C - (u8*)&m_eGameState, "mfCheatTilt");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified080 - (u8*)&m_eGameState, "mfXTilt");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified084 - (u8*)&m_eGameState, "mfYTilt");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified088 - (u8*)&m_eGameState, "mfXTiltMin");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified08C - (u8*)&m_eGameState, "mfXTiltMax");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified090 - (u8*)&m_eGameState, "mfYTiltMin");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified094 - (u8*)&m_eGameState, "mfYTiltMax");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified098 - (u8*)&m_eGameState, "mfTiltSpeed");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified09C - (u8*)&m_eGameState, "mfDesiredTiltSpeed");
+        cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mUnidentified0A0 - (u8*)&m_eGameState, "mfTiltTime");
+        cache->AddField(DEBUG_FIELD_ANGLE, gDebugFieldTypes[DEBUG_FIELD_ANGLE].size, (u8*)&mUnidentified0A4 - (u8*)&m_eGameState, "maTiltDir");
+        cache->AddField(DEBUG_FIELD_ANGLE, gDebugFieldTypes[DEBUG_FIELD_ANGLE].size, (u8*)&mUnidentified0A6 - (u8*)&m_eGameState, "maDesiredTiltDir");
+        cache->AddField(DEBUG_FIELD_UNSIGNED_INT, gDebugFieldTypes[DEBUG_FIELD_UNSIGNED_INT].size, (u8*)&mUnidentified0A8 - (u8*)&m_eGameState, "muTiltFrames");
+        cache->AddField(DEBUG_FIELD_VECTOR3, gDebugFieldTypes[DEBUG_FIELD_VECTOR3].size, (u8*)&mTiltDirection - (u8*)&m_eGameState, "m_vUpVectorTilt");
+        cache->EndType();
+    }
+
+    // The log copy of m_eGameState..m_vUpVectorTilt stores player indices
+    // instead of pointers.
+    struct DetermGameDataCopy
+    {
+        u8 mUnidentified00[0x2C];
+        int mScorer;
+        int mAssister;
+        int mTeamTouch[2];
+        int mRandomPlayers[10];
+        u8 mUnidentified64[0x3C];
+    };
+
+    DetermGameDataCopy* pCopy = (DetermGameDataCopy*)cache->WriteData(
+        lbl_806DBAB4, &m_eGameState, sizeof(DetermGameDataCopy));
+    if (pCopy != 0)
+    {
+        pCopy->mScorer = GetSyncPlayerIndex(m_pScorer);
+        pCopy->mAssister = GetSyncPlayerIndex(m_pAssister);
+        pCopy->mTeamTouch[0] = GetSyncPlayerIndex(m_pTeamTouch[0]);
+        pCopy->mTeamTouch[1] = GetSyncPlayerIndex(m_pTeamTouch[1]);
+        int* pRandomPlayers = pCopy->mRandomPlayers;
+        for (int i = 0; i < 10; i++)
+        {
+            pRandomPlayers[i] = GetSyncPlayerIndex(m_pRandomPlayersArray[i]);
+        }
+        cache->ChecksumData(lbl_806DBAB4, pCopy, context);
+    }
+
+    UnidentifiedGameSnapshot snapshot;
+    fn_80059B70(&snapshot);
+
+    if (lbl_806DBAB2 == 0xFFFF)
+    {
+        lbl_806DBAB2 = cache->BeginType("GenDetPlayerC");
+        cache->AddArrayField(DEBUG_FIELD_U8, gDebugFieldTypes[DEBUG_FIELD_U8].size, 100, 0, "m_nClosestPlayers[0]");
+        cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 100,
+            (u8*)snapshot.mDistances - (u8*)&snapshot, "m_fCachedPlayerDistances[0]");
+        cache->AddArrayField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, 10,
+            (u8*)snapshot.mUnidentified1F4 - (u8*)&snapshot, "m_fCachedBallPlayerDistances[0]");
+        cache->EndType();
+    }
+
+    cache->ChecksumData(lbl_806DBAB2, &snapshot, context);
+    cache->WriteData(lbl_806DBAB2, &snapshot, sizeof(snapshot));
+
+    mUnidentified10E0->SyncLog(context, cache);
+    mpTerrain->SyncLog(context, cache);
+    mpWeatherManager->SyncLog(context, cache);
+    lbl_806E12C8->SyncLog(context, cache);
+    NetMesh::spPositiveXNetMesh->SyncLog(context, cache);
+    NetMesh::spNegativeXNetMesh->SyncLog(context, cache);
 }
 
 void cGame::fn_8005BF50(RunningChecksum* runningChecksum)
@@ -1353,6 +2105,36 @@ void cGame::InitGameState(int state)
     }
 }
 
+// ShotPresentation
+extern "C" void fn_8005C650(cGame* pGame)
+{
+    pGame->mUnidentified49C.mEvent48.Deliver();
+}
+
+// ShotPresentationEnd
+extern "C" void fn_8005C830(cGame* pGame)
+{
+    pGame->mUnidentified49C.mEvent49.Deliver();
+}
+
+// CaptainClashPresentation
+extern "C" void fn_8005CA10(cGame* pGame)
+{
+    pGame->mUnidentified49C.mEvent50.Deliver();
+}
+
+// WindupPresentation
+extern "C" void fn_8005CBF0(cGame* pGame)
+{
+    pGame->mUnidentified49C.mEvent52.Deliver();
+}
+
+// WindupPresentationEnd
+extern "C" void fn_8005CDD0(cGame* pGame)
+{
+    pGame->mUnidentified49C.mEvent53.Deliver();
+}
+
 void cGame::SendPauseGameEvent()
 {
     mUnidentified49C.mEvent00.Queue(Function<FnVoidVoid>());
@@ -1361,6 +2143,128 @@ void cGame::SendPauseGameEvent()
 void cGame::SendResumingGameEvent()
 {
     mUnidentified49C.mEvent01.Queue(Function<FnVoidVoid>());
+}
+
+// LightningStrike
+extern "C" void fn_8005D210(cGame* pGame, LightningStrikeData* pData)
+{
+    pGame->mUnidentified49C.mEvent44.Queue(
+        pData, Function<LightningStrikeData*>(fn_80072134));
+}
+
+// GoalieSave
+extern "C" void fn_8005D354(cGame* pGame, const GoalieSaveData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent17.Deliver((GoalieSaveData*)pData);
+}
+
+// GoalieKick
+extern "C" void fn_8005D550(cGame* pGame, const GoalieSaveData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent18.Deliver((GoalieSaveData*)pData);
+}
+
+// GoalieCatch
+extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent20.Deliver((GoalieSaveData*)pData);
+}
+
+// GoalieExert
+extern "C" void fn_8005D948(cGame* pGame, const GoalieSaveData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent21.Deliver((GoalieSaveData*)pData);
+}
+
+// MegastrikeEnd: the captain's mega strike is over. Its goals count for the
+// attacking side, the game state moves on and the result is announced.
+extern "C" void fn_8005DB7C(cGame* pGame)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+
+    unsigned int side = 1 - pGame->mUnidentified034;
+    cPlayer* pCaptain = g_pTeams[side]->GetCaptain();
+
+    MegaStrikeEndData data;
+    data.defendingSide = pGame->mUnidentified034;
+    data.goals = pGame->mUnidentified030;
+    data.attempts = pGame->mUnidentified028;
+    data.unknown_08 = pGame->mUnidentified038;
+    data.pPlayer = pCaptain;
+    data.goalValue = -1;
+
+    g_pBall->m_pLastTouch = g_pTeams[side]->GetCaptain();
+    pGame->m_pTeamTouch[side] = pCaptain;
+    pGame->m_pScorer = pCaptain;
+    pGame->m_pAssister = 0;
+
+    if (pGame->mUnidentified030 != 0)
+    {
+        pGame->m_nLastTeamToScore = side;
+        g_pBall->m_uGoalType = 6;
+        g_pTeams[side]->m_nScore += pGame->mUnidentified030;
+        int score;
+
+        if (GameInfoManager::Instance()->IsInMode4()
+            && g_pStrikerChallenge->mCondition == 2 && side == 1)
+        {
+            pGame->ChangeGameState(3);
+        }
+        else if (pGame->m_eGameState == 6)
+        {
+            pGame->ChangeGameState(3);
+        }
+        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+            && (score = g_pTeams[side]->m_nScore,
+                score >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit))
+        {
+            pGame->ChangeGameState(3);
+        }
+        else
+        {
+            pGame->ChangeGameState(2);
+        }
+
+        if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
+        {
+            unsigned long soundID = 0xC274C205;
+            if (side == 0)
+            {
+                soundID = 0x04FC9F1C;
+            }
+            PlayCrowdReaction(soundID);
+        }
+
+        if (pCaptain->GetGlobalPad() != 0)
+        {
+            data.goalValue = pGame->m_pScorer->GetGlobalPad()->GetPadID();
+        }
+        Goalie::HandleGoalScored(side);
+    }
+
+    g_pGame->fn_80058498(false, 0, 0);
+    g_pGame->mUnidentified49C.mEvent47.Deliver(&data);
+    g_pBall->m_uGoalType = 4;
+    SetPlayerAudioController(0);
 }
 
 void cGame::QueueChainNisEnd(ShotAtGoalData* data)
@@ -1372,6 +2276,289 @@ void cGame::QueueChainNisEnd(ShotAtGoalData* data)
     }
     mUnidentified49C.mEvent37.Queue(
         data, Function<ShotAtGoalData*>(fn_8007214C));
+}
+
+void cGame::fn_8005E130(NISData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        g_NISDataPool.Free(pData);
+        return;
+    }
+    mUnidentified49C.mEvent05.Queue(
+        (UnidentifiedEventData_80065E10*)pData,
+        Function<UnidentifiedEventData_80065E10*>(
+            (void (*)(UnidentifiedEventData_80065E10*))fn_80072164));
+}
+
+// CollisionCrowd
+extern "C" void fn_8005E29C(cGame* pGame, CollisionCrowdData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        g_CollisionCrowdDataPool.Free(pData);
+        return;
+    }
+    pGame->mUnidentified49C.mEvent32.Queue(
+        pData, Function<CollisionCrowdData*>(
+                   (void (*)(CollisionCrowdData*))fn_8007217C));
+}
+
+// GoalieDekeAttackAttempt
+extern "C" void fn_8005E408(cGame* pGame, const PlayerAttackData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent24.Deliver((PlayerAttackData*)pData);
+}
+
+// GoalieDekeAttackSuccess
+extern "C" void fn_8005E604(cGame* pGame, const PlayerAttackData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent25.Deliver((PlayerAttackData*)pData);
+}
+
+// GoalieSlamAttackAttempt
+extern "C" void fn_8005E800(cGame* pGame, const PlayerAttackData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent26.Deliver((PlayerAttackData*)pData);
+}
+
+// GoalieSlamAttackSuccess
+extern "C" void fn_8005E9FC(cGame* pGame, const PlayerAttackData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent27.Deliver((PlayerAttackData*)pData);
+}
+
+// AttackAttempt
+extern "C" void fn_8005EBF8(cGame* pGame, PlayerAttackData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        g_PlayerAttackDataPool.Free(pData);
+        return;
+    }
+    pGame->mUnidentified49C.mEvent28.Queue(
+        pData, Function<PlayerAttackData*>(fn_80072194));
+}
+
+// AttackSuccess
+extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        g_PlayerAttackDataPool.Free(pData);
+        return;
+    }
+    pGame->mUnidentified49C.mEvent29.Queue(
+        pData, Function<PlayerAttackData*>(fn_80072194));
+}
+
+// ShotAtGoal
+extern "C" void fn_8005EED0(cGame* pGame, ShotAtGoalData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        g_ShotAtGoalDataPool.Free(pData);
+        return;
+    }
+    pGame->mUnidentified49C.mEvent22.Queue(
+        pData, Function<ShotAtGoalData*>(fn_8007214C));
+}
+
+// WindupShot
+extern "C" void fn_8005F03C(cGame* pGame, ShotAtGoalData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent23.Deliver(pData);
+}
+
+// MegaStrikeMeterStart
+extern "C" void fn_8005F238(cGame* pGame, MegaStrikeMeterData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent40.Deliver(pData);
+}
+
+// MegaStrikeMeterFirst
+extern "C" void fn_8005F434(cGame* pGame, MegaStrikeMeterData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent41.Deliver(pData);
+}
+
+// MegaStrikeMeterSecond
+extern "C" void fn_8005F630(cGame* pGame, MegaStrikeMeterData* pData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent42.Deliver(pData);
+}
+
+// MegaStrikeIntro
+extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    PauseAllAudio();
+    pGame->mUnidentified49C.mEvent46.Deliver(pFielder);
+}
+
+// MegaStrikeMeterEnd
+extern "C" void fn_8005FA2C(cGame* pGame)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent43.Deliver();
+}
+
+// PeachFlash
+extern "C" void fn_8005FC1C(cGame* pGame, PeachPhotoData* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent55.Deliver(pEventData);
+}
+
+// PeachCameraFlash
+extern "C" void fn_8005FE18(cGame* pGame, PeachPhotoData* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent54.Deliver(pEventData);
+}
+
+// PeachCamerasDown
+extern "C" void fn_80060014(cGame* pGame, PeachPhotoData* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent56.Deliver(pEventData);
+}
+
+// PeachCamerasAway
+extern "C" void fn_80060210(cGame* pGame, PeachPhotoData* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent57.Deliver(pEventData);
+}
+
+// WaluigiWallStart
+extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent58.Deliver(pFielder);
+}
+
+// WaluigiWallEnd
+extern "C" void fn_80060608(cGame* pGame, cFielder* pFielder)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent59.Deliver(pFielder);
+}
+
+// WaluigiWallAbort
+extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent60.Deliver(pFielder);
+}
+
+// SuperPresentation
+extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent64.Deliver(pFielder);
+}
+
+// BulletBillExplode
+void cGame::fn_80060BFC(CollisionBulletBillData& data)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    mUnidentified49C.mEvent63.Deliver(&data);
+}
+
+// MontyReappear
+extern "C" void fn_80060DF8(cGame* pGame, const CharacterImpactEvent* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent71.Deliver((CharacterImpactEvent*)pEventData);
+}
+
+// HammerBroHammer
+extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent72.Deliver((CharacterImpactEvent*)pEventData);
+}
+
+// WarioGroundPound
+extern "C" void fn_800611F0(cGame* pGame, const void* pEventData)
+{
+    if (g_pGame->m_eGameState == 4)
+    {
+        return;
+    }
+    pGame->mUnidentified49C.mEvent73.Deliver((CharacterImpactEvent*)pEventData);
 }
 
 extern "C" void fn_80061B1C(int relative, float xTilt, float yTilt)
@@ -1662,17 +2849,6 @@ void cGame::OnGameOver()
     StopSuddenDeathMusic();
 }
 
-extern "C" void fn_80070960(
-    UnidentifiedCallbackWithArgBinding* binding, void* value)
-{
-    (binding->mTarget->*binding->mCallback)(value);
-}
-
-extern "C" void fn_800709FC(UnidentifiedCallbackNoArgBinding* binding)
-{
-    (binding->mTarget->*binding->mCallback)();
-}
-
 extern "C" void fn_80072134(LightningStrikeData* node)
 {
     g_LightningStrikeDataPool.Free(node);
@@ -1710,15 +2886,52 @@ extern "C" EventDispatcher* fn_800721C4()
     return &gDispatchEventsTask->dispatcher;
 }
 
+// .sdata2 constants, in retail order. They are defined after every use so
+// the functions above keep loading them by name.
+extern "C" const float kGameTweakZero = 0.0f;
+extern "C" const float lbl_806E3740 = -1.0f;
+extern "C" const float lbl_806E3744 = 0.5f;
+extern "C" const float lbl_806E3748 = 1.0f;
 extern "C" const float lbl_806E374C = 65536.0f;
+extern "C" const float lbl_806E3750 = 999999.0f;
+extern "C" const float lbl_806E3754 = 1.5f;
+extern "C" const float lbl_806E3758 = 25.0f;
+extern "C" const float lbl_806E375C = 6.0f;
+extern "C" const float lbl_806E3760 = 3.0f;
+extern "C" const float lbl_806E3764 = 12.5f;
+extern "C" const float lbl_806E3768 = 41.2f;
+extern "C" const float lbl_806E376C = 0.3f;
 extern "C" const float lbl_806E3770 = 0.25f;
+extern "C" const float lbl_806E3774 = 0.0333f;
+extern "C" const float lbl_806E3778 = 10.0f;
+extern "C" const float lbl_806E377C = 5.0f;
+extern "C" const float lbl_806E3780 = 0.75f;
+extern "C" const float lbl_806E3784 = 30000.0f;
+extern "C" const float lbl_806E3788 = 3000.0f;
+extern "C" const float lbl_806E378C = 0.001f;
+extern "C" const float lbl_806E3798 = -0.01f;
+extern "C" const float lbl_806E379C = 0.01f;
 
+extern "C" char lbl_804FB238[] = "SendRemainingMegaStrikeMeter %d\n";
+extern "C" char lbl_804FB25C[] = "InitMegaStrikeGameplay called at %d\n";
+extern "C" char lbl_804FB284[] = "PPass Slowdown";
+extern "C" char lbl_804FB294[] = "Slow-mo_Captain_Hit";
 extern "C" char lbl_804FB2F4[] = "Sending NIS Loaded %d at frame %d\n";
 extern "C" char lbl_804FB318[] = "Sending MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n";
 extern "C" char lbl_804FB364[] = "Sending MegaStrikePlayerReady at frame %d\n";
 extern "C" char lbl_804FB390[] = "Sending SendMegaStrikeKillCursor at frame %d\n";
 extern "C" char lbl_804FB3C0[] = "Sending MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n";
 extern "C" char lbl_804FB404[] = "Sending Slow Down End at frame %d\n";
+extern "C" char lbl_804FB428[] = "Recv CustomDeterm %d size %d at frame %d\n";
+extern "C" char lbl_804FB454[] = "Received MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n";
+extern "C" char lbl_804FB4A4[] = "Received MegaStrikePlayerReady at frame %d\n";
+extern "C" char lbl_804FB4D0[] = "Received MegaStrikeKillCursor at frame %d\n";
+extern "C" char lbl_804FB4FC[] = "Received MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n";
+extern "C" char lbl_804FB544[] = "Received SlowDownEnd at frame %d\n";
+extern "C" char lbl_804FB568[] = "Received CleanupMegastrikeGameplay at frame %d\n";
+extern "C" char lbl_804FB598[] = "Unknown custom determ data %d..discarding\n";
+extern "C" char lbl_804FB5C4[] = "Discarded message type %d because from unknown connection %x\n";
+extern "C" char lbl_804FB604[] = "Discarded message type %d.  TournamentIdxToMachineIdx changed ID %d to ID %d, but invalid\n";
 extern "C" char lbl_804FB66C[] = "Changing game state %d to %d at frame %d\n";
 
 #include "NL/nlBind_impl.h"
