@@ -1,6 +1,6 @@
 #include "Game/SH/SHStadiumSelect.h"
 #include "NL/nlFunction.inl"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "Game/EventRegistry.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/feScrollText.h"

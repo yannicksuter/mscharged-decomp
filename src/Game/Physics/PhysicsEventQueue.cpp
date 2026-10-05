@@ -39,6 +39,7 @@
 #include "Game/Render/YoshiEggObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Physics/PhysicsEventQueue.inl"
+#include "NL/nlFunction.inl"
 
 class PhysicsEventQueue
 {

@@ -27,6 +27,7 @@
 
 #include <math.h>
 #include <string.h>
+#include "NL/nlFunction.inl"
 
 namespace
 {

@@ -56,6 +56,7 @@
 #include "NL/nlPolygonRegion.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "NL/nlFunction.inl"
 
 extern "C" cPlayer* fn_80096514(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,

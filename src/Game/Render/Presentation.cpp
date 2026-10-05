@@ -53,7 +53,7 @@
 #include "Game/TweakQuery.h"
 #include "Game/main.h"
 #include "NL/gl/gl.h"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "NL/globalpad.h"
 #include "NL/nlConfig.h"
 #include "NL/nlFile.h"

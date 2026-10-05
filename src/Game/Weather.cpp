@@ -1,6 +1,6 @@
 #include "Game/Render/tu_801B43F8.h"
 #include "NL/nlFunction.inl"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "NL/utility.h"
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 #include "Game/Goalie.h"

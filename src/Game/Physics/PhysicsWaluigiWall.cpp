@@ -29,6 +29,7 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
+#include "NL/nlFunction.inl"
 
 extern "C" void fn_80060608(cGame*, cFielder*);
 float Interpolate(float, float, float);

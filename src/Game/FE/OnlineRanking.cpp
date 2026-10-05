@@ -20,6 +20,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlstring_tmpl.h"
 #include "NL/nlFunction.h"
+#include "NL/nlFunction.inl"
 
 int gOnlineRankingCountdownSeconds = 10;
 

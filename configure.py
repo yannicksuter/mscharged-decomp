@@ -631,7 +631,7 @@ config.libs = [
             Object(Matching, "Game/Camera/rumblefilter.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Camera/ShootToScoreCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/TopDownCamera.cpp", cflags=cflags_game_deferred),
-            Object(NonMatching, "Game/Camera/tu_800F9460.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Camera/tu_800F9460.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
 
             # Game/Core
             Object(Matching, "Game/Core/mtRandom.cpp"),

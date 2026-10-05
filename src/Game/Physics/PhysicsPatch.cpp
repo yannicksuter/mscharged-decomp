@@ -32,6 +32,7 @@
 #include <math.h>
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
+#include "NL/nlFunction.inl"
 
 class EffectsGroup;
 

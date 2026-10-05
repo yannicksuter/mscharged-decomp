@@ -19,6 +19,7 @@
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlFunction.inl"
 #include "types.h"
 #include <math.h>
 

@@ -19,11 +19,22 @@
 #include "Game/Team.h"
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
-#include "NL/nlBindMember.h"
-#include "NL/nlFunction.inl"
 #include "NL/nlTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include <math.h>
+
+// Instantiate the Function classes RegisterEventListeners uses, in its order,
+// before BindMember is declared. MWCC emits late template copies grouped by
+// declaration point in reverse, which gives retail's tail: the BindMember
+// copies, then the Function constructors from the last event to the first.
+typedef char UnidentifiedFunctionSize0[sizeof(Function<GoalScoredData*>)];
+typedef char UnidentifiedFunctionSize1[sizeof(Function<FnVoidVoid>)];
+typedef char UnidentifiedFunctionSize2[sizeof(Function<MegaStrikeMeterData*>)];
+typedef char UnidentifiedFunctionSize3[sizeof(Function<GoalieSaveData*>)];
+typedef char UnidentifiedFunctionSize4[sizeof(Function<CollisionThwompPlayerData*>)];
+typedef char UnidentifiedFunctionSize5[sizeof(Function<PlayerAttackData*>)];
+
+#include "NL/nlBindMember.h"
 
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -784,6 +795,9 @@ void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
         mRotationDegrees *= -1.0f;
     }
 }
+
+#include "NL/nlBindMember.inl"
+#include "NL/nlFunction.inl"
 
 static UnidentifiedTypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length)

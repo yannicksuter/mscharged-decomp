@@ -26,6 +26,7 @@
 #include "NL/nlSlotPool.h"
 
 #include <math.h>
+#include "NL/nlFunction.inl"
 
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;

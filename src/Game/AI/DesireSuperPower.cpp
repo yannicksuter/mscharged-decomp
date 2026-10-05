@@ -45,6 +45,7 @@
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/EventRegistry.h"
+#include "NL/nlFunction.inl"
 
 extern "C" const nlVector3* fn_80040234(cFielder*);
 extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);

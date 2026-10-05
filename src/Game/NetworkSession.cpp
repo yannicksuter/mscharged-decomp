@@ -1,6 +1,6 @@
 #include "NL/nlSingleton.inl"
 #include "NL/nlFunction.inl"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "Game/TweakQuery.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/NetworkMessageRegistry.h"

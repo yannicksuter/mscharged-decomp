@@ -10,6 +10,7 @@
 #include "Game/WorldTriggers.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlMath.h"
+#include "NL/nlFunction.inl"
 
 FlyingCamera* gFlyingCameras[10];
 nlVector3 gFlyingCameraTargetPosition;

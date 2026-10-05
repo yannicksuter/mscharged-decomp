@@ -7,7 +7,8 @@
 template <typename ReturnType>
 class Function0
 {
-    friend class Function<FnVoidVoid>;
+    template <typename Signature>
+    friend class Function;
 
 public:
     struct FunctorBase
@@ -173,7 +174,8 @@ Function0<ReturnType>::FunctorImpl<Callable>::Clone() const
 template <typename ReturnType, typename P1>
 class Function1
 {
-    friend class Function<P1>;
+    template <typename Signature>
+    friend class Function;
 
 public:
     struct FunctorBase
@@ -347,73 +349,37 @@ Function1<ReturnType, P1>::FunctorImpl<Callable>::Clone() const
     return new FunctorImpl(*this);
 }
 
-template <typename P1>
-class Function : public Function1<void, P1>
+// One primary template serves both the event form Function<Data*> and the
+// nullary form Function<R()>; the base comes from FunctionTraits. Its
+// callable constructor is defined in NL/nlFunction.inl.
+// Only Function<R()> with R != void takes a free function directly.
+struct FunctionNoFreeFunction;
+
+template <typename Signature>
+struct FunctionTraits
 {
-    typedef Function1<void, P1> Base;
-
-public:
-    Function()
-        : Base()
-    {
-    }
-
-    template <typename Callable>
-    Function(Callable callable)
-        : Base(callable)
-    {
-    }
-
-    operator bool() const
-    {
-        return this->mTag != FUNCTION_EMPTY;
-    }
-
-    Function& operator=(const Function& other)
-    {
-        Base::operator=(other);
-        return *this;
-    }
-};
-
-template <>
-class Function<FnVoidVoid> : public Function0<void>
-{
-    typedef Function0<void> Base;
-
-public:
-    Function()
-        : Base()
-    {
-    }
-
-
-    template <typename Callable>
-    Function(Callable callable);
-
-    operator bool() const
-    {
-        return this->mTag != FUNCTION_EMPTY;
-    }
-
-    Function& operator=(const Function& other)
-    {
-        Base::operator=(other);
-        return *this;
-    }
-
-    template <typename Other>
-    Function& operator=(const Other& other)
-    {
-        Base::operator=(other);
-        return *this;
-    }
+    typedef Function1<void, Signature> Base;
+    typedef FunctionNoFreeFunction* FreeFunction;
 };
 
 template <typename ReturnType>
-class Function<ReturnType()> : public Function0<ReturnType>
+struct FunctionTraits<ReturnType()>
 {
     typedef Function0<ReturnType> Base;
+    typedef ReturnType (*FreeFunction)();
+};
+
+template <>
+struct FunctionTraits<FnVoidVoid>
+{
+    typedef Function0<void> Base;
+    typedef FunctionNoFreeFunction* FreeFunction;
+};
+
+template <typename Signature>
+class Function : public FunctionTraits<Signature>::Base
+{
+    typedef typename FunctionTraits<Signature>::Base Base;
 
 public:
     Function()
@@ -421,15 +387,17 @@ public:
     {
     }
 
-    Function(ReturnType (*function)())
+    Function(typename FunctionTraits<Signature>::FreeFunction function)
         : Base(function)
     {
     }
 
     template <typename Callable>
-    Function(Callable callable)
-        : Base(callable)
+    inline Function(Callable callable);
+
+    operator bool() const
     {
+        return this->mTag != FUNCTION_EMPTY;
     }
 
     Function& operator=(const Function& other)

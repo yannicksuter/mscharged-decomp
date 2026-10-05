@@ -16,7 +16,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlFunction.inl"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "NL/nlBind_impl.h"
 #include "NL/nlString.h"
 

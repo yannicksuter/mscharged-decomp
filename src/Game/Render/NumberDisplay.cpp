@@ -17,6 +17,7 @@
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
+#include "NL/nlFunction.inl"
 
 extern "C"
 {

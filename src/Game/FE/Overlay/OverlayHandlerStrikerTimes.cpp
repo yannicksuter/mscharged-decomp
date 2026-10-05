@@ -27,6 +27,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
+#include "NL/nlFunction.inl"
 
 int gStrikerTimesCountdownSeconds = 10;
 

@@ -15,6 +15,7 @@
 #include "Game/Render/RLView.h"
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
+#include "NL/nlFunction.inl"
 
 extern "C" const nlVector3 gWindDebrisZeroVelocity;
 extern "C" const nlVector3 gWindDebrisHiddenPosition;

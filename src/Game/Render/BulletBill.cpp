@@ -16,6 +16,7 @@
 
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlFunction.inl"
 #include "types.h"
 
 extern "C" DrawableBulletBill& fn_8018755C(RenderSnapshot*, unsigned int);

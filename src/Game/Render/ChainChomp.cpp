@@ -43,6 +43,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlColour.h"
 #include "NL/nlString.h"
+#include "NL/nlFunction.inl"
 
 static cAnimCamera sNisCam;
 float gfChainChompWindupSpeedScale;

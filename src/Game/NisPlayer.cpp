@@ -6,7 +6,7 @@
 #include "Game/EventDataTypes.h"
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "Game/Render/Presentation.h"
 #include "Game/Sys/tweak.h"
 #include "Game/Player.h"

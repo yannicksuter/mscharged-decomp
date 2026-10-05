@@ -22,6 +22,7 @@
 #include "NL/nlFormat.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
+#include "NL/nlFunction.inl"
 
 struct PowerupStatsData
 {

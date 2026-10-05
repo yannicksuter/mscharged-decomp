@@ -78,7 +78,7 @@
 #include "Game/NetworkMessages.h"
 #include "Game/NetworkEvents.h"
 #include "NL/nlAlgorithm.h"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "NL/nlFunction.inl"
 #include "NL/nlConfig.h"
 #include "NL/nlMain.h"

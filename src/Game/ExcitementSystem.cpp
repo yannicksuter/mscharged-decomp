@@ -11,6 +11,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlFunction.inl"
 
 namespace
 {

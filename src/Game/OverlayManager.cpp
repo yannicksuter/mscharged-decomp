@@ -16,7 +16,7 @@
 #include "Game/Render/Presentation.h"
 #include "Game/SH/SHStrikerTimesBase.h"
 #include "Game/main.h"
-#include "NL/nlBindMember.h"
+#include "NL/nlBindMember.inl"
 #include "NL/nlBind_impl.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlFunctionMemory.h"
