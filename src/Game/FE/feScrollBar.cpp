@@ -16,7 +16,7 @@
 FEScrollBar::FEScrollBar()
     : mThumb(0)
     , mInitialized(false)
-    , mUnidentified019(false)
+    , mPointerOver(false)
     , mUnidentified01A(true)
     , mIgnoreInputLock(false)
     , mRepeatTimer(0.0f)
@@ -24,7 +24,7 @@ FEScrollBar::FEScrollBar()
     , mTopPosition(0.0f)
     , mCurrentValue(0)
     , mMaxValue(0)
-    , mUnidentified048(9999.9f)
+    , mThumbStartY(9999.9f)
 {
     mButtons[0].mContext = (void*)0;
     mButtons[0].mSpeakerEnabled = false;
@@ -32,13 +32,13 @@ FEScrollBar::FEScrollBar()
     mButtons[1].mSpeakerEnabled = false;
     mScrolling[0] = false;
     mScrolling[1] = false;
-    mUnidentified014[1] = false;
-    mUnidentified014[0] = false;
-    mUnidentified016[1] = false;
-    mUnidentified016[0] = false;
-    mUnidentified03C.x = 0.0f;
-    mUnidentified03C.y = 0.0f;
-    mUnidentified03C.z = 0.0f;
+    mPointerPressed[1] = false;
+    mPointerPressed[0] = false;
+    mPadPressed[1] = false;
+    mPadPressed[0] = false;
+    mOffset.x = 0.0f;
+    mOffset.y = 0.0f;
+    mOffset.z = 0.0f;
 }
 
 FEScrollBar::~FEScrollBar()
@@ -61,11 +61,11 @@ void FEScrollBar::Update(FEPointerEvent event, float dt)
     mButtons[0].HandlePointerEvent(&event);
     mButtons[1].HandlePointerEvent(&event);
     eFEINPUT_PAD pad = (eFEINPUT_PAD)event.mIndex;
-    if (g_pFEInput->JustPressed(pad, 13, true, 0) && !mUnidentified014[0] && !mUnidentified014[1])
+    if (g_pFEInput->JustPressed(pad, 13, true, 0) && !mPointerPressed[0] && !mPointerPressed[1])
         OnPadPress(event.mIndex, (void*)0);
     else if (g_pFEInput->JustReleased(pad, 13, true, 0))
         OnPadRelease(event.mIndex, (void*)0);
-    else if (g_pFEInput->JustPressed(pad, 14, true, 0) && !mUnidentified014[0] && !mUnidentified014[1])
+    else if (g_pFEInput->JustPressed(pad, 14, true, 0) && !mPointerPressed[0] && !mPointerPressed[1])
         OnPadPress(event.mIndex, (void*)1);
     else if (g_pFEInput->JustReleased(pad, 14, true, 0))
         OnPadRelease(event.mIndex, (void*)1);
@@ -100,13 +100,13 @@ void FEScrollBar::Update(FEPointerEvent event, float dt)
         mButtonInstances[0]->SetActiveSlide("unused", true, false);
     if (mCurrentValue >= mMaxValue)
         mButtonInstances[1]->SetActiveSlide("unused", true, false);
-    if (mUnidentified014[0] && !g_pFEInput->IsPressed(pad, 30, true, 0))
+    if (mPointerPressed[0] && !g_pFEInput->IsPressed(pad, 30, true, 0))
         OnPointerRelease(event.mIndex, (void*)0);
-    if (mUnidentified014[1] && !g_pFEInput->IsPressed(pad, 30, true, 0))
+    if (mPointerPressed[1] && !g_pFEInput->IsPressed(pad, 30, true, 0))
         OnPointerRelease(event.mIndex, (void*)1);
-    if (mUnidentified016[1] && !g_pFEInput->IsPressed(pad, 14, true, 0))
+    if (mPadPressed[1] && !g_pFEInput->IsPressed(pad, 14, true, 0))
         OnPadRelease(event.mIndex, (void*)1);
-    if (mUnidentified016[0] && !g_pFEInput->IsPressed(pad, 13, true, 0))
+    if (mPadPressed[0] && !g_pFEInput->IsPressed(pad, 13, true, 0))
         OnPadRelease(event.mIndex, (void*)0);
 }
 
@@ -157,8 +157,8 @@ void FEScrollBar::SetRange(int value)
         distance = (distance - scale.f.y / 2.0f) * 100.0f;
         mScrollStep = distance / value;
         feVector3 position = mThumb->GetAssetPosition();
-        if (mUnidentified048 == 9999.9f)
-            mUnidentified048 = position.f.y;
+        if (mThumbStartY == 9999.9f)
+            mThumbStartY = position.f.y;
         mTopPosition = distance / 2.0f + position.f.y;
         mThumb->SetAssetPosition(position.f.x, mTopPosition, position.f.z);
         mThumb->m_bVisible = true;
@@ -200,7 +200,7 @@ void FEScrollBar::OnPointerEnter(int index, void* context)
         other = 1;
         if (mCurrentValue <= 0)
         {
-            mUnidentified019 = false;
+            mPointerOver = false;
             return;
         }
     }
@@ -209,20 +209,20 @@ void FEScrollBar::OnPointerEnter(int index, void* context)
         other = 0;
         if (mCurrentValue >= mMaxValue)
         {
-            mUnidentified019 = false;
+            mPointerOver = false;
             return;
         }
     }
-    if (mUnidentified014[direction])
+    if (mPointerPressed[direction])
         mButtonInstances[direction]->SetActiveSlide("slide1", true, false);
-    else if (!mUnidentified016[0] && !mUnidentified016[1] && !mUnidentified014[other])
+    else if (!mPadPressed[0] && !mPadPressed[1] && !mPointerPressed[other])
     {
         mButtonInstances[direction]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         mButtons[direction].PlayHoverFeedback(index);
     }
-    mUnidentified019 = true;
-    if (mUnidentified014[direction])
+    mPointerOver = true;
+    if (mPointerPressed[direction])
         mScrolling[direction] = true;
 }
 
@@ -230,7 +230,7 @@ bool FEScrollBar::IsScrolling(int direction, bool value)
 {
     if (mScrolling[direction] && mRepeatTimer >= 0.5f)
     {
-        if ((mUnidentified014[direction] || mUnidentified016[direction]) && value)
+        if ((mPointerPressed[direction] || mPadPressed[direction]) && value)
             mRepeatTimer = 0.0f;
         return true;
     }
@@ -251,33 +251,33 @@ void FEScrollBar::OnPointerLeave(int index, void* context)
         if (mCurrentValue >= mMaxValue)
             return;
     }
-    if (!mUnidentified016[direction])
+    if (!mPadPressed[direction])
     {
         mButtonInstances[direction]->SetActiveSlide("off", true, false);
-        mUnidentified019 = false;
+        mPointerOver = false;
         mScrolling[direction] = false;
     }
 }
 
 void FEScrollBar::OnPointerPress(int, void* context)
 {
-    if (mUnidentified016[0] || mUnidentified016[1])
+    if (mPadPressed[0] || mPadPressed[1])
         return;
     if (context == 0)
     {
-        if (mCurrentValue <= 0 || mUnidentified014[1])
+        if (mCurrentValue <= 0 || mPointerPressed[1])
             return;
     }
     else if (context == (void*)1)
     {
-        if (mCurrentValue >= mMaxValue || mUnidentified014[0])
+        if (mCurrentValue >= mMaxValue || mPointerPressed[0])
             return;
     }
     int direction = (int)context;
     int other = direction == 0 ? 1 : 0;
     mButtonInstances[direction]->SetActiveSlide("slide1", true, false);
     mButtonInstances[other]->SetActiveSlide("off", true, false);
-    mUnidentified014[direction] = true;
+    mPointerPressed[direction] = true;
     mScrolling[direction] = true;
     mRepeatTimer = 0.5f;
     FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
@@ -285,12 +285,12 @@ void FEScrollBar::OnPointerPress(int, void* context)
 
 void FEScrollBar::OnPointerRelease(int index, void* context)
 {
-    if (mUnidentified016[0] || mUnidentified016[1])
+    if (mPadPressed[0] || mPadPressed[1])
         return;
     mScrolling[0] = false;
-    mUnidentified014[0] = false;
+    mPointerPressed[0] = false;
     mScrolling[1] = false;
-    mUnidentified014[1] = false;
+    mPointerPressed[1] = false;
     mRepeatTimer = 0.0f;
     int direction = (int)context;
     if (context == 0)
@@ -317,23 +317,23 @@ void FEScrollBar::OnPointerRelease(int index, void* context)
 
 void FEScrollBar::OnPadPress(int, void* context)
 {
-    if (mUnidentified014[0] || mUnidentified014[1])
+    if (mPointerPressed[0] || mPointerPressed[1])
         return;
     if (context == 0)
     {
-        if (mCurrentValue <= 0 || mUnidentified016[1])
+        if (mCurrentValue <= 0 || mPadPressed[1])
             return;
     }
     else if (context == (void*)1)
     {
-        if (mCurrentValue >= mMaxValue || mUnidentified016[0])
+        if (mCurrentValue >= mMaxValue || mPadPressed[0])
             return;
     }
     int direction = (int)context;
     int other = direction == 0 ? 1 : 0;
     mButtonInstances[direction]->SetActiveSlide("slide1", true, false);
     mButtonInstances[other]->SetActiveSlide("off", true, false);
-    mUnidentified016[direction] = true;
+    mPadPressed[direction] = true;
     mScrolling[direction] = true;
     mRepeatTimer = 0.5f;
     FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
@@ -341,12 +341,12 @@ void FEScrollBar::OnPadPress(int, void* context)
 
 void FEScrollBar::OnPadRelease(int index, void* context)
 {
-    if (mUnidentified014[0] || mUnidentified014[1])
+    if (mPointerPressed[0] || mPointerPressed[1])
         return;
     mScrolling[0] = false;
-    mUnidentified016[0] = false;
+    mPadPressed[0] = false;
     mScrolling[1] = false;
-    mUnidentified016[1] = false;
+    mPadPressed[1] = false;
     mRepeatTimer = 0.0f;
     int direction = (int)context;
     int other = direction == 0 ? 1 : 0;
@@ -367,25 +367,25 @@ void FEScrollBar::OnPadRelease(int index, void* context)
 
 void FEScrollBar::SetOffset(const feVector3& value)
 {
-    nlVec3Set(mUnidentified03C, value.f.x, value.f.y, value.f.z);
-    mAssetPosition.f.x += mUnidentified03C.x;
-    mAssetPosition.f.y += mUnidentified03C.y;
-    mAssetPosition.f.z += mUnidentified03C.z;
+    nlVec3Set(mOffset, value.f.x, value.f.y, value.f.z);
+    mAssetPosition.f.x += mOffset.x;
+    mAssetPosition.f.y += mOffset.y;
+    mAssetPosition.f.z += mOffset.z;
 }
 
 void FEScrollBar::ResetScrolling()
 {
-    if (mUnidentified048 != 9999.9f && mThumb != 0)
+    if (mThumbStartY != 9999.9f && mThumb != 0)
     {
         feVector3 position = mThumb->GetAssetPosition();
-        position.f.y = mUnidentified048;
+        position.f.y = mThumbStartY;
         mThumb->SetAssetPosition(position.f.x, position.f.y, position.f.z);
     }
     mScrolling[0] = false;
     mScrolling[1] = false;
-    mUnidentified014[1] = false;
-    mUnidentified014[0] = false;
-    mUnidentified016[1] = false;
-    mUnidentified016[0] = false;
+    mPointerPressed[1] = false;
+    mPointerPressed[0] = false;
+    mPadPressed[1] = false;
+    mPadPressed[0] = false;
     mRepeatTimer = 0.0f;
 }

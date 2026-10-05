@@ -64,4 +64,6 @@ public:
     static unsigned char m_ctrlConnectedState[4];
 };
 
+extern unsigned char g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause;
+
 #endif // _FEMANAGER_H_

@@ -24,10 +24,10 @@
 
 #include <string.h>
 
-static const int lbl_804E8540[5] = { 1, 2, 3, 4, 5 };
-static const int lbl_804E8554[5] = { 1, 3, 5, 7, 9 };
-static const int lbl_804E8568[8] = { 3, 4, 5, 6, 7, 8, 9, 10 };
-static const int lbl_804E8588[4] = { 120, 180, 240, 300 };
+static const int sSkillLevelOptions[5] = { 1, 2, 3, 4, 5 };
+static const int sNumGamesOptions[5] = { 1, 3, 5, 7, 9 };
+static const int sGoalLimitOptions[8] = { 3, 4, 5, 6, 7, 8, 9, 10 };
+static const int sGameTimeOptions[4] = { 120, 180, 240, 300 };
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 SHGameplayOptions::SHGameplayOptions()
@@ -56,13 +56,13 @@ SHGameplayOptions::SHGameplayOptions()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
-        mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C);
-        mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68);
+        mSettings = gameInfo->mUserInfo.mAltGameplayOptions;
+        mPowerupSettings = GameInfoManager::Instance()->mUserInfo.mAltCheatOptions;
     }
     else
     {
-        mSettings = reinterpret_cast<const GameplaySettings&>(gameInfo->mUserInfo.mGameplayOptions);
-        mPowerupSettings = reinterpret_cast<const CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mCheatOptions);
+        mSettings = gameInfo->mUserInfo.mGameplayOptions;
+        mPowerupSettings = GameInfoManager::Instance()->mUserInfo.mCheatOptions;
     }
     mNavigation.SetPushBackScene(false);
     mNavigation.SetPopScene(false);
@@ -398,7 +398,7 @@ void SHGameplayOptions::InitializeSelections()
     UpdateLimitText(type, value);
     for (int i = 0; i < 5; ++i)
     {
-        if (skill == lbl_804E8540[i])
+        if (skill == sSkillLevelOptions[i])
         {
             mSelectedSkill = i;
             mOptionInstances[i]->SetActiveSlide("down", true, false);
@@ -410,7 +410,7 @@ void SHGameplayOptions::InitializeSelections()
     }
     for (int i = 0; i < 5; ++i)
     {
-        if (series == lbl_804E8554[i])
+        if (series == sNumGamesOptions[i])
         {
             mSelectedSeries = i + 5;
             mOptionInstances[mSelectedSeries]->SetActiveSlide("down", true, false);
@@ -422,7 +422,7 @@ void SHGameplayOptions::InitializeSelections()
     }
     for (int i = 0; i < 8; ++i)
     {
-        if (goals == lbl_804E8568[i])
+        if (goals == sGoalLimitOptions[i])
         {
             mSelectedGoals = i + 12;
             mOptionInstances[mSelectedGoals]->SetActiveSlide("down", true, false);
@@ -434,7 +434,7 @@ void SHGameplayOptions::InitializeSelections()
     }
     for (int i = 0; i < 4; ++i)
     {
-        if (time == lbl_804E8588[i])
+        if (time == sGameTimeOptions[i])
         {
             mSelectedTime = i + 20;
             mOptionInstances[mSelectedTime]->SetActiveSlide("down", true, false);
@@ -450,12 +450,12 @@ void SHGameplayOptions::ApplyOptionSelection(int item)
 {
     if (item >= 0 && item < 5)
     {
-        mSettings.SkillLevel = (GameplaySettings::eSkillLevel)lbl_804E8540[item];
+        mSettings.SkillLevel = (GameplaySettings::eSkillLevel)sSkillLevelOptions[item];
         UpdateSkillLevelSetting(this, mSettings.SkillLevel);
     }
     else if (item >= 5 && item < 10)
     {
-        mSettings.NumGames = lbl_804E8554[item - 5];
+        mSettings.NumGames = sNumGamesOptions[item - 5];
         UpdateSeriesSetting(this, mSettings.NumGames);
     }
     else if (item == 10)
@@ -470,12 +470,12 @@ void SHGameplayOptions::ApplyOptionSelection(int item)
     }
     else if (item >= 12 && item < 20)
     {
-        mSettings.GoalLimit = lbl_804E8568[item - 12];
+        mSettings.GoalLimit = sGoalLimitOptions[item - 12];
         UpdateLimitText(1, mSettings.GoalLimit);
     }
     else if (item >= 20 && item < 24)
     {
-        mSettings.GameTime = lbl_804E8588[item - 20];
+        mSettings.GameTime = sGameTimeOptions[item - 20];
         UpdateLimitText(0, mSettings.GameTime / 60);
     }
 }
@@ -695,16 +695,16 @@ void SHGameplayOptions::CommitSettings()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules())
     {
-        reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mUnidentified4C) = mSettings;
-        reinterpret_cast<GameplaySettings&>(GameInfoManager::Instance()->mNoCheatSettings) = mSettings;
-        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mUnidentified68) = mPowerupSettings;
-        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mRulesA) = mPowerupSettings;
+        gameInfo->mUserInfo.mAltGameplayOptions = mSettings;
+        GameInfoManager::Instance()->mNoCheatSettings = mSettings;
+        GameInfoManager::Instance()->mUserInfo.mAltCheatOptions = mPowerupSettings;
+        GameInfoManager::Instance()->mRulesA = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
     }
     else
     {
-        reinterpret_cast<GameplaySettings&>(gameInfo->mUserInfo.mGameplayOptions) = mSettings;
-        reinterpret_cast<CheatSettings&>(GameInfoManager::Instance()->mUserInfo.mCheatOptions) = mPowerupSettings;
+        gameInfo->mUserInfo.mGameplayOptions = mSettings;
+        GameInfoManager::Instance()->mUserInfo.mCheatOptions = mPowerupSettings;
         GameSceneManager::Instance()->Push((SceneList)2, SCREEN_FORWARD, true);
     }
 }

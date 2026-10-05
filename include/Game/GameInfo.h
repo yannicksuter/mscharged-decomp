@@ -31,8 +31,8 @@ struct UserInfo
     /* 0x1C */ VisualSettings mVisualOptions;
     /* 0x24 */ GameplaySettings mGameplayOptions;
     /* 0x40 */ CheatSettings mCheatOptions;
-    /* 0x4C */ GameplaySettings mUnidentified4C;
-    /* 0x68 */ CheatSettings mUnidentified68;
+    /* 0x4C */ GameplaySettings mAltGameplayOptions;
+    /* 0x68 */ CheatSettings mAltCheatOptions;
     /* 0x74 */ unsigned short mNumGamesPlayed;
     /* 0x76 */ unsigned short mNumGoalsScored;
     /* 0x78 */ unsigned short mNumSTSAttempts;

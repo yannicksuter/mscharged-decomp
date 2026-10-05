@@ -7,6 +7,7 @@
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
 #include "Game/Drawable/DrawableCharacter.h"
+#include "Game/FE/feManager.h"
 #include "Game/OverlayManager.h"
 #include "Game/Game.h"
 #include "Game/NisPlayer.h"
@@ -23,10 +24,7 @@
 #include "Game/Render/Presentation.h"
 
 // Charged keeps the predecessor's transition-manager surface but replaces
-// several of its subsystem calls. Everything still address-named below lives
-// in a translation unit that has not been reconstructed yet.
-
-extern unsigned char g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause;
+// several of its subsystem calls.
 
 void TransitionTask::Initialize()
 {

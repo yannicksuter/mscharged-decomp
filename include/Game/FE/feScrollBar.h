@@ -34,10 +34,10 @@ public:
     /* 0x00C */ TLImageInstance* mThumb;
     /* 0x010 */ bool mScrolling[2];
     /* 0x012 */ unsigned char mUnidentified012[2];
-    /* 0x014 */ bool mUnidentified014[2];
-    /* 0x016 */ bool mUnidentified016[2];
+    /* 0x014 */ bool mPointerPressed[2];
+    /* 0x016 */ bool mPadPressed[2];
     /* 0x018 */ bool mInitialized;
-    /* 0x019 */ bool mUnidentified019;
+    /* 0x019 */ bool mPointerOver;
     /* 0x01A */ bool mUnidentified01A;
     /* 0x01B */ bool mIgnoreInputLock;
     /* 0x01C */ feVector3 mAssetPosition;
@@ -46,8 +46,8 @@ public:
     /* 0x030 */ float mTopPosition;
     /* 0x034 */ int mCurrentValue;
     /* 0x038 */ int mMaxValue;
-    /* 0x03C */ nlVector3 mUnidentified03C;
-    /* 0x048 */ float mUnidentified048;
+    /* 0x03C */ nlVector3 mOffset;
+    /* 0x048 */ float mThumbStartY;
     /* 0x04C */ FEPointerButton mButtons[2];
 }; // size 0x1B4
 
