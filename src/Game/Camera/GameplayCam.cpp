@@ -11,9 +11,9 @@
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
-#include "Game/Render/RLViewLayers.h"
 
 
 bool lbl_806DC4F0 = true;
@@ -143,206 +143,15 @@ static inline float MapFromFieldPosToTargetPos(float fPos, const float* pFieldKn
     return Interpolate(pTargetKnots[nKnot], pTargetKnots[nKnot + 1], fKnotPercent);
 }
 
-static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutral);
-
-void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
+GameplayCamera::GameplayCamera()
 {
-    float fSin;
-    float fCos;
-    float fOrientSin;
-    float fOrientCos;
-    float fXYDist;
-    int i;
-
-    if (gGameplayCameraInReplay)
-    {
-        forceNeutral = true;
-    }
-
-    CalcCurrentKnotTable(this, forceNeutral);
-
-    float t = fDeltaT / 0.75f;
-    for (i = 0; i < 5; i++)
-    {
-        m_KnotTableBlendQueue[i].fBlendRiser += t;
-        if (m_KnotTableBlendQueue[i].fBlendRiser >= 1.0f)
-        {
-            m_KnotTableBlendQueue[i].fBlendRiser = 1.0f;
-            break;
-        }
-    }
-
-    CalcDesiredTarget();
-
-    if (!forceNeutral)
-    {
-        m_fDampenedTargetX = Dampen(m_fDampenedTargetX, m_fDesiredTargetX, m_fTargetSeekSpeedX, m_fTargetSeekTime, fDeltaT);
-        m_fDampenedTargetY = Dampen(m_fDampenedTargetY, m_fDesiredTargetY, m_fTargetSeekSpeedY, m_fTargetSeekTime, fDeltaT);
-    }
-    else
-    {
-        m_fDampenedTargetX = m_fDesiredTargetX;
-        m_fDampenedTargetY = m_fDesiredTargetY;
-    }
-
-    nlSinCos(&fSin, &fCos, DegreesToAngle(m_CameraData->pitch));
-    nlSinCos(&fOrientSin, &fOrientCos, DegreesToAngle(m_CameraData->orientation));
-
-    fXYDist = fCos * m_CameraData->distance;
-    m_v3Camera.x = (fOrientCos * fXYDist) + m_fDampenedTargetX;
-    m_v3Camera.y = (fOrientSin * fXYDist) + m_fDampenedTargetY;
-    m_v3Camera.z = fSin * m_CameraData->distance;
-
-    m_v3Target.x = m_fDampenedTargetX;
-    m_v3Target.y = m_fDampenedTargetY;
-    m_v3Target.z = 0.0f;
-}
-static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutral)
-{
-    cPlayer* pBallOwner;
-    if (g_pBall != NULL)
-    {
-        pBallOwner = g_pBall->m_pOwner;
-    }
-    else
-    {
-        pBallOwner = NULL;
-    }
-
-    if (pBallOwner == NULL)
-    {
-        pBallOwner = g_pBall->GetPassTarget();
-    }
-
-    int nNewKnotTable;
-    if (pBallOwner != NULL && !forceNeutral)
-    {
-        if (pBallOwner->m_pTeam->GetOtherNet()->m_v3NetLocation.x > 0.0f)
-        {
-            nNewKnotTable = 1;
-        }
-        else
-        {
-            nNewKnotTable = 2;
-        }
-    }
-    else
-    {
-        nNewKnotTable = 0;
-    }
-
-    if (nNewKnotTable != self->m_KnotTableBlendQueue[0].nKnotTable)
-    {
-        for (int i = 4; i > 0; i--)
-        {
-            self->m_KnotTableBlendQueue[i] = self->m_KnotTableBlendQueue[i - 1];
-        }
-        self->m_KnotTableBlendQueue[0].nKnotTable = nNewKnotTable;
-        self->m_KnotTableBlendQueue[0].fBlendRiser = 0.0f;
-    }
-
-    if (forceNeutral)
-    {
-        self->m_KnotTableBlendQueue[0].fBlendRiser = 1.0f;
-    }
-}
-
-void GameplayCameraZoomLevel::CalcDesiredTarget()
-{
-    nlVector3 v3OOIPos = { 0.0f, 0.0f, 0.0f };
-    float fKnotTableBlendWeights[3];
-    float fCurrWeight;
-    float fDampenedBlendRiser;
-    float fAccumulatedWeight;
-    float fBlendPercent;
-    int i;
-
-    if (!gGameplayCameraInReplay)
-    {
-        if (g_pBall != NULL)
-        {
-            cPlayer* pBallOwner = g_pBall->m_pOwner;
-            if (pBallOwner != NULL)
-            {
-                v3OOIPos = pBallOwner->mUnidentified024.m_v3Position;
-            }
-            else if (ReplayManager::Instance()->mRender != NULL)
-            {
-                v3OOIPos = ReplayManager::Instance()->mRender->mBall.mPosition;
-            }
-            else
-            {
-                v3OOIPos = g_pBall->m_v3Position;
-            }
-        }
-    }
-    else if (ReplayManager::Instance()->mRender != NULL)
-    {
-        v3OOIPos = ReplayManager::Instance()->mRender->mBall.mPosition;
-    }
-
-    fKnotTableBlendWeights[0] = 0.0f;
-    fKnotTableBlendWeights[1] = 0.0f;
-    fKnotTableBlendWeights[2] = 0.0f;
-
-    fCurrWeight = 1.0f;
-    for (int j = 0; j < 5; j++)
-    {
-        fDampenedBlendRiser = m_KnotTableBlendQueue[j].fBlendRiser;
-        fKnotTableBlendWeights[m_KnotTableBlendQueue[j].nKnotTable] += fCurrWeight * fDampenedBlendRiser;
-        if (fDampenedBlendRiser == 1.0f)
-        {
-            break;
-        }
-        fCurrWeight *= 1.0f - fDampenedBlendRiser;
-    }
-
-    fAccumulatedWeight = 0.0f;
-    m_fDesiredTargetX = 0.0f;
-    m_fDesiredTargetY = 0.0f;
-
-    i = 0;
-    for (; i < 3; i++)
-    {
-        if (fKnotTableBlendWeights[i] > 0.0f)
-        {
-            fAccumulatedWeight += fKnotTableBlendWeights[i];
-            float fMappedX = MapFromFieldPosToTargetPos(v3OOIPos.x, m_CameraData->fieldKnotsX[i], m_CameraData->targetKnotsX[i], m_CameraData->numKnotsX);
-            float fMappedY = MapFromFieldPosToTargetPos(v3OOIPos.y, m_CameraData->fieldKnotsY[i], m_CameraData->targetKnotsY[i], m_CameraData->numKnotsY);
-            fBlendPercent = fKnotTableBlendWeights[i] / fAccumulatedWeight;
-
-            m_fDesiredTargetX = Interpolate(m_fDesiredTargetX, fMappedX, fBlendPercent);
-            m_fDesiredTargetY = Interpolate(m_fDesiredTargetY, fMappedY, fBlendPercent);
-        }
-    }
-}
-
-void GameplayCamera::Reactivate()
-{
-    m_nearZoom.CalcDesiredTarget();
-    m_nearZoom.m_fDampenedTargetX = m_nearZoom.m_fDesiredTargetX;
-    m_nearZoom.m_fDampenedTargetY = m_nearZoom.m_fDesiredTargetY;
-
-    m_farZoom.CalcDesiredTarget();
-    m_farZoom.m_fDampenedTargetX = m_farZoom.m_fDesiredTargetX;
-    m_farZoom.m_fDampenedTargetY = m_farZoom.m_fDesiredTargetY;
-
-    if (m_pFilter[1] != NULL)
-    {
-        m_pFilter[1]->Reset();
-    }
-}
-
-void GameplayCamera::SetForceNeutralAndNearZoom(bool forceNeutralAndNearZoom)
-{
-    if (forceNeutralAndNearZoom && !m_ForceNeutralAndNearZoom)
-    {
-        Reactivate();
-        m_v3Target.x = 0.0f;
-        m_v3Target.y = 0.0f;
-        m_v3Target.z = 0.0f;
-    }
-    m_ForceNeutralAndNearZoom = forceNeutralAndNearZoom;
+    m_bDynamicZoom = true;
+    m_fZoom = 0.0f;
+    m_fDesiredZoom = 0.0f;
+    m_fZoomSeekSpeed = 0.0f;
+    m_ForceNeutralAndNearZoom = false;
+    m_fZoomOverride = 0.0f;
+    m_matView.SetIdentity();
 }
 
 void GameplayCamera::Update(float deltaTime)
@@ -463,13 +272,203 @@ void GameplayCamera::Update(float deltaTime)
     glMatrixLookAt(m_matView, camera, target, up);
 }
 
-GameplayCamera::GameplayCamera()
+void GameplayCamera::SetForceNeutralAndNearZoom(bool forceNeutralAndNearZoom)
 {
-    m_bDynamicZoom = true;
-    m_fZoom = 0.0f;
-    m_fDesiredZoom = 0.0f;
-    m_fZoomSeekSpeed = 0.0f;
-    m_ForceNeutralAndNearZoom = false;
-    m_fZoomOverride = 0.0f;
-    m_matView.SetIdentity();
+    if (forceNeutralAndNearZoom && !m_ForceNeutralAndNearZoom)
+    {
+        Reactivate();
+        m_v3Target.x = 0.0f;
+        m_v3Target.y = 0.0f;
+        m_v3Target.z = 0.0f;
+    }
+    m_ForceNeutralAndNearZoom = forceNeutralAndNearZoom;
+}
+
+void GameplayCamera::Reactivate()
+{
+    m_nearZoom.CalcDesiredTarget();
+    m_nearZoom.m_fDampenedTargetX = m_nearZoom.m_fDesiredTargetX;
+    m_nearZoom.m_fDampenedTargetY = m_nearZoom.m_fDesiredTargetY;
+
+    m_farZoom.CalcDesiredTarget();
+    m_farZoom.m_fDampenedTargetX = m_farZoom.m_fDesiredTargetX;
+    m_farZoom.m_fDampenedTargetY = m_farZoom.m_fDesiredTargetY;
+
+    if (m_pFilter[1] != NULL)
+    {
+        m_pFilter[1]->Reset();
+    }
+}
+
+void GameplayCameraZoomLevel::CalcDesiredTarget()
+{
+    nlVector3 v3OOIPos = { 0.0f, 0.0f, 0.0f };
+    float fKnotTableBlendWeights[3];
+    float fCurrWeight;
+    float fDampenedBlendRiser;
+    float fAccumulatedWeight;
+    float fBlendPercent;
+    int i;
+
+    if (!gGameplayCameraInReplay)
+    {
+        if (g_pBall != NULL)
+        {
+            cPlayer* pBallOwner = g_pBall->m_pOwner;
+            if (pBallOwner != NULL)
+            {
+                v3OOIPos = pBallOwner->mUnidentified024.m_v3Position;
+            }
+            else if (ReplayManager::Instance()->mRender != NULL)
+            {
+                v3OOIPos = ReplayManager::Instance()->mRender->mBall.mPosition;
+            }
+            else
+            {
+                v3OOIPos = g_pBall->m_v3Position;
+            }
+        }
+    }
+    else if (ReplayManager::Instance()->mRender != NULL)
+    {
+        v3OOIPos = ReplayManager::Instance()->mRender->mBall.mPosition;
+    }
+
+    fKnotTableBlendWeights[0] = 0.0f;
+    fKnotTableBlendWeights[1] = 0.0f;
+    fKnotTableBlendWeights[2] = 0.0f;
+
+    fCurrWeight = 1.0f;
+    for (int j = 0; j < 5; j++)
+    {
+        fDampenedBlendRiser = m_KnotTableBlendQueue[j].fBlendRiser;
+        fKnotTableBlendWeights[m_KnotTableBlendQueue[j].nKnotTable] += fCurrWeight * fDampenedBlendRiser;
+        if (fDampenedBlendRiser == 1.0f)
+        {
+            break;
+        }
+        fCurrWeight *= 1.0f - fDampenedBlendRiser;
+    }
+
+    fAccumulatedWeight = 0.0f;
+    m_fDesiredTargetX = 0.0f;
+    m_fDesiredTargetY = 0.0f;
+
+    i = 0;
+    for (; i < 3; i++)
+    {
+        if (fKnotTableBlendWeights[i] > 0.0f)
+        {
+            fAccumulatedWeight += fKnotTableBlendWeights[i];
+            float fMappedX = MapFromFieldPosToTargetPos(v3OOIPos.x, m_CameraData->fieldKnotsX[i], m_CameraData->targetKnotsX[i], m_CameraData->numKnotsX);
+            float fMappedY = MapFromFieldPosToTargetPos(v3OOIPos.y, m_CameraData->fieldKnotsY[i], m_CameraData->targetKnotsY[i], m_CameraData->numKnotsY);
+            fBlendPercent = fKnotTableBlendWeights[i] / fAccumulatedWeight;
+
+            m_fDesiredTargetX = Interpolate(m_fDesiredTargetX, fMappedX, fBlendPercent);
+            m_fDesiredTargetY = Interpolate(m_fDesiredTargetY, fMappedY, fBlendPercent);
+        }
+    }
+}
+
+static void CalcCurrentKnotTable(GameplayCameraZoomLevel* self, bool forceNeutral)
+{
+    cPlayer* pBallOwner;
+    if (g_pBall != NULL)
+    {
+        pBallOwner = g_pBall->m_pOwner;
+    }
+    else
+    {
+        pBallOwner = NULL;
+    }
+
+    if (pBallOwner == NULL)
+    {
+        pBallOwner = g_pBall->GetPassTarget();
+    }
+
+    int nNewKnotTable;
+    if (pBallOwner != NULL && !forceNeutral)
+    {
+        if (pBallOwner->m_pTeam->GetOtherNet()->m_v3NetLocation.x > 0.0f)
+        {
+            nNewKnotTable = 1;
+        }
+        else
+        {
+            nNewKnotTable = 2;
+        }
+    }
+    else
+    {
+        nNewKnotTable = 0;
+    }
+
+    if (nNewKnotTable != self->m_KnotTableBlendQueue[0].nKnotTable)
+    {
+        for (int i = 4; i > 0; i--)
+        {
+            self->m_KnotTableBlendQueue[i] = self->m_KnotTableBlendQueue[i - 1];
+        }
+        self->m_KnotTableBlendQueue[0].nKnotTable = nNewKnotTable;
+        self->m_KnotTableBlendQueue[0].fBlendRiser = 0.0f;
+    }
+
+    if (forceNeutral)
+    {
+        self->m_KnotTableBlendQueue[0].fBlendRiser = 1.0f;
+    }
+}
+
+void GameplayCameraZoomLevel::Update(float fDeltaT, bool forceNeutral)
+{
+    float fSin;
+    float fCos;
+    float fOrientSin;
+    float fOrientCos;
+    float fXYDist;
+    int i;
+
+    if (gGameplayCameraInReplay)
+    {
+        forceNeutral = true;
+    }
+
+    CalcCurrentKnotTable(this, forceNeutral);
+
+    float t = fDeltaT / 0.75f;
+    for (i = 0; i < 5; i++)
+    {
+        m_KnotTableBlendQueue[i].fBlendRiser += t;
+        if (m_KnotTableBlendQueue[i].fBlendRiser >= 1.0f)
+        {
+            m_KnotTableBlendQueue[i].fBlendRiser = 1.0f;
+            break;
+        }
+    }
+
+    CalcDesiredTarget();
+
+    if (!forceNeutral)
+    {
+        m_fDampenedTargetX = Dampen(m_fDampenedTargetX, m_fDesiredTargetX, m_fTargetSeekSpeedX, m_fTargetSeekTime, fDeltaT);
+        m_fDampenedTargetY = Dampen(m_fDampenedTargetY, m_fDesiredTargetY, m_fTargetSeekSpeedY, m_fTargetSeekTime, fDeltaT);
+    }
+    else
+    {
+        m_fDampenedTargetX = m_fDesiredTargetX;
+        m_fDampenedTargetY = m_fDesiredTargetY;
+    }
+
+    nlSinCos(&fSin, &fCos, DegreesToAngle(m_CameraData->pitch));
+    nlSinCos(&fOrientSin, &fOrientCos, DegreesToAngle(m_CameraData->orientation));
+
+    fXYDist = fCos * m_CameraData->distance;
+    m_v3Camera.x = (fOrientCos * fXYDist) + m_fDampenedTargetX;
+    m_v3Camera.y = (fOrientSin * fXYDist) + m_fDampenedTargetY;
+    m_v3Camera.z = fSin * m_CameraData->distance;
+
+    m_v3Target.x = m_fDampenedTargetX;
+    m_v3Target.y = m_fDampenedTargetY;
+    m_v3Target.z = 0.0f;
 }

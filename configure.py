@@ -622,7 +622,7 @@ config.libs = [
             Object(Matching, "Game/Camera/DebugCam.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Camera/FaceCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/FollowCam.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
-            Object(NonMatching, "Game/Camera/GameplayCam.cpp", cflags=cflags_game_deferred),
+            Object(Matching, "Game/Camera/GameplayCam.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Camera/GoalCam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/kickoffcam.cpp", cflags=cflags_game_deferred),
             Object(Matching, "Game/Camera/MatrixEffectCam.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
