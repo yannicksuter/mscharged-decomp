@@ -1,4 +1,5 @@
 #include "Game/TweakRegistry.h"
+#include "Game/TweakValueName.h"
 #include "NL/nlSlotPoolFixed.inl"
 
 #include "NL/nlMemory.h"
@@ -37,6 +38,15 @@ TweakNode::TweakNode()
     }
 }
 
+template TweakNode* TweakNodeListRemove<TweakNode>(TweakNode**, TweakNode*, TweakNode**);
+
+typedef int (*TweakStrCmpFunc)(const char*, const char*);
+
+TweakStrCmpFunc TweakNodeForceStrCmp()
+{
+    return &nlStrCmp<char>;
+}
+
 TweakNode::~TweakNode()
 {
     if (this != GetTweakRoot())
@@ -59,11 +69,11 @@ const char* GetTweakNodeName(const TweakNode* node)
 
 TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int noCreate)
 {
-    if (entry->UnidentifiedVirtual0C() == 0)
+    if (((TweakNode*)entry)->UnidentifiedVirtual0C() == 0)
     {
         return 0;
     }
-    TweakEntry* folder = entry->UnidentifiedVirtual18();
+    TweakEntry* folder = ((TweakNode*)entry)->UnidentifiedVirtual18();
     for (TweakNode* child = folder->m_ChildHead; child != 0; child = child->m_Next)
     {
         if (child->UnidentifiedVirtual0C() == 0)
@@ -79,7 +89,7 @@ TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int
     if (noCreate == 0)
     {
         TweakValueName* value = new TweakValueName(InternTweakString(name, kTweakStringFolder));
-        return CreateTweakEntry(value, entry->UnidentifiedVirtual18());
+        return CreateTweakEntry(value, ((TweakNode*)entry)->UnidentifiedVirtual18());
     }
     return 0;
 }

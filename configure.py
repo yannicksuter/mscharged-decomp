@@ -512,7 +512,7 @@ config.libs = [
             Object(Matching, "Game/TweakEntry.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/TweakFileLoader.cpp"),
             Object(Matching, "Game/TweakNameRecycler.cpp"),
-            Object(NonMatching, "Game/TweakNode.cpp", cflags=cflags_game, extra_cflags=["-inline nobottomup", "-ipa file"]),
+            Object(Matching, "Game/TweakNode.cpp", cflags=cflags_game, extra_cflags=["-inline nobottomup", "-ipa file", "-sym on"]),
             Object(Matching, "Game/TweakRegistry.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/TweaksBase.cpp"),
             Object(Matching, "Game/TweakValue.cpp"),
