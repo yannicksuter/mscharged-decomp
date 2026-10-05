@@ -1115,12 +1115,9 @@ void Goalie::InitMegaStrikeTargets()
     {
         const nlVector2* pPosition = &v2Positions[nIndices[i % 6]];
         int nX = (int)pPosition->x;
-        nX = (int)((float)nX
-                   + (nlRandomf(2.0f * lbl_806DBC0C) - lbl_806DBC0C));
+        nX += nlRandomf(2.0f * lbl_806DBC0C) - lbl_806DBC0C;
         int nY = (int)pPosition->y;
-        nY = (int)((float)nY
-                   + (nlRandomf(lbl_806DBC0C)
-                       - 0.5f * lbl_806DBC0C));
+        nY += nlRandomf(lbl_806DBC0C) - 0.5f * lbl_806DBC0C;
 
         MegaBallIndicator* pState
             = CreateMegaBallIndicator((float)nX, (float)nY, 1.0f);
@@ -2545,8 +2542,9 @@ void Goalie::ActionMoveWB(float fDeltaT)
             GoalieTweaks* pTweaks = (GoalieTweaks*)m_pTweaks;
             float jogging = pTweaks->fJoggingSpeed;
             float running = pTweaks->fRunningSpeed;
-            float speedScale = stickMag * (running - jogging);
-            mUnidentified024.m_fDesiredSpeed = jogging + speedScale;
+            float speed = running - jogging;
+            speed = stickMag * speed;
+            mUnidentified024.m_fDesiredSpeed = speed + jogging;
 
             float posX = mUnidentified024.m_v3Position.x;
             float posY = mUnidentified024.m_v3Position.y;
@@ -3999,32 +3997,12 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
             nlVector3 opponentLocalPos;
             GetLocalPoint(opponentLocalPos, pOwnerFielder->mUnidentified024.m_v3Position, mUnidentified024.m_v3Position, mUnidentified024.m_aActualFacingDirection);
 
-            nlVector2 dist1Delta;
-            dist1Delta.x = mv3LocalContactPosition.x
-                         - mpLooseBallInfo->mv3PickupPos.x;
-            dist1Delta.y = mv3LocalContactPosition.y
-                         - mpLooseBallInfo->mv3PickupPos.y;
-            float dist1Sq = (dist1Delta.x * dist1Delta.x)
-                          + (dist1Delta.y * dist1Delta.y);
+            float dist1Sq = nlVec3DistanceSquared2D(mv3LocalContactPosition, mpLooseBallInfo->mv3PickupPos);
+            float dist2Sq = nlVec3DistanceSquared2D(opponentLocalPos, mpLooseBallInfo->mv3PickupPos);
 
-            nlVector2 dist2Delta;
-            dist2Delta.x
-                = opponentLocalPos.x - mpLooseBallInfo->mv3PickupPos.x;
-            dist2Delta.y
-                = opponentLocalPos.y - mpLooseBallInfo->mv3PickupPos.y;
-            float dist2Sq = (dist2Delta.x * dist2Delta.x)
-                          + (dist2Delta.y * dist2Delta.y);
+            float dist3Sq = mv3LocalContactPosition.GetLengthSq2D();
 
-            float dist3Sq = nlGetLengthSquared2D(
-                mv3LocalContactPosition.x, mv3LocalContactPosition.y);
-
-            nlVector2 dist4Delta;
-            dist4Delta.x
-                = pOwnerFielder->mUnidentified024.m_v3Position.x - mUnidentified024.m_v3Position.x;
-            dist4Delta.y
-                = pOwnerFielder->mUnidentified024.m_v3Position.y - mUnidentified024.m_v3Position.y;
-            float dist4Sq = (dist4Delta.x * dist4Delta.x)
-                          + (dist4Delta.y * dist4Delta.y);
+            float dist4Sq = nlVec3DistanceSquared2D(pOwnerFielder->GetPosition(), GetPosition());
 
             if ((mv3LocalContactPosition.x < -0.35f)
                 || (dist1Sq > 0.36f && dist2Sq > 0.36f
@@ -5029,15 +5007,13 @@ void Goalie::InitActionLooseBallSetup()
     muBallDeflectCount = g_pBall->m_bBallDeflectCount;
 
     bool bInCone = IsLooseBallTowardNet();
-    float fBallSpeed = pBallVelocity->x * pBallVelocity->x
-                     + pBallVelocity->y * pBallVelocity->y
-                     + pBallVelocity->z * pBallVelocity->z;
+    float fBallSpeed = nlVec3LengthSquared(*pBallVelocity);
     float fAbsBallX;
 
-    if (fBallSpeed > lbl_806DBC80 * lbl_806DBC80 && bInCone)
+    if (fBallSpeed > nlGetLengthSquared1D(lbl_806DBC80) && bInCone)
     {
-        float fAbsGoalieX = (float)fabs(mUnidentified024.m_v3Position.x);
-        fAbsBallX = (float)fabs(v3BallPosition.x);
+        float fAbsGoalieX = fabsf(mUnidentified024.m_v3Position.x);
+        fAbsBallX = fabsf(v3BallPosition.x);
         if (fAbsBallX < fAbsGoalieX - 1.5f)
         {
             float fTimeTilSave
@@ -5114,7 +5090,7 @@ void Goalie::InitActionLooseBallSetup()
                 v3GuessBallVel);
 
             float fPanicLineX = cField::GetGoalLineX(1U) - 2.0f;
-            float fAbsGuessX = (float)fabs(v3GuessBallPos.x);
+            float fAbsGuessX = fabsf(v3GuessBallPos.x);
 
             if (fAbsGuessX > fPanicLineX)
             {
@@ -5122,7 +5098,7 @@ void Goalie::InitActionLooseBallSetup()
                     GOALIEACTION_LOOSEBALL_DESPERATE, 0);
                 mbIsDown = true;
 
-                if ((float)fabs(v3BallPosition.x) >= fPanicLineX)
+                if (fabsf(v3BallPosition.x) >= fPanicLineX)
                 {
                     mv3TargetPosition = v3BallPosition;
                 }
@@ -5172,9 +5148,9 @@ void Goalie::InitActionLooseBallSetup()
                 mbIsDown = true;
 
                 float fLimitX = cField::GetGoalLineX(1U) - 0.5f;
-                if ((float)fabs(mv3TargetPosition.x) > fLimitX)
+                if (fabsf(mv3TargetPosition.x) > fLimitX)
                 {
-                    if ((float)fabs(v3BallPosition.x) > fLimitX)
+                    if (fabsf(v3BallPosition.x) > fLimitX)
                     {
                         mv3TargetPosition = v3BallPosition;
                     }
@@ -5232,7 +5208,7 @@ void Goalie::InitActionLooseBallSetup()
             }
         }
 
-        fAbsBallX = (float)fabs(v3BallPosition.x);
+        fAbsBallX = fabsf(v3BallPosition.x);
         float fMinKickLine
             = 0.35f
                 * (cField::GetGoalLineX(1U)
@@ -5257,21 +5233,8 @@ void Goalie::InitActionLooseBallSetup()
                 = GetClosestOpponentFielder(&v3BallPosition, true);
             if (pOpponent != 0)
             {
-                nlVector2 v2OpponentDistance;
-                v2OpponentDistance.x
-                    = pOpponent->mUnidentified024.m_v3Position.x - v3BallPosition.x;
-                v2OpponentDistance.y
-                    = pOpponent->mUnidentified024.m_v3Position.y - v3BallPosition.y;
-                float fOppDistSq
-                    = nlVec2LengthSquared(v2OpponentDistance);
-
-                nlVector2 v2GoalieDistance;
-                v2GoalieDistance.x
-                    = mUnidentified024.m_v3Position.x - v3BallPosition.x;
-                v2GoalieDistance.y
-                    = mUnidentified024.m_v3Position.y - v3BallPosition.y;
-                float fGoalieDistSq
-                    = nlVec2LengthSquared(v2GoalieDistance);
+                float fOppDistSq = nlVec3DistanceSquared2D(pOpponent->GetPosition(), v3BallPosition);
+                float fGoalieDistSq = nlVec3DistanceSquared2D(GetPosition(), v3BallPosition);
 
                 if (fGoalieDistSq > fOppDistSq)
                 {
@@ -5311,9 +5274,7 @@ void Goalie::InitActionLooseBallSetup()
                 float fInvDist = 1.0f / fBallDist;
                 nlVec3Scale(v3BallDelta, fInvDist);
 
-                float fInvTargetDist = nlRecipSqrt(
-                    v3TargetDelta.GetLengthSq3D(), true);
-                nlVec3Scale(v3TargetDelta, fInvTargetDist);
+                nlVec3Normalize(v3TargetDelta, v3TargetDelta);
 
                 nlVector3 v3Right;
                 nlVec3Set(v3Right,
@@ -5347,16 +5308,8 @@ void Goalie::InitActionLooseBallSetup()
                                 &v3BallPosition, true);
                             if (pOpp != 0)
                             {
-                                nlVector2 v2OpponentDistance;
-                                v2OpponentDistance.x
-                                    = pOpp->mUnidentified024.m_v3Position.x
-                                    - v3BallPosition.x;
-                                v2OpponentDistance.y
-                                    = pOpp->mUnidentified024.m_v3Position.y
-                                    - v3BallPosition.y;
-                                if (nlVec2LengthSquared(
-                                        v2OpponentDistance)
-                                    < fBallDist * fBallDist)
+                                if (nlVec3DistanceSquared2D(pOpp->GetPosition(), v3BallPosition)
+                                    < nlGetLengthSquared1D(fBallDist))
                                 {
                                     bDoGrab = true;
                                 }
@@ -5369,10 +5322,10 @@ void Goalie::InitActionLooseBallSetup()
 
         if (!bDoGrab && mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
         {
-            float fAbsGoalieX = (float)fabs(mUnidentified024.m_v3Position.x);
-            float fAbsBallXPos = (float)fabs(v3BallPosition.x);
+            float fAbsGoalieX = fabsf(mUnidentified024.m_v3Position.x);
+            float fAbsBallXPos = fabsf(v3BallPosition.x);
             float fAbsBallYDist
-                = (float)fabs(v3BallPosition.y - mUnidentified024.m_v3Position.y);
+                = fabsf(v3BallPosition.y - mUnidentified024.m_v3Position.y);
             float fDiffX = fAbsBallXPos - fAbsGoalieX;
             u16 nAbsAngle = (u16)(s32)(nlATan2f(fAbsBallYDist, fDiffX) * 10430.378f);
 
@@ -5426,16 +5379,8 @@ void Goalie::InitActionLooseBallSetup()
         if (bFound && mv3TargetPosition.z < 1.0f
             && fClosestDist < 0.4f)
         {
-            nlVector2 v2Distance;
-            v2Distance.x
-                = mv3TargetPosition.x - mUnidentified024.m_v3Position.x;
-            v2Distance.y
-                = mv3TargetPosition.y - mUnidentified024.m_v3Position.y;
-            float fPickupDist = mpLooseBallInfo->mfPickupDistance;
-            float fReachDist = 0.4f + fPickupDist;
-            float fDistSq = nlVec2LengthSquared(v2Distance);
-            float fReachDistSq
-                = nlGetLengthSquared1D(fReachDist);
+            float fReachDistSq = nlGetLengthSquared1D(0.4f + mpLooseBallInfo->mfPickupDistance);
+            float fDistSq = nlVec3DistanceSquared2D(mv3TargetPosition, GetPosition());
             float fAnimTime = mpLooseBallInfo->mfPickupTime
                             * mpLooseBallInfo->mfAnimDuration;
             float fTargetTime = fInterceptTime - fAnimTime;
