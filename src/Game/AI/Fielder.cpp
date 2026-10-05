@@ -59,6 +59,9 @@ extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
+extern "C" void fn_800ED92C(unsigned long soundID);
+extern "C" bool fn_8003E8A0(const cFielder* pFielder);
+extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" void fn_80097358(cPlayer*, float);
 extern FuzzyVariant fvNotSet;
 
@@ -112,25 +115,6 @@ float lbl_806DB838 = 1.5f;
 bool lbl_806E0C53;
 bool lbl_806E0C58;
 bool lbl_806E0C59;
-
-static LooseBallContactAnimInfo gOneTimerIdleGroundContactAnims[4] = {
-    { 0x38, 9.0f, 0xE000, 0x2000 },
-    { 0x39, 9.0f, 0xA000, 0xE000 },
-    { 0x3B, 9.0f, 0x6000, 0xA000 },
-    { 0x3A, 9.0f, 0x2000, 0x6000 },
-};
-
-static LooseBallContactAnimInfo gOneTimerIdleVolleyContactAnims[4] = {
-    { 0x44, 4.0f, 0xE000, 0x2000 },
-    { 0x45, 4.0f, 0xA000, 0xE000 },
-    { 0x47, 4.0f, 0x6000, 0xA000 },
-    { 0x46, 4.0f, 0x2000, 0x6000 },
-};
-
-static LooseBallContactAnimInfo gOneTimerLeadGroundContactAnims[2] = {
-    { 0x48, 6.0f, 0xC000, 0x4000 },
-    { 0x49, 6.0f, 0x4000, 0xC000 },
-};
 
 static inline cFielder* GetAIOrderedFielder(cTeam* pTeam, s32 i)
 {
@@ -335,6 +319,145 @@ extern "C" int fn_8002E9FC(cFielder* pFielder,
     return nUnidentified;
 }
 
+static inline bool IsPowerupBlockedByAction(eFielderActionState eActionState)
+{
+    switch (eActionState)
+    {
+    case 3:
+    case 0x18:
+        return true;
+    default:
+        return false;
+    }
+}
+
+extern "C" bool fn_8002EDC8(cFielder* pFielder, int nPowerupType)
+{
+    if (nPowerupType == -1)
+    {
+        nPowerupType = pFielder->m_pTeam->GetCurrentPowerUp().eType;
+    }
+
+    eFielderActionState eActionState = pFielder->m_eActionState;
+    if (IsPowerupBlockedByAction(eActionState))
+    {
+        return false;
+    }
+
+    if (eActionState == (eFielderActionState)0x23)
+    {
+        return false;
+    }
+
+    bool bFrozen = fn_8003877C(pFielder) || pFielder->IsFrozen();
+    if (bFrozen)
+    {
+        return false;
+    }
+
+    if (pFielder->fn_8003EA6C())
+    {
+        return false;
+    }
+
+    if (pFielder->fn_8002E060() == (eFielderDesireState)0x20)
+    {
+        if (pFielder->m_eActionState == ACTION_SHOT)
+        {
+            return false;
+        }
+        if (nPowerupType >= 9 && nPowerupType <= 0x14)
+        {
+            return false;
+        }
+    }
+
+    if (pFielder->m_nPowerupAnimID >= 0)
+    {
+        return false;
+    }
+
+    if (pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    {
+        return false;
+    }
+
+    if (pFielder->m_eActionState == ACTION_ELECTROCUTION && pFielder->m_eAnimID != 0x78
+        && pFielder->m_eAnimID != 0x7B)
+    {
+        return false;
+    }
+
+    if (pFielder->IsFallenDown()
+        && (nPowerupType == POWER_UP_MUSHROOM || nPowerupType == POWER_UP_STAR))
+    {
+        return false;
+    }
+
+    if (pFielder->m_eActionState == ACTION_UNKNOWN_32
+        && (nPowerupType == POWER_UP_MUSHROOM || nPowerupType == POWER_UP_STAR))
+    {
+        return false;
+    }
+
+    if (fn_8003E948(pFielder) || fn_8003E8A0(pFielder) || pFielder->fn_8003E9F0())
+    {
+        if (pFielder->IsFallenDown())
+        {
+            return false;
+        }
+
+        switch (pFielder->m_eActionState)
+        {
+        case 1:
+        case ACTION_HIT:
+        case ACTION_LATE_ONETIMER_FROM_VOLLEY:
+        case ACTION_LOOSE_BALL_PASS:
+        case ACTION_LOOSE_BALL_SHOT:
+        case ACTION_SHOOT_TO_SCORE:
+        case ACTION_ONETIMER:
+        case ACTION_ONETOUCH_PASS_FROM_VOLLEY:
+        case ACTION_PASS:
+        case ACTION_RECEIVE_PASS:
+        case (eFielderActionState)0x13:
+        case ACTION_UNKNOWN_15:
+        case ACTION_SLIDE_ATTACK:
+            return false;
+        case ACTION_UNKNOWN_30:
+            if (fn_8003E948(pFielder))
+            {
+                return false;
+            }
+            break;
+        }
+    }
+
+    cFielder* pCaptain = pFielder->m_pTeam->GetCaptain();
+    if (pFielder->m_pTeam->fn_800A6764())
+    {
+        eCharacterClass eCaptainClass = pCaptain->mUnidentified024.m_eCharacterClass;
+        if (eCaptainClass == DAISY || eCaptainClass == YOSHI || eCaptainClass == MARIO)
+        {
+            switch (pFielder->m_eActionState)
+            {
+            case ACTION_HIT:
+                return false;
+            case 1:
+                return false;
+            case (eFielderActionState)0x1C:
+                return false;
+            }
+
+            if ((eCaptainClass == MARIO || eCaptainClass == DAISY || eCaptainClass == YOSHI)
+                && pFielder->IsFallenDown())
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool cFielder::CanGetElectrocuted(
     const CollisionPlayerWallData* eventData)
 {
@@ -513,7 +636,7 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
     nlVector3 v3ContactPos;
     if (mfAirInterceptHeight[0] < 0.0f)
     {
-        const LooseBallContactAnimInfo* pLeadAnimInfo = gOneTimerLeadGroundContactAnims;
+        const LooseBallContactAnimInfo* pLeadAnimInfo = GetOneTimerLeadGroundContactAnims();
         float fAnimContactFrame = pLeadAnimInfo->fAnimContactFrame;
         const cSAnim* pLeadAnim = m_pAnimInventory->GetAnim(pLeadAnimInfo->nAnimID);
         GetJointPositionFuture(&v3ContactPos, pLeadAnimInfo->nAnimID, m_nBallJointIndex,
@@ -543,11 +666,11 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
                 return true;
             }
 
-            float fGroundContactFrame = gOneTimerIdleGroundContactAnims[0].fAnimContactFrame;
-            const cSAnim* pGroundAnim = m_pAnimInventory->m_pSAnims[gOneTimerIdleGroundContactAnims[0].nAnimID];
+            float fGroundContactFrame = GetOneTimerIdleGroundContactAnims()[0].fAnimContactFrame;
+            const cSAnim* pGroundAnim = m_pAnimInventory->m_pSAnims[GetOneTimerIdleGroundContactAnims()[0].nAnimID];
             float fGroundContactTime = GetNormalizedContactTime(pGroundAnim, fGroundContactFrame);
-            const cSAnim* pVolleyAnim = m_pAnimInventory->m_pSAnims[gOneTimerIdleVolleyContactAnims[0].nAnimID];
-            float fVolleyContactTime = GetNormalizedContactTime(pVolleyAnim, gOneTimerIdleVolleyContactAnims[0].fAnimContactFrame);
+            const cSAnim* pVolleyAnim = m_pAnimInventory->m_pSAnims[GetOneTimerIdleVolleyContactAnims()[0].nAnimID];
+            float fVolleyContactTime = GetNormalizedContactTime(pVolleyAnim, GetOneTimerIdleVolleyContactAnims()[0].fAnimContactFrame);
 
             for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
             {
@@ -709,6 +832,13 @@ bool cFielder::fn_8003E8F4() const
 {
     bool active;
     GetCharacterSpecialActive(this, LUIGI, active);
+    return active;
+}
+
+extern "C" bool fn_8003E948(const cFielder* pFielder)
+{
+    bool active;
+    GetCharacterSpecialActive(pFielder, MARIO, active);
     return active;
 }
 
@@ -2577,6 +2707,25 @@ void cFielder::SetAction(eFielderActionState actionState)
     m_eActionState = actionState;
 }
 
+static LooseBallContactAnimInfo gOneTimerIdleGroundContactAnims[4] = {
+    { 0x38, 9.0f, 0xE000, 0x2000 },
+    { 0x39, 9.0f, 0xA000, 0xE000 },
+    { 0x3B, 9.0f, 0x6000, 0xA000 },
+    { 0x3A, 9.0f, 0x2000, 0x6000 },
+};
+
+static LooseBallContactAnimInfo gOneTimerIdleVolleyContactAnims[4] = {
+    { 0x44, 4.0f, 0xE000, 0x2000 },
+    { 0x45, 4.0f, 0xA000, 0xE000 },
+    { 0x47, 4.0f, 0x6000, 0xA000 },
+    { 0x46, 4.0f, 0x2000, 0x6000 },
+};
+
+static LooseBallContactAnimInfo gOneTimerLeadGroundContactAnims[2] = {
+    { 0x48, 6.0f, 0xC000, 0x4000 },
+    { 0x49, 6.0f, 0x4000, 0xC000 },
+};
+
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims()
 {
     return gOneTimerIdleGroundContactAnims;
@@ -2810,6 +2959,18 @@ bool cFielder::IsMidField() const
 bool cFielder::IsDefense() const
 {
     return m_eRole == ROLE_DEFENCE;
+}
+
+unsigned int cFielder::IsFrozen()
+{
+    return ((DesireFrozen*)fn_80319FC0(mUnidentified428->mScriptMachine, 0x1D))
+        ->IsUnidentifiedState(2);
+}
+
+extern "C" bool fn_8003877C(const cFielder* pFielder)
+{
+    return ((DesireFrozen*)fn_80319FC0(pFielder->mUnidentified428->mScriptMachine, 0x1D))
+        ->IsUnidentifiedState(1);
 }
 
 bool cFielder::CanPickupBall(cBall* pBall, bool bParam)

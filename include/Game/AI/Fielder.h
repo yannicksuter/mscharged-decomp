@@ -746,7 +746,7 @@ extern float lbl_806E342C;
 
 extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 
-extern "C" bool fn_8003877C(cFielder* pFielder);
+extern "C" bool fn_8003877C(const cFielder* pFielder);
 
 extern "C" void fn_800395C0(cFielder* pFielder);
 
