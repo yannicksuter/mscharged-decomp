@@ -60,7 +60,6 @@ extern "C" void fn_80036594(cFielder*, cFielder*, int);
 extern "C" void fn_8005EED0(cGame*, ShotAtGoalData*);
 extern "C" void fn_8005ED64(void*, void*);
 extern "C" void fn_80060608(void* pParam, cFielder* pFielder);
-extern "C" void fn_800ED92C(unsigned long soundID);
 extern "C" void fn_80097358(cPlayer*, float);
 extern FuzzyVariant fvNotSet;
 
@@ -1308,7 +1307,7 @@ void cFielder::CollideWithWallCallback(
             {
                 soundID = 0x5089F33E;
             }
-            fn_800ED92C(soundID);
+            PlayCrowdReaction(soundID);
         }
     }
     else if (m_eActionState != (eFielderActionState)3
