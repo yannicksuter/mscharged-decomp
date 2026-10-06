@@ -38,6 +38,13 @@ public:
 class Pitch : public AudioEffectBase
 {
 public:
+    Pitch()
+        : AudioEffectBase("Pitch")
+    {
+        m_CurrentParameter = &m_Initial;
+        m_ResultParameter = &m_Final;
+        m_Initial.m_Semitones = 1.0f;
+    }
     virtual void CreateParameter(unsigned int definition, const void* context,
         bool negate, AudioEffectParameter** output);
     virtual void BeginBlend();

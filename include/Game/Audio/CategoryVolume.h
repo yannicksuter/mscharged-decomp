@@ -42,6 +42,12 @@ public:
 class CategoryVolume : public AudioEffectBase
 {
 public:
+    CategoryVolume()
+        : AudioEffectBase("CategoryVolume")
+    {
+        m_CurrentParameter = &m_Initial;
+        m_ResultParameter = &m_Final;
+    }
     virtual void CreateParameter(u32 definition, const void* context, bool negate,
         AudioEffectParameter** output);
     virtual void BeginBlend();

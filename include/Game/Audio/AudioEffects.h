@@ -5,6 +5,7 @@
 #include "Game/Audio/AudioGlobals.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlSlotPool.h"
+#include "mem.h"
 
 class AudioEffectFactory
 {
@@ -46,7 +47,14 @@ public:
 class Volume : public AudioEffectBase
 {
 public:
-    Volume();
+    Volume()
+        : AudioEffectBase("Volume")
+    {
+        m_Initial.m_Unknown10 = 1.0f;
+        m_Initial.m_Unknown14_01 = m_Initial.m_Unknown14_00 = 0;
+        m_CurrentParameter = &m_Initial;
+        m_ResultParameter = &m_Final;
+    }
     virtual ~Volume();
     virtual void CreateParameter(unsigned int, const void*, bool, AudioEffectParameter**);
     virtual void BeginBlend();
@@ -81,7 +89,13 @@ public:
 class ControllerSpeaker : public AudioEffectBase
 {
 public:
-    ControllerSpeaker();
+    ControllerSpeaker()
+        : AudioEffectBase("ControllerSpeaker")
+    {
+        m_Unknown3C = -1;
+        m_Unknown40 = 0;
+        memset(m_Unknown44, 0, sizeof(m_Unknown44));
+    }
     virtual ~ControllerSpeaker();
     virtual void CreateParameter(unsigned int, const void*, bool, AudioEffectParameter**);
     virtual void BeginBlend();
