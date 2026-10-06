@@ -17,6 +17,21 @@
 #include "Game/Drawable/DrawableYoshiEgg.h"
 #include "Game/Drawable/DrawableDaisyFist.h"
 
+// Necessary to force extrwi instead of rlwinm
+union RenderSnapshotFlags
+{
+    u32 raw;
+    struct
+    {
+        u32 _b0    : 1;   // 0x80000000
+        u32 _b1    : 1;   // 0x40000000  -> _2294
+        u32 _b2_6  : 5;
+        u32 _b7    : 1;   // 0x01000000  -> Bowser
+        u32 _b8    : 1;   // 0x00800000  -> _1FC0
+        u32 _b9_31 : 23;
+    } bits;
+};
+
 class RenderSnapshot
 {
 public:
@@ -74,7 +89,7 @@ public:
     nlVector3 mCameraUp;
     nlVector3 _2440[60];
     float mFrameBlendPercent;
-    u32 _2714;
+    RenderSnapshotFlags _2714;
     float _2718;
 };
 
