@@ -49,8 +49,6 @@
 
 extern "C"
 {
-    void RestoreWorldRendering(Presentation* presentation);
-    bool DuringEndOfGamePresentation(Presentation* presentation);
 
     extern float g_AllActorsHidden;
 }

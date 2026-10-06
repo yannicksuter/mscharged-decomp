@@ -54,7 +54,7 @@ World::~World()
     typedef nlAVLTreeIterator<unsigned long, DrawableObject*,
         DefaultKeyCompare<unsigned long> > DrawableIterator;
 
-    m_objectList0.Clear();
+    m_renderObjects.Clear();
     m_objectList1.Clear();
     m_updateObjects.Clear();
 
@@ -88,7 +88,7 @@ void World::AddDrawableObject(DrawableObject* pDrawableObject)
 
     if (pDrawableObject->m_uObjectCreationFlags & 2)
     {
-        m_objectList0.AddEnd(
+        m_renderObjects.AddEnd(
             (WorldListObject0_80340AC8*)pDrawableObject);
     }
 
@@ -112,12 +112,12 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
     if (uFlags & 2)
     {
         nlDLListIterator<WorldListObject0_80340AC8*> iterator;
-        iterator = m_objectList0.Begin();
+        iterator = m_renderObjects.Begin();
         while (iterator.hasNext())
         {
             if (*iterator == (WorldListObject0_80340AC8*)pObject)
             {
-                m_objectList0.Remove(&iterator);
+                m_renderObjects.Remove(&iterator);
                 return;
             }
             iterator.next();
@@ -390,7 +390,7 @@ void World::Render()
     if (m_bRenderingEnabled)
     {
         nlDLListIterator<WorldListObject0_80340AC8*> iterator;
-        iterator = m_objectList0.Begin();
+        iterator = m_renderObjects.Begin();
         while (iterator.hasNext())
         {
             if (((DrawableObject*)*iterator)

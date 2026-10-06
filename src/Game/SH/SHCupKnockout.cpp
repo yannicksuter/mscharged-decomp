@@ -395,7 +395,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
 
     bool finished = tournamentGame->IsFinished();
     int winnerSide = -1;
-    tournamentGame->GetWinnerAndLoser(&winnerSide, 0);
+    tournamentGame->GetWinnerResult(&winnerSide, 0);
     homeConfidence->m_bVisible = false;
     awayConfidence->m_bVisible = false;
 
@@ -448,8 +448,8 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
     switch (tournamentGame->mState)
     {
     case NET_TOURN_GAME_NO_CONTEST:
-    case NET_TOURN_GAME_STATE_10:
-    case NET_TOURN_GAME_STATE_11:
+    case NET_TOURN_GAME_DID_NOT_FINISH:
+    case NET_TOURN_GAME_COULD_NOT_START:
         timer->SetActiveSlide("DNF", true, false);
         FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(timer, "timer")
             ->SetStringId("DNF");
@@ -462,8 +462,8 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
             ->SetStringId("TOURNAMENT_BY");
         timer->m_bVisible = true;
         break;
-    case NET_TOURN_GAME_STATE_3:
-    case NET_TOURN_GAME_STATE_4:
+    case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
+    case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
     case NET_TOURN_GAME_OVER:
         timer->m_bVisible = false;
         break;

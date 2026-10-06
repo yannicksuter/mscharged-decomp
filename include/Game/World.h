@@ -52,7 +52,7 @@ public:
     void ResetEffects();
     void TriggerEffects(unsigned long uType);
 
-    /* 0x04 */ nlDLListContainer<WorldListObject0_80340AC8*> m_objectList0;
+    /* 0x04 */ nlDLListContainer<WorldListObject0_80340AC8*> m_renderObjects;
     /* 0x0C */ nlDLListContainer<WorldListObject1_80340AC8*> m_objectList1;
     /* 0x14 */ nlDLListContainer<WorldUpdateObject_80341BC8*> m_updateObjects;
     /* 0x1C */ nlListContainer<WorldEffect*> m_worldEffects;

@@ -3,12 +3,17 @@
 
 class AudioSystem;
 class AudioBackend;
+class XSoundHandle;
 
 extern AudioSystem* g_pAudioSystem;
 extern AudioBackend* g_pAudioBackend;
 extern void* g_pAudioSilenceBuffer;
 extern unsigned long gAudioMemorySize;
 extern float sSpeedOfSound;
+extern void* gExclusiveAudioContext;
+extern XSoundHandle* g_pLastAudioHandle;
+extern unsigned int gResidentVoiceDropCount;
+extern unsigned int gStreamVoiceDropCount;
 
 void ReleaseAudioSoundOwner(void* value, void* owner);
 void SetControllerSpeakerEnabled(bool enabled);

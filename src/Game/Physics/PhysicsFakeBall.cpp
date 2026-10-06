@@ -63,8 +63,8 @@ static void ClearBallCache()
     FakeBallWorld::mfLastCacheTime = -1.0f;
     if (FakeBallWorld::mpPredictWorld != 0)
     {
-        FakeBallWorld::mpPredictWorld->mbHitSuccess = false;
-        FakeBallWorld::mpPredictWorld->mUnidentified1D = false;
+        FakeBallWorld::mpPredictWorld->mbCacheHitGoaliePlane = false;
+        FakeBallWorld::mpPredictWorld->mbCacheReachedGoalLine = false;
     }
 }
 
@@ -93,12 +93,12 @@ BallCacheInfo* FakeBallWorld::AddCacheEntry(
     }
     nlDLRingAddEnd(&mBallCacheList.m_Head, pNewEntry);
 
-    float fUnidentified0 = (float)fabs(pPhysicsBall->GetPosition().x);
-    float fUnidentified1
+    float fAbsoluteBallX = (float)fabs(pPhysicsBall->GetPosition().x);
+    float fGoalLineContactX
         = cField::GetGoalLineX(1U) - pPhysicsBall->GetRadius();
-    if (fUnidentified0 >= fUnidentified1)
+    if (fAbsoluteBallX >= fGoalLineContactX)
     {
-        mpPredictWorld->mUnidentified1D = true;
+        mpPredictWorld->mbCacheReachedGoalLine = true;
     }
 
     return pNewInfo;
@@ -685,7 +685,7 @@ FakeBallWorld::FakeBallWorld(cBall* pBall)
             PhysicsGoaliePlane(plane, *this);
     mpGoaliePlane1->DisableCollisions();
     mpGoaliePlane2->DisableCollisions();
-    mbHitSuccess = false;
+    mbCacheHitGoaliePlane = false;
 }
 
 FakeBallWorld::~FakeBallWorld()
@@ -805,7 +805,7 @@ bool FakeBallWorld::FindBallIntercept(const nlVector3& v3PlayerPos,
     return fInterceptTime < fMaxTime;
 }
 
-extern "C" void fn_8016EEC8()
+void EnablePredictedGoaliePlanes()
 {
     if (!FakeBallWorld::mpPredictWorld->mpGoaliePlane1
             ->AreCollisionsEnabled())
@@ -814,15 +814,15 @@ extern "C" void fn_8016EEC8()
             ->EnableCollisions();
         FakeBallWorld::mpPredictWorld->mpGoaliePlane2
             ->EnableCollisions();
-        if (FakeBallWorld::mpPredictWorld->mUnidentified1D)
+        if (FakeBallWorld::mpPredictWorld->mbCacheReachedGoalLine)
         {
-            FakeBallWorld::mpPredictWorld->mUnidentified1D = false;
+            FakeBallWorld::mpPredictWorld->mbCacheReachedGoalLine = false;
             FakeBallWorld::InvalidateBallCache();
         }
     }
 }
 
-extern "C" void fn_8016F06C()
+void DisablePredictedGoaliePlanes()
 {
     if (FakeBallWorld::mpPredictWorld->mpGoaliePlane1
             ->AreCollisionsEnabled())
@@ -831,9 +831,9 @@ extern "C" void fn_8016F06C()
             ->DisableCollisions();
         FakeBallWorld::mpPredictWorld->mpGoaliePlane2
             ->DisableCollisions();
-        if (FakeBallWorld::mpPredictWorld->mbHitSuccess)
+        if (FakeBallWorld::mpPredictWorld->mbCacheHitGoaliePlane)
         {
-            FakeBallWorld::mpPredictWorld->mbHitSuccess = false;
+            FakeBallWorld::mpPredictWorld->mbCacheHitGoaliePlane = false;
             FakeBallWorld::InvalidateBallCache();
         }
     }
@@ -852,7 +852,7 @@ ContactType FakePhysicsBall::Contact(
 {
     if (object->GetObjectType() == 0x16)
     {
-        mWorld.mbHitSuccess = true;
+        mWorld.mbCacheHitGoaliePlane = true;
     }
     return PhysicsBall::Contact(object, contact, numContacts);
 }

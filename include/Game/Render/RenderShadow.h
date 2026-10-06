@@ -38,6 +38,6 @@ void RenderProjectedShadow(const ProjectedShadowParams& params);
 
 RLView* SetCharacterShadowView(RLView* view);
 void ClearCharacterShadowsUpdated();
-void fn_80186354(ChargeShadowDrawable* object);
+void DrawBallShadowAndGlow(ChargeShadowDrawable* object);
 
 #endif // GAME_RENDER_RENDERSHADOW_H

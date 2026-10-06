@@ -2180,7 +2180,7 @@ bool Goalie::CheckForLobSave(bool bParam)
                     nlVec4Set(v4Plane, -1.0f, 0.0f, 0.0f, 0.1f + -fGoalLine);
                 nlVector3 v3Position;
                 nlVector3 v3Velocity;
-                fn_8016EEC8();
+                EnablePredictedGoaliePlanes();
                 float fContactTime = FakeBallWorld::GetPredictedPlaneIntersectTime(v4Plane, v3Position, v3Velocity);
                 if (fContactTime > 0.0f && IsInsideNetArea(v3Position))
                 {
@@ -2194,7 +2194,7 @@ bool Goalie::CheckForLobSave(bool bParam)
                         float fHeight;
                         fTime = FakeBallWorld::GetPredictedHeightLimitTime(2.5f, gfLobSaveMinTime,
                             v3Position, v3Velocity, fHeight, true);
-                        fn_8016F06C();
+                        DisablePredictedGoaliePlanes();
                         if (fHeight < 3.0f)
                             return false;
                         if (fTime > gfLobSaveMinTime)
@@ -2205,10 +2205,10 @@ bool Goalie::CheckForLobSave(bool bParam)
                         }
                         return false;
                     }
-                    fn_8016F06C();
+                    DisablePredictedGoaliePlanes();
                     return false;
                 }
-                fn_8016F06C();
+                DisablePredictedGoaliePlanes();
             }
         }
         float fCatchRange = 2.0f + gfLobSaveNetRange;
@@ -2219,10 +2219,10 @@ bool Goalie::CheckForLobSave(bool bParam)
             nlVector3 v3Velocity;
             float fHeight;
             float fLimit = 1.5f;
-            fn_8016EEC8();
+            EnablePredictedGoaliePlanes();
             float fContactTime = FakeBallWorld::GetPredictedHeightLimitTime(fLimit, gfLobSaveMinTime,
                 v3Position, v3Velocity, fHeight, true);
-            fn_8016F06C();
+            DisablePredictedGoaliePlanes();
             if (fHeight < 3.0f)
                 return false;
             if (fContactTime > gfLobSaveMinTime

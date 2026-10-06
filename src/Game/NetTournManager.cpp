@@ -106,8 +106,8 @@ void NetTournManager::Reset(bool)
     mLocalMachineEliminated = false;
     mTournamentMachineMappingActive = false;
     mCurrentGameIndex = -1;
-    mTournamentToMachine[0] = -1;
-    mTournamentToMachine[1] = -1;
+    mGameToTournamentMachine[0] = -1;
+    mGameToTournamentMachine[1] = -1;
     mFirstGameInRound = 0;
     mLastGameInRound = -1;
     mLastGameProgressUpdate = -1;
@@ -278,7 +278,7 @@ void NetTournManager::AdvanceBracket()
         for (int side = 0; side < 2; ++side, ++previousFirst)
         {
             int winningMachine = -1;
-            mGames[previousFirst].GetWinnerAndLoser(0, &winningMachine);
+            mGames[previousFirst].GetWinnerResult(0, &winningMachine);
             if (winningMachine != -1)
             {
                 NetworkDraftTeam* draftTeam
@@ -307,8 +307,8 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
 
     mTournamentMachineMappingActive = true;
     mCurrentGameIndex = (s8)message->mUnidentified1C[0];
-    mTournamentToMachine[0] = (s8)message->mUnidentified1C[1];
-    mTournamentToMachine[1] = (s8)message->mUnidentified1C[2];
+    mGameToTournamentMachine[0] = (s8)message->mUnidentified1C[1];
+    mGameToTournamentMachine[1] = (s8)message->mUnidentified1C[2];
 
     u8 gameBuffer[0xFF];
     u8 buffer[0xFF];
@@ -319,7 +319,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     SendToAllTournamentMachines(buffer, size);
 
     bool isHomeMachine = false;
-    if (mLocalMachineIndex == mTournamentToMachine[0])
+    if (mLocalMachineIndex == mGameToTournamentMachine[0])
     {
         isHomeMachine = true;
     }
@@ -334,14 +334,14 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
 
 int NetTournManager::MachineIdxToTournamentIdx(int machine) const
 {
-    return mTournamentToMachine[machine];
+    return mGameToTournamentMachine[machine];
 }
 
 int NetTournManager::TournamentIdxToMachineIdx(int machine) const
 {
     for (int i = 0; i < 2; ++i)
     {
-        if (machine == mTournamentToMachine[i])
+        if (machine == mGameToTournamentMachine[i])
         {
             return i;
         }
@@ -515,7 +515,7 @@ void NetTournManager::StartReadyGames()
         {
             if (!SendTournamentGameStart(game))
             {
-                game->mState = NET_TOURN_GAME_STATE_11;
+                game->mState = NET_TOURN_GAME_COULD_NOT_START;
                 u8 buffer[0xFF];
                 NetMessageTournamentGameUpdate update(
                     3, gameIndex, true, 0, 0, false);
@@ -567,22 +567,22 @@ bool NetworkTournamentGame::IsFinished() const
     switch (mState)
     {
     case NET_TOURN_GAME_IN_PROGRESS:
-    case NET_TOURN_GAME_STATE_3:
-    case NET_TOURN_GAME_STATE_4:
+    case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
+    case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
     case NET_TOURN_GAME_OVER:
         return true;
     case NET_TOURN_GAME_NO_CONTEST:
     case NET_TOURN_GAME_NO_PLAYERS:
     case NET_TOURN_GAME_HOME_ADVANCES:
     case NET_TOURN_GAME_AWAY_ADVANCES:
-    case NET_TOURN_GAME_STATE_10:
-    case NET_TOURN_GAME_STATE_11:
+    case NET_TOURN_GAME_DID_NOT_FINISH:
+    case NET_TOURN_GAME_COULD_NOT_START:
     default:
         return false;
     }
 }
 
-bool NetworkTournamentGame::GetWinnerAndLoser(
+bool NetworkTournamentGame::GetWinnerResult(
     int* winnerSide, int* winningMachine) const
 {
     switch (mState)
@@ -592,8 +592,8 @@ bool NetworkTournamentGame::GetWinnerAndLoser(
         return false;
     case NET_TOURN_GAME_IN_PROGRESS:
         return false;
-    case NET_TOURN_GAME_STATE_3:
-    case NET_TOURN_GAME_STATE_4:
+    case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
+    case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
         return false;
     case NET_TOURN_GAME_OVER:
     {
@@ -626,8 +626,8 @@ bool NetworkTournamentGame::GetWinnerAndLoser(
     }
     case NET_TOURN_GAME_NO_CONTEST:
     case NET_TOURN_GAME_NO_PLAYERS:
-    case NET_TOURN_GAME_STATE_10:
-    case NET_TOURN_GAME_STATE_11:
+    case NET_TOURN_GAME_DID_NOT_FINISH:
+    case NET_TOURN_GAME_COULD_NOT_START:
         if (winnerSide != 0)
         {
             *winnerSide = -1;
@@ -683,13 +683,13 @@ void NetTournManager::MarkDisconnectedMachine(int machine)
         {
         case NET_TOURN_GAME_EMPTY:
         case NET_TOURN_GAME_READY:
-            game.mState = NET_TOURN_GAME_STATE_11;
+            game.mState = NET_TOURN_GAME_COULD_NOT_START;
             break;
         case NET_TOURN_GAME_IN_PROGRESS:
-            game.mState = NET_TOURN_GAME_STATE_10;
+            game.mState = NET_TOURN_GAME_DID_NOT_FINISH;
             break;
-        case NET_TOURN_GAME_STATE_3:
-        case NET_TOURN_GAME_STATE_4:
+        case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
+        case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
             game.mState = NET_TOURN_GAME_OVER;
             break;
         }
@@ -703,7 +703,7 @@ bool NetTournManager::AreRoundGamesFinished()
     {
         int winner = -1;
         NetworkTournamentGame& game = mGames[gameIndex];
-        if (!game.GetWinnerAndLoser(&winner, 0))
+        if (!game.GetWinnerResult(&winner, 0))
         {
             return false;
         }
@@ -770,7 +770,7 @@ void NetTournManager::Update(float dt)
                     || game->mMachines[1] == mLocalMachineIndex)
                 {
                     int winningMachine = -1;
-                    game->GetWinnerAndLoser(0, &winningMachine);
+                    game->GetWinnerResult(0, &winningMachine);
                     if (mLocalMachineIndex != winningMachine)
                     {
                         mLocalMachineEliminated = true;
@@ -783,7 +783,7 @@ void NetTournManager::Update(float dt)
             {
                 gameIndex = mFirstGameInRound;
                 mWinningMachine = -1;
-                mGames[gameIndex].GetWinnerAndLoser(0, &mWinningMachine);
+                mGames[gameIndex].GetWinnerResult(0, &mWinningMachine);
                 gNetworkMessageRegistry->UnregisterReceiver(32);
                 gNetworkMessageRegistry->UnregisterReceiver(33);
                 NetworkMachineRoster* roster
@@ -819,7 +819,7 @@ void NetTournManager::Update(float dt)
                 }
 
                 bool isHomeMachine = false;
-                if (mLocalMachineIndex == mTournamentToMachine[0])
+                if (mLocalMachineIndex == mGameToTournamentMachine[0])
                 {
                     isHomeMachine = true;
                 }
@@ -880,7 +880,7 @@ void NetTournManager::NotifyGameStarted()
     }
 
     bool isHomeMachine = false;
-    if (mLocalMachineIndex == mTournamentToMachine[0])
+    if (mLocalMachineIndex == mGameToTournamentMachine[0])
     {
         isHomeMachine = true;
     }
@@ -926,7 +926,7 @@ void NetTournManager::NotifyFinishedLoadingToKnockout()
 void NetTournManager::NotifyOverlayPopped(int)
 {
     bool isHomeMachine = false;
-    if (mLocalMachineIndex == mTournamentToMachine[0])
+    if (mLocalMachineIndex == mGameToTournamentMachine[0])
     {
         isHomeMachine = true;
     }
@@ -940,7 +940,7 @@ void NetTournManager::NotifyOverlayPopped(int)
 void NetTournManager::NotifyGameOver()
 {
     bool isHomeMachine = false;
-    if (mLocalMachineIndex == mTournamentToMachine[0])
+    if (mLocalMachineIndex == mGameToTournamentMachine[0])
     {
         isHomeMachine = true;
     }
@@ -1033,10 +1033,10 @@ void NetTournManager::HandleTournamentGameUpdate(
         case NET_TOURN_GAME_EMPTY:
         case NET_TOURN_GAME_READY:
         case NET_TOURN_GAME_IN_PROGRESS:
-        case NET_TOURN_GAME_STATE_3:
-        case NET_TOURN_GAME_STATE_4:
-        case NET_TOURN_GAME_STATE_10:
-            game.mState = NET_TOURN_GAME_STATE_10;
+        case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
+        case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
+        case NET_TOURN_GAME_DID_NOT_FINISH:
+            game.mState = NET_TOURN_GAME_DID_NOT_FINISH;
             break;
         }
     }
@@ -1051,8 +1051,8 @@ void NetTournManager::HandleTournamentGameUpdate(
             break;
         case NET_TOURN_GAME_EMPTY:
         case NET_TOURN_GAME_READY:
-        case NET_TOURN_GAME_STATE_11:
-            game.mState = NET_TOURN_GAME_STATE_11;
+        case NET_TOURN_GAME_COULD_NOT_START:
+            game.mState = NET_TOURN_GAME_COULD_NOT_START;
             break;
         }
     }
@@ -1061,15 +1061,15 @@ void NetTournManager::HandleTournamentGameUpdate(
         switch (game.mState)
         {
         case NET_TOURN_GAME_EMPTY:
-        case NET_TOURN_GAME_STATE_3:
-        case NET_TOURN_GAME_STATE_4:
+        case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
+        case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
         case NET_TOURN_GAME_OVER:
         case NET_TOURN_GAME_NO_CONTEST:
         case NET_TOURN_GAME_NO_PLAYERS:
         case NET_TOURN_GAME_HOME_ADVANCES:
         case NET_TOURN_GAME_AWAY_ADVANCES:
-        case NET_TOURN_GAME_STATE_10:
-        case NET_TOURN_GAME_STATE_11:
+        case NET_TOURN_GAME_DID_NOT_FINISH:
+        case NET_TOURN_GAME_COULD_NOT_START:
         default:
             tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring GameInProgress NetworkTournamentGameUpdate because game group BGI status is %d\n",
@@ -1112,8 +1112,8 @@ void NetTournManager::HandleTournamentGameUpdate(
         case NET_TOURN_GAME_NO_PLAYERS:
         case NET_TOURN_GAME_HOME_ADVANCES:
         case NET_TOURN_GAME_AWAY_ADVANCES:
-        case NET_TOURN_GAME_STATE_10:
-        case NET_TOURN_GAME_STATE_11:
+        case NET_TOURN_GAME_DID_NOT_FINISH:
+        case NET_TOURN_GAME_COULD_NOT_START:
         default:
             tDebugPrintManager::Print(DC_NETWORK,
                 "Ignoring GameOver NetworkTournamentGameUpdate because game group BGI status is %d\n",
@@ -1125,15 +1125,15 @@ void NetTournManager::HandleTournamentGameUpdate(
             game.mGameTimeDelta = message->mGameTimeDelta;
             if (message->mIsHomeMachine)
             {
-                game.mState = NET_TOURN_GAME_STATE_3;
+                game.mState = NET_TOURN_GAME_HOME_RESULT_RECEIVED;
             }
             else
             {
-                game.mState = NET_TOURN_GAME_STATE_4;
+                game.mState = NET_TOURN_GAME_AWAY_RESULT_RECEIVED;
             }
             game.mGameInfo = message->mGameInfo;
             break;
-        case NET_TOURN_GAME_STATE_3:
+        case NET_TOURN_GAME_HOME_RESULT_RECEIVED:
         {
             if (message->mIsHomeMachine)
             {
@@ -1165,7 +1165,7 @@ void NetTournManager::HandleTournamentGameUpdate(
             }
             break;
         }
-        case NET_TOURN_GAME_STATE_4:
+        case NET_TOURN_GAME_AWAY_RESULT_RECEIVED:
         {
             if (!message->mIsHomeMachine)
             {

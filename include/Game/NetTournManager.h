@@ -11,15 +11,15 @@ enum NetworkTournamentGameState
     NET_TOURN_GAME_EMPTY = 0,
     NET_TOURN_GAME_READY = 1,
     NET_TOURN_GAME_IN_PROGRESS = 2,
-    NET_TOURN_GAME_STATE_3 = 3,
-    NET_TOURN_GAME_STATE_4 = 4,
+    NET_TOURN_GAME_HOME_RESULT_RECEIVED = 3,
+    NET_TOURN_GAME_AWAY_RESULT_RECEIVED = 4,
     NET_TOURN_GAME_OVER = 5,
     NET_TOURN_GAME_NO_CONTEST = 6,
     NET_TOURN_GAME_NO_PLAYERS = 7,
     NET_TOURN_GAME_HOME_ADVANCES = 8,
     NET_TOURN_GAME_AWAY_ADVANCES = 9,
-    NET_TOURN_GAME_STATE_10 = 10,
-    NET_TOURN_GAME_STATE_11 = 11,
+    NET_TOURN_GAME_DID_NOT_FINISH = 10,
+    NET_TOURN_GAME_COULD_NOT_START = 11,
 };
 
 struct NetworkTournamentGame
@@ -30,7 +30,7 @@ struct NetworkTournamentGame
     }
 
     bool IsFinished() const;
-    bool GetWinnerAndLoser(int* winnerSide, int* winningMachine) const;
+    bool GetWinnerResult(int* winnerSide, int* winningMachine) const;
     void Reset(int bracketIndex)
     {
         mState = NET_TOURN_GAME_EMPTY;
@@ -63,13 +63,7 @@ public:
     static void CreateInstance();
     static NetTournManager* Instance();
     int fn_801CA9D0() const { return mWinningMachine; }
-    // Bounded fit, not recovered source: R4QE01's CupKnockoutScene::SceneCreated
-    // keeps this value in a register allocated ahead of the inlined FEFinder
-    // result that follows it. Under GC/3.0a5 a caller-scope local holding the
-    // same computation is allocated after every inline temporary, so the value
-    // came out of an inline function. That function's owner and name are not
-    // recoverable - SceneCreated is its only reader and the DOL keeps no
-    // out-of-line copy - so it sits with the two fields it reads.
+    // Returns the nonnegative countdown, or -1 when games are not waiting to start.
     int GetSecondsToStartGames() const
     {
         if (!mWaitingToStartGames)
@@ -150,7 +144,7 @@ public:
     /* 0x925 */ bool mTournamentMachineMappingActive;
     /* 0x926 */ u8 mPadding926[2];
     /* 0x928 */ int mCurrentGameIndex;
-    /* 0x92C */ int mTournamentToMachine[2];
+    /* 0x92C */ int mGameToTournamentMachine[2];
     /* 0x934 */ int mFirstGameInRound;
     /* 0x938 */ int mLastGameInRound;
     /* 0x93C */ int mLastGameProgressUpdate;

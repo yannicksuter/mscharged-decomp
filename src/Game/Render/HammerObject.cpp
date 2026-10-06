@@ -32,7 +32,6 @@ extern "C"
 
     nlVector4 sHammerForward = { 1.0f, 0.0f, 0.0f, 0.0f };
 
-    extern void fn_802B5444(nlQuaternion&, unsigned short);
 }
 
 bool PlaySound(int, unsigned long, const void*, void*);
@@ -209,7 +208,7 @@ void HammerObject::OnLanding()
         nlQuaternion facing;
         nlQuaternion target;
         nlQuaternion tilt;
-        fn_802B5444(tilt,
+        nlMakeQuatY(tilt,
             (u16)(int)(sHammerRadiansToAngleUnits
                 * ToRadians(sHammerHalf * (gHammerMaxLandingAngle + gHammerMinLandingAngle))));
 
@@ -240,9 +239,9 @@ void HammerObject::OnLanding()
             lowDegrees = gHammerMinLandingAngle;
             float lowAngle = pi * lowDegrees / sHammerDegreesPerHalfTurn;
             float highAngle = pi * gHammerMaxLandingAngle / sHammerDegreesPerHalfTurn;
-            fn_802B5444(lowTilt,
+            nlMakeQuatY(lowTilt,
                 (u16)(int)(sHammerRadiansToAngleUnits * lowAngle));
-            fn_802B5444(highTilt,
+            nlMakeQuatY(highTilt,
                 (u16)(int)(sHammerRadiansToAngleUnits * highAngle));
 
             nlQuaternion lowOrientation;

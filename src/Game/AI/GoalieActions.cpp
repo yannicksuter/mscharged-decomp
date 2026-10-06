@@ -5619,7 +5619,7 @@ void Goalie::fn_8008CED8(float fTargetTime,
         pOtherAnim->mv3SavePos.z,
         fHeightRatio);
 
-    fn_8016EEC8();
+    EnablePredictedGoaliePlanes();
     nlVector3 v3PredictedPosition;
     nlVector3 v3PredictedVelocity;
     float fTargetHeight;
@@ -5630,7 +5630,7 @@ void Goalie::fn_8008CED8(float fTargetTime,
             v3PredictedVelocity,
             fTargetHeight,
             true);
-    fn_8016F06C();
+    DisablePredictedGoaliePlanes();
 
     if (fPredictedTime > 0.0f)
     {
@@ -5683,7 +5683,7 @@ void Goalie::fn_8008D210(float fDeltaT)
 
     mfWaitTime -= fDeltaT;
 
-    fn_8016EEC8();
+    EnablePredictedGoaliePlanes();
 
     nlVector3 v3ObservedPosition;
     nlVector3 v3ObservedVelocity;
@@ -5941,7 +5941,7 @@ void Goalie::fn_8008D210(float fDeltaT)
         mv3NavTarget.z = 0.0f;
     }
 
-    fn_8016F06C();
+    DisablePredictedGoaliePlanes();
 
     if (mpSaveData == 0)
     {

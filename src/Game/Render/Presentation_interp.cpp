@@ -569,7 +569,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 74:
         ++m_SP;
-        m_SP[-1] = nlRandomf(1.0f, &mRandomSeed) <= lbl_806DEF98;
+        m_SP[-1] = nlRandomf(1.0f, &mRandomSeed) <= gPresentationRandomChoiceChance;
         break;
     case 75:
         ++m_SP;

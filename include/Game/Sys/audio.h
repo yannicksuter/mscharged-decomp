@@ -14,20 +14,20 @@ extern bool gAudioEnabled;
 struct AudioHandleState
 {
     void Set(int slotId, unsigned long cueId,
-        void* context, bool restartable)
+        void* context, bool resumable)
     {
         m_CueId = cueId;
         m_Context = context;
-        m_FlagsHi16 = slotId;
-        m_FlagsBit15 = restartable;
-        m_FlagsBits12_14 = 0;
+        m_SlotId = slotId;
+        m_CanResume = resumable;
+        m_PauseDepth = 0;
     }
 
     unsigned long m_CueId;
     void* m_Context;
-    unsigned long m_FlagsHi16 : 16;
-    unsigned long m_FlagsBit15 : 1;
-    unsigned long m_FlagsBits12_14 : 3;
+    unsigned long m_SlotId : 16;
+    unsigned long m_CanResume : 1;
+    unsigned long m_PauseDepth : 3;
     unsigned long : 12;
 };
 
@@ -61,10 +61,10 @@ bool IsSoundTracked(unsigned long cueId, void* context);
 XSoundHandle* FindSoundHandle(
     unsigned long cueId, void* context);
 bool PlayTrackedSound(int slotId, unsigned long cueId,
-    const void* debugName, void* context, bool restartable);
+    const void* debugName, void* context, bool resumable);
 bool PlayTrackedOwnedSound(int slotId, unsigned long cueId,
     XSoundOwner* owner, const void* debugName,
-    void* context, bool restartable);
+    void* context, bool resumable);
 void StopSound(unsigned long cueId, void* context);
 void PauseSound(unsigned long cueId, void* context);
 void ResumeSound(unsigned long cueId, void* context);
@@ -74,7 +74,7 @@ void SetSoundCallbackEnabled(
     unsigned long cueId, void* context, unsigned char enabled);
 bool PrepareTrackedSound(int slotId, unsigned long cueId,
     XSoundOwner* owner, const void* debugName,
-    void* context, bool restartable);
+    void* context, bool resumable);
 bool StartTrackedSound(unsigned long cueId, void* context);
 void PauseAllAudio();
 void ResumeAllAudio();

@@ -26,7 +26,7 @@
 #include "Game/Physics/Physics.h"
 
 
-extern "C" int strcmpi(const char*, const char*);
+#include <extras.h>
 extern "C" bool fn_8003E948(const cFielder*);
 
 
@@ -34,7 +34,7 @@ static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
 static bool sbDoDKBallStuckHack = true;
 static float sfBallStuckHackShoveMagnitude = 10.0f;
 
-void fn_80142A1C()
+void ClearPlayerPlayerCollisionCache()
 {
     for (int i = 0; i < 100; ++i)
     {

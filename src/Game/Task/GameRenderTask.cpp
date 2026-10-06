@@ -5,6 +5,7 @@
 #include "types.h"
 
 #include "Game/BasicStadium.h"
+#include "Game/Render/ChainChomp.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
@@ -66,7 +67,6 @@
 #include <string.h>
 
 const nlVector3 gRenderUpVector = { 0.0f, 0.0f, 1.0f };
-extern void* gpChainChompShadowView;
 
 GameRenderTask* GameRenderTask::sInstance;
 
@@ -77,14 +77,14 @@ static u8 g_bWarblePreview;
 static u8 g_bWarbleShow;
 static float g_fWarbleBlobScale;
 static float g_fWarbleDuration = 0.375f;
-static float lbl_806DC7E0 = 3.0f;
-static float lbl_806DC7E4 = 12.0f;
-static float lbl_806DC7E8 = 32.0f;
-static float lbl_806DC7EC = 32.0f;
-static float lbl_806DC7F0 = 0.8125f;
-static float lbl_806E101C;
+static float sWarbleTestParameter0 = 3.0f;
+static float sWarbleTestParameter1 = 12.0f;
+static float sWarbleTestParameter2 = 32.0f;
+static float sWarbleTestParameter3 = 32.0f;
+static float sWarbleTestParameter4 = 0.8125f;
+static float sWarbleTestParameter5;
 bool g_bRenderWorld = true;
-static bool lbl_806DC7F5 = true;
+static bool sWarbleParticleRenderingEnabled = true;
 static bool g_bUpdateImpostorSprites = true;
 static u8 g_bMemoryOnScreen;
 static u8 g_bShowEmissionLights;
@@ -106,12 +106,12 @@ static void WarbleTest(float fDeltaT)
             + BasicStadium::GetCurrentStadium()->m_shadowHeight;
         config.blobScale = g_fWarbleBlobScale;
         config.duration = g_fWarbleDuration;
-        config.parameters[0] = lbl_806DC7E0;
-        config.parameters[1] = lbl_806DC7E4;
-        config.parameters[2] = lbl_806DC7E8;
-        config.parameters[3] = lbl_806DC7EC;
-        config.parameters[4] = lbl_806DC7F0;
-        config.parameters[5] = lbl_806E101C;
+        config.parameters[0] = sWarbleTestParameter0;
+        config.parameters[1] = sWarbleTestParameter1;
+        config.parameters[2] = sWarbleTestParameter2;
+        config.parameters[3] = sWarbleTestParameter3;
+        config.parameters[4] = sWarbleTestParameter4;
+        config.parameters[5] = sWarbleTestParameter5;
         SetWarbleInstance(&gWarble, new (8, false) WarbleInstance(config));
     }
 
@@ -196,7 +196,7 @@ void InstallImageRenderCallback()
 
 void GameRenderTask::Run(float fDeltaT)
 {
-    mValue_20 += fDeltaT;
+    mElapsedTime += fDeltaT;
 
     if (gpHBMManager != 0 && gpHBMManager->mActive && gpHBMManager->mReady)
     {
@@ -214,7 +214,7 @@ void GameRenderTask::Run(float fDeltaT)
 
     if (NisPlayer::Instance()->HasSecondaryNis())
     {
-        void* save14F8;
+        RLView* save14F8;
         GLView* save19D8;
         int saveView;
         GLView* saveStadiumOpaqueView;
@@ -552,8 +552,8 @@ void SetRenderWorldEffects(unsigned int enabled)
     }
 }
 
-bool fn_80115EB0()
+bool IsWarbleParticleRenderingEnabled()
 {
-    return lbl_806DC7F5;
+    return sWarbleParticleRenderingEnabled;
 }
 

@@ -4,6 +4,7 @@
 #include "Game/Physics/PhysicsWaluigiWall.h"
 
 #include "Game/AI/Fielder.h"
+#include "Game/AI/AiUtil.h"
 #include "Game/Goalie.h"
 #include "Game/Ball.h"
 #include "Game/CharacterTweaks.h"
@@ -33,7 +34,6 @@
 #include "NL/nlFunction.inl"
 
 extern "C" void fn_80060608(cGame*, cFielder*);
-float Interpolate(float, float, float);
 
 void OnWaluigiWallEffectFinished(EmissionController&, int);
 void UpdateWaluigiWallEmitter(EmissionController&);

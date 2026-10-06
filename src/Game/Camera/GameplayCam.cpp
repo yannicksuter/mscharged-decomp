@@ -16,17 +16,17 @@
 #include "NL/gl/glMatrix.h"
 
 
-bool lbl_806DC4F0 = true;
-float lbl_806DC4F4 = 1.0f;
-float lbl_806DC4F8 = 0.05f;
-float lbl_806DC4FC = 0.5f;
-float lbl_806DC500 = 0.2f;
-float lbl_806DC504 = 0.2f;
-float lbl_806DC508 = 30.0f;
-float lbl_806DC50C = 38.0f;
+bool gGameplayCameraOffsetCameraDuringTransition = true;
+float gGameplayCameraMaxZoom = 1.0f;
+float gGameplayCameraMinZoom = 0.05f;
+float gGameplayCameraDynamicZoomOffset = 0.5f;
+float gGameplayCameraScorelessNeutralZoom = 0.2f;
+float gGameplayCameraScoredNeutralZoom = 0.2f;
+float gGameplayCameraNearPitch = 30.0f;
+float gGameplayCameraFarPitch = 38.0f;
 
-float lbl_806E0F10;
-bool lbl_806E0F14;
+float gGameplayCameraZoomOverride;
+bool gGameplayCameraZoomOverrideEnabled;
 bool gGameplayCameraInReplay;
 
 static const float nearZoomPositiveTargetKnotsY[3] = { -5.2f, 0.0f, 10.0f };
@@ -55,7 +55,7 @@ static const CameraData gCameraData[4] = {
         { nearZoomPositiveFieldKnotsY, nearZoomPositiveFieldKnotsY, nearZoomPositiveFieldKnotsY },
         27.3f,
         20.0f,
-        lbl_806DC508,
+        gGameplayCameraNearPitch,
         270.0f,
     },
     {
@@ -67,7 +67,7 @@ static const CameraData gCameraData[4] = {
         { farZoomPositiveFieldKnotsY, farZoomPositiveFieldKnotsY, farZoomPositiveFieldKnotsY },
         27.3f,
         35.0f,
-        lbl_806DC50C,
+        gGameplayCameraFarPitch,
         270.0f,
     },
     {
@@ -79,7 +79,7 @@ static const CameraData gCameraData[4] = {
         { nearZoomPositiveFieldKnotsY, nearZoomPositiveFieldKnotsY, nearZoomPositiveFieldKnotsY },
         27.5f,
         20.0f,
-        lbl_806DC508,
+        gGameplayCameraNearPitch,
         270.0f,
     },
     {
@@ -91,7 +91,7 @@ static const CameraData gCameraData[4] = {
         { farZoomPositiveFieldKnotsY, farZoomPositiveFieldKnotsY, farZoomPositiveFieldKnotsY },
         27.5f,
         35.0f,
-        lbl_806DC50C,
+        gGameplayCameraFarPitch,
         270.0f,
     },
 };
@@ -176,23 +176,23 @@ void GameplayCamera::Update(float deltaTime)
     m_nearZoom.Update(deltaTime, m_ForceNeutralAndNearZoom);
     m_farZoom.Update(deltaTime, m_ForceNeutralAndNearZoom);
 
-    if (m_fZoomOverride != 0.0f || lbl_806E0F14)
+    if (m_fZoomOverride != 0.0f || gGameplayCameraZoomOverrideEnabled)
     {
         m_fZoom = m_fZoomOverride;
-        if (lbl_806E0F14)
+        if (gGameplayCameraZoomOverrideEnabled)
         {
-            m_fZoom = lbl_806E0F10;
+            m_fZoom = gGameplayCameraZoomOverride;
         }
     }
     else if (m_ForceNeutralAndNearZoom)
     {
         if (g_pTeams[0]->m_nScore == 0 && g_pTeams[1]->m_nScore == 0)
         {
-            m_fZoom = lbl_806DC500;
+            m_fZoom = gGameplayCameraScorelessNeutralZoom;
         }
         else
         {
-            m_fZoom = lbl_806DC504;
+            m_fZoom = gGameplayCameraScoredNeutralZoom;
         }
     }
     else
@@ -201,12 +201,12 @@ void GameplayCamera::Update(float deltaTime)
             && !UnidentifiedCameraEffects::Instance()->IsTransitionActive())
         {
             m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
-            m_fDesiredZoom = m_fDesiredZoom - lbl_806DC4FC;
+            m_fDesiredZoom = m_fDesiredZoom - gGameplayCameraDynamicZoomOffset;
             m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->GetZoomScale();
-            m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, lbl_806DC4F8), 1.2f * lbl_806DC4F4);
+            m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, gGameplayCameraMinZoom), 1.2f * gGameplayCameraMaxZoom);
         }
 
-        m_fDesiredZoom = Interpolate(lbl_806DC4F8, lbl_806DC4F4, m_fDesiredZoom);
+        m_fDesiredZoom = Interpolate(gGameplayCameraMinZoom, gGameplayCameraMaxZoom, m_fDesiredZoom);
         float smoothTime;
         if (gamePaused)
         {
@@ -242,7 +242,7 @@ void GameplayCamera::Update(float deltaTime)
 
     m_fFOV = Interpolate(m_nearZoom.GetFOV(), m_farZoom.GetFOV(), m_fZoom);
 
-    float clampedZoom = nlMinEquals(nlMaxEquals(m_fZoom, lbl_806DC4F8), lbl_806DC4F4);
+    float clampedZoom = nlMinEquals(nlMaxEquals(m_fZoom, gGameplayCameraMinZoom), gGameplayCameraMaxZoom);
     m_v3Camera.x = Interpolate(m_nearZoom.m_v3Camera.x, m_farZoom.m_v3Camera.x, clampedZoom);
     m_v3Target.x = Interpolate(m_nearZoom.m_v3Target.x, m_farZoom.m_v3Target.x, clampedZoom);
     m_v3Camera.y = Interpolate(m_nearZoom.m_v3Camera.y, m_farZoom.m_v3Camera.y, clampedZoom);
@@ -260,7 +260,7 @@ void GameplayCamera::Update(float deltaTime)
     {
         up = UnidentifiedCameraEffects::Instance()->RotateCameraVector(mUpVector);
         nlVector3 targetOffset = UnidentifiedCameraEffects::Instance()->CalculateTargetOffset(this);
-        if (lbl_806DC4F0 == true)
+        if (gGameplayCameraOffsetCameraDuringTransition == true)
         {
             nlVec3Add(camera, camera, targetOffset);
         }

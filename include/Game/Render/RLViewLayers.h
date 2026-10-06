@@ -142,6 +142,13 @@ void rlSetWidescreen(bool widescreen);
 bool IsWidescreen();
 void SetupViews();
 
+int GetShadowPartitionCount();
+void SetShadowPartitionEnabled(int partition, bool enabled);
+GLView* GetShadowPartitionView(int partition);
+u32 GetShadowPartitionTexture(int partition);
+void SetShadowPartitionCamera(int partition, const nlMatrix4& view,
+    const nlMatrix4& projection);
+
 extern const nlMatrix4 sIdentityMatrix;
 
 void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect,

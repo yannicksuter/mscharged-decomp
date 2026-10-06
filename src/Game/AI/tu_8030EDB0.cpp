@@ -1,6 +1,6 @@
 #include "Game/AI/DesireUpdate.h"
 
-UnidentifiedFuzzyVariantData lbl_805841D8;
+UnidentifiedFuzzyVariantData gDefaultFuzzyVariantData;
 SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200(16, 16);
 
 UnidentifiedVariantCollection::UnidentifiedVariantCollection()
@@ -51,7 +51,7 @@ FuzzyVariant* UnidentifiedVariantCollection::Get(int index)
         return mData[index];
     }
 
-    return &lbl_805841D8;
+    return &gDefaultFuzzyVariantData;
 }
 
 void UnidentifiedVariantCollection::Set(int index, FuzzyVariant value)

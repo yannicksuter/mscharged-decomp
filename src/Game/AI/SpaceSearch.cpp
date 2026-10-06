@@ -262,7 +262,6 @@ SSearchCutAndBreak::SSearchCutAndBreak(cPlayer* pPlayer)
     m_pPlayer = pPlayer;
 }
 
-// TODO: regswap f1 f2
 SSearchBestPass::SSearchBestPass(cPlayer* pBallOwner, cPlayer* pPassTarget,
     bool bAllowLeadPass, bool bIsPerfectPass, float fPassSpeed)
     : SpaceSearch(pBallOwner != NULL
@@ -275,8 +274,10 @@ SSearchBestPass::SSearchBestPass(cPlayer* pBallOwner, cPlayer* pPassTarget,
     m_pBallOwner = pBallOwner;
     m_pPassTarget = pPassTarget;
 
-    if (pPassTarget->mUnidentified024.m_v3Velocity.GetLengthSq2D() >= 1.0f)
+    if (nlGetLengthSquared2D(pPassTarget->GetVelocity().x,
+            pPassTarget->GetVelocity().y)
+        >= 1.0f)
     {
-        nlVec3Normalize(m_v3PassDirection, pPassTarget->mUnidentified024.m_v3Velocity);
+        nlVec3Normalize(m_v3PassDirection, pPassTarget->GetVelocity());
     }
 }

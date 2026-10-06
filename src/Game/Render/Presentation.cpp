@@ -77,8 +77,8 @@ static inline bool IsNumberDisplayCounting()
 }
 
 static const char* idleFun = "Idle";
-static float lbl_806DEF94 = 0.22f;
-float lbl_806DEF98 = 0.1f;
+static float sGoalCelebrationVariationChance = 0.22f;
+float gPresentationRandomChoiceChance = 0.1f;
 static bool loopPresentation;
 static bool sUseCupTrophy;
 static int sCupTrophy;
@@ -201,8 +201,8 @@ Presentation::Presentation()
     mSkipPastByPass = -1;
     mUnidentified156 = false;
     mUnidentified157 = false;
-    mUnidentified159 = false;
-    mUnidentified160 = false;
+    mResumeAfterPresentation = false;
+    mLastGoalUsedHighFilter = false;
     mUnidentified161 = true;
     mUnidentified162 = false;
     mDrawBlackOverlay = false;
@@ -380,7 +380,7 @@ void Presentation::Finish()
         {
             if (g_pGame->m_eGameState != 3)
             {
-                if (!mUnidentified159)
+                if (!mResumeAfterPresentation)
                 {
                     g_pGame->ChangeGameState(1);
                 }
@@ -795,7 +795,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         gpNumberDisplay->BeginScoreUpdate();
     }
 
-    mUnidentified159 = false;
+    mResumeAfterPresentation = false;
     mDisplayLetterBox = 0.0f;
 
     if (Config::Global().Get<bool>("no_presentation", false))
@@ -832,13 +832,13 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     const char* functionName = "GoalCelebration";
     PlayGoalEffects("Goal_score");
 
-    if (!mUnidentified160 || suddenDeath || closeGoal || scoreTied)
+    if (!mLastGoalUsedHighFilter || suddenDeath || closeGoal || scoreTied)
     {
-        mUnidentified160 = true;
+        mLastGoalUsedHighFilter = true;
     }
     else
     {
-        mUnidentified160 = false;
+        mLastGoalUsedHighFilter = false;
         filter = "low";
     }
 
@@ -847,7 +847,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
 
     if (!suddenDeath && !mUnidentified161
         && !nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && nlRandomf(1.0f, &mRandomSeed) < lbl_806DEF94)
+        && nlRandomf(1.0f, &mRandomSeed) < sGoalCelebrationVariationChance)
     {
         mUnidentified161 = true;
         mUnidentified156 = true;
@@ -982,7 +982,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
     }
 
     gpNumberDisplay->ResetGoalCount();
-    mUnidentified159 = true;
+    mResumeAfterPresentation = true;
     PauseSuddenDeathMusic();
 
     if (IsNetworkOrRecordedGame())
@@ -1037,7 +1037,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
     mMegaStrikeResult.defendingSide = data->defendingSide;
     mMegaStrikeResult.goalValue = data->goalValue;
     mMegaStrikeResult.unknown_08 = data->unknown_08;
-    mUnidentified159 = mMegaStrikeResult.goals == 0;
+    mResumeAfterPresentation = mMegaStrikeResult.goals == 0;
 
     if (IsNetworkOrRecordedGame())
     {
@@ -1762,8 +1762,8 @@ void Presentation::Reset()
     mChargeShadowsVisible = true;
     mUnidentified156 = false;
     mUnidentified157 = false;
-    mUnidentified159 = false;
-    mUnidentified160 = false;
+    mResumeAfterPresentation = false;
+    mLastGoalUsedHighFilter = false;
     mUnidentified161 = true;
     mUnidentified162 = false;
 

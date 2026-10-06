@@ -88,10 +88,10 @@ public:
     /* 0x156 */ bool mUnidentified156;
     /* 0x157 */ bool mUnidentified157;
     /* 0x158 */ bool mUnidentified158;
-    /* 0x159 */ bool mUnidentified159;
+    /* 0x159 */ bool mResumeAfterPresentation;
     /* 0x15A */ u8 mUnidentified15A[0x2];
     /* 0x15C */ float mWaitTimeRemaining;
-    /* 0x160 */ bool mUnidentified160;
+    /* 0x160 */ bool mLastGoalUsedHighFilter;
     /* 0x161 */ bool mUnidentified161;
     /* 0x162 */ bool mUnidentified162;
     /* 0x163 */ bool mDrawBlackOverlay;
@@ -108,11 +108,11 @@ bool IsIdleAndNoShotInProgress(Presentation* presentation);
 void HandlePresentationStateTransition(Presentation* presentation, u32 from, u32 to);
 bool IsNisLoadedOnAllMachines(Presentation* presentation);
 
-extern "C" bool DuringEndOfGamePresentation(
+bool DuringEndOfGamePresentation(
     Presentation* presentation);
-extern "C" void RestoreWorldRendering(
+void RestoreWorldRendering(
     Presentation* presentation);
 
-extern float lbl_806DEF98;
+extern float gPresentationRandomChoiceChance;
 
 #endif // GAME_RENDER_PRESENTATION_H

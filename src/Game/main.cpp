@@ -683,7 +683,7 @@ bool RenderParticleSystem(ParticleSystem* source, GLView* view,
         GLTexturedColourMeshWriter writer;
         BuildParticleQuads(&writer, source, vertices, viewRight, viewUp, pCoordSys);
 
-        if (isWarble && fn_80115EB0())
+        if (isWarble && IsWarbleParticleRenderingEnabled())
         {
             u32 texture = glGetTexture(sUseCheckerTextureForWarble
                     ? "global/checkers" : "target/warbletexture");

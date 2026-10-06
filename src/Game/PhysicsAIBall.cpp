@@ -27,24 +27,24 @@
 
 
 static unsigned short sPhysicsAIBallType = 0xFFFF;
-float lbl_806DCA0C = 0.05f;
-float lbl_806DCA10 = 1.0f;
-float lbl_806DCA14 = 10.0f;
-float lbl_806DCA18 = 60.0f;
-float lbl_806DCA1C = 37.5f;
-float lbl_806DCA20 = 1.9f;
-float lbl_806DCA24 = 0.5f;
-float lbl_806DCA28 = 2.0f;
-float lbl_806DCA2C = 5.0f;
-float lbl_806DCA30 = 6.0f;
-float lbl_806DCA34 = 0.7f;
-float lbl_806DCA38 = 0.7f;
-float lbl_806DCA3C = 0.3f;
-float lbl_806DCA40 = 0.3f;
-float lbl_806DCA44 = 0.35f;
-float lbl_806DCA48 = 1.0f;
-float lbl_806DCA4C = 0.005f;
-float lbl_806DCA50 = 0.3f;
+float gGoalieDeflectionVelocityScale = 0.05f;
+float gGoalieDeflectionBlend = 1.0f;
+float gMinGoalieDeflectionSpeed = 10.0f;
+float gMaxGoalieDeflectionSpeed = 60.0f;
+float gGoalieDeflectionSpeedPivot = 37.5f;
+float gLowSpeedGoalieDeflectionScale = 1.9f;
+float gHighSpeedGoalieDeflectionScale = 0.5f;
+float gGoalieDeflectionForwardBias = 2.0f;
+float gGoalieDeflectionSideBias = 5.0f;
+float gGoalieDeflectionHeightBias = 6.0f;
+float gGoalieDeflectionSideScale = 0.7f;
+float gGoalieDeflectionHeightScale = 0.7f;
+float gGoalieDeflectionSideRandomRange = 0.3f;
+float gGoalieDeflectionHeightRandomRange = 0.3f;
+float gGoalPostBounceVelocityScale = 0.35f;
+float gGoalPostBounceAngularVelocityScale = 1.0f;
+float gGoalPostSeparationOffset = 0.005f;
+float gGoalPostLowSpeedAdjustment = 0.3f;
 static float sfMaxBallBounceSpeed = 15.0f;
 static float sfBallGoalieSweepTestVelocityThreshold = 5.0f;
 
@@ -466,47 +466,47 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
 
             float exitSpeed = nlVec3Length(v3ExitVel);
             exitSpeed = nlMinEquals(
-                nlMaxEquals(exitSpeed, lbl_806DCA14), lbl_806DCA18);
+                nlMaxEquals(exitSpeed, gMinGoalieDeflectionSpeed), gMaxGoalieDeflectionSpeed);
 
             float scale;
-            if (exitSpeed <= lbl_806DCA1C)
+            if (exitSpeed <= gGoalieDeflectionSpeedPivot)
             {
-                scale = InterpolateRangeClamped(exitSpeed * lbl_806DCA20,
-                    exitSpeed, lbl_806DCA14, lbl_806DCA1C, exitSpeed);
+                scale = InterpolateRangeClamped(exitSpeed * gLowSpeedGoalieDeflectionScale,
+                    exitSpeed, gMinGoalieDeflectionSpeed, gGoalieDeflectionSpeedPivot, exitSpeed);
             }
             else
             {
                 scale = InterpolateRangeClamped(exitSpeed,
-                    exitSpeed * lbl_806DCA24, lbl_806DCA1C, lbl_806DCA18,
+                    exitSpeed * gHighSpeedGoalieDeflectionScale, gGoalieDeflectionSpeedPivot, gMaxGoalieDeflectionSpeed,
                     exitSpeed);
             }
 
-            v3DeflectFudge.x += lbl_806DCA28;
+            v3DeflectFudge.x += gGoalieDeflectionForwardBias;
 
             float saveY = pSaveData->mv3SavePos.y;
             v3DeflectFudge.y = saveY;
             if (saveY > 0.0f)
             {
-                v3DeflectFudge.y += lbl_806DCA2C;
+                v3DeflectFudge.y += gGoalieDeflectionSideBias;
             }
             else
             {
-                v3DeflectFudge.y -= lbl_806DCA2C;
+                v3DeflectFudge.y -= gGoalieDeflectionSideBias;
             }
 
-            v3DeflectFudge.z = lbl_806DCA30 + pSaveData->mv3SavePos.z;
+            v3DeflectFudge.z = gGoalieDeflectionHeightBias + pSaveData->mv3SavePos.z;
             v3DeflectFudge.y = v3DeflectFudge.y
-                             * (scale * (lbl_806DCA34 + nlRandomf(lbl_806DCA3C)));
+                             * (scale * (gGoalieDeflectionSideScale + nlRandomf(gGoalieDeflectionSideRandomRange)));
             v3DeflectFudge.z = v3DeflectFudge.z
-                             * (scale * (lbl_806DCA38 + nlRandomf(lbl_806DCA40)));
+                             * (scale * (gGoalieDeflectionHeightScale + nlRandomf(gGoalieDeflectionHeightRandomRange)));
 
             RotateVectorZAxis(v3DeflectFudge, v3DeflectFudge,
                 pGoalie->mUnidentified024.m_aActualFacingDirection);
 
-            nlVecLerp(v3ExitVel, v3ExitVel, v3DeflectFudge, lbl_806DCA10);
+            nlVecLerp(v3ExitVel, v3ExitVel, v3DeflectFudge, gGoalieDeflectionBlend);
         }
 
-        nlVec3Scale(v3ExitVel, lbl_806DCA0C);
+        nlVec3Scale(v3ExitVel, gGoalieDeflectionVelocityScale);
         SetLinearVelocity(v3ExitVel);
     }
 
@@ -557,33 +557,33 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalPost()
                 return;
             }
 
-            nlVec3ScaleAdd(ballPosition, lbl_806DCA4C, contactNormal, ballPosition);
+            nlVec3ScaleAdd(ballPosition, gGoalPostSeparationOffset, contactNormal, ballPosition);
 
             const nlVector3& v3BallVel = GetLinearVelocity();
             nlVector3 v3ExitVel;
             nlVector3 v3Projection;
             nlVec3Project(v3Projection, v3BallVel, contactNormal);
             nlVec3ScaleAdd(v3ExitVel, -2.0f, v3Projection, v3BallVel);
-            nlVec3Scale(v3ExitVel, lbl_806DCA44);
+            nlVec3Scale(v3ExitVel, gGoalPostBounceVelocityScale);
 
             if (nlVec3LengthSquared(v3BallVel) < 1.0f)
             {
                 if (ballPosition.x > 0.0f)
                 {
-                    v3ExitVel.x -= lbl_806DCA50;
+                    v3ExitVel.x -= gGoalPostLowSpeedAdjustment;
                 }
                 else
                 {
-                    v3ExitVel.x += lbl_806DCA50;
+                    v3ExitVel.x += gGoalPostLowSpeedAdjustment;
                 }
 
-                float dt = lbl_806DCA50 * FixedUpdateTask::GetPhysicsUpdateTick();
+                float dt = gGoalPostLowSpeedAdjustment * FixedUpdateTask::GetPhysicsUpdateTick();
                 nlVec3ScaleAdd(ballPosition, dt, v3ExitVel, ballPosition);
             }
 
             nlVector3 v3AngVel;
             GetAngularVelocity(&v3AngVel);
-            nlVec3Scale(v3AngVel, lbl_806DCA48);
+            nlVec3Scale(v3AngVel, gGoalPostBounceAngularVelocityScale);
 
             SetPosition(ballPosition, WORLD_COORDINATES);
             SetLinearVelocity(v3ExitVel);

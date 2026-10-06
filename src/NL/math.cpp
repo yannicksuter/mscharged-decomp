@@ -50,7 +50,7 @@ extern "C" void fn_802B53EC(nlQuaternion& out, unsigned short angle)
     nlVec4Set(*(nlVector4*)&out, fSin, 0.0f, 0.0f, fCos);
 }
 
-extern "C" void fn_802B5444(nlQuaternion& out, unsigned short angle)
+void nlMakeQuatY(nlQuaternion& out, unsigned short angle)
 {
     float fSin;
     float fCos;

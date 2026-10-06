@@ -45,6 +45,6 @@ public:
 }; // size: 0xAC
 
 
-void fn_80142A1C();
+void ClearPlayerPlayerCollisionCache();
 
 #endif // GAME_PHYSICS_PHYSICS_CHARACTER_H

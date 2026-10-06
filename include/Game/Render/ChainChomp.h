@@ -13,6 +13,9 @@ class AvoidablePowerup;
 template <class T>
 class cInventory;
 class SFXEmitter;
+class RLView;
+
+extern RLView* gpChainChompShadowView;
 
 enum eChainChompState
 {

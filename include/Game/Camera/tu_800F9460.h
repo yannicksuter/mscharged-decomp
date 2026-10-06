@@ -34,7 +34,7 @@ public:
     bool IsTransitionActive() const;
     nlVector3 RotateCameraVector(const nlVector3& vector) const;
     void AdjustCameraVectors(
-        float deltaTime, nlVector3* camera, nlVector3* target) const;
+        float zoom, nlVector3* camera, nlVector3* target) const;
     nlVector3 CalculateTargetOffset(const GameplayCamera* camera) const;
 
     void OnGoalScored(GoalScoredData* eventData);

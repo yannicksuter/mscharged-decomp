@@ -1951,7 +1951,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
             m_v3Position.z - m_v3ShotTarget.z);
         float fDist = nlSqrt(v3Unidentified.GetLengthSq3D(), true);
 
-        fn_8016F06C();
+        DisablePredictedGoaliePlanes();
         FakeBallWorld::GetPredictedPosAtDistance(
             fDist, v3PredPos, v3PredVel, true);
 

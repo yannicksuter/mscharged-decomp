@@ -93,6 +93,8 @@ public:
     float _2718;
 };
 
+DrawableBulletBill& GetSnapshotBulletBill(RenderSnapshot* snapshot, unsigned int index);
+
 inline void SaveFrame::fn_80191504()
 {
 }

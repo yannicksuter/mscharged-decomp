@@ -26,7 +26,7 @@ public:
         m_fNetDirection = pPlayer->m_pTeam->m_pNet->m_fDirection;
         m_bDebugOn = false;
         m_bDrawSearchSpace = false;
-        m_fMaxRadius = 0.0f;
+        m_fMaxRadius = 4.0f;
     }
 
     SpaceSearch(float fNetDirection)
@@ -34,7 +34,7 @@ public:
         m_fNetDirection = fNetDirection;
         m_bDebugOn = false;
         m_bDrawSearchSpace = false;
-        m_fMaxRadius = 0.0f;
+        m_fMaxRadius = 4.0f;
     }
 
     virtual ~SpaceSearch();

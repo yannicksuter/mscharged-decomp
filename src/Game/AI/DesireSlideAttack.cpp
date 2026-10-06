@@ -12,7 +12,7 @@
 #include <stddef.h>
 
 extern "C" AvoidController* fn_8002E144(cFielder*);
-static float lbl_806DC238 = 0.25f;
+static float sSlideAttackTargetLeadTime = 0.25f;
 static unsigned short sDesireSlideAttackType = 0xFFFF;
 
 /**
@@ -71,9 +71,9 @@ void DesireSlideAttack::Update(
         }
 
         v3VictimPosition.x = mpTarget->mUnidentified024.m_v3Position.x
-                           + lbl_806DC238 * mpTarget->mUnidentified024.m_v3Velocity.x;
+                           + sSlideAttackTargetLeadTime * mpTarget->mUnidentified024.m_v3Velocity.x;
         v3VictimPosition.y = mpTarget->mUnidentified024.m_v3Position.y
-                           + lbl_806DC238 * mpTarget->mUnidentified024.m_v3Velocity.y;
+                           + sSlideAttackTargetLeadTime * mpTarget->mUnidentified024.m_v3Velocity.y;
         v3VictimPosition.z = 0.0f;
         pFielder->AddDesiredPosition(v3VictimPosition, 1.5f, 1.0f);
         fn_8002E144(pFielder)->UseMinimumAvoidance(mpTarget);

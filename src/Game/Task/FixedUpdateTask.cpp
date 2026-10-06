@@ -431,7 +431,7 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     DispatchDetermDataEvents();
 
     AIUpdateTask(g_fSimulationTick);
-    fn_80142A1C();
+    ClearPlayerPlayerCollisionCache();
     gNPCManager->UpdateAINPCs(g_fSimulationTick);
     PrePhysicsAITask(g_fSimulationTick);
     PhysicsUpdate(g_PhysicsWorld, GetPhysicsUpdateTick());

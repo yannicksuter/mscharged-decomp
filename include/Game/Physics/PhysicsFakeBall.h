@@ -63,8 +63,8 @@ public:
     /* 0x10 */ PhysicsPlane* mpGroundPlane;
     /* 0x14 */ PhysicsGoaliePlane* mpGoaliePlane1;
     /* 0x18 */ PhysicsGoaliePlane* mpGoaliePlane2;
-    /* 0x1C */ bool mbHitSuccess;
-    /* 0x1D */ bool mUnidentified1D;
+    /* 0x1C */ bool mbCacheHitGoaliePlane;
+    /* 0x1D */ bool mbCacheReachedGoalLine;
     /* 0x1E */ unsigned char mPadding01E[2];
     /* 0x20 */ dContactGeom mContactInfo;
 
@@ -95,7 +95,7 @@ public:
     /* 0x38 */ FakeBallWorld& mWorld;
 }; // total size: 0x3C
 
-extern "C" void fn_8016EEC8();
-extern "C" void fn_8016F06C();
+void EnablePredictedGoaliePlanes();
+void DisablePredictedGoaliePlanes();
 
 #endif // _PHYSICSFAKEBALL_H_

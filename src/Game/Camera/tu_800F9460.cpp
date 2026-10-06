@@ -40,65 +40,65 @@ typedef char UnidentifiedFunctionSize5[sizeof(Function<PlayerAttackData*>)];
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
-bool lbl_806DC540 = true;
-float lbl_806DC544 = 0.6f;
-float lbl_806DC548 = -6.0f;
-float lbl_806DC54C = 0.65f;
-float lbl_806DC550 = 0.1f;
-float lbl_806DC554 = 3.0f;
-float lbl_806DC558 = 2.0f;
-float lbl_806DC55C = 0.2f;
-bool lbl_806DC560 = true;
-float lbl_806DC564 = 0.15f;
-float lbl_806DC568 = -3.0f;
-float lbl_806DC56C = -1.0f;
-float lbl_806DC570 = 0.5f;
-float lbl_806DC574 = 0.6f;
-float lbl_806DC578 = 0.075f;
-float lbl_806DC57C = 0.99f;
-bool lbl_806DC580 = true;
-float lbl_806DC584 = 1.0f;
-float lbl_806DC588 = 40.0f;
-float lbl_806DC58C = 3.7f;
-float lbl_806DC590 = -3.0f;
-float lbl_806DC594 = -1.0f;
-float lbl_806DC598 = 0.5f;
-float lbl_806DC59C = 0.6f;
-float lbl_806DC5A0 = 0.075f;
-float lbl_806DC5A4 = 0.99f;
-bool lbl_806DC5A8 = true;
-float lbl_806DC5AC = -3.0f;
-float lbl_806DC5B0 = -1.0f;
-float lbl_806DC5B4 = 0.5f;
-float lbl_806DC5B8 = 0.6f;
-float lbl_806DC5BC = 0.075f;
-float lbl_806DC5C0 = 0.99f;
-bool lbl_806DC5C4 = true;
-float lbl_806DC5C8 = 0.2f;
-float lbl_806DC5CC = 0.225f;
-float lbl_806DC5D0 = 4300.0f;
-float lbl_806DC5D4 = 6.0f;
-float lbl_806DC5D8 = 0.1f;
-float lbl_806DC5DC = 0.4f;
-float lbl_806DC5E0 = 0.6f;
-float lbl_806DC5E4 = -0.8f;
-float lbl_806DC5E8 = 0.65f;
-float lbl_806DC5EC = 0.4f;
-float lbl_806DC5F0 = 9.0f;
-float lbl_806DC5F4 = 8.0f;
-float lbl_806DC5F8 = -3.0f;
-float lbl_806DC5FC = -1.0f;
+bool gCameraEffectsEnabled = true;
+float gCameraTargetYOffsetScale = 0.6f;
+float gShotPresentationZoom = -6.0f;
+float gShotPresentationInitialTimeScale = 0.65f;
+float gShotPresentationEndTimeScale = 0.1f;
+float gShotPresentationMinBallCharge = 3.0f;
+float gShotPresentationPlayerClearRadius = 2.0f;
+float gShotPresentationMinPassTime = 0.2f;
+bool gShotPresentationRotateCamera = true;
+float gShotPresentationOutTime = 0.15f;
+float gCaptainClashZoom = -3.0f;
+float gCaptainClashRotationDegrees = -1.0f;
+float gCaptainClashInTime = 0.5f;
+float gCaptainClashOutTime = 0.6f;
+float gCaptainClashInitialTimeScale = 0.075f;
+float gCaptainClashEndTimeScale = 0.99f;
+bool gCaptainClashRotateCamera = true;
+float gGoalieSaveTimeScale = 1.0f;
+float gGoalieSaveMinBallSpeed = 40.0f;
+float gGoalieSaveMinBallCharge = 3.7f;
+float gGoalieSlamZoom = -3.0f;
+float gGoalieSlamRotationDegrees = -1.0f;
+float gGoalieSlamInTime = 0.5f;
+float gGoalieSlamOutTime = 0.6f;
+float gGoalieSlamInitialTimeScale = 0.075f;
+float gGoalieSlamEndTimeScale = 0.99f;
+bool gGoalieSlamRotateCamera = true;
+float gGoalieDekeZoom = -3.0f;
+float gGoalieDekeRotationDegrees = -1.0f;
+float gGoalieDekeInTime = 0.5f;
+float gGoalieDekeOutTime = 0.6f;
+float gGoalieDekeInitialTimeScale = 0.075f;
+float gGoalieDekeEndTimeScale = 0.99f;
+bool gGoalieDekeRotateCamera = true;
+float gCameraRumbleX = 0.2f;
+float gCameraRumbleY = 0.225f;
+float gCameraRumbleSpring = 4300.0f;
+float gCameraRumbleDamping = 6.0f;
+float gCameraFlagUpdateInterval = 0.1f;
+float gCameraOffensiveZoneZoomAdjustment = 0.4f;
+float gCameraWindupZoomAdjustment = 0.6f;
+float gCameraAlternateWindupZoomAdjustment = -0.8f;
+float gCameraMegaStrikeMeterZoomAdjustment = 0.65f;
+float gCameraClearFieldersZoomAdjustment = 0.4f;
+float gCameraFielderClearRadius = 9.0f;
+float gCameraMaxStadiumTilt = 8.0f;
+float gCameraTiltTargetOffset = -3.0f;
+float gStadium10CameraHeightZoomAdjustment = -1.0f;
 
 float lbl_806E0F20[2];
-float lbl_806E0F28;
-float lbl_806E0F2C;
-float lbl_806E0F30;
-float lbl_806E0F34;
-bool lbl_806E0F38;
-bool lbl_806E0F39;
-float lbl_806E0F3C;
-float lbl_806E0F40;
-float lbl_806E0F44;
+float gShotPresentationPassTimeOffset;
+float gGoalieSaveZoom;
+float gGoalieSaveRotationDegrees;
+float gGoalieSaveTransitionTime;
+bool gGoalieSaveRotateCamera;
+bool gCameraZoomOverrideEnabled;
+float gCameraNoFlagsZoomAdjustment;
+float gCameraCaptainFlagZoomAdjustment;
+float gCameraStadiumTiltZoomAdjustment;
 
 template <>
 UnidentifiedCameraEffects*
@@ -166,13 +166,13 @@ void UnidentifiedCameraEffects::Update(float deltaTime)
     mZoomScale = 0.0f;
     mTransitionScale = 0.0f;
     mFlagUpdateTimer += deltaTime;
-    if (mFlagUpdateTimer <= lbl_806DC5D8)
+    if (mFlagUpdateTimer <= gCameraFlagUpdateInterval)
     {
         mFlagUpdateTimer = 0.0f;
         UpdateCameraFlags();
     }
 
-    if (lbl_806DC540 == true)
+    if (gCameraEffectsEnabled == true)
     {
         if (IsTransitionActive())
         {
@@ -264,7 +264,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
     float dy;
     float dx;
     float dz;
-    float minimumDistanceSq = lbl_806DC5F0 * lbl_806DC5F0;
+    float minimumDistanceSq = gCameraFielderClearRadius * gCameraFielderClearRadius;
     if (owner != 0 && owner->m_eClassType == FIELDER)
     {
         int otherTeam = owner->m_pTeam->GetOtherTeam()->m_nSide;
@@ -315,13 +315,13 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
 {
     cPlayer* owner = g_pBall->m_pOwner;
     cPlayer* passTarget = g_pBall->m_pPassTarget;
-    float minimumDistanceSq = lbl_806DC558 * lbl_806DC558;
+    float minimumDistanceSq = gShotPresentationPlayerClearRadius * gShotPresentationPlayerClearRadius;
     if (owner != 0 || passTarget == 0
-        || GetBallChargeValue(g_pBall, 0) < lbl_806DC554)
+        || GetBallChargeValue(g_pBall, 0) < gShotPresentationMinBallCharge)
     {
         return false;
     }
-    if (g_pBall->m_tPassTargetTimer.GetSeconds() < lbl_806DC55C)
+    if (g_pBall->m_tPassTargetTimer.GetSeconds() < gShotPresentationMinPassTime)
     {
         return false;
     }
@@ -349,30 +349,30 @@ float UnidentifiedCameraEffects::CalculateZoomScale(float) const
 {
     float result = 1.0f;
     if ((mCameraFlags & 1) != 0)
-        result -= lbl_806DC5DC;
+        result -= gCameraOffensiveZoneZoomAdjustment;
     if ((mCameraFlags & 2) != 0)
-        result -= lbl_806DC5E0;
+        result -= gCameraWindupZoomAdjustment;
     if ((mCameraFlags & 4) != 0)
-        result -= lbl_806DC5E4;
+        result -= gCameraAlternateWindupZoomAdjustment;
     if ((mCameraFlags & 8) != 0)
-        result -= lbl_806DC5E8;
+        result -= gCameraMegaStrikeMeterZoomAdjustment;
     if ((mCameraFlags & 0x10) != 0)
-        result -= lbl_806DC5EC;
+        result -= gCameraClearFieldersZoomAdjustment;
     if ((mCameraFlags & 0x20) != 0)
-        result -= lbl_806E0F40;
+        result -= gCameraCaptainFlagZoomAdjustment;
     if ((mCameraFlags & 0x40) != 0)
     {
         float gameX = g_pGame->mfXTilt;
-        float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
+        float clampedX = nlMinEquals(gCameraMaxStadiumTilt, gameX);
         float gameY = g_pGame->mfYTilt;
-        float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
+        float clampedY = nlMinEquals(gCameraMaxStadiumTilt, gameY);
         float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
-        float fraction = amount / lbl_806DC5F4;
-        result -= fraction * lbl_806E0F44;
+        float fraction = amount / gCameraMaxStadiumTilt;
+        result -= fraction * gCameraStadiumTiltZoomAdjustment;
     }
     if (mCameraFlags == 0)
-        result -= lbl_806E0F3C;
-    if (lbl_806E0F39)
+        result -= gCameraNoFlagsZoomAdjustment;
+    if (gCameraZoomOverrideEnabled)
         result = 1.0f;
     return result;
 }
@@ -467,21 +467,21 @@ nlVector3 UnidentifiedCameraEffects::RotateCameraVector(
     return result;
 }
 
-void UnidentifiedCameraEffects::AdjustCameraVectors(float deltaTime,
+void UnidentifiedCameraEffects::AdjustCameraVectors(float zoom,
     nlVector3* camera, nlVector3* target) const
 {
     if ((mCameraFlags & 0x40) != 0)
     {
         float gameX = g_pGame->mfXTilt;
-        float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
+        float clampedX = nlMinEquals(gCameraMaxStadiumTilt, gameX);
         float gameY = g_pGame->mfYTilt;
-        float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
+        float clampedY = nlMinEquals(gCameraMaxStadiumTilt, gameY);
         float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
-        target->y += lbl_806DC5F8 * (amount / lbl_806DC5F4);
+        target->y += gCameraTiltTargetOffset * (amount / gCameraMaxStadiumTilt);
     }
     else if (GameInfoManager::Instance()->GetStadium() == 10)
     {
-        camera->z += lbl_806DC5FC * deltaTime;
+        camera->z += gStadium10CameraHeightZoomAdjustment * zoom;
     }
 }
 
@@ -513,7 +513,7 @@ nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
         ReplayManager::Instance();
         nlVec3Sub(offset, target, finalCameraTarget);
         result.x = Interpolate(0.0f, offset.x, mTransitionBlend);
-        result.y = lbl_806DC544
+        result.y = gCameraTargetYOffsetScale
                  * Interpolate(0.0f, offset.y, mTransitionBlend);
     }
 
@@ -548,18 +548,18 @@ void UnidentifiedCameraEffects::OnShotPresentation()
 
     Reset();
     float endTime = g_pBall->m_tPassTargetTimer.GetSeconds()
-                  + lbl_806E0F28;
-    g_pGame->StartSlowDown(lbl_806DC54C, 0.0f);
-    g_pGame->StartSlowDown(lbl_806DC550, endTime);
+                  + gShotPresentationPassTimeOffset;
+    g_pGame->StartSlowDown(gShotPresentationInitialTimeScale, 0.0f);
+    g_pGame->StartSlowDown(gShotPresentationEndTimeScale, endTime);
     mTransitionTime = endTime;
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
     mUseRealTime = true;
     mTransitionInTime = endTime;
-    mTransitionOutTime = lbl_806DC564;
-    mZoomStart = lbl_806DC548;
+    mTransitionOutTime = gShotPresentationOutTime;
+    mZoomStart = gShotPresentationZoom;
     mRotationDegrees = 0.0f;
-    mRotateCamera = lbl_806DC560;
+    mRotateCamera = gShotPresentationRotateCamera;
     mPrimaryPlayer = (cFielder*)g_pBall->m_pPassTarget;
 }
 
@@ -570,7 +570,7 @@ void UnidentifiedCameraEffects::OnShotPresentationEnd()
         && GetBallChargeValue(g_pBall, 0) >= 4.0f)
     {
         FireCameraRumbleFilter(
-            lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
+            gCameraRumbleX, gCameraRumbleY, gCameraRumbleSpring, gCameraRumbleDamping);
     }
 }
 
@@ -585,17 +585,17 @@ void UnidentifiedCameraEffects::OnCaptainClashPresentation()
     {
         Reset();
         FireCameraRumbleFilter(
-            lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
-        g_pGame->StartSlowDown(lbl_806DC578, 0.0f);
-        g_pGame->StartSlowDown(lbl_806DC57C, lbl_806DC570);
+            gCameraRumbleX, gCameraRumbleY, gCameraRumbleSpring, gCameraRumbleDamping);
+        g_pGame->StartSlowDown(gCaptainClashInitialTimeScale, 0.0f);
+        g_pGame->StartSlowDown(gCaptainClashEndTimeScale, gCaptainClashInTime);
         mOwnsTimeScale = true;
         mRestoreTimeScale = true;
-        mTransitionTime = lbl_806DC570;
-        mTransitionInTime = lbl_806DC570;
-        mTransitionOutTime = lbl_806DC574;
-        mZoomStart = lbl_806DC568;
-        mRotationDegrees = lbl_806DC56C;
-        mRotateCamera = lbl_806DC580;
+        mTransitionTime = gCaptainClashInTime;
+        mTransitionInTime = gCaptainClashInTime;
+        mTransitionOutTime = gCaptainClashOutTime;
+        mZoomStart = gCaptainClashZoom;
+        mRotationDegrees = gCaptainClashRotationDegrees;
+        mRotateCamera = gCaptainClashRotateCamera;
 
         if (g_pBall->m_pLastTouch != 0
             && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
@@ -657,30 +657,30 @@ void UnidentifiedCameraEffects::OnGoalieSave(
     {
         return;
     }
-    if (!(ballSpeedSq >= lbl_806DC588 * lbl_806DC588))
+    if (!(ballSpeedSq >= gGoalieSaveMinBallSpeed * gGoalieSaveMinBallSpeed))
     {
         return;
     }
-    if (!(GetBallChargeValue(g_pBall, 0) > lbl_806DC58C))
+    if (!(GetBallChargeValue(g_pBall, 0) > gGoalieSaveMinBallCharge))
     {
         return;
     }
 
     Reset();
-    if (lbl_806DC584 != 1.0f)
+    if (gGoalieSaveTimeScale != 1.0f)
     {
-        g_pGame->StartSlowDown(lbl_806DC584, 0.0f);
+        g_pGame->StartSlowDown(gGoalieSaveTimeScale, 0.0f);
         mOwnsTimeScale = true;
         mRestoreTimeScale = true;
     }
-    mTransitionTime = lbl_806E0F34;
-    mTransitionInTime = lbl_806E0F34;
-    mTransitionOutTime = lbl_806E0F34;
-    mZoomStart = lbl_806E0F2C;
-    mRotationDegrees = lbl_806E0F30;
-    mRotateCamera = lbl_806E0F38;
+    mTransitionTime = gGoalieSaveTransitionTime;
+    mTransitionInTime = gGoalieSaveTransitionTime;
+    mTransitionOutTime = gGoalieSaveTransitionTime;
+    mZoomStart = gGoalieSaveZoom;
+    mRotationDegrees = gGoalieSaveRotationDegrees;
+    mRotateCamera = gGoalieSaveRotateCamera;
     FireCameraRumbleFilter(
-        lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
+        gCameraRumbleX, gCameraRumbleY, gCameraRumbleSpring, gCameraRumbleDamping);
     if (g_pBall->m_v3Velocity.x < 0.0f)
     {
         mRotationDegrees *= -1.0f;
@@ -715,7 +715,7 @@ void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
     if (player->m_eClassType == FIELDER && g_pBall->m_pOwner == player)
     {
         FireCameraRumbleFilter(
-            lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
+            gCameraRumbleX, gCameraRumbleY, gCameraRumbleSpring, gCameraRumbleDamping);
     }
 }
 
@@ -738,18 +738,18 @@ void UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess(
     }
 
     FireCameraRumbleFilter(
-        lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
+        gCameraRumbleX, gCameraRumbleY, gCameraRumbleSpring, gCameraRumbleDamping);
     Reset();
-    g_pGame->StartSlowDown(lbl_806DC5BC, 0.0f);
-    g_pGame->StartSlowDown(lbl_806DC5C0, lbl_806DC5B4);
+    g_pGame->StartSlowDown(gGoalieDekeInitialTimeScale, 0.0f);
+    g_pGame->StartSlowDown(gGoalieDekeEndTimeScale, gGoalieDekeInTime);
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
-    mTransitionTime = lbl_806DC5B4;
-    mTransitionInTime = lbl_806DC5B4;
-    mTransitionOutTime = lbl_806DC5B8;
-    mZoomStart = lbl_806DC5AC;
-    mRotationDegrees = lbl_806DC5B0;
-    mRotateCamera = lbl_806DC5C4;
+    mTransitionTime = gGoalieDekeInTime;
+    mTransitionInTime = gGoalieDekeInTime;
+    mTransitionOutTime = gGoalieDekeOutTime;
+    mZoomStart = gGoalieDekeZoom;
+    mRotationDegrees = gGoalieDekeRotationDegrees;
+    mRotateCamera = gGoalieDekeRotateCamera;
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
@@ -778,16 +778,16 @@ void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
     }
 
     Reset();
-    g_pGame->StartSlowDown(lbl_806DC5A0, 0.0f);
-    g_pGame->StartSlowDown(lbl_806DC5A4, lbl_806DC598);
+    g_pGame->StartSlowDown(gGoalieSlamInitialTimeScale, 0.0f);
+    g_pGame->StartSlowDown(gGoalieSlamEndTimeScale, gGoalieSlamInTime);
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
-    mTransitionTime = lbl_806DC598;
-    mTransitionInTime = lbl_806DC598;
-    mTransitionOutTime = lbl_806DC59C;
-    mZoomStart = lbl_806DC590;
-    mRotationDegrees = lbl_806DC594;
-    mRotateCamera = lbl_806DC5A8;
+    mTransitionTime = gGoalieSlamInTime;
+    mTransitionInTime = gGoalieSlamInTime;
+    mTransitionOutTime = gGoalieSlamOutTime;
+    mZoomStart = gGoalieSlamZoom;
+    mRotationDegrees = gGoalieSlamRotationDegrees;
+    mRotateCamera = gGoalieSlamRotateCamera;
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()

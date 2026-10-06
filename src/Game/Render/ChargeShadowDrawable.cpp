@@ -177,7 +177,7 @@ void ChargeShadowDrawable::Draw()
     }
 
     if (visible && (m_uChargeFlags & 2) != 0)
-        fn_80186354(this);
+        DrawBallShadowAndGlow(this);
 }
 
 /**
