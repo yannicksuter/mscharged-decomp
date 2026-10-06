@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/CrowdImpostors.h"
 #include "Game/Render/ImpostorLighting.h"
 #include "NL/gl/glMemory.h"

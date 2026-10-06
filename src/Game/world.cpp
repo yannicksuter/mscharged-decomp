@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/World/WorldVisibility.h"
 #include "NL/gl/gl.h"
 #include "Game/World.h"

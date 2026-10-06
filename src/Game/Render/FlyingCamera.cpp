@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/FlyingCamera.h"
 
 #include "Game/AI/Fielder.h"

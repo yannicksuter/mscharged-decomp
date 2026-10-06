@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/SkinAnimatedNPC.h"
 
 #include "Game/BasicStadium.h"

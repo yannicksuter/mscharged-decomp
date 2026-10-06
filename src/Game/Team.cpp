@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "revolution/os/OSTime.h"
 #include "Game/CharacterTweaks.h"
 

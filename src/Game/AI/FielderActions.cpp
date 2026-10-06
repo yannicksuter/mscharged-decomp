@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
 #include "Game/Player.h"
 #include "Game/CharacterTriggers.h"
@@ -3308,26 +3309,26 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
         else if (g_pNetworkSession->IsLiveNetworkGame()
-                 && g_pGame->mUnidentified0C0.mSize != 0)
+                 && g_pGame->mUnidentified0C0.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.UnidentifiedRemoveStart(),
+                g_pGame->mUnidentified0C0.Pop(),
                 nParam);
         }
     }
     else if (g_pNetworkSession->IsLiveNetworkGame() && nParam == 0
-             && g_pGame->mUnidentified0C0.mSize != 0)
+             && g_pGame->mUnidentified0C0.mCount != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Have unprocessed m_ReceivedMegaMeterQ %d in state %d.  "
             "Processing All Now.\n",
-            g_pGame->mUnidentified0C0.mSize,
+            g_pGame->mUnidentified0C0.mCount,
             mUnidentified478);
 
-        while (g_pGame->mUnidentified0C0.mSize != 0)
+        while (g_pGame->mUnidentified0C0.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.UnidentifiedRemoveStart(),
+                g_pGame->mUnidentified0C0.Pop(),
                 nParam);
         }
     }
@@ -3465,7 +3466,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     if (nParam != 0)
     {
         if (g_pNetworkSession->IsLiveNetworkGame()
-            && g_pGame->mUnidentified134.mSize > 0)
+            && g_pGame->mUnidentified134.mCount > 0)
         {
             g_pGame->fn_80058180();
         }

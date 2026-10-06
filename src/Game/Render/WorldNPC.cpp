@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/WorldNPC.h"
 
 #include "Game/SAnim/pnSAnimController.h"

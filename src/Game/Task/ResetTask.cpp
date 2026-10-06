@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include <revolution/ax.h>
 #include <revolution/dvd.h>
 #include <revolution/os.h>

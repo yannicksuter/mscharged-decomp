@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlCompressedFile.h"
 #include "Game/Render/CrowdModelCollection.h"
 

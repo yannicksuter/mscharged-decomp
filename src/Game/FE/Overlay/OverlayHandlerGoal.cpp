@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/OverlayHandlerGoal.h"
 
 #include "Game/DB/GameProgress.h"

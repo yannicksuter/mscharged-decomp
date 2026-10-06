@@ -5,6 +5,7 @@
 #include "Game/NetworkMessage.h"
 #include "types.h"
 #include "NL/nlMath.h"
+#include "NL/CircularQueue.h"
 
 class Clock;
 class FuzzyTweaks;
@@ -24,42 +25,6 @@ struct CollisionPlayerWallData;
 struct PeachPhotoData;
 class cFielder;
 class cPlayer;
-
-struct UnidentifiedCircularByteQueue
-{
-    UnidentifiedCircularByteQueue(bool* data, u32 start, int size, u32 capacity)
-    {
-        mStart = start;
-        mSize = size;
-        mCapacity = capacity;
-        mData = data;
-    }
-
-    bool UnidentifiedRemoveStart()
-    {
-        bool* entry;
-        if (mSize == 0)
-        {
-            entry = mData + (mStart & mCapacity);
-        }
-        else
-        {
-            --mSize;
-            entry = mData + mStart;
-            ++mStart;
-            if (mStart % mCapacity == 0)
-            {
-                mStart = 0;
-            }
-        }
-        return *entry;
-    }
-
-    /* 0x00 */ bool* mData;
-    /* 0x04 */ u32 mStart;
-    /* 0x08 */ int mSize;
-    /* 0x0C */ u32 mCapacity;
-};
 
 void DestroyPowerups();
 void DestroyGame();
@@ -125,11 +90,13 @@ public:
     void PreUpdate(float deltaTime);
     void RandomizePlayerUpdateOrder();
     void ResetCharacters();
-    void fn_8005B508();
+    void fn_8005A7E8();
+    void fn_8005B508(float fDeltaT);
     float fn_8005B748(int param1, int param2);
     cPlayer* fn_8005B780(int param1, int param2, int param3);
     void SetPotentialScorer(cPlayer* pPlayer);
     void fn_8005BF50(RunningChecksum* runningChecksum);
+    static void UpdatePowerUpObjects(float fDeltaT);
     void fn_8005A8FC(float fDeltaT);
     void fn_8005B840(void* checksum, DebugWriteCache* cache);
     void ChangeGameState(int state);
@@ -159,6 +126,9 @@ public:
     /* 0x10 */ Clock* m_pPostGameDoneClock;
 
 private:
+    inline void RegisterDetermGameFields(DebugWriteCache* cache);
+    static void PlayEndGamePresentation();
+
     /* 0x14 */ AIContext* mUnidentified014;
 
 public:
@@ -236,13 +206,13 @@ private:
     /* 0xBE */ u8 mUnidentified0BE[0x02];
 
 public:
-    /* 0xC0 */ UnidentifiedCircularByteQueue mUnidentified0C0;
+    /* 0xC0 */ CircularQueueBase<bool> mUnidentified0C0;
 
 private:
     /* 0xD0 */ u8 mUnidentified0D0[0x64];
 
 public:
-    /* 0x134 */ UnidentifiedCircularByteQueue mUnidentified134;
+    /* 0x134 */ CircularQueueBase<bool> mUnidentified134;
 
 private:
     /* 0x144 */ u8 mUnidentified144[0x10];

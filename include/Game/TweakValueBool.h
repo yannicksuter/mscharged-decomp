@@ -1,7 +1,7 @@
 #ifndef GAME_TWEAK_VALUE_BOOL_H
 #define GAME_TWEAK_VALUE_BOOL_H
 #include "Game/TweakValue.h"
-inline void ParseBooleanTweakValue(bool& result, const char* value)
+inline void ParseOwnedTweakValue(bool& result, const char* value)
 {
     if (TweakValueStringEquals(value, "true") || TweakValueStringEquals(value, "triggered")
         || TweakValueStringEquals(value, "on"))
@@ -59,6 +59,30 @@ public:
         gLastTweakCategory = category;
     }
 
+    TweakValue(
+        const char* name, const char* category)
+        : mValue(T())
+    {
+        mName = name;
+        mFormatName = false;
+
+        if (IsTweakRegistryInitialized() == 0)
+        {
+            void* entry = nlMalloc(0x18, 8, true);
+            if (entry != 0)
+                QueueTweakValue((TweakPendingValue*)entry, this, category);
+        }
+        else
+        {
+            TweakEntry* config = GetTweakRoot();
+            TweakEntry* entry = FindOrCreateTweakPath(config, category, 0);
+            if (entry != 0)
+                AddTweakValue(entry, this);
+        }
+
+        gLastTweakCategory = category;
+    }
+
     TweakValue(const char* name, T value)
     {
         mValue = value;
@@ -81,8 +105,8 @@ public:
         return mValue;
     }
 
-    /* 0x0A */ T mValue;
-}; // total size: 0x0C
+    T mValue;
+};
 template <typename T>
 inline void TweakValue<T>::CopyValueFrom(
     TweakValueBase* other)
@@ -93,7 +117,7 @@ inline void TweakValue<T>::CopyValueFrom(
         mValue = ((TweakValue<T>*)other)->mValue;
         break;
     case 2:
-        mValue = *((TweakBinding<T>*)other)->m_pValue;
+        mValue = *((typename TweakType<T>::Binding*)other)->m_pValue;
         break;
     }
 }
@@ -107,7 +131,7 @@ inline int TweakValue<T>::GetStorageKind()
 template <typename T>
 inline int TweakValue<T>::GetValueType()
 {
-    return 2;
+    return TweakType<T>::ID;
 }
 
 template <typename T>
@@ -120,13 +144,13 @@ template <typename T>
 inline void TweakValue<T>::FormatValue(
     char* buffer, unsigned long size)
 {
-    FormatBooleanTweakValue(buffer, size, mValue);
+    FormatOwnedTweakValue(buffer, size, mValue);
 }
 
 template <typename T>
 inline void TweakValue<T>::ParseValue(const char* value)
 {
-    ParseBooleanTweakValue(mValue, value);
+    ParseOwnedTweakValue(mValue, value);
 }
 
 template <typename T>

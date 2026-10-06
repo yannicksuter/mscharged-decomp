@@ -49,7 +49,7 @@ inline void FEOnlinePlayerRow::Reset()
     mStats.mDisplayRank = 0;
     mStats.mWins = 0;
     mStats.mLosses = 0;
-    mStats.mUnidentified14 = 0;
+    mStats.mOnlineRegion = 0;
 }
 
 #endif // GAME_FE_ONLINE_PLAYER_ROW_H

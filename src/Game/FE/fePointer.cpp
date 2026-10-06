@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/fePointer.h"
 
 #include "Game/FE/feInput.h"

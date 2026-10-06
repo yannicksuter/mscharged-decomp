@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/Overlay/OverlayHandlerDefensivePlay.h"
 #include "Game/Audio/RegistryPools.h"
 

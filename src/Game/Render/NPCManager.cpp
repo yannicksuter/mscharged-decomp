@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/FlyingCamera.h"

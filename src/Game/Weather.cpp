@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/tu_801B43F8.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlBindMember.inl"

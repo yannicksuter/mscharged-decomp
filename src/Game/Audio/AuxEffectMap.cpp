@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioEffect.h"
 
 AuxEffectMap* g_pAuxEffectMap;

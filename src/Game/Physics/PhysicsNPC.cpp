@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsNPC.h"
 #include "Game/Render/ChainChomp.h"
 

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Task/ParticleUpdateTask.h"
 
 #include "Game/Effects/EmissionManager.h"

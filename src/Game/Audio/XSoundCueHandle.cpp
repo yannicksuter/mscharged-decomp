@@ -1,5 +1,8 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlDebugString.h"
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioSlider.h"
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioResourceLoader.h"
@@ -20,7 +23,6 @@ static char sCueSelectionMessage[] = "XSoundCueHandle::ctor selecting sound %s f
 SlotPool<XSoundCueHandle> sSoundCueHandlePool(32, 16);
 
 extern "C" AudioSliderSet* fn_802EED88(void*, XSoundCueHandle*);
-void DumpAudioMemory();
 
 inline AudioVoiceDefinition* XSoundCueHandle::SelectSound()
 {

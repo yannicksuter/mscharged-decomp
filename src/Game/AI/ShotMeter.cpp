@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/ShotMeter.h"
 
 #include "Game/AI/AIPad.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/feImpostorCharacter.h"
 #include "Game/FE/feModelManager.h"
 #include <assert.h>

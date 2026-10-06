@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/OverlayHandlerInGameText.h"
 #include <cstring>
 #include "Game/FE/feHelpFuncs_decl.h"

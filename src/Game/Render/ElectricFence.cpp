@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/ElectricFence.h"
 #include <cstring>
 

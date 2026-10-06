@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Task/DispatchEventsTask.h"
 #include "Game/EventDispatcher.inl"
 

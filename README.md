@@ -106,6 +106,13 @@ After configuration, open the project directory in
 [objdiff](https://github.com/encounter/objdiff). It reads the generated
 `objdiff.json` automatically and rebuilds changed objects with Ninja.
 
+Some retained template definitions are provided by another compiled source
+object. `objdiff_weak_providers` lists those sources for a unit. Ninja creates
+its comparison object in `build/<version>/compare/`, preserving the local
+object's definitions and adding missing weak definitions from the providers.
+The ordinary compiled objects remain the linker inputs. This accounts for
+shared method matches; source-linking a TU still requires matching its layout.
+
 ## Contributing
 
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before

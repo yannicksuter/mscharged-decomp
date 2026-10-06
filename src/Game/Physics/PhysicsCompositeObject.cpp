@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsCompositeObject.h"
 
 #include "Game/Physics/PhysicsWorld.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/Desire.h"
 #include "Game/AI/AIContext.h"
 

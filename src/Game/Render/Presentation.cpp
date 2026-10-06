@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/Presentation.h"
 #include "Game/DetInput.h"
 #include "Game/Blinker.h"

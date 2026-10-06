@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsEventQueue.h"
 

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/Fielder.h"
 #include "Game/Player.h"
 #include "Game/FE/feHelpFuncs_decl.h"

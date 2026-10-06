@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/NisPlayer.h"
 #include "Game/Blinker.h"
 #include "NL/nlBasicString.h"

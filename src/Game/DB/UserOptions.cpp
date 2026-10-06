@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/DB/UserOptions.h"
 
 #include "Game/Audio/AudioSystem.h"

@@ -126,7 +126,7 @@ void SHOnlineRanking::SceneCreated()
     UpdateScrollBar(
         this, GetLeaderboardCategory(mLeaderboardCategory)->GetCount());
 
-    mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mFirstRank;
+    mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mLocalPlayerIndex;
     UpdateRows();
     UpdateHeader();
 
@@ -228,7 +228,7 @@ void SHOnlineRanking::Update(float fDeltaT)
     if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete)
     {
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = false;
-        mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mFirstRank;
+        mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mLocalPlayerIndex;
         UpdateRows();
         return;
     }
@@ -245,7 +245,7 @@ void SHOnlineRanking::Update(float fDeltaT)
         return;
     }
 
-    if (!NetworkStatsManager::Instance()->RefreshFriendStats_80131B50())
+    if (!NetworkStatsManager::Instance()->RefreshRankings())
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();
@@ -365,7 +365,7 @@ void SHOnlineRanking::SelectLeaderboardCategory()
     FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
     UpdateHeader();
 
-    mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mFirstRank;
+    mMyRank = GetLeaderboardCategory(mLeaderboardCategory)->mLocalPlayerIndex;
 
     if ((mLeaderboardCategory == 0 || mLeaderboardCategory == 2)
         && mMyRank >= 0)

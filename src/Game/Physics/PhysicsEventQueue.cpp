@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Task/DispatchEventsTask.h"
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/BulletBill.h"
@@ -987,3 +988,5 @@ void QueueCollisionShockwave(CollisionShockwaveData* data)
 }
 
 #include "NL/nlBind_impl.h"
+
+#include "Game/EventBase.inl"

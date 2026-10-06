@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include <revolution/gx/GXTypes.h>
 
 #include "Game/Render/RenderShadow.h"

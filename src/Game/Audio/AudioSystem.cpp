@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/TweakValue.h"
 #include "Game/UnidentifiedStaticStorage.h"

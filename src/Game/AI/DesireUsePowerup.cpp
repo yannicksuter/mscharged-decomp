@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireUsePowerup.h"
 #include "Game/AI/ScriptMachine.h"
 #include "Game/AI/Powerups.h"

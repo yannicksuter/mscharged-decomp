@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Weather.h"
 #include "NL/nlDebug.h"
 #include "Game/CharacterTweaks.h"

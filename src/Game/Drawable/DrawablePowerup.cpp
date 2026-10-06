@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/BasicStadium.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Drawable/DrawablePowerup.h"

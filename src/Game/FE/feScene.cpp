@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/feScene.h"
 
 #include "Game/FE/fePackage.h"

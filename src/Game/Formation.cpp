@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Formation.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/Sys/debug.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/World/WorldEffect.h"
 
 #include "Game/Debug/ShapeRender.h"

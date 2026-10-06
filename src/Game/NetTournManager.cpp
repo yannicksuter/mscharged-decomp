@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/NetTournManager.h"
 #include "NL/nlFunction.inl"
 #include "Game/EventRegistry.h"

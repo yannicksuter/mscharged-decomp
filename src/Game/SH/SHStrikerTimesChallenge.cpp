@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/HBMManager.h"
 
 #include "Game/SH/SHStrikerTimesChallenge.h"

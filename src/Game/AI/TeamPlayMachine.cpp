@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/Desire.h"
 

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlIntersection.h"
 #include "Game/AI/FielderAbility.h"
 #include "Game/AI/DesireSuperPower.h"

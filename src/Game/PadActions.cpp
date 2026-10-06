@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
 #include "NL/plat/WiiPad.h"
 #include "NL/plat/GameCubePad.h"
@@ -49,7 +51,7 @@ void UseDefaultFreestyleButtonRemap(bool useDefaultRemap)
         return;
     }
 
-    switch (sControllerConfig.value)
+    switch (sControllerConfig.mValue)
     {
     case 1:
         gWiiFreestyleButtonRemap = sFreestyleButtonRemapConfig1;
@@ -120,7 +122,7 @@ void InitPads()
     gGameCubePadButtonMap = g_pPadRemapArray;
     gWiiRemoteButtonRemap = sWiiRemoteButtonRemap;
 
-    switch (sControllerConfig.value)
+    switch (sControllerConfig.mValue)
     {
     case 1:
         gWiiFreestyleButtonRemap = sFreestyleButtonRemapConfig1;
@@ -205,3 +207,5 @@ int PadMonkey::GetButtonMask(int buttonIndex)
 {
     return GetPadButtonMask(buttonIndex);
 }
+
+#include "Game/EventBase.inl"

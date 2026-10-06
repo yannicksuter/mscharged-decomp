@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsBirdoEgg.h"
 #include "Game/CharacterTriggers.h"
 

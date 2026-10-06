@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireReceivePass.h"
 #include "Game/DetInput.h"
 #include "Game/Sys/debug.h"

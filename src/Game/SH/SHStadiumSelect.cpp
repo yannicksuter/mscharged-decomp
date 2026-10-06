@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHStadiumSelect.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlBindMember.inl"

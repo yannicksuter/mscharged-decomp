@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/feResourceManager.h"
 
 #include <stddef.h>

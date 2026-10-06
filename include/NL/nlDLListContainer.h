@@ -15,48 +15,23 @@ public:
 
     void Copy(const nlDLListIterator& other);
 
-    Reference operator*() const { return m_Curr->entry; }
+    inline Reference operator*() const;
 
-    Pointer CurrentEntry() const { return m_Curr; }
+    inline Pointer CurrentEntry() const;
 
-    bool hasNext() const { return m_Curr != 0; }
+    inline bool hasNext() const;
 
-    bool IsDone() const { return m_Curr == 0; }
+    inline bool IsDone() const;
 
-    bool IsStart() const { return nlDLRingIsStart(m_Head, m_Curr); }
+    inline bool IsStart() const;
 
-    bool IsEnd() const { return nlDLRingIsEnd(m_Head, m_Curr); }
+    inline bool IsEnd() const;
 
-    void Step()
-    {
-        if (nlDLRingIsEnd(m_Head, m_Curr) || m_Curr == 0)
-        {
-            m_Curr = 0;
-        }
-        else
-        {
-            m_Curr = m_Curr->m_next;
-        }
-    }
+    inline void Step();
 
-    Pointer next()
-    {
-        Pointer result = m_Curr;
-        Step();
-        return result;
-    }
+    inline Pointer next();
 
-    void Retreat()
-    {
-        if (nlDLRingIsStart(m_Head, m_Curr))
-        {
-            m_Curr = 0;
-        }
-        else
-        {
-            m_Curr = m_Curr->m_prev;
-        }
-    }
+    inline void Retreat();
 
     Pointer m_Head;
     Pointer m_Curr;
@@ -68,161 +43,59 @@ class DLListContainerBase
 public:
     typedef void (DLListContainerBase::*EntryCallback)(DLListEntry<T>*);
 
-    DLListContainerBase()
-        : m_Head(0)
-    {
-    }
+    inline DLListContainerBase();
 
-    DLListContainerBase(int initial, int delta)
-        : m_Allocator(initial, delta)
-        , m_Head(0)
-    {
-    }
+    inline DLListContainerBase(int initial, int delta);
 
-    DLListContainerBase(Adapter allocator)
-        : m_Allocator(allocator)
-        , m_Head(0)
-    {
-    }
+    inline DLListContainerBase(Adapter allocator);
 
-    ~DLListContainerBase()
-    {
-        Clear();
-    }
+    inline ~DLListContainerBase();
 
-    void Clear()
-    {
-        nlWalkDLRing(m_Head, this, &DLListContainerBase::DeleteEntry);
-        m_Head = 0;
-    }
+    inline void Clear();
 
     // Not const: a const source lets the compiler hoist its head read above
     // this list's clearing store, which retail keeps below it.
-    void Copy(DLListContainerBase& other)
-    {
-        Clear();
-        nlDLListIterator<T> iterator;
-        iterator = other.Begin();
-        while (!iterator.IsDone())
-        {
-            AddEnd(*iterator);
-            iterator.Step();
-        }
-    }
+    inline void Copy(DLListContainerBase& other);
 
-    DLListEntry<T>* Allocate(const T& data)
-    {
-        DLListEntry<T> value(data);
-        DLListEntry<T>* entry = m_Allocator.Allocate();
-        new (entry) DLListEntry<T>(value);
-        return entry;
-    }
+    inline DLListEntry<T>* Allocate(const T& data);
 
-    unsigned long AddEnd(const T& data)
-    {
-        DLListEntry<T>* entry = Allocate(data);
-        nlDLRingAddEnd(&m_Head, entry);
-        return (unsigned long)entry;
-    }
+    inline unsigned long AddEnd(const T& data);
 
-    unsigned long AddAfter(nlDLListIterator<T>& position, const T& data)
-    {
-        DLListEntry<T>* entry = Allocate(data);
-        nlDLRingInsert(&m_Head, position.CurrentEntry(), entry);
-        return (unsigned long)entry;
-    }
+    inline unsigned long AddAfter(nlDLListIterator<T>& position, const T& data);
 
-    void AddStart(const T& data)
-    {
-        DLListEntry<T>* entry = Allocate(data);
-        nlDLRingAddStart(&m_Head, entry);
-    }
+    inline void AddStart(const T& data);
 
-    void Deallocate(DLListEntry<T>* entry, T* outData)
-    {
-        if (outData != 0)
-        {
-            *outData = entry->entry;
-        }
-        m_Allocator.DeleteEntry(entry);
-    }
+    inline void Deallocate(DLListEntry<T>* entry, T* outData);
 
-    void RemoveStart(T* outData)
-    {
-        DLListEntry<T>* entry = nlDLRingRemoveStart(&m_Head);
-        Deallocate(entry, outData);
-    }
+    inline void RemoveStart(T* outData);
 
-    void Remove(nlDLListIterator<T>* position)
-    {
-        DLListEntry<T>* entry = position->next();
-        nlDLRingRemove(&m_Head, entry);
-        m_Allocator.DeleteEntry(entry);
-    }
+    inline void Remove(nlDLListIterator<T>* position);
 
-    void Remove(nlDLListIterator<T>* position, T* outData)
-    {
-        DLListEntry<T>* entry = position->next();
-        nlDLRingRemove(&m_Head, entry);
-        Deallocate(entry, outData);
-    }
+    inline void Remove(nlDLListIterator<T>* position, T* outData);
 
-    T RemoveEntry(DLListEntry<T>* entry)
-    {
-        T data = entry->entry;
-        nlDLRingRemove(&m_Head, entry);
-        m_Allocator.DeleteEntry(entry);
-        return data;
-    }
+    inline T RemoveEntry(DLListEntry<T>* entry);
 
-    nlDLListIterator<T> Begin()
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = nlDLRingGetStart(m_Head);
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> Begin();
 
-    nlDLListIterator<T> Begin() const
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = nlDLRingGetStart(m_Head);
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> Begin() const;
 
-    nlDLListIterator<T> Begin(DLListEntry<T>* current) const
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = current;
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> Begin(DLListEntry<T>* current) const;
 
-    nlDLListIterator<T> End()
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = nlDLRingGetEnd(m_Head);
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> End();
 
-    bool IsEmpty()
-    {
-        return m_Head == 0;
-    }
+    inline bool IsEmpty();
 
-    u32 CountElements() const
-    {
-        return nlDLRingCountElements(m_Head);
-    }
+    inline u32 CountElements() const;
 
     T* AllocateAtEnd(unsigned long* outEntry);
 
     struct WalkCallback
     {
         const Function1<bool, T&>& m_Callback;
-        WalkCallback(const Function1<bool, T&>& callback) : m_Callback(callback) { }
+        WalkCallback(const Function1<bool, T&>& callback)
+            : m_Callback(callback)
+        {
+        }
         bool Call(DLListEntry<T>* entry) { return m_Callback(entry->entry); }
     };
 
@@ -240,181 +113,66 @@ class DLListContainerBase<T, Adapter&>
 public:
     typedef void (DLListContainerBase::*EntryCallback)(DLListEntry<T>*);
 
-    DLListContainerBase()
-        : m_Head(0)
-    {
-    }
+    inline DLListContainerBase();
 
-    DLListContainerBase(Adapter& allocator)
-        : m_Head(0)
-    {
-        m_Allocator = &allocator;
-    }
+    inline DLListContainerBase(Adapter& allocator);
 
-    ~DLListContainerBase()
-    {
-        Clear();
-    }
+    inline ~DLListContainerBase();
 
-    void Clear()
-    {
-        nlWalkDLRing(m_Head, this, &DLListContainerBase::DeleteEntry);
-        m_Head = 0;
-    }
+    inline void Clear();
 
-    DLListEntry<T>* Allocate(const T& data)
-    {
-        DLListEntry<T> value(data);
-        DLListEntry<T>* entry = m_Allocator->Allocate();
-        new (entry) DLListEntry<T>(value);
-        return entry;
-    }
+    inline DLListEntry<T>* Allocate(const T& data);
 
-    unsigned long AddEnd(const T& data)
-    {
-        DLListEntry<T>* entry = Allocate(data);
-        nlDLRingAddEnd(&m_Head, entry);
-        return (unsigned long)entry;
-    }
+    inline unsigned long AddEnd(const T& data);
 
-    unsigned long AddAfter(nlDLListIterator<T>& position, const T& data)
-    {
-        DLListEntry<T>* entry = Allocate(data);
-        nlDLRingInsert(&m_Head, position.CurrentEntry(), entry);
-        return (unsigned long)entry;
-    }
+    inline unsigned long AddAfter(nlDLListIterator<T>& position, const T& data);
 
-    void AddStart(const T& data)
-    {
-        DLListEntry<T>* entry = Allocate(data);
-        nlDLRingAddStart(&m_Head, entry);
-    }
+    inline void AddStart(const T& data);
 
-    void Deallocate(DLListEntry<T>* entry, T* outData)
-    {
-        if (outData != 0)
-        {
-            *outData = entry->entry;
-        }
-        m_Allocator->DeleteEntry(entry);
-    }
+    inline void Deallocate(DLListEntry<T>* entry, T* outData);
 
-    void RemoveStart(T* outData)
-    {
-        DLListEntry<T>* entry = nlDLRingRemoveStart(&m_Head);
-        Deallocate(entry, outData);
-    }
+    inline void RemoveStart(T* outData);
 
-    void Remove(nlDLListIterator<T>* position)
-    {
-        DLListEntry<T>* entry = position->next();
-        nlDLRingRemove(&m_Head, entry);
-        m_Allocator->DeleteEntry(entry);
-    }
+    inline void Remove(nlDLListIterator<T>* position);
 
-    nlDLListIterator<T> Begin() const
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = nlDLRingGetStart(m_Head);
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> Begin() const;
 
-    nlDLListIterator<T> Begin(DLListEntry<T>* current) const
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = current;
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> Begin(DLListEntry<T>* current) const;
 
-    nlDLListIterator<T> End() const
-    {
-        nlDLListIterator<T> result;
-        result.m_Curr = nlDLRingGetEnd(m_Head);
-        result.m_Head = m_Head;
-        return result;
-    }
+    inline nlDLListIterator<T> End() const;
 
-    bool IsEmpty() const
-    {
-        return m_Head == 0;
-    }
+    inline bool IsEmpty() const;
 
-    T* AllocateAtEnd(unsigned long* outEntry)
-    {
-        DLListEntry<T>* result;
-        m_Allocator->Allocate(result);
-        new (result) DLListEntry<T>;
-        nlDLRingAddEnd(&m_Head, result);
-
-        if (outEntry != 0)
-        {
-            *outEntry = (unsigned long)result;
-        }
-
-        return &result->entry;
-    }
+    inline T* AllocateAtEnd(unsigned long* outEntry);
 
     struct WalkCallback
     {
         const Function1<bool, T&>& m_Callback;
-        WalkCallback(const Function1<bool, T&>& callback) : m_Callback(callback) { }
+        WalkCallback(const Function1<bool, T&>& callback)
+            : m_Callback(callback)
+        {
+        }
         bool Call(DLListEntry<T>* entry) { return m_Callback(entry->entry); }
     };
 
-    bool Walk(const Function1<bool, T&>& callback)
-    {
-        WalkCallback adapter(callback);
-        return nlWalkRing(m_Head, &adapter, &WalkCallback::Call);
-    }
+    inline bool Walk(const Function1<bool, T&>& callback);
 
-    void DeleteEntry(DLListEntry<T>* entry)
-    {
-        if (entry != 0)
-        {
-            entry->entry.~T();
-        }
-        m_Allocator->DeleteEntry(entry);
-    }
+    inline void DeleteEntry(DLListEntry<T>* entry);
 
     /* 0x00 */ Adapter* m_Allocator;
     /* 0x04 */ DLListEntry<T>* m_Head;
 }; // size: 0x08
-
-template <typename T, typename Adapter>
-inline T* DLListContainerBase<T, Adapter>::AllocateAtEnd(
-    unsigned long* outEntry)
-{
-    DLListEntry<T>* result;
-    m_Allocator.Allocate(result);
-    new (result) DLListEntry<T>;
-    nlDLRingAddEnd(&m_Head, result);
-
-    if (outEntry != 0)
-    {
-        *outEntry = (unsigned long)result;
-    }
-
-    return &result->entry;
-}
 
 template <typename T>
 class nlDLListContainer
     : public DLListContainerBase<T, NewAdapter<DLListEntry<T> > >
 {
 public:
-    nlDLListContainer()
-        : DLListContainerBase<T, NewAdapter<DLListEntry<T> > >()
-    {
-    }
+    inline nlDLListContainer();
 
     // Mirrors the nlDLListSlotPool(int initial) form; a NewAdapter list has
     // no pool to size, so the count is accepted and ignored.
-    nlDLListContainer(int initial)
-        : DLListContainerBase<T, NewAdapter<DLListEntry<T> > >()
-    {
-    }
+    inline nlDLListContainer(int initial);
 };
 
 template <typename T>
@@ -422,61 +180,16 @@ class nlDLListSlotPool
     : public DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >
 {
 public:
-    void Free()
-    {
-        DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >::Clear();
-        this->m_Allocator.FreeBlocks();
-    }
+    inline void Free();
 
-    nlDLListSlotPool()
-        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
-    {
-        this->m_Allocator.Initialize(16, 16);
-    }
+    inline nlDLListSlotPool();
 
-    ~nlDLListSlotPool()
-    {
-        this->Clear();
-        this->m_Allocator.FreeBlocks();
-    }
+    inline ~nlDLListSlotPool();
 
-    nlDLListSlotPool(const int initial)
-        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
-    {
-        this->m_Allocator.Initialize(initial, 0);
-    }
+    inline nlDLListSlotPool(const int initial);
 
-    nlDLListSlotPool(const int initial, const int delta)
-        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> > >()
-    {
-        this->m_Allocator.Initialize(initial, delta);
-    }
+    inline nlDLListSlotPool(const int initial, const int delta);
 };
-
-template <typename T, typename Adapter>
-bool DLListContainerBase<T, Adapter>::Walk(const Function1<bool, T&>& callback)
-{
-    WalkCallback adapter(callback);
-    return nlWalkRing(m_Head, &adapter, &WalkCallback::Call);
-}
-
-template <typename T, typename Adapter>
-void DLListContainerBase<T, Adapter>::DeleteEntry(
-    DLListEntry<T>* entry)
-{
-    if (entry != 0)
-    {
-        entry->entry.~T();
-    }
-    m_Allocator.DeleteEntry(entry);
-}
-
-template <typename T>
-void nlDLListIterator<T>::Copy(const nlDLListIterator& other)
-{
-    m_Head = other.m_Head;
-    m_Curr = other.m_Curr;
-}
 
 // The list borrows its node pool and does not free the pool's blocks.
 template <typename T>
@@ -484,10 +197,7 @@ class BorrowedDLListSlotPool
     : public DLListContainerBase<T, BasicSlotPool<DLListEntry<T> >&>
 {
 public:
-    BorrowedDLListSlotPool(BasicSlotPool<DLListEntry<T> >& allocator)
-        : DLListContainerBase<T, BasicSlotPool<DLListEntry<T> >&>(allocator)
-    {
-    }
+    inline BorrowedDLListSlotPool(BasicSlotPool<DLListEntry<T> >& allocator);
 };
 
 #endif

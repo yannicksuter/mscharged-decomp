@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/OverlayManager.h"
 
 #include "Game/BaseGameSceneManager.h"

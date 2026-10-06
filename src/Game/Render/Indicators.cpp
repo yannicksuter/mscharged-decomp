@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/Indicators.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Goalie.h"

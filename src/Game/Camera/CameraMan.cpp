@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Camera/CameraMan.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/FE/feHelpFuncs_decl.h"

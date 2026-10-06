@@ -5,20 +5,21 @@
 
 // An event whose listeners come from a fixed-size pool.
 template <typename T, int Count>
-class UnidentifiedStaticEvent : public UnidentifiedTypedEvent<T>
+class UnidentifiedStaticEvent : public UnidentifiedEventInterface<T>::Type
 {
+    typedef typename UnidentifiedEventInterface<T>::Type TypedEvent;
     typedef UnidentifiedListener<T> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
     typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
 
 public:
-    typedef typename UnidentifiedTypedEvent<T>::Callback Callback;
+    typedef typename TypedEvent::Callback Callback;
 
     UnidentifiedStaticEvent(const char* name, int length)
-        : UnidentifiedTypedEvent<T>(name, length)
+        : TypedEvent(name, length)
         , mListeners()
     {
-        RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
+        RegisterEvent(this, TypedEvent::sType);
     }
 
     virtual ~UnidentifiedStaticEvent();

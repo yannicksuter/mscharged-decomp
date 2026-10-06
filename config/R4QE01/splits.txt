@@ -182,7 +182,7 @@ Game/Game.cpp:
 	.text       start:0x80056CA4 end:0x800739F0
 	.ctors      start:0x804DB524 end:0x804DB528
 	.rodata     start:0x804DBFE8 end:0x804DBFF8
-	.data       start:0x804FB060 end:0x804FC7F0
+	.data       start:0x804FB060 end:0x804FC7B8
 	.bss        start:0x8056B990 end:0x8056BA00
 	.sdata      start:0x806DBA68 end:0x806DBAE8
 	.sbss       start:0x806E0C90 end:0x806E0D10
@@ -195,7 +195,7 @@ Game/TweakFileLoader.cpp:
 Game/GameTweaksManager.cpp:
 	.text       start:0x80073C98 end:0x80074F04
 	.ctors      start:0x804DB528 end:0x804DB52C
-	.data       start:0x804FC7F0 end:0x804FC8C0
+	.data       start:0x804FC7B8 end:0x804FC8C0
 	.bss        start:0x8056BA00 end:0x8056CF28
 	.sdata      start:0x806DBAE8 end:0x806DBB00
 
@@ -893,13 +893,19 @@ Game/NetworkStats.cpp:
 	.sdata      start:0x806DC900 end:0x806DC910
 
 Game/NetworkStatsManager.cpp:
-	.text       start:0x8012F33C end:0x80133634
-	.ctors      start:0x804DB620 end:0x804DB624
-	.data       start:0x8050C468 end:0x8050CD58
-	.bss        start:0x8056FC20 end:0x8056FC60
-	.sdata      start:0x806DC910 end:0x806DC920
-	.sbss       start:0x806E1178 end:0x806E1190
+	.text       start:0x8012F33C end:0x80132DE8
+	.data       start:0x8050C468 end:0x8050CB68
+	.sdata      start:0x806DC910 end:0x806DC918
+	.sbss       start:0x806E1178 end:0x806E1180
 	.sdata2     start:0x806E4758 end:0x806E4760
+
+Game/NetworkSeasonCalendar.cpp:
+	.text       start:0x80132DE8 end:0x80133634
+	.ctors      start:0x804DB620 end:0x804DB624
+	.data       start:0x8050CB68 end:0x8050CD58
+	.bss        start:0x8056FC20 end:0x8056FC60
+	.sdata      start:0x806DC918 end:0x806DC920
+	.sbss       start:0x806E1180 end:0x806E1190
 
 Game/NetworkLobby.cpp:
 	.text       start:0x80133634 end:0x801360A4

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/feScrollText.h"
 #include "Game/FE/feText.h"
 #include "Game/FE/tlTextInstance.h"

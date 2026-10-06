@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Font/fontmanager.h"
 #include "NL/nlBundleFile.h"
 #include "NL/nlFont.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/gl/glPlat.h"
 #include "Game/Render/ShootToScoreMeter.h"
 

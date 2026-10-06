@@ -1,4 +1,5 @@
 #include "Game/Render/Nis.h"
+#include "NL/nlDLListContainer.inl"
 
 #include "Game/AI/AIPad.h"
 #include "Game/AnimInventory.h"

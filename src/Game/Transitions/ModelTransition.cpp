@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Transitions/ModelTransition.h"
 #include "NL/gl/glTexture.h"
 

@@ -2,19 +2,17 @@
 #define GAME_NETWORK_STATS_MANAGER_H
 
 #include "Game/NetworkStats.h"
+#include "Game/NetworkSeasonCalendar.h"
 #include "NL/CircularQueue.h"
 #include "types.h"
 
-struct DWCDate;
-struct DWCTime;
-
 enum NetworkPersistentCategory
 {
-    NETWORK_PERSISTENT_CATEGORY_0 = 0,
-    NETWORK_PERSISTENT_CATEGORY_1 = 1,
-    NETWORK_PERSISTENT_CATEGORY_2 = 2,
-    NETWORK_PERSISTENT_CATEGORY_3 = 3,
-    NETWORK_PERSISTENT_CATEGORY_4 = 4
+    NETWORK_PERSISTENT_SEASON = 0,
+    NETWORK_PERSISTENT_STRIKER_OF_DAY = 1,
+    NETWORK_PERSISTENT_FRIENDS = 2,
+    NETWORK_PERSISTENT_ALTERNATE_SEASON = 3,
+    NETWORK_PERSISTENT_ALTERNATE_STRIKER_OF_DAY = 4
 };
 
 struct NetworkLeaderboardCategory
@@ -24,48 +22,25 @@ struct NetworkLeaderboardCategory
 
     /* 0x0000 */ NetworkPersistentCategory mPersistentCategory;
     /* 0x0004 */ int mFilter;
-    /* 0x0008 */ int mResultType;
+    /* 0x0008 */ int mLocalStatsCategory;
     /* 0x000C */ bool mAvailable;
     /* 0x000D */ u8 mPadding000D[3];
     /* 0x0010 */ int mCount;
-    /* 0x0014 */ int mFirstRank;
+    /* 0x0014 */ int mLocalPlayerIndex;
     /* 0x0018 */ NetworkStatsPlayer mPlayers[65];
     /* 0x1A80 */ NetworkRankingMeta mMetadata[65];
 }; // size: 0x2098
-
-struct NetworkSeasonDate
-{
-    int mMonth;
-    int mDay;
-}; // size: 0x8
-
-struct NetworkSeasonDateTable
-{
-    NetworkSeasonDateTable(int count, NetworkSeasonDate* dates)
-        : mCount(count)
-        , mDates(dates)
-    {
-    }
-
-    NetworkSeasonDate GetDate(int index) const
-    {
-        return mDates[index];
-    }
-
-    mutable int mCount;
-    NetworkSeasonDate* mDates;
-}; // size: 0x8
 
 class NetworkStatsManager : public NetworkStatsListener
 {
 public:
     NetworkStatsManager()
-        : mCurrentJob(0)
-        , mUnidentifiedC430(false)
-        , mUnidentifiedC431(false)
-        , mUnidentifiedC434(0)
-        , mUnidentifiedC438(0)
-        , mUnidentifiedC43C(0)
+        : mLastTotalPoints(0)
+        , mLastGameWon(false)
+        , mLastGameTied(false)
+        , mLastResultPoints(0)
+        , mLastGoalPoints(0)
+        , mLastBonusPoints(0)
     {
         Reset(true);
     }
@@ -91,15 +66,15 @@ public:
         NetworkStatsPlayer* away, bool reportHome, int homeScore,
         int awayScore, const NetworkScoreSubmission* fallback);
     void SubmitJob(int job);
-    void RefreshSaveState_801314D0();
+    void RefreshFriendCount();
     void ClearGameResultReported();
     void ResetPregameDisconnectState();
     void MarkDisconnectPending();
     void PreGameRestoreDefaultDisconnectLoss();
-    bool RefreshFriendStats_80131B50();
-    void BeginOnlineGame_80131DB4();
+    bool RefreshRankings();
+    void BeginOnlineGame();
     void Update(float dt);
-    void HandleDisconnect_8013243C(int result);
+    void ReportDisconnect(int result);
     void CalculateAndReportGameResult(int result);
 
     NetworkRankingMeta* GetLocalStats(int category)
@@ -133,42 +108,29 @@ public:
     /* 0xC3FC */ NetworkPersistentCategory mPersistentCategories[3];
     /* 0xC408 */ float mCurrentTime;
     /* 0xC40C */ float mOperationStartTime;
-    /* 0xC410 */ int mUnidentifiedC410;
-    /* 0xC414 */ int mSaveState;
+    /* 0xC410 */ int mNextLeaderboardJobIndex;
+    /* 0xC414 */ int mCachedFriendCount;
     /* 0xC418 */ bool mStatsError;
     /* 0xC419 */ bool mSaveDataChanged;
     /* 0xC41A */ bool mGameResultReported;
     /* 0xC41B */ bool mDisconnectPending;
-    /* 0xC41C */ int mUnidentifiedC41C[3];
+    /* 0xC41C */ int mDisconnectPointsLost[3];
     /* 0xC428 */ bool mDisconnectLossPending[3];
     /* 0xC42B */ u8 mPaddingC42B;
-    /* 0xC42C */ int mCurrentJob;
-    /* 0xC430 */ bool mUnidentifiedC430;
-    /* 0xC431 */ bool mUnidentifiedC431;
+    /* 0xC42C */ int mLastTotalPoints;
+    /* 0xC430 */ bool mLastGameWon;
+    /* 0xC431 */ bool mLastGameTied;
     /* 0xC432 */ u8 mPaddingC432[2];
-    /* 0xC434 */ int mUnidentifiedC434;
-    /* 0xC438 */ int mUnidentifiedC438;
-    /* 0xC43C */ int mUnidentifiedC43C;
+    /* 0xC434 */ int mLastResultPoints;
+    /* 0xC438 */ int mLastGoalPoints;
+    /* 0xC43C */ int mLastBonusPoints;
     /* 0xC440 */ StaticCircularQueue<int, 10> mJobs;
 }; // size: 0xC478
 
-int CalculateResultPoints_80130684(int result, bool home, int homeScore,
+int CalculateNetworkResultPoints(int result, bool home, int homeScore,
     int awayScore, bool* won, bool* tied, int* resultPoints,
-    int* scorePoints, int* bonusPoints);
-int GetLocalPlayingSide_801323F4();
+    int* goalPoints, int* bonusPoints);
+int GetLocalNetworkPlayingSide();
 bool IsNewNetworkSeason(const NetworkRankingMeta* previous);
 bool IsNewNetworkDay(const NetworkRankingMeta* previous);
-bool GetAdjustedNetworkDate(DWCDate* date, DWCTime* time);
-int FindNetworkSeasonBoundary(
-    const NetworkSeasonDateTable* dates, NetworkSeasonDate date);
-int GetDaysUntilNextSeasonBoundary(
-    const NetworkSeasonDateTable* dates, int index, int year);
-int GetDaysSinceSeasonBoundary(const NetworkSeasonDateTable* dates, int index,
-    NetworkSeasonDate date, int year);
-
-extern NetworkSeasonDateTable sNetworkSeasonDateTable;
-
-extern int g_nAddHoursTime;
-extern int g_nAddMinsTime;
-
 #endif // GAME_NETWORK_STATS_MANAGER_H

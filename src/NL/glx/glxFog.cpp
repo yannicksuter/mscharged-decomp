@@ -64,17 +64,17 @@ void glx_Fog(bool enable)
     if (enable && glx_bFog)
     {
         GXColor fogColour;
-        float r = glx_FogRed.value;
+        float r = glx_FogRed.mValue;
         float rScaled = r * glx_FogIntensity.value;
         fogColour.r = (s32)rScaled;
-        float g = glx_FogGreen.value;
+        float g = glx_FogGreen.mValue;
         float gScaled = g * glx_FogIntensity.value;
         fogColour.g = (s32)gScaled;
-        float b = glx_FogBlue.value;
+        float b = glx_FogBlue.mValue;
         float bScaled = b * glx_FogIntensity.value;
         fogColour.b = (s32)bScaled;
         fogColour.a = 0xFF;
-        GXSetFog(fogtype[glx_FogType.value], fogColour, glx_GetFogStart(), glx_GetFogEnd(), glx_FogNear, glx_FogFar);
+        GXSetFog(fogtype[glx_FogType.mValue], fogColour, glx_GetFogStart(), glx_GetFogEnd(), glx_FogNear, glx_FogFar);
     }
     else
     {

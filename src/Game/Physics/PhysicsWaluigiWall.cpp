@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlIntersection.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"

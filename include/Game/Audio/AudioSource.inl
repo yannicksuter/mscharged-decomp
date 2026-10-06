@@ -1,6 +1,10 @@
 #ifndef GAME_AUDIO_AUDIO_SOURCE_INL
 #define GAME_AUDIO_AUDIO_SOURCE_INL
 
+#include "Game/Audio/AudioBackend.h"
+#include "NL/nlMath.h"
+#include "revolution/mix.h"
+
 inline bool AudioSource::IsLooping()
 {
     return m_PlayCount == 0xFFFF;
@@ -188,6 +192,157 @@ inline void AudioMonoStreamSource::SetInterauralDelay(int value)
 inline unsigned int AudioMonoStreamSource::GetStreamHeaderOffset()
 {
     return m_SourceInfo->m_StreamOffset;
+}
+
+inline void OnAudioReadCancelled(nlFile* file, void* buffer, unsigned int size,
+    unsigned long userParam, ReadAsyncCallback callback)
+{
+    callback(file, buffer, size, userParam);
+}
+
+inline unsigned int AudioStereoStreamSource::GetStreamHeaderOffset()
+{
+    return m_SourceInfo->m_StreamOffset + 12;
+}
+
+inline void AudioStereoStreamSource::SetInterauralDelay(int value)
+{
+    SetVoiceInterauralDelay(m_Channels[0].m_Voice, nlMin(value, 0));
+    SetVoiceInterauralDelay(m_Channels[1].m_Voice, nlMax(value, 0));
+}
+
+inline void AudioStereoStreamSource::SetPan(float value)
+{
+    float pan = 2.0f * value + -1.0f;
+    pan = pan >= -1.0f ? pan : -1.0f;
+    SetVoicePan(m_Channels[0].m_Voice, pan);
+    pan = 2.0f * value + 1.0f;
+    pan = pan <= 1.0f ? pan : 1.0f;
+    SetVoicePan(m_Channels[1].m_Voice, pan);
+}
+
+inline AudioStereoStreamSource::~AudioStereoStreamSource()
+{
+}
+
+inline void AudioSampleSource::SetAuxiliaryVolume(int auxiliary, int value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoiceAuxiliaryVolume(m_Voice, auxiliary, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline bool AudioSampleSource::HasVoice()
+{
+    return m_Voice != 0;
+}
+
+inline void AudioSampleSource::SetLowPassFilter(bool on, unsigned int frequency, bool unchanged)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoiceLowPassFilter(m_Voice, on, frequency, unchanged);
+    OSRestoreInterrupts(enabled);
+}
+
+inline void AudioSampleSource::SetSurroundPan(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoiceSurroundPan(m_Voice, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline void AudioSampleSource::SetInterauralDelay(int value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoiceInterauralDelay(m_Voice, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline void AudioSampleSource::SetPan(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoicePan(m_Voice, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline void AudioSampleSource::SetPitch(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoicePitch(m_Voice, m_SampleRateRatio, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline void AudioSampleSource::SetMixVolume(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    SetVoiceMixVolume(m_Voice, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline void AudioSampleSource::SetInputVolume(float value)
+{
+    bool enabled = OSDisableInterrupts();
+    if (!HasVoice())
+    {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+    if (m_ControllerSpeakerEnabled)
+        MIXRmtSetFader(m_Voice, m_ControllerSpeakerChannel, (int)(10.0f * value));
+    if (g_pAudioBackend->m_MixControllerSpeakersToMain || !m_ControllerSpeakerEnabled)
+        SetVoiceInputVolume(m_Voice, value);
+    OSRestoreInterrupts(enabled);
+}
+
+inline AXVPB* AudioSampleSource::GetVoice()
+{
+    return m_Voice;
+}
+
+inline bool AudioSampleSource::WasVoiceDropped()
+{
+    return m_VoiceDropped;
+}
+
+inline bool AudioSampleSource::Prepare()
+{
+    m_InternalState = 3;
+    return false;
 }
 
 inline AudioSource::~AudioSource()

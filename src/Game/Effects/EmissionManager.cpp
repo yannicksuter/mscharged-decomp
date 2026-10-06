@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Effects/EmissionManager.h"
 
 #include "Game/Effects/EmissionController.h"

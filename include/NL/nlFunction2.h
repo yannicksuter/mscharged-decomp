@@ -106,6 +106,15 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
+    void UnidentifiedTransfer(const Function2& other)
+    {
+        Function2& source = const_cast<Function2&>(other);
+        mTag = source.mTag;
+        mFreeFunction = source.mFreeFunction;
+        source.mTag = FUNCTION_EMPTY;
+        source.mFreeFunction = 0;
+    }
+
     operator bool() const
     {
         return mTag != FUNCTION_EMPTY;

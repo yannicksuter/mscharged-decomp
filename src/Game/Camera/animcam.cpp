@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Camera/animcam.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Render/RLViewLayers.h"

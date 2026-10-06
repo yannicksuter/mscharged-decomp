@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/CrowdImpostorManager.h"
 #include "Game/Render/Frustum.h"
 #include "NL/gl/glView.h"

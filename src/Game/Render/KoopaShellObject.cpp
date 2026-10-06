@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include <math.h>
 #include "Game/Render/KoopaShellObject.h"
 

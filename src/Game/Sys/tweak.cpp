@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/ImpostorCharacter.h"
 #include "NL/gl/glTexture.h"
 
@@ -86,12 +87,12 @@ void ImpostorCluster::Render(GLView* target, int)
 
     for (int i = 0; i < 4; ++i)
     {
-        quad.m_colour[i].c[0] = (unsigned char)siBackgroundRed.value;
-        quad.m_colour[i].c[1] = (unsigned char)siBackgroundGreen.value;
-        quad.m_colour[i].c[2] = (unsigned char)siBackgroundBlue.value;
+        quad.m_colour[i].c[0] = (unsigned char)siBackgroundRed.mValue;
+        quad.m_colour[i].c[1] = (unsigned char)siBackgroundGreen.mValue;
+        quad.m_colour[i].c[2] = (unsigned char)siBackgroundBlue.mValue;
         quad.m_colour[i].c[3] = 0xFF;
     }
-    quad.Attach((eGLView)target, siBackgroundQuadLayer.value);
+    quad.Attach((eGLView)target, siBackgroundQuadLayer.mValue);
 }
 
 void ImpostorCluster::PlayAnimation(float, const char*)

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Player.h"
 #include "Game/Terrain.h"

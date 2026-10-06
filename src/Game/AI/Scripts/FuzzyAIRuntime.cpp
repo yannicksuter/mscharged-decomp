@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Ball.h"
 #include "Game/AI/SkillTweaks.h"
 #include "Game/AI/Fuzzy.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Effects/EffectsTemplate.h"
 
 #include "Game/GL/GLInventory.h"

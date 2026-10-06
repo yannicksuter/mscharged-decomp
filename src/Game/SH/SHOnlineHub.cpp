@@ -22,6 +22,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkSeasonCalendar.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/RLViewLayers.h"
@@ -176,7 +177,7 @@ void SHOnlineHub::Update(float dt)
         GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
         return;
     }
-    if (!NetworkStatsManager::Instance()->RefreshFriendStats_80131B50())
+    if (!NetworkStatsManager::Instance()->RefreshRankings())
     {
         if (g_pNetworkSession->mDWCLastError == 0)
             g_pNetworkSession->ReadAndClearDWCError();

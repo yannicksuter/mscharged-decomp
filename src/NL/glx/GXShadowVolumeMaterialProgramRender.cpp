@@ -51,19 +51,19 @@ static void SetShadowVolumeMode(int mode)
 
 void CopyShadowVolumeColour(const GXColor* colour)
 {
-    sShadowVolumeRed.value = colour->r;
-    sShadowVolumeGreen.value = colour->g;
-    sShadowVolumeBlue.value = colour->b;
-    sShadowVolumeAlpha.value = colour->a;
+    sShadowVolumeRed.mValue = colour->r;
+    sShadowVolumeGreen.mValue = colour->g;
+    sShadowVolumeBlue.mValue = colour->b;
+    sShadowVolumeAlpha.mValue = colour->a;
 }
 
 static inline void SetShadowVolumeColour()
 {
     GXColor colour;
-    colour.r = sShadowVolumeRed.value;
-    colour.g = sShadowVolumeGreen.value;
-    colour.b = sShadowVolumeBlue.value;
-    colour.a = sShadowVolumeAlpha.value;
+    colour.r = sShadowVolumeRed.mValue;
+    colour.g = sShadowVolumeGreen.mValue;
+    colour.b = sShadowVolumeBlue.mValue;
+    colour.a = sShadowVolumeAlpha.mValue;
     GXSetTevColor(GX_TEVREG0, colour);
 }
 

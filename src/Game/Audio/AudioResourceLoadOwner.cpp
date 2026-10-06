@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioSystem.h"

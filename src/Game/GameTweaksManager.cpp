@@ -10,12 +10,9 @@
 #include "NL/nlString.h"
 #include "Game/TweakValue.inl"
 
-extern const char sHomeSkillTweakCategory[];
-extern const char sAwaySkillTweakCategory[];
-
 static const char* sSkillTweakCategories[2] = {
-    sHomeSkillTweakCategory,
-    sAwaySkillTweakCategory,
+    "/Game/AI/Team Skillz/Home",
+    "/Game/AI/Team Skillz/Away",
 };
 
 TweakFileLoader gTweakFileLoader;

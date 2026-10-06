@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 class InterpreterCore;
+class TweakIntBinding;
 class TweakEntry;
 class TweakNode;
 struct TweakPendingValue;
@@ -78,7 +79,7 @@ inline void ParseTweakBindingValue(bool*& result, const char* value)
     }
 }
 
-inline void FormatBooleanTweakValue(char* buffer, unsigned long size, bool value)
+inline void FormatOwnedTweakValue(char* buffer, unsigned long size, bool value)
 {
     nlSNPrintf(buffer, size, value ? "true" : "false");
 }
@@ -109,6 +110,7 @@ struct TweakType<bool>
         ID = 2
     };
     typedef TweakValueBool OwnedValue;
+    typedef TweakBinding<bool> Binding;
     static bool ReadOwned(TweakValueBase* value);
 };
 template <>
@@ -119,8 +121,23 @@ struct TweakType<float>
         ID = 5
     };
     typedef TweakValueFloat OwnedValue;
+    typedef TweakBinding<float> Binding;
     static float ReadOwned(TweakValueBase* value);
 };
+template <>
+struct TweakType<int>
+{
+    enum
+    {
+        ID = 3
+    };
+    typedef TweakValue<int> OwnedValue;
+    typedef TweakIntBinding Binding;
+};
+template <typename T>
+inline void FormatOwnedTweakValue(char*, unsigned long, T);
+inline void ParseOwnedTweakValue(int&, const char*);
+
 template <typename T>
 class TweakBinding : public TweakBindingBase
 {

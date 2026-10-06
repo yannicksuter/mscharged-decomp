@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Render/StadiumLoading.h"
 #include "Game/GameObjectLighting.h"

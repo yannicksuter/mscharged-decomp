@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireUserControlled.h"
 #include "Game/Player.h"
 #include "Game/CharacterTweaks.h"

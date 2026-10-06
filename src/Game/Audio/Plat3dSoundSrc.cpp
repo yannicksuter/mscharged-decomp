@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlPrint.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
 

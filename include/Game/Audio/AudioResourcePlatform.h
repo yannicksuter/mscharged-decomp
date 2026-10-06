@@ -43,6 +43,8 @@ public:
     virtual void Unload();
     virtual void Load(const char* name);
 
+    nlFile* GetFile() const { return m_File; }
+
 private:
     nlFile* m_File;
 };

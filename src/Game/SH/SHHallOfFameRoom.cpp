@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHHallOfFameRoom.h"
 #include "NL/nlFunction.inl"
 #include "Game/FE/FEAudio.h"

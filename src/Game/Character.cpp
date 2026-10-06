@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #define NL_AVL_TREE_DEFER_DELETE_ENTRY
 #include "NL/nlAVLTree.h"
 #undef NL_AVL_TREE_DEFER_DELETE_ENTRY

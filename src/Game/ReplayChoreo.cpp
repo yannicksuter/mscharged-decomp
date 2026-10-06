@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/ReplayChoreo.h"
 
 #include "Game/Ball.h"

@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include <revolution/pad.h>
 #include "Game/Render/StadiumLoading.h"
 

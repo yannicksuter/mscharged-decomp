@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioCalculation.h"
 #include "Game/Audio/AudioBundleManager.h"

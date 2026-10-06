@@ -225,7 +225,8 @@ struct WarbleRowGenerator
             const int rowPixel = IA8TileRowIndex(y, pixel);
             const int offset = (rowPixel | ((x >> 2) << 4)) << 1;
             const float normalized = (float)(u8)(int)source / 255.0f;
-            const int mapped = (int)((float)sWarbleInputExtent + normalized * (float)(sWarbleOutputExtent - sWarbleInputExtent));
+            const int inputExtent = sWarbleInputExtent;
+            const int mapped = (int)((float)inputExtent + normalized * (float)(sWarbleOutputExtent - inputExtent));
             output[offset] = (u8)mapped;
             output[offset + 1] = (u8)displacement;
         }

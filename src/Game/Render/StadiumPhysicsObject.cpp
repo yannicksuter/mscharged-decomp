@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/StadiumPhysicsObject.h"
 
 #include "Game/BasicStadium.h"

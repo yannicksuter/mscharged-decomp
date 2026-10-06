@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/platpad.h"
 #include "NL/plat/SwappablePad.h"
 

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/AI/AvoidController.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Sys/simpleparser.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #pragma pool_data off
 
 #include "Game/CharacterTweaks.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/ImpostorLighting.h"
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorManager.h"
@@ -148,18 +149,18 @@ nlColour LightingLookup::SampleColour(
     if (tint)
     {
         u8 shadowColour[4] = { 0, 0, 0, 255 };
-        shadowColour[0] = (u8)g_ShadowRed.value;
-        shadowColour[1] = (u8)g_ShadowGreen.value;
-        shadowColour[2] = (u8)g_ShadowBlue.value;
+        shadowColour[0] = (u8)g_ShadowRed.mValue;
+        shadowColour[1] = (u8)g_ShadowGreen.mValue;
+        shadowColour[2] = (u8)g_ShadowBlue.mValue;
         nlFloatColour shadow;
         shadow.c[0] = shadowColour[0] * (1.0f / 255.0f);
         shadow.c[1] = shadowColour[1] * (1.0f / 255.0f);
         shadow.c[2] = shadowColour[2] * (1.0f / 255.0f);
         shadow.c[3] = shadowColour[3] * (1.0f / 255.0f);
         u8 highlightColour[4] = { 0, 0, 0, 255 };
-        highlightColour[0] = (u8)g_HighlightRed.value;
-        highlightColour[1] = (u8)g_HighlightGreen.value;
-        highlightColour[2] = (u8)g_HighlightBlue.value;
+        highlightColour[0] = (u8)g_HighlightRed.mValue;
+        highlightColour[1] = (u8)g_HighlightGreen.mValue;
+        highlightColour[2] = (u8)g_HighlightBlue.mValue;
         nlFloatColour highlight;
         highlight.c[0] = highlightColour[0] * (1.0f / 255.0f);
         highlight.c[1] = highlightColour[1] * (1.0f / 255.0f);

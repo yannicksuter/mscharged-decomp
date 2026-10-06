@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "revolution/ax.h"
 #include "revolution/axfx.h"
 
@@ -5,6 +7,7 @@
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlString.h"
 

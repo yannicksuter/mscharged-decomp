@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlAVLTree.h"
 #include "NL/nlDLListContainer.h"
 #include "Game/AI/GoalieSave.h"

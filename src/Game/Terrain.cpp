@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/AiUtil.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"

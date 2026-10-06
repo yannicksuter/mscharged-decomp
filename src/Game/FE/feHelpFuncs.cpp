@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/feHelpFuncs_decl.h"
 
 #include <cmath>

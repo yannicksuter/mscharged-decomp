@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/main.h"
 #include "Game/TweakRegistry.h"
 #include "Game/TweakConfig.h"

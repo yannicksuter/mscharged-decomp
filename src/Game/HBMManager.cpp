@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/SH/SHNavigation.h"
@@ -469,3 +471,5 @@ void HBMManager::OnHomeButtonPressed()
         }
     }
 }
+
+#include "Game/EventBase.inl"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/FielderDesireMachine.h"
 #include "Game/AI/FielderDesireTransitions.h"
 #include "Game/AI/ScriptMachine.h"

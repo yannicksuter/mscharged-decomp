@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Drawable/DrawableFlyingCamera.h"
 #include "Game/Drawable/RenderObject.h"
 

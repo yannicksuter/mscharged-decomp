@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHNavigation.h"
 #include "Game/GameSceneManager.h"
 #include "Game/SH/SHCredits.h"

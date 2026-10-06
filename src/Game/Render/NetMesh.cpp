@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/NetMesh.h"
 #include "Game/Physics/PhysicsEventQueue.h"
 

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/Wiper.h"
 
 #include "Game/NisPlayer.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/CrowdImpostorManager.h"
 
 void CrowdLayoutObject::UnidentifiedVirtual1C(WorldObjectLoadContext*)

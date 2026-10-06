@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/LidOpenMessage.h"
 
 #include "Game/NetworkSession.h"

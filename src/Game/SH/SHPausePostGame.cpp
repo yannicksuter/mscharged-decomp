@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHPausePostGame.h"
 
 #include "Game/DB/CharacterInfo.h"

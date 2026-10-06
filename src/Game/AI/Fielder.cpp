@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Fielder.inl"
@@ -1510,7 +1511,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     else if (type == 2)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && !fn_800344B0() && m_eActionState != ACTION_UNKNOWN_34
+            && !fn_800344B0() && !IsInActionState(ACTION_UNKNOWN_34)
             && !IsInvincible())
         {
             fn_80045AEC(eventData->mUnidentified10);

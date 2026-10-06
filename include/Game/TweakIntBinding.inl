@@ -38,7 +38,7 @@ void TweakIntBinding::CopyValueFrom(
     switch (other->GetStorageKind())
     {
     case 1:
-        *m_pValue = ((TweakValueInt*)other)->value;
+        *m_pValue = ((TweakValueInt*)other)->mValue;
         break;
     case 2:
         *m_pValue = *((TweakIntBinding*)other)->m_pValue;

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/NetworkEvents.h"
 #include "Game/InputRouter.h"
 #include "Game/NetworkDebug.h"
@@ -841,3 +842,5 @@ typedef char VerifyNetworkInputRouterSize[
 
 #include "Game/InputRouter.inl"
 #include "NL/nlBind_impl.h"
+
+#include "Game/EventBase.inl"

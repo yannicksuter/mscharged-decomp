@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsKoopaShell.h"
 
 #include "Game/AI/Fielder.h"

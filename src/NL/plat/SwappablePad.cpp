@@ -1,3 +1,6 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
+#include "Game/EventBase.inl"
 #include "NL/plat/PlatPadManager.h"
 #include "NL/plat/SwappablePad.h"
 #include "NL/plat/WiiRemotePad.h"
@@ -5,8 +8,6 @@
 #include "NL/plat/WiiClassicPad.h"
 #include "NL/globalpad.h"
 #include "revolution/os/OSInterrupt.h"
-
-
 
 bool gEnableWiiRemotePad = true;
 bool gEnableWiiFreestylePad = true;

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/AiUtil.h"
 #include "Game/BasicStadium.h"
 #include "Game/Render/BirdoEgg.h"

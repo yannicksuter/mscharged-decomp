@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/OverlayHandlerHUD.h"
 #include "Game/AI/Fielder.h"
 

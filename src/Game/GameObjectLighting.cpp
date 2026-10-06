@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include <revolution/gx/GXLight.h>
 #include <revolution/gx/GXTev.h>
 #include <revolution/gx/GXTransform.h>
@@ -187,9 +189,9 @@ bool AlwaysUseCameraRelativeCharacterLighting()
 
 void UpdateCharacterLightColour()
 {
-    gCharacterLight.colour.c[0] = gCharacterLightRed.value;
-    gCharacterLight.colour.c[1] = gCharacterLightGreen.value;
-    gCharacterLight.colour.c[2] = gCharacterLightBlue.value;
+    gCharacterLight.colour.c[0] = gCharacterLightRed.mValue;
+    gCharacterLight.colour.c[1] = gCharacterLightGreen.mValue;
+    gCharacterLight.colour.c[2] = gCharacterLightBlue.mValue;
 }
 
 void fn_80182164()
@@ -220,7 +222,7 @@ int GetGameObjectLightCount(bool character, bool includeEffects)
     {
     case 0:
         if (character)
-            return numEffectsLights + gNumCharacterInGameLights.value;
+            return numEffectsLights + gNumCharacterInGameLights.mValue;
         return gNumInGameLights + numEffectsLights;
     case 1:
         return gNumInGameLights + numEffectsLights;
@@ -234,7 +236,7 @@ int GetGameObjectLightCount(bool character, bool includeEffects)
 
 GameObjectLight* GetGameObjectLight(int index, bool character)
 {
-    s32 numLights = character ? gNumCharacterInGameLights.value : gNumInGameLights;
+    s32 numLights = character ? gNumCharacterInGameLights.mValue : gNumInGameLights;
     if (!gCameraRelativeLightingAllowed && gGameObjectLightingMode == 1)
     {
         gGameObjectLightingMode = 0;
@@ -263,7 +265,7 @@ GameObjectLight* GetGameObjectLight(int index, bool character)
         {
             if (index == 0)
                 return &gCharacterLight;
-            s32 characterLightCount = gNumCharacterInGameLights.value;
+            s32 characterLightCount = gNumCharacterInGameLights.mValue;
             s32 lightIndex = index;
             if (lightIndex < characterLightCount)
                 return &gInGameLights[lightIndex];
@@ -320,9 +322,9 @@ void InitializeGameObjectLighting()
     {
         gCharacterLight.worldPosition = BasicStadium::GetCurrentStadium()->m_shadowLightPosition;
     }
-    gCharacterLight.colour.c[0] = gCharacterLightRed.value;
-    gCharacterLight.colour.c[1] = gCharacterLightGreen.value;
-    gCharacterLight.colour.c[2] = gCharacterLightBlue.value;
+    gCharacterLight.colour.c[0] = gCharacterLightRed.mValue;
+    gCharacterLight.colour.c[1] = gCharacterLightGreen.mValue;
+    gCharacterLight.colour.c[2] = gCharacterLightBlue.mValue;
 
     gCameraRelativeLights[0].intensity = 1.0f;
     gCameraRelativeLights[1].intensity = 1.0f;

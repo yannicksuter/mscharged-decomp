@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Ball.h"
 #include "Game/BallTrail.h"

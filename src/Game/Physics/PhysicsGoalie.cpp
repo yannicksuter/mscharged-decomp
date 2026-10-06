@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsGoalie.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/Ball.h"

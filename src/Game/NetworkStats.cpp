@@ -9,6 +9,7 @@
 
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkSeasonCalendar.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/Sys/simpleparser.h"
 #include "Game/TweakValue.h"
@@ -215,7 +216,7 @@ void NetworkStatsReporter::ParseLeaderboardResponse(
             switch (column)
             {
             case 0:
-                mLeaderboardMetadata[row].mUnidentified14 = GetOnlineRegion();
+                mLeaderboardMetadata[row].mOnlineRegion = GetOnlineRegion();
                 mLeaderboardMetadata[row].mDisplayRank = atoi(token);
                 break;
             case 1:
@@ -514,7 +515,7 @@ bool NetworkRanking::SubmitScore(int category,
     {
         mSubmission.mWins = submission->mWins;
         mSubmission.mLosses = submission->mLosses;
-        mSubmission.mOnlineRegion = (u16)submission->mUnidentified14;
+        mSubmission.mOnlineRegion = (u16)submission->mOnlineRegion;
         mSubmission.mDay = submission->mDay;
         mSubmission.mMonth = submission->mMonth;
         mSubmission.mYear = submission->mYear;
@@ -787,7 +788,7 @@ void NetworkRanking::ProcessLeaderboardResults()
             {
                 mLeaderboardMetadata[retained].mWins = submission->mWins;
                 mLeaderboardMetadata[retained].mLosses = submission->mLosses;
-                mLeaderboardMetadata[retained].mUnidentified14 = submission->mOnlineRegion;
+                mLeaderboardMetadata[retained].mOnlineRegion = submission->mOnlineRegion;
                 mLeaderboardMetadata[retained].mDay = submission->mDay;
                 mLeaderboardMetadata[retained].mMonth = submission->mMonth;
                 mLeaderboardMetadata[retained].mYear = submission->mYear;
@@ -800,7 +801,7 @@ void NetworkRanking::ProcessLeaderboardResults()
             {
                 mLeaderboardMetadata[retained].mWins = 0;
                 mLeaderboardMetadata[retained].mLosses = 0;
-                mLeaderboardMetadata[retained].mUnidentified14 = 0;
+                mLeaderboardMetadata[retained].mOnlineRegion = 0;
                 mLeaderboardMetadata[retained].mDay = 1;
                 mLeaderboardMetadata[retained].mMonth = 1;
                 mLeaderboardMetadata[retained].mYear = 2000;

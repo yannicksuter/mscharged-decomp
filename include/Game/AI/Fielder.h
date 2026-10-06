@@ -257,6 +257,10 @@ public:
     bool CanGetElectrocuted(
         const CollisionPlayerWallData* eventData);
     eFielderActionState GetActionState() const { return m_eActionState; }
+    bool IsInActionState(eFielderActionState actionState) const
+    {
+        return m_eActionState == actionState;
+    }
     bool CanDoCaptainShootToScore();
     bool CanDoSidekickShootToScore();
     bool CanReceivePass();

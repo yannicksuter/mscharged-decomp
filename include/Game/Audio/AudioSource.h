@@ -20,7 +20,7 @@ struct AudioSourceData
 
 struct AudioSourceInfo
 {
-    unsigned int m_Unknown00;
+    unsigned int m_SoundIndex;
     unsigned int m_StreamOffset;
     unsigned int m_Unknown08;
     unsigned int m_Unknown0C;
@@ -34,16 +34,16 @@ class AudioSource
 public:
     AudioSource()
     {
-        m_Unknown04 = 0;
+        m_State = 0;
         m_SourceInfo = 0;
-        m_Unknown10 = 0;
+        m_InternalState = 0;
         m_PlayCount = 0;
-        m_Unknown14_0C = 1;
-        m_Unknown14_18 = 0;
+        m_PlayIteration = 1;
+        m_ControllerSpeakerEnabled = 0;
     }
     virtual ~AudioSource();
     virtual void UpdateState();
-    virtual int GetState() { return m_Unknown04; }
+    virtual int GetState() { return m_State; }
     virtual bool IsResident();
     virtual bool IsStream();
     virtual bool Prepare() = 0;
@@ -70,14 +70,14 @@ public:
 
     void SetControllerSpeaker(bool, unsigned int);
 
-    /* 0x04 */ int m_Unknown04;
+    /* 0x04 */ int m_State;
     /* 0x08 */ AudioSourceInfo* m_SourceInfo;
     /* 0x0C */ float m_SampleRateRatio;
-    /* 0x10 */ int m_Unknown10;
+    /* 0x10 */ int m_InternalState;
     /* 0x14 */ unsigned int m_PlayCount : 12;
-    unsigned int m_Unknown14_0C : 12;
-    unsigned int m_Unknown14_18 : 1;
-    unsigned int m_Unknown14_19 : 2;
+    unsigned int m_PlayIteration : 12;
+    unsigned int m_ControllerSpeakerEnabled : 1;
+    unsigned int m_ControllerSpeakerChannel : 2;
     unsigned int m_Unknown14_1B : 5;
 };
 
@@ -91,35 +91,35 @@ public:
     virtual void Stop();
     virtual bool Pause();
     virtual bool Resume();
+    virtual bool WasVoiceDropped();
+    virtual AXVPB* GetVoice();
+    virtual void ReleaseVoice(bool);
     virtual void SetInputVolume(float);
     virtual void SetMixVolume(float);
     virtual void SetPitch(float);
+    virtual void SetPan(float);
+    virtual void SetInterauralDelay(int);
+    virtual void SetSurroundPan(float);
+    virtual void SetLowPassFilter(bool, unsigned int, bool);
+    virtual bool HasVoice();
+    virtual void SetAuxiliaryVolume(int, int);
     virtual void Initialize(AudioSourceInfo*);
     virtual void Update();
-    virtual void SetPan(float);
-    virtual void SetSurroundPan(float);
-    virtual void SetInterauralDelay(int);
-    virtual void SetLowPassFilter(bool, unsigned int, bool);
-    virtual void SetAuxiliaryVolume(int, int);
-    virtual bool WasVoiceDropped();
-    virtual bool HasVoice();
-    virtual AXVPB* GetVoice();
-    virtual void ReleaseVoice(bool);
 
     static void* operator new(unsigned long);
     static void operator delete(void* pointer);
     static void OnVoiceDropped(void*);
 
-    /* 0x18 */ unsigned int m_Unknown18;
-    /* 0x1C */ AXVPB* m_Unknown1C;
-    /* 0x20 */ SPSoundEntry* m_Unknown20;
-    /* 0x24 */ unsigned int m_Unknown24;
-    /* 0x28 */ bool m_Unknown28;
+    /* 0x18 */ unsigned int m_LastVoiceAddress;
+    /* 0x1C */ AXVPB* m_Voice;
+    /* 0x20 */ SPSoundEntry* m_SoundEntry;
+    /* 0x24 */ unsigned int m_PauseAddress;
+    /* 0x28 */ bool m_VoiceDropped;
 };
 
 struct AudioReadQueueEntry
 {
-    AsyncEntry* m_Unknown00;
+    AsyncEntry* m_Request;
     AudioReadQueueEntry* m_next;
 };
 
@@ -152,15 +152,18 @@ struct AudioStreamChannel
     ~AudioStreamChannel();
     void PrepareVoice(AudioStreamHeader*);
     void ReleaseVoice(bool);
+    unsigned int GetBufferSize();
+    void AdvanceReadPosition(unsigned int size);
+    void* GetBuffer() { return m_Buffer; }
     static void OnVoiceDropped(void*);
 
-    /* 0x00 */ AudioReadState* m_Unknown00;
+    /* 0x00 */ AudioReadState* m_ReadState;
     /* 0x04 */ AXVPB* m_Voice;
-    /* 0x08 */ void* m_Unknown08;
-    /* 0x0C */ unsigned int m_Unknown0C;
-    /* 0x10 */ unsigned int m_Unknown10_00 : 31;
+    /* 0x08 */ void* m_Buffer;
+    /* 0x0C */ unsigned int m_PauseAddress;
+    /* 0x10 */ unsigned int m_ReadPosition : 31;
     unsigned int m_VoiceDropped : 1;
-    /* 0x14 */ unsigned int m_Unknown14;
+    /* 0x14 */ unsigned int m_BufferAddress;
 };
 
 class AudioReadState : public AudioSource
@@ -187,13 +190,24 @@ public:
     virtual AudioStreamChannel* GetChannelIterator() = 0;
     virtual AudioStreamChannel* GetNextChannel(AudioStreamChannel*) = 0;
 
-    /* 0x18 */ unsigned int m_Unknown18;
-    /* 0x1C */ unsigned int m_Unknown1C;
-    /* 0x20 */ signed int m_Unknown20_00 : 7;
-    unsigned int m_Unknown20_07 : 24;
-    bool m_Unknown20_1F : 1;
-    /* 0x24 */ AudioReadQueueEntry* m_Unknown24;
-    /* 0x28 */ int m_Unknown28;
+    nlFile* GetStreamFile();
+    unsigned int GetStreamBlockSize();
+    unsigned int GetStreamDataStart();
+    unsigned int GetChannelDataOffset(AudioStreamChannel* channel);
+    void QueueStreamRead(unsigned int offset, void* buffer, unsigned int size,
+        ReadAsyncCallback callback, unsigned long userParam);
+    void QueuePartialChannelRead(AudioStreamChannel* channel, unsigned int size);
+    void CompleteRead();
+    void QueueFullChannelRead(AudioStreamChannel* channel);
+    void OnChannelPrepared(AudioStreamChannel* channel);
+
+    /* 0x18 */ unsigned int m_StreamDataSize;
+    /* 0x1C */ unsigned int m_StreamReadPosition;
+    /* 0x20 */ signed int m_PendingReadCount : 7;
+    unsigned int m_StreamEndPosition : 24;
+    bool m_EndAddressSet : 1;
+    /* 0x24 */ AudioReadQueueEntry* m_ReadQueue;
+    /* 0x28 */ int m_PendingState;
 };
 
 void SetVoiceInputVolume(AXVPB*, float);
@@ -205,11 +219,11 @@ void SetVoiceInterauralDelay(AXVPB*, int);
 void SetVoiceLowPassFilter(AXVPB*, bool, unsigned int, bool);
 void SetVoiceAuxiliaryVolume(AXVPB*, int, int);
 void OnAudioStreamReadComplete(nlFile*, void*, unsigned int, unsigned long);
+void OnAudioStreamHeaderRead(nlFile*, void*, unsigned int, unsigned long);
+void OnAudioStreamPrimeRead(nlFile*, void*, unsigned int, unsigned long);
 void TrackAudioRead(AudioReadState*, AsyncEntry*);
 void CancelAudioReads(AudioReadState*);
 void OnAudioReadCancelled(nlFile*, void*, unsigned int, unsigned long, ReadAsyncCallback);
-
-void GetSoundSources(void* handle, AudioSource** sources, unsigned int* count);
 
 extern SlotPool<AudioSampleSource> gAudioSampleSourcePool;
 
@@ -268,7 +282,7 @@ public:
 class AudioStereoStreamSource : public AudioStreamChannels<2>
 {
 public:
-    virtual ~AudioStereoStreamSource();
+    inline virtual ~AudioStereoStreamSource();
     virtual bool Prepare();
     virtual void SetPan(float);
     virtual void SetInterauralDelay(int);

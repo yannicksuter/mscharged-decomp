@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Render/ChainChomp.h"
 #include "Game/CharacterTriggers.h"
 

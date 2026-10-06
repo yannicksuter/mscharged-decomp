@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/AiUtil.h"
 #include "Game/CharacterTriggers.h"
 #include "Game/AI/Fielder.h"

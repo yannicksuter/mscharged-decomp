@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/DB/StatsTracker.h"
 #include "Game/FE/feHelpFuncs_decl.h"
 
@@ -1368,7 +1369,8 @@ void StatsTracker::WriteStats(
         header.AppendInPlace("Defense Rating,");
         header.AppendInPlace("Difficulty,");
         header[header.size() - 1] = '\n';
-        fwrite(header.c_str(), 1, header.size(), pFile);
+        size_t bytesToWrite = header.size();
+        fwrite(header.c_str(), 1, bytesToWrite, pFile);
     }
 
     int numHumans[2] = { 0, 0 };
@@ -1396,12 +1398,14 @@ void StatsTracker::WriteStats(
             g_pTeams[team]->fn_800A8EC0(), g_pTeams[team]->fn_800A8F20(),
             g_pTeams[team]->fn_800A8F80(), g_pTeams[team]->fn_800A8FE0()));
 
-        float possession = (float)GetStatValue(
+        int possession = GetStatValue(
             mCumulativeTeamStats[team]->mPlayerTotalStats, STATS_16);
+        possession = (int)(possession / gameTime);
         int difficulty = GameInfoManager::Instance()->GetDifficulty((short)team);
         stats.AppendInPlace(Format(NLString("{0},"), difficulty));
         stats[stats.size() - 1] = '\n';
-        fwrite(stats.c_str(), 1, stats.size(), pFile);
+        size_t bytesToWrite = stats.size();
+        fwrite(stats.c_str(), 1, bytesToWrite, pFile);
     }
 
     fclose(pFile);

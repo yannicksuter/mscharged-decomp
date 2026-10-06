@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Effects/ParticleSystem.h"
 #include "Game/Sys/debug.h"
 

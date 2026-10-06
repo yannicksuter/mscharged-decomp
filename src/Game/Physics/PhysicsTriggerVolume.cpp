@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Physics/PhysicsTriggerVolume.h"
 
 #include "Game/Physics/Physics.h"

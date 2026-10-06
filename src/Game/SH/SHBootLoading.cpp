@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include <revolution/sc.h>
 #include "Game/FE/fePresentation.inl"
 #include "Game/Audio/RegistryPools.h"

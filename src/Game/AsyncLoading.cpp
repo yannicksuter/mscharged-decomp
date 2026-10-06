@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "Game/Font/FontLoading.h"
 #include "Game/MiiManager.h"
 #include "Game/AI/FuzzyAIRuntime.h"

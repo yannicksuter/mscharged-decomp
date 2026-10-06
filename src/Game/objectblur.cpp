@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/ObjectBlur.h"
 
 #include "Game/Camera/CameraMan.h"

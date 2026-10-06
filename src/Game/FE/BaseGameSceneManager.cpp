@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHOnlineMiiSelectOverlay.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/main.h"

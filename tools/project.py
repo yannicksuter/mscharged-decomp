@@ -1354,6 +1354,39 @@ def generate_build_ninja(
         # Add all build steps needed post-build (re-building archives and such)
         write_custom_step("post-build", "post-link")
 
+        # Comparison objects can use separately compiled providers for weak
+        # definitions retained in an earlier unit. Linker inputs stay separate.
+        weak_compare_inputs: List[Path] = []
+        weak_compare_tool = config.tools_dir / "objdiff_weak.py"
+        n.rule(
+            name="objdiff_weak",
+            command=f'$python {weak_compare_tool} --target "$target" --base "$base" --output "$out" $providers',
+            description="WEAKCOMPARE $out",
+        )
+        compare_units = [*build_config["units"]]
+        for module in build_config["modules"]:
+            compare_units.extend(module["units"])
+        for unit in compare_units:
+            obj = objects.get(unit["name"])
+            if obj is None or not obj.options.get("objdiff_weak_providers"):
+                continue
+            providers = []
+            for name in obj.options["objdiff_weak_providers"]:
+                provider = objects.get(name)
+                if provider is None or provider.src_obj_path is None:
+                    sys.exit(f"Missing weak comparison provider: {name}")
+                providers.append(provider.src_obj_path)
+            output = (build_path / "compare" / unit["name"]).with_suffix(".o")
+            n.build(
+                outputs=output,
+                rule="objdiff_weak",
+                inputs=[unit["object"], obj.src_obj_path, *providers],
+                implicit=weak_compare_tool,
+                variables={"target": unit["object"], "base": obj.src_obj_path,
+                           "providers": " ".join(f'"{path}"' for path in providers)},
+            )
+            weak_compare_inputs.append(output)
+
         ###
         # Helper rule for building all source files
         ###
@@ -1361,7 +1394,7 @@ def generate_build_ninja(
         n.build(
             outputs="all_source",
             rule="phony",
-            inputs=source_inputs,
+            inputs=[*source_inputs, *weak_compare_inputs],
         )
         n.newline()
 
@@ -1723,6 +1756,9 @@ def generate_objdiff_config(
         if src_exists:
             unit_config["base_path"] = obj.src_obj_path
             unit_config["metadata"]["source_path"] = obj.src_path
+            if obj.options.get("objdiff_weak_providers"):
+                unit_config["base_path"] = (config.out_path() / "compare" / obj_name).with_suffix(".o")
+                unit_config["metadata"]["weak_providers"] = obj.options["objdiff_weak_providers"]
 
         # Filter out include directories
         def keep_flag(flag):

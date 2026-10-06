@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/AI/DesireSteering.h"
 #include "NL/nlMath.inl"
 #include "Game/AI/AvoidController.h"

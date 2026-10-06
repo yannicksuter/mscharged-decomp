@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Camera/tu_800F9460.h"
 
 #include "Game/AI/Fielder.h"

@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "NL/nlFunction.inl"
 #include "Game/Audio/AudioResourceRuntime.h"
 

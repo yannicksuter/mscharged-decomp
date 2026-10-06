@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "NL/plat/WiiRemotePad.h"
 #include "NL/plat/WiiPad.h"
 #include "NL/plat/PlatPadManager.h"

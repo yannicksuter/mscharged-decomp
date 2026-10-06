@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/ExcitementSystem.h"
 #include "Game/AI/FielderActions.h"
 

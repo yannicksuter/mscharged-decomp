@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/WorldTriggers.h"
 
 #include "Game/CharacterTriggers.h"

@@ -621,7 +621,7 @@ int GetTweakInt(const char* path, int defaultValue)
     int kind = entry->m_Value->GetStorageKind();
     if (kind == 1)
     {
-        return ((TweakValueInt*)entry->m_Value)->value;
+        return ((TweakValueInt*)entry->m_Value)->mValue;
     }
     if (kind == 2)
     {

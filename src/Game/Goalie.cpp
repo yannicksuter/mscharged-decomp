@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "NL/plat/PlatPadManager.h"
 #include "Game/Player.h"
 

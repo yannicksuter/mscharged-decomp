@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/Physics/PhysicsPatch.h"

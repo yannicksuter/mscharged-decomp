@@ -40,7 +40,7 @@ struct NetworkRankingMeta
         mDisplayRank = 0;
         mWins = 0;
         mLosses = 0;
-        mUnidentified14 = 0;
+        mOnlineRegion = 0;
     }
 
     void LoadLocal();
@@ -52,7 +52,7 @@ struct NetworkRankingMeta
     /* 0x08 */ int mDisplayRank;
     /* 0x0C */ int mWins;
     /* 0x10 */ int mLosses;
-    /* 0x14 */ int mUnidentified14;
+    /* 0x14 */ int mOnlineRegion;
 }; // size: 0x18
 
 struct NetworkScoreSubmission

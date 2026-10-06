@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Task/TransitionTask.h"
 
 #include "Game/Ball.h"

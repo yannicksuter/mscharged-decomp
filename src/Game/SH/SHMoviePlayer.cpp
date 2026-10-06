@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHMoviePlayer.h"
 #include "NL/nlFunction.inl"
 #include "Game/BasicStadium.h"

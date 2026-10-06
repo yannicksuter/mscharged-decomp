@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/Transitions/TransitionSequence.h"
 
 #include "stdlib.h"

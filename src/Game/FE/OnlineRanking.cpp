@@ -49,12 +49,12 @@ void OnlineRankingOverlay::SceneCreated()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
     NetworkStatsManager* stats = NetworkStatsManager::Instance();
-    mTotalPoints = stats->mCurrentJob;
-    mWon = stats->mUnidentifiedC430;
-    mTied = stats->mUnidentifiedC431;
-    mScorePoints = stats->mUnidentifiedC434;
-    mGoalPoints = stats->mUnidentifiedC438;
-    mBonusPoints = stats->mUnidentifiedC43C;
+    mTotalPoints = stats->mLastTotalPoints;
+    mWon = stats->mLastGameWon;
+    mTied = stats->mLastGameTied;
+    mScorePoints = stats->mLastResultPoints;
+    mGoalPoints = stats->mLastGoalPoints;
+    mBonusPoints = stats->mLastBonusPoints;
     FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(presentation, "out", "Layer", "screen", "TimerText")->SetVisible(false);
 }
 
@@ -117,7 +117,7 @@ void OnlineRankingOverlay::UpdateResultsDisplay()
     BasicGameInfo* game = GameInfoManager::Instance()->GetCurrentGameInfo();
     int winner = game->GetWinningSide();
     TLComponentInstance* result = static_cast<TLComponentInstance*>(FEFinder<TLInstance, TLAT_COMPONENT>::Find(screen, "RESULT"));
-    int localSide = GetLocalPlayingSide_801323F4();
+    int localSide = GetLocalNetworkPlayingSide();
     if (winner == localSide)
         result->SetActiveSlide("VICTORY", true, false);
     else

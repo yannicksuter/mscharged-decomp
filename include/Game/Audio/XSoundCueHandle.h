@@ -11,6 +11,8 @@ class AudioSlider;
 
 struct SoundInstance;
 
+void GetSoundSources(void* handle, AudioSource** sources, unsigned int* count);
+
 class XSoundCueHandle : public XSoundHandle
 {
 public:

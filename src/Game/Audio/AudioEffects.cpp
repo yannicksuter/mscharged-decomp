@@ -1,3 +1,5 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
 #include "revolution/wpad/WPAD.h"
 
 #include "Game/Audio/AudioEffects.h"

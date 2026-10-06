@@ -1,3 +1,4 @@
+#include "NL/nlDLListContainer.inl"
 #include "Game/FE/Overlay/OverlayHandlerSuperAbility.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Task/FixedUpdateTask.h"
