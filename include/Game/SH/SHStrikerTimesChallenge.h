@@ -7,6 +7,12 @@
 class SHStrikerTimesChallenge : public SHStrikerTimesBase
 {
 public:
+    enum ChallengeDisplayMode
+    {
+        ModeChallengeBriefing = 8,
+        ModeChallengeResults = 9,
+    };
+
     SHStrikerTimesChallenge();
     virtual ~SHStrikerTimesChallenge();
     virtual void Update(float dt);

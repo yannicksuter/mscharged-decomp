@@ -47,10 +47,9 @@ public:
         int numTextures, const ImpostorCharacterParams* params);
     ~ImpostorCharacter();
 
-    // These four are inline in the header: the retail vtable for
-    // ImpostorCharacter is emitted by this class's translation unit, which is
-    // only possible when they are skipped as CodeWarrior's key function. Their
-    // retained out-of-line copies live at 0x801A505C..0x801A508C.
+    // With the configured CodeWarrior flags, these inline accessors keep
+    // this translation unit as the reconstructed vtable provider while
+    // retaining their out-of-line copies.
     virtual void SetScale(float scale) { mfScale = scale; }
     virtual float GetScale() { return mfScale; }
     virtual float GetCameraDistance() { return mfCameraDistance; }

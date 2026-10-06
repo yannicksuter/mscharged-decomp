@@ -401,7 +401,7 @@ void FECaptainComponent::RandomizeSidekicks()
     int count = 0;
     for (int i = 0; i < 8; ++i)
     {
-        if (GetCharacterInfo(GetCharacterIndexFromSidekick(i)).unknown_0x24 == 1)
+        if (GetCharacterInfo(GetCharacterIndexFromSidekick(i)).mRandomSelectionAvailability == 1)
         {
             sidekicks[count++] = i;
         }

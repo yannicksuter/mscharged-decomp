@@ -1,5 +1,5 @@
-#ifndef UNCLASSIFIED_TU_8026F444_H
-#define UNCLASSIFIED_TU_8026F444_H
+#ifndef GAME_SH_SH_ONLINE_CONNECTION_QUALITY_H
+#define GAME_SH_SH_ONLINE_CONNECTION_QUALITY_H
 
 #include "Game/BaseSceneHandler.h"
 #include "Game/FE/fePointerButton.h"
@@ -12,6 +12,19 @@ class TLComponentInstance;
 class OnlineConnectionQualityScene : public BaseSceneHandler
 {
 public:
+    enum DecisionValue
+    {
+        DecisionRejected = 0,
+        DecisionAccepted = 1,
+        DecisionPending = 2,
+    };
+
+    enum DecisionButton
+    {
+        ButtonAccept = 0,
+        ButtonReject = 1,
+    };
+
     OnlineConnectionQualityScene();
     virtual ~OnlineConnectionQualityScene();
     virtual void Update(float dt);
@@ -30,12 +43,12 @@ public:
     void ShowError(int error);
 
     /* 0x01C */ unsigned int mUnidentified01C;
-    /* 0x020 */ int mHoverCounts[4];
+    /* 0x020 */ int mPointerHoverCounts[4];
     /* 0x030 */ bool mInitialized;
     /* 0x031 */ bool mDecisionMade;
     /* 0x032 */ unsigned char mPadding032[2];
     /* 0x034 */ int mDecisionOutcome;
-    /* 0x038 */ int mDecision;
+    /* 0x038 */ int mLocalDecision;
     /* 0x03C */ int mMachineDecisions[2];
     /* 0x044 */ unsigned short mTimerText[128];
     /* 0x144 */ FETimer mCountdownTimer;
@@ -50,4 +63,4 @@ public:
     /* 0x300 */ bool mPopupActive;
 }; // size 0x304
 
-#endif // UNCLASSIFIED_TU_8026F444_H
+#endif // GAME_SH_SH_ONLINE_CONNECTION_QUALITY_H

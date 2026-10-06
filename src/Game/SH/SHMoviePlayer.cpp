@@ -79,7 +79,7 @@ void MoviePlayerScene::Update(float fDeltaT)
     BaseSceneHandler::Update(fDeltaT);
     if (g_e3_Build)
     {
-        MoviePlayerVirtual3C();
+        OnMoviePlaybackEnded();
         return;
     }
     if (!mMovieStarted)
@@ -96,11 +96,11 @@ void MoviePlayerScene::Update(float fDeltaT)
         {
             streamName = "FE_Intro_Movie";
         }
-        char var_68[64];
-        nlSNPrintf(var_68, 64, "%s/Volume", streamName);
-        float volume = (float)GetConfigInt(gMovieConfig, var_68, 100) / 100.0f;
-        nlSNPrintf(var_68, 64, "%s/FadeIn", streamName);
-        int fadeIn = GetConfigInt(gMovieConfig, var_68, 500);
+        char configKey[64];
+        nlSNPrintf(configKey, 64, "%s/Volume", streamName);
+        float volume = (float)GetConfigInt(gMovieConfig, configKey, 100) / 100.0f;
+        nlSNPrintf(configKey, 64, "%s/FadeIn", streamName);
+        int fadeIn = GetConfigInt(gMovieConfig, configKey, 500);
         THPSimpleSetVolume(0, 0);
         THPSimpleSetVolume((int)(127.0f * volume), fadeIn);
         if (GameInfoManager::Instance()->mIsInStrikers101Mode)
@@ -111,7 +111,7 @@ void MoviePlayerScene::Update(float fDeltaT)
     if (!mMovieStarted || CheckMoviePlayerAbort())
     {
         MovieStop();
-        MoviePlayerVirtual3C();
+        OnMoviePlaybackEnded();
         mMovieStarted = false;
         return;
     }
@@ -128,7 +128,7 @@ void MoviePlayerScene::Update(float fDeltaT)
     if (IsMovieFinished())
     {
         MovieStop();
-        MoviePlayerVirtual3C();
+        OnMoviePlaybackEnded();
     }
 }
 
@@ -137,7 +137,7 @@ bool MoviePlayerScene::CheckMoviePlayerAbort()
     return g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0);
 }
 
-void MoviePlayerScene::MoviePlayerVirtual3C()
+void MoviePlayerScene::OnMoviePlaybackEnded()
 {
     if (mPushWithPop)
     {
@@ -165,7 +165,7 @@ void MoviePlayerScene::OverrideMovieDimensions()
 
 void MoviePlayerScene::OnHBMHide()
 {
-    MoviePlayerVirtual3C();
+    OnMoviePlaybackEnded();
     mMovieStarted = false;
 }
 
@@ -234,7 +234,7 @@ void IntroMovieScene::ResetMoviePlayer()
     mTransitionPending = false;
 }
 
-void IntroMovieScene::MoviePlayerVirtual3C()
+void IntroMovieScene::OnMoviePlaybackEnded()
 {
     GameSceneManager::s_pInstance->Push(mNextScene, SCREEN_NOTHING, true);
     BasicStadium* pStadium = BasicStadium::GetCurrentStadium();

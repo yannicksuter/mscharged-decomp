@@ -10,6 +10,26 @@ class TLComponentInstance;
 class SHOnlinePlayerCount : public BaseSceneHandler
 {
 public:
+    enum MatchMode
+    {
+        ModeRanked = 0,
+        ModeUnranked = 1,
+    };
+
+    enum TransitionState
+    {
+        StateEntering = 0,
+        StateInteractive = 1,
+        StateForward = 2,
+        StateBack = 3,
+    };
+
+    enum PlayerCountButton
+    {
+        ButtonOneLocalPlayer = 0,
+        ButtonTwoLocalPlayers = 1,
+    };
+
     SHOnlinePlayerCount(int mode);
     virtual ~SHOnlinePlayerCount();
     virtual void Update(float fDeltaT);
@@ -28,7 +48,7 @@ public:
     /* 0x278 */ bool mButtonsInitialized;
     /* 0x279 */ unsigned char mPadding279[3];
     /* 0x27C */ int mButtonCount;
-    /* 0x280 */ int mState;
+    /* 0x280 */ int mTransitionState;
     /* 0x284 */ int mNextScene;
 }; // size 0x288
 

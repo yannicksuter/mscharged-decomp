@@ -139,7 +139,7 @@ void DesireUserControlled::Update(
             }
 
             if (pShotMeter->m_eShotMeterState
-                == SHOT_METER_STS_TRANSISTION)
+                == SHOT_METER_STS_TRANSITION)
             {
                 *update = 3;
                 update->SetParameter(8, FuzzyVariant(FT_INT, sMegaStrikeDesireState));

@@ -323,7 +323,7 @@ DrawableObject* World::CreateObject(
     case 0x107:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) CrowdLayoutObject;
-        ((CrowdLayoutObject*)pObject)->UnidentifiedVirtual1C(pContext);
+        ((CrowdLayoutObject*)pObject)->RegisterWithCrowdManager(pContext);
         pContext->m_pObject += 0x80;
         ++pContext->m_uNumObjectsLoaded;
         break;

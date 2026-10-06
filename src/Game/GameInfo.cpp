@@ -42,7 +42,7 @@ GameInfoManager* nlSingleton<GameInfoManager>::s_pInstance = 0;
 GameInfoManager::GameInfoManager()
     : mCurrentMode(-1)
     , mIsOnlineMode(0)
-    , unknown_0x121(1)
+    , mSoakDemoMatchEnabled(1)
     , mIsInStrikers101Mode(0)
     , unknown_0x123(0)
     , mOnlineRankedMatch(false)

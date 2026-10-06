@@ -47,10 +47,10 @@ RoadToStrikersCupHubScene::RoadToStrikersCupHubScene()
     , mPlayButtonInstance(0)
     , mTransitionState(0)
 {
-    mPlayButton.mContext = (void*)0;
-    mScheduleButton.mContext = (void*)1;
-    mCupStatsButton.mContext = (void*)2;
-    mRulesButton.mContext = (void*)3;
+    mPlayButton.mContext = (void*)ButtonPlay;
+    mScheduleButton.mContext = (void*)ButtonSchedule;
+    mCupStatsButton.mContext = (void*)ButtonCupStats;
+    mRulesButton.mContext = (void*)ButtonRules;
 
     mPointerHoverCounts[0] = 0;
     mPointerHoverCounts[1] = 0;
@@ -187,11 +187,11 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
         }
         else if (mTransitionState == 2)
         {
-            if (mSelectedButton == 0)
+            if (mSelectedButton == ButtonPlay)
                 AdvanceCupFlow(false);
-            else if (mSelectedButton == 1)
+            else if (mSelectedButton == ButtonSchedule)
                 ShowCurrentCupRoundPage();
-            else if (mSelectedButton == 2)
+            else if (mSelectedButton == ButtonCupStats)
                 ShowFirstCupPage();
             return;
         }
@@ -457,7 +457,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerEnter(
 {
     ++mPointerHoverCounts[index];
 
-    if (context == (void*)0)
+    if (context == (void*)ButtonPlay)
     {
         if (!mPlayButton.HasOtherPointerState(1, index))
         {
@@ -466,7 +466,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerEnter(
             mPlayButton.SetPointerState(1, index);
         }
     }
-    else if (context == (void*)1)
+    else if (context == (void*)ButtonSchedule)
     {
         if (!mScheduleButton.HasOtherPointerState(1, index))
         {
@@ -475,7 +475,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerEnter(
             mScheduleButton.SetPointerState(1, index);
         }
     }
-    else if (context == (void*)2)
+    else if (context == (void*)ButtonCupStats)
     {
         if (!mCupStatsButton.HasOtherPointerState(1, index))
         {
@@ -484,7 +484,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerEnter(
             mCupStatsButton.SetPointerState(1, index);
         }
     }
-    else if (context == (void*)3
+    else if (context == (void*)ButtonRules
              && !mRulesButton.HasOtherPointerState(1, index))
     {
         mRulesButtonInstance->SetActiveSlide("over", true, false);
@@ -498,7 +498,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerLeave(
 {
     --mPointerHoverCounts[index];
 
-    if (context == (void*)0)
+    if (context == (void*)ButtonPlay)
     {
         if (!mPlayButton.HasOtherPointerState(1, index))
         {
@@ -506,7 +506,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerLeave(
             mPlayButton.SetPointerState(0, index);
         }
     }
-    else if (context == (void*)1)
+    else if (context == (void*)ButtonSchedule)
     {
         if (!mScheduleButton.HasOtherPointerState(1, index))
         {
@@ -514,7 +514,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerLeave(
             mScheduleButton.SetPointerState(0, index);
         }
     }
-    else if (context == (void*)2)
+    else if (context == (void*)ButtonCupStats)
     {
         if (!mCupStatsButton.HasOtherPointerState(1, index))
         {
@@ -522,7 +522,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerLeave(
             mCupStatsButton.SetPointerState(0, index);
         }
     }
-    else if (context == (void*)3
+    else if (context == (void*)ButtonRules
              && !mRulesButton.HasOtherPointerState(1, index))
     {
         mRulesButtonInstance->SetActiveSlide("off", true, false);
@@ -540,18 +540,18 @@ void RoadToStrikersCupHubScene::OnButtonPointerPress(
     }
 
     unsigned int button = (unsigned int)context;
-    if (button != 0)
+    if (button != ButtonPlay)
     {
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     }
 
-    if ((unsigned int)(button - 1) <= 1)
+    if ((unsigned int)(button - ButtonSchedule) <= 1)
     {
         FEAudio::PlayAnimAudioEvent(0xE4023EE3, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0xEA7AD449, 0, 0, 1);
     }
 
-    if (button != 3)
+    if (button != ButtonRules)
     {
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         mTransitionState = 2;
@@ -570,7 +570,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerPress(
         ShowCupRulesPopup();
     }
 
-    if (button == 0)
+    if (button == ButtonPlay)
     {
         FEAudio::PlayAnimAudioEvent(0x4A51F95D, 0, 0, 1);
     }

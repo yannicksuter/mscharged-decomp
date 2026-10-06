@@ -101,7 +101,7 @@ void SHStrikerTimesChallenge::OnSelectMainMenu()
  */
 void SHStrikerTimesChallenge::SceneCreated()
 {
-    if (mDisplayMode == 9 && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
+    if (mDisplayMode == ModeChallengeResults && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
     {
         mNewUnlock = g_pStrikerChallenge->UnlockCurrentChallenge();
         if (mNewUnlock)
@@ -112,7 +112,7 @@ void SHStrikerTimesChallenge::SceneCreated()
     int captain = challenge->GetCurrentCaptain();
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     int mood = -1;
-    if (mDisplayMode == 8)
+    if (mDisplayMode == ModeChallengeBriefing)
     {
         if (challenge->mCurrentChallenge < 10)
         {
@@ -126,7 +126,7 @@ void SHStrikerTimesChallenge::SceneCreated()
         }
         mood = 1;
     }
-    else if (mDisplayMode == 9)
+    else if (mDisplayMode == ModeChallengeResults)
     {
         FEMusic::StartStreamIfDifferent(13);
         if (challenge->IsCurrentChallengeWon() == true)
@@ -166,7 +166,7 @@ void SHStrikerTimesChallenge::SceneCreated()
         SetArticleImageName(captain, 1, 4);
     else
         SetArticleImageName(captain, mood, -1);
-    if (mDisplayMode == 8)
+    if (mDisplayMode == ModeChallengeBriefing)
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
@@ -198,7 +198,7 @@ void SHStrikerTimesChallenge::Update(float dt)
         return;
     }
     SHStrikerTimesBase::Update(dt);
-    if (mDisplayMode == 9)
+    if (mDisplayMode == ModeChallengeResults)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide,
             "Layer", "blackbox2");
@@ -213,7 +213,7 @@ void SHStrikerTimesChallenge::Update(float dt)
         return;
     for (int pad = 0; pad < 4; ++pad)
     {
-        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == 8)
+        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == ModeChallengeBriefing)
         {
             mBackButtonInstance->m_bVisible = true;
             u8 valid = true;
@@ -223,7 +223,7 @@ void SHStrikerTimesChallenge::Update(float dt)
             event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 30, true, 0);
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                if (mDisplayMode != 8)
+                if (mDisplayMode != ModeChallengeBriefing)
                     continue;
                 mState = 3;
                 SHNavigation* scene = GetNavigationScene();
@@ -246,7 +246,7 @@ void SHStrikerTimesChallenge::Update(float dt)
 void SHStrikerTimesChallenge::OnDoneTransitionComplete()
 {
     SHStrikerTimesBase::OnDoneTransitionComplete();
-    if (mDisplayMode == 8)
+    if (mDisplayMode == ModeChallengeBriefing)
     {
         mLoadingChallengeSettings = true;
         gTweakFileLoader.LoadFileAsync(g_pStrikerChallenge->GetConfigPath(), "/challenge");
@@ -259,12 +259,12 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
             int challenge = g_pStrikerChallenge->mCurrentChallenge;
             if (mNewUnlock && challenge >= 10)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push((SceneList)10, SCREEN_NOTHING, true);
+                FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
                 popup->Create((ePopupMenu)47, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             }
             else
             {
-                FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push((SceneList)10, SCREEN_NOTHING, true);
+                FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
                 if (challenge >= 10)
                     popup->Create((ePopupMenu)48, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
                 else
@@ -274,7 +274,7 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
         else
         {
             int challenge = g_pStrikerChallenge->mCurrentChallenge;
-            FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push((SceneList)10, SCREEN_NOTHING, true);
+            FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
             if (challenge >= 10)
                 popup->Create((ePopupMenu)49, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             else

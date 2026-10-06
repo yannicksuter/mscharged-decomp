@@ -24,7 +24,7 @@ public:
     virtual void PlayScreenForwardSFX();
     virtual void PlayScreenBackSFX();
     virtual void OverrideMovieDimensions();
-    virtual void MoviePlayerVirtual3C();
+    virtual void OnMoviePlaybackEnded();
     void OnHBMHide();
 
     /* 0x01C */ SceneList mNextScene;
@@ -78,7 +78,7 @@ public:
     virtual ~IntroMovieScene() { }
     virtual void PlayScreenForwardSFX() { }
     virtual void PlayScreenBackSFX() { }
-    virtual void MoviePlayerVirtual3C();
+    virtual void OnMoviePlaybackEnded();
     virtual void SceneCreated();
     virtual void Update(float fDeltaT);
     void ResetMoviePlayer();

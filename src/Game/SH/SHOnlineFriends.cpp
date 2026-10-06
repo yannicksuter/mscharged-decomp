@@ -43,13 +43,13 @@ SHOnlineFriends::SHOnlineFriends()
     : mUnidentified001C(64)
     , mScrollOffset(0)
     , mScrollRange(0)
-    , mUnidentified0028(0)
+    , mPointerHoverCount(0)
     , mPressedItem(0)
     , mInitialized(false)
     , mPressHandled(false)
     , mRefreshTimer(0.5f)
     , mPopupActive(false)
-    , mState(0)
+    , mTransitionState(StateEntering)
 {
     for (int i = 0; i < 4; ++i)
         mRowButtons[i].mContext = (void*)i;
@@ -215,7 +215,7 @@ void SHOnlineFriends::Update(float dt)
     mPressHandled = false;
     if (mPopupActive && !g_pFEInput->HasInputLock(this))
         return;
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mTransitionState == StateEntering || mTransitionState == StateForward || mTransitionState == StateBack)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -224,16 +224,16 @@ void SHOnlineFriends::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mState == 0)
+        if (mTransitionState == StateEntering)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->SetButtons(4, true);
-            mState = 1;
+            mTransitionState = StateInteractive;
             InitializeButtons();
             mInitialized = true;
         }
-        else if (mState == 2)
+        else if (mTransitionState == StateForward)
         {
             if (!IsOnlineFriendSelectionMode())
                 GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIEND_CODE_ENTRY, SCREEN_FORWARD, true);
@@ -241,7 +241,7 @@ void SHOnlineFriends::Update(float dt)
                 StartFriendInvite();
             return;
         }
-        else if (mState == 3)
+        else if (mTransitionState == StateBack)
         {
             if (IsOnlineFriendSelectionMode())
             {
@@ -250,18 +250,18 @@ void SHOnlineFriends::Update(float dt)
             }
             else
             {
-                GameSceneManager::Instance()->Push((SceneList)40, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_NOTHING, true);
                 FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
             }
             return;
         }
     }
-    if (!IsOnlineFriendSelectionMode() && !GameSceneManager::Instance()->IsOnStack((SceneList)10) && g_pFriendManager->FindHostInvitation())
+    if (!IsOnlineFriendSelectionMode() && !GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU) && g_pFriendManager->FindHostInvitation())
     {
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = 47;
         friendManager->mPreviousRankedMode = 0;
-        GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
         return;
     }
     if (!NetworkStatsManager::Instance()->RefreshRankings())
@@ -302,7 +302,7 @@ void SHOnlineFriends::Update(float dt)
         {
             for (int j = 0; j < 4; ++j)
                 GetPointerInstance(j)->SetActiveSlide("waiting", true, false);
-            mState = 3;
+            mTransitionState = StateBack;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->HideButtons();
@@ -418,9 +418,9 @@ void SHOnlineFriends::InitializeButtons()
 
 inline void SHOnlineFriends::ShowDialog(int type)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)type, Bind<void>(MemFun(&SHOnlineFriends::OnDialogDismissed), this));
         mPopupActive = true;
     }
@@ -428,9 +428,9 @@ inline void SHOnlineFriends::ShowDialog(int type)
 
 inline void SHOnlineFriends::ConfirmDeleteFriend(int index)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)106,
             Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, index),
             Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
@@ -474,7 +474,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     }
     if (change)
     {
-        mState = 2;
+        mTransitionState = StateForward;
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
             scene->HideButtons();
@@ -488,7 +488,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
 void SHOnlineFriends::OnPointerEnter(int index, void* context)
 {
     int item = (int)context;
-    ++mUnidentified0028;
+    ++mPointerHoverCount;
     mRowInstances[item]->SetActiveSlide("over", true, false);
     mRowButtons[item].SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
@@ -497,7 +497,7 @@ void SHOnlineFriends::OnPointerEnter(int index, void* context)
 void SHOnlineFriends::OnPointerLeave(int index, void* context)
 {
     int item = (int)context;
-    --mUnidentified0028;
+    --mPointerHoverCount;
     mRowInstances[item]->SetActiveSlide("off", true, false);
     mRowButtons[item].SetPointerState(0, index);
 }
@@ -552,9 +552,9 @@ void SHOnlineFriends::OnErrorDismissed()
 
 inline void SHOnlineFriends::ShowError(int error)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriends::OnErrorDismissed), this)));
         mPopupActive = true;

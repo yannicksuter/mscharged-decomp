@@ -191,7 +191,7 @@ public:
     /* 0x009C */ UserInfo mUserInfo;
     /* 0x011C */ int mCurrentMode;
     /* 0x0120 */ bool mIsOnlineMode;
-    /* 0x0121 */ u8 unknown_0x121;
+    /* 0x0121 */ u8 mSoakDemoMatchEnabled;
     /* 0x0122 */ u8 mIsInStrikers101Mode;
     /* 0x0123 */ u8 unknown_0x123;
     /* 0x0124 */ bool mOnlineRankedMatch;

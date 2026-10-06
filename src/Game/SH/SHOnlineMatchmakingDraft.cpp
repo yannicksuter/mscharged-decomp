@@ -290,11 +290,11 @@ void SHOnlineMatchmakingDraft::UpdateCountdownText(int countdown)
 
 inline void SHOnlineMatchmakingDraft::ShowError(int error)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
         FEAudio::StopAnimAudioEvent(0x89B1FC93, (void*)0x2A);
         FEMusic::StartStreamIfDifferent(3);
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMatchmakingDraft::OnErrorDismissed), this)));
         mErrorPopupOpen = true;

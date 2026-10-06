@@ -148,7 +148,7 @@ float lbl_806DB594 = 1.0f;
 float lbl_806DB598 = 18.0f;
 float lbl_806DB59C = 9.0f;
 float lbl_806DB5A0 = .2f;
-float lbl_806DB5A4 = .8f;
+float gHeaderTargetPredictionHeight = .8f;
 bool lbl_806DB5A8 = true;
 float lbl_806DB5AC = .33f;
 float lbl_806DB5B0 = .33f;
@@ -2253,12 +2253,12 @@ void cBall::Update(float fDeltaT)
                 {
                     bUnidentified = m_v3Position.z < 0.4f;
                 }
-                else if (m_v3Position.z > lbl_806DB5A4
+                else if (m_v3Position.z > gHeaderTargetPredictionHeight
                     && tHeaderTargetTimer.Countdown(fDeltaT, 0.0f))
                 {
                     nlVector3 v3Unidentified;
                     PredictLandingSpotAndTime(v3Unidentified,
-                        NULL, NULL, lbl_806DB5A4);
+                        NULL, NULL, gHeaderTargetPredictionHeight);
                     EmitHeaderTarget(this, &v3Unidentified, false);
                     sHeaderTargetVisible = true;
                     bUnidentified = false;

@@ -11,10 +11,10 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 
-bool lbl_806E0E50;
+bool gDebugRunToNetSpaceSearch;
 
-static float lbl_806DC1F8 = 5.0f;
-static float lbl_806DC1FC = 5.0f;
+static float sRunToNetSearchRadius = 5.0f;
+static float sRunToNetLookAheadDistance = 5.0f;
 static unsigned short sDesireRunToNetType = 0xFFFF;
 
 /**
@@ -26,12 +26,12 @@ bool DesireRunToNet::Initialize(void* context)
 
     m_pSpaceSearch = new (8, false) SSearchRunToNet(m_pFielder);
     m_pFielder->SetSpaceSearch(m_pSpaceSearch);
-    m_pFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E50;
+    m_pFielder->m_pSpaceSearch->m_bDebugOn = gDebugRunToNetSpaceSearch;
 
     nlVector3 v3BestPosition;
     m_pFielder->m_pSpaceSearch->FindBestPosition(
         v3BestPosition, m_pFielder->mUnidentified024.m_v3Position,
-        DIR_NONE, NULL, lbl_806DC1F8, 0x8000);
+        DIR_NONE, NULL, sRunToNetSearchRadius, 0x8000);
 
     nlVector3 v3DesiredVelDirection;
     v3DesiredVelDirection.Sub2D(
@@ -62,7 +62,7 @@ void DesireRunToNet::Update(
     DesireUpdate*, float)
 {
     nlVector3 v3DesiredPosition;
-    nlVec3ScaleAdd(v3DesiredPosition, lbl_806DC1FC,
+    nlVec3ScaleAdd(v3DesiredPosition, sRunToNetLookAheadDistance,
         mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position);
     cField::FixOutOfBoundsPosition(v3DesiredPosition, 0.2f, true);
     m_pFielder->AddDesiredPosition(v3DesiredPosition, 1.5f, 1.0f);

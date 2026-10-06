@@ -19,7 +19,7 @@ Impostor::Impostor()
     mColour.c[1] = 0xFF;
     mColour.c[2] = 0xFF;
     mColour.c[3] = 0xFF;
-    mUnidentified02C = false;
+    mSkipCrowdVisibilityPass = false;
 }
 
 void Impostor::Reset()
@@ -37,7 +37,7 @@ void Impostor::Reset()
     mColour.c[1] = 0xFF;
     mColour.c[2] = 0xFF;
     mColour.c[3] = 0xFF;
-    mUnidentified02C = false;
+    mSkipCrowdVisibilityPass = false;
 }
 
 void Impostor::Set(ImpostorCharacter* character, const nlVector3& position,
@@ -50,7 +50,7 @@ void Impostor::Set(ImpostorCharacter* character, const nlVector3& position,
     mPosition = position;
     mAngle = angle;
     character->Acquire(this);
-    mUnidentified02C = false;
+    mSkipCrowdVisibilityPass = false;
     mColour.c[0] = 0xFF;
     mColour.c[1] = 0xFF;
     mColour.c[2] = 0xFF;

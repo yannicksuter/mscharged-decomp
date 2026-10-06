@@ -6,7 +6,7 @@
 
 class TLComponentInstance;
 
-void StartMovieCB();
+void StartTitleToMainMenuTransition();
 
 class TitleScene : public BaseSceneHandler
 {
@@ -29,22 +29,30 @@ public:
     /* 0x0DC */ bool mStartedDemo;
     /* 0x0DD */ bool mStartedMovie;
     /* 0x0DE */ bool mInitialized;
-    /* 0x0DF */ bool mUnidentifiedDF;
+    /* 0x0DF */ bool mPointerOverStartButton;
     /* 0x0E0 */ ScreenMovement mMovement;
-    /* 0x0E4 */ int mControllerDefaults[9];
-    /* 0x108 */ bool mControllerReady[9];
+    /* 0x0E4 */ int mUnlockInputSequence[9];
+    /* 0x108 */ bool mUnlockInputEntered[9];
     /* 0x111 */ u8 mPadding111[3];
 }; // size 0x114
 
 class HealthWarningSceneV2 : public BaseSceneHandler
 {
 public:
+    enum WarningPhase
+    {
+        PhaseFadeIn = 0,
+        PhaseWaitForInput = 1,
+        PhaseFadeOut = 2,
+        PhaseFinished = 3,
+    };
+
     HealthWarningSceneV2();
     virtual ~HealthWarningSceneV2();
     virtual void Update(float fDeltaT);
     virtual void SceneCreated();
 
-    /* 0x1C */ int mState;
+    /* 0x1C */ int mWarningPhase;
 }; // size 0x20
 
 #endif // GAME_SH_SH_TITLE_SCREEN_H

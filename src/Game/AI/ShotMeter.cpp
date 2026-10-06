@@ -1,4 +1,3 @@
-#include "NL/nlDLListContainer.inl"
 #include "Game/AI/ShotMeter.h"
 
 #include "Game/AI/AIPad.h"
@@ -12,20 +11,18 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMath.h"
 
-extern "C" float fn_800A0508(cFielder*, bool, bool);
+float gShotMeterChargeGainMin = 1.55f;
+float gShotMeterChargeGainMax = 1.55f;
+float gShotMeterPlayerDistanceWeight = 0.05f;
+float gShotMeterNetOpenWeight = 0.15f;
+float gShotMeterChargeWeight = 0.8f;
+float gChipShotMeterGoaliePositionWeight = 0.8f;
+float gChipShotMeterNetOpenWeight = 0.1f;
+float gChipShotMeterChargeWeight = 0.3f;
 
-float lbl_806DBE58 = 1.55f;
-float lbl_806DBE5C = 1.55f;
-float lbl_806DBE60 = 0.05f;
-float lbl_806DBE64 = 0.15f;
-float lbl_806DBE68 = 0.8f;
-float lbl_806DBE6C = 0.8f;
-float lbl_806DBE70 = 0.1f;
-float lbl_806DBE74 = 0.3f;
-
-bool lbl_806E0DD0;
-float lbl_806E0DD4;
-float lbl_806E0DD8;
+bool gShotMeterSidekickShootToScoreEnabled;
+float gShotMeterRatingsWeight;
+float gChipShotMeterRatingsWeight;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
@@ -54,13 +51,13 @@ void ShotMeter::Update(float fDeltaT)
     {
         if (g_pBall->GetOwnerFielder() != 0)
         {
-            float fCurrent = m_fTime / mUnidentified008;
+            float fCurrent = m_fTime / m_fShotDuration;
             if (fCurrent > 1.0f)
             {
                 fCurrent = 1.0f;
             }
 
-            float fPrevious = (m_fTime - fDeltaT) / mUnidentified008;
+            float fPrevious = (m_fTime - fDeltaT) / m_fShotDuration;
             if (fPrevious < 0.0f)
             {
                 fPrevious = 0.0f;
@@ -68,14 +65,14 @@ void ShotMeter::Update(float fDeltaT)
 
             float fDelta = fCurrent - fPrevious;
             float fRange = InterpolateRangeClamped(0.0f, 1.0f, 0.5f, 1.0f, GetOffensiveRating((g_pBall->GetOwnerFielder())->GetTweaks()));
-            float fValue = Interpolate(fDelta * lbl_806DBE58,
-                fDelta * lbl_806DBE5C,
+            float fValue = Interpolate(fDelta * gShotMeterChargeGainMin,
+                fDelta * gShotMeterChargeGainMax,
                 fRange);
             fValue += GetBallChargeValue(g_pBall, 0);
             fn_800154FC(g_pBall, fValue);
         }
 
-        if (m_fTime >= mUnidentified008
+        if (m_fTime >= m_fShotDuration
             && g_pBall->GetOwnerFielder() != 0)
         {
             if (!fn_8003C180(g_pBall->GetOwnerFielder()))
@@ -95,7 +92,7 @@ void ShotMeter::Update(float fDeltaT)
                 if (g_pBall->GetOwnerFielder()
                         ->CanDoCaptainShootToScore())
                 {
-                    m_eShotMeterState = SHOT_METER_STS_TRANSISTION;
+                    m_eShotMeterState = SHOT_METER_STS_TRANSITION;
                 }
                 else if (g_pBall->GetOwnerFielder()->CanDoSidekickShootToScore())
                 {
@@ -108,7 +105,7 @@ void ShotMeter::Update(float fDeltaT)
         break;
     case SHOT_METER_INACTIVE:
     case SHOT_METER_RELEASED:
-    case SHOT_METER_STS_TRANSISTION:
+    case SHOT_METER_STS_TRANSITION:
     case SHOT_METER_STS_RELEASED:
     default:
         break;
@@ -168,7 +165,7 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
         0.0f,
         1.0f,
         fCombinedValue);
-    m_fScoreValue = fn_800A0508(pFielder,
+    m_fScoreValue = CalcShotScoreValue(pFielder,
         pFielder->bIsModified,
         bWasPerfectPass);
     CalcShotAim(pFielder);
@@ -176,11 +173,11 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
 
 void ShotMeter::CalcSpeedValue()
 {
-    if (mUnidentified008 < 0.01f)
+    if (m_fShotDuration < 0.01f)
     {
-        mUnidentified008 = 0.01f;
+        m_fShotDuration = 0.01f;
     }
-    m_fSpeedValue = InterpolateClamped(0.1f, 1.0f, m_fTime / mUnidentified008);
+    m_fSpeedValue = InterpolateClamped(0.1f, 1.0f, m_fTime / m_fShotDuration);
     if (m_fSpeedValue > 1.0f)
     {
         m_fSpeedValue = 1.0f;
@@ -232,14 +229,14 @@ void ShotMeter::CalcShotAim(cFielder* pFielder)
             }
         }
     }
-    mfSShotAimValue = fAimValue;
+    m_fShotAimValue = fAimValue;
 }
 
-extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
+float CalcShotScoreValue(cFielder* pFielder, bool bIsChipShot,
     bool bWasPerfectPass)
 {
-    float fPositionWeighting;
-    float fNetOpeness;
+    float fRatingsWeight;
+    float fNetOpenness;
     float fPlayerDistance;
     float fChargedValue;
     float fRatingsValue;
@@ -252,39 +249,39 @@ extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
     fChargedValue *= 0.25f;
     float fGoalieOut = GoalieOutOfPosition(pFielder);
 
-    fNetOpeness = fRatingsValue;
+    fNetOpenness = fRatingsValue;
 
     float fScoreValue;
     if (!bIsChipShot)
     {
-        float fRemainder;
-        float fPlayerWeighting = lbl_806DBE60;
-        fPositionWeighting = lbl_806E0DD4;
-        fShooting *= fPositionWeighting;
-        float fNetWeighting = lbl_806DBE64;
-        fNetOpeness *= fNetWeighting;
+        float fChargeWeight;
+        float fPlayerWeighting = gShotMeterPlayerDistanceWeight;
+        fRatingsWeight = gShotMeterRatingsWeight;
+        fShooting *= fRatingsWeight;
+        float fNetWeighting = gShotMeterNetOpenWeight;
+        fNetOpenness *= fNetWeighting;
         fPlayerDistance = fPlayerDistance * fPlayerWeighting;
-        fRemainder = lbl_806DBE68;
-        fChargedValue *= fRemainder;
-        float fScore = fNetOpeness + fPlayerDistance;
+        fChargeWeight = gShotMeterChargeWeight;
+        fChargedValue *= fChargeWeight;
+        float fScore = fNetOpenness + fPlayerDistance;
         fScoreValue = fShooting + (fChargedValue + fScore);
     }
     else
     {
         float fChipOpenWeight;
-        float fChipWeight = lbl_806DBE6C;
+        float fChipWeight = gChipShotMeterGoaliePositionWeight;
         float fGoalieVal;
-        float fRemainder;
+        float fChargeWeight;
         fGoalieVal = fGoalieOut;
         fGoalieVal *= fChipWeight;
-        fPositionWeighting = lbl_806E0DD8;
-        fShooting *= fPositionWeighting;
-        fChipOpenWeight = lbl_806DBE70;
-        fNetOpeness *= fChipOpenWeight;
-        fRemainder = lbl_806DBE74;
-        fChargedValue *= fRemainder;
+        fRatingsWeight = gChipShotMeterRatingsWeight;
+        fShooting *= fRatingsWeight;
+        fChipOpenWeight = gChipShotMeterNetOpenWeight;
+        fNetOpenness *= fChipOpenWeight;
+        fChargeWeight = gChipShotMeterChargeWeight;
+        fChargedValue *= fChargeWeight;
         fScoreValue = fShooting
-                    + (fChargedValue + (fGoalieVal + fNetOpeness));
+                    + (fChargedValue + (fGoalieVal + fNetOpenness));
     }
 
     if (fScoreValue > 1.0f)
@@ -298,15 +295,15 @@ void ShotMeter::Reset(cFielder* pFielder)
 {
     m_eShotMeterState = SHOT_METER_ACTIVE;
     ResetValues();
-    mUnidentified008 = GetShootingWindupTime(pFielder->GetTweaks());
-    mUnidentified00C = GetShootingWindupTotalTime(pFielder->GetTweaks());
+    m_fShotDuration = GetShootingWindupTime(pFielder->GetTweaks());
+    m_fTotalDuration = GetShootingWindupTotalTime(pFielder->GetTweaks());
 }
 
 void ShotMeter::ShotReleased(cFielder* pFielder)
 {
     if (m_eShotMeterState != SHOT_METER_STS_RELEASED)
     {
-        if ((lbl_806E0DD0
+        if ((gShotMeterSidekickShootToScoreEnabled
                 || GameInfoManager::Instance()->IsRule0x8Equal3())
             && pFielder->CanDoSidekickShootToScore())
         {
@@ -324,7 +321,7 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
     {
         m_fSTSValue = fn_800156A8(g_pBall);
     }
-    m_fScoreValue = fn_800A0508(pFielder,
+    m_fScoreValue = CalcShotScoreValue(pFielder,
         pFielder->bIsModified,
         false);
     CalcShotAim(pFielder);

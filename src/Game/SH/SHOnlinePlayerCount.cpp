@@ -32,8 +32,8 @@ SHOnlinePlayerCount::SHOnlinePlayerCount(int mode)
     , mButtons()
     , mMode(mode)
     , mButtonsInitialized(false)
-    , mState(0)
-    , mNextScene(-2)
+    , mTransitionState(StateEntering)
+    , mNextScene(SCENE_INVALID)
 {
     mBackButton.SetPopScene(false);
 
@@ -86,8 +86,8 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    int state = mTransitionState;
+    if (state == StateEntering || (unsigned int)(state - StateForward) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -99,7 +99,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == StateEntering)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
@@ -108,17 +108,17 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
             }
             InitializeButtons();
             mButtonsInitialized = true;
-            mState = 1;
+            mTransitionState = StateInteractive;
         }
-        else if (state == 3)
+        else if (state == StateBack)
         {
-            GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_NOTHING, true);
             FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
             return;
         }
-        else if (state == 2)
+        else if (state == StateForward)
         {
-            if (mNextScene == 0x1B)
+            if (mNextScene == SCENE_GAMEPLAY_OPTIONS)
             {
                 FEAudio::PlayAnimAudioEvent(0xC385EFFB, 0, 0, 1);
             }
@@ -127,10 +127,10 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
         }
     }
 
-    if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
+    if (!GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
         && g_pFriendManager->FindHostInvitation())
     {
-        SceneList invitationScene = (mMode == 0) ? (SceneList)0x29 : (SceneList)0x2A;
+        SceneList invitationScene = (mMode == ModeRanked) ? (SceneList)0x29 : (SceneList)0x2A;
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = invitationScene;
         friendManager->mPreviousRankedMode = 0;
@@ -175,7 +175,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
 
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mState = 3;
+            mTransitionState = StateBack;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
@@ -298,7 +298,7 @@ void InitializeOnlineMatch(bool twoLocalPlayers, unsigned char tournament, bool 
 void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
 {
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-    mState = 2;
+    mTransitionState = StateForward;
 
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
@@ -312,17 +312,17 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
     int item = (int)context;
     switch (item)
     {
-    case 0:
-        InitializeOnlineMatch(false, false, mMode == 0);
+    case ButtonOneLocalPlayer:
+        InitializeOnlineMatch(false, false, mMode == ModeRanked);
         if (g_pNetworkSession->GetSessionMode() == 2)
         {
-            if (mMode == 0)
+            if (mMode == ModeRanked)
             {
                 mNextScene = 0x31;
             }
             else
             {
-                mNextScene = 0x1B;
+                mNextScene = SCENE_GAMEPLAY_OPTIONS;
             }
         }
         else
@@ -330,8 +330,8 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
             GameSceneManager::Instance()->Push((SceneList)0x18, SCREEN_FORWARD, true);
         }
         break;
-    case 1:
-        InitializeOnlineMatch(true, false, mMode == 0);
+    case ButtonTwoLocalPlayers:
+        InitializeOnlineMatch(true, false, mMode == ModeRanked);
         if (g_pNetworkSession->GetSessionMode() == 2)
         {
             mNextScene = SCENE_ONLINE_GUEST_CONTROLLER_SELECT;

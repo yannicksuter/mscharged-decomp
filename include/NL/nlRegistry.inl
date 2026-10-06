@@ -55,7 +55,7 @@ inline RegistryValue DynamicRegistryContainer::NamedList()
 
 inline void DynamicRegistryContainer::UnidentifiedVirtual28() {}
 
-inline RegistryNode* DynamicRegistryContainer::UnidentifiedVirtual44(
+inline RegistryNode* DynamicRegistryContainer::FindNode(
     const u32& hash)
 {
     return Find(hash);

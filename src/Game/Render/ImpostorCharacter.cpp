@@ -14,7 +14,7 @@
 #include <math.h>
 #include "Game/TweakValue.inl"
 
-u32 gNumImpostorSpritesCreated;
+u32 gNumImpostorTextureSetsCreated;
 
 ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     int numAngles, int numTextures, const ImpostorCharacterParams* params)
@@ -67,7 +67,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
             sprite->mAngle = mBaseAngle + j * angleStep;
             mSprites.AddEnd(sprite);
         }
-        gNumImpostorSpritesCreated++;
+        gNumImpostorTextureSetsCreated++;
     }
     glEndResource();
 

@@ -419,10 +419,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(SHOnlineHub), 8, false)) SHOnlineHub();
         break;
     case (SceneList)41:
-        newHandler = new (nlMalloc(sizeof(SHOnlinePlayerCount), 8, false)) SHOnlinePlayerCount(0);
+        newHandler = new (nlMalloc(sizeof(SHOnlinePlayerCount), 8, false)) SHOnlinePlayerCount(SHOnlinePlayerCount::ModeRanked);
         break;
     case (SceneList)42:
-        newHandler = new (nlMalloc(sizeof(SHOnlinePlayerCount), 8, false)) SHOnlinePlayerCount(1);
+        newHandler = new (nlMalloc(sizeof(SHOnlinePlayerCount), 8, false)) SHOnlinePlayerCount(SHOnlinePlayerCount::ModeUnranked);
         break;
     case SCENE_ONLINE_GUEST_CONTROLLER_SELECT:
         newHandler = new (nlMalloc(sizeof(SHOnlineGuestControllerSelect), 8, false)) SHOnlineGuestControllerSelect();

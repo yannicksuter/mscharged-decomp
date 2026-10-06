@@ -158,7 +158,7 @@ void CreditScene::SetupForPhase()
     }
 }
 
-void CreditScene::MoviePlayerVirtual3C()
+void CreditScene::OnMoviePlaybackEnded()
 {
     if ((unsigned int)(mPhase - 1) <= 1)
     {

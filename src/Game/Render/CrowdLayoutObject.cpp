@@ -1,7 +1,7 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/CrowdImpostorManager.h"
 
-void CrowdLayoutObject::UnidentifiedVirtual1C(WorldObjectLoadContext*)
+void CrowdLayoutObject::RegisterWithCrowdManager(WorldObjectLoadContext*)
 {
     GetCrowdImpostorManager()->AddObject(this, false);
 }

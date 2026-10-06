@@ -12,6 +12,14 @@ class TLTextInstance;
 class RoadToStrikersCupHubScene : public BaseSceneHandler
 {
 public:
+    enum HubButton
+    {
+        ButtonPlay = 0,
+        ButtonSchedule = 1,
+        ButtonCupStats = 2,
+        ButtonRules = 3,
+    };
+
     RoadToStrikersCupHubScene();
     virtual ~RoadToStrikersCupHubScene();
     virtual void Update(float fDeltaT);

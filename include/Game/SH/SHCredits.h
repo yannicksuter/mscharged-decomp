@@ -40,7 +40,7 @@ public:
     virtual ~CreditScene();
     virtual void SceneCreated();
     virtual void Update(float fDeltaT);
-    virtual void MoviePlayerVirtual3C();
+    virtual void OnMoviePlaybackEnded();
 
     void DisplayFinalMessage();
     void SetupForPhase();

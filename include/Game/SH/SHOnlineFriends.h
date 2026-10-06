@@ -11,6 +11,14 @@ class TLTextInstance;
 class SHOnlineFriends : public BaseSceneHandler
 {
 public:
+    enum TransitionState
+    {
+        StateEntering = 0,
+        StateInteractive = 1,
+        StateForward = 2,
+        StateBack = 3,
+    };
+
     SHOnlineFriends();
     virtual ~SHOnlineFriends();
     virtual void SceneCreated();
@@ -37,7 +45,7 @@ public:
     /* 0x001C */ int mUnidentified001C;
     /* 0x0020 */ int mScrollOffset;
     /* 0x0024 */ int mScrollRange;
-    /* 0x0028 */ int mUnidentified0028;
+    /* 0x0028 */ int mPointerHoverCount;
     /* 0x002C */ int mPressedItem;
     /* 0x0030 */ bool mInitialized;
     /* 0x0031 */ bool mPressHandled;
@@ -53,7 +61,7 @@ public:
     /* 0x08A8 */ FEOnlinePlayerRow mFriendRows[64];
     /* 0x2EA8 */ FEOnlinePlayerRow* mSortedFriendRows[64];
     /* 0x2FA8 */ bool mPopupActive;
-    /* 0x2FAC */ int mState;
+    /* 0x2FAC */ int mTransitionState;
 }; // size 0x2FB0
 
 #endif // GAME_SH_SHONLINEFRIENDS_H

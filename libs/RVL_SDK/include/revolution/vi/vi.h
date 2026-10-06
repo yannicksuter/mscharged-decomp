@@ -4,6 +4,7 @@
 #include <revolution/gx/GXFrameBuf.h>
 #include <revolution/types.h>
 #include <revolution/vi/vitypes.h>
+#include <revolution/vi_fwd.h>
 
 #ifdef __cplusplus
 extern "C" {

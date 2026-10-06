@@ -29,8 +29,8 @@ static TweakValueFloat sfImpostorHeight(
     "sfImpostorHeight", "/Render/Crowd", 1.5f);
 
 static bool sCrowdRegistrationDisabled;
-static int sNumGeneratedCrowdMembers;
-static int sNumVisibleCrowdMembers;
+static int sNumGeneratedCrowdPoints;
+static int sNumCrowdImpostorsInSelectedLayouts;
 
 class CrowdPointCallbackBase
 {
@@ -114,7 +114,7 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
     if (reload == 0)
         LoadTweakConfigFile("ini/Crowd.ini", "/Render", false);
 
-    sNumGeneratedCrowdMembers = 0;
+    sNumGeneratedCrowdPoints = 0;
     if (mPrimaryObjects.m_Head != 0)
         ImpostorManager::GetInstance()->SetEnabled(true);
 
@@ -142,7 +142,7 @@ void CrowdImpostorManager::GenerateCrowd(int reload)
         CrowdPointCallback callback(object);
         callback.mLayout = GetCrowdImpostorManager()->AllocateLayout();
         callback.mLayout->mObject = object;
-        sNumGeneratedCrowdMembers += object->PlacePoints(&callback,
+        sNumGeneratedCrowdPoints += object->PlacePoints(&callback,
             sfDistanceBetweenCrowdRows,
             sfDistanceBetweenCrowdMembers);
         objectIt.Step();
@@ -258,7 +258,7 @@ void CrowdImpostorManager::UpdateCrowdVisibility(GLView* view)
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
     ImpostorManager::GetInstance()->ResetSpriteSlots();
-    sNumVisibleCrowdMembers = 0;
+    sNumCrowdImpostorsInSelectedLayouts = 0;
 
     for (int layoutIndex = 0; layoutIndex < mNumLayouts;
         ++layoutIndex)
@@ -277,13 +277,13 @@ void CrowdImpostorManager::UpdateCrowdVisibility(GLView* view)
         {
             Impostor* impostor
                 = &impostors[i + layout.mFirstImpostor];
-            if (impostor->mUnidentified02C)
+            if (impostor->mSkipCrowdVisibilityPass)
                 continue;
 
             if (IsCrowdImpostorVisible(this, impostor))
                 impostor->Release();
         }
-        sNumVisibleCrowdMembers += layout.mNumImpostors;
+        sNumCrowdImpostorsInSelectedLayouts += layout.mNumImpostors;
     }
 }
 
@@ -328,7 +328,7 @@ inline ImpostorCharacter* CrowdImpostorManager::GetCharacter(int index)
 void CrowdImpostorManager::ReleaseCrowdImpostors()
 {
     Impostor* impostors = ImpostorManager::GetInstance()->mImpostors;
-    sNumVisibleCrowdMembers = 0;
+    sNumCrowdImpostorsInSelectedLayouts = 0;
 
     for (int layoutIndex = 0; layoutIndex < mNumLayouts;
         ++layoutIndex)
@@ -340,7 +340,7 @@ void CrowdImpostorManager::ReleaseCrowdImpostors()
 
         for (int i = 0; i < layout.mNumImpostors; ++i)
             impostors[i + layout.mFirstImpostor].Release();
-        sNumVisibleCrowdMembers += layout.mNumImpostors;
+        sNumCrowdImpostorsInSelectedLayouts += layout.mNumImpostors;
     }
 }
 
@@ -435,7 +435,7 @@ void CrowdPointCallback::Place(
         sfImpostorWidth, sfImpostorHeight, angle);
 
     if (GetCrowdImpostorManager()->IsObjectEnabled(mObject))
-        impostor->mUnidentified02C = true;
+        impostor->mSkipCrowdVisibilityPass = true;
 
     if (mFirst)
     {

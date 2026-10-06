@@ -69,7 +69,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
     {
         bSwitchToShootDesire = 1;
     }
-    else if (pShotMeter->m_eShotMeterState == SHOT_METER_STS_TRANSISTION)
+    else if (pShotMeter->m_eShotMeterState == SHOT_METER_STS_TRANSITION)
     {
         bMeterTransition = true;
         bSwitchToShootDesire = 1;

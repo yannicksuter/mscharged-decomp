@@ -5,13 +5,15 @@
 
 class cFielder;
 
+float CalcShotScoreValue(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
+
 enum eShotMeterState
 {
     SHOT_METER_INACTIVE = 0,
     SHOT_METER_ACTIVE = 1,
     SHOT_METER_RELEASED = 2,
     SHOT_METER_STS_ACTIVE = 3,
-    SHOT_METER_STS_TRANSISTION = 4,
+    SHOT_METER_STS_TRANSITION = 4,
     SHOT_METER_STS_RELEASED = 5,
 };
 
@@ -21,12 +23,12 @@ public:
     ShotMeter()
         : m_eShotMeterState(SHOT_METER_INACTIVE)
         , m_fTime(0.0f)
-        , mUnidentified008(0.0f)
-        , mUnidentified00C(0.0f)
+        , m_fShotDuration(0.0f)
+        , m_fTotalDuration(0.0f)
         , m_fScoreValue(0.0f)
         , m_fSpeedValue(0.0f)
         , m_fSTSValue(0.0f)
-        , mfSShotAimValue(0.0f)
+        , m_fShotAimValue(0.0f)
     {
     }
 
@@ -38,11 +40,11 @@ public:
     void ShotReleased(cFielder* pFielder);
     float GetShotAimValue() const
     {
-        return mfSShotAimValue;
+        return m_fShotAimValue;
     }
     float GetTotalDuration() const
     {
-        return mUnidentified00C;
+        return m_fTotalDuration;
     }
     float GetTime() const
     {
@@ -52,9 +54,9 @@ public:
     {
         return m_fSpeedValue;
     }
-    float UnidentifiedGetShotDuration() const
+    float GetShotDuration() const
     {
-        return mUnidentified008;
+        return m_fShotDuration;
     }
     bool UnidentifiedIsCharging() const
     {
@@ -65,7 +67,7 @@ public:
     {
         bool bShotMeterActive = false;
         if (state == SHOT_METER_ACTIVE || state == SHOT_METER_STS_ACTIVE
-            || state == SHOT_METER_STS_TRANSISTION)
+            || state == SHOT_METER_STS_TRANSITION)
         {
             bShotMeterActive = true;
         }
@@ -74,12 +76,12 @@ public:
 
     /* 0x00 */ eShotMeterState m_eShotMeterState;
     /* 0x04 */ float m_fTime;
-    /* 0x08 */ float mUnidentified008;
-    /* 0x0C */ float mUnidentified00C;
+    /* 0x08 */ float m_fShotDuration;
+    /* 0x0C */ float m_fTotalDuration;
     /* 0x10 */ float m_fScoreValue;
     /* 0x14 */ float m_fSpeedValue;
     /* 0x18 */ float m_fSTSValue;
-    /* 0x1C */ float mfSShotAimValue;
+    /* 0x1C */ float m_fShotAimValue;
 
 private:
     void ResetValues();

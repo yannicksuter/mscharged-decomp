@@ -29,7 +29,6 @@ const char* sConnectionDecisionComponentNames[2] = { "ACCEPT", "REJECT" };
 #include "Game/SH/SHOnlineInvitePlayers.h"
 #include "NL/plat/TransportConnection.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/FE/FEAudio.h"
 #include "Game/FE/tlDefault.h"
 
 static inline void UpdateConnectionQualityTimerText(
@@ -44,8 +43,8 @@ static inline void UpdateConnectionQualityTimerText(
 OnlineConnectionQualityScene::OnlineConnectionQualityScene()
     : mInitialized(false)
     , mDecisionMade(false)
-    , mDecisionOutcome(2)
-    , mDecision(2)
+    , mDecisionOutcome(DecisionPending)
+    , mLocalDecision(DecisionPending)
     , mCountdownTimer(1.0f,
           Function<FETimer*>(
               Bind<void>(MemFun(&OnlineConnectionQualityScene::OnCountdownTick), this, Placeholder<0>())))
@@ -56,17 +55,17 @@ OnlineConnectionQualityScene::OnlineConnectionQualityScene()
     , mCountdownSeconds(30)
     , mPopupActive(false)
 {
-    mHoverCounts[0] = 0;
-    mHoverCounts[1] = 0;
-    mHoverCounts[2] = 0;
-    mHoverCounts[3] = 0;
-    mDecisionButtons[0].mContext = (void*)0;
+    mPointerHoverCounts[0] = 0;
+    mPointerHoverCounts[1] = 0;
+    mPointerHoverCounts[2] = 0;
+    mPointerHoverCounts[3] = 0;
+    mDecisionButtons[ButtonAccept].mContext = (void*)ButtonAccept;
     mDecisionButtons[0].mIgnoreInputLock = true;
-    mDecisionButtons[1].mContext = (void*)1;
+    mDecisionButtons[ButtonReject].mContext = (void*)ButtonReject;
     mDecisionButtons[1].mIgnoreInputLock = true;
-    mMachineDecisions[0] = 2;
+    mMachineDecisions[0] = DecisionPending;
     mProfileIds[0] = 0;
-    mMachineDecisions[1] = 2;
+    mMachineDecisions[1] = DecisionPending;
     mProfileIds[1] = 0;
     mReturnTimer.SetEnabled(false);
 }
@@ -155,20 +154,20 @@ void OnlineConnectionQualityScene::SceneCreated()
 void OnlineConnectionQualityScene::UpdateConnectionQuality()
 {
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
-    unsigned int value = 0;
+    unsigned int maxRoundTripTimeMS = 0;
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
         TransportConnection* connection
             = (TransportConnection*)roster->GetMachineAid(i);
         if (connection != 0 && connection != (TransportConnection*)-1)
         {
-            value = value >= connection->mRoundTripTimeMS ? value : connection->mRoundTripTimeMS;
+            maxRoundTripTimeMS = maxRoundTripTimeMS >= connection->mRoundTripTimeMS ? maxRoundTripTimeMS : connection->mRoundTripTimeMS;
         }
     }
 
     TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "QUALITY", "RATING", "stars");
     mStarsComponent = component;
-    unsigned int latency = value >> 1;
+    unsigned int latency = maxRoundTripTimeMS >> 1;
     if (latency > 200)
     {
         component->SetActiveSlide("1", true, false);
@@ -196,7 +195,7 @@ static inline bool IsAnyConnectionRejected(OnlineConnectionQualityScene* scene)
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
-        if (scene->mMachineDecisions[i] == 0)
+        if (scene->mMachineDecisions[i] == OnlineConnectionQualityScene::DecisionRejected)
         {
             return true;
         }
@@ -209,7 +208,7 @@ static inline bool AreAllConnectionsAccepted(OnlineConnectionQualityScene* scene
     NetworkMachineRoster* roster = g_pNetworkSessionBase->GetMachineRoster();
     for (int i = 0; i < roster->GetMachineCount(); ++i)
     {
-        if (scene->mMachineDecisions[i] != 1)
+        if (scene->mMachineDecisions[i] != OnlineConnectionQualityScene::DecisionAccepted)
         {
             return false;
         }
@@ -303,11 +302,11 @@ void OnlineConnectionQualityScene::Update(float dt)
     }
 
     bool isHost = roster->GetLocalMachineIndex() == 0;
-    if (mDecisionOutcome == 2 && isHost)
+    if (mDecisionOutcome == DecisionPending && isHost)
     {
         if (IsAnyConnectionRejected(this))
         {
-            mDecisionOutcome = 0;
+            mDecisionOutcome = DecisionRejected;
             NetMessageConnectionDecision message;
             message.mAccepted = false;
             message.mMachineIndex = 0;
@@ -315,14 +314,14 @@ void OnlineConnectionQualityScene::Update(float dt)
         }
         else if (mCountdownSeconds <= 0 || AreAllConnectionsAccepted(this))
         {
-            mDecisionOutcome = 1;
+            mDecisionOutcome = DecisionAccepted;
             SendLobbyDraft();
         }
     }
 
-    if (mDecisionOutcome == 0)
+    if (mDecisionOutcome == DecisionRejected)
     {
-        if (mDecision == 0)
+        if (mLocalDecision == DecisionRejected)
         {
             mReturnTimer.SetEnabled(true);
         }
@@ -357,9 +356,9 @@ void OnlineConnectionQualityScene::InitializeInput()
 
 inline void OnlineConnectionQualityScene::ShowError(int error)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&OnlineConnectionQualityScene::CloseConnectionsAndReturn), this)));
         mPopupActive = true;
@@ -383,14 +382,14 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, vo
         bool accepted = false;
         switch ((int)context)
         {
-        case 0:
+        case ButtonAccept:
             accepted = true;
-            mDecision = 1;
+            mLocalDecision = DecisionAccepted;
             FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, true);
             break;
-        case 1:
+        case ButtonReject:
             accepted = false;
-            mDecision = 0;
+            mLocalDecision = DecisionRejected;
             FEAudio::PlayAnimAudioEvent(0x6F6A3A07, 0, 0, true);
             break;
         }
@@ -399,11 +398,11 @@ void OnlineConnectionQualityScene::OnDecisionPointerPress(unsigned int index, vo
         {
             if (accepted)
             {
-                mMachineDecisions[0] = 1;
+                mMachineDecisions[0] = DecisionAccepted;
             }
             else
             {
-                mMachineDecisions[0] = 0;
+                mMachineDecisions[0] = DecisionRejected;
             }
         }
         else
@@ -425,29 +424,29 @@ void OnlineConnectionQualityScene::OnConnectionDecision(NetMessageConnectionDeci
     {
         if (message->mAccepted)
         {
-            mDecisionOutcome = 1;
+            mDecisionOutcome = DecisionAccepted;
         }
         else
         {
-            mDecisionOutcome = 0;
+            mDecisionOutcome = DecisionRejected;
         }
     }
     else
     {
         if (message->mAccepted)
         {
-            mMachineDecisions[machine] = 1;
+            mMachineDecisions[machine] = DecisionAccepted;
         }
         else
         {
-            mMachineDecisions[machine] = 0;
+            mMachineDecisions[machine] = DecisionRejected;
         }
     }
 }
 
 void OnlineConnectionQualityScene::OnDecisionPointerEnter(unsigned int index, void* context)
 {
-    ++mHoverCounts[index];
+    ++mPointerHoverCounts[index];
     mDecisionButtonInstances[(int)context]->SetActiveSlide("OVER", true, false);
     mDecisionButtons[(int)context].SetPointerState(1, index);
     FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
@@ -455,7 +454,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerEnter(unsigned int index, vo
 
 void OnlineConnectionQualityScene::OnDecisionPointerLeave(unsigned int index, void* context)
 {
-    --mHoverCounts[index];
+    --mPointerHoverCounts[index];
     mDecisionButtonInstances[(int)context]->SetActiveSlide("OFF", true, false);
     mDecisionButtons[(int)context].SetPointerState(0, index);
 }

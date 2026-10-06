@@ -8,6 +8,7 @@
 #include "Game/Team.h"
 
 #include "Game/AI/Fielder.h"
+#include "Game/AI/ShotMeter.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/AiUtil.h"
@@ -121,7 +122,6 @@ extern "C" void fn_800A6C94(cTeam*, float);
 extern "C" unsigned long fn_800A6EE0(cTeam*);
 extern "C" void fn_800A701C(cTeam*);
 extern "C" void fn_800A83CC(cTeam*, bool);
-extern "C" float fn_800A0508(cFielder*, bool, bool);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
@@ -1347,7 +1347,7 @@ void cTeam::fn_800A8098()
                 bIsChipShot = g_pBall->GetOwnerFielder()->GetGlobalPad()->IsPressed(0x17, true);
             }
 
-            float fScoreValue = fn_800A0508(
+            float fScoreValue = CalcShotScoreValue(
                 g_pBall->GetOwnerFielder(), bIsChipShot, false);
             mUnidentified010 = fScoreValue;
             mUnidentified00C = nlMinEquals(
@@ -1377,7 +1377,7 @@ void cTeam::fn_800A8098()
             if (pCaptain->IsOnSameTeam(
                     g_pBall->GetPassTargetFielder()))
             {
-                float fScoreValue = fn_800A0508(
+                float fScoreValue = CalcShotScoreValue(
                     g_pBall->GetPassTargetFielder(),
                     g_pBall->GetPassTargetFielder()->bIsModified, false);
                 mUnidentified010 = fScoreValue;

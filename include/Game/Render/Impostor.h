@@ -38,7 +38,7 @@ public:
     /* 0x22 */ nlColour mColour;
     /* 0x26 */ u8 mUnidentified026[2];
     /* 0x28 */ int mSlot;
-    /* 0x2C */ bool mUnidentified02C;
+    /* 0x2C */ bool mSkipCrowdVisibilityPass;
 }; // size: 0x30
 
 #endif // GAME_RENDER_IMPOSTOR_H

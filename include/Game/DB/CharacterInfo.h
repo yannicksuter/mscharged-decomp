@@ -36,7 +36,7 @@ struct CharacterInfo
     /* 0x18 */ int mSidekickId;
     /* 0x1C */ int mSoundBankId;
     /* 0x20 */ int unknown_0x20;
-    /* 0x24 */ int unknown_0x24;
+    /* 0x24 */ int mRandomSelectionAvailability;
     /* 0x28 */ int unknown_0x28;
     /* 0x2C */ int unknown_0x2C;
     /* 0x30 */ CharacterValuePair unknown_0x30;

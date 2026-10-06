@@ -129,7 +129,7 @@ void MatchLoadingScene::Update(float dt)
     }
 }
 
-bool UnidentifiedLoadingHasPresentation(BaseLoadingScene* scene)
+bool LoadingSceneHasPresentation(BaseLoadingScene* scene)
 {
     return scene->GetPresentation() != 0;
 }
@@ -152,7 +152,7 @@ void SuperLoadingScene::SceneCreated()
         GameInfoManager* gameInfo = GameInfoManager::Instance();
         if (gameInfo->mIsOnlineMode)
         {
-            if (gameInfo->mCurrentMode == 0)
+            if (gameInfo->mCurrentMode == GameInfoManager::GM_FRIENDLY)
             {
                 FEAudio::PlayAnimAudioEvent(0x7FEC4468, 0, 0, 1);
                 FrontEndPresentation::GetInstance()->Call("StartOnlineGrudgeMatchSequence");
@@ -162,7 +162,7 @@ void SuperLoadingScene::SceneCreated()
                 FrontEndPresentation::GetInstance()->Call("TransitionOnlineTournamentToGame");
             }
         }
-        else if (gameInfo->mCurrentMode == 0)
+        else if (gameInfo->mCurrentMode == GameInfoManager::GM_FRIENDLY)
         {
             FrontEndPresentation::GetInstance()->Call("StartGrudgeMatchSequence");
         }

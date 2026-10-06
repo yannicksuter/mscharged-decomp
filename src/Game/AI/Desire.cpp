@@ -752,6 +752,9 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
         m_aDirection = nlATan2Angle(direction.y, direction.x);
     }
 
+    // Calculate the remaining distance; steering uses a fixed lookahead.
+    float remainingDistance = nlMaxEquals(0.0f, m_fMaxDistance - m_fDistTravelled);
+
     nlVector3 direction;
     direction.z = 0.0f;
     nlPolar polar;

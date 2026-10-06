@@ -228,7 +228,7 @@ public:
     virtual RegistryContainer* AddUnnamedChild();
     virtual void UnidentifiedVirtual34();
     virtual void UnidentifiedVirtual38();
-    virtual RegistryNode* UnidentifiedVirtual44(const u32& hash);
+    virtual RegistryNode* FindNode(const u32& hash);
     virtual void GetIterator(RegistryIteratorBase* iterator, int which) const;
     virtual RegistryNode* Find(const u32& hash);
 
