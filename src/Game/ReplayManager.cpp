@@ -98,14 +98,14 @@ void RenderSnapshot::Replay(T& frame)
     frame.fn_80191504();
     frame.fn_80191504();
     frame.fn_80191504();
-    if ((_2714 >> 30) & 1)
+    if ((_2714.raw >> 30) & 1)
     {
         Replayable<0>(frame, _2294);
         for (unsigned int i = 0; i < _2294; i++)
             Replayable<0>(frame, _2298[i]);
     }
     frame.fn_80191504();
-    if ((_2714 >> 29) & 1)
+    if ((_2714.raw >> 29) & 1)
     {
         Replayable<0>(frame, _1DA0);
         if (_1DA0)
@@ -113,10 +113,10 @@ void RenderSnapshot::Replay(T& frame)
                 Replayable<0>(frame, _1DA4[i]);
         frame.fn_80191504();
     }
-    if ((_2714 >> 22) & 1)
+    if ((_2714.raw >> 22) & 1)
         for (unsigned int i = 0; i < 8; i++)
             Replayable<0>(frame, _2194[i]);
-    if ((_2714 >> 28) & 1)
+    if ((_2714.raw >> 28) & 1)
     {
         Replayable<0>(frame, _1CC4);
         for (unsigned int i = 0; i < _1CC4; i++)
@@ -124,29 +124,29 @@ void RenderSnapshot::Replay(T& frame)
         frame.fn_80191504();
     }
     Replayable<0>(frame, mChainChomp);
-    if ((_2714 >> 24) & 1)
+    if ((_2714.raw >> 24) & 1)
     {
         if (NPCManager::fn_801948A0()->fn_801919A4() != 0)
             Replayable<0>(frame, mBowser);
     }
-    if ((_2714 >> 25) & 1)
+    if ((_2714.raw >> 25) & 1)
     {
         Replayable<0>(frame, _1C00);
         for (unsigned int i = 0; i < _1C00; i++)
             Replayable<0>(frame, mDaisyFists[i]);
     }
-    if ((_2714 >> 31) & 1)
+    if ((_2714.raw >> 31) & 1)
         Replayable<0>(frame, _1BA0);
-    if ((_2714 >> 26) & 1)
+    if ((_2714.raw >> 26) & 1)
         Replayable<0>(frame, _1BC4);
-    if ((_2714 >> 27) & 1)
+    if ((_2714.raw >> 27) & 1)
         Replayable<0>(frame, _1BE8);
     Replayable<0>(frame, mBall);
     Replayable<1>(frame, mCameraUp);
     Replayable<1>(frame, mGoalLight);
     Replayable<1>(frame, CrowdManager::fn_801919AC());
     Replayable<0>(frame, WorldDarkening::Instance());
-    if ((_2714 >> 23) & 1)
+    if ((_2714.raw >> 23) & 1)
     {
         for (int i = 0; i < 3; i++)
         {
