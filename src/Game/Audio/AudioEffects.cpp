@@ -214,3 +214,25 @@ void AudioEffectFactory::Shutdown()
     CategoryVolumeParameter::s_Pool.FreeBlocks();
     CategoryVolume::s_Pool.FreeBlocks();
 }
+
+AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int type)
+{
+    switch ((int)type)
+    {
+    case (int)0xCE5C5677:
+        return new Volume();
+    case (int)0x7DDB838E:
+        return new ControllerSpeaker();
+    case (int)0xC457F745:
+        return new Reverb();
+    case (int)0x04F5A46E:
+        return new Delay();
+    case (int)0x0BCF338E:
+        return new LowPassFilter();
+    case (int)0x05D11E37:
+        return new Pitch();
+    case (int)0xFA8EC255:
+        return new CategoryVolume();
+    }
+    return 0;
+}
