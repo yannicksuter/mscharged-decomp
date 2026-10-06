@@ -6,11 +6,10 @@
 #include "Game/Ball.h"
 #include "Game/Team.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Scripts/ScriptDefines.h"
 
 class cGame;
 
-extern cFielder* g_pScriptCurrentFielder;
-extern cFielder* g_pScriptCurrentMark;
 
 enum eScriptFielderDesire
 {
@@ -50,6 +49,11 @@ extern "C" float fn_800DDF54(cPlayer* pCandidateFielder, cPlayer* pTargetFielder
 extern "C" float fn_800DED80(cPlayer* pPlayer);
 extern "C" cFielder* fn_800DF790(cTeam* pTeam);
 
+float DistanceAndAngleConfidence(const nlVector3& vFrom, const nlVector3& vTo,
+    unsigned short aDirection, const nlVector2* pDistanceRange,
+    const nlVector2* pAngleRange, bool bDistancePeak, bool bRequireInRange,
+    float fDistanceWeight);
+
 float CloseToFormationPosition(cFielder* pFielder);
 float CloseToMyGoalie(cPlayer*);
 float DoingS2S(cFielder*);
@@ -72,9 +76,6 @@ float Difficult(cTeam* pTeam);
 float TimeFarFromOver(cGame* pGame);
 float TimeNearlyOver(cGame* pGame);
 float TimeCloseToOver(cGame* pGame);
-float PerfectPassCandidateFrom(cFielder* pReceiver, cFielder* pBallOwner);
-float IsPerfectPassInPlay();
-float IsPassInPlayDelayed();
 float Stalling(cTeam* pTeam);
 float Loose(cTeam* pTeam);
 float Defensive(cTeam* pTeam);
@@ -88,56 +89,34 @@ float Moderate(cTeam* team);
 float AggressiveT(cTeam* team);
 float Ownerless(cBall* ball);
 float High(cBall* ball);
-float ReceivingVolleyPassDelayed(cPlayer* pPlayer);
-float PassReceiveCloseToDone(cFielder* pFielder);
-float ReceivingPassDelayed(cFielder* pFielder);
-float ReceivingVolleyPass(cPlayer* pPlayer);
 float ReceivingPass(cFielder* pFielder);
-float OnMushrooms(cFielder* fielder);
-float WindingUpForShot(cFielder* fielder);
 float InControlOfBall(cFielder* fielder);
-float FarToTheirNetB(cBall* ball);
-float NearToTheirNetB(cBall* ball);
-float CloseToTheirNetB(cBall* ball);
-float Stunned(Goalie* pGoalie);
 float OutOfNet(Goalie* pGoalie);
 float SeparatingFrom(cPlayer* pFielder1, cPlayer* pFielder2);
 float ClosingTo(cPlayer* pPlayer, cBall* pBall);
 float ClosingTo(cPlayer* pFielder1, cPlayer* pFielder2);
-float DownfieldFrom(cPlayer* pDownfieldPlayer, cPlayer* pFromPlayer);
-float UpfieldFrom(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer);
-float PositionIsAtIdealDistanceForShooting(const nlVector3& vPosition, const nlVector3& vOffNetPosition);
-float AtIdealDistanceForTackling(cPlayer* pFielder1, cPlayer* pFielder2);
-float StuckOnSidelines(cFielder* pFielder);
-float FacingSideline(cFielder* pFielder);
 float CloseToSideline(cFielder* pFielder);
 float NearToSideline(const nlVector3& v3Position);
 float CloseToSideline(const nlVector3& v3Position, const nlVector2* vDistanceConfidence, bool bInvert, nlVector2* pUnidentified);
 float FarToTheirGoalie(cPlayer* pPlayer);
 float NearToTheirGoalie(cPlayer* pPlayer);
 float CloseToTheirGoalie(cPlayer* pPlayer);
-float NearToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2);
 float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2);
 float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2);
 float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder);
 float InBetweenMyNetAnd(cFielder* pFielder, cBall* pBall);
 float InBetweenMyNetAnd(cFielder* pFielder, cFielder* pOtherFielder);
-float OpenToMyNet(cFielder* pFielder);
-float OnBreakaway(cFielder* pFielder);
 float NearToFormationPosition(cFielder* pFielder);
 float InFrontOfTheirNet(cFielder* pFielder);
 float PositionIsInFrontOfNet(const nlVector3& v3Position, const cNet* pNet);
 float GoalieOutOfPosition(cFielder* pFielder);
 float LikelyToScore(cFielder* pFielder);
 float PlayerShotDistance(cFielder* pFielder);
-float LikelyToScoreFromPosition(const nlVector3& v3Position, const nlVector3& v3GoaliePosition, const cNet* pNet, bool bIsChipShot);
 float FallenDown(cFielder* pFielder);
 float Frozen(cFielder* pFielder);
 float Incapacitated(cPlayer* pPlayer);
 float Invincible(cFielder* pFielder);
-float AvoidingPowerups(cFielder* pFielder);
-float Attacked(cFielder* pFielder);
 float Pressured(cFielder* pFielder);
 float FarToTheirNet(cPlayer* pPlayer);
 float NearToTheirNet(cPlayer* pPlayer);
@@ -148,20 +127,12 @@ float CloseToMyNet(cPlayer* pPlayer);
 float FarToBall(cPlayer* pPlayer);
 float NearToBall(cPlayer* pPlayer);
 float CloseToBall(cPlayer* pPlayer);
-float LikelyToUsePowerup(cFielder* pFielder, int ePowerup);
-float AbleToUsePowerup(cFielder* pFielder, int ePowerup);
-float AbleToInterceptBallForSwapController(cFielder* pFielder);
 float AbleToInterceptBall(cPlayer* pPlayer);
-float RepeatingLastDesire(cFielder* fielder, eScriptFielderDesire eDesire);
-float Deker(cFielder* fielder);
-float Passer(cFielder* fielder);
 float Shooter(cFielder* fielder);
-float Aggressive(cFielder* fielder);
 float InPassingLane(cFielder* pFielder);
 float UserControlled(cFielder* fielder);
 float StrategicBallOwner(cFielder* pFielder);
 float OnTheGround(cPlayer* player);
-float OnScreen(cPlayer* player);
 float OnTheirTeam(cFielder* fielder);
 float Marking(cFielder* pMarking, cPlayer* pMarked);
 float GoalieType(cPlayer* player);
@@ -173,7 +144,6 @@ float Striker(cFielder* fielder);
 float LastBallOwner(cPlayer* player);
 float BallOwnerT(cTeam* team);
 float BallOwner(cPlayer* player);
-float CalcSelectChance(float fDifficultyChance, float fPlayerAttribute);
 
 template <typename T>
 nlVector3& PositionOf(T pObject)
@@ -220,7 +190,6 @@ extern "C" float fn_800D88B4(cFielder*);
 extern "C" float fn_800D8970(cFielder*);
 extern "C" float fn_800D8A9C(cFielder*);
 extern "C" float fn_800D8BAC(cFielder*);
-extern "C" float fn_800D8C84(cFielder*);
 extern "C" float fn_800D912C(cFielder*);
 extern "C" float fn_800D91BC(cFielder*);
 extern "C" float fn_800D924C(cFielder*);
@@ -244,7 +213,7 @@ extern "C" float fn_800DA130(cFielder*);
 extern "C" float fn_800DA310(cFielder*);
 extern "C" float fn_800DA330(cFielder*);
 extern "C" float fn_800DA518(cFielder*);
-extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition);
+float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition);
 extern "C" float fn_800DA91C(cFielder*);
 extern "C" float fn_800DACF4(cPlayer*);
 extern "C" float fn_800DAD3C(cBall*);
@@ -294,7 +263,6 @@ extern "C" float fn_800DF390(cPlayer*);
 extern "C" float fn_800DF474(cFielder*);
 extern "C" float fn_800DF590(cBall*);
 extern "C" float fn_800DF838(cPlayer*);
-extern "C" float fn_800DFD74(cTeam*);
 extern "C" float fn_800DFF1C();
 extern "C" float fn_800DFF60();
 extern "C" float fn_800E0034();

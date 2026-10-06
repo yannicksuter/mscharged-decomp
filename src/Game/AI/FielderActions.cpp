@@ -36,6 +36,9 @@
 #include "Game/Team.h"
 #include "Game/Weather.h"
 #include "Game/NetworkSession.h"
+#include "Game/InputManager.h"
+#include "Game/NetworkInputRecording.h"
+#include "Game/CrowdRiot.h"
 #include "Game/TweakValue.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include "Game/Ball.h"
@@ -161,85 +164,28 @@ extern const float lbl_806E35D4[1];
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
 extern "C" void fn_8002E3F8(cFielder* pFielder);
-extern "C" bool fn_8003E948(cFielder* pFielder);
+extern "C" bool fn_8003E948(const cFielder* pFielder);
 extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
 extern "C" float fn_8002E1B0(cFielder* pFielder);
 extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
-extern "C" void fn_8005F03C(void* pParam, cFielder** ppFielder);
-extern "C" void fn_8005CBF0(void* pParam);
 
-extern "C" void fn_8005CDD0(void* pParam);
-extern "C" float fn_80030750(cFielder* pFielder);
-extern "C" float fn_800A0508(cPlayer* pPlayer, int nParam1, int nParam2);
-extern "C" bool fn_8003E8A0(cFielder* pFielder);
+extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
+extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" void fn_8002E340(cFielder* pFielder);
 extern "C" float fn_80038970(
     cFielder* pFielder, nlVector3* pTarget, int nParam);
 extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
-extern "C" void fn_8005EBF8(void* pParam, void* pNode);
-extern "C" void fn_8005ED64(void* pParam, void* pNode);
+extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" bool fn_8003E99C(cFielder* pFielder);
+extern "C" bool fn_8003E99C(const cFielder* pFielder);
 extern "C" void fn_8002E718(cFielder* pFielder);
 extern "C" void fn_8002E798(cFielder* pFielder);
 extern "C" void fn_8002E39C(cFielder* pFielder);
 extern "C" void fn_8002E2E4(cFielder* pFielder);
 
-extern "C" void ResetButtonStateTicks(void* pPad, int nParam, int nParam2);
 
-struct UnidentifiedActionTarget806E0C94
-{
-    /* 0x00 */ u8 mUnidentified00[0x14];
-    /* 0x14 */ nlVector3 mUnidentified14;
-};
-
-extern "C" void fn_8005CA10(cGame* pGame);
-extern "C" void fn_8005C830(cGame* pGame);
-extern bool gbUseTurboCharging;
-extern "C" void fn_8005F238(cGame* pGame, void* pEvent);
-
-class UnidentifiedHandler8011166C
-{
-public:
-    virtual void UnidentifiedVirtual00();
-    virtual void UnidentifiedVirtual04();
-    virtual void Allocate();
-    virtual void UnidentifiedVirtual0C();
-    virtual void UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14();
-    virtual void UnidentifiedVirtual18();
-    virtual void UnidentifiedVirtual1C();
-    virtual void UnidentifiedVirtual20();
-    virtual void UnidentifiedVirtual24();
-    virtual void UnidentifiedVirtual28();
-    virtual void UnidentifiedVirtual2C();
-    virtual void UnidentifiedVirtual30();
-    virtual int UnidentifiedVirtual34();
-
-    /* 0x00 vptr */
-    /* 0x04 */ u8 mUnknown04[0x28];
-    /* 0x2C */ float mUnidentified2C;
-};
-extern "C" void fn_8005F434(cGame* pGame, void* pEvent);
-extern "C" void fn_8005F630(cGame* pGame, void* pEvent);
-
-struct UnidentifiedOnlineState
-{
-    u8 mUnidentified000[4];
-    bool mUnidentified004;
-};
-extern UnidentifiedOnlineState* gNetworkInputRecording;
-bool IsNetworkOrRecordedGame(void);
-extern "C" void fn_8005F82C(cGame* pGame, cFielder* pFielder);
-
-struct UnidentifiedSkillshotNode
-{
-    /* 0x0 */ cFielder* mUnidentified0;
-    /* 0x4 */ void* mUnidentified4;
-};
-extern BasicSlotPool<UnidentifiedSkillshotNode> lbl_805712F8;
 
 extern int gHitReactAnims[3][4];
 
@@ -1043,11 +989,9 @@ void cFielder::fn_80043C18(float fDeltaT)
             else
             {
                 float fBlend = 1.0f - fTime;
-                UnidentifiedActionTarget806E0C94* pTarget
-                    = (UnidentifiedActionTarget806E0C94*)
-                          g_pGame->mUnidentified10E0;
+                CrowdRiot* pTarget = g_pGame->mpCrowdRiot;
                 nlVector3 v3Position;
-                nlVec3WeightedSum(v3Position, fBlend, pTarget->mUnidentified14, fTime, mUnidentified024.m_v3Position);
+                nlVec3WeightedSum(v3Position, fBlend, pTarget->mv3Position, fTime, mUnidentified024.m_v3Position);
                 SetPosition(v3Position);
             }
         }
@@ -1942,7 +1886,7 @@ void cFielder::fn_80046244()
         {
             ReleaseBall(0);
             g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
-            fn_8001458C(g_pBall);
+            SetBallFallState(g_pBall);
         }
 
         fn_8002E718(this);
@@ -2210,7 +2154,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
             = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pData->pTarget = pTarget;
         pData->mUnidentified10 = false;
-        fn_8005EBF8(g_pGame, pData);
+        QueueAttackAttemptEvent(g_pGame, pData);
 
         if (mUnidentified024.m_eCharacterClass == TOAD)
         {
@@ -2454,7 +2398,7 @@ void cFielder::fn_800474FC(float fDeltaT)
     if (m_pCurrentAnimController->TestFrameTrigger(lbl_806DB8EC)
         && mUnidentified360)
     {
-        fn_8005CA10(g_pGame);
+        DeliverCaptainClashPresentationEvent(g_pGame);
     }
 
     if (ShouldStartCrossBlend(4))
@@ -2548,7 +2492,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
     else
     {
         DoRegularShooting(false);
-        fn_8005C830(g_pGame);
+        DeliverShotPresentationEndEvent(g_pGame);
     }
 
     EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, 0, bShotNormally);
@@ -2995,7 +2939,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
         {
             cFielder* pFielder = pTeam->GetFielder(j);
             if (pCaptain != pFielder && fn_8003881C(pFielder)
-                && g_pGame->mUnidentified030 == 0)
+                && g_pGame->m_uMegastrikeGoals == 0)
             {
                 RequestStateMachineDeactivation(GetConcurrentState(fn_8002E1A4(pFielder), 0x1D));
             }
@@ -3050,7 +2994,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     mUnidentified3D0 = 0.0f;
     mUnidentified3D4 = 0.0f;
 
-    g_pGame->fn_80057FC0();
+    g_pGame->ResetMegaStrikeMeterQueues();
 
     mUnidentified478 = 0;
 
@@ -3135,7 +3079,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         nlVector3 v3Column;
         glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
         event.v3Position = v3Column;
-        fn_8005F238(g_pGame, &event);
+        DeliverMegaStrikeMeterStartEvent(g_pGame, &event);
 
         g_pGame->mpWeatherManager->Pause();
 
@@ -3304,31 +3248,31 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             NetworkMessageType35 message;
             if (g_pNetworkSession->IsLiveNetworkGame())
             {
-                g_pGame->fn_80057FD8(bButtonPressed);
+                g_pGame->SendMegaStrikeMeter(bButtonPressed);
             }
             fn_80048FB0(fDeltaT, bButtonPressed, nParam);
         }
         else if (g_pNetworkSession->IsLiveNetworkGame()
-                 && g_pGame->mUnidentified0C0.mCount != 0)
+                 && g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.Pop(),
+                g_pGame->mReceivedMegaStrikeMeter.Pop(),
                 nParam);
         }
     }
     else if (g_pNetworkSession->IsLiveNetworkGame() && nParam == 0
-             && g_pGame->mUnidentified0C0.mCount != 0)
+             && g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Have unprocessed m_ReceivedMegaMeterQ %d in state %d.  "
             "Processing All Now.\n",
-            g_pGame->mUnidentified0C0.mCount,
+            g_pGame->mReceivedMegaStrikeMeter.mCount,
             mUnidentified478);
 
-        while (g_pGame->mUnidentified0C0.mCount != 0)
+        while (g_pGame->mReceivedMegaStrikeMeter.mCount != 0)
         {
             fn_80048FB0(fDeltaT,
-                g_pGame->mUnidentified0C0.Pop(),
+                g_pGame->mReceivedMegaStrikeMeter.Pop(),
                 nParam);
         }
     }
@@ -3367,8 +3311,8 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
 
         g_pGame->mpWeatherManager->Stop(false);
         g_pGame->fn_80058704();
-        g_pGame->mUnidentified03C = this;
-        fn_8005F82C(g_pGame, this);
+        g_pGame->mpMegaStrikeShooter = this;
+        DeliverMegaStrikeIntroEvent(g_pGame, this);
     }
 }
 
@@ -3378,7 +3322,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     ShootToScoreMeter::instance.mbShowSavedWhiteBar = true;
 
-    mUnidentified3BC = (float)(s32)fn_800499EC(this, 0);
+    mUnidentified3BC = (float)(s32)GetMegaStrikeShotCount(this, 0);
 
     PlayRumbleAction(1, GetGlobalPad());
 
@@ -3388,7 +3332,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
     nlVector3 v3Column;
     glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
-    fn_8005F434(g_pGame, &event);
+    DeliverMegaStrikeMeterFirstEvent(g_pGame, &event);
 
     if (mUnidentified3AC >= 0.0f)
     {
@@ -3423,7 +3367,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     ShootToScoreMeter::instance.m_v3MeterPosition
         = ShootToScoreMeter::instance.m_v3OriginalMeterPosition;
 
-    mUnidentified3C0 = fn_80049CC0(this, 0);
+    mUnidentified3C0 = GetMegaStrikeAccuracy(this, 0);
 
     for (int i = 0; i < 2; i++)
     {
@@ -3461,19 +3405,19 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     nlVector3 v3Column;
     glViewProjectPointToViewport(GetLayerView(eCLV_Unshadowed), &mUnidentified024.m_v3Position, &v3Column);
     event.v3Position = v3Column;
-    fn_8005F630(g_pGame, &event);
+    DeliverMegaStrikeMeterSecondEvent(g_pGame, &event);
 
     if (nParam != 0)
     {
         if (g_pNetworkSession->IsLiveNetworkGame()
-            && g_pGame->mUnidentified134.mCount > 0)
+            && g_pGame->mPendingMegaStrikeMeter.mCount > 0)
         {
-            g_pGame->fn_80058180();
+            g_pGame->SendRemainingMegaStrikeMeter();
         }
 
-        if (!gNetworkInputRecording->mUnidentified004)
+        if (!gNetworkInputRecording->mPlaybackReady)
         {
-            g_pGame->fn_80059DEC(m_pTeam->m_nSide, mUnidentified1E4.m_ID, mUnidentified3BC, mUnidentified3C0);
+            g_pGame->SendMegaStrike(m_pTeam->m_nSide, mUnidentified1E4.m_ID, mUnidentified3BC, mUnidentified3C0);
         }
 
         mUnidentified478 = 1;
@@ -3487,7 +3431,7 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
     }
 }
 
-extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
+float GetMegaStrikeShotCount(cFielder* pFielder, int nParam)
 {
     float fResult = pFielder->fn_800489C4();
     float fMeterMax = pFielder->fn_80048A08();
@@ -3555,7 +3499,7 @@ extern "C" float fn_800499EC(cFielder* pFielder, int nParam)
     return (float)(s32)(fResult + fBias);
 }
 
-extern "C" float fn_80049CC0(cFielder* pFielder, int nParam)
+float GetMegaStrikeAccuracy(cFielder* pFielder, int nParam)
 {
     float fNeedle = -9999.0f;
     if (pFielder->mUnidentified3B8)
@@ -4152,9 +4096,10 @@ void cFielder::fn_8004B658()
             mUnidentified024.m_fActualSpeed = this->GetTweaks()->GetRunningSpeed();
         }
 
-        cFielder* pFielder = this;
-        fn_8005F03C(g_pGame, &pFielder);
-        fn_8005CBF0(g_pGame);
+        ShotAtGoalData event;
+        event.pShooter = this;
+        DeliverWindupShotEvent(g_pGame, &event);
+        DeliverWindupPresentationEvent(g_pGame);
 
         PlaySound(0, 0x900862AC, "Windup", this);
 
@@ -4373,7 +4318,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
         }
     }
 
-    fn_8005CDD0(g_pGame);
+    DeliverWindupPresentationEndEvent(g_pGame);
 }
 
 void cFielder::fn_8004C02C(float fDeltaT)
@@ -4567,7 +4512,7 @@ void cFielder::InitActionSlideAttack(
         pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->GetPadID() : -1;
         pNode->pTarget = 0;
         pNode->mUnidentified10 = true;
-        fn_8005EBF8(g_pGame, pNode);
+        QueueAttackAttemptEvent(g_pGame, pNode);
     }
 }
 

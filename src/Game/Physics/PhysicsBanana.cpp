@@ -159,7 +159,7 @@ ContactType PhysicsBanana::Contact(
             if ((m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0
                     && m_pPowerupObject->m_pThrower == (cFielder*)character)
                 || ((cFielder*)character)->IsCharacterInAir(upperHeight)
-                || fn_800977A4((cFielder*)character, lowerHeight))
+                || IsPlayerBelowHeight((cFielder*)character, lowerHeight))
             {
                 return NO_CONTACT;
             }

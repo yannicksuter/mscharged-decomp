@@ -15,7 +15,6 @@
 #include "Game/AI/ScriptMachine.h"
 #include "Game/AI/SpaceSearch.h"
 #include "Game/AI/Fuzzy.h"
-#include "Game/Game.h"
 #include "Game/GameInfo.h"
 #include "Game/GameTweaks.h"
 #include "Game/Goalie.h"
@@ -34,16 +33,11 @@
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-extern cBall* g_pScriptBall;
-extern cTeam* g_pScriptOtherTeam;
-extern cTeam* g_pScriptCurrentTeam;
-extern cFielder* g_pScriptBallOwner;
 extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" float fn_800A0508(cFielder* pFielder, bool bParam1, bool bParam2);
 extern "C" AvoidController* fn_8002E144(cFielder* pFielder);
 extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" float fn_800DB298(const nlVector3&, const nlVector3&, cFielder*,
+float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
 
 static float CloseToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
@@ -51,17 +45,16 @@ static float FarToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3
 static float InBetween(const nlVector3& v3InBetweenPos, const nlVector3& v3A, const nlVector3& v3B);
 extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot, bool bWasPerfectPass);
 extern "C" const nlVector3& fn_80040234(cFielder*);
-nlVector2 lbl_806DC3D8 = { 10.0f, 10.0f };
-nlVector2 lbl_806DC3E0 = { 21845.0f, 0.0f };
-static TweakFloatBinding lbl_8056DB30("Ideal Distance", "Game/Player", &lbl_806DC3D8.x);
-static TweakFloatBinding lbl_8056DB50("Ideal Range", gLastTweakCategory, &lbl_806DC3D8.y);
-static TweakFloatBinding lbl_8056DB70("Min Angle", gLastTweakCategory, &lbl_806DC3E0.x);
-static TweakFloatBinding lbl_8056DB90("Max Angle", gLastTweakCategory, &lbl_806DC3E0.y);
+nlVector2 gConfidenceDistanceRange = { 10.0f, 10.0f };
+nlVector2 gConfidenceAngleRange = { 21845.0f, 0.0f };
+static TweakFloatBinding sConfidenceIdealDistanceTweak("Ideal Distance", "Game/Player", &gConfidenceDistanceRange.x);
+static TweakFloatBinding sConfidenceIdealRangeTweak("Ideal Range", gLastTweakCategory, &gConfidenceDistanceRange.y);
+static TweakFloatBinding sConfidenceMinAngleTweak("Min Angle", gLastTweakCategory, &gConfidenceAngleRange.x);
+static TweakFloatBinding sConfidenceMaxAngleTweak("Max Angle", gLastTweakCategory, &gConfidenceAngleRange.y);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" float fn_8003C40C(cFielder*, unsigned short);
+extern "C" float fn_8003C40C(cFielder*, int);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
-extern "C" float fn_80030750(cFielder*);
 
 
 float GenerateFilteredRandom()
@@ -839,7 +832,7 @@ extern "C" float fn_800D7AB8(cFielder* pFielder)
     return 0.0f;
 }
 
-static float UnidentifiedFacingAdjustedConfidence(float fScore, cPlayer* pFielder, cPlayer* pOwner)
+static float FacingAdjustedConfidence(float fScore, cPlayer* pFielder, cPlayer* pOwner)
 {
     return InterpolateRangeClamped(fScore, 0.33f * fScore, 1.0f, 0.0f,
         fn_800DDF54(pFielder, pOwner));
@@ -870,11 +863,11 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         fScore = NormalizeVal(fDistance / fSpeed, 4.3f * fDuration, 0.08f);
     }
     if (pOwner != NULL && pOwner->fn_8003E74C() && !pFielder->fn_8003E74C())
-        fScore = UnidentifiedFacingAdjustedConfidence(fScore, pFielder, pOwner);
+        fScore = FacingAdjustedConfidence(fScore, pFielder, pOwner);
     return fScore;
 }
 
-static float UnidentifiedBallApproachConfidence(float fClosingScore, cPlayer* pPlayer)
+static float BallApproachConfidence(float fClosingScore, cPlayer* pPlayer)
 {
     float fFacingScore = fn_800DE0A8(pPlayer);
     return fClosingScore / 2.0f + fFacingScore / 2.0f;
@@ -908,7 +901,7 @@ float AbleToInterceptBall(cPlayer* pPlayer)
             {
                 float fClosingScore = ClosingTo(pFielder, g_pBall);
                 fScore = FMIN(1.0f, fScore * InterpolateClamped(1.0f, 1.6f,
-                    UnidentifiedBallApproachConfidence(fClosingScore, pFielder)));
+                    BallApproachConfidence(fClosingScore, pFielder)));
             }
         }
         else if (pPlayer->m_eClassType == GOALIE)
@@ -959,12 +952,12 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
     if (pFielder->IsCaptain() && !pFielder->fn_8003E6EC())
     {
         int powerup = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
-        if (fn_80099CE8(powerup) && fn_8002EDC8(pFielder, powerup))
+        if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
             fScore = 1.0f;
         else if (pFielder->m_pTeam->fn_800A6560())
         {
             powerup = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
-            if (fn_80099CE8(powerup) && fn_8002EDC8(pFielder, powerup))
+            if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
                 fScore = 1.0f;
         }
     }
@@ -1401,7 +1394,7 @@ extern "C" float fn_800D9480(cFielder* pFielder)
     return FMIN(FMAX(fScore, 0.0f), 1.0f);
 }
 
-static float UnidentifiedOpponentAttackConfidence(cFielder* pFielder, cPlayer* pOpponent,
+static float OpponentAttackConfidence(cFielder* pFielder, cPlayer* pOpponent,
     float fAngleWeight, float fClosingWeight)
 {
     float fFacing = fn_800DDF54(pOpponent, pFielder);
@@ -1434,7 +1427,7 @@ extern "C" float fn_800D96F4(cFielder* pFielder)
         }
         if (bAttacking)
         {
-            fScore += UnidentifiedOpponentAttackConfidence(pFielder, pOpponent, 0.2f, 0.8f);
+            fScore += OpponentAttackConfidence(pFielder, pOpponent, 0.2f, 0.8f);
         }
     }
     return FMIN(FMAX(fScore, 0.0f), 1.0f);
@@ -1840,10 +1833,10 @@ float NearToFormationPosition(cFielder* pFielder)
     {
         return 0.0f;
     }
-    return fn_800DA7A8(pFielder, &pFielder->mUnidentified024.m_v3Position);
+    return NearToFormationPosition(pFielder, &pFielder->mUnidentified024.m_v3Position);
 }
 
-extern "C" float fn_800DA7A8(cFielder* pFielder, nlVector3* pPosition)
+float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition)
 {
     if (pFielder == NULL)
     {
@@ -1931,15 +1924,15 @@ extern "C" float fn_800DAD3C(cBall* ball)
     return 0.0f;
 }
 
-extern "C" float fn_800DAD84(const nlVector3& vFrom, const nlVector3& vTo,
+float DistanceAndAngleConfidence(const nlVector3& vFrom, const nlVector3& vTo,
     unsigned short aDirection, const nlVector2* pDistanceRange,
     const nlVector2* pAngleRange, bool bDistancePeak, bool bRequireInRange,
     float fDistanceWeight)
 {
     if (pAngleRange == NULL)
-        pAngleRange = &lbl_806DC3E0;
+        pAngleRange = &gConfidenceAngleRange;
     if (pDistanceRange == NULL)
-        pDistanceRange = &lbl_806DC3D8;
+        pDistanceRange = &gConfidenceDistanceRange;
     nlVector2 diff;
     nlVec2Set(diff, vTo.x - vFrom.x, vTo.y - vFrom.y);
     float fDistance = nlVec2Length(diff);
@@ -2000,7 +1993,7 @@ extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
                 vPosition = pPlayer->mUnidentified024.m_v3Position;
             nlVector2 distanceRange = { 0.0f, 0.0f };
             distanceRange.y = fDistance;
-            float fScore = fn_800DAD84(vFrom, vPosition, aDirection, &distanceRange,
+            float fScore = DistanceAndAngleConfidence(vFrom, vPosition, aDirection, &distanceRange,
                 &lbl_806E4258, false, true, 0.2f);
             if (pIgnorePlayer1 != NULL && pIgnorePlayer1->m_pTeam == pPlayer->m_pTeam)
                 fScore *= fTeamWeight;
@@ -2017,7 +2010,7 @@ extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
     return 1.0f - fClosedScore;
 }
 
-extern "C" float fn_800DB298(const nlVector3& vFrom, const nlVector3& vTo,
+float GoalConeOpenness(const nlVector3& vFrom, const nlVector3& vTo,
     cFielder* pIgnorePlayer1, float fTeamWeight, float fOpponentWeight,
     float fGoalieWeight, float fPredictionTime, cPlayer* pIgnorePlayer2)
 {
@@ -2062,7 +2055,7 @@ extern "C" float fn_800DB298(const nlVector3& vFrom, const nlVector3& vTo,
                 vPosition = pPlayer->mUnidentified024.m_v3Position;
             nlVector2 distanceRange = { 0.0f, 0.0f };
             distanceRange.y = fDistance;
-            float fScore = fn_800DAD84(vFrom, vPosition, aDirection, &distanceRange,
+            float fScore = DistanceAndAngleConfidence(vFrom, vPosition, aDirection, &distanceRange,
                 &angleRange, false, true, 0.2f);
             if (pIgnorePlayer1 != NULL && pIgnorePlayer1->m_pTeam == pPlayer->m_pTeam)
                 fScore *= fTeamWeight;
@@ -2079,7 +2072,7 @@ extern "C" float fn_800DB298(const nlVector3& vFrom, const nlVector3& vTo,
     return 1.0f - fClosedScore;
 }
 
-extern "C" float fn_800DB678(const nlVector3& v3Position, cTeam* pOpponentTeam,
+float PositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
     cPlayer* pCurrentPlayer, const nlVector2* vOpenRadius, bool bIgnoreIncapacitated,
     float fPredictionTime)
 {
@@ -2100,7 +2093,7 @@ extern "C" float fn_800DB678(const nlVector3& v3Position, cTeam* pOpponentTeam,
         for (int player = 0; player < 5 && fTotalScore < 1.0f; player++)
         {
             if (pCurrentPlayer != NULL)
-                pPlayer = g_pGame->fn_8005B780(pCurrentPlayer->mUnidentified120, pTeam->m_nSide, player);
+                pPlayer = g_pGame->GetClosestPlayer(pCurrentPlayer->mUnidentified120, pTeam->m_nSide, player);
             else
                 pPlayer = pTeam->GetPlayer(player);
             if (pPlayer == pCurrentPlayer)
@@ -2137,13 +2130,13 @@ extern "C" float fn_800DB678(const nlVector3& v3Position, cTeam* pOpponentTeam,
     return FMIN(FMAX(1.0f - fTotalScore, 0.0f), 1.0f);
 }
 
-extern "C" float fn_800DBA68(const nlVector3& v3Position, cTeam* pOpponentTeam,
+float WidePositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
     cPlayer* pCurrentPlayer, bool bIgnoreIncapacitated, float fPredictionTime)
 {
     nlVector2 radius;
     nlVec2Set(radius, g_pGame->m_pFuzzyTweaks->fWideOpenRadiusMin,
         g_pGame->m_pFuzzyTweaks->fWideOpenRadiusMax);
-    return fn_800DB678(v3Position, pOpponentTeam, pCurrentPlayer, &radius,
+    return PositionOpenness(v3Position, pOpponentTeam, pCurrentPlayer, &radius,
         bIgnoreIncapacitated, fPredictionTime);
 }
 
@@ -2151,7 +2144,7 @@ extern "C" float fn_800DBAB0(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return fn_800DB678(pFielder->mUnidentified024.m_v3Position,
+    return PositionOpenness(pFielder->mUnidentified024.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(), pFielder, NULL, true, 0.0f);
 }
 
@@ -2159,7 +2152,7 @@ extern "C" float fn_800DBB0C(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return fn_800DBA68(pFielder->mUnidentified024.m_v3Position,
+    return WidePositionOpenness(pFielder->mUnidentified024.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(), pFielder, true, 0.0f);
 }
 
@@ -2179,7 +2172,7 @@ float LikelyToScore(cFielder* pFielder)
     }
 
     cNet* pNet = pFielder->m_pTeam->GetOtherNet();
-    return fn_800DB298(pFielder->mUnidentified024.m_v3Position, pNet->m_v3NetLocation,
+    return GoalConeOpenness(pFielder->mUnidentified024.m_v3Position, pNet->m_v3NetLocation,
         pFielder, 0.0f, 0.2f, 1.0f, 0.0f, NULL);
 }
 
@@ -2599,7 +2592,7 @@ extern "C" float fn_800DD37C(cFielder* pFielder)
     return CloseToSideline(pFielder->mUnidentified024.m_v3PrevVelocity, &v2Range, true, NULL);
 }
 
-extern "C" float fn_800DD3DC(const nlVector3& vFrom, const nlVector3& vTo,
+float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
     float fMin, float fMax)
 {
     nlVector2 diff;
@@ -2774,7 +2767,7 @@ extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
     return NormalizeVal(fDistance, 0.5f + fRange, 0.66f * fRange);
 }
 
-extern "C" float fn_800DDAC0(const nlVector3& vPosition, const nlVector3& vOffNetPosition,
+float PositionShotDistance(const nlVector3& vPosition, const nlVector3& vOffNetPosition,
     float fShooting)
 {
     float fMin = InterpolateClamped(g_pGame->m_pFuzzyTweaks->fBadShooterDistanceMin,
@@ -2798,7 +2791,7 @@ float PlayerShotDistance(cFielder* pFielder)
     {
         float fShooting = pFielder->GetTweaks()->fShooting;
         const nlVector3& netLocation = pFielder->GetAIOffNetLocation(&v3Position);
-        fScore = fn_800DDAC0(v3Position, netLocation, fShooting);
+        fScore = PositionShotDistance(v3Position, netLocation, fShooting);
     }
     return fScore;
 }
@@ -3603,7 +3596,7 @@ extern "C" float fn_800DF838(cPlayer* pPlayer)
     return fScore;
 }
 
-static float UnidentifiedConfidenceAverage(float fClosing, float fNear, float fAble)
+static float ConfidenceAverage(float fClosing, float fNear, float fAble)
 {
     return (fNear + (fAble + fClosing)) / 3.0f;
 }
@@ -3620,12 +3613,12 @@ extern "C" float fn_800DF888(cTeam* team)
 
     fOwner = BallOwner(players[0]);
     score[0] = FMAX(fOwner, FMAX(ReceivingPass(players[0]),
-        FMIN(fn_800DED80(players[0]), UnidentifiedConfidenceAverage(
+        FMIN(fn_800DED80(players[0]), ConfidenceAverage(
             ClosingTo(players[0], g_pBall), NearToBall(players[0]), AbleToInterceptBall(players[0])))));
 
     fOwner = BallOwner(players[1]);
     score[1] = FMAX(fOwner, FMAX(ReceivingPass(players[1]),
-        FMIN(fn_800DED80(players[1]), UnidentifiedConfidenceAverage(
+        FMIN(fn_800DED80(players[1]), ConfidenceAverage(
             ClosingTo(players[1], g_pBall), NearToBall(players[1]), AbleToInterceptBall(players[1])))));
     return score[0] / FMAX(0.1f, score[0] + score[1]);
 }

@@ -98,12 +98,11 @@ extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
 extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
     float*, const LooseBallContactAnimInfo*, nlVector3*, unsigned short);
 extern "C" void fn_80015B38(cBall*, bool);
-extern "C" void fn_80016DF8(
+void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
 extern "C" void fn_8003EBD0(
     cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" void fn_8005C650(cGame*);
 static float sfReceivePassMaxDuration = 5.0f;
 unsigned short DesireReceivePass::sDesireReceivePassType = 0xFFFF;
 bool g_bFindReceivePassPosition = true;
@@ -303,7 +302,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             == AIsgn(m_pFielder->GetTeam()->GetOtherNet()->GetNetLocation().x)
         && mbOneTouchShot && !mbOneTouchVolley)
     {
-        fn_8005C650(g_pGame);
+        DeliverShotPresentationEvent(g_pGame);
     }
 
     if (mEstimated.bLocked)
@@ -1471,7 +1470,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         }
     }
 
-    fn_80016DF8(g_pBall, pPasser, &v3BallVelocity,
+    ReleaseBallForPass(g_pBall, pPasser, &v3BallVelocity,
         eSpinType, bVolleyPass && !bHighArc, false);
     pPasser->SetNoPickUpTime(g_fPasserNoPickUpTime);
     EmitBallShot((cFielder*)pPasser, BALL_EFFECT_S2S_SUPER_SHOT, 0, 0, 0);
@@ -1485,7 +1484,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         eventData.mPasserControllerID = bHasGlobalPad
             ? pPasser->GetGlobalPad()->GetPadID()
             : -1;
-        g_pGame->mUnidentified49C.mEvent16.Deliver(&eventData);
+        g_pGame->mUnidentified49C.mPassBallEvent.Deliver(&eventData);
 
         UnidentifiedVariantCollection params;
         params.Set(14, FuzzyVariant(FT_VECTOR, v3PassPosition));

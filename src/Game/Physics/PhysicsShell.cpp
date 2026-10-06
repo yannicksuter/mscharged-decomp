@@ -120,7 +120,7 @@ ContactType PhysicsShell::Contact(
             if ((m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0
                     && m_pPowerupObject->m_pThrower == pFielder)
                 || pFielder->IsCharacterInAir(upperHeight)
-                || fn_800977A4(pFielder, lowerHeight))
+                || IsPlayerBelowHeight(pFielder, lowerHeight))
             {
                 return NO_CONTACT;
             }

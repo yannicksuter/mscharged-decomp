@@ -74,7 +74,7 @@ void cFielder::DoDKSuperHit()
 {
     EmitDKSuperHit(this);
     FireCameraNoiseFilter(*(nlVector3*)sDKSuperHitNoiseAmplitude, gDKSuperHitNoiseFrequency, gDKSuperHitNoiseDuration);
-    fn_80061B1C(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
+    SetFieldTilt(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
         gDKSuperHitTiltScale * mUnidentified024.m_v3Position.x);
     CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), gDKSuperShockwaveRadius);
@@ -114,7 +114,7 @@ void cFielder::CleanUpPeachSuper()
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         event.pPlayer = this;
-        fn_80060210(g_pGame, &event);
+        DeliverPeachCamerasAwayEvent(g_pGame, &event);
     }
 
     if (!g_pGame->IsGameplayOrOvertime())
@@ -151,7 +151,7 @@ void cFielder::InitActionPeachSuper()
     event.fHalfWidth = gPeachPhotoHalfWidth;
     event.fHalfHeight = gPeachPhotoHalfHeight;
     event.pPlayer = this;
-    fn_80060014(g_pGame, &event);
+    DeliverPeachCamerasDownEvent(g_pGame, &event);
 
     float fParam = FMAX(gPeachPhotoHalfWidth, gPeachPhotoHalfHeight);
     fParam += 0.5f;
@@ -197,7 +197,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         event.pPlayer = this;
-        fn_8005FE18(g_pGame, &event);
+        DeliverPeachCameraFlashEvent(g_pGame, &event);
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(gPeachFlashFrame))
     {
@@ -207,7 +207,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
         event.fHalfHeight = gPeachPhotoHalfHeight;
         cField::FixOutOfBoundsPosition(event.v3Position, gPeachPhotoHalfWidth, true);
         event.pPlayer = this;
-        fn_8005FC1C(g_pGame, &event);
+        DeliverPeachFlashEvent(g_pGame, &event);
 
         if (gPeachPhotoEmitEnabled)
         {
@@ -237,7 +237,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         event.pPlayer = this;
-        fn_80060210(g_pGame, &event);
+        DeliverPeachCamerasAwayEvent(g_pGame, &event);
     }
 
     if (ShouldStartCrossBlend(4))

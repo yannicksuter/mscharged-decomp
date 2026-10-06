@@ -971,7 +971,7 @@ void CharacterLoader::CreateCharacterInstance()
         g_pCharacters[mCurrent->nCharIdx] = pGoalie;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(goaliepos[mCurrent->nTeamID]);
         g_pTeams[mCurrent->nTeamID]->SetGoalie(pGoalie);
-        fn_800957E4(static_cast<cPlayer*>(g_pCharacters[mCurrent->nCharIdx]), g_pTeams[mCurrent->nTeamID]);
+        SetPlayerTeam(static_cast<cPlayer*>(g_pCharacters[mCurrent->nCharIdx]), g_pTeams[mCurrent->nTeamID]);
 
         if (mCurrent->bGoalie && mCurrent->cc != 20)
         {
@@ -997,7 +997,7 @@ void CharacterLoader::CreateCharacterInstance()
         g_pCharacters[mCurrent->nCharIdx] = pFielder;
         g_pCharacters[mCurrent->nCharIdx]->SetPosition(pos[mCurrent->nCharIdx]);
         g_pTeams[mCurrent->nTeamID]->SetPlayer((cPlayer*)g_pCharacters[mCurrent->nCharIdx], mCurrent->nPlayerID);
-        fn_800957E4(static_cast<cPlayer*>(g_pCharacters[mCurrent->nCharIdx]), g_pTeams[mCurrent->nTeamID]);
+        SetPlayerTeam(static_cast<cPlayer*>(g_pCharacters[mCurrent->nCharIdx]), g_pTeams[mCurrent->nTeamID]);
     }
 }
 

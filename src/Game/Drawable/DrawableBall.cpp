@@ -68,10 +68,10 @@ void DrawableBall::Grab()
     mFlags.bits.visible = ball->m_bVisible;
     mFlags.bits.transient = 0;
 
-    mTrailCount = fn_8001B30C();
+    mTrailCount = GetNumBallTrails();
     for (u32 i = 0; i < mTrailCount; ++i)
     {
-        LiveBallTrail* trail = fn_8001B284(i);
+        LiveBallTrail* trail = GetBallTrail(i);
         mTrail[i].visible = trail->visible;
         mTrail[i].position = trail->position;
         mTrail[i].orientation = trail->orientation;
@@ -140,7 +140,7 @@ void DrawableBall::Render() const
     for (u32 i = 0; i < mTrailCount; ++i)
     {
         const float scale = mScale;
-        DrawableModel* trail = fn_8001B284(i)->drawable;
+        DrawableModel* trail = GetBallTrail(i)->drawable;
 
         if (mTrail[i].visible)
         {

@@ -459,7 +459,7 @@ void ChainChomp::CollisionCallback(
         CollisionChainPlayerData* pData = g_CollisionChainPlayerDataPool.Allocate();
         pData->pFielder = pFielder;
         pData->pChain = pChainChomp;
-        g_pGame->mUnidentified49C.mEvent33.Queue(pData,
+        g_pGame->mUnidentified49C.mCollisionChainPlayerEvent.Queue(pData,
             Function<CollisionChainPlayerData*>(FreeCollisionChainPlayerData));
     }
 }

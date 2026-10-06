@@ -47,7 +47,7 @@ static inline void ClearCharacterEffectsTexturing()
     pGame = g_pGame;
     if (pGame != NULL)
     {
-        pGame->mUnidentified49C.mEvent10.Deliver();
+        pGame->mUnidentified49C.mResetEffectsEvent.Deliver();
         DrawableCharacter::RenderAllCharacters();
     }
 }

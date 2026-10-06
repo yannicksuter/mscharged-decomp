@@ -1,3 +1,4 @@
+#include "Game/Game.h"
 /**
  * Address/Size: 0x80288FF8 | size: 0x1444
  */
@@ -28,7 +29,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 2:
         ++lbl_806E2130;
-        g_pGame->fn_80058400();
+        g_pGame->CleanupMegaStrikeGameplay();
         --lbl_806E2130;
         break;
     case 3:
@@ -193,7 +194,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 25:
         ++lbl_806E2130;
         gpNumberDisplay->mVisible = false;
-        g_pGame->fn_8005830C();
+        g_pGame->InitMegaStrikeGameplay();
         --lbl_806E2130;
         break;
     case 26:
@@ -398,7 +399,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         NISData* data = g_NISDataPool.Allocate();
         data->Type = type;
         data->Param = param;
-        g_pGame->fn_8005E130(data);
+        g_pGame->QueueNIS(data);
         break;
     }
     case 52:
@@ -538,7 +539,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
-            && (g_pGame->GetMegaStrikeSaveMask() & (1 << original)) != 0;
+            && (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) != 0;
         if (m_RunState == 3)
         {
             m_SP[-1] = original;
@@ -549,7 +550,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
-            && g_pGame->GetMegaStrikeSaveMask() == 0;
+            && g_pGame->GetMegaStrikeGoalMask() == 0;
         if (m_RunState == 3)
         {
             m_SP[-1] = original;
@@ -559,7 +560,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     case 73:
     {
         int original = m_SP[-1];
-        m_SP[-1] = (g_pGame->GetMegaStrikeSaveMask() & (1 << original)) == 0;
+        m_SP[-1] = (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) == 0;
         if (m_RunState == 3)
         {
             m_SP[-1] = original;

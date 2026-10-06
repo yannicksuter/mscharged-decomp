@@ -63,7 +63,7 @@ void GoalOverlay::UpdateCaptainS2SGoalInfo(int homeAway)
 {
     if (g_pGame->mbCaptainShotToScoreOn)
     {
-        UpdateGoalInfo(homeAway, 0, true, g_pGame->mUnidentified030);
+        UpdateGoalInfo(homeAway, 0, true, g_pGame->m_uMegastrikeGoals);
     }
 }
 

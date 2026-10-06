@@ -76,7 +76,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
             {
                 return NO_CONTACT;
             }
-            if (fn_800977A4(fielder, GetPosition().z - GetRadius()))
+            if (IsPlayerBelowHeight(fielder, GetPosition().z - GetRadius()))
             {
                 return NO_CONTACT;
             }
@@ -84,7 +84,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         else
         {
             cPlayer* player = (cPlayer*)character;
-            if (fn_800977A4(player, GetPosition().z - GetRadius()))
+            if (IsPlayerBelowHeight(player, GetPosition().z - GetRadius()))
             {
                 return NO_CONTACT;
             }

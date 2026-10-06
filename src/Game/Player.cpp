@@ -59,12 +59,10 @@
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
-extern "C" cPlayer* fn_80096514(
+cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 extern "C" void fn_8002E3F8(cFielder*);
-extern "C" float fn_800DAD84(const nlVector3&, const nlVector3&, unsigned short,
-    float, const nlVector2&, const nlVector2&, bool, bool);
 
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
@@ -165,7 +163,7 @@ void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)
     m_pSpaceSearch = pSpaceSearch;
 }
 
-extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam)
+void SetPlayerTeam(cPlayer* pPlayer, cTeam* pTeam)
 {
     pPlayer->m_pTeam = pTeam;
     pPlayer->m_uSoundSlotId = pTeam->m_nSide == 0 ? 1 : 5;
@@ -324,7 +322,7 @@ u8 cPlayer::SwapController(bool bParam)
     return 0;
 }
 
-void cPlayer::fn_80095DF4(float fDeltaT)
+void cPlayer::UpdateGameplayTimers(float fDeltaT)
 {
     if (g_pGame->IsGameplayOrOvertime())
     {
@@ -404,7 +402,7 @@ void cPlayer::Update(float fDeltaT)
         mUnidentified1E4.m_UserControlledTime = 0.0f;
     }
 
-    fn_80095DF4(fDeltaT);
+    UpdateGameplayTimers(fDeltaT);
 
     FieldLocToAILoc(
         mUnidentified1E4.m_v3AIPosition, mUnidentified024.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
@@ -502,7 +500,7 @@ void cPlayer::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 {
 }
 
-extern "C" cPlayer* fn_80096514(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
+cPlayer* FindClosestTeamPlayer(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam)
 {
     cPlayer* pClosestPlayer = NULL;
@@ -536,19 +534,19 @@ extern "C" cPlayer* fn_80096514(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
 cFielder* cPlayer::GetClosestOpponentFielder(
     nlVector3* pPosition, bool bParam)
 {
-    return (cFielder*)::fn_80096514(
+    return (cFielder*)::FindClosestTeamPlayer(
         this, m_pTeam->GetOtherTeam(), 4, pPosition, bParam);
 }
 
 cPlayer* cPlayer::fn_800966AC(nlVector3* pPosition, bool bParam)
 {
-    return ::fn_80096514(
+    return ::FindClosestTeamPlayer(
         this, m_pTeam->GetOtherTeam(), 5, pPosition, bParam);
 }
 
 cPlayer* cPlayer::fn_8009670C(nlVector3* pPosition, bool bParam)
 {
-    return ::fn_80096514(this, m_pTeam, 5, pPosition, bParam);
+    return ::FindClosestTeamPlayer(this, m_pTeam, 5, pPosition, bParam);
 }
 
 void cPlayer::PickupBall(cBall* pBall)
@@ -617,7 +615,7 @@ void cPlayer::PickupBall(cBall* pBall)
         else if (pBall->m_pPassTarget->m_pTeam != m_pTeam)
             data.eResult = RECEIVEBALL_PASS_INTERCEPT;
     }
-    g_pGame->mUnidentified49C.mEvent15.Deliver(&data);
+    g_pGame->mUnidentified49C.mReceiveBallEvent.Deliver(&data);
     if (data.eResult == RECEIVEBALL_PASS_COMPLETE)
     {
         bool bOneTouchShot = false;
@@ -782,14 +780,14 @@ extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
         {
             aDirection = pSelf->m_pController->GetMovementStickDirection();
         }
-        float fScore = fn_800DAD84(pSelf->mUnidentified024.m_v3Position,
+        float fScore = DistanceAndAngleConfidence(pSelf->mUnidentified024.m_v3Position,
             pTarget->mUnidentified024.m_v3Position,
             aDirection,
-            fDistanceWeight,
-            v2Distance,
-            v2Angle,
+            &v2Distance,
+            &v2Angle,
             true,
-            false);
+            false,
+            fDistanceWeight);
         if (pBestTarget == NULL || fScore > fBestScore)
         {
             pBestTarget = pTarget;
@@ -932,7 +930,7 @@ bool cPlayer::IsCharacterInAir(float fParam) const
     return false;
 }
 
-extern "C" bool fn_800977A4(const cPlayer* pPlayer, float fParam)
+bool IsPlayerBelowHeight(const cPlayer* pPlayer, float fParam)
 {
     float leftFootZ = pPlayer->GetJointPosition(pPlayer->m_nLeftFootJointIndex).z;
     float rightFootZ = pPlayer->GetJointPosition(pPlayer->m_nRightFootJointIndex).z;
@@ -1305,7 +1303,7 @@ void cPlayer::UnidentifiedVirtual1C()
 void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
     cCharacter::Reset(v3Position, aDirection);
-    mUnidentified1E4.UnidentifiedReset();
+    mUnidentified1E4.Reset();
     mUnidentified1E4.m_ResetBaseBallOrientation = true;
     FieldLocToAILoc(mUnidentified1E4.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
     ClearSwapControllerTimer();
@@ -1314,17 +1312,17 @@ void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
     InitActionPostWhistle();
 }
 
-extern "C" void fn_80098AA0(PeachPhotoData*);
-extern "C" void fn_80098A68(PeachPhotoData*);
-extern "C" void fn_80098A84(PeachPhotoData*);
-extern "C" void fn_80099030(UnidentifiedEventData00*);
+void OnPlayerPeachFlash(PeachPhotoData*);
+void OnPlayerPeachCamerasDown(PeachPhotoData*);
+void OnPlayerPeachCamerasAway(PeachPhotoData*);
+void OnPlayerResetEffects(UnidentifiedEventData00*);
 
 extern "C" void fn_80098750()
 {
-    UnidentifiedFindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(fn_80098AA0), 0, -1);
-    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(fn_80098A68), 0, -1);
-    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(fn_80098A84), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(fn_80099030), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachFlash), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasDown), 0, -1);
+    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasAway), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(OnPlayerResetEffects), 0, -1);
 }
 
 static nlVector3 lbl_804FF5C8[] = {
@@ -1339,7 +1337,7 @@ static nlVector3 lbl_804FF5C8[] = {
     { 0.824f, 0.972f, 0.0f },
 };
 
-extern "C" void fn_80098A68(PeachPhotoData* pData)
+void OnPlayerPeachCamerasDown(PeachPhotoData* pData)
 {
     PlaySound(
         pData->pPlayer->m_uSoundSlotId,
@@ -1348,7 +1346,7 @@ extern "C" void fn_80098A68(PeachPhotoData* pData)
         NULL);
 }
 
-extern "C" void fn_80098A84(PeachPhotoData* pData)
+void OnPlayerPeachCamerasAway(PeachPhotoData* pData)
 {
     PlaySound(
         pData->pPlayer->m_uSoundSlotId,
@@ -1357,7 +1355,7 @@ extern "C" void fn_80098A84(PeachPhotoData* pData)
         NULL);
 }
 
-extern "C" void fn_80098AA0(PeachPhotoData* pData)
+void OnPlayerPeachFlash(PeachPhotoData* pData)
 {
     nlPolygonRegion region;
     nlVector3 points[9];
@@ -1493,9 +1491,9 @@ extern "C" void fn_80098AA0(PeachPhotoData* pData)
     }
 }
 
-extern "C" void fn_80098AA0(PeachPhotoData*);
 
-extern "C" void fn_80099030(UnidentifiedEventData00*)
+
+void OnPlayerResetEffects(UnidentifiedEventData00*)
 {
     if (gNPCManager != NULL)
     {
@@ -1516,7 +1514,7 @@ u16 lbl_806DBD96 = 0xFFFF;
 #define REGISTER_PLAYER_FIELD(type, field) \
     cache->AddField(type, gDebugFieldTypes[type].size, (u8*)&field - (u8*)&m_ID, #field)
 
-inline void UnidentifiedPlayerState_1E4::SyncLog(void* context, DebugWriteCache* cache)
+inline void PlayerGameplayState::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DBD96 == 0xFFFF)
     {

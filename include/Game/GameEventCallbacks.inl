@@ -1,26 +1,24 @@
-extern "C" void fn_80072134(LightningStrikeData* node)
+void FreeLightningStrikeData(LightningStrikeData* node)
 {
     g_LightningStrikeDataPool.Free(node);
 }
 
-extern "C" void fn_8007214C(ShotAtGoalData* node)
+void FreeShotAtGoalData(ShotAtGoalData* node)
 {
     g_ShotAtGoalDataPool.Free(node);
 }
 
-extern "C" void fn_80072164(UnidentifiedRegistrationNode* node)
+void FreeNISData(NISData* node)
 {
-    node->mNext = (UnidentifiedRegistrationNode*)g_NISDataPool.m_FreeList;
-    g_NISDataPool.m_FreeList = (SlotPoolEntry*)node;
+    g_NISDataPool.Free(node);
 }
 
-extern "C" void fn_8007217C(UnidentifiedRegistrationNode* node)
+void FreeCollisionCrowdData(CollisionCrowdData* node)
 {
-    node->mNext = (UnidentifiedRegistrationNode*)g_CollisionCrowdDataPool.m_FreeList;
-    g_CollisionCrowdDataPool.m_FreeList = (SlotPoolEntry*)node;
+    g_CollisionCrowdDataPool.Free(node);
 }
 
-extern "C" void fn_80072194(PlayerAttackData* node)
+void FreePlayerAttackData(PlayerAttackData* node)
 {
     g_PlayerAttackDataPool.Free(node);
 }
@@ -30,7 +28,7 @@ void FreeCollisionPlayerWallData(CollisionPlayerWallData* node)
     g_CollisionPlayerWallDataPool.Free(node);
 }
 
-extern "C" EventDispatcher* fn_800721C4()
+EventDispatcher* GetGameEventDispatcher()
 {
     return &gDispatchEventsTask->dispatcher;
 }

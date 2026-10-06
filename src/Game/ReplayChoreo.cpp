@@ -289,7 +289,7 @@ void ReplayChoreo::StartAutoReplay(bool highlight)
     nlVector3 offset = { 0.0f, 0.0f, 0.0f };
     mCamera.SetPositionOffset(offset);
     mCamera.SetPositionDampingTime(positionDampingTime);
-    fn_8001847C(g_pBall, false);
+    ResetBall(g_pBall, false);
 
     mReplayManager = ReplayManager::Instance();
     mReplay = mReplayManager->mReplay;

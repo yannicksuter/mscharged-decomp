@@ -437,7 +437,7 @@ config.libs = [
             Object(Matching, "Game/Formation.cpp", cflags=cflags_game, extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/FormationDefines.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/FriendManager.cpp"),
-            Object(NonMatching, "Game/Game.cpp", extra_cflags=["-ipa file", "-sym on"], objdiff_weak_providers=["Game/Physics/PhysicsEventQueue.cpp"]),
+            Object(Matching, "Game/Game.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/GameInfo.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/GameObjectLighting.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/GameTweaks.cpp", extra_cflags=["-ipa file", "-sym on"]),

@@ -42,7 +42,7 @@ void MegaStrikeMeterOverlay::Update(float dt)
     BaseSceneHandler::Update(dt);
     if (mFielder != 0)
     {
-        float value = fn_800499EC(mFielder, 1);
+        float value = GetMegaStrikeShotCount(mFielder, 1);
         mNumbers->SetActiveSlide(sNumberSlides[(int)(value - 1.0f)], true, false);
         mNumbers->m_bVisible = true;
     }

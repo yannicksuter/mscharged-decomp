@@ -391,8 +391,8 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
                 pDesire->m_pFielder->GetPowerupType());
         }
 
-        unk_8009A5D8 params;
-        fn_8009A5D8(pDesire->m_pFielder, pDesire->mePowerup,
+        PowerupThrowParameters params;
+        BuildPowerupThrowParameters(pDesire->m_pFielder, pDesire->mePowerup,
             pDesire->mnNumPowerups, &params);
         if (PowerupCreateAndThrow(pDesire->m_pFielder,
                 pDesire->mpTarget, params))
@@ -423,25 +423,25 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
         StatsTracker::s_pInstance->TrackStat(
             STATS_19, pDesire->m_pFielder->m_pTeam->m_nSide,
             pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
-        if (fn_80099C80(ePowerup))
+        if (IsMushroomPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_1A, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
-        else if (fn_80099C94(ePowerup))
+        else if (IsStarOrChainChompPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_1C, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
-        else if (fn_80099CE8(ePowerup))
+        else if (IsCaptainPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_1D, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
-        else if (fn_80099CC4(ePowerup))
+        else if (IsDrawablePowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_1B, pDesire->m_pFielder->m_pTeam->m_nSide,

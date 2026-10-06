@@ -64,7 +64,7 @@ public:
         float fDesiredTime);
     void Update(float fDeltaT);
     void SyncLog(void* context, DebugWriteCache* cache);
-    void fn_8001A898(RunningChecksum* runningChecksum);
+    void ChecksumState(RunningChecksum* runningChecksum);
     unsigned int UnidentifiedGetGoalType() const
     {
         return m_uGoalType;
@@ -173,46 +173,47 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState);
 
 struct LiveBallTrail;
 float GetBallChargeValue(cBall* pBall, int nParam);
-LiveBallTrail* fn_8001B284(unsigned int nIndex);
-unsigned int fn_8001B30C();
+LiveBallTrail* GetBallTrail(unsigned int nIndex);
+unsigned int GetNumBallTrails();
 
 extern cBall* g_pBall;
 
 
 // Shared functions and data from Game/Ball.cpp.
 extern "C" void fn_80014494(cBall*);
-extern "C" void fn_8001458C(cBall* pBall);
+void SetBallFallState(cBall* pBall);
 extern "C" void fn_800145A4(cBall*);
 extern "C" bool fn_80014D38(cBall*);
 extern "C" bool fn_80014E20(cBall* pBall);
 bool IsBallEffectPlaying(cBall* pBall, const EffectsGroup* pGroup);
 void EmitBallChargeTransition(cBall* pBall);
-extern "C" void fn_80017448(cBall*, float);
-extern "C" void fn_80017F18(cBall*);
+void UpdateBallStateAndTimers(cBall*, float);
+void DecayBallCharge(cBall*);
 extern "C" void fn_800189C4(cBall* pBall);
 extern "C" void fn_80018A00();
-extern "C" void fn_8001929C();
-extern "C" void fn_800193A0(void*);
-extern "C" void fn_800194A4(void*);
-extern "C" void fn_800195D8();
-extern "C" void fn_800196FC(void*);
-extern "C" void fn_80019718(void*);
+void OnBallGameOver();
+void OnBallResetEffects(void*);
+void OnBallGetReadyForKickoff(void*);
+void OnBallKickoff();
+void OnBallFall(void*);
+void OnBallTronWallCollision(void*);
 struct UnidentifiedEventData34;
-extern "C" void fn_80019814(UnidentifiedEventData34*);
-extern "C" void fn_80019910(PhysicsPatch*);
-extern "C" void fn_80019F10(void*);
-extern "C" void fn_8001A00C(void*);
-extern "C" void fn_8001A108(int, int);
-extern "C" void fn_8001B314(unsigned int nNumTrails);
+void OnBallEggCollision(UnidentifiedEventData34*);
+void OnBallPatchCollision(PhysicsPatch*);
+void OnBallDebrisCollision(void*);
+void OnBallThwompCollision(void*);
+void OnBallStateChange(int, int);
+void InitializeBallTrails(unsigned int nNumTrails);
 
 
 extern "C" void fn_800154FC(cBall* pBall, float fParam);
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pPlayer);
 extern "C" float fn_800156A8(cBall* pBall);
-extern "C" bool fn_80016768(cBall* pBall);
+bool IsDryBonesSkillshot(cBall* pBall);
 extern "C" bool fn_800167A8(cBall* pBall);
+bool IsBallShotActive(cBall* pBall);
 extern "C" void fn_800180F4( cBall* pBall, nlVector3* pPosition, float fTime);
-extern "C" void fn_8001847C(cBall* pBall, bool bParam);
-extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam);
+void ResetBall(cBall* pBall, bool bParam);
+void SetBallTrailVisible(LiveBallTrail* pBallTrail, bool bParam);
 
 #endif // GAME_BALL_H

@@ -217,7 +217,7 @@ ContactType PhysicsPatch::Contact(
         {
             return NO_CONTACT;
         }
-        if (fn_800977A4(fielder, GetPosition().z - GetRadius()))
+        if (IsPlayerBelowHeight(fielder, GetPosition().z - GetRadius()))
         {
             return NO_CONTACT;
         }

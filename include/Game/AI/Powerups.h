@@ -15,6 +15,8 @@ class SFXEmitter;
 class PowerupBase;
 class AvoidableObject;
 
+extern PowerupBase* g_pPowerups[25];
+
 struct PowerupSounds
 {
     /* 0x00 */ unsigned long sndAcquire;
@@ -76,7 +78,7 @@ enum eThrowStyle
     NUM_THROW_TYPES = 4,
 };
 
-struct unk_8009A5D8
+struct PowerupThrowParameters
 {
     /* 0x00 */ int nnumOfPowerups;
     /* 0x04 */ eThrowStyle eStyle;
@@ -135,7 +137,7 @@ public:
     /* 0x0C */ PhysicsObject* m_pPhysicsObject;
     /* 0x10 */ cFielder* m_pTarget;
     /* 0x14 */ cFielder* m_pThrower;
-    /* 0x18 */ AvoidableObject* m_unk18;
+    /* 0x18 */ AvoidableObject* m_pAvoidableObject;
     /* 0x1C */ ePowerUpType m_eType;
     /* 0x20 */ bool m_unk20;
     /* 0x24 */ Timer mtActiveTimer;
@@ -143,8 +145,8 @@ public:
     /* 0x34 */ Timer m_unk34;
     /* 0x3C */ Timer m_unk3C;
     /* 0x44 */ Timer m_unk44;
-    /* 0x4C */ float m_unk4C;
-    /* 0x50 */ nlVector3 m_unk50;
+    /* 0x4C */ float m_fSpawnGrowTimeRemaining;
+    /* 0x50 */ nlVector3 m_v3SavedVelocity;
     /* 0x5C */ u16 m_aOrientation;
     /* 0x60 */ float m_scale;
     /* 0x64 */ nlVector3 m_v3Position;
@@ -258,10 +260,10 @@ public:
     virtual void ThrowAt(cFielder* pThrower);
     virtual void Update(float dt);
 
-    void fn_8009F454(PowerupBase*, int nThrowOrder);
+    void ThrowInSequence(PowerupBase*, int nThrowOrder);
 
     /* 0xA9 */ bool mbIsMine;
-    /* 0xAC */ float m_unkAC;
+    /* 0xAC */ float m_fMineTimeRemaining;
     /* 0xB0 */ SFXEmitter* pMovementEmitter;
 
     static SlotPool<Bobomb> m_BobombSlotPool;
@@ -270,7 +272,7 @@ public:
 PowerupBase* FindPowerUp(unsigned long hashOfDrawable);
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType);
 int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
-    unk_8009A5D8 params);
+    PowerupThrowParameters params);
 void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
     PowerupBase* pNewPowerup, PowerupBase* pFirstPowerup,
     unsigned short aDirection);
@@ -278,11 +280,11 @@ void CompactPowerups();
 void InitializePowerups();
 
 
-extern "C" int fn_80099C80(ePowerUpType eType);
-extern "C" bool fn_80099C94(ePowerUpType eType);
-extern "C" bool fn_80099CC4(ePowerUpType eType);
-extern "C" bool fn_80099CE8(int nUnidentified);
-extern "C" void fn_8009A5D8(cFielder* pThrower, ePowerUpType eType,
-    int nnumOfPowerups, unk_8009A5D8* pUnidentified);
+int IsMushroomPowerup(ePowerUpType eType);
+bool IsStarOrChainChompPowerup(ePowerUpType eType);
+bool IsDrawablePowerup(ePowerUpType eType);
+bool IsCaptainPowerup(int nUnidentified);
+void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
+    int nnumOfPowerups, PowerupThrowParameters* pUnidentified);
 
 #endif // GAME_AI_POWERUPS_H

@@ -659,7 +659,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         NISData* pData = g_NISDataPool.Allocate();
         pData->Type = name;
         pData->Param = target;
-        g_pGame->fn_8005E130(pData);
+        g_pGame->QueueNIS(pData);
         break;
     }
     case NIS_TRIGGER_TYPE_PLAY_SOUND:

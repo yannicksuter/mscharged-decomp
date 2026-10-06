@@ -122,8 +122,8 @@ u32 FixedUpdateTask::CalculateChecksum()
     RunningChecksum checksum;
     float simulationTime = fixedUpdateTask.mSimulationTime;
     checksum.ChecksumData(&simulationTime, sizeof(simulationTime));
-    g_pGame->fn_8005BF50(&checksum);
-    g_pBall->fn_8001A898(&checksum);
+    g_pGame->ChecksumState(&checksum);
+    g_pBall->ChecksumState(&checksum);
     for (int i = 0; i < 2; i++)
     {
         g_pTeams[i]->fn_800A8DE8(&checksum);
@@ -200,7 +200,7 @@ u32 FixedUpdateTask::WriteSyncLog()
         }
     }
 
-    g_pGame->fn_8005B840(&checksum, cache);
+    g_pGame->SyncLog(&checksum, cache);
     g_pBall->SyncLog(&checksum, cache);
     for (int i = 0; i < 2; i++)
     {
@@ -398,7 +398,7 @@ void FixedUpdateTask::Run(float dt)
 static void AIUpdateTask(float fDeltaT)
 {
     g_pGame->PreUpdate(fDeltaT);
-    g_pGame->fn_8005A8FC(fDeltaT);
+    g_pGame->Update(fDeltaT);
 }
 
 static void PrePhysicsAITask(float fDeltaT)

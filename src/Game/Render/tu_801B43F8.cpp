@@ -135,7 +135,7 @@ void UnidentifiedNPC_801B43F8::fn_801B4830(
             CollisionWindDebrisPlayerData* pData = g_CollisionWindDebrisPlayerDataPool.Allocate();
             pData->pFielder = pFielder;
             pData->pDebris = pDebris;
-            g_pGame->mUnidentified49C.mEvent34.Queue(pData,
+            g_pGame->mUnidentified49C.mCollisionWindDebrisPlayerEvent.Queue(pData,
                 Function<CollisionWindDebrisPlayerData*>(fn_801B4F4C));
         }
     }

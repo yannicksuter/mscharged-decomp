@@ -7,7 +7,7 @@
 
 struct GoalScoredData;
 struct ReceiveBallData;
-struct UnidentifiedEventData_800663A8;
+struct PassBallData;
 struct GoalieSaveData;
 struct UnidentifiedEventData_80066590;
 
@@ -26,7 +26,7 @@ public:
     void OnMegaStrikeResult();
     void OnReceiveBall(ReceiveBallData* event);
     void OnShotAtGoal(UnidentifiedEventData_80066590* event);
-    void OnPassBall(UnidentifiedEventData_800663A8* event);
+    void OnPassBall(PassBallData* event);
     void OnGoalScored(GoalScoredData* event);
     void OnGoalieSave(GoalieSaveData* event);
     void OnKickoff();

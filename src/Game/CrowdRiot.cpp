@@ -32,7 +32,6 @@
 extern "C" float lbl_806E0C40;
 extern "C" float lbl_806E0C44;
 
-extern "C" void fn_8005E29C(cGame*, void*);
 extern "C" void fn_80029C80(
     PhysicsObject*, PhysicsObject*, const nlVector3&, void*);
 
@@ -280,7 +279,7 @@ void CrowdRiot::fn_80029460(bool param1)
 static inline void UnidentifiedInline_800298D8()
 {
     CrowdRiot* crowdRiot
-        = (CrowdRiot*)g_pGame->mUnidentified10E0;
+        = (CrowdRiot*)g_pGame->mpCrowdRiot;
     if (crowdRiot->meState == 2)
     {
         nlVector3 velocity;
@@ -429,7 +428,7 @@ void fn_80029C80(PhysicsObject*, PhysicsObject* other,
             event->pObject = other;
             event->v3Position = position;
             event->pCrowdRiot = crowdRiot;
-            fn_8005E29C(g_pGame, event);
+            QueueCollisionCrowdEvent(g_pGame, event);
         }
         break;
     }

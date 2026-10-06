@@ -53,27 +53,12 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/Render/StadiumLoading.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
-struct UnidentifiedGameState
-{
-    u8 mUnidentified00[0x28];
-    u32 mUnidentified28;
-    u32 mUnidentified2C;
-    u32 mUnidentified30;
-    u8 mUnidentified34[0x0C];
-    bool mUnidentified40;
-};
-
-extern "C" LiveBallTrail lbl_8056B518[];
-extern "C" unsigned int lbl_806E0C10;
-extern "C" void fn_80036594(cFielder*, cFielder*, int);
-extern "C" void fn_800156F8(cBall*, cPlayer*);
-extern "C" void Hide(BirdoEggObject*, bool);
-float Exp(float);
+extern unsigned int lbl_806E0C10;
+extern "C" void fn_80036594(cPlayer*, cFielder*, int);
 
 cBall* g_pBall = NULL;
 unsigned char lbl_806E0BC4;
@@ -87,21 +72,21 @@ bool lbl_806E0BDC;
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const char szPerfectPassBallBlurTexture[]
     = "global/perfectpassstreak";
-static const char sUnidentifiedPerfectPassBallBlurTexture2[]
+static const char szPerfectPassBallBlurTexture2[]
     = "global/perfectpass2streak";
-static const char sUnidentifiedPerfectPassBallBlurTexture3[]
+static const char szPerfectPassBallBlurTexture3[]
     = "global/perfectpass3streak";
-static const char sUnidentifiedPerfectPassBallBlurTexture4[]
+static const char szPerfectPassBallBlurTexture4[]
     = "global/perfectpass4streak";
-static const char sUnidentifiedShootToScoreBallBlurTexture0[]
+static const char szBowserShootToScoreBallBlurTexture[]
     = "global/bowsershoottoscorestreak";
-static const char sUnidentifiedShootToScoreBallBlurTexture1[]
+static const char szBowserJrShootToScoreBallBlurTexture[]
     = "global/bowserjrshoottoscorestreak";
 static const char szDaisyShootToScoreBallBlurTexture[]
     = "global/daisyshoottoscorestreak";
 static const char szDonkeyKongShootToScoreBallBlurTexture[]
     = "global/dkshoottoscorestreak";
-static const char sUnidentifiedShootToScoreBallBlurTexture2[]
+static const char szDiddyKongShootToScoreBallBlurTexture[]
     = "global/diddykongshoottoscorestreak";
 static const char szLuigiShootToScoreBallBlurTexture[]
     = "global/luigishoottoscorestreak";
@@ -109,7 +94,7 @@ static const char szMarioShootToScoreBallBlurTexture[]
     = "global/marioshoottoscorestreak";
 static const char szPeachShootToScoreBallBlurTexture[]
     = "global/peachshoottoscorestreak";
-static const char sUnidentifiedShootToScoreBallBlurTexture3[]
+static const char szPeteyShootToScoreBallBlurTexture[]
     = "global/peteyshoottoscorestreak";
 static const char szWaluigiShootToScoreBallBlurTexture[]
     = "global/washoottoscorestreak";
@@ -370,7 +355,7 @@ void cBall::CollideWithCharacterCallback(
             {
                 fn_80097358(pCharacter, 9999.9f);
             }
-            else if (fn_80016768(this))
+            else if (IsDryBonesSkillshot(this))
             {
                 fn_800156F8(this, pShooter);
                 pCharacterFielder->fn_800451B0(pShooter->mUnidentified024.m_v3Position);
@@ -792,7 +777,7 @@ extern "C" void fn_80014494(cBall* pBall)
     fn_80014494Impl(pBall);
 }
 
-extern "C" void fn_8001458C(cBall* pBall)
+void SetBallFallState(cBall* pBall)
 {
     if (pBall->meBallState != 10)
     {
@@ -1164,9 +1149,8 @@ cFielder* cBall::GetPassTargetFielder() const
 
 bool cBall::GetInNet(int& nSide)
 {
-    UnidentifiedGameState* gameState
-        = (UnidentifiedGameState*)g_pGame;
-    if (gameState->mUnidentified40 == 0)
+    cGame* gameState = g_pGame;
+    if (gameState->mbCaptainShotToScoreOn == 0)
     {
         if (m_pPhysicsBall->mbIsInsideNet)
         {
@@ -1175,8 +1159,8 @@ bool cBall::GetInNet(int& nSide)
             return true;
         }
     }
-    else if (gameState->mUnidentified2C > gameState->mUnidentified28
-             && gameState->mUnidentified30 != 0)
+    else if (gameState->m_uMegastrikeCurShot > gameState->m_uMegastrikeNumShots
+             && gameState->m_uMegastrikeGoals != 0)
     {
         float fDirection = g_pTeams[0]->m_pNet->m_fDirection;
         nSide = !(m_v3Position.x * fDirection > 1.0f);
@@ -1215,21 +1199,21 @@ void cBall::InitiateBallBlur(
             else if (mfChargeValue < 3.0f)
             {
                 nlStrNCpy(textureName,
-                    sUnidentifiedPerfectPassBallBlurTexture2,
+                    szPerfectPassBallBlurTexture2,
                     sizeof(textureName));
                 nLength = 12;
             }
             else if (mfChargeValue < 4.0f)
             {
                 nlStrNCpy(textureName,
-                    sUnidentifiedPerfectPassBallBlurTexture3,
+                    szPerfectPassBallBlurTexture3,
                     sizeof(textureName));
                 nLength = 18;
             }
             else
             {
                 nlStrNCpy(textureName,
-                    sUnidentifiedPerfectPassBallBlurTexture4,
+                    szPerfectPassBallBlurTexture4,
                     sizeof(textureName));
                 nLength = 24;
             }
@@ -1281,7 +1265,7 @@ void EmitBallChargeTransition(cBall* pBall)
     }
 }
 
-extern "C" void fn_800153FC(cBall* pBall, bool bParam)
+void ResetBallCharge(cBall* pBall, bool bParam)
 {
     if (pBall->mfChargeValue >= 0.0f && !bParam)
     {
@@ -1633,7 +1617,7 @@ static inline void UpdateBallShotClock(cBall* pBall)
 extern "C" void fn_80015C38(cBall* pBall, int nBallState)
 {
     ImmediateEvent<void(int, int)>* event
-        = &g_pGame->mUnidentified49C.mEvent14;
+        = &g_pGame->mUnidentified49C.mBallStateChangeEvent;
     event->Deliver(pBall->meBallState, nBallState);
 
     if (pBall->meBallState == 9)
@@ -1836,7 +1820,7 @@ void cBall::ClearBallBlur()
     }
 }
 
-extern "C" bool fn_80016768(cBall* pBall)
+bool IsDryBonesSkillshot(cBall* pBall)
 {
     return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
@@ -1852,7 +1836,7 @@ extern "C" bool fn_800167A8(cBall* pBall)
         == (eCharacterClass)0x10;
 }
 
-extern "C" bool fn_800167E8(cBall* pBall)
+bool IsBallShotActive(cBall* pBall)
 {
     return pBall->m_tShotTimer.m_uPackedTime != 0;
 }
@@ -2004,7 +1988,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
     }
 }
 
-extern "C" void fn_80016DF8(cBall* pBall, cPlayer* pPlayer,
+void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
     nlVector3* pVelocity, int nSpinType, bool bVolleyPass, bool bParam)
 {
     if (bVolleyPass && pBall->mePrevBallState == 5)
@@ -2113,7 +2097,7 @@ static inline float BallVelocityLength(float x, float y, float z)
     return nlSqrt(xSquared + ySquared + zSquared, true);
 }
 
-extern "C" void fn_80017114(cBall* pBall)
+void SteerBallToSideline(cBall* pBall)
 {
     if (nlAbs(pBall->m_v3Position.y) - lbl_806DB56C < 0.0f)
     {
@@ -2160,7 +2144,7 @@ extern "C" void fn_80017114(cBall* pBall)
         v3Velocity, SPINTYPE_PARAMETER, &v3AngularVelocity);
 }
 
-extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
+void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
 {
     bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
 
@@ -2168,7 +2152,7 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
     {
         if (pBall->meBallState == 10)
         {
-            fn_80017114(pBall);
+            SteerBallToSideline(pBall);
         }
 
         pBall->m_tNoPickupTimer.Countdown(fDeltaT, 0.0f);
@@ -2183,7 +2167,7 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
             }
             else
             {
-                fn_8001847C(pBall, false);
+                ResetBall(pBall, false);
             }
         }
 
@@ -2231,7 +2215,7 @@ extern "C" void fn_80017448(cBall* pBall, float fDeltaT)
     }
 }
 
-static bool sUnidentifiedUpdateActive;
+static bool sHeaderTargetVisible;
 
 static inline void RestoreFrozenBallPosition(cBall* pBall)
 {
@@ -2247,11 +2231,11 @@ void cBall::Update(float fDeltaT)
     }
     else
     {
-        fn_80017448(this, fDeltaT);
-        fn_80017F18(this);
+        UpdateBallStateAndTimers(this, fDeltaT);
+        DecayBallCharge(this);
 
         bool bUnidentified = true;
-        static Timer tUnidentifiedUpdateTimer(0.33f);
+        static Timer tHeaderTargetTimer(0.33f);
 
         bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
 
@@ -2265,34 +2249,34 @@ void cBall::Update(float fDeltaT)
                 && meBallState != 2
                 && meBallState != 10)
             {
-                if (sUnidentifiedUpdateActive)
+                if (sHeaderTargetVisible)
                 {
                     bUnidentified = m_v3Position.z < 0.4f;
                 }
                 else if (m_v3Position.z > lbl_806DB5A4
-                    && tUnidentifiedUpdateTimer.Countdown(fDeltaT, 0.0f))
+                    && tHeaderTargetTimer.Countdown(fDeltaT, 0.0f))
                 {
                     nlVector3 v3Unidentified;
                     PredictLandingSpotAndTime(v3Unidentified,
                         NULL, NULL, lbl_806DB5A4);
                     EmitHeaderTarget(this, &v3Unidentified, false);
-                    sUnidentifiedUpdateActive = true;
+                    sHeaderTargetVisible = true;
                     bUnidentified = false;
                 }
             }
 
-            if (sUnidentifiedUpdateActive && bUnidentified)
+            if (sHeaderTargetVisible && bUnidentified)
             {
                 KillHeaderTarget(this, false);
-                sUnidentifiedUpdateActive = false;
-                tUnidentifiedUpdateTimer.SetSeconds(lbl_806DB5AC);
+                sHeaderTargetVisible = false;
+                tHeaderTargetTimer.SetSeconds(lbl_806DB5AC);
             }
         }
         else
         {
             KillHeaderTarget(this, false);
-            sUnidentifiedUpdateActive = false;
-            tUnidentifiedUpdateTimer.SetSeconds(lbl_806DB5B0);
+            sHeaderTargetVisible = false;
+            tHeaderTargetTimer.SetSeconds(lbl_806DB5B0);
         }
 
         if (meBallState != 5
@@ -2443,7 +2427,7 @@ void cBall::SetPassTargetTimer(float seconds)
     }
 }
 
-extern "C" void fn_80017F18(cBall* pBall)
+void DecayBallCharge(cBall* pBall)
 {
     if (pBall->mtNoChargeLossTimer.m_uPackedTime != 0)
     {
@@ -2617,7 +2601,7 @@ float cBall::PredictLandingSpotAndTime(nlVector3& v3Dest,
     return fTime;
 }
 
-extern "C" void fn_8001847C(cBall* pBall, bool bParam)
+void ResetBall(cBall* pBall, bool bParam)
 {
     nlVector3 v3Pos = { 0.0f, 0.0f, 0.18f };
     if (g_pTeams[0]->m_nScore == 0 && g_pTeams[1]->m_nScore == 0)
@@ -2727,21 +2711,21 @@ extern "C" void fn_800189C4(cBall* pBall)
     pBall->mUnidentifiedF0 = 0;
 }
 
-static const nlVector3 lbl_804DBE48 = { 0.0f, 1.0f, 0.0f };
+static const nlVector3 sBallTrailUpVector = { 0.0f, 1.0f, 0.0f };
 
 extern "C" void fn_80018A00()
 {
-    UnidentifiedFindEvent<void>("BallFall", -1)->Add(Function<void*>(fn_800196FC), 0, -1);
-    UnidentifiedFindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(fn_8001A108), 0, -1);
-    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(fn_800193A0), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800195D8), 0, -1);
-    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(fn_800194A4), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8001929C), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(fn_80019718), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(fn_80019814), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(fn_80019F10), 0, -1);
-    UnidentifiedFindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(fn_80019910), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(fn_8001A00C), 0, -1);
+    UnidentifiedFindEvent<void>("BallFall", -1)->Add(Function<void*>(OnBallFall), 0, -1);
+    UnidentifiedFindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(OnBallStateChange), 0, -1);
+    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(OnBallResetEffects), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
+    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
+    UnidentifiedFindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(OnBallEggCollision), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);
+    UnidentifiedFindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
+    UnidentifiedFindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
 
     lbl_806E0C10 = 0;
     unsigned int i = 0;
@@ -2763,7 +2747,7 @@ extern "C" void fn_80018A00()
     }
 }
 
-extern "C" void fn_8001929C()
+void OnBallGameOver()
 {
     cBall* pBall = g_pBall;
     if (pBall == NULL)
@@ -2813,7 +2797,7 @@ extern "C" void fn_8001929C()
     fn_80015C38(pBall, 0);
 }
 
-extern "C" void fn_800193A0(void*)
+void OnBallResetEffects(void*)
 {
     cBall* pBall = g_pBall;
     if (pBall == NULL)
@@ -2863,7 +2847,7 @@ extern "C" void fn_800193A0(void*)
     fn_80015C38(pBall, 0);
 }
 
-extern "C" void fn_800194A4(void*)
+void OnBallGetReadyForKickoff(void*)
 {
     if (g_pBall == NULL)
     {
@@ -2896,7 +2880,7 @@ extern "C" void fn_800194A4(void*)
     }
 }
 
-extern "C" void fn_800195D8()
+void OnBallKickoff()
 {
     if (g_pBall == NULL)
     {
@@ -2933,7 +2917,7 @@ extern "C" void fn_800195D8()
     g_pBall->SetVelocity(v3Velocity, SPINTYPE_NONE, NULL);
 }
 
-extern "C" void fn_800196FC(void*)
+void OnBallFall(void*)
 {
     cBall* pBall = g_pBall;
     if (pBall->meBallState != 10)
@@ -2942,7 +2926,7 @@ extern "C" void fn_800196FC(void*)
     }
 }
 
-extern "C" void fn_80019718(void*)
+void OnBallTronWallCollision(void*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
@@ -2987,7 +2971,7 @@ extern "C" void fn_80019718(void*)
     fn_80015C38(pBall, 0);
 }
 
-extern "C" void fn_80019814(UnidentifiedEventData34*)
+void OnBallEggCollision(UnidentifiedEventData34*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
@@ -3038,7 +3022,7 @@ static inline cBall*& GetPatchBall()
     return g_pBall;
 }
 
-extern "C" void fn_80019910(PhysicsPatch* pPatch)
+void OnBallPatchCollision(PhysicsPatch* pPatch)
 {
     int patchType = pPatch->GetType();
     if (patchType == 1 && g_pBall->m_pOwner == NULL
@@ -3145,7 +3129,7 @@ extern "C" void fn_80019910(PhysicsPatch* pPatch)
     g_pBall->SetVelocity(v3Velocity, SPINTYPE_NONE, NULL);
 }
 
-extern "C" void fn_80019F10(void*)
+void OnBallDebrisCollision(void*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
@@ -3190,7 +3174,7 @@ extern "C" void fn_80019F10(void*)
     fn_80015C38(pBall, 0);
 }
 
-extern "C" void fn_8001A00C(void*)
+void OnBallThwompCollision(void*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
@@ -3235,14 +3219,14 @@ extern "C" void fn_8001A00C(void*)
     fn_80015C38(pBall, 0);
 }
 
-extern "C" void fn_8001A108(int previousState, int currentState)
+void OnBallStateChange(int previousState, int currentState)
 {
     if (previousState == 8 && currentState != 8)
     {
         g_pBall->mfSkillShotTime = 0.0f;
 
         cBall* pBall = g_pBall;
-        if (fn_80016768(pBall))
+        if (IsDryBonesSkillshot(pBall))
         {
             if (lbl_806E0BCC
                 || GameInfoManager::Instance()->IsRule0x4Equal5())
@@ -3414,7 +3398,7 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
     }
 }
 
-void cBall::fn_8001A898(RunningChecksum* runningChecksum)
+void cBall::ChecksumState(RunningChecksum* runningChecksum)
 {
     runningChecksum->ChecksumData(&m_v3Position, sizeof(m_v3Position));
     runningChecksum->ChecksumData(&m_v3Velocity, sizeof(m_v3Velocity));
@@ -3448,7 +3432,7 @@ LiveBallTrail::~LiveBallTrail()
     }
 }
 
-extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam)
+void SetBallTrailVisible(LiveBallTrail* pBallTrail, bool bParam)
 {
     pBallTrail->visible = bParam;
     if (!pBallTrail->visible)
@@ -3463,7 +3447,7 @@ extern "C" void fn_8001AA0C(LiveBallTrail* pBallTrail, bool bParam)
     }
 }
 
-extern "C" void fn_8001AA6C(LiveBallTrail* pBallTrail, float fParam)
+void UpdateBallTrail(LiveBallTrail* pBallTrail, float fParam)
 {
     nlVec3ScaleAdd(pBallTrail->position, fParam,
         pBallTrail->velocity, pBallTrail->position);
@@ -3485,7 +3469,7 @@ extern "C" void fn_8001AA6C(LiveBallTrail* pBallTrail, float fParam)
             v3Position = pBallTrail->position;
         }
 
-        nlVector3 v3Up = lbl_804DBE48;
+        nlVector3 v3Up = sBallTrailUpVector;
         if (pBallTrail->velocity.GetLengthSq3D() < 0.1f)
         {
             v3Up = v3Zero;
@@ -3526,7 +3510,7 @@ extern "C" void fn_8001AA6C(LiveBallTrail* pBallTrail, float fParam)
     nlQuatNormalize(pBallTrail->orientation, qOrientation);
 }
 
-extern "C" void fn_8001AD24(
+void InitializeMegaStrikeBallTrail(
     LiveBallTrail* pBallTrail, cFielder* pFielder)
 {
     char effectName[64];
@@ -3559,12 +3543,12 @@ extern "C" void fn_8001AD24(
     {
     case (eCharacterClass)1:
         nlStrNCpy(textureName,
-            sUnidentifiedShootToScoreBallBlurTexture0,
+            szBowserShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
     case (eCharacterClass)9:
         nlStrNCpy(textureName,
-            sUnidentifiedShootToScoreBallBlurTexture1,
+            szBowserJrShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
     case (eCharacterClass)2:
@@ -3579,7 +3563,7 @@ extern "C" void fn_8001AD24(
         break;
     case (eCharacterClass)10:
         nlStrNCpy(textureName,
-            sUnidentifiedShootToScoreBallBlurTexture2,
+            szDiddyKongShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
     case (eCharacterClass)4:
@@ -3599,7 +3583,7 @@ extern "C" void fn_8001AD24(
         break;
     case (eCharacterClass)11:
         nlStrNCpy(textureName,
-            sUnidentifiedShootToScoreBallBlurTexture3,
+            szPeteyShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
     case (eCharacterClass)6:
@@ -3626,30 +3610,30 @@ extern "C" void fn_8001AD24(
         true);
 }
 
-LiveBallTrail* fn_8001B284(unsigned int nIndex)
+LiveBallTrail* GetBallTrail(unsigned int nIndex)
 {
     return &lbl_8056B518[nIndex];
 }
 
-extern "C" void fn_8001B298(float fParam)
+void UpdateBallTrails(float fParam)
 {
     LiveBallTrail* pBallTrail = lbl_8056B518;
     for (unsigned int i = 0; i < lbl_806E0C10; ++i)
     {
         if (pBallTrail->visible)
         {
-            fn_8001AA6C(pBallTrail, fParam);
+            UpdateBallTrail(pBallTrail, fParam);
         }
         ++pBallTrail;
     }
 }
 
-unsigned int fn_8001B30C()
+unsigned int GetNumBallTrails()
 {
     return lbl_806E0C10;
 }
 
-extern "C" void fn_8001B314(unsigned int nNumTrails)
+void InitializeBallTrails(unsigned int nNumTrails)
 {
     lbl_806E0C10 = nNumTrails;
     nlVector3 v3Unidentified = v3Zero;
@@ -3658,7 +3642,7 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
     for (; i < nNumTrails; ++i)
     {
         LiveBallTrail* pBallTrail = &lbl_8056B518[i];
-        fn_8001AA0C(pBallTrail, false);
+        SetBallTrailVisible(pBallTrail, false);
         pBallTrail->position = v3Unidentified;
         pBallTrail->velocity = v3Unidentified;
         pBallTrail->drawable = (DrawableModel*)GetBallRenderObject(i);
@@ -3667,8 +3651,8 @@ extern "C" void fn_8001B314(unsigned int nNumTrails)
     for (; i < 10; ++i)
     {
         LiveBallTrail* pBallTrail = &lbl_8056B518[i];
-        fn_8001AA0C(pBallTrail, false);
+        SetBallTrailVisible(pBallTrail, false);
     }
 }
 
-extern "C" unsigned int lbl_806E0C10 = 0;
+unsigned int lbl_806E0C10 = 0;

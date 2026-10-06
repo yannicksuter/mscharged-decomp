@@ -35,11 +35,11 @@ enum ePadActions
     PAD_SWITCH = 26,
 };
 
-struct UnidentifiedPlayerState_1E4
+struct PlayerGameplayState
 {
 
-    UnidentifiedPlayerState_1E4() { UnidentifiedReset(); }
-    void UnidentifiedReset()
+    PlayerGameplayState() { Reset(); }
+    void Reset()
     {
         m_nFeatherAnimID = 0;
         m_bIsContactingWall = false;
@@ -140,7 +140,7 @@ public:
     void DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
         bool bFindPosition, bool bPerfectPass, bool bParam4,
         float fMinPassSpeed, float fMaxPassSpeed);
-    void fn_80095DF4(float fDeltaT);
+    void UpdateGameplayTimers(float fDeltaT);
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
     bool UnidentifiedPowerupPredicate();
     void PickupBall(cBall* pBall);
@@ -189,7 +189,7 @@ public:
         float fInitialWeight);
 
 public:
-    /* 0x1E4 */ UnidentifiedPlayerState_1E4 mUnidentified1E4;
+    /* 0x1E4 */ PlayerGameplayState mUnidentified1E4;
     /* 0x270 */ Timer m_tSwapControllerTimer[16];
 
 protected:
@@ -222,10 +222,10 @@ public:
 
 extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration);
 extern "C" void fn_80098098(cPlayer* pSelf);
-extern "C" void fn_800957E4(cPlayer* pPlayer, cTeam* pTeam);
+void SetPlayerTeam(cPlayer* pPlayer, cTeam* pTeam);
 void SetDesiredFacingDirection(cPlayer* pPlayer);
 extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass);
-extern "C" bool fn_800977A4(const cPlayer* pPlayer, float fParam);
+bool IsPlayerBelowHeight(const cPlayer* pPlayer, float fParam);
 extern "C" void fn_80098750();
 
 #endif // GAME_PLAYER_H

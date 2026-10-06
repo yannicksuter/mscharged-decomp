@@ -386,7 +386,7 @@ void Presentation::Finish()
                 }
                 else
                 {
-                    g_pGame->fn_8005DF38();
+                    g_pGame->ResumeAfterPresentation();
                 }
             }
         }
@@ -396,7 +396,7 @@ void Presentation::Finish()
             if (DuringEndOfGamePresentation(this))
             {
                 NisPlayer::Instance()->StopNisCue();
-                g_pGame->mUnidentified49C.mEvent02.Queue(
+                g_pGame->mUnidentified49C.mGameOverEvent.Queue(
                     Function<FnVoidVoid>());
                 nlTaskManager::SetNextState(1);
             }
@@ -566,7 +566,7 @@ void Presentation::Update(float deltaT)
             }
 
             tDebugPrintManager::Print(DC_NETWORK, "Bypassing...\n");
-            g_pGame->mUnidentified49C.mEvent04.Queue(
+            g_pGame->mUnidentified49C.mPresentationBypassEvent.Queue(
                 Function<FnVoidVoid>());
         }
 

@@ -181,18 +181,26 @@ static inline int IA8ColumnBits(int x)
     return (x & 3) | ((x >> 2) << 4);
 }
 
+static inline IA8PackedRow CopyIA8PixelToRow(u8* output, int y, int column,
+    const WarbleIA8Pixel& source)
+{
+    IA8PackedRow row;
+    row.word = (y & 3) << 2;
+    row.word |= (y & ~3) << 6;
+    IA8PixelAt(output, (row.word | column) << 1) = source;
+    return row;
+}
+
 static inline void MirrorWarblePixel(u8* output, int x, int y)
 {
     const int row = IA8RowBits(y);
-    const int reflectedRow = IA8RowBits(63 - y);
     const int column = IA8ColumnBits(x);
     const int reflectedColumn = IA8ColumnBits(63 - x);
     const WarbleIA8Pixel& source = IA8PixelAt(output, (row | column) << 1);
     const int mirrorX = (row | reflectedColumn) << 1;
-    const int mirrorY = (reflectedRow | column) << 1;
     IA8PixelAt(output, mirrorX) = source;
-    IA8PixelAt(output, mirrorY) = source;
-    const int mirrorXY = (reflectedRow | reflectedColumn) << 1;
+    const IA8PackedRow reflectedRow = CopyIA8PixelToRow(output, 63 - y, column, source);
+    const int mirrorXY = (reflectedRow.word | reflectedColumn) << 1;
     IA8PixelAt(output, mirrorXY) = source;
 }
 

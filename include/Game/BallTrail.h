@@ -22,7 +22,7 @@ struct LiveBallTrail
     /* 0x3C */ bool visible;
 };
 
-extern "C" void fn_8001AD24(LiveBallTrail* pBallTrail, cFielder* pFielder);
-extern "C" void fn_8001B298(float deltaTime);
+void InitializeMegaStrikeBallTrail(LiveBallTrail* pBallTrail, cFielder* pFielder);
+void UpdateBallTrails(float deltaTime);
 
 #endif // GAME_BALL_TRAIL_H

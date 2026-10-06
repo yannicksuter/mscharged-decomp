@@ -3,7 +3,7 @@
 
 class cPlayer;
 
-struct UnidentifiedEventData_800663A8
+struct PassBallData
 {
     cPlayer* pPasser;
     cPlayer* pTarget;
@@ -11,6 +11,5 @@ struct UnidentifiedEventData_800663A8
     int mPasserControllerID;
 }; // total size: 0x10
 
-typedef UnidentifiedEventData_800663A8 PassBallData;
 
 #endif // GAME_PASS_BALL_DATA_H

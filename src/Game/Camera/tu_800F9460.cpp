@@ -196,7 +196,7 @@ void UnidentifiedCameraEffects::Reset()
     if (mOwnsTimeScale && g_pNetworkSessionBase->GetLocalMachineId() == 0
         && !gNetworkInputRecording->mPlaybackReady)
     {
-        g_pGame->fn_80059FC4();
+        g_pGame->SendSlowDownEnd();
     }
 
     mOwnsTimeScale = false;
@@ -362,9 +362,9 @@ float UnidentifiedCameraEffects::CalculateZoomScale(float) const
         result -= lbl_806E0F40;
     if ((mCameraFlags & 0x40) != 0)
     {
-        float gameX = g_pGame->mUnidentified080;
+        float gameX = g_pGame->mfXTilt;
         float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
-        float gameY = g_pGame->mUnidentified084;
+        float gameY = g_pGame->mfYTilt;
         float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
         float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
         float fraction = amount / lbl_806DC5F4;
@@ -425,7 +425,7 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
         if (g_pNetworkSessionBase->GetLocalMachineId() == 0
             && !gNetworkInputRecording->mPlaybackReady)
         {
-            g_pGame->fn_80059FC4();
+            g_pGame->SendSlowDownEnd();
         }
         mOwnsTimeScale = false;
     }
@@ -472,9 +472,9 @@ void UnidentifiedCameraEffects::AdjustCameraVectors(float deltaTime,
 {
     if ((mCameraFlags & 0x40) != 0)
     {
-        float gameX = g_pGame->mUnidentified080;
+        float gameX = g_pGame->mfXTilt;
         float clampedX = nlMinEquals(lbl_806DC5F4, gameX);
-        float gameY = g_pGame->mUnidentified084;
+        float gameY = g_pGame->mfYTilt;
         float clampedY = nlMinEquals(lbl_806DC5F4, gameY);
         float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
         target->y += lbl_806DC5F8 * (amount / lbl_806DC5F4);
@@ -549,8 +549,8 @@ void UnidentifiedCameraEffects::OnShotPresentation()
     Reset();
     float endTime = g_pBall->m_tPassTargetTimer.GetSeconds()
                   + lbl_806E0F28;
-    g_pGame->fn_80058528(lbl_806DC54C, 0.0f);
-    g_pGame->fn_80058528(lbl_806DC550, endTime);
+    g_pGame->StartSlowDown(lbl_806DC54C, 0.0f);
+    g_pGame->StartSlowDown(lbl_806DC550, endTime);
     mTransitionTime = endTime;
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
@@ -586,8 +586,8 @@ void UnidentifiedCameraEffects::OnCaptainClashPresentation()
         Reset();
         FireCameraRumbleFilter(
             lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
-        g_pGame->fn_80058528(lbl_806DC578, 0.0f);
-        g_pGame->fn_80058528(lbl_806DC57C, lbl_806DC570);
+        g_pGame->StartSlowDown(lbl_806DC578, 0.0f);
+        g_pGame->StartSlowDown(lbl_806DC57C, lbl_806DC570);
         mOwnsTimeScale = true;
         mRestoreTimeScale = true;
         mTransitionTime = lbl_806DC570;
@@ -669,7 +669,7 @@ void UnidentifiedCameraEffects::OnGoalieSave(
     Reset();
     if (lbl_806DC584 != 1.0f)
     {
-        g_pGame->fn_80058528(lbl_806DC584, 0.0f);
+        g_pGame->StartSlowDown(lbl_806DC584, 0.0f);
         mOwnsTimeScale = true;
         mRestoreTimeScale = true;
     }
@@ -740,8 +740,8 @@ void UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess(
     FireCameraRumbleFilter(
         lbl_806DC5C8, lbl_806DC5CC, lbl_806DC5D0, lbl_806DC5D4);
     Reset();
-    g_pGame->fn_80058528(lbl_806DC5BC, 0.0f);
-    g_pGame->fn_80058528(lbl_806DC5C0, lbl_806DC5B4);
+    g_pGame->StartSlowDown(lbl_806DC5BC, 0.0f);
+    g_pGame->StartSlowDown(lbl_806DC5C0, lbl_806DC5B4);
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
     mTransitionTime = lbl_806DC5B4;
@@ -778,8 +778,8 @@ void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
     }
 
     Reset();
-    g_pGame->fn_80058528(lbl_806DC5A0, 0.0f);
-    g_pGame->fn_80058528(lbl_806DC5A4, lbl_806DC598);
+    g_pGame->StartSlowDown(lbl_806DC5A0, 0.0f);
+    g_pGame->StartSlowDown(lbl_806DC5A4, lbl_806DC598);
     mOwnsTimeScale = true;
     mRestoreTimeScale = true;
     mTransitionTime = lbl_806DC598;

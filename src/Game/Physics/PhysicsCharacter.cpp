@@ -27,7 +27,7 @@
 
 
 extern "C" int strcmpi(const char*, const char*);
-extern "C" bool fn_8003E948(cFielder*);
+extern "C" bool fn_8003E948(const cFielder*);
 
 
 static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
