@@ -5,6 +5,11 @@
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
+#include "Game/Audio/CategoryVolume.h"
+#include "Game/Audio/Delay.h"
+#include "Game/Audio/LowPassFilter.h"
+#include "Game/Audio/Pitch.h"
+#include "Game/Audio/Reverb.h"
 #include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/SoundInstance.h"
 #include "NL/nlString.h"
@@ -192,4 +197,20 @@ Volume::~Volume()
 
 ControllerSpeaker::~ControllerSpeaker()
 {
+}
+
+void AudioEffectFactory::Shutdown()
+{
+    VolumeParameter::s_Pool.FreeBlocks();
+    Volume::s_Pool.FreeBlocks();
+    ReverbParameter::s_Pool.FreeBlocks();
+    Reverb::s_Pool.FreeBlocks();
+    DelayParameter::s_Pool.FreeBlocks();
+    Delay::s_Pool.FreeBlocks();
+    LowPassFilterParameter::s_Pool.FreeBlocks();
+    LowPassFilter::s_Pool.FreeBlocks();
+    PitchParameter::s_Pool.FreeBlocks();
+    Pitch::s_Pool.FreeBlocks();
+    CategoryVolumeParameter::s_Pool.FreeBlocks();
+    CategoryVolume::s_Pool.FreeBlocks();
 }
