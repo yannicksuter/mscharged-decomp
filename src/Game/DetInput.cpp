@@ -282,6 +282,8 @@ void DetInput::Reset()
     m_aRemapAngle = 0;
 }
 
+#pragma push
+#pragma scheduling off
 void DetInput::CopyState(const DetInput& input)
 {
     m_AnalogLeftX = input.m_AnalogLeftX;
@@ -313,6 +315,7 @@ void DetInput::CopyState(const DetInput& input)
     m_buttonStateTicks[12] = input.m_buttonStateTicks[12];
     m_aRemapAngle = input.m_aRemapAngle;
 }
+#pragma pop
 
 void DetInput::ReadFromPad(cGlobalPad* pad)
 {
