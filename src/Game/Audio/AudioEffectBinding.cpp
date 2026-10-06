@@ -10,7 +10,7 @@ bool NotifyEffectSoundStarted(const u32&, AudioEffectBase**, u32);
 bool NotifyEffectSoundStopped(const u32&, AudioEffectBase**, u32);
 bool ApplyEffectToSound(const u32&, bool*, AudioEffectBase*);
 
-void AudioEffectBinding::Unidentified8418(u32 key)
+void AudioEffectBinding::OnBindingCreated(u32 key)
 {
 }
 

@@ -23,8 +23,6 @@
 #include "NL/nlColour.h"
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/Render/RLViewLayers.h"
 #include "Game/FE/tlDefault.h"
 
 BootLoadingScene::BootLoadingScene()
@@ -35,7 +33,7 @@ BootLoadingScene::BootLoadingScene()
     , mHomeButtonWarningActive(false)
     , mWidescreen(false)
 {
-    mPhase = 1;
+    mPhase = PhaseStrap;
 }
 
 BootLoadingScene::~BootLoadingScene()
@@ -160,17 +158,17 @@ void BootLoadingScene::SceneCreated()
 void BootLoadingScene::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
-    if (mPhase == 0)
+    if (mPhase == PhaseRatings)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
-            mPhase = 3;
+            mPhase = PhaseDeveloperLogo;
             mElapsedTime = 0.0f;
             SetPhaseSlide();
         }
     }
-    else if (mPhase == 1)
+    else if (mPhase == PhaseStrap)
     {
         if (mStrapDismissed)
         {
@@ -184,7 +182,7 @@ void BootLoadingScene::Update(float fDeltaT)
             if (mStrapAlpha <= 0.0f)
             {
                 mElapsedTime = 0.0f;
-                mPhase = 2;
+                mPhase = PhaseNunchuk;
                 SetPhaseSlide();
             }
         }
@@ -207,30 +205,30 @@ void BootLoadingScene::Update(float fDeltaT)
             }
         }
     }
-    else if (mPhase == 2)
+    else if (mPhase == PhaseNunchuk)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mElapsedTime = 0.0f;
             if (GetRegion() == 0)
-                mPhase = 0;
+                mPhase = PhaseRatings;
             else
-                mPhase = 3;
+                mPhase = PhaseDeveloperLogo;
             SetPhaseSlide();
         }
     }
-    else if (mPhase == 3)
+    else if (mPhase == PhaseDeveloperLogo)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
-            mPhase = 4;
+            mPhase = PhaseFinished;
             mElapsedTime = 0.0f;
             g_pAudioSystem->GetBundleManager()->GetSoundMap()->UnloadBank(0x17);
         }
     }
-    else if (mPhase == 4)
+    else if (mPhase == PhaseFinished)
     {
         if (mElapsedTime >= 0.0f)
         {
@@ -257,19 +255,19 @@ void BootLoadingScene::SetPhaseSlide()
 {
     switch (mPhase)
     {
-    case 0:
+    case PhaseRatings:
         mPresentation->SetActiveSlide("ESRB", true);
         break;
-    case 1:
+    case PhaseStrap:
         mPresentation->SetActiveSlide("strap", true);
         break;
-    case 2:
+    case PhaseNunchuk:
         mPresentation->SetActiveSlide("nunchuk", true);
         break;
-    case 4:
+    case PhaseFinished:
         mPresentation->SetActiveSlide("Slide1", true);
         break;
-    case 3:
+    case PhaseDeveloperLogo:
         mPresentation->SetActiveSlide("NLG", true);
         FEAudio::PlaySound(0x17, 0xDE83984E, 0, 0);
         break;
@@ -300,7 +298,7 @@ void BootLoadingScene::ShowHomeButtonWarning()
         return;
     }
 
-    if (mPhase != 1 || !(mElapsedTime <= 2.0f))
+    if (mPhase != PhaseStrap || !(mElapsedTime <= 2.0f))
     {
         mHomeButtonWarning->m_bVisible = true;
         if (mWidescreen)
@@ -317,24 +315,24 @@ bool BootLoadingScene::IsBootScreenPending()
     int alpha;
     switch (mPhase)
     {
-    case 0:
+    case PhaseRatings:
     {
         nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "ESRB",
             "Layer", "Text2")->GetAssetColour();
         alpha = colour.c[3];
         break;
     }
-    case 1:
+    case PhaseStrap:
         alpha = 0;
         break;
-    case 2:
+    case PhaseNunchuk:
     {
         nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "nunchuk",
             "Layer", "nunchuk")->GetAssetColour();
         alpha = colour.c[3];
         break;
     }
-    case 3:
+    case PhaseDeveloperLogo:
     {
         nlColour colour = FEFinder<TLInstance, 2>::Find(presentation, "NLG",
             "Layer", "nlgameslogo")->GetAssetColour();

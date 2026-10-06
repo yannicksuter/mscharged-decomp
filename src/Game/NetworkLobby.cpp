@@ -90,7 +90,7 @@ void NetworkLobby::Reset()
     mState = 0;
     mMatchFailed = false;
     mCancelRequested = false;
-    mUnidentified052 = false;
+    mLateCancelRequested = false;
     mElapsedTime = 0.0f;
     mConnectionDeadline = 0.0f;
     mMachineCount = 0;
@@ -812,7 +812,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Friend Matchmaking cancelling after the fact - after we got a connection\n");
-            mUnidentified052 = true;
+            mLateCancelRequested = true;
         }
     }
     else

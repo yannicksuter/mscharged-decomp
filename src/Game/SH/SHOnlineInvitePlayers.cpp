@@ -31,7 +31,6 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/FE/FEAudio.h"
 
 SHOnlineInvitePlayers::SHOnlineInvitePlayers()
     : mIsHost(true)
@@ -70,27 +69,27 @@ void SHOnlineInvitePlayers::RefreshRows()
         if (mSlots[i].mLocal)
         {
             if (mSlots[i].mGuest)
-                SetPlayerRow(1, i);
+                SetPlayerRow(RowLocalGuest, i);
             else
-                SetPlayerRow(0, i);
+                SetPlayerRow(RowLocalPlayer, i);
         }
         else if (mSlots[i].mGuest)
-            SetPlayerRow(6, i);
+            SetPlayerRow(RowRemoteGuest, i);
         else
-            SetPlayerRow(5, i);
+            SetPlayerRow(RowRemotePlayer, i);
     }
     if (mIsHost && i < 4)
     {
         if (mDeclinedDisplayTime > 0.0f)
-            SetPlayerRow(4, i);
+            SetPlayerRow(RowInvitationDeclined, i);
         else if (g_pFriendManager->mOwnStatus.mHeader.mStatus == EFriendStatus_HostInvitingPlayer)
-            SetPlayerRow(3, i);
+            SetPlayerRow(RowInvitationPending, i);
         else
-            SetPlayerRow(2, i);
+            SetPlayerRow(RowInviteAvailable, i);
         ++i;
     }
     for (; i < 4; ++i)
-        SetPlayerRow(7, i);
+        SetPlayerRow(RowHidden, i);
 }
 
 void SHOnlineInvitePlayers::SceneCreated()
@@ -345,11 +344,11 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
         int errorCode = g_pNetworkSession->fn_801CA9D8();
         ShowLobbyError(GetOnlineErrorPopup(errorCode, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5B));
     }
-    else if (lobby->mUnidentified052)
+    else if (lobby->mLateCancelRequested)
     {
         lobby->CloseConnectionsAndReset();
         lobby->StartFriendServer();
-        lobby->mUnidentified052 = false;
+        lobby->mLateCancelRequested = false;
     }
     else if (lobby->mCancelRequested)
     {
@@ -364,9 +363,9 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
     }
 }
 
-void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
+void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
 {
-    if (value == 0)
+    if (state == RowLocalPlayer)
     {
         mRows[index].Reset();
         nlStrNCpy(mRows[index].mName, gNetworkMiiNameWide, 14);
@@ -397,13 +396,13 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         mCancelButtons[index].Disable();
         return;
     }
-    else if (value == 1 || value == 6)
+    else if (state == RowLocalGuest || state == RowRemoteGuest)
     {
         mRows[index].Reset();
         BasicString<unsigned short, Detail::TempStringAllocator> string(
             g_pLocalization->GetString("ONLINE_CONTROLLERS_GUEST"));
         nlStrNCpy(mRows[index].mName, string.c_str(), 14);
-        if (value == 6)
+        if (state == RowRemoteGuest)
             memcpy(mRows[index].mMiiData, mSlots[index].mEntry->mMiiData, sizeof(mRows[index].mMiiData));
         else
             memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
@@ -417,7 +416,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         mCancelButtons[index].Disable();
         return;
     }
-    else if (value == 5)
+    else if (state == RowRemotePlayer)
     {
         mRows[index].Reset();
         NetworkDraftMachineInfo* entry = mSlots[index].mEntry;
@@ -440,7 +439,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         mCancelButtons[index].Disable();
         return;
     }
-    else if (value == 2)
+    else if (state == RowInviteAvailable)
     {
         mRows[index].Reset();
         mRows[index].mSearchState = 2;
@@ -452,7 +451,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         HidePlayerPortrait(index);
         return;
     }
-    else if (value == 3)
+    else if (state == RowInvitationPending)
     {
         mRows[index].Reset();
         GetFriendManager()->GetOwnStatus();
@@ -473,7 +472,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         HidePlayerPortrait(index);
         return;
     }
-    else if (value == 4)
+    else if (state == RowInvitationDeclined)
     {
         mRows[index].Reset();
         nlStrNCpy(mRows[index].mName,
@@ -492,7 +491,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int value, int index)
         HidePlayerPortrait(index);
         return;
     }
-    else if (value == 7)
+    else if (state == RowHidden)
     {
         mRows[index].Reset();
         mRows[index].mVisible = false;

@@ -20,6 +20,18 @@ struct OnlineInviteSlot
 class SHOnlineInvitePlayers : public BaseSceneHandler
 {
 public:
+    enum PlayerRowState
+    {
+        RowLocalPlayer = 0,
+        RowLocalGuest = 1,
+        RowInviteAvailable = 2,
+        RowInvitationPending = 3,
+        RowInvitationDeclined = 4,
+        RowRemotePlayer = 5,
+        RowRemoteGuest = 6,
+        RowHidden = 7
+    };
+
     SHOnlineInvitePlayers();
     virtual ~SHOnlineInvitePlayers();
     virtual void Update(float fDeltaT);
@@ -40,7 +52,7 @@ public:
     inline void ShowInvitationError(int popup);
     inline void ShowLobbyError(int popup);
     bool RefreshLobbySlots();
-    void SetPlayerRow(int value, int index);
+    void SetPlayerRow(int state, int index);
     void HidePlayerPortrait(int index);
     void OnLobbyErrorDismissed();
 

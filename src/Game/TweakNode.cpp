@@ -69,14 +69,14 @@ const char* GetTweakNodeName(const TweakNode* node)
 
 TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int noCreate)
 {
-    if (((TweakNode*)entry)->UnidentifiedVirtual0C() == 0)
+    if (((TweakNode*)entry)->IsEntry() == 0)
     {
         return 0;
     }
-    TweakEntry* folder = ((TweakNode*)entry)->UnidentifiedVirtual18();
+    TweakEntry* folder = ((TweakNode*)entry)->AsEntry();
     for (TweakNode* child = folder->m_ChildHead; child != 0; child = child->m_Next)
     {
-        if (child->UnidentifiedVirtual0C() == 0)
+        if (child->IsEntry() == 0)
         {
             continue;
         }
@@ -84,12 +84,12 @@ TweakEntry* FindOrCreateTweakChildEntry(TweakEntry* entry, const char* name, int
         {
             continue;
         }
-        return child->UnidentifiedVirtual18();
+        return child->AsEntry();
     }
     if (noCreate == 0)
     {
         TweakValueName* value = new TweakValueName(InternTweakString(name, kTweakStringFolder));
-        return CreateTweakEntry(value, ((TweakNode*)entry)->UnidentifiedVirtual18());
+        return CreateTweakEntry(value, ((TweakNode*)entry)->AsEntry());
     }
     return 0;
 }
@@ -113,12 +113,12 @@ TweakNode* FindTweakNode(TweakNode* entry, const char* path)
     {
         return entry;
     }
-    if (entry->UnidentifiedVirtual0C() != 0)
+    if (entry->IsEntry() != 0)
     {
         unsigned long length = nlStrLen(full);
         if (length == 0 || nlStrNICmp(search, full, length) == 0)
         {
-            TweakEntry* folder = entry->UnidentifiedVirtual18();
+            TweakEntry* folder = entry->AsEntry();
             for (TweakNode* child = folder->m_ChildHead; child != 0;
                 child = child->m_Next)
             {

@@ -1,3 +1,6 @@
+#include <revolution/sc_fwd.h>
+#include <revolution/thp_fwd.h>
+#include "string.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHMoviePlayer.h"
 #include "NL/nlFunction.inl"
@@ -19,10 +22,6 @@
 #include "NL/nlString.h"
 #include "Game/Task/GameRenderTask.h"
 #include "Game/main.h"
-
-extern "C" unsigned char SCGetSoundMode();
-extern "C" void THPSimpleSetVolume(int, int);
-extern "C" char* strstr(const char*, const char*);
 
 Config gMovieConfig(Config::ALLOCATE_HIGH, 0x2800, 0x400);
 

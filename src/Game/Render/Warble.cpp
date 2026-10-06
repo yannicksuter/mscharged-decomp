@@ -1,22 +1,13 @@
-#include "Game/TweakValueFloat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Render/Warble.h"
 #include "Game/GL/GLWarbleMeshWriter.h"
 #include "Game/Render/RLView.h"
+#include "Game/TweakValueFloat.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/gl/gl.h"
-#include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
-#include "Game/TweakValue.h"
 #include "NL/glx/glxTexture.h"
-#include "NL/nlColour.h"
-#include "NL/nlMath.h"
-#include "NL/nlMemory.h"
-#include "NL/nlString.h"
-
 #include "types.h"
-
-#include "Game/Render/Warble.h"
-
 
 static char sWarbleBlobTexture[] = "global/warble_blob";
 static char sWarbleTexture[] = "target/warbletexture";
@@ -41,8 +32,10 @@ static TweakValueFloat sWarbleRate(
 
 enum WarbleByteRow
 {
-    WarbleByteRow0 = 0, WarbleByteRow1 = 8,
-    WarbleByteRow2 = 16, WarbleByteRow3 = 24
+    WarbleByteRow0 = 0,
+    WarbleByteRow1 = 8,
+    WarbleByteRow2 = 16,
+    WarbleByteRow3 = 24
 };
 
 struct WarbleBlobRow
@@ -83,7 +76,7 @@ struct WarblePalette
 
 static inline WarblePalette BlobPalette(const PlatTexture* texture)
 {
-    WarblePalette result = {texture->m_PaletteData};
+    WarblePalette result = { texture->m_PaletteData };
     return result;
 }
 
@@ -161,9 +154,9 @@ union IA8PackedRow
     unsigned int word;
     struct
     {
-        unsigned int block : 24;
-        unsigned int blockX : 4;
-        unsigned int pixel : 2;
+        unsigned int tileRow : 24;
+        unsigned int tileColumn : 4;
+        unsigned int pixelY : 2;
         unsigned int pixelX : 2;
     } fields;
 };
@@ -172,7 +165,7 @@ static inline int IA8RowBits(int y)
 {
     IA8PackedRow row;
     row.word = (y & ~3) << 6;
-    row.fields.pixel = y;
+    row.fields.pixelY = y;
     return row.word;
 }
 

@@ -11,7 +11,7 @@ public:
 
     virtual void Unknown0();
     virtual bool SetContactInfo(
-        dContact* contact, PhysicsObject* other, bool param);
+        dContact* contact, PhysicsObject* other, bool first);
     virtual void PreUpdate();
     virtual void PostUpdate();
     virtual void PreCollide();
@@ -23,10 +23,10 @@ public:
     void CalcAngularFromLinearVelocity(nlVector3& v3AngularVel);
     void CalcSurfaceVelocity(nlVector3& v3VelocityOut);
     void fn_8013FE00();
-    void fn_8013FE14();
-    void fn_80140C30();
-    float fn_80140C3C();
-    void SetUseAngularVelocity(bool param_1);
+    void RestoreBallForces();
+    void ResetBallAirResistance();
+    float GetDefaultBallAirResistance();
+    void SetUseAngularVelocity(bool enableAfterDelay);
     void ScaleAngularVelocity(float scale);
     void AddResistanceForces();
     void CloneBall(const PhysicsBall& other);

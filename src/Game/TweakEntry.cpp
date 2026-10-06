@@ -110,9 +110,9 @@ TweakNode* FindTweakChild(TweakEntry* entry, const char* name)
 
 void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value)
 {
-    if (entry->UnidentifiedVirtual0C())
+    if (entry->IsEntry())
     {
-        TweakEntry* folder = entry->UnidentifiedVirtual18();
+        TweakEntry* folder = entry->AsEntry();
         for (TweakNode* child = folder->m_ChildHead; child != 0;)
         {
             TweakNode* next = child->GetNext();
@@ -120,9 +120,9 @@ void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value)
             {
                 delete child;
             }
-            else if (child->UnidentifiedVirtual0C())
+            else if (child->IsEntry())
             {
-                RemoveTweakValue(child->UnidentifiedVirtual18(), value);
+                RemoveTweakValue(child->AsEntry(), value);
             }
             child = next;
         }
@@ -135,9 +135,9 @@ void ClearTweakChildren(TweakEntry* entry)
     for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
         next = child->GetNext();
-        if (child->UnidentifiedVirtual0C())
+        if (child->IsEntry())
         {
-            ClearTweakChildren(child->UnidentifiedVirtual18());
+            ClearTweakChildren(child->AsEntry());
         }
         delete child;
         child = next;
@@ -155,9 +155,9 @@ void RemoveDynamicTweakChildren(TweakEntry* entry)
         {
             delete child;
         }
-        else if (child->UnidentifiedVirtual0C())
+        else if (child->IsEntry())
         {
-            RemoveDynamicTweakChildren(child->UnidentifiedVirtual18());
+            RemoveDynamicTweakChildren(child->AsEntry());
         }
         child = next;
     }

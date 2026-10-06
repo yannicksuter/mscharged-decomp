@@ -9,7 +9,6 @@
 #include "Game/Task/FrontEndTask.h"
 #include "Game/main.h"
 
-
 void LoadingTask::Start()
 {
     mElapsed = 0.0f;
@@ -27,19 +26,19 @@ void LoadingTask::Run(float dt)
 
     switch (fn_80118B7C(AsyncLoadingManager::Instance()))
     {
-    case 3:
+    case ASYNC_LOADING_FE_READY:
         nlTaskManager::SetNextState(0x00080000);
         break;
-    case 4:
+    case ASYNC_LOADING_CLEAN_BOOT_COMPLETE:
         nlTaskManager::SetNextState(0x00000004);
         break;
-    case 5:
+    case ASYNC_LOADING_GAME_READY:
         nlTaskManager::SetNextState(0x00000002);
         break;
-    case 7:
+    case ASYNC_LOADING_STADIUM_OR_GAME_READY:
         nlTaskManager::SetNextState(0x00000002);
         break;
-    case 6:
+    case ASYNC_LOADING_RETURN_TO_FE:
         nlTaskManager::SetNextState(0x00000004);
         break;
     }

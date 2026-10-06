@@ -57,7 +57,7 @@ public:
 
     /* 0x84 */ cSAnim* mpIdleAnim;
     /* 0x88 */ cSAnim* mpRecoverAnim;
-    /* 0x8C */ cSAnim* mpDropAnim;
+    /* 0x8C */ cSAnim* mpChompAnim;
     /* 0x90 */ cFielder* mpTarget;
     /* 0x94 */ eChainChompState meChainChompState;
     /* 0x98 */ Timer mtStateTimer;

@@ -6,7 +6,7 @@
 
 DispatchEventsTask* gDispatchEventsTask;
 
-void fn_80115F10()
+void InitializeDispatchEventsTask()
 {
     gDispatchEventsTask =
         new (nlMalloc(sizeof(DispatchEventsTask), 8, false)) DispatchEventsTask;

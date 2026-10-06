@@ -34,7 +34,7 @@
 
 
 
-static const nlVector3 v3Unidentified = { 0.0f, 0.0f, 160.0f };
+static const nlVector3 v3SidelineLiftForce = { 0.0f, 0.0f, 160.0f };
 static const nlVector3 v3Direction = { 0.0f, 0.0f, 1.0f };
 
 PhysicsShell::PhysicsShell(float radius)
@@ -45,9 +45,9 @@ PhysicsShell::PhysicsShell(float radius)
     m_pPowerupObject = 0;
     mbIsInNet = false;
     m_bIsSupportedByGround = false;
-    mUnidentified046 = false;
-    mUnidentified048 = 0;
-    mUnidentified04C = 0.0f;
+    m_bAllowOutOfBoundsFall = false;
+    mVelocityScaleTicksRemaining = 0;
+    mVelocityScale = 0.0f;
 
     SetCollide(0x1F062);
     SetCategory(0x2000);
@@ -67,11 +67,11 @@ void PhysicsShell::PreUpdate()
         AddForceAtCentreOfMass(g_pBall->m_pPhysicsBall->mv3WindForce);
     }
 
-    if (mUnidentified048 > 0)
+    if (mVelocityScaleTicksRemaining > 0)
     {
         nlVector3 velocity;
         GetLinearVelocity(&velocity);
-        nlVec3Scale(velocity, mUnidentified04C);
+        nlVec3Scale(velocity, mVelocityScale);
         SetLinearVelocity(velocity);
     }
 }
@@ -87,7 +87,7 @@ ContactType PhysicsShell::Contact(
 
     GetPosition(&myPos);
 
-    if (mUnidentified046)
+    if (m_bAllowOutOfBoundsFall)
     {
         return NO_CONTACT;
     }
@@ -300,12 +300,12 @@ ContactType PhysicsShell::Contact(
         PhysicsPatchInfo* patchInfo = GetPhysicsPatchInfo(value);
         if (patchInfo->mFriction != 0.0f)
         {
-            if (mUnidentified048 != 2
-                || patchInfo->mFriction > mUnidentified04C)
+            if (mVelocityScaleTicksRemaining != 2
+                || patchInfo->mFriction > mVelocityScale)
             {
-                mUnidentified04C = patchInfo->mFriction;
+                mVelocityScale = patchInfo->mFriction;
             }
-            mUnidentified048 = 2;
+            mVelocityScaleTicksRemaining = 2;
         }
 
         if (patchInfo->mType == 8
@@ -320,7 +320,7 @@ ContactType PhysicsShell::Contact(
     {
         if (obj->GetObjectType() == 0x12)
         {
-            if (mUnidentified046)
+            if (m_bAllowOutOfBoundsFall)
             {
                 return NO_CONTACT;
             }
@@ -452,10 +452,10 @@ ContactType PhysicsShell::Contact(
                     {
                         if (height < 0.72f)
                         {
-                            nlVector3 v3Force = v3Unidentified;
+                            nlVector3 v3Force = v3SidelineLiftForce;
                             AddForceAtCentreOfMass(v3Force);
                         }
-                        mUnidentified046 = true;
+                        m_bAllowOutOfBoundsFall = true;
                     }
                     return NO_CONTACT;
                 }
@@ -467,7 +467,7 @@ ContactType PhysicsShell::Contact(
 
     if (bWasRicochet)
     {
-        if (mUnidentified046)
+        if (m_bAllowOutOfBoundsFall)
         {
             eType = NO_CONTACT;
         }
@@ -531,15 +531,15 @@ void PhysicsShell::PostUpdate()
         SetLinearVelocity(velocity);
     }
 
-    if (mUnidentified048 > 0)
+    if (mVelocityScaleTicksRemaining > 0)
     {
         nlVector3 scaledVelocity;
         GetLinearVelocity(&scaledVelocity);
-        nlVec3Scale(scaledVelocity, 1.0f / mUnidentified04C);
+        nlVec3Scale(scaledVelocity, 1.0f / mVelocityScale);
         SetLinearVelocity(scaledVelocity);
-        if (--mUnidentified048 == 0)
+        if (--mVelocityScaleTicksRemaining == 0)
         {
-            mUnidentified04C = 0.0f;
+            mVelocityScale = 0.0f;
         }
     }
 }

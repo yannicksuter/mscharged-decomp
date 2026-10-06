@@ -1,12 +1,12 @@
 #include "Game/NetworkMessages.h"
 
-void NetworkMessageType30::Serialize(
+void NetMessageSkipNis::Serialize(
     NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mByPassNumber, sizeof(mByPassNumber));
 }
 
-void NetworkMessageType31::Serialize(
+void NetMessageSkipNisClient::Serialize(
     NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mByPassNumber, sizeof(mByPassNumber));

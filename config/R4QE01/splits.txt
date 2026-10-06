@@ -851,15 +851,15 @@ Game/NetworkMessages.cpp:
 	.data       start:0x8050AC20 end:0x8050AD68
 	.sbss       start:0x806E1108 end:0x806E1160
 
-Game/NetworkMessages_801268E8.cpp:
+Game/NetworkPauseMessages.cpp:
 	.text       start:0x801268E8 end:0x80126A70
 	.data       start:0x8050AD68 end:0x8050AD90
 
-Game/NetworkMessages_80126A70.cpp:
+Game/NetworkSkipNisMessages.cpp:
 	.text       start:0x80126A70 end:0x80126BE8
 	.data       start:0x8050AD90 end:0x8050ADB8
 
-Game/NetworkMessages_80126BE8.cpp:
+Game/NetworkMegaStrikeMessages.cpp:
 	.text       start:0x80126BE8 end:0x80126F2C
 	.data       start:0x8050ADB8 end:0x8050ADE0
 
@@ -1595,6 +1595,7 @@ Game/Render/ThwompObject.cpp:
 Game/Render/WarbleOwner.cpp:
 	.text       start:0x801B369C end:0x801B38C4
 	.bss        start:0x805741D0 end:0x80574200
+	.sbss       start:0x806E16C0 end:0x806E16C8
 	.sdata2     start:0x806E5388 end:0x806E53A8
 
 Game/Render/Warble.cpp:
@@ -1603,7 +1604,7 @@ Game/Render/Warble.cpp:
 	.data       start:0x80514750 end:0x805147D0
 	.bss        start:0x80574200 end:0x80578240
 	.sdata      start:0x806DD130 end:0x806DD140
-	.sbss       start:0x806E16C0 end:0x806E16E8
+	.sbss       start:0x806E16C8 end:0x806E16E8
 	.sdata2     start:0x806E53A8 end:0x806E53E8
 
 Game/Render/tu_801B43F8.cpp:

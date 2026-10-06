@@ -57,8 +57,8 @@ static NetworkMessageFactory<NetMessageLoadedGameEveryone> sFactoryType19;
 static NetworkMessageFactory<NetMessageTournamentStart> sFactoryType20;
 static NetworkMessageFactory<NetMessagePauseRequest> sFactoryType28;
 static NetworkMessageFactory<NetMessagePauseResponse> sFactoryType29;
-static NetworkMessageFactory<NetworkMessageType30> sFactoryType30;
-static NetworkMessageFactory<NetworkMessageType31> sFactoryType31;
+static NetworkMessageFactory<NetMessageSkipNis> sSkipNisFactory;
+static NetworkMessageFactory<NetMessageSkipNisClient> sSkipNisClientFactory;
 static NetworkMessageFactory<NetMessageTournamentGameUpdate> sFactoryType32;
 static NetworkMessageFactory<NetMessageTournamentLoadingState> sFactoryType33;
 static NetworkMessageFactory<NetMessageDraft> sFactoryType21;
@@ -69,8 +69,8 @@ static NetworkMessageFactory<NetMessageSidesChanged> sSidesChangedFactory;
 static NetworkMessageFactory<NetMessageCheckConnection> sFactoryType26;
 static NetworkMessageFactory<NetMessageConnectionDecision> sFactoryType27;
 static NetworkMessageFactory<NetMessageMegaBallPointer> sMegaBallPointerFactory;
-static NetworkMessageFactory<NetworkMessageType35>
-    sFactoryType35;
+static NetworkMessageFactory<NetMessageMegaStrikeMeter>
+    sMegaStrikeMeterFactory;
 
 void RegisterNetworkMessages_801258A8()
 {
@@ -90,10 +90,10 @@ void RegisterNetworkMessages_801258A8()
     gNetworkMessageRegistry->RegisterFactory(27, &sFactoryType27);
     gNetworkMessageRegistry->RegisterFactory(28, &sFactoryType28);
     gNetworkMessageRegistry->RegisterFactory(29, &sFactoryType29);
-    gNetworkMessageRegistry->RegisterFactory(30, &sFactoryType30);
-    gNetworkMessageRegistry->RegisterFactory(31, &sFactoryType31);
+    gNetworkMessageRegistry->RegisterFactory(30, &sSkipNisFactory);
+    gNetworkMessageRegistry->RegisterFactory(31, &sSkipNisClientFactory);
     gNetworkMessageRegistry->RegisterFactory(32, &sFactoryType32);
     gNetworkMessageRegistry->RegisterFactory(33, &sFactoryType33);
     gNetworkMessageRegistry->RegisterFactory(34, &sMegaBallPointerFactory);
-    gNetworkMessageRegistry->RegisterFactory(35, &sFactoryType35);
+    gNetworkMessageRegistry->RegisterFactory(35, &sMegaStrikeMeterFactory);
 }

@@ -13,7 +13,7 @@ void NetMessageMegaBallPointer::Serialize(
     serializer->Transfer(&mStatus, sizeof(mStatus));
 }
 
-void NetworkMessageType35::Serialize(
+void NetMessageMegaStrikeMeter::Serialize(
     NetworkMessageSerializer* serializer)
 {
     serializer->Transfer(&mCount, sizeof(mCount));
@@ -50,7 +50,7 @@ void NetworkMessageType35::Serialize(
     }
 }
 
-int NetworkMessageType35::GetType()
+int NetMessageMegaStrikeMeter::GetType()
 {
     return 35;
 }

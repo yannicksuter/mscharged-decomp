@@ -7,6 +7,7 @@ extern "C" {
 
 unsigned char SCGetAspectRatio(void);
 unsigned char SCGetLanguage(void);
+unsigned char SCGetSoundMode(void);
 unsigned long SCGetSimpleAddressID(void);
 
 #ifdef __cplusplus

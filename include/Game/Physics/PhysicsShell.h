@@ -22,10 +22,10 @@ public:
     /* 0x40 */ PowerupBase* m_pPowerupObject;
     /* 0x44 */ bool mbIsInNet;
     /* 0x45 */ bool m_bIsSupportedByGround;
-    /* 0x46 */ bool mUnidentified046;
+    /* 0x46 */ bool m_bAllowOutOfBoundsFall;
     /* 0x47 */ u8 mPadding047;
-    /* 0x48 */ int mUnidentified048;
-    /* 0x4C */ float mUnidentified04C;
+    /* 0x48 */ int mVelocityScaleTicksRemaining;
+    /* 0x4C */ float mVelocityScale;
 }; // total size: 0x50
 
 #endif // GAME_PHYSICS_PHYSICS_SHELL_H

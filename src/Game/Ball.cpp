@@ -1421,7 +1421,7 @@ static inline void ShootAtFastImpl(cBall* pBall, nlVector3& v3Vel,
 
 extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
 {
-    g_pBall->m_pPhysicsBall->fn_8013FE14();
+    g_pBall->m_pPhysicsBall->RestoreBallForces();
 
     nlVector3 v3Position = lbl_804DBE30;
     v3Position.x *= AIsgn(g_pBall->m_v3Position.x);
@@ -1631,15 +1631,15 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         && nBallState != 6 && nBallState != 7 && nBallState != 10)
     {
         EmitBallChargeTransition(pBall);
-        pBall->m_pPhysicsBall->fn_80140C30();
+        pBall->m_pPhysicsBall->ResetBallAirResistance();
     }
     else if (pBall->meBallState == 1 && nBallState != 10)
     {
-        pBall->m_pPhysicsBall->fn_80140C30();
+        pBall->m_pPhysicsBall->ResetBallAirResistance();
     }
     else if (pBall->meBallState == 10)
     {
-        pBall->m_pPhysicsBall->fn_80140C30();
+        pBall->m_pPhysicsBall->ResetBallAirResistance();
     }
 
     switch (nBallState)
@@ -1686,7 +1686,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
             && pBall->m_pPrevOwner->m_eClassType == FIELDER)
         {
             pBall->m_pPhysicsBall->mfBallAirResistance
-                = pBall->m_pPhysicsBall->fn_80140C3C() * lbl_806DB574;
+                = pBall->m_pPhysicsBall->GetDefaultBallAirResistance() * lbl_806DB574;
         }
         break;
     case 6:
@@ -1695,7 +1695,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         if (pPrevOwner != NULL
             && pPrevOwner->m_eClassType == FIELDER)
         {
-            float resistance = pBall->m_pPhysicsBall->fn_80140C3C();
+            float resistance = pBall->m_pPhysicsBall->GetDefaultBallAirResistance();
             PlayerTweaks* tweaks
                 = ((cFielder*)pPrevOwner)->GetTweaks();
             pBall->m_pPhysicsBall->mfBallAirResistance
@@ -1940,7 +1940,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 
     if (bParam6)
     {
-        m_pPhysicsBall->fn_80140C30();
+        m_pPhysicsBall->ResetBallAirResistance();
     }
 
     if (m_pPhysicsBall->mbUseMagnusEffect)
@@ -3268,7 +3268,7 @@ void OnBallStateChange(int previousState, int currentState)
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_bVisible = true;
-        g_pBall->m_pPhysicsBall->fn_8013FE14();
+        g_pBall->m_pPhysicsBall->RestoreBallForces();
 
         if (g_pBall->mbBallOnFire)
         {

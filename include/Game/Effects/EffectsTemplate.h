@@ -34,7 +34,7 @@ enum eEffectsBillboard
     EfBill_SoftwareControlled = 2,
 };
 
-extern unsigned int uSeed;
+extern unsigned int gEffectsRandomSeed;
 
 struct fxCurveKey
 {
@@ -73,24 +73,24 @@ public:
     /* 0x18 */ fxRange m_rInheritVelocity;
     /* 0x20 */ fxRange m_rAcceleration;
     /* 0x28 */ fxRange m_rRotation;
-    /* 0x30 */ float mUnidentified030;
+    /* 0x30 */ float m_fTexcoordFlipPercentage;
     /* 0x34 */ unsigned char m_eEmitter;
     /* 0x35 */ unsigned char m_eBlend;
     /* 0x36 */ unsigned char m_eBillboard;
-    /* 0x37 */ unsigned char mUnidentified037;
+    /* 0x37 */ unsigned char m_uFlags;
     /* 0x38 */ unsigned long m_hTexture;
     /* 0x3C */ int m_nFrames;
-    /* 0x40 */ unsigned long mUnidentified040;
-    /* 0x44 */ unsigned long mUnidentified044;
-    /* 0x48 */ unsigned long mUnidentified048;
+    /* 0x40 */ unsigned long m_uEmitterDeathCode;
+    /* 0x44 */ unsigned long m_uParticleCreationCode;
+    /* 0x48 */ unsigned long m_uParticleDeathCode;
     /* 0x4C */ fxRange m_rFPS;
     /* 0x54 */ unsigned long m_uModelID;
     /* 0x58 */ fxAnimatedRange* mProperties[8];
     /* 0x78 */ nlColour m_cColour[26];
 
-    bool IsInFront() const { return (mUnidentified037 & 1) != 0; }
-    bool IsLocalSpace() const { return (mUnidentified037 & 2) != 0; }
-    bool IsLit() const { return (mUnidentified037 & 4) != 0; }
+    bool IsInFront() const { return (m_uFlags & 1) != 0; }
+    bool IsLocalSpace() const { return (m_uFlags & 2) != 0; }
+    bool DisablesDepthWrite() const { return (m_uFlags & 4) != 0; }
     float EvaluateProperty(unsigned int index, float time) const
     {
         return mProperties[index]->Evaluate(time);
@@ -101,15 +101,15 @@ inline float RandomizedValue(float base, float range)
 {
     float halfRange = 0.5f * range;
     float result = base;
-    float randomOffset = nlRandomf(halfRange, &uSeed);
-    unsigned int randomSign = nlRandom(0x7FFFFFFF, &uSeed);
+    float randomOffset = nlRandomf(halfRange, &gEffectsRandomSeed);
+    unsigned int randomSign = nlRandom(0x7FFFFFFF, &gEffectsRandomSeed);
 
     return (randomSign & 1) ? result + randomOffset : result - randomOffset;
 }
 
 inline float RandomizedValue(float value)
 {
-    return nlRandomf(value, &uSeed);
+    return nlRandomf(value, &gEffectsRandomSeed);
 }
 
 inline float RandomizedValue(const fxRange& value)

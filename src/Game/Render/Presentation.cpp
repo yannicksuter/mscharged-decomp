@@ -118,7 +118,7 @@ static inline void SendSkipNisToAll(u8* buffer, int size)
 }
 
 static inline void SendSkipNisToHost(
-    NetworkMessageType31* message, u8* buffer)
+    NetMessageSkipNisClient* message, u8* buffer)
 {
     int size = gNetworkMessageRegistry->Serialize(message, buffer, 10);
     g_pNetworkSessionBase->Send(0, buffer, size, true);
@@ -546,7 +546,7 @@ void Presentation::Update(float deltaT)
                             "Sending NetworkSkipNIS message bypass# %d in peer-peer mode\n",
                             mByPassNumber);
 
-                        NetworkMessageType30 message(mByPassNumber);
+                        NetMessageSkipNis message(mByPassNumber);
                         u8 buffer[10];
                         SendSkipNisToAll(buffer,
                             gNetworkMessageRegistry->Serialize(
@@ -559,7 +559,7 @@ void Presentation::Update(float deltaT)
                             mByPassNumber);
 
                         u8 buffer[10];
-                        NetworkMessageType31 message(mByPassNumber);
+                        NetMessageSkipNisClient message(mByPassNumber);
                         SendSkipNisToHost(&message, buffer);
                     }
                 }
@@ -1213,7 +1213,7 @@ void Presentation::SendSkipNis()
             "Sending NetworkSkipNIS message bypass# %d in peer-peer mode\n",
             mByPassNumber);
 
-        NetworkMessageType30 message(mByPassNumber);
+        NetMessageSkipNis message(mByPassNumber);
         u8 buffer[10];
         SendSkipNisToAll(buffer,
             gNetworkMessageRegistry->Serialize(&message, buffer, 10));
@@ -1225,7 +1225,7 @@ void Presentation::SendSkipNis()
             mByPassNumber);
 
         u8 buffer[10];
-        NetworkMessageType31 message(mByPassNumber);
+        NetMessageSkipNisClient message(mByPassNumber);
         SendSkipNisToHost(&message, buffer);
     }
 }
@@ -1265,9 +1265,9 @@ int Presentation::ProcessMessage(NetworkMessage* message)
     case 30:
         tDebugPrintManager::Print(DC_NETWORK,
             "Received SkipNIS message from machine %d bypass# %d\n", machine,
-            ((NetworkMessageType30*)receivedMessage)->mByPassNumber);
+            ((NetMessageSkipNis*)receivedMessage)->mByPassNumber);
         mSkipPastByPass
-            = ((NetworkMessageType30*)receivedMessage)->mByPassNumber;
+            = ((NetMessageSkipNis*)receivedMessage)->mByPassNumber;
         break;
 
     case 31:
@@ -1276,11 +1276,11 @@ int Presentation::ProcessMessage(NetworkMessage* message)
             tDebugPrintManager::Print(DC_NETWORK,
                 "Host relaying origin machine %d sending NetworkSkipNIS message bypass# %d to all\n",
                 machine,
-                ((NetworkMessageType31*)receivedMessage)->mByPassNumber);
+                ((NetMessageSkipNisClient*)receivedMessage)->mByPassNumber);
 
             u8 buffer[10];
-            NetworkMessageType30 relay(
-                ((NetworkMessageType31*)receivedMessage)->mByPassNumber);
+            NetMessageSkipNis relay(
+                ((NetMessageSkipNisClient*)receivedMessage)->mByPassNumber);
             size = gNetworkMessageRegistry->Serialize(&relay, buffer, 10);
             SendSkipNisToAll(buffer, size);
         }

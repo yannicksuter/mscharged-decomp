@@ -95,7 +95,7 @@ public:
     /* 0x004C */ int mState;
     /* 0x0050 */ bool mMatchFailed;
     /* 0x0051 */ bool mCancelRequested;
-    /* 0x0052 */ bool mUnidentified052;
+    /* 0x0052 */ bool mLateCancelRequested;
     /* 0x0053 */ u8 mPadding053;
     /* 0x0054 */ float mElapsedTime;
     /* 0x0058 */ float mConnectionDeadline;

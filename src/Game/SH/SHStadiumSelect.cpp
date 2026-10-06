@@ -1,3 +1,6 @@
+#include <revolution/sc_fwd.h>
+#include <revolution/thp_fwd.h>
+#include "Game/SH/SHMoviePlayer.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/SH/SHStadiumSelect.h"
 #include "NL/nlFunction.inl"
@@ -39,10 +42,6 @@
 #include "NL/nlFormat.h"
 #include <string.h>
 
-extern "C" unsigned char SCGetSoundMode();
-extern "C" int THPSimpleSetVolume(long volume, long time);
-
-extern Config gMovieConfig;
 static const int STADIUM_ORDER[17] = {
     13, 11, 15, 16, 7, 14, 3, 4, 9, 5, 0, 1, 2, 6, 10, 8, 12,
 };

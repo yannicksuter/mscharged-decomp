@@ -516,7 +516,7 @@ static void Initialize()
     }
 
     glxSetDrawSyncTimeout(1000.0f);
-    fn_80115F10();
+    InitializeDispatchEventsTask();
     nlTaskManager::Startup(0x10000);
     sLoadingTask.Start();
     GetEmissionManager();

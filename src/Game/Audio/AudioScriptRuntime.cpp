@@ -67,7 +67,7 @@ static inline void AddSoundBinding(AudioScriptRuntime* script,
     bool added;
     AudioEffectBinding* binding = script->mBindings.UnidentifiedAddOrGet(key, added);
     if (added)
-        binding->Unidentified8418(key);
+        binding->OnBindingCreated(key);
     binding->OnSoundStarted(instance);
 
     AddInstanceBinding(script, instance, binding);

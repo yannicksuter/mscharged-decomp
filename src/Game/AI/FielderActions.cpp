@@ -3245,7 +3245,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
     {
         if (nParam != 0)
         {
-            NetworkMessageType35 message;
+            NetMessageMegaStrikeMeter message;
             if (g_pNetworkSession->IsLiveNetworkGame())
             {
                 g_pGame->SendMegaStrikeMeter(bButtonPressed);

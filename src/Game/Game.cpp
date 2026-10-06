@@ -526,7 +526,7 @@ void cGame::SendMegaStrikeMeter(bool value)
     }
 
     int count = mPendingMegaStrikeMeter.mCount;
-    NetworkMessageType35 message;
+    NetMessageMegaStrikeMeter message;
     message.mCount = count;
     for (int i = 0; i < count; i++)
     {
@@ -557,7 +557,7 @@ void cGame::SendRemainingMegaStrikeMeter()
             count = 8;
         }
 
-        NetworkMessageType35 message;
+        NetMessageMegaStrikeMeter message;
         message.mCount = count;
         for (int i = 0; i < count; i++)
         {
@@ -1327,7 +1327,7 @@ int cGame::ProcessMessage(NetworkMessage* message)
 
     case 35:
     {
-        NetworkMessageType35* pMessage = (NetworkMessageType35*)message;
+        NetMessageMegaStrikeMeter* pMessage = (NetMessageMegaStrikeMeter*)message;
         for (int i = 0; i < pMessage->mCount; i++)
         {
             mReceivedMegaStrikeMeter.Push(pMessage->mValues[i]);

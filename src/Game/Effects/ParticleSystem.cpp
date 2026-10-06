@@ -82,10 +82,10 @@ ParticleSystem::ParticleSystem(EffectsTemplate* pTemplate,
 
 ParticleSystem::~ParticleSystem()
 {
-    if (m_pTemplate->mUnidentified040 != 0)
+    if (m_pTemplate->m_uEmitterDeathCode != 0)
     {
         tDebugPrintManager::Print(DC_RENDER, "OnEmitterDeath: %d\n",
-            m_pTemplate->mUnidentified040);
+            m_pTemplate->m_uEmitterDeathCode);
     }
 
     --m_NumInstances;
@@ -412,10 +412,10 @@ void ParticleSystem::CreateNewParticles(int numParticles)
         if (pPart == 0)
             break;
 
-        if (m_pTemplate->mUnidentified044 != 0)
+        if (m_pTemplate->m_uParticleCreationCode != 0)
         {
             tDebugPrintManager::Print(DC_RENDER, "OnParticleCreation: %d\n",
-                m_pTemplate->mUnidentified044);
+                m_pTemplate->m_uParticleCreationCode);
         }
 
         m_Particles.AddStart(pPart);
@@ -440,7 +440,7 @@ void ParticleSystem::CreateNewParticles(int numParticles)
         pPart->sizeScale
             = m_pTemplate->mProperties[2]->Evaluate(0.0f);
         pPart->flipTexcoords
-            = nlRandomf(100.0f, &uSeed) < m_pTemplate->mUnidentified030;
+            = nlRandomf(100.0f, &gEffectsRandomSeed) < m_pTemplate->m_fTexcoordFlipPercentage;
 
         float inheritVelocity
             = RandomizedValue(m_pTemplate->m_rInheritVelocity);
@@ -479,10 +479,10 @@ void ParticleSystem::UpdateAllParticles(float dt,
         p->timeFraction = p->timeElapsed / p->lifeSpan;
         if (p->timeElapsed >= p->lifeSpan)
         {
-            if (m_pTemplate->mUnidentified048 != 0)
+            if (m_pTemplate->m_uParticleDeathCode != 0)
             {
                 tDebugPrintManager::Print(DC_RENDER, "OnParticleDeath: %d\n",
-                    m_pTemplate->mUnidentified048);
+                    m_pTemplate->m_uParticleDeathCode);
             }
             m_Particles.Remove(&iterator, 0);
             --m_NumParticles;
@@ -911,7 +911,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
             float meshRateScale = 1.0f;
             if (pAnim != 0)
             {
-                if ((m_pTemplate->mUnidentified037 & 8) != 0)
+                if ((m_pTemplate->m_uFlags & 8) != 0)
                 {
                     meshRateScale = ((float)(int)pAnim->m_nNumFrames
                         / pAnim->m_fFrameRate) / pPart->lifeSpan;
@@ -952,7 +952,7 @@ int ParticleSystem::RenderAllParticles(GLView* view)
                     blendType);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaTest, 1);
                 glSetRasterState(pPacket->rasterState, GLS_AlphaTestRef, 3);
-                if ((m_pTemplate->mUnidentified037 & 4) != 0)
+                if (m_pTemplate->DisablesDepthWrite())
                     glSetRasterState(
                         pPacket->rasterState, GLS_DepthWrite, 0);
                 pPacket->matrix = hMatrix;

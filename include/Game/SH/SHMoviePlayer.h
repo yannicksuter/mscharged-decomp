@@ -7,7 +7,10 @@
 #include "Game/FE/feButtonComponent.h"
 #include "Game/Render/RLViewLayers.h"
 
+class Config;
 class TLImageInstance;
+
+extern Config gMovieConfig;
 
 class MoviePlayerScene : public BaseSceneHandler
 {

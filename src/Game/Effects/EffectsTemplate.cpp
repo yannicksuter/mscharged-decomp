@@ -7,7 +7,7 @@
 #include "NL/gl/glState.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-unsigned int uSeed = 0x9184EB0C;
+unsigned int gEffectsRandomSeed = 0x9184EB0C;
 
 float fxAnimatedRange::Evaluate(float value) const
 {
@@ -117,21 +117,21 @@ void EffectsTemplate::Cleanup()
 
 float EffectsTemplate::GetBoundingRadius()
 {
-    float duration;
+    float maximumParticleLife;
     float result;
     switch (m_eEmitter)
     {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
+    case Emitter_Circle:
+    case Emitter_Sphere:
+    case Emitter_Spindle:
+    case Emitter_Hemisphere:
     {
-        float value4 = mProperties[4]->GetMaximum();
-        float value1 = mProperties[1]->GetMaximum();
-        float value2 = mProperties[2]->GetMaximum();
-        result = value4 + value2 * value1;
-        duration = 0.5f * m_rParticleLife.range + m_rParticleLife.base;
-        result += duration * mProperties[5]->GetMaximum();
+        float maximumRadius = mProperties[4]->GetMaximum();
+        float maximumSize = mProperties[1]->GetMaximum();
+        float maximumSizeScale = mProperties[2]->GetMaximum();
+        result = maximumRadius + maximumSizeScale * maximumSize;
+        maximumParticleLife = 0.5f * m_rParticleLife.range + m_rParticleLife.base;
+        result += maximumParticleLife * mProperties[5]->GetMaximum();
         break;
     }
     default:

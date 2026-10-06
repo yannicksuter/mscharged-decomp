@@ -373,10 +373,9 @@ static inline bool IsFloatValue(const char* string, float& value)
 }
 
 // Interns the name, allocates the value from the shared pool and registers it
-// under the entry. Retail evaluates the value argument before the interning
-// call in every branch, which only a call boundary reproduces.
+// under the entry.
 template <typename T, typename V>
-static T* UnidentifiedCreateValue(TweakEntry* entry, const char* name, V value)
+static T* CreateRegisteredTweakValue(TweakEntry* entry, const char* name, V value)
 {
     const char* interned = InternTweakString(name, kTweakStringCurrent);
     T* created = new (gTweakValueAllocator->Allocate(sizeof(T))) T(interned, value);
@@ -393,21 +392,21 @@ TweakValueBase* CreateTweakValueFromString(TweakEntry* entry, const char* name, 
 
     if (IsIntValue(valueStr, intValue))
     {
-        value = UnidentifiedCreateValue<TweakValueInt>(entry, name, intValue);
+        value = CreateRegisteredTweakValue<TweakValueInt>(entry, name, intValue);
     }
     else
     {
         if (IsFloatValue(valueStr, floatValue))
         {
-            value = UnidentifiedCreateValue<TweakValueFloat>(entry, name, floatValue);
+            value = CreateRegisteredTweakValue<TweakValueFloat>(entry, name, floatValue);
         }
         else if (ParseTweakBool(valueStr, &boolValue))
         {
-            value = UnidentifiedCreateValue<TweakValueBool>(entry, name, boolValue);
+            value = CreateRegisteredTweakValue<TweakValueBool>(entry, name, boolValue);
         }
         else
         {
-            value = UnidentifiedCreateValue<TweakValueString>(entry, name, "");
+            value = CreateRegisteredTweakValue<TweakValueString>(entry, name, "");
         }
     }
     value->ParseValue(valueStr);
@@ -692,12 +691,12 @@ void QueueTweakValue(TweakPendingValue* pending, TweakValueBase* value, const ch
     }
 }
 
-int TweakNode::UnidentifiedVirtual0C()
+int TweakNode::IsEntry()
 {
     return 0;
 }
 
-TweakEntry* TweakNode::UnidentifiedVirtual18()
+TweakEntry* TweakNode::AsEntry()
 {
     return 0;
 }

@@ -3,6 +3,8 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
+WarbleOwner gWarble;
+
 static WarbleConfiguration sWarbleConfiguration;
 
 void InitializeWarble(WarbleOwner* owner)

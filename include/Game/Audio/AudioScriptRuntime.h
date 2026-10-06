@@ -66,7 +66,7 @@ public:
         return mEffects.Walk(callback);
     }
 
-    void Unidentified8418(u32 key);
+    void OnBindingCreated(u32 key);
     bool StartEffect(u32 definition, void* parameterData,
         bool invert, float blendTime);
     bool StartEffect(u32 definition, void* parameterData,

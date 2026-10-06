@@ -9,6 +9,7 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/Game.h"
+#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlMath.h"
 
 extern "C" float fn_800A0508(cFielder*, bool, bool);
@@ -33,6 +34,14 @@ static inline float DistanceToNet(const nlVector3& ballPosition, const nlVector3
     nlVector3 difference;
     nlVec3Sub(difference, ballPosition, netPosition);
     return nlVec3Length(difference);
+}
+
+void ShotMeter::ResetValues()
+{
+    m_fTime = 0.0f;
+    m_fScoreValue = 0.0f;
+    m_fSpeedValue = 0.0f;
+    m_fSTSValue = 0.0f;
 }
 
 void ShotMeter::Update(float fDeltaT)
@@ -109,10 +118,7 @@ void ShotMeter::Update(float fDeltaT)
 void ShotMeter::Abort()
 {
     m_eShotMeterState = SHOT_METER_INACTIVE;
-    m_fTime = 0.0f;
-    m_fScoreValue = 0.0f;
-    m_fSpeedValue = 0.0f;
-    m_fSTSValue = 0.0f;
+    ResetValues();
 }
 
 void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
@@ -166,6 +172,19 @@ void ShotMeter::CalcOneTimerValue(cFielder* pFielder, bool bWasPerfectPass)
         pFielder->bIsModified,
         bWasPerfectPass);
     CalcShotAim(pFielder);
+}
+
+void ShotMeter::CalcSpeedValue()
+{
+    if (mUnidentified008 < 0.01f)
+    {
+        mUnidentified008 = 0.01f;
+    }
+    m_fSpeedValue = InterpolateClamped(0.1f, 1.0f, m_fTime / mUnidentified008);
+    if (m_fSpeedValue > 1.0f)
+    {
+        m_fSpeedValue = 1.0f;
+    }
 }
 
 void ShotMeter::CalcShotAim(cFielder* pFielder)
@@ -278,10 +297,7 @@ extern "C" float fn_800A0508(cFielder* pFielder, bool bIsChipShot,
 void ShotMeter::Reset(cFielder* pFielder)
 {
     m_eShotMeterState = SHOT_METER_ACTIVE;
-    m_fTime = 0.0f;
-    m_fScoreValue = 0.0f;
-    m_fSpeedValue = 0.0f;
-    m_fSTSValue = 0.0f;
+    ResetValues();
     mUnidentified008 = GetShootingWindupTime(pFielder->GetTweaks());
     mUnidentified00C = GetShootingWindupTotalTime(pFielder->GetTweaks());
 }
@@ -302,15 +318,8 @@ void ShotMeter::ShotReleased(cFielder* pFielder)
         }
     }
 
-    if (mUnidentified008 < 0.01f)
-    {
-        mUnidentified008 = 0.01f;
-    }
-    m_fSpeedValue = InterpolateClamped(0.1f, 1.0f, m_fTime / mUnidentified008);
-    if (m_fSpeedValue > 1.0f)
-    {
-        m_fSpeedValue = 1.0f;
-    }
+    CalcSpeedValue();
+
     if (pFielder->CanDoSidekickShootToScore())
     {
         m_fSTSValue = fn_800156A8(g_pBall);

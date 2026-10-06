@@ -2,6 +2,7 @@
 #define GAME_TWEAK_VALUE_H
 
 #include "Game/TweakValueBase.h"
+#include "Game/TweakRegistration.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"
 #include "NL/nlSmallBlockAllocator.h"
@@ -12,16 +13,6 @@
 
 class InterpreterCore;
 class TweakIntBinding;
-class TweakEntry;
-class TweakNode;
-struct TweakPendingValue;
-
-int IsTweakRegistryInitialized(void);
-TweakEntry* GetTweakRoot(void);
-void QueueTweakValue(TweakPendingValue*, TweakValueBase*, const char*);
-TweakEntry* FindOrCreateTweakPath(TweakEntry*, const char*, int);
-void AddTweakValue(TweakEntry*, TweakValueBase*);
-TweakNode* FindTweakChild(TweakEntry*, const char*);
 
 extern const char* gLastTweakCategory;
 

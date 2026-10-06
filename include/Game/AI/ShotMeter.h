@@ -80,6 +80,10 @@ public:
     /* 0x14 */ float m_fSpeedValue;
     /* 0x18 */ float m_fSTSValue;
     /* 0x1C */ float mfSShotAimValue;
+
+private:
+    void ResetValues();
+    void CalcSpeedValue();
 }; // total size: 0x20
 
 #endif // GAME_AI_SHOT_METER_H

@@ -21,13 +21,13 @@ float g_BallBounceGround = 0.35f;
 float g_BallBounceWall = 0.35f;
 float g_BallRollingResistance = 5.0f;
 float g_BallAirResistance = 0.1f;
-float lbl_806DCA7C = 0.01f;
-float lbl_806DCA80 = 0.01f;
-float lbl_806DCA84 = 0.07f;
+float g_BallMagnusAngularDampingScale = 0.01f;
+float g_BallMagnusForceMinScale = 0.01f;
+float g_BallMagnusForceMaxScale = 0.07f;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
-float lbl_806E11E8;
+float g_BallMagnusChargeWeight;
 
 PhysicsBall::PhysicsBall(
     CollisionSpace* space, PhysicsWorld* world, float radius)
@@ -71,7 +71,7 @@ void PhysicsBall::fn_8013FE00()
     m_gravity = 0.0f;
 }
 
-void PhysicsBall::fn_8013FE14()
+void PhysicsBall::RestoreBallForces()
 {
     mbIgnoreForces = false;
     m_gravity = -22.5f;
@@ -106,14 +106,14 @@ void PhysicsBall::Unknown0()
 }
 
 bool PhysicsBall::SetContactInfo(
-    dContact* contact, PhysicsObject* other, bool param)
+    dContact* contact, PhysicsObject* other, bool first)
 {
     if (m_parentObject != 0)
     {
-        return m_parentObject->SetContactInfo(contact, other, param);
+        return m_parentObject->SetContactInfo(contact, other, first);
     }
 
-    if (param)
+    if (first)
     {
         SetDefaultContactInfo(contact);
     }
@@ -437,7 +437,7 @@ void PhysicsBall::AddResistanceForces()
         {
             GetAngularVelocity(&v3CurAngVel);
             float airResistance = mfBallAirResistance;
-            float angularScale = 1.0f - lbl_806DCA7C * airResistance;
+            float angularScale = 1.0f - g_BallMagnusAngularDampingScale * airResistance;
             if (angularScale > 0.0001f)
             {
                 nlVec3Scale(v3CurAngVel, angularScale);
@@ -453,12 +453,12 @@ void PhysicsBall::AddResistanceForces()
             if (v3CurAngVel.GetLengthSq3D() > 1.0f)
             {
                 float speed = nlVec3Length(v3CurLinVel);
-                float chargeValue = mfChargeBonus * lbl_806E11E8;
+                float chargeValue = mfChargeBonus * g_BallMagnusChargeWeight;
                 float speedScale = InterpolateRangeClamped(
                     0.0f, 1.0f, 30.0f, 55.0f, speed);
-                float speedValue = speedScale * (1.0f - lbl_806E11E8);
+                float speedValue = speedScale * (1.0f - g_BallMagnusChargeWeight);
                 float magnusScale = InterpolateClamped(
-                    lbl_806DCA80, lbl_806DCA84, chargeValue + speedValue);
+                    g_BallMagnusForceMinScale, g_BallMagnusForceMaxScale, chargeValue + speedValue);
 
                 nlVec3CrossProduct(v3MagnusForce, v3CurAngVel, v3CurLinVel);
                 v3MagnusForce.x *= magnusScale;
@@ -470,12 +470,12 @@ void PhysicsBall::AddResistanceForces()
     }
 }
 
-void PhysicsBall::fn_80140C30()
+void PhysicsBall::ResetBallAirResistance()
 {
     mfBallAirResistance = g_BallAirResistance;
 }
 
-float PhysicsBall::fn_80140C3C()
+float PhysicsBall::GetDefaultBallAirResistance()
 {
     return g_BallAirResistance;
 }
@@ -503,10 +503,10 @@ void PhysicsBall::ScaleAngularVelocity(float scale)
     }
 }
 
-void PhysicsBall::SetUseAngularVelocity(bool param_1)
+void PhysicsBall::SetUseAngularVelocity(bool enableAfterDelay)
 {
     mbUseAngularVel = false;
-    if (param_1)
+    if (enableAfterDelay)
     {
         mfSpinTimer = 0.08f;
         return;

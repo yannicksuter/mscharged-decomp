@@ -2176,7 +2176,7 @@ void PowerupBase::fn_8009D500()
     }
     else if (m_pPhysicsObject->GetObjectType() == 0x14)
     {
-        bUnidentified = ((PhysicsShell*)m_pPhysicsObject)->mUnidentified046;
+        bUnidentified = ((PhysicsShell*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }
 
     float radius = ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();

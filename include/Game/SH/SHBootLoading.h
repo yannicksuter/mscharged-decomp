@@ -9,6 +9,15 @@ class TLImageInstance;
 class BootLoadingScene : public BaseSceneHandler
 {
 public:
+    enum BootPhase
+    {
+        PhaseRatings = 0,
+        PhaseStrap = 1,
+        PhaseNunchuk = 2,
+        PhaseDeveloperLogo = 3,
+        PhaseFinished = 4,
+    };
+
     BootLoadingScene();
     virtual ~BootLoadingScene();
     virtual void Update(float fDeltaT);

@@ -50,7 +50,7 @@ static cAnimCamera sNisCam;
 float gfChainChompWindupSpeedScale;
 static unsigned char gbChainChompProjectedShadow;
 RLView* gpChainChompShadowView;
-const nlVector3 gv3HomePosition = { 0.0f, 0.0f, -10.0f };
+const nlVector3 gv3ChainChompHiddenPosition = { 0.0f, 0.0f, -10.0f };
 
 float gfChainChompGroundHeight = -0.45f;
 float gfChainChompAttackSpeedScale = 1.75f;
@@ -77,7 +77,7 @@ ChainChomp::ChainChomp(cSHierarchy& pHierarchy, int nModelID,
     mtStateTimer.SetSeconds(0.0f);
     mpIdleAnim = pInventorySAnim->Find((unsigned int)nlStringHash("chain_idle"));
     mpRecoverAnim = pInventorySAnim->Find((unsigned int)nlStringHash("landing"));
-    mpDropAnim = pInventorySAnim->Find((unsigned int)nlStringHash("chomp"));
+    mpChompAnim = pInventorySAnim->Find((unsigned int)nlStringHash("chomp"));
     mpPhysObj->mpAINPC = this;
 
     if (mpInEffectSFX != 0)
@@ -91,7 +91,7 @@ ChainChomp::ChainChomp(cSHierarchy& pHierarchy, int nModelID,
     meChainChompState = CHAIN_STATE_HIDDEN;
     mfDesiredSpeed = 0.0f;
     SetAnimState(*mpIdleAnim, 0.0f, PM_CYCLIC);
-    SetPosition(gv3HomePosition);
+    SetPosition(gv3ChainChompHiddenPosition);
     maFacingDirection = 0;
     mv3Velocity = v3Zero;
     mpPhysObj->DisableCollisions();
@@ -114,7 +114,7 @@ ChainChomp::~ChainChomp()
     }
 }
 
-static inline u16 UnidentifiedDeltaToAngle(float y, float x)
+static inline u16 ChainChompDeltaToAngle(float y, float x)
 {
     return (u16)(s32)(10430.378f * nlATan2f(y, x));
 }
@@ -185,7 +185,7 @@ void ChainChomp::Update(float fDeltaT)
             meChainChompState = CHAIN_STATE_HIDDEN;
             mfDesiredSpeed = 0.0f;
             SetAnimState(*mpIdleAnim, 0.0f, PM_CYCLIC);
-            SetPosition(gv3HomePosition);
+            SetPosition(gv3ChainChompHiddenPosition);
             maFacingDirection = 0;
             mv3Velocity = v3Zero;
             mpPhysObj->DisableCollisions();
@@ -301,7 +301,7 @@ void ChainChomp::Update(float fDeltaT)
                             0.0f,
                             0);
                         meChainChompState = CHAIN_STATE_CHOMP;
-                        SetAnimState(*mpDropAnim, 0.0f, PM_HOLD);
+                        SetAnimState(*mpChompAnim, 0.0f, PM_HOLD);
                     }
                 }
             }
@@ -367,7 +367,7 @@ void ChainChomp::Update(float fDeltaT)
             meChainChompState = CHAIN_STATE_HIDDEN;
             mfDesiredSpeed = 0.0f;
             SetAnimState(*mpIdleAnim, 0.0f, PM_CYCLIC);
-            SetPosition(gv3HomePosition);
+            SetPosition(gv3ChainChompHiddenPosition);
             maFacingDirection = 0;
             mv3Velocity = v3Zero;
             mpPhysObj->DisableCollisions();
@@ -545,7 +545,7 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
                 nlVec2Sub(v2Delta, *(nlVector2*)&pCandidate->mUnidentified024.m_v3Position, v2Delta);
                 float fDist = nlSqrt(nlGetLengthSquared2D(v2Delta.x, v2Delta.y), true);
                 s16 angleDiff = (s16)(maFacingDirection
-                                      - UnidentifiedDeltaToAngle(v2Delta.y, v2Delta.x));
+                                      - ChainChompDeltaToAngle(v2Delta.y, v2Delta.x));
                 u16 absDelta = (u16)(angleDiff < 0 ? -angleDiff : angleDiff);
                 float fAngleScore = InterpolateRangeClamped(0.0f, 1.0f, 8192.0f, 32768.0f, (float)absDelta);
                 float fDistScore = InterpolateRangeClamped(0.0f, 1.0f, 0.0f, 20.0f, fDist);
@@ -888,7 +888,7 @@ void ChainChomp::Hide()
     meChainChompState = CHAIN_STATE_HIDDEN;
     mfDesiredSpeed = 0.0f;
     SetAnimState(*mpIdleAnim, 0.0f, PM_CYCLIC);
-    SetPosition(gv3HomePosition);
+    SetPosition(gv3ChainChompHiddenPosition);
     maFacingDirection = 0;
     mv3Velocity = v3Zero;
     mpPhysObj->DisableCollisions();
