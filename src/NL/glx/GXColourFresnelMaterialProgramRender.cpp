@@ -234,7 +234,7 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Draw(
     {
         glx_LoadSkinMatrices(
             static_cast<const GXColourFresnelParameters*>(packet->materialParameters)->skinMatrices,
-            static_cast<const GXColourFresnelParameters*>(packet->materialParameters)->skinMatricesSize / 48,
+            static_cast<const GXColourFresnelParameters*>(packet->materialParameters)->skinMatrixBytes / 48,
             &modelview, 0);
     }
     else

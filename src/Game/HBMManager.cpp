@@ -256,7 +256,7 @@ void HBMManager::Show()
         return;
     }
 
-    if (!HomeButtonFade::Instance()->mEnabled)
+    if (!HomeButtonFade::Instance()->mFading)
     {
         HomeButtonFade::Instance()->FadeOut();
     }

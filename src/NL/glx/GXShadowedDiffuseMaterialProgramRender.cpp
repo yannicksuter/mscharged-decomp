@@ -18,11 +18,11 @@ void GXMaterialProgramImpl<GXShadowedDiffuseMaterialProgram>::Activate(GLView*)
     gxSetNumTevStages(1);
     gxSetNumTexGens(1);
     gxSetNumChans(1);
-    gxSetTevOrder(0, 0, 0, 4);
-    gxSetTevColourOp(0, 0, 0, 0, true, 0);
-    gxSetTevAlphaOp(0, 0, 0, 0, true, 0);
-    gxSetTevColourIn(0, 15, 10, 8, 15);
-    gxSetTevAlphaIn(0, 7, 5, 4, 7);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    gxSetTevColourOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+    gxSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
 }
 
 template <>

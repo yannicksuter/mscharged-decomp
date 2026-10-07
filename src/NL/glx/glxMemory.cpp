@@ -15,15 +15,6 @@
 #include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-class GLXResourcePool;
-
-struct GLXResourceMarker
-{
-    unsigned long mUsedMemory[2];
-    int mLevel;
-    GLXResourcePool* mResource;
-};
-
 class GLXResourcePool
     : public GLResourcePool
 {
@@ -202,13 +193,13 @@ unsigned long GLXResourcePool::MarkResource()
 {
     unsigned long value0 = mUsedMemory[0];
     unsigned long value1 = mUsedMemory[1];
-    GLXResourceMarker* marker
-        = (GLXResourceMarker*)glResourceAlloc(
-            sizeof(GLXResourceMarker), GLM_Header, this);
+    GLResourceMarker* marker
+        = (GLResourceMarker*)glResourceAlloc(
+            sizeof(GLResourceMarker), GLM_Header, this);
     marker->mUsedMemory[0] = value0;
     marker->mUsedMemory[1] = value1;
     marker->mLevel = m_level;
-    marker->mResource = this;
+    marker->mPool = this;
     m_inventory->ResourceMark();
     m_level++;
     return (unsigned long)marker;
@@ -217,8 +208,8 @@ unsigned long GLXResourcePool::MarkResource()
 void GLXResourcePool::ReleaseResource(
     unsigned long value)
 {
-    GLXResourceMarker* marker
-        = (GLXResourceMarker*)value;
+    GLResourceMarker* marker
+        = (GLResourceMarker*)value;
     int level = marker->mLevel;
     m_inventory->ResourceRelease(level);
     mUsedMemory[0] = marker->mUsedMemory[0];

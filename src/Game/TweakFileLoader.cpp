@@ -6,8 +6,6 @@
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"
 
-#include "NL/nlstring_tmpl.h"
-
 void OnTweakFileLoaded(
     void* fileData, unsigned long fileSize, void* userData)
 {
@@ -20,7 +18,7 @@ void OnTweakFileLoaded(
     entry->mLoadEnd = nlGetTicker();
     entry->mLoadTime =
         nlGetTickerDifference(entry->mLoadStart, entry->mLoadEnd);
-    entry->mState = 1;
+    entry->mState = TweakLoadEntry::Loaded;
 }
 
 void TweakFileLoader::LoadFileAsync(const char* fileName, const char* category)
@@ -40,7 +38,7 @@ void TweakFileLoader::LoadFileAsync(const char* fileName, const char* category)
     entry->mLoadTime = 0.0f;
     entry->mWaitTime = 0.0f;
     entry->mParseTime = 0.0f;
-    entry->mState = 0;
+    entry->mState = TweakLoadEntry::Loading;
 
     nlFile* file = nlOpen(fileName);
     unsigned int bufferSize = 0;
@@ -64,7 +62,7 @@ bool TweakFileLoader::ProcessLoadedFiles()
     {
         switch (entry->mState)
         {
-        case 1:
+        case TweakLoadEntry::Loaded:
             entry->mParseStart = nlGetTicker();
             entry->mWaitTime = nlGetTickerDifference(
                 entry->mLoadEnd, entry->mParseStart);
@@ -75,11 +73,11 @@ bool TweakFileLoader::ProcessLoadedFiles()
             entry->mParseEnd = nlGetTicker();
             entry->mParseTime = nlGetTickerDifference(
                 entry->mParseStart, entry->mParseEnd);
-            entry->mState = 2;
-        case 2:
+            entry->mState = TweakLoadEntry::Processed;
+        case TweakLoadEntry::Processed:
             ++completed;
             break;
-        case 0:
+        case TweakLoadEntry::Loading:
         default:
             break;
         }

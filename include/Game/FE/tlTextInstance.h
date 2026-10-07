@@ -6,11 +6,7 @@
 #include "NL/nlFont.h"
 #include "NL/nlTextBox.h"
 
-struct FETextLibObjectAttributes
-{
-    /* 0x0 */ nlColour EffectColour;
-    /* 0x4 */ nlVector2 BoxSize;
-};
+#include "Game/FE/feTextAttributes.h"
 
 class TLTextInstance : public TLInstance
 {

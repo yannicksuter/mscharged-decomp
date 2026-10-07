@@ -6,6 +6,7 @@
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
+#include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxSend.h"
 #include "NL/nlMemory.h"
@@ -15,7 +16,6 @@
 
 #include "Game/Render/ShadowVolume.h"
 #include "Game/UnidentifiedStaticStorage.h"
-void CopyShadowVolumeColour(const GXColor* colour);
 
 struct RLViewLayerDesc
 {

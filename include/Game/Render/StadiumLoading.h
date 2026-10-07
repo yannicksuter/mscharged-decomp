@@ -81,4 +81,6 @@ extern StadiumLoadResult gStadiumModelLoadResults[2][22];
 
 extern "C" bool gDisableHighRange;
 
+extern "C" bool lbl_806E1960;
+
 #endif // GAME_RENDER_STADIUM_LOADING_H

@@ -9,7 +9,7 @@ struct GXCharacterSkinCustomParameters
     /* 0x00 */ glTextureBinding diffuseTexture;
     /* 0x08 */ glTextureBinding detailTexture;
     /* 0x10 */ const float (*skinMatrices)[3][4];
-    /* 0x14 */ unsigned long skinMatricesSize;
+    /* 0x14 */ unsigned long skinMatrixBytes;
     /* 0x18 */ float blendAmount;
     /* 0x1C */ float alphaValue;
     /* 0x20 */ unsigned long shadowLevel;

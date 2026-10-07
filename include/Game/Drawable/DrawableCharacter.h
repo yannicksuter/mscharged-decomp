@@ -11,7 +11,7 @@ class cPoseNode;
 class cCharacter;
 class cPoseAccumulator;
 class cPN_SAnimController;
-class SkinAnimatedMovableNPC;
+class SkinAnimatedNPC;
 
 enum eCharacterRenderPass
 {
@@ -35,9 +35,9 @@ public:
     void BuildNpcMatrix();
     void Render(cCharacter& source);
     void SendToGl(cCharacter& source, int renderPass);
-    void Grab(SkinAnimatedMovableNPC& npc);
-    void Render(SkinAnimatedMovableNPC& npc);
-    void Blend(float* blendFactors, DrawableCharacter& lhs, DrawableCharacter& rhs);
+    void Grab(SkinAnimatedNPC& npc);
+    void Render(SkinAnimatedNPC& npc);
+    void Blend(const float* blendFactors, DrawableCharacter& lhs, DrawableCharacter& rhs);
     void EvaluateFrom(const cPoseNode& poseNode, const nlVector3& offset,
         unsigned short facingAngle, float poseScale);
     nlVector3 GetBallPosition();

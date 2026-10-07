@@ -44,7 +44,6 @@ void glplatFinalizePacket(glModelPacket* packet, bool permanent, void* allocator
 void glplatInitializeMaterialPrograms();
 
 bool glplatPreStartup();
-void glplatInitializeMaterialPrograms();
 bool glplatStartup(gl_ScreenInfo* screenInfo);
 bool glplatPostStartup();
 void glplatBeginFrame();

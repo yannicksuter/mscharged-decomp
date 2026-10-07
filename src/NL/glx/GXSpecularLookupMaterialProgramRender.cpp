@@ -25,29 +25,29 @@ void GXMaterialProgramImpl<GXSpecularLookupMaterialProgram>::Activate(GLView* vi
 {
     static_cast<GXSpecularLookupMaterialProgram*>(this)->ConfigureVertexFormat(true);
     view->m_Interface->GetViewMatrix(sSpecularLookupViewMatrix);
-    GXLoadTexMtxImm(glx_SpecularLookupTextureMatrix, 64, GX_MTX3x4);
+    GXLoadTexMtxImm(glx_SpecularLookupTextureMatrix, GX_PTTEXMTX0, GX_MTX3x4);
     GXSetTexCoordGen2(
-        GX_TEXCOORD1, GX_TG_MTX3x4, GX_TG_NRM, 30, true, 64);
+        GX_TEXCOORD1, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, true, GX_PTTEXMTX0);
     sSpecularLookupModelMatrix = -1;
 
     gxSetNumChans(0);
     gxSetNumTexGens(2);
     gxSetNumTevStages(3);
-    gxSetTevOrder(0, 1, 1, 255);
-    gxSetTevOrder(1, 0, 2, 255);
-    gxSetTevOrder(2, 0, 0, 255);
-    gxSetTevColourIn(0, 15, 12, 8, 15);
-    gxSetTevColourIn(1, 15, 0, 8, 15);
-    gxSetTevColourIn(2, 15, 12, 8, 0);
-    gxSetTevAlphaIn(0, 7, 7, 7, 7);
-    gxSetTevAlphaIn(1, 7, 7, 7, 7);
-    gxSetTevAlphaIn(2, 7, 7, 7, 4);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP2, GX_COLOR_NULL);
+    gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_CPREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
 }
 
 template <>
 void GXMaterialProgramImpl<GXSpecularLookupMaterialProgram>::Deactivate()
 {
-    gxSetTexCoordGen(1, 1, 5, 60);
+    gxSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY);
 }
 
 template <>
@@ -75,7 +75,7 @@ void GXMaterialProgramImpl<GXSpecularLookupMaterialProgram>::Draw(
         nlMultMatrices(modelview, model, sSpecularLookupViewMatrix);
         glxCopyMatrix(modelViewTransform, modelview);
         PSMTXInvXpose(modelViewTransform, normalMatrix);
-        GXLoadTexMtxImm(normalMatrix, 30, GX_MTX3x4);
+        GXLoadTexMtxImm(normalMatrix, GX_TEXMTX0, GX_MTX3x4);
     }
 
     if (packet->displayList != 0)

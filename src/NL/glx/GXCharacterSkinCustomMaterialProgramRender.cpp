@@ -188,7 +188,7 @@ void GXMaterialProgramImpl<GXCharacterSkinCustomMaterialProgram>::Draw(
     {
         unsigned int numSkinMatrices;
         const GXCharacterSkinCustomParameters* parameters = static_cast<const GXCharacterSkinCustomParameters*>(packet->materialParameters);
-        numSkinMatrices = parameters->skinMatricesSize / sizeof(*parameters->skinMatrices);
+        numSkinMatrices = parameters->skinMatrixBytes / sizeof(*parameters->skinMatrices);
         glGetDrawSyncLog()->AddMarker("CharacterSkinCustom - RLXLoadSkinMatrices");
         glx_LoadSkinMatrices(parameters->skinMatrices, numSkinMatrices, &modelview, 1);
         glGetDrawSyncLog()->AddMarker("CharacterSkinCustom - After RLXLoadSkinMatrices");

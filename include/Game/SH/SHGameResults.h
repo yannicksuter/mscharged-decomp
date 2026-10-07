@@ -21,7 +21,7 @@ public:
     void SetResultsData(BasicGameInfo* data, BaseSceneHandler* listener, NetworkTournamentGame* game);
 
     /* 0x5D4 */ TLTextInstance* mTitleText;
-    /* 0x5D8 */ bool mUnidentified5D8;
+    /* 0x5D8 */ bool mSuppressMatchSummary;
     /* 0x5DC */ MatchSummary mSummary;
     /* 0xA10 */ BasicGameInfo* mGameData;
     /* 0xA14 */ BaseSceneHandler* mListener;

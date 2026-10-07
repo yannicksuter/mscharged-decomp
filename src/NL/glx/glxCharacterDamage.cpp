@@ -34,9 +34,9 @@ extern "C" void glxConfigureCharacterDamage(float megaBlend, const bool* damageE
     gxSetNumTexGens(texGenCount + extraTexGens);
     if (useMegaTexture)
     {
-        gxSetTevOrder(4, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
-        gxSetTevColourIn(4, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_C0);
-        gxSetTevAlphaIn(4, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevOrder(GX_TEVSTAGE4, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+        gxSetTevColourIn(GX_TEVSTAGE4, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_C0);
+        gxSetTevAlphaIn(GX_TEVSTAGE4, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     }
 
     int damageTexCoords[2] = { damageTexCoord1, damageTexCoord2 };

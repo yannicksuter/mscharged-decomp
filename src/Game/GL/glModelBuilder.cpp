@@ -6,12 +6,6 @@
 #include "NL/glx/glxLoadModel.h"
 #include "NL/gl/glLoadModel.h"
 
-struct UnidentifiedMaterialProgram_802D38A4
-{
-    unsigned char unknown00[8];
-    unsigned long dataSize;
-};
-
 void glCreateModel(glModel* pModel, int numVerts, int prim,
     void* pResource, int numStreams, unsigned long programHash)
 {
@@ -59,7 +53,7 @@ void glCreateModel(glModel* pModel, int numVerts, int prim,
     pPacket->rasterState = glGetCurrentRasterState();
 
     unsigned long dataSize =
-        ((UnidentifiedMaterialProgram_802D38A4*)pPacket->materialProgram)->dataSize;
+        static_cast<GLMaterialProgram*>(pPacket->materialProgram)->parameterDataSize;
     void* data;
     if (dataSize == 0)
     {

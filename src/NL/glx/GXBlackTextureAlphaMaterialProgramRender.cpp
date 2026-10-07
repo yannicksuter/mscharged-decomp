@@ -28,16 +28,16 @@ void GXMaterialProgramImpl<GXBlackTextureAlphaMaterialProgram>::Activate(GLView*
     gxSetNumChans(1);
     gxSetNumTexGens(1);
     gxSetNumTevStages(1);
-    gxSetTevOrder(0, 0, 0, 255);
-    gxSetTevColourIn(0, 15, 10, 8, 15);
-    gxSetTevAlphaIn(0, 7, 7, 7, 4);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
 }
 
 template <>
 void GXMaterialProgramImpl<GXBlackTextureAlphaMaterialProgram>::Deactivate()
 {
     SetGameObjectLightingEnabled(0, sBlackTextureAlphaLightCount, 1);
-    gxSetCurrentMtx(0, true);
+    gxSetCurrentMtx(GX_PNMTX0, true);
 }
 
 template <>
@@ -67,7 +67,7 @@ void GXMaterialProgramImpl<GXBlackTextureAlphaMaterialProgram>::Draw(
     {
         const GXBlackTextureAlphaParameters* parameters = static_cast<const GXBlackTextureAlphaParameters*>(packet->materialParameters);
         glx_LoadSkinMatrices(parameters->skinMatrices,
-            parameters->skinMatricesSize / 48,
+            parameters->skinMatrixBytes / 48,
             &modelview,
             0);
     }

@@ -11,7 +11,7 @@ struct GXSpecularParameters
     /* 0x08 */ glTextureBinding detailTexture;
     /* 0x10 */ glTextureBinding glossTexture;
     /* 0x18 */ const float (*skinMatrices)[3][4];
-    /* 0x1C */ unsigned long skinMatricesSize;
+    /* 0x1C */ unsigned long skinMatrixBytes;
     /* 0x20 */ float blendAmount;
     /* 0x24 */ float alphaValue;
     /* 0x28 */ float specularLevel;

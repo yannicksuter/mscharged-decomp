@@ -76,22 +76,22 @@ public:
 
 // Message IDs 16 and 17 are registered by this translation unit, but no
 // surviving behavior-level name has yet been established for either payload.
-class NetworkMessageType16 : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetworkMessageType16() { }
-    virtual int GetType();
-};
-
 class NetworkMessageType17 : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetworkMessageType17() { }
+    virtual ~NetworkMessageType17();
     virtual int GetType();
 
     /* 0x08 */ u32 mUnidentified08;
+};
+
+class NetworkMessageType16 : public NetworkMessage
+{
+public:
+    virtual void Serialize(NetworkMessageSerializer* serializer);
+    virtual ~NetworkMessageType16();
+    virtual int GetType();
 };
 
 #include "Game/NetworkLoadedGameMessages.h"

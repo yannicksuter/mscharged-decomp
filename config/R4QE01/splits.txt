@@ -845,10 +845,14 @@ Game/NetworkSocket.cpp:
 	.sdata      start:0x806DC8C0 end:0x806DC8D8
 	.sbss       start:0x806E1100 end:0x806E1108
 
+Game/NetworkGameStartMessage.cpp:
+	.text       start:0x80125254 end:0x801257A0
+	.data       start:0x8050AC20 end:0x8050AC38
+
 Game/NetworkMessages.cpp:
-	.text       start:0x80125254 end:0x801268E8
+	.text       start:0x801257A0 end:0x801268E8
 	.ctors      start:0x804DB610 end:0x804DB614
-	.data       start:0x8050AC20 end:0x8050AD68
+	.data       start:0x8050AC38 end:0x8050AD68
 	.sbss       start:0x806E1108 end:0x806E1160
 
 Game/NetworkPauseMessages.cpp:

@@ -12,7 +12,7 @@ struct GXMegaSpecularFresnelParameters
     /* 0x18 */ glTextureBinding specularMaskTexture;
     /* 0x20 */ glTextureBinding megaTexture;
     /* 0x28 */ const float (*skinMatrices)[3][4];
-    /* 0x2C */ unsigned long skinMatricesSize;
+    /* 0x2C */ unsigned long skinMatrixBytes;
     /* 0x30 */ float blendAmount;
     /* 0x34 */ float alphaValue;
     /* 0x38 */ float specularAmount;

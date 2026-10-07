@@ -30,4 +30,6 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius);
 FlyingCamera* GetFlyingCamera(int index);
 void SetFlyingCameraTarget(cFielder* fielder);
 
+extern unsigned int gFlyingCameraCount;
+
 #endif // GAME_RENDER_FLYING_CAMERA_H

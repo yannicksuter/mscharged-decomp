@@ -16,7 +16,7 @@
 #include "Game/PoseNode.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/RenderShadow.h"
-#include "Game/Render/SkinAnimatedMovableNPC.h"
+#include "Game/Render/SkinAnimatedNPC.h"
 #include "Game/Render/WorldNPC.h"
 #include "Game/SHierarchy.h"
 #include "Game/Team.h"
@@ -474,7 +474,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     RenderCharacterShadow(source, pModel, view);
 }
 
-void DrawableCharacter::Grab(SkinAnimatedMovableNPC& npc)
+void DrawableCharacter::Grab(SkinAnimatedNPC& npc)
 {
     position = npc.mv3Position;
     nlMatrix4& nodeMatrix = npc.mpPoseAccumulator->GetNodeMatrix(0);
@@ -495,7 +495,7 @@ void DrawableCharacter::Grab(SkinAnimatedMovableNPC& npc)
     }
 }
 
-void DrawableCharacter::Render(SkinAnimatedMovableNPC& npc)
+void DrawableCharacter::Render(SkinAnimatedNPC& npc)
 {
     if (!visible)
     {
@@ -512,7 +512,7 @@ void DrawableCharacter::Render(SkinAnimatedMovableNPC& npc)
     npc.RenderFromReplay(*poseAccumulator, &worldMatrix);
 }
 
-void DrawableCharacter::Blend(float* blendFactors, DrawableCharacter& lhs, DrawableCharacter& rhs)
+void DrawableCharacter::Blend(const float* blendFactors, DrawableCharacter& lhs, DrawableCharacter& rhs)
 {
     const float rhsWeight = *blendFactors;
     const float lhsWeight = 1.0f - rhsWeight;

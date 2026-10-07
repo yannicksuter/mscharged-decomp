@@ -68,7 +68,7 @@ public:
     void UpdatePeerConnectionState(int aid);
     inline void UpdatePeerConnectionStates();
     void BuildLocalMachineInfo(NetworkDraftMachineInfo* info);
-    inline void SendLocalMachineInfo(int aid);
+    void SendLocalMachineInfo(int aid);
     void MarkGameStarted();
     bool AllMachineInfoReceived();
     NetworkDraftMachineInfo* GetLocalMachineInfo();

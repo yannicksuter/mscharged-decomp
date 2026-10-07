@@ -3,6 +3,7 @@
 
 #include "Game/FE/feFontResource.h"
 #include "Game/FE/feLibObject.h"
+#include "Game/FE/feTextAttributes.h"
 #include "Game/FE/tlTextInstance.h"
 
 class FEText : public FELibObject

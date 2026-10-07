@@ -5,6 +5,13 @@
 
 struct TweakLoadEntry
 {
+    enum LoadState
+    {
+        Loading = 0,
+        Loaded = 1,
+        Processed = 2,
+    };
+
     char mFileName[0x40];
     char mCategory[0x40];
     void* mFileData;

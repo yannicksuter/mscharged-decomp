@@ -262,7 +262,7 @@ void GXMaterialProgramImpl<GXSkinnedMultiLightMaterialProgram>::Draw(
 
     if (packet->skinnedVertices == 0)
     {
-        glx_LoadSkinMatrices(static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->skinMatrices, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->skinMatricesSize / 48, &modelview, 0);
+        glx_LoadSkinMatrices(static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->skinMatrices, static_cast<const GXSkinnedMultiLightParameters*>(packet->materialParameters)->skinMatrixBytes / 48, &modelview, 0);
     }
     else
     {

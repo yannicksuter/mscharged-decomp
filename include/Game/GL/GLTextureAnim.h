@@ -37,7 +37,7 @@ public:
     /* 0x08 */ s32 m_nNumTextures;
     /* 0x0C */ eGLTexAnimMode m_ePlayMode;
     /* 0x10 */ s32 m_nPlayDir;
-    /* 0x14 */ unsigned char m_bPaused;
+    /* 0x14 */ bool m_bPaused;
     /* 0x15 */ u8 m_pad15[3];
     /* 0x18 */ u32 m_textureIndex;
     /* 0x1C */ f32 m_fTime;

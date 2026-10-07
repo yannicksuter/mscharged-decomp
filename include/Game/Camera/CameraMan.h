@@ -101,4 +101,6 @@ cBaseCamera* GetNextCamera();
 
 void FireCameraNoiseFilter(nlVector3& amplitude, float frequency, float duration);
 
+extern nlVector3 g_CameraWorldUpVector;
+
 #endif // _CAMERAMAN_H_

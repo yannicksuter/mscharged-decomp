@@ -6,10 +6,10 @@
 struct HomeButtonFade
 {
     HomeButtonFade()
-        : mRate(0.0f)
-        , mPos(0.0f)
-        , mTo(0.0f)
-        , mEnabled(false)
+        : mFadeRate(0.0f)
+        , mOpacity(0.0f)
+        , mTargetOpacity(0.0f)
+        , mFading(false)
     {
     }
 
@@ -19,18 +19,18 @@ struct HomeButtonFade
     void Update(float deltaTime);
     void Render();
 
-    /* 0x00 */ float mRate;
-    /* 0x04 */ float mPos;
-    /* 0x08 */ float mTo;
-    /* 0x0C */ bool mEnabled;
+    /* 0x00 */ float mFadeRate;
+    /* 0x04 */ float mOpacity;
+    /* 0x08 */ float mTargetOpacity;
+    /* 0x0C */ bool mFading;
 
 private:
     void Fade(float rate, float to)
     {
-        mRate = rate;
-        mTo = to;
-        mPos = 1.0f - mTo;
-        mEnabled = true;
+        mFadeRate = rate;
+        mTargetOpacity = to;
+        mOpacity = 1.0f - mTargetOpacity;
+        mFading = true;
     }
 
     static void SetPolyColour(glPoly2& poly, u8 r, u8 g, u8 b, u8 a)

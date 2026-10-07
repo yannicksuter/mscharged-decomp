@@ -29,37 +29,37 @@ void HomeButtonFade::FadeIn()
 
 void HomeButtonFade::Update(float deltaTime)
 {
-    if (mEnabled)
+    if (mFading)
     {
-        if (mPos < mTo)
+        if (mOpacity < mTargetOpacity)
         {
-            mPos += mRate * deltaTime;
+            mOpacity += mFadeRate * deltaTime;
         }
         else
         {
-            mPos -= mRate * deltaTime;
+            mOpacity -= mFadeRate * deltaTime;
         }
 
-        if (mPos <= 0.0f)
+        if (mOpacity <= 0.0f)
         {
-            mPos = 0.0f;
-            mEnabled = false;
+            mOpacity = 0.0f;
+            mFading = false;
         }
-        else if (mPos >= 1.0f)
+        else if (mOpacity >= 1.0f)
         {
-            mPos = 1.0f;
-            mEnabled = false;
+            mOpacity = 1.0f;
+            mFading = false;
         }
     }
     else
     {
-        mPos = mTo;
+        mOpacity = mTargetOpacity;
     }
 }
 
 void HomeButtonFade::Render()
 {
-    const int darkenAmount = (int)(255.0f * mPos);
+    const int darkenAmount = (int)(255.0f * mOpacity);
     if ((u8)darkenAmount == 0)
     {
         return;

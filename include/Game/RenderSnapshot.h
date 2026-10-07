@@ -18,18 +18,22 @@
 #include "Game/Drawable/DrawableYoshiEgg.h"
 #include "Game/Drawable/DrawableDaisyFist.h"
 
-// Necessary to force extrwi instead of rlwinm
 union RenderSnapshotFlags
 {
     u32 raw;
     struct
     {
-        u32 _b0    : 1;   // 0x80000000
-        u32 _b1    : 1;   // 0x40000000  -> _2294
-        u32 _b2_6  : 5;
-        u32 _b7    : 1;   // 0x01000000  -> Bowser
-        u32 _b8    : 1;   // 0x00800000  -> _1FC0
-        u32 _b9_31 : 23;
+        u32 yoshiEgg : 1;
+        u32 flyingCameras : 1;
+        u32 hammers : 1;
+        u32 bulletBills : 1;
+        u32 koopaShell : 1;
+        u32 birdoEgg : 1;
+        u32 daisyFists : 1;
+        u32 diddyBanana : 1;
+        u32 windDebris : 1;
+        u32 thwomps : 1;
+        u32 reserved : 22;
     } bits;
 };
 
@@ -47,9 +51,9 @@ public:
     int NumDrawableObjects() const;
     const nlVector3* GetPositionForDrawableObject(int) const;
     void Invalidate();
-    void Render(float) const;
+    void Render(float);
     void RenderDebugInfo(const RenderSnapshot&, const RenderSnapshot&, float) const;
-    void Blend(const float*, const RenderSnapshot&, const RenderSnapshot&);
+    void Blend(const float*, RenderSnapshot&, RenderSnapshot&);
     RenderSnapshot& GetMutable();
 
     DrawableCharacter& GetCharacter(int index)

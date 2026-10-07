@@ -24,7 +24,7 @@ struct GXSkinnedMultiLightParameters
     /* 0x008 */ glTextureBinding detailTexture;
     /* 0x010 */ glTextureBinding rampTexture;
     /* 0x018 */ const float (*skinMatrices)[3][4];
-    /* 0x01C */ unsigned long skinMatricesSize;
+    /* 0x01C */ unsigned long skinMatrixBytes;
     /* 0x020 */ float blendAmount;
     /* 0x024 */ int animateNormalTexCoords;
     /* 0x028 */ nlVector3 lightDirections[4];

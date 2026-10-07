@@ -8,7 +8,7 @@ struct GXBlackTextureAlphaParameters
 {
     /* 0x00 */ glTextureBinding diffuseTexture;
     /* 0x08 */ const float (*skinMatrices)[3][4];
-    /* 0x0C */ unsigned long skinMatricesSize;
+    /* 0x0C */ unsigned long skinMatrixBytes;
 }; // size: 0x10
 
 class GXBlackTextureAlphaMaterialProgram : public GXMaterialProgramImpl<GXBlackTextureAlphaMaterialProgram>

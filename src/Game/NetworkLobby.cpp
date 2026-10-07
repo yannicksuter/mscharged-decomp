@@ -242,24 +242,6 @@ int NetworkLobby::GetPlayerCount()
     return 0;
 }
 
-bool NetworkLobby::AllMachineInfoReceived()
-{
-    if (mMachineCount <= 0)
-    {
-        return false;
-    }
-
-    bool received = true;
-    for (int i = 0; i < mMachineCount; ++i)
-    {
-        if (!mMachineInfoReceived[i])
-        {
-            received = false;
-        }
-    }
-    return received;
-}
-
 bool NetworkLobby::AreAllConnectionsReady()
 {
     if (mState == 2 && AllMachineInfoReceived())
@@ -470,7 +452,7 @@ bool NetworkLobby::CanCancelMatchmaking()
 
 void NetworkLobby::CancelMatchmaking()
 {
-    tDebugPrintManager::Print(DC_NETWORK, "Cancelling DWC matchmaking\n");
+    tDebugPrintManager::Print(DC_NETWORK, "DWC Cancel Matchmaking\n");
     DWC_CancelMatching();
     mCancelRequested = false;
     g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
@@ -920,7 +902,7 @@ void NetworkLobby::BuildLocalMachineInfo(
     info->mGuestEnabled = HasOnlineTwoLocalPlayers();
 }
 
-inline void NetworkLobby::SendLocalMachineInfo(int aid)
+void NetworkLobby::SendLocalMachineInfo(int aid)
 {
     unsigned int connection = mPlayers[aid].mConnection;
     if (connection == 0)
@@ -1046,6 +1028,24 @@ void NetworkLobby::Update(float dt)
 void NetworkLobby::MarkGameStarted()
 {
     mGameStarted = 1;
+}
+
+bool NetworkLobby::AllMachineInfoReceived()
+{
+    if (mMachineCount <= 0)
+    {
+        return false;
+    }
+
+    bool received = true;
+    for (int i = 0; i < mMachineCount; ++i)
+    {
+        if (!mMachineInfoReceived[i])
+        {
+            received = false;
+        }
+    }
+    return received;
 }
 
 NetworkDraftMachineInfo* NetworkLobby::GetLocalMachineInfo()

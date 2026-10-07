@@ -209,7 +209,7 @@ void GXMaterialProgramImpl<GXSpecularFresnelMaterialProgram>::Draw(
     {
         glx_LoadSkinMatrices(
             static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->skinMatrices,
-            static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->skinMatricesSize / 48,
+            static_cast<const GXSpecularFresnelParameters*>(packet->materialParameters)->skinMatrixBytes / 48,
             &modelview, 0);
     }
     else

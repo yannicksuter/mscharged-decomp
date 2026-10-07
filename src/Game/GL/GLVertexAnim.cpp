@@ -5,26 +5,26 @@
 
 #include <string.h>
 
-struct UnidentifiedGLVertexAnimHeader_802D3D48
+struct GLVertexAnimHeader
 {
-    u32 m_00;
-    u32 m_04;
-    u32 m_08;
-    u32 m_0C;
-    u32 m_10;
-    u32 m_14;
+    u32 hashID;
+    u32 numFrames;
+    u32 numVertices;
+    u32 vertexStride;
+    u32 unknown10;
+    u32 numAnimatedStreams;
 };
 
 GLVertexAnim::GLVertexAnim(const void* data, const void* extraData)
 {
-    const UnidentifiedGLVertexAnimHeader_802D3D48* header =
-        (const UnidentifiedGLVertexAnimHeader_802D3D48*)data;
-    m_uHashID = header->m_00;
-    m_nNumFrames = header->m_04;
-    m_nNumVertices = header->m_08;
-    m_nVertexStride = header->m_0C;
-    m_Unknown10 = header->m_10;
-    m_nNumAnimatedStreams = header->m_14;
+    const GLVertexAnimHeader* header =
+        (const GLVertexAnimHeader*)data;
+    m_uHashID = header->hashID;
+    m_nNumFrames = header->numFrames;
+    m_nNumVertices = header->numVertices;
+    m_nVertexStride = header->vertexStride;
+    m_Unknown10 = header->unknown10;
+    m_nNumAnimatedStreams = header->numAnimatedStreams;
 
     m_eMode = GLVAnimMode_Loop;
     m_bDone = false;

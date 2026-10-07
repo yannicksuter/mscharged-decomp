@@ -21,7 +21,7 @@ void GXMaterialProgramImpl<GXThreeLightDiffuseMaterialProgram>::Activate(
     GXSetChanCtrl(GX_COLOR0, true, GX_SRC_REG, GX_SRC_REG, (GXLightID)(GX_LIGHT0 | GX_LIGHT1 | GX_LIGHT2), GX_DF_CLAMP, GX_AF_NONE);
 
     nlColour materialColour = { { 255, 255, 255, 255 } };
-    gxSetChanMatColour(0, materialColour);
+    gxSetChanMatColour(GX_COLOR0, materialColour);
 }
 
 template <>

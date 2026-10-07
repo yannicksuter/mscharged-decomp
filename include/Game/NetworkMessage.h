@@ -39,7 +39,7 @@ public:
     virtual NetworkMessage* Create(
         NetworkMessageSerializer* serializer)
     {
-        T* message = new T;
+        T* message = new (8, false) T;
         message->Serialize(serializer);
         return message;
     }
