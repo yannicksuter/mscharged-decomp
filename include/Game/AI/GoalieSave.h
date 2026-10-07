@@ -52,6 +52,8 @@ public:
 
 struct SaveBlendInfo
 {
+    float GetMilestoneTime(int milestone) const { return mfMilestoneTime[milestone]; }
+
     void Reset();
     void SyncLog(void* context, DebugWriteCache* cache);
 
