@@ -4,6 +4,7 @@
 #include "Game/Sys/audio.h"
 #include "Game/Audio/GameStreams.h"
 #include "Game/Audio/AudioGlobals.h"
+#include "Game/Audio/RegistryPools.h"
 
 #include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/XSoundCueHandle.h"

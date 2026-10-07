@@ -149,10 +149,10 @@ void SHOnlineMatchmakingDraft::UpdateDraftTeams()
         FEOnlinePlayerRow& row = mPlayers[i];
         NetworkDraftTeam* team = NetworkDraft::Instance()->GetDraftTeam(i);
         nlStrNCpy(row.mName, team->mPlayers[0].mName, 14);
-        memcpy(row.mMiiData, team->mPlayers[0].mData, sizeof(row.mMiiData));
+        memcpy(row.mMiiData, team->mPlayers[0].mMiiData, sizeof(row.mMiiData));
         row.mSearchState = 4;
         row.mStatus = 1;
-        row.mStats = team->mPlayers[0].mHead;
+        row.mStats = team->mPlayers[0].mStats;
         if (IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers())
             row.mSide = 3;
         else

@@ -14,8 +14,6 @@
 class InterpreterCore;
 class TweakIntBinding;
 
-extern const char* gLastTweakCategory;
-
 typedef nlSmallBlockAllocator<0x10, 0x20, 0x40, 1> TweakValueAllocator3;
 typedef nlSmallBlockAllocator<0x10, 0x20, 1, 1> TweakValueAllocator2;
 extern TweakValueAllocator3* gTweakValueAllocator;

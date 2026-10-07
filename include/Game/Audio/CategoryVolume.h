@@ -1,18 +1,8 @@
-#ifndef GAME_AUDIO_CATEGORY_VOLUME_H
-#define GAME_AUDIO_CATEGORY_VOLUME_H
+#ifndef GAME_AUDIO_CATEGORYVOLUME_H
+#define GAME_AUDIO_CATEGORYVOLUME_H
 
-#include "NL/nlDLListContainer.inl"
-#include "Game/Audio/AudioConfig.h"
-#include "Game/Audio/AudioSystem.h"
-#include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/AudioEffect.h"
-#include "NL/nlAlgorithm.h"
-#include "NL/nlMemory.h"
 #include "NL/nlSlotPool.h"
-#include "NL/nlString.h"
-#include "types.h"
-#include "Game/Audio/RegistryPools.h"
-#include "Game/UnidentifiedStaticStorage.h"
 
 class CategoryVolumeParameter
     : public AudioEffectParameter
@@ -48,6 +38,7 @@ public:
         m_CurrentParameter = &m_Initial;
         m_ResultParameter = &m_Final;
     }
+
     virtual void CreateParameter(u32 definition, const void* context, bool negate,
         AudioEffectParameter** output);
     virtual void BeginBlend();
@@ -72,4 +63,4 @@ public:
     static SlotPool<CategoryVolume> s_Pool;
 };
 
-#endif // GAME_AUDIO_CATEGORY_VOLUME_H
+#endif // GAME_AUDIO_CATEGORYVOLUME_H

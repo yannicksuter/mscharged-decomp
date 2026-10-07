@@ -20,7 +20,7 @@ DefensivePlayOverlay::DefensivePlayOverlay()
     , mCountdownSoundCount(0)
     , mCountdownSoundTimer(0.0f)
     , mCountdownSoundInterval(0.0f)
-    , mCountdownSpeed(0)
+    , mCountdownSpeed(COUNTDOWN_NORMAL)
 {
 }
 
@@ -76,11 +76,11 @@ void DefensivePlayOverlay::StartCountdown()
 {
     switch (mCountdownSpeed)
     {
-    case 2:
+    case COUNTDOWN_FASTEST:
         mPresentation->SetActiveSlide("COUNTDOWN3", true);
         mCountdownSoundInterval = 0.3f;
         break;
-    case 1:
+    case COUNTDOWN_FAST:
         mPresentation->SetActiveSlide("COUNTDOWN2", true);
         mCountdownSoundInterval = 0.5f;
         break;

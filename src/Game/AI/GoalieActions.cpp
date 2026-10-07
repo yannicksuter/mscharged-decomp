@@ -1613,11 +1613,11 @@ void Goalie::fn_80084EB0(float deltaTime)
             overlay->mGoalie = this;
         }
         if (mfMegaAccuracy < 0.001f)
-            overlay->mCountdownSpeed = 0;
+            overlay->mCountdownSpeed = DefensivePlayOverlay::COUNTDOWN_NORMAL;
         else if (mfMegaAccuracy < 0.999f)
-            overlay->mCountdownSpeed = 1;
+            overlay->mCountdownSpeed = DefensivePlayOverlay::COUNTDOWN_FAST;
         else
-            overlay->mCountdownSpeed = 2;
+            overlay->mCountdownSpeed = DefensivePlayOverlay::COUNTDOWN_FASTEST;
 
         MegaBallIndicator* target = GetMegaBallTargetIndicator(0);
         target->mActive = true;

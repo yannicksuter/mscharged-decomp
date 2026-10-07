@@ -6,6 +6,8 @@
 
 class PlatAudioListener;
 
+extern float sSpeedOfSound;
+
 class Plat3dSoundSrc : public XSoundOwner
 {
 public:

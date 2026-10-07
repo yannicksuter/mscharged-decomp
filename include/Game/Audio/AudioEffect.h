@@ -83,7 +83,7 @@ public:
         return true;
     }
 
-    bool m_Enabled;
+    bool m_Finished;
     u8 m_Pad05[3];
     nlDLListSlotPool<AudioEffectParameter*> m_Parameters;
     AudioEffectParameter* m_CurrentParameter;
@@ -117,7 +117,7 @@ inline void AudioEffectBase::CreateParameter(
 inline bool AudioEffectParameter::IsFinished()
 {
     return m_State.m_Flags.bytes[0]
-        ? ((AudioEffectBase*)m_State.m_Current.pointer)->m_Enabled
+        ? ((AudioEffectBase*)m_State.m_Current.pointer)->m_Finished
         : (GetTargetScalar()
             && (GetCurrentScalar() - GetTargetScalar() > 0.0001f
                 || nlNear(GetCurrentScalar(), GetTargetScalar())));

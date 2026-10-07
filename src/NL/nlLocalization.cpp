@@ -37,15 +37,10 @@ char* nlLocalization::LanguageName[] = {
     "Bob",
 };
 
-// Charged spells the thumbprint as a five-byte string rather than the
-// predecessor's char[4] initialiser list.
+// The retained thumbprint includes a trailing zero; validation compares four bytes.
 const char nlLocalization::Thumbprint[5] = "NLOC";
 
 nlLocalization* g_pLocalization;
-
-// Charged spells the file thumbprint as a string literal, so it is five bytes
-// in read-only small data rather than the predecessor's char[4] initialiser.
-
 
 static void OnTableLoaded(LOCHeader* pFile, unsigned long, nlLocalization* pLocalization)
 {

@@ -60,10 +60,10 @@ void AudioRpcBundleManager::Update(float dt)
 {
     if (IsLoaded())
     {
-        ((AudioSliderTable*)m_Chunk13100)->Update(dt);
+        ((AudioSliderTable*)m_SliderTable)->Update(dt);
         UpdateAudioRpcController(m_RpcController, dt);
         UpdateAudioResourceRuntime(&m_Runtime, dt);
-        ((AudioCalculationTable*)m_Chunk13400)->Update(dt);
+        ((AudioCalculationTable*)m_CalculationTable)->Update(dt);
     }
     m_Backend->ServiceReadQueue(dt);
 }

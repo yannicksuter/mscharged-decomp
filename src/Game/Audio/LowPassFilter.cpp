@@ -1,4 +1,11 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
+#include "Game/Audio/AudioSource.h"
+#include "Game/Audio/XSoundCueHandle.h"
+#include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/LowPassFilter.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlString.h"
 
 static u32 sLowPassFilterFrequency = 1000;
 static u32 sLowPassFilterEnabled = 1;
@@ -129,7 +136,7 @@ void LowPassFilter::EndBlend()
 {
     m_Final.m_Frequency /= m_FilterCount;
     if (m_Parameters.m_Head == 0 && m_Initial.m_On == 0)
-        m_Enabled = true;
+        m_Finished = true;
 }
 
 void LowPassFilter::ApplyToSound(void* handle)

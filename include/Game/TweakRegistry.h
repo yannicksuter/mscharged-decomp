@@ -63,9 +63,6 @@ void AddTweakChild(TweakEntry* entry, TweakNode* child);
 void RemoveDynamicTweakChildren(TweakEntry* entry);
 void RemoveTweakValue(TweakEntry* entry, TweakValueBase* value);
 void ClearTweakChildren(TweakEntry* entry);
-void SplitTweakPath(const char* path, const char** leafName, char* directory);
-void JoinTweakPath(const char* parentPath, const char* childPath, char* buffer);
-int IsTweakNameOnStack(const char* name);
 
 // Recycled-name TU.
 void RecycleTweakNames(void);

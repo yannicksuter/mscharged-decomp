@@ -10,8 +10,8 @@ ParticleUpdateTask::ParticleUpdateTask()
     : mTimeScale(1.0f)
     , mResetPending(false)
     , mContext(0)
-    , mParameter1(0)
-    , mParameter2(0)
+    , mNumParticles(0)
+    , mMaxRenderedParticles(0)
     , mRenderEnabled(true)
     , mUpdateEnabled(true)
 {
@@ -67,18 +67,18 @@ void ParticleUpdateTask::Shutdown()
     }
 }
 
-void ParticleUpdateTask::Initialize(void* context, int parameter1, int parameter2)
+void ParticleUpdateTask::Initialize(void* context, int numParticles, int maxRenderedParticles)
 {
     mContext = context;
-    mParameter1 = parameter1;
-    mParameter2 = parameter2;
+    mNumParticles = numParticles;
+    mMaxRenderedParticles = maxRenderedParticles;
     EmissionManager::Instance();
-    EmissionManager::Instance()->Startup(context, parameter1, parameter2);
+    EmissionManager::Instance()->Startup(context, numParticles, maxRenderedParticles);
 }
 
-void ParticleUpdateTask::StartLoading(bool first, bool second, bool third, bool fourth)
+void ParticleUpdateTask::StartLoading(bool allocateAtStart, bool allocateNonResidentAtStart, bool third, bool compressedNonResident)
 {
-    EmissionManager::StartLoading(first, second, third, fourth);
+    EmissionManager::StartLoading(allocateAtStart, allocateNonResidentAtStart, third, compressedNonResident);
 }
 
 bool ParticleUpdateTask::FinishLoading(GLResourcePool* context)

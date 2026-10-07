@@ -518,7 +518,6 @@ void RestartSinglePlayerGame();
 void StartSinglePlayerGame();
 void PlaybackRecordedGame();
 
-extern bool gOnlineFourMachineFriendLobby;
 extern u8 gOnlineTwoLocalPlayers;
 extern int gOnlineLocalControllerIndices[2];
 

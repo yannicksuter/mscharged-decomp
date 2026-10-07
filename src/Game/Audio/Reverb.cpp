@@ -188,5 +188,5 @@ void Reverb::OnSoundStarted(void*)
 void Reverb::EndBlend()
 {
     if (m_Parameters.m_Head == 0 && m_Final.auxvol < FLT_MIN)
-        m_Enabled = true;
+        m_Finished = true;
 }

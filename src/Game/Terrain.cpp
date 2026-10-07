@@ -24,7 +24,7 @@ static char sTerrainConfigPathFormat[] = "ini/Terrain/%s";
 static void LoadSelectedTerrain();
 
 static TerrainTweakValue sCurrentTerrain(
-    "CurrentTerrain", "Game/Terrain", 1, GetPowerupNamesArray());
+    "CurrentTerrain", "Game/Terrain", 1, GetSurfaceNamesArray());
 static TweakCallback sLoadTerrain(
     "LoadTerrain", "Game/Terrain", LoadSelectedTerrain, true);
 static u16 sFieldTerrainType = 0xFFFF;

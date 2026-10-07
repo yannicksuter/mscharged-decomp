@@ -1,24 +1,18 @@
 #include "Game/Triggers/SebringAnimScript.h"
 
 #include "Game/CharacterTriggers.h"
+#include "Game/Triggers/AnimTrigger.h"
 #include "NL/nlDebug.h"
 
-class AnimTriggerCallbackInfo
-{
-public:
-    /* 0x0 */ unsigned long m_uEventID;
-    /* 0x4 */ float m_fIntensity;
-}; // total size: 0x8
-
 void SebringAnimTagScriptInterpreter::TriggerFired(
-    cSAnim* arg0, unsigned long triggerId)
+    cSAnim* animation, unsigned long triggerId)
 {
     if (m_FireTriggers)
     {
         AnimTriggerCallbackInfo data;
         data.m_uEventID = triggerId;
         data.m_fIntensity = 100.0f;
-        CharacterTriggerHandler(arg0, (unsigned int)&data);
+        CharacterTriggerHandler(animation, (unsigned int)&data);
     }
 }
 

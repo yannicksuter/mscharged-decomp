@@ -14,8 +14,8 @@ public:
     void SetTimeScale(float timeScale);
     virtual void Run(float dt);
     void Shutdown();
-    void Initialize(void* context, int parameter1, int parameter2);
-    void StartLoading(bool first, bool second, bool third, bool fourth);
+    void Initialize(void* context, int numParticles, int maxRenderedParticles);
+    void StartLoading(bool allocateAtStart, bool allocateNonResidentAtStart, bool third, bool compressedNonResident);
     bool FinishLoading(GLResourcePool* context);
     virtual const char* GetName()
     {
@@ -30,8 +30,8 @@ private:
     bool mUnknownFlag;
     unsigned char mUnknown[0x82];
     void* mContext;
-    int mParameter1;
-    int mParameter2;
+    int mNumParticles;
+    int mMaxRenderedParticles;
     bool mRenderEnabled;
     bool mUpdateEnabled;
     unsigned char mCallbackPadding[2];

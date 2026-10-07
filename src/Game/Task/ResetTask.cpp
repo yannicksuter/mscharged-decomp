@@ -25,17 +25,16 @@ bool ResetTask::s_checkCardRemoved = false;
 
 u32 softResetTime[4] = { 0, 0, 0, 0 };
 
+bool gPowerButtonPressed;
 
-bool lbl_806E107C;
-
-void fn_8011BD0C()
+void OnPowerButtonPressed()
 {
-    lbl_806E107C = true;
+    gPowerButtonPressed = true;
 }
 
 ResetTask::ResetTask()
 {
-    OSSetPowerCallback(fn_8011BD0C);
+    OSSetPowerCallback(OnPowerButtonPressed);
 }
 
 void ResetTask::Run(float dt)
@@ -59,7 +58,7 @@ void ResetTask::Run(float dt)
         s_ResetState = s_ResetState == RS_RUNNING ? RS_STARTRESET : s_ResetState;
     }
 
-    if (lbl_806E107C)
+    if (gPowerButtonPressed)
     {
         s_ResetMode = 2;
         s_ResetState = s_ResetState == RS_RUNNING ? RS_STARTRESET : s_ResetState;

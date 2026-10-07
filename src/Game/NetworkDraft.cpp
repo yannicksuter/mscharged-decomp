@@ -38,91 +38,6 @@ static TweakFloatBinding sDefaultTimeFinalCountdownTweak(
     "s_fDefaultTimeFinalCountdown", "Network/Draft",
     &s_fDefaultTimeFinalCountdown, true);
 
-void NetMessageDraft::Serialize(NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
-    serializer->Transfer(&mMachineCount, sizeof(mMachineCount));
-    serializer->Transfer(&mUnidentified0A, sizeof(mUnidentified0A));
-    serializer->Transfer(&mPlayerSides, sizeof(mPlayerSides));
-    NetworkDraftMachineInfo* entry = mEntries;
-    for (int i = 0; i < mMachineCount; ++entry, ++i)
-    {
-        serializer->Transfer(&entry->mStats, sizeof(entry->mStats));
-        serializer->Transfer(
-            &entry->mProfileId, sizeof(entry->mProfileId));
-        serializer->Transfer(entry->mName, sizeof(entry->mName));
-        serializer->Transfer(
-            entry->mMiiData, sizeof(entry->mMiiData));
-        serializer->Transfer(&entry->mMachineIndex, sizeof(entry->mMachineIndex));
-        serializer->Transfer(&entry->mGuestEnabled,
-            sizeof(entry->mGuestEnabled));
-    }
-}
-
-void NetMessageDraftMachineInfo::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mEntry.mStats, sizeof(mEntry.mStats));
-    serializer->Transfer(&mEntry.mProfileId, sizeof(mEntry.mProfileId));
-    serializer->Transfer(mEntry.mName, sizeof(mEntry.mName));
-    serializer->Transfer(mEntry.mMiiData, sizeof(mEntry.mMiiData));
-    serializer->Transfer(&mEntry.mMachineIndex, sizeof(mEntry.mMachineIndex));
-    serializer->Transfer(
-        &mEntry.mGuestEnabled, sizeof(mEntry.mGuestEnabled));
-}
-
-void NetMessageDraftPickedCaptain::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mTeamIndex, sizeof(mTeamIndex));
-    serializer->Transfer(&mCaptain, sizeof(mCaptain));
-}
-
-void NetMessageDraftPickedSidekicks::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mTeamIndex, sizeof(mTeamIndex));
-    serializer->Transfer(&mSidekick0, sizeof(mSidekick0));
-    serializer->Transfer(&mSidekick1, sizeof(mSidekick1));
-    serializer->Transfer(&mSidekick2, sizeof(mSidekick2));
-}
-
-void NetMessageSidesChanged::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
-    serializer->Transfer(&mSide, sizeof(mSide));
-    serializer->Transfer(&mGuest, sizeof(mGuest));
-    serializer->Transfer(&mAccepted, sizeof(mAccepted));
-}
-
-void NetMessageCheckConnection::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    for (int i = 0; i < 2; ++i)
-    {
-        serializer->Transfer(&mProfileIds[i], sizeof(mProfileIds[i]));
-    }
-}
-
-void NetMessageConnectionDecision::Serialize(
-    NetworkMessageSerializer* serializer)
-{
-    serializer->Transfer(&mAccepted, sizeof(mAccepted));
-    serializer->Transfer(&mMachineIndex, sizeof(mMachineIndex));
-}
-
-NetMessageDraftPickedCaptain::~NetMessageDraftPickedCaptain() { }
-NetMessageDraftPickedSidekicks::~NetMessageDraftPickedSidekicks() { }
-
-int NetMessageConnectionDecision::GetType() { return 27; }
-int NetMessageCheckConnection::GetType() { return 26; }
-int NetMessageSidesChanged::GetType() { return 25; }
-int NetMessageDraftPickedSidekicks::GetType() { return 24; }
-int NetMessageDraftPickedCaptain::GetType() { return 23; }
-int NetMessageDraftMachineInfo::GetType() { return 22; }
-int NetMessageDraft::GetType() { return 21; }
-
 void NetworkDraft::CreateInstance()
 {
     sNetworkDraft = new (nlMalloc(sizeof(NetworkDraft), 8, false)) NetworkDraft;
@@ -142,13 +57,13 @@ void NetworkDraft::Reset(bool)
     mCurrentDraftingTeam = -1;
     mCurrentDraftingPeer = -1;
     mCurrentDrafterIsGuest = false;
-    mSideToTeam[0] = -1;
-    mSideDrafted[0] = false;
-    mSideToTeam[1] = -1;
-    mSideDrafted[1] = false;
+    mDraftingMachines[0] = -1;
+    mDraftingGuests[0] = false;
+    mDraftingMachines[1] = -1;
+    mDraftingGuests[1] = false;
     mNextDraftingTeam = -1;
     mTimeBeforeDrafting = s_fDefaultTimeToWaitBeforeDrafting;
-    mTimeToChangeDrafters = s_fDefaultTimeToChooseSidekicks;
+    mTimeToChooseSidekicks = s_fDefaultTimeToChooseSidekicks;
     mFinalCountdown = s_fDefaultTimeFinalCountdown;
 }
 
@@ -163,10 +78,10 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
     mCurrentDraftingTeam = -1;
     mCurrentDraftingPeer = -1;
     mCurrentDrafterIsGuest = false;
-    mSideToTeam[0] = -1;
-    mSideDrafted[0] = false;
-    mSideToTeam[1] = -1;
-    mSideDrafted[1] = false;
+    mDraftingMachines[0] = -1;
+    mDraftingGuests[0] = false;
+    mDraftingMachines[1] = -1;
+    mDraftingGuests[1] = false;
 
     tDebugPrintManager::Print(DC_NETWORK, "Starting Draft num Teams %d\n", mTeamCount);
     for (int teamIndex = 0; teamIndex < mTeamCount; ++teamIndex)
@@ -175,9 +90,9 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
         mTeams[teamIndex].mPlayerCount = 1;
         NetworkDraftPlayer& player = mTeams[teamIndex].mPlayers[0];
         const NetworkDraftMachineInfo& entry = message->mEntries[teamIndex];
-        player.mHead = entry.mStats;
+        player.mStats = entry.mStats;
         nlStrNCpy(player.mName, entry.mName, 11);
-        memcpy(player.mData, entry.mMiiData, sizeof(player.mData));
+        memcpy(player.mMiiData, entry.mMiiData, sizeof(player.mMiiData));
         player.mPeerIndex = (s8)entry.mMachineIndex;
     }
 
@@ -198,12 +113,12 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
         nlWcsToStr(player.mName, name, 11);
         tDebugPrintManager::Print(DC_NETWORK,
             "%s Rank %d. %d-%d MyPeerIndex %d\n", name,
-            player.mHead.mDisplayRank, player.mHead.mWins, player.mHead.mLosses,
+            player.mStats.mDisplayRank, player.mStats.mWins, player.mStats.mLosses,
             player.mPeerIndex);
     }
     mNextDraftingTeam = -1;
     mTimeBeforeDrafting = s_fDefaultTimeToWaitBeforeDrafting;
-    mTimeToChangeDrafters = s_fDefaultTimeToChooseSidekicks;
+    mTimeToChooseSidekicks = s_fDefaultTimeToChooseSidekicks;
     mFinalCountdown = s_fDefaultTimeFinalCountdown;
     mState = NET_DRAFT_CAPTAINS;
     gOnlineStartMatchmaking = 0;
@@ -222,9 +137,9 @@ static inline void CopyDraftPlayerName(NetworkDraftPlayer& player, const u16* na
 
 static inline void CopyDraftMachineInfo(NetworkDraftPlayer& player, const NetworkDraftMachineInfo& entry)
 {
-    player.mHead = entry.mStats;
+    player.mStats = entry.mStats;
     CopyDraftPlayerName(player, entry.mName);
-    memcpy(player.mData, entry.mMiiData, sizeof(player.mData));
+    memcpy(player.mMiiData, entry.mMiiData, sizeof(player.mMiiData));
     player.mPeerIndex = (s8)entry.mMachineIndex;
 }
 
@@ -260,7 +175,7 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     AssignDraftSides();
     mNextDraftingTeam = -1;
     mTimeBeforeDrafting = s_fDefaultTimeToWaitBeforeDrafting;
-    mTimeToChangeDrafters = s_fDefaultTimeToChooseSidekicks;
+    mTimeToChooseSidekicks = s_fDefaultTimeToChooseSidekicks;
     mFinalCountdown = s_fDefaultTimeFinalCountdown;
     mState = NET_DRAFT_CAPTAINS;
     GameSceneManager::Instance()->Push((SceneList)0x32, SCREEN_FORWARD, true);
@@ -349,9 +264,9 @@ void NetworkDraft::AssignDraftSides()
         side = 1;
     }
 
-    mSideToTeam[side] = sidePlayers[side][0].machine;
-    mSideDrafted[side] = sidePlayers[side][0].guest;
-    usedMachines[mSideToTeam[side]] = true;
+    mDraftingMachines[side] = sidePlayers[side][0].machine;
+    mDraftingGuests[side] = sidePlayers[side][0].guest;
+    usedMachines[mDraftingMachines[side]] = true;
 
     if (side == 0)
     {
@@ -366,9 +281,9 @@ void NetworkDraft::AssignDraftSides()
     {
         if (!usedMachines[sidePlayers[side][i].machine])
         {
-            mSideToTeam[side] = sidePlayers[side][i].machine;
-            mSideDrafted[side] = sidePlayers[side][i].guest;
-            usedMachines[mSideToTeam[side]] = true;
+            mDraftingMachines[side] = sidePlayers[side][i].machine;
+            mDraftingGuests[side] = sidePlayers[side][i].guest;
+            usedMachines[mDraftingMachines[side]] = true;
             break;
         }
     }
@@ -378,8 +293,8 @@ int NetworkDraft::CompareDraftTeams(const void* left, const void* right)
 {
     const NetworkDraftTeam* leftTeam = (const NetworkDraftTeam*)left;
     const NetworkDraftTeam* rightTeam = (const NetworkDraftTeam*)right;
-    int leftRank = leftTeam->mPlayers[0].mHead.mScore;
-    int rightRank = rightTeam->mPlayers[0].mHead.mScore;
+    int leftRank = leftTeam->mPlayers[0].mStats.mScore;
+    int rightRank = rightTeam->mPlayers[0].mStats.mScore;
     if (leftRank > rightRank)
     {
         return 1;
@@ -444,9 +359,9 @@ void NetworkDraft::Update(float dt)
         break;
     case NET_DRAFT_SIDEKICKS:
     {
-        if (mTimeToChangeDrafters > 0.0f)
+        if (mTimeToChooseSidekicks > 0.0f)
         {
-            mTimeToChangeDrafters -= dt;
+            mTimeToChooseSidekicks -= dt;
         }
         bool allTeamsFinished = true;
         for (int team = 0; team < mTeamCount; ++team)
@@ -554,7 +469,7 @@ void NetworkDraft::AdvanceDraftTeam()
     ++mNextDraftingTeam;
     if (mNextDraftingTeam >= mTeamCount)
     {
-        mTimeToChangeDrafters = s_fDefaultTimeToChooseSidekicks;
+        mTimeToChooseSidekicks = s_fDefaultTimeToChooseSidekicks;
         mState = NET_DRAFT_SIDEKICKS;
         return;
     }
@@ -574,12 +489,12 @@ void NetworkDraft::AdvanceDraftTeam()
             return;
         if (mNextDraftingTeam >= 2)
             return;
-        if (mLocalMachineIndex != mSideToTeam[mNextDraftingTeam])
+        if (mLocalMachineIndex != mDraftingMachines[mNextDraftingTeam])
             return;
 
         mCurrentDraftingTeam = mNextDraftingTeam;
-        mCurrentDraftingPeer = mSideToTeam[mNextDraftingTeam];
-        mCurrentDrafterIsGuest = mSideDrafted[mNextDraftingTeam];
+        mCurrentDraftingPeer = mDraftingMachines[mNextDraftingTeam];
+        mCurrentDrafterIsGuest = mDraftingGuests[mNextDraftingTeam];
         StartCaptainChoice(this);
     }
 }

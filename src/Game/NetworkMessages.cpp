@@ -72,7 +72,7 @@ static NetworkMessageFactory<NetMessageMegaBallPointer> sMegaBallPointerFactory;
 static NetworkMessageFactory<NetMessageMegaStrikeMeter>
     sMegaStrikeMeterFactory;
 
-void RegisterNetworkMessages_801258A8()
+void RegisterNetworkMessageFactories()
 {
     gNetworkMessageRegistry->RegisterFactory(13, &sFactoryType13);
     gNetworkMessageRegistry->RegisterFactory(15, &sFactoryType15);

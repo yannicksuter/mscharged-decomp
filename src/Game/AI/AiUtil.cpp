@@ -720,7 +720,7 @@ void SortToMinOrMaxTotalSum(unsigned int* result, float (*data)[4], bool findMin
 
 
 
-char** GetPowerupNamesArray()
+char** GetSurfaceNamesArray()
 {
     return g_sSurfaceNames;
 }

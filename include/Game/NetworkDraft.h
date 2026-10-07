@@ -11,7 +11,7 @@ struct NetworkDraftPlayer
     NetworkDraftPlayer()
     {
         mName[0] = 0;
-        memset(mData, 0, sizeof(mData));
+        memset(mMiiData, 0, sizeof(mMiiData));
         mPeerIndex = -1;
         mDisconnected = false;
         mGuest = false;
@@ -19,17 +19,17 @@ struct NetworkDraftPlayer
 
     void Reset()
     {
-        mHead.Reset();
+        mStats.Reset();
         mName[0] = 0;
-        memset(mData, 0, sizeof(mData));
+        memset(mMiiData, 0, sizeof(mMiiData));
         mPeerIndex = -1;
         mDisconnected = false;
         mGuest = false;
     }
 
-    /* 0x00 */ NetworkRankingMeta mHead;
+    /* 0x00 */ NetworkRankingMeta mStats;
     /* 0x18 */ u16 mName[11];
-    /* 0x2E */ u8 mData[0x4C];
+    /* 0x2E */ u8 mMiiData[0x4C];
     /* 0x7A */ u8 mPadding7A[2];
     /* 0x7C */ int mPeerIndex;
     /* 0x80 */ bool mDisconnected;
@@ -114,7 +114,7 @@ public:
     {
         if (mState != NET_DRAFT_SIDEKICKS)
             return -1;
-        int countdown = (int)mTimeToChangeDrafters;
+        int countdown = (int)mTimeToChooseSidekicks;
         if (countdown < 0)
             countdown = 0;
         return countdown;
@@ -130,7 +130,7 @@ public:
             countdown = (int)mTimeBeforeDrafting;
             break;
         case NET_DRAFT_SIDEKICKS:
-            countdown = (int)mTimeToChangeDrafters;
+            countdown = (int)mTimeToChooseSidekicks;
             break;
         case NET_DRAFT_FINAL_COUNTDOWN:
             countdown = (int)mFinalCountdown;
@@ -165,14 +165,14 @@ public:
     /* 0x014 */ int mCurrentDraftingPeer;
     /* 0x018 */ bool mCurrentDrafterIsGuest;
     /* 0x019 */ u8 mPadding019[3];
-    /* 0x01C */ int mSideToTeam[2];
-    /* 0x024 */ bool mSideDrafted[2];
+    /* 0x01C */ int mDraftingMachines[2];
+    /* 0x024 */ bool mDraftingGuests[2];
     /* 0x026 */ u8 mPadding026[2];
     /* 0x028 */ int mTeamCount;
     /* 0x02C */ NetworkDraftTeam mTeams[8];
     /* 0xD2C */ int mNextDraftingTeam;
     /* 0xD30 */ float mTimeBeforeDrafting;
-    /* 0xD34 */ float mTimeToChangeDrafters;
+    /* 0xD34 */ float mTimeToChooseSidekicks;
     /* 0xD38 */ float mFinalCountdown;
     /* 0xD3C */ NetMessageDraft mDraftMessage;
 }; // size: 0x1150

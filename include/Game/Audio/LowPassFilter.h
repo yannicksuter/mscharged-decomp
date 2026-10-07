@@ -1,15 +1,8 @@
-#ifndef GAME_AUDIO_LOW_PASS_FILTER_H
-#define GAME_AUDIO_LOW_PASS_FILTER_H
+#ifndef GAME_AUDIO_LOWPASSFILTER_H
+#define GAME_AUDIO_LOWPASSFILTER_H
 
-#include "revolution/types.h"
-#include "NL/nlDLListContainer.inl"
-#include "Game/Audio/AudioSource.h"
-#include "Game/Audio/XSoundCueHandle.h"
-#include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioEffect.h"
-#include "Game/UnidentifiedStaticStorage.h"
 #include "NL/nlSlotPool.h"
-#include "NL/nlString.h"
 
 class LowPassFilterParameter : public AudioEffectParameter
 {
@@ -37,14 +30,8 @@ public:
 class LowPassFilter : public AudioEffectBase
 {
 public:
-    LowPassFilter()
-        : AudioEffectBase("LowPassFilter")
-    {
-        m_CurrentParameter = &m_Initial;
-        m_ResultParameter = &m_Final;
-        m_Initial.m_On = 0;
-        m_Initial.m_Frequency = 16000;
-    }
+    LowPassFilter();
+
     virtual void CreateParameter(unsigned int definition, const void* context,
         bool disabled, AudioEffectParameter** output);
     virtual void BeginBlend();
@@ -73,4 +60,4 @@ public:
     static SlotPool<LowPassFilter> s_Pool;
 };
 
-#endif // GAME_AUDIO_LOW_PASS_FILTER_H
+#endif // GAME_AUDIO_LOWPASSFILTER_H

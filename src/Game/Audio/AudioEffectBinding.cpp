@@ -74,7 +74,7 @@ bool AudioEffectBinding::UpdateEffect(const u32& key,
 {
     AudioEffectBase* value = *effect;
     value->Update(update->mDeltaTime);
-    if (value->m_Enabled)
+    if (value->m_Finished)
     {
         update->mEntries[update->mCount].mKey = key;
         update->mEntries[update->mCount].mEffect = value;

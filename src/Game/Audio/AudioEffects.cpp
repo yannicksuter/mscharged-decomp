@@ -2,14 +2,14 @@
 #include "NL/nlDLListContainer.inl"
 #include "revolution/wpad/WPAD.h"
 
+#include "Game/Audio/CategoryVolume.h"
+#include "Game/Audio/Pitch.h"
+#include "Game/Audio/LowPassFilter.inl"
+#include "Game/Audio/Delay.h"
+#include "Game/Audio/Reverb.h"
 #include "Game/Audio/AudioEffects.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSource.h"
-#include "Game/Audio/CategoryVolume.h"
-#include "Game/Audio/Delay.h"
-#include "Game/Audio/LowPassFilter.h"
-#include "Game/Audio/Pitch.h"
-#include "Game/Audio/Reverb.h"
 #include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/SoundInstance.h"
 #include "NL/nlString.h"
@@ -43,6 +43,45 @@ void AudioEffectFactory::Update(float)
 {
 }
 
+void AudioEffectFactory::Shutdown()
+{
+    VolumeParameter::s_Pool.FreeBlocks();
+    Volume::s_Pool.FreeBlocks();
+    ReverbParameter::s_Pool.FreeBlocks();
+    Reverb::s_Pool.FreeBlocks();
+    DelayParameter::s_Pool.FreeBlocks();
+    Delay::s_Pool.FreeBlocks();
+    LowPassFilterParameter::s_Pool.FreeBlocks();
+    LowPassFilter::s_Pool.FreeBlocks();
+    PitchParameter::s_Pool.FreeBlocks();
+    Pitch::s_Pool.FreeBlocks();
+    CategoryVolumeParameter::s_Pool.FreeBlocks();
+    CategoryVolume::s_Pool.FreeBlocks();
+}
+
+AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int effectId)
+{
+    switch (effectId)
+    {
+    case 0xCE5C5677:
+        return new Volume;
+    case 0x7DDB838E:
+        return new ControllerSpeaker;
+    case 0xC457F745:
+        return new Reverb;
+    case 0x04F5A46E:
+        return new Delay;
+    case 0x0BCF338E:
+        return new LowPassFilter;
+    case 0x05D11E37:
+        return new Pitch;
+    case 0xFA8EC255:
+        return new CategoryVolume;
+    default:
+        return 0;
+    }
+}
+
 void AudioEffectFactory::ReleaseEffect(AudioEffectBase* effect)
 {
     delete effect;
@@ -61,10 +100,10 @@ void ControllerSpeaker::OnSoundStopped(void*)
 {
     if (sControllerSpeakerEnabled)
     {
-        if (--m_Unknown40 < 0)
-            m_Unknown40 = 0;
-        if (m_Unknown40 == 0)
-            WPADControlSpeaker(m_Unknown3C, WPAD_SPEAKER_MUTE, 0);
+        if (--m_ActiveSoundCount < 0)
+            m_ActiveSoundCount = 0;
+        if (m_ActiveSoundCount == 0)
+            WPADControlSpeaker(m_Channel, WPAD_SPEAKER_MUTE, 0);
     }
 }
 
@@ -72,16 +111,16 @@ void ControllerSpeaker::OnSoundStarted(void* handle)
 {
     if (sControllerSpeakerEnabled)
     {
-        if (m_Unknown40 == 0)
-            WPADControlSpeaker(m_Unknown3C, WPAD_SPEAKER_UNMUTE, 0);
-        ++m_Unknown40;
-        bool enabled = OSDisableInterrupts();
+        if (m_ActiveSoundCount == 0)
+            WPADControlSpeaker(m_Channel, WPAD_SPEAKER_UNMUTE, 0);
+        ++m_ActiveSoundCount;
+        bool interruptsEnabled = OSDisableInterrupts();
         AudioSource* voices[8];
         unsigned int count;
         GetSoundSources(handle, voices, &count);
         for (unsigned int i = 0; i < count; ++i)
-            voices[i]->SetControllerSpeaker(true, m_Unknown3C);
-        OSRestoreInterrupts(enabled);
+            voices[i]->SetControllerSpeaker(true, m_Channel);
+        OSRestoreInterrupts(interruptsEnabled);
     }
 }
 
@@ -101,17 +140,17 @@ void ControllerSpeaker::CreateParameter(unsigned int, const void* context, bool,
     AudioEffectParameter** output)
 {
     *output = &m_Parameter;
-    m_Unknown3C = *(const int*)context - 1;
+    m_Channel = *(const int*)context - 1;
 }
 
 void Volume::ApplyToSound(void* handle)
 {
-    ((XSoundCueHandle*)handle)->instance->volumeOffset = m_Final.m_Unknown10;
+    ((XSoundCueHandle*)handle)->instance->volumeOffset = m_Final.m_VolumeOffset;
 }
 
 void Volume::OnParameterFinished(AudioEffectParameter* parameter)
 {
-    m_Initial.m_Unknown10 += ((VolumeParameter*)parameter)->m_Unknown10;
+    m_Initial.m_VolumeOffset += ((VolumeParameter*)parameter)->m_VolumeOffset;
 }
 
 void Volume::BlendParameter(AudioEffectParameter* destination,
@@ -140,9 +179,9 @@ void Volume::BlendParameter(AudioEffectParameter* destination,
             amount = 1.0f;
         }
     }
-    destinationParameter->m_Unknown10 += sourceParameter->m_Unknown10 * amount;
-    destinationParameter->m_Unknown14_00 |= sourceParameter->m_Unknown14_00;
-    destinationParameter->m_Unknown14_01 |= sourceParameter->m_Unknown14_01;
+    destinationParameter->m_VolumeOffset += sourceParameter->m_VolumeOffset * amount;
+    destinationParameter->m_PauseOnZero |= sourceParameter->m_PauseOnZero;
+    destinationParameter->m_StopOnZero |= sourceParameter->m_StopOnZero;
 }
 
 void Volume::BeginBlend()
@@ -161,7 +200,7 @@ void Volume::CreateParameter(unsigned int definition, const void* context, bool 
     if (type == 2)
     {
         unsigned int volumeKey = 0xCE5C5677;
-        parameter->m_Unknown10 = node->Get(volumeKey).m_Float;
+        parameter->m_VolumeOffset = node->Get(volumeKey).m_Float;
     }
     else
     {
@@ -170,69 +209,11 @@ void Volume::CreateParameter(unsigned int definition, const void* context, bool 
             value = *(const float*)&argument->mData;
         else
             value = (float)(int)argument->mData;
-        parameter->m_Unknown10 = value;
+        parameter->m_VolumeOffset = value;
     }
-    parameter->m_Unknown10 = negate ? -parameter->m_Unknown10 : parameter->m_Unknown10;
+    parameter->m_VolumeOffset = negate ? -parameter->m_VolumeOffset : parameter->m_VolumeOffset;
     unsigned int pauseOnZeroKey = sPauseOnZeroKey;
-    parameter->m_Unknown14_00 = node->Get(pauseOnZeroKey).m_Words.m_Value;
+    parameter->m_PauseOnZero = node->Get(pauseOnZeroKey).m_Words.m_Value;
     unsigned int stopOnZeroKey = sStopOnZeroKey;
-    parameter->m_Unknown14_01 = node->Get(stopOnZeroKey).m_Words.m_Value;
-}
-
-AudioEffectFactory::~AudioEffectFactory()
-{
-}
-
-VolumeParameter::~VolumeParameter()
-{
-}
-
-ControllerSpeakerParameter::~ControllerSpeakerParameter()
-{
-}
-
-Volume::~Volume()
-{
-}
-
-ControllerSpeaker::~ControllerSpeaker()
-{
-}
-
-void AudioEffectFactory::Shutdown()
-{
-    VolumeParameter::s_Pool.FreeBlocks();
-    Volume::s_Pool.FreeBlocks();
-    ReverbParameter::s_Pool.FreeBlocks();
-    Reverb::s_Pool.FreeBlocks();
-    DelayParameter::s_Pool.FreeBlocks();
-    Delay::s_Pool.FreeBlocks();
-    LowPassFilterParameter::s_Pool.FreeBlocks();
-    LowPassFilter::s_Pool.FreeBlocks();
-    PitchParameter::s_Pool.FreeBlocks();
-    Pitch::s_Pool.FreeBlocks();
-    CategoryVolumeParameter::s_Pool.FreeBlocks();
-    CategoryVolume::s_Pool.FreeBlocks();
-}
-
-AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int type)
-{
-    switch ((int)type)
-    {
-    case (int)0xCE5C5677:
-        return new Volume();
-    case (int)0x7DDB838E:
-        return new ControllerSpeaker();
-    case (int)0xC457F745:
-        return new Reverb();
-    case (int)0x04F5A46E:
-        return new Delay();
-    case (int)0x0BCF338E:
-        return new LowPassFilter();
-    case (int)0x05D11E37:
-        return new Pitch();
-    case (int)0xFA8EC255:
-        return new CategoryVolume();
-    }
-    return 0;
+    parameter->m_StopOnZero = node->Get(stopOnZeroKey).m_Words.m_Value;
 }

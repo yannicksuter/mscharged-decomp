@@ -12,6 +12,7 @@
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/NetworkSession.h"
+#include "Game/Task/NetworkUpdateTask.h"
 #include "Game/NetworkLobby.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/FriendManager.h"

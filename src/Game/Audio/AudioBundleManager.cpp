@@ -17,9 +17,9 @@
 AudioBundleManager::AudioBundleManager()
     : m_Backend(0)
     , m_Initialized(false)
-    , m_Chunk13100(0)
-    , m_Chunk13400(0)
-    , m_Chunk13500(0)
+    , m_SliderTable(0)
+    , m_CalculationTable(0)
+    , m_BankTable(0)
 {
     m_Loaded = false;
     m_Backend = new (8, false) AudioBackend;
@@ -71,14 +71,14 @@ void AudioBundleManager::ParseChunk(nlChunk* chunk)
     case 0x80023800:
         break;
     case 0x80023500:
-        m_Chunk13500 = AudioBankTable::ParseChunk(chunk);
-        m_Chunk13500->Initialize();
+        m_BankTable = AudioBankTable::ParseChunk(chunk);
+        m_BankTable->Initialize();
         break;
     case 0x80023400:
-        m_Chunk13400 = ParseAudioCalculationTable(chunk);
+        m_CalculationTable = ParseAudioCalculationTable(chunk);
         break;
     case 0x80023100:
-        m_Chunk13100 = ParseAudioSliderTable(chunk);
+        m_SliderTable = ParseAudioSliderTable(chunk);
         break;
     case 0x1200:
         if (m_Runtime.m_Registry.Load(

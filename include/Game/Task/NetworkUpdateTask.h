@@ -3,6 +3,8 @@
 
 #include "NL/nlTask.h"
 
+extern bool gOnlineFourMachineFriendLobby;
+
 class NetworkUpdateTask : public nlTask
 {
 public:

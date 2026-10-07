@@ -3,6 +3,12 @@
 
 #include "types.h"
 
+extern const char* gLastTweakCategory;
+
+void SplitTweakPath(const char* path, const char** leafName, char* directory);
+void JoinTweakPath(const char* parentPath, const char* childPath, char* buffer);
+int IsTweakNameOnStack(const char* name);
+
 class TweakValueBase
 {
 public:

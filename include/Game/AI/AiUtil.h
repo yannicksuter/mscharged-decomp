@@ -3,7 +3,7 @@
 
 #include "NL/nlMath.h"
 
-char** GetPowerupNamesArray();
+char** GetSurfaceNamesArray();
 char* GetPowerupName(int powerup, bool useSpecificName);
 void MakeRandomDirection2D(nlVector3& direction, float length);
 void SortToMinOrMaxTotalSum(unsigned int* result, float (*data)[4], bool findMin);

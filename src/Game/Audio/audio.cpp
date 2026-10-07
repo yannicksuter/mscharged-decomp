@@ -2,6 +2,8 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioGlobals.h"
+#include "Game/Audio/Plat3dSoundSrc.h"
+#include "Game/Audio/AudioEffects.h"
 #include "Game/Sys/audio.h"
 #include "Game/Sys/debug.h"
 

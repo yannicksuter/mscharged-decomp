@@ -77,10 +77,8 @@ void Plat3dSoundSrc::Update(PlatAudioListener* listener, float deltaTime)
     nlVec3Sub(relativeVelocity, m_Velocity, listener->m_Velocity);
     float relativeSpeed = nlVec3Length(relativeVelocity);
     g_RelVel = relativeSpeed;
-    // R4QE01 compares the speed read back from g_RelVel (rounded to single
-    // precision, while the division below uses the unrounded value) and keeps
-    // that read in a variable of its own; only a local reproduces its register
-    // allocation. The original spelling is not recoverable.
+    // Compare the speed rounded to single precision, while the pitch
+    // calculation uses the value returned by the length calculation.
     float relVel = g_RelVel;
     if (relVel != 0.0f)
     {

@@ -604,7 +604,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerPress(unsigned int index, void* co
         GameInfoManager::Instance()->SetPlayingSide(i, mPlayerSides[i]);
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
-    mDraftMessage.mUnidentified0A = 0;
+    mDraftMessage.mChooseSides = 0;
     for (int i = 0; i < 4; ++i)
     {
         if (mPlayerSides[i] != -1)

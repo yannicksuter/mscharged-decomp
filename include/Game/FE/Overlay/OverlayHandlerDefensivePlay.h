@@ -8,6 +8,13 @@ class cPlayer;
 class DefensivePlayOverlay : public BaseOverlayHandler
 {
 public:
+    enum CountdownSpeed
+    {
+        COUNTDOWN_NORMAL = 0,
+        COUNTDOWN_FAST = 1,
+        COUNTDOWN_FASTEST = 2,
+    };
+
     DefensivePlayOverlay();
     virtual ~DefensivePlayOverlay();
     virtual void Update(float fDeltaT);

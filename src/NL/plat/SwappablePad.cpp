@@ -23,39 +23,39 @@ SwappablePadChangedEvent gSwappablePadChanged;
 bool UpdatePadBackend(PadBackend* pad)
 {
     int type = g_pPlatPadManager->type[pad->m_padIndex];
-    if ((type == 1 && !gEnableWiiRemotePad)
-        || (type == 2 && !gEnableWiiFreestylePad)
-        || (type == 3 && !gEnableWiiClassicPad))
+    if ((type == PLAT_PAD_REMOTE && !gEnableWiiRemotePad)
+        || (type == PLAT_PAD_FREESTYLE && !gEnableWiiFreestylePad)
+        || (type == PLAT_PAD_CLASSIC && !gEnableWiiClassicPad))
     {
-        type = 0;
+        type = PLAT_PAD_NONE;
     }
 
     int oldType;
     int classID = pad->GetClassID();
     if (classID == gWiiRemotePadClassID)
     {
-        oldType = 1;
+        oldType = PLAT_PAD_REMOTE;
     }
     else
     {
         classID = pad->GetClassID();
         if (classID == gWiiFreestylePadClassID)
         {
-            oldType = 2;
+            oldType = PLAT_PAD_FREESTYLE;
         }
         else
         {
             classID = pad->GetClassID();
             if (classID == gWiiClassicPadClassID)
             {
-                oldType = 3;
+                oldType = PLAT_PAD_CLASSIC;
             }
             else
             {
                 classID = pad->GetClassID();
                 if (classID == gPlatPadClassID)
                 {
-                    oldType = 0;
+                    oldType = PLAT_PAD_NONE;
                 }
             }
         }
@@ -69,16 +69,16 @@ bool UpdatePadBackend(PadBackend* pad)
         PadBackend* backend = 0;
         switch (type)
         {
-        case 1:
+        case PLAT_PAD_REMOTE:
             backend = new WiiRemotePad(pad->m_padIndex);
             break;
-        case 2:
+        case PLAT_PAD_FREESTYLE:
             backend = new WiiFreestylePad(pad->m_padIndex);
             break;
-        case 3:
+        case PLAT_PAD_CLASSIC:
             backend = new WiiClassicPad(pad->m_padIndex);
             break;
-        case 0:
+        case PLAT_PAD_NONE:
             backend = new cPlatPad(pad->m_padIndex);
             break;
         }

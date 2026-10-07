@@ -13,7 +13,7 @@ public:
     }
 
     virtual void DoFunctionCall(unsigned int func);
-    virtual void TriggerFired(cSAnim* arg0, unsigned long triggerId);
+    virtual void TriggerFired(cSAnim* animation, unsigned long triggerId);
 
     /* 0xC4 */ bool m_FireTriggers;
 }; // total size: 0xC8

@@ -2,7 +2,7 @@
 #include "Game/Audio/AudioEffect.h"
 
 AudioEffectBase::AudioEffectBase(const char*)
-    : m_Enabled(false)
+    : m_Finished(false)
     , m_Parameters()
     , m_CurrentParameter(0)
     , m_ResultParameter(0)

@@ -3,6 +3,13 @@
 
 #include "Game/Camera/CameraMan.h"
 
+enum FEWorldLoadState
+{
+    FE_WORLD_LOADING_DATA = 1,
+    FE_WORLD_LOADING_RESOURCES = 2,
+    FE_WORLD_LOADING_EFFECTS = 3,
+};
+
 extern int gFEWorldLoadState;
 
 void BeginLoadFEWorld();

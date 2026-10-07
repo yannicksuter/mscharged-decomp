@@ -11,6 +11,7 @@
 #include "Game/NetTournManager.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkMessages.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/FriendManager.h"
 #include "Game/main.h"
@@ -23,7 +24,6 @@
 u8 lbl_806E1008;
 bool gOnlineFourMachineFriendLobby;
 
-void RegisterNetworkMessages_801258A8();
 void NetworkUpdateTask::Initialize()
 {
     SocketNetworkInitializeMemory();
@@ -31,7 +31,7 @@ void NetworkUpdateTask::Initialize()
     InitializeNetworkSyncState();
     InitializeNetworkInputRecording();
     InitializeNetworkMessageRegistry();
-    RegisterNetworkMessages_801258A8();
+    RegisterNetworkMessageFactories();
     InitializeInputManager();
 
     InputFrameProvider* handler = GetFixedUpdateTask();

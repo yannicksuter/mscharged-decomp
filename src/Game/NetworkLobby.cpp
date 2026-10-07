@@ -10,6 +10,7 @@
 #include "Game/GameInfo.h"
 #include "Game/main.h"
 #include "Game/NetworkSession.h"
+#include "Game/Task/NetworkUpdateTask.h"
 #include "Game/NetworkDebug.h"
 #include "Game/Sys/debug.h"
 

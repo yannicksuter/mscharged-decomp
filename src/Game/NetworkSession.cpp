@@ -326,11 +326,11 @@ void NetworkSession::SendGameStartToEveryone()
 }
 
 void NetworkSession::SendDraftToEveryone(
-    int count, NetworkDraftMachineInfo* entries, bool unused, bool flag)
+    int count, NetworkDraftMachineInfo* entries, bool unused, bool chooseSides)
 {
     NetMessageDraft message;
     message.mMachineCount = count;
-    message.mUnidentified0A = flag;
+    message.mChooseSides = chooseSides;
 
     for (int entry = 0; entry < count; ++entry)
     {
@@ -1770,7 +1770,7 @@ int NetworkSession::ProcessMessage(
         break;
 
     case 0x15:
-        if (((NetMessageDraft*)message)->mUnidentified0A != 0)
+        if (((NetMessageDraft*)message)->mChooseSides != 0)
         {
             SHOnlineFriendsChooseSides* scene = (SHOnlineFriendsChooseSides*)
                 GameSceneManager::Instance()->Push((SceneList)0x38, SCREEN_FORWARD, true);

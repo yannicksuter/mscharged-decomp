@@ -9,7 +9,7 @@ class TweakNameAllocator
 {
 public:
     virtual void* Allocate();
-    virtual void UnidentifiedVirtual0C(void* ptr);
+    virtual void Free(void* ptr);
 };
 
 class TweakNameTable : public PointerEntryTable
@@ -41,7 +41,7 @@ void* TweakNameAllocator::Allocate()
     return nlMalloc(0x10, 8, false);
 }
 
-void TweakNameAllocator::UnidentifiedVirtual0C(void* ptr)
+void TweakNameAllocator::Free(void* ptr)
 {
     nlFree(ptr);
 }

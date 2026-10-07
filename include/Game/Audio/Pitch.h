@@ -1,16 +1,8 @@
 #ifndef GAME_AUDIO_PITCH_H
 #define GAME_AUDIO_PITCH_H
 
-#include "revolution/types.h"
-#include "NL/nlDLListContainer.inl"
-#include "Game/Audio/AudioSource.h"
-#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/AudioEffect.h"
-#include "Game/Audio/AudioConfig.h"
-#include "Game/UnidentifiedStaticStorage.h"
-#include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
-#include "NL/nlString.h"
 
 class PitchParameter : public AudioEffectParameter
 {
@@ -43,8 +35,9 @@ public:
     {
         m_CurrentParameter = &m_Initial;
         m_ResultParameter = &m_Final;
-        m_Initial.m_Semitones = 1.0f;
+        m_Initial.m_Semitones = 0.0f;
     }
+
     virtual void CreateParameter(unsigned int definition, const void* context,
         bool negate, AudioEffectParameter** output);
     virtual void BeginBlend();

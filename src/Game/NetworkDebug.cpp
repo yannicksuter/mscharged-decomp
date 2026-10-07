@@ -1,5 +1,4 @@
 #include "Game/NetworkDebug.h"
-#include "Game/OnlinePlayer.h"
 #include <RVLFaceLib/RFL_Types.h>
 
 #include "Game/NetworkSession.h"

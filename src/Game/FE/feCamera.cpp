@@ -14,7 +14,7 @@ void BeginLoadFEWorld()
 {
     if (FEModelManager::Instance() == 0)
         FEModelManager::s_pInstance = new (8, false) FEModelManager;
-    gFEWorldLoadState = 1;
+    gFEWorldLoadState = FE_WORLD_LOADING_DATA;
     AllocatorStack[AllocatorStackDepth++] = &VirtualAllocator;
     CurrentAllocator = &VirtualAllocator;
     BeginLoadStadium("art/fe/environments/main", true);
@@ -26,20 +26,20 @@ void BeginLoadFEWorld()
 
 bool FinishLoadFEWorld()
 {
-    if (gFEWorldLoadState == 1)
+    if (gFEWorldLoadState == FE_WORLD_LOADING_DATA)
     {
         if (IsStadiumResourceDataLoaded())
         {
-            gFEWorldLoadState = 2;
+            gFEWorldLoadState = FE_WORLD_LOADING_RESOURCES;
             BeginLoadStadiumTemporaryResources();
         }
         return false;
     }
-    else if (gFEWorldLoadState == 2)
+    else if (gFEWorldLoadState == FE_WORLD_LOADING_RESOURCES)
     {
         if (FinishLoadStadiumResources())
         {
-            gFEWorldLoadState = 3;
+            gFEWorldLoadState = FE_WORLD_LOADING_EFFECTS;
             BeginLoadStadiumEffects();
         }
         return false;

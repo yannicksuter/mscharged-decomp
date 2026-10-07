@@ -6,7 +6,7 @@
 #include "Game/Render/RenderShadow.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-u8 lbl_806DCBE8 = 1;
+u8 gHammerShadowEnabled = 1;
 
 DrawableHammer::DrawableHammer()
 {
@@ -78,7 +78,7 @@ void DrawableHammer::Render(const HammerObject* object) const
     drawable->SetWorldMatrix(matrix);
     drawable->Draw();
 
-    if (lbl_806DCBE8 != 0)
+    if (gHammerShadowEnabled != 0)
     {
         nlMatrix4* source;
         glModel* model;

@@ -16,8 +16,8 @@ public:
     virtual const char* GetName();
 };
 
-static UserEffectFactory* gUserEffectTypes[3];
-static int gnUserEffectTypes;
+static UserEffectFactory* sUserEffectFactories[3];
+static int sNumUserEffectFactories;
 
 bool EffectsGroup::IsPersistent() const
 {
@@ -78,16 +78,16 @@ void EffectsGroup::ParseUserSpecs()
         char* token = parser.NextToken(true);
 
         int i;
-        for (i = 0; i < gnUserEffectTypes; ++i)
+        for (i = 0; i < sNumUserEffectFactories; ++i)
         {
-            if (nlStrCmp<char>(gUserEffectTypes[i]->GetName(), token) == 0)
+            if (nlStrCmp<char>(sUserEffectFactories[i]->GetName(), token) == 0)
             {
-                m_userSpecsPtr[specIndex] = gUserEffectTypes[i]->ParseSpec(&parser);
+                m_userSpecsPtr[specIndex] = sUserEffectFactories[i]->ParseSpec(&parser);
                 break;
             }
         }
 
-        if (i == gnUserEffectTypes)
+        if (i == sNumUserEffectFactories)
         {
             EmissionManager::Instance()->AddError("Unknown usereffect used: '%s' (in effect '%s')\n",
                 token, nlLookupDebugString(g_pDebugStringTable, m_hashID));

@@ -1,4 +1,14 @@
+#include "NL/nlDLListContainer.inl"
+#include "Game/Audio/AudioConfig.h"
+#include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/CategoryVolume.h"
+#include "NL/nlAlgorithm.h"
+#include "NL/nlMemory.h"
+#include "NL/nlString.h"
+#include "types.h"
+#include "Game/Audio/RegistryPools.h"
+#include "Game/UnidentifiedStaticStorage.h"
 
 struct CategoryEntry
 {

@@ -33,7 +33,6 @@ public:
     static bool s_checkCardRemoved;
 };
 
-
-void fn_8011BD0C();
+void OnPowerButtonPressed();
 
 #endif // GAME_RESET_TASK_H

@@ -1,4 +1,12 @@
+#include "revolution/types.h"
+#include "NL/nlDLListContainer.inl"
+#include "Game/Audio/AudioSource.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/Pitch.h"
+#include "Game/Audio/AudioConfig.h"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "NL/nlMath.h"
+#include "NL/nlString.h"
 
 static float sPitchSemitones = 1.0f;
 
@@ -66,7 +74,7 @@ void Pitch::BlendParameter(AudioEffectParameter* destination,
 void Pitch::EndBlend()
 {
     if (m_Parameters.m_Head == 0 && nlNear(m_Initial.m_Semitones, 0.0f))
-        m_Enabled = true;
+        m_Finished = true;
 }
 
 void Pitch::ApplyToSound(void* handle)

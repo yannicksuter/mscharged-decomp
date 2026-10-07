@@ -70,14 +70,14 @@ void DrawableDaisyFist::Render(const DaisyFistObject* object) const
     matrix.m44 = 1.0f;
 
     World* pWorld = drawable->m_pWorldContext;
-    GLView* oldView68 = pWorld->m_pOpaqueView;
-    GLView* oldView6C = pWorld->m_pAlphaView;
+    GLView* oldOpaqueView = pWorld->m_pOpaqueView;
+    GLView* oldAlphaView = pWorld->m_pAlphaView;
     pWorld->m_pOpaqueView = GetLayerView(eCLV_ElectricFence);
     pWorld->m_pAlphaView = pWorld->m_pOpaqueView;
     drawable->SetWorldMatrix(matrix);
     drawable->Draw();
-    pWorld->m_pOpaqueView = oldView68;
-    pWorld->m_pAlphaView = oldView6C;
+    pWorld->m_pOpaqueView = oldOpaqueView;
+    pWorld->m_pAlphaView = oldAlphaView;
 }
 
 void DrawableDaisyFist::Blend(const float* factors,
