@@ -20,6 +20,14 @@ public:
         ST_STRIKER_CUP = 1,
     };
 
+    enum ScenePhase
+    {
+        PHASE_ENTERING = 0,
+        PHASE_CHOOSING = 1,
+        PHASE_EXITING_FORWARD = 2,
+        PHASE_EXITING_BACK = 3,
+    };
+
     ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement movement);
     virtual ~ChooseCaptainsSceneV2();
     virtual void Update(float dt);
@@ -29,7 +37,7 @@ public:
     void LoadCaptainTextures();
     void RefreshCaptainImages();
     void OnCaptainPointerPress(int index, void* context);
-    void UpdateDraftTimer(int value);
+    void UpdateDraftTimer(int countdown);
     void OnCaptainPointerInside(int index, void* context);
     void OnCaptainPointerEnter(int index, void* context);
     void OnCaptainPointerLeave(int index, void* context);
@@ -94,7 +102,7 @@ public:
     /* 0x136C */ unsigned short mTimerText[8];
     /* 0x137C */ bool mDraftExitDone;
     /* 0x137D */ u8 mPadding137D[3];
-    /* 0x1380 */ int mState;
+    /* 0x1380 */ int mScenePhase;
 }; // size 0x1384
 
 bool IsLocalDraftPad(int pad);

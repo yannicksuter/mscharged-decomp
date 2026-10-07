@@ -48,9 +48,10 @@ extern "C"
     extern const nlVector3 gThwompHiddenPosition = { 0.0f, 0.0f, -100.0f };
     extern const nlVector3 gWindDebrisZeroVelocity = { 0.0f, 0.0f, 0.0f };
     extern const nlVector3 gWindDebrisHiddenPosition = { 0.0f, 0.0f, -10.0f };
-    extern const nlVector3 gYoshiEggZeroDisplacement = { 0.0f, 0.0f, 0.0f };
-    extern const nlVector3 gYoshiEggHiddenPosition = { 0.0f, -20.0f, -20.0f };
 }
+
+extern const nlVector3 gYoshiEggZeroDisplacement = { 0.0f, 0.0f, 0.0f };
+extern const nlVector3 gYoshiEggHiddenPosition = { 0.0f, -20.0f, -20.0f };
 
 static inline void ApplyTexture(ThwompObject* object,
     unsigned long texture, unsigned long resolvedTexture)

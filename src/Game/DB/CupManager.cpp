@@ -1343,9 +1343,9 @@ void AppendCupHistoryRecord(CupHistory* history, int index, OSCalendarTime* date
         records.mCurrentRecord.mValues[0] - records.mSavedRecord.mValues[0],
         records.mCurrentRecord.mValues[1] - records.mSavedRecord.mValues[1],
         records.mCurrentRecord.mValues[2] - records.mSavedRecord.mValues[2]);
-    history->mRecords[index][history->mWriteIndex[index]].mUnidentified2B = difference.mValues[0];
-    history->mRecords[index][history->mWriteIndex[index]].mUnidentified32 = difference.mValues[1];
-    history->mRecords[index][history->mWriteIndex[index]].mUnidentified39 = difference.mValues[2];
+    history->mRecords[index][history->mWriteIndex[index]].mWins = difference.mValues[0];
+    history->mRecords[index][history->mWriteIndex[index]].mLosses = difference.mValues[1];
+    history->mRecords[index][history->mWriteIndex[index]].mOvertimeLosses = difference.mValues[2];
     switch (index)
     {
     case 4:

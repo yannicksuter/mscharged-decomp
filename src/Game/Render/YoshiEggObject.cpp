@@ -1,6 +1,7 @@
 #include "NL/nlDLListContainer.inl"
 #include <math.h>
 #include "Game/Render/YoshiEggObject.h"
+#include "Game/Render/ThwompObject.h"
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
@@ -18,15 +19,10 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C"
-{
-    extern const nlVector3 gYoshiEggZeroDisplacement;
-    extern const nlVector3 gYoshiEggHiddenPosition;
-    float gYoshiEggRollScale = 1.0f;
-    float gYoshiEggStartRadius = 0.5f;
-    float gYoshiEggExpandedRadius = 1.4f;
-    float gYoshiEggHeightOffset;
-}
+float gYoshiEggRollScale = 1.0f;
+float gYoshiEggStartRadius = 0.5f;
+float gYoshiEggExpandedRadius = 1.4f;
+float gYoshiEggHeightOffset;
 
 YoshiEggObject::YoshiEggObject(RenderObject* drawable)
 {

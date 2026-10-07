@@ -11,15 +11,15 @@
 class PhysicsNet
 {
 public:
-    NetMesh* fn_801949CC() const
+    NetMesh* GetNetMesh() const
     {
         return mpNetMesh;
     }
-    static PhysicsNet* fn_801949D4()
+    static PhysicsNet* GetPositiveXNet()
     {
         return spPhysNetPositiveX;
     }
-    static PhysicsNet* fn_801949DC()
+    static PhysicsNet* GetNegativeXNet()
     {
         return spPhysNetNegativeX;
     }
@@ -61,9 +61,9 @@ public:
     /* 0x34 */ float errorCorrectionDepth;
 }; // size: 0x38
 
-// Ball contact soft_cfm: goal wall set A (IsGoalWallSetA) and the
-// back/top/angled walls (IsAGoalWall). Set B uses sfWallSoftness.
-extern float lbl_806DCAB0;
-extern float lbl_806DCAB4;
+// Ball contact soft_cfm for goal wall set A and the back/top/angled walls.
+// Goal wall set B uses sfWallSoftness.
+extern float gGoalWallSetABallContactSoftness;
+extern float gGoalWallBallContactSoftness;
 
 #endif // GAME_PHYSICS_PHYSICS_NET_H

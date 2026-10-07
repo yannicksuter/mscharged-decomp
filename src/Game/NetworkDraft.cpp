@@ -14,6 +14,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -280,13 +281,37 @@ struct DraftSideCursor
     int mMachineIndex;
 };
 
-static inline void CollectDraftSidePlayers(const NetMessageDraft& message,
+struct DraftSideRow
+{
+    int GetPrimary() const
+    {
+        return (s8)mDraftBytes[offsetof(NetworkDraft, mDraftMessage)
+            + offsetof(NetMessageDraft, mPlayerSides)];
+    }
+
+    int GetGuest() const
+    {
+        return (s8)mDraftBytes[offsetof(NetworkDraft, mDraftMessage)
+            + offsetof(NetMessageDraft, mPlayerSides) + 1];
+    }
+
+    DraftSideRow Next() const
+    {
+        DraftSideRow next = { mDraftBytes + sizeof(((NetworkDraftSides*)0)->mData[0]) };
+        return next;
+    }
+
+    const char* mDraftBytes;
+};
+
+static inline void CollectDraftSidePlayers(const NetworkDraft& draft,
     int sideCounts[2], DraftSidePlayer sidePlayers[2][3])
 {
+    DraftSideRow current = { reinterpret_cast<const char*>(&draft) };
     DraftSideCursor cursor = DraftSideCursor();
-    for (; cursor.GetMachineIndex() < message.mMachineCount; cursor.Advance())
+    for (; cursor.GetMachineIndex() < draft.mDraftMessage.mMachineCount; cursor.Advance())
     {
-        int side = message.mPlayerSides.mData[cursor.GetMachineIndex()][0];
+        int side = current.GetPrimary();
         if (side != -1)
         {
             int count = sideCounts[side]++;
@@ -295,7 +320,7 @@ static inline void CollectDraftSidePlayers(const NetMessageDraft& message,
             player.guest = false;
         }
 
-        side = message.mPlayerSides.mData[cursor.GetMachineIndex()][1];
+        side = current.GetGuest();
         if (side != -1)
         {
             int count = sideCounts[side]++;
@@ -303,6 +328,7 @@ static inline void CollectDraftSidePlayers(const NetMessageDraft& message,
             player.machine = cursor.GetMachineIndex();
             player.guest = true;
         }
+        current = current.Next();
     }
 }
 
@@ -315,7 +341,7 @@ void NetworkDraft::AssignDraftSides()
         for (int player = 0; player < 3; ++player)
             sidePlayers[side][player].Reset();
 
-    CollectDraftSidePlayers(mDraftMessage, sideCounts, sidePlayers);
+    CollectDraftSidePlayers(*this, sideCounts, sidePlayers);
 
     int side = 0;
     if (sideCounts[1] == 1 && sideCounts[0] > 1)

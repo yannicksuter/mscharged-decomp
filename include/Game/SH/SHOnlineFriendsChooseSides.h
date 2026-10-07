@@ -90,7 +90,7 @@ public:
     /* 0x664 */ int mPlayerSides[4];
     /* 0x674 */ nlColour mPlayerColours[4];
     /* 0x684 */ OnlineSidePlayer mOnlinePlayers[4];
-    /* 0x6A4 */ int mPointerInsideCounts[4];
+    /* 0x6A4 */ int mPointerHoverCounts[4];
     /* 0x6B4 */ int mPlayerCount;
     /* 0x6B8 */ int mSidePlayerIndices[2][3];
     /* 0x6D0 */ unsigned short mPlayerNames[4][14];

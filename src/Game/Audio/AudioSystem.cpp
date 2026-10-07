@@ -29,7 +29,7 @@ AudioSystem::AudioSystem()
 {
     m_ResourcePath[0] = '\0';
     g_pAudioSystem = this;
-    m_BundleManager = new (8, false) UnidentifiedAudioBundleManager_802ECD34;
+    m_BundleManager = new (8, false) AudioRpcBundleManager;
     m_Listener = new (8, false) PlatAudioListener;
 }
 
@@ -230,7 +230,7 @@ bool AudioListener::IsEnabled() { return m_Enabled; }
 bool AudioListener::HasTransform() { return m_HasTransform; }
 void AudioListener::SetHasTransform(bool value) { m_HasTransform = value; }
 
-UnidentifiedAudioBundleManager_802ECD34::~UnidentifiedAudioBundleManager_802ECD34()
+AudioRpcBundleManager::~AudioRpcBundleManager()
 {
 }
 

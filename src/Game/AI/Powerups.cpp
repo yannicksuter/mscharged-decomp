@@ -2169,18 +2169,18 @@ void PowerupBase::fn_8009D500()
         m_pPhysicsObject->SetLinearVelocity(velocity);
     }
 
-    u8 bUnidentified = false;
+    u8 allowOutOfBoundsFall = false;
     if (m_pPhysicsObject->GetObjectType() == 0x15)
     {
-        bUnidentified = ((PhysicsBanana*)m_pPhysicsObject)->mUnidentified045[0];
+        allowOutOfBoundsFall = ((PhysicsBanana*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }
     else if (m_pPhysicsObject->GetObjectType() == 0x14)
     {
-        bUnidentified = ((PhysicsShell*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
+        allowOutOfBoundsFall = ((PhysicsShell*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }
 
     float radius = ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
-    if (m_v3Position.z < radius && !bUnidentified)
+    if (m_v3Position.z < radius && !allowOutOfBoundsFall)
     {
         m_v3Position.z = ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
         m_pPhysicsObject->SetPosition(m_v3Position, PhysicsObject::WORLD_COORDINATES);

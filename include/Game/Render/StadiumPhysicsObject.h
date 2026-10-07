@@ -15,7 +15,7 @@ public:
     virtual void ReleaseResources();
     virtual void Initialize(WorldObjectLoadContext* context);
 
-    /* 0x60 */ int mUnidentified060;
+    /* 0x60 */ int mMarkerID;
     /* 0x64 */ unsigned char mUnidentified064[0xC];
 }; // size: 0x70
 

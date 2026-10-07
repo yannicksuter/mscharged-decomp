@@ -8,9 +8,14 @@
 #include "NL/plat/WiiRemotePad.h"
 #include "NL/plat/WiiFreestylePad.h"
 #include "NL/plat/GameCubePad.h"
-#include "Game/NetworkInput.h"
+#include "Game/NetworkPeer.h"
 
-u16 lbl_806DF740 = 0xFFFF;
+static u8 PadPressureToByte(float pressure)
+{
+    return (u8)(255.0f * pressure);
+}
+
+u16 gDetInputDebugType = 0xFFFF;
 int lbl_806E2130;
 
 u8 DetInput::GetConnectionStatus()
@@ -282,9 +287,7 @@ void DetInput::Reset()
     m_aRemapAngle = 0;
 }
 
-#pragma push
-#pragma scheduling off
-void DetInput::CopyState(const DetInput& input)
+void DetInput::CopyState(DetInput& input)
 {
     m_AnalogLeftX = input.m_AnalogLeftX;
     m_AnalogLeftY = input.m_AnalogLeftY;
@@ -315,7 +318,6 @@ void DetInput::CopyState(const DetInput& input)
     m_buttonStateTicks[12] = input.m_buttonStateTicks[12];
     m_aRemapAngle = input.m_aRemapAngle;
 }
-#pragma pop
 
 void DetInput::ReadFromPad(cGlobalPad* pad)
 {
@@ -400,8 +402,8 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
                     gameCube = static_cast<GameCubePad*>(pad->mBackend);
                     PADStatus* status = gameCube->mCurrentStatus;
                     m_ButtonBitfield = status->button;
-                    m_LeftTrigger = (u8)(255.0f * gameCube->GetPressure(0x40, false));
-                    m_RightTrigger = (u8)(255.0f * gameCube->GetPressure(0x20, false));
+                    m_LeftTrigger = PadPressureToByte(gameCube->GetPressure(0x40, false));
+                    m_RightTrigger = PadPressureToByte(gameCube->GetPressure(0x20, false));
                     m_v3RevRemoteAccel.x = 0.0f;
                     m_v3RevRemoteAccel.y = 0.0f;
                     m_v3RevRemoteAccel.z = 0.0f;
@@ -427,8 +429,8 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
                                 m_ButtonBitfield |= button;
                             }
                         }
-                        m_LeftTrigger = (u8)(255.0f * monkey->GetPressure(0x40, false));
-                        m_RightTrigger = (u8)(255.0f * monkey->GetPressure(0x20, false));
+                        m_LeftTrigger = PadPressureToByte(monkey->GetPressure(0x40, false));
+                        m_RightTrigger = PadPressureToByte(monkey->GetPressure(0x20, false));
                         m_v3RevRemoteAccel.x = 0.0f;
                         m_v3RevRemoteAccel.y = 0.0f;
                         m_v3RevRemoteAccel.z = 0.0f;

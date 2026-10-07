@@ -46,10 +46,10 @@ protected:
     void* m_LoadedData;
 };
 
-class UnidentifiedAudioBundleManager_802ECD34 : public AudioBundleManager
+class AudioRpcBundleManager : public AudioBundleManager
 {
 public:
-    UnidentifiedAudioBundleManager_802ECD34()
+    AudioRpcBundleManager()
         : m_Unknown4C(0)
         , m_RpcController(0)
     {
@@ -59,7 +59,7 @@ public:
     virtual void Shutdown();
     virtual void Update(float dt);
     virtual void ParseChunk(nlChunk* chunk);
-    virtual ~UnidentifiedAudioBundleManager_802ECD34();
+    virtual ~AudioRpcBundleManager();
 
 private:
     void* m_Unknown4C;

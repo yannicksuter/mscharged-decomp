@@ -22,8 +22,6 @@
 static char sCueSelectionMessage[] = "XSoundCueHandle::ctor selecting sound %s from cue %s\n";
 SlotPool<XSoundCueHandle> sSoundCueHandlePool(32, 16);
 
-extern "C" AudioSliderSet* fn_802EED88(void*, XSoundCueHandle*);
-
 inline AudioVoiceDefinition* XSoundCueHandle::SelectSound()
 {
     if (definition->useSlider)
@@ -53,7 +51,8 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
         return;
     }
 
-    m_LocalSliders = fn_802EED88(g_pAudioSystem->GetBundleManager()->GetSliderTable(), this);
+    m_LocalSliders = AllocateLocalAudioSliders(
+        (AudioSliderTable*)g_pAudioSystem->GetBundleManager()->GetSliderTable(), this);
     if (GetLocalSliders() == 0)
         DumpAudioMemory();
 

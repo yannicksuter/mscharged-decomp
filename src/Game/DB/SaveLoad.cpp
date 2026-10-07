@@ -1,5 +1,7 @@
 #include "NL/nlSingleton.inl"
 #include "Game/DB/SaveLoad.h"
+#include <revolution/tpl_fwd.h>
+#include <revolution/nand/NANDBanner.h>
 #include "Game/TweakRegistry.h"
 
 #include "Game/GameSceneManager.h"
@@ -28,50 +30,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/BaseGameSceneManager.h"
 #include "NL/nlFunction.inl"
-
-#define NAND_BANNER_SIZE(frames) (0x60A0 + (0x1200 * (frames)))
-#define NAND_BANNER_ICON_SIZE    0x1200
-#define NAND_BANNER_TEXTURE_SIZE 0x6000
-#define NAND_BANNER_SET_ICON_SPEED(banner, frame, speed) \
-    (banner)->iconSpeed = ((banner)->iconSpeed & ~(3 << ((frame) * 2))) | ((speed) << ((frame) * 2))
-
-struct NANDBanner
-{
-    u32 magic;
-    u32 flags;
-    u16 iconSpeed;
-    u8 reserved[0x16];
-    wchar_t title[32];
-    wchar_t subtitle[32];
-    u8 bannerTexture[NAND_BANNER_TEXTURE_SIZE];
-    u8 iconTexture[8][NAND_BANNER_ICON_SIZE];
-};
-
-struct TPLHeader
-{
-    u16 height;
-    u16 width;
-    u32 format;
-    char* data;
-};
-
-struct TPLDescriptor
-{
-    TPLHeader* textureHeader;
-    void* CLUTHeader;
-};
-
-struct TPLPalette
-{
-    u32 versionNumber;
-    u32 numDescriptors;
-    TPLDescriptor* descriptorArray;
-};
-
-extern "C" void TPLBind(TPLPalette* palette);
-
-
-
 
 static const char* SaveFileName = "Strikers2";
 static const char* OnlineSaveFileName = "Online";

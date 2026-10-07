@@ -175,15 +175,15 @@ void RenderSnapshot::Replay(T& frame)
                     _2431,
                     0);
                 gLastReplayBallPosition = mBall.fn_801925BC();
-                mpNetMeshPositiveX->Grab(*PhysicsNet::fn_801949D4()->fn_801949CC());
-                mpNetMeshNegativeX->Grab(*PhysicsNet::fn_801949DC()->fn_801949CC());
+                mpNetMeshPositiveX->Grab(*PhysicsNet::GetPositiveXNet()->GetNetMesh());
+                mpNetMeshNegativeX->Grab(*PhysicsNet::GetNegativeXNet()->GetNetMesh());
             }
             if (((LoadFrame&)frame).fn_801948B0() > 0.0f)
             {
                 if (((LoadFrame&)frame).fn_801948B0() < gfLastAheadOfFrameTime)
                 {
-                    mpNetMeshPositiveX->Grab(*PhysicsNet::fn_801949D4()->fn_801949CC());
-                    mpNetMeshNegativeX->Grab(*PhysicsNet::fn_801949DC()->fn_801949CC());
+                    mpNetMeshPositiveX->Grab(*PhysicsNet::GetPositiveXNet()->GetNetMesh());
+                    mpNetMeshNegativeX->Grab(*PhysicsNet::GetNegativeXNet()->GetNetMesh());
                     gbNetMeshReplayResync = true;
                 }
                 gfLastAheadOfFrameTime = ((LoadFrame&)frame).fn_801948B0();

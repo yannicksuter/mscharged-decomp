@@ -14,7 +14,7 @@
 
 static inline AudioRpcController* GetAudioRpcController()
 {
-    return static_cast<UnidentifiedAudioBundleManager_802ECD34*>(
+    return static_cast<AudioRpcBundleManager*>(
         GetAudioBundleManager())->m_RpcController;
 }
 

@@ -1,6 +1,7 @@
 #ifndef RVL_SDK_GX_TYPES_H
 #define RVL_SDK_GX_TYPES_H
 #include <revolution/types.h>
+#include <revolution/gx/GXTextureTypes.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -722,14 +723,7 @@ typedef enum _GXTexCoordID {
     GX_TEXCOORD_NULL = 255
 } GXTexCoordID;
 
-typedef enum _GXTexFilter {
-    GX_NEAR,
-    GX_LINEAR,
-    GX_NEAR_MIP_NEAR,
-    GX_LIN_MIP_NEAR,
-    GX_NEAR_MIP_LIN,
-    GX_LIN_MIP_LIN,
-} GXTexFilter;
+
 
 typedef enum _GXTexFmt {
     GX_TF_I4,
@@ -967,13 +961,7 @@ typedef enum _GXPerf1 {
     GX_PERF1_NONE
 } GXPerf1;
 
-typedef enum _GXTexWrapMode {
-    GX_CLAMP,
-    GX_REPEAT,
-    GX_MIRROR,
 
-    GX_MAX_TEXWRAPMODE
-} GXTexWrapMode;
 
 typedef enum _GXTlut {
     GX_TLUT0,
@@ -1003,13 +991,7 @@ typedef enum _GXTlut {
     GX_MAX_TLUT_ALL = GX_MAX_TLUT + GX_MAX_BIGTLUT,
 } GXTlut;
 
-typedef enum _GXTlutFmt {
-    GX_TL_IA8,
-    GX_TL_RGB565,
-    GX_TL_RGB5A3,
 
-    GX_MAX_TLUTFMT
-} GXTlutFmt;
 
 typedef enum _GXTlutSize {
     GX_TLUT_16 = 1,

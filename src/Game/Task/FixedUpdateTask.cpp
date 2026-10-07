@@ -136,7 +136,7 @@ u32 FixedUpdateTask::CalculateChecksum()
 
 inline void RegisterDetInputDebugFields(DebugWriteCache* cache, DetInput* pad)
 {
-    lbl_806DF740 = cache->BeginType("DetInput");
+    gDetInputDebugType = cache->BeginType("DetInput");
     cache->AddField(17, gDebugFieldTypes[17].size, 0, "m_AnalogLeftX");
     cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogLeftY), "m_AnalogLeftY");
     cache->AddField(17, gDebugFieldTypes[17].size, PAD_FIELD_OFFSET(pad, m_AnalogRightX), "m_AnalogRightX");
@@ -184,18 +184,18 @@ u32 FixedUpdateTask::WriteSyncLog()
         for (int controllerIndex = 0; controllerIndex < numControllers; controllerIndex++)
         {
             DetInput* pad = (group->GetNetworkPeerChannel(controllerIndex))->GetNetworkPeerChannelInput();
-            if (lbl_806DF740 == 0xFFFF)
+            if (gDetInputDebugType == 0xFFFF)
             {
                 RegisterDetInputDebugFields(cache, pad);
             }
 
             DetInput* copy =
-                (DetInput*)cache->WriteData(lbl_806DF740, pad, sizeof(DetInput));
+                (DetInput*)cache->WriteData(gDetInputDebugType, pad, sizeof(DetInput));
             if (copy != 0)
             {
                 copy->m_pPrevInput = 0;
                 copy->m_pMyUser = (void*)pad->GetPadID();
-                cache->ChecksumData(lbl_806DF740, copy, &checksum);
+                cache->ChecksumData(gDetInputDebugType, copy, &checksum);
             }
         }
     }

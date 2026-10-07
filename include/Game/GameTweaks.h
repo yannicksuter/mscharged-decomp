@@ -15,7 +15,6 @@ public:
     void RegisterTweaks(bool registerTweaks);
     void fn_800756B4();
 
-public:
     /* 0x044 */ TweakFloatBinding fGameDuration;
     /* 0x054 */ TweakFloatBinding fFielderAttributeWeight;
     /* 0x064 */ TweakFloatBinding vGetInPositionKeyFielderDistX;
@@ -188,7 +187,6 @@ struct GameTweaksManager
         mSkillTweaks[1] = 0;
     }
 
-public:
     /* 0x00 */ u32 mTerrainType;
 
     /* 0x04 */ TerrainTweaks* mTerrainTweaks;
@@ -200,7 +198,6 @@ public:
     /* 0x10 */ GameTweaks* m_pGameTweaks;
     /* 0x14 */ FielderTweaks* mFielderTweaks;
 
-public:
     /* 0x18 */ SkillTweaks* mSkillTweaks[2];
 }; // total size: 0x20
 

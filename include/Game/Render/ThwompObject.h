@@ -64,4 +64,7 @@ struct ThwompObject
     /* 0x64 */ unsigned long mTexture1Index;
 }; // size: 0x68
 
+extern const nlVector3 gYoshiEggZeroDisplacement;
+extern const nlVector3 gYoshiEggHiddenPosition;
+
 #endif // GAME_RENDER_THWOMP_OBJECT_H

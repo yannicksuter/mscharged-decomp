@@ -12,14 +12,14 @@
 #include "NL/nlSlotPool.h"
 #include "Game/Audio/SoundInstancePool.h"
 
-bool UnidentifiedAudioBundleManager_802ECD34::Initialize()
+bool AudioRpcBundleManager::Initialize()
 {
     if (AudioBundleManager::Initialize())
         m_Initialized = true;
     return m_Initialized;
 }
 
-void UnidentifiedAudioBundleManager_802ECD34::Shutdown()
+void AudioRpcBundleManager::Shutdown()
 {
     fn_802B467C(&sSoundCueHandlePool);
     SlotPoolBase::BaseFreeBlocks(&sSoundCueHandlePool, 0x40);
@@ -43,7 +43,7 @@ void UnidentifiedAudioBundleManager_802ECD34::Shutdown()
     m_Backend->Shutdown();
 }
 
-void UnidentifiedAudioBundleManager_802ECD34::ParseChunk(nlChunk* chunk)
+void AudioRpcBundleManager::ParseChunk(nlChunk* chunk)
 {
     switch (chunk->GetID())
     {
@@ -56,7 +56,7 @@ void UnidentifiedAudioBundleManager_802ECD34::ParseChunk(nlChunk* chunk)
     }
 }
 
-void UnidentifiedAudioBundleManager_802ECD34::Update(float dt)
+void AudioRpcBundleManager::Update(float dt)
 {
     if (IsLoaded())
     {

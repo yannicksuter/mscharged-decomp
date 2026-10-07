@@ -6,8 +6,6 @@
 
 class cGlobalPad;
 
-extern int lbl_806E2130;
-
 class DetInput
 {
 public:
@@ -34,7 +32,7 @@ public:
     void UpdateButtonStateTicks();
     int GetButtonStateTicks(int button, bool remap);
     void ResetButtonStateTicks(int button, bool remap);
-    void CopyState(const DetInput& input);
+    void CopyState(DetInput& input);
     void ReadFromPad(cGlobalPad* pad);
     int GetPadID() const;
 
@@ -61,7 +59,7 @@ public:
     /* 0x88 */ u16 m_aRemapAngle;
 }; // size: 0x8C
 
-
-extern u16 lbl_806DF740;
+extern u16 gDetInputDebugType;
+extern int lbl_806E2130;
 
 #endif // GAME_DET_INPUT_H

@@ -7,6 +7,7 @@
 
 class nlChunk;
 class XSoundHandle;
+class XSoundCueHandle;
 
 struct AudioSliderDefinition
 {
@@ -88,7 +89,8 @@ struct AudioSliderTable
 };
 
 AudioSliderTable* ParseAudioSliderTable(nlChunk* chunk);
-extern "C" AudioSlider* GetAudioSlider(
-    AudioSliderTable* table, u32 index, XSoundHandle* owner);
+AudioSlider* GetAudioSlider(
+    AudioSliderTable* table, unsigned long index, XSoundHandle* owner);
+AudioSliderSet* AllocateLocalAudioSliders(AudioSliderTable* table, XSoundCueHandle* owner);
 
 #endif // GAME_AUDIO_AUDIO_SLIDER_H

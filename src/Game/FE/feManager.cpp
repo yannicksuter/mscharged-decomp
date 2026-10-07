@@ -3,6 +3,7 @@
 #include "NL/plat/PlatPadManager.h"
 #include "Game/HBMManager.h"
 #include "Game/FE/feManager.h"
+#include "Game/RenderSnapshot_fwd.h"
 #include "Game/Sys/debug.h"
 
 #include <math.h>
@@ -37,7 +38,6 @@
 #include "NL/nlFunction.h"
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
-#include "NL/plat/PlatPadManager.h"
 #include "Game/RumbleActions.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
@@ -47,12 +47,6 @@
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
 
-extern "C"
-{
-
-    extern float g_AllActorsHidden;
-}
-
 cAnimCamera* FrontEnd::m_pPauseMenuCamera = 0;
 bool FrontEnd::m_bGameOver = false;
 bool FrontEnd::m_bInPauseMenuState = false;
@@ -60,8 +54,8 @@ float FrontEnd::m_fDemoTimeElapsed = 0.0f;
 unsigned char FrontEnd::m_ctrlConnectedState[4];
 float FrontEnd::m_pauseDelay = 0.0f;
 
-static unsigned char AlreadyStartedStrikers101Menu;
-unsigned char g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause;
+static unsigned char sInitialModePauseMenuShown;
+unsigned char gSkipPresentationResetOnReturnToGame;
 
 eFEState FrontEnd::m_feStateCurrent = eFE_INVALID;
 eFEState FrontEnd::m_feStatePending = eFE_INVALID;
@@ -70,7 +64,7 @@ unsigned int FrontEnd::m_lastTaskState = -1;
 eFEINPUT_PAD FrontEnd::m_hitStartPad = FE_ALL_PADS;
 FrontEnd::MenuEnterType FrontEnd::m_menuType = MET_INVALID;
 
-static unsigned char DontCheckForControllerRemovalHack = 1;
+static unsigned char sControllerRemovalChecksSuppressed = 1;
 
 bool FrontEnd::Initialize()
 {
@@ -95,8 +89,8 @@ void FrontEnd::Reset()
     m_bInPauseMenuState = false;
     m_fDemoTimeElapsed = 0.0f;
     m_pauseDelay = 0.25f;
-    AlreadyStartedStrikers101Menu = 0;
-    DontCheckForControllerRemovalHack = 0;
+    sInitialModePauseMenuShown = 0;
+    sControllerRemovalChecksSuppressed = 0;
 
     UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(OnGetReadyForKickoff), 0, -1);
 
@@ -123,7 +117,7 @@ void FrontEnd::EnterStartScreen(bool bStraightToKickoff)
     {
         isInStrikers101 = true;
     }
-    AlreadyStartedStrikers101Menu = 0;
+    sInitialModePauseMenuShown = 0;
     g_pGame->BeginGame(false, isInStrikers101);
     m_feStatePending = eFE_WAIT_FOR_LOAD;
 }
@@ -138,9 +132,9 @@ void FrontEnd::ExitWinnerScreen()
     {
         g_AllActorsHidden = 0.5f;
     }
-    g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause
+    gSkipPresentationResetOnReturnToGame
         = 1;
-    DontCheckForControllerRemovalHack = 0;
+    sControllerRemovalChecksSuppressed = 0;
     nlTaskManager::SetNextState(2);
 }
 
@@ -185,7 +179,7 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
             g_pOverlayManager->Push((SceneList)0x54, SCREEN_NOTHING, false);
         }
         else if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-                 && !AlreadyStartedStrikers101Menu)
+                 && !sInitialModePauseMenuShown)
         {
             g_pOverlayManager->Push((SceneList)0x67, SCREEN_FORWARD, false);
         }
@@ -207,7 +201,7 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
     {
         ePopupMenu popupType;
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
-            (SceneList)0xA, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
 
         switch (m_menuType)
         {
@@ -302,7 +296,7 @@ void FrontEnd::Update(float fTimeDelta)
         g_pBall->m_bVisible = true;
         if ((nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode
                 || nlSingleton<GameInfoManager>::Instance()->IsInMode4())
-            && !AlreadyStartedStrikers101Menu)
+            && !sInitialModePauseMenuShown)
         {
             bool bPauseDelayElapsed = m_pauseDelay <= 0.0f;
             if (bPauseDelayElapsed)
@@ -310,7 +304,7 @@ void FrontEnd::Update(float fTimeDelta)
                 EnterMenuState(MET_PAUSE);
                 m_lastTaskState = 2;
                 m_feStatePrevious = eFE_INGAME;
-                AlreadyStartedStrikers101Menu = 1;
+                sInitialModePauseMenuShown = 1;
             }
         }
         else
@@ -480,10 +474,10 @@ void FrontEnd::UpdateForGame(float fDeltaT)
 
     if (DuringEndOfGamePresentation(GetPresentation()))
     {
-        DontCheckForControllerRemovalHack = 1;
+        sControllerRemovalChecksSuppressed = 1;
     }
 
-    if (DontCheckForControllerRemovalHack)
+    if (sControllerRemovalChecksSuppressed)
     {
         return;
     }
@@ -526,7 +520,7 @@ void FrontEnd::UpdateForGame(float fDeltaT)
     }
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && !AlreadyStartedStrikers101Menu)
+        && !sInitialModePauseMenuShown)
     {
         return;
     }

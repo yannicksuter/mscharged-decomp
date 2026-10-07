@@ -25,8 +25,6 @@
 #include "math.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-
-
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 PhysicsBanana::PhysicsBanana(float radius)
@@ -36,7 +34,7 @@ PhysicsBanana::PhysicsBanana(float radius)
     m_pCallbackParam = 0;
     m_pPowerupObject = 0;
     m_bIsSupportedByGround = false;
-    mUnidentified045[0] = 0;
+    m_bAllowOutOfBoundsFall = 0;
 
     SetCollide(0x1F062);
     SetCategory(0x2000);
@@ -49,7 +47,7 @@ void PhysicsBanana::PreUpdate()
 
     if (m_pPowerupObject->m_eType == POWER_UP_BANANA)
     {
-        if (!mUnidentified045[0])
+        if (!m_bAllowOutOfBoundsFall)
         {
             nlVector3 linVel = GetLinearVelocity();
             float len = nlSqrt((linVel.x * linVel.x)
@@ -61,9 +59,9 @@ void PhysicsBanana::PreUpdate()
             {
                 if (nlVec3LengthSquared(linVel) > 0.1f)
                 {
-                    float dumping
+                    float damping
                         = -gGameTweaks.m_pGameTweaks->fBananaResistance / len;
-                    nlVec3Scale(linVel, linVel, dumping);
+                    nlVec3Scale(linVel, linVel, damping);
                     AddForceAtCentreOfMass(linVel);
                 }
                 else
@@ -101,7 +99,7 @@ ContactType PhysicsBanana::Contact(
         return ONE_WAY_CONTACT_OTHER;
     }
 
-    if (other->GetObjectType() == 0x12 && !mUnidentified045[0])
+    if (other->GetObjectType() == 0x12 && !m_bAllowOutOfBoundsFall)
     {
         for (int i = 0; i < numContacts; i++)
         {
@@ -281,9 +279,9 @@ ContactType PhysicsBanana::Contact(
         return ONE_WAY_CONTACT_THIS;
     case 0x1C:
     {
-        int value = *(int*)((u8*)other + 0x48);
-        int result = GetPhysicsPatchInfo(value)->mType;
-        if (result == 8 || result == 9)
+        int patchIndex = ((PhysicsPatch*)other)->m_Type;
+        int patchType = GetPhysicsPatchInfo(patchIndex)->mType;
+        if (patchType == 8 || patchType == 9)
         {
             m_pPowerupObject->m_bShouldDestroy = true;
         }
@@ -330,7 +328,7 @@ ContactType PhysicsBanana::Contact(
                 {
                     if (beyondSideline)
                     {
-                        mUnidentified045[0] = true;
+                        m_bAllowOutOfBoundsFall = true;
                     }
                     return NO_CONTACT;
                 }
@@ -342,7 +340,7 @@ ContactType PhysicsBanana::Contact(
 
     nlVector3& linVel = GetLinearVelocity();
     float velSq = nlVec3LengthSquared(linVel);
-    if (hasWallContact && velSq > 1.0f && !mUnidentified045[0])
+    if (hasWallContact && velSq > 1.0f && !m_bAllowOutOfBoundsFall)
     {
         if (other->GetObjectType() == 0x17
             || other->GetObjectType() == 5)
@@ -357,7 +355,7 @@ ContactType PhysicsBanana::Contact(
         }
     }
 
-    if (mUnidentified045[0])
+    if (m_bAllowOutOfBoundsFall)
     {
         return NO_CONTACT;
     }

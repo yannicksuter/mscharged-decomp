@@ -430,7 +430,7 @@ config.libs = [
             Object(NonMatching, "Game/CrowdRiot.cpp"),
             Object(Matching, "Game/DebugWriteCache.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/DetermDataEvent.cpp"),
-            Object(NonMatching, "Game/DetInput.cpp"),
+            Object(Matching, "Game/DetInput.cpp"),
             Object(Matching, "Game/EventDataTypes.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/ExcitementSystem.cpp", cflags=cflags_game, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Field.cpp", extra_cflags=["-ipa file"]),

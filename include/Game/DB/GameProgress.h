@@ -1,5 +1,5 @@
-#ifndef GAME_DB_CUP_MANAGER_H
-#define GAME_DB_CUP_MANAGER_H
+#ifndef GAME_DB_GAME_PROGRESS_H
+#define GAME_DB_GAME_PROGRESS_H
 
 #include "Game/DB/Cup.h"
 #include "Game/DB/CupInterface.h"
@@ -33,11 +33,11 @@ struct CupHistoryRecord
             emptyThrough16 = true;
         if (emptyThrough16 && mGoals == 0)
             emptyThrough20 = true;
-        if (emptyThrough20 && mUnidentified2B == 0)
+        if (emptyThrough20 && mWins == 0)
             emptyThrough2B = true;
-        if (emptyThrough2B && mUnidentified32 == 0)
+        if (emptyThrough2B && mLosses == 0)
             emptyThrough32 = true;
-        if (emptyThrough32 && mUnidentified39 == 0)
+        if (emptyThrough32 && mOvertimeLosses == 0)
             empty = true;
         return empty;
     }
@@ -50,9 +50,9 @@ struct CupHistoryRecord
     unsigned int mMonth : 4;
     unsigned int mYearOffset : 10;
     unsigned int mGoals : 11;
-    unsigned int mUnidentified2B : 7;
-    unsigned int mUnidentified32 : 7;
-    unsigned int mUnidentified39 : 7;
+    unsigned int mWins : 7;
+    unsigned int mLosses : 7;
+    unsigned int mOvertimeLosses : 7;
 };
 
 struct CupRecordCounters
@@ -324,4 +324,4 @@ bool WasWastelandsLockedBeforeGame();
 bool WasDumpLockedBeforeGame();
 bool WasGalacticStadiumLockedBeforeGame();
 
-#endif // GAME_DB_CUP_MANAGER_H
+#endif // GAME_DB_GAME_PROGRESS_H

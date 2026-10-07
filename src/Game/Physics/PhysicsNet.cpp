@@ -27,8 +27,8 @@ static bool sbTestLowerHorizontalGoalpost = false;
 
 bool PhysicsNet::sbSweepTestEnabled = true;
 float PhysicsNet::sfWallSoftness = 0.01f;
-float lbl_806DCAB0 = 0.04f;
-float lbl_806DCAB4 = 0.06f;
+float gGoalWallSetABallContactSoftness = 0.04f;
+float gGoalWallBallContactSoftness = 0.06f;
 
 PhysicsNet::PhysicsNet(CollisionSpace* space, bool positive_x)
 {

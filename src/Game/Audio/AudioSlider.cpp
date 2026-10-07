@@ -1,23 +1,10 @@
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioSlider.h"
+#include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Sys/debug.h"
 #include "NL/nlChunk.h"
 #include "NL/nlDebugString.h"
 #include "types.h"
-
-struct SliderOwnerValue_802EE964
-{
-    u8 pad_00[0x1C];
-    u32 value;
-};
-
-struct SliderOwner_802EE964
-{
-    u8 pad_00[0x20];
-    AudioSliderSet* localSet;
-    u8 pad_24[8];
-    SliderOwnerValue_802EE964* valueSource;
-};
 
 AudioSliderTable* ParseAudioSliderTable(nlChunk* outer)
 {
@@ -37,17 +24,17 @@ AudioSliderTable* ParseAudioSliderTable(nlChunk* outer)
     return table;
 }
 
-extern "C" AudioSlider* GetAudioSlider(
-    AudioSliderTable* table, u32 index, XSoundHandle* owner)
+AudioSlider* GetAudioSlider(
+    AudioSliderTable* table, unsigned long index, XSoundHandle* owner)
 {
     AudioSliderDefinition* definition = table->globalDefinitions + table->localToGlobal[index];
     if (definition->kind == 2)
         return table->globalSliders + definition->index;
-    return ((SliderOwner_802EE964*)owner)->localSet->sliders
+    return owner->m_LocalSliders->sliders
          + definition->index;
 }
 
-extern "C" AudioSliderSet* fn_802EED88(AudioSliderTable* table, SliderOwner_802EE964* owner)
+AudioSliderSet* AllocateLocalAudioSliders(AudioSliderTable* table, XSoundCueHandle* owner)
 {
     AudioSliderSet* set = table->localSets;
     u32 setIndex;
@@ -70,7 +57,7 @@ extern "C" AudioSliderSet* fn_802EED88(AudioSliderTable* table, SliderOwner_802E
     AudioSliderDefinition* definition = table->globalDefinitions + table->localToGlobal[0];
     AudioSlider* slider = set->sliders + definition->index;
     tDebugPrintManager::Print(DC_SOUND, "Slider name: %s\n", nlLookupDebugString(g_pDebugStringTable, (unsigned long)slider->definition->name));
-    slider->SetTarget((float)owner->valueSource->value, 0.0f);
+    slider->SetTarget((float)owner->definition->activeCount, 0.0f);
     slider->Update(0.0f, 1.0f);
     return set;
 }

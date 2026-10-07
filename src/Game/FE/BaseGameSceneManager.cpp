@@ -159,8 +159,8 @@ SceneEntry SceneEntryTable[] = {
     { (SceneList)11, "art/fe/spoils_menu_v2.fen" },
     { (SceneList)12, "art/fe/custom_tournament_options_v2.fen" },
     { (SceneList)13, "art/fe/options_main_menu.fen" },
-    { (SceneList)14, "art/fe/options_audio_options.fen" },
-    { (SceneList)15, "art/fe/options_visual_options.fen" },
+    { SCENE_AUDIO_OPTIONS, "art/fe/options_audio_options.fen" },
+    { SCENE_VISUAL_OPTIONS, "art/fe/options_visual_options.fen" },
     { (SceneList)16, "art/fe/englegal.fen" },
     { SCENE_SUPER_LOADING, "art/fe/loadingscreen.fen" },
     { SCENE_BOOT_LOADING, "art/fe/boot_loading.fen" },
@@ -168,7 +168,7 @@ SceneEntry SceneEntryTable[] = {
     { (SceneList)20, "art/fe/movieplayer.fen" },
     { (SceneList)21, "art/fe/movieplayer.fen" },
     { SCENE_INTRO_MOVIE, "art/fe/movieplayer.fen" },
-    { (SceneList)23, "art/fe/credits.fen" },
+    { SCENE_CREDITS, "art/fe/credits.fen" },
     { (SceneList)24, "art/fe/sms2_network_start.fen" },
     { SCENE_ASYNC_LOADING, "art/fe/asyncloading.fen" },
     { SCENE_WIDESCREEN_LOADING, "art/fe/WIDESCREEN_LOADING_SCREEN.fen" },
@@ -337,10 +337,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case (SceneList)13:
         newHandler = new (nlMalloc(sizeof(OptionsScene), 8, false)) OptionsScene();
         break;
-    case (SceneList)14:
+    case SCENE_AUDIO_OPTIONS:
         newHandler = new (nlMalloc(sizeof(OptionsAudioMenuV2), 8, false)) OptionsAudioMenuV2(0);
         break;
-    case (SceneList)15:
+    case SCENE_VISUAL_OPTIONS:
         newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(0);
         break;
     case (SceneList)16:
@@ -364,7 +364,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_INTRO_MOVIE:
         newHandler = new (nlMalloc(sizeof(IntroMovieScene), 8, false)) IntroMovieScene();
         break;
-    case (SceneList)23:
+    case SCENE_CREDITS:
         newHandler = new (nlMalloc(sizeof(CreditScene), 8, false)) CreditScene();
         break;
     case (SceneList)24:
@@ -560,10 +560,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
         newHandler = new (nlMalloc(sizeof(InGameTextOverlay), 8, false)) InGameTextOverlay();
         break;
     case (SceneList)91:
-        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(0);
+        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(PausePostGameScene::MODE_RESULTS);
         break;
     case (SceneList)92:
-        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(1);
+        newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(PausePostGameScene::MODE_STATISTICS);
         break;
     case (SceneList)93:
         newHandler = new (nlMalloc(sizeof(OnlineRankingOverlay), 8, false)) OnlineRankingOverlay();

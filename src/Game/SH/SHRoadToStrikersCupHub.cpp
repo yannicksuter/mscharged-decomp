@@ -256,28 +256,28 @@ void RoadToStrikersCupHubScene::UpdateCupRecordText(TLTextInstance* text)
 {
     char winsString[4];
     char lossesString[4];
-    char cupsString[4];
+    char overtimeLossesString[4];
     unsigned short winsWideString[4];
     unsigned short lossesWideString[4];
-    unsigned short cupsWideString[4];
+    unsigned short overtimeLossesWideString[4];
     WideString unformatted;
     WideString formatted;
 
     CupRecordCounters& record = g_pCupManager->mCupRecord.mCurrentRecord;
     int wins = record.mValues[0];
     int losses = record.mValues[1];
-    int cups = record.mValues[2];
+    int overtimeLosses = record.mValues[2];
 
     nlSNPrintf(winsString, 4, "%d", wins);
     nlStrToWcs(winsString, winsWideString, 4);
     nlSNPrintf(lossesString, 4, "%d", losses);
     nlStrToWcs(lossesString, lossesWideString, 4);
-    nlSNPrintf(cupsString, 4, "%d", cups);
-    nlStrToWcs(cupsString, cupsWideString, 4);
+    nlSNPrintf(overtimeLossesString, 4, "%d", overtimeLosses);
+    nlStrToWcs(overtimeLossesString, overtimeLossesWideString, 4);
 
     unformatted = WideString(LookupLocString("ROAD_HUB_TEAM_RECORD_STATS"));
     formatted = Format(
-        unformatted, winsWideString, lossesWideString, cupsWideString);
+        unformatted, winsWideString, lossesWideString, overtimeLossesWideString);
 
     memcpy(mCupRecordText, formatted.c_str(), sizeof(mCupRecordText));
     text->SetString(mCupRecordText);

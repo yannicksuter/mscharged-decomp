@@ -1,5 +1,5 @@
-#ifndef _FEMANAGER_H_
-#define _FEMANAGER_H_
+#ifndef GAME_FE_MANAGER_H
+#define GAME_FE_MANAGER_H
 
 #include "Game/FE/feInput.h"
 
@@ -64,6 +64,6 @@ public:
     static unsigned char m_ctrlConnectedState[4];
 };
 
-extern unsigned char g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause;
+extern unsigned char gSkipPresentationResetOnReturnToGame;
 
-#endif // _FEMANAGER_H_
+#endif // GAME_FE_MANAGER_H

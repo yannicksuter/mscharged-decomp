@@ -383,29 +383,29 @@ void SHHallOfFameHistory::UpdateCupRecordText()
         recordText = &TLTextDefault::sInstance;
     }
 
-    char monthString[4];
-    char dayString[4];
-    char yearString[4];
-    unsigned short monthWideString[4];
-    unsigned short dayWideString[4];
-    unsigned short yearWideString[4];
+    char winsString[4];
+    char lossesString[4];
+    char overtimeLossesString[4];
+    unsigned short winsWideString[4];
+    unsigned short lossesWideString[4];
+    unsigned short overtimeLossesWideString[4];
     WideBasicString unformatted;
     WideBasicString formatted;
 
     CupHistoryRecord& record = mHistory[mSelectedHistoryIndex];
-    int month = record.mUnidentified2B;
-    int day = record.mUnidentified32;
-    int year = record.mUnidentified39;
+    int wins = record.mWins;
+    int losses = record.mLosses;
+    int overtimeLosses = record.mOvertimeLosses;
 
-    nlSNPrintf(monthString, 4, "%d", month);
-    nlStrToWcs(monthString, monthWideString, 4);
-    nlSNPrintf(dayString, 4, "%d", day);
-    nlStrToWcs(dayString, dayWideString, 4);
-    nlSNPrintf(yearString, 4, "%d", year);
-    nlStrToWcs(yearString, yearWideString, 4);
+    nlSNPrintf(winsString, 4, "%d", wins);
+    nlStrToWcs(winsString, winsWideString, 4);
+    nlSNPrintf(lossesString, 4, "%d", losses);
+    nlStrToWcs(lossesString, lossesWideString, 4);
+    nlSNPrintf(overtimeLossesString, 4, "%d", overtimeLosses);
+    nlStrToWcs(overtimeLossesString, overtimeLossesWideString, 4);
 
     unformatted = WideBasicString(LookupLocString("ROAD_HUB_TEAM_RECORD_STATS"));
-    formatted = Format(unformatted, monthWideString, dayWideString, yearWideString);
+    formatted = Format(unformatted, winsWideString, lossesWideString, overtimeLossesWideString);
 
     memcpy(mRecordText, formatted.c_str(), sizeof(mRecordText));
     recordText->SetString(mRecordText);

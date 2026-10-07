@@ -106,7 +106,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
             ReplayManager::Instance()->PrepareForRecording();
         }
 
-        if (!g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause)
+        if (!gSkipPresentationResetOnReturnToGame)
         {
             if ((from & 0x18) || (from == 1 && (nlTaskManager::m_pInstance->mPreviousState & 0x18)))
             {
@@ -117,7 +117,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         }
         else
         {
-            g_JaapAndJacksNastyHackBecauseWeDoNotKnowDifferenceBetweenPausePauseAndPostGamePause = false;
+            gSkipPresentationResetOnReturnToGame = false;
         }
     }
 

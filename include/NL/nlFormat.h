@@ -1,6 +1,7 @@
 #ifndef _NLFORMAT_H_
 #define _NLFORMAT_H_
 
+#include "NL/nlFormat_fwd.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlLexicalCast.h"
 

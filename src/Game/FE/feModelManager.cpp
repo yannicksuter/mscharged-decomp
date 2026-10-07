@@ -780,7 +780,7 @@ StadiumFEModelMarker* FEModelManager::GetObject(int id)
     while (iterator.IsValid())
     {
         StadiumFEModelMarker* object = iterator.Current();
-        if (id == object->mUnidentified060)
+        if (id == object->mMarkerID)
         {
             return object;
         }

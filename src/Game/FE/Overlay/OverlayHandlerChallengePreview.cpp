@@ -18,25 +18,20 @@
 #include "NL/nlBasicString.h"
 #include "NL/nlBind.h"
 #include "NL/nlLocalization.h"
+#include "NL/nlFormat_fwd.h"
 #include "NL/nlPrint.h"
 
 #include <string.h>
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
-template <typename StringType, typename T0>
-StringType Format(const StringType& string, const T0& t0);
-
-template <typename StringType, typename T0, typename T1>
-StringType Format(const StringType& string, const T0& t0, const T1& t1);
-
 ChallengePreviewOverlay::ChallengePreviewOverlay(ScreenMovement movement)
     : BaseOverlayHandler(1, POSITION_ALL)
     , mContinueButton()
     , mMovement(movement)
-    , mButtonInitialized(false)
+    , mContinueButtonInitialized(false)
     , mContinuePressed(false)
-    , mState(0)
+    , mScenePhase(PHASE_ENTERING)
 {
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
@@ -53,8 +48,8 @@ void ChallengePreviewOverlay::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    int state = mScenePhase;
+    if (state == PHASE_ENTERING || (unsigned int)(state - PHASE_EXITING) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -66,13 +61,13 @@ void ChallengePreviewOverlay::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == PHASE_ENTERING)
         {
             InitializeContinueButton();
-            mButtonInitialized = true;
-            mState = 1;
+            mContinueButtonInitialized = true;
+            mScenePhase = PHASE_ACTIVE;
         }
-        else if (state == 2)
+        else if (state == PHASE_EXITING)
         {
             if (mMovement == SCREEN_FORWARD)
             {
@@ -219,7 +214,7 @@ void ChallengePreviewOverlay::OnContinuePointerPress(int index, void*)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    mState = 2;
+    mScenePhase = PHASE_EXITING;
     mPresentation->SetActiveSlide("out", true);
     mPresentation->Update(0.0f);
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);

@@ -28,7 +28,6 @@
 #include "Game/SH/SHNavigation.h"
 #include "NL/nlstring_tmpl.h"
 
-#include "Game/FE/FEAudio.h"
 #include "Game/FE/tlDefault.h"
 
 const char* gOnlineSideGroupNames[2] = { "home_group", "away_group" };
@@ -61,7 +60,7 @@ SHOnlineFriendsChooseSides::SHOnlineFriendsChooseSides()
 
     for (int i = 0; i < 4; ++i)
     {
-        mPointerInsideCounts[i] = 0;
+        mPointerHoverCounts[i] = 0;
         for (int j = 0; j < 4; ++j)
         {
             mPlayerColours[i].c[j] = 0xFF;
@@ -373,7 +372,7 @@ void SHOnlineFriendsChooseSides::Update(float fDeltaT)
         if (mPlayerSides[index] != -1 && !g_pFEInput->IsConnected((eFEINPUT_PAD)pad))
         {
             GetOnlinePlayerIndex(pad);
-            mPointerInsideCounts[(unsigned int)pad] = 0;
+            mPointerHoverCounts[(unsigned int)pad] = 0;
             SendDisconnectedSideChange(pad);
         }
         if (mPlayerSides[index] == -1)
@@ -436,10 +435,10 @@ inline void SHOnlineFriendsChooseSides::ShowDisconnectedError()
     {
         object->mTimer->m_bVisible = false;
     }
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
         FEPopupMenu* popup = static_cast<FEPopupMenu*>(
-            GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
+            GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
         popup->Create((ePopupMenu)0x60,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsChooseSides::OnDisconnectPopupClosed), this)));
         mDisconnectPopupActive = true;
@@ -467,7 +466,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerEnter(unsigned int index, void* co
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
     mSideButtons[(int)context].SetPointerState(1, index);
-    ++mPointerInsideCounts[index];
+    ++mPointerHoverCounts[index];
     mSideButtons[(int)context].PlayHoverFeedback(index);
     FEAudio::PlayAnimAudioEvent(0x19E7B6AE, 0, 0, 1);
 }
@@ -484,7 +483,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerLeave(unsigned int index, void* co
         mSideInstances[(int)context]->SetActiveSlide("controllers", true, false);
     }
     mSideButtons[(int)context].SetPointerState(0, index);
-    --mPointerInsideCounts[index];
+    --mPointerHoverCounts[index];
 }
 
 void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* context)
@@ -512,7 +511,7 @@ void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* c
                 mSideInstances[(int)context]->SetActiveSlide("controllers", true, false);
             }
             mSideButtons[(int)context].SetPointerState(0, index);
-            --mPointerInsideCounts[index];
+            --mPointerHoverCounts[index];
         }
     }
 }
@@ -559,7 +558,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerEnter(unsigned int index, void* co
     {
         return;
     }
-    ++mPointerInsideCounts[index];
+    ++mPointerHoverCounts[index];
     mDoneButton.SetPointerState(1, index);
     mDoneButton.PlayHoverFeedback(index);
     if (!mDoneButton.HasOtherPointerState(1, index))
@@ -583,7 +582,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerLeave(unsigned int index, void* co
     {
         return;
     }
-    --mPointerInsideCounts[index];
+    --mPointerHoverCounts[index];
     mDoneButton.SetPointerState(0, index);
     if (!mDoneButton.HasOtherPointerState(1, index))
     {
@@ -665,7 +664,7 @@ void SHOnlineFriendsChooseSides::UpdateDoneButton()
             {
                 if (mDoneButton.GetPointerState(i) == 1)
                 {
-                    --mPointerInsideCounts[i];
+                    --mPointerHoverCounts[i];
                     mDoneButton.SetPointerState(0, i);
                 }
             }
@@ -811,5 +810,5 @@ void SHOnlineFriendsChooseSides::OnDisconnectPopupClosed()
 {
     mDisconnectPopupActive = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
-    GameSceneManager::Instance()->Push((SceneList)40, SCREEN_BACK, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
 }

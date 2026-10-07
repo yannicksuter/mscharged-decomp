@@ -33,7 +33,7 @@
 #include "NL/nlBind.h"
 #include "NL/nlFunction.inl"
 
-static int lbl_8051CE60[12] = { 0, 5, 3, 6, 4, 7, 1, 8, 2, 9, 10, 11 };
+static int sCaptainButtonSelectionOrder[12] = { 0, 5, 3, 6, 4, 7, 1, 8, 2, 9, 10, 11 };
 
 /**
  * Offset/Address/Size: 0x0 | 0x80222098 | size: 0x468
@@ -49,7 +49,7 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
     , mInputSuppressed(false)
     , mDoneButtonInstance(0)
     , mDraftExitDone(false)
-    , mState(0)
+    , mScenePhase(PHASE_ENTERING)
 {
     mSidePads[0] = -1;
     mSidePads[1] = -1;
@@ -120,11 +120,11 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
         mCaptainButtons[i].mContext = (void*)i;
         mCaptainButtons[i].mSpeakerEnabled = false;
 
-        if (mCaptainIds[0] == lbl_8051CE60[i])
+        if (mCaptainIds[0] == sCaptainButtonSelectionOrder[i])
         {
             mSelectedCaptains[0] = i;
         }
-        else if (mCaptainIds[1] == lbl_8051CE60[i])
+        else if (mCaptainIds[1] == sCaptainButtonSelectionOrder[i])
         {
             mSelectedCaptains[1] = i;
         }
@@ -293,7 +293,7 @@ void ChooseCaptainsSceneV2::SceneCreated()
 /**
  * Offset/Address/Size: 0x1B00 | 0x80223B98 | size: 0x170
  */
-void ChooseCaptainsSceneV2::UpdateDraftTimer(int value)
+void ChooseCaptainsSceneV2::UpdateDraftTimer(int countdown)
 {
     TLSlide* slide = mPresentation->GetActiveSlide();
 
@@ -301,7 +301,7 @@ void ChooseCaptainsSceneV2::UpdateDraftTimer(int value)
 
     TLInstance* timer = GetNavigationScene()->GetTimer();
 
-    if (value == -1)
+    if (countdown == -1)
     {
         timer->m_bVisible = false;
     }
@@ -310,7 +310,7 @@ void ChooseCaptainsSceneV2::UpdateDraftTimer(int value)
         char text[8];
 
         timer->m_bVisible = true;
-        nlSNPrintf(text, 8, "%d", value);
+        nlSNPrintf(text, 8, "%d", countdown);
         nlStrToWcs(text, mTimerText, 8);
         ((TLTextInstance*)timer)->SetString(mTimerText);
     }
@@ -359,7 +359,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
     BaseSceneHandler::Update(dt);
     mCaptainComponents[0].Update(dt);
     mCaptainComponents[1].Update(dt);
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mScenePhase == PHASE_ENTERING || mScenePhase == PHASE_EXITING_FORWARD || mScenePhase == PHASE_EXITING_BACK)
     {
         TLSlide* leftSlide = mPDALayers[0]->GetActiveSlide();
         TLSlide* rightSlide = mPDALayers[1]->GetActiveSlide();
@@ -370,7 +370,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mState == 0)
+        if (mScenePhase == PHASE_ENTERING)
         {
             if (GameInfoManager::Instance()->IsOnline())
                 GetNavigationScene()->SetButtons(0x20, true);
@@ -389,26 +389,26 @@ void ChooseCaptainsSceneV2::Update(float dt)
                 mCaptainComponents[1].SetDisplayMode(6);
                 mCaptainComponents[1].SetCaptainInfo(captain, 0, 1);
             }
-            mState = 1;
+            mScenePhase = PHASE_CHOOSING;
             InitializePointerButtons();
             mPointerButtonsInitialized = true;
         }
-        else if (mState == 2)
+        else if (mScenePhase == PHASE_EXITING_FORWARD)
         {
             if (mSceneType == ST_STRIKER_CUP)
-                GameSceneManager::Instance()->Push((SceneList)7, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDEKICKS_STRIKER_CUP, SCREEN_FORWARD, true);
             else
             {
                 if (GameInfoManager::Instance()->IsOnline())
                     NetworkDraft::Instance()->SendCaptainChoice();
-                GameSceneManager::Instance()->Push((SceneList)3, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDEKICKS_DOMINATION, SCREEN_FORWARD, true);
             }
             return;
         }
-        else if (mState == 3)
+        else if (mScenePhase == PHASE_EXITING_BACK)
         {
             if (GameInfoManager::Instance()->IsOnline())
-                GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
             else if (mSceneType != ST_STRIKER_CUP)
                 GameSceneManager::Instance()->Push(SCENE_GAMEPLAY_OPTIONS, SCREEN_BACK, true);
             if (mSceneType == ST_STRIKER_CUP)
@@ -460,7 +460,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
         {
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                mState = 3;
+                mScenePhase = PHASE_EXITING_BACK;
                 GetNavigationScene()->HideButtons();
                 mPDALayers[0]->SetActiveSlide("out", true, false);
                 mPDALayers[1]->SetActiveSlide("out", true, false);
@@ -488,14 +488,14 @@ void ChooseCaptainsSceneV2::Update(float dt)
         {
             int captain;
             if (mSidePads[0] != -1 && mSelectedCaptains[0] != -1
-                && !NetworkDraft::Instance()->IsCaptainTaken(lbl_8051CE60[mSelectedCaptains[0]]))
-                captain = lbl_8051CE60[mSelectedCaptains[0]];
+                && !NetworkDraft::Instance()->IsCaptainTaken(sCaptainButtonSelectionOrder[mSelectedCaptains[0]]))
+                captain = sCaptainButtonSelectionOrder[mSelectedCaptains[0]];
             else if (mConfirmed[0] == true)
                 captain = mCaptainIds[0];
             else
                 captain = NetworkDraft::Instance()->GetRandomAvailableCaptain();
             GameInfoManager::Instance()->SetTeam(0, captain);
-            mState = 2;
+            mScenePhase = PHASE_EXITING_FORWARD;
             GetNavigationScene()->HideButtons();
             mPDALayers[0]->SetActiveSlide("out", true, false);
             mPDALayers[1]->SetActiveSlide("out", true, false);
@@ -540,7 +540,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
     }
 
     eTeamSide other = side ? HOME : AWAY;
-    int captain = lbl_8051CE60[which];
+    int captain = sCaptainButtonSelectionOrder[which];
     if ((captain == 9 && !IsBowserJrUnlocked()) || (captain == 10 && !IsDiddyKongUnlocked())
         || (captain == 11 && !IsPeteyUnlocked()))
     {
@@ -551,14 +551,14 @@ void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
         return;
     }
     if (NetworkDraft::Instance()->mState != NET_DRAFT_IDLE
-        && NetworkDraft::Instance()->IsCaptainTaken(lbl_8051CE60[which]))
+        && NetworkDraft::Instance()->IsCaptainTaken(sCaptainButtonSelectionOrder[which]))
     {
         return;
     }
 
     mConfirmed[side] = true;
     mSidePads[side] = -1;
-    mCaptainIds[side] = lbl_8051CE60[mSelectedCaptains[side]];
+    mCaptainIds[side] = sCaptainButtonSelectionOrder[mSelectedCaptains[side]];
     mSelectDisplays[side]->SetActiveSlide("off", true, false);
     mSelectButtons[side].SetPointerState(0, index);
     for (int i = 0; i < 4; ++i)
@@ -567,7 +567,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
     }
     mGreenArrows[side]->m_bVisible = false;
 
-    int selectedCaptain = lbl_8051CE60[mSelectedCaptains[side]];
+    int selectedCaptain = sCaptainButtonSelectionOrder[mSelectedCaptains[side]];
     FEAudio::PlayAnimAudioEvent(FECharacterSound::GetCaptainAcceptSound((eTeamID)selectedCaptain), 0, 0, 1);
 
     if (!mChangeTextShown[side])
@@ -612,7 +612,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
     }
 
     eTeamSide other = side ? HOME : AWAY;
-    int captain = lbl_8051CE60[which];
+    int captain = sCaptainButtonSelectionOrder[which];
 
     if ((captain == 9 && !IsBowserJrUnlocked()) || (captain == 10 && !IsDiddyKongUnlocked())
         || (captain == 11 && !IsPeteyUnlocked()))
@@ -626,13 +626,13 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
     }
 
     if (NetworkDraft::Instance()->mState != NET_DRAFT_IDLE
-        && NetworkDraft::Instance()->IsCaptainTaken(lbl_8051CE60[which]))
+        && NetworkDraft::Instance()->IsCaptainTaken(sCaptainButtonSelectionOrder[which]))
     {
         return;
     }
 
     mSelectedCaptains[side] = which;
-    int selectedCaptain = lbl_8051CE60[which];
+    int selectedCaptain = sCaptainButtonSelectionOrder[which];
 
     if (mSceneType == ST_STRIKER_CUP)
     {
@@ -910,7 +910,7 @@ void ChooseCaptainsSceneV2::OnDonePointerPress(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
     FEAudio::PlayAnimAudioEvent(0x2A10C1C3, 0, 0, 1);
 
-    mState = 2;
+    mScenePhase = PHASE_EXITING_FORWARD;
     GetNavigationScene()->HideButtons();
 
     mPDALayers[0]->SetActiveSlide("out", true, false);
@@ -1125,7 +1125,7 @@ void ChooseCaptainsSceneV2::RefreshCaptainImages()
 {
     for (int i = 0; i < 12; ++i)
     {
-        int captain = lbl_8051CE60[i];
+        int captain = sCaptainButtonSelectionOrder[i];
         char name[8];
         char texture[32];
         nlSNPrintf(name, sizeof(name), "%d", i);
@@ -1251,7 +1251,7 @@ void ChooseCaptainsSceneV2::OnDisconnectDismissed()
 {
     mPopupActive = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
-    GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
 }
 
 int ChooseCaptainsSceneV2::GetSide(unsigned long pad)
@@ -1295,9 +1295,9 @@ inline void ChooseCaptainsSceneV2::ShowDisconnectedError()
 {
     g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
     NetworkDraft::Instance()->UnregisterMessageReceivers();
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseCaptainsSceneV2::OnDisconnectDismissed), this)));
         mPopupActive = true;
     }

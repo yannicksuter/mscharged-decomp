@@ -9,6 +9,13 @@
 class PausePostGameScene : public SHStrikerTimesBase
 {
 public:
+    enum Mode
+    {
+        MODE_RESULTS = 0,
+        MODE_STATISTICS = 1,
+        MODE_DEMO_EXIT_PROMPT = 2,
+    };
+
     PausePostGameScene(int);
     virtual ~PausePostGameScene();
     virtual void Update(float dt);
@@ -24,7 +31,7 @@ public:
 
     /* 0x5D4 */ int mMode;
     /* 0x5D8 */ eFEINPUT_PAD mControllingInput;
-    /* 0x5DC */ bool mIsMultiplayer;
+    /* 0x5DC */ bool mIsNetworkGame;
     /* 0x5DE */ u16 mCountdownText[8];
     /* 0x5F0 */ FETimer mTimer;
     /* 0x60C */ bool mTimerTicked;

@@ -63,7 +63,7 @@ public:
         {
             SetMovieDetails("movies/nlgintrofull.thp", true, false);
         }
-        mNextScene = (SceneList)23;
+        mNextScene = SCENE_CREDITS;
     }
     virtual ~NLGLogoMovieScene() { }
     virtual void PlayScreenForwardSFX() { }

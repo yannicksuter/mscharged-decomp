@@ -1,6 +1,7 @@
 #ifndef _RENDERSNAPSHOT_H_
 #define _RENDERSNAPSHOT_H_
 
+#include "Game/RenderSnapshot_fwd.h"
 #include "types.h"
 #include "NL/nlMath.h"
 

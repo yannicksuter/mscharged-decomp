@@ -239,11 +239,11 @@ ContactType PhysicsAIBall::Contact(
 
             if (PhysicsNet::IsAGoalWall(obj))
             {
-                info->surface.soft_cfm = lbl_806DCAB4;
+                info->surface.soft_cfm = gGoalWallBallContactSoftness;
             }
             else if (PhysicsNet::IsGoalWallSetA(obj))
             {
-                info->surface.soft_cfm = lbl_806DCAB0;
+                info->surface.soft_cfm = gGoalWallSetABallContactSoftness;
             }
             else if (PhysicsNet::IsGoalWallSetB(obj))
             {

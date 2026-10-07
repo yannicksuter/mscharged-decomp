@@ -2,12 +2,13 @@
 #include "Game/DB/UserOptions.h"
 
 #include "Game/Audio/AudioSystem.h"
+#include "Game/Audio/AudioCalculation.h"
 #include "Game/Audio/RegistryPools.h"
 
 #include <string.h>
 
 // Audio category names hashed with nlStringLowerHash, kept in hash order, and
-// the index of each category's volume block in AudioValues.
+// the index of each category's calculation slider.
 struct UnidentifiedAudioCategoryLookup
 {
     UnidentifiedAudioCategoryLookup(u32 hash, s16 index) : mHash(hash), mIndex(index) {}
@@ -53,120 +54,126 @@ void AudioSettings::ApplySettings()
 {
     MusicVolume = MusicVolume < 0 ? 0 : MusicVolume;
     MusicVolume = MusicVolume > 10 ? 10 : MusicVolume;
-    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
+    AudioCalculationSlider* sliders = ((AudioCalculationTable*)
+        g_pAudioSystem->GetBundleManager()->GetCalculationTable())->sliders;
     float volume = VOLUME_TABLE[MusicVolume];
-    if (volume < pValues->m_unk68)
+    if (volume < sliders[2].minimum)
     {
-        pValues->m_unk5C = pValues->m_unk68;
+        sliders[2].target = sliders[2].minimum;
     }
-    else if (volume > pValues->m_unk6C)
+    else if (volume > sliders[2].maximum)
     {
-        pValues->m_unk5C = pValues->m_unk6C;
+        sliders[2].target = sliders[2].maximum;
     }
     else
     {
-        pValues->m_unk5C = volume;
+        sliders[2].target = volume;
     }
-    pValues->m_unk60 = 0.0f;
+    sliders[2].elapsed = 0.0f;
 
     SFXVolume = SFXVolume < 0 ? 0 : SFXVolume;
     SFXVolume = SFXVolume > 10 ? 10 : SFXVolume;
-    pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
+    sliders = ((AudioCalculationTable*)
+        g_pAudioSystem->GetBundleManager()->GetCalculationTable())->sliders;
     volume = VOLUME_TABLE[SFXVolume];
-    if (volume < pValues->m_unkB8)
+    if (volume < sliders[4].minimum)
     {
-        pValues->m_unkAC = pValues->m_unkB8;
+        sliders[4].target = sliders[4].minimum;
     }
-    else if (volume > pValues->m_unkBC)
+    else if (volume > sliders[4].maximum)
     {
-        pValues->m_unkAC = pValues->m_unkBC;
+        sliders[4].target = sliders[4].maximum;
     }
     else
     {
-        pValues->m_unkAC = volume;
+        sliders[4].target = volume;
     }
-    pValues->m_unkB0 = 0.0f;
+    sliders[4].elapsed = 0.0f;
 
     VoiceVolume = VoiceVolume < 0 ? 0 : VoiceVolume;
     VoiceVolume = VoiceVolume > 10 ? 10 : VoiceVolume;
-    pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
+    sliders = ((AudioCalculationTable*)
+        g_pAudioSystem->GetBundleManager()->GetCalculationTable())->sliders;
     volume = VOLUME_TABLE[VoiceVolume];
-    if (volume < pValues->m_unk90)
+    if (volume < sliders[3].minimum)
     {
-        pValues->m_unk84 = pValues->m_unk90;
+        sliders[3].target = sliders[3].minimum;
     }
-    else if (volume > pValues->m_unk94)
+    else if (volume > sliders[3].maximum)
     {
-        pValues->m_unk84 = pValues->m_unk94;
+        sliders[3].target = sliders[3].maximum;
     }
     else
     {
-        pValues->m_unk84 = volume;
+        sliders[3].target = volume;
     }
-    pValues->m_unk88 = 0.0f;
+    sliders[3].elapsed = 0.0f;
 }
 
 void AudioSettings::ApplyMusicVolume()
 {
     MusicVolume = MusicVolume < 0 ? 0 : MusicVolume;
     MusicVolume = MusicVolume > 10 ? 10 : MusicVolume;
-    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
+    AudioCalculationSlider* sliders = ((AudioCalculationTable*)
+        g_pAudioSystem->GetBundleManager()->GetCalculationTable())->sliders;
     float volume = VOLUME_TABLE[MusicVolume];
-    if (volume < pValues->m_unk68)
+    if (volume < sliders[2].minimum)
     {
-        pValues->m_unk5C = pValues->m_unk68;
+        sliders[2].target = sliders[2].minimum;
     }
-    else if (volume > pValues->m_unk6C)
+    else if (volume > sliders[2].maximum)
     {
-        pValues->m_unk5C = pValues->m_unk6C;
+        sliders[2].target = sliders[2].maximum;
     }
     else
     {
-        pValues->m_unk5C = volume;
+        sliders[2].target = volume;
     }
-    pValues->m_unk60 = 0.0f;
+    sliders[2].elapsed = 0.0f;
 }
 
 void AudioSettings::ApplySFXVolume()
 {
     SFXVolume = SFXVolume < 0 ? 0 : SFXVolume;
     SFXVolume = SFXVolume > 10 ? 10 : SFXVolume;
-    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
+    AudioCalculationSlider* sliders = ((AudioCalculationTable*)
+        g_pAudioSystem->GetBundleManager()->GetCalculationTable())->sliders;
     float volume = VOLUME_TABLE[SFXVolume];
-    if (volume < pValues->m_unkB8)
+    if (volume < sliders[4].minimum)
     {
-        pValues->m_unkAC = pValues->m_unkB8;
+        sliders[4].target = sliders[4].minimum;
     }
-    else if (volume > pValues->m_unkBC)
+    else if (volume > sliders[4].maximum)
     {
-        pValues->m_unkAC = pValues->m_unkBC;
+        sliders[4].target = sliders[4].maximum;
     }
     else
     {
-        pValues->m_unkAC = volume;
+        sliders[4].target = volume;
     }
-    pValues->m_unkB0 = 0.0f;
+    sliders[4].elapsed = 0.0f;
 }
 
 void AudioSettings::ApplyVoiceVolume()
 {
     VoiceVolume = VoiceVolume < 0 ? 0 : VoiceVolume;
     VoiceVolume = VoiceVolume > 10 ? 10 : VoiceVolume;
-    AudioValues* pValues = g_pAudioSystem->m_unkCC->m_unk10->m_unk08;
+    AudioCalculationSlider* sliders = ((AudioCalculationTable*)
+        g_pAudioSystem->GetBundleManager()->GetCalculationTable())->sliders;
     float volume = VOLUME_TABLE[VoiceVolume];
-    if (volume < pValues->m_unk90)
+    if (volume < sliders[3].minimum)
     {
-        pValues->m_unk84 = pValues->m_unk90;
+        sliders[3].target = sliders[3].minimum;
     }
-    else if (volume > pValues->m_unk94)
+    else if (volume > sliders[3].maximum)
     {
-        pValues->m_unk84 = pValues->m_unk94;
+        sliders[3].target = sliders[3].maximum;
     }
     else
     {
-        pValues->m_unk84 = volume;
+        sliders[3].target = volume;
     }
-    pValues->m_unk88 = 0.0f;
+    sliders[3].elapsed = 0.0f;
 }
 
 GameplaySettings::GameplaySettings()

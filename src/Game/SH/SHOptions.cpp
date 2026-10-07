@@ -17,11 +17,6 @@
 #include "NL/nlBind.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/SH/SHNavigation.h"
-
-class SHNavigation;
-
 
 void BaseSceneHandler::SceneCreated()
 {
@@ -29,8 +24,8 @@ void BaseSceneHandler::SceneCreated()
 
 OptionsScene::OptionsScene()
     : mBackButton()
-    , mInitialized(false)
-    , mState(0)
+    , mPointerButtonsInitialized(false)
+    , mScenePhase(PHASE_ENTERING)
     , mNextScene(SCENE_INVALID)
 {
     mOptionButtons[0].mContext = (void*)0;
@@ -74,7 +69,7 @@ void OptionsScene::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mScenePhase == PHASE_ENTERING || mScenePhase == PHASE_EXITING_TO_OPTION || mScenePhase == PHASE_EXITING_TO_MAIN_MENU)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -86,21 +81,21 @@ void OptionsScene::Update(float fDeltaT)
             return;
         }
 
-        if (mState == 0)
+        if (mScenePhase == PHASE_ENTERING)
         {
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
                 object->SetButtons(4, true);
             }
-            mState = 1;
+            mScenePhase = PHASE_CHOOSING;
         }
-        else if (mState == 2)
+        else if (mScenePhase == PHASE_EXITING_TO_OPTION)
         {
             GameSceneManager::Instance()->Push(mNextScene, SCREEN_NOTHING, true);
             return;
         }
-        else if (mState == 3)
+        else if (mScenePhase == PHASE_EXITING_TO_MAIN_MENU)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
             FrontEndPresentation::GetInstance()->Call("TransitionOptionsToMainMenu");
@@ -109,10 +104,10 @@ void OptionsScene::Update(float fDeltaT)
         }
     }
 
-    if (!mInitialized)
+    if (!mPointerButtonsInitialized)
     {
         InitializePointerButtons();
-        mInitialized = true;
+        mPointerButtonsInitialized = true;
     }
 
     for (int i = 0; i < 4; ++i)
@@ -134,7 +129,7 @@ void OptionsScene::Update(float fDeltaT)
 
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mState = 3;
+            mScenePhase = PHASE_EXITING_TO_MAIN_MENU;
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
@@ -170,18 +165,18 @@ void OptionsScene::OnButtonPointerPress(int, void* context)
     {
     case 1:
         FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
-        mNextScene = (SceneList)14;
+        mNextScene = SCENE_AUDIO_OPTIONS;
         break;
     case 0:
         FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
-        mNextScene = (SceneList)15;
+        mNextScene = SCENE_VISUAL_OPTIONS;
         break;
     case 2:
-        mNextScene = (SceneList)23;
+        mNextScene = SCENE_CREDITS;
         break;
     }
 
-    mState = 2;
+    mScenePhase = PHASE_EXITING_TO_OPTION;
 
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
