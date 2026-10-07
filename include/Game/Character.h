@@ -272,6 +272,7 @@ public:
     {
         return mUnidentified024.m_v3Velocity;
     }
+    u16 GetDesiredFacing() const { return mUnidentified024.m_aDesiredFacingDirection; }
     u16 GetActualFacing() const
     {
         return mUnidentified024.m_aActualFacingDirection;

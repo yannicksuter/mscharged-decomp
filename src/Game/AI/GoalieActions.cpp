@@ -1349,7 +1349,7 @@ void Goalie::fn_80084840(MegaBallIndicator* pState)
     v3TargetPosition.y = nlMinEquals(nlMaxEquals(pBallTrail->position.y, -fYLimit), fYLimit);
 
     float fZLimit = cNet::m_fNetHeight - 0.8f;
-    float fDistance = (float)fabs(
+    float fDistance = fabsf(
         v3TargetPosition.x - pBallTrail->position.x);
     float fZ = pBallTrail->position.z - 0.7f * fDistance;
     v3TargetPosition.z
@@ -1365,8 +1365,7 @@ void Goalie::fn_80084840(MegaBallIndicator* pState)
     nlVector3 v3Unidentified2 = { 0.0f, 0.0f, 1.0f };
     nlVec3CrossProduct(
         v3Unidentified, v3Unidentified2, v3Velocity);
-    float fUnidentified = 2.0f + nlRandomf(1.0f);
-    nlVec3Scale(v3Unidentified, fUnidentified);
+    nlVec3Scale(v3Unidentified, 2.0f + nlRandomf(1.0f));
     pBallTrail->mUnidentified028 = v3Unidentified;
 
     if (!lbl_806E0D1A)
@@ -2705,7 +2704,7 @@ void Goalie::ActionMoveWB(float fDeltaT)
 
                 if (bClamped)
                 {
-                    u16 currentDir = mUnidentified024.m_aDesiredFacingDirection;
+                    u16 currentDir = GetDesiredFacing();
                     s16 diff = nlAngleDelta(yDir, currentDir);
                     s16 scaledDiff = (s16)(s32)(diff * 0.5f);
                     currentDir = (u16)(currentDir + scaledDiff);
@@ -5974,12 +5973,7 @@ void Goalie::fn_8008DAB4(float fDeltaT)
 {
     float fAnimTime = m_pCurrentAnimController->m_fTime;
     bool bUnidentifiedCondition = true;
-    bool bActionStateActive = false;
-    if (g_pGame->m_bBallInNet
-        || g_pGame->m_eGameState == 3)
-    {
-        bActionStateActive = true;
-    }
+    bool bActionStateActive = g_pGame->m_bBallInNet || g_pGame->GetGameState() == 3;
 
     if (!bActionStateActive
         && mnOffplayPending == GOALIE_OFFPLAY_NONE)
@@ -6083,14 +6077,14 @@ void Goalie::fn_8008DAB4(float fDeltaT)
         }
     }
     else if (fAnimTime
-             > 0.2f + mpSaveData->mfMilestonePercent[2])
+             > 0.2f + mpSaveData->GetMilestonePercent(2))
     {
         CheckForLimbEndZoneCollision();
     }
 
     if (!bUnidentifiedCondition
         && (mpSaveData->muSaveType & 3) != 0
-        && fAnimTime > 0.08f + mpSaveData->mfMilestonePercent[3]
+        && fAnimTime > 0.08f + mpSaveData->GetMilestonePercent(3)
         && m_pBall == 0)
     {
         InitActionDiveRecover();
