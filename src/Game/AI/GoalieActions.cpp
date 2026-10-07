@@ -1347,7 +1347,8 @@ void Goalie::fn_80084840(MegaBallIndicator* pState)
         = fDirection * (cField::GetGoalLineX(1U) + 0.5f);
     v3TargetPosition.y = nlMinEquals(nlMaxEquals(pBallTrail->position.y, -fYLimit), fYLimit);
 
-    float fZLimit = cNet::m_fNetHeight - 0.8f;
+    float fNetHeight = cNet::m_fNetHeight;
+    float fZLimit = fNetHeight - 0.8f;
     float fDistance = fabsf(
         v3TargetPosition.x - pBallTrail->position.x);
     float fZ = pBallTrail->position.z - 0.7f * fDistance;
