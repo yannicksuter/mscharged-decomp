@@ -28,11 +28,11 @@ static float sSidelineMargin = 0.25f;
  * Address/Size: 0x8027A7F0 | size: 0x78
  */
 ChargeShadowDrawable::ChargeShadowDrawable(
-    WorldObjectLoadContext* context, glModel* model, unsigned long type)
-    : PlanarShadowDrawable(context, model, type)
+    WorldObjectLoadContext* context, glModel* model, unsigned long hash)
+    : PlanarShadowDrawable(context, model, hash)
 {
     m_uChargeFlags = 0;
-    Initialize(model, type);
+    Initialize(model, hash);
 }
 
 

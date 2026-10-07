@@ -65,4 +65,6 @@ public:
     static SlotPool<Pitch> s_Pool;
 };
 
+extern bool gPitchOverrideEnabled;
+
 #endif // GAME_AUDIO_PITCH_H

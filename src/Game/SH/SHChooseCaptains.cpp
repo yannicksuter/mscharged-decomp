@@ -24,6 +24,7 @@
 #include "Game/GameSceneManager.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
+#include "Game/SH/SHOnlineMatchmakingDraft.h"
 #include "Game/NetworkLobby.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/SH/SHNavigation.h"

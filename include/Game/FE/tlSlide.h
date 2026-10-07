@@ -32,8 +32,8 @@ public:
         return m_duration;
     }
 
-    void Update(float time);
-    void UpdateAsset(TLInstance* instance, float time);
+    void Update(float deltaTime);
+    void UpdateAsset(TLInstance* instance, float deltaTime);
 
     /* 0x00 */ TLSlide* m_next;
     /* 0x04 */ char pad0[0x4];
@@ -45,7 +45,7 @@ public:
     /* 0x1C */ eTimeLinePlayMode m_uPlayMode;
     /* 0x20 */ char m_szName[32];
     /* 0x40 */ u32 m_hash;
-    /* 0x44 */ bool field_0x44;
+    /* 0x44 */ bool m_bPaused;
 
 private:
     void SetName(const char* name);

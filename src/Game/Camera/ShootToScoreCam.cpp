@@ -7,7 +7,7 @@ void cShootToScoreCamera::Update(float fDeltaT)
     glMatrixLookAt(m_matView, m_v3Camera, m_v3Target, mUpVector);
 }
 
-void cShootToScoreCamera::fn_800F93F0(float side)
+void cShootToScoreCamera::AlignToSide(float side)
 {
     if (side * m_v3Camera.x < 0.0f)
     {

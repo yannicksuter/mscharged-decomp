@@ -20,11 +20,11 @@ static char sBlackTexture[] = "global/black";
 MegastrikeBackgroundOverlay gMegastrikeBackgroundOverlay;
 
 void MegastrikeBackgroundOverlay::Start(
-    float rate, float target, int mode)
+    float rate, float target, int teamIndex)
 {
     mFadeRate = rate;
     mTargetAlpha = target;
-    mTeamIndex = mode;
+    mTeamIndex = teamIndex;
 }
 
 void MegastrikeBackgroundOverlay::UpdateAndRender(float deltaTime)

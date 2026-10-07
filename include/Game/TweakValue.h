@@ -19,9 +19,9 @@ typedef nlSmallBlockAllocator<0x10, 0x20, 1, 1> TweakValueAllocator2;
 extern TweakValueAllocator3* gTweakValueAllocator;
 extern TweakValueAllocator2* gTweakBindingAllocator;
 
-// Shared base of the pool-allocated pointer-backed values. Retail keeps no
-// vtable for it: derived constructors elide its vtable store, and derived
-// destructors inline its empty destructor.
+// Shared base of the pool-allocated pointer-backed values. The reconstructed
+// linked layout has no separate vtable for this base: derived constructors
+// elide its vtable store, and derived destructors inline its empty destructor.
 // It owns the type-independent registration entry points, which only use the
 // base fields and the virtuals below.
 class TweakBindingBase : public TweakValueBase
@@ -33,7 +33,8 @@ public:
     virtual void BindValueAddress(void* value) = 0;
 
     bool Bind(const char* path);
-    bool Bind(const char*, const char*, bool, float, float, float);
+    bool Bind(const char* name, const char* group, bool formatName,
+        float value, float min, float max);
 
     static void operator delete(void* pointer)
     {
@@ -238,9 +239,9 @@ public:
     }
 
     bool Bind(const char* name, float value,
-        const char* group, bool reload, float min, float max)
+        const char* group, bool formatName, float min, float max)
     {
-        bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
+        bool found = TweakBindingBase::Bind(name, group, formatName, value, min, max);
         if (!found)
         {
             *m_pValue = GetDefaultValue();
@@ -250,9 +251,9 @@ public:
     }
 
     bool BindWithDefault(const char* name, T defaultValue,
-        const char* group, bool reload, float value, float min, float max)
+        const char* group, bool formatName, float value, float min, float max)
     {
-        bool found = Bind(name, value, group, reload, min, max);
+        bool found = Bind(name, value, group, formatName, min, max);
         if (!found)
         {
             *m_pValue = defaultValue;
@@ -334,9 +335,9 @@ public:
     using TweakBindingBase::Bind;
 
     bool Bind(const char* name, float value,
-        const char* group, bool reload, float min, float max)
+        const char* group, bool formatName, float min, float max)
     {
-        bool found = TweakBindingBase::Bind(name, group, reload, value, min, max);
+        bool found = TweakBindingBase::Bind(name, group, formatName, value, min, max);
         if (!found)
         {
             *m_pValue = GetDefault();

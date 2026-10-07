@@ -6786,7 +6786,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
 
     mpShootToScoreCamera = new (8, false) cShootToScoreCamera();
     float netX = m_pTeam->m_pNet->m_v3NetLocation.x;
-    mpShootToScoreCamera->fn_800F93F0(netX);
+    mpShootToScoreCamera->AlignToSide(netX);
     cCameraManager::PushCamera(mpShootToScoreCamera);
     lbl_806DC7C8 = 1.5f;
     SetAnimState(5, false, 0.0f, false, false);

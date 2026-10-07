@@ -14,9 +14,7 @@ public:
     }
 };
 
-// g_bProfiling keeps the predecessor's name; retail never writes either flag
-// or reads the frame counter, so the second flag and the counter are named
-// after their only use here.
+// IsProfiling combines the two flags; ProfilerTask::Run increments the counter.
 extern bool g_bProfiling;
 extern bool g_bShowProfiler;
 extern u32 g_nProfilerFrame;

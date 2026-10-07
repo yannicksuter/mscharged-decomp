@@ -71,7 +71,7 @@ int nlScreenPrintf(
 
 void DrawTextRectangle(GLView* view, const nlColour& c,
     float left, float top, float right, float bottom, float z, int layer,
-    bool bSnapToGrid, bool bVirtualCoords)
+    bool bApplyBorder, bool bVirtualCoords)
 {
     float x = 0.0f;
     float y = 0.0f;
@@ -91,7 +91,7 @@ void DrawTextRectangle(GLView* view, const nlColour& c,
         y2 = bottom;
     }
 
-    if (bSnapToGrid)
+    if (bApplyBorder)
     {
         x -= sfTextRectangleBorder;
         y -= sfTextRectangleBorder;

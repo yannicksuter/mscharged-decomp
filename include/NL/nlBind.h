@@ -11,31 +11,31 @@ extern Placeholder<0> placeholder0;
 // Bound arguments are selected per call: a placeholder yields the call
 // argument, any other bound value yields itself.
 template <typename P, typename T>
-inline const T& UnidentifiedBindArg(P&, const T& bound)
+inline const T& SelectBoundArgument(P&, const T& bound)
 {
     return bound;
 }
 
 template <typename P>
-inline P& UnidentifiedBindArg(P& p0, const Placeholder<0>&)
+inline P& SelectBoundArgument(P& p0, const Placeholder<0>&)
 {
     return p0;
 }
 
 template <typename P0, typename P1, typename T>
-inline const T& UnidentifiedBindArg(P0&, P1&, const T& bound)
+inline const T& SelectBoundArgument(P0&, P1&, const T& bound)
 {
     return bound;
 }
 
 template <typename P0, typename P1>
-inline P0& UnidentifiedBindArg(P0& p0, P1&, const Placeholder<0>&)
+inline P0& SelectBoundArgument(P0& p0, P1&, const Placeholder<0>&)
 {
     return p0;
 }
 
 template <typename P0, typename P1>
-inline P1& UnidentifiedBindArg(P0&, P1& p1, const Placeholder<1>&)
+inline P1& SelectBoundArgument(P0&, P1& p1, const Placeholder<1>&)
 {
     return p1;
 }
@@ -63,7 +63,7 @@ public:
     template <typename P>
     R operator()(P& p0)
     {
-        return mFunction(UnidentifiedBindArg(p0, mT0));
+        return mFunction(SelectBoundArgument(p0, mT0));
     }
 };
 
@@ -98,7 +98,7 @@ public:
     template <typename P>
     R operator()(P& p0)
     {
-        return mFunction(UnidentifiedBindArg(p0, mT0), UnidentifiedBindArg(p0, mT1));
+        return mFunction(SelectBoundArgument(p0, mT0), SelectBoundArgument(p0, mT1));
     }
 };
 
@@ -135,15 +135,15 @@ public:
     template <typename P0, typename P1>
     R operator()(P0& p0, P1& p1)
     {
-        return mFunction(UnidentifiedBindArg(p0, p1, mT0),
-            UnidentifiedBindArg(p0, p1, mT1),
-            UnidentifiedBindArg(p0, p1, mT2));
+        return mFunction(SelectBoundArgument(p0, p1, mT0),
+            SelectBoundArgument(p0, p1, mT1),
+            SelectBoundArgument(p0, p1, mT2));
     }
 
     template <typename P>
     R operator()(P& p0)
     {
-        return mFunction(UnidentifiedBindArg(p0, mT0), UnidentifiedBindArg(p0, mT1), UnidentifiedBindArg(p0, mT2));
+        return mFunction(SelectBoundArgument(p0, mT0), SelectBoundArgument(p0, mT1), SelectBoundArgument(p0, mT2));
     }
 };
 
@@ -183,16 +183,16 @@ public:
     template <typename P>
     R operator()(P& p0)
     {
-        return mFunction(UnidentifiedBindArg(p0, mT0), UnidentifiedBindArg(p0, mT1), UnidentifiedBindArg(p0, mT2), UnidentifiedBindArg(p0, mT3));
+        return mFunction(SelectBoundArgument(p0, mT0), SelectBoundArgument(p0, mT1), SelectBoundArgument(p0, mT2), SelectBoundArgument(p0, mT3));
     }
 
     template <typename P0, typename P1>
     R operator()(P0& p0, P1& p1)
     {
-        return mFunction(UnidentifiedBindArg(p0, p1, mT0),
-            UnidentifiedBindArg(p0, p1, mT1),
-            UnidentifiedBindArg(p0, p1, mT2),
-            UnidentifiedBindArg(p0, p1, mT3));
+        return mFunction(SelectBoundArgument(p0, p1, mT0),
+            SelectBoundArgument(p0, p1, mT1),
+            SelectBoundArgument(p0, p1, mT2),
+            SelectBoundArgument(p0, p1, mT3));
     }
 };
 

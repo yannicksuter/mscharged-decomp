@@ -11,12 +11,6 @@
 #include <string.h>
 #include "Game/TweakValue.inl"
 
-struct NetworkSocketInitializeInfo
-{
-    u32 mVersionWord;
-    bool mDirectMode;
-};
-
 int g_nLocalDirectPort = 1000;
 static int sLocalAddressColumn = 2;
 static int sLocalAddressRow = 5;
@@ -92,7 +86,7 @@ void NetworkSocket::OnMessageReceived(
 void NetworkSocket::OnVoiceReceived(
     u32 connection, void* buffer, int size)
 {
-    mListener->ListenerVirtual18();
+    mListener->OnVoiceReceived();
 }
 
 void NetworkSocket::OnConnectionRequest(
@@ -320,7 +314,7 @@ void NetworkSocket::Update(float)
                        sizeof(mVersionWord))
                     == 0)
             {
-                mListener->ListenerVirtual00(
+                mListener->OnBroadcastReceived(
                     mPacketBuffer + sizeof(mVersionWord),
                     received - sizeof(mVersionWord));
             }

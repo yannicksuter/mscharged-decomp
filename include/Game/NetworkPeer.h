@@ -41,6 +41,7 @@ class NetworkPeer
 {
 public:
     NetworkPeer();
+    ~NetworkPeer() { }
 
     NetworkPeerChannel* GetNetworkPeerChannel(int channel);
     s8 GetNetworkPeerMachineId();

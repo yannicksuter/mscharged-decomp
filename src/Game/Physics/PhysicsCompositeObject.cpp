@@ -83,8 +83,8 @@ int PhysicsCompositeObject::AddObject(PhysicsObject* object)
 }
 
 void PhysicsCompositeObject::AdjustTransform(
-    int i, nlMatrix4& m, bool type)
+    int componentIndex, nlMatrix4& transform, bool relativeToParent)
 {
-    GetComponent(i)->SetSubObjectTransform(
-        m, (PhysicsObject::CoordinateType)type);
+    GetComponent(componentIndex)->SetSubObjectTransform(
+        transform, (PhysicsObject::CoordinateType)relativeToParent);
 }

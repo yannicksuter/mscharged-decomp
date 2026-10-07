@@ -338,7 +338,7 @@ void SHOnlineMatchmakingDraft::Update(float fDeltaT)
             g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
             if (g_pNetworkSession->RequiresDisconnectAfterError())
                 mReturnScene = SCENE_MAIN_MENU;
-            int error = g_pNetworkSession->fn_801CA9D8();
+            int error = g_pNetworkSession->GetDWCErrorCode();
             ShowError(GetOnlineErrorPopup(error, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5A));
             return;
         }

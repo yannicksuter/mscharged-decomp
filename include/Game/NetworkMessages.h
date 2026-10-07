@@ -6,27 +6,13 @@
 #include "types.h"
 #include "Game/NetworkStatsManager.h"
 
-// "Failed to SendTournamentStartToEveryone to %d because no connection".
-class NetMessageTournamentStart : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 20; }
-
-    /* 0x08 */ u8 mMachineIndex;
-    /* 0x09 */ u8 mMachineCount;
-    /* 0x0A */ u8 mCupPersona;
-    /* 0x0B */ u8 mFirstStadium;
-    /* 0x0C */ u8 mSecondStadium;
-    /* 0x0D */ u8 mSeedings[8];
-};
+#include "Game/NetworkTournamentStartMessage.h"
 
 // "Failed to SendGameStartToEveryone to %d because no connection".
 class NetMessageGameStart : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessageGameStart() { }
     virtual int GetType();
 
     /* 0x08 */ u32 mRandomSeed;
@@ -35,11 +21,12 @@ public:
     /* 0x0E */ u8 mHomeCharacters[4];
     /* 0x12 */ u8 mAwayCharacters[4];
     /* 0x16 */ u8 mStadium;
-    /* 0x17 */ u8 mMachineFlags[4];
-    /* 0x1B */ u8 mUnidentified1B;
-    /* 0x1C */ s8 mUnidentified1C[3];
-    /* 0x20 */ u32 mUnidentified20;
-    /* 0x24 */ u32 mUnidentified24;
+    /* 0x17 */ u8 mMachinePlayerCounts[4];
+    /* 0x1B */ u8 mTournamentGame;
+    // Bracket game index, followed by home and away machine indices.
+    /* 0x1C */ s8 mTournamentSetup[3];
+    /* 0x20 */ u32 mSecondGameRandomSeed;
+    /* 0x24 */ u32 mThirdGameRandomSeed;
 };
 
 struct NetworkDraftSides
@@ -107,31 +94,7 @@ public:
     /* 0x08 */ u32 mUnidentified08;
 };
 
-// Payload-less loaded-game notifications. Every virtual is inline, so the
-// vtables and retained weak copies belong to the session translation unit.
-class NetMessageLoadedGame : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer*) { }
-    virtual ~NetMessageLoadedGame() { }
-    virtual int GetType() { return 0xF; }
-};
-
-class NetMessageLoadedGameClient : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer*) { }
-    virtual ~NetMessageLoadedGameClient() { }
-    virtual int GetType() { return 0x12; }
-};
-
-class NetMessageLoadedGameEveryone : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer*) { }
-    virtual ~NetMessageLoadedGameEveryone() { }
-    virtual int GetType() { return 0x13; }
-};
+#include "Game/NetworkLoadedGameMessages.h"
 
 class NetMessageDraftMachineInfo : public NetworkMessage
 {
@@ -198,33 +161,7 @@ public:
     /* 0x09 */ s8 mMachineIndex;
 };
 
-class NetMessagePauseRequest : public NetworkMessage
-{
-public:
-    virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessagePauseRequest();
-    virtual int GetType();
-
-    /* 0x08 */ u8 mMachineIndex;
-    /* 0x09 */ u8 mPaused;
-};
-
-// "HOST sending Pause Response to all clients and myself".
-class NetMessagePauseResponse : public NetworkMessage
-{
-public:
-    NetMessagePauseResponse() { }
-    NetMessagePauseResponse(u8 machineMask)
-        : mMachineMask(machineMask)
-    {
-    }
-
-    virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual ~NetMessagePauseResponse() { }
-    virtual int GetType();
-
-    /* 0x08 */ u8 mMachineMask;
-};
+#include "Game/NetworkPauseMessages.h"
 
 class NetMessageSkipNis : public NetworkMessage
 {

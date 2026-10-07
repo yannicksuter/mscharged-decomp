@@ -41,6 +41,7 @@ private:
     /* 0xA0 */ int mPointerStates[4];
 
 public:
+    // Gates automatic hover rumble in OnPointerEnter.
     /* 0xB0 */ bool mSpeakerEnabled;
 }; // size 0xB4
 

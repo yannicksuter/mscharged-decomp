@@ -666,7 +666,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             mDrawBlackOverlay = false;
             Wiper::Instance().DoWipe(wipe);
-            if (!Wiper::Instance().CutHasOccured()
+            if (!Wiper::Instance().CutHasOccurred()
                 && Wiper::Instance().WipeInProgress())
             {
                 StopWithUndo();

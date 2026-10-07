@@ -12,8 +12,8 @@ public:
         SetSeconds(seconds);
     }
 
-    bool Countup(float dt, float thresh);
-    bool Countdown(float dt, float thresh);
+    bool Countup(float deltaTime, float thresholdSeconds);
+    bool Countdown(float deltaTime, float thresholdSeconds);
     f32 GetSeconds() const;
     void SetSeconds(float seconds);
     void UnidentifiedClear()

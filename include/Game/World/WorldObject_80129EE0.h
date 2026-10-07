@@ -6,7 +6,8 @@
 
 // Common base of the stream objects whose vtables share the matrix accessor at
 // 0x80129EE0 (it returns the matrix at +0x20) and the empty SetWorldMatrix at
-// 0x80341EE8: the two stadium markers, WorldObject_805223B0 and WorldEffect.
+// 0x80341EE8: the stadium markers and WorldEffect. The 0x104 stream object
+// constructs this base directly.
 // No drawable vtable uses either body. WorldEffect also uses the world and
 // animation context in this prefix. The original class name is unknown.
 class WorldAnimController;
@@ -14,6 +15,9 @@ class WorldAnimController;
 class WorldObject_80129EE0 : public WorldObject
 {
 public:
+    virtual ~WorldObject_80129EE0() { }
+    virtual void Initialize(WorldObjectLoadContext* context);
+    virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix() { return &mWorldMatrix; }
     virtual void SetWorldMatrix(const nlMatrix4& transform);
 

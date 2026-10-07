@@ -9,7 +9,7 @@
 /**
  * Offset/Address/Size: 0x0 | 0x802FFAFC | size: 0x1D8
  */
-void TLSlide::UpdateAsset(TLInstance* instance, float time)
+void TLSlide::UpdateAsset(TLInstance* instance, float deltaTime)
 {
     if (instance->pChildren == 0)
     {
@@ -21,9 +21,9 @@ void TLSlide::UpdateAsset(TLInstance* instance, float time)
     {
         if (child->GetType() == TLAT_COMPONENT)
         {
-            ((TLComponentInstance*)child)->Update(time);
+            ((TLComponentInstance*)child)->Update(deltaTime);
         }
-        UpdateAsset(child, time);
+        UpdateAsset(child, deltaTime);
         if (nlDLRingIsEnd<TLInstance>(instance->pChildren, child))
         {
             break;
@@ -35,14 +35,14 @@ void TLSlide::UpdateAsset(TLInstance* instance, float time)
 /**
  * Offset/Address/Size: 0x1D8 | 0x802FFCD4 | size: 0x308
  */
-void TLSlide::Update(float time)
+void TLSlide::Update(float deltaTime)
 {
-    if (field_0x44)
+    if (m_bPaused)
     {
-        time = 0.0f;
+        deltaTime = 0.0f;
     }
 
-    m_time += time;
+    m_time += deltaTime;
     float end = GetStartTime() + GetDuration();
     if (m_time > end)
     {
@@ -84,9 +84,9 @@ void TLSlide::Update(float time)
         }
         if (instance->GetType() == TLAT_COMPONENT)
         {
-            ((TLComponentInstance*)instance)->Update(time);
+            ((TLComponentInstance*)instance)->Update(deltaTime);
         }
-        UpdateAsset(instance, time);
+        UpdateAsset(instance, deltaTime);
         if (nlDLRingIsEnd<TLInstance>(pChildren, instance))
         {
             break;
@@ -109,6 +109,6 @@ TLSlide::TLSlide()
     m_animations = 0;
     m_time = 0.0f;
     m_uPlayMode = TLPM_LOOPING;
-    field_0x44 = false;
+    m_bPaused = false;
     SetName("<undefined slide>");
 }

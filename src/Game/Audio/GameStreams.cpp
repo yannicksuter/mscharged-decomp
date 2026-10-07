@@ -1,26 +1,14 @@
-#include "revolution/types.h"
-#include "NL/nlDLListContainer.inl"
-#include "revolution/os/OSTime.h"
-#include "Game/Sys/audio.h"
 #include "Game/Audio/GameStreams.h"
+#include "revolution/os/OSTime.h"
 #include "Game/Audio/AudioGlobals.h"
 #include "Game/Audio/RegistryPools.h"
-
-#include "Game/Audio/AudioBundleManager.h"
 #include "Game/Audio/XSoundCueHandle.h"
-#include "Game/Audio/AudioGlobals.h"
+#include "Game/NetworkPeer.h"
 #include "Game/Player.h"
+#include "Game/Sys/audio.h"
 #include "Game/TweakRegistry.h"
 #include "NL/globalpad.h"
 #include "NL/nlString.h"
-#include "Game/NetworkInput.h"
-
-
-struct AudioControllerOwner
-{
-    u8 m_Unknown00[4];
-    int m_PadIndex;
-};
 
 struct RestrictedStreamSlot
 {
@@ -61,8 +49,7 @@ void InitializeGameStreams()
 
 static inline unsigned long GetAudioMilliseconds()
 {
-    return (unsigned long)(OSGetTime()
-        / ((*(unsigned long*)0x800000F8 >> 2) / 1000));
+    return (unsigned long)OSTicksToMilliseconds(OSGetTime());
 }
 
 void StopCrowdReactions()
@@ -210,21 +197,21 @@ void StopSuddenDeathMusic()
 
 void SetPlayerAudioController(cPlayer* player)
 {
-    DetInput* globalPad = 0;
+    DetInput* input = 0;
     if (player != 0)
     {
-        globalPad = player->GetGlobalPad();
+        input = player->GetGlobalPad();
     }
 
-    AudioControllerOwner* owner = 0;
-    if (globalPad != 0)
+    cGlobalPad* pad = 0;
+    if (input != 0)
     {
-        owner = (AudioControllerOwner*)((NetworkPeerChannel*)globalPad->m_pMyUser)->GetLocalChannelPad();
+        pad = ((NetworkPeerChannel*)input->m_pMyUser)->GetLocalChannelPad();
     }
 
-    if (owner != 0)
+    if (pad != 0)
     {
-        int padIndex = owner->m_PadIndex;
+        int padIndex = pad->m_padIndex;
         unsigned long hash = nlStringLowerHash(sControllerSpeakerName);
         SetAudioEffectContext(&hash, padIndex + 1);
     }

@@ -20,7 +20,7 @@ public:
     void Reset();
     void Initialize();
     bool WipeInProgress() const;
-    bool CutHasOccured() const;
+    bool CutHasOccurred() const;
     static Wiper& Instance();
     void DoWipe(const char* wipe);
     virtual void Run(float dt);

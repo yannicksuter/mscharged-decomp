@@ -9,9 +9,9 @@ inline TweakIntBinding::TweakIntBinding(int* value)
 }
 
 inline bool TweakIntBinding::BindWithDefault(const char* name, int defaultValue,
-    const char* group, bool reload, float value, float min, float max)
+    const char* group, bool formatName, float value, float min, float max)
 {
-    bool found = Bind(name, value, group, reload, min, max);
+    bool found = Bind(name, value, group, formatName, min, max);
     if (!found)
     {
         *m_pValue = defaultValue;

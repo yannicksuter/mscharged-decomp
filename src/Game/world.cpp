@@ -308,8 +308,8 @@ DrawableObject* World::CreateObject(
         break;
     case 0x104:
         pObject = (DrawableObject*)pContext->m_pObject;
-        new (pObject) WorldObject_805223B0;
-        ((WorldObject_805223B0*)pObject)->UnidentifiedVirtual1C(pContext);
+        new (pObject) WorldObject_80129EE0;
+        ((WorldObject_80129EE0*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x60;
         ++pContext->m_uNumObjectsLoaded;
         break;

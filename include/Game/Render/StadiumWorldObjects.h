@@ -11,7 +11,6 @@ struct WorldObjectLoadContext;
 class StadiumWorldDrawable : public WorldDrawable
 {
 public:
-    virtual ~StadiumWorldDrawable() { }
     virtual void ReleaseResources();
     virtual void Draw();
     virtual bool IsVisibleInFrustum(const nlVector4* planes) const;

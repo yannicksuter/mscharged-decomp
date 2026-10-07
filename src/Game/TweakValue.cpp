@@ -14,9 +14,9 @@ bool TweakBindingBase::Bind(const char* path)
 }
 
 bool TweakBindingBase::Bind(const char* name, const char* group,
-    bool reload, float value, float min, float max)
+    bool formatName, float value, float min, float max)
 {
-    if (reload)
+    if (formatName)
     {
         if (NeedsTweakNameFormatting(name, 0) != 0)
         {

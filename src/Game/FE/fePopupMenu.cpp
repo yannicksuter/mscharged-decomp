@@ -507,7 +507,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
     case 110:
     {
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
-        int error = g_pNetworkSession->fn_801CA9D8();
+        int error = g_pNetworkSession->GetDWCErrorCode();
         if (error < 0)
             error = -error;
         mPopup.pMessage = new (8, false) WStr(Format<WStr>(message, error));

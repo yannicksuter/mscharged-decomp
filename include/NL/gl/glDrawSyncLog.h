@@ -25,6 +25,6 @@ public:
     unsigned int m_UnknownStateC;
 };
 
-extern "C" GLDrawSyncLog* glGetDrawSyncLog();
+GLDrawSyncLog* glGetDrawSyncLog();
 
 #endif // NL_GL_GL_DRAW_SYNC_LOG_H

@@ -16,6 +16,7 @@
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkRandom.h"
 #include "Game/NetworkSession.h"
+#include "Game/SH/SHOnlineMatchmakingDraft.h"
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Team.h"
 #include "Game/TweakValue.h"
@@ -298,7 +299,7 @@ void NetTournManager::AdvanceBracket()
 
 void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
 {
-    if (message->mUnidentified1B == 0)
+    if (message->mTournamentGame == 0)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "NetTournManager discarded NetworkStartGame Msg because not a tournament game\n");
@@ -306,9 +307,9 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     }
 
     mTournamentMachineMappingActive = true;
-    mCurrentGameIndex = (s8)message->mUnidentified1C[0];
-    mGameToTournamentMachine[0] = (s8)message->mUnidentified1C[1];
-    mGameToTournamentMachine[1] = (s8)message->mUnidentified1C[2];
+    mCurrentGameIndex = (s8)message->mTournamentSetup[0];
+    mGameToTournamentMachine[0] = (s8)message->mTournamentSetup[1];
+    mGameToTournamentMachine[1] = (s8)message->mTournamentSetup[2];
 
     u8 gameBuffer[0xFF];
     u8 buffer[0xFF];
@@ -364,12 +365,12 @@ bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
     message.mRandomSeed = randomSeed;
     message.mMachineIndex = 0;
     message.mMachineCount = 2;
-    message.mUnidentified20 = 0;
-    message.mUnidentified24 = 0;
-    message.mUnidentified1B = 1;
-    message.mUnidentified1C[0] = game->mBracketIndex;
-    message.mUnidentified1C[1] = game->mMachines[0];
-    message.mUnidentified1C[2] = game->mMachines[1];
+    message.mSecondGameRandomSeed = 0;
+    message.mThirdGameRandomSeed = 0;
+    message.mTournamentGame = 1;
+    message.mTournamentSetup[0] = game->mBracketIndex;
+    message.mTournamentSetup[1] = game->mMachines[0];
+    message.mTournamentSetup[2] = game->mMachines[1];
 
     BasicGameInfo& info = game->mGameInfo;
     message.mHomeCharacters[0] = info.mTeamIndex[0];
@@ -382,23 +383,23 @@ bool NetTournManager::SendTournamentGameStart(NetworkTournamentGame* game)
     message.mAwayCharacters[3] = info.mSidekickIndex[1][2];
     message.mStadium = info.mStadiumIndex;
 
-    u8 remote = gOnlineTwoLocalPlayers;
+    u8 twoLocalPlayers = gOnlineTwoLocalPlayers;
     for (int machine = 0; machine < 4; ++machine)
     {
         if (machine < 2)
         {
-            if (remote)
+            if (twoLocalPlayers)
             {
-                message.mMachineFlags[machine] = 2;
+                message.mMachinePlayerCounts[machine] = 2;
             }
             else
             {
-                message.mMachineFlags[machine] = 1;
+                message.mMachinePlayerCounts[machine] = 1;
             }
         }
         else
         {
-            message.mMachineFlags[machine] = 0;
+            message.mMachinePlayerCounts[machine] = 0;
         }
     }
 

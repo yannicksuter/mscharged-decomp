@@ -7,7 +7,6 @@
 bool g_bRenderParticles = true;
 u8 lbl_806E1458;
 
-ParticleUpdateTask* GetParticleUpdateTask();
 
 void ParticleUpdateNoOp(u8*)
 {

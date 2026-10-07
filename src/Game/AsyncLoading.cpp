@@ -1866,7 +1866,7 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
 
     manager->mLoadingState = 1;
     lbl_806E1040->SetVisible(false);
-    g_pNetworkSession->mUnidentified2472 = true;
+    g_pNetworkSession->mGameLoadComplete = true;
 
     float mem1Free = (float)StandardAllocator.TotalFreeMemory();
     float mem2Free = (float)VirtualAllocator.TotalFreeMemory();
@@ -1946,7 +1946,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     OnInputSessionReset();
     gNetworkInputRecording->Reset(0);
     gNetworkSyncState->Reset(0);
-    g_pNetworkSessionBase->BaseVirtual48(5);
+    g_pNetworkSessionBase->EndNetworkedGame(5);
     GetInputRouter()->Reset(0);
     gInputManager->Reset();
     g_pNetworkSessionBase->Initialize(false);

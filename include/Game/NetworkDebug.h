@@ -2,6 +2,9 @@
 #define GAME_NETWORK_DEBUG_H
 
 struct RFLStoreData;
+class NetworkSessionBase;
+
+extern NetworkSessionBase* g_pNetworkSessionBase;
 
 extern char gNetworkMiiName[12];
 extern unsigned short gNetworkMiiNameWide[11];

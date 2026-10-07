@@ -14,18 +14,18 @@ void GXMaterialProgramImpl<GXFourTextureAddMaterialProgram>::Activate(GLView*)
     gxSetNumTexGens(4);
     static_cast<GXFourTextureAddMaterialProgram*>(this)->ConfigureVertexFormat(true);
 
-    gxSetTevOrder(0, 0, 0, 4);
-    gxSetTevOrder(1, 1, 1, 4);
-    gxSetTevOrder(2, 2, 2, 4);
-    gxSetTevOrder(3, 3, 3, 4);
-    gxSetTevColourIn(0, 15, 10, 8, 15);
-    gxSetTevColourIn(1, 15, 10, 8, 0);
-    gxSetTevColourIn(2, 15, 10, 8, 0);
-    gxSetTevColourIn(3, 15, 10, 8, 0);
-    gxSetTevAlphaIn(0, 7, 5, 4, 7);
-    gxSetTevAlphaIn(1, 7, 5, 4, 0);
-    gxSetTevAlphaIn(2, 7, 5, 4, 0);
-    gxSetTevAlphaIn(3, 7, 5, 4, 0);
+    gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
+    gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
+    gxSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD3, GX_TEXMAP3, GX_COLOR0A0);
+    gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+    gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_CPREV);
+    gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_CPREV);
+    gxSetTevColourIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_CPREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+    gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_APREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_APREV);
+    gxSetTevAlphaIn(GX_TEVSTAGE3, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_APREV);
 }
 
 template <>

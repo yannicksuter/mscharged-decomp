@@ -14,6 +14,7 @@
 #include "Game/GameInfo.h"
 #include "Game/NetworkDraft.h"
 #include "Game/NetworkSession.h"
+#include "Game/SH/SHOnlineMatchmakingDraft.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/TweakValue.h"

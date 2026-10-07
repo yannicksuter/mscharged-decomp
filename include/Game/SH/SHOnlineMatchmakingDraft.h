@@ -6,6 +6,9 @@
 #include "Game/FE/feBackButton.h"
 #include "Game/FE/feScrollBar.h"
 
+extern u8 gOnlineTwoLocalPlayers;
+extern int gOnlineLocalControllerIndices[2];
+
 class SHOnlineMatchmakingDraft : public BaseSceneHandler
 {
 public:

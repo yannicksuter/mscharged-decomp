@@ -19,14 +19,4 @@ public:
     virtual void UnidentifiedVirtual18(World* world);
 };
 
-// The 0x104 stream object uses the vtable retained with BasicStadium.
-class WorldObject_805223B0 : public WorldObject
-{
-public:
-    virtual ~WorldObject_805223B0();
-    virtual void UnidentifiedVirtual1C(WorldObjectLoadContext* context);
-
-    /* 0x04 */ unsigned char mUnidentified004[0x5C];
-}; // size: 0x60
-
 #endif // GAME_WORLD_WORLD_OBJECT_H

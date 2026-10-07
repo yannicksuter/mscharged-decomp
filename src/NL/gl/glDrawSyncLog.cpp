@@ -2,7 +2,7 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" GLDrawSyncLog* glGetDrawSyncLog()
+GLDrawSyncLog* glGetDrawSyncLog()
 {
     static GLDrawSyncLog instance;
     return &instance;

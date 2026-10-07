@@ -5,9 +5,6 @@
 #include "NL/nlList.h"
 #include "types.h"
 
-extern const float lbl_806E6178;
-extern const float lbl_806E617C;
-
 void DestroyTimeRegions();
 void InitializeTimeRegions();
 
@@ -33,5 +30,9 @@ public:
 extern TimeRegion* pGamePlayTimeRegion;
 extern TimeRegion* pNISTimeRegion;
 extern TimeRegion* pAutoReplayTimeRegion;
+extern TimeRegion* pCentreFieldTimeRegion;
+extern TimeRegion* pLeftFieldTimeRegion;
+extern TimeRegion* pRightFieldTimeRegion;
+extern TimeRegion* pShotTimeRegion;
 
 #endif // GAME_DEBUG_TIME_REGIONS_H

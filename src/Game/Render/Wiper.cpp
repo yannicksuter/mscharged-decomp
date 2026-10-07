@@ -18,8 +18,6 @@
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Sys/audio.h"
 
-class MemoryAllocator;
-
 namespace
 {
 static WiperCallback wiperCallback;
@@ -49,7 +47,7 @@ bool Wiper::WipeInProgress() const
     return wiperCallback.mTransitionActive;
 }
 
-bool Wiper::CutHasOccured() const
+bool Wiper::CutHasOccurred() const
 {
     return ScreenTransitionManager::Instance()->m_Cut;
 }
@@ -104,8 +102,8 @@ void Wiper::Run(float dt)
 {
     if (!FrontEnd::m_bGameOver)
     {
-        bool b = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
-        if (!b && nlTaskManager::m_pInstance->mCurrentState == 1)
+        bool frameLocked = GetFixedUpdateTask()->mfFrameLockTime > 0.0f;
+        if (!frameLocked && nlTaskManager::m_pInstance->mCurrentState == 1)
         {
             dt = 0.0f;
         }

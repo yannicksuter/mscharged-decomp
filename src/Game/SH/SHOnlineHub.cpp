@@ -22,6 +22,7 @@
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
 #include "Game/NetworkSession.h"
+#include "Game/SH/SHOnlineMatchmakingDraft.h"
 #include "Game/NetworkSeasonCalendar.h"
 #include "Game/NetworkStatsManager.h"
 #include "Game/Render/FrontEndPresentation.h"

@@ -4,7 +4,7 @@
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Sys/audio.h"
 
-static bool mIsEnabled = true;
+static bool sSoundsEnabled = true;
 static int sSoundCategory = 0x15;
 
 void FEAudio::PlaySound(
@@ -13,7 +13,7 @@ void FEAudio::PlaySound(
     const void* debugName,
     void* context)
 {
-    if (!mIsEnabled)
+    if (!sSoundsEnabled)
     {
         return;
     }
@@ -28,7 +28,7 @@ void FEAudio::PlayTrackedSound(
     const void* debugName,
     void* context)
 {
-    if (!mIsEnabled)
+    if (!sSoundsEnabled)
     {
         return;
     }
@@ -43,7 +43,7 @@ void FEAudio::PlayAnimAudioEvent(
     void* context,
     bool restartable)
 {
-    if (!mIsEnabled)
+    if (!sSoundsEnabled)
     {
         return;
     }
@@ -69,7 +69,7 @@ void FEAudio::ResumeSound(unsigned long cueId, void* context)
 
 void FEAudio::EnableSounds(bool enable)
 {
-    mIsEnabled = enable;
+    sSoundsEnabled = enable;
 }
 
 void FEAudio::SetSoundCategory(int category)

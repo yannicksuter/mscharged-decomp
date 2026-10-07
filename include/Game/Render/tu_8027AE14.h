@@ -2,6 +2,7 @@
 #define GAME_RENDER_TU_8027AE14_H
 
 #include "NL/nlMath.h"
+#include "Game/World/WorldDrawable.h"
 #include "Game/Render/TimedObject.h"
 
 class UnidentifiedObject_8027AE14 : public TimedObject
@@ -16,23 +17,14 @@ public:
     /* 0x20 */ bool mUnidentified020;
 }; // size: 0x24
 
-class StadiumDrawable_8027ADC0
+class StadiumDrawable_8027ADC0 : public WorldDrawable
 {
 public:
     virtual ~StadiumDrawable_8027ADC0();
-    virtual void V1();
-    virtual nlMatrix4* GetWorldMatrix();
-    virtual void SetWorldMatrix(const nlMatrix4* transform);
-    virtual void V4(void* world);
+    virtual void ReleaseResources();
     virtual void Draw();
-    virtual bool IsVisibleInFrustum(const nlVector4* planes);
-    virtual void UpdateModelMaterials(void* model);
-    virtual void DrawToView(void* view);
-    virtual void V9(void* context);
+    virtual void Initialize(WorldObjectLoadContext* context);
 
-    /* 0x04 */ u8 m_Unknown04[0x1C];
-    /* 0x20 */ nlMatrix4 m_WorldMatrix;
-    /* 0x60 */ u8 m_Unknown60[0x10];
     /* 0x70 */ unsigned long m_Unknown70;
 };
 

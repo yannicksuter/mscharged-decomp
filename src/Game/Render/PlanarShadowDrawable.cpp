@@ -14,10 +14,10 @@
  * Address/Size: 0x8027A4BC | size: 0x54
  */
 PlanarShadowDrawable::PlanarShadowDrawable(
-    WorldObjectLoadContext*, glModel* model, unsigned long type)
+    WorldObjectLoadContext*, glModel* model, unsigned long hash)
 {
     m_uObjectFlags = 0;
-    Initialize(model, type);
+    Initialize(model, hash);
 }
 
 /**

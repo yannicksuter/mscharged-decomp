@@ -5,6 +5,7 @@
 #include "Game/FE/feHelpFuncs_decl.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/NetworkSession.h"
+#include "Game/SH/SHOnlineMatchmakingDraft.h"
 #include "Game/Sys/debug.h"
 
 #include "Game/GameSceneManager.h"

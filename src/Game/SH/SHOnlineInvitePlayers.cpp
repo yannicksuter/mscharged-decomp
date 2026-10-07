@@ -342,7 +342,7 @@ void SHOnlineInvitePlayers::Update(float fDeltaT)
     {
         lobby->CloseConnectionsAndReset();
         g_pFriendManager->SetOwnStatusInitial(0);
-        int errorCode = g_pNetworkSession->fn_801CA9D8();
+        int errorCode = g_pNetworkSession->GetDWCErrorCode();
         ShowLobbyError(GetOnlineErrorPopup(errorCode, g_pNetworkSession->RequiresDisconnectAfterError(), 0x5B));
     }
     else if (lobby->mLateCancelRequested)

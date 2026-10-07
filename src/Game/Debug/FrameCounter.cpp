@@ -37,8 +37,8 @@ static nlColour sHappyColour = { 0, 192, 0, 255 };
 static nlColour FrameBackgroundColour = { 0, 0, 0, 128 };
 static const char* FrameCounterOutputString = "%2.2fFPS %0.3fms [%0.3fms %s, %0.3fms %s]";
 
-const float lbl_806E6178 = 17.0f;
-const float lbl_806E617C = 10.0f;
+const float gTimeRegionHistogramMinValue = 17.0f;
+const float gTimeRegionHistogramBinSize = 10.0f;
 
 nlListContainer<TimeRegion*> TimeRegion::sTimeRegionList;
 

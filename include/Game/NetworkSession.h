@@ -1,6 +1,7 @@
-#include "Game/OnlinePlayer.h"
 #ifndef GAME_NETWORK_SESSION_H
 #define GAME_NETWORK_SESSION_H
+
+#include "Game/NetworkDebug.h"
 
 #include "Game/LANLobbyListener.h"
 #include "Game/main.h"
@@ -23,7 +24,6 @@ class LANLobby;
 class NetworkLobby;
 class NetMessageGameStart;
 
-extern int g_BuildNumber;
 extern int gNetworkBuildNumberOverride;
 
 class NetworkConnectionListener;
@@ -43,13 +43,13 @@ public:
 class NetworkConnectionListener
 {
 public:
-    virtual void ListenerVirtual00(void* buffer, int size) = 0;
+    virtual void OnBroadcastReceived(void* buffer, int size) = 0;
     virtual void OnMessageReceived(int source, void* buffer, int size, bool reliable) = 0;
     virtual void OnConnectionRequest(u32 connection, u8* address) = 0;
     virtual void OnConnected(u32 connection, int result) = 0;
     virtual void OnConnectionClosed(u32 connection, int reason) = 0;
     virtual void ListenerVirtual14() = 0;
-    virtual void ListenerVirtual18() = 0;
+    virtual void OnVoiceReceived() = 0;
 };
 
 // Public operations supplied by the session's direct/broadcast socket.
@@ -103,7 +103,6 @@ struct TransportPlayerInfo
     /* 0x12 */ u16 mLosses;
 }; // size: 0x14
 
-
 class NetworkMachineRoster
 {
 public:
@@ -143,14 +142,19 @@ public:
     virtual NetworkSocket* GetDirectSocket();
     virtual NetworkMachineRoster* GetMachineRoster();
     virtual LANLobby* GetTransport();
-    virtual void BaseVirtual3C(const NetworkGameStartInfo* info);
+    virtual void InitializeGamePeers(const NetworkGameStartInfo* info);
     virtual void BaseVirtual40();
-    virtual void BaseVirtual44(NetMessageGameStart* message);
-    virtual void BaseVirtual48(int reason);
-    virtual int Send(s8 player, void* buffer, int size, bool reliable);
+    virtual void StartNetworkedGame(NetMessageGameStart* message);
+    virtual void EndNetworkedGame(int reason);
+    virtual int Send(s8 machineIndex, void* buffer, int size, bool reliable);
     virtual void DebugDraw();
 };
 
+struct NetworkSocketInitializeInfo
+{
+    u32 mVersionWord;
+    bool mDirectMode;
+};
 
 // Reliable UDP direct/broadcast socket layer owned by the session.
 class NetworkSocket : public NetworkSocketInterface,
@@ -244,7 +248,6 @@ struct NetworkTransportConnectionSlot
     TransportConnection* m_Connection;
     int mStatus;
 };
-
 
 class NetMessageReadyToLaunchConfirm;
 class NetMessageFoundGame;
@@ -386,7 +389,6 @@ public:
     /* 0x1CC */ NetworkSocket* mSocket;
 }; // size: 0x1D0
 
-
 class NetworkSession : public NetworkSessionBase,
                                    public NetworkConnectionListener,
                                    public NetworkMessageReceiver
@@ -396,8 +398,8 @@ public:
 
     NetworkSession()
     {
-        mUnidentified2464 = 0;
-        mUnidentified2468 = 0;
+        mPauseEventOwner = 0;
+        mResumingEventOwner = 0;
         Initialize(true);
     }
 
@@ -422,6 +424,13 @@ public:
     void DWCLoginCallback(int error, int profileID, void* param);
     bool RequestLoginRankings();
     void UpdateLogin();
+    void RequestLoginNearbySeasonRankingsAgain();
+    void RequestLoginNearbyDailyRankings();
+    void RequestLoginNearbyDailyRankingsAgain();
+    void RequestLoginFriendsSeasonRankings();
+    void RequestLoginTopDailyRankings();
+    void RequestLoginTopSeasonRankings();
+
     void ShutdownOnline();
     NetworkLobby* GetOnlineLobby();
     NetworkStatsInterface* GetStatsInterface();
@@ -440,17 +449,16 @@ public:
     void PopupNetworkError(int overlay);
     void DisconnectOnlineMatch();
 
-
     virtual void Initialize(bool);
     virtual void Update();
     virtual NetworkSocket* GetDirectSocket();
     virtual NetworkMachineRoster* GetMachineRoster();
     virtual LANLobby* GetTransport();
-    virtual void BaseVirtual3C(const NetworkGameStartInfo* info);
+    virtual void InitializeGamePeers(const NetworkGameStartInfo* info);
     virtual void BaseVirtual40();
-    virtual void BaseVirtual44(NetMessageGameStart* message);
-    virtual void BaseVirtual48(int reason);
-    virtual int Send(s8 player, void* buffer, int size, bool reliable);
+    virtual void StartNetworkedGame(NetMessageGameStart* message);
+    virtual void EndNetworkedGame(int reason);
+    virtual int Send(s8 machineIndex, void* buffer, int size, bool reliable);
 
     virtual void InitializeLAN();
     virtual void InitializeOnline();
@@ -459,14 +467,14 @@ public:
     virtual int GetSessionState();
     virtual void SetSessionState(int);
 
-    virtual void ListenerVirtual00(void* buffer, int size);
+    virtual void OnBroadcastReceived(void* buffer, int size);
     virtual void OnMessageReceived(
         int source, void* buffer, int size, bool reliable);
     virtual void OnConnectionRequest(u32 connection, u8* address);
     virtual void OnConnected(u32 connection, int result);
     virtual void OnConnectionClosed(u32 connection, int reason);
     virtual void ListenerVirtual14();
-    virtual void ListenerVirtual18();
+    virtual void OnVoiceReceived();
 
     virtual int ProcessMessage(NetworkMessage* message);
 
@@ -481,44 +489,39 @@ public:
     /* 0x2458 */ NetworkLobby* mLobby;
     /* 0x245C */ NetworkStatsReporter* mStatsReporter;
     /* 0x2460 */ NetworkRanking* mRankingReporter;
-    /* 0x2464 */ u32 mUnidentified2464;
-    /* 0x2468 */ u32 mUnidentified2468;
+    /* 0x2464 */ u32 mPauseEventOwner;
+    /* 0x2468 */ u32 mResumingEventOwner;
     /* 0x246C */ u8 mPauseRequestMachineMask;
     /* 0x246D */ u8 mPausedMachineMask;
     /* 0x246E */ u8 mMachineLoadedGame[4];
-    /* 0x2472 */ u8 mUnidentified2472;
+    /* 0x2472 */ u8 mGameLoadComplete;
     /* 0x2473 */ u8 mCupMode;
-    /* 0x2474 */ u32 mUnidentified2474;
-    /* 0x2478 */ u32 mUnidentified2478;
-    /* 0x247C */ int mUnidentified247C;
+    /* 0x2474 */ u32 mSecondGameRandomSeed;
+    /* 0x2478 */ u32 mThirdGameRandomSeed;
+    /* 0x247C */ int mGameNumber;
     /* 0x2480 */ int mOverlayRequest;
     /* 0x2484 */ int mPoppedOverlay;
-    long fn_801CA9D8() const { return mDWCErrorCode; }
+    long GetDWCErrorCode() const { return mDWCErrorCode; }
 
     /* 0x2488 */ long mDWCErrorCode;
     /* 0x248C */ DWCErrorType mDWCErrorType;
     /* 0x2490 */ int mDWCLastError;
-    /* 0x2494 */ u8 mUnidentified2494;
+    /* 0x2494 */ u8 mFriendsMatchProcessingSuspended;
     /* 0x2498 */ int mLoginStage;
     /* 0x249C */ NetworkLoginListener* mLoginListener;
     /* 0x24A0 */ float mLoginStartTime;
-    /* 0x24A4 */ u8 mUnidentified24A4;
-    /* 0x24A5 */ u8 mUnidentified24A5;
+    /* 0x24A4 */ u8 mLoginRequestStarted;
+    /* 0x24A5 */ u8 mDWCInitialized;
     /* 0x24A8 */ u32 mLoginThread[0x318 / 4];
     /* 0x27C0 */ u8 mLoginThreadStack[0x4000];
 }; // size: 0x67C0
 
-extern NetworkSessionBase* g_pNetworkSessionBase;
 extern NetworkSession* g_pNetworkSession;
-
 
 unsigned int GetNetworkVersionWord();
 
 void RestartSinglePlayerGame();
 void StartSinglePlayerGame();
 void PlaybackRecordedGame();
-
-extern u8 gOnlineTwoLocalPlayers;
-extern int gOnlineLocalControllerIndices[2];
 
 #endif // GAME_NETWORK_SESSION_H

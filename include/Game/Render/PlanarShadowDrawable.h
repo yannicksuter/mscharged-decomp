@@ -16,7 +16,7 @@ class PlanarShadowDrawable : public DrawableObject
 {
 public:
     PlanarShadowDrawable(
-        WorldObjectLoadContext* context, glModel* model, unsigned long type);
+        WorldObjectLoadContext* context, glModel* model, unsigned long hash);
 
     virtual void Draw();
     virtual void DrawToView(GLView* view);
@@ -31,7 +31,7 @@ class ChargeShadowDrawable : public PlanarShadowDrawable
 {
 public:
     ChargeShadowDrawable(
-        WorldObjectLoadContext* context, glModel* model, unsigned long type);
+        WorldObjectLoadContext* context, glModel* model, unsigned long hash);
     virtual ~ChargeShadowDrawable();
     virtual void ReleaseResources();
     virtual void Draw();

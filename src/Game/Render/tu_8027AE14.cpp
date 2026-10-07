@@ -14,20 +14,20 @@ bool lbl_806E19B8;
 StadiumDrawable_8027ADC0* lbl_806E19BC;
 
 
-extern "C" void fn_8027ADC0(StadiumDrawable_8027ADC0* object, void* context)
+void StadiumDrawable_8027ADC0::Initialize(WorldObjectLoadContext* context)
 {
-    ((WorldDrawable*)object)->Initialize((WorldObjectLoadContext*)context);
-    lbl_806E19BC = object;
+    WorldDrawable::Initialize(context);
+    lbl_806E19BC = this;
 }
 
-extern "C" void fn_8027ADF0(StadiumDrawable_8027ADC0*)
+void StadiumDrawable_8027ADC0::ReleaseResources()
 {
 }
 
-extern "C" void fn_8027ADF4(StadiumDrawable_8027ADC0* object)
+void StadiumDrawable_8027ADC0::Draw()
 {
-    if (object->m_Unknown70 != 0 || lbl_806E19B8)
-        ((WorldDrawable*)object)->WorldDrawable::Draw();
+    if (m_Unknown70 != 0 || lbl_806E19B8)
+        WorldDrawable::Draw();
 }
 
 UnidentifiedObject_8027AE14::UnidentifiedObject_8027AE14(const nlVector3& param1)

@@ -104,7 +104,7 @@ void SHOnlineLogin::Update(float fDeltaT)
             mState = 2;
         break;
     case 2:
-        if (!g_pNetworkSession->mUnidentified24A4)
+        if (!g_pNetworkSession->mLoginRequestStarted)
         {
             int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x74);
             if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
@@ -263,6 +263,6 @@ int GetOnlineErrorPopup(int error, bool connected, int value)
     if (!found)
         tDebugPrintManager::Print(DC_NETWORK, "Warning failed to find standard error msg for code %d\n", error);
     if (connected)
-        g_pNetworkSession->mUnidentified2494 = true;
+        g_pNetworkSession->mFriendsMatchProcessingSuspended = true;
     return value;
 }

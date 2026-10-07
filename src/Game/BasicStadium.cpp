@@ -1,5 +1,11 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/BasicStadium.h"
+#include "Game/Render/StadiumWorldObjects.h"
+#include "Game/Render/StadiumPhysicsObject.h"
+#include "Game/Render/tu_8027AE14.h"
+#include "Game/World/WorldObjectLoadContext.h"
+#include "Game/World/WorldObject.inl"
+#include "Game/TweakBindingInline.h"
 
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Drawable/DrawableObj.h"
@@ -26,6 +32,119 @@ extern "C"
 {
     float fn_80184AF8(float antiFlimmer);
     float fn_80184B08();
+}
+
+template <class T>
+static inline DrawableObject* LoadStadiumObject(WorldObjectLoadContext* context,
+    unsigned long recordSize)
+{
+    T* object = (T*)context->m_pObject;
+    new (object) T;
+    object->Initialize(context);
+    context->m_pObject += recordSize;
+    ++context->m_uNumObjectsLoaded;
+    return (DrawableObject*)object;
+}
+
+/**
+ * Address/Size: 0x80278A2C | size: 0x284
+ */
+BasicStadium::BasicStadium(GLResourcePool* pResource)
+    : World(pResource)
+{
+    m_shadowHeight = 0.0f;
+    m_fTime = 0.0f;
+
+    GetEmissionManager()->SetShadowHeight(0.0f);
+    fn_80184B08();
+
+    m_shadowLightPosition.x = 10.0f;
+    m_shadowLightPosition.y = -10.0f;
+    m_shadowLightPosition.z = 40.0f;
+
+    m_pStadiumHighRangeTweaks = new (
+        nlMalloc(sizeof(HighRangeTweaks), 8, false)) HighRangeTweaks();
+    BindHighRangeTweaks(m_pStadiumHighRangeTweaks, "/Rendering/Effects/HighRange/Stadium");
+
+    m_pMegastrikeHighRangeTweaks = new (
+        nlMalloc(sizeof(HighRangeTweaks), 8, false)) HighRangeTweaks();
+    BindHighRangeTweaks(
+        m_pMegastrikeHighRangeTweaks, "/Rendering/Effects/HighRange/Megastrike");
+
+    m_pHighRangeTweaks = m_pStadiumHighRangeTweaks;
+}
+
+/**
+ * Address/Size: 0x80277E28 | size: 0x3A8
+ */
+DrawableObject* BasicStadium::HandleObjectCreation(
+    unsigned long uType, WorldObjectLoadContext* pContext)
+{
+    DrawableObject* pObject = 0;
+    switch (uType)
+    {
+    case 0x10000:
+        pObject = LoadStadiumObject<StadiumPhysicsObject>(pContext, 0x90);
+        break;
+    case 0x10001:
+        pObject = LoadStadiumObject<StadiumCupTrophyDrawable>(pContext, 0x80);
+        break;
+    case 0x10002:
+        pObject = LoadStadiumObject<StadiumWorldDrawable>(pContext, 0x90);
+        break;
+    case 0x10003:
+        pObject = LoadStadiumObject<StadiumLight>(pContext, 0x90);
+        break;
+    case 0x10004:
+        pObject = LoadStadiumObject<StadiumAttackSideIndicator>(pContext, 0x80);
+        break;
+    case 0x10005:
+        pObject = LoadStadiumObject<StadiumDrawable_8027ADC0>(pContext, 0x80);
+        break;
+    case 0x10006:
+        pObject = LoadStadiumObject<StadiumFEModelMarker>(pContext, 0x70);
+        break;
+    case 0x10007:
+        pObject = LoadStadiumObject<StadiumShadowHeightMarker>(pContext, 0x70);
+        break;
+    case 0x10008:
+        pObject = LoadStadiumObject<StadiumToggleDrawable>(pContext, 0x80);
+        break;
+    case 0x10009:
+        pObject = LoadStadiumObject<StadiumShadowVolumeDrawable>(pContext, 0x80);
+        break;
+    case 0x1000A:
+        pObject = LoadStadiumObject<StadiumHighRangeDrawable>(pContext, 0x90);
+        break;
+    default:
+        break;
+    }
+    return pObject;
+}
+
+/**
+ * Address/Size: 0x802781D0 | size: 0x39C
+ */
+BasicStadium::~BasicStadium()
+{
+    typedef nlAVLTreeIterator<unsigned long, DrawableObject*,
+        DefaultKeyCompare<unsigned long> > DrawableIterator;
+    DrawableIterator* pIterator = m_registeredDrawables.GetIterator();
+    while (pIterator->IsValid())
+    {
+        pIterator->Current()->value->ReleaseResources();
+        if ((pIterator->Current()->value->m_uObjectCreationFlags & 1) == 0)
+        {
+            delete pIterator->Current()->value;
+        }
+        pIterator->Next();
+    }
+    if (pIterator != 0)
+    {
+        delete pIterator;
+    }
+    delete m_pStadiumHighRangeTweaks;
+    delete m_pMegastrikeHighRangeTweaks;
 }
 
 /**
@@ -231,32 +350,4 @@ void BasicStadium::SetEffectsActive(unsigned long uType, int active)
             pEffect->m_bActive = active;
         }
     }
-}
-
-/**
- * Address/Size: 0x80278A2C | size: 0x284
- */
-BasicStadium::BasicStadium(GLResourcePool* pResource)
-    : World(pResource)
-{
-    m_shadowHeight = 0.0f;
-    m_fTime = 0.0f;
-
-    GetEmissionManager()->SetShadowHeight(0.0f);
-    fn_80184B08();
-
-    m_shadowLightPosition.x = 10.0f;
-    m_shadowLightPosition.y = -10.0f;
-    m_shadowLightPosition.z = 40.0f;
-
-    m_pStadiumHighRangeTweaks = new (
-        nlMalloc(sizeof(HighRangeTweaks), 8, false)) HighRangeTweaks();
-    BindHighRangeTweaks(m_pStadiumHighRangeTweaks, "/Rendering/Effects/HighRange/Stadium");
-
-    m_pMegastrikeHighRangeTweaks = new (
-        nlMalloc(sizeof(HighRangeTweaks), 8, false)) HighRangeTweaks();
-    BindHighRangeTweaks(
-        m_pMegastrikeHighRangeTweaks, "/Rendering/Effects/HighRange/Megastrike");
-
-    m_pHighRangeTweaks = m_pStadiumHighRangeTweaks;
 }

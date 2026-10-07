@@ -3,8 +3,8 @@
 
 #include "NL/nlFunction.h"
 
-// Placeholder for the tweak-tree action registered by name and category with a
-// callback; its retail constructor is the empty function at 0x800F3A10.
+// Callers supply a tweak name, category and callback; the retail constructor
+// at 0x800F3A10 returns without storing them or registering an action.
 struct UnidentifiedTweakAction
 {
     UnidentifiedTweakAction(const char* name, const char* category,

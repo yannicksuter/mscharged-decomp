@@ -15,7 +15,8 @@ public:
     virtual void Unknown0();
     virtual int GetObjectType() const { return 9; }
 
-    void AdjustTransform(int, nlMatrix4&, bool);
+    void AdjustTransform(int componentIndex, nlMatrix4& transform,
+        bool relativeToParent);
     int AddObject(PhysicsObject*);
     PhysicsTransform* GetComponent(unsigned int i)
     {

@@ -7,8 +7,6 @@
 #include "Game/Audio/XSoundHandle.h"
 #include "types.h"
 
-class cPlayer;
-
 extern bool gAudioEnabled;
 
 struct AudioHandleState
@@ -79,16 +77,5 @@ bool StartTrackedSound(unsigned long cueId, void* context);
 void PauseAllAudio();
 void ResumeAllAudio();
 int GetAudioPauseDepth();
-void InitializeGameStreams();
-void StopCrowdReactions();
-void PlayCaptainChant(int slotId, unsigned long cueId, void* context);
-void StopCaptainChant(unsigned long cueId, void* context);
-void PlayCaptainPowerupStream(int slotId, unsigned long cueId, void* context);
-void StopCaptainPowerupStream(unsigned long cueId, void* context);
-void PlaySuddenDeathMusic();
-void PauseSuddenDeathMusic();
-void ResumeSuddenDeathMusic();
-void StopSuddenDeathMusic();
-void SetPlayerAudioController(cPlayer* player);
 
 #endif // GAME_SYS_AUDIO_H

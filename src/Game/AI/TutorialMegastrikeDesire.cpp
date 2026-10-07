@@ -3,7 +3,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/Team.h"
 
-char lbl_80504000[] = "TutorialMegastrikeDesire";
+char gTutorialMegastrikeTransitionName[] = "TutorialMegastrikeDesire";
 
 void TutorialMegastrikeDesire::Update(
     DesireUpdate*, float)
@@ -20,7 +20,7 @@ TutorialMegastrikeDesire::~TutorialMegastrikeDesire()
 
 bool TutorialMegastrikeDesire::Initialize(void*)
 {
-    const char* name = lbl_80504000;
+    const char* name = gTutorialMegastrikeTransitionName;
 
     for (int i = 0; i < 4; ++i)
     {

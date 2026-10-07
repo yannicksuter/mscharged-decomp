@@ -13,7 +13,7 @@ public:
     {
     }
 
-    void Start(float rate, float target, int mode);
+    void Start(float rate, float target, int teamIndex);
     void UpdateAndRender(float deltaTime);
 
     /* 0x00 */ float mFadeRate;

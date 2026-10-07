@@ -15,7 +15,7 @@ public:
     virtual const nlVector3& GetTargetPosition() const { return m_v3Target; }
     virtual const nlVector3& GetCameraPosition() const { return m_v3Camera; }
 
-    void fn_800F93F0(float side);
+    void AlignToSide(float side);
 
     /* 0x20 */ nlMatrix4 m_matView;
     /* 0x60 */ nlVector3 m_v3Camera;

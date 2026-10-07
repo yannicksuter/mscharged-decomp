@@ -15,12 +15,12 @@ void NetMessageGameStart::Serialize(NetworkMessageSerializer* serializer)
     serializer->Transfer(&mAwayCharacters[2], sizeof(mAwayCharacters[2]));
     serializer->Transfer(&mAwayCharacters[3], sizeof(mAwayCharacters[3]));
     serializer->Transfer(&mStadium, sizeof(mStadium));
-    serializer->Transfer(mMachineFlags, sizeof(mMachineFlags));
-    serializer->Transfer(&mUnidentified1B, sizeof(mUnidentified1B));
-    serializer->Transfer(&mUnidentified1C[0], sizeof(mUnidentified1C[0]));
-    serializer->Transfer(&mUnidentified1C[1], sizeof(mUnidentified1C) - 1);
-    serializer->Transfer(&mUnidentified20, sizeof(mUnidentified20));
-    serializer->Transfer(&mUnidentified24, sizeof(mUnidentified24));
+    serializer->Transfer(mMachinePlayerCounts, sizeof(mMachinePlayerCounts));
+    serializer->Transfer(&mTournamentGame, sizeof(mTournamentGame));
+    serializer->Transfer(&mTournamentSetup[0], sizeof(mTournamentSetup[0]));
+    serializer->Transfer(&mTournamentSetup[1], sizeof(mTournamentSetup) - 1);
+    serializer->Transfer(&mSecondGameRandomSeed, sizeof(mSecondGameRandomSeed));
+    serializer->Transfer(&mThirdGameRandomSeed, sizeof(mThirdGameRandomSeed));
 }
 
 int NetMessageGameStart::GetType()

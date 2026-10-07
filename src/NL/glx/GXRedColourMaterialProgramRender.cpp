@@ -38,13 +38,14 @@ void GXMaterialProgramImpl<GXRedColourMaterialProgram>::Draw(
     GXColor colour = { 255, 0, 0, 255 };
     GXSetTevKColor(GX_KCOLOR0, colour);
 
-    static_cast<GXRedColourMaterialProgram*>(this)->BindVertexArrays(packet);
-    static_cast<GXRedColourMaterialProgram*>(this)->BindParameters(packet);
+    GXRedColourMaterialProgram* program = static_cast<GXRedColourMaterialProgram*>(this);
+    program->BindVertexArrays(packet);
+    program->BindParameters(packet);
 
     if (packet->displayList != 0)
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);
     else if (packet->indexBuffer != 0)
-        static_cast<GXRedColourMaterialProgram*>(this)->DrawIndexed(packet);
+        program->DrawIndexed(packet);
     else
-        static_cast<GXRedColourMaterialProgram*>(this)->DrawDirect(packet);
+        program->DrawDirect(packet);
 }
