@@ -13,7 +13,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
 
-u8 lbl_806DCDE0 = true;
+u8 gDepthOfFieldEnabled = true;
 
 DepthOfFieldManager::DepthOfFieldManager()
     : m_bOn(false)
@@ -57,7 +57,7 @@ void DepthOfFieldManager::Update()
         return;
     }
 
-    if (!lbl_806DCDE0)
+    if (!gDepthOfFieldEnabled)
     {
         return;
     }
