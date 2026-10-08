@@ -341,7 +341,7 @@ inline bool AudioSampleSource::WasVoiceDropped()
 
 inline bool AudioSampleSource::Prepare()
 {
-    m_InternalState = 3;
+    m_InternalState = AUDIO_SOURCE_PREPARED;
     return false;
 }
 

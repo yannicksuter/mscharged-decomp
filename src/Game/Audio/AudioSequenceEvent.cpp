@@ -159,18 +159,18 @@ int SoundPlaybackEvent::Update(float)
     switch (state)
     {
     case AUDIO_EVENT_PREPARING:
-        if (source->GetState() == 3)
+        if (source->GetState() == AUDIO_SOURCE_PREPARED)
             state = AUDIO_EVENT_PREPARED;
         break;
     case AUDIO_EVENT_PLAYING:
-        if (source->GetState() == 1)
+        if (source->GetState() == AUDIO_SOURCE_IDLE)
         {
             state = AUDIO_EVENT_STOPPED;
             flags = 0;
         }
         break;
     case AUDIO_EVENT_STOPPING:
-        if (source->GetState() == 1)
+        if (source->GetState() == AUDIO_SOURCE_IDLE)
         {
             state = AUDIO_EVENT_STOPPED;
             flags = 0;
