@@ -248,7 +248,7 @@ void CupCheaterScene::SceneCreated()
     presentation = mFEScene->m_pFEPackage->GetPresentation();
     menuHash = nlStringLowerHash("Menu");
     layerHash = nlStringLowerHash("Layer");
-    TLComponentInstance* comp = FEFinder<TLComponentInstance, 4>::Find(
+    TLComponentInstance* comp = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(
         (FEPresentation*)presentation, nlStringLowerHash("Slide1"), layerHash, menuHash, 0, 0, 0);
 
     m_SlideMenu = new ((FESlideMenu*)nlMalloc(sizeof(FESlideMenu), 8, false)) FESlideMenu(comp);
@@ -315,7 +315,7 @@ void CupCheaterScene::UpdateSlides()
         m_SlideMenu->SetSlideByIndex((unsigned char)i);
         pSlide = comp->GetActiveSlide();
 
-        pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(
+        pText = FEFinder<TLTextInstance, TLAT_TEXT>::Find<TLSlide>(
             pSlide, "number1");
 
         BasicString<char, Detail::TempStringAllocator> HomeScore(
@@ -323,7 +323,7 @@ void CupCheaterScene::UpdateSlides()
         nlStrToWcs(HomeScore.c_str(), mHomeScoreBuffer, 10);
         pText->SetString(mHomeScoreBuffer);
 
-        pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(
+        pText = FEFinder<TLTextInstance, TLAT_TEXT>::Find<TLSlide>(
             pSlide, "number2");
 
         BasicString<char, Detail::TempStringAllocator> AwayScore(
@@ -331,7 +331,7 @@ void CupCheaterScene::UpdateSlides()
         nlStrToWcs(AwayScore.c_str(), mAwayScoreBuffer, 10);
         pText->SetString(mAwayScoreBuffer);
 
-        pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(
+        pText = FEFinder<TLTextInstance, TLAT_TEXT>::Find<TLSlide>(
             pSlide, "number5");
         if (!mUserSide)
         {
