@@ -1,6 +1,7 @@
 #include <revolution/os.h>
 
 #include <revolution/ncd.h>
+#include <revolution/net/NETStartup.h>
 
 s32 GetStartupErrorCode(s32 soErr, s32 connType);
 
