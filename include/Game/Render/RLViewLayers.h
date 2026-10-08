@@ -135,7 +135,7 @@ extern GLRenderPair sWarbleOffsetTarget;
 extern GLRenderPair sWarbleTextureTarget;
 extern GLRenderPair sDofTarget;
 extern GLRenderPair sScreenGrabTarget;
-extern GLRenderPair sTarget_806E1950;
+extern GLRenderPair sUnusedTarget;
 extern bool sWidescreen;
 
 void rlSetWidescreen(bool widescreen);

@@ -109,7 +109,7 @@ GLRenderPair sWarbleOffsetTarget;
 GLRenderPair sWarbleTextureTarget;
 GLRenderPair sDofTarget;
 GLRenderPair sScreenGrabTarget;
-GLRenderPair sTarget_806E1950;
+GLRenderPair sUnusedTarget;
 bool sWidescreen;
 
 void ApplyLayerVisibilityTweaks()
