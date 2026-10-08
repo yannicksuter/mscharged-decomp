@@ -218,7 +218,7 @@ void EmissionController::Die()
     }
 }
 
-float EmissionController::GetRemainingTime() const
+float EmissionController::GetRemainingTime()
 {
     float maxRemainingTime = 0.0f;
     nlDLListIterator<ParticleSystem*> node;
@@ -557,7 +557,7 @@ void EmissionController::SetFinishedCallback(
     mFinishedCallback = fcb;
 }
 
-float EmissionController::GetBoundingRadius() const
+float EmissionController::GetBoundingRadius()
 {
     float maxRadius = 0.0f;
     nlDLListIterator<ParticleSystem*> node;
