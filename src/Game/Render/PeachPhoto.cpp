@@ -147,33 +147,153 @@ void EndPeachPhoto(PeachPhotoState* photo, bool immediate)
     }
 }
 
-static inline void SetPeachPhotoTexel(
-    PlatTexture* texture, int x, int y, unsigned short colour)
+// A 4x4 tile of 16-bit texels occupies 32 bytes.
+struct PeachPhotoTexelOffset
 {
-    int offset = (x & 3) << 1;
-    offset += (y & 3) << 3;
-    offset += ((y >> 2) * (texture->m_Width >> 2) + (x >> 2)) << 5;
+    int bytes;
+};
+
+struct PeachPhotoCoordinate
+{
+    int value;
+
+    PeachPhotoCoordinate(int v) : value(v) { }
+};
+
+struct PeachPhotoTexelColumn
+{
+    int pixel;
+    int tile;
+};
+
+static inline void GetPeachPhotoTexelColumn(
+    PeachPhotoCoordinate coordinate, PeachPhotoTexelColumn& column)
+{
+    column.tile = coordinate.value >> 2;
+    column.pixel = (coordinate.value & 3) << 1;
+}
+
+static inline PeachPhotoTexelOffset PeachPhotoTopOffset(
+    const PeachPhotoTexelColumn& column)
+{
+    PeachPhotoTexelOffset offset;
+    offset.bytes = column.pixel;
+    offset.bytes += column.tile << 5;
+    return offset;
+}
+
+static inline void SetPeachPhotoTop(
+    PlatTexture* texture, const PeachPhotoTexelColumn& column, unsigned short colour)
+{
+    PeachPhotoTexelOffset offset = PeachPhotoTopOffset(column);
     *reinterpret_cast<unsigned short*>(
-        static_cast<u8*>(texture->m_SwizzledData) + offset) = colour;
+        static_cast<u8*>(texture->m_SwizzledData) + offset.bytes) = colour;
+}
+
+static inline PeachPhotoTexelOffset PeachPhotoPixelOffset(int coordinate, int shift)
+{
+    PeachPhotoTexelOffset result;
+    result.bytes = coordinate & 3;
+    result.bytes <<= shift;
+    return result;
+}
+
+static inline PeachPhotoTexelOffset PeachPhotoCombineOffset(int columnPixel, int rowPixel)
+{
+    PeachPhotoTexelOffset result;
+    result.bytes = columnPixel;
+    result.bytes += rowPixel;
+    return result;
+}
+
+static inline PeachPhotoTexelOffset PeachPhotoColumnOffset(
+    PlatTexture* texture, const PeachPhotoTexelColumn& column, int y)
+{
+    PeachPhotoTexelOffset pixel = PeachPhotoPixelOffset(y, 3);
+    PeachPhotoTexelOffset offset;
+    offset.bytes = ((y >> 2) * (texture->m_Width >> 2) + column.tile) << 5;
+    PeachPhotoTexelOffset within = PeachPhotoCombineOffset(column.pixel, pixel.bytes);
+    offset.bytes += within.bytes;
+    return offset;
+}
+
+static inline void SetPeachPhotoBottom(PlatTexture* texture,
+    PeachPhotoCoordinate row, const PeachPhotoTexelColumn& column, unsigned short colour)
+{
+    PeachPhotoTexelOffset offset = PeachPhotoColumnOffset(texture, column, row.value);
+    *reinterpret_cast<unsigned short*>(
+        static_cast<u8*>(texture->m_SwizzledData) + offset.bytes) = colour;
+}
+
+struct PeachPhotoTexelRow
+{
+    int pixel;
+    int tile;
+};
+
+static inline void GetPeachPhotoTexelRow(
+    PeachPhotoCoordinate coordinate, PeachPhotoTexelRow& row)
+{
+    row.tile = coordinate.value >> 2;
+    row.pixel = (coordinate.value & 3) << 3;
+}
+
+static inline void SetPeachPhotoLeft(
+    PlatTexture* texture, const PeachPhotoTexelRow& row, unsigned short colour)
+{
+    PeachPhotoTexelOffset offset;
+    offset.bytes = row.pixel;
+    offset.bytes += (row.tile * (texture->m_Width >> 2)) << 5;
+    *reinterpret_cast<unsigned short*>(
+        static_cast<u8*>(texture->m_SwizzledData) + offset.bytes) = colour;
+}
+
+static inline PeachPhotoTexelOffset PeachPhotoRowOffset(
+    PlatTexture* texture, int column, const PeachPhotoTexelRow& row)
+{
+    PeachPhotoTexelOffset within = PeachPhotoPixelOffset(column, 1);
+    PeachPhotoTexelOffset offset;
+    offset.bytes = (row.tile * (texture->m_Width >> 2) + (column >> 2)) << 5;
+    within.bytes += row.pixel;
+    offset.bytes += within.bytes;
+    return offset;
+}
+
+static inline void SetPeachPhotoRight(PlatTexture* texture,
+    PeachPhotoCoordinate column, const PeachPhotoTexelRow& row, unsigned short colour)
+{
+    PeachPhotoTexelOffset offset = PeachPhotoRowOffset(texture, column.value, row);
+    *reinterpret_cast<unsigned short*>(
+        static_cast<u8*>(texture->m_SwizzledData) + offset.bytes) = colour;
 }
 
 void SetPeachPhotoTextureBorder(
     unsigned short colour, unsigned long textureHandle)
 {
+    int x, y;
     PlatTexture* texture = glx_GetTex(textureHandle);
     const int width = texture->m_Width;
     const int height = texture->m_Height;
+    PeachPhotoCoordinate coordinate(0);
 
-    for (int x = 0; x < width; ++x)
+    for (x = 0; x < width; ++x)
     {
-        SetPeachPhotoTexel(texture, x, 0, colour);
-        SetPeachPhotoTexel(texture, x, height - 1, colour);
+        coordinate.value = x;
+        PeachPhotoTexelColumn column;
+        GetPeachPhotoTexelColumn(coordinate, column);
+        coordinate.value = height - 1;
+        SetPeachPhotoTop(texture, column, colour);
+        SetPeachPhotoBottom(texture, coordinate, column, colour);
     }
 
-    for (int y = 0; y < height; ++y)
+    for (y = 0; y < height; ++y)
     {
-        SetPeachPhotoTexel(texture, 0, y, colour);
-        SetPeachPhotoTexel(texture, width - 1, y, colour);
+        coordinate.value = y;
+        PeachPhotoTexelRow row;
+        GetPeachPhotoTexelRow(coordinate, row);
+        SetPeachPhotoLeft(texture, row, colour);
+        coordinate.value = width - 1;
+        SetPeachPhotoRight(texture, coordinate, row, colour);
     }
 }
 

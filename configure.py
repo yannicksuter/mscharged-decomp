@@ -862,7 +862,7 @@ config.libs = [
             Object(Matching, "Game/Render/Nis.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/NPCManager.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/NumberDisplay.cpp", extra_cflags=["-ipa file"]),
-            Object(NonMatching, "Game/Render/PeachPhoto.cpp", extra_cflags=["-ipa file"]),
+            Object(Matching, "Game/Render/PeachPhoto.cpp", extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/Presentation.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/Render/RenderShadow.cpp", cflags=cflags_game_deferred, extra_cflags=["-ipa file"]),
             Object(Matching, "Game/Render/RLView.cpp"),
