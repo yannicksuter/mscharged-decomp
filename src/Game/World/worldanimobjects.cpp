@@ -237,7 +237,7 @@ void WorldDrawable::Initialize(WorldObjectLoadContext* pContext)
     glModel*& pModel = m_pModel;
     pContext->m_pWorld->ResolveModel(pModel);
     m_pModel = glModelDupNoStreams(
-        (glModel*)m_pModel, true,
+        m_pModel, true,
         pContext->m_pWorld->m_pResource);
 }
 
