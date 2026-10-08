@@ -545,8 +545,8 @@ void Windy::Reset()
     mtWindTimer.Clear();
     aWindDirection = 0;
     fWindStrength = 0.0f;
-    eDebrisType = -1;
-    eLastDebrisType = -1;
+    eDebrisType = WIND_DEBRIS_NONE;
+    eLastDebrisType = WIND_DEBRIS_NONE;
 }
 
 inline void Windy::RegisterDebugFields(u16* type, DebugWriteCache* cache)
@@ -576,13 +576,13 @@ inline nlVector3 Windy::GetDebrisVelocity(const nlVector3& direction)
     float speed = 0.0f;
     switch (eDebrisType)
     {
-    case 0:
+    case WIND_DEBRIS_COW:
         speed = gDebrisSpeed0;
         break;
-    case 1:
+    case WIND_DEBRIS_CATFISH:
         speed = gDebrisSpeed1;
         break;
-    case 2:
+    case WIND_DEBRIS_TRACTOR:
         speed = gDebrisSpeed2;
         break;
     }
