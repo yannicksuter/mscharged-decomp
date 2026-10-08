@@ -27,7 +27,7 @@ class DebugWriteCache;
 class cSHierarchy;
 class CharacterPhysicsData;
 class AnimRetargetList;
-struct UnidentifiedCharacterObject_8001C158;
+struct cCharacterSFX;
 
 enum eCharacterClass
 {
@@ -321,7 +321,7 @@ public:
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[3];
-    /* 0x0F8 */ UnidentifiedCharacterObject_8001C158* mUnidentified0F8;
+    /* 0x0F8 */ cCharacterSFX* m_pCharacterSFX;
     /* 0x0FC */ void* mUnidentified0FC;
     /* 0x100 */ u32 mUnidentified100;
     /* 0x104 */ u32 mUnidentified104;

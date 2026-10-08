@@ -80,7 +80,7 @@
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
-struct UnidentifiedCharacterObject_8001C158
+struct cCharacterSFX
 {
     u32 mUnidentified00;
 };
@@ -274,7 +274,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     , m_szEffectsName(0)
     , m_eClassType(eNewClassType)
     , m_bIsUsingElectrocutionTexture(false)
-    , mUnidentified0F8(0)
+    , m_pCharacterSFX(0)
     , mUnidentified0FC(0)
     , mUnidentified100(0)
     , mUnidentified104(0)
@@ -355,7 +355,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
     mUnidentified0E8 = hierarchy0->GetNodeIndexByID(
         nlStringLowerHash("bip01 r foot"));
-    mUnidentified0F8 = new (8, false) UnidentifiedCharacterObject_8001C158;
+    m_pCharacterSFX = new (8, false) cCharacterSFX;
     m_pEffectsTexturing = 0;
     m_pBlinker = MakeBlinker(mUnidentified024.m_eCharacterClass);
     nlVec3Set(m_v3ScreenPosition, 0.0f, 0.0f, 0.0f);
@@ -392,7 +392,7 @@ cCharacter::~cCharacter()
         delete m_pPhysicsCharacter;
     }
     delete m_pHeadTrack;
-    delete mUnidentified0F8;
+    delete m_pCharacterSFX;
     if (m_pBlinker != 0)
     {
         delete m_pBlinker;
