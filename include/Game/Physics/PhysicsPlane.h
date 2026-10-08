@@ -9,7 +9,7 @@ class PhysicsPlane : public PhysicsObject
 {
 public:
     PhysicsPlane(CollisionSpace*, float, float, float, float);
-    virtual int GetObjectType() const { return 6; }
+    virtual int GetObjectType() const { return PHYSOBJ_PLANE; }
 };
 
 #endif

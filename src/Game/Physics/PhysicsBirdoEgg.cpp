@@ -40,7 +40,7 @@ ContactType PhysicsBirdoEgg::Contact(
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -85,7 +85,7 @@ ContactType PhysicsBirdoEgg::Contact(
         }
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         PowerupBase* powerup = ((PhysicsBanana*)other)->m_pPowerupObject;
         if (mBirdoEgg->mShooter == powerup->m_pThrower
@@ -104,7 +104,7 @@ ContactType PhysicsBirdoEgg::Contact(
         }
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         PowerupBase* powerup = ((PhysicsShell*)other)->m_pPowerupObject;
         if (mBirdoEgg->mShooter == powerup->m_pThrower
@@ -115,7 +115,7 @@ ContactType PhysicsBirdoEgg::Contact(
         QueueBirdoEggDestroyPowerup(powerup);
         break;
     }
-    case 0x1F:
+    case PHYSOBJ_HAMMER:
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
         if (mBirdoEgg->mShooter == hammer->mOwner)
@@ -129,7 +129,7 @@ ContactType PhysicsBirdoEgg::Contact(
         QueueBirdoEggDestroyHammer(hammer);
         break;
     }
-    case 0x20:
+    case PHYSOBJ_YOSHI_EGG:
     {
         YoshiEggObject* egg = ((PhysicsYoshiEgg*)other)->mYoshiEgg;
         if (egg->mActive)
@@ -151,7 +151,7 @@ ContactType PhysicsBirdoEgg::Contact(
         }
         break;
     }
-    case 0x18:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
@@ -180,7 +180,7 @@ ContactType PhysicsBirdoEgg::Contact(
         }
         break;
     }
-    case 0x24:
+    case PHYSOBJ_THWOMP:
     {
         CollisionBirdoEggEndData* eventData = 0;
         g_CollisionBirdoEggEndDataPool.Allocate(eventData);
@@ -189,7 +189,7 @@ ContactType PhysicsBirdoEgg::Contact(
         QueueCollisionBirdoEggEnd(eventData);
         break;
     }
-    case 0x1E:
+    case PHYSOBJ_BULLET_BILL:
     {
         CollisionBirdoEggEndData* eventData = 0;
         g_CollisionBirdoEggEndDataPool.Allocate(eventData);
@@ -198,7 +198,7 @@ ContactType PhysicsBirdoEgg::Contact(
         QueueCollisionBirdoEggEnd(eventData);
         break;
     }
-    case 0x23:
+    case PHYSOBJ_SHOCKWAVE:
     {
         CollisionBirdoEggEndData* eventData = 0;
         g_CollisionBirdoEggEndDataPool.Allocate(eventData);
@@ -207,7 +207,7 @@ ContactType PhysicsBirdoEgg::Contact(
         QueueCollisionBirdoEggEnd(eventData);
         break;
     }
-    case 0x1C:
+    case PHYSOBJ_PATCH:
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
         if (patch->m_bKillMe)
@@ -264,7 +264,7 @@ void PhysicsBirdoEgg::PreCollide()
 
 int PhysicsBirdoEgg::GetObjectType() const
 {
-    return 0x21;
+    return PHYSOBJ_BIRDO_EGG;
 }
 
 PhysicsBirdoEgg::~PhysicsBirdoEgg()

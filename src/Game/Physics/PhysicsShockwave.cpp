@@ -72,7 +72,7 @@ ContactType PhysicsShockwave::Contact(
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cFielder* fielder =
             (cFielder*)((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -93,21 +93,21 @@ ContactType PhysicsShockwave::Contact(
         QueueCollisionShockwave(eventData);
         break;
     }
-    case 28:
+    case PHYSOBJ_PATCH:
         if (((PhysicsPatch*)other)->m_Type != 0)
         {
             break;
         }
     // fall through
-    case 16:
-    case 20:
-    case 21:
-    case 29:
-    case 30:
-    case 31:
-    case 32:
-    case 33:
-    case 34:
+    case PHYSOBJ_AI_BALL:
+    case PHYSOBJ_SHELL:
+    case PHYSOBJ_BANANA:
+    case PHYSOBJ_WALUIGI_WALL:
+    case PHYSOBJ_BULLET_BILL:
+    case PHYSOBJ_HAMMER:
+    case PHYSOBJ_YOSHI_EGG:
+    case PHYSOBJ_BIRDO_EGG:
+    case PHYSOBJ_KOOPA_SHELL:
     {
         eventData = 0;
         gCollisionShockwaveDataPool.Allocate(eventData);
@@ -116,7 +116,7 @@ ContactType PhysicsShockwave::Contact(
         QueueCollisionShockwave(eventData);
         break;
     }
-    case 24:
+    case PHYSOBJ_NPC:
         result = ONE_WAY_CONTACT_OTHER;
         break;
     }

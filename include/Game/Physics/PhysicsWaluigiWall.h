@@ -20,7 +20,7 @@ public:
     PhysicsWaluigiWall(cFielder* owner, float width, float height);
     virtual ~PhysicsWaluigiWall();
 
-    virtual int GetObjectType() const { return 0x1D; }
+    virtual int GetObjectType() const { return PHYSOBJ_WALUIGI_WALL; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PreCollide();
     virtual ContactType Contact(PhysicsObject*, dContact*, int);

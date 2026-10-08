@@ -99,7 +99,7 @@ ContactType PhysicsBanana::Contact(
         return ONE_WAY_CONTACT_OTHER;
     }
 
-    if (other->GetObjectType() == 0x12 && !m_bAllowOutOfBoundsFall)
+    if (other->GetObjectType() == PHYSOBJ_GROUND_PLANE && !m_bAllowOutOfBoundsFall)
     {
         for (int i = 0; i < numContacts; i++)
         {
@@ -139,7 +139,7 @@ ContactType PhysicsBanana::Contact(
     bool hasWallContact = false;
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -179,7 +179,7 @@ ContactType PhysicsBanana::Contact(
         }
         break;
     }
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         ball = ((PhysicsAIBall*)other)->m_pAIBall;
         if (ball->m_pOwner != 0 && ball->m_pOwner->m_eClassType == FIELDER)
@@ -227,7 +227,7 @@ ContactType PhysicsBanana::Contact(
         ++ball->m_bBallPathChangeCount;
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         if (m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0)
         {
@@ -246,7 +246,7 @@ ContactType PhysicsBanana::Contact(
         }
         return NO_CONTACT;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         if (m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0)
         {
@@ -265,7 +265,7 @@ ContactType PhysicsBanana::Contact(
         }
         return NO_CONTACT;
     }
-    case 0x18:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_CHAIN_CHOMP;
         if (isChainChomp)
@@ -275,9 +275,9 @@ ContactType PhysicsBanana::Contact(
         }
         break;
     }
-    case 0x1D:
+    case PHYSOBJ_WALUIGI_WALL:
         return ONE_WAY_CONTACT_THIS;
-    case 0x1C:
+    case PHYSOBJ_PATCH:
     {
         int patchIndex = ((PhysicsPatch*)other)->m_Type;
         int patchType = GetPhysicsPatchInfo(patchIndex)->mType;
@@ -289,8 +289,8 @@ ContactType PhysicsBanana::Contact(
     }
     default:
     {
-        if (other->GetObjectType() == 0x17
-            || other->GetObjectType() == 5)
+        if (other->GetObjectType() == PHYSOBJ_WALL
+            || other->GetObjectType() == PHYSOBJ_ROUNDED_CORNER)
         {
             for (int i = 0; i < numContacts; i++)
             {
@@ -342,8 +342,8 @@ ContactType PhysicsBanana::Contact(
     float velSq = nlVec3LengthSquared(linVel);
     if (hasWallContact && velSq > 1.0f && !m_bAllowOutOfBoundsFall)
     {
-        if (other->GetObjectType() == 0x17
-            || other->GetObjectType() == 5)
+        if (other->GetObjectType() == PHYSOBJ_WALL
+            || other->GetObjectType() == PHYSOBJ_ROUNDED_CORNER)
         {
             CollisionPowerupWallData* eventData = 0;
             g_CollisionPowerupWallDataPool.Allocate(eventData);
@@ -369,7 +369,7 @@ bool PhysicsBanana::SetContactInfo(dContact* contact, PhysicsObject* other, bool
         SetDefaultContactInfo(contact);
     }
 
-    if (other->GetObjectType() == 0x12)
+    if (other->GetObjectType() == PHYSOBJ_GROUND_PLANE)
     {
         contact->surface.bounce = gGameTweaks.m_pGameTweaks->fShellBounceGround;
     }

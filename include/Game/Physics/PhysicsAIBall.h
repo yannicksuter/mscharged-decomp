@@ -12,7 +12,7 @@ public:
     PhysicsAIBall(float radius);
 
     virtual void Unknown0();
-    virtual int GetObjectType() const { return 0x10; }
+    virtual int GetObjectType() const { return PHYSOBJ_AI_BALL; }
     virtual void PreUpdate();
     virtual void PostUpdate();
     virtual ContactType Contact(

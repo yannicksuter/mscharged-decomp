@@ -33,7 +33,7 @@ public:
 
     PhysicsNet(CollisionSpace* space, bool positive_x);
     virtual ~PhysicsNet();
-    virtual int GetObjectType() const { return 25; }
+    virtual int GetObjectType() const { return PHYSOBJ_NET; }
 
     static bool IsAGoalPost(PhysicsObject*);
     static bool IsAGoalWall(PhysicsObject*);

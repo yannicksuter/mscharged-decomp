@@ -43,7 +43,7 @@ public:
     }
 
     virtual void Unknown0();
-    virtual int GetObjectType() const { return 0x1C; }
+    virtual int GetObjectType() const { return PHYSOBJ_PATCH; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
     virtual void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);

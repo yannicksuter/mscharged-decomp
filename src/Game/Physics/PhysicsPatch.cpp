@@ -210,7 +210,7 @@ ContactType PhysicsPatch::Contact(
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cFielder* fielder = (cFielder*)((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
         if (fielder->IsCharacterInAir(GetPosition().z + GetRadius()))
@@ -258,7 +258,7 @@ ContactType PhysicsPatch::Contact(
         QueueCollisionPatchPlayer(eventData);
         return NO_CONTACT;
     }
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         QueueCollisionPatchBall(this);
         if (m_Type == 0 && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
@@ -271,7 +271,7 @@ ContactType PhysicsPatch::Contact(
         }
         return NO_CONTACT;
     }
-    case 18:
+    case PHYSOBJ_GROUND_PLANE:
     {
         eventData = 0;
         g_CollisionPatchDataPool.Allocate(eventData);
@@ -280,7 +280,7 @@ ContactType PhysicsPatch::Contact(
         QueueCollisionPatchGround(eventData);
         return NO_CONTACT;
     }
-    case 20:
+    case PHYSOBJ_SHELL:
     {
         CollisionPatchPowerupData* data = 0;
         g_CollisionPatchPowerupDataPool.Allocate(data);
@@ -289,7 +289,7 @@ ContactType PhysicsPatch::Contact(
         QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
-    case 21:
+    case PHYSOBJ_BANANA:
     {
         CollisionPatchPowerupData* data = 0;
         g_CollisionPatchPowerupDataPool.Allocate(data);
@@ -298,7 +298,7 @@ ContactType PhysicsPatch::Contact(
         QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
-    case 24:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
@@ -310,12 +310,12 @@ ContactType PhysicsPatch::Contact(
         }
         return NO_CONTACT;
     }
-    case 29:
+    case PHYSOBJ_WALUIGI_WALL:
         return m_Type == 1 ? ONE_WAY_CONTACT_THIS : NO_CONTACT;
-    case 23:
+    case PHYSOBJ_WALL:
         QueueCollisionPatchWall(this);
         return NO_CONTACT;
-    case 28:
+    case PHYSOBJ_PATCH:
         if (m_Type == 0 && !m_bKillMe)
         {
             switch (((PhysicsPatch*)other)->m_Type)

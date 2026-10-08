@@ -10,7 +10,7 @@ class PhysicsSphere : public PhysicsObject
 {
 public:
     PhysicsSphere(CollisionSpace*, PhysicsWorld*, float);
-    virtual int GetObjectType() const { return 0xA; }
+    virtual int GetObjectType() const { return PHYSOBJ_SPHERE; }
 
     float GetRadius();
     void SetRadius(float);

@@ -69,7 +69,7 @@ static inline PhysicsCharacterBase* GetRootCharacter(PhysicsObject* object)
     PhysicsObject* root = object;
     int type = root->GetObjectType();
 
-    if (type == 0xE || type == 0xD)
+    if (type == PHYSOBJ_CAPSULE_BONE || type == PHYSOBJ_SPHERE_BONE)
     {
         PhysicsObject* parent;
         while ((parent = root->m_parentObject) != 0)
@@ -78,7 +78,7 @@ static inline PhysicsCharacterBase* GetRootCharacter(PhysicsObject* object)
         }
     }
 
-    return root->GetObjectType() == 8 ? (PhysicsCharacterBase*)root : 0;
+    return root->GetObjectType() == PHYSOBJ_CHARACTER ? (PhysicsCharacterBase*)root : 0;
 }
 
 bool PhysicsCharacterBase::BaseSetContactInfo(
@@ -103,7 +103,7 @@ bool PhysicsCharacterBase::BaseSetContactInfo(
     contact->surface.soft_cfm = 0.00001f;
     contact->surface.mu = 0.0f;
 
-    if (objectType == 6 || objectType == 0xB)
+    if (objectType == PHYSOBJ_PLANE || objectType == 0xB)
     {
         contact->surface.mode &= ~dContactBounce;
         contact->surface.bounce = 0.0f;
@@ -294,7 +294,7 @@ PhysicsBoneID PhysicsCharacterBase::GetBoneIDForSubObject(
 {
     switch (object->GetObjectType())
     {
-    case 0xD:
+    case PHYSOBJ_SPHERE_BONE:
     {
         const PhysicsSphereBone* bone = (const PhysicsSphereBone*)object;
         if (bone->m_pBoneVolume != 0)
@@ -303,7 +303,7 @@ PhysicsBoneID PhysicsCharacterBase::GetBoneIDForSubObject(
         }
         break;
     }
-    case 0xE:
+    case PHYSOBJ_CAPSULE_BONE:
     {
         const PhysicsCapsuleBone* bone = (const PhysicsCapsuleBone*)object;
         if (bone->m_pBoneVolume != 0)
@@ -312,7 +312,7 @@ PhysicsBoneID PhysicsCharacterBase::GetBoneIDForSubObject(
         }
         break;
     }
-    case 0xF:
+    case PHYSOBJ_CYLINDER_BONE:
     {
         const PhysicsCylinderBone* bone = (const PhysicsCylinderBone*)object;
         if (bone->m_pBoneVolume != 0)
@@ -334,20 +334,20 @@ void PhysicsCharacterBase::SetBoneVolumeScale(float scale)
         volume = entry->entry;
         switch (volume->m_pObject->GetObjectType())
         {
-        case 0xD:
+        case PHYSOBJ_SPHERE_BONE:
         {
             ((PhysicsSphereBone*)volume->m_pObject)
                 ->SetRadius(scale * ((PhysicsSphereBone*)volume->m_pObject)->m_Radius);
             break;
         }
-        case 0xE:
+        case PHYSOBJ_CAPSULE_BONE:
         {
             PhysicsCapsuleBone* capsule = (PhysicsCapsuleBone*)volume->m_pObject;
             capsule->SetRadius(scale * capsule->m_Radius);
             capsule->SetLength(scale * capsule->m_Length);
             break;
         }
-        case 0xF:
+        case PHYSOBJ_CYLINDER_BONE:
         {
             PhysicsCylinderBone* cylinder = (PhysicsCylinderBone*)volume->m_pObject;
             cylinder->SetRadius(scale * cylinder->m_Radius);
@@ -381,22 +381,22 @@ PhysicsCharacterBase::PhysicsCylinderBone::~PhysicsCylinderBone()
 
 int PhysicsCharacterBase::GetObjectType() const
 {
-    return 8;
+    return PHYSOBJ_CHARACTER;
 }
 
 int PhysicsCharacterBase::PhysicsCylinderBone::GetObjectType() const
 {
-    return 0xF;
+    return PHYSOBJ_CYLINDER_BONE;
 }
 
 int PhysicsCharacterBase::PhysicsCapsuleBone::GetObjectType() const
 {
-    return 0xE;
+    return PHYSOBJ_CAPSULE_BONE;
 }
 
 int PhysicsCharacterBase::PhysicsSphereBone::GetObjectType() const
 {
-    return 0xD;
+    return PHYSOBJ_SPHERE_BONE;
 }
 
 BoneVolumeTypeState s_BoneVolumeType = { 0xFFFF, 0 };

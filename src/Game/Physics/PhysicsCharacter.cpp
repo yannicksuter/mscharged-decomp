@@ -99,7 +99,7 @@ bool PhysicsCharacter::SetContactInfo(
 {
     bool result = BaseSetContactInfo(contact, other, first);
     int objectType = other->GetObjectType();
-    if (objectType == 0x10 || objectType == 0x11)
+    if (objectType == PHYSOBJ_AI_BALL || objectType == PHYSOBJ_FAKE_BALL)
     {
         contact->surface.bounce = 0.2f;
     }
@@ -115,17 +115,17 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     DebugPrintf(
         "PhysChar Contact objID %d numContacts %d\n", objectType, numContacts);
 
-    if (objectType == 0x13)
+    if (objectType == PHYSOBJ_TRIGGER_VOLUME)
     {
         DebugPrintf("PhysChar PHYSOBJ_TRIGGER_VOLUME\n");
         return NO_CONTACT;
     }
-    if (objectType == 0x07)
+    if (objectType == PHYSOBJ_FINITEPLANE)
     {
         DebugPrintf("PhysChar PHYSOBJ_FINITEPLANE\n");
         return NO_CONTACT;
     }
-    if (objectType == 0x1D)
+    if (objectType == PHYSOBJ_WALUIGI_WALL)
     {
         if (m_pAICharacter->m_eClassType == FIELDER
             && !((cFielder*)m_pAICharacter)->mbTangible)
@@ -136,7 +136,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         DebugPrintf("PhysChar PHYSOBJ_TRON_WALL\n");
         return ONE_WAY_CONTACT_THIS;
     }
-    if (objectType == 0x1F && m_pAICharacter->m_eClassType == GOALIE)
+    if (objectType == PHYSOBJ_HAMMER && m_pAICharacter->m_eClassType == GOALIE)
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
         bool onGround = hammer->mLandedTimer > 0.0f;
@@ -153,7 +153,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
     }
 
-    if (objectType == 0x17 || objectType == 5)
+    if (objectType == PHYSOBJ_WALL || objectType == PHYSOBJ_ROUNDED_CORNER)
     {
         nlVector3 contactPosition;
         nlVec3Set(contactPosition, contacts->geom.pos[0], contacts->geom.pos[1], contacts->geom.pos[2]);
@@ -186,7 +186,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             return NO_CONTACT;
         }
 
-        if (sidelineCollision && objectType == 0x17
+        if (sidelineCollision && objectType == PHYSOBJ_WALL
             && GameInfoManager::Instance()->GetStadium() == 0x0B
             && m_pAICharacter->m_eClassType == FIELDER)
         {
@@ -250,7 +250,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
     }
 
-    if (objectType == 0x10)
+    if (objectType == PHYSOBJ_AI_BALL)
     {
         if (!m_CanCollideWithBall)
         {
@@ -362,7 +362,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
     }
 
     ContactType contactType = TWO_WAY_CONTACT;
-    if (objectType == 4 || objectType == 0x0D || objectType == 0x0E)
+    if (objectType == PHYSOBJ_COLUMN || objectType == PHYSOBJ_SPHERE_BONE || objectType == PHYSOBJ_CAPSULE_BONE)
     {
         if (!m_CanCollideWithCharacters)
             return NO_CONTACT;

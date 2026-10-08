@@ -410,10 +410,10 @@ void ChainChomp::CollisionCallback(
     cFielder* pFielder = 0;
     switch (pObjA->GetObjectType())
     {
-    case 0x04:
+    case PHYSOBJ_COLUMN:
         pFielder = (cFielder*)((PhysicsCharacter*)pObjA->m_parentObject)->m_pAICharacter;
         break;
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* pBall = ((PhysicsAIBall*)pObjA)->m_pAIBall;
         cFielder* pOwner = (cFielder*)pBall->m_pOwner;
@@ -432,7 +432,7 @@ void ChainChomp::CollisionCallback(
         }
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         CollisionChainPowerupData* pData = g_CollisionChainPowerupDataPool.Allocate();
         pData->pChain = pChainChomp;
@@ -440,7 +440,7 @@ void ChainChomp::CollisionCallback(
         QueueCollisionChainPowerup(pData);
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         CollisionChainPowerupData* pData = g_CollisionChainPowerupDataPool.Allocate();
         pData->pChain = pChainChomp;

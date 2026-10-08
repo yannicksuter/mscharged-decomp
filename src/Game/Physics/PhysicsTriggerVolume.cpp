@@ -53,7 +53,7 @@ ContactType PhysicsTriggerVolume::Contact(
 
     switch (other->GetObjectType())
     {
-    case 0x18:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)

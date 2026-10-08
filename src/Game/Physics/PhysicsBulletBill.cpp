@@ -41,7 +41,7 @@ ContactType PhysicsBulletBill::Contact(
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -72,7 +72,7 @@ ContactType PhysicsBulletBill::Contact(
         }
         break;
     }
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cPlayer* owner = ((PhysicsAIBall*)other)->m_pAIBall->m_pOwner;
         target = mBulletBill->target;
@@ -111,11 +111,11 @@ ContactType PhysicsBulletBill::Contact(
         }
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 0x14:
-    case 0x15:
+    case PHYSOBJ_SHELL:
+    case PHYSOBJ_BANANA:
     {
         PowerupBase* powerup;
-        if (other->GetObjectType() == 0x14)
+        if (other->GetObjectType() == PHYSOBJ_SHELL)
         {
             powerup = ((PhysicsShell*)other)->m_pPowerupObject;
         }
@@ -154,21 +154,21 @@ ContactType PhysicsBulletBill::Contact(
         QueueExplosionBulletBill(eventData);
         break;
     }
-    case 0x17:
+    case PHYSOBJ_WALL:
         if (mBulletBill->target->m_pBall != 0)
         {
             break;
         }
         // fall through
-    case 0x18:
-    case 0x19:
-    case 0x1C:
-    case 0x1D:
-    case 0x1E:
-    case 0x1F:
-    case 0x21:
-    case 0x22:
-    case 0x24:
+    case PHYSOBJ_NPC:
+    case PHYSOBJ_NET:
+    case PHYSOBJ_PATCH:
+    case PHYSOBJ_WALUIGI_WALL:
+    case PHYSOBJ_BULLET_BILL:
+    case PHYSOBJ_HAMMER:
+    case PHYSOBJ_BIRDO_EGG:
+    case PHYSOBJ_KOOPA_SHELL:
+    case PHYSOBJ_THWOMP:
     {
         eventData = 0;
         g_CollisionBulletBillDataPool.Allocate(eventData);
@@ -212,7 +212,7 @@ void PhysicsBulletBill::PreCollide()
 
 int PhysicsBulletBill::GetObjectType() const
 {
-    return 0x1E;
+    return PHYSOBJ_BULLET_BILL;
 }
 
 PhysicsBulletBill::~PhysicsBulletBill()

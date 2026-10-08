@@ -9,7 +9,7 @@ class PhysicsShell : public PhysicsSphere
 {
 public:
     PhysicsShell(float radius);
-    virtual int GetObjectType() const { return 0x14; }
+    virtual int GetObjectType() const { return PHYSOBJ_SHELL; }
     virtual bool SetContactInfo(
         dContact* contact, PhysicsObject* other, bool first);
     virtual void PreUpdate();

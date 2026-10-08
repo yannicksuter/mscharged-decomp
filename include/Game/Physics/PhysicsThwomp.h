@@ -16,7 +16,7 @@ public:
         ThwompObject* object, float lx, float ly, float lz);
     virtual ~PhysicsThwomp();
 
-    virtual int GetObjectType() const { return 0x24; }
+    virtual int GetObjectType() const { return PHYSOBJ_THWOMP; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PostUpdate();
     virtual void PreCollide();

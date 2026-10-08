@@ -385,7 +385,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
 
     switch (pObject->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* pCharacter =
             ((PhysicsCharacter*)pObject->m_parentObject)->m_pAICharacter;
@@ -498,7 +498,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         }
         break;
     }
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         pBall = ((PhysicsAIBall*)pObject)->m_pAIBall;
         if (shockwaveType == SHOCKWAVE_LIGHTNING)
@@ -576,7 +576,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         fn_80015B38(pBall, false);
         break;
     }
-    case 21:
+    case PHYSOBJ_BANANA:
         if (shockwaveType == SHOCKWAVE_HIT)
         {
             ((PhysicsBanana*)pObject)->m_pPowerupObject->fn_8009CEBC(
@@ -591,7 +591,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         }
         ((PhysicsBanana*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
-    case 20:
+    case PHYSOBJ_SHELL:
         if (shockwaveType == SHOCKWAVE_HIT)
         {
             ((PhysicsShell*)pObject)->m_pPowerupObject->fn_8009CEBC(
@@ -600,13 +600,13 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         }
         ((PhysicsShell*)pObject)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
-    case 31:
+    case PHYSOBJ_HAMMER:
         ((PhysicsHammer*)pObject)->mHammer->Deactivate(true);
         break;
-    case 29:
+    case PHYSOBJ_WALUIGI_WALL:
         ((PhysicsWaluigiWall*)pObject)->ApplyDamage(0.35f);
         break;
-    case 32:
+    case PHYSOBJ_YOSHI_EGG:
         if (((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder
             == pShockwave->mOwner)
         {
@@ -622,10 +622,10 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             (((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder)->EndSuperPower(0);
         }
         break;
-    case 30:
+    case PHYSOBJ_BULLET_BILL:
         ((PhysicsBulletBill*)pObject)->mBulletBill->Hide(false);
         break;
-    case 28:
+    case PHYSOBJ_PATCH:
         if (((PhysicsPatch*)pObject)->m_Type == 0
             && !((PhysicsPatch*)pObject)->m_bKillMe)
         {
@@ -633,8 +633,8 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             pObject->Unknown0();
         }
         break;
-    case 33:
-    case 34:
+    case PHYSOBJ_BIRDO_EGG:
+    case PHYSOBJ_KOOPA_SHELL:
         break;
     default:
         break;

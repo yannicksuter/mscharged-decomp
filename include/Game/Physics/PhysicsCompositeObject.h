@@ -13,7 +13,7 @@ public:
     virtual ~PhysicsCompositeObject();
 
     virtual void Unknown0();
-    virtual int GetObjectType() const { return 9; }
+    virtual int GetObjectType() const { return PHYSOBJ_COMPOSITE; }
 
     void AdjustTransform(int componentIndex, nlMatrix4& transform,
         bool relativeToParent);

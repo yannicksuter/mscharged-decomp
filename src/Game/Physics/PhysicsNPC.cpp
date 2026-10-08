@@ -48,7 +48,7 @@ ContactType PhysicsNPC::Contact(
 
     switch (object->GetObjectType())
     {
-    case 0x04:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)object->m_parentObject)->m_pAICharacter;
@@ -69,7 +69,7 @@ ContactType PhysicsNPC::Contact(
         }
         break;
     }
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* ball = ((PhysicsAIBall*)object)->m_pAIBall;
         if (!ball->m_pPhysicsBall->mbCanCollidePlayer)
@@ -88,7 +88,7 @@ ContactType PhysicsNPC::Contact(
         ++ball->m_bBallPathChangeCount;
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         if (mpTriggerCallbackFunc != 0)
         {
@@ -98,7 +98,7 @@ ContactType PhysicsNPC::Contact(
         }
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         if (mpTriggerCallbackFunc != 0)
         {
@@ -108,11 +108,11 @@ ContactType PhysicsNPC::Contact(
         }
         break;
     }
-    case 0x23:
+    case PHYSOBJ_SHOCKWAVE:
         return ONE_WAY_CONTACT_THIS;
     default:
     {
-        if (object->GetObjectType() == 0x17
+        if (object->GetObjectType() == PHYSOBJ_WALL
             && GameInfoManager::Instance()->GetStadium() == 0x0B)
         {
             bool isChainChomp
@@ -134,7 +134,7 @@ ContactType PhysicsNPC::Contact(
             }
         }
 
-        if (object->GetObjectType() == 0x1C)
+        if (object->GetObjectType() == PHYSOBJ_PATCH)
         {
             bool isChainChomp
                 = ((SkinAnimatedNPC*)mpAINPC)->GetSkinAnimatedNPC_Type()

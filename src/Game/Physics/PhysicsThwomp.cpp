@@ -43,14 +43,14 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
 {
     ThwompObject* thwomp = mThwomp;
     bool isDelayed = thwomp->mDelayTimer > 0.0f;
-    if (isDelayed && other->GetObjectType() != 4)
+    if (isDelayed && other->GetObjectType() != PHYSOBJ_COLUMN)
     {
         return NO_CONTACT;
     }
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -75,7 +75,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionThwompPlayer(thwomp, character);
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* ball = ((PhysicsAIBall*)other)->m_pAIBall;
         if (ball->m_pOwner == 0)
@@ -96,24 +96,24 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
         FakeBallWorld::InvalidateBallCache();
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 18:
+    case PHYSOBJ_GROUND_PLANE:
         thwomp->OnLanding();
         return ONE_WAY_CONTACT_THIS;
-    case 21:
+    case PHYSOBJ_BANANA:
         ((PhysicsBanana*)other)->m_pPowerupObject->m_bShouldDestroy = true;
         return NO_CONTACT;
-    case 20:
+    case PHYSOBJ_SHELL:
         ((PhysicsShell*)other)->m_pPowerupObject->m_bShouldDestroy = true;
         return NO_CONTACT;
-    case 24:
+    case PHYSOBJ_NPC:
         return ONE_WAY_CONTACT_OTHER;
-    case 29:
+    case PHYSOBJ_WALUIGI_WALL:
         if (thwomp->mState == THWOMP_STATE_FALLING)
         {
             ((PhysicsWaluigiWall*)other)->ApplyDamage(1.0f);
         }
         return NO_CONTACT;
-    case 23:
+    case PHYSOBJ_WALL:
         return NO_CONTACT;
     default:
         return NO_CONTACT;

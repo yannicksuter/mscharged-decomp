@@ -14,7 +14,7 @@ public:
     void SetRadius(float);
     void SetLength(float);
 
-    virtual int GetObjectType() const { return 2; }
+    virtual int GetObjectType() const { return PHYSOBJ_CAPSULE; }
 };
 
 #endif

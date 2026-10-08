@@ -100,10 +100,10 @@ void WindDebris::CollisionCallback(
 
     switch (pObjA->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
         pPlayer = (cPlayer*)((PhysicsCharacter*)pObjA->m_parentObject)->m_pAICharacter;
         break;
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* pBall = ((PhysicsAIBall*)pObjA)->m_pAIBall;
         if (pBall->m_pOwner != 0)
@@ -116,10 +116,10 @@ void WindDebris::CollisionCallback(
         }
         break;
     }
-    case 20:
+    case PHYSOBJ_SHELL:
         ((PhysicsShell*)pObjA)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
-    case 21:
+    case PHYSOBJ_BANANA:
         ((PhysicsBanana*)pObjA)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
     }

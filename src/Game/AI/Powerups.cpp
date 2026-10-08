@@ -1594,10 +1594,10 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     int type = pObjB->GetObjectType();
     switch (type)
     {
-    case 0x04:
+    case PHYSOBJ_COLUMN:
         pCharacter = ((PhysicsCharacter*)pObjB->m_parentObject)->m_pAICharacter;
         break;
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* pBall = ((PhysicsAIBall*)pObjB)->m_pAIBall;
         if (pBall->m_bVisible != 0)
@@ -1617,7 +1617,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         }
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         if (((PhysicsShell*)pObjB)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
         {
@@ -1663,7 +1663,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         }
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         PowerupBase* pOther = ((PhysicsBanana*)pObjB)->m_pPowerupObject;
         if (pOther->m_unk44.m_uPackedTime != 0)
@@ -1694,7 +1694,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     {
         Bobomb* pBobomb = (Bobomb*)pObj;
         if (pObj->m_eType == POWER_UP_BOBOMB
-            && pObjB->GetObjectType() == 0x12
+            && pObjB->GetObjectType() == PHYSOBJ_GROUND_PLANE
             && !pBobomb->mbIsMine)
         {
             pBobomb->mbIsMine = true;
@@ -2170,11 +2170,11 @@ void PowerupBase::fn_8009D500()
     }
 
     u8 allowOutOfBoundsFall = false;
-    if (m_pPhysicsObject->GetObjectType() == 0x15)
+    if (m_pPhysicsObject->GetObjectType() == PHYSOBJ_BANANA)
     {
         allowOutOfBoundsFall = ((PhysicsBanana*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }
-    else if (m_pPhysicsObject->GetObjectType() == 0x14)
+    else if (m_pPhysicsObject->GetObjectType() == PHYSOBJ_SHELL)
     {
         allowOutOfBoundsFall = ((PhysicsShell*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }

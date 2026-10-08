@@ -36,7 +36,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -88,7 +88,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
         break;
     }
-    case 0x17:
+    case PHYSOBJ_WALL:
     {
         bool isGrowing = mKoopaShell->mRadiusTimer > 0.0f;
         if (isGrowing)
@@ -97,7 +97,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
     }
     // fall through
-    case 0x19:
+    case PHYSOBJ_NET:
     {
         CollisionKoopaShellEndData* eventData = 0;
         g_CollisionKoopaShellEndDataPool.Allocate(eventData);
@@ -106,7 +106,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionKoopaShellEnd(eventData);
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         PowerupBase* powerup = ((PhysicsBanana*)other)->m_pPowerupObject;
         if (mKoopaShell->mOwner == powerup->m_pThrower
@@ -126,7 +126,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         PowerupBase* powerup = ((PhysicsShell*)other)->m_pPowerupObject;
         if (mKoopaShell->mOwner == powerup->m_pThrower
@@ -145,7 +145,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
         break;
     }
-    case 0x1F:
+    case PHYSOBJ_HAMMER:
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
         if (mKoopaShell->mOwner == hammer->mOwner)
@@ -159,7 +159,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         QueueKoopaShellDestroyHammer(hammer);
         break;
     }
-    case 0x20:
+    case PHYSOBJ_YOSHI_EGG:
     {
         egg = ((PhysicsYoshiEgg*)other)->mYoshiEgg;
         if (egg->mActive)
@@ -181,7 +181,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
         break;
     }
-    case 0x24:
+    case PHYSOBJ_THWOMP:
     {
         CollisionKoopaShellEndData* eventData = 0;
         g_CollisionKoopaShellEndDataPool.Allocate(eventData);
@@ -190,7 +190,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionKoopaShellEnd(eventData);
         break;
     }
-    case 0x18:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
@@ -219,7 +219,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         }
         break;
     }
-    case 0x1E:
+    case PHYSOBJ_BULLET_BILL:
     {
         CollisionKoopaShellEndData* eventData = 0;
         g_CollisionKoopaShellEndDataPool.Allocate(eventData);
@@ -228,7 +228,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionKoopaShellEnd(eventData);
         break;
     }
-    case 0x23:
+    case PHYSOBJ_SHOCKWAVE:
     {
         CollisionKoopaShellEndData* eventData = 0;
         g_CollisionKoopaShellEndDataPool.Allocate(eventData);
@@ -237,7 +237,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionKoopaShellEnd(eventData);
         break;
     }
-    case 0x1C:
+    case PHYSOBJ_PATCH:
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
         if (patch->m_bKillMe)
@@ -283,7 +283,7 @@ void PhysicsKoopaShell::PreCollide()
 
 int PhysicsKoopaShell::GetObjectType() const
 {
-    return 0x22;
+    return PHYSOBJ_KOOPA_SHELL;
 }
 
 PhysicsKoopaShell::~PhysicsKoopaShell()
