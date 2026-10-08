@@ -25,7 +25,7 @@
 
 SHOnlineLogin::SHOnlineLogin()
     : mPopupActive(false)
-    , mState(0)
+    , mState(ONLINE_LOGIN_WAIT_SLIDE)
     , mElapsedTime(0.0f)
     , mSlideCompleteTime(0.0f)
 {
@@ -61,7 +61,7 @@ void SHOnlineLogin::Update(float fDeltaT)
         return;
     switch (mState)
     {
-    case 0:
+    case ONLINE_LOGIN_WAIT_SLIDE:
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (mSlideCompleteTime > 0.0f)
@@ -69,19 +69,19 @@ void SHOnlineLogin::Update(float fDeltaT)
             if (mElapsedTime > mSlideCompleteTime + 0.3f)
             {
                 SocketNetworkStartupAsync();
-                mState = 1;
+                mState = ONLINE_LOGIN_WAIT_NETWORK;
             }
         }
         else if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
             mSlideCompleteTime = mElapsedTime;
         break;
     }
-    case 1:
+    case ONLINE_LOGIN_WAIT_NETWORK:
         if (SocketNetworkIsStartupComplete())
         {
             if (SocketNetworkIsStarted())
             {
-                mState = 3;
+                mState = ONLINE_LOGIN_WAIT_THREAD;
                 g_pNetworkSession->StartLoginThread();
                 mLoginComponent->SetActiveSlide("LOGGING", false, false);
             }
@@ -94,16 +94,16 @@ void SHOnlineLogin::Update(float fDeltaT)
                     CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
                     mPopupActive = true;
                 }
-                mState = 7;
+                mState = ONLINE_LOGIN_NETWORK_ERROR;
                 FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
             }
         }
         break;
-    case 3:
+    case ONLINE_LOGIN_WAIT_THREAD:
         if (g_pNetworkSession->IsLoginThreadComplete())
-            mState = 2;
+            mState = ONLINE_LOGIN_CHECK_REQUEST;
         break;
-    case 2:
+    case ONLINE_LOGIN_CHECK_REQUEST:
         if (!g_pNetworkSession->mLoginRequestStarted)
         {
             int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x74);
@@ -113,22 +113,22 @@ void SHOnlineLogin::Update(float fDeltaT)
                 CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
                 mPopupActive = true;
             }
-            mState = 8;
+            mState = ONLINE_LOGIN_LOGIN_ERROR;
             FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         }
         else
-            mState = 4;
+            mState = ONLINE_LOGIN_WAIT_RESULT;
         break;
-    case 6:
+    case ONLINE_LOGIN_SUCCESS:
         GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_FORWARD, true);
         FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
         break;
-    case 4:
-    case 5:
-    case 7:
-    case 8:
-    case 9:
+    case ONLINE_LOGIN_WAIT_RESULT:
+    case ONLINE_LOGIN_WAIT_STATS:
+    case ONLINE_LOGIN_NETWORK_ERROR:
+    case ONLINE_LOGIN_LOGIN_ERROR:
+    case ONLINE_LOGIN_STATS_ERROR:
         break;
     }
 }
@@ -149,7 +149,7 @@ void SHOnlineLogin::OnLoginResult(int result)
             CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
             mPopupActive = true;
         }
-        mState = 8;
+        mState = ONLINE_LOGIN_LOGIN_ERROR;
         FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         return;
     }
@@ -161,7 +161,7 @@ void SHOnlineLogin::OnLoginResult(int result)
             CreateOnlineLoginErrorPopup(menu, (ePopupMenu)0x70, this);
             mPopupActive = true;
         }
-        mState = 8;
+        mState = ONLINE_LOGIN_LOGIN_ERROR;
         FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         return;
     }
@@ -174,13 +174,13 @@ void SHOnlineLogin::OnLoginResult(int result)
             CreateOnlineLoginErrorPopup(menu, (ePopupMenu)0x6F, this);
             mPopupActive = true;
         }
-        mState = 9;
+        mState = ONLINE_LOGIN_STATS_ERROR;
         FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         return;
     }
     g_pFriendManager->SetOwnStatusInitial(1);
     g_pFriendManager->SynchronizeFriends();
-    mState = 5;
+    mState = ONLINE_LOGIN_WAIT_STATS;
 }
 
 void SHOnlineLogin::OnStatsResult(bool success)
@@ -199,7 +199,7 @@ void SHOnlineLogin::OnStatsResult(bool success)
         return;
     }
     mLoginComponent->SetActiveSlide("SUCCESS", false, false);
-    mState = 6;
+    mState = ONLINE_LOGIN_SUCCESS;
 }
 
 void SHOnlineLogin::OnErrorDismissed()
