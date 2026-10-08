@@ -49,9 +49,9 @@ void DesireDeke::Update(DesireUpdate* update, float)
         // Without an explicit target, use the nearest opponent below.
 
     case YOSHI:
-    case 14:
-    case 16:
-    case 19:
+    case KOOPA:
+    case BOO:
+    case SHYGUY:
     {
         avoidSideline = true;
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
@@ -81,7 +81,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
 
     case PEACH:
     case DIDDYKONG:
-    case 15:
+    case TOAD:
     {
         avoidSideline = true;
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
@@ -108,7 +108,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
 
     case DAISY:
     case WALUIGI:
-    case 17:
+    case DRYBONES:
     {
         float dekeDistance = m_pFielder->GetDekeDistance();
         cNet* net = m_pFielder->m_pTeam->GetOtherNet();
@@ -156,8 +156,8 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case BOWSERJR:
     case PETEY:
     case BIRDO:
-    case 13:
-    case 18:
+    case HAMMERBROS:
+    case MONTYMOLE:
     {
         cPlayer* opponent = m_pFielder->fn_800966AC(0, true);
         if (opponent == 0)

@@ -941,12 +941,12 @@ void EmitHammerDestroyBig(const nlVector3& v3Position)
 
 void EmitGroundPound(cCharacter* pCharacter)
 {
-    if (pCharacter->m_DetChar.m_eCharacterClass == 7)
+    if (pCharacter->m_DetChar.m_eCharacterClass == WARIO)
     {
         EmissionController* pController = EmitGeneric(pCharacter, "ground_pound", 0);
         pController->SetUpdateCallback(UpdateEmitterFromCharacter);
     }
-    else if (pCharacter->m_DetChar.m_eCharacterClass == 9)
+    else if (pCharacter->m_DetChar.m_eCharacterClass == BOWSERJR)
     {
         EmissionController* pController = EmitGeneric(pCharacter, "bowserjr_ground_pound", 0);
         pController->SetUpdateCallback(UpdateEmitterFromCharacter);
@@ -1624,7 +1624,7 @@ void EmitSuperGrow(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+    if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
     {
         pController = EmitGeneric(pCharacter, "mario_super_grow", 0);
     }
@@ -1641,7 +1641,7 @@ void EmitSuperShrink(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+    if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
     {
         pController = EmitGeneric(pCharacter, "mario_super_shrink", 0);
     }
@@ -1660,7 +1660,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
 
     if (bRight)
     {
-        if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+        if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
         {
             const char* szEffectName = "mario_right_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1683,7 +1683,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
     }
     else
     {
-        if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+        if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
         {
             const char* szEffectName = "mario_left_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1825,12 +1825,12 @@ void EmitDeke(cCharacter* pCharacter)
         if (pAnimController->m_fTime
             < 15.0f / pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pCharacter->m_DetChar.m_eCharacterClass == 0xB)
+            if (pCharacter->m_DetChar.m_eCharacterClass == PETEY)
             {
                 EmissionController* pController = EmitGeneric(pCharacter, "petey_deke", 0);
                 pController->SetUpdateCallback(UpdateEmitterFromCharacter);
             }
-            else if (pCharacter->m_DetChar.m_eCharacterClass == 0xC)
+            else if (pCharacter->m_DetChar.m_eCharacterClass == BIRDO)
             {
                 EmissionController* pController = EmitGeneric(pCharacter, "birdo_deke", 0);
                 pController->SetUpdateCallback(UpdateEmitterFromCharacter);
@@ -1841,12 +1841,12 @@ void EmitDeke(cCharacter* pCharacter)
 
 void KillDeke(cCharacter* pCharacter)
 {
-    if (pCharacter->m_DetChar.m_eCharacterClass == 11)
+    if (pCharacter->m_DetChar.m_eCharacterClass == PETEY)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
         EmissionManager::Instance()->Kill(pGroup);
     }
-    else if (pCharacter->m_DetChar.m_eCharacterClass == 12)
+    else if (pCharacter->m_DetChar.m_eCharacterClass == BIRDO)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
         EmissionManager::Instance()->Kill(pGroup);
@@ -1878,29 +1878,29 @@ void EndDeke(cFielder* pFielder)
 {
     pFielder->ClearInvincibility(0);
 
-    if (pFielder->m_DetChar.m_eCharacterClass == 3)
+    if (pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dk_deke");
         EmissionManager::Instance()->Destroy((unsigned long)g_pBall, pGroup);
     }
     else if (pFielder->m_eActionState == 1)
     {
-        if (pFielder->m_DetChar.m_eCharacterClass == 11)
+        if (pFielder->m_DetChar.m_eCharacterClass == PETEY)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
             EmissionManager::Instance()->Kill(pGroup);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 12)
+        else if (pFielder->m_DetChar.m_eCharacterClass == BIRDO)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
             EmissionManager::Instance()->Kill(pGroup);
         }
 
-        if (pFielder->m_DetChar.m_eCharacterClass == 1)
+        if (pFielder->m_DetChar.m_eCharacterClass == BOWSER)
         {
             pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 7)
+        else if (pFielder->m_DetChar.m_eCharacterClass == WARIO)
         {
             CharacterImpactEvent event;
             event.v3Position = pFielder->m_DetChar.m_v3Position;
@@ -1910,7 +1910,7 @@ void EndDeke(cFielder* pFielder)
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x5BF8E132, 0, 0);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 9)
+        else if (pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
         {
             CharacterImpactEvent event;
             event.v3Position = pFielder->m_DetChar.m_v3Position;
@@ -1920,7 +1920,7 @@ void EndDeke(cFielder* pFielder)
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x560BD5F9, 0, 0);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 13)
+        else if (pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS)
         {
             CharacterImpactEvent event;
             nlVector3 v3Offset;

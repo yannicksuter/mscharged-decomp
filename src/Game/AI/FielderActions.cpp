@@ -223,14 +223,14 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 1:
+            case STRAFE_RIGHT:
                 SetStrafeRightAnimState();
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 SetStrafeLeftAnimState();
                 break;
-            case 0:
-            case 3:
+            case STRAFE_IDLE:
+            case STRAFE_FORWARD:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -248,7 +248,7 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 4:
+            case STRAFE_BACK:
                 m_DetChar.m_fDesiredSpeed = fn_8002CD2C(this->GetTweaks());
                 break;
             }
@@ -282,13 +282,13 @@ void cFielder::asmRunning()
             {
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 4:
+                case STRAFE_IDLE:
+                case STRAFE_RIGHT:
+                case STRAFE_LEFT:
+                case STRAFE_BACK:
                     SetBackRunningStopRecoverAnimState();
                     break;
-                case 3:
+                case STRAFE_FORWARD:
                 {
                     int nIndex = (u16)(m_DetChar.m_aDesiredFacingDirection
                                        - m_DetChar.m_aActualFacingDirection + 0x2000)
@@ -314,15 +314,15 @@ void cFielder::asmRunning()
             {
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
-                case 1:
-                case 2:
-                case 4:
+                case STRAFE_RIGHT:
+                case STRAFE_LEFT:
+                case STRAFE_BACK:
                     SetStopAnimState();
                     break;
-                case 0:
+                case STRAFE_IDLE:
                     SetIdleAnimState();
                     break;
-                case 3:
+                case STRAFE_FORWARD:
                     SetRunningAnimState(lbl_806E3538[0]);
                     break;
                 }
@@ -336,19 +336,19 @@ void cFielder::asmRunning()
             {
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
-                case 4:
+                case STRAFE_BACK:
                     SetRunBackwardsAnimState();
                     break;
-                case 1:
+                case STRAFE_RIGHT:
                     SetStrafeRightAnimState();
                     break;
-                case 2:
+                case STRAFE_LEFT:
                     SetStrafeLeftAnimState();
                     break;
-                case 0:
+                case STRAFE_IDLE:
                     SetIdleAnimState();
                     break;
-                case 3:
+                case STRAFE_FORWARD:
                     SetStartAnimState(-1);
                     break;
                 }
@@ -360,8 +360,8 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
-            case 1:
+            case STRAFE_IDLE:
+            case STRAFE_RIGHT:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -372,13 +372,13 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 m_DetChar.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 SetRunningAnimState(lbl_806E3538[0]);
                 break;
-            case 4:
+            case STRAFE_BACK:
                 SetRunBackwardsAnimState();
                 break;
             }
@@ -389,8 +389,8 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
-            case 2:
+            case STRAFE_IDLE:
+            case STRAFE_LEFT:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -401,13 +401,13 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 m_DetChar.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 SetRunningAnimState(lbl_806E3538[0]);
                 break;
-            case 4:
+            case STRAFE_BACK:
                 SetRunBackwardsAnimState();
                 break;
             }
@@ -420,25 +420,25 @@ void cFielder::asmRunning()
 
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
+            case STRAFE_IDLE:
                 if (ShouldStartCrossBlend(0))
                 {
                     SetIdleAnimState();
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 if (ShouldStartCrossBlend(0x1D))
                 {
                     SetStrafeRightAnimState();
                 }
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 if (ShouldStartCrossBlend(0x1C))
                 {
                     SetStrafeLeftAnimState();
                 }
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (m_DetChar.m_fActualSpeed
@@ -456,7 +456,7 @@ void cFielder::asmRunning()
                     SetStartAnimState(-1);
                 }
                 break;
-            case 4:
+            case STRAFE_BACK:
                 if (ShouldStartCrossBlend(0))
                 {
                     SetRunBackwardsAnimState();
@@ -481,7 +481,7 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
+            case STRAFE_IDLE:
                 m_DetChar.m_fDesiredSpeed = 0.0f;
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
@@ -489,13 +489,13 @@ void cFielder::asmRunning()
                     SetStopAnimState();
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 SetStrafeRightAnimState();
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 SetStrafeLeftAnimState();
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 if (m_DetChar.m_fActualSpeed
                     < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                 {
@@ -506,7 +506,7 @@ void cFielder::asmRunning()
                     SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
-            case 4:
+            case STRAFE_BACK:
                 SetRunBackwardsAnimState();
                 break;
             }
@@ -543,7 +543,7 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
+            case STRAFE_IDLE:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -554,7 +554,7 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (m_DetChar.m_fActualSpeed
@@ -573,13 +573,13 @@ void cFielder::asmRunning()
                     SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 SetStrafeRightAnimState();
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 SetStrafeLeftAnimState();
                 break;
-            case 4:
+            case STRAFE_BACK:
                 if (m_DetChar.m_fDesiredSpeed > GetJogSpeed(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
@@ -1180,7 +1180,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
             TurnOffSuperPowerTank(false);
         }
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    else if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         EmitShyGuyDeke(this);
     }
@@ -1188,19 +1188,19 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     s16 sFacingDelta;
     switch (m_DetChar.m_eCharacterClass)
     {
-    case (eCharacterClass)0x01:
-    case (eCharacterClass)0x03:
-    case (eCharacterClass)0x07:
-    case (eCharacterClass)0x09:
-    case (eCharacterClass)0x0B:
-    case (eCharacterClass)0x0C:
-    case (eCharacterClass)0x12:
+    case BOWSER:
+    case DONKEYKONG:
+    case WARIO:
+    case BOWSERJR:
+    case PETEY:
+    case BIRDO:
+    case MONTYMOLE:
         sFacingDelta = nlAngleDiff(aDirection, GetActualFacing());
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
-    case (eCharacterClass)0x02:
-    case (eCharacterClass)0x06:
-    case (eCharacterClass)0x11:
+    case DAISY:
+    case WALUIGI:
+    case DRYBONES:
         if (m_pController != 0
             && m_pController->GetMovementStickMagnitude() > 0.001f)
         {
@@ -1209,11 +1209,11 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         sFacingDelta = nlAngleDiff(aDirection, GetActualFacing());
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
-    case (eCharacterClass)0x05:
-    case (eCharacterClass)0x0A:
-    case (eCharacterClass)0x0D:
-    case (eCharacterClass)0x0F:
-    case (eCharacterClass)0x10:
+    case PEACH:
+    case DIDDYKONG:
+    case HAMMERBROS:
+    case TOAD:
+    case BOO:
         sFacingDelta = nlAngleDiff(aDirection, GetActualFacing());
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
@@ -1259,18 +1259,18 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
 
     switch (m_DetChar.m_eCharacterClass)
     {
-    case (eCharacterClass)0x00:
-    case (eCharacterClass)0x04:
-    case (eCharacterClass)0x08:
-    case (eCharacterClass)0x0E:
-    case (eCharacterClass)0x13:
+    case MARIO:
+    case LUIGI:
+    case YOSHI:
+    case KOOPA:
+    case SHYGUY:
         m_pCurrentAnimController->m_fPlaybackSpeedScale
             = InterpolateRangeClamped(lbl_806DB988, lbl_806DB98C, 0.35f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
         break;
-    case (eCharacterClass)0x01:
-    case (eCharacterClass)0x07:
-    case (eCharacterClass)0x09:
-    case (eCharacterClass)0x0D:
+    case BOWSER:
+    case WARIO:
+    case BOWSERJR:
+    case HAMMERBROS:
         SetFacingDirection(sFacingDelta + m_DetChar.m_aActualFacingDirection, true);
         InitMovementDecelerateExponential(lbl_806DB8F4);
         break;
@@ -1321,9 +1321,9 @@ void cFielder::fn_80044BEC(float fDeltaT)
     {
         switch (m_DetChar.m_eCharacterClass)
         {
-        case (eCharacterClass)0x05:
-        case (eCharacterClass)0x0A:
-        case (eCharacterClass)0x0F:
+        case PEACH:
+        case DIDDYKONG:
+        case TOAD:
         {
             float fChance = Difficult(m_pTeam);
             if (nlRandomf(2.0f) < fChance)
@@ -4135,27 +4135,27 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
         if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
         {
             g_pBall->m_uGoalType = 2;
-            if (GetCharacterClass() == (eCharacterClass)0x10)
+            if (GetCharacterClass() == BOO)
             {
                 BeginDekeIntangibility();
             }
             else
             {
-                if (GetCharacterClass() == (eCharacterClass)0x0D
-                    || GetCharacterClass() == (eCharacterClass)0x12
-                    || GetCharacterClass() == (eCharacterClass)0x13)
+                if (GetCharacterClass() == HAMMERBROS
+                    || GetCharacterClass() == MONTYMOLE
+                    || GetCharacterClass() == SHYGUY)
                 {
                     fn_8004E438();
                     return true;
                 }
-                if (GetCharacterClass() == (eCharacterClass)0x0E)
+                if (GetCharacterClass() == KOOPA)
                 {
                     if (gNPCManager->mpKoopaShell != 0)
                     {
                         gNPCManager->mpKoopaShell->Activate(this);
                     }
                 }
-                else if (GetCharacterClass() == (eCharacterClass)0x0C)
+                else if (GetCharacterClass() == BIRDO)
                 {
                     if (gNPCManager->mpBirdoEgg != 0)
                     {
@@ -4251,7 +4251,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
         m_pShotMeter->Update(fDeltaT);
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10 && m_pBall != 0)
+    if (m_DetChar.m_eCharacterClass == BOO && m_pBall != 0)
     {
         ShotMeter* pShotMeter = m_pShotMeter;
         float fWindow = lbl_806E3538[0];
@@ -4285,7 +4285,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     if (eNewAction != ACTION_UNKNOWN_15)
     {
         m_pShotMeter->Abort();
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
+        if (m_DetChar.m_eCharacterClass == BOO
             && eNewAction != (eFielderActionState)1)
         {
             m_fOpacity = 1.0f;
@@ -4293,7 +4293,7 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     }
     else
     {
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
+        if (m_DetChar.m_eCharacterClass == BOO
             && m_pShotMeter->m_eShotMeterState != SHOT_METER_STS_RELEASED)
         {
             m_fOpacity = 1.0f;
@@ -4331,15 +4331,15 @@ void cFielder::fn_8004C02C(float fDeltaT)
 
             if (g_pBall->meBallState == 8)
             {
-                if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x11)
+                if (m_DetChar.m_eCharacterClass == DRYBONES)
                 {
                     EmitBallShot(this, BALL_EFFECT_REGULAR_SHOT, 0, 0, 1);
                 }
-                else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x0F)
+                else if (m_DetChar.m_eCharacterClass == TOAD)
                 {
                     EmitBallShot(this, BALL_EFFECT_PERFECT_PASS, 0, 0, 1);
                 }
-                else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
+                else if (m_DetChar.m_eCharacterClass == BOO)
                 {
                     EmitBallShot(this, BALL_EFFECT_ONETIMER_SHOT, 0, 0, 1);
                 }
@@ -4953,19 +4953,19 @@ void cFielder::fn_8004E438()
     SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
     SetFacingDirection(m_DetChar.m_aDesiredFacingDirection, true);
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x0D)
+    if (m_DetChar.m_eCharacterClass == HAMMERBROS)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
+    else if (m_DetChar.m_eCharacterClass == MONTYMOLE)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    else if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         m_pBulletBill->Show(this);
@@ -5041,7 +5041,7 @@ void cFielder::fn_8004E8B8()
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
         muInvincibleStatus |= 1;
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+        if (m_DetChar.m_eCharacterClass == SHYGUY)
         {
             EmitShyGuyBulletShoot(this);
             PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
@@ -5059,7 +5059,7 @@ void cFielder::fn_8004E92C()
             DoResetShotMeter(0.0f);
             m_pShotMeter->CalcOneTimerValue(this, false);
 
-            if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
+            if (m_DetChar.m_eCharacterClass == MONTYMOLE)
             {
                 g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
 
@@ -5076,7 +5076,7 @@ void cFielder::fn_8004E92C()
                 }
                 EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
             }
-            else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x0D)
+            else if (m_DetChar.m_eCharacterClass == HAMMERBROS)
             {
                 DoRegularShooting(false);
                 EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
@@ -5102,7 +5102,7 @@ void cFielder::fn_8004EA9C()
 
 void cFielder::fn_8004EAB4(float fDeltaT)
 {
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         m_pBulletBill->position = GetJointPosition(m_nBallJointIndex);
         m_pBulletBill->velocity = m_DetChar.m_v3Velocity;
@@ -5121,12 +5121,12 @@ void cFielder::fn_8004EC40()
         RestoreTangibility(false);
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
+    if (m_DetChar.m_eCharacterClass == MONTYMOLE)
     {
         ClearInvincibility(0);
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    else if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         ClearInvincibility(0);
 

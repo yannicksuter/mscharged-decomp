@@ -668,9 +668,9 @@ static inline float GetShotTargetDistance(const nlVector3& ballPosition, const n
 
 inline bool cFielder::ShouldSkipHardStopAnim()
 {
-    bool specialMovement = ((IsCharacterSuperPowerActive(this, (eCharacterClass)6)
-            || IsCharacterSuperPowerActive(this, (eCharacterClass)1))
-            || (IsCharacterSuperPowerActive(this, (eCharacterClass)11) && m_bSuperPowerTankOn))
+    bool specialMovement = ((IsCharacterSuperPowerActive(this, WALUIGI)
+            || IsCharacterSuperPowerActive(this, BOWSER))
+            || (IsCharacterSuperPowerActive(this, PETEY) && m_bSuperPowerTankOn))
         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, 27);
     bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
     if (!skip && GetDesireState() == (eFielderDesireState)20)
@@ -694,12 +694,12 @@ static inline float GetSlideInterceptTimeLimit(PlayerTweaks* tweaks)
 
 inline bool cFielder::IsDaisySuperPowerActive() const
 {
-    return IsCharacterSuperPowerActive(this, (eCharacterClass)2);
+    return IsCharacterSuperPowerActive(this, DAISY);
 }
 
 inline bool cFielder::CanBeCaughtInPhoto() const
 {
-    return mbTangible || IsCharacterSuperPowerActive(this, (eCharacterClass)8);
+    return mbTangible || IsCharacterSuperPowerActive(this, YOSHI);
 }
 
 inline bool cFielder::CanBeFrozen() const
@@ -715,7 +715,7 @@ inline bool cFielder::CanBeAffectedByPhoto() const
 {
     bool canFreeze = CanBeFrozen();
     bool susceptible = false;
-    if (canFreeze && GetCharacterClass() != (eCharacterClass)5)
+    if (canFreeze && GetCharacterClass() != PEACH)
         susceptible = true;
     return susceptible && CanBeCaughtInPhoto();
 }
@@ -819,7 +819,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     m_pAIContext->mScriptMachine->Initialize();
 
     bIsModified = false;
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)6)
+    if (m_DetChar.m_eCharacterClass == WALUIGI)
     {
         mWaluigiWallState.mWallManager
             = new (8, false) WaluigiWallManager();
@@ -829,7 +829,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         mWaluigiWallState.mWallManager = 0;
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)19)
+    if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         m_pBulletBill = gNPCManager->fn_801A9D20();
     }
@@ -842,7 +842,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
 cFielder::~cFielder()
 {
     CleanUpAction(ACTION_NEED_ACTION);
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)6)
+    if (m_DetChar.m_eCharacterClass == WALUIGI)
     {
         delete mWaluigiWallState.mWallManager;
     }
@@ -1374,7 +1374,7 @@ bool cFielder::CanGetElectrocuted(
 
             if ((m_DetChar.m_eCharacterClass == WALUIGI
                     || m_DetChar.m_eCharacterClass == DAISY
-                    || m_DetChar.m_eCharacterClass == (eCharacterClass)0x11)
+                    || m_DetChar.m_eCharacterClass == DRYBONES)
                 && m_eActionState == (eFielderActionState)1)
             {
                 if (m_pCurrentAnimController->m_fTime > 0.7f
@@ -1932,7 +1932,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
     else if (pFielder->m_pBall != 0)
     {
         pFielder->ReleaseBall(0);
-        if ((pFielder->m_DetChar.m_eCharacterClass == (eCharacterClass)0xE
+        if ((pFielder->m_DetChar.m_eCharacterClass == KOOPA
                 || pFielder->m_DetChar.m_eCharacterClass == BIRDO)
             && pFielder->m_eActionState == (eFielderActionState)0x15)
         {
@@ -1978,13 +1978,13 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
 bool cFielder::FreezeWithPeachPhoto(float duration)
 {
     bool tangible = CanBeAffectedByPhoto();
-    if (GetCharacterClass() == (eCharacterClass)18)
+    if (GetCharacterClass() == MONTYMOLE)
     {
         if (GetJointPosition(m_nHeadJointIndex).z < 0.0f || m_eActionState == 34)
             return false;
     }
     bool yoshiActive;
-    GetCharacterSpecialActive(this, (eCharacterClass)8, yoshiActive);
+    GetCharacterSpecialActive(this, YOSHI, yoshiActive);
     if (yoshiActive)
     {
         if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
@@ -2484,14 +2484,14 @@ bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
     }
     if (m_DetChar.m_eCharacterClass == BOWSERJR && m_eActionState == ACTION_SLIDE_ATTACK)
         return false;
-    if (pOtherFielder->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
+    if (pOtherFielder->m_DetChar.m_eCharacterClass == BOO
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
     {
         float fPlayerScale = pOtherFielder->m_DetChar.m_fPlayerScale;
         fPlayerScale = 0.6f * fPlayerScale;
         return IsCharacterInAir(fPlayerScale);
     }
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
+    if (m_DetChar.m_eCharacterClass == BOO
         && m_eActionState == ACTION_SLIDE_ATTACK)
         return false;
 
@@ -2616,7 +2616,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             m_pController->ResetAccelerationHistory();
         }
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)8)
+        if (m_DetChar.m_eCharacterClass == YOSHI)
         {
             m_pHeadTrack->Reset();
             ClearPhysicsPatchesOfType(6);
@@ -2730,7 +2730,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             EmitBowserSmoke(this);
         }
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12 && !mbTangible)
+        if (m_DetChar.m_eCharacterClass == MONTYMOLE && !mbTangible)
         {
             m_pPhysicsCharacter->m_CanCollideWithBall = true;
             m_pPhysicsCharacter->m_CanCollideWithCharacters = true;
@@ -3163,9 +3163,9 @@ void cFielder::PlayImpactCameraRumble()
 {
     if (IsSuperGrowActive())
         FireCameraRumbleFilter(gSuperImpactRumbleX, gSuperImpactRumbleY, gSuperImpactRumbleSpring, gSuperImpactRumbleDamping);
-    else if (GetCharacterClass() == (eCharacterClass)7 || GetCharacterClass() == (eCharacterClass)13 || GetCharacterClass() == (eCharacterClass)9)
+    else if (GetCharacterClass() == WARIO || GetCharacterClass() == HAMMERBROS || GetCharacterClass() == BOWSERJR)
         FireCameraRumbleFilter(gHeavyImpactRumbleX, gHeavyImpactRumbleY, gHeavyImpactRumbleSpring, gHeavyImpactRumbleDamping);
-    else if (GetCharacterClass() == (eCharacterClass)19)
+    else if (GetCharacterClass() == SHYGUY)
         FireCameraRumbleFilter(gBulletImpactRumbleX, gBulletImpactRumbleY, gBulletImpactRumbleSpring, gBulletImpactRumbleDamping);
     else
         FireCameraRumbleFilter(gImpactRumbleX, gImpactRumbleY, gImpactRumbleSpring, gImpactRumbleDamping);
@@ -3373,13 +3373,13 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         cNet::GetNetHeight() - kBallAllowance);
     float fShotDist = nlSqrt(nlVec3DistanceSquared2D(pBall->m_v3Position, v3Target), true);
 
-    if (nParam == 8 && (m_DetChar.m_eCharacterClass == 14 || m_DetChar.m_eCharacterClass == 12))
+    if (nParam == 8 && (m_DetChar.m_eCharacterClass == KOOPA || m_DetChar.m_eCharacterClass == BIRDO))
     {
-        if (m_DetChar.m_eCharacterClass == 14)
+        if (m_DetChar.m_eCharacterClass == KOOPA)
         {
             fShotSpeed = gKoopaSkillshotSpeed;
         }
-        else if (m_DetChar.m_eCharacterClass == 12)
+        else if (m_DetChar.m_eCharacterClass == BIRDO)
         {
             fShotSpeed = gBirdoSkillshotSpeed;
         }
@@ -3515,7 +3515,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
             }
         }
 
-        if (nParam == 8 && (m_DetChar.m_eCharacterClass == 14 || m_DetChar.m_eCharacterClass == 12))
+        if (nParam == 8 && (m_DetChar.m_eCharacterClass == KOOPA || m_DetChar.m_eCharacterClass == BIRDO))
         {
             v3PositionOut.z = cNet::GetNetHeight() * gKoopaBirdoSkillshotHeightFraction;
             v3PositionOut.y = 0.0f;
@@ -3564,7 +3564,7 @@ void cFielder::DoRegularShooting(bool bParam)
         {
             DeactivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C);
         }
-        if (m_DetChar.m_eCharacterClass == 14 || m_DetChar.m_eCharacterClass == 12)
+        if (m_DetChar.m_eCharacterClass == KOOPA || m_DetChar.m_eCharacterClass == BIRDO)
         {
             bHideBall = true;
             g_pBall->m_pPhysicsBall->fn_8013FE00();
@@ -3703,7 +3703,7 @@ void cFielder::DoRegularShooting(bool bParam)
 
     g_pBall->Shoot(this, v3BallVelocity, v3AngVel, spinType, nBallState, bParam);
     SetNoPickUpTime(0.2f);
-    if (nBallState == 8 && m_DetChar.m_eCharacterClass == 16)
+    if (nBallState == 8 && m_DetChar.m_eCharacterClass == BOO)
     {
         fn_8004ED64();
     }
@@ -4071,7 +4071,7 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
         position = g_pBall->GetOwnerFielder()->GetPosition();
     }
     else if (g_pBall->GetOwnerFielder() != 0
-        && g_pBall->GetOwnerFielder()->GetCharacterClass() == (eCharacterClass)12)
+        && g_pBall->GetOwnerFielder()->GetCharacterClass() == BIRDO)
     {
         nlVector3 average;
         nlVecLerp(average, g_pBall->GetPosition(), g_pBall->GetOwnerFielder()->GetPosition(), 0.5f);
@@ -4227,19 +4227,19 @@ void cFielder::BeginDekeIntangibility()
 {
     if (mbTangible)
     {
-        if (GetCharacterClass() == (eCharacterClass)16)
+        if (GetCharacterClass() == BOO)
         {
             SetTangible(false, false);
             mtPostDekeTimer.Clear();
             m_fOpacity = gIntangibleAlpha;
             EmitBooDekePuffStart(this);
         }
-        else if (GetCharacterClass() == (eCharacterClass)8)
+        else if (GetCharacterClass() == YOSHI)
         {
             SetTangible(false, false);
             m_fOpacity = gIntangibleAlpha;
         }
-        else if (GetCharacterClass() == (eCharacterClass)18)
+        else if (GetCharacterClass() == MONTYMOLE)
         {
             SetTangible(false, false);
             m_fOpacity = gIntangibleAlpha;
@@ -4259,11 +4259,11 @@ void cFielder::BeginDekeIntangibility()
             int spread = gDekeDirectionSpread;
             float distance = GetDekeDistance();
             ResetBallCharge(g_pBall, false);
-            if (GetCharacterClass() == (eCharacterClass)6)
+            if (GetCharacterClass() == WALUIGI)
                 EmitDekeEnter(this, "waluigi_deke_enter");
-            else if (GetCharacterClass() == (eCharacterClass)2)
+            else if (GetCharacterClass() == DAISY)
                 EmitDekeEnter(this, "daisy_deke_enter");
-            else if (GetCharacterClass() == (eCharacterClass)17)
+            else if (GetCharacterClass() == DRYBONES)
                 EmitDekeEnter(this, "drybones_deke_enter");
             unsigned short direction = GetActualFacing() + (nlRandomf(2 * spread) - spread);
             float safeY = cField::GetSidelineY(1U) - fn_8002BFA8(m_pTweaks, GetPlayerScale()) - 0.25f;
@@ -4320,26 +4320,26 @@ void cFielder::EmitMegaStrikeWindup()
     KillWindups();
     switch (m_DetChar.m_eCharacterClass)
     {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 15:
-    case 16:
-    case 17:
-    case 18:
-    case 19:
+    case MARIO:
+    case BOWSER:
+    case DAISY:
+    case DONKEYKONG:
+    case LUIGI:
+    case PEACH:
+    case WALUIGI:
+    case WARIO:
+    case YOSHI:
+    case BOWSERJR:
+    case DIDDYKONG:
+    case PETEY:
+    case BIRDO:
+    case HAMMERBROS:
+    case KOOPA:
+    case TOAD:
+    case BOO:
+    case DRYBONES:
+    case MONTYMOLE:
+    case SHYGUY:
         EmitWindupAtBall("ball_sts_windup");
         break;
     }
@@ -4350,7 +4350,7 @@ void cFielder::RestoreTangibility(bool fadeIn)
     if (!mbTangible)
     {
         SetTangible(true, false);
-        if (GetCharacterClass() == (eCharacterClass)16)
+        if (GetCharacterClass() == BOO)
         {
             if (m_fOpacity < 1.0f)
             {
@@ -4361,11 +4361,11 @@ void cFielder::RestoreTangibility(bool fadeIn)
             }
             EmitBooDekePuffEnd(this);
         }
-        else if (GetCharacterClass() == (eCharacterClass)8)
+        else if (GetCharacterClass() == YOSHI)
         {
             m_fOpacity = 1.0f;
         }
-        else if (GetCharacterClass() == (eCharacterClass)18)
+        else if (GetCharacterClass() == MONTYMOLE)
         {
             m_fOpacity = 1.0f;
             if (!IsFallenDown())
@@ -4387,11 +4387,11 @@ void cFielder::RestoreTangibility(bool fadeIn)
         {
             m_fOpacity = 1.0f;
             PlaySound(m_uSoundSlotId, 0x5bf8e132, 0, 0);
-            if (GetCharacterClass() == (eCharacterClass)6)
+            if (GetCharacterClass() == WALUIGI)
                 EmitDekeExit(this, "waluigi_deke_enter");
-            else if (GetCharacterClass() == (eCharacterClass)2)
+            else if (GetCharacterClass() == DAISY)
                 EmitDekeExit(this, "daisy_deke_enter");
-            else if (GetCharacterClass() == (eCharacterClass)17)
+            else if (GetCharacterClass() == DRYBONES)
                 EmitDekeExit(this, "drybones_deke_enter");
         }
     }
@@ -4406,14 +4406,14 @@ void cFielder::CleanActionDeke()
         EndDeke(this);
     if (m_pController != 0)
         m_pController->ResetAccelerationHistory();
-    if (GetCharacterClass() == (eCharacterClass)16)
+    if (GetCharacterClass() == BOO)
         RestoreTangibility(true);
-    else if (GetCharacterClass() == (eCharacterClass)18
-        || GetCharacterClass() == (eCharacterClass)6
-        || GetCharacterClass() == (eCharacterClass)2
-        || GetCharacterClass() == (eCharacterClass)17)
+    else if (GetCharacterClass() == MONTYMOLE
+        || GetCharacterClass() == WALUIGI
+        || GetCharacterClass() == DAISY
+        || GetCharacterClass() == DRYBONES)
         RestoreTangibility(false);
-    if (IsCharacterSuperPowerActive(this, (eCharacterClass)1) && g_pGame->GetGameState() != GS_UNLOADING)
+    if (IsCharacterSuperPowerActive(this, BOWSER) && g_pGame->GetGameState() != GS_UNLOADING)
         EmitBowserSmoke(this);
     if (m_pBall != 0 && !m_pBall->m_bVisible)
         m_pBall->m_bVisible = true;
@@ -4434,14 +4434,14 @@ void cFielder::CleanActionShot(eFielderActionState newAction)
 {
     bIsModified = false;
     m_pShotMeter->Abort();
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)16 && newAction != 33)
+    if (m_DetChar.m_eCharacterClass == BOO && newAction != 33)
         m_fOpacity = 1.0f;
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)12 && g_pBall->meBallState != 8)
+    if (m_DetChar.m_eCharacterClass == BIRDO && g_pBall->meBallState != 8)
     {
         if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
             gNPCManager->mpBirdoEgg->Hide(false);
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)14 && g_pBall->meBallState != 8)
+    else if (m_DetChar.m_eCharacterClass == KOOPA && g_pBall->meBallState != 8)
     {
         if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
             gNPCManager->mpKoopaShell->Deactivate(false);
@@ -4459,9 +4459,9 @@ void cFielder::ResetAnimState()
 void cFielder::SetStartAnimState(int animState)
 {
     static int runStartAnims[4] = { 2, 2, 3, 1 };
-    if ((IsCharacterSuperPowerActive(this, (eCharacterClass)1)
-            || IsCharacterSuperPowerActive(this, (eCharacterClass)6)
-            || IsCharacterSuperPowerActive(this, (eCharacterClass)11)) && m_bSuperPowerTankOn)
+    if ((IsCharacterSuperPowerActive(this, BOWSER)
+            || IsCharacterSuperPowerActive(this, WALUIGI)
+            || IsCharacterSuperPowerActive(this, PETEY)) && m_bSuperPowerTankOn)
     {
         SetRunningAnimState(0.1f);
     }
@@ -4506,9 +4506,9 @@ void cFielder::SetWindupWBAnimState()
 void cFielder::SetStartWBAnimState()
 {
     static int runStartAnims[4] = { 17, 17, 18, 16 };
-    if ((IsCharacterSuperPowerActive(this, (eCharacterClass)1)
-            || IsCharacterSuperPowerActive(this, (eCharacterClass)6)
-            || IsCharacterSuperPowerActive(this, (eCharacterClass)11)) && m_bSuperPowerTankOn)
+    if ((IsCharacterSuperPowerActive(this, BOWSER)
+            || IsCharacterSuperPowerActive(this, WALUIGI)
+            || IsCharacterSuperPowerActive(this, PETEY)) && m_bSuperPowerTankOn)
     {
         SetRunningWBAnimState(0.1f);
     }
@@ -5107,7 +5107,7 @@ void cFielder::TestButtonsWindup()
 
 void cFielder::TestButtonsRunningWB(float deltaTime)
 {
-    if (GetCharacterClass() == (eCharacterClass)8 && !GetGlobalPad()->IsPressed(28, true))
+    if (GetCharacterClass() == YOSHI && !GetGlobalPad()->IsPressed(28, true))
         bYoshiInWindup = false;
     unsigned short direction = 0;
     if (GetGlobalPad()->JustPressed(27, true))
@@ -5117,7 +5117,7 @@ void cFielder::TestButtonsRunningWB(float deltaTime)
     }
     else if (GetGlobalPad()->IsPressed(28, true))
     {
-        if (GetCharacterClass() == (eCharacterClass)8)
+        if (GetCharacterClass() == YOSHI)
         {
             if (!bYoshiInWindup)
                 fn_8004B658();
@@ -5259,18 +5259,18 @@ bool cFielder::IsSuperGrowActive() const
 
 bool cFielder::IsMarioSuperPowerActive() const
 {
-    return GetCharacterClass() == (eCharacterClass)0 && IsSuperPowerActive();
+    return GetCharacterClass() == MARIO && IsSuperPowerActive();
 }
 
 bool cFielder::IsLuigiSuperPowerActive() const
 {
-    return GetCharacterClass() == (eCharacterClass)4 && IsSuperPowerActive();
+    return GetCharacterClass() == LUIGI && IsSuperPowerActive();
 }
 
 bool IsBowserSuperPowerActive(const cFielder* pFielder)
 {
     bool active;
-    GetCharacterSpecialActive(pFielder, (eCharacterClass)1, active);
+    GetCharacterSpecialActive(pFielder, BOWSER, active);
     return active;
 }
 
@@ -5333,7 +5333,7 @@ void cFielder::UpdateTimers(float deltaTime)
                 ThrowPowerup(desire);
             }
         }
-        if (!m_DetPlayer.m_bSkipActionUpdate && GetCharacterClass() == (eCharacterClass)16
+        if (!m_DetPlayer.m_bSkipActionUpdate && GetCharacterClass() == BOO
             && mtPostDekeTimer.m_uPackedTime != 0)
         {
             mtPostDekeTimer.Countdown(deltaTime, 0.0f);
@@ -5431,7 +5431,7 @@ void cFielder::Update(float fDeltaT)
             1, m_pPowerupLayer->GetChild(1)->Update(fDeltaT));
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)6
+    if (m_DetChar.m_eCharacterClass == WALUIGI
         && mWaluigiWallState.mWallManager != 0)
     {
         mWaluigiWallState.mWallManager->Update(fDeltaT);
@@ -5638,7 +5638,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
+    if (m_DetChar.m_eCharacterClass == BOO)
     {
         m_pHeadTrack->m_bTrackOOI = false;
         return;
@@ -5646,7 +5646,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 
     if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E)
         && !IsFallenDown()
-        && (m_DetChar.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
+        && (m_DetChar.m_eCharacterClass != BIRDO || m_pBall == 0))
     {
         float fWholeGameSeconds = (int)g_pGame->GetGameTime();
         nlVector3 v3LookAtPosition;
@@ -5669,12 +5669,12 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
     switch (m_eActionState)
     {
     case ACTION_HIT:
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)8)
+        if (m_DetChar.m_eCharacterClass == YOSHI)
         {
             m_pHeadTrack->m_fSmoothTime = 0.005f;
         }
     case 29:
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)9)
+        if (m_DetChar.m_eCharacterClass == BOWSERJR)
         {
             m_pHeadTrack->m_fSmoothTime = 0.005f;
         }

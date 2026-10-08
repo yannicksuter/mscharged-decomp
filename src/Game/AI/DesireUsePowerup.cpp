@@ -259,7 +259,7 @@ void DesireUsePowerup::SetPowerup(
 
         switch (m_pFielder->m_DetChar.m_eCharacterClass)
         {
-        case (eCharacterClass)3:
+        case DONKEYKONG:
             if (m_pFielder->m_eAnimID == 0x52
                 || m_pFielder->m_eAnimID == 0x54)
             {
@@ -273,9 +273,9 @@ void DesireUsePowerup::SetPowerup(
                 else if (nDirection == 3) nDirection = 0;
             }
             break;
-        case (eCharacterClass)7:
-        case (eCharacterClass)11:
-        case (eCharacterClass)13:
+        case WARIO:
+        case PETEY:
+        case HAMMERBROS:
             if (m_pFielder->m_eAnimID == 0x52
                 || m_pFielder->m_eAnimID == 0x54)
             {

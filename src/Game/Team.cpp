@@ -1634,7 +1634,7 @@ bool cTeam::fn_800A6764() const
         bCaptainPowerupActive = true;
     }
 
-    if (pCaptain->m_DetChar.m_eCharacterClass == (eCharacterClass)5
+    if (pCaptain->m_DetChar.m_eCharacterClass == PEACH
         && gPeachPhotoState.state == 1)
     {
         bCaptainPowerupActive = true;

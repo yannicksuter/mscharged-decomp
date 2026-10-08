@@ -471,9 +471,9 @@ void Presentation::DoFunctionCall(unsigned int function)
         character->fn_80022D3C(value, direction ? 1.0f : 0.0f);
         switch (character->m_DetChar.m_eCharacterClass)
         {
-        case 5:
-        case 6:
-        case 8:
+        case PEACH:
+        case WALUIGI:
+        case YOSHI:
             gDisableHighRange = direction;
             break;
         }

@@ -118,13 +118,13 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
     case PHYSOBJ_COLUMN:
     {
         cPlayer* player = (cPlayer*)((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
-        if (player->m_eClassType == 2)
+        if (player->m_eClassType == FIELDER)
         {
             if (((cFielder*)player)->mbTangible)
                 return FielderContact((cFielder*)player);
             return NO_CONTACT;
         }
-        if (player->m_eClassType == 3)
+        if (player->m_eClassType == GOALIE)
         {
             cFielder* goalie = (cFielder*)player;
             ((Goalie*)goalie)->SetWallBlock(true, mID);
@@ -138,13 +138,13 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         cPlayer* player = ball->m_pOwner;
         if (player != 0)
         {
-            if (player->m_eClassType == 2)
+            if (player->m_eClassType == FIELDER)
             {
                 if (((cFielder*)player)->mbTangible)
                     return FielderContact((cFielder*)player);
                 return NO_CONTACT;
             }
-            if (player->m_eClassType == 3)
+            if (player->m_eClassType == GOALIE)
                 return FielderContact((cFielder*)player);
             return ONE_WAY_CONTACT_OTHER;
         }
@@ -367,7 +367,7 @@ inline void WaluigiWallManager::EndWall()
 
 ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
 {
-    if (player->m_eClassType == 2)
+    if (player->m_eClassType == FIELDER)
     {
         if (player == mOwner)
         {

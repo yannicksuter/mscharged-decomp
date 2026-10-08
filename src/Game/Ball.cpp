@@ -297,7 +297,7 @@ static inline bool IsClass15BallShot(cBall* pBall, cPlayer* pShooter)
         bState8ShotWithShooter = true;
     }
     if (bState8ShotWithShooter
-        && pShooter->m_DetChar.m_eCharacterClass == (eCharacterClass)0xF)
+        && pShooter->m_DetChar.m_eCharacterClass == TOAD)
     {
         bClassShot = true;
     }
@@ -961,7 +961,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
 
     bool bBooSkillshot = m_tShotTimer.m_uPackedTime != 0
         && meBallState == 8 && m_pShooter != NULL
-        && m_pShooter->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10;
+        && m_pShooter->m_DetChar.m_eCharacterClass == BOO;
     if (bBooSkillshot)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
@@ -1373,7 +1373,7 @@ float GetBallChargeValue(cBall* pBall, int nParam)
 
         if (pBall->GetOwnerFielder() != NULL
             && pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                == (eCharacterClass)0x13
+                == SHYGUY
             && pBall->GetOwnerFielder()->m_eActionState == ACTION_UNKNOWN_32)
         {
             return 0.0f;
@@ -1444,7 +1444,7 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
             - 0.5f * lbl_806DB538;
         fTimeScale = lbl_806DB518;
         break;
-    case (eCharacterClass)14:
+    case KOOPA:
         v3Position.x += nlRandomf(lbl_806DB52C)
             - 0.5f * lbl_806DB52C;
         v3Position.y += nlRandomf(lbl_806DB52C)
@@ -1458,14 +1458,14 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
             - 0.5f * lbl_806DB530;
         fTimeScale = lbl_806DB520;
         break;
-    case (eCharacterClass)17:
+    case DRYBONES:
         v3Position.x += nlRandomf(lbl_806DB528)
             - 0.5f * lbl_806DB528;
         v3Position.y += nlRandomf(lbl_806DB528)
             - 0.5f * lbl_806DB528;
         fTimeScale = lbl_806DB518;
         break;
-    case (eCharacterClass)19:
+    case SHYGUY:
         v3Position.x += nlRandomf(lbl_806DB534)
             - 0.5f * lbl_806DB534;
         v3Position.y += nlRandomf(lbl_806DB534)
@@ -1496,7 +1496,7 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
     float fDistance = nlSqrt(
         v2Delta.x * v2Delta.x + v2Delta.y * v2Delta.y, true);
     float fDesiredTime = fTimeScale * fDistance;
-    if (eClass == (eCharacterClass)19)
+    if (eClass == SHYGUY)
     {
         fDesiredTime = fTimeScale;
     }
@@ -1824,7 +1824,7 @@ bool IsDryBonesSkillshot(cBall* pBall)
     return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
         && pBall->m_pShooter->m_DetChar.m_eCharacterClass
-        == (eCharacterClass)0x11;
+        == DRYBONES;
 }
 
 extern "C" bool fn_800167A8(cBall* pBall)
@@ -1832,7 +1832,7 @@ extern "C" bool fn_800167A8(cBall* pBall)
     return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
         && pBall->m_pShooter->m_DetChar.m_eCharacterClass
-        == (eCharacterClass)0x10;
+        == BOO;
 }
 
 bool IsBallShotActive(cBall* pBall)
@@ -3540,62 +3540,62 @@ void InitializeMegaStrikeBallTrail(
 
     switch (pFielder->m_DetChar.m_eCharacterClass)
     {
-    case (eCharacterClass)1:
+    case BOWSER:
         nlStrNCpy(textureName,
             szBowserShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)9:
+    case BOWSERJR:
         nlStrNCpy(textureName,
             szBowserJrShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)2:
+    case DAISY:
         nlStrNCpy(textureName,
             szDaisyShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)3:
+    case DONKEYKONG:
         nlStrNCpy(textureName,
             szDonkeyKongShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)10:
+    case DIDDYKONG:
         nlStrNCpy(textureName,
             szDiddyKongShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)4:
+    case LUIGI:
         nlStrNCpy(textureName,
             szLuigiShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)0:
+    case MARIO:
         nlStrNCpy(textureName,
             szMarioShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)5:
+    case PEACH:
         nlStrNCpy(textureName,
             szPeachShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)11:
+    case PETEY:
         nlStrNCpy(textureName,
             szPeteyShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)6:
+    case WALUIGI:
         nlStrNCpy(textureName,
             szWaluigiShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)7:
+    case WARIO:
         nlStrNCpy(textureName,
             szWarioShootToScoreBallBlurTexture,
             sizeof(textureName));
         break;
-    case (eCharacterClass)8:
+    case YOSHI:
         nlStrNCpy(textureName,
             szYoshiShootToScoreBallBlurTexture,
             sizeof(textureName));

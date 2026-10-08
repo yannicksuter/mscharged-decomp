@@ -2296,11 +2296,11 @@ void Goalie::ActionMove(float deltaTime)
 
                 if (g_pBall->GetOwnerFielder() != 0
                     && (g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                            == (eCharacterClass)0x05
+                            == PEACH
                         || g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                               == (eCharacterClass)0x0A
+                               == DIDDYKONG
                         || g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                               == (eCharacterClass)0x0F)
+                               == TOAD)
                     && g_pBall->m_v3Position.z > 0.66f)
                 {
                     mbPlayMiss = true;
@@ -2320,7 +2320,7 @@ void Goalie::ActionMove(float deltaTime)
 
         if (shouldPreCrouch
             && pOwnerFielder->m_DetChar.m_eCharacterClass
-                   != (eCharacterClass)0x10)
+                   != BOO)
         {
             if (IsCloseToPlane(
                     mv3TargetPosition, m_DetChar.m_v3Position, 1.2f))
@@ -3820,11 +3820,11 @@ void Goalie::ActionPreCrouch(float deltaTime)
 
                     if (g_pBall->GetOwnerFielder() != 0
                         && (g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                                == (eCharacterClass)0x05
+                                == PEACH
                             || g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                                   == (eCharacterClass)0x0A
+                                   == DIDDYKONG
                             || g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                                   == (eCharacterClass)0x0F)
+                                   == TOAD)
                         && g_pBall->m_v3Position.z > 0.66f)
                     {
                         mbPlayMiss = true;
@@ -4046,11 +4046,11 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
 
                 if (g_pBall->GetOwnerFielder() != 0
                     && (g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                            == (eCharacterClass)0x05
+                            == PEACH
                         || g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                               == (eCharacterClass)0x0A
+                               == DIDDYKONG
                         || g_pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
-                               == (eCharacterClass)0x0F)
+                               == TOAD)
                     && g_pBall->m_v3Position.z > 0.66f)
                 {
                     mbPlayMiss = true;
@@ -4430,7 +4430,7 @@ void Goalie::ActionPursueDeke(float fDeltaT)
                 mPursueDekeType = 0;
             }
 
-            if (mpTarget->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
+            if (mpTarget->m_DetChar.m_eCharacterClass == BOO)
             {
                 nlVector3 v3Direction;
                 nlSinCos(&v3Direction.y, &v3Direction.x, m_DetChar.m_aActualFacingDirection);
@@ -6309,7 +6309,7 @@ void Goalie::InitActionSTSAttack()
     mpShooter->m_pPhysicsCharacter->GetRadius(&fRadius);
 
     bool bInRange = false;
-    if (mpShooter->m_DetChar.m_eCharacterClass != (eCharacterClass)13
+    if (mpShooter->m_DetChar.m_eCharacterClass != HAMMERBROS
         || mpShooter->m_eActionState != (eFielderActionState)32
         || fn_800DEB04(mpShooter) > 0.8f)
     {
@@ -6963,11 +6963,11 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
             mpSkillShooter = pSkillShooter;
             switch ((int)pSkillShooter->m_DetChar.m_eCharacterClass)
             {
-            case 12:
-            case 14:
-            case 15:
-            case 17:
-            case 19:
+            case BIRDO:
+            case KOOPA:
+            case TOAD:
+            case DRYBONES:
+            case SHYGUY:
                 mbNoUserControl = true;
                 break;
             }
@@ -7009,11 +7009,11 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         mpSkillShooter = pSkillShooter;
         switch ((int)pSkillShooter->m_DetChar.m_eCharacterClass)
         {
-        case 12:
-        case 14:
-        case 15:
-        case 17:
-        case 19:
+        case BIRDO:
+        case KOOPA:
+        case TOAD:
+        case DRYBONES:
+        case SHYGUY:
             mbNoUserControl = true;
             break;
         }

@@ -235,7 +235,7 @@ ContactType PhysicsPatch::Contact(
             case 12:
             {
                 float height = gfPatchAirborneHeight;
-                if (fielder->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
+                if (fielder->m_DetChar.m_eCharacterClass == BOO)
                 {
                     height = 0.5f;
                 }

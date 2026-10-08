@@ -890,9 +890,9 @@ void ClearNisAnimatedCharacters()
 
 void Nis::AttachHeadImpostors()
 {
-    mDryBonesHead = AttachImpostorToCharacter((eCharacterClass)17, "DryBonesHead",
+    mDryBonesHead = AttachImpostorToCharacter(DRYBONES, "DryBonesHead",
         "dryboneshead/drybones_mario", &mDryBonesHeadCharacter);
-    mShyGuyMask = AttachImpostorToCharacter((eCharacterClass)19, "ShyGuyMask",
+    mShyGuyMask = AttachImpostorToCharacter(SHYGUY, "ShyGuyMask",
         "shyguymask/shyguy_mario", &mShyGuyMaskCharacter);
 }
 

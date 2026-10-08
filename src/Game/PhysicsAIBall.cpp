@@ -99,14 +99,14 @@ ContactType PhysicsAIBall::Contact(
                 = (PhysicsCharacter*)obj->m_parentObject;
             cFielder* pFielder = (cFielder*)physicsCharacter->m_pAICharacter;
 
-            if (pFielder->m_eClassType == 3)
+            if (pFielder->m_eClassType == GOALIE)
             {
                 if (!mbBallSpeedBelowSweepTestThreshold || !mbCanCollideGoalie)
                 {
                     return NO_CONTACT;
                 }
             }
-            else if (pFielder->m_eClassType == 2)
+            else if (pFielder->m_eClassType == FIELDER)
             {
                 if (!mbHasHitPlayer && pFielder != m_pAIBall->m_pShooter
                     && !mbCanCollidePlayer)

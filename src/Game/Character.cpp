@@ -967,7 +967,7 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     m_pAILayer[0] = blender;
     m_pCurrentAnimController = newController;
     SetAnimID(animID);
-    if (m_eClassType == FIELDER && m_DetChar.m_eCharacterClass == 13)
+    if (m_eClassType == FIELDER && m_DetChar.m_eCharacterClass == HAMMERBROS)
     {
         m_bLeftPropAnimated = false;
         m_bRightPropAnimated = false;
@@ -2462,13 +2462,13 @@ extern "C" void fn_80022824(cPlayer*)
                 {
                     pFielder->EndSuperPower(0);
                 }
-                else if (pFielder->m_DetChar.m_eCharacterClass == 13
+                else if (pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
                     && pFielder->m_eActionState == ACTION_UNKNOWN_32)
                 {
                     pFielder->EndDesire();
                     pFielder->EndAction();
                 }
-                else if (pFielder->m_DetChar.m_eCharacterClass == 19
+                else if (pFielder->m_DetChar.m_eCharacterClass == SHYGUY
                     && pFielder->m_eActionState == ACTION_UNKNOWN_32)
                 {
                     pFielder->EndDesire();
@@ -2582,7 +2582,7 @@ extern "C" void fn_80022BD8(CollisionEggData* pEventData)
                 || (pFielder->m_eActionState == 0x1D && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
                 || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == WARIO)
                 || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == 13))
+                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS))
             {
                 pFielder->InitActionBombReact(pEventData->pEgg->mPosition, 0.0f);
                 EmitTackleImpact(pFielder);

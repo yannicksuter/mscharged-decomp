@@ -716,7 +716,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         return;
     cPlayer::CollideWithCharacterCallback(pData);
     cFielder* pFldr = static_cast<cFielder*>(pPlayer);
-    if ((int)pFldr->m_DetChar.m_eCharacterClass == 0x12
+    if ((int)pFldr->m_DetChar.m_eCharacterClass == MONTYMOLE
         && mGoalieActionState != GOALIEACTION_DEKE_STUNNED
         && pFldr->IsInvincibleChars() && pFldr->m_eActionState == 0x20
         && pFldr->m_fOpacity > 0.4f && !IsPlayerBelowHeight(pFldr, 0.0f))
@@ -724,7 +724,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         InitActionDazed(true);
         return;
     }
-    if ((int)pFldr->m_DetChar.m_eCharacterClass == 0x13
+    if ((int)pFldr->m_DetChar.m_eCharacterClass == SHYGUY
         && mGoalieActionState != GOALIEACTION_SHOCKWAVE_REACT
         && pFldr->m_eActionState == 0x20)
         return;
@@ -821,7 +821,7 @@ bool Goalie::PreCollideWithBallCallback(const dContact& contact)
         return false;
     case GOALIEACTION_DAZED:
         if (mpSkillShooter != NULL
-            && (int)mpSkillShooter->m_DetChar.m_eCharacterClass == 0xC)
+            && (int)mpSkillShooter->m_DetChar.m_eCharacterClass == BIRDO)
             return false;
         break;
     case GOALIEACTION_GRAB_MONTY:
@@ -897,7 +897,7 @@ void Goalie::ExecutePounce(cPlayer* pPlayer, bool bCheckHitDistance)
     cFielder* pFldr = static_cast<cFielder*>(pPlayer);
     bool bDoHit = !pFldr->IsFallenDown() && !pFldr->IsInvincible();
     if (bDoHit && bCheckHitDistance
-        && (int)pFldr->m_DetChar.m_eCharacterClass != 1)
+        && (int)pFldr->m_DetChar.m_eCharacterClass != BOWSER)
     {
         float fPlayerRadius;
         float fGoalieRadius;
@@ -2041,21 +2041,21 @@ bool Goalie::CheckForDekeAttack()
                     float fThreshold = GetDekeAttackWindowEnd(pFielder);
                     float fCurrentTime = pFielder->m_pCurrentAnimController->m_fTime;
                     int nType = 0;
-                    if ((int)pFielder->m_DetChar.m_eCharacterClass == 3
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 1
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 0xB
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 0xC)
+                    if ((int)pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == BOWSER
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == PETEY
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == BIRDO)
                         nType = 5;
-                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == 0xD
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 9
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 7)
+                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == BOWSERJR
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == WARIO)
                     {
                         if (fCurrentTime < fThreshold)
                             nType = 2;
                     }
-                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == 2
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 6
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 0x11)
+                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == DAISY
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == WALUIGI
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == DRYBONES)
                     {
                         float fFrame = pFielder->m_pCurrentAnimController->m_fTime
                             * pFielder->m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
@@ -2064,17 +2064,17 @@ bool Goalie::CheckForDekeAttack()
                         else
                             nType = 3;
                     }
-                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == 0xF
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 5
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 0xA
-                        || (int)pFielder->m_DetChar.m_eCharacterClass == 8)
+                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == TOAD
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == PEACH
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == DIDDYKONG
+                        || (int)pFielder->m_DetChar.m_eCharacterClass == YOSHI)
                     {
                         if (fCurrentTime < fThreshold)
                             nType = 1;
                     }
-                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == 0x10)
+                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == BOO)
                         nType = 6;
-                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == 0x12)
+                    else if ((int)pFielder->m_DetChar.m_eCharacterClass == MONTYMOLE)
                     {
                         if (fCurrentTime < fThreshold)
                             nType = 7;
@@ -2095,26 +2095,26 @@ float Goalie::GetDekeAttackWindowEnd(cFielder* pTarget)
     float fTime;
     switch (pTarget->m_DetChar.m_eCharacterClass)
     {
-    case (eCharacterClass)8: fTime = 0.9f; break;
-    case (eCharacterClass)5: fTime = 0.67f; break;
-    case (eCharacterClass)7: fTime = 0.4f; break;
-    case (eCharacterClass)10: fTime = 0.66f; break;
-    case (eCharacterClass)9: fTime = 0.37f; break;
-    case (eCharacterClass)15: fTime = 0.63f; break;
-    case (eCharacterClass)13: fTime = 0.73f; break;
-    case (eCharacterClass)18: fTime = 0.47f; break;
-    case (eCharacterClass)16: fTime = 0.0f; break;
-    case (eCharacterClass)2:
-    case (eCharacterClass)6:
-    case (eCharacterClass)17: fTime = 0.0f; break;
-    case (eCharacterClass)0:
-    case (eCharacterClass)1:
-    case (eCharacterClass)3:
-    case (eCharacterClass)4:
-    case (eCharacterClass)11:
-    case (eCharacterClass)12:
-    case (eCharacterClass)14:
-    case (eCharacterClass)19:
+    case YOSHI: fTime = 0.9f; break;
+    case PEACH: fTime = 0.67f; break;
+    case WARIO: fTime = 0.4f; break;
+    case DIDDYKONG: fTime = 0.66f; break;
+    case BOWSERJR: fTime = 0.37f; break;
+    case TOAD: fTime = 0.63f; break;
+    case HAMMERBROS: fTime = 0.73f; break;
+    case MONTYMOLE: fTime = 0.47f; break;
+    case BOO: fTime = 0.0f; break;
+    case DAISY:
+    case WALUIGI:
+    case DRYBONES: fTime = 0.0f; break;
+    case MARIO:
+    case BOWSER:
+    case DONKEYKONG:
+    case LUIGI:
+    case PETEY:
+    case BIRDO:
+    case KOOPA:
+    case SHYGUY:
     default: fTime = 1.0f; break;
     }
     return fTime;
@@ -2288,7 +2288,7 @@ bool Goalie::FindApproachingMonty()
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
         return false;
     cFielder* pFielder = g_pBall->GetOwnerFielder();
-    if (pFielder != 0 && (int)pFielder->m_DetChar.m_eCharacterClass == 0x12
+    if (pFielder != 0 && (int)pFielder->m_DetChar.m_eCharacterClass == MONTYMOLE
         && !pFielder->IsStarActive()
         && (int)pFielder->m_eActionState == 0x20
         && pFielder->m_pCurrentAnimController->m_fTime < 0.55f)
@@ -2331,12 +2331,12 @@ bool Goalie::FindSTSMissData(const nlVector3& rPos)
 {
     cFielder* pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
     cFielder* pWaluigi;
-    if ((int)pCaptain->m_DetChar.m_eCharacterClass == 6)
+    if ((int)pCaptain->m_DetChar.m_eCharacterClass == WALUIGI)
         pWaluigi = pCaptain;
     else
     {
         pCaptain = m_pTeam->GetCaptain();
-        if ((int)pCaptain->m_DetChar.m_eCharacterClass == 6)
+        if ((int)pCaptain->m_DetChar.m_eCharacterClass == WALUIGI)
             pWaluigi = pCaptain;
         else
             return false;
@@ -2457,10 +2457,10 @@ bool Goalie::CheckForSTSAttack()
             return false;
         float fDifficulty = Difficult(m_pTeam);
         float fLower = InterpolateRangeClamped(0.05f, 0.25f, 1.0f, 0.2f, fDifficulty);
-        float fUpper = (int)pFielder->m_DetChar.m_eCharacterClass == 0xD ? 1.0f : 0.7f;
+        float fUpper = (int)pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS ? 1.0f : 0.7f;
         float fShotMeter = fn_800DEB04(pFielder);
         if ((fShotMeter > fLower && fShotMeter < fUpper)
-            || ((int)pFielder->m_DetChar.m_eCharacterClass == 0xD
+            || ((int)pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
                 && (int)pFielder->m_eActionState == 0x20))
         {
             if (nlRandomf(lbl_806DBB5C) < fDifficulty)

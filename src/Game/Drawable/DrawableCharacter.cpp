@@ -524,9 +524,9 @@ void DrawableCharacter::Blend(const float* blendFactors, DrawableCharacter& lhs,
 
     if (character != 0)
     {
-        if (character->m_eClassType == 2)
+        if (character->m_eClassType == FIELDER)
         {
-            if (character->m_DetChar.m_eCharacterClass == 13)
+            if (character->m_DetChar.m_eCharacterClass == HAMMERBROS)
             {
                 isHammerBro = true;
                 if (g_nLeftPropJointIndex <= 0)

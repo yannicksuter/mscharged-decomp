@@ -2805,28 +2805,28 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
         float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
         switch (pFielder->m_DetChar.m_eCharacterClass)
         {
-        case 14:
-        case 15:
-        case 17:
-        case 19:
+        case KOOPA:
+        case TOAD:
+        case DRYBONES:
+        case SHYGUY:
             fScore = 1.0f;
             break;
-        case 12:
+        case BIRDO:
             if (aiPos.x > 0.0f)
                 fScore = LaneOpenness(pFielder->m_DetChar.m_v3Position,
                     pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation, pFielder, NULL,
                     1.0f, 1.0f, 0.0f, 0.0f);
             break;
-        case 13:
+        case HAMMERBROS:
             if (fDistance > 12.5f)
                 fScore = NormalizeVal(fDistance, 15.0f, 12.5f);
             else
                 fScore = NormalizeVal(fDistance, 7.0f, 12.5f);
             break;
-        case 16:
+        case BOO:
             fScore = NormalizeVal(fDistance, 7.0f, 4.5f);
             break;
-        case 18:
+        case MONTYMOLE:
             fScore = fDistance > 12.0f ? NormalizeVal(fDistance, 18.0f, 12.0f)
                                      : NormalizeVal(fDistance, 7.0f, 12.0f);
             break;
