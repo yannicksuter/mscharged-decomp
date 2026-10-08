@@ -4,6 +4,7 @@
 #include "Game/Audio/AudioGlobals.h"
 #include "Game/Audio/AudioRpc.h"
 #include "Game/Audio/AudioSlider.h"
+#include "Game/Audio/AudioSystem.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/SoundInstance.h"
 #include "NL/nlChunk.h"
@@ -13,18 +14,11 @@
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
-struct AudioSystemRpcView
-{
-    u8 pad_00[0xCC];
-    AudioBundleManager* bundleManager;
-};
-
 char sAudioRpcValueFormat[] = "RpcController: %s %f\n";
 
 static inline AudioSliderTable* GetAudioSliderTable()
 {
-    return (AudioSliderTable*)((AudioSystemRpcView*)g_pAudioSystem)
-        ->bundleManager->GetSliderTable();
+    return (AudioSliderTable*)g_pAudioSystem->GetBundleManager()->GetSliderTable();
 }
 
 static inline float EvaluateAudioRpcCurve(
