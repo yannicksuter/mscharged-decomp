@@ -82,21 +82,21 @@ void DesireUserControlled::Update(
                 m_pFielder->GetTweaks());
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
-            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
-            fn_8003DA94(m_pFielder, false);
+            m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
+            m_pFielder->TestLooseBallControls(false);
 
             if (g_pBall->m_pOwner == NULL
                 && (!fn_8003E948(m_pFielder)
                     || !m_pFielder->mUnidentified3DC))
             {
-                fn_800368E4(m_pFielder);
+                m_pFielder->UpdateFacingToLooseBall();
             }
             return;
         }
 
         if (m_pFielder->m_eActionState == ACTION_UNKNOWN_30)
         {
-            fn_8003E0A8(m_pFielder);
+            m_pFielder->TestButtonsWindup();
             if (m_pFielder->m_eActionState != ACTION_UNKNOWN_30)
             {
                 return;
@@ -152,8 +152,8 @@ void DesireUserControlled::Update(
             float fMaxSpeed = m_pFielder->GetTweaks()->GetRunningSpeed();
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
-            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
-            fn_8003E168(m_pFielder, fDeltaT);
+            m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
+            m_pFielder->TestButtonsRunningWB(fDeltaT);
         }
     }
 }

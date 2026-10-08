@@ -10,8 +10,8 @@ struct Transition
         value = 0.0f;
         valid = true;
         target = 0.0f;
-        elapsed = -1.0f;
-        duration = 1.0f;
+        remainingTime = -1.0f;
+        modifier = 1.0f;
         minimum = 0.0f;
         maximum = 1.0f;
         enabled = true;
@@ -19,7 +19,7 @@ struct Transition
     ~Transition() { }
 
     virtual float GetValue();
-    virtual void Update(float dt, float multiplier);
+    virtual void Update(float dt, float outputModifier);
 
     void SetTarget(float newTarget, float transitionTime)
     {
@@ -29,7 +29,7 @@ struct Transition
             target = maximum;
         else
             target = newTarget;
-        elapsed = transitionTime;
+        remainingTime = transitionTime;
     }
 
     void Reset(float initialValue, float minimumValue, float maximumValue)
@@ -45,8 +45,8 @@ struct Transition
     u8 valid;
     u8 pad_09[3];
     float target;
-    float elapsed;
-    float duration;
+    float remainingTime;
+    float modifier;
     float minimum;
     float maximum;
     u8 enabled;

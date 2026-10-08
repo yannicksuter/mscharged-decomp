@@ -2,6 +2,7 @@
 #define NL_GLX_GLXMEMORY_H
 
 #include "NL/nlMath.h"
+#include "NL/glx/glxModel.h"
 
 enum eGLMemory
 {
@@ -14,8 +15,6 @@ enum eGLMemory
     GLM_Num = 6,
 };
 
-void glplatSetMatrix(unsigned long matrix, const nlMatrix4& m);
-void glplatGetMatrix(unsigned long matrix, nlMatrix4& m);
 bool glxInitMemory(
     unsigned long frameMemSize1, unsigned long frameMemSize2);
 void glplatFrameAllocNextFrame();

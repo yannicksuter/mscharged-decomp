@@ -4,7 +4,7 @@
 #include "ode/ext/dRoundedCorner.h"
 
 PhysicsRoundedCorner::PhysicsRoundedCorner(
-    CollisionSpace* collisionSpace, const nlVector2& position, float radius, bool isTrigger, bool isStatic)
+    CollisionSpace* collisionSpace, const nlVector2& position, float radius, bool extendPositiveX, bool extendPositiveY)
     : PhysicsObject(0)
 {
     dMass mass;
@@ -15,7 +15,7 @@ PhysicsRoundedCorner::PhysicsRoundedCorner(
         space = collisionSpace->m_spaceID;
     }
 
-    m_geomID = dCreateRoundedCorner(space, radius, isTrigger, isStatic);
+    m_geomID = dCreateRoundedCorner(space, radius, extendPositiveX, extendPositiveY);
     m_bodyID = 0;
 
     dGeomSetData(m_geomID, this);

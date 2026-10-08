@@ -951,7 +951,7 @@ void Goalie::fn_80083960(float)
         {
             unsigned short aDirection
                 = (unsigned short)(mUnidentified024.m_aActualFacingDirection + 0x9FF6);
-            fn_8003C5D8(mpMonty, true, aDirection);
+            mpMonty->EjectMonty(true, aDirection);
             PlaySound(m_uSoundSlotId, 0x4AE0B399, 0, 0);
         }
 

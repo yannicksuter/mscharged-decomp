@@ -203,7 +203,7 @@ public:
     void AccumulateWeightedFielderCenter(const float*& pWeight);
     unsigned int* GetHighestWeightFielderOrder();
     bool CalculateFielderPosition(nlVector3& v3DestPosition, cFielder* pFielder,
-        bool bInPosition, float fBallPosFormationWeight);
+        bool bInPosition);
     void ClearFormationEvaluators();
     static void LoadFormationSets();
     static void UnloadFormationSets();

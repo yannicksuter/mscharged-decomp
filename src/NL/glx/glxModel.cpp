@@ -1,3 +1,5 @@
+#include "NL/glx/glxModel.h"
+
 #include "NL/gl/glMaterialProgram.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glMemory.h"

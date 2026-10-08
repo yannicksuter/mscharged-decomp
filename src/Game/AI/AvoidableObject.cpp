@@ -26,7 +26,6 @@
 extern "C" float fn_80030750(cFielder*);
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
-extern "C" bool fn_8003E99C(const cFielder* pFielder);
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
 static const nlVector2 sAvoidanceStrengthRange = { 0.5f, 1.0f };
 
@@ -306,7 +305,7 @@ float AvoidableFielder::GetAvoidanceStrength(
             }
         }
         if (fn_8003E8A0(m_pFielder) || m_pFielder->fn_8003E9F0()
-            || fn_8003E99C(m_pFielder))
+            || m_pFielder->IsPeachSuperPowerActive())
         {
             cFielder* pTarget = 0;
             DesireRunInDirection* pDesire

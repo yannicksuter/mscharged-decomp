@@ -16,7 +16,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/WindDebrisConfig.h"
 #include "math.h"
-#include "Game/Render/tu_8027AE14.h"
+#include "Game/Render/SolarFlareEffect.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Player.h"
 #include "Game/AI/ScriptMachine.h"
@@ -936,7 +936,7 @@ void SolarFlare::Update(float value)
         int team = m_NextFlare % 2;
         int index = (int)floorf(m_NextFlare / 2.0f);
         cFielder* fielder = g_pTeams[team]->GetFielder(m_TargetIndicies[index]);
-        new (8, false) UnidentifiedObject_8027AE14(fielder->mUnidentified024.m_v3Position);
+        new (8, false) SolarFlareEffect(fielder->mUnidentified024.m_v3Position);
         PlaySound(11, 0xE853C469, 0, 0);
         if (m_NextFlare == 0)
             PlaySound(13, 0xF68B3F0F, 0, 0);

@@ -1395,8 +1395,10 @@ void StatsTracker::WriteStats(
             GameInfoManager::Instance()->GetTeam((short)team));
 
         stats = stats.Append(Format(NLString("{0},{1},{2},{3},"),
-            g_pTeams[team]->fn_800A8EC0(), g_pTeams[team]->fn_800A8F20(),
-            g_pTeams[team]->fn_800A8F80(), g_pTeams[team]->fn_800A8FE0()));
+            g_pTeams[team]->GetAverageMovementRating(),
+            g_pTeams[team]->GetAverageShootingRating(),
+            g_pTeams[team]->GetAveragePassingRating(),
+            g_pTeams[team]->GetAverageDefenseRating()));
 
         int possession = GetStatValue(
             mCumulativeTeamStats[team]->mPlayerTotalStats, STATS_16);

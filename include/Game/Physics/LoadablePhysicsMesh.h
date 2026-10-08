@@ -3,13 +3,7 @@
 
 #include "Game/Physics/PhysicsObject.h"
 
-struct PhysTriMeshHeader
-{
-};
-
-struct dxTriMeshData
-{
-};
+struct PhysTriMeshHeader;
 
 class PhysicsMesh : public PhysicsObject
 {

@@ -102,7 +102,6 @@ struct UnidentifiedCharacterAnimState
 
 inline float ClampMin(float speedRatio, const float min);
 inline float ClampMax(float speedRatio, const float max);
-extern "C" void fn_8002E5F4(cFielder*, int);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 
@@ -1340,7 +1339,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     }
 
     if (pFielder != NULL && !fn_80014D38(g_pBall)
-        && fn_800392D8(pFielder) && pFielder->m_eActionState != 28)
+        && pFielder->fn_800392D8() && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
         unidentifiedSlide += pFielder->fn_8003E72C() ? lbl_806E0E40 : 0.0f;
@@ -2212,7 +2211,7 @@ extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
 
 extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
 {
-    if (!fn_8002F1E0(pEventData->player))
+    if (!pEventData->player->CanBeHitBySkillshot())
     {
         return;
     }
@@ -2256,7 +2255,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
 
 extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 {
-    if (fn_8002F1E0(pEventData->player))
+    if (pEventData->player->CanBeHitBySkillshot())
     {
         if (pEventData->player->fn_8003E73C())
         {
@@ -2301,7 +2300,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 
 extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
 {
-    if (fn_8002F1E0(pEventData->pFielder))
+    if (pEventData->pFielder->CanBeHitBySkillshot())
     {
         cFielder* pFielder;
         cBall* pBall = pEventData->pBall;
@@ -2461,7 +2460,7 @@ extern "C" void fn_80022824(cPlayer*)
                 cFielder* pFielder = pTeam->GetFielder(j);
                 if (pFielder->fn_8003EA6C())
                 {
-                    fn_8002E5F4(pFielder, 0);
+                    pFielder->EndSuperPower(0);
                 }
                 else if (pFielder->mUnidentified024.m_eCharacterClass == 13
                     && pFielder->m_eActionState == ACTION_UNKNOWN_32)
@@ -2531,7 +2530,7 @@ extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
     event.fRadius = lbl_806DB5F4;
     event.pCharacter = pEventData->pFielder;
     fn_80060FF4(g_pGame, &event);
-    fn_800367B4(pEventData->pFielder);
+    pEventData->pFielder->PlayImpactCameraRumble();
 }
 
 extern "C" void fn_80022B04(UnidentifiedEventData24* pEventData)
@@ -2570,7 +2569,7 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
         cFielder* pFielder = (cFielder*)pPlayer;
         if (pFielder->IsInvincible())
         {
-            fn_8002E5F4(pEventData->mUnidentified04, 0);
+            pEventData->mUnidentified04->EndSuperPower(0);
         }
         else if (!pFielder->IsFallenDown())
         {

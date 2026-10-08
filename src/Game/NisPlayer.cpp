@@ -73,7 +73,6 @@ namespace
 static unsigned char useAsyncLoading = true;
 }
 
-extern "C" void fn_8002E3F8(cFielder*);
 
 NisPlayer* NisPlayer::Instance()
 {
@@ -737,7 +736,7 @@ void NisPlayer::ResetPlayerEffects()
             cFielder* fielder = team->GetFielder(i);
             fielder->ResetEffects();
             fielder->fn_8001EE74(1.0f, 0.0f, 1.0f);
-            fn_8002E3F8(fielder);
+            fielder->EndFrozenOrDazed();
             fielder->fn_800974B0();
         }
     }

@@ -4,6 +4,7 @@
 #include "NL/nlBindMember.inl"
 #include "Game/TweakQuery.h"
 #include "Game/Task/FixedUpdateTask.h"
+#include "Game/Task/ComUpdateTask.h"
 #include "Game/NetworkMessageRegistry.h"
 #include "NL/plat/SocketNetwork.h"
 #include <revolution/os/OSThread_fwd.h>

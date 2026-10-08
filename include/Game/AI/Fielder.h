@@ -5,6 +5,15 @@
 #include "Game/AI/Powerups.h"
 #include "Game/AI/FielderAbility.h"
 
+enum ePenaltyType
+{
+    PEN_TYPE_HIT_WITH_BALL = 0,
+    PEN_TYPE_HIT_NO_BALL = 1,
+    PEN_TYPE_SLIDE_WITH_BALL = 2,
+    PEN_TYPE_SLIDE_NO_BALL = 3,
+    NUM_PEN_TYPES = 4,
+};
+
 enum eTurboRequest
 {
     TR_FAR_DISTANCE = 0,
@@ -164,6 +173,9 @@ struct UnidentifiedFielderAction410
 };
 
 class FuzzyVariant;
+class UnidentifiedVariantCollection;
+class AvoidController;
+class cPN_SingleAxisBlender;
 class DesireSteering;
 class DesireUserControlled;
 class UnidentifiedDesire35;
@@ -195,6 +207,102 @@ class cFielder : public cPlayer
     friend float fn_80030750(cFielder*);
 
 public:
+    bool fn_800392D8() const;
+    bool ActivateDesire(int state, UnidentifiedVariantCollection* parameters);
+    const nlVector3& GetDesiredPosition();
+    const nlVector3& GetDesiredVelocity();
+
+    void SetDesiredSpeed(float minSpeed, float maxSpeed);
+    float GetSlideAttackSpeed(int direction);
+    void SetTangible(bool tangible, bool affectGoalLine);
+    bool GetDekePadDirection(unsigned short* direction);
+    bool IsDekeRequested(unsigned short* direction);
+    bool IsReceivePassDekeRequested(unsigned short* direction);
+    bool IsDekePadPressed();
+    void TestButtonsToQueueActions(float deltaTime);
+    bool TestQueuedActions();
+
+    void GetApproachPosition(nlVector3* position, const nlVector3* from, float predictionTime);
+    float GetDekeDistance();
+    void EmitMegaStrikeWindup();
+    void CleanActionShootToScore();
+    void CleanActionShot(eFielderActionState newAction);
+    void SetWindupWBAnimState();
+
+    void TestButtonsWindup();
+    void TestButtonsRunningWB(float deltaTime);
+    void UpdateTimers(float deltaTime);
+    void UseCaptainPowerup();
+    bool IsReceivePassHitRequested(unsigned short* direction);
+    void UpdateFacingToLooseBall();
+
+    float GetRunningSpeed();
+    void ClearInvincibility(bool force);
+    void SetMegaStrikeResult(float numBalls, float accuracy);
+    void EjectMonty(bool finished, unsigned short direction);
+    void EndMontyDeke();
+    float GetAirInterceptHeight(int type);
+    bool CalculateFormationPosition(nlVector3& position);
+    bool IsPeachSuperPowerActive() const;
+
+    bool CanBeHitBySkillshot();
+    bool CanGetElectrocuted() const;
+    void PlayImpactCameraRumble();
+    void ShouldIWave();
+
+    void CollideWithShockwaveCallback(const nlVector3& position);
+
+    void SetNormalTweaks();
+    void SetSuperPowerTweaks();
+    void SetRunningAnimState(float blendTime);
+    void SetRunningWBAnimState(float blendTime);
+    float GetShotProbability(float fValue);
+    void CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballState);
+    bool DoLooseBallContactFromIdle(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, unsigned short facing, const LooseBallContactAnimInfo* info);
+    bool DoLooseBallContactFromRun(nlVector3& animStart, float& animStartTime, nlVector3& ballContact, float& ballContactTime, const LooseBallContactAnimInfo* info, const nlVector3& passIntercept, unsigned int facing);
+    void DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type);
+    void RestoreTangibility(bool fadeIn);
+    void BeginDekeIntangibility();
+    void CleanActionDeke();
+    void SetStartAnimState(int animState);
+    void SetStartWBAnimState();
+    void SetHardStopAnimState();
+    bool ShouldIClearBall();
+    void TestAnimBallContact();
+    void TestLooseBallControls(bool forceContact);
+    float CalcSlideAttackBallIntercept(nlVector3& target, int direction);
+    AvoidController* GetAvoidController();
+    bool EndMushroom();
+    bool EndShrink();
+    bool EndStar();
+    void EndFrozenOrDazed();
+    void EndConfusion();
+    void EndDaze();
+    bool EndSuperPower(int);
+    bool EndDaisySuperPower(bool);
+    bool EndBirdoSuperPower();
+    bool EndKoopaSuperPower();
+    bool EndMarioSuperPower();
+    bool EndPeachSuperPower(bool);
+    bool EndYoshiSuperPower(bool);
+
+    void SetHardStopRecoverAnimState();
+    void SetHardStopTurnAnimState();
+    void SetRunBackwardsAnimState();
+    void SetStrafeLeftAnimState();
+    void SetStrafeRightAnimState();
+    void SetRunToBackRunningAnimState();
+    void SetBackRunningToRunAnimState();
+    void SetBackRunningStopAnimState();
+    void SetBackRunningStopStartAnimState();
+    void SetBackRunningStopRecoverAnimState();
+    void SetStopAnimState();
+    void fn_8003B5FC();
+    void fn_8003B664();
+    void SetIdleAnimState();
+    void SetIdleWBAnimState();
+    static void RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender* blender);
+
     void GetReceivePassBallContactOffset(nlVector3&, unsigned short, const LooseBallContactAnimInfo*);
     PlayerTweaks* GetTweaks() const;
     void AddDesiredPosition(const nlVector3& position, float urgency, float weight);
@@ -204,8 +312,14 @@ public:
     FuzzyRuntimeBase* GetFuzzyRuntime() const;
     float GetSpeedPowerupAdjusted(float fSpeed);
 
+    bool FreezeWithPeachPhoto(float duration);
+    bool CanBeFrozen() const;
+    bool CanBeCaughtInPhoto() const;
+    bool CanBeAffectedByPhoto() const;
+    bool IsDaisySuperPowerActive() const;
     unsigned int IsFrozen() const;
-    unsigned int IsShattered();
+    unsigned int IsShattered() const;
+    bool fn_8003881C() const;
 
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         const int* nModelID, cSHierarchy* pHierarchy,
@@ -316,9 +430,7 @@ public:
     }
     bool IsInvincibleHammers() const
     {
-        bool result = false;
-        if (!IsStuck() && (muInvincibleStatus & 0x10))
-            result = true;
+        bool result = !IsStuck() && (muInvincibleStatus & 0x10);
         return result;
     }
     bool UnidentifiedInvincibleStatus2() const
@@ -394,7 +506,7 @@ public:
     void fn_80049EA0(float fDeltaT);
     void InitActionOneTouchPassFromVolley(cPlayer* pPlayer, bool bParam);
     void ActionOneTouchPassFromVolley(float fDeltaT);
-    bool fn_8004A330(cFielder* pOther);
+    bool DoCalcCanDoPerfectPass(cFielder* pOther, const nlVector3& position);
     bool InitActionPass(
         cPlayer* pPassTarget, bool bVolleyPass, int nParam, bool bIsOneTouchPass);
     void ActionPass(float fDeltaT);
@@ -667,76 +779,20 @@ public:
 
 public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
+private:
+    bool ShouldSkipHardStopAnim();
+    float CalculateShotProbability(float fValue);
+    float EvaluateShotProbability(float fValue);
+    void SetRunLeanSAB(const int* anims, int count, int primary);
+    bool CheckReceivePassState();
+    bool IsAvailableToReceivePass();
 }; // total size: 0x480
 
 
 // Shared fielder functions and data.
-extern "C" bool fn_8003C180(cFielder*);
-extern "C" void fn_8003C5D8(cFielder* pFielder, bool bParam, unsigned short aDirection);
-extern "C" void fn_8002E52C(cFielder*);
-extern "C" void fn_8002E580(cFielder* pFielder);
-extern "C" void fn_8002E66C(cFielder*, bool);
-extern "C" void fn_8002E818(cFielder*);
-extern "C" void fn_8002E898(cFielder*, bool);
-extern "C" void fn_8002E934(cFielder*, bool);
 extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
-extern "C" bool fn_8002F1E0(cFielder*);
-extern "C" bool fn_8002F310(cFielder* pFielder);
-extern "C" void fn_8002FE54(cFielder* pFielder);
-extern "C" void fn_800301E8(cFielder* pFielder);
 extern "C" void fn_800318F8(cFielder*);
-extern "C" void fn_80031C3C(cFielder*, float);
-extern "C" void fn_80032534(cFielder*, const nlVector3&);
-extern "C" float fn_80034F98(cFielder*, float);
-extern "C" void fn_80035194(cFielder*, nlVector3&, nlVector3&, int);
-extern "C" void fn_800367B4(cFielder*);
-extern "C" void fn_800368E4(cFielder*);
-extern "C" bool fn_80036A58(cFielder*, unsigned short*);
-extern "C" bool fn_80036C8C(cFielder*, unsigned short*);
-extern "C" bool fn_80036F88(cFielder* pFielder);
-extern "C" bool fn_8003881C(cFielder* pFielder);
-extern "C" bool fn_800392D8(cFielder*);
-extern "C" void fn_80039350(cFielder*, nlVector3*, const nlVector3*, float);
-extern "C" float fn_800394A8(cFielder*, int);
-extern "C" float fn_80039574(cFielder*);
-extern "C" void fn_80039CA0(cFielder*);
-extern "C" void fn_80039F24(cFielder*);
-extern "C" void fn_8003A0E4(cFielder*);
-extern "C" void fn_8003A178(cFielder*);
-extern "C" void fn_8003A2D0(cFielder* pFielder, int nParam);
-extern "C" void fn_8003A544(cFielder* pFielder);
-extern "C" void fn_8003A5C8(cFielder* pFielder);
-extern "C" void fn_8003ADAC(cFielder* pFielder);
-extern "C" void fn_8003B020(cFielder* pFielder);
-extern "C" void fn_8003B0D8(cFielder* pFielder);
-extern "C" void fn_8003B190(cFielder* pFielder);
-extern "C" void fn_8003B254(cFielder* pFielder);
-extern "C" void fn_8003B2EC(cFielder* pFielder);
-extern "C" void fn_8003B384(cFielder* pFielder);
-extern "C" void fn_8003B41C(cFielder* pFielder);
-extern "C" void fn_8003B4B4(cFielder* pFielder);
-extern "C" void fn_8003B54C(cFielder* pFielder);
-extern "C" void fn_8003B5FC(cFielder* pFielder);
-extern "C" void fn_8003B664(cFielder* pFielder);
-extern "C" void fn_8003B6CC(cFielder* pFielder);
-extern "C" void fn_8003B790(cFielder* pFielder);
-extern "C" void fn_8003B854(cFielder* pFielder);
-extern "C" void fn_8003B920(cFielder* pFielder);
-extern "C" void fn_8003BE14(cFielder* pFielder, float fParam);
-extern "C" void fn_8003C268(cFielder*, float, float);
 extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
-extern "C" void fn_8003C560(cFielder* pFielder, int nParam1, int nParam2);
-extern "C" void fn_8003C6E0(cFielder* pFielder);
-extern "C" void fn_8003C7B0(cFielder*);
-extern "C" void fn_8003D8A4(cFielder* pFielder, float fDeltaT);
-extern "C" bool fn_8003D9BC(cFielder* pFielder);
-extern "C" void fn_8003DA94(cFielder*, bool);
-extern "C" void fn_8003E0A8(cFielder*);
-extern "C" void fn_8003E168(cFielder*, float);
-extern "C" void fn_8003E354(cFielder* pFielder);
-extern "C" void fn_8003EAC0(cFielder*, float);
-extern "C" void fn_8003F1E8(cFielder*);
-extern "C" const nlVector3& fn_80040318(cFielder*);
 extern bool lbl_806E0C50;
 extern bool lbl_806E0C51;
 extern bool lbl_806E0C52;
@@ -748,13 +804,10 @@ extern float lbl_806E3424;
 extern float lbl_806E3428;
 extern float lbl_806E342C;
 
-extern "C" void fn_80038158(cFielder* pFielder, int nParam);
 
 extern "C" bool fn_8003877C(const cFielder* pFielder);
 
-extern "C" void fn_800395C0(cFielder* pFielder);
 
-extern "C" void fn_80039CF0(cFielder* pFielder, int nParam);
 
 ScriptMachine* fn_8002E1A4(cFielder* pFielder);
 

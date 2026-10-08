@@ -2,7 +2,7 @@
 #include "Game/BasicStadium.h"
 #include "Game/Render/StadiumWorldObjects.h"
 #include "Game/Render/StadiumPhysicsObject.h"
-#include "Game/Render/tu_8027AE14.h"
+#include "Game/Render/SolarFlareEffect.h"
 #include "Game/World/WorldObjectLoadContext.h"
 #include "Game/World/WorldObject.inl"
 #include "Game/TweakBindingInline.h"
@@ -99,7 +99,7 @@ DrawableObject* BasicStadium::HandleObjectCreation(
         pObject = LoadStadiumObject<StadiumAttackSideIndicator>(pContext, 0x80);
         break;
     case 0x10005:
-        pObject = LoadStadiumObject<StadiumDrawable_8027ADC0>(pContext, 0x80);
+        pObject = LoadStadiumObject<SolarFlareDrawable>(pContext, 0x80);
         break;
     case 0x10006:
         pObject = LoadStadiumObject<StadiumFEModelMarker>(pContext, 0x70);

@@ -75,9 +75,9 @@ void ShotMeter::Update(float fDeltaT)
         if (m_fTime >= m_fShotDuration
             && g_pBall->GetOwnerFielder() != 0)
         {
-            if (!fn_8003C180(g_pBall->GetOwnerFielder()))
+            if (!g_pBall->GetOwnerFielder()->ShouldIClearBall())
             {
-                fn_80039CA0(g_pBall->GetOwnerFielder());
+                g_pBall->GetOwnerFielder()->EmitMegaStrikeWindup();
             }
             m_eShotMeterState = SHOT_METER_STS_ACTIVE;
         }

@@ -22,7 +22,7 @@ public:
         mfRecoverRate = 1.0f;
     }
     void Update(float dt);
-    void RegisterShot(float fLevel);
+    void RegisterShot(float energyCost);
     void SyncLog(void* context, DebugWriteCache* cache);
 
     /* 0x00 */ f32 mfEnergyLevel;

@@ -617,7 +617,7 @@ void UnidentifiedCameraEffects::OnWindupPresentation()
         return;
     }
 
-    if (fn_8003C180((cFielder*)g_pBall->m_pOwner) == true)
+    if (static_cast<cFielder*>(g_pBall->m_pOwner)->ShouldIClearBall() == true)
     {
         mCameraFlags |= 4;
     }
@@ -698,11 +698,11 @@ void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
     {
         return;
     }
-    if (eventData->source == 0)
+    if (eventData->thwomp == 0)
     {
         return;
     }
-    if ((int)eventData->sourceValue != 3)
+    if (eventData->state != THWOMP_STATE_FALLING)
     {
         return;
     }

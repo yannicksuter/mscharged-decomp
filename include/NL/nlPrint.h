@@ -12,6 +12,4 @@ int nlVSNPrintf(char* buffer, unsigned long size, const char* format, __va_list_
 int nlSNPrintf(char* buffer, unsigned long size, const char* format, ...);
 int nlSNPrintf(unsigned short* buffer, unsigned long size, const unsigned short* format, ...);
 
-int nlSNPrintf(unsigned short* buffer, unsigned long size, const unsigned short* format, ...);
-
 #endif // _NLPRINT_H_

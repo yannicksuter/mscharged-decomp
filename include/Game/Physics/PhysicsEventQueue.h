@@ -73,7 +73,7 @@ void QueueCollisionBulletBillPlayer(CollisionBulletBillData*);
 void QueueCollisionBulletBillFreeze(CollisionBulletBillData*);
 void QueueExplosionBulletBill(CollisionBulletBillData*);
 void QueuePowerupUsed(PowerupUsedEventData*);
-void QueueCollisionThwompPlayer(void* source, cCharacter* target);
+void QueueCollisionThwompPlayer(ThwompObject* thwomp, cCharacter* target);
 void QueueCollisionThwompBall(UnidentifiedEventData33* data);
 void QueueCollisionWaluigiWall(cFielder*);
 void QueueCollisionShockwave(CollisionShockwaveData* data);

@@ -11,19 +11,19 @@ void TLComponentInstance::Update(float dt)
     }
 }
 
-void TLComponentInstance::SetActiveSlide(const char* name, bool arg2, bool arg3)
+void TLComponentInstance::SetActiveSlide(const char* name, bool forceRestart, bool preserveTime)
 {
-    static_cast<TLComponent*>(m_component)->SetActiveSlide(name, arg2, arg3);
+    static_cast<TLComponent*>(m_component)->SetActiveSlide(name, forceRestart, preserveTime);
 }
 
-void TLComponentInstance::SetActiveSlide(unsigned long hash, bool arg2, bool arg3)
+void TLComponentInstance::SetActiveSlide(unsigned long hash, bool forceRestart, bool preserveTime)
 {
-    static_cast<TLComponent*>(m_component)->SetActiveSlide(hash, arg2, arg3);
+    static_cast<TLComponent*>(m_component)->SetActiveSlide(hash, forceRestart, preserveTime);
 }
 
-void TLComponentInstance::SetActiveSlide(TLSlide* slide, bool arg2, bool arg3)
+void TLComponentInstance::SetActiveSlide(TLSlide* slide, bool forceRestart, bool preserveTime)
 {
-    static_cast<TLComponent*>(m_component)->SetActiveSlide(slide, arg2, arg3);
+    static_cast<TLComponent*>(m_component)->SetActiveSlide(slide, forceRestart, preserveTime);
 }
 
 TLSlide* TLComponentInstance::GetActiveSlide()

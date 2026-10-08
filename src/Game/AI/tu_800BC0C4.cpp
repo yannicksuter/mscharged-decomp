@@ -14,11 +14,6 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/audio.h"
 
-extern "C" void fn_8002E2E4(cFielder*);
-extern "C" void fn_8002E340(cFielder*);
-extern "C" void fn_8002E3F8(cFielder*);
-extern "C" void fn_8002E718(cFielder*);
-extern "C" void fn_8002E798(cFielder*);
 extern float lbl_806E0E40;
 extern const nlVector3 lbl_804DC1A0;
 
@@ -115,7 +110,7 @@ void DesireStar::Update(DesireUpdate* update, float fDeltaT)
 void DesireStar::Cleanup()
 {
     KillStar(m_pFielder);
-    fn_80038158(m_pFielder, true);
+    m_pFielder->ClearInvincibility(true);
 }
 
 /**
@@ -125,7 +120,7 @@ bool DesireMushroom::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
     mMaxDuration = GetMushroomEffectTime(m_pFielder->GetTweaks());
-    fn_8002E340(m_pFielder);
+    m_pFielder->EndShrink();
     if (!m_pFielder->fn_8003E74C())
     {
         m_pFielder->fn_8001EE74(lbl_806DC17C, 0.2f, -1.0f);
@@ -300,14 +295,14 @@ bool DesireShrink::Initialize(void* context)
     mMaxDuration = lbl_806DC168;
     mfSlowPercentage = 1.0f;
 
-    fn_8002E2E4(m_pFielder);
-    fn_8002E718(m_pFielder);
-    fn_8002E898(m_pFielder, false);
-    fn_8002E934(m_pFielder, false);
-    fn_8002E66C(m_pFielder, false);
-    fn_8002E818(m_pFielder);
-    fn_8002E798(m_pFielder);
-    fn_8002E3F8(m_pFielder);
+    m_pFielder->EndMushroom();
+    m_pFielder->EndBirdoSuperPower();
+    m_pFielder->EndPeachSuperPower(false);
+    m_pFielder->EndYoshiSuperPower(false);
+    m_pFielder->EndDaisySuperPower(false);
+    m_pFielder->EndMarioSuperPower();
+    m_pFielder->EndKoopaSuperPower();
+    m_pFielder->EndFrozenOrDazed();
     m_pFielder->fn_8001EE74(1.0f, 0.0f, -1.0f);
     m_pFielder->fn_8001EE74(
         lbl_806DC174, lbl_806DC178, lbl_806DC170);

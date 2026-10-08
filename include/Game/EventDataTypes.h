@@ -2,6 +2,7 @@
 #define GAME_EVENT_DATA_TYPES_H
 
 #include "Game/AI/Powerups.h"
+#include "Game/Render/ThwompObject.h"
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
@@ -107,8 +108,8 @@ struct CollisionWindDebrisPlayerData
 
 struct CollisionThwompPlayerData
 {
-    /* 0x00 */ void* source;
-    /* 0x04 */ void* sourceValue;
+    /* 0x00 */ ThwompObject* thwomp;
+    /* 0x04 */ eThwompState state;
     /* 0x08 */ cCharacter* target;
 }; // total size: 0xC
 

@@ -3,6 +3,8 @@
 
 #include "NL/nlTask.h"
 
+extern unsigned char gOnlineLoginStarted;
+
 class ComUpdateTask : public nlTask
 {
 public:

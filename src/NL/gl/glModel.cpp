@@ -1,16 +1,11 @@
 #include "NL/gl/glModel.h"
 
 #include "NL/gl/gl.h"
+#include "NL/gl/glMaterialProgram.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glMemory.h"
 
 #include <string.h>
-
-struct glModelPacketDataInfo
-{
-    /* 0x00 */ u8 unknown00[8];
-    /* 0x08 */ u32 size;
-}; // size: 0xC
 
 void glModelSetMatrix(glModel* model, const nlMatrix4& value)
 {
@@ -80,7 +75,7 @@ glModel* glModelDupArrayNoStreams(
     unsigned long packetSize;
     unsigned long j;
     glModelPacket* packet;
-    glModelPacketDataInfo* info;
+    GLMaterialProgram* materialProgram;
     unsigned long numPackets;
     int i;
 
@@ -126,9 +121,9 @@ glModel* glModelDupArrayNoStreams(
         while (j < dst_model->numPackets)
         {
             packet = (glModelPacket*)((u8*)dst_model->packets + packetOffset);
-            info = (glModelPacketDataInfo*)packet->materialProgram;
+            materialProgram = static_cast<GLMaterialProgram*>(packet->materialProgram);
             source = packet->materialParameters;
-            dataSize = info->size;
+            dataSize = materialProgram->parameterDataSize;
             if (bPermanent)
             {
                 data = glResourceAlloc(dataSize, GLM_Header, pAllocator);

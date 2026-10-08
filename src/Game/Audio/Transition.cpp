@@ -1,31 +1,31 @@
 #include "Game/Audio/Transition.h"
 
-void Transition::Update(float dt, float multiplier)
+void Transition::Update(float dt, float outputModifier)
 {
     valid = enabled;
     enabled = false;
-    duration = multiplier;
+    modifier = outputModifier;
     if (value == target)
     {
-        elapsed = 0.0f;
+        remainingTime = 0.0f;
         return;
     }
 
     valid = true;
-    if (elapsed <= dt)
+    if (remainingTime <= dt)
     {
         value = target;
-        elapsed = 0.0f;
+        remainingTime = 0.0f;
         return;
     }
 
-    float t = dt / elapsed;
+    float t = dt / remainingTime;
     float delta = t * (target - value);
-    elapsed -= dt;
+    remainingTime -= dt;
     value += delta;
 }
 
 float Transition::GetValue()
 {
-    return duration * value;
+    return modifier * value;
 }

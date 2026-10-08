@@ -91,17 +91,9 @@ static const LooseBallContactAnimInfo sSpecialVolleyContactAnims[2] = {
     { 0x30, 4.0f, 0xE000, 0x2000 },
 };
 
-extern "C" void fn_8003BA94(cFielder*, float);
-extern "C" float fn_8002E1B0(cFielder*);
-extern "C" bool fn_80035F84(cFielder*, nlVector3*, float*, nlVector3*,
-    float*, unsigned short, const LooseBallContactAnimInfo*);
-extern "C" bool fn_80036234(cFielder*, nlVector3*, float*, nlVector3*,
-    float*, const LooseBallContactAnimInfo*, nlVector3*, unsigned short);
 extern "C" void fn_80015B38(cBall*, bool);
 void ReleaseBallForPass(
     cBall*, cPlayer*, nlVector3*, int, bool, bool);
-extern "C" void fn_8003EBD0(
-    cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" float fn_8002CE14(PlayerTweaks*);
 static float sfReceivePassMaxDuration = 5.0f;
 unsigned short DesireReceivePass::sDesireReceivePassType = 0xFFFF;
@@ -224,7 +216,7 @@ bool DesireReceivePass::Initialize(void* context)
     {
         meDesireSubState = 0;
         m_pFielder->InitActionRunning();
-        fn_8003BA94(m_pFielder, 0.1f);
+        m_pFielder->SetRunningAnimState(0.1f);
     }
     else
     {
@@ -545,14 +537,14 @@ void DesireReceivePass::ProcessUserInput()
             float fMaxSpeed = pTweaks->GetRunningSpeed();
             float fMinSpeed = fn_8002CE14(
                 m_pFielder->GetTweaks());
-            fn_8003C268(m_pFielder, fMinSpeed, fMaxSpeed);
+            m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             return;
         }
 
         if (meDesireSubState != 4)
         {
             unsigned short aDirection = 0;
-            if (fn_80036A58(m_pFielder, &aDirection))
+            if (m_pFielder->IsReceivePassHitRequested(&aDirection))
             {
                 unsigned short aHitDirection =
                     m_pFielder->mUnidentified024.m_aActualFacingDirection;
@@ -566,7 +558,7 @@ void DesireReceivePass::ProcessUserInput()
                 return;
             }
 
-            if (fn_80036C8C(m_pFielder, &aDirection))
+            if (m_pFielder->IsReceivePassDekeRequested(&aDirection))
             {
                 m_pFielder->InitActionSlideAttack(
                     0, -1.0f, aDirection);
@@ -836,7 +828,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     {
         cBall* pBall = g_pBall;
         CalcInterceptXY(m_pFielder->GetPosition(),
-            fn_8002E1B0(m_pFielder), m_pFielder->mUnidentified320->GetRadius(),
+            m_pFielder->GetRunningSpeed(), m_pFielder->mUnidentified320->GetRadius(),
             pBall->GetPosition(), pBall->m_v3Velocity,
             nNumIntercepts, fInterceptTimes);
 
@@ -995,18 +987,18 @@ bool DesireReceivePass::CalcExactEstimates(bool bLocked)
     bool result;
     if (fn_800C0E74())
     {
-        result = fn_80036234(m_pFielder,
-            &mEstimated.v3AnimStartPos, &mEstimated.fAnimStartTime,
-            &mEstimated.v3BallContactPos, &mEstimated.fBallContactTime,
+        result = m_pFielder->DoLooseBallContactFromRun(
+            mEstimated.v3AnimStartPos, mEstimated.fAnimStartTime,
+            mEstimated.v3BallContactPos, mEstimated.fBallContactTime,
             mEstimated.pAnimInfo,
-            &mEstimated.v3BallContactPos,
+            mEstimated.v3BallContactPos,
             mEstimated.aFacingTargetDirection);
     }
     else
     {
-        result = fn_80035F84(m_pFielder,
-            &mEstimated.v3AnimStartPos, &mEstimated.fAnimStartTime,
-            &mEstimated.v3BallContactPos, &mEstimated.fBallContactTime,
+        result = m_pFielder->DoLooseBallContactFromIdle(
+            mEstimated.v3AnimStartPos, mEstimated.fAnimStartTime,
+            mEstimated.v3BallContactPos, mEstimated.fBallContactTime,
             mEstimated.aFacingTargetDirection,
             mEstimated.pAnimInfo);
     }
@@ -1489,7 +1481,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         UnidentifiedVariantCollection params;
         params.Set(14, FuzzyVariant(FT_VECTOR, v3PassPosition));
         params.Set(11, FuzzyVariant(FT_INT, eReceiveAnimType));
-        fn_8003EBD0(pPassTarget, 22, &params);
+        pPassTarget->ActivateDesire(22, &params);
 
         cAIPad* pAIPad = pPasser->m_pController;
         if (pAIPad != 0 && pPassTarget->m_pController == 0)

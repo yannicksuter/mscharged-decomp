@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-// Retail keeps the predecessor's Jumbotron object and its eight methods as
-// empty stubs; the layout follows the predecessor header.
+// The retained methods are empty. The field layout follows the predecessor
+// header.
 class GLResourcePool;
 
 class Jumbotron

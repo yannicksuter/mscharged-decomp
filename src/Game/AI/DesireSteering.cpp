@@ -24,7 +24,6 @@
 #include <stddef.h>
 
 extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" float fn_8002E1B0(cFielder*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
@@ -194,7 +193,7 @@ void DesireSteering::Update(
         fn_800C5DBC(this, fDeltaT);
     }
     fn_800C6FDC(this, fDeltaT);
-    fn_8003C7B0(m_pFielder);
+    m_pFielder->ShouldIWave();
 
     desiredVelocity.a = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
     desiredVelocity.r = m_pFielder->mUnidentified024.m_fDesiredSpeed;
@@ -411,7 +410,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
     fDesiredSpeed = nlMinEquals(
         nlMaxEquals(
             (fDesiredSpeed /= fDesiredArrivalTime), fMinimumSpeed),
-        fn_8002E1B0(desire->m_pFielder));
+        desire->m_pFielder->GetRunningSpeed());
 
     if (fDesiredSpeed < sMinimumDesiredSpeed)
     {
@@ -436,7 +435,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
     }
 
     fDesiredSpeed = nlMinEquals(
-        fDesiredSpeed, fn_8002E1B0(desire->m_pFielder));
+        fDesiredSpeed, desire->m_pFielder->GetRunningSpeed());
     desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
 }
 
@@ -632,7 +631,7 @@ void SeekSteeringTarget(DesireSteering* desire,
         fMinSpeed, fMaxSpeed, fSpeedPercent * fUrgency);
     fDesiredSpeed *= GetSteeringSpeedScale(fDistance);
     fDesiredSpeed = nlMinEquals(
-        fDesiredSpeed, fn_8002E1B0(desire->m_pFielder));
+        fDesiredSpeed, desire->m_pFielder->GetRunningSpeed());
     desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
 }
 

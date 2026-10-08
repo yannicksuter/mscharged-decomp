@@ -97,7 +97,7 @@ unsigned int FindAudioResourceCue(AudioResourceLoadOwner* state,
 }
 
 void LoadAudioResource(AudioResourceLoadOwner* state,
-    const char* name, AudioResourceLoadCallback field18, void* field1C,
+    const char* name, AudioResourceLoadCallback callback, void* context,
     MemoryAllocator* allocator)
 {
     if (allocator != 0)
@@ -121,8 +121,8 @@ void LoadAudioResource(AudioResourceLoadOwner* state,
     }
     PopAllocator();
 
-    state->m_Callback = field18;
-    state->m_CallbackParam = field1C;
+    state->m_Callback = callback;
+    state->m_CallbackParam = context;
 
     char path[0x80];
     nlSNPrintf(path, sizeof(path), "%s%s.resbun", g_pAudioSystem->m_ResourcePath, name);

@@ -2,6 +2,7 @@
 #define NL_GL_GLPLAT_H
 
 #include "NL/gl/glStruct.h"
+#include "NL/glx/glxModel.h"
 
 #ifndef RVL_SDK_GX_FRAMEBUF_H
 struct GXRenderModeObj
@@ -39,8 +40,6 @@ struct PlatformViewport
 PlatformViewport* glplatGetViewport();
 
 extern GXRenderModeObj glx_rmode;
-void glplatFinalizePacket(glModelPacket* packet, bool permanent, void* allocator);
-
 void glplatInitializeMaterialPrograms();
 
 bool glplatPreStartup();

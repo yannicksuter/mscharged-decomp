@@ -145,7 +145,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
             for (i = 0; i < 2; i++)
             {
-                g_pTeams[i]->fn_800A7998();
+                g_pTeams[i]->StopPlayingAllTrackedSFX();
             }
 
             ClearCharacterEffectsTexturing();

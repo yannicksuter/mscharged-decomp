@@ -18,8 +18,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" void fn_8002E340(cFielder*);
-extern "C" void fn_8002E39C(cFielder*);
 bool gMegaStrikeUsePassButton;
 bool gMegaStrikeInvincible;
 
@@ -135,7 +133,7 @@ bool DesireMegaStrike::Initialize(void* context)
     }
 
     m_pFielder->InitActionMegaStrikeMeter(true);
-    fn_8002E340(m_pFielder);
+    m_pFielder->EndShrink();
     mMaxDuration = sMegaStrikeMaxDuration;
 
     if (gMegaStrikeInvincible || GameInfoManager::Instance()->IsRule0x8Equal2())
@@ -213,7 +211,7 @@ void DesireMegaStrike::Update(
     }
     else if (m_pFielder->m_eActionState == ACTION_SHOT)
     {
-        fn_8002E39C(m_pFielder);
+        m_pFielder->EndStar();
         m_pFielder->fn_800489C0(fDeltaT);
     }
 }
@@ -339,7 +337,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
 void DesireMegaStrike::Cleanup()
 {
     DeliverMegaStrikeMeterEndEvent(g_pGame);
-    fn_8003A0E4(m_pFielder);
+    m_pFielder->CleanActionShootToScore();
 }
 
 /**

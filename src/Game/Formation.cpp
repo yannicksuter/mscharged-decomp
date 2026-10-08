@@ -22,7 +22,6 @@
 #include "Game/Game.h"
 #include <mem.h>
 
-extern "C" float fn_8002E1B0(cFielder*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const float sFielderPositionBonus[4][4] = {
@@ -388,7 +387,7 @@ unsigned int* FormationManager::GetHighestWeightFielderOrder()
 }
 
 bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
-    cFielder* pFielder, bool bInPosition, float fBallPosFormationWeight)
+    cFielder* pFielder, bool bInPosition)
 {
     float fFielderInPosition;
     float fWeights[3];
@@ -820,7 +819,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
             offset.x = av2FormationPositions[i_pos].x - av3FielderAILocs[i_fielder].x;
             fFielderToPositionDistance[i_fielder][i_pos]
                 = nlSqrt(offset.x * offset.x + offset.y * offset.y, true);
-            fFielderToPositionDistance[i_fielder][i_pos] /= fn_8002E1B0(pFielder2);
+            fFielderToPositionDistance[i_fielder][i_pos] /= pFielder2->GetRunningSpeed();
 
             if (bApplyFielderOrder)
             {

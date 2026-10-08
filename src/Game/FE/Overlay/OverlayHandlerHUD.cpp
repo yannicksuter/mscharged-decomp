@@ -26,7 +26,6 @@
 
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
-extern "C" bool fn_8003E99C(const cFielder*);
 
 static unsigned char g_hudVisible = 1;
 static const char* POWER_UP_IMAGE_NAMES[2][2] = { { "left_powerup1", "left_powerup2" }, { "right_powerup1", "right_powerup2" } };
@@ -322,7 +321,7 @@ void HUDPowerUpDisplay::DisplayPowerUps(float fDeltaT)
                 {
                     cFielder* pCaptain = g_pTeams[team]->GetCaptain();
                     if (pCaptain && (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-                                       || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0()))
+                                       || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0()))
                     {
                         m_pImagePowerUps[0][team][i]->m_bVisible = false;
                         m_pImagePowerUps[1][team][i]->m_bVisible = false;
@@ -664,7 +663,7 @@ void HUDCaptainMeter::Update(float fDeltaT)
     {
         cFielder* pCaptain = g_pTeams[i]->GetCaptain();
         if (pCaptain && (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-                           || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0()))
+                           || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0()))
         {
             m_pMeter[i]->m_bVisible = true;
             m_pPowerBarContainer[i]->m_bVisible = false;

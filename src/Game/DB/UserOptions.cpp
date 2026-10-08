@@ -69,7 +69,7 @@ void AudioSettings::ApplySettings()
     {
         sliders[2].target = volume;
     }
-    sliders[2].elapsed = 0.0f;
+    sliders[2].remainingTime = 0.0f;
 
     SFXVolume = SFXVolume < 0 ? 0 : SFXVolume;
     SFXVolume = SFXVolume > 10 ? 10 : SFXVolume;
@@ -88,7 +88,7 @@ void AudioSettings::ApplySettings()
     {
         sliders[4].target = volume;
     }
-    sliders[4].elapsed = 0.0f;
+    sliders[4].remainingTime = 0.0f;
 
     VoiceVolume = VoiceVolume < 0 ? 0 : VoiceVolume;
     VoiceVolume = VoiceVolume > 10 ? 10 : VoiceVolume;
@@ -107,7 +107,7 @@ void AudioSettings::ApplySettings()
     {
         sliders[3].target = volume;
     }
-    sliders[3].elapsed = 0.0f;
+    sliders[3].remainingTime = 0.0f;
 }
 
 void AudioSettings::ApplyMusicVolume()
@@ -129,7 +129,7 @@ void AudioSettings::ApplyMusicVolume()
     {
         sliders[2].target = volume;
     }
-    sliders[2].elapsed = 0.0f;
+    sliders[2].remainingTime = 0.0f;
 }
 
 void AudioSettings::ApplySFXVolume()
@@ -151,7 +151,7 @@ void AudioSettings::ApplySFXVolume()
     {
         sliders[4].target = volume;
     }
-    sliders[4].elapsed = 0.0f;
+    sliders[4].remainingTime = 0.0f;
 }
 
 void AudioSettings::ApplyVoiceVolume()
@@ -173,7 +173,7 @@ void AudioSettings::ApplyVoiceVolume()
     {
         sliders[3].target = volume;
     }
-    sliders[3].elapsed = 0.0f;
+    sliders[3].remainingTime = 0.0f;
 }
 
 GameplaySettings::GameplaySettings()

@@ -4,7 +4,7 @@
 class TweaksBase
 {
 public:
-    TweaksBase(const char* param_1);
+    TweaksBase(const char* fileName);
     virtual ~TweaksBase();
     virtual void Init() = 0;
 

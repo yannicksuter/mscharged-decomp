@@ -33,9 +33,6 @@
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" AvoidController* fn_8002E144(cFielder* pFielder);
-extern "C" bool fn_800381B4(cFielder* pFielder, nlVector3* pOutPos);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
@@ -43,7 +40,6 @@ float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
 static float CloseToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float FarToGoaliePosition(const nlVector3& v3FromPos, const nlVector3& v3GoaliePos);
 static float InBetween(const nlVector3& v3InBetweenPos, const nlVector3& v3A, const nlVector3& v3B);
-extern "C" const nlVector3& fn_80040234(cFielder*);
 nlVector2 gConfidenceDistanceRange = { 10.0f, 10.0f };
 nlVector2 gConfidenceAngleRange = { 21845.0f, 0.0f };
 static TweakFloatBinding sConfidenceIdealDistanceTweak("Ideal Distance", "Game/Player", &gConfidenceDistanceRange.x);
@@ -51,7 +47,6 @@ static TweakFloatBinding sConfidenceIdealRangeTweak("Ideal Range", gLastTweakCat
 static TweakFloatBinding sConfidenceMinAngleTweak("Min Angle", gLastTweakCategory, &gConfidenceAngleRange.x);
 static TweakFloatBinding sConfidenceMaxAngleTweak("Max Angle", gLastTweakCategory, &gConfidenceAngleRange.y);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" float fn_8003C40C(cFielder*, int);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
 
@@ -582,7 +577,7 @@ static float InPassingLane(cFielder* pFielder, cPlayer* pPassTarget, float fPote
                 g_pBall->m_v3Position, g_pBall->m_v3PassIntercept, pFielder->mUnidentified024.m_v3Position);
             float fDistBall = nlSqrt(nlVec3DistanceSquared2D(g_pBall->m_v3Position, v3Between2), true);
             float fTime = fDistBall / fBallSpeed;
-            fTime *= fn_8002E1B0(pFielder);
+            fTime *= pFielder->GetRunningSpeed();
 
             float fDist3 = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, v3Between2), true);
             FuzzyTweaks* pFuzzyTweaks2 = g_pGame->m_pFuzzyTweaks;
@@ -855,7 +850,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
     if (pFielder->m_eActionState != ACTION_SLIDE_ATTACK && vTarget.z <= 0.35f)
     {
         float fDuration = GetSlideTime(pFielder->GetTweaks());
-        float fSpeed = fn_8003C40C(pFielder, pFielder->mUnidentified024.m_aActualFacingDirection);
+        float fSpeed = pFielder->GetSlideAttackSpeed(pFielder->mUnidentified024.m_aActualFacingDirection);
         float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, vTarget), true);
         float fRadius = pFielder->mUnidentified320->GetRadius();
         fDistance -= fRadius + fOwnerRadius;
@@ -1436,7 +1431,7 @@ extern "C" float fn_800D9A38(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    nlVector3 vRepulsion = fn_8002E144(pFielder)->GetLastRepulsionVector(AVOID_GOALIES);
+    nlVector3 vRepulsion = pFielder->GetAvoidController()->GetLastRepulsionVector(AVOID_GOALIES);
     float fMagnitude = nlVec3Length(vRepulsion);
     float fScore = NormalizeVal(fMagnitude, g_pGame->m_pFuzzyTweaks->fAvoidGoalieRepulsionConfidenceMin,
         g_pGame->m_pFuzzyTweaks->fAvoidGoalieRepulsionConfidenceMax);
@@ -1452,7 +1447,7 @@ extern "C" float fn_800D9B0C(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(fn_8002E144(pFielder), AVOID_FIELDERS);
+    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_FIELDERS);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
@@ -1463,7 +1458,7 @@ extern "C" float fn_800D9B74(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(fn_8002E144(pFielder), AVOID_POWERUPS);
+    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_POWERUPS);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
@@ -1474,7 +1469,7 @@ extern "C" float fn_800D9BDC(cFielder* pFielder)
         return 0.0f;
     }
 
-    if ((fn_8002E144(pFielder)->m_CurrentlyAvoiding & AVOID_SIDELINES) != 0)
+    if ((pFielder->GetAvoidController()->m_CurrentlyAvoiding & AVOID_SIDELINES) != 0)
     {
         return 1.0f;
     }
@@ -1489,7 +1484,7 @@ extern "C" float fn_800D9C24(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fAvoid = fn_8000F558(fn_8002E144(pFielder), AVOID_EVERYTHING);
+    float fAvoid = fn_8000F558(pFielder->GetAvoidController(), AVOID_EVERYTHING);
     return FMIN(FMAX(fAvoid, 0.0f), 1.0f);
 }
 
@@ -1792,7 +1787,7 @@ extern "C" float fn_800DA518(cFielder* pFielder)
     if (InOffensiveZone(pFielder) > 0.5f)
     {
         nlVector3 v3FormationPos;
-        if (fn_800381B4(pFielder, &v3FormationPos))
+        if (pFielder->CalculateFormationPosition(v3FormationPos))
             v3FormationPos = pFielder->mUnidentified024.m_v3Position;
         SSearchCutAndBreak search(pFielder);
         nlVector3 v3BestPosition;
@@ -1809,7 +1804,7 @@ static float CloseToFormationPosition(cFielder* pFielder, const nlVector3& vPosi
         return 0.0f;
     }
     nlVector3 v3FormationPos;
-    fn_800381B4(pFielder, &v3FormationPos);
+    pFielder->CalculateFormationPosition(v3FormationPos);
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fCloseToFormationPositionDistanceMax;
     float fMinDist = pFuzzyTweaks->fCloseToFormationPositionDistanceMin;
@@ -1842,7 +1837,7 @@ float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition)
         return 0.0f;
     }
     nlVector3 v3FormationPos;
-    fn_800381B4(pFielder, &v3FormationPos);
+    pFielder->CalculateFormationPosition(v3FormationPos);
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fNearToFormationPositionDistanceMax;
     float fMinDist = pFuzzyTweaks->fNearToFormationPositionDistanceMin;
@@ -1857,7 +1852,7 @@ static float FarToFormationPosition(cFielder* pFielder, const nlVector3& vPositi
         return 0.0f;
     }
     nlVector3 v3FormationPos;
-    fn_800381B4(pFielder, &v3FormationPos);
+    pFielder->CalculateFormationPosition(v3FormationPos);
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fFarToFormationPositionDistanceMax;
     float fMinDist = pFuzzyTweaks->fFarToFormationPositionDistanceMin;
@@ -2649,7 +2644,7 @@ extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)
     {
         return 0.0f;
     }
-    const nlVector3& vPosition = fn_80040234(pFielder);
+    const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
     diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
@@ -2667,7 +2662,7 @@ extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
     {
         return 0.0f;
     }
-    const nlVector3& vPosition = fn_80040234(pFielder);
+    const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
     diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
@@ -2685,7 +2680,7 @@ extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
     {
         return 0.0f;
     }
-    const nlVector3& vPosition = fn_80040234(pFielder);
+    const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
     diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;

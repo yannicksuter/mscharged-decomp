@@ -48,11 +48,7 @@
 #include "Game/EventRegistry.h"
 #include "NL/nlFunction.inl"
 
-extern "C" const nlVector3* fn_80040234(cFielder*);
-extern "C" void fn_8003EBD0(cFielder*, int, UnidentifiedVariantCollection*);
 extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" void fn_8002E340(cFielder*);
-extern "C" void fn_8002E3F8(cFielder*);
 int ChooseRunDirection(cFielder*, const unsigned short*, int,
     const nlVector2*, float*);
 // Shared position constants used by the super-power desires.
@@ -194,14 +190,14 @@ void DesireSuperPower::SetContext(
 bool DesireSuperPower::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    fn_8002E340(m_pFielder);
+    m_pFielder->EndShrink();
 
     switch (m_pFielder->mUnidentified024.m_eCharacterClass)
     {
     case DAISY:
     {
         mpTarget = 0;
-        fn_8002E3F8(m_pFielder);
+        m_pFielder->EndFrozenOrDazed();
         mMaxDuration = gBowserSuperPowerTimeLimit;
         m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
@@ -248,7 +244,7 @@ bool DesireSuperPower::Initialize(void* context)
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
-        fn_800367B4(m_pFielder);
+        m_pFielder->PlayImpactCameraRumble();
         result = true;
         break;
     case BIRDO:
@@ -256,7 +252,7 @@ bool DesireSuperPower::Initialize(void* context)
         m_pFielder->fn_8001EE74(gSuperGrowScale, gSuperGrowTime, -1.0f);
         EmitSuperGrow(m_pFielder);
         mMaxDuration = gSuperGrowTimeLimit;
-        fn_800367B4(m_pFielder);
+        m_pFielder->PlayImpactCameraRumble();
         result = true;
         break;
     case LUIGI:
@@ -267,7 +263,7 @@ bool DesireSuperPower::Initialize(void* context)
     case YOSHI:
     {
         mpTarget = 0;
-        fn_8002E3F8(m_pFielder);
+        m_pFielder->EndFrozenOrDazed();
         mMaxDuration = gPeteySuperPowerTimeLimit;
         m_pFielder->InitSuperPowerTank(
             (bool)UserControlledT(m_pFielder->m_pTeam));
@@ -414,7 +410,7 @@ void DesireSuperPower::Cleanup()
         EndBowserSmoke(m_pFielder);
         break;
     case WALUIGI:
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         {
             EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
                 "bowserjr_shriek_mouth");
@@ -425,16 +421,16 @@ void DesireSuperPower::Cleanup()
         }
         break;
     case DONKEYKONG:
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         break;
     case WARIO:
         m_pFielder->mUnidentified181 = false;
         m_pFielder->mUnidentified182 = false;
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         break;
     case HAMMERBROS:
         KillDKSuperCharge(m_pFielder);
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         delete (AvoidablePoint*)mpDKShockAvoidable;
         mpDKShockAvoidable = 0;
         break;
@@ -455,7 +451,7 @@ void DesireSuperPower::Cleanup()
         SetFlyingCameraTarget((cFielder*)0);
         break;
     case YOSHI:
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
         m_pFielder->mUnidentified404 = 0.0f;
         m_pFielder->mUnidentified408 = 0.0f;
         m_pFielder->ClearSuperPowerTank();
@@ -486,7 +482,7 @@ void DesireSuperPower::Cleanup()
     case TOAD:
         m_pFielder->m_pTweaks
             = m_pFielder->mUnidentified32C;
-        fn_80039CF0(m_pFielder, 0);
+        m_pFielder->RestoreTangibility(false);
         m_pFielder->bYoshiInWindup = false;
         EmitYoshiShellBreak(m_pFielder);
         gNPCManager->mpYoshiEgg->Break();
@@ -604,7 +600,7 @@ extern "C" void fn_800C9D74(DesireSuperPower* self, int param)
  */
 void EmitBowserJrShriek(DesireSuperPower* self)
 {
-    fn_80038158(self->m_pFielder, 0);
+    self->m_pFielder->ClearInvincibility(0);
     nlVector3 vel;
     vel.z = 0.0f;
     nlPolarToCartesian(vel.x, vel.y,
@@ -726,13 +722,13 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
     }
     else if (m_pFielder->m_pCurrentAnimController->TestTrigger(0.04f + gDaisyFistSpawnTime))
     {
-        fn_80038158(m_pFielder, 0);
+        m_pFielder->ClearInvincibility(0);
     }
 }
 
 void DesireSuperPower::EmitHeavenlyLight()
 {
-    fn_80038158(m_pFielder, 0);
+    m_pFielder->ClearInvincibility(0);
     nlVector3 direction;
     nlPolarToCartesian(direction.x, direction.y,
         m_pFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
@@ -1128,7 +1124,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
         {
             m_pFielder->fn_800305DC(0.0f);
             nlVector3 direction;
-            const nlVector3& target = *fn_80040234(m_pFielder);
+            const nlVector3& target = m_pFielder->GetDesiredPosition();
             nlVec3Sub(direction, target, m_pFielder->mUnidentified024.m_v3Position);
             bool valid;
             float lengthSq = direction.GetLengthSq3D();
@@ -1191,7 +1187,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(1, FuzzyVariant(count));
             params.Set(13, FuzzyVariant(gFollowPathSpeed));
             params.Set(10, FuzzyVariant((void*)FollowPathTransition));
-            fn_8003EBD0(m_pFielder, 12, &params);
+            m_pFielder->ActivateDesire(12, &params);
         }
         else if (m_pFielder->mUnidentified3DC)
         {
@@ -1218,7 +1214,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 params.Set(18, FuzzyVariant(gChooseDirectionMaxDistance));
                 params.Set(13, FuzzyVariant(gChooseDirectionSpeed));
                 params.Set(10, FuzzyVariant((void*)ChooseDirectionTransition));
-                fn_8003EBD0(m_pFielder, 12, &params);
+                m_pFielder->ActivateDesire(12, &params);
             }
         }
         else if (!(bool)Offensive(m_pFielder->m_pTeam)
@@ -1231,7 +1227,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             params.Set(14, FuzzyVariant(g_pBall));
             params.Set(13, FuzzyVariant(gInterceptBallSpeed));
             params.Set(10, FuzzyVariant((unsigned long)nlStringHash("TransDesireInterceptBall")));
-            fn_8003EBD0(m_pFielder, 13, &params);
+            m_pFielder->ActivateDesire(13, &params);
         }
     }
 }
@@ -1549,7 +1545,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
-                    fn_800367B4(m_pFielder);
+                    m_pFielder->PlayImpactCameraRumble();
                     m_pFielder->fn_800D0534(gWarioGasInterval);
                     m_pFielder->mUnidentified3F4 = gWarioGasInterval;
                     nlVector3 pos;
@@ -1594,7 +1590,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         params.Set(18, FuzzyVariant(distance));
                         params.Set(13, FuzzyVariant(gWarioRunSpeed));
                         params.Set(10, FuzzyVariant(gWarioRunTransitionHash));
-                        fn_8003EBD0(m_pFielder, 12, &params);
+                        m_pFielder->ActivateDesire(12, &params);
                     }
                 }
             }
@@ -1627,7 +1623,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     gNPCManager->mpYoshiEgg->Activate(self->m_pFielder);
     self->m_pFielder->m_pTweaks
         = self->m_pFielder->mUnidentified328;
-    fn_8002E52C(self->m_pFielder);
+    self->m_pFielder->EndConfusion();
     if (self->m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
     {
         self->m_pFielder->fn_8009750C();
@@ -1649,7 +1645,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     {
         self->m_pFielder->StartRunning();
     }
-    fn_800395C0(self->m_pFielder);
+    self->m_pFielder->BeginDekeIntangibility();
     self->mMaxDuration = gYoshiSuperPowerTimeLimit;
     return true;
 }

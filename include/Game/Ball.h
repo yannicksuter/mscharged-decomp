@@ -173,6 +173,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState);
 
 struct LiveBallTrail;
 float GetBallChargeValue(cBall* pBall, int nParam);
+void ResetBallCharge(cBall* pBall, bool bParam);
 LiveBallTrail* GetBallTrail(unsigned int nIndex);
 unsigned int GetNumBallTrails();
 

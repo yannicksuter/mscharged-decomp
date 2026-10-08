@@ -126,7 +126,7 @@ u32 FixedUpdateTask::CalculateChecksum()
     g_pBall->ChecksumState(&checksum);
     for (int i = 0; i < 2; i++)
     {
-        g_pTeams[i]->fn_800A8DE8(&checksum);
+        g_pTeams[i]->ChecksumState(&checksum);
     }
     return ~checksum.m_nChecksum;
 }
@@ -204,7 +204,7 @@ u32 FixedUpdateTask::WriteSyncLog()
     g_pBall->SyncLog(&checksum, cache);
     for (int i = 0; i < 2; i++)
     {
-        g_pTeams[i]->fn_800A8900(&checksum, cache);
+        g_pTeams[i]->SyncLog(&checksum, cache);
     }
     g_PhysicsWorld->SyncLog(&checksum, cache);
 

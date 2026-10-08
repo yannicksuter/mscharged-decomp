@@ -163,26 +163,13 @@ extern const float lbl_806E35D4[1];
 
 static const nlVector3 v3LaunchUp = { 0.0f, 0.0f, 5.0f };
 
-extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8003E948(const cFielder* pFielder);
-extern "C" void fn_8003BA94(cFielder* pFielder, float fParam);
 
-extern "C" float fn_8002E1B0(cFielder* pFielder);
-extern "C" void fn_80036594(cPlayer* pAttacker, cFielder* pVictim, int nParam);
 extern bool lbl_806DB5A8;
 
 extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" void fn_8002E340(cFielder* pFielder);
-extern "C" float fn_80038970(
-    cFielder* pFielder, nlVector3* pTarget, int nParam);
-extern "C" float fn_8003C40C(cFielder* pFielder, int nParam);
 extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData);
 extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
-extern "C" bool fn_8003E99C(const cFielder* pFielder);
-extern "C" void fn_8002E718(cFielder* pFielder);
-extern "C" void fn_8002E798(cFielder* pFielder);
-extern "C" void fn_8002E39C(cFielder* pFielder);
-extern "C" void fn_8002E2E4(cFielder* pFielder);
 
 
 
@@ -212,7 +199,7 @@ void cFielder::asmRunning()
         {
         default:
         {
-            fn_8003B854(this);
+            SetIdleAnimState();
             bFirstTime = false;
             break;
         }
@@ -225,12 +212,12 @@ void cFielder::asmRunning()
             {
                 if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 else
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
             }
             break;
@@ -241,10 +228,10 @@ void cFielder::asmRunning()
             switch (mActionRunningVars.eLastStrafeDirection)
             {
             case 1:
-                fn_8003B790(this);
+                SetStrafeRightAnimState();
                 break;
             case 2:
-                fn_8003B6CC(this);
+                SetStrafeLeftAnimState();
                 break;
             case 0:
             case 3:
@@ -253,16 +240,16 @@ void cFielder::asmRunning()
                 {
                     if (nAbsActualToDesiredFacingDirection >= 0x3A98)
                     {
-                        fn_8003B2EC(this);
+                        SetBackRunningToRunAnimState();
                     }
                     else
                     {
-                        fn_8003B384(this);
+                        SetBackRunningStopAnimState();
                     }
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 4:
@@ -276,7 +263,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(4))
             {
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
             }
             break;
         }
@@ -285,7 +272,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0x1B))
             {
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
             }
             break;
         }
@@ -303,7 +290,7 @@ void cFielder::asmRunning()
                 case 1:
                 case 2:
                 case 4:
-                    fn_8003B4B4(this);
+                    SetBackRunningStopRecoverAnimState();
                     break;
                 case 3:
                 {
@@ -312,11 +299,11 @@ void cFielder::asmRunning()
                               >> 14;
                     if (nIndex != 0)
                     {
-                        fn_8003A2D0(this, nIndex);
+                        SetStartAnimState(nIndex);
                     }
                     else
                     {
-                        fn_8003B41C(this);
+                        SetBackRunningStopStartAnimState();
                     }
                     break;
                 }
@@ -334,13 +321,13 @@ void cFielder::asmRunning()
                 case 1:
                 case 2:
                 case 4:
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                     break;
                 case 0:
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                     break;
                 case 3:
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                     break;
                 }
             }
@@ -354,19 +341,19 @@ void cFielder::asmRunning()
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
                 case 4:
-                    fn_8003B190(this);
+                    SetRunBackwardsAnimState();
                     break;
                 case 1:
-                    fn_8003B790(this);
+                    SetStrafeRightAnimState();
                     break;
                 case 2:
-                    fn_8003B6CC(this);
+                    SetStrafeLeftAnimState();
                     break;
                 case 0:
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                     break;
                 case 3:
-                    fn_8003A2D0(this, -1);
+                    SetStartAnimState(-1);
                     break;
                 }
             }
@@ -382,21 +369,21 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B664(this);
+                    fn_8003B664();
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 2:
                 mUnidentified024.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
                 break;
             case 4:
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
                 break;
             }
             break;
@@ -411,21 +398,21 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B5FC(this);
+                    fn_8003B5FC();
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 1:
                 mUnidentified024.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
             case 3:
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
                 break;
             case 4:
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
                 break;
             }
             break;
@@ -440,19 +427,19 @@ void cFielder::asmRunning()
             case 0:
                 if (ShouldStartCrossBlend(0))
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 1:
                 if (ShouldStartCrossBlend(0x1D))
                 {
-                    fn_8003B790(this);
+                    SetStrafeRightAnimState();
                 }
                 break;
             case 2:
                 if (ShouldStartCrossBlend(0x1C))
                 {
-                    fn_8003B6CC(this);
+                    SetStrafeLeftAnimState();
                 }
                 break;
             case 3:
@@ -461,22 +448,22 @@ void cFielder::asmRunning()
                     if (mUnidentified024.m_fActualSpeed
                         < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003A2D0(this, -1);
+                        SetStartAnimState(-1);
                     }
                     else if (!mUnidentified1E4.m_tSwapFacingTimer.GetSeconds())
                     {
-                        fn_8003ADAC(this);
+                        SetHardStopAnimState();
                     }
                 }
                 else if (ShouldStartCrossBlend(0))
                 {
-                    fn_8003A2D0(this, -1);
+                    SetStartAnimState(-1);
                 }
                 break;
             case 4:
                 if (ShouldStartCrossBlend(0))
                 {
-                    fn_8003B190(this);
+                    SetRunBackwardsAnimState();
                     mUnidentified024.m_fActualSpeed = 0.0f;
                 }
                 break;
@@ -489,7 +476,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(0))
             {
-                fn_8003B854(this);
+                SetIdleAnimState();
             }
             break;
         }
@@ -503,28 +490,28 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 break;
             case 1:
-                fn_8003B790(this);
+                SetStrafeRightAnimState();
                 break;
             case 2:
-                fn_8003B6CC(this);
+                SetStrafeLeftAnimState();
                 break;
             case 3:
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003A2D0(this, -1);
+                    SetStartAnimState(-1);
                 }
                 else
                 {
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
             case 4:
-                fn_8003B190(this);
+                SetRunBackwardsAnimState();
                 break;
             }
             break;
@@ -540,11 +527,11 @@ void cFielder::asmRunning()
                     if (mUnidentified024.m_fActualSpeed
                         > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003B54C(this);
+                        SetStopAnimState();
                     }
                     else
                     {
-                        fn_8003B854(this);
+                        SetIdleAnimState();
                     }
                 }
                 return;
@@ -564,11 +551,11 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 else
                 {
-                    fn_8003B854(this);
+                    SetIdleAnimState();
                 }
                 break;
             case 3:
@@ -577,40 +564,40 @@ void cFielder::asmRunning()
                     if (mUnidentified024.m_fActualSpeed
                         < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003A2D0(this, -1);
+                        SetStartAnimState(-1);
                     }
                     else if (!mUnidentified1E4.m_tSwapFacingTimer.GetSeconds())
                     {
-                        fn_8003ADAC(this);
+                        SetHardStopAnimState();
                     }
                 }
                 else if ((m_eAnimID != 9 && fn_8003E74C())
                          || (m_eAnimID == 9 && !fn_8003E74C()))
                 {
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
             case 1:
-                fn_8003B790(this);
+                SetStrafeRightAnimState();
                 break;
             case 2:
-                fn_8003B6CC(this);
+                SetStrafeLeftAnimState();
                 break;
             case 4:
                 if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
                     {
-                        fn_8003B254(this);
+                        SetRunToBackRunningAnimState();
                     }
                     else
                     {
-                        fn_8003B54C(this);
+                        SetStopAnimState();
                     }
                 }
                 else
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 break;
             }
@@ -626,11 +613,11 @@ void cFielder::asmRunning()
             {
                 if (mUnidentified024.m_fDesiredSpeed > fn_8002CE14(this->GetTweaks()))
                 {
-                    fn_8003B0D8(this);
+                    SetHardStopTurnAnimState();
                 }
                 else
                 {
-                    fn_8003B020(this);
+                    SetHardStopRecoverAnimState();
                 }
             }
             break;
@@ -643,11 +630,11 @@ void cFielder::asmRunning()
                 if (mUnidentified024.m_fDesiredSpeed >= fn_8002CE14(this->GetTweaks()))
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BA94(this, lbl_806E3538[0]);
+                    SetRunningAnimState(lbl_806E3538[0]);
                 }
                 else
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
             }
             break;
@@ -657,7 +644,7 @@ void cFielder::asmRunning()
         {
             if (ShouldStartCrossBlend(4))
             {
-                fn_8003B854(this);
+                SetIdleAnimState();
             }
             break;
         }
@@ -697,7 +684,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 break;
             }
 
-            fn_8003B920(this);
+            SetIdleWBAnimState();
             bFirstTime = false;
             break;
         }
@@ -710,12 +697,12 @@ void cFielder::asmRunningWB(float fDeltaT)
             {
                 if (mUnidentified024.m_fDesiredSpeed <= fn_8002CE14(this->GetTweaks()))
                 {
-                    fn_8003B920(this);
+                    SetIdleWBAnimState();
                 }
                 else
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BE14(this, lbl_806E3538[0]);
+                    SetRunningWBAnimState(lbl_806E3538[0]);
                 }
             }
             break;
@@ -727,7 +714,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
             if (ShouldStartCrossBlend(0xF))
             {
-                fn_8003B920(this);
+                SetIdleWBAnimState();
                 mUnidentified024.m_fActualSpeed = 0.0f;
                 break;
             }
@@ -737,11 +724,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
                 else
                 {
-                    fn_8003ADAC(this);
+                    SetHardStopAnimState();
                 }
                 break;
             }
@@ -751,7 +738,7 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
             }
             break;
@@ -764,17 +751,17 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     < fSpeedFactor * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
                 else
                 {
-                    fn_8003BE14(this, lbl_806E3538[0]);
+                    SetRunningWBAnimState(lbl_806E3538[0]);
                 }
             }
             else if (mUnidentified024.m_fActualSpeed
                      > 0.6f * this->GetTweaks()->GetRunningSpeed())
             {
-                fn_8003B54C(this);
+                SetStopAnimState();
             }
             else
             {
@@ -793,11 +780,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                     if (mUnidentified024.m_fActualSpeed
                         > 0.6f * GetRunSpeed(this->GetTweaks()))
                     {
-                        fn_8003B54C(this);
+                        SetStopAnimState();
                     }
                     else
                     {
-                        fn_8003B920(this);
+                        SetIdleWBAnimState();
                     }
                 }
                 return;
@@ -816,11 +803,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003ADAC(this);
+                    SetHardStopAnimState();
                 }
                 else
                 {
-                    fn_8003A5C8(this);
+                    SetStartWBAnimState();
                 }
                 break;
             }
@@ -830,11 +817,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                 if (mUnidentified024.m_fActualSpeed
                     > 0.6f * this->GetTweaks()->GetRunningSpeed())
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
                 else
                 {
-                    fn_8003B920(this);
+                    SetIdleWBAnimState();
                 }
                 break;
             }
@@ -842,7 +829,7 @@ void cFielder::asmRunningWB(float fDeltaT)
             if ((m_eAnimID != 9 && fn_8003E74C())
                 || (m_eAnimID == 9 && !fn_8003E74C()))
             {
-                fn_8003BE14(this, lbl_806E3538[0]);
+                SetRunningWBAnimState(lbl_806E3538[0]);
             }
             break;
         }
@@ -861,12 +848,12 @@ void cFielder::asmRunningWB(float fDeltaT)
                     }
                     else
                     {
-                        fn_8003B020(this);
+                        SetHardStopRecoverAnimState();
                     }
                 }
                 else
                 {
-                    fn_8003B0D8(this);
+                    SetHardStopTurnAnimState();
                 }
             }
             break;
@@ -884,11 +871,11 @@ void cFielder::asmRunningWB(float fDeltaT)
                          >= fn_8002CE14(this->GetTweaks()))
                 {
                     mUnidentified024.m_fActualSpeed = GetRunSpeed(this->GetTweaks());
-                    fn_8003BE14(this, lbl_806E3538[0]);
+                    SetRunningWBAnimState(lbl_806E3538[0]);
                 }
                 else
                 {
-                    fn_8003B54C(this);
+                    SetStopAnimState();
                 }
             }
             break;
@@ -898,7 +885,7 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (ShouldStartCrossBlend(0x14))
             {
-                fn_8003B920(this);
+                SetIdleWBAnimState();
                 mUnidentified024.m_fActualSpeed = 0.0f;
             }
             break;
@@ -1051,7 +1038,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     SetAnimState(0x7C, false, 0.0333333f, false, false);
     SetVelocity(v3Velocity);
     InitMovementCoast();
-    fn_8003C560(this, 1, 0);
+    SetTangible(1, 0);
     mUnidentified178 = 1.0f;
 
     if (GameInfoManager::Instance()->GetStadium() == 0x0B)
@@ -1183,7 +1170,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     mUnidentified33A = false;
     mUnidentified33C = 2;
 
-    if (fn_8003E99C(this))
+    if (IsPeachSuperPowerActive())
     {
         if (mUnidentified3DC)
         {
@@ -1322,7 +1309,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
     {
         if (m_pCurrentAnimController->m_fTime > lbl_806DB8F0)
         {
-            mUnidentified33A = !fn_80036F88(this);
+            mUnidentified33A = !IsDekePadPressed();
         }
         else
         {
@@ -1331,7 +1318,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
 
         if (m_pBall != 0)
         {
-            fn_8003D8A4(this, fDeltaT);
+            TestButtonsToQueueActions(fDeltaT);
         }
     }
     else
@@ -1366,7 +1353,7 @@ void cFielder::fn_80044BEC(float fDeltaT)
 
         if (GetGlobalPad() != 0)
         {
-            if (fn_8003D9BC(this))
+            if (TestQueuedActions())
             {
                 mUnidentified1E4.m_eLastPadAction = 0x32;
             }
@@ -1382,7 +1369,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         return;
     }
 
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     float fElectrocutionTime;
@@ -1475,7 +1462,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
         g_pBall->ShootRelease(v3BallVelocity, SPINTYPE_NONE);
     }
 
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     if (m_pBall == 0)
@@ -1691,11 +1678,11 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
             g_pBall->ShootRelease(mUnidentified024.m_v3Velocity, SPINTYPE_NONE);
         }
 
-        fn_8002E718(this);
-        fn_8002E798(this);
-        fn_8002E3F8(this);
-        fn_8002E39C(this);
-        fn_8002E2E4(this);
+        EndBirdoSuperPower();
+        EndKoopaSuperPower();
+        EndFrozenOrDazed();
+        EndStar();
+        EndMushroom();
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -1888,11 +1875,11 @@ void cFielder::fn_80046244()
             SetBallFallState(g_pBall);
         }
 
-        fn_8002E718(this);
-        fn_8002E798(this);
-        fn_8002E3F8(this);
-        fn_8002E39C(this);
-        fn_8002E2E4(this);
+        EndBirdoSuperPower();
+        EndKoopaSuperPower();
+        EndFrozenOrDazed();
+        EndStar();
+        EndMushroom();
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -2306,7 +2293,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         return false;
     }
 
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
 
     mUnidentified360 = bDoFrameLock;
 
@@ -2317,12 +2304,12 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
         if (bBookPenalty)
         {
-            fn_80036594(pAttacker, this, 0);
+            static_cast<cFielder*>(pAttacker)->DoPenaltyCardBooking(this, PEN_TYPE_HIT_WITH_BALL);
         }
     }
     else if (bBookPenalty)
     {
-        fn_80036594(pAttacker, this, 1);
+        static_cast<cFielder*>(pAttacker)->DoPenaltyCardBooking(this, PEN_TYPE_HIT_NO_BALL);
     }
 
     if (!mUnidentified360)
@@ -2483,7 +2470,7 @@ void cFielder::InitActionLateOneTimerFromVolley()
         (s16)(nTurnAdjust + facingDelta2), v3Zero, 0.6f, false);
 
     bool bShotNormally = true;
-    if (fn_8003C180(this))
+    if (ShouldIClearBall())
     {
         DoClearBall();
         bShotNormally = false;
@@ -2590,7 +2577,7 @@ bool cFielder::DoCommonInitActionLooseBall(
         true,
         true);
 
-    float fMaxCatchupSpeed = fn_8002E1B0(this);
+    float fMaxCatchupSpeed = GetRunningSpeed();
     float fMinBallZ = 100.0f;
     bool bBallState5 = g_pBall->meBallState == 5;
     bool bNoContactFound = true;
@@ -2937,7 +2924,7 @@ void UnFreezeEveryoneButCaptain(cFielder* pCaptain)
         for (int j = 0; j < 4; j++)
         {
             cFielder* pFielder = pTeam->GetFielder(j);
-            if (pCaptain != pFielder && fn_8003881C(pFielder)
+            if (pCaptain != pFielder && pFielder->fn_8003881C()
                 && g_pGame->m_uMegastrikeGoals == 0)
             {
                 RequestStateMachineDeactivation(GetConcurrentState(fn_8002E1A4(pFielder), 0x1D));
@@ -3631,9 +3618,9 @@ void cFielder::ActionOneTouchPassFromVolley(float fDeltaT)
     }
 }
 
-bool cFielder::fn_8004A330(cFielder* pOther)
+bool cFielder::DoCalcCanDoPerfectPass(cFielder* pOther, const nlVector3& position)
 {
-    if (!fn_8003C180(pOther))
+    if (!pOther->ShouldIClearBall())
     {
         float fOtherScore = fn_800DBAB0(pOther);
 
@@ -3746,7 +3733,7 @@ void cFielder::ActionPostWhistle(float fDeltaT)
 void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
     float fRadius)
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     if (g_pBall->m_pOwner == this)
@@ -3799,7 +3786,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
 
 void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     mUnidentified360 = false;
@@ -3880,7 +3867,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
         }
     }
 
-    fn_8002E580(this);
+    EndDaze();
     fn_8009750C();
 
     PlayRumbleAction(2, GetGlobalPad());
@@ -3931,7 +3918,7 @@ void cFielder::ActionRunning(float dt)
         {
             if (m_eAnimID != 4)
             {
-                fn_8003BA94(this, lbl_806E3538[0]);
+                SetRunningAnimState(lbl_806E3538[0]);
             }
         }
         else
@@ -4087,7 +4074,7 @@ void cFielder::fn_8004B658()
     {
         SetAction(ACTION_UNKNOWN_30);
         DoResetShotMeter(0.0f);
-        fn_8003A544(this);
+        SetWindupWBAnimState();
         InitMovementRunningNoTurn(0.0f, GetShotWindupDecel(this->GetTweaks()));
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         if (mUnidentified024.m_fActualSpeed > this->GetTweaks()->GetRunningSpeed())
@@ -4154,7 +4141,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
             g_pBall->m_uGoalType = 2;
             if (GetCharacterClass() == (eCharacterClass)0x10)
             {
-                fn_800395C0(this);
+                BeginDekeIntangibility();
             }
             else
             {
@@ -4342,7 +4329,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
     if (m_pBall != 0
         && m_pCurrentAnimController->TestFrameTrigger(1.825f))
     {
-        if (!fn_8003C180(this))
+        if (!ShouldIClearBall())
         {
             DoRegularShooting(false);
 
@@ -4412,7 +4399,7 @@ void cFielder::InitActionSlideAttack(
         nlVector3 v3BallDelta;
         if (fTime < 0.0f)
         {
-            fTime = fn_80038970(this, &v3Target, nParam);
+            fTime = CalcSlideAttackBallIntercept(v3Target, nParam);
         }
         else
         {
@@ -4432,7 +4419,7 @@ void cFielder::InitActionSlideAttack(
             v3Target.z = 0.0f;
         }
 
-        float fSpeed = fn_8003C40C(this, nParam);
+        float fSpeed = GetSlideAttackSpeed(nParam);
         if (fn_8003E70C())
         {
             nlPolarToCartesian(
@@ -4613,12 +4600,12 @@ void cFielder::fn_8004C88C(float fDeltaT)
     {
         if (GetGlobalPad() != 0 && !mUnidentified38D)
         {
-            mUnidentified38D = fn_80036F88(this) == 0;
+            mUnidentified38D = IsDekePadPressed() == 0;
         }
 
         if (m_pBall != 0)
         {
-            fn_8003D8A4(this, fDeltaT);
+            TestButtonsToQueueActions(fDeltaT);
         }
     }
 
@@ -4635,7 +4622,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
         bool bUnidentified = false;
         if (GetGlobalPad() != 0 && mUnidentified38D && m_pBall != 0)
         {
-            if (!fn_80036F88(this))
+            if (!IsDekePadPressed())
             {
                 bUnidentified = true;
             }
@@ -4685,7 +4672,7 @@ void cFielder::fn_8004D238()
 {
     if (m_pBall != 0)
     {
-        if (!fn_8003D9BC(this))
+        if (!TestQueuedActions())
         {
             EndDesire();
             EndAction();
@@ -4702,7 +4689,7 @@ void cFielder::fn_8004D238()
 
 void cFielder::fn_8004D480(const nlVector3& v3CollisionVelocity)
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     fn_8009750C();
 
     if (IsFallenDown() && m_eActionState == (eFielderActionState)0x1C)
@@ -4747,7 +4734,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
 {
     if (!IsFallenDown())
     {
-        fn_8002E3F8(this);
+        EndFrozenOrDazed();
 
         bool bHadBall = false;
         if (m_pBall != 0)
@@ -4960,7 +4947,7 @@ void cFielder::fn_8004E228()
 
 void cFielder::fn_8004E438()
 {
-    fn_8002E340(this);
+    EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_UNKNOWN_32);
 
@@ -5113,7 +5100,7 @@ void cFielder::fn_8004EA9C()
 {
     if (m_eActionState == ACTION_UNKNOWN_32)
     {
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
     }
 }
 
@@ -5135,17 +5122,17 @@ void cFielder::fn_8004EC40()
 {
     if (!mbTangible)
     {
-        fn_80039CF0(this, 0);
+        RestoreTangibility(false);
     }
 
     if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12)
     {
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
     }
     else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x13)
     {
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
 
         if (m_pBulletBill->active)
         {
@@ -5165,7 +5152,7 @@ void cFielder::fn_8004EC40()
 
 void cFielder::fn_8004ED64()
 {
-    fn_8002E340(this);
+    EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction((eFielderActionState)0x21);
     InitMovementCoast();
@@ -5178,7 +5165,7 @@ void cFielder::fn_8004ED64()
 
     Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
     pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = 0;
-    fn_8003C560(this, 0, 1);
+    SetTangible(0, 1);
 
     g_pBall->m_pPhysicsBall->mbCanCollidePlayer = false;
     g_pBall->m_pPhysicsBall->mbCanCollideGoalie = false;
@@ -5233,7 +5220,7 @@ void cFielder::fn_8004EE48(float fDeltaT)
 
         if (m_pCurrentAnimController->TestTrigger(0.05f))
         {
-            fn_80039CF0(this, 0);
+            RestoreTangibility(false);
         }
 
         if (ShouldStartCrossBlend(0))
@@ -5255,8 +5242,8 @@ void cFielder::fn_8004F180()
     SetPosition(v3Position);
 
     mUnidentified17C = true;
-    fn_80039CF0(this, 0);
-    fn_80038158(this, 0);
+    RestoreTangibility(false);
+    ClearInvincibility(0);
     mUnidentified424 = false;
 }
 
@@ -5272,7 +5259,7 @@ void cFielder::fn_8004F204()
     SetPosition(v3Position);
     SetVelocity(v3Zero);
 
-    fn_8003C560(this, 1, 0);
+    SetTangible(1, 0);
 
     mUnidentified17C = false;
     mUnidentified178 = 1.0f;
@@ -5313,7 +5300,7 @@ void cFielder::fn_8004F2FC(float fDeltaT)
         case 0x7D:
             if (ShouldStartCrossBlend(4))
             {
-                fn_8003C560(this, 1, 0);
+                SetTangible(1, 0);
                 EndAction();
             }
             break;

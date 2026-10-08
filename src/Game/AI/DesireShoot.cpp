@@ -104,7 +104,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
             if (fSign * m_pFielder->mUnidentified024.m_v3Position.x < fGoalieX
                 || (float)__fabs(m_pFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
             {
-                float fRange = fn_80039574(m_pFielder);
+                float fRange = m_pFielder->GetDekeDistance();
                 float fDistance = nlSqrt(nlVec3DistanceSquared2D(
                     m_pFielder->mUnidentified024.m_v3Position,
                     m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position), true);
@@ -154,7 +154,7 @@ bool DesireShoot::Initialize(void* context)
         m_pFielder->DoResetShotMeter(0.0f);
     }
 
-    if (fn_8003C180(m_pFielder))
+    if (m_pFielder->ShouldIClearBall())
     {
         float fRange = GetShootingWindupTime(m_pFielder->GetTweaks()) - 0.2f;
         m_pFielder->m_pShotMeter->m_fTime = 0.1f + (float)nlRandom((unsigned int)fRange);

@@ -276,7 +276,6 @@ void RegisterPhysicsEventHandlers()
 
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pShooter);
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
-extern "C" void fn_8002E5F4(cFielder* pFielder, int nParam);
 void HandleCollisionFireballPowerup(void* object)
 {
     ((unsigned char*)object)[4] = true;
@@ -325,7 +324,7 @@ void HandleCollisionCrackEgg(void* data)
     unsigned char* object = *(unsigned char**)((unsigned char*)data + 4);
     if (*(int*)(object + 0xF0) == 2)
     {
-        fn_8002E5F4((cFielder*)object, 0);
+        ((cFielder*)object)->EndSuperPower(0);
     }
 }
 
@@ -408,7 +407,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                 {
                     break;
                 }
-                fn_80032534(pFielder, pShockwave->mPosition);
+                pFielder->CollideWithShockwaveCallback(pShockwave->mPosition);
                 break;
             case SHOCKWAVE_FREEZE:
                 pFielder->CollideWithFreezeCallback();
@@ -620,9 +619,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         }
         if (shockwaveType != SHOCKWAVE_LIGHTNING)
         {
-            fn_8002E5F4(
-                ((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder,
-                0);
+            (((PhysicsYoshiEgg*)pObject)->mYoshiEgg->mFielder)->EndSuperPower(0);
         }
         break;
     case 30:
@@ -935,12 +932,12 @@ void QueueCollisionHammerChain(UnidentifiedEventData28* data)
     gPhysicsEventQueue->mCollisionHammerChainEvent.Queue(data, Function<UnidentifiedEventData28*>());
 }
 
-void QueueCollisionThwompPlayer(void* source, cCharacter* target)
+void QueueCollisionThwompPlayer(ThwompObject* thwomp, cCharacter* target)
 {
     CollisionThwompPlayerData* data = 0;
     g_CollisionThwompPlayerDataPool.Allocate(data);
-    data->source = source;
-    data->sourceValue = *(void**)source;
+    data->thwomp = thwomp;
+    data->state = thwomp->mState;
     data->target = target;
     gPhysicsEventQueue->mCollisionThwompPlayerEvent.Queue(
         data,

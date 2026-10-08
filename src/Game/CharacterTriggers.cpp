@@ -222,14 +222,14 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xE26970B8:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800395C0((cFielder*)g_pCurrentlyUpdatingCharacter);
+                static_cast<cFielder*>(g_pCurrentlyUpdatingCharacter)->BeginDekeIntangibility();
             }
             break;
 
         case 0x09FC95CF:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_80039CF0((cFielder*)g_pCurrentlyUpdatingCharacter, 0);
+                static_cast<cFielder*>(g_pCurrentlyUpdatingCharacter)->RestoreTangibility(false);
             }
             break;
 
@@ -396,7 +396,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x1A8EBA53:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800367B4((cFielder*)g_pCurrentlyUpdatingCharacter);
+                ((cFielder*)g_pCurrentlyUpdatingCharacter)->PlayImpactCameraRumble();
             }
             break;
 
@@ -1876,7 +1876,7 @@ void BeginDeke(cFielder* pFielder)
 
 void EndDeke(cFielder* pFielder)
 {
-    fn_80038158(pFielder, 0);
+    pFielder->ClearInvincibility(0);
 
     if (pFielder->mUnidentified024.m_eCharacterClass == 3)
     {

@@ -58,7 +58,6 @@
 #include "NL/nlFunction.inl"
 
 extern unsigned int lbl_806E0C10;
-extern "C" void fn_80036594(cPlayer*, cFielder*, int);
 
 cBall* g_pBall = NULL;
 unsigned char lbl_806E0BC4;
@@ -657,8 +656,8 @@ void cBall::CollideWithCharacterCallback(
                         {
                             pOwnerFielder->InitActionSlideAttackReact(
                                 pCharacterFielder, false);
-                            fn_80036594(
-                                pCharacterFielder, pOwnerFielder, 2);
+                            pCharacterFielder->DoPenaltyCardBooking(
+                            pOwnerFielder, PEN_TYPE_SLIDE_WITH_BALL);
                             pCharacterFielder->SetSlideAttackSuccessFlag();
                             if (pCharacterFielder->CanPickupBall(
                                     g_pBall, false))
@@ -671,8 +670,8 @@ void cBall::CollideWithCharacterCallback(
                     {
                         pOwnerFielder->InitActionSlideAttackReact(
                             pCharacterFielder, false);
-                        fn_80036594(
-                            pCharacterFielder, pOwnerFielder, 2);
+                        pCharacterFielder->DoPenaltyCardBooking(
+                            pOwnerFielder, PEN_TYPE_SLIDE_WITH_BALL);
                         pCharacterFielder->SetSlideAttackSuccessFlag();
                         if (pCharacterFielder->CanPickupBall(
                                 g_pBall, false))

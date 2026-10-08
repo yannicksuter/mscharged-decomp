@@ -31,7 +31,7 @@ public:
 
     virtual float GetValue()
     {
-        float result = duration + value;
+        float result = modifier + value;
         result = (result >= -96.0f) ? result : -96.0f;
         result = (result <= 6.0f) ? result : 6.0f;
         return result;

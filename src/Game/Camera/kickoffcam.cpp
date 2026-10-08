@@ -2,8 +2,8 @@
 
 #include "NL/gl/glMatrix.h"
 
-nlVector3 vecCameraDefault = { 0.0f, -18.0f, 8.0f };
-nlVector3 vecTargetDefault = { 0.0f, 0.0f, 0.0f };
+nlVector3 gKickOffCameraDefaultPosition = { 0.0f, -18.0f, 8.0f };
+nlVector3 gKickOffCameraDefaultTarget = { 0.0f, 0.0f, 0.0f };
 
 void cKickOffCamera::Update(float dt)
 {
@@ -16,6 +16,6 @@ cKickOffCamera::~cKickOffCamera()
 
 cKickOffCamera::cKickOffCamera()
 {
-    m_v3Camera = vecCameraDefault;
-    m_v3Target = vecTargetDefault;
+    m_v3Camera = gKickOffCameraDefaultPosition;
+    m_v3Target = gKickOffCameraDefaultTarget;
 }

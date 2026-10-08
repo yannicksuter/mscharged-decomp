@@ -10,9 +10,9 @@ class TLComponent : public FELibObject
 public:
     TLComponent();
 
-    void SetActiveSlide(const char* name, bool arg2, bool arg3);
-    void SetActiveSlide(unsigned long hash, bool arg2, bool arg3);
-    void SetActiveSlide(TLSlide* slide, bool arg2, bool arg3);
+    void SetActiveSlide(const char* name, bool forceRestart, bool preserveTime);
+    void SetActiveSlide(unsigned long hash, bool forceRestart, bool preserveTime);
+    void SetActiveSlide(TLSlide* slide, bool forceRestart, bool preserveTime);
 
     TLSlide* GetActiveSlide()
     {

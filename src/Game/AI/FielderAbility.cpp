@@ -52,13 +52,12 @@ float gDKSuperHitTiltScale = 0.4f;
 float gWaluigiTankOffCost;
 bool gPeachPhotoEmitEnabled;
 
-extern "C" void fn_8002E3F8(cFielder* pFielder);
 extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 
 
 void cFielder::InitActionDKSuper()
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     SetAction((eFielderActionState)0x1D);
     SetAnimState(0x68, true, 0.2f, false, false);
     muInvincibleStatus |= 1;
@@ -103,7 +102,7 @@ void cFielder::ActionDKSuper(float fDeltaT)
 
 void cFielder::CleanUpPeachSuper()
 {
-    fn_80038158(this, 0);
+    ClearInvincibility(0);
 
     if (m_pCurrentAnimController->m_fTime
             * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys
@@ -125,7 +124,7 @@ void cFielder::CleanUpPeachSuper()
 
 void cFielder::InitActionPeachSuper()
 {
-    fn_8002E3F8(this);
+    EndFrozenOrDazed();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction((eFielderActionState)0x1D);
     muInvincibleStatus |= 1;
@@ -226,7 +225,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
         {
             FixedUpdateTask::SetFrameLock(gPeachFlashFrameLockTime);
         }
-        fn_80038158(this, 0);
+        ClearInvincibility(0);
     }
     else if (m_pCurrentAnimController->TestFrameTrigger(gPeachCamerasAwayFrame))
     {
@@ -294,7 +293,7 @@ void cFielder::fn_8005001C(bool bForce)
                 }
             }
             mUnidentified3E8.nextFireballTime = 0.0f;
-            fn_8002FE54(this);
+            SetNormalTweaks();
             StopSound(0x8A9FCF66, this);
         }
     }
@@ -316,7 +315,7 @@ void cFielder::fn_8005001C(bool bForce)
                         mUnidentified3E0 = mUnidentified3F8.mUnidentified04;
                     }
                 }
-                fn_8002FE54(this);
+                SetNormalTweaks();
                 if (IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
                 {
                     DeactivateConcurrentState(fn_8002E1A4(this), 0x23);
@@ -343,7 +342,7 @@ void cFielder::fn_8005001C(bool bForce)
         {
             mUnidentified3DC = false;
             mUnidentified408 = 0.0f;
-            fn_8002FE54(this);
+            SetNormalTweaks();
         }
     }
 }
@@ -406,7 +405,7 @@ bool cFielder::TurnOnSuperPowerTank()
         {
             mUnidentified3E8.fireballStageTime = 0.0f;
             mUnidentified3E8.fireballStageNum = 0;
-            fn_800301E8(this);
+            SetSuperPowerTweaks();
         }
     }
     else if (mUnidentified024.m_eCharacterClass == MARIO)
@@ -446,7 +445,7 @@ bool cFielder::TurnOnSuperPowerTank()
     else if (mUnidentified024.m_eCharacterClass == YOSHI)
     {
         mUnidentified408 = 0.0f;
-        fn_800301E8(this);
+        SetSuperPowerTweaks();
     }
 
     return true;

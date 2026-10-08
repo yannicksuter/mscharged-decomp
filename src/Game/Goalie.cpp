@@ -2538,7 +2538,7 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
         if (bInterceptorDown || fOtherBallInTime < 0.08f + fBallInTime)
         {
             float fGoalieTime = nlSqrt(CalculateDistanceSquared(mUnidentified024.m_v3Position,
-                pOtherTeam->UnidentifiedInterceptPosition(pOtherInterceptor->mUnidentified1E4.m_ID)), true) / 8.0f;
+                pOtherTeam->GetBallInterceptPosition(pOtherInterceptor->mUnidentified1E4.m_ID)), true) / 8.0f;
             if (fOtherBallInTime < 0.08f + fGoalieTime)
                 return false;
         }
@@ -3625,13 +3625,13 @@ void Goalie::ReleaseMonty()
             if (mbGrabMonty
                 && mpMonty->mUnidentified024.m_v3Position.z > -0.25f)
             {
-                fn_8003C5D8(mpMonty, true,
+                mpMonty->EjectMonty(true,
                     mUnidentified024.m_aActualFacingDirection + 0x9FF6);
                 PlaySound(m_uSoundSlotId, 0x4AE0B399, 0, 0);
             }
             else
             {
-                fn_8003C6E0(mpMonty);
+                mpMonty->EndMontyDeke();
             }
         }
         mpMonty = 0;

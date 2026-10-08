@@ -1,4 +1,4 @@
-#include "Game/InputRouter.h"
+#include "Game/NetworkRandomSeed.h"
 
 #include "NL/nlMath.h"
 

@@ -23,8 +23,6 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" bool fn_800381B4(cFielder*, nlVector3*);
-extern "C" float fn_8002E1B0(cFielder*);
 extern bool lbl_806E0E20;
 extern float lbl_806DC058;
 extern nlVector2 lbl_806DC078;
@@ -164,7 +162,7 @@ bool DesireCutAndBreak::Initialize(void* context)
 {
     bool initialized = Desire::Initialize(context);
     nlVector3 searchCenter;
-    if (fn_800381B4(m_pFielder, &searchCenter))
+    if (m_pFielder->CalculateFormationPosition(searchCenter))
     {
         searchCenter = m_pFielder->mUnidentified024.m_v3Position;
     }
@@ -316,7 +314,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case MARIO:
     case 17:
     {
-        float dekeDistance = fn_80039574(m_pFielder);
+        float dekeDistance = m_pFielder->GetDekeDistance();
         cNet* net = m_pFielder->m_pTeam->GetOtherNet();
         cFielder* fielder = m_pFielder;
         nlVector3 goalieDelta;
@@ -513,7 +511,7 @@ bool DesireGetInPosition::Initialize(void* context)
 void DesireGetInPosition::Update(DesireUpdate* update, float)
 {
     nlVector3 position;
-    if (fn_800381B4(m_pFielder, &position))
+    if (m_pFielder->CalculateFormationPosition(position))
     {
         position = m_pFielder->mUnidentified024.m_v3Position;
     }
@@ -561,7 +559,7 @@ bool DesireRunUpfield::Initialize(void* context)
 void DesireRunUpfield::Update(DesireUpdate* update, float)
 {
     nlVector3 position;
-    if (fn_800381B4(m_pFielder, &position) && g_pBall->GetOwnerGoalie() == 0)
+    if (m_pFielder->CalculateFormationPosition(position) && g_pBall->GetOwnerGoalie() == 0)
     {
         position = m_pFielder->mUnidentified024.m_v3Position;
     }
@@ -616,7 +614,7 @@ bool DesireRunDownfield::Initialize(void* context)
 void DesireRunDownfield::Update(DesireUpdate* update, float)
 {
     nlVector3 position;
-    if (fn_800381B4(m_pFielder, &position) && g_pBall->GetOwnerGoalie() == 0)
+    if (m_pFielder->CalculateFormationPosition(position) && g_pBall->GetOwnerGoalie() == 0)
     {
         position = m_pFielder->mUnidentified024.m_v3Position;
     }
@@ -712,7 +710,7 @@ bool DesireRunInDirection::Initialize(void* context)
         if (parameters->IsSet(18))
         {
             m_fMaxDistance = parameters->Get(18)->mData.f;
-            mMaxDuration = 0.5f + m_fMaxDistance / fn_8002E1B0(m_pFielder);
+            mMaxDuration = 0.5f + m_fMaxDistance / m_pFielder->GetRunningSpeed();
         }
         m_pFielder->StartRunning();
     }
@@ -853,7 +851,6 @@ extern "C" int fn_800B04B4(SandTombWeather*)
     return 4;
 }
 
-extern "C" AvoidController* fn_8002E144(cFielder*);
 extern float lbl_806DC0A8;
 extern int lbl_806DC0B0;
 
@@ -891,7 +888,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
         cFielder* target = static_cast<cFielder*>(passTarget);
         if (fn_800DF0B8(target))
         {
-            if (g_pBall->m_v3Position.z > fn_800394A8(m_pFielder, 0))
+            if (g_pBall->m_v3Position.z > m_pFielder->GetAirInterceptHeight(0))
             {
                 float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
                 float predictionTime = lbl_806DC0A8 <= interceptTime ? lbl_806DC0A8 : interceptTime;
@@ -899,7 +896,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
             }
             else
             {
-                fn_80039350(target, &position, &m_pFielder->mUnidentified024.m_v3Position, 0.1f);
+                target->GetApproachPosition(&position, &m_pFielder->mUnidentified024.m_v3Position, 0.1f);
             }
         }
         else
@@ -915,7 +912,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     }
     else if (g_pBall->GetOwnerFielder() != NULL)
     {
-        fn_80039350(g_pBall->GetOwnerFielder(), &position,
+        g_pBall->GetOwnerFielder()->GetApproachPosition(&position,
             &m_pFielder->mUnidentified024.m_v3Position, 0.25f);
     }
     else
@@ -927,7 +924,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
 
     position.z = 0.0f;
     m_pFielder->AddDesiredPosition(position, 2.0f, 1.0f);
-    AvoidController* avoidance = fn_8002E144(m_pFielder);
+    AvoidController* avoidance = m_pFielder->GetAvoidController();
     avoidance->m_fRepulsionMult = 0.5f;
     if (g_pBall->m_pOwner != NULL && g_pBall->m_pOwner->m_eClassType == GOALIE)
     {

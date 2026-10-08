@@ -62,11 +62,9 @@
 cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
-extern "C" void fn_8002E3F8(cFielder*);
 
 extern "C" bool fn_8003E8A0(const cFielder*);
 extern "C" bool fn_8003E948(const cFielder*);
-extern "C" bool fn_8003E99C(const cFielder*);
 extern "C" void fn_80015B38(cBall*, bool);
 
 float lbl_806DBD80 = 0.75f;
@@ -855,7 +853,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
         EmitSkillshotPlayerOnFire(pPlayer);
         pPlayer->AddRandomDirt();
         pPlayer->fn_8001F1C0(2);
-        fn_8002E3F8((cFielder*)pPlayer);
+        ((cFielder*)pPlayer)->EndFrozenOrDazed();
         pPlayer->mUnidentified1E4.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)
         {
@@ -1226,7 +1224,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-                || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
+                || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
             && !pCaptain->mUnidentified3DC)
         {
             pCaptain->TurnOnSuperPowerTank();
@@ -1235,9 +1233,9 @@ extern "C" void fn_80098098(cPlayer* pSelf)
         if (bCaptainPowerup)
         {
             if (pSelf->m_eClassType == FIELDER)
-                fn_8003F1E8((cFielder*)pSelf);
+                ((cFielder*)pSelf)->UseCaptainPowerup();
             else
-                fn_8003F1E8(pSelf->m_pTeam->GetCaptain());
+                pSelf->m_pTeam->GetCaptain()->UseCaptainPowerup();
         }
         else if (pSelf->m_eClassType == FIELDER)
         {
@@ -1248,7 +1246,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
         if (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-            || fn_8003E99C(pCaptain) || pCaptain->fn_8003E9F0())
+            || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
         {
             bool bPressed = false;
             for (int i = 0; i < 4; i++)
@@ -1392,7 +1390,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                     position.x = pFielder->mUnidentified024.m_v3Position.x;
                     position.y = pFielder->mUnidentified024.m_v3Position.y;
                     if (region.ContainsPoint2D(position))
-                        fn_80031C3C(pFielder, lbl_806DBD88);
+                        pFielder->FreezeWithPeachPhoto(lbl_806DBD88);
                 }
             }
         }

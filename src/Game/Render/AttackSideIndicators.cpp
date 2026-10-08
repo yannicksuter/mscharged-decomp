@@ -105,7 +105,7 @@ void UpdateAttackSideIndicators()
     for (int i = 0; i < 2; ++i)
     {
         gAttackSideIndicatorSets[i]->Update(
-            active ? g_pTeams[i]->mUnidentified00C : 0.0f);
+            active ? g_pTeams[i]->mfAttackIndicatorProgress : 0.0f);
     }
 }
 

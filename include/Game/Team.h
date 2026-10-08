@@ -65,10 +65,6 @@ public:
     cFielder* GetBestBallInterceptor() { return mpBestBallInterceptor; }
     const nlVector3& GetBallInterceptPosition(int i) const { return mvBallInterceptPosition[i]; }
     cFielder* GetAIOrderedFielder(int i) { return m_pAIOrderedFielders[i]; }
-    const nlVector3& UnidentifiedInterceptPosition(int i) const
-    {
-        return mvBallInterceptPosition[i];
-    }
     cPlayer* GetPlayer(int nIndex);
     cPlayer* GetControlledPlayer(cGlobalPad* pController);
     cFielder* GetCaptain();
@@ -90,23 +86,22 @@ public:
     void ResetCharacters();
     void StopGameplayEffectsAndSounds();
     bool CalculateFormationPosition(nlVector3& v3DestPosition,
-        cFielder* pFielder, bool bInPosition,
-        float fBallPosFormationWeight);
+        cFielder* pFielder, bool bInPosition);
     void CalculateNewBallInterceptTimes();
     PowerUpTeamType GetPowerUpByIndex(int index) const;
     int SetCurrentPowerUp(
         ePowerUpType eNewPowerUpType, int nnumOfPowerups);
-    void SetDifficulty(int difficulty, int param2, bool param3);
-    void fn_800A607C();
-    void fn_800A6248();
-    void fn_800A7998();
-    void fn_800A8098();
-    void fn_800A8900(void* context, DebugWriteCache* cache);
-    void fn_800A8DE8(RunningChecksum* runningChecksum);
-    float fn_800A8EC0();
-    float fn_800A8F20();
-    float fn_800A8F80();
-    float fn_800A8FE0();
+    void SetDifficulty(int difficulty, bool blend, bool reload);
+    void Reset();
+    void ResetAI();
+    void StopPlayingAllTrackedSFX();
+    void UpdateShotScore();
+    void SyncLog(void* context, DebugWriteCache* cache);
+    void ChecksumState(RunningChecksum* runningChecksum);
+    float GetAverageMovementRating();
+    float GetAverageShootingRating();
+    float GetAveragePassingRating();
+    float GetAverageDefenseRating();
 
 public:
     /* 0x00 */ int m_nSide;
@@ -115,10 +110,12 @@ public:
 public:
     /* 0x08 */ float mfPowerupMeter;
 
-    /* 0x0C */ float mUnidentified00C;
+    /* 0x0C */ float mfAttackIndicatorProgress;
 
 private:
-    /* 0x10 */ float mUnidentified010;
+    void WriteTeamStateLog(void* context, DebugWriteCache* cache);
+
+    /* 0x10 */ float mfShotScore;
 
 public:
     /* 0x14 */ float mfPowerupTimer;
@@ -145,12 +142,12 @@ public:
     /* 0xD8 */ cFielder* m_pFieldersByTeamRelativeX[4];
     /* 0xE8 */ cNet* m_pNet;
     /* 0xEC */ FormationManager* m_pFormationManager;
-    /* 0xF0 */ AIContext* mUnidentified0F0;
+    /* 0xF0 */ AIContext* m_pAIContext;
     /* 0xF4 */ u32 mUnidentified0F4;
 };
 
 extern cTeam* g_pTeams[];
-extern "C" FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam*);
+FuzzyRuntimeBase* GetTeamFuzzyRuntime(cTeam*);
 extern "C" ScriptMachine* fn_800A6968(cTeam*);
 extern cTeam* g_pCurrentlyUpdatingTeam;
 

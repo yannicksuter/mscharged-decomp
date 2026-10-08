@@ -14,10 +14,7 @@ public:
         int stateCount, bool ownsStates, AIContext* context, const char* name);
     virtual ~ScriptMachine();
 
-    virtual bool IsIdle() const
-    {
-        return mActiveState == 0;
-    }
+    virtual bool IsIdle() const;
     virtual void Initialize();
     virtual void Update(float deltaTime);
     virtual void Reset(bool deleting);

@@ -2,6 +2,7 @@
 #define NL_GL_GLMEMORY_H
 
 #include "NL/glx/glxMemory.h"
+#include "NL/glx/glxModel.h"
 
 class GLInventory;
 struct glModelPacket;
@@ -38,9 +39,6 @@ void glDestroyResourcePool(GLResourcePool* resource);
 void glSetCurrentResourcePool(GLResourcePool* resource);
 GLResourcePool* glGetCurrentResourcePool();
 GLResourcePool* glGetResourcePools();
-
-// Platform hook applied after a packet and its material data have been cloned.
-void glplatOnPacketCloned(glModelPacket* packet, void* allocator);
 
 void* glResourceAlloc(
     unsigned long size, eGLMemory memType, void* resource);

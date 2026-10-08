@@ -3,6 +3,7 @@
 
 #include "Game/PackedDetInput.h"
 #include "Game/NetworkSession.h"
+#include "Game/NetworkRandomSeed.h"
 #include "NL/CircularQueue.h"
 #include "NL/nlMemory.h"
 #include "types.h"
@@ -131,11 +132,6 @@ private:
     void RecordEmptyInputHeader(s8 machine, int frame);
 }; // size: 0xE5C8
 
-extern u32 gNetworkRandomSeed;
-
-u32 GetNetworkRandomSeed();
-void SetNetworkRandomSeed(u32 seed);
-void OnInputSessionReset();
 void InitializeInputRouters();
 InputRouter* GetInputRouter();
 void DispatchDetermDataEvents();

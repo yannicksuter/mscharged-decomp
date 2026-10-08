@@ -179,7 +179,7 @@ void BulletBillObject::Hide(bool destroyEffect)
                 target->m_pCurrentAnimController->m_fPlaybackSpeedScale = sBulletBillEndReactionPlaybackSpeed;
             }
             EmitShyGuyBulletEnd(target);
-            fn_800367B4(target);
+            target->PlayImpactCameraRumble();
         }
         position = sHiddenBulletBillPosition;
         velocity = sHiddenBulletBillVelocity;

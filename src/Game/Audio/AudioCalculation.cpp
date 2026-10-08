@@ -43,10 +43,10 @@ void AudioCalculationTable::Update(float dt)
     AudioCalculationDefinition* definition = definitions;
     for (u32 i = 0; i < count;)
     {
-        float multiplier = definition->field_0C != 0
+        float modifier = definition->field_0C != 0
                              ? sliders[*definition->field_0C].value
                              : 1.0f;
-        slider->Update(dt, multiplier);
+        slider->Update(dt, modifier);
         i++;
         slider++;
         definition++;

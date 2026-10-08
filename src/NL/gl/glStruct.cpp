@@ -1,18 +1,18 @@
 #include "NL/gl/glStruct.h"
 
-gl_ScreenInfo _ScreenInfo;
+gl_ScreenInfo gScreenInfo;
 
 gl_ScreenInfo* glGetScreenInfo()
 {
-    return &_ScreenInfo;
+    return &gScreenInfo;
 }
 
 u32 glGetScreenWidth()
 {
-    return _ScreenInfo.ScreenWidth;
+    return gScreenInfo.ScreenWidth;
 }
 
 u32 glGetScreenHeight()
 {
-    return _ScreenInfo.ScreenHeight;
+    return gScreenInfo.ScreenHeight;
 }

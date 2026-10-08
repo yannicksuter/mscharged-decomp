@@ -97,7 +97,6 @@
 #include "Game/DB/StadiumInfo.h"
 
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
-extern "C" void fn_800406B0(cFielder* pFielder, float numBalls, float accuracy);
 
 struct PlayerDistanceSnapshot
 {
@@ -208,7 +207,7 @@ inline void cGame::ResetCharacters()
     RandomizePlayerUpdateOrder();
     for (int i = 0; i < 2; i++)
     {
-        g_pTeams[i]->fn_800A6248();
+        g_pTeams[i]->ResetAI();
         g_pTeams[i]->ResetCharacters();
     }
 }
@@ -597,7 +596,7 @@ void cGame::InitMegaStrikeGameplay()
     Goalie* pGoalie = mpMegaStrikeShooter->m_pTeam->GetOtherTeam()->GetGoalie();
     pGoalie->InitActionMegaStrike(numBalls, accuracy);
     mpMegaStrikeShooter->EndAction();
-    fn_80038158(mpMegaStrikeShooter, 0);
+    mpMegaStrikeShooter->ClearInvincibility(0);
 }
 void cGame::CleanupMegaStrikeGameplay()
 {
@@ -1042,7 +1041,7 @@ void cGame::ResetCachedPlayerDistances()
 {
     for (int i = 0; i < 2; i++)
     {
-        g_pTeams[i]->fn_800A607C();
+        g_pTeams[i]->Reset();
     }
 
     for (int i = 0; i < 10; i++)
@@ -1229,7 +1228,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n", pEvent->mData[1],
             pEvent->mData[2], *(float*)&pEvent->mData[4], *(float*)&pEvent->mData[8],
             gInputManager->mFrameProvider->GetFrame());
-        fn_800406B0(pFielder, *(float*)&pEvent->mData[4], *(float*)&pEvent->mData[8]);
+        pFielder->SetMegaStrikeResult(*(float*)&pEvent->mData[4], *(float*)&pEvent->mData[8]);
         break;
     }
 

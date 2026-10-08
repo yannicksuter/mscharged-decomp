@@ -19,9 +19,9 @@ void GoalieFatigue::Update(float dt)
     }
 }
 
-void GoalieFatigue::RegisterShot(float fLevel)
+void GoalieFatigue::RegisterShot(float energyCost)
 {
-    mfEnergyLevel -= fLevel;
+    mfEnergyLevel -= energyCost;
     if (mfEnergyLevel < 100.0f)
     {
         mfHotStreakTimer = 0.0f;

@@ -1,7 +1,7 @@
 #include "Game/CharacterEffects.h"
 
 #include "NL/gl/glState.h"
-#include "NL/glx/glxTexture.h"
+#include "NL/gl/glTextureManager.h"
 
 static EffectsTexturing fxTexturing[] = {
     EffectsTexturing(0xFFFFFFFF, GLB_None, false, false),

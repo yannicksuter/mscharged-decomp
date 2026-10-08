@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-struct FILE_HEADER
+struct BinaryTriggerFileHeader
 {
     /* 0x0 */ s8 Thumbprint[4];
     /* 0x4 */ u16 Version;
@@ -35,7 +35,7 @@ public:
     BinaryTriggerFile(void* pFileData, unsigned long FileSize);
 
     /* 0x00 */ u32 m_FileSize;
-    /* 0x04 */ FILE_HEADER* m_pFileData;
+    /* 0x04 */ BinaryTriggerFileHeader* m_pFileData;
     /* 0x08 */ ANIM_RECORD* m_pFirstAnim;
     /* 0x0C */ TRIGGER_RECORD* m_pFirstTrigger;
     /* 0x10 */ ANIM_RECORD* m_pCurrentAnim;

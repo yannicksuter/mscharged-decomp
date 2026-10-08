@@ -9,20 +9,20 @@ TLComponent::TLComponent()
     m_type = FEOT_COMPONENT;
 }
 
-void TLComponent::SetActiveSlide(const char* name, bool arg2, bool arg3)
+void TLComponent::SetActiveSlide(const char* name, bool forceRestart, bool preserveTime)
 {
     unsigned long hash = nlStringLowerHash(name);
-    SetActiveSlide(hash, arg2, arg3);
+    SetActiveSlide(hash, forceRestart, preserveTime);
 }
 
-void TLComponent::SetActiveSlide(unsigned long hash, bool arg2, bool arg3)
+void TLComponent::SetActiveSlide(unsigned long hash, bool forceRestart, bool preserveTime)
 {
     TLSlide* slide = FindItemByHashID<TLSlide>(pChildren, hash);
     if (slide != 0)
     {
-        if (arg2 || slide != m_pActiveSlide)
+        if (forceRestart || slide != m_pActiveSlide)
         {
-            if (!arg3)
+            if (!preserveTime)
             {
                 slide->m_time = 0.0f;
             }
@@ -36,13 +36,13 @@ void TLComponent::SetActiveSlide(unsigned long hash, bool arg2, bool arg3)
     }
 }
 
-void TLComponent::SetActiveSlide(TLSlide* slide, bool arg2, bool arg3)
+void TLComponent::SetActiveSlide(TLSlide* slide, bool forceRestart, bool preserveTime)
 {
     if (slide != 0)
     {
-        if (arg2 || slide != m_pActiveSlide)
+        if (forceRestart || slide != m_pActiveSlide)
         {
-            if (!arg3)
+            if (!preserveTime)
             {
                 slide->m_time = 0.0f;
             }
