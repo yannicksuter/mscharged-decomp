@@ -1024,8 +1024,8 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_unk34.m_uWasRunning = m_unk34.m_uPackedTime != 0;
     m_unk34.m_uPackedTime = 0;
 
-    nlVector3 v3Unidentified = v3Zero;
-    m_v3SavedVelocity = v3Unidentified;
+    nlVector3 v3ZeroVelocity = v3Zero;
+    m_v3SavedVelocity = v3ZeroVelocity;
     m_v3PrevPosition = m_v3Position;
     m_v3Velocity = v3Zero;
 
@@ -1952,7 +1952,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
 /**
  * Offset/Address/Size: 0x385C | 0x8009CEBC | size: 0x23C
  */
-void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
+void PowerupBase::fn_8009CEBC(const nlVector3& v3ShockwaveOrigin)
 {
     if (m_unk44.m_uPackedTime == 0)
     {
@@ -1963,7 +1963,7 @@ void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
 
             const nlVector3& v3Velocity = m_v3Velocity;
             float fVerticalVelocity = -v3Velocity.z;
-            nlVec3Sub(v3Direction, m_v3Position, v3Unidentified);
+            nlVec3Sub(v3Direction, m_v3Position, v3ShockwaveOrigin);
 
             if (nlVec3DotProduct(v3Direction, v3Velocity) < 0.0f)
             {
@@ -1992,9 +1992,9 @@ void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
         else
         {
             nlVector3 v3Direction;
-            float fDirectionY = m_v3Position.y - v3Unidentified.y;
-            float fDirectionX = m_v3Position.x - v3Unidentified.x;
-            float fDirectionZ = m_v3Position.z - v3Unidentified.z;
+            float fDirectionY = m_v3Position.y - v3ShockwaveOrigin.y;
+            float fDirectionX = m_v3Position.x - v3ShockwaveOrigin.x;
+            float fDirectionZ = m_v3Position.z - v3ShockwaveOrigin.z;
             nlVec3Set(v3Direction, fDirectionX, fDirectionY, fDirectionZ);
             float fInvDistance = nlRecipSqrt(
                 nlVec3LengthSquared(v3Direction), true);
@@ -2686,21 +2686,21 @@ Banana::~Banana()
  */
 void Banana::ThrowAt(cFielder* pThrower)
 {
-    nlVector3 v3Unidentified = { 0.0f, 0.0f, 0.0f };
+    nlVector3 v3SpawnPosition = { 0.0f, 0.0f, 0.0f };
     unsigned short aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
     float fThrowerScale = pThrower->m_DetChar.m_fPlayerScale;
     float fRadius = GetRadius();
     float fThrowerRadius = fn_8002BFA8(
         pThrower->GetTweaks(), fThrowerScale);
 
-    nlPolarToCartesian(v3Unidentified.x, v3Unidentified.y,
+    nlPolarToCartesian(v3SpawnPosition.x, v3SpawnPosition.y,
         (unsigned short)(aDirection + 0x8000),
         0.15f + fRadius + fThrowerRadius);
 
-    nlVec3Add(v3Unidentified,
-        pThrower->m_DetChar.m_v3Position, v3Unidentified);
+    nlVec3Add(v3SpawnPosition,
+        pThrower->m_DetChar.m_v3Position, v3SpawnPosition);
 
-    m_v3Position = v3Unidentified;
+    m_v3Position = v3SpawnPosition;
     m_pPhysicsObject->SetPosition(
         m_v3Position, PhysicsObject::WORLD_COORDINATES);
 
@@ -2733,10 +2733,10 @@ void Banana::Update(float dt)
         return;
     }
 
-    nlVector3 v3Unidentified = m_v3Position;
+    nlVector3 v3BoundedPosition = m_v3Position;
     float fPhysicsRadius =
         ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
-    if (cField::FixOutOfBoundsPosition(v3Unidentified,
+    if (cField::FixOutOfBoundsPosition(v3BoundedPosition,
             ((PhysicsSphere*)m_pPhysicsObject)->GetRadius()
                 - 0.85f * fPhysicsRadius,
             false))

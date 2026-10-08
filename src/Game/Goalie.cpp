@@ -1925,14 +1925,14 @@ bool Goalie::IsCloseToPlane(const nlVector3& rPos1,
 
     nlVector3* pBallPos = &g_pBall->m_v3Position;
 
-    nlVector2 v2Unidentified;
-    v2Unidentified.x = pBallPos->x - rPos1.x;
-    v2Unidentified.y = pBallPos->y - rPos1.y;
+    nlVector2 v2ToBall;
+    v2ToBall.x = pBallPos->x - rPos1.x;
+    v2ToBall.y = pBallPos->y - rPos1.y;
     float fBallDistanceSquared
-        = nlGetLengthSquared2D(v2Unidentified.x, v2Unidentified.y);
+        = nlGetLengthSquared2D(v2ToBall.x, v2ToBall.y);
     if (fBallDistanceSquared > nlGetLengthSquared1D(0.01f))
     {
-        v3Dir.x = v2Unidentified.y;
+        v3Dir.x = v2ToBall.y;
         v3Dir.y = rPos1.x - pBallPos->x;
         v3Dir.z = 0.0f;
     }
@@ -1950,10 +1950,10 @@ bool Goalie::IsCloseToPlane(const nlVector3& rPos1,
         }
         else
         {
-            nlVector2 v2Unidentified2;
-            v2Unidentified2.x = rPos2.x - rPos1.x;
-            v2Unidentified2.y = rPos2.y - rPos1.y;
-            return nlVec2LengthSquared(v2Unidentified2)
+            nlVector2 v2BetweenPoints;
+            v2BetweenPoints.x = rPos2.x - rPos1.x;
+            v2BetweenPoints.y = rPos2.y - rPos1.y;
+            return nlVec2LengthSquared(v2BetweenPoints)
                 < nlGetLengthSquared1D(fThreshold);
         }
     }
@@ -2657,13 +2657,13 @@ bool Goalie::IsPassThreat()
     {
         if (!IsOnSameTeam(pPassTarget))
         {
-            nlVector2 v2Unidentified;
-            v2Unidentified.x = m_pTeam->m_pNet->m_v3NetLocation.x
+            nlVector2 v2InterceptToNet;
+            v2InterceptToNet.x = m_pTeam->m_pNet->m_v3NetLocation.x
                 - g_pBall->m_v3PassIntercept.x;
-            v2Unidentified.y = m_pTeam->m_pNet->m_v3NetLocation.y
+            v2InterceptToNet.y = m_pTeam->m_pNet->m_v3NetLocation.y
                 - g_pBall->m_v3PassIntercept.y;
 
-            if (nlGetLengthSquared2D(v2Unidentified.x, v2Unidentified.y)
+            if (nlGetLengthSquared2D(v2InterceptToNet.x, v2InterceptToNet.y)
                 < nlGetLengthSquared1D(gfPassThreatNetRange))
             {
                 mpPassTarget = pPassTarget;

@@ -282,8 +282,8 @@ nlVector3 ReplayCamera::GetClampedFocusPosition(const nlVector3& position,
         if (cameraUp.GetLengthSq3D() < 0.0f)
             nlVec3Scale(cameraUp, -1.0f);
 
-        nlVector3 v3Unidentified;
-        nlVec3Set(v3Unidentified, 1.0f, 0.0f, 0.0f);
+        nlVector3 v3XAxis;
+        nlVec3Set(v3XAxis, 1.0f, 0.0f, 0.0f);
 
         nlMatrix4 cameraMatrix;
         nlMatrix4 inverseCameraMatrix;

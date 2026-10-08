@@ -1929,7 +1929,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
     nlVector3 v3ToDir;
     nlVector3 v3FromDir;
     nlQuaternion qRot;
-    nlVector3 v3Unidentified;
+    nlVector3 v3TargetOffset;
 
     SetVelocity(v3Dir, spinType, &v3Spin);
     m_tNoPickupTimer.SetSeconds(0.1f);
@@ -1944,11 +1944,11 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 
     if (m_pPhysicsBall->mbUseMagnusEffect)
     {
-        nlVec3Set(v3Unidentified,
+        nlVec3Set(v3TargetOffset,
             m_v3Position.x - m_v3ShotTarget.x,
             m_v3Position.y - m_v3ShotTarget.y,
             m_v3Position.z - m_v3ShotTarget.z);
-        float fDist = nlSqrt(v3Unidentified.GetLengthSq3D(), true);
+        float fDist = nlSqrt(v3TargetOffset.GetLengthSq3D(), true);
 
         DisablePredictedGoaliePlanes();
         FakeBallWorld::GetPredictedPosAtDistance(
@@ -2255,10 +2255,10 @@ void cBall::Update(float fDeltaT)
                 else if (m_v3Position.z > gHeaderTargetPredictionHeight
                     && tHeaderTargetTimer.Countdown(fDeltaT, 0.0f))
                 {
-                    nlVector3 v3Unidentified;
-                    PredictLandingSpotAndTime(v3Unidentified,
+                    nlVector3 v3LandingSpot;
+                    PredictLandingSpotAndTime(v3LandingSpot,
                         NULL, NULL, gHeaderTargetPredictionHeight);
-                    EmitHeaderTarget(this, &v3Unidentified, false);
+                    EmitHeaderTarget(this, &v3LandingSpot, false);
                     sHeaderTargetVisible = true;
                     bKillHeaderTarget = false;
                 }
@@ -3635,15 +3635,15 @@ unsigned int GetNumBallTrails()
 void InitializeBallTrails(unsigned int nNumTrails)
 {
     lbl_806E0C10 = nNumTrails;
-    nlVector3 v3Unidentified = v3Zero;
+    nlVector3 v3ZeroValue = v3Zero;
 
     unsigned int i = 0;
     for (; i < nNumTrails; ++i)
     {
         LiveBallTrail* pBallTrail = &lbl_8056B518[i];
         SetBallTrailVisible(pBallTrail, false);
-        pBallTrail->position = v3Unidentified;
-        pBallTrail->velocity = v3Unidentified;
+        pBallTrail->position = v3ZeroValue;
+        pBallTrail->velocity = v3ZeroValue;
         pBallTrail->drawable = (DrawableModel*)GetBallRenderObject(i);
     }
 

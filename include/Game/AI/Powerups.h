@@ -115,7 +115,7 @@ public:
 
     float GetRadius() const;
     ePowerUpType GetType() const { return m_eType; }
-    void fn_8009CEBC(const nlVector3& v3Unidentified);
+    void fn_8009CEBC(const nlVector3& v3ShockwaveOrigin);
     void fn_8009D500();
     void fn_8009D74C(float seconds, bool bEnableCollisions);
     void SpeedManagement();

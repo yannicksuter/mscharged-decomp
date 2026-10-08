@@ -412,8 +412,8 @@ void cTeam::AssignMarks(bool bForceReMark)
         bool bMyFielderDown = pMyFielder->IsInFallAction()
                                    || pMyFielder->IsShattered();
 
-        nlVector3 v3UnidentifiedPosition;
-        pMyFielder->CalculateFormationPosition(v3UnidentifiedPosition);
+        nlVector3 v3FormationPosition;
+        pMyFielder->CalculateFormationPosition(v3FormationPosition);
 
         for (int i_otherf = 0; i_otherf < 4; i_otherf++)
         {
@@ -430,7 +430,7 @@ void cTeam::AssignMarks(bool bForceReMark)
                 fFielderMarkScores[i_fielder][i_otherf] = 0.5f
                     * nlSqrt(nlVec3DistanceSquared2D(
                         pOppFielder->m_DetChar.m_v3Position,
-                        v3UnidentifiedPosition), true);
+                        v3FormationPosition), true);
                 fFielderMarkScores[i_fielder][i_otherf] += 0.5f
                     * nlSqrt(nlVec3DistanceSquared2D(
                         pOppFielder->m_DetChar.m_v3Position,

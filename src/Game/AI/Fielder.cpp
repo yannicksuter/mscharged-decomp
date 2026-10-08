@@ -2311,19 +2311,19 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
         {
             AddRandomDirt();
             fn_8001F1C0(1);
-            nlVector3 v3Unidentified = eventData->pPatch->m_Velocity;
-            v3Unidentified.z = 0.0f;
-            if (nlVec3LengthSquared(v3Unidentified) == 0.0f)
+            nlVector3 v3PatchDirection = eventData->pPatch->m_Velocity;
+            v3PatchDirection.z = 0.0f;
+            if (nlVec3LengthSquared(v3PatchDirection) == 0.0f)
             {
-                nlVec3Set(v3Unidentified,
+                nlVec3Set(v3PatchDirection,
                     m_DetChar.m_v3Position.x - eventData->pPatch->m_pOwner->m_DetChar.m_v3Position.x,
                     m_DetChar.m_v3Position.y - eventData->pPatch->m_pOwner->m_DetChar.m_v3Position.y,
                     0.0f);
             }
-            nlVec3Scale(v3Unidentified,
-                nlRecipSqrt(nlVec3LengthSquared(v3Unidentified), false));
+            nlVec3Scale(v3PatchDirection,
+                nlRecipSqrt(nlVec3LengthSquared(v3PatchDirection), false));
             nlPolar polar;
-            nlCartesianToPolar(polar, v3Unidentified);
+            nlCartesianToPolar(polar, v3PatchDirection);
             fn_80047240(eventData->pPatch->m_pOwner,
                 polar.a, 1, false, false);
         }
@@ -2387,9 +2387,9 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && m_eActionState != (eFielderActionState)0x23)
         {
             PlayRumbleAction(3, GetGlobalPad());
-            nlVector3 v3Unidentified = m_DetChar.m_v3Velocity;
-            v3Unidentified.z = 25.0f;
-            fn_80044148(v3Unidentified);
+            nlVector3 v3KnockbackVelocity = m_DetChar.m_v3Velocity;
+            v3KnockbackVelocity.z = 25.0f;
+            fn_80044148(v3KnockbackVelocity);
             fn_80097358(this, 5.0f);
         }
     }
@@ -2408,14 +2408,14 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             nlVec3ScaleAdd(v3End, 100.0f,
                 eventData->pPatch->fn_80173CCC(),
                 eventData->pPatch->GetPosition());
-            nlVector3 v3Unidentified = GetClosestPointOnLineABFromPointC(
+            nlVector3 v3KnockbackDirection = GetClosestPointOnLineABFromPointC(
                 v3Start, v3End, m_DetChar.m_v3Position);
-            nlVec3Set(v3Unidentified,
-                m_DetChar.m_v3Position.x - v3Unidentified.x,
-                m_DetChar.m_v3Position.y - v3Unidentified.y, 0.0f);
-            nlVec3Scale(v3Unidentified,
-                nlRecipSqrt(nlVec3LengthSquared(v3Unidentified), false));
-            InitActionElectrocution(m_DetChar.m_v3Position, v3Unidentified, false);
+            nlVec3Set(v3KnockbackDirection,
+                m_DetChar.m_v3Position.x - v3KnockbackDirection.x,
+                m_DetChar.m_v3Position.y - v3KnockbackDirection.y, 0.0f);
+            nlVec3Scale(v3KnockbackDirection,
+                nlRecipSqrt(nlVec3LengthSquared(v3KnockbackDirection), false));
+            InitActionElectrocution(m_DetChar.m_v3Position, v3KnockbackDirection, false);
         }
     }
 }
@@ -2507,10 +2507,10 @@ bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
     if (bRunning)
         leftFootZ = rightFootZ = 0.0f;
 
-    nlVector3 v3Unidentified0, v3Unidentified1;
+    nlVector3 v3HeadPosition, v3PreviousHeadPosition;
     m_pPhysicsCharacter->GetBonePositions(
-        PHYSBONE_FIELDER_HEAD, v3Unidentified0, v3Unidentified1);
-    float headZ = v3Unidentified0.z;
+        PHYSBONE_FIELDER_HEAD, v3HeadPosition, v3PreviousHeadPosition);
+    float headZ = v3HeadPosition.z;
     leftFootZ = nlMinEquals(nlMinEquals(leftFootZ, rightFootZ), headZ) - 0.15f;
     if (leftFootZ < 0.0f)
         leftFootZ = 0.0f;
@@ -2521,11 +2521,11 @@ bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
     float otherRightFootZ = pOtherFielder->GetJointPosition(
                                           pOtherFielder->m_nRightFootJointIndex)
                               .z;
-    nlVector3 v3Unidentified2, v3Unidentified3;
+    nlVector3 v3OtherHeadPosition, v3OtherPreviousHeadPosition;
     pOtherFielder->m_pPhysicsCharacter->GetBonePositions(
-        PHYSBONE_FIELDER_HEAD, v3Unidentified2, v3Unidentified3);
+        PHYSBONE_FIELDER_HEAD, v3OtherHeadPosition, v3OtherPreviousHeadPosition);
     float otherTopZ = nlMaxEquals(
-        nlMaxEquals(otherLeftFootZ, otherRightFootZ), v3Unidentified2.z);
+        nlMaxEquals(otherLeftFootZ, otherRightFootZ), v3OtherHeadPosition.z);
     otherTopZ += 0.15f;
     if (leftFootZ > otherTopZ)
         return true;
@@ -3815,9 +3815,9 @@ const LooseBallContactAnimInfo* cFielder::FindLooseBallContactAnim(
     const nlVector3& v3FuturePosition, const nlVector3& v3OneTimerTarget,
     float fAngle)
 {
-    nlVector3 v3Unidentified;
-    nlVec3Sub(v3Unidentified, v3OneTimerTarget, v3FuturePosition);
-    u16 aNetAngle = nlVector3ToAngle(v3Unidentified) - aFutureFacingDirection;
+    nlVector3 v3ToOneTimerTarget;
+    nlVec3Sub(v3ToOneTimerTarget, v3OneTimerTarget, v3FuturePosition);
+    u16 aNetAngle = nlVector3ToAngle(v3ToOneTimerTarget) - aFutureFacingDirection;
 
     const LooseBallContactAnimInfo* pBestBallContactAnimInfo = NULL;
     for (int i = 0; i < nNumContactAnims; i++)
@@ -5598,24 +5598,24 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
                 FindHeadTrackingHitTarget(this, pLookTarget);
             }
 
-            nlVector3 v3Unidentified;
+            nlVector3 v3LookAtPosition;
             if (pLookTarget == 0)
             {
-                nlVector3 v3Unidentified0 = GetJointPosition(m_nHeadJointIndex);
-                const nlMatrix4& m4Unidentified
+                nlVector3 v3HeadPosition = GetJointPosition(m_nHeadJointIndex);
+                const nlMatrix4& m4HeadTransform
                     = m_pPoseAccumulator->GetNodeMatrix(m_nHeadJointIndex);
-                nlVector3 v3Unidentified1;
-                nlVec3Set(v3Unidentified1,
-                    m4Unidentified.m11, m4Unidentified.m12, m4Unidentified.m13);
-                nlVec3ScaleAdd(v3Unidentified, 5.0f,
-                    v3Unidentified1, v3Unidentified0);
+                nlVector3 v3HeadDirection;
+                nlVec3Set(v3HeadDirection,
+                    m4HeadTransform.m11, m4HeadTransform.m12, m4HeadTransform.m13);
+                nlVec3ScaleAdd(v3LookAtPosition, 5.0f,
+                    v3HeadDirection, v3HeadPosition);
             }
             else
             {
-                v3Unidentified = pLookTarget->m_DetChar.m_v3Position;
+                v3LookAtPosition = pLookTarget->m_DetChar.m_v3Position;
             }
-            v3Unidentified.z = gSuperPowerHeadTrackingHeight;
-            m_pHeadTrack->m_v3OOI = v3Unidentified;
+            v3LookAtPosition.z = gSuperPowerHeadTrackingHeight;
+            m_pHeadTrack->m_v3OOI = v3LookAtPosition;
             m_pHeadTrack->m_bTrackOOI = true;
         }
         else
@@ -5649,19 +5649,19 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         && (m_DetChar.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
     {
         float fWholeGameSeconds = (int)g_pGame->GetGameTime();
-        nlVector3 v3Unidentified;
+        nlVector3 v3LookAtPosition;
         if (g_pGame->GetGameTime() - fWholeGameSeconds < 0.25f
             || (g_pGame->GetGameTime() - fWholeGameSeconds > 0.5f
                 && g_pGame->GetGameTime() - fWholeGameSeconds < GetHeadTrackingFinalPhaseTime()))
         {
-            v3Unidentified = m_pTeam->m_pNet->m_v3NetLocation;
+            v3LookAtPosition = m_pTeam->m_pNet->m_v3NetLocation;
         }
         else
         {
-            v3Unidentified = m_pTeam->GetOtherNet()->m_v3NetLocation;
+            v3LookAtPosition = m_pTeam->GetOtherNet()->m_v3NetLocation;
         }
-        v3Unidentified.z = 5.0f + nlRandomf(30.0f);
-        m_pHeadTrack->m_v3OOI = v3Unidentified;
+        v3LookAtPosition.z = 5.0f + nlRandomf(30.0f);
+        m_pHeadTrack->m_v3OOI = v3LookAtPosition;
         m_pHeadTrack->m_bTrackOOI = true;
         return;
     }
@@ -5707,9 +5707,9 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         m_pHeadTrack->m_bTrackOOI = true;
         if (m_fFallingTime > 0.0f)
         {
-            nlVector3 v3Unidentified = m_DetChar.m_v3Position;
-            v3Unidentified.z -= 20.0f;
-            m_pHeadTrack->m_v3OOI = v3Unidentified;
+            nlVector3 v3LookAtPosition = m_DetChar.m_v3Position;
+            v3LookAtPosition.z -= 20.0f;
+            m_pHeadTrack->m_v3OOI = v3LookAtPosition;
         }
         else
         {
