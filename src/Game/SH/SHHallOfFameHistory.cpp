@@ -140,17 +140,17 @@ void SHHallOfFameHistory::SceneCreated()
     UpdateTitle();
     switch (mMode)
     {
-    case 4:
-    case 5:
-    case 6:
+    case HOF_FIRE_CUP_HISTORY:
+    case HOF_CRYSTAL_CUP_HISTORY:
+    case HOF_STRIKER_CUP_HISTORY:
         UpdateCupRecordText();
         break;
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
+    case HOF_FIRE_BRICK_WALL_HISTORY:
+    case HOF_FIRE_GOLDEN_BOOT_HISTORY:
+    case HOF_CRYSTAL_BRICK_WALL_HISTORY:
+    case HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
+    case HOF_STRIKER_BRICK_WALL_HISTORY:
+    case HOF_STRIKER_GOLDEN_BOOT_HISTORY:
         UpdateGoalsRecordText();
         break;
     }
@@ -280,17 +280,17 @@ void SHHallOfFameHistory::Update(float fDeltaT)
         ++mSelectedHistoryIndex;
         switch (mMode)
         {
-        case 4:
-        case 5:
-        case 6:
+        case HOF_FIRE_CUP_HISTORY:
+        case HOF_CRYSTAL_CUP_HISTORY:
+        case HOF_STRIKER_CUP_HISTORY:
             UpdateCupRecordText();
             break;
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
+        case HOF_FIRE_BRICK_WALL_HISTORY:
+        case HOF_FIRE_GOLDEN_BOOT_HISTORY:
+        case HOF_CRYSTAL_BRICK_WALL_HISTORY:
+        case HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
+        case HOF_STRIKER_BRICK_WALL_HISTORY:
+        case HOF_STRIKER_GOLDEN_BOOT_HISTORY:
             UpdateGoalsRecordText();
             break;
         }
@@ -302,17 +302,17 @@ void SHHallOfFameHistory::Update(float fDeltaT)
         --mSelectedHistoryIndex;
         switch (mMode)
         {
-        case 4:
-        case 5:
-        case 6:
+        case HOF_FIRE_CUP_HISTORY:
+        case HOF_CRYSTAL_CUP_HISTORY:
+        case HOF_STRIKER_CUP_HISTORY:
             UpdateCupRecordText();
             break;
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
+        case HOF_FIRE_BRICK_WALL_HISTORY:
+        case HOF_FIRE_GOLDEN_BOOT_HISTORY:
+        case HOF_CRYSTAL_BRICK_WALL_HISTORY:
+        case HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
+        case HOF_STRIKER_BRICK_WALL_HISTORY:
+        case HOF_STRIKER_GOLDEN_BOOT_HISTORY:
             UpdateGoalsRecordText();
             break;
         }
@@ -338,31 +338,31 @@ void SHHallOfFameHistory::UpdateTitle()
 
     switch (mMode)
     {
-    case 4:
+    case HOF_FIRE_CUP_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_FIRE_CUP"));
         break;
-    case 6:
+    case HOF_STRIKER_CUP_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_STRIKER_CUP"));
         break;
-    case 5:
+    case HOF_CRYSTAL_CUP_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_CRYSTAL_CUP"));
         break;
-    case 7:
+    case HOF_FIRE_BRICK_WALL_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_FIRE_BRICK_WALL"));
         break;
-    case 8:
+    case HOF_FIRE_GOLDEN_BOOT_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_FIRE_GOLDEN_BOOT"));
         break;
-    case 11:
+    case HOF_STRIKER_BRICK_WALL_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_STRIKER_BRICK_WALL"));
         break;
-    case 12:
+    case HOF_STRIKER_GOLDEN_BOOT_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_STRIKER_GOLDEN_BOOT"));
         break;
-    case 9:
+    case HOF_CRYSTAL_BRICK_WALL_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_CRYSTAL_BRICK_WALL"));
         break;
-    case 10:
+    case HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
         title = WideBasicString(LookupLocString("HOF_HISTORY_TITLE_CRYSTAL_GOLDEN_BOOT"));
         break;
     }
@@ -427,9 +427,9 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
     TLTextInstance* goalsText = 0;
     switch (mMode)
     {
-    case 7:
-    case 9:
-    case 11:
+    case HOF_FIRE_BRICK_WALL_HISTORY:
+    case HOF_CRYSTAL_BRICK_WALL_HISTORY:
+    case HOF_STRIKER_BRICK_WALL_HISTORY:
     {
         unformatted = WideBasicString(LookupLocString("HOF_GOALS_AGAINST"));
 
@@ -447,9 +447,9 @@ void SHHallOfFameHistory::UpdateGoalsRecordText()
         }
         break;
     }
-    case 8:
-    case 10:
-    case 12:
+    case HOF_FIRE_GOLDEN_BOOT_HISTORY:
+    case HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
+    case HOF_STRIKER_GOLDEN_BOOT_HISTORY:
     {
         unformatted = WideBasicString(LookupLocString("HOF_GOALS_FOR"));
 

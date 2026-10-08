@@ -357,13 +357,13 @@ void SHHallOfFameCup::OnItemPointerEnter(unsigned int index, void* context)
     int first = 0;
     switch (mMode)
     {
-    case 0:
+    case HOF_FIRE_CUP:
         first = 0;
         break;
-    case 1:
+    case HOF_STRIKER_CUP:
         first = 14;
         break;
-    case 2:
+    case HOF_CRYSTAL_CUP:
         first = 7;
         break;
     }
@@ -427,14 +427,14 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
     {
         switch (mMode)
         {
-        case 0:
-            ShowHallOfFameTrophy(4);
+        case HOF_FIRE_CUP:
+            ShowHallOfFameTrophy(HOF_FIRE_CUP_HISTORY);
             break;
-        case 1:
-            ShowHallOfFameTrophy(6);
+        case HOF_STRIKER_CUP:
+            ShowHallOfFameTrophy(HOF_STRIKER_CUP_HISTORY);
             break;
-        case 2:
-            ShowHallOfFameTrophy(5);
+        case HOF_CRYSTAL_CUP:
+            ShowHallOfFameTrophy(HOF_CRYSTAL_CUP_HISTORY);
             break;
         }
     }
@@ -443,7 +443,7 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
         int camera;
         switch (mMode)
         {
-        case 0:
+        case HOF_FIRE_CUP:
             camera = 8;
             if (item - 1 == 0)
             {
@@ -451,7 +451,7 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
             }
             ShowHallOfFameTrophy(camera);
             break;
-        case 1:
+        case HOF_STRIKER_CUP:
             camera = 12;
             if (item - 1 == 0)
             {
@@ -459,7 +459,7 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
             }
             ShowHallOfFameTrophy(camera);
             break;
-        case 2:
+        case HOF_CRYSTAL_CUP:
             camera = 10;
             if (item - 1 == 0)
             {
@@ -473,13 +473,13 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
     {
         switch (mMode)
         {
-        case 0:
+        case HOF_FIRE_CUP:
             ShowHallOfFamePlayerCard(item - 3);
             break;
-        case 1:
+        case HOF_STRIKER_CUP:
             ShowHallOfFamePlayerCard(item + 5);
             break;
-        case 2:
+        case HOF_CRYSTAL_CUP:
             ShowHallOfFamePlayerCard(item + 1);
             break;
         }
@@ -527,13 +527,13 @@ void SHHallOfFameCup::ShowLockedItemMessage(unsigned int item)
     {
         switch (mMode)
         {
-        case 0:
+        case HOF_FIRE_CUP:
             type = (ePopupMenu)0x7D;
             break;
-        case 1:
+        case HOF_STRIKER_CUP:
             type = (ePopupMenu)0x7E;
             break;
-        case 2:
+        case HOF_CRYSTAL_CUP:
             type = (ePopupMenu)0x7F;
             break;
         }
@@ -542,13 +542,13 @@ void SHHallOfFameCup::ShowLockedItemMessage(unsigned int item)
     {
         switch (mMode)
         {
-        case 0:
+        case HOF_FIRE_CUP:
             type = item == 1 ? (ePopupMenu)0x80 : (ePopupMenu)0x81;
             break;
-        case 1:
+        case HOF_STRIKER_CUP:
             type = item == 1 ? (ePopupMenu)0x82 : (ePopupMenu)0x83;
             break;
-        case 2:
+        case HOF_CRYSTAL_CUP:
             type = item == 1 ? (ePopupMenu)0x84 : (ePopupMenu)0x85;
             break;
         }
@@ -623,5 +623,5 @@ void SHHallOfFameProfile::OnSummaryPointerPress(unsigned int, void*)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
-    CycleHallOfFameDetailPage(4, 0);
+    CycleHallOfFameDetailPage(HOF_FIRE_CUP_HISTORY, 0);
 }
