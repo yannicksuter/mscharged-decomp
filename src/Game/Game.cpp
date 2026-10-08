@@ -1105,6 +1105,18 @@ void cGame::PlayEndGamePresentation()
     GetPresentation()->Call("GameEndNoSuddenDeath", "");
 }
 
+enum eCustomDetermType
+{
+    DETERM_PLAYER_VISIBILITY = 5,
+    DETERM_NIS_LOADED = 29,
+    DETERM_MEGA_STRIKE_RESULT = 181,
+    DETERM_MEGA_STRIKE_SAVE = 182,
+    DETERM_MEGA_STRIKE_PLAYER_READY = 183,
+    DETERM_MEGA_STRIKE_KILL_CURSOR = 185,
+    DETERM_MEGA_STRIKE_CLEANUP = 188,
+    DETERM_SLOW_DOWN_END = 222,
+};
+
 void cGame::SendNISLoadedCustomDeterm(u8 machineBits)
 {
     struct Message
@@ -1113,7 +1125,7 @@ void cGame::SendNISLoadedCustomDeterm(u8 machineBits)
         u8 machineBits;
     } message;
 
-    message.type = 29;
+    message.type = DETERM_NIS_LOADED;
     message.machineBits = machineBits;
 
     u32 frame = gInputManager->mFrameProvider->GetFrame();
@@ -1133,7 +1145,7 @@ void cGame::SendMegaStrike(
         float accuracy;
     } message;
 
-    message.type = 181;
+    message.type = DETERM_MEGA_STRIKE_RESULT;
     message.side = side;
     message.playerId = playerId;
     message.padding = 0;
@@ -1146,14 +1158,14 @@ void cGame::SendMegaStrike(
 }
 void cGame::SendMegaStrikePlayerReady()
 {
-    u8 message = 183;
+    u8 message = DETERM_MEGA_STRIKE_PLAYER_READY;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrikePlayerReady at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 void cGame::SendMegaStrikeKillCursor()
 {
-    u8 message = 185;
+    u8 message = DETERM_MEGA_STRIKE_KILL_CURSOR;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending SendMegaStrikeKillCursor at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
@@ -1169,7 +1181,7 @@ void cGame::SendMegaStrikeGoalie(unsigned int side, unsigned int target, float s
         float score;
     } message;
 
-    message.type = 182;
+    message.type = DETERM_MEGA_STRIKE_SAVE;
     message.side = side;
     message.target = target;
     message.padding = 0;
@@ -1181,7 +1193,7 @@ void cGame::SendMegaStrikeGoalie(unsigned int side, unsigned int target, float s
 }
 void cGame::SendSlowDownEnd()
 {
-    u8 message = 222;
+    u8 message = DETERM_SLOW_DOWN_END;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending Slow Down End at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
@@ -1201,7 +1213,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
 
     switch (type)
     {
-    case 5:
+    case DETERM_PLAYER_VISIBILITY:
     {
         // Which players are on screen, one bit per player.
         u8* data = pEvent->mData;
@@ -1218,11 +1230,11 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         break;
     }
 
-    case 29:
+    case DETERM_NIS_LOADED:
         GetPresentation()->ReceiveNisLoaded(pEvent->mData[1]);
         break;
 
-    case 181:
+    case DETERM_MEGA_STRIKE_RESULT:
     {
         cFielder* pFielder = g_pTeams[pEvent->mData[1]]->GetFielder(pEvent->mData[2]);
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n", pEvent->mData[1],
@@ -1232,19 +1244,19 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         break;
     }
 
-    case 183:
+    case DETERM_MEGA_STRIKE_PLAYER_READY:
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikePlayerReady at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
         mbMegaStrikePlayerReady = true;
         break;
 
-    case 185:
+    case DETERM_MEGA_STRIKE_KILL_CURSOR:
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikeKillCursor at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
         ResetMegaBallPointer();
         break;
 
-    case 182:
+    case DETERM_MEGA_STRIKE_SAVE:
     {
         Goalie* pGoalie = g_pTeams[pEvent->mData[1]]->GetGoalie();
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n", pEvent->mData[1],
@@ -1254,7 +1266,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         break;
     }
 
-    case 222:
+    case DETERM_SLOW_DOWN_END:
         // SlowDownEnd: back to full speed after a captain hit.
         tDebugPrintManager::Print(DC_NETWORK, "Received SlowDownEnd at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
@@ -1279,7 +1291,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         }
         break;
 
-    case 188:
+    case DETERM_MEGA_STRIKE_CLEANUP:
     {
         // CleanupMegastrikeGameplay
         tDebugPrintManager::Print(DC_NETWORK, "Received CleanupMegastrikeGameplay at frame %d\n",
@@ -1379,7 +1391,7 @@ void cGame::SendPlayerVisibility()
         && gInputManager->mFrameProvider->GetFrame() % 10 == 0)
     {
         u8 message[3];
-        message[0] = 5;
+        message[0] = DETERM_PLAYER_VISIBILITY;
 
         for (int i = 0; i < 2; i++)
         {
