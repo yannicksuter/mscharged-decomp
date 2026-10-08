@@ -54,7 +54,7 @@ SHChooseSides2::SHChooseSides2(eCSContext context, ScreenMovement movement)
     , mHomeAwayBox(0)
     , mContext(context)
     , mHomeAwayButtonMask(0)
-    , mState(0)
+    , mState(CHOOSE_SIDES_ENTERING)
 {
     if (movement == SCREEN_BACK || context == PAUSE)
     {
@@ -341,7 +341,7 @@ void SHChooseSides2::Update(float fDeltaT)
         UpdateCharacterIdleAnimations(fDeltaT);
     }
 
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == CHOOSE_SIDES_ENTERING || mState == CHOOSE_SIDES_EXITING_FORWARD || mState == CHOOSE_SIDES_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -353,7 +353,7 @@ void SHChooseSides2::Update(float fDeltaT)
             return;
         }
 
-        if (mState == 0)
+        if (mState == CHOOSE_SIDES_ENTERING)
         {
             if (!mInitialized)
             {
@@ -375,7 +375,7 @@ void SHChooseSides2::Update(float fDeltaT)
                 BindChooseSideInstances();
                 UpdateHomeAwayVisibility();
                 mInitialized = true;
-                mState = 1;
+                mState = CHOOSE_SIDES_CHOOSING;
 
                 for (int i = 0; i < 4; ++i)
                 {
@@ -397,12 +397,12 @@ void SHChooseSides2::Update(float fDeltaT)
                 }
             }
         }
-        else if (mState == 2)
+        else if (mState == CHOOSE_SIDES_EXITING_FORWARD)
         {
             Proceed();
             return;
         }
-        else if (mState == 3)
+        else if (mState == CHOOSE_SIDES_EXITING_BACK)
         {
             LeaveScene();
             return;
@@ -480,7 +480,7 @@ void SHChooseSides2::Update(float fDeltaT)
         bool leave = mContext != PAUSE && mBackButton.UpdateBackButton(event, fDeltaT);
         if (leave)
         {
-            mState = 3;
+            mState = CHOOSE_SIDES_EXITING_BACK;
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
@@ -780,7 +780,7 @@ void SHChooseSides2::OnHomeAwayPointerPress(unsigned int, void*)
     mControllerComponents[0].Disable();
     mControllerComponents[1].Disable();
     mHomeAwayComponent.Disable();
-    mState = 2;
+    mState = CHOOSE_SIDES_EXITING_FORWARD;
 
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
