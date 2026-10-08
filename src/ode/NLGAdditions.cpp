@@ -5,8 +5,6 @@
 #include "joint.h"
 #include "objects.h"
 
-extern dxJoint* createJoint(dWorldID w, dJointGroupID group, dxJoint::Vtable* vtable);
-
 struct dxJointCharacter : public dxJoint
 {
     float direction[4];
