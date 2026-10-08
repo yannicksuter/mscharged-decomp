@@ -4,7 +4,7 @@
 #include "Game/AI/DesireUpdate.h"
 
 template <typename T>
-inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(T input)
+inline DesireUpdate& DesireUpdate::operator=(T input)
 {
     {
         FuzzyVariant other(VariantTypeOf(input), input);
@@ -14,7 +14,7 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(T i
     return *this;
 }
 
-inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::SetDesireFinished()
+inline DesireUpdate& DesireUpdate::SetDesireFinished()
 {
     {
         FuzzyVariant other(FT_INT, 1);

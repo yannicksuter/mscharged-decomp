@@ -30,10 +30,10 @@ public:
     }
 
     unsigned char Lookup(
-        unsigned long hash, UnidentifiedVariant_80054AB8& returnVal,
+        unsigned long hash, DesireUpdate& returnVal,
         const char* name)
     {
-        UnidentifiedVariant_80054AB8* pValue;
+        DesireUpdate* pValue;
 
         if (!g_bScriptQuestionCachingOn)
         {
@@ -50,7 +50,7 @@ public:
         return 0;
     }
 
-    nlAVLTreeSlotPool<unsigned long, UnidentifiedVariant_80054AB8,
+    nlAVLTreeSlotPool<unsigned long, DesireUpdate,
         DefaultKeyCompare<unsigned long> > mQuestionCacheMap;
     int mTotalLookups;
     int mCacheHits;

@@ -8,7 +8,7 @@
 
 
 static inline float GetActionFloatParameter(
-    UnidentifiedVariant_80054AB8* pAction, int index,
+    DesireUpdate* pAction, int index,
     float defaultValue)
 {
     if (pAction->ExtraData.IsSet(index))
@@ -19,8 +19,8 @@ static inline float GetActionFloatParameter(
 }
 
 int CompareActionConfidence(
-    UnidentifiedVariant_80054AB8*& first,
-    UnidentifiedVariant_80054AB8*& second)
+    DesireUpdate*& first,
+    DesireUpdate*& second)
 {
     if (first->UnidentifiedGetFloat(4)
         == second->UnidentifiedGetFloat(4))
@@ -36,8 +36,8 @@ int CompareActionConfidence(
 }
 
 static inline void InsertNonHead(ScriptActionQueue* queue,
-    UnidentifiedVariant_80054AB8* prev,
-    UnidentifiedVariant_80054AB8* pInsertionNode)
+    DesireUpdate* prev,
+    DesireUpdate* pInsertionNode)
 {
     if (prev == queue->m_lQueuedActions.m_pEnd)
     {
@@ -46,7 +46,7 @@ static inline void InsertNonHead(ScriptActionQueue* queue,
     }
     else
     {
-        UnidentifiedVariant_80054AB8* next = prev->next;
+        DesireUpdate* next = prev->next;
         prev->next = pInsertionNode;
         pInsertionNode->next = next;
     }
@@ -67,8 +67,8 @@ ScriptActionQueue::ScriptActionQueue()
 
 ScriptActionQueue::~ScriptActionQueue()
 {
-    UnidentifiedVariant_80054AB8* pNext;
-    UnidentifiedVariant_80054AB8* pAction
+    DesireUpdate* pNext;
+    DesireUpdate* pAction
         = m_lQueuedActions.m_pStart;
     while (pAction != 0)
     {
@@ -85,11 +85,11 @@ ScriptActionQueue::~ScriptActionQueue()
 
 void ScriptActionQueue::ClearQueuedActions(bool preserveSelected)
 {
-    UnidentifiedVariant_80054AB8* pAction
+    DesireUpdate* pAction
         = m_lQueuedActions.m_pStart;
     while (pAction != 0)
     {
-        UnidentifiedVariant_80054AB8* pNext = pAction->next;
+        DesireUpdate* pNext = pAction->next;
         if (!preserveSelected || pAction != m_pSelectedAction)
         {
             delete pAction;
@@ -115,8 +115,8 @@ void ScriptActionQueue::SetSelectionWeights(
     mNumSelectionWeights = count;
 }
 
-UnidentifiedVariant_80054AB8* ScriptActionQueue::QueueAction(
-    UnidentifiedVariant_80054AB8* pNewAction)
+DesireUpdate* ScriptActionQueue::QueueAction(
+    DesireUpdate* pNewAction)
 {
     if (pNewAction->ExtraData.IsSet(5)
         && GetActionFloatParameter(pNewAction, 4, 0.0f)
@@ -137,7 +137,7 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::QueueAction(
         nlPrintf("This should never happen!.\n");
     }
 
-    UnidentifiedVariant_80054AB8* pAction = FindQueuedAction(pNewAction);
+    DesireUpdate* pAction = FindQueuedAction(pNewAction);
     if (pAction != 0)
     {
         float oldValue = GetActionFloatParameter(pAction, 4, 0.0f)
@@ -163,9 +163,9 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::QueueAction(
 
     if (pAction != 0)
     {
-        UnidentifiedVariant_80054AB8* pQueuedAction = pAction;
-        UnidentifiedVariant_80054AB8* prev = 0;
-        UnidentifiedVariant_80054AB8* cur
+        DesireUpdate* pQueuedAction = pAction;
+        DesireUpdate* prev = 0;
+        DesireUpdate* cur
             = m_lQueuedActions.m_pStart;
 
         if (cur == 0)
@@ -211,15 +211,15 @@ static inline bool EqualParameterValue(const FuzzyVariant& value,
     return value == other;
 }
 
-UnidentifiedVariant_80054AB8* ScriptActionQueue::FindQueuedAction(
-    UnidentifiedVariant_80054AB8* pFind)
+DesireUpdate* ScriptActionQueue::FindQueuedAction(
+    DesireUpdate* pFind)
 {
     if (m_lQueuedActions.m_pStart == 0)
     {
         return 0;
     }
 
-    UnidentifiedVariant_80054AB8* pAction
+    DesireUpdate* pAction
         = m_lQueuedActions.m_pStart;
     while (pAction != 0)
     {
@@ -249,11 +249,11 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::FindQueuedAction(
     return 0;
 }
 
-UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
+DesireUpdate* ScriptActionQueue::SelectAction()
 {
-    UnidentifiedVariant_80054AB8* pSelectedAction;
+    DesireUpdate* pSelectedAction;
     int count;
-    UnidentifiedVariant_80054AB8* pAction
+    DesireUpdate* pAction
         = m_lQueuedActions.m_pStart;
     if (pAction == 0)
     {
@@ -265,7 +265,7 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
     {
     case 2:
     {
-        UnidentifiedVariant_80054AB8* actions[16];
+        DesireUpdate* actions[16];
         float chances[16];
         float total = 0.0f;
         count = 0;
@@ -339,7 +339,7 @@ UnidentifiedVariant_80054AB8* ScriptActionQueue::SelectAction()
 
         if (pSelectedAction == 0)
         {
-            for (UnidentifiedVariant_80054AB8* pBest
+            for (DesireUpdate* pBest
                      = m_lQueuedActions.m_pStart;
                  pBest != 0; pBest = pBest->next)
             {

@@ -67,7 +67,7 @@
 
 extern "C" void CleanupMegaStrike(Goalie* pGoalie);
 class FuzzyRuntimeBase;
-extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunction(
+extern "C" DesireUpdate EvaluateGoalieFuzzyFunction(
     FuzzyRuntimeBase*, const char*, cPlayer*);
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
@@ -124,7 +124,7 @@ float gfIdleSeekSpeed = 90.0f;
 float gfRepositionThreshold = 0.15f;
 bool gbEnableBallGoalieSweepTest = true;
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunctionByName(
+extern "C" DesireUpdate EvaluateGoalieFuzzyFunctionByName(
     FuzzyRuntimeBase*, cPlayer*, const char*);
 extern "C" void fn_80015B38(cBall* pBall, bool bParam);
 
@@ -1659,7 +1659,7 @@ cPlayer* Goalie::FindOpenPassTarget()
     }
     else
     {
-        UnidentifiedVariant_80054AB8 vBestPassTarget = EvaluateGoalieFuzzyFunction(
+        DesireUpdate vBestPassTarget = EvaluateGoalieFuzzyFunction(
             GetTeamFuzzyRuntime(m_pTeam), "BestPassTarget", this);
 
         if (vBestPassTarget.UnidentifiedGetFloat(4) >= 0.5f)
@@ -4549,27 +4549,27 @@ extern "C" void GoalieOnGameOver()
     pAwayGoalie->InitActionMove(false);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunction(
+extern "C" DesireUpdate EvaluateGoalieFuzzyFunction(
     FuzzyRuntimeBase* runtime, const char* name, cPlayer* player)
 {
     return EvaluateGoalieFuzzyFunctionByName(runtime, player, name);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunctionByHash(
+extern "C" DesireUpdate EvaluateGoalieFuzzyFunctionByHash(
     InterpreterCore*, const unsigned int&, cPlayer*);
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunctionByName(
+extern "C" DesireUpdate EvaluateGoalieFuzzyFunctionByName(
     FuzzyRuntimeBase* runtime, cPlayer* player, const char* name)
 {
     unsigned int functionHash = nlStringHash(name);
     return EvaluateGoalieFuzzyFunctionByHash(runtime, functionHash, player);
 }
 
-extern "C" UnidentifiedVariant_80054AB8 EvaluateGoalieFuzzyFunctionByHash(
+extern "C" DesireUpdate EvaluateGoalieFuzzyFunctionByHash(
     InterpreterCore* interpreter, const unsigned int& hash, cPlayer* player)
 {
     FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(interpreter);
     unsigned int functionHash = hash;
-    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
+    return DesireUpdate(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(functionHash), 1, FuzzyArgumentBits(player), 0));
 }

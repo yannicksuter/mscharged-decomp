@@ -3,10 +3,10 @@
 
 class InterpreterCore;
 class cFielder;
-class UnidentifiedVariant_80054AB8;
+class DesireUpdate;
 
-UnidentifiedVariant_80054AB8 CallFielderFuzzyFunction(InterpreterCore*, const char*, cFielder*);
-UnidentifiedVariant_80054AB8 CallFielderFuzzyFunction(void*, cFielder*, const char*);
-UnidentifiedVariant_80054AB8 CallFielderFuzzyFunction(void*, const unsigned int&, cFielder*);
+DesireUpdate CallFielderFuzzyFunction(InterpreterCore*, const char*, cFielder*);
+DesireUpdate CallFielderFuzzyFunction(void*, cFielder*, const char*);
+DesireUpdate CallFielderFuzzyFunction(void*, const unsigned int&, cFielder*);
 
 #endif // GAME_AI_FUZZYRUNTIMECALL_FWD_H

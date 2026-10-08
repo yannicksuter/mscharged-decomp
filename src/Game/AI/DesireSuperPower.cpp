@@ -1231,12 +1231,12 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
     }
 }
 
-UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
+DesireUpdate DesireSuperPower::FollowPathTransition(
     const FuzzyVariant& value, shdStateMachine* machine)
 {
-    UnidentifiedVariant_80054AB8 result(gFollowPathContinueResult, -1.0f, -1.0f);
+    DesireUpdate result(gFollowPathContinueResult, -1.0f, -1.0f);
     if (GetStateMachineState(machine) != 12)
-        return UnidentifiedVariant_80054AB8(gFollowPathFinishedResult, -1.0f, -1.0f);
+        return DesireUpdate(gFollowPathFinishedResult, -1.0f, -1.0f);
     cFielder* fielder = (cFielder*)value.GetPlayer();
     DesireSuperPower* desire = (DesireSuperPower*)GetFielderDesire(fielder, 23);
     int index = GetStateMachineParameters(machine)->Get(0)->fn_800C2BD4();
@@ -1294,7 +1294,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
             }
         }
     }
-    return UnidentifiedVariant_80054AB8(result, -1.0f, -1.0f);
+    return DesireUpdate(result, -1.0f, -1.0f);
 }
 
 struct UnidentifiedFielderRef
@@ -1302,12 +1302,12 @@ struct UnidentifiedFielderRef
     cFielder* mFielder;
 };
 
-UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
+DesireUpdate DesireSuperPower::ChooseDirectionTransition(
     const FuzzyVariant& value, shdStateMachine* machine)
 {
-    UnidentifiedVariant_80054AB8 result(FT_INT, gChooseDirectionContinueResult);
+    DesireUpdate result(FT_INT, gChooseDirectionContinueResult);
     if (machine->GetState() != 12)
-        return UnidentifiedVariant_80054AB8(FT_INT, gChooseDirectionFinishedResult);
+        return DesireUpdate(FT_INT, gChooseDirectionFinishedResult);
     UnidentifiedFielderRef fielder = { (cFielder*)value.mData.pointer };
     GetFielderDesire(fielder.mFielder, 23);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();

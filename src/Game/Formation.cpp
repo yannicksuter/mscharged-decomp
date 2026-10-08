@@ -260,7 +260,7 @@ void FormationManager::ChooseNewFormations()
     unsigned int ballFormationSet;
 
     InterpreterCore* context = GetTeamFuzzyRuntime(m_pTeam);
-    UnidentifiedVariant_80054AB8 result = EvaluateTeamFuzzyFunction(context, "BestDefensiveFormation", m_pTeam);
+    DesireUpdate result = EvaluateTeamFuzzyFunction(context, "BestDefensiveFormation", m_pTeam);
     defensiveFormation = result.GetInt();
 
     result = EvaluateTeamFuzzyFunction(context, "BestOffensiveFormation", m_pTeam);
@@ -1636,24 +1636,24 @@ FormationSet::~FormationSet()
     }
 }
 
-UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(
+DesireUpdate EvaluateTeamFuzzyFunction(
     InterpreterCore* context, const char* name, cTeam* team)
 {
     return EvaluateTeamFuzzyFunctionByName(context, team, name);
 }
 
-UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(
+DesireUpdate EvaluateTeamFuzzyFunctionByName(
     InterpreterCore* context, cTeam* team, const char* name)
 {
     unsigned int hash = nlStringHash(name);
     return EvaluateTeamFuzzyFunctionByHash(context, hash, team);
 }
 
-UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(
+DesireUpdate EvaluateTeamFuzzyFunctionByHash(
     InterpreterCore* context, const unsigned int& hash, cTeam* team)
 {
     FuzzyRuntimeBase* runtime = static_cast<FuzzyRuntimeBase*>(context);
     unsigned int localHash = hash;
-    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
+    return DesireUpdate(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(team), 0));
 }

@@ -760,7 +760,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 71:
     {
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-1];
         ((float*)m_SP)[-1] = FuzzyAIGetConfidence(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
@@ -1160,7 +1160,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 111:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         bool arg0 = m_SP[-3] != 0;
         m_SP -= 3;
@@ -1169,7 +1169,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 112:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         cBall* arg0 = (cBall*)m_SP[-3];
         m_SP -= 3;
@@ -1178,7 +1178,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 113:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         cPlayer* arg0 = (cPlayer*)m_SP[-3];
         m_SP -= 3;
@@ -1187,7 +1187,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 114:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         const char* arg0 = (const char*)m_SP[-3];
         m_SP -= 3;
@@ -1196,7 +1196,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 115:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         cPlayer* arg0 = (cPlayer*)m_SP[-3];
         m_SP -= 3;
@@ -1205,7 +1205,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 116:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
@@ -1214,7 +1214,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 117:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
@@ -1223,7 +1223,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 118:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
@@ -1232,7 +1232,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 119:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
@@ -1241,7 +1241,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 120:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         FuzzyFielderIterator* arg0 = (FuzzyFielderIterator*)m_SP[-3];
         m_SP -= 3;
@@ -1250,7 +1250,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 121:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         float arg0 = ((float*)m_SP)[-3];
         m_SP -= 3;
@@ -1259,7 +1259,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 122:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
@@ -1268,7 +1268,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 123:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         Variant& arg0 = *(Variant*)m_SP[-3];
         m_SP -= 3;
@@ -1277,7 +1277,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 124:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         unsigned long arg0 = (unsigned long)m_SP[-3];
         m_SP -= 3;
@@ -1459,7 +1459,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 140:
     {
         float arg1 = ((float*)m_SP)[-1];
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-2];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-2];
         m_SP -= 1;
         m_SP[-1] = (u32)FuzzyAIReturnVariant(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
@@ -1482,7 +1482,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 142:
     {
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-1];
         m_SP -= 1;
         FuzzyNoOp_80314438(this, arg0);
         break;
@@ -1490,7 +1490,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 143:
     {
         float arg1 = ((float*)m_SP)[-1];
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-2];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-2];
         m_SP -= 2;
         FuzzyNoOp_80314434(this, arg0, arg1);
         break;
@@ -1633,7 +1633,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 159:
     {
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-1];
         m_SP -= 1;
         AddAction(arg0);
         break;
@@ -3149,7 +3149,7 @@ extern "C" float FuzzyAIGetVariantFloat_800E7EEC(void*, Variant* value)
 }
 
 extern "C" float FuzzyAIGetConfidence(
-    void*, UnidentifiedVariant_80054AB8* value)
+    void*, DesireUpdate* value)
 {
     if (value->ExtraData.IsSet(4))
     {
@@ -3164,50 +3164,50 @@ extern "C" float FuzzyAIBoolToFloat(bool value)
     return value ? 1.0f : 0.0f;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnBool(
+extern "C" DesireUpdate* FuzzyAIReturnBool(
     FuzzyAIRuntime* runtime, bool value, float confidence)
 {
     return runtime->CreateReturnValue(FT_BOOL, value, confidence);
 }
 
-UnidentifiedVariant_80054AB8* FuzzyRuntimeBase::ReturnValue(
-    UnidentifiedVariant_80054AB8* value, float)
+DesireUpdate* FuzzyRuntimeBase::ReturnValue(
+    DesireUpdate* value, float)
 {
     return value;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E8090(
+extern "C" DesireUpdate* FuzzyAIReturnInt_800E8090(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E81BC(
+extern "C" DesireUpdate* FuzzyAIReturnInt_800E81BC(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E82E8(
+extern "C" DesireUpdate* FuzzyAIReturnFloat_800E82E8(
     FuzzyAIRuntime* runtime, float value, float confidence)
 {
     return runtime->CreateReturnValue(FT_FLOAT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E8414(
+extern "C" DesireUpdate* FuzzyAIReturnFloat_800E8414(
     FuzzyAIRuntime* runtime, float value, float confidence)
 {
     return runtime->CreateReturnValue(FT_FLOAT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnVariant(
+extern "C" DesireUpdate* FuzzyAIReturnVariant(
     FuzzyAIRuntime* runtime,
-    UnidentifiedVariant_80054AB8* value, float confidence)
+    DesireUpdate* value, float confidence)
 {
     return runtime->CreateReturnValue(value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnU32(
+extern "C" DesireUpdate* FuzzyAIReturnU32(
     FuzzyAIRuntime* runtime, unsigned long value, float confidence)
 {
     return runtime->CreateReturnValue(FT_U32, value, confidence);
@@ -3225,58 +3225,58 @@ extern "C" unsigned long FuzzyAIGetVariantU32_800E8CB0(void*, Variant* value)
 
 extern "C" void FuzzyAISetPlayerParameter_800E8CB8(
     void*, cPlayer* value, unsigned long parameterHash,
-    UnidentifiedVariant_80054AB8* action)
+    DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D6C(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetIntParameter_800E8D6C(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D70(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetIntParameter_800E8D70(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D74(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetIntParameter_800E8D74(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
 extern "C" void FuzzyAISetFielderParameter(
     void*, FuzzyFielderIterator* value,
-    unsigned long parameterHash, UnidentifiedVariant_80054AB8* action)
+    unsigned long parameterHash, DesireUpdate* action)
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant((cPlayer*)fielder));
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnPlayer(
+extern "C" DesireUpdate* FuzzyAIReturnPlayer(
     FuzzyAIRuntime* runtime, cPlayer* value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(value);
+    DesireUpdate* result = new (lbl_805842C8.Allocate())
+        DesireUpdate(value);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
     return runtime->ReturnValue(result, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(
+extern "C" DesireUpdate* FuzzyAIReturnFielder(
     FuzzyAIRuntime* runtime,
     FuzzyFielderIterator* value, float confidence)
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(fielder);
+    DesireUpdate* result = new (lbl_805842C8.Allocate())
+        DesireUpdate(fielder);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
     return runtime->ReturnValue(result, confidence);

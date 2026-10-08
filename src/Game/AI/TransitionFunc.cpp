@@ -16,15 +16,15 @@ ScriptTransitionFunc::ScriptTransitionFunc(const char* name)
     mValue.mFuncHash = nlStringHash(name);
 }
 
-typedef UnidentifiedVariant_80054AB8 (*NativeTransitionFuncPtr)(
+typedef DesireUpdate (*NativeTransitionFuncPtr)(
     AIContext*, UnidentifiedFuzzyRuntimeValue*);
 
 void TransitionFunc::Execute(AIContext* input,
-    UnidentifiedVariant_80054AB8* result, UnidentifiedFuzzyRuntimeValue* context)
+    DesireUpdate* result, UnidentifiedFuzzyRuntimeValue* context)
 {
     if (mNativeFunc != 0)
     {
-        UnidentifiedVariant_80054AB8 transitionValue =
+        DesireUpdate transitionValue =
             ((NativeTransitionFuncPtr)mNativeFunc)(
                 input, context);
         *result = transitionValue;

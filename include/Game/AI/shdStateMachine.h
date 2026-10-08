@@ -9,7 +9,6 @@
 class AIContext;
 class FuzzyRuntimeBase;
 class ScriptMachine;
-typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 class shdStateMachine
 {
@@ -62,6 +61,6 @@ AIContext* GetStateMachineAIContext(shdStateMachine* machine);
 void DeactivateStateMachine(shdStateMachine* machine, bool cleanup);
 bool ReinitializeStateMachine(shdStateMachine* machine, UnidentifiedVariantCollection* parameters, bool reinitialize);
 bool InitializeStateMachine(shdStateMachine* machine, UnidentifiedVariantCollection* parameters, bool initialize);
-void UpdateStateMachine(shdStateMachine* machine, UnidentifiedVariant_80054AB8* update, bool runUpdate, float deltaTime);
+void UpdateStateMachine(shdStateMachine* machine, DesireUpdate* update, bool runUpdate, float deltaTime);
 
 #endif // GAME_AI_SHDSTATEMACHINE_H

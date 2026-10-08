@@ -156,7 +156,7 @@ bool InitializeStateMachine(
 }
 
 void UpdateStateMachine(
-    shdStateMachine* machine, UnidentifiedVariant_80054AB8* update,
+    shdStateMachine* machine, DesireUpdate* update,
     bool runUpdate, float deltaTime)
 {
     *update = 0;
@@ -244,7 +244,7 @@ bool ScriptState::Initialize(void*)
         float start = gAIProfilingClock();
         void* context = mScriptMachine->mAIContext->mData.pointer;
         u32 hash = mInitFunctionHash;
-        UnidentifiedVariant_80054AB8 result
+        DesireUpdate result
             = ExecuteScriptStateFunction(GetFuzzyRuntime(), hash, context);
         initialized = result.mData.b;
         AccumulateScriptExecutionTime(start, gAIProfilingClock());
@@ -268,7 +268,7 @@ void ScriptState::Update(
     void* context = mScriptMachine->mAIContext->mData.pointer;
     u32 hash = mUpdateFunctionHash;
     {
-        UnidentifiedVariant_80054AB8 result = ExecuteScriptStateFunction(
+        DesireUpdate result = ExecuteScriptStateFunction(
             GetFuzzyRuntime(), hash, context, deltaTime);
         *update = result;
     }

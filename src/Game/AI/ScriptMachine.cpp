@@ -69,20 +69,20 @@ extern const float gStateMachineUnsetDuration = -1.0f;
 extern const float gStateMachineNeverActiveTime = -99999.0f;
 extern const float gStateMachineAgeThreshold = 10.0f;
 
-UnidentifiedVariant_80054AB8 ExecuteScriptStateFunction(
+DesireUpdate ExecuteScriptStateFunction(
     FuzzyRuntimeBase* runtime, const u32& hash, void* argument)
 {
     u32 localHash = hash;
-    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
+    return DesireUpdate(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(localHash), 1, FuzzyArgumentBits(argument), 0));
 }
 
-UnidentifiedVariant_80054AB8 ExecuteScriptStateFunction(
+DesireUpdate ExecuteScriptStateFunction(
     FuzzyRuntimeBase* runtime, const u32& hash, void* argument,
     float value)
 {
     u32 localHash = hash;
-    return UnidentifiedVariant_80054AB8(ExecuteFuzzyFunction(
+    return DesireUpdate(ExecuteFuzzyFunction(
         runtime, runtime->FindFunctionEntryPoint(localHash), 2, FuzzyArgumentBits(argument), FuzzyArgumentBits(value)));
 }
 
@@ -204,7 +204,7 @@ void ScriptMachine::Reset(bool param)
 void ScriptMachine::Update(float deltaTime)
 {
     bool selectState = false;
-    UnidentifiedVariant_80054AB8 update(0, -1.0f, -1.0f);
+    DesireUpdate update(0, -1.0f, -1.0f);
     shdStateMachine* active = mActiveState;
 
     if (active != 0)
@@ -304,7 +304,7 @@ void ScriptMachine::SelectState()
     if (IsTransitionFuncSet(&mTransition.mValue))
     {
         float start = gAIProfilingClock();
-        UnidentifiedVariant_80054AB8 result;
+        DesireUpdate result;
         mTransition.Execute(mAIContext, &result, 0);
         AccumulateScriptExecutionTime(start, gAIProfilingClock());
 

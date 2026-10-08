@@ -33,8 +33,8 @@ public:
     void EmitHeavenlyLight();
 
 private:
-    static UnidentifiedVariant_80054AB8 FollowPathTransition(const FuzzyVariant&, shdStateMachine*);
-    static UnidentifiedVariant_80054AB8 ChooseDirectionTransition(const FuzzyVariant&, shdStateMachine*);
+    static DesireUpdate FollowPathTransition(const FuzzyVariant&, shdStateMachine*);
+    static DesireUpdate ChooseDirectionTransition(const FuzzyVariant&, shdStateMachine*);
     void UpdateWario(DesireUpdate*, float);
     bool IsMuckBallReady() const;
     void UpdatePetey(DesireUpdate*, float);

@@ -18,7 +18,6 @@ class Desire;
 class SpaceSearch;
 class ScriptMachine;
 class FuzzyRuntimeBase;
-typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 class Desire : public shdStateMachine
 {

@@ -209,7 +209,7 @@ void FielderDesireMachine::Update(float deltaTime)
     Desire* frozen = GetFielderDesire(GetFielder(), 29);
     if (frozen->IsActive())
     {
-        UnidentifiedVariant_80054AB8 result;
+        DesireUpdate result;
         UpdateStateMachine(frozen, &result, true, deltaTime);
         if (result.mData.pointer != 0)
         {

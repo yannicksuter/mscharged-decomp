@@ -110,7 +110,7 @@ void DesireInterceptBall::Cleanup()
 {
 }
 
-void UnidentifiedVariant_80054AB8::SetParameter(int index, FuzzyVariant value)
+void DesireUpdate::SetParameter(int index, FuzzyVariant value)
 {
     ExtraData.Set(index, value);
 }

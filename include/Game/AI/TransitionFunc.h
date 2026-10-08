@@ -21,7 +21,7 @@ struct TransitionFunc
     // Runs the bound function, or the script function named by the hash
     // through the input's fuzzy runtime, and stores the desire update it
     // returns.
-    void Execute(AIContext* input, UnidentifiedVariant_80054AB8* result,
+    void Execute(AIContext* input, DesireUpdate* result,
         UnidentifiedFuzzyRuntimeValue* context);
 
     u32 mFuncHash;
@@ -53,7 +53,7 @@ struct UnsetTransitionFunc
     }
 
     bool IsUnset() const { return mValue.IsUnset(); }
-    void Execute(AIContext* input, UnidentifiedVariant_80054AB8* result,
+    void Execute(AIContext* input, DesireUpdate* result,
         UnidentifiedFuzzyRuntimeValue* context)
     {
         mValue.Execute(input, result, context);

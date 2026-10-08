@@ -259,16 +259,16 @@ bool FuzzyRuntimeBase::ExecuteFunction(
     FunctionEntryPoint* function, unsigned int argumentCount,
     u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
-    ListEntry<UnidentifiedVariant_80054AB8*>* entry;
-    UnidentifiedVariant_80054AB8* value;
+    ListEntry<DesireUpdate*>* entry;
+    DesireUpdate* value;
 
     mFunctionHash = function->hash;
     bool result = InterpreterCore::ExecuteFunction(
         function, argumentCount, arg1, arg2, arg3, arg4);
 
-    UnidentifiedVariant_80054AB8* returnValue =
+    DesireUpdate* returnValue =
         mCaptureReturnValue
-            ? *(UnidentifiedVariant_80054AB8**)m_SP
+            ? *(DesireUpdate**)m_SP
             : 0;
 
     for (entry = mReturnValues.m_Head; entry != 0;
@@ -290,7 +290,7 @@ extern "C" char FuzzyPassThrough_80312358(void*, char value)
     return value;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
+extern "C" DesireUpdate* ExecuteFuzzyFunction(
     FuzzyRuntimeBase* runtime,
     FunctionEntryPoint* function, int argumentCount,
     u32 arg1, u32 arg2)
@@ -312,8 +312,8 @@ extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
         break;
     }
 
-    UnidentifiedVariant_80054AB8* result =
-        *(UnidentifiedVariant_80054AB8**)runtime->m_SP;
+    DesireUpdate* result =
+        *(DesireUpdate**)runtime->m_SP;
     if (result != 0)
     {
         result->mTemporary = true;
@@ -322,7 +322,7 @@ extern "C" UnidentifiedVariant_80054AB8* ExecuteFuzzyFunction(
     return result;
 }
 
-UnidentifiedVariant_80054AB8* ExecuteScriptFunction(
+DesireUpdate* ExecuteScriptFunction(
     FuzzyRuntimeBase* runtime, u32 hash,
     UnidentifiedFuzzyRuntimeValue* action)
 {
@@ -336,8 +336,8 @@ UnidentifiedVariant_80054AB8* ExecuteScriptFunction(
         runtime->ExecuteFunction(
             function, 1, (u32)value, 0, 0, 0);
 
-        UnidentifiedVariant_80054AB8* result =
-            *(UnidentifiedVariant_80054AB8**)runtime->m_SP;
+        DesireUpdate* result =
+            *(DesireUpdate**)runtime->m_SP;
         if (result != 0)
         {
             result->mTemporary = true;
@@ -415,17 +415,17 @@ float FuzzyRuntimeBase::BeginActionQueue()
     return 1.0f;
 }
 
-UnidentifiedVariant_80054AB8*
+DesireUpdate*
 FuzzyRuntimeBase::EndActionQueue()
 {
     FuzzyActionQueueEntry* entry =
         nlListRemoveStart(&mActionQueues.mHead, &mActionQueues.mTail);
     ScriptActionQueue* queue = entry->mQueue;
-    UnidentifiedVariant_80054AB8* selected = queue->SelectAction();
+    DesireUpdate* selected = queue->SelectAction();
     if (queue->m_pSelectedAction == 0)
     {
         selected = new (lbl_805842C8.Allocate())
-            UnidentifiedVariant_80054AB8(lbl_80584250);
+            DesireUpdate(lbl_80584250);
     }
     else if (entry->mQuestionHash != 0)
     {
@@ -449,7 +449,7 @@ FuzzyRuntimeBase::EndActionQueue()
 }
 
 static inline float GetActionFloatParameter(
-    UnidentifiedVariant_80054AB8* action, int index,
+    DesireUpdate* action, int index,
     float defaultValue)
 {
     if (action->ExtraData.IsSet(index))
@@ -468,13 +468,13 @@ static inline unsigned long StrategicQuestionHash(
 extern "C" bool FuzzyTryCachedQuestion(
     FuzzyRuntimeBase* runtime, const Variant& value)
 {
-    UnidentifiedVariant_80054AB8 action;
+    DesireUpdate action;
     unsigned long hash = StrategicQuestionHash(
         runtime->GetInstructionOffset(), value);
 
     if (g_FuzzyQuestionCache.Lookup(hash, action, 0))
     {
-        UnidentifiedVariant_80054AB8* result = FuzzyReturnVariantCopy(
+        DesireUpdate* result = FuzzyReturnVariantCopy(
             runtime, action,
             GetActionFloatParameter(&action, 4, 0.0f));
         runtime->AddAction(result);
@@ -523,10 +523,10 @@ float FuzzyRuntimeBase::EndConfidenceScope()
 }
 
 void FuzzyRuntimeBase::AddAction(
-    UnidentifiedVariant_80054AB8* action)
+    DesireUpdate* action)
 {
     FuzzyActionQueueEntry* entry = mActionQueues.mHead;
-    UnidentifiedVariant_80054AB8* value =
+    DesireUpdate* value =
         entry->mQueue->QueueAction(action);
     if (value != 0)
     {
@@ -545,7 +545,7 @@ void FuzzyRuntimeBase::AddAction(
 }
 
 void FuzzyRuntimeBase::SetActionParameter(
-    UnidentifiedVariant_80054AB8* action, int index,
+    DesireUpdate* action, int index,
     Variant& value)
 {
     action->ExtraData.Set(index, FuzzyVariant(value));
@@ -553,7 +553,7 @@ void FuzzyRuntimeBase::SetActionParameter(
 
 extern "C" void FuzzySetBoolParameter(
     FuzzyRuntimeBase* runtime, bool value,
-    unsigned long hash, UnidentifiedVariant_80054AB8* action)
+    unsigned long hash, DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(hash);
     FuzzyVariant variant(FT_BOOL, value);
@@ -563,7 +563,7 @@ extern "C" void FuzzySetBoolParameter(
 
 extern "C" void FuzzySetFloatParameter(
     FuzzyRuntimeBase* runtime, float value,
-    unsigned long hash, UnidentifiedVariant_80054AB8* action)
+    unsigned long hash, DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(hash);
     FuzzyVariant variant(FT_FLOAT, value);
@@ -573,7 +573,7 @@ extern "C" void FuzzySetFloatParameter(
 
 extern "C" void FuzzySetIntParameter(
     FuzzyRuntimeBase* runtime, int value,
-    unsigned long hash, UnidentifiedVariant_80054AB8* action)
+    unsigned long hash, DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(hash);
     FuzzyVariant variant(FT_INT, value);
@@ -583,7 +583,7 @@ extern "C" void FuzzySetIntParameter(
 
 extern "C" void FuzzySetU32Parameter(
     FuzzyRuntimeBase* runtime, unsigned long value,
-    unsigned long hash, UnidentifiedVariant_80054AB8* action)
+    unsigned long hash, DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(hash);
     FuzzyVariant variant(FT_U32, value);
@@ -593,7 +593,7 @@ extern "C" void FuzzySetU32Parameter(
 
 extern "C" void FuzzySetVariantParameter(
     FuzzyRuntimeBase* runtime, Variant& value,
-    unsigned long hash, UnidentifiedVariant_80054AB8* action)
+    unsigned long hash, DesireUpdate* action)
 {
     runtime->SetActionParameter(
         action, FuzzyFindParameterIndex(hash), value);
@@ -601,7 +601,7 @@ extern "C" void FuzzySetVariantParameter(
 
 extern "C" void FuzzySetStringParameter(
     FuzzyRuntimeBase* runtime, const char* value,
-    unsigned long hash, UnidentifiedVariant_80054AB8* action)
+    unsigned long hash, DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(hash);
     if (index == 10)
@@ -627,11 +627,11 @@ extern "C" float FuzzyGetQueueConfidence(
     return runtime->mActionQueues.mHead->mConfidence;
 }
 
-extern "C" void FuzzyNoOp_80314434(void*, UnidentifiedVariant_80054AB8*, float)
+extern "C" void FuzzyNoOp_80314434(void*, DesireUpdate*, float)
 {
 }
 
-extern "C" void FuzzyNoOp_80314438(void*, UnidentifiedVariant_80054AB8*)
+extern "C" void FuzzyNoOp_80314438(void*, DesireUpdate*)
 {
 }
 

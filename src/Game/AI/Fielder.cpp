@@ -542,7 +542,7 @@ static inline bool HasHitWindowStarted(const cFielder* fielder, float fAnimTime)
 static void FindHeadTrackingHitTarget(cFielder* fielder, cPlayer*& target)
 {
     {
-        UnidentifiedVariant_80054AB8 bestTarget = CallFielderFuzzyFunction(
+        DesireUpdate bestTarget = CallFielderFuzzyFunction(
             FuzzyAIGetFielderRuntime(fielder), "BestHitTarget", fielder);
         if (bestTarget.IsPointerType())
         {
@@ -1896,7 +1896,7 @@ void TryFielderQueuedPass(cFielder* pFielder)
         cPlayer* pPassTarget;
         if (pFielder->GetGlobalPad() == 0)
         {
-            UnidentifiedVariant_80054AB8 vBestTarget = CallFielderFuzzyFunction(
+            DesireUpdate vBestTarget = CallFielderFuzzyFunction(
                 FuzzyAIGetFielderRuntime(pFielder), "BestPassTarget", pFielder);
             pPassTarget = vBestTarget.GetPlayer();
         }
@@ -3348,7 +3348,7 @@ bool cFielder::IsDekePadPressed()
 
 cFielder* cFielder::DoFindBestHitTarget()
 {
-    UnidentifiedVariant_80054AB8 vBestTarget = CallFielderFuzzyFunction(
+    DesireUpdate vBestTarget = CallFielderFuzzyFunction(
         FuzzyAIGetFielderRuntime(this), "BestHitTarget", this);
     if (vBestTarget.IsPointerType())
     {

@@ -115,14 +115,14 @@ float FuzzyAIRuntime::BeginActionQueue()
     return result;
 }
 
-UnidentifiedVariant_80054AB8*
+DesireUpdate*
 FuzzyAIRuntime::EndActionQueue()
 {
     return FuzzyRuntimeBase::EndActionQueue();
 }
 
 void FuzzyAIRuntime::AddAction(
-    UnidentifiedVariant_80054AB8* action)
+    DesireUpdate* action)
 {
     FuzzyRuntimeBase::AddAction(action);
 }
@@ -173,25 +173,25 @@ float FuzzyAIRuntime::GetSkillValue(unsigned long hash)
     return result;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E35D4(
+extern "C" DesireUpdate* FuzzyAIReturnInt_800E35D4(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E3700(
+extern "C" DesireUpdate* FuzzyAIReturnInt_800E3700(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E382C(
+extern "C" DesireUpdate* FuzzyAIReturnInt_800E382C(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E3958(
+extern "C" DesireUpdate* FuzzyAIReturnInt_800E3958(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
@@ -199,7 +199,7 @@ extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E3958(
 
 extern "C" void FuzzyAISetPlayerParameter_800E3A84(
     void*, cPlayer* value, unsigned long parameterHash,
-    UnidentifiedVariant_80054AB8* action)
+    DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant(value));
@@ -207,7 +207,7 @@ extern "C" void FuzzyAISetPlayerParameter_800E3A84(
 
 extern "C" void FuzzyAISetBallParameter(
     void*, cBall* value, unsigned long parameterHash,
-    UnidentifiedVariant_80054AB8* action)
+    DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant(value));

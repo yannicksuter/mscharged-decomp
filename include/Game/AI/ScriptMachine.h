@@ -63,8 +63,8 @@ public:
 void DeactivateScriptMachineState(ScriptMachine* machine, shdStateMachine* state);
 AIContext* GetScriptMachineAIContext(ScriptMachine* machine);
 bool HasStateMachineTimedOut(const shdStateMachine* machine);
-UnidentifiedVariant_80054AB8 ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
-UnidentifiedVariant_80054AB8 ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
+DesireUpdate ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
+DesireUpdate ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
 void QueueScriptMachineState(ScriptMachine* machine, int state, const UnidentifiedVariantCollection* parameters);
 
 extern const float gStateMachineZeroDuration;
