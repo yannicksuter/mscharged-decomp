@@ -13,7 +13,7 @@
 #include "Game/Render/RenderShadow.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/SAnim/pnSAnimController.h"
-#include "NL/MemAlloc.h"
+#include "NL/gl/glMemory.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glMaterialParameters.h"
@@ -46,8 +46,7 @@ SkinAnimatedNPC::SkinAnimatedNPC(
     else
     {
         GLInventory* pInventory =
-            static_cast<GLInventory*>(
-                static_cast<MemoryAllocator*>(resource)->m_memory);
+            static_cast<GLResourcePool*>(resource)->m_inventory;
         mpSkinMesh = pInventory->MakeSkinMesh(
             (unsigned long)nModelID, &pHierarchy);
     }
