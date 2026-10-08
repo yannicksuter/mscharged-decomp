@@ -11,7 +11,6 @@
 #include "NL/nlDLRing.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "NL/nlstring_tmpl.h"
 #include "NL/nlPrint.h"
 
 template <>
