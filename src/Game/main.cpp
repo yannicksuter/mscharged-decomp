@@ -344,25 +344,25 @@ void ConfigureTweakerButtons(int)
     }
 
     const int classID = pad->mBackend->GetClassID();
-    const bool tweakerEnabled =
+    const bool justZButton =
         GetTweakBool("/user/Tweaker with just Z Button", false);
     const bool isWiiRemote =
         classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
 
-    gTweakerButton_806DF2E0 = 9;
-    gTweakerButton_806DF2E4 = 10;
-    gTweakerButton_806DF2E8 = 8;
-    gTweakerButton_806DF2F0 = 11;
-    gTweakerButton_806DF2F4 = 12;
-    gTweakerButton_806DF2F8 = 13;
-    gTweakerButton_806DF2FC = 14;
-    if (!tweakerEnabled && !isWiiRemote)
+    gTweakerAccelButton = 9;
+    gTweakerBackButton = 10;
+    gTweakerToggleButton = 8;
+    gTweakerLeftButton = 11;
+    gTweakerRightButton = 12;
+    gTweakerUpButton = 13;
+    gTweakerDownButton = 14;
+    if (!justZButton && !isWiiRemote)
     {
-        gTweakerButton_806DF2EC = 23;
+        gTweakerModifierButton = 23;
     }
     else
     {
-        gTweakerButton_806DF2EC = -1;
+        gTweakerModifierButton = -1;
     }
 }
 

@@ -17,13 +17,13 @@ extern bool g_bTweaking;
 
 void ToggleTweaking();
 
-extern s32 gTweakerButton_806DF2E0;
-extern s32 gTweakerButton_806DF2E4;
-extern s32 gTweakerButton_806DF2E8;
-extern s32 gTweakerButton_806DF2EC;
-extern s32 gTweakerButton_806DF2F0;
-extern s32 gTweakerButton_806DF2F4;
-extern s32 gTweakerButton_806DF2F8;
-extern s32 gTweakerButton_806DF2FC;
+extern s32 gTweakerAccelButton;
+extern s32 gTweakerBackButton;
+extern s32 gTweakerToggleButton;
+extern s32 gTweakerModifierButton;
+extern s32 gTweakerLeftButton;
+extern s32 gTweakerRightButton;
+extern s32 gTweakerUpButton;
+extern s32 gTweakerDownButton;
 
 #endif // GAME_TWEAKER_TASK_H
