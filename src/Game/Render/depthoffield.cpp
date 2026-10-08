@@ -1,5 +1,7 @@
 #include "Game/Render/depthoffield.h"
 
+#include <string.h>
+
 #include "Game/SharedStaticStorage.h"
 #include "Game/Render/RLView.h"
 
@@ -22,7 +24,6 @@ extern "C"
         const float* projection, const float* viewport, float* screenX,
         float* screenY, float* screenZ);
     void PSMTXIdentity(Mtx matrix);
-    void* memcpy(void* destination, const void* source, u32 size);
 }
 
 u8 lbl_806DCDE0 = true;

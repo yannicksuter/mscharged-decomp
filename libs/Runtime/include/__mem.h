@@ -1,10 +1,11 @@
 #pragma once
 
+#include <size_t.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef unsigned int size_t;
 typedef unsigned int u32;
 
 #pragma section code_type ".init"
