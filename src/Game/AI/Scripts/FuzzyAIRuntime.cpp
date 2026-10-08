@@ -173,31 +173,31 @@ float FuzzyAIRuntime::GetSkillValue(unsigned long hash)
     return result;
 }
 
-extern "C" DesireUpdate* FuzzyAIReturnInt_800E35D4(
+extern "C" DesireUpdate* FuzzyAIReturnDesire(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" DesireUpdate* FuzzyAIReturnInt_800E3700(
+extern "C" DesireUpdate* FuzzyAIReturnIntNative133(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" DesireUpdate* FuzzyAIReturnInt_800E382C(
+extern "C" DesireUpdate* FuzzyAIReturnTeamPlay(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" DesireUpdate* FuzzyAIReturnInt_800E3958(
+extern "C" DesireUpdate* FuzzyAIReturnDirection(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" void FuzzyAISetPlayerParameter_800E3A84(
+extern "C" void FuzzyAISetPlayerParameter(
     void*, cPlayer* value, unsigned long parameterHash,
     DesireUpdate* action)
 {
@@ -213,52 +213,52 @@ extern "C" void FuzzyAISetBallParameter(
     action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
-extern "C" void* FuzzyAIPassThrough_800E3BE4(void*, void* value)
+extern "C" void* FuzzyAIAutoCastNative19(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* FuzzyAIPassThrough_800E3BEC(void*, void* value)
+extern "C" void* FuzzyAIAutoCastNative24(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* FuzzyAIPassThrough_800E3BF4(void*, void* value)
+extern "C" void* FuzzyAIAutoCastFielderToPlayer(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* FuzzyAIPassThrough_800E3BFC(void*, void* value)
+extern "C" void* FuzzyAIAutoCastGoalieToPlayer(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* FuzzyAIPassThrough_800E3C04(void*, void* value)
+extern "C" void* FuzzyAIAutoCastPlayerToFielder(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* FuzzyAIPassThrough_800E3C0C(void*, void* value)
+extern "C" void* FuzzyAIAutoCastNative18(void*, void* value)
 {
     return value;
 }
 
-extern "C" void* FuzzyAIGetVariantPointer_800E3C14(void*, Variant* value)
+extern "C" void* FuzzyAIAutoCastResultToFielder(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
 
-extern "C" void* FuzzyAIGetVariantPointer_800E3C2C(void*, Variant* value)
+extern "C" void* FuzzyAIAutoCastResultToPlayer(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
 
-extern "C" void* FuzzyAIGetVariantPointer_800E3C44(void*, Variant* value)
+extern "C" void* FuzzyAIAutoCastParameterToPlayer(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
 
-extern "C" void* FuzzyAIGetVariantPointer_800E3C5C(void*, Variant* value)
+extern "C" void* FuzzyAIAutoCastParameterToFielder(void*, Variant* value)
 {
     return value != 0 ? value->mData.pointer : 0;
 }
@@ -334,13 +334,13 @@ extern "C" void FuzzyAIDestroyFielderIterator(
     g_FuzzyFielderIteratorPool.Free(entry);
 }
 
-extern "C" cFielder* FuzzyAIGetIteratorFielder_800E3F10(
+extern "C" cFielder* FuzzyAIAutoCastIteratorToFielder(
     void*, FuzzyFielderIterator* iterator)
 {
     return iterator->mTeam->GetFielder(iterator->mCurrent);
 }
 
-extern "C" cFielder* FuzzyAIGetIteratorFielder_800E3F1C(
+extern "C" cFielder* FuzzyAIAutoCastIteratorToPlayer(
     void*, FuzzyFielderIterator* iterator)
 {
     return iterator->mTeam->GetFielder(iterator->mCurrent);

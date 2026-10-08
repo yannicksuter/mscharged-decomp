@@ -285,7 +285,7 @@ bool FuzzyRuntimeBase::ExecuteFunction(
     return result;
 }
 
-extern "C" char FuzzyPassThrough_80312358(void*, char value)
+extern "C" char FuzzyByteIdentityNative287(void*, char value)
 {
     return value;
 }
@@ -627,20 +627,20 @@ extern "C" float FuzzyGetQueueConfidence(
     return runtime->mActionQueues.mHead->mConfidence;
 }
 
-extern "C" void FuzzyNoOp_80314434(void*, DesireUpdate*, float)
+extern "C" void FuzzyBlockEnterHook(void*, DesireUpdate*, float)
 {
 }
 
-extern "C" void FuzzyNoOp_80314438(void*, DesireUpdate*)
+extern "C" void FuzzyBlockExitHook(void*, DesireUpdate*)
 {
 }
 
-extern "C" void* FuzzyPassThrough_8031443C(void*, void* value, bool)
+extern "C" void* FuzzyIsPredicateResult(void*, void* value, bool)
 {
     return value;
 }
 
-extern "C" float FuzzyPassThrough_80314444(void*, float value, bool)
+extern "C" float FuzzyIsPredicateFloat(void*, float value, bool)
 {
     return value;
 }
@@ -751,7 +751,7 @@ extern "C" float FuzzySetTimerSeconds(
     return context->SetTimer(key, seconds)->GetSeconds();
 }
 
-extern "C" void FuzzyNoOp_80314740(void*, bool)
+extern "C" void FuzzyTransitionHook(void*, bool)
 {
 }
 
