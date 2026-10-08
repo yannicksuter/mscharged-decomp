@@ -3,6 +3,7 @@
 
 #include <revolution/thp/THPBuffer.h>
 #include <revolution/thp/THPInfo.h>
+#include <revolution/thp_fwd.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -23,7 +24,6 @@ extern "C"
     long THPSimpleDecode(long audioTrack);
     int THPSimpleGetVideoInfo(THPVideoInfo* videoInfo);
     s32 THPSimpleGetTotalFrame(void);
-    int THPSimpleSetVolume(long vol, long time);
 
 #ifdef __cplusplus
 }

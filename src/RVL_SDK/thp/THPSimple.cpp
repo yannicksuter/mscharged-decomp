@@ -12,13 +12,6 @@
 #include <revolution/thp/THPFile.h>
 #include <string.h>
 
-extern "C"
-{
-    BOOL THPInit(void);
-    s32 THPVideoDecode(void* file, void* tileY, void* tileU, void* tileV, void* work);
-    u32 THPAudioDecode(s16* buffer, u8* audioFrame, s32 flag);
-}
-
 static void THPAudioMixCallback();
 
 struct THPSimpleControlWork
