@@ -27,7 +27,6 @@
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHOnlinePlayerCount.h"
 #include "Game/SH/SHOnlineGuestControllerSelect.h"
-#include "NL/nlstring_tmpl.h"
 #include "Game/FE/tlDefault.h"
 
 SHOnlineInviteResponse::~SHOnlineInviteResponse()
