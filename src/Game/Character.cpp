@@ -634,7 +634,7 @@ void cCharacter::EndBlur()
     }
 }
 
-bool UnidentifiedCharacterFloatComparison(float value)
+bool EmitCharacterComparisonConstants(float value)
 {
     return nlNear(value, 0.1f);
 }

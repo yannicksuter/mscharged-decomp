@@ -28,12 +28,12 @@
 // before BindMember is declared. MWCC emits late template copies grouped by
 // declaration point in reverse, which gives retail's tail: the BindMember
 // copies, then the Function constructors from the last event to the first.
-typedef char UnidentifiedFunctionSize0[sizeof(Function<GoalScoredData*>)];
-typedef char UnidentifiedFunctionSize1[sizeof(Function<FnVoidVoid>)];
-typedef char UnidentifiedFunctionSize2[sizeof(Function<MegaStrikeMeterData*>)];
-typedef char UnidentifiedFunctionSize3[sizeof(Function<GoalieSaveData*>)];
-typedef char UnidentifiedFunctionSize4[sizeof(Function<CollisionThwompPlayerData*>)];
-typedef char UnidentifiedFunctionSize5[sizeof(Function<PlayerAttackData*>)];
+typedef char GoalScoredCallbackInstantiation[sizeof(Function<GoalScoredData*>)];
+typedef char VoidCallbackInstantiation[sizeof(Function<FnVoidVoid>)];
+typedef char MegaStrikeMeterCallbackInstantiation[sizeof(Function<MegaStrikeMeterData*>)];
+typedef char GoalieSaveCallbackInstantiation[sizeof(Function<GoalieSaveData*>)];
+typedef char ThwompCollisionCallbackInstantiation[sizeof(Function<CollisionThwompPlayerData*>)];
+typedef char PlayerAttackCallbackInstantiation[sizeof(Function<PlayerAttackData*>)];
 
 #include "NL/nlBindMember.h"
 
