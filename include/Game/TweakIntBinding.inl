@@ -14,12 +14,12 @@ int TweakIntBinding::GetDefault()
 
 int TweakIntBinding::GetValueType()
 {
-    return 3;
+    return TWEAK_TYPE_INT;
 }
 
 int TweakIntBinding::GetStorageKind()
 {
-    return 2;
+    return TWEAK_STORAGE_BINDING;
 }
 
 TweakValueBase* TweakIntBinding::CreateValue(
@@ -37,10 +37,10 @@ void TweakIntBinding::CopyValueFrom(
 {
     switch (other->GetStorageKind())
     {
-    case 1:
+    case TWEAK_STORAGE_OWNED:
         *m_pValue = ((TweakValueInt*)other)->mValue;
         break;
-    case 2:
+    case TWEAK_STORAGE_BINDING:
         *m_pValue = *((TweakIntBinding*)other)->m_pValue;
         break;
     }

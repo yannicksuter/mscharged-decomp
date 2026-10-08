@@ -222,7 +222,7 @@ void RegisterPendingTweaks(void)
         value = pending->m_Value;
         value->GetValueType();
         int kind = value->GetStorageKind();
-        if ((!pending->m_Registered && kind == 1) || (kind == 2 && ((TweakBindingBase*)value)->IsBound()))
+        if ((!pending->m_Registered && kind == TWEAK_STORAGE_OWNED) || (kind == TWEAK_STORAGE_BINDING && ((TweakBindingBase*)value)->IsBound()))
         {
             if (value->mFormatName)
             {
@@ -264,7 +264,7 @@ void BindPendingTweaks(void)
         TweakValueBase* value = pending->m_Value;
         int type = value->GetValueType();
         int kind = value->GetStorageKind();
-        if (!pending->m_Registered && kind == 2)
+        if (!pending->m_Registered && kind == TWEAK_STORAGE_BINDING)
         {
             if (value->mFormatName)
             {
@@ -279,16 +279,16 @@ void BindPendingTweaks(void)
                 TweakFloatBinding* impl = (TweakFloatBinding*)value;
                 switch (type)
                 {
-                case 5:
+                case TWEAK_TYPE_FLOAT:
                     *impl->m_pValue = pending->m_DefaultFloat;
                     break;
-                case 3:
+                case TWEAK_TYPE_INT:
                     *(int*)impl->m_pValue = pending->m_Default32;
                     break;
-                case 2:
+                case TWEAK_TYPE_BOOL:
                     *(u8*)impl->m_pValue = pending->m_Default8;
                     break;
-                case 8:
+                case TWEAK_TYPE_STRING:
                     *(u32*)impl->m_pValue = (u32)pending->m_Default32;
                     break;
                 }
@@ -599,11 +599,11 @@ float GetTweakFloat(const char* path, float defaultValue)
         return defaultValue;
     }
     int kind = entry->m_Value->GetStorageKind();
-    if (kind == 1)
+    if (kind == TWEAK_STORAGE_OWNED)
     {
         return ((TweakValueFloat*)entry->m_Value)->value;
     }
-    if (kind == 2)
+    if (kind == TWEAK_STORAGE_BINDING)
     {
         return *((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
@@ -618,11 +618,11 @@ int GetTweakInt(const char* path, int defaultValue)
         return defaultValue;
     }
     int kind = entry->m_Value->GetStorageKind();
-    if (kind == 1)
+    if (kind == TWEAK_STORAGE_OWNED)
     {
         return ((TweakValueInt*)entry->m_Value)->mValue;
     }
-    if (kind == 2)
+    if (kind == TWEAK_STORAGE_BINDING)
     {
         return *(int*)((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
@@ -637,11 +637,11 @@ bool GetTweakBool(const char* path, bool defaultValue)
         return defaultValue;
     }
     int kind = entry->m_Value->GetStorageKind();
-    if (kind == 1)
+    if (kind == TWEAK_STORAGE_OWNED)
     {
         return ((TweakValueBool*)entry->m_Value)->mValue;
     }
-    if (kind == 2)
+    if (kind == TWEAK_STORAGE_BINDING)
     {
         return *(bool*)((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }
@@ -656,11 +656,11 @@ const char* GetTweakString(const char* path, const char* defaultValue)
         return defaultValue;
     }
     int kind = entry->m_Value->GetStorageKind();
-    if (kind == 1)
+    if (kind == TWEAK_STORAGE_OWNED)
     {
         return ((TweakValueString*)entry->m_Value)->m_Value;
     }
-    if (kind == 2)
+    if (kind == TWEAK_STORAGE_BINDING)
     {
         return *(const char**)((TweakFloatBinding*)entry->m_Value)->m_pValue;
     }

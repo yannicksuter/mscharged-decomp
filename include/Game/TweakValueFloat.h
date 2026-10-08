@@ -44,10 +44,10 @@ public:
     {
         switch (other->GetStorageKind())
         {
-        case 1:
+        case TWEAK_STORAGE_OWNED:
             value = ((TweakValueFloat*)other)->value;
             break;
-        case 2:
+        case TWEAK_STORAGE_BINDING:
             value = *((TweakFloatBinding*)other)->m_pValue;
             break;
         }
@@ -55,11 +55,11 @@ public:
 
     virtual int GetStorageKind()
     {
-        return 1;
+        return TWEAK_STORAGE_OWNED;
     }
     virtual int GetValueType()
     {
-        return 5;
+        return TWEAK_TYPE_FLOAT;
     }
     virtual void* GetValueAddress()
     {

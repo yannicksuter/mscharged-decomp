@@ -9,6 +9,23 @@ void SplitTweakPath(const char* path, const char** leafName, char* directory);
 void JoinTweakPath(const char* parentPath, const char* childPath, char* buffer);
 int IsTweakNameOnStack(const char* name);
 
+enum eTweakStorageKind
+{
+    TWEAK_STORAGE_OWNED = 1,
+    TWEAK_STORAGE_BINDING = 2,
+    TWEAK_STORAGE_FOLDER = 3,
+};
+
+enum eTweakValueType
+{
+    TWEAK_TYPE_FOLDER = 1,
+    TWEAK_TYPE_BOOL = 2,
+    TWEAK_TYPE_INT = 3,
+    TWEAK_TYPE_UINT = 4,
+    TWEAK_TYPE_FLOAT = 5,
+    TWEAK_TYPE_STRING = 8,
+};
+
 class TweakValueBase
 {
 public:
@@ -16,7 +33,6 @@ public:
     virtual ~TweakValueBase();
     // Value type discriminator shared by owned values and bindings.
     virtual int GetValueType() = 0;
-    // 1: owned value, 2: pointer binding, 3: folder name.
     virtual int GetStorageKind() = 0;
     // These three slots have no established semantic names.
     virtual void GetFloatParameters(

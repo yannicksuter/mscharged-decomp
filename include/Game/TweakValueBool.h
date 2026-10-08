@@ -113,10 +113,10 @@ inline void TweakValue<T>::CopyValueFrom(
 {
     switch (other->GetStorageKind())
     {
-    case 1:
+    case TWEAK_STORAGE_OWNED:
         mValue = ((TweakValue<T>*)other)->mValue;
         break;
-    case 2:
+    case TWEAK_STORAGE_BINDING:
         mValue = *((typename TweakType<T>::Binding*)other)->m_pValue;
         break;
     }
@@ -125,7 +125,7 @@ inline void TweakValue<T>::CopyValueFrom(
 template <typename T>
 inline int TweakValue<T>::GetStorageKind()
 {
-    return 1;
+    return TWEAK_STORAGE_OWNED;
 }
 
 template <typename T>
