@@ -201,9 +201,9 @@ static inline bool SidekickFacingFlag(int sidekick)
 {
     switch (sidekick)
     {
-    case 3:
+    case SK_BIRDO:
         return false;
-    case 5:
+    case SK_DRYBONES:
         return false;
     default:
         return true;

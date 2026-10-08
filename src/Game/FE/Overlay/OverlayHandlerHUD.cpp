@@ -715,16 +715,16 @@ void HUDCaptainMeter::Init(FEPresentation* presentation)
         nlColour colour;
         switch (nlSingleton<GameInfoManager>::Instance()->GetTeam(i))
         {
-        case 1:
+        case TEAM_BOWSER:
             nlColourSet(colour, 0xEE, 0x9A, 0x15, 0xFF);
             break;
-        case 11:
+        case TEAM_PETEY:
             nlColourSet(colour, 0x8F, 0x72, 0x19, 0xFF);
             break;
-        case 7:
+        case TEAM_WARIO:
             nlColourSet(colour, 0x52, 0xA7, 0x38, 0xFF);
             break;
-        case 6:
+        case TEAM_WALUIGI:
             nlColourSet(colour, 0x66, 0x3A, 0x8F, 0xFF);
             break;
         default:

@@ -493,13 +493,13 @@ void GoalOverlay::DoCupWinOverlay(int cup)
     }
     switch (cup)
     {
-    case 0:
+    case CUP_FIRE:
         cupName = "FIRE_CUP";
         break;
-    case 1:
+    case CUP_CRYSTAL:
         cupName = "CRYSTAL_CUP";
         break;
-    case 2:
+    case CUP_STRIKER:
         cupName = "STRIKER_CUP";
         break;
     }

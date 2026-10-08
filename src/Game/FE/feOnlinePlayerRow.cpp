@@ -1,4 +1,5 @@
 #include "Game/MiiManager.h"
+#include "Game/DB/PlayerStats.h"
 #include "Game/FE/feOnlinePlayerRow.h"
 #include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinderFind_impl.h"
@@ -22,29 +23,29 @@ const char* GetOnlineCaptainSlideName(unsigned int captain)
 {
     switch (captain)
     {
-    case 0:
+    case TEAM_MARIO:
         return "MARIO";
-    case 1:
+    case TEAM_BOWSER:
         return "BOWSER";
-    case 2:
+    case TEAM_DAISY:
         return "DAISY";
-    case 3:
+    case TEAM_DONKEYKONG:
         return "DONKEYKONG";
-    case 4:
+    case TEAM_LUIGI:
         return "LUIGI";
-    case 5:
+    case TEAM_PEACH:
         return "PEACH";
-    case 6:
+    case TEAM_WALUIGI:
         return "WALUIGI";
-    case 7:
+    case TEAM_WARIO:
         return "WARIO";
-    case 8:
+    case TEAM_YOSHI:
         return "YOSHI";
-    case 9:
+    case TEAM_BOWSERJR:
         return "BOWSERJR";
-    case 10:
+    case TEAM_DIDDYKONG:
         return "DIDDYKONG";
-    case 11:
+    case TEAM_PETEY:
         return "PETEY";
     default:
         return 0;

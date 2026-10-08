@@ -1007,14 +1007,14 @@ void SHChooseSides2::SetSidekickImage(TLImageInstance* image, int sidekick, int 
 
         switch (sidekick)
         {
-        case 0:
-        case 1:
-        case 4:
-        case 5:
+        case SK_TOAD:
+        case SK_KOOPA:
+        case SK_BOO:
+        case SK_DRYBONES:
         {
             int captain = GameInfoManager::Instance()->GetTeam((short)team);
             const CharacterInfo& captainInfo = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
-            if (captain == 0 || captain == 5 || captain == 3 || captain == 1)
+            if (captain == TEAM_MARIO || captain == TEAM_PEACH || captain == TEAM_DONKEYKONG || captain == TEAM_BOWSER)
             {
                 nlSNPrintf(textureName, 64, "sidekick_%s_%s_s", sidekickInfo.mName, captainInfo.mName);
             }
