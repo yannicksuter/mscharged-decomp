@@ -238,12 +238,12 @@ UnidentifiedMakeReplayBinding(
 
 void ReplayManager::RegisterEventHandlers()
 {
-    UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnReceiveBall, this)), 0, -1);
-    UnidentifiedFindEvent<ShotAtGoalData>("ShotAtGoal", -1)->Add(Function<ShotAtGoalData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
-    UnidentifiedFindEvent<PassBallData>("PassBall", -1)->Add(Function<PassBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
-    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
+    FindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnReceiveBall, this)), 0, -1);
+    FindEvent<ShotAtGoalData>("ShotAtGoal", -1)->Add(Function<ShotAtGoalData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
+    FindEvent<PassBallData>("PassBall", -1)->Add(Function<PassBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
+    FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
 }
 
 void ReplayManager::InitializeSnapshots()

@@ -579,7 +579,7 @@ PhysicsPatchManager::PhysicsPatchManager()
         mPatches[i] = 0;
     }
 
-    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(HandleResetEffects), (unsigned int)&mResetEffectsConnection, -1);
+    FindEvent<void>("ResetEffects", -1)->Add(Function<void*>(HandleResetEffects), (unsigned int)&mResetEffectsConnection, -1);
 }
 
 PhysicsPatchManager::~PhysicsPatchManager()

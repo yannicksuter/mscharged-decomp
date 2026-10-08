@@ -73,44 +73,44 @@ struct EventConnection
 typedef void UnidentifiedEventNoData();
 
 template <typename T>
-struct UnidentifiedEventCallback
+struct EventCallbackTraits
 {
     typedef Function<T*> Type;
     typedef T* Parameter;
 };
 
 template <typename P1>
-struct UnidentifiedEventCallback<void(P1)>
+struct EventCallbackTraits<void(P1)>
 {
     typedef Function<void(P1)> Type;
     typedef P1 Parameter;
 };
 
 template <typename P1, typename P2>
-struct UnidentifiedEventCallback<void(P1, P2)>
+struct EventCallbackTraits<void(P1, P2)>
 {
     typedef Function<void(P1, P2)> Type;
 };
 
 template <typename ReturnType>
-struct UnidentifiedEventCallback<ReturnType()>
+struct EventCallbackTraits<ReturnType()>
 {
     typedef Function<ReturnType()> Type;
 };
 
 template <>
-struct UnidentifiedEventCallback<UnidentifiedEventNoData>
+struct EventCallbackTraits<UnidentifiedEventNoData>
 {
     typedef Function<FnVoidVoid> Type;
     typedef UnidentifiedEventNoData* Parameter;
 };
 
 template <typename T>
-struct UnidentifiedListener : public EventConnection
+struct EventListener : public EventConnection
 {
-    typedef typename UnidentifiedEventCallback<T>::Type Callback;
+    typedef typename EventCallbackTraits<T>::Type Callback;
 
-    UnidentifiedListener(int = 0)
+    EventListener(int = 0)
         : EventConnection()
         , callback()
     {
@@ -120,25 +120,25 @@ struct UnidentifiedListener : public EventConnection
 };
 
 template <typename T>
-class UnidentifiedEventType
+class EventType
 {
 protected:
     static void* sType;
 };
 
 template <typename T>
-void* UnidentifiedEventType<T>::sType;
+void* EventType<T>::sType;
 
 template <typename T>
-class UnidentifiedTypedEvent;
+class TypedEvent;
 
 template <typename T>
-class UnidentifiedTypedEvent : public EventBase, public UnidentifiedEventType<T>
+class TypedEvent : public EventBase, public EventType<T>
 {
 public:
-    typedef typename UnidentifiedEventCallback<T>::Type Callback;
+    typedef typename EventCallbackTraits<T>::Type Callback;
 
-    UnidentifiedTypedEvent(const char* name, int length)
+    TypedEvent(const char* name, int length)
         : EventBase(name, length)
     {
         this->mCurrentConnection = 0;
@@ -151,56 +151,56 @@ public:
 };
 
 template <typename ReturnType>
-class UnidentifiedTypedEvent0 : public EventBase, public UnidentifiedEventType<ReturnType()>
+class TypedEvent0 : public EventBase, public EventType<ReturnType()>
 {
 public:
-    typedef typename UnidentifiedEventCallback<ReturnType()>::Type Callback;
+    typedef typename EventCallbackTraits<ReturnType()>::Type Callback;
 
-    UnidentifiedTypedEvent0(const char* name, int length)
+    TypedEvent0(const char* name, int length)
         : EventBase(name, length)
     {
         this->mCurrentConnection = 0;
         sType = *(void**)this;
     }
 
-    virtual inline ~UnidentifiedTypedEvent0();
+    virtual inline ~TypedEvent0();
     virtual void Disconnect(void* owner) = 0;
     virtual void Add(const Callback&, unsigned int, int) = 0;
 
 };
 
 template <typename T>
-struct UnidentifiedEventInterface
+struct EventInterface
 {
-    typedef UnidentifiedTypedEvent<T> Type;
+    typedef TypedEvent<T> Type;
 };
 
 template <typename ReturnType>
-struct UnidentifiedEventInterface<ReturnType()>
+struct EventInterface<ReturnType()>
 {
-    typedef UnidentifiedTypedEvent0<ReturnType> Type;
+    typedef TypedEvent0<ReturnType> Type;
 };
 
 template <typename T>
-typename UnidentifiedEventInterface<T>::Type* UnidentifiedFindEvent(const char* name, int length);
+typename EventInterface<T>::Type* FindEvent(const char* name, int length);
 
 template <typename ReturnType>
-class UnidentifiedEvent0 : public UnidentifiedTypedEvent0<ReturnType>
+class Event0 : public TypedEvent0<ReturnType>
 {
-    typedef UnidentifiedListener<ReturnType()> Listener;
+    typedef EventListener<ReturnType()> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
 
 public:
-    typedef typename UnidentifiedTypedEvent0<ReturnType>::Callback Callback;
+    typedef typename TypedEvent0<ReturnType>::Callback Callback;
 
-    UnidentifiedEvent0(const char* name, int length)
-        : UnidentifiedTypedEvent0<ReturnType>(name, length)
+    Event0(const char* name, int length)
+        : TypedEvent0<ReturnType>(name, length)
         , mListeners(16, 16)
     {
-        RegisterEvent(this, UnidentifiedTypedEvent0<ReturnType>::sType);
+        RegisterEvent(this, TypedEvent0<ReturnType>::sType);
     }
 
-    virtual ~UnidentifiedEvent0();
+    virtual ~Event0();
 
     void RemoveAll()
     {
@@ -212,7 +212,7 @@ public:
 
     virtual void Add(const Callback& callback, unsigned int value, int flags)
     {
-        UnidentifiedAddListener(callback, value, flags);
+        AddListener(callback, value, flags);
     }
 
     virtual void Disconnect(void* owner);
@@ -250,7 +250,7 @@ public:
 protected:
     // Add hands the listener its callback by reference: retail's copies
     // clear the caller's Function instead of cloning it.
-    void UnidentifiedAddListener(
+    void AddListener(
         const Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
@@ -273,7 +273,7 @@ public:
 };
 
 template <typename ReturnType>
-UnidentifiedEvent0<ReturnType>::~UnidentifiedEvent0()
+Event0<ReturnType>::~Event0()
 {
     RemoveAll();
     UnregisterEvent(this);
@@ -283,7 +283,7 @@ UnidentifiedEvent0<ReturnType>::~UnidentifiedEvent0()
 // re-anchored on the current list head before it continues past the entry
 // that was just delivered.
 template <typename ReturnType>
-void UnidentifiedEvent0<ReturnType>::RestartAt(
+void Event0<ReturnType>::RestartAt(
     nlDLListIterator<Listener>& iterator, ListenerEntry* current)
 {
     iterator.Copy(mListeners.Begin());
@@ -291,7 +291,7 @@ void UnidentifiedEvent0<ReturnType>::RestartAt(
 }
 
 template <typename ReturnType>
-void UnidentifiedEvent0<ReturnType>::Remove(Listener* listener)
+void Event0<ReturnType>::Remove(Listener* listener)
 {
     UnregisterEventConnection(this, listener);
     if (this->mCurrentConnection == listener)
@@ -304,14 +304,14 @@ void UnidentifiedEvent0<ReturnType>::Remove(Listener* listener)
 }
 
 template <typename ReturnType>
-DLListEntry<UnidentifiedListener<ReturnType()> >*
-UnidentifiedEvent0<ReturnType>::GetEntry(Listener* listener)
+DLListEntry<EventListener<ReturnType()> >*
+Event0<ReturnType>::GetEntry(Listener* listener)
 {
     return mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
 }
 
 template <typename ReturnType>
-void UnidentifiedEvent0<ReturnType>::DeleteListener(Listener* listener)
+void Event0<ReturnType>::DeleteListener(Listener* listener)
 {
     ListenerEntry* entry = GetEntry(listener);
     nlDLRingRemove(&mListeners.m_Head, entry);
@@ -319,31 +319,31 @@ void UnidentifiedEvent0<ReturnType>::DeleteListener(Listener* listener)
 }
 
 template <typename ReturnType>
-void UnidentifiedEvent0<ReturnType>::Disconnect(void* owner)
+void Event0<ReturnType>::Disconnect(void* owner)
 {
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
 }
 
 template <typename ReturnType>
-class UnidentifiedQueuedEventBase0 : public UnidentifiedEvent0<ReturnType>
+class QueuedEventBase0 : public Event0<ReturnType>
 {
 public:
-    UnidentifiedQueuedEventBase0(
+    QueuedEventBase0(
         EventDispatcher* dispatcher, const char* name, int length)
-        : UnidentifiedEvent0<ReturnType>(name, length)
+        : Event0<ReturnType>(name, length)
         , mDispatcher(dispatcher)
     {
     }
 
-    virtual ~UnidentifiedQueuedEventBase0() { }
+    virtual ~QueuedEventBase0() { }
 
-    typedef typename UnidentifiedEvent0<ReturnType>::Callback Callback;
+    typedef typename Event0<ReturnType>::Callback Callback;
 
-    virtual void Add(const typename UnidentifiedEvent0<ReturnType>::Callback& callback,
+    virtual void Add(const typename Event0<ReturnType>::Callback& callback,
         unsigned int value, int flags)
     {
-        this->UnidentifiedAddListener(callback, value, flags);
+        this->AddListener(callback, value, flags);
     }
 
     void Dispatch(Callback disposer, unsigned char deliver)
@@ -364,22 +364,22 @@ protected:
 };
 
 template <typename T>
-class UnidentifiedEvent : public UnidentifiedTypedEvent<T>
+class Event : public TypedEvent<T>
 {
-    typedef UnidentifiedListener<T> Listener;
+    typedef EventListener<T> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
 
 public:
-    typedef typename UnidentifiedTypedEvent<T>::Callback Callback;
+    typedef typename TypedEvent<T>::Callback Callback;
 
-    UnidentifiedEvent(const char* name, int length)
-        : UnidentifiedTypedEvent<T>(name, length)
+    Event(const char* name, int length)
+        : TypedEvent<T>(name, length)
         , mListeners(16, 16)
     {
-        RegisterEvent(this, UnidentifiedTypedEvent<T>::sType);
+        RegisterEvent(this, TypedEvent<T>::sType);
     }
 
-    virtual ~UnidentifiedEvent();
+    virtual ~Event();
 
     void RemoveAll()
     {
@@ -391,7 +391,7 @@ public:
 
     virtual void Add(const Callback& callback, unsigned int value, int flags)
     {
-        UnidentifiedAddListener(callback, value, flags);
+        AddListener(callback, value, flags);
     }
 
     virtual void Disconnect(void* owner);
@@ -459,7 +459,7 @@ public:
 protected:
     // Add hands the listener its callback by reference: retail's copies
     // clear the caller's Function instead of cloning it.
-    void UnidentifiedAddListener(
+    void AddListener(
         const Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
@@ -482,7 +482,7 @@ public:
 };
 
 template <typename T>
-UnidentifiedEvent<T>::~UnidentifiedEvent()
+Event<T>::~Event()
 {
     RemoveAll();
     UnregisterEvent(this);
@@ -492,7 +492,7 @@ UnidentifiedEvent<T>::~UnidentifiedEvent()
 // re-anchored on the current list head before it continues past the entry
 // that was just delivered.
 template <typename T>
-void UnidentifiedEvent<T>::RestartAt(
+void Event<T>::RestartAt(
     nlDLListIterator<Listener>& iterator, ListenerEntry* current)
 {
     iterator.Copy(mListeners.Begin());
@@ -500,7 +500,7 @@ void UnidentifiedEvent<T>::RestartAt(
 }
 
 template <typename T>
-void UnidentifiedEvent<T>::Remove(Listener* listener)
+void Event<T>::Remove(Listener* listener)
 {
     UnregisterEventConnection(this, listener);
     if (this->mCurrentConnection == listener)
@@ -513,14 +513,14 @@ void UnidentifiedEvent<T>::Remove(Listener* listener)
 }
 
 template <typename T>
-DLListEntry<UnidentifiedListener<T> >*
-UnidentifiedEvent<T>::GetEntry(Listener* listener)
+DLListEntry<EventListener<T> >*
+Event<T>::GetEntry(Listener* listener)
 {
     return mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
 }
 
 template <typename T>
-void UnidentifiedEvent<T>::DeleteListener(Listener* listener)
+void Event<T>::DeleteListener(Listener* listener)
 {
     ListenerEntry* entry = GetEntry(listener);
     nlDLRingRemove(&mListeners.m_Head, entry);
@@ -528,7 +528,7 @@ void UnidentifiedEvent<T>::DeleteListener(Listener* listener)
 }
 
 template <typename T>
-void UnidentifiedEvent<T>::Disconnect(void* owner)
+void Event<T>::Disconnect(void* owner)
 {
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
@@ -537,11 +537,11 @@ void UnidentifiedEvent<T>::Disconnect(void* owner)
 // Concrete immediate events retain their own runtime type while sharing the
 // listener storage and delivery implementation.
 template <typename T>
-class ImmediateEvent : public UnidentifiedEvent<T>
+class ImmediateEvent : public Event<T>
 {
 public:
     ImmediateEvent(const char* name, int length)
-        : UnidentifiedEvent<T>(name, length)
+        : Event<T>(name, length)
     {
     }
 
@@ -549,9 +549,9 @@ public:
 };
 
 template <typename P1, typename P2, typename P3>
-struct UnidentifiedListener3 : public EventConnection
+struct EventListener3 : public EventConnection
 {
-    UnidentifiedListener3(int = 0)
+    EventListener3(int = 0)
         : EventConnection()
         , callback()
     {
@@ -561,19 +561,19 @@ struct UnidentifiedListener3 : public EventConnection
 };
 
 template <typename P1, typename P2, typename P3>
-class UnidentifiedTypedEvent3 : public EventBase
+class TypedEvent3 : public EventBase
 {
 public:
     typedef Function<void(P1, P2, P3)> Callback;
 
-    UnidentifiedTypedEvent3(const char* name, int length)
+    TypedEvent3(const char* name, int length)
         : EventBase(name, length)
     {
         this->mCurrentConnection = 0;
         sType = *(void**)this;
     }
 
-    virtual ~UnidentifiedTypedEvent3() { }
+    virtual ~TypedEvent3() { }
     virtual void Disconnect(void* owner) = 0;
     virtual void Add(Callback, unsigned int, int) = 0;
 
@@ -583,30 +583,30 @@ protected:
 };
 
 template <typename P1, typename P2, typename P3>
-void* UnidentifiedTypedEvent3<P1, P2, P3>::sType;
+void* TypedEvent3<P1, P2, P3>::sType;
 
 // Retail queued-event destructors inline one more non-trivial destructor
-// level than UnidentifiedEvent's own copies. This base stores the dispatcher
+// level than Event's own copies. This base stores the dispatcher
 // before the derived vtable is installed; its own vtable is not retained.
 template <typename T>
-class UnidentifiedQueuedEventBase : public UnidentifiedEvent<T>
+class QueuedEventBase : public Event<T>
 {
 public:
-    UnidentifiedQueuedEventBase(
+    QueuedEventBase(
         EventDispatcher* dispatcher, const char* name, int length)
-        : UnidentifiedEvent<T>(name, length)
+        : Event<T>(name, length)
         , mDispatcher(dispatcher)
     {
     }
 
-    virtual ~UnidentifiedQueuedEventBase() { }
+    virtual ~QueuedEventBase() { }
 
-    typedef typename UnidentifiedEvent<T>::Callback Callback;
+    typedef typename Event<T>::Callback Callback;
 
-    virtual void Add(const typename UnidentifiedEvent<T>::Callback& callback,
+    virtual void Add(const typename Event<T>::Callback& callback,
         unsigned int value, int flags)
     {
-        this->UnidentifiedAddListener(callback, value, flags);
+        this->AddListener(callback, value, flags);
     }
 
     void Dispatch(T* data, Function<T*> disposer, unsigned char deliver)
@@ -640,17 +640,17 @@ protected:
 };
 
 template <typename T>
-class UnidentifiedQueuedEvent : public UnidentifiedQueuedEventBase<T>
+class QueuedEvent : public QueuedEventBase<T>
 {
 public:
-    typedef typename UnidentifiedEvent<T>::Callback Callback;
+    typedef typename Event<T>::Callback Callback;
 
-    UnidentifiedQueuedEvent(EventDispatcher* dispatcher, const char* name, int length)
-        : UnidentifiedQueuedEventBase<T>(dispatcher, name, length)
+    QueuedEvent(EventDispatcher* dispatcher, const char* name, int length)
+        : QueuedEventBase<T>(dispatcher, name, length)
     {
     }
 
-    virtual ~UnidentifiedQueuedEvent() { }
+    virtual ~QueuedEvent() { }
 
     void Queue(T* data, const Function<T*>& disposer);
     void Queue(const Callback& disposer);
@@ -658,44 +658,44 @@ public:
 };
 
 template <typename T>
-void UnidentifiedQueuedEvent<T>::Queue(T* data, const Function<T*>& disposer)
+void QueuedEvent<T>::Queue(T* data, const Function<T*>& disposer)
 {
-    typedef void (UnidentifiedQueuedEventBase<T>::*DispatchFunction)(
+    typedef void (QueuedEventBase<T>::*DispatchFunction)(
         T*, Function<T*>, unsigned char);
     Function<bool> callback(
-        Bind<void>(MemFun((DispatchFunction)&UnidentifiedQueuedEventBase<T>::Dispatch),
+        Bind<void>(MemFun((DispatchFunction)&QueuedEventBase<T>::Dispatch),
             this, data, disposer, placeholder0));
     this->mDispatcher->Add(callback);
 }
 
 template <typename T>
-void UnidentifiedQueuedEvent<T>::Queue(const Callback& disposer)
+void QueuedEvent<T>::Queue(const Callback& disposer)
 {
-    typedef void (UnidentifiedQueuedEventBase<T>::*DispatchFunction)(
+    typedef void (QueuedEventBase<T>::*DispatchFunction)(
         Callback, unsigned char);
     Function<bool> callback(
-        Bind<void>(MemFun((DispatchFunction)&UnidentifiedQueuedEventBase<T>::Dispatch),
+        Bind<void>(MemFun((DispatchFunction)&QueuedEventBase<T>::Dispatch),
             this, disposer, placeholder0));
     this->mDispatcher->Add(callback);
 }
 
 template <typename P1, typename P2>
-class UnidentifiedEvent2 : public UnidentifiedTypedEvent<void(P1, P2)>
+class Event2 : public TypedEvent<void(P1, P2)>
 {
-    typedef UnidentifiedListener<void(P1, P2)> Listener;
+    typedef EventListener<void(P1, P2)> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
 
 public:
-    typedef typename UnidentifiedTypedEvent<void(P1, P2)>::Callback Callback;
+    typedef typename TypedEvent<void(P1, P2)>::Callback Callback;
 
-    UnidentifiedEvent2(const char* name, int length)
-        : UnidentifiedTypedEvent<void(P1, P2)>(name, length)
+    Event2(const char* name, int length)
+        : TypedEvent<void(P1, P2)>(name, length)
         , mListeners(16, 16)
     {
-        RegisterEvent(this, UnidentifiedTypedEvent<void(P1, P2)>::sType);
+        RegisterEvent(this, TypedEvent<void(P1, P2)>::sType);
     }
 
-    virtual ~UnidentifiedEvent2();
+    virtual ~Event2();
 
     void RemoveAll()
     {
@@ -707,7 +707,7 @@ public:
 
     virtual void Add(const Callback& callback, unsigned int value, int flags)
     {
-        UnidentifiedAddListener(callback, value, flags);
+        AddListener(callback, value, flags);
     }
 
     virtual void Disconnect(void* owner);
@@ -747,7 +747,7 @@ public:
 protected:
     // Add hands the listener its callback by reference: retail's copies
     // clear the caller's Function instead of cloning it.
-    void UnidentifiedAddListener(
+    void AddListener(
         const Callback& callback, unsigned int value, int flags)
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
@@ -770,7 +770,7 @@ public:
 };
 
 template <typename P1, typename P2>
-UnidentifiedEvent2<P1, P2>::~UnidentifiedEvent2()
+Event2<P1, P2>::~Event2()
 {
     RemoveAll();
     UnregisterEvent(this);
@@ -780,7 +780,7 @@ UnidentifiedEvent2<P1, P2>::~UnidentifiedEvent2()
 // re-anchored on the current list head before it continues past the entry
 // that was just delivered.
 template <typename P1, typename P2>
-void UnidentifiedEvent2<P1, P2>::RestartAt(
+void Event2<P1, P2>::RestartAt(
     nlDLListIterator<Listener>& iterator, ListenerEntry* current)
 {
     iterator.Copy(mListeners.Begin());
@@ -788,7 +788,7 @@ void UnidentifiedEvent2<P1, P2>::RestartAt(
 }
 
 template <typename P1, typename P2>
-void UnidentifiedEvent2<P1, P2>::Remove(Listener* listener)
+void Event2<P1, P2>::Remove(Listener* listener)
 {
     UnregisterEventConnection(this, listener);
     if (this->mCurrentConnection == listener)
@@ -801,14 +801,14 @@ void UnidentifiedEvent2<P1, P2>::Remove(Listener* listener)
 }
 
 template <typename P1, typename P2>
-DLListEntry<UnidentifiedListener<void(P1, P2)> >*
-UnidentifiedEvent2<P1, P2>::GetEntry(Listener* listener)
+DLListEntry<EventListener<void(P1, P2)> >*
+Event2<P1, P2>::GetEntry(Listener* listener)
 {
     return mListeners.Begin((ListenerEntry*)((char*)listener - 8)).CurrentEntry();
 }
 
 template <typename P1, typename P2>
-void UnidentifiedEvent2<P1, P2>::DeleteListener(Listener* listener)
+void Event2<P1, P2>::DeleteListener(Listener* listener)
 {
     ListenerEntry* entry = GetEntry(listener);
     nlDLRingRemove(&mListeners.m_Head, entry);
@@ -816,7 +816,7 @@ void UnidentifiedEvent2<P1, P2>::DeleteListener(Listener* listener)
 }
 
 template <typename P1, typename P2>
-void UnidentifiedEvent2<P1, P2>::Disconnect(void* owner)
+void Event2<P1, P2>::Disconnect(void* owner)
 {
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
@@ -824,48 +824,48 @@ void UnidentifiedEvent2<P1, P2>::Disconnect(void* owner)
 
 
 template <typename P1, typename P2>
-class ImmediateEvent<void(P1, P2)> : public UnidentifiedEvent2<P1, P2>
+class ImmediateEvent<void(P1, P2)> : public Event2<P1, P2>
 {
 public:
     ImmediateEvent(const char* name, int length)
-        : UnidentifiedEvent2<P1, P2>(name, length)
+        : Event2<P1, P2>(name, length)
     {
     }
     virtual ~ImmediateEvent() { }
 };
 
 template <typename ReturnType>
-class ImmediateEvent<ReturnType()> : public UnidentifiedEvent0<ReturnType>
+class ImmediateEvent<ReturnType()> : public Event0<ReturnType>
 {
 public:
     ImmediateEvent(const char* name, int length)
-        : UnidentifiedEvent0<ReturnType>(name, length)
+        : Event0<ReturnType>(name, length)
     {
     }
     virtual ~ImmediateEvent() { }
 };
 
 template <typename ReturnType>
-class UnidentifiedQueuedEvent<ReturnType()> : public UnidentifiedQueuedEventBase0<ReturnType>
+class QueuedEvent<ReturnType()> : public QueuedEventBase0<ReturnType>
 {
 public:
-    typedef typename UnidentifiedEvent0<ReturnType>::Callback Callback;
-    UnidentifiedQueuedEvent(EventDispatcher* dispatcher, const char* name, int length)
-        : UnidentifiedQueuedEventBase0<ReturnType>(dispatcher, name, length)
+    typedef typename Event0<ReturnType>::Callback Callback;
+    QueuedEvent(EventDispatcher* dispatcher, const char* name, int length)
+        : QueuedEventBase0<ReturnType>(dispatcher, name, length)
     {
     }
-    virtual ~UnidentifiedQueuedEvent() { }
+    virtual ~QueuedEvent() { }
     void Queue(const Callback& disposer);
     void Queue() { Queue(Callback()); }
 };
 
 template <typename ReturnType>
-void UnidentifiedQueuedEvent<ReturnType()>::Queue(const Callback& disposer)
+void QueuedEvent<ReturnType()>::Queue(const Callback& disposer)
 {
-    typedef void (UnidentifiedQueuedEventBase0<ReturnType>::*DispatchFunction)(
+    typedef void (QueuedEventBase0<ReturnType>::*DispatchFunction)(
         Callback, unsigned char);
     Function<bool> callback(
-        Bind<void>(MemFun((DispatchFunction)&UnidentifiedQueuedEventBase0<ReturnType>::Dispatch),
+        Bind<void>(MemFun((DispatchFunction)&QueuedEventBase0<ReturnType>::Dispatch),
             this, disposer, placeholder0));
     this->mDispatcher->Add(callback);
 }

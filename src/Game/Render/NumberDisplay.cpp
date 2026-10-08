@@ -83,7 +83,7 @@ NumberDisplay::NumberDisplay()
 
     typedef Detail::MemFunImpl<void, void (NumberDisplay::*)()> MemFunImpl_NumberDisplay_v;
     typedef BindExp1<void, MemFunImpl_NumberDisplay_v, NumberDisplay*> BindExp1_NumberDisplay_v;
-    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(BindExp1_NumberDisplay_v(MemFun(&NumberDisplay::OnGetReadyForKickoff), this)), 0, -1);
+    FindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(BindExp1_NumberDisplay_v(MemFun(&NumberDisplay::OnGetReadyForKickoff), this)), 0, -1);
 }
 
 NumberDisplay::~NumberDisplay()

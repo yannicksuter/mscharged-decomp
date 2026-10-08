@@ -1915,12 +1915,12 @@ int NetworkSession::ProcessMessage(
 static inline void RegisterLoadedGameActions(NetworkSession* session)
 {
     Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
-    UnidentifiedTypedEvent0<void>* pauseEvent
+    TypedEvent0<void>* pauseEvent
         = &g_pGame->mUnidentified49C.mPauseGameEvent;
     pauseEvent->Add(first, (unsigned int)&session->mPauseEventOwner, -1);
 
     Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
-    UnidentifiedTypedEvent0<void>* resumingEvent
+    TypedEvent0<void>* resumingEvent
         = &g_pGame->mUnidentified49C.mResumingGameEvent;
     resumingEvent->Add(second, (unsigned int)&session->mResumingEventOwner, -1);
 

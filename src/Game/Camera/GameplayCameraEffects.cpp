@@ -104,7 +104,7 @@ template <>
 GameplayCameraEffects*
     nlSingleton<GameplayCameraEffects>::s_pInstance = 0;
 
-static UnidentifiedTypedEvent<GoalieSaveData>*
+static TypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length);
 
 GameplayCameraEffects::GameplayCameraEffects()
@@ -129,21 +129,21 @@ GameplayCameraEffects::GameplayCameraEffects()
 
 void GameplayCameraEffects::RegisterEventListeners()
 {
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &GameplayCameraEffects::OnGoalScored)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &GameplayCameraEffects::OnGoalScored)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
+    FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
     GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSave)), 0, -1);
-    UnidentifiedFindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(BindMember(this, &GameplayCameraEffects::OnCollisionThwompPlayer)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackSuccess)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackAttempt)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackSuccess)), 0, -1);
+    FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(BindMember(this, &GameplayCameraEffects::OnCollisionThwompPlayer)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackSuccess)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackAttempt)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackSuccess)), 0, -1);
 }
 
 void GameplayCameraEffects::Update(float deltaTime)
@@ -800,12 +800,12 @@ void GameplayCameraEffects::OnGoalieSlamAttackSuccess(
 #include "NL/nlBindMember.inl"
 #include "NL/nlFunction.inl"
 
-static UnidentifiedTypedEvent<GoalieSaveData>*
+static TypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length)
 {
     unsigned int hash = HashEventName(name, length);
     EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
     EventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-    return (UnidentifiedTypedEvent<GoalieSaveData>*)event;
+    return (TypedEvent<GoalieSaveData>*)event;
 }

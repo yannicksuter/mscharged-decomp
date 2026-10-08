@@ -99,9 +99,9 @@ ChainChomp::ChainChomp(cSHierarchy& pHierarchy, int nModelID,
     mnThrowerPadID = -1;
     mbIsVisible = false;
 
-    UnidentifiedFindEvent<void>("CollisionFireballChain", -1)->Add(Function<void*>(CollisionFireballChain), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionChainCrowd", -1)->Add(Function<void*>(CollisionChainCrowd), 0, -1);
-    UnidentifiedFindEvent<CollisionChainPowerupData>("CollisionChainPowerup", -1)->Add(Function<CollisionChainPowerupData*>(CollisionChainPowerup), 0, -1);
+    FindEvent<void>("CollisionFireballChain", -1)->Add(Function<void*>(CollisionFireballChain), 0, -1);
+    FindEvent<void>("CollisionChainCrowd", -1)->Add(Function<void*>(CollisionChainCrowd), 0, -1);
+    FindEvent<CollisionChainPowerupData>("CollisionChainPowerup", -1)->Add(Function<CollisionChainPowerupData*>(CollisionChainPowerup), 0, -1);
     mpAvoidable = 0;
 }
 

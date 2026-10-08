@@ -10,20 +10,20 @@
 // the event's own destructor after the unit's vtables.
 template <typename P1, typename P2, typename P3, int Count>
 class UnidentifiedStaticEvent3
-    : public UnidentifiedTypedEvent3<P1, P2, P3>
+    : public TypedEvent3<P1, P2, P3>
 {
-    typedef UnidentifiedListener3<P1, P2, P3> Listener;
+    typedef EventListener3<P1, P2, P3> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
     typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
     typedef Function<void(P1, P2, P3)> Callback;
 
 public:
     UnidentifiedStaticEvent3(const char* name, int length)
-        : UnidentifiedTypedEvent3<P1, P2, P3>(name, length)
+        : TypedEvent3<P1, P2, P3>(name, length)
         , mListeners()
     {
         RegisterEvent(
-            this, UnidentifiedTypedEvent3<P1, P2, P3>::sType);
+            this, TypedEvent3<P1, P2, P3>::sType);
     }
 
     virtual ~UnidentifiedStaticEvent3();

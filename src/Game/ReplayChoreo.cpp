@@ -140,8 +140,8 @@ void ReplayChoreo::RegisterEventHandlers()
         Placeholder<0> >
         GoalieSaveBinding;
 
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(GoalScoredBinding(MemFun(&ReplayChoreo::OnGoalScored), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(GoalieSaveBinding(MemFun(&ReplayChoreo::OnGoalieSave), this, placeholder0)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(GoalScoredBinding(MemFun(&ReplayChoreo::OnGoalScored), this, placeholder0)), 0, -1);
+    FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(GoalieSaveBinding(MemFun(&ReplayChoreo::OnGoalieSave), this, placeholder0)), 0, -1);
 }
 
 void ReplayChoreo::OnGoalScored(GoalScoredData* data)

@@ -2714,17 +2714,17 @@ static const nlVector3 sBallTrailUpVector = { 0.0f, 1.0f, 0.0f };
 
 extern "C" void fn_80018A00()
 {
-    UnidentifiedFindEvent<void>("BallFall", -1)->Add(Function<void*>(OnBallFall), 0, -1);
-    UnidentifiedFindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(OnBallStateChange), 0, -1);
-    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(OnBallResetEffects), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
-    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(OnBallEggCollision), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);
-    UnidentifiedFindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
+    FindEvent<void>("BallFall", -1)->Add(Function<void*>(OnBallFall), 0, -1);
+    FindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(OnBallStateChange), 0, -1);
+    FindEvent<void>("ResetEffects", -1)->Add(Function<void*>(OnBallResetEffects), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
+    FindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
+    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
+    FindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
+    FindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(OnBallEggCollision), 0, -1);
+    FindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);
+    FindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
+    FindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
 
     lbl_806E0C10 = 0;
     unsigned int i = 0;

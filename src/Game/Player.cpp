@@ -1315,10 +1315,10 @@ void OnPlayerResetEffects(UnidentifiedEventData00*);
 
 extern "C" void fn_80098750()
 {
-    UnidentifiedFindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachFlash), 0, -1);
-    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasDown), 0, -1);
-    UnidentifiedFindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasAway), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(OnPlayerResetEffects), 0, -1);
+    FindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachFlash), 0, -1);
+    FindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasDown), 0, -1);
+    FindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasAway), 0, -1);
+    FindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(OnPlayerResetEffects), 0, -1);
 }
 
 static nlVector3 lbl_804FF5C8[] = {

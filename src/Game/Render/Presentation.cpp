@@ -732,43 +732,43 @@ void Presentation::RegisterEventListeners()
     {
         Function<GoalScoredData*> callback(
             BindMember(this, &Presentation::OnGoalScored));
-        UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)
+        FindEvent<GoalScoredData>("GoalScored", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<GoalieSaveData*> callback(
             BindMember(this, &Presentation::OnGoalieSave));
-        UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)
+        FindEvent<GoalieSaveData>("GoalieSave", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<FnVoidVoid> callback(
             BindMember(this, &Presentation::OnKickoff));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)
+        FindEvent<UnidentifiedEventNoData>("Kickoff", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<FnVoidVoid> callback(
             BindMember(this, &Presentation::OnSuddenDeath));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
+        FindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<FnVoidVoid> callback(
             BindMember(this, &Presentation::OnCharacterDirectionEnd));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>(
+        FindEvent<UnidentifiedEventNoData>(
             "CharacterDirectionEnd", -1)->Add(callback, 0, -1);
     }
     {
         Function<cPlayer*> callback(
             BindMember(this, &Presentation::OnMegaStrikeIntro));
-        UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)
+        FindEvent<cPlayer>("MegaStrikeIntro", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<MegaStrikeEndData*> callback(
             BindMember(this, &Presentation::OnMegaStrikeEnd));
-        UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)
+        FindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)
             ->Add(callback, 0, -1);
     }
 }

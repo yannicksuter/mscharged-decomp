@@ -1744,7 +1744,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     fn_8001FE80();
     fn_80018A00();
     GameplayCameraEffects::Instance()->RegisterEventListeners();
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mLoadingHandle, -1);
+    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mLoadingHandle, -1);
     GLResourcePool* pool = glGetCurrentResourcePool();
     Jumbotron::instance.Initialize(pool);
     CrowdManager::instance.Initialize(pool);

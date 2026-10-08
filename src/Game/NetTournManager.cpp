@@ -876,7 +876,7 @@ void NetTournManager::NotifyGameStarted()
 
         Function<FnVoidVoid> callback(NetTournManagerBinding(
             MemFun(&NetTournManager::NotifyGameOver), this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+        FindEvent<UnidentifiedEventNoData>("GameOver", -1)
             ->Add(callback, 0, -1);
     }
 

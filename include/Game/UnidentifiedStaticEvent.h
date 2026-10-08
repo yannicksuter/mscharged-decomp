@@ -5,10 +5,10 @@
 
 // An event whose listeners come from a fixed-size pool.
 template <typename T, int Count>
-class UnidentifiedStaticEvent : public UnidentifiedEventInterface<T>::Type
+class UnidentifiedStaticEvent : public EventInterface<T>::Type
 {
-    typedef typename UnidentifiedEventInterface<T>::Type TypedEvent;
-    typedef UnidentifiedListener<T> Listener;
+    typedef typename EventInterface<T>::Type TypedEvent;
+    typedef EventListener<T> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
     typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
 
@@ -35,7 +35,7 @@ public:
     virtual void Add(const Callback& callback, unsigned int value, int flags);
     virtual void Disconnect(void* owner);
 
-    void Deliver(typename UnidentifiedEventCallback<T>::Parameter data)
+    void Deliver(typename EventCallbackTraits<T>::Parameter data)
     {
         nlDLListIterator<Listener> iterator;
         iterator = mListeners.Begin();

@@ -52,13 +52,13 @@ StatsTracker* nlSingleton<StatsTracker>::s_pInstance = 0;
 static const char* STATS_FILE = "statsfile.csv";
 
 template <typename T>
-static inline UnidentifiedTypedEvent<T>* FindStatsEvent(const char* name)
+static inline TypedEvent<T>* FindStatsEvent(const char* name)
 {
     unsigned int hash = HashEventName(name, -1);
     EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
     EventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-    return (UnidentifiedTypedEvent<T>*)event;
+    return (TypedEvent<T>*)event;
 }
 
 template <typename P1, typename P2>

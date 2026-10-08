@@ -177,9 +177,9 @@ void DesireSuperPower::SetContext(
 
     if (m_pFielder->m_DetChar.m_eCharacterClass == PETEY)
     {
-        UnidentifiedFindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
-        UnidentifiedFindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
-        UnidentifiedFindEvent<void>("CollisionPatchWall", -1)->Add(Function<void*>(HandleMuckBallWallCollision), 0, -1);
+        FindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
+        FindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
+        FindEvent<void>("CollisionPatchWall", -1)->Add(Function<void*>(HandleMuckBallWallCollision), 0, -1);
     }
 }
 

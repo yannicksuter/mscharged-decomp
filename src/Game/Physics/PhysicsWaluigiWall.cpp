@@ -406,10 +406,10 @@ WaluigiWallManager::WaluigiWallManager()
     , mEmitterStarted(false)
     , mHeightUpdateDelay(0.0f)
 {
-    UnidentifiedFindEvent<cPlayer>(gWaluigiWallStartEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallStart), (unsigned int)&mStartConnection, -1);
-    UnidentifiedFindEvent<cPlayer>(gWaluigiWallEndEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallEnd), (unsigned int)&mEndConnection, -1);
-    UnidentifiedFindEvent<cPlayer>(gWaluigiWallAbortEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallAbort), (unsigned int)&mAbortConnection, -1);
-    UnidentifiedFindEvent<void>(gWaluigiWallMegastrikeEventName, -1)->Add(Function<void*>(OnWaluigiWallMegastrikeStart), (unsigned int)&mMegastrikeConnection, -1);
+    FindEvent<cPlayer>(gWaluigiWallStartEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallStart), (unsigned int)&mStartConnection, -1);
+    FindEvent<cPlayer>(gWaluigiWallEndEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallEnd), (unsigned int)&mEndConnection, -1);
+    FindEvent<cPlayer>(gWaluigiWallAbortEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallAbort), (unsigned int)&mAbortConnection, -1);
+    FindEvent<void>(gWaluigiWallMegastrikeEventName, -1)->Add(Function<void*>(OnWaluigiWallMegastrikeStart), (unsigned int)&mMegastrikeConnection, -1);
     for (unsigned int i = 0; i < 20; ++i)
         mWalls[i] = 0;
     ++gWaluigiWallManagerCount;

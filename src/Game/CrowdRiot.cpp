@@ -83,10 +83,10 @@ CrowdRiot::CrowdRiot(bool enableRiot)
         mv3Target.z = 0.0f;
     }
 
-    UnidentifiedFindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(OnCrowdRiotCollision), 0, -1);
-    UnidentifiedFindEvent<void>("GoalScored", -1)->Add(Function<void*>(OnCrowdRiotGoalScored), 0, -1);
-    UnidentifiedFindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(OnCrowdRiotMegastrikeEnd), 0, -1);
-    UnidentifiedFindEvent<void>("GameOver", -1)->Add(Function<void*>(OnCrowdRiotGameOver), 0, -1);
+    FindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(OnCrowdRiotCollision), 0, -1);
+    FindEvent<void>("GoalScored", -1)->Add(Function<void*>(OnCrowdRiotGoalScored), 0, -1);
+    FindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(OnCrowdRiotMegastrikeEnd), 0, -1);
+    FindEvent<void>("GameOver", -1)->Add(Function<void*>(OnCrowdRiotGameOver), 0, -1);
 }
 
 CrowdRiot::~CrowdRiot()
