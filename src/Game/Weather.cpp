@@ -1269,7 +1269,7 @@ void BubblingLava::Stop(bool initialize)
 
 StormShipWeather::StormShipWeather()
 {
-    fn_800B0358();
+    InitChainLightningPaths();
     meWeather = 6;
     Reset();
     m_StartWeatherTimer = gStormStartDelay;
@@ -1326,13 +1326,13 @@ void StormShipWeather::CreateChainLightning(int index)
     int count;
     if (m_bRightSide == true)
     {
-        points = fn_800B048C(index);
-        count = fn_800B04A0(index);
+        points = GetRightChainLightningPath(index);
+        count = GetRightChainLightningPathLength(index);
     }
     else
     {
-        points = fn_800B0464(index);
-        count = fn_800B0478(index);
+        points = GetLeftChainLightningPath(index);
+        count = GetLeftChainLightningPathLength(index);
     }
     patch->SetWorldPosition(*points);
     patch->SetPath(points, count, gStormChainSpeed);
@@ -1359,11 +1359,11 @@ void StormShipWeather::Start()
     m_bRightSide = g_pBall->m_v3Position.x > 0.0f;
     m_FirstStrikeTimer = gStormFirstStrikeDelay;
     m_StartWeatherTimer = gStormStartDelay;
-    m_PathIndex1 = RandomWeatherIndex(fn_800B045C() - 1);
+    m_PathIndex1 = RandomWeatherIndex(GetNumChainLightningPaths() - 1);
     m_PathIndex2 = m_PathIndex1;
     while (m_PathIndex2 == m_PathIndex1)
     {
-        m_PathIndex2 = RandomWeatherIndex(fn_800B045C() - 1);
+        m_PathIndex2 = RandomWeatherIndex(GetNumChainLightningPaths() - 1);
     }
     m_ChainCount = 0;
     WorldDarkening::Instance().Fade(gStormFadeTime, gStormDarkness);
@@ -1640,9 +1640,9 @@ void SandTombWeather::CreateSandPatches()
     }
     for (int side = 0; side < 2; side++)
     {
-        for (int i = 0; i < fn_800B04B4(this); i++)
+        for (int i = 0; i < GetNumSandPatches(this); i++)
         {
-            nlVector4 patch = fn_800B04BC(this, i, side == 1);
+            nlVector4 patch = GetSandPatch(this, i, side == 1);
             nlVector3 position = { patch.x, patch.y, patch.z };
             lbl_806E12C8->CreatePatch(11, 0, position, v3Zero, patch.w, patch.w, 99999.0f);
         }

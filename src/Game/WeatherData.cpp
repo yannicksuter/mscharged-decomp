@@ -120,7 +120,7 @@ static int sRightChainPathLengths[6];
 static nlVector3* sLeftChainPaths[6];
 static int sLeftChainPathLengths[6];
 
-void fn_800B0358()
+void InitChainLightningPaths()
 {
     sRightChainPaths[0] = sRightChainPath0;
     sRightChainPathLengths[0] = ARRAY_COUNT(sRightChainPath0);
@@ -149,37 +149,37 @@ void fn_800B0358()
     sLeftChainPathLengths[5] = ARRAY_COUNT(sLeftChainPath5);
 }
 
-int fn_800B045C()
+int GetNumChainLightningPaths()
 {
     return ARRAY_COUNT(sLeftChainPaths);
 }
 
-nlVector3* fn_800B0464(int index)
+nlVector3* GetLeftChainLightningPath(int index)
 {
     return sLeftChainPaths[index];
 }
 
-int fn_800B0478(int index)
+int GetLeftChainLightningPathLength(int index)
 {
     return sLeftChainPathLengths[index];
 }
 
-nlVector3* fn_800B048C(int index)
+nlVector3* GetRightChainLightningPath(int index)
 {
     return sRightChainPaths[index];
 }
 
-int fn_800B04A0(int index)
+int GetRightChainLightningPathLength(int index)
 {
     return sRightChainPathLengths[index];
 }
 
-int fn_800B04B4(SandTombWeather*)
+int GetNumSandPatches(SandTombWeather*)
 {
     return ARRAY_COUNT(sSandPatches);
 }
 
-nlVector4 fn_800B04BC(SandTombWeather*, int index, bool side)
+nlVector4 GetSandPatch(SandTombWeather*, int index, bool side)
 {
     nlVector4 patch = sSandPatches[index];
     if (side == true)
