@@ -18,6 +18,17 @@ enum eJointBinding
     JB_Num = 2
 };
 
+enum eFXForwardAxis
+{
+    FX_FORWARD_DIRECTION = 0,
+    FX_FORWARD_POSITIVE_X = 1,
+    FX_FORWARD_POSITIVE_Y = 2,
+    FX_FORWARD_POSITIVE_Z = 3,
+    FX_FORWARD_NEGATIVE_X = 4,
+    FX_FORWARD_NEGATIVE_Y = 5,
+    FX_FORWARD_NEGATIVE_Z = 6,
+};
+
 struct EffectsSpec
 {
     /* 0x00 */ unsigned long m_uHashID;
@@ -40,7 +51,7 @@ struct EffectsSpec
     /* 0x3C */ float m_fLingerStart;
     /* 0x40 */ float m_fLingerEnd;
     /* 0x44 */ unsigned long m_uLayer;
-    /* 0x48 */ int m_nForwardAxis;
+    /* 0x48 */ eFXForwardAxis m_nForwardAxis;
     /* 0x4C */ unsigned char mPadding04C[0x0C];
 }; // size: 0x58
 
