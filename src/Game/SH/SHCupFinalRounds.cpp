@@ -24,7 +24,6 @@
 #include "Game/SH/SHGameResults.h"
 #include "NL/nlString.h"
 
-class SHNavigation;
 
 
 static inline TLImageInstance* FindCupImage(FEPresentation* presentation, const char* name)
