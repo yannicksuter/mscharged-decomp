@@ -168,7 +168,7 @@ private:
     }
 };
 
-class StringAllocator_801CBA50
+class TempStringHeapAllocator
 {
 public:
     enum { kAtEnd = true };
