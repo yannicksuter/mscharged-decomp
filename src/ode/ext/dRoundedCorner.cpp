@@ -9,9 +9,9 @@ int dRoundedCornerClassUser = -1;
 
 struct RoundedCornerData
 {
-    float param;
-    bool flag1;
-    bool flag2;
+    float radius;
+    bool extendPositiveX;
+    bool extendPositiveY;
 };
 
 static void dRoundedCornerAABB(dGeomID geomID, float* aabb)
@@ -21,22 +21,22 @@ static void dRoundedCornerAABB(dGeomID geomID, float* aabb)
     float maxX;
     float minY;
     float maxY;
-    unsigned int extendPosX;
-    unsigned int extendPosY;
+    unsigned int extendPositiveX;
+    unsigned int extendPositiveY;
     RoundedCornerData* data;
     const float* position;
 
     data = (RoundedCornerData*)dGeomGetClassData(geomID);
-    radius = data->param;
-    extendPosX = data->flag1;
-    extendPosY = data->flag2;
+    radius = data->radius;
+    extendPositiveX = data->extendPositiveX;
+    extendPositiveY = data->extendPositiveY;
     position = dGeomGetPosition(geomID);
     minX = position[0];
     minY = position[1];
     maxX = minX;
     maxY = minY;
 
-    if (extendPosX != 0)
+    if (extendPositiveX != 0)
     {
         maxX += radius;
     }
@@ -45,7 +45,7 @@ static void dRoundedCornerAABB(dGeomID geomID, float* aabb)
         minX -= radius;
     }
 
-    if (extendPosY != 0)
+    if (extendPositiveY != 0)
     {
         maxY += radius;
     }
@@ -63,7 +63,7 @@ static void dRoundedCornerAABB(dGeomID geomID, float* aabb)
 }
 
 static int dCollideRoundedCorner(dGeomID cornerGeomID, dGeomID otherGeomID,
-    bool flag1, bool flag2, float cornerRadius, float otherRadius,
+    bool extendPositiveX, bool extendPositiveY, float cornerRadius, float otherRadius,
     const float* cornerPosition, const float* otherPosition, dContactGeom* contact)
 {
     float distanceSquared;
@@ -82,7 +82,7 @@ static int dCollideRoundedCorner(dGeomID cornerGeomID, dGeomID otherGeomID,
 
     xCheck = deltaX > 0.0f;
     yCheck = deltaY > 0.0f;
-    if (xCheck != flag1 || yCheck != flag2)
+    if (xCheck != extendPositiveX || yCheck != extendPositiveY)
     {
         result = 0;
     }
@@ -119,34 +119,34 @@ int dCollideRoundedCornerSphere(dGeomID cornerGeomID, dGeomID sphereGeomID, int,
     dContactGeom* contact, int)
 {
     RoundedCornerData* data = (RoundedCornerData*)dGeomGetClassData(cornerGeomID);
-    float cornerRadius = data->param;
-    bool flag1 = data->flag1;
-    bool flag2 = data->flag2;
+    float cornerRadius = data->radius;
+    bool extendPositiveX = data->extendPositiveX;
+    bool extendPositiveY = data->extendPositiveY;
     float sphereRadius = dGeomSphereGetRadius(sphereGeomID);
     const float* cornerPosition = dGeomGetPosition(cornerGeomID);
     const float* spherePosition = dGeomGetPosition(sphereGeomID);
 
-    return dCollideRoundedCorner(cornerGeomID, sphereGeomID, flag1, flag2, cornerRadius, sphereRadius, cornerPosition, spherePosition, contact);
+    return dCollideRoundedCorner(cornerGeomID, sphereGeomID, extendPositiveX, extendPositiveY, cornerRadius, sphereRadius, cornerPosition, spherePosition, contact);
 }
 
 int dCollideRoundedCornerColumn(dGeomID cornerGeomID, dGeomID columnGeomID, int,
     dContactGeom* contact, int)
 {
     RoundedCornerData* data = (RoundedCornerData*)dGeomGetClassData(cornerGeomID);
-    float cornerRadius = data->param;
-    bool flag1 = data->flag1;
-    bool flag2 = data->flag2;
+    float cornerRadius = data->radius;
+    bool extendPositiveX = data->extendPositiveX;
+    bool extendPositiveY = data->extendPositiveY;
     float columnRadius;
     dGeomColumnGetParams(columnGeomID, &columnRadius);
     const float* cornerPosition = dGeomGetPosition(cornerGeomID);
     const float* columnPosition = dGeomGetPosition(columnGeomID);
 
-    return dCollideRoundedCorner(cornerGeomID, columnGeomID, flag1, flag2, cornerRadius, columnRadius, cornerPosition, columnPosition, contact);
+    return dCollideRoundedCorner(cornerGeomID, columnGeomID, extendPositiveX, extendPositiveY, cornerRadius, columnRadius, cornerPosition, columnPosition, contact);
 }
 
 static dColliderFn* dRoundedCornerColliderFn(int num)
 {
-    if (num == 0)
+    if (num == dSphereClass)
     {
         return &dCollideRoundedCornerSphere;
     }
@@ -159,7 +159,7 @@ static dColliderFn* dRoundedCornerColliderFn(int num)
     return 0;
 }
 
-dGeomID dCreateRoundedCorner(dSpaceID space, float param, bool flag1, bool flag2)
+dGeomID dCreateRoundedCorner(dSpaceID space, float radius, bool extendPositiveX, bool extendPositiveY)
 {
     if (dRoundedCornerClassUser == -1)
     {
@@ -179,8 +179,8 @@ dGeomID dCreateRoundedCorner(dSpaceID space, float param, bool flag1, bool flag2
     }
 
     RoundedCornerData* data = (RoundedCornerData*)dGeomGetClassData(geomID);
-    data->param = param;
-    data->flag1 = flag1;
-    data->flag2 = flag2;
+    data->radius = radius;
+    data->extendPositiveX = extendPositiveX;
+    data->extendPositiveY = extendPositiveY;
     return geomID;
 }

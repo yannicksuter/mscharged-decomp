@@ -3,6 +3,7 @@
 
 #include <ode/collision.h>
 
-dGeomID dCreateRoundedCorner(dSpaceID, float, bool, bool);
+dGeomID dCreateRoundedCorner(dSpaceID space, float radius,
+    bool extendPositiveX, bool extendPositiveY);
 
 #endif
