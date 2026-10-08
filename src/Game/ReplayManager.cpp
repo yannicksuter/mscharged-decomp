@@ -239,7 +239,7 @@ UnidentifiedMakeReplayBinding(
 void ReplayManager::RegisterEventHandlers()
 {
     UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnReceiveBall, this)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_80066590>("ShotAtGoal", -1)->Add(Function<UnidentifiedEventData_80066590*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
+    UnidentifiedFindEvent<ShotAtGoalData>("ShotAtGoal", -1)->Add(Function<ShotAtGoalData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
     UnidentifiedFindEvent<PassBallData>("PassBall", -1)->Add(Function<PassBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
     UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
     UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
@@ -264,7 +264,7 @@ void ReplayManager::OnReceiveBall(ReceiveBallData* event)
     mEvents |= 4;
 }
 
-void ReplayManager::OnShotAtGoal(UnidentifiedEventData_80066590* event)
+void ReplayManager::OnShotAtGoal(ShotAtGoalData* event)
 {
     mEvents |= 2;
 }
