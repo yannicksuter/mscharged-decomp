@@ -269,7 +269,7 @@ unsigned char FERender::RenderImageInstance(const TLImageInstance* pTLImageInsta
     glSetRasterState(GLS_Culling, 0);
     if (textureHandle != grabTex && textureHandle != movieTex)
     {
-        glSetRasterState(GLS_AlphaBlend, pTLImageInstance->field_0x94);
+        glSetRasterState(GLS_AlphaBlend, pTLImageInstance->m_uAlphaBlendMode);
         glSetRasterState(GLS_AlphaTest, 1);
         glSetRasterState(GLS_AlphaTestRef, 0);
     }
