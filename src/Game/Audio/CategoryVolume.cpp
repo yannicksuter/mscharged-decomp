@@ -2,6 +2,7 @@
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/Audio/AudioBundleManager.h"
+#include "Game/Audio/AudioCalculation.h"
 #include "Game/Audio/CategoryVolume.h"
 #include "NL/nlAlgorithm.h"
 #include "NL/nlMemory.h"
@@ -25,30 +26,6 @@ struct CategoryEntry
 
     u32 m_Hash;
     u16 m_Index;
-};
-
-struct CategoryRuntimeState
-{
-    u8 m_Pad00[8];
-    float m_Volume;
-};
-
-struct CategoryBackendEntry
-{
-    u8 m_Pad00[0xC];
-    float m_Current;
-    float m_Transition;
-    u8 m_Pad14[4];
-    float m_Minimum;
-    float m_Maximum;
-    u8 m_Pad20[4];
-    CategoryRuntimeState* m_State;
-};
-
-struct CategoryBackendTable
-{
-    u8 m_Pad00[8];
-    CategoryBackendEntry* m_Entries;
 };
 
 static CategoryEntry s_CategoryEntries[5] = {
@@ -103,17 +80,17 @@ void CategoryVolume::CreateParameter(u32 definition, const void*, bool negate,
     CategoryEntry* entry = FindCategoryEntry(parameter->m_Category);
     if (entry != 0)
     {
-        CategoryBackendEntry* backend
-            = &((CategoryBackendTable*)g_pAudioSystem->GetBundleManager()->GetCalculationTable())
-                   ->m_Entries[entry->m_Index];
-        backend->m_State->m_Volume = parameter->m_Volume;
-        if (parameter->m_Volume < backend->m_Minimum)
-            backend->m_Current = backend->m_Minimum;
-        else if (parameter->m_Volume > backend->m_Maximum)
-            backend->m_Current = backend->m_Maximum;
+        AudioCalculationSlider* backend
+            = &((AudioCalculationTable*)g_pAudioSystem->GetBundleManager()->GetCalculationTable())
+                   ->sliders[entry->m_Index];
+        backend->definition->initialValue = parameter->m_Volume;
+        if (parameter->m_Volume < backend->minimum)
+            backend->target = backend->minimum;
+        else if (parameter->m_Volume > backend->maximum)
+            backend->target = backend->maximum;
         else
-            backend->m_Current = parameter->m_Volume;
-        backend->m_Transition = 0.0f;
+            backend->target = parameter->m_Volume;
+        backend->remainingTime = 0.0f;
     }
 }
 
