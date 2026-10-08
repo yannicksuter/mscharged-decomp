@@ -1,7 +1,6 @@
 #include <revolution/gx.h>
 #include "NL/gl/glTexture.h"
 
-#include "NL/gl/glTexture.h"
 #include "NL/glx/glxTarget.h"
 
 #include "NL/gc/gcSwizzler.h"
@@ -12,7 +11,6 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "NL/gl/glTexture.h"
 
 static GLXTarget* sBackBufferTarget;
 static GLXTarget* sCurrentTarget;
@@ -53,8 +51,8 @@ void GLXTarget::ReservedTargetHookA()
 void GLXTarget::CreateTexture(unsigned long hash)
 {
     mTextureHash = hash;
-    MemoryAllocator* allocator = (MemoryAllocator*)glGetCurrentResourcePool();
-    if (mFormat == 6)
+    GLResourcePool* allocator = glGetCurrentResourcePool();
+    if (mFormat == GLTargetFormat_A8)
     {
         mTextureData = glResourceAlloc(GXGetTexBufferSize(
                                                mWidth, mHeight, GX_CTF_A8, false, 0),
@@ -65,7 +63,7 @@ void GLXTarget::CreateTexture(unsigned long hash)
         mTexture->Prepare();
         mCopyFormat = GX_CTF_A8;
     }
-    else if (mFormat == 7)
+    else if (mFormat == GLTargetFormat_IA8)
     {
         mTextureData = glResourceAlloc(GXGetTexBufferSize(
                                                mWidth, mHeight, GX_TF_IA8, false, 0),
@@ -79,12 +77,12 @@ void GLXTarget::CreateTexture(unsigned long hash)
     else
     {
         eGXTextureFormat format;
-        if (mFormat == 0)
+        if (mFormat == GLTargetFormat_RGB5A3)
         {
             mCopyFormat = GX_TF_RGB5A3;
             format = GXTex_RGB5A3;
         }
-        else if (mFormat == 5)
+        else if (mFormat == GLTargetFormat_RGBA8)
         {
             mCopyFormat = GX_TF_RGBA8;
             format = GXTex_RGBA8;
