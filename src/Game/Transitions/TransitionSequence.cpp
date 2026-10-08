@@ -11,6 +11,13 @@
 #include "Game/Transitions/ModelTransition.h"
 #include "Game/Transitions/ScriptedTransition.h"
 
+enum TransitionPlaybackState
+{
+    TRANSITION_PENDING = 0,
+    TRANSITION_PLAYING = 1,
+    TRANSITION_FINISHED = 2,
+};
+
 TransitionSequence::TransitionSequence()
 {
     m_pTransitions = NULL;
@@ -62,7 +69,7 @@ void TransitionSequence::Update(float dt)
 {
     for (int i = 0; i < m_nNumTransitions; i++)
     {
-        if (m_pPlaying[i] == 1)
+        if (m_pPlaying[i] == TRANSITION_PLAYING)
         {
             m_pTransitions[i]->Update(dt);
 
@@ -86,7 +93,7 @@ void TransitionSequence::Update(float dt)
             if (isFinished)
             {
                 m_pTransitions[i]->Cancel();
-                m_pPlaying[i] = 2;
+                m_pPlaying[i] = TRANSITION_FINISHED;
             }
 
             if (next < m_nNumTransitions)
@@ -97,11 +104,11 @@ void TransitionSequence::Update(float dt)
                     manager->m_pCallback->SequenceSwitch();
                 }
 
-                if (m_pPlaying[next] == 0)
+                if (m_pPlaying[next] == TRANSITION_PENDING)
                 {
                     m_pTransitions[next]->Reset();
                     m_pTransitions[next]->Update(0.0f);
-                    m_pPlaying[next] = 1;
+                    m_pPlaying[next] = TRANSITION_PLAYING;
                 }
             }
         }
@@ -123,11 +130,11 @@ void TransitionSequence::Reset()
 {
     for (int i = 0; i < m_nNumTransitions; i++)
     {
-        m_pPlaying[i] = 0;
+        m_pPlaying[i] = TRANSITION_PENDING;
         m_pTransitions[i]->Reset();
     }
 
-    m_pPlaying[0] = 1;
+    m_pPlaying[0] = TRANSITION_PLAYING;
     m_Time = 0.0f;
 }
 
@@ -135,7 +142,7 @@ void TransitionSequence::Render(GLView* glView)
 {
     for (int i = 0; i < m_nNumTransitions; i++)
     {
-        if (m_pPlaying[i] == 1)
+        if (m_pPlaying[i] == TRANSITION_PLAYING)
         {
             m_pTransitions[i]->Render(glView);
         }
@@ -174,7 +181,7 @@ bool TransitionSequence::IsFinished()
 {
     for (int i = 0; i < m_nNumTransitions; i++)
     {
-        if (m_pPlaying[i] != 2)
+        if (m_pPlaying[i] != TRANSITION_FINISHED)
         {
             return false;
         }
@@ -268,6 +275,6 @@ void TransitionSequence::Initialize(SimpleParser* parser)
     m_pPlaying = (char*)nlMalloc(m_nNumTransitions, 8, false);
     for (int i = 0; i < m_nNumTransitions; i++)
     {
-        m_pPlaying[i] = 0;
+        m_pPlaying[i] = TRANSITION_PENDING;
     }
 }
