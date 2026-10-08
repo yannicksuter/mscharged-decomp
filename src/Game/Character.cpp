@@ -39,7 +39,7 @@
 #include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/ExcitementSystem.h"
-#include "Game/UnidentifiedBitPacker.h"
+#include "Game/BitPacker.h"
 #include "Game/CharacterTriggers.h"
 #include "Game/SAnim/pnBlender.h"
 #include "Game/Blinker.h"

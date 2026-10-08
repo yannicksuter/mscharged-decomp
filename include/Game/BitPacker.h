@@ -1,5 +1,5 @@
-#ifndef GAME_UNIDENTIFIED_BIT_PACKER_H
-#define GAME_UNIDENTIFIED_BIT_PACKER_H
+#ifndef GAME_BIT_PACKER_H
+#define GAME_BIT_PACKER_H
 
 #include "Game/AI/AiUtil.h"
 #include "Game/MathHelpers.h"
