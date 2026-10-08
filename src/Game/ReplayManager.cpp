@@ -145,7 +145,7 @@ void RenderSnapshot::Replay(T& frame)
     Replayable<0>(frame, mBall);
     Replayable<1>(frame, mCameraUp);
     Replayable<1>(frame, mGoalLight);
-    Replayable<1>(frame, CrowdManager::fn_801919AC());
+    Replayable<1>(frame, CrowdManager::Instance());
     Replayable<0>(frame, WorldDarkening::Instance());
     if ((mFlags.raw >> 23) & 1)
     {

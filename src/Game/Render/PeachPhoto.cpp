@@ -127,7 +127,7 @@ void StartPeachPhoto(PeachPhotoState* photo,
     photo->projected = false;
     photo->fadeTime = 0.0f;
     RLView* view = GetLayerView(eCLV_Characters);
-    view->m_Target = 8;
+    view->m_Target = GLViewTarget_Mode8;
 }
 
 void EndPeachPhoto(PeachPhotoState* photo, bool immediate)
@@ -137,7 +137,7 @@ void EndPeachPhoto(PeachPhotoState* photo, bool immediate)
         if (immediate)
         {
             photo->state = PEACH_PHOTO_INACTIVE;
-            GetLayerView(eCLV_Characters)->m_Target = 0;
+            GetLayerView(eCLV_Characters)->m_Target = GLViewTarget_None;
         }
         else
         {
@@ -329,7 +329,7 @@ void UpdatePeachPhoto(
                 photo->lastFrame = currentFrame;
                 photo->textureReady = true;
                 RLView* view = GetLayerView(eCLV_Characters);
-                view->m_Target = 0;
+                view->m_Target = GLViewTarget_None;
             }
             else
             {
@@ -452,7 +452,7 @@ void RenderPeachPhoto(PeachPhotoState* photo)
     texture[2] = sPeachPhotoTexcoords[2];
     texture[3] = sPeachPhotoTexcoords[3];
 
-    if (writer.Begin(4, 3, 0))
+    if (writer.Begin(4, GLP_QuadList, 0))
     {
         for (int i = 0; i < 4; ++i)
         {
