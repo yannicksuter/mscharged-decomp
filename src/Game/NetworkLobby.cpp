@@ -89,7 +89,7 @@ void NetworkLobby::Reset()
     mMinCompletionElapsedMsLow = 0;
     mMinCompletionElapsedMsHigh = 0;
     mMinCompletionState = -1;
-    mState = 0;
+    mState = NET_LOBBY_IDLE;
     mMatchFailed = false;
     mCancelRequested = false;
     mLateCancelRequested = false;
@@ -219,7 +219,7 @@ int NetworkLobby::GetPlayerCount()
     {
         if (mFriendMatch)
         {
-            if (mState == 2 && AllMachineInfoReceived())
+            if (mState == NET_LOBBY_FRIEND_EXCHANGE_INFO && AllMachineInfoReceived())
             {
                 if (gOnlineFourMachineFriendLobby)
                 {
@@ -234,7 +234,7 @@ int NetworkLobby::GetPlayerCount()
                 }
             }
         }
-        else if (mState == 7)
+        else if (mState == NET_LOBBY_READY)
         {
             return mMachineCount;
         }
@@ -244,7 +244,7 @@ int NetworkLobby::GetPlayerCount()
 
 bool NetworkLobby::AreAllConnectionsReady()
 {
-    if (mState == 2 && AllMachineInfoReceived())
+    if (mState == NET_LOBBY_FRIEND_EXCHANGE_INFO && AllMachineInfoReceived())
     {
         return true;
     }
@@ -284,7 +284,7 @@ void NetworkLobby::OnConnected(unsigned int connection, int result)
     {
         if (mPlayers[i].mConnection == connection)
         {
-            mPlayers[i].mConnectionState = 5;
+            mPlayers[i].mConnectionState = NET_PEER_CONNECTED;
             tDebugPrintManager::Print(DC_NETWORK, "Connection %d established I am %d\n", i, DWC_GetMyAID());
             return;
         }
@@ -302,7 +302,7 @@ int NetworkLobby::ShouldAcceptConnection(
     if (aid < myAid)
     {
         mPlayers[aid].mConnection = connection;
-        mPlayers[aid].mConnectionState = 5;
+        mPlayers[aid].mConnectionState = NET_PEER_CONNECTED;
         tDebugPrintManager::Print(DC_NETWORK, "Accepting connection from %d to me %d\n", aid, myAid);
         return 1;
     }
@@ -362,7 +362,7 @@ void NetworkLobby::CloseConnections()
 
     int result = DWC_CloseAllConnectionsHard();
     tDebugPrintManager::Print(DC_NETWORK, "DWC_CloseAllConnectionsHard returned %d\n", result);
-    bool failed = mMatchmakingThreadRunning || mState != 0;
+    bool failed = mMatchmakingThreadRunning || mState != NET_LOBBY_IDLE;
     if (failed)
     {
         mMatchFailed = true;
@@ -443,7 +443,7 @@ bool NetworkLobby::CanCancelMatchmaking()
     {
         return false;
     }
-    if ((mState == 3 || mState == 1) && DWC_IsValidCancelMatching())
+    if ((mState == NET_LOBBY_MATCHMAKING || mState == NET_LOBBY_FRIEND_MATCHING) && DWC_IsValidCancelMatching())
     {
         return true;
     }
@@ -456,7 +456,7 @@ void NetworkLobby::CancelMatchmaking()
     DWC_CancelMatching();
     mCancelRequested = false;
     g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
-    mState = 0;
+    mState = NET_LOBBY_IDLE;
 }
 
 bool NetworkLobby::StartMatchmaking()
@@ -557,14 +557,14 @@ bool NetworkLobby::StartMatchmaking()
         tDebugPrintManager::Print(DC_NETWORK,
             "Initial failure of DWC_ConnectToAnybodyAsync\n");
         g_pNetworkSession->ReadAndClearDWCError();
-        mState = 0;
+        mState = NET_LOBBY_IDLE;
         mMatchFailed = true;
         return false;
     }
 
     tDebugPrintManager::Print(DC_NETWORK,
         "Started DWC_ConnectToAnybodyAsync with filter %s\n", filter);
-    mState = 3;
+    mState = NET_LOBBY_MATCHMAKING;
     g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(true);
     return true;
 }
@@ -615,13 +615,13 @@ void NetworkLobby::OnMatchmakingResult(
             mPlayers[aid].mConnection = 0;
             mPlayers[aid].mName[0] = 0;
             mPlayers[aid].mUserMatchDataSize = 0;
-            mPlayers[aid].mConnectionState = 0;
+            mPlayers[aid].mConnectionState = NET_PEER_INITIAL;
             if (aid != DWC_GetMyAID())
             {
                 DWC_SetRecvBuffer(aid, mReceiveBuffers[aid], 0x4000);
             }
         }
-        mState = 4;
+        mState = NET_LOBBY_CONNECT_PEERS;
         mConnectionDeadline = mElapsedTime + s_fConnectionTimeout;
     }
     else
@@ -629,7 +629,7 @@ void NetworkLobby::OnMatchmakingResult(
         tDebugPrintManager::Print(DC_NETWORK, "Matching Error\n");
         g_pNetworkSession->ReadAndClearDWCError();
         g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
-        mState = 0;
+        mState = NET_LOBBY_IDLE;
         mMatchFailed = true;
     }
 }
@@ -662,13 +662,13 @@ bool NetworkLobby::StartFriendServer()
     {
         tDebugPrintManager::Print(DC_NETWORK, "Initial failure of DWC_SetupGameServer\n");
         g_pNetworkSession->ReadAndClearDWCError();
-        mState = 0;
+        mState = NET_LOBBY_IDLE;
         mMatchFailed = true;
         return false;
     }
 
     tDebugPrintManager::Print(DC_NETWORK, "Started DWC_SetupGameServer\n");
-    mState = 1;
+    mState = NET_LOBBY_FRIEND_MATCHING;
     g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(true);
     return true;
 }
@@ -703,13 +703,13 @@ bool NetworkLobby::ConnectToFriendServer(int profileId)
     {
         tDebugPrintManager::Print(DC_NETWORK, "Initial failure of DWC_ConnectToGameServerAsync\n");
         g_pNetworkSession->ReadAndClearDWCError();
-        mState = 0;
+        mState = NET_LOBBY_IDLE;
         mMatchFailed = true;
         return false;
     }
 
     tDebugPrintManager::Print(DC_NETWORK, "Started DWC_ConnectToGameServerAsync\n");
-    mState = 1;
+    mState = NET_LOBBY_FRIEND_MATCHING;
     g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(true);
     return true;
 }
@@ -773,7 +773,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
                 mPlayers[mMachineCount].mConnection = 0;
                 mPlayers[mMachineCount].mName[0] = 0;
                 mPlayers[mMachineCount].mUserMatchDataSize = 0;
-                mPlayers[mMachineCount].mConnectionState = 0;
+                mPlayers[mMachineCount].mConnectionState = NET_PEER_INITIAL;
                 if (mMachineCount != DWC_GetMyAID())
                 {
                     DWC_SetRecvBuffer(mMachineCount,
@@ -786,7 +786,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
             {
                 g_pFriendManager->SetOwnStatusInitial(false);
             }
-            mState = 2;
+            mState = NET_LOBBY_FRIEND_EXCHANGE_INFO;
             mConnectionDeadline = mElapsedTime + s_fConnectionTimeout;
             tDebugPrintManager::Print(DC_NETWORK,
                 "Friend Matchmaking Success Peers changed from %d to %d!\n",
@@ -804,7 +804,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
         tDebugPrintManager::Print(DC_NETWORK, "Matching Error\n");
         g_pNetworkSession->ReadAndClearDWCError();
         g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
-        mState = 0;
+        mState = NET_LOBBY_IDLE;
         mMatchFailed = true;
     }
 }
@@ -813,11 +813,11 @@ void NetworkLobby::UpdatePeerConnectionState(int aid)
 {
     if (aid == DWC_GetMyAID())
     {
-        mPlayers[aid].mConnectionState = 1;
+        mPlayers[aid].mConnectionState = NET_PEER_LOCAL;
     }
     else if (DWC_GetMyAID() < aid)
     {
-        mPlayers[aid].mConnectionState = 2;
+        mPlayers[aid].mConnectionState = NET_PEER_CONNECTING;
 
         u8 address[4];
         address[0] = 0;
@@ -836,12 +836,12 @@ void NetworkLobby::UpdatePeerConnectionState(int aid)
             tDebugPrintManager::Print(DC_NETWORK,
                 "Initial Failure to make reliable connection with AID %d\n",
                 aid);
-            mPlayers[aid].mConnectionState = 4;
+            mPlayers[aid].mConnectionState = NET_PEER_FAILED;
         }
     }
     else
     {
-        mPlayers[aid].mConnectionState = 3;
+        mPlayers[aid].mConnectionState = NET_PEER_WAIT_CONNECTION;
     }
 }
 
@@ -936,46 +936,46 @@ void NetworkLobby::Update(float dt)
 
     switch (mState)
     {
-    case 3:
+    case NET_LOBBY_MATCHMAKING:
         mMinCompletionState =
             DWC_GetMOMinCompState((u64*)&mMinCompletionElapsedMsHigh);
         break;
-    case 2:
+    case NET_LOBBY_FRIEND_EXCHANGE_INFO:
         for (int i = 0; i < mMachineCount; ++i)
         {
             switch (mPlayers[i].mConnectionState)
             {
-            case 0:
+            case NET_PEER_INITIAL:
                 UpdatePeerConnectionState(i);
                 break;
-            case 1:
+            case NET_PEER_LOCAL:
                 BuildLocalMachineInfo(&mMachineInfo[i]);
                 mMachineInfoReceived[i] = true;
-                mPlayers[i].mConnectionState = 6;
+                mPlayers[i].mConnectionState = NET_PEER_LOCAL_INFO_READY;
                 break;
-            case 5:
+            case NET_PEER_CONNECTED:
             {
                 SendLocalMachineInfo(i);
-                mPlayers[i].mConnectionState = 7;
+                mPlayers[i].mConnectionState = NET_PEER_INFO_SENT;
                 break;
             }
-            case 4:
+            case NET_PEER_FAILED:
                 mMatchFailed = true;
                 break;
             }
         }
         break;
-    case 4:
+    case NET_LOBBY_CONNECT_PEERS:
         UpdatePeerConnectionStates();
-        mState = 5;
+        mState = NET_LOBBY_WAIT_PEERS;
         break;
-    case 5:
+    case NET_LOBBY_WAIT_PEERS:
     {
         bool connectionsReady = true;
         for (int i = 0; i < mMachineCount; ++i)
         {
-            if (mPlayers[i].mConnectionState != 1
-                && mPlayers[i].mConnectionState != 5)
+            if (mPlayers[i].mConnectionState != NET_PEER_LOCAL
+                && mPlayers[i].mConnectionState != NET_PEER_CONNECTED)
             {
                 connectionsReady = false;
             }
@@ -987,19 +987,19 @@ void NetworkLobby::Update(float dt)
                 "DWCLobby finished establishing Rel Connections\n");
             if (GetLocalMachineIndex() == 0)
             {
-                mState = 6;
+                mState = NET_LOBBY_HOST_WAIT_INFO;
                 BuildLocalMachineInfo(&mMachineInfo[0]);
                 mMachineInfoReceived[0] = true;
             }
             else
             {
                 SendLocalMachineInfo(0);
-                mState = 7;
+                mState = NET_LOBBY_READY;
             }
         }
         break;
     }
-    case 6:
+    case NET_LOBBY_HOST_WAIT_INFO:
     {
         bool allMachineInfoReceived = true;
         for (int i = 0; i < mMachineCount; ++i)
@@ -1013,13 +1013,13 @@ void NetworkLobby::Update(float dt)
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "DWCLobby host finished waiting for all machine info\n");
-            mState = 7;
+            mState = NET_LOBBY_READY;
         }
         break;
     }
-    case 0:
-    case 1:
-    case 7:
+    case NET_LOBBY_IDLE:
+    case NET_LOBBY_FRIEND_MATCHING:
+    case NET_LOBBY_READY:
     default:
         break;
     }
