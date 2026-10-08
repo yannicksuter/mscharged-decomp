@@ -19,7 +19,6 @@
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "NL/nlMemory.h"
 #include "Game/DebugWriteCache.h"
-#include "Game/WeatherData.h"
 
 #include "Game/UnidentifiedStaticStorage.h"
 
@@ -40,39 +39,6 @@ extern unsigned short lbl_806DC094;
 extern unsigned short lbl_806DC0A0;
 extern unsigned short lbl_806DC070;
 extern unsigned short lbl_806DC06E;
-
-extern "C" int fn_800B045C()
-{
-    return 6;
-}
-
-extern nlVector3* lbl_8056DA30[6];
-
-extern "C" nlVector3* fn_800B0464(int index)
-{
-    return lbl_8056DA30[index];
-}
-
-extern int lbl_8056DA48[6];
-
-extern "C" int fn_800B0478(int index)
-{
-    return lbl_8056DA48[index];
-}
-
-extern nlVector3* lbl_8056DA00[6];
-
-extern "C" nlVector3* fn_800B048C(int index)
-{
-    return lbl_8056DA00[index];
-}
-
-extern int lbl_8056DA18[6];
-
-extern "C" int fn_800B04A0(int index)
-{
-    return lbl_8056DA18[index];
-}
 
 Desire::Desire(int state, TransitionFunc& transition)
     : shdStateMachine(state, transition)
@@ -844,11 +810,6 @@ void DesireRunToTarget::UnidentifiedVirtual7(void* context, DebugWriteCache* cac
                 ? -1 : m_pTargetFielder->mUnidentified120);
         cache->ChecksumData(lbl_806DC070, data, context);
     }
-}
-
-extern "C" int fn_800B04B4(SandTombWeather*)
-{
-    return 4;
 }
 
 extern float lbl_806DC0A8;

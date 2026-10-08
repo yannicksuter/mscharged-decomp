@@ -347,15 +347,20 @@ Game/Weather.cpp:
 	.sbss       start:0x806E0E10 end:0x806E0E20
 	.sdata2     start:0x806E3E00 end:0x806E3EA0
 
+Game/WeatherData.cpp:
+	.text       start:0x800B0358 end:0x800B053C
+	.data       start:0x805012B8 end:0x80501630
+	.bss        start:0x8056DA00 end:0x8056DA60
+	.sdata2     start:0x806E3EA0 end:0x806E3EA8
+
 Game/AI/Desire.cpp:
-	.text       start:0x800B0358 end:0x800B6DC0
+	.text       start:0x800B053C end:0x800B6DC0
 	.ctors      start:0x804DB560 end:0x804DB564
 	.rodata     start:0x804DC180 end:0x804DC190
-	.data       start:0x805012B8 end:0x80501B10
-	.bss        start:0x8056DA00 end:0x8056DA60
+	.data       start:0x80501630 end:0x80501B10
 	.sdata      start:0x806DC048 end:0x806DC0B8 align:4
 	.sbss       start:0x806E0E20 end:0x806E0E30
-	.sdata2     start:0x806E3EA0 end:0x806E3F58
+	.sdata2     start:0x806E3EA8 end:0x806E3F58
 
 Game/AI/DesireMark.cpp:
 	.text       start:0x800B6DC0 end:0x800B93C4
