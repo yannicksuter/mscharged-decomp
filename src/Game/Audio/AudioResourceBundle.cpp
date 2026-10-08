@@ -11,12 +11,6 @@
 #include "NL/nlSlotPool.h"
 #include "types.h"
 
-struct AudioBundleManagerRpcView
-{
-    u8 pad_00[0x50];
-    AudioRpcController* rpcController;
-};
-
 AudioResourceBundle* ParseAudioResourceBundle(nlChunk* outer)
 {
     nlChunk* header = (nlChunk*)outer->GetData();
@@ -267,7 +261,7 @@ void InitializeAudioVoiceRpcModifiers(AudioVoiceDefinition* voice)
 
     for (u32 i = 0; i < voice->rpcGroupCount; i++)
     {
-        AudioRpcController* controller = ((AudioBundleManagerRpcView*)g_pAudioSystem->GetBundleManager())->rpcController;
+        AudioRpcController* controller = static_cast<AudioRpcBundleManager*>(g_pAudioSystem->GetBundleManager())->m_RpcController;
         AudioRpcGroup* rpcGroup = controller->groups + voice->rpcGroupIndices[i];
         voice->modifierCount += rpcGroup->staticDefinitionCount;
         voice->dynamicRpcCount += rpcGroup->dynamicDefinitionCount;
@@ -281,7 +275,7 @@ void InitializeAudioVoiceRpcModifiers(AudioVoiceDefinition* voice)
     u32 outputIndex = 0;
     for (u32 i = 0; i < voice->rpcGroupCount; i++)
     {
-        AudioRpcController* controller = ((AudioBundleManagerRpcView*)g_pAudioSystem->GetBundleManager())->rpcController;
+        AudioRpcController* controller = static_cast<AudioRpcBundleManager*>(g_pAudioSystem->GetBundleManager())->m_RpcController;
         AudioRpcGroup* rpcGroup = controller->groups + voice->rpcGroupIndices[i];
         for (u32 definitionIndex = 0;
             definitionIndex < rpcGroup->staticDefinitionCount;
