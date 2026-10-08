@@ -260,23 +260,23 @@ void PauseMenuScene::Update(float fDeltaT)
         case TT_OUT:
             FrontEnd::ExitMenuState();
             break;
-        case 2:
+        case TT_CHOOSE_SIDES:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)81, SCREEN_FORWARD, true);
             break;
-        case 3:
+        case TT_AUDIO_OPTIONS:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)82, SCREEN_FORWARD, true);
             break;
-        case 4:
+        case TT_VISUAL_OPTIONS:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)83, SCREEN_FORWARD, true);
             break;
-        case 5:
+        case TT_CHALLENGE_PREVIEW:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)103, SCREEN_NOTHING, true);
             break;
-        case 6:
+        case TT_STATISTICS:
         {
             mSelectionMade = true;
             PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push((SceneList)92, SCREEN_FORWARD, true));
@@ -284,7 +284,7 @@ void PauseMenuScene::Update(float fDeltaT)
             scene->SetDisplayMode(12);
             break;
         }
-        case 7:
+        case TT_CONTROLLER_MAP:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)104, SCREEN_NOTHING, true);
             break;
@@ -411,26 +411,26 @@ void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
         OnSelectRESUME(0);
         break;
     case 1:
-        TransitionOut((TransitionType)2);
+        TransitionOut(TT_CHOOSE_SIDES);
         break;
     case 2:
-        TransitionOut((TransitionType)3);
+        TransitionOut(TT_AUDIO_OPTIONS);
         break;
     case 3:
-        TransitionOut((TransitionType)4);
+        TransitionOut(TT_VISUAL_OPTIONS);
         break;
     case 4:
         if (GameInfoManager::Instance()->IsInMode4())
-            TransitionOut((TransitionType)5);
+            TransitionOut(TT_CHALLENGE_PREVIEW);
         else
-            TransitionOut((TransitionType)6);
+            TransitionOut(TT_STATISTICS);
         break;
     case 5:
         mQuittingController = (eFEINPUT_PAD)index;
         OnSelectQUIT();
         break;
     case 6:
-        TransitionOut((TransitionType)7);
+        TransitionOut(TT_CONTROLLER_MAP);
         break;
     }
 }

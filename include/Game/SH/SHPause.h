@@ -14,6 +14,12 @@ public:
         TT_INVALID = -1,
         TT_IN = 0,
         TT_OUT = 1,
+        TT_CHOOSE_SIDES = 2,
+        TT_AUDIO_OPTIONS = 3,
+        TT_VISUAL_OPTIONS = 4,
+        TT_CHALLENGE_PREVIEW = 5,
+        TT_STATISTICS = 6,
+        TT_CONTROLLER_MAP = 7,
     };
 
     PauseMenuScene();
