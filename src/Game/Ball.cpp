@@ -66,7 +66,7 @@ unsigned char lbl_806E0BCC;
 float lbl_806E0BD0;
 float lbl_806E0BD4;
 float lbl_806E0BD8;
-bool lbl_806E0BDC;
+bool gbUseShotClock;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const char szPerfectPassBallBlurTexture[]
@@ -105,8 +105,8 @@ extern const nlVector3 lbl_804DBE30 = { 12.5f, 0.0f, 0.18f };
 static nlMatrix3 m3Ident
     = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
-bool lbl_806DB500 = true;
-bool lbl_806DB501 = true;
+bool gbUsePassCharging = true;
+bool gbUseShotCharging = true;
 float lbl_806DB504 = .55f;
 float lbl_806DB508 = .55f;
 float lbl_806DB50C = 6.0f;
@@ -128,8 +128,8 @@ float lbl_806DB548 = 2.0f;
 float lbl_806DB54C = .1f;
 float lbl_806DB550 = 2.2f;
 int lbl_806DB554 = 150;
-float lbl_806DB558 = 10.0f;
-float lbl_806DB55C = 10.0f;
+float gfShotClockTime = 10.0f;
+float gfShotClockFrozenTime = 10.0f;
 float lbl_806DB560 = .8f;
 float lbl_806DB564 = 7.5f;
 float lbl_806DB568 = 22.5f;
@@ -152,16 +152,16 @@ bool lbl_806DB5A8 = true;
 float lbl_806DB5AC = .33f;
 float lbl_806DB5B0 = .33f;
 
-static TweakBoolBinding sUnidentifiedTweak_8056B478(
-    "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &lbl_806DB500, true);
-static TweakBoolBinding sUnidentifiedTweak_8056B498(
-    "gbUseShotCharging", "Game/Gameplay/Charging/Shot", &lbl_806DB501, true);
-static TweakFloatBinding sUnidentifiedTweak_8056B4B8(
-    "gfShotClockTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB558, true);
-static TweakFloatBinding sUnidentifiedTweak_8056B4D8(
-    "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB55C, true);
-static TweakBoolBinding sUnidentifiedTweak_8056B4F8(
-    "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
+static TweakBoolBinding sUsePassChargingTweak(
+    "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &gbUsePassCharging, true);
+static TweakBoolBinding sUseShotChargingTweak(
+    "gbUseShotCharging", "Game/Gameplay/Charging/Shot", &gbUseShotCharging, true);
+static TweakFloatBinding sShotClockTimeTweak(
+    "gfShotClockTime", "Game/Gameplay/Charging/Shot Clock", &gfShotClockTime, true);
+static TweakFloatBinding sShotClockFrozenTimeTweak(
+    "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &gfShotClockFrozenTime, true);
+static TweakBoolBinding sUseShotClockTweak(
+    "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &gbUseShotClock, true);
 LiveBallTrail lbl_8056B518[10];
 
 static inline float FullBallCharge()
@@ -1602,7 +1602,7 @@ static inline void UpdateBallShotClock(cBall* pBall)
     {
         if (!pBall->m_pOwner->IsOnSameTeam(pBall->m_pPrevOwner))
         {
-            pBall->mtShotClockTimer.SetSeconds(lbl_806DB558);
+            pBall->mtShotClockTimer.SetSeconds(gfShotClockTime);
             pBall->mnShotClockTeam = pBall->m_pOwner->m_pTeam->m_nSide;
         }
     }
@@ -2015,7 +2015,7 @@ void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
     pPhysicsBall->mbUseMagnusEffect = false;
     pPhysicsBall->mfChargeBonus = 0.0f;
 
-    if (lbl_806DB500 && pPlayer->m_eClassType == FIELDER)
+    if (gbUsePassCharging && pPlayer->m_eClassType == FIELDER)
     {
         float fValue = GetPlaymakerRating(((cFielder*)pPlayer)->GetTweaks());
         float fPercent = InterpolateRangeClamped(
@@ -2195,7 +2195,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
 
         if (pBall->mtShotClockTimer.m_uPackedTime != 0
             && pBall->mtShotClockTimer.Countdown(fDeltaT, 0.0f)
-            && lbl_806E0BDC)
+            && gbUseShotClock)
         {
             cFielder* pFielder = NULL;
             if (GetOwnerFielderImpl(pBall) != NULL)
@@ -2208,7 +2208,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
             }
             if (pFielder != NULL)
             {
-                SetFielderFrozenState(pFielder, 1, lbl_806DB55C);
+                SetFielderFrozenState(pFielder, 1, gfShotClockFrozenTime);
             }
         }
     }
@@ -2682,7 +2682,7 @@ void ResetBall(cBall* pBall, bool bParam)
     {
         if (!pBall->m_pOwner->IsOnSameTeam(pBall->m_pPrevOwner))
         {
-            pBall->mtShotClockTimer.SetSeconds(lbl_806DB558);
+            pBall->mtShotClockTimer.SetSeconds(gfShotClockTime);
             pBall->mnShotClockTeam = pBall->m_pOwner->m_pTeam->m_nSide;
         }
     }
