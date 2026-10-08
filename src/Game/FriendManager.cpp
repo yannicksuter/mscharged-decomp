@@ -235,7 +235,7 @@ static inline bool HaveSameInvitationSettings(
             == previous.mGameplaySettings.GameLimitType
         && current.mGameplaySettings.NumGames
             == previous.mGameplaySettings.NumGames
-        && (current.mGameplaySettings.GameLimitType == 0
+        && (current.mGameplaySettings.GameLimitType == GAME_LIMIT_TIME
             ? current.mGameplaySettings.GameTime
                 == previous.mGameplaySettings.GameTime
             : current.mGameplaySettings.GoalLimit

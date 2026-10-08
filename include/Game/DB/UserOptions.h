@@ -28,6 +28,12 @@ public:
     /* 0x8 */ int mPlayerCheat;
 };
 
+enum eGameLimitType
+{
+    GAME_LIMIT_TIME = 0,
+    GAME_LIMIT_GOALS = 1,
+};
+
 class GameplaySettings
 {
 public:
@@ -45,7 +51,7 @@ public:
     void OnSettingsUpdated() const;
 
     /* 0x00 */ eSkillLevel SkillLevel;
-    /* 0x04 */ int GameLimitType;
+    /* 0x04 */ eGameLimitType GameLimitType;
     /* 0x08 */ int GameTime;
     /* 0x0C */ int GoalLimit;
     /* 0x10 */ int NumGames;

@@ -364,11 +364,11 @@ void StatsTracker::OnGoalScored(GoalScoredStatsData* data)
         float gameDuration = g_pGame->m_fGameDuration;
         if (!((unsigned int)(10.0f * (gameDuration - g_pGame->GetGameTime())) == 0
                 && !scoreTied
-                && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0))
+                && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME))
         {
             int teamScore = g_pTeams[data->data.uTeamIndex]->m_nScore;
             if (teamScore < GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit
-                || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != 1)
+                || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != GAME_LIMIT_GOALS)
             {
                 goto skipTrackWinner;
             }
@@ -404,11 +404,11 @@ void StatsTracker::OnMegastrikeEnd(MegaStrikeEndData* data)
             float gameDuration = g_pGame->m_fGameDuration;
             if (!((unsigned int)(10.0f * (gameDuration - g_pGame->GetGameTime())) == 0
                     && !scoreTied
-                    && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0))
+                    && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME))
             {
                 int teamScore = g_pTeams[side]->m_nScore;
                 if (teamScore < GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit
-                    || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != 1)
+                    || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != GAME_LIMIT_GOALS)
                 {
                     goto skipTrackWinner;
                 }

@@ -201,7 +201,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
         mCaptainGoals[homeAway] += numGoals;
     }
     int score[2] = { mCaptainGoals[0] + mSidekickGoals[0], mCaptainGoals[1] + mSidekickGoals[1] };
-    if (gameInfo->GetCurrentSettings()->GameLimitType == 1
+    if (gameInfo->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
         && score[homeAway] >= gameInfo->GetCurrentSettings()->GoalLimit)
     {
         isMatchEnd = true;
@@ -232,7 +232,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
     memcpy(mClockBuffer, formatted.c_str(), sizeof(mClockBuffer));
     pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Time");
     pText->SetString(mClockBuffer);
-    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0
+    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME
         && !GameInfoManager::Instance()->IsInMode4())
         pText->SetVisible(true);
     else
@@ -263,7 +263,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("GOAL_MATCH_WINNER"));
     }
-    else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+    else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
         && score[homeAway] >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit)
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("GOAL_MATCH_WINNER_GOALS"));
@@ -467,7 +467,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Name");
     pText->SetString(mScoresBuffer);
     pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Time");
-    if (!isMatchEnd && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0
+    if (!isMatchEnd && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME
         && !GameInfoManager::Instance()->IsInMode4())
         pText->m_bVisible = true;
     else

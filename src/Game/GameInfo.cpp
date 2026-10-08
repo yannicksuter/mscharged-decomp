@@ -93,12 +93,12 @@ GameInfoManager::GameInfoManager()
 
     mDefaultSettings.SkillLevel = GameplaySettings::ROOKIE;
     mDefaultSettings.NumGames = 3;
-    mDefaultSettings.GameLimitType = 0;
+    mDefaultSettings.GameLimitType = GAME_LIMIT_TIME;
     mDefaultSettings.GoalLimit = 5;
     mDefaultSettings.GameTime = 0xB4;
     mMode1Settings.SkillLevel = GameplaySettings::ROOKIE;
     mMode1Settings.NumGames = 1;
-    mMode1Settings.GameLimitType = 0;
+    mMode1Settings.GameLimitType = GAME_LIMIT_TIME;
     mMode1Settings.GoalLimit = 5;
     mMode1Settings.GameTime = 0xB4;
     sThis = this;
@@ -394,7 +394,7 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameGameplayOptions.mAwayMegastrikeEnabled = other->mAwayMegastrikeEnabled;
         mCurGameGameplayOptions.m_unk18 = other->mHomeSkillshotDisabled;
         mCurGameGameplayOptions.m_unk19 = other->mAwaySkillshotDisabled;
-        mCurGameGameplayOptions.GameLimitType = 0;
+        mCurGameGameplayOptions.GameLimitType = GAME_LIMIT_TIME;
         mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)other->mAIDifficulty;
         mCurGameGameplayOptions.NumGames = 1;
     }

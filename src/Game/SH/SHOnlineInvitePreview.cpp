@@ -163,7 +163,7 @@ void SHOnlineInvitePreview::SceneCreated()
     text = (TLTextInstance*)FEFinder<TLInstance, TLAT_TEXT>::Find<TLSlide>(slide, "Layer", "PREVIEW", "OPTIONS", "OPTION_1");
     const char* id;
     int value;
-    if (payload->mGameplaySettings.GameLimitType == 0)
+    if (payload->mGameplaySettings.GameLimitType == GAME_LIMIT_TIME)
     {
         id = "X_MINUTES";
         value = payload->mGameplaySettings.GameTime / 60;

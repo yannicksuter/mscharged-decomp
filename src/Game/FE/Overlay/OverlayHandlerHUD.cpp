@@ -63,7 +63,7 @@ void HUDOverlay::Update(float fDeltaT)
     mScoreDisplay.Update(fDeltaT);
     mCaptainMeter.Update(fDeltaT);
     mPowerUpDisplay.DisplayPowerUps(fDeltaT);
-    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         mClock.Update(fDeltaT);
     }
@@ -452,7 +452,7 @@ void HUDClock::Init(FEPresentation* presentation)
         presentation, HUD_SLIDE_OUT_NAME, LAYER_NAME, "clock elements", "SUDDEN DEATH");
     mSuddenDeath[0]->m_bVisible = false;
     mSuddenDeath[1]->m_bVisible = false;
-    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == 1)
+    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS)
     {
         char goalLimit[4];
         unsigned short goalLimitWide[4];

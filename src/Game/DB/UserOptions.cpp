@@ -181,7 +181,7 @@ GameplaySettings::GameplaySettings()
     memset(this, 0, sizeof(GameplaySettings));
     SkillLevel = ROOKIE;
     NumGames = 3;
-    GameLimitType = 0;
+    GameLimitType = GAME_LIMIT_TIME;
     GoalLimit = 5;
     GameTime = 180;
     mHomePowerupsEnabled = true;

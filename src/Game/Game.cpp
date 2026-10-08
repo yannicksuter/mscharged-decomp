@@ -424,12 +424,12 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     {
         if (noClock)
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
                 game->m_pGameClock->Stop();
         }
         else
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
                 game->m_pGameClock->Start();
         }
     }
@@ -660,7 +660,7 @@ void cGame::StartSlowDown(float timeScale, float transitionTime)
     {
         if (g_pGame->m_eGameState != GS_UNLOADING)
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
             {
                 m_pGameClock->Stop();
             }
@@ -701,14 +701,14 @@ float cGame::GetGameTime()
 }
 void cGame::fn_800586C0()
 {
-    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         m_pGameClock->Start();
     }
 }
 void cGame::fn_80058704()
 {
-    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         m_pGameClock->Stop();
     }
@@ -885,7 +885,7 @@ void cGame::CheckForGoal()
         {
             ChangeGameState(GS_END_GAME);
         }
-        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
             && g_pTeams[nSide]->GetScore() >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit)
         {
             ChangeGameState(GS_END_GAME);
@@ -1265,7 +1265,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
             {
                 FixedUpdateTask::SetTimeScale(1.0f);
                 ParticleUpdateTask::sInstance->SetTimeScale(1.0f);
-                if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+                if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
                 {
                     m_pGameClock->Start();
                 }
@@ -1982,7 +1982,7 @@ void cGame::InitGameState(eGameState state)
     switch (state)
     {
     case GS_KICKOFF:
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
@@ -1990,13 +1990,13 @@ void cGame::InitGameState(eGameState state)
         break;
 
     case GS_PRE_GAME:
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
         break;
     case GS_POST_GOAL:
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
@@ -2016,7 +2016,7 @@ void cGame::InitGameState(eGameState state)
             PlaySound(10, 0x42F55573, 0, 0);
         }
         m_pPostGameDoneClock->Start();
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
@@ -2063,7 +2063,7 @@ void cGame::InitGameState(eGameState state)
 
     if (state == GS_GAMEPLAY || state == GS_OVERTIME)
     {
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Start();
         }
@@ -2214,7 +2214,7 @@ void FinishMegaStrike(cGame* pGame)
         {
             pGame->ChangeGameState(GS_END_GAME);
         }
-        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
             && (score = g_pTeams[side]->m_nScore,
                 score >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit))
         {

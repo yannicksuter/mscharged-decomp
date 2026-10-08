@@ -1995,7 +1995,7 @@ static void ApplyRecordedGameConfig(RecordedGameConfig* config)
 
     GameInfoManager* manager = GameInfoManager::GetInstance();
     manager->mUserInfo.mGameplayOptions.SkillLevel = config->mSkillLevel;
-    manager->mUserInfo.mGameplayOptions.GameLimitType = config->mWinBy;
+    manager->mUserInfo.mGameplayOptions.GameLimitType = static_cast<eGameLimitType>(config->mWinBy);
     manager->mUserInfo.mGameplayOptions.GameTime = config->mGameTime;
     manager->mUserInfo.mGameplayOptions.GoalLimit = config->mGameGoals;
     manager->mUserInfo.mGameplayOptions.NumGames = config->mBestSeries;

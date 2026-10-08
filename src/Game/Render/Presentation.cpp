@@ -890,7 +890,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     else if (nlSingleton<GameInfoManager>::Instance()
                  ->GetCurrentSettings()
                  ->GameLimitType
-        == 1)
+        == GAME_LIMIT_GOALS)
     {
         int teamScore
             = g_pTeams[data->pScorer->m_pTeam->m_nSide]->m_nScore;
@@ -1080,7 +1080,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
         if (nlSingleton<GameInfoManager>::Instance()
                 ->GetCurrentSettings()
                 ->GameLimitType
-            == 1)
+            == GAME_LIMIT_GOALS)
         {
             teamScore
                 = g_pTeams[data->pPlayer->m_pTeam->m_nSide]->GetScore();
