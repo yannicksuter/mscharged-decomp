@@ -3,6 +3,8 @@
 
 #include <ode/collision.h>
 
+extern int dColumnClassUser;
+
 dGeomID dCreateColumn(dSpaceID, float);
 void dGeomColumnSetParams(dGeomID, float);
 void dGeomColumnGetParams(dGeomID, float*);

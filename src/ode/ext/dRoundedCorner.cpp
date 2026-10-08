@@ -5,8 +5,6 @@ extern "C"
 {
 #include <internal/fdlibm.h>
 }
-extern int dColumnClassUser;
-
 int dRoundedCornerClassUser = -1;
 
 struct RoundedCornerData
