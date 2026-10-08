@@ -4904,11 +4904,11 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         if (IsSlideAttacking() && !IsSuperGrowActive())
         {
             float fPlayerScale = m_DetChar.m_fPlayerScale;
-            float fUnidentified = 0.18f
+            float fContactRadius = 0.18f
                 + fn_8002BFA8(GetTweaks(), fPlayerScale);
-            fUnidentified += gSlideBallContactRadiusBuffer;
+            fContactRadius += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(m_DetChar.m_v3Position, g_pBall->m_v3Position)
-                < fUnidentified * fUnidentified)
+                < fContactRadius * fContactRadius)
                 bSlideReachesBall = true;
         }
     }
@@ -4917,11 +4917,11 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         if (pOpponent->IsSlideAttacking() && !pOpponent->IsSuperGrowActive())
         {
             float fPlayerScale = pOpponent->m_DetChar.m_fPlayerScale;
-            float fUnidentified = 0.18f
+            float fContactRadius = 0.18f
                 + fn_8002BFA8(pOpponent->GetTweaks(), fPlayerScale);
-            fUnidentified += gSlideBallContactRadiusBuffer;
+            fContactRadius += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(pOpponent->m_DetChar.m_v3Position, g_pBall->m_v3Position)
-                < fUnidentified * fUnidentified)
+                < fContactRadius * fContactRadius)
                 bSlideReachesBall = true;
         }
     }
@@ -5582,24 +5582,24 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
     {
         if (gUseBowserPeteyHeadTracking)
         {
-            cPlayer* pUnidentified = g_pBall->m_pOwner;
-            if (pUnidentified != 0)
+            cPlayer* pLookTarget = g_pBall->m_pOwner;
+            if (pLookTarget != 0)
             {
-                if (IsOnSameTeam(pUnidentified)
-                    || nlVec3DistanceSquared2D(pUnidentified->m_DetChar.m_v3Position,
+                if (IsOnSameTeam(pLookTarget)
+                    || nlVec3DistanceSquared2D(pLookTarget->m_DetChar.m_v3Position,
                            m_DetChar.m_v3Position) > 36.0f
-                    || fn_800DDF54(this, pUnidentified) < 0.6f)
+                    || fn_800DDF54(this, pLookTarget) < 0.6f)
                 {
-                    pUnidentified = 0;
+                    pLookTarget = 0;
                 }
             }
-            if (pUnidentified == 0)
+            if (pLookTarget == 0)
             {
-                FindHeadTrackingHitTarget(this, pUnidentified);
+                FindHeadTrackingHitTarget(this, pLookTarget);
             }
 
             nlVector3 v3Unidentified;
-            if (pUnidentified == 0)
+            if (pLookTarget == 0)
             {
                 nlVector3 v3Unidentified0 = GetJointPosition(m_nHeadJointIndex);
                 const nlMatrix4& m4Unidentified
@@ -5612,7 +5612,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
             }
             else
             {
-                v3Unidentified = pUnidentified->m_DetChar.m_v3Position;
+                v3Unidentified = pLookTarget->m_DetChar.m_v3Position;
             }
             v3Unidentified.z = gSuperPowerHeadTrackingHeight;
             m_pHeadTrack->m_v3OOI = v3Unidentified;
@@ -5648,11 +5648,11 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         && !IsFallenDown()
         && (m_DetChar.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
     {
-        float fUnidentified = (int)g_pGame->GetGameTime();
+        float fWholeGameSeconds = (int)g_pGame->GetGameTime();
         nlVector3 v3Unidentified;
-        if (g_pGame->GetGameTime() - fUnidentified < 0.25f
-            || (g_pGame->GetGameTime() - fUnidentified > 0.5f
-                && g_pGame->GetGameTime() - fUnidentified < GetHeadTrackingFinalPhaseTime()))
+        if (g_pGame->GetGameTime() - fWholeGameSeconds < 0.25f
+            || (g_pGame->GetGameTime() - fWholeGameSeconds > 0.5f
+                && g_pGame->GetGameTime() - fWholeGameSeconds < GetHeadTrackingFinalPhaseTime()))
         {
             v3Unidentified = m_pTeam->m_pNet->m_v3NetLocation;
         }

@@ -499,7 +499,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 
 float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
 {
-    float fUnidentified = 0.0f;
+    float fRadius = 0.0f;
 
     switch (eType)
     {
@@ -510,13 +510,13 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fShellBigRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fShellBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fShellMediumRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fShellMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
             break;
         }
         break;
@@ -524,13 +524,13 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaBigRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBananaBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaMediumRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBananaMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
             break;
         }
         break;
@@ -538,13 +538,13 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombBigRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBobombBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombMediumRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBobombMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
             break;
         }
         break;
@@ -552,18 +552,18 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         break;
     }
 
-    return fUnidentified;
+    return fRadius;
 }
 
 void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
-    int nnumOfPowerups, PowerupThrowParameters* pUnidentified)
+    int nnumOfPowerups, PowerupThrowParameters* pParameters)
 {
-    pUnidentified->bExplode = false;
-    pUnidentified->nnumOfPowerups = nnumOfPowerups;
-    pUnidentified->eStyle = THROW_ARROW;
-    pUnidentified->eSize = POWERUPSIZE_SMALL;
-    pUnidentified->eType = eType;
-    pUnidentified->fRadius = 0.0f;
+    pParameters->bExplode = false;
+    pParameters->nnumOfPowerups = nnumOfPowerups;
+    pParameters->eStyle = THROW_ARROW;
+    pParameters->eSize = POWERUPSIZE_SMALL;
+    pParameters->eType = eType;
+    pParameters->fRadius = 0.0f;
 
     float fMediumChance = gGameTweaks.m_pGameTweaks->fShellMediumChance;
     float fExplodeChance = gGameTweaks.m_pGameTweaks->fShellExplodeChance;
@@ -583,7 +583,7 @@ void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
     }
 
     if (GameInfoManager::Instance()->GetRule0x0() == 4
-        && pUnidentified->nnumOfPowerups == 1)
+        && pParameters->nnumOfPowerups == 1)
     {
         fMediumChance = 0.0f;
     }
@@ -592,44 +592,44 @@ void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
         fExplodeChance = 1.0f;
     }
 
-    if (pUnidentified->nnumOfPowerups > 1)
+    if (pParameters->nnumOfPowerups > 1)
     {
-        if (pUnidentified->eType == POWER_UP_RED_SHELL)
+        if (pParameters->eType == POWER_UP_RED_SHELL)
         {
-            pUnidentified->eStyle = THROW_SURROUND;
+            pParameters->eStyle = THROW_SURROUND;
         }
-        else if (pUnidentified->eType == POWER_UP_BANANA)
+        else if (pParameters->eType == POWER_UP_BANANA)
         {
-            pUnidentified->eStyle = THROW_HORIZONTAL_LINE;
+            pParameters->eStyle = THROW_HORIZONTAL_LINE;
         }
-        else if (pUnidentified->nnumOfPowerups > 3)
+        else if (pParameters->nnumOfPowerups > 3)
         {
-            pUnidentified->eStyle = THROW_ARROW;
+            pParameters->eStyle = THROW_ARROW;
         }
         else
         {
-            pUnidentified->eStyle = THROW_HORIZONTAL_LINE;
+            pParameters->eStyle = THROW_HORIZONTAL_LINE;
         }
     }
     else
     {
         if (nlRandomf(1.0f) <= fExplodeChance)
         {
-            pUnidentified->bExplode = true;
+            pParameters->bExplode = true;
         }
 
         if (nlRandomf(1.0f) < fMediumChance)
         {
-            pUnidentified->eSize = POWERUPSIZE_MEDIUM;
+            pParameters->eSize = POWERUPSIZE_MEDIUM;
         }
         else
         {
-            pUnidentified->eSize = POWERUPSIZE_LARGE;
+            pParameters->eSize = POWERUPSIZE_LARGE;
         }
     }
 
-    pUnidentified->fRadius = GetPowerupRadius(
-        pUnidentified->eType, pUnidentified->eSize);
+    pParameters->fRadius = GetPowerupRadius(
+        pParameters->eType, pParameters->eSize);
 }
 
 inline Banana::Banana(cFielder* pTarget, int nIndex, float fRadius,
@@ -894,7 +894,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     , m_eType(eType)
     , m_unk20(true)
 {
-    AvoidablePowerup* pUnidentified = 0;
+    AvoidablePowerup* pAvoidable = 0;
 
     m_aOrientation = 0;
     m_scale = 1.0f;
@@ -1034,9 +1034,9 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_pPhysicsObject->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsObject->EnableCollisions();
 
-    pUnidentified = (AvoidablePowerup*)nlMalloc(sizeof(AvoidablePowerup), 8, false);
-    pUnidentified = new (pUnidentified) AvoidablePowerup(this);
-    m_pAvoidableObject = pUnidentified;
+    pAvoidable = (AvoidablePowerup*)nlMalloc(sizeof(AvoidablePowerup), 8, false);
+    pAvoidable = new (pAvoidable) AvoidablePowerup(this);
+    m_pAvoidableObject = pAvoidable;
 
     if (eType == POWER_UP_RED_SHELL)
     {
@@ -2688,10 +2688,10 @@ void Banana::ThrowAt(cFielder* pThrower)
 {
     nlVector3 v3Unidentified = { 0.0f, 0.0f, 0.0f };
     unsigned short aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
-    float fUnidentified = pThrower->m_DetChar.m_fPlayerScale;
+    float fThrowerScale = pThrower->m_DetChar.m_fPlayerScale;
     float fRadius = GetRadius();
     float fThrowerRadius = fn_8002BFA8(
-        pThrower->GetTweaks(), fUnidentified);
+        pThrower->GetTweaks(), fThrowerScale);
 
     nlPolarToCartesian(v3Unidentified.x, v3Unidentified.y,
         (unsigned short)(aDirection + 0x8000),
@@ -2734,11 +2734,11 @@ void Banana::Update(float dt)
     }
 
     nlVector3 v3Unidentified = m_v3Position;
-    float fUnidentified =
+    float fPhysicsRadius =
         ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
     if (cField::FixOutOfBoundsPosition(v3Unidentified,
             ((PhysicsSphere*)m_pPhysicsObject)->GetRadius()
-                - 0.85f * fUnidentified,
+                - 0.85f * fPhysicsRadius,
             false))
     {
         m_bShouldDestroy = true;

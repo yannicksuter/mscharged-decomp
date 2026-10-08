@@ -285,6 +285,6 @@ bool IsStarOrChainChompPowerup(ePowerUpType eType);
 bool IsDrawablePowerup(ePowerUpType eType);
 bool IsCaptainPowerup(int nType);
 void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
-    int nnumOfPowerups, PowerupThrowParameters* pUnidentified);
+    int nnumOfPowerups, PowerupThrowParameters* pParameters);
 
 #endif // GAME_AI_POWERUPS_H

@@ -2608,10 +2608,10 @@ void ResetBall(cBall* pBall, bool bParam)
         v3Pos.z = lbl_806E0BC8;
     }
 
-    float fUnidentified = 0.0f;
+    float fChargeValue = 0.0f;
     if (lbl_806DB544)
     {
-        fUnidentified = pBall->mfChargeValue;
+        fChargeValue = pBall->mfChargeValue;
     }
 
     if (pBall->m_pOwner != NULL)
@@ -2694,7 +2694,7 @@ void ResetBall(cBall* pBall, bool bParam)
 
     if (lbl_806DB544 && bParam)
     {
-        fn_800154FC(pBall, fUnidentified);
+        fn_800154FC(pBall, fChargeValue);
     }
     else if (lbl_806E0BC4)
     {

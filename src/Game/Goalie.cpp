@@ -1928,9 +1928,9 @@ bool Goalie::IsCloseToPlane(const nlVector3& rPos1,
     nlVector2 v2Unidentified;
     v2Unidentified.x = pBallPos->x - rPos1.x;
     v2Unidentified.y = pBallPos->y - rPos1.y;
-    float fUnidentified
+    float fBallDistanceSquared
         = nlGetLengthSquared2D(v2Unidentified.x, v2Unidentified.y);
-    if (fUnidentified > nlGetLengthSquared1D(0.01f))
+    if (fBallDistanceSquared > nlGetLengthSquared1D(0.01f))
     {
         v3Dir.x = v2Unidentified.y;
         v3Dir.y = rPos1.x - pBallPos->x;

@@ -640,7 +640,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
         SetFacingDirection(aNewFacingDirection, true);
     }
 
-    bool bUnidentifiedCondition = true;
+    bool bOffplayActive = true;
     bool bActionStateActive = false;
     if (g_pGame->m_bBallInNet
         || g_pGame->m_eGameState == 3)
@@ -651,11 +651,11 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
     if (!bActionStateActive
         && mnOffplayPending == GOALIE_OFFPLAY_NONE)
     {
-        bUnidentifiedCondition = false;
+        bOffplayActive = false;
     }
 
     if (g_pBall->m_pOwner != this && mfWaitTime > 0.0f
-        && !bUnidentifiedCondition)
+        && !bOffplayActive)
     {
         TacklePlayer(g_pBall->m_pOwner);
         StealBall(g_pBall->m_pOwner);
@@ -729,7 +729,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
     if (g_pBall->m_pOwner != 0
         && g_pBall->m_pOwner != this)
     {
-        if (bUnidentifiedCondition
+        if (bOffplayActive
             || IsOnSameTeam(g_pBall->m_pOwner))
         {
             InitActionMove(false);
@@ -762,7 +762,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
 
                 const nlVector3& pickupPos
                     = GetJointPosition(m_nBallJointIndex);
-                if (!bUnidentifiedCondition
+                if (!bOffplayActive
                     && (CalculateDistanceSquared(
                             g_pBall->m_v3Position, pickupPos)
                             < 1.0f
@@ -778,7 +778,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
                 return;
             }
 
-            if (!bUnidentifiedCondition)
+            if (!bOffplayActive)
             {
                 const nlVector3& pickupPos
                     = GetJointPosition(m_nBallJointIndex);
@@ -792,7 +792,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
             return;
         }
 
-        if (bUnidentifiedCondition)
+        if (bOffplayActive)
         {
             return;
         }
