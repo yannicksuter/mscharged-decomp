@@ -217,9 +217,9 @@ ContactType PhysicsBirdoEgg::Contact(
 
         switch (patch->m_Type)
         {
-        case 1:
-        case 3:
-        case 8:
+        case PATCH_FIRE_BALL:
+        case PATCH_MUCK_BALL:
+        case PATCH_LAVA_BALL:
         {
             CollisionBirdoEggEndData* eventData = 0;
             g_CollisionBirdoEggEndDataPool.Allocate(eventData);
@@ -228,7 +228,7 @@ ContactType PhysicsBirdoEgg::Contact(
             QueueCollisionBirdoEggEnd(eventData);
             break;
         }
-        case 6:
+        case PATCH_YOSHI_TONGUE:
         {
             cFielder* fielder = (cFielder*)patch->m_pOwner;
             if (!fielder->IsInvincible())

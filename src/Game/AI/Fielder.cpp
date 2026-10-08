@@ -2221,7 +2221,7 @@ void cFielder::CollideWithWallCallback(
 void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
 {
     int type = eventData->pPatch->m_Type;
-    if (type == 1)
+    if (type == PATCH_FIRE_BALL)
     {
         if (eventData->pPatch->m_pOwner != this
             && m_DetPlayer.m_tFireTimer.m_uPackedTime == 0
@@ -2242,7 +2242,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
         }
     }
-    else if (type == 0)
+    else if (type == PATCH_GAS_BALL)
     {
         if (eventData->pPatch->m_pOwner != this
             && !IsStuck() && !IsInvincible())
@@ -2253,7 +2253,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E));
         }
     }
-    else if (type == 2)
+    else if (type == PATCH_HEAVENLY_LIGHT)
     {
         if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && GetActionState() != ACTION_UNKNOWN_34
@@ -2267,35 +2267,35 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             eventData->pPatch->fn_80173AF4();
         }
     }
-    else if (type == 5 || type == 4 || type == 11)
+    else if (type == PATCH_YOSHI_YOKE || type == PATCH_MUCK_HOLE || type == PATCH_SAND)
     {
         if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && !IsInvincible())
         {
             PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
             FuzzyVariantCollection params;
-            if (type == 5)
+            if (type == PATCH_YOSHI_YOKE)
             {
                 params.Set(0, FuzzyVariant(info->mFriction));
                 params.Set(1, FuzzyVariant(gYoshiYolkGooDuration));
                 params.Set(2, FuzzyVariant(gYoshiYolkAnimSpeedScale));
                 params.Set(3, FuzzyVariant(gYoshiYolkMovementScale));
             }
-            else if (type == 4)
+            else if (type == PATCH_MUCK_HOLE)
             {
                 params.Set(0, FuzzyVariant(info->mFriction));
                 params.Set(1, FuzzyVariant(gMuckHoleGooDuration));
                 params.Set(2, FuzzyVariant(gMuckHoleAnimSpeedScale));
                 params.Set(3, FuzzyVariant(gMuckHoleMovementScale));
             }
-            else if (type == 11)
+            else if (type == PATCH_SAND)
             {
                 params.Set(0, FuzzyVariant(gSandRunningSpeedScale));
                 params.Set(1, FuzzyVariant(gSandGooDuration));
                 params.Set(2, FuzzyVariant(gSandAnimSpeedScale));
                 params.Set(3, FuzzyVariant(gSandMovementScale));
             }
-            if (type == 4)
+            if (type == PATCH_MUCK_HOLE)
             {
                 AddRandomDirt();
                 fn_8001F1C0(1);
@@ -2304,7 +2304,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1B));
         }
     }
-    else if (type == 3)
+    else if (type == PATCH_MUCK_BALL)
     {
         if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && !IsInvincible())
@@ -2328,7 +2328,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 polar.a, 1, false, false);
         }
     }
-    else if (type == 7)
+    else if (type == PATCH_SHRINKER)
     {
         if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && !IsInvincible())
@@ -2348,7 +2348,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C, &params, false);
         }
     }
-    else if (type == 6)
+    else if (type == PATCH_YOSHI_TONGUE)
     {
         cFielder* pOwner = (cFielder*)eventData->pPatch->m_pOwner;
         if (pOwner != this && !IsFallenDown())
@@ -2376,11 +2376,11 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             }
         }
     }
-    else if (type == 12)
+    else if (type == PATCH_SPEEDER)
     {
         ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x19, 0, true);
     }
-    else if (type == 8 || type == 9)
+    else if (type == PATCH_LAVA_BALL || type == PATCH_LAVA_HOLE)
     {
         if (!IsInFallAction() && !IsInvincible()
             && m_eActionState != (eFielderActionState)0x18
@@ -2393,7 +2393,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             fn_80097358(this, 5.0f);
         }
     }
-    else if (type == 10)
+    else if (type == PATCH_CHAIN_LIGHTNING)
     {
         if (!IsInFallAction() && !IsStarActive()
             && !IsYoshiSuperPowerActive() && !IsInvincible()
@@ -4202,7 +4202,7 @@ float cFielder::GetAirInterceptHeight(int type)
     if (mfAirInterceptHeight[type] < 0.0f)
     {
         const LooseBallContactAnimInfo* anim = gOneTimerIdleVolleyContactAnims;
-        if (type == 0)
+        if (type == PATCH_GAS_BALL)
             anim = gOneTimerLeadGroundContactAnims;
         nlVector3 position;
         const cSAnim* contactAnim = m_pAnimInventory->GetAnim(anim->nAnimID);

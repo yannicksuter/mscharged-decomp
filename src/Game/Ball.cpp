@@ -3088,7 +3088,7 @@ void OnBallPatchCollision(PhysicsPatch* pPatch)
         g_pBall->m_pPhysicsBall->AddForceAtCentreOfMass(v3Force);
     }
 
-    if (pPatch->m_Type != 9)
+    if (pPatch->m_Type != PATCH_LAVA_HOLE)
     {
         return;
     }

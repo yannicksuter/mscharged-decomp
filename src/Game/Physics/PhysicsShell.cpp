@@ -308,8 +308,8 @@ ContactType PhysicsShell::Contact(
             mVelocityScaleTicksRemaining = 2;
         }
 
-        if (patchInfo->mType == 8
-            || patchInfo->mType == 9)
+        if (patchInfo->mType == PATCH_LAVA_BALL
+            || patchInfo->mType == PATCH_LAVA_HOLE)
         {
             m_pPowerupObject->m_bShouldDestroy = true;
         }

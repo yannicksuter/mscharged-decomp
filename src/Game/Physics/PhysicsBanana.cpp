@@ -281,7 +281,7 @@ ContactType PhysicsBanana::Contact(
     {
         int patchIndex = ((PhysicsPatch*)other)->m_Type;
         int patchType = GetPhysicsPatchInfo(patchIndex)->mType;
-        if (patchType == 8 || patchType == 9)
+        if (patchType == PATCH_LAVA_BALL || patchType == PATCH_LAVA_HOLE)
         {
             m_pPowerupObject->m_bShouldDestroy = true;
         }

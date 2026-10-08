@@ -247,7 +247,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
 
         switch (patch->m_Type)
         {
-        case 6:
+        case PATCH_YOSHI_TONGUE:
         {
             cFielder* fielder = (cFielder*)patch->m_pOwner;
             if (!fielder->IsInvincible())
