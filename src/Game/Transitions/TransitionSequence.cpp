@@ -3,7 +3,6 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "strtold.h"
 
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
@@ -11,7 +10,6 @@
 #include "Game/Transitions/ColourBlendScreenTransition.h"
 #include "Game/Transitions/ModelTransition.h"
 #include "Game/Transitions/ScriptedTransition.h"
-#include "NL/nlstring_tmpl.h"
 
 TransitionSequence::TransitionSequence()
 {
