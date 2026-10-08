@@ -3283,13 +3283,13 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
         SetAction((eFielderActionState)0xB);
         FreezeEveryoneButCaptain(0);
 
-        m_pTeam->GetGoalie()->fn_8008E2D0();
-        m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008E2D0();
+        m_pTeam->GetGoalie()->InitActionFrozen();
+        m_pTeam->GetOtherTeam()->GetGoalie()->InitActionFrozen();
 
         g_pBall->mbBallFrozen = true;
         muInvincibleStatus |= 0x1F;
 
-        m_pTeam->GetOtherTeam()->GetGoalie()->fn_8008EF58();
+        m_pTeam->GetOtherTeam()->GetGoalie()->InitMegaStrikeUserControl();
 
         g_pGame->mpWeatherManager->Stop(false);
         g_pGame->fn_80058704();

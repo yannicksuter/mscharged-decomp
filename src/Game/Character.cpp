@@ -2045,7 +2045,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                             pEventData->v3Position.z - pGoalie->mUnidentified024.m_v3Position.z);
                 if (nlVec3LengthSquared(v3Delta) < pEventData->fRadius * pEventData->fRadius)
                 {
-                    pGoalie->fn_8008EC2C();
+                    pGoalie->InitActionShockwaveReact();
                 }
             }
         }
@@ -2198,14 +2198,14 @@ extern "C" void fn_80021C98(CollisionPowerupWallData* pEventData)
 
 extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData)
 {
-    ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->shell->mOwner != NULL);
+    ((Goalie*)pEventData->goalie)->HandleSkillShotImpact(pEventData->shell->mOwner != NULL);
     pEventData->shell->Deactivate(false);
     fn_80015B38(g_pBall, false);
 }
 
 extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData)
 {
-    ((Goalie*)pEventData->goalie)->fn_80090958(pEventData->egg->mShooter != NULL);
+    ((Goalie*)pEventData->goalie)->HandleSkillShotImpact(pEventData->egg->mShooter != NULL);
     PlaySound(pEventData->egg->mShooter->m_uSoundSlotId, 0x16BA5AE9UL, NULL, NULL);
 }
 
@@ -2553,9 +2553,9 @@ extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
     else if (pCharacter->m_eClassType == GOALIE)
     {
         Goalie* pGoalie = (Goalie*)pCharacter;
-        if (pGoalie->mGoalieActionState != GOALIEACTION_UNIDENTIFIED_32)
+        if (pGoalie->mGoalieActionState != GOALIEACTION_HEAD_IMPACT)
         {
-            pGoalie->fn_80090320(0.0f);
+            pGoalie->InitActionHeadImpact(0.0f);
             PlaySound(pEventData->pFielder->m_uSoundSlotId, 0xFD0DC03DUL, NULL, NULL);
         }
     }

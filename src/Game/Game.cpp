@@ -1250,7 +1250,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n", pEvent->mData[1],
             pEvent->mData[2], *(float*)&pEvent->mData[4],
             gInputManager->mFrameProvider->GetFrame());
-        pGoalie->fn_80084D70(pEvent->mData[2], *(float*)&pEvent->mData[4]);
+        pGoalie->QueueMegaStrikeSave(pEvent->mData[2], *(float*)&pEvent->mData[4]);
         break;
     }
 

@@ -5396,7 +5396,7 @@ void cFielder::PrePhysicsUpdate()
     }
 
     Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
-    if (pGoalie->mGoalieActionState == GOALIEACTION_UNIDENTIFIED_13
+    if (pGoalie->mGoalieActionState == GOALIEACTION_PURSUE_DEKE
         && pGoalie->mpTarget == this)
     {
         pGoalie->fn_80080BFC(0.0f);

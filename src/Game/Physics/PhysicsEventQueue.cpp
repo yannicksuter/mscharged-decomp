@@ -482,16 +482,16 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             {
             case SHOCKWAVE_BULLET_BILL:
                 if (pGoalie->mGoalieActionState
-                    != GOALIEACTION_UNIDENTIFIED_29)
+                    != GOALIEACTION_SHOCKWAVE_REACT)
                 {
-                    pGoalie->fn_8008EC2C();
+                    pGoalie->InitActionShockwaveReact();
                 }
                 break;
             case SHOCKWAVE_LIGHTNING:
                 if (pGoalie->mGoalieActionState
                     != GOALIEACTION_ELECTROCUTION)
                 {
-                    pGoalie->fn_8008E130();
+                    pGoalie->InitActionElectrocution();
                 }
                 break;
             }

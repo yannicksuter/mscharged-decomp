@@ -317,7 +317,7 @@ void Goalie::Update(float dt)
         m_pPowerupLayer->SetChild(1, m_pPowerupLayer->GetChild(1)->Update(dt));
     }
     if (mGoalieActionState != GOALIEACTION_MEGA_STRIKE && mbDefensivePlayOverlayPushed)
-        fn_80084CE0();
+        CleanupMegaStrikeOverlay();
     if (mUnidentified024.m_v3Position.x < 1.0f && m_pTeam->m_nSide == 1)
     {
         nlVector3 v3Position = mUnidentified024.m_v3Position;
@@ -391,7 +391,7 @@ bool Goalie::CheckForDaze()
                 if (mpSaveData != 0
                     && (fSpeedSquared > fLimitSquared || (mpSaveData->muSaveType & 0xA)))
                 {
-                    fn_8008ED44(false);
+                    InitActionDazed(false);
                     return true;
                 }
                 StartStun();
@@ -441,22 +441,22 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 case GOALIEACTION_PASS:
                 case GOALIEACTION_PASS_INTERCEPT:
                 case GOALIEACTION_PURSUE_BALL_POUNCE:
-                case GOALIEACTION_UNIDENTIFIED_13:
+                case GOALIEACTION_PURSUE_DEKE:
                 case GOALIEACTION_LOOSEBALL_DESPERATE:
-                case GOALIEACTION_UNIDENTIFIED_21:
+                case GOALIEACTION_LOB_SAVE_CONTACT:
                 case GOALIEACTION_SNAP_BALL:
                 case GOALIEACTION_GRAB_BALL:
                 case GOALIEACTION_ELECTROCUTION:
                 case GOALIEACTION_FROZEN:
-                case GOALIEACTION_UNIDENTIFIED_29:
-                case GOALIEACTION_UNIDENTIFIED_30:
+                case GOALIEACTION_SHOCKWAVE_REACT:
+                case GOALIEACTION_DEKE_STUNNED:
                 case GOALIEACTION_GRAB_MONTY:
-                case GOALIEACTION_UNIDENTIFIED_32:
-                case GOALIEACTION_UNIDENTIFIED_33:
+                case GOALIEACTION_HEAD_IMPACT:
+                case GOALIEACTION_STS_KICK:
                 case GOALIEACTION_STS_ATTACK_SETUP:
                 case GOALIEACTION_STS_ATTACK:
-                case GOALIEACTION_UNIDENTIFIED_36:
-                    fn_800908F8();
+                case GOALIEACTION_STS_PURSUE:
+                    UpdateSkillShotShooter();
                     break;
                 case GOALIEACTION_MOVE:
                 case GOALIEACTION_SAVE_SETUP:
@@ -470,12 +470,12 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 case GOALIEACTION_LOOSEBALL_PURSUE_BOUNCING:
                 case GOALIEACTION_LOOSEBALL_PURSUE_ROLLING:
                 case GOALIEACTION_LOB_SAVE:
-                    fn_800908F8();
+                    UpdateSkillShotShooter();
                     bPlayAnimation = true;
                     break;
                 case GOALIEACTION_MOVE_WB:
                 case GOALIEACTION_SAVE:
-                case GOALIEACTION_UNIDENTIFIED_25:
+                case GOALIEACTION_DAZED:
                 case GOALIEACTION_MEGA_STRIKE:
                 case GOALIEACTION_UNIDENTIFIED_37:
                     bSkip = true;
@@ -487,7 +487,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 if (mpSkillShooter != NULL)
                 {
                     mfBallCharge = GetBallChargeValue(pBall, 0);
-                    fn_80090958(false);
+                    HandleSkillShotImpact(false);
                 }
                 else if (pBall->mbBallOnFire)
                 {
@@ -534,7 +534,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             InitActionMove(false);
             CheckForBallOnHead();
             break;
-        case GOALIEACTION_UNIDENTIFIED_21:
+        case GOALIEACTION_LOB_SAVE_CONTACT:
         {
             if (mbBallImpacted)
                 return;
@@ -570,7 +570,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 mbPickedUp = true;
             }
             else
-                fn_8008DEF4(1.0f);
+                LaunchSaveDeflection(1.0f);
             break;
         }
         case GOALIEACTION_MISS_CHIP_SHOT:
@@ -597,7 +597,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             if (mpSkillShooter != NULL && mpSaveData != NULL)
             {
                 mfBallCharge = GetBallChargeValue(pBall, 0);
-                if (fn_80090958(false))
+                if (HandleSkillShotImpact(false))
                     break;
             }
             else if (pBall->mbBallOnFire)
@@ -647,7 +647,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                         return;
                     }
                     else
-                        fn_8008DEF4(1.0f);
+                        LaunchSaveDeflection(1.0f);
                 }
             }
             else if (pBall->m_tShotTimer.m_uPackedTime == 0 && mpSaveData != NULL
@@ -683,14 +683,14 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
             break;
         }
         case GOALIEACTION_STS_RECOVER:
-        case GOALIEACTION_UNIDENTIFIED_25:
+        case GOALIEACTION_DAZED:
         case GOALIEACTION_ELECTROCUTION:
         case GOALIEACTION_FROZEN:
-        case GOALIEACTION_UNIDENTIFIED_29:
-        case GOALIEACTION_UNIDENTIFIED_30:
-        case GOALIEACTION_UNIDENTIFIED_32:
+        case GOALIEACTION_SHOCKWAVE_REACT:
+        case GOALIEACTION_DEKE_STUNNED:
+        case GOALIEACTION_HEAD_IMPACT:
             if (pBall->m_pOwner == NULL)
-                fn_8008DEF4(0.5f);
+                LaunchSaveDeflection(0.5f);
             mbBallImpacted = true;
             break;
         }
@@ -717,15 +717,15 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     cPlayer::CollideWithCharacterCallback(pData);
     cFielder* pFldr = static_cast<cFielder*>(pPlayer);
     if ((int)pFldr->mUnidentified024.m_eCharacterClass == 0x12
-        && mGoalieActionState != GOALIEACTION_UNIDENTIFIED_30
+        && mGoalieActionState != GOALIEACTION_DEKE_STUNNED
         && pFldr->IsInvincibleChars() && pFldr->m_eActionState == 0x20
         && pFldr->mUnidentified178 > 0.4f && !IsPlayerBelowHeight(pFldr, 0.0f))
     {
-        fn_8008ED44(true);
+        InitActionDazed(true);
         return;
     }
     if ((int)pFldr->mUnidentified024.m_eCharacterClass == 0x13
-        && mGoalieActionState != GOALIEACTION_UNIDENTIFIED_29
+        && mGoalieActionState != GOALIEACTION_SHOCKWAVE_REACT
         && pFldr->m_eActionState == 0x20)
         return;
 
@@ -794,7 +794,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             TacklePlayer(pPlayer);
         break;
     case GOALIEACTION_LOB_SAVE:
-    case GOALIEACTION_UNIDENTIFIED_21:
+    case GOALIEACTION_LOB_SAVE_CONTACT:
         if (!IsOnSameTeam(pPlayer))
             TacklePlayer(pPlayer);
         break;
@@ -817,9 +817,9 @@ bool Goalie::PreCollideWithBallCallback(const dContact& contact)
         if (InitiatePickup())
             return false;
         break;
-    case GOALIEACTION_UNIDENTIFIED_30:
+    case GOALIEACTION_DEKE_STUNNED:
         return false;
-    case GOALIEACTION_UNIDENTIFIED_25:
+    case GOALIEACTION_DAZED:
         if (mpSkillShooter != NULL
             && (int)mpSkillShooter->mUnidentified024.m_eCharacterClass == 0xC)
             return false;
@@ -834,8 +834,8 @@ bool Goalie::PreCollideWithBallCallback(const dContact& contact)
         if (!mbBallImpacted && IsDryBonesSkillshot(g_pBall))
         {
             mbBallImpacted = true;
-            fn_800908F8();
-            fn_80090958(false);
+            UpdateSkillShotShooter();
+            HandleSkillShotImpact(false);
             return false;
         }
         break;
@@ -2091,7 +2091,7 @@ bool Goalie::CheckForDekeAttack()
                         else
                             return false;
                     }
-                    fn_8008BBB0(pFielder, nType);
+                    InitActionPursueDeke(pFielder, nType);
                     return true;
                 }
             }
@@ -2200,7 +2200,7 @@ bool Goalie::CheckForLobSave(bool bParam)
                         if (fTime > gfLobSaveMinTime)
                         {
                             mbShouldMiss = bShouldMiss;
-                            fn_8008CED8(fTime, v3Position, v3Velocity);
+                            InitActionLobSave(fTime, v3Position, v3Velocity);
                             return true;
                         }
                         return false;
@@ -2237,7 +2237,7 @@ bool Goalie::CheckForLobSave(bool bParam)
                 if (nlVec3DotProduct(v3Normal, v3Down) > fCos)
                 {
                     mbShouldMiss = bShouldMiss;
-                    fn_8008CED8(fContactTime, v3Position, v3Velocity);
+                    InitActionLobSave(fContactTime, v3Position, v3Velocity);
                     return true;
                 }
             }
@@ -2829,8 +2829,8 @@ void Goalie::UpdateActionState(float fDeltaTime)
     case GOALIEACTION_PURSUE_BALL_POUNCE:
         ActionPursueBallPounce(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_13:
-        fn_8008A610(fDeltaTime);
+    case GOALIEACTION_PURSUE_DEKE:
+        ActionPursueDeke(fDeltaTime);
         break;
     case GOALIEACTION_LOOSEBALL_SETUP:
         ActionLooseBallSetup(fDeltaTime);
@@ -2851,10 +2851,10 @@ void Goalie::UpdateActionState(float fDeltaTime)
         ActionLooseBallDesperate(fDeltaTime);
         break;
     case GOALIEACTION_LOB_SAVE:
-        fn_8008D210(fDeltaTime);
+        ActionLobSave(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_21:
-        fn_8008DAB4(fDeltaTime);
+    case GOALIEACTION_LOB_SAVE_CONTACT:
+        ActionLobSaveContact(fDeltaTime);
         break;
     case GOALIEACTION_OFFPLAY:
         ActionOffplay(fDeltaTime);
@@ -2865,32 +2865,32 @@ void Goalie::UpdateActionState(float fDeltaTime)
     case GOALIEACTION_GRAB_BALL:
         ActionGrabBall(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_25:
-        fn_8008B718(fDeltaTime);
+    case GOALIEACTION_DAZED:
+        ActionDazed(fDeltaTime);
         break;
     case GOALIEACTION_MEGA_STRIKE:
-        fn_80084EB0(fDeltaTime);
+        ActionMegaStrike(fDeltaTime);
         break;
     case GOALIEACTION_ELECTROCUTION:
-        fn_80083750(fDeltaTime);
+        ActionElectrocution(fDeltaTime);
         break;
     case GOALIEACTION_FROZEN:
-        fn_800838F8(fDeltaTime);
+        ActionFrozen(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_29:
-        fn_800891E8(fDeltaTime);
+    case GOALIEACTION_SHOCKWAVE_REACT:
+        ActionShockwaveReact(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_30:
-        fn_80083DE0(fDeltaTime);
+    case GOALIEACTION_DEKE_STUNNED:
+        ActionDekeStunned(fDeltaTime);
         break;
     case GOALIEACTION_GRAB_MONTY:
-        fn_80083960(fDeltaTime);
+        ActionGrabMonty(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_32:
-        fn_8008895C(fDeltaTime);
+    case GOALIEACTION_HEAD_IMPACT:
+        ActionHeadImpact(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_33:
-        fn_80088A94(fDeltaTime);
+    case GOALIEACTION_STS_KICK:
+        ActionSTSKick(fDeltaTime);
         break;
     case GOALIEACTION_STS_ATTACK_SETUP:
         ActionSTSAttackSetup(fDeltaTime);
@@ -2898,8 +2898,8 @@ void Goalie::UpdateActionState(float fDeltaTime)
     case GOALIEACTION_STS_ATTACK:
         ActionSTSAttack(fDeltaTime);
         break;
-    case GOALIEACTION_UNIDENTIFIED_36:
-        fn_8008E69C(fDeltaTime);
+    case GOALIEACTION_STS_PURSUE:
+        ActionSTSPursue(fDeltaTime);
         break;
     default:
         break;
@@ -3257,7 +3257,7 @@ void Goalie::CleanGoalieAction()
         mbPickedUp = false;
         break;
 
-    case GOALIEACTION_UNIDENTIFIED_21:
+    case GOALIEACTION_LOB_SAVE_CONTACT:
         mbNoUserControl = false;
         break;
 
@@ -3265,7 +3265,7 @@ void Goalie::CleanGoalieAction()
         mnOffplayPending = GOALIE_OFFPLAY_NONE;
         break;
 
-    case GOALIEACTION_UNIDENTIFIED_25:
+    case GOALIEACTION_DAZED:
         m_pPhysicsCharacter->m_CanCollideWithBall = true;
         break;
 
@@ -3285,11 +3285,11 @@ void Goalie::CleanGoalieAction()
         EndFreeze();
         break;
 
-    case GOALIEACTION_UNIDENTIFIED_29:
+    case GOALIEACTION_SHOCKWAVE_REACT:
         m_pPhysicsCharacter->m_CanCollideWithBall = true;
         break;
 
-    case GOALIEACTION_UNIDENTIFIED_30:
+    case GOALIEACTION_DEKE_STUNNED:
         m_pPhysicsCharacter->m_CanCollideWithBall = true;
         break;
 
@@ -3297,7 +3297,7 @@ void Goalie::CleanGoalieAction()
         ReleaseMonty();
         break;
 
-    case GOALIEACTION_UNIDENTIFIED_33:
+    case GOALIEACTION_STS_KICK:
         mpShooter = 0;
         break;
 
@@ -3656,7 +3656,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
         return;
     }
 
-    pGoalie->fn_80084CE0();
+    pGoalie->CleanupMegaStrikeOverlay();
     pGoalie->mbMegaUserSave = false;
     pGoalie->mMegaMachine = -1;
 
@@ -3694,7 +3694,7 @@ extern "C" void CleanupMegaStrike(Goalie* pGoalie)
     lbl_806DC7C8 = -1.0f;
     DrawableCharacter::RenderAllCharacters();
     UnFreezeEveryoneButCaptain(0);
-    pGoalie->fn_80084C3C(true);
+    pGoalie->RestoreBallAfterMegaStrike(true);
     InitializeBallTrails(0);
     WorldDarkening::Instance().Fade(100.0f, 0.0f);
     if (g_pGame->mbCaptainShotToScoreOn)
@@ -4078,7 +4078,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
                 pFielder->ReleaseBall(0);
                 bReleased = true;
             }
-            if (mGoalieActionState != GOALIEACTION_UNIDENTIFIED_13)
+            if (mGoalieActionState != GOALIEACTION_PURSUE_DEKE)
                 mPursueDekeType = 0;
             switch (mPursueDekeType)
             {
@@ -4333,7 +4333,7 @@ void Goalie::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mbPosGoalieNetCheck = false;
     mbNegGoalieNetCheck = false;
     mpLooseBallInfo = 0;
-    fn_80084C3C(false);
+    RestoreBallAfterMegaStrike(false);
 }
 
 

@@ -40,7 +40,7 @@ enum eGoalieActionState
     GOALIEACTION_PRE_CROUCH = 10,
     GOALIEACTION_PURSUE_BALL_CARRIER = 11,
     GOALIEACTION_PURSUE_BALL_POUNCE = 12,
-    GOALIEACTION_UNIDENTIFIED_13 = 13,
+    GOALIEACTION_PURSUE_DEKE = 13,
     GOALIEACTION_LOOSEBALL_SETUP = 14,
     GOALIEACTION_LOOSEBALL_CATCH = 15,
     GOALIEACTION_LOOSEBALL_PICKUP = 16,
@@ -48,22 +48,22 @@ enum eGoalieActionState
     GOALIEACTION_LOOSEBALL_PURSUE_ROLLING = 18,
     GOALIEACTION_LOOSEBALL_DESPERATE = 19,
     GOALIEACTION_LOB_SAVE = 20,
-    GOALIEACTION_UNIDENTIFIED_21 = 21,
+    GOALIEACTION_LOB_SAVE_CONTACT = 21,
     GOALIEACTION_OFFPLAY = 22,
     GOALIEACTION_SNAP_BALL = 23,
     GOALIEACTION_GRAB_BALL = 24,
-    GOALIEACTION_UNIDENTIFIED_25 = 25,
+    GOALIEACTION_DAZED = 25,
     GOALIEACTION_MEGA_STRIKE = 26,
     GOALIEACTION_ELECTROCUTION = 27,
     GOALIEACTION_FROZEN = 28,
-    GOALIEACTION_UNIDENTIFIED_29 = 29,
-    GOALIEACTION_UNIDENTIFIED_30 = 30,
+    GOALIEACTION_SHOCKWAVE_REACT = 29,
+    GOALIEACTION_DEKE_STUNNED = 30,
     GOALIEACTION_GRAB_MONTY = 31,
-    GOALIEACTION_UNIDENTIFIED_32 = 32,
-    GOALIEACTION_UNIDENTIFIED_33 = 33,
+    GOALIEACTION_HEAD_IMPACT = 32,
+    GOALIEACTION_STS_KICK = 33,
     GOALIEACTION_STS_ATTACK_SETUP = 34,
     GOALIEACTION_STS_ATTACK = 35,
-    GOALIEACTION_UNIDENTIFIED_36 = 36,
+    GOALIEACTION_STS_PURSUE = 36,
     GOALIEACTION_UNIDENTIFIED_37 = 37,
 };
 
@@ -142,7 +142,7 @@ public:
     void CleanGoalieAction();
     float CheckForDelflectAwayFromNet();
     void CheckForLimbEndZoneCollision();
-    void fn_800883D4(bool& bAdjustY, float& fXAdjustment,
+    void GetLimbEndZoneAdjustment(bool& bAdjustY, float& fXAdjustment,
         float& fYAdjustment, const nlVector3& v3JointPosition,
         float fXLimit, float fYLimit);
     void InitActionMove(bool bParam);
@@ -165,15 +165,15 @@ public:
     void InitActionOffplay(eGoalieOffplayType offplayType);
     void InitActionPass(bool useTarget);
     void InitActionPreCrouch(eGoalieCrouchType crouchType);
-    void fn_8008BBB0(cFielder* pTarget, int nPursueDekeType);
+    void InitActionPursueDeke(cFielder* pTarget, int nPursueDekeType);
     void StartLooseBallPickup(float fDistance);
     void InitActionLooseBallPickup(float fDistance, bool bStartPickup);
     void InitActionSaveSetup(bool bCanReposition);
     void InitActionSave();
-    void fn_80090320(float fParam);
+    void InitActionHeadImpact(float fParam);
     void InitActionSnapBall();
-    void fn_800908F8();
-    bool fn_80090958(bool bParam);
+    void UpdateSkillShotShooter();
+    bool HandleSkillShotImpact(bool bParam);
     bool IsTeammateHoardingBall();
     inline void InitActionPassInterceptSave();
     inline void InitActionPursueBallCarrier();
@@ -217,7 +217,7 @@ public:
     void ChooseDesperationAnim(float fFudgeDist);
     float CalcTimeToPlane(float fPlaneOffset);
     void UpdateActionState(float fDeltaTime);
-    void fn_80084EB0(float fDeltaTime);
+    void ActionMegaStrike(float fDeltaTime);
     bool CheckForDaze();
     void InitActionSTSRecover();
     bool PreCollideWithBallCallback(const dContact& contact);
@@ -276,21 +276,21 @@ public:
     void StartSaveReposition();
     void InitActionLooseBallPursueRolling();
     void InitActionLooseBallSetup();
-    void fn_8008CD08();
-    void fn_8008CED8(float fTargetTime,
+    void UpdateLobSaveAngle();
+    void InitActionLobSave(float fTargetTime,
         const nlVector3& v3TargetPosition,
         const nlVector3& v3TargetVelocity);
-    void fn_8008D210(float fDeltaT);
-    void fn_8008DAB4(float fDeltaT);
-    void fn_8008DEF4(float fParam);
-    void fn_8008E130();
-    void fn_8008E2D0();
+    void ActionLobSave(float fDeltaT);
+    void ActionLobSaveContact(float fDeltaT);
+    void LaunchSaveDeflection(float fParam);
+    void InitActionElectrocution();
+    void InitActionFrozen();
     void InitActionSTSAttackSetup(float fWaitTime);
     void InitActionSTSAttack();
     void InitActionLooseBallCatch();
-    void fn_8008EC2C();
-    void fn_8008ED44(bool bParam);
-    void fn_8008EF58();
+    void InitActionShockwaveReact();
+    void InitActionDazed(bool bParam);
+    void InitMegaStrikeUserControl();
     static void MoveDirectionCB(
         unsigned int nParam, cPN_SingleAxisBlender* blender);
     static void MoveWeightCB(
@@ -299,7 +299,7 @@ public:
         unsigned int nParam, cPN_SAnimController* controller);
     static void RunWeightCB(
         unsigned int nParam, cPN_SingleAxisBlender* blender);
-    static void fn_80087434(
+    static void RunSynchronizedSpeedCallback(
         unsigned int nParam, cPN_SAnimController* controller);
     void StartRunBlend();
     void ActionMoveWB(float fDeltaT);
@@ -312,37 +312,37 @@ public:
     void ActionLooseBallPickup(float fDeltaT);
     void ActionLooseBallPursueRolling(float deltaTime);
     void ActionLooseBallSetup(float fDeltaT);
-    void fn_80083750(float fDeltaT);
-    void fn_800838F8(float fDeltaT);
-    void fn_80083960(float fDeltaT);
-    void fn_80083DE0(float fDeltaT);
-    void fn_8008418C(float fDeltaT);
-    void fn_80084568(unsigned int nIndex, float fParam);
-    bool fn_80084724(unsigned int nParam, float* pScore);
-    void fn_80084840(MegaBallIndicator* pState);
-    void fn_80084C3C(bool bParam);
-    void fn_80084CE0();
-    void fn_80084AE0(MegaBallIndicator* pState);
-    void fn_80084D94(float fParam);
+    void ActionElectrocution(float fDeltaT);
+    void ActionFrozen(float fDeltaT);
+    void ActionGrabMonty(float fDeltaT);
+    void ActionDekeStunned(float fDeltaT);
+    void UpdateMegaStrikeBallLaunches(float fDeltaT);
+    void ActivateMegaStrikeTarget(unsigned int nIndex, float fParam);
+    bool TestMegaStrikeCatch(unsigned int nParam, float* pScore);
+    void LaunchMissedMegaStrikeBall(MegaBallIndicator* pState);
+    void RestoreBallAfterMegaStrike(bool bParam);
+    void CleanupMegaStrikeOverlay();
+    void ClearSavedMegaStrikeBall(MegaBallIndicator* pState);
+    void SimulateMegaStrikeResults(float fParam);
     void ActionDiveRecover(float fDeltaT);
     void ActionPass(float deltaTime);
     void ActionPassIntercept(float deltaTime);
     void ActionPreCrouch(float deltaTime);
     void ActionPursueBallCarrier(float fDeltaT);
     void ActionPursueBallPounce(float fDeltaT);
-    void fn_8008A610(float fDeltaT);
+    void ActionPursueDeke(float fDeltaT);
     void ActionOffplay(float fDeltaT);
     void ActionLooseBallPursueBouncing(float deltaTime);
     void ActionSnapBall(float fDeltaT);
     void ActionGrabBall(float fDeltaT);
-    void fn_8008B718(float fDeltaT);
-    void fn_80084D70(int nCurTarget, float fScore);
-    void fn_8008E69C(float fDeltaT);
-    void fn_8008895C(float deltaTime);
+    void ActionDazed(float fDeltaT);
+    void QueueMegaStrikeSave(int nCurTarget, float fScore);
+    void ActionSTSPursue(float fDeltaT);
+    void ActionHeadImpact(float deltaTime);
     void ActionSTSRecover(float deltaTime);
-    void fn_80088A94(float deltaTime);
+    void ActionSTSKick(float deltaTime);
     void ActionSTSAttackSetup(float deltaTime);
-    void fn_800891E8(float deltaTime);
+    void ActionShockwaveReact(float deltaTime);
     void ActionChipShotStumble(float deltaTime);
     void ActionSTSAttack(float deltaTime);
 
@@ -433,9 +433,9 @@ public:
     /* 0x4B8 */ GoalieFatigue mFatigue;
     /* 0x4C8 */ cShootToScoreCamera* mpShootToScoreCamera;
     /* 0x4CC */ const LooseBallInfo* mpLooseBallInfo;
-    /* 0x4D0 */ int mUnidentified4D0[10];
-    /* 0x4F8 */ float mUnidentified4F8[10];
-    /* 0x520 */ unsigned int mUnidentified520;
+    /* 0x4D0 */ int mMegaBallState[10];
+    /* 0x4F8 */ float mfMegaCatchScore[10];
+    /* 0x520 */ unsigned int mMegaCatchAttempts;
     /* 0x524 */ float mUnidentified524;
     /* 0x528 */ bool mbFirstMegaStrike;
     /* 0x529 */ bool mbDefensivePlayOverlayPushed;

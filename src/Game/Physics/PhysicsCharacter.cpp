@@ -144,7 +144,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             DebugPrintf("PhysChar PHYSOBJ_HAMMER OnGround\n");
             Goalie* goalie = (Goalie*)m_pAICharacter;
-            if (goalie->mGoalieActionState != GOALIEACTION_UNIDENTIFIED_32
+            if (goalie->mGoalieActionState != GOALIEACTION_HEAD_IMPACT
                 && goalie->mGoalieActionState != GOALIEACTION_SAVE)
             {
                 DebugPrintf("PhysChar PHYSOBJ_HAMMER Goalie return\n");
