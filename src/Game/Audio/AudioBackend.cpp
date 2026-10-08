@@ -81,7 +81,7 @@ bool AudioBackend::Initialize()
     AllocatorStack[AllocatorStackDepth] = 0;
     CurrentAllocator = AllocatorStack[AllocatorStackDepth - 1];
     m_AudioAllocator.Initialize(memory, gAudioMemorySize);
-    InitializeAudioStreamBlockPool();
+    InitializeAudioStreamHeaderPool();
     SetOutputMode(AUDIO_OUTPUT_STEREO);
 
     OSCreateAlarm(&m_ControllerSpeakerAlarm);

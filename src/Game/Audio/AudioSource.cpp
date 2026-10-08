@@ -501,7 +501,7 @@ void OnAudioStreamHeaderRead(nlFile*, void* buffer, unsigned int, unsigned long 
         entry->m_State->CompleteRead();
     }
     if (buffer != 0)
-        g_pAudioStreamBlockPool->Free((AudioStreamBlock*)buffer);
+        g_pAudioStreamHeaderPool->Free((AudioStreamHeader*)buffer);
 }
 
 inline void AudioReadState::OnChannelPrepared(AudioStreamChannel* channel)
@@ -572,7 +572,7 @@ bool AudioReadState::Prepare()
         entry->m_State = this;
         entry->m_Channel = channel;
         int index = channel - GetFirstChannel();
-        AudioStreamBlock* header = g_pAudioStreamBlockPool->Allocate();
+        AudioStreamHeader* header = g_pAudioStreamHeaderPool->Allocate();
         unsigned int offset = GetStreamHeaderOffset() + index * sizeof(AudioStreamHeader);
         QueueStreamRead(offset, header, sizeof(AudioStreamHeader), OnAudioStreamHeaderRead, (unsigned long)entry);
     }
