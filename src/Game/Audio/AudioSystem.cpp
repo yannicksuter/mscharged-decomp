@@ -12,7 +12,8 @@
 #include "NL/nlBind.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/Audio/AudioResourceRuntime.inl"
+#include "Game/Audio/AudioResourceRuntime.h"
+#include "Game/Audio/RegistryPools.h"
 
 int AllocatedCueCount;
 AudioSystem* g_pAudioSystem;
