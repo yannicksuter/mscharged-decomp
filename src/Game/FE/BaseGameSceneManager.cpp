@@ -611,7 +611,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     mBaseSceneHandlerStack[mCurrentStackDepth] = newHandler;
     mCurrentStackDepth++;
 
-    if (g_bEnableGamecubePadMonkey)
+    if (gEnablePadMonkeys)
     {
         nlPrintf("PAD MONKEY PUSHED: %s\n", filename);
     }

@@ -10,7 +10,6 @@
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 #include "Game/Render/CrowdImpostors.h"
-#include "NL/nlstring_tmpl.h"
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/World/WorldObject.h"
 

@@ -101,19 +101,22 @@ struct LexicalCastImpl<To, char>
     static To Do(char value);
 };
 
-template <>
-inline NLString LexicalCastImpl<NLString, char>::Do(char value)
+template <typename To>
+inline To LexicalCastImpl<To, char>::Do(char value)
 {
     char buffer[0x40];
     nlSNPrintf(buffer, sizeof(buffer), "%c", value);
-    return NLString(buffer);
+    return To(buffer);
 }
 
-template <>
-inline NLString LexicalCastImpl<NLString, char*>::Do(char* const& f)
+template <typename To>
+struct LexicalCastImpl<To, char*>
 {
-    return NLString(f);
-}
+    static To Do(char* const& f)
+    {
+        return To(f);
+    }
+};
 
 template <typename To, typename From, int N>
 struct LexicalCastImpl<To, From[N]>

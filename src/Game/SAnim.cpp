@@ -22,7 +22,7 @@ cSAnim* cSAnim::Initialize(nlChunk* pChunk)
     pRetval->m_szName = (const char*)chunkB->GetData();
 
     chunkA = chunkB->GetNextChunk();
-    pRetval->m_Unknown18 = (const unsigned int*)chunkA->GetData();
+    pRetval->m_pNumWeightKeys = (const unsigned int*)chunkA->GetData();
 
     chunkB = chunkA->GetNextChunk();
     pRetval->m_Unknown1C = (const unsigned int*)chunkB->GetData();
@@ -37,7 +37,7 @@ cSAnim* cSAnim::Initialize(nlChunk* pChunk)
     pRetval->m_pScaleKeys = (PackedScale**)chunkA->GetData();
 
     chunkB = chunkA->GetNextChunk();
-    pRetval->m_Unknown2C = (unsigned char**)chunkB->GetData();
+    pRetval->m_pWeightKeys = (unsigned char**)chunkB->GetData();
 
     chunkA = chunkB->GetNextChunk();
     pRetval->m_Unknown30 = (void**)chunkA->GetData();
@@ -56,7 +56,7 @@ cSAnim* cSAnim::Initialize(nlChunk* pChunk)
     {
         if (type == 0x80017100)
         {
-            pRetval->fn_80308610(nodeChunk, nodeIndex);
+            pRetval->InitializeNodeKeys(nodeChunk, nodeIndex);
             nodeIndex++;
         }
         nodeChunk = nodeChunk->GetNextChunk();
@@ -97,7 +97,7 @@ cSAnim* cSAnim::Initialize(nlChunk* pChunk)
     return pRetval;
 }
 
-void cSAnim::fn_80308610(nlChunk* nodeChunk, int nodeIndex)
+void cSAnim::InitializeNodeKeys(nlChunk* nodeChunk, int nodeIndex)
 {
     nlChunk* subEnd;
     nlChunk* subChunk;
@@ -121,7 +121,7 @@ void cSAnim::fn_80308610(nlChunk* nodeChunk, int nodeIndex)
         }
         else if (type == 0x17112)
         {
-            m_Unknown2C[nodeIndex] = (unsigned char*)subChunk->GetData();
+            m_pWeightKeys[nodeIndex] = (unsigned char*)subChunk->GetData();
         }
         else if (type == 0x17115)
         {
@@ -464,23 +464,23 @@ void cSAnim::GetRootTrans(float t, nlVector3* out) const
 }
 
 
-bool cSAnim::fn_8030939C(int channel, float time, float* weight) const
+bool cSAnim::GetChannelWeight(int channel, float time, float* weight) const
 {
-    if (m_Unknown2C == 0 || m_Unknown2C[channel] == 0)
+    if (m_pWeightKeys == 0 || m_pWeightKeys[channel] == 0)
     {
         *weight = 1.0f;
         return false;
     }
 
-    unsigned char* keys = m_Unknown2C[channel];
-    float fRealIndex = time * (float)(m_Unknown18[channel] - 1);
+    unsigned char* keys = m_pWeightKeys[channel];
+    float fRealIndex = time * (float)(m_pNumWeightKeys[channel] - 1);
     int nIndex = (int)fRealIndex;
     float fWeightB = fRealIndex - (float)nIndex;
     float fWeightA = 1.0f - fWeightB;
     float weightA;
     float weightB;
     SAnimDecodeWeight(&weightA, &keys[nIndex]);
-    SAnimDecodeWeight(&weightB, m_Unknown2C[channel] + nIndex + 1);
+    SAnimDecodeWeight(&weightB, m_pWeightKeys[channel] + nIndex + 1);
     *weight = fWeightA * weightA + fWeightB * weightB;
     return true;
 }

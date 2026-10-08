@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
@@ -14,57 +14,55 @@
 #include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Physics/PhysicsShell.h"
 #include "Game/Render/RLView.h"
+#include "Game/Render/ThwompObject.h"
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
 #include "NL/nlFunction.inl"
+#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/Audio/RegistryPools.h"
 
-extern "C" const nlVector3 gWindDebrisZeroVelocity;
-extern "C" const nlVector3 gWindDebrisHiddenPosition;
-static RLView* lbl_806E16E8;
+static RLView* sUnshadowedView;
 
-static inline void fn_801B4F4C(CollisionWindDebrisPlayerData* pData)
-{
-    g_CollisionWindDebrisPlayerDataPool.Free(pData);
-}
+static inline void FreeCollisionWindDebrisPlayerData(CollisionWindDebrisPlayerData* pData);
 
-UnidentifiedNPC_801B43F8::UnidentifiedNPC_801B43F8(
-    cSHierarchy& pHierarchy, int nModelID, unsigned long param1,
-    unsigned long param2, PhysicsNPC& rPhysObj,
+WindDebris::WindDebris(
+    cSHierarchy& pHierarchy, int nModelID, unsigned long activationSoundCue,
+    unsigned long impactSoundCue, PhysicsNPC& rPhysObj,
     cInventory<cSAnim>* pInventorySAnim, void* resource)
     : SkinAnimatedMovableNPC(pHierarchy, nModelID, rPhysObj, resource)
-    , mUnidentified088(param1)
-    , mUnidentified08C(param2)
-    , mUnidentified090(false)
-    , mUnidentified094(0.0f)
+    , mActivationSoundCue(activationSoundCue)
+    , mUnidentified08C(impactSoundCue)
+    , mbUpdateSuspended(false)
+    , mfCollisionDelay(0.0f)
 {
-    lbl_806E16E8 = GetUnshadowedView();
-    mUnidentified084 = pInventorySAnim->Find((unsigned int)nlStringHash("tumble"));
-    SetAnimState(*mUnidentified084, 0.2f, PM_CYCLIC);
+    sUnshadowedView = GetUnshadowedView();
+    mpTumbleAnim = pInventorySAnim->Find((unsigned int)nlStringHash("tumble"));
+    SetAnimState(*mpTumbleAnim, 0.2f, PM_CYCLIC);
     mpPhysObj->mpAINPC = this;
-    fn_801B4B24(false);
+    Deactivate(false);
 }
 
-UnidentifiedNPC_801B43F8::~UnidentifiedNPC_801B43F8()
+WindDebris::~WindDebris()
 {
 }
 
-void UnidentifiedNPC_801B43F8::Update(float fDeltaT)
+void WindDebris::Update(float fDeltaT)
 {
-    if (mbIsVisible == true && !mUnidentified090)
+    if (mbIsVisible == true && !mbUpdateSuspended)
     {
         nlVector3 pos;
         pos.x = mv3Position.x + fDeltaT * mv3Velocity.x;
         pos.y = mv3Position.y + fDeltaT * mv3Velocity.y;
         pos.z = mv3Position.z + fDeltaT * mv3Velocity.z;
         SetPosition(pos);
-        if (mUnidentified084 != 0)
+        if (mpTumbleAnim != 0)
         {
             SkinAnimatedNPC::Update(fDeltaT);
         }
     }
-    else if (mUnidentified090 == true)
+    else if (mbUpdateSuspended == true)
     {
-        mUnidentified094 -= fDeltaT;
+        mfCollisionDelay -= fDeltaT;
     }
 
     float x = cField::GetGoalLineX(1U);
@@ -72,30 +70,30 @@ void UnidentifiedNPC_801B43F8::Update(float fDeltaT)
     float y = 0.5f * width;
     if (mv3Velocity.x > 0.0f && mv3Position.x > 2.0f * x)
     {
-        fn_801B4B24(false);
+        Deactivate(false);
     }
     else if (mv3Velocity.x < 0.0f && mv3Position.x < -2.0f * x)
     {
-        fn_801B4B24(false);
+        Deactivate(false);
     }
     if (mv3Velocity.y > 0.0f && mv3Position.y > 2.0f * y)
     {
-        fn_801B4B24(false);
+        Deactivate(false);
     }
     else if (mv3Velocity.y < 0.0f && mv3Position.y < -2.0f * y)
     {
-        fn_801B4B24(false);
+        Deactivate(false);
     }
 }
 
-void UnidentifiedNPC_801B43F8::fn_801B4830(
+void WindDebris::CollisionCallback(
     PhysicsObject* pPhysObj, PhysicsObject* pObjA, const nlVector3& v3Pos)
 {
     cPlayer* pPlayer = 0;
-    UnidentifiedNPC_801B43F8* pDebris
-        = (UnidentifiedNPC_801B43F8*)((PhysicsNPC*)pPhysObj)->mpAINPC;
-    bool bUnidentified = pDebris->mUnidentified094 > 0.0f;
-    if (bUnidentified)
+    WindDebris* pDebris
+        = (WindDebris*)((PhysicsNPC*)pPhysObj)->mpAINPC;
+    bool collisionDelayed = pDebris->mfCollisionDelay > 0.0f;
+    if (collisionDelayed)
     {
         return;
     }
@@ -126,7 +124,7 @@ void UnidentifiedNPC_801B43F8::fn_801B4830(
         break;
     }
 
-    if (pPlayer != 0 && pPlayer->m_eClassType == 2)
+    if (pPlayer != 0 && pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
         if (pFielder->m_eActionState != 35 && pFielder->m_eActionState != 3
@@ -136,22 +134,22 @@ void UnidentifiedNPC_801B43F8::fn_801B4830(
             pData->pFielder = pFielder;
             pData->pDebris = pDebris;
             g_pGame->mUnidentified49C.mCollisionWindDebrisPlayerEvent.Queue(pData,
-                Function<CollisionWindDebrisPlayerData*>(fn_801B4F4C));
+                Function<CollisionWindDebrisPlayerData*>(FreeCollisionWindDebrisPlayerData));
         }
     }
 }
 
-void UnidentifiedNPC_801B43F8::fn_801B4AD0()
+void WindDebris::Activate()
 {
     mpPhysObj->EnableCollisions();
     mbIsVisible = true;
-    if (mUnidentified088 != 0)
+    if (mActivationSoundCue != 0)
     {
-        PlaySound(11, mUnidentified088, 0, 0);
+        PlaySound(11, mActivationSoundCue, 0, 0);
     }
 }
 
-void UnidentifiedNPC_801B43F8::fn_801B4B24(bool param)
+void WindDebris::Deactivate(bool)
 {
     SetPosition(gWindDebrisHiddenPosition);
     maFacingDirection = 0;
@@ -160,20 +158,20 @@ void UnidentifiedNPC_801B43F8::fn_801B4B24(bool param)
     mbIsVisible = false;
 }
 
-void UnidentifiedNPC_801B43F8::fn_801B4B9C()
+void WindDebris::Reset()
 {
-    fn_801B4B24(false);
+    Deactivate(false);
 }
 
-void UnidentifiedNPC_801B43F8::fn_801B4C14(float param)
-{
-}
-
-void UnidentifiedNPC_801B43F8::Move(float fDeltaT)
+void WindDebris::fn_801B4C14(float duration)
 {
 }
 
-void UnidentifiedNPC_801B43F8::DrawShadow(
+void WindDebris::Move(float fDeltaT)
+{
+}
+
+void WindDebris::DrawShadow(
     const cPoseAccumulator& pa, const nlMatrix4& worldMatrix)
 {
     if (mbIsVisible == true)
@@ -182,4 +180,5 @@ void UnidentifiedNPC_801B43F8::DrawShadow(
     }
 }
 
+#include "Game/Render/WindDebris.inl"
 #include "NL/nlBind_impl.h"

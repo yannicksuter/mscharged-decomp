@@ -4,6 +4,7 @@
 #include <revolution/os/OSContext.h>
 #include <revolution/os/OSThread.h>
 #include <revolution/types.h>
+#include <revolution/os/OSHardware_fwd.h>
 #include <revolution/dvd/dvd.h>
 
 #ifdef __cplusplus
@@ -40,7 +41,6 @@ OSContext* OS_CURRENT_FPU_CONTEXT AT_ADDRESS(0x800000D8);
 OSThreadQueue OS_THREAD_QUEUE AT_ADDRESS(0x800000DC);
 OSThread* OS_CURRENT_THREAD AT_ADDRESS(0x800000E4);
 u32 OS_TV_FORMAT AT_ADDRESS(0x800000CC);
-u32 OS_BUS_CLOCK_SPEED AT_ADDRESS(0x800000F8);
 s64 OS_SYSTEM_TIME AT_ADDRESS(0x800030D8);
 extern volatile s32 OS_EXI_LAST_INSERT[2] AT_ADDRESS(0x800030C0);
 u16 OS_GC_PAD_3_BTN AT_ADDRESS(0x800030E4);

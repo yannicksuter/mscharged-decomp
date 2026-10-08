@@ -478,8 +478,6 @@ void Config::Set(const char* tag, const String& value)
     Set(tag, value.c_str());
 }
 
-void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
-
 void Config::Parse(const char* data, int size, Parser& parser)
 {
     if (size == 0)

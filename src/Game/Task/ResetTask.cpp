@@ -141,7 +141,7 @@ void HandleSoftReset()
 
     LastTime = OSGetTime();
 
-    if (g_bEnableGamecubePadMonkey)
+    if (gEnablePadMonkeys)
     {
         return;
     }

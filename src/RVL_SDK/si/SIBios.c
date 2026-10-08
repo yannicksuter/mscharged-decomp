@@ -1,4 +1,5 @@
 #include <revolution/si.h>
+#include <revolution/vi/vi_fwd.h>
 #include <revolution/os.h>
 
 static const char* __SIVersion = "<< RVL_SDK - SI \trelease build: Nov 30 2006 03:31:44 (0x4199_60831) >>";

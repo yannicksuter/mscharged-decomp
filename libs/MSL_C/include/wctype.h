@@ -5,6 +5,18 @@
 #include "locale.h"
 #include <wchar_t.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern const unsigned short __wctype_map[256];
+extern const wchar_t __wupper_map[256];
+extern const wchar_t __wlower_map[256];
+
+#ifdef __cplusplus
+}
+#endif
+
 inline int iswdigit(wint_t value)
 {
     return value < 0 || value >= 256

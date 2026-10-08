@@ -126,7 +126,7 @@ void SkinAnimatedNPC::SendToGL() const
 {
     static unsigned long prevFrame = 0;
     bool isChainChomp;
-    bool isBowser;
+    bool isWindDebris;
 
     unsigned long frame = glGetCurrentFrame();
     if (prevFrame != frame)
@@ -168,9 +168,9 @@ void SkinAnimatedNPC::SendToGL() const
     }
     else
     {
-        isBowser =
-            GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_BOWSER;
-        if (isBowser)
+        isWindDebris =
+            GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_WIND_DEBRIS;
+        if (isWindDebris)
         {
             view = eCLV_MoreCharacters;
         }

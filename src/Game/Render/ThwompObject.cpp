@@ -21,35 +21,32 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
-extern "C"
-{
-    bool gThwompHideAfterRise = true;
-    float gThwompTextureSwitchHeight = 2.0f;
-    float gThwompLandingTime = 0.8f;
-    float gThwompWarningTime = 0.2f;
-    float gThwompFallGravity = -60.0f;
-    float gThwompRiseSpeed = 1.25f;
-    float gThwompRiseGravity = 4.65f;
-    float gThwompScaleTime = 2.0f;
-    float gThwompSpawnHeight = 25.0f;
-    float gThwompCameraRumbleX = 0.1f;
-    float gThwompCameraRumbleY = 0.125f;
-    float gThwompCameraRumbleSpring = 4300.0f;
-    float gThwompCameraRumbleDamping = 5.8f;
+bool gThwompHideAfterRise = true;
+float gThwompTextureSwitchHeight = 2.0f;
+float gThwompLandingTime = 0.8f;
+float gThwompWarningTime = 0.2f;
+float gThwompFallGravity = -60.0f;
+float gThwompRiseSpeed = 1.25f;
+float gThwompRiseGravity = 4.65f;
+float gThwompScaleTime = 2.0f;
+float gThwompSpawnHeight = 25.0f;
+float gThwompCameraRumbleX = 0.1f;
+float gThwompCameraRumbleY = 0.125f;
+float gThwompCameraRumbleSpring = 4300.0f;
+float gThwompCameraRumbleDamping = 5.8f;
 
-    bool gThwompAutoDrop;
+bool gThwompAutoDrop;
 
-    char gThwompTexture3Name[] = "gameplay/thwomp_3";
-    char gThwompTexture2Name[] = "global/thwomp_2";
-    char gThwompTexture1Name[] = "global/thwomp_1";
-    char gThwompMovementSoundName[] = "ThwompUp";
-    char gThwompLandingEffectName[] = "fx_thwompland";
+char gThwompTexture3Name[] = "gameplay/thwomp_3";
+char gThwompTexture2Name[] = "global/thwomp_2";
+char gThwompTexture1Name[] = "global/thwomp_1";
+char gThwompMovementSoundName[] = "ThwompUp";
+char gThwompLandingEffectName[] = "fx_thwompland";
 
-    extern const nlVector3 gThwompHiddenPosition = { 0.0f, 0.0f, -100.0f };
-    extern const nlVector3 gWindDebrisZeroVelocity = { 0.0f, 0.0f, 0.0f };
-    extern const nlVector3 gWindDebrisHiddenPosition = { 0.0f, 0.0f, -10.0f };
-}
+extern const nlVector3 gThwompHiddenPosition = { 0.0f, 0.0f, -100.0f };
 
+extern const nlVector3 gWindDebrisZeroVelocity = { 0.0f, 0.0f, 0.0f };
+extern const nlVector3 gWindDebrisHiddenPosition = { 0.0f, 0.0f, -10.0f };
 extern const nlVector3 gYoshiEggZeroDisplacement = { 0.0f, 0.0f, 0.0f };
 extern const nlVector3 gYoshiEggHiddenPosition = { 0.0f, -20.0f, -20.0f };
 

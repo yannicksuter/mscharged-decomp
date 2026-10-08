@@ -39,7 +39,7 @@
 #include "Game/Render/PeachPhoto.h"
 #include "Game/Render/ChainChomp.h"
 #include "Game/Render/BirdoEgg.h"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "Game/RumbleActions.h"
 #include "Game/SAnim/pnFeather.h"
@@ -1447,7 +1447,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
             }
             for (unsigned int i = 0; i < 3; i++)
             {
-                UnidentifiedNPC_801B43F8* pNPC = gNPCManager->fn_801A9DE0(i);
+                WindDebris* pNPC = gNPCManager->fn_801A9DE0(i);
                 if (pNPC != NULL && pNPC->mbIsVisible)
                 {
                     nlVector2 position;

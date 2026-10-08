@@ -423,7 +423,7 @@ void cCameraManager::Update(float fDeltaT)
     if (cameraType != g_LastCameraType)
     {
         ImpostorManager* impostorManager = ImpostorManager::GetInstance();
-        impostorManager->mUnidentified037 = cameraType != eCameraType_Gameplay;
+        impostorManager->mUpdateClusters = cameraType != eCameraType_Gameplay;
         int updatePeriod = cameraType == eCameraType_Gameplay ? 2 : 1;
         ImpostorManager::GetInstance()->SetUpdatePeriod(updatePeriod);
     }

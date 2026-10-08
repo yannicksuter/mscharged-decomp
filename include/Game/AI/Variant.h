@@ -74,7 +74,7 @@ public:
         mType = FT_STRING;
         unsigned long size = nlStrLen(value) + 1;
         char* copy = (char*)nlMalloc(size, 8, false);
-        UnidentifiedCopyString(copy, value, size);
+        CopyString(copy, value, size);
     }
 
     Variant(const FuzzyVariant& other);
@@ -172,7 +172,7 @@ protected:
 
             int size = nlStrLen(source) + 1;
             char* copy = (char*)nlMalloc(size, 8, false);
-            UnidentifiedCopyString(copy, source, size);
+            CopyString(copy, source, size);
         }
         else
         {
@@ -180,7 +180,7 @@ protected:
         }
     }
 
-    void UnidentifiedCopyString(
+    void CopyString(
         char* destination, const char* source, unsigned long length)
     {
         *(char**)((char*)this + offsetof(Variant, mData)) = destination;

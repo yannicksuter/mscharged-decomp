@@ -71,7 +71,7 @@ public:
     void SendLocalMachineInfo(int aid);
     void MarkGameStarted();
     bool AllMachineInfoReceived();
-    NetworkDraftMachineInfo* GetLocalMachineInfo();
+    NetworkDraftMachineInfo* GetMachineInfoArray();
     NetworkDraftMachineInfo* GetMachineInfo(int index);
 
     /* 0x0008 */ bool mReceiverRegistered;
@@ -88,9 +88,9 @@ public:
     /* 0x0024 */ int mMaxMatchmakingEntries;
     /* 0x0028 */ int mMinMatchmakingEntries;
     /* 0x002C */ unsigned int mPadding02C;
-    /* 0x0030 */ unsigned int mUnidentified030;
-    /* 0x0034 */ unsigned int mUnidentified034;
-    /* 0x0038 */ int mFriendProfileId;
+    /* 0x0030 */ unsigned int mMinCompletionElapsedMsHigh;
+    /* 0x0034 */ unsigned int mMinCompletionElapsedMsLow;
+    /* 0x0038 */ int mMinCompletionState;
     /* 0x003C */ void* mReceiveBuffers[4];
     /* 0x004C */ int mState;
     /* 0x0050 */ bool mMatchFailed;

@@ -90,6 +90,7 @@ typedef struct DVDFileInfo {
 } DVDFileInfo;
 
 extern volatile u32 __DVDLayoutFormat;
+extern DVDCommandBlock __DVDStopMotorCommandBlock;
 
 void DVDInit(void);
 s32 DVDConvertPathToEntrynum(const char* path);

@@ -10,6 +10,8 @@
 extern "C" double atof(const char* string);
 extern "C" int strcmp(const char* first, const char* second);
 
+void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
+
 namespace Detail
 {
 template <>

@@ -98,12 +98,12 @@ struct CollisionChainPlayerData
     /* 0x04 */ ChainChomp* pChain;
 }; // total size: 0x8
 
-class UnidentifiedNPC_801B43F8;
+class WindDebris;
 
 struct CollisionWindDebrisPlayerData
 {
     /* 0x00 */ cFielder* pFielder;
-    /* 0x04 */ UnidentifiedNPC_801B43F8* pDebris;
+    /* 0x04 */ WindDebris* pDebris;
 }; // total size: 0x8
 
 struct CollisionThwompPlayerData

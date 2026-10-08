@@ -69,7 +69,7 @@ public:
 
     /* 0x04 */ int mNumAngles;
     /* 0x08 */ int mNumTextures;
-    /* 0x0C */ u8 mUnidentified00C;
+    /* 0x0C */ u8 mIsCluster;
     /* 0x0D */ u8 mUnidentified00D[3];
     /* 0x10 */ nlDLListSlotPool<ImpostorSprite*> mSprites;
     /* 0x2C */ int mWidth;

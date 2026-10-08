@@ -13,8 +13,8 @@
 
 // Charged-only shadow prop, sixth of the run described beside
 // DrawableBulletBill. This one carries the index of its live camera instead of
-// a pointer, and owns a lowercase hash of the flying-camera model name. The
-// The render-object lookup remains address-named.
+// a pointer, and owns a lowercase hash of the flying-camera model name.
+// It uses the indexed render-object lookup.
 
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 100;
@@ -103,7 +103,7 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
 
 DrawableFlyingCamera::DrawableFlyingCamera()
 {
-    mIndex = 0;
+    mCameraIndex = 0;
     mScale = 1.0f;
     mVisible = false;
     mPosition.x = 0.0f;
@@ -117,15 +117,15 @@ DrawableFlyingCamera::DrawableFlyingCamera()
 
 void DrawableFlyingCamera::Grab()
 {
-    mVisible = GetFlyingCamera(mIndex)->mVisible;
-    mPosition = GetFlyingCamera(mIndex)->mPosition;
-    mOrientation = GetFlyingCamera(mIndex)->mOrientation;
+    mVisible = GetFlyingCamera(mCameraIndex)->mVisible;
+    mPosition = GetFlyingCamera(mCameraIndex)->mPosition;
+    mOrientation = GetFlyingCamera(mCameraIndex)->mOrientation;
 }
 
 void DrawableFlyingCamera::Render() const
 {
     nlMatrix4 matrix;
-    RenderObject* drawable = GetRenderObject(7, mIndex);
+    RenderObject* drawable = GetRenderObject(7, mCameraIndex);
 
     if (drawable == 0)
     {

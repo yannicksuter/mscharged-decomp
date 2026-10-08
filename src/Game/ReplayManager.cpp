@@ -98,60 +98,60 @@ void RenderSnapshot::Replay(T& frame)
     frame.fn_80191504();
     frame.fn_80191504();
     frame.fn_80191504();
-    if ((_2714.raw >> 30) & 1)
+    if ((mFlags.raw >> 30) & 1)
     {
-        Replayable<0>(frame, _2294);
-        for (unsigned int i = 0; i < _2294; i++)
+        Replayable<0>(frame, mNumFlyingCameras);
+        for (unsigned int i = 0; i < mNumFlyingCameras; i++)
             Replayable<0>(frame, _2298[i]);
     }
     frame.fn_80191504();
-    if ((_2714.raw >> 29) & 1)
+    if ((mFlags.raw >> 29) & 1)
     {
-        Replayable<0>(frame, _1DA0);
-        if (_1DA0)
+        Replayable<0>(frame, mHasHammers);
+        if (mHasHammers)
             for (unsigned int i = 0; i < 15; i++)
-                Replayable<0>(frame, _1DA4[i]);
+                Replayable<0>(frame, mHammers[i]);
         frame.fn_80191504();
     }
-    if ((_2714.raw >> 22) & 1)
+    if ((mFlags.raw >> 22) & 1)
         for (unsigned int i = 0; i < 8; i++)
-            Replayable<0>(frame, _2194[i]);
-    if ((_2714.raw >> 28) & 1)
+            Replayable<0>(frame, mThwomps[i]);
+    if ((mFlags.raw >> 28) & 1)
     {
-        Replayable<0>(frame, _1CC4);
-        for (unsigned int i = 0; i < _1CC4; i++)
-            Replayable<0>(frame, _1CC8[i]);
+        Replayable<0>(frame, mNumBulletBills);
+        for (unsigned int i = 0; i < mNumBulletBills; i++)
+            Replayable<0>(frame, mBulletBills[i]);
         frame.fn_80191504();
     }
     Replayable<0>(frame, mChainChomp);
-    if ((_2714.raw >> 24) & 1)
+    if ((mFlags.raw >> 24) & 1)
     {
         if (NPCManager::fn_801948A0()->fn_801919A4() != 0)
-            Replayable<0>(frame, mBowser);
+            Replayable<0>(frame, mDiddyBanana);
     }
-    if ((_2714.raw >> 25) & 1)
+    if ((mFlags.raw >> 25) & 1)
     {
-        Replayable<0>(frame, _1C00);
-        for (unsigned int i = 0; i < _1C00; i++)
+        Replayable<0>(frame, mNumVisibleDaisyFists);
+        for (unsigned int i = 0; i < mNumVisibleDaisyFists; i++)
             Replayable<0>(frame, mDaisyFists[i]);
     }
-    if ((_2714.raw >> 31) & 1)
-        Replayable<0>(frame, _1BA0);
-    if ((_2714.raw >> 26) & 1)
-        Replayable<0>(frame, _1BC4);
-    if ((_2714.raw >> 27) & 1)
-        Replayable<0>(frame, _1BE8);
+    if ((mFlags.raw >> 31) & 1)
+        Replayable<0>(frame, mYoshiEgg);
+    if ((mFlags.raw >> 26) & 1)
+        Replayable<0>(frame, mBirdoEgg);
+    if ((mFlags.raw >> 27) & 1)
+        Replayable<0>(frame, mKoopaShell);
     Replayable<0>(frame, mBall);
     Replayable<1>(frame, mCameraUp);
     Replayable<1>(frame, mGoalLight);
     Replayable<1>(frame, CrowdManager::fn_801919AC());
     Replayable<0>(frame, WorldDarkening::Instance());
-    if ((_2714.raw >> 23) & 1)
+    if ((mFlags.raw >> 23) & 1)
     {
         for (int i = 0; i < 3; i++)
         {
             if (NPCManager::fn_801948A0()->fn_801A9DE0(i) != 0)
-                Replayable<0>(frame, _1FC0[i]);
+                Replayable<0>(frame, mWindDebris[i]);
         }
         frame.fn_80191504();
     }
@@ -165,16 +165,16 @@ void RenderSnapshot::Replay(T& frame)
             {
                 gbNetMeshReplayResync = false;
                 NetMesh::GetPositiveXNetMesh()->Update(g_fFixedUpdateTick,
-                    mBall.fn_801925BC(),
+                    mBall.GetPosition(),
                     gLastReplayBallPosition,
-                    _2430,
+                    mPositiveGoalieNetCheck,
                     0);
                 NetMesh::GetNegativeXNetMesh()->Update(g_fFixedUpdateTick,
-                    mBall.fn_801925BC(),
+                    mBall.GetPosition(),
                     gLastReplayBallPosition,
-                    _2431,
+                    mNegativeGoalieNetCheck,
                     0);
-                gLastReplayBallPosition = mBall.fn_801925BC();
+                gLastReplayBallPosition = mBall.GetPosition();
                 mpNetMeshPositiveX->Grab(*PhysicsNet::GetPositiveXNet()->GetNetMesh());
                 mpNetMeshNegativeX->Grab(*PhysicsNet::GetNegativeXNet()->GetNetMesh());
             }
@@ -192,7 +192,7 @@ void RenderSnapshot::Replay(T& frame)
         Replayable<1>(frame, *mpNetMeshPositiveX);
         Replayable<1>(frame, *mpNetMeshNegativeX);
     }
-    Replayable<1>(frame, _2718);
+    Replayable<1>(frame, mSimulationTime);
     frame.fn_80191504();
     if (frame.fn_801919D0())
     {
@@ -545,7 +545,7 @@ void ReplayManager::RenderSnapshotAt(float deltaTime)
     }
 
     mRender->Render(deltaTime);
-    lbl_806E14CC = mRender->_2718;
+    lbl_806E14CC = mRender->mSimulationTime;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 0x20000)
     {

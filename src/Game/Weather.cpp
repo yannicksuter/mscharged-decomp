@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 #include "NL/nlFunction.inl"
 #include "NL/nlBindMember.inl"
 #include "NL/utility.h"
@@ -530,7 +530,7 @@ void Windy::OnGetReadyForKickoff()
 {
     for (int i = 0; i < 3; i++)
     {
-        gNPCManager->fn_801A9DE0(i)->fn_801B4B24(false);
+        gNPCManager->fn_801A9DE0(i)->Deactivate(false);
     }
 }
 
@@ -645,7 +645,7 @@ void Windy::Start()
             float index = 2.0f * nlRandomf(1.0f);
             index += index < 0.0f ? -0.5f : 0.5f;
             eDebrisType = (int)index;
-            UnidentifiedNPC_801B43F8* npc = gNPCManager->fn_801A9DE0(eDebrisType);
+            WindDebris* npc = gNPCManager->fn_801A9DE0(eDebrisType);
             int i = 0;
             while ((npc->mbIsVisible == 1 || eDebrisType == eLastDebrisType) && i < 3 && i > -1)
             {
@@ -670,7 +670,7 @@ void Windy::Start()
                 npc->SetPosition(debrisPosition);
                 npc->mv3Velocity = debrisVelocity;
                 npc->maFacingDirection = aWindDirection;
-                npc->fn_801B4AD0();
+                npc->Activate();
             }
         }
     }

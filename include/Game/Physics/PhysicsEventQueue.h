@@ -42,7 +42,7 @@ void QueueKoopaShellKnockYoshiTongue(cFielder* data);
 void QueueCollisionEggBall(UnidentifiedEventData34* data);
 void QueueCollisionEggPlayer(UnidentifiedEventData34* data);
 void QueueCollisionCrackEgg(UnidentifiedEventData34* data);
-void QueueCollisionDebrisBall(UnidentifiedNPC_801B43F8* data);
+void QueueCollisionDebrisBall(WindDebris* data);
 
 
 // Shared functions and data from Game/Physics/PhysicsEventQueue.cpp.

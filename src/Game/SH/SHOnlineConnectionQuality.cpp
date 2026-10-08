@@ -220,7 +220,7 @@ static inline void SendLobbyDraft()
 {
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
     bool unranked = !IsOnlineRankedMatch();
-    g_pNetworkSession->SendDraftToEveryone(lobby->GetPlayerCount(), lobby->GetLocalMachineInfo(), false, unranked);
+    g_pNetworkSession->SendDraftToEveryone(lobby->GetPlayerCount(), lobby->GetMachineInfoArray(), false, unranked);
 }
 
 void OnlineConnectionQualityScene::Update(float dt)

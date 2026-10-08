@@ -68,7 +68,7 @@ public:
     }
 
     void Destroy();
-    void fn_80308610(nlChunk* nodeChunk, int nodeIndex);
+    void InitializeNodeKeys(nlChunk* nodeChunk, int nodeIndex);
 
     void BlendRot(int accumulatorNode, int animNode, float time, float weight,
         cPoseAccumulator* accumulator, bool mirror) const;
@@ -80,7 +80,7 @@ public:
         cPoseAccumulator* accumulator, bool mirror) const;
     void GetRootRot(float time, u16* rootRotation) const;
     void GetRootTrans(float time, nlVector3* rootTranslation) const;
-    bool fn_8030939C(int channel, float time, float* weight) const;
+    bool GetChannelWeight(int channel, float time, float* weight) const;
     void CreateCallback(float fTime, unsigned int nParam1,
         void (*funcCallback)(cSAnim*, unsigned int));
     float GetMorphWeight(int channel, float time) const;
@@ -121,12 +121,12 @@ public:
     unsigned int m_nNumNodes;
     unsigned int m_nNumMorphChannels;
     const unsigned int* m_pNodeProperties;
-    const unsigned int* m_Unknown18;
+    const unsigned int* m_pNumWeightKeys;
     const unsigned int* m_Unknown1C;
     void** m_pRotKeys;
     PackedScale** m_pScaleKeys;
     PackedTrans** m_pTransKeys;
-    unsigned char** m_Unknown2C;
+    unsigned char** m_pWeightKeys;
     void** m_Unknown30;
     unsigned int m_nNumRootKeys;
     unsigned short* m_pRootRot;

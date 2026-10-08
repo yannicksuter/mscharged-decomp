@@ -596,7 +596,7 @@ void ChainChomp::Spawn(cFielder* pThrower, cFielder* pTarget)
     mpTarget = 0;
     mpTarget = FindTarget(pThrower->m_pTeam->GetOtherTeam());
     mpPhysObj->DisableCollisions();
-    mpPhysObj->mUnidentified040 = false;
+    mpPhysObj->mContactsDisabled = false;
     nlVector3 v3StartPosition = v3Zero;
     if (mpTarget != 0)
     {

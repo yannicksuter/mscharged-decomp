@@ -317,7 +317,7 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
     TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mCaptainAttributes->GetActiveSlide(), "attributes_captains", "overall");
     if (overall != 0)
     {
-        switch (info.unknown_0x48)
+        switch (info.mPlayStyle)
         {
         case 0:
             overall->SetActiveSlide("offensive", true, false);
@@ -377,7 +377,7 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
     TLComponentInstance* overall = FEFinder<TLComponentInstance, 4>::FindOrDefault(mSidekickAttributes->GetActiveSlide(), "attributes_sidekicks", "overall");
     if (overall != 0)
     {
-        switch (info.unknown_0x48)
+        switch (info.mPlayStyle)
         {
         case 0:
             overall->SetActiveSlide("offensive", true, false);

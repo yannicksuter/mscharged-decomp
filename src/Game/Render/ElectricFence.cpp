@@ -16,12 +16,9 @@
 
 #include <math.h>
 
-class EffectsGroup;
-
-
 static float sfGridTextureSize = 7.0f;
 static float sfNumGridSquares = 9.48f;
-static float lbl_806DCDF0 = 16.0f;
+static float sfVerticalGridSubdivisions = 16.0f;
 static float sfFadeOutTime = 0.2f;
 static float sfAlignmentOffset1 = 0.25f;
 static float sfAlignmentOffset2 = 0.13f;
@@ -29,12 +26,12 @@ static float sfAngleAnimationRate = 100.0f;
 static float sfTimeBetweenEffects = 0.02f;
 static int sNumRevolutionsToDisplay = 2;
 static float sfStartAngle = 180.0f;
-static float lbl_806DCE10 = 5.0f;
+static float sfFlyByMaxHeight = 5.0f;
 
 const unsigned long GridTexture = glGetTexture("global/grid");
 static float sfAngleRandomOffset;
 static bool sbUseSparksDuringElectricFenceFlyBy;
-GLView* lbl_806E1514;
+GLView* gElectricFenceView;
 
 int ElectricFenceData::numAllocated;
 nlList<ElectricFenceData> ElectricFenceData::sActiveElectricFences(
@@ -102,17 +99,17 @@ static void GetWallPoint(const nlVector3& impactPosition, float xOffset,
     }
     else
     {
-        float ratio_8019DEA0 = outCoordinate / radius;
+        float cornerAngle = outCoordinate / radius;
         nlVec3Set(outPosition,
             (goalLineX - radius)
                 + (radius
                     * nlSin((u16)((u16)(s32)(10430.378f
-                                          * ratio_8019DEA0)
+                                          * cornerAngle)
                         + 0x4000))),
             (sideLineY - radius)
                 + (radius
                     * nlSin((u16)(s32)(10430.378f
-                                      * ratio_8019DEA0))),
+                                      * cornerAngle))),
             impactPositionPositive.z + zOffset);
     }
 
@@ -219,7 +216,7 @@ static void DrawPrimitive(const ElectricFenceGeometry& prim,
         {
             return;
         }
-        lbl_806E1514->AttachModel(mesh.GetModel(), 0);
+        gElectricFenceView->AttachModel(mesh.GetModel(), 0);
     }
 }
 
@@ -245,9 +242,9 @@ static void RenderElectricFenceFlat(const nlVector3& position,
     nlMatrix4 matrix2;
     nlMakeRotationMatrixZ(matrix2,
         0.0000958738f * (float)(u16)(s32)(10430.378f * angle));
-    nlMatrix4 matrix_8019E544;
-    nlMultMatrices(matrix_8019E544, matrix, matrix2);
-    matrix = matrix_8019E544;
+    nlMatrix4 combinedRotation;
+    nlMultMatrices(combinedRotation, matrix, matrix2);
+    matrix = combinedRotation;
 
     matrix.m41 = position.x;
     matrix.m42 = position.y;
@@ -260,7 +257,7 @@ static void RenderElectricFenceFlat(const nlVector3& position,
     u8 lightenAmount = (u8)(255.0f * intensity);
     quad.SetColour(
         lightenAmount, lightenAmount, lightenAmount, 0xFF);
-    glAttachQuad3((eGLView)lbl_806E1514, 1, &quad);
+    glAttachQuad3((eGLView)gElectricFenceView, 1, &quad);
     glSetDefaultState(false);
 }
 
@@ -425,7 +422,7 @@ void EmitElectricFenceCharacterEffect(const nlVector3& pos,
 
 void InitializeElectricFence(GLView* view)
 {
-    lbl_806E1514 = view;
+    gElectricFenceView = view;
 }
 
 void FreeElectricFence()
@@ -474,7 +471,7 @@ ElectricFenceData::ElectricFenceData(
     f32 distanceFromGoal = diffX;
 
     float increment = sfGridTextureSize / sfNumGridSquares;
-    float verticalIncrement = sfGridTextureSize / lbl_806DCDF0;
+    float verticalIncrement = sfGridTextureSize / sfVerticalGridSubdivisions;
     float cornerDiameter = 2.0f * cField::GetCornerRadius();
     if (distanceFromGoal > cornerDiameter
         || distanceFromSideline > cornerDiameter)
@@ -648,7 +645,7 @@ void UpdateElectricFence(float fDeltaT)
         }
 
         nlVec3Scale(pos, pos, scale);
-        pos.z = nlRandomf(0.0f, lbl_806DCE10, &nlDefaultSeed);
+        pos.z = nlRandomf(0.0f, sfFlyByMaxHeight, &nlDefaultSeed);
         if ((counter & 1) == 0)
         {
             pos.x = -pos.x;

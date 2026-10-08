@@ -123,29 +123,29 @@ static void ConfigureVideo(u16 width, u16 height) {
     rmode.viHeight = height;
 
     switch (VIGetTvFormat()) {
-    case VI_TVFORMAT_NTSC:
-    case VI_TVFORMAT_MPAL:
+    case VI_TV_FMT_NTSC:
+    case VI_TV_FMT_MPAL:
         if (VI_HW_REGS[VI_VICLK] & VI_VICLK_SPEED /* == VI_VICLK_54MHZ */) {
             // Progressive mode
-            rmode.tvInfo = VI_TVMODE(VI_TVFORMAT_NTSC, VI_SCANMODE_PROG);
+            rmode.tvInfo = VI_TVMODE(VI_TV_FMT_NTSC, VI_SCAN_MODE_PROG);
             rmode.viYOrigin = 0;
-            rmode.xfbMode = VI_XFBMODE_SF;
+            rmode.xfbMode = VI_XFB_MODE_SF;
         } else {
             // Non-progressive mode
-            rmode.tvInfo = VI_TVMODE(VI_TVFORMAT_NTSC, VI_SCANMODE_INT);
+            rmode.tvInfo = VI_TVMODE(VI_TV_FMT_NTSC, VI_SCAN_MODE_INT);
             rmode.viYOrigin = 0;
-            rmode.xfbMode = VI_XFBMODE_DF;
+            rmode.xfbMode = VI_XFB_MODE_DF;
         }
         break;
-    case VI_TVFORMAT_EURGB60:
-        rmode.tvInfo = VI_TVMODE(VI_TVFORMAT_EURGB60, VI_SCANMODE_INT);
+    case VI_TV_FMT_EURGB60:
+        rmode.tvInfo = VI_TVMODE(VI_TV_FMT_EURGB60, VI_SCAN_MODE_INT);
         rmode.viYOrigin = 0;
-        rmode.xfbMode = VI_XFBMODE_DF;
+        rmode.xfbMode = VI_XFB_MODE_DF;
         break;
-    case VI_TVFORMAT_PAL:
-        rmode.tvInfo = VI_TVMODE(VI_TVFORMAT_PAL, VI_SCANMODE_INT);
+    case VI_TV_FMT_PAL:
+        rmode.tvInfo = VI_TVMODE(VI_TV_FMT_PAL, VI_SCAN_MODE_INT);
         rmode.viYOrigin = 47;
-        rmode.xfbMode = VI_XFBMODE_DF;
+        rmode.xfbMode = VI_XFB_MODE_DF;
         break;
     }
 
@@ -195,7 +195,7 @@ void OSFatal(GXColor textColor, GXColor bgColor, const char* msg) {
     OSEnableInterrupts();
 
     retraceCount = VIGetRetraceCount();
-    while (VIGetRetraceCount() - retraceCount < 1) {
+    while ((s32)(VIGetRetraceCount() - retraceCount) < 1) {
         ;
     }
 
@@ -263,7 +263,7 @@ static void Halt(void) {
     VIFlush();
 
     retraceCount = VIGetRetraceCount();
-    while (VIGetRetraceCount() - retraceCount < 2) {
+    while ((s32)(VIGetRetraceCount() - retraceCount) < 2) {
         ;
     }
 
@@ -274,7 +274,7 @@ static void Halt(void) {
     VIFlush();
 
     retraceCount = VIGetRetraceCount();
-    while (VIGetRetraceCount() - retraceCount < 1) {
+    while ((s32)(VIGetRetraceCount() - retraceCount) < 1) {
         ;
     }
 

@@ -20,55 +20,51 @@
 #include "NL/nlTask.h"
 #include "NL/nlFunction.inl"
 
-extern "C"
-{
-    const float gNumberDigitWidths[10] = {
-        0.1662f,
-        0.1164f,
-        0.1682f,
-        0.1658f,
-        0.1749f,
-        0.1675f,
-        0.1667f,
-        0.1644f,
-        0.1632f,
-        0.1671f,
-    };
+const float gNumberDigitWidths[10] = {
+    0.1662f,
+    0.1164f,
+    0.1682f,
+    0.1658f,
+    0.1749f,
+    0.1675f,
+    0.1667f,
+    0.1644f,
+    0.1632f,
+    0.1671f,
+};
 
-    float gNumberDigitSpacing = -0.0f;
-    float gScoreCollapseTime = 0.6f;
-    float gGoalCountExpandTime = 1.0f;
-    float gScoreIncrementInterval = 0.4f;
-    float gAccumulatedScoreIncrementInterval = 0.4f;
-    float gNumberWidescreenWidthScale = 0.8f;
-    float gNumberWidescreenDepthScale = 1.05f;
-    float gScoreCompactScale = 140.0f;
-    float gScoreCompactY = 50.0f;
-    float gScoreCompactSeparation = 60.0f;
-    float gScoreCompactWideSeparation = 82.0f;
-    float gScoreCompactOpacity = 1.0f;
-    float gScoreExpandedScale = 650.0f;
-    float gScoreExpandedThreeDigitScale = 400.0f;
-    float gScoreExpandedThreeDigitWideScale = 500.0f;
-    float gScoreExpandedY = 220.0f;
-    float gScoreExpandedSeparation = 80.0f;
-    float gScoreExpandedWideSeparation = 80.0f;
-    float gScoreExpandedOpacity = 0.45f;
-    float gGoalCountStartScale = 50.0f;
-    float gGoalCountEndScale = 800.0f;
-    float gGoalCountOpacity = 0.6f;
-    float gNumberRotationX[2] = { 90.0f, 0.0f };
+float gNumberDigitSpacing = -0.0f;
+float gScoreCollapseTime = 0.6f;
+float gGoalCountExpandTime = 1.0f;
+float gScoreIncrementInterval = 0.4f;
+float gAccumulatedScoreIncrementInterval = 0.4f;
+float gNumberWidescreenWidthScale = 0.8f;
+float gNumberWidescreenDepthScale = 1.05f;
+float gScoreCompactScale = 140.0f;
+float gScoreCompactY = 50.0f;
+float gScoreCompactSeparation = 60.0f;
+float gScoreCompactWideSeparation = 82.0f;
+float gScoreCompactOpacity = 1.0f;
+float gScoreExpandedScale = 650.0f;
+float gScoreExpandedThreeDigitScale = 400.0f;
+float gScoreExpandedThreeDigitWideScale = 500.0f;
+float gScoreExpandedY = 220.0f;
+float gScoreExpandedSeparation = 80.0f;
+float gScoreExpandedWideSeparation = 80.0f;
+float gScoreExpandedOpacity = 0.45f;
+float gGoalCountStartScale = 50.0f;
+float gGoalCountEndScale = 800.0f;
+float gGoalCountOpacity = 0.6f;
+float gNumberRotationX[2] = { 90.0f, 0.0f };
 
-    NumberDisplay* gpNumberDisplay;
-    bool gScoreForceExpanded;
-    bool gScoreUseAlternateSeparator;
-    float gNumberPositionZ;
-    float gScoreExpandTime;
-    float gScoreExpandedHoldTime;
-    float gNumberRotationY;
-    float gNumberRotationZ;
-}
-
+NumberDisplay* gpNumberDisplay;
+bool gScoreForceExpanded;
+bool gScoreUseAlternateSeparator;
+float gNumberPositionZ;
+float gScoreExpandTime;
+float gScoreExpandedHoldTime;
+float gNumberRotationY;
+float gNumberRotationZ;
 NumberDisplay::NumberDisplay()
 {
     mVisible = false;

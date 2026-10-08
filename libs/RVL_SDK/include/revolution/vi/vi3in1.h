@@ -12,6 +12,18 @@
 extern "C" {
 #endif
 
+extern volatile u32 Vdac_Flag_Changed;
+
+void VISetRGBModeImm(void);
+void __VISetFilter4EURGB60(VITiming timing);
+void __VISetCGMS(void);
+void __VISetWSS(void);
+void __VISetClosedCaption(void);
+void __VISetMacrovision(void);
+void __VISetGamma(void);
+void VISetGamma(VIGamma gamma);
+void __VISetTrapFilter(void);
+void __VISetRGBOverDrive(void);
 void __VISetRGBModeImm(void);
 
 void __VISetRevolutionModeSimple(void);

@@ -1,9 +1,8 @@
 // Adapted from https://github.com/SMGCommunity/Petari (CC0-1.0).
-extern void OSReport(const char *, ...);
-extern void* OSGetArenaLo();
-extern void* OSGetArenaHi();
-extern void* OSInitAlloc(void *, void *, int);
-extern volatile int __OSCurrHeap;
+#include "GCN_mem_alloc.h"
+#include <revolution/os/OSAlloc.h>
+#include <revolution/os/OSArena.h>
+#include <revolution/os/OSError.h>
 
 #define OSRoundUp32B(x) (((unsigned int)(x) + 32 - 1) & ~(32 - 1))
 #define OSRoundDown32B(x) (((unsigned int)(x)) & ~(32 - 1))
@@ -29,12 +28,12 @@ static inline void InitDefaultHeap()
 	OSSetArenaLo(arenaLo = arenaHi);
 }
 
-void __sys_alloc(unsigned int size)
+void* __sys_alloc(unsigned int size)
 {
 	if (__OSCurrHeap == -1) {
 		InitDefaultHeap();
 	}
-	OSAllocFromHeap(__OSCurrHeap, size);
+	return OSAllocFromHeap(__OSCurrHeap, size);
 }
 
 __declspec(weak) extern void __sys_free(void* ptr)

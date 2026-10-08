@@ -1619,7 +1619,7 @@ Game/Render/Warble.cpp:
 	.sbss       start:0x806E16C8 end:0x806E16E8
 	.sdata2     start:0x806E53A8 end:0x806E53E8
 
-Game/Render/tu_801B43F8.cpp:
+Game/Render/WindDebris.cpp:
 	.text       start:0x801B43F8 end:0x801B532C
 	.ctors      start:0x804DB748 end:0x804DB74C
 	.data       start:0x805147D0 end:0x80514830

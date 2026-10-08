@@ -61,7 +61,7 @@ public:
         return mCharacters[index];
     }
 
-    DrawablePowerup& GetUnidentifiedPowerup(int index)
+    DrawablePowerup& GetPowerup(int index)
     {
         return mPowerups[index];
     }
@@ -73,29 +73,29 @@ public:
     DrawableCharacter mCharacters[10];
     DrawablePowerup mPowerups[150];
     DrawableCharacter mChainChomp;
-    DrawableCharacter mBowser;
-    DrawableYoshiEgg _1BA0;
-    DrawableBirdoEgg _1BC4;
-    DrawableKoopaShell _1BE8;
-    u32 _1C00;
+    DrawableCharacter mDiddyBanana;
+    DrawableYoshiEgg mYoshiEgg;
+    DrawableBirdoEgg mBirdoEgg;
+    DrawableKoopaShell mKoopaShell;
+    u32 mNumVisibleDaisyFists;
     DrawableDaisyFist mDaisyFists[8];
-    u32 _1CC4;
-    DrawableBulletBill _1CC8[6];
-    bool _1DA0;
-    DrawableHammer _1DA4[15];
-    DrawableCharacter _1FC0[3];
-    DrawableThwomp _2194[8];
-    u32 _2294;
+    u32 mNumBulletBills;
+    DrawableBulletBill mBulletBills[6];
+    bool mHasHammers;
+    DrawableHammer mHammers[15];
+    DrawableCharacter mWindDebris[3];
+    DrawableThwomp mThwomps[8];
+    u32 mNumFlyingCameras;
     DrawableFlyingCamera _2298[10];
     DrawableNetMesh* mpNetMeshPositiveX;
     DrawableNetMesh* mpNetMeshNegativeX;
-    bool _2430;
-    bool _2431;
+    bool mPositiveGoalieNetCheck;
+    bool mNegativeGoalieNetCheck;
     nlVector3 mCameraUp;
-    nlVector3 _2440[60];
+    nlVector3 mPatchPositions[60];
     float mFrameBlendPercent;
-    RenderSnapshotFlags _2714;
-    float _2718;
+    RenderSnapshotFlags mFlags;
+    float mSimulationTime;
 };
 
 DrawableBulletBill& GetSnapshotBulletBill(RenderSnapshot* snapshot, unsigned int index);

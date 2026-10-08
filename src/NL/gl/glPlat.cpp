@@ -1,4 +1,8 @@
 #include <revolution/gx/GXPixel.h>
+#include <revolution/gx/GXFrameBuf.h>
+#include <revolution/vi/vi_fwd.h>
+#include <revolution/gx/GXMisc_fwd.h>
+#include <revolution/os/OSError_fwd.h>
 #include <revolution/gx/GXTransform.h>
 
 #include "Game/TweakQuery.h"
@@ -24,38 +28,14 @@ extern "C"
 {
     void DCFlushRange(void* address, u32 length);
     void GXSetMisc(s32 token, s32 value);
-    void GXSetCopyFilter(u8 aa, const u8 samplePattern[12][2], u8 vf, const u8 vfilter[7]);
-    void GXFlush();
     void* GXInit(void* fifo, u32 size);
-
-    void VIConfigure(GXRenderModeObj* mode);
-    void VIFlush();
-    void VIWaitForRetrace();
-    u32 VIGetTvFormat();
-    u32 VIGetDTVStatus();
-    void VISetNextFrameBuffer(void* framebuffer);
 
     void SCInit();
     u32 SCCheckStatus();
     u8 SCGetProgressiveMode();
     u8 SCGetEuRgb60Mode();
-    void OSReport(const char* format, ...);
 
-    void GXAdjustForOverscan(const GXRenderModeObj* source, GXRenderModeObj* destination, u16 horizontal, u16 vertical);
-    f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
-    void GXSetDispCopySrc(u16 left, u16 top, u16 width, u16 height);
-    void GXSetDispCopyDst(u16 width, u16 height);
-    void GXSetDispCopyYScale(f32 scale);
-    void GXSetDispCopyGamma(s32 gamma);
     void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
-
-    extern GXRenderModeObj GXNtsc480IntDf;
-    extern GXRenderModeObj GXNtsc480Prog;
-    extern GXRenderModeObj GXNtsc480ProgSoft;
-    extern GXRenderModeObj GXMpal480IntDf;
-    extern GXRenderModeObj GXEurgb60Hz480IntDf;
-    extern GXRenderModeObj GXEurgb60Hz480Prog;
-    extern GXRenderModeObj GXEurgb60Hz480ProgSoft;
 }
 
 static GXRenderModeObj glPal480IntDf = {
@@ -135,7 +115,7 @@ static void glx_InitGX()
     gxSetDither(true);
     gxSetColourUpdate(true);
     gxSetAlphaUpdate(true);
-    GXSetDispCopyGamma(0);
+    GXSetDispCopyGamma(GX_GM_1_0);
 
     for (int stage = 0; stage < 16; stage++)
     {

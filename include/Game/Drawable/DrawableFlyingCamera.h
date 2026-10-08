@@ -18,7 +18,7 @@ public:
     nlQuaternion mOrientation;
     nlVector3 mPosition;
     float mScale;
-    int mIndex;
+    int mCameraIndex;
     bool mVisible;
     char _025[3];
 };

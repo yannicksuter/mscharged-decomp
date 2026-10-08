@@ -677,7 +677,7 @@ void NisPlayer::HideAllActors() const
     RenderSnapshot& snapshot = ReplayManager::Instance()->GetMutableRenderSnapshot();
     for (int i = 0; i < 150; i++)
     {
-        snapshot.GetUnidentifiedPowerup(i).SetUnidentifiedVisible(false);
+        snapshot.GetPowerup(i).SetUnidentifiedVisible(false);
     }
     for (int i = 0; i < 10; i++)
     {
@@ -685,11 +685,11 @@ void NisPlayer::HideAllActors() const
     }
     for (int i = 0; i < 15; i++)
     {
-        snapshot._1DA4[i].mVisible = false;
+        snapshot.mHammers[i].mVisible = false;
     }
     for (int i = 0; i < 3; i++)
     {
-        snapshot._1FC0[i].visible = false;
+        snapshot.mWindDebris[i].visible = false;
     }
     for (int i = 0; i < 8; i++)
     {
@@ -697,13 +697,13 @@ void NisPlayer::HideAllActors() const
     }
     for (int i = 0; i < 6; i++)
     {
-        snapshot._1CC8[i].mVisible = false;
+        snapshot.mBulletBills[i].mVisible = false;
     }
     for (int i = 0; i < 8; i++)
     {
-        snapshot._2194[i].mVisible = false;
+        snapshot.mThwomps[i].mVisible = false;
     }
-    snapshot._1BA0.mVisible = false;
+    snapshot.mYoshiEgg.mVisible = false;
     snapshot.mBall.mFlags.bits.visible = false;
     snapshot.mChainChomp.visible = false;
 }

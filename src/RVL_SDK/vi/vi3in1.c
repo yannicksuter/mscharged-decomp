@@ -1,7 +1,9 @@
 #include <revolution/os.h>
+#include <revolution/vi/vi_fwd.h>
 
 #include <revolution/vi/vitypes.h>
 #include <revolution/vi/vi3in1.h>
+#include <revolution/vi/i2c.h>
 
 static VIVideo Vdac_Flag_Region;
 volatile u32 Vdac_Flag_Changed = 0;
@@ -124,9 +126,6 @@ VIMacroVisionObj VIZeroACPType = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
-
-extern s32 __VISendI2CData(u8 slaveAddr, u8* pData, s32 nBytes);
-extern void WaitMicroTime(s32 usec);
 
 void __VISetYUVSEL(VIBool outsel) {
     u8 buffer[2];
@@ -270,7 +269,7 @@ static inline void __VISetMacrovisionImm(VIMacroVisionObj* mparam) {
 
 void __VISetMacrovision(void) {
     switch (__type) {
-        case 2:
+        case VI_ACP_TYPE1:
             switch (__tvType) {
                 case VI_NTSC:
                     __VISetMacrovisionImm(&VINtscACPType1);
@@ -286,7 +285,7 @@ void __VISetMacrovision(void) {
                     break;
             }
             break;
-        case 3:
+        case VI_ACP_TYPE2:
             switch (__tvType) {
                 case VI_NTSC:
                     __VISetMacrovisionImm(&VINtscACPType2);
@@ -302,7 +301,7 @@ void __VISetMacrovision(void) {
                     break;
             }
             break;
-        case 4:
+        case VI_ACP_TYPE3:
             switch (__tvType) {
                 case VI_NTSC:
                     __VISetMacrovisionImm(&VINtscACPType3);
@@ -318,7 +317,7 @@ void __VISetMacrovision(void) {
                     break;
             }
             break;
-        case 1:
+        case VI_ACP_OFF:
             __VISetMacrovisionImm(&VIZeroACPType);
             break;
     }
@@ -355,7 +354,7 @@ static VIGamma __gamma;
 
 void __VISetGamma(void) { __VISetGammaImm(&gammaSet[__gamma]); }
 
-void fn_8009C5B0(VIGamma gamma) {
+void VISetGamma(VIGamma gamma) {
     if (__gamma != gamma) {
         __gamma = gamma;
         Vdac_Flag_Changed |= 0x10;

@@ -132,7 +132,7 @@ void UpdateBirdoEggEmitter(EmissionController& controller)
     }
     if (!controller.m_Replaying && ReplayManager::Instance()->mRender != 0)
     {
-        DrawableBirdoEgg& egg = ReplayManager::Instance()->mRender->_1BC4;
+        DrawableBirdoEgg& egg = ReplayManager::Instance()->mRender->mBirdoEgg;
         if (egg.mVisible)
         {
             controller.SetPosition(egg.mPosition);

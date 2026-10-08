@@ -51,7 +51,7 @@ union DrawableBallFlags
 class DrawableBall
 {
 public:
-    const nlVector3& fn_801925BC() const
+    const nlVector3& GetPosition() const
     {
         return mPosition;
     }

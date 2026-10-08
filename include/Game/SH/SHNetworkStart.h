@@ -11,6 +11,22 @@ class TLTextInstance;
 class NetworkStartScene : public BaseSceneHandler, public LANLobbyListener
 {
 public:
+    enum State
+    {
+        STATE_ONLINE_OPTIONS = 0,
+        STATE_CREATE_GAME = 1,
+        STATE_JOIN_GAME = 2,
+        STATE_WAIT_FOR_START = 3,
+    };
+
+    enum ActionButtons
+    {
+        ACTION_BUTTONS_HIDDEN = -1,
+        ACTION_BUTTONS_A_AND_B = 0,
+        ACTION_BUTTONS_A = 1,
+        ACTION_BUTTONS_B = 2,
+    };
+
     NetworkStartScene();
     virtual ~NetworkStartScene();
     virtual void Update(float dt);
@@ -24,7 +40,7 @@ public:
     virtual void OnGameExpired(LANGameInfo* game) { }
     virtual void OnLobbyShutdown() { }
 
-    void SetActionButtons(int state);
+    void SetActionButtons(int buttonState);
     void SelectMenuItem(TLComponentInstance* component);
     void DeselectMenuItem(TLComponentInstance* component);
     void EnterState(int state);

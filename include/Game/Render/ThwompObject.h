@@ -64,6 +64,8 @@ struct ThwompObject
     /* 0x64 */ unsigned long mTexture1Index;
 }; // size: 0x68
 
+extern const nlVector3 gWindDebrisZeroVelocity;
+extern const nlVector3 gWindDebrisHiddenPosition;
 extern const nlVector3 gYoshiEggZeroDisplacement;
 extern const nlVector3 gYoshiEggHiddenPosition;
 

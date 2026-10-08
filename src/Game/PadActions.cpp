@@ -18,9 +18,9 @@
 #include "types.h"
 
 
-bool g_bEnableGamecubePadMonkey;
+bool gEnablePadMonkeys;
 
-int g_pPadRemapArray[51] = {
+int gGameCubeButtonRemap[51] = {
     0x00000020, 0x00000040, 0x00000800, 0x00000400, 0x00000001, 0x00000040, 0x00000020, 0x00000100, 0x00000010, 0x00000100, 0x00000200, 0x00000001, 0x00000002, 0x00000008, 0x00000004, 0x00000100, 0x00000200, 0x00000400, 0x00000800, 0x00001000, 0x00000020, 0x00000400, 0x00000010, 0x00000040, 0x00000800, 0x00000200, 0x00000100, 0x00000100, 0x00000200, 0x00000800, 0x00000100, 0x00000200, 0x00001000, 0x00000800, 0x00000800, 0x00000800, 0x00000200, 0x00000800, 0x00000040, 0x00000020, 0x00000800, 0x00000400, 0x00000040, 0x00000020, 0x00000040, 0x00000020, 0x00000010, 0x00001000, 0x00000020, 0x00000040, 0x00001000
 };
 
@@ -67,7 +67,7 @@ void UseDefaultFreestyleButtonRemap(bool useDefaultRemap)
 
 void CreatePadBackends()
 {
-    if (g_bEnableGamecubePadMonkey)
+    if (gEnablePadMonkeys)
     {
         for (int padSet = 0; padSet < 2; ++padSet)
         {
@@ -119,7 +119,7 @@ void InitPads()
 
     g_pPadManager->Initialize(4, 2);
     g_pPadManager->SetActivePadSet(0);
-    gGameCubePadButtonMap = g_pPadRemapArray;
+    gGameCubePadButtonMap = gGameCubeButtonRemap;
     gWiiRemoteButtonRemap = sWiiRemoteButtonRemap;
 
     switch (sControllerConfig.mValue)
@@ -158,7 +158,7 @@ void InitPlatPad()
 
 void UpdateMonkeyState(int monkeySet)
 {
-    if (!g_bEnableGamecubePadMonkey)
+    if (!gEnablePadMonkeys)
     {
         return;
     }

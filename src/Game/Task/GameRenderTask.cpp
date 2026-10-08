@@ -513,16 +513,16 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
             UpdateImpostorPositions();
             (GetCrowdImpostorManager())->UpdateCrowdVisibility(GetLayerView(bPictureInPicture ? eCLV_PictureInPicture : eCLV_ImpostorOut));
 
-            if (ImpostorManager::GetInstance()->mUnidentified037)
+            if (ImpostorManager::GetInstance()->mUpdateClusters)
             {
                 GetCrowdImpostorManager()->ReleaseCrowdImpostors();
             }
 
             bool paused = nlTaskManager::m_pInstance->mCurrentState == 0x10;
-            ImpostorManager::GetInstance()->mUnidentified04C = g_bUpdateImpostorSprites && !paused;
+            ImpostorManager::GetInstance()->mUseRenderCache = g_bUpdateImpostorSprites && !paused;
             ImpostorManager::GetInstance()->UpdateSprites();
 
-            if (ImpostorManager::GetInstance()->mUnidentified037)
+            if (ImpostorManager::GetInstance()->mUpdateClusters)
             {
                 (GetCrowdImpostorManager())->UpdateCrowdVisibility(GetLayerView(bPictureInPicture ? eCLV_PictureInPicture : eCLV_ImpostorOut));
             }

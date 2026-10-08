@@ -285,7 +285,7 @@ void FECaptainComponent::SetOverallSlide(TLComponentInstance* overall, const Cha
 {
     if (overall != 0)
     {
-        switch (info.unknown_0x48)
+        switch (info.mPlayStyle)
         {
         case 0:
             overall->SetActiveSlide("offensive", false, false);

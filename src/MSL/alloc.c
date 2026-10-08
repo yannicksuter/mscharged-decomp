@@ -1,4 +1,5 @@
 #include "alloc.h"
+#include "GCN_mem_alloc.h"
 
 typedef struct Block {
     struct Block* prev;

@@ -7,6 +7,7 @@
 #include <revolution/vi/vi3in1.h>
 #include <revolution/os.h>
 #include <revolution/sc.h>
+#include <revolution/si.h>
 // clang-format on
 
 // for some reasons this is required
@@ -20,8 +21,10 @@
 const char* __VIVersion = "<< RVL_SDK - VI \trelease build: Nov 30 2006 03:31:49 (0x4199_60831) >>";
 
 static void __VIRetraceHandler(__OSInterrupt, OSContext*);
-void VISetRGBModeImm(void);
-extern bool __OSIsDiag;
+static inline VIScanMode VIGetScanMode(void);
+static inline void __VIGetCurrentPosition(s16* x, s16* y);
+static inline bool VIEnableDVDStopMotor(bool enable);
+static inline bool VIEnableDimming(bool enable);
 
 static volatile u32 retraceCount;
 static volatile u32 flushFlag;
@@ -52,9 +55,6 @@ static timing_s* timingExtra = NULL;
 
 static vu32 __VIDimmingFlag_RF_IDLE;
 static vu32 __VIDimmingFlag_SI_IDLE;
-
-extern VIVideo Vdac_Flag_Region;
-extern volatile u32 Vdac_Flag_Changed;
 
 static OSThreadQueue retraceQueue;
 
@@ -99,7 +99,6 @@ static u16 taps[] = {
 };
 
 static OSShutdownFunctionInfo ShutdownFunctionInfo = {OnShutdown, 127};
-
 
 static bool OnShutdown(bool final, u32 event) {
     bool retval;
@@ -177,8 +176,6 @@ static bool VISetRegs(void) {
         return false;
     }
 }
-
-extern DVDCommandBlock __DVDStopMotorCommandBlock;
 
 static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
@@ -1169,7 +1166,7 @@ void VISetNextFrameBuffer(void* fb) {
 
 void* VIGetCurrentFrameBuffer() { return *(void**)(&CurrBufAddr); }
 
-void VISetBlack(bool black) {
+void VISetBlack(BOOL black) {
     bool enabled;
     timing_s* tm;
 
@@ -1386,12 +1383,12 @@ VITimeToDIM VISetTimeToDimming(VITimeToDIM time) {
     return old_time;
 }
 
-bool __VIResetRFIdle(void) {
+BOOL __VIResetRFIdle(void) {
     __VIDimmingFlag_RF_IDLE = 0;
     return true;
 }
 
-bool __VIResetSIIdle(void) {
+BOOL __VIResetSIIdle(void) {
     __VIDimmingFlag_SI_IDLE = 0;
     return true;
 }

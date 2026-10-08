@@ -201,7 +201,7 @@ float WorldAnimController::GetMorphWeight(int nChannel) const
     cPN_SAnimController* cntrl = m_pPoseTree;
     float fWeight;
     float fTime = cntrl->m_fTime;
-    cntrl->m_pSAnim->fn_8030939C(
+    cntrl->m_pSAnim->GetChannelWeight(
         nChannel, fTime, &fWeight);
     return fWeight;
 }

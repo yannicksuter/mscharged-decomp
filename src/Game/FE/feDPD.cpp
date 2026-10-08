@@ -19,7 +19,6 @@
 #include "NL/nlPrint.h"
 #include "NL/plat/DPDData.h"
 #include "decomp.h"
-#include "Game/Render/RLViewLayers.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 TLComponentInstance* gFEPointerInstances[4];
@@ -89,7 +88,7 @@ nlVector2 GetPointerPosition(int pad, u16* angle, u8* valid)
     int width = IsWidescreen() ? 854 : screenInfo->ScreenWidth;
     int height = screenInfo->ScreenHeight;
 
-    if (g_bEnableGamecubePadMonkey)
+    if (gEnablePadMonkeys)
     {
         char path[32];
         nlSNPrintf(path, sizeof(path), "user/monkey_%d_offset", pad);

@@ -1,4 +1,7 @@
+#include <revolution/gx/GXMisc_fwd.h>
+#include <revolution/gx/GXFrameBuf_fwd.h>
 #include "NL/nlDLListContainer.inl"
+#include <revolution/vi/vi_fwd.h>
 #include "Game/FE/LidOpenMessage.h"
 
 #include "Game/NetworkSession.h"
@@ -2026,16 +2029,9 @@ static bool CanGetResetPauseState = true;
 extern "C"
 {
     u8 SCGetLanguage();
-    void GXDrawDone();
-    void GXFlush();
-    void GXCopyDisp(void*, unsigned char);
     void GXPokeColorUpdate(unsigned char);
     void GXPokeBlendMode(int, int, int, int);
     void GXPokeARGB(unsigned short, unsigned short, unsigned long);
-    void VIWaitForRetrace();
-    void VISetBlack(unsigned char);
-    void VIFlush();
-    void VISetNextFrameBuffer(void*);
 }
 
 static int fn_801BF4EC()

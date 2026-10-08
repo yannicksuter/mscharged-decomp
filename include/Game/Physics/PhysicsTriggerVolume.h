@@ -12,7 +12,7 @@ public:
         PhysicsObject* other, dContact* info, int numContacts);
 
     /* 0x38 */ void (*m_pTriggerCallbackFunc)(PhysicsObject*, PhysicsObject*,
-        nlVector3&, void*);
+        const nlVector3&, void*);
     /* 0x3C */ void* m_pCallbackParam;
 }; // total size: 0x40
 

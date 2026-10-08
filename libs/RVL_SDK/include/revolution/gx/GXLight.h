@@ -4,6 +4,7 @@
 
 #include <revolution/gx/GXInternal.h>
 #include <revolution/gx/GXTypes.h>
+#include <revolution/gx/GXLight_fwd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,8 +26,6 @@ void GXInitSpecularDir(GXLightObj* light, f32 x, f32 y, f32 z);
 void GXInitLightColor(GXLightObj* light, GXColor color);
 void GXLoadLightObjImm(const GXLightObj* light, GXLightID id);
 void GXLoadLightObjIndx(u16 index, GXLightID id);
-void GXSetChanAmbColor(GXChannelID chan, GXColor color);
-void GXSetChanMatColor(GXChannelID chan, GXColor color);
 void GXSetNumChans(u8 num);
 void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc ambSrc,
                    GXColorSrc matSrc, GXLightID lightMask, GXDiffuseFn diffFn,

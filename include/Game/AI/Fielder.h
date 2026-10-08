@@ -89,7 +89,7 @@ struct LooseBallContactAnimInfo
 class cFielder;
 extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
 class ChainChomp;
-class UnidentifiedNPC_801B43F8;
+class WindDebris;
 struct CollisionThwompPlayerData;
 extern "C" bool fn_800344DC(cFielder*, const nlVector3*);
 class cSHierarchy;
@@ -195,6 +195,28 @@ struct BulletBillObject;
 
 class cFielder : public cPlayer
 {
+    static float GetHeadTrackingFinalPhaseTime();
+    static float GetModifiedShotTargetDistance(float shotDistance);
+    void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActCrowdVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActDekeVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActElectVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActFallVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActHitVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActHitReactVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActSuperVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActShootPassCommonFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActLooseBallPassFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActOneTimerVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActPassingVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActRunPassVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActRunningVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActRunningWBVarsFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActSlideAttackFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActMegaStrikeMeterFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActStunnedFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActBowserSuperFields(unsigned short* type, DebugWriteCache* cache);
+    void RegisterActWarioSuperFields(unsigned short* type, DebugWriteCache* cache);
     friend void fn_800C5DBC(DesireSteering*, float);
     friend void fn_800C6FDC(DesireSteering*, float);
     friend class UnidentifiedDesire35;
@@ -387,7 +409,7 @@ public:
     bool CollideWithShellCallback(ePowerupSize eSize, bool bUnknown, const nlVector3& rv3Pos1, const nlVector3& rv3Pos2);
     bool CollideWithBobombCallback(const nlVector3& v3CollisionLocation, float fBombRadius);
     void CollideWithChainCallback(ChainChomp* pChainChomp);
-    void fn_8003295C(UnidentifiedNPC_801B43F8* pDebris);
+    void fn_8003295C(WindDebris* pDebris);
     void fn_80032CB8(CollisionThwompPlayerData*);
     bool fn_8003E7F8() const;
     bool fn_8003E84C() const;

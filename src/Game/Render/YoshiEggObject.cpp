@@ -134,8 +134,8 @@ void YoshiEggObject::UpdateTrailEffect(EmissionController& controller)
     if (controller.m_Replaying == 0 && ReplayManager::Instance()->mRender != 0)
     {
         RenderSnapshot* snapshot = ReplayManager::Instance()->mRender;
-        if (snapshot->_1BA0.mVisible)
-            controller.SetPosition(snapshot->_1BA0.mPosition);
+        if (snapshot->mYoshiEgg.mVisible)
+            controller.SetPosition(snapshot->mYoshiEgg.mPosition);
     }
 }
 

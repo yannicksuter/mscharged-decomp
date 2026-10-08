@@ -166,11 +166,11 @@ ContactType PhysicsBirdoEgg::Contact(
             QueueCollisionBirdoEggEnd(eventData);
         }
 
-        bool isBowser
+        bool isWindDebris
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
                   ->GetSkinAnimatedNPC_Type()
-            == SkinAnimatedNPC_BOWSER;
-        if (isBowser)
+            == SkinAnimatedNPC_WIND_DEBRIS;
+        if (isWindDebris)
         {
             CollisionBirdoEggEndData* eventData = 0;
             g_CollisionBirdoEggEndDataPool.Allocate(eventData);

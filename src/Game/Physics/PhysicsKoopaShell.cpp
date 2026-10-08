@@ -205,11 +205,11 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
             QueueCollisionKoopaShellEnd(eventData);
         }
 
-        bool isBowser
+        bool isWindDebris
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
                   ->GetSkinAnimatedNPC_Type()
-            == SkinAnimatedNPC_BOWSER;
-        if (isBowser)
+            == SkinAnimatedNPC_WIND_DEBRIS;
+        if (isWindDebris)
         {
             CollisionKoopaShellEndData* eventData = 0;
             g_CollisionKoopaShellEndDataPool.Allocate(eventData);

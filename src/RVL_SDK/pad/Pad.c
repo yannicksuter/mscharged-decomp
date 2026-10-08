@@ -1,10 +1,10 @@
 #include <revolution/pad.h>
+#include <revolution/vi/vi_fwd.h>
 
 #include <revolution/os.h>
 #include <revolution/si.h>
 #include <string.h>
 
-BOOL __VIResetSIIdle(void);
 
 extern u16 __OSWirelessPadFixMode;
 

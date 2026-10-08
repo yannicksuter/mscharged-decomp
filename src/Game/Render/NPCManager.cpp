@@ -2,7 +2,7 @@
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/FlyingCamera.h"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 #include "Game/Render/WindDebrisConfig.h"
 #include "Game/AsyncLoading.h"
 #include "Game/Drawable/RenderObject.h"
@@ -214,7 +214,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
     return pObject;
 }
 
-UnidentifiedNPC_801B43F8* NPCManager::fn_801A9DE0(int nIndex)
+WindDebris* NPCManager::fn_801A9DE0(int nIndex)
 {
     return mWindDebris[nIndex];
 }
@@ -229,13 +229,13 @@ void NPCManager::CreateWindDebris()
 
         PhysicsNPC* pPhysics = new (8, false) PhysicsNPC(
             pConfig->mRadius);
-        UnidentifiedNPC_801B43F8* pObject = new (8, false) UnidentifiedNPC_801B43F8(
+        WindDebris* pObject = new (8, false) WindDebris(
             *pTemplate->hierarchy, pTemplate->modelID,
             pConfig->mCueId, pConfig->mUnidentified010,
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
         mWindDebris[i] = pObject;
-        pPhysics->SetCallbackFunction(UnidentifiedNPC_801B43F8::fn_801B4830);
+        pPhysics->SetCallbackFunction(WindDebris::CollisionCallback);
     }
 }
 
@@ -692,7 +692,7 @@ void NPCManager::ResetNPCs()
     {
         if (mWindDebris[i] != 0)
         {
-            mWindDebris[i]->fn_801B4B9C();
+            mWindDebris[i]->Reset();
         }
     }
     for (i = 0; i < 8; ++i)

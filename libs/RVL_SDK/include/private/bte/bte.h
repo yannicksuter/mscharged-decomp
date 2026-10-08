@@ -58,10 +58,10 @@ void bte_hcisu_task(int);
 void bte_hcisu_close(void);
 void bta_ci_hci_msg_handler(void *p_data);
 
-void BTE_InitStack(void);
 
 void BTE_LoadStack(void);
 void BTE_UnloadStack(void);
+void bta_usb_close_evt(INT8 status);
 
 #ifdef __cplusplus
 	}

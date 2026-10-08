@@ -15,8 +15,6 @@
 void __btu_interrupt_handler_debug_msg(BOOLEAN enable);
 #endif
 
-void bta_usb_close_evt(INT8);
-
 // uusb_ppc.c
 
 void HCI_TRACE(char const *p_msg);

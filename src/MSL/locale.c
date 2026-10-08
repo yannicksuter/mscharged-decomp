@@ -1,5 +1,6 @@
 #include "locale.h"
 #include "ctype.h"
+#include "wctype.h"
 #include "limits.h"
 #include "mbstring.h"
 
@@ -29,13 +30,6 @@ struct lconv __lconv = {
     CHAR_MAX, // int_p_sign_posn
     CHAR_MAX, // int_n_sign_posn
 };
-
-extern unsigned short __ctype_map[256];
-extern unsigned char __upper_map[256];
-extern unsigned char __lower_map[256];
-extern unsigned short __wctype_map[256];
-extern wchar_t __wupper_map[256];
-extern wchar_t __wlower_map[256];
 
 struct _loc_ctype_cmpt __ctype_cmpt = {
     "C", // CmptName

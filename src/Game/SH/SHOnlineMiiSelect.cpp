@@ -36,7 +36,6 @@
 #include <string.h>
 #include "Game/FE/fePageControls.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/FE/FEAudio.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
@@ -148,7 +147,7 @@ void SHOnlineMiiSelect::ClearMissingMiiSaveSlots()
             scene->HideButtons();
 
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x8C,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::UpdatePage), this)));
@@ -168,7 +167,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         if (result == RFLErrcode_Broken)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
@@ -191,7 +190,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         if (result == RFLErrcode_Broken)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
@@ -214,7 +213,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         if (result == RFLErrcode_Broken)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
@@ -237,7 +236,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         if (result == RFLErrcode_Broken)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));

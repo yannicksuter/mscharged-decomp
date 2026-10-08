@@ -15,7 +15,7 @@
 #include "Game/Render/NetMesh.h"
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/StadiumLoading.h"
-#include "Game/Render/tu_801B43F8.h"
+#include "Game/Render/WindDebris.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
@@ -25,20 +25,20 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 float g_AllActorsHidden;
-static nlVector3 lbl_80570C58 = {};
+static nlVector3 sInvalidDrawablePosition = {};
 
 RenderSnapshot::RenderSnapshot()
     : mEvents(0)
     , mValid(false)
     , mGoalLight(false)
     , mBall(this)
-    , _1CC4(0)
-    , _1DA0(false)
-    , _2294(0)
+    , mNumBulletBills(0)
+    , mHasHammers(false)
+    , mNumFlyingCameras(0)
     , mpNetMeshPositiveX(0)
     , mpNetMeshNegativeX(0)
     , mFrameBlendPercent(0.0f)
-    , _2714(RenderSnapshotFlags())
+    , mFlags(RenderSnapshotFlags())
 {
     mCameraUp.x = 0.0f;
     mCameraUp.y = 0.0f;
@@ -56,54 +56,54 @@ void RenderSnapshot::Initialize()
     int index = 0;
     for (DrawableFlyingCamera* camera = _2298; index < 10; ++camera)
     {
-        camera->mIndex = index++;
+        camera->mCameraIndex = index++;
     }
 
-    _2294 = 0;
-    _1FC0[0].visible = false;
-    _1FC0[1].visible = false;
-    _1FC0[2].visible = false;
+    mNumFlyingCameras = 0;
+    mWindDebris[0].visible = false;
+    mWindDebris[1].visible = false;
+    mWindDebris[2].visible = false;
 
     for (int i = 0; i < 10; ++i)
     {
         int value = g_pCharacters[i]->mUnidentified024.m_eCharacterClass;
         if (value == 8)
         {
-            _2714.raw |= 0x80000000;
+            mFlags.raw |= 0x80000000;
         }
         else if (value == 5)
         {
-            _2714.raw |= 0x40000000;
+            mFlags.raw |= 0x40000000;
         }
         else if (value == 13)
         {
-            _2714.raw |= 0x20000000;
+            mFlags.raw |= 0x20000000;
         }
         else if (value == 19)
         {
-            _2714.raw |= 0x10000000;
+            mFlags.raw |= 0x10000000;
         }
         else if (value == 14)
         {
-            _2714.raw |= 0x08000000;
+            mFlags.raw |= 0x08000000;
         }
         else if (value == 12)
         {
-            _2714.raw |= 0x04000000;
+            mFlags.raw |= 0x04000000;
         }
         else if (value == 2)
         {
-            _2714.raw |= 0x02000000;
+            mFlags.raw |= 0x02000000;
         }
     }
 
     if (GameInfoManager::Instance()->GetStadium() == 0x0B)
     {
-        _2714.raw |= 0x00800000;
+        mFlags.raw |= 0x00800000;
     }
     if (GameInfoManager::Instance()->GetStadium() == 0x0F)
     {
-        _2714.raw |= 0x00400000;
+        mFlags.raw |= 0x00400000;
     }
 
     mValid = false;
@@ -117,11 +117,11 @@ void RenderSnapshot::Free()
     }
 
     mChainChomp.Free();
-    mBowser.Free();
+    mDiddyBanana.Free();
 
     for (int i = 0; i < 3; ++i)
     {
-        _1FC0[i].Free();
+        mWindDebris[i].Free();
     }
 
     delete mpNetMeshPositiveX;
@@ -141,60 +141,60 @@ void RenderSnapshot::Grab()
     {
         mPowerups[i].Grab(i);
     }
-    if (_2714.bits.hammers)
+    if (mFlags.bits.hammers)
     {
-        _1DA0 = gNPCManager->GetNumHammers() != 0;
-        if (_1DA0)
+        mHasHammers = gNPCManager->GetNumHammers() != 0;
+        if (mHasHammers)
         {
             for (unsigned int i = 0; i < 15; i++)
-                _1DA4[i].Grab(gNPCManager->GetHammer(i));
+                mHammers[i].Grab(gNPCManager->GetHammer(i));
         }
     }
-    if (_2714.bits.thwomps)
+    if (mFlags.bits.thwomps)
     {
         for (unsigned int i = 0; i < 8; i++)
-            _2194[i].Grab(gNPCManager->GetThwomp(i));
+            mThwomps[i].Grab(gNPCManager->GetThwomp(i));
     }
-    if (_2714.bits.flyingCameras)
+    if (mFlags.bits.flyingCameras)
     {
-        _2294 = gFlyingCameraCount;
-        for (i = 0; i < _2294; i++)
+        mNumFlyingCameras = gFlyingCameraCount;
+        for (i = 0; i < mNumFlyingCameras; i++)
             _2298[i].Grab();
         for (; i < 10; i++)
             _2298[i].mVisible = false;
     }
-    if (_2714.bits.bulletBills)
+    if (mFlags.bits.bulletBills)
     {
-        _1CC4 = gNPCManager->GetNumBulletBills();
-        for (i = 0; i < _1CC4; i++)
-            _1CC8[i].Grab(gNPCManager->GetBulletBill(i));
+        mNumBulletBills = gNPCManager->GetNumBulletBills();
+        for (i = 0; i < mNumBulletBills; i++)
+            mBulletBills[i].Grab(gNPCManager->GetBulletBill(i));
     }
     mChainChomp.Grab(*gNPCManager->GetChainChomp());
-    if (_2714.bits.yoshiEgg)
-        _1BA0.Grab(gNPCManager->mpYoshiEgg);
-    if (_2714.bits.birdoEgg)
-        _1BC4.Grab(gNPCManager->mpBirdoEgg);
-    if (_2714.bits.koopaShell)
-        _1BE8.Grab(gNPCManager->mpKoopaShell);
-    if (_2714.bits.daisyFists)
+    if (mFlags.bits.yoshiEgg)
+        mYoshiEgg.Grab(gNPCManager->mpYoshiEgg);
+    if (mFlags.bits.birdoEgg)
+        mBirdoEgg.Grab(gNPCManager->mpBirdoEgg);
+    if (mFlags.bits.koopaShell)
+        mKoopaShell.Grab(gNPCManager->mpKoopaShell);
+    if (mFlags.bits.daisyFists)
     {
-        _1C00 = gNPCManager->mNumVisibleDaisyFists;
+        mNumVisibleDaisyFists = gNPCManager->mNumVisibleDaisyFists;
         for (i = 0; i < 8; i++)
             mDaisyFists[i].Grab(gNPCManager->GetDaisyFist(i));
     }
-    if (_2714.bits.diddyBanana)
+    if (mFlags.bits.diddyBanana)
     {
         if (gNPCManager->mpDiddyBanana != 0)
-            mBowser.Grab(*gNPCManager->mpDiddyBanana);
+            mDiddyBanana.Grab(*gNPCManager->mpDiddyBanana);
         else
-            mBowser.visible = false;
+            mDiddyBanana.visible = false;
     }
-    if (_2714.bits.windDebris)
+    if (mFlags.bits.windDebris)
     {
         for (i = 0; i < 3; i++)
         {
             if (gNPCManager->fn_801A9DE0(i) != 0)
-                _1FC0[i].Grab(*gNPCManager->fn_801A9DE0(i));
+                mWindDebris[i].Grab(*gNPCManager->fn_801A9DE0(i));
         }
     }
     mBall.Grab();
@@ -205,8 +205,8 @@ void RenderSnapshot::Grab()
             mpNetMeshPositiveX->Grab(*PhysicsNet::spPhysNetPositiveX->mpNetMesh);
         if (mpNetMeshNegativeX != 0)
             mpNetMeshNegativeX->Grab(*PhysicsNet::spPhysNetNegativeX->mpNetMesh);
-        _2430 = Goalie::mbPosGoalieNetCheck;
-        _2431 = Goalie::mbNegGoalieNetCheck;
+        mPositiveGoalieNetCheck = Goalie::mbPosGoalieNetCheck;
+        mNegativeGoalieNetCheck = Goalie::mbNegGoalieNetCheck;
     }
     mCameraUp = g_CameraWorldUpVector;
     if (lbl_806E12C8 != 0)
@@ -215,18 +215,18 @@ void RenderSnapshot::Grab()
         {
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
             if (patch != 0)
-                _2440[i] = patch->GetPosition();
+                mPatchPositions[i] = patch->GetPosition();
             else
-                _2440[i].z = -10000.0f;
+                mPatchPositions[i].z = -10000.0f;
         }
     }
-    _2718 = GetFixedUpdateTask()->mSimulationTime;
+    mSimulationTime = GetFixedUpdateTask()->mSimulationTime;
     mValid = true;
 }
 
 DrawableBulletBill& GetSnapshotBulletBill(RenderSnapshot* snapshot, unsigned int index)
 {
-    return snapshot->_1CC8[index];
+    return snapshot->mBulletBills[index];
 }
 
 int RenderSnapshot::NumDrawableObjects() const
@@ -237,16 +237,16 @@ int RenderSnapshot::NumDrawableObjects() const
         count = 12;
     }
 
-    if (_2714.bits.diddyBanana && mBowser.visible)
+    if (mFlags.bits.diddyBanana && mDiddyBanana.visible)
     {
         count++;
     }
 
-    if (_2714.bits.windDebris)
+    if (mFlags.bits.windDebris)
     {
         for (int i = 0; i < 3; i++)
         {
-            if (this->_1FC0[i].visible)
+            if (this->mWindDebris[i].visible)
             {
                 count++;
             }
@@ -261,9 +261,9 @@ int RenderSnapshot::NumDrawableObjects() const
         }
     }
 
-    if (_2714.bits.flyingCameras)
+    if (mFlags.bits.flyingCameras)
     {
-        count += this->_2294;
+        count += this->mNumFlyingCameras;
     }
 
     return count;
@@ -295,13 +295,13 @@ const nlVector3* RenderSnapshot::GetPositionForDrawableObject(int index) const
         index--;
     }
 
-    if (_2714.bits.diddyBanana)
+    if (mFlags.bits.diddyBanana)
     {
         if (index == 0)
         {
-            if (mBowser.visible)
+            if (mDiddyBanana.visible)
             {
-                return &mBowser.position;
+                return &mDiddyBanana.position;
             }
         }
         else
@@ -310,15 +310,15 @@ const nlVector3* RenderSnapshot::GetPositionForDrawableObject(int index) const
         }
     }
 
-    if (_2714.bits.windDebris)
+    if (mFlags.bits.windDebris)
     {
         for (int i = 0; i < 3; i++)
         {
-            if (_1FC0[i].visible == true)
+            if (mWindDebris[i].visible == true)
             {
                 if (index == 0)
                 {
-                    return &_1FC0[i].position;
+                    return &mWindDebris[i].position;
                 }
                 index--;
             }
@@ -337,12 +337,12 @@ const nlVector3* RenderSnapshot::GetPositionForDrawableObject(int index) const
         }
     }
 
-    if (_2714.bits.flyingCameras && index < (s32)_2294)
+    if (mFlags.bits.flyingCameras && index < (s32)mNumFlyingCameras)
     {
         return &_2298[index].mPosition;
     }
 
-    return &lbl_80570C58;
+    return &sInvalidDrawablePosition;
 }
 
 void RenderSnapshot::Invalidate()
@@ -364,49 +364,49 @@ void RenderSnapshot::Render(float deltaTime)
     if (!allActorsHidden)
     {
         mChainChomp.Render(*gNPCManager->GetChainChomp());
-        if (_2714.bits.yoshiEgg)
-            _1BA0.Render(gNPCManager->mpYoshiEgg);
-        if (_2714.bits.birdoEgg)
-            _1BC4.Render(gNPCManager->mpBirdoEgg);
-        if (_2714.bits.koopaShell)
-            _1BE8.Render(gNPCManager->mpKoopaShell);
-        if (_2714.bits.daisyFists && _1C00 != 0)
+        if (mFlags.bits.yoshiEgg)
+            mYoshiEgg.Render(gNPCManager->mpYoshiEgg);
+        if (mFlags.bits.birdoEgg)
+            mBirdoEgg.Render(gNPCManager->mpBirdoEgg);
+        if (mFlags.bits.koopaShell)
+            mKoopaShell.Render(gNPCManager->mpKoopaShell);
+        if (mFlags.bits.daisyFists && mNumVisibleDaisyFists != 0)
         {
             for (i = 0; i < 8; i++)
                 mDaisyFists[i].Render(gNPCManager->GetDaisyFist(i));
         }
-        if (_2714.bits.diddyBanana && gNPCManager->mpDiddyBanana != 0)
-            mBowser.Render(*gNPCManager->mpDiddyBanana);
-        if (_2714.bits.bulletBills)
+        if (mFlags.bits.diddyBanana && gNPCManager->mpDiddyBanana != 0)
+            mDiddyBanana.Render(*gNPCManager->mpDiddyBanana);
+        if (mFlags.bits.bulletBills)
         {
-            for (i = 0; i < _1CC4; i++)
-                _1CC8[i].Render(gNPCManager->GetBulletBill(i));
+            for (i = 0; i < mNumBulletBills; i++)
+                mBulletBills[i].Render(gNPCManager->GetBulletBill(i));
         }
-        if (_2714.bits.windDebris)
+        if (mFlags.bits.windDebris)
         {
             for (i = 0; i < 3; i++)
             {
-                if (_1FC0[i].visible == true)
-                    _1FC0[i].Render(*gNPCManager->fn_801A9DE0(i));
+                if (mWindDebris[i].visible == true)
+                    mWindDebris[i].Render(*gNPCManager->fn_801A9DE0(i));
             }
         }
         for (i = 0; i < 10; i++)
             mCharacters[i].Render(*g_pCharacters[i]);
         for (i = 0; i < 150; i++)
             mPowerups[i].Render(i);
-        if (_2714.bits.hammers && _1DA0)
+        if (mFlags.bits.hammers && mHasHammers)
         {
             for (unsigned int i = 0; i < 15; i++)
-                _1DA4[i].Render(gNPCManager->GetHammer(i));
+                mHammers[i].Render(gNPCManager->GetHammer(i));
         }
-        if (_2714.bits.thwomps)
+        if (mFlags.bits.thwomps)
         {
             for (unsigned int i = 0; i < 8; i++)
-                _2194[i].Render(gNPCManager->GetThwomp(i));
+                mThwomps[i].Render(gNPCManager->GetThwomp(i));
         }
-        if (_2714.bits.flyingCameras)
+        if (mFlags.bits.flyingCameras)
         {
-            for (i = 0; i < _2294; i++)
+            for (i = 0; i < mNumFlyingCameras; i++)
                 _2298[i].Render();
         }
         mBall.Render();
@@ -434,53 +434,53 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
         mCharacters[i].Blend(blendFactors, lhs.mCharacters[i], rhs.mCharacters[i]);
     for (int i = 0; i < 150; i++)
         mPowerups[i].Blend(blendFactors, lhs.mPowerups[i], rhs.mPowerups[i]);
-    if (_2714.bits.hammers)
+    if (mFlags.bits.hammers)
     {
-        _1DA0 = lhs._1DA0 && rhs._1DA0;
-        if (_1DA0)
+        mHasHammers = lhs.mHasHammers && rhs.mHasHammers;
+        if (mHasHammers)
         {
             for (unsigned int i = 0; i < 15; i++)
-                _1DA4[i].Blend(blendFactors, lhs._1DA4[i], rhs._1DA4[i]);
+                mHammers[i].Blend(blendFactors, lhs.mHammers[i], rhs.mHammers[i]);
         }
     }
-    if (_2714.bits.thwomps)
+    if (mFlags.bits.thwomps)
     {
         for (unsigned int i = 0; i < 8; i++)
-            _2194[i].Blend(blendFactors, lhs._2194[i], rhs._2194[i]);
+            mThwomps[i].Blend(blendFactors, lhs.mThwomps[i], rhs.mThwomps[i]);
     }
-    if (_2714.bits.flyingCameras)
+    if (mFlags.bits.flyingCameras)
     {
-        _2294 = lhs._2294 <= rhs._2294 ? lhs._2294 : rhs._2294;
-        for (unsigned int i = 0; i < _2294; i++)
+        mNumFlyingCameras = lhs.mNumFlyingCameras <= rhs.mNumFlyingCameras ? lhs.mNumFlyingCameras : rhs.mNumFlyingCameras;
+        for (unsigned int i = 0; i < mNumFlyingCameras; i++)
             _2298[i].Blend(blendFactors, lhs._2298[i], rhs._2298[i]);
     }
     mChainChomp.Blend(blendFactors, lhs.mChainChomp, rhs.mChainChomp);
-    if (_2714.bits.yoshiEgg)
-        _1BA0.Blend(blendFactors, lhs._1BA0, rhs._1BA0);
-    if (_2714.bits.birdoEgg)
-        _1BC4.Blend(blendFactors, lhs._1BC4, rhs._1BC4);
-    if (_2714.bits.koopaShell)
-        _1BE8.Blend(blendFactors, lhs._1BE8, rhs._1BE8);
-    if (_2714.bits.daisyFists)
+    if (mFlags.bits.yoshiEgg)
+        mYoshiEgg.Blend(blendFactors, lhs.mYoshiEgg, rhs.mYoshiEgg);
+    if (mFlags.bits.birdoEgg)
+        mBirdoEgg.Blend(blendFactors, lhs.mBirdoEgg, rhs.mBirdoEgg);
+    if (mFlags.bits.koopaShell)
+        mKoopaShell.Blend(blendFactors, lhs.mKoopaShell, rhs.mKoopaShell);
+    if (mFlags.bits.daisyFists)
     {
-        _1C00 = lhs._1C00 >= rhs._1C00 ? lhs._1C00 : rhs._1C00;
-        for (unsigned int i = 0; i < 8 && _1C00 != 0; i++)
+        mNumVisibleDaisyFists = lhs.mNumVisibleDaisyFists >= rhs.mNumVisibleDaisyFists ? lhs.mNumVisibleDaisyFists : rhs.mNumVisibleDaisyFists;
+        for (unsigned int i = 0; i < 8 && mNumVisibleDaisyFists != 0; i++)
             mDaisyFists[i].Blend(blendFactors, lhs.mDaisyFists[i], rhs.mDaisyFists[i]);
     }
-    if (_2714.bits.diddyBanana && gNPCManager->mpDiddyBanana != 0)
-        mBowser.Blend(blendFactors, lhs.mBowser, rhs.mBowser);
-    if (_2714.bits.bulletBills)
+    if (mFlags.bits.diddyBanana && gNPCManager->mpDiddyBanana != 0)
+        mDiddyBanana.Blend(blendFactors, lhs.mDiddyBanana, rhs.mDiddyBanana);
+    if (mFlags.bits.bulletBills)
     {
-        _1CC4 = lhs._1CC4 <= rhs._1CC4 ? lhs._1CC4 : rhs._1CC4;
-        for (unsigned int i = 0; i < _1CC4; i++)
-            _1CC8[i].Blend(blendFactors, lhs._1CC8[i], rhs._1CC8[i]);
+        mNumBulletBills = lhs.mNumBulletBills <= rhs.mNumBulletBills ? lhs.mNumBulletBills : rhs.mNumBulletBills;
+        for (unsigned int i = 0; i < mNumBulletBills; i++)
+            mBulletBills[i].Blend(blendFactors, lhs.mBulletBills[i], rhs.mBulletBills[i]);
     }
-    if (_2714.bits.windDebris)
+    if (mFlags.bits.windDebris)
     {
         for (int i = 0; i < 3; i++)
         {
             if (gNPCManager->fn_801A9DE0(i) != 0)
-                _1FC0[i].Blend(blendFactors, lhs._1FC0[i], rhs._1FC0[i]);
+                mWindDebris[i].Blend(blendFactors, lhs.mWindDebris[i], rhs.mWindDebris[i]);
         }
     }
     mBall.Blend(blendFactors, lhs.mBall, rhs.mBall);
@@ -497,10 +497,10 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
             if (patch != 0)
             {
-                if (previous._2440[i].z > -100.0f && current._2440[i].z > -100.0f)
+                if (previous.mPatchPositions[i].z > -100.0f && current.mPatchPositions[i].z > -100.0f)
                 {
                     nlVector3 position;
-                    nlVecLerp(position, previous._2440[i], current._2440[i], blendFactors[0]);
+                    nlVecLerp(position, previous.mPatchPositions[i], current.mPatchPositions[i], blendFactors[0]);
                     patch->m_SpawnPosition = position;
                 }
                 else
@@ -509,17 +509,17 @@ void RenderSnapshot::Blend(const float* blendFactors, RenderSnapshot& lhs, Rende
         }
     }
     static float sPreviousStadiumTime = -1.0f;
-    _2718 = (1.0f - blendFactors[0]) * lhs._2718 + blendFactors[0] * rhs._2718;
+    mSimulationTime = (1.0f - blendFactors[0]) * lhs.mSimulationTime + blendFactors[0] * rhs.mSimulationTime;
     if (sPreviousStadiumTime > 0.0f)
     {
-        float deltaTime = _2718 - sPreviousStadiumTime;
+        float deltaTime = mSimulationTime - sPreviousStadiumTime;
         if (deltaTime > 0.0f)
             UpdateStadium(deltaTime);
     }
     mGoalLight = rhs.mGoalLight;
-    _2430 = rhs._2430;
-    sPreviousStadiumTime = _2718;
-    _2431 = rhs._2431;
+    mPositiveGoalieNetCheck = rhs.mPositiveGoalieNetCheck;
+    sPreviousStadiumTime = mSimulationTime;
+    mNegativeGoalieNetCheck = rhs.mNegativeGoalieNetCheck;
 }
 
 RenderSnapshot& RenderSnapshot::GetMutable()

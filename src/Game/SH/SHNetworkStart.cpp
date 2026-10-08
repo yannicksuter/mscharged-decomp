@@ -36,7 +36,7 @@ void ResumeNetworkStart()
 }
 
 NetworkStartScene::NetworkStartScene()
-    : mState(0)
+    : mState(STATE_ONLINE_OPTIONS)
     , mShowPlayer2Controls(false)
 {
     gNetworkStartWaitingForDialog = false;
@@ -57,25 +57,25 @@ NetworkStartScene::~NetworkStartScene()
     }
 }
 
-void NetworkStartScene::SetActionButtons(int state)
+void NetworkStartScene::SetActionButtons(int buttonState)
 {
     TLSlide* activeSlide = mPresentation->m_currentSlide;
     TLComponentInstance* buttons = FEFinder<TLComponentInstance, 2>::Find<>(activeSlide, "Layer", "BUTTONS");
 
     bool visible = true;
-    if (state == 0)
+    if (buttonState == ACTION_BUTTONS_A_AND_B)
     {
         buttons->SetActiveSlide("A AND B", true, false);
     }
-    else if (state == 1)
+    else if (buttonState == ACTION_BUTTONS_A)
     {
         buttons->SetActiveSlide("A", true, false);
     }
-    else if (state == 2)
+    else if (buttonState == ACTION_BUTTONS_B)
     {
         buttons->SetActiveSlide("B", true, false);
     }
-    else if (state == -1)
+    else if (buttonState == ACTION_BUTTONS_HIDDEN)
     {
         visible = false;
     }
@@ -85,24 +85,24 @@ void NetworkStartScene::SetActionButtons(int state)
 void NetworkStartScene::EnterState(int state)
 {
     mMenuItems.SetItem(0);
-    int buttons = 0;
+    int buttons = ACTION_BUTTONS_A_AND_B;
     switch (state)
     {
-    case 0:
+    case STATE_ONLINE_OPTIONS:
         mPresentation->SetActiveSlide("ONLINE OPTIONS", true);
-        buttons = 0;
+        buttons = ACTION_BUTTONS_A_AND_B;
         break;
-    case 1:
+    case STATE_CREATE_GAME:
         mPresentation->SetActiveSlide("CREATE", true);
-        buttons = 2;
+        buttons = ACTION_BUTTONS_B;
         break;
-    case 2:
+    case STATE_JOIN_GAME:
         mPresentation->SetActiveSlide("JOIN", true);
-        buttons = 2;
+        buttons = ACTION_BUTTONS_B;
         break;
-    case 3:
+    case STATE_WAIT_FOR_START:
         mPresentation->SetActiveSlide("waiting for start", true);
-        buttons = -1;
+        buttons = ACTION_BUTTONS_HIDDEN;
         break;
     }
     SetActionButtons(buttons);
@@ -129,12 +129,12 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
     };
     switch (state)
     {
-    case 0:
-        EnterState(0);
+    case STATE_ONLINE_OPTIONS:
+        EnterState(STATE_ONLINE_OPTIONS);
         break;
-    case 1:
+    case STATE_CREATE_GAME:
     {
-        EnterState(1);
+        EnterState(STATE_CREATE_GAME);
         LANLobby* lobby = g_pNetworkSessionBase->GetTransport();
         MatchData data;
         NetworkStatsManager* stats = NetworkStatsManager::Instance();
@@ -157,17 +157,17 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
         case 0:
             break;
         case 1:
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)0x5c, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
         default:
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)0x58, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
@@ -175,9 +175,9 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
         }
         break;
     }
-    case 2:
+    case STATE_JOIN_GAME:
     {
-        EnterState(2);
+        EnterState(STATE_JOIN_GAME);
         LANLobby* lobby = g_pNetworkSessionBase->GetTransport();
         MatchData data;
         NetworkStatsManager* stats = NetworkStatsManager::Instance();
@@ -200,33 +200,33 @@ void NetworkStartScene::OnMenuItemApply(TLComponentInstance* component, int stat
         case 0:
             break;
         case 1:
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)0x5c, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
         case 4:
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)0x5d, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
         case 5:
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)0x5e, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
             break;
         default:
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+                FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 popup->Create((ePopupMenu)0x59, Function<FnVoidVoid>(ResetNetworkStart));
                 gNetworkStartWaitingForDialog = true;
             }
@@ -243,7 +243,7 @@ void NetworkStartScene::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     const char* menuNames[] = { "CREATE GAME", "JOIN GAME" };
-    int menuStates[] = { 1, 2 };
+    int menuStates[] = { STATE_CREATE_GAME, STATE_JOIN_GAME };
     presentation->SetActiveSlide("online options", true);
     for (int i = 0; i < 2; ++i)
     {
@@ -293,22 +293,22 @@ void NetworkStartScene::Update(float dt)
         return;
     if (gNetworkStartResetRequested)
     {
-        EnterState(0);
+        EnterState(STATE_ONLINE_OPTIONS);
         gNetworkStartResetRequested = false;
     }
     switch (mState)
     {
-    case 0:
+    case STATE_ONLINE_OPTIONS:
         UpdateMenuInput();
         break;
-    case 1:
+    case STATE_CREATE_GAME:
         UpdateLobby();
         break;
-    case 2:
+    case STATE_JOIN_GAME:
         if (g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0))
-            EnterState(0);
+            EnterState(STATE_ONLINE_OPTIONS);
         break;
-    case 3:
+    case STATE_WAIT_FOR_START:
         break;
     }
 }
@@ -340,7 +340,7 @@ void NetworkStartScene::UpdateMenuInput()
         }
         else if (g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0))
         {
-            GameSceneManager::Instance()->Push((SceneList)40, SCREEN_BACK, true);
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
             g_pNetworkSessionBase->SetSessionState(0);
         }
     }
@@ -365,15 +365,15 @@ void NetworkStartScene::UpdateLobby()
             mPlayerText[i]->SetString(mPlayerNames[i]);
     }
     if (playerCount >= 2)
-        SetActionButtons(0);
+        SetActionButtons(ACTION_BUTTONS_A_AND_B);
     else
-        SetActionButtons(2);
+        SetActionButtons(ACTION_BUTTONS_B);
 
     if (g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0))
     {
         int result = lobby->AbortCreateGame();
         tDebugPrintManager::Print(DC_NETWORK, "Abort create game returned status %d\n", result);
-        EnterState(0);
+        EnterState(STATE_ONLINE_OPTIONS);
     }
     else if (g_pFEInput->JustPressed(FE_ALL_PADS, 30, true, 0) && playerCount >= 2)
     {
@@ -403,17 +403,17 @@ void NetworkStartScene::OnGameCreated(int result)
     case 8:
         break;
     case 7:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
     default:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x58, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
@@ -427,36 +427,36 @@ void NetworkStartScene::OnGameJoined(int result)
     switch (result)
     {
     case 0:
-        EnterState(3);
+        EnterState(STATE_WAIT_FOR_START);
         break;
     case 4:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x5d, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
     case 6:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x5f, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
     case 7:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
     default:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x59, Function<FnVoidVoid>(ResetNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
@@ -472,17 +472,17 @@ void NetworkStartScene::OnGameLaunched(int result)
     case 0:
         break;
     case 9:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x61, Function<FnVoidVoid>(ResumeNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }
         break;
     default:
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)10)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x62, Function<FnVoidVoid>(ResumeNetworkStart));
             gNetworkStartWaitingForDialog = true;
         }

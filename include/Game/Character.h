@@ -256,6 +256,8 @@ public:
     const CharacterInfo* GetCharacterInfoData() const { return mUnidentified11C; }
     cPN_SAnimController* GetCurrentAnimController() const { return m_pCurrentAnimController; }
 
+    int GetCurrentAnimID() const { return m_eAnimID; }
+
     cAnimInventory* GetAnimInventory() const
     {
         return m_pAnimInventory;

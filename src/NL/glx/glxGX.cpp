@@ -1,28 +1,16 @@
 #include "NL/glx/glxGX.h"
+#include <revolution/gx/GXFrameBuf_fwd.h>
+#include <revolution/gx/GXLight_fwd.h>
 
 #include "NL/gl/glPlat.h"
 
-// R4QE01 links the Revolution SDK GX library as automatic objects. Its entry
-// points are declared here rather than through <revolution/gx.h> because that
-// header's <revolution/types.h> and the game's own "types.h" spell the
-// fixed-width typedefs differently.
-struct GXColor
-{
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-};
-
+// Remaining GX entry points use the game type aliases below.
 extern "C"
 {
     void GXSetTexCoordGen2(s32 dst_coord, s32 func, s32 src_param, u32 mtx, u8 normalize, u32 pt_texmtx);
     void GXSetNumTexGens(u8 nTexGens);
     void GXSetCullMode(s32 mode);
     void GXSetCoPlanar(u8 enable);
-    void GXSetCopyFilter(u8 aa, const u8 sample_pattern[12][2], u8 vf, const u8 vfilter[7]);
-    void GXSetChanAmbColor(s32 chan, GXColor amb_color);
-    void GXSetChanMatColor(s32 chan, GXColor mat_color);
     void GXSetNumChans(u8 nChans);
     void GXSetChanCtrl(s32 chan, u8 enable, s32 amb_src, s32 mat_src, u32 light_mask, s32 diff_fn, s32 attn_fn);
     void GXSetTevColorIn(s32 stage, s32 a, s32 b, s32 c, s32 d);
@@ -50,9 +38,6 @@ enum
 {
     GX_CULL_BACK = 2,
 
-    GX_LEQUAL = 3,
-    GX_ALWAYS = 7,
-
     GX_AOP_AND = 0,
 
     GX_BM_NONE = 0,
@@ -75,9 +60,6 @@ enum
     GX_TB_ZERO = 0,
     GX_CS_SCALE_1 = 0,
     GX_TEVPREV = 0,
-
-    GX_ALPHA0 = 4,
-    GX_ALPHA1 = 5,
 
     GX_SRC_REG = 0,
     GX_SRC_VTX = 1,
@@ -198,10 +180,10 @@ void gxInit()
     GXColor white = { 255, 255, 255, 255 };
     GXColor black = { 0, 0, 0, 255 };
 
-    GXSetChanMatColor(0, white);
-    GXSetChanMatColor(1, white);
-    GXSetChanAmbColor(0, black);
-    GXSetChanAmbColor(1, black);
+    GXSetChanMatColor(GX_COLOR0, white);
+    GXSetChanMatColor(GX_COLOR1, white);
+    GXSetChanAmbColor(GX_COLOR0, black);
+    GXSetChanAmbColor(GX_COLOR1, black);
 
     nlColourSet(gx_matColour[0], 255, 255, 255, 255);
     gx_matColour[1] = gx_matColour[0];
@@ -221,8 +203,8 @@ void gxInit()
     GXSetCoPlanar(0);
     gx_coplanar = false;
 
-    GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_VTX, 0xFF, GX_DF_CLAMP, GX_AF_SPOT);
-    GXSetChanCtrl(GX_ALPHA1, 0, GX_SRC_REG, GX_SRC_VTX, 0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_VTX, 0xFF, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_COLOR1A1, 0, GX_SRC_REG, GX_SRC_VTX, 0xFF, GX_DF_CLAMP, GX_AF_SPOT);
 
     GXSetScissorBoxOffset(0, 0);
 }
@@ -448,7 +430,7 @@ void gxSetTexCoordGen(s32 dst_coord, s32 func, s32 src_param, u32 arg, bool norm
 static inline void SetGXChanMatColour(s32 chan, const nlColour& colour)
 {
     u32 c = *(u32*)&colour;
-    GXSetChanMatColor(chan, *(GXColor*)&c);
+    GXSetChanMatColor((GXChannelID)chan, *(GXColor*)&c);
 }
 
 nlColour gxSetChanMatColour(s32 chan, const nlColour& colour)
@@ -466,7 +448,7 @@ nlColour gxSetChanMatColour(s32 chan, const nlColour& colour)
 static inline void SetGXChanAmbColour(s32 chan, const nlColour& colour)
 {
     u32 c = *(u32*)&colour;
-    GXSetChanAmbColor(chan, *(GXColor*)&c);
+    GXSetChanAmbColor((GXChannelID)chan, *(GXColor*)&c);
 }
 
 nlColour gxSetChanAmbColour(s32 chan, const nlColour& colour)

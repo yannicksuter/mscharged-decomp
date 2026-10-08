@@ -4,6 +4,7 @@
 #include <revolution/os/OSContext.h>
 #include <revolution/types.h>
 #include <stdarg.h>
+#include <revolution/os/OSError_fwd.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -48,7 +49,6 @@ typedef void (*OSErrorHandler)(u8 error, OSContext* context, u32 dsisr, u32 dar,
 extern OSErrorHandler __OSErrorTable[OS_ERR_MAX];
 extern u32 __OSFpscrEnableBits;
 
-void OSReport(const char* message, ...);
 void OSVReport(const char* message, va_list list);
 void OSPanic(const char* file, int line, const char* message, ...);
 OSErrorHandler OSSetErrorHandler(u16 error, OSErrorHandler handler);

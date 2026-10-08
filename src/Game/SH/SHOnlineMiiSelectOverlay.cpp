@@ -31,7 +31,6 @@
 
 #include <string.h>
 #include "Game/FE/fePageControls.h"
-#include "Game/NetworkSession.h"
 #include "NL/nlstring_tmpl.h"
 
 SHOnlineMiiSelectOverlay::SHOnlineMiiSelectOverlay()
@@ -92,7 +91,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
         else if (error == RFLErrcode_Broken)
         {
             FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87,
                 Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToWiiMenu), this)));
         }
@@ -100,7 +99,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x88,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::ReturnToMiiSelect), this)));
     }
@@ -123,7 +122,7 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
     if (!GameInfoManager::Instance()->HasSaveSlot(mCreateID))
     {
         FEPopupMenu* popup = (FEPopupMenu*)fn_801CA660()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x8A);
         mButtonInstances[1]->SetVisible(false);
         mButtons[1].Disable();
@@ -232,7 +231,7 @@ void SHOnlineMiiSelectOverlay::SelectOption(unsigned int, void* context)
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
 
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x89,
             Function<FnVoidVoid>(
                 Bind<void>(MemFun(&SHOnlineMiiSelectOverlay::DeleteSaveSlot), this)),
@@ -284,7 +283,7 @@ bool SHOnlineMiiSelectOverlay::SelectMii()
         else
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x8B);
             return false;
         }

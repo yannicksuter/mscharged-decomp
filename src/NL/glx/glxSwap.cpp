@@ -1,4 +1,13 @@
 #include "NL/glx/glxSwap.h"
+#include "NL/nlDebug.h"
+#include "NL/nlConfig.h"
+#include <stdio.h>
+#include <revolution/vi/vi_fwd.h>
+#include <revolution/os/OSTime_fwd.h>
+#include <revolution/os/OSError_fwd.h>
+#include <revolution/gx/GXFifo_fwd.h>
+#include <revolution/gx/GXMisc_fwd.h>
+#include <revolution/gx/GXFrameBuf_fwd.h>
 
 #include "NL/gl/glPlat.h"
 #include "NL/gl/glDrawSyncLog.h"
@@ -9,66 +18,6 @@
 #include "NL/nlPrint.h"
 #include "NL/nlTicker.h"
 #include "NL/nlAllocatorStack.h"
-
-// Revolution SDK and neighbouring renderer entry points retained as automatic
-// objects in R4QE01. The SDK's own <revolution/gx.h> cannot be included from
-// game code yet, because "types.h" and <revolution/types.h> spell the
-// fixed-width typedefs differently, so the declarations are repeated here.
-// Only identities established from the target are spelled out; the rest stay
-// address-named.
-extern "C"
-{
-    void VIFlush();
-    void VISetBlack(u8 black);
-    void VISetNextFrameBuffer(void* fb);
-    u32 VIGetRetraceCount();
-    void VISetPreRetraceCallback(void (*cb)(u32));
-    void VISetPostRetraceCallback(void (*cb)(u32));
-    u32 OSGetTick();
-    void OSReport(const char* format, ...);
-
-    void GXGetGPStatus(u8* overhi, u8* underlow, u8* readIdle, u8* cmdIdle, u8* brkpt);
-    void GXFlush();
-    void GXAbortFrame();
-    u16 GXReadDrawSync();
-    void GXSetDrawDone();
-    void GXWaitDrawDone();
-    void GXDrawDone();
-    void GXPeekARGB(u16 x, u16 y, u32* colour);
-    void (*GXSetDrawDoneCallback(void (*cb)()))();
-    void GXCopyDisp(void* dest, u8 clear);
-    void nlBreak__Fv();
-
-    void VIWaitForRetrace();
-    // C stdio entry points retained in the MSL region.
-    typedef struct _FILE FILE;
-    FILE* fopen(const char* path, const char* mode);
-    unsigned long fwrite(const void* buffer, unsigned long size, unsigned long count, FILE* file);
-    int fclose(FILE* file);
-}
-
-struct GXColor
-{
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-};
-
-extern "C" void GXSetCopyClear(GXColor clear_clr, u32 clear_z);
-
-// R4QE01 keeps one copy of the aligned nlMalloc forwarding thunk, emitted by
-// the nlConfig translation unit and called from here as well.
-void* ConfigParserAllocate(unsigned long size, unsigned int alignment, bool fromEnd);
-
-enum
-{
-    GX_LEQUAL = 3
-};
-
-#define OS_BUS_CLOCK                 (*(u32*)0x800000F8)
-#define OS_TIMER_CLOCK               (OS_BUS_CLOCK / 4)
-#define OSTicksToMicroseconds(ticks) (((ticks) * 8) / (OS_TIMER_CLOCK / 125000))
 
 #pragma push
 #pragma pack(1)
@@ -93,8 +42,8 @@ static void HandleSoftReset();
 static void glx_ScreenCapture(bool isMovie);
 static void PutPixel(u8* dst, u32 argbColor);
 static void loading_indicator();
-static void vi_pre_cb(u32);
-static void vi_post_cb(u32);
+static void vi_pre_cb(unsigned long);
+static void vi_post_cb(unsigned long);
 static void draw_done_cb();
 static void AdvanceFrame();
 static void ReportGPStatus();
@@ -120,7 +69,7 @@ static unsigned long long glx_LastRetraceTick;
 static int glx_nLoadFrame;
 static int glx_nLoadWaitFrames;
 static void (*glx_pLoadingIndicator)(void*);
-static u8 glx_bAborted;
+static u8 glx_bDrawWaitComplete;
 static u32 glx_nRetraceAtSwap;
 static f32 glx_DrawSyncTimeout;
 static GXColor glx_ClearColour;
@@ -165,9 +114,9 @@ void glxRequestScreenShot()
 static void glx_ScreenCapture(bool isMovie)
 {
     char filename[0x40];
-    void* file;
+    FILE* file;
     TargaHeader header;
-    u32 argbColor;
+    unsigned long argbColor;
     s32 pixelOffset;
     s32 y, x;
     u8* imageData;
@@ -218,9 +167,9 @@ static void glx_ScreenCapture(bool isMovie)
             }
         }
 
-        fwrite(&header, 1, sizeof(TargaHeader), (FILE*)file);
-        fwrite(imageData, 3, 0x46000, (FILE*)file);
-        fclose((FILE*)file);
+        fwrite(&header, 1, sizeof(TargaHeader), file);
+        fwrite(imageData, 3, 0x46000, file);
+        fclose(file);
         delete[] imageData;
     }
 }
@@ -271,12 +220,12 @@ static void loading_indicator()
     }
 }
 
-static void vi_pre_cb(u32)
+static void vi_pre_cb(unsigned long)
 {
     bInRetrace = 1;
 }
 
-static void vi_post_cb(u32)
+static void vi_post_cb(unsigned long)
 {
     HandleSoftReset();
     if (glx_bLoadingIndicator != 0)
@@ -301,7 +250,7 @@ void glxSwapWaitDrawDone()
 
 static void draw_done_cb()
 {
-    glx_bAborted = 1;
+    glx_bDrawWaitComplete = 1;
 }
 
 void glxInitSwap(void* fb0, void* fb1)
@@ -391,17 +340,17 @@ static void WaitDrawDone()
         return;
     }
 
-    if (glx_bAborted != 0)
+    if (glx_bDrawWaitComplete != 0)
     {
         return;
     }
 
     u32 start = nlGetTicker();
-    while (glx_bAborted == 0)
+    while (glx_bDrawWaitComplete == 0)
     {
         if (nlGetTickerDifference(start, nlGetTicker()) > glx_DrawSyncTimeout)
         {
-            glx_bAborted = 1;
+            glx_bDrawWaitComplete = 1;
             OSReport("Warning: Hung in WaitDrawDone, had to abort frame.\n");
             ReportGPStatus();
             if (glx_bAllowAbortFrame != 0)
@@ -410,7 +359,7 @@ static void WaitDrawDone()
                 gxInit();
                 return;
             }
-            nlBreak__Fv();
+            nlBreak();
         }
     }
 }
@@ -458,7 +407,7 @@ static void swap_Post()
     }
     else
     {
-        nlBreak__Fv();
+        nlBreak();
     }
 
     glxSwapBuffers();
@@ -482,7 +431,7 @@ static void swap_Pre()
     gxSetAlphaUpdate(true);
     GXCopyDisp(glx_FrameBuffer[glx_nBuffer], 1);
     GXSetDrawDone();
-    glx_bAborted = 0;
+    glx_bDrawWaitComplete = 0;
     GXFlush();
     glx_nRetraceAtSwap = VIGetRetraceCount();
 }

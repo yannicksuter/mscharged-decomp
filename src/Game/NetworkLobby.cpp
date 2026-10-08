@@ -86,9 +86,9 @@ void NetworkLobby::Reset()
     mProfileId = 0;
     mMaxMatchmakingEntries = 0;
     mMinMatchmakingEntries = 0;
-    mUnidentified034 = 0;
-    mUnidentified030 = 0;
-    mFriendProfileId = -1;
+    mMinCompletionElapsedMsLow = 0;
+    mMinCompletionElapsedMsHigh = 0;
+    mMinCompletionState = -1;
     mState = 0;
     mMatchFailed = false;
     mCancelRequested = false;
@@ -467,9 +467,9 @@ bool NetworkLobby::StartMatchmaking()
     mFriendMatch = false;
     mMaxMatchmakingEntries = gOnlineMaxMatchmakingEntries;
     mMinMatchmakingEntries = gOnlineMinMatchmakingEntries;
-    mUnidentified034 = 0;
-    mUnidentified030 = 0;
-    mFriendProfileId = -1;
+    mMinCompletionElapsedMsLow = 0;
+    mMinCompletionElapsedMsHigh = 0;
+    mMinCompletionState = -1;
     mMatchFailed = false;
 
     DWCMatchOptMinComplete option;
@@ -937,8 +937,8 @@ void NetworkLobby::Update(float dt)
     switch (mState)
     {
     case 3:
-        mFriendProfileId =
-            DWC_GetMOMinCompState((u64*)&mUnidentified030);
+        mMinCompletionState =
+            DWC_GetMOMinCompState((u64*)&mMinCompletionElapsedMsHigh);
         break;
     case 2:
         for (int i = 0; i < mMachineCount; ++i)
@@ -1048,7 +1048,7 @@ bool NetworkLobby::AllMachineInfoReceived()
     return received;
 }
 
-NetworkDraftMachineInfo* NetworkLobby::GetLocalMachineInfo()
+NetworkDraftMachineInfo* NetworkLobby::GetMachineInfoArray()
 {
     return mMachineInfo;
 }

@@ -127,13 +127,13 @@ static void DrawShadow(float radius, float x, float y, float z)
     *(u32*)&quad.m_colour[0] = packed;
 
     glSetDefaultState(true);
-    glSetRasterState((eGLState)5, 1);
-    glSetRasterState((eGLState)6, 0);
-    glSetRasterState((eGLState)1, 0);
+    glSetRasterState(GLS_AlphaBlend, 1);
+    glSetRasterState(GLS_Culling, 0);
+    glSetRasterState(GLS_DepthWrite, 0);
     glSetCurrentRasterState(glHandleizeRasterState());
 
-    glSetCurrentTexture(glGetTexture("global/ball_shadow"), (eGLTextureType)0);
-    glSetTextureState((eGLTextureState)0, 3);
+    glSetCurrentTexture(glGetTexture("global/ball_shadow"), GLTT_Diffuse);
+    glSetTextureState(GLTS_DiffuseWrap, 3);
     glSetCurrentTextureState(glHandleizeTextureState());
 
     quad.Attach((eGLView)(u32)GetUnshadowedView(), 0);

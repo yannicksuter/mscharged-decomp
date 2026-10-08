@@ -56,7 +56,7 @@ float gWaluigiWallPatchDamage = 0.5f;
 float gWaluigiWallDamage_806DCB24 = 0.5f;
 float gWaluigiWallYoshiEggDamage = 0.5f;
 float gWaluigiWallChainChompDamage = 0.5f;
-float gWaluigiWallBowserDamage = 0.75f;
+float gWaluigiWallWindDebrisDamage = 0.75f;
 
 unsigned int gWaluigiWallManagerCount;
 unsigned int gWaluigiWallNextID;
@@ -217,9 +217,9 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         object = npc->mpAINPC;
         if (object != 0)
         {
-            bool bowser = object->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_BOWSER;
-            if (bowser)
-                ApplyDamage(gWaluigiWallBowserDamage);
+            bool windDebris = object->GetSkinAnimatedNPC_Type() == SkinAnimatedNPC_WIND_DEBRIS;
+            if (windDebris)
+                ApplyDamage(gWaluigiWallWindDebrisDamage);
         }
         return NO_CONTACT;
     }

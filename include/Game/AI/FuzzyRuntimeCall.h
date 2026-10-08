@@ -65,4 +65,28 @@ extern "C" inline UnidentifiedVariant_80054AB8 fn_800C3448(
         2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
 }
 
+extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B6C(
+    void*, const unsigned int&, cFielder*);
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_80041AFC(
+    InterpreterCore* runtime, const char* name, cFielder* fielder)
+{
+    return fn_80041B0C(runtime, fielder, name);
+}
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B0C(
+    void* runtime, cFielder* fielder, const char* name)
+{
+    unsigned int functionHash = nlStringHash(name);
+    return fn_80041B6C(runtime, functionHash, fielder);
+}
+
+extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B6C(
+    void* runtime, const unsigned int& hash, cFielder* fielder)
+{
+    unsigned int functionHash = hash;
+    FunctionEntryPoint* entry = ((InterpreterCore*)runtime)->FindFunctionEntryPoint(functionHash);
+    return ExecuteFuzzyFunction((FuzzyRuntimeBase*)runtime, entry, 1, FuzzyArgumentBits(fielder), 0);
+}
+
 #endif

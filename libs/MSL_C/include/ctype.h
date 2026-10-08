@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+extern const unsigned short __ctype_map[256];
+extern const unsigned char __upper_map[256];
+extern const unsigned char __lower_map[256];
+
 #define __MSL_ISALPHA_MAP  (1 << 0)
 #define __MSL_ISBLANK_MAP  (1 << 1)
 #define __MSL_ISCNTRL_MAP  (1 << 2)

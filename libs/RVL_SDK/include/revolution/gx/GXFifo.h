@@ -3,6 +3,7 @@
 #include <revolution/types.h>
 
 #include <revolution/gx/GXInternal.h>
+#include <revolution/gx/GXFifo_fwd.h>
 
 #include <revolution/os.h>
 #ifdef __cplusplus
@@ -17,8 +18,6 @@ void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size);
 void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr);
 void GXInitFifoLimits(GXFifoObj* fifo, u32 hiWatermark, u32 loWatermark);
 
-void GXGetGPStatus(GXBool* overhi, GXBool* underlow, GXBool* readIdle,
-                   GXBool* cmdIdle, GXBool* brkpt);
 
 void GXSetCPUFifo(GXFifoObj* fifo);
 void GXSetGPFifo(GXFifoObj* fifo);

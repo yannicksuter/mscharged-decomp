@@ -1,5 +1,6 @@
 #include <decomp.h>
 #include <revolution/os.h>
+#include <revolution/vi/vi3in1.h>
 #include <revolution/os/OSNandbootInfo.h>
 #include <mem.h>
 
@@ -37,7 +38,6 @@ u32 SCCheckStatus(void);
 void __OSLaunchMenu(void);
 void __OSRelaunchTitle(void);
 BOOL __PADDisableRecalibration(BOOL disable);
-void __VISetRGBModeImm(void);
 u32 __DVDGetCoverStatus(void);
 void __DVDPrepareReset(void);
 

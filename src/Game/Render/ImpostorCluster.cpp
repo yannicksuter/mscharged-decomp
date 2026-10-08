@@ -29,7 +29,7 @@ ImpostorCluster::ImpostorCluster(const char* name,
     : ImpostorCharacter(name, budget, 1, 1, params)
     , mName(name)
 {
-    mUnidentified00C = true;
+    mIsCluster = true;
 }
 
 unsigned long ImpostorCluster::GetTexture()

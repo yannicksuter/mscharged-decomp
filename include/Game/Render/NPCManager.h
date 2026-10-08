@@ -13,7 +13,7 @@
 class GLResourcePool;
 class ChainChomp;
 class SkinAnimatedNPC;
-class UnidentifiedNPC_801B43F8;
+class WindDebris;
 class DiddyBanana;
 struct HammerObject;
 struct DaisyFistObject;
@@ -76,7 +76,7 @@ public:
     unsigned int GetNumBulletBills() const { return mNumBulletBills; }
     BulletBillObject* GetBulletBill(int nIndex);
     BulletBillObject* fn_801A9D20();
-    UnidentifiedNPC_801B43F8* fn_801A9DE0(int nIndex);
+    WindDebris* fn_801A9DE0(int nIndex);
     void CreateWindDebris();
     void CreateDiddyBanana();
     void CreateHammers();
@@ -139,7 +139,7 @@ public:
     /* 0x58 */ BulletBillObject* mBulletBills[6];
     /* 0x70 */ HammerObject* mHammers[15];
     /* 0xAC */ ThwompObject* mThwomps[8];
-    /* 0xCC */ UnidentifiedNPC_801B43F8* mWindDebris[3];
+    /* 0xCC */ WindDebris* mWindDebris[3];
     /* 0xD8 */ DiddyBanana* mpDiddyBanana;
 }; // total size: 0xDC
 

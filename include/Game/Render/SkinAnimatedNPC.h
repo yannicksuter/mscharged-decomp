@@ -18,7 +18,7 @@ enum SkinAnimatedNPC_Type
     SkinAnimatedNPC_MOVABLE = 1,
     SkinAnimatedNPC_CAMERA_GUY = 2,
     SkinAnimatedNPC_CHAIN_CHOMP = 3,
-    SkinAnimatedNPC_BOWSER = 4,
+    SkinAnimatedNPC_WIND_DEBRIS = 4,
     NUM_SkinAnimatedNPC_TYPES = 5,
 };
 

@@ -13,4 +13,14 @@ inline bool Variant::fn_800C2BF8() const
     return mData.b;
 }
 
+inline bool Variant::IsSet() const
+{
+    return mType != FT_UNSPECIFIED;
+}
+
+inline bool Variant::IsPointerType() const
+{
+    return mType == FT_POINTER || mType == FT_STRING;
+}
+
 #endif // GAME_AI_VARIANT_INL

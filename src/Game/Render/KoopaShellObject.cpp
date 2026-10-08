@@ -173,9 +173,9 @@ void KoopaShellObject::UpdateTrailEffect(EmissionController& controller)
         && ReplayManager::Instance()->mRender != 0)
     {
         RenderSnapshot* snapshot = ReplayManager::Instance()->mRender;
-        if (snapshot->_1BE8.mVisible)
+        if (snapshot->mKoopaShell.mVisible)
         {
-            controller.SetPosition(snapshot->_1BE8.mPosition);
+            controller.SetPosition(snapshot->mKoopaShell.mPosition);
         }
     }
 }

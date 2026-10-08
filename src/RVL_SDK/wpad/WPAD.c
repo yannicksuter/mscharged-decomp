@@ -1,4 +1,5 @@
 #include <revolution/version.h>
+#include <revolution/vi/vi_fwd.h>
 
 #include <revolution/bte.h>
 #include <revolution/dvd.h>

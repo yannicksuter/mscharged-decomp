@@ -22,9 +22,9 @@ PhysicsNPC::PhysicsNPC(float radius)
     : PhysicsSphere(g_CollisionSpace, (PhysicsWorld*)0, radius)
     , mpTriggerCallbackFunc(0)
     , mpAINPC(0)
-    , mUnidentified040(false)
-    , mUnidentified044(0)
-    , mUnidentified048(0.0f)
+    , mContactsDisabled(false)
+    , mFrictionUpdatesRemaining(0)
+    , mFrictionScale(0.0f)
 {
     SetCollide(0x14062);
     SetCategory(2);
@@ -41,7 +41,7 @@ ContactType PhysicsNPC::Contact(
     nlVector3 position;
     GetPosition(&position);
 
-    if (mUnidentified040)
+    if (mContactsDisabled)
     {
         return NO_CONTACT;
     }
@@ -129,7 +129,7 @@ ContactType PhysicsNPC::Contact(
                 if (isInsideGoalLine && isPastSideline)
                 {
                     chainChomp->Fall();
-                    mUnidentified040 = true;
+                    mContactsDisabled = true;
                 }
             }
         }
@@ -145,12 +145,12 @@ ContactType PhysicsNPC::Contact(
                 PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
                 if (info->mFriction != 0.0f)
                 {
-                    if (mUnidentified044 != 2
-                        || info->mFriction > mUnidentified048)
+                    if (mFrictionUpdatesRemaining != 2
+                        || info->mFriction > mFrictionScale)
                     {
-                        mUnidentified048 = info->mFriction;
+                        mFrictionScale = info->mFriction;
                     }
-                    mUnidentified044 = 2;
+                    mFrictionUpdatesRemaining = 2;
                 }
             }
         }
@@ -164,11 +164,11 @@ ContactType PhysicsNPC::Contact(
 void PhysicsNPC::PreUpdate()
 {
     PhysicsObject::PreUpdate();
-    if (mUnidentified044 > 0)
+    if (mFrictionUpdatesRemaining > 0)
     {
         nlVector3 velocity;
         GetLinearVelocity(&velocity);
-        nlVec3Scale(velocity, mUnidentified048);
+        nlVec3Scale(velocity, mFrictionScale);
         SetLinearVelocity(velocity);
     }
 }
@@ -176,15 +176,15 @@ void PhysicsNPC::PreUpdate()
 void PhysicsNPC::PostUpdate()
 {
     PhysicsObject::PostUpdate();
-    if (mUnidentified044 > 0)
+    if (mFrictionUpdatesRemaining > 0)
     {
         nlVector3 velocity;
         GetLinearVelocity(&velocity);
-        nlVec3Scale(velocity, 1.0f / mUnidentified048);
+        nlVec3Scale(velocity, 1.0f / mFrictionScale);
         SetLinearVelocity(velocity);
-        if (--mUnidentified044 == 0)
+        if (--mFrictionUpdatesRemaining == 0)
         {
-            mUnidentified048 = 0.0f;
+            mFrictionScale = 0.0f;
         }
     }
 }

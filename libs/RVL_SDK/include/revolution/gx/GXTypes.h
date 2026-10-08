@@ -2,6 +2,7 @@
 #define RVL_SDK_GX_TYPES_H
 #include <revolution/types.h>
 #include <revolution/gx/GXTextureTypes.h>
+#include <revolution/gx/GXPublicTypes.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,7 +48,6 @@ extern "C" {
 
 // Differentiate between 8-byte and boolean values
 // Real name! (from patent)
-typedef unsigned char GXBool;
 
 #define GX_TRUE ((GXBool)TRUE)
 #define GX_FALSE ((GXBool)FALSE)
@@ -59,9 +59,6 @@ typedef unsigned char GXBool;
  * Common structs
  */
 
-typedef struct _GXColor {
-    u8 r, g, b, a;
-} GXColor;
 
 typedef struct _GXColorS10 {
     s16 r, g, b, a;
@@ -161,19 +158,6 @@ typedef enum _GXBlendMode {
     GX_MAX_BLENDMODE
 } GXBlendMode;
 
-typedef enum _GXChannelID {
-    GX_COLOR0,
-    GX_COLOR1,
-    GX_ALPHA0,
-    GX_ALPHA1,
-    GX_COLOR0A0,
-    GX_COLOR1A1,
-    GX_COLOR_ZERO,
-    GX_ALPHA_BUMP,
-    GX_ALPHA_BUMPN,
-
-    GX_COLOR_NULL = 255
-} GXChannelID;
 
 typedef enum _GXCITexFmt {
     GX_TF_C4 = 8,
@@ -194,16 +178,6 @@ typedef enum _GXClipMode {
 
 typedef enum _GXColorSrc { GX_SRC_REG, GX_SRC_VTX } GXColorSrc;
 
-typedef enum _GXCompare {
-    GX_NEVER,
-    GX_LESS,
-    GX_EQUAL,
-    GX_LEQUAL,
-    GX_GREATER,
-    GX_NEQUAL,
-    GX_GEQUAL,
-    GX_ALWAYS
-} GXCompare;
 
 typedef enum _GXCompCnt {
     GX_POS_XY = 0,

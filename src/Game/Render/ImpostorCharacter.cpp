@@ -20,7 +20,7 @@ ImpostorCharacter::ImpostorCharacter(const char* name, int budget,
     int numAngles, int numTextures, const ImpostorCharacterParams* params)
     : mNumAngles(numAngles)
     , mNumTextures(numTextures)
-    , mUnidentified00C(false)
+    , mIsCluster(false)
     , mWidth(0x40)
     , mHeight(0x40)
     , mUseAdditiveBlend(false)
@@ -211,7 +211,7 @@ void ImpostorCharacter::UpdateSprites(int period, int slot)
         if (sprite->mID % period == slot)
         {
             sprite->ResumeCapture();
-            if (sprite->mNumRenderSlots > 0 || mUnidentified00C != 0)
+            if (sprite->mNumRenderSlots > 0 || mIsCluster != 0)
             {
                 if (lastTexture != sprite->mTextureIndex)
                 {

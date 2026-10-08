@@ -23,10 +23,10 @@ public:
 
     /* 0x38 */ CallbackFn mpTriggerCallbackFunc;
     /* 0x3C */ SkinAnimatedMovableNPC* mpAINPC;
-    /* 0x40 */ bool mUnidentified040;
+    /* 0x40 */ bool mContactsDisabled;
     /* 0x41 */ unsigned char mPadding041[3];
-    /* 0x44 */ int mUnidentified044;
-    /* 0x48 */ float mUnidentified048;
+    /* 0x44 */ int mFrictionUpdatesRemaining;
+    /* 0x48 */ float mFrictionScale;
 }; // total size: 0x4C
 
 #endif // GAME_PHYSICS_PHYSICS_NPC_H

@@ -115,7 +115,7 @@ public:
     UnidentifiedQueuedEvent<UnidentifiedEventData27> mDestroyPowerupEvent;
     UnidentifiedQueuedEvent<UnidentifiedEventData35> mDestroyHammerEvent;
     UnidentifiedQueuedEvent<cFielder> mKnockYoshiTongueEvent;
-    UnidentifiedQueuedEvent<UnidentifiedNPC_801B43F8> mCollisionDebrisBallEvent;
+    UnidentifiedQueuedEvent<WindDebris> mCollisionDebrisBallEvent;
     UnidentifiedQueuedEvent<cFielder> mCollisionWaluigiWallEvent;
     UnidentifiedQueuedEvent<CollisionShockwaveData> mCollisionShockwaveEvent;
 };
@@ -967,9 +967,9 @@ void QueueCollisionCrackEgg(UnidentifiedEventData34* data)
         data, Function<UnidentifiedEventData34*>(FreeUnidentifiedEventData34));
 }
 
-void QueueCollisionDebrisBall(UnidentifiedNPC_801B43F8* data)
+void QueueCollisionDebrisBall(WindDebris* data)
 {
-    gPhysicsEventQueue->mCollisionDebrisBallEvent.Queue(data, Function<UnidentifiedNPC_801B43F8*>());
+    gPhysicsEventQueue->mCollisionDebrisBallEvent.Queue(data, Function<WindDebris*>());
 }
 
 void QueueCollisionWaluigiWall(cFielder* data)

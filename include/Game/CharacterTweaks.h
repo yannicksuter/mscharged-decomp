@@ -113,6 +113,8 @@ private:
 class PlayerTweaks
 {
 public:
+    float GetDefenseSize() const { return mUnidentified064.GetValue(); }
+
     float GetSkillRating(unsigned int index);
     float GetRunningSpeed();
 

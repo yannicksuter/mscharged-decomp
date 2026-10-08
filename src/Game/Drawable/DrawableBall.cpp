@@ -6,28 +6,9 @@
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Drawable/DrawableModel.h"
 #include "Game/RenderSnapshot.h"
+#include "Game/Render/Presentation.h"
+#include "NL/nlTask.h"
 #include "Game/UnidentifiedStaticStorage.h"
-
-struct CharacterState
-{
-    char _000[0x24];
-    int type;
-};
-
-struct TaskManager
-{
-    char _000[8];
-    u32 flags;
-};
-
-struct BallScaleData
-{
-    char _000[0xD8];
-    float scale;
-};
-
-extern TaskManager* m_pInstance__13nlTaskManager;
-BallScaleData* GetPresentation();
 
 static float g_fBallTrailScale = 2.25f;
 
@@ -97,7 +78,7 @@ void DrawableBall::Render() const
         drawable->translation = mPosition;
         drawable->worldMatrixUpToDate = false;
 
-        if ((m_pInstance__13nlTaskManager->flags & 0x20018) == 0)
+        if ((nlTaskManager::m_pInstance->mCurrentState & 0x20018) == 0)
         {
             if (g_pBall->m_pOwner == 0)
             {
@@ -120,7 +101,7 @@ void DrawableBall::Render() const
         bool useDefaultRendering = true;
         if (IndexToPlayer(ownerIndex) != 0)
         {
-            if (((CharacterState*)IndexToPlayer(ownerIndex)->character)->type == 12)
+            if (IndexToPlayer(ownerIndex)->character->GetCharacterClass() == MYSTERY)
             {
                 useDefaultRendering = false;
             }
@@ -212,6 +193,6 @@ void DrawableBall::EvaluateFrom(DrawableCharacter& character)
 {
     mPosition = character.GetBallPosition();
     mOrientation = character.GetBallOrientation();
-    mScale = GetPresentation()->scale;
+    mScale = GetPresentation()->mBallGlowLevel;
 }
 

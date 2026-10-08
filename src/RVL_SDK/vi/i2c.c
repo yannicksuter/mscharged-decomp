@@ -1,3 +1,4 @@
+#include <revolution/vi/i2c.h>
 #include "revolution/os.h"
 
 static volatile u32 __i2c_ident_flag = 1;
