@@ -83,11 +83,11 @@ public:
     /* 0x30 */ u32 mLoadingState;
     /* 0x34 */ const char* mLoadingComment;
     /* 0x38 */ u32 mPreviousStageTick;
-    /* 0x3C */ u32 mUnidentified3C;
+    /* 0x3C */ u32 m_pad3C;
     /* 0x40 */ unsigned long long mSequenceStartTime;
     /* 0x48 */ u32 mStageStartTick;
-    /* 0x4C */ void* mUnidentified4C;
-    /* 0x50 */ void* mUnidentified50;
+    /* 0x4C */ void* mPoolResourceMark;
+    /* 0x50 */ void* mGameResourceMark;
     /* 0x54 */ UnidentifiedOwnerHandle mLoadingHandle;
 }; // size 0x58
 

@@ -33,7 +33,7 @@ OverlayManager::OverlayManager()
     mIsInHighlights = false;
     mIsDemoSlideVisible = false;
     mHUDDelay = 0.0f;
-    mUnidentified120 = 0;
+    m_pad120 = 0;
     mStrikerTimesStoryVariant = -1;
     mStrikerTimesHeadlineVariant = -1;
     mStrikerTimesImageVariant = -1;

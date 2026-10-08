@@ -100,8 +100,8 @@ public:
     /* 0x124 */ unsigned int mEffectsNonResLoad;
     /* 0x128 */ void* mModelData[4];
     /* 0x138 */ unsigned long mModelSize[4];
-    /* 0x148 */ void* mUnidentified148;
-    /* 0x14C */ unsigned long mUnidentified14C;
+    /* 0x148 */ void* m_pad148;
+    /* 0x14C */ unsigned long m_pad14C;
     /* 0x150 */ void* mHierarchyData;
     /* 0x154 */ unsigned long mHierarchySize;
     /* 0x158 */ void* mPhysicsData;

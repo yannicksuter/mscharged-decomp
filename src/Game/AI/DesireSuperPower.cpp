@@ -1072,7 +1072,7 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
     nlSinCos(&s, &c, 0x4000);
     normal.x = direction->x * c - direction->y * s;
     normal.y = direction->y * c + direction->x * s;
-    float radius = fielder->mUnidentified320->GetRadius();
+    float radius = fielder->m_pAvoidableObject->GetRadius();
     nlVec2Set(left[1], radius * normal.x + fielder->m_DetChar.m_v3Position.x,
         radius * normal.y + fielder->m_DetChar.m_v3Position.y);
     nlVec2Set(left[1], distance * direction->x + left[1].x, distance * direction->y + left[1].y);
@@ -1082,7 +1082,7 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
     nlSinCos(&s2, &c2, 0xC000);
     normal.x = direction->x * c2 - direction->y * s2;
     normal.y = direction->y * c2 + direction->x * s2;
-    radius = fielder->mUnidentified320->GetRadius();
+    radius = fielder->m_pAvoidableObject->GetRadius();
     nlVec2Set(right[1], radius * normal.x + fielder->m_DetChar.m_v3Position.x,
         radius * normal.y + fielder->m_DetChar.m_v3Position.y);
     nlVec2Set(right[1], distance * direction->x + right[1].x, distance * direction->y + right[1].y);
@@ -1472,7 +1472,7 @@ int DesireSuperPower::BuildPathPoints()
             m_pFielder->m_DetChar.m_aActualFacingDirection, 4.0f);
         nlVec3Add(pos, m_pFielder->m_DetChar.m_v3Position, pos);
         cField::FixOutOfBoundsPosition(pos,
-            m_pFielder->mUnidentified320->GetRadius(), true);
+            m_pFielder->m_pAvoidableObject->GetRadius(), true);
         mvPathPoints[1] = (const nlVector2&)pos;
     }
     else
@@ -1578,7 +1578,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         nlPolarToCartesian(pos.x, pos.y,
                             m_pFielder->m_DetChar.m_aActualFacingDirection, 5.0f);
                         nlVec3Add(pos, m_pFielder->m_DetChar.m_v3Position, pos);
-                        cField::FixOutOfBoundsPosition(pos, m_pFielder->mUnidentified320->GetRadius(), true);
+                        cField::FixOutOfBoundsPosition(pos, m_pFielder->m_pAvoidableObject->GetRadius(), true);
                         nlVector3 delta;
                         nlVec3Sub(delta, pos, m_pFielder->m_DetChar.m_v3Position);
                         float distance = nlSqrt(delta.GetLengthSq2D(), true);

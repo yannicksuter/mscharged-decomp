@@ -190,19 +190,19 @@ float AvoidableFielder::GetAttackReach()
 bool AvoidableFielder::IsWithinRange(
     AvoidableObject* other, float range)
 {
-    int nIndex = m_pFielder->mUnidentified120;
+    int nIndex = m_pFielder->m_nCharacterIndex;
     int otherType = other->mType;
     cPlayer* pOther = 0;
     int nOtherIndex = -1;
     if (otherType == AVOID_FIELDERS)
     {
         pOther = ((AvoidableFielder*)other)->m_pFielder;
-        nOtherIndex = pOther->mUnidentified120;
+        nOtherIndex = pOther->m_nCharacterIndex;
     }
     else if (otherType == AVOID_GOALIES)
     {
         pOther = ((AvoidableGoalie*)other)->m_pPlayer;
-        nOtherIndex = pOther->mUnidentified120;
+        nOtherIndex = pOther->m_nCharacterIndex;
     }
     if (range <= 0.0f)
     {

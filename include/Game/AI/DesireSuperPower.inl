@@ -39,7 +39,7 @@ inline void DesireSuperPower::SyncLog(
         *(int*)&copy->mpDKShockAvoidable = -1;
         cFielder* target = mpTarget;
         *(int*)&copy->mpTarget
-            = target == NULL ? -1 : target->mUnidentified120;
+            = target == NULL ? -1 : target->m_nCharacterIndex;
         cache->ChecksumData(sDesireSuperPowerType, data, context);
     }
 }

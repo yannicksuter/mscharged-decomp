@@ -42,7 +42,7 @@ void FielderTweaks::Init()
     fJogTurnSpeedMax = 40000.0f;
     fStrafeSpeedScale = 0.85f;
     fStrafeTurnSpeed = 120000.0f;
-    mUnidentified49C = 0.9f;
+    fRunBackwardsSpeedScale = 0.9f;
     fTurboTurnFalloff = 2500.0f;
     fTurboAccel = 22.5f;
     fTurboDecel = 18.0f;
@@ -498,7 +498,7 @@ extern "C" float fn_8002CD2C(const PlayerTweaks* tweaks)
     float terrainMinimum = fielderTweaks->fTerrainMinSpeedAdjust;
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float terrainScale = Interpolate(terrainMinimum, terrainMaximum, terrain);
-    return gGameTweaks.mFielderTweaks->mUnidentified49C * terrainScale
+    return gGameTweaks.mFielderTweaks->fRunBackwardsSpeedScale * terrainScale
          * Interpolate(minimum, maximum, playerValue);
 }
 

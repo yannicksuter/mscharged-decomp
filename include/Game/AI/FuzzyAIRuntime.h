@@ -71,7 +71,7 @@ public:
     FuzzyRuntimeBase* GetRuntime();
 
     FuzzyRuntimeBase* mRuntime;
-    u32 mUnidentified018;
+    u32 m_pad018;
     FuzzyVariantCollection ExtraData;
 };
 

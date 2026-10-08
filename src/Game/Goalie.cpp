@@ -4475,15 +4475,15 @@ void Goalie::SyncLog(void* context, DebugWriteCache* cache)
     if (data != NULL)
     {
         *(int*)((u8*)data + offsetof(Goalie, mpPassTarget) - offsetof(Goalie, mGoalieActionState))
-            = mpPassTarget == NULL ? -1 : mpPassTarget->mUnidentified120;
+            = mpPassTarget == NULL ? -1 : mpPassTarget->m_nCharacterIndex;
         *(int*)((u8*)data + offsetof(Goalie, mpShooter) - offsetof(Goalie, mGoalieActionState))
-            = mpShooter == NULL ? -1 : mpShooter->mUnidentified120;
+            = mpShooter == NULL ? -1 : mpShooter->m_nCharacterIndex;
         *(int*)((u8*)data + offsetof(Goalie, mpTarget) - offsetof(Goalie, mGoalieActionState))
-            = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
+            = mpTarget == NULL ? -1 : mpTarget->m_nCharacterIndex;
         *(int*)((u8*)data + offsetof(Goalie, mpMonty) - offsetof(Goalie, mGoalieActionState))
-            = mpMonty == NULL ? -1 : mpMonty->mUnidentified120;
+            = mpMonty == NULL ? -1 : mpMonty->m_nCharacterIndex;
         *(int*)((u8*)data + offsetof(Goalie, mpSkillShooter) - offsetof(Goalie, mGoalieActionState))
-            = mpSkillShooter == NULL ? -1 : mpSkillShooter->mUnidentified120;
+            = mpSkillShooter == NULL ? -1 : mpSkillShooter->m_nCharacterIndex;
         *(int*)((u8*)data + offsetof(Goalie, mpSaveData) - offsetof(Goalie, mGoalieActionState))
             = mpSaveData == NULL ? -1 : mpSaveData->mnAnimID;
         cache->ChecksumData(sDetGoalieType, data, context);

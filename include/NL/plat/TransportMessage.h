@@ -119,7 +119,7 @@ public:
     /* 0x009 */ u8 mPadding09;
     /* 0x00A */ u16 mAck;
     /* 0x00C */ u16 mUnidentified0C;
-    /* 0x00E */ u8 mUnidentified0E;
+    /* 0x00E */ u8 mFlag80Byte;
     /* 0x00F */ u8 mPadding0F;
     /* 0x010 */ u32 mTimestamp;
     /* 0x014 */ u32 mPongTimestamp;

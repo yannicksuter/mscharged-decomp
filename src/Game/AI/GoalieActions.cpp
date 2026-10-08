@@ -6788,7 +6788,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
         mMegaBallState[i] = 0;
     }
     mMegaCatchAttempts = 0;
-    mUnidentified524 = 0.0f;
+    mPadding524 = 0.0f;
 
     char texture[128];
     const CharacterInfo& teamInfo = *m_pTeam->GetCaptain()->GetCharacterInfoData();

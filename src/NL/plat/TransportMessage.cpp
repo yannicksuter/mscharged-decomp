@@ -26,7 +26,7 @@ TransportMessage::TransportMessage()
     mFlags = 0;
     mAck = 0;
     mUnidentified0C = 0;
-    mUnidentified0E = 0;
+    mFlag80Byte = 0;
     mTimestamp = 0;
     mPongTimestamp = 0;
     mPongDelayMS = 0;
@@ -283,8 +283,8 @@ void TransportMessage::Serialize(
     {
         serializer->Transfer(&mUnidentified0C,
             sizeof(mUnidentified0C));
-        serializer->Transfer(&mUnidentified0E,
-            sizeof(mUnidentified0E));
+        serializer->Transfer(&mFlag80Byte,
+            sizeof(mFlag80Byte));
     }
     if ((mFlags & 4) != 0)
     {

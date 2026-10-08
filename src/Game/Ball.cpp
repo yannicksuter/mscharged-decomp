@@ -3382,17 +3382,17 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
     if (copy != NULL)
     {
         *(int*)&copy->m_pOwner
-            = m_pOwner == NULL ? -1 : m_pOwner->mUnidentified120;
+            = m_pOwner == NULL ? -1 : m_pOwner->m_nCharacterIndex;
         *(int*)&copy->m_pPrevOwner
-            = m_pPrevOwner == NULL ? -1 : m_pPrevOwner->mUnidentified120;
+            = m_pPrevOwner == NULL ? -1 : m_pPrevOwner->m_nCharacterIndex;
         *(int*)&copy->m_pLastTouch
-            = m_pLastTouch == NULL ? -1 : m_pLastTouch->mUnidentified120;
+            = m_pLastTouch == NULL ? -1 : m_pLastTouch->m_nCharacterIndex;
         *(int*)&copy->m_pPassTarget
-            = m_pPassTarget == NULL ? -1 : m_pPassTarget->mUnidentified120;
+            = m_pPassTarget == NULL ? -1 : m_pPassTarget->m_nCharacterIndex;
         *(int*)&copy->m_pShooter
-            = m_pShooter == NULL ? -1 : m_pShooter->mUnidentified120;
+            = m_pShooter == NULL ? -1 : m_pShooter->m_nCharacterIndex;
         *(int*)&copy->mpDamageTarget
-            = mpDamageTarget == NULL ? -1 : mpDamageTarget->mUnidentified120;
+            = mpDamageTarget == NULL ? -1 : mpDamageTarget->m_nCharacterIndex;
         cache->ChecksumData(lbl_806DB5C0, copy, context);
     }
 }

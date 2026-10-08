@@ -590,7 +590,7 @@ void DesireFrozen::Cleanup()
             PowerupBase::PWRUP_SOUND_END, m_pFielder->m_pPhysicsCharacter, 0.0f, 0);
         break;
     case FROZEN_PHOTO:
-        m_pFielder->mUnidentified17D = false;
+        m_pFielder->m_bCaughtInPhoto = false;
         m_pFielder->SetTangible(true, false);
         m_pFielder->m_fOpacity = 1.0f;
         m_pFielder->SetModelType(0);
@@ -606,7 +606,7 @@ void DesireFrozen::Cleanup()
             EmitUnFreeze(m_pFielder);
             break;
         case FROZEN_PHOTO:
-            m_pFielder->mUnidentified17D = false;
+            m_pFielder->m_bCaughtInPhoto = false;
             m_pFielder->SetTangible(true, false);
             m_pFielder->m_fOpacity = 1.0f;
             m_pFielder->SetModelType(0);
@@ -696,7 +696,7 @@ void DesireFrozen::SetFrozenState(int state)
         }
         break;
     case FROZEN_PHOTO:
-        m_pFielder->mUnidentified17D = true;
+        m_pFielder->m_bCaughtInPhoto = true;
         m_pFielder->SetTangible(false, false);
         break;
     case FROZEN_MEGA_STRIKE:

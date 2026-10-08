@@ -228,7 +228,7 @@ extern "C" void fn_8000F324(AvoidController* controller,
     {
         *(int*)&copy->m_pFielder = controller->m_pFielder == 0
             ? -1
-            : controller->m_pFielder->mUnidentified120;
+            : controller->m_pFielder->m_nCharacterIndex;
         cache->ChecksumData(sAvoidControllerType, copy, context);
     }
 }
@@ -342,7 +342,7 @@ void AvoidController::Update(float fDeltaT)
     m_Avoidances.Walk(&callback,
         &RepulsionAccumulator::Accumulate);
 
-    AvoidableObject* pSelf = m_pFielder->mUnidentified320;
+    AvoidableObject* pSelf = m_pFielder->m_pAvoidableObject;
     ObstacleAvoidance* value;
     for (AvoidableObject* pObject = gAvoidableObjects.m_pStart;
          pObject != 0 && m_NumAvoidances < 99; pObject = pObject->next)
@@ -487,7 +487,7 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
     float fDistanceSquared = nlVec2LengthSquared(vToSideline);
     float fDistance = nlSqrt(fDistanceSquared, true);
 
-    fDistance -= m_pFielder->mUnidentified320->GetRadius();
+    fDistance -= m_pFielder->m_pAvoidableObject->GetRadius();
     float fMaxDistance = sSidelineMaxDistance;
     if (m_CurrentlyAvoiding & AVOID_SIDELINES)
     {

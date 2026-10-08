@@ -109,9 +109,9 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
                     m_pFielder->m_DetChar.m_v3Position,
                     m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->m_DetChar.m_v3Position), true);
                 pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-                AvoidableObject* pAvoidable = m_pFielder->mUnidentified320;
+                AvoidableObject* pAvoidable = m_pFielder->m_pAvoidableObject;
                 if (0.25f + (fDistance + (pAvoidable->GetRadius()
-                        + pGoalie->mUnidentified320->GetRadius())) < fRange)
+                        + pGoalie->m_pAvoidableObject->GetRadius())) < fRange)
                 {
                     float fSkillshotChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->GetSkillValue(
                         nlStringLowerHash("Windup/Skillshot"), m_pFielder);

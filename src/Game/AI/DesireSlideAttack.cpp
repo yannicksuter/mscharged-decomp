@@ -175,7 +175,7 @@ inline void DesireSlideAttack::SyncLog(
         DesireSlideAttack* copy
             = (DesireSlideAttack*)((u8*)data - offset);
         *(int*)&copy->mpTarget
-            = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
+            = mpTarget == NULL ? -1 : mpTarget->m_nCharacterIndex;
         cache->ChecksumData(sDesireSlideAttackType, data, context);
     }
 }

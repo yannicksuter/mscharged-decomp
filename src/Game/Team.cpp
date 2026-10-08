@@ -245,7 +245,7 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
     {
         *(int*)&copy->mpBestBallInterceptor = mpBestBallInterceptor == NULL
             ? -1
-            : mpBestBallInterceptor->mUnidentified120;
+            : mpBestBallInterceptor->m_nCharacterIndex;
         cache->ChecksumData(gDetTeamDebugType, copy, context);
     }
 
@@ -259,11 +259,11 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
     {
         data.m_nAIOrdFs[i] = m_pAIOrderedFielders[i] == NULL
             ? -1
-            : m_pAIOrderedFielders[i]->mUnidentified120;
+            : m_pAIOrderedFielders[i]->m_nCharacterIndex;
         data.BallIntOrdFs[i]
             = m_pBallInterceptOrderedFielders[i] == NULL
             ? -1
-            : m_pBallInterceptOrderedFielders[i]->mUnidentified120;
+            : m_pBallInterceptOrderedFielders[i]->m_nCharacterIndex;
     }
     data.m_nTeamPlayTransFunc
         = m_pAIContext->mScriptMachine->mTransition.mValue.mFuncHash;
@@ -694,7 +694,7 @@ void cTeam::CalculateNewBallInterceptTimes()
         pPlayer = GetPlayer(i);
         float interceptTime = -1.0f;
         float speed = ((cFielder*)pPlayer)->GetRunningSpeed();
-        float radius = pPlayer->mUnidentified320->GetRadius();
+        float radius = pPlayer->m_pAvoidableObject->GetRadius();
 
         if (Incapacitated(pPlayer))
         {

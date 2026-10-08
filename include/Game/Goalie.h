@@ -436,7 +436,7 @@ public:
     /* 0x4D0 */ int mMegaBallState[10];
     /* 0x4F8 */ float mfMegaCatchScore[10];
     /* 0x520 */ unsigned int mMegaCatchAttempts;
-    /* 0x524 */ float mUnidentified524;
+    /* 0x524 */ float mPadding524;
     /* 0x528 */ bool mbFirstMegaStrike;
     /* 0x529 */ bool mbDefensivePlayOverlayPushed;
 }; // total size: at least 0x52A

@@ -314,7 +314,7 @@ inline void DesirePreparePass::SyncLog(
         DesirePreparePass* desire =
             (DesirePreparePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
-                ? -1 : mpPassTarget->mUnidentified120);
+                ? -1 : mpPassTarget->m_nCharacterIndex);
         cache->ChecksumData(sDesirePreparePassType, data, context);
     }
 }
@@ -355,7 +355,7 @@ inline void DesirePass::SyncLog(
         DesirePass* desire =
             (DesirePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
-                ? -1 : mpPassTarget->mUnidentified120);
+                ? -1 : mpPassTarget->m_nCharacterIndex);
         cache->ChecksumData(sDesirePassType, data, context);
     }
 }

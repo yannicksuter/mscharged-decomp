@@ -351,7 +351,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     if (gPeachPhotoState.state == 1)
     {
         view = eCLV_MoreCharacters;
-        if (source.mUnidentified17D)
+        if (source.m_bCaughtInPhoto)
         {
             view = eCLV_Characters;
         }
@@ -1085,7 +1085,7 @@ void DrawableCharacter::RenderCharacterShadow(const cCharacter& source, glModel*
     params.fHeight = characterScale * fHeight;
     params.pModel = 0;
     params.fScalar = fScalar;
-    params.nPartitionIndex = source.mUnidentified120;
+    params.nPartitionIndex = source.m_nCharacterIndex;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 2)
     {

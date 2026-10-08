@@ -54,7 +54,7 @@ static float sCharacterDamageSpecularLookupScale[2];
 static int sCharacterDamageLightCount;
 static bool sCharacterDamageLightingEnabled;
 static bool sCharacterDamageFresnelIndicesInitialized;
-static unsigned long sCharacterDamageUnidentifiedCache;
+static unsigned long sCharacterDamageBoundTexture;
 
 extern "C" void glxConfigureCharacterDamageLighting(bool enabled, GXCharacterDamageMaterialProgram*)
 {
@@ -123,7 +123,7 @@ void GXMaterialProgramImpl<GXCharacterDamageMaterialProgram>::Activate(GLView* v
     sCharacterDamageModelMatrix = -1;
     sCharacterDamageSpecularLookupScale[0] = -1.0f;
     sCharacterDamageSpecularLookupScale[1] = -1.0f;
-    sCharacterDamageUnidentifiedCache = -1;
+    sCharacterDamageBoundTexture = -1;
     GXLoadTexMtxImm(sCharacterDamageFresnelLookupMatrix, 67, GX_MTX3x4);
     sCharacterDamageLightCount = GetGameObjectLightCount(1, 1);
     LoadGameObjectLights(sCharacterDamageLightCount, view, true);

@@ -12,7 +12,7 @@ struct FEPointerEvent
     FEPointerEvent()
         : mPressed(false)
         , mReleased(false)
-        , mUnidentified0E(false)
+        , mFlag0E(false)
     {
         mPosition.x = -9999.9f;
         mPosition.y = -9999.9f;
@@ -23,7 +23,7 @@ struct FEPointerEvent
     /* 0x04 */ nlVector2 mPosition;
     /* 0x0C */ bool mPressed;
     /* 0x0D */ bool mReleased;
-    /* 0x0E */ bool mUnidentified0E;
+    /* 0x0E */ bool mFlag0E;
 }; // size 0x10
 
 class FEPointerListener

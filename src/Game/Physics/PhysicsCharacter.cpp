@@ -460,8 +460,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
 
         cCharacter* collisionPlayer1 = m_pAICharacter;
         cCharacter* collisionPlayer2 = otherCharacter->m_pAICharacter;
-        int id1 = collisionPlayer1->mUnidentified120;
-        int id2 = collisionPlayer2->mUnidentified120;
+        int id1 = collisionPlayer1->m_nCharacterIndex;
+        int id2 = collisionPlayer2->m_nCharacterIndex;
         int collisionIndex = id1 * 10 + id2;
         if (sPlayerPlayerCollisionData[collisionIndex] == 0)
         {

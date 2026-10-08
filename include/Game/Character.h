@@ -332,7 +332,7 @@ public:
     /* 0x118 */ bool m_bTexturesResolved;
     /* 0x119 */ u8 unknown_0x119[3];
     /* 0x11C */ const CharacterInfo* m_pCharacterInfo;
-    /* 0x120 */ int mUnidentified120;
+    /* 0x120 */ int m_nCharacterIndex;
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
     /* 0x164 */ float m_Dirt;
     /* 0x168 */ float m_MinDirt;
@@ -341,7 +341,7 @@ public:
     /* 0x174 */ Blinker* m_pBlinker;
     /* 0x178 */ float m_fOpacity;
     /* 0x17C */ bool m_bShadowVisible;
-    /* 0x17D */ bool mUnidentified17D;
+    /* 0x17D */ bool m_bCaughtInPhoto;
     /* 0x17E */ bool m_bLeftPropAnimated;
     /* 0x17F */ bool m_bRightPropAnimated;
     /* 0x180 */ bool m_bHammerTransformFrozen;

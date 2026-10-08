@@ -88,7 +88,7 @@ public:
     /* 0x490 */ float fJogTurnSpeedMax;
     /* 0x494 */ float fStrafeSpeedScale;
     /* 0x498 */ float fStrafeTurnSpeed;
-    /* 0x49C */ float mUnidentified49C;
+    /* 0x49C */ float fRunBackwardsSpeedScale;
     /* 0x4A0 */ float fTurboTurnFalloff;
     /* 0x4A4 */ float fTurboAccel;
     /* 0x4A8 */ float fTurboDecel;

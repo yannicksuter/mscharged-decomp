@@ -132,11 +132,11 @@ cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
     m_DetPlayer.m_tSwapFacingTimer.SetSeconds(0.0f);
     ClearSwapControllerTimer();
     if (classType == FIELDER)
-        mUnidentified320 = new (nlMalloc(sizeof(AvoidableFielder), 8, false)) AvoidableFielder((cFielder*)this);
+        m_pAvoidableObject = new (nlMalloc(sizeof(AvoidableFielder), 8, false)) AvoidableFielder((cFielder*)this);
     else if (classType == GOALIE)
-        mUnidentified320 = new (nlMalloc(sizeof(AvoidableGoalie), 8, false)) AvoidableGoalie(this);
+        m_pAvoidableObject = new (nlMalloc(sizeof(AvoidableGoalie), 8, false)) AvoidableGoalie(this);
     else
-        mUnidentified320 = NULL;
+        m_pAvoidableObject = NULL;
 }
 
 cPlayer::~cPlayer()
@@ -147,7 +147,7 @@ cPlayer::~cPlayer()
         ReleaseBall(0);
     }
     delete m_pSpaceSearch;
-    delete mUnidentified320;
+    delete m_pAvoidableObject;
 }
 
 void cPlayer::SetSpaceSearch(SpaceSearch* pSpaceSearch)

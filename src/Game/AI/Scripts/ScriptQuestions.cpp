@@ -839,7 +839,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
     cFielder* pOwner = g_pBall->GetOwnerFielder();
     if (pOwner != NULL)
     {
-        fOwnerRadius = pOwner->mUnidentified320->GetRadius();
+        fOwnerRadius = pOwner->m_pAvoidableObject->GetRadius();
         if (pOwner->IsAboveFielder(pFielder))
             return 0.0f;
     }
@@ -850,7 +850,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         float fDuration = GetSlideTime(pFielder->GetTweaks());
         float fSpeed = pFielder->GetSlideAttackSpeed(pFielder->m_DetChar.m_aActualFacingDirection);
         float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position, vTarget), true);
-        float fRadius = pFielder->mUnidentified320->GetRadius();
+        float fRadius = pFielder->m_pAvoidableObject->GetRadius();
         fDistance -= fRadius + fOwnerRadius;
         fScore = NormalizeVal(fDistance / fSpeed, 4.3f * fDuration, 0.08f);
     }
@@ -1057,7 +1057,7 @@ float ReallyCloseToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fReallyCloseToBallDistanceConfidenceMin,
         g_pGame->m_pFuzzyTweaks->fReallyCloseToBallDistanceConfidenceMax);
 }
@@ -1069,7 +1069,7 @@ float CloseToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fCloseBallConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fCloseBallConfidenceDistanceMax);
 }
@@ -1130,7 +1130,7 @@ float NearToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fNearBallConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fNearBallConfidenceDistanceMax);
 }
@@ -1142,7 +1142,7 @@ float FarToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fFarBallConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fFarBallConfidenceDistanceMax);
 }
@@ -2085,7 +2085,7 @@ float PositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
         for (int player = 0; player < 5 && fTotalScore < 1.0f; player++)
         {
             if (pCurrentPlayer != NULL)
-                pPlayer = g_pGame->GetClosestPlayer(pCurrentPlayer->mUnidentified120, pTeam->m_nSide, player);
+                pPlayer = g_pGame->GetClosestPlayer(pCurrentPlayer->m_nCharacterIndex, pTeam->m_nSide, player);
             else
                 pPlayer = pTeam->GetPlayer(player);
             if (pPlayer == pCurrentPlayer)
@@ -2245,13 +2245,13 @@ float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->mUnidentified120, pPlayer1->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax);
     }
     else
@@ -2269,7 +2269,7 @@ float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2291,13 +2291,13 @@ float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->mUnidentified120, pPlayer1->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax);
     }
     else
@@ -2315,7 +2315,7 @@ float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2337,13 +2337,13 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->mUnidentified120, pPlayer1->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMax);
     }
     else
@@ -2361,7 +2361,7 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2647,7 +2647,7 @@ extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)
     diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->mUnidentified320->GetRadius(), lbl_806E4270);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4270);
 }
 
 extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
@@ -2665,7 +2665,7 @@ extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
     diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->mUnidentified320->GetRadius(), lbl_806E4278);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4278);
 }
 
 extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
@@ -2683,7 +2683,7 @@ extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
     diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
     diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->mUnidentified320->GetRadius(), lbl_806E4280);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4280);
 }
 
 extern "C" float fn_800DD744(cFielder* pFielder)
@@ -3125,7 +3125,7 @@ float InControlOfBall(cFielder* fielder)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[fielder->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[fielder->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fControlConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fControlConfidenceDistanceMax);
 }
@@ -3937,7 +3937,7 @@ extern "C" float fn_800E06F4(cPlayer* pPlayer)
     float fMinDistance;
     float fMaxDistanceForPlayer = lbl_806E42B0.y;
     float fMinDistanceForPlayer = lbl_806E42B0.x;
-    float fPlayerDistance = g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120];
+    float fPlayerDistance = g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex];
     float fTotal = 0.0f;
     float fClose = NormalizeVal(fPlayerDistance, fMinDistanceForPlayer, fMaxDistanceForPlayer);
     if (fClose < 1.0f)

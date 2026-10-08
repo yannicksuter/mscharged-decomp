@@ -53,7 +53,7 @@ void FEPointerListener::ProcessPointerEvent(const FEPointerEvent* event)
             OnPointerPress(event->mIndex, mContext);
         }
 
-        if (event->mUnidentified0E)
+        if (event->mFlag0E)
         {
             UnidentifiedVirtual24(event->mIndex, mContext);
         }

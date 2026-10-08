@@ -4185,7 +4185,7 @@ bool cFielder::CanReactToGroundEffects() const
 
 void cFielder::GetApproachPosition(nlVector3* position, const nlVector3* from, float predictionTime)
 {
-    float radius = 1.0f + mUnidentified320->GetRadius();
+    float radius = 1.0f + m_pAvoidableObject->GetRadius();
     nlVector3 center;
     if (predictionTime > 0.0f)
         nlVec3ScaleAdd(center, predictionTime, m_DetChar.m_v3Velocity,
@@ -6398,7 +6398,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         {
             marks[i] = (cFielder*)(m_pMark[i] == 0
                 ? -1
-                : m_pMark[i]->mUnidentified120);
+                : m_pMark[i]->m_nCharacterIndex);
         }
         cache->ChecksumData(sFielderType, data, context);
     }
@@ -6473,7 +6473,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         ActLooseBallPass* copy = (ActLooseBallPass*)data;
         copy->passTarget = (cFielder*)(mActionLooseBallPassVars.passTarget == 0
             ? -1
-            : mActionLooseBallPassVars.passTarget->mUnidentified120);
+            : mActionLooseBallPassVars.passTarget->m_nCharacterIndex);
         cache->ChecksumData(sActLooseBallPassType, data, context);
     }
 
@@ -6495,7 +6495,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
         cFielder* copy = (cFielder*)((u8*)data - offsetof(cFielder, m_pPassTarget));
         copy->m_pPassTarget = (cPlayer*)(m_pPassTarget == 0
             ? -1
-            : m_pPassTarget->mUnidentified120);
+            : m_pPassTarget->m_nCharacterIndex);
         cache->ChecksumData(sActPassingVarsType, data, context);
     }
 

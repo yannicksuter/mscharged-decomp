@@ -272,7 +272,7 @@ bool GameplayCameraEffects::AreFieldersClear() const
         for (int i = 0; i < 4; ++i)
         {
             cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
-            if (fielder->mUnidentified120 == owner->mUnidentified120)
+            if (fielder->m_nCharacterIndex == owner->m_nCharacterIndex)
                 continue;
 
             if (goalLineX > 0.0f)
@@ -330,7 +330,7 @@ bool GameplayCameraEffects::IsPassTargetClear() const
     for (int i = 0; i < 4; ++i)
     {
         cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
-        if (fielder->mUnidentified120 == passTarget->mUnidentified120)
+        if (fielder->m_nCharacterIndex == passTarget->m_nCharacterIndex)
             continue;
         float dy = fielder->m_DetChar.m_v3Position.y - passTarget->m_DetChar.m_v3Position.y;
         float dx = fielder->m_DetChar.m_v3Position.x - passTarget->m_DetChar.m_v3Position.x;

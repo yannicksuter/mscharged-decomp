@@ -22,7 +22,7 @@ GXMaterialParameter GXCharacterDamageMaterialProgram::Parameters[19] = {
     { 0x710D1571, 0x01010101, 68 }, // specularScaleY
     { 0x15CAAD1F, 0x01010102, 72 }, // fresnelRamp
     { 0xAD07B63E, 0x01010101, 76 }, // megaBlend
-    { 0x89DEEB79, 0x01010102, 80 }, // Unidentified control
+    { 0x89DEEB79, 0x01010102, 80 }, // disableDiffuse
     { 0x46CCF41D, 0x01010102, 84 }, // shadowLevel
     { 0x8E10B600, 0x01010102, 88 }, // lightingEnabled
     { 0x8E89F7EF, 0x01010102, 92 }, // blackOnly

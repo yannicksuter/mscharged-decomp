@@ -196,7 +196,7 @@ inline void DesireReceivePass::SyncLog(
         desire->mpOneTouchPassTarget =
             (cPlayer*)(mpOneTouchPassTarget == 0
                     ? -1
-                    : mpOneTouchPassTarget->mUnidentified120);
+                    : mpOneTouchPassTarget->m_nCharacterIndex);
         cache->ChecksumData(sDesireReceivePassType, data, context);
     }
 }

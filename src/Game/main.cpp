@@ -150,9 +150,9 @@ static float sStandardUsedMiB;
 static float sSubsystemFreeMiB;
 static float sSubsystemUsedMiB;
 static float sSubsystemLargestFreeMiB;
-static float sUnidentifiedMemoryMetric0;
-static float sUnidentifiedMemoryMetric1;
-static float sUnidentifiedMemoryMetric2;
+static float sStandardM10MiB;
+static float sAudioM14MiB;
+static float sAudioM10MiB;
 int g_BuildNumber;
 
 FrameCounter g_FrameCounter("frame", "send");
@@ -288,9 +288,9 @@ void MemCheckTask::Run(float)
     sSubsystemFreeMiB = VirtualAllocator.m_14 / bytesPerMiB;
     sSubsystemUsedMiB = VirtualAllocator.m_10 / bytesPerMiB;
     sSubsystemLargestFreeMiB = StandardAllocator.m_14 / bytesPerMiB;
-    sUnidentifiedMemoryMetric0 = StandardAllocator.m_10 / bytesPerMiB;
-    sUnidentifiedMemoryMetric1 = audioAllocator->m_14 / bytesPerMiB;
-    sUnidentifiedMemoryMetric2 = audioAllocator->m_10 / bytesPerMiB;
+    sStandardM10MiB = StandardAllocator.m_10 / bytesPerMiB;
+    sAudioM14MiB = audioAllocator->m_14 / bytesPerMiB;
+    sAudioM10MiB = audioAllocator->m_10 / bytesPerMiB;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 2 &&
         sPreviousTaskState == 2 && !g_bTweaking)

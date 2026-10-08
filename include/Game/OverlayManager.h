@@ -63,7 +63,7 @@ public:
     /* 0x114 */ int mStrikerTimesStoryVariant;
     /* 0x118 */ int mStrikerTimesHeadlineVariant;
     /* 0x11C */ int mStrikerTimesImageVariant;
-    /* 0x120 */ u32 mUnidentified120;
+    /* 0x120 */ u32 m_pad120;
 
 private:
     void SlideHUDOut();

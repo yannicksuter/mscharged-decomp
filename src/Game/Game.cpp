@@ -157,7 +157,7 @@ bool gNoGameClock;
 
 static inline int GetPlayerIndex(cPlayer* pPlayer)
 {
-    return pPlayer->mUnidentified120;
+    return pPlayer->m_nCharacterIndex;
 }
 
 inline void cGame::ResetGameFields()
@@ -1715,7 +1715,7 @@ void cGame::UpdateCachedGameData(float fDeltaT)
     for (int i = 0; i < 10; i++)
     {
         float fPlayerRadius
-            = static_cast<cPlayer*>(g_pCharacters[i])->mUnidentified320->GetRadius();
+            = static_cast<cPlayer*>(g_pCharacters[i])->m_pAvoidableObject->GetRadius();
 
         cPlayer* pPlayer = static_cast<cPlayer*>(g_pCharacters[i]);
         cBall* pBall = g_pBall;
@@ -1747,7 +1747,7 @@ void cGame::UpdateCachedGameData(float fDeltaT)
                     = nlVec2Length(v2PlayerDistance);
                 m_fCachedPlayerDistances[i][j]
                     -= fPlayerRadius
-                     + static_cast<cPlayer*>(g_pCharacters[j])->mUnidentified320->GetRadius();
+                     + static_cast<cPlayer*>(g_pCharacters[j])->m_pAvoidableObject->GetRadius();
             }
         }
     }

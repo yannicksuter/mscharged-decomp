@@ -328,8 +328,8 @@ void DesireRunToTarget::Update(DesireUpdate* update, float)
 
         if (target != 0)
         {
-            AvoidableObject* targetObject = target->mUnidentified320;
-            float distance = targetObject->GetRadius() + m_pFielder->mUnidentified320->GetRadius();
+            AvoidableObject* targetObject = target->m_pAvoidableObject;
+            float distance = targetObject->GetRadius() + m_pFielder->m_pAvoidableObject->GetRadius();
             distance += m_fDistOffset;
             if (target->m_eClassType == FIELDER
                 && ((cFielder*)target)->IsInvincibleChars()
@@ -483,7 +483,7 @@ inline void DesireRunInDirection::SyncLog(void* context, DebugWriteCache* cache)
     {
         DesireRunInDirection* desire = (DesireRunInDirection*)((u8*)data - offset);
         desire->m_pTarget = (cFielder*)(m_pTarget == 0
-                ? -1 : m_pTarget->mUnidentified120);
+                ? -1 : m_pTarget->m_nCharacterIndex);
         cache->ChecksumData(sDesireRunInDirectionType, data, context);
     }
 }
@@ -516,7 +516,7 @@ inline void DesireRunToTarget::SyncLog(void* context, DebugWriteCache* cache)
     {
         DesireRunToTarget* desire = (DesireRunToTarget*)((u8*)data - offset);
         desire->m_pTargetFielder = (cFielder*)(m_pTargetFielder == 0
-                ? -1 : m_pTargetFielder->mUnidentified120);
+                ? -1 : m_pTargetFielder->m_nCharacterIndex);
         cache->ChecksumData(sDesireRunToTargetType, data, context);
     }
 }

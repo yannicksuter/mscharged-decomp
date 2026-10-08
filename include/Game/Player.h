@@ -216,7 +216,7 @@ public:
 
 public:
     /* 0x31C */ SpaceSearch* m_pSpaceSearch;
-    /* 0x320 */ AvoidableObject* mUnidentified320;
+    /* 0x320 */ AvoidableObject* m_pAvoidableObject;
 
 }; // total size: 0x324
 

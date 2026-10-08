@@ -748,7 +748,7 @@ int GetCharacterIndex(const cCharacter* character)
 {
     if (character != NULL)
     {
-        return character->mUnidentified120;
+        return character->m_nCharacterIndex;
     }
     return -1;
 }

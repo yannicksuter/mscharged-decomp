@@ -827,7 +827,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     {
         cBall* pBall = g_pBall;
         CalcInterceptXY(m_pFielder->GetPosition(),
-            m_pFielder->GetRunningSpeed(), m_pFielder->mUnidentified320->GetRadius(),
+            m_pFielder->GetRunningSpeed(), m_pFielder->m_pAvoidableObject->GetRadius(),
             pBall->GetPosition(), pBall->m_v3Velocity,
             nNumIntercepts, fInterceptTimes);
 
@@ -949,7 +949,7 @@ bool DesireReceivePass::CalcRoughEstimates(int receiveAnimType)
     }
 
     cField::FixOutOfBoundsPosition(estimated.v3BallContactPos,
-        m_pFielder->mUnidentified320->GetRadius(), true);
+        m_pFielder->m_pAvoidableObject->GetRadius(), true);
 
     nlVector3 v3FacingDirection;
     nlVec3Set(v3FacingDirection,
@@ -1135,7 +1135,7 @@ bool DesireReceivePass::StartPickupAnimation()
             - m_pFielder->m_DetChar.m_v3Position.y,
     };
     float fDistance = nlSqrt(nlVec2LengthSquared(v2Delta), true);
-    float fRadius = m_pFielder->mUnidentified320->GetRadius();
+    float fRadius = m_pFielder->m_pAvoidableObject->GetRadius();
     if (fDistance - fRadius
         > mEstimated.fAnimStartOffset + g_fAnimStartPositionTolerance)
     {

@@ -595,7 +595,7 @@ PhysicsPatch* PhysicsPatchManager::CreatePatch(
     DebugWriteCache* log = gNetworkSyncState->GetWriteCache();
     if (log != 0)
     {
-        int ownerID = owner == 0 ? -1 : owner->mUnidentified120;
+        int ownerID = owner == 0 ? -1 : owner->m_nCharacterIndex;
         char buffer[200];
         nlSNPrintf(buffer, sizeof(buffer), "Creating patch %d owner %d r1 %f r2 %f life %f at frame %d\n", type, ownerID, startRadius, endRadius, lifetime, GetFixedUpdateTask()->GetFrame());
         log->WriteText(buffer);
@@ -719,9 +719,9 @@ void PhysicsPatchManager::SyncLog(
         {
             PhysicsPatch* copy = (PhysicsPatch*)((unsigned char*)data - offset);
             cPlayer* owner = patch->m_pOwner;
-            copy->m_pOwner = (cPlayer*)(owner == 0 ? -1 : owner->mUnidentified120);
+            copy->m_pOwner = (cPlayer*)(owner == 0 ? -1 : owner->m_nCharacterIndex);
             cPlayer* target = patch->m_pTarget;
-            copy->m_pTarget = (cPlayer*)(target == 0 ? -1 : target->mUnidentified120);
+            copy->m_pTarget = (cPlayer*)(target == 0 ? -1 : target->m_nCharacterIndex);
             cache->ChecksumData(sPhysicsPatchType, data, context);
         }
     }

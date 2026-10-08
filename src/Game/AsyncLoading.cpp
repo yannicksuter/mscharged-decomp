@@ -1415,7 +1415,7 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
         { GLM_TextureData, 0xA00000 },
     };
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "FE"));
-    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
     if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_3)
     {
@@ -1673,7 +1673,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     glCompact();
     g_PendingAnimationRequestPool.FreeBlocks();
 
-    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mPoolResourceMark);
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
     fn_80111658(2);
@@ -1701,7 +1701,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     requirements[1].mSize = 0x8B3333;
     requirements[2].mSize = 0x580000;
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 3, "InGame"));
-    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
     gDispatchEventsTask->dispatcher.Dispatch(true);
@@ -1718,7 +1718,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     }
     GameInfoManager::Instance()->ApplyDifficultySettings();
     ReplayManager::Instance()->Initialize();
-    manager->mUnidentified50 = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mGameResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
     lbl_806E1050 = new (8, false) WorldNPCManager;
     lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
@@ -2027,7 +2027,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FEResourceManager::Instance()->Cleanup();
     DestroyFEResourcePool();
     ScreenTransitionManager::Instance()->CancelAllTransitions();
-    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified50);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mGameResourceMark);
 
     if (FontManager::s_pInstance != 0)
     {
@@ -2054,7 +2054,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     glCompact();
     g_PendingAnimationRequestPool.FreeBlocks();
     FreeFunctionMemoryPools();
-    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mPoolResourceMark);
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
     FreeEventDataPools();
@@ -2229,7 +2229,7 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
         { GLM_TextureData, 0xB00000 },
     };
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "StadiumViewer"));
-    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
     GameInfoManager::Instance()->SetMode(0, 0);
@@ -2239,7 +2239,7 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
     ReplayManager::Instance()->Initialize();
     CreateInstance(nlSingleton<TimedObjectManager>::s_pInstance);
     lbl_806E1050 = new (8, false) WorldNPCManager;
-    manager->mUnidentified50 = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mGameResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
 }
 

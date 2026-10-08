@@ -124,7 +124,7 @@ void DesireDeke::Update(DesireUpdate* update, float)
         goalLine.x *= AIsgn(net->m_v3NetLocation.x);
         nlVec3Sub(goalDelta, goalLine, m_pFielder->m_DetChar.m_v3Position);
         unsigned short goalAngle = nlATan2Angle(goalDelta.y, goalDelta.x);
-        AvoidableObject* playerObject = m_pFielder->mUnidentified320;
+        AvoidableObject* playerObject = m_pFielder->m_pAvoidableObject;
         float goalDistanceLength = nlSqrt(nlVec3DistanceSquared2D(goalLine,
             m_pFielder->m_DetChar.m_v3Position), true);
         float goalRange = goalDistanceLength - playerObject->GetRadius();
@@ -135,8 +135,8 @@ void DesireDeke::Update(DesireUpdate* update, float)
             m_pFielder->m_DetChar.m_v3Position,
             goalie->m_DetChar.m_v3Position), true);
         goalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-        playerObject = m_pFielder->mUnidentified320;
-        float goalieRadius = goalie->mUnidentified320->GetRadius();
+        playerObject = m_pFielder->m_pAvoidableObject;
+        float goalieRadius = goalie->m_pAvoidableObject->GetRadius();
         float playerRadius = playerObject->GetRadius();
         if (goalieRange + (playerRadius + goalieRadius) > dekeDistance)
         {

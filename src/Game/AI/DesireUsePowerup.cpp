@@ -492,7 +492,7 @@ void DesireUsePowerup::SyncLog(
         DesireUsePowerup* copy
             = (DesireUsePowerup*)((u8*)data - offset);
         *(int*)&copy->mpTarget
-            = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
+            = mpTarget == NULL ? -1 : mpTarget->m_nCharacterIndex;
         cache->ChecksumData(sDesireUsePowerupType, data, context);
     }
 }
