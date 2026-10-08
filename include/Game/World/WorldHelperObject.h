@@ -20,11 +20,13 @@ public:
     virtual nlMatrix4* GetWorldMatrix() { return &mWorldMatrix; }
     virtual void SetWorldMatrix(const nlMatrix4& transform);
 
-    /* 0x04 */ unsigned char mUnidentified004[0x0C];
+    /* 0x04 */ unsigned long m_uHashID;
+    /* 0x08 */ unsigned long m_uObjectType;
+    /* 0x0C */ unsigned long m_uObjectCreationFlags;
     /* 0x10 */ World* m_pWorld;
     /* 0x14 */ int m_nAnimNode;
     /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ unsigned char mUnidentified01C[0x04];
+    /* 0x1C */ unsigned char m_pad1C[0x04];
     /* 0x20 */ nlMatrix4 mWorldMatrix;
 }; // size: 0x60
 

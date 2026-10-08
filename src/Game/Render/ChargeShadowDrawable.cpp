@@ -44,7 +44,7 @@ void ChargeShadowDrawable::Initialize(glModel* model, unsigned long hash)
     PlanarShadowDrawable::Initialize(model, hash);
 
     m_pModel = model;
-    m_uRenderLayer = 0x1000B;
+    m_uObjectType = 0x1000B;
     m_uObjectCreationFlags = 2;
     m_uHashID = hash;
     m_pAnimController = 0;

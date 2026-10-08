@@ -33,7 +33,7 @@ public:
     glModel* GetModel() const { return m_pModel; }
 
     /* 0x04 */ unsigned long m_uHashID;
-    /* 0x08 */ unsigned long m_uRenderLayer;
+    /* 0x08 */ unsigned long m_uObjectType;
     /* 0x0C */ unsigned long m_uObjectCreationFlags;
     /* 0x10 */ World* m_pWorldContext;
     /* 0x14 */ int m_nAnimNode;
