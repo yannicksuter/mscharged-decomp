@@ -478,16 +478,16 @@ void CharacterLoader::StartLoadingCharacterModel(int nModel)
     const char* szFilename = 0;
     switch (nModel)
     {
-    case 0:
+    case CHAR_MODEL_NORMAL:
         szFilename = mTemplateInfo->szModelFilename;
         break;
-    case 1:
+    case CHAR_MODEL_SHOCK:
         szFilename = mTemplateInfo->szShockModelFilename;
         break;
-    case 2:
+    case CHAR_MODEL_LOW_POLY:
         szFilename = mTemplateInfo->szLowPolyModelFilename;
         break;
-    case 3:
+    case CHAR_MODEL_SHADOW:
         szFilename = mTemplateInfo->szShadowModelFilename;
         break;
     }
@@ -502,16 +502,16 @@ bool CharacterLoader::FinalizeLoadingCharacterModel(int nModel)
     const char* szFilename = 0;
     switch (nModel)
     {
-    case 0:
+    case CHAR_MODEL_NORMAL:
         szFilename = mTemplateInfo->szModelFilename;
         break;
-    case 1:
+    case CHAR_MODEL_SHOCK:
         szFilename = mTemplateInfo->szShockModelFilename;
         break;
-    case 2:
+    case CHAR_MODEL_LOW_POLY:
         szFilename = mTemplateInfo->szLowPolyModelFilename;
         break;
-    case 3:
+    case CHAR_MODEL_SHADOW:
         szFilename = mTemplateInfo->szShadowModelFilename;
         break;
     }

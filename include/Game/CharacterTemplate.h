@@ -14,6 +14,14 @@ class cSAnim;
 class SebringAnimTagScriptInterpreter;
 struct AnimProperties;
 
+enum eCharacterModelSlot
+{
+    CHAR_MODEL_NORMAL = 0,
+    CHAR_MODEL_SHOCK = 1,
+    CHAR_MODEL_LOW_POLY = 2,
+    CHAR_MODEL_SHADOW = 3,
+};
+
 struct tCharacterTemplate
 {
     /* 0x00 */ int nCharacterModelID[4];
