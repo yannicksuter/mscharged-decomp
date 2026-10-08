@@ -3,7 +3,6 @@
 
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "NL/nlstring_tmpl.h"
 
 nlSlotPoolFixed<0x2C> gTweakEntryPool(0x20);
 
