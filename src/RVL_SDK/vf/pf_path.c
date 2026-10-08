@@ -481,7 +481,7 @@ s32 VFiPFPATH_GetNextTokenOfPath(struct PF_STR* p_str, u32 wildcard) {
 }
 
 s32 VFiPFPATH_SplitPath(struct PF_STR* p_path, struct PF_STR* p_dir_path, struct PF_STR* p_filename) {
-    VFiPFPATH_DoSplitPath(p_path, p_dir_path, p_filename, 0);
+    return VFiPFPATH_DoSplitPath(p_path, p_dir_path, p_filename, 0);
 }
 
 struct PF_VOLUME* VFiPFPATH_GetVolumeFromPath(struct PF_STR* p_path) {
