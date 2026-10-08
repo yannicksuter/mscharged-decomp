@@ -83,7 +83,7 @@ public:
     virtual void Update(float fDeltaT);
     void ResetMoviePlayer();
 
-    /* 0xB4 */ float mUnidentifiedB4;
+    /* 0xB4 */ float m_padB4;
     /* 0xB8 */ bool mMovieFinished;
     /* 0xB9 */ bool mTransitionPending;
 };

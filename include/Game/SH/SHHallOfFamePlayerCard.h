@@ -19,7 +19,7 @@ public:
     /* 0x01C */ int mMode;
     /* 0x020 */ int mCardIndex;
     /* 0x024 */ FEBackButton mNavigation;
-    /* 0x0FC */ int mUnidentified0FC[4];
+    /* 0x0FC */ int mHoverCounts[4];
     /* 0x10C */ bool mSlideFinished;
     /* 0x10D */ bool mIsUnlocked;
     /* 0x10E */ unsigned short mTitleText[0x20];

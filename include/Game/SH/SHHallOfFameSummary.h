@@ -25,7 +25,7 @@ public:
     /* 0x0FC */ FEScrollBar mScrollBar;
     /* 0x2B0 */ unsigned short mTitleBuffer[0x40];
     /* 0x330 */ unsigned short mItemTextBuffers[7][0x20];
-    /* 0x4F0 */ unsigned char mUnidentified4F0[0x1C0];
+    /* 0x4F0 */ unsigned char mPadding4F0[0x1C0];
     /* 0x6B0 */ int mPointerInsideCount[4];
     /* 0x6C0 */ int mItemCount;
     /* 0x6C4 */ int mFirstVisibleItem;

@@ -38,7 +38,7 @@ public:
     /* 0x10 */ World* m_pWorldContext;
     /* 0x14 */ int m_nAnimNode;
     /* 0x18 */ WorldAnimController* m_pAnimController;
-    /* 0x1C */ u8 mUnidentified1C[0x04];
+    /* 0x1C */ u8 m_pad1C[0x04];
     /* 0x20 */ nlMatrix4 mWorldMatrix;
     /* 0x60 */ float m_fBoundingRadius;
     /* 0x64 */ glModel* m_pModel;

@@ -32,7 +32,7 @@ public:
     /* 0x300 */ FEPointerButton mHelpButton;
     /* 0x3B4 */ TLComponentInstance* mHelpButtonInstance;
     /* 0x3B8 */ FEBackButton mBackButton;
-    /* 0x490 */ ButtonComponent mUnidentified490;
+    /* 0x490 */ ButtonComponent mButtonComponent;
     /* 0x4B4 */ bool mInitialized;
     /* 0x4B8 */ int mHoverCounts[4];
     /* 0x4C8 */ u16 mFriendsText[48];

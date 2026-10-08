@@ -204,7 +204,7 @@ void NLGLogoMovieScene::OverrideMovieDimensions()
 }
 
 IntroMovieScene::IntroMovieScene()
-    : mUnidentifiedB4(0.0f)
+    : m_padB4(0.0f)
     , mMovieFinished(false)
     , mTransitionPending(false)
 {
@@ -229,7 +229,7 @@ void IntroMovieScene::ResetMoviePlayer()
     }
     BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
     pStadium->m_bRenderingEnabled = false;
-    mUnidentifiedB4 = 0.0f;
+    m_padB4 = 0.0f;
     mMovieFinished = false;
     mTransitionPending = false;
 }

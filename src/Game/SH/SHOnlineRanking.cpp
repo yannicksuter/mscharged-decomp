@@ -61,7 +61,7 @@ static inline void UpdateScrollBar(SHOnlineRanking* scene, int count)
 }
 
 SHOnlineRanking::SHOnlineRanking()
-    : mUnidentified30(false)
+    : mPadding30(false)
     , mMyRank(-1)
     , mFirstVisibleRank(0)
     , mRowButtons()

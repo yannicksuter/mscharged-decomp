@@ -32,17 +32,17 @@
 
 
 CupKnockoutScene::CupKnockoutScene()
-    : mUnidentified2DC(true)
+    : m_pad2DC(true)
     , mTournament(0)
-    , mUnidentified2E8(0.0f)
+    , m_pad2E8(0.0f)
     , mStartSeconds(-1)
-    , mUnidentified2F0(false)
-    , mUnidentified2F1(false)
-    , mUnidentified2F2(false)
-    , mUnidentified2F3(false)
-    , mUnidentified2F4(false)
-    , mUnidentified2F5(false)
-    , mUnidentified2F6(false)
+    , m_pad2F0(false)
+    , m_pad2F1(false)
+    , m_pad2F2(false)
+    , m_pad2F3(false)
+    , m_pad2F4(false)
+    , m_pad2F5(false)
+    , m_pad2F6(false)
     , mPointerButtonsInitialized(false)
     , mPreviousPagePressed(false)
     , mNextPagePressed(false)
@@ -148,7 +148,7 @@ void CupKnockoutScene::SceneCreated()
         UpdateCupBreadcrumbs(2);
     }
 
-    mUnidentified2E8 = 0.0f;
+    m_pad2E8 = 0.0f;
     UpdateRoundHighlight();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);

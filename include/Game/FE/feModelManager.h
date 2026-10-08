@@ -89,7 +89,7 @@ public:
     virtual ~FEImpostorModel();
 
     /* 0x54 */ ImpostorModel* mModel;
-    /* 0x58 */ u32 mUnidentified58;
+    /* 0x58 */ u32 mPadding58;
     /* 0x5C */ FEImpostorCharacter* mCharacter;
     /* 0x60 */ nlVector3 mPosition;
     /* 0x6C */ float mTime;

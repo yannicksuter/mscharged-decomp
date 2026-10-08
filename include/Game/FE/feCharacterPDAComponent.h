@@ -42,7 +42,7 @@ public:
 
     /* 0x004 */ FEAttributeBar* mCaptainAttributeBars[4];
     /* 0x014 */ FEAttributeBar* mSidekickAttributeBars[4];
-    /* 0x024 */ u32 mUnidentified24;
+    /* 0x024 */ u32 m_pad24;
     /* 0x028 */ FETimerList mTimers;
     /* 0x034 */ FEScrollText mScrollText;
     /* 0x074 */ TLComponentInstance* mRootComponent;
@@ -60,7 +60,7 @@ public:
     /* 0x0D4 */ TLComponentInstance* mScrollArrows;
     /* 0x0D8 */ TLGroupInstance* mContinueGroup;
     /* 0x0DC */ FEScrollBar mScrollBar;
-    /* 0x290 */ int mUnidentified290;
+    /* 0x290 */ int m_pad290;
     /* 0x294 */ int mSelectedCaptain;
     /* 0x298 */ int mSelectedSidekick;
     /* 0x29C */ int mDisplayMode;

@@ -19,9 +19,9 @@ public:
     /* 0x0C */ u32 m_pad00C[4];
     /* 0x1C */ u32 m_pad01C;
     /* 0x20 */ float m_pad020[4][2];
-    /* 0x40 */ u16 mUnidentified040[4];
-    /* 0x48 */ bool mUnidentified048[4];
-    /* 0x4C */ bool mUnidentified04C[4];
+    /* 0x40 */ u16 m_pad040[4];
+    /* 0x48 */ bool m_pad048[4];
+    /* 0x4C */ bool m_pad04C[4];
     /* 0x50 */ int mListenerCount;
     /* 0x54 */ int m_pad054;
 }; // size 0x58

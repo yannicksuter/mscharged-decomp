@@ -275,7 +275,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     , m_eClassType(eNewClassType)
     , m_bIsUsingElectrocutionTexture(false)
     , m_pCharacterSFX(0)
-    , mUnidentified0FC(0)
+    , m_pPropModel(0)
     , m_uNormalTextureID(0)
     , m_uSwapTextureID(0)
     , m_uShockTextureID(0)

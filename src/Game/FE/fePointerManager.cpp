@@ -15,9 +15,9 @@ FEPointerManager::FEPointerManager()
         m_pad00C[i] = 0;
         m_pad020[i][0] = 0.0f;
         m_pad020[i][1] = 0.0f;
-        mUnidentified040[i] = 0;
-        mUnidentified048[i] = false;
-        mUnidentified04C[i] = true;
+        m_pad040[i] = 0;
+        m_pad048[i] = false;
+        m_pad04C[i] = true;
     }
 }
 

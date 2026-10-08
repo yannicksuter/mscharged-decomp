@@ -322,7 +322,7 @@ public:
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[3];
     /* 0x0F8 */ cCharacterSFX* m_pCharacterSFX;
-    /* 0x0FC */ void* mUnidentified0FC;
+    /* 0x0FC */ void* m_pPropModel;
     /* 0x100 */ u32 m_uNormalTextureID;
     /* 0x104 */ u32 m_uSwapTextureID;
     /* 0x108 */ u32 m_uShockTextureID;

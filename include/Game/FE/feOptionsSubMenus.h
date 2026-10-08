@@ -13,17 +13,17 @@ class OptionsSubMenu : public BaseSceneHandler
 {
 public:
     OptionsSubMenu()
-        : mUnidentified1C(12)
-        , mUnidentified20(1)
-        , mUnidentified24(false)
+        : mPadding1C(12)
+        , mMenuState(1)
+        , mPadding24(false)
     {
     }
     virtual ~OptionsSubMenu() { }
-    int fn_801CAA10() const { return mUnidentified20; }
+    int fn_801CAA10() const { return mMenuState; }
 
-    /* 0x01C */ int mUnidentified1C;
-    /* 0x020 */ int mUnidentified20;
-    /* 0x024 */ bool mUnidentified24;
+    /* 0x01C */ int mPadding1C;
+    /* 0x020 */ int mMenuState;
+    /* 0x024 */ bool mPadding24;
     /* 0x025 */ u8 mPadding25[3];
 }; // size 0x28
 

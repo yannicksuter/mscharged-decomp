@@ -42,7 +42,7 @@ public:
     void UpdateAddFriendRow();
     void UpdateVisibleRows();
 
-    /* 0x001C */ int mUnidentified001C;
+    /* 0x001C */ int m_pad001C;
     /* 0x0020 */ int mScrollOffset;
     /* 0x0024 */ int mScrollRange;
     /* 0x0028 */ int mPointerHoverCount;

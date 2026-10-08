@@ -33,12 +33,12 @@ public:
     /* 0x004 */ TLComponentInstance* mButtonInstances[2];
     /* 0x00C */ TLImageInstance* mThumb;
     /* 0x010 */ bool mScrolling[2];
-    /* 0x012 */ unsigned char mUnidentified012[2];
+    /* 0x012 */ unsigned char m_pad012[2];
     /* 0x014 */ bool mPointerPressed[2];
     /* 0x016 */ bool mPadPressed[2];
     /* 0x018 */ bool mInitialized;
     /* 0x019 */ bool mPointerOver;
-    /* 0x01A */ bool mUnidentified01A;
+    /* 0x01A */ bool m_pad01A;
     /* 0x01B */ bool mIgnoreInputLock;
     /* 0x01C */ feVector3 mAssetPosition;
     /* 0x028 */ float mRepeatTimer;

@@ -27,7 +27,7 @@ FECharacterPDAComponent::FECharacterPDAComponent()
     , mCaptainAttributes(0)
     , mPositions(0)
     , mJoinPrompt(0)
-    , mUnidentified290(2)
+    , m_pad290(2)
     , mSelectedCaptain(-1)
     , mDisplayMode(-1)
 {
@@ -66,7 +66,7 @@ void FECharacterPDAComponent::Initialize(TLComponentInstance* component, int sid
     static const char* sidekickAttributes[] = { "attribute_movement", "attribute_shooting", "attribute_passing", "attribute_defense" };
 
     mRootComponent = component;
-    mUnidentified24 = value;
+    m_pad24 = value;
     mSide = side;
     mPDAScreens = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mRootComponent->GetActiveSlide(), "pda_screens");
     mCaptainAttributes = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPDAScreens->GetActiveSlide(), "attributes_captains");
