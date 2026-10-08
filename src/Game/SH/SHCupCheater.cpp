@@ -244,12 +244,12 @@ void CupCheaterScene::SceneCreated()
 
     unsigned long menuHash;
     unsigned long layerHash;
-    void* presentation;
+    FEPresentation* presentation;
     presentation = mFEScene->m_pFEPackage->GetPresentation();
     menuHash = nlStringLowerHash("Menu");
     layerHash = nlStringLowerHash("Layer");
     TLComponentInstance* comp = FEFinder<TLComponentInstance, TLAT_COMPONENT>::Find(
-        (FEPresentation*)presentation, nlStringLowerHash("Slide1"), layerHash, menuHash, 0, 0, 0);
+        presentation, nlStringLowerHash("Slide1"), layerHash, menuHash, 0, 0, 0);
 
     m_SlideMenu = new ((FESlideMenu*)nlMalloc(sizeof(FESlideMenu), 8, false)) FESlideMenu(comp);
 
