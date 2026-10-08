@@ -94,7 +94,7 @@ public:
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
-    void* mUnidentifiedA4;
+    SpaceSearch* mpSpaceSearch;
 };
 
 class DesireDeke : public Desire
@@ -114,7 +114,7 @@ public:
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
-    void* mUnidentifiedA4;
+    cFielder* mpTarget;
 };
 
 class DesireHit : public Desire
@@ -173,7 +173,7 @@ public:
     virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
-    void* mUnidentifiedA4;
+    SpaceSearch* mpSpaceSearch;
 };
 
 DesireUpdate TransDesireRunToTarget(AIContext* input, Desire* desire);

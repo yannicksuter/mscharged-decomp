@@ -35,7 +35,7 @@ bool DesireGetOpen::Initialize(void* context)
     {
         SSearchGetOpen* search = new (nlMalloc(sizeof(SSearchGetOpen), 8, false))
             SSearchGetOpen(m_pFielder);
-        mUnidentifiedA4 = search;
+        mpSpaceSearch = search;
         m_pFielder->SetSpaceSearch(search);
         m_pFielder->m_pSpaceSearch->m_bDebugOn = gGetOpenSearchDebug;
         m_pFielder->m_pSpaceSearch->FindBestPosition(
@@ -45,7 +45,7 @@ bool DesireGetOpen::Initialize(void* context)
     {
         SSearchOpenLane* search = new (nlMalloc(sizeof(SSearchOpenLane), 8, false))
             SSearchOpenLane(ballCarrier, m_pFielder);
-        mUnidentifiedA4 = search;
+        mpSpaceSearch = search;
         m_pFielder->SetSpaceSearch(search);
         m_pFielder->m_pSpaceSearch->m_bDebugOn = gGetOpenSearchDebug;
         m_pFielder->m_pSpaceSearch->FindBestPosition(
@@ -62,11 +62,11 @@ void DesireGetOpen::Update(DesireUpdate*, float)
 
 void DesireGetOpen::Cleanup()
 {
-    if (mUnidentifiedA4 == m_pFielder->m_pSpaceSearch)
+    if (mpSpaceSearch == m_pFielder->m_pSpaceSearch)
     {
         m_pFielder->SetSpaceSearch(0);
     }
-    mUnidentifiedA4 = 0;
+    mpSpaceSearch = 0;
 }
 
 DesireUpdate TransDesireGetOpen(AIContext* input)

@@ -21,7 +21,7 @@ bool DesireCutAndBreak::Initialize(void* context)
 
     SSearchCutAndBreak* search = new (nlMalloc(sizeof(SSearchCutAndBreak), 8, false))
         SSearchCutAndBreak(m_pFielder);
-    mUnidentifiedA4 = search;
+    mpSpaceSearch = search;
     m_pFielder->SetSpaceSearch(search);
     m_pFielder->m_pSpaceSearch->m_bDebugOn = gCutAndBreakSearchDebug;
     m_pFielder->m_pSpaceSearch->FindBestPosition(
@@ -42,11 +42,11 @@ void DesireCutAndBreak::Update(DesireUpdate* update, float)
 
 void DesireCutAndBreak::Cleanup()
 {
-    if (mUnidentifiedA4 == m_pFielder->m_pSpaceSearch)
+    if (mpSpaceSearch == m_pFielder->m_pSpaceSearch)
     {
         m_pFielder->SetSpaceSearch(0);
     }
-    mUnidentifiedA4 = 0;
+    mpSpaceSearch = 0;
 }
 
 DesireCutAndBreak::~DesireCutAndBreak()

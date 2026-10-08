@@ -15,11 +15,10 @@ static unsigned short sDesireDekeType = 0xFFFF;
 
 bool DesireDeke::Initialize(void* context)
 {
-    mUnidentifiedA4 = 0;
+    mpTarget = 0;
     if (((UnidentifiedVariantCollection*)context)->IsSet(14))
     {
-        mUnidentifiedA4
-            = ((UnidentifiedVariantCollection*)context)->Get(14)->mData.pointer;
+        mpTarget = (cFielder*)((UnidentifiedVariantCollection*)context)->Get(14)->mData.pointer;
     }
     return true;
 }
@@ -38,9 +37,9 @@ void DesireDeke::Update(DesireUpdate* update, float)
     case MARIO:
     case LUIGI:
         avoidSideline = true;
-        if (m_pFielder->IsSuperPowerActive() && mUnidentifiedA4 != 0)
+        if (m_pFielder->IsSuperPowerActive() && mpTarget != 0)
         {
-            cFielder* target = (cFielder*)mUnidentifiedA4;
+            cFielder* target = mpTarget;
             nlVector3 delta;
             nlVec3Sub(delta, target->mUnidentified024.m_v3Position,
                 m_pFielder->mUnidentified024.m_v3Position);
