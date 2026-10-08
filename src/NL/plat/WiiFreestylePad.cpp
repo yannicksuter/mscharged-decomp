@@ -22,7 +22,8 @@ inline void WiiFreestylePad::UpdateState(float dt)
     mAnalogLeft.y = status->fsStickY / 56.0f;
     if (m_isLeftAnalogToDPadMapEnabled)
     {
-        status->button |= MapWiiStickToDPad(mAnalogLeft.x, mAnalogLeft.y, 1, 2, 4, 8);
+        status->button |= MapWiiStickToDPad(mAnalogLeft.x, mAnalogLeft.y,
+            WPAD_BUTTON_LEFT, WPAD_BUTTON_RIGHT, WPAD_BUTTON_DOWN, WPAD_BUTTON_UP);
     }
 
     changed = mCurrentStatus->wpad.button ^ mPreviousStatus->wpad.button;
