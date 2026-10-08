@@ -22,6 +22,12 @@ enum eTurboRequest
     TR_FORCED_OFF = 3,
 };
 
+enum eSlideAttackState
+{
+    SLIDE_ATTACK_SLIDING = 0,
+    SLIDE_ATTACK_DECELERATING = 1,
+};
+
 enum eFielderActionState
 {
     ACTION_NEED_ACTION = -1,
@@ -681,7 +687,7 @@ private:
     /* 0x386 */ u8 mUnknown386[0x02];
 
 public:
-    /* 0x388 */ int m_eSlideAttackState;
+    /* 0x388 */ eSlideAttackState m_eSlideAttackState;
     /* 0x38C */ bool bAttackSucceeded;
     /* 0x38D */ bool m_bSlideAttackReset;
 

@@ -313,6 +313,13 @@ public:
     virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
+enum eMegaStrikePressStage
+{
+    MEGA_PRESS_SHOT_COUNT = 0,
+    MEGA_PRESS_ACCURACY_RISING = 1,
+    MEGA_PRESS_ACCURACY_FALLING = 2,
+};
+
 class DesireMegaStrike : public Desire
 {
 public:
@@ -336,7 +343,7 @@ private:
     float mfAccuracyScore;
     float mfPrevMeterPosition;
     float mfFirstPressDelay;
-    int mnPressStage;
+    eMegaStrikePressStage mnPressStage;
 };
 
 class DesireStar : public Desire

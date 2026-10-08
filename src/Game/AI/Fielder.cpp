@@ -750,7 +750,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     , mActionRunPassVars()
     , mActionRunningVars()
     , mActionRunningWBVars()
-    , m_eSlideAttackState(0)
+    , m_eSlideAttackState(SLIDE_ATTACK_SLIDING)
     , bAttackSucceeded(false)
     , m_bSlideAttackReset(true)
     , m_fMegaStrikeNumBalls(0.0f)
@@ -6051,7 +6051,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mActionRunningVars.bFirstCycleOfTurbo = false;
     mActionRunningWBVars.bWaitForAnimToFinish = false;
     mActionRunningWBVars.bCuePitch = false;
-    m_eSlideAttackState = 0;
+    m_eSlideAttackState = SLIDE_ATTACK_SLIDING;
     bAttackSucceeded = false;
     m_bSlideAttackReset = true;
     m_nStunnedAngularAcceleration = 0;

@@ -47,7 +47,7 @@ bool DesireMegaStrike::Initialize(void* context)
         float fRange = fDelay * sMegaStrikeFirstPressDelayJitter;
         mfFirstPressDelay =
             fDelay + (nlRandomf(fRange) - (0.5f * fRange));
-        mnPressStage = 0;
+        mnPressStage = MEGA_PRESS_SHOT_COUNT;
 
         float probabilities[4];
         int i;
@@ -230,9 +230,9 @@ bool DesireMegaStrike::UpdateAIButtonPress(
     {
         *update = 0;
         if (mAgeTimer.GetSeconds() >= mfFirstPressDelay
-            && mnPressStage < 1)
+            && mnPressStage < MEGA_PRESS_ACCURACY_RISING)
         {
-            mnPressStage = 1;
+            mnPressStage = MEGA_PRESS_ACCURACY_RISING;
             bButtonPressed = true;
         }
     }
@@ -248,7 +248,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
     int nMeterResult = (int)fMeterResult;
     switch (mnPressStage)
     {
-    case 0:
+    case MEGA_PRESS_SHOT_COUNT:
     {
         bool bAtRequestedValue = false;
         if (Difficult(m_pFielder->m_pTeam) < 0.25f
@@ -269,35 +269,35 @@ bool DesireMegaStrike::UpdateAIButtonPress(
                 bButtonPressed = true;
                 if (m_pFielder->GetMegaStrikeMeterPosition() <= 0.225f)
                 {
-                    mnPressStage = 2;
+                    mnPressStage = MEGA_PRESS_ACCURACY_FALLING;
                 }
                 else if (nlRandomf(1.0f) < 0.5f)
                 {
-                    mnPressStage = 1;
+                    mnPressStage = MEGA_PRESS_ACCURACY_RISING;
                 }
                 else
                 {
-                    mnPressStage = 2;
+                    mnPressStage = MEGA_PRESS_ACCURACY_FALLING;
                 }
             }
             else if (nMeterResult > mnRequestedBalls)
             {
                 bButtonPressed = true;
                 if (nlRandomf(1.0f) < 0.5f)
-                    mnPressStage = 1;
+                    mnPressStage = MEGA_PRESS_ACCURACY_RISING;
                 else
-                    mnPressStage = 2;
+                    mnPressStage = MEGA_PRESS_ACCURACY_FALLING;
             }
         }
         break;
     }
-    case 1:
+    case MEGA_PRESS_ACCURACY_RISING:
         if (mfPrevMeterPosition > fMeterPosition)
         {
             if (mfAccuracyScore >= 0.0f)
                 bButtonPressed = true;
             else
-                mnPressStage = 2;
+                mnPressStage = MEGA_PRESS_ACCURACY_FALLING;
         }
         else if (mfAccuracyScore < 0.0f && fMeterPosition < 0.0f)
         {
@@ -310,7 +310,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
             bButtonPressed = true;
         }
         break;
-    case 2:
+    case MEGA_PRESS_ACCURACY_FALLING:
         if (fMeterPosition < mfPrevMeterPosition)
         {
             if (mfAccuracyScore < 0.0f && fMeterPosition < 0.0f)

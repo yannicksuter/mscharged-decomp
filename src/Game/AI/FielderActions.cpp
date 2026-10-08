@@ -4385,7 +4385,7 @@ void cFielder::InitActionSlideAttack(
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(this->GetTweaks()), fn_8002CF24(this->GetTweaks()));
         m_DetPlayer.m_tSlideAttackTimer.SetSeconds(GetSlideTime(this->GetTweaks()));
 
-        m_eSlideAttackState = 0;
+        m_eSlideAttackState = SLIDE_ATTACK_SLIDING;
         bAttackSucceeded = false;
         m_bSlideAttackReset = false;
 
@@ -4500,7 +4500,7 @@ void cFielder::InitActionSlideAttack(
 
 void cFielder::fn_8004C88C(float fDeltaT)
 {
-    if (!bAttackSucceeded && m_eSlideAttackState == 0 && IsStarActive())
+    if (!bAttackSucceeded && m_eSlideAttackState == SLIDE_ATTACK_SLIDING && IsStarActive())
     {
         float fCurrSpeed;
         nlVector3 v3NewVelocity;
@@ -4607,7 +4607,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
     switch (m_eSlideAttackState)
     {
-    case 0:
+    case SLIDE_ATTACK_SLIDING:
     {
         nlVector3 v3Velocity = m_DetChar.m_v3Velocity;
         float fSpeed = GetActualSpeed();
@@ -4627,12 +4627,12 @@ void cFielder::fn_8004C88C(float fDeltaT)
         if (m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime == 0 || bDecelerateEarly)
         {
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
-            m_eSlideAttackState = 1;
+            m_eSlideAttackState = SLIDE_ATTACK_DECELERATING;
             m_DetPlayer.m_tSlideAttackTimer.SetSeconds(GetSlideDecelTime(this->GetTweaks()));
         }
         break;
     }
-    case 1:
+    case SLIDE_ATTACK_DECELERATING:
     {
         float fDecelTime = m_DetPlayer.m_tSlideAttackTimer.GetSeconds();
         if (fDecelTime < 0.01f)
