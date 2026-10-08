@@ -180,9 +180,3 @@ void GameTweaks::Init()
     fShotWidthVariance.BindWithDefault("Shot Width Variance", 0.12f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fShotHeightVariance.BindWithDefault("Shot Height Variance", 0.06f, mCategory, false, 0.0f, 0.0f, 0.0f);
 }
-
-// TweakIntBinding::FormatValue's format. Retail keeps FormatValue inside the
-// TweakIntBinding.inl code group and Init in the following one; a string
-// literal first used by FormatValue would move FormatValue out of that group.
-// The original construct is not recoverable from the retail image.
-char gTweakIntBindingFormat[] = "%d";

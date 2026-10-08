@@ -51,12 +51,15 @@ void* TweakIntBinding::GetValueAddress()
     return m_pValue;
 }
 
-extern char gTweakIntBindingFormat[];
+void FormatTweakBindingValue(char* buffer, unsigned long size, int* value)
+{
+    nlSNPrintf(buffer, size, "%d", *value);
+}
 
 void TweakIntBinding::FormatValue(
     char* buffer, unsigned long size)
 {
-    nlSNPrintf(buffer, size, gTweakIntBindingFormat, *m_pValue);
+    FormatTweakBindingValue(buffer, size, m_pValue);
 }
 
 void TweakIntBinding::ParseValue(const char* value)
