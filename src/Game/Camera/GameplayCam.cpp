@@ -198,11 +198,11 @@ void GameplayCamera::Update(float deltaTime)
     else
     {
         if (m_bDynamicZoom && !gGameplayCameraInReplay
-            && !UnidentifiedCameraEffects::Instance()->IsTransitionActive())
+            && !GameplayCameraEffects::Instance()->IsTransitionActive())
         {
             m_fDesiredZoom = 1.0f - GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel;
             m_fDesiredZoom = m_fDesiredZoom - gGameplayCameraDynamicZoomOffset;
-            m_fDesiredZoom = m_fDesiredZoom + UnidentifiedCameraEffects::Instance()->GetZoomScale();
+            m_fDesiredZoom = m_fDesiredZoom + GameplayCameraEffects::Instance()->GetZoomScale();
             m_fDesiredZoom = nlMinEquals(nlMaxEquals(m_fDesiredZoom, gGameplayCameraMinZoom), 1.2f * gGameplayCameraMaxZoom);
         }
 
@@ -248,24 +248,24 @@ void GameplayCamera::Update(float deltaTime)
     m_v3Camera.y = Interpolate(m_nearZoom.m_v3Camera.y, m_farZoom.m_v3Camera.y, clampedZoom);
     m_v3Target.y = Interpolate(m_nearZoom.m_v3Target.y, m_farZoom.m_v3Target.y, clampedZoom);
 
-    UnidentifiedCameraEffects::Instance()->AdjustCameraVectors(m_fZoom, &m_v3Camera, &m_v3Target);
+    GameplayCameraEffects::Instance()->AdjustCameraVectors(m_fZoom, &m_v3Camera, &m_v3Target);
 
     nlVector3 up = mUpVector;
     nlVector3 camera = m_v3Camera;
     nlVector3 target = m_v3Target;
 
-    if (UnidentifiedCameraEffects::Instance()->IsTransitionActive() == true
+    if (GameplayCameraEffects::Instance()->IsTransitionActive() == true
         && !gamePaused && !gGameplayCameraInReplay
         && ReplayManager::Instance()->mRender != NULL)
     {
-        up = UnidentifiedCameraEffects::Instance()->RotateCameraVector(mUpVector);
-        nlVector3 targetOffset = UnidentifiedCameraEffects::Instance()->CalculateTargetOffset(this);
+        up = GameplayCameraEffects::Instance()->RotateCameraVector(mUpVector);
+        nlVector3 targetOffset = GameplayCameraEffects::Instance()->CalculateTargetOffset(this);
         if (gGameplayCameraOffsetCameraDuringTransition == true)
         {
             nlVec3Add(camera, camera, targetOffset);
         }
         nlVec3Add(target, target, targetOffset);
-        float fovIncrease = UnidentifiedCameraEffects::Instance()->mTransitionScale;
+        float fovIncrease = GameplayCameraEffects::Instance()->mTransitionScale;
         m_fFOV += fovIncrease;
     }
 

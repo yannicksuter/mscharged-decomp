@@ -15,11 +15,11 @@ struct GoalieSaveData;
 struct PlayerAttackData;
 struct MegaStrikeMeterData;
 
-class UnidentifiedCameraEffects
-    : public nlSingleton<UnidentifiedCameraEffects>
+class GameplayCameraEffects
+    : public nlSingleton<GameplayCameraEffects>
 {
 public:
-    UnidentifiedCameraEffects();
+    GameplayCameraEffects();
 
     void RegisterEventListeners();
     void Update(float deltaTime);

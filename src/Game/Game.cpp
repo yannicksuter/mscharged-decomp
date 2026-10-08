@@ -302,12 +302,12 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
                 PhysicsPatchManager();
         lbl_806E12C8 = memory;
     }
-    if (UnidentifiedCameraEffects::Instance() == 0)
+    if (GameplayCameraEffects::Instance() == 0)
     {
-        UnidentifiedCameraEffects* memory = new (nlMalloc(
-            sizeof(UnidentifiedCameraEffects), 8, false))
-            UnidentifiedCameraEffects;
-        UnidentifiedCameraEffects::s_pInstance = memory;
+        GameplayCameraEffects* memory = new (nlMalloc(
+            sizeof(GameplayCameraEffects), 8, false))
+            GameplayCameraEffects;
+        GameplayCameraEffects::s_pInstance = memory;
     }
     if (gpNumberDisplay == 0)
     {
@@ -347,10 +347,10 @@ void DestroyGame()
         delete lbl_806E12C8;
         lbl_806E12C8 = 0;
     }
-    if (UnidentifiedCameraEffects::Instance() != 0)
+    if (GameplayCameraEffects::Instance() != 0)
     {
-        delete UnidentifiedCameraEffects::Instance();
-        UnidentifiedCameraEffects::s_pInstance = 0;
+        delete GameplayCameraEffects::Instance();
+        GameplayCameraEffects::s_pInstance = 0;
     }
     if (gpNumberDisplay != 0)
     {
@@ -1658,14 +1658,14 @@ void cGame::Update(float fDeltaT)
             NisPlayer::Instance()->mWinnerSide[0] = nWinner;
         }
 
-        UnidentifiedCameraEffects::Instance()->ResetForPresentation((void*)nWinner);
+        GameplayCameraEffects::Instance()->ResetForPresentation((void*)nWinner);
         if (!DuringEndOfGamePresentation(GetPresentation()))
         {
             PlayEndGamePresentation();
         }
     }
 
-    UnidentifiedCameraEffects::Instance()->UnidentifiedNoOp();
+    GameplayCameraEffects::Instance()->UnidentifiedNoOp();
 }
 extern "C" void fn_8005B330(
     nlVector3* pVector, float fXAxisTilt, float fYAxisTilt)

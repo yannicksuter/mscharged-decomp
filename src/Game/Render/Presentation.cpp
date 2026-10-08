@@ -448,9 +448,9 @@ void HandlePresentationStateTransition(Presentation* presentation, u32 from, u32
  */
 void Presentation::Update(float deltaT)
 {
-    if (nlSingleton<UnidentifiedCameraEffects>::s_pInstance != 0)
+    if (nlSingleton<GameplayCameraEffects>::s_pInstance != 0)
     {
-        nlSingleton<UnidentifiedCameraEffects>::s_pInstance->Update(deltaT);
+        nlSingleton<GameplayCameraEffects>::s_pInstance->Update(deltaT);
     }
 
     if (gpNumberDisplay != 0)
@@ -689,9 +689,9 @@ bool DuringEndOfGamePresentation(Presentation* presentation)
 void Presentation::Call(
     const char* functionName, const char* nisFilter)
 {
-    if (nlSingleton<UnidentifiedCameraEffects>::s_pInstance != 0)
+    if (nlSingleton<GameplayCameraEffects>::s_pInstance != 0)
     {
-        nlSingleton<UnidentifiedCameraEffects>::s_pInstance->Reset();
+        nlSingleton<GameplayCameraEffects>::s_pInstance->Reset();
     }
 
     if (nlStrCmp<char>(idleFun, mCurrentFunction) != 0
