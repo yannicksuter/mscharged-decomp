@@ -150,13 +150,15 @@ public:
     void InitActionMegaStrike(float numBalls, float accuracy);
     cFielder* GetMonty() const { return mpMonty; }
     cFielder* GetShooter() const { return mpShooter; }
+    float GetMegaStrikeGoalDirection() const;
+    void SetBouncingBallTarget(float targetTime, const nlVector3& position);
     void InitMegaStrikeTargets();
     void HideMegaStrikeBall();
     void SwapMegaStrikeController(cPlayer* player);
     void UpdateMegaStrikeFade(float deltaTime);
     void UpdateMegaStrikePointer();
     void PopDefensivePlayOverlay();
-    void CheckMegaStrikeGoals();
+    unsigned int GetNextMegaStrikeTarget() const { return muMegaNextTarget; }
     void InitActionMegaStrikeWait();
     void InitActionChipShotStumble(float fTargetTime);
     void InitActionDiveRecover();
