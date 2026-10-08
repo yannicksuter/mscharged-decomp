@@ -53,18 +53,18 @@ DesireCutAndBreak::~DesireCutAndBreak()
 {
 }
 
-inline void DesireCutAndBreak::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireCutAndBreak::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireCutAndBreak");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireCutAndBreak::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireCutAndBreak::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireCutAndBreakType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireCutAndBreakType, cache);
+        RegisterDebugFields(&sDesireCutAndBreakType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

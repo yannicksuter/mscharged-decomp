@@ -343,23 +343,23 @@ void DesireMegaStrike::Cleanup()
 /**
  * Offset/Address/Size: 0xFD8 | 0x800BA39C | size: 0xC8
  */
-inline void DesireMegaStrike::UnidentifiedVirtual8(
+inline void DesireMegaStrike::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireMegaStrike");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x10A0 | 0x800BA464 | size: 0x9C
  */
-inline void DesireMegaStrike::UnidentifiedVirtual7(
+inline void DesireMegaStrike::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireMegaStrikeType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireMegaStrikeType, cache);
+        RegisterDebugFields(&sDesireMegaStrikeType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

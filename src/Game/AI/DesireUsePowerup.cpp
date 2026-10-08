@@ -451,12 +451,12 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
 /**
  * Offset/Address/Size: 0x2160 | 0x800D41D4 | size: 0x17C
  */
-void DesireUsePowerup::UnidentifiedVirtual8(
+void DesireUsePowerup::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireUsePowerup");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
     cache->AddField(16, gDebugFieldTypes[16].size,
@@ -476,12 +476,12 @@ void DesireUsePowerup::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x22DC | 0x800D4350 | size: 0xC0
  */
-void DesireUsePowerup::UnidentifiedVirtual7(
+void DesireUsePowerup::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireUsePowerupType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireUsePowerupType, cache);
+        RegisterDebugFields(&sDesireUsePowerupType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

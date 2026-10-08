@@ -86,18 +86,18 @@ DesireUpdate TransDesireGetOpen(AIContext* input)
     return result;
 }
 
-inline void DesireGetOpen::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireGetOpen::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireGetOpen");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireGetOpen::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireGetOpen::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireGetOpenType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireGetOpenType, cache);
+        RegisterDebugFields(&sDesireGetOpenType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

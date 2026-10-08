@@ -876,23 +876,23 @@ void DesireConfused::Cleanup()
 /**
  * Offset/Address/Size: 0x3704 | 0x800BF7C8 | size: 0xC8
  */
-inline void DesireStar::UnidentifiedVirtual8(
+inline void DesireStar::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireStar");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x37CC | 0x800BF890 | size: 0x9C
  */
-inline void DesireStar::UnidentifiedVirtual7(
+inline void DesireStar::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireStarType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireStarType, cache);
+        RegisterDebugFields(&sDesireStarType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -904,23 +904,23 @@ inline void DesireStar::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x35A0 | 0x800BF664 | size: 0xC8
  */
-inline void DesireMushroom::UnidentifiedVirtual8(
+inline void DesireMushroom::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireMushroom");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3668 | 0x800BF72C | size: 0x9C
  */
-inline void DesireMushroom::UnidentifiedVirtual7(
+inline void DesireMushroom::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireMushroomType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireMushroomType, cache);
+        RegisterDebugFields(&sDesireMushroomType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -932,23 +932,23 @@ inline void DesireMushroom::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x343C | 0x800BF500 | size: 0xC8
  */
-inline void DesireSlippery::UnidentifiedVirtual8(
+inline void DesireSlippery::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireSlippery");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3504 | 0x800BF5C8 | size: 0x9C
  */
-inline void DesireSlippery::UnidentifiedVirtual7(
+inline void DesireSlippery::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSlipperyType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireSlipperyType, cache);
+        RegisterDebugFields(&sDesireSlipperyType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -960,7 +960,7 @@ inline void DesireSlippery::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x3224 | 0x800BF2E8 | size: 0x17C
  */
-inline void DesireGooey::UnidentifiedVirtual8(
+inline void DesireGooey::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireGooey");
@@ -969,19 +969,19 @@ inline void DesireGooey::UnidentifiedVirtual8(
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfGooTime - (u8*)&mvDesiredPosition, "mfGooTime");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mf_NotRunning_SpeedScale - (u8*)&mvDesiredPosition, "mf_NotRunning_SpeedScale");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mf_NotRunning_MovementScale - (u8*)&mvDesiredPosition, "mf_NotRunning_MovementScale");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x33A0 | 0x800BF464 | size: 0x9C
  */
-inline void DesireGooey::UnidentifiedVirtual7(
+inline void DesireGooey::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireGooeyType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireGooeyType, cache);
+        RegisterDebugFields(&sDesireGooeyType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -993,24 +993,24 @@ inline void DesireGooey::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x309C | 0x800BF160 | size: 0xEC
  */
-inline void DesireShrink::UnidentifiedVirtual8(
+inline void DesireShrink::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireShrink");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfSlowPercentage - (u8*)&mvDesiredPosition, "mfSlowPercentage");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3188 | 0x800BF24C | size: 0x9C
  */
-inline void DesireShrink::UnidentifiedVirtual7(
+inline void DesireShrink::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireShrinkType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireShrinkType, cache);
+        RegisterDebugFields(&sDesireShrinkType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -1022,7 +1022,7 @@ inline void DesireShrink::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x2E84 | 0x800BEF48 | size: 0x17C
  */
-inline void DesireFrozen::UnidentifiedVirtual8(
+inline void DesireFrozen::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireFrozen");
@@ -1031,19 +1031,19 @@ inline void DesireFrozen::UnidentifiedVirtual8(
     cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, (u8*)&mePrevActionState - (u8*)&mvDesiredPosition, "mePrevActionState");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfPrevFrozenTime - (u8*)&mvDesiredPosition, "mfPrevFrozenTime");
     cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbWasDazed - (u8*)&mvDesiredPosition, "mbWasDazed");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3000 | 0x800BF0C4 | size: 0x9C
  */
-inline void DesireFrozen::UnidentifiedVirtual7(
+inline void DesireFrozen::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireFrozenType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireFrozenType, cache);
+        RegisterDebugFields(&sDesireFrozenType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -1055,25 +1055,25 @@ inline void DesireFrozen::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x2CD8 | 0x800BED9C | size: 0x110
  */
-inline void DesireConfused::UnidentifiedVirtual8(
+inline void DesireConfused::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireConfused");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfConfusedPercentage - (u8*)&mvDesiredPosition, "mfConfusedPercentage");
     cache->AddField(DEBUG_FIELD_INT, gDebugFieldTypes[DEBUG_FIELD_INT].size, (u8*)&mfConfusedDirection - (u8*)&mvDesiredPosition, "mfConfusedDirection");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x2DE8 | 0x800BEEAC | size: 0x9C
  */
-inline void DesireConfused::UnidentifiedVirtual7(
+inline void DesireConfused::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireConfusedType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireConfusedType, cache);
+        RegisterDebugFields(&sDesireConfusedType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

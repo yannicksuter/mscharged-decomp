@@ -115,20 +115,20 @@ void UnidentifiedVariant_80054AB8::SetParameter(int index, FuzzyVariant value)
     ExtraData.Set(index, value);
 }
 
-inline void DesireInterceptBall::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireInterceptBall::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireInterceptBall");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&meDesireSubState - (u8*)&mvDesiredPosition, "meDesireSubState");
     cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbInterceptPass - (u8*)&mvDesiredPosition, "mbInterceptPass");
     cache->EndType();
 }
 
-inline void DesireInterceptBall::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireInterceptBall::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireInterceptBallType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireInterceptBallType, cache);
+        RegisterDebugFields(&sDesireInterceptBallType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

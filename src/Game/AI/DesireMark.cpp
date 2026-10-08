@@ -357,23 +357,23 @@ extern "C" DesireUpdate fn_800B9020(
 /**
  * Offset/Address/Size: 0x23C8 | 0x800B9188 | size: 0xC8
  */
-inline void DesireMark::UnidentifiedVirtual8(
+inline void DesireMark::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireMark");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x2490 | 0x800B9250 | size: 0x9C
  */
-inline void DesireMark::UnidentifiedVirtual7(
+inline void DesireMark::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireMarkType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireMarkType, cache);
+        RegisterDebugFields(&sDesireMarkType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -386,23 +386,23 @@ inline void DesireMark::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x2264 | 0x800B9024 | size: 0xC8
  */
-inline void DesireDefendPos::UnidentifiedVirtual8(
+inline void DesireDefendPos::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireDefendPos");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x232C | 0x800B90EC | size: 0x9C
  */
-inline void DesireDefendPos::UnidentifiedVirtual7(
+inline void DesireDefendPos::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireDefendPosType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireDefendPosType, cache);
+        RegisterDebugFields(&sDesireDefendPosType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

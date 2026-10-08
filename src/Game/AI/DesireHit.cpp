@@ -26,18 +26,18 @@ DesireHit::~DesireHit()
 {
 }
 
-inline void DesireHit::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireHit::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireHit");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireHit::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireHit::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireHitType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireHitType, cache);
+        RegisterDebugFields(&sDesireHitType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

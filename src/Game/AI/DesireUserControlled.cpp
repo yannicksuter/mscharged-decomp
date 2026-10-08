@@ -166,24 +166,24 @@ void DesireUserControlled::Cleanup()
 /**
  * Offset/Address/Size: 0x7C0 | 0x800D4C4C | size: 0xC8
  */
-inline void DesireUserControlled::UnidentifiedVirtual8(
+inline void DesireUserControlled::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireUserControlled");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x888 | 0x800D4D14 | size: 0x9C
  */
-inline void DesireUserControlled::UnidentifiedVirtual7(
+inline void DesireUserControlled::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireUserControlledType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireUserControlledType, cache);
+        RegisterDebugFields(&sDesireUserControlledType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

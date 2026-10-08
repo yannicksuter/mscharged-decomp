@@ -396,18 +396,18 @@ DesireRunToTarget::~DesireRunToTarget()
 {
 }
 
-inline void DesireGetInPosition::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireGetInPosition::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireGetInPosition");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireGetInPosition::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireGetInPosition::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireGetInPositionType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireGetInPositionType, cache);
+        RegisterDebugFields(&sDesireGetInPositionType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -416,18 +416,18 @@ inline void DesireGetInPosition::UnidentifiedVirtual7(void* context, DebugWriteC
     cache->WriteData(sDesireGetInPositionType, data, sizeof(DesireGetInPosition) - offset);
 }
 
-inline void DesireRunUpfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireRunUpfield::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireRunUpfield");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireRunUpfield::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireRunUpfield::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireRunUpfieldType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireRunUpfieldType, cache);
+        RegisterDebugFields(&sDesireRunUpfieldType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -436,18 +436,18 @@ inline void DesireRunUpfield::UnidentifiedVirtual7(void* context, DebugWriteCach
     cache->WriteData(sDesireRunUpfieldType, data, sizeof(DesireRunUpfield) - offset);
 }
 
-inline void DesireRunDownfield::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireRunDownfield::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireRunDownfield");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireRunDownfield::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireRunDownfield::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireRunDownfieldType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireRunDownfieldType, cache);
+        RegisterDebugFields(&sDesireRunDownfieldType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -456,10 +456,10 @@ inline void DesireRunDownfield::UnidentifiedVirtual7(void* context, DebugWriteCa
     cache->WriteData(sDesireRunDownfieldType, data, sizeof(DesireRunDownfield) - offset);
 }
 
-inline void DesireRunInDirection::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireRunInDirection::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireRunInDirection");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(19, gDebugFieldTypes[19].size, (u8*)&m_aDirection - (u8*)&mvDesiredPosition, "m_aDirection");
     cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fMaxDistance - (u8*)&mvDesiredPosition, "m_fMaxDistance");
     cache->AddField(17, gDebugFieldTypes[17].size, (u8*)&m_fDistTravelled - (u8*)&mvDesiredPosition, "m_fDistTravelled");
@@ -469,11 +469,11 @@ inline void DesireRunInDirection::UnidentifiedVirtual8(void* field, DebugWriteCa
     cache->EndType();
 }
 
-inline void DesireRunInDirection::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireRunInDirection::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireRunInDirectionType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireRunInDirectionType, cache);
+        RegisterDebugFields(&sDesireRunInDirectionType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -488,10 +488,10 @@ inline void DesireRunInDirection::UnidentifiedVirtual7(void* context, DebugWrite
     }
 }
 
-inline void DesireRunToTarget::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireRunToTarget::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireRunToTarget");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size, (u8*)&m_pTargetFielder - (u8*)&mvDesiredPosition, "m_pTargetFielder");
     cache->AddField(22, gDebugFieldTypes[22].size, (u8*)&m_vTargetPos - (u8*)&mvDesiredPosition, "m_vTargetPos");
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&m_eDirection - (u8*)&mvDesiredPosition, "m_eDirection");
@@ -502,11 +502,11 @@ inline void DesireRunToTarget::UnidentifiedVirtual8(void* field, DebugWriteCache
     cache->EndType();
 }
 
-inline void DesireRunToTarget::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireRunToTarget::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireRunToTargetType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireRunToTargetType, cache);
+        RegisterDebugFields(&sDesireRunToTargetType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

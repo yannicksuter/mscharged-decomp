@@ -6582,7 +6582,7 @@ void cFielder::SyncLog(void* context, DebugWriteCache* cache)
             }
             cache->ChecksumData(gFielderDesireStateDebugType, &state, context);
             cache->WriteData(gFielderDesireStateDebugType, &state, sizeof(state));
-            desire->UnidentifiedVirtual7(context, cache);
+            desire->SyncLog(context, cache);
         }
     }
 }

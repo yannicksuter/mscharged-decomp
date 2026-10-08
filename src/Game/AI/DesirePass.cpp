@@ -277,12 +277,12 @@ DesireUpdate TransDesireLooseBallContact(
 /**
  * Offset/Address/Size: 0x187C | 0x800BBDF8 | size: 0x134
  */
-inline void DesirePreparePass::UnidentifiedVirtual8(
+inline void DesirePreparePass::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field =
         cache->BeginType("DesirePreparePass");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
@@ -298,12 +298,12 @@ inline void DesirePreparePass::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x19B0 | 0x800BBF2C | size: 0xC0
  */
-inline void DesirePreparePass::UnidentifiedVirtual7(
+inline void DesirePreparePass::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesirePreparePassType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesirePreparePassType, cache);
+        RegisterDebugFields(&sDesirePreparePassType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -322,11 +322,11 @@ inline void DesirePreparePass::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x16AC | 0x800BBC28 | size: 0x110
  */
-inline void DesirePass::UnidentifiedVirtual8(
+inline void DesirePass::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesirePass");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
@@ -339,12 +339,12 @@ inline void DesirePass::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x17BC | 0x800BBD38 | size: 0xC0
  */
-inline void DesirePass::UnidentifiedVirtual7(
+inline void DesirePass::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesirePassType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesirePassType, cache);
+        RegisterDebugFields(&sDesirePassType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

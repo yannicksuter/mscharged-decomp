@@ -83,23 +83,23 @@ void DesireRunToNet::Cleanup()
 /**
  * Offset/Address/Size: 0x21C | 0x800C3FB8 | size: 0xC8
  */
-inline void DesireRunToNet::UnidentifiedVirtual8(
+inline void DesireRunToNet::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireRunToNet");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x2E4 | 0x800C4080 | size: 0x9C
  */
-inline void DesireRunToNet::UnidentifiedVirtual7(
+inline void DesireRunToNet::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireRunToNetType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireRunToNetType, cache);
+        RegisterDebugFields(&sDesireRunToNetType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

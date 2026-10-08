@@ -142,12 +142,12 @@ inline DesireSlideAttack::~DesireSlideAttack()
 /**
  * Offset/Address/Size: 0x750 | 0x800C852C | size: 0x110
  */
-inline void DesireSlideAttack::UnidentifiedVirtual8(
+inline void DesireSlideAttack::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireSlideAttack");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
     cache->AddField(14, gDebugFieldTypes[14].size,
@@ -159,12 +159,12 @@ inline void DesireSlideAttack::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x860 | 0x800C863C | size: 0xC0
  */
-inline void DesireSlideAttack::UnidentifiedVirtual7(
+inline void DesireSlideAttack::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSlideAttackType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireSlideAttackType, cache);
+        RegisterDebugFields(&sDesireSlideAttackType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

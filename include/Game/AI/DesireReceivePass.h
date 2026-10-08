@@ -17,8 +17,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 
     void ProcessUserInput();
     void RequestOneTouchShot(bool);
@@ -112,12 +112,12 @@ private:
     Estimated mEstimated;
 };
 
-inline void DesireReceivePass::UnidentifiedVirtual8(
+inline void DesireReceivePass::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field =
         cache->BeginType("DesireReceivePass");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(16, gDebugFieldTypes[16].size,
         (u8*)&mbValidPassIntercept - (u8*)&mvDesiredPosition,
         "mbValidPassIntercept");
@@ -178,12 +178,12 @@ inline void DesireReceivePass::UnidentifiedVirtual8(
     cache->EndType();
 }
 
-inline void DesireReceivePass::UnidentifiedVirtual7(
+inline void DesireReceivePass::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireReceivePassType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireReceivePassType, cache);
+        RegisterDebugFields(&sDesireReceivePassType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

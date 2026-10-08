@@ -35,8 +35,8 @@ public:
     {
     }
     virtual void SetContext(ScriptMachine*);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 
     const nlVector3& GetDesiredPosition() const { return mvDesiredPosition; }
 
@@ -90,8 +90,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     SpaceSearch* mpSpaceSearch;
@@ -110,8 +110,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     cFielder* mpTarget;
@@ -129,8 +129,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireInterceptBall : public Desire
@@ -146,8 +146,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     int meDesireSubState;
@@ -169,8 +169,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     SpaceSearch* mpSpaceSearch;
@@ -190,8 +190,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireRunUpfield : public Desire
@@ -206,8 +206,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireRunDownfield : public Desire
@@ -222,8 +222,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireRunInDirection : public Desire
@@ -242,8 +242,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     unsigned short m_aDirection;
@@ -267,8 +267,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
     cBall* GetTargetBall() const { return m_pTargetBall; }
 
@@ -293,8 +293,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 DesireUpdate TransDesireDefendPos(AIContext* input);
@@ -310,8 +310,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireMegaStrike : public Desire
@@ -327,8 +327,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     bool UpdateAIButtonPress(DesireUpdate*, float);
@@ -352,8 +352,8 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireMushroom : public Desire
@@ -368,8 +368,8 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 extern float gSlipperySlideFactor;
@@ -386,8 +386,8 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 };
 
 class DesireGooey : public Desire
@@ -399,8 +399,8 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 
     float GetSpeedScale();
 
@@ -424,8 +424,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 
     float GetSpeedScale();
 
@@ -456,8 +456,8 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 
     void Activate(float duration, int state);
 
@@ -488,8 +488,8 @@ public:
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual void SyncLog(void*, DebugWriteCache*);
+    virtual void RegisterDebugFields(void*, DebugWriteCache*);
 
     void AdjustInputDirection(unsigned short*);
 
@@ -498,7 +498,7 @@ private:
     float mfConfusedDirection;
 };
 
-inline void Desire::UnidentifiedVirtual8(void*, DebugWriteCache* cache)
+inline void Desire::RegisterDebugFields(void*, DebugWriteCache* cache)
 {
     cache->AddField(22, gDebugFieldTypes[22].size, 0, "mvDesiredPosition");
     cache->AddField(14, gDebugFieldTypes[14].size, (u8*)&mTurboRequest - (u8*)&mvDesiredPosition, "mTurboRequest");

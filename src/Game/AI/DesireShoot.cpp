@@ -200,11 +200,11 @@ void DesireShoot::Update(
 /**
  * Offset/Address/Size: 0xFFC | 0x800C5194 | size: 0xEC
  */
-inline void DesireWindupShot::UnidentifiedVirtual8(
+inline void DesireWindupShot::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireWindupShot");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbShotMeterActivated - (u8*)&mvDesiredPosition, "mbShotMeterActivated");
     cache->EndType();
 }
@@ -212,12 +212,12 @@ inline void DesireWindupShot::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x10E8 | 0x800C5280 | size: 0x9C
  */
-inline void DesireWindupShot::UnidentifiedVirtual7(
+inline void DesireWindupShot::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireWindupShotType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireWindupShotType, cache);
+        RegisterDebugFields(&sDesireWindupShotType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -229,11 +229,11 @@ inline void DesireWindupShot::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0xE74 | 0x800C500C | size: 0xEC
  */
-inline void DesireShoot::UnidentifiedVirtual8(
+inline void DesireShoot::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireShoot");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbLobShot - (u8*)&mvDesiredPosition, "mbLobShot");
     cache->EndType();
 }
@@ -241,12 +241,12 @@ inline void DesireShoot::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0xF60 | 0x800C50F8 | size: 0x9C
  */
-inline void DesireShoot::UnidentifiedVirtual7(
+inline void DesireShoot::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireShootType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireShootType, cache);
+        RegisterDebugFields(&sDesireShootType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

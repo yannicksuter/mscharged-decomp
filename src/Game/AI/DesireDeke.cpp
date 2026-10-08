@@ -199,18 +199,18 @@ DesireDeke::~DesireDeke()
 {
 }
 
-inline void DesireDeke::UnidentifiedVirtual8(void* field, DebugWriteCache* cache)
+inline void DesireDeke::RegisterDebugFields(void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireDeke");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
-inline void DesireDeke::UnidentifiedVirtual7(void* context, DebugWriteCache* cache)
+inline void DesireDeke::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (sDesireDekeType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireDekeType, cache);
+        RegisterDebugFields(&sDesireDekeType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

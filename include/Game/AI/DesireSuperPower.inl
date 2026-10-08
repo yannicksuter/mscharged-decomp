@@ -4,12 +4,12 @@
 /**
  * Offset/Address/Size: 0x9658 | 0x800D1D54 | size: 0x110
  */
-inline void DesireSuperPower::UnidentifiedVirtual8(
+inline void DesireSuperPower::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireSuperPower");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpDKShockAvoidable - (u8*)&mvDesiredPosition,
         "mpDKShockAvoidable");
@@ -21,12 +21,12 @@ inline void DesireSuperPower::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x9768 | 0x800D1E64 | size: 0xC4
  */
-inline void DesireSuperPower::UnidentifiedVirtual7(
+inline void DesireSuperPower::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSuperPowerType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireSuperPowerType, cache);
+        RegisterDebugFields(&sDesireSuperPowerType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

@@ -1,8 +1,8 @@
-inline void DesireSteering::UnidentifiedVirtual8(
+inline void DesireSteering::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireSteering");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(14, gDebugFieldTypes[14].size,
         (u8*)&m_ePositionSeekState - (u8*)&mvDesiredPosition,
         "m_ePositionSeekState");
@@ -45,12 +45,12 @@ inline void DesireSteering::UnidentifiedVirtual8(
     cache->EndType();
 }
 
-inline void DesireSteering::UnidentifiedVirtual7(
+inline void DesireSteering::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSteeringType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireSteeringType, cache);
+        RegisterDebugFields(&sDesireSteeringType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
