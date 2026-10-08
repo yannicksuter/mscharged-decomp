@@ -15,8 +15,8 @@ public:
     }
     static void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
     virtual int GetValueType() { return 1; }
-    virtual int UnidentifiedVirtual30() { return 1; }
-    virtual int TweakNameVirtual34() { return 0; }
+    virtual int ReservedNameQueryA() { return 1; }
+    virtual int ReservedNameQueryB() { return 0; }
     virtual void FormatValue(char*, unsigned long) { }
     virtual void ParseValue(const char*) { }
     virtual void CopyValueFrom(TweakValueBase*) { }

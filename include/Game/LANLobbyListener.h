@@ -10,7 +10,7 @@ public:
     virtual void OnGameJoined(int result) = 0;
     virtual void OnGameLaunched(int result) = 0;
     virtual void OnGameFound(LANGameInfo* game) = 0;
-    virtual void LobbyListenerVirtual10() = 0;
+    virtual void OnReservedLobbyEvent() = 0;
     virtual void OnGameExpired(LANGameInfo* game) = 0;
     virtual void OnLobbyShutdown() = 0;
 };

@@ -141,7 +141,7 @@ int LANLobby::CreateGame(int gameType)
         mAdvertiseGame = false;
     else
         mAdvertiseGame = true;
-    mSocket->SocketVirtual10(true);
+    mSocket->SetConnectionEnabled(true);
     if (mListener != 0)
         mListener->OnGameCreated(0);
     return 0;
@@ -172,7 +172,7 @@ int LANLobby::AbortCreateGame(int result)
         mFindGameElapsedTime = g_fBroadCastFindGameTime;
     }
     mAdvertiseGame = false;
-    mSocket->SocketVirtual10(false);
+    mSocket->SetConnectionEnabled(false);
     if (mListener != 0)
         mListener->OnGameCreated(result);
     mHostState = 0;
@@ -229,7 +229,7 @@ int LANLobby::JoinGame(LANGameInfo* game, int gameType)
     }
     mLaunchConfirmationPending = false;
     if (mTopology == 0)
-        mSocket->SocketVirtual10(true);
+        mSocket->SetConnectionEnabled(true);
     m_ConnectionPool[0].mStatus = 1;
     if (mSocket->Connect(&m_ConnectionPool[0].m_Connection,
             game->mAddress,
@@ -241,7 +241,7 @@ int LANLobby::JoinGame(LANGameInfo* game, int gameType)
     {
         m_ConnectionPool[0].m_Connection = 0;
         m_ConnectionPool[0].mStatus = 0;
-        mSocket->SocketVirtual10(false);
+        mSocket->SetConnectionEnabled(false);
         tDebugPrintManager::Print(DC_NETWORK, "Connection failed at outset\n");
         return 4;
     }
@@ -252,7 +252,7 @@ int LANLobby::JoinGame(LANGameInfo* game, int gameType)
 void LANLobby::OnGameStarted()
 {
     mAdvertiseGame = false;
-    mSocket->SocketVirtual10(false);
+    mSocket->SetConnectionEnabled(false);
     if (mIsHost)
         mHostState = 2;
     tDebugPrintManager::Print(DC_NETWORK, "LANLobby Game Started\n");
@@ -274,7 +274,7 @@ void LANLobby::Shutdown(bool)
         mFindGameElapsedTime = g_fBroadCastFindGameTime;
     }
     mAdvertiseGame = false;
-    mSocket->SocketVirtual10(false);
+    mSocket->SetConnectionEnabled(false);
     mJoinState = 0;
     mLaunchConfirmationPending = false;
     mLocalMachineIndex = -1;

@@ -73,7 +73,7 @@ void NetworkSocket::OnConnectionClosed(
     mListener->OnConnectionClosed(connection, reason);
 }
 
-void NetworkSocket::ReliableCallbackVirtual08()
+void NetworkSocket::OnReservedReliableEvent()
 {
 }
 
@@ -236,13 +236,13 @@ void NetworkSocket::SendBroadcast(void* buffer, int size)
         size + sizeof(mVersionWord), 1001);
 }
 
-void NetworkSocket::SocketVirtual10(bool enabled)
+void NetworkSocket::SetConnectionEnabled(bool enabled)
 {
     mReliableSocket.SetEnabled(enabled);
     mConnectionEnabled = enabled;
 }
 
-bool NetworkSocket::SocketVirtual14()
+bool NetworkSocket::IsConnectionEnabled()
 {
     return mConnectionEnabled;
 }
@@ -290,7 +290,7 @@ void NetworkSocket::Receive(void* buffer, int size)
     mListener->OnMessageReceived(-1, buffer, size, true);
 }
 
-void NetworkSocket::SocketVirtual34(
+void NetworkSocket::SendVoice(
     u8 aid, void* buffer, int size)
 {
     mReliableSocket.SendVoice(aid, buffer, size);
@@ -360,7 +360,7 @@ void NetworkSocket::DebugDraw(int a, int* b, bool c)
     }
 }
 
-void NetworkSocket::SocketVirtual48()
+void NetworkSocket::DrawScreenPrinter()
 {
     if (!mInitialized)
     {

@@ -77,7 +77,7 @@ void NetworkSessionBase::DebugDraw()
     glFontEnd();
     if (socket != 0)
     {
-        socket->SocketVirtual48();
+        socket->DrawScreenPrinter();
     }
 }
 

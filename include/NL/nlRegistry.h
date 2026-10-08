@@ -80,11 +80,11 @@ public:
     virtual RegistryValue NamedList() = 0;
     virtual RegistryNode* AddNamed(const char* name) = 0;
     virtual RegistryContainer* AddChild(const char* name) = 0;
-    virtual void RegistryContainerVirtual28() = 0;
+    virtual void ReservedContainerHookA() = 0;
     virtual RegistryNode* AddUnnamed() = 0;
     virtual RegistryContainer* AddUnnamedChild() = 0;
-    virtual void RegistryContainerVirtual34() = 0;
-    virtual void RegistryContainerVirtual38() = 0;
+    virtual void ReservedContainerHookB() = 0;
+    virtual void ReservedContainerHookC() = 0;
     virtual void GetIterator(RegistryIteratorBase* iterator, int which) const = 0;
     virtual RegistryNode* Find(const u32& hash) = 0;
 };
@@ -223,11 +223,11 @@ public:
     virtual RegistryValue NamedList();
     virtual RegistryNode* AddNamed(const char* name);
     virtual RegistryContainer* AddChild(const char* name);
-    virtual void RegistryContainerVirtual28();
+    virtual void ReservedContainerHookA();
     virtual RegistryNode* AddUnnamed();
     virtual RegistryContainer* AddUnnamedChild();
-    virtual void RegistryContainerVirtual34();
-    virtual void RegistryContainerVirtual38();
+    virtual void ReservedContainerHookB();
+    virtual void ReservedContainerHookC();
     virtual RegistryNode* FindNode(const u32& hash);
     virtual void GetIterator(RegistryIteratorBase* iterator, int which) const;
     virtual RegistryNode* Find(const u32& hash);
@@ -346,9 +346,9 @@ public:
     virtual RegistryNode* Find(const u32& hash);
     virtual RegistryValue UnnamedList();
     virtual RegistryValue NamedList();
-    virtual void RegistryContainerVirtual28();
-    virtual void RegistryContainerVirtual38();
-    virtual void RegistryContainerVirtual34();
+    virtual void ReservedContainerHookA();
+    virtual void ReservedContainerHookC();
+    virtual void ReservedContainerHookB();
     virtual void GetIterator(RegistryIteratorBase* iterator, int which) const;
 
     const u32* NamedTypes() const
@@ -402,9 +402,9 @@ public:
     virtual RegistryValue UnnamedList();
     virtual RegistryValue NamedList();
     virtual RegistryContainer* AddChild(const char* name);
-    virtual void RegistryContainerVirtual28();
-    virtual void RegistryContainerVirtual38();
-    virtual void RegistryContainerVirtual34();
+    virtual void ReservedContainerHookA();
+    virtual void ReservedContainerHookC();
+    virtual void ReservedContainerHookB();
     virtual RegistryNode* Find(const u32& hash);
 
     /* 0x10 */ RegistryContainer* mParent;

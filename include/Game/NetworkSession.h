@@ -48,7 +48,7 @@ public:
     virtual void OnConnectionRequest(u32 connection, u8* address) = 0;
     virtual void OnConnected(u32 connection, int result) = 0;
     virtual void OnConnectionClosed(u32 connection, int reason) = 0;
-    virtual void ListenerVirtual14() = 0;
+    virtual void OnReservedConnectionEvent() = 0;
     virtual void OnVoiceReceived() = 0;
 };
 
@@ -61,8 +61,8 @@ public:
     virtual void Shutdown() = 0;
     virtual void SetBroadcastEnabled(bool enabled) = 0;
     virtual void SendBroadcast(void* buffer, int size) = 0;
-    virtual void SocketVirtual10(bool enabled) = 0;
-    virtual bool SocketVirtual14() = 0;
+    virtual void SetConnectionEnabled(bool enabled) = 0;
+    virtual bool IsConnectionEnabled() = 0;
     virtual bool Connect(void* connection, const u8* address, u16 port,
         int p4 = 0, int p5 = 0) = 0;
     virtual void AcceptConnection(u32 connection) = 0;
@@ -72,10 +72,10 @@ public:
     virtual void* FindConnection(const u8* address) = 0;
     virtual void Send(int aid, void* buffer, int size, bool reliable) = 0;
     virtual void Receive(void* buffer, int size) = 0;
-    virtual void SocketVirtual34(u8 aid, void* buffer, int size) = 0;
+    virtual void SendVoice(u8 aid, void* buffer, int size) = 0;
     virtual void Update(float dt) = 0;
     virtual void DebugDraw(int a, int* b, bool c) = 0;
-    virtual void SocketVirtual48() = 0;
+    virtual void DrawScreenPrinter() = 0;
     virtual u8* GetLocalAddress() = 0;
     virtual u16 GetLocalPort() = 0;
 };
@@ -143,7 +143,7 @@ public:
     virtual NetworkMachineRoster* GetMachineRoster();
     virtual LANLobby* GetTransport();
     virtual void InitializeGamePeers(const NetworkGameStartInfo* info);
-    virtual void BaseVirtual40();
+    virtual void ReservedSessionHook();
     virtual void StartNetworkedGame(NetMessageGameStart* message);
     virtual void EndNetworkedGame(int reason);
     virtual int Send(s8 machineIndex, void* buffer, int size, bool reliable);
@@ -170,8 +170,8 @@ public:
     virtual void Shutdown();
     virtual void SetBroadcastEnabled(bool enabled);
     virtual void SendBroadcast(void* buffer, int size);
-    virtual void SocketVirtual10(bool enabled);
-    virtual bool SocketVirtual14();
+    virtual void SetConnectionEnabled(bool enabled);
+    virtual bool IsConnectionEnabled();
     virtual bool Connect(void* connection, const u8* address, u16 port,
         int p4 = 0, int p5 = 0);
     virtual void AcceptConnection(u32 connection);
@@ -181,16 +181,16 @@ public:
     virtual void* FindConnection(const u8* address);
     virtual void Send(int aid, void* buffer, int size, bool reliable);
     virtual void Receive(void* buffer, int size);
-    virtual void SocketVirtual34(u8 aid, void* buffer, int size);
+    virtual void SendVoice(u8 aid, void* buffer, int size);
     virtual void Update(float dt);
     virtual void DebugDraw(int a, int* b, bool c);
-    virtual void SocketVirtual48();
+    virtual void DrawScreenPrinter();
     virtual u8* GetLocalAddress();
     virtual u16 GetLocalPort();
 
     virtual void OnConnectionAttempted(u32 connection, int result);
     virtual void OnConnectionClosed(u32 connection, int reason);
-    virtual void ReliableCallbackVirtual08();
+    virtual void OnReservedReliableEvent();
     virtual void OnMessageReceived(
         u32 connection, void* buffer, int size, bool reliable);
     virtual void OnVoiceReceived(
@@ -455,7 +455,7 @@ public:
     virtual NetworkMachineRoster* GetMachineRoster();
     virtual LANLobby* GetTransport();
     virtual void InitializeGamePeers(const NetworkGameStartInfo* info);
-    virtual void BaseVirtual40();
+    virtual void ReservedSessionHook();
     virtual void StartNetworkedGame(NetMessageGameStart* message);
     virtual void EndNetworkedGame(int reason);
     virtual int Send(s8 machineIndex, void* buffer, int size, bool reliable);
@@ -473,7 +473,7 @@ public:
     virtual void OnConnectionRequest(u32 connection, u8* address);
     virtual void OnConnected(u32 connection, int result);
     virtual void OnConnectionClosed(u32 connection, int reason);
-    virtual void ListenerVirtual14();
+    virtual void OnReservedConnectionEvent();
     virtual void OnVoiceReceived();
 
     virtual int ProcessMessage(NetworkMessage* message);

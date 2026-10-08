@@ -344,7 +344,7 @@ void NetworkLobby::OnGameStarted()
 {
     tDebugPrintManager::Print(DC_NETWORK, "DWCLobby GameStarted\n");
     mConnectionDeadline = 0.0f;
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
+    g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
 }
 
 void NetworkLobby::CloseConnections()
@@ -371,7 +371,7 @@ void NetworkLobby::CloseConnections()
 
 void NetworkLobby::CloseConnectionsAndReset()
 {
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
+    g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
     CloseConnections();
     Reset();
 }
@@ -455,7 +455,7 @@ void NetworkLobby::CancelMatchmaking()
     tDebugPrintManager::Print(DC_NETWORK, "DWC Cancel Matchmaking\n");
     DWC_CancelMatching();
     mCancelRequested = false;
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
+    g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
     mState = 0;
 }
 
@@ -565,7 +565,7 @@ bool NetworkLobby::StartMatchmaking()
     tDebugPrintManager::Print(DC_NETWORK,
         "Started DWC_ConnectToAnybodyAsync with filter %s\n", filter);
     mState = 3;
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(true);
+    g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(true);
     return true;
 }
 
@@ -628,7 +628,7 @@ void NetworkLobby::OnMatchmakingResult(
     {
         tDebugPrintManager::Print(DC_NETWORK, "Matching Error\n");
         g_pNetworkSession->ReadAndClearDWCError();
-        g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
+        g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
         mState = 0;
         mMatchFailed = true;
     }
@@ -669,7 +669,7 @@ bool NetworkLobby::StartFriendServer()
 
     tDebugPrintManager::Print(DC_NETWORK, "Started DWC_SetupGameServer\n");
     mState = 1;
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(true);
+    g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(true);
     return true;
 }
 
@@ -710,7 +710,7 @@ bool NetworkLobby::ConnectToFriendServer(int profileId)
 
     tDebugPrintManager::Print(DC_NETWORK, "Started DWC_ConnectToGameServerAsync\n");
     mState = 1;
-    g_pNetworkSession->GetDirectSocket()->SocketVirtual10(true);
+    g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(true);
     return true;
 }
 
@@ -803,7 +803,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
     {
         tDebugPrintManager::Print(DC_NETWORK, "Matching Error\n");
         g_pNetworkSession->ReadAndClearDWCError();
-        g_pNetworkSession->GetDirectSocket()->SocketVirtual10(false);
+        g_pNetworkSession->GetDirectSocket()->SetConnectionEnabled(false);
         mState = 0;
         mMatchFailed = true;
     }

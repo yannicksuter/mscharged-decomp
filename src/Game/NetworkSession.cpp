@@ -1575,7 +1575,7 @@ void NetworkSession::OnConnectionClosed(u32 connection, int reason)
     }
 }
 
-void NetworkSession::ListenerVirtual14()
+void NetworkSession::OnReservedConnectionEvent()
 {
 }
 
@@ -2010,7 +2010,7 @@ static void ApplyRecordedGameConfig(RecordedGameConfig* config)
     }
 }
 
-void NetworkSession::BaseVirtual40()
+void NetworkSession::ReservedSessionHook()
 {
 }
 

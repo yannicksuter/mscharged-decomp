@@ -9,7 +9,7 @@ class ReliableSocketCallback
 public:
     virtual void OnConnectionAttempted(u32 connection, int result) = 0;
     virtual void OnConnectionClosed(u32 connection, int reason) = 0;
-    virtual void ReliableCallbackVirtual08() = 0;
+    virtual void OnReservedReliableEvent() = 0;
     virtual void OnMessageReceived(
         u32 connection, void* buffer, int size, bool reliable) = 0;
     virtual void OnVoiceReceived(

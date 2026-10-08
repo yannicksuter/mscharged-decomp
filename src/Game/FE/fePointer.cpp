@@ -53,9 +53,9 @@ void FEPointerListener::ProcessPointerEvent(const FEPointerEvent* event)
             OnPointerPress(event->mIndex, mContext);
         }
 
-        if (event->mFlag0E)
+        if (event->mAuxiliaryTriggered)
         {
-            UnidentifiedVirtual24(event->mIndex, mContext);
+            OnPointerAuxiliaryAction(event->mIndex, mContext);
         }
     }
     else if (ContainsPoint(mPreviousEvents[event->mIndex].mPosition))
@@ -346,11 +346,11 @@ void FEPointerListener::OnPointerPress(int index, void* context)
     }
 }
 
-void FEPointerListener::UnidentifiedVirtual24(int index, void* context)
+void FEPointerListener::OnPointerAuxiliaryAction(int index, void* context)
 {
-    if (mUnidentified34)
+    if (mAuxiliaryCallback)
     {
-        mUnidentified34(index, context);
+        mAuxiliaryCallback(index, context);
     }
 }
 
