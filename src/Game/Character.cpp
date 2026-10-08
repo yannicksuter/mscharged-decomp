@@ -947,7 +947,7 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     newController = NewAnimController(animID, bRestartCyclic, bForceMirrorSwap, 0, 0);
     if (m_pAILayer[0] != 0 && finalBlendTime != 0.0f)
     {
-        if (m_pAILayer[0]->GetType() == 0)
+        if (m_pAILayer[0]->GetType() == POSE_NODE_BLENDER)
         {
             blender = (cPN_Blender*)m_pAILayer[0];
             if (blender->GetNumChildren() == 2 && blender->m_fBlendTime < 0.001f)

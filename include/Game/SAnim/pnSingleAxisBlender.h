@@ -20,7 +20,7 @@ public:
     virtual cPoseNode* Update(float dt);
     virtual int GetType()
     {
-        return 3;
+        return POSE_NODE_SINGLE_AXIS_BLENDER;
     }
     virtual void BlendRootTrans(nlVector3* outBase, float weight, float* scratch);
     virtual void BlendRootRot(u16* outRot, float weight, float* scratch);

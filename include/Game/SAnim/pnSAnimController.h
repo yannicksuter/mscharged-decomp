@@ -30,7 +30,7 @@ public:
     virtual cPoseNode* Update(float dt);
     virtual int GetType()
     {
-        return 2;
+        return POSE_NODE_ANIMATION;
     }
     virtual void BlendRootTrans(
         nlVector3* rootTranslation, float weight, float* accumulatedWeight);

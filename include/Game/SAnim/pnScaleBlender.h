@@ -25,7 +25,7 @@ public:
     virtual cPoseNode* Update(float dt);
     virtual int GetType()
     {
-        return 4;
+        return POSE_NODE_SCALE_BLENDER;
     }
     virtual void BlendRootTrans(
         nlVector3* outBase, float weight, float* scratch);
