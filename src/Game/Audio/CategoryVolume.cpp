@@ -51,7 +51,7 @@ CategoryVolumeParameter::CategoryVolumeParameter()
 {
 }
 
-void CategoryVolume::CreateParameter(u32 definition, const void*, bool negate,
+void CategoryVolume::CreateParameter(unsigned int definition, const void*, bool negate,
     AudioEffectParameter** output)
 {
     CategoryVolumeParameter* parameter

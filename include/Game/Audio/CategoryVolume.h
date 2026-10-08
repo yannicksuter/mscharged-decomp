@@ -24,7 +24,7 @@ public:
     }
 
     float m_Volume;
-    u32 m_Category;
+    unsigned int m_Category;
 
     static SlotPool<CategoryVolumeParameter> s_Pool;
 };
@@ -39,7 +39,7 @@ public:
         m_ResultParameter = &m_Final;
     }
 
-    virtual void CreateParameter(u32 definition, const void* context, bool negate,
+    virtual void CreateParameter(unsigned int definition, const void* context, bool negate,
         AudioEffectParameter** output);
     virtual void BeginBlend();
     virtual void BlendParameter(AudioEffectParameter* destination,
