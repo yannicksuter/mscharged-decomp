@@ -56,7 +56,7 @@ static bool sCharacterDamageLightingEnabled;
 static bool sCharacterDamageFresnelIndicesInitialized;
 static unsigned long sCharacterDamageBoundTexture;
 
-extern "C" void glxConfigureCharacterDamageLighting(bool enabled, GXCharacterDamageMaterialProgram*)
+void glxConfigureCharacterDamageLighting(bool enabled, GXCharacterDamageMaterialProgram*)
 {
     if (!sCharacterDamageEnabled)
         return;
