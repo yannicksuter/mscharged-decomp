@@ -3015,7 +3015,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         }
     }
 
-    if (g_pGame->m_eGameState == 3 || bNearGoal)
+    if (g_pGame->m_eGameState == GS_END_GAME || bNearGoal)
     {
         KillWindup("ball_sts_windup");
         InitActionShot(false, false);

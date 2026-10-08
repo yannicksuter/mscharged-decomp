@@ -177,7 +177,7 @@ extern "C" void UpdateShockwaves(float dt)
             continue;
         }
 
-        if ((!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 3)
+        if ((!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != GS_END_GAME)
             || shockwave->mFinished)
         {
             delete shockwave;

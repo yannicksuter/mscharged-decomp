@@ -385,7 +385,7 @@ bool DesireShrink::Initialize(void* context)
     }
 
     if (g_pGame->IsGameplayOrOvertime()
-        && g_pGame->m_eGameState != 4)
+        && g_pGame->m_eGameState != GS_UNLOADING)
     {
         PlaySound(source->m_uSoundSlotId, 0xE6E31092, 0, 0);
     }
@@ -425,7 +425,7 @@ void DesireShrink::Cleanup()
     CreateMushroomEffect(m_pFielder);
     m_pFielder->m_pTweaks = m_pFielder->m_pNormalTweaks;
     m_pFielder->fn_8001EE74(1.0f, sShrinkScaleDuration, 1.0f);
-    if (g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 4)
+    if (g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != GS_UNLOADING)
     {
         cFielder* captain = m_pFielder->m_pTeam->GetOtherTeam()->GetCaptain();
         PlaySound(captain->m_uSoundSlotId, 0x8011C562, 0, 0);

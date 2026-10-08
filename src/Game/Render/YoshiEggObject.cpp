@@ -129,7 +129,7 @@ void YoshiEggObject::Update(float dt)
 
 void YoshiEggObject::UpdateTrailEffect(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
         return;
     if (controller.m_Replaying == 0 && ReplayManager::Instance()->mRender != 0)
     {

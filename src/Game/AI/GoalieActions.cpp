@@ -643,7 +643,7 @@ void Goalie::ActionLooseBallPickup(float fDeltaT)
     bool bOffplayActive = true;
     bool bActionStateActive = false;
     if (g_pGame->m_bBallInNet
-        || g_pGame->m_eGameState == 3)
+        || g_pGame->m_eGameState == GS_END_GAME)
     {
         bActionStateActive = true;
     }
@@ -3917,7 +3917,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
             cFielder* pOwnerFielder = g_pBall->GetOwnerFielder();
 
             if (mnOffplayPending != 0 || g_pGame->m_bBallInNet
-                || g_pGame->m_eGameState == 3
+                || g_pGame->m_eGameState == GS_END_GAME
                 || pOwnerFielder == 0
                 || IsOnSameTeam((cPlayer*)pOwnerFielder)
                 || !IsOpponentBallCarrierInRange())
@@ -4629,7 +4629,7 @@ void Goalie::ActionSnapBall(float fDeltaT)
 
     if (mnOffplayPending != GOALIE_OFFPLAY_NONE
         || g_pGame->m_bBallInNet
-        || g_pGame->m_eGameState == 3)
+        || g_pGame->m_eGameState == GS_END_GAME)
     {
         if (m_pBall != 0)
         {
@@ -5994,7 +5994,7 @@ void Goalie::ActionLobSaveContact(float fDeltaT)
 {
     float fAnimTime = m_pCurrentAnimController->m_fTime;
     bool bPlayStopped = true;
-    bool bActionStateActive = g_pGame->m_bBallInNet || g_pGame->GetGameState() == 3;
+    bool bActionStateActive = g_pGame->m_bBallInNet || g_pGame->GetGameState() == GS_END_GAME;
 
     if (!bActionStateActive
         && mnOffplayPending == GOALIE_OFFPLAY_NONE)

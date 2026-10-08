@@ -405,7 +405,7 @@ bool Goalie::CheckForDaze()
 inline void Goalie::CheckForBallOnHead()
 {
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime == 0 && !g_pGame->m_bBallInNet
-        && g_pGame->GetGameState() != 3 && mnOffplayPending == GOALIE_OFFPLAY_NONE
+        && g_pGame->GetGameState() != GS_END_GAME && mnOffplayPending == GOALIE_OFFPLAY_NONE
         && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0
         && g_pBall->m_pOwner == NULL && g_pBall->m_pPassTarget == NULL
         && g_pBall->m_v3Position.z > 0.8f)
@@ -418,7 +418,7 @@ inline void Goalie::CheckForBallOnHead()
 void Goalie::CollideWithBallCallback(cBall* pBall)
 {
     cPlayer::CollideWithBallCallback(pBall);
-    if (g_pGame->m_bBallInNet || g_pGame->GetGameState() == 3
+    if (g_pGame->m_bBallInNet || g_pGame->GetGameState() == GS_END_GAME
         || mnOffplayPending != GOALIE_OFFPLAY_NONE || IsInOffplay())
     {
         mbBallImpacted = true;
@@ -3854,7 +3854,7 @@ void Goalie::HandleGoalScored(int nTeamSide)
     Goalie* pGoalie = g_pTeams[nTeamSide]->GetGoalie();
     Goalie* pOtherGoalie = g_pTeams[1 - nTeamSide]->GetGoalie();
 
-    if (g_pGame->m_eGameState != 1)
+    if (g_pGame->m_eGameState != GS_KICKOFF)
     {
         pGoalie->InitActionOffplay(GOALIE_OFFPLAY_GOAL_FOR);
         pOtherGoalie->InitActionOffplay(GOALIE_OFFPLAY_GOAL_AGAINST);

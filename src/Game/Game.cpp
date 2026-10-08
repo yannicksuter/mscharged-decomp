@@ -222,7 +222,7 @@ static inline void InitializeChallengeTeamScore(cTeam* team, int side)
 
 static inline void DeliverGoalScored(cGame* game, GoalScoredData* data)
 {
-    if (game->GetGameState() != 4)
+    if (game->GetGameState() != GS_UNLOADING)
     {
         game->mEventQueue.mGoalScoredEvent.Deliver(data);
     }
@@ -326,7 +326,7 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
 }
 void fn_80056EA8()
 {
-    g_pGame->ChangeGameState(4);
+    g_pGame->ChangeGameState(GS_UNLOADING);
 }
 void DestroyGame()
 {
@@ -384,7 +384,7 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     mpTerrain = 0;
     mpWeatherManager = 0;
     mpCrowdRiot = 0;
-    m_eGameState = -1;
+    m_eGameState = GS_NONE;
 
     m_pPostResetClock = new (nlMalloc(sizeof(Clock), 8, false))
         Clock(0.0f, 0.5f, 1.0f, 2, PostResetCallback);
@@ -658,7 +658,7 @@ void cGame::StartSlowDown(float timeScale, float transitionTime)
 
     if (FixedUpdateTask::GetTargetTimeScale() != 1.0f || 1.0f != timeScale)
     {
-        if (g_pGame->m_eGameState != 4)
+        if (g_pGame->m_eGameState != GS_UNLOADING)
         {
             if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
             {
@@ -781,9 +781,9 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     GetInputRouter();
     GetDetermDataEventQueue()->Add(callback, 0, -1);
 
-    if (m_eGameState != 0)
+    if (m_eGameState != GS_PRE_GAME)
     {
-        ChangeGameState(0);
+        ChangeGameState(GS_PRE_GAME);
     }
 
     ResetGameFields();
@@ -836,7 +836,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     ReplayChoreo::Instance().Finish();
     if (bStraightToKickoff)
     {
-        ChangeGameState(1);
+        ChangeGameState(GS_KICKOFF);
         FixedUpdateTask* task = GetFixedUpdateTask();
         task->mSimulationStarted = true;
     }
@@ -879,20 +879,20 @@ void cGame::CheckForGoal()
         if (GameInfoManager::Instance()->IsInMode4()
             && g_pStrikerChallenge->mCondition == 2 && nSide == 1)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
         }
-        else if (m_eGameState == 6)
+        else if (m_eGameState == GS_OVERTIME)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
         }
         else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
             && g_pTeams[nSide]->GetScore() >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
         }
         else
         {
-            ChangeGameState(2);
+            ChangeGameState(GS_POST_GOAL);
         }
 
         if (g_pBall->m_pLastTouch == NULL)
@@ -1258,7 +1258,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         // SlowDownEnd: back to full speed after a captain hit.
         tDebugPrintManager::Print(DC_NETWORK, "Received SlowDownEnd at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
-        if (g_pGame->m_eGameState != 4)
+        if (g_pGame->m_eGameState != GS_UNLOADING)
         {
             StopSound(0xCE5CBAC7, g_pGame);
             if (FixedUpdateTask::GetTargetTimeScale() < 1.0f)
@@ -1402,7 +1402,7 @@ void cGame::SendPlayerVisibility()
 }
 void cGame::Update(float fDeltaT)
 {
-    if (m_eGameState == 4)
+    if (m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -1421,25 +1421,25 @@ void cGame::Update(float fDeltaT)
     {
         if (g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
         {
-            if (m_eGameState == 5)
+            if (m_eGameState == GS_GAMEPLAY)
             {
                 if (GameInfoManager::Instance()->IsInMode4()
                     && g_pStrikerChallenge->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
                 {
-                    ChangeGameState(3);
+                    ChangeGameState(GS_END_GAME);
                     StatsTracker::Instance()->TrackWinner(-1);
                 }
                 else
                 {
-                    ChangeGameState(6);
+                    ChangeGameState(GS_OVERTIME);
                     StatsTracker::Instance()->mIsOvertime = true;
                 }
             }
         }
-        else if (m_eGameState != 3)
+        else if (m_eGameState != GS_END_GAME)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
             StatsTracker::Instance()->TrackWinner(-1);
         }
     }
@@ -1907,7 +1907,7 @@ void cGame::ChecksumState(RunningChecksum* runningChecksum)
     runningChecksum->ChecksumData(&m_bBallInNet, sizeof(m_bBallInNet));
     runningChecksum->ChecksumData(&m_nLastTeamToScore, sizeof(m_nLastTeamToScore));
 }
-void cGame::ChangeGameState(int state)
+void cGame::ChangeGameState(eGameState state)
 {
     DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
     if (output != 0)
@@ -1926,12 +1926,12 @@ void cGame::ChangeGameState(int state)
 
     if (state != m_eGameState)
     {
-        if (m_eGameState == 6 && state == 3)
+        if (m_eGameState == GS_OVERTIME && state == GS_END_GAME)
         {
             StopSuddenDeathMusic();
         }
 
-        if (state == 3)
+        if (state == GS_END_GAME)
         {
             if ((GameInfoManager::Instance()->IsInMode4()
                     && g_pStrikerChallenge->mCondition == 2
@@ -1961,7 +1961,7 @@ void cGame::ChangeGameState(int state)
             }
         }
 
-        if (m_eGameState == 5)
+        if (m_eGameState == GS_GAMEPLAY)
         {
             unsigned long soundID = GetStadiumSoundID(
                 GameInfoManager::Instance()->GetStadium());
@@ -1971,9 +1971,9 @@ void cGame::ChangeGameState(int state)
         InitGameState(state);
     }
 }
-void cGame::InitGameState(int state)
+void cGame::InitGameState(eGameState state)
 {
-    if (m_eGameState == 5 && state == 6)
+    if (m_eGameState == GS_GAMEPLAY && state == GS_OVERTIME)
     {
         mEventQueue.mSuddenDeathEvent.Queue();
     }
@@ -1981,7 +1981,7 @@ void cGame::InitGameState(int state)
     m_eGameState = state;
     switch (state)
     {
-    case 1:
+    case GS_KICKOFF:
         if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
         {
             m_pGameClock->Stop();
@@ -1989,13 +1989,13 @@ void cGame::InitGameState(int state)
         ResetForKickOff();
         break;
 
-    case 0:
+    case GS_PRE_GAME:
         if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
         {
             m_pGameClock->Stop();
         }
         break;
-    case 2:
+    case GS_POST_GOAL:
         if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
         {
             m_pGameClock->Stop();
@@ -2010,7 +2010,7 @@ void cGame::InitGameState(int state)
         }
         break;
 
-    case 3:
+    case GS_END_GAME:
         if (!DuringMegaStrikeEndPresentation(GetPresentation()))
         {
             PlaySound(10, 0x42F55573, 0, 0);
@@ -2042,7 +2042,7 @@ void cGame::InitGameState(int state)
         gpNumberDisplay->mHoldUntilKickoff = true;
         break;
 
-    case 5:
+    case GS_GAMEPLAY:
     {
         unsigned long soundID = GetStadiumSoundID(GameInfoManager::Instance()->GetStadium());
         if (IsSoundTracked(soundID, this))
@@ -2056,12 +2056,12 @@ void cGame::InitGameState(int state)
         break;
     }
 
-    case 6:
+    case GS_OVERTIME:
         StopSound(GetStadiumSoundID(GameInfoManager::Instance()->GetStadium()), this);
         break;
     }
 
-    if (state == 5 || state == 6)
+    if (state == GS_GAMEPLAY || state == GS_OVERTIME)
     {
         if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
         {
@@ -2134,7 +2134,7 @@ extern "C" void fn_8005D210(cGame* pGame, LightningStrikeData* pData)
 }
 void DeliverGoalieSaveEvent(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2142,7 +2142,7 @@ void DeliverGoalieSaveEvent(cGame* pGame, const GoalieSaveData* pData)
 }
 void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2150,7 +2150,7 @@ void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData)
 }
 extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2158,7 +2158,7 @@ extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
 }
 void DeliverGoalieExertEvent(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2177,7 +2177,7 @@ void cGame::SetMegaStrikeShotResult(int shotIndex, bool scored)
 }
 void FinishMegaStrike(cGame* pGame)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2208,21 +2208,21 @@ void FinishMegaStrike(cGame* pGame)
         if (GameInfoManager::Instance()->IsInMode4()
             && g_pStrikerChallenge->mCondition == 2 && side == 1)
         {
-            pGame->ChangeGameState(3);
+            pGame->ChangeGameState(GS_END_GAME);
         }
-        else if (pGame->m_eGameState == 6)
+        else if (pGame->m_eGameState == GS_OVERTIME)
         {
-            pGame->ChangeGameState(3);
+            pGame->ChangeGameState(GS_END_GAME);
         }
         else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
             && (score = g_pTeams[side]->m_nScore,
                 score >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit))
         {
-            pGame->ChangeGameState(3);
+            pGame->ChangeGameState(GS_END_GAME);
         }
         else
         {
-            pGame->ChangeGameState(2);
+            pGame->ChangeGameState(GS_POST_GOAL);
         }
 
         if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
@@ -2270,7 +2270,7 @@ void cGame::ResumeAfterPresentation()
 }
 void cGame::QueueChainNisEnd(ShotAtGoalData* data)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_ShotAtGoalDataPool.Free(data);
         return;
@@ -2280,7 +2280,7 @@ void cGame::QueueChainNisEnd(ShotAtGoalData* data)
 }
 void cGame::QueueNIS(NISData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_NISDataPool.Free(pData);
         return;
@@ -2290,7 +2290,7 @@ void cGame::QueueNIS(NISData* pData)
 }
 void QueueCollisionCrowdEvent(cGame* pGame, CollisionCrowdData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_CollisionCrowdDataPool.Free(pData);
         return;
@@ -2300,7 +2300,7 @@ void QueueCollisionCrowdEvent(cGame* pGame, CollisionCrowdData* pData)
 }
 void DeliverGoalieDekeAttackAttemptEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2308,7 +2308,7 @@ void DeliverGoalieDekeAttackAttemptEvent(cGame* pGame, const PlayerAttackData* p
 }
 void DeliverGoalieDekeAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2316,7 +2316,7 @@ void DeliverGoalieDekeAttackSuccessEvent(cGame* pGame, const PlayerAttackData* p
 }
 void DeliverGoalieSlamAttackAttemptEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2324,7 +2324,7 @@ void DeliverGoalieSlamAttackAttemptEvent(cGame* pGame, const PlayerAttackData* p
 }
 void DeliverGoalieSlamAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2332,7 +2332,7 @@ void DeliverGoalieSlamAttackSuccessEvent(cGame* pGame, const PlayerAttackData* p
 }
 void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_PlayerAttackDataPool.Free(pData);
         return;
@@ -2342,7 +2342,7 @@ void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
 }
 void QueueAttackSuccessEvent(cGame* pGame, PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_PlayerAttackDataPool.Free(pData);
         return;
@@ -2352,7 +2352,7 @@ void QueueAttackSuccessEvent(cGame* pGame, PlayerAttackData* pData)
 }
 void QueueShotAtGoalEvent(cGame* pGame, ShotAtGoalData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_ShotAtGoalDataPool.Free(pData);
         return;
@@ -2362,7 +2362,7 @@ void QueueShotAtGoalEvent(cGame* pGame, ShotAtGoalData* pData)
 }
 void DeliverWindupShotEvent(cGame* pGame, ShotAtGoalData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2370,7 +2370,7 @@ void DeliverWindupShotEvent(cGame* pGame, ShotAtGoalData* pData)
 }
 void DeliverMegaStrikeMeterStartEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2378,7 +2378,7 @@ void DeliverMegaStrikeMeterStartEvent(cGame* pGame, MegaStrikeMeterData* pData)
 }
 void DeliverMegaStrikeMeterFirstEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2386,7 +2386,7 @@ void DeliverMegaStrikeMeterFirstEvent(cGame* pGame, MegaStrikeMeterData* pData)
 }
 void DeliverMegaStrikeMeterSecondEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2394,7 +2394,7 @@ void DeliverMegaStrikeMeterSecondEvent(cGame* pGame, MegaStrikeMeterData* pData)
 }
 void DeliverMegaStrikeIntroEvent(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2403,7 +2403,7 @@ void DeliverMegaStrikeIntroEvent(cGame* pGame, cFielder* pFielder)
 }
 void DeliverMegaStrikeMeterEndEvent(cGame* pGame)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2411,7 +2411,7 @@ void DeliverMegaStrikeMeterEndEvent(cGame* pGame)
 }
 void DeliverPeachFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2419,7 +2419,7 @@ void DeliverPeachFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 void DeliverPeachCameraFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2427,7 +2427,7 @@ void DeliverPeachCameraFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 void DeliverPeachCamerasDownEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2435,7 +2435,7 @@ void DeliverPeachCamerasDownEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2443,7 +2443,7 @@ void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2451,7 +2451,7 @@ extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
 }
 void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2459,7 +2459,7 @@ void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
 }
 extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2467,7 +2467,7 @@ extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
 }
 extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2475,7 +2475,7 @@ extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
 }
 void cGame::fn_80060BFC(CollisionBulletBillData& data)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2483,7 +2483,7 @@ void cGame::fn_80060BFC(CollisionBulletBillData& data)
 }
 void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2491,7 +2491,7 @@ void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventD
 }
 extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2499,7 +2499,7 @@ extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData
 }
 extern "C" void fn_800611F0(cGame* pGame, const void* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

@@ -354,7 +354,7 @@ void Weather::Update(float)
     {
         return;
     }
-    if (!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 1 && meState == WEATHER_ACTIVE)
+    if (!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != GS_KICKOFF && meState == WEATHER_ACTIVE)
     {
         Stop(false);
     }
@@ -1034,7 +1034,7 @@ void SolarFlare::ResetFlares(bool initialize)
         m_StartChance = 0.0f;
         m_NextFlare = 0;
         m_NextVaporize = 0;
-        if (g_pGame == 0 || g_pGame->m_eGameState == 0)
+        if (g_pGame == 0 || g_pGame->m_eGameState == GS_PRE_GAME)
         {
             m_StartCount = 0;
             for (int i = 0; i < 3; ++i)

@@ -713,7 +713,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         pFielder->EndDesire();
         return;
     }
-    if (m_pController != NULL && pFielder->GetDesireState() == 31 && g_pGame->m_eGameState == 1)
+    if (m_pController != NULL && pFielder->GetDesireState() == 31 && g_pGame->m_eGameState == GS_KICKOFF)
     {
         pFielder->EndDesire();
     }

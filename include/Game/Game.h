@@ -7,6 +7,18 @@
 #include "NL/nlMath.h"
 #include "NL/CircularQueue.h"
 
+enum eGameState
+{
+    GS_NONE = -1,
+    GS_PRE_GAME = 0,
+    GS_KICKOFF = 1,
+    GS_POST_GOAL = 2,
+    GS_END_GAME = 3,
+    GS_UNLOADING = 4,
+    GS_GAMEPLAY = 5,
+    GS_OVERTIME = 6,
+};
+
 class Clock;
 class FuzzyTweaks;
 class DebugWriteCache;
@@ -96,8 +108,8 @@ public:
     static void UpdatePowerUpObjects(float fDeltaT);
     void Update(float fDeltaT);
     void SyncLog(void* checksum, DebugWriteCache* cache);
-    void ChangeGameState(int state);
-    void InitGameState(int state);
+    void ChangeGameState(eGameState state);
+    void InitGameState(eGameState state);
     void LoadTerrain(int terrain);
     void SetDifficulty(int diff0, int diff1, int diff2, bool param4);
     void SetMegaStrikeShotResult(int shotIndex, bool scored);
@@ -106,7 +118,7 @@ public:
 
     inline bool IsGameplayOrOvertime()
     {
-        return (m_eGameState == 5 || m_eGameState == 6);
+        return (m_eGameState == GS_GAMEPLAY || m_eGameState == GS_OVERTIME);
     }
 
     inline int GetGameState() const { return m_eGameState; }
@@ -129,7 +141,7 @@ private:
     /* 0x14 */ AIContext* mpAIContext;
 
 public:
-    /* 0x18 */ int m_eGameState;
+    /* 0x18 */ eGameState m_eGameState;
     /* 0x1C */ float m_fGameDuration;
     /* 0x20 */ bool m_bBallInNet;
 

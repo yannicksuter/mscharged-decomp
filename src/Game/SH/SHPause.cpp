@@ -103,7 +103,7 @@ void PauseMenuScene::OnSelectQUIT()
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
         else if (GameInfoManager::Instance()->mCurrentMode == 0
-            || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == 3)
+            || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == GS_END_GAME)
         {
             popup->Create((ePopupMenu)10,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
@@ -149,7 +149,7 @@ void PauseMenuScene::OnSelectPopupYESFORFEIT()
         mQuitDelay = 1.0f;
         return;
     }
-    if (g_pGame->m_eGameState != 3)
+    if (g_pGame->m_eGameState != GS_END_GAME)
     {
         s32 quittingSide = -1;
         if (gameInfoManager->IsInMode3())

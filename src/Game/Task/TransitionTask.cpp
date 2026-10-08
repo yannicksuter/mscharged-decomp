@@ -171,7 +171,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
         }
         else if (to == 1)
         {
-            if (g_pGame != NULL && g_pGame->m_eGameState == 3)
+            if (g_pGame != NULL && g_pGame->m_eGameState == GS_END_GAME)
             {
                 Presentation* presentation = GetPresentation();
                 presentation->mLetterBoxEnabled = false;

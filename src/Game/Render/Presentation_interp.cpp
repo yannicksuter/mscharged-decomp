@@ -223,7 +223,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 28:
         ++m_SP;
-        m_SP[-1] = g_pGame->m_eGameState == 3;
+        m_SP[-1] = g_pGame->m_eGameState == GS_END_GAME;
         break;
     case 29:
         ++m_SP;
@@ -325,7 +325,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 44:
         PlaySound(11, 0x8CEE6665, 0, 0);
-        if (g_pGame->m_eGameState == 3)
+        if (g_pGame->m_eGameState == GS_END_GAME)
         {
             PlaySound(10, 0x42F55573, 0, 0);
         }

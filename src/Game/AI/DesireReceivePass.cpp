@@ -1500,8 +1500,8 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         fn_80015B38(g_pBall, false);
     }
 
-    if (g_pGame->GetGameState() == 3
-        || g_pGame->GetGameState() == 2)
+    if (g_pGame->GetGameState() == GS_END_GAME
+        || g_pGame->GetGameState() == GS_POST_GOAL)
     {
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;

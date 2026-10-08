@@ -4413,7 +4413,7 @@ void cFielder::CleanActionDeke()
         || GetCharacterClass() == (eCharacterClass)2
         || GetCharacterClass() == (eCharacterClass)17)
         RestoreTangibility(false);
-    if (IsCharacterSuperPowerActive(this, (eCharacterClass)1) && g_pGame->GetGameState() != 4)
+    if (IsCharacterSuperPowerActive(this, (eCharacterClass)1) && g_pGame->GetGameState() != GS_UNLOADING)
         EmitBowserSmoke(this);
     if (m_pBall != 0 && !m_pBall->m_bVisible)
         m_pBall->m_bVisible = true;

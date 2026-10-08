@@ -1343,7 +1343,7 @@ void cTeam::Update(float fDeltaT)
 void UpdateTeamTimers(cTeam* pTeam, float fDeltaT)
 {
     if ((g_pGame->IsGameplayOrOvertime()
-            || g_pGame->GetGameState() == 1)
+            || g_pGame->GetGameState() == GS_KICKOFF)
         && !g_pGame->IsCaptainShotToScoreOn())
     {
         pTeam->mfPowerupTimer -= fDeltaT;
@@ -1748,7 +1748,7 @@ void cTeam::ClearCurrentPowerUp()
     {
         return;
     }
-    if (g_pGame->IsGameplayOrOvertime() || g_pGame->GetGameState() != 2)
+    if (g_pGame->IsGameplayOrOvertime() || g_pGame->GetGameState() != GS_POST_GOAL)
     {
         return;
     }

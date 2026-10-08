@@ -578,7 +578,7 @@ PhysicsWaluigiWall* WaluigiWallManager::FindWall(unsigned int id)
 
 void OnWaluigiWallEffectFinished(EmissionController& controller, int reason)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
         return;
     if (!controller.m_Replaying && reason == 2)
     {
@@ -590,7 +590,7 @@ void OnWaluigiWallEffectFinished(EmissionController& controller, int reason)
 
 void UpdateWaluigiWallEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
         return;
     if (!controller.m_Replaying && ReplayManager::Instance()->mRender != 0)
     {

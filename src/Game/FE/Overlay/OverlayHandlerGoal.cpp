@@ -39,7 +39,7 @@ void GoalOverlay::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    if (!mIsInOvertime && g_pGame->m_eGameState == 6)
+    if (!mIsInOvertime && g_pGame->m_eGameState == GS_OVERTIME)
     {
         mIsInOvertime = true;
     }

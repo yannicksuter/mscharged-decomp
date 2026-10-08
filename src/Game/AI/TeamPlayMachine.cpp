@@ -35,7 +35,7 @@ void TeamPlayMachine::SelectState()
     FuzzyVariantCollection values;
     int state = -1;
 
-    if (g_pGame->m_eGameState == 1)
+    if (g_pGame->m_eGameState == GS_KICKOFF)
     {
         values.Set(7, FuzzyVariant(gKickoffStateTimeLimit));
         state = 1;

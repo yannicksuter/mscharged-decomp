@@ -148,7 +148,7 @@ void GameplayCameraEffects::RegisterEventListeners()
 
 void GameplayCameraEffects::Update(float deltaTime)
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         Reset();
         return;
@@ -533,7 +533,7 @@ void GameplayCameraEffects::ResetForPresentation(void*)
 
 void GameplayCameraEffects::OnShotPresentation()
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }
@@ -565,7 +565,7 @@ void GameplayCameraEffects::OnShotPresentation()
 
 void GameplayCameraEffects::OnShotPresentationEnd()
 {
-    if (g_pGame->m_eGameState != 3 && IsTransitionActive()
+    if (g_pGame->m_eGameState != GS_END_GAME && IsTransitionActive()
         && mPrimaryPlayer != 0
         && GetBallChargeValue(g_pBall, 0) >= 4.0f)
     {
@@ -576,7 +576,7 @@ void GameplayCameraEffects::OnShotPresentationEnd()
 
 void GameplayCameraEffects::OnCaptainClashPresentation()
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }
@@ -612,7 +612,7 @@ void GameplayCameraEffects::OnCaptainClashPresentationEnd()
 
 void GameplayCameraEffects::OnWindupPresentation()
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }
@@ -647,7 +647,7 @@ void GameplayCameraEffects::OnMegaStrikeMeterEnd()
 void GameplayCameraEffects::OnGoalieSave(
     GoalieSaveData*)
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }
@@ -690,7 +690,7 @@ void GameplayCameraEffects::OnGoalieSave(
 void GameplayCameraEffects::OnCollisionThwompPlayer(
     CollisionThwompPlayerData* eventData)
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }
@@ -727,7 +727,7 @@ void GameplayCameraEffects::OnGoalieDekeAttackAttempt(
 void GameplayCameraEffects::OnGoalieDekeAttackSuccess(
     PlayerAttackData*)
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }
@@ -767,7 +767,7 @@ void GameplayCameraEffects::OnGoalieSlamAttackAttempt(
 void GameplayCameraEffects::OnGoalieSlamAttackSuccess(
     PlayerAttackData*)
 {
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }

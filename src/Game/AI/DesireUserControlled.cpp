@@ -55,7 +55,7 @@ void DesireUserControlled::Update(
         return;
     }
 
-    if (g_pGame->m_eGameState == 1)
+    if (g_pGame->m_eGameState == GS_KICKOFF)
     {
         return;
     }

@@ -164,7 +164,7 @@ void KoopaShellObject::Update(float deltaTime)
 
 void KoopaShellObject::UpdateTrailEffect(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

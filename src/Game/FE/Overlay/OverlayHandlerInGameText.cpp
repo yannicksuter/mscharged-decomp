@@ -232,7 +232,7 @@ void InGameTextOverlay::DisplayFinalScore()
 
         if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode != 0)
         {
-            if (g_pGame->m_eGameState == 6)
+            if (g_pGame->m_eGameState == GS_OVERTIME)
             {
                 StatsTracker::Track(STATS_OT_WIN, winningSide, 0,
                     scoreLeft, scoreRight, 0, 0);

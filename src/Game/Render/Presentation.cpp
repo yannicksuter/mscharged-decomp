@@ -378,11 +378,11 @@ void Presentation::Finish()
         if (mCurrentFunction == strstr(mCurrentFunction, "Goal")
             || mCurrentFunction == strstr(mCurrentFunction, "MegastrikeEnd"))
         {
-            if (g_pGame->m_eGameState != 3)
+            if (g_pGame->m_eGameState != GS_END_GAME)
             {
                 if (!mResumeAfterPresentation)
                 {
-                    g_pGame->ChangeGameState(1);
+                    g_pGame->ChangeGameState(GS_KICKOFF);
                 }
                 else
                 {
@@ -404,7 +404,7 @@ void Presentation::Finish()
             {
                 if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
                 {
-                    g_pGame->ChangeGameState(1);
+                    g_pGame->ChangeGameState(GS_KICKOFF);
                     FixedUpdateTask* task = GetFixedUpdateTask();
                     task->mSimulationStarted = true;
                 }
@@ -800,7 +800,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
 
     if (Config::Global().Get<bool>("no_presentation", false))
     {
-        g_pGame->ChangeGameState(1);
+        g_pGame->ChangeGameState(GS_KICKOFF);
         return;
     }
 
@@ -817,7 +817,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     bool scoreTied = scoreDifference == 0;
     bool closeGoal = scoreDifference == 1
         || scoreDifference == data->uNumGoalsScored;
-    bool suddenDeath = g_pGame->m_eGameState == 6;
+    bool suddenDeath = g_pGame->m_eGameState == GS_OVERTIME;
 
     if (data->uGoalType == 5)
     {

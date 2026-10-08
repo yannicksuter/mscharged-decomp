@@ -2435,7 +2435,7 @@ extern "C" void fn_800227C8()
 {
     if (g_pGame != NULL)
     {
-        g_pGame->ChangeGameState(5);
+        g_pGame->ChangeGameState(GS_GAMEPLAY);
         PlaySound(10, 0xA21ADED3UL, NULL, NULL);
     }
 }

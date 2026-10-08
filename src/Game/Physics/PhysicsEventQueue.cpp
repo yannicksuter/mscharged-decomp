@@ -368,7 +368,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
     {
         switch (g_pGame->m_eGameState)
         {
-        case 3:
+        case GS_END_GAME:
             break;
         default:
             return;

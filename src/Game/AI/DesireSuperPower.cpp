@@ -1764,7 +1764,7 @@ const nlVector3* GetCharacterPosition(const cCharacter* character)
  */
 bool IsGameplayOrOvertime(const cGame* game)
 {
-    return game->m_eGameState == 5 || game->m_eGameState == 6;
+    return game->m_eGameState == GS_GAMEPLAY || game->m_eGameState == GS_OVERTIME;
 }
 
 #include "Game/AI/Fielder.inl"
