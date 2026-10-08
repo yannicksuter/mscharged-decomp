@@ -523,7 +523,7 @@ Windy::Windy()
 {
     meWeather = 2;
     Reset();
-    FindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &Windy::OnGetReadyForKickoff)), 0, -1);
+    FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &Windy::OnGetReadyForKickoff)), 0, -1);
 }
 
 void Windy::OnGetReadyForKickoff()
@@ -778,8 +778,8 @@ void Windy::Stop(bool value)
 SolarFlare::SolarFlare()
 {
     meWeather = 4;
-    FindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnGetReadyForKickoff)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnKickoff)), 0, -1);
+    FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnGetReadyForKickoff)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnKickoff)), 0, -1);
     m_StartCount = 0;
     for (int i = 0; i < 3; i++)
         m_TargetIndicies[i] = -1;
@@ -1510,7 +1510,7 @@ SandTombWeather::SandTombWeather()
 {
     meWeather = 7;
     Reset();
-    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SandTombWeather::OnKickoff)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SandTombWeather::OnKickoff)), 0, -1);
 }
 
 float SandTombWeather::GetStartChance()

@@ -2717,9 +2717,9 @@ extern "C" void fn_80018A00()
     FindEvent<void>("BallFall", -1)->Add(Function<void*>(OnBallFall), 0, -1);
     FindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(OnBallStateChange), 0, -1);
     FindEvent<void>("ResetEffects", -1)->Add(Function<void*>(OnBallResetEffects), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
     FindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
     FindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
     FindEvent<CollisionEggData>("CollisionEggBall", -1)->Add(Function<CollisionEggData*>(OnBallEggCollision), 0, -1);
     FindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);

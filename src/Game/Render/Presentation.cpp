@@ -744,19 +744,19 @@ void Presentation::RegisterEventListeners()
     {
         Function<FnVoidVoid> callback(
             BindMember(this, &Presentation::OnKickoff));
-        FindEvent<UnidentifiedEventNoData>("Kickoff", -1)
+        FindEvent<NoEventData>("Kickoff", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<FnVoidVoid> callback(
             BindMember(this, &Presentation::OnSuddenDeath));
-        FindEvent<UnidentifiedEventNoData>("SuddenDeath", -1)
+        FindEvent<NoEventData>("SuddenDeath", -1)
             ->Add(callback, 0, -1);
     }
     {
         Function<FnVoidVoid> callback(
             BindMember(this, &Presentation::OnCharacterDirectionEnd));
-        FindEvent<UnidentifiedEventNoData>(
+        FindEvent<NoEventData>(
             "CharacterDirectionEnd", -1)->Add(callback, 0, -1);
     }
     {

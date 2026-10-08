@@ -70,7 +70,7 @@ struct EventConnection
 };
 
 // Events without a payload use a zero-argument callback signature.
-typedef void UnidentifiedEventNoData();
+typedef void NoEventData();
 
 template <typename T>
 struct EventCallbackTraits
@@ -99,10 +99,10 @@ struct EventCallbackTraits<ReturnType()>
 };
 
 template <>
-struct EventCallbackTraits<UnidentifiedEventNoData>
+struct EventCallbackTraits<NoEventData>
 {
     typedef Function<FnVoidVoid> Type;
-    typedef UnidentifiedEventNoData* Parameter;
+    typedef NoEventData* Parameter;
 };
 
 template <typename T>

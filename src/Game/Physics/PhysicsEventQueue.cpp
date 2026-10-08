@@ -55,7 +55,7 @@ public:
 
 public:
     EventDispatcher mDispatcher;
-    QueuedEvent<UnidentifiedEventNoData> mBallFallEvent;
+    QueuedEvent<NoEventData> mBallFallEvent;
     QueuedEvent<CollisionPlayerPlayerData> mCollisionPlayerPlayerEvent;
     QueuedEvent<CollisionPlayerWallData> mCollisionPlayerWallEvent;
     QueuedEvent<CollisionPlayerBallData> mCollisionPlayerBallEvent;
@@ -83,7 +83,7 @@ public:
     QueuedEvent<CollisionBulletBillData> mCollisionBulletBillFreezeEvent;
     QueuedEvent<CollisionBulletBillData> mExplosionBulletBillEvent;
     QueuedEvent<CollisionPatchData> mCollisionTongueEvent;
-    QueuedEvent<UnidentifiedEventNoData> mCollisionBallTronWallEvent;
+    QueuedEvent<NoEventData> mCollisionBallTronWallEvent;
     QueuedEvent<PowerupUsedEventData> mPowerupUsedEvent;
     QueuedEvent<CollisionProjectileData> mCollisionFireballPlayerEvent;
     QueuedEvent<CollisionProjectileData> mCollisionFireballBallEvent;

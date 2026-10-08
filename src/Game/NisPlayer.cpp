@@ -891,7 +891,7 @@ void NisPlayer::RegisterEventHandlers()
     FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &NisPlayer::OnGoalScored)), 0, -1);
     FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &NisPlayer::OnGoalieSave)), 0, -1);
     FindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(BindMember(this, &NisPlayer::OnMegaStrikeIntro)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::OnPauseGame)), 0, -1);
+    FindEvent<NoEventData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::OnPauseGame)), 0, -1);
 }
 
 void NisPlayer::OnGoalScored(GoalScoredData* goalScoredData)

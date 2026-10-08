@@ -24,12 +24,12 @@ public:
     virtual void SetPopScene(bool value) { mPopScene = value; }
 
     /* 0x0B4 */ int mBackScene;
-    /* 0x0B8 */ float mUnidentifiedB8;
+    /* 0x0B8 */ float m_padB8;
     /* 0x0BC */ feVector3 mButtonPosition;
     /* 0x0C8 */ TLComponentInstance* mButtonInstance;
     /* 0x0CC */ bool mPressed;
-    /* 0x0CD */ bool mUnidentifiedCD;
-    /* 0x0CE */ bool mUnidentifiedCE;
+    /* 0x0CD */ bool m_padCD;
+    /* 0x0CE */ bool m_padCE;
     /* 0x0CF */ bool mPushBackScene;
     /* 0x0D0 */ bool mPopScene;
     /* 0x0D1 */ bool mBoundsInitialized;

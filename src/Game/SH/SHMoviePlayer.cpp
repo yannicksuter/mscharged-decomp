@@ -45,7 +45,7 @@ MoviePlayerScene::MoviePlayerScene()
     {
         mGameSceneManager = g_pOverlayManager;
     }
-    FindEvent<UnidentifiedEventNoData>("HBMHide", -1)->Add(Function<FnVoidVoid>(BindExp1_MoviePlayerScene_v(MemFun(&MoviePlayerScene::OnHBMHide), this)), (unsigned int)&mHBMHideConnection, -1);
+    FindEvent<NoEventData>("HBMHide", -1)->Add(Function<FnVoidVoid>(BindExp1_MoviePlayerScene_v(MemFun(&MoviePlayerScene::OnHBMHide), this)), (unsigned int)&mHBMHideConnection, -1);
 }
 
 MoviePlayerScene::~MoviePlayerScene()

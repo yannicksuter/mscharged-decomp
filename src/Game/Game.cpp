@@ -2586,9 +2586,9 @@ GameEventQueue::GameEventQueue()
 
 inline void cGame::RegisterEventListeners()
 {
-    FindEvent<UnidentifiedEventNoData>(SuddenDeathEventName(), -1)
+    FindEvent<NoEventData>(SuddenDeathEventName(), -1)
         ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnSuddenDeath)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>(GameOverEventName(), -1)
+    FindEvent<NoEventData>(GameOverEventName(), -1)
         ->Add(Function<FnVoidVoid>(BindMember(this, &cGame::OnGameOver)), 0, -1);
 }
 

@@ -130,14 +130,14 @@ GameplayCameraEffects::GameplayCameraEffects()
 void GameplayCameraEffects::RegisterEventListeners()
 {
     FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &GameplayCameraEffects::OnGoalScored)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
+    FindEvent<NoEventData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
+    FindEvent<NoEventData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
+    FindEvent<NoEventData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
     FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
+    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
     GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSave)), 0, -1);
     FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(BindMember(this, &GameplayCameraEffects::OnCollisionThwompPlayer)), 0, -1);
     FindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);

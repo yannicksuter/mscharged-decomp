@@ -1766,10 +1766,10 @@ extern "C" void fn_8001FE80()
     FindEvent<CollisionWindDebrisPlayerData>("CollisionWindDebrisPlayer", -1)->Add(Function<CollisionWindDebrisPlayerData*>(fn_800229F0), 0, -1);
     FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(fn_80022A78), 0, -1);
     FindEvent<cFielder>("KnockYoshiTongue", -1)->Add(Function<cFielder*>(fn_80020B8C), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8002276C), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800227C8), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(fn_8002276C), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(fn_800227C8), 0, -1);
     FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(fn_80022810), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(fn_80022908), 0, -1);
+    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(fn_80022908), 0, -1);
     FindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(fn_80022824), 0, -1);
     FindEvent<CollisionPlayerPlayerData>("CollisionPlayerPlayer", -1)->Add(Function<CollisionPlayerPlayerData*>(fn_80022664), 0, -1);
     FindEvent<CollisionPlayerWallData>("CollisionPlayerWall", -1)->Add(Function<CollisionPlayerWallData*>(fn_8002268C), 0, -1);

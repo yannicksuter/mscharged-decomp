@@ -4,11 +4,11 @@
 #include "Game/StaticEvent.h"
 
 class HBMHideEvent
-    : public UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>
+    : public UnidentifiedStaticEvent<NoEventData, 8>
 {
 public:
     HBMHideEvent()
-        : UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>("HBMHide", -1)
+        : UnidentifiedStaticEvent<NoEventData, 8>("HBMHide", -1)
     {
     }
 

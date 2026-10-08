@@ -63,7 +63,7 @@ public:
     /* 0x050 */ TLComponentInstance* mHomeWarning;
     /* 0x054 */ TLInstance* mTimer;
     /* 0x058 */ FEPageControls mPageControls;
-    /* 0x1E0 */ int mUnidentified1E0;
+    /* 0x1E0 */ int mPadding1E0;
     /* 0x1E4 */ unsigned char mVisibleButtons;
     /* 0x1E5 */ bool mTransitionPlaying;
     /* 0x1E6 */ bool mTransitionPending;

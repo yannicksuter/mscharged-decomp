@@ -243,7 +243,7 @@ void ReplayManager::RegisterEventHandlers()
     FindEvent<PassBallData>("PassBall", -1)->Add(Function<PassBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
     FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
     FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
 }
 
 void ReplayManager::InitializeSnapshots()

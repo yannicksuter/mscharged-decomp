@@ -145,7 +145,7 @@ MakeGoalBinding(void (GoalOverlay::*callback)(), GoalOverlay* goalOverlay)
 
 static inline void CreateGoalEventHandler(GoalOverlay* goalOverlay)
 {
-    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(MakeGoalBinding(&GoalOverlay::Reset, goalOverlay)), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(MakeGoalBinding(&GoalOverlay::Reset, goalOverlay)), 0, -1);
     FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(MakeGoalBinding(&GoalOverlay::OnGoalScored, goalOverlay)), 0, -1);
     FindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(MakeGoalBinding(&GoalOverlay::OnMegastrikeEnd, goalOverlay)), 0, -1);
 }

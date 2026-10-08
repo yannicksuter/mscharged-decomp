@@ -45,14 +45,14 @@ OverlayManager::~OverlayManager()
 
 void OverlayManager::RegisterEventHandlers()
 {
-    FindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnGetReadyForKickoff)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnKickoff)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnGameOver)), 0, -1);
+    FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnGetReadyForKickoff)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnKickoff)), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnGameOver)), 0, -1);
     FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::OnMegaStrikeMeterStart)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnMegaStrikeMeterEnd)), 0, -1);
+    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnMegaStrikeMeterEnd)), 0, -1);
     FindEvent<MegaStrikeMeterData>("MegaStrikeMeterFirst", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::OnMegaStrikeMeterFirst)), 0, -1);
     FindEvent<MegaStrikeMeterData>("MegaStrikeMeterSecond", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &OverlayManager::OnMegaStrikeMeterSecond)), 0, -1);
-    FindEvent<UnidentifiedEventNoData>("MegastrikeStart", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnMegastrikeStart)), 0, -1);
+    FindEvent<NoEventData>("MegastrikeStart", -1)->Add(Function<FnVoidVoid>(BindMember(this, &OverlayManager::OnMegastrikeStart)), 0, -1);
     FindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(BindMember(this, &OverlayManager::OnMegastrikeEnd)), 0, -1);
     FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &OverlayManager::OnGoalScored)), 0, -1);
 }

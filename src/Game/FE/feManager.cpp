@@ -92,11 +92,11 @@ void FrontEnd::Reset()
     sInitialModePauseMenuShown = 0;
     sControllerRemovalChecksSuppressed = 0;
 
-    FindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(OnGetReadyForKickoff), 0, -1);
+    FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(OnGetReadyForKickoff), 0, -1);
 
-    FindEvent<UnidentifiedEventNoData>("PresentationBypass", -1)->Add(Function<FnVoidVoid>(OnPresentationBypass), 0, -1);
+    FindEvent<NoEventData>("PresentationBypass", -1)->Add(Function<FnVoidVoid>(OnPresentationBypass), 0, -1);
 
-    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnGameOver), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnGameOver), 0, -1);
 }
 
 static const float sPauseCameraAnimationSpeed[1] = { 0.3f };
