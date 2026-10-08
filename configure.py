@@ -520,7 +520,7 @@ config.libs = [
             Object(Matching, "Game/TweaksBase.cpp"),
             Object(Matching, "Game/TweakValue.cpp"),
             Object(Matching, "Game/TweakValueBase.cpp"),
-            Object(Matching, "Game/UnidentifiedTweakAction.cpp"),
+            Object(Matching, "Game/TweakAction.cpp"),
             Object(Matching, "Game/Weather.cpp", extra_cflags=["-ipa file", "-sym on"]),
             Object(Matching, "Game/WeatherData.cpp"),
             Object(Matching, "Game/world.cpp", extra_cflags=["-ipa file"]),

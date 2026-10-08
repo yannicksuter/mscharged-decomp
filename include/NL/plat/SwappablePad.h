@@ -1,7 +1,7 @@
 #ifndef NL_PLAT_SWAPPABLE_PAD_H
 #define NL_PLAT_SWAPPABLE_PAD_H
 
-#include "Game/UnidentifiedStaticEvent.h"
+#include "Game/StaticEvent.h"
 
 class PadBackend;
 bool UpdatePadBackend(PadBackend* pad);

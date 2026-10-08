@@ -635,7 +635,7 @@ Game/Camera/DebugCam.cpp:
 	.sbss       start:0x806E0EE8 end:0x806E0F08
 	.sdata2     start:0x806E43C8 end:0x806E4408
 
-Game/UnidentifiedTweakAction.cpp:
+Game/TweakAction.cpp:
 	.text       start:0x800F3A10 end:0x800F3A14
 
 Game/Camera/FaceCam.cpp:

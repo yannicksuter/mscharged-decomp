@@ -34,7 +34,7 @@
 #include "Game/TweakValueFloat.h"
 #include "Game/TweakValueInt.h"
 #include "Game/SharedStaticStorage.h"
-#include "Game/UnidentifiedTweakAction.h"
+#include "Game/TweakAction.h"
 
 // GameRenderTask defines this flag as u8; this unit only matches closer when
 // it reads the byte as a bool.

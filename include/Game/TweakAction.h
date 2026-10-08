@@ -1,5 +1,5 @@
-#ifndef GAME_UNIDENTIFIED_TWEAK_ACTION_H
-#define GAME_UNIDENTIFIED_TWEAK_ACTION_H
+#ifndef GAME_TWEAK_ACTION_H
+#define GAME_TWEAK_ACTION_H
 
 #include "NL/nlFunction.h"
 
@@ -11,4 +11,4 @@ struct UnidentifiedTweakAction
         const Function0<void>& action);
 };
 
-#endif // GAME_UNIDENTIFIED_TWEAK_ACTION_H
+#endif // GAME_TWEAK_ACTION_H

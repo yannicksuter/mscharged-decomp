@@ -1,5 +1,5 @@
-#ifndef GAME_UNIDENTIFIED_STATIC_EVENT_H
-#define GAME_UNIDENTIFIED_STATIC_EVENT_H
+#ifndef GAME_STATIC_EVENT_H
+#define GAME_STATIC_EVENT_H
 
 #include "Game/Event.h"
 
@@ -157,4 +157,4 @@ void UnidentifiedStaticEvent<T, Count>::Add(
     RegisterEventConnection(this, listener, value, flags);
 }
 
-#endif // GAME_UNIDENTIFIED_STATIC_EVENT_H
+#endif // GAME_STATIC_EVENT_H
