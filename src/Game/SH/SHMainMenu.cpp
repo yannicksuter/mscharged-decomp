@@ -175,7 +175,7 @@ void SHMainMenu::Update(float fDeltaT)
             {
                 return;
             }
-            ApplyItem(1);
+            ApplyItem(MAIN_MENU_ONLINE);
         }
     }
 
@@ -329,14 +329,14 @@ void SHMainMenu::OpenItem(unsigned int index, void* context)
 void SHMainMenu::SelectItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (GetTweakBool("/user/media_build", false) && (item == 3 || item == 5 || item == 6))
+    if (GetTweakBool("/user/media_build", false) && (item == MAIN_MENU_CHALLENGE || item == MAIN_MENU_HALL_OF_FAME || item == MAIN_MENU_OPTIONS))
     {
         FEAudio::PlayAnimAudioEvent(0x7326DD54, 0, 0, true);
         return;
     }
 
     FEAudio::PlayAnimAudioEvent(0x0A93E9A0, 0, 0, true);
-    if (item == 1)
+    if (item == MAIN_MENU_ONLINE)
     {
         if (!SaveEnabled)
         {
@@ -385,7 +385,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
 
     switch (item)
     {
-    case 0:
+    case MAIN_MENU_FRIENDLY:
     {
         GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, 0);
         GameInfoManager::Instance()->SetTeam(0, 0);
@@ -402,7 +402,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
-    case 1:
+    case MAIN_MENU_ONLINE:
     {
         GameInfoManager::Instance()->mIsOnlineMode = true;
         GameSceneManager::Instance()->Pop();
@@ -419,7 +419,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         break;
     }
-    case 2:
+    case MAIN_MENU_CUP:
         GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CUP, 0);
         if (CupManager::s_pInstance->GetCurrentMode() == -1)
         {
@@ -430,7 +430,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
             ShowCupStartOptions();
         }
         break;
-    case 3:
+    case MAIN_MENU_CHALLENGE:
     {
         GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CHALLENGE, 0);
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
@@ -444,7 +444,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
-    case 4:
+    case MAIN_MENU_STRIKERS_101:
     {
         GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CHALLENGE, 0);
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
@@ -458,7 +458,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
-    case 5:
+    case MAIN_MENU_HALL_OF_FAME:
     {
         GameSceneManager::Instance()->Pop();
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
@@ -472,7 +472,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         break;
     }
-    case 6:
+    case MAIN_MENU_OPTIONS:
     {
         GameSceneManager::Instance()->Pop();
         SHNavigation* scene = GetNavigationScene();
