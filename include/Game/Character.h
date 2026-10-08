@@ -76,6 +76,13 @@ enum eClassTypes
     NUM_CLASSES = 4,
 };
 
+enum eCharacterDamageType
+{
+    DAMAGE_TEXTURE_STADIUM = 0,
+    DAMAGE_TEXTURE_DIRT = 1,
+    DAMAGE_TEXTURE_SCORCH = 2,
+};
+
 enum eCharacterModelType
 {
     CharModel_Rigid = 0,

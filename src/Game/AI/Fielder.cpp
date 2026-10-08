@@ -2033,7 +2033,7 @@ bool cFielder::CollideWithBobombCallback(const nlVector3& position, float radius
         if (g_pGame->IsGameplayOrOvertime())
         {
             AddRandomDirt();
-            fn_8001F1C0(2);
+            fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
         }
         InitActionBombReact(position, radius);
         return true;
@@ -2298,7 +2298,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             if (type == PATCH_MUCK_HOLE)
             {
                 AddRandomDirt();
-                fn_8001F1C0(1);
+                fn_8001F1C0(DAMAGE_TEXTURE_DIRT);
             }
             ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1B, &params,
                 IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1B));
@@ -2310,7 +2310,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && !IsInFallAction() && !IsInvincible())
         {
             AddRandomDirt();
-            fn_8001F1C0(1);
+            fn_8001F1C0(DAMAGE_TEXTURE_DIRT);
             nlVector3 v3PatchDirection = eventData->pPatch->m_Velocity;
             v3PatchDirection.z = 0.0f;
             if (nlVec3LengthSquared(v3PatchDirection) == 0.0f)

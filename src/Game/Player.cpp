@@ -850,7 +850,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
     {
         EmitSkillshotPlayerOnFire(pPlayer);
         pPlayer->AddRandomDirt();
-        pPlayer->fn_8001F1C0(2);
+        pPlayer->fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
         ((cFielder*)pPlayer)->EndFrozenOrDazed();
         pPlayer->m_DetPlayer.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)

@@ -650,7 +650,7 @@ void Nis::Trigger::Fire(Nis& nis) const
         {
             cCharacter* character = g_pCharacters[charIdx];
             character->m_Dirt = params.float1;
-            character->fn_8001F1C0(2);
+            character->fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
         }
         break;
     }
@@ -944,8 +944,8 @@ void Nis::ApplyDamageEffects(glModel* model, DrawableCharacter* character)
     nlSNPrintf(textureName, sizeof(textureName), "%s/dirt", character->character->m_pCharacterInfo->mName);
     damageTexture = glGetTexture(textureName);
 
-    if (character->character->m_nDamageType != 1
-        && (character->character->m_nDamageType == 2
+    if (character->character->m_nDamageType != DAMAGE_TEXTURE_DIRT
+        && (character->character->m_nDamageType == DAMAGE_TEXTURE_SCORCH
             || stadium == 0 || stadium == 5 || stadium == 7
             || stadium == 9 || stadium == 16 || stadium == 8
             || stadium == 14 || stadium == 11 || stadium == 15

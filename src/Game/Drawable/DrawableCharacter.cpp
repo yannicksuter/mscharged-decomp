@@ -140,7 +140,7 @@ DrawableCharacter::DrawableCharacter()
     character = 0;
     damage1 = 0.0f;
     damage2 = 0.0f;
-    damageType = 0;
+    damageType = DAMAGE_TEXTURE_STADIUM;
     savedScorchTexture = 0xFFFFFFFF;
     scorchTexture = 0;
     position.x = 0.0f;
@@ -980,8 +980,8 @@ void DrawableCharacter::ApplyDamageEffects(const cCharacter& source, glModel* mo
         int stadium = GameInfoManager::Instance()->GetStadium();
         unsigned long damageTexture = glGetTexture("global/scorch");
         bool useDamageTexture = false;
-        if (damageType != 1
-            && (damageType == 2
+        if (damageType != DAMAGE_TEXTURE_DIRT
+            && (damageType == DAMAGE_TEXTURE_SCORCH
                 || stadium == 0
                 || stadium == 5
                 || stadium == 7

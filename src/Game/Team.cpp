@@ -907,7 +907,7 @@ void cTeam::ResetCharacters()
     {
         cFielder* pFielder = GetFielder(i);
         pFielder->m_Dirt = 0.0f;
-        pFielder->m_nDamageType = 0;
+        pFielder->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         pFielder->m_MinDirt = 0.0f;
 
         if (i == 0 && GetNumAssignedControllers() > 1)

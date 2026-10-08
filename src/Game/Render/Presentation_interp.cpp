@@ -43,7 +43,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             {
                 cFielder* fielder = (*team)->GetFielder(player);
                 fielder->m_Dirt = 0.0f;
-                fielder->m_nDamageType = 0;
+                fielder->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
                 fielder->m_MinDirt = 0.0f;
             }
         }
@@ -54,7 +54,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             cFielder* captain = g_pTeams[0]->GetCaptain();
             captain->m_Dirt = 0.0f;
-            captain->m_nDamageType = 0;
+            captain->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         }
         {
             cFielder* captain = g_pTeams[0]->GetCaptain();
@@ -63,7 +63,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             cFielder* captain = g_pTeams[1]->GetCaptain();
             captain->m_Dirt = 0.0f;
-            captain->m_nDamageType = 0;
+            captain->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         }
         {
             cFielder* captain = g_pTeams[1]->GetCaptain();

@@ -1542,7 +1542,7 @@ void cCharacter::AddRandomDirt()
 void cCharacter::fn_8001F1C0(int nParam)
 {
     m_nDamageType = nParam;
-    if (nParam == 2)
+    if (nParam == DAMAGE_TEXTURE_SCORCH)
     {
         m_MinDirt = 0.0f;
     }

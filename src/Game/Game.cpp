@@ -828,7 +828,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
         g_pCharacters[i]->fn_80022E60();
         cCharacter* character = g_pCharacters[i];
         character->m_Dirt = 0.0f;
-        character->m_nDamageType = 0;
+        character->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         g_pCharacters[i]->m_MinDirt = 0.0f;
     }
     GetPresentation()->Reset();
