@@ -6,6 +6,14 @@
 
 class TLComponentInstance;
 
+enum eOnlineInviteStatus
+{
+    INVITE_STATUS_CONNECTING = 0,
+    INVITE_STATUS_ENTERING_LOBBY = 1,
+    INVITE_STATUS_CANCELED = 2,
+    INVITE_STATUS_DECLINED = 3,
+};
+
 class SHOnlineInviteStatus : public BaseSceneHandler
 {
 public:
@@ -18,7 +26,7 @@ public:
     void ShowConnectionError();
     void OnConnectionErrorDismissed();
 
-    /* 0x01C */ int mStatus;
+    /* 0x01C */ eOnlineInviteStatus mStatus;
     /* 0x020 */ float mReturnDelay;
     /* 0x024 */ FEBackButton mBackButton;
     /* 0x0FC */ bool mCanCancel;

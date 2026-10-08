@@ -115,7 +115,7 @@ void SHOnlineInvitePreview::Update(float fDeltaT)
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
         SHOnlineInviteStatus* scene
             = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
-        scene->mStatus = 2;
+        scene->mStatus = INVITE_STATUS_CANCELED;
         scene->mReturnDelay = 2.0f;
         return;
     }

@@ -25,7 +25,7 @@
 #include "Game/FE/tlDefault.h"
 
 SHOnlineInviteStatus::SHOnlineInviteStatus()
-    : mStatus(0)
+    : mStatus(INVITE_STATUS_CONNECTING)
     , mReturnDelay(0.0f)
     , mCanCancel(false)
     , mPopupActive(false)
@@ -40,7 +40,7 @@ SHOnlineInviteStatus::~SHOnlineInviteStatus()
 
 inline bool SHOnlineInviteStatus::CanCancel()
 {
-    if (mStatus != 1)
+    if (mStatus != INVITE_STATUS_ENTERING_LOBBY)
         return false;
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
     if (lobby != 0)
@@ -61,10 +61,10 @@ void SHOnlineInviteStatus::SceneCreated()
         presentation->m_currentSlide, "Layer", "INVITATION", "LOGIN");
     switch (mStatus)
     {
-    case 1:
+    case INVITE_STATUS_ENTERING_LOBBY:
         mStatusInstance->SetActiveSlide("ENTERING LOBBY", false, false);
         break;
-    case 2:
+    case INVITE_STATUS_CANCELED:
     {
         mStatusInstance->SetActiveSlide("DECLINED", false, false);
         TLTextInstance* text = FEFinder<TLTextInstance, 3>::FindOrDefault<>(
@@ -72,7 +72,7 @@ void SHOnlineInviteStatus::SceneCreated()
         text->SetStringId("LOC_ONLINE_CANCELED_INVITATION");
         break;
     }
-    case 3:
+    case INVITE_STATUS_DECLINED:
         mStatusInstance->SetActiveSlide("DECLINED", false, false);
         break;
     default:
@@ -122,11 +122,11 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
     NetworkLobby* lobby = g_pNetworkSession->GetOnlineLobby();
     switch (mStatus)
     {
-    case 1:
+    case INVITE_STATUS_ENTERING_LOBBY:
         if (lobby->mMatchFailed || lobby->mCancelRequested)
         {
             lobby->CloseConnectionsAndReset();
-            mStatus = 2;
+            mStatus = INVITE_STATUS_CANCELED;
             mReturnDelay = 2.0f;
             mElapsedTime = 0.0f;
             mStatusInstance->SetActiveSlide("DECLINED", false, false);
@@ -141,7 +141,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
             scene->mStartFriendServer = true;
         }
         break;
-    case 3:
+    case INVITE_STATUS_DECLINED:
         if (!g_pFriendManager->ValidateHostInvitation() || mElapsedTime >= 30.0f)
         {
             g_pFriendManager->SetOwnStatusInitial(1);
