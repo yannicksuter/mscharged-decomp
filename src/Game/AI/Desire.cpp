@@ -7,6 +7,7 @@
 unsigned short gFielderDesireStateDebugType = 0xFFFF;
 float gFinishActionMaxDuration = 60.0f;
 float gWaitMaxDuration = 0.3f;
+// The reinitialization age resides in initialized small data.
 #pragma explicit_zero_data on
 float gDesireReinitializeAge = 0.0f;
 #pragma explicit_zero_data off
@@ -79,6 +80,10 @@ void DesireWait::Update(DesireUpdate*, float)
     m_pFielder->AddDesiredPosition(m_pFielder->mUnidentified024.m_v3Position, 1.0f, 1.0f);
 }
 
+// In this reconstruction, the disposal function causes MWCC to emit the weak
+// Desire destructor before the derived destructors; the function itself is
+// discarded at link time. The retail destructor order does not establish an
+// original disposal function, its signature or its source owner.
 void DestroyDesire(Desire* desire)
 {
     delete desire;

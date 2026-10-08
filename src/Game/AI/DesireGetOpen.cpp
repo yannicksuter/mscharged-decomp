@@ -11,6 +11,7 @@
 
 float gGetOpenSearchRadius = 6.0f;
 static unsigned short sDesireGetOpenType = 0xFFFF;
+// The default transition result resides in initialized small data.
 #pragma explicit_zero_data on
 int gTransDesireGetOpenContinue = DESIRE_CONTINUE;
 #pragma explicit_zero_data off

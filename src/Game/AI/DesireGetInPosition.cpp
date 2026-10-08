@@ -22,6 +22,7 @@ static unsigned short sDesireRunInDirectionType = 0xFFFF;
 static unsigned short sDesireRunToTargetType = 0xFFFF;
 nlVector2 gRunFieldInputRange = { 0.5f, 3.5f };
 nlVector2 gRunFieldDistanceRange = { 4.0f, 1.0f };
+// The default transition result resides in initialized small data.
 #pragma explicit_zero_data on
 int gTransDesireRunToTargetContinue = DESIRE_CONTINUE;
 #pragma explicit_zero_data off
