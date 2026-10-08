@@ -1,7 +1,10 @@
 #include <ode/ext/dRoundedCorner.h>
 #include <ode/ext/dColumn.h>
 
-extern "C" double sqrt(double);
+extern "C"
+{
+#include <internal/fdlibm.h>
+}
 extern int dColumnClassUser;
 
 int dRoundedCornerClassUser = -1;

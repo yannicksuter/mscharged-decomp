@@ -1,9 +1,9 @@
 #include <revolution/gx.h>
+#include <internal/fdlibm.h>
 
 #define M_PI 3.1415927f
 
 extern f32 cosf(f32);
-extern double sqrt(double);
 
 inline f32 sqrtf(f32 x) { return (f32)sqrt((double)x); }
 

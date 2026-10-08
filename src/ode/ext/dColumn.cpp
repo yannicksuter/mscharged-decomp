@@ -23,7 +23,10 @@
 #include <ode/ext/dColumn.h>
 #include <ode/odemath.h>
 
-extern "C" double sqrt(double);
+extern "C"
+{
+#include <internal/fdlibm.h>
+}
 
 static inline double odeFabs(double value)
 {
