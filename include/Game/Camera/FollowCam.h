@@ -14,7 +14,6 @@ public:
         FOLLOW_ANIM_VIEWER_CHARACTER = 3,
     };
 
-    cFollowCamera();
     cFollowCamera(cFollowCamera::FollowTarget followTarget);
     virtual ~cFollowCamera() { }
 
