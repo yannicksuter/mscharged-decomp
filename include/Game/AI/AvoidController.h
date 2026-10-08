@@ -193,9 +193,9 @@ struct UnidentifiedAvoidanceValue
 {
     UnidentifiedAvoidanceValue();
     void UnidentifiedTurn(nlVector3&, const nlVector3&, const nlVector3&, bool);
-    bool UnidentifiedResponse_800127E0(int, UnidentifiedAvoidanceContext&, float);
-    bool UnidentifiedResponse_800123D8(UnidentifiedAvoidanceContext&, float);
-    bool UnidentifiedResponse_800121D0(UnidentifiedAvoidanceContext&, float);
+    bool OverlapResponse(int, UnidentifiedAvoidanceContext&, float);
+    bool StaticObstacleResponse(UnidentifiedAvoidanceContext&, float);
+    bool MobileObstacleResponse(UnidentifiedAvoidanceContext&, float);
     bool UnidentifiedMovingResponse(UnidentifiedAvoidanceContext&, float);
     void UnidentifiedPrepareContext(UnidentifiedAvoidanceContext&, float);
     void Update(float fDeltaT);

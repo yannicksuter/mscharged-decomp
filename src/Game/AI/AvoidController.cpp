@@ -19,27 +19,27 @@
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
 
 #pragma explicit_zero_data on
-static float sUnidentifiedMemorySeconds = 0.0f;
+static float sAvoidanceMemoryInitialSeconds = 0.0f;
 #pragma explicit_zero_data off
 static float sUnidentifiedRepulsionValue0 = 0.5f;
 static float sUnidentifiedRepulsionValue1 = 1.0f;
 static float sUnidentifiedInitialValue0 = 0.5f;
 static float sUnidentifiedInitialValue1 = 1.0f;
-static float sUnidentifiedValue_806DB4F4 = -0.99f;
-static float sUnidentifiedValue_806DB4F8 = 0.01f;
+static float sSidelineUnavoidableDot = -0.99f;
+static float sAvoidanceMemoryRefreshSeconds = 0.01f;
 static unsigned short sAvoidControllerType = 0xFFFF;
 
-class UnidentifiedAvoidanceCallback_8000F7FC
+class AvoidanceRemovalCollector
 {
 public:
-    UnidentifiedAvoidanceCallback_8000F7FC(AvoidableObject* pObject, nlList<UnidentifiedAvoidanceValue>& list)
-        : mUnidentified000(pObject), mUnidentified004(list)
+    AvoidanceRemovalCollector(AvoidableObject* pObject, nlList<UnidentifiedAvoidanceValue>& list)
+        : mpRemovedObject(pObject), mRemovals(list)
     {
     }
-    void UnidentifiedCallback(const u32&, UnidentifiedAvoidanceValue*);
+    void Collect(const u32&, UnidentifiedAvoidanceValue*);
 
-    AvoidableObject* mUnidentified000;
-    nlList<UnidentifiedAvoidanceValue>& mUnidentified004;
+    AvoidableObject* mpRemovedObject;
+    nlList<UnidentifiedAvoidanceValue>& mRemovals;
 };
 
 inline float UnidentifiedAvoidanceValue::UnidentifiedGetWeight() const
@@ -50,27 +50,27 @@ inline float UnidentifiedAvoidanceValue::UnidentifiedGetWeight() const
     return mUnidentified018 * fWeight;
 }
 
-class UnidentifiedAvoidanceCallback_800102A8
+class RepulsionAccumulator
 {
 public:
-    UnidentifiedAvoidanceCallback_800102A8(float fDeltaT,
+    RepulsionAccumulator(float fDeltaT,
         nlVector3& accumulated, float& totalWeight,
         nlVector3* vectors, float* weights, int* counts,
         nlList<UnidentifiedAvoidanceValue>& list)
-        : mUnidentified000(fDeltaT), mUnidentified004(accumulated),
-          mUnidentified008(totalWeight), mUnidentified00C(vectors),
-          mUnidentified010(weights), mUnidentified014(counts),
-          mUnidentified018(list)
+        : mfDeltaT(fDeltaT), mAccumulated(accumulated),
+          mTotalWeight(totalWeight), mpCategoryVectors(vectors),
+          mpCategoryWeights(weights), mpCategoryCounts(counts),
+          mRemovals(list)
     {
     }
-    void UnidentifiedCallback(const u32&, UnidentifiedAvoidanceValue*);
-    float mUnidentified000;
-    nlVector3& mUnidentified004;
-    float& mUnidentified008;
-    nlVector3* mUnidentified00C;
-    float* mUnidentified010;
-    int* mUnidentified014;
-    nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
+    void Accumulate(const u32&, UnidentifiedAvoidanceValue*);
+    float mfDeltaT;
+    nlVector3& mAccumulated;
+    float& mTotalWeight;
+    nlVector3* mpCategoryVectors;
+    float* mpCategoryWeights;
+    int* mpCategoryCounts;
+    nlList<UnidentifiedAvoidanceValue>& mRemovals;
 };
 
 bool lbl_806E0BB8;
@@ -84,7 +84,7 @@ bool lbl_806E0BB9;
 inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
     : mTimer()
 {
-    mTimer.SetSeconds(sUnidentifiedMemorySeconds);
+    mTimer.SetSeconds(sAvoidanceMemoryInitialSeconds);
 }
 
 inline void AvoidController::RegisterDebugFields(u16* type, DebugWriteCache* cache)
@@ -261,7 +261,7 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
     }
 
     nlList<UnidentifiedAvoidanceValue> list(0, 0);
-    UnidentifiedAvoidanceCallback_8000F7FC callback(pObject, list);
+    AvoidanceRemovalCollector callback(pObject, list);
 
     for (int i = 0; i < 10; ++i)
     {
@@ -273,7 +273,7 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
             AvoidController* controller = ((cFielder*)pCharacter)->GetAvoidController();
             UnidentifiedAvoidanceTree& tree = controller->mUnidentified174;
             tree.Walk(
-                &callback, &UnidentifiedAvoidanceCallback_8000F7FC::UnidentifiedCallback);
+                &callback, &AvoidanceRemovalCollector::Collect);
 
             UnidentifiedAvoidanceValue* value = list.m_pStart;
             while (value != 0)
@@ -287,12 +287,12 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
     }
 }
 
-void UnidentifiedAvoidanceCallback_8000F7FC::UnidentifiedCallback(
+void AvoidanceRemovalCollector::Collect(
     const u32&, UnidentifiedAvoidanceValue* value)
 {
-    if (value->mUnidentified004 == mUnidentified000 || value->mUnidentified008 == mUnidentified000)
+    if (value->mUnidentified004 == mpRemovedObject || value->mUnidentified008 == mpRemovedObject)
     {
-        nlListAddEnd(&mUnidentified004.m_pStart, &mUnidentified004.m_pEnd, value);
+        nlListAddEnd(&mRemovals.m_pStart, &mRemovals.m_pEnd, value);
     }
 }
 
@@ -337,10 +337,10 @@ void AvoidController::Update(float fDeltaT)
     }
 
     nlList<UnidentifiedAvoidanceValue> list(0, 0);
-    UnidentifiedAvoidanceCallback_800102A8 callback(fDeltaT,
+    RepulsionAccumulator callback(fDeltaT,
         vAccumulated_v3, fTotalWeight_v3, v3Vectors, fWeights, nCounts, list);
     mUnidentified174.Walk(&callback,
-        &UnidentifiedAvoidanceCallback_800102A8::UnidentifiedCallback);
+        &RepulsionAccumulator::Accumulate);
 
     AvoidableObject* pSelf = m_pFielder->mUnidentified320;
     UnidentifiedAvoidanceValue* value;
@@ -399,7 +399,7 @@ void AvoidController::Update(float fDeltaT)
             m_CurrentlyAvoiding |= things;
             UnidentifiedSetLast(things, v3Repulsion, fWeight);
             mUnidentified0B4[i].mRepulsion = v3Repulsion;
-            mUnidentified0B4[i].mTimer.SetSeconds(sUnidentifiedValue_806DB4F8);
+            mUnidentified0B4[i].mTimer.SetSeconds(sAvoidanceMemoryRefreshSeconds);
         }
         else
         {
@@ -430,7 +430,7 @@ void AvoidController::Update(float fDeltaT)
     m_fRepulsionMult = 1.0f;
 }
 
-void UnidentifiedAvoidanceCallback_800102A8::UnidentifiedCallback(
+void RepulsionAccumulator::Accumulate(
     const u32&, UnidentifiedAvoidanceValue* value)
 {
     AvoidableObject* pObject = value->mUnidentified008;
@@ -438,23 +438,23 @@ void UnidentifiedAvoidanceCallback_800102A8::UnidentifiedCallback(
     float fWeight = 0.0f;
     if (controller->UnidentifiedCanAvoid(pObject->mType))
     {
-        value->Update(mUnidentified000);
+        value->Update(mfDeltaT);
         fWeight = value->UnidentifiedGetWeight();
     }
     if (fWeight)
     {
-        nlVec3ScaleAdd(mUnidentified004, fWeight,
-            value->mUnidentified00C, mUnidentified004);
-        mUnidentified008 += fWeight;
+        nlVec3ScaleAdd(mAccumulated, fWeight,
+            value->mUnidentified00C, mAccumulated);
+        mTotalWeight += fWeight;
         int index = GetAvoidableIndex((eAvoidableThings)pObject->mType);
-        nlVec3ScaleAdd(mUnidentified00C[index], fWeight,
-            value->mUnidentified00C, mUnidentified00C[index]);
-        mUnidentified010[index] += fWeight;
-        ++mUnidentified014[index];
+        nlVec3ScaleAdd(mpCategoryVectors[index], fWeight,
+            value->mUnidentified00C, mpCategoryVectors[index]);
+        mpCategoryWeights[index] += fWeight;
+        ++mpCategoryCounts[index];
     }
     else
     {
-        nlListAddEnd(&mUnidentified018.m_pStart, &mUnidentified018.m_pEnd, value);
+        nlListAddEnd(&mRemovals.m_pStart, &mRemovals.m_pEnd, value);
     }
 }
 
@@ -509,7 +509,7 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
     {
         if (fDotNormalVel <= 0.0f)
         {
-            if (fDotNormalVel > sUnidentifiedValue_806DB4F4)
+            if (fDotNormalVel > sSidelineUnavoidableDot)
             {
                 float fCos, fSin;
                 nlSinCos(&fSin, &fCos, 0x4000);
@@ -811,8 +811,8 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
             case AVOID_BOWSER:
             case AVOID_PATCHES:
                 bUnidentifiedResult = mUnidentified008->IsMobile()
-                    ? UnidentifiedResponse_800121D0(context, fDeltaT)
-                    : UnidentifiedResponse_800123D8(context, fDeltaT);
+                    ? MobileObstacleResponse(context, fDeltaT)
+                    : StaticObstacleResponse(context, fDeltaT);
                 break;
             }
             context.mUnidentified00C *= mUnidentified004->GetAvoidanceStrength(mUnidentified008);
@@ -895,7 +895,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
     float fRadius = mUnidentified008->GetRadius();
     bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
     if (context.mUnidentified014)
-        return UnidentifiedResponse_800127E0(!bUnidentifiedCollision, context, fDeltaT);
+        return OverlapResponse(!bUnidentifiedCollision, context, fDeltaT);
     if (bUnidentifiedCollision)
     {
         const nlVector3& v3Normal = context.mUnidentified044;
@@ -928,7 +928,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
     return true;
 }
 
-bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800121D0(
+bool UnidentifiedAvoidanceValue::MobileObstacleResponse(
     UnidentifiedAvoidanceContext& context, float fDeltaT)
 {
     cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
@@ -938,7 +938,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800121D0(
     float fRadius = mUnidentified008->GetRadius();
     bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
     if (context.mUnidentified014)
-        return UnidentifiedResponse_800127E0(bUnidentifiedCollision ? 0 : 2, context, fDeltaT);
+        return OverlapResponse(bUnidentifiedCollision ? 0 : 2, context, fDeltaT);
 
     nlVector3 v3Velocity = mUnidentified008->GetVelocity();
     v3Velocity.z = 0.0f;
@@ -955,7 +955,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800121D0(
     return true;
 }
 
-bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
+bool UnidentifiedAvoidanceValue::StaticObstacleResponse(
     UnidentifiedAvoidanceContext& context, float fDeltaT)
 {
     cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
@@ -965,7 +965,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
     float fRadius = mUnidentified008->GetRadius();
     bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
     if (context.mUnidentified014)
-        return UnidentifiedResponse_800127E0(1, context, fDeltaT);
+        return OverlapResponse(1, context, fDeltaT);
     if (bUnidentifiedCollision)
     {
         const nlVector3& v3Normal = context.mUnidentified044;
@@ -998,7 +998,7 @@ bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800123D8(
     return true;
 }
 
-bool UnidentifiedAvoidanceValue::UnidentifiedResponse_800127E0(
+bool UnidentifiedAvoidanceValue::OverlapResponse(
     int mode, UnidentifiedAvoidanceContext& context, float fDeltaT)
 {
     context.mUnidentified000 = context.mUnidentified044;
