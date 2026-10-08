@@ -3582,18 +3582,18 @@ void cFielder::DoRegularShooting(bool bParam)
 
     if (nBallState == BALL_STATE_SKILLSHOT)
     {
-        g_pBall->m_uGoalType = 2;
+        g_pBall->m_uGoalType = GOAL_SKILLSHOT;
     }
     else if (m_eActionState == ACTION_ONETIMER
         || m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
         || (m_eActionState == ACTION_REGULAR_SHOT
             && m_DetPlayer.m_tBallPossessionTimer.GetSeconds() < 0.1f))
     {
-        g_pBall->m_uGoalType = 1;
+        g_pBall->m_uGoalType = GOAL_ONE_TIMER;
     }
     else
     {
-        g_pBall->m_uGoalType = 0;
+        g_pBall->m_uGoalType = GOAL_REGULAR;
     }
 
     if (m_pBall != NULL)
@@ -3667,7 +3667,7 @@ void cFielder::DoRegularShooting(bool bParam)
             nlVec3Scale(v3AngVel, 0.4f);
         }
 
-        if ((g_pBall->m_uGoalType == 0 || g_pBall->m_uGoalType == 2)
+        if ((g_pBall->m_uGoalType == GOAL_REGULAR || g_pBall->m_uGoalType == GOAL_SKILLSHOT)
             && m_pTweaks->fShooting > 0.25f)
         {
             if (m_eActionState == ACTION_LOOSE_BALL_SHOT)

@@ -48,7 +48,7 @@ void GoalOverlay::Update(float fDeltaT)
 void GoalOverlay::OnGoalScored(GoalScoredData* data)
 {
     int playerIndex;
-    if (data->uGoalType == 5)
+    if (data->uGoalType == GOAL_OWN_GOAL)
     {
         playerIndex = data->pLastTouch[data->uTeamIndex]->m_DetPlayer.m_ID;
     }

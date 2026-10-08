@@ -589,7 +589,7 @@ void cGame::InitMegaStrikeGameplay()
         tDebugPrintManager::Print(DC_NETWORK, buffer);
     }
 
-    g_pBall->m_uGoalType = 6;
+    g_pBall->m_uGoalType = GOAL_MEGA_STRIKE;
 
     float accuracy = mpMegaStrikeShooter->m_fMegaStrikeAccuracy;
     float numBalls = mpMegaStrikeShooter->m_fMegaStrikeNumBalls;
@@ -912,11 +912,11 @@ void cGame::CheckForGoal()
                 * g_pBall->m_v3Position.x;
             if (fDirection >= 0.0f)
             {
-                g_pBall->m_uGoalType = 5;
+                g_pBall->m_uGoalType = GOAL_OWN_GOAL;
             }
             else
             {
-                g_pBall->m_uGoalType = 3;
+                g_pBall->m_uGoalType = GOAL_DEFLECTION;
             }
 
             SetPotentialScorer(g_pBall->m_pLastTouch);
@@ -925,7 +925,7 @@ void cGame::CheckForGoal()
         {
             if (nSide != m_pScorer->m_pTeam->m_nSide)
             {
-                g_pBall->m_uGoalType = 5;
+                g_pBall->m_uGoalType = GOAL_OWN_GOAL;
             }
         }
 
@@ -936,7 +936,7 @@ void cGame::CheckForGoal()
             if (m_pScorer->m_eClassType == FIELDER)
             {
                 ((cFielder*)m_pScorer)->ShootBallDueToContact(m_pScorer->m_DetChar.m_v3Velocity);
-                g_pBall->m_uGoalType = 7;
+                g_pBall->m_uGoalType = GOAL_CARRIED_IN;
             }
         }
 
@@ -990,7 +990,7 @@ void cGame::CheckForGoal()
         }
 
         Goalie::HandleGoalScored(nSide);
-        g_pBall->m_uGoalType = 4;
+        g_pBall->m_uGoalType = GOAL_UNCLASSIFIED;
     }
 }
 void cGame::BlowUpPowerups(
@@ -2201,7 +2201,7 @@ void FinishMegaStrike(cGame* pGame)
     if (pGame->m_uMegastrikeGoals != 0)
     {
         pGame->m_nLastTeamToScore = side;
-        g_pBall->m_uGoalType = 6;
+        g_pBall->m_uGoalType = GOAL_MEGA_STRIKE;
         g_pTeams[side]->m_nScore += pGame->m_uMegastrikeGoals;
         int score;
 
@@ -2244,7 +2244,7 @@ void FinishMegaStrike(cGame* pGame)
 
     g_pGame->SetMegaStrikeGameplay(false, 0, 0);
     g_pGame->mEventQueue.mMegaStrikeEndEvent.Deliver(&data);
-    g_pBall->m_uGoalType = 4;
+    g_pBall->m_uGoalType = GOAL_UNCLASSIFIED;
     SetPlayerAudioController(0);
 }
 void cGame::ResumeAfterPresentation()

@@ -1849,7 +1849,7 @@ extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData)
 
 extern "C" void fn_80020CDC(GoalScoredData* pEventData)
 {
-    if (pEventData != NULL && pEventData->uGoalType != 6)
+    if (pEventData != NULL && pEventData->uGoalType != GOAL_MEGA_STRIKE)
     {
         PlaySound(11, 0x8CEE6665UL, NULL, NULL);
     }

@@ -4134,7 +4134,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 
         if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
         {
-            g_pBall->m_uGoalType = 2;
+            g_pBall->m_uGoalType = GOAL_SKILLSHOT;
             if (GetCharacterClass() == BOO)
             {
                 BeginDekeIntangibility();

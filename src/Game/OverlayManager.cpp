@@ -314,7 +314,7 @@ void OverlayManager::ResetStrikerTimesVariants()
 void OverlayManager::OnGoalScored(GoalScoredData* eventData)
 {
     g_bGoalScored = true;
-    if (eventData->uGoalType != 6)
+    if (eventData->uGoalType != GOAL_MEGA_STRIKE)
     {
         static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
         gpNumberDisplay->mVisible = true;

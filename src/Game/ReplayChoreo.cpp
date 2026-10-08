@@ -239,9 +239,9 @@ void ReplayChoreo::StartScript(const ReplayShotData& data)
         int zoneDepth = GetZoneDepth(data);
 
         int replayType = data.uGoalType;
-        if (replayType == 1 || replayType == 2)
+        if (replayType == GOAL_ONE_TIMER || replayType == GOAL_SKILLSHOT)
         {
-            replayType = 0;
+            replayType = GOAL_REGULAR;
         }
 
         if (mNumScripts[zoneDepth][zoneInWidth][replayType] == 0
@@ -265,7 +265,7 @@ void ReplayChoreo::StartScript(const ReplayShotData& data)
         {
             zoneInWidth = 0;
             zoneDepth = 0;
-            replayType = 0;
+            replayType = GOAL_REGULAR;
         }
 
         int numScripts = mNumScripts[zoneDepth][zoneInWidth][replayType];

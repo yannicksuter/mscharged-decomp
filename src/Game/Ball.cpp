@@ -182,7 +182,7 @@ cBall::cBall()
     m_bBallPathChangeCount = 0;
     m_bBallDeflectCount = 0;
     m_fTotalPassTime = 0.0f;
-    m_uGoalType = 4;
+    m_uGoalType = GOAL_UNCLASSIFIED;
     m_uVoiceID = 0;
     m_CurrentGlowEffect = 0;
     mfChargeValue = 0.0f;
@@ -515,7 +515,7 @@ void cBall::CollideWithCharacterCallback(
     {
         if (pCharacter->m_eClassType == FIELDER)
         {
-            m_uGoalType = 3;
+            m_uGoalType = GOAL_DEFLECTION;
         }
 
         if (m_pOwner != NULL)
@@ -2626,7 +2626,7 @@ void ResetBall(cBall* pBall, bool bParam)
     pBall->m_bBallPathChangeCount = 0;
     pBall->m_bBallDeflectCount = 0;
     pBall->m_fTotalPassTime = 0.0f;
-    pBall->m_uGoalType = 4;
+    pBall->m_uGoalType = GOAL_UNCLASSIFIED;
     pBall->m_uVoiceID = 0;
     pBall->m_CurrentGlowEffect = 0;
     pBall->mfChargeValue = 0.0f;

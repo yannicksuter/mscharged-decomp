@@ -5012,7 +5012,7 @@ void Goalie::InitActionLooseBallSetup()
         return;
     }
 
-    g_pBall->m_uGoalType = 4;
+    g_pBall->m_uGoalType = GOAL_UNCLASSIFIED;
 
     m_pPhysicsCharacter->m_CanCollideWithBall = true;
     mbDoHeadTrack = true;

@@ -790,7 +790,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         return;
     }
 
-    if (data->uGoalType != 6)
+    if (data->uGoalType != GOAL_MEGA_STRIKE)
     {
         gpNumberDisplay->BeginScoreUpdate();
     }
@@ -819,7 +819,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         || scoreDifference == data->uNumGoalsScored;
     bool suddenDeath = g_pGame->m_eGameState == GS_OVERTIME;
 
-    if (data->uGoalType == 5)
+    if (data->uGoalType == GOAL_OWN_GOAL)
     {
         data->pLastTouch[data->uTeamIndex]->IsCaptain();
     }
