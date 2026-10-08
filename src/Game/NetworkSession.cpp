@@ -108,7 +108,7 @@ void NetworkSession::Initialize(bool first)
         mCupMode = 0;
 
         PushAllocator(&VirtualAllocator);
-        if (GetRegion() == 0)
+        if (GetRegion() == GAME_REGION_US)
         {
             u32 poolSize = 0xB0000 - 0x2A90;
             void* pool = nlMalloc(poolSize, 8, false);
@@ -696,11 +696,11 @@ void NetworkSession::InitializeOnline()
     mLoginRequestStarted = 0;
 
     u32 gameCode = gNetworkGameCodeR4QP;
-    if (GetRegion() == 2)
+    if (GetRegion() == GAME_REGION_JAPAN)
     {
         gameCode = gNetworkGameCodeR4QJ;
     }
-    else if (GetRegion() == 0)
+    else if (GetRegion() == GAME_REGION_US)
     {
         gameCode = gNetworkGameCodeR4QE;
     }
@@ -2547,13 +2547,13 @@ unsigned int GetNetworkVersionWord()
     int channel = 10;
     switch (GetRegion())
     {
-    case 0:
+    case GAME_REGION_US:
         channel = 10;
         break;
-    case 1:
+    case GAME_REGION_EU:
         channel = 14;
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         channel = 15;
         break;
     }

@@ -445,13 +445,13 @@ bool NetworkRanking::ReportGameResult(int category,
     DWCRnkRegion region;
     switch (GetRegion())
     {
-    case 0:
+    case GAME_REGION_US:
         region = DWC_RNK_REGION_US;
         break;
-    case 1:
+    case GAME_REGION_EU:
         region = DWC_RNK_REGION_EU;
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         region = DWC_RNK_REGION_JP;
         break;
     default:
@@ -533,13 +533,13 @@ bool NetworkRanking::SubmitScore(int category,
     DWCRnkRegion region;
     switch (GetRegion())
     {
-    case 0:
+    case GAME_REGION_US:
         region = DWC_RNK_REGION_US;
         break;
-    case 1:
+    case GAME_REGION_EU:
         region = DWC_RNK_REGION_EU;
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         region = DWC_RNK_REGION_JP;
         break;
     default:
@@ -705,13 +705,13 @@ bool NetworkRanking::GetLeaderboardStats(int category,
     DWCRnkRegion region;
     switch (GetRegion())
     {
-    case 0:
+    case GAME_REGION_US:
         region = DWC_RNK_REGION_US;
         break;
-    case 1:
+    case GAME_REGION_EU:
         region = DWC_RNK_REGION_EU;
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         region = DWC_RNK_REGION_JP;
         break;
     default:

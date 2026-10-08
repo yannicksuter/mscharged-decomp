@@ -2040,7 +2040,7 @@ static int fn_801BF4EC()
 
     switch (GetRegion())
     {
-    case 0:
+    case GAME_REGION_US:
         switch ((u8)SCGetLanguage())
         {
         case 3:
@@ -2054,7 +2054,7 @@ static int fn_801BF4EC()
             break;
         }
         break;
-    case 1:
+    case GAME_REGION_EU:
         switch ((u8)SCGetLanguage())
         {
         case 2:
@@ -2074,7 +2074,7 @@ static int fn_801BF4EC()
             break;
         }
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         lang = 5;
         break;
     default:

@@ -813,10 +813,10 @@ void SaveLoad::IconLoadsComplete()
     const char* region;
     switch (GetRegion())
     {
-    case 1:
+    case GAME_REGION_EU:
         region = "EU";
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         region = "JP";
         break;
     default:

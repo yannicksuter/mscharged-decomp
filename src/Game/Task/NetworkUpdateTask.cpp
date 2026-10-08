@@ -50,11 +50,11 @@ void NetworkUpdateTask::Initialize()
     }
 
     NetworkStatsManager::CreateInstance();
-    if (GetRegion() == 2)
+    if (GetRegion() == GAME_REGION_JAPAN)
     {
         g_nAddHoursTime = 9;
     }
-    else if (GetRegion() == 0)
+    else if (GetRegion() == GAME_REGION_US)
     {
         g_nAddHoursTime = -8;
     }

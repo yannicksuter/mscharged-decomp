@@ -191,7 +191,7 @@ void PauseMenuScene::SceneCreated()
     FEAudio::EnableSounds(true);
     if (GameInfoManager::Instance()->IsInMode4())
     {
-        if (GetRegion() == 1)
+        if (GetRegion() == GAME_REGION_EU)
         {
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");

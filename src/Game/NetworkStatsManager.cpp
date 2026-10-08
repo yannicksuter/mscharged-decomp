@@ -110,7 +110,7 @@ void NetworkStatsManager::Reset(bool)
         mCategories[i].mLocalPlayerIndex = -1;
     }
 
-    bool european = GetRegion() == 1;
+    bool european = GetRegion() == GAME_REGION_EU;
     if (european)
     {
         int alternate;
@@ -176,7 +176,7 @@ void NetworkStatsManager::Reset(bool)
 
 bool NetworkStatsManager::UsesEuropeanRankings() const
 {
-    return GetRegion() == 1;
+    return GetRegion() == GAME_REGION_EU;
 }
 
 NetworkLeaderboardCategory* NetworkStatsManager::GetCategory(

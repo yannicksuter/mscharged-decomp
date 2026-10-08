@@ -31,7 +31,7 @@ ControllerMapOverlay::ControllerMapOverlay()
     , mDonePressed(false)
     , mAsyncImage("art/fe/controllermapui.res", 0)
 {
-    if ((GetRegion() == 0
+    if ((GetRegion() == GAME_REGION_US
             && g_pLocalization->m_CurrentLanguage == nlLocalization::LangEnglish)
         || g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
