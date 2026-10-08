@@ -9,8 +9,8 @@ s32 NHTTPi_strlen(const char* string);
 s32 NHTTPi_memfind(const void* haystack, s32 haystackLength,
     const void* needle, s32 needleLength);
 
-static BOOL addHdrList(NHTTPHeader** list, NHTTPBgnEndInfo* info, char* name,
-    char* value)
+static BOOL addHdrList(NHTTPHeader** list, NHTTPBgnEndInfo* info, const char* name,
+    const char* value)
 {
     BOOL found = FALSE;
     NHTTPHeader* header = *list;
@@ -148,7 +148,7 @@ NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list)
 }
 
 BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
-    char* name, char* value)
+    const char* name, const char* value)
 {
     if (request->state != 0)
     {
@@ -158,7 +158,7 @@ BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
 }
 
 BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* req_p,
-    NHTTPBgnEndInfo* bgnEndInfo_p, char* label_p, char* value_p)
+    NHTTPBgnEndInfo* bgnEndInfo_p, const char* label_p, const char* value_p)
 {
     int rc = FALSE;
     u32 length = 0;

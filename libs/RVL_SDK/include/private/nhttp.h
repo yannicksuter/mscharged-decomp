@@ -54,8 +54,8 @@ typedef struct NHTTPHeader
 {
     struct NHTTPHeader* next;
     struct NHTTPHeader* prev;
-    char* name;
-    char* value;
+    const char* name;
+    const char* value;
     u32 length;
     u32 _unk14;
 } NHTTPHeader;
@@ -198,7 +198,7 @@ NHTTPResponseInfo* NHTTPi_GetResponse(void* mutexInfo,
     NHTTPResponseInfo* response);
 s32 NHTTPi_GetConnectionListLength(void);
 s32 NHTTPi_PostSendCallback(void* mutexInfo,
-    NHTTPConnectionInfo* connection, void* value, u32 arg);
+    NHTTPConnectionInfo* connection, const char* label, u32 arg);
 void NHTTPi_BufferFullCallback(void* mutexInfo,
     NHTTPConnectionInfo* connection);
 void NHTTPi_ReceivedCallback(void* mutexInfo,
