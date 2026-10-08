@@ -60,8 +60,7 @@ static  char sccsid[] = "@(#)e_pow.c 1.5 04/04/22 SMI";
 
 #include <internal/fdlibm.h>
 
-extern int __float_nan[];
-#define NAN (*(float*)__float_nan)
+#include <internal/math_nan.h>
 #define fabs(x) __fabs(x)
 #include <errno.h>
 

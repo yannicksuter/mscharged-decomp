@@ -37,8 +37,7 @@
 
 #include <internal/fdlibm.h>
 
-extern int __float_nan[];
-#define NAN (*(float*)__float_nan)
+#include <internal/math_nan.h>
 
 #ifdef __STDC__
 static const double

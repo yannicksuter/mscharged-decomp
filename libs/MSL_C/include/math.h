@@ -2,6 +2,7 @@
 #define _MATH_H_
 
 #include <stdint.h>
+#include <internal/math_nan.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -78,7 +79,6 @@ long labs(long n);
 #endif
 
     extern _INT32 __float_huge[];
-    extern _INT32 __float_nan[];
     extern _INT32 __double_huge[];
     extern _INT32 __extended_huge[];
     extern _INT32 __extended_min[];
@@ -92,7 +92,6 @@ long labs(long n);
 #define INFINITY (*(float*)__float_huge)
     // #define INFINITY (*(float*)__float_max)
 
-#define NAN       (*(float*)__float_nan)
 #define HUGE_VALF (*(float*)__float_max)
 // #define HUGE_VALF (*(float*)__float_huge)
 #define HUGE_VALL (*(long double*)__extended_huge)
