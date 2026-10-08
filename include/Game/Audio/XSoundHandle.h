@@ -4,6 +4,20 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+enum eSoundHandleState
+{
+    SOUND_HANDLE_INITIAL = 0,
+    SOUND_HANDLE_PENDING = 1,
+    SOUND_HANDLE_PREPARING = 2,
+    SOUND_HANDLE_PREPARED = 3,
+    SOUND_HANDLE_PLAYING = 4,
+    SOUND_HANDLE_PAUSED = 5,
+    SOUND_HANDLE_FAILED = 6,
+    SOUND_HANDLE_STOPPING = 7,
+    SOUND_HANDLE_STOPPED = 8,
+    SOUND_HANDLE_RELEASED = 9,
+};
+
 struct XSoundOwner
 {
     XSoundOwner()
@@ -81,7 +95,7 @@ public:
 
     u32** m_Slot;
     u32 m_CueIndex;
-    s32 m_State;
+    eSoundHandleState m_State;
     u8 m_CallbackEnabled;
     u8 m_Unknown11[3];
     XSoundOwner* m_Owner;

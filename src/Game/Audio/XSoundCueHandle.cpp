@@ -47,7 +47,7 @@ XSoundCueHandle::XSoundCueHandle(void* resource, XSoundOwner* owner, unsigned in
 
     if (this->definition->activeCount > this->definition->maximumCount)
     {
-        m_State = 6;
+        m_State = SOUND_HANDLE_FAILED;
         return;
     }
 
@@ -99,21 +99,21 @@ bool XSoundCueHandle::Play(bool callbackEnabled)
 {
     switch (m_State)
     {
-    case 1:
+    case SOUND_HANDLE_PENDING:
         bits.playWhenPrepared = true;
         this->Prepare(callbackEnabled);
         return false;
-    case 2:
-    case 5:
+    case SOUND_HANDLE_PREPARING:
+    case SOUND_HANDLE_PAUSED:
         bits.playWhenPrepared = true;
         return false;
-    case 3:
+    case SOUND_HANDLE_PREPARED:
         this->instance->Play(0.0f);
-        m_State = this->instance->state;
-        return m_State == 4;
-    case 4:
+        m_State = static_cast<eSoundHandleState>(this->instance->state);
+        return m_State == SOUND_HANDLE_PLAYING;
+    case SOUND_HANDLE_PLAYING:
         break;
-    case 6:
+    case SOUND_HANDLE_FAILED:
         return false;
     default:
         break;
@@ -123,11 +123,11 @@ bool XSoundCueHandle::Play(bool callbackEnabled)
 
 bool XSoundCueHandle::Prepare(bool callbackEnabled)
 {
-    if (m_State == 6)
+    if (m_State == SOUND_HANDLE_FAILED)
         return false;
     m_CallbackEnabled = callbackEnabled;
     this->instance->Prepare();
-    m_State = 2;
+    m_State = SOUND_HANDLE_PREPARING;
     return true;
 }
 
@@ -135,78 +135,78 @@ void XSoundCueHandle::Stop(u8 callbackEnabled, void* force)
 {
     switch (m_State)
     {
-    case 7:
+    case SOUND_HANDLE_STOPPING:
         if (force != 0)
             this->instance->Stop(force);
         break;
-    case 8:
+    case SOUND_HANDLE_STOPPED:
         break;
     default:
         this->instance->Stop(force);
         break;
     }
     m_CallbackEnabled = callbackEnabled;
-    m_State = 7;
+    m_State = SOUND_HANDLE_STOPPING;
     bits.flag8000 = true;
 }
 
 void XSoundCueHandle::Pause()
 {
     this->bits.savedState = m_State;
-    m_State = 5;
+    m_State = SOUND_HANDLE_PAUSED;
     this->instance->Pause();
 }
 
 void XSoundCueHandle::Resume()
 {
-    m_State = bits.savedState;
+    m_State = static_cast<eSoundHandleState>(bits.savedState);
     this->instance->Resume();
 }
 
 void XSoundCueHandle::Update(float dt)
 {
-    if (m_State == 4)
+    if (m_State == SOUND_HANDLE_PLAYING)
     {
         m_PreviousTime = m_CurrentTime;
         m_CurrentTime += dt;
     }
-    if (m_State == 6)
-        m_State = 8;
+    if (m_State == SOUND_HANDLE_FAILED)
+        m_State = SOUND_HANDLE_STOPPED;
 
-    if (m_State != 8 && m_State != 5 && m_State != 9)
+    if (m_State != SOUND_HANDLE_STOPPED && m_State != SOUND_HANDLE_PAUSED && m_State != SOUND_HANDLE_RELEASED)
     {
         if (this->definition->useSlider)
             UpdateSlider(dt);
         this->instance->Update(dt);
 
-        if (m_State != 9)
+        if (m_State != SOUND_HANDLE_RELEASED)
         {
-            if (m_State == 2)
+            if (m_State == SOUND_HANDLE_PREPARING)
             {
-                if (this->instance->state == 3)
+                if (this->instance->state == SOUND_INSTANCE_STATE_PREPARED)
                 {
-                    m_State = 3;
+                    m_State = SOUND_HANDLE_PREPARED;
                     if (this->bits.playWhenPrepared)
                     {
                         this->instance->Play(0.0f);
-                        m_State = this->instance->state;
+                        m_State = static_cast<eSoundHandleState>(this->instance->state);
                     }
                 }
             }
             else if (this->instance->nextInstance != 0)
-                m_State = 4;
+                m_State = SOUND_HANDLE_PLAYING;
             else
-                m_State = this->instance->state;
+                m_State = static_cast<eSoundHandleState>(this->instance->state);
         }
     }
 
-    if (m_State == 8 && m_CallbackEnabled)
+    if (m_State == SOUND_HANDLE_STOPPED && m_CallbackEnabled)
         this->Release();
 }
 
 void XSoundCueHandle::UpdateSlider(float dt)
 {
-    if (m_State != 4 && m_State != 8)
+    if (m_State != SOUND_HANDLE_PLAYING && m_State != SOUND_HANDLE_STOPPED)
         return;
 
     float previousValue = this->sliderValue;
@@ -219,7 +219,7 @@ void XSoundCueHandle::UpdateSlider(float dt)
         SoundInstance* oldInstance = this->instance;
         if (selected != oldInstance->definition)
         {
-            if (oldInstance->state == 4)
+            if (oldInstance->state == SOUND_INSTANCE_STATE_PLAYING)
             {
                 oldInstance->SetVolume(false, 0.0f, 0.5f);
                 oldInstance->releaseTime = 0.5f;
@@ -229,7 +229,7 @@ void XSoundCueHandle::UpdateSlider(float dt)
             this->instance = newInstance;
             newInstance->SetVolume(false, 1.0f, 0.5f);
             this->instance->nextInstance = oldInstance;
-            m_State = 4;
+            m_State = SOUND_HANDLE_PLAYING;
         }
     }
 
@@ -238,7 +238,7 @@ void XSoundCueHandle::UpdateSlider(float dt)
     while (previous != 0 && instance != 0)
     {
         instance->Update(dt);
-        if (instance->state == 8 && instance->nextInstance == 0)
+        if (instance->state == SOUND_INSTANCE_STATE_STOPPED && instance->nextInstance == 0)
         {
             previous->nextInstance = 0;
             delete instance;

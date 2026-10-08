@@ -323,19 +323,19 @@ void StopSound(unsigned long cueId, void* context)
             {
                 switch (handle->m_State)
                 {
-                case 2:
-                case 3:
-                case 4:
-                case 5:
+                case SOUND_HANDLE_PREPARING:
+                case SOUND_HANDLE_PREPARED:
+                case SOUND_HANDLE_PLAYING:
+                case SOUND_HANDLE_PAUSED:
                     handle->Stop(1, 0);
                     break;
-                case 7:
+                case SOUND_HANDLE_STOPPING:
                     handle->SetCallbackEnabled(1);
                     break;
-                case 8:
+                case SOUND_HANDLE_STOPPED:
                     handle->Release();
                     break;
-                case 9:
+                case SOUND_HANDLE_RELEASED:
                     break;
                 }
             }
@@ -356,12 +356,12 @@ void PauseSound(unsigned long cueId, void* context)
             sAudioHandleStates.FindGet(key, &state);
             if (state->m_CanResume != 0 && *slot != 0)
             {
-                if ((*slot)->m_State == 8)
+                if ((*slot)->m_State == SOUND_HANDLE_STOPPED)
                 {
                     (*slot)->Release();
                     *slot = 0;
                 }
-                else if ((*slot)->m_State != 5)
+                else if ((*slot)->m_State != SOUND_HANDLE_PAUSED)
                 {
                     (*slot)->Pause();
                 }
@@ -432,7 +432,7 @@ int GetSoundState(
     unsigned long cueId, void* context)
 {
     XSoundHandle* handle = FindSoundHandle(cueId, context);
-    return handle != 0 ? handle->m_State : 8;
+    return handle != 0 ? handle->m_State : SOUND_HANDLE_STOPPED;
 }
 
 void SetSoundCallbackEnabled(unsigned long cueId, void* context,
@@ -498,19 +498,19 @@ void PauseAllAudio()
             XSoundHandle* handle = (XSoundHandle*)key;
             switch (handle->m_State)
             {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
+            case SOUND_HANDLE_PREPARING:
+            case SOUND_HANDLE_PREPARED:
+            case SOUND_HANDLE_PLAYING:
+            case SOUND_HANDLE_PAUSED:
                 handle->Stop(1, 0);
                 break;
-            case 7:
+            case SOUND_HANDLE_STOPPING:
                 handle->SetCallbackEnabled(1);
                 break;
-            case 8:
+            case SOUND_HANDLE_STOPPED:
                 handle->Release();
                 break;
-            case 9:
+            case SOUND_HANDLE_RELEASED:
                 break;
             }
         }
