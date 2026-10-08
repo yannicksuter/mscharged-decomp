@@ -1652,8 +1652,8 @@ unsigned int Goalie::FindDumpDirection(unsigned short aDesired, bool bConstrain)
 cPlayer* Goalie::FindOpenPassTarget()
 {
     cPlayer* pPassTarget = 0;
-    bool bUnidentified = GetGlobalPad() != 0;
-    if (bUnidentified)
+    bool bHasGlobalPad = GetGlobalPad() != 0;
+    if (bHasGlobalPad)
     {
         pPassTarget = fn_80096F54(this, false);
     }
@@ -1938,11 +1938,11 @@ bool Goalie::IsCloseToPlane(const nlVector3& rPos1,
     }
     else
     {
-        float fUnidentified2
+        float fBallVelYSq
             = nlGetLengthSquared1D(g_pBall->m_v3Velocity.y);
-        float fUnidentified3
+        float fBallVelXSq
             = nlGetLengthSquared1D(g_pBall->m_v3Velocity.x);
-        if (fUnidentified3 + fUnidentified2
+        if (fBallVelXSq + fBallVelYSq
             > nlGetLengthSquared1D(0.01f))
         {
             v3Dir.x = g_pBall->m_v3Velocity.y;
@@ -2038,8 +2038,8 @@ bool Goalie::CheckForDekeAttack()
         if (nlRandomf(100.0f) < fChance)
         {
             cFielder* pFielder = g_pBall->GetOwnerFielder();
-            bool bUnidentifiedSecond = pFielder->HasTeleportDeke();
-            float fDistance = bUnidentifiedSecond ? gfDekeAttackRangeLong : gfDekeAttackRange;
+            bool bHasTeleportDeke = pFielder->HasTeleportDeke();
+            float fDistance = bHasTeleportDeke ? gfDekeAttackRangeLong : gfDekeAttackRange;
             if (!pFielder->IsFallenDown() && !IsFielderDazed(pFielder)
                 && nlVec3DistanceSquared2D(g_pBall->m_v3Position, m_DetChar.m_v3Position)
                     < nlGetLengthSquared1D(fDistance))
@@ -3353,17 +3353,17 @@ void Goalie::ChooseDesperationAnim(f32 fFudgeDist)
 
 void Goalie::StartFireAnim()
 {
-    bool bUnidentified;
+    bool bFireAnimPlaying;
     if (fn_800976C4() && m_DetPlayer.m_nFeatherAnimID == 0xAA)
     {
-        bUnidentified = true;
+        bFireAnimPlaying = true;
     }
     else
     {
-        bUnidentified = false;
+        bFireAnimPlaying = false;
     }
 
-    if (!bUnidentified)
+    if (!bFireAnimPlaying)
     {
         SetPowerupAnimState(m_nSpine1JointIndex, 0xAA, 0.08f);
         PlaySound(9, 0x528D7B6A, 0, 0);

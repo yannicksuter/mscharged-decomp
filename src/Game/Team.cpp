@@ -369,47 +369,47 @@ void cTeam::AssignMarks(bool bForceReMark)
         return;
     }
 
-    cFielder* pUnidentifiedFielder =
+    cFielder* pSBC =
         (cFielder*)fn_800DF790(GetOtherTeam());
     float fDownfield;
     float fScore;
-    cFielder* pUnidentifiedBestFielder = NULL;
-    float fUnidentifiedBestScore = 0.0f;
+    cFielder* pBestFielder = NULL;
+    float fBestScore = 0.0f;
 
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
         pMyFielder->ClearMarks();
-        bool bUnidentified = pMyFielder->IsInFallAction()
+        bool bUnavailable = pMyFielder->IsInFallAction()
                           || pMyFielder->IsShattered()
                           || Incapacitated(pMyFielder);
-        if (!bUnidentified)
+        if (!bUnavailable)
         {
             fDownfield = NearTo(
-                pMyFielder, pUnidentifiedFielder);
+                pMyFielder, pSBC);
             float fInBetween =
-                InBetweenMyNetAnd(pMyFielder, pUnidentifiedFielder);
+                InBetweenMyNetAnd(pMyFielder, pSBC);
             fScore = WeightedScore2(
                 fInBetween, 0.4f, fDownfield, 0.6f);
-            if (fScore > fUnidentifiedBestScore)
+            if (fScore > fBestScore)
             {
-                fUnidentifiedBestScore = fScore;
-                pUnidentifiedBestFielder = pMyFielder;
+                fBestScore = fScore;
+                pBestFielder = pMyFielder;
             }
         }
     }
 
-    if (pUnidentifiedBestFielder != NULL
-        && pUnidentifiedFielder != NULL)
+    if (pBestFielder != NULL
+        && pSBC != NULL)
     {
-        pUnidentifiedBestFielder->AddMark(pUnidentifiedFielder);
+        pBestFielder->AddMark(pSBC);
     }
 
     float fFielderMarkScores[4][4];
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
-        bool bUnidentifiedMyFielder = pMyFielder->IsInFallAction()
+        bool bMyFielderDown = pMyFielder->IsInFallAction()
                                    || pMyFielder->IsShattered();
 
         nlVector3 v3UnidentifiedPosition;
@@ -418,10 +418,10 @@ void cTeam::AssignMarks(bool bForceReMark)
         for (int i_otherf = 0; i_otherf < 4; i_otherf++)
         {
             pOppFielder = GetOtherTeam()->GetFielder(i_otherf);
-            bool bUnidentifiedOppFielder = pOppFielder->IsInFallAction()
+            bool bOppFielderDown = pOppFielder->IsInFallAction()
                                         || pOppFielder->IsShattered();
 
-            if (bUnidentifiedMyFielder && !bUnidentifiedOppFielder)
+            if (bMyFielderDown && !bOppFielderDown)
             {
                 fFielderMarkScores[i_fielder][i_otherf] = 200.0f;
             }
@@ -577,16 +577,16 @@ void cTeam::UpdateShotScore()
     }
     else
     {
-        bool bUnidentified = false;
+        bool bHasPassTarget = false;
         if (g_pBall->meBallState == 5
             || g_pBall->meBallState == 3)
         {
             if (g_pBall->m_pPassTarget != NULL)
             {
-                bUnidentified = true;
+                bHasPassTarget = true;
             }
         }
-        if (bUnidentified
+        if (bHasPassTarget
             && g_pBall->GetPassTargetFielder() != NULL)
         {
             cPlayer* pCaptain = m_pPlayers[0];

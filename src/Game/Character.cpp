@@ -1871,8 +1871,8 @@ extern "C" void fn_80020CDC(GoalScoredData* pEventData)
             for (s32 j = 0; j < 5; j++)
             {
                 cPlayer* pPlayer = pTeam->GetPlayer(j);
-                bool bUnidentified = pPlayer->GetGlobalPad() != NULL;
-                if (bUnidentified)
+                bool bHasGlobalPad = pPlayer->GetGlobalPad() != NULL;
+                if (bHasGlobalPad)
                 {
                     pPlayer->SetAIPad(NULL);
                 }
@@ -1914,19 +1914,19 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
 {
     if (pEventData->bulletBill->active)
     {
-        cFielder* pUnidentified1;
-        cFielder* pUnidentified0 = (cFielder*)pEventData->player;
-        pUnidentified1 = pEventData->bulletBill->target;
-        if (pUnidentified1 != pUnidentified0)
+        cFielder* pAttacker;
+        cFielder* pFielder = (cFielder*)pEventData->player;
+        pAttacker = pEventData->bulletBill->target;
+        if (pAttacker != pFielder)
         {
-            if (pUnidentified0->IsSuperGrowActive() || pUnidentified0->IsStarActive())
+            if (pFielder->IsSuperGrowActive() || pFielder->IsStarActive())
             {
                 CollisionBulletBillData data = { pEventData->player, pEventData->bulletBill };
                 g_pGame->fn_80060BFC(data);
             }
-            else if (pUnidentified0->fn_800470B4(pUnidentified0, pUnidentified1))
+            else if (pFielder->fn_800470B4(pFielder, pAttacker))
             {
-                PlayOwnedSound(pUnidentified0->m_uSoundSlotId, 0xFD0DC03DUL,
+                PlayOwnedSound(pFielder->m_uSoundSlotId, 0xFD0DC03DUL,
                     (XSoundOwner*)g_pBall->m_pSoundOwner, NULL, NULL);
             }
         }

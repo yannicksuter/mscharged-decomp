@@ -283,7 +283,7 @@ void InitializePowerups();
 int IsMushroomPowerup(ePowerUpType eType);
 bool IsStarOrChainChompPowerup(ePowerUpType eType);
 bool IsDrawablePowerup(ePowerUpType eType);
-bool IsCaptainPowerup(int nUnidentified);
+bool IsCaptainPowerup(int nType);
 void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
     int nnumOfPowerups, PowerupThrowParameters* pUnidentified);
 

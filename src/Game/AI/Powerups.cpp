@@ -178,36 +178,36 @@ const char* uBANANA_STREAK_TEXTURE;
 
 int IsMushroomPowerup(ePowerUpType eType)
 {
-    int nUnidentified = 0;
+    int nIsMushroom = 0;
     switch (eType)
     {
     case POWER_UP_MUSHROOM:
-        nUnidentified = 1;
+        nIsMushroom = 1;
         break;
     default:
         break;
     }
-    return nUnidentified;
+    return nIsMushroom;
 }
 
 bool IsStarOrChainChompPowerup(ePowerUpType eType)
 {
-    bool bUnidentified = false;
+    bool bIsStarOrChainChomp = false;
     switch (eType)
     {
     case POWER_UP_CHAIN_CHOMP:
     case POWER_UP_STAR:
-        bUnidentified = true;
+        bIsStarOrChainChomp = true;
         break;
     default:
         break;
     }
-    return bUnidentified;
+    return bIsStarOrChainChomp;
 }
 
 bool IsDrawablePowerup(ePowerUpType eType)
 {
-    bool bUnidentified = false;
+    bool bIsDrawable = false;
     switch (eType)
     {
     case POWER_UP_GREEN_SHELL:
@@ -216,17 +216,17 @@ bool IsDrawablePowerup(ePowerUpType eType)
     case POWER_UP_FREEZE_SHELL:
     case POWER_UP_BANANA:
     case POWER_UP_BOBOMB:
-        bUnidentified = true;
+        bIsDrawable = true;
         break;
     default:
         break;
     }
-    return bUnidentified;
+    return bIsDrawable;
 }
 
-bool IsCaptainPowerup(int nUnidentified)
+bool IsCaptainPowerup(int nType)
 {
-    return nUnidentified >= NUM_POWER_UPS && nUnidentified <= 20;
+    return nType >= NUM_POWER_UPS && nType <= 20;
 }
 
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
@@ -2050,9 +2050,9 @@ void PowerupBase::Destroy(bool bSilent)
         StopSound(soundID, this);
     }
 
-    bool bUnidentified = m_v3Position.z < -1.0f;
+    bool bBelowGround = m_v3Position.z < -1.0f;
 
-    if (!bSilent && !bUnidentified
+    if (!bSilent && !bBelowGround
         && (m_eType == POWER_UP_BOBOMB || mbExploder))
     {
         if (m_eType != POWER_UP_FREEZE_SHELL)
@@ -2529,8 +2529,8 @@ void GreenShell::Update(float dt)
  */
 void GreenShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2593,8 +2593,8 @@ void RedShell::Update(float dt)
  */
 void RedShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2690,12 +2690,12 @@ void Banana::ThrowAt(cFielder* pThrower)
     unsigned short aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
     float fUnidentified = pThrower->m_DetChar.m_fPlayerScale;
     float fRadius = GetRadius();
-    float fUnidentified2 = fn_8002BFA8(
+    float fThrowerRadius = fn_8002BFA8(
         pThrower->GetTweaks(), fUnidentified);
 
     nlPolarToCartesian(v3Unidentified.x, v3Unidentified.y,
         (unsigned short)(aDirection + 0x8000),
-        0.15f + fRadius + fUnidentified2);
+        0.15f + fRadius + fThrowerRadius);
 
     nlVec3Add(v3Unidentified,
         pThrower->m_DetChar.m_v3Position, v3Unidentified);
@@ -2761,8 +2761,8 @@ void Banana::Update(float dt)
  */
 void Banana::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2819,8 +2819,8 @@ void SpinyShell::Update(float dt)
  */
 void SpinyShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2877,8 +2877,8 @@ void FreezeShell::Update(float fDeltaT)
  */
 void FreezeShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;

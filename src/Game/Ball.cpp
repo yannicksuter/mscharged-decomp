@@ -959,10 +959,10 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
 
     UpdateOrientation(fDeltaT);
 
-    bool bUnidentified = m_tShotTimer.m_uPackedTime != 0
+    bool bBooSkillshot = m_tShotTimer.m_uPackedTime != 0
         && meBallState == 8 && m_pShooter != NULL
         && m_pShooter->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10;
-    if (bUnidentified)
+    if (bBooSkillshot)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
         if (pFielder->m_eActionState == (eFielderActionState)0x21
@@ -2233,7 +2233,7 @@ void cBall::Update(float fDeltaT)
         UpdateBallStateAndTimers(this, fDeltaT);
         DecayBallCharge(this);
 
-        bool bUnidentified = true;
+        bool bKillHeaderTarget = true;
         static Timer tHeaderTargetTimer(0.33f);
 
         bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
@@ -2250,7 +2250,7 @@ void cBall::Update(float fDeltaT)
             {
                 if (sHeaderTargetVisible)
                 {
-                    bUnidentified = m_v3Position.z < 0.4f;
+                    bKillHeaderTarget = m_v3Position.z < 0.4f;
                 }
                 else if (m_v3Position.z > gHeaderTargetPredictionHeight
                     && tHeaderTargetTimer.Countdown(fDeltaT, 0.0f))
@@ -2260,11 +2260,11 @@ void cBall::Update(float fDeltaT)
                         NULL, NULL, gHeaderTargetPredictionHeight);
                     EmitHeaderTarget(this, &v3Unidentified, false);
                     sHeaderTargetVisible = true;
-                    bUnidentified = false;
+                    bKillHeaderTarget = false;
                 }
             }
 
-            if (sHeaderTargetVisible && bUnidentified)
+            if (sHeaderTargetVisible && bKillHeaderTarget)
             {
                 KillHeaderTarget(this, false);
                 sHeaderTargetVisible = false;
@@ -2898,16 +2898,16 @@ void OnBallKickoff()
         return;
     }
 
-    float fUnidentified0
+    float fSpeedX
         = nlRandomf(lbl_806DB548 * lbl_806E0BD8)
         + lbl_806DB548 * (1.0f - lbl_806E0BD8);
-    float fUnidentified1
+    float fSpreadY
         = nlRandomf(lbl_806E0BD0 * lbl_806E0BD8)
         + lbl_806E0BD0 * (1.0f - lbl_806E0BD8);
 
-    nlVector3 v3Velocity = { fUnidentified0, 0.0f, 0.0f };
+    nlVector3 v3Velocity = { fSpeedX, 0.0f, 0.0f };
     v3Velocity.y
-        = 0.5f * fUnidentified1 - nlRandomf(fUnidentified1);
+        = 0.5f * fSpreadY - nlRandomf(fSpreadY);
     v3Velocity.x = 0.0f;
     v3Velocity.z
         = 0.75f * lbl_806E0BD4

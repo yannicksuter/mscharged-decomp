@@ -187,13 +187,13 @@ float Striker(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsStriker = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsStriker())
     {
-        bUnidentified = true;
+        bIsStriker = true;
     }
 
-    if (bUnidentified)
+    if (bIsStriker)
     {
         return 1.0f;
     }
@@ -208,13 +208,13 @@ float Winger(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsWinger = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsWinger())
     {
-        bUnidentified = true;
+        bIsWinger = true;
     }
 
-    if (bUnidentified)
+    if (bIsWinger)
     {
         return 1.0f;
     }
@@ -229,13 +229,13 @@ float Midfield(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsMidfield = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsMidField())
     {
-        bUnidentified = true;
+        bIsMidfield = true;
     }
 
-    if (bUnidentified)
+    if (bIsMidfield)
     {
         return 1.0f;
     }
@@ -250,13 +250,13 @@ float Defence(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsDefence = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsDefense())
     {
-        bUnidentified = true;
+        bIsDefence = true;
     }
 
-    if (bUnidentified)
+    if (bIsDefence)
     {
         return 1.0f;
     }

@@ -346,7 +346,7 @@ public:
         const int* nModelID, cSHierarchy* pHierarchy,
         cAnimInventory* pAnimInventory,
         const CharacterPhysicsData* pCharacterPhysicsData, PlayerTweaks* pCharTweaks,
-        PlayerTweaks* pUnidentifiedTweaks,
+        PlayerTweaks* pSuperPowerTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
     virtual ~cFielder();
     virtual void PrePhysicsUpdate();

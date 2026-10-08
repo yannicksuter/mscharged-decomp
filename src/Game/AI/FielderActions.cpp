@@ -1043,9 +1043,9 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
         m_pPhysicsCharacter->m_CanCollideWithWall = 0;
     }
 
-    bool bUnidentified = IsCaptain();
+    bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0x1CF82176;
-    if (bUnidentified)
+    if (bIsCaptain)
     {
         soundID = 0xFDEC8E0F;
     }
@@ -1276,16 +1276,16 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         break;
     }
 
-    bool bUnidentified = IsCaptain();
+    bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0xDEA5F49B;
-    if (bUnidentified)
+    if (bIsCaptain)
     {
         soundID = 0xA91D4914;
     }
     PlaySound(m_uSoundSlotId, soundID, 0, 0);
 
-    bool bUnidentified2 = g_pGame->IsGameplayOrOvertime();
-    if (bUnidentified2)
+    bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
+    if (bIsGameplay)
     {
         StatsTracker::Instance()->TrackStat(
             (ePlayerStats)0x15, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
@@ -1430,9 +1430,9 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
         EmitElectrocution(this);
     }
 
-    bool bUnidentified = IsCaptain();
+    bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0xBADF0EF9;
-    if (bUnidentified)
+    if (bIsCaptain)
     {
         soundID = 0x1602CA52;
     }
@@ -1494,9 +1494,9 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
 
     PlayRumbleAction(4, GetGlobalPad());
 
-    bool bUnidentified = IsCaptain();
+    bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0xBADF0EF9;
-    if (bUnidentified)
+    if (bIsCaptain)
     {
         soundID = 0x1602CA52;
     }
@@ -1700,9 +1700,9 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
             SwapController(false);
         }
 
-        bool bUnidentified = IsCaptain();
+        bool bIsCaptain = IsCaptain();
         unsigned long soundID = 0x1CF82176;
-        if (bUnidentified)
+        if (bIsCaptain)
         {
             soundID = 0xFDEC8E0F;
         }
@@ -1912,9 +1912,9 @@ void cFielder::fn_80046244()
             m_pPhysicsCharacter->m_CanCollideWithWall = 0;
         }
 
-        bool bUnidentified = IsCaptain();
+        bool bIsCaptain = IsCaptain();
         unsigned long soundID = 0x1CF82176;
-        if (bUnidentified)
+        if (bIsCaptain)
         {
             soundID = 0xFDEC8E0F;
         }
@@ -2315,18 +2315,18 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
         unsigned long soundID;
         if (pAttacker->IsCaptain())
         {
-            bool bUnidentified = IsCaptain();
+            bool bIsCaptain = IsCaptain();
             soundID = 0xE606A2;
-            if (bUnidentified)
+            if (bIsCaptain)
             {
                 soundID = 0x3642C41B;
             }
         }
         else
         {
-            bool bUnidentified = IsCaptain();
+            bool bIsCaptain = IsCaptain();
             soundID = 0xBDD19FFF;
-            if (bUnidentified)
+            if (bIsCaptain)
             {
                 soundID = 0xBD539FB8;
             }
@@ -2479,9 +2479,9 @@ void cFielder::InitActionLateOneTimerFromVolley()
 
     EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, 0, bShotNormally);
 
-    bool bUnidentified = IsCaptain();
+    bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0x1CEC5A02;
-    if (bUnidentified)
+    if (bIsCaptain)
     {
         soundID = 0xFDE0C69B;
     }
@@ -2808,9 +2808,9 @@ void cFielder::InitActionLooseBallPass(cFielder* pPassTarget, bool bVolleyPass)
             bIsModified = false;
             SetNoPickUpTime(3.0f);
 
-            bool bUnidentified = IsCaptain();
+            bool bIsCaptain = IsCaptain();
             unsigned long soundID = 0x1CEC5A02;
-            if (bUnidentified)
+            if (bIsCaptain)
             {
                 soundID = 0xFDE0C69B;
             }
@@ -2860,9 +2860,9 @@ void cFielder::InitActionLooseBallShot(bool bIsChipShot)
         bIsModified = bIsChipShot;
         SetNoPickUpTime(3.0f);
 
-        bool bUnidentified = IsCaptain();
+        bool bIsCaptain = IsCaptain();
         unsigned long soundID = 0x1CEC5A02;
-        if (bUnidentified)
+        if (bIsCaptain)
         {
             soundID = 0xFDE0C69B;
         }
@@ -3519,9 +3519,9 @@ void cFielder::InitActionOneTimer(int animID, nlVector3& targetPos,
 
     ClearPowerupAnimState(false);
 
-    bool bUnidentified = IsCaptain();
+    bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0x1CEC5A02;
-    if (bUnidentified)
+    if (bIsCaptain)
     {
         soundID = 0xFDE0C69B;
     }
@@ -3750,9 +3750,9 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
     {
         if (!IsFallenDown())
         {
-            bool bUnidentified = IsCaptain();
+            bool bIsCaptain = IsCaptain();
             unsigned long soundID = 0x00E606A2;
-            if (bUnidentified)
+            if (bIsCaptain)
             {
                 soundID = 0x3642C41B;
             }
@@ -3789,9 +3789,9 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
 
     if (!IsFallenDown())
     {
-        bool bUnidentified = IsCaptain();
+        bool bIsCaptain = IsCaptain();
         unsigned long soundID = 0x00E606A2;
-        if (bUnidentified)
+        if (bIsCaptain)
         {
             soundID = 0x3642C41B;
         }
@@ -4615,16 +4615,16 @@ void cFielder::fn_8004C88C(float fDeltaT)
         v3Velocity.z = 0.0f;
         SetVelocity(v3Velocity);
 
-        bool bUnidentified = false;
+        bool bDecelerateEarly = false;
         if (GetGlobalPad() != 0 && m_bSlideAttackReset && m_pBall != 0)
         {
             if (!IsDekePadPressed())
             {
-                bUnidentified = true;
+                bDecelerateEarly = true;
             }
         }
 
-        if (m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime == 0 || bUnidentified)
+        if (m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime == 0 || bDecelerateEarly)
         {
             PlayRumbleAction(1, GetGlobalPad());
             m_eSlideAttackState = 1;
@@ -4974,8 +4974,8 @@ void cFielder::fn_8004E438()
         PlaySound(m_uSoundSlotId, 0x1D6C8D56, 0, 0);
     }
 
-    bool bUnidentified = g_pGame->IsGameplayOrOvertime();
-    if (bUnidentified)
+    bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
+    if (bIsGameplay)
     {
         StatsTracker::Instance()->TrackStat(
             (ePlayerStats)4, m_pTeam->m_nSide, m_DetPlayer.m_ID, 1, 0, 0, 0);
@@ -5051,8 +5051,8 @@ void cFielder::fn_8004E8B8()
 
 void cFielder::fn_8004E92C()
 {
-    bool bUnidentified = g_pGame->IsGameplayOrOvertime();
-    if (bUnidentified)
+    bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
+    if (bIsGameplay)
     {
         if (m_pBall != 0 && m_eActionState == ACTION_UNKNOWN_32)
         {

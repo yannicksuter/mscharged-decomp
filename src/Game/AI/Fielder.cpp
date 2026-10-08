@@ -724,7 +724,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     const int* nModelID, cSHierarchy* pHierarchy,
     cAnimInventory* pAnimInventory,
     const CharacterPhysicsData* pCharacterPhysicsData, PlayerTweaks* pCharTweaks,
-    PlayerTweaks* pUnidentifiedTweaks,
+    PlayerTweaks* pSuperPowerTweaks,
     AnimRetargetList* pAnimRetargetList, int nIndex)
     : cPlayer(nPlayerID, cc, nModelID, pHierarchy, pAnimInventory,
           pCharacterPhysicsData, pCharTweaks->mUnidentified004,
@@ -810,7 +810,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     m_nMegaStrikeResultState = 0;
     m_pNormalTweaks = pCharTweaks;
     m_pTweaks = pCharTweaks;
-    m_pSuperPowerTweaks = pUnidentifiedTweaks;
+    m_pSuperPowerTweaks = pSuperPowerTweaks;
 
     m_pShotMeter = new (8, false) ShotMeter();
     m_pAIContext = new (8, false) AIContext(this,
@@ -1357,15 +1357,15 @@ bool cFielder::CanGetElectrocuted(
                 > minYElectrocutionPosition
             || (float)fabs(jointPos.z) > netHeight)
         {
-            bool bUnidentified = false;
+            bool bWaluigiSuperPowerActive = false;
             if (m_DetChar.m_eCharacterClass == WALUIGI
                 && IsConcurrentStateActive(
                     m_pAIContext->mScriptMachine, 0x17))
             {
-                bUnidentified = true;
+                bWaluigiSuperPowerActive = true;
             }
 
-            if (bUnidentified && m_bSuperPowerTankOn)
+            if (bWaluigiSuperPowerActive && m_bSuperPowerTankOn)
             {
                 DeliverWaluigiWallEndEvent(g_pGame, this);
                 TurnOffSuperPowerTank(true);
@@ -1730,13 +1730,13 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
             float attackIntensity = GetCollisionHitIntensity(this, adjustedPosition,
                 pData->velocity1, pFielderCollidedWith);
-            int nUnidentified = GetFielderHitReaction(this, pFielderCollidedWith, attackIntensity);
+            int nHitReaction = GetFielderHitReaction(this, pFielderCollidedWith, attackIntensity);
             bool doFrameLock = false;
             if (m_pBall != 0 && (attackIntensity >= gHitFrameLockMinIntensity || IsSuperGrowActive()))
             {
                 if (gHitFrameLockRequiresHeavyReaction)
                 {
-                    if (nUnidentified == 2 || IsSuperGrowActive())
+                    if (nHitReaction == 2 || IsSuperGrowActive())
                         doFrameLock = true;
                 }
                 else
@@ -1751,7 +1751,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             }
             else
             {
-                switch (nUnidentified)
+                switch (nHitReaction)
                 {
                 case 0:
                     PlaySound(0, 0x057208DA, 0, 0);
@@ -1767,14 +1767,14 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
             fn_80047240(pFielderCollidedWith,
                 pFielderCollidedWith->m_DetChar.m_aActualFacingDirection,
-                nUnidentified, doFrameLock, true);
+                nHitReaction, doFrameLock, true);
             PlayerAttackData* pAttackData = g_PlayerAttackDataPool.Allocate();
             pAttackData->pAttacker = pFielderCollidedWith;
             u8 bHasGlobalPad = pFielderCollidedWith->GetGlobalPad() != 0;
             pAttackData->nAttackerPadID = bHasGlobalPad
                 ? pFielderCollidedWith->GetGlobalPad()->GetPadID() : -1;
             pAttackData->pTarget = this;
-            pAttackData->mUnidentified0C = nUnidentified;
+            pAttackData->mUnidentified0C = nHitReaction;
             pAttackData->bIsSlideAttack = false;
             QueueAttackSuccessEvent(g_pGame, pAttackData);
             PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
@@ -2515,19 +2515,19 @@ bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
     if (leftFootZ < 0.0f)
         leftFootZ = 0.0f;
 
-    float fUnidentified1 = pOtherFielder->GetJointPosition(
+    float otherLeftFootZ = pOtherFielder->GetJointPosition(
                                           pOtherFielder->m_nLeftFootJointIndex)
                               .z;
-    float fUnidentified2 = pOtherFielder->GetJointPosition(
+    float otherRightFootZ = pOtherFielder->GetJointPosition(
                                           pOtherFielder->m_nRightFootJointIndex)
                               .z;
     nlVector3 v3Unidentified2, v3Unidentified3;
     pOtherFielder->m_pPhysicsCharacter->GetBonePositions(
         PHYSBONE_FIELDER_HEAD, v3Unidentified2, v3Unidentified3);
-    float fUnidentified3 = nlMaxEquals(
-        nlMaxEquals(fUnidentified1, fUnidentified2), v3Unidentified2.z);
-    fUnidentified3 += 0.15f;
-    if (leftFootZ > fUnidentified3)
+    float otherTopZ = nlMaxEquals(
+        nlMaxEquals(otherLeftFootZ, otherRightFootZ), v3Unidentified2.z);
+    otherTopZ += 0.15f;
+    if (leftFootZ > otherTopZ)
         return true;
     return false;
 }
@@ -2539,11 +2539,11 @@ bool cFielder::HasLooseBallContactPriority(cFielder* pOtherFielder) const
     case ACTION_LOOSE_BALL_PASS:
     case ACTION_LOOSE_BALL_SHOT:
     {
-        float fUnidentified0 = m_pTweaks->GetDefenseSize();
-        float fUnidentified1 = pOtherFielder->m_pTweaks->GetDefenseSize();
-        if (fUnidentified1 > fUnidentified0)
+        float fDefenseSize = m_pTweaks->GetDefenseSize();
+        float fOtherDefenseSize = pOtherFielder->m_pTweaks->GetDefenseSize();
+        if (fOtherDefenseSize > fDefenseSize)
             return false;
-        if (fUnidentified0 > fUnidentified1)
+        if (fDefenseSize > fOtherDefenseSize)
             return true;
 
         switch (pOtherFielder->m_eActionState)
@@ -2554,9 +2554,9 @@ bool cFielder::HasLooseBallContactPriority(cFielder* pOtherFielder) const
         case ACTION_RECEIVE_PASS:
         {
             float fAnimTime = m_pCurrentAnimController->m_fTime;
-            float fUnidentified2 = m_fOneTimerAnimTime - fAnimTime;
-            if (fUnidentified2 > 0.0f
-                && fUnidentified2 <= pOtherFielder->m_fOneTimerAnimTime
+            float fTimeToContact = m_fOneTimerAnimTime - fAnimTime;
+            if (fTimeToContact > 0.0f
+                && fTimeToContact <= pOtherFielder->m_fOneTimerAnimTime
                                          - pOtherFielder->m_pCurrentAnimController->m_fTime)
             {
                 return true;
@@ -4118,14 +4118,14 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
         return false;
     }
 
-    bool bUnidentified = false;
+    bool bYoshiSuperPowerActive = false;
     if (m_DetChar.m_eCharacterClass == YOSHI
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
     {
-        bUnidentified = true;
+        bYoshiSuperPowerActive = true;
     }
 
-    if (bUnidentified)
+    if (bYoshiSuperPowerActive)
     {
         return false;
     }
@@ -4898,7 +4898,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
     if (pOpponent->IsFrozenStateActive())
         return;
 
-    bool bUnidentified = false;
+    bool bSlideReachesBall = false;
     if (pOpponent->m_pBall != NULL)
     {
         if (IsSlideAttacking() && !IsSuperGrowActive())
@@ -4909,7 +4909,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
             fUnidentified += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(m_DetChar.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
-                bUnidentified = true;
+                bSlideReachesBall = true;
         }
     }
     else if (m_pBall != NULL)
@@ -4922,7 +4922,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
             fUnidentified += gSlideBallContactRadiusBuffer;
             if (nlVec3DistanceSquared2D(pOpponent->m_DetChar.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
-                bUnidentified = true;
+                bSlideReachesBall = true;
         }
     }
 
@@ -4942,7 +4942,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         pAttacker = pOpponent;
     }
     else if (IsSuperGrowActive() && !pOpponent->IsSuperGrowActive()
-        && !IsFrozenStateActive() && !bUnidentified
+        && !IsFrozenStateActive() && !bSlideReachesBall
         && !pOpponent->IsSuperGrowActive() && !pOpponent->IsInFallAction())
     {
         pReactee = pOpponent;
@@ -4959,7 +4959,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
     else if (pOpponent->IsSuperGrowActive() && !IsSuperGrowActive()
-        && !pOpponent->IsFrozenStateActive() && !bUnidentified && !IsInFallAction())
+        && !pOpponent->IsFrozenStateActive() && !bSlideReachesBall && !IsInFallAction())
     {
         pReactee = this;
         pAttacker = pOpponent;
@@ -5839,17 +5839,17 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 
 void cFielder::UpdateController(float fDeltaT)
 {
-    bool bUnidentified = false;
+    bool bSwapToCaptain = false;
     if (GetGlobalPad() != NULL
         && GetGlobalPad()->IsPressed(PAD_SWITCH, true))
     {
-        int nUnidentified = GetGlobalPad()->GetButtonStateTicks(PAD_SWITCH, true);
-        if (nUnidentified * FixedUpdateTask::GetPhysicsUpdateTick() > 0.33f
+        int nSwitchHeldTicks = GetGlobalPad()->GetButtonStateTicks(PAD_SWITCH, true);
+        if (nSwitchHeldTicks * FixedUpdateTask::GetPhysicsUpdateTick() > 0.33f
             && m_pTeam->GetCaptain() != this)
         {
             GetGlobalPad()->ResetButtonStateTicks(PAD_SWITCH, true);
             m_pTeam->GetCaptain()->mbIgnorePadSwitchRelease = true;
-            bUnidentified = true;
+            bSwapToCaptain = true;
         }
     }
 
@@ -5860,7 +5860,7 @@ void cFielder::UpdateController(float fDeltaT)
                     && !(GetGlobalPad() != NULL
                             ? GetGlobalPad()->IsPressed(0x17, true)
                             : false))
-                || bUnidentified))
+                || bSwapToCaptain))
         {
             switch (m_eActionState)
             {
@@ -5873,7 +5873,7 @@ void cFielder::UpdateController(float fDeltaT)
                 {
                     if (m_pBall == NULL)
                     {
-                        SwapController(bUnidentified);
+                        SwapController(bSwapToCaptain);
                     }
                 }
                 break;
@@ -5888,14 +5888,14 @@ void cFielder::UpdateController(float fDeltaT)
                 {
                     if (m_pBall == NULL)
                     {
-                        SwapController(bUnidentified);
+                        SwapController(bSwapToCaptain);
                         break;
                     }
                 }
 
                 if (m_pBall == NULL)
                 {
-                    SwapController(bUnidentified);
+                    SwapController(bSwapToCaptain);
                 }
                 break;
             }
@@ -5932,7 +5932,7 @@ void cFielder::UpdateController(float fDeltaT)
             case ACTION_WAIT:
                 if (m_pBall == NULL)
                 {
-                    SwapController(bUnidentified);
+                    SwapController(bSwapToCaptain);
                 }
                 break;
             }
