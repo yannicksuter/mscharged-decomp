@@ -385,7 +385,7 @@ void GoalOverlay::DoMatchEndOverlay()
             formatted = Format(unformatted, g_pLocalization->GetString(character.mDisplayNameKey), scoreLeftWideString, scoreRightWideString);
         }
     }
-    else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == 2 && g_pTeams[1]->m_nScore > 0)
+    else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
         BasicString<unsigned short, Detail::TempStringAllocator> unformatted(g_pLocalization->GetString("SHUTOUT_FAILED"));
         formatted = Format(unformatted, g_pLocalization->GetString(GetLOCCharacterName(winnerID)));
@@ -425,7 +425,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     const unsigned short* unformatted;
     if (isMatchEnd)
     {
-        if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == 2 && g_pTeams[1]->m_nScore > 0)
+        if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
         {
             homeAway = 1;
             unformatted = g_pLocalization->GetString("POPUP_CHALLENGE_FAILED");
@@ -448,7 +448,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     else
         unformatted = g_pLocalization->GetString("GOAL_TITLE_TIED");
     eTeamID winningTeam = (eTeamID)GameInfoManager::Instance()->GetTeam((short)homeAway);
-    if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == 2 && g_pTeams[1]->m_nScore > 0)
+    if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("POPUP_CHALLENGE_FAILED"));
     }

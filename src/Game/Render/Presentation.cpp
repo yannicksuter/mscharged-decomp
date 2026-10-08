@@ -867,7 +867,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     }
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && g_pStrikerChallenge->mCondition == 2
+        && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
         && g_pTeams[1]->m_nScore > 0)
     {
         NisPlayer* nisPlayer = NisPlayer::Instance();
@@ -1052,7 +1052,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
     NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] = scoringSide;
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && g_pStrikerChallenge->mCondition == 2
+        && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
         && data->pPlayer->m_pTeam->m_nSide == 1 && data->goals > 0)
     {
         gameEndFunction = "GameEndMegaStrike";

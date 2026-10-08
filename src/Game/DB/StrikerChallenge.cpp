@@ -48,7 +48,7 @@ StrikerChallenge::StrikerChallenge()
 {
     mRemainingTime = 0;
     mAIDifficulty = 1;
-    mCondition = 0;
+    mCondition = CHALLENGE_WIN;
     mCaptain = 0;
     mWinParameter = 0;
     mCustomPowerups = 0;
@@ -106,7 +106,7 @@ void StrikerChallenge::LoadSettings()
 
     mRemainingTime = GetTweakInt("challenge/remainingtime", 180);
     mAIDifficulty = GetTweakInt("challenge/ai", 1);
-    mCondition = GetTweakInt("challenge/condition", 0);
+    mCondition = static_cast<eChallengeCondition>(GetTweakInt("challenge/condition", CHALLENGE_WIN));
     mWinParameter = GetTweakInt("challenge/winparameter", 0);
     mScore[0] = GetTweakInt("challenge/homescore", 0);
     mScore[1] = GetTweakInt("challenge/awayscore", 0);
@@ -293,25 +293,25 @@ bool StrikerChallenge::IsCurrentChallengeWon() const
     const BasicGameInfo* info = GameInfoManager::Instance()->GetCurrentGameInfo();
     switch (mCondition)
     {
-    case 0:
+    case CHALLENGE_WIN:
         if (info->GetFinalScore(side) > info->GetFinalScore(opponent))
         {
             won = true;
         }
         break;
-    case 1:
+    case CHALLENGE_WIN_BY_MARGIN:
         if (info->GetFinalScore(side) >= mWinParameter + info->GetFinalScore(opponent))
         {
             won = true;
         }
         break;
-    case 2:
+    case CHALLENGE_SHUTOUT:
         if (g_pTeams[side]->m_nScore > g_pTeams[opponent]->m_nScore && g_pTeams[opponent]->m_nScore == 0)
         {
             won = true;
         }
         break;
-    case 3:
+    case CHALLENGE_WIN_WITH_MINIMUM_GOALS:
         if (info->GetFinalScore(side) > info->GetFinalScore(opponent) && info->GetFinalScore(side) >= mWinParameter)
         {
             won = true;

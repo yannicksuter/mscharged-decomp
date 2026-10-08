@@ -877,7 +877,7 @@ void cGame::CheckForGoal()
         g_pTeams[nSide]->m_nScore += 1;
 
         if (GameInfoManager::Instance()->IsInMode4()
-            && g_pStrikerChallenge->mCondition == 2 && nSide == 1)
+            && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && nSide == 1)
         {
             ChangeGameState(GS_END_GAME);
         }
@@ -1645,7 +1645,7 @@ void cGame::Update(float fDeltaT)
         int homeScore = g_pTeams[0]->m_nScore;
         int nWinner = homeScore < awayScore;
         if ((GameInfoManager::Instance()->IsInMode4()
-                && g_pStrikerChallenge->mCondition == 2
+                && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                 && g_pTeams[1]->m_nScore > 0)
             || (g_pStrikerChallenge->mCurrentChallenge == 2
                 && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
@@ -1934,7 +1934,7 @@ void cGame::ChangeGameState(eGameState state)
         if (state == GS_END_GAME)
         {
             if ((GameInfoManager::Instance()->IsInMode4()
-                    && g_pStrikerChallenge->mCondition == 2
+                    && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                     && g_pTeams[1]->m_nScore > 0)
                 || (g_pStrikerChallenge->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
@@ -2206,7 +2206,7 @@ void FinishMegaStrike(cGame* pGame)
         int score;
 
         if (GameInfoManager::Instance()->IsInMode4()
-            && g_pStrikerChallenge->mCondition == 2 && side == 1)
+            && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && side == 1)
         {
             pGame->ChangeGameState(GS_END_GAME);
         }

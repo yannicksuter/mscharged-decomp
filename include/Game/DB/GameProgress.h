@@ -218,6 +218,14 @@ struct ChallengeUnlockRecord
     u32 mUnlockedChallenges;
 };
 
+enum eChallengeCondition
+{
+    CHALLENGE_WIN = 0,
+    CHALLENGE_WIN_BY_MARGIN = 1,
+    CHALLENGE_SHUTOUT = 2,
+    CHALLENGE_WIN_WITH_MINIMUM_GOALS = 3,
+};
+
 class StrikerChallenge
 {
 public:
@@ -244,7 +252,7 @@ public:
 
     /* 0x04 */ int mRemainingTime;
     /* 0x08 */ int mAIDifficulty;
-    /* 0x0C */ int mCondition;
+    /* 0x0C */ eChallengeCondition mCondition;
     /* 0x10 */ int mCaptain;
     /* 0x14 */ int mWinParameter;
     /* 0x18 */ int mScore[2];
