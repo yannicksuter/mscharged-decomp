@@ -167,7 +167,7 @@ void SuperLoadingScene::SceneCreated()
         {
             FrontEndPresentation::GetInstance()->Call("StartGrudgeMatchSequence");
         }
-        else if (gameInfo->mCurrentMode == 3)
+        else if (gameInfo->mCurrentMode == GameInfoManager::GM_CUP)
         {
             FrontEndPresentation::GetInstance()->Call("StartCupMatchSequence");
         }

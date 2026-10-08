@@ -338,7 +338,7 @@ static inline int PickRandomSidekick(bool e3Build)
 void TitleScene::StartDemoMatch()
 {
     GameInfoManager* gameInfo = GameInfoManager::Instance();
-    gameInfo->SetMode(GameInfoManager::GM_MODE_2, false);
+    gameInfo->SetMode(GameInfoManager::GM_DEMO, false);
 
     int homeId = PickRandomCaptain(g_e3_Build);
     int awayId = homeId;

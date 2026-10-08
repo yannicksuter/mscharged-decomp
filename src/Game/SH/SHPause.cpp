@@ -102,7 +102,7 @@ void PauseMenuScene::OnSelectQUIT()
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
-        else if (GameInfoManager::Instance()->mCurrentMode == 0
+        else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY
             || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == GS_END_GAME)
         {
             popup->Create((ePopupMenu)10,

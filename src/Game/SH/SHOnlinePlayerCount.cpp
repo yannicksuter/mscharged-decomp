@@ -238,11 +238,11 @@ void InitializeOnlineMatch(bool twoLocalPlayers, unsigned char tournament, bool 
 {
     if (tournament)
     {
-        GameInfoManager::GetInstance()->SetMode(1, true);
+        GameInfoManager::GetInstance()->SetMode(GameInfoManager::GM_ONLINE_TOURNAMENT, true);
     }
     else
     {
-        GameInfoManager::GetInstance()->SetMode(0, true);
+        GameInfoManager::GetInstance()->SetMode(GameInfoManager::GM_FRIENDLY, true);
     }
 
     SetOnlineTwoLocalPlayers(twoLocalPlayers);

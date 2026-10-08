@@ -202,7 +202,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
         {
             g_pOverlayManager->Push((SceneList)93, SCREEN_NOTHING, true);
         }
-        else if (GameInfoManager::Instance()->mCurrentMode == 0)
+        else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY)
         {
             if (g_e3_Build)
             {

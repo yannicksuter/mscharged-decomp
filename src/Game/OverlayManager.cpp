@@ -113,7 +113,7 @@ void OverlayManager::Update(float deltaTime)
 
 void OverlayManager::SetVisible(SceneList scene, bool visibility, bool overrideStateSettings)
 {
-    if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode == 2 && scene != OVERLAY_HUD)
+    if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode == GameInfoManager::GM_DEMO && scene != OVERLAY_HUD)
     {
         return;
     }

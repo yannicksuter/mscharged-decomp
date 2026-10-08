@@ -230,7 +230,7 @@ void InGameTextOverlay::DisplayFinalScore()
             WINNER_SLIDE_NAME, OVERLAY_HANDLER_LAYER_NAME, "right_face");
         pComponentInstance->SetActiveSlide(TEAM_SLIDE_NAMES[team], true, false);
 
-        if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode != 0)
+        if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode != GameInfoManager::GM_FRIENDLY)
         {
             if (g_pGame->m_eGameState == GS_OVERTIME)
             {

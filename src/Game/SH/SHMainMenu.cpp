@@ -387,7 +387,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     {
     case 0:
     {
-        GameInfoManager::Instance()->SetMode(0, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, 0);
         GameInfoManager::Instance()->SetTeam(0, 0);
         GameInfoManager::Instance()->SetTeam(1, 0);
         GameInfoManager::Instance()->ResetPlayingSides();
@@ -420,7 +420,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         break;
     }
     case 2:
-        GameInfoManager::Instance()->SetMode(3, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CUP, 0);
         if (CupManager::s_pInstance->GetCurrentMode() == -1)
         {
             StartNewCup();
@@ -432,7 +432,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         break;
     case 3:
     {
-        GameInfoManager::Instance()->SetMode(4, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CHALLENGE, 0);
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         GameSceneManager::Instance()->Pop();
         SHNavigation* scene = GetNavigationScene();
@@ -446,7 +446,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     }
     case 4:
     {
-        GameInfoManager::Instance()->SetMode(4, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CHALLENGE, 0);
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         GameSceneManager::Instance()->Pop();
         SHNavigation* scene = GetNavigationScene();

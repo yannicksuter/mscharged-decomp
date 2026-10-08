@@ -89,7 +89,7 @@ void OnlineRankingOverlay::Update(float dt)
     {
         GetNavigationScene()->GetTimer()->SetVisible(false);
         SetPointerEnabled(false);
-        if (GameInfoManager::Instance()->mCurrentMode == 0)
+        if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY)
         {
             mPresentation->SetActiveSlide("out", true);
             mPlayingOutSlide = true;

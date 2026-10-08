@@ -12,7 +12,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         unsigned int name = m_SP[-3];
         m_SP -= 3;
         bool alternate = false;
-        if (side == -1 && GameInfoManager::Instance()->mCurrentMode == 3)
+        if (side == -1 && GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_CUP)
         {
             side = CupManager::s_pInstance->mPendingCupTeam;
         }
