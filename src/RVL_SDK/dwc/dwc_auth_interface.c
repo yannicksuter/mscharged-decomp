@@ -551,14 +551,14 @@ DWCIngamesnCheckResult DWCi_Auth_GetIngamesnCheckResult(void)
     return s_auth_result.ingamesn_check_result;
 }
 
-BOOL fn_8049F7D4(OSTime* arg0)
+BOOL DWCi_Auth_GetServerTimeOffsetInSeconds(OSTime* offsetSeconds)
 {
     if (s_auth_result.server_timediff == 0)
     {
         return FALSE;
     }
 
-    *arg0 = s_auth_result.server_timediff / OS_TIME_SPEED;
+    *offsetSeconds = s_auth_result.server_timediff / OS_TIME_SPEED;
     return TRUE;
 }
 

@@ -22,7 +22,7 @@ extern "C"
     int DWCi_Auth_GetErrorCode(void);
     DWCIngamesnCheckResult DWCi_Auth_GetIngamesnCheckResult(void);
     u64 DWCi_Auth_GetConsoleUserId(void);
-    BOOL fn_8049F7D4(OSTime*);
+    BOOL DWCi_Auth_GetServerTimeOffsetInSeconds(OSTime* offsetSeconds);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 s64 DWCi_Np_GetTimeInSeconds(void);
-struct tm* fn_8049BB54(s64* theTime);
+struct tm* DWCi_Np_SecondsToCalendarTime(s64* theTime);
 u64 DWCi_Np_GetConsoleId(void);
 
 #define DWCi_Np_TicksToMilliSeconds OSTicksToMilliseconds
