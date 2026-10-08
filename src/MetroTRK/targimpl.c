@@ -446,7 +446,7 @@ ASM void TRKInterruptHandler(u16) {
     ori r2, r2, TRK_saved_exceptionID@l
     sth r3, 0(r2)
     cmpwi r3, 0x500
-    bne L_802CF694
+    bne NonTransportInterrupt
     lis r2, gTRKCPUState@h
     ori r2, r2, gTRKCPUState@l
     mflr r3
@@ -461,18 +461,18 @@ ASM void TRKInterruptHandler(u16) {
     lwz r2, TRKState_PPC.inputPendingPtr(r2)
     lbz r2, TRKState_PPC.GPR[0](r2)
     cmpwi r2, 0
-    beq L_802CF678
+    beq TransportReturn
     lis r2, gTRKExceptionStatus@h
     ori r2, r2, gTRKExceptionStatus@l
     lbz r2, TRKExceptionStatus.inTRK(r2)
     cmpwi r2, 1
-    beq L_802CF678
+    beq TransportReturn
     lis r2, gTRKState@h
     ori r2, r2, gTRKState@l
     li r3, 1
     stb r3, TRKState_PPC.inputActivated(r2)
-    b L_802CF694
-L_802CF678:
+    b NonTransportInterrupt
+TransportReturn:
     lis r2, gTRKSaveState@h
     ori r2, r2, gTRKSaveState@l
     lwz r3, Default_PPC.CR(r2)
@@ -480,7 +480,7 @@ L_802CF678:
     lwz r3, Default_PPC.GPR[3](r2)
     lwz r2, Default_PPC.GPR[2](r2)
     rfi
-L_802CF694:
+NonTransportInterrupt:
     lis r2, TRK_saved_exceptionID@h
     ori r2, r2, TRK_saved_exceptionID@l
     lhz r3, 0(r2)
