@@ -1464,18 +1464,11 @@ inline unsigned char Goalie::ClampToGoalCone(nlVector3& v3Position, float fDistF
     return false;
 }
 
-// Branch-returning max/min for the net-width clamp in
+// Branch-returning maximum for the net-width clamp in
 // FindDesiredGoaliePosition; see the comment there.
 static inline float MaxOf(float a, float b)
 {
     if (a >= b)
-        return a;
-    return b;
-}
-
-static inline float MinOf(float a, float b)
-{
-    if (a <= b)
         return a;
     return b;
 }
@@ -1567,12 +1560,9 @@ void Goalie::FindDesiredGoaliePosition(nlVector3& pos, nlVector3& dir, nlVector3
     {
         float fNetWidth = cNet::GetNetWidth();
         fNetY = 0.5f * fNetWidth - 1.0f;
-        // R4QE01 keeps this clamp in f5 and desiredVec.x in f6. The compiler
-        // assigns them that way only when the clamp returns through branches;
-        // the shared nlMaxEquals/nlMinEquals bodies swap them, and changing
-        // those regresses other units. The original form of this clamp is not
-        // recoverable from a stripped executable.
-        desiredPos.y = MinOf(MaxOf(desiredPos.y, -fNetY), fNetY);
+        // The local maximum preserves the clamp's inline-return boundary.
+        // The shared minimum already uses the same branch-returning form.
+        desiredPos.y = nlMinEquals(MaxOf(desiredPos.y, -fNetY), fNetY);
         desiredPos.x = goalLine * pNet->m_fDirection;
         nlVec3Sub(desiredVec, desiredPos, m_DetChar.m_v3Position);
     }
