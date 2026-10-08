@@ -70,7 +70,7 @@ struct NetworkScoreSubmission
 class NetworkStatsListener
 {
 public:
-    virtual void StatsListenerVirtual00() = 0;
+    virtual void OnReservedStatsEvent() = 0;
     virtual void OnLeaderboardResult(bool success, int category, int filter,
         int count, NetworkStatsPlayer* players, NetworkRankingMeta* metadata) = 0;
     virtual void OnSubmitScoreResult(bool success, int category) = 0;
@@ -91,7 +91,7 @@ public:
         int homeScore,
         int awayScore,
         const NetworkScoreSubmission* fallback) = 0;
-    virtual bool StatsVirtual0C() = 0;
+    virtual bool ReservedStatsQuery() = 0;
     virtual bool GetLeaderboardStats(int category, int filter, int limit,
         NetworkStatsPlayer* players, NetworkRankingMeta* metadata) = 0;
     virtual void Update() = 0;
@@ -125,7 +125,7 @@ public:
         int homeScore,
         int awayScore,
         const NetworkScoreSubmission* fallback);
-    virtual bool StatsVirtual0C();
+    virtual bool ReservedStatsQuery();
     virtual bool GetLeaderboardStats(int category, int filter, int limit,
         NetworkStatsPlayer* players, NetworkRankingMeta* metadata);
     virtual void Update();
@@ -208,7 +208,7 @@ public:
         int homeScore,
         int awayScore,
         const NetworkScoreSubmission* fallback);
-    virtual bool StatsVirtual0C();
+    virtual bool ReservedStatsQuery();
     virtual bool GetLeaderboardStats(int category, int filter, int limit,
         NetworkStatsPlayer* players, NetworkRankingMeta* metadata);
     virtual void Update();

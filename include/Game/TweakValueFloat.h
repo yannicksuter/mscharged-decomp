@@ -75,14 +75,14 @@ public:
     {
         value = (float)atof(string);
     }
-    virtual void UnidentifiedVirtual14(
+    virtual void GetFloatParameters(
         float* minimum, float* maximum, float* increment)
     {
         *minimum = 0.0f;
         *maximum = 0.0f;
         *increment = 0.0f;
     }
-    virtual void UnidentifiedVirtual18()
+    virtual void ReservedValueHook()
     {
     }
 

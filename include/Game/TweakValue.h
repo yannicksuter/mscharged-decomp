@@ -221,7 +221,7 @@ public:
     {
         return m_pValue != 0;
     }
-    virtual void UnidentifiedVirtual14(
+    virtual void GetFloatParameters(
         float* minimum, float* maximum, float* increment)
     {
         *minimum = 0.0f;
@@ -320,7 +320,7 @@ public:
     }
     virtual int GetValueType();
     virtual int GetStorageKind();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
+    virtual void GetFloatParameters(float*, float*, float*);
     virtual void* GetValueAddress();
     virtual void FormatValue(char*, unsigned long);
     virtual void ParseValue(const char*);

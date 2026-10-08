@@ -186,8 +186,8 @@ public:
         mName = name;
     }
     virtual ~TweakValueString() { }
-    virtual void UnidentifiedVirtual18() { }
-    virtual void UnidentifiedVirtual14(float* value, float* min, float* max)
+    virtual void ReservedValueHook() { }
+    virtual void GetFloatParameters(float* value, float* min, float* max)
     {
         *value = 0.0f;
         *min = 0.0f;

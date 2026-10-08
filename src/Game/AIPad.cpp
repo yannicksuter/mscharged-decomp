@@ -300,7 +300,7 @@ void AIPadManager::UpdateAccelerationHistory()
     }
 }
 
-void* TweakValueBase::UnidentifiedVirtual1C()
+void* TweakValueBase::ReservedValueQuery()
 {
     return 0;
 }

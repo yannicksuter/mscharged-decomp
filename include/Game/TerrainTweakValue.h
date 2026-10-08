@@ -33,9 +33,9 @@ public:
         gLastTweakCategory = category;
     }
 
-    virtual void UnidentifiedVirtual14(
+    virtual void GetFloatParameters(
         float* minimum, float* maximum, float* increment);
-    virtual void UnidentifiedVirtual18();
+    virtual void ReservedValueHook();
     virtual void CopyValueFrom(TweakValueBase*);
     virtual int GetStorageKind();
     virtual int GetValueType();
@@ -65,7 +65,7 @@ public:
 
     virtual int GetValueType() { return 4; }
     virtual int GetStorageKind() { return 1; }
-    virtual void* UnidentifiedVirtual1C() { return 0; }
+    virtual void* ReservedValueQuery() { return 0; }
     virtual void* GetValueAddress() { return &mValue; }
     virtual void CopyValueFrom(TweakValueBase* other)
     {
@@ -107,7 +107,7 @@ public:
     virtual void ParseValue(const char*) { }
 };
 
-inline void TerrainTweakValueBase::UnidentifiedVirtual14(
+inline void TerrainTweakValueBase::GetFloatParameters(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;
@@ -115,7 +115,7 @@ inline void TerrainTweakValueBase::UnidentifiedVirtual14(
     *increment = 0.0f;
 }
 
-inline void TerrainTweakValueBase::UnidentifiedVirtual18()
+inline void TerrainTweakValueBase::ReservedValueHook()
 {
 }
 

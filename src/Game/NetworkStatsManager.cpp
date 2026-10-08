@@ -218,7 +218,7 @@ bool NetworkStatsManager::RequestRankings(int category)
     return false;
 }
 
-void NetworkStatsManager::StatsListenerVirtual00()
+void NetworkStatsManager::OnReservedStatsEvent()
 {
 }
 
