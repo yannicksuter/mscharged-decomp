@@ -16,7 +16,6 @@
 #include "Game/FE/fePresentation.h"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
-#include "Game/FE/tlImageInstance.h"
 #include "Game/FE/tlSlide.h"
 #include "Game/FE/tlTextInstance.h"
 #include "Game/GameInfo.h"
@@ -27,8 +26,6 @@
 #include "NL/nlLocalization.h"
 #include "NL/nlString.h"
 #include "Game/FE/feDPD.h"
-#include "Game/FE/FEAudio.h"
-#include "Game/SH/SHNavigation.h"
 
 static inline void ShowDoneButtons(TLSlide* first)
 {
