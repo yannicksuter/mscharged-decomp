@@ -124,7 +124,7 @@ void StadiumSelectScene::SceneCreated()
         m_pTicker->SetDisplayMessage(GetStadiumTickerStringID(0));
     }
 
-    mPreviewState = 1;
+    mPreviewState = STADIUM_PREVIEW_WAIT_PRESENTATION;
     for (int i = 0; i < 17; ++i)
     {
         if (IsStadiumEnabled(mStadiumOrder[i]) && IsStadiumUnlocked(mStadiumOrder[i]))
@@ -208,15 +208,15 @@ void StadiumSelectScene::Update(float deltaTime)
 {
     switch (mPreviewState)
     {
-    case 0:
+    case STADIUM_PREVIEW_INACTIVE:
         break;
-    case 1:
+    case STADIUM_PREVIEW_WAIT_PRESENTATION:
         if (!FrontEndPresentation::GetInstance()->mCameraFinished)
         {
             return;
         }
         mMoviePlayer.Start(GetStadiumMoviePath(mStadiumOrder[mStadiumIndex]));
-        mPreviewState = 4;
+        mPreviewState = STADIUM_PREVIEW_PLAYING;
         mPlayingStadiumIndex = mStadiumIndex;
         if (m_pTicker != 0)
         {
@@ -228,20 +228,20 @@ void StadiumSelectScene::Update(float deltaTime)
             mStadiumNames->SetActiveSlide(GetStadiumName(mStadiumOrder[mPlayingStadiumIndex]), true, false);
             UpdateStadiumLabel(this);
         }
-        mPreviewState = 2;
+        mPreviewState = STADIUM_PREVIEW_WAIT_CAMERA;
         break;
-    case 2:
+    case STADIUM_PREVIEW_WAIT_CAMERA:
     {
         cAnimCamera* camera = (cAnimCamera*)cCameraManager::PeekCamera();
         if (camera != 0 && camera->GetAnimationTime() >= 1.0f)
         {
-            mPreviewState = 4;
+            mPreviewState = STADIUM_PREVIEW_PLAYING;
         }
         break;
     }
-    case 3:
+    case STADIUM_PREVIEW_START_MOVIE:
         mMoviePlayer.Start(GetStadiumMoviePath(mStadiumOrder[mStadiumIndex]));
-        mPreviewState = 4;
+        mPreviewState = STADIUM_PREVIEW_PLAYING;
         mPlayingStadiumIndex = mStadiumIndex;
         if (m_pTicker != 0)
         {
@@ -254,18 +254,18 @@ void StadiumSelectScene::Update(float deltaTime)
             UpdateStadiumLabel(this);
         }
         break;
-    case 4:
+    case STADIUM_PREVIEW_PLAYING:
         if (mPlayingStadiumIndex != mStadiumIndex)
         {
-            mPreviewState = 5;
+            mPreviewState = STADIUM_PREVIEW_STOP_MOVIE;
         }
         break;
-    case 5:
+    case STADIUM_PREVIEW_STOP_MOVIE:
         mMoviePlayer.Stop();
-        mPreviewState = 6;
+        mPreviewState = STADIUM_PREVIEW_RESTART_DELAY;
         break;
-    case 6:
-        mPreviewState = 3;
+    case STADIUM_PREVIEW_RESTART_DELAY:
+        mPreviewState = STADIUM_PREVIEW_START_MOVIE;
         break;
     }
 
@@ -300,7 +300,7 @@ void StadiumSelectScene::Update(float deltaTime)
         mControlsInitialized = true;
     }
 
-    if (mPreviewState > 2)
+    if (mPreviewState > STADIUM_PREVIEW_WAIT_CAMERA)
     {
         TLSlide* activeSlide = mStadiumNames->GetActiveSlide();
         bool finished = true;
@@ -502,7 +502,7 @@ void StadiumSelectScene::OnSelectStadium(int, void*)
 void StadiumSelectScene::OnHBMHide()
 {
     mMoviePlayer.mMovieStarted = false;
-    mPreviewState = 3;
+    mPreviewState = STADIUM_PREVIEW_START_MOVIE;
 }
 
 void MoviePlayerControl::Start(const char* filename)

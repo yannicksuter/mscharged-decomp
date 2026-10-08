@@ -32,6 +32,17 @@ public:
     /* 0x90 */ int mEndFrameCount;
 }; // size 0x94
 
+enum eStadiumPreviewState
+{
+    STADIUM_PREVIEW_INACTIVE = 0,
+    STADIUM_PREVIEW_WAIT_PRESENTATION = 1,
+    STADIUM_PREVIEW_WAIT_CAMERA = 2,
+    STADIUM_PREVIEW_START_MOVIE = 3,
+    STADIUM_PREVIEW_PLAYING = 4,
+    STADIUM_PREVIEW_STOP_MOVIE = 5,
+    STADIUM_PREVIEW_RESTART_DELAY = 6,
+};
+
 class StadiumSelectScene : public BaseSceneHandler
 {
 public:
@@ -54,7 +65,7 @@ public:
     /* 0x0B6 */ bool mProceeding;
     /* 0x0B7 */ u8 mPaddingB7;
     /* 0x0B8 */ EventConnectionOwner mHBMHideConnection;
-    /* 0x0BC */ int mPreviewState;
+    /* 0x0BC */ eStadiumPreviewState mPreviewState;
     /* 0x0C0 */ int mPlayingStadiumIndex;
     /* 0x0C4 */ int mStadiumIndex;
     /* 0x0C8 */ int mStadiumOrder[17];
