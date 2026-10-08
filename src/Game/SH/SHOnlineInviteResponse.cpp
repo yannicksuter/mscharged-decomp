@@ -60,7 +60,6 @@ void SHOnlineInviteResponse::SceneCreated()
     }
     int index = g_pFriendManager->mHostInvitationIndex;
     const unsigned short* name = GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, index);
-    typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
     WideBasicString string = Format(WideBasicString(g_pLocalization->GetString("ONLINE_INVITATION_INVITATION")), name);
     nlStrNCpy(mInvitationText, string.c_str(), 0x80);
     FEFinder<TLTextInstance, 3>::Find<>(
