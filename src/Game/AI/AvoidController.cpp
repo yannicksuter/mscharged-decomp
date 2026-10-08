@@ -21,10 +21,10 @@ static const nlVector2 v2Zero = { 0.0f, 0.0f };
 #pragma explicit_zero_data on
 static float sAvoidanceMemoryInitialSeconds = 0.0f;
 #pragma explicit_zero_data off
-static float sUnidentifiedRepulsionValue0 = 0.5f;
-static float sUnidentifiedRepulsionValue1 = 1.0f;
-static float sUnidentifiedInitialValue0 = 0.5f;
-static float sUnidentifiedInitialValue1 = 1.0f;
+static float sSidelineMaxDistance = 0.5f;
+static float sSidelineMaxDistanceWhileAvoiding = 1.0f;
+static float sInitialSidelineMaxDistance = 0.5f;
+static float sInitialSidelineMaxDistanceWhileAvoiding = 1.0f;
 static float sSidelineUnavoidableDot = -0.99f;
 static float sAvoidanceMemoryRefreshSeconds = 0.01f;
 static unsigned short sAvoidControllerType = 0xFFFF;
@@ -32,22 +32,22 @@ static unsigned short sAvoidControllerType = 0xFFFF;
 class AvoidanceRemovalCollector
 {
 public:
-    AvoidanceRemovalCollector(AvoidableObject* pObject, nlList<UnidentifiedAvoidanceValue>& list)
+    AvoidanceRemovalCollector(AvoidableObject* pObject, nlList<ObstacleAvoidance>& list)
         : mpRemovedObject(pObject), mRemovals(list)
     {
     }
-    void Collect(const u32&, UnidentifiedAvoidanceValue*);
+    void Collect(const u32&, ObstacleAvoidance*);
 
     AvoidableObject* mpRemovedObject;
-    nlList<UnidentifiedAvoidanceValue>& mRemovals;
+    nlList<ObstacleAvoidance>& mRemovals;
 };
 
-inline float UnidentifiedAvoidanceValue::UnidentifiedGetWeight() const
+inline float ObstacleAvoidance::GetWeight() const
 {
     float fWeight = 1.0f;
     if (mFadeOutTimer.m_uPackedTime != 0)
         fWeight = mFadeOutTimer.GetSeconds() / 0.3f;
-    return mUnidentified018 * fWeight;
+    return mWeight * fWeight;
 }
 
 class RepulsionAccumulator
@@ -56,21 +56,21 @@ public:
     RepulsionAccumulator(float fDeltaT,
         nlVector3& accumulated, float& totalWeight,
         nlVector3* vectors, float* weights, int* counts,
-        nlList<UnidentifiedAvoidanceValue>& list)
+        nlList<ObstacleAvoidance>& list)
         : mfDeltaT(fDeltaT), mAccumulated(accumulated),
           mTotalWeight(totalWeight), mpCategoryVectors(vectors),
           mpCategoryWeights(weights), mpCategoryCounts(counts),
           mRemovals(list)
     {
     }
-    void Accumulate(const u32&, UnidentifiedAvoidanceValue*);
+    void Accumulate(const u32&, ObstacleAvoidance*);
     float mfDeltaT;
     nlVector3& mAccumulated;
     float& mTotalWeight;
     nlVector3* mpCategoryVectors;
     float* mpCategoryWeights;
     int* mpCategoryCounts;
-    nlList<UnidentifiedAvoidanceValue>& mRemovals;
+    nlList<ObstacleAvoidance>& mRemovals;
 };
 
 bool lbl_806E0BB8;
@@ -81,7 +81,7 @@ bool lbl_806E0BB9;
 
 
 
-inline UnidentifiedAvoidanceMemory::UnidentifiedAvoidanceMemory()
+inline AvoidanceMemory::AvoidanceMemory()
     : mTimer()
 {
     mTimer.SetSeconds(sAvoidanceMemoryInitialSeconds);
@@ -120,7 +120,7 @@ inline void AvoidController::RegisterDebugFields(u16* type, DebugWriteCache* cac
     cache->EndType();
 }
 
-inline bool AvoidController::UnidentifiedCanAvoid(int things)
+inline bool AvoidController::IsAvoiding(int things)
 {
     bool bCanAvoid = (m_ThingsToAvoid & things) && !Incapacitated(m_pFielder);
     bool result = bCanAvoid;
@@ -143,32 +143,32 @@ inline bool AvoidController::UnidentifiedCanAvoid(int things)
     return result;
 }
 
-inline void UnidentifiedAvoidanceValue::UnidentifiedInitialize(
+inline void ObstacleAvoidance::Initialize(
     AvoidableObject* pObject, AvoidableObject* pOther)
 {
-    mUnidentified004 = pObject;
-    mUnidentified008 = pOther;
-    mUnidentified01C.Clear();
+    mpAvoider = pObject;
+    mpObstacle = pOther;
+    mActiveTimer.Clear();
     mFadeOutTimer.Clear();
-    mUnidentified00C = v3Zero;
-    mUnidentified018 = 0.0f;
-    mUnidentified02C.UnidentifiedReset();
+    mRepulsion = v3Zero;
+    mWeight = 0.0f;
+    mRepulsionHistory.UnidentifiedReset();
 }
 
-inline void AvoidController::UnidentifiedSetLast(
+inline void AvoidController::SetLastRepulsionVector(
     eAvoidableThings things, const nlVector3& v3Repulsion, float fWeight)
 {
     int index = GetAvoidableIndex(things);
     m_LastRepulVec[index] = v3Repulsion;
-    mUnidentified094[index] = fWeight;
+    m_LastRepulWeight[index] = fWeight;
 }
 
-inline void UnidentifiedAvoidanceContext::UnidentifiedNormalize()
+inline void AvoidanceContext::NormalizeRepulsion()
 {
-    mUnidentified00C = nlVec3Length(mUnidentified000);
-    float lengthSquared = nlVec3LengthSquared(mUnidentified000);
+    mRepulsionMag = nlVec3Length(mRepulsionDir);
+    float lengthSquared = nlVec3LengthSquared(mRepulsionDir);
     if (lengthSquared != 0.0f)
-        nlVec3Scale(mUnidentified000, nlRecipSqrt(lengthSquared, true));
+        nlVec3Scale(mRepulsionDir, nlRecipSqrt(lengthSquared, true));
 }
 
 static inline f32 ClampRunningWBSpeed(f32 speed, f32 maxSpeed)
@@ -180,17 +180,17 @@ static inline f32 ClampRunningWBSpeed(f32 speed, f32 maxSpeed)
 }
 
 AvoidController::AvoidController(cFielder* fielder)
-    : mUnidentified174(16, 16)
+    : m_Avoidances(16, 16)
 {
-    sUnidentifiedRepulsionValue0 = sUnidentifiedInitialValue0;
-    sUnidentifiedRepulsionValue1 = sUnidentifiedInitialValue1;
+    sSidelineMaxDistance = sInitialSidelineMaxDistance;
+    sSidelineMaxDistanceWhileAvoiding = sInitialSidelineMaxDistanceWhileAvoiding;
     fn_8000F178(this);
     m_pFielder = fielder;
 }
 
 AvoidController::~AvoidController()
 {
-    mUnidentified174.Clear();
+    m_Avoidances.Clear();
 }
 
 extern "C" void fn_8000F178(AvoidController* controller)
@@ -205,14 +205,14 @@ extern "C" void fn_8000F178(AvoidController* controller)
 
     for (int i = 0; i < sizeof(controller->m_LastRepulVec) / sizeof(controller->m_LastRepulVec[0]); ++i)
     {
-        controller->mUnidentified094[i] = 0.0f;
+        controller->m_LastRepulWeight[i] = 0.0f;
         controller->m_LastRepulVec[i] = v3Zero;
-        controller->mUnidentified0B4[i].mRepulsion = v3Zero;
-        controller->mUnidentified0B4[i].mTimer.Clear();
+        controller->m_AvoidanceMemory[i].mRepulsion = v3Zero;
+        controller->m_AvoidanceMemory[i].mTimer.Clear();
     }
 
-    controller->mUnidentified174.Clear();
-    controller->mUnidentified198 = 0;
+    controller->m_Avoidances.Clear();
+    controller->m_NumAvoidances = 0;
 }
 
 extern "C" void fn_8000F324(AvoidController* controller,
@@ -250,7 +250,7 @@ nlVector3& AvoidController::GetLastRepulsionVector(eAvoidableThings things)
 extern "C" float fn_8000F558(
     AvoidController* controller, eAvoidableThings things)
 {
-    return controller->mUnidentified094[GetAvoidableIndex(things)];
+    return controller->m_LastRepulWeight[GetAvoidableIndex(things)];
 }
 
 extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
@@ -260,7 +260,7 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
         return;
     }
 
-    nlList<UnidentifiedAvoidanceValue> list(0, 0);
+    nlList<ObstacleAvoidance> list(0, 0);
     AvoidanceRemovalCollector callback(pObject, list);
 
     for (int i = 0; i < 10; ++i)
@@ -271,15 +271,15 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
             list.m_pEnd = 0;
             list.m_pStart = 0;
             AvoidController* controller = ((cFielder*)pCharacter)->GetAvoidController();
-            UnidentifiedAvoidanceTree& tree = controller->mUnidentified174;
+            ObstacleAvoidanceTree& tree = controller->m_Avoidances;
             tree.Walk(
                 &callback, &AvoidanceRemovalCollector::Collect);
 
-            UnidentifiedAvoidanceValue* value = list.m_pStart;
+            ObstacleAvoidance* value = list.m_pStart;
             while (value != 0)
             {
-                --controller->mUnidentified198;
-                AvoidableObject* object = value->mUnidentified008;
+                --controller->m_NumAvoidances;
+                AvoidableObject* object = value->mpObstacle;
                 value = value->next;
                 tree.Remove(object->mId);
             }
@@ -288,9 +288,9 @@ extern "C" void RemoveFromAvoidControllers(AvoidableObject* pObject)
 }
 
 void AvoidanceRemovalCollector::Collect(
-    const u32&, UnidentifiedAvoidanceValue* value)
+    const u32&, ObstacleAvoidance* value)
 {
-    if (value->mUnidentified004 == mpRemovedObject || value->mUnidentified008 == mpRemovedObject)
+    if (value->mpAvoider == mpRemovedObject || value->mpObstacle == mpRemovedObject)
     {
         nlListAddEnd(&mRemovals.m_pStart, &mRemovals.m_pEnd, value);
     }
@@ -301,7 +301,7 @@ static inline bool CanAddAvoidance(AvoidController& controller,
 {
     bool bCanAvoid = !alreadyTracked;
     if (bCanAvoid)
-        bCanAvoid = controller.UnidentifiedCanAvoid(pObject->mType);
+        bCanAvoid = controller.IsAvoiding(pObject->mType);
     if (bCanAvoid)
         bCanAvoid = pSelf != pObject;
     if (bCanAvoid)
@@ -328,7 +328,7 @@ void AvoidController::Update(float fDeltaT)
 
     bool bCanAvoid;
     m_VeryCloseToSideline = m_SidelineUnavoidable = false;
-    bCanAvoid = UnidentifiedCanAvoid(AVOID_SIDELINES);
+    bCanAvoid = IsAvoiding(AVOID_SIDELINES);
     if (bCanAvoid)
     {
         bool bHasGlobalPad = m_pFielder->GetGlobalPad() != 0;
@@ -336,32 +336,32 @@ void AvoidController::Update(float fDeltaT)
             AvoidSidelines(v3Repulsion);
     }
 
-    nlList<UnidentifiedAvoidanceValue> list(0, 0);
+    nlList<ObstacleAvoidance> list(0, 0);
     RepulsionAccumulator callback(fDeltaT,
         vAccumulated_v3, fTotalWeight_v3, v3Vectors, fWeights, nCounts, list);
-    mUnidentified174.Walk(&callback,
+    m_Avoidances.Walk(&callback,
         &RepulsionAccumulator::Accumulate);
 
     AvoidableObject* pSelf = m_pFielder->mUnidentified320;
-    UnidentifiedAvoidanceValue* value;
+    ObstacleAvoidance* value;
     for (AvoidableObject* pObject = gAvoidableObjects.m_pStart;
-         pObject != 0 && mUnidentified198 < 99; pObject = pObject->next)
+         pObject != 0 && m_NumAvoidances < 99; pObject = pObject->next)
     {
         if (CanAddAvoidance(*this, pSelf, pObject,
-                mUnidentified174.FindGet((u32)pObject->mId, &value)))
+                m_Avoidances.FindGet((u32)pObject->mId, &value)))
         {
-            if (!UnidentifiedCanAvoid(AVOID_SIDELINES)
+            if (!IsAvoiding(AVOID_SIDELINES)
                 && pObject->mType == AVOID_POLYGONS
                 && ((AvoidablePolygon*)pObject)->mPolygonType == 1)
                 continue;
-            ++mUnidentified198;
-            value = mUnidentified174.UnidentifiedAddOrGet((u32)pObject->mId);
-            value->UnidentifiedInitialize(pSelf, pObject);
+            ++m_NumAvoidances;
+            value = m_Avoidances.UnidentifiedAddOrGet((u32)pObject->mId);
+            value->Initialize(pSelf, pObject);
             value->Update(fDeltaT);
-            float fWeight = value->UnidentifiedGetWeight();
+            float fWeight = value->GetWeight();
             if (fWeight)
             {
-                const nlVector3& v3Repulsion = value->mUnidentified00C;
+                const nlVector3& v3Repulsion = value->mRepulsion;
                 nlVec3ScaleAdd(vAccumulated_v3, fWeight,
                     v3Repulsion, vAccumulated_v3);
                 fTotalWeight_v3 += fWeight;
@@ -374,13 +374,13 @@ void AvoidController::Update(float fDeltaT)
         }
     }
 
-    UnidentifiedAvoidanceValue* entry = list.m_pStart;
+    ObstacleAvoidance* entry = list.m_pStart;
     while (entry != 0)
     {
-        --mUnidentified198;
-        AvoidableObject* pObject = entry->mUnidentified008;
+        --m_NumAvoidances;
+        AvoidableObject* pObject = entry->mpObstacle;
         entry = entry->next;
-        mUnidentified174.Remove((u32)pObject->mId);
+        m_Avoidances.Remove((u32)pObject->mId);
     }
     list.m_pEnd = 0;
     list.m_pStart = 0;
@@ -397,15 +397,15 @@ void AvoidController::Update(float fDeltaT)
             float fWeight = (fWeights[i] / nCounts[i]) / gAvoidableTweaks[i][0];
             eAvoidableThings things = (eAvoidableThings)GetAvoidableMask(i);
             m_CurrentlyAvoiding |= things;
-            UnidentifiedSetLast(things, v3Repulsion, fWeight);
-            mUnidentified0B4[i].mRepulsion = v3Repulsion;
-            mUnidentified0B4[i].mTimer.SetSeconds(sAvoidanceMemoryRefreshSeconds);
+            SetLastRepulsionVector(things, v3Repulsion, fWeight);
+            m_AvoidanceMemory[i].mRepulsion = v3Repulsion;
+            m_AvoidanceMemory[i].mTimer.SetSeconds(sAvoidanceMemoryRefreshSeconds);
         }
         else
         {
             eAvoidableThings things = (eAvoidableThings)GetAvoidableMask(i);
             m_CurrentlyAvoiding &= ~things;
-            UnidentifiedSetLast(things, v3Zero, 0.0f);
+            SetLastRepulsionVector(things, v3Zero, 0.0f);
         }
     }
 
@@ -426,29 +426,29 @@ void AvoidController::Update(float fDeltaT)
         }
         ApplyRepulsionVector(v3SmoothedRepulsion);
     }
-    UnidentifiedSetLast(AVOID_EVERYTHING, v3FinalRepulsion, fWeight);
+    SetLastRepulsionVector(AVOID_EVERYTHING, v3FinalRepulsion, fWeight);
     m_fRepulsionMult = 1.0f;
 }
 
 void RepulsionAccumulator::Accumulate(
-    const u32&, UnidentifiedAvoidanceValue* value)
+    const u32&, ObstacleAvoidance* value)
 {
-    AvoidableObject* pObject = value->mUnidentified008;
-    AvoidController* controller = (((AvoidableFielder*)value->mUnidentified004)->m_pFielder)->GetAvoidController();
+    AvoidableObject* pObject = value->mpObstacle;
+    AvoidController* controller = (((AvoidableFielder*)value->mpAvoider)->m_pFielder)->GetAvoidController();
     float fWeight = 0.0f;
-    if (controller->UnidentifiedCanAvoid(pObject->mType))
+    if (controller->IsAvoiding(pObject->mType))
     {
         value->Update(mfDeltaT);
-        fWeight = value->UnidentifiedGetWeight();
+        fWeight = value->GetWeight();
     }
     if (fWeight)
     {
         nlVec3ScaleAdd(mAccumulated, fWeight,
-            value->mUnidentified00C, mAccumulated);
+            value->mRepulsion, mAccumulated);
         mTotalWeight += fWeight;
         int index = GetAvoidableIndex((eAvoidableThings)pObject->mType);
         nlVec3ScaleAdd(mpCategoryVectors[index], fWeight,
-            value->mUnidentified00C, mpCategoryVectors[index]);
+            value->mRepulsion, mpCategoryVectors[index]);
         mpCategoryWeights[index] += fWeight;
         ++mpCategoryCounts[index];
     }
@@ -481,22 +481,22 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
     nlVector3 v3SidelineNormal = { 0.0f, 0.0f, 0.0f };
     v3SidelineNormal.x = vSidelineNormal.x;
     v3SidelineNormal.y = vSidelineNormal.y;
-    nlVector2 vUnidentified018;
-    vUnidentified018.x = v3SidelinePos.x - pPos.x;
-    vUnidentified018.y = v3SidelinePos.y - pPos.y;
-    float fDistanceSquared = nlVec2LengthSquared(vUnidentified018);
+    nlVector2 vToSideline;
+    vToSideline.x = v3SidelinePos.x - pPos.x;
+    vToSideline.y = v3SidelinePos.y - pPos.y;
+    float fDistanceSquared = nlVec2LengthSquared(vToSideline);
     float fDistance = nlSqrt(fDistanceSquared, true);
 
     fDistance -= m_pFielder->mUnidentified320->GetRadius();
-    float fMaxDistance = sUnidentifiedRepulsionValue0;
+    float fMaxDistance = sSidelineMaxDistance;
     if (m_CurrentlyAvoiding & AVOID_SIDELINES)
     {
-        fMaxDistance = sUnidentifiedRepulsionValue1;
+        fMaxDistance = sSidelineMaxDistanceWhileAvoiding;
     }
 
     m_SidelineUnavoidable = false;
     m_VeryCloseToSideline = false;
-    float fMinDistance = 2.0f * sUnidentifiedRepulsionValue1;
+    float fMinDistance = 2.0f * sSidelineMaxDistanceWhileAvoiding;
 
     if (fDistance <= fMinDistance)
     {
@@ -533,18 +533,18 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
             bHitSideline = true;
             if (lbl_806E0BB9)
             {
-                nlVector3 vUnidentified034;
-                nlVector3 vUnidentified028;
-                nlVec3Set(vUnidentified034,
+                nlVector3 v3DebugPos;
+                nlVector3 v3DebugNormalEnd;
+                nlVec3Set(v3DebugPos,
                     vSidelinePos.x, vSidelinePos.y, 0.0f);
-                nlVec3Set(vUnidentified028,
+                nlVec3Set(v3DebugNormalEnd,
                     vSidelinePos.x + vSidelineNormal.x,
                     vSidelinePos.y + vSidelineNormal.y, 0.0f);
                 nlColourSet(colour, 255, 0, 0, 255);
-                g_ShapeRenderer.DrawEllipse2D(vUnidentified034,
+                g_ShapeRenderer.DrawEllipse2D(v3DebugPos,
                     0.2f, 1.0f, 1.0f, colour, true);
                 nlColourSet(colour, 0, 0, 255, 255);
-                g_ShapeRenderer.DrawLine3D(vUnidentified034, vUnidentified028, colour, true);
+                g_ShapeRenderer.DrawLine3D(v3DebugPos, v3DebugNormalEnd, colour, true);
             }
         }
     }
@@ -573,15 +573,15 @@ bool AvoidController::CalcDesiredVelocityToAvoidCorner(
         vBallPosition = vPosition;
     }
 
-    nlVector2 vUnidentified018;
-    nlVector2 vUnidentified010;
-    nlVector2 vUnidentified008;
-    nlVec2Sub(vUnidentified008, corner.vCenter, vBallPosition);
-    if (nlVec2Length(vUnidentified008) <= corner.fRadius)
+    nlVector2 vCornerToBall;
+    nlVector2 vCornerToFielder;
+    nlVector2 vBallToCorner;
+    nlVec2Sub(vBallToCorner, corner.vCenter, vBallPosition);
+    if (nlVec2Length(vBallToCorner) <= corner.fRadius)
     {
-        nlVec2Sub(vUnidentified018, vBallPosition, corner.vCenter);
+        nlVec2Sub(vCornerToBall, vBallPosition, corner.vCenter);
 
-        f32 fAngle = 10430.378f * nlATan2f(vUnidentified018.y, vUnidentified018.x);
+        f32 fAngle = 10430.378f * nlATan2f(vCornerToBall.y, vCornerToBall.x);
         u32 aCornerToPos = (u16)(s32)fAngle;
 
         u16 absEnd = (u16)abs_s16((s16)(aCornerToPos - corner.thetaEnd));
@@ -592,9 +592,9 @@ bool AvoidController::CalcDesiredVelocityToAvoidCorner(
             absEnd = absStart;
         if ((s16)absEnd <= 0x4000)
         {
-            nlVec2Sub(vUnidentified010, vPosition, corner.vCenter);
+            nlVec2Sub(vCornerToFielder, vPosition, corner.vCenter);
 
-            f32 fAngle2 = 10430.378f * nlATan2f(vUnidentified010.y, vUnidentified010.x);
+            f32 fAngle2 = 10430.378f * nlATan2f(vCornerToFielder.y, vCornerToFielder.x);
             u32 aCornerToFielder = (u16)(s32)fAngle2;
 
             u16 absEnd2 = (u16)abs_s16((s16)(aCornerToFielder - corner.thetaEnd));
@@ -605,11 +605,11 @@ bool AvoidController::CalcDesiredVelocityToAvoidCorner(
                 absEnd2 = absStart2;
             if ((s16)absEnd2 <= 0x4000)
             {
-                float fInvDistance = nlRecipSqrt(nlVec2DotProduct(vUnidentified010, vUnidentified010), true);
-                nlVec2Set(vUnidentified010, fInvDistance * vUnidentified010.x, fInvDistance * vUnidentified010.y);
-                nlVec2Sub(vSidelineNormal, v2Zero, vUnidentified010);
+                float fInvDistance = nlRecipSqrt(nlVec2DotProduct(vCornerToFielder, vCornerToFielder), true);
+                nlVec2Set(vCornerToFielder, fInvDistance * vCornerToFielder.x, fInvDistance * vCornerToFielder.y);
+                nlVec2Sub(vSidelineNormal, v2Zero, vCornerToFielder);
                 float fRadius = corner.fRadius;
-                nlVec2Set(vSidelinePos, fRadius * vUnidentified010.x + corner.vCenter.x, fRadius * vUnidentified010.y + corner.vCenter.y);
+                nlVec2Set(vSidelinePos, fRadius * vCornerToFielder.x + corner.vCenter.x, fRadius * vCornerToFielder.y + corner.vCenter.y);
                 bHitSideline = CalcDesiredVelocityToAvoidSideline(vNewDesiredVelDir, vCurrentDesiredVelDir, vCurrentVelDir, vSidelinePos, vSidelineNormal);
             }
 
@@ -645,7 +645,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     nlVector2 vCurrentDesiredVelDir;
     nlVector2 vNewDesiredVelDir;
 
-    mUnidentified028 = v3Zero;
+    m_SidelineRepulsion = v3Zero;
     if (m_pFielder->GetDistanceToDesiredPos() <= 0.25f)
         return false;
     bTurboAllowed = true;
@@ -703,7 +703,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         m_pFielder->fn_8001DCE0(aDesiredMovementDir);
         m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
     }
-    v3OutRepulsion = mUnidentified028;
+    v3OutRepulsion = m_SidelineRepulsion;
     return bHitSideline;
 }
 
@@ -725,15 +725,15 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         {
             if (nlVec2DotProduct(m_SidelineDirection, m_SidelineDirection) > 0.0f)
             {
-                nlVector3 vUnidentified030;
-                nlVector3 vUnidentified024;
-                nlVector3 vUnidentified018;
-                nlVec3Set(vUnidentified018,
+                nlVector3 v3Parallel;
+                nlVector3 v3Perpendicular;
+                nlVector3 v3SidelineDir;
+                nlVec3Set(v3SidelineDir,
                     m_SidelineDirection.x, m_SidelineDirection.y, 0.0f);
-                nlVec3Project(vUnidentified030,
-                    rRepulsionDir, vUnidentified018);
-                nlVec3Sub(vUnidentified024, rRepulsionDir, vUnidentified030);
-                nlVec3ScaleAdd(rRepulsionDir, -1.0f, vUnidentified024, vUnidentified030);
+                nlVec3Project(v3Parallel,
+                    rRepulsionDir, v3SidelineDir);
+                nlVec3Sub(v3Perpendicular, rRepulsionDir, v3Parallel);
+                nlVec3ScaleAdd(rRepulsionDir, -1.0f, v3Perpendicular, v3Parallel);
                 rRepulsionDir.z = 0.0f;
                 nlVec3Scale(v3Repulsion, rRepulsionDir, fRepulsionMag);
             }
@@ -751,19 +751,19 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     {
         nlColour colour;
         nlColourSet(colour, 0, 0, 255, 255);
-        nlVector3 vUnidentified00C;
-        nlVec3ScaleAdd(vUnidentified00C, 0.5f, v3Repulsion, m_pFielder->m_DetChar.m_v3Position);
-        g_ShapeRenderer.DrawLine3D(m_pFielder->m_DetChar.m_v3Position, vUnidentified00C, colour, true);
+        nlVector3 v3DebugLineEnd;
+        nlVec3ScaleAdd(v3DebugLineEnd, 0.5f, v3Repulsion, m_pFielder->m_DetChar.m_v3Position);
+        g_ShapeRenderer.DrawLine3D(m_pFielder->m_DetChar.m_v3Position, v3DebugLineEnd, colour, true);
     }
 
     nlVec3Add(v3Repulsion, v3Repulsion, m_pFielder->GetDesiredVelocity());
     float fDesiredSpeed = m_pFielder->GetRunningSpeed();
     float fResultantMag = nlVec3Length(v3Repulsion);
     fDesiredSpeed = fResultantMag <= fDesiredSpeed ? fResultantMag : fDesiredSpeed;
-    float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(GetJogSpeed(m_pFielder->GetTweaks()));
-    if (fDesiredSpeed >= 0.35f * fUnidentifiedSpeed)
+    float fJogSpeed = m_pFielder->GetSpeedPowerupAdjusted(GetJogSpeed(m_pFielder->GetTweaks()));
+    if (fDesiredSpeed >= 0.35f * fJogSpeed)
     {
-        fDesiredSpeed = fDesiredSpeed >= fUnidentifiedSpeed ? fDesiredSpeed : fUnidentifiedSpeed;
+        fDesiredSpeed = fDesiredSpeed >= fJogSpeed ? fDesiredSpeed : fJogSpeed;
         m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(nlVector3ToAngle(v3Repulsion));
         m_pFielder->SetDesiredFacingDirection(nlVector3ToAngle(v3Repulsion), false);
@@ -772,269 +772,269 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         m_pFielder->m_DetChar.m_fDesiredSpeed = 0.0f;
 }
 
-UnidentifiedAvoidanceValue::UnidentifiedAvoidanceValue()
+ObstacleAvoidance::ObstacleAvoidance()
 {
-    UnidentifiedInitialize(0, 0);
+    Initialize(0, 0);
 }
 
-void UnidentifiedAvoidanceValue::Update(float fDeltaT)
+void ObstacleAvoidance::Update(float fDeltaT)
 {
-    float fUnidentifiedPrevious = mUnidentified018 > 0.0f;
+    float fWasActive = mWeight > 0.0f;
     nlVector3 v3Repulsion = v3Zero;
-    float fWeight = mUnidentified004->GetAvoidanceWeight(mUnidentified008);
+    float fWeight = mpAvoider->GetAvoidanceWeight(mpObstacle);
     if (fWeight == 0.0f)
-        mUnidentified018 = 0.0f;
+        mWeight = 0.0f;
     else
     {
-        UnidentifiedAvoidanceContext context;
-        bool bUnidentifiedResult = false;
-        UnidentifiedPrepareContext(context, fDeltaT);
-        if (context.mUnidentified018 <= mUnidentified008->mTweaks[2])
+        AvoidanceContext context;
+        bool bResponded = false;
+        CalcContext(context, fDeltaT);
+        if (context.mGap <= mpObstacle->mTweaks[2])
         {
-            switch (mUnidentified008->mType)
+            switch (mpObstacle->mType)
             {
             case AVOID_FIELDERS:
             case AVOID_GOALIES:
-                bUnidentifiedResult = UnidentifiedMovingResponse(context, fDeltaT);
+                bResponded = AgentResponse(context, fDeltaT);
                 break;
             case AVOID_POWERUPS:
             {
-                AvoidablePowerup* pPowerup = (AvoidablePowerup*)mUnidentified008;
+                AvoidablePowerup* pPowerup = (AvoidablePowerup*)mpObstacle;
                 if (pPowerup->m_pChainChomp != 0
                     || pPowerup->m_pPowerup->m_eType == POWER_UP_RED_SHELL)
                 {
-                    bUnidentifiedResult = UnidentifiedMovingResponse(context, fDeltaT);
+                    bResponded = AgentResponse(context, fDeltaT);
                     break;
                 }
             }
             case AVOID_POLYGONS:
             case AVOID_BOWSER:
             case AVOID_PATCHES:
-                bUnidentifiedResult = mUnidentified008->IsMobile()
+                bResponded = mpObstacle->IsMobile()
                     ? MobileObstacleResponse(context, fDeltaT)
                     : StaticObstacleResponse(context, fDeltaT);
                 break;
             }
-            context.mUnidentified00C *= mUnidentified004->GetAvoidanceStrength(mUnidentified008);
+            context.mRepulsionMag *= mpAvoider->GetAvoidanceStrength(mpObstacle);
         }
-        if (bUnidentifiedResult && context.mUnidentified00C >= 0.1f)
+        if (bResponded && context.mRepulsionMag >= 0.1f)
         {
             mFadeOutTimer.Clear();
-            mUnidentified018 = fWeight * context.mUnidentified010;
-            context.mUnidentified00C *= context.mUnidentified010;
-            nlVec3Scale(v3Repulsion, context.mUnidentified000, context.mUnidentified00C);
-            mUnidentified02C.Update(mUnidentified00C, v3Repulsion, fDeltaT);
+            mWeight = fWeight * context.mProximity;
+            context.mRepulsionMag *= context.mProximity;
+            nlVec3Scale(v3Repulsion, context.mRepulsionDir, context.mRepulsionMag);
+            mRepulsionHistory.Update(mRepulsion, v3Repulsion, fDeltaT);
         }
         else
             fWeight = 0.0f;
     }
-    if (mUnidentified018 && !fWeight)
+    if (mWeight && !fWeight)
     {
         if (mFadeOutTimer.m_uPackedTime == 0)
             mFadeOutTimer.SetSeconds(0.3f);
         if (mFadeOutTimer.Countdown(fDeltaT, 0.0f))
         {
-            mUnidentified02C.UnidentifiedReset();
-            mUnidentified018 = 0.0f;
+            mRepulsionHistory.UnidentifiedReset();
+            mWeight = 0.0f;
         }
         else
         {
-            mUnidentified02C.Update(mUnidentified00C,
-                mUnidentified02C.UnidentifiedLast(), fDeltaT, 0.3f, &mFadeOutTimer);
+            mRepulsionHistory.Update(mRepulsion,
+                mRepulsionHistory.GetLastSample(), fDeltaT, 0.3f, &mFadeOutTimer);
         }
     }
-    if (!fUnidentifiedPrevious && mUnidentified018)
-        mUnidentified01C.Clear();
-    mUnidentified01C.Countup(fDeltaT, 10.0f);
+    if (!fWasActive && mWeight)
+        mActiveTimer.Clear();
+    mActiveTimer.Countup(fDeltaT, 10.0f);
 }
 
-void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
-    UnidentifiedAvoidanceContext& context, float fDeltaT)
+void ObstacleAvoidance::CalcContext(
+    AvoidanceContext& context, float fDeltaT)
 {
-    bool bUnidentifiedOther = mUnidentified008->GetClosestBoundaryPoint(
-        mUnidentified004->GetPosition(), context.mUnidentified02C, context.mUnidentified044);
-    context.mUnidentified014 = mUnidentified004->GetClosestBoundaryPoint(
-        context.mUnidentified02C, context.mUnidentified020, context.mAvoiderNormal) || bUnidentifiedOther;
-    context.mUnidentified018 = nlSqrt(nlVec3DistanceSquared2D(context.mUnidentified020, context.mUnidentified02C), true);
-    if (context.mUnidentified014)
-        context.mUnidentified018 *= -1.0f;
+    bool bAvoiderInsideObstacle = mpObstacle->GetClosestBoundaryPoint(
+        mpAvoider->GetPosition(), context.mObstaclePoint, context.mObstacleNormal);
+    context.mContactState = mpAvoider->GetClosestBoundaryPoint(
+        context.mObstaclePoint, context.mAvoiderPoint, context.mAvoiderNormal) || bAvoiderInsideObstacle;
+    context.mGap = nlSqrt(nlVec3DistanceSquared2D(context.mAvoiderPoint, context.mObstaclePoint), true);
+    if (context.mContactState)
+        context.mGap *= -1.0f;
 
-    cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
-    if (mUnidentified008->mType == AVOID_FIELDERS
-        && !((AvoidableFielder*)mUnidentified008)->m_pFielder->IsOnSameTeam(pFielder))
-        context.mUnidentified018 -= mUnidentified008->GetAttackReach();
-    context.mUnidentified010 = NormalizeVal(context.mUnidentified018,
-        mUnidentified008->mTweaks[2], mUnidentified008->mTweaks[1]);
-    context.mUnidentified01C = GetClosingSpeed2D(
-        context.mUnidentified020, pFielder->GetDesiredVelocity(),
-        context.mUnidentified02C, mUnidentified008->GetVelocity());
-    float fClosingSpeed = context.mUnidentified01C;
-    context.mUnidentified01C = nlMaxEquals(0.0f, fClosingSpeed);
-    context.mUnidentified050 = nlVec2Length(*(const nlVector2*)&pFielder->GetDesiredVelocity());
-    if (context.mUnidentified050 > 0.1f)
-        nlVec3Scale(context.mUnidentified054, pFielder->GetDesiredVelocity(), 1.0f / context.mUnidentified050);
+    cFielder* pFielder = ((AvoidableFielder*)mpAvoider)->m_pFielder;
+    if (mpObstacle->mType == AVOID_FIELDERS
+        && !((AvoidableFielder*)mpObstacle)->m_pFielder->IsOnSameTeam(pFielder))
+        context.mGap -= mpObstacle->GetAttackReach();
+    context.mProximity = NormalizeVal(context.mGap,
+        mpObstacle->mTweaks[2], mpObstacle->mTweaks[1]);
+    context.mClosingSpeed = GetClosingSpeed2D(
+        context.mAvoiderPoint, pFielder->GetDesiredVelocity(),
+        context.mObstaclePoint, mpObstacle->GetVelocity());
+    float fClosingSpeed = context.mClosingSpeed;
+    context.mClosingSpeed = nlMaxEquals(0.0f, fClosingSpeed);
+    context.mDesiredSpeed = nlVec2Length(*(const nlVector2*)&pFielder->GetDesiredVelocity());
+    if (context.mDesiredSpeed > 0.1f)
+        nlVec3Scale(context.mDesiredDir, pFielder->GetDesiredVelocity(), 1.0f / context.mDesiredSpeed);
     else
-        context.mUnidentified054 = v3Zero;
+        context.mDesiredDir = v3Zero;
 
-    if (mUnidentified008->mType == AVOID_POLYGONS)
+    if (mpObstacle->mType == AVOID_POLYGONS)
     {
-        AvoidablePolygon* pPolygon = (AvoidablePolygon*)mUnidentified008;
+        AvoidablePolygon* pPolygon = (AvoidablePolygon*)mpObstacle;
         if (pPolygon->mPolygonType == 2 && pPolygon->mOwner != 0
-            && !pPolygon->mOwner->IsOnSameTeam(((AvoidableFielder*)mUnidentified004)->m_pFielder))
-            nlVec3Scale(context.mUnidentified044, -1.0f);
+            && !pPolygon->mOwner->IsOnSameTeam(((AvoidableFielder*)mpAvoider)->m_pFielder))
+            nlVec3Scale(context.mObstacleNormal, -1.0f);
     }
 }
 
-bool UnidentifiedAvoidanceValue::UnidentifiedMovingResponse(
-    UnidentifiedAvoidanceContext& context, float fDeltaT)
+bool ObstacleAvoidance::AgentResponse(
+    AvoidanceContext& context, float fDeltaT)
 {
-    cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
+    cFielder* pFielder = ((AvoidableFielder*)mpAvoider)->m_pFielder;
     float fDistanceSquared = nlVec3DistanceSquared2D(
-        pFielder->GetDesiredPosition(), mUnidentified008->GetPosition())
-        - (mUnidentified008->mTweaks[1] * mUnidentified008->mTweaks[1]);
-    float fRadius = mUnidentified008->GetRadius();
-    bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
-    if (context.mUnidentified014)
-        return OverlapResponse(!bUnidentifiedCollision, context, fDeltaT);
-    if (bUnidentifiedCollision)
+        pFielder->GetDesiredPosition(), mpObstacle->GetPosition())
+        - (mpObstacle->mTweaks[1] * mpObstacle->mTweaks[1]);
+    float fRadius = mpObstacle->GetRadius();
+    bool bDesiredPosBlocked = fDistanceSquared < fRadius * fRadius;
+    if (context.mContactState)
+        return OverlapResponse(!bDesiredPosBlocked, context, fDeltaT);
+    if (bDesiredPosBlocked)
     {
-        const nlVector3& v3Normal = context.mUnidentified044;
-        context.mUnidentified014 = 2;
-        nlVec3Scale(context.mUnidentified000, v3Normal, context.mUnidentified01C);
-        if (!(-nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054) >= 0.7f))
+        const nlVector3& v3Normal = context.mObstacleNormal;
+        context.mContactState = 2;
+        nlVec3Scale(context.mRepulsionDir, v3Normal, context.mClosingSpeed);
+        if (!(-nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir) >= 0.7f))
         {
             nlVector3 v3Repulsion;
-            UnidentifiedTurn(v3Repulsion, context.mUnidentified054, v3Normal, false);
-            nlVec3ScaleAdd(context.mUnidentified000, context.mUnidentified050, v3Repulsion, context.mUnidentified000);
+            CalcPerpendicularToward(v3Repulsion, context.mDesiredDir, v3Normal, false);
+            nlVec3ScaleAdd(context.mRepulsionDir, context.mDesiredSpeed, v3Repulsion, context.mRepulsionDir);
         }
-        context.UnidentifiedNormalize();
+        context.NormalizeRepulsion();
         return true;
     }
 
     float fWeight = InterpolateRangeClamped(1.0f, 0.0f, 0.7f, 1.0f,
-        -nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054));
-    context.mUnidentified000 = context.mUnidentified044;
+        -nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir));
+    context.mRepulsionDir = context.mObstacleNormal;
     if (fWeight < 1.0f)
     {
-        UnidentifiedTurn(context.mUnidentified000, context.mUnidentified054, context.mUnidentified044, true);
-        nlVec3WeightedSum(context.mUnidentified000, 1.0f - fWeight, context.mUnidentified000, fWeight, context.mUnidentified044);
-        nlVec3Scale(context.mUnidentified000,
-            nlRecipSqrt(nlVec3LengthSquared(context.mUnidentified000), true));
+        CalcPerpendicularToward(context.mRepulsionDir, context.mDesiredDir, context.mObstacleNormal, true);
+        nlVec3WeightedSum(context.mRepulsionDir, 1.0f - fWeight, context.mRepulsionDir, fWeight, context.mObstacleNormal);
+        nlVec3Scale(context.mRepulsionDir,
+            nlRecipSqrt(nlVec3LengthSquared(context.mRepulsionDir), true));
     }
-    context.mUnidentified00C = ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed();
-    nlVec3Scale(context.mUnidentified000, context.mUnidentified00C);
-    nlVec3ScaleAdd(context.mUnidentified000, 0.9f * context.mUnidentified01C, context.mUnidentified044, context.mUnidentified000);
-    context.UnidentifiedNormalize();
+    context.mRepulsionMag = ((AvoidableFielder*)mpAvoider)->m_pFielder->GetRunningSpeed();
+    nlVec3Scale(context.mRepulsionDir, context.mRepulsionMag);
+    nlVec3ScaleAdd(context.mRepulsionDir, 0.9f * context.mClosingSpeed, context.mObstacleNormal, context.mRepulsionDir);
+    context.NormalizeRepulsion();
     return true;
 }
 
-bool UnidentifiedAvoidanceValue::MobileObstacleResponse(
-    UnidentifiedAvoidanceContext& context, float fDeltaT)
+bool ObstacleAvoidance::MobileObstacleResponse(
+    AvoidanceContext& context, float fDeltaT)
 {
-    cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
+    cFielder* pFielder = ((AvoidableFielder*)mpAvoider)->m_pFielder;
     float fDistanceSquared = nlVec3DistanceSquared2D(
-        pFielder->GetDesiredPosition(), mUnidentified008->GetPosition())
-        - (mUnidentified008->mTweaks[1] * mUnidentified008->mTweaks[1]);
-    float fRadius = mUnidentified008->GetRadius();
-    bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
-    if (context.mUnidentified014)
-        return OverlapResponse(bUnidentifiedCollision ? 0 : 2, context, fDeltaT);
+        pFielder->GetDesiredPosition(), mpObstacle->GetPosition())
+        - (mpObstacle->mTweaks[1] * mpObstacle->mTweaks[1]);
+    float fRadius = mpObstacle->GetRadius();
+    bool bDesiredPosBlocked = fDistanceSquared < fRadius * fRadius;
+    if (context.mContactState)
+        return OverlapResponse(bDesiredPosBlocked ? 0 : 2, context, fDeltaT);
 
-    nlVector3 v3Velocity = mUnidentified008->GetVelocity();
+    nlVector3 v3Velocity = mpObstacle->GetVelocity();
     v3Velocity.z = 0.0f;
     float fLengthSquared = nlVec3LengthSquared(v3Velocity);
     if (fLengthSquared > 0.1f)
     {
         nlVec3Scale(v3Velocity, 1.0f / nlSqrt(fLengthSquared, true));
-        UnidentifiedTurn(context.mUnidentified000, context.mUnidentified044, v3Velocity, false);
+        CalcPerpendicularToward(context.mRepulsionDir, context.mObstacleNormal, v3Velocity, false);
     }
     else
-        context.mUnidentified000 = context.mUnidentified044;
-    context.mUnidentified00C = nlMaxEquals(context.mUnidentified01C,
-        ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed());
+        context.mRepulsionDir = context.mObstacleNormal;
+    context.mRepulsionMag = nlMaxEquals(context.mClosingSpeed,
+        ((AvoidableFielder*)mpAvoider)->m_pFielder->GetRunningSpeed());
     return true;
 }
 
-bool UnidentifiedAvoidanceValue::StaticObstacleResponse(
-    UnidentifiedAvoidanceContext& context, float fDeltaT)
+bool ObstacleAvoidance::StaticObstacleResponse(
+    AvoidanceContext& context, float fDeltaT)
 {
-    cFielder* pFielder = ((AvoidableFielder*)mUnidentified004)->m_pFielder;
+    cFielder* pFielder = ((AvoidableFielder*)mpAvoider)->m_pFielder;
     float fDistanceSquared = nlVec3DistanceSquared2D(
-        pFielder->GetDesiredPosition(), mUnidentified008->GetPosition())
-        - (mUnidentified008->mTweaks[1] * mUnidentified008->mTweaks[1]);
-    float fRadius = mUnidentified008->GetRadius();
-    bool bUnidentifiedCollision = fDistanceSquared < fRadius * fRadius;
-    if (context.mUnidentified014)
+        pFielder->GetDesiredPosition(), mpObstacle->GetPosition())
+        - (mpObstacle->mTweaks[1] * mpObstacle->mTweaks[1]);
+    float fRadius = mpObstacle->GetRadius();
+    bool bDesiredPosBlocked = fDistanceSquared < fRadius * fRadius;
+    if (context.mContactState)
         return OverlapResponse(1, context, fDeltaT);
-    if (bUnidentifiedCollision)
+    if (bDesiredPosBlocked)
     {
-        const nlVector3& v3Normal = context.mUnidentified044;
-        context.mUnidentified014 = 2;
-        nlVec3Scale(context.mUnidentified000, v3Normal, context.mUnidentified01C);
-        if (-nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054) >= 0.0f)
+        const nlVector3& v3Normal = context.mObstacleNormal;
+        context.mContactState = 2;
+        nlVec3Scale(context.mRepulsionDir, v3Normal, context.mClosingSpeed);
+        if (-nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir) >= 0.0f)
         {
             nlVector3 v3Repulsion;
-            UnidentifiedTurn(v3Repulsion, context.mUnidentified054, v3Normal, false);
-            nlVec3ScaleAdd(context.mUnidentified000, context.mUnidentified050, v3Repulsion, context.mUnidentified000);
+            CalcPerpendicularToward(v3Repulsion, context.mDesiredDir, v3Normal, false);
+            nlVec3ScaleAdd(context.mRepulsionDir, context.mDesiredSpeed, v3Repulsion, context.mRepulsionDir);
         }
-        context.UnidentifiedNormalize();
+        context.NormalizeRepulsion();
         return true;
     }
 
     float fWeight = InterpolateRangeClamped(1.0f, 0.0f, 0.7f, 1.0f,
-        -nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054));
-    context.mUnidentified000 = context.mUnidentified044;
+        -nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir));
+    context.mRepulsionDir = context.mObstacleNormal;
     if (fWeight < 1.0f)
     {
-        UnidentifiedTurn(context.mUnidentified000, context.mUnidentified054, context.mUnidentified044, false);
-        nlVec3WeightedSum(context.mUnidentified000, 1.0f - fWeight, context.mUnidentified000, fWeight, context.mUnidentified044);
-        nlVec3Scale(context.mUnidentified000,
-            nlRecipSqrt(nlVec3LengthSquared(context.mUnidentified000), true));
+        CalcPerpendicularToward(context.mRepulsionDir, context.mDesiredDir, context.mObstacleNormal, false);
+        nlVec3WeightedSum(context.mRepulsionDir, 1.0f - fWeight, context.mRepulsionDir, fWeight, context.mObstacleNormal);
+        nlVec3Scale(context.mRepulsionDir,
+            nlRecipSqrt(nlVec3LengthSquared(context.mRepulsionDir), true));
     }
-    context.mUnidentified00C = ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed();
-    nlVec3Scale(context.mUnidentified000, context.mUnidentified00C);
-    nlVec3ScaleAdd(context.mUnidentified000, 0.9f * context.mUnidentified01C, context.mUnidentified044, context.mUnidentified000);
-    context.UnidentifiedNormalize();
+    context.mRepulsionMag = ((AvoidableFielder*)mpAvoider)->m_pFielder->GetRunningSpeed();
+    nlVec3Scale(context.mRepulsionDir, context.mRepulsionMag);
+    nlVec3ScaleAdd(context.mRepulsionDir, 0.9f * context.mClosingSpeed, context.mObstacleNormal, context.mRepulsionDir);
+    context.NormalizeRepulsion();
     return true;
 }
 
-bool UnidentifiedAvoidanceValue::OverlapResponse(
-    int mode, UnidentifiedAvoidanceContext& context, float fDeltaT)
+bool ObstacleAvoidance::OverlapResponse(
+    int mode, AvoidanceContext& context, float fDeltaT)
 {
-    context.mUnidentified000 = context.mUnidentified044;
-    if (mode != 0 && context.mUnidentified050 > 0.5f)
+    context.mRepulsionDir = context.mObstacleNormal;
+    if (mode != 0 && context.mDesiredSpeed > 0.5f)
     {
         if (mode == 1)
         {
             float fWeight = InterpolateRangeClamped(1.0f, 0.0f, 0.0f, 1.0f,
-                -nlVec3DotProduct(context.mUnidentified044, context.mUnidentified054));
+                -nlVec3DotProduct(context.mObstacleNormal, context.mDesiredDir));
             if (fWeight < 1.0f)
             {
-                UnidentifiedTurn(context.mUnidentified000, context.mUnidentified054, context.mUnidentified044, true);
-                nlVec3WeightedSum(context.mUnidentified000, 1.0f - fWeight, context.mUnidentified000, fWeight, context.mUnidentified044);
-                nlVec3Scale(context.mUnidentified000, nlRecipSqrt(nlVec3LengthSquared(context.mUnidentified000), true));
+                CalcPerpendicularToward(context.mRepulsionDir, context.mDesiredDir, context.mObstacleNormal, true);
+                nlVec3WeightedSum(context.mRepulsionDir, 1.0f - fWeight, context.mRepulsionDir, fWeight, context.mObstacleNormal);
+                nlVec3Scale(context.mRepulsionDir, nlRecipSqrt(nlVec3LengthSquared(context.mRepulsionDir), true));
             }
         }
         else if (mode == 2)
         {
-            nlVector3 v3Velocity = mUnidentified008->GetVelocity();
+            nlVector3 v3Velocity = mpObstacle->GetVelocity();
             float fLengthSquared = nlVec3LengthSquared(v3Velocity);
             if (fLengthSquared > 0.1f)
             {
                 nlVec3Scale(v3Velocity, 1.0f / nlSqrt(fLengthSquared, true));
-                UnidentifiedTurn(context.mUnidentified000, context.mUnidentified054, v3Velocity, false);
+                CalcPerpendicularToward(context.mRepulsionDir, context.mDesiredDir, v3Velocity, false);
             }
         }
     }
-    context.mUnidentified014 = 1;
-    context.mUnidentified00C = ((AvoidableFielder*)mUnidentified004)->m_pFielder->GetRunningSpeed();
-    nlVec3Scale(context.mUnidentified000, context.mUnidentified00C);
-    nlVec3ScaleAdd(context.mUnidentified000, -context.mUnidentified050, context.mUnidentified054, context.mUnidentified000);
-    context.UnidentifiedNormalize();
+    context.mContactState = 1;
+    context.mRepulsionMag = ((AvoidableFielder*)mpAvoider)->m_pFielder->GetRunningSpeed();
+    nlVec3Scale(context.mRepulsionDir, context.mRepulsionMag);
+    nlVec3ScaleAdd(context.mRepulsionDir, -context.mDesiredSpeed, context.mDesiredDir, context.mRepulsionDir);
+    context.NormalizeRepulsion();
     return true;
 }
 
-void UnidentifiedAvoidanceValue::UnidentifiedTurn(
+void ObstacleAvoidance::CalcPerpendicularToward(
     nlVector3& output, const nlVector3& first, const nlVector3& second, bool rotateFirst)
 {
     int angle = 0x4000;

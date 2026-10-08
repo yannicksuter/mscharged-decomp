@@ -85,7 +85,7 @@ private:
     float m_fFacingTotalWeight;
     float m_fDesiredArrivalTime;
     float m_fForcedArrivalRadius;
-    UnidentifiedAvoidanceHistory m_AvoidanceHistory;
+    VectorAverageHistory m_AvoidanceHistory;
 };
 
 

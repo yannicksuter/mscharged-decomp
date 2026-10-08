@@ -29,74 +29,74 @@ enum eAvoidableThings
     NUM_AVOIDABLES = 8,
 };
 
-class UnidentifiedAvoidanceHistoryBase
+class VectorHistoryBase
 {
 public:
-    UnidentifiedAvoidanceHistoryBase(float duration, float sampleRate)
+    VectorHistoryBase(float duration, float sampleRate)
     {
-        mUnidentified004 = duration;
+        mWindowDuration = duration;
         int count = (int)(float)ceil(duration * sampleRate) + 2;
-        mUnidentified014 = (nlVector3*)nlMalloc(
+        mpSamples = (nlVector3*)nlMalloc(
             count * sizeof(nlVector3), 8, false);
-        mUnidentified018 = (float*)nlMalloc(
+        mpSampleDurations = (float*)nlMalloc(
             count * sizeof(float), 8, false);
-        mUnidentified008 = count;
-        memset(&mUnidentified02C, 0, sizeof(mUnidentified02C));
-        mUnidentified00C = 0;
-        mUnidentified010 = 0;
-        mUnidentified01C = mUnidentified02C;
-        mUnidentified028 = 0.0f;
+        mCapacity = count;
+        memset(&mZero, 0, sizeof(mZero));
+        mWriteIndex = 0;
+        mOldestIndex = 0;
+        mWeightedSum = mZero;
+        mTotalDuration = 0.0f;
     }
-    virtual ~UnidentifiedAvoidanceHistoryBase()
+    virtual ~VectorHistoryBase()
     {
-        delete[] mUnidentified014;
-        delete[] mUnidentified018;
+        delete[] mpSamples;
+        delete[] mpSampleDurations;
     }
-    virtual void UnidentifiedGetValue(
+    virtual void Evaluate(
         nlVector3&, float, const nlVector3&) const = 0;
 
     void UnidentifiedReset()
     {
-        mUnidentified00C = 0;
-        mUnidentified010 = 0;
-        mUnidentified01C = mUnidentified02C;
-        mUnidentified028 = 0.0f;
+        mWriteIndex = 0;
+        mOldestIndex = 0;
+        mWeightedSum = mZero;
+        mTotalDuration = 0.0f;
     }
 
-    const nlVector3& UnidentifiedLast() const
+    const nlVector3& GetLastSample() const
     {
-        return mUnidentified00C != mUnidentified010
-            ? mUnidentified014[mUnidentified00C - 1 >= 0
-                  ? mUnidentified00C - 1 : mUnidentified008 - 1]
-            : mUnidentified02C;
+        return mWriteIndex != mOldestIndex
+            ? mpSamples[mWriteIndex - 1 >= 0
+                  ? mWriteIndex - 1 : mCapacity - 1]
+            : mZero;
     }
 
-    void UnidentifiedRemoveOldest()
+    void RemoveOldest()
     {
         nlVector3 value;
-        nlVec3Scale(value, mUnidentified014[mUnidentified010],
-            mUnidentified018[mUnidentified010]);
-        nlVec3Sub(mUnidentified01C, mUnidentified01C, value);
-        mUnidentified028 -= mUnidentified018[mUnidentified010];
-        mUnidentified010 = (mUnidentified010 + 1) % mUnidentified008;
+        nlVec3Scale(value, mpSamples[mOldestIndex],
+            mpSampleDurations[mOldestIndex]);
+        nlVec3Sub(mWeightedSum, mWeightedSum, value);
+        mTotalDuration -= mpSampleDurations[mOldestIndex];
+        mOldestIndex = (mOldestIndex + 1) % mCapacity;
     }
 
-    bool UnidentifiedCanTrim()
+    bool CanRemoveOldest()
     {
-        return mUnidentified028 - mUnidentified018[mUnidentified010] > mUnidentified004;
+        return mTotalDuration - mpSampleDurations[mOldestIndex] > mWindowDuration;
     }
 
-    void UnidentifiedAdvance()
+    void AdvanceWriteIndex()
     {
-        mUnidentified00C = (mUnidentified00C + 1) % mUnidentified008;
-        if (mUnidentified00C == mUnidentified010)
-            UnidentifiedRemoveOldest();
+        mWriteIndex = (mWriteIndex + 1) % mCapacity;
+        if (mWriteIndex == mOldestIndex)
+            RemoveOldest();
     }
 
-    void UnidentifiedTrim()
+    void TrimToDuration()
     {
-        while (UnidentifiedCanTrim() && mUnidentified00C != mUnidentified010)
-            UnidentifiedRemoveOldest();
+        while (CanRemoveOldest() && mWriteIndex != mOldestIndex)
+            RemoveOldest();
     }
 
     void Update(nlVector3& value, const nlVector3& sample, float dt,
@@ -112,109 +112,109 @@ public:
             pSample = &faded;
         }
 
-        mUnidentified014[mUnidentified00C] = *pSample;
-        mUnidentified018[mUnidentified00C] = dt;
-        nlVec3ScaleAdd(mUnidentified01C, dt, *pSample, mUnidentified01C);
-        mUnidentified028 += dt;
-        UnidentifiedAdvance();
-        UnidentifiedTrim();
-        if (mUnidentified00C != mUnidentified010)
+        mpSamples[mWriteIndex] = *pSample;
+        mpSampleDurations[mWriteIndex] = dt;
+        nlVec3ScaleAdd(mWeightedSum, dt, *pSample, mWeightedSum);
+        mTotalDuration += dt;
+        AdvanceWriteIndex();
+        TrimToDuration();
+        if (mWriteIndex != mOldestIndex)
         {
-            nlVector3 input = mUnidentified01C;
-            int next = (mUnidentified010 + 1) % mUnidentified008;
-            float magnitude = mUnidentified028;
-            float excess = mUnidentified028 - mUnidentified004;
-            float weight = mUnidentified018[mUnidentified010];
-            if (next != mUnidentified00C && excess > 0.0f)
+            nlVector3 input = mWeightedSum;
+            int next = (mOldestIndex + 1) % mCapacity;
+            float magnitude = mTotalDuration;
+            float excess = mTotalDuration - mWindowDuration;
+            float weight = mpSampleDurations[mOldestIndex];
+            if (next != mWriteIndex && excess > 0.0f)
             {
                 float fraction = excess / weight;
                 nlVec3ScaleAdd(input, fraction * -weight,
-                    mUnidentified014[mUnidentified010], input);
-                magnitude -= fraction * mUnidentified018[mUnidentified010];
+                    mpSamples[mOldestIndex], input);
+                magnitude -= fraction * mpSampleDurations[mOldestIndex];
             }
-            UnidentifiedGetValue(value, magnitude, input);
+            Evaluate(value, magnitude, input);
         }
         else
-            value = mUnidentified02C;
+            value = mZero;
     }
 
 protected:
     friend class DesireSteering;
 
-    float mUnidentified004;
-    int mUnidentified008;
-    int mUnidentified00C;
-    int mUnidentified010;
-    nlVector3* mUnidentified014;
-    float* mUnidentified018;
-    nlVector3 mUnidentified01C;
-    float mUnidentified028;
-    nlVector3 mUnidentified02C;
+    float mWindowDuration;
+    int mCapacity;
+    int mWriteIndex;
+    int mOldestIndex;
+    nlVector3* mpSamples;
+    float* mpSampleDurations;
+    nlVector3 mWeightedSum;
+    float mTotalDuration;
+    nlVector3 mZero;
 };
 
-class UnidentifiedAvoidanceHistory : public UnidentifiedAvoidanceHistoryBase
+class VectorAverageHistory : public VectorHistoryBase
 {
 public:
-    UnidentifiedAvoidanceHistory(float duration = 0.3f)
-        : UnidentifiedAvoidanceHistoryBase(duration, 60.0f)
+    VectorAverageHistory(float duration = 0.3f)
+        : VectorHistoryBase(duration, 60.0f)
     {
     }
-    virtual ~UnidentifiedAvoidanceHistory()
+    virtual ~VectorAverageHistory()
     {
     }
-    virtual void UnidentifiedGetValue(
+    virtual void Evaluate(
         nlVector3& value, float magnitude, const nlVector3& input) const;
 };
 
-struct UnidentifiedAvoidanceContext
+struct AvoidanceContext
 {
-    void UnidentifiedNormalize();
-    float UnidentifiedGetAlignment() const
+    void NormalizeRepulsion();
+    float GetNormalDotDesiredDir() const
     {
-        return (mUnidentified044.x * mUnidentified054.x)
-            + (mUnidentified044.y * mUnidentified054.y)
-            + (mUnidentified044.z * mUnidentified054.z);
+        return (mObstacleNormal.x * mDesiredDir.x)
+            + (mObstacleNormal.y * mDesiredDir.y)
+            + (mObstacleNormal.z * mDesiredDir.z);
     }
-    nlVector3 mUnidentified000;
-    float mUnidentified00C;
-    float mUnidentified010;
-    int mUnidentified014;
-    float mUnidentified018;
-    float mUnidentified01C;
-    nlVector3 mUnidentified020;
-    nlVector3 mUnidentified02C;
+    nlVector3 mRepulsionDir;
+    float mRepulsionMag;
+    float mProximity;
+    int mContactState;
+    float mGap;
+    float mClosingSpeed;
+    nlVector3 mAvoiderPoint;
+    nlVector3 mObstaclePoint;
     nlVector3 mAvoiderNormal;
-    nlVector3 mUnidentified044;
-    float mUnidentified050;
-    nlVector3 mUnidentified054;
+    nlVector3 mObstacleNormal;
+    float mDesiredSpeed;
+    nlVector3 mDesiredDir;
 };
 
-struct UnidentifiedAvoidanceValue
+struct ObstacleAvoidance
 {
-    UnidentifiedAvoidanceValue();
-    void UnidentifiedTurn(nlVector3&, const nlVector3&, const nlVector3&, bool);
-    bool OverlapResponse(int, UnidentifiedAvoidanceContext&, float);
-    bool StaticObstacleResponse(UnidentifiedAvoidanceContext&, float);
-    bool MobileObstacleResponse(UnidentifiedAvoidanceContext&, float);
-    bool UnidentifiedMovingResponse(UnidentifiedAvoidanceContext&, float);
-    void UnidentifiedPrepareContext(UnidentifiedAvoidanceContext&, float);
+    ObstacleAvoidance();
+    void CalcPerpendicularToward(nlVector3&, const nlVector3&, const nlVector3&, bool);
+    bool OverlapResponse(int, AvoidanceContext&, float);
+    bool StaticObstacleResponse(AvoidanceContext&, float);
+    bool MobileObstacleResponse(AvoidanceContext&, float);
+    bool AgentResponse(AvoidanceContext&, float);
+    void CalcContext(AvoidanceContext&, float);
     void Update(float fDeltaT);
-    void UnidentifiedInitialize(AvoidableObject*, AvoidableObject*);
-    float UnidentifiedGetWeight() const;
+    void Initialize(AvoidableObject*, AvoidableObject*);
+    float GetWeight() const;
 
-    UnidentifiedAvoidanceValue* next;
-    AvoidableObject* mUnidentified004;
-    AvoidableObject* mUnidentified008;
-    nlVector3 mUnidentified00C;
-    float mUnidentified018;
-    Timer mUnidentified01C;
+    ObstacleAvoidance* next;
+    AvoidableObject* mpAvoider;
+    AvoidableObject* mpObstacle;
+    nlVector3 mRepulsion;
+    float mWeight;
+    Timer mActiveTimer;
     Timer mFadeOutTimer;
-    UnidentifiedAvoidanceHistory mUnidentified02C;
+    VectorAverageHistory mRepulsionHistory;
 };
 
-struct UnidentifiedAvoidanceMemory
+struct AvoidanceMemory
 {
-    UnidentifiedAvoidanceMemory();
+    AvoidanceMemory();
 
     Timer mTimer;
     nlVector3 mRepulsion;
@@ -222,9 +222,9 @@ struct UnidentifiedAvoidanceMemory
 };
 
 typedef nlAVLTreeSlotPool<u32,
-    UnidentifiedAvoidanceValue,
+    ObstacleAvoidance,
     DefaultKeyCompare<u32> >
-    UnidentifiedAvoidanceTree;
+    ObstacleAvoidanceTree;
 
 struct sCornerSegment;
 struct sSideLinePlane;
@@ -248,8 +248,8 @@ public:
     bool CalcDesiredVelocityToAvoidSideline(nlVector2&, const nlVector2&, const nlVector2&, const nlVector2&, const nlVector2&);
     void ApplyRepulsionVector(nlVector3 v3Repulsion);
     void RegisterDebugFields(u16*, DebugWriteCache*);
-    bool UnidentifiedCanAvoid(int);
-    void UnidentifiedSetLast(eAvoidableThings, const nlVector3&, float);
+    bool IsAvoiding(int);
+    void SetLastRepulsionVector(eAvoidableThings, const nlVector3&, float);
 
     /* 0x000 */ cFielder* m_pFielder;
     /* 0x004 */ int m_ThingsToAvoid;
@@ -260,19 +260,19 @@ public:
     /* 0x015 */ bool m_SidelineUnavoidable;
     /* 0x018 */ nlVector2 m_SidelineNormal;
     /* 0x020 */ nlVector2 m_SidelineDirection;
-    /* 0x028 */ nlVector3 mUnidentified028;
+    /* 0x028 */ nlVector3 m_SidelineRepulsion;
     /* 0x034 */ nlVector3 m_LastRepulVec[NUM_AVOIDABLES];
-    /* 0x094 */ float mUnidentified094[NUM_AVOIDABLES];
-    /* 0x0B4 */ UnidentifiedAvoidanceMemory mUnidentified0B4[NUM_AVOIDABLES];
-    /* 0x174 */ UnidentifiedAvoidanceTree mUnidentified174;
-    /* 0x198 */ int mUnidentified198;
+    /* 0x094 */ float m_LastRepulWeight[NUM_AVOIDABLES];
+    /* 0x0B4 */ AvoidanceMemory m_AvoidanceMemory[NUM_AVOIDABLES];
+    /* 0x174 */ ObstacleAvoidanceTree m_Avoidances;
+    /* 0x198 */ int m_NumAvoidances;
 };
 
 class DebugWriteCache;
 extern "C" void fn_8000F324(AvoidController* controller,
     void* context, DebugWriteCache* cache);
 
-inline void UnidentifiedAvoidanceHistory::UnidentifiedGetValue(
+inline void VectorAverageHistory::Evaluate(
     nlVector3& value, float magnitude, const nlVector3& input) const
 {
     if (magnitude > 0.0001f)
@@ -281,10 +281,10 @@ inline void UnidentifiedAvoidanceHistory::UnidentifiedGetValue(
     }
     else
     {
-        value = mUnidentified00C != mUnidentified010
-            ? mUnidentified014[mUnidentified00C - 1 >= 0
-                  ? mUnidentified00C - 1 : mUnidentified008 - 1]
-            : mUnidentified02C;
+        value = mWriteIndex != mOldestIndex
+            ? mpSamples[mWriteIndex - 1 >= 0
+                  ? mWriteIndex - 1 : mCapacity - 1]
+            : mZero;
     }
 }
 
