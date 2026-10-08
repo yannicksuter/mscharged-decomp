@@ -11,6 +11,30 @@ struct AudioSourceInfo;
 
 struct AudioSequenceEvent;
 
+enum eAudioSequenceEventType
+{
+    AUDIO_EVENT_SOUND = 1,
+    AUDIO_EVENT_PARAMETER = 2,
+    AUDIO_EVENT_MARKER = 3,
+};
+
+enum eAudioSequenceEventState
+{
+    AUDIO_EVENT_INITIAL = 0,
+    AUDIO_EVENT_PREPARING = 2,
+    AUDIO_EVENT_PREPARED = 3,
+    AUDIO_EVENT_PLAYING = 4,
+    AUDIO_EVENT_PAUSED = 5,
+    AUDIO_EVENT_STOPPING = 7,
+    AUDIO_EVENT_STOPPED = 8,
+};
+
+enum eAudioSequenceParameter
+{
+    AUDIO_EVENT_PARAMETER_PITCH = 0,
+    AUDIO_EVENT_PARAMETER_VOLUME = 1,
+};
+
 struct SoundChoice
 {
     u32 index;
@@ -56,7 +80,7 @@ struct ParameterChangeEventDefinition
 
 struct AudioSequenceEventDefinition
 {
-    s32 type;
+    eAudioSequenceEventType type;
     union
     {
         SoundEventDefinition* sound;
@@ -70,7 +94,7 @@ struct AudioSequenceEvent
     AudioSequenceEvent(AudioSequenceInstance* owner)
         : next(0)
         , owner(owner)
-        , state(0)
+        , state(AUDIO_EVENT_INITIAL)
         , startTime(0.0f)
     {
     }
@@ -91,7 +115,7 @@ struct AudioSequenceEvent
 
     /* 0x04 */ AudioSequenceEvent* next;
     AudioSequenceInstance* owner;
-    s32 state;
+    eAudioSequenceEventState state;
     float startTime;
 };
 
@@ -137,11 +161,11 @@ struct HitMarkerEvent : AudioSequenceEvent
     HitMarkerEvent(AudioSequenceInstance* owner,
         HitMarkerEventDefinition* definition);
     virtual ~HitMarkerEvent() { }
-    virtual void Play() { state = 4; }
-    virtual void Prepare() { state = 2; }
-    virtual void Stop() { state = 8; }
-    virtual void Pause() { state = 5; }
-    virtual void Resume() { state = 4; }
+    virtual void Play() { state = AUDIO_EVENT_PLAYING; }
+    virtual void Prepare() { state = AUDIO_EVENT_PREPARING; }
+    virtual void Stop() { state = AUDIO_EVENT_STOPPED; }
+    virtual void Pause() { state = AUDIO_EVENT_PAUSED; }
+    virtual void Resume() { state = AUDIO_EVENT_PLAYING; }
     virtual int Update(float time);
 
     static void* operator new(unsigned long size);
@@ -155,11 +179,11 @@ struct ParameterChangeEvent : AudioSequenceEvent
     ParameterChangeEvent(AudioSequenceInstance* owner,
         ParameterChangeEventDefinition* definition);
     virtual ~ParameterChangeEvent() { }
-    virtual void Play() { state = 4; }
-    virtual void Prepare() { state = 2; }
-    virtual void Stop() { state = 8; }
-    virtual void Pause() { state = 5; }
-    virtual void Resume() { state = 4; }
+    virtual void Play() { state = AUDIO_EVENT_PLAYING; }
+    virtual void Prepare() { state = AUDIO_EVENT_PREPARING; }
+    virtual void Stop() { state = AUDIO_EVENT_STOPPED; }
+    virtual void Pause() { state = AUDIO_EVENT_PAUSED; }
+    virtual void Resume() { state = AUDIO_EVENT_PLAYING; }
     virtual int Update(float time);
 
     static void* operator new(unsigned long size);
