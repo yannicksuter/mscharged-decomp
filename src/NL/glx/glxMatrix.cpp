@@ -3,11 +3,7 @@
 #include "math.h"
 #include <string.h>
 
-extern "C"
-{
-    void C_MTXPerspective(float m[4][4], float fovY, float aspect, float near, float far);
-    void C_MTXOrtho(float m[4][4], float top, float bottom, float left, float right, float near, float far);
-}
+#include <revolution/mtx_fwd.h>
 
 void glplatMatrixOrthographic(nlMatrix4& matrix, float width, float height)
 {
