@@ -21,6 +21,7 @@ extern BOOL __OSInReboot;
 extern OSExecParams __OSRebootParams;
 
 void __OSGetExecParams(OSExecParams* params);
+void __OSBootDol(u32 doloffset, u32 restartCode, char* const argv[]);
 void __OSLaunchMenu(void);
 
 #ifdef __cplusplus
