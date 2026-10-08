@@ -182,15 +182,14 @@ static TweakFloatBinding lbl_8056E4B8(
 
 static AsyncLoadingManager sAsyncLoadingManager;
 
-static inline void ReleaseUnidentifiedOwner(UnidentifiedOwnerHandle* handle)
+static inline void ReleaseEventConnection(EventConnection** owner)
 {
-    if (handle != 0 && handle->mOwner != 0
-        && ((handle->mOwner->mFlags >> 30) & 1) != 0)
+    if (owner != 0 && (*owner) != 0
+        && (((*owner)->mFlags >> 30) & 1) != 0)
     {
-        handle->mOwner->mTarget->Release(handle);
+        ((EventBase*)(*owner)->mEvent)->Disconnect(owner);
     }
 }
-
 struct PersistentResourceRequirements
 {
     GLMemoryRequirement entries[2];
@@ -1121,7 +1120,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
 AsyncLoadingManager::AsyncLoadingManager()
     : InterpreterCore(100)
 {
-    mLoadingHandle.mOwner = 0;
+    mGameOverConnection = 0;
     mByteCode = 0;
     mSequenceState = ASYNC_LOADING_IDLE;
     mLoadingState = 0;
@@ -1144,7 +1143,7 @@ AsyncLoadingManager::~AsyncLoadingManager()
         nlFree(mByteCode);
         mByteCode = 0;
     }
-    ReleaseUnidentifiedOwner(&mLoadingHandle);
+    ReleaseEventConnection(&mGameOverConnection);
 }
 
 extern "C" void fn_80118B38(void* data, unsigned long, void*)
@@ -1744,7 +1743,7 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     fn_8001FE80();
     fn_80018A00();
     GameplayCameraEffects::Instance()->RegisterEventListeners();
-    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mLoadingHandle, -1);
+    FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mGameOverConnection, -1);
     GLResourcePool* pool = glGetCurrentResourcePool();
     Jumbotron::instance.Initialize(pool);
     CrowdManager::instance.Initialize(pool);
@@ -1940,7 +1939,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
         FEResourceManager::Instance()->Run(0.0f);
     }
 
-    DisconnectEventOwner(&manager->mLoadingHandle);
+    DisconnectEventOwner(&manager->mGameOverConnection);
     FEMusic::StopStream();
     BeginFrameTask::s_FramerateLocked = false;
     OnInputSessionReset();
@@ -2248,11 +2247,11 @@ GLResourcePool* AsyncLoadingManager::GetPersistentResourcePool()
     return sPersistentResourcePool;
 }
 
-UnidentifiedOwnerConnection::~UnidentifiedOwnerConnection()
+GlobalEventConnectionOwner::~GlobalEventConnectionOwner()
 {
     if (mOwner != 0 && ((mOwner->mFlags >> 30) & 1) != 0)
     {
-        mOwner->mTarget->Release(this);
+        ((EventBase*)mOwner->mEvent)->Disconnect(this);
     }
 }
 

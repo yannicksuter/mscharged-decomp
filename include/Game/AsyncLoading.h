@@ -5,35 +5,18 @@
 
 class GLResourcePool;
 struct AudioResourceLoadOwner;
+struct EventConnection;
 
-struct UnidentifiedOwnerTarget
+struct GlobalEventConnectionOwner
 {
-    virtual ~UnidentifiedOwnerTarget();
-    virtual void Release(void*) = 0;
-};
-
-struct UnidentifiedOwnerRecord
-{
-    /* 0x00 */ u32 mUnidentified00;
-    /* 0x04 */ UnidentifiedOwnerTarget* mTarget;
-    /* 0x08 */ u32 mFlags;
-};
-
-struct UnidentifiedOwnerHandle
-{
-    /* 0x00 */ UnidentifiedOwnerRecord* mOwner;
-};
-
-struct UnidentifiedOwnerConnection
-{
-    UnidentifiedOwnerConnection()
+    GlobalEventConnectionOwner()
         : mOwner(0)
     {
     }
 
-    ~UnidentifiedOwnerConnection();
+    ~GlobalEventConnectionOwner();
 
-    /* 0x00 */ UnidentifiedOwnerRecord* mOwner;
+    /* 0x00 */ EventConnection* mOwner;
 };
 
 enum AsyncLoadingSequenceState
@@ -88,7 +71,7 @@ public:
     /* 0x48 */ u32 mStageStartTick;
     /* 0x4C */ void* mPoolResourceMark;
     /* 0x50 */ void* mGameResourceMark;
-    /* 0x54 */ UnidentifiedOwnerHandle mLoadingHandle;
+    /* 0x54 */ EventConnection* mGameOverConnection;
 }; // size 0x58
 
 extern bool g_VerboseAudio;

@@ -32,9 +32,9 @@ cFielder* gFlyingCameraTarget;
 u16 gFlyingCameraAngle;
 float gTimeUntilNextFlyingCameraFlash;
 unsigned int gFlyingCameraFlashesRemaining;
-UnidentifiedOwnerConnection gPeachCameraFlashConnection;
-UnidentifiedOwnerConnection gResetEffectsConnection;
-UnidentifiedOwnerConnection gMegaStrikeMeterEndConnection;
+GlobalEventConnectionOwner gPeachCameraFlashConnection;
+GlobalEventConnectionOwner gResetEffectsConnection;
+GlobalEventConnectionOwner gMegaStrikeMeterEndConnection;
 FlyingCamera gFlyingCameraStorage[10];
 nlArrayAllocator<FlyingCamera> gFlyingCameraAllocator(gFlyingCameraStorage, 10);
 
