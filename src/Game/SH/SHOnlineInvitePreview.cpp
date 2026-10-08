@@ -24,8 +24,6 @@
 
 #include <string.h>
 
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
-
 SHOnlineInvitePreview::SHOnlineInvitePreview()
     : mContinueButton()
     , mButtonInitialized(false)
