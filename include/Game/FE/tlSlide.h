@@ -10,6 +10,7 @@ enum eTimeLinePlayMode
 {
     TLPM_STOP_AT_END = 0,
     TLPM_LOOPING = 1,
+    TLPM_CONTINUE = 2,
 };
 
 class TLSlide

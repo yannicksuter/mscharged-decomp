@@ -54,7 +54,7 @@ void TLSlide::Update(float deltaTime)
         case TLPM_STOP_AT_END:
             m_time = end;
             break;
-        case 2:
+        case TLPM_CONTINUE:
         default:
             break;
         }
