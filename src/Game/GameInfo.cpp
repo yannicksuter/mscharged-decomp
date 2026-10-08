@@ -479,7 +479,7 @@ bool GameInfoManager::IsRule0x8Equal4() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 4;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_GLASS_JAW;
     }
 
     return false;
@@ -504,7 +504,7 @@ bool GameInfoManager::IsRule0x0Equal10() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mCustomPowerups == 10;
+        return GetActiveRules()->mCustomPowerups == POWERUP_CHEAT_INFINITE;
     }
 
     return false;
@@ -517,7 +517,7 @@ bool GameInfoManager::IsRule0x4Equal4() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 4;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_TILT;
     }
 
     return false;
@@ -530,7 +530,7 @@ bool GameInfoManager::IsRule0x8Equal2() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 2;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_SAFE;
     }
 
     return false;
@@ -543,7 +543,7 @@ bool GameInfoManager::IsRule0x4Equal1() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 1;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_SECURE;
     }
 
     return false;
@@ -556,7 +556,7 @@ bool GameInfoManager::IsRule0x8Equal3() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 3;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_SKILL_SHOT;
     }
 
     return false;
@@ -569,7 +569,7 @@ bool GameInfoManager::IsRule0x8Equal1() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 1;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_DEVASTATING;
     }
 
     return false;
@@ -582,7 +582,7 @@ bool GameInfoManager::IsRule0x4Equal3() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 3;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_VOLTAGE;
     }
 
     return false;
@@ -595,7 +595,7 @@ bool GameInfoManager::IsRule0x4Equal2() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 2;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_POWER;
     }
 
     return false;
@@ -608,7 +608,7 @@ bool GameInfoManager::IsRule0x4Equal5() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 5;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_WHITE_BALL;
     }
 
     return false;
@@ -621,7 +621,7 @@ bool GameInfoManager::IsRule0x0Equal11() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mCustomPowerups == 11;
+        return GetActiveRules()->mCustomPowerups == POWERUP_CHEAT_BUTTERFINGERS;
     }
 
     return false;

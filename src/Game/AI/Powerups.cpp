@@ -1311,23 +1311,23 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 
     switch (GameInfoManager::Instance()->GetRule0x0())
     {
-    case 1:
+    case POWERUP_CHEAT_EXPLOSIVES:
         nChanceForChainChomp = nChanceForStar = nChanceForMushroom
             = nChanceForFreezeShell = nChanceForCaptainPowerup = 0;
         powerUpType = POWER_UP_BOBOMB;
         break;
-    case 2:
+    case POWERUP_CHEAT_FREEZING:
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBanana
             = nChanceForBoBomb = nChanceForMushroom
             = nChanceForGreenShell = 0;
         powerUpType = POWER_UP_FREEZE_SHELL;
         break;
-    case 4:
+    case POWERUP_CHEAT_GIANT:
         nChanceForStar = nChanceForCaptainPowerup = nChanceForMushroom = 0;
         powerUpType = POWER_UP_GREEN_SHELL;
         break;
-    case 3:
+    case POWERUP_CHEAT_SHELLS:
         nChanceForChainChomp = nChanceForStar = nChanceForBanana
             = nChanceForBoBomb = nChanceForCaptainPowerup
             = nChanceForMushroom = 0;
@@ -1335,13 +1335,13 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             ? POWER_UP_RED_SHELL
             : POWER_UP_GREEN_SHELL;
         break;
-    case 5:
+    case POWERUP_CHEAT_ACCELERATOR:
         nChanceForChainChomp = nChanceForSpinyShell = nChanceForRedShell
             = nChanceForBanana = nChanceForBoBomb = nChanceForGreenShell
             = nChanceForCaptainPowerup = nChanceForFreezeShell = 0;
         powerUpType = POWER_UP_MUSHROOM;
         break;
-    case 6:
+    case POWERUP_CHEAT_PEELIN_OUT:
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBoBomb
             = nChanceForGreenShell = nChanceForFreezeShell = 0;
@@ -1349,20 +1349,20 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             ? POWER_UP_BANANA
             : POWER_UP_MUSHROOM;
         break;
-    case 7:
+    case POWERUP_CHEAT_HEAT_SEEKERS:
         nChanceForStar = nChanceForCaptainPowerup = nChanceForSpinyShell
             = nChanceForBanana = nChanceForMushroom = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
         powerUpType = POWER_UP_RED_SHELL;
         break;
-    case 8:
+    case POWERUP_CHEAT_BOMBS_AWAY:
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBanana
             = nChanceForMushroom = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
         powerUpType = POWER_UP_BOBOMB;
         break;
-    case 9:
+    case POWERUP_CHEAT_SUPER:
         nChanceForChainChomp = nChanceForStar = nChanceForSpinyShell
             = nChanceForRedShell = nChanceForBanana = nChanceForMushroom
             = nChanceForBoBomb = nChanceForGreenShell

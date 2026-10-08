@@ -51,7 +51,7 @@ StrikerChallenge::StrikerChallenge()
     mCondition = CHALLENGE_WIN;
     mCaptain = 0;
     mWinParameter = 0;
-    mCustomPowerups = 0;
+    mCustomPowerups = POWERUP_CHEAT_NONE;
     mCurrentChallenge = -1;
     mUnlocks.mUnlockedChallenges = 0;
     memset(mUnlocks.mCompletionDates, 0, sizeof(mUnlocks.mCompletionDates));

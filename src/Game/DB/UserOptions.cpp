@@ -204,16 +204,16 @@ void GameplaySettings::OnSettingsUpdated() const
 CheatSettings::CheatSettings()
 {
     memset(this, 0, sizeof(CheatSettings));
-    mCustomPowerups = 0;
-    mEnvironmentCheat = 0;
-    mPlayerCheat = 0;
+    mCustomPowerups = POWERUP_CHEAT_NONE;
+    mEnvironmentCheat = ENV_CHEAT_NONE;
+    mPlayerCheat = PLAYER_CHEAT_NONE;
 }
 
 void CheatSettings::InitializeDefaults()
 {
-    mCustomPowerups = 0;
-    mEnvironmentCheat = 0;
-    mPlayerCheat = 0;
+    mCustomPowerups = POWERUP_CHEAT_NONE;
+    mEnvironmentCheat = ENV_CHEAT_NONE;
+    mPlayerCheat = PLAYER_CHEAT_NONE;
 }
 
 void CheatSettings::OnSettingsUpdated() const
