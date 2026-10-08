@@ -61,7 +61,7 @@ struct NetworkScoreSubmission
     /* 0x01 */ u8 mMonth;
     /* 0x02 */ u16 mYear;
     /* 0x04 */ int mScore;
-    /* 0x08 */ int mUnidentified08;
+    /* 0x08 */ int m_pad08;
     /* 0x0C */ int mWins;
     /* 0x10 */ int mLosses;
     /* 0x14 */ int mOnlineRegion;
