@@ -16,9 +16,9 @@ class World;
 class nlChunk;
 struct WorldVisibilityNode;
 
-class WorldListObject0_80340AC8;
-class WorldListObject1_80340AC8;
-class WorldUpdateObject_80341BC8;
+class WorldDrawable;
+class WorldPhysicsDrawable;
+class WorldUpdateObject;
 class WorldEffect;
 
 class World
@@ -52,9 +52,9 @@ public:
     void ResetEffects();
     void TriggerEffects(unsigned long uType);
 
-    /* 0x04 */ nlDLListContainer<WorldListObject0_80340AC8*> m_renderObjects;
-    /* 0x0C */ nlDLListContainer<WorldListObject1_80340AC8*> m_objectList1;
-    /* 0x14 */ nlDLListContainer<WorldUpdateObject_80341BC8*> m_updateObjects;
+    /* 0x04 */ nlDLListContainer<WorldDrawable*> m_renderObjects;
+    /* 0x0C */ nlDLListContainer<WorldPhysicsDrawable*> m_physicsObjects;
+    /* 0x14 */ nlDLListContainer<WorldUpdateObject*> m_updateObjects;
     /* 0x1C */ nlListContainer<WorldEffect*> m_worldEffects;
     /* 0x28 */ GLResourcePool* m_pResource;
     /* 0x2C */ WorldAnimManager mWorldAnimManager;

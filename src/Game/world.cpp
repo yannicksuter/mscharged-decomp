@@ -18,10 +18,10 @@
 #include "Game/World/WorldAnimObjects.h"
 #include "NL/nlMemory.h"
 
-class WorldUpdateObject_80341BC8
+class WorldUpdateObject
 {
 public:
-    virtual ~WorldUpdateObject_80341BC8();
+    virtual ~WorldUpdateObject();
     virtual void UnidentifiedVirtual0C();
     virtual void UnidentifiedVirtual10();
     virtual void UnidentifiedVirtual14();
@@ -55,7 +55,7 @@ World::~World()
         DefaultKeyCompare<unsigned long> > DrawableIterator;
 
     m_renderObjects.Clear();
-    m_objectList1.Clear();
+    m_physicsObjects.Clear();
     m_updateObjects.Clear();
 
     DrawableIterator* pIterator = m_drawableMap.GetIterator();
@@ -89,17 +89,17 @@ void World::AddDrawableObject(DrawableObject* pDrawableObject)
     if (pDrawableObject->m_uObjectCreationFlags & 2)
     {
         m_renderObjects.AddEnd(
-            (WorldListObject0_80340AC8*)pDrawableObject);
+            (WorldDrawable*)pDrawableObject);
     }
 
     if (pDrawableObject->m_uObjectCreationFlags & 4)
     {
-        m_objectList1.AddEnd(
-            (WorldListObject1_80340AC8*)pDrawableObject);
+        m_physicsObjects.AddEnd(
+            (WorldPhysicsDrawable*)pDrawableObject);
         if (pDrawableObject->m_uObjectCreationFlags & 8)
         {
             m_updateObjects.AddEnd(
-                (WorldUpdateObject_80341BC8*)pDrawableObject);
+                (WorldUpdateObject*)pDrawableObject);
         }
     }
 }
@@ -111,11 +111,11 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
 
     if (uFlags & 2)
     {
-        nlDLListIterator<WorldListObject0_80340AC8*> iterator;
+        nlDLListIterator<WorldDrawable*> iterator;
         iterator = m_renderObjects.Begin();
         while (iterator.hasNext())
         {
-            if (*iterator == (WorldListObject0_80340AC8*)pObject)
+            if (*iterator == (WorldDrawable*)pObject)
             {
                 m_renderObjects.Remove(&iterator);
                 return;
@@ -126,13 +126,13 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
 
     if (uFlags & 4)
     {
-        nlDLListIterator<WorldListObject1_80340AC8*> iterator;
-        iterator = m_objectList1.Begin();
+        nlDLListIterator<WorldPhysicsDrawable*> iterator;
+        iterator = m_physicsObjects.Begin();
         while (iterator.hasNext())
         {
-            if (*iterator == (WorldListObject1_80340AC8*)pObject)
+            if (*iterator == (WorldPhysicsDrawable*)pObject)
             {
-                m_objectList1.Remove(&iterator);
+                m_physicsObjects.Remove(&iterator);
                 break;
             }
             iterator.next();
@@ -140,12 +140,12 @@ void World::RemoveDrawableObject(DrawableObject* pObject)
 
         if (pObject->m_uObjectCreationFlags & 4)
         {
-            nlDLListIterator<WorldUpdateObject_80341BC8*> updateIterator;
+            nlDLListIterator<WorldUpdateObject*> updateIterator;
             updateIterator = m_updateObjects.Begin();
             while (updateIterator.hasNext())
             {
                 if (*updateIterator
-                    == (WorldUpdateObject_80341BC8*)pObject)
+                    == (WorldUpdateObject*)pObject)
                 {
                     m_updateObjects.Remove(&updateIterator);
                     return;
@@ -389,7 +389,7 @@ void World::Render()
 
     if (m_bRenderingEnabled)
     {
-        nlDLListIterator<WorldListObject0_80340AC8*> iterator;
+        nlDLListIterator<WorldDrawable*> iterator;
         iterator = m_renderObjects.Begin();
         while (iterator.hasNext())
         {
@@ -426,7 +426,7 @@ void World::Update(float fDeltaT, bool bUpdateState)
         }
     }
 
-    nlDLListIterator<WorldUpdateObject_80341BC8*> iterator;
+    nlDLListIterator<WorldUpdateObject*> iterator;
     iterator = m_updateObjects.Begin();
     while (iterator.hasNext())
     {
