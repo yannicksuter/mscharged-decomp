@@ -4,6 +4,13 @@
 #include "NL/nlColour.h"
 #include "types.h"
 
+enum eGameObjectLightingMode
+{
+    OBJECT_LIGHTING_IN_GAME = 0,
+    OBJECT_LIGHTING_CAMERA_RELATIVE = 1,
+    OBJECT_LIGHTING_SHOOT_TO_SCORE = 2,
+};
+
 class GLView;
 struct GameObjectLight;
 class nlMatrix4;
@@ -39,7 +46,7 @@ int ShouldUseGameObjectLightTexture(int character);
 int ShouldDoubleGameObjectLighting();
 int GetGameObjectLightCount(bool character, bool includeEffects);
 GameObjectLight* GetGameObjectLight(int index, bool character);
-void SetGameObjectLightingMode(int mode);
+void SetGameObjectLightingMode(eGameObjectLightingMode mode);
 void SetGameObjectLightTexture(unsigned long texture);
 void LoadGameObjectSpecularLight(int index, GameObjectLight* light, float exponent, const nlMatrix4& viewMatrix);
 void SetGameObjectSpecularLightingEnabled(int enabled, int count);

@@ -379,15 +379,15 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
 
     if (sSTSLighting)
     {
-        SetGameObjectLightingMode(2);
+        SetGameObjectLightingMode(OBJECT_LIGHTING_SHOOT_TO_SCORE);
     }
     else if (sCameraRelativeLighting || AlwaysUseCameraRelativeCharacterLighting())
     {
-        SetGameObjectLightingMode(1);
+        SetGameObjectLightingMode(OBJECT_LIGHTING_CAMERA_RELATIVE);
     }
     else
     {
-        SetGameObjectLightingMode(0);
+        SetGameObjectLightingMode(OBJECT_LIGHTING_IN_GAME);
     }
 
     bool isVisible;

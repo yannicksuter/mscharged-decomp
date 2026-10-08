@@ -138,7 +138,7 @@ Mtx gShadowLookupBiasMatrix = {
 
 LightingLookup* gpShadowLightingLookup;
 PlatTexture* g_pGameObjectLightRamp;
-s32 gGameObjectLightingMode;
+eGameObjectLightingMode gGameObjectLightingMode;
 bool gAlwaysUseCameraRelativeCharacterLighting;
 
 GameObjectLight gInGameLights[8];
@@ -220,16 +220,16 @@ int GetGameObjectLightCount(bool character, bool includeEffects)
 
     switch (gGameObjectLightingMode)
     {
-    case 0:
+    case OBJECT_LIGHTING_IN_GAME:
         if (character)
             return numEffectsLights + gNumCharacterInGameLights.mValue;
         return gNumInGameLights + numEffectsLights;
-    case 1:
+    case OBJECT_LIGHTING_CAMERA_RELATIVE:
         return gNumInGameLights + numEffectsLights;
-    case 2:
+    case OBJECT_LIGHTING_SHOOT_TO_SCORE:
         return 1;
     default:
-        gGameObjectLightingMode = 0;
+        gGameObjectLightingMode = OBJECT_LIGHTING_IN_GAME;
         return 2;
     }
 }
@@ -237,14 +237,14 @@ int GetGameObjectLightCount(bool character, bool includeEffects)
 GameObjectLight* GetGameObjectLight(int index, bool character)
 {
     s32 numLights = character ? gNumCharacterInGameLights.mValue : gNumInGameLights;
-    if (!gCameraRelativeLightingAllowed && gGameObjectLightingMode == 1)
+    if (!gCameraRelativeLightingAllowed && gGameObjectLightingMode == OBJECT_LIGHTING_CAMERA_RELATIVE)
     {
-        gGameObjectLightingMode = 0;
+        gGameObjectLightingMode = OBJECT_LIGHTING_IN_GAME;
     }
 
     switch (gGameObjectLightingMode)
     {
-    case 0:
+    case OBJECT_LIGHTING_IN_GAME:
         if (index >= numLights)
         {
             EffectsLight* pLight = GetEmissionManager()->GetLight(index - gNumInGameLights);
@@ -274,7 +274,7 @@ GameObjectLight* GetGameObjectLight(int index, bool character)
         }
         return &gInGameLights[index];
 
-    case 1:
+    case OBJECT_LIGHTING_CAMERA_RELATIVE:
         if (index >= numLights)
         {
             EffectsLight* pLight = GetEmissionManager()->GetLight(index - gNumInGameLights);
@@ -293,7 +293,7 @@ GameObjectLight* GetGameObjectLight(int index, bool character)
         }
         return &gCameraRelativeLights[index];
 
-    case 2:
+    case OBJECT_LIGHTING_SHOOT_TO_SCORE:
         return &gSTSLight;
 
     default:
@@ -345,7 +345,7 @@ void UpdateGameObjectLighting()
     if (!gCameraRelativeLightingAllowed)
         return;
 
-    if (!DrawableCharacter::sCameraRelativeLighting && !gAlwaysUseCameraRelativeCharacterLighting && gGameObjectLightingMode != 1)
+    if (!DrawableCharacter::sCameraRelativeLighting && !gAlwaysUseCameraRelativeCharacterLighting && gGameObjectLightingMode != OBJECT_LIGHTING_CAMERA_RELATIVE)
         return;
 
     SetCameraRelativeLightData(&gCameraRelativeLights);
@@ -522,7 +522,7 @@ void SetGameObjectLightTexture(unsigned long texture)
     gGameObjectLightTexture = texture;
 }
 
-void SetGameObjectLightingMode(int mode)
+void SetGameObjectLightingMode(eGameObjectLightingMode mode)
 {
     gGameObjectLightingMode = mode;
 }
