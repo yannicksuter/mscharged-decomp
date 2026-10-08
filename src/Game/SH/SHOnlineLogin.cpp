@@ -41,7 +41,7 @@ void SHOnlineLogin::SceneCreated()
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
-    mLoginComponent = FEFinder<TLComponentInstance, 4>::FindOrDefault(
+    mLoginComponent = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "INVITATION", "LOGIN");
     mLoginComponent->SetActiveSlide("CONNECTING", false, false);
     SHNavigation* scene = GetNavigationScene();
