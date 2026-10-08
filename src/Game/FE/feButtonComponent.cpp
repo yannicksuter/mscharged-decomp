@@ -148,7 +148,7 @@ void ButtonComponent::SetState(ButtonComponent::ButtonState buttonstate)
             mButtonLabels[2] = FEFinder<TLTextInstance, 3>::Find<TLSlide>(mButtonInstance->GetActiveSlide(), "OPTIONS");
             break;
 
-        case 4:
+        case BS_A_AND_B_AND_START:
             mButtonInstance->SetActiveSlide("a and b and start", true, false);
             mNumButtons = 3;
             mButtonImages[0] = FEFinder<TLImageInstance, 2>::Find<TLSlide>(mButtonInstance->GetActiveSlide(), "start_button");

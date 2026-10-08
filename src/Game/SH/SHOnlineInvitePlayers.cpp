@@ -371,8 +371,8 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
         mRows[index].Reset();
         nlStrNCpy(mRows[index].mName, gNetworkMiiNameWide, 14);
         memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
-        mRows[index].mSearchState = 4;
-        mRows[index].mStatus = 1;
+        mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
+        mRows[index].mStatus = ONLINE_ROW_WAIT_OPPONENT;
         memset(&mRows[index].mStats, 0, sizeof(mRows[index].mStats));
         if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
         {
@@ -407,8 +407,8 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
             memcpy(mRows[index].mMiiData, mSlots[index].mEntry->mMiiData, sizeof(mRows[index].mMiiData));
         else
             memcpy(mRows[index].mMiiData, &gNetworkMiiData, sizeof(mRows[index].mMiiData));
-        mRows[index].mSearchState = 4;
-        mRows[index].mStatus = 1;
+        mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
+        mRows[index].mStatus = ONLINE_ROW_WAIT_OPPONENT;
         mRows[index].mGuest = true;
         mRows[index].mVisible = true;
         UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
@@ -423,8 +423,8 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
         NetworkDraftMachineInfo* entry = mSlots[index].mEntry;
         nlStrNCpy(mRows[index].mName, entry->mName, 14);
         memcpy(mRows[index].mMiiData, entry->mMiiData, sizeof(mRows[index].mMiiData));
-        mRows[index].mSearchState = 4;
-        mRows[index].mStatus = 1;
+        mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
+        mRows[index].mStatus = ONLINE_ROW_WAIT_OPPONENT;
         mRows[index].mStats = entry->mStats;
         NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
         if (category != 0)
@@ -443,7 +443,7 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
     else if (state == RowInviteAvailable)
     {
         mRows[index].Reset();
-        mRows[index].mSearchState = 2;
+        mRows[index].mSearchState = ONLINE_ROW_INVITE;
         mRows[index].mVisible = true;
         UpdateOnlinePlayerRow(&mRows[index], mRowInstances[index], mRankText[index], 0x20,
             mRecordText[index], 0x30, index, mInitialized);
@@ -459,10 +459,10 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
         int friendIndex = GetFriendManager()->GetFriendStatusIndex();
         nlStrNCpy(mRows[index].mName,
             GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, friendIndex), 14);
-        mRows[index].mSearchState = 4;
-        mRows[index].mStatus = 10;
+        mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
+        mRows[index].mStatus = ONLINE_ROW_INVITING;
         mRows[index].mStats.Reset();
-        mRows[index].mSide = 0;
+        mRows[index].mSide = ONLINE_ROW_NO_SIDE;
         mRows[index].mVisible = true;
         mRows[index].mGuest = false;
         mRows[index].mShowCancel = true;
@@ -478,10 +478,10 @@ void SHOnlineInvitePlayers::SetPlayerRow(int state, int index)
         mRows[index].Reset();
         nlStrNCpy(mRows[index].mName,
             GameInfoManager::Instance()->GetSavedFriendName(gNetworkSaveSlotIndex, mDeclinedFriendIndex), 14);
-        mRows[index].mSearchState = 4;
-        mRows[index].mStatus = 9;
+        mRows[index].mSearchState = ONLINE_ROW_SEARCH_OFF;
+        mRows[index].mStatus = ONLINE_ROW_DECLINED;
         mRows[index].mStats.Reset();
-        mRows[index].mSide = 0;
+        mRows[index].mSide = ONLINE_ROW_NO_SIDE;
         mRows[index].mVisible = true;
         mRows[index].mGuest = false;
         mRows[index].mShowCancel = true;

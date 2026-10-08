@@ -9,9 +9,16 @@
 #include "NL/nlConfig.h"
 #include "types.h"
 
+enum eRumbleOpType
+{
+    RUMBLE_OP_PLAY = 0,
+    RUMBLE_OP_WAIT = 1,
+    RUMBLE_OP_END = 2,
+};
+
 struct RumbleOp
 {
-    s32 type;
+    eRumbleOpType type;
     u32 value;
 };
 
@@ -27,29 +34,29 @@ struct RumbleActionState
 };
 
 RumbleOp opArrayShotContact[] = {
-    { 0, 0x29A },
-    { 2, 0 },
+    { RUMBLE_OP_PLAY, 0x29A },
+    { RUMBLE_OP_END, 0 },
 };
 
 RumbleOp opArraySolidContact[] = {
-    { 0, 0x1BC },
-    { 2, 0 },
+    { RUMBLE_OP_PLAY, 0x1BC },
+    { RUMBLE_OP_END, 0 },
 };
 
 RumbleOp opArrayMediumContact[] = {
-    { 0, 0xDE },
-    { 2, 0 },
+    { RUMBLE_OP_PLAY, 0xDE },
+    { RUMBLE_OP_END, 0 },
 };
 
 RumbleOp opArraySmallContact[] = {
-    { 0, 0x6F },
-    { 2, 0 },
+    { RUMBLE_OP_PLAY, 0x6F },
+    { RUMBLE_OP_END, 0 },
 };
 
 RumbleOp lbl_8050DFF8[] = {
-    { 0, 0x2D },
-    { 1, 0x96 },
-    { 2, 0 },
+    { RUMBLE_OP_PLAY, 0x2D },
+    { RUMBLE_OP_WAIT, 0x96 },
+    { RUMBLE_OP_END, 0 },
 };
 
 static TweakValueBool g_bRumbleOn(
@@ -84,7 +91,7 @@ void UpdateRumbleActions(float dt)
 
                 switch (op->type)
                 {
-                case 0:
+                case RUMBLE_OP_PLAY:
                     if (op->value != 0)
                     {
                         state->timer = (float)op->value / 1000.0f;
@@ -97,7 +104,7 @@ void UpdateRumbleActions(float dt)
                     }
                     break;
 
-                case 1:
+                case RUMBLE_OP_WAIT:
                     pad->StopRumble();
                     {
                         int nextOp = state->current;
@@ -114,7 +121,7 @@ void UpdateRumbleActions(float dt)
                     }
                     break;
 
-                case 2:
+                case RUMBLE_OP_END:
                     pad->StopRumble();
                     state->active = 0;
                     state->ops = 0;
@@ -174,7 +181,7 @@ void BeginRumbleAction(eRumbleActionPreset preset, cGlobalPad* pad)
 
         switch (preset)
         {
-        case 0:
+        case RUMBLE_STOP:
             StopRumble(pad);
             return;
         case RUMBLE_SMALL_CONTACT:

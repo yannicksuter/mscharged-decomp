@@ -43,6 +43,18 @@ struct GoalieSaveData
     /* 0x1C */ unsigned int padding : 31;
 }; // total size: 0x20
 
+enum eGoalType
+{
+    GOAL_REGULAR = 0,
+    GOAL_ONE_TIMER = 1,
+    GOAL_SKILLSHOT = 2,
+    GOAL_DEFLECTION = 3,
+    GOAL_UNCLASSIFIED = 4,
+    GOAL_OWN_GOAL = 5,
+    GOAL_MEGA_STRIKE = 6,
+    GOAL_CARRIED_IN = 7,
+};
+
 struct GoalScoredData
 {
     /* 0x00 */ unsigned int uTeamIndex : 8;

@@ -36,7 +36,7 @@ void FEPresentation::Update(float deltaTime)
             case TLPM_STOP_AT_END:
                 m_fadeDuration = end;
                 break;
-            case 2:
+            case TLPM_CONTINUE:
             default:
                 break;
             }

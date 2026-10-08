@@ -13,6 +13,39 @@
 
 #include "Game/SharedStaticStorage.h"
 
+enum eInterpreterOpcode
+{
+    INTERPRETER_OP_PUSH_CONSTANT = 0,
+    INTERPRETER_OP_PUSH_STRING_CONSTANT = 1,
+    INTERPRETER_OP_PUSH_IMMEDIATE = 2,
+    INTERPRETER_OP_PUSH_STRING = 3,
+    INTERPRETER_OP_JUMP_FORWARD_IF_TRUE = 4,
+    INTERPRETER_OP_JUMP_FORWARD = 5,
+    INTERPRETER_OP_JUMP_BACKWARD_IF_TRUE = 6,
+    INTERPRETER_OP_JUMP_BACKWARD = 7,
+    INTERPRETER_OP_CALL_NATIVE = 8,
+    INTERPRETER_OP_CALL_SCRIPT = 9,
+    INTERPRETER_OP_RETURN = 10,
+    INTERPRETER_OP_LOAD_LOCAL = 11,
+    INTERPRETER_OP_STORE_LOCAL = 12,
+    INTERPRETER_OP_OPERATION = 13,
+    INTERPRETER_OP_LOAD_GLOBAL = 14,
+    INTERPRETER_OP_STORE_GLOBAL = 15,
+    INTERPRETER_OP_ADJUST_STACK = 16,
+    INTERPRETER_OP_COPY_TOP_TO_LOCAL = 17,
+    INTERPRETER_OP_COPY_LOCAL = 18,
+    INTERPRETER_OP_STORE_LOCAL_IMMEDIATE = 19,
+    INTERPRETER_OP_LOAD_TWO_LOCALS = 20,
+    INTERPRETER_OP_LOAD_THREE_LOCALS = 21,
+};
+
+enum eInterpreterTweakType
+{
+    INTERPRETER_TWEAK_INT = 0,
+    INTERPRETER_TWEAK_FLOAT = 1,
+    INTERPRETER_TWEAK_BOOL = 2,
+};
+
 struct InterpreterTweakStorage
 {
     /* 0x00 */ u32 numIntTweaks;
@@ -53,7 +86,7 @@ InterpreterCore::~InterpreterCore()
 
 void InterpreterCore::Reset()
 {
-    m_RunState = 2;
+    m_RunState = INTERPRETER_FINISHED;
     m_SP = m_StackSegment;
     m_SavedSP = m_SP;
     m_BP = 0;
@@ -189,16 +222,16 @@ void InterpreterCore::RunFunction(FunctionEntryPoint* entry, unsigned int count)
     }
 
     m_SP += entry->frameSize;
-    if (m_RunState != 1)
+    if (m_RunState != INTERPRETER_RUNNING)
     {
-        m_RunState = 0;
+        m_RunState = INTERPRETER_READY;
     }
 
     u16* saved_ip = m_IP;
     m_IP = (u16*)entry->offset;
     Step();
 
-    if (m_RunState != 3)
+    if (m_RunState != INTERPRETER_SUSPENDED)
     {
         m_IP = saved_ip;
         if (entry->flags & 1)
@@ -210,7 +243,7 @@ void InterpreterCore::RunFunction(FunctionEntryPoint* entry, unsigned int count)
 
 bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, unsigned int value0, unsigned int value1, unsigned int value2, unsigned int value3)
 {
-    if (m_RunState == 3)
+    if (m_RunState == INTERPRETER_SUSPENDED)
     {
         Reset();
     }
@@ -249,7 +282,7 @@ bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int co
 
 bool InterpreterCore::ExecuteFunction(FunctionEntryPoint* entry, unsigned int count, const unsigned int* values)
 {
-    if (m_RunState == 3)
+    if (m_RunState == INTERPRETER_SUSPENDED)
     {
         Reset();
     }
@@ -279,7 +312,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
 
     switch (type)
     {
-    case 0:
+    case INTERPRETER_TWEAK_INT:
     {
         if (flags & 2)
         {
@@ -307,7 +340,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
         break;
     }
 
-    case 1:
+    case INTERPRETER_TWEAK_FLOAT:
     {
         if (flags & 2)
         {
@@ -335,7 +368,7 @@ void InterpreterCore::RegisterTweak(unsigned int index, unsigned int type, const
         break;
     }
 
-    case 2:
+    case INTERPRETER_TWEAK_BOOL:
     {
         unsigned int storageIndex = index - storage->numIntTweaks - storage->numFloatTweaks;
         if (flags & 1)
@@ -379,8 +412,8 @@ void InterpreterCore::Run()
 
 void InterpreterCore::Step()
 {
-    unsigned int wasNotRunning = m_RunState != 1;
-    m_RunState = 1;
+    unsigned int wasNotRunning = m_RunState != INTERPRETER_RUNNING;
+    m_RunState = INTERPRETER_RUNNING;
     m_Stop = 0;
 
     while (!m_Stop)
@@ -392,45 +425,45 @@ void InterpreterCore::Step()
 
         switch (opcode)
         {
-        case 0:
+        case INTERPRETER_OP_PUSH_CONSTANT:
             *m_SP = m_Header->m_DataSegment[operand];
             m_SP++;
             break;
 
-        case 1:
+        case INTERPRETER_OP_PUSH_STRING_CONSTANT:
             *m_SP = (u32)(m_Header->m_StringSegment + m_Header->m_DataSegment[operand]);
             m_SP++;
             break;
 
-        case 2:
+        case INTERPRETER_OP_PUSH_IMMEDIATE:
             *m_SP = operand;
             m_SP++;
             break;
 
-        case 3:
+        case INTERPRETER_OP_PUSH_STRING:
             *m_SP = (u32)(m_Header->m_StringSegment + operand);
             m_SP++;
             break;
 
-        case 4:
+        case INTERPRETER_OP_JUMP_FORWARD_IF_TRUE:
             if (Pop() == 0)
             {
                 break;
             }
-        case 5:
+        case INTERPRETER_OP_JUMP_FORWARD:
             m_IP += operand;
             continue;
 
-        case 6:
+        case INTERPRETER_OP_JUMP_BACKWARD_IF_TRUE:
             if (Pop() == 0)
             {
                 break;
             }
-        case 7:
+        case INTERPRETER_OP_JUMP_BACKWARD:
             m_IP -= operand;
             continue;
 
-        case 8:
+        case INTERPRETER_OP_CALL_NATIVE:
             if (wasNotRunning)
             {
                 m_SavedSP = m_SP;
@@ -438,7 +471,7 @@ void InterpreterCore::Step()
             DoFunctionCall(operand);
             break;
 
-        case 9:
+        case INTERPRETER_OP_CALL_SCRIPT:
         {
             FunctionEntryPoint* entry = &m_Header->m_FunctionTable[operand];
             m_SP[0] = (u32)instructionPointer;
@@ -449,7 +482,7 @@ void InterpreterCore::Step()
             continue;
         }
 
-        case 10:
+        case INTERPRETER_OP_RETURN:
         {
             u32* oldBP = m_BP;
             u32* frame = oldBP + (operand >> 1);
@@ -466,20 +499,20 @@ void InterpreterCore::Step()
             break;
         }
 
-        case 11:
+        case INTERPRETER_OP_LOAD_LOCAL:
             *m_SP = m_BP[operand];
             m_SP++;
             break;
 
-        case 12:
+        case INTERPRETER_OP_STORE_LOCAL:
             m_BP[operand] = Pop();
             break;
 
-        case 13:
+        case INTERPRETER_OP_OPERATION:
             gInterpreterOperations[operand](this);
             break;
 
-        case 14:
+        case INTERPRETER_OP_LOAD_GLOBAL:
         {
             if (operand < m_Header->numGlobals)
             {
@@ -512,7 +545,7 @@ void InterpreterCore::Step()
             break;
         }
 
-        case 15:
+        case INTERPRETER_OP_STORE_GLOBAL:
         {
             if (operand < m_Header->numGlobals)
             {
@@ -541,23 +574,23 @@ void InterpreterCore::Step()
             break;
         }
 
-        case 16:
+        case INTERPRETER_OP_ADJUST_STACK:
             m_SP += (s8)operand;
             break;
 
-        case 17:
+        case INTERPRETER_OP_COPY_TOP_TO_LOCAL:
             m_BP[operand] = m_SP[-1];
             break;
 
-        case 18:
+        case INTERPRETER_OP_COPY_LOCAL:
             m_BP[operand & 0x1F] = m_BP[operand >> 5];
             break;
 
-        case 19:
+        case INTERPRETER_OP_STORE_LOCAL_IMMEDIATE:
             m_BP[operand >> 5] = 16 - (operand & 0x1F);
             break;
 
-        case 20:
+        case INTERPRETER_OP_LOAD_TWO_LOCALS:
         {
             u32 upper = operand >> 5;
             u32 lower = operand & 0x1F;
@@ -567,7 +600,7 @@ void InterpreterCore::Step()
             break;
         }
 
-        case 21:
+        case INTERPRETER_OP_LOAD_THREE_LOCALS:
         {
             int index0;
             int index1;
@@ -591,16 +624,16 @@ void InterpreterCore::Step()
     {
         m_Stop = 0;
     }
-    else if (m_RunState != 3)
+    else if (m_RunState != INTERPRETER_SUSPENDED)
     {
-        m_RunState = 2;
+        m_RunState = INTERPRETER_FINISHED;
     }
 }
 
 void InterpreterCore::StopWithoutUndo()
 {
     m_Stop = 1;
-    m_RunState = 3;
+    m_RunState = INTERPRETER_SUSPENDED;
 }
 
 void InterpreterCore::StopWithUndo()
@@ -608,7 +641,7 @@ void InterpreterCore::StopWithUndo()
     m_IP--;
     m_SP = m_SavedSP;
     m_Stop = 1;
-    m_RunState = 3;
+    m_RunState = INTERPRETER_SUSPENDED;
 }
 
 int InterpreterCore::GetInstructionOffset()

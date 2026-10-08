@@ -5,11 +5,35 @@
 #include <dwc/dwci_error.h>
 #include <dwc/dwc_main_fwd.h>
 
+enum eNetworkLobbyState
+{
+    NET_LOBBY_IDLE = 0,
+    NET_LOBBY_FRIEND_MATCHING = 1,
+    NET_LOBBY_FRIEND_EXCHANGE_INFO = 2,
+    NET_LOBBY_MATCHMAKING = 3,
+    NET_LOBBY_CONNECT_PEERS = 4,
+    NET_LOBBY_WAIT_PEERS = 5,
+    NET_LOBBY_HOST_WAIT_INFO = 6,
+    NET_LOBBY_READY = 7,
+};
+
+enum eNetworkLobbyPeerState
+{
+    NET_PEER_INITIAL = 0,
+    NET_PEER_LOCAL = 1,
+    NET_PEER_CONNECTING = 2,
+    NET_PEER_WAIT_CONNECTION = 3,
+    NET_PEER_FAILED = 4,
+    NET_PEER_CONNECTED = 5,
+    NET_PEER_LOCAL_INFO_READY = 6,
+    NET_PEER_INFO_SENT = 7,
+};
+
 struct NetworkLobbyPlayer : public TransportPlayerInfo
 {
     /* 0x14 */ unsigned int mConnection;
     /* 0x18 */ u8 mAid[4];
-    /* 0x1C */ int mConnectionState;
+    /* 0x1C */ eNetworkLobbyPeerState mConnectionState;
 }; // size: 0x20
 
 class NetworkLobby : public NetworkMachineRoster,
@@ -54,7 +78,7 @@ public:
     void CloseConnectionsAndReset();
     bool CanCancelMatchmaking();
     int GetConnectionCount() const { return DWC_GetNumConnectionHost(); }
-    bool IsMatchmaking() const { return mMatchmakingThreadRunning || mState != 0; }
+    bool IsMatchmaking() const { return mMatchmakingThreadRunning || mState != NET_LOBBY_IDLE; }
     void CancelMatchmaking();
     bool StartMatchmaking();
     void StartMatchmakingThread();
@@ -92,7 +116,7 @@ public:
     /* 0x0034 */ unsigned int mMinCompletionElapsedMsLow;
     /* 0x0038 */ int mMinCompletionState;
     /* 0x003C */ void* mReceiveBuffers[4];
-    /* 0x004C */ int mState;
+    /* 0x004C */ eNetworkLobbyState mState;
     /* 0x0050 */ bool mMatchFailed;
     /* 0x0051 */ bool mCancelRequested;
     /* 0x0052 */ bool mLateCancelRequested;

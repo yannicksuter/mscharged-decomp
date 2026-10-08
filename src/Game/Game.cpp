@@ -222,7 +222,7 @@ static inline void InitializeChallengeTeamScore(cTeam* team, int side)
 
 static inline void DeliverGoalScored(cGame* game, GoalScoredData* data)
 {
-    if (game->GetGameState() != 4)
+    if (game->GetGameState() != GS_UNLOADING)
     {
         game->mEventQueue.mGoalScoredEvent.Deliver(data);
     }
@@ -326,7 +326,7 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
 }
 void fn_80056EA8()
 {
-    g_pGame->ChangeGameState(4);
+    g_pGame->ChangeGameState(GS_UNLOADING);
 }
 void DestroyGame()
 {
@@ -384,7 +384,7 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     mpTerrain = 0;
     mpWeatherManager = 0;
     mpCrowdRiot = 0;
-    m_eGameState = -1;
+    m_eGameState = GS_NONE;
 
     m_pPostResetClock = new (nlMalloc(sizeof(Clock), 8, false))
         Clock(0.0f, 0.5f, 1.0f, 2, PostResetCallback);
@@ -395,7 +395,7 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
 
     mpWeatherManager = new (nlMalloc(sizeof(WeatherManager), 8, false)) WeatherManager();
 
-    mpWeatherManager->Initialize(weatherType);
+    mpWeatherManager->Initialize(static_cast<eWeatherType>(weatherType));
 
     mpCrowdRiot = new (nlMalloc(sizeof(CrowdRiot), 8, false))
         CrowdRiot(startCrowdRiot);
@@ -424,12 +424,12 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     {
         if (noClock)
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
                 game->m_pGameClock->Stop();
         }
         else
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
                 game->m_pGameClock->Start();
         }
     }
@@ -445,8 +445,8 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
         AIContext(
             this, 0, new (nlMalloc(sizeof(FuzzyAIRuntime), 8, false))
                          FuzzyAIRuntime());
-    gNetworkMessageRegistry->RegisterReceiver(34, this);
-    gNetworkMessageRegistry->RegisterReceiver(35, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_MEGA_BALL_POINTER, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_MEGA_STRIKE_METER, this);
 
     float avoidableWidth = 1.0f;
     nlVector3 avoidableCenter = { 20.6f, 0.0f, 0.0f };
@@ -456,9 +456,9 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     mpBoundaryAvoidables[1] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, avoidableWidth, 25.0f);
 
-    if (GameInfoManager::Instance()->GetStadium() == 15)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_SAND_TOMB)
         avoidableWidth = 6.0f;
-    else if (GameInfoManager::Instance()->GetStadium() == 11)
+    else if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         avoidableWidth = 3.0f;
 
     avoidableCenter.x = 0.0f;
@@ -492,8 +492,8 @@ cGame::~cGame()
     mpAIContext->Cleanup(true, true);
     delete mpAIContext;
 
-    gNetworkMessageRegistry->UnregisterReceiver(34);
-    gNetworkMessageRegistry->UnregisterReceiver(35);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_MEGA_BALL_POINTER);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_MEGA_STRIKE_METER);
 
     for (int i = 0; i < 4; i++)
     {
@@ -589,7 +589,7 @@ void cGame::InitMegaStrikeGameplay()
         tDebugPrintManager::Print(DC_NETWORK, buffer);
     }
 
-    g_pBall->m_uGoalType = 6;
+    g_pBall->m_uGoalType = GOAL_MEGA_STRIKE;
 
     float accuracy = mpMegaStrikeShooter->m_fMegaStrikeAccuracy;
     float numBalls = mpMegaStrikeShooter->m_fMegaStrikeNumBalls;
@@ -609,7 +609,7 @@ void cGame::CleanupMegaStrikeGameplay()
     {
         if (pGoalie->m_pBall == 0 && g_pBall->m_pOwner != 0)
         {
-            g_pBall->m_pOwner->ReleaseBall(0);
+            g_pBall->m_pOwner->ReleaseBall(BALL_STATE_LOOSE);
         }
         pGoalie->PickupBall(g_pBall);
         pGoalie->InitActionMoveWB();
@@ -658,9 +658,9 @@ void cGame::StartSlowDown(float timeScale, float transitionTime)
 
     if (FixedUpdateTask::GetTargetTimeScale() != 1.0f || 1.0f != timeScale)
     {
-        if (g_pGame->m_eGameState != 4)
+        if (g_pGame->m_eGameState != GS_UNLOADING)
         {
-            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+            if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
             {
                 m_pGameClock->Stop();
             }
@@ -701,14 +701,14 @@ float cGame::GetGameTime()
 }
 void cGame::fn_800586C0()
 {
-    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         m_pGameClock->Start();
     }
 }
 void cGame::fn_80058704()
 {
-    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         m_pGameClock->Stop();
     }
@@ -781,9 +781,9 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     GetInputRouter();
     GetDetermDataEventQueue()->Add(callback, 0, -1);
 
-    if (m_eGameState != 0)
+    if (m_eGameState != GS_PRE_GAME)
     {
-        ChangeGameState(0);
+        ChangeGameState(GS_PRE_GAME);
     }
 
     ResetGameFields();
@@ -828,7 +828,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
         g_pCharacters[i]->fn_80022E60();
         cCharacter* character = g_pCharacters[i];
         character->m_Dirt = 0.0f;
-        character->m_nDamageType = 0;
+        character->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         g_pCharacters[i]->m_MinDirt = 0.0f;
     }
     GetPresentation()->Reset();
@@ -836,7 +836,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
     ReplayChoreo::Instance().Finish();
     if (bStraightToKickoff)
     {
-        ChangeGameState(1);
+        ChangeGameState(GS_KICKOFF);
         FixedUpdateTask* task = GetFixedUpdateTask();
         task->mSimulationStarted = true;
     }
@@ -877,22 +877,22 @@ void cGame::CheckForGoal()
         g_pTeams[nSide]->m_nScore += 1;
 
         if (GameInfoManager::Instance()->IsInMode4()
-            && g_pStrikerChallenge->mCondition == 2 && nSide == 1)
+            && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && nSide == 1)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
         }
-        else if (m_eGameState == 6)
+        else if (m_eGameState == GS_OVERTIME)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
         }
-        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
             && g_pTeams[nSide]->GetScore() >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
         }
         else
         {
-            ChangeGameState(2);
+            ChangeGameState(GS_POST_GOAL);
         }
 
         if (g_pBall->m_pLastTouch == NULL)
@@ -912,11 +912,11 @@ void cGame::CheckForGoal()
                 * g_pBall->m_v3Position.x;
             if (fDirection >= 0.0f)
             {
-                g_pBall->m_uGoalType = 5;
+                g_pBall->m_uGoalType = GOAL_OWN_GOAL;
             }
             else
             {
-                g_pBall->m_uGoalType = 3;
+                g_pBall->m_uGoalType = GOAL_DEFLECTION;
             }
 
             SetPotentialScorer(g_pBall->m_pLastTouch);
@@ -925,18 +925,18 @@ void cGame::CheckForGoal()
         {
             if (nSide != m_pScorer->m_pTeam->m_nSide)
             {
-                g_pBall->m_uGoalType = 5;
+                g_pBall->m_uGoalType = GOAL_OWN_GOAL;
             }
         }
 
         // A scorer still holding the ball (a captain carried in) lets go of it.
         if (m_pScorer != NULL && m_pScorer->m_pBall != NULL)
         {
-            m_pScorer->ReleaseBall(0);
+            m_pScorer->ReleaseBall(BALL_STATE_LOOSE);
             if (m_pScorer->m_eClassType == FIELDER)
             {
                 ((cFielder*)m_pScorer)->ShootBallDueToContact(m_pScorer->m_DetChar.m_v3Velocity);
-                g_pBall->m_uGoalType = 7;
+                g_pBall->m_uGoalType = GOAL_CARRIED_IN;
             }
         }
 
@@ -990,7 +990,7 @@ void cGame::CheckForGoal()
         }
 
         Goalie::HandleGoalScored(nSide);
-        g_pBall->m_uGoalType = 4;
+        g_pBall->m_uGoalType = GOAL_UNCLASSIFIED;
     }
 }
 void cGame::BlowUpPowerups(
@@ -1105,6 +1105,18 @@ void cGame::PlayEndGamePresentation()
     GetPresentation()->Call("GameEndNoSuddenDeath", "");
 }
 
+enum eCustomDetermType
+{
+    DETERM_PLAYER_VISIBILITY = 5,
+    DETERM_NIS_LOADED = 29,
+    DETERM_MEGA_STRIKE_RESULT = 181,
+    DETERM_MEGA_STRIKE_SAVE = 182,
+    DETERM_MEGA_STRIKE_PLAYER_READY = 183,
+    DETERM_MEGA_STRIKE_KILL_CURSOR = 185,
+    DETERM_MEGA_STRIKE_CLEANUP = 188,
+    DETERM_SLOW_DOWN_END = 222,
+};
+
 void cGame::SendNISLoadedCustomDeterm(u8 machineBits)
 {
     struct Message
@@ -1113,7 +1125,7 @@ void cGame::SendNISLoadedCustomDeterm(u8 machineBits)
         u8 machineBits;
     } message;
 
-    message.type = 29;
+    message.type = DETERM_NIS_LOADED;
     message.machineBits = machineBits;
 
     u32 frame = gInputManager->mFrameProvider->GetFrame();
@@ -1133,7 +1145,7 @@ void cGame::SendMegaStrike(
         float accuracy;
     } message;
 
-    message.type = 181;
+    message.type = DETERM_MEGA_STRIKE_RESULT;
     message.side = side;
     message.playerId = playerId;
     message.padding = 0;
@@ -1146,14 +1158,14 @@ void cGame::SendMegaStrike(
 }
 void cGame::SendMegaStrikePlayerReady()
 {
-    u8 message = 183;
+    u8 message = DETERM_MEGA_STRIKE_PLAYER_READY;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending MegaStrikePlayerReady at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
 }
 void cGame::SendMegaStrikeKillCursor()
 {
-    u8 message = 185;
+    u8 message = DETERM_MEGA_STRIKE_KILL_CURSOR;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending SendMegaStrikeKillCursor at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
@@ -1169,7 +1181,7 @@ void cGame::SendMegaStrikeGoalie(unsigned int side, unsigned int target, float s
         float score;
     } message;
 
-    message.type = 182;
+    message.type = DETERM_MEGA_STRIKE_SAVE;
     message.side = side;
     message.target = target;
     message.padding = 0;
@@ -1181,7 +1193,7 @@ void cGame::SendMegaStrikeGoalie(unsigned int side, unsigned int target, float s
 }
 void cGame::SendSlowDownEnd()
 {
-    u8 message = 222;
+    u8 message = DETERM_SLOW_DOWN_END;
     u32 frame = gInputManager->mFrameProvider->GetFrame();
     tDebugPrintManager::Print(DC_NETWORK, "Sending Slow Down End at frame %d\n", frame);
     GetInputRouter()->QueueDetermData(&message, sizeof(message));
@@ -1201,7 +1213,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
 
     switch (type)
     {
-    case 5:
+    case DETERM_PLAYER_VISIBILITY:
     {
         // Which players are on screen, one bit per player.
         u8* data = pEvent->mData;
@@ -1218,11 +1230,11 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         break;
     }
 
-    case 29:
+    case DETERM_NIS_LOADED:
         GetPresentation()->ReceiveNisLoaded(pEvent->mData[1]);
         break;
 
-    case 181:
+    case DETERM_MEGA_STRIKE_RESULT:
     {
         cFielder* pFielder = g_pTeams[pEvent->mData[1]]->GetFielder(pEvent->mData[2]);
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrike Side %d PlayerID %d NumBalls %f Accuracy %f at frame %d\n", pEvent->mData[1],
@@ -1232,19 +1244,19 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         break;
     }
 
-    case 183:
+    case DETERM_MEGA_STRIKE_PLAYER_READY:
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikePlayerReady at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
         mbMegaStrikePlayerReady = true;
         break;
 
-    case 185:
+    case DETERM_MEGA_STRIKE_KILL_CURSOR:
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikeKillCursor at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
         ResetMegaBallPointer();
         break;
 
-    case 182:
+    case DETERM_MEGA_STRIKE_SAVE:
     {
         Goalie* pGoalie = g_pTeams[pEvent->mData[1]]->GetGoalie();
         tDebugPrintManager::Print(DC_NETWORK, "Received MegaStrikeGoalie Side %d CurTarget %d Score %f at frame %d\n", pEvent->mData[1],
@@ -1254,18 +1266,18 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         break;
     }
 
-    case 222:
+    case DETERM_SLOW_DOWN_END:
         // SlowDownEnd: back to full speed after a captain hit.
         tDebugPrintManager::Print(DC_NETWORK, "Received SlowDownEnd at frame %d\n",
             gInputManager->mFrameProvider->GetFrame());
-        if (g_pGame->m_eGameState != 4)
+        if (g_pGame->m_eGameState != GS_UNLOADING)
         {
             StopSound(0xCE5CBAC7, g_pGame);
             if (FixedUpdateTask::GetTargetTimeScale() < 1.0f)
             {
                 FixedUpdateTask::SetTimeScale(1.0f);
                 ParticleUpdateTask::sInstance->SetTimeScale(1.0f);
-                if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+                if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
                 {
                     m_pGameClock->Start();
                 }
@@ -1279,7 +1291,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
         }
         break;
 
-    case 188:
+    case DETERM_MEGA_STRIKE_CLEANUP:
     {
         // CleanupMegastrikeGameplay
         tDebugPrintManager::Print(DC_NETWORK, "Received CleanupMegastrikeGameplay at frame %d\n",
@@ -1317,14 +1329,14 @@ int cGame::ProcessMessage(NetworkMessage* message)
 
     switch ((u8)message->GetType())
     {
-    case 34:
+    case NETMSG_MEGA_BALL_POINTER:
         if (mbCaptainShotToScoreOn)
         {
             ReceiveMegaBallPointerUpdate(message);
         }
         break;
 
-    case 35:
+    case NETMSG_MEGA_STRIKE_METER:
     {
         NetMessageMegaStrikeMeter* pMessage = (NetMessageMegaStrikeMeter*)message;
         for (int i = 0; i < pMessage->mCount; i++)
@@ -1379,7 +1391,7 @@ void cGame::SendPlayerVisibility()
         && gInputManager->mFrameProvider->GetFrame() % 10 == 0)
     {
         u8 message[3];
-        message[0] = 5;
+        message[0] = DETERM_PLAYER_VISIBILITY;
 
         for (int i = 0; i < 2; i++)
         {
@@ -1402,7 +1414,7 @@ void cGame::SendPlayerVisibility()
 }
 void cGame::Update(float fDeltaT)
 {
-    if (m_eGameState == 4)
+    if (m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -1421,25 +1433,25 @@ void cGame::Update(float fDeltaT)
     {
         if (g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
         {
-            if (m_eGameState == 5)
+            if (m_eGameState == GS_GAMEPLAY)
             {
                 if (GameInfoManager::Instance()->IsInMode4()
                     && g_pStrikerChallenge->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
                 {
-                    ChangeGameState(3);
+                    ChangeGameState(GS_END_GAME);
                     StatsTracker::Instance()->TrackWinner(-1);
                 }
                 else
                 {
-                    ChangeGameState(6);
+                    ChangeGameState(GS_OVERTIME);
                     StatsTracker::Instance()->mIsOvertime = true;
                 }
             }
         }
-        else if (m_eGameState != 3)
+        else if (m_eGameState != GS_END_GAME)
         {
-            ChangeGameState(3);
+            ChangeGameState(GS_END_GAME);
             StatsTracker::Instance()->TrackWinner(-1);
         }
     }
@@ -1528,7 +1540,7 @@ void cGame::Update(float fDeltaT)
             mfYTilt, fDiff * gScoreTiltScale, gScoreTiltSeekRate, fDeltaT);
         SetFieldTilt(0, mfXTilt, mfYTilt);
     }
-    else if ((GameInfoManager::Instance()->GetStadium() == 9 || gForceWeatherTilt)
+    else if ((GameInfoManager::Instance()->GetStadium() == STAD_STORM_SHIP || gForceWeatherTilt)
         && !GetConfigBool(Config::Global(), "no_weather", false)
         && !GameInfoManager::Instance()->IsRule0x4Equal1())
     {
@@ -1645,7 +1657,7 @@ void cGame::Update(float fDeltaT)
         int homeScore = g_pTeams[0]->m_nScore;
         int nWinner = homeScore < awayScore;
         if ((GameInfoManager::Instance()->IsInMode4()
-                && g_pStrikerChallenge->mCondition == 2
+                && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                 && g_pTeams[1]->m_nScore > 0)
             || (g_pStrikerChallenge->mCurrentChallenge == 2
                 && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
@@ -1907,7 +1919,7 @@ void cGame::ChecksumState(RunningChecksum* runningChecksum)
     runningChecksum->ChecksumData(&m_bBallInNet, sizeof(m_bBallInNet));
     runningChecksum->ChecksumData(&m_nLastTeamToScore, sizeof(m_nLastTeamToScore));
 }
-void cGame::ChangeGameState(int state)
+void cGame::ChangeGameState(eGameState state)
 {
     DebugWriteCache* output = gNetworkSyncState->GetWriteCache();
     if (output != 0)
@@ -1926,15 +1938,15 @@ void cGame::ChangeGameState(int state)
 
     if (state != m_eGameState)
     {
-        if (m_eGameState == 6 && state == 3)
+        if (m_eGameState == GS_OVERTIME && state == GS_END_GAME)
         {
             StopSuddenDeathMusic();
         }
 
-        if (state == 3)
+        if (state == GS_END_GAME)
         {
             if ((GameInfoManager::Instance()->IsInMode4()
-                    && g_pStrikerChallenge->mCondition == 2
+                    && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                     && g_pTeams[1]->m_nScore > 0)
                 || (g_pStrikerChallenge->mCurrentChallenge == 2
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
@@ -1961,7 +1973,7 @@ void cGame::ChangeGameState(int state)
             }
         }
 
-        if (m_eGameState == 5)
+        if (m_eGameState == GS_GAMEPLAY)
         {
             unsigned long soundID = GetStadiumSoundID(
                 GameInfoManager::Instance()->GetStadium());
@@ -1971,9 +1983,9 @@ void cGame::ChangeGameState(int state)
         InitGameState(state);
     }
 }
-void cGame::InitGameState(int state)
+void cGame::InitGameState(eGameState state)
 {
-    if (m_eGameState == 5 && state == 6)
+    if (m_eGameState == GS_GAMEPLAY && state == GS_OVERTIME)
     {
         mEventQueue.mSuddenDeathEvent.Queue();
     }
@@ -1981,22 +1993,22 @@ void cGame::InitGameState(int state)
     m_eGameState = state;
     switch (state)
     {
-    case 1:
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    case GS_KICKOFF:
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
         ResetForKickOff();
         break;
 
-    case 0:
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    case GS_PRE_GAME:
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
         break;
-    case 2:
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    case GS_POST_GOAL:
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
@@ -2010,13 +2022,13 @@ void cGame::InitGameState(int state)
         }
         break;
 
-    case 3:
+    case GS_END_GAME:
         if (!DuringMegaStrikeEndPresentation(GetPresentation()))
         {
             PlaySound(10, 0x42F55573, 0, 0);
         }
         m_pPostGameDoneClock->Start();
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Stop();
         }
@@ -2042,7 +2054,7 @@ void cGame::InitGameState(int state)
         gpNumberDisplay->mHoldUntilKickoff = true;
         break;
 
-    case 5:
+    case GS_GAMEPLAY:
     {
         unsigned long soundID = GetStadiumSoundID(GameInfoManager::Instance()->GetStadium());
         if (IsSoundTracked(soundID, this))
@@ -2056,14 +2068,14 @@ void cGame::InitGameState(int state)
         break;
     }
 
-    case 6:
+    case GS_OVERTIME:
         StopSound(GetStadiumSoundID(GameInfoManager::Instance()->GetStadium()), this);
         break;
     }
 
-    if (state == 5 || state == 6)
+    if (state == GS_GAMEPLAY || state == GS_OVERTIME)
     {
-        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0)
+        if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
         {
             m_pGameClock->Start();
         }
@@ -2134,7 +2146,7 @@ extern "C" void fn_8005D210(cGame* pGame, LightningStrikeData* pData)
 }
 void DeliverGoalieSaveEvent(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2142,7 +2154,7 @@ void DeliverGoalieSaveEvent(cGame* pGame, const GoalieSaveData* pData)
 }
 void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2150,7 +2162,7 @@ void DeliverGoalieKickEvent(cGame* pGame, const GoalieSaveData* pData)
 }
 extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2158,7 +2170,7 @@ extern "C" void fn_8005D74C(cGame* pGame, const GoalieSaveData* pData)
 }
 void DeliverGoalieExertEvent(cGame* pGame, const GoalieSaveData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2177,7 +2189,7 @@ void cGame::SetMegaStrikeShotResult(int shotIndex, bool scored)
 }
 void FinishMegaStrike(cGame* pGame)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2201,28 +2213,28 @@ void FinishMegaStrike(cGame* pGame)
     if (pGame->m_uMegastrikeGoals != 0)
     {
         pGame->m_nLastTeamToScore = side;
-        g_pBall->m_uGoalType = 6;
+        g_pBall->m_uGoalType = GOAL_MEGA_STRIKE;
         g_pTeams[side]->m_nScore += pGame->m_uMegastrikeGoals;
         int score;
 
         if (GameInfoManager::Instance()->IsInMode4()
-            && g_pStrikerChallenge->mCondition == 2 && side == 1)
+            && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && side == 1)
         {
-            pGame->ChangeGameState(3);
+            pGame->ChangeGameState(GS_END_GAME);
         }
-        else if (pGame->m_eGameState == 6)
+        else if (pGame->m_eGameState == GS_OVERTIME)
         {
-            pGame->ChangeGameState(3);
+            pGame->ChangeGameState(GS_END_GAME);
         }
-        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+        else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
             && (score = g_pTeams[side]->m_nScore,
                 score >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit))
         {
-            pGame->ChangeGameState(3);
+            pGame->ChangeGameState(GS_END_GAME);
         }
         else
         {
-            pGame->ChangeGameState(2);
+            pGame->ChangeGameState(GS_POST_GOAL);
         }
 
         if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium()))
@@ -2244,7 +2256,7 @@ void FinishMegaStrike(cGame* pGame)
 
     g_pGame->SetMegaStrikeGameplay(false, 0, 0);
     g_pGame->mEventQueue.mMegaStrikeEndEvent.Deliver(&data);
-    g_pBall->m_uGoalType = 4;
+    g_pBall->m_uGoalType = GOAL_UNCLASSIFIED;
     SetPlayerAudioController(0);
 }
 void cGame::ResumeAfterPresentation()
@@ -2261,7 +2273,7 @@ void cGame::ResumeAfterPresentation()
 
     if (mpWeatherManager != 0)
     {
-        SandTombWeather* weather = static_cast<SandTombWeather*>(mpWeatherManager->GetWeather(7));
+        SandTombWeather* weather = static_cast<SandTombWeather*>(mpWeatherManager->GetWeather(WEATHER_SAND_TOMB));
         if (weather != 0)
         {
             weather->InvalidateSandPatches();
@@ -2270,7 +2282,7 @@ void cGame::ResumeAfterPresentation()
 }
 void cGame::QueueChainNisEnd(ShotAtGoalData* data)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_ShotAtGoalDataPool.Free(data);
         return;
@@ -2280,7 +2292,7 @@ void cGame::QueueChainNisEnd(ShotAtGoalData* data)
 }
 void cGame::QueueNIS(NISData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_NISDataPool.Free(pData);
         return;
@@ -2290,7 +2302,7 @@ void cGame::QueueNIS(NISData* pData)
 }
 void QueueCollisionCrowdEvent(cGame* pGame, CollisionCrowdData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_CollisionCrowdDataPool.Free(pData);
         return;
@@ -2300,7 +2312,7 @@ void QueueCollisionCrowdEvent(cGame* pGame, CollisionCrowdData* pData)
 }
 void DeliverGoalieDekeAttackAttemptEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2308,7 +2320,7 @@ void DeliverGoalieDekeAttackAttemptEvent(cGame* pGame, const PlayerAttackData* p
 }
 void DeliverGoalieDekeAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2316,7 +2328,7 @@ void DeliverGoalieDekeAttackSuccessEvent(cGame* pGame, const PlayerAttackData* p
 }
 void DeliverGoalieSlamAttackAttemptEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2324,7 +2336,7 @@ void DeliverGoalieSlamAttackAttemptEvent(cGame* pGame, const PlayerAttackData* p
 }
 void DeliverGoalieSlamAttackSuccessEvent(cGame* pGame, const PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2332,7 +2344,7 @@ void DeliverGoalieSlamAttackSuccessEvent(cGame* pGame, const PlayerAttackData* p
 }
 void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_PlayerAttackDataPool.Free(pData);
         return;
@@ -2342,7 +2354,7 @@ void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
 }
 void QueueAttackSuccessEvent(cGame* pGame, PlayerAttackData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_PlayerAttackDataPool.Free(pData);
         return;
@@ -2352,7 +2364,7 @@ void QueueAttackSuccessEvent(cGame* pGame, PlayerAttackData* pData)
 }
 void QueueShotAtGoalEvent(cGame* pGame, ShotAtGoalData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         g_ShotAtGoalDataPool.Free(pData);
         return;
@@ -2362,7 +2374,7 @@ void QueueShotAtGoalEvent(cGame* pGame, ShotAtGoalData* pData)
 }
 void DeliverWindupShotEvent(cGame* pGame, ShotAtGoalData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2370,7 +2382,7 @@ void DeliverWindupShotEvent(cGame* pGame, ShotAtGoalData* pData)
 }
 void DeliverMegaStrikeMeterStartEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2378,7 +2390,7 @@ void DeliverMegaStrikeMeterStartEvent(cGame* pGame, MegaStrikeMeterData* pData)
 }
 void DeliverMegaStrikeMeterFirstEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2386,7 +2398,7 @@ void DeliverMegaStrikeMeterFirstEvent(cGame* pGame, MegaStrikeMeterData* pData)
 }
 void DeliverMegaStrikeMeterSecondEvent(cGame* pGame, MegaStrikeMeterData* pData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2394,7 +2406,7 @@ void DeliverMegaStrikeMeterSecondEvent(cGame* pGame, MegaStrikeMeterData* pData)
 }
 void DeliverMegaStrikeIntroEvent(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2403,7 +2415,7 @@ void DeliverMegaStrikeIntroEvent(cGame* pGame, cFielder* pFielder)
 }
 void DeliverMegaStrikeMeterEndEvent(cGame* pGame)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2411,7 +2423,7 @@ void DeliverMegaStrikeMeterEndEvent(cGame* pGame)
 }
 void DeliverPeachFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2419,7 +2431,7 @@ void DeliverPeachFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 void DeliverPeachCameraFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2427,7 +2439,7 @@ void DeliverPeachCameraFlashEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 void DeliverPeachCamerasDownEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2435,7 +2447,7 @@ void DeliverPeachCamerasDownEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2443,7 +2455,7 @@ void DeliverPeachCamerasAwayEvent(cGame* pGame, PeachPhotoData* pEventData)
 }
 extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2451,7 +2463,7 @@ extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
 }
 void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2459,7 +2471,7 @@ void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
 }
 extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2467,7 +2479,7 @@ extern "C" void fn_80060804(cGame* pGame, cFielder* pFielder)
 }
 extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2475,7 +2487,7 @@ extern "C" void fn_80060A00(cGame* pGame, cFielder* pFielder)
 }
 void cGame::fn_80060BFC(CollisionBulletBillData& data)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2483,7 +2495,7 @@ void cGame::fn_80060BFC(CollisionBulletBillData& data)
 }
 void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2491,7 +2503,7 @@ void DeliverMontyReappearEvent(cGame* pGame, const CharacterImpactEvent* pEventD
 }
 extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -2499,7 +2511,7 @@ extern "C" void fn_80060FF4(cGame* pGame, const CharacterImpactEvent* pEventData
 }
 extern "C" void fn_800611F0(cGame* pGame, const void* pEventData)
 {
-    if (g_pGame->m_eGameState == 4)
+    if (g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

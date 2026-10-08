@@ -276,7 +276,7 @@ void ReplayManager::OnPassBall(PassBallData* event)
 
 void ReplayManager::OnGoalScored(GoalScoredData* event)
 {
-    if (event->uGoalType != 6)
+    if (event->uGoalType != GOAL_MEGA_STRIKE)
     {
         mEvents |= 1;
     }

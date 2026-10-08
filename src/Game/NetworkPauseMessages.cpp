@@ -15,12 +15,12 @@ void NetMessagePauseResponse::Serialize(
 
 int NetMessagePauseResponse::GetType()
 {
-    return 29;
+    return NETMSG_PAUSE_RESPONSE;
 }
 
 int NetMessagePauseRequest::GetType()
 {
-    return 28;
+    return NETMSG_PAUSE_REQUEST;
 }
 
 NetMessagePauseRequest::~NetMessagePauseRequest()

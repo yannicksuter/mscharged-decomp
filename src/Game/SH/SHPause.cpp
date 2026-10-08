@@ -102,8 +102,8 @@ void PauseMenuScene::OnSelectQUIT()
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
-        else if (GameInfoManager::Instance()->mCurrentMode == 0
-            || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == 3)
+        else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY
+            || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == GS_END_GAME)
         {
             popup->Create((ePopupMenu)10,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
@@ -149,7 +149,7 @@ void PauseMenuScene::OnSelectPopupYESFORFEIT()
         mQuitDelay = 1.0f;
         return;
     }
-    if (g_pGame->m_eGameState != 3)
+    if (g_pGame->m_eGameState != GS_END_GAME)
     {
         s32 quittingSide = -1;
         if (gameInfoManager->IsInMode3())
@@ -191,7 +191,7 @@ void PauseMenuScene::SceneCreated()
     FEAudio::EnableSounds(true);
     if (GameInfoManager::Instance()->IsInMode4())
     {
-        if (GetRegion() == 1)
+        if (GetRegion() == GAME_REGION_EU)
         {
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "off", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
             FEFinder<TLTextInstance, 3>::FindOrDefault(mOptionInstances[4], "over", "option")->SetStringId("CHALLENGES_OBJECTIVES_BUTTON");
@@ -260,23 +260,23 @@ void PauseMenuScene::Update(float fDeltaT)
         case TT_OUT:
             FrontEnd::ExitMenuState();
             break;
-        case 2:
+        case TT_CHOOSE_SIDES:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)81, SCREEN_FORWARD, true);
             break;
-        case 3:
+        case TT_AUDIO_OPTIONS:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)82, SCREEN_FORWARD, true);
             break;
-        case 4:
+        case TT_VISUAL_OPTIONS:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)83, SCREEN_FORWARD, true);
             break;
-        case 5:
+        case TT_CHALLENGE_PREVIEW:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)103, SCREEN_NOTHING, true);
             break;
-        case 6:
+        case TT_STATISTICS:
         {
             mSelectionMade = true;
             PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push((SceneList)92, SCREEN_FORWARD, true));
@@ -284,7 +284,7 @@ void PauseMenuScene::Update(float fDeltaT)
             scene->SetDisplayMode(12);
             break;
         }
-        case 7:
+        case TT_CONTROLLER_MAP:
             mSelectionMade = true;
             g_pOverlayManager->Push((SceneList)104, SCREEN_NOTHING, true);
             break;
@@ -411,26 +411,26 @@ void PauseMenuScene::OnOptionPointerPress(unsigned int index, void* context)
         OnSelectRESUME(0);
         break;
     case 1:
-        TransitionOut((TransitionType)2);
+        TransitionOut(TT_CHOOSE_SIDES);
         break;
     case 2:
-        TransitionOut((TransitionType)3);
+        TransitionOut(TT_AUDIO_OPTIONS);
         break;
     case 3:
-        TransitionOut((TransitionType)4);
+        TransitionOut(TT_VISUAL_OPTIONS);
         break;
     case 4:
         if (GameInfoManager::Instance()->IsInMode4())
-            TransitionOut((TransitionType)5);
+            TransitionOut(TT_CHALLENGE_PREVIEW);
         else
-            TransitionOut((TransitionType)6);
+            TransitionOut(TT_STATISTICS);
         break;
     case 5:
         mQuittingController = (eFEINPUT_PAD)index;
         OnSelectQUIT();
         break;
     case 6:
-        TransitionOut((TransitionType)7);
+        TransitionOut(TT_CONTROLLER_MAP);
         break;
     }
 }

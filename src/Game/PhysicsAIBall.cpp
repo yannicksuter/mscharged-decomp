@@ -86,12 +86,12 @@ ContactType PhysicsAIBall::Contact(
     DebugPrintf(
         "AIBall Contact objID %d numContacts %d\n", objID, numContacts);
 
-    if (objID == 0x1D)
+    if (objID == PHYSOBJ_WALUIGI_WALL)
     {
         return fn_800167A8(m_pAIBall) ? NO_CONTACT : ONE_WAY_CONTACT_THIS;
     }
 
-    if (objID == 0xD || objID == 0xE)
+    if (objID == PHYSOBJ_SPHERE_BONE || objID == PHYSOBJ_CAPSULE_BONE)
     {
         if (gbEnableBallGoalieSweepTest)
         {
@@ -99,14 +99,14 @@ ContactType PhysicsAIBall::Contact(
                 = (PhysicsCharacter*)obj->m_parentObject;
             cFielder* pFielder = (cFielder*)physicsCharacter->m_pAICharacter;
 
-            if (pFielder->m_eClassType == 3)
+            if (pFielder->m_eClassType == GOALIE)
             {
                 if (!mbBallSpeedBelowSweepTestThreshold || !mbCanCollideGoalie)
                 {
                     return NO_CONTACT;
                 }
             }
-            else if (pFielder->m_eClassType == 2)
+            else if (pFielder->m_eClassType == FIELDER)
             {
                 if (!mbHasHitPlayer && pFielder != m_pAIBall->m_pShooter
                     && !mbCanCollidePlayer)
@@ -132,7 +132,7 @@ ContactType PhysicsAIBall::Contact(
             return NO_CONTACT;
         }
 
-        if (objID == 0x17 || objID == 5)
+        if (objID == PHYSOBJ_WALL || objID == PHYSOBJ_ROUNDED_CORNER)
         {
             if (mbIsInsideNet)
             {
@@ -157,7 +157,7 @@ ContactType PhysicsAIBall::Contact(
             {
                 if (m_pAIBall->HasActivePassTarget()
                     || m_pAIBall->m_tShotTimer.m_uPackedTime != 0
-                    || m_pAIBall->meBallState == 1)
+                    || m_pAIBall->meBallState == BALL_STATE_CLEARING)
                 {
                     return NO_CONTACT;
                 }
@@ -175,14 +175,14 @@ ContactType PhysicsAIBall::Contact(
                 pContact++;
             }
 
-            if (hitWall || objID == 5)
+            if (hitWall || objID == PHYSOBJ_ROUNDED_CORNER)
             {
                 nlVector3 contactPos;
                 nlVec3Set(contactPos, info->geom.pos[0], info->geom.pos[1],
                     info->geom.pos[2]);
 
-                if (GameInfoManager::Instance()->GetStadium() == 11
-                    && objID == 0x17)
+                if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
+                    && objID == PHYSOBJ_WALL)
                 {
                     bool bAboveHeight = contactPos.z > 0.36f;
                     float sideDist = fabsf(contactPos.y) - GetRadius();
@@ -230,7 +230,7 @@ ContactType PhysicsAIBall::Contact(
                 }
             }
         }
-        else if (objID == 7)
+        else if (objID == PHYSOBJ_FINITEPLANE)
         {
             if (!mbIsInsideNet)
             {
@@ -250,7 +250,7 @@ ContactType PhysicsAIBall::Contact(
                 info->surface.soft_cfm = PhysicsNet::sfWallSoftness;
             }
         }
-        else if (objID == 0x12)
+        else if (objID == PHYSOBJ_GROUND_PLANE)
         {
             nlVector3 v3IncidentVel = GetLinearVelocity();
             if (m_pAIBall->m_tNoPickupTimer.m_uPackedTime == 0

@@ -63,8 +63,8 @@ bool cAIPad::IsWiiController() const
 {
     if (m_pGlobalPad != 0)
     {
-        if (m_pGlobalPad->GetControllerType() == 1
-            || m_pGlobalPad->GetControllerType() == 2)
+        if (m_pGlobalPad->GetControllerType() == DET_CONTROLLER_WII_REMOTE
+            || m_pGlobalPad->GetControllerType() == DET_CONTROLLER_WII_FREESTYLE)
         {
             return true;
         }

@@ -7,6 +7,29 @@
 
 #include <string.h>
 
+enum eNetworkStatsReportState
+{
+    STATS_REPORT_IDLE = 0,
+    STATS_REPORT_SEND_QUERY = 1,
+    STATS_REPORT_RECEIVE_QUERY = 2,
+    STATS_REPORT_SEND_RESULT = 3,
+    STATS_REPORT_WAIT_CLOSE = 4,
+};
+
+enum eNetworkRankingOperation
+{
+    RANKING_OP_IDLE = 0,
+    RANKING_OP_PUT_SCORE = 1,
+    RANKING_OP_GET_SCORE = 2,
+};
+
+enum eNetworkRankingFilter
+{
+    RANKING_FILTER_NEARBY = 0,
+    RANKING_FILTER_FRIENDS = 1,
+    RANKING_FILTER_TOP = 2,
+};
+
 struct NetworkStatsPlayer
 {
     NetworkStatsPlayer()
@@ -132,7 +155,7 @@ public:
 
     /* 0x004 */ NetworkStatsListener* mListener;
     /* 0x008 */ NetworkStatsSocket mSocket;
-    /* 0x00C */ int mState;
+    /* 0x00C */ eNetworkStatsReportState mState;
     /* 0x010 */ int mFilter;
     /* 0x014 */ int mLimit;
     /* 0x018 */ NetworkStatsPlayer* mLeaderboardPlayers;
@@ -216,7 +239,7 @@ public:
     /* 0x004 */ bool mInitialized;
     /* 0x005 */ bool mRequestFailed;
     /* 0x006 */ u8 mPadding006[2];
-    /* 0x008 */ int mOperation;
+    /* 0x008 */ eNetworkRankingOperation mOperation;
     /* 0x00C */ NetworkStatsListener* mListener;
     /* 0x010 */ NetworkRankingSubmission mSubmission;
     /* 0x090 */ bool mSubmittingScore;

@@ -29,14 +29,26 @@ struct AudioSourceInfo
     AudioBankLoader* m_BankLoader;
 };
 
+enum eAudioSourceState
+{
+    AUDIO_SOURCE_UNINITIALIZED = 0,
+    AUDIO_SOURCE_IDLE = 1,
+    AUDIO_SOURCE_PREPARING = 2,
+    AUDIO_SOURCE_PREPARED = 3,
+    AUDIO_SOURCE_PLAYING = 4,
+    AUDIO_SOURCE_START_PENDING = 5,
+    AUDIO_SOURCE_STOPPING = 6,
+    AUDIO_SOURCE_PAUSED = 7,
+};
+
 class AudioSource
 {
 public:
     AudioSource()
     {
-        m_State = 0;
+        m_State = AUDIO_SOURCE_UNINITIALIZED;
         m_SourceInfo = 0;
-        m_InternalState = 0;
+        m_InternalState = AUDIO_SOURCE_UNINITIALIZED;
         m_PlayCount = 0;
         m_PlayIteration = 1;
         m_ControllerSpeakerEnabled = 0;
@@ -70,10 +82,10 @@ public:
 
     void SetControllerSpeaker(bool, unsigned int);
 
-    /* 0x04 */ int m_State;
+    /* 0x04 */ eAudioSourceState m_State;
     /* 0x08 */ AudioSourceInfo* m_SourceInfo;
     /* 0x0C */ float m_SampleRateRatio;
-    /* 0x10 */ int m_InternalState;
+    /* 0x10 */ eAudioSourceState m_InternalState;
     /* 0x14 */ unsigned int m_PlayCount : 12;
     unsigned int m_PlayIteration : 12;
     unsigned int m_ControllerSpeakerEnabled : 1;
@@ -207,7 +219,7 @@ public:
     unsigned int m_StreamEndPosition : 24;
     bool m_EndAddressSet : 1;
     /* 0x24 */ AudioReadQueueEntry* m_ReadQueue;
-    /* 0x28 */ int m_PendingState;
+    /* 0x28 */ eAudioSourceState m_PendingState;
 };
 
 void SetVoiceInputVolume(AXVPB*, float);

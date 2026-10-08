@@ -8,6 +8,13 @@
 #include "Game/DB/UserOptions.h"
 #include "types.h"
 
+enum eCupRoundType
+{
+    CUP_ROUND_LEAGUE = 0,
+    CUP_ROUND_KNOCKOUT = 1,
+    CUP_ROUND_FINALS = 2,
+};
+
 struct BaseCup
 {
     bool IsHumanTeam(eTeamID team) const { return (mHumanTeams & (1 << team)) != 0; }
@@ -15,7 +22,7 @@ struct BaseCup
     BaseCup()
         : mUserSelectedTeam(-1)
         , mUserSelectedSidekick()
-        , mRoundType(0)
+        , mRoundType(CUP_ROUND_LEAGUE)
         , mRoundNumber(0)
         , mGameNumber(0)
         , mHumanTeams(0)
@@ -95,13 +102,13 @@ struct Cup : public BaseCup
         BasicGameInfo* result = 0;
         switch (phase)
         {
-        case 0:
+        case CUP_ROUND_LEAGUE:
         {
             int index = matchup + round * Teams / 2;
             result = &mGameInfo[0][index];
             break;
         }
-        case 1:
+        case CUP_ROUND_KNOCKOUT:
         {
             int index = (Rounds - 2) * (Teams / 2) + Teams - 4;
             if (round != (Teams == 4 ? 0 : Teams == 6 ? 1 : 2))
@@ -118,7 +125,7 @@ struct Cup : public BaseCup
             result = &mGameInfo[0][index];
             break;
         }
-        case 2:
+        case CUP_ROUND_FINALS:
         {
             int index = Rounds * (Teams / 2) - (3 - round);
             result = &mGameInfo[0][index];
@@ -141,15 +148,15 @@ struct Cup : public BaseCup
     }
     virtual u16 GetNumRoundsForType(int phase)
     {
-        if (phase == 0)
+        if (phase == CUP_ROUND_LEAGUE)
         {
             return Rounds - 2;
         }
-        if (phase == 1)
+        if (phase == CUP_ROUND_KNOCKOUT)
         {
             return Teams == 4 ? 1 : Teams == 6 ? 2 : 3;
         }
-        if (phase == 2)
+        if (phase == CUP_ROUND_FINALS)
         {
             return 3;
         }

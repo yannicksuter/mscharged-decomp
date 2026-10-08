@@ -451,6 +451,13 @@ void FESkinnedModel::Render()
     }
 }
 
+enum eFEImpostorMode
+{
+    FE_IMPOSTOR_DEFAULT = 0,
+    FE_IMPOSTOR_INITIAL_CUP = 1,
+    FE_IMPOSTOR_CUP = 2,
+};
+
 FEImpostorModel::~FEImpostorModel()
 {
     delete mCharacter;
@@ -709,11 +716,10 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
         params.mUseAdditiveBlend = 1;
         params.mUseIntensityAlpha = 0;
         params.mBaseAngle = 0xc000;
-        enum ModelType { Default, InitialCup, Cup };
-        ModelType modelType = Default;
+        eFEImpostorMode modelType = FE_IMPOSTOR_DEFAULT;
         if (GameInfoManager::Instance()->IsInMode3())
         {
-            modelType = CupManager::s_pInstance->GetCurrentMode() == -1 ? InitialCup : Cup;
+            modelType = CupManager::s_pInstance->GetCurrentMode() == -1 ? FE_IMPOSTOR_INITIAL_CUP : FE_IMPOSTOR_CUP;
         }
         impostorModel->mCharacter = new (8, false) FEImpostorCharacter(
             characterInfo.mName, impostorModel->mModel,
@@ -1045,10 +1051,10 @@ void FEImpostorCharacter::SetScale(float scale)
 {
     switch (mModelType)
     {
-    case 1:
+    case FE_IMPOSTOR_INITIAL_CUP:
         mfScaleInitialCup = scale;
         break;
-    case 2:
+    case FE_IMPOSTOR_CUP:
         mfScaleCup = scale;
         break;
     default:
@@ -1061,9 +1067,9 @@ float FEImpostorCharacter::GetScale()
 {
     switch (mModelType)
     {
-    case 1:
+    case FE_IMPOSTOR_INITIAL_CUP:
         return mfScaleInitialCup;
-    case 2:
+    case FE_IMPOSTOR_CUP:
         return mfScaleCup;
     default:
         return ImpostorCharacter::GetScale();
@@ -1074,9 +1080,9 @@ float FEImpostorCharacter::GetCameraDistance()
 {
     switch (mModelType)
     {
-    case 1:
+    case FE_IMPOSTOR_INITIAL_CUP:
         return mfCameraDistanceInitialCup;
-    case 2:
+    case FE_IMPOSTOR_CUP:
         return mfCameraDistanceCup;
     default:
         return ImpostorCharacter::GetCameraDistance();
@@ -1087,9 +1093,9 @@ float FEImpostorCharacter::GetCameraLookatZ()
 {
     switch (mModelType)
     {
-    case 1:
+    case FE_IMPOSTOR_INITIAL_CUP:
         return mfCameraLookatZInitialCup;
-    case 2:
+    case FE_IMPOSTOR_CUP:
         return mfCameraLookatZCup;
     default:
         return ImpostorCharacter::GetCameraLookatZ();

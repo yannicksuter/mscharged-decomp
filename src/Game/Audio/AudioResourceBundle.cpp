@@ -95,13 +95,13 @@ AudioResourceBundle* ParseAudioResourceBundle(nlChunk* outer)
             eventIndex < sequence->eventCount;
             eventIndex++, event++)
         {
-            if (event->type == 1)
+            if (event->type == AUDIO_EVENT_SOUND)
                 event->sound = (SoundEventDefinition*)((u8*)event->sound
                                                        + soundEventOffset);
-            else if (event->type == 3)
+            else if (event->type == AUDIO_EVENT_MARKER)
                 event->hitMarker = (HitMarkerEventDefinition*)((u8*)event->hitMarker
                                                                + hitMarkerEventOffset);
-            else if (event->type == 2)
+            else if (event->type == AUDIO_EVENT_PARAMETER)
                 event->parameter = (ParameterChangeEventDefinition*)((u8*)event->parameter
                                                                      + parameterEventOffset);
         }
@@ -124,7 +124,7 @@ AudioResourceBundle* ParseAudioResourceBundle(nlChunk* outer)
 AudioVoiceDefinition* SelectAudioCueVoice(AudioCueDefinition* cue)
 {
     AudioCueEntry* selected = 0;
-    if (cue->selectionMode == -1)
+    if (cue->selectionMode == AUDIO_CUE_DISABLED)
         return 0;
     if (cue->voiceCount == 0)
         return 0;
@@ -133,8 +133,8 @@ AudioVoiceDefinition* SelectAudioCueVoice(AudioCueDefinition* cue)
     {
         selected = cue->voices;
     }
-    else if (cue->selectionMode == 0
-             || (cue->selectionMode == 1 && cue->selectedVoiceIndex != 0xFFFF))
+    else if (cue->selectionMode == AUDIO_CUE_SEQUENTIAL
+             || (cue->selectionMode == AUDIO_CUE_RANDOM_START && cue->selectedVoiceIndex != 0xFFFF))
     {
         if (cue->selectedVoiceIndex == 0xFFFF)
             selected = cue->voices;
@@ -149,7 +149,7 @@ AudioVoiceDefinition* SelectAudioCueVoice(AudioCueDefinition* cue)
     else
     {
         float totalWeight = 0.0f;
-        if (cue->selectionMode == 3)
+        if (cue->selectionMode == AUDIO_CUE_RANDOM_NO_REPEAT)
         {
             u32 i;
             AudioCueEntry* entry = cue->voices;
@@ -166,7 +166,7 @@ AudioVoiceDefinition* SelectAudioCueVoice(AudioCueDefinition* cue)
                 }
             }
         }
-        else if (cue->selectionMode == 1 || cue->selectionMode == 2)
+        else if (cue->selectionMode == AUDIO_CUE_RANDOM_START || cue->selectionMode == AUDIO_CUE_RANDOM)
         {
             AudioCueEntry* entry = cue->voices;
             for (u32 i = 0; i < cue->voiceCount; i++, entry++)
@@ -175,7 +175,7 @@ AudioVoiceDefinition* SelectAudioCueVoice(AudioCueDefinition* cue)
                 totalWeight += entry->weight;
             }
         }
-        else if (cue->selectionMode == 4)
+        else if (cue->selectionMode == AUDIO_CUE_SHUFFLE)
         {
             if (cue->selectedVoiceIndex != 0xFFFF)
             {

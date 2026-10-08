@@ -890,7 +890,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         int value = m_SP[-1];
         m_SP[-1] = IsTeamInCurrentGame(value);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -900,7 +900,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         int value = m_SP[-1];
         m_SP[-1] = GameInfoManager::Instance()->GetStadium() == value;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -910,7 +910,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         eSidekickID value = (eSidekickID)m_SP[-1];
         m_SP[-1] = IsSidekickInCurrentGame(value);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -1416,7 +1416,7 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "FE"));
     manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
-    if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_3)
+    if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_CUP)
     {
         CupManager::Instance()->AdvanceToNextUserGame();
     }
@@ -1471,7 +1471,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         {
             GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
             FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
-            GameInfoManager::Instance()->SetMode(GameInfoManager::GM_MODE_2, 0);
+            GameInfoManager::Instance()->SetMode(GameInfoManager::GM_DEMO, 0);
         }
         else if (GameInfoManager::Instance()->IsInFriendlyMode())
         {
@@ -1704,7 +1704,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
     gDispatchEventsTask->dispatcher.Dispatch(true);
-    if (g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         if (gNetworkInputRecording->mPlaybackEnabled)
         {
@@ -1839,7 +1839,7 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
         presentation->mLetterBoxDuration = 0.0f;
     }
     g_pOverlayManager->Push((SceneList)0x5F, SCREEN_NOTHING, false)->SetVisible(false);
-    if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_2)
+    if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_DEMO)
     {
         g_pOverlayManager->Push((SceneList)0x60, SCREEN_NOTHING, false);
     }
@@ -2231,7 +2231,7 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
     manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
-    GameInfoManager::Instance()->SetMode(0, 0);
+    GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, 0);
     GameInfoManager::Instance()->mCurrentDifficulty[0] = 2;
     GameInfoManager::Instance()->mCurrentDifficulty[1] = 2;
     GameInfoManager::Instance()->SetupGameFromConfig();

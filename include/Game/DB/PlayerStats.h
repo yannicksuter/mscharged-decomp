@@ -6,11 +6,31 @@
 enum eTeamID
 {
     TEAM_INVALID = -1,
+    TEAM_MARIO = 0,
+    TEAM_BOWSER = 1,
+    TEAM_DAISY = 2,
+    TEAM_DONKEYKONG = 3,
+    TEAM_LUIGI = 4,
+    TEAM_PEACH = 5,
+    TEAM_WALUIGI = 6,
+    TEAM_WARIO = 7,
+    TEAM_YOSHI = 8,
+    TEAM_BOWSERJR = 9,
+    TEAM_DIDDYKONG = 10,
+    TEAM_PETEY = 11,
 };
 
 enum eSidekickID
 {
     SK_INVALID = -1,
+    SK_TOAD = 0,
+    SK_KOOPA = 1,
+    SK_HAMMERBROS = 2,
+    SK_BIRDO = 3,
+    SK_BOO = 4,
+    SK_DRYBONES = 5,
+    SK_MONTYMOLE = 6,
+    SK_SHYGUY = 7,
 };
 
 enum eType

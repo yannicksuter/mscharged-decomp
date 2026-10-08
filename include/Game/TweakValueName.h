@@ -14,13 +14,13 @@ public:
         mName = name;
     }
     static void* operator new(unsigned long size) { return nlMalloc(size, 8, false); }
-    virtual int GetValueType() { return 1; }
+    virtual int GetValueType() { return TWEAK_TYPE_FOLDER; }
     virtual int ReservedNameQueryA() { return 1; }
     virtual int ReservedNameQueryB() { return 0; }
     virtual void FormatValue(char*, unsigned long) { }
     virtual void ParseValue(const char*) { }
     virtual void CopyValueFrom(TweakValueBase*) { }
-    virtual int GetStorageKind() { return 3; }
+    virtual int GetStorageKind() { return TWEAK_STORAGE_FOLDER; }
     virtual void* GetValueAddress() { return 0; }
 }; // size: 0x0C
 

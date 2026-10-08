@@ -76,8 +76,8 @@ ReplayCamera::ReplayCamera()
     mNoDampenLookAtForOneUpdate = false;
     mFrozen = false;
     mPositionFrozen = false;
-    mFocus = 0;
-    mSecondaryFocus = 0;
+    mFocus = REPLAY_FOCUS_BALL;
+    mSecondaryFocus = REPLAY_FOCUS_BALL;
     mCamPos = REPLAY_CAMERA_POSITION_SIDELINE;
     mAutoFov = false;
     mAutoFovMin = -1.0f;
@@ -340,25 +340,25 @@ nlVector3 ReplayCamera::GetClampedFocusPosition(const nlVector3& position,
 /**
  * Offset/Address/Size: 0x26D8 | 0x800F6B40 | size: 0x310
  */
-nlVector3 ReplayCamera::GetFocusPosition(int focus) const
+nlVector3 ReplayCamera::GetFocusPosition(eReplayCameraFocus focus) const
 {
     RenderSnapshot* render = ReplayManager::Instance()->mRender;
     nlVector3 result = { 0.0f, 0.0f, 0.0f };
 
     switch (focus)
     {
-    case 0:
+    case REPLAY_FOCUS_BALL:
         result = render->mBall.mPosition;
         result.z += 0.35f;
         break;
-    case 3:
+    case REPLAY_FOCUS_GOALIE:
     {
         cCharacter* goalie = mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9];
         result = goalie->m_DetChar.m_v3Position;
         result.z = 1.0f;
         break;
     }
-    case 1:
+    case REPLAY_FOCUS_CURRENT_OR_LAST_OWNER:
     {
         DrawableCharacter* player = render->mBall.IndexToPlayer(render->mBall.mFlags.bits.ownerIndex);
         if (player != NULL && player->character != NULL
@@ -387,7 +387,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
         }
         break;
     }
-    case 2:
+    case REPLAY_FOCUS_NET:
     {
         nlVector3 netPos = { 0.0f, 0.0f, 1.0f };
         netPos.x = cField::GetGoalLineX(GetSideDirection(mSideOfInterest));
@@ -398,7 +398,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
         result = netPos;
         break;
     }
-    case 4:
+    case REPLAY_FOCUS_CAPTAIN:
     {
         cPlayer* goalie = (cPlayer*)(mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9]);
         cFielder* captain = goalie->m_pTeam->GetCaptain();
@@ -406,7 +406,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
         result.z = 1.0f;
         break;
     }
-    case 5:
+    case REPLAY_FOCUS_ORIGIN:
         nlVec3Set(result, 0.0f, 0.0f, 0.0f);
         break;
     }

@@ -87,10 +87,10 @@ bool FEAudio::IsSoundFinished(unsigned long cueId, void* context)
 
     switch (handle->m_State)
     {
-    case 2:
-    case 3:
-    case 4:
-    case 5:
+    case SOUND_HANDLE_PREPARING:
+    case SOUND_HANDLE_PREPARED:
+    case SOUND_HANDLE_PLAYING:
+    case SOUND_HANDLE_PAUSED:
         return false;
     default:
         return true;

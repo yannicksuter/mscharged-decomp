@@ -107,7 +107,7 @@ void SHOnlineHub::SceneCreated()
         scene->SetBackButtonText(1);
     }
     mBackButton.SetButtonInstance(done);
-    g_pNetworkSessionBase->SetSessionState(2);
+    g_pNetworkSessionBase->SetSessionState(NET_SESSION_MATCHMAKE);
     UpdateFriendAndSeasonText();
     UpdateLocalStats();
     UpdateStrikerOfTheDay();
@@ -150,7 +150,7 @@ void SHOnlineHub::Update(float dt)
             switch (mPressedItem)
             {
             case 0:
-                if (g_pNetworkSessionBase->GetSessionMode() == 2)
+                if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
                     GameSceneManager::Instance()->Push((SceneList)42, SCREEN_FORWARD, true);
                 break;
             case 1: GameSceneManager::Instance()->Push((SceneList)41, SCREEN_FORWARD, true); break;
@@ -226,7 +226,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
 {
     int friends = 0;
     int online = 0;
-    if (g_pNetworkSessionBase->GetSessionMode() == 1)
+    if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LAN)
         return;
     for (int i = 0; i < 64; ++i)
     {
@@ -384,7 +384,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
     switch (item)
     {
     case 0:
-        if (g_pNetworkSessionBase->GetSessionMode() == 2)
+        if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
         {
             if (g_pFriendManager->CountBuddies() > 0)
                 change = true;
@@ -399,7 +399,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
         change = true;
         break;
     case 3:
-        if (g_pNetworkSessionBase->GetSessionMode() == 2)
+        if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
             change = true;
         break;
     case 4:

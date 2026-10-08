@@ -16,6 +16,7 @@ public:
         BS_A_ONLY = 1,
         BS_B_ONLY = 2,
         BS_A_AND_B_AND_Y = 3,
+        BS_A_AND_B_AND_START = 4,
     };
 
     ButtonComponent();

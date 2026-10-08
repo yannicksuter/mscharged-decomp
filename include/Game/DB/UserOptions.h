@@ -12,6 +12,41 @@ public:
     /* 0x4 */ float mCameraZoomLevel;
 };
 
+enum eEnvironmentCheat
+{
+    ENV_CHEAT_NONE = 0,
+    ENV_CHEAT_SECURE = 1,
+    ENV_CHEAT_POWER = 2,
+    ENV_CHEAT_VOLTAGE = 3,
+    ENV_CHEAT_TILT = 4,
+    ENV_CHEAT_WHITE_BALL = 5,
+};
+
+enum ePlayerCheat
+{
+    PLAYER_CHEAT_NONE = 0,
+    PLAYER_CHEAT_DEVASTATING = 1,
+    PLAYER_CHEAT_SAFE = 2,
+    PLAYER_CHEAT_SKILL_SHOT = 3,
+    PLAYER_CHEAT_GLASS_JAW = 4,
+};
+
+enum ePowerupCheat
+{
+    POWERUP_CHEAT_NONE = 0,
+    POWERUP_CHEAT_EXPLOSIVES = 1,
+    POWERUP_CHEAT_FREEZING = 2,
+    POWERUP_CHEAT_SHELLS = 3,
+    POWERUP_CHEAT_GIANT = 4,
+    POWERUP_CHEAT_ACCELERATOR = 5,
+    POWERUP_CHEAT_PEELIN_OUT = 6,
+    POWERUP_CHEAT_HEAT_SEEKERS = 7,
+    POWERUP_CHEAT_BOMBS_AWAY = 8,
+    POWERUP_CHEAT_SUPER = 9,
+    POWERUP_CHEAT_INFINITE = 10,
+    POWERUP_CHEAT_BUTTERFINGERS = 11,
+};
+
 class CheatSettings
 {
 public:
@@ -26,6 +61,12 @@ public:
     /* 0x0 */ int mCustomPowerups;
     /* 0x4 */ int mEnvironmentCheat;
     /* 0x8 */ int mPlayerCheat;
+};
+
+enum eGameLimitType
+{
+    GAME_LIMIT_TIME = 0,
+    GAME_LIMIT_GOALS = 1,
 };
 
 class GameplaySettings
@@ -45,7 +86,7 @@ public:
     void OnSettingsUpdated() const;
 
     /* 0x00 */ eSkillLevel SkillLevel;
-    /* 0x04 */ int GameLimitType;
+    /* 0x04 */ eGameLimitType GameLimitType;
     /* 0x08 */ int GameTime;
     /* 0x0C */ int GoalLimit;
     /* 0x10 */ int NumGames;

@@ -26,13 +26,22 @@
 
 
 
+enum eCreditsPhase
+{
+    CREDITS_NINTENDO_LOGO = 0,
+    CREDITS_NLG_INTRO = 1,
+    CREDITS_SCROLL = 2,
+    CREDITS_COPYRIGHT = 3,
+    CREDITS_FINISHED = 4,
+};
+
 SceneList CreditScene::mNextScene = (SceneList)13;
 
 CreditScene::CreditScene()
     : mAreCreditsOver(false)
     , mFinalMessageDisplayed(false)
     , mFadeStarted(false)
-    , mPhase(0)
+    , mPhase(CREDITS_NINTENDO_LOGO)
 {
     SetPointerEnabled(0);
     mTimeElapsed = 0.0f;
@@ -62,18 +71,18 @@ void CreditScene::Update(float fDeltaT)
 {
     switch (mPhase)
     {
-    case 2:
+    case CREDITS_SCROLL:
         UpdateForCredits(fDeltaT);
         break;
-    case 3:
+    case CREDITS_COPYRIGHT:
         BaseSceneHandler::Update(fDeltaT);
         UpdateForCopyrightMessage(fDeltaT);
         break;
-    case 0:
+    case CREDITS_NINTENDO_LOGO:
         BaseSceneHandler::Update(fDeltaT);
         UpdateForNintendoLogo(fDeltaT);
         break;
-    case 1:
+    case CREDITS_NLG_INTRO:
         MoviePlayerScene::Update(fDeltaT);
         break;
     }
@@ -95,7 +104,7 @@ void CreditScene::SetupForPhase()
 
     switch (mPhase)
     {
-    case 1:
+    case CREDITS_NLG_INTRO:
         if (IsWidescreen())
         {
             mPresentation->SetActiveSlide("NLG", true);
@@ -117,22 +126,22 @@ void CreditScene::SetupForPhase()
             pStadium->m_bRenderingEnabled = false;
         }
         break;
-    case 0:
+    case CREDITS_NINTENDO_LOGO:
         mPresentation->SetActiveSlide("NINTENDO", true);
         mPresentation->m_currentSlide->Update(0.0f);
         FEAudio::PlayAnimAudioEvent(0xF394C076, 0, 0, 1);
         BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
-    case 2:
+    case CREDITS_SCROLL:
         SetupForCredits();
         BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
-    case 3:
+    case CREDITS_COPYRIGHT:
         mPresentation->SetActiveSlide("COPYRIGHTS", true);
         mPresentation->m_currentSlide->Update(0.0f);
         BasicStadium::GetCurrentStadium()->m_bRenderingEnabled = false;
         break;
-    case 4:
+    case CREDITS_FINISHED:
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
         GameSceneManager::Instance()->Push(mNextScene, SCREEN_NOTHING, true);
         if (mNextScene == (SceneList)13)

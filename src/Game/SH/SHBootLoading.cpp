@@ -211,7 +211,7 @@ void BootLoadingScene::Update(float fDeltaT)
         if (slide->GetCurrentTime() >= slide->GetStartTime() + slide->GetDuration())
         {
             mElapsedTime = 0.0f;
-            if (GetRegion() == 0)
+            if (GetRegion() == GAME_REGION_US)
                 mPhase = PhaseRatings;
             else
                 mPhase = PhaseDeveloperLogo;

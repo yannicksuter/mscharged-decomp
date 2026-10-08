@@ -6,6 +6,14 @@
 
 class cGlobalPad;
 
+enum eDetControllerType
+{
+    DET_CONTROLLER_DISCONNECTED = 0,
+    DET_CONTROLLER_WII_REMOTE = 1,
+    DET_CONTROLLER_WII_FREESTYLE = 2,
+    DET_CONTROLLER_GAMECUBE = 3,
+};
+
 class DetInput
 {
 public:

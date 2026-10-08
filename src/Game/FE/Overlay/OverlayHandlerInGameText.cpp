@@ -200,7 +200,7 @@ void InGameTextOverlay::DisplayFinalScore()
             = LookupLocHash(GetLOCTeamName(winningTeam));
         WideString winnerNameWideString(winnerNameLookup);
 
-        if (winningTeam == (eTeamID)0)
+        if (winningTeam == TEAM_MARIO)
         {
             const unsigned short* const& spaceCharacters = (const unsigned short*)L" ";
             WideString space(spaceCharacters);
@@ -230,9 +230,9 @@ void InGameTextOverlay::DisplayFinalScore()
             WINNER_SLIDE_NAME, OVERLAY_HANDLER_LAYER_NAME, "right_face");
         pComponentInstance->SetActiveSlide(TEAM_SLIDE_NAMES[team], true, false);
 
-        if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode != 0)
+        if (nlSingleton<GameInfoManager>::Instance()->mCurrentMode != GameInfoManager::GM_FRIENDLY)
         {
-            if (g_pGame->m_eGameState == 6)
+            if (g_pGame->m_eGameState == GS_OVERTIME)
             {
                 StatsTracker::Track(STATS_OT_WIN, winningSide, 0,
                     scoreLeft, scoreRight, 0, 0);

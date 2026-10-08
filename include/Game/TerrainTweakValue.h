@@ -63,34 +63,34 @@ public:
         mFormatName = true;
     }
 
-    virtual int GetValueType() { return 4; }
-    virtual int GetStorageKind() { return 1; }
+    virtual int GetValueType() { return TWEAK_TYPE_UINT; }
+    virtual int GetStorageKind() { return TWEAK_STORAGE_OWNED; }
     virtual void* ReservedValueQuery() { return 0; }
     virtual void* GetValueAddress() { return &mValue; }
     virtual void CopyValueFrom(TweakValueBase* other)
     {
-        if (other->GetValueType() == 4)
+        if (other->GetValueType() == TWEAK_TYPE_UINT)
         {
             switch (other->GetStorageKind())
             {
-            case 1:
+            case TWEAK_STORAGE_OWNED:
                 mValue = ((TerrainTweakValue*)other)->mValue;
                 break;
-            case 2:
+            case TWEAK_STORAGE_BINDING:
                 mValue = *((TweakIntBinding*)other)->m_pValue;
                 break;
             }
         }
 
-        if (other->GetValueType() == 8)
+        if (other->GetValueType() == TWEAK_TYPE_STRING)
         {
             const char* value = 0;
             switch (other->GetStorageKind())
             {
-            case 1:
+            case TWEAK_STORAGE_OWNED:
                 value = ((TweakValueString*)other)->m_Value;
                 break;
-            case 2:
+            case TWEAK_STORAGE_BINDING:
                 value = *(const char**)((TweakFloatBinding*)other)->m_pValue;
                 break;
             }

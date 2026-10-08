@@ -226,7 +226,7 @@ bool IsDrawablePowerup(ePowerUpType eType)
 
 bool IsCaptainPowerup(int nType)
 {
-    return nType >= NUM_POWER_UPS && nType <= 20;
+    return nType >= NUM_POWER_UPS && nType <= POWER_UP_PETEY;
 }
 
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
@@ -1211,7 +1211,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 
     int nChanceForChainChomp
         = lbl_806DBE14 + (int)(nDifference * lbl_806DBE18);
-    if (nChanceForChainChomp < 0 || g_pGame->m_eGameState == 6)
+    if (nChanceForChainChomp < 0 || g_pGame->m_eGameState == GS_OVERTIME)
     {
         nChanceForChainChomp = 0;
     }
@@ -1242,7 +1242,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     }
 
     if (!gNPCManager->mpChainChomp->IsHidden()
-        || g_pGame->mpWeatherManager->GetWeather(7))
+        || g_pGame->mpWeatherManager->GetWeather(WEATHER_SAND_TOMB))
     {
         nChanceForChainChomp = 0;
     }
@@ -1311,23 +1311,23 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 
     switch (GameInfoManager::Instance()->GetRule0x0())
     {
-    case 1:
+    case POWERUP_CHEAT_EXPLOSIVES:
         nChanceForChainChomp = nChanceForStar = nChanceForMushroom
             = nChanceForFreezeShell = nChanceForCaptainPowerup = 0;
         powerUpType = POWER_UP_BOBOMB;
         break;
-    case 2:
+    case POWERUP_CHEAT_FREEZING:
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBanana
             = nChanceForBoBomb = nChanceForMushroom
             = nChanceForGreenShell = 0;
         powerUpType = POWER_UP_FREEZE_SHELL;
         break;
-    case 4:
+    case POWERUP_CHEAT_GIANT:
         nChanceForStar = nChanceForCaptainPowerup = nChanceForMushroom = 0;
         powerUpType = POWER_UP_GREEN_SHELL;
         break;
-    case 3:
+    case POWERUP_CHEAT_SHELLS:
         nChanceForChainChomp = nChanceForStar = nChanceForBanana
             = nChanceForBoBomb = nChanceForCaptainPowerup
             = nChanceForMushroom = 0;
@@ -1335,13 +1335,13 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             ? POWER_UP_RED_SHELL
             : POWER_UP_GREEN_SHELL;
         break;
-    case 5:
+    case POWERUP_CHEAT_ACCELERATOR:
         nChanceForChainChomp = nChanceForSpinyShell = nChanceForRedShell
             = nChanceForBanana = nChanceForBoBomb = nChanceForGreenShell
             = nChanceForCaptainPowerup = nChanceForFreezeShell = 0;
         powerUpType = POWER_UP_MUSHROOM;
         break;
-    case 6:
+    case POWERUP_CHEAT_PEELIN_OUT:
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBoBomb
             = nChanceForGreenShell = nChanceForFreezeShell = 0;
@@ -1349,20 +1349,20 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
             ? POWER_UP_BANANA
             : POWER_UP_MUSHROOM;
         break;
-    case 7:
+    case POWERUP_CHEAT_HEAT_SEEKERS:
         nChanceForStar = nChanceForCaptainPowerup = nChanceForSpinyShell
             = nChanceForBanana = nChanceForMushroom = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
         powerUpType = POWER_UP_RED_SHELL;
         break;
-    case 8:
+    case POWERUP_CHEAT_BOMBS_AWAY:
         nChanceForChainChomp = nChanceForStar = nChanceForCaptainPowerup
             = nChanceForSpinyShell = nChanceForRedShell = nChanceForBanana
             = nChanceForMushroom = nChanceForGreenShell
             = nChanceForFreezeShell = 0;
         powerUpType = POWER_UP_BOBOMB;
         break;
-    case 9:
+    case POWERUP_CHEAT_SUPER:
         nChanceForChainChomp = nChanceForStar = nChanceForSpinyShell
             = nChanceForRedShell = nChanceForBanana = nChanceForMushroom
             = nChanceForBoBomb = nChanceForGreenShell
@@ -1535,7 +1535,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
 
     if (pTeam->SetCurrentPowerUp(powerUpType, nNumOfPowerups))
     {
-        if (g_pGame->m_eGameState == 1
+        if (g_pGame->m_eGameState == GS_KICKOFF
             && GameInfoManager::Instance()->IsInMode4())
         {
             int mode = g_pStrikerChallenge->mCurrentChallenge;
@@ -1594,10 +1594,10 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     int type = pObjB->GetObjectType();
     switch (type)
     {
-    case 0x04:
+    case PHYSOBJ_COLUMN:
         pCharacter = ((PhysicsCharacter*)pObjB->m_parentObject)->m_pAICharacter;
         break;
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* pBall = ((PhysicsAIBall*)pObjB)->m_pAIBall;
         if (pBall->m_bVisible != 0)
@@ -1617,7 +1617,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         }
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         if (((PhysicsShell*)pObjB)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
         {
@@ -1663,7 +1663,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
         }
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         PowerupBase* pOther = ((PhysicsBanana*)pObjB)->m_pPowerupObject;
         if (pOther->m_unk44.m_uPackedTime != 0)
@@ -1694,7 +1694,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
     {
         Bobomb* pBobomb = (Bobomb*)pObj;
         if (pObj->m_eType == POWER_UP_BOBOMB
-            && pObjB->GetObjectType() == 0x12
+            && pObjB->GetObjectType() == PHYSOBJ_GROUND_PLANE
             && !pBobomb->mbIsMine)
         {
             pBobomb->mbIsMine = true;
@@ -2170,11 +2170,11 @@ void PowerupBase::fn_8009D500()
     }
 
     u8 allowOutOfBoundsFall = false;
-    if (m_pPhysicsObject->GetObjectType() == 0x15)
+    if (m_pPhysicsObject->GetObjectType() == PHYSOBJ_BANANA)
     {
         allowOutOfBoundsFall = ((PhysicsBanana*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }
-    else if (m_pPhysicsObject->GetObjectType() == 0x14)
+    else if (m_pPhysicsObject->GetObjectType() == PHYSOBJ_SHELL)
     {
         allowOutOfBoundsFall = ((PhysicsShell*)m_pPhysicsObject)->m_bAllowOutOfBoundsFall;
     }
@@ -2907,7 +2907,7 @@ void FreezeShell::Destroy(bool bSilent)
  */
 void UpdateBobombEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

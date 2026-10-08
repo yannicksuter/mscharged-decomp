@@ -21,27 +21,27 @@ PhysicsObject* CreatePhysicsPrimitive(
     PhysicsObject* pPhysicsObject = 0;
     switch (pDescription->uPrimitiveType)
     {
-    case 0:
+    case PHYS_PRIMITIVE_BOX:
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsBox), 8, false)) PhysicsBox(
                 pCollisionSpace, 0, pDescription->fLength,
                 pDescription->fWidth, pDescription->fHeight);
         pPhysicsObject->SetWorldMatrix(pDescription->matLocalToParent);
         break;
-    case 1:
+    case PHYS_PRIMITIVE_SPHERE:
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsSphere), 8, false)) PhysicsSphere(
                 pCollisionSpace, 0, pDescription->fRadius);
         pPhysicsObject->SetWorldMatrix(pDescription->matLocalToParent);
         break;
-    case 2:
+    case PHYS_PRIMITIVE_CAPSULE:
         pPhysicsObject
             = new (nlMalloc(sizeof(PhysicsCapsule), 8, false))
                 PhysicsCapsule(pCollisionSpace, 0,
                     pDescription->fRadius, pDescription->fHeight);
         pPhysicsObject->SetWorldMatrix(pDescription->matLocalToParent);
         break;
-    case 4:
+    case PHYS_PRIMITIVE_FINITE_PLANE:
     {
         const nlMatrix4& transform = pDescription->matLocalToParent;
         nlVector3 position;
@@ -58,7 +58,7 @@ PhysicsObject* CreatePhysicsPrimitive(
             PhysicsFinitePlane(pCollisionSpace, position, axis0, axis1, true, -1.0f);
         break;
     }
-    case 6:
+    case PHYS_PRIMITIVE_PLANE:
     {
         const nlMatrix4& transform = pDescription->matLocalToParent;
         nlVector3 normal;

@@ -103,7 +103,7 @@ void SHOnlineInviteResponse::Update(float fDeltaT)
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
         SHOnlineInviteStatus* scene = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
-        scene->mStatus = 2;
+        scene->mStatus = INVITE_STATUS_CANCELED;
         scene->mReturnDelay = 2.0f;
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
         return;
@@ -191,7 +191,7 @@ void JoinOnlineFriendInvitation()
     g_pNetworkSession->GetOnlineLobby()->ConnectToFriendServer(index);
     GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
     SHOnlineInviteStatus* scene = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
-    scene->mStatus = 1;
+    scene->mStatus = INVITE_STATUS_ENTERING_LOBBY;
     scene->mReturnDelay = 0.0f;
 }
 
@@ -216,7 +216,7 @@ void SHOnlineInviteResponse::ApplySelectedAction()
         g_pFriendManager->SetOwnStatusDecline(g_pFriendManager->mHostInvitationIndex);
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
         SHOnlineInviteStatus* scene = (SHOnlineInviteStatus*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_INVITE_STATUS);
-        scene->mStatus = 3;
+        scene->mStatus = INVITE_STATUS_DECLINED;
         scene->mReturnDelay = 0.0f;
         tDebugPrintManager::Print(DC_NETWORK, "Respond invitation Decline\n");
         break;

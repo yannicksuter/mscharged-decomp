@@ -15,7 +15,7 @@ public:
     void SetRadius(float);
     void SetLength(float);
 
-    virtual int GetObjectType() const { return 3; }
+    virtual int GetObjectType() const { return PHYSOBJ_CYLINDER; }
 
 private:
     void SetParams(float radius, float length)

@@ -112,7 +112,7 @@ int AudioSequenceInstance::Update(float time)
     for (AudioSequenceEvent* event = events; event != 0;
         event = event->next)
     {
-        if (!stopped || event->state != 0)
+        if (!stopped || event->state != AUDIO_EVENT_INITIAL)
         {
             int state = event->Update(time);
             result = nlMin(result, state);

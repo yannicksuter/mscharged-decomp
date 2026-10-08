@@ -413,20 +413,20 @@ void OnCrowdRiotCollision(void* param)
 
     switch (object->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         PhysicsObject* parent = object->m_parentObject;
         cFielder* fielder
             = (cFielder*)((PhysicsCharacter*)parent)->m_pAICharacter;
         if (fielder->m_eClassType == FIELDER
             && fielder->m_eActionState != ACTION_SHOOT_TO_SCORE
-            && fielder->m_eActionState != ACTION_SHOT)
+            && fielder->m_eActionState != ACTION_MEGA_STRIKE)
         {
             fielder->fn_80043ADC();
         }
         break;
     }
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* ball = ((PhysicsAIBall*)object)->m_pAIBall;
         cPlayer* player = ball->m_pOwner;
@@ -447,13 +447,13 @@ void OnCrowdRiotCollision(void* param)
         }
         break;
     }
-    case 20:
+    case PHYSOBJ_SHELL:
         break;
-    case 21:
+    case PHYSOBJ_BANANA:
         ((PhysicsBanana*)object)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
-    case 24:
-    case 28:
+    case PHYSOBJ_NPC:
+    case PHYSOBJ_PATCH:
         break;
     }
 }
@@ -463,12 +463,12 @@ void QueueCrowdRiotCollision(PhysicsObject*, PhysicsObject* other,
 {
     switch (other->GetObjectType())
     {
-    case 4:
-    case 16:
-    case 20:
-    case 21:
-    case 24:
-    case 28:
+    case PHYSOBJ_COLUMN:
+    case PHYSOBJ_AI_BALL:
+    case PHYSOBJ_SHELL:
+    case PHYSOBJ_BANANA:
+    case PHYSOBJ_NPC:
+    case PHYSOBJ_PATCH:
     {
         CrowdRiot* crowdRiot = (CrowdRiot*)context;
         if (crowdRiot->meState != CrowdRiot::STATE_READY)

@@ -550,7 +550,7 @@ void EmitBallShot(cFielder* pCharacter,
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_meteor");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
-        PlayRumbleAction(2, pCharacter->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_REGULAR_SHOT:
@@ -560,7 +560,7 @@ void EmitBallShot(cFielder* pCharacter,
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_drybones");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
-        PlayRumbleAction(2, pCharacter->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_ONETIMER_SHOT:
@@ -569,7 +569,7 @@ void EmitBallShot(cFielder* pCharacter,
         KillBallGlow();
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_boo");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
-        PlayRumbleAction(2, pCharacter->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_S2S_SHOT:
@@ -694,12 +694,12 @@ static bool isEffectOn;
 
 void EmitSmallRumble(cPlayer* pPlayer)
 {
-    PlayRumbleAction(1, pPlayer->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pPlayer->GetGlobalPad());
 }
 
 void EmitMediumRumble(cPlayer* pPlayer)
 {
-    PlayRumbleAction(2, pPlayer->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pPlayer->GetGlobalPad());
 }
 
 void EmitDivot(cCharacter* pCharacter)
@@ -866,7 +866,7 @@ void EmitFreeze(cPlayer* pCharacter)
     pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
-    PlayRumbleAction(1, pCharacter->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pCharacter->GetGlobalPad());
     pCharacter->m_pEffectsTexturing = fxGetTexturing(eFXTex_Freeze);
 }
 
@@ -888,7 +888,7 @@ void EmitUnFreeze(cPlayer* pCharacter)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, pCharacter->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pCharacter->GetGlobalPad());
 }
 
 void EmitYoshiShellBreak(cCharacter* pCharacter)
@@ -941,12 +941,12 @@ void EmitHammerDestroyBig(const nlVector3& v3Position)
 
 void EmitGroundPound(cCharacter* pCharacter)
 {
-    if (pCharacter->m_DetChar.m_eCharacterClass == 7)
+    if (pCharacter->m_DetChar.m_eCharacterClass == WARIO)
     {
         EmissionController* pController = EmitGeneric(pCharacter, "ground_pound", 0);
         pController->SetUpdateCallback(UpdateEmitterFromCharacter);
     }
-    else if (pCharacter->m_DetChar.m_eCharacterClass == 9)
+    else if (pCharacter->m_DetChar.m_eCharacterClass == BOWSERJR)
     {
         EmissionController* pController = EmitGeneric(pCharacter, "bowserjr_ground_pound", 0);
         pController->SetUpdateCallback(UpdateEmitterFromCharacter);
@@ -1325,7 +1325,7 @@ void CreateMushroomEffect(cFielder* pFielder)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pFielder->GetGlobalPad());
 }
 
 void EmitMushroom(cFielder* pFielder, bool bReinitialize)
@@ -1352,7 +1352,7 @@ void EmitMushroom(cFielder* pFielder, bool bReinitialize)
             pFielder);
         tDebugPrintManager::Print(DC_SOUND, "***EmitMushroom()***\n");
     }
-    PlayRumbleAction(1, pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pFielder->GetGlobalPad());
 }
 
 void KillMushroom(cFielder* pFielder)
@@ -1418,7 +1418,7 @@ void EmitPullHeadOut(cCharacter* pPlayer)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, ((cPlayer*)pPlayer)->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, ((cPlayer*)pPlayer)->GetGlobalPad());
 }
 
 void EmitPushHeadIn(cPlayer* pPlayer)
@@ -1433,7 +1433,7 @@ void EmitLanding(cCharacter* pCharacter)
     {
         if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
-            PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
+            PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, ((cPlayer*)pCharacter)->GetGlobalPad());
 
             const char* szEffectName = "landing_big";
             EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
@@ -1510,7 +1510,7 @@ void EmitHitTrail(cCharacter* pCharacter)
 
         if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
-            PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
+            PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, ((cPlayer*)pCharacter)->GetGlobalPad());
         }
     }
 }
@@ -1547,67 +1547,67 @@ void EmitPowerupIcon(cCharacter* pCharacter, int nIcon)
 
     switch (nIcon)
     {
-    case 6:
+    case POWER_UP_CHAIN_CHOMP:
         nlStrNCpy<char>(szIconName, "icon_chomp", 0x20);
         break;
-    case 0:
+    case POWER_UP_GREEN_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_green", 0x20);
         break;
-    case 1:
+    case POWER_UP_RED_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_red", 0x20);
         break;
-    case 2:
+    case POWER_UP_SPINY_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_spike", 0x20);
         break;
-    case 3:
+    case POWER_UP_FREEZE_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_blue", 0x20);
         break;
-    case 7:
+    case POWER_UP_MUSHROOM:
         nlStrNCpy<char>(szIconName, "icon_mushroom", 0x20);
         break;
-    case 9:
+    case POWER_UP_MARIO:
         nlStrNCpy<char>(szIconName, "icon_mario", 0x20);
         break;
-    case 20:
+    case POWER_UP_PETEY:
         nlStrNCpy<char>(szIconName, "icon_petey", 0x20);
         break;
-    case 10:
+    case POWER_UP_PEACH:
         nlStrNCpy<char>(szIconName, "icon_peach", 0x20);
         break;
-    case 11:
+    case POWER_UP_DONKEYKONG:
         nlStrNCpy<char>(szIconName, "icon_dk", 0x20);
         break;
-    case 12:
+    case POWER_UP_BOWSER:
         nlStrNCpy<char>(szIconName, "icon_bowser", 0x20);
         break;
-    case 13:
+    case POWER_UP_LUIGI:
         nlStrNCpy<char>(szIconName, "icon_luigi", 0x20);
         break;
-    case 14:
+    case POWER_UP_DAISY:
         nlStrNCpy<char>(szIconName, "icon_daisy", 0x20);
         break;
-    case 15:
+    case POWER_UP_WARIO:
         nlStrNCpy<char>(szIconName, "icon_wario", 0x20);
         break;
-    case 16:
+    case POWER_UP_WALUIGI:
         nlStrNCpy<char>(szIconName, "icon_waluigi", 0x20);
         break;
-    case 17:
+    case POWER_UP_BOWSERJR:
         nlStrNCpy<char>(szIconName, "icon_bowserjr", 0x20);
         break;
-    case 18:
+    case POWER_UP_DIDDYKONG:
         nlStrNCpy<char>(szIconName, "icon_diddy", 0x20);
         break;
-    case 19:
+    case POWER_UP_YOSHI:
         nlStrNCpy<char>(szIconName, "icon_yoshi", 0x20);
         break;
-    case 8:
+    case POWER_UP_STAR:
         nlStrNCpy<char>(szIconName, "icon_star", 0x20);
         break;
-    case 4:
+    case POWER_UP_BANANA:
         nlStrNCpy<char>(szIconName, "icon_banana", 0x20);
         break;
-    case 5:
+    case POWER_UP_BOBOMB:
         nlStrNCpy<char>(szIconName, "icon_bobomb", 0x20);
         break;
     }
@@ -1624,7 +1624,7 @@ void EmitSuperGrow(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+    if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
     {
         pController = EmitGeneric(pCharacter, "mario_super_grow", 0);
     }
@@ -1641,7 +1641,7 @@ void EmitSuperShrink(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+    if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
     {
         pController = EmitGeneric(pCharacter, "mario_super_shrink", 0);
     }
@@ -1660,7 +1660,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
 
     if (bRight)
     {
-        if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+        if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
         {
             const char* szEffectName = "mario_right_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1683,7 +1683,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
     }
     else
     {
-        if (pCharacter->m_DetChar.m_eCharacterClass == 0)
+        if (pCharacter->m_DetChar.m_eCharacterClass == MARIO)
         {
             const char* szEffectName = "mario_left_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1721,7 +1721,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
             cFielder* pFielder = pTeam->GetFielder(i);
             if (pFielder->GetGlobalPad())
             {
-                PlayRumbleAction(1, pFielder->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, pFielder->GetGlobalPad());
             }
         }
     }
@@ -1825,12 +1825,12 @@ void EmitDeke(cCharacter* pCharacter)
         if (pAnimController->m_fTime
             < 15.0f / pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pCharacter->m_DetChar.m_eCharacterClass == 0xB)
+            if (pCharacter->m_DetChar.m_eCharacterClass == PETEY)
             {
                 EmissionController* pController = EmitGeneric(pCharacter, "petey_deke", 0);
                 pController->SetUpdateCallback(UpdateEmitterFromCharacter);
             }
-            else if (pCharacter->m_DetChar.m_eCharacterClass == 0xC)
+            else if (pCharacter->m_DetChar.m_eCharacterClass == BIRDO)
             {
                 EmissionController* pController = EmitGeneric(pCharacter, "birdo_deke", 0);
                 pController->SetUpdateCallback(UpdateEmitterFromCharacter);
@@ -1841,12 +1841,12 @@ void EmitDeke(cCharacter* pCharacter)
 
 void KillDeke(cCharacter* pCharacter)
 {
-    if (pCharacter->m_DetChar.m_eCharacterClass == 11)
+    if (pCharacter->m_DetChar.m_eCharacterClass == PETEY)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
         EmissionManager::Instance()->Kill(pGroup);
     }
-    else if (pCharacter->m_DetChar.m_eCharacterClass == 12)
+    else if (pCharacter->m_DetChar.m_eCharacterClass == BIRDO)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
         EmissionManager::Instance()->Kill(pGroup);
@@ -1878,29 +1878,29 @@ void EndDeke(cFielder* pFielder)
 {
     pFielder->ClearInvincibility(0);
 
-    if (pFielder->m_DetChar.m_eCharacterClass == 3)
+    if (pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dk_deke");
         EmissionManager::Instance()->Destroy((unsigned long)g_pBall, pGroup);
     }
-    else if (pFielder->m_eActionState == 1)
+    else if (pFielder->m_eActionState == ACTION_DEKE)
     {
-        if (pFielder->m_DetChar.m_eCharacterClass == 11)
+        if (pFielder->m_DetChar.m_eCharacterClass == PETEY)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
             EmissionManager::Instance()->Kill(pGroup);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 12)
+        else if (pFielder->m_DetChar.m_eCharacterClass == BIRDO)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
             EmissionManager::Instance()->Kill(pGroup);
         }
 
-        if (pFielder->m_DetChar.m_eCharacterClass == 1)
+        if (pFielder->m_DetChar.m_eCharacterClass == BOWSER)
         {
             pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 7)
+        else if (pFielder->m_DetChar.m_eCharacterClass == WARIO)
         {
             CharacterImpactEvent event;
             event.v3Position = pFielder->m_DetChar.m_v3Position;
@@ -1910,7 +1910,7 @@ void EndDeke(cFielder* pFielder)
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x5BF8E132, 0, 0);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 9)
+        else if (pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
         {
             CharacterImpactEvent event;
             event.v3Position = pFielder->m_DetChar.m_v3Position;
@@ -1920,7 +1920,7 @@ void EndDeke(cFielder* pFielder)
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x560BD5F9, 0, 0);
         }
-        else if (pFielder->m_DetChar.m_eCharacterClass == 13)
+        else if (pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS)
         {
             CharacterImpactEvent event;
             nlVector3 v3Offset;
@@ -2025,7 +2025,7 @@ void EmitDKDeke(cCharacter* pCharacter)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, ((cPlayer*)pCharacter)->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, ((cPlayer*)pCharacter)->GetGlobalPad());
 }
 
 void SetEffectsGroupFountainLife(EffectsGroup* group, float life)

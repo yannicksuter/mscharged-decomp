@@ -9,7 +9,7 @@ class PhysicsWall : public PhysicsPlane
 {
 public:
     PhysicsWall(CollisionSpace* collision_space, float a, float b, float c);
-    virtual int GetObjectType() const { return 0x17; }
+    virtual int GetObjectType() const { return PHYSOBJ_WALL; }
 };
 
 #endif // GAME_PHYSICS_PHYSICS_WALL_H

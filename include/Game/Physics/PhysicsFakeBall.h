@@ -78,7 +78,7 @@ class FakePhysicsBall : public PhysicsBall
 {
 public:
     FakePhysicsBall(float radius, FakeBallWorld& fakeBallWorld);
-    virtual int GetObjectType() const { return 0x11; }
+    virtual int GetObjectType() const { return PHYSOBJ_FAKE_BALL; }
     virtual ContactType Contact(
         PhysicsObject* object, dContact* contact, int numContacts);
 
@@ -90,7 +90,7 @@ class PhysicsGoaliePlane : public PhysicsWall
 public:
     PhysicsGoaliePlane(
         const nlVector4& plane, FakeBallWorld& fakeBallWorld);
-    virtual int GetObjectType() const { return 0x16; }
+    virtual int GetObjectType() const { return PHYSOBJ_GOALIE_PLANE; }
 
     /* 0x38 */ FakeBallWorld& mWorld;
 }; // total size: 0x3C

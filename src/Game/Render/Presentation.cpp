@@ -222,8 +222,8 @@ Presentation::Presentation()
     mIsAllowedToSkip[2] = true;
     mIsAllowedToSkip[3] = true;
 
-    gNetworkMessageRegistry->RegisterReceiver(30, this);
-    gNetworkMessageRegistry->RegisterReceiver(31, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_SKIP_NIS, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_SKIP_NIS_CLIENT, this);
     m_pad02C = 0;
 }
 
@@ -235,7 +235,7 @@ void Presentation::UpdateAllowedToSkip()
     mSkipPermissionsUpdated = true;
 
     NetworkSessionControl& session = *g_pNetworkSessionBase;
-    if (session.GetSessionMode() == 0)
+    if (session.GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -337,7 +337,7 @@ void Presentation::Finish()
     if (strcmp("PlayHighlight", mCurrentFunction) == 0 || loopPresentation)
     {
         fadeToStrikerTimes = true;
-        if (g_pNetworkSessionBase->GetSessionMode() != 0)
+        if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL)
         {
             if (mHighlightsLeft > 0)
             {
@@ -378,11 +378,11 @@ void Presentation::Finish()
         if (mCurrentFunction == strstr(mCurrentFunction, "Goal")
             || mCurrentFunction == strstr(mCurrentFunction, "MegastrikeEnd"))
         {
-            if (g_pGame->m_eGameState != 3)
+            if (g_pGame->m_eGameState != GS_END_GAME)
             {
                 if (!mResumeAfterPresentation)
                 {
-                    g_pGame->ChangeGameState(1);
+                    g_pGame->ChangeGameState(GS_KICKOFF);
                 }
                 else
                 {
@@ -404,7 +404,7 @@ void Presentation::Finish()
             {
                 if (nlStrCmp<char>(mCurrentFunction, "GameBegin") == 0)
                 {
-                    g_pGame->ChangeGameState(1);
+                    g_pGame->ChangeGameState(GS_KICKOFF);
                     FixedUpdateTask* task = GetFixedUpdateTask();
                     task->mSimulationStarted = true;
                 }
@@ -508,7 +508,7 @@ void Presentation::Update(float deltaT)
             }
         }
 
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             Run();
         }
@@ -570,7 +570,7 @@ void Presentation::Update(float deltaT)
                 Function<FnVoidVoid>());
         }
 
-        if (m_RunState == 2)
+        if (m_RunState == INTERPRETER_FINISHED)
         {
             Finish();
         }
@@ -660,9 +660,9 @@ bool IsIdleAndNoShotInProgress(Presentation* presentation)
         return false;
     }
 
-    if (g_pTeams[0]->GetCaptain()->m_eActionState == ACTION_SHOT
+    if (g_pTeams[0]->GetCaptain()->m_eActionState == ACTION_MEGA_STRIKE
         || g_pTeams[0]->GetCaptain()->m_eActionState == ACTION_SHOOT_TO_SCORE
-        || g_pTeams[1]->GetCaptain()->m_eActionState == ACTION_SHOT
+        || g_pTeams[1]->GetCaptain()->m_eActionState == ACTION_MEGA_STRIKE
         || g_pTeams[1]->GetCaptain()->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         return false;
@@ -790,7 +790,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         return;
     }
 
-    if (data->uGoalType != 6)
+    if (data->uGoalType != GOAL_MEGA_STRIKE)
     {
         gpNumberDisplay->BeginScoreUpdate();
     }
@@ -800,7 +800,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
 
     if (Config::Global().Get<bool>("no_presentation", false))
     {
-        g_pGame->ChangeGameState(1);
+        g_pGame->ChangeGameState(GS_KICKOFF);
         return;
     }
 
@@ -817,9 +817,9 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     bool scoreTied = scoreDifference == 0;
     bool closeGoal = scoreDifference == 1
         || scoreDifference == data->uNumGoalsScored;
-    bool suddenDeath = g_pGame->m_eGameState == 6;
+    bool suddenDeath = g_pGame->m_eGameState == GS_OVERTIME;
 
-    if (data->uGoalType == 5)
+    if (data->uGoalType == GOAL_OWN_GOAL)
     {
         data->pLastTouch[data->uTeamIndex]->IsCaptain();
     }
@@ -867,7 +867,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     }
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && g_pStrikerChallenge->mCondition == 2
+        && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
         && g_pTeams[1]->m_nScore > 0)
     {
         NisPlayer* nisPlayer = NisPlayer::Instance();
@@ -890,7 +890,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     else if (nlSingleton<GameInfoManager>::Instance()
                  ->GetCurrentSettings()
                  ->GameLimitType
-        == 1)
+        == GAME_LIMIT_GOALS)
     {
         int teamScore
             = g_pTeams[data->pScorer->m_pTeam->m_nSide]->m_nScore;
@@ -935,7 +935,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         }
     }
 
-    if (!scoreTied && g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (!scoreTied && g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -1006,7 +1006,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
         mIsAllowedToSkip[channel->mGlobalPadIndex] = true;
     }
 
-    if (!hasLocalPlayer && g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (!hasLocalPlayer && g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -1052,7 +1052,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
     NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] = scoringSide;
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
-        && g_pStrikerChallenge->mCondition == 2
+        && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
         && data->pPlayer->m_pTeam->m_nSide == 1 && data->goals > 0)
     {
         gameEndFunction = "GameEndMegaStrike";
@@ -1080,7 +1080,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
         if (nlSingleton<GameInfoManager>::Instance()
                 ->GetCurrentSettings()
                 ->GameLimitType
-            == 1)
+            == GAME_LIMIT_GOALS)
         {
             teamScore
                 = g_pTeams[data->pPlayer->m_pTeam->m_nSide]->GetScore();
@@ -1137,7 +1137,7 @@ setupSkipVotes:
         }
     }
 
-    if (!hasLocalWinner && g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (!hasLocalWinner && g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -1262,7 +1262,7 @@ int Presentation::ProcessMessage(NetworkMessage* message)
 
     switch ((u8)receivedMessage->GetType())
     {
-    case 30:
+    case NETMSG_SKIP_NIS:
         tDebugPrintManager::Print(DC_NETWORK,
             "Received SkipNIS message from machine %d bypass# %d\n", machine,
             ((NetMessageSkipNis*)receivedMessage)->mByPassNumber);
@@ -1270,7 +1270,7 @@ int Presentation::ProcessMessage(NetworkMessage* message)
             = ((NetMessageSkipNis*)receivedMessage)->mByPassNumber;
         break;
 
-    case 31:
+    case NETMSG_SKIP_NIS_CLIENT:
         if (g_pNetworkSessionBase->GetLocalMachineId() == 0)
         {
             tDebugPrintManager::Print(DC_NETWORK,

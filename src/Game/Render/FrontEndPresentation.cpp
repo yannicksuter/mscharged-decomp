@@ -81,12 +81,12 @@ FrontEndPresentation::~FrontEndPresentation()
 void FrontEndPresentation::Update(float deltaTime)
 {
     mDeltaTime = deltaTime;
-    if (m_RunState == 3)
+    if (m_RunState == INTERPRETER_SUSPENDED)
     {
         Run();
     }
 
-    if (m_RunState == 2)
+    if (m_RunState == INTERPRETER_FINISHED)
     {
         mCameraFinished = false;
         mWaitTime = 0.0f;

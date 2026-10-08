@@ -6,6 +6,16 @@
 class TLComponentInstance;
 class TLInstance;
 
+enum eCrossFadeState
+{
+    CROSSFADE_INACTIVE = -1,
+    CROSSFADE_INITIALIZE = 0,
+    CROSSFADE_REVEAL_IMAGE = 1,
+    CROSSFADE_HOLD_IMAGE = 2,
+    CROSSFADE_NEXT_IMAGE = 3,
+    CROSSFADE_TO_BLACK = 4,
+};
+
 class CrossFaderScene : public BaseSceneHandler
 {
 public:
@@ -23,7 +33,7 @@ public:
     /* 0x31 */ u8 mPadding31[3];
     /* 0x34 */ float mTimer;
     /* 0x38 */ float mAlpha;
-    /* 0x3C */ int mFadeState;
+    /* 0x3C */ eCrossFadeState mFadeState;
     /* 0x40 */ float mFadeToBlackTimer;
 }; // size 0x44
 

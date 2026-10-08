@@ -73,14 +73,14 @@ void LANLobby::Reset(bool initialize)
     if (!initialize)
     {
         RegisterLANMessages();
-        gNetworkMessageRegistry->RegisterReceiver(2, this);
-        gNetworkMessageRegistry->RegisterReceiver(3, this);
-        gNetworkMessageRegistry->RegisterReceiver(4, this);
-        gNetworkMessageRegistry->RegisterReceiver(5, this);
-        gNetworkMessageRegistry->RegisterReceiver(7, this);
-        gNetworkMessageRegistry->RegisterReceiver(10, this);
-        gNetworkMessageRegistry->RegisterReceiver(11, this);
-        gNetworkMessageRegistry->RegisterReceiver(12, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_FIND_GAME, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_FOUND_GAME, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_JOIN_REQUEST, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_JOIN_RESPONSE, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_GAME_PEER_ADDED, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_READY_TO_LAUNCH_REQUEST, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_READY_TO_LAUNCH_CONFIRM, this);
+        gNetworkMessageRegistry->RegisterReceiver(NETMSG_CLIENT_CONFIRMED_JOIN, this);
         if (gNetworkMiiName[0] != '\0')
             nlStrNCpy(mLocalPlayerName, gNetworkMiiName, 11);
         if (mLocalPlayerName[0] == '\0')
@@ -96,14 +96,14 @@ void LANLobby::Reset(bool initialize)
 
 void LANLobby::UnregisterMessageReceivers()
 {
-    gNetworkMessageRegistry->UnregisterReceiver(2);
-    gNetworkMessageRegistry->UnregisterReceiver(3);
-    gNetworkMessageRegistry->UnregisterReceiver(4);
-    gNetworkMessageRegistry->UnregisterReceiver(5);
-    gNetworkMessageRegistry->UnregisterReceiver(7);
-    gNetworkMessageRegistry->UnregisterReceiver(10);
-    gNetworkMessageRegistry->UnregisterReceiver(11);
-    gNetworkMessageRegistry->UnregisterReceiver(12);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_FIND_GAME);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_FOUND_GAME);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_JOIN_REQUEST);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_JOIN_RESPONSE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_GAME_PEER_ADDED);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_READY_TO_LAUNCH_REQUEST);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_READY_TO_LAUNCH_CONFIRM);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_CLIENT_CONFIRMED_JOIN);
     if (mListener != 0)
         mListener->OnLobbyShutdown();
     mFoundGameCount = 0;
@@ -944,11 +944,11 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
 {
     switch ((u8)message->GetType())
     {
-    case 2:
+    case NETMSG_FIND_GAME:
         if (mIsHost && mAdvertiseGame)
             SendFoundGame(static_cast<NetMessageFindGame*>(message)->mToken);
         break;
-    case 3:
+    case NETMSG_FOUND_GAME:
         if (!mIsHost)
         {
             NetMessageFoundGame* reply = static_cast<NetMessageFoundGame*>(message);
@@ -956,7 +956,7 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
                 ProcessFoundGame(reply);
         }
         break;
-    case 4:
+    case NETMSG_JOIN_REQUEST:
         if (mIsHost)
         {
             int index = GetConnectionIndex((TransportConnection*)message->mSource);
@@ -966,7 +966,7 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
                 tDebugPrintManager::Print(DC_NETWORK, "Ignored join request because did not find connection in pool\n");
         }
         break;
-    case 5:
+    case NETMSG_JOIN_RESPONSE:
         if (!mIsHost)
         {
             int index = GetConnectionIndex((TransportConnection*)message->mSource);
@@ -976,7 +976,7 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
                 tDebugPrintManager::Print(DC_NETWORK, "Ignored join response because did not find connection in pool\n");
         }
         break;
-    case 7:
+    case NETMSG_GAME_PEER_ADDED:
         if (!mIsHost)
         {
             int index = GetConnectionIndex((TransportConnection*)message->mSource);
@@ -986,10 +986,10 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
                 tDebugPrintManager::Print(DC_NETWORK, "Ignored game peer added because did not find connection in pool\n");
         }
         break;
-    case 10:
+    case NETMSG_READY_TO_LAUNCH_REQUEST:
         ProcessReadyToLaunchRequest();
         break;
-    case 11:
+    case NETMSG_READY_TO_LAUNCH_CONFIRM:
         if (mIsHost)
         {
             int peer = MachineIdxFromConnection(message->mSource);
@@ -999,7 +999,7 @@ int LANLobby::ProcessMessage(NetworkMessage* message)
                 tDebugPrintManager::Print(DC_NETWORK, "Ignored Ready To Launch Confirm because did not find peer it's from\n");
         }
         break;
-    case 12:
+    case NETMSG_CLIENT_CONFIRMED_JOIN:
         if (mIsHost && GetTopology() == 0)
         {
             int peer = MachineIdxFromConnection(message->mSource);

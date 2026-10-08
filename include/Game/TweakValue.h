@@ -97,7 +97,7 @@ struct TweakType<bool>
 {
     enum
     {
-        ID = 2
+        ID = TWEAK_TYPE_BOOL
     };
     typedef TweakValueBool OwnedValue;
     typedef TweakBinding<bool> Binding;
@@ -108,7 +108,7 @@ struct TweakType<float>
 {
     enum
     {
-        ID = 5
+        ID = TWEAK_TYPE_FLOAT
     };
     typedef TweakValueFloat OwnedValue;
     typedef TweakBinding<float> Binding;
@@ -119,7 +119,7 @@ struct TweakType<int>
 {
     enum
     {
-        ID = 3
+        ID = TWEAK_TYPE_INT
     };
     typedef TweakValue<int> OwnedValue;
     typedef TweakIntBinding Binding;
@@ -177,7 +177,7 @@ public:
     }
     virtual int GetStorageKind()
     {
-        return 2;
+        return TWEAK_STORAGE_BINDING;
     }
     virtual T GetDefault()
     {
@@ -196,10 +196,10 @@ public:
     {
         switch (other->GetStorageKind())
         {
-        case 1:
+        case TWEAK_STORAGE_OWNED:
             *m_pValue = TweakType<T>::ReadOwned(other);
             break;
-        case 2:
+        case TWEAK_STORAGE_BINDING:
             *m_pValue = *((TweakBinding<T>*)other)->m_pValue;
             break;
         }

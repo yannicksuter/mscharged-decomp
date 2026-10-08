@@ -15,6 +15,15 @@ struct CharacterValuePair
     /* 0x4 */ float unknown_0x4;
 };
 
+enum eCharacterPlayStyle
+{
+    PLAYSTYLE_OFFENSIVE = 0,
+    PLAYSTYLE_DEFENSIVE = 1,
+    PLAYSTYLE_PLAYMAKER = 2,
+    PLAYSTYLE_POWER = 3,
+    PLAYSTYLE_BALANCED = 4,
+};
+
 /**
  * Charged's static character database entry. R4QE01 holds 33 of them: twelve
  * captains, eight sidekicks, twelve goalies and one INVALID fallback that every
@@ -32,7 +41,7 @@ struct CharacterInfo
     /* 0x08 */ const char* mDisplayNameKey;
     /* 0x0C */ int unknown_0x0C;
     /* 0x10 */ int mCaptainId;
-    /* 0x14 */ int unknown_0x14;
+    /* 0x14 */ int mCaptainPowerup;
     /* 0x18 */ int mSidekickId;
     /* 0x1C */ int mSoundBankId;
     /* 0x20 */ int unknown_0x20;
@@ -44,7 +53,7 @@ struct CharacterInfo
     /* 0x3C */ float unknown_0x3C;
     /* 0x40 */ float unknown_0x40;
     /* 0x44 */ float unknown_0x44;
-    /* 0x48 */ int mPlayStyle;
+    /* 0x48 */ eCharacterPlayStyle mPlayStyle;
     /* 0x4C */ int mColourMask;
     /* 0x50 */ int mColourRank;
     /* 0x54 */ int mPrimaryColour;

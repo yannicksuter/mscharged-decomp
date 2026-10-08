@@ -119,13 +119,13 @@ bool PhysicsBall::SetContactInfo(
     }
 
     int objType = other->GetObjectType();
-    if (objType != 8)
+    if (objType != PHYSOBJ_CHARACTER)
     {
-        if (objType == 0x12)
+        if (objType == PHYSOBJ_GROUND_PLANE)
         {
             contact->surface.bounce = g_pGame->mpTerrain->GetRestitution(g_BallBounceGround);
         }
-        else if (objType == 0x16 || objType == 0x17)
+        else if (objType == PHYSOBJ_GOALIE_PLANE || objType == PHYSOBJ_WALL)
         {
             contact->surface.bounce = g_BallBounceWall;
             contact->surface.mu = g_BallFrictionWall;
@@ -244,12 +244,12 @@ ContactType PhysicsBall::Contact(
         "Ball Contact objID %d numContacts %d\n", objID, numContacts);
     GetPosition(&myPos);
 
-    if (objID == 0x1C)
+    if (objID == PHYSOBJ_PATCH)
     {
         return NO_CONTACT;
     }
 
-    if (objID == 0x12 && !mbCanFreeFall && !mbCanGoThroughGround)
+    if (objID == PHYSOBJ_GROUND_PLANE && !mbCanFreeFall && !mbCanGoThroughGround)
     {
         dContact* c = contact;
         for (int i = 0; i < numContacts; ++i, ++c)
@@ -264,7 +264,7 @@ ContactType PhysicsBall::Contact(
 
     if (m_parentObject != 0)
     {
-        if (objID == 0x12)
+        if (objID == PHYSOBJ_GROUND_PLANE)
         {
             if (mbCanFreeFall)
             {
@@ -305,9 +305,9 @@ ContactType PhysicsBall::Contact(
         return m_parentObject->Contact(other, contact, numContacts);
     }
 
-    if (objID != 0x12 && objID != 0xD && objID != 0xE && objID != 8)
+    if (objID != PHYSOBJ_GROUND_PLANE && objID != PHYSOBJ_SPHERE_BONE && objID != PHYSOBJ_CAPSULE_BONE && objID != PHYSOBJ_CHARACTER)
     {
-        if (objID == 0x16)
+        if (objID == PHYSOBJ_GOALIE_PLANE)
         {
             DebugPrintf("Ball contact PHYSOBJ_GOALIE_PLANE\n");
             return TWO_WAY_CONTACT;
@@ -315,7 +315,7 @@ ContactType PhysicsBall::Contact(
 
         mbUseMagnusEffect = false;
         mfChargeBonus = 0.0f;
-        if (objID == 0x17)
+        if (objID == PHYSOBJ_WALL)
         {
             float absX = fabsf(GetPosition().x);
             float absY = fabsf(GetPosition().y);

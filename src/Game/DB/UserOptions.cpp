@@ -181,7 +181,7 @@ GameplaySettings::GameplaySettings()
     memset(this, 0, sizeof(GameplaySettings));
     SkillLevel = ROOKIE;
     NumGames = 3;
-    GameLimitType = 0;
+    GameLimitType = GAME_LIMIT_TIME;
     GoalLimit = 5;
     GameTime = 180;
     mHomePowerupsEnabled = true;
@@ -204,16 +204,16 @@ void GameplaySettings::OnSettingsUpdated() const
 CheatSettings::CheatSettings()
 {
     memset(this, 0, sizeof(CheatSettings));
-    mCustomPowerups = 0;
-    mEnvironmentCheat = 0;
-    mPlayerCheat = 0;
+    mCustomPowerups = POWERUP_CHEAT_NONE;
+    mEnvironmentCheat = ENV_CHEAT_NONE;
+    mPlayerCheat = PLAYER_CHEAT_NONE;
 }
 
 void CheatSettings::InitializeDefaults()
 {
-    mCustomPowerups = 0;
-    mEnvironmentCheat = 0;
-    mPlayerCheat = 0;
+    mCustomPowerups = POWERUP_CHEAT_NONE;
+    mEnvironmentCheat = ENV_CHEAT_NONE;
+    mPlayerCheat = PLAYER_CHEAT_NONE;
 }
 
 void CheatSettings::OnSettingsUpdated() const

@@ -51,7 +51,7 @@ ChooseSidekicksSceneV2::ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::SceneType 
     , mSelectionMade(false)
     , mDoneButtonInstance(0)
     , mDraftExitDone(false)
-    , mState(0)
+    , mState(CHOOSE_SIDEKICKS_ENTERING)
     , mImagesLoaded(false)
 {
     int i;
@@ -255,7 +255,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
     for (int side = 0; side < 2; ++side)
     {
         mCaptainComponents[side].Initialize(pda[side], side, 0);
-        mCaptainComponents[side].SetDisplayMode(1);
+        mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
         mCaptainComponents[side].SetReadyPromptVisible(false);
         mCaptainComponents[side].SetSidekickInfo(-1, 0, 0);
     }
@@ -270,7 +270,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
     if (GameInfoManager::Instance()->IsOnline() || mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
         mCaptainComponents[1].SetVisible(false);
-        mCaptainComponents[1].SetDisplayMode(5);
+        mCaptainComponents[1].SetDisplayMode(CHARACTER_PDA_EMPTY);
         LoadSidekickImages(captain, -1);
     }
     else
@@ -360,13 +360,13 @@ void ChooseSidekicksSceneV2::Update(float dt)
     mCaptainComponents[1].Update(dt);
     if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
         UpdateCharacterIdleAnimations(dt);
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == CHOOSE_SIDEKICKS_ENTERING || mState == CHOOSE_SIDEKICKS_EXITING_FORWARD || mState == CHOOSE_SIDEKICKS_EXITING_BACK)
     {
         TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA left");
         TLComponentInstance* right = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA right");
         TLSlide* leftSlide = left->GetActiveSlide();
         TLSlide* rightSlide = right->GetActiveSlide();
-        if (mState == 0 && !mPointerButtonsInitialized)
+        if (mState == CHOOSE_SIDEKICKS_ENTERING && !mPointerButtonsInitialized)
         {
             mSidekickComponents[0].LoadSlotImages(dt);
             mSidekickComponents[1].LoadSlotImages(dt);
@@ -378,7 +378,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mState == 0)
+        if (mState == CHOOSE_SIDEKICKS_ENTERING)
         {
             if (!mPointerButtonsInitialized)
             {
@@ -391,15 +391,15 @@ void ChooseSidekicksSceneV2::Update(float dt)
                     GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
-                mState = 1;
+                mState = CHOOSE_SIDEKICKS_CHOOSING;
             }
         }
-        else if (mState == 2)
+        else if (mState == CHOOSE_SIDEKICKS_EXITING_FORWARD)
         {
             SubmitSidekickChoice();
             return;
         }
-        else if (mState == 3)
+        else if (mState == CHOOSE_SIDEKICKS_EXITING_BACK)
         {
             if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
             {
@@ -420,7 +420,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
         return;
     for (int i = 0; i < 4; ++i)
     {
-        if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
+        if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL && !IsLocalDraftPad(i))
         {
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             continue;
@@ -457,7 +457,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
         {
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                mState = 3;
+                mState = CHOOSE_SIDEKICKS_EXITING_BACK;
                 GetNavigationScene()->HideButtons();
                 TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA left");
                 TLComponentInstance* right = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA right");
@@ -490,7 +490,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
         if (countdown == 0 && !mDraftExitDone)
         {
             CommitSidekickChoices();
-            mState = 2;
+            mState = CHOOSE_SIDEKICKS_EXITING_FORWARD;
             GetNavigationScene()->HideButtons();
             TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA left");
             TLComponentInstance* right = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "PDA right");
@@ -523,7 +523,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
         mSlotButtons[side][i].ResetPointerStates();
     }
     mSidekickButtons[which].SetPointerState(0, index);
-    mCaptainComponents[side].SetDisplayMode(1);
+    mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
     mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
     mSelectedSlots[side] = -1;
@@ -546,7 +546,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerEnter(int index, void* context)
 
     mHoveredSidekicks[side] = which;
     int sidekick = sSidekickButtonIDs[which];
-    mCaptainComponents[side].SetDisplayMode(3);
+    mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_SIDEKICK);
     mCaptainComponents[side].SetSidekickInfo(sidekick, index, 0);
     mGreenArrows[side]->m_bVisible = false;
     if (!mSidekickButtons[which].HasOtherPointerState(1, index))
@@ -897,7 +897,7 @@ void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
     }
     mDoneButton.Disable();
     mSelectionMade = true;
-    mState = 2;
+    mState = CHOOSE_SIDEKICKS_EXITING_FORWARD;
     GetNavigationScene()->HideButtons();
     TLComponentInstance* left = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(mPresentation->m_currentSlide,
         "Layer", "PDA left");
@@ -1091,7 +1091,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
-        else if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
+        else if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL && !IsLocalDraftPad(i))
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
@@ -1120,7 +1120,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
         if (mSidePads[side] != -1 && idle[side])
         {
             mHoveredSidekicks[side] = -1;
-            mCaptainComponents[side].SetDisplayMode(1);
+            mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
             mGreenArrows[side]->m_bVisible = true;
         }
         for (int i = 0; i < 3; ++i)
@@ -1467,7 +1467,7 @@ void ChooseSidekicksSceneV2::ReleaseController(int index)
     {
         mSlotButtons[side][slot].ResetPointerStates();
     }
-    mCaptainComponents[side].SetDisplayMode(1);
+    mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
     mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
     mSelectedSlots[side] = -1;

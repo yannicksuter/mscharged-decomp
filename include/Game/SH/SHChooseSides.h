@@ -9,6 +9,14 @@
 class TLComponentInstance;
 class TLImageInstance;
 
+enum eChooseSidesState
+{
+    CHOOSE_SIDES_ENTERING = 0,
+    CHOOSE_SIDES_CHOOSING = 1,
+    CHOOSE_SIDES_EXITING_FORWARD = 2,
+    CHOOSE_SIDES_EXITING_BACK = 3,
+};
+
 class SHChooseSides2 : public BaseSceneHandler
 {
 public:
@@ -61,7 +69,7 @@ public:
     /* 0x3F0 */ nlColour mTeamColours[2];
     /* 0x3F8 */ int mControllerCounts[4];
     /* 0x408 */ int mHomeAwayButtonMask;
-    /* 0x40C */ int mState;
+    /* 0x40C */ eChooseSidesState mState;
 }; // size 0x410
 
 #endif // GAME_SH_SH_CHOOSE_SIDES_H

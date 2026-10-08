@@ -276,7 +276,7 @@ void FielderDesireMachine::SelectState()
             state = 20;
         }
     }
-    else if (g_pGame->m_eGameState == 1)
+    else if (g_pGame->m_eGameState == GS_KICKOFF)
     {
         state = 31;
     }
@@ -317,7 +317,7 @@ void FielderDesireMachine::SelectState()
             }
         }
     }
-    else if (g_pGame->GetGameState() == 2)
+    else if (g_pGame->GetGameState() == GS_POST_GOAL)
     {
         cTeam* team = fielder->m_pTeam;
         FormationSpec* formation;

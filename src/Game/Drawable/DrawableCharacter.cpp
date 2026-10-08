@@ -140,7 +140,7 @@ DrawableCharacter::DrawableCharacter()
     character = 0;
     damage1 = 0.0f;
     damage2 = 0.0f;
-    damageType = 0;
+    damageType = DAMAGE_TEXTURE_STADIUM;
     savedScorchTexture = 0xFFFFFFFF;
     scorchTexture = 0;
     position.x = 0.0f;
@@ -348,7 +348,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     GLSkinMesh* skinMesh;
     int characterClass = source.m_DetChar.m_eCharacterClass;
     int view = g_nCharacterView;
-    if (gPeachPhotoState.state == 1)
+    if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
     {
         view = eCLV_MoreCharacters;
         if (source.m_bCaughtInPhoto)
@@ -379,15 +379,15 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
 
     if (sSTSLighting)
     {
-        SetGameObjectLightingMode(2);
+        SetGameObjectLightingMode(OBJECT_LIGHTING_SHOOT_TO_SCORE);
     }
     else if (sCameraRelativeLighting || AlwaysUseCameraRelativeCharacterLighting())
     {
-        SetGameObjectLightingMode(1);
+        SetGameObjectLightingMode(OBJECT_LIGHTING_CAMERA_RELATIVE);
     }
     else
     {
-        SetGameObjectLightingMode(0);
+        SetGameObjectLightingMode(OBJECT_LIGHTING_IN_GAME);
     }
 
     bool isVisible;
@@ -524,9 +524,9 @@ void DrawableCharacter::Blend(const float* blendFactors, DrawableCharacter& lhs,
 
     if (character != 0)
     {
-        if (character->m_eClassType == 2)
+        if (character->m_eClassType == FIELDER)
         {
-            if (character->m_DetChar.m_eCharacterClass == 13)
+            if (character->m_DetChar.m_eCharacterClass == HAMMERBROS)
             {
                 isHammerBro = true;
                 if (g_nLeftPropJointIndex <= 0)
@@ -980,8 +980,8 @@ void DrawableCharacter::ApplyDamageEffects(const cCharacter& source, glModel* mo
         int stadium = GameInfoManager::Instance()->GetStadium();
         unsigned long damageTexture = glGetTexture("global/scorch");
         bool useDamageTexture = false;
-        if (damageType != 1
-            && (damageType == 2
+        if (damageType != DAMAGE_TEXTURE_DIRT
+            && (damageType == DAMAGE_TEXTURE_SCORCH
                 || stadium == 0
                 || stadium == 5
                 || stadium == 7

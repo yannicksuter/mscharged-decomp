@@ -137,7 +137,7 @@ void UpdateAudioSystem(AudioSystem* audio, float dt)
     {
         XSoundHandle* handle = *it;
         handle->Update(dt);
-        if (handle->m_State == 9)
+        if (handle->m_State == SOUND_HANDLE_RELEASED)
         {
             NotifyAudioSoundStopped(audio->GetBundleManager()->GetResourceRuntime(), reinterpret_cast<u32>(handle));
             if (handle->m_Owner != 0)
@@ -174,7 +174,7 @@ void FlushAudio(AudioSystem* audio, int callbackEnabled, bool force)
     {
         XSoundHandle* handle = *it;
         int state = handle->m_State;
-        if ((force && state == 7) || (unsigned int)(state - 2) <= 3)
+        if ((force && state == SOUND_HANDLE_STOPPING) || (unsigned int)(state - 2) <= 3)
         {
             if (callbackEnabled == 2)
                 callbackEnabled = handle->IsCallbackEnabled();
@@ -243,7 +243,7 @@ bool AudioSystem::UpdateSoundSource(float dt, Plat3dSoundSrc& source)
 
 void XSoundHandle::Update(float dt)
 {
-    if (m_State == 4)
+    if (m_State == SOUND_HANDLE_PLAYING)
     {
         m_PreviousTime = m_CurrentTime;
         m_CurrentTime += dt;

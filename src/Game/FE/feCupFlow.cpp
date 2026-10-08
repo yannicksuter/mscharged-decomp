@@ -116,18 +116,18 @@ void CycleCupRoundPage(int currentPage, bool advance)
     const int* pages = 0;
 
     int roundType = CupManager::s_pInstance->mState == 0x10
-                      ? 0
+                      ? CUP_ROUND_LEAGUE
                       : CupManager::s_pInstance->GetCurrentRoundType();
 
-    if (roundType != 0)
+    if (roundType != CUP_ROUND_LEAGUE)
     {
         switch (roundType)
         {
-        case 1:
+        case CUP_ROUND_KNOCKOUT:
             pageCount = 2;
             pages = sCupRoundPageOrderTwo;
             break;
-        case 2:
+        case CUP_ROUND_FINALS:
             pageCount = 3;
             pages = sCupRoundPageOrderThree;
             break;
@@ -183,18 +183,18 @@ void ShowCurrentCupRoundPage()
 {
     int scene = -2;
     int roundType = CupManager::s_pInstance->mState == 0x10
-                      ? 0
+                      ? CUP_ROUND_LEAGUE
                       : CupManager::s_pInstance->GetCurrentRoundType();
 
     switch (roundType)
     {
-    case 0:
+    case CUP_ROUND_LEAGUE:
         scene = 32;
         break;
-    case 1:
+    case CUP_ROUND_KNOCKOUT:
         scene = 34;
         break;
-    case 2:
+    case CUP_ROUND_FINALS:
         scene = 35;
         break;
     }
@@ -209,9 +209,9 @@ void AdvanceCupFlow(bool pad)
     {
         if (cupManager->mState == 4)
         {
-            if (cupManager->GetCurrentMode() == 0)
+            if (cupManager->GetCurrentMode() == CUP_FIRE)
             {
-                cupManager->SetMode(1);
+                cupManager->SetMode(CUP_CRYSTAL);
                 cupManager->mState = -1;
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
@@ -219,9 +219,9 @@ void AdvanceCupFlow(bool pad)
                 scene->SetDisplayMode(1);
                 SaveLoad::StartSave(false);
             }
-            else if (cupManager->GetCurrentMode() == 1)
+            else if (cupManager->GetCurrentMode() == CUP_CRYSTAL)
             {
-                cupManager->SetMode(2);
+                cupManager->SetMode(CUP_STRIKER);
                 cupManager->mState = -1;
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
@@ -354,15 +354,15 @@ void UpdateCupBreadcrumbs(int currentPage)
                                 : CupManager::s_pInstance->GetCurrentRoundType();
             switch (roundType)
             {
-            case 0:
+            case CUP_ROUND_LEAGUE:
                 navigation->SetButtonVisibility(8, false);
                 breadcrumbs->m_bVisible = false;
                 return;
-            case 1:
+            case CUP_ROUND_KNOCKOUT:
                 pageCount = 2;
                 pages = sCupRoundPageOrderTwo;
                 break;
-            case 2:
+            case CUP_ROUND_FINALS:
                 pageCount = 3;
                 pages = sCupRoundPageOrderThree;
                 break;
@@ -441,7 +441,7 @@ void StartNewCup()
 
     CupManager::s_pInstance->mState = -1;
     CupManager::s_pInstance->ResetCupRecord();
-    CupManager::s_pInstance->SetMode(-1);
+    CupManager::s_pInstance->SetMode(CUP_NONE);
     CupManager::s_pInstance->mGameInProgress = false;
     GameSceneManager::Instance()->Pop();
     SaveLoad::StartSave(false);
@@ -511,39 +511,39 @@ void ShowCupRulesPopup()
     int cupMode = CupManager::s_pInstance->GetCurrentMode();
     int roundType = CupManager::s_pInstance->GetCurrentRoundType();
     int menuType = -1;
-    if (roundType == 0 && cupMode == 0)
+    if (roundType == CUP_ROUND_LEAGUE && cupMode == 0)
     {
         menuType = 29;
     }
-    else if (roundType == 0 && cupMode == 1)
+    else if (roundType == CUP_ROUND_LEAGUE && cupMode == 1)
     {
         menuType = 30;
     }
-    else if (roundType == 0 && cupMode == 2)
+    else if (roundType == CUP_ROUND_LEAGUE && cupMode == 2)
     {
         menuType = 31;
     }
-    else if (roundType == 1 && cupMode == 0)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 0)
     {
         menuType = 32;
     }
-    else if (roundType == 1 && cupMode == 1)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 1)
     {
         menuType = 33;
     }
-    else if (roundType == 1 && cupMode == 2)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 2)
     {
         menuType = 34;
     }
-    else if (roundType == 2 && cupMode == 0)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == 0)
     {
         menuType = 35;
     }
-    else if (roundType == 2 && cupMode == 1)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == 1)
     {
         menuType = 36;
     }
-    else if (roundType == 2 && cupMode == 2)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == 2)
     {
         menuType = 37;
     }
@@ -617,15 +617,15 @@ void ShowCupAwardRewardsPopup()
     int menuType = -1;
     switch (CupManager::s_pInstance->GetCurrentMode())
     {
-    case 0:
+    case CUP_FIRE:
         showRewards = HasWastelandsUnlockFlags() && WasWastelandsLockedBeforeGame();
         menuType = 41;
         break;
-    case 1:
+    case CUP_CRYSTAL:
         showRewards = HasDumpUnlockFlags() && WasDumpLockedBeforeGame();
         menuType = 42;
         break;
-    case 2:
+    case CUP_STRIKER:
         showRewards = HasGalacticStadiumUnlockFlags() && WasGalacticStadiumLockedBeforeGame();
         menuType = 43;
         break;
@@ -652,15 +652,15 @@ void ShowCupTrophyRewardsPopup()
     int menuType = -1;
     switch (CupManager::s_pInstance->GetCurrentMode())
     {
-    case 0:
+    case CUP_FIRE:
         showRewards = IsUnlockFlagSet(1) && WereUnlockFlagsClearBeforeGame(1);
         menuType = 44;
         break;
-    case 1:
+    case CUP_CRYSTAL:
         showRewards = IsUnlockFlagSet(2) && WereUnlockFlagsClearBeforeGame(2);
         menuType = 45;
         break;
-    case 2:
+    case CUP_STRIKER:
         showRewards = IsUnlockFlagSet(4) && WereUnlockFlagsClearBeforeGame(4);
         menuType = 46;
         break;
@@ -715,19 +715,19 @@ void UpdateCupTitleText(TLComponentInstance* component, unsigned short* buffer, 
     WideString formatted;
     switch (CupManager::s_pInstance->GetCurrentMode())
     {
-    case 0:
+    case CUP_FIRE:
     {
         formatted = Format(WideString(oldTitle),
                            g_pLocalization->GetString("FIRE_CUP"));
         break;
     }
-    case 1:
+    case CUP_CRYSTAL:
     {
         formatted = Format(WideString(oldTitle),
                            g_pLocalization->GetString("CRYSTAL_CUP"));
         break;
     }
-    case 2:
+    case CUP_STRIKER:
     {
         formatted = Format(WideString(oldTitle),
                            g_pLocalization->GetString("STRIKER_CUP"));
@@ -796,7 +796,7 @@ void ResetCupFlow()
     CupManager* cupManager = CupManager::s_pInstance;
     cupManager->mState = -1;
     cupManager->ResetCupRecord();
-    cupManager->SetMode(-1);
+    cupManager->SetMode(CUP_NONE);
     SaveLoad::StartSave(false);
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)

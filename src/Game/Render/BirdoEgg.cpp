@@ -126,7 +126,7 @@ void BirdoEggObject::Update(float deltaTime)
 
 void UpdateBirdoEggEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

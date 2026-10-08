@@ -69,8 +69,8 @@ void NetworkDraft::Reset(bool)
 
 void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
 {
-    gNetworkMessageRegistry->RegisterReceiver(23, this);
-    gNetworkMessageRegistry->RegisterReceiver(24, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT_PICKED_CAPTAIN, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT_PICKED_SIDEKICKS, this);
     mDraftMessage = *message;
     mTeamCount = message->mMachineCount;
     mLocalMachineIndex = message->mMachineIndex;
@@ -145,8 +145,8 @@ static inline void CopyDraftMachineInfo(NetworkDraftPlayer& player, const Networ
 
 void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
 {
-    gNetworkMessageRegistry->RegisterReceiver(23, this);
-    gNetworkMessageRegistry->RegisterReceiver(24, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT_PICKED_CAPTAIN, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT_PICKED_SIDEKICKS, this);
     mDraftMessage = *message;
     mTeamCount = 2;
     mLocalMachineIndex = message->mMachineIndex;
@@ -385,8 +385,8 @@ void NetworkDraft::Update(float dt)
             mFinalCountdown -= dt;
             if (mFinalCountdown <= 0.0f)
             {
-                gNetworkMessageRegistry->UnregisterReceiver(23);
-                gNetworkMessageRegistry->UnregisterReceiver(24);
+                gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT_PICKED_CAPTAIN);
+                gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT_PICKED_SIDEKICKS);
 
                 bool disconnected = false;
                 if (!g_pNetworkSession->mCupMode)
@@ -501,8 +501,8 @@ void NetworkDraft::AdvanceDraftTeam()
 
 void NetworkDraft::UnregisterMessageReceivers()
 {
-    gNetworkMessageRegistry->UnregisterReceiver(23);
-    gNetworkMessageRegistry->UnregisterReceiver(24);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT_PICKED_CAPTAIN);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT_PICKED_SIDEKICKS);
 }
 
 int NetworkDraft::GetCurrentDraftingTeam() const
@@ -617,7 +617,7 @@ int NetworkDraft::ProcessMessage(NetworkMessage* message)
 
     switch ((u8)message->GetType())
     {
-    case 23:
+    case NETMSG_DRAFT_PICKED_CAPTAIN:
     {
         NetMessageDraftPickedCaptain* pickedCaptain =
             (NetMessageDraftPickedCaptain*)message;
@@ -646,7 +646,7 @@ int NetworkDraft::ProcessMessage(NetworkMessage* message)
         }
         break;
     }
-    case 24:
+    case NETMSG_DRAFT_PICKED_SIDEKICKS:
     {
         NetMessageDraftPickedSidekicks* pickedSidekicks =
             (NetMessageDraftPickedSidekicks*)message;

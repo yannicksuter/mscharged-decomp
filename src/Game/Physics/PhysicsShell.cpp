@@ -101,7 +101,7 @@ ContactType PhysicsShell::Contact(
 
     switch (obj->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)obj->m_parentObject)->m_pAICharacter;
@@ -151,7 +151,7 @@ ContactType PhysicsShell::Contact(
         break;
     }
 
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         ball = ((PhysicsAIBall*)obj)->m_pAIBall;
         numContacts = eType;
@@ -223,7 +223,7 @@ ContactType PhysicsShell::Contact(
         break;
     }
 
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         if (m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0)
         {
@@ -251,7 +251,7 @@ ContactType PhysicsShell::Contact(
         break;
     }
 
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         if (m_pPowerupObject->mtNoHitTimer.m_uPackedTime != 0)
         {
@@ -277,7 +277,7 @@ ContactType PhysicsShell::Contact(
         break;
     }
 
-    case 0x18:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp
             = ((SkinAnimatedNPC*)((PhysicsNPC*)obj)->mpAINPC)
@@ -291,10 +291,10 @@ ContactType PhysicsShell::Contact(
         break;
     }
 
-    case 0x1D:
+    case PHYSOBJ_WALUIGI_WALL:
         return ONE_WAY_CONTACT_THIS;
 
-    case 0x1C:
+    case PHYSOBJ_PATCH:
     {
         int value = ((PhysicsPatch*)obj)->m_Type;
         PhysicsPatchInfo* patchInfo = GetPhysicsPatchInfo(value);
@@ -308,8 +308,8 @@ ContactType PhysicsShell::Contact(
             mVelocityScaleTicksRemaining = 2;
         }
 
-        if (patchInfo->mType == 8
-            || patchInfo->mType == 9)
+        if (patchInfo->mType == PATCH_LAVA_BALL
+            || patchInfo->mType == PATCH_LAVA_HOLE)
         {
             m_pPowerupObject->m_bShouldDestroy = true;
         }
@@ -318,7 +318,7 @@ ContactType PhysicsShell::Contact(
 
     default:
     {
-        if (obj->GetObjectType() == 0x12)
+        if (obj->GetObjectType() == PHYSOBJ_GROUND_PLANE)
         {
             if (m_bAllowOutOfBoundsFall)
             {
@@ -412,7 +412,7 @@ ContactType PhysicsShell::Contact(
             return NO_CONTACT;
         }
 
-        if (obj->GetObjectType() == 0x17 || obj->GetObjectType() == 5)
+        if (obj->GetObjectType() == PHYSOBJ_WALL || obj->GetObjectType() == PHYSOBJ_ROUNDED_CORNER)
         {
             for (int i = 0; i < numContacts; i++)
             {
@@ -430,7 +430,7 @@ ContactType PhysicsShell::Contact(
             }
 
             if (bWasRicochet
-                && GameInfoManager::Instance()->GetStadium() == 0x0B)
+                && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
             {
                 nlVector3 contactPos;
                 nlVec3Set(contactPos, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
@@ -473,8 +473,8 @@ ContactType PhysicsShell::Contact(
         }
         else
         {
-            if (obj->GetObjectType() == 0x17
-                || obj->GetObjectType() == 5)
+            if (obj->GetObjectType() == PHYSOBJ_WALL
+                || obj->GetObjectType() == PHYSOBJ_ROUNDED_CORNER)
             {
                 CollisionPowerupWallData* eventData = 0;
                 g_CollisionPowerupWallDataPool.Allocate(eventData);
@@ -492,8 +492,8 @@ ContactType PhysicsShell::Contact(
                 }
             }
 
-            if (obj->GetObjectType() != 0x10
-                || (obj->GetObjectType() == 0x10
+            if (obj->GetObjectType() != PHYSOBJ_AI_BALL
+                || (obj->GetObjectType() == PHYSOBJ_AI_BALL
                     && m_pPowerupObject->m_pTarget != 0))
             {
                 EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("shell_ricochet");
@@ -552,7 +552,7 @@ bool PhysicsShell::SetContactInfo(
         SetDefaultContactInfo(contact);
     }
 
-    if (other->GetObjectType() == 0x12)
+    if (other->GetObjectType() == PHYSOBJ_GROUND_PLANE)
     {
         contact->surface.bounce = g_pGame->mpTerrain->GetRestitution(gGameTweaks.m_pGameTweaks->fShellBounceGround);
         contact->surface.mu = 0.005f;

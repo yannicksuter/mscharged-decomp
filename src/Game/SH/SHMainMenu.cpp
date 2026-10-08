@@ -135,7 +135,7 @@ void SHMainMenu::SceneCreated()
     {
         mMenuArrows[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(mMenuItemInstances[i]->GetActiveSlide(), "arrows");
     }
-    if (g_pNetworkSessionBase->GetSessionMode() != 0)
+    if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL)
     {
         g_pNetworkSessionBase->Shutdown();
     }
@@ -303,7 +303,7 @@ void SHMainMenu::CloseItem(unsigned int index, void* context)
  */
 void SHMainMenu::ReturnToWiiMenu()
 {
-    ResetTask::s_ResetMode = 3;
+    ResetTask::s_ResetMode = RM_RETURN_TO_MENU;
     ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING ? RS_STARTRESET : ResetTask::s_ResetState;
 }
 
@@ -387,7 +387,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     {
     case 0:
     {
-        GameInfoManager::Instance()->SetMode(0, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_FRIENDLY, 0);
         GameInfoManager::Instance()->SetTeam(0, 0);
         GameInfoManager::Instance()->SetTeam(1, 0);
         GameInfoManager::Instance()->ResetPlayingSides();
@@ -406,7 +406,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     {
         GameInfoManager::Instance()->mIsOnlineMode = true;
         GameSceneManager::Instance()->Pop();
-        if (g_pNetworkSessionBase->GetSessionMode() == 0)
+        if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
         {
             gNextFETransition = "TransitionMainMenuToOnlineMatch";
         }
@@ -420,7 +420,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         break;
     }
     case 2:
-        GameInfoManager::Instance()->SetMode(3, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CUP, 0);
         if (CupManager::s_pInstance->GetCurrentMode() == -1)
         {
             StartNewCup();
@@ -432,7 +432,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         break;
     case 3:
     {
-        GameInfoManager::Instance()->SetMode(4, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CHALLENGE, 0);
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         GameSceneManager::Instance()->Pop();
         SHNavigation* scene = GetNavigationScene();
@@ -446,7 +446,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     }
     case 4:
     {
-        GameInfoManager::Instance()->SetMode(4, 0);
+        GameInfoManager::Instance()->SetMode(GameInfoManager::GM_CHALLENGE, 0);
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
         GameSceneManager::Instance()->Pop();
         SHNavigation* scene = GetNavigationScene();

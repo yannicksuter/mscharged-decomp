@@ -13,7 +13,7 @@ public:
     virtual ~PhysicsCharacter() { }
 
     virtual void Unknown0();
-    virtual int GetObjectType() const { return 8; }
+    virtual int GetObjectType() const { return PHYSOBJ_CHARACTER; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PostUpdate();
     virtual void PreCollide();

@@ -166,7 +166,7 @@ inline void CupManager::IncreaseRoundNumber()
     int nextType = -1;
     mCurrentCup->mRoundNumber = GetNextRoundNumber(&nextType);
     mCurrentCup->mRoundType = nextType;
-    if (previousType != 1 && nextType == 1)
+    if (previousType != CUP_ROUND_KNOCKOUT && nextType == CUP_ROUND_KNOCKOUT)
     {
         SetupPlayoffSchedule();
         if (mState == 16)
@@ -271,11 +271,11 @@ BasicGameInfo* CupManager::GetMatchupInfo(int phase, short round, int matchup) c
 
 BasicGameInfo* CupManager::GetGameInfo(int phase, int matchup)
 {
-    if (phase == 1)
+    if (phase == CUP_ROUND_KNOCKOUT)
     {
         matchup += GetNumGames(0);
     }
-    else if (phase == 2)
+    else if (phase == CUP_ROUND_FINALS)
     {
         matchup += GetNumGames(0);
         matchup += GetNumGames(1);
@@ -335,15 +335,15 @@ s16 CupManager::GetNextRoundNumber(int* roundType)
     }
 
     s16 nextRound = 0;
-    if (currentType == 0)
+    if (currentType == CUP_ROUND_LEAGUE)
     {
-        *roundType = 1;
+        *roundType = CUP_ROUND_KNOCKOUT;
     }
-    else if (currentType == 1)
+    else if (currentType == CUP_ROUND_KNOCKOUT)
     {
-        *roundType = 2;
+        *roundType = CUP_ROUND_FINALS;
     }
-    else if (currentType == 2)
+    else if (currentType == CUP_ROUND_FINALS)
     {
         nextRound = -5;
     }
@@ -353,7 +353,7 @@ s16 CupManager::GetNextRoundNumber(int* roundType)
 u16 CupManager::GetNumGamesPerRound(int phase, int round) const
 {
     u16 returnValue;
-    if (phase == 1)
+    if (phase == CUP_ROUND_KNOCKOUT)
     {
         u16 numRounds = mCurrentCup->GetNumPlayoffRounds();
         if (round == numRounds - 1)
@@ -369,11 +369,11 @@ u16 CupManager::GetNumGamesPerRound(int phase, int round) const
             returnValue = 4;
         }
     }
-    else if (phase == 0)
+    else if (phase == CUP_ROUND_LEAGUE)
     {
         returnValue = mCurrentCup->GetNumTeams() >> 1;
     }
-    else if (phase == 2)
+    else if (phase == CUP_ROUND_FINALS)
     {
         returnValue = 1;
     }
@@ -383,13 +383,13 @@ u16 CupManager::GetNumGamesPerRound(int phase, int round) const
 u16 CupManager::GetNumGames(int phase) const
 {
     int result;
-    if (phase == 0)
+    if (phase == CUP_ROUND_LEAGUE)
     {
         int rounds = mCurrentCup->GetNumRegularRounds();
         result = GetNumGamesPerRound(phase, 0);
         result *= rounds;
     }
-    else if (phase == 1)
+    else if (phase == CUP_ROUND_KNOCKOUT)
     {
         int rounds = mCurrentCup->GetNumPlayoffRounds();
         if (rounds == 1)
@@ -459,17 +459,17 @@ void CupManager::PickRoundStadiums(int* stadiums)
     int count = 0;
     int rounds = mCurrentCup->GetNumRegularRounds();
     int first = 0;
-    if (mCurrentMode == 0)
+    if (mCurrentMode == CUP_FIRE)
     {
         choices = gFireCupStadiums;
         count = 6;
     }
-    else if (mCurrentMode == 1)
+    else if (mCurrentMode == CUP_CRYSTAL)
     {
         choices = gCrystalCupStadiums;
         count = 7;
     }
-    else if (mCurrentMode == 2)
+    else if (mCurrentMode == CUP_STRIKER)
     {
         choices = gStrikerCupStadiums;
         count = 8;
@@ -535,7 +535,7 @@ void CupManager::SetupRoundRobinSchedule(int* lineup, CupSidekicks* sklineup)
     PickRoundStadiums(stadiums);
     mCurrentCup->mRoundNumber = 0;
     mCurrentCup->mGameNumber = 0;
-    mCurrentCup->mRoundType = 0;
+    mCurrentCup->mRoundType = CUP_ROUND_LEAGUE;
     mCurrentCup->Reset();
     for (int round = 0; round < numRounds; round++)
     {
@@ -658,7 +658,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
     bool userWon = winner == team;
     int phase = mCurrentCup->mRoundType;
     int round = mCurrentCup->mRoundNumber;
-    if (phase == 1)
+    if (phase == CUP_ROUND_KNOCKOUT)
     {
         int numRounds = mCurrentCup->GetNumPlayoffRounds();
         if (round == numRounds - 1)
@@ -745,7 +745,7 @@ void CupManager::SetRoundResult(bool inOvertime, int winningSide)
             next->mStadiumIndex = PickStadium(false);
         }
     }
-    else if (phase == 2 && round > 0)
+    else if (phase == CUP_ROUND_FINALS && round > 0)
     {
         int wins = 0;
         int losses = 0;
@@ -830,15 +830,15 @@ bool CupManager::DetermineNextMatchups(int dnmflags)
 
 void CupManager::UpdateCurrentCup()
 {
-    if (mCurrentMode == 0)
+    if (mCurrentMode == CUP_FIRE)
     {
         mCurrentCup = &mFireCupSeries;
     }
-    else if (mCurrentMode == 1)
+    else if (mCurrentMode == CUP_CRYSTAL)
     {
         mCurrentCup = &mCrystalCupSeries;
     }
-    else if (mCurrentMode == 2)
+    else if (mCurrentMode == CUP_STRIKER)
     {
         mCurrentCup = &mStrikerCupSeries;
     }
@@ -1028,7 +1028,7 @@ void CupManager::StartCupSeries()
         }
         SetupRoundRobinSchedule(teams, sidekicks);
     }
-    SetMode(0);
+    SetMode(CUP_FIRE);
     DetermineNextMatchups(19);
 }
 
@@ -1208,17 +1208,17 @@ void CupManager::ShowRoundNews()
     int roundType = GetCurrentRoundType();
     int round = GetCurrentRoundNumber();
     int state = mState;
-    if (roundType == 0 && round == (mCurrentCup->GetNumRegularRounds() >> 1))
+    if (roundType == CUP_ROUND_LEAGUE && round == (mCurrentCup->GetNumRegularRounds() >> 1))
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
         scene->SetDisplayMode(2);
     }
-    else if ((roundType == 1 && round == 0) || state == 16)
+    else if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == 16)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
         scene->SetDisplayMode(3);
     }
-    else if ((roundType == 2 && round == 0) || state == 17)
+    else if ((roundType == CUP_ROUND_FINALS && round == 0) || state == 17)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
         scene->SetDisplayMode(4);
@@ -1260,7 +1260,7 @@ void CupManager::AwardGoalTrophies()
     int roundType = GetCurrentRoundType();
     int round = GetCurrentRoundNumber();
     int state = mState;
-    if ((roundType == 1 && round == 0) || state == 16)
+    if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == 16)
     {
         int statistic0 = 0;
         int statistic1 = 0;

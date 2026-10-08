@@ -53,7 +53,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -120,9 +120,9 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         }
         return NO_CONTACT;
     }
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
         return NO_CONTACT;
-    case 0x12:
+    case PHYSOBJ_GROUND_PLANE:
     {
         isLanded = hammer->mLandedTimer > 0.0f;
         if (!isLanded)
@@ -138,7 +138,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         hammer->OnLanding();
         return NO_CONTACT;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         PowerupBase* powerup = ((PhysicsBanana*)other)->m_pPowerupObject;
         if (hammer->mOwner == powerup->m_pThrower
@@ -153,7 +153,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         }
         return NO_CONTACT;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         PowerupBase* powerup = ((PhysicsShell*)other)->m_pPowerupObject;
         if (hammer->mOwner == powerup->m_pThrower
@@ -168,7 +168,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         }
         return NO_CONTACT;
     }
-    case 0x18:
+    case PHYSOBJ_NPC:
     {
         bool isChainChomp
             = ((SkinAnimatedNPC*)((PhysicsNPC*)other)->mpAINPC)
@@ -182,12 +182,12 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         }
         return NO_CONTACT;
     }
-    case 0x1D:
+    case PHYSOBJ_WALUIGI_WALL:
         return NO_CONTACT;
-    case 0x24:
+    case PHYSOBJ_THWOMP:
         hammer->Deactivate(true);
         return NO_CONTACT;
-    case 0x17:
+    case PHYSOBJ_WALL:
     {
         float radius = GetRadius();
         float netWidth = cNet::m_fNetWidth;

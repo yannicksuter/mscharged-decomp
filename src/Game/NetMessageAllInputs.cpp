@@ -34,10 +34,10 @@ void NetMessageAllInputsBundle::Serialize(
 
 int NetMessageAllInputsBundle::GetType()
 {
-    return 9;
+    return NETMSG_ALL_INPUTS_BUNDLE;
 }
 
 int NetMessageAllInputs::GetType()
 {
-    return 8;
+    return NETMSG_ALL_INPUTS;
 }

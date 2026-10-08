@@ -43,7 +43,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             {
                 cFielder* fielder = (*team)->GetFielder(player);
                 fielder->m_Dirt = 0.0f;
-                fielder->m_nDamageType = 0;
+                fielder->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
                 fielder->m_MinDirt = 0.0f;
             }
         }
@@ -54,7 +54,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             cFielder* captain = g_pTeams[0]->GetCaptain();
             captain->m_Dirt = 0.0f;
-            captain->m_nDamageType = 0;
+            captain->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         }
         {
             cFielder* captain = g_pTeams[0]->GetCaptain();
@@ -63,7 +63,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             cFielder* captain = g_pTeams[1]->GetCaptain();
             captain->m_Dirt = 0.0f;
-            captain->m_nDamageType = 0;
+            captain->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         }
         {
             cFielder* captain = g_pTeams[1]->GetCaptain();
@@ -205,7 +205,7 @@ void Presentation::DoFunctionCall(unsigned int function)
                        ->GetCurrentGameInfo()
                        ->GetTeam((short)side);
         m_SP[-1] = team == original;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -215,7 +215,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = original == GameInfoManager::Instance()->GetStadium();
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -223,7 +223,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     }
     case 28:
         ++m_SP;
-        m_SP[-1] = g_pGame->m_eGameState == 3;
+        m_SP[-1] = g_pGame->m_eGameState == GS_END_GAME;
         break;
     case 29:
         ++m_SP;
@@ -325,7 +325,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 44:
         PlaySound(11, 0x8CEE6665, 0, 0);
-        if (g_pGame->m_eGameState == 3)
+        if (g_pGame->m_eGameState == GS_END_GAME)
         {
             PlaySound(10, 0x42F55573, 0, 0);
         }
@@ -471,9 +471,9 @@ void Presentation::DoFunctionCall(unsigned int function)
         character->fn_80022D3C(value, direction ? 1.0f : 0.0f);
         switch (character->m_DetChar.m_eCharacterClass)
         {
-        case 5:
-        case 6:
-        case 8:
+        case PEACH:
+        case WALUIGI:
+        case YOSHI:
             gDisableHighRange = direction;
             break;
         }
@@ -529,7 +529,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = (s8)mMegaStrikeResult.attempts > original;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -540,7 +540,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
             && (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) != 0;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -551,7 +551,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
             && g_pGame->GetMegaStrikeGoalMask() == 0;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -561,7 +561,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) == 0;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }

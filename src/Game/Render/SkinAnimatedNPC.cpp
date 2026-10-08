@@ -103,7 +103,7 @@ void SkinAnimatedNPC::RenderFromReplay(
         const_cast<cPoseAccumulator*>(&poseAccumulator));
     SendToGL();
 
-    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         float positionY = mv3Position.y;
         if (positionY

@@ -202,16 +202,16 @@ public:
         nlSNPrintf(buffer, size, "%s", m_Value);
     }
     virtual void* GetValueAddress() { return &m_Value; }
-    virtual int GetValueType() { return 8; }
-    virtual int GetStorageKind() { return 1; }
+    virtual int GetValueType() { return TWEAK_TYPE_STRING; }
+    virtual int GetStorageKind() { return TWEAK_STORAGE_OWNED; }
     virtual void CopyValueFrom(TweakValueBase* other)
     {
         switch (other->GetStorageKind())
         {
-        case 1:
+        case TWEAK_STORAGE_OWNED:
             m_Value = ((TweakValueString*)other)->m_Value;
             break;
-        case 2:
+        case TWEAK_STORAGE_BINDING:
             m_Value = *(const char**)((TweakFloatBinding*)other)->m_pValue;
             break;
         }

@@ -45,14 +45,14 @@ bool DetInput::IsPressed(int button, bool remap)
         int* pArray;
         switch (m_nConnected)
         {
-        case 0:
-        case 3:
+        case DET_CONTROLLER_DISCONNECTED:
+        case DET_CONTROLLER_GAMECUBE:
             pArray = gGameCubePadButtonMap;
             break;
-        case 1:
+        case DET_CONTROLLER_WII_REMOTE:
             pArray = gWiiRemoteButtonRemap;
             break;
-        case 2:
+        case DET_CONTROLLER_WII_FREESTYLE:
             pArray = gWiiFreestyleButtonRemap;
             break;
         default:
@@ -71,14 +71,14 @@ bool DetInput::JustPressed(int button, bool remap)
         int* pArray;
         switch (m_nConnected)
         {
-        case 0:
-        case 3:
+        case DET_CONTROLLER_DISCONNECTED:
+        case DET_CONTROLLER_GAMECUBE:
             pArray = gGameCubePadButtonMap;
             break;
-        case 1:
+        case DET_CONTROLLER_WII_REMOTE:
             pArray = gWiiRemoteButtonRemap;
             break;
-        case 2:
+        case DET_CONTROLLER_WII_FREESTYLE:
             pArray = gWiiFreestyleButtonRemap;
             break;
         default:
@@ -102,14 +102,14 @@ bool DetInput::JustReleased(int button, bool remap)
         int* pArray;
         switch (m_nConnected)
         {
-        case 0:
-        case 3:
+        case DET_CONTROLLER_DISCONNECTED:
+        case DET_CONTROLLER_GAMECUBE:
             pArray = gGameCubePadButtonMap;
             break;
-        case 1:
+        case DET_CONTROLLER_WII_REMOTE:
             pArray = gWiiRemoteButtonRemap;
             break;
-        case 2:
+        case DET_CONTROLLER_WII_FREESTYLE:
             pArray = gWiiFreestyleButtonRemap;
             break;
         default:
@@ -139,12 +139,12 @@ void DetInput::UpdateButtonStateTicks()
         int button;
         switch (m_nConnected)
         {
-        case 0:
-        case 3:
+        case DET_CONTROLLER_DISCONNECTED:
+        case DET_CONTROLLER_GAMECUBE:
             button = GetPadButtonMask(i);
             break;
-        case 1:
-        case 2:
+        case DET_CONTROLLER_WII_REMOTE:
+        case DET_CONTROLLER_WII_FREESTYLE:
             button = GetWiiButtonMask(i);
             break;
         }
@@ -173,14 +173,14 @@ int DetInput::GetButtonStateTicks(int button, bool remap)
         int* pArray;
         switch (m_nConnected)
         {
-        case 0:
-        case 3:
+        case DET_CONTROLLER_DISCONNECTED:
+        case DET_CONTROLLER_GAMECUBE:
             pArray = gGameCubePadButtonMap;
             break;
-        case 1:
+        case DET_CONTROLLER_WII_REMOTE:
             pArray = gWiiRemoteButtonRemap;
             break;
-        case 2:
+        case DET_CONTROLLER_WII_FREESTYLE:
             pArray = gWiiFreestyleButtonRemap;
             break;
         default:
@@ -192,11 +192,11 @@ int DetInput::GetButtonStateTicks(int button, bool remap)
 
     switch (m_nConnected)
     {
-    case 0:
-    case 3:
+    case DET_CONTROLLER_DISCONNECTED:
+    case DET_CONTROLLER_GAMECUBE:
         return m_buttonStateTicks[GetPadButtonIndex(button)];
-    case 1:
-    case 2:
+    case DET_CONTROLLER_WII_REMOTE:
+    case DET_CONTROLLER_WII_FREESTYLE:
         return m_buttonStateTicks[GetWiiButtonIndex(button)];
     default:
         return 0;
@@ -210,14 +210,14 @@ void DetInput::ResetButtonStateTicks(int button, bool remap)
         int* pArray;
         switch (m_nConnected)
         {
-        case 0:
-        case 3:
+        case DET_CONTROLLER_DISCONNECTED:
+        case DET_CONTROLLER_GAMECUBE:
             pArray = gGameCubePadButtonMap;
             break;
-        case 1:
+        case DET_CONTROLLER_WII_REMOTE:
             pArray = gWiiRemoteButtonRemap;
             break;
-        case 2:
+        case DET_CONTROLLER_WII_FREESTYLE:
             pArray = gWiiFreestyleButtonRemap;
             break;
         default:
@@ -229,15 +229,15 @@ void DetInput::ResetButtonStateTicks(int button, bool remap)
 
     switch (m_nConnected)
     {
-    case 0:
-    case 3:
+    case DET_CONTROLLER_DISCONNECTED:
+    case DET_CONTROLLER_GAMECUBE:
     {
         int buttonIndex = GetPadButtonIndex(button);
         m_buttonStateTicks[buttonIndex] = 0;
         break;
     }
-    case 1:
-    case 2:
+    case DET_CONTROLLER_WII_REMOTE:
+    case DET_CONTROLLER_WII_FREESTYLE:
     {
         int buttonIndex = GetWiiButtonIndex(button);
         m_buttonStateTicks[buttonIndex] = 0;
@@ -252,7 +252,7 @@ void DetInput::Reset()
     m_AnalogLeftY = 0.0f;
     m_AnalogRightX = 0.0f;
     m_AnalogRightY = 0.0f;
-    m_nConnected = 2;
+    m_nConnected = DET_CONTROLLER_WII_FREESTYLE;
     m_ButtonBitfield = 0;
     m_LeftTrigger = 0;
     m_RightTrigger = 0;
@@ -329,7 +329,7 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
     PadBackend* backend = pad->mBackend;
     if (backend == 0 || !backend->IsConnected())
     {
-        m_nConnected = 0;
+        m_nConnected = DET_CONTROLLER_DISCONNECTED;
         m_LeftTrigger = 0;
         m_RightTrigger = 0;
         m_ButtonBitfield = 0;
@@ -348,7 +348,7 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
         int classID = backend->GetClassID();
         if (classID == gWiiRemotePadClassID)
         {
-            m_nConnected = 1;
+            m_nConnected = DET_CONTROLLER_WII_REMOTE;
             WPADStatus* status;
             WiiRemotePad* remote = static_cast<WiiRemotePad*>(pad->mBackend);
             status = &remote->mCurrentStatus->wpad;
@@ -372,7 +372,7 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
             classID = backend->GetClassID();
             if (classID == gWiiFreestylePadClassID)
             {
-                m_nConnected = 2;
+                m_nConnected = DET_CONTROLLER_WII_FREESTYLE;
                 WPADFSStatus* status;
                 WiiFreestylePad* nunchuk = static_cast<WiiFreestylePad*>(pad->mBackend);
                 status = &nunchuk->mCurrentStatus->wpad;
@@ -398,7 +398,7 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
                 classID = backend->GetClassID();
                 if (classID == gGameCubePadClassID)
                 {
-                    m_nConnected = 3;
+                    m_nConnected = DET_CONTROLLER_GAMECUBE;
                     gameCube = static_cast<GameCubePad*>(pad->mBackend);
                     PADStatus* status = gameCube->mCurrentStatus;
                     m_ButtonBitfield = status->button;
@@ -419,7 +419,7 @@ void DetInput::ReadFromPad(cGlobalPad* pad)
                     classID = backend->GetClassID();
                     if (classID == PadMonkey::sClassID)
                     {
-                        m_nConnected = 3;
+                        m_nConnected = DET_CONTROLLER_GAMECUBE;
                         monkey = static_cast<PadMonkey*>(pad->mBackend);
                         m_ButtonBitfield = 0;
                         for (int button = 1; button < (1 << monkey->GetButtonCount()); button <<= 1)

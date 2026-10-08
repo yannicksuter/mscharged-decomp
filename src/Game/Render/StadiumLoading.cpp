@@ -536,7 +536,7 @@ void UpdateStadium(float fDeltaT)
     bool bUpdateNPCs = true;
     if (GameInfoManager::Instance() != 0
         && nlTaskManager::m_pInstance->mCurrentState == 2 && lbl_806DEE60
-        && GameInfoManager::Instance()->GetStadium() == 13)
+        && GameInfoManager::Instance()->GetStadium() == STAD_VICE)
     {
         bUpdateNPCs = false;
     }

@@ -50,6 +50,13 @@ struct NetworkTournamentGame
     /* 0x13C */ int mGameTimeDelta;
 }; // size: 0x140
 
+enum eNetworkTournamentState
+{
+    NET_TOURN_INACTIVE = 0,
+    NET_TOURN_RUNNING = 1,
+    NET_TOURN_FINISHED = 2,
+};
+
 class NetTournManager : public CupInterface,
                         public NetworkMessageReceiver
 {

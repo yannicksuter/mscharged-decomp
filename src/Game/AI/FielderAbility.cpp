@@ -1,3 +1,4 @@
+#include "Game/Ball.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
 #include "Game/CharacterTriggers.h"
@@ -57,7 +58,7 @@ bool gPeachPhotoEmitEnabled;
 void cFielder::InitActionDKSuper()
 {
     EndFrozenOrDazed();
-    SetAction((eFielderActionState)0x1D);
+    SetAction(ACTION_SUPER_POWER);
     SetAnimState(0x68, true, 0.2f, false, false);
     muInvincibleStatus |= 1;
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -76,7 +77,7 @@ void cFielder::DoDKSuperHit()
         gDKSuperHitTiltScale * m_DetChar.m_v3Position.x);
     CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), gDKSuperShockwaveRadius);
-    PlayRumbleAction(4, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
 }
 
 void cFielder::ActionDKSuper(float fDeltaT)
@@ -125,7 +126,7 @@ void cFielder::InitActionPeachSuper()
 {
     EndFrozenOrDazed();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x1D);
+    SetAction(ACTION_SUPER_POWER);
     muInvincibleStatus |= 1;
 
     if ((u16)abs_s16((s16)(m_DetChar.m_aActualFacingDirection
@@ -250,12 +251,12 @@ void cFielder::fn_8004FF40()
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)5);
+        SetAction(ACTION_HIT_REACT);
         SetAnimState(0x68, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
         m_DetChar.m_fDesiredSpeed = 0.0f;
@@ -434,7 +435,7 @@ bool cFielder::TurnOnSuperPowerTank()
         if (m_eAnimID != 0x68 && IsRunning()
             && GetDesireState() != (eFielderDesireState)0x16)
         {
-            SetAction((eFielderActionState)0x1D);
+            SetAction(ACTION_SUPER_POWER);
             SetAnimState(0x68, true, 0.2f, false, false);
             InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet,
                 fvNotSet);

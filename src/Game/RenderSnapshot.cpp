@@ -97,11 +97,11 @@ void RenderSnapshot::Initialize()
         }
     }
 
-    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         mFlags.raw |= 0x00800000;
     }
-    if (GameInfoManager::Instance()->GetStadium() == 0x0F)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_SAND_TOMB)
     {
         mFlags.raw |= 0x00400000;
     }

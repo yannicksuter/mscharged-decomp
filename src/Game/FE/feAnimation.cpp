@@ -169,10 +169,10 @@ void FEAnimation::Update(float fCurrentTime)
 {
     switch (m_cast_type)
     {
-    case 1:
+    case FE_ANIMATION_VECTOR3:
         AnimateTargetAtTimeWithVector3(fCurrentTime);
         return;
-    case 0:
+    case FE_ANIMATION_FLOAT:
         AnimateTargetAtTimeWithFloat(fCurrentTime);
         return;
     }

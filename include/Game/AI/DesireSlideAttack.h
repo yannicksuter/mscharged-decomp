@@ -4,6 +4,13 @@
 #include "Game/AI/Desire.h"
 
 
+enum eDesireSlideAttackState
+{
+    DESIRE_SLIDE_APPROACH = 0,
+    DESIRE_SLIDE_ATTACKING = 1,
+    DESIRE_SLIDE_RECOVER = 2,
+};
+
 class DesireSlideAttack : public Desire
 {
 public:
@@ -22,7 +29,7 @@ public:
 
 private:
     cFielder* mpTarget;
-    int meDesireSubState;
+    eDesireSlideAttackState meDesireSubState;
 };
 
 #endif // GAME_AI_DESIRE_SLIDE_ATTACK_H

@@ -100,26 +100,26 @@ void WindDebris::CollisionCallback(
 
     switch (pObjA->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
         pPlayer = (cPlayer*)((PhysicsCharacter*)pObjA->m_parentObject)->m_pAICharacter;
         break;
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* pBall = ((PhysicsAIBall*)pObjA)->m_pAIBall;
         if (pBall->m_pOwner != 0)
         {
             pPlayer = pBall->m_pOwner;
         }
-        else if (pBall->meBallState != 10)
+        else if (pBall->meBallState != BALL_STATE_FALLING)
         {
             QueueCollisionDebrisBall(pDebris);
         }
         break;
     }
-    case 20:
+    case PHYSOBJ_SHELL:
         ((PhysicsShell*)pObjA)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
-    case 21:
+    case PHYSOBJ_BANANA:
         ((PhysicsBanana*)pObjA)->m_pPowerupObject->m_bShouldDestroy = true;
         break;
     }
@@ -127,7 +127,7 @@ void WindDebris::CollisionCallback(
     if (pPlayer != 0 && pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
-        if (pFielder->m_eActionState != 35 && pFielder->m_eActionState != 3
+        if (pFielder->m_eActionState != ACTION_LAUNCHED && pFielder->m_eActionState != ACTION_FALL
             && !pFielder->IsInFallAction())
         {
             CollisionWindDebrisPlayerData* pData = g_CollisionWindDebrisPlayerDataPool.Allocate();

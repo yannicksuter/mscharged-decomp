@@ -96,13 +96,13 @@ void CupNewsScene::SceneCreated()
 
     switch (cup)
     {
-    case 0:
+    case CUP_FIRE:
         nlSNPrintf(cupName, 0x10, "FIRE");
         break;
-    case 1:
+    case CUP_CRYSTAL:
         nlSNPrintf(cupName, 0x10, "CRYSTAL");
         break;
-    case 2:
+    case CUP_STRIKER:
         nlSNPrintf(cupName, 0x10, "STRIKER");
         break;
     }

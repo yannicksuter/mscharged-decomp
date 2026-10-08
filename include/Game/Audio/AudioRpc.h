@@ -14,12 +14,18 @@ struct AudioRpcCurvePoint
 
 struct AudioRpcRuntimeNode;
 
+enum eAudioRpcKind
+{
+    AUDIO_RPC_VOLUME = 0,
+    AUDIO_RPC_PITCH = 1,
+};
+
 struct AudioRpcDefinition
 {
     u32 field_00;
     u32 field_04;
     u32 sliderIndex;
-    s32 kind;
+    eAudioRpcKind kind;
     u32 enabled;
     u32 field_14;
     u32 pointCount;

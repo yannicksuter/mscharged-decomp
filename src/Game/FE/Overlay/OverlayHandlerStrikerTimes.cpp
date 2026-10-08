@@ -43,8 +43,8 @@ StrikerTimesOverlay::StrikerTimesOverlay()
     , mButtonsHidden(false)
     , mInputDelay(0.0f)
 {
-    mStoryScroller.SetEndBehavior(2);
-    mStoryScroller.SetScrollMode(1);
+    mStoryScroller.SetEndBehavior(SCROLL_END_STOP);
+    mStoryScroller.SetScrollMode(SCROLL_OVERFLOW);
     mIsNetworkGame = g_pNetworkSessionBase->GetNumMachines() > 1;
     mCountdownTimer.SetEnabled(mIsNetworkGame);
     mArticleImage = new (0x20, true) AsyncImage("art/fe/StrikerTimesUI.res", 0);
@@ -78,7 +78,7 @@ void StrikerTimesOverlay::Update(float dt)
     BaseSceneHandler::Update(dt);
     mHeadlineScroller->Update(dt);
     mArticleImage->Update(true);
-    mStoryScroller.SetScrollDirection(0);
+    mStoryScroller.SetScrollDirection(SCROLL_STOPPED);
     mStoryScroller.Update(dt);
 
     if (mIsNetworkGame)
@@ -245,7 +245,7 @@ void StrikerTimesOverlay::SceneCreated()
 
     headlineText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->GetActiveSlide(), "Layer", "HEADLINE");
     glGetScreenInfo();
-    mHeadlineScroller = new (8, false) FEScrollText(0);
+    mHeadlineScroller = new (8, false) FEScrollText(SCROLL_HORIZONTAL);
     mHeadlineScroller->ApplyNewTextInstancePointer(headlineText, -17, 240, 0);
     mHeadlineScroller->SetDisplayMessage(headline);
 

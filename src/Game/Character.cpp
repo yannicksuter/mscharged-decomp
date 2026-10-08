@@ -947,7 +947,7 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     newController = NewAnimController(animID, bRestartCyclic, bForceMirrorSwap, 0, 0);
     if (m_pAILayer[0] != 0 && finalBlendTime != 0.0f)
     {
-        if (m_pAILayer[0]->GetType() == 0)
+        if (m_pAILayer[0]->GetType() == POSE_NODE_BLENDER)
         {
             blender = (cPN_Blender*)m_pAILayer[0];
             if (blender->GetNumChildren() == 2 && blender->m_fBlendTime < 0.001f)
@@ -967,7 +967,7 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     m_pAILayer[0] = blender;
     m_pCurrentAnimController = newController;
     SetAnimID(animID);
-    if (m_eClassType == FIELDER && m_DetChar.m_eCharacterClass == 13)
+    if (m_eClassType == FIELDER && m_DetChar.m_eCharacterClass == HAMMERBROS)
     {
         m_bLeftPropAnimated = false;
         m_bRightPropAnimated = false;
@@ -1339,7 +1339,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     }
 
     if (pFielder != NULL && !fn_80014D38(g_pBall)
-        && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != 28)
+        && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != ACTION_KNOCKDOWN_REACT)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
         unidentifiedSlide += pFielder->IsSlippery() ? gSlipperySlideFactor : 0.0f;
@@ -1399,7 +1399,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
             nlVec2Set(*(nlVector2*)&m_DetChar.m_v3Position,
                 unidentifiedForceScale * unidentifiedForce.x + m_DetChar.m_v3Position.x,
                 unidentifiedForceScale * unidentifiedForce.y + m_DetChar.m_v3Position.y);
-            if (GameInfoManager::Instance()->GetStadium() != 11 && m_pPhysicsCharacter->m_CanCollideWithWall)
+            if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND && m_pPhysicsCharacter->m_CanCollideWithWall)
             {
                 cField::FixOutOfBoundsPosition(
                     m_DetChar.m_v3Position, fMinDistanceFromWall, false);
@@ -1542,7 +1542,7 @@ void cCharacter::AddRandomDirt()
 void cCharacter::fn_8001F1C0(int nParam)
 {
     m_nDamageType = nParam;
-    if (nParam == 2)
+    if (nParam == DAMAGE_TEXTURE_SCORCH)
     {
         m_MinDirt = 0.0f;
     }
@@ -1815,7 +1815,7 @@ extern "C" void fn_80020B8C(cFielder* pFielder)
 {
     pFielder->fn_80047240(pFielder,
         (unsigned short)(pFielder->m_DetChar.m_aActualFacingDirection + 0x8000),
-        0, false, false);
+        HIT_REACTION_LIGHT, false, false);
 }
 
 extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
@@ -1829,7 +1829,7 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
         {
             PlayCrowdReaction(0x3648CBA4UL);
         }
-        else if (pEventData->nHitReaction == 2)
+        else if (pEventData->nHitReaction == HIT_REACTION_HEAVY)
         {
             PlayCrowdReaction(pEventData->pAttacker->m_pTeam->m_nSide == HOME
                     ? 0xF2B4508FUL : 0x5F30D098UL);
@@ -1849,7 +1849,7 @@ extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData)
 
 extern "C" void fn_80020CDC(GoalScoredData* pEventData)
 {
-    if (pEventData != NULL && pEventData->uGoalType != 6)
+    if (pEventData != NULL && pEventData->uGoalType != GOAL_MEGA_STRIKE)
     {
         PlaySound(11, 0x8CEE6665UL, NULL, NULL);
     }
@@ -1959,9 +1959,9 @@ extern "C" void fn_80021050(LightningStrikeData* pEventData)
         if (nlSqrt(nlVec3DistanceSquared2D(g_pBall->m_v3Position,
                 pEventData->position), true) < pEventData->radius
             && g_pBall->m_pOwner == NULL
-            && g_pBall->meBallState != 10 && g_pBall->meBallState != 9)
+            && g_pBall->meBallState != BALL_STATE_FALLING && g_pBall->meBallState != BALL_STATE_LIGHTNING)
         {
-            fn_80015C38(g_pBall, 9);
+            fn_80015C38(g_pBall, BALL_STATE_LIGHTNING);
         }
         CreateLightningShockwave(&pEventData->position, pEventData->radius);
     }
@@ -2184,7 +2184,7 @@ extern "C" void fn_80021C98(CollisionPowerupWallData* pEventData)
     const nlVector3& pos = pEventData->position;
     const nlVector3& nrm = pEventData->normal;
     unsigned long powerupID = (unsigned long)pEventData->pPowerup;
-    if (GameInfoManager::Instance()->GetStadium() != 0xB
+    if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND
         || fabsf(pos.x) > cField::GetGoalLineX(1U) - 2.5f)
     {
         EmissionManager* unidentifiedManager = EmissionManager::Instance();
@@ -2247,7 +2247,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     nlVector3 v3Position;
     nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, v3FielderPosition);
     pEventData->player->SetPosition(v3Position);
-    if (pEventData->player->fn_80047240(pEventData->shell->mOwner, aDirection, 2, false, false))
+    if (pEventData->player->fn_80047240(pEventData->shell->mOwner, aDirection, HIT_REACTION_HEAVY, false, false))
     {
         pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
     }
@@ -2289,7 +2289,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, v3FielderPosition);
             pEventData->player->SetPosition(v3Position);
-            if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, 2, false, false))
+            if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, HIT_REACTION_HEAVY, false, false))
             {
                 pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
@@ -2332,7 +2332,7 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->m_DetChar.m_v3Position);
             pEventData->pFielder->SetPosition(v3Position);
-            if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, 2, false, false))
+            if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, HIT_REACTION_HEAVY, false, false))
             {
                 pEventData->pFielder->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
@@ -2340,7 +2340,7 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
             pEventData->pFielder->SetNoPickUpTime(0.06f);
             Goalie* pGoalie = pEventData->pBall->m_pShooter->m_pTeam->GetOtherTeam()->GetGoalie();
             pGoalie->mpSkillShooter = NULL;
-            fn_80015C38(pEventData->pBall, 6);
+            fn_80015C38(pEventData->pBall, BALL_STATE_SHOT);
         }
     }
     if (pEventData->pBall != NULL && pEventData->pFielder != NULL)
@@ -2354,7 +2354,7 @@ extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
     if (pEventData->pBall != NULL)
     {
         fn_800145A4(pEventData->pBall);
-        if (GameInfoManager::Instance()->GetStadium() != 0xB
+        if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND
             || fabsf(pEventData->pBall->m_v3Position.x) > cField::GetGoalLineX(1U) - 2.5f)
         {
             if (EmitElectricFenceBallEffect(pEventData->position, pEventData->normal, (unsigned long)pEventData->pBall, false))
@@ -2368,7 +2368,7 @@ extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
 extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
 {
     if (pEventData->pBall != NULL
-        && (pEventData->pBall->meBallState == 5 || pEventData->pBall->meBallState == 4 || pEventData->bIsShot))
+        && (pEventData->pBall->meBallState == BALL_STATE_VOLLEY_PASS || pEventData->pBall->meBallState == BALL_STATE_GOALIE_DEFLECTION || pEventData->bIsShot))
     {
         fn_80014494(pEventData->pBall);
     }
@@ -2435,7 +2435,7 @@ extern "C" void fn_800227C8()
 {
     if (g_pGame != NULL)
     {
-        g_pGame->ChangeGameState(5);
+        g_pGame->ChangeGameState(GS_GAMEPLAY);
         PlaySound(10, 0xA21ADED3UL, NULL, NULL);
     }
 }
@@ -2462,14 +2462,14 @@ extern "C" void fn_80022824(cPlayer*)
                 {
                     pFielder->EndSuperPower(0);
                 }
-                else if (pFielder->m_DetChar.m_eCharacterClass == 13
-                    && pFielder->m_eActionState == ACTION_UNKNOWN_32)
+                else if (pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
+                    && pFielder->m_eActionState == ACTION_SKILLSHOT)
                 {
                     pFielder->EndDesire();
                     pFielder->EndAction();
                 }
-                else if (pFielder->m_DetChar.m_eCharacterClass == 19
-                    && pFielder->m_eActionState == ACTION_UNKNOWN_32)
+                else if (pFielder->m_DetChar.m_eCharacterClass == SHYGUY
+                    && pFielder->m_eActionState == ACTION_SKILLSHOT)
                 {
                     pFielder->EndDesire();
                     pFielder->EndAction();
@@ -2579,10 +2579,10 @@ extern "C" void fn_80022BD8(CollisionEggData* pEventData)
                     pEventData->pFielder->m_DetChar.m_v3Velocity);
             }
             else if (pFielder->IsCharacterInAir(pEventData->pEgg->mPhysics->GetRadius())
-                || (pFielder->m_eActionState == 0x1D && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == WARIO)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == 13))
+                || (pFielder->m_eActionState == ACTION_SUPER_POWER && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
+                || (pFielder->m_eActionState == ACTION_DEKE && pFielder->m_DetChar.m_eCharacterClass == WARIO)
+                || (pFielder->m_eActionState == ACTION_DEKE && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
+                || (pFielder->m_eActionState == ACTION_DEKE && pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS))
             {
                 pFielder->InitActionBombReact(pEventData->pEgg->mPosition, 0.0f);
                 EmitTackleImpact(pFielder);

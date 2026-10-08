@@ -242,7 +242,7 @@ void ChainChomp::Update(float fDeltaT)
                         cFielder* pFielder = pTeam->GetFielder(j);
                         if (pFielder != 0)
                         {
-                            PlayRumbleAction(3, pFielder->GetGlobalPad());
+                            PlayRumbleAction(RUMBLE_SOLID_CONTACT, pFielder->GetGlobalPad());
                         }
                     }
                 }
@@ -385,7 +385,7 @@ void ChainChomp::Update(float fDeltaT)
     v3UpdatedPosition.x = mv3Position.x + fDeltaT * mv3Velocity.x;
     v3UpdatedPosition.y = mv3Position.y + fDeltaT * mv3Velocity.y;
     v3UpdatedPosition.z = gfChainChompGroundHeight;
-    if (GameInfoManager::Instance()->GetStadium() != 0xB && meChainChompState != CHAIN_STATE_LEAVE)
+    if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND && meChainChompState != CHAIN_STATE_LEAVE)
     {
         cField::FixOutOfBoundsPosition(v3UpdatedPosition,
             gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue(),
@@ -410,10 +410,10 @@ void ChainChomp::CollisionCallback(
     cFielder* pFielder = 0;
     switch (pObjA->GetObjectType())
     {
-    case 0x04:
+    case PHYSOBJ_COLUMN:
         pFielder = (cFielder*)((PhysicsCharacter*)pObjA->m_parentObject)->m_pAICharacter;
         break;
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* pBall = ((PhysicsAIBall*)pObjA)->m_pAIBall;
         cFielder* pOwner = (cFielder*)pBall->m_pOwner;
@@ -423,7 +423,7 @@ void ChainChomp::CollisionCallback(
         {
             pFielder = (cFielder*)pBall->m_pOwner;
         }
-        if (pFielder == 0 && pBall->meBallState != 10)
+        if (pFielder == 0 && pBall->meBallState != BALL_STATE_FALLING)
         {
             CollisionBallChainData* pData = g_CollisionBallChainDataPool.Allocate();
             pData->pChain = pChainChomp;
@@ -432,7 +432,7 @@ void ChainChomp::CollisionCallback(
         }
         break;
     }
-    case 0x14:
+    case PHYSOBJ_SHELL:
     {
         CollisionChainPowerupData* pData = g_CollisionChainPowerupDataPool.Allocate();
         pData->pChain = pChainChomp;
@@ -440,7 +440,7 @@ void ChainChomp::CollisionCallback(
         QueueCollisionChainPowerup(pData);
         break;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
     {
         CollisionChainPowerupData* pData = g_CollisionChainPowerupDataPool.Allocate();
         pData->pChain = pChainChomp;
@@ -466,7 +466,7 @@ void ChainChomp::CollisionCallback(
 
 void UpdateChainEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -849,7 +849,7 @@ void ChainChomp::DrawShadow(
         glSetCurrentTextureState(glHandleizeTextureState());
 
         RLView* view;
-        if (gPeachPhotoState.state == 1)
+        if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
         {
             view = GetLayerView(eCLV_MoreCharacters);
         }

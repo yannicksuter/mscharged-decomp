@@ -378,7 +378,7 @@ void ThwompObject::OnLanding()
                 cFielder* player = pTeam->GetFielder(fielder);
                 if (player->GetGlobalPad() != 0)
                 {
-                    PlayRumbleAction(1, player->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, player->GetGlobalPad());
                 }
             }
         }

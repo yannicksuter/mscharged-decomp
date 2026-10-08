@@ -15,7 +15,7 @@ public:
     void GetRadius(float*);
     void SetRadius(float);
 
-    virtual int GetObjectType() const { return 4; }
+    virtual int GetObjectType() const { return PHYSOBJ_COLUMN; }
 
     /* 0x38 */ dJointID m_jointID;
 }; // size: 0x3C

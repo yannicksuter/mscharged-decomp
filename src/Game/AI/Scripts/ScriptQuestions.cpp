@@ -1012,11 +1012,11 @@ extern "C" float fn_800D88B4(cFielder* pFielder)
     {
         switch (pFielder->m_pTeam->GetPowerUpByIndex(i).eType)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 5:
+        case POWER_UP_GREEN_SHELL:
+        case POWER_UP_RED_SHELL:
+        case POWER_UP_SPINY_SHELL:
+        case POWER_UP_FREEZE_SHELL:
+        case POWER_UP_BOBOMB:
             nPowerups++;
             break;
         }
@@ -1035,12 +1035,12 @@ extern "C" float fn_800D8970(cFielder* pFielder)
     {
         switch (pFielder->m_pTeam->GetPowerUpByIndex(i).eType)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
+        case POWER_UP_GREEN_SHELL:
+        case POWER_UP_RED_SHELL:
+        case POWER_UP_SPINY_SHELL:
+        case POWER_UP_FREEZE_SHELL:
+        case POWER_UP_BANANA:
+        case POWER_UP_BOBOMB:
             break;
         default:
             nPowerups++;
@@ -1547,7 +1547,7 @@ extern "C" float fn_800D9DD8(cPlayer* pPlayer)
         nlVector3 v3Position = pFielder->m_DetChar.m_v3Position;
         bool bOutOfBounds = cField::FixOutOfBoundsPosition(v3Position, -1.0f, true);
         bool bIncapacitated = pFielder->IsFrozenStateActive() || pFielder->IsInFallAction()
-            || pFielder->m_eActionState == 35
+            || pFielder->m_eActionState == ACTION_LAUNCHED
             || pFielder->m_eActionState == ACTION_ELECTROCUTION || bOutOfBounds;
         fScore = bIncapacitated ? 1.0f : 0.0f;
     }
@@ -2735,7 +2735,7 @@ extern "C" float fn_800DD99C(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (pFielder->m_eActionState == 0x1D)
+    if (pFielder->m_eActionState == ACTION_SUPER_POWER)
     {
         return 1.0f;
     }
@@ -2805,28 +2805,28 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
         float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
         switch (pFielder->m_DetChar.m_eCharacterClass)
         {
-        case 14:
-        case 15:
-        case 17:
-        case 19:
+        case KOOPA:
+        case TOAD:
+        case DRYBONES:
+        case SHYGUY:
             fScore = 1.0f;
             break;
-        case 12:
+        case BIRDO:
             if (aiPos.x > 0.0f)
                 fScore = LaneOpenness(pFielder->m_DetChar.m_v3Position,
                     pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation, pFielder, NULL,
                     1.0f, 1.0f, 0.0f, 0.0f);
             break;
-        case 13:
+        case HAMMERBROS:
             if (fDistance > 12.5f)
                 fScore = NormalizeVal(fDistance, 15.0f, 12.5f);
             else
                 fScore = NormalizeVal(fDistance, 7.0f, 12.5f);
             break;
-        case 16:
+        case BOO:
             fScore = NormalizeVal(fDistance, 7.0f, 4.5f);
             break;
-        case 18:
+        case MONTYMOLE:
             fScore = fDistance > 12.0f ? NormalizeVal(fDistance, 18.0f, 12.0f)
                                      : NormalizeVal(fDistance, 7.0f, 12.0f);
             break;
@@ -3139,10 +3139,10 @@ extern "C" float fn_800DEAB4(cFielder* pFielder)
 
     if (pFielder->m_eClassType == FIELDER)
     {
-        if (pFielder->GetActionState() == ACTION_UNKNOWN_15
-            || pFielder->GetActionState() == ACTION_UNKNOWN_30
+        if (pFielder->GetActionState() == ACTION_REGULAR_SHOT
+            || pFielder->GetActionState() == ACTION_SHOT_WINDUP
             || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-            || pFielder->GetActionState() == ACTION_SHOT)
+            || pFielder->GetActionState() == ACTION_MEGA_STRIKE)
         {
             return 1.0f;
         }

@@ -4,6 +4,15 @@
 #include "Game/PoseAccumulator.h"
 #include "NL/nlMath.h"
 
+enum ePoseNodeType
+{
+    POSE_NODE_BLENDER = 0,
+    POSE_NODE_FEATHER = 1,
+    POSE_NODE_ANIMATION = 2,
+    POSE_NODE_SINGLE_AXIS_BLENDER = 3,
+    POSE_NODE_SCALE_BLENDER = 4,
+};
+
 class cPoseNode
 {
 public:

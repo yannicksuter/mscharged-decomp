@@ -218,7 +218,7 @@ void EmissionController::Die()
     }
 }
 
-float EmissionController::GetRemainingTime() const
+float EmissionController::GetRemainingTime()
 {
     float maxRemainingTime = 0.0f;
     nlDLListIterator<ParticleSystem*> node;
@@ -355,7 +355,7 @@ bool fxUpdateParticleSystem(
 
 void EmissionController::UpdateParticleSystemDirection(EffectsSpec* pSpec, ParticleSystem* pSys)
 {
-    if (pSpec->m_nForwardAxis == 0 || m_pPose == 0)
+    if (pSpec->m_nForwardAxis == FX_FORWARD_DIRECTION || m_pPose == 0)
     {
         pSys->m_vForward = m_vDirection;
         return;
@@ -364,22 +364,22 @@ void EmissionController::UpdateParticleSystemDirection(EffectsSpec* pSpec, Parti
     nlVector4 dir;
     switch (pSpec->m_nForwardAxis)
     {
-    case 1:
+    case FX_FORWARD_POSITIVE_X:
         nlVec4Set(dir, 1.0f, 0.0f, 0.0f, 0.0f);
         break;
-    case 2:
+    case FX_FORWARD_POSITIVE_Y:
         nlVec4Set(dir, 0.0f, 1.0f, 0.0f, 0.0f);
         break;
-    case 3:
+    case FX_FORWARD_POSITIVE_Z:
         nlVec4Set(dir, 0.0f, 0.0f, 1.0f, 0.0f);
         break;
-    case 4:
+    case FX_FORWARD_NEGATIVE_X:
         nlVec4Set(dir, -1.0f, 0.0f, 0.0f, 0.0f);
         break;
-    case 5:
+    case FX_FORWARD_NEGATIVE_Y:
         nlVec4Set(dir, 0.0f, -1.0f, 0.0f, 0.0f);
         break;
-    case 6:
+    case FX_FORWARD_NEGATIVE_Z:
         nlVec4Set(dir, 0.0f, 0.0f, -1.0f, 0.0f);
         break;
     }
@@ -557,7 +557,7 @@ void EmissionController::SetFinishedCallback(
     mFinishedCallback = fcb;
 }
 
-float EmissionController::GetBoundingRadius() const
+float EmissionController::GetBoundingRadius()
 {
     float maxRadius = 0.0f;
     nlDLListIterator<ParticleSystem*> node;

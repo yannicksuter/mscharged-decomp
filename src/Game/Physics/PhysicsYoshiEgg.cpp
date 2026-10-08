@@ -44,7 +44,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
 
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cCharacter* character
             = ((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
@@ -97,7 +97,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         }
         break;
     }
-    case 0x10:
+    case PHYSOBJ_AI_BALL:
     {
         cPlayer* owner = ((PhysicsAIBall*)other)->m_pAIBall->m_pOwner;
         cFielder* player = mYoshiEgg->mFielder;
@@ -160,12 +160,12 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         }
         return NO_CONTACT;
     }
-    case 0x15:
+    case PHYSOBJ_BANANA:
         ((PhysicsBanana*)other)->m_pPowerupObject->m_bShouldDestroy = true;
         return NO_CONTACT;
-    case 0x14:
+    case PHYSOBJ_SHELL:
         return ONE_WAY_CONTACT_OTHER;
-    case 0x24:
+    case PHYSOBJ_THWOMP:
     {
         if (((PhysicsThwomp*)other)->mThwomp->mState == THWOMP_STATE_FALLING)
         {
@@ -186,7 +186,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         mYoshiEgg->SetPendingDisplacement(normal, contact->geom.depth);
         return ONE_WAY_CONTACT_THIS;
     }
-    case 0x1C:
+    case PHYSOBJ_PATCH:
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
         int type = patch->GetType();
@@ -212,7 +212,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         }
         return NO_CONTACT;
     }
-    case 0x1F:
+    case PHYSOBJ_HAMMER:
     {
         HammerObject* hammer = ((PhysicsHammer*)other)->mHammer;
         bool isLanded = hammer->mLandedTimer > 0.0f;
@@ -232,8 +232,8 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         QueueCollisionCrackEgg(crackData);
         break;
     }
-    case 0x18:
-    case 0x1E:
+    case PHYSOBJ_NPC:
+    case PHYSOBJ_BULLET_BILL:
     {
         crackData = 0;
         g_CollisionEggDataPool.Allocate(crackData);
@@ -269,7 +269,7 @@ void PhysicsYoshiEgg::PreCollide()
 
 int PhysicsYoshiEgg::GetObjectType() const
 {
-    return 0x20;
+    return PHYSOBJ_YOSHI_EGG;
 }
 
 PhysicsYoshiEgg::~PhysicsYoshiEgg()

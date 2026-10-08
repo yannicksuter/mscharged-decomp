@@ -52,19 +52,19 @@ GameInfoManager::GameInfoManager()
 {
     unknown_0x71C8 = 0;
     mGameInfo[GM_FRIENDLY] = 0;
-    mGameInfo[GM_MODE_1] = 0;
-    mGameInfo[GM_MODE_2] = 0;
-    mGameInfo[GM_MODE_3] = 0;
-    mGameInfo[GM_MODE_4] = 0;
+    mGameInfo[GM_ONLINE_TOURNAMENT] = 0;
+    mGameInfo[GM_DEMO] = 0;
+    mGameInfo[GM_CUP] = 0;
+    mGameInfo[GM_CHALLENGE] = 0;
 
     mGameInfo[GM_FRIENDLY] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
     mGameInfo[GM_FRIENDLY]->Reset(false);
-    mGameInfo[GM_MODE_2] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    mGameInfo[GM_MODE_2]->Reset(false);
-    mGameInfo[GM_MODE_1] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    mGameInfo[GM_MODE_1]->Reset(false);
-    mGameInfo[GM_MODE_4] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
-    mGameInfo[GM_MODE_4]->Reset(false);
+    mGameInfo[GM_DEMO] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
+    mGameInfo[GM_DEMO]->Reset(false);
+    mGameInfo[GM_ONLINE_TOURNAMENT] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
+    mGameInfo[GM_ONLINE_TOURNAMENT]->Reset(false);
+    mGameInfo[GM_CHALLENGE] = new (nlMalloc(sizeof(BasicGameInfo), 8, false)) BasicGameInfo;
+    mGameInfo[GM_CHALLENGE]->Reset(false);
 
     if (GetTweakBool("User/skipfe", false)) {
         SetMode(GM_FRIENDLY, false);
@@ -72,7 +72,7 @@ GameInfoManager::GameInfoManager()
         SetSidekick(0, 1, -1);
         SetTeam(1, 0);
         SetSidekick(1, 0, -1);
-        SetStadium(13);
+        SetStadium(STAD_VICE);
     }
 
     mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
@@ -93,12 +93,12 @@ GameInfoManager::GameInfoManager()
 
     mDefaultSettings.SkillLevel = GameplaySettings::ROOKIE;
     mDefaultSettings.NumGames = 3;
-    mDefaultSettings.GameLimitType = 0;
+    mDefaultSettings.GameLimitType = GAME_LIMIT_TIME;
     mDefaultSettings.GoalLimit = 5;
     mDefaultSettings.GameTime = 0xB4;
     mMode1Settings.SkillLevel = GameplaySettings::ROOKIE;
     mMode1Settings.NumGames = 1;
-    mMode1Settings.GameLimitType = 0;
+    mMode1Settings.GameLimitType = GAME_LIMIT_TIME;
     mMode1Settings.GoalLimit = 5;
     mMode1Settings.GameTime = 0xB4;
     sThis = this;
@@ -116,8 +116,8 @@ GameInfoManager::GameInfoManager()
 GameInfoManager::~GameInfoManager()
 {
     delete mGameInfo[GM_FRIENDLY];
-    delete mGameInfo[GM_MODE_2];
-    delete mGameInfo[GM_MODE_1];
+    delete mGameInfo[GM_DEMO];
+    delete mGameInfo[GM_ONLINE_TOURNAMENT];
     sThis = 0;
     SaveLoad::FreeBannerBuffer();
 }
@@ -229,17 +229,17 @@ bool GameInfoManager::HasTrophy(eTrophyType trophyType) const
 
 bool GameInfoManager::IsInMode3() const
 {
-    return mCurrentMode == GM_MODE_3;
+    return mCurrentMode == GM_CUP;
 }
 
 bool GameInfoManager::IsInOddCupMode() const
 {
-    return mCurrentMode == GM_MODE_1 || mCurrentMode == GM_MODE_3;
+    return mCurrentMode == GM_ONLINE_TOURNAMENT || mCurrentMode == GM_CUP;
 }
 
 bool GameInfoManager::IsInMode2() const
 {
-    return mCurrentMode == GM_MODE_2;
+    return mCurrentMode == GM_DEMO;
 }
 
 bool GameInfoManager::IsInFriendlyMode() const
@@ -249,12 +249,12 @@ bool GameInfoManager::IsInFriendlyMode() const
 
 bool GameInfoManager::IsInMode1() const
 {
-    return mCurrentMode == GM_MODE_1;
+    return mCurrentMode == GM_ONLINE_TOURNAMENT;
 }
 
 bool GameInfoManager::IsInMode4() const
 {
-    return mCurrentMode == GM_MODE_4;
+    return mCurrentMode == GM_CHALLENGE;
 }
 
 AudioSettings* GameInfoManager::GetAudioSettings()
@@ -277,7 +277,7 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
 
     if (mIsOnlineMode != 0) {
         if (mOnlineRankedMatch != 0) {
-            if (mCurrentMode == GM_MODE_1) {
+            if (mCurrentMode == GM_ONLINE_TOURNAMENT) {
                 const GameplaySettings* settings = &mMode1Settings;
 
                 return settings;
@@ -293,7 +293,7 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
         return settings;
     }
 
-    if (mCurrentMode == GM_MODE_3) {
+    if (mCurrentMode == GM_CUP) {
         const GameplaySettings* settings =
             &CupManager::s_pInstance->mCurrentCup->mCupSettings;
 
@@ -376,7 +376,7 @@ void GameInfoManager::SetupGameFromConfig()
         }
     }
 
-    if (mCurrentMode == GM_MODE_2) {
+    if (mCurrentMode == GM_DEMO) {
         mCurGameGameplayOptions.GameTime = 0x78;
         mCurGameGameplayOptions.SkillLevel = GameplaySettings::PROFESSIONAL;
     } else if (mIsInStrikers101Mode) {
@@ -384,7 +384,7 @@ void GameInfoManager::SetupGameFromConfig()
     } else if (g_e3_Build) {
         mCurGameGameplayOptions.GameTime = 0xB4;
         mCurGameGameplayOptions.SkillLevel = GameplaySettings::ROOKIE;
-    } else if (mCurrentMode == GM_MODE_4) {
+    } else if (mCurrentMode == GM_CHALLENGE) {
         StrikerChallenge* other = g_pStrikerChallenge;
 
         mCurGameGameplayOptions.GameTime = other->mRemainingTime;
@@ -394,7 +394,7 @@ void GameInfoManager::SetupGameFromConfig()
         mCurGameGameplayOptions.mAwayMegastrikeEnabled = other->mAwayMegastrikeEnabled;
         mCurGameGameplayOptions.m_unk18 = other->mHomeSkillshotDisabled;
         mCurGameGameplayOptions.m_unk19 = other->mAwaySkillshotDisabled;
-        mCurGameGameplayOptions.GameLimitType = 0;
+        mCurGameGameplayOptions.GameLimitType = GAME_LIMIT_TIME;
         mCurGameGameplayOptions.SkillLevel = (GameplaySettings::eSkillLevel)other->mAIDifficulty;
         mCurGameGameplayOptions.NumGames = 1;
     }
@@ -406,7 +406,7 @@ void GameInfoManager::SetupGameFromConfig()
     if (TweakExists("User/stadium")) {
         const char* value = GetTweakString("User/stadium", 0);
 
-        SetStadium(-1);
+        SetStadium(STAD_INVALID);
 
         for (int stadium = 0; stadium < 18; stadium++) {
             if (nlStrICmp(GetStadiumName(stadium), value) == 0) {
@@ -479,7 +479,7 @@ bool GameInfoManager::IsRule0x8Equal4() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 4;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_GLASS_JAW;
     }
 
     return false;
@@ -491,7 +491,7 @@ bool GameInfoManager::IsRule0x0Equal10() const
         return false;
     }
 
-    if (mCurrentMode == GM_MODE_4) {
+    if (mCurrentMode == GM_CHALLENGE) {
         int value = g_pStrikerChallenge->mCurrentChallenge;
 
         switch (value) {
@@ -504,7 +504,7 @@ bool GameInfoManager::IsRule0x0Equal10() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mCustomPowerups == 10;
+        return GetActiveRules()->mCustomPowerups == POWERUP_CHEAT_INFINITE;
     }
 
     return false;
@@ -517,7 +517,7 @@ bool GameInfoManager::IsRule0x4Equal4() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 4;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_TILT;
     }
 
     return false;
@@ -530,7 +530,7 @@ bool GameInfoManager::IsRule0x8Equal2() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 2;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_SAFE;
     }
 
     return false;
@@ -543,7 +543,7 @@ bool GameInfoManager::IsRule0x4Equal1() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 1;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_SECURE;
     }
 
     return false;
@@ -556,7 +556,7 @@ bool GameInfoManager::IsRule0x8Equal3() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 3;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_SKILL_SHOT;
     }
 
     return false;
@@ -569,7 +569,7 @@ bool GameInfoManager::IsRule0x8Equal1() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mPlayerCheat == 1;
+        return GetActiveRules()->mPlayerCheat == PLAYER_CHEAT_DEVASTATING;
     }
 
     return false;
@@ -582,7 +582,7 @@ bool GameInfoManager::IsRule0x4Equal3() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 3;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_VOLTAGE;
     }
 
     return false;
@@ -595,7 +595,7 @@ bool GameInfoManager::IsRule0x4Equal2() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 2;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_POWER;
     }
 
     return false;
@@ -608,7 +608,7 @@ bool GameInfoManager::IsRule0x4Equal5() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mEnvironmentCheat == 5;
+        return GetActiveRules()->mEnvironmentCheat == ENV_CHEAT_WHITE_BALL;
     }
 
     return false;
@@ -621,7 +621,7 @@ bool GameInfoManager::IsRule0x0Equal11() const
     }
 
     if ((mIsOnlineMode == 0 && mCurrentMode == GM_FRIENDLY) || UseAltRules()) {
-        return GetActiveRules()->mCustomPowerups == 11;
+        return GetActiveRules()->mCustomPowerups == POWERUP_CHEAT_BUTTERFINGERS;
     }
 
     return false;
@@ -817,7 +817,7 @@ int GameInfoManager::GetRule0x0() const
         return GetActiveRules()->mCustomPowerups;
     }
 
-    if (mCurrentMode == GM_MODE_4) {
+    if (mCurrentMode == GM_CHALLENGE) {
         return g_pStrikerChallenge->mCustomPowerups;
     }
 

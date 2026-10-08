@@ -31,6 +31,29 @@ struct NetworkLeaderboardCategory
     /* 0x1A80 */ NetworkRankingMeta mMetadata[65];
 }; // size: 0x2098
 
+enum eNetworkStatsJob
+{
+    NET_STATS_REPORT_SEASON = 0,
+    NET_STATS_REPORT_DAILY = 1,
+    NET_STATS_REPORT_FRIENDS = 2,
+    NET_STATS_RESET_SEASON = 3,
+    NET_STATS_RESET_DAILY = 4,
+    NET_STATS_RESET_FRIENDS = 5,
+    NET_STATS_GET_DAILY_NEARBY = 6,
+    NET_STATS_GET_DAILY_TOP = 7,
+    NET_STATS_GET_SEASON_NEARBY = 8,
+    NET_STATS_GET_SEASON_TOP = 9,
+    NET_STATS_GET_FRIENDS = 10,
+};
+
+enum eNetworkStatsOperation
+{
+    NET_STATS_IDLE = 0,
+    NET_STATS_SUBMIT_SCORE = 1,
+    NET_STATS_REPORT_RESULT = 2,
+    NET_STATS_GET_LEADERBOARD = 3,
+};
+
 class NetworkStatsManager : public NetworkStatsListener
 {
 public:
@@ -98,7 +121,7 @@ public:
     /* 0x000D */ bool mScoreRequestSucceeded;
     /* 0x000E */ u8 mPadding000E[2];
     /* 0x0010 */ int mScoreCategory;
-    /* 0x0014 */ int mOperation;
+    /* 0x0014 */ eNetworkStatsOperation mOperation;
     /* 0x0018 */ int mRequestedCategory;
     /* 0x001C */ int mSubmissionCategory;
     /* 0x0020 */ bool mHasLocalStats[3];

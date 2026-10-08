@@ -850,7 +850,7 @@ FakePhysicsBall::FakePhysicsBall(
 ContactType FakePhysicsBall::Contact(
     PhysicsObject* object, dContact* contact, int numContacts)
 {
-    if (object->GetObjectType() == 0x16)
+    if (object->GetObjectType() == PHYSOBJ_GOALIE_PLANE)
     {
         mWorld.mbCacheHitGoaliePlane = true;
     }

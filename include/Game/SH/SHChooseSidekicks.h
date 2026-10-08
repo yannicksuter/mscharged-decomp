@@ -9,6 +9,14 @@ class AsyncImage;
 class TLComponentInstance;
 class FETextureResource;
 
+enum eChooseSidekicksState
+{
+    CHOOSE_SIDEKICKS_ENTERING = 0,
+    CHOOSE_SIDEKICKS_CHOOSING = 1,
+    CHOOSE_SIDEKICKS_EXITING_FORWARD = 2,
+    CHOOSE_SIDEKICKS_EXITING_BACK = 3,
+};
+
 class ChooseSidekicksSceneV2 : public BaseSceneHandler
 {
 public:
@@ -95,7 +103,7 @@ public:
     /* 0x1940 */ unsigned short mTimerText[8];
     /* 0x1950 */ bool mDraftExitDone;
     /* 0x1951 */ u8 mPadding1951[3];
-    /* 0x1954 */ int mState;
+    /* 0x1954 */ eChooseSidekicksState mState;
     /* 0x1958 */ AsyncImage* mAttributeImages[2][8];
     /* 0x1998 */ AsyncImage* mPositionImages[2][8];
     /* 0x19D8 */ bool mAttributesLoaded[2][8];

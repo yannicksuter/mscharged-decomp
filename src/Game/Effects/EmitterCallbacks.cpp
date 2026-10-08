@@ -38,7 +38,7 @@ DrawableCharacter* GetReplayDrawableCharacter(cCharacter* character)
 
 void UpdateEmitterFromCharacterUnculled(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -60,7 +60,7 @@ void UpdateEmitterFromCharacterWithoutAnimController(
     EmissionController& controller, void* context)
 {
     cCharacter* character = (cCharacter*)context;
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -77,7 +77,7 @@ void UpdateEmitterFromCharacterWithoutAnimController(
 
 void UpdateEmitterFromCharacter(EmissionController& ec)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -98,7 +98,7 @@ void UpdateEmitterFromCharacter(EmissionController& ec)
 
 void UpdateEmitterPoseFromCharacter(EmissionController& emitter)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -116,7 +116,7 @@ void UpdateEmitterPoseFromCharacter(EmissionController& emitter)
 
 void UpdateEmitterFromBall(EmissionController& emitter)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -139,7 +139,7 @@ void UpdateEmitterFromBall(EmissionController& emitter)
 
 void UpdateEmitterFromBallTrail(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -163,7 +163,7 @@ void UpdateEmitterFromBallTrail(EmissionController& controller)
 
 void UpdateEmitterFromBallLandingSpot(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -184,7 +184,7 @@ void UpdateEmitterFromBallLandingSpot(EmissionController& controller)
 
 void UpdateEmitterFromCharacterHead(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -220,7 +220,7 @@ void UpdateEmitterFromCharacterHead(EmissionController& controller)
 
 void UpdateEmitterFromCharacterBackward(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -247,7 +247,7 @@ void UpdateEmitterFromCharacterBackward(EmissionController& controller)
 
 void UpdateEmitterFromCharacterForward(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -276,7 +276,7 @@ void UpdateEmitterFromImpostorModel(EmissionController& controller,
     void* context)
 {
     ImpostorModel* model = (ImpostorModel*)context;
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

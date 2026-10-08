@@ -218,13 +218,13 @@ bool DesireSuperPower::Initialize(void* context)
     case DAISY:
         m_pFielder->InitDesire(
             (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        m_pFielder->SetAction((eFielderActionState)29);
+        m_pFielder->SetAction(ACTION_SUPER_POWER);
         m_pFielder->muInvincibleStatus |= 1;
         m_pFielder->SetAnimState(104, true, 0.2f, false, false);
         m_pFielder->InitMovementFromAnim(
             0, gSuperPowerZeroVector, 1.0f, false);
         mMaxDuration = gDaisySuperPowerTimeLimit;
-        result = m_pFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == ACTION_SUPER_POWER;
         break;
     case DIDDYKONG:
         result = InitializeDiddy(this, context);
@@ -236,7 +236,7 @@ bool DesireSuperPower::Initialize(void* context)
                 4.0f + gDKSuperShockwaveRadius);
         m_pFielder->InitActionDKSuper();
         mMaxDuration = gDKSuperPowerTimeLimit;
-        result = m_pFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == ACTION_SUPER_POWER;
         break;
     case LUIGI:
         m_pFielder->m_pTweaks = m_pFielder->m_pSuperPowerTweaks;
@@ -257,7 +257,7 @@ bool DesireSuperPower::Initialize(void* context)
     case PEACH:
         m_pFielder->InitActionPeachSuper();
         mMaxDuration = gPeachSuperPowerTimeLimit;
-        result = m_pFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == ACTION_SUPER_POWER;
         break;
     case PETEY:
     {
@@ -322,7 +322,7 @@ bool DesireSuperPower::Initialize(void* context)
         }
 
         unsigned long sound = PowerupBase::GetSoundType(
-            (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
+            (ePowerUpType)m_pFielder->m_pCharacterInfo->mCaptainPowerup,
             PowerupBase::PWRUP_SOUND_ACTIVATE);
         if (m_pFielder->m_DetChar.m_eCharacterClass == MARIO
             || m_pFielder->m_DetChar.m_eCharacterClass == LUIGI)
@@ -489,7 +489,7 @@ void DesireSuperPower::Cleanup()
     }
 
     unsigned long sound = PowerupBase::GetSoundType(
-        (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
+        (ePowerUpType)m_pFielder->m_pCharacterInfo->mCaptainPowerup,
         PowerupBase::PWRUP_SOUND_ACTIVATE);
     StopCaptainPowerupStream(sound, m_pFielder);
     if ((m_pFielder->m_DetChar.m_eCharacterClass == MARIO)
@@ -565,9 +565,9 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
                         direction, m_pFielder->m_DetChar.m_v3Velocity);
                     float radius = Interpolate(gBowserFireBallMinEndRadius, gBowserFireBallMaxEndRadius, stage);
                     float lifetime = Interpolate(gBowserFireBallMinLifetime, gBowserFireBallMaxLifetime, stage);
-                    lbl_806E12C8->CreatePatch(1, m_pFielder, pos, direction,
+                    lbl_806E12C8->CreatePatch(PATCH_FIRE_BALL, m_pFielder, pos, direction,
                         gBowserFireBallStartRadius, radius, lifetime);
-                    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, m_pFielder->GetGlobalPad());
                 }
             }
             else
@@ -607,11 +607,11 @@ void EmitBowserJrShriek(DesireSuperPower* self)
     nlVec3Scale(vel, vel, gBowserJrShriekSpeed);
     nlVector3 pos = self->m_pFielder->GetJointPosition(
         self->m_pFielder->m_nHeadJointIndex);
-    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(7,
+    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_SHRINKER,
         self->m_pFielder, pos, vel,
         gBowserJrShriekStartRadius, gBowserJrShriekEndRadius, gBowserJrShriekLifetime);
     patch->SetEndRadiusTime(gBowserJrShriekEndRadiusTime);
-    PlayRumbleAction(1, self->m_pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, self->m_pFielder->GetGlobalPad());
     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
         "bowserjr_shriek_mouth");
     if (group != 0)
@@ -645,7 +645,7 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
     }
     short dir = 0;
     cFielder* target = FindPowerupTarget(
-        self->m_pFielder, (ePowerUpType)-1);
+        self->m_pFielder, POWER_UP_NONE);
     self->mpTarget = target;
     if ((target != 0) && (gBowserJrFaceTarget != 0))
     {
@@ -654,14 +654,14 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
     }
     self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    self->m_pFielder->SetAction((eFielderActionState)29);
+    self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
     self->m_pFielder->InitMovementFromAnim(
         dir, gSuperPowerZeroVector, 0.15f, false);
     self->mMaxDuration = gBowserJrSuperPowerTimeLimit;
     return self->m_pFielder->m_eActionState
-        == (eFielderActionState)29;
+        == ACTION_SUPER_POWER;
 }
 
 /**
@@ -679,7 +679,7 @@ void DesireSuperPower::UpdateBowserJr(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -700,7 +700,7 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -741,11 +741,11 @@ void DesireSuperPower::EmitHeavenlyLight()
     nlVec3Scale(offset, offset, gHeavenlyLightStartRadius + gHeavenlyLightOffset);
     nlVec3Add(pos, pos, offset);
     cField::FixOutOfBoundsPosition(pos, 0.9f * gHeavenlyLightEndRadius, true);
-    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(2,
+    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_HEAVENLY_LIGHT,
         m_pFielder, pos, gSuperPowerZeroVector,
         gHeavenlyLightStartRadius, gHeavenlyLightEndRadius, gHeavenlyLightLifetime);
     patch->SetEndRadiusTime(gHeavenlyLightEndRadiusTime);
-    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, m_pFielder->GetGlobalPad());
 }
 
 /**
@@ -764,7 +764,7 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
     }
     short dir = 0;
     cFielder* target = FindPowerupTarget(
-        self->m_pFielder, (ePowerUpType)-1);
+        self->m_pFielder, POWER_UP_NONE);
     self->mpTarget = target;
     if ((target != 0) && (gDiddyFaceTarget != 0))
     {
@@ -773,14 +773,14 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
     }
     self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    self->m_pFielder->SetAction((eFielderActionState)29);
+    self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
     self->m_pFielder->InitMovementFromAnim(
         dir, gSuperPowerZeroVector, 0.15f, false);
     self->mMaxDuration = gDiddySuperPowerTimeLimit;
     return self->m_pFielder->m_eActionState
-        == (eFielderActionState)29;
+        == ACTION_SUPER_POWER;
 }
 
 /**
@@ -798,7 +798,7 @@ void DesireSuperPower::UpdateDiddy(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -816,7 +816,7 @@ void DesireSuperPower::UpdateDK(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -848,13 +848,13 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
     m_pFielder->fn_8001EF6C(1.0f);
     switch (m_pFielder->m_eActionState)
     {
-    case (eFielderActionState)1:
+    case ACTION_DEKE:
         m_pFielder->fn_8001EF6C(lbl_806DC260);
         break;
     case ACTION_HIT:
         m_pFielder->fn_8001EF6C(gSuperGrowHitMovementScale);
         break;
-    case ACTION_SHOT:
+    case ACTION_MEGA_STRIKE:
         *update = 1;
         break;
     default:
@@ -892,13 +892,13 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
     m_pFielder->fn_8001EF6C(1.0f);
     switch (m_pFielder->m_eActionState)
     {
-    case (eFielderActionState)1:
+    case ACTION_DEKE:
         m_pFielder->fn_8001EF6C(lbl_806DC260);
         break;
     case ACTION_HIT:
         m_pFielder->fn_8001EF6C(gSuperGrowHitMovementScale);
         break;
-    case ACTION_SHOT:
+    case ACTION_MEGA_STRIKE:
         *update = 1;
         break;
     default:
@@ -922,7 +922,7 @@ void DesireSuperPower::UpdatePeach(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -991,7 +991,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
                     direction.y = m_pFielder->m_fPeteyMuckBallSpeed * nlSin(angle);
                     direction.z = gPeteyMuckBallUpSpeed;
                     nlVec3Add(direction, direction, m_pFielder->m_DetChar.m_v3Velocity);
-                    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(3, m_pFielder,
+                    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_MUCK_BALL, m_pFielder,
                         pos, direction, gPeteyMuckBallRadius, gPeteyMuckBallRadius, 9999.0f);
                     patch->m_Gravity = gPeteyMuckBallGravity;
                 }
@@ -1541,7 +1541,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                 if (m_pFielder->m_fNextGasTime <= 0.0f)
                 {
                     unsigned long sound = PowerupBase::GetSoundType(
-                        (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
+                        (ePowerUpType)m_pFielder->m_pCharacterInfo->mCaptainPowerup,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
                     m_pFielder->PlayImpactCameraRumble();
@@ -1555,9 +1555,9 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                     const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
                         m_pFielder->m_nBip01JointIndex_0xA4);
                     nlVec3Add(pos, (const nlVector3&)mat.m41, offset);
-                    lbl_806E12C8->CreatePatch(0, m_pFielder, pos, gSuperPowerZeroVector,
+                    lbl_806E12C8->CreatePatch(PATCH_GAS_BALL, m_pFielder, pos, gSuperPowerZeroVector,
                         gWarioGasStartRadius, gWarioGasEndRadius, gWarioGasLifetime);
-                    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, m_pFielder->GetGlobalPad());
                     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("wario_ignition");
                     if (group != 0)
                     {
@@ -1630,7 +1630,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     }
     self->m_pFielder->bYoshiInWindup
         = (self->m_pFielder->m_eActionState
-            == ACTION_UNKNOWN_30);
+            == ACTION_SHOT_WINDUP);
     if ((self->m_pFielder->GetDesireState() == 21)
         || (self->m_pFielder->GetDesireState() == 19)
         || (self->m_pFielder->GetDesireState() == 18)
@@ -1640,7 +1640,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
         self->m_pFielder->StartRunning();
     }
     else if (self->m_pFielder->m_eActionState
-        == ACTION_UNKNOWN_30)
+        == ACTION_SHOT_WINDUP)
     {
         self->m_pFielder->StartRunning();
     }
@@ -1705,7 +1705,7 @@ void HandleMuckBallCollision(void* context)
         pos.z = 0.0f;
         if (IsClearOfMuckHoles(pos) == true)
         {
-            lbl_806E12C8->CreatePatch(4, event->pPatch->m_pOwner,
+            lbl_806E12C8->CreatePatch(PATCH_MUCK_HOLE, event->pPatch->m_pOwner,
                 pos, gSuperPowerZeroVector, gPeteyMuckHoleRadius, gPeteyMuckHoleRadius, gPeteyMuckHoleLifetime);
         }
         event->pPatch->Unknown0();
@@ -1764,7 +1764,7 @@ const nlVector3* GetCharacterPosition(const cCharacter* character)
  */
 bool IsGameplayOrOvertime(const cGame* game)
 {
-    return game->m_eGameState == 5 || game->m_eGameState == 6;
+    return game->m_eGameState == GS_GAMEPLAY || game->m_eGameState == GS_OVERTIME;
 }
 
 #include "Game/AI/Fielder.inl"

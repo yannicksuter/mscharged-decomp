@@ -33,7 +33,7 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
         int original = m_SP[-2];
         m_SP--;
         m_SP[-1] = PickRandom(original);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -145,8 +145,8 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
     {
         int focus = m_SP[-1];
         m_SP--;
-        mCamera.mFocus = focus;
-        mCamera.mSecondaryFocus = focus;
+        mCamera.mFocus = static_cast<eReplayCameraFocus>(focus);
+        mCamera.mSecondaryFocus = static_cast<eReplayCameraFocus>(focus);
         break;
     }
     case 20:
@@ -190,7 +190,7 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
     {
         int focus = m_SP[-1];
         m_SP--;
-        mCamera.mSecondaryFocus = focus;
+        mCamera.mSecondaryFocus = static_cast<eReplayCameraFocus>(focus);
         break;
     }
     case 25:
@@ -220,7 +220,7 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
             result = 0;
         }
         m_SP[-1] = result;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             *(float*)&m_SP[-1] = original;
         }

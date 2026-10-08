@@ -15,7 +15,7 @@ public:
     PhysicsHammer(float radius);
     virtual ~PhysicsHammer();
 
-    virtual int GetObjectType() const { return 0x1F; }
+    virtual int GetObjectType() const { return PHYSOBJ_HAMMER; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual void PostUpdate();
     virtual void PreCollide();

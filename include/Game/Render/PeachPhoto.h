@@ -11,9 +11,16 @@ struct PeachPhotoCell
     nlVector2 texture[4];
 };
 
+enum ePeachPhotoState
+{
+    PEACH_PHOTO_INACTIVE = 0,
+    PEACH_PHOTO_ACTIVE = 1,
+    PEACH_PHOTO_FADING = 2,
+};
+
 struct PeachPhotoState
 {
-    int state;
+    ePeachPhotoState state;
     nlVector3 centre;
     nlVector3 corners[4];
     float displacement;

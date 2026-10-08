@@ -56,7 +56,7 @@ void InitializeInputRouters()
 
 InputRouter* GetInputRouter()
 {
-    if (g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         return gSimpleInputRouter;
     }

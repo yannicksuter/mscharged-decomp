@@ -195,7 +195,7 @@ void SaveLoad::ContinueWithoutSaving()
 
 void SaveLoad::BeginReset()
 {
-    ResetTask::s_ResetMode = 3;
+    ResetTask::s_ResetMode = RM_RETURN_TO_MENU;
     ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
         ? RS_STARTRESET
         : ResetTask::s_ResetState;
@@ -813,10 +813,10 @@ void SaveLoad::IconLoadsComplete()
     const char* region;
     switch (GetRegion())
     {
-    case 1:
+    case GAME_REGION_EU:
         region = "EU";
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         region = "JP";
         break;
     default:

@@ -460,12 +460,12 @@ void SHGameplayOptions::ApplyOptionSelection(int item)
     }
     else if (item == 10)
     {
-        mSettings.GameLimitType = 1;
+        mSettings.GameLimitType = GAME_LIMIT_GOALS;
         UpdateLimitText(1, mSettings.GoalLimit);
     }
     else if (item == 11)
     {
-        mSettings.GameLimitType = 0;
+        mSettings.GameLimitType = GAME_LIMIT_TIME;
         UpdateLimitText(0, mSettings.GameTime / 60);
     }
     else if (item >= 12 && item < 20)

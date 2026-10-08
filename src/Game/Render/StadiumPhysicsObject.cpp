@@ -20,7 +20,7 @@ PhysicsObject* ConstructStaticPhysicsPrimitive(StadiumPhysicsObject* object)
     PhysicsObject* obj;
     switch (physElement->uPrimitiveType)
     {
-    case 4:
+    case PHYS_PRIMITIVE_FINITE_PLANE:
     {
         const nlMatrix4& transform = physElement->matLocalToParent;
         bool normalPointsAwayFromField = false;

@@ -122,15 +122,15 @@ void AudioSource::SetSpatialParameters(Plat3dSoundSrc* source)
 
 void AudioSource::UpdateState()
 {
-    if (m_InternalState == 5)
+    if (m_InternalState == AUDIO_SOURCE_START_PENDING)
     {
-        m_State = 3;
+        m_State = AUDIO_SOURCE_PREPARED;
     }
     else
     {
         m_State = m_InternalState;
     }
-    if (m_State == 6 && HasVoice() && !WasVoiceDropped())
+    if (m_State == AUDIO_SOURCE_STOPPING && HasVoice() && !WasVoiceDropped())
         ReleaseVoice(true);
 }
 
@@ -169,8 +169,8 @@ void AudioSampleSource::Initialize(AudioSourceInfo* info)
     SPPrepareSound(m_SoundEntry, m_Voice, m_SoundEntry->sampleRate);
     m_SampleRateRatio = (float)m_SoundEntry->sampleRate / 32000.0f;
     MIXInitChannel(m_Voice, 0, 0, -960, -960, -960, 64, 127, 0);
-    m_InternalState = 1;
-    m_State = 1;
+    m_InternalState = AUDIO_SOURCE_IDLE;
+    m_State = AUDIO_SOURCE_IDLE;
 }
 
 inline void AudioSampleSource::operator delete(void* pointer)
@@ -189,7 +189,7 @@ void AudioSampleSource::Update()
 {
     switch (m_InternalState)
     {
-    case 5:
+    case AUDIO_SOURCE_START_PENDING:
         if (m_PlayCount == 1)
         {
             AXSetVoiceLoop(m_Voice, false);
@@ -201,12 +201,12 @@ void AudioSampleSource::Update()
                 (m_Voice->pb.addr.currentAddressHi << 16) | m_Voice->pb.addr.currentAddressLo);
         }
         AXSetVoiceState(m_Voice, AX_VOICE_RUN);
-        m_InternalState = 4;
+        m_InternalState = AUDIO_SOURCE_PLAYING;
         break;
-    case 4:
+    case AUDIO_SOURCE_PLAYING:
         if (m_Voice->pb.state == AX_VOICE_STOP)
         {
-            m_InternalState = 6;
+            m_InternalState = AUDIO_SOURCE_STOPPING;
         }
         else
         {
@@ -224,14 +224,14 @@ void AudioSampleSource::Update()
             m_LastVoiceAddress = address;
         }
         break;
-    case 6:
-        m_InternalState = 1;
+    case AUDIO_SOURCE_STOPPING:
+        m_InternalState = AUDIO_SOURCE_IDLE;
         break;
-    case 0:
+    case AUDIO_SOURCE_UNINITIALIZED:
         return;
-    case 1:
-    case 3:
-    case 7:
+    case AUDIO_SOURCE_IDLE:
+    case AUDIO_SOURCE_PREPARED:
+    case AUDIO_SOURCE_PAUSED:
         break;
     }
 }
@@ -239,7 +239,7 @@ void AudioSampleSource::Update()
 bool AudioSampleSource::Play(unsigned int value)
 {
     m_PlayCount = value;
-    m_InternalState = 5;
+    m_InternalState = AUDIO_SOURCE_START_PENDING;
     return true;
 }
 
@@ -247,7 +247,7 @@ void AudioSampleSource::Stop()
 {
     switch (m_InternalState)
     {
-    case 4:
+    case AUDIO_SOURCE_PLAYING:
     {
         bool enabled = OSDisableInterrupts();
         if (m_Voice != 0)
@@ -258,10 +258,10 @@ void AudioSampleSource::Stop()
         OSRestoreInterrupts(enabled);
         break;
     }
-    case 3:
-    case 7:
-        m_InternalState = 6;
-        m_State = 6;
+    case AUDIO_SOURCE_PREPARED:
+    case AUDIO_SOURCE_PAUSED:
+        m_InternalState = AUDIO_SOURCE_STOPPING;
+        m_State = AUDIO_SOURCE_STOPPING;
         break;
     }
 }
@@ -271,8 +271,8 @@ bool AudioSampleSource::Pause()
     m_PauseAddress = ((m_Voice->pb.addr.currentAddressHi << 16) | m_Voice->pb.addr.currentAddressLo) + 320;
     AXSetVoiceEndAddr(m_Voice, m_PauseAddress);
     AXSetVoiceLoop(m_Voice, false);
-    m_InternalState = 7;
-    m_State = 7;
+    m_InternalState = AUDIO_SOURCE_PAUSED;
+    m_State = AUDIO_SOURCE_PAUSED;
     return true;
 }
 
@@ -283,8 +283,8 @@ bool AudioSampleSource::Resume()
     AXSetVoiceLoop(m_Voice, m_PlayIteration < m_PlayCount || m_PlayCount == 0xFFFF);
     AXSetVoiceSrcRatio(m_Voice, (float)m_SoundEntry->sampleRate / 32000.0f);
     AXSetVoiceState(m_Voice, AX_VOICE_RUN);
-    m_InternalState = 4;
-    m_State = 4;
+    m_InternalState = AUDIO_SOURCE_PLAYING;
+    m_State = AUDIO_SOURCE_PLAYING;
     return true;
 }
 
@@ -295,8 +295,8 @@ void AudioSampleSource::OnVoiceDropped(void* pointer)
     source->m_VoiceDropped = true;
     source->ReleaseVoice(false);
     ++gResidentVoiceDropCount;
-    source->m_InternalState = 6;
-    source->m_State = 6;
+    source->m_InternalState = AUDIO_SOURCE_STOPPING;
+    source->m_State = AUDIO_SOURCE_STOPPING;
 }
 
 void AudioSampleSource::ReleaseVoice(bool release)
@@ -454,7 +454,7 @@ AudioReadState::AudioReadState()
     m_StreamEndPosition = 0;
     m_EndAddressSet = 0;
     m_ReadQueue = 0;
-    m_PendingState = 3;
+    m_PendingState = AUDIO_SOURCE_PREPARED;
     ++gAudioStreamSourceCount;
     ++gAudioSourceCount;
 }
@@ -478,7 +478,7 @@ inline unsigned int AudioReadState::GetChannelDataOffset(AudioStreamChannel* cha
 void OnAudioStreamHeaderRead(nlFile*, void* buffer, unsigned int, unsigned long userParam)
 {
     AudioReadCallbackEntry* entry = (AudioReadCallbackEntry*)userParam;
-    if (entry->m_State->m_PendingState == 6)
+    if (entry->m_State->m_PendingState == AUDIO_SOURCE_STOPPING)
     {
         entry->m_State->CompleteRead();
         gAudioReadCallbackAllocator.Free(entry);
@@ -507,21 +507,21 @@ inline void AudioReadState::OnChannelPrepared(AudioStreamChannel* channel)
 {
     if (channel == GetFirstChannel() + GetChannelCount() - 1)
     {
-        m_InternalState = 3;
+        m_InternalState = AUDIO_SOURCE_PREPARED;
         switch (m_PendingState)
         {
-        case 3:
+        case AUDIO_SOURCE_PREPARED:
             break;
-        case 5:
+        case AUDIO_SOURCE_START_PENDING:
         {
             AudioStreamChannel* voiceChannel = GetChannelIterator();
             while ((voiceChannel = GetNextChannel(voiceChannel)) != 0)
                 AXSetVoiceState(voiceChannel->m_Voice, AX_VOICE_RUN);
-            m_InternalState = 4;
+            m_InternalState = AUDIO_SOURCE_PLAYING;
             break;
         }
-        case 1:
-            m_InternalState = 3;
+        case AUDIO_SOURCE_IDLE:
+            m_InternalState = AUDIO_SOURCE_PREPARED;
             break;
         }
     }
@@ -531,7 +531,7 @@ void OnAudioStreamPrimeRead(nlFile* file, void* buffer, unsigned int size, unsig
 {
     AudioReadCallbackEntry* entry = (AudioReadCallbackEntry*)userParam;
     AudioReadState* state = entry->m_State;
-    if (state->m_PendingState == 6)
+    if (state->m_PendingState == AUDIO_SOURCE_STOPPING)
     {
         state->CompleteRead();
         gAudioReadCallbackAllocator.Free(entry);
@@ -559,7 +559,7 @@ void AudioReadState::Initialize(AudioSourceInfo* info)
         channel->m_BufferAddress = (unsigned int)channel->m_Buffer;
     }
     SetPan(0.0f);
-    m_InternalState = 1;
+    m_InternalState = AUDIO_SOURCE_IDLE;
 }
 
 bool AudioReadState::Prepare()
@@ -576,7 +576,7 @@ bool AudioReadState::Prepare()
         QueueStreamRead(offset, header, sizeof(AudioStreamHeader), OnAudioStreamHeaderRead, (unsigned long)entry);
     }
     SetInputVolume(-96.0f);
-    m_InternalState = 2;
+    m_InternalState = AUDIO_SOURCE_PREPARING;
     return true;
 }
 
@@ -585,17 +585,17 @@ bool AudioReadState::Play(unsigned int value)
     m_PlayCount = value;
     switch (m_InternalState)
     {
-    case 1:
+    case AUDIO_SOURCE_IDLE:
         Prepare();
-    case 2:
-        m_PendingState = 5;
+    case AUDIO_SOURCE_PREPARING:
+        m_PendingState = AUDIO_SOURCE_START_PENDING;
         break;
-    case 3:
+    case AUDIO_SOURCE_PREPARED:
     {
         AudioStreamChannel* channel = GetChannelIterator();
         while ((channel = GetNextChannel(channel)) != 0)
             AXSetVoiceState(channel->m_Voice, AX_VOICE_RUN);
-        m_InternalState = 4;
+        m_InternalState = AUDIO_SOURCE_PLAYING;
         break;
     }
     default:
@@ -608,7 +608,7 @@ void AudioReadState::Stop()
 {
     switch (m_InternalState)
     {
-    case 4:
+    case AUDIO_SOURCE_PLAYING:
     {
         bool enabled;
         AudioStreamChannel* channel = GetChannelIterator();
@@ -620,17 +620,17 @@ void AudioReadState::Stop()
             OSRestoreInterrupts(enabled);
         }
     }
-    case 2:
-        m_PendingState = 6;
+    case AUDIO_SOURCE_PREPARING:
+        m_PendingState = AUDIO_SOURCE_STOPPING;
         if (m_PendingReadCount != 0)
             g_pAudioBackend->QueueReadCancellation(this);
-        m_InternalState = 6;
+        m_InternalState = AUDIO_SOURCE_STOPPING;
         break;
-    case 3:
-    case 7:
-        m_InternalState = 6;
+    case AUDIO_SOURCE_PREPARED:
+    case AUDIO_SOURCE_PAUSED:
+        m_InternalState = AUDIO_SOURCE_STOPPING;
         break;
-    case 5:
+    case AUDIO_SOURCE_START_PENDING:
         break;
     }
 }
@@ -715,10 +715,10 @@ void AudioReadState::Update()
 {
     switch (m_InternalState)
     {
-    case 6:
-        m_InternalState = m_PendingReadCount == 0 ? 1 : 6;
+    case AUDIO_SOURCE_STOPPING:
+        m_InternalState = m_PendingReadCount == 0 ? AUDIO_SOURCE_IDLE : AUDIO_SOURCE_STOPPING;
         break;
-    case 4:
+    case AUDIO_SOURCE_PLAYING:
     {
         AXVPB* voice = GetFirstChannel()->m_Voice;
         if (GetVoiceCurrentAddress(voice) > GetVoiceEndAddress(voice))
@@ -791,17 +791,17 @@ void AudioReadState::Update()
         }
         break;
     }
-    case 2:
-    case 3:
-    case 5:
-    case 7:
+    case AUDIO_SOURCE_PREPARING:
+    case AUDIO_SOURCE_PREPARED:
+    case AUDIO_SOURCE_START_PENDING:
+    case AUDIO_SOURCE_PAUSED:
         break;
     }
 }
 
 bool AudioReadState::Pause()
 {
-    if (m_InternalState != 4)
+    if (m_InternalState != AUDIO_SOURCE_PLAYING)
         return false;
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
@@ -809,13 +809,13 @@ bool AudioReadState::Pause()
         channel->m_PauseAddress = (channel->m_Voice->pb.addr.currentAddressHi << 16) | channel->m_Voice->pb.addr.currentAddressLo;
         AXSetVoiceState(channel->m_Voice, AX_VOICE_STOP);
     }
-    m_InternalState = 7;
+    m_InternalState = AUDIO_SOURCE_PAUSED;
     return true;
 }
 
 bool AudioReadState::Resume()
 {
-    if (m_InternalState != 7)
+    if (m_InternalState != AUDIO_SOURCE_PAUSED)
         return false;
     AudioStreamChannel* channel = GetChannelIterator();
     while ((channel = GetNextChannel(channel)) != 0)
@@ -823,7 +823,7 @@ bool AudioReadState::Resume()
         AXSetVoiceCurrentAddr(channel->m_Voice, channel->m_PauseAddress);
         AXSetVoiceState(channel->m_Voice, AX_VOICE_RUN);
     }
-    m_InternalState = 4;
+    m_InternalState = AUDIO_SOURCE_PLAYING;
     return true;
 }
 

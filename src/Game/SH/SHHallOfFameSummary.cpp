@@ -97,13 +97,13 @@ SHHallOfFameSummary::SHHallOfFameSummary(int mode)
 
     switch (mMode)
     {
-    case 14:
+    case HOF_TROPHY_SUMMARY:
         mItemCount = 9;
         break;
-    case 15:
+    case HOF_UNLOCK_SUMMARY:
         mItemCount = 9;
         break;
-    case 16:
+    case HOF_CHALLENGE_SUMMARY:
         mItemCount = 12;
         break;
     }
@@ -117,21 +117,21 @@ inline void SHHallOfFameSummary::UpdateRows()
 {
     switch (mMode)
     {
-    case 14:
+    case HOF_TROPHY_SUMMARY:
         for (int i = 0; i < 7; i++)
         {
             UpdateRow(i, sTrophyEntries[i + mFirstVisibleItem].mStringId,
                 IsUnlockFlagSet(sTrophyEntries[i + mFirstVisibleItem].mUnlockFlag));
         }
         break;
-    case 15:
+    case HOF_UNLOCK_SUMMARY:
         for (int i = 0; i < 7; i++)
         {
             UpdateRow(i, sUnlockEntries[i + mFirstVisibleItem].mStringId,
                 sUnlockEntries[i + mFirstVisibleItem].mIsUnlocked());
         }
         break;
-    case 16:
+    case HOF_CHALLENGE_SUMMARY:
         for (int i = 0; i < 7; i++)
         {
             UpdateRow(i, sChallengeEntries[i + mFirstVisibleItem].mStringId,
@@ -318,13 +318,13 @@ void SHHallOfFameSummary::UpdateTitle()
 
     switch (this->mMode)
     {
-    case 14:
+    case HOF_TROPHY_SUMMARY:
         title = WideBasicString(LookupLocString("TITLE_SUMMARY_TROPHIES"));
         break;
-    case 15:
+    case HOF_UNLOCK_SUMMARY:
         title = WideBasicString(LookupLocString("TITLE_SUMMARY_STADIUMS_CHARACTERS"));
         break;
-    case 16:
+    case HOF_CHALLENGE_SUMMARY:
         title = WideBasicString(LookupLocString("TITLE_SUMMARY_STRIKER_CHALLENGES"));
         break;
     }
@@ -336,7 +336,7 @@ void SHHallOfFameSummary::UpdateTitle()
 void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlocked)
 {
     WideBasicString itemText;
-    if (this->mMode == 16)
+    if (this->mMode == HOF_CHALLENGE_SUMMARY)
     {
         WideBasicString itemName(LookupLocString(stringId));
         WideBasicString format(LookupLocString("SUMMARY_CHALLENGES"));
@@ -357,11 +357,11 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
 
     if (unlocked)
     {
-        if (this->mMode == 14)
+        if (this->mMode == HOF_TROPHY_SUMMARY)
         {
             lockState->SetActiveSlide("claimed", true, false);
         }
-        else if (this->mMode == 15)
+        else if (this->mMode == HOF_UNLOCK_SUMMARY)
         {
             lockState->SetActiveSlide("unlocked", true, false);
         }
@@ -372,11 +372,11 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
     }
     else
     {
-        if (this->mMode == 14)
+        if (this->mMode == HOF_TROPHY_SUMMARY)
         {
             lockState->SetActiveSlide("unclaimed", true, false);
         }
-        else if (this->mMode == 15)
+        else if (this->mMode == HOF_UNLOCK_SUMMARY)
         {
             lockState->SetActiveSlide("locked", true, false);
         }
@@ -386,7 +386,7 @@ void SHHallOfFameSummary::UpdateRow(int index, const char* stringId, bool unlock
         }
     }
 
-    if (this->mMode == 16)
+    if (this->mMode == HOF_CHALLENGE_SUMMARY)
     {
         TLTextInstance* statusText = FEFinder<TLTextInstance, 3>::FindOrDefault(presentation->m_currentSlide, "Layer", "summary", itemComponentName, "CHALLENGE_0", "lockedunlocked", "stat_1");
 

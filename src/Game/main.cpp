@@ -132,7 +132,7 @@ private:
 }; // size 0x28
 
 
-volatile int g_Region = 3;
+volatile int g_Region = GAME_REGION_DEFAULT;
 
 static u32 sCountryCode;
 GameAudio* g_pGameAudio;
@@ -214,8 +214,8 @@ void BuildParticleQuads(glShadowedTexturedColourModelWriter*, ParticleSystem*,
 
 int GetRegion()
 {
-    int region = 0;
-    if (g_Region != 3)
+    int region = GAME_REGION_US;
+    if (g_Region != GAME_REGION_DEFAULT)
     {
         region = g_Region;
     }
@@ -224,8 +224,8 @@ int GetRegion()
 
 int GetOnlineRegion()
 {
-    int region = 0;
-    if (g_Region != 3)
+    int region = GAME_REGION_US;
+    if (g_Region != GAME_REGION_DEFAULT)
     {
         region = g_Region;
     }
@@ -420,7 +420,7 @@ static void Initialize()
 
     switch (GetRegion())
     {
-    case 0:
+    case GAME_REGION_US:
         switch (SCGetLanguage())
         {
         case 3:
@@ -434,7 +434,7 @@ static void Initialize()
             break;
         }
         break;
-    case 1:
+    case GAME_REGION_EU:
         switch (SCGetLanguage())
         {
         case 2:
@@ -454,7 +454,7 @@ static void Initialize()
             break;
         }
         break;
-    case 2:
+    case GAME_REGION_JAPAN:
         g_Language = nlLocalization::LangJapanese;
         break;
     }

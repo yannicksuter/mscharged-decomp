@@ -358,17 +358,17 @@ const char* GetLOCEnvironmentCheatName(int cheat)
 {
     switch (cheat)
     {
-    case 0:
+    case ENV_CHEAT_NONE:
         return "CHEATS_NONE";
-    case 1:
+    case ENV_CHEAT_SECURE:
         return "CHEATS_ENVIRONMENT_SECURE";
-    case 2:
+    case ENV_CHEAT_POWER:
         return "CHEATS_ENVIRONMENT_POWER";
-    case 3:
+    case ENV_CHEAT_VOLTAGE:
         return "CHEATS_ENVIRONMENT_VOLTAGE";
-    case 4:
+    case ENV_CHEAT_TILT:
         return "CHEATS_ENVIRONMENT_TILT";
-    case 5:
+    case ENV_CHEAT_WHITE_BALL:
         return "CHEATS_ENVIRONMENT_WHITE_BALL";
     }
 }
@@ -377,17 +377,17 @@ const char* GetLOCEnvironmentCheatDescription(int cheat)
 {
     switch (cheat)
     {
-    case 0:
+    case ENV_CHEAT_NONE:
         return "CHEATS_NONE_DESC";
-    case 1:
+    case ENV_CHEAT_SECURE:
         return "CHEATS_ENVIRONMENT_SECURE_DESC";
-    case 2:
+    case ENV_CHEAT_POWER:
         return "CHEATS_ENVIRONMENT_POWER_DESC";
-    case 3:
+    case ENV_CHEAT_VOLTAGE:
         return "CHEATS_ENVIRONMENT_VOLTAGE_DESC";
-    case 4:
+    case ENV_CHEAT_TILT:
         return "CHEATS_ENVIRONMENT_TILT_DESC";
-    case 5:
+    case ENV_CHEAT_WHITE_BALL:
         return "CHEATS_ENVIRONMENT_WHITE_BALL_DESC";
     }
 }
@@ -396,15 +396,15 @@ const char* GetLOCPlayerCheatName(int cheat)
 {
     switch (cheat)
     {
-    case 0:
+    case PLAYER_CHEAT_NONE:
         return "CHEATS_NONE";
-    case 1:
+    case PLAYER_CHEAT_DEVASTATING:
         return "CHEATS_PLAYER_DEVASTATING";
-    case 2:
+    case PLAYER_CHEAT_SAFE:
         return "CHEATS_PLAYER_SAFE";
-    case 3:
+    case PLAYER_CHEAT_SKILL_SHOT:
         return "CHEATS_PLAYER_SKILL_SHOT";
-    case 4:
+    case PLAYER_CHEAT_GLASS_JAW:
         return "CHEATS_PLAYER_GLASS_JAW";
     }
 }
@@ -413,15 +413,15 @@ const char* GetLOCPlayerCheatDescription(int cheat)
 {
     switch (cheat)
     {
-    case 0:
+    case PLAYER_CHEAT_NONE:
         return "CHEATS_NONE_DESC";
-    case 1:
+    case PLAYER_CHEAT_DEVASTATING:
         return "CHEATS_PLAYER_DEVASTATING_DESC";
-    case 2:
+    case PLAYER_CHEAT_SAFE:
         return "CHEATS_PLAYER_SAFE_DESC";
-    case 3:
+    case PLAYER_CHEAT_SKILL_SHOT:
         return "CHEATS_PLAYER_SKILL_SHOT_DESC";
-    case 4:
+    case PLAYER_CHEAT_GLASS_JAW:
         return "CHEATS_PLAYER_GLASS_JAW_DESC";
     }
 }
@@ -430,29 +430,29 @@ const char* GetLOCPowerupCheatName(int cheat)
 {
     switch (cheat)
     {
-    case 0:
+    case POWERUP_CHEAT_NONE:
         return "CHEATS_NONE";
-    case 5:
+    case POWERUP_CHEAT_ACCELERATOR:
         return "CHEATS_POWERUPS_ACCELERATOR";
-    case 1:
+    case POWERUP_CHEAT_EXPLOSIVES:
         return "CHEATS_POWERUPS_EXPLOSIVES";
-    case 2:
+    case POWERUP_CHEAT_FREEZING:
         return "CHEATS_POWERUPS_FREEZING";
-    case 4:
+    case POWERUP_CHEAT_GIANT:
         return "CHEATS_POWERUPS_GIANT";
-    case 3:
+    case POWERUP_CHEAT_SHELLS:
         return "CHEATS_POWERUPS_SHELLS";
-    case 10:
+    case POWERUP_CHEAT_INFINITE:
         return "CHEATS_POWERUPS_INFINITE";
-    case 9:
+    case POWERUP_CHEAT_SUPER:
         return "CHEATS_POWERUPS_SUPER";
-    case 6:
+    case POWERUP_CHEAT_PEELIN_OUT:
         return "CHEATS_POWERUPS_PEELINOUT";
-    case 7:
+    case POWERUP_CHEAT_HEAT_SEEKERS:
         return "CHEATS_POWERUPS_HEATSEEEKERS";
-    case 8:
+    case POWERUP_CHEAT_BOMBS_AWAY:
         return "CHEATS_POWERUPS_BOMBSAWAY";
-    case 11:
+    case POWERUP_CHEAT_BUTTERFINGERS:
         return "CHEATS_PLAYER_BUTTERFINGERS";
     }
 }
@@ -461,29 +461,29 @@ const char* GetLOCPowerupCheatDescription(int cheat)
 {
     switch (cheat)
     {
-    case 0:
+    case POWERUP_CHEAT_NONE:
         return "CHEATS_NONE_DESC";
-    case 5:
+    case POWERUP_CHEAT_ACCELERATOR:
         return "CHEATS_POWERUPS_ACCELERATOR_DESC";
-    case 1:
+    case POWERUP_CHEAT_EXPLOSIVES:
         return "CHEATS_POWERUPS_EXPLOSIVES_DESC";
-    case 2:
+    case POWERUP_CHEAT_FREEZING:
         return "CHEATS_POWERUPS_FREEZING_DESC";
-    case 4:
+    case POWERUP_CHEAT_GIANT:
         return "CHEATS_POWERUPS_GIANT_DESC";
-    case 3:
+    case POWERUP_CHEAT_SHELLS:
         return "CHEATS_POWERUPS_SHELLS_DESC";
-    case 10:
+    case POWERUP_CHEAT_INFINITE:
         return "CHEATS_POWERUPS_INFINITE_DESC";
-    case 9:
+    case POWERUP_CHEAT_SUPER:
         return "CHEATS_POWERUPS_SUPER_DESC";
-    case 6:
+    case POWERUP_CHEAT_PEELIN_OUT:
         return "CHEATS_POWERUPS_PEELINOUT_DESC";
-    case 7:
+    case POWERUP_CHEAT_HEAT_SEEKERS:
         return "CHEATS_POWERUPS_HEATSEEEKERS_DESC";
-    case 8:
+    case POWERUP_CHEAT_BOMBS_AWAY:
         return "CHEATS_POWERUPS_BOMBSAWAY_DESC";
-    case 11:
+    case POWERUP_CHEAT_BUTTERFINGERS:
         return "CHEATS_PLAYER_BUTTERFINGERS_DESC";
     }
 }
@@ -494,19 +494,19 @@ bool IsEnvironmentCheatUnlocked(int cheat)
     bool unlocked = true;
     switch (cheat)
     {
-    case 1:
+    case ENV_CHEAT_SECURE:
         unlocked = IsSecureEnvironmentCheatUnlocked();
         break;
-    case 2:
+    case ENV_CHEAT_POWER:
         unlocked = IsPowerEnvironmentCheatUnlocked();
         break;
-    case 3:
+    case ENV_CHEAT_VOLTAGE:
         unlocked = IsVoltageEnvironmentCheatUnlocked();
         break;
-    case 4:
+    case ENV_CHEAT_TILT:
         unlocked = IsTiltEnvironmentCheatUnlocked();
         break;
-    case 5:
+    case ENV_CHEAT_WHITE_BALL:
         unlocked = IsWhiteBallEnvironmentCheatUnlocked();
         break;
     }
@@ -518,16 +518,16 @@ bool IsPlayerCheatUnlocked(int cheat)
     bool unlocked = true;
     switch (cheat)
     {
-    case 1:
+    case PLAYER_CHEAT_DEVASTATING:
         unlocked = IsDevastatingPlayerCheatUnlocked();
         break;
-    case 2:
+    case PLAYER_CHEAT_SAFE:
         unlocked = IsSafePlayerCheatUnlocked();
         break;
-    case 3:
+    case PLAYER_CHEAT_SKILL_SHOT:
         unlocked = IsSkillShotPlayerCheatUnlocked();
         break;
-    case 4:
+    case PLAYER_CHEAT_GLASS_JAW:
         unlocked = IsGlassJawPlayerCheatUnlocked();
         break;
     }
@@ -539,21 +539,21 @@ bool IsPowerupCheatUnlocked(int cheat)
     bool unlocked = true;
     switch (cheat)
     {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 10:
+    case POWERUP_CHEAT_EXPLOSIVES:
+    case POWERUP_CHEAT_FREEZING:
+    case POWERUP_CHEAT_SHELLS:
+    case POWERUP_CHEAT_GIANT:
+    case POWERUP_CHEAT_ACCELERATOR:
+    case POWERUP_CHEAT_PEELIN_OUT:
+    case POWERUP_CHEAT_HEAT_SEEKERS:
+    case POWERUP_CHEAT_BOMBS_AWAY:
+    case POWERUP_CHEAT_INFINITE:
         unlocked = IsPowerupCheatsUnlocked();
         break;
-    case 11:
+    case POWERUP_CHEAT_BUTTERFINGERS:
         unlocked = IsButterfingersPlayerCheatUnlocked();
         break;
-    case 9:
+    case POWERUP_CHEAT_SUPER:
         unlocked = IsSuperPowerupsCheatUnlocked();
         break;
     }

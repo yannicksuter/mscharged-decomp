@@ -17,7 +17,7 @@ XSoundHandle::XSoundHandle(void* value1,
     XSoundHitMarkerCallback callback, void* callbackContext)
     : m_Slot(0)
     , m_CueIndex(0xFFFF)
-    , m_State(0)
+    , m_State(SOUND_HANDLE_INITIAL)
     , m_CallbackEnabled(false)
     , m_Owner(owner)
     , m_PreviousTime(0.0f)
@@ -55,7 +55,7 @@ void XSoundHandle::SetCue(u32** slot, u32 cueIndex)
 {
     m_Slot = slot;
     m_CueIndex = cueIndex;
-    m_State = 1;
+    m_State = SOUND_HANDLE_PENDING;
 }
 
 void XSoundHandle::OnHitMarker(void* value)

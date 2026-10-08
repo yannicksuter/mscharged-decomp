@@ -46,7 +46,7 @@ static inline void Deactivate(KoopaShellObject* object, bool destroyEffect)
     {
         if (object->mOwner != 0 && object->mOwner->m_pBall != 0)
         {
-            object->mOwner->ReleaseBall(0);
+            object->mOwner->ReleaseBall(BALL_STATE_LOOSE);
         }
 
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(sKoopaShellTrail);
@@ -164,7 +164,7 @@ void KoopaShellObject::Update(float deltaTime)
 
 void KoopaShellObject::UpdateTrailEffect(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

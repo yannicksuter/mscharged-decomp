@@ -96,7 +96,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
         {
         case DAISY:
         case WALUIGI:
-        case (eCharacterClass)17:
+        case DRYBONES:
         {
             float fSign = AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
             Goalie* pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();

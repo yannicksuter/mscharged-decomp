@@ -11,7 +11,7 @@ public:
     PhysicsFinitePlane(CollisionSpace*, nlVector3&, nlVector3&, nlVector3&, bool, float);
     virtual ~PhysicsFinitePlane() { }
 
-    virtual int GetObjectType() const { return 7; }
+    virtual int GetObjectType() const { return PHYSOBJ_FINITEPLANE; }
 
     /* 0x38 */ float xMin;
     /* 0x3C */ float xMax;

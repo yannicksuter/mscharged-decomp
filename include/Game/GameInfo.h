@@ -85,10 +85,10 @@ public:
     enum eGameMode
     {
         GM_FRIENDLY = 0,
-        GM_MODE_1 = 1,
-        GM_MODE_2 = 2,
-        GM_MODE_3 = 3,
-        GM_MODE_4 = 4,
+        GM_ONLINE_TOURNAMENT = 1,
+        GM_DEMO = 2,
+        GM_CUP = 3,
+        GM_CHALLENGE = 4,
         GM_NUM_MODES = 5,
     };
 

@@ -12,7 +12,7 @@ void Nis::DoFunctionCall(unsigned int function)
     {
         int stadium = m_SP[-1];
         m_SP[-1] = GameInfoManager::Instance()->GetStadium() == stadium;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = stadium;
         }

@@ -63,7 +63,7 @@ void HUDOverlay::Update(float fDeltaT)
     mScoreDisplay.Update(fDeltaT);
     mCaptainMeter.Update(fDeltaT);
     mPowerUpDisplay.DisplayPowerUps(fDeltaT);
-    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == 0)
+    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME)
     {
         mClock.Update(fDeltaT);
     }
@@ -201,70 +201,70 @@ void HUDPowerUpDisplay::DisplayPowerUps(float fDeltaT)
             int num = g_pTeams[team]->GetPowerUpByIndex(i).nnumOfPowerups;
             switch (g_pTeams[team]->GetPowerUpByIndex(i).eType)
             {
-            case -1:
+            case POWER_UP_NONE:
                 pTextureResource[i] = 0;
                 break;
-            case 0:
+            case POWER_UP_GREEN_SHELL:
                 pTextureResource[i] = m_pPowerUpTextures->m_pShellGreen;
                 break;
-            case 2:
+            case POWER_UP_SPINY_SHELL:
                 pTextureResource[i] = m_pPowerUpTextures->m_pShellSpike;
                 break;
-            case 3:
+            case POWER_UP_FREEZE_SHELL:
                 pTextureResource[i] = m_pPowerUpTextures->m_pShellBlue;
                 break;
-            case 1:
+            case POWER_UP_RED_SHELL:
                 pTextureResource[i] = m_pPowerUpTextures->m_pShellRed;
                 break;
-            case 7:
+            case POWER_UP_MUSHROOM:
                 pTextureResource[i] = m_pPowerUpTextures->m_pMushroom;
                 break;
-            case 4:
+            case POWER_UP_BANANA:
                 pTextureResource[i] = m_pPowerUpTextures->m_pBanana;
                 break;
-            case 5:
+            case POWER_UP_BOBOMB:
                 pTextureResource[i] = m_pPowerUpTextures->m_pBobomb;
                 break;
-            case 8:
+            case POWER_UP_STAR:
                 pTextureResource[i] = m_pPowerUpTextures->m_pStar;
                 break;
-            case 6:
+            case POWER_UP_CHAIN_CHOMP:
                 pTextureResource[i] = m_pPowerUpTextures->m_pChomp;
                 break;
-            case 9:
+            case POWER_UP_MARIO:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[0];
                 break;
-            case 11:
+            case POWER_UP_DONKEYKONG:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[3];
                 break;
-            case 10:
+            case POWER_UP_PEACH:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[5];
                 break;
-            case 12:
+            case POWER_UP_BOWSER:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[1];
                 break;
-            case 13:
+            case POWER_UP_LUIGI:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[4];
                 break;
-            case 14:
+            case POWER_UP_DAISY:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[2];
                 break;
-            case 15:
+            case POWER_UP_WARIO:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[7];
                 break;
-            case 16:
+            case POWER_UP_WALUIGI:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[6];
                 break;
-            case 17:
+            case POWER_UP_BOWSERJR:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[9];
                 break;
-            case 18:
+            case POWER_UP_DIDDYKONG:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[10];
                 break;
-            case 19:
+            case POWER_UP_YOSHI:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[8];
                 break;
-            case 20:
+            case POWER_UP_PETEY:
                 pTextureResource[i] = m_pPowerUpTextures->m_pCaptainAbility[11];
                 break;
             }
@@ -452,7 +452,7 @@ void HUDClock::Init(FEPresentation* presentation)
         presentation, HUD_SLIDE_OUT_NAME, LAYER_NAME, "clock elements", "SUDDEN DEATH");
     mSuddenDeath[0]->m_bVisible = false;
     mSuddenDeath[1]->m_bVisible = false;
-    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == 1)
+    if (nlSingleton<GameInfoManager>::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS)
     {
         char goalLimit[4];
         unsigned short goalLimitWide[4];
@@ -715,16 +715,16 @@ void HUDCaptainMeter::Init(FEPresentation* presentation)
         nlColour colour;
         switch (nlSingleton<GameInfoManager>::Instance()->GetTeam(i))
         {
-        case 1:
+        case TEAM_BOWSER:
             nlColourSet(colour, 0xEE, 0x9A, 0x15, 0xFF);
             break;
-        case 11:
+        case TEAM_PETEY:
             nlColourSet(colour, 0x8F, 0x72, 0x19, 0xFF);
             break;
-        case 7:
+        case TEAM_WARIO:
             nlColourSet(colour, 0x52, 0xA7, 0x38, 0xFF);
             break;
-        case 6:
+        case TEAM_WALUIGI:
             nlColourSet(colour, 0x66, 0x3A, 0x8F, 0xFF);
             break;
         default:

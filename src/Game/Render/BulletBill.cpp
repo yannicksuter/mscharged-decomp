@@ -104,7 +104,7 @@ void BulletBillObject::Update(float deltaTime)
 
 void UpdateBulletBillEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }
@@ -168,7 +168,7 @@ void BulletBillObject::Hide(bool destroyEffect)
         {
             g_pBall->m_pPhysicsBall->EnableCollisions();
             g_pBall->m_bVisible = true;
-            target->ReleaseBall(0);
+            target->ReleaseBall(BALL_STATE_LOOSE);
             target->SetNoPickUpTime(0.2f);
         }
         if (!destroyEffect)

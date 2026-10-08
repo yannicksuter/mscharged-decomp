@@ -201,9 +201,9 @@ static inline bool SidekickFacingFlag(int sidekick)
 {
     switch (sidekick)
     {
-    case 3:
+    case SK_BIRDO:
         return false;
-    case 5:
+    case SK_DRYBONES:
         return false;
     default:
         return true;
@@ -287,19 +287,19 @@ void FECaptainComponent::SetOverallSlide(TLComponentInstance* overall, const Cha
     {
         switch (info.mPlayStyle)
         {
-        case 0:
+        case PLAYSTYLE_OFFENSIVE:
             overall->SetActiveSlide("offensive", false, false);
             break;
-        case 1:
+        case PLAYSTYLE_DEFENSIVE:
             overall->SetActiveSlide("defensive", false, false);
             break;
-        case 2:
+        case PLAYSTYLE_PLAYMAKER:
             overall->SetActiveSlide("playmaker", false, false);
             break;
-        case 3:
+        case PLAYSTYLE_POWER:
             overall->SetActiveSlide("power", false, false);
             break;
-        case 4:
+        case PLAYSTYLE_BALANCED:
             overall->SetActiveSlide("balanced", false, false);
             break;
         }

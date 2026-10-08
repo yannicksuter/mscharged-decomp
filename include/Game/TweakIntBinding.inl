@@ -14,12 +14,12 @@ int TweakIntBinding::GetDefault()
 
 int TweakIntBinding::GetValueType()
 {
-    return 3;
+    return TWEAK_TYPE_INT;
 }
 
 int TweakIntBinding::GetStorageKind()
 {
-    return 2;
+    return TWEAK_STORAGE_BINDING;
 }
 
 TweakValueBase* TweakIntBinding::CreateValue(
@@ -37,10 +37,10 @@ void TweakIntBinding::CopyValueFrom(
 {
     switch (other->GetStorageKind())
     {
-    case 1:
+    case TWEAK_STORAGE_OWNED:
         *m_pValue = ((TweakValueInt*)other)->mValue;
         break;
-    case 2:
+    case TWEAK_STORAGE_BINDING:
         *m_pValue = *((TweakIntBinding*)other)->m_pValue;
         break;
     }
@@ -51,12 +51,15 @@ void* TweakIntBinding::GetValueAddress()
     return m_pValue;
 }
 
-extern char gTweakIntBindingFormat[];
+void FormatTweakBindingValue(char* buffer, unsigned long size, int* value)
+{
+    nlSNPrintf(buffer, size, "%d", *value);
+}
 
 void TweakIntBinding::FormatValue(
     char* buffer, unsigned long size)
 {
-    nlSNPrintf(buffer, size, gTweakIntBindingFormat, *m_pValue);
+    FormatTweakBindingValue(buffer, size, m_pValue);
 }
 
 void TweakIntBinding::ParseValue(const char* value)

@@ -6,6 +6,16 @@
 extern float gMatrixEffectCameraDistance[2];
 extern u8 gMatrixEffectCameraFrozen[8];
 
+enum eReplayCameraFocus
+{
+    REPLAY_FOCUS_BALL = 0,
+    REPLAY_FOCUS_CURRENT_OR_LAST_OWNER = 1,
+    REPLAY_FOCUS_NET = 2,
+    REPLAY_FOCUS_GOALIE = 3,
+    REPLAY_FOCUS_CAPTAIN = 4,
+    REPLAY_FOCUS_ORIGIN = 5,
+};
+
 enum ReplayCameraPosition
 {
     REPLAY_CAMERA_POSITION_INSIDE_NET = 0,
@@ -63,7 +73,7 @@ private:
     nlVector3 GetClampedFocusPosition(const nlVector3& position, const nlVector3& lookAt,
         const nlVector3& secondaryLookAt, unsigned int width, unsigned int height,
         float fov) const;
-    nlVector3 GetFocusPosition(int focus) const;
+    nlVector3 GetFocusPosition(eReplayCameraFocus focus) const;
 
 public:
     /* 0x020 */ float mDeltaFov;
@@ -78,8 +88,8 @@ public:
     /* 0x061 */ bool mNoDampenLookAtForOneUpdate;
     /* 0x062 */ bool mFrozen;
     /* 0x063 */ bool mPositionFrozen;
-    /* 0x064 */ int mFocus;
-    /* 0x068 */ int mSecondaryFocus;
+    /* 0x064 */ eReplayCameraFocus mFocus;
+    /* 0x068 */ eReplayCameraFocus mSecondaryFocus;
     /* 0x06C */ ReplayCameraPosition mCamPos;
     /* 0x070 */ nlVector3 mPosition;
     /* 0x07C */ nlVector3 mLookAt;

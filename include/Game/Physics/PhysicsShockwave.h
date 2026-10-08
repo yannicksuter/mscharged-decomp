@@ -26,7 +26,7 @@ public:
         int type, float maximumRadius, float expansionRate);
 
     virtual ~PhysicsShockwave();
-    virtual int GetObjectType() const { return 0x23; }
+    virtual int GetObjectType() const { return PHYSOBJ_SHOCKWAVE; }
     virtual bool SetContactInfo(dContact*, PhysicsObject*, bool);
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
 

@@ -58,7 +58,7 @@ inline HitMarkerEvent::HitMarkerEvent(
         startTime = minimum;
     else
         startTime = RandomRange(minimum, minimum + maximum);
-    state = 0;
+    state = AUDIO_EVENT_INITIAL;
 }
 
 inline ParameterChangeEvent::ParameterChangeEvent(
@@ -72,7 +72,7 @@ inline ParameterChangeEvent::ParameterChangeEvent(
         startTime = minimum;
     else
         startTime = RandomRange(minimum, minimum + maximum);
-    state = 0;
+    state = AUDIO_EVENT_INITIAL;
 }
 
 AudioSequenceEvent* AudioSequenceEvent::Create(AudioSequenceInstance* owner,
@@ -80,11 +80,11 @@ AudioSequenceEvent* AudioSequenceEvent::Create(AudioSequenceInstance* owner,
 {
     switch (definition->type)
     {
-    case 1:
+    case AUDIO_EVENT_SOUND:
         return new SoundPlaybackEvent(owner, definition->sound);
-    case 3:
+    case AUDIO_EVENT_MARKER:
         return new HitMarkerEvent(owner, definition->hitMarker);
-    case 2:
+    case AUDIO_EVENT_PARAMETER:
         return new ParameterChangeEvent(owner, definition->parameter);
     default:
         return 0;
@@ -116,13 +116,13 @@ void SoundPlaybackEvent::StartPlayback()
     currentPitch = 0.0f;
     UpdatePlaybackParameters(true);
     source->Play(definition->soundId);
-    state = 4;
+    state = AUDIO_EVENT_PLAYING;
 }
 
 void SoundPlaybackEvent::Prepare()
 {
     source->Prepare();
-    state = 2;
+    state = AUDIO_EVENT_PREPARING;
 }
 
 AudioSourceInfo* SoundPlaybackEvent::SelectSourceInfo()
@@ -158,25 +158,25 @@ int SoundPlaybackEvent::Update(float)
 
     switch (state)
     {
-    case 2:
-        if (source->GetState() == 3)
-            state = 3;
+    case AUDIO_EVENT_PREPARING:
+        if (source->GetState() == AUDIO_SOURCE_PREPARED)
+            state = AUDIO_EVENT_PREPARED;
         break;
-    case 4:
-        if (source->GetState() == 1)
+    case AUDIO_EVENT_PLAYING:
+        if (source->GetState() == AUDIO_SOURCE_IDLE)
         {
-            state = 8;
+            state = AUDIO_EVENT_STOPPED;
             flags = 0;
         }
         break;
-    case 7:
-        if (source->GetState() == 1)
+    case AUDIO_EVENT_STOPPING:
+        if (source->GetState() == AUDIO_SOURCE_IDLE)
         {
-            state = 8;
+            state = AUDIO_EVENT_STOPPED;
             flags = 0;
         }
         break;
-    case 5:
+    case AUDIO_EVENT_PAUSED:
         return state;
     default:
         break;
@@ -189,7 +189,7 @@ int SoundPlaybackEvent::Update(float)
                   && owner->soundInstance->currentTime >= startTime;
     if (condition)
         StartPlayback();
-    if (state != 4)
+    if (state != AUDIO_EVENT_PLAYING)
         return state;
     UpdatePlaybackParameters(false);
     return state;
@@ -200,28 +200,28 @@ void SoundPlaybackEvent::Pause()
     if (source != 0)
         source->Pause();
     savedState = state;
-    state = 5;
+    state = AUDIO_EVENT_PAUSED;
 }
 
 void SoundPlaybackEvent::Resume()
 {
     if (source != 0)
         source->Resume();
-    state = savedState;
+    state = static_cast<eAudioSequenceEventState>(savedState);
 }
 
 static inline void AccumulateRpcModifier(
     AudioRpcRuntimeNode* node, u32& volumeCount, u32& pitchCount,
     float* volume, float* pitch)
 {
-    if (node->definition->kind == 1)
+    if (node->definition->kind == AUDIO_RPC_PITCH)
     {
         pitchCount++;
         float value = 0.01f * node->value;
         value = 0.091f * value;
         *pitch += value;
     }
-    else if (node->definition->kind == 0)
+    else if (node->definition->kind == AUDIO_RPC_VOLUME)
     {
         volumeCount++;
         *volume += node->value;
@@ -297,7 +297,7 @@ void SoundPlaybackEvent::AccumulateRpcModifiers(
 void SoundPlaybackEvent::Stop()
 {
     source->Stop();
-    state = 7;
+    state = AUDIO_EVENT_STOPPING;
     flags = 0;
 }
 
@@ -316,33 +316,33 @@ u32 SoundPlaybackEvent::GetSources(AudioSource** results)
 
 int HitMarkerEvent::Update(float)
 {
-    if (state == 2)
-        state = 3;
+    if (state == AUDIO_EVENT_PREPARING)
+        state = AUDIO_EVENT_PREPARED;
     bool condition = owner->soundInstance->previousTime < startTime
                   && owner->soundInstance->currentTime >= startTime;
     if (condition)
     {
         ((XSoundHandle*)owner->soundInstance->owner)
             ->OnHitMarker(definition->marker);
-        state = 8;
+        state = AUDIO_EVENT_STOPPED;
     }
     return state;
 }
 
 int ParameterChangeEvent::Update(float)
 {
-    if (state == 2)
-        state = 3;
+    if (state == AUDIO_EVENT_PREPARING)
+        state = AUDIO_EVENT_PREPARED;
     AudioSequenceInstance* owner = this->owner;
     bool trigger = owner->soundInstance->previousTime < startTime
                 && owner->soundInstance->currentTime >= startTime;
     if (trigger)
     {
-        if (definition->parameter == 0)
+        if (definition->parameter == AUDIO_EVENT_PARAMETER_PITCH)
             owner->SetPitch(definition->value);
-        else if (definition->parameter == 1)
+        else if (definition->parameter == AUDIO_EVENT_PARAMETER_VOLUME)
             owner->SetVolume(definition->value);
-        state = 8;
+        state = AUDIO_EVENT_STOPPED;
     }
     return state;
 }

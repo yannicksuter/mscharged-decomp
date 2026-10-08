@@ -55,26 +55,26 @@ static NetworkMessageFactory<NetMessageMegaStrikeMeter>
 
 void RegisterNetworkMessageFactories()
 {
-    gNetworkMessageRegistry->RegisterFactory(13, &sGameStartFactory);
-    gNetworkMessageRegistry->RegisterFactory(15, &sLoadedGameFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_GAME_START, &sGameStartFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_LOADED_GAME, &sLoadedGameFactory);
     gNetworkMessageRegistry->RegisterFactory(16, &sFactoryType16);
     gNetworkMessageRegistry->RegisterFactory(17, &sFactoryType17);
-    gNetworkMessageRegistry->RegisterFactory(18, &sLoadedGameClientFactory);
-    gNetworkMessageRegistry->RegisterFactory(19, &sLoadedGameEveryoneFactory);
-    gNetworkMessageRegistry->RegisterFactory(20, &sTournamentStartFactory);
-    gNetworkMessageRegistry->RegisterFactory(21, &sDraftFactory);
-    gNetworkMessageRegistry->RegisterFactory(22, &sDraftMachineInfoFactory);
-    gNetworkMessageRegistry->RegisterFactory(23, &sDraftPickedCaptainFactory);
-    gNetworkMessageRegistry->RegisterFactory(24, &sDraftPickedSidekicksFactory);
-    gNetworkMessageRegistry->RegisterFactory(25, &sSidesChangedFactory);
-    gNetworkMessageRegistry->RegisterFactory(26, &sCheckConnectionFactory);
-    gNetworkMessageRegistry->RegisterFactory(27, &sConnectionDecisionFactory);
-    gNetworkMessageRegistry->RegisterFactory(28, &sPauseRequestFactory);
-    gNetworkMessageRegistry->RegisterFactory(29, &sPauseResponseFactory);
-    gNetworkMessageRegistry->RegisterFactory(30, &sSkipNisFactory);
-    gNetworkMessageRegistry->RegisterFactory(31, &sSkipNisClientFactory);
-    gNetworkMessageRegistry->RegisterFactory(32, &sTournamentGameUpdateFactory);
-    gNetworkMessageRegistry->RegisterFactory(33, &sTournamentLoadingStateFactory);
-    gNetworkMessageRegistry->RegisterFactory(34, &sMegaBallPointerFactory);
-    gNetworkMessageRegistry->RegisterFactory(35, &sMegaStrikeMeterFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_LOADED_GAME_CLIENT, &sLoadedGameClientFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_LOADED_GAME_EVERYONE, &sLoadedGameEveryoneFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_TOURNAMENT_START, &sTournamentStartFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_DRAFT, &sDraftFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_DRAFT_MACHINE_INFO, &sDraftMachineInfoFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_DRAFT_PICKED_CAPTAIN, &sDraftPickedCaptainFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_DRAFT_PICKED_SIDEKICKS, &sDraftPickedSidekicksFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_SIDES_CHANGED, &sSidesChangedFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_CHECK_CONNECTION, &sCheckConnectionFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_CONNECTION_DECISION, &sConnectionDecisionFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_PAUSE_REQUEST, &sPauseRequestFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_PAUSE_RESPONSE, &sPauseResponseFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_SKIP_NIS, &sSkipNisFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_SKIP_NIS_CLIENT, &sSkipNisClientFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_TOURNAMENT_GAME_UPDATE, &sTournamentGameUpdateFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_TOURNAMENT_LOADING_STATE, &sTournamentLoadingStateFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_MEGA_BALL_POINTER, &sMegaBallPointerFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_MEGA_STRIKE_METER, &sMegaStrikeMeterFactory);
 }

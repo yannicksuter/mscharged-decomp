@@ -11,7 +11,7 @@ public:
     typedef void (*CallbackFn)(PhysicsObject*, PhysicsObject*, const nlVector3&);
 
     PhysicsNPC(float radius);
-    virtual int GetObjectType() const { return 0x18; }
+    virtual int GetObjectType() const { return PHYSOBJ_NPC; }
     virtual bool SetContactInfo(
         dContact* contact, PhysicsObject* other, bool first);
     virtual void PreUpdate();

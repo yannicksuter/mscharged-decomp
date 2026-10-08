@@ -347,7 +347,7 @@ void SHOnlineMiiSelectOverlay::ReturnToMiiSelect()
 
 void SHOnlineMiiSelectOverlay::ReturnToWiiMenu()
 {
-    ResetTask::s_ResetMode = 3;
+    ResetTask::s_ResetMode = RM_RETURN_TO_MENU;
     ResetTask::s_ResetState = ResetTask::s_ResetState == RS_RUNNING
                                 ? RS_STARTRESET
                                 : ResetTask::s_ResetState;

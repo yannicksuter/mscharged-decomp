@@ -10,7 +10,7 @@ class PhysicsRoundedCorner : public PhysicsObject
 {
 public:
     PhysicsRoundedCorner(CollisionSpace* collisionSpace, const nlVector2& position, float radius, bool extendPositiveX, bool extendPositiveY);
-    virtual int GetObjectType() const { return 5; }
+    virtual int GetObjectType() const { return PHYSOBJ_ROUNDED_CORNER; }
 };
 
 #endif

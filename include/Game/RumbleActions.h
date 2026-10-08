@@ -6,6 +6,7 @@ class cGlobalPad;
 
 enum eRumbleActionPreset
 {
+    RUMBLE_STOP = 0,
     RUMBLE_SMALL_CONTACT = 1,
     RUMBLE_MEDIUM_CONTACT = 2,
     RUMBLE_SOLID_CONTACT = 3,

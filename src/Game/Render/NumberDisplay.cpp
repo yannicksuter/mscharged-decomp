@@ -206,7 +206,7 @@ void NumberDisplay::Render()
     {
         return;
     }
-    if ((g_pGame->m_eGameState == 3
+    if ((g_pGame->m_eGameState == GS_END_GAME
          && nlTaskManager::m_pInstance->mCurrentState == 8)
         || !mVisible)
     {

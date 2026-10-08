@@ -59,9 +59,9 @@ void SHOnlineFriendsDraft::UpdateDraftStatuses()
         NetworkDraftTeam* team = NetworkDraft::Instance()->GetDraftTeam(teamIndex);
         NetworkDraftPlayer* player = team->FindPlayer(mDraftPlayers[i].mMachineInfo->mMachineIndex, mDraftPlayers[i].mIsGuest);
         if (player->mDisconnected)
-            row.mStatus = 8;
+            row.mStatus = ONLINE_ROW_OFFLINE;
         else if (teamIndex > draftingTeam)
-            row.mStatus = 1;
+            row.mStatus = ONLINE_ROW_WAIT_OPPONENT;
         else if (teamIndex == draftingTeam)
         {
             NetworkDraft* draft = NetworkDraft::Instance();
@@ -69,17 +69,17 @@ void SHOnlineFriendsDraft::UpdateDraftStatuses()
             bool draftingGuest = draft->mCurrentDrafterIsGuest;
             if (draftingPeer == mDraftPlayers[i].mMachineInfo->mMachineIndex
                 && draftingGuest == mDraftPlayers[i].mIsGuest)
-                row.mStatus = 0;
+                row.mStatus = ONLINE_ROW_WAIT_FRIEND;
             else
-                row.mStatus = 4;
+                row.mStatus = ONLINE_ROW_CHOOSE_CAPTAIN;
         }
         else if (team->mCaptain != -1)
         {
-            row.mStatus = 6;
+            row.mStatus = ONLINE_ROW_CAPTAIN_NAMES;
             row.mCaptain = team->mCaptain;
         }
         else
-            row.mStatus = 11;
+            row.mStatus = ONLINE_ROW_EMPTY;
     }
 }
 
@@ -105,8 +105,8 @@ void SHOnlineFriendsDraft::InitializePlayerRows()
             nlStrNCpy(row.mName, string.c_str(), 14);
         }
         memcpy(row.mMiiData, mDraftPlayers[i].mMachineInfo->mMiiData, sizeof(row.mMiiData));
-        row.mSearchState = 4;
-        row.mStatus = 1;
+        row.mSearchState = ONLINE_ROW_SEARCH_OFF;
+        row.mStatus = ONLINE_ROW_WAIT_OPPONENT;
         row.mStats = mDraftPlayers[i].mMachineInfo->mStats;
         NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
         if (category != 0)

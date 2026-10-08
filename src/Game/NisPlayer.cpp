@@ -917,7 +917,7 @@ void NisPlayer::OnMegaStrikeIntro(cPlayer* player)
     {
         return;
     }
-    if (g_pGame->m_eGameState == 3)
+    if (g_pGame->m_eGameState == GS_END_GAME)
     {
         return;
     }

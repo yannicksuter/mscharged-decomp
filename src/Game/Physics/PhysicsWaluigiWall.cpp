@@ -115,16 +115,16 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
 {
     switch (other->GetObjectType())
     {
-    case 4:
+    case PHYSOBJ_COLUMN:
     {
         cPlayer* player = (cPlayer*)((PhysicsCharacter*)other->m_parentObject)->m_pAICharacter;
-        if (player->m_eClassType == 2)
+        if (player->m_eClassType == FIELDER)
         {
             if (((cFielder*)player)->mbTangible)
                 return FielderContact((cFielder*)player);
             return NO_CONTACT;
         }
-        if (player->m_eClassType == 3)
+        if (player->m_eClassType == GOALIE)
         {
             cFielder* goalie = (cFielder*)player;
             ((Goalie*)goalie)->SetWallBlock(true, mID);
@@ -132,19 +132,19 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         }
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 16:
+    case PHYSOBJ_AI_BALL:
     {
         cBall* ball = ((PhysicsAIBall*)other)->m_pAIBall;
         cPlayer* player = ball->m_pOwner;
         if (player != 0)
         {
-            if (player->m_eClassType == 2)
+            if (player->m_eClassType == FIELDER)
             {
                 if (((cFielder*)player)->mbTangible)
                     return FielderContact((cFielder*)player);
                 return NO_CONTACT;
             }
-            if (player->m_eClassType == 3)
+            if (player->m_eClassType == GOALIE)
                 return FielderContact((cFielder*)player);
             return ONE_WAY_CONTACT_OTHER;
         }
@@ -161,7 +161,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         }
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 28:
+    case PHYSOBJ_PATCH:
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
         if (patch->m_Type == 1)
@@ -176,16 +176,16 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         }
         return NO_CONTACT;
     }
-    case 18:
-    case 23:
-    case 25:
-    case 29:
+    case PHYSOBJ_GROUND_PLANE:
+    case PHYSOBJ_WALL:
+    case PHYSOBJ_NET:
+    case PHYSOBJ_WALUIGI_WALL:
         return NO_CONTACT;
-    case 20:
-    case 21:
+    case PHYSOBJ_SHELL:
+    case PHYSOBJ_BANANA:
         ApplyDamage(gWaluigiWallShellBananaDamage);
         return ONE_WAY_CONTACT_OTHER;
-    case 33:
+    case PHYSOBJ_BIRDO_EGG:
     {
         CollisionBirdoEggEndData* data = 0;
         g_CollisionBirdoEggEndDataPool.Allocate(data);
@@ -194,7 +194,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionBirdoEggEnd(data);
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 34:
+    case PHYSOBJ_KOOPA_SHELL:
     {
         CollisionKoopaShellEndData* data = 0;
         g_CollisionKoopaShellEndDataPool.Allocate(data);
@@ -203,7 +203,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         QueueCollisionKoopaShellEnd(data);
         return ONE_WAY_CONTACT_OTHER;
     }
-    case 24:
+    case PHYSOBJ_NPC:
     {
         PhysicsNPC* npc = (PhysicsNPC*)other;
         SkinAnimatedNPC* object = npc->mpAINPC;
@@ -228,7 +228,7 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
     case 26:
         ApplyDamage(gWaluigiWallType26Damage);
         return ONE_WAY_CONTACT_OTHER;
-    case 32:
+    case PHYSOBJ_YOSHI_EGG:
         ApplyDamage(gWaluigiWallYoshiEggDamage);
         return NO_CONTACT;
     default:
@@ -251,7 +251,7 @@ void PhysicsWaluigiWall::PreCollide()
     const nlVector3& velocity = g_pBall->m_v3Velocity;
     if (g_pBall->m_pOwner == 0 && !fn_800167A8(g_pBall)
         && nlVec3DotProduct(velocity, velocity) > 400.0f
-        && g_pBall->meBallState != 10)
+        && g_pBall->meBallState != BALL_STATE_FALLING)
     {
         const nlVector3& start = g_pBall->GetPosition();
         nlVector3 end;
@@ -367,7 +367,7 @@ inline void WaluigiWallManager::EndWall()
 
 ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
 {
-    if (player->m_eClassType == 2)
+    if (player->m_eClassType == FIELDER)
     {
         if (player == mOwner)
         {
@@ -578,7 +578,7 @@ PhysicsWaluigiWall* WaluigiWallManager::FindWall(unsigned int id)
 
 void OnWaluigiWallEffectFinished(EmissionController& controller, int reason)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
         return;
     if (!controller.m_Replaying && reason == 2)
     {
@@ -590,7 +590,7 @@ void OnWaluigiWallEffectFinished(EmissionController& controller, int reason)
 
 void UpdateWaluigiWallEmitter(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
         return;
     if (!controller.m_Replaying && ReplayManager::Instance()->mRender != 0)
     {

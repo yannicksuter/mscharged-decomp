@@ -16,7 +16,7 @@
 
 #define OSSleepMilliseconds(msec) OSSleepTicks(OSMillisecondsToTicks((OSTime)msec))
 
-s32 ResetTask::s_ResetMode = 0;
+RESET_MODE ResetTask::s_ResetMode = RM_RESTART;
 RESET_STATE ResetTask::s_ResetState = RS_RUNNING;
 bool ResetTask::s_AudioInInit = false;
 bool ResetTask::s_ResetPressed = false;
@@ -54,13 +54,13 @@ void ResetTask::Run(float dt)
 
     if (!OSGetResetButtonState() && s_ResetPressed)
     {
-        s_ResetMode = 0;
+        s_ResetMode = RM_RESTART;
         s_ResetState = s_ResetState == RS_RUNNING ? RS_STARTRESET : s_ResetState;
     }
 
     if (gPowerButtonPressed)
     {
-        s_ResetMode = 2;
+        s_ResetMode = RM_SHUTDOWN;
         s_ResetState = s_ResetState == RS_RUNNING ? RS_STARTRESET : s_ResetState;
     }
 
@@ -108,16 +108,16 @@ void ResetTask::Run(float dt)
 
         switch (s_ResetMode)
         {
-        case 0:
+        case RM_RESTART:
             OSRestart(0);
             break;
-        case 1:
+        case RM_REBOOT:
             OSRebootSystem();
             break;
-        case 2:
+        case RM_SHUTDOWN:
             OSShutdownSystem();
             break;
-        case 3:
+        case RM_RETURN_TO_MENU:
             OSReturnToMenu();
             break;
         }

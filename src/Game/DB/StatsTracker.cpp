@@ -364,11 +364,11 @@ void StatsTracker::OnGoalScored(GoalScoredStatsData* data)
         float gameDuration = g_pGame->m_fGameDuration;
         if (!((unsigned int)(10.0f * (gameDuration - g_pGame->GetGameTime())) == 0
                 && !scoreTied
-                && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0))
+                && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME))
         {
             int teamScore = g_pTeams[data->data.uTeamIndex]->m_nScore;
             if (teamScore < GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit
-                || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != 1)
+                || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != GAME_LIMIT_GOALS)
             {
                 goto skipTrackWinner;
             }
@@ -404,11 +404,11 @@ void StatsTracker::OnMegastrikeEnd(MegaStrikeEndData* data)
             float gameDuration = g_pGame->m_fGameDuration;
             if (!((unsigned int)(10.0f * (gameDuration - g_pGame->GetGameTime())) == 0
                     && !scoreTied
-                    && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0))
+                    && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME))
             {
                 int teamScore = g_pTeams[side]->m_nScore;
                 if (teamScore < GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit
-                    || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != 1)
+                    || GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType != GAME_LIMIT_GOALS)
                 {
                     goto skipTrackWinner;
                 }
@@ -537,14 +537,14 @@ void StatsTracker::TrackStat(ePlayerStats stat, int homeaway,
         AddUserStatByPad(STATS_GOALS_FOR, param3, param2);
         switch (param1)
         {
-        case 1:
+        case GOAL_ONE_TIMER:
             Track(STATS_ONE_TIMER_GOALS, homeaway, playerindex, param2, param3, 0, 0);
             break;
-        case 0:
-        case 7:
+        case GOAL_REGULAR:
+        case GOAL_CARRIED_IN:
             Track(STATS_REGULAR_GOALS, homeaway, playerindex, param2, param3, 0, 0);
             break;
-        case 2:
+        case GOAL_SKILLSHOT:
             Track(STATS_STS_GOALS, homeaway, playerindex, param2, param3, 0, 0);
             break;
         }

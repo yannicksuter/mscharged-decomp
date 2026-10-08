@@ -20,7 +20,7 @@ static const nlVector3 sCameraFlashOffset = { -0.8f, 0.0f, 0.1f };
 
 static void UpdateCameraFlash(EmissionController& controller)
 {
-    if (g_pGame == 0 || g_pGame->m_eGameState == 4)
+    if (g_pGame == 0 || g_pGame->m_eGameState == GS_UNLOADING)
     {
         return;
     }

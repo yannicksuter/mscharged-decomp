@@ -346,13 +346,13 @@ void SkillTweaks::CreateTweaks(bool reload)
         const char* sSituationName;
         switch (i_sit)
         {
-        case 1:
+        case SITUATION_DEFENSE:
             sSituationName = "Def";
             break;
-        case 0:
+        case SITUATION_OFFENSE:
             sSituationName = "Off";
             break;
-        case 2:
+        case SITUATION_LOOSE:
             sSituationName = "Loose";
             break;
         }
@@ -592,11 +592,11 @@ float SkillTweaks::GetReaction(cPlayer* param1)
 
     switch (param1->m_pTeam->mpCurrentSituation)
     {
-    case 1:
+    case SITUATION_DEFENSE:
         return Def_Reaction->GetValue();
-    case 0:
+    case SITUATION_OFFENSE:
         return Off_Reaction->GetValue();
-    case 2:
+    case SITUATION_LOOSE:
         return Loose_Reaction->GetValue();
     }
     return result;

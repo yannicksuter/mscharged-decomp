@@ -120,7 +120,7 @@ void StartPeachPhoto(PeachPhotoState* photo,
 
     photo->displacement = nlRandomf(2.0f * gPeachPhotoDisplacementRange)
                         - gPeachPhotoDisplacementRange;
-    photo->state = 1;
+    photo->state = PEACH_PHOTO_ACTIVE;
     photo->firstFrameSeen = false;
     photo->textureReady = false;
     photo->lastFrame = glGetCurrentFrame();
@@ -132,16 +132,16 @@ void StartPeachPhoto(PeachPhotoState* photo,
 
 void EndPeachPhoto(PeachPhotoState* photo, bool immediate)
 {
-    if (photo->state != 0)
+    if (photo->state != PEACH_PHOTO_INACTIVE)
     {
         if (immediate)
         {
-            photo->state = 0;
+            photo->state = PEACH_PHOTO_INACTIVE;
             GetLayerView(eCLV_Characters)->m_Target = 0;
         }
         else
         {
-            photo->state = 2;
+            photo->state = PEACH_PHOTO_FADING;
             photo->fadeTime = 0.0f;
         }
     }
@@ -300,7 +300,7 @@ void SetPeachPhotoTextureBorder(
 void UpdatePeachPhoto(
     PeachPhotoState* photo, float dt, int)
 {
-    if (photo->state == 1)
+    if (photo->state == PEACH_PHOTO_ACTIVE)
     {
         const unsigned long texture = glGetTexture(sPeachPhotoTexture);
         const unsigned short border =
@@ -311,15 +311,15 @@ void UpdatePeachPhoto(
         if (photo->delay < 0.0f)
         {
             photo->delay = 0.0f;
-            if (photo->state != 0)
+            if (photo->state != PEACH_PHOTO_INACTIVE)
             {
-                photo->state = 2;
+                photo->state = PEACH_PHOTO_FADING;
                 photo->fadeTime = 0.0f;
             }
         }
     }
 
-    if (photo->state != 0)
+    if (photo->state != PEACH_PHOTO_INACTIVE)
     {
         const unsigned int currentFrame = glGetCurrentFrame();
         if (currentFrame != photo->lastFrame)
@@ -338,12 +338,12 @@ void UpdatePeachPhoto(
             }
         }
 
-        if (photo->state == 2)
+        if (photo->state == PEACH_PHOTO_FADING)
         {
             photo->fadeTime += dt;
             if (photo->fadeTime > gPeachPhotoFadeTime)
             {
-                photo->state = 0;
+                photo->state = PEACH_PHOTO_INACTIVE;
             }
         }
     }
@@ -353,13 +353,13 @@ void RenderPeachPhoto(PeachPhotoState* photo)
 {
     glModel* model;
 
-    if (photo->state == 0)
+    if (photo->state == PEACH_PHOTO_INACTIVE)
     {
         return;
     }
 
     float alpha;
-    if (photo->state == 2)
+    if (photo->state == PEACH_PHOTO_FADING)
     {
         float elapsed = photo->fadeTime / gPeachPhotoFadeTime;
         if (elapsed > 1.0f)

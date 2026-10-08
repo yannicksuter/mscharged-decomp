@@ -578,8 +578,8 @@ void cTeam::UpdateShotScore()
     else
     {
         bool bHasPassTarget = false;
-        if (g_pBall->meBallState == 5
-            || g_pBall->meBallState == 3)
+        if (g_pBall->meBallState == BALL_STATE_VOLLEY_PASS
+            || g_pBall->meBallState == BALL_STATE_GROUND_PASS)
         {
             if (g_pBall->m_pPassTarget != NULL)
             {
@@ -645,7 +645,7 @@ void cTeam::UpdateTeamAI(float fDeltaT)
             {
                 u16 angle = (u16)nlRandom(0xFFFF, &nlDefaultSeed);
                 ShootToScoreMeter::instance.RumbleMeter(angle);
-                PlayRumbleAction(1, pBallOwner->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, pBallOwner->GetGlobalPad());
             }
         }
     }
@@ -907,7 +907,7 @@ void cTeam::ResetCharacters()
     {
         cFielder* pFielder = GetFielder(i);
         pFielder->m_Dirt = 0.0f;
-        pFielder->m_nDamageType = 0;
+        pFielder->m_nDamageType = DAMAGE_TEXTURE_STADIUM;
         pFielder->m_MinDirt = 0.0f;
 
         if (i == 0 && GetNumAssignedControllers() > 1)
@@ -1185,7 +1185,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 
     bool bPlayCaptainChant = false;
     cFielder* pCaptain = (cFielder*)pTeam->m_pPlayers[0];
-    int nCaptainPowerup = pCaptain->m_pCharacterInfo->unknown_0x14;
+    int nCaptainPowerup = pCaptain->m_pCharacterInfo->mCaptainPowerup;
     bool bCaptainPowerupActive
         = pTeam->m_ePowerupList[0].eType == nCaptainPowerup;
     bCaptainPowerupActive
@@ -1230,18 +1230,18 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 unsigned long GetTeamCaptainChantCue(cTeam* pTeam)
 {
     unsigned long result = 0;
-    switch (pTeam->m_pPlayers[0]->m_pCharacterInfo->unknown_0x14)
+    switch (pTeam->m_pPlayers[0]->m_pCharacterInfo->mCaptainPowerup)
     {
-    case 9:
+    case POWER_UP_MARIO:
         result = 0xF1B432C3;
         break;
-    case 11:
+    case POWER_UP_DONKEYKONG:
         result = 0xE8DC557A;
         break;
-    case 10:
+    case POWER_UP_PEACH:
         result = 0xB7B862AC;
         break;
-    case 12:
+    case POWER_UP_BOWSER:
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
             result = 0x52F53867;
@@ -1251,19 +1251,19 @@ unsigned long GetTeamCaptainChantCue(cTeam* pTeam)
             result = 0x2424F09D;
         }
         break;
-    case 15:
+    case POWER_UP_WARIO:
         result = 0xAE3706CD;
         break;
-    case 16:
+    case POWER_UP_WALUIGI:
         result = 0xF2D97BFD;
         break;
-    case 13:
+    case POWER_UP_LUIGI:
         result = 0x42C3BE45;
         break;
-    case 14:
+    case POWER_UP_DAISY:
         result = 0xB83BDCC5;
         break;
-    case 17:
+    case POWER_UP_BOWSERJR:
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
             result = 0x392661A3;
@@ -1277,13 +1277,13 @@ unsigned long GetTeamCaptainChantCue(cTeam* pTeam)
             result = 0xB62C6459;
         }
         break;
-    case 18:
+    case POWER_UP_DIDDYKONG:
         result = 0x505B79C8;
         break;
-    case 19:
+    case POWER_UP_YOSHI:
         result = 0x0A9FD837;
         break;
-    case 20:
+    case POWER_UP_PETEY:
         if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
         {
             result = 0x8192CDBC;
@@ -1343,7 +1343,7 @@ void cTeam::Update(float fDeltaT)
 void UpdateTeamTimers(cTeam* pTeam, float fDeltaT)
 {
     if ((g_pGame->IsGameplayOrOvertime()
-            || g_pGame->GetGameState() == 1)
+            || g_pGame->GetGameState() == GS_KICKOFF)
         && !g_pGame->IsCaptainShotToScoreOn())
     {
         pTeam->mfPowerupTimer -= fDeltaT;
@@ -1619,7 +1619,7 @@ PowerUpTeamType cTeam::GetCurrentPowerUp() const
 bool cTeam::fn_800A6764() const
 {
     cFielder* pCaptain = (cFielder*)m_pPlayers[0];
-    int nCaptainPowerup = pCaptain->m_pCharacterInfo->unknown_0x14;
+    int nCaptainPowerup = pCaptain->m_pCharacterInfo->mCaptainPowerup;
     bool bCaptainPowerupActive
         = m_ePowerupList[0].eType == nCaptainPowerup;
     bCaptainPowerupActive
@@ -1634,8 +1634,8 @@ bool cTeam::fn_800A6764() const
         bCaptainPowerupActive = true;
     }
 
-    if (pCaptain->m_DetChar.m_eCharacterClass == (eCharacterClass)5
-        && gPeachPhotoState.state == 1)
+    if (pCaptain->m_DetChar.m_eCharacterClass == PEACH
+        && gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
     {
         bCaptainPowerupActive = true;
     }
@@ -1748,7 +1748,7 @@ void cTeam::ClearCurrentPowerUp()
     {
         return;
     }
-    if (g_pGame->IsGameplayOrOvertime() || g_pGame->GetGameState() != 2)
+    if (g_pGame->IsGameplayOrOvertime() || g_pGame->GetGameState() != GS_POST_GOAL)
     {
         return;
     }

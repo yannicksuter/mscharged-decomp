@@ -25,7 +25,7 @@ static tCharacterTemplate* g_GoalieTemplate;
 
 static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
     {
-        (eCharacterClass)0,
+        MARIO,
         "art/characters/mario/mario.rlg",
         "art/characters/mario/mario_shock.rlg",
         NULL,
@@ -50,7 +50,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)1,
+        BOWSER,
         "art/characters/bowser/bowser.rlg",
         "art/characters/bowser/bowser_shock.rlg",
         NULL,
@@ -75,7 +75,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)2,
+        DAISY,
         "art/characters/daisy/daisy.rlg",
         "art/characters/daisy/daisy_shock.rlg",
         NULL,
@@ -100,7 +100,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)3,
+        DONKEYKONG,
         "art/characters/donkeykong/donkeykong.rlg",
         "art/characters/donkeykong/donkeykong_shock.rlg",
         NULL,
@@ -125,7 +125,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)4,
+        LUIGI,
         "art/characters/luigi/luigi.rlg",
         "art/characters/luigi/luigi_shock.rlg",
         NULL,
@@ -150,7 +150,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)5,
+        PEACH,
         "art/characters/peach/peach.rlg",
         "art/characters/peach/peach_shock.rlg",
         NULL,
@@ -175,7 +175,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)6,
+        WALUIGI,
         "art/characters/waluigi/waluigi.rlg",
         "art/characters/waluigi/waluigi_shock.rlg",
         NULL,
@@ -200,7 +200,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)7,
+        WARIO,
         "art/characters/wario/wario.rlg",
         "art/characters/wario/wario_shock.rlg",
         NULL,
@@ -225,7 +225,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)8,
+        YOSHI,
         "art/characters/yoshi/yoshi.rlg",
         "art/characters/yoshi/yoshi_shock.rlg",
         NULL,
@@ -250,7 +250,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)9,
+        BOWSERJR,
         "art/characters/bowserjr/bowserjr.rlg",
         "art/characters/bowserjr/bowserjr_shock.rlg",
         NULL,
@@ -275,7 +275,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)10,
+        DIDDYKONG,
         "art/characters/diddykong/diddykong.rlg",
         "art/characters/diddykong/diddykong_shock.rlg",
         NULL,
@@ -300,7 +300,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)11,
+        PETEY,
         "art/characters/petey/petey.rlg",
         "art/characters/petey/petey_shock.rlg",
         NULL,
@@ -325,7 +325,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)12,
+        BIRDO,
         "art/characters/birdo/birdo.rlg",
         "art/characters/birdo/birdo_shock.rlg",
         "art/characters/birdo/birdo_lowpoly.rlg",
@@ -350,7 +350,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)13,
+        HAMMERBROS,
         "art/characters/hammerbro/hammerbro.rlg",
         "art/characters/hammerbro/hammerbro_shock.rlg",
         "art/characters/hammerbro/hammerbro_lowpoly.rlg",
@@ -375,7 +375,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)14,
+        KOOPA,
         "art/characters/koopa/koopa.rlg",
         "art/characters/koopa/koopa_shock.rlg",
         "art/characters/koopa/koopa_lowpoly.rlg",
@@ -400,7 +400,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)15,
+        TOAD,
         "art/characters/toad/toad.rlg",
         "art/characters/toad/toad_shock.rlg",
         "art/characters/toad/toad_lowpoly.rlg",
@@ -425,7 +425,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)16,
+        BOO,
         "art/characters/boo/boo.rlg",
         NULL,
         "art/characters/boo/boo_lowpoly.rlg",
@@ -450,7 +450,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)17,
+        DRYBONES,
         "art/characters/drybones/drybones.rlg",
         "art/characters/drybones/drybones_shock.rlg",
         "art/characters/drybones/drybones_lowpoly.rlg",
@@ -475,7 +475,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)18,
+        MONTYMOLE,
         "art/characters/montymole/montymole.rlg",
         "art/characters/montymole/montymole_shock.rlg",
         "art/characters/montymole/montymole_lowpoly.rlg",
@@ -500,7 +500,7 @@ static tCharacterTemplateInfo g_aCharacterTemplateInfo[20] = {
         0
     },
     {
-        (eCharacterClass)19,
+        SHYGUY,
         "art/characters/shyguy/shyguy.rlg",
         "art/characters/shyguy/shyguy_shock.rlg",
         "art/characters/shyguy/shyguy_lowpoly.rlg",

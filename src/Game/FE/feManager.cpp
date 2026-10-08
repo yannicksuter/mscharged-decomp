@@ -395,17 +395,17 @@ void FrontEnd::UpdateForGame(float fDeltaT)
                 && nlTaskManager::m_pInstance->mPendingState
                        == nlTaskManager::m_pInstance->mCurrentState)
             {
-                if (g_pNetworkSession->mPoppedOverlay != 3)
+                if (g_pNetworkSession->mPoppedOverlay != NET_ERROR_NONE)
                 {
                     switch (g_pNetworkSession->mPoppedOverlay)
                     {
-                    case 0:
+                    case NET_ERROR_CONNECTION_LOST:
                         EnterMenuState(MET_CONNECTIONLOST);
                         break;
-                    case 1:
+                    case NET_ERROR_SYNC:
                         EnterMenuState(MET_SYNCERROR);
                         break;
-                    case 2:
+                    case NET_ERROR_QUEUE_OVERFLOW:
                         EnterMenuState(MET_QUEUEOVERFLOW);
                         break;
                     default:

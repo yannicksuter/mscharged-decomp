@@ -39,7 +39,7 @@ void GoalOverlay::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    if (!mIsInOvertime && g_pGame->m_eGameState == 6)
+    if (!mIsInOvertime && g_pGame->m_eGameState == GS_OVERTIME)
     {
         mIsInOvertime = true;
     }
@@ -48,7 +48,7 @@ void GoalOverlay::Update(float fDeltaT)
 void GoalOverlay::OnGoalScored(GoalScoredData* data)
 {
     int playerIndex;
-    if (data->uGoalType == 5)
+    if (data->uGoalType == GOAL_OWN_GOAL)
     {
         playerIndex = data->pLastTouch[data->uTeamIndex]->m_DetPlayer.m_ID;
     }
@@ -201,7 +201,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
         mCaptainGoals[homeAway] += numGoals;
     }
     int score[2] = { mCaptainGoals[0] + mSidekickGoals[0], mCaptainGoals[1] + mSidekickGoals[1] };
-    if (gameInfo->GetCurrentSettings()->GameLimitType == 1
+    if (gameInfo->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
         && score[homeAway] >= gameInfo->GetCurrentSettings()->GoalLimit)
     {
         isMatchEnd = true;
@@ -232,7 +232,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
     memcpy(mClockBuffer, formatted.c_str(), sizeof(mClockBuffer));
     pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Time");
     pText->SetString(mClockBuffer);
-    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0
+    if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME
         && !GameInfoManager::Instance()->IsInMode4())
         pText->SetVisible(true);
     else
@@ -263,7 +263,7 @@ void GoalOverlay::UpdateGoalInfo(int homeAway, int playerIndex, bool isCaptainS2
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("GOAL_MATCH_WINNER"));
     }
-    else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 1
+    else if (GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_GOALS
         && score[homeAway] >= GameInfoManager::Instance()->GetCurrentSettings()->GoalLimit)
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("GOAL_MATCH_WINNER_GOALS"));
@@ -385,7 +385,7 @@ void GoalOverlay::DoMatchEndOverlay()
             formatted = Format(unformatted, g_pLocalization->GetString(character.mDisplayNameKey), scoreLeftWideString, scoreRightWideString);
         }
     }
-    else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == 2 && g_pTeams[1]->m_nScore > 0)
+    else if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
         BasicString<unsigned short, Detail::TempStringAllocator> unformatted(g_pLocalization->GetString("SHUTOUT_FAILED"));
         formatted = Format(unformatted, g_pLocalization->GetString(GetLOCCharacterName(winnerID)));
@@ -425,7 +425,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     const unsigned short* unformatted;
     if (isMatchEnd)
     {
-        if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == 2 && g_pTeams[1]->m_nScore > 0)
+        if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
         {
             homeAway = 1;
             unformatted = g_pLocalization->GetString("POPUP_CHALLENGE_FAILED");
@@ -448,7 +448,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     else
         unformatted = g_pLocalization->GetString("GOAL_TITLE_TIED");
     eTeamID winningTeam = (eTeamID)GameInfoManager::Instance()->GetTeam((short)homeAway);
-    if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == 2 && g_pTeams[1]->m_nScore > 0)
+    if (GameInfoManager::Instance()->IsInMode4() && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT && g_pTeams[1]->m_nScore > 0)
     {
         formatted = BasicString<unsigned short, Detail::TempStringAllocator>(g_pLocalization->GetString("POPUP_CHALLENGE_FAILED"));
     }
@@ -467,7 +467,7 @@ void GoalOverlay::SetWinnerTitle(int homeAway, bool isMatchEnd, int numGoals)
     TLTextInstance* pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Name");
     pText->SetString(mScoresBuffer);
     pText = FEFinder<TLTextInstance, 3>::Find<TLSlide>(slide, "Layer", "Time");
-    if (!isMatchEnd && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == 0
+    if (!isMatchEnd && GameInfoManager::Instance()->GetCurrentSettings()->GameLimitType == GAME_LIMIT_TIME
         && !GameInfoManager::Instance()->IsInMode4())
         pText->m_bVisible = true;
     else
@@ -493,13 +493,13 @@ void GoalOverlay::DoCupWinOverlay(int cup)
     }
     switch (cup)
     {
-    case 0:
+    case CUP_FIRE:
         cupName = "FIRE_CUP";
         break;
-    case 1:
+    case CUP_CRYSTAL:
         cupName = "CRYSTAL_CUP";
         break;
-    case 2:
+    case CUP_STRIKER:
         cupName = "STRIKER_CUP";
         break;
     }

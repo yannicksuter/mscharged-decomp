@@ -68,16 +68,16 @@ static inline void InitializeLocalPlayerRow(FEOnlinePlayerRow& row)
 {
     nlStrNCpy(row.mName, gNetworkMiiNameWide, 14);
     memcpy(row.mMiiData, &gNetworkMiiData, sizeof(row.mMiiData));
-    row.mSearchState = 4;
-    row.mStatus = 1;
+    row.mSearchState = ONLINE_ROW_SEARCH_OFF;
+    row.mStatus = ONLINE_ROW_WAIT_OPPONENT;
     if (NetworkStatsManager::Instance()->GetLocalStats(0) != 0)
         row.mStats = *NetworkStatsManager::Instance()->GetLocalStats(0);
     else
         memset(&row.mStats, 0, sizeof(NetworkRankingMeta));
     if (IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers())
-        row.mSide = 3;
+        row.mSide = ONLINE_ROW_GUEST;
     else
-        row.mSide = 0;
+        row.mSide = ONLINE_ROW_NO_SIDE;
     row.mVisible = true;
 }
 
@@ -85,7 +85,7 @@ static inline void ClearPlayerRow(FEOnlinePlayerRow& row, int searchState, bool 
 {
     row.mName[0] = 0;
     row.mSearchState = searchState;
-    row.mStatus = 1;
+    row.mStatus = ONLINE_ROW_WAIT_OPPONENT;
     memset(&row.mStats, 0, sizeof(NetworkRankingMeta));
     row.mVisible = visible;
 }
@@ -150,13 +150,13 @@ void SHOnlineMatchmakingDraft::UpdateDraftTeams()
         NetworkDraftTeam* team = NetworkDraft::Instance()->GetDraftTeam(i);
         nlStrNCpy(row.mName, team->mPlayers[0].mName, 14);
         memcpy(row.mMiiData, team->mPlayers[0].mMiiData, sizeof(row.mMiiData));
-        row.mSearchState = 4;
-        row.mStatus = 1;
+        row.mSearchState = ONLINE_ROW_SEARCH_OFF;
+        row.mStatus = ONLINE_ROW_WAIT_OPPONENT;
         row.mStats = team->mPlayers[0].mStats;
         if (IsOnlineRankedMatch() && HasOnlineTwoLocalPlayers())
-            row.mSide = 3;
+            row.mSide = ONLINE_ROW_GUEST;
         else
-            row.mSide = 0;
+            row.mSide = ONLINE_ROW_NO_SIDE;
         row.mVisible = true;
     }
     for (; i < 8; ++i)
@@ -172,18 +172,18 @@ void SHOnlineMatchmakingDraft::UpdateDraftStatuses()
         FEOnlinePlayerRow& row = mPlayers[i];
         if (NetworkDraft::Instance()->HasDisconnectedPlayer(i))
         {
-            row.mStatus = 8;
+            row.mStatus = ONLINE_ROW_OFFLINE;
         }
         else
         {
             NetworkDraftTeam* team = NetworkDraft::Instance()->GetDraftTeam(i);
             if (i > draftingTeam)
-                row.mStatus = 1;
+                row.mStatus = ONLINE_ROW_WAIT_OPPONENT;
             else if (i == draftingTeam)
-                row.mStatus = 4;
+                row.mStatus = ONLINE_ROW_CHOOSE_CAPTAIN;
             else
             {
-                row.mStatus = 6;
+                row.mStatus = ONLINE_ROW_CAPTAIN_NAMES;
                 row.mCaptain = team->mCaptain;
             }
         }

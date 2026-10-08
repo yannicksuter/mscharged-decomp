@@ -326,10 +326,10 @@ float AvoidableFielder::GetAvoidanceStrength(
     {
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
-        case 1:
-        case 8:
-        case 9:
-        case 10:
+        case PATCH_FIRE_BALL:
+        case PATCH_LAVA_BALL:
+        case PATCH_LAVA_HOLE:
+        case PATCH_CHAIN_LIGHTNING:
             fStrength *= 1.5f;
             break;
         }
@@ -431,19 +431,19 @@ float AvoidableFielder::GetAvoidanceWeight(
     case AVOID_PATCHES:
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
-        case 4:
+        case PATCH_MUCK_HOLE:
             if (m_pFielder->m_DetChar.m_eCharacterClass == PETEY)
             {
                 fWeight = 0.0f;
             }
             break;
-        case 0:
+        case PATCH_GAS_BALL:
             if (m_pFielder->m_DetChar.m_eCharacterClass == WARIO)
             {
                 fWeight = 0.0f;
             }
             break;
-        case 2:
+        case PATCH_HEAVENLY_LIGHT:
             if (m_pFielder->m_DetChar.m_eCharacterClass == DIDDYKONG)
             {
                 fWeight = 0.0f;
@@ -543,7 +543,7 @@ const nlVector3& AvoidablePatch::GetPosition()
 
 const nlVector3& AvoidablePatch::GetVelocity()
 {
-    if (m_pPatch->m_Type == 10)
+    if (m_pPatch->m_Type == PATCH_CHAIN_LIGHTNING)
     {
         float fSpeed = m_pPatch->m_PathSpeed;
         nlVec3Scale(mPathVelocity, m_pPatch->fn_80173CCC(), fSpeed);
@@ -555,7 +555,7 @@ const nlVector3& AvoidablePatch::GetVelocity()
 float AvoidablePatch::GetRadius()
 {
     float fRadius = m_pPatch->GetRadius();
-    if (m_pPatch->m_Type == 10)
+    if (m_pPatch->m_Type == PATCH_CHAIN_LIGHTNING)
     {
         fRadius *= 3.0f;
     }
@@ -564,7 +564,7 @@ float AvoidablePatch::GetRadius()
 
 bool AvoidablePatch::IsMobile()
 {
-    if (m_pPatch->m_Type == 8 || m_pPatch->m_Type == 10)
+    if (m_pPatch->m_Type == PATCH_LAVA_BALL || m_pPatch->m_Type == PATCH_CHAIN_LIGHTNING)
     {
         return true;
     }

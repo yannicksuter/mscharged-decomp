@@ -8,6 +8,24 @@
 class DebugWriteCache;
 class ThwompObject;
 
+enum eWeatherType
+{
+    WEATHER_NONE = 0,
+    WEATHER_LIGHTNING = 1,
+    WEATHER_WINDY = 2,
+    WEATHER_LIGHTNING_AND_WIND = 3,
+    WEATHER_SOLAR_FLARE = 4,
+    WEATHER_BUBBLING_LAVA = 5,
+    WEATHER_STORM_SHIP = 6,
+    WEATHER_SAND_TOMB = 7,
+};
+
+enum eWeatherState
+{
+    WEATHER_STOPPED = 0,
+    WEATHER_ACTIVE = 1,
+};
+
 struct Weather
 {
     Weather();
@@ -21,8 +39,8 @@ struct Weather
     virtual void SyncLog(void*, DebugWriteCache*);
     virtual void Reset();
 
-    s32 meWeather;
-    s32 meState;
+    eWeatherType meWeather;
+    eWeatherState meState;
     bool mbPaused;
     u8 padding0D[3];
 };
@@ -177,9 +195,9 @@ class WeatherManager
 public:
     WeatherManager();
     ~WeatherManager();
-    void Initialize(unsigned int type);
+    void Initialize(eWeatherType type);
     void Clear();
-    Weather* GetWeather(int value);
+    Weather* GetWeather(eWeatherType type);
     void SyncLog(void* context, DebugWriteCache* cache);
     void Update(float value);
     void Stop(bool value);

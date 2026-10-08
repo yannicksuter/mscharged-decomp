@@ -144,7 +144,7 @@ cPlayer::~cPlayer()
     EndBlur();
     if (m_pBall != NULL)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
     }
     delete m_pSpaceSearch;
     delete m_pAvoidableObject;
@@ -620,12 +620,12 @@ void cPlayer::PickupBall(cBall* pBall)
         if (!bOneTouchShot)
         {
             EmitBallImpact(this, false);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
     }
     else if (m_eClassType != GOALIE || ((Goalie*)this)->mGoalieActionState != 26)
     {
-        PlayRumbleAction(1, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
     }
     if (m_eClassType == FIELDER)
         ((cFielder*)this)->m_pShotMeter->Abort();
@@ -682,7 +682,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         state = pMeter->m_eShotMeterState;
         if (state != SHOT_METER_ACTIVE && state != SHOT_METER_STS_ACTIVE)
             bShotInProgress = false;
-        if (bShotInProgress || (pFielder->GetActionState() != ACTION_UNKNOWN_15 && pMeter->m_eShotMeterState == SHOT_METER_RELEASED))
+        if (bShotInProgress || (pFielder->GetActionState() != ACTION_REGULAR_SHOT && pMeter->m_eShotMeterState == SHOT_METER_RELEASED))
         {
             pFielder->InitActionShot(false, false);
             return;
@@ -692,7 +692,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
     {
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-                || pFielder->GetActionState() == ACTION_SHOT))
+                || pFielder->GetActionState() == ACTION_MEGA_STRIKE))
         {
             pFielder->InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             return;
@@ -705,7 +705,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->IsSlideAttacking()
                 || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-                || pFielder->GetActionState() == ACTION_SHOT))
+                || pFielder->GetActionState() == ACTION_MEGA_STRIKE))
         {
             pFielder->InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             return;
@@ -713,7 +713,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         pFielder->EndDesire();
         return;
     }
-    if (m_pController != NULL && pFielder->GetDesireState() == 31 && g_pGame->m_eGameState == 1)
+    if (m_pController != NULL && pFielder->GetDesireState() == 31 && g_pGame->m_eGameState == GS_KICKOFF)
     {
         pFielder->EndDesire();
     }
@@ -850,7 +850,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
     {
         EmitSkillshotPlayerOnFire(pPlayer);
         pPlayer->AddRandomDirt();
-        pPlayer->fn_8001F1C0(2);
+        pPlayer->fn_8001F1C0(DAMAGE_TEXTURE_SCORCH);
         ((cFielder*)pPlayer)->EndFrozenOrDazed();
         pPlayer->m_DetPlayer.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)
@@ -1138,7 +1138,7 @@ void cPlayer::PrePhysicsUpdate()
 
 bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
 {
-    if (pBall->meBallState == 10)
+    if (pBall->meBallState == BALL_STATE_FALLING)
         return false;
     if (sbNoBallPickups)
         return false;
@@ -1214,7 +1214,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
             if (pOwner != NULL && pOwner != pSelf && !pSelf->IsOnSameTeam(pOwner))
             {
                 ShootToScoreMeter::instance.RumbleMeter(aDirection);
-                PlayRumbleAction(1, pOwner->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, pOwner->GetGlobalPad());
             }
         }
     }

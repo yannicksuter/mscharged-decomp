@@ -7,21 +7,21 @@
 class NetMessageLoadedGame : public NetworkMessage
 {
 public:
-    virtual int GetType() { return 0xF; }
+    virtual int GetType() { return NETMSG_LOADED_GAME; }
     virtual void Serialize(NetworkMessageSerializer*) { }
 };
 
 class NetMessageLoadedGameClient : public NetworkMessage
 {
 public:
-    virtual int GetType() { return 0x12; }
+    virtual int GetType() { return NETMSG_LOADED_GAME_CLIENT; }
     virtual void Serialize(NetworkMessageSerializer*) { }
 };
 
 class NetMessageLoadedGameEveryone : public NetworkMessage
 {
 public:
-    virtual int GetType() { return 0x13; }
+    virtual int GetType() { return NETMSG_LOADED_GAME_EVERYONE; }
     virtual void Serialize(NetworkMessageSerializer*) { }
 };
 

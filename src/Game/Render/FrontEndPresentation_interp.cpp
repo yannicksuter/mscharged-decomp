@@ -12,7 +12,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         unsigned int name = m_SP[-3];
         m_SP -= 3;
         bool alternate = false;
-        if (side == -1 && GameInfoManager::Instance()->mCurrentMode == 3)
+        if (side == -1 && GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_CUP)
         {
             side = CupManager::s_pInstance->mPendingCupTeam;
         }
@@ -50,7 +50,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
     {
         unsigned int value = m_SP[-1];
         m_SP[-1] = nlStringHash((const char*)value);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -86,7 +86,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
             isPlaying = 0;
         }
         m_SP[-1] = isPlaying;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = (unsigned int)objectName;
         }

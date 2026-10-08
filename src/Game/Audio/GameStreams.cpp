@@ -40,7 +40,7 @@ void XSoundHandle::SetCallbackEnabled(unsigned char enabled)
 
 void XSoundCueHandle::Release()
 {
-    m_State = 9;
+    m_State = SOUND_HANDLE_RELEASED;
 }
 
 void InitializeGameStreams()

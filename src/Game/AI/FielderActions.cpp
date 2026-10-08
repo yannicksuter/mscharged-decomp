@@ -223,14 +223,14 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 1:
+            case STRAFE_RIGHT:
                 SetStrafeRightAnimState();
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 SetStrafeLeftAnimState();
                 break;
-            case 0:
-            case 3:
+            case STRAFE_IDLE:
+            case STRAFE_FORWARD:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -248,7 +248,7 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 4:
+            case STRAFE_BACK:
                 m_DetChar.m_fDesiredSpeed = fn_8002CD2C(this->GetTweaks());
                 break;
             }
@@ -282,13 +282,13 @@ void cFielder::asmRunning()
             {
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
-                case 0:
-                case 1:
-                case 2:
-                case 4:
+                case STRAFE_IDLE:
+                case STRAFE_RIGHT:
+                case STRAFE_LEFT:
+                case STRAFE_BACK:
                     SetBackRunningStopRecoverAnimState();
                     break;
-                case 3:
+                case STRAFE_FORWARD:
                 {
                     int nIndex = (u16)(m_DetChar.m_aDesiredFacingDirection
                                        - m_DetChar.m_aActualFacingDirection + 0x2000)
@@ -314,15 +314,15 @@ void cFielder::asmRunning()
             {
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
-                case 1:
-                case 2:
-                case 4:
+                case STRAFE_RIGHT:
+                case STRAFE_LEFT:
+                case STRAFE_BACK:
                     SetStopAnimState();
                     break;
-                case 0:
+                case STRAFE_IDLE:
                     SetIdleAnimState();
                     break;
-                case 3:
+                case STRAFE_FORWARD:
                     SetRunningAnimState(lbl_806E3538[0]);
                     break;
                 }
@@ -336,19 +336,19 @@ void cFielder::asmRunning()
             {
                 switch (mActionRunningVars.eLastStrafeDirection)
                 {
-                case 4:
+                case STRAFE_BACK:
                     SetRunBackwardsAnimState();
                     break;
-                case 1:
+                case STRAFE_RIGHT:
                     SetStrafeRightAnimState();
                     break;
-                case 2:
+                case STRAFE_LEFT:
                     SetStrafeLeftAnimState();
                     break;
-                case 0:
+                case STRAFE_IDLE:
                     SetIdleAnimState();
                     break;
-                case 3:
+                case STRAFE_FORWARD:
                     SetStartAnimState(-1);
                     break;
                 }
@@ -360,8 +360,8 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
-            case 1:
+            case STRAFE_IDLE:
+            case STRAFE_RIGHT:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -372,13 +372,13 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 m_DetChar.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 SetRunningAnimState(lbl_806E3538[0]);
                 break;
-            case 4:
+            case STRAFE_BACK:
                 SetRunBackwardsAnimState();
                 break;
             }
@@ -389,8 +389,8 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
-            case 2:
+            case STRAFE_IDLE:
+            case STRAFE_LEFT:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -401,13 +401,13 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 m_DetChar.m_fDesiredSpeed = fn_8002CC44(this->GetTweaks());
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 SetRunningAnimState(lbl_806E3538[0]);
                 break;
-            case 4:
+            case STRAFE_BACK:
                 SetRunBackwardsAnimState();
                 break;
             }
@@ -420,25 +420,25 @@ void cFielder::asmRunning()
 
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
+            case STRAFE_IDLE:
                 if (ShouldStartCrossBlend(0))
                 {
                     SetIdleAnimState();
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 if (ShouldStartCrossBlend(0x1D))
                 {
                     SetStrafeRightAnimState();
                 }
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 if (ShouldStartCrossBlend(0x1C))
                 {
                     SetStrafeLeftAnimState();
                 }
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (m_DetChar.m_fActualSpeed
@@ -456,7 +456,7 @@ void cFielder::asmRunning()
                     SetStartAnimState(-1);
                 }
                 break;
-            case 4:
+            case STRAFE_BACK:
                 if (ShouldStartCrossBlend(0))
                 {
                     SetRunBackwardsAnimState();
@@ -481,7 +481,7 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
+            case STRAFE_IDLE:
                 m_DetChar.m_fDesiredSpeed = 0.0f;
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
@@ -489,13 +489,13 @@ void cFielder::asmRunning()
                     SetStopAnimState();
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 SetStrafeRightAnimState();
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 SetStrafeLeftAnimState();
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 if (m_DetChar.m_fActualSpeed
                     < fSpeedFactor * GetRunSpeed(this->GetTweaks()))
                 {
@@ -506,7 +506,7 @@ void cFielder::asmRunning()
                     SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
-            case 4:
+            case STRAFE_BACK:
                 SetRunBackwardsAnimState();
                 break;
             }
@@ -543,7 +543,7 @@ void cFielder::asmRunning()
         {
             switch (mActionRunningVars.eLastStrafeDirection)
             {
-            case 0:
+            case STRAFE_IDLE:
                 if (m_DetChar.m_fActualSpeed
                     > 0.6f * GetRunSpeed(this->GetTweaks()))
                 {
@@ -554,7 +554,7 @@ void cFielder::asmRunning()
                     SetIdleAnimState();
                 }
                 break;
-            case 3:
+            case STRAFE_FORWARD:
                 if (nAbsActualToDesiredFacingDirection >= 0x639C)
                 {
                     if (m_DetChar.m_fActualSpeed
@@ -573,13 +573,13 @@ void cFielder::asmRunning()
                     SetRunningAnimState(lbl_806E3538[0]);
                 }
                 break;
-            case 1:
+            case STRAFE_RIGHT:
                 SetStrafeRightAnimState();
                 break;
-            case 2:
+            case STRAFE_LEFT:
                 SetStrafeLeftAnimState();
                 break;
-            case 4:
+            case STRAFE_BACK:
                 if (m_DetChar.m_fDesiredSpeed > GetJogSpeed(this->GetTweaks()))
                 {
                     if (nAbsActualToDesiredMovementDirection < 0x4000)
@@ -904,8 +904,8 @@ void cFielder::EndAction()
 
 void cFielder::fn_80043ADC()
 {
-    if (m_eActionState == (eFielderActionState)0
-        || m_eActionState == (eFielderActionState)0x23
+    if (m_eActionState == ACTION_CROWD_RIOT
+        || m_eActionState == ACTION_LAUNCHED
         || m_eActionState == ACTION_ELECTROCUTION)
     {
         return;
@@ -913,7 +913,7 @@ void cFielder::fn_80043ADC()
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         nlVector3 v3Velocity = v3LaunchUp;
         ShootBallDueToContact(v3Velocity);
     }
@@ -926,7 +926,7 @@ void cFielder::fn_80043ADC()
 
     InitDesire(
         FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0);
+    SetAction(ACTION_CROWD_RIOT);
     SetAnimState(0x7C, true, 0.2f, false, false);
     InitMovementCoast();
 }
@@ -1017,27 +1017,27 @@ void cFielder::fn_80043C18(float fDeltaT)
 
 void cFielder::fn_80044148(const nlVector3& v3Velocity)
 {
-    if (m_eActionState == (eFielderActionState)0
-        || m_eActionState == (eFielderActionState)0x23)
+    if (m_eActionState == ACTION_CROWD_RIOT
+        || m_eActionState == ACTION_LAUNCHED)
     {
         return;
     }
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         g_pBall->SetVelocity(m_DetChar.m_v3Velocity, SPINTYPE_NONE, 0);
     }
 
     InitDesire(
         FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x23);
+    SetAction(ACTION_LAUNCHED);
     SetAnimState(0x7C, false, 0.0333333f, false, false);
     SetVelocity(v3Velocity);
     InitMovementCoast();
     SetTangible(1, 0);
     m_fOpacity = 1.0f;
 
-    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         m_pPhysicsCharacter->m_CanCollideWithGoalLine = 0;
         m_pPhysicsCharacter->m_CanCollideWithWall = 0;
@@ -1065,7 +1065,7 @@ void cFielder::fn_80044290(float fDeltaT)
             float fSidelineY
                 = (float)fabs(0.5f * (2.0f * cField::mv3FieldPosition.y));
 
-            if (GameInfoManager::Instance()->GetStadium() == 0x0B
+            if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
                 && (((float)fabs(v3Position.x) - fGoalLineX > 0.0f
                         && (float)fabs(v3Position.x) - (5.0f + fGoalLineX)
                                < 0.0f)
@@ -1161,7 +1161,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)1);
+    SetAction(ACTION_DEKE);
     m_aDekeDirection = 0;
     m_bDekeReset = false;
     m_nDPadDownCounter = 2;
@@ -1180,7 +1180,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
             TurnOffSuperPowerTank(false);
         }
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    else if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         EmitShyGuyDeke(this);
     }
@@ -1188,19 +1188,19 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     s16 sFacingDelta;
     switch (m_DetChar.m_eCharacterClass)
     {
-    case (eCharacterClass)0x01:
-    case (eCharacterClass)0x03:
-    case (eCharacterClass)0x07:
-    case (eCharacterClass)0x09:
-    case (eCharacterClass)0x0B:
-    case (eCharacterClass)0x0C:
-    case (eCharacterClass)0x12:
+    case BOWSER:
+    case DONKEYKONG:
+    case WARIO:
+    case BOWSERJR:
+    case PETEY:
+    case BIRDO:
+    case MONTYMOLE:
         sFacingDelta = nlAngleDiff(aDirection, GetActualFacing());
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
-    case (eCharacterClass)0x02:
-    case (eCharacterClass)0x06:
-    case (eCharacterClass)0x11:
+    case DAISY:
+    case WALUIGI:
+    case DRYBONES:
         if (m_pController != 0
             && m_pController->GetMovementStickMagnitude() > 0.001f)
         {
@@ -1209,11 +1209,11 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
         sFacingDelta = nlAngleDiff(aDirection, GetActualFacing());
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
-    case (eCharacterClass)0x05:
-    case (eCharacterClass)0x0A:
-    case (eCharacterClass)0x0D:
-    case (eCharacterClass)0x0F:
-    case (eCharacterClass)0x10:
+    case PEACH:
+    case DIDDYKONG:
+    case HAMMERBROS:
+    case TOAD:
+    case BOO:
         sFacingDelta = nlAngleDiff(aDirection, GetActualFacing());
         SetAnimState(0x50, true, 0.2f, false, false);
         break;
@@ -1259,18 +1259,18 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
 
     switch (m_DetChar.m_eCharacterClass)
     {
-    case (eCharacterClass)0x00:
-    case (eCharacterClass)0x04:
-    case (eCharacterClass)0x08:
-    case (eCharacterClass)0x0E:
-    case (eCharacterClass)0x13:
+    case MARIO:
+    case LUIGI:
+    case YOSHI:
+    case KOOPA:
+    case SHYGUY:
         m_pCurrentAnimController->m_fPlaybackSpeedScale
             = InterpolateRangeClamped(lbl_806DB988, lbl_806DB98C, 0.35f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
         break;
-    case (eCharacterClass)0x01:
-    case (eCharacterClass)0x07:
-    case (eCharacterClass)0x09:
-    case (eCharacterClass)0x0D:
+    case BOWSER:
+    case WARIO:
+    case BOWSERJR:
+    case HAMMERBROS:
         SetFacingDirection(sFacingDelta + m_DetChar.m_aActualFacingDirection, true);
         InitMovementDecelerateExponential(lbl_806DB8F4);
         break;
@@ -1321,9 +1321,9 @@ void cFielder::fn_80044BEC(float fDeltaT)
     {
         switch (m_DetChar.m_eCharacterClass)
         {
-        case (eCharacterClass)0x05:
-        case (eCharacterClass)0x0A:
-        case (eCharacterClass)0x0F:
+        case PEACH:
+        case DIDDYKONG:
+        case TOAD:
         {
             float fChance = Difficult(m_pTeam);
             if (nlRandomf(2.0f) < fChance)
@@ -1378,7 +1378,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
 
         nlVector3 v3BallVelocity;
         nlVec3Set(v3BallVelocity, 0.4f * m_DetChar.m_v3Velocity.x, 0.5f * -m_DetChar.m_v3Position.y, 6.0f);
@@ -1448,7 +1448,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
 
         float fSpread = 4.0f;
         nlVector3 v3BallVelocity;
@@ -1492,7 +1492,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
     m_bGroundElectrocution = true;
     EmitElectrocution(this);
 
-    PlayRumbleAction(4, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
 
     bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0xBADF0EF9;
@@ -1555,7 +1555,7 @@ void cFielder::ActionElectrocution(float dt)
 
             EndElectrocution(this);
             InitMovementCoast();
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         break;
     }
@@ -1584,7 +1584,7 @@ void cFielder::ActionElectrocution(float dt)
             }
             InitMovementFromAnim(0, v3Zero, 0.0f, false);
             EmitElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         else
         {
@@ -1605,17 +1605,17 @@ void cFielder::ActionElectrocution(float dt)
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9AC))
         {
             EndElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B0))
         {
             EmitElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B4))
         {
             EndElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
 
         if (ShouldStartCrossBlend(4))
@@ -1635,7 +1635,7 @@ void cFielder::fn_80045930()
     nlVector3 v3Direction;
     if (!g_pBall->m_pPhysicsBall->mbUseWindForce)
     {
-        Weather* pObject = g_pGame->mpWeatherManager->GetWeather(2);
+        Weather* pObject = g_pGame->mpWeatherManager->GetWeather(WEATHER_WINDY);
         if (pObject != 0 && !pObject->mbPaused)
         {
             pObject->Start();
@@ -1670,7 +1670,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             g_pBall->ShootRelease(m_DetChar.m_v3Velocity, SPINTYPE_NONE);
         }
 
@@ -1682,7 +1682,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)0x18);
+        SetAction(ACTION_SUCKED_AWAY);
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
         SetVelocity(v3Zero);
@@ -1866,7 +1866,7 @@ void cFielder::fn_80046244()
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             g_pBall->ShootRelease(m_DetChar.m_v3Velocity, SPINTYPE_NONE);
             SetBallFallState(g_pBall);
         }
@@ -1879,7 +1879,7 @@ void cFielder::fn_80046244()
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)3);
+        SetAction(ACTION_FALL);
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
 
@@ -1906,7 +1906,7 @@ void cFielder::fn_80046244()
             SwapController(false);
         }
 
-        if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+        if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         {
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = 0;
             m_pPhysicsCharacter->m_CanCollideWithWall = 0;
@@ -2070,7 +2070,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
             nlVector3 targetVelocity = pTarget->m_DetChar.m_v3Velocity;
 
-            if (pTarget->m_eActionState == 1
+            if (pTarget->m_eActionState == ACTION_DEKE
                 && pTarget->m_pCurrentAnimController->m_fTime < 0.66f)
             {
                 targetVelocity = v3Zero;
@@ -2141,7 +2141,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         if (m_DetChar.m_eCharacterClass == YOSHI)
         {
             lbl_806E12C8
-                ->CreatePatch(6, this, m_DetChar.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
+                ->CreatePatch(PATCH_YOSHI_TONGUE, this, m_DetChar.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
                 ->SetEndRadiusTime(0.33f);
             PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
         }
@@ -2254,26 +2254,26 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
             = ((cFielder*)pAttacker)->GetTweaks()->fDefenseSize;
     }
 
-    int nReact = 1;
+    int nReact = HIT_REACTION_MEDIUM;
     if (GameInfoManager::Instance()->IsRule0x8Equal1())
     {
-        nReact = 2;
+        nReact = HIT_REACTION_HEAVY;
     }
     else if (fIntensityB < 0.0f && fIntensityA >= 0.0f)
     {
-        nReact = 0;
+        nReact = HIT_REACTION_LIGHT;
     }
     else if (fIntensityA < 0.0f && fIntensityB >= 0.0f)
     {
-        nReact = 2;
+        nReact = HIT_REACTION_HEAVY;
     }
     else if ((u16)abs_s16(nFacingDelta) < 0x4000)
     {
-        nReact = 2;
+        nReact = HIT_REACTION_HEAVY;
     }
 
     if (pAttacker->m_DetChar.m_eCharacterClass == BIRDO
-        && ((cFielder*)pAttacker)->m_eActionState == 1)
+        && ((cFielder*)pAttacker)->m_eActionState == ACTION_DEKE)
     {
         aAngle = pFielder->m_DetChar.m_aActualFacingDirection;
     }
@@ -2295,7 +2295,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         ShootBallDueToContact(pAttacker->m_DetChar.m_v3Velocity);
 
         if (bBookPenalty)
@@ -2335,7 +2335,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)5);
+    SetAction(ACTION_HIT_REACT);
 
     s16 angleDiff
         = (s16)((u16)(aDirection + 0x8000) - m_DetChar.m_aActualFacingDirection);
@@ -2360,14 +2360,14 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     switch (nReact)
     {
-    case 0:
-        PlayRumbleAction(2, GetGlobalPad());
+    case HIT_REACTION_LIGHT:
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
         break;
-    case 1:
-        PlayRumbleAction(3, GetGlobalPad());
+    case HIT_REACTION_MEDIUM:
+        PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
         break;
-    case 2:
-        PlayRumbleAction(4, GetGlobalPad());
+    case HIT_REACTION_HEAVY:
+        PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
         break;
     }
 
@@ -2575,7 +2575,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
     float fMaxCatchupSpeed = GetRunningSpeed();
     float fMinBallZ = 100.0f;
-    bool bBallState5 = g_pBall->meBallState == 5;
+    bool bBallState5 = g_pBall->meBallState == BALL_STATE_VOLLEY_PASS;
     bool bNoContactFound = true;
 
     while (fSimulatedTime < fMaxSimulatedTime)
@@ -2984,7 +2984,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     {
         m_pHeadTrack->m_bTrackOOI = true;
 
-        if (m_eActionState != 0x12)
+        if (m_eActionState != ACTION_RUNNING)
         {
             mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
             m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
@@ -3015,7 +3015,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         }
     }
 
-    if (g_pGame->m_eGameState == 3 || bNearGoal)
+    if (g_pGame->m_eGameState == GS_END_GAME || bNearGoal)
     {
         KillWindup("ball_sts_windup");
         InitActionShot(false, false);
@@ -3280,7 +3280,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             = (MegaStrikeMeterOverlay*)g_pOverlayManager->GetScene(
                 (SceneList)0x64);
         pScene->mMegaStrikeStarted = true;
-        SetAction((eFielderActionState)0xB);
+        SetAction(ACTION_MEGA_STRIKE);
         FreezeEveryoneButCaptain(0);
 
         m_pTeam->GetGoalie()->InitActionFrozen();
@@ -3306,7 +3306,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     m_fLocalMegaStrikeNumBalls = (float)(s32)GetMegaStrikeShotCount(this, 0);
 
-    PlayRumbleAction(1, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
 
     MegaStrikeMeterData event;
     event.pFielder = this;
@@ -3361,19 +3361,19 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
             {
                 if (m_fLocalMegaStrikeAccuracy >= 1.0f)
                 {
-                    PlayRumbleAction(3, pPlayer->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SOLID_CONTACT, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xD17A65BA, 0, 0);
                 }
                 else if (m_fLocalMegaStrikeAccuracy >= 0.0f)
                 {
-                    PlayRumbleAction(2, pPlayer->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xCC2F680B, 0, 0);
                 }
                 else
                 {
-                    PlayRumbleAction(1, pPlayer->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xCC36B742, 0, 0);
                 }
@@ -3734,7 +3734,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
 
     if (g_pBall->m_pOwner == this)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         ShootBallDueToContact((unsigned short)(s32)nlRandomf(65535.0f));
     }
 
@@ -3799,7 +3799,7 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_HIT_REACT);
+    SetAction(ACTION_BOMB_HIT_REACT);
 
     u32 index = (((u16)((u16)GetFacingDeltaToPosition(v3BombPosition)) >> 14) & 3);
     SetAnimState(gHitReactAnims[2][index], true, 0.2f, false, false);
@@ -3830,11 +3830,11 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
 
     if (g_pBall->m_pOwner == this)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         ShootBallDueToContact(m_DetChar.m_aActualFacingDirection);
     }
 
-    PlayRumbleAction(2, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BANANA_REACT);
@@ -3851,7 +3851,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
 {
     if (g_pBall->m_pOwner == this)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
 
         if (nlSqrt(v3CollisionVelocity.GetLengthSq3D(), true) > 0.05f)
         {
@@ -3866,7 +3866,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
     EndDaze();
     fn_8009750C();
 
-    PlayRumbleAction(2, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_SHELL_REACT);
@@ -3967,7 +3967,7 @@ void cFielder::ActionRunningWB(float dt)
 void cFielder::fn_8004B148()
 {
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x13);
+    SetAction(ACTION_RUNNING_PASS);
 
     u16 aDirection = m_DetChar.m_aActualFacingDirection;
     if (GetGlobalPad() != 0)
@@ -4030,9 +4030,9 @@ void cFielder::fn_8004B2E4(float fDeltaT)
         float fScale = lbl_806DB8E4 / nlSqrt(v3Spin.GetLengthSq3D(), true);
         nlVec3Scale(v3Spin, fScale);
 
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         g_pBall->SetVelocity(v3BallVelocity, SPINTYPE_PARAMETER, &v3Spin);
-        fn_80015C38(g_pBall, 0);
+        fn_80015C38(g_pBall, BALL_STATE_LOOSE);
         g_pBall->SetVelocity(v3BallVelocity, SPINTYPE_PARAMETER, &v3Spin);
         SetNoPickUpTime(0.25f);
 
@@ -4068,7 +4068,7 @@ void cFielder::fn_8004B658()
     }
     else
     {
-        SetAction(ACTION_UNKNOWN_30);
+        SetAction(ACTION_SHOT_WINDUP);
         DoResetShotMeter(0.0f);
         SetWindupWBAnimState();
         InitMovementRunningNoTurn(0.0f, GetShotWindupDecel(this->GetTweaks()));
@@ -4134,28 +4134,28 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 
         if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
         {
-            g_pBall->m_uGoalType = 2;
-            if (GetCharacterClass() == (eCharacterClass)0x10)
+            g_pBall->m_uGoalType = GOAL_SKILLSHOT;
+            if (GetCharacterClass() == BOO)
             {
                 BeginDekeIntangibility();
             }
             else
             {
-                if (GetCharacterClass() == (eCharacterClass)0x0D
-                    || GetCharacterClass() == (eCharacterClass)0x12
-                    || GetCharacterClass() == (eCharacterClass)0x13)
+                if (GetCharacterClass() == HAMMERBROS
+                    || GetCharacterClass() == MONTYMOLE
+                    || GetCharacterClass() == SHYGUY)
                 {
                     fn_8004E438();
                     return true;
                 }
-                if (GetCharacterClass() == (eCharacterClass)0x0E)
+                if (GetCharacterClass() == KOOPA)
                 {
                     if (gNPCManager->mpKoopaShell != 0)
                     {
                         gNPCManager->mpKoopaShell->Activate(this);
                     }
                 }
-                else if (GetCharacterClass() == (eCharacterClass)0x0C)
+                else if (GetCharacterClass() == BIRDO)
                 {
                     if (gNPCManager->mpBirdoEgg != 0)
                     {
@@ -4167,7 +4167,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction(ACTION_UNKNOWN_15);
+        SetAction(ACTION_REGULAR_SHOT);
         bIsModified = bIsChipShot;
 
         switch (m_eAnimID)
@@ -4208,7 +4208,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 
 void cFielder::fn_8004BB80(float fDeltaT)
 {
-    PlayRumbleAction(1, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
 
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVector3 v3Delta;
@@ -4251,7 +4251,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
         m_pShotMeter->Update(fDeltaT);
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10 && m_pBall != 0)
+    if (m_DetChar.m_eCharacterClass == BOO && m_pBall != 0)
     {
         ShotMeter* pShotMeter = m_pShotMeter;
         float fWindow = lbl_806E3538[0];
@@ -4282,18 +4282,18 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     KillWindups();
     StopSound(0x900862AC, this);
 
-    if (eNewAction != ACTION_UNKNOWN_15)
+    if (eNewAction != ACTION_REGULAR_SHOT)
     {
         m_pShotMeter->Abort();
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
-            && eNewAction != (eFielderActionState)1)
+        if (m_DetChar.m_eCharacterClass == BOO
+            && eNewAction != ACTION_DEKE)
         {
             m_fOpacity = 1.0f;
         }
     }
     else
     {
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
+        if (m_DetChar.m_eCharacterClass == BOO
             && m_pShotMeter->m_eShotMeterState != SHOT_METER_STS_RELEASED)
         {
             m_fOpacity = 1.0f;
@@ -4329,17 +4329,17 @@ void cFielder::fn_8004C02C(float fDeltaT)
         {
             DoRegularShooting(false);
 
-            if (g_pBall->meBallState == 8)
+            if (g_pBall->meBallState == BALL_STATE_SKILLSHOT)
             {
-                if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x11)
+                if (m_DetChar.m_eCharacterClass == DRYBONES)
                 {
                     EmitBallShot(this, BALL_EFFECT_REGULAR_SHOT, 0, 0, 1);
                 }
-                else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x0F)
+                else if (m_DetChar.m_eCharacterClass == TOAD)
                 {
                     EmitBallShot(this, BALL_EFFECT_PERFECT_PASS, 0, 0, 1);
                 }
-                else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
+                else if (m_DetChar.m_eCharacterClass == BOO)
                 {
                     EmitBallShot(this, BALL_EFFECT_ONETIMER_SHOT, 0, 0, 1);
                 }
@@ -4385,7 +4385,7 @@ void cFielder::InitActionSlideAttack(
         InitMovementRunning(0.0f, 0.0f, fn_8002C180(this->GetTweaks()), fn_8002CF24(this->GetTweaks()));
         m_DetPlayer.m_tSlideAttackTimer.SetSeconds(GetSlideTime(this->GetTweaks()));
 
-        m_eSlideAttackState = 0;
+        m_eSlideAttackState = SLIDE_ATTACK_SLIDING;
         bAttackSucceeded = false;
         m_bSlideAttackReset = false;
 
@@ -4500,7 +4500,7 @@ void cFielder::InitActionSlideAttack(
 
 void cFielder::fn_8004C88C(float fDeltaT)
 {
-    if (!bAttackSucceeded && m_eSlideAttackState == 0 && IsStarActive())
+    if (!bAttackSucceeded && m_eSlideAttackState == SLIDE_ATTACK_SLIDING && IsStarActive())
     {
         float fCurrSpeed;
         nlVector3 v3NewVelocity;
@@ -4607,7 +4607,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
     switch (m_eSlideAttackState)
     {
-    case 0:
+    case SLIDE_ATTACK_SLIDING:
     {
         nlVector3 v3Velocity = m_DetChar.m_v3Velocity;
         float fSpeed = GetActualSpeed();
@@ -4626,13 +4626,13 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime == 0 || bDecelerateEarly)
         {
-            PlayRumbleAction(1, GetGlobalPad());
-            m_eSlideAttackState = 1;
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
+            m_eSlideAttackState = SLIDE_ATTACK_DECELERATING;
             m_DetPlayer.m_tSlideAttackTimer.SetSeconds(GetSlideDecelTime(this->GetTweaks()));
         }
         break;
     }
-    case 1:
+    case SLIDE_ATTACK_DECELERATING:
     {
         float fDecelTime = m_DetPlayer.m_tSlideAttackTimer.GetSeconds();
         if (fDecelTime < 0.01f)
@@ -4688,7 +4688,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
     EndFrozenOrDazed();
     fn_8009750C();
 
-    if (IsFallenDown() && m_eActionState == (eFielderActionState)0x1C)
+    if (IsFallenDown() && m_eActionState == ACTION_KNOCKDOWN_REACT)
     {
         SetAnimState(0x56, true, 0.2f, false, false);
         cPN_SAnimController* pController = m_pCurrentAnimController;
@@ -4700,13 +4700,13 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
     {
         if (g_pBall->m_pOwner == this)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             ShootBallDueToContact(v3CollisionVelocity);
         }
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)0x1C);
+        SetAction(ACTION_KNOCKDOWN_REACT);
         SetAnimState(0x56, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
@@ -4717,7 +4717,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
         m_DetChar.m_aActualMovementDirection = polar.a;
         m_DetChar.m_fDesiredSpeed = 0.0f;
 
-        PlayRumbleAction(2, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
         if (IsBowserSuperPowerActive(this))
         {
@@ -4736,7 +4736,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
         if (m_pBall != 0)
         {
             bHadBall = true;
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         InitDesire(
@@ -4768,7 +4768,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
 
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-        PlayRumbleAction(2, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
         if (pAttacker->m_eClassType == FIELDER && !bSkipEvent
             && pAttacker != this && bHadBall)
@@ -4794,7 +4794,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
             }
         }
 
-        PlayRumbleAction(1, pAttacker->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, pAttacker->GetGlobalPad());
         PlaySound(0, 0x57208DA, 0, 0);
         m_DetChar.m_fDesiredSpeed = 0.0f;
     }
@@ -4882,7 +4882,7 @@ void cFielder::fn_8004E11C(float fParam)
     SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
     fn_80097358(this, fParam);
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_UNKNOWN_31);
+    SetAction(ACTION_BURNING);
     SetAnimState(0x80, false, 0.3f, false, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
     m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.5f;
@@ -4945,7 +4945,7 @@ void cFielder::fn_8004E438()
 {
     EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_UNKNOWN_32);
+    SetAction(ACTION_SKILLSHOT);
 
     nlVector3 v3Delta;
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
@@ -4953,19 +4953,19 @@ void cFielder::fn_8004E438()
     SetDesiredFacingDirection(nlVector3ToAngle(v3Delta), false);
     SetFacingDirection(m_DetChar.m_aDesiredFacingDirection, true);
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x0D)
+    if (m_DetChar.m_eCharacterClass == HAMMERBROS)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
+    else if (m_DetChar.m_eCharacterClass == MONTYMOLE)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
         PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    else if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         m_pBulletBill->Show(this);
@@ -4984,7 +4984,7 @@ void cFielder::fn_8004E438()
 
 void cFielder::ReleaseHammerProjectile()
 {
-    if (m_eActionState == ACTION_UNKNOWN_32)
+    if (m_eActionState == ACTION_SKILLSHOT)
     {
         for (int i = 0; i < 1; i++)
         {
@@ -5038,10 +5038,10 @@ void cFielder::ReleaseHammerProjectile()
 
 void cFielder::fn_8004E8B8()
 {
-    if (m_eActionState == ACTION_UNKNOWN_32)
+    if (m_eActionState == ACTION_SKILLSHOT)
     {
         muInvincibleStatus |= 1;
-        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+        if (m_DetChar.m_eCharacterClass == SHYGUY)
         {
             EmitShyGuyBulletShoot(this);
             PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
@@ -5054,12 +5054,12 @@ void cFielder::fn_8004E92C()
     bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
     if (bIsGameplay)
     {
-        if (m_pBall != 0 && m_eActionState == ACTION_UNKNOWN_32)
+        if (m_pBall != 0 && m_eActionState == ACTION_SKILLSHOT)
         {
             DoResetShotMeter(0.0f);
             m_pShotMeter->CalcOneTimerValue(this, false);
 
-            if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
+            if (m_DetChar.m_eCharacterClass == MONTYMOLE)
             {
                 g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
 
@@ -5072,11 +5072,11 @@ void cFielder::fn_8004E92C()
                 }
                 else
                 {
-                    ReleaseBall(0);
+                    ReleaseBall(BALL_STATE_LOOSE);
                 }
                 EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
             }
-            else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x0D)
+            else if (m_DetChar.m_eCharacterClass == HAMMERBROS)
             {
                 DoRegularShooting(false);
                 EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
@@ -5087,14 +5087,14 @@ void cFielder::fn_8004E92C()
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
     }
 }
 
 void cFielder::fn_8004EA9C()
 {
-    if (m_eActionState == ACTION_UNKNOWN_32)
+    if (m_eActionState == ACTION_SKILLSHOT)
     {
         ClearInvincibility(0);
     }
@@ -5102,7 +5102,7 @@ void cFielder::fn_8004EA9C()
 
 void cFielder::fn_8004EAB4(float fDeltaT)
 {
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         m_pBulletBill->position = GetJointPosition(m_nBallJointIndex);
         m_pBulletBill->velocity = m_DetChar.m_v3Velocity;
@@ -5121,12 +5121,12 @@ void cFielder::fn_8004EC40()
         RestoreTangibility(false);
     }
 
-    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
+    if (m_DetChar.m_eCharacterClass == MONTYMOLE)
     {
         ClearInvincibility(0);
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
     }
-    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
+    else if (m_DetChar.m_eCharacterClass == SHYGUY)
     {
         ClearInvincibility(0);
 
@@ -5150,7 +5150,7 @@ void cFielder::fn_8004ED64()
 {
     EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x21);
+    SetAction(ACTION_BOO_SKILLSHOT);
     InitMovementCoast();
 
     mActionBooSkillshot.v3StartPosition = m_DetChar.m_v3Position;
@@ -5246,7 +5246,7 @@ void cFielder::fn_8004F180()
 void cFielder::fn_8004F204()
 {
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_UNKNOWN_34);
+    SetAction(ACTION_MONTY_BURROWED);
     SetAnimState(0, false, 0.0f, false, false);
     InitMovementNone(0.0f, 0.0f);
 

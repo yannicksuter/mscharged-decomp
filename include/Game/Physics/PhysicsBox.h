@@ -14,7 +14,7 @@ public:
     void GetSides(float*);
     void SetSides(float, float, float);
 
-    virtual int GetObjectType() const { return 1; }
+    virtual int GetObjectType() const { return PHYSOBJ_BOX; }
 };
 
 #endif

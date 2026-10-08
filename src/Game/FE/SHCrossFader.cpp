@@ -21,7 +21,7 @@ CrossFaderScene::CrossFaderScene()
     , mImageInstances(0)
     , mTimer(0.0f)
     , mAlpha(0.0f)
-    , mFadeState(-1)
+    , mFadeState(CROSSFADE_INACTIVE)
     , mFadeToBlackTimer(0.0f)
 {
     mWidescreen = IsWidescreen();
@@ -67,7 +67,7 @@ void CrossFaderScene::SceneCreated()
     }
 
     mCurrentImageInstance = FEFinder<TLImageInstance, 2>::Find(presentation, "Slide1", "Layer", "whitebackground");
-    mFadeState = 0;
+    mFadeState = CROSSFADE_INITIALIZE;
     mCurrentImage = 0;
     FEFinder<TLImageInstance, 2>::Find(presentation, "Slide1", "Layer", "whitebackground2")->m_bVisible = false;
     mHomeMessage = FEFinder<TLComponentInstance, 4>::Find(presentation, "Slide1", "Layer", "no home");
@@ -81,7 +81,7 @@ void CrossFaderScene::Update(float fDeltaT)
     const nlColour colWhite = { { 255, 255, 255, 255 } };
     const nlColour colTransparent = { { 255, 255, 255, 0 } };
     BaseSceneHandler::Update(fDeltaT);
-    if (mFadeState != 4 && g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x2E, true, 0))
+    if (mFadeState != CROSSFADE_TO_BLACK && g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x2E, true, 0))
     {
         TLSlide* slide = mHomeMessage->GetActiveSlide();
         if (!mHomeMessage->m_bVisible || slide->GetCurrentTime() == slide->GetStartTime() + slide->GetDuration())
@@ -96,7 +96,7 @@ void CrossFaderScene::Update(float fDeltaT)
 
     switch (mFadeState)
     {
-    case 0:
+    case CROSSFADE_INITIALIZE:
         for (int i = 0; i < mNumImages; i++)
         {
             if (i == 0)
@@ -106,23 +106,23 @@ void CrossFaderScene::Update(float fDeltaT)
         }
         mCurrentImageInstance->SetAssetColour(colWhite);
         mAlpha = 255.0f;
-        mFadeState = 1;
+        mFadeState = CROSSFADE_REVEAL_IMAGE;
         break;
-    case 1:
+    case CROSSFADE_REVEAL_IMAGE:
     {
         int speed = 510;
         mAlpha = mAlpha - speed * fDeltaT;
         if (mAlpha <= 0.0f)
         {
             mAlpha = 0.0f;
-            mFadeState = 2;
+            mFadeState = CROSSFADE_HOLD_IMAGE;
         }
         nlColour colour = { { 255, 255, 255, 0 } };
         colour.c[3] = (u8)(int)mAlpha;
         mCurrentImageInstance->SetAssetColour(colour);
         break;
     }
-    case 2:
+    case CROSSFADE_HOLD_IMAGE:
     {
         static bool triggeraudioload = true;
         if (triggeraudioload)
@@ -145,11 +145,11 @@ void CrossFaderScene::Update(float fDeltaT)
         {
             if (mCurrentImage < mNumImages - 1)
             {
-                mFadeState = 3;
+                mFadeState = CROSSFADE_NEXT_IMAGE;
             }
             else
             {
-                mFadeState = 4;
+                mFadeState = CROSSFADE_TO_BLACK;
                 for (int i = 0; i < mNumImages - 1; ++i)
                     mImageInstances[i]->m_bVisible = false;
                 mCurrentImageInstance->m_bVisible = false;
@@ -160,7 +160,7 @@ void CrossFaderScene::Update(float fDeltaT)
         }
         break;
     }
-    case 3:
+    case CROSSFADE_NEXT_IMAGE:
     {
         int speed = 849;
         mAlpha = mAlpha + speed * fDeltaT;
@@ -178,11 +178,11 @@ void CrossFaderScene::Update(float fDeltaT)
             mImageInstances[mCurrentImage]->SetAssetColour(colTransparent);
             mCurrentImage++;
             mImageInstances[mCurrentImage]->SetAssetColour(colWhite);
-            mFadeState = 1;
+            mFadeState = CROSSFADE_REVEAL_IMAGE;
         }
         break;
     }
-    case 4:
+    case CROSSFADE_TO_BLACK:
     {
         int speed = 1020;
         mAlpha = mAlpha + speed * fDeltaT;
