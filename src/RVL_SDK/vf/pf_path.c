@@ -444,23 +444,23 @@ s32 VFiPFPATH_GetNextTokenOfPath(struct PF_STR* p_str, u32 wildcard) {
                     if (code_mode == 1 && (u8)*p_str->p_tail < 0x80 && ((u8)*p_str->p_tail < 0x20 || (VFipf_valid_fn_char[(u8)*p_str->p_tail - 0x20] & 1) == 0)) {
                         goto check_wildcard;
                     } else if (code_mode == 2) {
-                        u16 bVar1 = (u64)(((u8)p_str->p_tail[0] << 8) + (u8)p_str->p_tail[1]);
-                        u32 bVar3 = 1;
+                        u16 decodedChar = (u64)(((u8)p_str->p_tail[0] << 8) + (u8)p_str->p_tail[1]);
+                        u32 validChar = 1;
 
-                        if (bVar1 < 0x80) {
-                            s32 bVar2 = 0;
+                        if (decodedChar < 0x80) {
+                            s32 validAsciiChar = 0;
 
-                            if ((u8)bVar1 >= 0x20 && ((u8)bVar1 & 0xFF00) == 0) {
-                                if ((VFipf_valid_fn_char[(u8)((u8)bVar1 - 0x20)] & 1) != 0) {
-                                    bVar2 = 1;
+                            if ((u8)decodedChar >= 0x20 && ((u8)decodedChar & 0xFF00) == 0) {
+                                if ((VFipf_valid_fn_char[(u8)((u8)decodedChar - 0x20)] & 1) != 0) {
+                                    validAsciiChar = 1;
                                 }
                             }
-                            if (bVar2 == 0) {
-                                bVar3 = 0;
+                            if (validAsciiChar == 0) {
+                                validChar = 0;
                             }
                         }
 
-                        if (bVar3 == 0) {
+                        if (validChar == 0) {
                         check_wildcard:
                             if (wildcard == 0 || (VFiPFSTR_StrNCmp(p_str, (const s8*)"*", 2, 0, 1) != 0 && VFiPFSTR_StrNCmp(p_str, (const s8*)"?", 2, 0, 1) != 0)) {
                                 return 2;
@@ -812,7 +812,7 @@ u32 VFiPFPATH_parseShortName(s8* pDest, struct PF_STR* p_pattern) {
                         if (src_pos < src_dot || src_dot == 0) {
                             if ((num_base + width) > 8) {
                                 is_create_tail = 1;
-                                goto jump;  // remove me!
+                                goto advanceSource;
                             }
                         }
 
@@ -882,7 +882,7 @@ u32 VFiPFPATH_parseShortName(s8* pDest, struct PF_STR* p_pattern) {
                     break;
                 }
             }
-        jump:
+        advanceSource:
             src_pos++;
         }
 
@@ -1053,7 +1053,7 @@ u32 VFiPFPATH_CheckExtShortName(struct PF_STR* p_str, u32 target, u32 wildcard) 
 
     if (VFiPFSTR_StrNCmp(p_str, sig, target, 0, 2) == 0 || (VFiPFSTR_StrNCmp(p_str, (const s8*)"?", target, 0, 1) == 0 && (VFiPFSTR_StrNCmp(p_str, (const s8*)"?", target, 1, 1) == 0 || VFiPFSTR_StrNCmp(p_str, (const s8*)"*", target, 0, 1) == 0)) || VFiPFSTR_StrNCmp(p_str, (const s8*)"*", target, 0, 1) == 0) {
         i = 2;
-        goto jump;
+        goto checkLength;
         while (1) {
             if ((u32)VFiPFSTR_GetCodeMode(p_str) == 1) {
                 p_c = (s8*)VFiPFSTR_GetStrPos(p_str, target);
@@ -1078,7 +1078,7 @@ u32 VFiPFPATH_CheckExtShortName(struct PF_STR* p_str, u32 target, u32 wildcard) 
             }
 
             i++;
-        jump:;
+        checkLength:;
             if (i < 8) {
                 if ((VFiPFSTR_StrNCmp(p_str, (const s8*)"\\", target, i, 1) == 0 || VFiPFSTR_StrNCmp(p_str, (const s8*)"/", target, i, 1) == 0) == 0 && (VFiPFSTR_StrNCmp(p_str, (const s8*)" ", target, i, 1) != 0 && VFiPFSTR_StrNCmp(p_str, (const s8*)"\0", target, i, 1) != 0)) {
                     continue;
