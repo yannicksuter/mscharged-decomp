@@ -53,7 +53,7 @@ RumbleOp opArraySmallContact[] = {
     { RUMBLE_OP_END, 0 },
 };
 
-RumbleOp lbl_8050DFF8[] = {
+RumbleOp opArrayPointerHover[] = {
     { RUMBLE_OP_PLAY, 0x2D },
     { RUMBLE_OP_WAIT, 0x96 },
     { RUMBLE_OP_END, 0 },
@@ -197,7 +197,7 @@ void BeginRumbleAction(eRumbleActionPreset preset, cGlobalPad* pad)
             ops = opArrayShotContact;
             break;
         case RUMBLE_POINTER_HOVER:
-            ops = lbl_8050DFF8;
+            ops = opArrayPointerHover;
             break;
         default:
             return;
