@@ -2,7 +2,7 @@
 #define GAME_RENDER_STADIUM_PHYSICS_OBJECT_H
 
 #include "Game/World/WorldAnimObjects.h"
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/World/WorldHelperObject.h"
 
 struct WorldObjectLoadContext;
 

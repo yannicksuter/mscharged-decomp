@@ -1,5 +1,5 @@
-#ifndef GAME_WORLD_WORLD_OBJECT_80129EE0_H
-#define GAME_WORLD_WORLD_OBJECT_80129EE0_H
+#ifndef GAME_WORLD_WORLD_HELPER_OBJECT_H
+#define GAME_WORLD_WORLD_HELPER_OBJECT_H
 
 #include "Game/World/WorldObject.h"
 #include "NL/nlMath.h"
@@ -29,4 +29,4 @@ public:
     /* 0x20 */ nlMatrix4 mWorldMatrix;
 }; // size: 0x60
 
-#endif // GAME_WORLD_WORLD_OBJECT_80129EE0_H
+#endif // GAME_WORLD_WORLD_HELPER_OBJECT_H

@@ -4,7 +4,7 @@
 #include "Game/MathHelpers.h"
 #include "NL/nlColour.h"
 #include "Game/World/WorldDrawable.h"
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/World/WorldHelperObject.h"
 
 struct WorldObjectLoadContext;
 

@@ -1,7 +1,7 @@
 #include "Game/World/WorldPhysics.h"
 #include "Game/World/WorldPhysicsDescription.h"
 #include "Game/World/WorldAnimObjects.h"
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/World/WorldHelperObject.h"
 
 #include "Game/Physics/PhysicsBox.h"
 #include "Game/Physics/PhysicsCapsule.h"

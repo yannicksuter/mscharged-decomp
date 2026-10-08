@@ -1,7 +1,7 @@
 #ifndef GAME_WORLD_WORLD_OBJECT_INL
 #define GAME_WORLD_WORLD_OBJECT_INL
 
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/World/WorldHelperObject.h"
 
 inline void WorldObject::UnidentifiedVirtual18(World*)
 {

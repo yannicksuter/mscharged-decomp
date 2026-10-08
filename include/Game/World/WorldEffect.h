@@ -2,7 +2,7 @@
 #define GAME_WORLD_WORLD_EFFECT_H
 
 #include "types.h"
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/World/WorldHelperObject.h"
 
 class World;
 class WorldAnimController;
