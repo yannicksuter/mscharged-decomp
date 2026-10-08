@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <revolution/gx/GXTransform_fwd.h>
+#include <revolution/mtx_fwd.h>
 
 #include "Game/SharedStaticStorage.h"
 #include "Game/Render/RLView.h"
@@ -11,13 +12,6 @@
 #include "NL/gl/glView.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
-
-typedef float Mtx[3][4];
-
-extern "C"
-{
-    void PSMTXIdentity(Mtx matrix);
-}
 
 u8 lbl_806DCDE0 = true;
 
@@ -82,7 +76,7 @@ void DepthOfFieldManager::Update()
     float projection[7];
     float savedProjection[7];
     nlMatrix4 projectionMatrix;
-    Mtx identity;
+    float identity[3][4];
     glPoly2 poly;
 
     GXGetProjectionv(savedProjection);
