@@ -5,6 +5,12 @@
 
 class TLInstance;
 
+enum eFEAnimationValueType
+{
+    FE_ANIMATION_FLOAT = 0,
+    FE_ANIMATION_VECTOR3 = 1,
+};
+
 enum AnimType
 {
     eAnimUnknown = 0,
