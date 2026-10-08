@@ -56,15 +56,7 @@ static const char* ModeToStringName[10] = {
 static const float sDoneButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
 static const float sPlayButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
 
-// Retail's .sdata2 pool for this unit opens with 0.0f, ahead of the constants
-// EnableAutoPressed creates, although no surviving function generated before
-// EnableAutoPressed uses a float. Under -ipa file a non-static, non-inline
-// function is generated at its definition and creates its literals there, and
-// the release link strips its body when nothing references it. So a function
-// defined here used 0.0f and was stripped whole; R4QE01 keeps no byte of it.
-// This never-called placeholder reproduces the pool position only. Its real
-// name, signature and body are unknown.
-void UnidentifiedZeroFloat(float* value)
+void ZeroFloat(float* value)
 {
     *value = 0.0f;
 }
@@ -200,7 +192,7 @@ float gTimeElapsed;
 void TakeGameMemSnapshot::ResetTimers()
 {
     gTakenSnapshot = 0;
-    gTimeElapsed = 0.0f;
+    ZeroFloat(&gTimeElapsed);
 }
 
 // The Wii build has no virtual-memory statistics; the two columns the
@@ -295,11 +287,7 @@ nlVector2 fn_801CC48C(TLTextInstance* pText)
     return size;
 }
 
-// The same pool keeps 0.5f between fn_801CC48C's constants and the idle
-// animation constants, while SetBreadcrumbs, its only surviving reader, is the
-// unit's last function. A stripped function defined here created it; its
-// identity is unknown.
-void UnidentifiedHalveFloat(float* value)
+void HalveFloat(float* value)
 {
     *value *= 0.5f;
 }
@@ -581,7 +569,9 @@ void SetBreadcrumbs(int numBreadcrumbs, int currentBreadcrumb)
     }
 
     int middle = (int)std::ceil(17 / 2.0f);
-    int half = (int)std::floor(numBreadcrumbs / 2.0f);
+    float halfCount = numBreadcrumbs;
+    HalveFloat(&halfCount);
+    int half = (int)std::floor(halfCount);
     int first = middle - half;
     int last = middle + half;
     bool odd = (bool)(numBreadcrumbs % 2);
