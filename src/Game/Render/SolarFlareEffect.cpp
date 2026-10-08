@@ -35,9 +35,9 @@ SolarFlareEffect::SolarFlareEffect(const nlVector3& targetPosition)
           + nlRandomf(-gSolarFlareEffectLifetimeVariation,
               gSolarFlareEffectLifetimeVariation, &nlDefaultSeed))
     , mTargetPosition(targetPosition)
-    , mUnidentified020(false)
+    , m_pad020(false)
 {
-    mUnidentified01C = lbl_806DEE90
+    m_pad01C = lbl_806DEE90
         + nlRandomf(-lbl_806DEE94, lbl_806DEE94, &nlDefaultSeed);
 }
 

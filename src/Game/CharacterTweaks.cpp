@@ -141,7 +141,7 @@ PlayerTweaks::~PlayerTweaks()
 void InitPlayerTweaks(PlayerTweaks* tweaks, const char* name,
     const char* category, bool registerTweaks)
 {
-    tweaks->mUnidentified004.BindWithDefault("mfHeight", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
+    tweaks->fHeight.BindWithDefault("mfHeight", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
     tweaks->fWidth.BindWithDefault("mfWidth", 0.5f, category, true, 0.0f, 0.0f, 0.0f);
     tweaks->fMovementTurningRadius.BindWithDefault("mfMovement_TurningRadius", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->fMovementSpeed.BindWithDefault("mfMovement_Speed", 0.5f, category, true, -4.0f, 4.0f, 0.05f);

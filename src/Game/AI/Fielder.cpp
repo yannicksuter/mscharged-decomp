@@ -727,7 +727,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     PlayerTweaks* pSuperPowerTweaks,
     AnimRetargetList* pAnimRetargetList, int nIndex)
     : cPlayer(nPlayerID, cc, nModelID, pHierarchy, pAnimInventory,
-          pCharacterPhysicsData, pCharTweaks->mUnidentified004,
+          pCharacterPhysicsData, pCharTweaks->fHeight,
           fn_8002BFA8(pCharTweaks, 1.0f), pAnimRetargetList, nIndex, FIELDER)
     , mActionCrowdVars(false, -1.0f)
     , m_aDekeDirection(0)

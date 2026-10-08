@@ -26,7 +26,7 @@ public:
     void OnPointerEnter(unsigned int index, void* context);
     void OnPointerLeave(unsigned int index, void* context);
 
-    /* 0x01C */ u32 mUnidentified01C;
+    /* 0x01C */ u32 m_pad01C;
     /* 0x020 */ FEPointerButton mButtons[4];
     /* 0x2F0 */ TLComponentInstance* mButtonInstances[4];
     /* 0x300 */ FEPointerButton mHelpButton;

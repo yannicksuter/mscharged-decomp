@@ -218,7 +218,7 @@ struct AvoidanceMemory
 
     Timer mTimer;
     nlVector3 mRepulsion;
-    float mUnidentified014;
+    float m_pad014;
 };
 
 typedef nlAVLTreeSlotPool<u32,
@@ -254,7 +254,7 @@ public:
     /* 0x000 */ cFielder* m_pFielder;
     /* 0x004 */ int m_ThingsToAvoid;
     /* 0x008 */ int m_CurrentlyAvoiding;
-    /* 0x00C */ int mUnidentified00C;
+    /* 0x00C */ int m_pad00C;
     /* 0x010 */ float m_fRepulsionMult;
     /* 0x014 */ bool m_VeryCloseToSideline;
     /* 0x015 */ bool m_SidelineUnavoidable;

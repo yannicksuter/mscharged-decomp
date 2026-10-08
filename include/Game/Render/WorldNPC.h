@@ -52,7 +52,7 @@ public:
         return mModelCallback;
     }
 
-    /* 0x004 */ bool mUnidentified004;
+    /* 0x004 */ bool mPadding004;
     /* 0x005 */ u8 mPadding005[3];
     /* 0x008 */ CrowdModelCollection* mModelCollection;
     /* 0x00C */ CrowdCharacterDefinition mTemplates[50];

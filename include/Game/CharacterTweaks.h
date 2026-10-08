@@ -121,7 +121,7 @@ public:
     PlayerTweaks(const char* name, const char* category);
     virtual ~PlayerTweaks();
 
-    /* 0x004 */ TweakFloatBinding mUnidentified004;
+    /* 0x004 */ TweakFloatBinding fHeight;
     /* 0x014 */ TweakFloatBinding fWidth;
     /* 0x024 */ TweakFloatBinding fMovementTurningRadius;
     /* 0x034 */ TweakFloatBinding fMovementSpeed;

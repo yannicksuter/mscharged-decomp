@@ -56,7 +56,7 @@ public:
     void UpdateAndRenderLetterBox();
     void Reset();
 
-    /* 0x02C */ u32 mUnidentified02C;
+    /* 0x02C */ u32 m_pad02C;
     /* 0x030 */ char mCurrentFunction[64];
     /* 0x070 */ char mInterruptWipe[64];
     /* 0x0B0 */ bool mByPassWasSkipped;

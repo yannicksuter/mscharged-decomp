@@ -16,14 +16,14 @@ public:
     void UnregisterListener(FEPointerListener* listener);
 
     /* 0x00 */ nlListContainer<FEPointerListener*> mListeners;
-    /* 0x0C */ u32 mUnidentified00C[4];
-    /* 0x1C */ u32 mUnidentified01C;
-    /* 0x20 */ float mUnidentified020[4][2];
+    /* 0x0C */ u32 m_pad00C[4];
+    /* 0x1C */ u32 m_pad01C;
+    /* 0x20 */ float m_pad020[4][2];
     /* 0x40 */ u16 mUnidentified040[4];
     /* 0x48 */ bool mUnidentified048[4];
     /* 0x4C */ bool mUnidentified04C[4];
     /* 0x50 */ int mListenerCount;
-    /* 0x54 */ int mUnidentified054;
+    /* 0x54 */ int m_pad054;
 }; // size 0x58
 
 extern FEPointerManager* g_pFEPointerManager;

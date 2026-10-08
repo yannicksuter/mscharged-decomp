@@ -1222,7 +1222,7 @@ void Goalie::UpdateMegaStrikeBallLaunches(float fDeltaT)
 
             nlVec3CrossProduct(v3Rotation, v3Axis, v3Velocity);
             nlVec3Scale(v3Rotation, 2.0f + nlRandomf(1.0f));
-            pBallTrail->mUnidentified028 = v3Rotation;
+            pBallTrail->angularVelocity = v3Rotation;
 
             nlQuaternion qOrientation;
             qOrientation.x = nlRandomf(0.57f);
@@ -1255,15 +1255,15 @@ void Goalie::ActivateMegaStrikeTarget(unsigned int nIndex, float)
     nlVector3 v3StoppedSpin = GetStoppedBallSpin();
     if (gbKeepStoppedMegaBallSpin == true)
     {
-        v3Spin = pBallTrail->mUnidentified028;
+        v3Spin = pBallTrail->angularVelocity;
         nlVec3Normalize(v3Spin, v3Spin);
         float fSpinSpeed = 2.0f + nlRandomf(1.0f);
         nlVec3Scale(v3Spin, fSpinSpeed);
-        pBallTrail->mUnidentified028 = v3Spin;
+        pBallTrail->angularVelocity = v3Spin;
     }
     else
     {
-        pBallTrail->mUnidentified028 = v3StoppedSpin;
+        pBallTrail->angularVelocity = v3StoppedSpin;
     }
 
     SetMegaBallIndicatorTexture(pState, false);
@@ -1373,7 +1373,7 @@ void Goalie::LaunchMissedMegaStrikeBall(MegaBallIndicator* pState)
     nlVec3CrossProduct(
         v3Spin, v3UpAxis, v3Velocity);
     nlVec3Scale(v3Spin, 2.0f + nlRandomf(1.0f));
-    pBallTrail->mUnidentified028 = v3Spin;
+    pBallTrail->angularVelocity = v3Spin;
 
     if (!gbAnimateMissedMegaBalls)
     {

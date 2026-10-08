@@ -30,7 +30,7 @@ CrowdModelCollection::CrowdModelCollection()
     mDefinitions = 0;
     mLoadIndex = 0;
     mTextureBundleData = 0;
-    mUnidentified020 = 0;
+    m_pad020 = 0;
     mAnimationData = 0;
     mHierarchyData = 0;
     mModels = 0;

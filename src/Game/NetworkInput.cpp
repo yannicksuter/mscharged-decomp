@@ -63,7 +63,7 @@ void NetworkPeerChannel::Initialize(NetworkPeer* peer, s8 channelIndex, int glob
     mPeer = peer;
     mChannelIndex = channelIndex;
     mGlobalPadIndex = globalPadIndex;
-    mUnidentified00C = false;
+    mPadding00C = false;
 }
 
 DetInput* NetworkPeerChannel::GetNetworkPeerChannelInput()

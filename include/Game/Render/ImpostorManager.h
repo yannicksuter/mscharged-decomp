@@ -47,7 +47,7 @@ public:
     /* 0x04 */ Impostor* mImpostors;
     /* 0x08 */ int mNumUsed;
     /* 0x0C */ int mCapacity;
-    /* 0x10 */ void* mUnidentified010;
+    /* 0x10 */ void* mPadding010;
     /* 0x14 */ nlDLListSlotPool<ImpostorCharacter*> mCharacters;
     /* 0x30 */ GLView* mParentView;
     /* 0x34 */ u8 mInitialized;

@@ -301,7 +301,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
                 {
                     continue;
                 }
-                float height = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue();
+                float height = ((cFielder*)pCharacter)->GetTweaks()->fHeight.GetValue();
                 worldPos.z += height / 2.0f;
             }
             else
@@ -395,7 +395,7 @@ static void UpdateAndRenderPlayerIndicators(float)
                     continue;
                 }
                 fVerticalOffset
-                    = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() / 2.0f;
+                    = ((cFielder*)pCharacter)->GetTweaks()->fHeight.GetValue() / 2.0f;
                 fVerticalOffset *= pCharacter->GetPlayerScale();
             }
             else

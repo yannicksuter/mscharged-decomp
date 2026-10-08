@@ -66,7 +66,7 @@ static inline void FindLoadedTemplate(const WorldNPCManager& manager,
 }
 
 WorldNPCManager::WorldNPCManager()
-    : mUnidentified004(false)
+    : mPadding004(false)
     , mNumTemplates(0)
     , mNumLoadTemplates(0)
     , mNumLoadedModels(0)

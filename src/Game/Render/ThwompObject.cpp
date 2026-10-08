@@ -81,7 +81,7 @@ ThwompObject::ThwompObject(int index)
     mLandingTimer = 0.0f;
     mWarningTimer = 0.0f;
     mScaleTimer = 0.0f;
-    mUnidentified028 = -1;
+    mPadding028 = -1;
 
     mTexture3 = glGetTexture(gThwompTexture3Name);
     mTexture2 = glGetTexture(gThwompTexture2Name);

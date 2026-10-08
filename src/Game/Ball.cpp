@@ -3419,7 +3419,7 @@ LiveBallTrail::LiveBallTrail()
     orientation.w = 1.0f;
     position = v3Zero;
     velocity = v3Zero;
-    mUnidentified028 = v3Zero;
+    angularVelocity = v3Zero;
 }
 
 LiveBallTrail::~LiveBallTrail()
@@ -3488,7 +3488,7 @@ void UpdateBallTrail(LiveBallTrail* pBallTrail, float fParam)
 
     nlVector3 v3Rotation;
     nlVec3Scale(
-        v3Rotation, pBallTrail->mUnidentified028, fParam);
+        v3Rotation, pBallTrail->angularVelocity, fParam);
     nlQuaternion qOrientation;
     qOrientation.x = pBallTrail->orientation.x
         + 0.5f * (v3Rotation.x * pBallTrail->orientation.w

@@ -52,7 +52,7 @@ struct ThwompObject
     /* 0x1C */ float mLandingTimer;
     /* 0x20 */ float mWarningTimer;
     /* 0x24 */ float mScaleTimer;
-    /* 0x28 */ int mUnidentified028;
+    /* 0x28 */ int mPadding028;
     /* 0x2C */ u8 mPadding02C[0x1C];
     /* 0x48 */ glModelPacket* mDiffusePacket;
     /* 0x4C */ glModelPacket* mGlossPacket;

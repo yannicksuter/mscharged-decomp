@@ -34,7 +34,7 @@ ImpostorManager::ImpostorManager()
     , mImpostors(0)
     , mNumUsed(0)
     , mCapacity(0)
-    , mUnidentified010(0)
+    , mPadding010(0)
 {
     mParentView = 0;
     mInitialized = false;

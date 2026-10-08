@@ -58,7 +58,7 @@ FEDPDTask::FEDPDTask()
         gFEPointerPositions[i].y = 0.0f;
         gFEPointerEnabled[i] = false;
     }
-    g_pFEPointerManager->mUnidentified054 = 30;
+    g_pFEPointerManager->m_pad054 = 30;
 }
 
 FEDPDTask::~FEDPDTask()

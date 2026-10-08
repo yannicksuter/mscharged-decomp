@@ -11,7 +11,7 @@ public:
     virtual int GetClassID();
 
     /* 0x1C */ PADStatus* mCurrentStatus;
-    /* 0x20 */ unsigned char mUnidentified020[0x5C];
+    /* 0x20 */ unsigned char m_pad020[0x5C];
 }; // size 0x7C
 
 extern nlArrayAllocator<GameCubePad> gGameCubePadAllocator;

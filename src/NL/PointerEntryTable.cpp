@@ -29,7 +29,7 @@ bool PointerEntryTable::Remove(void* entry)
         {
             Entry& value = mEntries[i];
             value.mPointer = 0;
-            value.mUnidentified004 = 0;
+            value.m_pad004 = 0;
             return true;
         }
     }

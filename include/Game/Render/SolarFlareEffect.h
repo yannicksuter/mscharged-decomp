@@ -13,8 +13,8 @@ public:
     virtual void Update(float deltaTime);
 
     /* 0x10 */ nlVector3 mTargetPosition;
-    /* 0x1C */ float mUnidentified01C;
-    /* 0x20 */ bool mUnidentified020;
+    /* 0x1C */ float m_pad01C;
+    /* 0x20 */ bool m_pad020;
 }; // size: 0x24
 
 class SolarFlareDrawable : public WorldDrawable

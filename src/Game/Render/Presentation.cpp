@@ -224,7 +224,7 @@ Presentation::Presentation()
 
     gNetworkMessageRegistry->RegisterReceiver(30, this);
     gNetworkMessageRegistry->RegisterReceiver(31, this);
-    mUnidentified02C = 0;
+    m_pad02C = 0;
 }
 
 /**
