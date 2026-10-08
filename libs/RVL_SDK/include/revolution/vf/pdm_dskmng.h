@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+extern struct PDM_DISK_SET VFipdm_disk_set;
+
 s32 VFipdm_init_diskmanager(u32 config, void* param);
 s32 VFipdm_open_disk(struct PDM_INIT_DISK* p_init_disk_tbl, struct PDM_DISK** pp_disk);
 s32 VFipdm_close_disk(struct PDM_DISK* p_disk);
