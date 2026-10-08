@@ -22,6 +22,7 @@ NCDErr NCDGetLinkStatus();
 BOOL NCDIsInterfaceDecided();
 
 NCDErr NCDGetWirelessMacAddress(u8* macAddr);
+NCDErr NCDiGetWirelessMacAddress(u8* macAddr);
 
 NCDErr NCDLockWirelessDriver();
 NCDErr NCDUnlockWirelessDriver(s32 id);

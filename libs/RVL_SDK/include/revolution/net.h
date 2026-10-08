@@ -1,5 +1,7 @@
 #ifndef RVL_SDK_PUBLIC_NET_H
 #define RVL_SDK_PUBLIC_NET_H
+
+#include <revolution/net_fwd.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,7 +11,6 @@ extern "C" {
 #include <revolution/net/NETStartup.h>
 #include <revolution/net/nettime.h>
 
-int NETGetWirelessMacAddress(void* data);
 
 #ifdef __cplusplus
 }

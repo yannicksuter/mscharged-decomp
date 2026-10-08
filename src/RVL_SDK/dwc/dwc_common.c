@@ -1,13 +1,13 @@
 #include <dwc/dwc_common.h>
 
 #include <nitro/math/rand.h>
+#include <revolution/net_fwd.h>
 #include <revolution/os/OSTime.h>
 #include <stdio.h>
 #include <string.h>
 
 static MATHRandContext32 stRandContext32 = { 0, 0, 0 };
 
-int NETGetWirelessMacAddress(void* data);
 
 int DWC_SetCommonKeyValueString(const char* key, const char* value,
     char* string, char separator)
