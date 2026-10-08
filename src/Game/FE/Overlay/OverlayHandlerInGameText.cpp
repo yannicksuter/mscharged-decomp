@@ -27,7 +27,6 @@
 #include "NL/nlSingleton.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
-#include "Game/Render/RLViewLayers.h"
 
 
 static inline const unsigned short* LookupLocHash(const char* stringId)
