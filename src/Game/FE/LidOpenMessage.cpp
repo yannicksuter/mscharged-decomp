@@ -2027,7 +2027,7 @@ static bool lbl_806E17ED;
 static bool CanGetResetPauseState = true;
 
 
-static int fn_801BF4EC()
+static int GetDiscMessageLanguageIndex()
 {
     int lang;
 
@@ -2247,7 +2247,7 @@ void DisplayDVDMessageSebring(int arg)
 
         if (arg == 1)
         {
-            int lang = fn_801BF4EC();
+            int lang = GetDiscMessageLanguageIndex();
             DisplayMessage(LID_DATA[lang][4].x, LID_DATA[lang][4].y, LID_DATA[lang][4].text, LID_DATA[lang][4].param, (unsigned long)-1, false);
             return;
         }
@@ -2256,7 +2256,7 @@ void DisplayDVDMessageSebring(int arg)
     ResetTask::s_resetPaused = false;
     OpenCloseRefCount++;
 
-    int lang = fn_801BF4EC();
+    int lang = GetDiscMessageLanguageIndex();
     switch (arg + 1)
     {
     case 5:
@@ -2308,6 +2308,6 @@ void DVDAllClearSebring(int nStatus)
 
 void DisplayLoadingMessageFast()
 {
-    int lang = fn_801BF4EC();
+    int lang = GetDiscMessageLanguageIndex();
     DisplayMessage(LID_DATA[lang][4].x, LID_DATA[lang][4].y, LID_DATA[lang][4].text, LID_DATA[lang][4].param, (unsigned long)-1, false);
 }
