@@ -13,7 +13,7 @@
 
 #include "Game/UnidentifiedStaticStorage.h"
 
-float lbl_806DC0A8 = 3.0f;
+float gInterceptBallMaxPredictionTime = 3.0f;
 static unsigned short sDesireInterceptBallType = 0xFFFF;
 int gInterceptBallSlideAttackState = 16;
 
@@ -65,7 +65,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
             if (g_pBall->GetPosition().z > m_pFielder->GetAirInterceptHeight(0))
             {
                 float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
-                float predictionTime = lbl_806DC0A8 <= interceptTime ? lbl_806DC0A8 : interceptTime;
+                float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;
                 fn_800180F4(g_pBall, &position, predictionTime);
             }
             else
@@ -92,7 +92,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     else
     {
         float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
-        float predictionTime = lbl_806DC0A8 <= interceptTime ? lbl_806DC0A8 : interceptTime;
+        float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;
         fn_800180F4(g_pBall, &position, predictionTime);
     }
 

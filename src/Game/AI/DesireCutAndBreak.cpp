@@ -6,9 +6,9 @@
 #include "NL/nlMemory.h"
 #include "Game/DebugWriteCache.h"
 
-float lbl_806DC058 = 8.0f;
+float gCutAndBreakSearchRadius = 8.0f;
 static unsigned short sDesireCutAndBreakType = 0xFFFF;
-bool lbl_806E0E20;
+bool gCutAndBreakSearchDebug;
 
 bool DesireCutAndBreak::Initialize(void* context)
 {
@@ -23,9 +23,9 @@ bool DesireCutAndBreak::Initialize(void* context)
         SSearchCutAndBreak(m_pFielder);
     mUnidentifiedA4 = search;
     m_pFielder->SetSpaceSearch(search);
-    m_pFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E20;
+    m_pFielder->m_pSpaceSearch->m_bDebugOn = gCutAndBreakSearchDebug;
     m_pFielder->m_pSpaceSearch->FindBestPosition(
-        mvDesiredPosition, searchCenter, DIR_NONE, 0, lbl_806DC058, 0x8000);
+        mvDesiredPosition, searchCenter, DIR_NONE, 0, gCutAndBreakSearchRadius, 0x8000);
     return initialized;
 }
 

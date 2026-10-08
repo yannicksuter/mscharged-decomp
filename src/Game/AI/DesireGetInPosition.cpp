@@ -20,8 +20,8 @@ static unsigned short sDesireRunUpfieldType = 0xFFFF;
 static unsigned short sDesireRunDownfieldType = 0xFFFF;
 static unsigned short sDesireRunInDirectionType = 0xFFFF;
 static unsigned short sDesireRunToTargetType = 0xFFFF;
-nlVector2 lbl_806DC078 = { 0.5f, 3.5f };
-nlVector2 lbl_806DC080 = { 4.0f, 1.0f };
+nlVector2 gRunFieldInputRange = { 0.5f, 3.5f };
+nlVector2 gRunFieldDistanceRange = { 4.0f, 1.0f };
 #pragma explicit_zero_data on
 int gTransDesireRunToTargetContinue = DESIRE_CONTINUE;
 #pragma explicit_zero_data off
@@ -65,7 +65,7 @@ void DesireRunUpfield::Update(DesireUpdate* update, float)
     else
     {
         float distance = InterpolateRangeClamped(
-            lbl_806DC080.x, lbl_806DC080.y, lbl_806DC078.x, lbl_806DC078.y,
+            gRunFieldDistanceRange.x, gRunFieldDistanceRange.y, gRunFieldInputRange.x, gRunFieldInputRange.y,
             m_pFielder->mUnidentified1E4.m_v3AIPosition.x);
         position.x += distance * AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
     }
@@ -94,7 +94,7 @@ void DesireRunDownfield::Update(DesireUpdate* update, float)
     else
     {
         float distance = InterpolateRangeClamped(
-            lbl_806DC080.y, lbl_806DC080.x, lbl_806DC078.x, lbl_806DC078.y,
+            gRunFieldDistanceRange.y, gRunFieldDistanceRange.x, gRunFieldInputRange.x, gRunFieldInputRange.y,
             m_pFielder->mUnidentified1E4.m_v3AIPosition.x);
         if (g_pBall->GetOwnerGoalie() != 0)
         {

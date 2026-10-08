@@ -5,10 +5,10 @@
 #include "Game/Sys/debug.h"
 
 unsigned short gFielderDesireStateDebugType = 0xFFFF;
-float lbl_806DC04C = 60.0f;
-float lbl_806DC050 = 0.3f;
+float gFinishActionMaxDuration = 60.0f;
+float gWaitMaxDuration = 0.3f;
 #pragma explicit_zero_data on
-float lbl_806DC054 = 0.0f;
+float gDesireReinitializeAge = 0.0f;
 #pragma explicit_zero_data off
 
 Desire::Desire(int state, TransitionFunc& transition)
@@ -46,13 +46,13 @@ bool Desire::Initialize(void*)
 bool Desire::Reinitialize(void* context)
 {
     Cleanup();
-    mAgeTimer.SetSeconds(lbl_806DC054);
+    mAgeTimer.SetSeconds(gDesireReinitializeAge);
     return Initialize(context);
 }
 
 bool DesireFinishAction::Initialize(void*)
 {
-    mMaxDuration = lbl_806DC04C;
+    mMaxDuration = gFinishActionMaxDuration;
     return true;
 }
 
@@ -69,7 +69,7 @@ void DesireFinishAction::Update(DesireUpdate* update, float)
 
 bool DesireWait::Initialize(void*)
 {
-    mMaxDuration = lbl_806DC050;
+    mMaxDuration = gWaitMaxDuration;
     return true;
 }
 

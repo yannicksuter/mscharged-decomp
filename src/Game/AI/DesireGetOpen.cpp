@@ -9,12 +9,12 @@
 #include "NL/nlMemory.h"
 #include "Game/DebugWriteCache.h"
 
-float lbl_806DC090 = 6.0f;
+float gGetOpenSearchRadius = 6.0f;
 static unsigned short sDesireGetOpenType = 0xFFFF;
 #pragma explicit_zero_data on
 int gTransDesireGetOpenContinue = DESIRE_CONTINUE;
 #pragma explicit_zero_data off
-bool lbl_806E0E28;
+bool gGetOpenSearchDebug;
 
 bool DesireGetOpen::Initialize(void* context)
 {
@@ -37,9 +37,9 @@ bool DesireGetOpen::Initialize(void* context)
             SSearchGetOpen(m_pFielder);
         mUnidentifiedA4 = search;
         m_pFielder->SetSpaceSearch(search);
-        m_pFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E28;
+        m_pFielder->m_pSpaceSearch->m_bDebugOn = gGetOpenSearchDebug;
         m_pFielder->m_pSpaceSearch->FindBestPosition(
-            bestPosition, formationPosition, DIR_NONE, 0, lbl_806DC090, 0x8000);
+            bestPosition, formationPosition, DIR_NONE, 0, gGetOpenSearchRadius, 0x8000);
     }
     else
     {
@@ -47,9 +47,9 @@ bool DesireGetOpen::Initialize(void* context)
             SSearchOpenLane(ballCarrier, m_pFielder);
         mUnidentifiedA4 = search;
         m_pFielder->SetSpaceSearch(search);
-        m_pFielder->m_pSpaceSearch->m_bDebugOn = lbl_806E0E28;
+        m_pFielder->m_pSpaceSearch->m_bDebugOn = gGetOpenSearchDebug;
         m_pFielder->m_pSpaceSearch->FindBestPosition(
-            bestPosition, formationPosition, DIR_TOWARD_TARGET, &targetPosition, lbl_806DC090, 0x8000);
+            bestPosition, formationPosition, DIR_TOWARD_TARGET, &targetPosition, gGetOpenSearchRadius, 0x8000);
     }
     mvDesiredPosition = bestPosition;
     return initialized;
