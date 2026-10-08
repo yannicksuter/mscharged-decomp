@@ -69,30 +69,30 @@ void UpdateOnlinePlayerRow(FEOnlinePlayerRow* row, TLComponentInstance* instance
 
     TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(off, "NAME");
     nameText->SetString(row->mName);
-    nameText->SetVisible(row->mSearchState == 4);
+    nameText->SetVisible(row->mSearchState == ONLINE_ROW_SEARCH_OFF);
     nameText = FEFinder<TLTextInstance, 3>::FindOrDefault(over, "NAME");
     nameText->SetString(row->mName);
-    nameText->SetVisible(row->mSearchState == 4);
+    nameText->SetVisible(row->mSearchState == ONLINE_ROW_SEARCH_OFF);
 
     TLComponentInstance* status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "STATUS"));
     status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
-    status->SetVisible(row->mSearchState == 4);
-    if (row->mStatus == 6)
+    status->SetVisible(row->mSearchState == ONLINE_ROW_SEARCH_OFF);
+    if (row->mStatus == ONLINE_ROW_CAPTAIN_NAMES)
     {
         TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, "NAMES");
         names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
     }
     status = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(over, "STATUS"));
     status->SetActiveSlide(sOnlinePlayerStatusSlides[row->mStatus], false, false);
-    status->SetVisible(row->mSearchState == 4);
-    if (row->mStatus == 6)
+    status->SetVisible(row->mSearchState == ONLINE_ROW_SEARCH_OFF);
+    if (row->mStatus == ONLINE_ROW_CAPTAIN_NAMES)
     {
         TLComponentInstance* names = FEFinder<TLComponentInstance, 4>::FindOrDefault(status, "NAMES");
         names->SetActiveSlide(GetOnlineCaptainSlideName(row->mCaptain), false, false);
     }
-    bool show = row->mSearchState == 4
-             && row->mStatus != 7 && row->mStatus != 9 && row->mStatus != 10;
-    bool hasSide = row->mSide != 0;
+    bool show = row->mSearchState == ONLINE_ROW_SEARCH_OFF
+             && row->mStatus != ONLINE_ROW_ESTABLISHING && row->mStatus != ONLINE_ROW_DECLINED && row->mStatus != ONLINE_ROW_INVITING;
+    bool hasSide = row->mSide != ONLINE_ROW_NO_SIDE;
     TLComponentInstance* guest = static_cast<TLComponentInstance*>(FEFinder<TLInstance, 4>::FindOrDefault(off, "GUEST_HOME_AWAY"));
     guest->SetActiveSlide(sOnlinePlayerSideSlides[row->mSide], true, false);
     guest->SetVisible(show && hasSide);

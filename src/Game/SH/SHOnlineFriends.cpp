@@ -103,28 +103,28 @@ void SHOnlineFriends::UpdateFriend(int index)
     switch (DWC_GetFriendStatus((DWCFriendData*)data, status))
     {
     case 0:
-        row->mStatus = 8;
+        row->mStatus = ONLINE_ROW_OFFLINE;
         break;
     case 1:
         if (g_pFriendManager->GetFriendStatusPayload(index)->mHeader.mStatus == 1)
         {
-            if (row->mStatus != 2)
+            if (row->mStatus != ONLINE_ROW_AVAILABLE)
                 FEAudio::PlayAnimAudioEvent(0xCC2C93F1, 0, 0, 1);
-            row->mStatus = 2;
+            row->mStatus = ONLINE_ROW_AVAILABLE;
         }
         else
-            row->mStatus = 3;
+            row->mStatus = ONLINE_ROW_BUSY;
         break;
     case 2:
     case 3:
     case 4:
     case 5:
     case 6:
-        row->mStatus = 3;
+        row->mStatus = ONLINE_ROW_BUSY;
         break;
     }
     if (type == 1 || type == 2)
-        row->mStatus = 7;
+        row->mStatus = ONLINE_ROW_ESTABLISHING;
     NetworkLeaderboardCategory* category = NetworkStatsManager::Instance()->GetCategory(4);
     int player = category->FindPlayer(((int*)data)[1]);
     if (player != -1)
@@ -150,7 +150,7 @@ inline void SHOnlineFriends::UpdateVisibleRows()
         if (!IsOnlineFriendSelectionMode())
             --selected;
         UpdateOnlinePlayerRow(mSortedFriendRows[selected], mRowInstances[i], mRankText[i], 32, mRecordText[i], 48, i, mInitialized);
-        if (!mSortedFriendRows[selected]->mVisible || (IsOnlineFriendSelectionMode() && mSortedFriendRows[selected]->mStatus != 2))
+        if (!mSortedFriendRows[selected]->mVisible || (IsOnlineFriendSelectionMode() && mSortedFriendRows[selected]->mStatus != ONLINE_ROW_AVAILABLE))
             mRowButtons[i].Disable();
         else
             mRowButtons[i].Enable();
@@ -509,7 +509,7 @@ void SHOnlineFriends::DeleteFriend(int index)
     if (!IsOnlineFriendSelectionMode())
         --selected;
     g_pFriendManager->DeleteFriend(mSortedFriendRows[selected]->mFriendIndex);
-    mSortedFriendRows[selected]->mStatus = 11;
+    mSortedFriendRows[selected]->mStatus = ONLINE_ROW_EMPTY;
     if (mScrollOffset == mScrollRange && mScrollOffset > 0)
         --mScrollOffset;
     RefreshFriends(this);
