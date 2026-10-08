@@ -149,7 +149,7 @@ extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData);
 extern "C" void fn_80021050(LightningStrikeData* pEventData);
 extern "C" void fn_80021120(CharacterImpactEvent* pEventData);
 extern "C" void fn_800212A0(CharacterImpactEvent* pEventData);
-extern "C" void fn_8002147C(UnidentifiedEventData24* pEventData);
+extern "C" void fn_8002147C(CollisionPatchData* pEventData);
 extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData);
 extern "C" void fn_800216C4(CollisionPlayerShellData* pEventData);
 extern "C" void fn_80021924(CollisionPlayerBananaData* pEventData);
@@ -161,10 +161,10 @@ extern "C" void fn_80021D70(CollisionKoopaShellGoalieData* pEventData);
 extern "C" void fn_80021DCC(CollisionBirdoEggGoalieData* pEventData);
 extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData);
 extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData);
-extern "C" void fn_80022280(UnidentifiedEventData16* pEventData);
+extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData);
 extern "C" void fn_800224DC(CollisionBallWallData* pEventData);
 extern "C" void fn_80022594(CollisionBallGroundData* pEventData);
-extern "C" void fn_80022614(UnidentifiedEventData04*);
+extern "C" void fn_80022614(BallNetmeshEventData*);
 extern "C" void fn_80022664(CollisionPlayerPlayerData* pEventData);
 extern "C" void fn_8002268C(CollisionPlayerWallData* pEventData);
 extern "C" void fn_800226B4(CollisionPlayerBallData* pEventData);
@@ -176,10 +176,10 @@ extern "C" void fn_80022908();
 extern "C" void fn_80022968(CollisionChainPlayerData* pEventData);
 extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData);
 extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData);
-extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData);
-extern "C" void fn_80022B04(UnidentifiedEventData24* pEventData);
-extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData);
-extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData);
+extern "C" void fn_80022A98(CollisionProjectileData* pEventData);
+extern "C" void fn_80022B04(CollisionPatchData* pEventData);
+extern "C" void fn_80022B1C(CollisionProjectileData* pEventData);
+extern "C" void fn_80022BD8(CollisionEggData* pEventData);
 
 inline void cCharacter::CreateWorldMatrix()
 {
@@ -1774,7 +1774,7 @@ extern "C" void fn_8001FE80()
     FindEvent<CollisionPlayerPlayerData>("CollisionPlayerPlayer", -1)->Add(Function<CollisionPlayerPlayerData*>(fn_80022664), 0, -1);
     FindEvent<CollisionPlayerWallData>("CollisionPlayerWall", -1)->Add(Function<CollisionPlayerWallData*>(fn_8002268C), 0, -1);
     FindEvent<CollisionPlayerBallData>("CollisionPlayerBall", -1)->Add(Function<CollisionPlayerBallData*>(fn_800226B4), 0, -1);
-    FindEvent<UnidentifiedEventData04>("CollisionBallNetmesh", -1)->Add(Function<UnidentifiedEventData04*>(fn_80022614), 0, -1);
+    FindEvent<BallNetmeshEventData>("CollisionBallNetmesh", -1)->Add(Function<BallNetmeshEventData*>(fn_80022614), 0, -1);
     FindEvent<CollisionBallGroundData>("CollisionBallGround", -1)->Add(Function<CollisionBallGroundData*>(fn_80022594), 0, -1);
     FindEvent<CollisionBallWallData>("CollisionBallWall", -1)->Add(Function<CollisionBallWallData*>(fn_800224DC), 0, -1);
     FindEvent<CollisionBallShellData>("CollisionBallShell", -1)->Add(Function<CollisionBallShellData*>(fn_80021B68), 0, -1);
@@ -1784,12 +1784,12 @@ extern "C" void fn_8001FE80()
     FindEvent<CollisionBirdoShotBallPlayerData>("CollisionBirdoShotBallPlayer", -1)->Add(Function<CollisionBirdoShotBallPlayerData*>(fn_80022050), 0, -1);
     FindEvent<CollisionKoopaShellGoalieData>("CollisionKoopaShellGoalie", -1)->Add(Function<CollisionKoopaShellGoalieData*>(fn_80021D70), 0, -1);
     FindEvent<CollisionBirdoEggGoalieData>("CollisionBirdoEggGoalie", -1)->Add(Function<CollisionBirdoEggGoalieData*>(fn_80021DCC), 0, -1);
-    FindEvent<UnidentifiedEventData16>("CollisionHammerbroShotBallPlayer", -1)->Add(Function<UnidentifiedEventData16*>(fn_80022280), 0, -1);
+    FindEvent<CollisionHammerbroShotBallPlayerData>("CollisionHammerbroShotBallPlayer", -1)->Add(Function<CollisionHammerbroShotBallPlayerData*>(fn_80022280), 0, -1);
     FindEvent<CollisionPowerupWallData>("CollisionPowerupWall", -1)->Add(Function<CollisionPowerupWallData*>(fn_80021C98), 0, -1);
     FindEvent<CollisionPlayerBananaData>("CollisionPlayerBanana", -1)->Add(Function<CollisionPlayerBananaData*>(fn_80021924), 0, -1);
     FindEvent<CollisionPlayerShellData>("CollisionPlayerShell", -1)->Add(Function<CollisionPlayerShellData*>(fn_800216C4), 0, -1);
     FindEvent<CollisionPlayerFreezeData>("CollisionPlayerFreeze", -1)->Add(Function<CollisionPlayerFreezeData*>(fn_80021484), 0, -1);
-    FindEvent<UnidentifiedEventData24>("CollisionTongue", -1)->Add(Function<UnidentifiedEventData24*>(fn_8002147C), 0, -1);
+    FindEvent<CollisionPatchData>("CollisionTongue", -1)->Add(Function<CollisionPatchData*>(fn_8002147C), 0, -1);
     FindEvent<CharacterImpactEvent>("MontyReappear", -1)->Add(Function<CharacterImpactEvent*>(fn_800212A0), 0, -1);
     FindEvent<CharacterImpactEvent>("HammerBroHammer", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
     FindEvent<CharacterImpactEvent>("WarioGroundPound", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
@@ -1804,10 +1804,10 @@ extern "C" void fn_8001FE80()
     FindEvent<CollisionBulletBillData>("BulletBillExplode", -1)->Add(Function<CollisionBulletBillData*>(fn_80020FD4), 0, -1);
     FindEvent<CollisionPowerupStatsData>("PowerupStats", -1)->Add(Function<CollisionPowerupStatsData*>(fn_80020C70), 0, -1);
     FindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(fn_80020BB0), 0, -1);
-    FindEvent<UnidentifiedEventData26>("CollisionHammerPlayer", -1)->Add(Function<UnidentifiedEventData26*>(fn_80022B1C), 0, -1);
-    FindEvent<UnidentifiedEventData24>("CollisionPatchPlayer", -1)->Add(Function<UnidentifiedEventData24*>(fn_80022B04), 0, -1);
-    FindEvent<UnidentifiedEventData26>("CollisionHammerGround", -1)->Add(Function<UnidentifiedEventData26*>(fn_80022A98), 0, -1);
-    FindEvent<UnidentifiedEventData34>("CollisionEggPlayer", -1)->Add(Function<UnidentifiedEventData34*>(fn_80022BD8), 0, -1);
+    FindEvent<CollisionProjectileData>("CollisionHammerPlayer", -1)->Add(Function<CollisionProjectileData*>(fn_80022B1C), 0, -1);
+    FindEvent<CollisionPatchData>("CollisionPatchPlayer", -1)->Add(Function<CollisionPatchData*>(fn_80022B04), 0, -1);
+    FindEvent<CollisionProjectileData>("CollisionHammerGround", -1)->Add(Function<CollisionProjectileData*>(fn_80022A98), 0, -1);
+    FindEvent<CollisionEggData>("CollisionEggPlayer", -1)->Add(Function<CollisionEggData*>(fn_80022BD8), 0, -1);
     fn_80098750();
 }
 
@@ -2052,7 +2052,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
     }
 }
 
-extern "C" void fn_8002147C(UnidentifiedEventData24* pEventData)
+extern "C" void fn_8002147C(CollisionPatchData* pEventData)
 {
     ((cFielder*)pEventData->mUnidentified0C)->EndAction();
 }
@@ -2298,7 +2298,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
     fn_800156F8(g_pBall, pEventData->egg->mShooter);
 }
 
-extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
+extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
 {
     if (pEventData->pFielder->CanBeHitBySkillshot())
     {
@@ -2376,7 +2376,7 @@ extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
     SetLastSoundParameter(6, pEventData->fVecZComponent);
 }
 
-extern "C" void fn_80022614(UnidentifiedEventData04*)
+extern "C" void fn_80022614(BallNetmeshEventData*)
 {
     if (g_pBall->m_tShotTimer.m_uPackedTime != 0)
     {
@@ -2522,7 +2522,7 @@ extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData)
     }
 }
 
-extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
+extern "C" void fn_80022A98(CollisionProjectileData* pEventData)
 {
     CharacterImpactEvent event;
     event.v3Position = pEventData->v3Position;
@@ -2533,12 +2533,12 @@ extern "C" void fn_80022A98(UnidentifiedEventData26* pEventData)
     pEventData->pFielder->PlayImpactCameraRumble();
 }
 
-extern "C" void fn_80022B04(UnidentifiedEventData24* pEventData)
+extern "C" void fn_80022B04(CollisionPatchData* pEventData)
 {
     pEventData->mUnidentified0C->CollideWithPatchCallback(pEventData);
 }
 
-extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
+extern "C" void fn_80022B1C(CollisionProjectileData* pEventData)
 {
     cCharacter* pCharacter = (cCharacter*)pEventData->mUnidentified18;
     if (pCharacter->m_eClassType == FIELDER)
@@ -2561,7 +2561,7 @@ extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
     }
 }
 
-extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
+extern "C" void fn_80022BD8(CollisionEggData* pEventData)
 {
     cPlayer* pPlayer = pEventData->mUnidentified00;
     if (pPlayer->m_eClassType == FIELDER)

@@ -2721,7 +2721,7 @@ extern "C" void fn_80018A00()
     FindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
     FindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
     FindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
-    FindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(OnBallEggCollision), 0, -1);
+    FindEvent<CollisionEggData>("CollisionEggBall", -1)->Add(Function<CollisionEggData*>(OnBallEggCollision), 0, -1);
     FindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);
     FindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
     FindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
@@ -2970,7 +2970,7 @@ void OnBallTronWallCollision(void*)
     fn_80015C38(pBall, 0);
 }
 
-void OnBallEggCollision(UnidentifiedEventData34*)
+void OnBallEggCollision(CollisionEggData*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)

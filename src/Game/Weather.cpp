@@ -119,7 +119,7 @@ static u16 sBubblingLavaSyncLogType = 0xFFFF;
 static u16 sStormShipWeatherSyncLogType = 0xFFFF;
 static u16 sSandTombWeatherSyncLogType = 0xFFFF;
 
-void OnLavaCollisionPatchGround(UnidentifiedEventData24*);
+void OnLavaCollisionPatchGround(CollisionPatchData*);
 
 inline bool SolarFlare::IsTargetSelected(int target, int count)
 {
@@ -1048,7 +1048,7 @@ void SolarFlare::ResetFlares(bool initialize)
 BubblingLava::BubblingLava()
 {
     meWeather = 5;
-    FindEvent<UnidentifiedEventData24>("CollisionPatchGround", -1)->Add(Function<UnidentifiedEventData24*>(OnLavaCollisionPatchGround), 0, -1);
+    FindEvent<CollisionPatchData>("CollisionPatchGround", -1)->Add(Function<CollisionPatchData*>(OnLavaCollisionPatchGround), 0, -1);
     Reset();
 }
 
@@ -1077,9 +1077,9 @@ float BubblingLava::GetStartChance()
     return 0.0f;
 }
 
-void OnLavaCollisionPatchGround(UnidentifiedEventData24* event)
+void OnLavaCollisionPatchGround(CollisionPatchData* event)
 {
-    PhysicsPatch* patch = event->mUnidentified10;
+    PhysicsPatch* patch = event->pPatch;
     if (patch->m_Type == 8 && patch->m_Velocity.z < 0.0f)
     {
         Weather* state = g_pGame->mpWeatherManager->GetWeather(5);
@@ -1088,7 +1088,7 @@ void OnLavaCollisionPatchGround(UnidentifiedEventData24* event)
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
         lbl_806E12C8->CreatePatch(9, 0, position, v3Zero, gLavaPoolStartRadius, gLavaPoolEndRadius, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
-        event->mUnidentified10->Unknown0();
+        event->pPatch->Unknown0();
         PlaySound(11, 0xC15AA25B, 0, 0);
     }
 }

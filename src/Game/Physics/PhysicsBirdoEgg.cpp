@@ -93,7 +93,7 @@ ContactType PhysicsBirdoEgg::Contact(
         {
             return NO_CONTACT;
         }
-        QueueBirdoEggDestroyPowerup((UnidentifiedEventData27*)powerup);
+        QueueBirdoEggDestroyPowerup(powerup);
         if (((PhysicsBanana*)other)->m_pPowerupObject->m_eType == POWER_UP_BOBOMB)
         {
             endData = 0;
@@ -112,7 +112,7 @@ ContactType PhysicsBirdoEgg::Contact(
         {
             return NO_CONTACT;
         }
-        QueueBirdoEggDestroyPowerup((UnidentifiedEventData27*)powerup);
+        QueueBirdoEggDestroyPowerup(powerup);
         break;
     }
     case 0x1F:
@@ -126,7 +126,7 @@ ContactType PhysicsBirdoEgg::Contact(
                 return NO_CONTACT;
             }
         }
-        QueueBirdoEggDestroyHammer((UnidentifiedEventData35*)hammer);
+        QueueBirdoEggDestroyHammer(hammer);
         break;
     }
     case 0x20:
@@ -140,13 +140,13 @@ ContactType PhysicsBirdoEgg::Contact(
             endData->cracked = true;
             QueueCollisionBirdoEggEnd(endData);
 
-            UnidentifiedEventData34* crackData = 0;
+            CollisionEggData* crackData = 0;
             g_UnidentifiedEventData34Pool.Allocate(crackData);
             crackData->mUnidentified00 = 0;
             crackData->mUnidentified04 = egg->mFielder;
             crackData->mUnidentified08 = egg;
-            crackData->mUnidentified0C = 0;
-            crackData->mUnidentified10 = 0;
+            crackData->m_pad0C = 0;
+            crackData->m_pad10 = 0;
             QueueCollisionCrackEgg(crackData);
         }
         break;

@@ -21,7 +21,7 @@ class SpaceSearch;
 class AvoidableObject;
 struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
-struct UnidentifiedEventData24;
+struct CollisionPatchData;
 
 enum eBallRotationMode
 {
@@ -129,7 +129,7 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle() { }
-    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const CollisionPatchData*);
 
     void ClearSwapControllerTimer()
     {

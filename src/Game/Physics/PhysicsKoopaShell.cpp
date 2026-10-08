@@ -114,7 +114,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         {
             return NO_CONTACT;
         }
-        QueueKoopaShellDestroyPowerup((UnidentifiedEventData27*)powerup);
+        QueueKoopaShellDestroyPowerup(powerup);
         if (((PhysicsBanana*)other)->m_pPowerupObject->m_eType == POWER_UP_BOBOMB
             || ((PhysicsBanana*)other)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
         {
@@ -134,7 +134,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
         {
             return NO_CONTACT;
         }
-        QueueKoopaShellDestroyPowerup((UnidentifiedEventData27*)powerup);
+        QueueKoopaShellDestroyPowerup(powerup);
         if (((PhysicsShell*)other)->m_pPowerupObject->m_unk44.m_uPackedTime != 0)
         {
             CollisionKoopaShellEndData* eventData = 0;
@@ -156,7 +156,7 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
                 return NO_CONTACT;
             }
         }
-        QueueKoopaShellDestroyHammer((UnidentifiedEventData35*)hammer);
+        QueueKoopaShellDestroyHammer(hammer);
         break;
     }
     case 0x20:
@@ -170,13 +170,13 @@ ContactType PhysicsKoopaShell::Contact(PhysicsObject* other, dContact*, int)
             endData->cracked = true;
             QueueCollisionKoopaShellEnd(endData);
 
-            UnidentifiedEventData34* crackData = 0;
+            CollisionEggData* crackData = 0;
             g_UnidentifiedEventData34Pool.Allocate(crackData);
             crackData->mUnidentified00 = 0;
             crackData->mUnidentified04 = egg->mFielder;
             crackData->mUnidentified08 = egg;
-            crackData->mUnidentified0C = 0;
-            crackData->mUnidentified10 = 0;
+            crackData->m_pad0C = 0;
+            crackData->m_pad10 = 0;
             QueueCollisionCrackEgg(crackData);
         }
         break;

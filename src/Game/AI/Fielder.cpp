@@ -2218,12 +2218,12 @@ void cFielder::CollideWithWallCallback(
     }
 }
 
-void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData)
+void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
 {
-    int type = eventData->mUnidentified10->m_Type;
+    int type = eventData->pPatch->m_Type;
     if (type == 1)
     {
-        if (eventData->mUnidentified10->m_pOwner != this
+        if (eventData->pPatch->m_pOwner != this
             && m_DetPlayer.m_tFireTimer.m_uPackedTime == 0
             && m_eActionState != ACTION_ELECTROCUTION
             && !IsStuck() && !IsInvincible())
@@ -2236,7 +2236,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             if (m_pBall != 0)
             {
                 ReleaseBall(0);
-                ShootBallDueToContact(eventData->mUnidentified10->m_Velocity);
+                ShootBallDueToContact(eventData->pPatch->m_Velocity);
             }
             fn_8004E11C(gFirePatchBurnDuration);
             PlayRumbleAction(2, GetGlobalPad());
@@ -2244,7 +2244,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 0)
     {
-        if (eventData->mUnidentified10->m_pOwner != this
+        if (eventData->pPatch->m_pOwner != this
             && !IsStuck() && !IsInvincible())
         {
             UnidentifiedVariantCollection params;
@@ -2255,21 +2255,21 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 2)
     {
-        if (eventData->mUnidentified10->m_pOwner != this
+        if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && GetActionState() != ACTION_UNKNOWN_34
             && !IsInvincible())
         {
-            fn_80045AEC(eventData->mUnidentified10);
+            fn_80045AEC(eventData->pPatch);
         }
-        else if (eventData->mUnidentified10->m_pTarget != 0
-            && eventData->mUnidentified10->m_pTarget == this)
+        else if (eventData->pPatch->m_pTarget != 0
+            && eventData->pPatch->m_pTarget == this)
         {
-            eventData->mUnidentified10->fn_80173AF4();
+            eventData->pPatch->fn_80173AF4();
         }
     }
     else if (type == 5 || type == 4 || type == 11)
     {
-        if (eventData->mUnidentified10->m_pOwner != this
+        if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && !IsInvincible())
         {
             PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
@@ -2306,39 +2306,39 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 3)
     {
-        if (eventData->mUnidentified10->m_pOwner != this
+        if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && !IsInvincible())
         {
             AddRandomDirt();
             fn_8001F1C0(1);
-            nlVector3 v3Unidentified = eventData->mUnidentified10->m_Velocity;
+            nlVector3 v3Unidentified = eventData->pPatch->m_Velocity;
             v3Unidentified.z = 0.0f;
             if (nlVec3LengthSquared(v3Unidentified) == 0.0f)
             {
                 nlVec3Set(v3Unidentified,
-                    m_DetChar.m_v3Position.x - eventData->mUnidentified10->m_pOwner->m_DetChar.m_v3Position.x,
-                    m_DetChar.m_v3Position.y - eventData->mUnidentified10->m_pOwner->m_DetChar.m_v3Position.y,
+                    m_DetChar.m_v3Position.x - eventData->pPatch->m_pOwner->m_DetChar.m_v3Position.x,
+                    m_DetChar.m_v3Position.y - eventData->pPatch->m_pOwner->m_DetChar.m_v3Position.y,
                     0.0f);
             }
             nlVec3Scale(v3Unidentified,
                 nlRecipSqrt(nlVec3LengthSquared(v3Unidentified), false));
             nlPolar polar;
             nlCartesianToPolar(polar, v3Unidentified);
-            fn_80047240(eventData->mUnidentified10->m_pOwner,
+            fn_80047240(eventData->pPatch->m_pOwner,
                 polar.a, 1, false, false);
         }
     }
     else if (type == 7)
     {
-        if (eventData->mUnidentified10->m_pOwner != this
+        if (eventData->pPatch->m_pOwner != this
             && !IsInFallAction() && !IsInvincible())
         {
-            cPlayer* pOwner = eventData->mUnidentified10->m_pOwner;
+            cPlayer* pOwner = eventData->pPatch->m_pOwner;
             if (gShrinkerIgnoreTeammates && IsOnSameTeam(pOwner))
             {
                 return;
             }
-            fn_800470B4(this, eventData->mUnidentified10->m_pOwner);
+            fn_800470B4(this, eventData->pPatch->m_pOwner);
             if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1C))
             {
                 return;
@@ -2350,7 +2350,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     }
     else if (type == 6)
     {
-        cFielder* pOwner = (cFielder*)eventData->mUnidentified10->m_pOwner;
+        cFielder* pOwner = (cFielder*)eventData->pPatch->m_pOwner;
         if (pOwner != this && !IsFallenDown())
         {
             if (IsSuperGrowActive() || IsInvincibleChars())
@@ -2397,17 +2397,17 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     {
         if (!IsInFallAction() && !IsStarActive()
             && !IsYoshiSuperPowerActive() && !IsInvincible()
-            && !IsCharacterInAir(eventData->mUnidentified10->GetRadius()))
+            && !IsCharacterInAir(eventData->pPatch->GetRadius()))
         {
             PlayRumbleAction(3, GetGlobalPad());
             nlVector3 v3Start;
             nlVec3ScaleAdd(v3Start, -100.0f,
-                eventData->mUnidentified10->fn_80173CCC(),
-                eventData->mUnidentified10->GetPosition());
+                eventData->pPatch->fn_80173CCC(),
+                eventData->pPatch->GetPosition());
             nlVector3 v3End;
             nlVec3ScaleAdd(v3End, 100.0f,
-                eventData->mUnidentified10->fn_80173CCC(),
-                eventData->mUnidentified10->GetPosition());
+                eventData->pPatch->fn_80173CCC(),
+                eventData->pPatch->GetPosition());
             nlVector3 v3Unidentified = GetClosestPointOnLineABFromPointC(
                 v3Start, v3End, m_DetChar.m_v3Position);
             nlVec3Set(v3Unidentified,

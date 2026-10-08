@@ -168,10 +168,10 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
             ApplyDamage(gWaluigiWallPatchDamage);
         else if (patch->m_Type == 6)
         {
-            UnidentifiedEventData24* data = 0;
+            CollisionPatchData* data = 0;
             g_UnidentifiedEventData24Pool.Allocate(data);
             data->mUnidentified0C = patch->m_pOwner;
-            data->mUnidentified10 = patch;
+            data->pPatch = patch;
             QueueCollisionTongue(data);
         }
         return NO_CONTACT;

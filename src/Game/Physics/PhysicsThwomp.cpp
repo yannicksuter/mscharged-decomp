@@ -87,7 +87,7 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
             }
             if (ball->meBallState != 10)
             {
-                QueueCollisionThwompBall((UnidentifiedEventData33*)mThwomp);
+                QueueCollisionThwompBall(mThwomp);
             }
         }
         ball = ((PhysicsAIBall*)other)->m_pAIBall;

@@ -286,7 +286,7 @@ ContactType PhysicsShell::Contact(
         if (isChainChomp)
         {
             QueueCollisionChainCrowd(
-                (UnidentifiedEventData28*)((PhysicsNPC*)obj)->mpAINPC);
+                (ChainChomp*)((PhysicsNPC*)obj)->mpAINPC);
         }
         break;
     }

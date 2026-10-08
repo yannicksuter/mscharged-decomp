@@ -205,7 +205,7 @@ void PhysicsPatch::Unknown0()
 ContactType PhysicsPatch::Contact(
     PhysicsObject* other, dContact*, int)
 {
-    UnidentifiedEventData24* eventData;
+    CollisionPatchData* eventData;
     GetPhysicsPatchInfo(m_Type);
 
     switch (other->GetObjectType())
@@ -254,19 +254,19 @@ ContactType PhysicsPatch::Contact(
         eventData = 0;
         g_UnidentifiedEventData24Pool.Allocate(eventData);
         eventData->mUnidentified0C = fielder;
-        eventData->mUnidentified10 = this;
+        eventData->pPatch = this;
         QueueCollisionPatchPlayer(eventData);
         return NO_CONTACT;
     }
     case 16:
     {
-        QueueCollisionPatchBall((UnidentifiedEventData31*)this);
+        QueueCollisionPatchBall(this);
         if (m_Type == 0 && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
         {
             eventData = 0;
             g_UnidentifiedEventData24Pool.Allocate(eventData);
             eventData->mUnidentified0C = 0;
-            eventData->mUnidentified10 = this;
+            eventData->pPatch = this;
             QueueCollisionPatchPatch(eventData);
         }
         return NO_CONTACT;
@@ -276,13 +276,13 @@ ContactType PhysicsPatch::Contact(
         eventData = 0;
         g_UnidentifiedEventData24Pool.Allocate(eventData);
         eventData->mUnidentified0C = 0;
-        eventData->mUnidentified10 = this;
+        eventData->pPatch = this;
         QueueCollisionPatchGround(eventData);
         return NO_CONTACT;
     }
     case 20:
     {
-        UnidentifiedEventData30* data = 0;
+        CollisionPatchPowerupData* data = 0;
         g_UnidentifiedEventData30Pool.Allocate(data);
         data->mUnidentified00 = ((PhysicsShell*)other)->m_pPowerupObject;
         data->mUnidentified04 = this;
@@ -291,7 +291,7 @@ ContactType PhysicsPatch::Contact(
     }
     case 21:
     {
-        UnidentifiedEventData30* data = 0;
+        CollisionPatchPowerupData* data = 0;
         g_UnidentifiedEventData30Pool.Allocate(data);
         data->mUnidentified00 = ((PhysicsBanana*)other)->m_pPowerupObject;
         data->mUnidentified04 = this;
@@ -306,14 +306,14 @@ ContactType PhysicsPatch::Contact(
            == SkinAnimatedNPC_CHAIN_CHOMP;
         if (isChainChomp)
         {
-            QueueCollisionPatchChain((UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
+            QueueCollisionPatchChain((ChainChomp*)((PhysicsNPC*)other)->mpAINPC);
         }
         return NO_CONTACT;
     }
     case 29:
         return m_Type == 1 ? ONE_WAY_CONTACT_THIS : NO_CONTACT;
     case 23:
-        QueueCollisionPatchWall((UnidentifiedEventData31*)this);
+        QueueCollisionPatchWall(this);
         return NO_CONTACT;
     case 28:
         if (m_Type == 0 && !m_bKillMe)
@@ -324,10 +324,10 @@ ContactType PhysicsPatch::Contact(
             case 8:
             case 9:
             {
-                UnidentifiedEventData24* data = 0;
+                CollisionPatchData* data = 0;
                 g_UnidentifiedEventData24Pool.Allocate(data);
                 data->mUnidentified0C = m_pOwner;
-                data->mUnidentified10 = this;
+                data->pPatch = this;
                 QueueCollisionPatchPatch(data);
                 break;
             }

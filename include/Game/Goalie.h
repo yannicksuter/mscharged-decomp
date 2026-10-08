@@ -128,7 +128,7 @@ public:
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
     virtual void InitActionPostWhistle();
-    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const CollisionPatchData*);
     void RegisterDebugFields(unsigned short* type, DebugWriteCache* cache);
 
     void SetGoalieAction(eGoalieActionState newGoalieState, int newSubstate);

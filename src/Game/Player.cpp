@@ -1311,14 +1311,14 @@ void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
 void OnPlayerPeachFlash(PeachPhotoData*);
 void OnPlayerPeachCamerasDown(PeachPhotoData*);
 void OnPlayerPeachCamerasAway(PeachPhotoData*);
-void OnPlayerResetEffects(UnidentifiedEventData00*);
+void OnPlayerResetEffects(ResetEffectsData*);
 
 extern "C" void fn_80098750()
 {
     FindEvent<PeachPhotoData>("PeachFlash", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachFlash), 0, -1);
     FindEvent<PeachPhotoData>("PeachCamerasDown", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasDown), 0, -1);
     FindEvent<PeachPhotoData>("PeachCamerasAway", -1)->Add(Function<PeachPhotoData*>(OnPlayerPeachCamerasAway), 0, -1);
-    FindEvent<UnidentifiedEventData00>("ResetEffects", -1)->Add(Function<UnidentifiedEventData00*>(OnPlayerResetEffects), 0, -1);
+    FindEvent<ResetEffectsData>("ResetEffects", -1)->Add(Function<ResetEffectsData*>(OnPlayerResetEffects), 0, -1);
 }
 
 static nlVector3 lbl_804FF5C8[] = {
@@ -1489,7 +1489,7 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
 
 
 
-void OnPlayerResetEffects(UnidentifiedEventData00*)
+void OnPlayerResetEffects(ResetEffectsData*)
 {
     if (gNPCManager != NULL)
     {
@@ -1501,7 +1501,7 @@ void OnPlayerResetEffects(UnidentifiedEventData00*)
     }
 }
 
-void cPlayer::CollideWithPatchCallback(const UnidentifiedEventData24*)
+void cPlayer::CollideWithPatchCallback(const CollisionPatchData*)
 {
 }
 

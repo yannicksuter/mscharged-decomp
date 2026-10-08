@@ -846,9 +846,9 @@ bool Goalie::PreCollideWithBallCallback(const dContact& contact)
 }
 
 
-void Goalie::CollideWithPatchCallback(const UnidentifiedEventData24* pData)
+void Goalie::CollideWithPatchCallback(const CollisionPatchData* pData)
 {
-    PhysicsPatch* pPatch = pData->mUnidentified10;
+    PhysicsPatch* pPatch = pData->pPatch;
     int type = pPatch->m_Type;
     if (type == 1 || type == 8 || type == 9)
     {

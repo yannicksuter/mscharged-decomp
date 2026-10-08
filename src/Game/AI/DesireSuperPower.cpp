@@ -1687,10 +1687,10 @@ static inline bool IsClearOfMuckHoles(nlVector3 point)
 
 void HandleMuckBallCollision(void* context)
 {
-    UnidentifiedEventData24* event = (UnidentifiedEventData24*)context;
+    CollisionPatchData* event = (CollisionPatchData*)context;
     bool hit = false;
-    if (event->mUnidentified10->GetPosition().z < 0.0f
-        && event->mUnidentified10->m_Velocity.z < 0.0f)
+    if (event->pPatch->GetPosition().z < 0.0f
+        && event->pPatch->m_Velocity.z < 0.0f)
     {
         hit = true;
     }
@@ -1699,16 +1699,16 @@ void HandleMuckBallCollision(void* context)
     {
         hit = true;
     }
-    if (hit == true && event->mUnidentified10->m_Type == 3)
+    if (hit == true && event->pPatch->m_Type == 3)
     {
-        nlVector3 pos = event->mUnidentified10->GetPosition();
+        nlVector3 pos = event->pPatch->GetPosition();
         pos.z = 0.0f;
         if (IsClearOfMuckHoles(pos) == true)
         {
-            lbl_806E12C8->CreatePatch(4, event->mUnidentified10->m_pOwner,
+            lbl_806E12C8->CreatePatch(4, event->pPatch->m_pOwner,
                 pos, gSuperPowerZeroVector, gPeteyMuckHoleRadius, gPeteyMuckHoleRadius, gPeteyMuckHoleLifetime);
         }
-        event->mUnidentified10->Unknown0();
+        event->pPatch->Unknown0();
     }
 }
 

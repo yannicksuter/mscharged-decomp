@@ -106,7 +106,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
             return ONE_WAY_CONTACT_OTHER;
         }
 
-        UnidentifiedEventData26* data = 0;
+        CollisionProjectileData* data = 0;
         g_UnidentifiedEventData26Pool.Allocate(data);
         data->mUnidentified18 = character;
         data->pFielder = thrower;
@@ -127,7 +127,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         isLanded = hammer->mLandedTimer > 0.0f;
         if (!isLanded)
         {
-            UnidentifiedEventData26* data = 0;
+            CollisionProjectileData* data = 0;
             g_UnidentifiedEventData26Pool.Allocate(data);
             data->mUnidentified18 = 0;
             data->pFielder = thrower;
@@ -146,7 +146,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         {
             return NO_CONTACT;
         }
-        QueueCollisionHammerPowerup((UnidentifiedEventData27*)powerup);
+        QueueCollisionHammerPowerup(powerup);
         if (((PhysicsBanana*)other)->m_pPowerupObject->m_eType == POWER_UP_BOBOMB)
         {
             hammer->Deactivate(true);
@@ -161,7 +161,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         {
             return NO_CONTACT;
         }
-        QueueCollisionHammerPowerup((UnidentifiedEventData27*)powerup);
+        QueueCollisionHammerPowerup(powerup);
         if (((PhysicsShell*)other)->m_pPowerupObject->meSize == POWERUPSIZE_LARGE)
         {
             hammer->Deactivate(true);
@@ -177,7 +177,7 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         if (isChainChomp)
         {
             QueueCollisionHammerChain(
-                (UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
+                (ChainChomp*)((PhysicsNPC*)other)->mpAINPC);
             hammer->Deactivate(true);
         }
         return NO_CONTACT;
