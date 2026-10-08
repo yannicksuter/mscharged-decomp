@@ -1,4 +1,5 @@
 #include <revolution/gx/GXMisc_fwd.h>
+#include <revolution/sc_fwd.h>
 #include <revolution/gx/GXFrameBuf_fwd.h>
 #include "NL/nlDLListContainer.inl"
 #include <revolution/vi/vi_fwd.h>
@@ -2026,14 +2027,6 @@ static bool lbl_806E17ED;
 static bool CanGetResetPauseState = true;
 
 
-extern "C"
-{
-    u8 SCGetLanguage();
-    void GXPokeColorUpdate(unsigned char);
-    void GXPokeBlendMode(int, int, int, int);
-    void GXPokeARGB(unsigned short, unsigned short, unsigned long);
-}
-
 static int fn_801BF4EC()
 {
     int lang;
@@ -2155,7 +2148,7 @@ static void DisplayMessage(int imagewidth, int imageheight, const unsigned char*
     UncompressLidMessage(datastart, datasize, expanded, expandedSize);
 
     GXPokeColorUpdate(1);
-    GXPokeBlendMode(0, 1, 0, 0xF);
+    GXPokeBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_SET);
 
     xStart = (0x280 - imagewidth) / 2;
     centeredFlag = (centered == 0);
