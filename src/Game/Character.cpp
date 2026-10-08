@@ -141,7 +141,7 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData);
 extern "C" void fn_80020C70(CollisionPowerupStatsData* pEventData);
 extern "C" void fn_80020CDC(GoalScoredData* pEventData);
 extern "C" void fn_80020E04(MegaStrikeEndData* pEventData);
-extern "C" void fn_80020E1C(UnidentifiedEventData_80066008*);
+extern "C" void fn_80020E1C(CharacterDirectionData*);
 extern "C" void fn_80020E20(ReceiveBallData* pEventData);
 extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData);
 extern "C" void fn_80020FB8(CollisionBulletBillData* pEventData);
@@ -1794,7 +1794,7 @@ extern "C" void fn_8001FE80()
     UnidentifiedFindEvent<CharacterImpactEvent>("HammerBroHammer", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
     UnidentifiedFindEvent<CharacterImpactEvent>("WarioGroundPound", -1)->Add(Function<CharacterImpactEvent*>(fn_80021120), 0, -1);
     UnidentifiedFindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(fn_80020E20), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData_80066008>("DirectionBegin", -1)->Add(Function<UnidentifiedEventData_80066008*>(fn_80020E1C), 0, -1);
+    UnidentifiedFindEvent<CharacterDirectionData>("DirectionBegin", -1)->Add(Function<CharacterDirectionData*>(fn_80020E1C), 0, -1);
     UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(fn_80020CDC), 0, -1);
     UnidentifiedFindEvent<MegaStrikeEndData>("MegastrikeEnd", -1)->Add(Function<MegaStrikeEndData*>(fn_80020E04), 0, -1);
     UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(fn_80021050), 0, -1);
@@ -1889,7 +1889,7 @@ extern "C" void fn_80020E04(MegaStrikeEndData* pEventData)
     }
 }
 
-extern "C" void fn_80020E1C(UnidentifiedEventData_80066008*)
+extern "C" void fn_80020E1C(CharacterDirectionData*)
 {
 }
 

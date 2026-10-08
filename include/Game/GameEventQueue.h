@@ -6,7 +6,7 @@
 
 struct NISData;
 struct GoalScoredData;
-struct UnidentifiedEventData_80066008;
+struct CharacterDirectionData;
 struct ReceiveBallData;
 struct PassBallData;
 struct GoalieSaveData;
@@ -37,7 +37,7 @@ public:
     UnidentifiedQueuedEvent<NISData> mNISEvent;
     ImmediateEvent<GoalScoredData> mGoalScoredEvent;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mEnterStartScreenEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData_80066008> mDirectionBeginEvent;
+    UnidentifiedQueuedEvent<CharacterDirectionData> mDirectionBeginEvent;
     ImmediateEvent<UnidentifiedEventNoData> mCharacterDirectionEndEvent;
     ImmediateEvent<UnidentifiedEventNoData> mResetEffectsEvent;
     UnidentifiedQueuedEvent<UnidentifiedEventNoData> mGetReadyForKickoffEvent;
