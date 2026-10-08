@@ -31,7 +31,7 @@
 #define __LOp(x) *(1+(int*)x)
 #endif
 
-#ifdef __STDC__
+#if defined(__STDC__) || defined(__cplusplus)
 #define	__P(p)	p
 #else
 #define	__P(p)	()
