@@ -142,7 +142,7 @@ void SHOnlineInvitePreview::SceneCreated()
         GetFriendManager()->GetHostInvitationIndex());
     const CheatSettings& settings = payload->mPowerupSettings;
     TLSlide* slide = GetPresentation()->GetActiveSlide();
-    mContinueButtonInstance = FEFinder<TLComponentInstance, 4>::FindOrDefault<TLSlide>(slide, "Layer", "PREVIEW", "BTN_1");
+    mContinueButtonInstance = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault<TLSlide>(slide, "Layer", "PREVIEW", "BTN_1");
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
