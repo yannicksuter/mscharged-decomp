@@ -1242,7 +1242,7 @@ int PowerupBase::AwardPowerup(cTeam* pTeam, cFielder* pFielder, bool)
     }
 
     if (!gNPCManager->mpChainChomp->IsHidden()
-        || g_pGame->mpWeatherManager->GetWeather(7))
+        || g_pGame->mpWeatherManager->GetWeather(WEATHER_SAND_TOMB))
     {
         nChanceForChainChomp = 0;
     }

@@ -1635,7 +1635,7 @@ void cFielder::fn_80045930()
     nlVector3 v3Direction;
     if (!g_pBall->m_pPhysicsBall->mbUseWindForce)
     {
-        Weather* pObject = g_pGame->mpWeatherManager->GetWeather(2);
+        Weather* pObject = g_pGame->mpWeatherManager->GetWeather(WEATHER_WINDY);
         if (pObject != 0 && !pObject->mbPaused)
         {
             pObject->Start();

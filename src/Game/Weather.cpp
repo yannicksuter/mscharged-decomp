@@ -157,12 +157,12 @@ WeatherManager::~WeatherManager()
     mWeather.m_Allocator.FreeBlocks();
 }
 
-void WeatherManager::Initialize(unsigned int type)
+void WeatherManager::Initialize(eWeatherType type)
 {
     Clear();
     switch (type)
     {
-    case 3:
+    case WEATHER_LIGHTNING_AND_WIND:
     {
         Weather* state = new (8, false) Lightning();
         mWeather.AddEnd(state);
@@ -170,37 +170,37 @@ void WeatherManager::Initialize(unsigned int type)
         mWeather.AddEnd(state);
         break;
     }
-    case 1:
+    case WEATHER_LIGHTNING:
     {
         Weather* state = new (8, false) Lightning();
         mWeather.AddEnd(state);
         break;
     }
-    case 2:
+    case WEATHER_WINDY:
     {
         Weather* state = new (8, false) Windy();
         mWeather.AddEnd(state);
         break;
     }
-    case 4:
+    case WEATHER_SOLAR_FLARE:
     {
         Weather* state = new (8, false) SolarFlare();
         mWeather.AddEnd(state);
         break;
     }
-    case 5:
+    case WEATHER_BUBBLING_LAVA:
     {
         Weather* state = new (8, false) BubblingLava();
         mWeather.AddEnd(state);
         break;
     }
-    case 6:
+    case WEATHER_STORM_SHIP:
     {
         Weather* state = new (8, false) StormShipWeather();
         mWeather.AddEnd(state);
         break;
     }
-    case 7:
+    case WEATHER_SAND_TOMB:
     {
         Weather* state = new (8, false) SandTombWeather();
         mWeather.AddEnd(state);
@@ -216,7 +216,7 @@ void WeatherManager::Initialize(unsigned int type)
     gDisableWeather = Config::Global().Get<bool>("no_weather", false);
 }
 
-Weather* WeatherManager::GetWeather(int value)
+Weather* WeatherManager::GetWeather(eWeatherType type)
 {
     if (!mWeather.IsEmpty())
     {
@@ -225,7 +225,7 @@ Weather* WeatherManager::GetWeather(int value)
         while (it.hasNext())
         {
             Weather* state = *it;
-            if (value == state->meWeather)
+            if (type == state->meWeather)
             {
                 return state;
             }
@@ -337,15 +337,15 @@ void WeatherManager::Resume()
 }
 
 Weather::Weather()
-    : meWeather(0)
-    , meState(0)
+    : meWeather(WEATHER_NONE)
+    , meState(WEATHER_STOPPED)
     , mbPaused(0)
 {
 }
 
 void Weather::Start()
 {
-    meState = 1;
+    meState = WEATHER_ACTIVE;
 }
 
 void Weather::Update(float)
@@ -354,11 +354,11 @@ void Weather::Update(float)
     {
         return;
     }
-    if (!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 1 && meState == 1)
+    if (!g_pGame->IsGameplayOrOvertime() && g_pGame->m_eGameState != 1 && meState == WEATHER_ACTIVE)
     {
         Stop(false);
     }
-    else if (meState != 1 && !mbPaused && meWeather != 0)
+    else if (meState != WEATHER_ACTIVE && !mbPaused && meWeather != WEATHER_NONE)
     {
         float value = nlRandomf(100.0f);
         if (value < GetStartChance())
@@ -377,7 +377,7 @@ int RandomWeatherIndex(int maximum)
 
 void Weather::Stop(bool)
 {
-    meState = 0;
+    meState = WEATHER_STOPPED;
 }
 
 inline void Weather::RegisterDebugFields(u16* type, DebugWriteCache* cache)
@@ -401,13 +401,13 @@ void Weather::SyncLog(void* context, DebugWriteCache* cache)
 
 void Weather::Reset()
 {
-    meState = 0;
+    meState = WEATHER_STOPPED;
     mbPaused = 0;
 }
 
 Lightning::Lightning()
 {
-    meWeather = 1;
+    meWeather = WEATHER_LIGHTNING;
     Reset();
 }
 
@@ -521,7 +521,7 @@ void Lightning::Stop(bool value)
 
 Windy::Windy()
 {
-    meWeather = 2;
+    meWeather = WEATHER_WINDY;
     Reset();
     FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &Windy::OnGetReadyForKickoff)), 0, -1);
 }
@@ -777,7 +777,7 @@ void Windy::Stop(bool value)
 
 SolarFlare::SolarFlare()
 {
-    meWeather = 4;
+    meWeather = WEATHER_SOLAR_FLARE;
     FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnGetReadyForKickoff)), 0, -1);
     FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnKickoff)), 0, -1);
     m_StartCount = 0;
@@ -898,7 +898,7 @@ void SolarFlare::Update(float value)
     Weather::Update(value);
     bool flare = false;
     bool vaporize = false;
-    if (meState == 1 && !mbPaused && m_FlareTimer != 0.0f)
+    if (meState == WEATHER_ACTIVE && !mbPaused && m_FlareTimer != 0.0f)
     {
         m_FlareTimer -= value;
         if (m_FlareTimer <= 0.0f)
@@ -907,7 +907,7 @@ void SolarFlare::Update(float value)
             flare = true;
         }
     }
-    if (meState == 1 && !mbPaused && m_VaporizeTimer != 0.0f)
+    if (meState == WEATHER_ACTIVE && !mbPaused && m_VaporizeTimer != 0.0f)
     {
         m_VaporizeTimer -= value;
         if (m_VaporizeTimer <= 0.0f)
@@ -1047,7 +1047,7 @@ void SolarFlare::ResetFlares(bool initialize)
 
 BubblingLava::BubblingLava()
 {
-    meWeather = 5;
+    meWeather = WEATHER_BUBBLING_LAVA;
     FindEvent<CollisionPatchData>("CollisionPatchGround", -1)->Add(Function<CollisionPatchData*>(OnLavaCollisionPatchGround), 0, -1);
     Reset();
 }
@@ -1082,8 +1082,8 @@ void OnLavaCollisionPatchGround(CollisionPatchData* event)
     PhysicsPatch* patch = event->pPatch;
     if (patch->m_Type == 8 && patch->m_Velocity.z < 0.0f)
     {
-        Weather* state = g_pGame->mpWeatherManager->GetWeather(5);
-        if (state == 0 || state->meState != 1)
+        Weather* state = g_pGame->mpWeatherManager->GetWeather(WEATHER_BUBBLING_LAVA);
+        if (state == 0 || state->meState != WEATHER_ACTIVE)
             return;
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
@@ -1234,7 +1234,7 @@ void BubblingLava::Update(float value)
         if (m_VolleyCountdown > 0.0f)
         {
             m_VolleyCountdown -= value;
-            if (m_VolleyCountdown <= 0.0f && meState == 1)
+            if (m_VolleyCountdown <= 0.0f && meState == WEATHER_ACTIVE)
                 Stop(false);
         }
         if (m_FlySoundCountdown > 0.0f)
@@ -1270,7 +1270,7 @@ void BubblingLava::Stop(bool initialize)
 StormShipWeather::StormShipWeather()
 {
     InitChainLightningPaths();
-    meWeather = 6;
+    meWeather = WEATHER_STORM_SHIP;
     Reset();
     m_StartWeatherTimer = gStormStartDelay;
 }
@@ -1508,7 +1508,7 @@ void StormShipWeather::ResetLightning(bool initialize)
 SandTombWeather::SandTombWeather()
     : m_Thwomps()
 {
-    meWeather = 7;
+    meWeather = WEATHER_SAND_TOMB;
     Reset();
     FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SandTombWeather::OnKickoff)), 0, -1);
 }

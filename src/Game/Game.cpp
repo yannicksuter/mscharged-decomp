@@ -395,7 +395,7 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
 
     mpWeatherManager = new (nlMalloc(sizeof(WeatherManager), 8, false)) WeatherManager();
 
-    mpWeatherManager->Initialize(weatherType);
+    mpWeatherManager->Initialize(static_cast<eWeatherType>(weatherType));
 
     mpCrowdRiot = new (nlMalloc(sizeof(CrowdRiot), 8, false))
         CrowdRiot(startCrowdRiot);
@@ -2261,7 +2261,7 @@ void cGame::ResumeAfterPresentation()
 
     if (mpWeatherManager != 0)
     {
-        SandTombWeather* weather = static_cast<SandTombWeather*>(mpWeatherManager->GetWeather(7));
+        SandTombWeather* weather = static_cast<SandTombWeather*>(mpWeatherManager->GetWeather(WEATHER_SAND_TOMB));
         if (weather != 0)
         {
             weather->InvalidateSandPatches();
