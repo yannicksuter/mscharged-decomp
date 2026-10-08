@@ -147,30 +147,33 @@ void EndPeachPhoto(PeachPhotoState* photo, bool immediate)
     }
 }
 
+static inline void SetPeachPhotoTexel(
+    PlatTexture* texture, int x, int y, unsigned short colour)
+{
+    int offset = (x & 3) << 1;
+    offset += (y & 3) << 3;
+    offset += ((y >> 2) * (texture->m_Width >> 2) + (x >> 2)) << 5;
+    *reinterpret_cast<unsigned short*>(
+        static_cast<u8*>(texture->m_SwizzledData) + offset) = colour;
+}
+
 void SetPeachPhotoTextureBorder(
     unsigned short colour, unsigned long textureHandle)
 {
     PlatTexture* texture = glx_GetTex(textureHandle);
-    unsigned short* data =
-        static_cast<unsigned short*>(texture->m_SwizzledData);
     const int width = texture->m_Width;
     const int height = texture->m_Height;
 
     for (int x = 0; x < width; ++x)
     {
-        data[(x / 4) * 16 + (x & 3)] = colour;
-        const int y = height - 1;
-        data[((y / 4) * (width >> 2) + (x / 4)) * 16
-            + ((y & 3) << 2) + (x & 3)] = colour;
+        SetPeachPhotoTexel(texture, x, 0, colour);
+        SetPeachPhotoTexel(texture, x, height - 1, colour);
     }
 
     for (int y = 0; y < height; ++y)
     {
-        data[((y / 4) * (width >> 2)) * 16
-            + ((y & 3) << 2)] = colour;
-        const int x = width - 1;
-        data[((y / 4) * (width >> 2) + (x / 4)) * 16
-            + ((y & 3) << 2) + (x & 3)] = colour;
+        SetPeachPhotoTexel(texture, 0, y, colour);
+        SetPeachPhotoTexel(texture, width - 1, y, colour);
     }
 }
 
