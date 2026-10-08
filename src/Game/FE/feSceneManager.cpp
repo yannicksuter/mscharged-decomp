@@ -17,7 +17,7 @@ template <>
 FESceneManager* nlSingleton<FESceneManager>::s_pInstance = 0;
 
 SlotPool<PackagePushPopMessage> PackagePushPopMessage::m_PushPopMessageSlotPool(0x14, 0);
-nlDLListSlotPool<PackagePushPopMessage*> m_pushPopMessageQueue(0x14, 0);
+nlDLListSlotPool<PackagePushPopMessage*> g_scenePushPopMessageQueue(0x14, 0);
 
 FESceneManager::FESceneManager()
     : m_sceneHandlerStack(0x14, 0)
@@ -51,13 +51,13 @@ bool FESceneManager::AreAllScenesValid()
         }
     }
 
-    return m_pushPopMessageQueue.m_Head == 0;
+    return g_scenePushPopMessageQueue.m_Head == 0;
 }
 
 bool FESceneManager::IsObjectQueuedForPop(BaseSceneHandler* pSceneHandler)
 {
     nlDLListIterator<PackagePushPopMessage*> msgIterator;
-    msgIterator = m_pushPopMessageQueue.Begin();
+    msgIterator = g_scenePushPopMessageQueue.Begin();
 
     while (msgIterator.hasNext())
     {
@@ -130,9 +130,9 @@ void FESceneManager::ProcessPushPopQueue()
     FESceneManager* pSceneManager = this;
     PackagePushPopMessage* pPackagePushPopMessage;
 
-    while (m_pushPopMessageQueue.m_Head != 0)
+    while (g_scenePushPopMessageQueue.m_Head != 0)
     {
-        m_pushPopMessageQueue.RemoveStart(&pPackagePushPopMessage);
+        g_scenePushPopMessageQueue.RemoveStart(&pPackagePushPopMessage);
 
         if (pPackagePushPopMessage->m_bPush != false)
         {
@@ -186,7 +186,7 @@ void FESceneManager::QueueScenePush(
     msg->m_pSceneHandler->mHashID = nlStringLowerHash(szFilename);
     msg->m_pAllocator = pAllocator != 0 ? pAllocator : CurrentAllocator;
 
-    m_pushPopMessageQueue.AddEnd(msg);
+    g_scenePushPopMessageQueue.AddEnd(msg);
 }
 
 void FESceneManager::QueueScenePop()
@@ -215,7 +215,7 @@ void FESceneManager::QueueScenePop()
         sceneIterator.Step();
     }
 
-    m_pushPopMessageQueue.AddEnd(msg);
+    g_scenePushPopMessageQueue.AddEnd(msg);
 }
 
 void FESceneManager::RenderActiveScenes()
