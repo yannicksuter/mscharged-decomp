@@ -79,17 +79,17 @@ NetMessageTransportType6::~NetMessageTransportType6()
 
 int NetMessageClientConfirmedJoin::GetType()
 {
-    return 12;
+    return NETMSG_CLIENT_CONFIRMED_JOIN;
 }
 
 int NetMessageReadyToLaunchConfirm::GetType()
 {
-    return 11;
+    return NETMSG_READY_TO_LAUNCH_CONFIRM;
 }
 
 int NetMessageReadyToLaunchRequest::GetType()
 {
-    return 10;
+    return NETMSG_READY_TO_LAUNCH_REQUEST;
 }
 
 int NetMessageTransportType6::GetType()
@@ -99,15 +99,15 @@ int NetMessageTransportType6::GetType()
 
 int NetMessageGamePeerAdded::GetType()
 {
-    return 7;
+    return NETMSG_GAME_PEER_ADDED;
 }
 
 int NetMessageJoinResponse::GetType()
 {
-    return 5;
+    return NETMSG_JOIN_RESPONSE;
 }
 
 int NetMessageJoinRequest::GetType()
 {
-    return 4;
+    return NETMSG_JOIN_REQUEST;
 }

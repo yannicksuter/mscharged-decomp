@@ -43,10 +43,10 @@ void InitializeInputManager()
         manager->mFrameProvider = 0;
         manager->mEnabled = false;
 
-        gNetworkMessageRegistry->RegisterFactory(0, &sFactoryType0);
-        gNetworkMessageRegistry->RegisterFactory(1, &sFactoryType1);
-        gNetworkMessageRegistry->RegisterFactory(8, &sFactoryType8);
-        gNetworkMessageRegistry->RegisterFactory(9, &sFactoryType9);
+        gNetworkMessageRegistry->RegisterFactory(NETMSG_INPUT, &sFactoryType0);
+        gNetworkMessageRegistry->RegisterFactory(NETMSG_INPUT_BUNDLE, &sFactoryType1);
+        gNetworkMessageRegistry->RegisterFactory(NETMSG_ALL_INPUTS, &sFactoryType8);
+        gNetworkMessageRegistry->RegisterFactory(NETMSG_ALL_INPUTS_BUNDLE, &sFactoryType9);
 
         manager->mCongestionStartTicker = 0;
         manager->mLastCongestionMilliseconds = 0.0f;

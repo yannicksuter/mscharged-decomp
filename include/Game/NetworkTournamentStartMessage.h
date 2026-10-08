@@ -9,7 +9,7 @@ class NetMessageTournamentStart : public NetworkMessage
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
     virtual ~NetMessageTournamentStart() { }
-    virtual int GetType() { return 20; }
+    virtual int GetType() { return NETMSG_TOURNAMENT_START; }
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ u8 mMachineCount;

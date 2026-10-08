@@ -24,10 +24,10 @@ void NetMessageFoundGame::Serialize(NetworkMessageSerializer* serializer)
 
 int NetMessageFoundGame::GetType()
 {
-    return 3;
+    return NETMSG_FOUND_GAME;
 }
 
 int NetMessageFindGame::GetType()
 {
-    return 2;
+    return NETMSG_FIND_GAME;
 }

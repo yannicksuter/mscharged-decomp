@@ -59,7 +59,7 @@ NetworkLobby::NetworkLobby()
 
 void NetworkLobby::RegisterMessageReceiver()
 {
-    gNetworkMessageRegistry->RegisterReceiver(0x16, static_cast<NetworkMessageReceiver*>(this));
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT_MACHINE_INFO, static_cast<NetworkMessageReceiver*>(this));
     mReceiverRegistered = true;
     Reset();
 }
@@ -107,7 +107,7 @@ void NetworkLobby::Reset()
 
 void NetworkLobby::UnregisterMessageReceiver()
 {
-    gNetworkMessageRegistry->UnregisterReceiver(0x16);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT_MACHINE_INFO);
     Reset();
     mReceiverRegistered = false;
 }
@@ -1077,7 +1077,7 @@ int NetworkLobby::ProcessMessage(
 
     switch ((u8)message->GetType())
     {
-    case 0x16:
+    case NETMSG_DRAFT_MACHINE_INFO:
     {
         NetMessageDraftMachineInfo* machineInfo = (NetMessageDraftMachineInfo*)message;
         int index = machineInfo->mEntry.mMachineIndex;

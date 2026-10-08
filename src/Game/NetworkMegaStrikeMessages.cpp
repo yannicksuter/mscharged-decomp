@@ -52,10 +52,10 @@ void NetMessageMegaStrikeMeter::Serialize(
 
 int NetMessageMegaStrikeMeter::GetType()
 {
-    return 35;
+    return NETMSG_MEGA_STRIKE_METER;
 }
 
 int NetMessageMegaBallPointer::GetType()
 {
-    return 34;
+    return NETMSG_MEGA_BALL_POINTER;
 }

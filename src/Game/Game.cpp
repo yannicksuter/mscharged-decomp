@@ -445,8 +445,8 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
         AIContext(
             this, 0, new (nlMalloc(sizeof(FuzzyAIRuntime), 8, false))
                          FuzzyAIRuntime());
-    gNetworkMessageRegistry->RegisterReceiver(34, this);
-    gNetworkMessageRegistry->RegisterReceiver(35, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_MEGA_BALL_POINTER, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_MEGA_STRIKE_METER, this);
 
     float avoidableWidth = 1.0f;
     nlVector3 avoidableCenter = { 20.6f, 0.0f, 0.0f };
@@ -492,8 +492,8 @@ cGame::~cGame()
     mpAIContext->Cleanup(true, true);
     delete mpAIContext;
 
-    gNetworkMessageRegistry->UnregisterReceiver(34);
-    gNetworkMessageRegistry->UnregisterReceiver(35);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_MEGA_BALL_POINTER);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_MEGA_STRIKE_METER);
 
     for (int i = 0; i < 4; i++)
     {
@@ -1317,14 +1317,14 @@ int cGame::ProcessMessage(NetworkMessage* message)
 
     switch ((u8)message->GetType())
     {
-    case 34:
+    case NETMSG_MEGA_BALL_POINTER:
         if (mbCaptainShotToScoreOn)
         {
             ReceiveMegaBallPointerUpdate(message);
         }
         break;
 
-    case 35:
+    case NETMSG_MEGA_STRIKE_METER:
     {
         NetMessageMegaStrikeMeter* pMessage = (NetMessageMegaStrikeMeter*)message;
         for (int i = 0; i < pMessage->mCount; i++)

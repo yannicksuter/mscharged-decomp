@@ -118,8 +118,8 @@ void NetTournManager::Reset(bool)
 void NetTournManager::TransitionOnlineMenuToTournament(
     NetMessageTournamentStart* message)
 {
-    gNetworkMessageRegistry->RegisterReceiver(32, this);
-    gNetworkMessageRegistry->RegisterReceiver(33, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_TOURNAMENT_GAME_UPDATE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_TOURNAMENT_LOADING_STATE, this);
 
     mMachineCount = (s8)message->mMachineCount;
     mLocalMachineIndex = (s8)message->mMachineIndex;
@@ -785,8 +785,8 @@ void NetTournManager::Update(float dt)
                 gameIndex = mFirstGameInRound;
                 mWinningMachine = -1;
                 mGames[gameIndex].GetWinnerResult(0, &mWinningMachine);
-                gNetworkMessageRegistry->UnregisterReceiver(32);
-                gNetworkMessageRegistry->UnregisterReceiver(33);
+                gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_GAME_UPDATE);
+                gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_LOADING_STATE);
                 NetworkMachineRoster* roster
                     = g_pNetworkSessionBase->GetMachineRoster();
                 if (roster != 0)
@@ -973,11 +973,11 @@ int NetTournManager::ProcessMessage(NetworkMessage* message)
 
     switch ((u8)message->GetType())
     {
-    case 32:
+    case NETMSG_TOURNAMENT_GAME_UPDATE:
         HandleTournamentGameUpdate(
             static_cast<NetMessageTournamentGameUpdate*>(message));
         break;
-    case 33:
+    case NETMSG_TOURNAMENT_LOADING_STATE:
     {
         NetMessageTournamentLoadingState* loading
             = static_cast<NetMessageTournamentLoadingState*>(message);

@@ -382,12 +382,12 @@ void NetMessageInputBundle::Serialize(
 
 int NetMessageInputBundle::GetType()
 {
-    return 1;
+    return NETMSG_INPUT_BUNDLE;
 }
 
 int NetMessageInput::GetType()
 {
-    return 0;
+    return NETMSG_INPUT;
 }
 
 typedef char VerifyNetworkPeerChannelSize[

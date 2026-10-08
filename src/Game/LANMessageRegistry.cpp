@@ -13,13 +13,13 @@ static NetworkMessageFactory<NetMessageClientConfirmedJoin> sClientConfirmedJoin
 
 void RegisterLANMessages()
 {
-    gNetworkMessageRegistry->RegisterFactory(2, &sFindGameFactory);
-    gNetworkMessageRegistry->RegisterFactory(3, &sFoundGameFactory);
-    gNetworkMessageRegistry->RegisterFactory(4, &sJoinRequestFactory);
-    gNetworkMessageRegistry->RegisterFactory(5, &sJoinResponseFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_FIND_GAME, &sFindGameFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_FOUND_GAME, &sFoundGameFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_JOIN_REQUEST, &sJoinRequestFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_JOIN_RESPONSE, &sJoinResponseFactory);
     gNetworkMessageRegistry->RegisterFactory(6, &sFactoryType6);
-    gNetworkMessageRegistry->RegisterFactory(7, &sGamePeerAddedFactory);
-    gNetworkMessageRegistry->RegisterFactory(10, &sReadyToLaunchRequestFactory);
-    gNetworkMessageRegistry->RegisterFactory(11, &sReadyToLaunchConfirmFactory);
-    gNetworkMessageRegistry->RegisterFactory(12, &sClientConfirmedJoinFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_GAME_PEER_ADDED, &sGamePeerAddedFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_READY_TO_LAUNCH_REQUEST, &sReadyToLaunchRequestFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_READY_TO_LAUNCH_CONFIRM, &sReadyToLaunchConfirmFactory);
+    gNetworkMessageRegistry->RegisterFactory(NETMSG_CLIENT_CONFIRMED_JOIN, &sClientConfirmedJoinFactory);
 }

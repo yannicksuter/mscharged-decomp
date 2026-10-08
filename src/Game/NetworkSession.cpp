@@ -639,18 +639,18 @@ void NetworkSession::InitializeLAN()
     }
 
     mSessionMode = 1;
-    gNetworkMessageRegistry->RegisterReceiver(0xD, this);
-    gNetworkMessageRegistry->RegisterReceiver(0xF, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x12, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x13, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x14, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x15, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x0, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x8, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x9, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1C, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1D, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_GAME_START, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME_CLIENT, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME_EVERYONE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_TOURNAMENT_START, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_INPUT, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_INPUT_BUNDLE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_ALL_INPUTS, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_ALL_INPUTS_BUNDLE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_PAUSE_REQUEST, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_PAUSE_RESPONSE, this);
 
     NetworkSocketInitializeInfo info;
     info.mVersionWord = GetNetworkVersionWord();
@@ -670,18 +670,18 @@ void NetworkSession::ShutdownLAN()
     mTransport->UnregisterMessageReceivers();
     mDirectSocket->Shutdown();
 
-    gNetworkMessageRegistry->UnregisterReceiver(0xD);
-    gNetworkMessageRegistry->UnregisterReceiver(0xF);
-    gNetworkMessageRegistry->UnregisterReceiver(0x12);
-    gNetworkMessageRegistry->UnregisterReceiver(0x13);
-    gNetworkMessageRegistry->UnregisterReceiver(0x14);
-    gNetworkMessageRegistry->UnregisterReceiver(0x15);
-    gNetworkMessageRegistry->UnregisterReceiver(0x0);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1);
-    gNetworkMessageRegistry->UnregisterReceiver(0x8);
-    gNetworkMessageRegistry->UnregisterReceiver(0x9);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1C);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1D);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_GAME_START);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME_CLIENT);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME_EVERYONE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_START);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_INPUT);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_INPUT_BUNDLE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_ALL_INPUTS);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_ALL_INPUTS_BUNDLE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_REQUEST);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_RESPONSE);
 
     mSessionMode = 0;
 }
@@ -710,21 +710,21 @@ void NetworkSession::InitializeOnline()
     mDWCInitialized = 1;
     mSessionMode = 2;
 
-    gNetworkMessageRegistry->RegisterReceiver(0xD, this);
-    gNetworkMessageRegistry->RegisterReceiver(0xF, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x12, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x13, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x14, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x15, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x19, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1A, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1B, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x0, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x8, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x9, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1C, this);
-    gNetworkMessageRegistry->RegisterReceiver(0x1D, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_GAME_START, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME_CLIENT, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME_EVERYONE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_TOURNAMENT_START, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_DRAFT, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_SIDES_CHANGED, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_CHECK_CONNECTION, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_CONNECTION_DECISION, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_INPUT, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_INPUT_BUNDLE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_ALL_INPUTS, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_ALL_INPUTS_BUNDLE, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_PAUSE_REQUEST, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_PAUSE_RESPONSE, this);
 
     NetworkSocketInitializeInfo info;
     info.mVersionWord = GetNetworkVersionWord();
@@ -1404,21 +1404,21 @@ void NetworkSession::ShutdownOnline()
     mDWCInitialized = 0;
     SocketNetworkShutdown();
 
-    gNetworkMessageRegistry->UnregisterReceiver(0xD);
-    gNetworkMessageRegistry->UnregisterReceiver(0xF);
-    gNetworkMessageRegistry->UnregisterReceiver(0x12);
-    gNetworkMessageRegistry->UnregisterReceiver(0x13);
-    gNetworkMessageRegistry->UnregisterReceiver(0x14);
-    gNetworkMessageRegistry->UnregisterReceiver(0x15);
-    gNetworkMessageRegistry->UnregisterReceiver(0x19);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1A);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1B);
-    gNetworkMessageRegistry->UnregisterReceiver(0x0);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1);
-    gNetworkMessageRegistry->UnregisterReceiver(0x8);
-    gNetworkMessageRegistry->UnregisterReceiver(0x9);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1C);
-    gNetworkMessageRegistry->UnregisterReceiver(0x1D);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_GAME_START);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME_CLIENT);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_LOADED_GAME_EVERYONE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_TOURNAMENT_START);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_DRAFT);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_SIDES_CHANGED);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_CHECK_CONNECTION);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_CONNECTION_DECISION);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_INPUT);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_INPUT_BUNDLE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_ALL_INPUTS);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_ALL_INPUTS_BUNDLE);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_REQUEST);
+    gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_RESPONSE);
     mSessionMode = 0;
 }
 
@@ -1674,9 +1674,9 @@ int NetworkSession::ProcessMessage(
         return 1;
     }
 
-    if ((u8)message->GetType() != 0x14 && (u8)message->GetType() != 0xD
-        && (u8)message->GetType() != 0x15 && (u8)message->GetType() != 0x19
-        && (u8)message->GetType() != 0x1A && (u8)message->GetType() != 0x1B
+    if ((u8)message->GetType() != NETMSG_TOURNAMENT_START && (u8)message->GetType() != NETMSG_GAME_START
+        && (u8)message->GetType() != NETMSG_DRAFT && (u8)message->GetType() != NETMSG_SIDES_CHANGED
+        && (u8)message->GetType() != NETMSG_CHECK_CONNECTION && (u8)message->GetType() != NETMSG_CONNECTION_DECISION
         && NetTournManager::Instance()->mTournamentMachineMappingActive)
     {
         int original = machine;
@@ -1694,7 +1694,7 @@ int NetworkSession::ProcessMessage(
 
     switch ((u8)message->GetType())
     {
-    case 0xD:
+    case NETMSG_GAME_START:
         if (gNetworkInputRecording->mPlaybackEnabled != 0)
         {
             PlaybackRecordedGameBody();
@@ -1712,12 +1712,12 @@ int NetworkSession::ProcessMessage(
         GameSceneManager::Instance()->PushLoadingScene(false);
         break;
 
-    case 0x14:
+    case NETMSG_TOURNAMENT_START:
         NetTournManager::Instance()->TransitionOnlineMenuToTournament(
             static_cast<NetMessageTournamentStart*>(message));
         break;
 
-    case 0x15:
+    case NETMSG_DRAFT:
         if (((NetMessageDraft*)message)->mChooseSides != 0)
         {
             SHOnlineFriendsChooseSides* scene = (SHOnlineFriendsChooseSides*)
@@ -1740,7 +1740,7 @@ int NetworkSession::ProcessMessage(
         }
         break;
 
-    case 0x19:
+    case NETMSG_SIDES_CHANGED:
     {
         BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene((SceneList)0x38);
         SHOnlineFriendsChooseSides* handler = 0;
@@ -1755,7 +1755,7 @@ int NetworkSession::ProcessMessage(
         break;
     }
 
-    case 0x1A:
+    case NETMSG_CHECK_CONNECTION:
     {
         mSessionState = 3;
         GetMachineRoster()->OnGameStarted();
@@ -1770,7 +1770,7 @@ int NetworkSession::ProcessMessage(
         break;
     }
 
-    case 0x1B:
+    case NETMSG_CONNECTION_DECISION:
     {
         OnlineConnectionQualityScene* scene = static_cast<OnlineConnectionQualityScene*>(
             GameSceneManager::Instance()->GetScene((SceneList)0x39));
@@ -1781,17 +1781,17 @@ int NetworkSession::ProcessMessage(
         break;
     }
 
-    case 0xF:
+    case NETMSG_LOADED_GAME:
         tDebugPrintManager::Print(DC_NETWORK, "Received loaded game message from %d\n", machine);
         mMachineLoadedGame[machine] = 1;
         break;
 
-    case 0x12:
+    case NETMSG_LOADED_GAME_CLIENT:
         tDebugPrintManager::Print(DC_NETWORK, "Received loaded game CLIENT message from %d\n", machine);
         mMachineLoadedGame[machine] = 1;
         break;
 
-    case 0x13:
+    case NETMSG_LOADED_GAME_EVERYONE:
     {
         tDebugPrintManager::Print(DC_NETWORK, "Received loaded game EVERYONE message from %d\n", machine);
         for (int index = 0; index < this->GetNumMachines(); ++index)
@@ -1803,8 +1803,8 @@ int NetworkSession::ProcessMessage(
         break;
     }
 
-    case 0x0:
-    case 0x1:
+    case NETMSG_INPUT:
+    case NETMSG_INPUT_BUNDLE:
         if (gNetworkInputRecording->mPlaybackEnabled != 0)
         {
             break;
@@ -1823,7 +1823,7 @@ int NetworkSession::ProcessMessage(
                 mSessionState);
             break;
         }
-        if ((u8)message->GetType() == 0)
+        if ((u8)message->GetType() == NETMSG_INPUT)
         {
             GetInputRouter()->ReceiveInput(
                 machine, (NetMessageInput*)message);
@@ -1837,8 +1837,8 @@ int NetworkSession::ProcessMessage(
         }
         break;
 
-    case 0x8:
-    case 0x9:
+    case NETMSG_ALL_INPUTS:
+    case NETMSG_ALL_INPUTS_BUNDLE:
         if (gNetworkInputRecording->mPlaybackEnabled != 0)
         {
             break;
@@ -1857,7 +1857,7 @@ int NetworkSession::ProcessMessage(
                 mSessionState);
             break;
         }
-        if ((u8)message->GetType() == 8)
+        if ((u8)message->GetType() == NETMSG_ALL_INPUTS)
         {
             GetInputRouter()->ReceiveAllInputs(
                 machine, (NetMessageAllInputs*)message);
@@ -1871,7 +1871,7 @@ int NetworkSession::ProcessMessage(
         }
         break;
 
-    case 0x1C:
+    case NETMSG_PAUSE_REQUEST:
     {
         if ((s8)this->GetLocalMachineId() != 0)
         {
@@ -1900,7 +1900,7 @@ int NetworkSession::ProcessMessage(
         break;
     }
 
-    case 0x1D:
+    case NETMSG_PAUSE_RESPONSE:
         if (machine != 0)
         {
             break;

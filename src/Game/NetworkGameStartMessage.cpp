@@ -24,5 +24,5 @@ void NetMessageGameStart::Serialize(NetworkMessageSerializer* serializer)
 
 int NetMessageGameStart::GetType()
 {
-    return 13;
+    return NETMSG_GAME_START;
 }

@@ -222,8 +222,8 @@ Presentation::Presentation()
     mIsAllowedToSkip[2] = true;
     mIsAllowedToSkip[3] = true;
 
-    gNetworkMessageRegistry->RegisterReceiver(30, this);
-    gNetworkMessageRegistry->RegisterReceiver(31, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_SKIP_NIS, this);
+    gNetworkMessageRegistry->RegisterReceiver(NETMSG_SKIP_NIS_CLIENT, this);
     m_pad02C = 0;
 }
 
@@ -1262,7 +1262,7 @@ int Presentation::ProcessMessage(NetworkMessage* message)
 
     switch ((u8)receivedMessage->GetType())
     {
-    case 30:
+    case NETMSG_SKIP_NIS:
         tDebugPrintManager::Print(DC_NETWORK,
             "Received SkipNIS message from machine %d bypass# %d\n", machine,
             ((NetMessageSkipNis*)receivedMessage)->mByPassNumber);
@@ -1270,7 +1270,7 @@ int Presentation::ProcessMessage(NetworkMessage* message)
             = ((NetMessageSkipNis*)receivedMessage)->mByPassNumber;
         break;
 
-    case 31:
+    case NETMSG_SKIP_NIS_CLIENT:
         if (g_pNetworkSessionBase->GetLocalMachineId() == 0)
         {
             tDebugPrintManager::Print(DC_NETWORK,

@@ -65,7 +65,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 21; }
+    virtual int GetType() { return NETMSG_DRAFT; }
 
     /* 0x008 */ s8 mMachineIndex;
     /* 0x009 */ s8 mMachineCount;
@@ -100,7 +100,7 @@ class NetMessageDraftMachineInfo : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 22; }
+    virtual int GetType() { return NETMSG_DRAFT_MACHINE_INFO; }
 
     /* 0x008 */ NetworkDraftMachineInfo mEntry;
 }; // size: 0x88
@@ -110,7 +110,7 @@ class NetMessageDraftPickedCaptain : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 23; }
+    virtual int GetType() { return NETMSG_DRAFT_PICKED_CAPTAIN; }
 
     /* 0x08 */ s8 mTeamIndex;
     /* 0x09 */ u8 mCaptain;
@@ -121,7 +121,7 @@ class NetMessageDraftPickedSidekicks : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 24; }
+    virtual int GetType() { return NETMSG_DRAFT_PICKED_SIDEKICKS; }
 
     /* 0x08 */ u8 mTeamIndex;
     /* 0x09 */ u8 mSidekick0;
@@ -133,7 +133,7 @@ class NetMessageSidesChanged : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 25; }
+    virtual int GetType() { return NETMSG_SIDES_CHANGED; }
 
     /* 0x08 */ u8 mMachineIndex;
     /* 0x09 */ s8 mSide;
@@ -146,7 +146,7 @@ class NetMessageCheckConnection : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 26; }
+    virtual int GetType() { return NETMSG_CHECK_CONNECTION; }
 
     /* 0x08 */ u32 mProfileIds[2];
 };
@@ -155,7 +155,7 @@ class NetMessageConnectionDecision : public NetworkMessage
 {
 public:
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 27; }
+    virtual int GetType() { return NETMSG_CONNECTION_DECISION; }
 
     /* 0x08 */ u8 mAccepted;
     /* 0x09 */ s8 mMachineIndex;
@@ -176,7 +176,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 30; }
+    virtual int GetType() { return NETMSG_SKIP_NIS; }
 
     /* 0x08 */ u32 mByPassNumber;
 };
@@ -194,7 +194,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 31; }
+    virtual int GetType() { return NETMSG_SKIP_NIS_CLIENT; }
 
     /* 0x08 */ u32 mByPassNumber;
 };
@@ -219,7 +219,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 32; }
+    virtual int GetType() { return NETMSG_TOURNAMENT_GAME_UPDATE; }
 
     /* 0x008 */ u8 mUpdateType;
     /* 0x009 */ u8 mGameIndex;
@@ -245,7 +245,7 @@ public:
     }
 
     virtual void Serialize(NetworkMessageSerializer* serializer);
-    virtual int GetType() { return 33; }
+    virtual int GetType() { return NETMSG_TOURNAMENT_LOADING_STATE; }
 
     /* 0x08 */ s8 mMachineIndex;
     /* 0x09 */ u8 mFinishedLoadingToKnockout;
