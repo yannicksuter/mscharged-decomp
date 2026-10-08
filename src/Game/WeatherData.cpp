@@ -107,7 +107,8 @@ static nlVector3 sRightChainPath5[] = {
     { 19.15f, -9.68f, 0.0f },
 };
 
-// Sand patch centres (x, y, z) and radii (w) on the left half of the field.
+// Sand patch centres (x, y, z) and radii (w) on the negative-y side of the field;
+// GetSandPatch mirrors them through the centre for the other side.
 static nlVector4 sSandPatches[] = {
     { -19.53f, -17.05f, 0.0f, 12.04f },
     { -9.09f, -13.63f, 0.0f, 5.88f },
