@@ -202,7 +202,7 @@ void ChooseCaptainsSceneV2::SceneCreated()
     mCaptainComponents[0].Initialize(mPDALayers[0], 0, 0);
     for (int side = 0; side < 2; ++side)
     {
-        mCaptainComponents[side].SetDisplayMode(0);
+        mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_CAPTAIN_ATTRIBUTES);
         mCaptainComponents[side].SetReadyPromptVisible(false);
         mCaptainComponents[side].SetCaptainInfo(mCaptainIds[side], 0, 1);
     }
@@ -387,7 +387,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
             if (mMovement == SCREEN_BACK && mSceneType == ST_STRIKER_CUP)
             {
                 int captain = CupManager::s_pInstance->GetPendingCupTeam();
-                mCaptainComponents[1].SetDisplayMode(6);
+                mCaptainComponents[1].SetDisplayMode(CHARACTER_PDA_DESCRIPTION);
                 mCaptainComponents[1].SetCaptainInfo(captain, 0, 1);
             }
             mScenePhase = PHASE_CHOOSING;
@@ -637,7 +637,7 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
 
     if (mSceneType == ST_STRIKER_CUP)
     {
-        mCaptainComponents[1].SetDisplayMode(6);
+        mCaptainComponents[1].SetDisplayMode(CHARACTER_PDA_DESCRIPTION);
         mCaptainComponents[1].SetCaptainInfo(selectedCaptain, index, 1);
     }
 
@@ -1111,7 +1111,7 @@ void ChooseCaptainsSceneV2::UpdatePointerCursors()
             if (mSceneType == ST_STRIKER_CUP)
             {
                 mCaptainComponents[1].SetCaptainInfo(-1, mSidePads[side], 1);
-                mCaptainComponents[1].SetDisplayMode(0);
+                mCaptainComponents[1].SetDisplayMode(CHARACTER_PDA_CAPTAIN_ATTRIBUTES);
             }
         }
     }
@@ -1241,7 +1241,7 @@ void ChooseCaptainsSceneV2::ReleaseController(int index)
     if (mSceneType == ST_STRIKER_CUP)
     {
         mCaptainComponents[1].SetCaptainInfo(-1, mSidePads[side], 1);
-        mCaptainComponents[1].SetDisplayMode(0);
+        mCaptainComponents[1].SetDisplayMode(CHARACTER_PDA_CAPTAIN_ATTRIBUTES);
     }
 }
 

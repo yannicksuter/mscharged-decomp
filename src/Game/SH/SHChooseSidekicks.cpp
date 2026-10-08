@@ -255,7 +255,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
     for (int side = 0; side < 2; ++side)
     {
         mCaptainComponents[side].Initialize(pda[side], side, 0);
-        mCaptainComponents[side].SetDisplayMode(1);
+        mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
         mCaptainComponents[side].SetReadyPromptVisible(false);
         mCaptainComponents[side].SetSidekickInfo(-1, 0, 0);
     }
@@ -270,7 +270,7 @@ void ChooseSidekicksSceneV2::SceneCreated()
     if (GameInfoManager::Instance()->IsOnline() || mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
     {
         mCaptainComponents[1].SetVisible(false);
-        mCaptainComponents[1].SetDisplayMode(5);
+        mCaptainComponents[1].SetDisplayMode(CHARACTER_PDA_EMPTY);
         LoadSidekickImages(captain, -1);
     }
     else
@@ -523,7 +523,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
         mSlotButtons[side][i].ResetPointerStates();
     }
     mSidekickButtons[which].SetPointerState(0, index);
-    mCaptainComponents[side].SetDisplayMode(1);
+    mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
     mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
     mSelectedSlots[side] = -1;
@@ -546,7 +546,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerEnter(int index, void* context)
 
     mHoveredSidekicks[side] = which;
     int sidekick = sSidekickButtonIDs[which];
-    mCaptainComponents[side].SetDisplayMode(3);
+    mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_SIDEKICK);
     mCaptainComponents[side].SetSidekickInfo(sidekick, index, 0);
     mGreenArrows[side]->m_bVisible = false;
     if (!mSidekickButtons[which].HasOtherPointerState(1, index))
@@ -1120,7 +1120,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
         if (mSidePads[side] != -1 && idle[side])
         {
             mHoveredSidekicks[side] = -1;
-            mCaptainComponents[side].SetDisplayMode(1);
+            mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
             mGreenArrows[side]->m_bVisible = true;
         }
         for (int i = 0; i < 3; ++i)
@@ -1467,7 +1467,7 @@ void ChooseSidekicksSceneV2::ReleaseController(int index)
     {
         mSlotButtons[side][slot].ResetPointerStates();
     }
-    mCaptainComponents[side].SetDisplayMode(1);
+    mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
     mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
     mSelectedSlots[side] = -1;

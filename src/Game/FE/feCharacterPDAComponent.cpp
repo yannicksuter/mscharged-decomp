@@ -29,7 +29,7 @@ FECharacterPDAComponent::FECharacterPDAComponent()
     , mJoinPrompt(0)
     , m_pad290(2)
     , mSelectedCaptain(-1)
-    , mDisplayMode(-1)
+    , mDisplayMode(CHARACTER_PDA_HIDDEN)
 {
     mCaptainNeedsRefresh = false;
     mSidekickNeedsRefresh = false;
@@ -174,7 +174,7 @@ void FECharacterPDAComponent::SetVisible(bool visible)
 
 inline void FECharacterPDAComponent::ResetAttributes()
 {
-    if (mDisplayMode != 6 && mDisplayMode != -1)
+    if (mDisplayMode != CHARACTER_PDA_DESCRIPTION && mDisplayMode != CHARACTER_PDA_HIDDEN)
     {
         for (int i = 0; i < 4; ++i)
         {
@@ -191,7 +191,7 @@ void FECharacterPDAComponent::Update(float dt)
 {
     mTimers.Update(dt);
     bool animating = 2.0f + mRootComponent->GetActiveSlide()->GetCurrentTime() < mRootComponent->GetActiveSlide()->GetDuration();
-    if (mSlideAnimating && !animating && mDisplayMode == 0)
+    if (mSlideAnimating && !animating && mDisplayMode == CHARACTER_PDA_CAPTAIN_ATTRIBUTES)
     {
         mSlideAnimating = false;
         mCaptainNeedsRefresh = true;
@@ -200,7 +200,7 @@ void FECharacterPDAComponent::Update(float dt)
     }
     mSlideAnimating = animating;
     mScrollText.m_scrollSpeed = 600.0f;
-    if (mDisplayMode == 6 && mScrollBarNeedsReset)
+    if (mDisplayMode == CHARACTER_PDA_DESCRIPTION && mScrollBarNeedsReset)
     {
         mScrollText.Update(0.0167f);
         mScrollBar.SetComponent(FEFinder<TLComponentInstance, 4>::FindOrDefault(mRootComponent->GetActiveSlide(), "scrollbar"));
@@ -217,7 +217,7 @@ void FECharacterPDAComponent::Update(float dt)
     m_pad2A8 = false;
     for (int i = 0; i < 4; ++i)
     {
-        if (mDisplayMode == 6 && mSide == 1 && i == gFEControllerIndex)
+        if (mDisplayMode == CHARACTER_PDA_DESCRIPTION && mSide == 1 && i == gFEControllerIndex)
         {
             m_pad2A8 = false;
             bool valid = true;
@@ -283,7 +283,7 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
     }
     mSelectedCaptain = captain;
     mCaptainNeedsRefresh = false;
-    if (mDisplayMode == 6)
+    if (mDisplayMode == CHARACTER_PDA_DESCRIPTION)
     {
         mDescriptions->SetActiveSlide(GetTeamName((eTeamID)captain), false, false);
         mScrollText.SetScrollDirection(-1);
@@ -418,13 +418,13 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
 {
     if (value == mDisplayMode)
     {
-        if (value == 6 && mSide == 1)
+        if (value == CHARACTER_PDA_DESCRIPTION && mSide == 1)
         {
             mScrollBarNeedsReset = true;
         }
         return;
     }
-    if (value == 0 && mDisplayMode == 6)
+    if (value == CHARACTER_PDA_CAPTAIN_ATTRIBUTES && mDisplayMode == CHARACTER_PDA_DESCRIPTION)
     {
         mScrollBar.ResetScrolling();
         mScrollBar.SetRange(0);
@@ -441,7 +441,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
     mContinueGroup->m_bVisible = false;
     switch (mDisplayMode)
     {
-    case 0:
+    case CHARACTER_PDA_CAPTAIN_ATTRIBUTES:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = true;
@@ -468,7 +468,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case 1:
+    case CHARACTER_PDA_SELECT_POSITION:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -495,7 +495,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case 2:
+    case CHARACTER_PDA_SIDEKICK_ATTRIBUTES:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -522,7 +522,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case 3:
+    case CHARACTER_PDA_SELECT_SIDEKICK:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -549,7 +549,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case 4:
+    case CHARACTER_PDA_JOIN_PROMPT:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -576,7 +576,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case -1:
+    case CHARACTER_PDA_HIDDEN:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -603,7 +603,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case 5:
+    case CHARACTER_PDA_EMPTY:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -630,7 +630,7 @@ void FECharacterPDAComponent::SetDisplayMode(int value)
         }
         SetReadyPromptVisible(false);
         break;
-    case 6:
+    case CHARACTER_PDA_DESCRIPTION:
         if (mCaptainAttributes != 0)
         {
             mCaptainAttributes->m_bVisible = false;
@@ -723,7 +723,7 @@ void FECharacterPDAComponent::ApplyCaptainColours(int captain, int opponent)
 void FECharacterPDAComponent::TintInstanceForCaptain(TLInstance* instance, int captain, unsigned char alpha)
 {
     nlColour colour;
-    if (mDisplayMode == 3 && GameInfoManager::Instance()->IsInFriendlyMode() && !GameInfoManager::Instance()->mIsOnlineMode)
+    if (mDisplayMode == CHARACTER_PDA_SELECT_SIDEKICK && GameInfoManager::Instance()->IsInFriendlyMode() && !GameInfoManager::Instance()->mIsOnlineMode)
     {
         int team0 = GameInfoManager::Instance()->GetTeam(0);
         int team1 = GameInfoManager::Instance()->GetTeam(1);

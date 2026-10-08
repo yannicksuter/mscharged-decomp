@@ -20,6 +20,18 @@ struct FEAttributeBar
     /* 0x04 */ TLComponentInstance* mComponent;
 }; // size 0x8
 
+enum eCharacterPDAMode
+{
+    CHARACTER_PDA_HIDDEN = -1,
+    CHARACTER_PDA_CAPTAIN_ATTRIBUTES = 0,
+    CHARACTER_PDA_SELECT_POSITION = 1,
+    CHARACTER_PDA_SIDEKICK_ATTRIBUTES = 2,
+    CHARACTER_PDA_SELECT_SIDEKICK = 3,
+    CHARACTER_PDA_JOIN_PROMPT = 4,
+    CHARACTER_PDA_EMPTY = 5,
+    CHARACTER_PDA_DESCRIPTION = 6,
+};
+
 class FECharacterPDAComponent
 {
 public:
