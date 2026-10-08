@@ -24,7 +24,7 @@
 
 #include <string.h>
 
-static int sLeaderboardJobs[5] = { 6, 7, 8, 9, 10 };
+static int sLeaderboardJobs[5] = { NET_STATS_GET_DAILY_NEARBY, NET_STATS_GET_DAILY_TOP, NET_STATS_GET_SEASON_NEARBY, NET_STATS_GET_SEASON_TOP, NET_STATS_GET_FRIENDS };
 
 static NetworkStatsManager* sNetworkStatsManager;
 
@@ -79,7 +79,7 @@ void NetworkStatsManager::Reset(bool)
     mScoreRequestComplete = false;
     mScoreRequestSucceeded = false;
     mScoreCategory = 0;
-    mOperation = 0;
+    mOperation = NET_STATS_IDLE;
     mRequestedCategory = 2;
     mSubmissionCategory = 0;
     mHasLocalStats[0] = false;
@@ -126,25 +126,25 @@ void NetworkStatsManager::Reset(bool)
 
         mCategories[0].mPersistentCategory =
             alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_STRIKER_OF_DAY : NETWORK_PERSISTENT_STRIKER_OF_DAY;
-        mCategories[0].mFilter = 0;
+        mCategories[0].mFilter = RANKING_FILTER_NEARBY;
         mCategories[0].mLocalStatsCategory = 1;
         mCategories[1].mPersistentCategory =
             alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_STRIKER_OF_DAY : NETWORK_PERSISTENT_STRIKER_OF_DAY;
-        mCategories[1].mFilter = 2;
+        mCategories[1].mFilter = RANKING_FILTER_TOP;
         mCategories[1].mLocalStatsCategory = 1;
         mCategories[2].mPersistentCategory =
             alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_SEASON : NETWORK_PERSISTENT_SEASON;
-        mCategories[2].mFilter = 0;
+        mCategories[2].mFilter = RANKING_FILTER_NEARBY;
         mCategories[2].mLocalStatsCategory = 0;
         mCategories[3].mPersistentCategory =
             alternate == 1 ? NETWORK_PERSISTENT_ALTERNATE_SEASON : NETWORK_PERSISTENT_SEASON;
-        mCategories[3].mFilter = 2;
+        mCategories[3].mFilter = RANKING_FILTER_TOP;
         mCategories[3].mLocalStatsCategory = 0;
         mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_FRIENDS;
-        mCategories[4].mFilter = 1;
+        mCategories[4].mFilter = RANKING_FILTER_FRIENDS;
         mCategories[4].mLocalStatsCategory = 2;
         mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_FRIENDS;
-        mCategories[5].mFilter = 1;
+        mCategories[5].mFilter = RANKING_FILTER_FRIENDS;
         mCategories[5].mLocalStatsCategory = 2;
     }
     else
@@ -154,22 +154,22 @@ void NetworkStatsManager::Reset(bool)
         mPersistentCategories[2] = NETWORK_PERSISTENT_FRIENDS;
 
         mCategories[0].mPersistentCategory = NETWORK_PERSISTENT_STRIKER_OF_DAY;
-        mCategories[0].mFilter = 0;
+        mCategories[0].mFilter = RANKING_FILTER_NEARBY;
         mCategories[0].mLocalStatsCategory = 1;
         mCategories[1].mPersistentCategory = NETWORK_PERSISTENT_STRIKER_OF_DAY;
-        mCategories[1].mFilter = 2;
+        mCategories[1].mFilter = RANKING_FILTER_TOP;
         mCategories[1].mLocalStatsCategory = 1;
         mCategories[2].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
-        mCategories[2].mFilter = 0;
+        mCategories[2].mFilter = RANKING_FILTER_NEARBY;
         mCategories[2].mLocalStatsCategory = 0;
         mCategories[3].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
-        mCategories[3].mFilter = 2;
+        mCategories[3].mFilter = RANKING_FILTER_TOP;
         mCategories[3].mLocalStatsCategory = 0;
         mCategories[4].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
-        mCategories[4].mFilter = 1;
+        mCategories[4].mFilter = RANKING_FILTER_FRIENDS;
         mCategories[4].mLocalStatsCategory = 0;
         mCategories[5].mPersistentCategory = NETWORK_PERSISTENT_SEASON;
-        mCategories[5].mFilter = 1;
+        mCategories[5].mFilter = RANKING_FILTER_FRIENDS;
         mCategories[5].mLocalStatsCategory = 0;
     }
 }
@@ -188,7 +188,7 @@ NetworkLeaderboardCategory* NetworkStatsManager::GetCategory(
 bool NetworkStatsManager::RequestRankings(int category)
 {
     g_pNetworkSession->GetStatsInterface()->SetListener(this);
-    if (mOperation != 0)
+    if (mOperation != NET_STATS_IDLE)
     {
         return false;
     }
@@ -202,7 +202,7 @@ bool NetworkStatsManager::RequestRankings(int category)
             leaderboard.mPlayers,
             leaderboard.mMetadata))
     {
-        mOperation = 3;
+        mOperation = NET_STATS_GET_LEADERBOARD;
         mOperationStartTime = mCurrentTime;
         return true;
     }
@@ -213,7 +213,7 @@ bool NetworkStatsManager::RequestRankings(int category)
         "Initial failure GetLeaderboardStats cat %d filter %d\n",
         leaderboard.mPersistentCategory,
         leaderboard.mFilter);
-    mOperation = 0;
+    mOperation = NET_STATS_IDLE;
     mStatsError = true;
     return false;
 }
@@ -243,14 +243,14 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
                     }
                     else
                     {
-                        apply = leaderboard->mFilter == 0;
+                        apply = leaderboard->mFilter == RANKING_FILTER_NEARBY;
                     }
                 }
                 if (apply)
                 {
                     mHasLocalStats[leaderboard->mLocalStatsCategory] = true;
                     mLocalStats[leaderboard->mLocalStatsCategory] = leaderboard->mMetadata[i];
-                    if (leaderboard->mLocalStatsCategory == 0 && leaderboard->mFilter == 0)
+                    if (leaderboard->mLocalStatsCategory == 0 && leaderboard->mFilter == RANKING_FILTER_NEARBY)
                     {
                         NetworkRankingMeta& record = mLocalStats[leaderboard->mLocalStatsCategory];
                         int* pendingWins = GameInfoManager::GetInstance()->GetUnknown0xA98(gNetworkSaveSlotIndex);
@@ -280,7 +280,7 @@ void NetworkStatsManager::ApplyLeaderboardToSave(
             if (nlStrICmp(gNetworkMiiNameWide, leaderboard->mPlayers[i].mName) == 0)
             {
                 leaderboard->mLocalPlayerIndex = i;
-                if (leaderboard->mFilter == 0)
+                if (leaderboard->mFilter == RANKING_FILTER_NEARBY)
                 {
                     mHasLocalStats[leaderboard->mPersistentCategory] = true;
                     mLocalStats[leaderboard->mPersistentCategory] = leaderboard->mMetadata[i];
@@ -411,7 +411,7 @@ struct LeaderboardResultView
 static inline void FinishLeaderboardRequest(NetworkStatsManager* manager,
     const LeaderboardResultView& result)
 {
-    manager->mOperation = 0;
+    manager->mOperation = NET_STATS_IDLE;
     manager->mLeaderboardRequestComplete = true;
     manager->mLeaderboardCategory = manager->mRequestedCategory;
     if ((int)result.mSucceeded != 1)
@@ -442,7 +442,7 @@ static inline void FinishLeaderboardRequest(NetworkStatsManager* manager,
         manager->mCategories[manager->mRequestedCategory].mAvailable = true;
         manager->mCategories[manager->mRequestedCategory].mCount = result.mCount;
         manager->mCategories[manager->mRequestedCategory].mLocalPlayerIndex = -1;
-        if (result.mFilter == 1)
+        if (result.mFilter == RANKING_FILTER_FRIENDS)
         {
             GetRegion();
             manager->UpdateFriendRankingNames(&manager->mCategories[manager->mRequestedCategory]);
@@ -467,7 +467,7 @@ void NetworkStatsManager::OnLeaderboardResult(bool success,
 bool NetworkStatsManager::PostResetMyPlayerStats(
     int category, bool useExistingStats)
 {
-    if (mOperation != 0)
+    if (mOperation != NET_STATS_IDLE)
     {
         return false;
     }
@@ -488,13 +488,13 @@ bool NetworkStatsManager::PostResetMyPlayerStats(
     NetworkRanking* ranking = g_pNetworkSession->GetRankingReporter();
     if (ranking->SubmitScore(mPersistentCategories[category], submission))
     {
-        mOperation = 1;
+        mOperation = NET_STATS_SUBMIT_SCORE;
         mOperationStartTime = mCurrentTime;
     }
     else
     {
         tDebugPrintManager::Print(DC_NETWORK, "Initial failure PostResetMyPlayerStats cat %d\n", category);
-        mOperation = 0;
+        mOperation = NET_STATS_IDLE;
         mStatsError = true;
         return false;
     }
@@ -504,7 +504,7 @@ bool NetworkStatsManager::PostResetMyPlayerStats(
 void NetworkStatsManager::OnSubmitScoreResult(
     bool success, int category)
 {
-    mOperation = 0;
+    mOperation = NET_STATS_IDLE;
     mScoreRequestComplete = true;
     mScoreCategory = mSubmissionCategory;
     if ((int)success != 1)
@@ -683,14 +683,14 @@ void NetworkStatsManager::ReportDefaultDisconnectLoss()
 
         if (categoryCount == 2)
         {
-            SubmitJob(0);
-            SubmitJob(1);
+            SubmitJob(NET_STATS_REPORT_SEASON);
+            SubmitJob(NET_STATS_REPORT_DAILY);
         }
         else if (categoryCount == 3)
         {
-            SubmitJob(0);
-            SubmitJob(1);
-            SubmitJob(2);
+            SubmitJob(NET_STATS_REPORT_SEASON);
+            SubmitJob(NET_STATS_REPORT_DAILY);
+            SubmitJob(NET_STATS_REPORT_FRIENDS);
         }
     }
 }
@@ -856,14 +856,14 @@ void NetworkStatsManager::ReportGameResult(int result,
 
         if (categoryCount == 2)
         {
-            SubmitJob(0);
-            SubmitJob(1);
+            SubmitJob(NET_STATS_REPORT_SEASON);
+            SubmitJob(NET_STATS_REPORT_DAILY);
         }
         else if (categoryCount == 3)
         {
-            SubmitJob(0);
-            SubmitJob(1);
-            SubmitJob(2);
+            SubmitJob(NET_STATS_REPORT_SEASON);
+            SubmitJob(NET_STATS_REPORT_DAILY);
+            SubmitJob(NET_STATS_REPORT_FRIENDS);
         }
     }
     else if (g_pNetworkSession->GetStatsReporter() != 0)
@@ -878,7 +878,7 @@ void NetworkStatsManager::ReportGameResult(int result,
 
 void NetworkStatsManager::OnReportGameResult(bool success, int category)
 {
-    mOperation = 0;
+    mOperation = NET_STATS_IDLE;
     if ((int)success != 1)
     {
         tDebugPrintManager::Print(DC_NETWORK,
@@ -936,32 +936,32 @@ void NetworkStatsManager::PreGameRestoreDefaultDisconnectLoss()
         NetworkRankingMeta* record = Instance()->GetLocalStats(2);
         if (record != 0 && IsNewNetworkSeason(record))
         {
-            SubmitJob(5);
-            SubmitJob(10);
+            SubmitJob(NET_STATS_RESET_FRIENDS);
+            SubmitJob(NET_STATS_GET_FRIENDS);
         }
     }
     NetworkRankingMeta* record = Instance()->GetLocalStats(0);
     if (record != 0 && IsNewNetworkSeason(record))
     {
         CommitPendingOnlineTotals(record);
-        SubmitJob(3);
-        SubmitJob(8);
-        SubmitJob(9);
+        SubmitJob(NET_STATS_RESET_SEASON);
+        SubmitJob(NET_STATS_GET_SEASON_NEARBY);
+        SubmitJob(NET_STATS_GET_SEASON_TOP);
         if (!UsesEuropeanRankings())
-            SubmitJob(10);
+            SubmitJob(NET_STATS_GET_FRIENDS);
     }
     record = Instance()->GetLocalStats(1);
     if (record != 0 && IsNewNetworkDay(record))
     {
-        SubmitJob(4);
-        SubmitJob(6);
-        SubmitJob(7);
+        SubmitJob(NET_STATS_RESET_DAILY);
+        SubmitJob(NET_STATS_GET_DAILY_NEARBY);
+        SubmitJob(NET_STATS_GET_DAILY_TOP);
     }
 }
 
 bool NetworkStatsManager::RefreshRankings()
 {
-    if (mOperation == 0 && g_pNetworkSession->mLoginStage == NET_LOGIN_COMPLETE)
+    if (mOperation == NET_STATS_IDLE && g_pNetworkSession->mLoginStage == NET_LOGIN_COMPLETE)
     {
         if (mStatsError)
             return false;
@@ -974,11 +974,11 @@ bool NetworkStatsManager::RefreshRankings()
         if (count != mCachedFriendCount)
         {
             tDebugPrintManager::Print(DC_NETWORK, "Num friends changed from %d to %d\n", mCachedFriendCount, count);
-            SubmitJob(10);
+            SubmitJob(NET_STATS_GET_FRIENDS);
             mNextLeaderboardJobIndex = -1;
             for (int i = 0; i < 5; ++i)
             {
-                if (sLeaderboardJobs[i] != 10)
+                if (sLeaderboardJobs[i] != NET_STATS_GET_FRIENDS)
                 {
                     mNextLeaderboardJobIndex = i;
                     break;
@@ -1013,11 +1013,11 @@ static inline void PrepareOnlineGame(NetworkStatsManager* manager)
     {
         return;
     }
-    manager->SubmitJob(6);
-    manager->SubmitJob(7);
-    manager->SubmitJob(8);
-    manager->SubmitJob(9);
-    manager->SubmitJob(10);
+    manager->SubmitJob(NET_STATS_GET_DAILY_NEARBY);
+    manager->SubmitJob(NET_STATS_GET_DAILY_TOP);
+    manager->SubmitJob(NET_STATS_GET_SEASON_NEARBY);
+    manager->SubmitJob(NET_STATS_GET_SEASON_TOP);
+    manager->SubmitJob(NET_STATS_GET_FRIENDS);
 }
 
 void NetworkStatsManager::BeginOnlineGame()
@@ -1028,7 +1028,7 @@ void NetworkStatsManager::BeginOnlineGame()
 void NetworkStatsManager::Update(float dt)
 {
     mCurrentTime += dt;
-    if (mOperation != 0)
+    if (mOperation != NET_STATS_IDLE)
     {
         return;
     }
@@ -1044,95 +1044,95 @@ void NetworkStatsManager::Update(float dt)
     int job = mJobs.Pop();
     switch (job)
     {
-    case 0:
+    case NET_STATS_REPORT_SEASON:
         if (g_pNetworkSession->GetRankingReporter()->ReportGameResult(
                 mPersistentCategories[0], 0, 0, 0, false, 0, 0,
                 reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[0])))
         {
             mOperationStartTime = mCurrentTime;
-            mOperation = 2;
+            mOperation = NET_STATS_REPORT_RESULT;
             mSubmissionCategory = 0;
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Initial failure of ReportGameResultSeason\n");
-            mOperation = 0;
+            mOperation = NET_STATS_IDLE;
             mStatsError = true;
         }
         break;
-    case 1:
+    case NET_STATS_REPORT_DAILY:
         if (g_pNetworkSession->GetRankingReporter()->ReportGameResult(
                 mPersistentCategories[1], 0, 0, 0, false, 0, 0,
                 reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[1])))
         {
             mOperationStartTime = mCurrentTime;
-            mOperation = 2;
+            mOperation = NET_STATS_REPORT_RESULT;
             mSubmissionCategory = 1;
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Initial failure of ReportGameResultSOD\n");
-            mOperation = 0;
+            mOperation = NET_STATS_IDLE;
             mStatsError = true;
         }
         break;
-    case 2:
+    case NET_STATS_REPORT_FRIENDS:
         if (g_pNetworkSession->GetRankingReporter()->ReportGameResult(
                 mPersistentCategories[2], 0, 0, 0, false, 0, 0,
                 reinterpret_cast<const NetworkScoreSubmission*>(&mLocalStats[2])))
         {
             mOperationStartTime = mCurrentTime;
-            mOperation = 2;
+            mOperation = NET_STATS_REPORT_RESULT;
             mSubmissionCategory = 2;
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Initial failure of ReportGameResultFriends\n");
-            mOperation = 0;
+            mOperation = NET_STATS_IDLE;
             mStatsError = true;
         }
         break;
-    case 3:
+    case NET_STATS_RESET_SEASON:
         Instance()->PostResetMyPlayerStats(0, false);
         break;
-    case 4:
+    case NET_STATS_RESET_DAILY:
         Instance()->PostResetMyPlayerStats(1, false);
         break;
-    case 5:
+    case NET_STATS_RESET_FRIENDS:
         Instance()->PostResetMyPlayerStats(2, false);
         break;
-    case 6:
+    case NET_STATS_GET_DAILY_NEARBY:
         if (!RequestRankings(0))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings STRIKER_OF_DAY Nearby\n");
         }
         break;
-    case 7:
+    case NET_STATS_GET_DAILY_TOP:
         if (!RequestRankings(1))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure to RequestRankings STRIKER_OF_DAY TOP\n");
         }
         break;
-    case 8:
+    case NET_STATS_GET_SEASON_NEARBY:
         if (!RequestRankings(2))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure getting nearby season stats\n");
         }
         break;
-    case 9:
+    case NET_STATS_GET_SEASON_TOP:
         if (!RequestRankings(3))
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Job initial failure getting TOP season stats\n");
         }
         break;
-    case 10:
+    case NET_STATS_GET_FRIENDS:
         if (!RequestRankings(4))
         {
             tDebugPrintManager::Print(DC_NETWORK,

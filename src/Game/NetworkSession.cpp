@@ -1122,7 +1122,7 @@ void NetworkSession::UpdateLogin()
             {
                 tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
             }
-            NetworkStatsManager::Instance()->SubmitJob(0xA);
+            NetworkStatsManager::Instance()->SubmitJob(NET_STATS_GET_FRIENDS);
         }
         else
         {
