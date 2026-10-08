@@ -9,6 +9,15 @@ class DesireReceivePass;
 class SpaceSearch;
 struct LooseBallContactAnimInfo;
 
+enum eDesireReceivePassState
+{
+    RECEIVE_PASS_APPROACH = 0,
+    RECEIVE_PASS_TIMED_APPROACH = 1,
+    RECEIVE_PASS_TURN = 2,
+    RECEIVE_PASS_WAIT = 3,
+    RECEIVE_PASS_ANIMATION = 4,
+};
+
 class DesireReceivePass : public Desire
 {
 public:
@@ -100,7 +109,7 @@ private:
     int meReceiveAnimType;
 
 public:
-    int meDesireSubState;
+    eDesireReceivePassState meDesireSubState;
 
 private:
     SpaceSearch* m_pSpaceSearch;

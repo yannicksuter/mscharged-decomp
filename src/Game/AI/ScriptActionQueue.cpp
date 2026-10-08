@@ -60,7 +60,7 @@ ScriptActionQueue::ScriptActionQueue()
     m_lQueuedActions.m_pStart = 0;
     m_pLastQueuedAction = 0;
     m_pSelectedAction = 0;
-    mActionSelection = 1;
+    mActionSelection = ACTION_SELECT_ORDERED_CHANCE;
     m_pSelectionWeights = 0;
     mNumSelectionWeights = 0;
 }
@@ -263,7 +263,7 @@ DesireUpdate* ScriptActionQueue::SelectAction()
     pSelectedAction = 0;
     switch (mActionSelection)
     {
-    case 2:
+    case ACTION_SELECT_WEIGHTED_RANDOM:
     {
         DesireUpdate* actions[16];
         float chances[16];
@@ -313,11 +313,11 @@ DesireUpdate* ScriptActionQueue::SelectAction()
         break;
     }
 
-    case 0:
+    case ACTION_SELECT_FIRST:
         pSelectedAction = pAction;
         break;
 
-    case 1:
+    case ACTION_SELECT_ORDERED_CHANCE:
     {
         int index = 0;
         for (; pAction != 0; pAction = pAction->next, ++index)

@@ -159,6 +159,13 @@ public:
     bool mTemporary;
 };
 
+enum eActionSelection
+{
+    ACTION_SELECT_FIRST = 0,
+    ACTION_SELECT_ORDERED_CHANCE = 1,
+    ACTION_SELECT_WEIGHTED_RANDOM = 2,
+};
+
 class ScriptActionQueue
 {
 public:

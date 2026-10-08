@@ -213,7 +213,7 @@ bool DesireReceivePass::Initialize(void* context)
     };
     if (nlVec2LengthSquared(v2Delta) > fMaxDistanceSq)
     {
-        meDesireSubState = 0;
+        meDesireSubState = RECEIVE_PASS_APPROACH;
         m_pFielder->InitActionRunning();
         m_pFielder->SetRunningAnimState(0.1f);
     }
@@ -222,7 +222,7 @@ bool DesireReceivePass::Initialize(void* context)
         result = CalcExactEstimates(true);
         if (result)
         {
-            meDesireSubState = 4;
+            meDesireSubState = RECEIVE_PASS_ANIMATION;
             result = StartPickupAnimation();
         }
     }
@@ -270,7 +270,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
         }
     }
 
-    if (meDesireSubState != 4
+    if (meDesireSubState != RECEIVE_PASS_ANIMATION
         && (!g_pBall->HasActivePassTarget()
             || g_pBall->GetPassTarget() != m_pFielder
             || !m_pFielder->CanReceivePass()))
@@ -303,7 +303,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
     float fStartThreshold = g_fAnimStartThresholdTicks * g_fSimulationTick;
     switch (meDesireSubState)
     {
-    case 0:
+    case RECEIVE_PASS_APPROACH:
     {
         if (!CalcRoughEstimates(meReceiveAnimType))
         {
@@ -317,7 +317,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             {
                 *update = 1;
             }
-            meDesireSubState = 4;
+            meDesireSubState = RECEIVE_PASS_ANIMATION;
             return;
         }
 
@@ -339,7 +339,7 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             }
             if (mEstimated.fAnimStartTime <= fStartThreshold)
             {
-                meDesireSubState = 4;
+                meDesireSubState = RECEIVE_PASS_ANIMATION;
                 if (!StartPickupAnimation())
                 {
                     *update = 1;
@@ -347,16 +347,16 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
             }
             else
             {
-                meDesireSubState = 2;
+                meDesireSubState = RECEIVE_PASS_TURN;
                 m_pFielder->InitActionIdleTurn(mEstimated.aFacingDirection);
             }
         }
         break;
     }
-    case 1:
+    case RECEIVE_PASS_TIMED_APPROACH:
         if (mEstimated.fAnimStartTime <= fStartThreshold)
         {
-            meDesireSubState = 4;
+            meDesireSubState = RECEIVE_PASS_ANIMATION;
             if (!StartPickupAnimation())
             {
                 *update = 1;
@@ -369,32 +369,32 @@ void DesireReceivePass::Update(DesireUpdate* update, float fDeltaT)
                 mEstimated.aFacingDirection, mEstimated.fAnimStartTime, g_fReceiveArrivalRadius);
         }
         break;
-    case 2:
+    case RECEIVE_PASS_TURN:
         if (m_pFielder->IsActionDone())
         {
-            meDesireSubState = 3;
+            meDesireSubState = RECEIVE_PASS_WAIT;
             m_pFielder->InitActionWait();
         }
         else if (mEstimated.fAnimStartTime <= fStartThreshold)
         {
-            meDesireSubState = 4;
+            meDesireSubState = RECEIVE_PASS_ANIMATION;
             if (!StartPickupAnimation())
             {
                 *update = 1;
             }
         }
         break;
-    case 3:
+    case RECEIVE_PASS_WAIT:
         if (mEstimated.fAnimStartTime <= fStartThreshold)
         {
-            meDesireSubState = 4;
+            meDesireSubState = RECEIVE_PASS_ANIMATION;
             if (!StartPickupAnimation())
             {
                 *update = 1;
             }
         }
         break;
-    case 4:
+    case RECEIVE_PASS_ANIMATION:
         if (m_pFielder->fn_800C2F40() != 0)
         {
             if (m_pFielder->GetGlobalPad() != 0)
@@ -508,7 +508,7 @@ inline bool DesireReceivePass::CanRequestOneTouch()
     if ((bSpecialReceive && m_pFielder->m_pBall != 0)
         || (fPassProgress < g_fOneTouchMinPassProgress
             && mAgeTimer.GetSeconds() < g_fOneTouchMinDesireAge)
-        || (meDesireSubState == 4 && (mbOneTouchShot || mbOneTouchPass)))
+        || (meDesireSubState == RECEIVE_PASS_ANIMATION && (mbOneTouchShot || mbOneTouchPass)))
     {
         return false;
     }
@@ -540,7 +540,7 @@ void DesireReceivePass::ProcessUserInput()
             return;
         }
 
-        if (meDesireSubState != 4)
+        if (meDesireSubState != RECEIVE_PASS_ANIMATION)
         {
             unsigned short aDirection = 0;
             if (m_pFielder->IsReceivePassHitRequested(&aDirection))
@@ -580,15 +580,15 @@ void DesireReceivePass::RequestOneTouchShot(bool bVolleyPass)
     bool bSpecialReceive =
         m_pFielder->IsMarioSuperPowerActive()
         || m_pFielder->IsLuigiSuperPowerActive();
-    if (meDesireSubState == 4 && !bSpecialReceive)
+    if (meDesireSubState == RECEIVE_PASS_ANIMATION && !bSpecialReceive)
     {
         mbOneTouchShotLate = true;
         return;
     }
 
-    if (meDesireSubState != 0)
+    if (meDesireSubState != RECEIVE_PASS_APPROACH)
     {
-        meDesireSubState = 0;
+        meDesireSubState = RECEIVE_PASS_APPROACH;
         mEstimated.bLocked = false;
     }
 
@@ -644,14 +644,14 @@ void DesireReceivePass::RequestOneTouchPass(bool bVolleyPass, cPlayer* pPassTarg
     bool bSpecialReceive =
         m_pFielder->IsMarioSuperPowerActive()
         || m_pFielder->IsLuigiSuperPowerActive();
-    if (meDesireSubState == 4 && !bSpecialReceive)
+    if (meDesireSubState == RECEIVE_PASS_ANIMATION && !bSpecialReceive)
     {
         return;
     }
 
-    if (meDesireSubState != 0)
+    if (meDesireSubState != RECEIVE_PASS_APPROACH)
     {
-        meDesireSubState = 0;
+        meDesireSubState = RECEIVE_PASS_APPROACH;
         mEstimated.bLocked = false;
     }
 

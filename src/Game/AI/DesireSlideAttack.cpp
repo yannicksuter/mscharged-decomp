@@ -33,11 +33,11 @@ bool DesireSlideAttack::Initialize(void* context)
     if (mpTarget == NULL)
     {
         m_pFielder->InitActionSlideAttack(NULL, -1.0f, 0);
-        meDesireSubState = 1;
+        meDesireSubState = DESIRE_SLIDE_ATTACKING;
     }
     else
     {
-        meDesireSubState = 0;
+        meDesireSubState = DESIRE_SLIDE_APPROACH;
     }
     return result;
 }
@@ -54,7 +54,7 @@ void DesireSlideAttack::Update(
 
     switch (meDesireSubState)
     {
-    case 0:
+    case DESIRE_SLIDE_APPROACH:
     {
         if (mpTarget == NULL || mpTarget != g_pBall->m_pOwner)
         {
@@ -65,7 +65,7 @@ void DesireSlideAttack::Update(
         if (fn_800D7B00(pFielder) >= 0.5f)
         {
             pFielder->InitActionSlideAttack(mpTarget, -1.0f, 0);
-            meDesireSubState = 1;
+            meDesireSubState = DESIRE_SLIDE_ATTACKING;
             break;
         }
 
@@ -78,7 +78,7 @@ void DesireSlideAttack::Update(
         pFielder->GetAvoidController()->UseMinimumAvoidance(mpTarget);
         break;
     }
-    case 1:
+    case DESIRE_SLIDE_ATTACKING:
     {
         mMaxDuration = 5.0f;
         if (pFielder->m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime != 0)
@@ -103,18 +103,18 @@ void DesireSlideAttack::Update(
                         && nlRandomf(1.0f) > 0.5f)
                     {
                         pFielder->m_DetPlayer.m_tSlideAttackTimer.SetSeconds(0.0f);
-                        meDesireSubState = 2;
+                        meDesireSubState = DESIRE_SLIDE_RECOVER;
                     }
                 }
             }
         }
         else
         {
-            meDesireSubState = 2;
+            meDesireSubState = DESIRE_SLIDE_RECOVER;
         }
         break;
     }
-    case 2:
+    case DESIRE_SLIDE_RECOVER:
     {
         if (pFielder->IsActionDone())
         {
