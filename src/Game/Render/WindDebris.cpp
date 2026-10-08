@@ -31,7 +31,7 @@ WindDebris::WindDebris(
     cInventory<cSAnim>* pInventorySAnim, void* resource)
     : SkinAnimatedMovableNPC(pHierarchy, nModelID, rPhysObj, resource)
     , mActivationSoundCue(activationSoundCue)
-    , mUnidentified08C(impactSoundCue)
+    , mImpactSoundCue(impactSoundCue)
     , mbUpdateSuspended(false)
     , mfCollisionDelay(0.0f)
 {

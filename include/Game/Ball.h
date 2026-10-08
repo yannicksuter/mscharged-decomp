@@ -165,8 +165,8 @@ public:
     /* 0xE0 */ BlurHandler* m_pBlurHandler;
     /* 0xE4 */ DrawableModel* m_pDrawableBall;
     /* 0xE8 */ PhysicsAIBall* m_pPhysicsBall;
-    /* 0xEC */ Plat3dSoundSrc* mUnidentifiedEC;
-    /* 0xF0 */ unsigned long mUnidentifiedF0;
+    /* 0xEC */ Plat3dSoundSrc* m_pSoundOwner;
+    /* 0xF0 */ unsigned long m_uGlowSoundCue;
 }; // total size: 0xF4
 
 extern "C" void fn_80015C38(cBall* pBall, int nBallState);

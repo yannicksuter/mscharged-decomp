@@ -73,7 +73,7 @@ void ExcitementSystem::RegisterEventHandlers()
 void ExcitementSystem::OnAttackSuccess(
     PlayerAttackData* event)
 {
-    if (event->mUnidentified10 == 1 && mEventExcitement[1] != 0)
+    if (event->bIsSlideAttack == 1 && mEventExcitement[1] != 0)
     {
         mExcitement += mEventExcitement[1];
         mExcitementCount++;

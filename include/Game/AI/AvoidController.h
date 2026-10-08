@@ -183,7 +183,7 @@ struct UnidentifiedAvoidanceContext
     float mUnidentified01C;
     nlVector3 mUnidentified020;
     nlVector3 mUnidentified02C;
-    nlVector3 mUnidentified038;
+    nlVector3 mAvoiderNormal;
     nlVector3 mUnidentified044;
     float mUnidentified050;
     nlVector3 mUnidentified054;
@@ -208,7 +208,7 @@ struct UnidentifiedAvoidanceValue
     nlVector3 mUnidentified00C;
     float mUnidentified018;
     Timer mUnidentified01C;
-    Timer mUnidentified024;
+    Timer mFadeOutTimer;
     UnidentifiedAvoidanceHistory mUnidentified02C;
 };
 

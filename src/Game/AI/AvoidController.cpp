@@ -45,8 +45,8 @@ public:
 inline float UnidentifiedAvoidanceValue::UnidentifiedGetWeight() const
 {
     float fWeight = 1.0f;
-    if (mUnidentified024.m_uPackedTime != 0)
-        fWeight = mUnidentified024.GetSeconds() / 0.3f;
+    if (mFadeOutTimer.m_uPackedTime != 0)
+        fWeight = mFadeOutTimer.GetSeconds() / 0.3f;
     return mUnidentified018 * fWeight;
 }
 
@@ -149,7 +149,7 @@ inline void UnidentifiedAvoidanceValue::UnidentifiedInitialize(
     mUnidentified004 = pObject;
     mUnidentified008 = pOther;
     mUnidentified01C.Clear();
-    mUnidentified024.Clear();
+    mFadeOutTimer.Clear();
     mUnidentified00C = v3Zero;
     mUnidentified018 = 0.0f;
     mUnidentified02C.UnidentifiedReset();
@@ -819,7 +819,7 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
         }
         if (bUnidentifiedResult && context.mUnidentified00C >= 0.1f)
         {
-            mUnidentified024.Clear();
+            mFadeOutTimer.Clear();
             mUnidentified018 = fWeight * context.mUnidentified010;
             context.mUnidentified00C *= context.mUnidentified010;
             nlVec3Scale(v3Repulsion, context.mUnidentified000, context.mUnidentified00C);
@@ -830,9 +830,9 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
     }
     if (mUnidentified018 && !fWeight)
     {
-        if (mUnidentified024.m_uPackedTime == 0)
-            mUnidentified024.SetSeconds(0.3f);
-        if (mUnidentified024.Countdown(fDeltaT, 0.0f))
+        if (mFadeOutTimer.m_uPackedTime == 0)
+            mFadeOutTimer.SetSeconds(0.3f);
+        if (mFadeOutTimer.Countdown(fDeltaT, 0.0f))
         {
             mUnidentified02C.UnidentifiedReset();
             mUnidentified018 = 0.0f;
@@ -840,7 +840,7 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
         else
         {
             mUnidentified02C.Update(mUnidentified00C,
-                mUnidentified02C.UnidentifiedLast(), fDeltaT, 0.3f, &mUnidentified024);
+                mUnidentified02C.UnidentifiedLast(), fDeltaT, 0.3f, &mFadeOutTimer);
         }
     }
     if (!fUnidentifiedPrevious && mUnidentified018)
@@ -854,7 +854,7 @@ void UnidentifiedAvoidanceValue::UnidentifiedPrepareContext(
     bool bUnidentifiedOther = mUnidentified008->GetClosestBoundaryPoint(
         mUnidentified004->GetPosition(), context.mUnidentified02C, context.mUnidentified044);
     context.mUnidentified014 = mUnidentified004->GetClosestBoundaryPoint(
-        context.mUnidentified02C, context.mUnidentified020, context.mUnidentified038) || bUnidentifiedOther;
+        context.mUnidentified02C, context.mUnidentified020, context.mAvoiderNormal) || bUnidentifiedOther;
     context.mUnidentified018 = nlSqrt(nlVec3DistanceSquared2D(context.mUnidentified020, context.mUnidentified02C), true);
     if (context.mUnidentified014)
         context.mUnidentified018 *= -1.0f;

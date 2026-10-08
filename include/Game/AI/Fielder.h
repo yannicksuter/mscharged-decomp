@@ -701,7 +701,7 @@ public:
     /* 0x3C8 */ float m_fMegaStrikeSegment2Position;
     /* 0x3CC */ float m_fMegaStrikeSegment3Position;
     /* 0x3D0 */ float m_fMegaStrikeSegment4Position;
-    /* 0x3D4 */ float mUnidentified3D4;
+    /* 0x3D4 */ float m_fMegaStrikeLastSegmentPosition;
 
     /* 0x3D8 */ s16 m_nStunnedAngularAcceleration;
     /* 0x3DA */ s16 m_nStunnedAngularVelocity;

@@ -333,7 +333,7 @@ void StatsTracker::OnPowerupStats(CollisionPowerupStatsData* data)
 
 void StatsTracker::OnAttackSuccess(PlayerAttackData* data)
 {
-    if (data->mUnidentified10 && data->pAttacker != 0 && data->pAttacker->m_pBall != 0)
+    if (data->bIsSlideAttack && data->pAttacker != 0 && data->pAttacker->m_pBall != 0)
     {
         Instance()->TrackStat(STATS_ATTACK_SUCCESSES,
             data->pAttacker->m_pTeam->m_nSide, data->pAttacker->m_DetPlayer.m_ID,
@@ -343,7 +343,7 @@ void StatsTracker::OnAttackSuccess(PlayerAttackData* data)
 
 void StatsTracker::OnAttackAttempt(PlayerAttackData* data)
 {
-    if (data->mUnidentified10)
+    if (data->bIsSlideAttack)
     {
         Instance()->TrackStat(STATS_ATTACK_ATTEMPTS,
             data->pAttacker->m_pTeam->m_nSide, data->pAttacker->m_DetPlayer.m_ID,

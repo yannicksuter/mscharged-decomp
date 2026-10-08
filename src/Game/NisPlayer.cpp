@@ -283,7 +283,7 @@ void NisPlayer::ParseDictionary(char* data)
             }
             header.buffer = 0;
             header.bufferSize = 0;
-            header.mUnidentified194 = false;
+            header.m_pad194 = false;
             mDictSize++;
         }
         nlFree(data);
@@ -1056,7 +1056,7 @@ void NisPlayer::ReleaseCachedNisBuffers()
     for (int i = 0; i < mDictSize; i++)
     {
         delete mDict[i].buffer;
-        mDict[i].mUnidentified194 = false;
+        mDict[i].m_pad194 = false;
         mDict[i].buffer = 0;
         mDict[i].bufferSize = 0;
     }

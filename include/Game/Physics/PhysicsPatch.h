@@ -111,7 +111,7 @@ public:
 
     /* 0x00 */ PhysicsPatch* mPatches[60];
     /* 0xF0 */ EventConnectionOwner mResetEffectsConnection;
-    /* 0xF4 */ unsigned int mUnidentified0F4;
+    /* 0xF4 */ unsigned int mPaddingF4;
 }; // total size: 0xF8
 
 extern PhysicsPatchManager* lbl_806E12C8;

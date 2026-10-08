@@ -938,7 +938,7 @@ void cFielder::fn_80043C18(float fDeltaT)
     case 0x7C:
     {
         float fSpin
-            = 1.0f - this->GetTweaks()->mUnidentified064;
+            = 1.0f - this->GetTweaks()->fDefenseSize;
         int nSpinStep
             = (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f));
         SetDesiredFacingDirection(
@@ -1128,7 +1128,7 @@ void cFielder::fn_80044290(float fDeltaT)
             }
 
             float fSpin = 1.0f
-                        - this->GetTweaks()->mUnidentified064;
+                        - this->GetTweaks()->fDefenseSize;
             int nSpinStep
                 = (u16)(s32)(5000.0f * (2.0f * fSpin + 1.0f));
             SetDesiredFacingDirection(
@@ -1517,7 +1517,7 @@ void cFielder::ActionElectrocution(float dt)
         {
             nlVector3 v3Position = m_DetChar.m_v3Position;
             float fShake
-                = this->GetTweaks()->mUnidentified064;
+                = this->GetTweaks()->fDefenseSize;
             float fRise = lbl_806DB9A0
                         * ((1.0f - fShake) * nlRandomf(0.5f) + 0.5f);
             v3Position.z += fRise * dt;
@@ -2135,7 +2135,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         pData->nAttackerPadID
             = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pData->pTarget = pTarget;
-        pData->mUnidentified10 = false;
+        pData->bIsSlideAttack = false;
         QueueAttackAttemptEvent(g_pGame, pData);
 
         if (m_DetChar.m_eCharacterClass == YOSHI)
@@ -2246,12 +2246,12 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
     nFacingDelta = aAngle - pAttacker->m_DetChar.m_aActualFacingDirection;
 
     float fIntensityA
-        = pFielder->GetTweaks()->mUnidentified064;
+        = pFielder->GetTweaks()->fDefenseSize;
     float fIntensityB = 1.0f;
     if (pAttacker->m_eClassType == FIELDER)
     {
         fIntensityB
-            = ((cFielder*)pAttacker)->GetTweaks()->mUnidentified064;
+            = ((cFielder*)pAttacker)->GetTweaks()->fDefenseSize;
     }
 
     int nReact = 1;
@@ -2974,7 +2974,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     m_fMegaStrikeSegment2Position = 0.0f;
     m_fMegaStrikeSegment3Position = 0.0f;
     m_fMegaStrikeSegment4Position = 0.0f;
-    mUnidentified3D4 = 0.0f;
+    m_fMegaStrikeLastSegmentPosition = 0.0f;
 
     g_pGame->ResetMegaStrikeMeterQueues();
 
@@ -3112,7 +3112,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
         ShootToScoreMeter::instance.SetSegment4Position(m_fMegaStrikeSegment4Position);
         ShootToScoreMeter::instance.SetSegment4Width(fSegmentD);
 
-        mUnidentified3D4 = m_fMegaStrikeSegment4Position;
+        m_fMegaStrikeLastSegmentPosition = m_fMegaStrikeSegment4Position;
 
         StopSound(0x5C8E379, this);
         PlaySound(0, 0x5C8E379, "Needle Left", this);
@@ -4003,7 +4003,7 @@ void cFielder::fn_8004B148()
     }
 
     SetAnimState(0x25, true, 0.2f, false, false);
-    PlayOwnedSound(0, 0x874F86F2, (XSoundOwner*)g_pBall->mUnidentifiedEC, 0, 0);
+    PlayOwnedSound(0, 0x874F86F2, (XSoundOwner*)g_pBall->m_pSoundOwner, 0, 0);
 }
 
 void cFielder::fn_8004B2E4(float fDeltaT)
@@ -4493,7 +4493,7 @@ void cFielder::InitActionSlideAttack(
         bool bHasPad = GetGlobalPad() != 0;
         pNode->nAttackerPadID = bHasPad ? GetGlobalPad()->GetPadID() : -1;
         pNode->pTarget = 0;
-        pNode->mUnidentified10 = true;
+        pNode->bIsSlideAttack = true;
         QueueAttackAttemptEvent(g_pGame, pNode);
     }
 }
@@ -4570,7 +4570,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
                 pNode->nAttackerPadID
                     = bHasPad ? GetGlobalPad()->GetPadID() : -1;
                 pNode->pTarget = 0;
-                pNode->mUnidentified10 = true;
+                pNode->bIsSlideAttack = true;
                 QueueAttackSuccessEvent(g_pGame, pNode);
 
                 if (m_pBall != 0)
@@ -4779,7 +4779,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
             pNode->nAttackerPadID
                 = bHasPad ? pAttacker->GetGlobalPad()->GetPadID() : -1;
             pNode->pTarget = 0;
-            pNode->mUnidentified10 = true;
+            pNode->bIsSlideAttack = true;
             QueueAttackSuccessEvent(g_pGame, pNode);
 
             if (pAttacker->m_pBall != 0
@@ -4957,13 +4957,13 @@ void cFielder::fn_8004E438()
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC, "Skillshot", this);
+        PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
     }
     else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12)
     {
         SetAnimState(0x81, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 0.0f, false);
-        PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC, "Skillshot", this);
+        PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
     }
     else if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
     {
@@ -5044,7 +5044,7 @@ void cFielder::fn_8004E8B8()
         if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x13)
         {
             EmitShyGuyBulletShoot(this);
-            PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->mUnidentifiedEC, "Skillshot", this);
+            PlayOwnedSound(m_uSoundSlotId, 0x3D267BDF, (XSoundOwner*)g_pBall->m_pSoundOwner, "Skillshot", this);
         }
     }
 }

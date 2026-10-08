@@ -4950,7 +4950,7 @@ void Goalie::InitActionPursueDeke(
         data.nAttackerPadID = -1;
         data.pTarget = mpTarget;
         data.mUnidentified0C = 2;
-        data.mUnidentified10 = false;
+        data.bIsSlideAttack = false;
         DeliverGoalieDekeAttackAttemptEvent(g_pGame, &data);
     }
 }
@@ -6292,7 +6292,7 @@ void Goalie::InitActionSTSAttackSetup(float fWaitTime)
     data.nAttackerPadID = -1;
     data.pTarget = g_pBall->GetOwnerFielder();
     data.mUnidentified0C = 2;
-    data.mUnidentified10 = false;
+    data.bIsSlideAttack = false;
     DeliverGoalieSlamAttackAttemptEvent(g_pGame, &data);
 }
 
@@ -6562,7 +6562,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
                 data.nAttackerPadID = -1;
                 data.pTarget = mpShooter;
                 data.mUnidentified0C = 2;
-                data.mUnidentified10 = false;
+                data.bIsSlideAttack = false;
                 DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
 
                 mbPickedUp = true;
@@ -7465,7 +7465,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
         {
             GoalieTweaks* pTweaks = (GoalieTweaks*)m_pTweaks;
             float fParam = InterpolateRangeClamped(
-                pTweaks->mUnidentified2A8,
+                pTweaks->fOnFireTimeMin,
                 pTweaks->mUnidentified2B8,
                 1.0f,
                 4.0f,

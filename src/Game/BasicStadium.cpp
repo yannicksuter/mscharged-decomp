@@ -203,10 +203,10 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
                 if (nlRandom(100, &nlDefaultSeed) < pEffect->m_uProbability)
                 {
                     pEffect->Emit();
-                    if (-1.0f != pEffect->mUnidentified064)
+                    if (-1.0f != pEffect->m_fEmissionIntervalOffset)
                     {
                         float fBaseInterval = GetWorldEffectBaseInterval(pEffect);
-                        fNextTime = fBaseInterval + pEffect->mUnidentified064;
+                        fNextTime = fBaseInterval + pEffect->m_fEmissionIntervalOffset;
                     }
                     else
                     {

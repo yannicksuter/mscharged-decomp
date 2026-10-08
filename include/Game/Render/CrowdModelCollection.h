@@ -49,7 +49,7 @@ public:
     /* 0x18 */ void* mTextureBundleData;
     /* 0x1C */ unsigned long mTextureBundleSize;
     /* 0x20 */ void* mUnidentified020;
-    /* 0x24 */ u32 mUnidentified024;
+    /* 0x24 */ u32 m_pad24;
     /* 0x28 */ void* mAnimationData;
     /* 0x2C */ unsigned long mAnimationSize;
     /* 0x30 */ void* mModelData;

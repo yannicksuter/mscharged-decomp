@@ -31,7 +31,7 @@ public:
 
     /* 0x84 */ cSAnim* mpTumbleAnim;
     /* 0x88 */ unsigned long mActivationSoundCue;
-    /* 0x8C */ unsigned long mUnidentified08C;
+    /* 0x8C */ unsigned long mImpactSoundCue;
     /* 0x90 */ bool mbUpdateSuspended;
     /* 0x94 */ float mfCollisionDelay;
 }; // total size: 0x98

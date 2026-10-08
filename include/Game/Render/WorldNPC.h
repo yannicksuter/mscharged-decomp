@@ -84,7 +84,7 @@ public:
     /* 0x04 */ u8 mUnidentified004[0x1C];
     /* 0x20 */ nlMatrix4 mTransform;
     /* 0x60 */ unsigned long mTemplateHash;
-    /* 0x64 */ u8 mUnidentified064[0x0C];
+    /* 0x64 */ u8 mPadding64[0x0C];
 }; // size: 0x70
 
 extern WorldNPCManager* gpWorldNPCManager;

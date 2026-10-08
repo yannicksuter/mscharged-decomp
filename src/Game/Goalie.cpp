@@ -491,7 +491,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 }
                 else if (pBall->mbBallOnFire)
                 {
-                    fn_80097358(this, m_pTweaks->mUnidentified2A8);
+                    fn_80097358(this, m_pTweaks->fOnFireTimeMin);
                     if (bPlayAnimation)
                         StartFireAnim();
                 }
@@ -601,7 +601,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                     break;
             }
             else if (pBall->mbBallOnFire)
-                fn_80097358(this, m_pTweaks->mUnidentified2A8);
+                fn_80097358(this, m_pTweaks->fOnFireTimeMin);
             if (mpSaveData != NULL && (mpSaveData->muSaveType & 0x80003))
             {
                 float fNetWidth = cNet::GetNetWidth();
@@ -853,7 +853,7 @@ void Goalie::CollideWithPatchCallback(const UnidentifiedEventData24* pData)
     if (type == 1 || type == 8 || type == 9)
     {
         GoalieTweaks* pTweaks = m_pTweaks;
-        float fTime = Interpolate(pTweaks->mUnidentified2A8, pTweaks->mUnidentified2B8,
+        float fTime = Interpolate(pTweaks->fOnFireTimeMin, pTweaks->mUnidentified2B8,
             fn_800156A8(g_pBall));
         fn_80097358(this, fTime);
         bool bPlayAnimation = false;
@@ -4171,7 +4171,7 @@ void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
                 data.nAttackerPadID = -1;
                 data.pTarget = pTarget;
                 data.mUnidentified0C = 2;
-                data.mUnidentified10 = false;
+                data.bIsSlideAttack = false;
                 DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
             }
             else
@@ -4195,7 +4195,7 @@ void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
             data.nAttackerPadID = -1;
             data.pTarget = pTarget;
             data.mUnidentified0C = 2;
-            data.mUnidentified10 = false;
+            data.bIsSlideAttack = false;
             DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
         }
         else
@@ -4287,7 +4287,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     data.nAttackerPadID = -1;
     data.pTarget = pFielder;
     data.mUnidentified0C = 2;
-    data.mUnidentified10 = false;
+    data.bIsSlideAttack = false;
     DeliverGoalieSlamAttackSuccessEvent(g_pGame, &data);
 }
 

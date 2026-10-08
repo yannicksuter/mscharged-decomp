@@ -13,8 +13,8 @@ struct PlayerAttackData
     /* 0x04 */ int nAttackerPadID;
     /* 0x08 */ cFielder* pTarget;
     /* 0x0C */ int mUnidentified0C;
-    /* 0x10 */ bool mUnidentified10;
-    /* 0x11 */ u8 mUnidentified11[3];
+    /* 0x10 */ bool bIsSlideAttack;
+    /* 0x11 */ u8 m_pad11[3];
 }; // total size: 0x14
 
 template <typename T>

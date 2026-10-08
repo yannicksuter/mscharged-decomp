@@ -770,7 +770,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     , m_fMegaStrikeSegment2Position(0.0f)
     , m_fMegaStrikeSegment3Position(0.0f)
     , m_fMegaStrikeSegment4Position(0.0f)
-    , mUnidentified3D4(0.0f)
+    , m_fMegaStrikeLastSegmentPosition(0.0f)
     , m_nStunnedAngularAcceleration(0)
     , m_nStunnedAngularVelocity(0)
     , m_bSuperPowerTankOn(false)
@@ -1775,7 +1775,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
                 ? pFielderCollidedWith->GetGlobalPad()->GetPadID() : -1;
             pAttackData->pTarget = this;
             pAttackData->mUnidentified0C = nUnidentified;
-            pAttackData->mUnidentified10 = false;
+            pAttackData->bIsSlideAttack = false;
             QueueAttackSuccessEvent(g_pGame, pAttackData);
             PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
         }
@@ -2107,7 +2107,7 @@ void cFielder::CollideWithWindDebrisCallback(WindDebris* debris)
             velocity.z = 8.0f;
         }
         fn_80044148(velocity);
-        PlaySound(11, debris->mUnidentified08C, 0, 0);
+        PlaySound(11, debris->mImpactSoundCue, 0, 0);
         PlayRumbleAction(3, GetGlobalPad());
         EmitTackleImpact(this);
     }
@@ -4955,7 +4955,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         pAttackData->nAttackerPadID = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = pOpponent;
         pAttackData->mUnidentified0C = 2;
-        pAttackData->mUnidentified10 = false;
+        pAttackData->bIsSlideAttack = false;
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
     else if (pOpponent->IsSuperGrowActive() && !IsSuperGrowActive()
@@ -4971,7 +4971,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         pAttackData->nAttackerPadID = bHasGlobalPad ? pOpponent->GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = this;
         pAttackData->mUnidentified0C = 2;
-        pAttackData->mUnidentified10 = false;
+        pAttackData->bIsSlideAttack = false;
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
     else if (IsInvincibleChars() && !pOpponent->IsInvincibleChars())
@@ -6084,7 +6084,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_fMegaStrikeSegment2Position = 0.0f;
     m_fMegaStrikeSegment3Position = 0.0f;
     m_fMegaStrikeSegment4Position = 0.0f;
-    mUnidentified3D4 = 0.0f;
+    m_fMegaStrikeLastSegmentPosition = 0.0f;
     InitDesire(
         (eFielderDesireState)0x1F, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitActionWait();

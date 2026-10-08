@@ -34,31 +34,31 @@ void FielderTweaks::Init()
 {
     fRunTurnFalloff = 4000.0f;
     fRunDecel = 12.5f;
-    mUnidentified47C = 9.5f;
+    fRunStopDecel = 9.5f;
     fStrafeTurnFalloff = 4000.0f;
     fStrafeDecel = 15.0f;
     fStrafeAccel = 15.0f;
     fJogTurnSpeedMin = 30000.0f;
     fJogTurnSpeedMax = 40000.0f;
-    mUnidentified494 = 0.85f;
+    fStrafeSpeedScale = 0.85f;
     fStrafeTurnSpeed = 120000.0f;
     mUnidentified49C = 0.9f;
-    mUnidentified4A0 = 2500.0f;
-    mUnidentified4A4 = 22.5f;
-    mUnidentified4A8 = 18.0f;
+    fTurboTurnFalloff = 2500.0f;
+    fTurboAccel = 22.5f;
+    fTurboDecel = 18.0f;
     fRunWBTurnFalloff = 3200.0f;
     fRunWBDecel = 18.0f;
-    mUnidentified4B4 = 10.0f;
+    fRunWBStopDecel = 10.0f;
     fSlowestGroundPassSpeed = 12.0f;
     fSlowestVolleyPassSpeed = 12.0f;
     fShotWindupTurnSpeed = 75000.0f;
     fShotWindupTurnFalloff = 4000.0f;
     fShotWindupDecel = 6.0f;
-    mUnidentified4CC = 26.0f;
-    mUnidentified4D0 = 106.0f;
-    mUnidentified4D4 = 27.0f;
-    mUnidentified4D8 = 3.0f;
-    mUnidentified4DC = g_pTweaks[0];
+    m_pad4CC = 26.0f;
+    m_pad4D0 = 106.0f;
+    m_pad4D4 = 27.0f;
+    m_pad4D8 = 3.0f;
+    m_pad4DC = g_pTweaks[0];
 
     fRunSpeedMin.BindWithDefault("Run Speed Min", 6.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fRunSpeedMax.BindWithDefault("Run Speed Max", 6.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
@@ -147,7 +147,7 @@ void InitPlayerTweaks(PlayerTweaks* tweaks, const char* name,
     tweaks->fMovementSpeed.BindWithDefault("mfMovement_Speed", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->fMovementAcceleration.BindWithDefault("mfMovement_Acceleration", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->fDefenseSlideTackle.BindWithDefault("mfDefense_SlideTackle", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
-    tweaks->mUnidentified064.BindWithDefault("mfDefense_Size", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
+    tweaks->fDefenseSize.BindWithDefault("mfDefense_Size", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->fDefenseHittingDistance.BindWithDefault("mfDefense_HittingDistance", 0.5f, category, true, -4.0f, 4.0f, 0.05f);
     tweaks->fOffenseShootingWindupTime.BindWithDefault("mfOffense_ShootingWindupTime", 0.5f, category, true, 0.0f, 4.0f, 0.05f);
     tweaks->fOffenseShootingWindupTotalTime.BindWithDefault("mfOffense_ShootingWindupTotalTime", 0.5f, category, true, 0.0f, 4.0f, 0.05f);
@@ -484,7 +484,7 @@ extern "C" float fn_8002CC44(const PlayerTweaks* tweaks)
     float terrainMinimum = fielderTweaks->fTerrainMinSpeedAdjust;
     float terrain = g_pGame->mpTerrain->GetSpeedFactor();
     float terrainScale = Interpolate(terrainMinimum, terrainMaximum, terrain);
-    return gGameTweaks.mFielderTweaks->mUnidentified494 * terrainScale
+    return gGameTweaks.mFielderTweaks->fStrafeSpeedScale * terrainScale
          * Interpolate(minimum, maximum, playerValue);
 }
 

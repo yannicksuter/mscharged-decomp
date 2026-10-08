@@ -18,7 +18,7 @@ struct LiveBallTrail
     /* 0x1C */ nlVector3 velocity;
     /* 0x28 */ nlVector3 mUnidentified028;
     /* 0x34 */ DrawableModel* drawable;
-    /* 0x38 */ BlurHandler* mUnidentified038;
+    /* 0x38 */ BlurHandler* blurHandler;
     /* 0x3C */ bool visible;
 };
 

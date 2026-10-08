@@ -382,7 +382,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
         else if (player->IsSuperGrowActive())
             ApplyDamage(gWaluigiWallSuperGrowDamage);
         else if (player->m_eActionState == ACTION_HIT)
-            ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->mUnidentified064));
+            ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->fDefenseSize));
         else if (player->m_eActionState == ACTION_SLIDE_ATTACK)
             ApplyDamage(gWaluigiWallSlideAttackDamage);
         else

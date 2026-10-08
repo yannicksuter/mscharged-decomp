@@ -80,31 +80,31 @@ public:
     /* 0x464 */ TweakFloatBinding fTerrainMaxSlipperyMomentum;
     /* 0x474 */ float fRunTurnFalloff;
     /* 0x478 */ float fRunDecel;
-    /* 0x47C */ float mUnidentified47C;
+    /* 0x47C */ float fRunStopDecel;
     /* 0x480 */ float fStrafeTurnFalloff;
     /* 0x484 */ float fStrafeDecel;
     /* 0x488 */ float fStrafeAccel;
     /* 0x48C */ float fJogTurnSpeedMin;
     /* 0x490 */ float fJogTurnSpeedMax;
-    /* 0x494 */ float mUnidentified494;
+    /* 0x494 */ float fStrafeSpeedScale;
     /* 0x498 */ float fStrafeTurnSpeed;
     /* 0x49C */ float mUnidentified49C;
-    /* 0x4A0 */ float mUnidentified4A0;
-    /* 0x4A4 */ float mUnidentified4A4;
-    /* 0x4A8 */ float mUnidentified4A8;
+    /* 0x4A0 */ float fTurboTurnFalloff;
+    /* 0x4A4 */ float fTurboAccel;
+    /* 0x4A8 */ float fTurboDecel;
     /* 0x4AC */ float fRunWBTurnFalloff;
     /* 0x4B0 */ float fRunWBDecel;
-    /* 0x4B4 */ float mUnidentified4B4;
+    /* 0x4B4 */ float fRunWBStopDecel;
     /* 0x4B8 */ float fSlowestGroundPassSpeed;
     /* 0x4BC */ float fSlowestVolleyPassSpeed;
     /* 0x4C0 */ float fShotWindupTurnSpeed;
     /* 0x4C4 */ float fShotWindupTurnFalloff;
     /* 0x4C8 */ float fShotWindupDecel;
-    /* 0x4CC */ float mUnidentified4CC;
-    /* 0x4D0 */ float mUnidentified4D0;
-    /* 0x4D4 */ float mUnidentified4D4;
-    /* 0x4D8 */ float mUnidentified4D8;
-    /* 0x4DC */ float mUnidentified4DC;
+    /* 0x4CC */ float m_pad4CC;
+    /* 0x4D0 */ float m_pad4D0;
+    /* 0x4D4 */ float m_pad4D4;
+    /* 0x4D8 */ float m_pad4D8;
+    /* 0x4DC */ float m_pad4DC;
 
 private:
     /* 0x4E0 */ const char* mCategory;
@@ -113,7 +113,7 @@ private:
 class PlayerTweaks
 {
 public:
-    float GetDefenseSize() const { return mUnidentified064.GetValue(); }
+    float GetDefenseSize() const { return fDefenseSize.GetValue(); }
 
     float GetSkillRating(unsigned int index);
     float GetRunningSpeed();
@@ -127,7 +127,7 @@ public:
     /* 0x034 */ TweakFloatBinding fMovementSpeed;
     /* 0x044 */ TweakFloatBinding fMovementAcceleration;
     /* 0x054 */ TweakFloatBinding fDefenseSlideTackle;
-    /* 0x064 */ TweakFloatBinding mUnidentified064;
+    /* 0x064 */ TweakFloatBinding fDefenseSize;
     /* 0x074 */ TweakFloatBinding fDefenseHittingDistance;
     /* 0x084 */ TweakFloatBinding fOffenseShootingWindupTime;
     /* 0x094 */ TweakFloatBinding fOffenseShootingWindupTotalTime;
@@ -186,7 +186,7 @@ public:
     /* 0x284 */ TweakFloatBinding fShotFatigueSTSSave;
     /* 0x294 */ TweakFloatBinding fShotFatigueSTSStun;
     /* 0x2A4 */ float fShotFatigueMax;
-    /* 0x2A8 */ TweakFloatBinding mUnidentified2A8;
+    /* 0x2A8 */ TweakFloatBinding fOnFireTimeMin;
     /* 0x2B8 */ TweakFloatBinding mUnidentified2B8;
     /* 0x2C8 */ TweakFloatBinding fPounceRange;
     /* 0x2D8 */ TweakFloatBinding fPhysCapsuleRadius;

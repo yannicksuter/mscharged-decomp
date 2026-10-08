@@ -45,7 +45,7 @@ FECharacterPDAComponent::FECharacterPDAComponent()
     }
     mScrollText.SetEndBehavior(2);
     mScrollText.SetScrollMode(1);
-    mUnidentified2A8 = false;
+    m_pad2A8 = false;
 }
 
 FECharacterPDAComponent::~FECharacterPDAComponent()
@@ -214,12 +214,12 @@ void FECharacterPDAComponent::Update(float dt)
             mScrollBar.Initialize();
         }
     }
-    mUnidentified2A8 = false;
+    m_pad2A8 = false;
     for (int i = 0; i < 4; ++i)
     {
         if (mDisplayMode == 6 && mSide == 1 && i == gFEControllerIndex)
         {
-            mUnidentified2A8 = false;
+            m_pad2A8 = false;
             bool valid = true;
             FEPointerEvent event;
             event.mIndex = i;

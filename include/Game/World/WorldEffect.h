@@ -22,7 +22,7 @@ public:
     void UpdateVisibility(EmissionController* pController);
 
     /* 0x60 */ float m_fEmissionInterval;
-    /* 0x64 */ float mUnidentified064;
+    /* 0x64 */ float m_fEmissionIntervalOffset;
     /* 0x68 */ float m_fEmissionRadius;
     /* 0x6C */ u8 m_pad6C[0x04];
     /* 0x70 */ unsigned long m_uEffectHash;

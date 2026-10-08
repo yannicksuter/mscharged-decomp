@@ -1921,7 +1921,7 @@ cTeam::cTeam(int nSide)
         m_pBallInterceptOrderedFielders[i] = NULL;
         m_pFieldersByTeamRelativeX[i] = NULL;
     }
-    mUnidentified0F4 = 0;
+    m_nCurrentPowerUp = 0;
 
     m_pNet = new (8, false) cNet(nSide);
     m_pFormationManager = new (8, false) FormationManager(this);

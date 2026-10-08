@@ -1379,19 +1379,19 @@ void cCharacter::UpdateMovementState(float fDeltaT)
                 nlVec3Add(unidentifiedForce, unidentifiedBall->mv3TiltForce, unidentifiedBall->mv3WindForce);
                 unidentifiedForceScale = InterpolateClamped(
                     lbl_806E0C1C + lbl_806DB5E0, lbl_806E0C18 + lbl_806DB5DC,
-                    pFielder->GetTweaks()->mUnidentified064);
+                    pFielder->GetTweaks()->fDefenseSize);
             }
             else if (unidentifiedBall->mbUseTiltForce)
             {
                 unidentifiedForce = unidentifiedBall->mv3TiltForce;
                 unidentifiedForceScale = InterpolateClamped(lbl_806DB5E0, lbl_806DB5DC,
-                    pFielder->GetTweaks()->mUnidentified064);
+                    pFielder->GetTweaks()->fDefenseSize);
             }
             else
             {
                 unidentifiedForce = unidentifiedBall->mv3WindForce;
                 unidentifiedForceScale = InterpolateClamped(lbl_806E0C1C, lbl_806E0C18,
-                    pFielder->GetTweaks()->mUnidentified064);
+                    pFielder->GetTweaks()->fDefenseSize);
             }
             unidentifiedForceScale = InterpolateRangeClamped(0.0f, unidentifiedForceScale,
                 lbl_806DB5E4, lbl_806DB5E8, nlVec3Length(m_DetChar.m_v3Velocity));
@@ -1822,7 +1822,7 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
 {
     if (GetStadiumUnknown0x10(GameInfoManager::Instance()->GetStadium())
         && pEventData->pTarget != NULL && pEventData->pAttacker != NULL
-        && !pEventData->mUnidentified10)
+        && !pEventData->bIsSlideAttack)
     {
         if (pEventData->pAttacker->IsCaptain()
             && pEventData->pTarget->IsCaptain())
@@ -1927,7 +1927,7 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
             else if (pUnidentified0->fn_800470B4(pUnidentified0, pUnidentified1))
             {
                 PlayOwnedSound(pUnidentified0->m_uSoundSlotId, 0xFD0DC03DUL,
-                    (XSoundOwner*)g_pBall->mUnidentifiedEC, NULL, NULL);
+                    (XSoundOwner*)g_pBall->m_pSoundOwner, NULL, NULL);
             }
         }
     }
@@ -1948,7 +1948,7 @@ extern "C" void fn_80020FD4(CollisionBulletBillData* pEventData)
         CreateBulletBillShockwave(pEventData->bulletBill);
         pEventData->bulletBill->Hide(false);
         PlayOwnedSound(pEventData->bulletBill->target->m_uSoundSlotId,
-            0xFD0DC03DUL, (XSoundOwner*)g_pBall->mUnidentifiedEC, NULL, NULL);
+            0xFD0DC03DUL, (XSoundOwner*)g_pBall->m_pSoundOwner, NULL, NULL);
     }
 }
 

@@ -69,7 +69,7 @@ public:
     /* 0x2A5 */ bool mSidekickNeedsRefresh;
     /* 0x2A6 */ bool mSlideAnimating;
     /* 0x2A7 */ bool mScrollBarNeedsReset;
-    /* 0x2A8 */ bool mUnidentified2A8;
+    /* 0x2A8 */ bool m_pad2A8;
 }; // size 0x2AC
 
 #endif // GAME_FE_FE_CHARACTER_PDA_COMPONENT_H

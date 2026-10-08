@@ -92,7 +92,7 @@ struct NisHeader
     /* 0x180 */ u32 renderMode;
     /* 0x184 */ nlVector3 stadiumOffset;
     /* 0x190 */ float mTime;
-    /* 0x194 */ bool mUnidentified194;
+    /* 0x194 */ bool m_pad194;
     /* 0x195 */ bool mirrored;
     /* 0x196 */ u8 unknown_0x196[0x02];
     /* 0x198 */ char* buffer;
