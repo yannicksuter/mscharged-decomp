@@ -1295,25 +1295,25 @@ const char* NetTournManager::GetTournamentTrophyResource() const
     }
     switch (cupPersona)
     {
-    case 0:
+    case CUP_PERSONA_MUSHROOM:
         return "art/characters/npcs/trophymushroom/trophymushroom";
-    case 1:
+    case CUP_PERSONA_FLOWER:
         return "art/characters/npcs/trophyflower/trophyflower";
-    case 2:
+    case CUP_PERSONA_STAR:
         return "art/characters/npcs/trophystar/trophystar";
-    case 3:
+    case CUP_PERSONA_SUNSHINE:
         return "art/characters/npcs/trophysunshine/trophysunshine";
-    case 4:
+    case CUP_PERSONA_BANANA:
         return "art/characters/npcs/trophybanana/trophybanana";
-    case 5:
+    case CUP_PERSONA_NEXT_LEVEL:
         return "art/characters/npcs/trophynextlevelcup/trophynextlevelcup";
-    case 6:
+    case CUP_PERSONA_KONGA:
         return "art/characters/npcs/trophykonga/trophykonga";
-    case 7:
+    case CUP_PERSONA_SAND:
         return "art/characters/npcs/trophysand/trophysand";
-    case 8:
+    case CUP_PERSONA_LAVA:
         return "art/characters/npcs/trophylava/trophylava";
-    case 9:
+    case CUP_PERSONA_NINTENDO:
         return "art/characters/npcs/trophynintendo/trophynintendo";
     default:
         return "art/characters/npcs/trophymushroom/trophymushroom";
