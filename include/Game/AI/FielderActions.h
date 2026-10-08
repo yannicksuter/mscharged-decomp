@@ -12,7 +12,7 @@ struct PlayerAttackData
     /* 0x00 */ const cPlayer* pAttacker;
     /* 0x04 */ int nAttackerPadID;
     /* 0x08 */ cFielder* pTarget;
-    /* 0x0C */ int mUnidentified0C;
+    /* 0x0C */ int nHitReaction;
     /* 0x10 */ bool bIsSlideAttack;
     /* 0x11 */ u8 m_pad11[3];
 }; // total size: 0x14

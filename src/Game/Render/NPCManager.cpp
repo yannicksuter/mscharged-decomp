@@ -231,7 +231,7 @@ void NPCManager::CreateWindDebris()
             pConfig->mRadius);
         WindDebris* pObject = new (8, false) WindDebris(
             *pTemplate->hierarchy, pTemplate->modelID,
-            pConfig->mCueId, pConfig->mUnidentified010,
+            pConfig->mCueId, pConfig->mImpactCueId,
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
         mWindDebris[i] = pObject;

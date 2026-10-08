@@ -84,19 +84,19 @@ public:
     /* 0x148 */ int mHighlightsLeft;
     /* 0x14C */ int mByPassNumber;
     /* 0x150 */ int mSkipPastByPass;
-    /* 0x154 */ u8 mUnidentified154[0x2];
-    /* 0x156 */ bool mUnidentified156;
-    /* 0x157 */ bool mUnidentified157;
-    /* 0x158 */ bool mUnidentified158;
+    /* 0x154 */ u8 m_pad154[0x2];
+    /* 0x156 */ bool mPlayLoserReaction;
+    /* 0x157 */ bool mLoserReactionOutraged;
+    /* 0x158 */ bool mMegaStrikeScored;
     /* 0x159 */ bool mResumeAfterPresentation;
-    /* 0x15A */ u8 mUnidentified15A[0x2];
+    /* 0x15A */ u8 m_pad15A[0x2];
     /* 0x15C */ float mWaitTimeRemaining;
     /* 0x160 */ bool mLastGoalUsedHighFilter;
-    /* 0x161 */ bool mUnidentified161;
-    /* 0x162 */ bool mUnidentified162;
+    /* 0x161 */ bool mLastGoalUsedLoserReaction;
+    /* 0x162 */ bool mNextLoserReactionOutraged;
     /* 0x163 */ bool mDrawBlackOverlay;
-    /* 0x164 */ bool mUnidentified164;
-    /* 0x165 */ u8 mUnidentified165[0x3];
+    /* 0x164 */ bool mNisStadiumEffectsEnabled;
+    /* 0x165 */ u8 m_pad165[0x3];
     /* 0x168 */ MegaStrikeEndData mMegaStrikeResult;
 }; // total size: 0x174
 

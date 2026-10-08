@@ -25,7 +25,7 @@ TransportMessage::TransportMessage()
     mChecksum = 0;
     mFlags = 0;
     mAck = 0;
-    mUnidentified0C = 0;
+    mFlag80Word = 0;
     mFlag80Byte = 0;
     mTimestamp = 0;
     mPongTimestamp = 0;
@@ -281,8 +281,8 @@ void TransportMessage::Serialize(
     }
     if ((mFlags & 0x80) != 0)
     {
-        serializer->Transfer(&mUnidentified0C,
-            sizeof(mUnidentified0C));
+        serializer->Transfer(&mFlag80Word,
+            sizeof(mFlag80Word));
         serializer->Transfer(&mFlag80Byte,
             sizeof(mFlag80Byte));
     }
@@ -397,13 +397,13 @@ void TransportServerResponse::Serialize(
 void TransportClosing::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified04, sizeof(mUnidentified04));
+    serializer->Transfer(&mPayload, sizeof(mPayload));
 }
 
 void TransportKeepAlive::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified04, sizeof(mUnidentified04));
+    serializer->Transfer(&mPayload, sizeof(mPayload));
 }
 
 void InitializeTransportChallengeCipher()

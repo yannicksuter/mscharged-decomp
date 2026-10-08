@@ -10,7 +10,7 @@ public:
         void (*callback)(), bool arg3)
         : TweakValueBool(name, category, false, false)
         , next(0)
-        , mUnidentified010(arg3)
+        , mUseValueType7(arg3)
         , mCallback(callback)
     {
         mFormatName = false;
@@ -21,7 +21,7 @@ public:
     virtual int GetValueType()
     {
         int result = 6;
-        if (mUnidentified010)
+        if (mUseValueType7)
         {
             result = 7;
         }
@@ -35,7 +35,7 @@ public:
     }
 
     /* 0x0C */ TweakCallback* next;
-    /* 0x10 */ bool mUnidentified010;
+    /* 0x10 */ bool mUseValueType7;
     /* 0x14 */ void (*mCallback)();
 }; // size: 0x18
 

@@ -63,7 +63,7 @@ struct EventConnection
         };
         struct
         {
-            unsigned short mUnidentified08;
+            unsigned short mFlagsHigh;
             unsigned short mGroupCount : 16;
         };
     };

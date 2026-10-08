@@ -1091,7 +1091,7 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
     bool result = false;
     for (int i = 0; i < 20; i++)
     {
-        PhysicsWaluigiWall* wall = fielder->mWaluigiWallState.mUnidentified08->GetWall(i);
+        PhysicsWaluigiWall* wall = fielder->mWaluigiWallState.mWallManager->GetWall(i);
         if (wall != 0)
         {
             AvoidablePolygon* polygon = wall->GetAvoidablePolygon();
@@ -1694,8 +1694,8 @@ void HandleMuckBallCollision(void* context)
     {
         hit = true;
     }
-    if (event->mUnidentified0C != 0
-        && event->mUnidentified0C->m_DetChar.m_eCharacterClass != PETEY)
+    if (event->pPlayer != 0
+        && event->pPlayer->m_DetChar.m_eCharacterClass != PETEY)
     {
         hit = true;
     }

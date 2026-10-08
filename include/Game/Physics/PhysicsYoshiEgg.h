@@ -15,7 +15,7 @@ public:
     virtual void PreCollide();
     virtual ContactType Contact(PhysicsObject*, dContact*, int);
 
-    /* 0x38 */ void* mUnidentified38;
+    /* 0x38 */ void* mPadding38;
     /* 0x3C */ YoshiEggObject* mYoshiEgg;
 }; // total size: 0x40
 

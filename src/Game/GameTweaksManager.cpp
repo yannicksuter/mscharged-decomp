@@ -34,7 +34,7 @@ void InitializeGameTweaks(GameTweaksManager* state)
     state->mTerrainTweaks = terrainTweaks;
 
     state->mWeatherType = GetStadiumUnknown0x0C(stadium);
-    state->mUnidentified0C = GetStadiumUnknown0x11(stadium);
+    state->mCrowdRiotEnabled = GetStadiumUnknown0x11(stadium);
 
     GameTweaks* gameTweaks = new (8, false)
         GameTweaks("/ini/GameTweaks.ini", "/Game/GameTweaks");

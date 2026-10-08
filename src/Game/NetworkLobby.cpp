@@ -611,7 +611,7 @@ void NetworkLobby::OnMatchmakingResult(
         mMachineCount = GetConnectionCount();
         for (int aid = 0; aid < GetConnectionCount(); ++aid)
         {
-            mPlayers[aid].mUnidentified18[0] = aid;
+            mPlayers[aid].mAid[0] = aid;
             mPlayers[aid].mConnection = 0;
             mPlayers[aid].mName[0] = 0;
             mPlayers[aid].mUserMatchDataSize = 0;
@@ -769,7 +769,7 @@ void NetworkLobby::OnFriendMatchmakingResult(DWCError error,
             int previousMachineCount = mMachineCount;
             while (mMachineCount < connectionCount)
             {
-                mPlayers[mMachineCount].mUnidentified18[0] = mMachineCount;
+                mPlayers[mMachineCount].mAid[0] = mMachineCount;
                 mPlayers[mMachineCount].mConnection = 0;
                 mPlayers[mMachineCount].mName[0] = 0;
                 mPlayers[mMachineCount].mUserMatchDataSize = 0;

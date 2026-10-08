@@ -821,12 +821,12 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     bIsModified = false;
     if (m_DetChar.m_eCharacterClass == (eCharacterClass)6)
     {
-        mWaluigiWallState.mUnidentified08
+        mWaluigiWallState.mWallManager
             = new (8, false) WaluigiWallManager();
     }
     else
     {
-        mWaluigiWallState.mUnidentified08 = 0;
+        mWaluigiWallState.mWallManager = 0;
     }
 
     if (m_DetChar.m_eCharacterClass == (eCharacterClass)19)
@@ -844,7 +844,7 @@ cFielder::~cFielder()
     CleanUpAction(ACTION_NEED_ACTION);
     if (m_DetChar.m_eCharacterClass == (eCharacterClass)6)
     {
-        delete mWaluigiWallState.mUnidentified08;
+        delete mWaluigiWallState.mWallManager;
     }
     if (m_pBulletBill != 0)
     {
@@ -1774,7 +1774,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pAttackData->nAttackerPadID = bHasGlobalPad
                 ? pFielderCollidedWith->GetGlobalPad()->GetPadID() : -1;
             pAttackData->pTarget = this;
-            pAttackData->mUnidentified0C = nHitReaction;
+            pAttackData->nHitReaction = nHitReaction;
             pAttackData->bIsSlideAttack = false;
             QueueAttackSuccessEvent(g_pGame, pAttackData);
             PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
@@ -4954,7 +4954,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         u8 bHasGlobalPad = GetGlobalPad() != NULL;
         pAttackData->nAttackerPadID = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = pOpponent;
-        pAttackData->mUnidentified0C = 2;
+        pAttackData->nHitReaction = 2;
         pAttackData->bIsSlideAttack = false;
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
@@ -4970,7 +4970,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         u8 bHasGlobalPad = pOpponent->GetGlobalPad() != NULL;
         pAttackData->nAttackerPadID = bHasGlobalPad ? pOpponent->GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = this;
-        pAttackData->mUnidentified0C = 2;
+        pAttackData->nHitReaction = 2;
         pAttackData->bIsSlideAttack = false;
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
@@ -5432,9 +5432,9 @@ void cFielder::Update(float fDeltaT)
     }
 
     if (m_DetChar.m_eCharacterClass == (eCharacterClass)6
-        && mWaluigiWallState.mUnidentified08 != 0)
+        && mWaluigiWallState.mWallManager != 0)
     {
-        mWaluigiWallState.mUnidentified08->Update(fDeltaT);
+        mWaluigiWallState.mWallManager->Update(fDeltaT);
     }
     UpdateController(fDeltaT);
     m_bHasBeenUpdated = true;
@@ -6064,8 +6064,8 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mActionBowserSuper.fireballStageTime = 0.0f;
     mActionBowserSuper.fireballStageNum = 0;
     mActionBowserSuper.fn_800504A4();
-    mWaluigiWallState.mUnidentified00 = 0.0f;
-    mWaluigiWallState.mUnidentified04 = 0.0f;
+    mWaluigiWallState.mSegmentTimeRemaining = 0.0f;
+    mWaluigiWallState.mMinSegmentTime = 0.0f;
     mWaluigiWallState.fn_800504A8();
     nlVec3Set(mActionBooSkillshot.v3StartPosition, 0.0f, 0.0f, 0.0f);
     mActionBooSkillshot.bFollowingBall = false;
@@ -6093,9 +6093,9 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
 void cFielder::ResetEffects()
 {
     cCharacter::ResetEffects();
-    if (mWaluigiWallState.mUnidentified08 != 0)
+    if (mWaluigiWallState.mWallManager != 0)
     {
-        mWaluigiWallState.mUnidentified08->ClearWalls();
+        mWaluigiWallState.mWallManager->ClearWalls();
     }
     if (m_pBulletBill != 0)
     {

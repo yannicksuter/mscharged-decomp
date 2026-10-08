@@ -147,7 +147,7 @@ public:
     /* 0x854 */ TweakFloatBinding fSmallShellHitReactionVolume;
     /* 0x864 */ TweakFloatBinding fMediumShellHitReactionVolume;
     /* 0x874 */ TweakFloatBinding fLargeShellHitReactionVolume;
-    /* 0x884 */ TweakFloatBinding mUnidentified884;
+    /* 0x884 */ TweakFloatBinding m_pad884;
     /* 0x894 */ TweakFloatBinding fGoalieDropKickHitReactionVolume;
     /* 0x8A4 */ TweakFloatBinding fBallHitWallMaxAudibleVelocity;
     /* 0x8B4 */ TweakFloatBinding fBallHitWallMinAudibleVelocity;
@@ -179,7 +179,7 @@ struct GameTweaksManager
         : mTerrainType(1)
         , mTerrainTweaks(0)
         , mWeatherType(0)
-        , mUnidentified0C(false)
+        , mCrowdRiotEnabled(false)
         , m_pGameTweaks(0)
         , mFielderTweaks(0)
     {
@@ -192,7 +192,7 @@ struct GameTweaksManager
     /* 0x04 */ TerrainTweaks* mTerrainTweaks;
 
     /* 0x08 */ int mWeatherType;
-    /* 0x0C */ bool mUnidentified0C;
+    /* 0x0C */ bool mCrowdRiotEnabled;
     /* 0x0D */ u8 mPadding0D[3];
 
     /* 0x10 */ GameTweaks* m_pGameTweaks;

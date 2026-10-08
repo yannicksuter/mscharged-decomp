@@ -300,7 +300,7 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
     {
         if (m_bSuperPowerTankOn)
         {
-            if (mWaluigiWallState.mUnidentified00 <= 0.0f || bForce)
+            if (mWaluigiWallState.mSegmentTimeRemaining <= 0.0f || bForce)
             {
                 m_bSuperPowerTankOn = false;
                 m_bSuperPowerTankShutdownPending = false;
@@ -309,9 +309,9 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
                 bool bRunning = m_fSuperPowerTankLevel > 0.0f;
                 if (bRunning)
                 {
-                    if (m_fSuperPowerTankLevel < mWaluigiWallState.mUnidentified04)
+                    if (m_fSuperPowerTankLevel < mWaluigiWallState.mMinSegmentTime)
                     {
-                        m_fSuperPowerTankLevel = mWaluigiWallState.mUnidentified04;
+                        m_fSuperPowerTankLevel = mWaluigiWallState.mMinSegmentTime;
                     }
                 }
                 SetNormalTweaks();
@@ -356,8 +356,8 @@ void cFielder::InitSuperPowerTank(bool bTurnOn)
         break;
     case WALUIGI:
         m_fSuperPowerTankCapacity = gWaluigiTankCapacity;
-        mWaluigiWallState.mUnidentified00
-            = mWaluigiWallState.mUnidentified04 = gWaluigiWallMinSegmentTime;
+        mWaluigiWallState.mSegmentTimeRemaining
+            = mWaluigiWallState.mMinSegmentTime = gWaluigiWallMinSegmentTime;
         break;
     case WARIO:
         m_fSuperPowerTankCapacity = gWarioTankCapacity;
@@ -456,8 +456,8 @@ void ActBowserSuper::fn_800504A4()
 
 void WaluigiWallState::fn_800504A8()
 {
-    if (mUnidentified08 != 0)
+    if (mWallManager != 0)
     {
-        mUnidentified08->ClearWalls();
+        mWallManager->ClearWalls();
     }
 }

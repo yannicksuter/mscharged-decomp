@@ -368,7 +368,7 @@ void StadiumWorldDrawable::UpdateBlend()
     if (cameraType == eCameraType_Gameplay
         || cameraType == eCameraType_ShootToScore
         || cameraType == eCameraType_Goal
-        || !GetPresentation()->mUnidentified164)
+        || !GetPresentation()->mNisStadiumEffectsEnabled)
     {
         hide = true;
     }

@@ -4,7 +4,7 @@
 void NetworkMessageType17::Serialize(
     NetworkMessageSerializer* serializer)
 {
-    serializer->Transfer(&mUnidentified08, sizeof(mUnidentified08));
+    serializer->Transfer(&mPayload, sizeof(mPayload));
 }
 
 void NetworkMessageType16::Serialize(NetworkMessageSerializer*)

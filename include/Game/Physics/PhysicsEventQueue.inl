@@ -11,7 +11,7 @@ inline void FreeCollisionPlayerPlayerData(void* data)
 
 inline void FreeCollisionPatchData(void* data)
 {
-    g_UnidentifiedEventData24Pool.Free((CollisionPatchData*)data);
+    g_CollisionPatchDataPool.Free((CollisionPatchData*)data);
 }
 
 inline void FreeCollisionPlayerBallData(CollisionPlayerBallData* data)
@@ -126,12 +126,12 @@ inline void FreeCollisionChainPowerupData(CollisionChainPowerupData* data)
 
 inline void FreeCollisionPatchPowerupData(void* data)
 {
-    g_UnidentifiedEventData30Pool.Free((CollisionPatchPowerupData*)data);
+    g_CollisionPatchPowerupDataPool.Free((CollisionPatchPowerupData*)data);
 }
 
 inline void FreeCollisionProjectileData(CollisionProjectileData* data)
 {
-    g_UnidentifiedEventData26Pool.Free(data);
+    g_CollisionProjectileDataPool.Free(data);
 }
 
 inline void FreeCollisionThwompPlayerData(CollisionThwompPlayerData* data)
@@ -141,7 +141,7 @@ inline void FreeCollisionThwompPlayerData(CollisionThwompPlayerData* data)
 
 inline void FreeCollisionEggData(CollisionEggData* data)
 {
-    g_UnidentifiedEventData34Pool.Free(data);
+    g_CollisionEggDataPool.Free(data);
 }
 
 inline void FreeCollisionShockwaveData(void* data)

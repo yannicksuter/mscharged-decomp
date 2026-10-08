@@ -377,8 +377,8 @@ struct CollisionHammerbroShotBallPlayerData
 };
 struct CollisionPatchData
 {
-    /* 0x00 */ unsigned char mUnidentified00[0x0C];
-    /* 0x0C */ cPlayer* mUnidentified0C;
+    /* 0x00 */ unsigned char m_pad00[0x0C];
+    /* 0x0C */ cPlayer* pPlayer;
     /* 0x10 */ PhysicsPatch* pPatch;
 }; // total size: 0x14
 
@@ -386,21 +386,21 @@ struct CollisionProjectileData
 {
     /* 0x00 */ nlVector3 v3Position;
     /* 0x0C */ nlVector3 v3Velocity;
-    /* 0x18 */ void* mUnidentified18;
+    /* 0x18 */ void* pTarget;
     /* 0x1C */ cFielder* pFielder;
 }; // total size: 0x20
 struct CollisionPatchPowerupData
 {
-    /* 0x00 */ PowerupBase* mUnidentified00;
-    /* 0x04 */ PhysicsPatch* mUnidentified04;
+    /* 0x00 */ PowerupBase* pPowerup;
+    /* 0x04 */ PhysicsPatch* pPatch;
 }; // total size: 0x8
 class YoshiEggObject;
 
 struct CollisionEggData
 {
-    /* 0x00 */ cPlayer* mUnidentified00;
-    /* 0x04 */ cFielder* mUnidentified04;
-    /* 0x08 */ YoshiEggObject* mUnidentified08;
+    /* 0x00 */ cPlayer* pPlayer;
+    /* 0x04 */ cFielder* pFielder;
+    /* 0x08 */ YoshiEggObject* pEgg;
     /* 0x0C */ u32 m_pad0C;
     /* 0x10 */ u32 m_pad10;
 }; // total size: 0x14
@@ -410,7 +410,7 @@ struct CollisionShockwaveData
 {
     /* 0x00 */ PhysicsShockwave* pShockwave;
     /* 0x04 */ PhysicsObject* pObject;
-    /* 0x08 */ unsigned int mUnidentified08;
+    /* 0x08 */ unsigned int m_pad08;
 }; // total size: 0xC
 
 #endif // GAME_EVENT_DATA_TYPES_H

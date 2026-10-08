@@ -38,7 +38,7 @@ ImpostorManager::ImpostorManager()
 {
     mParentView = 0;
     mInitialized = false;
-    mUnidentified035 = false;
+    mPadding035 = false;
     mHasClusters = false;
     mUpdateClusters = false;
     mCurrentResource = 0;
@@ -81,7 +81,7 @@ void ImpostorManager::Initialize(GLView* parentView, int capacity,
     mCaptured = false;
     mUpdateClusters = false;
     mHasClusters = false;
-    mUnidentified035 = false;
+    mPadding035 = false;
     mInvalidateCaptureOnRender = invalidateCaptureOnRender;
     LoadTweakConfigFile("ini/ImpostorCharacterTweaks.ini",
         "/Render/Impostor/CharacterTweaks", false);

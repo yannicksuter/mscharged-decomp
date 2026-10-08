@@ -67,7 +67,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
     , mNumTriggers(0)
     , mMainCharacterIndex(-1)
     , mAudioCharacterIndex(-1)
-    , mUnidentified850(0)
+    , m_pad850(0)
     , mDryBonesHead(0)
     , mDryBonesHeadCharacter(0)
     , mShyGuyMask(0)
@@ -944,8 +944,8 @@ void Nis::ApplyDamageEffects(glModel* model, DrawableCharacter* character)
     nlSNPrintf(textureName, sizeof(textureName), "%s/dirt", character->character->m_pCharacterInfo->mName);
     damageTexture = glGetTexture(textureName);
 
-    if (character->character->mUnidentified16C != 1
-        && (character->character->mUnidentified16C == 2
+    if (character->character->m_nDamageType != 1
+        && (character->character->m_nDamageType == 2
             || stadium == 0 || stadium == 5 || stadium == 7
             || stadium == 9 || stadium == 16 || stadium == 8
             || stadium == 14 || stadium == 11 || stadium == 15

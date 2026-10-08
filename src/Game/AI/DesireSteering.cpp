@@ -820,8 +820,8 @@ bool DesireWaluigiWall::Initialize(void*)
 {
     mMaxDuration = 10.0f;
     fn_8006040C(g_pGame, m_pFielder);
-    m_pFielder->mWaluigiWallState.mUnidentified00
-        = m_pFielder->mWaluigiWallState.mUnidentified04;
+    m_pFielder->mWaluigiWallState.mSegmentTimeRemaining
+        = m_pFielder->mWaluigiWallState.mMinSegmentTime;
     return true;
 }
 
@@ -851,10 +851,10 @@ void DesireWaluigiWall::Update(
         return;
     }
 
-    m_pFielder->mWaluigiWallState.mUnidentified00 -= fDeltaT;
+    m_pFielder->mWaluigiWallState.mSegmentTimeRemaining -= fDeltaT;
     short nFacingDelta = (short)(m_pFielder->m_DetChar.m_aActualFacingDirection
         - m_pFielder->m_DetChar.m_aDesiredFacingDirection);
-    if (m_pFielder->mWaluigiWallState.mUnidentified00 <= 0.0f)
+    if (m_pFielder->mWaluigiWallState.mSegmentTimeRemaining <= 0.0f)
     {
         if (m_pFielder->m_bSuperPowerTankShutdownPending)
         {
@@ -869,10 +869,10 @@ void DesireWaluigiWall::Update(
             DeliverWaluigiWallEndEvent(g_pGame, m_pFielder);
             if (m_pFielder->m_fSuperPowerTankLevel > 0.0f
                 && m_pFielder->m_fSuperPowerTankLevel
-                    < m_pFielder->mWaluigiWallState.mUnidentified04)
+                    < m_pFielder->mWaluigiWallState.mMinSegmentTime)
             {
                 m_pFielder->m_fSuperPowerTankLevel
-                    = m_pFielder->mWaluigiWallState.mUnidentified04;
+                    = m_pFielder->mWaluigiWallState.mMinSegmentTime;
             }
             if (nFacingDelta < 0)
             {
@@ -885,8 +885,8 @@ void DesireWaluigiWall::Update(
                     m_pFielder->m_DetChar.m_aActualFacingDirection - 0x4000, true);
             }
             fn_8006040C(g_pGame, m_pFielder);
-            m_pFielder->mWaluigiWallState.mUnidentified00
-                = m_pFielder->mWaluigiWallState.mUnidentified04;
+            m_pFielder->mWaluigiWallState.mSegmentTimeRemaining
+                = m_pFielder->mWaluigiWallState.mMinSegmentTime;
         }
     }
 

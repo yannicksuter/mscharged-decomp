@@ -83,7 +83,7 @@ public:
     virtual ~NetworkMessageType17();
     virtual int GetType();
 
-    /* 0x08 */ u32 mUnidentified08;
+    /* 0x08 */ u32 mPayload;
 };
 
 class NetworkMessageType16 : public NetworkMessage
@@ -214,7 +214,7 @@ public:
         , mGameStatus(gameStatus)
         , mGameTimeDelta(gameTimeDelta)
         , mHasGameInfo(hasGameInfo)
-        , mUnidentified0F(0)
+        , mPadding0F(0)
     {
     }
 
@@ -227,7 +227,7 @@ public:
     /* 0x00B */ u8 mGameStatus;
     /* 0x00C */ u16 mGameTimeDelta;
     /* 0x00E */ u8 mHasGameInfo;
-    /* 0x00F */ u8 mUnidentified0F;
+    /* 0x00F */ u8 mPadding0F;
     /* 0x010 */ BasicGameInfo mGameInfo;
 }; // size: 0x138
 

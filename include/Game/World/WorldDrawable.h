@@ -42,7 +42,7 @@ public:
     /* 0x20 */ nlMatrix4 mWorldMatrix;
     /* 0x60 */ float m_fBoundingRadius;
     /* 0x64 */ glModel* m_pModel;
-    /* 0x68 */ u8 mUnidentified68[0x08];
+    /* 0x68 */ u8 m_pad68[0x08];
 }; // size: 0x70
 
 #endif // GAME_WORLD_WORLD_DRAWABLE_H

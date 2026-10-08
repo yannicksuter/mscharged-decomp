@@ -21,7 +21,7 @@ DiddyBanana::DiddyBanana(
         SetAnimState(*mpZip, 0.0f, PM_HOLD);
     }
     mpCharacter = 0;
-    mUnidentified80 = false;
+    mPadding80 = false;
 }
 
 DiddyBanana::~DiddyBanana()

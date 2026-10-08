@@ -107,8 +107,8 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         }
 
         CollisionProjectileData* data = 0;
-        g_UnidentifiedEventData26Pool.Allocate(data);
-        data->mUnidentified18 = character;
+        g_CollisionProjectileDataPool.Allocate(data);
+        data->pTarget = character;
         data->pFielder = thrower;
         data->v3Position = GetPosition();
         data->v3Velocity = GetLinearVelocity();
@@ -128,8 +128,8 @@ ContactType PhysicsHammer::Contact(PhysicsObject* other, dContact*, int)
         if (!isLanded)
         {
             CollisionProjectileData* data = 0;
-            g_UnidentifiedEventData26Pool.Allocate(data);
-            data->mUnidentified18 = 0;
+            g_CollisionProjectileDataPool.Allocate(data);
+            data->pTarget = 0;
             data->pFielder = thrower;
             data->v3Position = GetPosition();
             data->v3Velocity = GetLinearVelocity();

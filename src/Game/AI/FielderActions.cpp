@@ -2194,7 +2194,7 @@ void cFielder::ActionHit(float fDeltaT)
             for (int i = 0; i < 0x14; i++)
             {
                 PhysicsWaluigiWall* pObject
-                    = pCaptain->mWaluigiWallState.mUnidentified08->GetWall(i);
+                    = pCaptain->mWaluigiWallState.mWallManager->GetWall(i);
                 if (pObject != 0
                     && nlIntersectLineSegments2D((const nlVector2*)&v2Position, &v2Target, (const nlVector2*)&pObject->GetStartPoint(), (const nlVector2*)&pObject->GetEndPoint(), &fT1, &fT2))
                 {

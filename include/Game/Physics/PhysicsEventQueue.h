@@ -7,10 +7,10 @@
 class PhysicsEventQueue;
 extern PhysicsEventQueue* gPhysicsEventQueue;
 
-extern SlotPool<CollisionProjectileData> g_UnidentifiedEventData26Pool;
-extern SlotPool<CollisionPatchData> g_UnidentifiedEventData24Pool;
-extern SlotPool<CollisionPatchPowerupData> g_UnidentifiedEventData30Pool;
-extern SlotPool<CollisionEggData> g_UnidentifiedEventData34Pool;
+extern SlotPool<CollisionProjectileData> g_CollisionProjectileDataPool;
+extern SlotPool<CollisionPatchData> g_CollisionPatchDataPool;
+extern SlotPool<CollisionPatchPowerupData> g_CollisionPatchPowerupDataPool;
+extern SlotPool<CollisionEggData> g_CollisionEggDataPool;
 extern SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool;
 
 void QueueCollisionBallChain(CollisionBallChainData* data);

@@ -187,7 +187,7 @@ public:
     /* 0x188 */ Trigger mTriggers[MAX_NUM_TRIGGERS];
     /* 0x848 */ int mMainCharacterIndex;
     /* 0x84C */ int mAudioCharacterIndex;
-    /* 0x850 */ u32 mUnidentified850;
+    /* 0x850 */ u32 m_pad850;
     /* 0x854 */ ImpostorModel* mDryBonesHead;
     /* 0x858 */ DrawableCharacter* mDryBonesHeadCharacter;
     /* 0x85C */ ImpostorModel* mShyGuyMask;

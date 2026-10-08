@@ -29,7 +29,7 @@ public:
     {
         /* 0x00 */ unsigned int uTeamIndex : 8;
         /* 0x00 */ unsigned int uGoalType : 16;
-        /* 0x00 */ unsigned int mUnidentified003 : 8;
+        /* 0x00 */ unsigned int m_pad03 : 8;
         /* 0x04 */ nlVector3 v3ShotPosition;
         /* 0x10 */ cPlayer* pScorer;
     }; // size: 0x14

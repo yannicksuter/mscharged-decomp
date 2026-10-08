@@ -33,7 +33,7 @@ struct AudioEffectSoundStartedVisitor
     }
 
     /* 0x00 */ bool (*mCallback)(u32, AudioEffectBase*);
-    /* 0x04 */ bool mUnidentified04;
+    /* 0x04 */ bool m_pad04;
     /* 0x08 */ AudioEffectBase* mEffect;
 }; // size: 0x0C
 
@@ -110,7 +110,7 @@ struct AudioScriptBindingList
     bool Contains(const u32& key) const;
 
     u16 mCount;
-    u16 mUnidentified02;
+    u16 m_pad02;
     u32* mValues;
 };
 

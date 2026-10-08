@@ -9,9 +9,9 @@ class BitPacker
 {
 public:
     BitPacker()
-        : mUnidentified00(0)
+        : mBitCount(0)
     {
-        memset(&mUnidentified04, 0, sizeof(mUnidentified04));
+        memset(&mBits, 0, sizeof(mBits));
     }
 
     void Pack(int value, int min, int max)
@@ -26,10 +26,10 @@ public:
             if ((1 << i) & range)
                 bits = i + 1;
         }
-        if (bits + mUnidentified00 < 32)
+        if (bits + mBitCount < 32)
         {
-            mUnidentified00 += bits;
-            mUnidentified04 = (mUnidentified04 << bits) | (value - min);
+            mBitCount += bits;
+            mBits = (mBits << bits) | (value - min);
         }
     }
 
@@ -46,11 +46,11 @@ public:
 
     unsigned long GetBits() const
     {
-        return mUnidentified04;
+        return mBits;
     }
 
-    unsigned int mUnidentified00;
-    unsigned long mUnidentified04;
+    unsigned int mBitCount;
+    unsigned long mBits;
 };
 
 #endif

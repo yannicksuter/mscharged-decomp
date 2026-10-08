@@ -123,20 +123,20 @@ public:
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 float gfDaisyFistShotTime = 1.0f;
 
-SlotPool<CollisionProjectileData> g_UnidentifiedEventData26Pool(16, 16);
-SlotPool<CollisionPatchData> g_UnidentifiedEventData24Pool(16, 16);
-SlotPool<CollisionPatchPowerupData> g_UnidentifiedEventData30Pool(16, 16);
-SlotPool<CollisionEggData> g_UnidentifiedEventData34Pool(16, 16);
+SlotPool<CollisionProjectileData> g_CollisionProjectileDataPool(16, 16);
+SlotPool<CollisionPatchData> g_CollisionPatchDataPool(16, 16);
+SlotPool<CollisionPatchPowerupData> g_CollisionPatchPowerupDataPool(16, 16);
+SlotPool<CollisionEggData> g_CollisionEggDataPool(16, 16);
 SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool(16, 16);
 
 PhysicsEventQueue* gPhysicsEventQueue;
 
 void FreePhysicsEventDataPools()
 {
-    g_UnidentifiedEventData26Pool.FreeBlocks();
-    g_UnidentifiedEventData24Pool.FreeBlocks();
-    g_UnidentifiedEventData30Pool.FreeBlocks();
-    g_UnidentifiedEventData34Pool.FreeBlocks();
+    g_CollisionProjectileDataPool.FreeBlocks();
+    g_CollisionPatchDataPool.FreeBlocks();
+    g_CollisionPatchPowerupDataPool.FreeBlocks();
+    g_CollisionEggDataPool.FreeBlocks();
     gCollisionShockwaveDataPool.FreeBlocks();
 }
 

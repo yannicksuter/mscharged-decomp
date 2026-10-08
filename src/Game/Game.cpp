@@ -828,7 +828,7 @@ void cGame::BeginGame(bool bRematch, bool bStraightToKickoff)
         g_pCharacters[i]->fn_80022E60();
         cCharacter* character = g_pCharacters[i];
         character->m_Dirt = 0.0f;
-        character->mUnidentified16C = 0;
+        character->m_nDamageType = 0;
         g_pCharacters[i]->m_MinDirt = 0.0f;
     }
     GetPresentation()->Reset();
@@ -1861,7 +1861,7 @@ void cGame::SyncLog(void* context, DebugWriteCache* cache)
     // instead of pointers.
     struct DetermGameDataCopy
     {
-        u8 mUnidentified00[0x2C];
+        u8 mStateFields[0x2C];
         int mScorer;
         int mAssister;
         int mTeamTouch[2];

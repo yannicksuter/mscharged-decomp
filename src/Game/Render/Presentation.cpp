@@ -199,14 +199,14 @@ Presentation::Presentation()
     mHighlightsLeft = 0;
     mByPassNumber = 0;
     mSkipPastByPass = -1;
-    mUnidentified156 = false;
-    mUnidentified157 = false;
+    mPlayLoserReaction = false;
+    mLoserReactionOutraged = false;
     mResumeAfterPresentation = false;
     mLastGoalUsedHighFilter = false;
-    mUnidentified161 = true;
-    mUnidentified162 = false;
+    mLastGoalUsedLoserReaction = true;
+    mNextLoserReactionOutraged = false;
     mDrawBlackOverlay = false;
-    mUnidentified164 = true;
+    mNisStadiumEffectsEnabled = true;
     mQueuedFunction[0] = '\0';
     mQueuedFilter[0] = '\0';
 
@@ -842,28 +842,28 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         filter = "low";
     }
 
-    mUnidentified156 = false;
-    mUnidentified157 = false;
+    mPlayLoserReaction = false;
+    mLoserReactionOutraged = false;
 
-    if (!suddenDeath && !mUnidentified161
+    if (!suddenDeath && !mLastGoalUsedLoserReaction
         && !nlSingleton<GameInfoManager>::Instance()->IsInMode4()
         && nlRandomf(1.0f, &mRandomSeed) < sGoalCelebrationVariationChance)
     {
-        mUnidentified161 = true;
-        mUnidentified156 = true;
-        if (mUnidentified162 == true)
+        mLastGoalUsedLoserReaction = true;
+        mPlayLoserReaction = true;
+        if (mNextLoserReactionOutraged == true)
         {
-            mUnidentified157 = true;
-            mUnidentified162 = false;
+            mLoserReactionOutraged = true;
+            mNextLoserReactionOutraged = false;
         }
         else
         {
-            mUnidentified162 = true;
+            mNextLoserReactionOutraged = true;
         }
     }
     else
     {
-        mUnidentified161 = false;
+        mLastGoalUsedLoserReaction = false;
     }
 
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
@@ -872,7 +872,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
     {
         NisPlayer* nisPlayer = NisPlayer::Instance();
         nisPlayer->mWinnerSide[NIS_GAME_WINNER] = 1;
-        mUnidentified156 = false;
+        mPlayLoserReaction = false;
         functionName = "GameEndSuddenDeath";
     }
     else if (!scoreTied && g_pGame != 0
@@ -884,7 +884,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         int homeScore = g_pTeams[0]->m_nScore;
         NisPlayer* nisPlayer = NisPlayer::Instance();
         nisPlayer->mWinnerSide[NIS_GAME_WINNER] = homeScore < awayScore;
-        mUnidentified156 = false;
+        mPlayLoserReaction = false;
         functionName = "GameEndSuddenDeath";
     }
     else if (nlSingleton<GameInfoManager>::Instance()
@@ -904,7 +904,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
             NisPlayer* nisPlayer = NisPlayer::Instance();
             nisPlayer->mWinnerSide[NIS_GAME_WINNER]
                 = homeScore < awayScore;
-            mUnidentified156 = false;
+            mPlayLoserReaction = false;
             functionName = "GameEndSuddenDeath";
         }
     }
@@ -1058,8 +1058,8 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
         gameEndFunction = "GameEndMegaStrike";
         NisPlayer* nisPlayer = NisPlayer::Instance();
         nisPlayer->mWinnerSide[NIS_GAME_WINNER] = 1;
-        mUnidentified158 = true;
-        mUnidentified156 = false;
+        mMegaStrikeScored = true;
+        mPlayLoserReaction = false;
         Call(gameEndFunction, "high");
     }
     else if (g_pGame != 0
@@ -1071,8 +1071,8 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
         gameEndFunction = "GameEndMegaStrike";
         NisPlayer* nisPlayer = NisPlayer::Instance();
         nisPlayer->mWinnerSide[NIS_GAME_WINNER] = scoringSide;
-        mUnidentified158 = true;
-        mUnidentified157 = false;
+        mMegaStrikeScored = true;
+        mLoserReactionOutraged = false;
         Call(gameEndFunction, "high");
     }
     else
@@ -1092,8 +1092,8 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
                 gameEndFunction = "GameEndMegaStrike";
                 NisPlayer* nisPlayer = NisPlayer::Instance();
                 nisPlayer->mWinnerSide[NIS_GAME_WINNER] = scoringSide;
-                mUnidentified158 = true;
-                mUnidentified157 = false;
+                mMegaStrikeScored = true;
+                mLoserReactionOutraged = false;
                 Call(gameEndFunction, "high");
                 goto setupSkipVotes;
             }
@@ -1101,15 +1101,15 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
 
         const char* filter = "high";
         const char* functionName = "MegastrikeEnd";
-        mUnidentified156 = false;
+        mPlayLoserReaction = false;
         bool hasGoals = data->goals != 0;
-        mUnidentified158 = hasGoals;
-        mUnidentified157 = !hasGoals;
+        mMegaStrikeScored = hasGoals;
+        mLoserReactionOutraged = !hasGoals;
         if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
             || nlSingleton<GameInfoManager>::Instance()
                    ->mIsInStrikers101Mode)
         {
-            mUnidentified157 = false;
+            mLoserReactionOutraged = false;
         }
         Call(functionName, filter);
     }
@@ -1760,12 +1760,12 @@ void Presentation::Reset()
     mSkipPastByPass = -1;
     mSkipPermissionsUpdated = false;
     mChargeShadowsVisible = true;
-    mUnidentified156 = false;
-    mUnidentified157 = false;
+    mPlayLoserReaction = false;
+    mLoserReactionOutraged = false;
     mResumeAfterPresentation = false;
     mLastGoalUsedHighFilter = false;
-    mUnidentified161 = true;
-    mUnidentified162 = false;
+    mLastGoalUsedLoserReaction = true;
+    mNextLoserReactionOutraged = false;
 
     tDebugPrintManager::Print(DC_NETWORK,
         "Resetting NIS Loaded bitfield at frame %d\n",
@@ -1782,7 +1782,7 @@ void Presentation::Reset()
     ReplayManager::Instance()->Flush();
 
     mDrawBlackOverlay = false;
-    mUnidentified164 = true;
+    mNisStadiumEffectsEnabled = true;
 }
 
 /**

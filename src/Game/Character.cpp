@@ -82,7 +82,7 @@ static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 
 struct cCharacterSFX
 {
-    u32 mUnidentified00;
+    u32 m_pad00;
 };
 
 extern u16 g_headTrackSyncLogType;
@@ -275,7 +275,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     , m_eClassType(eNewClassType)
     , m_bIsUsingElectrocutionTexture(false)
     , m_pCharacterSFX(0)
-    , m_pPropModel(0)
+    , m_pad0FC(0)
     , m_uNormalTextureID(0)
     , m_uSwapTextureID(0)
     , m_uShockTextureID(0)
@@ -1541,7 +1541,7 @@ void cCharacter::AddRandomDirt()
 
 void cCharacter::fn_8001F1C0(int nParam)
 {
-    mUnidentified16C = nParam;
+    m_nDamageType = nParam;
     if (nParam == 2)
     {
         m_MinDirt = 0.0f;
@@ -1829,7 +1829,7 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
         {
             PlayCrowdReaction(0x3648CBA4UL);
         }
-        else if (pEventData->mUnidentified0C == 2)
+        else if (pEventData->nHitReaction == 2)
         {
             PlayCrowdReaction(pEventData->pAttacker->m_pTeam->m_nSide == HOME
                     ? 0xF2B4508FUL : 0x5F30D098UL);
@@ -2054,7 +2054,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
 
 extern "C" void fn_8002147C(CollisionPatchData* pEventData)
 {
-    ((cFielder*)pEventData->mUnidentified0C)->EndAction();
+    ((cFielder*)pEventData->pPlayer)->EndAction();
 }
 
 extern "C" void fn_80021484(CollisionPlayerFreezeData* pEventData)
@@ -2535,12 +2535,12 @@ extern "C" void fn_80022A98(CollisionProjectileData* pEventData)
 
 extern "C" void fn_80022B04(CollisionPatchData* pEventData)
 {
-    pEventData->mUnidentified0C->CollideWithPatchCallback(pEventData);
+    pEventData->pPlayer->CollideWithPatchCallback(pEventData);
 }
 
 extern "C" void fn_80022B1C(CollisionProjectileData* pEventData)
 {
-    cCharacter* pCharacter = (cCharacter*)pEventData->mUnidentified18;
+    cCharacter* pCharacter = (cCharacter*)pEventData->pTarget;
     if (pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pCharacter;
@@ -2563,33 +2563,33 @@ extern "C" void fn_80022B1C(CollisionProjectileData* pEventData)
 
 extern "C" void fn_80022BD8(CollisionEggData* pEventData)
 {
-    cPlayer* pPlayer = pEventData->mUnidentified00;
+    cPlayer* pPlayer = pEventData->pPlayer;
     if (pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
         if (pFielder->IsInvincible())
         {
-            pEventData->mUnidentified04->EndSuperPower(0);
+            pEventData->pFielder->EndSuperPower(0);
         }
         else if (!pFielder->IsFallenDown())
         {
             if (pFielder->IsSuperGrowActive())
             {
-                pFielder->InitActionShellReact(pEventData->mUnidentified08->mPosition,
-                    pEventData->mUnidentified04->m_DetChar.m_v3Velocity);
+                pFielder->InitActionShellReact(pEventData->pEgg->mPosition,
+                    pEventData->pFielder->m_DetChar.m_v3Velocity);
             }
-            else if (pFielder->IsCharacterInAir(pEventData->mUnidentified08->mPhysics->GetRadius())
+            else if (pFielder->IsCharacterInAir(pEventData->pEgg->mPhysics->GetRadius())
                 || (pFielder->m_eActionState == 0x1D && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
                 || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == WARIO)
                 || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
                 || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == 13))
             {
-                pFielder->InitActionBombReact(pEventData->mUnidentified08->mPosition, 0.0f);
+                pFielder->InitActionBombReact(pEventData->pEgg->mPosition, 0.0f);
                 EmitTackleImpact(pFielder);
             }
             else
             {
-                pFielder->InitActionKnockdownReact(pEventData->mUnidentified04->m_DetChar.m_v3Velocity);
+                pFielder->InitActionKnockdownReact(pEventData->pFielder->m_DetChar.m_v3Velocity);
             }
         }
     }

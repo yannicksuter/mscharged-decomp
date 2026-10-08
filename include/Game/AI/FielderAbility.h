@@ -22,16 +22,16 @@ struct ActBowserSuper
 struct WaluigiWallState
 {
     WaluigiWallState()
-        : mUnidentified00(0.0f)
-        , mUnidentified04(0.0f)
+        : mSegmentTimeRemaining(0.0f)
+        , mMinSegmentTime(0.0f)
     {
     }
 
     void fn_800504A8();
 
-    /* 0x00 */ float mUnidentified00;
-    /* 0x04 */ float mUnidentified04;
-    /* 0x08 */ WaluigiWallManager* mUnidentified08;
+    /* 0x00 */ float mSegmentTimeRemaining;
+    /* 0x04 */ float mMinSegmentTime;
+    /* 0x08 */ WaluigiWallManager* mWallManager;
 }; // size: 0xC
 
 

@@ -58,24 +58,24 @@ class TransportClosing
 {
 public:
     TransportClosing()
-        : mUnidentified04(0)
+        : mPayload(0)
     {
     }
     virtual void Serialize(NetworkMessageSerializer* serializer);
 
-    /* 0x04 */ u8 mUnidentified04;
+    /* 0x04 */ u8 mPayload;
 }; // size: 0x08
 
 class TransportKeepAlive
 {
 public:
     TransportKeepAlive()
-        : mUnidentified04(0)
+        : mPayload(0)
     {
     }
     virtual void Serialize(NetworkMessageSerializer* serializer);
 
-    /* 0x04 */ u8 mUnidentified04;
+    /* 0x04 */ u8 mPayload;
 }; // size: 0x08
 
 // Transport-layer datagram assembled by the reliable connection layer: the
@@ -118,7 +118,7 @@ public:
     /* 0x008 */ u8 mFlags;
     /* 0x009 */ u8 mPadding09;
     /* 0x00A */ u16 mAck;
-    /* 0x00C */ u16 mUnidentified0C;
+    /* 0x00C */ u16 mFlag80Word;
     /* 0x00E */ u8 mFlag80Byte;
     /* 0x00F */ u8 mPadding0F;
     /* 0x010 */ u32 mTimestamp;

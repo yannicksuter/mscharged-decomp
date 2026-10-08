@@ -8,7 +8,7 @@
 struct NetworkLobbyPlayer : public TransportPlayerInfo
 {
     /* 0x14 */ unsigned int mConnection;
-    /* 0x18 */ u8 mUnidentified18[4];
+    /* 0x18 */ u8 mAid[4];
     /* 0x1C */ int mConnectionState;
 }; // size: 0x20
 

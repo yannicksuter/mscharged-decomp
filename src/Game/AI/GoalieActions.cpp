@@ -2164,14 +2164,14 @@ void Goalie::ActionMove(float deltaTime)
         PhysicsWaluigiWall* pWall = 0;
         if (pCaptain->m_DetChar.m_eCharacterClass == WALUIGI)
         {
-            pWall = pCaptain->mWaluigiWallState.mUnidentified08->FindWall(muWallID);
+            pWall = pCaptain->mWaluigiWallState.mWallManager->FindWall(muWallID);
         }
         else
         {
             pCaptain = m_pTeam->GetCaptain();
             if (pCaptain->m_DetChar.m_eCharacterClass == WALUIGI)
             {
-                pWall = pCaptain->mWaluigiWallState.mUnidentified08->FindWall(muWallID);
+                pWall = pCaptain->mWaluigiWallState.mWallManager->FindWall(muWallID);
             }
         }
 
@@ -4949,7 +4949,7 @@ void Goalie::InitActionPursueDeke(
         data.pAttacker = this;
         data.nAttackerPadID = -1;
         data.pTarget = mpTarget;
-        data.mUnidentified0C = 2;
+        data.nHitReaction = 2;
         data.bIsSlideAttack = false;
         DeliverGoalieDekeAttackAttemptEvent(g_pGame, &data);
     }
@@ -6291,7 +6291,7 @@ void Goalie::InitActionSTSAttackSetup(float fWaitTime)
     data.pAttacker = this;
     data.nAttackerPadID = -1;
     data.pTarget = g_pBall->GetOwnerFielder();
-    data.mUnidentified0C = 2;
+    data.nHitReaction = 2;
     data.bIsSlideAttack = false;
     DeliverGoalieSlamAttackAttemptEvent(g_pGame, &data);
 }
@@ -6561,7 +6561,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
                 data.pAttacker = this;
                 data.nAttackerPadID = -1;
                 data.pTarget = mpShooter;
-                data.mUnidentified0C = 2;
+                data.nHitReaction = 2;
                 data.bIsSlideAttack = false;
                 DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
 
@@ -7466,7 +7466,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
             GoalieTweaks* pTweaks = (GoalieTweaks*)m_pTweaks;
             float fParam = InterpolateRangeClamped(
                 pTweaks->fOnFireTimeMin,
-                pTweaks->mUnidentified2B8,
+                pTweaks->fOnFireTimeMax,
                 1.0f,
                 4.0f,
                 mfBallCharge);

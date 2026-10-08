@@ -169,8 +169,8 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         else if (patch->m_Type == 6)
         {
             CollisionPatchData* data = 0;
-            g_UnidentifiedEventData24Pool.Allocate(data);
-            data->mUnidentified0C = patch->m_pOwner;
+            g_CollisionPatchDataPool.Allocate(data);
+            data->pPlayer = patch->m_pOwner;
             data->pPatch = patch;
             QueueCollisionTongue(data);
         }
@@ -371,7 +371,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
     {
         if (player == mOwner)
         {
-            WaluigiWallManager* manager = player->mWaluigiWallState.mUnidentified08;
+            WaluigiWallManager* manager = player->mWaluigiWallState.mWallManager;
             float gracePeriod = 0.2f;
             if (manager->mCurrentWall == this)
                 return NO_CONTACT;
@@ -608,20 +608,20 @@ void UpdateWaluigiWallEmitter(EmissionController& controller)
 
 void OnWaluigiWallStart(cPlayer* player)
 {
-    static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08->CreateWall(
+    static_cast<cFielder*>(player)->mWaluigiWallState.mWallManager->CreateWall(
         static_cast<cFielder*>(player), gWaluigiWallWidth, gWaluigiWallHeight);
 }
 
 void OnWaluigiWallEnd(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mWallManager;
     if (manager->mCurrentWall != 0)
         manager->EndWall();
 }
 
 void OnWaluigiWallAbort(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mWallManager;
     if (manager->mCurrentWall != 0)
     {
         manager->EndWall();
@@ -639,8 +639,8 @@ void OnWaluigiWallMegastrikeStart(void*)
         for (int i = 0; i < 4; ++i)
         {
             cFielder* player = team->GetFielder(i);
-            if (player != 0 && player->mWaluigiWallState.mUnidentified08 != 0)
-                player->mWaluigiWallState.mUnidentified08->ClearWalls();
+            if (player != 0 && player->mWaluigiWallState.mWallManager != 0)
+                player->mWaluigiWallState.mWallManager->ClearWalls();
         }
     }
 }

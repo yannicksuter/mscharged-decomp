@@ -213,7 +213,7 @@ void DrawableCharacter::Grab(cCharacter& source)
     useObject = source.m_pPoseAccumulator->m_bUseObject;
     damage1 = source.GetDirt();
     damage2 = source.GetMinDirt();
-    damageType = source.mUnidentified16C;
+    damageType = source.m_nDamageType;
     if (!useObject)
     {
         object = source.m_pPoseTree;
@@ -737,7 +737,7 @@ void DrawableCharacter::EvaluateFrom(const cPoseNode& poseNode, const nlVector3&
     megaBlend = 0.0f;
     damage1 = character->GetDirt();
     damage2 = character->GetMinDirt();
-    damageType = character->mUnidentified16C;
+    damageType = character->m_nDamageType;
     shadowLevel = 1.0f;
 
     poseAccumulator->m_Scale = poseScale;

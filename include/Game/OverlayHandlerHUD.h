@@ -162,7 +162,7 @@ public:
     /* 0x028 */ HUDCaptainMeter mCaptainMeter;
     /* 0x054 */ HUDPowerUpTextures mPowerUpTextures;
     /* 0x0AC */ HUDPowerUpDisplay mPowerUpDisplay;
-    /* 0x13C */ unsigned char mUnidentified13C[4];
+    /* 0x13C */ unsigned char m_pad13C[4];
     /* 0x140 */ HUDClock mClock;
     /* 0x1A8 */ HUDScoreDisplay mScoreDisplay;
     /* 0x258 */ AsyncImage* mAsyncImage[2];

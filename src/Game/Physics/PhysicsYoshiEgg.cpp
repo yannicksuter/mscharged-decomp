@@ -21,7 +21,7 @@
 
 PhysicsYoshiEgg::PhysicsYoshiEgg(YoshiEggObject* egg, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)
-    , mUnidentified38(0)
+    , mPadding38(0)
     , mYoshiEgg(egg)
 {
     SetCategory(0x4000);
@@ -67,10 +67,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             }
 
             eventData = 0;
-            g_UnidentifiedEventData34Pool.Allocate(eventData);
-            eventData->mUnidentified00 = fielder;
-            eventData->mUnidentified04 = player;
-            eventData->mUnidentified08 = mYoshiEgg;
+            g_CollisionEggDataPool.Allocate(eventData);
+            eventData->pPlayer = fielder;
+            eventData->pFielder = player;
+            eventData->pEgg = mYoshiEgg;
             eventData->m_pad0C = 0;
             eventData->m_pad10 = 0;
             QueueCollisionEggPlayer(eventData);
@@ -83,10 +83,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         else if (!player->IsOnSameTeam((cPlayer*)character))
         {
             crackData = 0;
-            g_UnidentifiedEventData34Pool.Allocate(crackData);
-            crackData->mUnidentified00 = (cPlayer*)character;
-            crackData->mUnidentified04 = player;
-            crackData->mUnidentified08 = mYoshiEgg;
+            g_CollisionEggDataPool.Allocate(crackData);
+            crackData->pPlayer = (cPlayer*)character;
+            crackData->pFielder = player;
+            crackData->pEgg = mYoshiEgg;
             crackData->m_pad0C = 0;
             crackData->m_pad10 = 0;
             QueueCollisionCrackEgg(crackData);
@@ -120,10 +120,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
                 }
 
                 eventData = 0;
-                g_UnidentifiedEventData34Pool.Allocate(eventData);
-                eventData->mUnidentified00 = owner;
-                eventData->mUnidentified04 = player;
-                eventData->mUnidentified08 = mYoshiEgg;
+                g_CollisionEggDataPool.Allocate(eventData);
+                eventData->pPlayer = owner;
+                eventData->pFielder = player;
+                eventData->pEgg = mYoshiEgg;
                 eventData->m_pad0C = 0;
                 eventData->m_pad10 = 0;
                 QueueCollisionEggPlayer(eventData);
@@ -131,10 +131,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             else if (!player->IsOnSameTeam(owner))
             {
                 crackData = 0;
-                g_UnidentifiedEventData34Pool.Allocate(crackData);
-                crackData->mUnidentified00 = owner;
-                crackData->mUnidentified04 = player;
-                crackData->mUnidentified08 = mYoshiEgg;
+                g_CollisionEggDataPool.Allocate(crackData);
+                crackData->pPlayer = owner;
+                crackData->pFielder = player;
+                crackData->pEgg = mYoshiEgg;
                 crackData->m_pad0C = 0;
                 crackData->m_pad10 = 0;
                 QueueCollisionCrackEgg(crackData);
@@ -149,10 +149,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         if (!fn_800167A8(g_pBall))
         {
             eventData = 0;
-            g_UnidentifiedEventData34Pool.Allocate(eventData);
-            eventData->mUnidentified00 = 0;
-            eventData->mUnidentified04 = player;
-            eventData->mUnidentified08 = mYoshiEgg;
+            g_CollisionEggDataPool.Allocate(eventData);
+            eventData->pPlayer = 0;
+            eventData->pFielder = player;
+            eventData->pEgg = mYoshiEgg;
             eventData->m_pad0C = 0;
             eventData->m_pad10 = 0;
             QueueCollisionEggBall(eventData);
@@ -170,10 +170,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         if (((PhysicsThwomp*)other)->mThwomp->mState == THWOMP_STATE_FALLING)
         {
             crackData = 0;
-            g_UnidentifiedEventData34Pool.Allocate(crackData);
-            crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = mYoshiEgg->mFielder;
-            crackData->mUnidentified08 = mYoshiEgg;
+            g_CollisionEggDataPool.Allocate(crackData);
+            crackData->pPlayer = 0;
+            crackData->pFielder = mYoshiEgg->mFielder;
+            crackData->pEgg = mYoshiEgg;
             crackData->m_pad0C = 0;
             crackData->m_pad10 = 0;
             QueueCollisionCrackEgg(crackData);
@@ -194,10 +194,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         if (patch->GetType() == 1 || patch->GetType() == 8 || patch->GetType() == 9)
         {
             crackData = 0;
-            g_UnidentifiedEventData34Pool.Allocate(crackData);
-            crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = mYoshiEgg->mFielder;
-            crackData->mUnidentified08 = mYoshiEgg;
+            g_CollisionEggDataPool.Allocate(crackData);
+            crackData->pPlayer = 0;
+            crackData->pFielder = mYoshiEgg->mFielder;
+            crackData->pEgg = mYoshiEgg;
             crackData->m_pad0C = 0;
             crackData->m_pad10 = 0;
             QueueCollisionCrackEgg(crackData);
@@ -205,8 +205,8 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         else if (info->mFriction != 0.0f)
         {
             patchData = 0;
-            g_UnidentifiedEventData24Pool.Allocate(patchData);
-            patchData->mUnidentified0C = mYoshiEgg->mFielder;
+            g_CollisionPatchDataPool.Allocate(patchData);
+            patchData->pPlayer = mYoshiEgg->mFielder;
             patchData->pPatch = patch;
             QueueCollisionPatchPlayer(patchData);
         }
@@ -223,10 +223,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
         }
 
         crackData = 0;
-        g_UnidentifiedEventData34Pool.Allocate(crackData);
-        crackData->mUnidentified00 = 0;
-        crackData->mUnidentified04 = mYoshiEgg->mFielder;
-        crackData->mUnidentified08 = mYoshiEgg;
+        g_CollisionEggDataPool.Allocate(crackData);
+        crackData->pPlayer = 0;
+        crackData->pFielder = mYoshiEgg->mFielder;
+        crackData->pEgg = mYoshiEgg;
         crackData->m_pad0C = 0;
         crackData->m_pad10 = 0;
         QueueCollisionCrackEgg(crackData);
@@ -236,10 +236,10 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
     case 0x1E:
     {
         crackData = 0;
-        g_UnidentifiedEventData34Pool.Allocate(crackData);
-        crackData->mUnidentified00 = 0;
-        crackData->mUnidentified04 = mYoshiEgg->mFielder;
-        crackData->mUnidentified08 = mYoshiEgg;
+        g_CollisionEggDataPool.Allocate(crackData);
+        crackData->pPlayer = 0;
+        crackData->pFielder = mYoshiEgg->mFielder;
+        crackData->pEgg = mYoshiEgg;
         crackData->m_pad0C = 0;
         crackData->m_pad10 = 0;
         QueueCollisionCrackEgg(crackData);

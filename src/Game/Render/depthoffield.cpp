@@ -32,7 +32,7 @@ DepthOfFieldManager::DepthOfFieldManager()
     , m_bDebugView(false)
     , m_fDistanceFromCamera(16.0f)
     , m_fIntensity(1.0f)
-    , mUnidentified0C(0)
+    , m_pad0C(0)
 {
 }
 

@@ -42,7 +42,7 @@ public:
 
     /* 0x00 */ bool mCaptureSuspended;
     /* 0x01 */ char mName[0x40];
-    /* 0x41 */ u8 mUnidentified041[3];
+    /* 0x41 */ u8 m_pad41[3];
     /* 0x44 */ int mID;
     /* 0x48 */ int mTextureIndex;
     /* 0x4C */ ImpostorCharacter* mCharacter;
@@ -56,13 +56,13 @@ public:
     /* 0x6C */ GLRenderPair mRenderPair;
     /* 0x74 */ GLCompactColourMeshWriter* mMesh;
     /* 0x78 */ u8 mEnabled;
-    /* 0x79 */ u8 mUnidentified079;
+    /* 0x79 */ u8 mCaptureDisabled;
     /* 0x7A */ u16 mAngle;
     /* 0x7C */ float mAngleJitter;
     /* 0x80 */ int* mRenderSlots;
     /* 0x84 */ int mNumRenderSlots;
     /* 0x88 */ u8 mUseIntensityAlpha;
-    /* 0x89 */ u8 mUnidentified089[3];
+    /* 0x89 */ u8 m_pad89[3];
 }; // size: 0x8C
 
 #endif // GAME_RENDER_IMPOSTOR_SPRITE_H

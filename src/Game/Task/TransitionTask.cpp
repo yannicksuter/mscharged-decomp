@@ -85,7 +85,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (BasicStadium::GetCurrentStadium() != NULL)
     {
-        if (to == 0x10 && GetPresentation()->mUnidentified164)
+        if (to == 0x10 && GetPresentation()->mNisStadiumEffectsEnabled)
         {
             BasicStadium::GetCurrentStadium()->SetEffectsActive(0x37, 1);
         }

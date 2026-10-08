@@ -34,7 +34,7 @@ public:
     /* 0x68 */ float mLength;
     /* 0x6C */ float mEndOffset;
     /* 0x70 */ unsigned int mIsOcclusionVolume;
-    /* 0x74 */ u8 mUnidentified074[0x0C];
+    /* 0x74 */ u8 m_pad74[0x0C];
 }; // size: 0x80
 
 class CrowdSidelineFilter

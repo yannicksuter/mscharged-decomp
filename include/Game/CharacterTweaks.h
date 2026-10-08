@@ -187,7 +187,7 @@ public:
     /* 0x294 */ TweakFloatBinding fShotFatigueSTSStun;
     /* 0x2A4 */ float fShotFatigueMax;
     /* 0x2A8 */ TweakFloatBinding fOnFireTimeMin;
-    /* 0x2B8 */ TweakFloatBinding mUnidentified2B8;
+    /* 0x2B8 */ TweakFloatBinding fOnFireTimeMax;
     /* 0x2C8 */ TweakFloatBinding fPounceRange;
     /* 0x2D8 */ TweakFloatBinding fPhysCapsuleRadius;
     /* 0x2E8 */ TweakFloatBinding fPhysCapsuleHeight;

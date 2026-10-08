@@ -63,7 +63,7 @@ static const float sPlayButtonBounds[4] = { -84.0f, 84.0f, -165.0f, -259.0f };
 // the release link strips its body when nothing references it. So a function
 // defined here used 0.0f and was stripped whole; R4QE01 keeps no byte of it.
 // This never-called placeholder reproduces the pool position only. Its real
-// name, signature and body are unknown (final_review.md).
+// name, signature and body are unknown.
 void UnidentifiedZeroFloat(float* value)
 {
     *value = 0.0f;
@@ -298,7 +298,7 @@ nlVector2 fn_801CC48C(TLTextInstance* pText)
 // The same pool keeps 0.5f between fn_801CC48C's constants and the idle
 // animation constants, while SetBreadcrumbs, its only surviving reader, is the
 // unit's last function. A stripped function defined here created it; its
-// identity is unknown (final_review.md).
+// identity is unknown.
 void UnidentifiedHalveFloat(float* value)
 {
     *value *= 0.5f;

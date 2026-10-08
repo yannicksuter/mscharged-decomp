@@ -27,7 +27,7 @@ static void ApplyDebugCameraFOV();
 
 struct DebugCameraTarget
 {
-    u8 mUnidentified00[0x20];
+    u8 m_pad00[0x20];
     nlVector3 mPosition;
 };
 
@@ -95,7 +95,7 @@ cDebugCamera::cDebugCamera(bool)
     , m_pPad(0)
     , m_bUseWiiControls(false)
     , m_bEnableControls(true)
-    , mUnidentified8E(false)
+    , m_pad8E(false)
     , m_bUpdateTargets(false)
     , m_pTarget(0)
 {
@@ -111,7 +111,7 @@ cDebugCamera::cDebugCamera(bool)
     {
         g_pPlatPadManager->SetDPDEnabled(pPad->m_padIndex, true);
     }
-    mUnidentified8E = true;
+    m_pad8E = true;
 }
 
 static inline void ClearTargetEntries(nlDLListContainer<DebugCameraTarget*>& targets)

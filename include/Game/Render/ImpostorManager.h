@@ -51,7 +51,7 @@ public:
     /* 0x14 */ nlDLListSlotPool<ImpostorCharacter*> mCharacters;
     /* 0x30 */ GLView* mParentView;
     /* 0x34 */ u8 mInitialized;
-    /* 0x35 */ u8 mUnidentified035;
+    /* 0x35 */ u8 mPadding035;
     /* 0x36 */ u8 mHasClusters;
     /* 0x37 */ u8 mUpdateClusters;
     /* 0x38 */ GLResourcePool* mResources[2];

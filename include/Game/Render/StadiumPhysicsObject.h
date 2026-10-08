@@ -27,7 +27,7 @@ public:
     virtual void ReleaseResources();
     virtual void Initialize(WorldObjectLoadContext* context);
 
-    /* 0x60 */ unsigned char mUnidentified060[0x10];
+    /* 0x60 */ unsigned char m_pad60[0x10];
 }; // size: 0x70
 
 // Builds its static physics primitive when loaded and removes it on release.

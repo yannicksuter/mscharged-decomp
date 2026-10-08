@@ -7,7 +7,7 @@ struct WindDebrisConfig
     /* 0x04 */ const char* mName;
     /* 0x08 */ float mRadius;
     /* 0x0C */ unsigned long mCueId;
-    /* 0x10 */ unsigned long mUnidentified010;
+    /* 0x10 */ unsigned long mImpactCueId;
 }; // total size: 0x14
 
 extern "C" WindDebrisConfig* GetWindDebrisConfig(const int& index);

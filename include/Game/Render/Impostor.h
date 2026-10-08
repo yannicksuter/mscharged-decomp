@@ -36,7 +36,7 @@ public:
     /* 0x1C */ float mHeight;
     /* 0x20 */ u16 mAngle;
     /* 0x22 */ nlColour mColour;
-    /* 0x26 */ u8 mUnidentified026[2];
+    /* 0x26 */ u8 m_pad26[2];
     /* 0x28 */ int mSlot;
     /* 0x2C */ bool mSkipCrowdVisibilityPass;
 }; // size: 0x30

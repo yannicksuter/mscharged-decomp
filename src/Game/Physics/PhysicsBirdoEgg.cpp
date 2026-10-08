@@ -22,7 +22,7 @@
 
 PhysicsBirdoEgg::PhysicsBirdoEgg(BirdoEggObject* egg, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)
-    , mUnidentified38(0)
+    , mPadding38(0)
     , mBirdoEgg(egg)
 {
     SetCategory(0x4000);
@@ -141,10 +141,10 @@ ContactType PhysicsBirdoEgg::Contact(
             QueueCollisionBirdoEggEnd(endData);
 
             CollisionEggData* crackData = 0;
-            g_UnidentifiedEventData34Pool.Allocate(crackData);
-            crackData->mUnidentified00 = 0;
-            crackData->mUnidentified04 = egg->mFielder;
-            crackData->mUnidentified08 = egg;
+            g_CollisionEggDataPool.Allocate(crackData);
+            crackData->pPlayer = 0;
+            crackData->pFielder = egg->mFielder;
+            crackData->pEgg = egg;
             crackData->m_pad0C = 0;
             crackData->m_pad10 = 0;
             QueueCollisionCrackEgg(crackData);

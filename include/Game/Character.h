@@ -322,7 +322,7 @@ public:
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[3];
     /* 0x0F8 */ cCharacterSFX* m_pCharacterSFX;
-    /* 0x0FC */ void* m_pPropModel;
+    /* 0x0FC */ void* m_pad0FC;
     /* 0x100 */ u32 m_uNormalTextureID;
     /* 0x104 */ u32 m_uSwapTextureID;
     /* 0x108 */ u32 m_uShockTextureID;
@@ -336,7 +336,7 @@ public:
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
     /* 0x164 */ float m_Dirt;
     /* 0x168 */ float m_MinDirt;
-    /* 0x16C */ int mUnidentified16C;
+    /* 0x16C */ int m_nDamageType;
     /* 0x170 */ BlurHandler* m_pBlurHandler;
     /* 0x174 */ Blinker* m_pBlinker;
     /* 0x178 */ float m_fOpacity;

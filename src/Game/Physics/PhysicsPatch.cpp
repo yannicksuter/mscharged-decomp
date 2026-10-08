@@ -252,8 +252,8 @@ ContactType PhysicsPatch::Contact(
             }
         }
         eventData = 0;
-        g_UnidentifiedEventData24Pool.Allocate(eventData);
-        eventData->mUnidentified0C = fielder;
+        g_CollisionPatchDataPool.Allocate(eventData);
+        eventData->pPlayer = fielder;
         eventData->pPatch = this;
         QueueCollisionPatchPlayer(eventData);
         return NO_CONTACT;
@@ -264,8 +264,8 @@ ContactType PhysicsPatch::Contact(
         if (m_Type == 0 && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
         {
             eventData = 0;
-            g_UnidentifiedEventData24Pool.Allocate(eventData);
-            eventData->mUnidentified0C = 0;
+            g_CollisionPatchDataPool.Allocate(eventData);
+            eventData->pPlayer = 0;
             eventData->pPatch = this;
             QueueCollisionPatchPatch(eventData);
         }
@@ -274,8 +274,8 @@ ContactType PhysicsPatch::Contact(
     case 18:
     {
         eventData = 0;
-        g_UnidentifiedEventData24Pool.Allocate(eventData);
-        eventData->mUnidentified0C = 0;
+        g_CollisionPatchDataPool.Allocate(eventData);
+        eventData->pPlayer = 0;
         eventData->pPatch = this;
         QueueCollisionPatchGround(eventData);
         return NO_CONTACT;
@@ -283,18 +283,18 @@ ContactType PhysicsPatch::Contact(
     case 20:
     {
         CollisionPatchPowerupData* data = 0;
-        g_UnidentifiedEventData30Pool.Allocate(data);
-        data->mUnidentified00 = ((PhysicsShell*)other)->m_pPowerupObject;
-        data->mUnidentified04 = this;
+        g_CollisionPatchPowerupDataPool.Allocate(data);
+        data->pPowerup = ((PhysicsShell*)other)->m_pPowerupObject;
+        data->pPatch = this;
         QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
     case 21:
     {
         CollisionPatchPowerupData* data = 0;
-        g_UnidentifiedEventData30Pool.Allocate(data);
-        data->mUnidentified00 = ((PhysicsBanana*)other)->m_pPowerupObject;
-        data->mUnidentified04 = this;
+        g_CollisionPatchPowerupDataPool.Allocate(data);
+        data->pPowerup = ((PhysicsBanana*)other)->m_pPowerupObject;
+        data->pPatch = this;
         QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
@@ -325,8 +325,8 @@ ContactType PhysicsPatch::Contact(
             case 9:
             {
                 CollisionPatchData* data = 0;
-                g_UnidentifiedEventData24Pool.Allocate(data);
-                data->mUnidentified0C = m_pOwner;
+                g_CollisionPatchDataPool.Allocate(data);
+                data->pPlayer = m_pOwner;
                 data->pPatch = this;
                 QueueCollisionPatchPatch(data);
                 break;

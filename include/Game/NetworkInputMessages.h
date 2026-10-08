@@ -77,7 +77,7 @@ public:
     /* 0x008 */ u8 mFlags;
     /* 0x009 */ u8 mPadding009[3];
     /* 0x00C */ NetMessageInput mMessages[4];
-    /* 0x3CC */ u32 mUnidentified3CC[3];
+    /* 0x3CC */ u32 mControl80Data[3];
 }; // size: 0x3D8
 
 class NetMessageAllInputsBundle : public NetworkMessage

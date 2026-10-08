@@ -31,7 +31,7 @@ struct Particle
     /* 0x28 */ nlVector3 velDir;
     /* 0x34 */ float mass;
     /* 0x38 */ float size;
-    /* 0x3C */ float m_fUnidentified03C;
+    /* 0x3C */ float mPadding03C;
     /* 0x40 */ float sizeScale;
     /* 0x44 */ float rot;
     /* 0x48 */ float dRot;

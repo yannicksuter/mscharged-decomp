@@ -35,11 +35,11 @@ public:
 
     float GetIntensity() const { return m_fIntensity; }
 
-    /* 0x60 */ u8 mUnidentified60[0x04];
+    /* 0x60 */ u8 m_pad60[0x04];
     /* 0x64 */ float m_fIntensity;
-    /* 0x68 */ u8 mUnidentified68[0x08];
+    /* 0x68 */ u8 m_pad68[0x08];
     /* 0x70 */ nlFloatColour m_colour;
-    /* 0x80 */ u8 mUnidentified80[0x10];
+    /* 0x80 */ u8 m_pad80[0x10];
 }; // size: 0x90
 
 class StadiumAttackSideIndicator : public WorldDrawable
@@ -52,7 +52,7 @@ public:
 
     /* 0x70 */ int m_nIndex;
     /* 0x74 */ int m_nVisible;
-    /* 0x78 */ u8 mUnidentified78[0x08];
+    /* 0x78 */ u8 m_pad78[0x08];
 }; // size: 0x80
 
 class StadiumToggleDrawable : public WorldDrawable
@@ -64,7 +64,7 @@ public:
     virtual void Initialize(WorldObjectLoadContext* context);
 
     /* 0x70 */ int m_nVisible;
-    /* 0x74 */ u8 mUnidentified74[0x0C];
+    /* 0x74 */ u8 m_pad74[0x0C];
 }; // size: 0x80
 
 class StadiumShadowVolumeDrawable : public WorldDrawable
@@ -76,7 +76,7 @@ public:
     virtual void Initialize(WorldObjectLoadContext* context);
 
     /* 0x70 */ glModel* m_pShadowModels[2];
-    /* 0x78 */ u8 mUnidentified78[0x08];
+    /* 0x78 */ u8 m_pad78[0x08];
 }; // size: 0x80
 
 class StadiumHighRangeDrawable : public StadiumWorldDrawable
@@ -106,7 +106,7 @@ public:
 
     /* 0x70 */ unsigned long m_uCupTrophyKey;
     /* 0x74 */ float m_fCupTrophyOpacity;
-    /* 0x78 */ u8 mUnidentified78[0x08];
+    /* 0x78 */ u8 m_pad78[0x08];
 }; // size: 0x80
 
 #endif // GAME_RENDER_STADIUM_WORLD_OBJECTS_H
