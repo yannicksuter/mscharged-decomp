@@ -2141,7 +2141,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
         if (m_DetChar.m_eCharacterClass == YOSHI)
         {
             lbl_806E12C8
-                ->CreatePatch(6, this, m_DetChar.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
+                ->CreatePatch(PATCH_YOSHI_TONGUE, this, m_DetChar.m_v3Position, v3Zero, lbl_806DB8FC, lbl_806DB900, lbl_806DB904)
                 ->SetEndRadiusTime(0.33f);
             PlaySound(m_uSoundSlotId, 0xA9AF871E, 0, 0);
         }

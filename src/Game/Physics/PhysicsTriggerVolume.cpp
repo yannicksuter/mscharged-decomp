@@ -8,19 +8,19 @@
 #include "Game/Render/SkinAnimatedMovableNPC.h"
 
 PhysicsPatchInfo gPhysicsPatchInfo[13] = {
-    { 0, "GAS BALL", "gas_cloud", 0x13062, 0, 3.0f, 0.0f, 0.1f },
-    { 1, "FIRE BALL", "bowser_fire", 0x40, 0, 0.001f, 0.0f, 0.0f },
-    { 2, "HEAVENLY LIGHT", "heavenly_light", 0x40, 0, 0.0f, 0.0f, 0.001f },
-    { 3, "MUCK BALL", "fx_mud_ball", 0x202, 0, 8.0f, 0.0f, 0.0f },
-    { 4, "MUCK HOLE", "fx_mud_hole", 0x60, 0, 0.0f, 0.15f, 0.0f },
-    { 5, "YOSHI YOKE", "yoshi_yoke", 0x60, 0, 0.0f, 0.15f, 0.0f },
-    { 6, "YOSHI TONGUE", 0, 0x40, 0, 0.0f, 0.0f, 0.0f },
-    { 7, "SHRINKER", "shrill_shrinker", 0x40, 0, 0.0f, 0.0f, 0.0f },
-    { 8, "LAVA BALL", "fx_lava_ball", 0x2, 0, 8.0f, 0.0f, 0.0f },
-    { 9, "LAVA HOLE", "fx_lava_hole", 0x60, 0, 0.0f, 0.0f, 0.0f },
-    { 10, "CHAINLIGHTNING", "fx_electric_ground_effect", 0x40, 0, 0.0f, 0.0f, 0.0f },
-    { 11, "SANDPATCH", 0, 0x40, 0, 0.0f, 0.6f, 0.0f },
-    { 12, "SPEEDER", "yoshi_yoke", 0x40, 0, 0.0f, 1.5f, 0.001f },
+    { PATCH_GAS_BALL, "GAS BALL", "gas_cloud", 0x13062, 0, 3.0f, 0.0f, 0.1f },
+    { PATCH_FIRE_BALL, "FIRE BALL", "bowser_fire", 0x40, 0, 0.001f, 0.0f, 0.0f },
+    { PATCH_HEAVENLY_LIGHT, "HEAVENLY LIGHT", "heavenly_light", 0x40, 0, 0.0f, 0.0f, 0.001f },
+    { PATCH_MUCK_BALL, "MUCK BALL", "fx_mud_ball", 0x202, 0, 8.0f, 0.0f, 0.0f },
+    { PATCH_MUCK_HOLE, "MUCK HOLE", "fx_mud_hole", 0x60, 0, 0.0f, 0.15f, 0.0f },
+    { PATCH_YOSHI_YOKE, "YOSHI YOKE", "yoshi_yoke", 0x60, 0, 0.0f, 0.15f, 0.0f },
+    { PATCH_YOSHI_TONGUE, "YOSHI TONGUE", 0, 0x40, 0, 0.0f, 0.0f, 0.0f },
+    { PATCH_SHRINKER, "SHRINKER", "shrill_shrinker", 0x40, 0, 0.0f, 0.0f, 0.0f },
+    { PATCH_LAVA_BALL, "LAVA BALL", "fx_lava_ball", 0x2, 0, 8.0f, 0.0f, 0.0f },
+    { PATCH_LAVA_HOLE, "LAVA HOLE", "fx_lava_hole", 0x60, 0, 0.0f, 0.0f, 0.0f },
+    { PATCH_CHAIN_LIGHTNING, "CHAINLIGHTNING", "fx_electric_ground_effect", 0x40, 0, 0.0f, 0.0f, 0.0f },
+    { PATCH_SAND, "SANDPATCH", 0, 0x40, 0, 0.0f, 0.6f, 0.0f },
+    { PATCH_SPEEDER, "SPEEDER", "yoshi_yoke", 0x40, 0, 0.0f, 1.5f, 0.001f },
 };
 
 PhysicsPatchInfo* GetPhysicsPatchInfo(const int& type)

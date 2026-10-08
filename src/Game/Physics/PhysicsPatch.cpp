@@ -52,7 +52,7 @@ static void UpdatePatchEffect(EmissionController& controller);
 
 inline void PhysicsPatch::KillEffect()
 {
-    if (m_Type != -1)
+    if (m_Type != PATCH_NONE)
     {
         PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
         if (info->mEffectName != 0)
@@ -73,7 +73,7 @@ inline void PhysicsPatch::KillEffect()
 
 inline void PhysicsPatch::DestroyEffect()
 {
-    if (m_Type != -1)
+    if (m_Type != PATCH_NONE)
     {
         PhysicsPatchInfo* info = GetPhysicsPatchInfo(m_Type);
         if (info->mEffectName != 0)
@@ -96,7 +96,7 @@ PhysicsPatch::PhysicsPatch()
     : PhysicsSphere(g_CollisionSpace, 0, 0.5f)
     , m_PathFinishedCallback()
     , m_PathPoints(0)
-    , m_Type(-1)
+    , m_Type(PATCH_NONE)
     , m_bVisible(false)
     , m_Gravity(0.0f)
     , m_pTarget(0)
@@ -161,13 +161,13 @@ void PhysicsPatch::InitType(const int* type)
 
     switch (m_Type)
     {
-    case 0:
-    case 2:
-    case 4:
-    case 5:
-    case 8:
-    case 9:
-    case 10:
+    case PATCH_GAS_BALL:
+    case PATCH_HEAVENLY_LIGHT:
+    case PATCH_MUCK_HOLE:
+    case PATCH_YOSHI_YOKE:
+    case PATCH_LAVA_BALL:
+    case PATCH_LAVA_HOLE:
+    case PATCH_CHAIN_LIGHTNING:
         m_pAvoidable
             = new (nlMalloc(sizeof(AvoidablePatch), 8, false))
                 AvoidablePatch(this);
@@ -182,7 +182,7 @@ void PhysicsPatch::Unknown0()
 {
     KillEffect();
 
-    m_Type = -1;
+    m_Type = PATCH_NONE;
     m_pOwner = 0;
     m_fStartRadius = 0.5f;
     m_fEndRadius = 0.5f;
@@ -229,10 +229,10 @@ ContactType PhysicsPatch::Contact(
             }
             switch (m_Type)
             {
-            case 4:
-            case 5:
-            case 9:
-            case 12:
+            case PATCH_MUCK_HOLE:
+            case PATCH_YOSHI_YOKE:
+            case PATCH_LAVA_HOLE:
+            case PATCH_SPEEDER:
             {
                 float height = gfPatchAirborneHeight;
                 if (fielder->m_DetChar.m_eCharacterClass == BOO)
@@ -261,7 +261,7 @@ ContactType PhysicsPatch::Contact(
     case PHYSOBJ_AI_BALL:
     {
         QueueCollisionPatchBall(this);
-        if (m_Type == 0 && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
+        if (m_Type == PATCH_GAS_BALL && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
         {
             eventData = 0;
             g_CollisionPatchDataPool.Allocate(eventData);
@@ -311,18 +311,18 @@ ContactType PhysicsPatch::Contact(
         return NO_CONTACT;
     }
     case PHYSOBJ_WALUIGI_WALL:
-        return m_Type == 1 ? ONE_WAY_CONTACT_THIS : NO_CONTACT;
+        return m_Type == PATCH_FIRE_BALL ? ONE_WAY_CONTACT_THIS : NO_CONTACT;
     case PHYSOBJ_WALL:
         QueueCollisionPatchWall(this);
         return NO_CONTACT;
     case PHYSOBJ_PATCH:
-        if (m_Type == 0 && !m_bKillMe)
+        if (m_Type == PATCH_GAS_BALL && !m_bKillMe)
         {
             switch (((PhysicsPatch*)other)->m_Type)
             {
-            case 1:
-            case 8:
-            case 9:
+            case PATCH_FIRE_BALL:
+            case PATCH_LAVA_BALL:
+            case PATCH_LAVA_HOLE:
             {
                 CollisionPatchData* data = 0;
                 g_CollisionPatchDataPool.Allocate(data);
@@ -433,7 +433,7 @@ bool PhysicsPatch::SetContactInfo(
 
 void PhysicsPatch::ClearMuckHole(float)
 {
-    if (m_Type == 4)
+    if (m_Type == PATCH_MUCK_HOLE)
     {
         DestroyEffect();
         Unknown0();

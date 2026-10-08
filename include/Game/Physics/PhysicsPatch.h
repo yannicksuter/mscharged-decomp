@@ -12,9 +12,27 @@ class PhysicsPatch;
 class cPlayer;
 class AvoidableObject;
 
+enum ePhysicsPatchType
+{
+    PATCH_NONE = -1,
+    PATCH_GAS_BALL = 0,
+    PATCH_FIRE_BALL = 1,
+    PATCH_HEAVENLY_LIGHT = 2,
+    PATCH_MUCK_BALL = 3,
+    PATCH_MUCK_HOLE = 4,
+    PATCH_YOSHI_YOKE = 5,
+    PATCH_YOSHI_TONGUE = 6,
+    PATCH_SHRINKER = 7,
+    PATCH_LAVA_BALL = 8,
+    PATCH_LAVA_HOLE = 9,
+    PATCH_CHAIN_LIGHTNING = 10,
+    PATCH_SAND = 11,
+    PATCH_SPEEDER = 12,
+};
+
 struct PhysicsPatchInfo
 {
-    /* 0x00 */ int mType;
+    /* 0x00 */ ePhysicsPatchType mType;
     /* 0x04 */ const char* mName;
     /* 0x08 */ const char* mEffectName;
     /* 0x0C */ unsigned int mCollisionMask;

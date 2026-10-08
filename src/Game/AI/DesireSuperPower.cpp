@@ -565,7 +565,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
                         direction, m_pFielder->m_DetChar.m_v3Velocity);
                     float radius = Interpolate(gBowserFireBallMinEndRadius, gBowserFireBallMaxEndRadius, stage);
                     float lifetime = Interpolate(gBowserFireBallMinLifetime, gBowserFireBallMaxLifetime, stage);
-                    lbl_806E12C8->CreatePatch(1, m_pFielder, pos, direction,
+                    lbl_806E12C8->CreatePatch(PATCH_FIRE_BALL, m_pFielder, pos, direction,
                         gBowserFireBallStartRadius, radius, lifetime);
                     PlayRumbleAction(1, m_pFielder->GetGlobalPad());
                 }
@@ -607,7 +607,7 @@ void EmitBowserJrShriek(DesireSuperPower* self)
     nlVec3Scale(vel, vel, gBowserJrShriekSpeed);
     nlVector3 pos = self->m_pFielder->GetJointPosition(
         self->m_pFielder->m_nHeadJointIndex);
-    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(7,
+    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_SHRINKER,
         self->m_pFielder, pos, vel,
         gBowserJrShriekStartRadius, gBowserJrShriekEndRadius, gBowserJrShriekLifetime);
     patch->SetEndRadiusTime(gBowserJrShriekEndRadiusTime);
@@ -741,7 +741,7 @@ void DesireSuperPower::EmitHeavenlyLight()
     nlVec3Scale(offset, offset, gHeavenlyLightStartRadius + gHeavenlyLightOffset);
     nlVec3Add(pos, pos, offset);
     cField::FixOutOfBoundsPosition(pos, 0.9f * gHeavenlyLightEndRadius, true);
-    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(2,
+    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_HEAVENLY_LIGHT,
         m_pFielder, pos, gSuperPowerZeroVector,
         gHeavenlyLightStartRadius, gHeavenlyLightEndRadius, gHeavenlyLightLifetime);
     patch->SetEndRadiusTime(gHeavenlyLightEndRadiusTime);
@@ -991,7 +991,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
                     direction.y = m_pFielder->m_fPeteyMuckBallSpeed * nlSin(angle);
                     direction.z = gPeteyMuckBallUpSpeed;
                     nlVec3Add(direction, direction, m_pFielder->m_DetChar.m_v3Velocity);
-                    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(3, m_pFielder,
+                    PhysicsPatch* patch = lbl_806E12C8->CreatePatch(PATCH_MUCK_BALL, m_pFielder,
                         pos, direction, gPeteyMuckBallRadius, gPeteyMuckBallRadius, 9999.0f);
                     patch->m_Gravity = gPeteyMuckBallGravity;
                 }
@@ -1555,7 +1555,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                     const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
                         m_pFielder->m_nBip01JointIndex_0xA4);
                     nlVec3Add(pos, (const nlVector3&)mat.m41, offset);
-                    lbl_806E12C8->CreatePatch(0, m_pFielder, pos, gSuperPowerZeroVector,
+                    lbl_806E12C8->CreatePatch(PATCH_GAS_BALL, m_pFielder, pos, gSuperPowerZeroVector,
                         gWarioGasStartRadius, gWarioGasEndRadius, gWarioGasLifetime);
                     PlayRumbleAction(1, m_pFielder->GetGlobalPad());
                     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("wario_ignition");
@@ -1705,7 +1705,7 @@ void HandleMuckBallCollision(void* context)
         pos.z = 0.0f;
         if (IsClearOfMuckHoles(pos) == true)
         {
-            lbl_806E12C8->CreatePatch(4, event->pPatch->m_pOwner,
+            lbl_806E12C8->CreatePatch(PATCH_MUCK_HOLE, event->pPatch->m_pOwner,
                 pos, gSuperPowerZeroVector, gPeteyMuckHoleRadius, gPeteyMuckHoleRadius, gPeteyMuckHoleLifetime);
         }
         event->pPatch->Unknown0();
