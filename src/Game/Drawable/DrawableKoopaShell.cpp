@@ -6,20 +6,12 @@
 #include "Game/Render/RLView.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
+#include "NL/nlColour.h"
 #include "NL/nlMath.h"
 #include "math.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/SharedStaticStorage.h"
 #include "Game/Field.h"
-
-// Charged-only shadow prop, third of the run described beside
-// DrawableBulletBill. The live object's translation unit spells
-// "koopa_shell_trail", and this snapshot spins the prop about Z from a 16-bit
-// angle unit. The remaining material services stay address-named.
-
-extern "C"
-{
-}
 
 static float gShadowScaleIn = 0.125f;
 static float gShadowScaleHigh = 0.125f;
@@ -29,7 +21,7 @@ static float gShadowFadeHeight = 10.0f;
 
 static void DrawShadow(const nlMatrix4& matrix, float scale)
 {
-    u8 colour[4];
+    nlColour colour;
     nlVector3 extent;
     nlVector3 position;
     nlVector3 transformed;
@@ -85,10 +77,10 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     nlMultDirVectorMatrix(transformed, extent, matrix);
 
     extent = transformed;
-    colour[0] = 255;
-    colour[1] = 255;
-    colour[2] = 255;
-    colour[3] = (u8)value;
+    colour.c[0] = 255;
+    colour.c[1] = 255;
+    colour.c[2] = 255;
+    colour.c[3] = (u8)value;
 
     nlVec3Set(quad.m_pos[0], position.x + extent.y, position.y - extent.x, position.z);
     nlVec3Set(quad.m_pos[1], position.x - extent.x, position.y - extent.y, position.z);
@@ -104,10 +96,10 @@ static void DrawShadow(const nlMatrix4& matrix, float scale)
     quad.m_uv[3].x = 1.0f;
     quad.m_uv[3].y = 0.0f;
 
-    *(u32*)&quad.m_colour[3] = *(u32*)colour;
-    *(u32*)&quad.m_colour[2] = *(u32*)colour;
-    *(u32*)&quad.m_colour[1] = *(u32*)colour;
-    *(u32*)&quad.m_colour[0] = *(u32*)colour;
+    quad.m_colour[3] = colour;
+    quad.m_colour[2] = colour;
+    quad.m_colour[1] = colour;
+    quad.m_colour[0] = colour;
 
     glSetDefaultState(true);
     glSetRasterState(GLS_AlphaBlend, 1);
