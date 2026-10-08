@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+extern struct PF_VOLUME_SET VFipf_vol_set;
+
 s32 VFiPFVOL_DoMountVolume(struct PF_VOLUME* p_vol);
 s32 VFiPFVOL_p_unmount(struct PF_VOLUME* p_vol, u32 mode);
 s32 VFiPFVOL_InitModule(u32 config, void* param);

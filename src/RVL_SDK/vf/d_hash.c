@@ -5,7 +5,6 @@ typedef struct {
     u8 arg;
 } pHashCell;
 
-extern struct PF_VOLUME_SET VFipf_vol_set;
 
 static u16 l_tmpWName[8];
 static pHashCell hashTable[31];

@@ -1,6 +1,5 @@
 #include <revolution/vf.h>
 
-extern PF_VOLUME_SET VFipf_vol_set;
 
 s32 VFiPFDRV_GetBPBInformation(u8* p_buf, struct PF_BPB* p_bpb) {
     s32 err;  // Present in DWARF but unused here.

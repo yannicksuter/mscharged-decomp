@@ -1,6 +1,5 @@
 #include <revolution/vf.h>
 
-extern PF_VOLUME_SET VFipf_vol_set;
 
 static void VFiPFFILE_Cursor_MoveToEnd(struct PF_FILE* p_file);
 static s32 VFiPFFILE_RemoveFile(struct PF_VOLUME* p_vol, struct PF_DIR_ENT* p_ent, struct PF_ENT_ITER* p_iter);

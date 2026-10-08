@@ -41,8 +41,6 @@ static struct MEMiHeapHead* l_vfsys_exp_heap_handle;
 static s32 l_vfsys_last_err;
 static u32 l_vfsys_vol_max;
 
-extern s32 VF_nand_retry_max;
-extern s32 VF_nand_sleep_msec;
 
 static s32 (*l_check_exist_file[4])(struct VF_HANDLE_DEVICE*, const s8*, void*, u32) = {
     VFSysCheckExistPrfFile_nandflash,

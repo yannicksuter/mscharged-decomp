@@ -1,6 +1,5 @@
 #include <revolution/vf.h>
 
-extern PF_VOLUME_SET VFipf_vol_set;
 
 void* VFiPFAPI_convertReturnValue2NULL(s32 err, void* p_stream);
 

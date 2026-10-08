@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+extern s32 VF_nand_retry_max;
+extern s32 VF_nand_sleep_msec;
+
 s32 VFi_NandCreate(const char* path, u8 perm, u8 attr);
 s32 VFi_NandDelete(const char* path);
 s32 VFi_NandClose(struct NANDFileInfo* info);

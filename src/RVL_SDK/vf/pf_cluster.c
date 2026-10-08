@@ -1,6 +1,5 @@
 #include <revolution/vf.h>
 
-extern PF_VOLUME_SET VFipf_vol_set;
 
 void VFiPFCLUSTER_UpdateLastAccessCluster(struct PF_FILE* p_file, u32 sector) {
     struct PF_VOLUME* p_vol;

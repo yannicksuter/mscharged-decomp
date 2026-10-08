@@ -1,6 +1,5 @@
 #include <revolution/vf.h>
 
-extern struct PF_VOLUME_SET VFipf_vol_set;
 
 static s32 VFiPFENT_RecalcEntryIterator(struct PF_ENT_ITER* p_iter, u32 may_allocate) {
     s32 err;
