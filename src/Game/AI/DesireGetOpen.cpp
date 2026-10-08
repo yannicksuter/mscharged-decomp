@@ -12,7 +12,7 @@
 float lbl_806DC090 = 6.0f;
 static unsigned short sDesireGetOpenType = 0xFFFF;
 #pragma explicit_zero_data on
-int lbl_806DC098 = DESIRE_CONTINUE;
+int gTransDesireGetOpenContinue = DESIRE_CONTINUE;
 #pragma explicit_zero_data off
 bool lbl_806E0E28;
 
@@ -69,9 +69,9 @@ void DesireGetOpen::Cleanup()
     mUnidentifiedA4 = 0;
 }
 
-extern "C" DesireUpdate fn_800B4DC0(AIContext* input)
+DesireUpdate TransDesireGetOpen(AIContext* input)
 {
-    DesireUpdate result(FT_INT, lbl_806DC098);
+    DesireUpdate result(FT_INT, gTransDesireGetOpenContinue);
     cFielder* fielder = (cFielder*)input->mData.pPlayer;
     cFielder* ballCarrier = fn_800DF790(fielder->m_pTeam);
     if (fielder->m_pBall != 0)

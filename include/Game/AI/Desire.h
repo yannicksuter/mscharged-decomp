@@ -154,7 +154,7 @@ private:
     bool mbInterceptPass;
 };
 
-extern "C" DesireUpdate fn_800B4DC0(AIContext* input);
+DesireUpdate TransDesireGetOpen(AIContext* input);
 
 class DesireGetOpen : public Desire
 {
@@ -176,7 +176,7 @@ private:
     void* mUnidentifiedA4;
 };
 
-extern "C" DesireUpdate fn_800B38AC(AIContext* input, UnidentifiedFuzzyRuntimeValue* context);
+DesireUpdate TransDesireRunToTarget(AIContext* input, Desire* desire);
 
 class DesireGetInPosition : public Desire
 {

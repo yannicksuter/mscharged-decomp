@@ -15,7 +15,7 @@
 
 float lbl_806DC0A8 = 3.0f;
 static unsigned short sDesireInterceptBallType = 0xFFFF;
-int lbl_806DC0B0 = 16;
+int gInterceptBallSlideAttackState = 16;
 
 bool DesireInterceptBall::Initialize(void* context)
 {
@@ -80,7 +80,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
             if (mbInterceptPass && fn_800D7B00(m_pFielder) >= 0.5f)
             {
                 *update = DESIRE_CHANGE;
-                update->SetParameter(8, FuzzyVariant(FT_INT, lbl_806DC0B0));
+                update->SetParameter(8, FuzzyVariant(FT_INT, gInterceptBallSlideAttackState));
             }
         }
     }

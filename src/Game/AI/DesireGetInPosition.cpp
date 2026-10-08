@@ -23,7 +23,7 @@ static unsigned short sDesireRunToTargetType = 0xFFFF;
 nlVector2 lbl_806DC078 = { 0.5f, 3.5f };
 nlVector2 lbl_806DC080 = { 4.0f, 1.0f };
 #pragma explicit_zero_data on
-int lbl_806DC088 = DESIRE_CONTINUE;
+int gTransDesireRunToTargetContinue = DESIRE_CONTINUE;
 #pragma explicit_zero_data off
 
 bool DesireGetInPosition::Initialize(void* context)
@@ -358,11 +358,10 @@ void DesireRunToTarget::Update(DesireUpdate* update, float)
     m_pFielder->SetAvoidanceMultiplier(m_fAvoidanceCoeff);
 }
 
-extern "C" DesireUpdate fn_800B38AC(AIContext* input, UnidentifiedFuzzyRuntimeValue* context)
+DesireUpdate TransDesireRunToTarget(AIContext* input, Desire* desire)
 {
-    DesireUpdate result(FT_INT, lbl_806DC088);
+    DesireUpdate result(FT_INT, gTransDesireRunToTargetContinue);
     cFielder* fielder = (cFielder*)input->mData.pPlayer;
-    Desire* desire = (Desire*)context;
     nlVector2 delta = { fielder->mUnidentified024.m_v3Position.x - desire->GetDesiredPosition().x,
         fielder->mUnidentified024.m_v3Position.y - desire->GetDesiredPosition().y };
     if (nlVec2LengthSquared(delta) < 0.7f * 0.7f)

@@ -92,7 +92,7 @@ void FielderDesireMachine::Initialize()
     AddState(4, getInPosition, false);
 
     DesireGetOpen* getOpen
-        = new (8, false) DesireGetOpen(5, (void*)fn_800B4DC0);
+        = new (8, false) DesireGetOpen(5, (void*)TransDesireGetOpen);
     AddState(5, getOpen, false);
 
     DesireHit* hit = new (8, false) DesireHit(6, (void*)TransDesireActionDone);
@@ -135,7 +135,7 @@ void FielderDesireMachine::Initialize()
     AddState(12, runInDirection, false);
 
     DesireRunToTarget* runToTarget
-        = new (8, false) DesireRunToTarget(13, (void*)fn_800B38AC);
+        = new (8, false) DesireRunToTarget(13, (void*)TransDesireRunToTarget);
     AddState(13, runToTarget, false);
 
     DesireShoot* shoot
