@@ -391,13 +391,13 @@ void RoadToStrikersCupHubScene::UpdateCupHeading()
 
     switch (cupManager->GetCurrentMode())
     {
-    case 0:
+    case CUP_FIRE:
         cupHeading->SetActiveSlide("FIRE CUP", true, false);
         break;
-    case 1:
+    case CUP_CRYSTAL:
         cupHeading->SetActiveSlide("CRYSTAL CUP", true, false);
         break;
-    case 2:
+    case CUP_STRIKER:
         cupHeading->SetActiveSlide("Slide1", true, false);
         break;
     }

@@ -101,6 +101,14 @@ struct CupProgressRecord
 void AppendCupHistoryRecord(CupHistory* history, int index, OSCalendarTime* date,
     int captain, CupSidekicks* sidekicks, TeamStats* stats, CupProgressRecord records);
 
+enum eCupType
+{
+    CUP_NONE = -1,
+    CUP_FIRE = 0,
+    CUP_CRYSTAL = 1,
+    CUP_STRIKER = 2,
+};
+
 class CupManager : public CupInterface, public nlSingleton<CupManager>
 {
 public:
