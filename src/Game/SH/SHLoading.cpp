@@ -18,6 +18,7 @@
 #include "Game/FE/feFinder_impl.h"
 #include "Game/FE/fePackage.h"
 #include "Game/FE/fePresentation.h"
+#include "Game/FE/fePresentation.inl"
 #include "Game/FE/feScene.h"
 #include "Game/FE/tlComponentInstance.h"
 #include "Game/FE/tlSlide.h"
@@ -129,9 +130,9 @@ void MatchLoadingScene::Update(float dt)
     }
 }
 
-bool LoadingSceneHasPresentation(BaseLoadingScene* scene)
+static TLSlide* GetLoadingSceneSlide(BaseLoadingScene* scene)
 {
-    return scene->GetPresentation() != 0;
+    return scene->GetPresentation()->GetActiveSlide();
 }
 
 void SuperLoadingScene::SceneCreated()
@@ -175,7 +176,7 @@ void SuperLoadingScene::SceneCreated()
 
 void BaseLoadingScene::SceneCreated()
 {
-    mTransitionComponent = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "no home");
+    mTransitionComponent = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(GetLoadingSceneSlide(this), "Layer", "no home");
     mTransitionComponent->m_bVisible = false;
 
     if (IsWidescreen())
