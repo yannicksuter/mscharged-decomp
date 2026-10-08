@@ -392,7 +392,7 @@ void ModeledScreenTransition::Cancel()
     m_Effects = NULL;
 }
 
-// The original parser does not define a return value; callers discard it.
+// The current caller discards the result.
 #pragma warning off(10184) // return value expected
 ModeledScreenTransition* ModeledScreenTransition::LoadFromParser(
     SimpleParser* parser)
