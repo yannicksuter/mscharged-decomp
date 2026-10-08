@@ -353,7 +353,7 @@ inline void Goalie::StartStun()
     bool bHumanControlled = GetGlobalPad() != 0;
     if (bHumanControlled)
     {
-        PlayRumbleAction(1, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         SwapController(false);
     }
 }
@@ -746,7 +746,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             unsigned short aHit = RadToAng16(nlATan2f(y, x));
             bool bHitReactResult = pFldr->fn_80047240(this, aHit, 1, false, false);
             if (bHitReactResult)
-                PlayRumbleAction(1, GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             mnSubstate = 6;
             nlVector3 v3LocalPos;
             GetLocalPoint(v3LocalPos, pPlayer->m_DetChar.m_v3Position,
@@ -3391,7 +3391,7 @@ void Goalie::FumbleBall()
     bool bHumanControlled = GetGlobalPad() != NULL;
     if (bHumanControlled)
     {
-        PlayRumbleAction(1, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         SwapController(false);
     }
 }
@@ -3840,7 +3840,7 @@ void Goalie::DoPassRelease()
     v3Velocity.x = v3Direction.x * fXYMag;
     v3Velocity.y = v3Direction.y * fXYMag;
     v3Velocity.z = fSin * fShotSpeed;
-    PlayRumbleAction(1, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
     ReleaseBall(0);
     g_pBall->ShootRelease(v3Velocity, spinType);
     SetNoPickUpTime(0.25f);
@@ -4110,7 +4110,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
             nlVec3Scale(v3Velocity, fScale);
             pFielder->fn_80044148(v3Velocity);
             EmitTackleImpact(pFielder);
-            PlayRumbleAction(3, pFielder->GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SOLID_CONTACT, pFielder->GetGlobalPad());
         }
         if (bReleased)
         {

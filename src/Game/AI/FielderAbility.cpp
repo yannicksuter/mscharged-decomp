@@ -76,7 +76,7 @@ void cFielder::DoDKSuperHit()
         gDKSuperHitTiltScale * m_DetChar.m_v3Position.x);
     CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), gDKSuperShockwaveRadius);
-    PlayRumbleAction(4, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
 }
 
 void cFielder::ActionDKSuper(float fDeltaT)

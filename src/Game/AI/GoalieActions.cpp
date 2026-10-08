@@ -1405,7 +1405,7 @@ void Goalie::ClearSavedMegaStrikeBall(MegaBallIndicator* pState)
 
         PlaySound(0, 0xE335EFF5, 0, 0);
         PlaySound(0, 0x848EBDEB, 0, 0);
-        PlayRumbleAction(1, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
     }
 
     for (unsigned int i = 0;
@@ -1685,7 +1685,7 @@ void Goalie::ActionMegaStrike(float deltaTime)
             else
                 mfWaitTime = gfMegaHighAccuracyCountdown;
             if (input != 0)
-                PlayRumbleAction(1, input);
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, input);
             gMegaBallTimerVisible = true;
         }
         break;
@@ -2268,7 +2268,7 @@ void Goalie::ActionMove(float deltaTime)
         if (m_pBall != 0)
         {
             DetInput* pGlobalPad = GetGlobalPad();
-            PlayRumbleAction(1, pGlobalPad);
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, pGlobalPad);
             ReleaseBall(0);
         }
         SetNoPickUpTime(0.2f);
@@ -3900,7 +3900,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
 
             if (m_pBall != 0)
             {
-                PlayRumbleAction(1, GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
                 ReleaseBall(false);
             }
 
@@ -4073,7 +4073,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
 
         if (m_pBall != 0)
         {
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             ReleaseBall(false);
         }
 
@@ -6388,7 +6388,7 @@ void Goalie::ActionSTSPursue(float fDeltaT)
 
         if (m_pBall != 0)
         {
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6470,7 +6470,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
 
         if (m_pBall != 0)
         {
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6601,7 +6601,7 @@ void Goalie::InitActionShockwaveReact()
 
         if (m_pBall != 0)
         {
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6676,7 +6676,7 @@ void Goalie::InitActionDazed(bool bParam)
 
         if (m_pBall != 0)
         {
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             ReleaseBall(0);
         }
 
@@ -6815,7 +6815,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     SetPlayerAudioController(this);
     PlaySound(0, 0xCC32C1A8, 0, 0);
     if (GetGlobalPad() != 0)
-        PlayRumbleAction(1, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
 
     mpShootToScoreCamera = new (8, false) cShootToScoreCamera();
     float netX = m_pTeam->m_pNet->m_v3NetLocation.x;

@@ -645,7 +645,7 @@ void cTeam::UpdateTeamAI(float fDeltaT)
             {
                 u16 angle = (u16)nlRandom(0xFFFF, &nlDefaultSeed);
                 ShootToScoreMeter::instance.RumbleMeter(angle);
-                PlayRumbleAction(1, pBallOwner->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, pBallOwner->GetGlobalPad());
             }
         }
     }

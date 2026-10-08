@@ -1777,7 +1777,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             pAttackData->nHitReaction = nHitReaction;
             pAttackData->bIsSlideAttack = false;
             QueueAttackSuccessEvent(g_pGame, pAttackData);
-            PlayRumbleAction(2, pFielderCollidedWith->GetGlobalPad());
+            PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pFielderCollidedWith->GetGlobalPad());
         }
         else if (pFielderCollidedWith->IsSlideAttacking() && m_eActionState != ACTION_HIT)
         {
@@ -2056,7 +2056,7 @@ void cFielder::CollideWithShockwaveCallback(const nlVector3& position)
             g_pBall->ShootRelease(velocity, SPINTYPE_NONE);
         }
         InitActionBombHitReact(position);
-        PlayRumbleAction(3, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
     }
 }
 
@@ -2108,7 +2108,7 @@ void cFielder::CollideWithWindDebrisCallback(WindDebris* debris)
         }
         fn_80044148(velocity);
         PlaySound(11, debris->mImpactSoundCue, 0, 0);
-        PlayRumbleAction(3, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
         EmitTackleImpact(this);
     }
 }
@@ -2141,7 +2141,7 @@ void cFielder::CollideWithThwompCallback(CollisionThwompPlayerData* event)
             }
             else
                 InitActionKnockdownReact(direction);
-            PlayRumbleAction(3, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
         }
     }
 }
@@ -2239,7 +2239,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 ShootBallDueToContact(eventData->pPatch->m_Velocity);
             }
             fn_8004E11C(gFirePatchBurnDuration);
-            PlayRumbleAction(2, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
         }
     }
     else if (type == 0)
@@ -2365,14 +2365,14 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 {
                     fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, 0, false, false);
                     PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
-                    PlayRumbleAction(2, pOwner->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
                 fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, 1, false, true);
                 PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
-                PlayRumbleAction(2, pOwner->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pOwner->GetGlobalPad());
             }
         }
     }
@@ -2386,7 +2386,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && m_eActionState != (eFielderActionState)0x18
             && m_eActionState != (eFielderActionState)0x23)
         {
-            PlayRumbleAction(3, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
             nlVector3 v3KnockbackVelocity = m_DetChar.m_v3Velocity;
             v3KnockbackVelocity.z = 25.0f;
             fn_80044148(v3KnockbackVelocity);
@@ -2399,7 +2399,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && !IsYoshiSuperPowerActive() && !IsInvincible()
             && !IsCharacterInAir(eventData->pPatch->GetRadius()))
         {
-            PlayRumbleAction(3, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
             nlVector3 v3Start;
             nlVec3ScaleAdd(v3Start, -100.0f,
                 eventData->pPatch->fn_80173CCC(),

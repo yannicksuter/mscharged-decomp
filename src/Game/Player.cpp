@@ -620,12 +620,12 @@ void cPlayer::PickupBall(cBall* pBall)
         if (!bOneTouchShot)
         {
             EmitBallImpact(this, false);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
     }
     else if (m_eClassType != GOALIE || ((Goalie*)this)->mGoalieActionState != 26)
     {
-        PlayRumbleAction(1, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
     }
     if (m_eClassType == FIELDER)
         ((cFielder*)this)->m_pShotMeter->Abort();
@@ -1214,7 +1214,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
             if (pOwner != NULL && pOwner != pSelf && !pSelf->IsOnSameTeam(pOwner))
             {
                 ShootToScoreMeter::instance.RumbleMeter(aDirection);
-                PlayRumbleAction(1, pOwner->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, pOwner->GetGlobalPad());
             }
         }
     }

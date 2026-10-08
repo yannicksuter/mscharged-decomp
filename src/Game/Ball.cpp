@@ -2862,14 +2862,14 @@ void OnBallGetReadyForKickoff(void*)
     {
         SetPlayerAudioController(pCaptain);
         PlaySound(0, 0xCC32C1A8, NULL, NULL);
-        PlayRumbleAction(1, pCaptain->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, pCaptain->GetGlobalPad());
     }
 
     if (pOtherCaptain->GetGlobalPad() != NULL)
     {
         SetPlayerAudioController(pOtherCaptain);
         PlaySound(0, 0xCC32C1A8, NULL, NULL);
-        PlayRumbleAction(1, pOtherCaptain->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, pOtherCaptain->GetGlobalPad());
     }
 
     if ((g_pTeams[0]->m_nScore > 0 || g_pTeams[1]->m_nScore > 0)

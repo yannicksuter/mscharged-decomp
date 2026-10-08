@@ -242,7 +242,7 @@ void ChainChomp::Update(float fDeltaT)
                         cFielder* pFielder = pTeam->GetFielder(j);
                         if (pFielder != 0)
                         {
-                            PlayRumbleAction(3, pFielder->GetGlobalPad());
+                            PlayRumbleAction(RUMBLE_SOLID_CONTACT, pFielder->GetGlobalPad());
                         }
                     }
                 }

@@ -567,7 +567,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
                     float lifetime = Interpolate(gBowserFireBallMinLifetime, gBowserFireBallMaxLifetime, stage);
                     lbl_806E12C8->CreatePatch(PATCH_FIRE_BALL, m_pFielder, pos, direction,
                         gBowserFireBallStartRadius, radius, lifetime);
-                    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, m_pFielder->GetGlobalPad());
                 }
             }
             else
@@ -611,7 +611,7 @@ void EmitBowserJrShriek(DesireSuperPower* self)
         self->m_pFielder, pos, vel,
         gBowserJrShriekStartRadius, gBowserJrShriekEndRadius, gBowserJrShriekLifetime);
     patch->SetEndRadiusTime(gBowserJrShriekEndRadiusTime);
-    PlayRumbleAction(1, self->m_pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, self->m_pFielder->GetGlobalPad());
     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup(
         "bowserjr_shriek_mouth");
     if (group != 0)
@@ -745,7 +745,7 @@ void DesireSuperPower::EmitHeavenlyLight()
         m_pFielder, pos, gSuperPowerZeroVector,
         gHeavenlyLightStartRadius, gHeavenlyLightEndRadius, gHeavenlyLightLifetime);
     patch->SetEndRadiusTime(gHeavenlyLightEndRadiusTime);
-    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, m_pFielder->GetGlobalPad());
 }
 
 /**
@@ -1557,7 +1557,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                     nlVec3Add(pos, (const nlVector3&)mat.m41, offset);
                     lbl_806E12C8->CreatePatch(PATCH_GAS_BALL, m_pFielder, pos, gSuperPowerZeroVector,
                         gWarioGasStartRadius, gWarioGasEndRadius, gWarioGasLifetime);
-                    PlayRumbleAction(1, m_pFielder->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, m_pFielder->GetGlobalPad());
                     EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("wario_ignition");
                     if (group != 0)
                     {

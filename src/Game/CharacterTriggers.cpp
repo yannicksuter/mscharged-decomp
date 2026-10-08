@@ -550,7 +550,7 @@ void EmitBallShot(cFielder* pCharacter,
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_meteor");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
-        PlayRumbleAction(2, pCharacter->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_REGULAR_SHOT:
@@ -560,7 +560,7 @@ void EmitBallShot(cFielder* pCharacter,
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_drybones");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
         g_pBall->InitiateBallBlur(eNewBallEffect, 0);
-        PlayRumbleAction(2, pCharacter->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_ONETIMER_SHOT:
@@ -569,7 +569,7 @@ void EmitBallShot(cFielder* pCharacter,
         KillBallGlow();
         static unsigned long uHash = nlStringLowerHash("skillshot_ball_boo");
         pGlowControl = CreateBallEffect(uHash, g_pBall);
-        PlayRumbleAction(2, pCharacter->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pCharacter->GetGlobalPad());
         break;
     }
     case BALL_EFFECT_S2S_SHOT:
@@ -694,12 +694,12 @@ static bool isEffectOn;
 
 void EmitSmallRumble(cPlayer* pPlayer)
 {
-    PlayRumbleAction(1, pPlayer->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pPlayer->GetGlobalPad());
 }
 
 void EmitMediumRumble(cPlayer* pPlayer)
 {
-    PlayRumbleAction(2, pPlayer->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pPlayer->GetGlobalPad());
 }
 
 void EmitDivot(cCharacter* pCharacter)
@@ -866,7 +866,7 @@ void EmitFreeze(cPlayer* pCharacter)
     pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
     pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
-    PlayRumbleAction(1, pCharacter->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pCharacter->GetGlobalPad());
     pCharacter->m_pEffectsTexturing = fxGetTexturing(eFXTex_Freeze);
 }
 
@@ -888,7 +888,7 @@ void EmitUnFreeze(cPlayer* pCharacter)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, pCharacter->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pCharacter->GetGlobalPad());
 }
 
 void EmitYoshiShellBreak(cCharacter* pCharacter)
@@ -1325,7 +1325,7 @@ void CreateMushroomEffect(cFielder* pFielder)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pFielder->GetGlobalPad());
 }
 
 void EmitMushroom(cFielder* pFielder, bool bReinitialize)
@@ -1352,7 +1352,7 @@ void EmitMushroom(cFielder* pFielder, bool bReinitialize)
             pFielder);
         tDebugPrintManager::Print(DC_SOUND, "***EmitMushroom()***\n");
     }
-    PlayRumbleAction(1, pFielder->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pFielder->GetGlobalPad());
 }
 
 void KillMushroom(cFielder* pFielder)
@@ -1418,7 +1418,7 @@ void EmitPullHeadOut(cCharacter* pPlayer)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, ((cPlayer*)pPlayer)->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, ((cPlayer*)pPlayer)->GetGlobalPad());
 }
 
 void EmitPushHeadIn(cPlayer* pPlayer)
@@ -1433,7 +1433,7 @@ void EmitLanding(cCharacter* pCharacter)
     {
         if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
-            PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
+            PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, ((cPlayer*)pCharacter)->GetGlobalPad());
 
             const char* szEffectName = "landing_big";
             EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
@@ -1510,7 +1510,7 @@ void EmitHitTrail(cCharacter* pCharacter)
 
         if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
-            PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
+            PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, ((cPlayer*)pCharacter)->GetGlobalPad());
         }
     }
 }
@@ -1721,7 +1721,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
             cFielder* pFielder = pTeam->GetFielder(i);
             if (pFielder->GetGlobalPad())
             {
-                PlayRumbleAction(1, pFielder->GetGlobalPad());
+                PlayRumbleAction(RUMBLE_SMALL_CONTACT, pFielder->GetGlobalPad());
             }
         }
     }
@@ -2025,7 +2025,7 @@ void EmitDKDeke(cCharacter* pCharacter)
             UpdateEmitterFromCharacter);
         pController->SetUpdateCallback(update2);
     }
-    PlayRumbleAction(1, ((cPlayer*)pCharacter)->GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, ((cPlayer*)pCharacter)->GetGlobalPad());
 }
 
 void SetEffectsGroupFountainLife(EffectsGroup* group, float life)

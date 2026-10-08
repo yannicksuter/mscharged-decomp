@@ -1492,7 +1492,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
     m_bGroundElectrocution = true;
     EmitElectrocution(this);
 
-    PlayRumbleAction(4, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
 
     bool bIsCaptain = IsCaptain();
     unsigned long soundID = 0xBADF0EF9;
@@ -1555,7 +1555,7 @@ void cFielder::ActionElectrocution(float dt)
 
             EndElectrocution(this);
             InitMovementCoast();
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         break;
     }
@@ -1584,7 +1584,7 @@ void cFielder::ActionElectrocution(float dt)
             }
             InitMovementFromAnim(0, v3Zero, 0.0f, false);
             EmitElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         else
         {
@@ -1605,17 +1605,17 @@ void cFielder::ActionElectrocution(float dt)
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9AC))
         {
             EndElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B0))
         {
             EmitElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
         if (m_pCurrentAnimController->TestTrigger(lbl_806DB9B4))
         {
             EndElectrocution(this);
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
 
         if (ShouldStartCrossBlend(4))
@@ -2361,13 +2361,13 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     switch (nReact)
     {
     case 0:
-        PlayRumbleAction(2, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
         break;
     case 1:
-        PlayRumbleAction(3, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
         break;
     case 2:
-        PlayRumbleAction(4, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
         break;
     }
 
@@ -3306,7 +3306,7 @@ void cFielder::DoMegaMeterFirstButtonPressEvent(int nParam)
 
     m_fLocalMegaStrikeNumBalls = (float)(s32)GetMegaStrikeShotCount(this, 0);
 
-    PlayRumbleAction(1, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
 
     MegaStrikeMeterData event;
     event.pFielder = this;
@@ -3361,19 +3361,19 @@ void cFielder::DoMegaMeterSecondButtonPressEvent(int nParam)
             {
                 if (m_fLocalMegaStrikeAccuracy >= 1.0f)
                 {
-                    PlayRumbleAction(3, pPlayer->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SOLID_CONTACT, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xD17A65BA, 0, 0);
                 }
                 else if (m_fLocalMegaStrikeAccuracy >= 0.0f)
                 {
-                    PlayRumbleAction(2, pPlayer->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xCC2F680B, 0, 0);
                 }
                 else
                 {
-                    PlayRumbleAction(1, pPlayer->GetGlobalPad());
+                    PlayRumbleAction(RUMBLE_SMALL_CONTACT, pPlayer->GetGlobalPad());
                     SetPlayerAudioController(pPlayer);
                     PlaySound(0, 0xCC36B742, 0, 0);
                 }
@@ -3834,7 +3834,7 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
         ShootBallDueToContact(m_DetChar.m_aActualFacingDirection);
     }
 
-    PlayRumbleAction(2, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_BANANA_REACT);
@@ -3866,7 +3866,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
     EndDaze();
     fn_8009750C();
 
-    PlayRumbleAction(2, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_SHELL_REACT);
@@ -4208,7 +4208,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 
 void cFielder::fn_8004BB80(float fDeltaT)
 {
-    PlayRumbleAction(1, GetGlobalPad());
+    PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
 
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
     nlVector3 v3Delta;
@@ -4626,7 +4626,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime == 0 || bDecelerateEarly)
         {
-            PlayRumbleAction(1, GetGlobalPad());
+            PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             m_eSlideAttackState = 1;
             m_DetPlayer.m_tSlideAttackTimer.SetSeconds(GetSlideDecelTime(this->GetTweaks()));
         }
@@ -4717,7 +4717,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
         m_DetChar.m_aActualMovementDirection = polar.a;
         m_DetChar.m_fDesiredSpeed = 0.0f;
 
-        PlayRumbleAction(2, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
         if (IsBowserSuperPowerActive(this))
         {
@@ -4768,7 +4768,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
 
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
-        PlayRumbleAction(2, GetGlobalPad());
+        PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
 
         if (pAttacker->m_eClassType == FIELDER && !bSkipEvent
             && pAttacker != this && bHadBall)
@@ -4794,7 +4794,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
             }
         }
 
-        PlayRumbleAction(1, pAttacker->GetGlobalPad());
+        PlayRumbleAction(RUMBLE_SMALL_CONTACT, pAttacker->GetGlobalPad());
         PlaySound(0, 0x57208DA, 0, 0);
         m_DetChar.m_fDesiredSpeed = 0.0f;
     }
