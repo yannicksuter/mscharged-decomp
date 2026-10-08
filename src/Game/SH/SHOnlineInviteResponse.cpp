@@ -35,9 +35,9 @@ SHOnlineInviteResponse::~SHOnlineInviteResponse()
 }
 
 SHOnlineInviteResponse::SHOnlineInviteResponse()
-    : mSelectedAction(0)
+    : mSelectedAction(INVITE_RESPONSE_ALONE)
     , mButtonsInitialized(0)
-    , mState(0)
+    , mState(INVITE_RESPONSE_ENTERING)
 {
     for (int i = 0; i < 4; ++i)
         mButtons[i].mContext = (void*)i;
@@ -76,7 +76,7 @@ void SHOnlineInviteResponse::SceneCreated()
 void SHOnlineInviteResponse::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == INVITE_RESPONSE_ENTERING || mState == INVITE_RESPONSE_EXITING_FORWARD || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -85,13 +85,13 @@ void SHOnlineInviteResponse::Update(float fDeltaT)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (mState == 0)
+        if (mState == INVITE_RESPONSE_ENTERING)
         {
             InitializeButtons();
             mButtonsInitialized = 1;
-            mState = 1;
+            mState = INVITE_RESPONSE_READY;
         }
-        else if (mState == 2)
+        else if (mState == INVITE_RESPONSE_EXITING_FORWARD)
         {
             ApplySelectedAction();
             return;
@@ -157,7 +157,7 @@ void SHOnlineInviteResponse::OnPointerPress(unsigned int, void* context)
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     mSelectedAction = (int)context;
-    mState = 2;
+    mState = INVITE_RESPONSE_EXITING_FORWARD;
     mPresentation->SetActiveSlide("out", true);
     mPresentation->Update(0.0f);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
@@ -199,19 +199,19 @@ void SHOnlineInviteResponse::ApplySelectedAction()
 {
     switch (mSelectedAction)
     {
-    case 0:
+    case INVITE_RESPONSE_ALONE:
         tDebugPrintManager::Print(DC_NETWORK, "Respond invitation Alone\n");
         SetOnlineTwoLocalPlayers(false);
         JoinOnlineFriendInvitation();
         break;
-    case 1:
+    case INVITE_RESPONSE_WITH_GUEST:
     {
         GameSceneManager::Instance()->Push(SCENE_ONLINE_GUEST_CONTROLLER_SELECT, SCREEN_FORWARD, true);
         SHOnlineGuestControllerSelect* scene = (SHOnlineGuestControllerSelect*)GameSceneManager::Instance()->GetScene(SCENE_ONLINE_GUEST_CONTROLLER_SELECT);
         scene->mRespondingToInvitation = true;
         break;
     }
-    case 2:
+    case INVITE_RESPONSE_DECLINE:
     {
         g_pFriendManager->SetOwnStatusDecline(g_pFriendManager->mHostInvitationIndex);
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_STATUS, SCREEN_FORWARD, true);
@@ -221,7 +221,7 @@ void SHOnlineInviteResponse::ApplySelectedAction()
         tDebugPrintManager::Print(DC_NETWORK, "Respond invitation Decline\n");
         break;
     }
-    case 3:
+    case INVITE_RESPONSE_PREVIEW:
         tDebugPrintManager::Print(DC_NETWORK, "Preview Invitation\n");
         GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PREVIEW, SCREEN_FORWARD, true);
         break;

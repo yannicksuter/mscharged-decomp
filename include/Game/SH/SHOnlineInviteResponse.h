@@ -6,6 +6,21 @@
 
 class TLComponentInstance;
 
+enum eOnlineInviteResponseState
+{
+    INVITE_RESPONSE_ENTERING = 0,
+    INVITE_RESPONSE_READY = 1,
+    INVITE_RESPONSE_EXITING_FORWARD = 2,
+};
+
+enum eOnlineInviteResponseAction
+{
+    INVITE_RESPONSE_ALONE = 0,
+    INVITE_RESPONSE_WITH_GUEST = 1,
+    INVITE_RESPONSE_DECLINE = 2,
+    INVITE_RESPONSE_PREVIEW = 3,
+};
+
 class SHOnlineInviteResponse : public BaseSceneHandler
 {
 public:
