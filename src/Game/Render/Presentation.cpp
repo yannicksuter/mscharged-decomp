@@ -48,7 +48,7 @@
 #include "Game/Task/GameRenderTask.h"
 #include "Game/Transitions/ScreenTransitionManager.h"
 #include "Game/AI/Fielder.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/Team.h"
 #include "Game/Render/NumberDisplay.h"
 #include "Game/TweakQuery.h"

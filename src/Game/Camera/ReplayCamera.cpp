@@ -1,7 +1,7 @@
 #include "Game/Camera/ReplayCamera.h"
 #include "Game/Camera/CameraDamping.h"
 #include "Game/Camera/CameraMan.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"

@@ -1,6 +1,6 @@
 #include "Game/Camera/GameplayCam.h"
 #include "Game/Camera/CameraDamping.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/Ball.h"

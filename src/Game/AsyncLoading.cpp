@@ -40,7 +40,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/EventRegistry.h"
 #include "Game/ExcitementSystem.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/Render/Presentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feModelManager.h"

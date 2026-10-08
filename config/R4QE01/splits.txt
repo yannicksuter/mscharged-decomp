@@ -688,7 +688,7 @@ Game/Camera/ShootToScoreCam.cpp:
 	.data       start:0x805054A8 end:0x805054D0
 	.sdata2     start:0x806E4570 end:0x806E4590
 
-Game/Camera/tu_800F9460.cpp:
+Game/Camera/GameplayCameraEffects.cpp:
 	.text       start:0x800F9460 end:0x800FBBA0
 	.ctors      start:0x804DB5CC end:0x804DB5D0
 	.rodata     start:0x804DC548 end:0x804DC558

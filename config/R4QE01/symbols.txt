@@ -3477,7 +3477,7 @@ __dt__Q230Function1<v,P14GoalieSaveData>152FunctorImpl<136BindExp2<v,Q26Detail67
 __dt__Q235Function1<v,P19MegaStrikeMeterData>157FunctorImpl<141BindExp2<v,Q26Detail72MemFunImpl<v,M25UnidentifiedCameraEffectsFPCvPvP19MegaStrikeMeterData_v>,P25UnidentifiedCameraEffects,14Placeholder<0>>>Fv = .text:0x800FBAB4; // type:function size:0x44
 __dt__Q212Function0<v>118FunctorImpl<102BindExp1<v,Q26Detail50MemFunImpl<v,M25UnidentifiedCameraEffectsFPCvPv_v>,P25UnidentifiedCameraEffects>>Fv = .text:0x800FBAF8; // type:function size:0x44
 __dt__Q230Function1<v,P14GoalScoredData>152FunctorImpl<136BindExp2<v,Q26Detail67MemFunImpl<v,M25UnidentifiedCameraEffectsFPCvPvP14GoalScoredData_v>,P25UnidentifiedCameraEffects,14Placeholder<0>>>Fv = .text:0x800FBB3C; // type:function size:0x44
-__sinit_\tu_800F9460_cpp = .text:0x800FBB80; // type:function size:0x20 scope:local
+__sinit_\GameplayCameraEffects_cpp = .text:0x800FBB80; // type:function size:0x20 scope:local
 __ct__13BasicGameInfoFv = .text:0x800FBBA0; // type:function size:0x110 scope:global align:4
 Reset__13BasicGameInfoFb = .text:0x800FBCB0; // type:function size:0xB0 scope:global align:4
 GetCharacterInfo__Fi = .text:0x800FBD60; // type:function size:0x34 scope:global align:4

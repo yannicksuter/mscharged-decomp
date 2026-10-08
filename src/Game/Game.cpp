@@ -24,7 +24,7 @@
 #include "Game/BaseGameSceneManager.h"
 #include "Game/OverlayManager.h"
 #include "Game/OverlayHandlerHUD.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/EventDataTypes.h"
 #include "Game/Field.h"
