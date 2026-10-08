@@ -31,10 +31,14 @@ public:
     virtual bool Initialize(void*);
     virtual bool Reinitialize(void*);
     virtual void Cleanup();
-    virtual void Update(DesireUpdate*, float);
+    virtual void Update(DesireUpdate*, float)
+    {
+    }
     virtual void SetContext(ScriptMachine*);
     virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
     virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+
+    const nlVector3& GetDesiredPosition() const { return mvDesiredPosition; }
 
 protected:
     cFielder* GetFielder() const { return m_pFielder; }
@@ -86,8 +90,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
     void* mUnidentifiedA4;
@@ -106,8 +110,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
     void* mUnidentifiedA4;
@@ -125,8 +129,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
 class DesireInterceptBall : public Desire
@@ -137,16 +141,17 @@ public:
     {
     }
 
-    virtual ~DesireInterceptBall();
+    virtual inline ~DesireInterceptBall();
 
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
-    u8 mUnidentifiedA4[0x08];
+    int meDesireSubState;
+    bool mbInterceptPass;
 };
 
 extern "C" DesireUpdate fn_800B4DC0(AIContext* input);
@@ -159,13 +164,13 @@ public:
     {
     }
 
-    virtual ~DesireGetOpen();
+    virtual inline ~DesireGetOpen();
 
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
     void* mUnidentifiedA4;
@@ -173,33 +178,52 @@ private:
 
 extern "C" DesireUpdate fn_800B38AC(AIContext* input, UnidentifiedFuzzyRuntimeValue* context);
 
-class DesireRunToTarget : public Desire
+class DesireGetInPosition : public Desire
 {
 public:
-    DesireRunToTarget(int state, void* function)
+    DesireGetInPosition(int state, void* function)
         : Desire(state, NativeTransitionFunc(function))
     {
     }
 
-    virtual ~DesireRunToTarget();
+    virtual ~DesireGetInPosition();
 
     virtual bool Initialize(void*);
-    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
 
-    cBall* GetTargetBall() const { return m_pTargetBall; }
+class DesireRunUpfield : public Desire
+{
+public:
+    DesireRunUpfield(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
+    {
+    }
 
-private:
-    cFielder* m_pTargetFielder;
-    cBall* m_pTargetBall;
-    nlVector3 m_vTargetPos;
-    int m_eDirection;
-    float m_fDistOffset;
-    float m_fUrgency;
-    float m_fSpeedCoeff;
-    float m_fAvoidanceCoeff;
+    virtual ~DesireRunUpfield();
+
+    virtual bool Initialize(void*);
+    virtual void Update(DesireUpdate*, float);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+};
+
+class DesireRunDownfield : public Desire
+{
+public:
+    DesireRunDownfield(int state, void* function)
+        : Desire(state, NativeTransitionFunc(function))
+    {
+    }
+
+    virtual ~DesireRunDownfield();
+
+    virtual bool Initialize(void*);
+    virtual void Update(DesireUpdate*, float);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 };
 
 class DesireRunInDirection : public Desire
@@ -218,8 +242,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
 private:
     unsigned short m_aDirection;
@@ -230,52 +254,33 @@ private:
     cFielder* m_pTarget;
 };
 
-class DesireRunDownfield : public Desire
+class DesireRunToTarget : public Desire
 {
 public:
-    DesireRunDownfield(int state, void* function)
+    DesireRunToTarget(int state, void* function)
         : Desire(state, NativeTransitionFunc(function))
     {
     }
 
-    virtual ~DesireRunDownfield();
+    virtual ~DesireRunToTarget();
 
     virtual bool Initialize(void*);
+    virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
-};
+    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
+    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
 
-class DesireRunUpfield : public Desire
-{
-public:
-    DesireRunUpfield(int state, void* function)
-        : Desire(state, NativeTransitionFunc(function))
-    {
-    }
+    cBall* GetTargetBall() const { return m_pTargetBall; }
 
-    virtual ~DesireRunUpfield();
-
-    virtual bool Initialize(void*);
-    virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
-};
-
-class DesireGetInPosition : public Desire
-{
-public:
-    DesireGetInPosition(int state, void* function)
-        : Desire(state, NativeTransitionFunc(function))
-    {
-    }
-
-    virtual ~DesireGetInPosition();
-
-    virtual bool Initialize(void*);
-    virtual void Update(DesireUpdate*, float);
-    virtual void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual void UnidentifiedVirtual8(void*, DebugWriteCache*);
+private:
+    cFielder* m_pTargetFielder;
+    cBall* m_pTargetBall;
+    nlVector3 m_vTargetPos;
+    int m_eDirection;
+    float m_fDistOffset;
+    float m_fUrgency;
+    float m_fSpeedCoeff;
+    float m_fAvoidanceCoeff;
 };
 
 class DesireMark : public Desire

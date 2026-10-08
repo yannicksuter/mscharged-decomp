@@ -354,13 +354,49 @@ Game/WeatherData.cpp:
 	.sdata2     start:0x806E3EA0 end:0x806E3EA8
 
 Game/AI/Desire.cpp:
-	.text       start:0x800B053C end:0x800B6DC0
-	.ctors      start:0x804DB560 end:0x804DB564
+	.text       start:0x800B053C end:0x800B0904
+	.data       start:0x80501630 end:0x80501738
+	.sdata      start:0x806DC048 end:0x806DC058
+	.sdata2     start:0x806E3EA8 end:0x806E3EB8
+
+Game/AI/DesireCutAndBreak.cpp:
+	.text       start:0x800B0904 end:0x800B0E98
+	.data       start:0x80501738 end:0x80501778
+	.sdata      start:0x806DC058 end:0x806DC060
+	.sbss       start:0x806E0E20 end:0x806E0E28
+	.sdata2     start:0x806E3EB8 end:0x806E3EC8
+
+Game/AI/DesireDeke.cpp:
+	.text       start:0x800B0E98 end:0x800B1E98
+	.data       start:0x80501778 end:0x80501800
+	.sdata      start:0x806DC060 end:0x806DC068
+	.sdata2     start:0x806E3EC8 end:0x806E3EF8
+
+Game/AI/DesireGetInPosition.cpp:
+	.text       start:0x800B1E98 end:0x800B4B58
 	.rodata     start:0x804DC180 end:0x804DC190
-	.data       start:0x80501630 end:0x80501B10
-	.sdata      start:0x806DC048 end:0x806DC0B8 align:4
-	.sbss       start:0x806E0E20 end:0x806E0E30
-	.sdata2     start:0x806E3EA8 end:0x806E3F58
+	.data       start:0x80501800 end:0x80501A18
+	.sdata      start:0x806DC068 end:0x806DC090
+	.sdata2     start:0x806E3EF8 end:0x806E3F30
+
+Game/AI/DesireGetOpen.cpp:
+	.text       start:0x800B4B58 end:0x800B5960
+	.data       start:0x80501A18 end:0x80501A58
+	.sdata      start:0x806DC090 end:0x806DC0A0
+	.sbss       start:0x806E0E28 end:0x806E0E30
+	.sdata2     start:0x806E3F30 end:0x806E3F40
+
+Game/AI/DesireHit.cpp:
+	.text       start:0x800B5960 end:0x800B5B9C
+	.data       start:0x80501A58 end:0x80501A90
+	.sdata      start:0x806DC0A0 end:0x806DC0A8
+
+Game/AI/DesireInterceptBall.cpp:
+	.text       start:0x800B5B9C end:0x800B6DC0
+	.ctors      start:0x804DB560 end:0x804DB564
+	.data       start:0x80501A90 end:0x80501B10
+	.sdata      start:0x806DC0A8 end:0x806DC0B8
+	.sdata2     start:0x806E3F40 end:0x806E3F58
 
 Game/AI/DesireMark.cpp:
 	.text       start:0x800B6DC0 end:0x800B93C4

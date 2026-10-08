@@ -128,7 +128,7 @@ public:
         return *this;
     }
 
-    void SetParameter(int index, const Variant& value);
+    void SetParameter(int index, FuzzyVariant value);
 
     Variant* GetParameter(int index) { return ExtraData.Get(index); }
     UnidentifiedVariantCollection* GetParameters() { return &ExtraData; }
