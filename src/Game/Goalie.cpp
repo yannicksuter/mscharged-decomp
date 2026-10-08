@@ -744,7 +744,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             float x = pPlayer->m_DetChar.m_v3Position.x - m_DetChar.m_v3Position.x;
             float y = pPlayer->m_DetChar.m_v3Position.y - m_DetChar.m_v3Position.y;
             unsigned short aHit = RadToAng16(nlATan2f(y, x));
-            bool bHitReactResult = pFldr->fn_80047240(this, aHit, 1, false, false);
+            bool bHitReactResult = pFldr->fn_80047240(this, aHit, HIT_REACTION_MEDIUM, false, false);
             if (bHitReactResult)
                 PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
             mnSubstate = 6;
@@ -888,7 +888,7 @@ void Goalie::CollideWithPatchCallback(const CollisionPatchData* pData)
         cFielder* pFielder = static_cast<cFielder*>(pPatch->m_pOwner);
         if (!pFielder->IsInvincible() && !IsOnSameTeam(pFielder))
             pFielder->fn_80047240(this,
-                pFielder->m_DetChar.m_aActualFacingDirection + 0x8000, 0, false, false);
+                pFielder->m_DetChar.m_aActualFacingDirection + 0x8000, HIT_REACTION_LIGHT, false, false);
     }
 }
 
@@ -4082,7 +4082,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
                         aDirection = 0x4000;
                     else
                         aDirection = 0xC000;
-                    pFielder->fn_80047240(this, aDirection, 1, false, false);
+                    pFielder->fn_80047240(this, aDirection, HIT_REACTION_MEDIUM, false, false);
                     if (bReleased)
                     {
                         nlVector3 v3BallVelocity;
@@ -4160,7 +4160,7 @@ void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
                 data.pAttacker = this;
                 data.nAttackerPadID = -1;
                 data.pTarget = pTarget;
-                data.nHitReaction = 2;
+                data.nHitReaction = HIT_REACTION_HEAVY;
                 data.bIsSlideAttack = false;
                 DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
             }
@@ -4184,7 +4184,7 @@ void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
             data.pAttacker = this;
             data.nAttackerPadID = -1;
             data.pTarget = pTarget;
-            data.nHitReaction = 2;
+            data.nHitReaction = HIT_REACTION_HEAVY;
             data.bIsSlideAttack = false;
             DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
         }
@@ -4251,7 +4251,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     }
 
     pFielder->fn_80047240(
-        pFielder, m_DetChar.m_aActualFacingDirection, 2, true, false);
+        pFielder, m_DetChar.m_aActualFacingDirection, HIT_REACTION_HEAVY, true, false);
     PlaySound(pFielder->m_uSoundSlotId, 0x3642C41B, 0, 0);
 
     mbDoHeadTrack = false;
@@ -4276,7 +4276,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     data.pAttacker = this;
     data.nAttackerPadID = -1;
     data.pTarget = pFielder;
-    data.nHitReaction = 2;
+    data.nHitReaction = HIT_REACTION_HEAVY;
     data.bIsSlideAttack = false;
     DeliverGoalieSlamAttackSuccessEvent(g_pGame, &data);
 }

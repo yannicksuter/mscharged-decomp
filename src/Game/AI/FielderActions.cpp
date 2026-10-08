@@ -2254,22 +2254,22 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
             = ((cFielder*)pAttacker)->GetTweaks()->fDefenseSize;
     }
 
-    int nReact = 1;
+    int nReact = HIT_REACTION_MEDIUM;
     if (GameInfoManager::Instance()->IsRule0x8Equal1())
     {
-        nReact = 2;
+        nReact = HIT_REACTION_HEAVY;
     }
     else if (fIntensityB < 0.0f && fIntensityA >= 0.0f)
     {
-        nReact = 0;
+        nReact = HIT_REACTION_LIGHT;
     }
     else if (fIntensityA < 0.0f && fIntensityB >= 0.0f)
     {
-        nReact = 2;
+        nReact = HIT_REACTION_HEAVY;
     }
     else if ((u16)abs_s16(nFacingDelta) < 0x4000)
     {
-        nReact = 2;
+        nReact = HIT_REACTION_HEAVY;
     }
 
     if (pAttacker->m_DetChar.m_eCharacterClass == BIRDO
@@ -2360,13 +2360,13 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     switch (nReact)
     {
-    case 0:
+    case HIT_REACTION_LIGHT:
         PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, GetGlobalPad());
         break;
-    case 1:
+    case HIT_REACTION_MEDIUM:
         PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
         break;
-    case 2:
+    case HIT_REACTION_HEAVY:
         PlayRumbleAction(RUMBLE_SHOT_CONTACT, GetGlobalPad());
         break;
     }

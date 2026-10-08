@@ -1107,22 +1107,22 @@ int GetFielderHitReaction(cFielder* pReceiver,
 {
     float fReceiverDefenseSize = pReceiver->m_pTweaks->GetDefenseSize();
     float fAttackerDefenseSize = pAttacker->m_pTweaks->GetDefenseSize();
-    int nReaction = 1;
+    int nReaction = HIT_REACTION_MEDIUM;
     if (gForceHeavyHitReaction || GameInfoManager::Instance()->IsRule0x8Equal1())
-        return 2;
+        return HIT_REACTION_HEAVY;
 
     if (fAttackerDefenseSize < 0.0f && fReceiverDefenseSize >= 0.0f)
-        return 0;
+        return HIT_REACTION_LIGHT;
     if (fReceiverDefenseSize < 0.0f && fAttackerDefenseSize >= 0.0f)
-        return 2;
+        return HIT_REACTION_HEAVY;
 
     attackIntensity -= 0.5f;
     float fRelativeStrength = fAttackerDefenseSize - fReceiverDefenseSize;
     fRelativeStrength += attackIntensity;
     if (fRelativeStrength <= gLightHitReactionThreshold)
-        nReaction = 0;
+        nReaction = HIT_REACTION_LIGHT;
     else if (fRelativeStrength >= gHeavyHitReactionThreshold)
-        nReaction = 2;
+        nReaction = HIT_REACTION_HEAVY;
 
     if (pAttacker->IsMushroomActive()
         || pAttacker->IsInvincible()
@@ -1130,7 +1130,7 @@ int GetFielderHitReaction(cFielder* pReceiver,
         || IsFielderFrontInvincible(pAttacker, &pReceiver->GetPosition())
         || pAttacker->IsSuperGrowActive())
     {
-        nReaction = 2;
+        nReaction = HIT_REACTION_HEAVY;
     }
     return nReaction;
 }
@@ -1736,7 +1736,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             {
                 if (gHitFrameLockRequiresHeavyReaction)
                 {
-                    if (nHitReaction == 2 || IsSuperGrowActive())
+                    if (nHitReaction == HIT_REACTION_HEAVY || IsSuperGrowActive())
                         doFrameLock = true;
                 }
                 else
@@ -1753,13 +1753,13 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             {
                 switch (nHitReaction)
                 {
-                case 0:
+                case HIT_REACTION_LIGHT:
                     PlaySound(0, 0x057208DA, 0, 0);
                     break;
-                case 1:
+                case HIT_REACTION_MEDIUM:
                     PlaySound(0, 0xECE94BBB, 0, 0);
                     break;
-                case 2:
+                case HIT_REACTION_HEAVY:
                     PlaySound(0, 0xE8120AC5, 0, 0);
                     break;
                 }
@@ -2077,7 +2077,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
         if (chain->IsFrozen())
             InitActionShellReact(chain->mv3Position, chain->mv3Velocity);
         else if (chain->meChainChompState != CHAIN_STATE_RECOVER)
-            fn_80047240(chain->mpThrower, direction, 2, false, false);
+            fn_80047240(chain->mpThrower, direction, HIT_REACTION_HEAVY, false, false);
         else
             InitActionKnockdownReact(chain->mv3Velocity);
         if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
@@ -2325,7 +2325,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             nlPolar polar;
             nlCartesianToPolar(polar, v3PatchDirection);
             fn_80047240(eventData->pPatch->m_pOwner,
-                polar.a, 1, false, false);
+                polar.a, HIT_REACTION_MEDIUM, false, false);
         }
     }
     else if (type == PATCH_SHRINKER)
@@ -2358,19 +2358,19 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
                 if (!pOwner->IsInvincibleChars())
                 {
                     pOwner->fn_80047240(this,
-                        pOwner->m_DetChar.m_aActualFacingDirection + 0x8000, 1, false, false);
+                        pOwner->m_DetChar.m_aActualFacingDirection + 0x8000, HIT_REACTION_MEDIUM, false, false);
                     PlaySound(0, 0xECE94BBB, 0, 0);
                 }
                 else
                 {
-                    fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, 0, false, false);
+                    fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, HIT_REACTION_LIGHT, false, false);
                     PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                     PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
-                fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, 1, false, true);
+                fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, HIT_REACTION_MEDIUM, false, true);
                 PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                 PlayRumbleAction(RUMBLE_MEDIUM_CONTACT, pOwner->GetGlobalPad());
             }
@@ -4954,7 +4954,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         u8 bHasGlobalPad = GetGlobalPad() != NULL;
         pAttackData->nAttackerPadID = bHasGlobalPad ? GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = pOpponent;
-        pAttackData->nHitReaction = 2;
+        pAttackData->nHitReaction = HIT_REACTION_HEAVY;
         pAttackData->bIsSlideAttack = false;
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }
@@ -4970,7 +4970,7 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
         u8 bHasGlobalPad = pOpponent->GetGlobalPad() != NULL;
         pAttackData->nAttackerPadID = bHasGlobalPad ? pOpponent->GetGlobalPad()->GetPadID() : -1;
         pAttackData->pTarget = this;
-        pAttackData->nHitReaction = 2;
+        pAttackData->nHitReaction = HIT_REACTION_HEAVY;
         pAttackData->bIsSlideAttack = false;
         QueueAttackSuccessEvent(g_pGame, pAttackData);
     }

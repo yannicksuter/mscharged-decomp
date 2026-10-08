@@ -378,14 +378,14 @@ void cBall::CollideWithCharacterCallback(
 
             if (bReactToHit)
             {
-                int nReact = 0;
+                int nReact = HIT_REACTION_LIGHT;
                 if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB580)
                 {
-                    nReact = 2;
+                    nReact = HIT_REACTION_HEAVY;
                 }
                 else if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB57C)
                 {
-                    nReact = 1;
+                    nReact = HIT_REACTION_MEDIUM;
                 }
                 pCharacterFielder->fn_80047240(m_pPrevOwner,
                     aBallDirection, nReact, false, false);

@@ -1815,7 +1815,7 @@ extern "C" void fn_80020B8C(cFielder* pFielder)
 {
     pFielder->fn_80047240(pFielder,
         (unsigned short)(pFielder->m_DetChar.m_aActualFacingDirection + 0x8000),
-        0, false, false);
+        HIT_REACTION_LIGHT, false, false);
 }
 
 extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
@@ -1829,7 +1829,7 @@ extern "C" void fn_80020BB0(PlayerAttackData* pEventData)
         {
             PlayCrowdReaction(0x3648CBA4UL);
         }
-        else if (pEventData->nHitReaction == 2)
+        else if (pEventData->nHitReaction == HIT_REACTION_HEAVY)
         {
             PlayCrowdReaction(pEventData->pAttacker->m_pTeam->m_nSide == HOME
                     ? 0xF2B4508FUL : 0x5F30D098UL);
@@ -2247,7 +2247,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     nlVector3 v3Position;
     nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, v3FielderPosition);
     pEventData->player->SetPosition(v3Position);
-    if (pEventData->player->fn_80047240(pEventData->shell->mOwner, aDirection, 2, false, false))
+    if (pEventData->player->fn_80047240(pEventData->shell->mOwner, aDirection, HIT_REACTION_HEAVY, false, false))
     {
         pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
     }
@@ -2289,7 +2289,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, v3FielderPosition);
             pEventData->player->SetPosition(v3Position);
-            if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, 2, false, false))
+            if (pEventData->player->fn_80047240(pEventData->egg->mShooter, aDirection, HIT_REACTION_HEAVY, false, false))
             {
                 pEventData->player->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }
@@ -2332,7 +2332,7 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
             nlVector3 v3Position;
             nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->m_DetChar.m_v3Position);
             pEventData->pFielder->SetPosition(v3Position);
-            if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, 2, false, false))
+            if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, HIT_REACTION_HEAVY, false, false))
             {
                 pEventData->pFielder->PlayAttackReactionSounds(gGameTweaks.m_pGameTweaks->fShootToScoreBallHitReactionVolume.GetValue());
             }

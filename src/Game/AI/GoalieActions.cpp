@@ -4949,7 +4949,7 @@ void Goalie::InitActionPursueDeke(
         data.pAttacker = this;
         data.nAttackerPadID = -1;
         data.pTarget = mpTarget;
-        data.nHitReaction = 2;
+        data.nHitReaction = HIT_REACTION_HEAVY;
         data.bIsSlideAttack = false;
         DeliverGoalieDekeAttackAttemptEvent(g_pGame, &data);
     }
@@ -6291,7 +6291,7 @@ void Goalie::InitActionSTSAttackSetup(float fWaitTime)
     data.pAttacker = this;
     data.nAttackerPadID = -1;
     data.pTarget = g_pBall->GetOwnerFielder();
-    data.nHitReaction = 2;
+    data.nHitReaction = HIT_REACTION_HEAVY;
     data.bIsSlideAttack = false;
     DeliverGoalieSlamAttackAttemptEvent(g_pGame, &data);
 }
@@ -6561,7 +6561,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
                 data.pAttacker = this;
                 data.nAttackerPadID = -1;
                 data.pTarget = mpShooter;
-                data.nHitReaction = 2;
+                data.nHitReaction = HIT_REACTION_HEAVY;
                 data.bIsSlideAttack = false;
                 DeliverGoalieDekeAttackSuccessEvent(g_pGame, &data);
 

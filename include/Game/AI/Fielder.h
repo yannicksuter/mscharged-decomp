@@ -28,6 +28,13 @@ enum eSlideAttackState
     SLIDE_ATTACK_DECELERATING = 1,
 };
 
+enum eHitReaction
+{
+    HIT_REACTION_LIGHT = 0,
+    HIT_REACTION_MEDIUM = 1,
+    HIT_REACTION_HEAVY = 2,
+};
+
 enum eFielderActionState
 {
     ACTION_NEED_ACTION = -1,
