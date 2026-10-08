@@ -18,12 +18,12 @@
 #include "Game/RumbleActions.h"
 #include "Game/Audio/RegistryPools.h"
 
-struct LoadingTextEntry
+struct DiscMessageImage
 {
-    int x;
-    int y;
-    unsigned long param;
-    const unsigned char* text;
+    int width;
+    int height;
+    unsigned long compressedSize;
+    const unsigned char* compressedData;
 };
 
 namespace HEADER_NoDiskImage_eng
@@ -1965,7 +1965,7 @@ const unsigned char g_ImageData[0xB1] = {
 };
 }
 
-static const LoadingTextEntry LID_DATA[7][5] = {
+static const DiscMessageImage sDiscMessageImages[7][5] = {
     {
         { 400, 200, sizeof(HEADER_FatalErrorImage_eng::g_ImageData), HEADER_FatalErrorImage_eng::g_ImageData },
         { 400, 200, sizeof(HEADER_NoDiskImage_eng::g_ImageData), HEADER_NoDiskImage_eng::g_ImageData },
@@ -2023,7 +2023,7 @@ static int lastImageSize;
 static const unsigned char* lastImageData;
 static int OpenCloseRefCount;
 static bool ResetWasPaused;
-static bool lbl_806E17ED;
+static bool sAudioPausedForDiscMessage;
 static bool CanGetResetPauseState = true;
 
 
@@ -2111,9 +2111,9 @@ static void UncompressLidMessage(const unsigned char* compressed, int compressed
     uncompressed[index] = compressed[compressedSize - 1];
 }
 
-static void DisplayMessage(int imagewidth, int imageheight, const unsigned char* datastart, int datasize, unsigned long color, bool centered)
+static void DisplayMessage(int imagewidth, int imageheight, const unsigned char* datastart, int datasize, unsigned long color, bool alignBottom)
 {
-    unsigned int centeredFlag;
+    unsigned int centerVertically;
     unsigned char* expanded;
     int yStart;
     int yCenter;
@@ -2151,7 +2151,7 @@ static void DisplayMessage(int imagewidth, int imageheight, const unsigned char*
     GXPokeBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_SET);
 
     xStart = (0x280 - imagewidth) / 2;
-    centeredFlag = (centered == 0);
+    centerVertically = (alignBottom == 0);
     pass = 0;
     yCenter = (0x1C0 - imageheight) / 2;
     xEnd = xStart + imagewidth;
@@ -2172,7 +2172,7 @@ static void DisplayMessage(int imagewidth, int imageheight, const unsigned char*
         glx_ClearXFB(fb);
 
         yStart = yBottom;
-        if (centeredFlag != 0)
+        if (centerVertically != 0)
         {
             yStart = yCenter;
         }
@@ -2238,17 +2238,17 @@ void DisplayDVDMessageSebring(int arg)
     {
         if (arg == 4 || arg == -1 || arg == 11 || arg == 6)
         {
-            if (!lbl_806E17ED)
+            if (!sAudioPausedForDiscMessage)
             {
                 PauseAllAudio();
             }
-            lbl_806E17ED = true;
+            sAudioPausedForDiscMessage = true;
         }
 
         if (arg == 1)
         {
             int lang = GetDiscMessageLanguageIndex();
-            DisplayMessage(LID_DATA[lang][4].x, LID_DATA[lang][4].y, LID_DATA[lang][4].text, LID_DATA[lang][4].param, (unsigned long)-1, false);
+            DisplayMessage(sDiscMessageImages[lang][4].width, sDiscMessageImages[lang][4].height, sDiscMessageImages[lang][4].compressedData, sDiscMessageImages[lang][4].compressedSize, (unsigned long)-1, false);
             return;
         }
     }
@@ -2260,16 +2260,16 @@ void DisplayDVDMessageSebring(int arg)
     switch (arg + 1)
     {
     case 5:
-        DisplayMessage(LID_DATA[lang][0].x, LID_DATA[lang][0].y, LID_DATA[lang][0].text, LID_DATA[lang][0].param, (unsigned long)-1, false);
+        DisplayMessage(sDiscMessageImages[lang][0].width, sDiscMessageImages[lang][0].height, sDiscMessageImages[lang][0].compressedData, sDiscMessageImages[lang][0].compressedSize, (unsigned long)-1, false);
         break;
     case 0:
-        DisplayMessage(LID_DATA[lang][1].x, LID_DATA[lang][1].y, LID_DATA[lang][1].text, LID_DATA[lang][1].param, (unsigned long)-1, false);
+        DisplayMessage(sDiscMessageImages[lang][1].width, sDiscMessageImages[lang][1].height, sDiscMessageImages[lang][1].compressedData, sDiscMessageImages[lang][1].compressedSize, (unsigned long)-1, false);
         break;
     case 12:
-        DisplayMessage(LID_DATA[lang][2].x, LID_DATA[lang][2].y, LID_DATA[lang][2].text, LID_DATA[lang][2].param, (unsigned long)-1, false);
+        DisplayMessage(sDiscMessageImages[lang][2].width, sDiscMessageImages[lang][2].height, sDiscMessageImages[lang][2].compressedData, sDiscMessageImages[lang][2].compressedSize, (unsigned long)-1, false);
         break;
     case 7:
-        DisplayMessage(LID_DATA[lang][3].x, LID_DATA[lang][3].y, LID_DATA[lang][3].text, LID_DATA[lang][3].param, (unsigned long)-1, false);
+        DisplayMessage(sDiscMessageImages[lang][3].width, sDiscMessageImages[lang][3].height, sDiscMessageImages[lang][3].compressedData, sDiscMessageImages[lang][3].compressedSize, (unsigned long)-1, false);
         break;
     }
 
@@ -2303,11 +2303,11 @@ void DVDAllClearSebring(int nStatus)
     CanGetResetPauseState = true;
     ResetTask::s_checkCardRemoved = false;
     ResumeAllAudio();
-    lbl_806E17ED = false;
+    sAudioPausedForDiscMessage = false;
 }
 
 void DisplayLoadingMessageFast()
 {
     int lang = GetDiscMessageLanguageIndex();
-    DisplayMessage(LID_DATA[lang][4].x, LID_DATA[lang][4].y, LID_DATA[lang][4].text, LID_DATA[lang][4].param, (unsigned long)-1, false);
+    DisplayMessage(sDiscMessageImages[lang][4].width, sDiscMessageImages[lang][4].height, sDiscMessageImages[lang][4].compressedData, sDiscMessageImages[lang][4].compressedSize, (unsigned long)-1, false);
 }
