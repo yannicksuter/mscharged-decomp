@@ -166,7 +166,7 @@ void CreditScene::SetupForPhase()
 
 void CreditScene::OnMoviePlaybackEnded()
 {
-    if ((unsigned int)(mPhase - 1) <= 1)
+    if ((unsigned int)(mPhase - CREDITS_NLG_INTRO) <= 1)
     {
         ++mPhase;
         SetupForPhase();
