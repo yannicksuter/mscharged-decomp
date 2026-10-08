@@ -228,13 +228,13 @@ void GameplayCameraEffects::UpdateCameraFlags()
         float goalLineX = cField::GetGoalLineX((unsigned int)
             owner->m_pTeam->GetOtherTeam()->m_nSide);
         if (goalLineX > 0.0
-            && owner->mUnidentified024.m_v3Position.x > 0.0f)
+            && owner->m_DetChar.m_v3Position.x > 0.0f)
         {
             facingGoal = true;
             goto facingGoalKnown;
         }
         if (goalLineX < 0.0
-            && owner->mUnidentified024.m_v3Position.x < 0.0f)
+            && owner->m_DetChar.m_v3Position.x < 0.0f)
         {
             facingGoal = true;
             goto facingGoalKnown;
@@ -277,7 +277,7 @@ bool GameplayCameraEffects::AreFieldersClear() const
 
             if (goalLineX > 0.0f)
             {
-                if (fielder->mUnidentified024.m_v3Position.x > owner->mUnidentified024.m_v3Position.x
+                if (fielder->m_DetChar.m_v3Position.x > owner->m_DetChar.m_v3Position.x
                     && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
@@ -287,7 +287,7 @@ bool GameplayCameraEffects::AreFieldersClear() const
             }
             if (goalLineX < 0.0f)
             {
-                if (fielder->mUnidentified024.m_v3Position.x < owner->mUnidentified024.m_v3Position.x
+                if (fielder->m_DetChar.m_v3Position.x < owner->m_DetChar.m_v3Position.x
                     && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
@@ -296,9 +296,9 @@ bool GameplayCameraEffects::AreFieldersClear() const
                 }
             }
 
-            dy = fielder->mUnidentified024.m_v3Position.y - owner->mUnidentified024.m_v3Position.y;
-            dx = fielder->mUnidentified024.m_v3Position.x - owner->mUnidentified024.m_v3Position.x;
-            dz = fielder->mUnidentified024.m_v3Position.z - owner->mUnidentified024.m_v3Position.z;
+            dy = fielder->m_DetChar.m_v3Position.y - owner->m_DetChar.m_v3Position.y;
+            dx = fielder->m_DetChar.m_v3Position.x - owner->m_DetChar.m_v3Position.x;
+            dz = fielder->m_DetChar.m_v3Position.z - owner->m_DetChar.m_v3Position.z;
             nlVector3 delta;
             delta.x = dx;
             delta.y = dy;
@@ -332,9 +332,9 @@ bool GameplayCameraEffects::IsPassTargetClear() const
         cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
         if (fielder->mUnidentified120 == passTarget->mUnidentified120)
             continue;
-        float dy = fielder->mUnidentified024.m_v3Position.y - passTarget->mUnidentified024.m_v3Position.y;
-        float dx = fielder->mUnidentified024.m_v3Position.x - passTarget->mUnidentified024.m_v3Position.x;
-        float dz = fielder->mUnidentified024.m_v3Position.z - passTarget->mUnidentified024.m_v3Position.z;
+        float dy = fielder->m_DetChar.m_v3Position.y - passTarget->m_DetChar.m_v3Position.y;
+        float dx = fielder->m_DetChar.m_v3Position.x - passTarget->m_DetChar.m_v3Position.x;
+        float dz = fielder->m_DetChar.m_v3Position.z - passTarget->m_DetChar.m_v3Position.z;
         nlVector3 delta;
         delta.x = dx;
         delta.y = dy;
@@ -503,7 +503,7 @@ nlVector3 GameplayCameraEffects::CalculateTargetOffset(
     if (mTransitionBlend != 0.0f && mTrackSecondaryPlayer
         && mSecondaryPlayer != 0)
     {
-        target = mSecondaryPlayer->mUnidentified024.m_v3Position;
+        target = mSecondaryPlayer->m_DetChar.m_v3Position;
         hasTarget = true;
     }
 
@@ -599,7 +599,7 @@ void GameplayCameraEffects::OnCaptainClashPresentation()
 
         if (g_pBall->m_pLastTouch != 0
             && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-                   ->mUnidentified024.m_v3Velocity.x < 0.0f)
+                   ->m_DetChar.m_v3Velocity.x < 0.0f)
         {
             mRotationDegrees *= -1.0f;
         }
@@ -753,7 +753,7 @@ void GameplayCameraEffects::OnGoalieDekeAttackSuccess(
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-               ->mUnidentified024.m_v3Velocity.x < 0.0f)
+               ->m_DetChar.m_v3Velocity.x < 0.0f)
     {
         mRotationDegrees *= -1.0f;
     }
@@ -791,7 +791,7 @@ void GameplayCameraEffects::OnGoalieSlamAttackSuccess(
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-               ->mUnidentified024.m_v3Velocity.x < 0.0f)
+               ->m_DetChar.m_v3Velocity.x < 0.0f)
     {
         mRotationDegrees *= -1.0f;
     }

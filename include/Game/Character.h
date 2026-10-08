@@ -83,10 +83,10 @@ enum eCharacterModelType
     CharModel_Num = 2,
 };
 
-struct UnidentifiedCharacterState_024
+struct DetChar
 {
     void SyncLog(void* context, DebugWriteCache* cache);
-    UnidentifiedCharacterState_024()
+    DetChar()
     {
         UnidentifiedReset();
     }
@@ -260,7 +260,7 @@ public:
     bool fn_8001E160();
     bool IsCaptain() const;
     bool fn_8001E184();
-    const CharacterInfo* GetCharacterInfoData() const { return mUnidentified11C; }
+    const CharacterInfo* GetCharacterInfoData() const { return m_pCharacterInfo; }
     cPN_SAnimController* GetCurrentAnimController() const { return m_pCurrentAnimController; }
 
     int GetCurrentAnimID() const { return m_eAnimID; }
@@ -271,28 +271,28 @@ public:
     }
     eCharacterClass GetCharacterClass() const
     {
-        return mUnidentified024.m_eCharacterClass;
+        return m_DetChar.m_eCharacterClass;
     }
     const nlVector3& GetPosition() const
     {
-        return mUnidentified024.m_v3Position;
+        return m_DetChar.m_v3Position;
     }
     const nlVector3& GetVelocity() const
     {
-        return mUnidentified024.m_v3Velocity;
+        return m_DetChar.m_v3Velocity;
     }
-    u16 GetDesiredFacing() const { return mUnidentified024.m_aDesiredFacingDirection; }
+    u16 GetDesiredFacing() const { return m_DetChar.m_aDesiredFacingDirection; }
     u16 GetActualFacing() const
     {
-        return mUnidentified024.m_aActualFacingDirection;
+        return m_DetChar.m_aActualFacingDirection;
     }
     float GetActualSpeed() const
     {
-        return mUnidentified024.m_fActualSpeed;
+        return m_DetChar.m_fActualSpeed;
     }
     float GetPlayerScale() const
     {
-        return mUnidentified024.m_fPlayerScale;
+        return m_DetChar.m_fPlayerScale;
     }
     int GetHeadJointIndex() const
     {
@@ -303,7 +303,7 @@ public:
     /* 0x018 */ bool unknown_0x018[4];
     /* 0x01C */ int m_ModelType;
     /* 0x020 */ PhysicsCharacter* m_pPhysicsCharacter;
-    /* 0x024 */ UnidentifiedCharacterState_024 mUnidentified024;
+    /* 0x024 */ DetChar m_DetChar;
     /* 0x0B8 */ cAnimInventory* m_pAnimInventory;
     /* 0x0BC */ cPoseAccumulator* m_pPoseAccumulator;
     /* 0x0C0 */ cPoseNode* m_pPoseTree;
@@ -315,23 +315,23 @@ public:
     /* 0x0D8 */ int m_nHeadJointIndex;
     /* 0x0DC */ int m_nBip01JointIndex_0xA4;
     /* 0x0E0 */ int m_nSpine1JointIndex;
-    /* 0x0E4 */ int mUnidentified0E4;
-    /* 0x0E8 */ int mUnidentified0E8;
+    /* 0x0E4 */ int m_nLFootJointIndex;
+    /* 0x0E8 */ int m_nRFootJointIndex;
     /* 0x0EC */ const char* m_szEffectsName;
     /* 0x0F0 */ eClassTypes m_eClassType;
     /* 0x0F4 */ bool m_bIsUsingElectrocutionTexture;
     /* 0x0F5 */ u8 unknown_0x0F5[3];
     /* 0x0F8 */ cCharacterSFX* m_pCharacterSFX;
     /* 0x0FC */ void* mUnidentified0FC;
-    /* 0x100 */ u32 mUnidentified100;
-    /* 0x104 */ u32 mUnidentified104;
-    /* 0x108 */ u32 mUnidentified108;
-    /* 0x10C */ ResolvedTexture mUnidentified10C;
-    /* 0x110 */ ResolvedTexture mUnidentified110;
-    /* 0x114 */ ResolvedTexture mUnidentified114;
-    /* 0x118 */ bool mUnidentified118;
+    /* 0x100 */ u32 m_uNormalTextureID;
+    /* 0x104 */ u32 m_uSwapTextureID;
+    /* 0x108 */ u32 m_uShockTextureID;
+    /* 0x10C */ ResolvedTexture m_ResolvedNormalTexture;
+    /* 0x110 */ ResolvedTexture m_ResolvedSwapTexture;
+    /* 0x114 */ ResolvedTexture m_ResolvedShockTexture;
+    /* 0x118 */ bool m_bTexturesResolved;
     /* 0x119 */ u8 unknown_0x119[3];
-    /* 0x11C */ const CharacterInfo* mUnidentified11C;
+    /* 0x11C */ const CharacterInfo* m_pCharacterInfo;
     /* 0x120 */ int mUnidentified120;
     /* 0x124 */ nlMatrix4 m_m4WorldMatrix;
     /* 0x164 */ float m_Dirt;
@@ -339,25 +339,25 @@ public:
     /* 0x16C */ int mUnidentified16C;
     /* 0x170 */ BlurHandler* m_pBlurHandler;
     /* 0x174 */ Blinker* m_pBlinker;
-    /* 0x178 */ float mUnidentified178;
-    /* 0x17C */ bool mUnidentified17C;
+    /* 0x178 */ float m_fOpacity;
+    /* 0x17C */ bool m_bShadowVisible;
     /* 0x17D */ bool mUnidentified17D;
     /* 0x17E */ bool m_bLeftPropAnimated;
     /* 0x17F */ bool m_bRightPropAnimated;
-    /* 0x180 */ bool mUnidentified180;
-    /* 0x181 */ bool mUnidentified181;
-    /* 0x182 */ bool mUnidentified182;
+    /* 0x180 */ bool m_bHammerTransformFrozen;
+    /* 0x181 */ bool m_bPacketAVisible;
+    /* 0x182 */ bool m_bPacketBVisible;
     /* 0x183 */ u8 unknown_0x183;
-    /* 0x184 */ nlQuaternion mUnidentified184;
-    /* 0x194 */ nlVector3 mUnidentified194;
-    /* 0x1A0 */ float mUnidentified1A0;
-    /* 0x1A4 */ float mUnidentified1A4;
-    /* 0x1A8 */ float mUnidentified1A8;
-    /* 0x1AC */ float mUnidentified1AC;
+    /* 0x184 */ nlQuaternion m_qFrozenHammerRotation;
+    /* 0x194 */ nlVector3 m_v3FrozenHammerTranslation;
+    /* 0x1A0 */ float m_fFrozenHammerScale;
+    /* 0x1A4 */ float m_fMegaBlendRate;
+    /* 0x1A8 */ float m_fMegaBlend;
+    /* 0x1AC */ float m_fMegaBlendTarget;
     /* 0x1B0 */ EffectsTexturing* m_pEffectsTexturing;
     /* 0x1B4 */ nlVector3 m_v3ScreenPosition;
     /* 0x1C0 */ nlAVLTreeSlotPool<unsigned long, nlVector3,
-        DefaultKeyCompare<unsigned long> > mUnidentified1C0;
+        DefaultKeyCompare<unsigned long> > m_JointPositionCache;
 
 private:
     void CaptureHammerTransform();

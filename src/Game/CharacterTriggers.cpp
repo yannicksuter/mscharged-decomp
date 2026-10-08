@@ -609,7 +609,7 @@ void EmitBallShot(cFielder* pCharacter,
     if (pGlowControl != 0)
     {
         pGlowControl->SetPosition(g_pBall->m_v3Position);
-        pGlowControl->SetVelocity(pCharacter->mUnidentified024.m_v3Velocity);
+        pGlowControl->SetVelocity(pCharacter->m_DetChar.m_v3Velocity);
         SetBallUpdateCallback(pGlowControl);
     }
 }
@@ -726,7 +726,7 @@ void EmitDivot(cCharacter* pCharacter)
     v3Position.z = 0.0f;
 
     nlPolarToCartesian(v3Offset.x, v3Offset.y,
-        pCharacter->mUnidentified024.m_aActualFacingDirection, 0.65f);
+        pCharacter->m_DetChar.m_aActualFacingDirection, 0.65f);
     v3Offset.z = 0.0f;
 
     nlVec3Add(v3Position, v3Position, v3Offset);
@@ -864,7 +864,7 @@ void EmitFreeze(cPlayer* pCharacter)
 
     pGroup = EmissionManager::Instance()->GetEffectsGroup("freeze_ground");
     pController = EmissionManager::Instance()->Create(pGroup, 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
     PlayRumbleAction(1, pCharacter->GetGlobalPad());
     pCharacter->m_pEffectsTexturing = fxGetTexturing(eFXTex_Freeze);
@@ -895,7 +895,7 @@ void EmitYoshiShellBreak(cCharacter* pCharacter)
 {
     const char* groupName = "yoshi_shell_break";
     EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
     {
         Function1<void, EmissionController&> update2(
@@ -907,7 +907,7 @@ void EmitYoshiShellBreak(cCharacter* pCharacter)
 void EmitPeachPhoto(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("peach_photo"), 0, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -941,12 +941,12 @@ void EmitHammerDestroyBig(const nlVector3& v3Position)
 
 void EmitGroundPound(cCharacter* pCharacter)
 {
-    if (pCharacter->mUnidentified024.m_eCharacterClass == 7)
+    if (pCharacter->m_DetChar.m_eCharacterClass == 7)
     {
         EmissionController* pController = EmitGeneric(pCharacter, "ground_pound", 0);
         pController->SetUpdateCallback(UpdateEmitterFromCharacter);
     }
-    else if (pCharacter->mUnidentified024.m_eCharacterClass == 9)
+    else if (pCharacter->m_DetChar.m_eCharacterClass == 9)
     {
         EmissionController* pController = EmitGeneric(pCharacter, "bowserjr_ground_pound", 0);
         pController->SetUpdateCallback(UpdateEmitterFromCharacter);
@@ -956,14 +956,14 @@ void EmitGroundPound(cCharacter* pCharacter)
 void EmitMontySquishEnter(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("monty_squish_enter"), 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
 void EmitMontySquishExit(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("monty_squish_exit"), 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -974,7 +974,7 @@ void EmitGoalieArmInGround(cPlayer* pPlayer)
 
     nlVector3 v3Point;
     nlVec3Set(v3Point, sGoalieArmInGroundOffsetX, sGoalieArmInGroundOffsetY, 0.2f);
-    GetWorldPoint(v3Point, v3Point, pPlayer->mUnidentified024.m_v3Position, pPlayer->mUnidentified024.m_aActualFacingDirection);
+    GetWorldPoint(v3Point, v3Point, pPlayer->m_DetChar.m_v3Position, pPlayer->m_DetChar.m_aActualFacingDirection);
     pController->SetPosition(v3Point);
     pController->SetVelocity(v3Zero);
 }
@@ -982,14 +982,14 @@ void EmitGoalieArmInGround(cPlayer* pPlayer)
 void EmitDekeEnter(cCharacter* pCharacter, const char* szEffectName)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(szEffectName), 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
 void EmitDekeExit(cCharacter* pCharacter, const char* szEffectName)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup(szEffectName), 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1021,14 +1021,14 @@ void EmitShyGuyBulletEnd(cFielder* pFielder)
 void EmitBooDekePuffStart(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("boo_deke_puff_start"), 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
 void EmitBooDekePuffEnd(cCharacter* pCharacter)
 {
     EmissionController* pController = EmissionManager::Instance()->Create(EmissionManager::Instance()->GetEffectsGroup("boo_deke_puff_end"), 3, true, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1150,14 +1150,14 @@ void EmitLandingFeetTrigger(cCharacter* pCharacter)
 {
     const char* groupName = "landing_feet";
     EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
 }
 
 void EmitToadGoalDustTrigger(cCharacter* pCharacter)
 {
     const char* groupName = "toad_goal_hi_0_dust";
     EmissionController* pController = EmitGeneric(pCharacter, groupName, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
 }
 
 bool EmitWindupAtBall(const char* szEffectName)
@@ -1486,7 +1486,7 @@ void EmitBowserExplode(cCharacter* pCharacter)
 {
     const char* szEffectName = "bowser_explode";
     EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
-    pController->SetPosition(pCharacter->mUnidentified024.m_v3Position);
+    pController->SetPosition(pCharacter->m_DetChar.m_v3Position);
     pController->SetVelocity(v3Zero);
 }
 
@@ -1617,14 +1617,14 @@ void EmitPowerupIcon(cCharacter* pCharacter, int nIcon)
     nlVector3 v3Position = pCharacter->GetJointPosition(pCharacter->m_nHeadJointIndex);
     v3Position.z += 0.1f;
     pController->SetPosition(v3Position);
-    pController->SetVelocity(pCharacter->mUnidentified024.m_v3Velocity);
+    pController->SetVelocity(pCharacter->m_DetChar.m_v3Velocity);
 }
 
 void EmitSuperGrow(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
+    if (pCharacter->m_DetChar.m_eCharacterClass == 0)
     {
         pController = EmitGeneric(pCharacter, "mario_super_grow", 0);
     }
@@ -1641,7 +1641,7 @@ void EmitSuperShrink(cCharacter* pCharacter)
 {
     EmissionController* pController;
 
-    if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
+    if (pCharacter->m_DetChar.m_eCharacterClass == 0)
     {
         pController = EmitGeneric(pCharacter, "mario_super_shrink", 0);
     }
@@ -1660,7 +1660,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
 
     if (bRight)
     {
-        if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
+        if (pCharacter->m_DetChar.m_eCharacterClass == 0)
         {
             const char* szEffectName = "mario_right_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1683,7 +1683,7 @@ void EmitSuperFootstep(cCharacter* pCharacter, bool bRight)
     }
     else
     {
-        if (pCharacter->mUnidentified024.m_eCharacterClass == 0)
+        if (pCharacter->m_DetChar.m_eCharacterClass == 0)
         {
             const char* szEffectName = "mario_left_super_footstep";
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup(szEffectName);
@@ -1825,12 +1825,12 @@ void EmitDeke(cCharacter* pCharacter)
         if (pAnimController->m_fTime
             < 15.0f / pAnimController->m_pSAnim->m_nNumKeys)
         {
-            if (pCharacter->mUnidentified024.m_eCharacterClass == 0xB)
+            if (pCharacter->m_DetChar.m_eCharacterClass == 0xB)
             {
                 EmissionController* pController = EmitGeneric(pCharacter, "petey_deke", 0);
                 pController->SetUpdateCallback(UpdateEmitterFromCharacter);
             }
-            else if (pCharacter->mUnidentified024.m_eCharacterClass == 0xC)
+            else if (pCharacter->m_DetChar.m_eCharacterClass == 0xC)
             {
                 EmissionController* pController = EmitGeneric(pCharacter, "birdo_deke", 0);
                 pController->SetUpdateCallback(UpdateEmitterFromCharacter);
@@ -1841,12 +1841,12 @@ void EmitDeke(cCharacter* pCharacter)
 
 void KillDeke(cCharacter* pCharacter)
 {
-    if (pCharacter->mUnidentified024.m_eCharacterClass == 11)
+    if (pCharacter->m_DetChar.m_eCharacterClass == 11)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
         EmissionManager::Instance()->Kill(pGroup);
     }
-    else if (pCharacter->mUnidentified024.m_eCharacterClass == 12)
+    else if (pCharacter->m_DetChar.m_eCharacterClass == 12)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
         EmissionManager::Instance()->Kill(pGroup);
@@ -1878,49 +1878,49 @@ void EndDeke(cFielder* pFielder)
 {
     pFielder->ClearInvincibility(0);
 
-    if (pFielder->mUnidentified024.m_eCharacterClass == 3)
+    if (pFielder->m_DetChar.m_eCharacterClass == 3)
     {
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dk_deke");
         EmissionManager::Instance()->Destroy((unsigned long)g_pBall, pGroup);
     }
     else if (pFielder->m_eActionState == 1)
     {
-        if (pFielder->mUnidentified024.m_eCharacterClass == 11)
+        if (pFielder->m_DetChar.m_eCharacterClass == 11)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("petey_deke");
             EmissionManager::Instance()->Kill(pGroup);
         }
-        else if (pFielder->mUnidentified024.m_eCharacterClass == 12)
+        else if (pFielder->m_DetChar.m_eCharacterClass == 12)
         {
             EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("birdo_deke");
             EmissionManager::Instance()->Kill(pGroup);
         }
 
-        if (pFielder->mUnidentified024.m_eCharacterClass == 1)
+        if (pFielder->m_DetChar.m_eCharacterClass == 1)
         {
             pFielder->InitMovementFromAnim(0, v3Zero, 0.0f, false);
         }
-        else if (pFielder->mUnidentified024.m_eCharacterClass == 7)
+        else if (pFielder->m_DetChar.m_eCharacterClass == 7)
         {
             CharacterImpactEvent event;
-            event.v3Position = pFielder->mUnidentified024.m_v3Position;
+            event.v3Position = pFielder->m_DetChar.m_v3Position;
             event.fRadius = sWarioGroundPoundRadius;
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x5BF8E132, 0, 0);
         }
-        else if (pFielder->mUnidentified024.m_eCharacterClass == 9)
+        else if (pFielder->m_DetChar.m_eCharacterClass == 9)
         {
             CharacterImpactEvent event;
-            event.v3Position = pFielder->mUnidentified024.m_v3Position;
+            event.v3Position = pFielder->m_DetChar.m_v3Position;
             event.fRadius = sBowserJrGroundPoundRadius;
             event.pCharacter = pFielder;
             fn_800611F0(g_pGame, &event);
             EmitGroundPound(pFielder);
             PlaySound(pFielder->m_uSoundSlotId, 0x560BD5F9, 0, 0);
         }
-        else if (pFielder->mUnidentified024.m_eCharacterClass == 13)
+        else if (pFielder->m_DetChar.m_eCharacterClass == 13)
         {
             CharacterImpactEvent event;
             nlVector3 v3Offset;
@@ -1930,7 +1930,7 @@ void EndDeke(cFielder* pFielder)
             event.v3Position = pFielder->GetJointPosition(nNodeIndex);
             event.v3Position.z = 0.0f;
             nlPolarToCartesian(v3Offset.x, v3Offset.y,
-                pFielder->mUnidentified024.m_aActualFacingDirection, sHammerBroHammerForwardOffset);
+                pFielder->m_DetChar.m_aActualFacingDirection, sHammerBroHammerForwardOffset);
             v3Offset.z = 0.0f;
             float z = event.v3Position.z + v3Offset.z;
             float y = event.v3Position.y + v3Offset.y;

@@ -178,8 +178,8 @@ inline void FormationManager::AccumulateWeightedFielderCenter(const float*& pWei
         bool bIgnoreFielder = pFielder->IsInFallAction() || pFielder->IsShattered();
         if (!bIgnoreFielder)
         {
-            float newY = m_v2WeightedFielderCenter.y + *pWeight * pFielder->mUnidentified024.m_v3Position.y;
-            float newX = m_v2WeightedFielderCenter.x + *pWeight * pFielder->mUnidentified024.m_v3Position.x;
+            float newY = m_v2WeightedFielderCenter.y + *pWeight * pFielder->m_DetChar.m_v3Position.y;
+            float newX = m_v2WeightedFielderCenter.x + *pWeight * pFielder->m_DetChar.m_v3Position.x;
             m_v2WeightedFielderCenter.y = newY;
             m_v2WeightedFielderCenter.x = newX;
             pWeight++;
@@ -326,8 +326,8 @@ void FormationManager::CalculateAIFielderCenter(nlVector2* pCenter)
         if (!bIgnoreFielder)
         {
             numFielders++;
-            float newY = pCenter->y + pFielder->mUnidentified024.m_v3Position.y;
-            float newX = pCenter->x + pFielder->mUnidentified024.m_v3Position.x;
+            float newY = pCenter->y + pFielder->m_DetChar.m_v3Position.y;
+            float newX = pCenter->x + pFielder->m_DetChar.m_v3Position.x;
             pCenter->y = newY;
             pCenter->x = newX;
         }
@@ -394,7 +394,7 @@ bool FormationManager::CalculateFielderPosition(nlVector3& v3DestPosition,
     nlVector3 v3FutureDesiredPosition;
     nlVector3 v3FormationPosition[2][3];
 
-    int id = pFielder->mUnidentified1E4.m_ID;
+    int id = pFielder->m_DetPlayer.m_ID;
     if (m_CachedPositions[id].bCacheIsValid)
     {
         v3DestPosition = m_CachedPositions[id].vPosition;
@@ -657,7 +657,7 @@ void FormationEval::AssignPositionsToFielders(
                     for (int iFielder = 0; iFielder < 4; iFielder++)
                     {
                         cFielder* pFielder = pTeam->GetFielder(iFielder);
-                        if (iFielder == pKeyPlayer->mUnidentified1E4.m_ID
+                        if (iFielder == pKeyPlayer->m_DetPlayer.m_ID
                             && *piAssignedPos == m_pFormationSpec->m_iKeyIndex)
                         {
                             fCaptainPosScore += 25.0f;
@@ -769,16 +769,16 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
             if (bHasGlobalPad)
             {
                 nlVec3Set(av3FielderAILocs[i],
-                    0.1f * pFielder->mUnidentified024.m_v3Velocity.x + pFielder->mUnidentified024.m_v3Position.x,
-                    0.1f * pFielder->mUnidentified024.m_v3Velocity.y + pFielder->mUnidentified024.m_v3Position.y,
-                    0.1f * pFielder->mUnidentified024.m_v3Velocity.z + pFielder->mUnidentified024.m_v3Position.z);
+                    0.1f * pFielder->m_DetChar.m_v3Velocity.x + pFielder->m_DetChar.m_v3Position.x,
+                    0.1f * pFielder->m_DetChar.m_v3Velocity.y + pFielder->m_DetChar.m_v3Position.y,
+                    0.1f * pFielder->m_DetChar.m_v3Velocity.z + pFielder->m_DetChar.m_v3Position.z);
             }
             else
             {
                 nlVec3Set(av3FielderAILocs[i],
-                    0.1f * pFielder->mUnidentified024.m_v3Velocity.x + pFielder->mUnidentified024.m_v3Position.x,
-                    0.1f * pFielder->mUnidentified024.m_v3Velocity.y + pFielder->mUnidentified024.m_v3Position.y,
-                    0.1f * pFielder->mUnidentified024.m_v3Velocity.z + pFielder->mUnidentified024.m_v3Position.z);
+                    0.1f * pFielder->m_DetChar.m_v3Velocity.x + pFielder->m_DetChar.m_v3Position.x,
+                    0.1f * pFielder->m_DetChar.m_v3Velocity.y + pFielder->m_DetChar.m_v3Position.y,
+                    0.1f * pFielder->m_DetChar.m_v3Velocity.z + pFielder->m_DetChar.m_v3Position.z);
             }
         }
 
@@ -919,7 +919,7 @@ void FormationEval::GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPositi
 
         if (pKeyFormationAIPosition != 0 && keyPlayer->m_eClassType != GOALIE)
         {
-            u32 posIndex = m_iFielderFormationPos[keyPlayer->mUnidentified1E4.m_ID];
+            u32 posIndex = m_iFielderFormationPos[keyPlayer->m_DetPlayer.m_ID];
             const FormationPos* pPos = &m_pFormationSpec->m_Positions[posIndex];
             f32 px;
             f32 py;
@@ -958,18 +958,18 @@ void FormationEval::GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPositi
         if (bExtrapolate)
         {
             f32 t = 0.1f;
-            f32 rz = keyPlayer->mUnidentified024.m_v3Position.z + t * keyPlayer->mUnidentified024.m_v3Velocity.z;
+            f32 rz = keyPlayer->m_DetChar.m_v3Position.z + t * keyPlayer->m_DetChar.m_v3Velocity.z;
             f32 rx;
             f32 ry;
-            ry = keyPlayer->mUnidentified024.m_v3Position.y + t * keyPlayer->mUnidentified024.m_v3Velocity.y;
-            rx = keyPlayer->mUnidentified024.m_v3Position.x + t * keyPlayer->mUnidentified024.m_v3Velocity.x;
+            ry = keyPlayer->m_DetChar.m_v3Position.y + t * keyPlayer->m_DetChar.m_v3Velocity.y;
+            rx = keyPlayer->m_DetChar.m_v3Position.x + t * keyPlayer->m_DetChar.m_v3Velocity.x;
             v3KeyAIPosition.x = rx;
             v3KeyAIPosition.y = ry;
             v3KeyAIPosition.z = rz;
         }
         else
         {
-            v3KeyAIPosition = keyPlayer->mUnidentified024.m_v3Position;
+            v3KeyAIPosition = keyPlayer->m_DetChar.m_v3Position;
         }
 
         FieldLocToAILoc(v3KeyAIPosition, v3KeyAIPosition, pFielder->m_pTeam->m_nSide);
@@ -995,7 +995,7 @@ void FormationEval::GetKeyPositions(cFielder* pFielder, nlVector3& v3KeyAIPositi
 
                 if (keyPlayer->m_eClassType != GOALIE)
                 {
-                    u32 posIndex = m_iFielderFormationPos[keyPlayer->mUnidentified1E4.m_ID];
+                    u32 posIndex = m_iFielderFormationPos[keyPlayer->m_DetPlayer.m_ID];
                     const FormationPos* pPos = &m_pFormationSpec->m_Positions[posIndex];
                     f32 px;
                     f32 py;
@@ -1029,7 +1029,7 @@ void FormationEval::CalculateDesiredLocation(
     offset.y = dy;
     offset.x = dx;
 
-    u32 posIndex = m_iFielderFormationPos[pFielder->mUnidentified1E4.m_ID];
+    u32 posIndex = m_iFielderFormationPos[pFielder->m_DetPlayer.m_ID];
 
     if (m_eFormationType == FTYPE_BALLPOSITION)
     {
@@ -1086,8 +1086,8 @@ float FormationEval::IsFielderInPosition(
     nlVector2 offset;
     float dy;
     float dx;
-    dx = pFielder->mUnidentified024.m_v3Position.x - v3DesiredPos.x;
-    dy = pFielder->mUnidentified024.m_v3Position.y - v3DesiredPos.y;
+    dx = pFielder->m_DetChar.m_v3Position.x - v3DesiredPos.x;
+    dy = pFielder->m_DetChar.m_v3Position.y - v3DesiredPos.y;
     offset.x = dx;
     offset.y = dy;
     float distToDesiredSquared
@@ -1097,9 +1097,9 @@ float FormationEval::IsFielderInPosition(
     nlVector2 offset2;
     float dx2;
     float dy2;
-    dx2 = pFielder->mUnidentified024.m_v3Position.x;
+    dx2 = pFielder->m_DetChar.m_v3Position.x;
     dx2 -= v3Pos.x;
-    dy2 = pFielder->mUnidentified024.m_v3Position.y - v3Pos.y;
+    dy2 = pFielder->m_DetChar.m_v3Position.y - v3Pos.y;
     offset2.x = dx2;
     offset2.y = dy2;
     float distToTargetSquared = offset2.x * offset2.x + offset2.y * offset2.y;
@@ -1189,8 +1189,8 @@ float FormationDefensive::IsFielderInPosition(
     nlVector2 keyOffset;
     float dy;
     float dx;
-    dx = pFielder->mUnidentified024.m_v3Position.x - v3KeyPosition.x;
-    dy = pFielder->mUnidentified024.m_v3Position.y - v3KeyPosition.y;
+    dx = pFielder->m_DetChar.m_v3Position.x - v3KeyPosition.x;
+    dy = pFielder->m_DetChar.m_v3Position.y - v3KeyPosition.y;
     keyOffset.x = dx;
     keyOffset.y = dy;
     float fPercent
@@ -1200,7 +1200,7 @@ float FormationDefensive::IsFielderInPosition(
         gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistX,
         gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistY);
 
-    nlVector3 v3FielderPos = pFielder->mUnidentified024.m_v3Position;
+    nlVector3 v3FielderPos = pFielder->m_DetChar.m_v3Position;
     nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);
     const FormationPositionThresholds* pPositionThresholds
         = &g_aDefensiveFormationThresholds[pFielder->m_eRole];
@@ -1315,8 +1315,8 @@ float FormationOffensive::IsFielderInPosition(
     nlVector2 keyOffset;
     float dy;
     float dx;
-    dx = pFielder->mUnidentified024.m_v3Position.x - v3KeyPosition.x;
-    dy = pFielder->mUnidentified024.m_v3Position.y - v3KeyPosition.y;
+    dx = pFielder->m_DetChar.m_v3Position.x - v3KeyPosition.x;
+    dy = pFielder->m_DetChar.m_v3Position.y - v3KeyPosition.y;
     keyOffset.x = dx;
     keyOffset.y = dy;
     float fPercent
@@ -1326,7 +1326,7 @@ float FormationOffensive::IsFielderInPosition(
         gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistX,
         gGameTweaks.m_pGameTweaks->vGetInPositionKeyFielderDistY);
 
-    nlVector3 v3FielderPos = pFielder->mUnidentified024.m_v3Position;
+    nlVector3 v3FielderPos = pFielder->m_DetChar.m_v3Position;
     nlVector3 v3NetLocation = pFielder->GetAIOffNetLocation(0);
     const FormationPositionThresholds* pPositionThresholds
         = &g_aDefensiveFormationThresholds[pFielder->m_eRole];
@@ -1423,8 +1423,8 @@ inline void FormationBallPosition::CalcBallPosition(nlVector2& v2DestAIBallPos)
     if (g_pBall->m_pOwner != 0)
     {
         nlVec3ScaleAdd(v3AIBallLoc, 0.1f,
-            g_pBall->m_pOwner->mUnidentified024.m_v3Velocity,
-            g_pBall->m_pOwner->mUnidentified024.m_v3Position);
+            g_pBall->m_pOwner->m_DetChar.m_v3Velocity,
+            g_pBall->m_pOwner->m_DetChar.m_v3Position);
     }
     else if (g_pBall->m_pPassTarget != 0)
     {
@@ -1563,7 +1563,7 @@ void FormationBallPosition::CalculateDesiredLocation(
 {
     if (!HasActiveFormation())
     {
-        destPosition = pFielder->mUnidentified024.m_v3Position;
+        destPosition = pFielder->m_DetChar.m_v3Position;
         return;
     }
 

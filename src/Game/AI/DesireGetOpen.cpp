@@ -23,13 +23,13 @@ bool DesireGetOpen::Initialize(void* context)
     nlVector3 formationPosition;
     if (m_pFielder->CalculateFormationPosition(formationPosition))
     {
-        formationPosition = m_pFielder->mUnidentified024.m_v3Position;
+        formationPosition = m_pFielder->m_DetChar.m_v3Position;
     }
 
     cFielder* ballCarrier = fn_800DF790(m_pFielder->m_pTeam);
     nlVector3 bestPosition = formationPosition;
     nlVector3 targetPosition = ballCarrier != NULL
-        ? ballCarrier->mUnidentified024.m_v3Position
+        ? ballCarrier->m_DetChar.m_v3Position
         : g_pBall->m_v3Position;
     targetPosition.z = 0.0f;
     if (ballCarrier == m_pFielder)

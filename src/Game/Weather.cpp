@@ -139,7 +139,7 @@ inline bool SandTombWeather::IsPlayerInDropZone(nlVector3 position)
         for (int player = 0; player < 4; player++)
         {
             nlVector3 delta;
-            nlVec3Sub(delta, g_pTeams[team]->GetFielder(player)->mUnidentified024.m_v3Position, position);
+            nlVec3Sub(delta, g_pTeams[team]->GetFielder(player)->m_DetChar.m_v3Position, position);
             if (nlVec3LengthSquared(delta) < radiusSquared)
                 return true;
         }
@@ -696,8 +696,8 @@ nlVector3 Windy::CalculateDebrisDisplacement(const nlVector3& position, const nl
     nlVec3Add(end, end, displacement);
     if (gDebrisGoalieClearance > 0.0f)
     {
-        AvoidDebrisObstacle(start, end, displacement, g_pTeams[0]->GetGoalie()->mUnidentified024.m_v3Position, gDebrisGoalieClearance + radius);
-        AvoidDebrisObstacle(start, end, displacement, g_pTeams[1]->GetGoalie()->mUnidentified024.m_v3Position, gDebrisGoalieClearance + radius);
+        AvoidDebrisObstacle(start, end, displacement, g_pTeams[0]->GetGoalie()->m_DetChar.m_v3Position, gDebrisGoalieClearance + radius);
+        AvoidDebrisObstacle(start, end, displacement, g_pTeams[1]->GetGoalie()->m_DetChar.m_v3Position, gDebrisGoalieClearance + radius);
     }
     if (gDebrisGoalClearance > 0.0f)
     {
@@ -924,7 +924,7 @@ void SolarFlare::Update(float value)
         SetFielderFrozenState(fielder, 4, 99999.0f);
         PlaySound(16, 0x5FCB9348, 0, 0);
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_player_explode");
-        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->mUnidentified024.m_v3Position);
+        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->m_DetChar.m_v3Position);
         ++m_NextVaporize;
         if (m_NextVaporize < 2.0f * m_NumToVaporizePerTeam)
             m_VaporizeTimer = gSolarFlareInterval;
@@ -936,7 +936,7 @@ void SolarFlare::Update(float value)
         int team = m_NextFlare % 2;
         int index = (int)floorf(m_NextFlare / 2.0f);
         cFielder* fielder = g_pTeams[team]->GetFielder(m_TargetIndicies[index]);
-        new (8, false) SolarFlareEffect(fielder->mUnidentified024.m_v3Position);
+        new (8, false) SolarFlareEffect(fielder->m_DetChar.m_v3Position);
         PlaySound(11, 0xE853C469, 0, 0);
         if (m_NextFlare == 0)
             PlaySound(13, 0xF68B3F0F, 0, 0);
@@ -948,7 +948,7 @@ void SolarFlare::Update(float value)
             g_pBall->SetVelocity(v3Zero, (eSpinType)0, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_zap");
-        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->mUnidentified024.m_v3Position);
+        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->m_DetChar.m_v3Position);
         bool controlled = fielder->GetGlobalPad() != 0;
         if (controlled == true)
             fielder->SwapController(false);

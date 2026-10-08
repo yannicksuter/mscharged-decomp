@@ -73,8 +73,8 @@ bool DesirePreparePass::Initialize(void* context)
     m_pFielder->SetSpaceSearch(m_pSpaceSearch);
     m_pFielder->m_pSpaceSearch->m_bDebugOn = sDebugPassSpaceSearch;
     m_pFielder->m_pSpaceSearch->FindBestPosition(
-        mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position,
-        DIR_UPFIELD, &mpPassTarget->mUnidentified024.m_v3Position,
+        mvDesiredPosition, m_pFielder->m_DetChar.m_v3Position,
+        DIR_UPFIELD, &mpPassTarget->m_DetChar.m_v3Position,
         sPassSearchRadius, 0x8000);
     return true;
 }
@@ -104,8 +104,8 @@ void DesirePreparePass::Update(DesireUpdate* update, float fDeltaT)
             m_pFielder->GetDistanceToDesiredPos();
         float fClosingSpeedToDesiredPos = GetClosingSpeed2D(
             mvDesiredPosition, sStationaryTargetVelocity,
-            m_pFielder->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Velocity);
+            m_pFielder->m_DetChar.m_v3Position,
+            m_pFielder->m_DetChar.m_v3Velocity);
         if (fClosingSpeedToDesiredPos < 0.0f
             || fDistanceToDesiredPos <= sPassArrivalDistance
             || ((fInDanger >= fNotFarToTheirGoalie
@@ -175,8 +175,8 @@ bool DesirePass::Initialize(void* context)
 
     PlayerTweaks* pTweaks = m_pFielder->GetTweaks();
     float fMaxSpeed = pTweaks->GetRunningSpeed();
-    m_pFielder->mUnidentified024.m_fDesiredSpeed =
-        FMIN(m_pFielder->mUnidentified024.m_fDesiredSpeed, fMaxSpeed);
+    m_pFielder->m_DetChar.m_fDesiredSpeed =
+        FMIN(m_pFielder->m_DetChar.m_fDesiredSpeed, fMaxSpeed);
 
     if (m_pFielder->m_pBall != 0)
     {

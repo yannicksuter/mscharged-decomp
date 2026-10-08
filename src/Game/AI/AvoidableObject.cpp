@@ -141,12 +141,12 @@ bool AvoidableObject::GetClosestBoundaryPoint(
 
 const nlVector3& AvoidableFielder::GetPosition()
 {
-    return m_pFielder->mUnidentified024.m_v3Position;
+    return m_pFielder->m_DetChar.m_v3Position;
 }
 
 const nlVector3& AvoidableFielder::GetVelocity()
 {
-    return m_pFielder->mUnidentified024.m_v3Velocity;
+    return m_pFielder->m_DetChar.m_v3Velocity;
 }
 
 float AvoidableFielder::GetRadius()
@@ -176,7 +176,7 @@ float AvoidableFielder::GetAttackReach()
     }
     else
     {
-        float fTime = m_pFielder->mUnidentified024.m_fPlayerScale;
+        float fTime = m_pFielder->m_DetChar.m_fPlayerScale;
         float fValue = fn_8002BFA8(m_pFielder->GetTweaks(), fTime);
         fRadius = GetFielderHitReach(m_pFielder) - fValue;
     }
@@ -432,19 +432,19 @@ float AvoidableFielder::GetAvoidanceWeight(
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
         case 4:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == PETEY)
+            if (m_pFielder->m_DetChar.m_eCharacterClass == PETEY)
             {
                 fWeight = 0.0f;
             }
             break;
         case 0:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == WARIO)
+            if (m_pFielder->m_DetChar.m_eCharacterClass == WARIO)
             {
                 fWeight = 0.0f;
             }
             break;
         case 2:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == DIDDYKONG)
+            if (m_pFielder->m_DetChar.m_eCharacterClass == DIDDYKONG)
             {
                 fWeight = 0.0f;
             }
@@ -457,12 +457,12 @@ float AvoidableFielder::GetAvoidanceWeight(
 
 const nlVector3& AvoidableGoalie::GetPosition()
 {
-    return m_pPlayer->mUnidentified024.m_v3Position;
+    return m_pPlayer->m_DetChar.m_v3Position;
 }
 
 const nlVector3& AvoidableGoalie::GetVelocity()
 {
-    return m_pPlayer->mUnidentified024.m_v3Velocity;
+    return m_pPlayer->m_DetChar.m_v3Velocity;
 }
 
 float AvoidableGoalie::GetRadius()

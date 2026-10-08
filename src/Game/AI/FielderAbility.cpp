@@ -62,9 +62,9 @@ void cFielder::InitActionDKSuper()
     muInvincibleStatus |= 1;
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitMovementDecelerateExponential(gDKSuperDeceleration);
-    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
-    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
-    mUnidentified024.m_fDesiredSpeed = 0.0f;
+    SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
+    m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aActualMovementDirection;
+    m_DetChar.m_fDesiredSpeed = 0.0f;
     EmitDKSuperCharge(this);
 }
 
@@ -72,8 +72,8 @@ void cFielder::DoDKSuperHit()
 {
     EmitDKSuperHit(this);
     FireCameraNoiseFilter(*(nlVector3*)sDKSuperHitNoiseAmplitude, gDKSuperHitNoiseFrequency, gDKSuperHitNoiseDuration);
-    SetFieldTilt(1, gDKSuperHitTiltScale * mUnidentified024.m_v3Position.y,
-        gDKSuperHitTiltScale * mUnidentified024.m_v3Position.x);
+    SetFieldTilt(1, gDKSuperHitTiltScale * m_DetChar.m_v3Position.y,
+        gDKSuperHitTiltScale * m_DetChar.m_v3Position.x);
     CreateHitShockwave(
         this, &GetJointPosition(m_nHeadJointIndex), gDKSuperShockwaveRadius);
     PlayRumbleAction(4, GetGlobalPad());
@@ -81,15 +81,15 @@ void cFielder::DoDKSuperHit()
 
 void cFielder::ActionDKSuper(float fDeltaT)
 {
-    mUnidentified024.m_fDesiredSpeed = 0.0f;
+    m_DetChar.m_fDesiredSpeed = 0.0f;
 
     if (m_pCurrentAnimController->TestFrameTrigger(gDKSuperChargeEndFrame))
     {
         KillDKSuperCharge(this);
-        mUnidentified024.m_fActualSpeed = 0.0f;
-        mUnidentified024.m_fDesiredSpeed = 0.0f;
+        m_DetChar.m_fActualSpeed = 0.0f;
+        m_DetChar.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
-        SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
+        SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
     }
 
@@ -108,7 +108,7 @@ void cFielder::CleanUpPeachSuper()
         < gPeachCamerasAwayFrame)
     {
         PeachPhotoData event;
-        event.v3Position = mUnidentified024.m_v3Position;
+        event.v3Position = m_DetChar.m_v3Position;
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         event.pPlayer = this;
@@ -128,7 +128,7 @@ void cFielder::InitActionPeachSuper()
     SetAction((eFielderActionState)0x1D);
     muInvincibleStatus |= 1;
 
-    if ((u16)abs_s16((s16)(mUnidentified024.m_aActualFacingDirection
+    if ((u16)abs_s16((s16)(m_DetChar.m_aActualFacingDirection
             - (u16)(s32)(65536.0f * gPeachSuperFacing)))
         < 0x4000)
     {
@@ -140,12 +140,12 @@ void cFielder::InitActionPeachSuper()
     }
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
-    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
-    mUnidentified024.m_fDesiredSpeed = 0.0f;
+    SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
+    m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aActualMovementDirection;
+    m_DetChar.m_fDesiredSpeed = 0.0f;
 
     PeachPhotoData event;
-    event.v3Position = mUnidentified024.m_v3Position;
+    event.v3Position = m_DetChar.m_v3Position;
     event.fHalfWidth = gPeachPhotoHalfWidth;
     event.fHalfHeight = gPeachPhotoHalfHeight;
     event.pPlayer = this;
@@ -164,7 +164,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
 
     if (fFrame <= 1.0f)
     {
-        u32 aFacing = mUnidentified024.m_aActualFacingDirection;
+        u32 aFacing = m_DetChar.m_aActualFacingDirection;
         float fBlend = fFrame * (-2.0f * fFrame + 3.0f);
         fBlend = fFrame * fBlend;
         float fTurn = (float)aFacing / 65536.0f;
@@ -191,7 +191,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
     if (m_pCurrentAnimController->TestFrameTrigger(gPeachCameraFlashFrame))
     {
         PeachPhotoData event;
-        event.v3Position = mUnidentified024.m_v3Position;
+        event.v3Position = m_DetChar.m_v3Position;
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         event.pPlayer = this;
@@ -200,7 +200,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
     else if (m_pCurrentAnimController->TestFrameTrigger(gPeachFlashFrame))
     {
         PeachPhotoData event;
-        event.v3Position = mUnidentified024.m_v3Position;
+        event.v3Position = m_DetChar.m_v3Position;
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         cField::FixOutOfBoundsPosition(event.v3Position, gPeachPhotoHalfWidth, true);
@@ -231,7 +231,7 @@ void cFielder::ActionPeachSuper(float fDeltaT)
         SetFlyingCameraTarget(0);
 
         PeachPhotoData event;
-        event.v3Position = mUnidentified024.m_v3Position;
+        event.v3Position = m_DetChar.m_v3Position;
         event.fHalfWidth = gPeachPhotoHalfWidth;
         event.fHalfHeight = gPeachPhotoHalfHeight;
         event.pPlayer = this;
@@ -258,7 +258,7 @@ void cFielder::fn_8004FF40()
         SetAction((eFielderActionState)5);
         SetAnimState(0x68, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
-        mUnidentified024.m_fDesiredSpeed = 0.0f;
+        m_DetChar.m_fDesiredSpeed = 0.0f;
     }
 }
 
@@ -276,7 +276,7 @@ void cFielder::ClearSuperPowerTank()
 
 void cFielder::TurnOffSuperPowerTank(bool bForce)
 {
-    if (mUnidentified024.m_eCharacterClass == BOWSER)
+    if (m_DetChar.m_eCharacterClass == BOWSER)
     {
         if (m_bSuperPowerTankOn || bForce)
         {
@@ -296,7 +296,7 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == WALUIGI)
+    else if (m_DetChar.m_eCharacterClass == WALUIGI)
     {
         if (m_bSuperPowerTankOn)
         {
@@ -327,7 +327,7 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
             }
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == WARIO)
+    else if (m_DetChar.m_eCharacterClass == WARIO)
     {
         if (m_bSuperPowerTankOn || bForce)
         {
@@ -335,7 +335,7 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == PETEY)
+    else if (m_DetChar.m_eCharacterClass == PETEY)
     {
         if (m_bSuperPowerTankOn || bForce)
         {
@@ -348,7 +348,7 @@ void cFielder::TurnOffSuperPowerTank(bool bForce)
 
 void cFielder::InitSuperPowerTank(bool bTurnOn)
 {
-    switch (mUnidentified024.m_eCharacterClass)
+    switch (m_DetChar.m_eCharacterClass)
     {
     case BOWSER:
         m_fSuperPowerTankCapacity = gBowserTankCapacity;
@@ -385,7 +385,7 @@ bool cFielder::TurnOnSuperPowerTank()
 
     if (!m_bSuperPowerTankOn)
     {
-        if (mUnidentified024.m_eCharacterClass == PETEY)
+        if (m_DetChar.m_eCharacterClass == PETEY)
         {
             PlaySound(m_uSoundSlotId, 0x8A9FCF66, 0, 0);
         }
@@ -397,7 +397,7 @@ bool cFielder::TurnOnSuperPowerTank()
         m_bSuperPowerTankShutdownPending = false;
     }
 
-    if (mUnidentified024.m_eCharacterClass == BOWSER)
+    if (m_DetChar.m_eCharacterClass == BOWSER)
     {
         bool bRunning = m_fSuperPowerTankLevel > 0.0f;
         if (bRunning)
@@ -407,7 +407,7 @@ bool cFielder::TurnOnSuperPowerTank()
             SetSuperPowerTweaks();
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == WALUIGI)
+    else if (m_DetChar.m_eCharacterClass == WALUIGI)
     {
         m_pTweaks = m_pSuperPowerTweaks;
         if (GetDesireState() != (eFielderDesireState)0xC)
@@ -423,13 +423,13 @@ bool cFielder::TurnOnSuperPowerTank()
             InitActionRunningWB(false);
         }
         InitMovementCoast();
-        mUnidentified024.m_fLeanAmount = 0.0f;
+        m_DetChar.m_fLeanAmount = 0.0f;
         if (!IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
         {
             ActivateConcurrentState(GetFielderScriptMachine(this), 0x23, 0, 0);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == WARIO)
+    else if (m_DetChar.m_eCharacterClass == WARIO)
     {
         if (m_eAnimID != 0x68 && IsRunning()
             && GetDesireState() != (eFielderDesireState)0x16)
@@ -441,7 +441,7 @@ bool cFielder::TurnOnSuperPowerTank()
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == PETEY)
+    else if (m_DetChar.m_eCharacterClass == PETEY)
     {
         m_fPeteyMuckBallSpeed = 0.0f;
         SetSuperPowerTweaks();

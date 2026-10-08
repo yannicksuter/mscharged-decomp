@@ -379,7 +379,7 @@ bool DesireShrink::Initialize(void* context)
         {
             m_pFielder->ReleaseBall(0);
             m_pFielder->ShootBallDueToContact(
-                m_pFielder->mUnidentified024
+                m_pFielder->m_DetChar
                     .m_aActualFacingDirection);
         }
     }
@@ -405,7 +405,7 @@ float DesireShrink::GetSpeedScale()
  */
 void DesireShrink::Update(DesireUpdate* update, float)
 {
-    if (!(m_pFielder->mUnidentified024.m_fPlayerScale < 0.99f))
+    if (!(m_pFielder->m_DetChar.m_fPlayerScale < 0.99f))
     {
         m_pFielder->fn_8001EE74(
             sShrinkPlayerScale, 0.0f, sShrinkMovementScale);
@@ -434,14 +434,14 @@ void DesireShrink::Cleanup()
 
 static inline void SetAnimationUpdatePaused(cPlayer* player, bool paused)
 {
-    player->mUnidentified1E4.m_bSkipAnimUpdate = paused;
-    player->mUnidentified1E4.m_fSkipTimer = 0.0f;
+    player->m_DetPlayer.m_bSkipAnimUpdate = paused;
+    player->m_DetPlayer.m_fSkipTimer = 0.0f;
 }
 
 static inline void SetActionUpdatePaused(cPlayer* player, bool paused)
 {
-    player->mUnidentified1E4.m_bSkipActionUpdate = paused;
-    player->mUnidentified1E4.m_fSkipTimer = 0.0f;
+    player->m_DetPlayer.m_bSkipActionUpdate = paused;
+    player->m_DetPlayer.m_fSkipTimer = 0.0f;
 }
 
 /**
@@ -488,8 +488,8 @@ bool DesireFrozen::Initialize(void* context)
     mfPrevFrozenTime = -1.0f;
     mePrevFrozenState = FROZEN_NONE;
     m_pFielder->SetVelocity(gStatusEffectZeroVector);
-    m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
-    m_pFielder->mUnidentified024.m_fActualSpeed = 0.0f;
+    m_pFielder->m_DetChar.m_fDesiredSpeed = 0.0f;
+    m_pFielder->m_DetChar.m_fActualSpeed = 0.0f;
     if (KillDaze(m_pFielder))
     {
         mbWasDazed = true;
@@ -504,7 +504,7 @@ bool DesireFrozen::Initialize(void* context)
     KillHitTrail(m_pFielder, 1);
     EndElectrocution(m_pFielder);
     KillDeke(m_pFielder);
-    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         KillSkillshotPlayerOnFire(m_pFielder);
     }
@@ -551,7 +551,7 @@ bool DesireFrozen::Reinitialize(void* context)
 
 static inline float GetCharacterOpacity(const cCharacter* character)
 {
-    return character->mUnidentified178;
+    return character->m_fOpacity;
 }
 
 /**
@@ -563,7 +563,7 @@ void DesireFrozen::Update(DesireUpdate*, float)
     {
         if (GetCharacterOpacity(m_pFielder) != 0.0f)
         {
-            m_pFielder->mUnidentified178 = 0.0f;
+            m_pFielder->m_fOpacity = 0.0f;
         }
     }
     if (!g_pGame->IsGameplayOrOvertime())
@@ -592,7 +592,7 @@ void DesireFrozen::Cleanup()
     case FROZEN_PHOTO:
         m_pFielder->mUnidentified17D = false;
         m_pFielder->SetTangible(true, false);
-        m_pFielder->mUnidentified178 = 1.0f;
+        m_pFielder->m_fOpacity = 1.0f;
         m_pFielder->SetModelType(0);
         break;
     case FROZEN_MEGA_STRIKE:
@@ -608,7 +608,7 @@ void DesireFrozen::Cleanup()
         case FROZEN_PHOTO:
             m_pFielder->mUnidentified17D = false;
             m_pFielder->SetTangible(true, false);
-            m_pFielder->mUnidentified178 = 1.0f;
+            m_pFielder->m_fOpacity = 1.0f;
             m_pFielder->SetModelType(0);
             break;
         case FROZEN_MEGA_STRIKE:
@@ -617,7 +617,7 @@ void DesireFrozen::Cleanup()
             break;
         }
         m_pFielder->EndConfusion();
-        if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+        if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
         {
             m_pFielder->fn_8009750C();
             m_pFielder->EndAction();
@@ -629,11 +629,11 @@ void DesireFrozen::Cleanup()
         break;
     case FROZEN_SHATTERED:
         m_pFielder->SetTangible(true, false);
-        m_pFielder->mUnidentified178 = 1.0f;
+        m_pFielder->m_fOpacity = 1.0f;
         break;
     }
 
-    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         EmitSkillshotPlayerOnFire(m_pFielder);
     }
@@ -708,7 +708,7 @@ void DesireFrozen::SetFrozenState(int state)
         break;
     case FROZEN_SHATTERED:
         m_pFielder->SetTangible(false, false);
-        m_pFielder->mUnidentified178 = 0.0f;
+        m_pFielder->m_fOpacity = 0.0f;
         m_pFielder->ResetEffects();
         m_pFielder->ClearInvincibility(false);
         PowerupBase::StopPowerupInEffectSound(POWER_UP_STAR,
@@ -750,7 +750,7 @@ bool DesireConfused::Initialize(void* context)
             m_pFielder->EndDesire();
             m_pFielder->InitActionRunning();
         }
-        else if (m_pFielder->mUnidentified024.m_eCharacterClass
+        else if (m_pFielder->m_DetChar.m_eCharacterClass
                      == SHYGUY
                  && m_pFielder->m_eActionState
                         == ACTION_UNKNOWN_32)
@@ -767,7 +767,7 @@ bool DesireConfused::Initialize(void* context)
         {
             m_pFielder->ReleaseBall(0);
             m_pFielder->ShootBallDueToContact(
-                m_pFielder->mUnidentified024.m_aActualFacingDirection);
+                m_pFielder->m_DetChar.m_aActualFacingDirection);
         }
     }
 
@@ -792,14 +792,14 @@ bool DesireConfused::Reinitialize(void* context)
     }
 
     if (m_pFielder->m_pBall != 0
-        && (m_pFielder->mUnidentified024.m_eCharacterClass
+        && (m_pFielder->m_DetChar.m_eCharacterClass
                 != SHYGUY
             || m_pFielder->m_eActionState
                    != ACTION_UNKNOWN_32))
     {
         m_pFielder->ReleaseBall(0);
         m_pFielder->ShootBallDueToContact(
-            m_pFielder->mUnidentified024.m_aActualFacingDirection);
+            m_pFielder->m_DetChar.m_aActualFacingDirection);
     }
     return result;
 }
@@ -825,7 +825,7 @@ void DesireConfused::Update(
     {
         *update = 1;
     }
-    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime
+    if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime
         != 0)
     {
         *update = 1;

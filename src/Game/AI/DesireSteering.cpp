@@ -173,8 +173,8 @@ void DesireSteering::Update(
     }
 
     nlPolar desiredVelocity;
-    desiredVelocity.a = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
-    desiredVelocity.r = m_pFielder->mUnidentified024.m_fDesiredSpeed;
+    desiredVelocity.a = m_pFielder->m_DetChar.m_aDesiredMovementDirection;
+    desiredVelocity.r = m_pFielder->m_DetChar.m_fDesiredSpeed;
     nlPolarToCartesian(m_v3DesiredVel, desiredVelocity);
     m_v3DesiredVel.z = 0.0f;
 
@@ -190,8 +190,8 @@ void DesireSteering::Update(
     fn_800C6FDC(this, fDeltaT);
     m_pFielder->ShouldIWave();
 
-    desiredVelocity.a = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
-    desiredVelocity.r = m_pFielder->mUnidentified024.m_fDesiredSpeed;
+    desiredVelocity.a = m_pFielder->m_DetChar.m_aDesiredMovementDirection;
+    desiredVelocity.r = m_pFielder->m_DetChar.m_fDesiredSpeed;
     nlPolarToCartesian(m_v3DesiredVel, desiredVelocity);
     m_v3DesiredVel.z = 0.0f;
 }
@@ -259,7 +259,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
             = CloseToMyNet(desire->m_pFielder);
         bool bBetweenPosts
             = (float)fabs(desire->m_pFielder
-                              ->mUnidentified024.m_v3Position.y)
+                              ->m_DetChar.m_v3Position.y)
             <= 0.5f * cNet::GetNetWidth() + cNet::GetPostRadius();
         bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
 
@@ -344,7 +344,7 @@ const nlVector3* GetSteeringTargetPosition(DesireSteering* desire)
     {
         nlVec3ScaleAdd(desire->m_v3TempDesiredPos, 0.3333f,
             desire->m_v3DesiredVel,
-            desire->m_pFielder->mUnidentified024.m_v3Position);
+            desire->m_pFielder->m_DetChar.m_v3Position);
         return &desire->m_v3TempDesiredPos;
     }
 
@@ -372,7 +372,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
 {
     nlVector3 v3FixedPos = v3Position;
     float fPlayerScale
-        = desire->m_pFielder->mUnidentified024.m_fPlayerScale;
+        = desire->m_pFielder->m_DetChar.m_fPlayerScale;
     float fRadius = fn_8002BFA8(desire->m_pFielder->GetTweaks(),
         fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
@@ -380,7 +380,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
     nlVector3 v3DeltaFromDesired;
     nlVec3Sub(v3DeltaFromDesired, v3FixedPos, desire->m_v3LastDesiredPos);
     float fDistSq = nlVec3DistanceSquared2D(v3FixedPos,
-        desire->m_pFielder->mUnidentified024.m_v3Position);
+        desire->m_pFielder->m_DetChar.m_v3Position);
 
     if (fDistSq < desire->m_fForcedArrivalRadius
             * desire->m_fForcedArrivalRadius)
@@ -393,7 +393,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
                     + 0.5f),
                 false);
         }
-        desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
+        desire->m_pFielder->m_DetChar.m_fDesiredSpeed = 0.0f;
         ResetSteeringTargets(desire);
         return;
     }
@@ -422,7 +422,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
     {
         nlVector3 v3Direction;
         nlVec3Sub(v3Direction, v3FixedPos,
-            desire->m_pFielder->mUnidentified024.m_v3Position);
+            desire->m_pFielder->m_DetChar.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
         desire->m_pFielder->fn_8001DCE0(aDirection);
         desire->m_pFielder->SetDesiredFacingDirection(
@@ -431,7 +431,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
 
     fDesiredSpeed = nlMinEquals(
         fDesiredSpeed, desire->m_pFielder->GetRunningSpeed());
-    desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
+    desire->m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
 }
 
 static inline float GetSteeringSpeedScale(float distance)
@@ -446,7 +446,7 @@ void SeekSteeringTarget(DesireSteering* desire,
     float fDeltaT, float fUrgency)
 {
     nlVector3 v3FixedPos = v3Pos;
-    float fPlayerScale = desire->m_pFielder->mUnidentified024.m_fPlayerScale;
+    float fPlayerScale = desire->m_pFielder->m_DetChar.m_fPlayerScale;
     float fRadius = fn_8002BFA8(
         desire->m_pFielder->GetTweaks(), fPlayerScale);
     cField::FixOutOfBoundsPosition(v3FixedPos, fRadius, false);
@@ -455,7 +455,7 @@ void SeekSteeringTarget(DesireSteering* desire,
     nlVec3Sub(v3DeltaFromDesired, v3FixedPos,
         desire->m_v3LastDesiredPos);
     float fDistance = nlVec3Distance2D(v3FixedPos,
-        desire->m_pFielder->mUnidentified024.m_v3Position);
+        desire->m_pFielder->m_DetChar.m_v3Position);
     float fDesiredPositionRateOfChange = 0.0f;
     float fRadiusScale = fUrgency > 0.0f ? 1.0f / fUrgency : 1.0f;
     float fMinimumSpeedScale = 1.0f;
@@ -471,7 +471,7 @@ void SeekSteeringTarget(DesireSteering* desire,
 
         nlVector3 v3Direction;
         nlVec3Sub(v3Direction, v3FixedPos,
-            desire->m_pFielder->mUnidentified024.m_v3Position);
+            desire->m_pFielder->m_DetChar.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
         desire->m_pFielder->SetDesiredFacingDirection(aDirection, false);
         desire->m_pFielder->fn_8001DCE0(aDirection);
@@ -627,7 +627,7 @@ void SeekSteeringTarget(DesireSteering* desire,
     fDesiredSpeed *= GetSteeringSpeedScale(fDistance);
     fDesiredSpeed = nlMinEquals(
         fDesiredSpeed, desire->m_pFielder->GetRunningSpeed());
-    desire->m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
+    desire->m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
 }
 
 float GetBallFacingWeight(cFielder* pFielder)
@@ -686,7 +686,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
                      && !(bool)ReceivingPass(desire->m_pFielder)
                      && fn_800DED80(desire->m_pFielder) < 0.2f;
 
-    int aFacingDirection = desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
+    int aFacingDirection = desire->m_pFielder->m_DetChar.m_aDesiredMovementDirection;
     eStrafeDirection eMovement = STRAFE_IDLE;
     if (bCanFaceBall)
     {
@@ -725,12 +725,12 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
                 if (pMark != NULL)
                 {
                     nlVec3ScaleAdd(v3FacingPos, fMarkWeight / fTotalWeight,
-                        pMark->mUnidentified024.m_v3Position, v3FacingPos);
+                        pMark->m_DetChar.m_v3Position, v3FacingPos);
                 }
                 float fDeltaX = v3FacingPos.x
-                              - desire->m_pFielder->mUnidentified024.m_v3Position.x;
+                              - desire->m_pFielder->m_DetChar.m_v3Position.x;
                 float fDeltaY = v3FacingPos.y
-                              - desire->m_pFielder->mUnidentified024.m_v3Position.y;
+                              - desire->m_pFielder->m_DetChar.m_v3Position.y;
                 aFacingDirection = (unsigned short)(int)(
                     nlATan2f(fDeltaY, fDeltaX)
                     * 10430.378f);
@@ -738,16 +738,16 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
         }
 
         eMovement = GetSteeringStrafeDirection(desire, (unsigned short)aFacingDirection,
-            desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection);
+            desire->m_pFielder->m_DetChar.m_aDesiredMovementDirection);
         if (eMovement == STRAFE_FORWARD)
         {
-            aFacingDirection = desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
+            aFacingDirection = desire->m_pFielder->m_DetChar.m_aDesiredMovementDirection;
         }
         desire->m_pFielder->SetDesiredFacingDirection((unsigned short)aFacingDirection, false);
     }
     else
     {
-        eMovement = desire->m_pFielder->mUnidentified024.m_fDesiredSpeed < 0.1f
+        eMovement = desire->m_pFielder->m_DetChar.m_fDesiredSpeed < 0.1f
                   ? STRAFE_IDLE : STRAFE_FORWARD;
     }
     desire->m_pFielder->mActionRunningVars.eLastStrafeDirection = eMovement;
@@ -787,7 +787,7 @@ eStrafeDirection GetSteeringStrafeDirection(DesireSteering* desire,
         = 0.5f * (fn_8002C254(desire->m_pFielder->GetTweaks())
               - GetRunSpeed(pFielder->GetTweaks()))
         + GetRunSpeed(desire->m_pFielder->GetTweaks());
-    float fDesiredSpeed = desire->m_pFielder->mUnidentified024.m_fDesiredSpeed;
+    float fDesiredSpeed = desire->m_pFielder->m_DetChar.m_fDesiredSpeed;
 
     if (fDesiredSpeed < 0.1f)
     {
@@ -842,7 +842,7 @@ void UnidentifiedDesire35::Update(
     float fSpeed = m_pFielder->m_pBall != NULL
                  ? m_pFielder->GetTweaks()->GetRunningSpeed()
                  : fn_8002C254(m_pFielder->GetTweaks());
-    m_pFielder->mUnidentified024.m_fDesiredSpeed = fSpeed;
+    m_pFielder->m_DetChar.m_fDesiredSpeed = fSpeed;
     m_pFielder->m_fSuperPowerTankLevel -= fDeltaT;
     bool bRunning = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
     if (!bRunning)
@@ -852,8 +852,8 @@ void UnidentifiedDesire35::Update(
     }
 
     m_pFielder->mWaluigiWallState.mUnidentified00 -= fDeltaT;
-    short nFacingDelta = (short)(m_pFielder->mUnidentified024.m_aActualFacingDirection
-        - m_pFielder->mUnidentified024.m_aDesiredFacingDirection);
+    short nFacingDelta = (short)(m_pFielder->m_DetChar.m_aActualFacingDirection
+        - m_pFielder->m_DetChar.m_aDesiredFacingDirection);
     if (m_pFielder->mWaluigiWallState.mUnidentified00 <= 0.0f)
     {
         if (m_pFielder->m_bSuperPowerTankShutdownPending)
@@ -877,12 +877,12 @@ void UnidentifiedDesire35::Update(
             if (nFacingDelta < 0)
             {
                 m_pFielder->SetFacingDirection(
-                    m_pFielder->mUnidentified024.m_aActualFacingDirection + 0x4000, true);
+                    m_pFielder->m_DetChar.m_aActualFacingDirection + 0x4000, true);
             }
             else
             {
                 m_pFielder->SetFacingDirection(
-                    m_pFielder->mUnidentified024.m_aActualFacingDirection - 0x4000, true);
+                    m_pFielder->m_DetChar.m_aActualFacingDirection - 0x4000, true);
             }
             fn_8006040C(g_pGame, m_pFielder);
             m_pFielder->mWaluigiWallState.mUnidentified00
@@ -891,9 +891,9 @@ void UnidentifiedDesire35::Update(
     }
 
     m_pFielder->fn_8001DCE0(
-        m_pFielder->mUnidentified024.m_aActualFacingDirection);
-    m_pFielder->mUnidentified024.m_aActualMovementDirection
-        = m_pFielder->mUnidentified024.m_aActualFacingDirection;
+        m_pFielder->m_DetChar.m_aActualFacingDirection);
+    m_pFielder->m_DetChar.m_aActualMovementDirection
+        = m_pFielder->m_DetChar.m_aActualFacingDirection;
     m_pFielder->fn_8001E304(fSpeed, fDeltaT);
 }
 

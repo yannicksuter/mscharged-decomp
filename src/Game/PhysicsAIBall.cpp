@@ -356,12 +356,12 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
     bool bCanCollide1 = pGoalie1->m_pPhysicsCharacter->m_CanCollideWithBall;
 
     if (!bCanCollide0
-        || newPosition.x * pGoalie0->mUnidentified024.m_v3Position.x < 0.0f)
+        || newPosition.x * pGoalie0->m_DetChar.m_v3Position.x < 0.0f)
     {
         pGoalie0 = 0;
     }
     if (!bCanCollide1
-        || newPosition.x * pGoalie1->mUnidentified024.m_v3Position.x < 0.0f)
+        || newPosition.x * pGoalie1->m_DetChar.m_v3Position.x < 0.0f)
     {
         pGoalie1 = 0;
     }
@@ -380,9 +380,9 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
         pGoalie = (Goalie*)pGoalie0;
     }
     else if (CalculateDistanceSquared(
-                 pGoalie0->mUnidentified024.m_v3Position, newPosition)
+                 pGoalie0->m_DetChar.m_v3Position, newPosition)
              < CalculateDistanceSquared(
-                 pGoalie1->mUnidentified024.m_v3Position, newPosition))
+                 pGoalie1->m_DetChar.m_v3Position, newPosition))
     {
         pGoalie = (Goalie*)pGoalie0;
     }
@@ -462,7 +462,7 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
         {
             nlVector3 v3DeflectFudge;
             RotateVectorZAxis(v3DeflectFudge, v3ExitVel,
-                (u16)-pGoalie->mUnidentified024.m_aActualFacingDirection);
+                (u16)-pGoalie->m_DetChar.m_aActualFacingDirection);
 
             float exitSpeed = nlVec3Length(v3ExitVel);
             exitSpeed = nlMinEquals(
@@ -501,7 +501,7 @@ void PhysicsAIBall::CheckIfBallWentThroughGoalie()
                              * (scale * (gGoalieDeflectionHeightScale + nlRandomf(gGoalieDeflectionHeightRandomRange)));
 
             RotateVectorZAxis(v3DeflectFudge, v3DeflectFudge,
-                pGoalie->mUnidentified024.m_aActualFacingDirection);
+                pGoalie->m_DetChar.m_aActualFacingDirection);
 
             nlVecLerp(v3ExitVel, v3ExitVel, v3DeflectFudge, gGoalieDeflectionBlend);
         }

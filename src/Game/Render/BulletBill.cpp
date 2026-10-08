@@ -98,7 +98,7 @@ void BulletBillObject::Update(float deltaTime)
     if (target != 0)
     {
         fn_802B549C(
-            orientation, target->mUnidentified024.m_aActualFacingDirection);
+            orientation, target->m_DetChar.m_aActualFacingDirection);
     }
 }
 
@@ -126,7 +126,7 @@ void BulletBillObject::Show(cFielder* fielder)
     target = fielder;
     if (fielder != 0)
     {
-        fn_802B549C(orientation, fielder->mUnidentified024.m_aActualFacingDirection);
+        fn_802B549C(orientation, fielder->m_DetChar.m_aActualFacingDirection);
     }
 
     nlVector3 newPosition = g_pBall->m_v3Position;
@@ -141,10 +141,10 @@ void BulletBillObject::Show(cFielder* fielder)
     targetScale = 1.0f;
     scaleTimer = 0.52f;
 
-    float speed = fielder->mUnidentified024.m_fActualSpeed;
+    float speed = fielder->m_DetChar.m_fActualSpeed;
     nlVector3 newVelocity;
     nlPolarToCartesian(newVelocity.x, newVelocity.y,
-        fielder->mUnidentified024.m_aActualFacingDirection,
+        fielder->m_DetChar.m_aActualFacingDirection,
         speed);
     newVelocity.z = 0.0f;
     velocity = newVelocity;

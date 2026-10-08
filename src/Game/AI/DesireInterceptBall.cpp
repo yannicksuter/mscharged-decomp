@@ -64,19 +64,19 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
         {
             if (g_pBall->GetPosition().z > m_pFielder->GetAirInterceptHeight(0))
             {
-                float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
+                float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->m_DetPlayer.m_ID];
                 float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;
                 fn_800180F4(g_pBall, &position, predictionTime);
             }
             else
             {
-                target->GetApproachPosition(&position, &m_pFielder->mUnidentified024.m_v3Position, 0.1f);
+                target->GetApproachPosition(&position, &m_pFielder->m_DetChar.m_v3Position, 0.1f);
             }
         }
         else
         {
             position = GetClosestPointOnLineABFromPointC(g_pBall->m_v3Position,
-                g_pBall->m_v3PassIntercept, m_pFielder->mUnidentified024.m_v3Position);
+                g_pBall->m_v3PassIntercept, m_pFielder->m_DetChar.m_v3Position);
             if (mbInterceptPass && fn_800D7B00(m_pFielder) >= 0.5f)
             {
                 *update = DESIRE_CHANGE;
@@ -87,11 +87,11 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
     else if (g_pBall->GetOwnerFielder() != NULL)
     {
         g_pBall->GetOwnerFielder()->GetApproachPosition(&position,
-            &m_pFielder->mUnidentified024.m_v3Position, 0.25f);
+            &m_pFielder->m_DetChar.m_v3Position, 0.25f);
     }
     else
     {
-        float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->mUnidentified1E4.m_ID];
+        float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->m_DetPlayer.m_ID];
         float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;
         fn_800180F4(g_pBall, &position, predictionTime);
     }

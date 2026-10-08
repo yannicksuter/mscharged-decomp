@@ -189,7 +189,7 @@ public:
         float fInitialWeight);
 
 public:
-    /* 0x1E4 */ PlayerGameplayState mUnidentified1E4;
+    /* 0x1E4 */ PlayerGameplayState m_DetPlayer;
     /* 0x270 */ Timer m_tSwapControllerTimer[16];
 
 protected:

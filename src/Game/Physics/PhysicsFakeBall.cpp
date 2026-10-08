@@ -113,7 +113,7 @@ bool FakeBallWorld::GetPredictedBallPosition(float fDeltaTime,
     {
         v3Position = pBall->m_v3Position;
         v3Velocity
-            = predictWorld->mpBall->m_pOwner->mUnidentified024.m_v3Velocity;
+            = predictWorld->mpBall->m_pOwner->m_DetChar.m_v3Velocity;
         return false;
     }
 

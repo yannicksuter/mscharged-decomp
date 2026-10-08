@@ -208,7 +208,7 @@ void HammerObject::OnLanding()
                 * ToRadians(sHammerHalf * (gHammerMaxLandingAngle + gHammerMinLandingAngle))));
 
         fn_802B549C(facing,
-            mOwner->mUnidentified024.m_aActualFacingDirection);
+            mOwner->m_DetChar.m_aActualFacingDirection);
 
         nlMultQuat(target, facing, tilt);
 
@@ -338,7 +338,7 @@ void HammerObject::Activate(cFielder* fielder)
     HammerObject* object = this;
     object->mOwner = fielder;
     object->mPhysics->SetPosition(
-        fielder->mUnidentified024.m_v3Position, PhysicsObject::WORLD_COORDINATES);
+        fielder->m_DetChar.m_v3Position, PhysicsObject::WORLD_COORDINATES);
     object->mPendingReset = false;
     object->mActive = true;
     object->mPhysics->EnableCollisions();

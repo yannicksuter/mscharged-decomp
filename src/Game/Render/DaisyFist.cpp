@@ -126,7 +126,7 @@ void DaisyFistObject::Spawn(cCharacter* owner, u16 orientation)
 
     nlVector3 local = { sForwardOffset, 0.0f, sHiddenHeight };
     nlVector3 world;
-    GetWorldPoint(world, local, owner->mUnidentified024.m_v3Position, orientation);
+    GetWorldPoint(world, local, owner->m_DetChar.m_v3Position, orientation);
     mPosition = world;
     mVisible = true;
 }

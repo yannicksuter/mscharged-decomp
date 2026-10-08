@@ -204,7 +204,7 @@ void ChainChomp::Update(float fDeltaT)
             v3RecoverPosition = v3Zero;
             if (mpTarget != 0)
             {
-                v3RecoverPosition = mpTarget->mUnidentified024.m_v3Position;
+                v3RecoverPosition = mpTarget->m_DetChar.m_v3Position;
             }
             v3RecoverPosition.z = gfChainChompGroundHeight;
             cField::FixOutOfBoundsPosition(v3RecoverPosition,
@@ -273,14 +273,14 @@ void ChainChomp::Update(float fDeltaT)
             break;
         }
         if (mpTarget == 0
-            || (mpTarget != 0 && mpTarget->IsFallenDown() && mpTarget->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
-            || fabsf(mpTarget->mUnidentified024.m_v3Position.x) > cField::GetGoalLineX(1U))
+            || (mpTarget != 0 && mpTarget->IsFallenDown() && mpTarget->m_DetPlayer.m_tFireTimer.m_uPackedTime == 0)
+            || fabsf(mpTarget->m_DetChar.m_v3Position.x) > cField::GetGoalLineX(1U))
         {
             mpTarget = FindTarget(mpThrower->m_pTeam->GetOtherTeam());
         }
         {
-            float fDeltaX = mpTarget->mUnidentified024.m_v3Position.x - mv3Position.x;
-            float fDeltaY = mpTarget->mUnidentified024.m_v3Position.y - mv3Position.y;
+            float fDeltaX = mpTarget->m_DetChar.m_v3Position.x - mv3Position.x;
+            float fDeltaY = mpTarget->m_DetChar.m_v3Position.y - mv3Position.y;
             aDesiredFacing = (u16)(s32)(10430.378f * nlATan2f(fDeltaY, fDeltaX));
             maDesiredFacingDirection = aDesiredFacing;
             Move(fDeltaT);
@@ -292,7 +292,7 @@ void ChainChomp::Update(float fDeltaT)
                 {
                     const nlVector3& v3ChompPosition = mv3Position;
                     float fRadius = gfChainChompAttackRange + gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue();
-                    if (nlVec3DistanceSquared2D(v3ChompPosition, mpTarget->mUnidentified024.m_v3Position) < fRadius * fRadius)
+                    if (nlVec3DistanceSquared2D(v3ChompPosition, mpTarget->m_DetChar.m_v3Position) < fRadius * fRadius)
                     {
                         mfDesiredSpeed = gfChainChompWindupSpeedScale * gGameTweaks.m_pGameTweaks->fChainChompSpeed.GetValue();
                         PowerupBase::PlayPowerupSound(POWER_UP_CHAIN_CHOMP,
@@ -315,8 +315,8 @@ void ChainChomp::Update(float fDeltaT)
     case CHAIN_STATE_CHOMP:
         if (mpTarget != 0 && mpAnimController->m_fTime < 3.0f / mpAnimController->m_pSAnim->m_nNumKeys)
         {
-            float fDeltaX = mpTarget->mUnidentified024.m_v3Position.x - mv3Position.x;
-            float fDeltaY = mpTarget->mUnidentified024.m_v3Position.y - mv3Position.y;
+            float fDeltaX = mpTarget->m_DetChar.m_v3Position.x - mv3Position.x;
+            float fDeltaY = mpTarget->m_DetChar.m_v3Position.y - mv3Position.y;
             maDesiredFacingDirection = (u16)(s32)(10430.378f * nlATan2f(fDeltaY, fDeltaX));
         }
         Move(fDeltaT);
@@ -511,7 +511,7 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
         pFielder = g_pBall->GetOwnerFielder();
         if (pFielder->IsOnSameTeam(pTeam->GetStriker())
             && !pFielder->IsFrozen() && !pFielder->IsShattered()
-            && (!pFielder->IsFallenDown() || pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+            && (!pFielder->IsFallenDown() || pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
             && pFielder != mpTarget)
         {
             pBestCandidate = g_pBall->GetOwnerFielder();
@@ -522,7 +522,7 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
         pFielder2 = g_pBall->GetPassTargetFielder();
         if (pFielder2->IsOnSameTeam(pTeam->GetStriker())
             && !pFielder2->IsFrozen() && !pFielder2->IsShattered()
-            && (!pFielder2->IsFallenDown() || pFielder2->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+            && (!pFielder2->IsFallenDown() || pFielder2->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
             && pFielder2 != mpTarget)
         {
             pBestCandidate = pFielder2;
@@ -534,15 +534,15 @@ cFielder* ChainChomp::FindTarget(cTeam* pTeam)
         {
             fTempScore = 999999.9f;
             pCandidate = pTeam->GetFielder(i);
-            if ((!pCandidate->IsFallenDown() || pCandidate->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+            if ((!pCandidate->IsFallenDown() || pCandidate->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
                 && !pCandidate->IsFrozen() && !pCandidate->IsShattered()
                 && pCandidate != mpTarget
-                && fabsf(pCandidate->mUnidentified024.m_v3Position.x) < cField::GetGoalLineX(1U))
+                && fabsf(pCandidate->m_DetChar.m_v3Position.x) < cField::GetGoalLineX(1U))
             {
                 nlVector2 v2Delta = meChainChompState == CHAIN_STATE_RECOVER
-                                      ? *(nlVector2*)&mpThrower->mUnidentified024.m_v3Position
+                                      ? *(nlVector2*)&mpThrower->m_DetChar.m_v3Position
                                       : *(nlVector2*)&mv3Position;
-                nlVec2Sub(v2Delta, *(nlVector2*)&pCandidate->mUnidentified024.m_v3Position, v2Delta);
+                nlVec2Sub(v2Delta, *(nlVector2*)&pCandidate->m_DetChar.m_v3Position, v2Delta);
                 float fDist = nlSqrt(nlGetLengthSquared2D(v2Delta.x, v2Delta.y), true);
                 s16 angleDiff = (s16)(maFacingDirection
                                       - ChainChompDeltaToAngle(v2Delta.y, v2Delta.x));
@@ -600,7 +600,7 @@ void ChainChomp::Spawn(cFielder* pThrower, cFielder* pTarget)
     nlVector3 v3StartPosition = v3Zero;
     if (mpTarget != 0)
     {
-        v3StartPosition = mpTarget->mUnidentified024.m_v3Position;
+        v3StartPosition = mpTarget->m_DetChar.m_v3Position;
     }
     v3StartPosition.z = 0.0f;
     SetPosition(v3StartPosition);

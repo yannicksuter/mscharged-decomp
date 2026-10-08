@@ -360,7 +360,7 @@ static inline float GetCollisionHitIntensity(cFielder* hittee,
     const cFielder* hitter)
 {
     float closingSpeed = GetClosingSpeed(contactPosition, velocity,
-        hitter->mUnidentified024.m_v3Position, v3Zero);
+        hitter->m_DetChar.m_v3Position, v3Zero);
     float runningSpeed = fn_8002C254(hittee->m_pTweaks);
     float minimumSpeed = -runningSpeed;
     return NormalizeVal(closingSpeed, minimumSpeed, runningSpeed);
@@ -467,7 +467,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         if (bCondition3)
         {
             bool bExcluded
-                = pFielder->mUnidentified024.m_eCharacterClass == DAISY
+                = pFielder->m_DetChar.m_eCharacterClass == DAISY
                && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, 0x17);
             if (!bExcluded)
             {
@@ -478,7 +478,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         if (bCondition4)
         {
             bool bExcluded
-                = pFielder->mUnidentified024.m_eCharacterClass == BOWSERJR
+                = pFielder->m_DetChar.m_eCharacterClass == BOWSERJR
                && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, 0x17);
             if (!bExcluded)
             {
@@ -505,12 +505,12 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         }
 
         if (bCanReceivePass
-            && AIsgn(pFielder->mUnidentified024.m_v3Position.x) != AIsgn(player->mUnidentified024.m_v3Position.x))
+            && AIsgn(pFielder->m_DetChar.m_v3Position.x) != AIsgn(player->m_DetChar.m_v3Position.x))
         {
-            if (nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
-                    player->mUnidentified024.m_v3Position), true) > 0.5f * fClearDistance)
+            if (nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position,
+                    player->m_DetChar.m_v3Position), true) > 0.5f * fClearDistance)
             {
-                nlVec3Sub(v3Direction, pFielder->mUnidentified024.m_v3Position, player->mUnidentified024.m_v3Position);
+                nlVec3Sub(v3Direction, pFielder->m_DetChar.m_v3Position, player->m_DetChar.m_v3Position);
                 nlCartesianToPolar(pDirection, v3Direction);
                 aClearingAngle = pDirection.a;
             }
@@ -583,7 +583,7 @@ static inline void SetStoppingAnimState(cFielder* fielder, int animation)
 {
     fielder->SetAnimState(animation, true, 0.2f, false, false);
     fielder->InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    fielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
+    fielder->m_DetChar.m_fDesiredSpeed = 0.0f;
 }
 
 static inline bool IsCharacterSuperPowerActive(const cFielder* fielder, eCharacterClass character)
@@ -819,7 +819,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     m_pAIContext->mScriptMachine->Initialize();
 
     bIsModified = false;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6)
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)6)
     {
         mWaluigiWallState.mUnidentified08
             = new (8, false) WaluigiWallManager();
@@ -829,7 +829,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         mWaluigiWallState.mUnidentified08 = 0;
     }
 
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)19)
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)19)
     {
         m_pBulletBill = gNPCManager->fn_801A9D20();
     }
@@ -842,7 +842,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
 cFielder::~cFielder()
 {
     CleanUpAction(ACTION_NEED_ACTION);
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6)
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)6)
     {
         delete mWaluigiWallState.mUnidentified08;
     }
@@ -999,7 +999,7 @@ bool cFielder::EndSuperPower(int)
 bool cFielder::EndBowserSuperPower(bool value)
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == BOWSER
+    if (m_DetChar.m_eCharacterClass == BOWSER
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
         active = true;
@@ -1015,7 +1015,7 @@ bool cFielder::EndBowserSuperPower(bool value)
 bool cFielder::EndMarioSuperPower()
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == MARIO
+    if (m_DetChar.m_eCharacterClass == MARIO
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
         active = true;
@@ -1031,7 +1031,7 @@ bool cFielder::EndMarioSuperPower()
 bool cFielder::EndLuigiSuperPower()
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == LUIGI
+    if (m_DetChar.m_eCharacterClass == LUIGI
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
         active = true;
@@ -1047,7 +1047,7 @@ bool cFielder::EndLuigiSuperPower()
 bool cFielder::EndWaluigiSuperPower()
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == WALUIGI
+    if (m_DetChar.m_eCharacterClass == WALUIGI
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
         active = true;
@@ -1063,7 +1063,7 @@ bool cFielder::EndWaluigiSuperPower()
 bool cFielder::EndWarioSuperPower(bool)
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == WARIO
+    if (m_DetChar.m_eCharacterClass == WARIO
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
         active = true;
@@ -1079,7 +1079,7 @@ bool cFielder::EndWarioSuperPower(bool)
 bool cFielder::EndPeteySuperPower(bool)
 {
     bool active = false;
-    if (mUnidentified024.m_eCharacterClass == PETEY
+    if (m_DetChar.m_eCharacterClass == PETEY
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 23))
     {
         active = true;
@@ -1181,7 +1181,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         return false;
     }
@@ -1239,7 +1239,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
     cFielder* pCaptain = pFielder->m_pTeam->GetCaptain();
     if (pFielder->m_pTeam->fn_800A6764())
     {
-        eCharacterClass eCaptainClass = pCaptain->mUnidentified024.m_eCharacterClass;
+        eCharacterClass eCaptainClass = pCaptain->m_DetChar.m_eCharacterClass;
         if (eCaptainClass == BOWSER || eCaptainClass == PETEY || eCaptainClass == WALUIGI)
         {
             switch (pFielder->m_eActionState)
@@ -1298,7 +1298,7 @@ bool cFielder::CanGetElectrocuted() const
         return false;
     if (GameInfoManager::Instance()->GetStadium() == 11)
     {
-        float x = (float)fabs(mUnidentified024.m_v3Position.x);
+        float x = (float)fabs(m_DetChar.m_v3Position.x);
         if (x < cField::GetGoalLineX(1U) - 1.0f)
             return false;
     }
@@ -1358,7 +1358,7 @@ bool cFielder::CanGetElectrocuted(
             || (float)fabs(jointPos.z) > netHeight)
         {
             bool bUnidentified = false;
-            if (mUnidentified024.m_eCharacterClass == WALUIGI
+            if (m_DetChar.m_eCharacterClass == WALUIGI
                 && IsConcurrentStateActive(
                     m_pAIContext->mScriptMachine, 0x17))
             {
@@ -1372,13 +1372,13 @@ bool cFielder::CanGetElectrocuted(
                 return false;
             }
 
-            if ((mUnidentified024.m_eCharacterClass == WALUIGI
-                    || mUnidentified024.m_eCharacterClass == DAISY
-                    || mUnidentified024.m_eCharacterClass == (eCharacterClass)0x11)
+            if ((m_DetChar.m_eCharacterClass == WALUIGI
+                    || m_DetChar.m_eCharacterClass == DAISY
+                    || m_DetChar.m_eCharacterClass == (eCharacterClass)0x11)
                 && m_eActionState == (eFielderActionState)1)
             {
                 if (m_pCurrentAnimController->m_fTime > 0.7f
-                    || mUnidentified024.m_v3Position.z > 1.0f)
+                    || m_DetChar.m_v3Position.z > 1.0f)
                 {
                     return true;
                 }
@@ -1490,16 +1490,16 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
             for (float fTime = 0.0f; fTime < fGroundContactTime; fTime += FixedUpdateTask::GetPhysicsUpdateTick())
             {
                 fn_800180F4(g_pBall, &v3BallPos, fTime);
-                u16 aMoveDirection = mUnidentified024.m_aActualMovementDirection;
-                float fDeltaX = v3BallPos.x - mUnidentified024.m_v3Position.x;
-                float fDeltaY = v3BallPos.y - mUnidentified024.m_v3Position.y;
+                u16 aMoveDirection = m_DetChar.m_aActualMovementDirection;
+                float fDeltaX = v3BallPos.x - m_DetChar.m_v3Position.x;
+                float fDeltaY = v3BallPos.y - m_DetChar.m_v3Position.y;
                 u16 aBallDirection = RadToAng16(nlATan2f(fDeltaY, fDeltaX));
                 u16 aDelta = abs_s16((s16)(aBallDirection - aMoveDirection));
                 float fReachScale = InterpolateRangeClamped(1.25f, 3.0f, 32768.0f, 0.0f, aDelta);
                 nlVector2 v2Delta;
-                v2Delta.x = v3BallPos.x - mUnidentified024.m_v3Position.x;
-                v2Delta.y = v3BallPos.y - mUnidentified024.m_v3Position.y;
-                if (nlVec2Length(v2Delta) <= fReachScale * mUnidentified024.m_fPlayerScale)
+                v2Delta.x = v3BallPos.x - m_DetChar.m_v3Position.x;
+                v2Delta.y = v3BallPos.y - m_DetChar.m_v3Position.y;
+                if (nlVec2Length(v2Delta) <= fReachScale * m_DetChar.m_fPlayerScale)
                 {
                     if (requireBestInterceptor)
                     {
@@ -1638,7 +1638,7 @@ float GetFielderHitReach(cFielder* pFielder)
         cSAnim* pAnim = pFielder->m_pAnimInventory->GetAnim(0x67);
         nlVector3 v3Start;
         nlVector3 v3End;
-        if (pFielder->mUnidentified024.m_eCharacterClass != YOSHI)
+        if (pFielder->m_DetChar.m_eCharacterClass != YOSHI)
         {
             pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D020(pFielder->m_pTweaks)), &v3Start);
             pAnim->GetRootTrans(GetNormalizedContactTime(pAnim, fn_8002D050(pFielder->m_pTweaks)), &v3End);
@@ -1656,7 +1656,7 @@ float GetFielderHitReach(cFielder* pFielder)
         nlVec3Set(v3Delta, v3End.x - v3Start.x, v3End.y - v3Start.y, v3End.z - v3Start.z);
         pFielder->m_fHitDistance = nlVec3Length(v3Delta);
     }
-    float fScale = pFielder->mUnidentified024.m_fMovementScale;
+    float fScale = pFielder->m_DetChar.m_fMovementScale;
     float fReach = pFielder->m_fHitDistance * fScale;
     fReach += fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale());
     return fReach;
@@ -1718,13 +1718,13 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             m_pPhysicsCharacter->m_pPlayerPlayerColumn->GetRadius(&thisRadius);
             pFielderCollidedWith->m_pPhysicsCharacter->m_pPlayerPlayerColumn->GetRadius(&otherRadius);
             float combinedRadius = thisRadius + otherRadius;
-            if (fabsf(mUnidentified024.m_v3Position.x) > thisRadius + cField::GetGoalLineX(1U))
+            if (fabsf(m_DetChar.m_v3Position.x) > thisRadius + cField::GetGoalLineX(1U))
                 return;
 
             float sinVal, cosVal;
-            nlSinCos(&sinVal, &cosVal, pFielderCollidedWith->mUnidentified024.m_aActualFacingDirection);
+            nlSinCos(&sinVal, &cosVal, pFielderCollidedWith->m_DetChar.m_aActualFacingDirection);
             nlVector3 adjustedPosition;
-            adjustedPosition = pFielderCollidedWith->mUnidentified024.m_v3Position;
+            adjustedPosition = pFielderCollidedWith->m_DetChar.m_v3Position;
             adjustedPosition.x += cosVal * combinedRadius;
             adjustedPosition.y += sinVal * combinedRadius;
 
@@ -1766,7 +1766,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             }
 
             fn_80047240(pFielderCollidedWith,
-                pFielderCollidedWith->mUnidentified024.m_aActualFacingDirection,
+                pFielderCollidedWith->m_DetChar.m_aActualFacingDirection,
                 nUnidentified, doFrameLock, true);
             PlayerAttackData* pAttackData = g_PlayerAttackDataPool.Allocate();
             pAttackData->pAttacker = pFielderCollidedWith;
@@ -1781,8 +1781,8 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         }
         else if (pFielderCollidedWith->IsSlideAttacking() && m_eActionState != ACTION_HIT)
         {
-            s16 nHitteeToHitterFacingDelta = pFielderCollidedWith->GetFacingDeltaToPosition(mUnidentified024.m_v3Position);
-            s16 nHitterToHitteeFacingDelta = GetFacingDeltaToPosition(pFielderCollidedWith->mUnidentified024.m_v3Position);
+            s16 nHitteeToHitterFacingDelta = pFielderCollidedWith->GetFacingDeltaToPosition(m_DetChar.m_v3Position);
+            s16 nHitterToHitteeFacingDelta = GetFacingDeltaToPosition(pFielderCollidedWith->m_DetChar.m_v3Position);
             u8 isThisSlideAttacking = IsSlideAttacking();
             if (isThisSlideAttacking)
             {
@@ -1813,23 +1813,23 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
         else if (GetActionState() == ACTION_LOOSE_BALL_PASS
             || GetActionState() == ACTION_LOOSE_BALL_SHOT)
         {
-            nlVector3 v3Position = mUnidentified024.m_v3Position;
+            nlVector3 v3Position = m_DetChar.m_v3Position;
             float otherRadius, thisRadius;
             pFielderCollidedWith->m_pPhysicsCharacter->GetRadius(&otherRadius);
             m_pPhysicsCharacter->GetRadius(&thisRadius);
             nlVector2 v2Delta = {
-                pFielderCollidedWith->mUnidentified024.m_v3Position.x - v3Position.x,
-                pFielderCollidedWith->mUnidentified024.m_v3Position.y - v3Position.y,
+                pFielderCollidedWith->m_DetChar.m_v3Position.x - v3Position.x,
+                pFielderCollidedWith->m_DetChar.m_v3Position.y - v3Position.y,
             };
             float fOverlap = thisRadius + otherRadius - nlVec2Length(v2Delta);
             if (!(fOverlap > 0.0f))
                 return;
 
             nlVector3 v3BallDelta;
-            nlVec3Sub(v3BallDelta, g_pBall->m_v3Position, mUnidentified024.m_v3Position);
+            nlVec3Sub(v3BallDelta, g_pBall->m_v3Position, m_DetChar.m_v3Position);
             v3BallDelta.z = 0.0f;
             nlVector3 v3PlayerDelta;
-            nlVec3Sub(v3PlayerDelta, pFielderCollidedWith->mUnidentified024.m_v3Position, mUnidentified024.m_v3Position);
+            nlVec3Sub(v3PlayerDelta, pFielderCollidedWith->m_DetChar.m_v3Position, m_DetChar.m_v3Position);
             v3PlayerDelta.z = 0.0f;
             nlVector3 v3Projection;
             nlVec3Project(v3Projection, v3PlayerDelta, v3BallDelta);
@@ -1842,7 +1842,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
             }
             nlVec3Normalize(v3Direction, v3Direction);
             nlVec3ScaleAdd(v3Direction, fOverlap, v3Direction,
-                pFielderCollidedWith->mUnidentified024.m_v3Position);
+                pFielderCollidedWith->m_DetChar.m_v3Position);
             pFielderCollidedWith->SetPosition(v3Direction);
         }
     }
@@ -1857,7 +1857,7 @@ void cFielder::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
 bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, const nlVector3& position, const nlVector3& velocity)
 {
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
+    if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0
         || (!IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !IsInvinciblePowerups()))
     {
         if (!IsCharacterInAir(0.5f) && size == POWERUPSIZE_LARGE && !IsSuperGrowActive())
@@ -1891,7 +1891,7 @@ bool cFielder::CollideWithShellCallback(ePowerupSize size, bool largeSound, cons
 
 void TryFielderQueuedPass(cFielder* pFielder)
 {
-    if (pFielder->m_pBall != 0 && pFielder->mUnidentified1E4.m_eLastPadAction == 0x1B)
+    if (pFielder->m_pBall != 0 && pFielder->m_DetPlayer.m_eLastPadAction == 0x1B)
     {
         cPlayer* pPassTarget;
         if (pFielder->GetGlobalPad() == 0)
@@ -1912,14 +1912,14 @@ void TryFielderQueuedPass(cFielder* pFielder)
                 GetSlowestVolleyPassSpeed(pFielder->GetTweaks()),
                 GetFastestVolleyPassSpeed(pFielder->GetTweaks()));
         }
-        pFielder->mUnidentified1E4.m_eLastPadAction = 0x32;
+        pFielder->m_DetPlayer.m_eLastPadAction = 0x32;
     }
 }
 
 void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTime)
 {
     bool bHasEgg = false;
-    if (pFielder->mUnidentified024.m_eCharacterClass == YOSHI
+    if (pFielder->m_DetChar.m_eCharacterClass == YOSHI
         && IsConcurrentStateActive(pFielder->m_pAIContext->mScriptMachine, 0x17))
     {
         bHasEgg = true;
@@ -1932,8 +1932,8 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
     else if (pFielder->m_pBall != 0)
     {
         pFielder->ReleaseBall(0);
-        if ((pFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xE
-                || pFielder->mUnidentified024.m_eCharacterClass == BIRDO)
+        if ((pFielder->m_DetChar.m_eCharacterClass == (eCharacterClass)0xE
+                || pFielder->m_DetChar.m_eCharacterClass == BIRDO)
             && pFielder->m_eActionState == (eFielderActionState)0x15)
         {
             if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
@@ -1946,13 +1946,13 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
             }
         }
 
-        if (pFielder->mUnidentified024.m_eCharacterClass == BOWSER
+        if (pFielder->m_DetChar.m_eCharacterClass == BOWSER
             && pFielder->m_eActionState == (eFielderActionState)1)
         {
-            nlVector3 v3WarpPos = pFielder->mUnidentified024.m_v3Position;
+            nlVector3 v3WarpPos = pFielder->m_DetChar.m_v3Position;
             v3WarpPos.z = 0.18f;
             nlVector3 v3Offset;
-            u16 aFacing = pFielder->mUnidentified024.m_aActualFacingDirection;
+            u16 aFacing = pFielder->m_DetChar.m_aActualFacingDirection;
             nlPolarToCartesian(v3Offset.x, v3Offset.y, aFacing,
                 fn_8002BFA8(pFielder->m_pTweaks, pFielder->GetPlayerScale()));
             v3Offset.z = 0.18f;
@@ -1964,7 +1964,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
         {
             nlVector3 v3ReleaseVelocity;
             nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
-                pFielder->mUnidentified024.m_aActualFacingDirection,
+                pFielder->m_DetChar.m_aActualFacingDirection,
                 2.0f + pFielder->GetActualSpeed());
             v3ReleaseVelocity.z = 0.5f;
             g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
@@ -2017,7 +2017,7 @@ bool cFielder::CollideWithFreezeCallback()
 
 bool cFielder::CollideWithBananaCallback(const nlVector3& position)
 {
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
+    if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0
         || (!IsStuck() && !IsFallenDown() && m_eActionState != ACTION_POST_WHISTLE && !IsInvinciblePowerups()))
     {
         InitActionBananaReact(position);
@@ -2051,7 +2051,7 @@ void cFielder::CollideWithShockwaveCallback(const nlVector3& position)
         {
             ReleaseBall(0);
             nlVector3 velocity;
-            nlPolarToCartesian(velocity.x, velocity.y, mUnidentified024.m_aActualFacingDirection, 2.0f + GetActualSpeed());
+            nlPolarToCartesian(velocity.x, velocity.y, m_DetChar.m_aActualFacingDirection, 2.0f + GetActualSpeed());
             velocity.z = 0.5f;
             g_pBall->ShootRelease(velocity, SPINTYPE_NONE);
         }
@@ -2062,10 +2062,10 @@ void cFielder::CollideWithShockwaveCallback(const nlVector3& position)
 
 void cFielder::CollideWithChainCallback(ChainChomp* chain)
 {
-    if (!IsFallenDown() || mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (!IsFallenDown() || m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
-        unsigned short direction = nlATan2Angle(mUnidentified024.m_v3Position.y - chain->mv3Position.y,
-            mUnidentified024.m_v3Position.x - chain->mv3Position.x);
+        unsigned short direction = nlATan2Angle(m_DetChar.m_v3Position.y - chain->mv3Position.y,
+            m_DetChar.m_v3Position.x - chain->mv3Position.x);
         if (m_pBall != 0)
         {
             ReleaseBall(0);
@@ -2082,7 +2082,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
             InitActionKnockdownReact(chain->mv3Velocity);
         if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
             StatsTracker::Instance()->TrackStat((ePlayerStats)0x1E, m_pTeam->m_nSide,
-                mUnidentified1E4.m_ID, chain->mnThrowerPadID, 0, 0, 0);
+                m_DetPlayer.m_ID, chain->mnThrowerPadID, 0, 0, 0);
     }
 }
 
@@ -2097,11 +2097,11 @@ void cFielder::CollideWithWindDebrisCallback(WindDebris* debris)
         velocity.y = debrisVelocity.y * gWindDebrisKnockbackScale;
         velocity.z = gWindDebrisKnockbackZ + nlRandomf(gWindDebrisKnockbackZRange);
         float goalLine = cField::GetGoalLineX(1U);
-        if (mUnidentified024.m_v3Position.x > goalLine || mUnidentified024.m_v3Position.x < -1.0f * goalLine)
+        if (m_DetChar.m_v3Position.x > goalLine || m_DetChar.m_v3Position.x < -1.0f * goalLine)
         {
             velocity.z = 0.0f;
             velocity.x = 2.0f * nlSqrt(nlVec3LengthSquared(velocity), true);
-            if (mUnidentified024.m_v3Position.x > goalLine)
+            if (m_DetChar.m_v3Position.x > goalLine)
                 velocity.x *= -1.0f;
             velocity.y = 0.0f;
             velocity.z = 8.0f;
@@ -2125,14 +2125,14 @@ void cFielder::CollideWithThwompCallback(CollisionThwompPlayerData* event)
             {
                 ReleaseBall(0);
                 nlVector3 velocity;
-                nlPolarToCartesian(velocity.x, velocity.y, mUnidentified024.m_aActualFacingDirection, gThwompBallReleaseSpeed);
+                nlPolarToCartesian(velocity.x, velocity.y, m_DetChar.m_aActualFacingDirection, gThwompBallReleaseSpeed);
                 velocity.z = gThwompBallReleaseSpeed;
                 g_pBall->SetVelocity(velocity, SPINTYPE_NONE, 0);
             }
             const nlVector3* thwompPosition = event->thwomp->GetPosition();
             nlVector3 direction;
-            nlVec3Set(direction, thwompPosition->x - mUnidentified024.m_v3Position.x,
-                thwompPosition->y - mUnidentified024.m_v3Position.y, 0.0f);
+            nlVec3Set(direction, thwompPosition->x - m_DetChar.m_v3Position.x,
+                thwompPosition->y - m_DetChar.m_v3Position.y, 0.0f);
             nlVec3Scale(direction, direction, nlRecipSqrt(nlVec3LengthSquared(direction), false));
             if (IsCharacterSuperPowerActive(this, WALUIGI) && m_bSuperPowerTankOn)
             {
@@ -2209,7 +2209,7 @@ void cFielder::CollideWithWallCallback(
     else if (m_eActionState != (eFielderActionState)3
              && GameInfoManager::Instance()->GetStadium() == 0x0B)
     {
-        float distance = (float)fabs(mUnidentified024.m_v3Position.y);
+        float distance = (float)fabs(m_DetChar.m_v3Position.y);
         distance -= fn_8002BFA8(m_pTweaks, 1.0f);
         if (distance > cField::GetSidelineY(1) + 0.5f)
         {
@@ -2224,7 +2224,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
     if (type == 1)
     {
         if (eventData->mUnidentified10->m_pOwner != this
-            && mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0
+            && m_DetPlayer.m_tFireTimer.m_uPackedTime == 0
             && m_eActionState != ACTION_ELECTROCUTION
             && !IsStuck() && !IsInvincible())
         {
@@ -2316,8 +2316,8 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             if (nlVec3LengthSquared(v3Unidentified) == 0.0f)
             {
                 nlVec3Set(v3Unidentified,
-                    mUnidentified024.m_v3Position.x - eventData->mUnidentified10->m_pOwner->mUnidentified024.m_v3Position.x,
-                    mUnidentified024.m_v3Position.y - eventData->mUnidentified10->m_pOwner->mUnidentified024.m_v3Position.y,
+                    m_DetChar.m_v3Position.x - eventData->mUnidentified10->m_pOwner->m_DetChar.m_v3Position.x,
+                    m_DetChar.m_v3Position.y - eventData->mUnidentified10->m_pOwner->m_DetChar.m_v3Position.y,
                     0.0f);
             }
             nlVec3Scale(v3Unidentified,
@@ -2358,19 +2358,19 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 if (!pOwner->IsInvincibleChars())
                 {
                     pOwner->fn_80047240(this,
-                        pOwner->mUnidentified024.m_aActualFacingDirection + 0x8000, 1, false, false);
+                        pOwner->m_DetChar.m_aActualFacingDirection + 0x8000, 1, false, false);
                     PlaySound(0, 0xECE94BBB, 0, 0);
                 }
                 else
                 {
-                    fn_80047240(pOwner, pOwner->mUnidentified024.m_aActualFacingDirection, 0, false, false);
+                    fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, 0, false, false);
                     PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                     PlayRumbleAction(2, pOwner->GetGlobalPad());
                 }
             }
             else if (!IsOnSameTeam(pOwner))
             {
-                fn_80047240(pOwner, pOwner->mUnidentified024.m_aActualFacingDirection, 1, false, true);
+                fn_80047240(pOwner, pOwner->m_DetChar.m_aActualFacingDirection, 1, false, true);
                 PlaySound(pOwner->m_uSoundSlotId, 0x9E87FEBC, 0, 0);
                 PlayRumbleAction(2, pOwner->GetGlobalPad());
             }
@@ -2387,7 +2387,7 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
             && m_eActionState != (eFielderActionState)0x23)
         {
             PlayRumbleAction(3, GetGlobalPad());
-            nlVector3 v3Unidentified = mUnidentified024.m_v3Velocity;
+            nlVector3 v3Unidentified = m_DetChar.m_v3Velocity;
             v3Unidentified.z = 25.0f;
             fn_80044148(v3Unidentified);
             fn_80097358(this, 5.0f);
@@ -2409,13 +2409,13 @@ void cFielder::CollideWithPatchCallback(const UnidentifiedEventData24* eventData
                 eventData->mUnidentified10->fn_80173CCC(),
                 eventData->mUnidentified10->GetPosition());
             nlVector3 v3Unidentified = GetClosestPointOnLineABFromPointC(
-                v3Start, v3End, mUnidentified024.m_v3Position);
+                v3Start, v3End, m_DetChar.m_v3Position);
             nlVec3Set(v3Unidentified,
-                mUnidentified024.m_v3Position.x - v3Unidentified.x,
-                mUnidentified024.m_v3Position.y - v3Unidentified.y, 0.0f);
+                m_DetChar.m_v3Position.x - v3Unidentified.x,
+                m_DetChar.m_v3Position.y - v3Unidentified.y, 0.0f);
             nlVec3Scale(v3Unidentified,
                 nlRecipSqrt(nlVec3LengthSquared(v3Unidentified), false));
-            InitActionElectrocution(mUnidentified024.m_v3Position, v3Unidentified, false);
+            InitActionElectrocution(m_DetChar.m_v3Position, v3Unidentified, false);
         }
     }
 }
@@ -2464,34 +2464,34 @@ bool IsFielderFrontInvincible(cFielder* pFielder, const nlVector3* position)
 
 bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
 {
-    if (pOtherFielder->mUnidentified024.m_eCharacterClass == BOWSER
+    if (pOtherFielder->m_DetChar.m_eCharacterClass == BOWSER
         && pOtherFielder->m_eActionState == 1)
     {
-        return IsCharacterInAir(pOtherFielder->mUnidentified024.m_fPlayerScale);
+        return IsCharacterInAir(pOtherFielder->m_DetChar.m_fPlayerScale);
     }
-    if (mUnidentified024.m_eCharacterClass == BOWSER && m_eActionState == 1)
+    if (m_DetChar.m_eCharacterClass == BOWSER && m_eActionState == 1)
         return false;
-    if (mUnidentified024.m_eCharacterClass == YOSHI && m_eActionState == 1)
+    if (m_DetChar.m_eCharacterClass == YOSHI && m_eActionState == 1)
         return false;
-    if (mUnidentified024.m_eCharacterClass == DIDDYKONG && m_eActionState == 0x1E)
+    if (m_DetChar.m_eCharacterClass == DIDDYKONG && m_eActionState == 0x1E)
         return false;
-    if (pOtherFielder->mUnidentified024.m_eCharacterClass == BOWSERJR
+    if (pOtherFielder->m_DetChar.m_eCharacterClass == BOWSERJR
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
     {
-        float fPlayerScale = pOtherFielder->mUnidentified024.m_fPlayerScale;
+        float fPlayerScale = pOtherFielder->m_DetChar.m_fPlayerScale;
         fPlayerScale = 0.5f * fPlayerScale;
         return IsCharacterInAir(fPlayerScale);
     }
-    if (mUnidentified024.m_eCharacterClass == BOWSERJR && m_eActionState == ACTION_SLIDE_ATTACK)
+    if (m_DetChar.m_eCharacterClass == BOWSERJR && m_eActionState == ACTION_SLIDE_ATTACK)
         return false;
-    if (pOtherFielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
+    if (pOtherFielder->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
     {
-        float fPlayerScale = pOtherFielder->mUnidentified024.m_fPlayerScale;
+        float fPlayerScale = pOtherFielder->m_DetChar.m_fPlayerScale;
         fPlayerScale = 0.6f * fPlayerScale;
         return IsCharacterInAir(fPlayerScale);
     }
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10
         && m_eActionState == ACTION_SLIDE_ATTACK)
         return false;
 
@@ -2616,7 +2616,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             m_pController->ResetAccelerationHistory();
         }
-        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)8)
+        if (m_DetChar.m_eCharacterClass == (eCharacterClass)8)
         {
             m_pHeadTrack->UnidentifiedReset();
             ClearPhysicsPatchesOfType(6);
@@ -2625,8 +2625,8 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case 0:
         m_ModelType = CharModel_Rigid;
-        mUnidentified024.m_v3Position.z = 0.0f;
-        mUnidentified024.m_v3Velocity.z = 0.0f;
+        m_DetChar.m_v3Position.z = 0.0f;
+        m_DetChar.m_v3Velocity.z = 0.0f;
         EndElectrocution(this);
         break;
 
@@ -2636,15 +2636,15 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case ACTION_ELECTROCUTION:
         m_ModelType = CharModel_Rigid;
-        mUnidentified024.m_v3Position.z = 0.0f;
-        mUnidentified024.m_v3Velocity.z = 0.0f;
+        m_DetChar.m_v3Position.z = 0.0f;
+        m_DetChar.m_v3Velocity.z = 0.0f;
         EndElectrocution(this);
         break;
 
     case 3:
-        mUnidentified17C = true;
-        mUnidentified024.m_v3Position.z = 0.0f;
-        mUnidentified024.m_v3Velocity.z = 0.0f;
+        m_bShadowVisible = true;
+        m_DetChar.m_v3Position.z = 0.0f;
+        m_DetChar.m_v3Velocity.z = 0.0f;
         if (GameInfoManager::Instance()->GetStadium() == 0x0B)
         {
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
@@ -2653,8 +2653,8 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case 0x18:
-        mUnidentified024.m_v3Position.z = 0.0f;
-        mUnidentified024.m_v3Velocity.z = 0.0f;
+        m_DetChar.m_v3Position.z = 0.0f;
+        m_DetChar.m_v3Velocity.z = 0.0f;
         break;
 
     case ACTION_LOOSE_BALL_PASS:
@@ -2705,7 +2705,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     }
 
     case ACTION_RUNNING_WB:
-        mUnidentified1E4.m_eLastPadAction = 50;
+        m_DetPlayer.m_eLastPadAction = 50;
         if (IsYoshiSuperPowerActive())
         {
             if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
@@ -2730,7 +2730,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         {
             EmitBowserSmoke(this);
         }
-        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x12 && !mbTangible)
+        if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x12 && !mbTangible)
         {
             m_pPhysicsCharacter->m_CanCollideWithBall = true;
             m_pPhysicsCharacter->m_CanCollideWithCharacters = true;
@@ -2744,8 +2744,8 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
             {
                 m_pBall->m_bVisible = true;
             }
-            mUnidentified17C = true;
-            mUnidentified178 = 1.0f;
+            m_bShadowVisible = true;
+            m_fOpacity = 1.0f;
         }
         break;
 
@@ -2764,7 +2764,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         g_pBall->m_pPhysicsBall->mbCanCollideGoalie = true;
         g_pBall->m_pPhysicsBall->mbCanCollidePlayer = true;
         mActionBooSkillshot.bFollowingBall = false;
-        nlVector3 v3Position = mUnidentified024.m_v3Position;
+        nlVector3 v3Position = m_DetChar.m_v3Position;
         if (v3Position.z != 0.0f)
         {
             v3Position.z = 0.0f;
@@ -2781,8 +2781,8 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
     case 0x23:
         if (actionState != 3 && actionState != 0x18)
         {
-            mUnidentified024.m_v3Position.z = 0.0f;
-            mUnidentified024.m_v3Velocity.z = 0.0f;
+            m_DetChar.m_v3Position.z = 0.0f;
+            m_DetChar.m_v3Velocity.z = 0.0f;
         }
         if (GameInfoManager::Instance()->GetStadium() == 0x0B)
         {
@@ -2854,22 +2854,22 @@ void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
     }
 
     nlVector3 v3ReleaseVelocity;
-    nlVec3Add(v3ReleaseVelocity, v3IncomingVelocity, mUnidentified024.m_v3Velocity);
+    nlVec3Add(v3ReleaseVelocity, v3IncomingVelocity, m_DetChar.m_v3Velocity);
     float fMinSpeedSquared = 0.001f * 0.001f;
     if (nlVec3LengthSquared(v3IncomingVelocity) < fMinSpeedSquared
-        || nlVec3LengthSquared(mUnidentified024.m_v3Velocity) < fMinSpeedSquared
+        || nlVec3LengthSquared(m_DetChar.m_v3Velocity) < fMinSpeedSquared
         || nlVec3LengthSquared(v3ReleaseVelocity) < fMinSpeedSquared)
     {
         nlVector3 v3ReleaseVelocity;
         nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
-            mUnidentified024.m_aActualFacingDirection, 2.0f);
+            m_DetChar.m_aActualFacingDirection, 2.0f);
         v3ReleaseVelocity.z = 0.5f;
         g_pBall->ShootRelease(v3ReleaseVelocity, SPINTYPE_NONE);
         return;
     }
 
     nlVec3Normalize(v3ReleaseVelocity, v3ReleaseVelocity);
-    float fSpeed = mUnidentified024.m_fActualSpeed;
+    float fSpeed = m_DetChar.m_fActualSpeed;
     fSpeed = 2.0f + fSpeed;
     nlVec3Scale(v3ReleaseVelocity, v3ReleaseVelocity, fSpeed);
     v3ReleaseVelocity.z = 0.5f;
@@ -2879,7 +2879,7 @@ void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
 void cFielder::ShootBallDueToContact(unsigned short aShootDirection)
 {
     nlVector3 v3ReleaseVelocity;
-    float fRadius = mUnidentified024.m_fActualSpeed;
+    float fRadius = m_DetChar.m_fActualSpeed;
     fRadius = 2.0f + fRadius;
     nlPolarToCartesian(v3ReleaseVelocity.x, v3ReleaseVelocity.y,
         aShootDirection, fRadius);
@@ -2894,7 +2894,7 @@ void cFielder::DoClearBall()
     int i;
     nlVector3 v3Target;
     nlVector3 v3ClearBallVelocity;
-    float fAbsPosition = fabsf(mUnidentified024.m_v3Position.x);
+    float fAbsPosition = fabsf(m_DetChar.m_v3Position.x);
     float fPositionValue = gClearPositionWeight * InterpolateRangeClamped(0.0f, 1.0f,
         cField::GetGoalLineX(1U), 0.0f, fAbsPosition);
     float fBallChargeValue = (1.0f - gClearPositionWeight) * fn_800156A8(g_pBall);
@@ -2907,7 +2907,7 @@ void cFielder::DoClearBall()
     float fClearDistance = Interpolate(gClearMinDistance, gClearMaxDistance,
         fShotMeterValue + fPlayerValue);
 
-    aClearingAngle = mUnidentified024.m_aActualFacingDirection;
+    aClearingAngle = m_DetChar.m_aActualFacingDirection;
     if (m_pController != NULL)
     {
         if (m_pController->GetMovementStickMagnitude() > 0.01f)
@@ -2936,9 +2936,9 @@ void cFielder::DoClearBall()
         v3Top.y = cField::GetSidelineY(1);
         v3Bottom.y = cField::GetSidelineY(0);
         v3Top.z = v3Bottom.z = 0.0f;
-        nlVec3Sub(v3Net, m_pTeam->GetOtherNet()->m_v3NetLocation, mUnidentified024.m_v3Position);
-        nlVec3Sub(v3Top, v3Top, mUnidentified024.m_v3Position);
-        nlVec3Sub(v3Bottom, v3Bottom, mUnidentified024.m_v3Position);
+        nlVec3Sub(v3Net, m_pTeam->GetOtherNet()->m_v3NetLocation, m_DetChar.m_v3Position);
+        nlVec3Sub(v3Top, v3Top, m_DetChar.m_v3Position);
+        nlVec3Sub(v3Bottom, v3Bottom, m_DetChar.m_v3Position);
 
         nlPolar pClearingTopAngle;
         nlPolar pClearingBottomAngle;
@@ -2960,8 +2960,8 @@ void cFielder::DoClearBall()
             m_pTeam->GetOtherNet()->GetPostLocation(v3TopPost, 0, 0.0f);
             v3BottomPost = v3TopPost;
             v3BottomPost.y = -v3TopPost.y;
-            nlVec3Sub(v3TopPost, v3TopPost, mUnidentified024.m_v3Position);
-            nlVec3Sub(v3BottomPost, v3BottomPost, mUnidentified024.m_v3Position);
+            nlVec3Sub(v3TopPost, v3TopPost, m_DetChar.m_v3Position);
+            nlVec3Sub(v3BottomPost, v3BottomPost, m_DetChar.m_v3Position);
             nlPolar pTopPost;
             nlPolar pBottomPost;
             nlCartesianToPolar(pTopPost, v3TopPost);
@@ -2993,7 +2993,7 @@ void cFielder::DoClearBall()
     nlVector3 v3Direction;
     nlPolarToCartesian(v3Direction.x, v3Direction.y, aClearingAngle, fClearDistance);
     v3Direction.z = 0.0f;
-    nlVec3Add(v3Target, mUnidentified024.m_v3Position, v3Direction);
+    nlVec3Add(v3Target, m_DetChar.m_v3Position, v3Direction);
     if (m_pBall != NULL)
     {
         ReleaseBall(1);
@@ -3034,7 +3034,7 @@ bool cFielder::DoLooseBallContactFromIdle(nlVector3& animStart, float& animStart
     nlVec2Rotate(*(nlVector2*)&worldOffset, *(const nlVector2*)&localOffset, facing);
     worldOffset.z = localOffset.z;
     nlVector3 contactTarget;
-    nlVec3Add(contactTarget, mUnidentified024.m_v3Position, worldOffset);
+    nlVec3Add(contactTarget, m_DetChar.m_v3Position, worldOffset);
     FakeBallWorld::ResetBallIterator();
     float bestDistanceSquared = 0.0f;
     bool done = false;
@@ -3141,7 +3141,7 @@ float CalcPenaltyWorth(ePenaltyType type)
 
 void cFielder::DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type)
 {
-    if (foulee->mUnidentified1E4.m_tBallUnPossessionTimer.GetSeconds() < gPenaltyPossessionGraceTime)
+    if (foulee->m_DetPlayer.m_tBallUnPossessionTimer.GetSeconds() < gPenaltyPossessionGraceTime)
     {
         if (type == PEN_TYPE_HIT_NO_BALL)
             type = PEN_TYPE_HIT_WITH_BALL;
@@ -3176,13 +3176,13 @@ void cFielder::UpdateFacingToLooseBall()
     const cBall* ball = g_pBall;
     const nlVector3& ballPosition = ball->GetPosition();
     nlVector2 delta;
-    nlVec2Set(delta, ballPosition.x - mUnidentified024.m_v3Position.x,
-        ballPosition.y - mUnidentified024.m_v3Position.y);
+    nlVec2Set(delta, ballPosition.x - m_DetChar.m_v3Position.x,
+        ballPosition.y - m_DetChar.m_v3Position.y);
     if (nlVec2LengthSquared(delta) <= 4.0f)
     {
         int count;
         float times[2];
-        CalcInterceptXY(mUnidentified024.m_v3Position, fn_8002C254(GetTweaks()), 0.0f,
+        CalcInterceptXY(m_DetChar.m_v3Position, fn_8002C254(GetTweaks()), 0.0f,
             ballPosition, ball->m_v3Velocity, count, times);
         if (count != 0)
         {
@@ -3191,10 +3191,10 @@ void cFielder::UpdateFacingToLooseBall()
             nlVec2Set(future, time * g_pBall->m_v3Velocity.x + g_pBall->m_v3Position.x,
                 time * g_pBall->m_v3Velocity.y + g_pBall->m_v3Position.y);
             nlVector2 interceptDelta;
-            nlVec2Set(interceptDelta, future.x - mUnidentified024.m_v3Position.x,
-                future.y - mUnidentified024.m_v3Position.y);
+            nlVec2Set(interceptDelta, future.x - m_DetChar.m_v3Position.x,
+                future.y - m_DetChar.m_v3Position.y);
             unsigned short direction = nlATan2Angle(interceptDelta.y, interceptDelta.x);
-            if (nlAbsAngle(direction - mUnidentified024.m_aDesiredFacingDirection) <= 0x4000)
+            if (nlAbsAngle(direction - m_DetChar.m_aDesiredFacingDirection) <= 0x4000)
                 cCharacter::SetDesiredFacingDirection(direction, true);
         }
     }
@@ -3212,7 +3212,7 @@ bool cFielder::IsReceivePassHitRequested(unsigned short* direction)
 {
     if (IsWaluigiSuperPowerActive(this) && m_bSuperPowerTankOn)
         return false;
-    if (mUnidentified1E4.m_tBallUnPossessionTimer.GetSeconds() > 0.0f
+    if (m_DetPlayer.m_tBallUnPossessionTimer.GetSeconds() > 0.0f
         && m_pController->DetectRightShake(direction))
     {
         *direction = m_pController->GetMovementStickDirection();
@@ -3267,7 +3267,7 @@ bool cFielder::IsReceivePassDekeRequested(unsigned short* direction)
             return false;
         if (!m_bDekeReset)
             return false;
-        if (mUnidentified1E4.m_tBallUnPossessionTimer.GetSeconds() < 0.0f)
+        if (m_DetPlayer.m_tBallUnPossessionTimer.GetSeconds() < 0.0f)
             return false;
         if (--m_nDPadDownCounter == 0)
             *direction = padDirection;
@@ -3373,13 +3373,13 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
         cNet::GetNetHeight() - kBallAllowance);
     float fShotDist = nlSqrt(nlVec3DistanceSquared2D(pBall->m_v3Position, v3Target), true);
 
-    if (nParam == 8 && (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12))
+    if (nParam == 8 && (m_DetChar.m_eCharacterClass == 14 || m_DetChar.m_eCharacterClass == 12))
     {
-        if (mUnidentified024.m_eCharacterClass == 14)
+        if (m_DetChar.m_eCharacterClass == 14)
         {
             fShotSpeed = gKoopaSkillshotSpeed;
         }
-        else if (mUnidentified024.m_eCharacterClass == 12)
+        else if (m_DetChar.m_eCharacterClass == 12)
         {
             fShotSpeed = gBirdoSkillshotSpeed;
         }
@@ -3406,7 +3406,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
     float fAbsAimValue = fabsf(fAimValue);
 
     if (fAbsBallY < 1.5f + fDist2NetSide
-        && (fAbsBallX > fabsf(pGoalie->mUnidentified024.m_v3Position.x)
+        && (fAbsBallX > fabsf(pGoalie->m_DetChar.m_v3Position.x)
             || fAbsBallX > cField::GetGoalLineX(1U) - 1.5f))
     {
         v3PositionOut.x = 1.005f * pNet->m_v3NetLocation.x;
@@ -3435,7 +3435,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
 
         nlVec3Sub(v3Post1Delta, v3Post1, pBall->m_v3Position);
         nlVec3Sub(v3Post2Delta, v3Post2, pBall->m_v3Position);
-        nlVec3Sub(v3GoalieDelta, pGoalie->mUnidentified024.m_v3Position, pBall->m_v3Position);
+        nlVec3Sub(v3GoalieDelta, pGoalie->m_DetChar.m_v3Position, pBall->m_v3Position);
 
         u32 aAngPost1 = nlVector3ToAngle(v3Post1Delta);
         u32 aAngPost2 = nlVector3ToAngle(v3Post2Delta);
@@ -3472,8 +3472,8 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
             s16 sAng2Net = (s16)angle2Net;
             if ((u16)abs_s16(sAng2Net) > 0x2000)
             {
-                float fGD1Sq = nlVec3DistanceSquared2D(pGoalie->mUnidentified024.m_v3Position, v3Post1);
-                float fGD2Sq = nlVec3DistanceSquared2D(pGoalie->mUnidentified024.m_v3Position, v3Post2);
+                float fGD1Sq = nlVec3DistanceSquared2D(pGoalie->m_DetChar.m_v3Position, v3Post1);
+                float fGD2Sq = nlVec3DistanceSquared2D(pGoalie->m_DetChar.m_v3Position, v3Post2);
                 fProbability = nlMinEquals(nlMaxEquals(fGD1Sq / (fGD1Sq + fGD2Sq), 0.03f), 0.97f);
             }
             else if (3 * uAbsP1G < uAbsP2G || 3 * uAbsP2G < uAbsP1G)
@@ -3515,7 +3515,7 @@ void cFielder::DoFindBestShotTarget(nlVector3& v3PositionOut, float& fShotSpeed,
             }
         }
 
-        if (nParam == 8 && (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12))
+        if (nParam == 8 && (m_DetChar.m_eCharacterClass == 14 || m_DetChar.m_eCharacterClass == 12))
         {
             v3PositionOut.z = cNet::GetNetHeight() * gKoopaBirdoSkillshotHeightFraction;
             v3PositionOut.y = 0.0f;
@@ -3564,7 +3564,7 @@ void cFielder::DoRegularShooting(bool bParam)
         {
             DeactivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C);
         }
-        if (mUnidentified024.m_eCharacterClass == 14 || mUnidentified024.m_eCharacterClass == 12)
+        if (m_DetChar.m_eCharacterClass == 14 || m_DetChar.m_eCharacterClass == 12)
         {
             bHideBall = true;
             g_pBall->m_pPhysicsBall->fn_8013FE00();
@@ -3587,7 +3587,7 @@ void cFielder::DoRegularShooting(bool bParam)
     else if (m_eActionState == ACTION_ONETIMER
         || m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
         || (m_eActionState == ACTION_UNKNOWN_15
-            && mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() < 0.1f))
+            && m_DetPlayer.m_tBallPossessionTimer.GetSeconds() < 0.1f))
     {
         g_pBall->m_uGoalType = 1;
     }
@@ -3629,7 +3629,7 @@ void cFielder::DoRegularShooting(bool bParam)
         {
             float fMinDistanceSq = gShotYSpinMinDistance * gShotYSpinMinDistance;
             float fDistanceSq = nlVec3DistanceSquared2D(
-                mUnidentified024.m_v3Position, m_pTeam->GetOtherNet()->m_v3NetLocation);
+                m_DetChar.m_v3Position, m_pTeam->GetOtherNet()->m_v3NetLocation);
             if (fDistanceSq > fMinDistanceSq)
             {
                 float fDistanceValue = InterpolateRangeClamped(0.2f, 1.0f,
@@ -3661,7 +3661,7 @@ void cFielder::DoRegularShooting(bool bParam)
         {
             v3AngVel.z *= -1.0f;
         }
-        RotateVectorZAxis(v3AngVel, v3AngVel, mUnidentified024.m_aActualFacingDirection);
+        RotateVectorZAxis(v3AngVel, v3AngVel, m_DetChar.m_aActualFacingDirection);
         if (m_eActionState == ACTION_ONETIMER)
         {
             nlVec3Scale(v3AngVel, 0.4f);
@@ -3703,7 +3703,7 @@ void cFielder::DoRegularShooting(bool bParam)
 
     g_pBall->Shoot(this, v3BallVelocity, v3AngVel, spinType, nBallState, bParam);
     SetNoPickUpTime(0.2f);
-    if (nBallState == 8 && mUnidentified024.m_eCharacterClass == 16)
+    if (nBallState == 8 && m_DetChar.m_eCharacterClass == 16)
     {
         fn_8004ED64();
     }
@@ -3724,7 +3724,7 @@ void cFielder::DoRegularShooting(bool bParam)
             {
                 stat = STATS_01;
             }
-            StatsTracker::Instance()->TrackStat(stat, m_pTeam->m_nSide, mUnidentified1E4.m_ID, 0, 0, 0, 0);
+            StatsTracker::Instance()->TrackStat(stat, m_pTeam->m_nSide, m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
     }
 }
@@ -3842,7 +3842,7 @@ const LooseBallContactAnimInfo* cFielder::FindLooseBallContactAnim(
 
 bool cFielder::IsFallenDown() const
 {
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         return true;
     }
@@ -3945,7 +3945,7 @@ bool cFielder::IsFallenDown() const
         fGetUpFrame = 29.0f;
         break;
     case 0x68:
-        if (mUnidentified024.m_eCharacterClass == BOWSER)
+        if (m_DetChar.m_eCharacterClass == BOWSER)
         {
             fGetUpFrame = (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
         }
@@ -4119,7 +4119,7 @@ bool cFielder::CanPickupBall(cBall* pBall, bool bParam)
     }
 
     bool bUnidentified = false;
-    if (mUnidentified024.m_eCharacterClass == YOSHI
+    if (m_DetChar.m_eCharacterClass == YOSHI
         && IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
     {
         bUnidentified = true;
@@ -4188,10 +4188,10 @@ void cFielder::GetApproachPosition(nlVector3* position, const nlVector3* from, f
     float radius = 1.0f + mUnidentified320->GetRadius();
     nlVector3 center;
     if (predictionTime > 0.0f)
-        nlVec3ScaleAdd(center, predictionTime, mUnidentified024.m_v3Velocity,
-            mUnidentified024.m_v3Position);
+        nlVec3ScaleAdd(center, predictionTime, m_DetChar.m_v3Velocity,
+            m_DetChar.m_v3Position);
     else
-        center = mUnidentified024.m_v3Position;
+        center = m_DetChar.m_v3Position;
     nlVec3Sub(*position, *from, center);
     nlVec3Normalize(*position, *position);
     nlVec3ScaleAdd(*position, radius, *position, center);
@@ -4231,18 +4231,18 @@ void cFielder::BeginDekeIntangibility()
         {
             SetTangible(false, false);
             mtPostDekeTimer.Clear();
-            mUnidentified178 = gIntangibleAlpha;
+            m_fOpacity = gIntangibleAlpha;
             EmitBooDekePuffStart(this);
         }
         else if (GetCharacterClass() == (eCharacterClass)8)
         {
             SetTangible(false, false);
-            mUnidentified178 = gIntangibleAlpha;
+            m_fOpacity = gIntangibleAlpha;
         }
         else if (GetCharacterClass() == (eCharacterClass)18)
         {
             SetTangible(false, false);
-            mUnidentified178 = gIntangibleAlpha;
+            m_fOpacity = gIntangibleAlpha;
             if (m_eActionState == (eFielderActionState)1 || m_eActionState == (eFielderActionState)32)
             {
                 EmitMontyDekeEnter(this);
@@ -4255,7 +4255,7 @@ void cFielder::BeginDekeIntangibility()
         else if (m_pBall != 0 && m_eActionState == (eFielderActionState)1)
         {
             SetTangible(false, false);
-            mUnidentified178 = gIntangibleAlpha;
+            m_fOpacity = gIntangibleAlpha;
             int spread = gDekeDirectionSpread;
             float distance = GetDekeDistance();
             ResetBallCharge(g_pBall, false);
@@ -4267,12 +4267,12 @@ void cFielder::BeginDekeIntangibility()
                 EmitDekeEnter(this, "drybones_deke_enter");
             unsigned short direction = GetActualFacing() + (nlRandomf(2 * spread) - spread);
             float safeY = cField::GetSidelineY(1U) - fn_8002BFA8(m_pTweaks, GetPlayerScale()) - 0.25f;
-            bool nearSideline = fabsf(mUnidentified024.m_v3Position.y) >= safeY;
+            bool nearSideline = fabsf(m_DetChar.m_v3Position.y) >= safeY;
             nlVector3 destination;
             nlPolarToCartesian(destination.x, destination.y, direction, 1.0f);
             destination.z = 0.0f;
             nlVec3Scale(destination, destination, distance);
-            nlVec3Add(destination, destination, mUnidentified024.m_v3Position);
+            nlVec3Add(destination, destination, m_DetChar.m_v3Position);
             bool beyondSideline = fabsf(destination.y) > cField::GetSidelineY(1U);
             bool fixed = false;
             if (GameInfoManager::Instance()->GetStadium() != 11 && m_pPhysicsCharacter->m_CanCollideWithWall)
@@ -4318,7 +4318,7 @@ void cFielder::BeginDekeIntangibility()
 void cFielder::EmitMegaStrikeWindup()
 {
     KillWindups();
-    switch (mUnidentified024.m_eCharacterClass)
+    switch (m_DetChar.m_eCharacterClass)
     {
     case 0:
     case 1:
@@ -4352,26 +4352,26 @@ void cFielder::RestoreTangibility(bool fadeIn)
         SetTangible(true, false);
         if (GetCharacterClass() == (eCharacterClass)16)
         {
-            if (mUnidentified178 < 1.0f)
+            if (m_fOpacity < 1.0f)
             {
                 if (fadeIn && g_pGame->IsGameplayOrOvertime())
                     mtPostDekeTimer.SetSeconds(gBooDekeFadeTime);
                 else
-                    mUnidentified178 = 1.0f;
+                    m_fOpacity = 1.0f;
             }
             EmitBooDekePuffEnd(this);
         }
         else if (GetCharacterClass() == (eCharacterClass)8)
         {
-            mUnidentified178 = 1.0f;
+            m_fOpacity = 1.0f;
         }
         else if (GetCharacterClass() == (eCharacterClass)18)
         {
-            mUnidentified178 = 1.0f;
+            m_fOpacity = 1.0f;
             if (!IsFallenDown())
             {
                 CharacterImpactEvent event;
-                event.v3Position = mUnidentified024.m_v3Position;
+                event.v3Position = m_DetChar.m_v3Position;
                 event.fRadius = gMontyReappearRadius;
                 event.pCharacter = this;
                 DeliverMontyReappearEvent(g_pGame, &event);
@@ -4385,7 +4385,7 @@ void cFielder::RestoreTangibility(bool fadeIn)
         }
         else
         {
-            mUnidentified178 = 1.0f;
+            m_fOpacity = 1.0f;
             PlaySound(m_uSoundSlotId, 0x5bf8e132, 0, 0);
             if (GetCharacterClass() == (eCharacterClass)6)
                 EmitDekeExit(this, "waluigi_deke_enter");
@@ -4399,7 +4399,7 @@ void cFielder::RestoreTangibility(bool fadeIn)
 
 void cFielder::CleanActionDeke()
 {
-    mUnidentified1E4.m_eLastPadAction = 50;
+    m_DetPlayer.m_eLastPadAction = 50;
     m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.0f;
     bIsModified = false;
     if (IsInvincibleChars())
@@ -4434,14 +4434,14 @@ void cFielder::CleanActionShot(eFielderActionState newAction)
 {
     bIsModified = false;
     m_pShotMeter->Abort();
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)16 && newAction != 33)
-        mUnidentified178 = 1.0f;
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)12 && g_pBall->meBallState != 8)
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)16 && newAction != 33)
+        m_fOpacity = 1.0f;
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)12 && g_pBall->meBallState != 8)
     {
         if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
             gNPCManager->mpBirdoEgg->Hide(false);
     }
-    else if (mUnidentified024.m_eCharacterClass == (eCharacterClass)14 && g_pBall->meBallState != 8)
+    else if (m_DetChar.m_eCharacterClass == (eCharacterClass)14 && g_pBall->meBallState != 8)
     {
         if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
             gNPCManager->mpKoopaShell->Deactivate(false);
@@ -4468,20 +4468,20 @@ void cFielder::SetStartAnimState(int animState)
     else if (animState != -1)
     {
         SetAnimState(runStartAnims[animState], true, 0.2f, false, false);
-        s16 turnAdjust = CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
-            mUnidentified024.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
+        s16 turnAdjust = CalcAnimTurnAdjust(m_DetChar.m_aActualFacingDirection,
+            m_DetChar.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
         InitMovementFromAnim(turnAdjust, v3Zero, 1.0f, false);
         m_pCurrentAnimController->m_fPlaybackSpeedScale = gStartAnimPlaybackSpeed
             + InterpolateRangeClamped(0.0f, gStartTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
     }
     else
     {
-        int direction = ((mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection + 0x2000) >> 14) & 3;
+        int direction = ((m_DetChar.m_aDesiredFacingDirection - m_DetChar.m_aActualFacingDirection + 0x2000) >> 14) & 3;
         if (direction != 0)
         {
             SetAnimState(runStartAnims[direction], true, 0.2f, false, false);
-            s16 turnAdjust = CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
-                mUnidentified024.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
+            s16 turnAdjust = CalcAnimTurnAdjust(m_DetChar.m_aActualFacingDirection,
+                m_DetChar.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
             InitMovementFromAnim(turnAdjust, v3Zero, 1.0f, false);
             m_pCurrentAnimController->m_fPlaybackSpeedScale = gStartAnimPlaybackSpeed
                 + InterpolateRangeClamped(0.0f, gStartTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4489,8 +4489,8 @@ void cFielder::SetStartAnimState(int animState)
         else
         {
             SetRunningAnimState(0.1f);
-            if (mUnidentified024.m_fActualSpeed < GetJogSpeed(m_pTweaks))
-                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = GetJogSpeed(m_pTweaks);
+            if (m_DetChar.m_fActualSpeed < GetJogSpeed(m_pTweaks))
+                m_DetChar.m_fActualSpeed = m_DetChar.m_fDesiredSpeed = GetJogSpeed(m_pTweaks);
         }
     }
 }
@@ -4514,12 +4514,12 @@ void cFielder::SetStartWBAnimState()
     }
     else
     {
-        int direction = ((mUnidentified024.m_aDesiredFacingDirection - mUnidentified024.m_aActualFacingDirection + 0x2000) >> 14) & 3;
+        int direction = ((m_DetChar.m_aDesiredFacingDirection - m_DetChar.m_aActualFacingDirection + 0x2000) >> 14) & 3;
         if (direction != 0)
         {
             SetAnimState(runStartAnims[direction], true, 0.2f, false, false);
-            s16 turnAdjust = CalcAnimTurnAdjust(mUnidentified024.m_aActualFacingDirection,
-                mUnidentified024.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
+            s16 turnAdjust = CalcAnimTurnAdjust(m_DetChar.m_aActualFacingDirection,
+                m_DetChar.m_aDesiredFacingDirection, m_eAnimID, 1.0f);
             InitMovementFromAnim(turnAdjust, v3Zero, 1.0f, false);
             m_pCurrentAnimController->m_fPlaybackSpeedScale = gStartAnimPlaybackSpeed
                 + InterpolateRangeClamped(0.0f, gStartTerrainSpeedBoost, 0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4527,8 +4527,8 @@ void cFielder::SetStartWBAnimState()
         else
         {
             SetRunningWBAnimState(0.1f);
-            if (mUnidentified024.m_fActualSpeed < GetJogSpeed(m_pTweaks))
-                mUnidentified024.m_fActualSpeed = mUnidentified024.m_fDesiredSpeed = GetJogSpeed(m_pTweaks);
+            if (m_DetChar.m_fActualSpeed < GetJogSpeed(m_pTweaks))
+                m_DetChar.m_fActualSpeed = m_DetChar.m_fDesiredSpeed = GetJogSpeed(m_pTweaks);
         }
     }
 }
@@ -4585,14 +4585,14 @@ void cFielder::SetRunBackwardsAnimState()
     PlayerTweaks* tweaks = m_pTweaks;
     InitMovementStrafing(GetStrafeTurnSpeed(tweaks), GetStrafeTurnFalloff(tweaks),
         GetStrafeAccel(tweaks), GetStrafeDecel(tweaks));
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
 }
 
 void cFielder::SetRunToBackRunningAnimState()
 {
     SetAnimState(33, true, 0.067f, true, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
     m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
         + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
             0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4602,7 +4602,7 @@ void cFielder::SetBackRunningToRunAnimState()
 {
     SetAnimState(34, true, 0.067f, true, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
     m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
         + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
             0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4612,7 +4612,7 @@ void cFielder::SetBackRunningStopAnimState()
 {
     SetAnimState(30, true, 0.067f, true, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
     m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
         + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
             0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4622,7 +4622,7 @@ void cFielder::SetBackRunningStopStartAnimState()
 {
     SetAnimState(31, true, 0.067f, true, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
     m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
         + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
             0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4632,7 +4632,7 @@ void cFielder::SetBackRunningStopRecoverAnimState()
 {
     SetAnimState(32, true, 0.067f, true, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
     m_pCurrentAnimController->m_fPlaybackSpeedScale = gBackRunningAnimPlaybackSpeed
         + InterpolateRangeClamped(0.0f, gBackRunningTerrainSpeedBoost,
             0.33f, 0.75f, g_pGame->mpTerrain->GetSpeedFactor());
@@ -4670,7 +4670,7 @@ void cFielder::SetStrafeLeftAnimState()
     PlayerTweaks* tweaks = m_pTweaks;
     InitMovementStrafing(GetStrafeTurnSpeed(tweaks), GetStrafeTurnFalloff(tweaks),
         GetStrafeAccel(tweaks), GetStrafeDecel(tweaks));
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
 }
 
 void cFielder::SetStrafeRightAnimState()
@@ -4679,15 +4679,15 @@ void cFielder::SetStrafeRightAnimState()
     PlayerTweaks* tweaks = m_pTweaks;
     InitMovementStrafing(GetStrafeTurnSpeed(tweaks), GetStrafeTurnFalloff(tweaks),
         GetStrafeAccel(tweaks), GetStrafeDecel(tweaks));
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredMovementDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredMovementDirection;
 }
 
 void cFielder::SetIdleAnimState()
 {
     SetAnimState(0, true, 0.2f, false, false);
-    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aActualFacingDirection;
-    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualFacingDirection;
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    m_DetChar.m_aDesiredFacingDirection = m_DetChar.m_aActualFacingDirection;
+    m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aActualFacingDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
     PlayerTweaks* tweaks = m_pTweaks;
     InitMovementRunning(GetJogTurnSpeed(tweaks), fn_8002CF10(tweaks),
         fn_8002C180(tweaks), fn_8002CF24(tweaks));
@@ -4696,9 +4696,9 @@ void cFielder::SetIdleAnimState()
 void cFielder::SetIdleWBAnimState()
 {
     SetAnimState(15, true, 0.2f, false, false);
-    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aActualFacingDirection;
-    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualFacingDirection;
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    m_DetChar.m_aDesiredFacingDirection = m_DetChar.m_aActualFacingDirection;
+    m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aActualFacingDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
     PlayerTweaks* tweaks = m_pTweaks;
     InitMovementRunning(GetJogTurnSpeed(tweaks), GetRunWBTurnFalloff(tweaks),
         GetRunWBAccel(tweaks), GetRunWBDecel(tweaks));
@@ -4709,7 +4709,7 @@ void cFielder::RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender*
     cFielder* fielder = (cFielder*)parameter;
     if (fielder->m_eAnimID == 4 || fielder->m_eAnimID == 9 || fielder->m_eAnimID == 0x14)
     {
-        float weight = 0.5f * fielder->mUnidentified024.m_fLeanAmount + 0.5f;
+        float weight = 0.5f * fielder->m_DetChar.m_fLeanAmount + 0.5f;
         if (fielder->m_pCurrentAnimController->m_bMirror)
         {
             weight = 1.0f - weight;
@@ -4728,8 +4728,8 @@ void cFielder::RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender*
 
 void cFielder::SetRunningAnimState(float blendTime)
 {
-    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aDesiredMovementDirection
-        = mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    m_DetChar.m_aDesiredFacingDirection = m_DetChar.m_aDesiredMovementDirection
+        = m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
     const int runningAnims[3] = { 7, 4, 8 };
     const int superAnims[3] = { 10, 9, 11 };
     if (IsSuperGrowActive()
@@ -4745,8 +4745,8 @@ void cFielder::SetRunningAnimState(float blendTime)
 
 void cFielder::SetRunningWBAnimState(float blendTime)
 {
-    mUnidentified024.m_aDesiredFacingDirection = mUnidentified024.m_aDesiredMovementDirection
-        = mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+    m_DetChar.m_aDesiredFacingDirection = m_DetChar.m_aDesiredMovementDirection
+        = m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
     int runningAnims[3] = { 0x15, 0x14, 0x16 };
     int superAnims[3] = { 10, 9, 11 };
     if (IsSuperGrowActive()
@@ -4778,7 +4778,7 @@ void cFielder::SetDesiredSpeed(float minSpeed, float maxSpeed)
         {
             speed = (maxSpeed - minSpeed) * m_pController->GetMovementStickMagnitude() + minSpeed;
         }
-        mUnidentified024.m_fDesiredSpeed = speed;
+        m_DetChar.m_fDesiredSpeed = speed;
     }
 }
 
@@ -4838,7 +4838,7 @@ void cFielder::SetTangible(bool tangible, bool affectGoalLine)
     {
         m_pBall->m_bVisible = tangible;
     }
-    mUnidentified17C = tangible;
+    m_bShadowVisible = tangible;
 }
 
 void cFielder::EjectMonty(bool finished, unsigned short direction)
@@ -4853,7 +4853,7 @@ void cFielder::EjectMonty(bool finished, unsigned short direction)
     InitMovementCoast();
     m_bMontyDekeFinished = finished;
     SetTangible(true, false);
-    mUnidentified178 = 1.0f;
+    m_fOpacity = 1.0f;
 }
 
 void cFielder::EndMontyDeke()
@@ -4861,12 +4861,12 @@ void cFielder::EndMontyDeke()
     SetAnimState(0x50, false, 0.0f, false, false);
     m_pCurrentAnimController->SetTime(0.5f);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    nlVector3 position = mUnidentified024.m_v3Position;
+    nlVector3 position = m_DetChar.m_v3Position;
     position.z = 0.0f;
     SetPosition(position);
     m_bMontyDekeFinished = true;
-    mUnidentified178 = 1.0f;
-    mUnidentified17C = true;
+    m_fOpacity = 1.0f;
+    m_bShadowVisible = true;
     EmitMontyDekeExit(this);
 }
 
@@ -4875,9 +4875,9 @@ void cFielder::ShouldIWave()
     if (IsCaptain() && m_pBall == 0 && IsAvailableToReceivePass() && m_nPowerupAnimID < 0 && !fn_800976C4())
     {
         if (g_pBall->GetOwnerFielder() != 0
-            && g_pBall->GetOwnerFielder()->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() > 0.5f
+            && g_pBall->GetOwnerFielder()->m_DetPlayer.m_tBallPossessionTimer.GetSeconds() > 0.5f
             && IsOnSameTeam(g_pBall->GetOwnerFielder())
-            && g_pBall->GetOwnerFielder()->DoCalcCanDoPerfectPass(this, mUnidentified024.m_v3Position))
+            && g_pBall->GetOwnerFielder()->DoCalcCanDoPerfectPass(this, m_DetChar.m_v3Position))
         {
             SetPowerupAnimState(0x5D);
             PlaySound(m_uSoundSlotId, 0x270203ED, 0, 0);
@@ -4903,11 +4903,11 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
     {
         if (IsSlideAttacking() && !IsSuperGrowActive())
         {
-            float fPlayerScale = mUnidentified024.m_fPlayerScale;
+            float fPlayerScale = m_DetChar.m_fPlayerScale;
             float fUnidentified = 0.18f
                 + fn_8002BFA8(GetTweaks(), fPlayerScale);
             fUnidentified += gSlideBallContactRadiusBuffer;
-            if (nlVec3DistanceSquared2D(mUnidentified024.m_v3Position, g_pBall->m_v3Position)
+            if (nlVec3DistanceSquared2D(m_DetChar.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
                 bUnidentified = true;
         }
@@ -4916,11 +4916,11 @@ void cFielder::TestCollisionForInvincibility(cFielder* pOpponent)
     {
         if (pOpponent->IsSlideAttacking() && !pOpponent->IsSuperGrowActive())
         {
-            float fPlayerScale = pOpponent->mUnidentified024.m_fPlayerScale;
+            float fPlayerScale = pOpponent->m_DetChar.m_fPlayerScale;
             float fUnidentified = 0.18f
                 + fn_8002BFA8(pOpponent->GetTweaks(), fPlayerScale);
             fUnidentified += gSlideBallContactRadiusBuffer;
-            if (nlVec3DistanceSquared2D(pOpponent->mUnidentified024.m_v3Position, g_pBall->m_v3Position)
+            if (nlVec3DistanceSquared2D(pOpponent->m_DetChar.m_v3Position, g_pBall->m_v3Position)
                 < fUnidentified * fUnidentified)
                 bUnidentified = true;
         }
@@ -5004,14 +5004,14 @@ void cFielder::TestButtonsToQueueActions(float deltaTime)
         if (GetGlobalPad()->JustPressed(27, true))
         {
             bIsModified = bIsModified || IsActionModifierPressed();
-            mUnidentified1E4.m_eLastPadAction = 27;
+            m_DetPlayer.m_eLastPadAction = 27;
         }
         else if (GetGlobalPad()->JustPressed(28, true))
-            mUnidentified1E4.m_eLastPadAction = 28;
+            m_DetPlayer.m_eLastPadAction = 28;
         else if (IsDekeRequested(&direction) && m_bDekeReset && m_bSlideAttackReset)
         {
             m_aDekeDirection = direction;
-            mUnidentified1E4.m_eLastPadAction = 29;
+            m_DetPlayer.m_eLastPadAction = 29;
         }
     }
 }
@@ -5019,24 +5019,24 @@ void cFielder::TestButtonsToQueueActions(float deltaTime)
 bool cFielder::TestQueuedActions()
 {
     bool result = false;
-    if (mUnidentified1E4.m_eLastPadAction == 28 && GetGlobalPad() != 0
+    if (m_DetPlayer.m_eLastPadAction == 28 && GetGlobalPad() != 0
         && !GetGlobalPad()->IsPressed(28, true))
     {
         result = InitActionShot(bIsModified, false);
     }
-    else if (mUnidentified1E4.m_eLastPadAction == 27)
+    else if (m_DetPlayer.m_eLastPadAction == 27)
     {
         bool volley = bIsModified;
         result = InitActionPass(fn_80096F54(this, volley), volley, 0, false);
     }
-    else if (mUnidentified1E4.m_eLastPadAction == 29)
+    else if (m_DetPlayer.m_eLastPadAction == 29)
         result = fn_800447C0(m_aDekeDirection);
     return result;
 }
 
 void cFielder::TestLooseBallControls(bool forceContact)
 {
-    if (mUnidentified1E4.m_bCanTestController && GetGlobalPad() != 0)
+    if (m_DetPlayer.m_bCanTestController && GetGlobalPad() != 0)
     {
         unsigned short hitDirection = 0;
         unsigned short dekeDirection = 0;
@@ -5048,7 +5048,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                 cFielder* target = static_cast<cFielder*>(fn_80096F54(this, volley));
                 InitActionLooseBallPass(target, volley);
                 if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
-                    && m_pTeam->mfBallInTimes[mUnidentified1E4.m_ID] <= gLooseBallContactBufferTime)
+                    && m_pTeam->mfBallInTimes[m_DetPlayer.m_ID] <= gLooseBallContactBufferTime)
                 {
                     UnidentifiedVariantCollection parameters;
                     parameters.Set(7, FuzzyVariant(0.1f + gLooseBallContactBufferTime));
@@ -5058,7 +5058,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                     parameters.Set(1, FuzzyVariant(false));
                     parameters.Set(10, FuzzyVariant((void*)TransDesireLooseBallContact));
                     m_pAIContext->mScriptMachine->ActivateState(13, &parameters, true);
-                    mUnidentified1E4.m_bCanTestController = false;
+                    m_DetPlayer.m_bCanTestController = false;
                 }
             }
         }
@@ -5069,7 +5069,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                 bool modified = IsActionModifierPressed();
                 InitActionLooseBallShot(modified);
                 if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
-                    && m_pTeam->mfBallInTimes[mUnidentified1E4.m_ID] <= gLooseBallContactBufferTime)
+                    && m_pTeam->mfBallInTimes[m_DetPlayer.m_ID] <= gLooseBallContactBufferTime)
                 {
                     UnidentifiedVariantCollection parameters;
                     parameters.Set(7, FuzzyVariant(0.1f + gLooseBallContactBufferTime));
@@ -5165,8 +5165,8 @@ void cFielder::TestAnimBallContact()
             case ACTION_LOOSE_BALL_PASS:
             {
                 g_pBall->SetOwner(this);
-                mUnidentified1E4.m_tBallPossessionTimer.Clear();
-                mUnidentified1E4.m_tBallUnPossessionTimer.Clear();
+                m_DetPlayer.m_tBallPossessionTimer.Clear();
+                m_DetPlayer.m_tBallUnPossessionTimer.Clear();
                 float slow = GetSlowestVolleyPassSpeed(m_pTweaks);
                 float fast = GetFastestVolleyPassSpeed(m_pTweaks);
                 if (!bIsModified)
@@ -5196,8 +5196,8 @@ void cFielder::TestAnimBallContact()
                 }
                 m_pShotMeter->CalcOneTimerValue(this, perfectPass);
                 g_pBall->SetOwner(this);
-                mUnidentified1E4.m_tBallPossessionTimer.Clear();
-                mUnidentified1E4.m_tBallUnPossessionTimer.Clear();
+                m_DetPlayer.m_tBallPossessionTimer.Clear();
+                m_DetPlayer.m_tBallUnPossessionTimer.Clear();
                 if (!ShouldIClearBall())
                 {
                     DoRegularShooting(false);
@@ -5333,16 +5333,16 @@ void cFielder::UpdateTimers(float deltaTime)
                 ThrowPowerup(desire);
             }
         }
-        if (!mUnidentified1E4.m_bSkipActionUpdate && GetCharacterClass() == (eCharacterClass)16
+        if (!m_DetPlayer.m_bSkipActionUpdate && GetCharacterClass() == (eCharacterClass)16
             && mtPostDekeTimer.m_uPackedTime != 0)
         {
             mtPostDekeTimer.Countdown(deltaTime, 0.0f);
             float seconds = mtPostDekeTimer.GetSeconds();
             float fraction = seconds / gBooDekeFadeTime;
             if (fraction < 0.1f)
-                mUnidentified178 = 1.0f - (1.0f - gBooDekeAlpha) * (fraction / 0.1f);
+                m_fOpacity = 1.0f - (1.0f - gBooDekeAlpha) * (fraction / 0.1f);
             else
-                mUnidentified178 = gBooDekeAlpha;
+                m_fOpacity = gBooDekeAlpha;
         }
     }
 }
@@ -5410,28 +5410,28 @@ void cFielder::Update(float fDeltaT)
     cPlayer::Update(fDeltaT);
     m_pAIContext->Update(true, fDeltaT);
 
-    if (!mUnidentified1E4.m_bSkipActionUpdate)
+    if (!m_DetPlayer.m_bSkipActionUpdate)
     {
         UpdateActionState(fDeltaT);
         UpdateHeadTracking(fDeltaT);
     }
     else
     {
-        SetPosition(mUnidentified024.m_v3PrevPosition);
+        SetPosition(m_DetChar.m_v3PrevPosition);
     }
 
-    if (!mUnidentified1E4.m_bSkipAnimUpdate)
+    if (!m_DetPlayer.m_bSkipAnimUpdate)
     {
         cCharacter::Update(fDeltaT);
     }
-    else if (mUnidentified1E4.m_bForceFeatherUpdate && fn_800976C4())
+    else if (m_DetPlayer.m_bForceFeatherUpdate && fn_800976C4())
     {
         cCharacter::Update(0.0f);
         m_pPowerupLayer->SetChild(
             1, m_pPowerupLayer->GetChild(1)->Update(fDeltaT));
     }
 
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)6
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)6
         && mWaluigiWallState.mUnidentified08 != 0)
     {
         mWaluigiWallState.mUnidentified08->Update(fDeltaT);
@@ -5586,8 +5586,8 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
             if (pUnidentified != 0)
             {
                 if (IsOnSameTeam(pUnidentified)
-                    || nlVec3DistanceSquared2D(pUnidentified->mUnidentified024.m_v3Position,
-                           mUnidentified024.m_v3Position) > 36.0f
+                    || nlVec3DistanceSquared2D(pUnidentified->m_DetChar.m_v3Position,
+                           m_DetChar.m_v3Position) > 36.0f
                     || fn_800DDF54(this, pUnidentified) < 0.6f)
                 {
                     pUnidentified = 0;
@@ -5612,7 +5612,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
             }
             else
             {
-                v3Unidentified = pUnidentified->mUnidentified024.m_v3Position;
+                v3Unidentified = pUnidentified->m_DetChar.m_v3Position;
             }
             v3Unidentified.z = gSuperPowerHeadTrackingHeight;
             m_pHeadTrack->m_v3OOI = v3Unidentified;
@@ -5638,7 +5638,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
     }
 
-    if (mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
+    if (m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
     {
         m_pHeadTrack->m_bTrackOOI = false;
         return;
@@ -5646,7 +5646,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
 
     if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E)
         && !IsFallenDown()
-        && (mUnidentified024.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
+        && (m_DetChar.m_eCharacterClass != (eCharacterClass)0xC || m_pBall == 0))
     {
         float fUnidentified = (int)g_pGame->GetGameTime();
         nlVector3 v3Unidentified;
@@ -5669,12 +5669,12 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
     switch (m_eActionState)
     {
     case ACTION_HIT:
-        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)8)
+        if (m_DetChar.m_eCharacterClass == (eCharacterClass)8)
         {
             m_pHeadTrack->m_fSmoothTime = 0.005f;
         }
     case 29:
-        if (mUnidentified024.m_eCharacterClass == (eCharacterClass)9)
+        if (m_DetChar.m_eCharacterClass == (eCharacterClass)9)
         {
             m_pHeadTrack->m_fSmoothTime = 0.005f;
         }
@@ -5707,7 +5707,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         m_pHeadTrack->m_bTrackOOI = true;
         if (m_fFallingTime > 0.0f)
         {
-            nlVector3 v3Unidentified = mUnidentified024.m_v3Position;
+            nlVector3 v3Unidentified = m_DetChar.m_v3Position;
             v3Unidentified.z -= 20.0f;
             m_pHeadTrack->m_v3OOI = v3Unidentified;
         }
@@ -5820,7 +5820,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         cPlayer* pScorer = g_pGame->m_pScorer;
         if (pScorer != 0)
         {
-            m_pHeadTrack->m_v3OOI = pScorer->mUnidentified024.m_v3Position;
+            m_pHeadTrack->m_v3OOI = pScorer->m_DetChar.m_v3Position;
         }
         else
         {
@@ -5962,14 +5962,14 @@ const nlVector3& cFielder::GetDesiredPosition()
     {
         return *GetSteeringTargetPosition(steering);
     }
-    return mUnidentified024.m_v3Position;
+    return m_DetChar.m_v3Position;
 }
 
 float cFielder::GetDistanceToDesiredPos()
 {
     const nlVector3& desiredPosition = GetDesiredPosition();
-    nlVector2 delta = { mUnidentified024.m_v3Position.x - desiredPosition.x,
-        mUnidentified024.m_v3Position.y - desiredPosition.y };
+    nlVector2 delta = { m_DetChar.m_v3Position.x - desiredPosition.x,
+        m_DetChar.m_v3Position.y - desiredPosition.y };
     return nlVec2Length(delta);
 }
 
@@ -6024,7 +6024,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     mtPowerupThrowTime.Clear();
     muInvincibleStatus = 0;
     m_nMegaStrikeResultState = 0;
-    mUnidentified178 = 1.0f;
+    m_fOpacity = 1.0f;
     mActionCrowdVars.bHasBeenSuckedToMiddle = false;
     mActionCrowdVars.fStuckInRiotTime = -1.0f;
     m_aDekeDirection = 0;

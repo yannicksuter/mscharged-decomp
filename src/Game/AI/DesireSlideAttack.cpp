@@ -69,10 +69,10 @@ void DesireSlideAttack::Update(
             break;
         }
 
-        v3VictimPosition.x = mpTarget->mUnidentified024.m_v3Position.x
-                           + sSlideAttackTargetLeadTime * mpTarget->mUnidentified024.m_v3Velocity.x;
-        v3VictimPosition.y = mpTarget->mUnidentified024.m_v3Position.y
-                           + sSlideAttackTargetLeadTime * mpTarget->mUnidentified024.m_v3Velocity.y;
+        v3VictimPosition.x = mpTarget->m_DetChar.m_v3Position.x
+                           + sSlideAttackTargetLeadTime * mpTarget->m_DetChar.m_v3Velocity.x;
+        v3VictimPosition.y = mpTarget->m_DetChar.m_v3Position.y
+                           + sSlideAttackTargetLeadTime * mpTarget->m_DetChar.m_v3Velocity.y;
         v3VictimPosition.z = 0.0f;
         pFielder->AddDesiredPosition(v3VictimPosition, 1.5f, 1.0f);
         pFielder->GetAvoidController()->UseMinimumAvoidance(mpTarget);
@@ -81,7 +81,7 @@ void DesireSlideAttack::Update(
     case 1:
     {
         mMaxDuration = 5.0f;
-        if (pFielder->mUnidentified1E4.m_tSlideAttackTimer.m_uPackedTime != 0)
+        if (pFielder->m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime != 0)
         {
             if (!pFielder->bAttackSucceeded)
             {
@@ -97,12 +97,12 @@ void DesireSlideAttack::Update(
                     fBallClosingSpeed = GetClosingSpeed2D(
                         pFielder->GetJointPosition(
                             pFielder->m_nLeftFootJointIndex),
-                        pFielder->mUnidentified024.m_v3Velocity,
+                        pFielder->m_DetChar.m_v3Velocity,
                         pBall->m_v3Position, ballVelocity);
                     if (fBallClosingSpeed < 0.0f
                         && nlRandomf(1.0f) > 0.5f)
                     {
-                        pFielder->mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(0.0f);
+                        pFielder->m_DetPlayer.m_tSlideAttackTimer.SetSeconds(0.0f);
                         meDesireSubState = 2;
                     }
                 }

@@ -92,7 +92,7 @@ cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
     : cCharacter(characterClass, nModelID, hierarchy, animInventory, physData,
           fPhysCapsuleHeight, fPhysCapsuleRadius, animRetargetList, nIndex, classType)
 {
-    mUnidentified1E4.m_ID = nPlayerID;
+    m_DetPlayer.m_ID = nPlayerID;
     m_pController = NULL;
     m_pBall = NULL;
     m_pTeam = NULL;
@@ -129,7 +129,7 @@ cPlayer::cPlayer(int nPlayerID, eCharacterClass characterClass,
     m_pSpaceSearch = NULL;
     SetAnimState(0, true, 0.2f, false, false);
     PostPhysicsUpdate();
-    mUnidentified1E4.m_tSwapFacingTimer.SetSeconds(0.0f);
+    m_DetPlayer.m_tSwapFacingTimer.SetSeconds(0.0f);
     ClearSwapControllerTimer();
     if (classType == FIELDER)
         mUnidentified320 = new (nlMalloc(sizeof(AvoidableFielder), 8, false)) AvoidableFielder((cFielder*)this);
@@ -166,7 +166,7 @@ void SetPlayerTeam(cPlayer* pPlayer, cTeam* pTeam)
     bool bSidekick = !pPlayer->IsCaptain();
     if (bSidekick && pPlayer->m_eClassType == FIELDER)
     {
-        pPlayer->m_uSoundSlotId += pPlayer->mUnidentified1E4.m_ID;
+        pPlayer->m_uSoundSlotId += pPlayer->m_DetPlayer.m_ID;
     }
     else if (pPlayer->m_eClassType == GOALIE)
     {
@@ -186,20 +186,20 @@ void SetDesiredFacingDirection(cPlayer* pPlayer)
         }
         else
         {
-            pPlayer->mUnidentified024.m_aDesiredFacingDirection
-                = pPlayer->mUnidentified024.m_aActualFacingDirection;
+            pPlayer->m_DetChar.m_aDesiredFacingDirection
+                = pPlayer->m_DetChar.m_aActualFacingDirection;
         }
     }
     if (pPlayer->m_eAnimID >= 0x56 || pPlayer->m_eAnimID < 0x52)
     {
-        pPlayer->mUnidentified024.m_aDesiredMovementDirection
-            = pPlayer->mUnidentified024.m_aDesiredFacingDirection;
+        pPlayer->m_DetChar.m_aDesiredMovementDirection
+            = pPlayer->m_DetChar.m_aDesiredFacingDirection;
     }
 }
 
 u8 cPlayer::SwapController(bool bParam)
 {
-    if (mUnidentified1E4.m_bCanTestController)
+    if (m_DetPlayer.m_bCanTestController)
     {
         if (!g_pBall->UnidentifiedHasPassTarget()
             || g_pBall->m_pPassTarget != this)
@@ -303,14 +303,14 @@ u8 cPlayer::SwapController(bool bParam)
                 if (pSwapPlayer == NULL)
                     return 0;
             }
-            if (mUnidentified024.m_fActualSpeed > 1.0f)
+            if (m_DetChar.m_fActualSpeed > 1.0f)
             {
-                pSwapPlayer->mUnidentified1E4.m_tSwapFacingTimer.SetSeconds(gGameTweaks.m_pGameTweaks->fSwapFacingTime);
-                pSwapPlayer->mUnidentified1E4.m_aSwapFacingDirection = pSwapPlayer->mUnidentified024.m_aActualMovementDirection;
+                pSwapPlayer->m_DetPlayer.m_tSwapFacingTimer.SetSeconds(gGameTweaks.m_pGameTweaks->fSwapFacingTime);
+                pSwapPlayer->m_DetPlayer.m_aSwapFacingDirection = pSwapPlayer->m_DetChar.m_aActualMovementDirection;
             }
             m_tSwapControllerTimer[iPadID].SetSeconds(gGameTweaks.m_pGameTweaks->fSwapControllerTime);
             pSwapPlayer->SetAIPad(m_pController);
-            pSwapPlayer->mUnidentified1E4.m_bCanTestController = false;
+            pSwapPlayer->m_DetPlayer.m_bCanTestController = false;
             SetAIPad(NULL);
             return 1;
         }
@@ -324,61 +324,61 @@ void cPlayer::UpdateGameplayTimers(float fDeltaT)
     {
         if (m_pBall != NULL)
         {
-            mUnidentified1E4.m_tBallPossessionTimer.Countup(fDeltaT, 10.0f);
-            StatsTracker::Instance()->TrackStat(STATS_16, m_pTeam->m_nSide, mUnidentified1E4.m_ID, 100.0f * fDeltaT, 0, 0, 0);
+            m_DetPlayer.m_tBallPossessionTimer.Countup(fDeltaT, 10.0f);
+            StatsTracker::Instance()->TrackStat(STATS_16, m_pTeam->m_nSide, m_DetPlayer.m_ID, 100.0f * fDeltaT, 0, 0, 0);
         }
         else
         {
-            mUnidentified1E4.m_tBallUnPossessionTimer.Countup(fDeltaT, 10.0f);
+            m_DetPlayer.m_tBallUnPossessionTimer.Countup(fDeltaT, 10.0f);
         }
-        mUnidentified1E4.m_tSwapFacingTimer.Countdown(fDeltaT, 0.0f);
+        m_DetPlayer.m_tSwapFacingTimer.Countdown(fDeltaT, 0.0f);
         float fScaledDt = fDeltaT * (1.0f / FixedUpdateTask::GetTargetTimeScale());
         for (int iPadID = 0; iPadID < 16; iPadID++)
         {
             m_tSwapControllerTimer[iPadID].Countdown(fScaledDt, 0.0f);
         }
-        if (mUnidentified024.m_fActualSpeed < 2.5f)
+        if (m_DetChar.m_fActualSpeed < 2.5f)
         {
-            mUnidentified1E4.m_tInactivityTimer.Countup(fDeltaT, 10.0f);
+            m_DetPlayer.m_tInactivityTimer.Countup(fDeltaT, 10.0f);
         }
         else
         {
-            mUnidentified1E4.m_tInactivityTimer.Clear();
+            m_DetPlayer.m_tInactivityTimer.Clear();
         }
-        if (mUnidentified1E4.m_fSkipTimer > 0.0f)
+        if (m_DetPlayer.m_fSkipTimer > 0.0f)
         {
-            mUnidentified1E4.m_fSkipTimer -= fDeltaT;
-            if (mUnidentified1E4.m_fSkipTimer <= 0.0f)
+            m_DetPlayer.m_fSkipTimer -= fDeltaT;
+            if (m_DetPlayer.m_fSkipTimer <= 0.0f)
             {
-                mUnidentified1E4.m_fSkipTimer = 0.0f;
-                mUnidentified1E4.m_bSkipActionUpdate = false;
-                mUnidentified1E4.m_bSkipAnimUpdate = false;
+                m_DetPlayer.m_fSkipTimer = 0.0f;
+                m_DetPlayer.m_bSkipActionUpdate = false;
+                m_DetPlayer.m_bSkipAnimUpdate = false;
             }
         }
-        if (!mUnidentified1E4.m_bSkipActionUpdate)
+        if (!m_DetPlayer.m_bSkipActionUpdate)
         {
-            mUnidentified1E4.m_tSlideAttackTimer.Countdown(fDeltaT, 0.0f);
-            if (mUnidentified1E4.m_tNoPickupTimer.m_uPackedTime != 0)
+            m_DetPlayer.m_tSlideAttackTimer.Countdown(fDeltaT, 0.0f);
+            if (m_DetPlayer.m_tNoPickupTimer.m_uPackedTime != 0)
             {
-                m_pPhysicsCharacter->m_CanCollideWithBall = mUnidentified1E4.m_tNoPickupTimer.Countdown(fDeltaT, 0.0f);
+                m_pPhysicsCharacter->m_CanCollideWithBall = m_DetPlayer.m_tNoPickupTimer.Countdown(fDeltaT, 0.0f);
             }
             else
             {
                 m_pPhysicsCharacter->m_CanCollideWithBall = true;
             }
-            if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+            if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
             {
                 if (m_eClassType == FIELDER && FixedUpdateTask::GetTargetTimeScale() == 1.0f
-                    && mUnidentified1E4.m_tFireTimer.GetSeconds() > 1.1f)
+                    && m_DetPlayer.m_tFireTimer.GetSeconds() > 1.1f)
                 {
-                    float fWholeSeconds = floor(mUnidentified1E4.m_tFireTimer.GetSeconds());
-                    if (mUnidentified1E4.m_tFireTimer.GetSeconds() - fWholeSeconds < 0.02f)
+                    float fWholeSeconds = floor(m_DetPlayer.m_tFireTimer.GetSeconds());
+                    if (m_DetPlayer.m_tFireTimer.GetSeconds() - fWholeSeconds < 0.02f)
                     {
                         unsigned long sound = IsCaptain() ? 0x3642C41B : 0x00E606A2;
                         PlaySound(m_uSoundSlotId, sound, NULL, NULL);
                     }
                 }
-                if (mUnidentified1E4.m_tFireTimer.Countdown(fDeltaT, 0.0f))
+                if (m_DetPlayer.m_tFireTimer.Countdown(fDeltaT, 0.0f))
                 {
                     fn_800974B0();
                 }
@@ -391,17 +391,17 @@ void cPlayer::Update(float fDeltaT)
 {
     if (m_pController != NULL)
     {
-        mUnidentified1E4.m_UserControlledTime += fDeltaT;
+        m_DetPlayer.m_UserControlledTime += fDeltaT;
     }
     else
     {
-        mUnidentified1E4.m_UserControlledTime = 0.0f;
+        m_DetPlayer.m_UserControlledTime = 0.0f;
     }
 
     UpdateGameplayTimers(fDeltaT);
 
     FieldLocToAILoc(
-        mUnidentified1E4.m_v3AIPosition, mUnidentified024.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
+        m_DetPlayer.m_v3AIPosition, m_DetChar.m_v3Position, (eTeamSide)m_pTeam->m_nSide);
 }
 
 void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
@@ -424,18 +424,18 @@ void cPlayer::GetAnimatedBallOrientation(nlQuaternion& qRetval)
     nlVector3 v3Up = { 0.0f, 0.0f, 1.0f };
     nlQuaternion qOrient;
     nlQuaternion startInverse;
-    fn_802B5370(qFacing, v3Up, (unsigned short)(int)(10430.378f * AngUnitsToRad_fromUnsignedShort(mUnidentified024.m_aActualFacingDirection)));
+    fn_802B5370(qFacing, v3Up, (unsigned short)(int)(10430.378f * AngUnitsToRad_fromUnsignedShort(m_DetChar.m_aActualFacingDirection)));
     nlMultQuat(qOrient, qFacing, qAnimated);
-    if (mUnidentified1E4.m_ResetBaseBallOrientation)
+    if (m_DetPlayer.m_ResetBaseBallOrientation)
     {
         startInverse.x = -qOrient.x;
         startInverse.y = -qOrient.y;
         startInverse.z = -qOrient.z;
         startInverse.w = qOrient.w;
-        nlMultQuat(mUnidentified1E4.m_BaseBallOrientation, startInverse, g_pBall->m_qOrientation);
-        mUnidentified1E4.m_ResetBaseBallOrientation = false;
+        nlMultQuat(m_DetPlayer.m_BaseBallOrientation, startInverse, g_pBall->m_qOrientation);
+        m_DetPlayer.m_ResetBaseBallOrientation = false;
     }
-    nlMultQuat(qRetval, qOrient, mUnidentified1E4.m_BaseBallOrientation);
+    nlMultQuat(qRetval, qOrient, m_DetPlayer.m_BaseBallOrientation);
 }
 
 
@@ -444,18 +444,18 @@ void cPlayer::SetAnimID(int animID)
     cCharacter::SetAnimID(animID);
     eBallRotationMode ballRotationMode
         = (eBallRotationMode)m_pAnimInventory->GetBallRotationMode(animID);
-    if (mUnidentified024.m_eCharacterClass != BIRDO)
+    if (m_DetChar.m_eCharacterClass != BIRDO)
     {
-        mUnidentified1E4.m_eBallRotationMode = ballRotationMode;
+        m_DetPlayer.m_eBallRotationMode = ballRotationMode;
         if (m_pBall != NULL)
         {
-            mUnidentified1E4.m_ResetBaseBallOrientation = true;
+            m_DetPlayer.m_ResetBaseBallOrientation = true;
         }
     }
     else
     {
-        mUnidentified1E4.m_ResetBaseBallOrientation = true;
-        mUnidentified1E4.m_eBallRotationMode = BRM_ANIMATED;
+        m_DetPlayer.m_ResetBaseBallOrientation = true;
+        m_DetPlayer.m_eBallRotationMode = BRM_ANIMATED;
     }
 }
 
@@ -464,7 +464,7 @@ float cPlayer::DoFlashLight(const nlVector3& Position, unsigned short aDirection
     float fIgnoreObjectFartherThanThis)
 {
     nlVector2 v2Difference;
-    nlVec2Sub(v2Difference, *(const nlVector2*)&Position, *(const nlVector2*)&mUnidentified024.m_v3Position);
+    nlVec2Sub(v2Difference, *(const nlVector2*)&Position, *(const nlVector2*)&m_DetChar.m_v3Position);
     float fDistBetween = nlSqrt(nlVec2LengthSquared(v2Difference), true);
     if (fDistBetween < fIgnoreObjectCloserThanThis
         || fDistBetween > fIgnoreObjectFartherThanThis)
@@ -501,7 +501,7 @@ cPlayer* FindClosestTeamPlayer(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
 {
     cPlayer* pClosestPlayer = NULL;
     float fClosestDistSquared = FLT_MAX;
-    nlVector3 v3RefPos = pPosition == NULL ? pSelf->mUnidentified024.m_v3Position : *pPosition;
+    nlVector3 v3RefPos = pPosition == NULL ? pSelf->m_DetChar.m_v3Position : *pPosition;
     nlVector3 v3Position = v3RefPos;
     for (int i = 0; i < nNumPlayers; i++)
     {
@@ -515,8 +515,8 @@ cPlayer* FindClosestTeamPlayer(cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
             continue;
         }
         nlVector2 v2Difference;
-        v2Difference.x = v3Position.x - pPlayer->mUnidentified024.m_v3Position.x;
-        v2Difference.y = v3Position.y - pPlayer->mUnidentified024.m_v3Position.y;
+        v2Difference.x = v3Position.x - pPlayer->m_DetChar.m_v3Position.x;
+        v2Difference.y = v3Position.y - pPlayer->m_DetChar.m_v3Position.y;
         float fDistSquared = v2Difference.x * v2Difference.x + v2Difference.y * v2Difference.y;
         if (fDistSquared < fClosestDistSquared)
         {
@@ -569,8 +569,8 @@ void cPlayer::PickupBall(cBall* pBall)
                     if (closest != NULL)
                     {
                         float distSq = nlVec3DistanceSquared2D(
-                            player->mUnidentified024.m_v3Position,
-                            mUnidentified024.m_v3Position);
+                            player->m_DetChar.m_v3Position,
+                            m_DetChar.m_v3Position);
                         bool bPassTarget = g_pBall->IsInPassState()
                                         && g_pBall->m_pPassTarget != NULL;
                         if ((bPassTarget && closest == g_pBall->m_pPrevOwner) || distSq < bestDistSq)
@@ -629,8 +629,8 @@ void cPlayer::PickupBall(cBall* pBall)
     }
     if (m_eClassType == FIELDER)
         ((cFielder*)this)->m_pShotMeter->Abort();
-    mUnidentified1E4.m_tBallPossessionTimer.Clear();
-    mUnidentified1E4.m_tBallUnPossessionTimer.Clear();
+    m_DetPlayer.m_tBallPossessionTimer.Clear();
+    m_DetPlayer.m_tBallUnPossessionTimer.Clear();
     pBall->SetOwner(this);
     if (m_pBall != NULL)
     {
@@ -640,7 +640,7 @@ void cPlayer::PickupBall(cBall* pBall)
     if (m_pBall != NULL)
     {
         nlVector3 jointPos = GetJointPosition(m_nBallJointIndex);
-        float scale = mUnidentified024.m_fPlayerScale;
+        float scale = m_DetChar.m_fPlayerScale;
         if (scale > 1.0f)
         {
             float radius = g_pBall->m_pPhysicsBall->GetRadius();
@@ -648,7 +648,7 @@ void cPlayer::PickupBall(cBall* pBall)
         }
         m_pPhysicsCharacter->m_SubObject.SetSubObjectPosition(jointPos, PhysicsObject::WORLD_COORDINATES);
     }
-    mUnidentified1E4.m_ResetBaseBallOrientation = true;
+    m_DetPlayer.m_ResetBaseBallOrientation = true;
 }
 
 void cPlayer::PlayAttackReactionSounds(float fScale)
@@ -770,14 +770,14 @@ extern "C" cPlayer* fn_80096F54(cPlayer* pSelf, bool bVolleyPass)
         {
             continue;
         }
-        unsigned short aDirection = pSelf->mUnidentified024.m_aActualFacingDirection;
+        unsigned short aDirection = pSelf->m_DetChar.m_aActualFacingDirection;
         if (pSelf->m_pController != NULL
             && pSelf->m_pController->GetMovementStickMagnitude() > 0.01f)
         {
             aDirection = pSelf->m_pController->GetMovementStickDirection();
         }
-        float fScore = DistanceAndAngleConfidence(pSelf->mUnidentified024.m_v3Position,
-            pTarget->mUnidentified024.m_v3Position,
+        float fScore = DistanceAndAngleConfidence(pSelf->m_DetChar.m_v3Position,
+            pTarget->m_DetChar.m_v3Position,
             aDirection,
             &v2Distance,
             &v2Angle,
@@ -827,8 +827,8 @@ void cPlayer::ReleaseBall(int nParam)
 
 extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
 {
-    float fRemaining = pPlayer->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
-                         ? pPlayer->mUnidentified1E4.m_tFireTimer.GetSeconds()
+    float fRemaining = pPlayer->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0
+                         ? pPlayer->m_DetPlayer.m_tFireTimer.GetSeconds()
                          : 0.0f;
     if (pPlayer->m_eClassType == GOALIE)
     {
@@ -843,7 +843,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
         EmitSkillshotHandFire(pPlayer);
         if (fDuration > 0.0f)
         {
-            pPlayer->mUnidentified1E4.m_tFireTimer.SetSeconds(fDuration);
+            pPlayer->m_DetPlayer.m_tFireTimer.SetSeconds(fDuration);
         }
     }
     else
@@ -852,7 +852,7 @@ extern "C" void fn_80097358(cPlayer* pPlayer, float fDuration)
         pPlayer->AddRandomDirt();
         pPlayer->fn_8001F1C0(2);
         ((cFielder*)pPlayer)->EndFrozenOrDazed();
-        pPlayer->mUnidentified1E4.m_tFireTimer.SetSeconds(fDuration);
+        pPlayer->m_DetPlayer.m_tFireTimer.SetSeconds(fDuration);
         if (fRemaining <= 0.0f)
         {
             unsigned long sound = pPlayer->IsCaptain() ? 0x3642C41B : 0x00E606A2;
@@ -871,13 +871,13 @@ void cPlayer::fn_800974B0()
     {
         KillSkillshotPlayerOnFire(this);
     }
-    mUnidentified1E4.m_tFireTimer.m_uWasRunning = mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0;
-    mUnidentified1E4.m_tFireTimer.m_uPackedTime = 0;
+    m_DetPlayer.m_tFireTimer.m_uWasRunning = m_DetPlayer.m_tFireTimer.m_uPackedTime != 0;
+    m_DetPlayer.m_tFireTimer.m_uPackedTime = 0;
 }
 
 void cPlayer::fn_8009750C()
 {
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         fn_800974B0();
     }
@@ -894,7 +894,7 @@ void cPlayer::SetPowerupAnimState(int nodeIndex, int animID, float blendTime)
     m_pPowerupLayer->SetNodeWeight(nodeIndex, 1.0f, 0.2f);
     m_pPowerupLayer->SetChild(1, controller);
     m_pPowerupLayer->BeginBlendIn(blendTime);
-    mUnidentified1E4.m_nFeatherAnimID = animID;
+    m_DetPlayer.m_nFeatherAnimID = animID;
 }
 
 void cPlayer::fn_80097648(float duration)
@@ -982,22 +982,22 @@ void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
     {
         return;
     }
-    if (mUnidentified1E4.m_eBallRotationMode != BRM_ANIMATED)
+    if (m_DetPlayer.m_eBallRotationMode != BRM_ANIMATED)
     {
         return;
     }
-    if (mUnidentified024.m_eCharacterClass != BIRDO)
+    if (m_DetChar.m_eCharacterClass != BIRDO)
     {
-        mUnidentified1E4.m_eBallRotationMode = BRM_MATCH_VELOCITY;
+        m_DetPlayer.m_eBallRotationMode = BRM_MATCH_VELOCITY;
         if (m_pBall != NULL)
         {
-            mUnidentified1E4.m_ResetBaseBallOrientation = true;
+            m_DetPlayer.m_ResetBaseBallOrientation = true;
         }
     }
     else
     {
-        mUnidentified1E4.m_ResetBaseBallOrientation = true;
-        mUnidentified1E4.m_eBallRotationMode = BRM_ANIMATED;
+        m_DetPlayer.m_ResetBaseBallOrientation = true;
+        m_DetPlayer.m_eBallRotationMode = BRM_ANIMATED;
     }
 }
 
@@ -1059,7 +1059,7 @@ void cPlayer::PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
     }
     else
     {
-        cc = self.mUnidentified024.m_eCharacterClass;
+        cc = self.m_DetChar.m_eCharacterClass;
         if (cc == WARIO)
         {
             nHeadSpinMax = lbl_806E0D8C;
@@ -1101,7 +1101,7 @@ void cPlayer::PostPhysicsUpdate()
     if (m_pBall != NULL)
     {
         nlVector3 jointPos = GetJointPosition(m_nBallJointIndex);
-        float scale = mUnidentified024.m_fPlayerScale;
+        float scale = m_DetChar.m_fPlayerScale;
         if (scale > 1.0f)
         {
             float radius = g_pBall->m_pPhysicsBall->GetRadius();
@@ -1126,7 +1126,7 @@ void cPlayer::Unknown7(float)
 void cPlayer::PreUpdate(float dt)
 {
     cCharacter::PreUpdate(dt);
-    mUnidentified1E4.m_bCanTestController = true;
+    m_DetPlayer.m_bCanTestController = true;
 }
 
 void cPlayer::PrePhysicsUpdate()
@@ -1142,7 +1142,7 @@ bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
         return false;
     if (sbNoBallPickups)
         return false;
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
         return false;
     if (!g_pGame->IsGameplayOrOvertime())
         return false;
@@ -1155,12 +1155,12 @@ bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
     }
     if (pBall->m_pOwner == NULL && pBall->m_tNoPickupTimer.m_uPackedTime == 0
         && fSpeedSquared <= nlGetLengthSquared1D(fMaxPickupSpeed)
-        && mUnidentified1E4.m_tNoPickupTimer.m_uPackedTime == 0)
+        && m_DetPlayer.m_tNoPickupTimer.m_uPackedTime == 0)
     {
         float fPlayerRadius = 0.0f;
         m_pPhysicsCharacter->m_pPlayerPlayerColumn->GetRadius(&fPlayerRadius);
-        nlVector3 v3PrevPosition = mUnidentified024.m_v3PrevPosition;
-        nlVector3 v3Position = mUnidentified024.m_v3Position;
+        nlVector3 v3PrevPosition = m_DetChar.m_v3PrevPosition;
+        nlVector3 v3Position = m_DetChar.m_v3Position;
         v3Position.z = 0.18f;
         v3PrevPosition.z = 0.18f;
         bool bCollision = TestCollision(fPlayerRadius, v3PrevPosition, v3Position, 0.18f, pBall->m_v3PrevPosition, pBall->m_v3Position);
@@ -1181,13 +1181,13 @@ bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
 nlVector3 cPlayer::GetAIOffNetLocation(const nlVector3* v3ReferencePos)
 {
     return m_pTeam->GetAIOffNetLocation(
-        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
+        v3ReferencePos != NULL ? v3ReferencePos : &m_DetChar.m_v3Position);
 }
 
 nlVector3 cPlayer::GetAIDefNetLocation(const nlVector3* v3ReferencePos)
 {
     return m_pTeam->GetAIDefNetLocation(
-        v3ReferencePos != NULL ? v3ReferencePos : &mUnidentified024.m_v3Position);
+        v3ReferencePos != NULL ? v3ReferencePos : &m_DetChar.m_v3Position);
 }
 
 extern "C" void fn_80098098(cPlayer* pSelf)
@@ -1269,7 +1269,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
 void cPlayer::SetNoPickUpTime(float NewNoPickUpTime)
 {
     m_pPhysicsCharacter->m_CanCollideWithBall = (NewNoPickUpTime <= 0.0f);
-    mUnidentified1E4.m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
+    m_DetPlayer.m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
 }
 
 inline bool cPlayer::IsCaptainPowerupNext()
@@ -1299,12 +1299,12 @@ void cPlayer::ResetAnimState()
 void cPlayer::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
     cCharacter::Reset(v3Position, aDirection);
-    mUnidentified1E4.Reset();
-    mUnidentified1E4.m_ResetBaseBallOrientation = true;
-    FieldLocToAILoc(mUnidentified1E4.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
+    m_DetPlayer.Reset();
+    m_DetPlayer.m_ResetBaseBallOrientation = true;
+    FieldLocToAILoc(m_DetPlayer.m_v3AIPosition, v3Position, (eTeamSide)m_pTeam->m_nSide);
     ClearSwapControllerTimer();
     if (m_pBall == NULL)
-        mUnidentified1E4.m_tBallUnPossessionTimer.SetSeconds(2.5f);
+        m_DetPlayer.m_tBallUnPossessionTimer.SetSeconds(2.5f);
     InitActionPostWhistle();
 }
 
@@ -1385,8 +1385,8 @@ void OnPlayerPeachFlash(PeachPhotoData* pData)
                 {
                     cFielder* pFielder = pTeam->GetFielder(j);
                     nlVector2 position;
-                    position.x = pFielder->mUnidentified024.m_v3Position.x;
-                    position.y = pFielder->mUnidentified024.m_v3Position.y;
+                    position.x = pFielder->m_DetChar.m_v3Position.x;
+                    position.y = pFielder->m_DetChar.m_v3Position.y;
                     if (region.ContainsPoint2D(position))
                         pFielder->FreezeWithPeachPhoto(lbl_806DBD88);
                 }
@@ -1548,7 +1548,7 @@ inline void PlayerGameplayState::SyncLog(void* context, DebugWriteCache* cache)
 void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
 {
     cCharacter::SyncLog(context, cache);
-    mUnidentified1E4.SyncLog(context, cache);
+    m_DetPlayer.SyncLog(context, cache);
 }
 
 #undef REGISTER_PLAYER_FIELD
@@ -1556,11 +1556,11 @@ void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
 void cPlayer::ChecksumState(RunningChecksum* pChecksum)
 {
     cCharacter::ChecksumState(pChecksum);
-    pChecksum->ChecksumData(&mUnidentified1E4.m_v3AIPosition, sizeof(mUnidentified1E4.m_v3AIPosition));
-    pChecksum->ChecksumData(&mUnidentified1E4.m_eBallRotationMode, sizeof(mUnidentified1E4.m_eBallRotationMode));
-    pChecksum->ChecksumData(&mUnidentified1E4.m_BaseBallOrientation, sizeof(mUnidentified1E4.m_BaseBallOrientation));
-    pChecksum->ChecksumData(&mUnidentified1E4.m_tBallPossessionTimer, sizeof(mUnidentified1E4.m_tBallPossessionTimer));
-    pChecksum->ChecksumData(&mUnidentified1E4.m_fShotStrengthTime, sizeof(mUnidentified1E4.m_fShotStrengthTime));
-    pChecksum->ChecksumData(&mUnidentified1E4.m_tSlideAttackTimer, sizeof(mUnidentified1E4.m_tSlideAttackTimer));
-    pChecksum->ChecksumData(&mUnidentified1E4.m_UserControlledTime, sizeof(mUnidentified1E4.m_UserControlledTime));
+    pChecksum->ChecksumData(&m_DetPlayer.m_v3AIPosition, sizeof(m_DetPlayer.m_v3AIPosition));
+    pChecksum->ChecksumData(&m_DetPlayer.m_eBallRotationMode, sizeof(m_DetPlayer.m_eBallRotationMode));
+    pChecksum->ChecksumData(&m_DetPlayer.m_BaseBallOrientation, sizeof(m_DetPlayer.m_BaseBallOrientation));
+    pChecksum->ChecksumData(&m_DetPlayer.m_tBallPossessionTimer, sizeof(m_DetPlayer.m_tBallPossessionTimer));
+    pChecksum->ChecksumData(&m_DetPlayer.m_fShotStrengthTime, sizeof(m_DetPlayer.m_fShotStrengthTime));
+    pChecksum->ChecksumData(&m_DetPlayer.m_tSlideAttackTimer, sizeof(m_DetPlayer.m_tSlideAttackTimer));
+    pChecksum->ChecksumData(&m_DetPlayer.m_UserControlledTime, sizeof(m_DetPlayer.m_UserControlledTime));
 }

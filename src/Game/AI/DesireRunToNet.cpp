@@ -30,12 +30,12 @@ bool DesireRunToNet::Initialize(void* context)
 
     nlVector3 v3BestPosition;
     m_pFielder->m_pSpaceSearch->FindBestPosition(
-        v3BestPosition, m_pFielder->mUnidentified024.m_v3Position,
+        v3BestPosition, m_pFielder->m_DetChar.m_v3Position,
         DIR_NONE, NULL, sRunToNetSearchRadius, 0x8000);
 
     nlVector3 v3DesiredVelDirection;
     v3DesiredVelDirection.Sub2D(
-        v3BestPosition, m_pFielder->mUnidentified024.m_v3Position);
+        v3BestPosition, m_pFielder->m_DetChar.m_v3Position);
     v3DesiredVelDirection.z = 0.0f;
 
     float fLengthSq = v3DesiredVelDirection.GetLengthSq3D();
@@ -43,7 +43,7 @@ bool DesireRunToNet::Initialize(void* context)
     {
         nlPolarToCartesian(v3DesiredVelDirection.x,
             v3DesiredVelDirection.y,
-            m_pFielder->mUnidentified024.m_aDesiredFacingDirection, 1.0f);
+            m_pFielder->m_DetChar.m_aDesiredFacingDirection, 1.0f);
     }
     else
     {
@@ -63,7 +63,7 @@ void DesireRunToNet::Update(
 {
     nlVector3 v3DesiredPosition;
     nlVec3ScaleAdd(v3DesiredPosition, sRunToNetLookAheadDistance,
-        mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position);
+        mvDesiredPosition, m_pFielder->m_DetChar.m_v3Position);
     cField::FixOutOfBoundsPosition(v3DesiredPosition, 0.2f, true);
     m_pFielder->AddDesiredPosition(v3DesiredPosition, 1.5f, 1.0f);
 }

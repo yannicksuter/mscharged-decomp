@@ -918,10 +918,10 @@ ImpostorModel* Nis::AttachImpostorToCharacter(eCharacterClass characterClass, co
             DrawableCharacter* pDC = &snapshot.GetCharacter(i);
             cCharacter* character = pDC->character;
             if (character->m_eClassType == FIELDER
-                && characterClass == character->mUnidentified024.m_eCharacterClass
+                && characterClass == character->m_DetChar.m_eCharacterClass
                 && mCharacterControllers[i] != 0)
             {
-                model->SetReplacementTexture(character->mUnidentified104);
+                model->SetReplacementTexture(character->m_uSwapTextureID);
                 model->mOriginalTexture = glGetTexture(textureName);
                 *outCharacter = pDC;
                 break;
@@ -941,7 +941,7 @@ void Nis::ApplyDamageEffects(glModel* model, DrawableCharacter* character)
     int stadium = GameInfoManager::Instance()->GetStadium();
     u32 damageTexture = glGetTexture("global/scorch");
     char textureName[64];
-    nlSNPrintf(textureName, sizeof(textureName), "%s/dirt", character->character->mUnidentified11C->mName);
+    nlSNPrintf(textureName, sizeof(textureName), "%s/dirt", character->character->m_pCharacterInfo->mName);
     damageTexture = glGetTexture(textureName);
 
     if (character->character->mUnidentified16C != 1
@@ -1018,7 +1018,7 @@ void Nis::LoadCharacterAnimation(const char* animName, int characterIndex)
 
     if (entry != 0)
     {
-        eCharacterClass characterClass = character->mUnidentified024.m_eCharacterClass;
+        eCharacterClass characterClass = character->m_DetChar.m_eCharacterClass;
         entry->name = animName;
         entry->characterIndex = characterIndex;
         entry->loaded = false;

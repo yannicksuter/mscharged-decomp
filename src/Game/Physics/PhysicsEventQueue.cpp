@@ -549,7 +549,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         if (shockwaveType == SHOCKWAVE_DAISY_FIST)
         {
             pBall->ShootAtFast(v3Velocity,
-                ((cCharacter*)pShockwave->mOwner)->mUnidentified024.m_v3Position, gfDaisyFistShotTime);
+                ((cCharacter*)pShockwave->mOwner)->m_DetChar.m_v3Position, gfDaisyFistShotTime);
             nlRandom(2);
         }
         else

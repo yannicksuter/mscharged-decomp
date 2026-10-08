@@ -107,7 +107,7 @@ void YoshiEggObject::Update(float dt)
 
     if (mDisplacementDistance != 0.0f)
     {
-        nlVector3 position = mFielder->mUnidentified024.m_v3Position;
+        nlVector3 position = mFielder->m_DetChar.m_v3Position;
         nlVector3 offset;
         nlVec3Scale(offset, mDisplacementDirection, mDisplacementDistance);
         if (nlAbs(offset.x) <= 0.01f && nlAbs(offset.y) <= 0.01f)
@@ -143,7 +143,7 @@ void YoshiEggObject::Activate(cFielder* fielder)
 {
     mFielder = fielder;
     if (fielder != 0)
-        fn_802B549C(mOrientation, fielder->mUnidentified024.m_aActualFacingDirection);
+        fn_802B549C(mOrientation, fielder->m_DetChar.m_aActualFacingDirection);
     mTargetRadius = gYoshiEggStartRadius;
     mRadiusTime = 0.0f;
     mRadius = mTargetRadius;
@@ -213,7 +213,7 @@ float YoshiEggObject::GetRadius() const
 void YoshiEggObject::UpdateTransform(float dt)
 {
     cFielder* player = mFielder;
-    nlVector3 position = player->mUnidentified024.m_v3Position;
+    nlVector3 position = player->m_DetChar.m_v3Position;
     position.z += mRadius + gYoshiEggHeightOffset;
     nlVector3 foot = player->GetJointPosition(player->m_nLeftFootJointIndex);
     nlVector3 head = player->GetJointPosition(player->m_nHeadJointIndex);
@@ -228,11 +228,11 @@ void YoshiEggObject::UpdateTransform(float dt)
         nlVector3 axis;
         nlVector3 displacement;
         float sine, cosine;
-        nlSinCos(&sine, &cosine, player->mUnidentified024.m_aActualFacingDirection + 0x4000);
+        nlSinCos(&sine, &cosine, player->m_DetChar.m_aActualFacingDirection + 0x4000);
         axis.x = cosine;
         axis.y = sine;
         axis.z = 0.0f;
-        nlVec3Scale(displacement, player->mUnidentified024.m_v3Velocity, dt);
+        nlVec3Scale(displacement, player->m_DetChar.m_v3Velocity, dt);
         float length = nlVec3Length(displacement);
         float angle = length * gYoshiEggRollScale / mRadius;
         fn_802B5370(rotation, axis, (unsigned short)(int)(10430.378f * angle));

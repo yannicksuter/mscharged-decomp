@@ -433,12 +433,12 @@ public:
     bool IsStuck() const;
     bool IsDaisyOrDryBones() const
     {
-        return (int)mUnidentified024.m_eCharacterClass == 0x11
-            || (int)mUnidentified024.m_eCharacterClass == 2;
+        return (int)m_DetChar.m_eCharacterClass == 0x11
+            || (int)m_DetChar.m_eCharacterClass == 2;
     }
     bool HasTeleportDeke() const
     {
-        return IsDaisyOrDryBones() || (int)mUnidentified024.m_eCharacterClass == 6;
+        return IsDaisyOrDryBones() || (int)m_DetChar.m_eCharacterClass == 6;
     }
     bool IsInvincible() const
     {

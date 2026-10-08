@@ -184,29 +184,29 @@ cPN_SAnimController& DrawableCharacter::GetAnimController() const
 void DrawableCharacter::Grab(cCharacter& source)
 {
     character = &source;
-    position = source.mUnidentified024.m_v3Position;
+    position = source.m_DetChar.m_v3Position;
     bip01Position = source.GetJointPosition(source.m_nBip01JointIndex_0xA4);
     headPosition = source.GetJointPosition(source.m_nHeadJointIndex);
     height = bip01Position.z;
-    scale = source.mUnidentified024.m_fPlayerScale;
+    scale = source.m_DetChar.m_fPlayerScale;
     leftPropAnimated = source.m_bLeftPropAnimated;
     rightPropAnimated = source.m_bRightPropAnimated;
-    hammerTransformFrozen = source.mUnidentified180;
+    hammerTransformFrozen = source.m_bHammerTransformFrozen;
     if (hammerTransformFrozen)
     {
-        frozenHammerTranslation = source.mUnidentified194;
-        frozenHammerRotation = source.mUnidentified184;
-        frozenHammerScale = source.mUnidentified1A0;
+        frozenHammerTranslation = source.m_v3FrozenHammerTranslation;
+        frozenHammerRotation = source.m_qFrozenHammerRotation;
+        frozenHammerScale = source.m_fFrozenHammerScale;
     }
-    packetAVisible = source.mUnidentified181;
-    packetBVisible = source.mUnidentified182;
+    packetAVisible = source.m_bPacketAVisible;
+    packetBVisible = source.m_bPacketBVisible;
     useShockModel = source.m_ModelType == 1;
-    blendAmount = source.mUnidentified178;
-    megaBlend = source.mUnidentified1A8;
-    shadowLevel = source.mUnidentified17C ? 1.0f : 0.0f;
+    blendAmount = source.m_fOpacity;
+    megaBlend = source.m_fMegaBlend;
+    shadowLevel = source.m_bShadowVisible ? 1.0f : 0.0f;
     shadowLevel *= blendAmount;
-    velocity = source.mUnidentified024.m_v3Velocity;
-    facingDirection = source.mUnidentified024.m_aActualFacingDirection;
+    velocity = source.m_DetChar.m_v3Velocity;
+    facingDirection = source.m_DetChar.m_aActualFacingDirection;
     headSpin = (unsigned short)source.m_pHeadTrack->m_fHeadSpin;
     headTilt = (unsigned short)source.m_pHeadTrack->m_fHeadTilt;
     visible = true;
@@ -346,7 +346,7 @@ void DrawableCharacter::Render(cCharacter& source)
 void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
 {
     GLSkinMesh* skinMesh;
-    int characterClass = source.mUnidentified024.m_eCharacterClass;
+    int characterClass = source.m_DetChar.m_eCharacterClass;
     int view = g_nCharacterView;
     if (gPeachPhotoState.state == 1)
     {
@@ -356,7 +356,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
             view = eCLV_Characters;
         }
     }
-    if (characterClass == 5 && source.mUnidentified1A8 > 0.0f)
+    if (characterClass == 5 && source.m_fMegaBlend > 0.0f)
     {
         view = eCLV_HighRange3D;
     }
@@ -526,7 +526,7 @@ void DrawableCharacter::Blend(const float* blendFactors, DrawableCharacter& lhs,
     {
         if (character->m_eClassType == 2)
         {
-            if (character->mUnidentified024.m_eCharacterClass == 13)
+            if (character->m_DetChar.m_eCharacterClass == 13)
             {
                 isHammerBro = true;
                 if (g_nLeftPropJointIndex <= 0)
@@ -827,7 +827,7 @@ void DrawableCharacter::ApplyMaterialEffects(const cCharacter& source, glModel* 
     static u32 blendAmountHash = nlStringLowerHash("blendAmount");
 
     EffectsTexturing* fxtex = effectsTexturing;
-    int characterClass = source.mUnidentified024.m_eCharacterClass;
+    int characterClass = source.m_DetChar.m_eCharacterClass;
     u32 texture;
     glModelPacket* pPacket;
 
@@ -867,17 +867,17 @@ void DrawableCharacter::ApplyMaterialEffects(const cCharacter& source, glModel* 
     }
     else
     {
-        texture = source.mUnidentified100;
+        texture = source.m_uNormalTextureID;
         if (renderPass == CRP_Default)
         {
-            if (texture != source.mUnidentified104)
+            if (texture != source.m_uSwapTextureID)
             {
                 for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
                 {
                     if (texture == glGetMaterialUnsignedParameter(pPacket, gDiffuseTextureSemantic))
                     {
-                        glSetMaterialTextureParameter(pPacket, gDiffuseTextureSemantic, source.mUnidentified104);
-                        unsigned long resolvedTexture = source.mUnidentified110.value;
+                        glSetMaterialTextureParameter(pPacket, gDiffuseTextureSemantic, source.m_uSwapTextureID);
+                        unsigned long resolvedTexture = source.m_ResolvedSwapTexture.value;
                         glSetMaterialTextureIndexParameter(pPacket, gDiffuseTextureSemantic, &resolvedTexture);
                     }
                 }
@@ -897,7 +897,7 @@ void DrawableCharacter::ApplyMaterialEffects(const cCharacter& source, glModel* 
         {
             if (characterClass != 0)
             {
-                ApplyTexture(model, source.mUnidentified108, source.mUnidentified114);
+                ApplyTexture(model, source.m_uShockTextureID, source.m_ResolvedShockTexture);
             }
         }
     }
@@ -948,7 +948,7 @@ void DrawableCharacter::ApplyDamageEffects(const cCharacter& source, glModel* mo
     }
 
     static u32 megaBlendHash = nlStringLowerHash("megaBlend");
-    float megaAmount = 0.0f != g_fMegaBlendOverride ? g_fMegaBlendOverride : source.mUnidentified1A8;
+    float megaAmount = 0.0f != g_fMegaBlendOverride ? g_fMegaBlendOverride : source.m_fMegaBlend;
     if (megaAmount != 0.0f)
     {
         for (pPacket = model->packets; pPacket < model->packets + model->numPackets; pPacket++)
@@ -1067,13 +1067,13 @@ void DrawableCharacter::RenderCharacterShadow(const cCharacter& source, glModel*
     static u32 alphaValueHash = nlStringLowerHash("alphaValue");
     static float s_fHeightFudge = 1.125f;
     params.fScalar = 1.0f;
-    info = source.mUnidentified11C;
+    info = source.m_pCharacterInfo;
     float shadowRadius = info->unknown_0x30.unknown_0x4;
     float shadowHeight = info->unknown_0x30.unknown_0x0;
     characterSizeIndex = info->unknown_0x2C;
     fRadius = g_fRadiusScale * shadowRadius;
     fHeight = s_fHeightFudge * shadowHeight;
-    float characterScale = source.mUnidentified024.m_fPlayerScale;
+    float characterScale = source.m_DetChar.m_fPlayerScale;
     nlVec4Set(
         params.vLight,
         stadium->m_shadowLightPosition.x,

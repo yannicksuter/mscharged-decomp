@@ -292,7 +292,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             DebugPrintf("PhysChar Fielder\n");
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->IsFallenDown()
-                && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
+                && fielder->m_DetPlayer.m_tFireTimer.m_uPackedTime == 0)
             {
                 DebugPrintf("PhysChar Fallen down not on fire\n");
                 if (ball->GetOwnerFielder()->IsAboveFielder(fielder)
@@ -406,7 +406,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             }
 
             if (fielder->IsInvincibleChars()
-                || IsFielderFrontInvincible(fielder, &otherFielder->mUnidentified024.m_v3Position)
+                || IsFielderFrontInvincible(fielder, &otherFielder->m_DetChar.m_v3Position)
                 || fielder->IsStuck()
                 || (IsWaluigiSuperPowerActive(fielder) && fielder->m_bSuperPowerTankOn))
             {
@@ -415,7 +415,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             else
             {
                 if (otherFielder->IsInvincibleChars()
-                    || IsFielderFrontInvincible(otherFielder, &fielder->mUnidentified024.m_v3Position)
+                    || IsFielderFrontInvincible(otherFielder, &fielder->m_DetChar.m_v3Position)
                     || otherFielder->IsStuck())
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
@@ -434,7 +434,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                     contactType = NO_CONTACT;
                 }
                 else if (fielder->IsFallenDown()
-                         && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
+                         && fielder->m_DetPlayer.m_tFireTimer.m_uPackedTime == 0)
                 {
                     if (fielder->m_eAnimID == 0x76)
                         contactType = NO_CONTACT;
@@ -444,7 +444,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                         contactType = ONE_WAY_CONTACT_THIS;
                 }
                 else if (otherFielder->IsFallenDown()
-                         && otherFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
+                         && otherFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime == 0)
                 {
                     if (otherFielder->m_eAnimID == 0x76)
                         contactType = NO_CONTACT;
@@ -470,8 +470,8 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             sPlayerPlayerCollisionData[collisionIndex] = data;
             data->player1 = (cPlayer*)collisionPlayer1;
             data->player2 = (cPlayer*)collisionPlayer2;
-            data->velocity1 = m_pAICharacter->mUnidentified024.m_v3Velocity;
-            data->velocity2 = otherCharacter->m_pAICharacter->mUnidentified024.m_v3Velocity;
+            data->velocity1 = m_pAICharacter->m_DetChar.m_v3Velocity;
+            data->velocity2 = otherCharacter->m_pAICharacter->m_DetChar.m_v3Velocity;
             QueueCollisionPlayerPlayer(data);
         }
     }

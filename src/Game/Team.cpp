@@ -305,7 +305,7 @@ cFielder* cTeam::GetRearMostFielder()
     {
         pFielder = (cFielder*)m_pPlayers[i_fielder];
         if ((pRearMostFielder == NULL)
-            || (pFielder->mUnidentified1E4.m_v3AIPosition.x < pRearMostFielder->mUnidentified1E4.m_v3AIPosition.x))
+            || (pFielder->m_DetPlayer.m_v3AIPosition.x < pRearMostFielder->m_DetPlayer.m_v3AIPosition.x))
         {
             pRearMostFielder = pFielder;
         }
@@ -326,7 +326,7 @@ cFielder* cTeam::GetFrontMostFielder()
     {
         pFielder = (cFielder*)m_pPlayers[i_fielder];
         if ((pFrontMostFielder == NULL)
-            || (pFielder->mUnidentified1E4.m_v3AIPosition.x > pFrontMostFielder->mUnidentified1E4.m_v3AIPosition.x))
+            || (pFielder->m_DetPlayer.m_v3AIPosition.x > pFrontMostFielder->m_DetPlayer.m_v3AIPosition.x))
         {
             pFrontMostFielder = pFielder;
         }
@@ -429,12 +429,12 @@ void cTeam::AssignMarks(bool bForceReMark)
             {
                 fFielderMarkScores[i_fielder][i_otherf] = 0.5f
                     * nlSqrt(nlVec3DistanceSquared2D(
-                        pOppFielder->mUnidentified024.m_v3Position,
+                        pOppFielder->m_DetChar.m_v3Position,
                         v3UnidentifiedPosition), true);
                 fFielderMarkScores[i_fielder][i_otherf] += 0.5f
                     * nlSqrt(nlVec3DistanceSquared2D(
-                        pOppFielder->mUnidentified024.m_v3Position,
-                        pMyFielder->mUnidentified024.m_v3Position), true);
+                        pOppFielder->m_DetChar.m_v3Position,
+                        pMyFielder->m_DetChar.m_v3Position), true);
             }
         }
     }
@@ -661,8 +661,8 @@ int CompareFieldersByTeamRelativeX(const void* a, const void* b)
     cFielder* p1 = *(cFielder**)a;
     cFielder* p2 = *(cFielder**)b;
 
-    float fPosition1 = p1->mUnidentified024.m_v3Position.x;
-    float fPosition2 = p2->mUnidentified024.m_v3Position.x;
+    float fPosition1 = p1->m_DetChar.m_v3Position.x;
+    float fPosition2 = p2->m_DetChar.m_v3Position.x;
     if (p1->m_pTeam->m_nSide == AWAY)
     {
         fPosition1 = -fPosition1;
@@ -735,9 +735,9 @@ void cTeam::CalculateNewBallInterceptTimes()
                 {
                     nlVector2 v2Delta = {
                         v3PredictedLandingSpot.x
-                            - pPlayer->mUnidentified024.m_v3Position.x,
+                            - pPlayer->m_DetChar.m_v3Position.x,
                         v3PredictedLandingSpot.y
-                            - pPlayer->mUnidentified024.m_v3Position.y,
+                            - pPlayer->m_DetChar.m_v3Position.y,
                     };
                     float fDistance
                         = nlSqrt(nlVec2LengthSquared(v2Delta), true)
@@ -754,7 +754,7 @@ void cTeam::CalculateNewBallInterceptTimes()
                 nNumSolutions = 0;
                 pBallPosition = &g_pBall->m_v3Position;
                 nlVector3* pAIVelocity = g_pBall->GetAIVelocity();
-                CalcInterceptXY(pPlayer->mUnidentified024.m_v3Position,
+                CalcInterceptXY(pPlayer->m_DetChar.m_v3Position,
                     speed, radius, *pBallPosition, *pAIVelocity,
                     nNumSolutions, pSolutions);
 
@@ -784,9 +784,9 @@ void cTeam::CalculateNewBallInterceptTimes()
                             = g_pBall->m_v3PassIntercept;
                         nlVector2 v2Delta = {
                             mvBallInterceptPosition[i].x
-                                - pPlayer->mUnidentified024.m_v3Position.x,
+                                - pPlayer->m_DetChar.m_v3Position.x,
                             mvBallInterceptPosition[i].y
-                                - pPlayer->mUnidentified024.m_v3Position.y,
+                                - pPlayer->m_DetChar.m_v3Position.y,
                         };
                         float fDistance
                             = nlSqrt(nlVec2LengthSquared(v2Delta), true)
@@ -800,9 +800,9 @@ void cTeam::CalculateNewBallInterceptTimes()
                         mvBallInterceptPosition[i] = g_pBall->m_v3Position;
                         nlVector2 v2Delta = {
                             mvBallInterceptPosition[i].x
-                                - pPlayer->mUnidentified024.m_v3Position.x,
+                                - pPlayer->m_DetChar.m_v3Position.x,
                             mvBallInterceptPosition[i].y
-                                - pPlayer->mUnidentified024.m_v3Position.y,
+                                - pPlayer->m_DetChar.m_v3Position.y,
                         };
                         float fDistance
                             = nlSqrt(nlVec2LengthSquared(v2Delta), true)
@@ -1185,7 +1185,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 
     bool bPlayCaptainChant = false;
     cFielder* pCaptain = (cFielder*)pTeam->m_pPlayers[0];
-    int nCaptainPowerup = pCaptain->mUnidentified11C->unknown_0x14;
+    int nCaptainPowerup = pCaptain->m_pCharacterInfo->unknown_0x14;
     bool bCaptainPowerupActive
         = pTeam->m_ePowerupList[0].eType == nCaptainPowerup;
     bCaptainPowerupActive
@@ -1230,7 +1230,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 unsigned long GetTeamCaptainChantCue(cTeam* pTeam)
 {
     unsigned long result = 0;
-    switch (pTeam->m_pPlayers[0]->mUnidentified11C->unknown_0x14)
+    switch (pTeam->m_pPlayers[0]->m_pCharacterInfo->unknown_0x14)
     {
     case 9:
         result = 0xF1B432C3;
@@ -1619,7 +1619,7 @@ PowerUpTeamType cTeam::GetCurrentPowerUp() const
 bool cTeam::fn_800A6764() const
 {
     cFielder* pCaptain = (cFielder*)m_pPlayers[0];
-    int nCaptainPowerup = pCaptain->mUnidentified11C->unknown_0x14;
+    int nCaptainPowerup = pCaptain->m_pCharacterInfo->unknown_0x14;
     bool bCaptainPowerupActive
         = m_ePowerupList[0].eType == nCaptainPowerup;
     bCaptainPowerupActive
@@ -1634,7 +1634,7 @@ bool cTeam::fn_800A6764() const
         bCaptainPowerupActive = true;
     }
 
-    if (pCaptain->mUnidentified024.m_eCharacterClass == (eCharacterClass)5
+    if (pCaptain->m_DetChar.m_eCharacterClass == (eCharacterClass)5
         && gPeachPhotoState.state == 1)
     {
         bCaptainPowerupActive = true;

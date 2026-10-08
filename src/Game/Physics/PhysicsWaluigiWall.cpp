@@ -81,11 +81,11 @@ PhysicsWaluigiWall::PhysicsWaluigiWall(cFielder* owner, float width, float heigh
 {
     nlMatrix3 rotation;
     nlMakeRotationMatrixZ(rotation,
-        0.0000958738f * owner->mUnidentified024.m_aActualFacingDirection);
+        0.0000958738f * owner->m_DetChar.m_aActualFacingDirection);
     nlVector3 direction;
     rotation.GetRow_(0, direction);
-    nlVec3ScaleAdd(mStartPoint, -0.1f, direction, owner->mUnidentified024.m_v3Position);
-    nlVec3ScaleAdd(mEndPoint, -0.0f, direction, owner->mUnidentified024.m_v3Position);
+    nlVec3ScaleAdd(mStartPoint, -0.1f, direction, owner->m_DetChar.m_v3Position);
+    nlVec3ScaleAdd(mEndPoint, -0.0f, direction, owner->m_DetChar.m_v3Position);
     Initialize(rotation, height);
 }
 
@@ -447,8 +447,8 @@ PhysicsWaluigiWall* WaluigiWallManager::CreateWall(cFielder* owner, float width,
                 if (group != 0)
                 {
                     EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
-                    controller->SetPosition(owner->mUnidentified024.m_v3Position);
-                    controller->SetVelocity(owner->mUnidentified024.m_v3Velocity);
+                    controller->SetPosition(owner->m_DetChar.m_v3Position);
+                    controller->SetVelocity(owner->m_DetChar.m_v3Velocity);
                     controller->m_uUserData = (unsigned long)wall;
                     controller->SetUpdateCallback(Function1<void, EmissionController&>(UpdateWaluigiWallEmitter));
                     controller->SetFinishedCallback(Function2<void, EmissionController&, int>(OnWaluigiWallEffectFinished));
@@ -553,7 +553,7 @@ void WaluigiWallManager::Update(float dt)
         nlVector3 direction;
         rotation.GetRow_(0, direction);
         nlVector3 end;
-        nlVec3ScaleAdd(end, -0.0f, direction, mCurrentWall->mOwner->mUnidentified024.m_v3Position);
+        nlVec3ScaleAdd(end, -0.0f, direction, mCurrentWall->mOwner->m_DetChar.m_v3Position);
         mCurrentWall->SetEndPoint(end);
         if (nlVec3DistanceSquared2D(mCurrentWall->mStartPoint, mCurrentWall->mEndPoint) > 25.0f)
             CreateWall(mCurrentWall->mOwner, gWaluigiWallWidth, gWaluigiWallHeight);

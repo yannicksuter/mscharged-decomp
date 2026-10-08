@@ -101,7 +101,7 @@ static void WarbleTest(float fDeltaT)
         WarbleConfiguration config;
         nlZeroMemory(&config, sizeof(config));
         config.view = GetLayerView(eCLV_Unshadowed);
-        config.position = g_pCharacters[0]->mUnidentified024.m_v3Position;
+        config.position = g_pCharacters[0]->m_DetChar.m_v3Position;
         config.position.z = (1.0f / 128.0f)
             + BasicStadium::GetCurrentStadium()->m_shadowHeight;
         config.blobScale = g_fWarbleBlobScale;

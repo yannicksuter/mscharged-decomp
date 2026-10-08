@@ -354,7 +354,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
     case 3:
     {
         cCharacter* goalie = mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9];
-        result = goalie->mUnidentified024.m_v3Position;
+        result = goalie->m_DetChar.m_v3Position;
         result.z = 1.0f;
         break;
     }
@@ -402,7 +402,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
     {
         cPlayer* goalie = (cPlayer*)(mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9]);
         cFielder* captain = goalie->m_pTeam->GetCaptain();
-        result = captain->mUnidentified024.m_v3Position;
+        result = captain->m_DetChar.m_v3Position;
         result.z = 1.0f;
         break;
     }

@@ -152,8 +152,8 @@ void BirdoEggObject::Show(cFielder* shooter)
     DebugPrintf("BirdoEggShow\n");
     mShooter = shooter;
     cNet* net = shooter->m_pTeam->GetOtherNet();
-    float x = shooter->mUnidentified024.m_v3Position.x - net->m_v3NetLocation.x;
-    float y = shooter->mUnidentified024.m_v3Position.y - net->m_v3NetLocation.y;
+    float x = shooter->m_DetChar.m_v3Position.x - net->m_v3NetLocation.x;
+    float y = shooter->m_DetChar.m_v3Position.y - net->m_v3NetLocation.y;
     float angle = nlATan2f(y, x);
     fn_802B549C(mOrientation, (unsigned short)(int)(10430.378f * angle));
     mSpinSpeed = sSpinSpeed;

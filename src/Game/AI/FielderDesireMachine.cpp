@@ -291,8 +291,8 @@ void FielderDesireMachine::SelectState()
         {
             cFielder* outOfBoundsFielder = GetFielder();
             bool shouldRunToTarget;
-            if ((outOfBoundsFielder->mUnidentified024.m_v3Position.x > 20.6f
-                    || outOfBoundsFielder->mUnidentified024.m_v3Position.x < -20.6f)
+            if ((outOfBoundsFielder->m_DetChar.m_v3Position.x > 20.6f
+                    || outOfBoundsFielder->m_DetChar.m_v3Position.x < -20.6f)
                 && !Incapacitated(outOfBoundsFielder)
                 && !outOfBoundsFielder->IsInFallAction()
                 && !outOfBoundsFielder->IsShattered())
@@ -311,7 +311,7 @@ void FielderDesireMachine::SelectState()
                 params.Set(2, FuzzyVariant(gBehindGoalLineRunAvoidanceCoeff[0]));
 
                 nlVector3 position = gFielderDesireZeroVector;
-                position.x = GetFielder()->mUnidentified024.m_v3Position.x;
+                position.x = GetFielder()->m_DetChar.m_v3Position.x;
                 position.x -= 10.0f * AIsgn(position.x);
                 params.Set(14, FuzzyVariant(FT_VECTOR, position));
             }
@@ -333,7 +333,7 @@ void FielderDesireMachine::SelectState()
         }
 
         nlVector3 position;
-        formation->m_Positions[GetFielder()->mUnidentified1E4.m_ID].GetLocationForTeam(
+        formation->m_Positions[GetFielder()->m_DetPlayer.m_ID].GetLocationForTeam(
             *(nlVector2*)&position, team->m_nSide);
         position.z = 0.0f;
         state = 13;

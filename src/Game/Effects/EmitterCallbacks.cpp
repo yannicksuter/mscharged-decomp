@@ -23,7 +23,7 @@ DrawableCharacter* GetReplayDrawableCharacter(cCharacter* character)
     {
         cPlayer* player = (cPlayer*)character;
         int characterIndex
-            = player->mUnidentified1E4.m_ID + 4 * player->m_pTeam->m_nSide;
+            = player->m_DetPlayer.m_ID + 4 * player->m_pTeam->m_nSide;
         return &ReplayManager::Instance()
                     ->mRender->mCharacters[characterIndex];
     }

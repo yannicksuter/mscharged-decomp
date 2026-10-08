@@ -158,7 +158,7 @@ void cDebugCamera::UpdateTargetPositions()
             cPlayer* player = (cPlayer*)g_pCharacters[i];
             if (player->m_eClassType == FIELDER)
             {
-                int index = player->mUnidentified1E4.m_ID + 4 * player->m_pTeam->m_nSide;
+                int index = player->m_DetPlayer.m_ID + 4 * player->m_pTeam->m_nSide;
                 position = ReplayManager::Instance()->mRender->mCharacters[index].position;
             }
             else if (player->m_eClassType == GOALIE)

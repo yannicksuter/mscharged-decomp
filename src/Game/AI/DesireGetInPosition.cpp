@@ -39,7 +39,7 @@ void DesireGetInPosition::Update(DesireUpdate* update, float)
     nlVector3 position;
     if (m_pFielder->CalculateFormationPosition(position))
     {
-        position = m_pFielder->mUnidentified024.m_v3Position;
+        position = m_pFielder->m_DetChar.m_v3Position;
     }
     m_pFielder->AddDesiredPosition(position, 0.8f, 1.0f);
     if (m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder
@@ -61,13 +61,13 @@ void DesireRunUpfield::Update(DesireUpdate* update, float)
     nlVector3 position;
     if (m_pFielder->CalculateFormationPosition(position) && g_pBall->GetOwnerGoalie() == 0)
     {
-        position = m_pFielder->mUnidentified024.m_v3Position;
+        position = m_pFielder->m_DetChar.m_v3Position;
     }
     else
     {
         float distance = InterpolateRangeClamped(
             gRunFieldDistanceRange.x, gRunFieldDistanceRange.y, gRunFieldInputRange.x, gRunFieldInputRange.y,
-            m_pFielder->mUnidentified1E4.m_v3AIPosition.x);
+            m_pFielder->m_DetPlayer.m_v3AIPosition.x);
         position.x += distance * AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
     }
     m_pFielder->AddDesiredPosition(position, 1.25f, 1.0f);
@@ -90,13 +90,13 @@ void DesireRunDownfield::Update(DesireUpdate* update, float)
     nlVector3 position;
     if (m_pFielder->CalculateFormationPosition(position) && g_pBall->GetOwnerGoalie() == 0)
     {
-        position = m_pFielder->mUnidentified024.m_v3Position;
+        position = m_pFielder->m_DetChar.m_v3Position;
     }
     else
     {
         float distance = InterpolateRangeClamped(
             gRunFieldDistanceRange.y, gRunFieldDistanceRange.x, gRunFieldInputRange.x, gRunFieldInputRange.y,
-            m_pFielder->mUnidentified1E4.m_v3AIPosition.x);
+            m_pFielder->m_DetPlayer.m_v3AIPosition.x);
         if (g_pBall->GetOwnerGoalie() != 0)
         {
             distance *= 2.0f;
@@ -185,8 +185,8 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
     if (m_pTarget != 0)
     {
         nlVector3 direction;
-        nlVec3Sub(direction, m_pTarget->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Position);
+        nlVec3Sub(direction, m_pTarget->m_DetChar.m_v3Position,
+            m_pFielder->m_DetChar.m_v3Position);
         if (m_eFieldDirection == DIR_AWAYFROM_TARGET)
         {
             nlVec3Scale(direction, -1.0f);
@@ -204,9 +204,9 @@ void DesireRunInDirection::Update(DesireUpdate* update, float deltaTime)
     polar.r = 1.0f;
     nlPolarToCartesian(direction, polar);
     nlVec3ScaleAdd(mvDesiredPosition, 5.0f, direction,
-        m_pFielder->mUnidentified024.m_v3Position);
+        m_pFielder->m_DetChar.m_v3Position);
     m_pFielder->AddDesiredPosition(mvDesiredPosition, m_fSpeed, 1.0f);
-    m_fDistTravelled += deltaTime * m_pFielder->mUnidentified024.m_fActualSpeed;
+    m_fDistTravelled += deltaTime * m_pFielder->m_DetChar.m_fActualSpeed;
 }
 
 void DesireRunInDirection::Cleanup()
@@ -288,8 +288,8 @@ bool DesireRunToTarget::Initialize(void* context)
 
 static inline void PredictPosition(nlVector3& result, const cPlayer* player, float time)
 {
-    nlVec3ScaleAdd(result, time, player->mUnidentified024.m_v3Velocity,
-        player->mUnidentified024.m_v3Position);
+    nlVec3ScaleAdd(result, time, player->m_DetChar.m_v3Velocity,
+        player->m_DetChar.m_v3Position);
 }
 
 void DesireRunToTarget::Update(DesireUpdate* update, float)
@@ -317,11 +317,11 @@ void DesireRunToTarget::Update(DesireUpdate* update, float)
                 if (g_pBall->m_tShotTimer.m_uPackedTime == 0)
                 {
                     mvDesiredPosition = m_pFielder->m_pTeam->GetBallInterceptPosition(
-                        m_pFielder->mUnidentified1E4.m_ID);
+                        m_pFielder->m_DetPlayer.m_ID);
                 }
                 else
                 {
-                    mvDesiredPosition = m_pFielder->mUnidentified024.m_v3Position;
+                    mvDesiredPosition = m_pFielder->m_DetChar.m_v3Position;
                 }
             }
         }
@@ -341,7 +341,7 @@ void DesireRunToTarget::Update(DesireUpdate* update, float)
 
             nlVector3 predicted;
             PredictPosition(predicted, target, 0.2f);
-            nlVec3Sub(mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position, predicted);
+            nlVec3Sub(mvDesiredPosition, m_pFielder->m_DetChar.m_v3Position, predicted);
             nlVec3Normalize(mvDesiredPosition, mvDesiredPosition);
             nlVec3ScaleAdd(mvDesiredPosition, distance, mvDesiredPosition, predicted);
         }
@@ -350,8 +350,8 @@ void DesireRunToTarget::Update(DesireUpdate* update, float)
         if (m_eDirection == DIR_AWAYFROM_TARGET)
         {
             nlVector3 delta;
-            nlVec3Sub(delta, mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position);
-            nlVec3ScaleAdd(mvDesiredPosition, -1.0f, delta, m_pFielder->mUnidentified024.m_v3Position);
+            nlVec3Sub(delta, mvDesiredPosition, m_pFielder->m_DetChar.m_v3Position);
+            nlVec3ScaleAdd(mvDesiredPosition, -1.0f, delta, m_pFielder->m_DetChar.m_v3Position);
         }
     }
 
@@ -363,8 +363,8 @@ DesireUpdate TransDesireRunToTarget(AIContext* input, Desire* desire)
 {
     DesireUpdate result(FT_INT, gTransDesireRunToTargetContinue);
     cFielder* fielder = (cFielder*)input->mData.pPlayer;
-    nlVector2 delta = { fielder->mUnidentified024.m_v3Position.x - desire->GetDesiredPosition().x,
-        fielder->mUnidentified024.m_v3Position.y - desire->GetDesiredPosition().y };
+    nlVector2 delta = { fielder->m_DetChar.m_v3Position.x - desire->GetDesiredPosition().x,
+        fielder->m_DetChar.m_v3Position.y - desire->GetDesiredPosition().y };
     if (nlVec2LengthSquared(delta) < 0.7f * 0.7f)
     {
         result = 4;

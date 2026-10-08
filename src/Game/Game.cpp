@@ -935,7 +935,7 @@ void cGame::CheckForGoal()
             m_pScorer->ReleaseBall(0);
             if (m_pScorer->m_eClassType == FIELDER)
             {
-                ((cFielder*)m_pScorer)->ShootBallDueToContact(m_pScorer->mUnidentified024.m_v3Velocity);
+                ((cFielder*)m_pScorer)->ShootBallDueToContact(m_pScorer->m_DetChar.m_v3Velocity);
                 g_pBall->m_uGoalType = 7;
             }
         }
@@ -1212,7 +1212,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
             for (int j = 0; j < 5; j++)
             {
                 cPlayer* pPlayer = pTeam->GetPlayer(j);
-                pPlayer->mUnidentified024.m_bOnScreen = (flags & (u8)(1 << j)) != 0;
+                pPlayer->m_DetChar.m_bOnScreen = (flags & (u8)(1 << j)) != 0;
             }
         }
         break;
@@ -1721,9 +1721,9 @@ void cGame::UpdateCachedGameData(float fDeltaT)
         cBall* pBall = g_pBall;
         nlVector2 v2BallDistance;
         v2BallDistance.x
-            = pBall->m_v3Position.x - pPlayer->mUnidentified024.m_v3Position.x;
+            = pBall->m_v3Position.x - pPlayer->m_DetChar.m_v3Position.x;
         v2BallDistance.y
-            = pBall->m_v3Position.y - pPlayer->mUnidentified024.m_v3Position.y;
+            = pBall->m_v3Position.y - pPlayer->m_DetChar.m_v3Position.y;
         m_fCachedBallPlayerDistances[i] = nlVec2Length(v2BallDistance);
         m_fCachedBallPlayerDistances[i]
             -= fBallRadius + fPlayerRadius;
@@ -1739,10 +1739,10 @@ void cGame::UpdateCachedGameData(float fDeltaT)
                 cPlayer* pPlayer = static_cast<cPlayer*>(g_pCharacters[i]);
                 cPlayer* pOtherPlayer = static_cast<cPlayer*>(g_pCharacters[j]);
                 nlVector2 v2PlayerDistance;
-                v2PlayerDistance.x = pPlayer->mUnidentified024.m_v3Position.x
-                                   - pOtherPlayer->mUnidentified024.m_v3Position.x;
-                v2PlayerDistance.y = pPlayer->mUnidentified024.m_v3Position.y
-                                   - pOtherPlayer->mUnidentified024.m_v3Position.y;
+                v2PlayerDistance.x = pPlayer->m_DetChar.m_v3Position.x
+                                   - pOtherPlayer->m_DetChar.m_v3Position.x;
+                v2PlayerDistance.y = pPlayer->m_DetChar.m_v3Position.y
+                                   - pOtherPlayer->m_DetChar.m_v3Position.y;
                 m_fCachedPlayerDistances[i][j]
                     = nlVec2Length(v2PlayerDistance);
                 m_fCachedPlayerDistances[i][j]
@@ -2029,7 +2029,7 @@ void cGame::InitGameState(int state)
                 fielder->EndBlur();
                 if (!fielder->IsShattered())
                 {
-                    fielder->mUnidentified178 = 1.0f;
+                    fielder->m_fOpacity = 1.0f;
                 }
             }
         }

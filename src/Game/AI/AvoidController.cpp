@@ -473,7 +473,7 @@ bool AvoidController::CalcDesiredVelocityToAvoidSideline(
         + vSidelineNormal.y * vCurrentDesiredVelDir.y;
 
     nlVector3 pPos = m_pFielder->m_pBall != NULL
-        ? m_pFielder->m_pBall->m_v3Position : m_pFielder->mUnidentified024.m_v3Position;
+        ? m_pFielder->m_pBall->m_v3Position : m_pFielder->m_DetChar.m_v3Position;
     pPos.z = 0.0f;
     nlVector3 v3SidelinePos = { 0.0f, 0.0f, 0.0f };
     v3SidelinePos.x = vSidelinePos.x;
@@ -561,7 +561,7 @@ bool AvoidController::CalcDesiredVelocityToAvoidCorner(
     bool bHitSideline = false;
     nlVector2 vSidelinePos;
     nlVector2 vSidelineNormal;
-    nlVector2 vPosition = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
+    nlVector2 vPosition = *(nlVector2*)&m_pFielder->m_DetChar.m_v3Position;
     nlVector2 vBallPosition;
 
     if (m_pFielder->m_pBall != NULL)
@@ -624,7 +624,7 @@ inline bool AvoidController::CalcDesiredVelocityToAvoidSideline(
     const nlVector2& vCurrentDesiredVelDir,
     const nlVector2& vCurrentVelDir)
 {
-    nlVector2 vSidelinePos = *(nlVector2*)&m_pFielder->mUnidentified024.m_v3Position;
+    nlVector2 vSidelinePos = *(nlVector2*)&m_pFielder->m_DetChar.m_v3Position;
     nlVector2 vSidelineNormal;
     nlVec2Sub(vSidelineNormal, v2Zero, sideline.vNormal);
     if (vSidelineNormal.x == 0.0f)
@@ -649,7 +649,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     if (m_pFielder->GetDistanceToDesiredPos() <= 0.25f)
         return false;
     bTurboAllowed = true;
-    nlSinCos(&vCurrentVelDir.y, &vCurrentVelDir.x, m_pFielder->mUnidentified024.m_aActualMovementDirection);
+    nlSinCos(&vCurrentVelDir.y, &vCurrentVelDir.x, m_pFielder->m_DetChar.m_aActualMovementDirection);
     vCurrentDesiredVelDir = *(const nlVector2*)&m_pFielder->GetDesiredVelocity();
     float fLengthSquared = vCurrentDesiredVelDir.x * vCurrentDesiredVelDir.x + vCurrentDesiredVelDir.y * vCurrentDesiredVelDir.y;
     if (fLengthSquared > 0.0f)
@@ -658,7 +658,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         nlVec2Set(vCurrentDesiredVelDir, fInvLength * vCurrentDesiredVelDir.x, fInvLength * vCurrentDesiredVelDir.y);
     }
     else
-        nlPolarToCartesian(vCurrentDesiredVelDir.x, vCurrentDesiredVelDir.y, m_pFielder->mUnidentified024.m_aDesiredMovementDirection, 1.0f);
+        nlPolarToCartesian(vCurrentDesiredVelDir.x, vCurrentDesiredVelDir.y, m_pFielder->m_DetChar.m_aDesiredMovementDirection, 1.0f);
     vNewDesiredVelDir = vCurrentDesiredVelDir;
     {
         for (int i = 0; i < 4; i++)
@@ -697,9 +697,9 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
     }
     if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
     {
-        f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->mUnidentified024.m_fDesiredSpeed, m_pFielder->GetTweaks()->GetRunningSpeed());
-        aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
-        m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
+        f32 fDesiredSpeed = ClampRunningWBSpeed(m_pFielder->m_DetChar.m_fDesiredSpeed, m_pFielder->GetTweaks()->GetRunningSpeed());
+        aDesiredMovementDir = m_pFielder->m_DetChar.m_aDesiredMovementDirection;
+        m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(aDesiredMovementDir);
         m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
     }
@@ -752,8 +752,8 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
         nlColour colour;
         nlColourSet(colour, 0, 0, 255, 255);
         nlVector3 vUnidentified00C;
-        nlVec3ScaleAdd(vUnidentified00C, 0.5f, v3Repulsion, m_pFielder->mUnidentified024.m_v3Position);
-        g_ShapeRenderer.DrawLine3D(m_pFielder->mUnidentified024.m_v3Position, vUnidentified00C, colour, true);
+        nlVec3ScaleAdd(vUnidentified00C, 0.5f, v3Repulsion, m_pFielder->m_DetChar.m_v3Position);
+        g_ShapeRenderer.DrawLine3D(m_pFielder->m_DetChar.m_v3Position, vUnidentified00C, colour, true);
     }
 
     nlVec3Add(v3Repulsion, v3Repulsion, m_pFielder->GetDesiredVelocity());
@@ -764,12 +764,12 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     if (fDesiredSpeed >= 0.35f * fUnidentifiedSpeed)
     {
         fDesiredSpeed = fDesiredSpeed >= fUnidentifiedSpeed ? fDesiredSpeed : fUnidentifiedSpeed;
-        m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
+        m_pFielder->m_DetChar.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(nlVector3ToAngle(v3Repulsion));
         m_pFielder->SetDesiredFacingDirection(nlVector3ToAngle(v3Repulsion), false);
     }
     else
-        m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
+        m_pFielder->m_DetChar.m_fDesiredSpeed = 0.0f;
 }
 
 UnidentifiedAvoidanceValue::UnidentifiedAvoidanceValue()

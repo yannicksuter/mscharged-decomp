@@ -77,7 +77,7 @@ bool DesireWait::Initialize(void*)
 void DesireWait::Update(DesireUpdate*, float)
 {
     m_pFielder->SetThingsToAvoid(0);
-    m_pFielder->AddDesiredPosition(m_pFielder->mUnidentified024.m_v3Position, 1.0f, 1.0f);
+    m_pFielder->AddDesiredPosition(m_pFielder->m_DetChar.m_v3Position, 1.0f, 1.0f);
 }
 
 // In this reconstruction, the disposal function causes MWCC to emit the weak

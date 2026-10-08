@@ -80,7 +80,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
     {
         if (fn_800A636C(g_pCurrentlyUpdatingTeam)->Def_SlideAttackChance->GetValue() > 0.0f
             && Difficult(m_pFielder->m_pTeam) > 0.7f
-            && pMark->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() > gMarkSlideAttackPossessionTime)
+            && pMark->m_DetPlayer.m_tBallPossessionTimer.GetSeconds() > gMarkSlideAttackPossessionTime)
         {
             *update = 3;
             update->SetParameter(8, FuzzyVariant(FT_INT, gMarkSlideAttackState));
@@ -102,7 +102,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
         nlVector3 v3MarkPosition;
         nlVector3 v3NetPosition;
         v3NetPosition = m_pFielder->m_pTeam->m_pNet->m_v3NetLocation;
-        nlVec3ScaleAdd(v3MarkPosition, sMarkLookAheadTime, pMark->mUnidentified024.m_v3Velocity, pMark->mUnidentified024.m_v3Position);
+        nlVec3ScaleAdd(v3MarkPosition, sMarkLookAheadTime, pMark->m_DetChar.m_v3Velocity, pMark->m_DetChar.m_v3Position);
         v3MarkPosition.z = 0.0f;
         nlVector3 v3Dir;
         nlVec3Sub(v3Dir, v3NetPosition, v3MarkPosition);
@@ -132,9 +132,9 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
                 nlVector3 v3SBCDir;
                 nlVector3 v3SBCPosition;
                 nlVec3Set(v3SBCPosition,
-                    (sMarkLookAheadTime * pSBC->mUnidentified024.m_v3Velocity.x) + pSBC->mUnidentified024.m_v3Position.x,
-                    (sMarkLookAheadTime * pSBC->mUnidentified024.m_v3Velocity.y) + pSBC->mUnidentified024.m_v3Position.y,
-                    (sMarkLookAheadTime * pSBC->mUnidentified024.m_v3Velocity.z) + pSBC->mUnidentified024.m_v3Position.z);
+                    (sMarkLookAheadTime * pSBC->m_DetChar.m_v3Velocity.x) + pSBC->m_DetChar.m_v3Position.x,
+                    (sMarkLookAheadTime * pSBC->m_DetChar.m_v3Velocity.y) + pSBC->m_DetChar.m_v3Position.y,
+                    (sMarkLookAheadTime * pSBC->m_DetChar.m_v3Velocity.z) + pSBC->m_DetChar.m_v3Position.z);
                 nlVec3Sub(v3SBCDir, v3SBCPosition, v3MarkPosition);
                 nlVec3Normalize(v3SBCDir, v3SBCDir);
                 if (nlVec3DotProduct(v3SBCDir, v3Dir) >= 0.0f)
@@ -162,7 +162,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
         nlVector3 v3FormationPosition;
         if (m_pFielder->CalculateFormationPosition(v3FormationPosition))
         {
-            v3FormationPosition = m_pFielder->mUnidentified024.m_v3Position;
+            v3FormationPosition = m_pFielder->m_DetChar.m_v3Position;
         }
         m_pFielder->AddDesiredPosition(v3FormationPosition, gMarkUrgency, 1.0f - fMarkFormationBalance);
     }
@@ -194,7 +194,7 @@ DesireUpdate TransDesireDefendPos(AIContext* input)
  */
 bool DesireDefendPos::Initialize(void*)
 {
-    mvDesiredPosition = m_pFielder->mUnidentified024.m_v3Position;
+    mvDesiredPosition = m_pFielder->m_DetChar.m_v3Position;
     mThinkTimer.m_uWasRunning = mThinkTimer.m_uPackedTime != 0;
     mThinkTimer.m_uPackedTime = 0;
     return true;
@@ -265,13 +265,13 @@ void DesireDefendPos::Update(
                 || (bool)ReceivingPass(pMark)
                 || (bool)fn_800DEAB4(pMark)))
         {
-            v3MarkPosition = pMark->mUnidentified024.m_v3Position;
+            v3MarkPosition = pMark->m_DetChar.m_v3Position;
             fMarkingDistance *= fMarkThreatCoeff;
             fUrgency = gMarkImmediateThreatUrgency;
         }
         else
         {
-            nlVec3ScaleAdd(v3MarkPosition, sMarkLookAheadTime, pMark->mUnidentified024.m_v3Velocity, pMark->mUnidentified024.m_v3Position);
+            nlVec3ScaleAdd(v3MarkPosition, sMarkLookAheadTime, pMark->m_DetChar.m_v3Velocity, pMark->m_DetChar.m_v3Position);
         }
         v3MarkPosition.z = 0.0f;
 
@@ -290,9 +290,9 @@ void DesireDefendPos::Update(
                 nlVector3 v3SBCDir;
                 nlVector3 v3SBCPosition;
                 nlVec3Set(v3SBCPosition,
-                    (sMarkLookAheadTime * pSBC->mUnidentified024.m_v3Velocity.x) + pSBC->mUnidentified024.m_v3Position.x,
-                    (sMarkLookAheadTime * pSBC->mUnidentified024.m_v3Velocity.y) + pSBC->mUnidentified024.m_v3Position.y,
-                    (sMarkLookAheadTime * pSBC->mUnidentified024.m_v3Velocity.z) + pSBC->mUnidentified024.m_v3Position.z);
+                    (sMarkLookAheadTime * pSBC->m_DetChar.m_v3Velocity.x) + pSBC->m_DetChar.m_v3Position.x,
+                    (sMarkLookAheadTime * pSBC->m_DetChar.m_v3Velocity.y) + pSBC->m_DetChar.m_v3Position.y,
+                    (sMarkLookAheadTime * pSBC->m_DetChar.m_v3Velocity.z) + pSBC->m_DetChar.m_v3Position.z);
 
                 nlVec3Sub(v3SBCDir, v3SBCPosition, v3MarkPosition);
                 nlVec3Normalize(v3SBCDir, v3SBCDir);
@@ -330,7 +330,7 @@ void DesireDefendPos::Update(
         bool bInPosition = m_pFielder->CalculateFormationPosition(v3FormationPosition);
         if (bInPosition)
         {
-            v3FormationPosition = m_pFielder->mUnidentified024.m_v3Position;
+            v3FormationPosition = m_pFielder->m_DetChar.m_v3Position;
         }
         m_pFielder->AddDesiredPosition(v3FormationPosition, gMarkUrgency, fFormationWeight);
     }

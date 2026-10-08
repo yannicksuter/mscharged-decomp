@@ -237,7 +237,7 @@ public:
     }
     bool IsBusy() const
     {
-        return mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0
+        return m_DetPlayer.m_tFireTimer.m_uPackedTime == 0
             && (m_pBall != 0
                 || mGoalieActionState == GOALIEACTION_PASS
                 || mGoalieActionState == GOALIEACTION_PASS_INTERCEPT

@@ -254,10 +254,10 @@ void DesireUsePowerup::SetPowerup(
         if (mpTarget != NULL)
         {
             nDirection = (m_pFielder->GetFacingDeltaToPosition(
-                mpTarget->mUnidentified024.m_v3Position) >> 14) & 3;
+                mpTarget->m_DetChar.m_v3Position) >> 14) & 3;
         }
 
-        switch (m_pFielder->mUnidentified024.m_eCharacterClass)
+        switch (m_pFielder->m_DetChar.m_eCharacterClass)
         {
         case (eCharacterClass)3:
             if (m_pFielder->m_eAnimID == 0x52
@@ -420,30 +420,30 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     {
         StatsTracker::s_pInstance->TrackStat(
             STATS_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-            pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+            pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         if (IsMushroomPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_MUSHROOMS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
         else if (IsStarOrChainChompPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_STARS_AND_CHAIN_CHOMPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
         else if (IsCaptainPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_CAPTAIN_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
         else if (IsDrawablePowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_DRAWABLE_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
     }
 }

@@ -317,7 +317,7 @@ void GameplayCameraZoomLevel::CalcDesiredTarget()
             cPlayer* pBallOwner = g_pBall->m_pOwner;
             if (pBallOwner != NULL)
             {
-                v3OOIPos = pBallOwner->mUnidentified024.m_v3Position;
+                v3OOIPos = pBallOwner->m_DetChar.m_v3Position;
             }
             else if (ReplayManager::Instance()->mRender != NULL)
             {

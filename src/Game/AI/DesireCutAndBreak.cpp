@@ -16,7 +16,7 @@ bool DesireCutAndBreak::Initialize(void* context)
     nlVector3 searchCenter;
     if (m_pFielder->CalculateFormationPosition(searchCenter))
     {
-        searchCenter = m_pFielder->mUnidentified024.m_v3Position;
+        searchCenter = m_pFielder->m_DetChar.m_v3Position;
     }
 
     SSearchCutAndBreak* search = new (nlMalloc(sizeof(SSearchCutAndBreak), 8, false))

@@ -34,8 +34,8 @@ void DiddyBanana::Update(float dt)
     {
         if (mpCharacter != 0)
         {
-            maFacingDirection = mpCharacter->mUnidentified024.m_aActualFacingDirection;
-            SetPosition(mpCharacter->mUnidentified024.m_v3Position);
+            maFacingDirection = mpCharacter->m_DetChar.m_aActualFacingDirection;
+            SetPosition(mpCharacter->m_DetChar.m_v3Position);
         }
 
         if (mTimer.m_uPackedTime != 0)

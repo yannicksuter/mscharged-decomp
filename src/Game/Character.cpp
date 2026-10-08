@@ -87,7 +87,7 @@ struct cCharacterSFX
 
 extern u16 g_headTrackSyncLogType;
 
-struct UnidentifiedCharacterAnimState
+struct CharAnim
 {
     void SyncLog(void* context, DebugWriteCache* cache);
     float m_fFrame;
@@ -184,10 +184,10 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData);
 inline void cCharacter::CreateWorldMatrix()
 {
     nlMakeRotationMatrixZ(m_m4WorldMatrix,
-        0.0000958738f * (float)mUnidentified024.m_aActualFacingDirection);
-    m_m4WorldMatrix.e2[3][0] = mUnidentified024.m_v3Position.x;
-    m_m4WorldMatrix.e2[3][1] = mUnidentified024.m_v3Position.y;
-    m_m4WorldMatrix.e2[3][2] = mUnidentified024.m_v3Position.z;
+        0.0000958738f * (float)m_DetChar.m_aActualFacingDirection);
+    m_m4WorldMatrix.e2[3][0] = m_DetChar.m_v3Position.x;
+    m_m4WorldMatrix.e2[3][1] = m_DetChar.m_v3Position.y;
+    m_m4WorldMatrix.e2[3][2] = m_DetChar.m_v3Position.z;
 }
 
 static inline Blinker* MakeBlinker(eCharacterClass cc)
@@ -239,7 +239,7 @@ inline float ClampMax(float speedRatio, const float max)
 
 inline void cCharacter::SetPlayerScale(float unidentifiedScale)
 {
-    mUnidentified024.m_fPlayerScale = unidentifiedScale;
+    m_DetChar.m_fPlayerScale = unidentifiedScale;
     m_pPoseAccumulator->m_Scale = unidentifiedScale;
     float unidentifiedRadius;
     if (m_eClassType == FIELDER)
@@ -276,31 +276,31 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     , m_bIsUsingElectrocutionTexture(false)
     , m_pCharacterSFX(0)
     , mUnidentified0FC(0)
-    , mUnidentified100(0)
-    , mUnidentified104(0)
-    , mUnidentified108(0)
-    , mUnidentified118(false)
+    , m_uNormalTextureID(0)
+    , m_uSwapTextureID(0)
+    , m_uShockTextureID(0)
+    , m_bTexturesResolved(false)
     , mUnidentified120(nIndex)
     , m_Dirt(0.0f)
     , m_MinDirt(0.0f)
     , m_pBlurHandler(0)
     , m_pBlinker(0)
-    , mUnidentified178(1.0f)
-    , mUnidentified17C(true)
+    , m_fOpacity(1.0f)
+    , m_bShadowVisible(true)
     , mUnidentified17D(false)
     , m_bLeftPropAnimated(false)
     , m_bRightPropAnimated(false)
-    , mUnidentified180(false)
-    , mUnidentified181(false)
-    , mUnidentified182(false)
-    , mUnidentified1A4(0.0f)
-    , mUnidentified1A8(0.0f)
-    , mUnidentified1AC(0.0f)
-    , mUnidentified1C0(16, 16)
+    , m_bHammerTransformFrozen(false)
+    , m_bPacketAVisible(false)
+    , m_bPacketBVisible(false)
+    , m_fMegaBlendRate(0.0f)
+    , m_fMegaBlend(0.0f)
+    , m_fMegaBlendTarget(0.0f)
+    , m_JointPositionCache(16, 16)
 {
     cSHierarchy* hierarchy0;
-    mUnidentified024.m_eCharacterClass = cc;
-    mUnidentified11C = &GetCharacterInfo(cc);
+    m_DetChar.m_eCharacterClass = cc;
+    m_pCharacterInfo = &GetCharacterInfo(cc);
     if (pPhysicsData != 0)
     {
         if (eNewClassType == GOALIE)
@@ -318,8 +318,8 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     }
     m_m4WorldMatrix.SetIdentity();
     SetPosition(v3Zero);
-    mUnidentified024.m_v3Velocity = v3Zero;
-    m_pPhysicsCharacter->SetCharacterVelocityXY(mUnidentified024.m_v3Velocity);
+    m_DetChar.m_v3Velocity = v3Zero;
+    m_pPhysicsCharacter->SetCharacterVelocityXY(m_DetChar.m_v3Velocity);
 
     for (int i = 0; i < 4; ++i)
     {
@@ -350,21 +350,21 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
     m_nSpine1JointIndex = hierarchy0->GetNodeIndexByID(nlStringLowerHash("bip01 spine1"));
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
-    mUnidentified0E4 = hierarchy0->GetNodeIndexByID(
+    m_nLFootJointIndex = hierarchy0->GetNodeIndexByID(
         nlStringLowerHash("bip01 l foot"));
     hierarchy0 = m_pPoseAccumulator->m_BaseSHierarchy;
-    mUnidentified0E8 = hierarchy0->GetNodeIndexByID(
+    m_nRFootJointIndex = hierarchy0->GetNodeIndexByID(
         nlStringLowerHash("bip01 r foot"));
     m_pCharacterSFX = new (8, false) cCharacterSFX;
     m_pEffectsTexturing = 0;
-    m_pBlinker = MakeBlinker(mUnidentified024.m_eCharacterClass);
+    m_pBlinker = MakeBlinker(m_DetChar.m_eCharacterClass);
     nlVec3Set(m_v3ScreenPosition, 0.0f, 0.0f, 0.0f);
-    mUnidentified194 = v3Zero;
-    mUnidentified184.z = 0.0f;
-    mUnidentified184.y = 0.0f;
-    mUnidentified184.x = 0.0f;
-    mUnidentified184.w = 1.0f;
-    mUnidentified1A0 = 0.0f;
+    m_v3FrozenHammerTranslation = v3Zero;
+    m_qFrozenHammerRotation.z = 0.0f;
+    m_qFrozenHammerRotation.y = 0.0f;
+    m_qFrozenHammerRotation.x = 0.0f;
+    m_qFrozenHammerRotation.w = 1.0f;
+    m_fFrozenHammerScale = 0.0f;
     for (int i = 0; i < 4; ++i)
     {
         unknown_0x018[i] = false;
@@ -397,8 +397,8 @@ cCharacter::~cCharacter()
     {
         delete m_pBlinker;
     }
-    mUnidentified1C0.Clear();
-    mUnidentified1C0.GetAllocator()->FreeBlocks();
+    m_JointPositionCache.Clear();
+    m_JointPositionCache.GetAllocator()->FreeBlocks();
 }
 
 void cCharacter::SetModelType(int modelType)
@@ -437,7 +437,7 @@ void cCharacter::AttachEffect(EmissionController* pEmissionController)
     pEmissionController->m_uUserData = (u32)this;
     pEmissionController->SetPoseAccumulator(*m_pPoseAccumulator);
     pEmissionController->SetAnimController(*m_pCurrentAnimController);
-    pEmissionController->m_aFacing = mUnidentified024.m_aActualFacingDirection;
+    pEmissionController->m_aFacing = m_DetChar.m_aActualFacingDirection;
 }
 
 s16 cCharacter::CalcAnimTurnAdjust(unsigned short aFacingDirection,
@@ -463,13 +463,13 @@ s16 cCharacter::CalcAnimTurnAdjust(unsigned short aFacingDirection,
 
 s16 cCharacter::GetFacingDeltaToPosition(const nlVector3& position)
 {
-    float dx = position.x - mUnidentified024.m_v3Position.x;
-    float dy = position.y - mUnidentified024.m_v3Position.y;
+    float dx = position.x - m_DetChar.m_v3Position.x;
+    float dy = position.y - m_DetChar.m_v3Position.y;
     float angleRad = nlATan2f(dy, dx);
     float angle16 = 10430.378f * angleRad;
     u16 targetAngle = (u16)(s32)angle16;
 
-    return (s16)(targetAngle - mUnidentified024.m_aActualFacingDirection);
+    return (s16)(targetAngle - m_DetChar.m_aActualFacingDirection);
 }
 
 nlVector3& cCharacter::GetJointPosition(int jointIndex) const
@@ -510,7 +510,7 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
         unidentifiedKey.Pack(nJointIndex, 0, 50);
         unidentifiedKey.Pack(fTime, 0.0f, 1.0f, 0.01f);
         nlVector3* unidentifiedValue;
-        if (mUnidentified1C0.FindGet(unidentifiedKey.GetBits(), &unidentifiedValue))
+        if (m_JointPositionCache.FindGet(unidentifiedKey.GetBits(), &unidentifiedValue))
         {
             static unsigned int lbl_806E0C24;
             *v3Out = *unidentifiedValue;
@@ -525,16 +525,16 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
         *v3Out = *(nlVector3*)&m4NodeMatrix.e2[3][0];
         if (unidentifiedCache)
         {
-            mUnidentified1C0.Add(unidentifiedKey.GetBits(), *v3Out);
+            m_JointPositionCache.Add(unidentifiedKey.GetBits(), *v3Out);
             nlVector3* unidentifiedValue;
-            mUnidentified1C0.Find(unidentifiedKey.GetBits(), &unidentifiedValue, 0);
+            m_JointPositionCache.Find(unidentifiedKey.GetBits(), &unidentifiedValue, 0);
         }
     }
     if (bAddRootRot)
     {
         u16 aCurRotation = 0;
         if (bUsePrevPosition)
-            aCurRotation = mUnidentified024.m_aActualFacingDirection;
+            aCurRotation = m_DetChar.m_aActualFacingDirection;
         u16 aRootRotation;
         animController.GetRootRot(&aRootRotation);
         aCurRotation += aRootRotation;
@@ -544,15 +544,15 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
     {
         u16 aCurRotation = 0;
         if (bUsePrevPosition)
-            aCurRotation = mUnidentified024.m_aActualFacingDirection;
+            aCurRotation = m_DetChar.m_aActualFacingDirection;
         nlVector3 v3RootVelocity;
         animController.GetRootTrans(&v3RootVelocity, aCurRotation,
-            mUnidentified024.m_fMovementScale);
+            m_DetChar.m_fMovementScale);
         v3RootVelocity.z = 0.0f;
         if (bUsePrevPosition)
         {
-            v3RootVelocity.x += mUnidentified024.m_v3Position.x;
-            v3RootVelocity.y += mUnidentified024.m_v3Position.y;
+            v3RootVelocity.x += m_DetChar.m_v3Position.x;
+            v3RootVelocity.y += m_DetChar.m_v3Position.y;
         }
         if (nJointIndex < 0)
         {
@@ -571,7 +571,7 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
     unidentifiedRotation.e2[2][0] = m4RootMat.e2[2][0];
     unidentifiedRotation.e2[2][1] = m4RootMat.e2[2][1];
     unidentifiedRotation.e2[2][2] = m4RootMat.e2[2][2];
-    float desiredScale = mUnidentified024.m_fDesiredPlayerScale;
+    float desiredScale = m_DetChar.m_fDesiredPlayerScale;
     nlVec3Scale(*v3Out, desiredScale);
     nlMultVectorMatrix(*v3Out, *v3Out, unidentifiedRotation);
     nlVec3Add(*v3Out, *v3Out, m4RootMat.GetTranslation());
@@ -586,15 +586,15 @@ void cCharacter::GetCurrentAnimFuture(int nJointIndex, float fTime,
     savedTime = pAnim->m_fTime;
     pAnim->SetTime(fTime);
 
-    outFacing = mUnidentified024.m_aActualFacingDirection;
-    float movementScale = mUnidentified024.m_fMovementScale;
+    outFacing = m_DetChar.m_aActualFacingDirection;
+    float movementScale = m_DetChar.m_fMovementScale;
     m_pCurrentAnimController->GetRootTrans(&v3FutureRoot, outFacing,
         movementScale);
     unsigned short rootRot;
     m_pCurrentAnimController->GetRootRot(&rootRot);
     outFacing += rootRot;
-    v3FutureRoot.x += mUnidentified024.m_v3Position.x;
-    v3FutureRoot.y += mUnidentified024.m_v3Position.y;
+    v3FutureRoot.x += m_DetChar.m_v3Position.x;
+    v3FutureRoot.y += m_DetChar.m_v3Position.y;
     v3FutureRoot.z = 0.0f;
     if (nJointIndex < 0)
     {
@@ -603,7 +603,7 @@ void cCharacter::GetCurrentAnimFuture(int nJointIndex, float fTime,
     else
     {
         cPoseAccumulator pAccumulator(m_pPoseAccumulator->m_BaseSHierarchy, true);
-        pAccumulator.m_Scale = mUnidentified024.m_fPlayerScale;
+        pAccumulator.m_Scale = m_DetChar.m_fPlayerScale;
         nlMatrix4 m;
         nlMakeRotationMatrixZ(m, 0.0000958738f * (float)outFacing);
         m.e2[3][0] = v3FutureRoot.x;
@@ -641,80 +641,80 @@ bool UnidentifiedCharacterFloatComparison(float value)
 
 void cCharacter::InitMovementCoast()
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_COAST;
+    m_DetChar.m_eMovementState = MOVEMENT_COAST;
 }
 
 void cCharacter::InitMovementDecelerateExponential(float fDecel)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_DECELERATE_EXPONENTIAL;
-    mUnidentified024.m_fDecel = fDecel;
+    m_DetChar.m_eMovementState = MOVEMENT_DECELERATE_EXPONENTIAL;
+    m_DetChar.m_fDecel = fDecel;
 }
 
 void cCharacter::InitMovementFromAnim(short fDirectionSeekSpeed,
     const nlVector3& v3AnimMoveAdjust, float fAdjustEndTime, bool bBlended)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_FROM_ANIM;
-    mUnidentified024.m_nAnimTurnAdjust = fDirectionSeekSpeed;
-    mUnidentified024.m_v3AnimMoveAdjust = v3AnimMoveAdjust;
-    mUnidentified024.m_fAnimAdjustBeginTime = m_pCurrentAnimController->m_fTime;
-    mUnidentified024.m_fAnimAdjustEndTime = fAdjustEndTime;
-    mUnidentified024.m_bFromAnimBlended = bBlended;
+    m_DetChar.m_eMovementState = MOVEMENT_FROM_ANIM;
+    m_DetChar.m_nAnimTurnAdjust = fDirectionSeekSpeed;
+    m_DetChar.m_v3AnimMoveAdjust = v3AnimMoveAdjust;
+    m_DetChar.m_fAnimAdjustBeginTime = m_pCurrentAnimController->m_fTime;
+    m_DetChar.m_fAnimAdjustEndTime = fAdjustEndTime;
+    m_DetChar.m_bFromAnimBlended = bBlended;
 }
 
 void cCharacter::InitMovementFromAnimSeek(
     float fDirectionSeekSpeed, float fDirectionSeekFalloff)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_FROM_ANIM_SEEK;
-    mUnidentified024.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
-    mUnidentified024.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
+    m_DetChar.m_eMovementState = MOVEMENT_FROM_ANIM_SEEK;
+    m_DetChar.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
+    m_DetChar.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
 }
 
 void cCharacter::InitMovementNone(
     float fDirectionSeekSpeed, float fDirectionSeekFalloff)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_NONE;
-    mUnidentified024.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
-    mUnidentified024.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
+    m_DetChar.m_eMovementState = MOVEMENT_NONE;
+    m_DetChar.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
+    m_DetChar.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
 }
 
 void cCharacter::InitMovementRunning(float fDirectionSeekSpeed,
     float fDirectionSeekFalloff, float fAccel, float fDecel)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_RUNNING;
-    mUnidentified024.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
-    mUnidentified024.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
-    mUnidentified024.m_fAccel = fAccel;
-    mUnidentified024.m_fDecel = fDecel;
+    m_DetChar.m_eMovementState = MOVEMENT_RUNNING;
+    m_DetChar.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
+    m_DetChar.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
+    m_DetChar.m_fAccel = fAccel;
+    m_DetChar.m_fDecel = fDecel;
 }
 
 void cCharacter::InitMovementRunningNoTurn(float fAccel, float fDecel)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_RUNNING_NO_TURN;
-    mUnidentified024.m_fAccel = fAccel;
-    mUnidentified024.m_fDecel = fDecel;
+    m_DetChar.m_eMovementState = MOVEMENT_RUNNING_NO_TURN;
+    m_DetChar.m_fAccel = fAccel;
+    m_DetChar.m_fDecel = fDecel;
 }
 
 void cCharacter::InitMovementStrafing(float fDirectionSeekSpeed,
     float fDirectionSeekFalloff, float fAccel, float fDecel)
 {
-    mUnidentified024.m_eMovementState = MOVEMENT_STRAFING;
-    mUnidentified024.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
-    mUnidentified024.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
-    mUnidentified024.m_fAccel = fAccel;
-    mUnidentified024.m_fDecel = fDecel;
+    m_DetChar.m_eMovementState = MOVEMENT_STRAFING;
+    m_DetChar.m_fDirectionSeekSpeed = fDirectionSeekSpeed;
+    m_DetChar.m_fDirectionSeekFalloff = fDirectionSeekFalloff;
+    m_DetChar.m_fAccel = fAccel;
+    m_DetChar.m_fDecel = fDecel;
 }
 
 void cCharacter::MatchAnimSpeedToCharacterSpeed(unsigned int nParam,
     cPN_SAnimController* pController)
 {
     cCharacter* pChar = (cCharacter*)nParam;
-    if (pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM
-        && pChar->mUnidentified024.m_eMovementState != MOVEMENT_FROM_ANIM_SEEK)
+    if (pChar->m_DetChar.m_eMovementState != MOVEMENT_FROM_ANIM
+        && pChar->m_DetChar.m_eMovementState != MOVEMENT_FROM_ANIM_SEEK)
     {
         float min = 0.6f;
         float max = 1.4f;
         pController->m_fPlaybackSpeedScale = ClampMax(ClampMin(
-            pChar->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->GetLinearSpeed(),
+            pChar->m_DetChar.m_fActualSpeed / pController->m_pSAnim->GetLinearSpeed(),
             min), max);
     }
 }
@@ -823,20 +823,20 @@ cPN_SAnimController* cCharacter::NewAnimController(int animID, bool bRestartCycl
 
 void cCharacter::PostPhysicsUpdate()
 {
-    mUnidentified024.m_v3PrevPosition = mUnidentified024.m_v3Position;
-    m_pPhysicsCharacter->GetCharacterPositionXY(&mUnidentified024.m_v3Position);
-    m_pPhysicsCharacter->GetCharacterVelocityXY(&mUnidentified024.m_v3Velocity);
+    m_DetChar.m_v3PrevPosition = m_DetChar.m_v3Position;
+    m_pPhysicsCharacter->GetCharacterPositionXY(&m_DetChar.m_v3Position);
+    m_pPhysicsCharacter->GetCharacterVelocityXY(&m_DetChar.m_v3Velocity);
 
-    float velY = mUnidentified024.m_v3Velocity.y;
-    float velX = mUnidentified024.m_v3Velocity.x;
-    mUnidentified024.m_fActualSpeed =
+    float velY = m_DetChar.m_v3Velocity.y;
+    float velX = m_DetChar.m_v3Velocity.x;
+    m_DetChar.m_fActualSpeed =
         nlSqrt(nlGetLengthSquared1D(velX) + nlGetLengthSquared1D(velY), true);
 
     CreateWorldMatrix();
 
     m_pPoseAccumulator->Pose(*m_pPoseTree, m_m4WorldMatrix);
     m_pPhysicsCharacter->UpdatePose(
-        m_pPoseAccumulator, mUnidentified024.m_v3Position.z, false);
+        m_pPoseAccumulator, m_DetChar.m_v3Position.z, false);
 }
 
 void cCharacter::PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType)
@@ -909,7 +909,7 @@ void cCharacter::SetAnimID(int animID)
         m_eAnimID = animID;
         ExcitementSystem& excitementSystem = ExcitementSystem::Instance();
         nlVector3 toBall;
-        nlVec3Sub(toBall, mUnidentified024.m_v3Position, g_pBall->m_v3Position);
+        nlVec3Sub(toBall, m_DetChar.m_v3Position, g_pBall->m_v3Position);
         if (nlVec3LengthSquared(toBall) < excitementSystem.mMaxBallDistanceSq)
         {
             if (m_eClassType == GOALIE)
@@ -967,7 +967,7 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
     m_pAILayer[0] = blender;
     m_pCurrentAnimController = newController;
     SetAnimID(animID);
-    if (m_eClassType == FIELDER && mUnidentified024.m_eCharacterClass == 13)
+    if (m_eClassType == FIELDER && m_DetChar.m_eCharacterClass == 13)
     {
         m_bLeftPropAnimated = false;
         m_bRightPropAnimated = false;
@@ -978,26 +978,26 @@ void cCharacter::SetAnimState(int animID, bool useBlendTime,
 void cCharacter::SetFacingDirection(
     unsigned short dir, bool bSetMovementDirection)
 {
-    mUnidentified024.m_aPrevFacingDirection = mUnidentified024.m_aActualFacingDirection;
-    mUnidentified024.m_aActualFacingDirection = dir;
+    m_DetChar.m_aPrevFacingDirection = m_DetChar.m_aActualFacingDirection;
+    m_DetChar.m_aActualFacingDirection = dir;
     m_pPhysicsCharacter->SetFacingDirection(dir);
     if (bSetMovementDirection)
     {
-        mUnidentified024.m_aActualMovementDirection = dir;
+        m_DetChar.m_aActualMovementDirection = dir;
     }
 }
 
 void cCharacter::SetPosition(const nlVector3& position)
 {
-    mUnidentified024.m_v3Position = position;
-    mUnidentified024.m_v3PrevPosition = mUnidentified024.m_v3Position;
-    m_pPhysicsCharacter->SetCharacterPositionXY(mUnidentified024.m_v3Position);
+    m_DetChar.m_v3Position = position;
+    m_DetChar.m_v3PrevPosition = m_DetChar.m_v3Position;
+    m_pPhysicsCharacter->SetCharacterPositionXY(m_DetChar.m_v3Position);
 }
 
 void cCharacter::SetVelocity(const nlVector3& velocity)
 {
-    mUnidentified024.m_v3Velocity = velocity;
-    m_pPhysicsCharacter->SetCharacterVelocityXY(mUnidentified024.m_v3Velocity);
+    m_DetChar.m_v3Velocity = velocity;
+    m_pPhysicsCharacter->SetCharacterVelocityXY(m_DetChar.m_v3Velocity);
 }
 
 bool cCharacter::ShouldStartCrossBlend(int nAnimID)
@@ -1008,19 +1008,19 @@ bool cCharacter::ShouldStartCrossBlend(int nAnimID)
 
 void cCharacter::SetDesiredFacingDirection(unsigned short aDirection, bool bParam)
 {
-    mUnidentified024.m_aDesiredFacingDirection = aDirection;
+    m_DetChar.m_aDesiredFacingDirection = aDirection;
     if (bParam)
     {
-        mUnidentified024.m_aDesiredMovementDirection = aDirection;
+        m_DetChar.m_aDesiredMovementDirection = aDirection;
     }
 }
 
 void cCharacter::fn_8001DCE0(unsigned short aDirection)
 {
-    mUnidentified024.m_aDesiredMovementDirection = aDirection;
-    if (mUnidentified024.m_eMovementState != MOVEMENT_STRAFING)
+    m_DetChar.m_aDesiredMovementDirection = aDirection;
+    if (m_DetChar.m_eMovementState != MOVEMENT_STRAFING)
     {
-        mUnidentified024.m_aDesiredFacingDirection = aDirection;
+        m_DetChar.m_aDesiredFacingDirection = aDirection;
     }
 }
 
@@ -1028,23 +1028,23 @@ void cCharacter::Update(float fDeltaT)
 {
     if (fDeltaT > 0.0f)
     {
-        if (mUnidentified024.m_tScaleTimer.m_uPackedTime != 0)
+        if (m_DetChar.m_tScaleTimer.m_uPackedTime != 0)
         {
-            if (!mUnidentified024.m_tScaleTimer.Countdown(fDeltaT, 0.0f))
+            if (!m_DetChar.m_tScaleTimer.Countdown(fDeltaT, 0.0f))
             {
-                float unidentifiedFraction = fDeltaT / mUnidentified024.m_tScaleTimer.GetSeconds();
+                float unidentifiedFraction = fDeltaT / m_DetChar.m_tScaleTimer.GetSeconds();
                 unidentifiedFraction = nlMinEquals(unidentifiedFraction, 1.0f);
-                float unidentifiedScale = Interpolate(mUnidentified024.m_fPlayerScale,
-                    mUnidentified024.m_fDesiredPlayerScale, unidentifiedFraction);
+                float unidentifiedScale = Interpolate(m_DetChar.m_fPlayerScale,
+                    m_DetChar.m_fDesiredPlayerScale, unidentifiedFraction);
                 SetPlayerScale(unidentifiedScale);
-                mUnidentified024.m_fMovementScale = Interpolate(mUnidentified024.m_fMovementScale,
-                    mUnidentified024.m_fDesiredMovementScale, unidentifiedFraction);
+                m_DetChar.m_fMovementScale = Interpolate(m_DetChar.m_fMovementScale,
+                    m_DetChar.m_fDesiredMovementScale, unidentifiedFraction);
             }
             else
             {
-                SetPlayerScale(mUnidentified024.m_fDesiredPlayerScale);
-                mUnidentified024.m_tScaleTimer.Clear();
-                mUnidentified024.m_fMovementScale = mUnidentified024.m_fDesiredMovementScale;
+                SetPlayerScale(m_DetChar.m_fDesiredPlayerScale);
+                m_DetChar.m_tScaleTimer.Clear();
+                m_DetChar.m_fMovementScale = m_DetChar.m_fDesiredMovementScale;
             }
         }
         fn_8001EF78(fDeltaT);
@@ -1081,7 +1081,7 @@ void cCharacter::Update(float fDeltaT)
             && nlNear(v3Zero.y, g_v3PrevJointPosition.y)
             && nlNear(v3Zero.z, g_v3PrevJointPosition.z);
         if (bIsZero)
-            g_v3PrevJointPosition = mUnidentified024.m_v3Position;
+            g_v3PrevJointPosition = m_DetChar.m_v3Position;
         nlVector3 jointPosition;
         nlVector3 forwardVector;
         if (m_eClassType == FIELDER)
@@ -1091,9 +1091,9 @@ void cCharacter::Update(float fDeltaT)
                 hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 spine1")));
             jointPosition = *(nlVector3*)&nodeMatrix.e2[3][0];
             nlVec3Set(forwardVector,
-                mUnidentified024.m_v3Position.x - mUnidentified024.m_v3PrevPosition.x,
-                mUnidentified024.m_v3Position.y - mUnidentified024.m_v3PrevPosition.y,
-                mUnidentified024.m_v3Position.z - mUnidentified024.m_v3PrevPosition.z);
+                m_DetChar.m_v3Position.x - m_DetChar.m_v3PrevPosition.x,
+                m_DetChar.m_v3Position.y - m_DetChar.m_v3PrevPosition.y,
+                m_DetChar.m_v3Position.z - m_DetChar.m_v3PrevPosition.z);
         }
         g_v3PrevJointPosition = jointPosition;
         m_pBlurHandler->AddViewOrientedPoint(jointPosition, forwardVector);
@@ -1102,12 +1102,12 @@ void cCharacter::Update(float fDeltaT)
 
 bool cCharacter::fn_8001E160()
 {
-    return mUnidentified024.m_bOnScreen;
+    return m_DetChar.m_bOnScreen;
 }
 
 bool cCharacter::IsCaptain() const
 {
-    return mUnidentified11C->mCaptainId != -1;
+    return m_pCharacterInfo->mCaptainId != -1;
 }
 
 bool cCharacter::fn_8001E184()
@@ -1142,20 +1142,20 @@ bool cCharacter::IsEffectDying(const EffectsGroup* effectGroup) const
 
 void cCharacter::fn_8001E304(float fSpeed, float fDeltaT)
 {
-    mUnidentified024.m_fActualSpeed = SeekSpeed(mUnidentified024.m_fActualSpeed,
-        fSpeed, mUnidentified024.m_fAccel, mUnidentified024.m_fDecel, fDeltaT);
-    if (mUnidentified024.m_fActualSpeed > 25.0f)
+    m_DetChar.m_fActualSpeed = SeekSpeed(m_DetChar.m_fActualSpeed,
+        fSpeed, m_DetChar.m_fAccel, m_DetChar.m_fDecel, fDeltaT);
+    if (m_DetChar.m_fActualSpeed > 25.0f)
     {
-        mUnidentified024.m_fActualSpeed = 25.0f;
+        m_DetChar.m_fActualSpeed = 25.0f;
     }
-    nlPolarToCartesian(mUnidentified024.m_v3Velocity.x,
-        mUnidentified024.m_v3Velocity.y, mUnidentified024.m_aActualMovementDirection,
-        mUnidentified024.m_fActualSpeed);
+    nlPolarToCartesian(m_DetChar.m_v3Velocity.x,
+        m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualMovementDirection,
+        m_DetChar.m_fActualSpeed);
 }
 
 void cCharacter::UpdateMovementState(float fDeltaT)
 {
-    float fDesiredSpeed = mUnidentified024.m_fDesiredSpeed;
+    float fDesiredSpeed = m_DetChar.m_fDesiredSpeed;
     float fMinDistanceFromWall = 0.0f;
     cFielder* pFielder = NULL;
 
@@ -1165,23 +1165,23 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         bool isCharging = pFielder->m_pShotMeter->UnidentifiedIsCharging();
         if (!isCharging)
         {
-            fDesiredSpeed = pFielder->GetSpeedPowerupAdjusted(mUnidentified024.m_fDesiredSpeed);
+            fDesiredSpeed = pFielder->GetSpeedPowerupAdjusted(m_DetChar.m_fDesiredSpeed);
         }
     }
 
-    switch (mUnidentified024.m_eMovementState)
+    switch (m_DetChar.m_eMovementState)
     {
     case MOVEMENT_COAST:
     {
-        nlVector3 unidentifiedVelocity = mUnidentified024.m_v3Velocity;
+        nlVector3 unidentifiedVelocity = m_DetChar.m_v3Velocity;
         float mag = unidentifiedVelocity.GetLengthSq2D();
         if (mag > 625.0f)
         {
             nlPolar polar;
-            nlCartesianToPolar(polar, mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y);
-            nlPolarToCartesian(mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y, polar.a, 25.0f);
+            nlCartesianToPolar(polar, m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y);
+            nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, polar.a, 25.0f);
         }
-        if (fabsf(mUnidentified024.m_v3Position.y) > 100.0f || fabsf(mUnidentified024.m_v3Position.x) > 100.0f)
+        if (fabsf(m_DetChar.m_v3Position.y) > 100.0f || fabsf(m_DetChar.m_v3Position.x) > 100.0f)
         {
             nlVector3 unidentifiedZero;
             nlVec3Set(unidentifiedZero, 0.0f, 0.0f, 0.0f);
@@ -1192,8 +1192,8 @@ void cCharacter::UpdateMovementState(float fDeltaT)
 
     case MOVEMENT_DECELERATE_EXPONENTIAL:
     {
-        mUnidentified024.m_fActualSpeed = SeekSpeedExponential(mUnidentified024.m_fActualSpeed, fDesiredSpeed, mUnidentified024.m_fDecel, fDeltaT);
-        nlPolarToCartesian(mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y, mUnidentified024.m_aActualMovementDirection, mUnidentified024.m_fActualSpeed);
+        m_DetChar.m_fActualSpeed = SeekSpeedExponential(m_DetChar.m_fActualSpeed, fDesiredSpeed, m_DetChar.m_fDecel, fDeltaT);
+        nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualMovementDirection, m_DetChar.m_fActualSpeed);
         break;
     }
 
@@ -1201,7 +1201,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     {
         s16 nAdjust;
         cPoseNode* pSourceNode;
-        if (mUnidentified024.m_bFromAnimBlended)
+        if (m_DetChar.m_bFromAnimBlended)
         {
             pSourceNode = *m_pAILayer;
         }
@@ -1213,98 +1213,98 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         nAdjust = 0;
         nlVector3 v3ConsumedMove;
         nlVec3Set(v3ConsumedMove, 0.0f, 0.0f, 0.0f);
-        float adjustTime = mUnidentified024.m_fAnimAdjustEndTime - mUnidentified024.m_fAnimAdjustBeginTime;
+        float adjustTime = m_DetChar.m_fAnimAdjustEndTime - m_DetChar.m_fAnimAdjustBeginTime;
 
         if (adjustTime > 0.0f)
         {
-            float smoothStep1 = CharacterAnimSmoothStep((m_pCurrentAnimController->get_fTime() - mUnidentified024.m_fAnimAdjustBeginTime) / adjustTime);
+            float smoothStep1 = CharacterAnimSmoothStep((m_pCurrentAnimController->get_fTime() - m_DetChar.m_fAnimAdjustBeginTime) / adjustTime);
             smoothStep1 = (smoothStep1 <= 1.0f) ? smoothStep1 : 1.0f;
 
-            float smoothStep2 = CharacterAnimSmoothStep((m_pCurrentAnimController->m_fPrevTime - mUnidentified024.m_fAnimAdjustBeginTime) / adjustTime);
+            float smoothStep2 = CharacterAnimSmoothStep((m_pCurrentAnimController->m_fPrevTime - m_DetChar.m_fAnimAdjustBeginTime) / adjustTime);
             smoothStep2 = (smoothStep2 <= 1.0f) ? smoothStep2 : 1.0f;
 
             if (smoothStep2 < 1.0f)
             {
                 float fAdjustPercent = (smoothStep1 - smoothStep2) / (1.0f - smoothStep2);
-                nAdjust = (s16)((float)mUnidentified024.m_nAnimTurnAdjust * fAdjustPercent);
-                mUnidentified024.m_nAnimTurnAdjust -= nAdjust;
+                nAdjust = (s16)((float)m_DetChar.m_nAnimTurnAdjust * fAdjustPercent);
+                m_DetChar.m_nAnimTurnAdjust -= nAdjust;
 
-                nlVec3Scale(v3ConsumedMove, mUnidentified024.m_v3AnimMoveAdjust, fAdjustPercent);
-                nlVec3Sub(mUnidentified024.m_v3AnimMoveAdjust, mUnidentified024.m_v3AnimMoveAdjust, v3ConsumedMove);
+                nlVec3Scale(v3ConsumedMove, m_DetChar.m_v3AnimMoveAdjust, fAdjustPercent);
+                nlVec3Sub(m_DetChar.m_v3AnimMoveAdjust, m_DetChar.m_v3AnimMoveAdjust, v3ConsumedMove);
             }
         }
 
         u16 aRootRotation;
         pSourceNode->GetRootRot(&aRootRotation);
-        u16 prevFacing = mUnidentified024.m_aActualFacingDirection;
+        u16 prevFacing = m_DetChar.m_aActualFacingDirection;
         u16 newFacing = prevFacing + aRootRotation + (u16)nAdjust;
         SetFacingDirection(newFacing, true);
 
-        float movementScale = mUnidentified024.m_fMovementScale;
+        float movementScale = m_DetChar.m_fMovementScale;
         nlVector3 v3RootTrans;
         pSourceNode->GetRootTrans(
-            &v3RootTrans, mUnidentified024.m_aPrevFacingDirection, movementScale);
+            &v3RootTrans, m_DetChar.m_aPrevFacingDirection, movementScale);
         nlVec3Add(v3RootTrans, v3RootTrans, v3ConsumedMove);
-        mUnidentified024.m_v3Velocity.x = v3RootTrans.x / fDeltaT;
-        mUnidentified024.m_v3Velocity.y = v3RootTrans.y / fDeltaT;
+        m_DetChar.m_v3Velocity.x = v3RootTrans.x / fDeltaT;
+        m_DetChar.m_v3Velocity.y = v3RootTrans.y / fDeltaT;
 
         nlPolar aSpeed;
-        nlCartesianToPolar(aSpeed, mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y);
-        mUnidentified024.m_fActualSpeed = aSpeed.r;
+        nlCartesianToPolar(aSpeed, m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y);
+        m_DetChar.m_fActualSpeed = aSpeed.r;
         break;
     }
 
     case MOVEMENT_FROM_ANIM_SEEK:
     {
-        u16 aNewFacingDirection = SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, mUnidentified024.m_fDirectionSeekSpeed, mUnidentified024.m_fDirectionSeekFalloff, fDeltaT);
+        u16 aNewFacingDirection = SeekDirection(m_DetChar.m_aActualFacingDirection, m_DetChar.m_aDesiredFacingDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
         SetFacingDirection(aNewFacingDirection, true);
 
-        float movementScale = mUnidentified024.m_fMovementScale;
+        float movementScale = m_DetChar.m_fMovementScale;
         nlVector3 v3RootTrans;
         m_pCurrentAnimController->GetRootTrans(
-            &v3RootTrans, mUnidentified024.m_aPrevFacingDirection, movementScale);
-        mUnidentified024.m_v3Velocity.x = v3RootTrans.x / fDeltaT;
-        mUnidentified024.m_v3Velocity.y = v3RootTrans.y / fDeltaT;
+            &v3RootTrans, m_DetChar.m_aPrevFacingDirection, movementScale);
+        m_DetChar.m_v3Velocity.x = v3RootTrans.x / fDeltaT;
+        m_DetChar.m_v3Velocity.y = v3RootTrans.y / fDeltaT;
         break;
     }
 
     case MOVEMENT_NONE:
     {
-        u16 aNewFacingDirection = SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, mUnidentified024.m_fDirectionSeekSpeed, mUnidentified024.m_fDirectionSeekFalloff, fDeltaT);
+        u16 aNewFacingDirection = SeekDirection(m_DetChar.m_aActualFacingDirection, m_DetChar.m_aDesiredFacingDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
         SetFacingDirection(aNewFacingDirection, true);
 
-        mUnidentified024.m_fActualSpeed = 0.0f;
-        nlPolarToCartesian(mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y, mUnidentified024.m_aActualMovementDirection, mUnidentified024.m_fActualSpeed);
+        m_DetChar.m_fActualSpeed = 0.0f;
+        nlPolarToCartesian(m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y, m_DetChar.m_aActualMovementDirection, m_DetChar.m_fActualSpeed);
         break;
     }
 
     case MOVEMENT_RUNNING:
     {
-        u16 aNewFacingDirection = SeekDirection(mUnidentified024.m_aActualMovementDirection, mUnidentified024.m_aDesiredMovementDirection, mUnidentified024.m_fDirectionSeekSpeed, mUnidentified024.m_fDirectionSeekFalloff, fDeltaT);
+        u16 aNewFacingDirection = SeekDirection(m_DetChar.m_aActualMovementDirection, m_DetChar.m_aDesiredMovementDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
 
-        int delta = (s16)(aNewFacingDirection - mUnidentified024.m_aActualMovementDirection);
-        int maxDelta = (int)(fDeltaT * mUnidentified024.m_fDirectionSeekSpeed);
+        int delta = (s16)(aNewFacingDirection - m_DetChar.m_aActualMovementDirection);
+        int maxDelta = (int)(fDeltaT * m_DetChar.m_fDirectionSeekSpeed);
         int sign = delta >> 31;
         int absDelta = (sign ^ delta) - sign;
 
         int unidentifiedLeanThreshold = 182;
         if (absDelta <= unidentifiedLeanThreshold)
         {
-            mUnidentified024.m_fLeanAmount = 0.0f;
+            m_DetChar.m_fLeanAmount = 0.0f;
         }
         else
         {
-            mUnidentified024.m_fLeanAmount = NormalizeVal((float)absDelta, (float)unidentifiedLeanThreshold, (float)maxDelta);
+            m_DetChar.m_fLeanAmount = NormalizeVal((float)absDelta, (float)unidentifiedLeanThreshold, (float)maxDelta);
             if (delta < 0)
             {
-                mUnidentified024.m_fLeanAmount = -mUnidentified024.m_fLeanAmount;
+                m_DetChar.m_fLeanAmount = -m_DetChar.m_fLeanAmount;
             }
         }
 
-        mUnidentified024.m_aActualMovementDirection = aNewFacingDirection;
+        m_DetChar.m_aActualMovementDirection = aNewFacingDirection;
         if (fDesiredSpeed < 0.1f)
         {
-            u16 unidentifiedFacing = SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, mUnidentified024.m_fDirectionSeekSpeed, mUnidentified024.m_fDirectionSeekFalloff, fDeltaT);
+            u16 unidentifiedFacing = SeekDirection(m_DetChar.m_aActualFacingDirection, m_DetChar.m_aDesiredFacingDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
             SetFacingDirection(unidentifiedFacing, false);
         }
         else
@@ -1324,10 +1324,10 @@ void cCharacter::UpdateMovementState(float fDeltaT)
 
     case MOVEMENT_STRAFING:
     {
-        u16 aNewFacingDirection = SeekDirection(mUnidentified024.m_aActualFacingDirection, mUnidentified024.m_aDesiredFacingDirection, mUnidentified024.m_fDirectionSeekSpeed, mUnidentified024.m_fDirectionSeekFalloff, fDeltaT);
+        u16 aNewFacingDirection = SeekDirection(m_DetChar.m_aActualFacingDirection, m_DetChar.m_aDesiredFacingDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
         SetFacingDirection(aNewFacingDirection, false);
 
-        mUnidentified024.m_aActualMovementDirection = SeekDirection(mUnidentified024.m_aActualMovementDirection, mUnidentified024.m_aDesiredMovementDirection, mUnidentified024.m_fDirectionSeekSpeed, mUnidentified024.m_fDirectionSeekFalloff, fDeltaT);
+        m_DetChar.m_aActualMovementDirection = SeekDirection(m_DetChar.m_aActualMovementDirection, m_DetChar.m_aDesiredMovementDirection, m_DetChar.m_fDirectionSeekSpeed, m_DetChar.m_fDirectionSeekFalloff, fDeltaT);
 
         fn_8001E304(fDesiredSpeed, fDeltaT);
         break;
@@ -1350,24 +1350,24 @@ void cCharacter::UpdateMovementState(float fDeltaT)
         float unidentifiedBlend = InterpolateClamped(0.0f,
             gGameTweaks.mFielderTweaks->fTerrainMaxSlipperyMomentum, unidentifiedSlide);
         nlVector2 unidentifiedDelta;
-        nlVec2Sub(unidentifiedDelta, *(const nlVector2*)&mUnidentified024.m_v3PrevVelocity,
-            *(const nlVector2*)&mUnidentified024.m_v3Velocity);
+        nlVec2Sub(unidentifiedDelta, *(const nlVector2*)&m_DetChar.m_v3PrevVelocity,
+            *(const nlVector2*)&m_DetChar.m_v3Velocity);
         float unidentifiedLengthSquared = nlVec2LengthSquared(unidentifiedDelta);
         if (unidentifiedLengthSquared > lbl_806DB5D8 * lbl_806DB5D8)
         {
             nlVec2Scale(unidentifiedDelta, unidentifiedDelta,
                 lbl_806DB5D8 * nlRecipSqrt(unidentifiedLengthSquared, true));
         }
-        nlVector2 unidentifiedPosition = *(const nlVector2*)&mUnidentified024.m_v3Position;
+        nlVector2 unidentifiedPosition = *(const nlVector2*)&m_DetChar.m_v3Position;
         nlVec2Set(unidentifiedPosition,
             fDeltaT * unidentifiedDelta.x + unidentifiedPosition.x,
             fDeltaT * unidentifiedDelta.y + unidentifiedPosition.y);
-        nlVec2Set(*(nlVector2*)&mUnidentified024.m_v3Position, unidentifiedPosition.x, unidentifiedPosition.y);
+        nlVec2Set(*(nlVector2*)&m_DetChar.m_v3Position, unidentifiedPosition.x, unidentifiedPosition.y);
         if (m_pPhysicsCharacter->m_CanCollideWithWall && unidentifiedSlide > 0.0f)
         {
             cField::FixOutOfBoundsPosition(
-                mUnidentified024.m_v3Position, fMinDistanceFromWall, false);
-            m_pPhysicsCharacter->SetCharacterPositionXY(mUnidentified024.m_v3Position);
+                m_DetChar.m_v3Position, fMinDistanceFromWall, false);
+            m_pPhysicsCharacter->SetCharacterPositionXY(m_DetChar.m_v3Position);
         }
         PhysicsAIBall* unidentifiedBall = g_pBall->m_pPhysicsBall;
         if (unidentifiedBall->mbUseTiltForce || unidentifiedBall->mbUseWindForce)
@@ -1394,68 +1394,68 @@ void cCharacter::UpdateMovementState(float fDeltaT)
                     pFielder->GetTweaks()->mUnidentified064);
             }
             unidentifiedForceScale = InterpolateRangeClamped(0.0f, unidentifiedForceScale,
-                lbl_806DB5E4, lbl_806DB5E8, nlVec3Length(mUnidentified024.m_v3Velocity));
+                lbl_806DB5E4, lbl_806DB5E8, nlVec3Length(m_DetChar.m_v3Velocity));
             unidentifiedForceScale = fDeltaT * unidentifiedForceScale;
-            nlVec2Set(*(nlVector2*)&mUnidentified024.m_v3Position,
-                unidentifiedForceScale * unidentifiedForce.x + mUnidentified024.m_v3Position.x,
-                unidentifiedForceScale * unidentifiedForce.y + mUnidentified024.m_v3Position.y);
+            nlVec2Set(*(nlVector2*)&m_DetChar.m_v3Position,
+                unidentifiedForceScale * unidentifiedForce.x + m_DetChar.m_v3Position.x,
+                unidentifiedForceScale * unidentifiedForce.y + m_DetChar.m_v3Position.y);
             if (GameInfoManager::Instance()->GetStadium() != 11 && m_pPhysicsCharacter->m_CanCollideWithWall)
             {
                 cField::FixOutOfBoundsPosition(
-                    mUnidentified024.m_v3Position, fMinDistanceFromWall, false);
+                    m_DetChar.m_v3Position, fMinDistanceFromWall, false);
             }
             else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine && !pFielder->IsInFallAction())
             {
                 cField::FixOutOfBoundsX(
-                    mUnidentified024.m_v3Position, false, fMinDistanceFromWall);
+                    m_DetChar.m_v3Position, false, fMinDistanceFromWall);
             }
-            m_pPhysicsCharacter->SetCharacterPositionXY(mUnidentified024.m_v3Position);
+            m_pPhysicsCharacter->SetCharacterPositionXY(m_DetChar.m_v3Position);
         }
-        nlVecLerp(mUnidentified024.m_v3PrevVelocity, mUnidentified024.m_v3Velocity, mUnidentified024.m_v3PrevVelocity, unidentifiedBlend);
+        nlVecLerp(m_DetChar.m_v3PrevVelocity, m_DetChar.m_v3Velocity, m_DetChar.m_v3PrevVelocity, unidentifiedBlend);
     }
     else
     {
-        mUnidentified024.m_v3PrevVelocity = mUnidentified024.m_v3Velocity;
+        m_DetChar.m_v3PrevVelocity = m_DetChar.m_v3Velocity;
     }
-    if (mUnidentified024.m_fActualSpeed > 0.01f)
+    if (m_DetChar.m_fActualSpeed > 0.01f)
     {
         nlPolar pMovement;
-        nlCartesianToPolar(pMovement, mUnidentified024.m_v3Velocity.x, mUnidentified024.m_v3Velocity.y);
-        mUnidentified024.m_aActualMovementDirection = pMovement.a;
+        nlCartesianToPolar(pMovement, m_DetChar.m_v3Velocity.x, m_DetChar.m_v3Velocity.y);
+        m_DetChar.m_aActualMovementDirection = pMovement.a;
     }
     else
     {
-        mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aActualFacingDirection;
+        m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
     }
-    m_pPhysicsCharacter->SetCharacterVelocityXY(mUnidentified024.m_v3Velocity);
+    m_pPhysicsCharacter->SetCharacterVelocityXY(m_DetChar.m_v3Velocity);
 }
 
 void cCharacter::fn_8001EE74(float fParam0, float fParam1, float fParam2)
 {
-    mUnidentified024.m_fDesiredPlayerScale = fParam0;
+    m_DetChar.m_fDesiredPlayerScale = fParam0;
     if (fParam2 > 0.0f)
     {
-        mUnidentified024.m_fDesiredMovementScale = fParam2;
+        m_DetChar.m_fDesiredMovementScale = fParam2;
     }
     else
     {
-        mUnidentified024.m_fDesiredMovementScale = mUnidentified024.m_fMovementScale;
+        m_DetChar.m_fDesiredMovementScale = m_DetChar.m_fMovementScale;
     }
     if (fParam1 > 0.0f)
     {
-        mUnidentified024.m_tScaleTimer.SetSeconds(fParam1);
+        m_DetChar.m_tScaleTimer.SetSeconds(fParam1);
     }
     else
     {
-        mUnidentified024.m_tScaleTimer.Clear();
+        m_DetChar.m_tScaleTimer.Clear();
         SetPlayerScale(fParam0);
-        mUnidentified024.m_fMovementScale = mUnidentified024.m_fDesiredMovementScale;
+        m_DetChar.m_fMovementScale = m_DetChar.m_fDesiredMovementScale;
     }
 }
 
 void cCharacter::fn_8001EF6C(float movementScale)
 {
-    mUnidentified024.m_fMovementScale = movementScale;
+    m_DetChar.m_fMovementScale = movementScale;
 }
 
 void cCharacter::StopPlayingAllTrackedSFX()
@@ -1495,24 +1495,24 @@ void cCharacter::CaptureHammerTransform()
         hierarchy = m_pPoseAccumulator->m_BaseSHierarchy;
         lbl_806E0C28 = hierarchy->GetNodeIndexByID(nlStringLowerHash("bip01 r prop"));
     }
-    mUnidentified184 = m_pPoseAccumulator->GetNodeQuaternion(lbl_806E0C28);
+    m_qFrozenHammerRotation = m_pPoseAccumulator->GetNodeQuaternion(lbl_806E0C28);
     const nlMatrix4& m = m_pPoseAccumulator->GetNodeMatrix(lbl_806E0C28);
-    mUnidentified194 = m.GetTranslation();
-    mUnidentified1A0 = nlVec3Length(*(nlVector3*)&m.e2[0][0]);
+    m_v3FrozenHammerTranslation = m.GetTranslation();
+    m_fFrozenHammerScale = nlVec3Length(*(nlVector3*)&m.e2[0][0]);
 }
 
 void cCharacter::SetHammerTransformFrozen(bool frozen)
 {
     bool destroyHammer = false;
-    if (mUnidentified180 && !frozen)
+    if (m_bHammerTransformFrozen && !frozen)
         destroyHammer = true;
-    mUnidentified180 = frozen;
+    m_bHammerTransformFrozen = frozen;
     if (frozen)
     {
         CaptureHammerTransform();
     }
     if (destroyHammer)
-        EmitHammerDestroyBig(mUnidentified194);
+        EmitHammerDestroyBig(m_v3FrozenHammerTranslation);
 }
 
 void cCharacter::SetElectrocutionTextureEnabled(bool isEnabled)
@@ -1559,33 +1559,33 @@ void cCharacter::fn_8001F1D8()
 
 void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
-    mUnidentified024.UnidentifiedReset();
+    m_DetChar.UnidentifiedReset();
     ResetAnimState();
     m_pHeadTrack->UnidentifiedReset();
     m_pPhysicsCharacter->Unknown0();
     SetPosition(v3Position);
-    mUnidentified024.m_v3PrevPosition = v3Position;
-    mUnidentified024.m_aDesiredFacingDirection = aDirection;
+    m_DetChar.m_v3PrevPosition = v3Position;
+    m_DetChar.m_aDesiredFacingDirection = aDirection;
     SetFacingDirection(aDirection, false);
-    mUnidentified024.m_aPrevFacingDirection = mUnidentified024.m_aDesiredFacingDirection;
-    mUnidentified024.m_aActualMovementDirection = mUnidentified024.m_aDesiredFacingDirection;
-    mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aDesiredFacingDirection;
+    m_DetChar.m_aPrevFacingDirection = m_DetChar.m_aDesiredFacingDirection;
+    m_DetChar.m_aActualMovementDirection = m_DetChar.m_aDesiredFacingDirection;
+    m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aDesiredFacingDirection;
     SetVelocity(v3Zero);
-    mUnidentified024.m_fActualSpeed = 0.0f;
-    mUnidentified024.m_fDesiredSpeed = 0.0f;
+    m_DetChar.m_fActualSpeed = 0.0f;
+    m_DetChar.m_fDesiredSpeed = 0.0f;
     CreateWorldMatrix();
     m_pPoseAccumulator->Pose(*m_pPoseTree, m_m4WorldMatrix);
     m_pPhysicsCharacter->UpdatePose(m_pPoseAccumulator, 0.0f, false);
     m_pPhysicsCharacter->UpdatePose(m_pPoseAccumulator, 0.0f, false);
     m_bLeftPropAnimated = false;
     m_bRightPropAnimated = false;
-    mUnidentified180 = false;
-    mUnidentified181 = false;
-    mUnidentified182 = false;
+    m_bHammerTransformFrozen = false;
+    m_bPacketAVisible = false;
+    m_bPacketBVisible = false;
     m_bIsUsingElectrocutionTexture = false;
     m_ModelType = 0;
-    mUnidentified178 = 1.0f;
-    mUnidentified17C = true;
+    m_fOpacity = 1.0f;
+    m_bShadowVisible = true;
     ResetEffects();
     EndBlur();
     fn_8001C574();
@@ -1598,7 +1598,7 @@ u16 lbl_806DB604 = 0xFFFF;
     cache->AddField(type, gDebugFieldTypes[type].size, \
         (u8*)&(field) - (u8*)&(base), name)
 
-inline void UnidentifiedCharacterState_024::SyncLog(void* context, DebugWriteCache* cache)
+inline void DetChar::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DB604 == 0xFFFF)
     {
@@ -1699,7 +1699,7 @@ inline void cHeadTrack::SyncLog(void* context, DebugWriteCache* cache)
     cache->WriteData(g_headTrackSyncLogType, this, sizeof(cHeadTrack));
 }
 
-inline void UnidentifiedCharacterAnimState::SyncLog(void* context, DebugWriteCache* cache)
+inline void CharAnim::SyncLog(void* context, DebugWriteCache* cache)
 {
     if (lbl_806DB602 == 0xFFFF)
     {
@@ -1721,9 +1721,9 @@ inline void UnidentifiedCharacterAnimState::SyncLog(void* context, DebugWriteCac
 
 void cCharacter::SyncLog(void* context, DebugWriteCache* cache)
 {
-    mUnidentified024.SyncLog(context, cache);
+    m_DetChar.SyncLog(context, cache);
 
-    UnidentifiedCharacterAnimState state;
+    CharAnim state;
     state.m_fFrame = m_pCurrentAnimController->m_fTime
         * (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
     state.m_fTotalFrames = (float)m_pCurrentAnimController->m_pSAnim->m_nNumKeys;
@@ -1744,20 +1744,20 @@ void cCharacter::SyncLog(void* context, DebugWriteCache* cache)
 
 void cCharacter::ChecksumState(RunningChecksum* pChecksum)
 {
-    pChecksum->ChecksumData(&mUnidentified024.m_eCharacterClass, sizeof(mUnidentified024.m_eCharacterClass));
-    pChecksum->ChecksumData(&mUnidentified024.m_eMovementState, sizeof(mUnidentified024.m_eMovementState));
-    pChecksum->ChecksumData(&mUnidentified024.m_bOnScreen, sizeof(mUnidentified024.m_bOnScreen));
-    pChecksum->ChecksumData(&mUnidentified024.m_v3Position, sizeof(mUnidentified024.m_v3Position));
-    pChecksum->ChecksumData(&mUnidentified024.m_v3Velocity, sizeof(mUnidentified024.m_v3Velocity));
-    pChecksum->ChecksumData(&mUnidentified024.m_aDesiredFacingDirection, sizeof(mUnidentified024.m_aDesiredFacingDirection));
-    pChecksum->ChecksumData(&mUnidentified024.m_aActualFacingDirection, sizeof(mUnidentified024.m_aActualFacingDirection));
-    pChecksum->ChecksumData(&mUnidentified024.m_aDesiredMovementDirection, sizeof(mUnidentified024.m_aDesiredMovementDirection));
-    pChecksum->ChecksumData(&mUnidentified024.m_aActualMovementDirection, sizeof(mUnidentified024.m_aActualMovementDirection));
-    pChecksum->ChecksumData(&mUnidentified024.m_fAccel, sizeof(mUnidentified024.m_fAccel));
-    pChecksum->ChecksumData(&mUnidentified024.m_fDecel, sizeof(mUnidentified024.m_fDecel));
-    pChecksum->ChecksumData(&mUnidentified024.m_fDesiredSpeed, sizeof(mUnidentified024.m_fDesiredSpeed));
-    pChecksum->ChecksumData(&mUnidentified024.m_fActualSpeed, sizeof(mUnidentified024.m_fActualSpeed));
-    pChecksum->ChecksumData(&mUnidentified024.m_nAnimTurnAdjust, sizeof(mUnidentified024.m_nAnimTurnAdjust));
+    pChecksum->ChecksumData(&m_DetChar.m_eCharacterClass, sizeof(m_DetChar.m_eCharacterClass));
+    pChecksum->ChecksumData(&m_DetChar.m_eMovementState, sizeof(m_DetChar.m_eMovementState));
+    pChecksum->ChecksumData(&m_DetChar.m_bOnScreen, sizeof(m_DetChar.m_bOnScreen));
+    pChecksum->ChecksumData(&m_DetChar.m_v3Position, sizeof(m_DetChar.m_v3Position));
+    pChecksum->ChecksumData(&m_DetChar.m_v3Velocity, sizeof(m_DetChar.m_v3Velocity));
+    pChecksum->ChecksumData(&m_DetChar.m_aDesiredFacingDirection, sizeof(m_DetChar.m_aDesiredFacingDirection));
+    pChecksum->ChecksumData(&m_DetChar.m_aActualFacingDirection, sizeof(m_DetChar.m_aActualFacingDirection));
+    pChecksum->ChecksumData(&m_DetChar.m_aDesiredMovementDirection, sizeof(m_DetChar.m_aDesiredMovementDirection));
+    pChecksum->ChecksumData(&m_DetChar.m_aActualMovementDirection, sizeof(m_DetChar.m_aActualMovementDirection));
+    pChecksum->ChecksumData(&m_DetChar.m_fAccel, sizeof(m_DetChar.m_fAccel));
+    pChecksum->ChecksumData(&m_DetChar.m_fDecel, sizeof(m_DetChar.m_fDecel));
+    pChecksum->ChecksumData(&m_DetChar.m_fDesiredSpeed, sizeof(m_DetChar.m_fDesiredSpeed));
+    pChecksum->ChecksumData(&m_DetChar.m_fActualSpeed, sizeof(m_DetChar.m_fActualSpeed));
+    pChecksum->ChecksumData(&m_DetChar.m_nAnimTurnAdjust, sizeof(m_DetChar.m_nAnimTurnAdjust));
 }
 
 extern "C" void fn_8001FE80()
@@ -1814,7 +1814,7 @@ extern "C" void fn_8001FE80()
 extern "C" void fn_80020B8C(cFielder* pFielder)
 {
     pFielder->fn_80047240(pFielder,
-        (unsigned short)(pFielder->mUnidentified024.m_aActualFacingDirection + 0x8000),
+        (unsigned short)(pFielder->m_DetChar.m_aActualFacingDirection + 0x8000),
         0, false, false);
 }
 
@@ -1983,9 +1983,9 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                         && !pFielder->IsSuperGrowActive() && pEventData->pCharacter != pFielder)
                     {
                         nlVector3 v3Delta;
-                        nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->mUnidentified024.m_v3Position.x,
-                            pEventData->v3Position.y - pFielder->mUnidentified024.m_v3Position.y,
-                            pEventData->v3Position.z - pFielder->mUnidentified024.m_v3Position.z);
+                        nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->m_DetChar.m_v3Position.x,
+                            pEventData->v3Position.y - pFielder->m_DetChar.m_v3Position.y,
+                            pEventData->v3Position.z - pFielder->m_DetChar.m_v3Position.z);
                         float fDistance = nlVec3Length(v3Delta);
                         if (fDistance < pEventData->fRadius)
                         {
@@ -1995,7 +1995,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                             }
                             else
                             {
-                                pFielder->InitActionKnockdownReact(pFielder->mUnidentified024.m_v3Velocity);
+                                pFielder->InitActionKnockdownReact(pFielder->m_DetChar.m_v3Velocity);
                             }
                         }
                     }
@@ -2021,9 +2021,9 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                         && !pFielder->IsSuperGrowActive() && pEventData->pCharacter != pFielder)
                     {
                         nlVector3 v3Delta;
-                        nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->mUnidentified024.m_v3Position.x,
-                            pEventData->v3Position.y - pFielder->mUnidentified024.m_v3Position.y,
-                            pEventData->v3Position.z - pFielder->mUnidentified024.m_v3Position.z);
+                        nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->m_DetChar.m_v3Position.x,
+                            pEventData->v3Position.y - pFielder->m_DetChar.m_v3Position.y,
+                            pEventData->v3Position.z - pFielder->m_DetChar.m_v3Position.z);
                         float fDistance = nlVec3Length(v3Delta);
                         if (fDistance < pEventData->fRadius)
                         {
@@ -2040,9 +2040,9 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                 }
                 Goalie* pGoalie = pTeam->GetGoalie();
                 nlVector3 v3Delta;
-                nlVec3Set(v3Delta, pEventData->v3Position.x - pGoalie->mUnidentified024.m_v3Position.x,
-                            pEventData->v3Position.y - pGoalie->mUnidentified024.m_v3Position.y,
-                            pEventData->v3Position.z - pGoalie->mUnidentified024.m_v3Position.z);
+                nlVec3Set(v3Delta, pEventData->v3Position.x - pGoalie->m_DetChar.m_v3Position.x,
+                            pEventData->v3Position.y - pGoalie->m_DetChar.m_v3Position.y,
+                            pEventData->v3Position.z - pGoalie->m_DetChar.m_v3Position.z);
                 if (nlVec3LengthSquared(v3Delta) < pEventData->fRadius * pEventData->fRadius)
                 {
                     pGoalie->InitActionShockwaveReact();
@@ -2228,7 +2228,7 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     if (nlGetLengthSquared2D(pBall->m_v3Velocity.x, pBall->m_v3Velocity.y) < 0.01f)
     {
         MakePerpendicularPlane(pBall->m_v3Position,
-            (unsigned short)(pEventData->shell->mOwner->mUnidentified024.m_aActualFacingDirection + 0x4000), plane, 0.0f);
+            (unsigned short)(pEventData->shell->mOwner->m_DetChar.m_aActualFacingDirection + 0x4000), plane, 0.0f);
         nlVec3Scale(v3Velocity, *(const nlVector3*)&plane, 40.0f);
     }
     else
@@ -2270,7 +2270,7 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
             if (nlGetLengthSquared2D(pBall->m_v3Velocity.x, pBall->m_v3Velocity.y) < 0.01f)
             {
                 MakePerpendicularPlane(pBall->m_v3Position,
-                    (unsigned short)(pEventData->egg->mShooter->mUnidentified024.m_aActualFacingDirection + 0x4000), plane, 0.0f);
+                    (unsigned short)(pEventData->egg->mShooter->m_DetChar.m_aActualFacingDirection + 0x4000), plane, 0.0f);
                 nlVec3Scale(v3Velocity, *(const nlVector3*)&plane, 40.0f);
             }
             else
@@ -2313,7 +2313,7 @@ extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
             if (v3BallVelocity.GetLengthSq2D() < 0.01f)
             {
                 MakePerpendicularPlane(g_pBall->m_v3Position,
-                    (unsigned short)(g_pBall->m_pShooter->mUnidentified024.m_aActualFacingDirection + 0x4000), plane, 0.0f);
+                    (unsigned short)(g_pBall->m_pShooter->m_DetChar.m_aActualFacingDirection + 0x4000), plane, 0.0f);
                 nlVec3Scale(v3Velocity, *(const nlVector3*)&plane, 40.0f);
             }
             else
@@ -2321,7 +2321,7 @@ extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
                 nlVec3Set(v3Velocity, v3BallVelocity.y, -v3BallVelocity.x, 0.0f);
                 MakePerpendicularPlane(pEventData->pBall->m_v3Position, v3Velocity, plane, 0.0f);
             }
-            if (nlPlaneSide(pFielder->mUnidentified024.m_v3Position, plane) < 0.0f)
+            if (nlPlaneSide(pFielder->m_DetChar.m_v3Position, plane) < 0.0f)
             {
                 v3Velocity.x = -v3Velocity.x;
                 v3Velocity.y = -v3Velocity.y;
@@ -2330,7 +2330,7 @@ extern "C" void fn_80022280(UnidentifiedEventData16* pEventData)
             v3Velocity.y += v3BallVelocity.y;
             unsigned short aDirection = RadToAng16(nlATan2f(v3Velocity.y, v3Velocity.x));
             nlVector3 v3Position;
-            nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->mUnidentified024.m_v3Position);
+            nlVec3ScaleAdd(v3Position, 0.015f, v3Velocity, pFielder->m_DetChar.m_v3Position);
             pEventData->pFielder->SetPosition(v3Position);
             if (pEventData->pFielder->fn_80047240(pEventData->pBall->m_pPrevOwner, aDirection, 2, false, false))
             {
@@ -2462,13 +2462,13 @@ extern "C" void fn_80022824(cPlayer*)
                 {
                     pFielder->EndSuperPower(0);
                 }
-                else if (pFielder->mUnidentified024.m_eCharacterClass == 13
+                else if (pFielder->m_DetChar.m_eCharacterClass == 13
                     && pFielder->m_eActionState == ACTION_UNKNOWN_32)
                 {
                     pFielder->EndDesire();
                     pFielder->EndAction();
                 }
-                else if (pFielder->mUnidentified024.m_eCharacterClass == 19
+                else if (pFielder->m_DetChar.m_eCharacterClass == 19
                     && pFielder->m_eActionState == ACTION_UNKNOWN_32)
                 {
                     pFielder->EndDesire();
@@ -2576,20 +2576,20 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
             if (pFielder->IsSuperGrowActive())
             {
                 pFielder->InitActionShellReact(pEventData->mUnidentified08->mPosition,
-                    pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
+                    pEventData->mUnidentified04->m_DetChar.m_v3Velocity);
             }
             else if (pFielder->IsCharacterInAir(pEventData->mUnidentified08->mPhysics->GetRadius())
-                || (pFielder->m_eActionState == 0x1D && pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == WARIO)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == BOWSERJR)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == 13))
+                || (pFielder->m_eActionState == 0x1D && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
+                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == WARIO)
+                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
+                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == 13))
             {
                 pFielder->InitActionBombReact(pEventData->mUnidentified08->mPosition, 0.0f);
                 EmitTackleImpact(pFielder);
             }
             else
             {
-                pFielder->InitActionKnockdownReact(pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
+                pFielder->InitActionKnockdownReact(pEventData->mUnidentified04->m_DetChar.m_v3Velocity);
             }
         }
     }
@@ -2597,50 +2597,50 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
 
 void cCharacter::fn_80022D3C(float fParam0, float fParam1)
 {
-    mUnidentified1A4 = fParam0;
-    mUnidentified1AC = fParam1;
+    m_fMegaBlendRate = fParam0;
+    m_fMegaBlendTarget = fParam1;
     if (fParam0 == 0.0f)
     {
-        mUnidentified1A8 = fParam1;
+        m_fMegaBlend = fParam1;
     }
 }
 
 void cCharacter::fn_80022D58(float fDeltaT)
 {
-    mUnidentified1A8 += mUnidentified1A4 * fDeltaT;
-    if (mUnidentified1A4 > 0.0f && mUnidentified1A8 > mUnidentified1AC)
+    m_fMegaBlend += m_fMegaBlendRate * fDeltaT;
+    if (m_fMegaBlendRate > 0.0f && m_fMegaBlend > m_fMegaBlendTarget)
     {
-        mUnidentified1A8 = mUnidentified1AC;
+        m_fMegaBlend = m_fMegaBlendTarget;
     }
-    if (mUnidentified1A4 < 0.0f && mUnidentified1A8 < mUnidentified1AC)
+    if (m_fMegaBlendRate < 0.0f && m_fMegaBlend < m_fMegaBlendTarget)
     {
-        mUnidentified1A8 = mUnidentified1AC;
+        m_fMegaBlend = m_fMegaBlendTarget;
     }
 }
 
 void cCharacter::fn_80022DAC(unsigned long uTextureID)
 {
-    mUnidentified100 = uTextureID;
-    mUnidentified10C.value = glGetTextureManager()->GetTextureIndex(mUnidentified100);
+    m_uNormalTextureID = uTextureID;
+    m_ResolvedNormalTexture.value = glGetTextureManager()->GetTextureIndex(m_uNormalTextureID);
 }
 
 void cCharacter::fn_80022DE8(unsigned long uTextureID)
 {
-    mUnidentified104 = uTextureID;
-    mUnidentified110.value = glGetTextureManager()->GetTextureIndex(mUnidentified104);
+    m_uSwapTextureID = uTextureID;
+    m_ResolvedSwapTexture.value = glGetTextureManager()->GetTextureIndex(m_uSwapTextureID);
 }
 
 void cCharacter::fn_80022E24(unsigned long uTextureID)
 {
-    mUnidentified108 = uTextureID;
-    mUnidentified114.value = glGetTextureManager()->GetTextureIndex(mUnidentified108);
+    m_uShockTextureID = uTextureID;
+    m_ResolvedShockTexture.value = glGetTextureManager()->GetTextureIndex(m_uShockTextureID);
 }
 
 void cCharacter::fn_80022E60()
 {
     int i;
     glModelPacket* packet;
-    if (mUnidentified118)
+    if (m_bTexturesResolved)
     {
         return;
     }
@@ -2683,7 +2683,7 @@ void cCharacter::fn_80022E60()
             m_pSkinMesh[i]->m_Unknown0C = modelIndex;
         }
     }
-    mUnidentified118 = true;
+    m_bTexturesResolved = true;
 }
 
 

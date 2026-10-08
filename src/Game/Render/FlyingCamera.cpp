@@ -167,7 +167,7 @@ void UpdateFlyingCameras(float dt)
     else
     {
         shouldReset = false;
-        targetPosition = gFlyingCameraTarget->mUnidentified024.m_v3Position;
+        targetPosition = gFlyingCameraTarget->m_DetChar.m_v3Position;
         gFlyingCameraTargetPosition = targetPosition;
 
         if (gNextFlyingCameraFlashIndex < gFlyingCameraCount)
@@ -285,8 +285,8 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
 
     if (fielder != 0)
     {
-        initialPosition.x = fielder->mUnidentified024.m_v3Position.x;
-        initialPosition.y = fielder->mUnidentified024.m_v3Position.y;
+        initialPosition.x = fielder->m_DetChar.m_v3Position.x;
+        initialPosition.y = fielder->m_DetChar.m_v3Position.y;
     }
 
     for (unsigned int i = 0; i < (unsigned int)count; ++i)
@@ -327,7 +327,7 @@ void SetFlyingCameraTarget(cFielder* fielder)
     gFlyingCameraTarget = fielder;
     if (fielder != 0)
     {
-        gFlyingCameraTargetPosition = fielder->mUnidentified024.m_v3Position;
+        gFlyingCameraTargetPosition = fielder->m_DetChar.m_v3Position;
     }
 }
 

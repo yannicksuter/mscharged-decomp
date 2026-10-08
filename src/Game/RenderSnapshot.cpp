@@ -66,7 +66,7 @@ void RenderSnapshot::Initialize()
 
     for (int i = 0; i < 10; ++i)
     {
-        int value = g_pCharacters[i]->mUnidentified024.m_eCharacterClass;
+        int value = g_pCharacters[i]->m_DetChar.m_eCharacterClass;
         if (value == 8)
         {
             mFlags.raw |= 0x80000000;

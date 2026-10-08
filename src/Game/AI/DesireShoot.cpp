@@ -92,7 +92,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
 
     if (sWindupSkillshotRollPending)
     {
-        switch (m_pFielder->mUnidentified024.m_eCharacterClass)
+        switch (m_pFielder->m_DetChar.m_eCharacterClass)
         {
         case DAISY:
         case WALUIGI:
@@ -100,14 +100,14 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
         {
             float fSign = AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
             Goalie* pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-            float fGoalieX = fSign * pGoalie->mUnidentified024.m_v3Position.x;
-            if (fSign * m_pFielder->mUnidentified024.m_v3Position.x < fGoalieX
-                || (float)__fabs(m_pFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
+            float fGoalieX = fSign * pGoalie->m_DetChar.m_v3Position.x;
+            if (fSign * m_pFielder->m_DetChar.m_v3Position.x < fGoalieX
+                || (float)__fabs(m_pFielder->m_DetChar.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
             {
                 float fRange = m_pFielder->GetDekeDistance();
                 float fDistance = nlSqrt(nlVec3DistanceSquared2D(
-                    m_pFielder->mUnidentified024.m_v3Position,
-                    m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position), true);
+                    m_pFielder->m_DetChar.m_v3Position,
+                    m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->m_DetChar.m_v3Position), true);
                 pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
                 AvoidableObject* pAvoidable = m_pFielder->mUnidentified320;
                 if (0.25f + (fDistance + (pAvoidable->GetRadius()

@@ -469,7 +469,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         int side = NisPlayer::Instance()->mMegaStrikeSide == 0 ? 0 : 4;
         character = g_pCharacters[side];
         character->fn_80022D3C(value, direction ? 1.0f : 0.0f);
-        switch (character->mUnidentified024.m_eCharacterClass)
+        switch (character->m_DetChar.m_eCharacterClass)
         {
         case 5:
         case 6:
