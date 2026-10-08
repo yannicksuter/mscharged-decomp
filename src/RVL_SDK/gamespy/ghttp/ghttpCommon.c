@@ -28,10 +28,6 @@ unsigned short ghiProxyPort;
 int ghiThrottleBufferSize = 125;
 gsi_time ghiThrottleTimeDelay = 250;
 
-// Number of connections
-/////////////////////
-extern int ghiNumConnections;
-
 // Creates the ghttp lock.
 //////////////////////////
 void ghiCreateLock(void) {}
