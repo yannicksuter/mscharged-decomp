@@ -10,7 +10,7 @@
 #include "NL/gl/glStruct.h"
 #include "NL/nlLexicalCast.h"
 
-static float TEXT_TIME = 4.5f;
+static float sScrollWindowTraversalSeconds = 4.5f;
 static float sScrollTextBoxWidth = 8000.0f;
 
 FEScrollText::FEScrollText(int axis)
@@ -69,7 +69,7 @@ void FEScrollText::ApplyNewTextInstancePointer(TLTextInstance* controltext, int 
         SetMetrics(m_pos);
     }
 
-    m_scrollSpeed = (float)m_width / TEXT_TIME;
+    m_scrollSpeed = (float)m_width / sScrollWindowTraversalSeconds;
     if (IsWidescreen())
     {
         float aspectRatio = 854.0f / 640.0f;
