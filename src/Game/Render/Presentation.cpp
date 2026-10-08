@@ -235,7 +235,7 @@ void Presentation::UpdateAllowedToSkip()
     mSkipPermissionsUpdated = true;
 
     NetworkSessionControl& session = *g_pNetworkSessionBase;
-    if (session.GetSessionMode() == 0)
+    if (session.GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -337,7 +337,7 @@ void Presentation::Finish()
     if (strcmp("PlayHighlight", mCurrentFunction) == 0 || loopPresentation)
     {
         fadeToStrikerTimes = true;
-        if (g_pNetworkSessionBase->GetSessionMode() != 0)
+        if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL)
         {
             if (mHighlightsLeft > 0)
             {
@@ -935,7 +935,7 @@ void Presentation::OnGoalScored(GoalScoredData* data)
         }
     }
 
-    if (!scoreTied && g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (!scoreTied && g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -1006,7 +1006,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
         mIsAllowedToSkip[channel->mGlobalPadIndex] = true;
     }
 
-    if (!hasLocalPlayer && g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (!hasLocalPlayer && g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;
@@ -1137,7 +1137,7 @@ setupSkipVotes:
         }
     }
 
-    if (!hasLocalWinner && g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (!hasLocalWinner && g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         mIsAllowedToSkip[0] = true;
         mIsAllowedToSkip[1] = true;

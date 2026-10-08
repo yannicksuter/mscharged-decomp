@@ -420,7 +420,7 @@ void ChooseSidekicksSceneV2::Update(float dt)
         return;
     for (int i = 0; i < 4; ++i)
     {
-        if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
+        if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL && !IsLocalDraftPad(i))
         {
             GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             continue;
@@ -1091,7 +1091,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
         {
             pointer->SetActiveSlide("waiting", true, false);
         }
-        else if (g_pNetworkSessionBase->GetSessionMode() != 0 && !IsLocalDraftPad(i))
+        else if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL && !IsLocalDraftPad(i))
         {
             pointer->SetActiveSlide("waiting", true, false);
         }

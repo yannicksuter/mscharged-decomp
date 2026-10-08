@@ -476,7 +476,7 @@ bool NetworkRanking::ReportGameResult(int category,
 
 void NetworkRankingMeta::LoadLocal()
 {
-    if (g_pNetworkSessionBase->GetSessionMode() == 1)
+    if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LAN)
     {
         mDay = 1;
         mMonth = 1;

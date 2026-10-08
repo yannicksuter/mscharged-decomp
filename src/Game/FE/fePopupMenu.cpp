@@ -455,7 +455,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         WStr cupName;
         CupInterface* manager;
-        if (g_pNetworkSessionBase->GetSessionMode() != 0)
+        if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL)
             manager = NetTournManager::Instance();
         else
             manager = CupManager::Instance();

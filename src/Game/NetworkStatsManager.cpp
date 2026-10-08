@@ -225,7 +225,7 @@ void NetworkStatsManager::OnReservedStatsEvent()
 void NetworkStatsManager::ApplyLeaderboardToSave(
     NetworkLeaderboardCategory* leaderboard, bool updateProfile)
 {
-    if (g_pNetworkSessionBase->GetSessionMode() == 2)
+    if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
     {
         GameInfoSaveSlot* slot = GameInfoManager::GetInstance()->GetSaveSlot(gNetworkSaveSlotIndex);
         for (int i = 0; i < leaderboard->mCount; ++i)
@@ -575,7 +575,7 @@ int CalculateNetworkResultPoints(int result, bool home, int homeScore,
 void NetworkStatsManager::UpdateOnlineResultTotals(
     int result, bool home, int homeScore, int awayScore)
 {
-    if (g_pNetworkSessionBase->GetSessionMode() != 2)
+    if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_ONLINE)
     {
         return;
     }
@@ -961,7 +961,7 @@ void NetworkStatsManager::PreGameRestoreDefaultDisconnectLoss()
 
 bool NetworkStatsManager::RefreshRankings()
 {
-    if (mOperation == 0 && g_pNetworkSession->mLoginStage == 14)
+    if (mOperation == 0 && g_pNetworkSession->mLoginStage == NET_LOGIN_COMPLETE)
     {
         if (mStatsError)
             return false;
@@ -1032,7 +1032,7 @@ void NetworkStatsManager::Update(float dt)
     {
         return;
     }
-    if (g_pNetworkSession->mLoginStage != 14)
+    if (g_pNetworkSession->mLoginStage != NET_LOGIN_COMPLETE)
     {
         return;
     }

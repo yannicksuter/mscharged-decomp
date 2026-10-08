@@ -496,7 +496,7 @@ void FriendManager::Update(float dt)
     {
         return;
     }
-    if (g_pNetworkSessionBase->GetSessionState() != 2)
+    if (g_pNetworkSessionBase->GetSessionState() != NET_SESSION_MATCHMAKE)
     {
         return;
     }

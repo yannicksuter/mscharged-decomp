@@ -20,7 +20,7 @@ bool IsNetworkOrRecordedGame()
 {
     NetworkSessionControl& online = *g_pNetworkSessionBase;
     int mode = online.GetSessionMode();
-    if (mode == 1 || mode == 2)
+    if (mode == NET_MODE_LAN || mode == NET_MODE_ONLINE)
     {
         return true;
     }

@@ -268,7 +268,7 @@ void NetworkStartScene::SceneCreated()
     UpdatePlayer2Controls(this);
     mMenuItems.SetFlag(1);
     EnterState(mState);
-    g_pNetworkSessionBase->SetSessionState(2);
+    g_pNetworkSessionBase->SetSessionState(NET_SESSION_MATCHMAKE);
     g_pNetworkSessionBase->GetTransport()->SetLobbyListener(this);
     FEMusic::StartStreamIfDifferent(1);
 }
@@ -341,7 +341,7 @@ void NetworkStartScene::UpdateMenuInput()
         else if (g_pFEInput->JustPressed(FE_ALL_PADS, 31, true, 0))
         {
             GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
-            g_pNetworkSessionBase->SetSessionState(0);
+            g_pNetworkSessionBase->SetSessionState(NET_SESSION_NONE);
         }
     }
 }

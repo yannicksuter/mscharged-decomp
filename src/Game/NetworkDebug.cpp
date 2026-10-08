@@ -40,10 +40,10 @@ void NetworkSessionBase::DebugDraw()
         const char* mode = "None";
         switch (GetSessionMode())
         {
-        case 0:
+        case NET_MODE_LOCAL:
             mode = "Local";
             break;
-        case 1:
+        case NET_MODE_LAN:
             if (g_bDirectConnectMode)
             {
                 mode = "LAN_D";
@@ -53,7 +53,7 @@ void NetworkSessionBase::DebugDraw()
                 mode = "LAN";
             }
             break;
-        case 2:
+        case NET_MODE_ONLINE:
             mode = "INT";
             break;
         }

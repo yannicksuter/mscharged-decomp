@@ -17,6 +17,44 @@
 
 #include <dwc/dwc_main_fwd.h>
 
+enum eNetworkSessionMode
+{
+    NET_MODE_LOCAL = 0,
+    NET_MODE_LAN = 1,
+    NET_MODE_ONLINE = 2,
+};
+
+enum eNetworkSessionState
+{
+    NET_SESSION_NONE = 0,
+    NET_SESSION_LOGIN = 1,
+    NET_SESSION_MATCHMAKE = 2,
+    NET_SESSION_PRESTART = 3,
+    NET_SESSION_LOADING = 4,
+    NET_SESSION_IN_GAME = 5,
+    NET_SESSION_GAME_END = 6,
+};
+
+enum eNetworkLoginStage
+{
+    NET_LOGIN_IDLE = 0,
+    NET_LOGIN_CONNECTING = 1,
+    NET_LOGIN_AUTHENTICATED = 2,
+    NET_LOGIN_GET_INITIAL_FRIENDS_STATS = 3,
+    NET_LOGIN_PUT_FRIENDS_STATS = 4,
+    NET_LOGIN_GET_SEASON_STATS = 5,
+    NET_LOGIN_PUT_SEASON_STATS = 6,
+    NET_LOGIN_REFRESH_SEASON_STATS = 7,
+    NET_LOGIN_GET_DAILY_STATS = 8,
+    NET_LOGIN_PUT_DAILY_STATS = 9,
+    NET_LOGIN_REFRESH_DAILY_STATS = 10,
+    NET_LOGIN_GET_FRIENDS_STATS = 11,
+    NET_LOGIN_GET_TOP_DAILY_STATS = 12,
+    NET_LOGIN_GET_TOP_SEASON_STATS = 13,
+    NET_LOGIN_COMPLETE = 14,
+    NET_LOGIN_FAILED = 15,
+};
+
 class NetMessageDraft;
 struct NetworkDraftMachineInfo;
 class NetworkSocket;
@@ -481,8 +519,8 @@ public:
     /* 0x2438 */ float mElapsedTime;
     /* 0x243C */ u32 mUpdateCount;
     /* 0x2440 */ u32 mLastTicker;
-    /* 0x2444 */ int mSessionMode;
-    /* 0x2448 */ int mSessionState;
+    /* 0x2444 */ eNetworkSessionMode mSessionMode;
+    /* 0x2448 */ eNetworkSessionState mSessionState;
     /* 0x244C */ int mGameEndReason;
     /* 0x2450 */ NetworkSocket* mDirectSocket;
     /* 0x2454 */ LANLobby* mTransport;
@@ -507,7 +545,7 @@ public:
     /* 0x248C */ DWCErrorType mDWCErrorType;
     /* 0x2490 */ int mDWCLastError;
     /* 0x2494 */ u8 mFriendsMatchProcessingSuspended;
-    /* 0x2498 */ int mLoginStage;
+    /* 0x2498 */ eNetworkLoginStage mLoginStage;
     /* 0x249C */ NetworkLoginListener* mLoginListener;
     /* 0x24A0 */ float mLoginStartTime;
     /* 0x24A4 */ u8 mLoginRequestStarted;

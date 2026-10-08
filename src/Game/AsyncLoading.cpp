@@ -1704,7 +1704,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
     gDispatchEventsTask->dispatcher.Dispatch(true);
-    if (g_pNetworkSessionBase->GetSessionMode() == 0)
+    if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
     {
         if (gNetworkInputRecording->mPlaybackEnabled)
         {

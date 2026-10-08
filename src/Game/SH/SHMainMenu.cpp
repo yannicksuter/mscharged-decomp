@@ -135,7 +135,7 @@ void SHMainMenu::SceneCreated()
     {
         mMenuArrows[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(mMenuItemInstances[i]->GetActiveSlide(), "arrows");
     }
-    if (g_pNetworkSessionBase->GetSessionMode() != 0)
+    if (g_pNetworkSessionBase->GetSessionMode() != NET_MODE_LOCAL)
     {
         g_pNetworkSessionBase->Shutdown();
     }
@@ -406,7 +406,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     {
         GameInfoManager::Instance()->mIsOnlineMode = true;
         GameSceneManager::Instance()->Pop();
-        if (g_pNetworkSessionBase->GetSessionMode() == 0)
+        if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_LOCAL)
         {
             gNextFETransition = "TransitionMainMenuToOnlineMatch";
         }

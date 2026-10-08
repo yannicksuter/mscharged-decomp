@@ -260,7 +260,7 @@ void InitializeOnlineMatch(bool twoLocalPlayers, unsigned char tournament, bool 
         gOnlineLocalControllerIndices[0] = gFEControllerIndex;
         gOnlineLocalControllerIndices[1] = -1;
     }
-    else if (g_pNetworkSession->GetSessionMode() == 1)
+    else if (g_pNetworkSession->GetSessionMode() == NET_MODE_LAN)
     {
         gOnlineLocalControllerIndices[0] = 0;
         gOnlineLocalControllerIndices[1] = 1;
@@ -315,7 +315,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
     {
     case ButtonOneLocalPlayer:
         InitializeOnlineMatch(false, false, mMode == ModeRanked);
-        if (g_pNetworkSession->GetSessionMode() == 2)
+        if (g_pNetworkSession->GetSessionMode() == NET_MODE_ONLINE)
         {
             if (mMode == ModeRanked)
             {
@@ -333,7 +333,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
         break;
     case ButtonTwoLocalPlayers:
         InitializeOnlineMatch(true, false, mMode == ModeRanked);
-        if (g_pNetworkSession->GetSessionMode() == 2)
+        if (g_pNetworkSession->GetSessionMode() == NET_MODE_ONLINE)
         {
             mNextScene = SCENE_ONLINE_GUEST_CONTROLLER_SELECT;
         }

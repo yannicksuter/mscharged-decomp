@@ -95,9 +95,9 @@ void NetworkSession::Initialize(bool first)
     {
         this->InitializeMachines(1, 4);
 
-        mSessionMode = 0;
-        mSessionState = 0;
-        mLoginStage = 0;
+        mSessionMode = NET_MODE_LOCAL;
+        mSessionState = NET_SESSION_NONE;
+        mLoginStage = NET_LOGIN_IDLE;
         mGameEndReason = 0;
         mDirectSocket = 0;
         mTransport = 0;
@@ -548,7 +548,7 @@ void NetworkSession::Update()
     mLastTicker = ticker;
     mUpdateCount++;
 
-    if (mSessionMode == 1)
+    if (mSessionMode == NET_MODE_LAN)
     {
         mDirectSocket->Update(dt);
         mTransport->Update(dt);
@@ -587,9 +587,9 @@ void NetworkSession::Update()
             }
         }
     }
-    else if (mSessionMode == 2)
+    else if (mSessionMode == NET_MODE_ONLINE)
     {
-        if (mSessionState != 0 && mFriendsMatchProcessingSuspended == 0
+        if (mSessionState != NET_SESSION_NONE && mFriendsMatchProcessingSuspended == 0
             && !mLobby->mMatchmakingThreadRunning)
         {
             DWC_ProcessFriendsMatch();
@@ -603,7 +603,7 @@ void NetworkSession::Update()
         mRankingReporter->Update();
         NetworkStatsManager::Instance()->Update(dt);
 
-        if (GetSessionState() == 1)
+        if (GetSessionState() == NET_SESSION_LOGIN)
         {
             UpdateLogin();
         }
@@ -638,7 +638,7 @@ void NetworkSession::InitializeLAN()
         return;
     }
 
-    mSessionMode = 1;
+    mSessionMode = NET_MODE_LAN;
     gNetworkMessageRegistry->RegisterReceiver(NETMSG_GAME_START, this);
     gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME, this);
     gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME_CLIENT, this);
@@ -683,7 +683,7 @@ void NetworkSession::ShutdownLAN()
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_REQUEST);
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_RESPONSE);
 
-    mSessionMode = 0;
+    mSessionMode = NET_MODE_LOCAL;
 }
 
 void NetworkSession::InitializeOnline()
@@ -708,7 +708,7 @@ void NetworkSession::InitializeOnline()
     DWC_Init(DWC_SVR_RELEASE, "mschargedwii", gameCode, NetworkAlloc, NetworkFree);
     DWC_SetReportLevel(0);
     mDWCInitialized = 1;
-    mSessionMode = 2;
+    mSessionMode = NET_MODE_ONLINE;
 
     gNetworkMessageRegistry->RegisterReceiver(NETMSG_GAME_START, this);
     gNetworkMessageRegistry->RegisterReceiver(NETMSG_LOADED_GAME, this);
@@ -812,8 +812,8 @@ bool NetworkSession::StartLogin()
 {
     GameInfoManager* gameInfo;
 
-    SetSessionState(true);
-    mLoginStage = 1;
+    SetSessionState(NET_SESSION_LOGIN);
+    mLoginStage = NET_LOGIN_CONNECTING;
     mLoginStartTime = 0.0f;
     gOnlineLoginStarted = 1;
 
@@ -863,14 +863,14 @@ void NetworkSession::DWCLoginCallback(
     tDebugPrintManager::Print(DC_NETWORK, "DWCLoginCallback returned %d, profileID %d param %d\n", error,
         profileID, param);
 
-    if (mLoginStage != 1)
+    if (mLoginStage != NET_LOGIN_CONNECTING)
     {
         tDebugPrintManager::Print(DC_NETWORK, "DWCLoginCallback ignored because in stage %d\n",
             mLoginStage);
         return;
     }
 
-    mLoginStage = 2;
+    mLoginStage = NET_LOGIN_AUTHENTICATED;
     if (error != 0)
     {
         if (param == 0)
@@ -896,12 +896,12 @@ void NetworkSession::DWCLoginCallback(
 
 bool NetworkSession::RequestLoginRankings()
 {
-    (mSessionMode == 2 ? mRankingReporter : 0)->InitializeRanking();
+    (mSessionMode == NET_MODE_ONLINE ? mRankingReporter : 0)->InitializeRanking();
 
     bool started;
     if (NetworkStatsManager::Instance()->UsesEuropeanRankings())
     {
-        mLoginStage = 3;
+        mLoginStage = NET_LOGIN_GET_INITIAL_FRIENDS_STATS;
         if (!NetworkStatsManager::Instance()->RequestRankings(4))
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting friends stats\n");
@@ -914,7 +914,7 @@ bool NetworkSession::RequestLoginRankings()
     }
     else
     {
-        mLoginStage = 5;
+        mLoginStage = NET_LOGIN_GET_SEASON_STATS;
         if (!NetworkStatsManager::Instance()->RequestRankings(2))
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
@@ -937,18 +937,18 @@ bool NetworkSession::RequestLoginRankings()
 
 void NetworkSession::RequestLoginNearbySeasonRankingsAgain()
 {
-    mLoginStage = 7;
+    mLoginStage = NET_LOGIN_REFRESH_SEASON_STATS;
     if (!NetworkStatsManager::Instance()->RequestRankings(2))
     {
         tDebugPrintManager::Print(DC_NETWORK, "Error REgetting nearby stats\n");
         mLoginListener->OnStatsResult(false);
-        mLoginStage = 0xF;
+        mLoginStage = NET_LOGIN_FAILED;
     }
 }
 
 void NetworkSession::RequestLoginNearbyDailyRankings()
 {
-    mLoginStage = 8;
+    mLoginStage = NET_LOGIN_GET_DAILY_STATS;
     tDebugPrintManager::Print(DC_NETWORK,
         "Login: Transition to "
         "ELoggingInStage_GettingSODNearbyStats\n");
@@ -958,13 +958,13 @@ void NetworkSession::RequestLoginNearbyDailyRankings()
             "Initial failure to RequestRankings "
             "STRIKER_OF_DAY Nearby\n");
         mLoginListener->OnStatsResult(false);
-        mLoginStage = 0xF;
+        mLoginStage = NET_LOGIN_FAILED;
     }
 }
 
 void NetworkSession::RequestLoginNearbyDailyRankingsAgain()
 {
-    mLoginStage = 0xA;
+    mLoginStage = NET_LOGIN_REFRESH_DAILY_STATS;
     tDebugPrintManager::Print(DC_NETWORK,
         "Login: Transition to "
         "ELoggingInStage_ReGettingSODNearbyStats\n");
@@ -974,45 +974,45 @@ void NetworkSession::RequestLoginNearbyDailyRankingsAgain()
             "Initial failure to RE-RequestRankings STRIKER_OF_DAY "
             "Nearby\n");
         mLoginListener->OnStatsResult(false);
-        mLoginStage = 0xF;
+        mLoginStage = NET_LOGIN_FAILED;
     }
 }
 
 void NetworkSession::RequestLoginFriendsSeasonRankings()
 {
-    mLoginStage = 0xB;
+    mLoginStage = NET_LOGIN_GET_FRIENDS_STATS;
     if (!NetworkStatsManager::Instance()->RequestRankings(4))
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Initial failure to RequestRankings SEASON "
             "FRIENDS\n");
         mLoginListener->OnStatsResult(false);
-        mLoginStage = 0xF;
+        mLoginStage = NET_LOGIN_FAILED;
     }
 }
 
 void NetworkSession::RequestLoginTopDailyRankings()
 {
-    mLoginStage = 0xC;
+    mLoginStage = NET_LOGIN_GET_TOP_DAILY_STATS;
     if (!NetworkStatsManager::Instance()->RequestRankings(1))
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Initial failure to RequestRankings "
             "STRIKER_OF_DAY TOP\n");
         mLoginListener->OnStatsResult(false);
-        mLoginStage = 0xF;
+        mLoginStage = NET_LOGIN_FAILED;
     }
 }
 
 void NetworkSession::RequestLoginTopSeasonRankings()
 {
-    mLoginStage = 0xD;
+    mLoginStage = NET_LOGIN_GET_TOP_SEASON_STATS;
     if (!NetworkStatsManager::Instance()->RequestRankings(3))
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Initial failure to RequestRankings SEASON TOP\n");
         mLoginListener->OnStatsResult(false);
-        mLoginStage = 0xF;
+        mLoginStage = NET_LOGIN_FAILED;
     }
 }
 
@@ -1023,14 +1023,14 @@ void NetworkSession::UpdateLogin()
     {
         switch (mLoginStage)
         {
-        case 1:
-        case 2:
-        case 0xE:
-        case 0xF:
+        case NET_LOGIN_CONNECTING:
+        case NET_LOGIN_AUTHENTICATED:
+        case NET_LOGIN_COMPLETE:
+        case NET_LOGIN_FAILED:
             break;
         default:
             tDebugPrintManager::Print(DC_NETWORK, "Aborting Getting Stats in Login Timed out!\n");
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
             mLoginListener->OnStatsResult(false);
             break;
         }
@@ -1039,7 +1039,7 @@ void NetworkSession::UpdateLogin()
 
     switch (mLoginStage)
     {
-    case 1:
+    case NET_LOGIN_CONNECTING:
         if (mDWCLastError == 0)
         {
             int error = DWC_GetLastErrorEx(&mDWCErrorCode, &mDWCErrorType);
@@ -1058,7 +1058,7 @@ void NetworkSession::UpdateLogin()
         }
         break;
 
-    case 3:
+    case NET_LOGIN_GET_INITIAL_FRIENDS_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1073,7 +1073,7 @@ void NetworkSession::UpdateLogin()
                     tDebugPrintManager::Print(DC_NETWORK,
                         "Starting new friends season clearing stats\n");
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(2, 0);
-                    mLoginStage = 4;
+                    mLoginStage = NET_LOGIN_PUT_FRIENDS_STATS;
                 }
                 else if (gNetworkMiiChanged != 0)
                 {
@@ -1081,11 +1081,11 @@ void NetworkSession::UpdateLogin()
                         "Detected Mii change putting friends unchanged "
                         "win/loss stats\n");
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(2, 1);
-                    mLoginStage = 4;
+                    mLoginStage = NET_LOGIN_PUT_FRIENDS_STATS;
                 }
                 else
                 {
-                    mLoginStage = 5;
+                    mLoginStage = NET_LOGIN_GET_SEASON_STATS;
                     if (!NetworkStatsManager::Instance()->RequestRankings(2))
                     {
                         tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
@@ -1098,26 +1098,26 @@ void NetworkSession::UpdateLogin()
                     "Login: Did not get own friends stats, first time user "
                     "will now put new own stats\n");
                 NetworkStatsManager::Instance()->PostResetMyPlayerStats(2, 0);
-                mLoginStage = 4;
+                mLoginStage = NET_LOGIN_PUT_FRIENDS_STATS;
             }
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting friends stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 4:
+    case NET_LOGIN_PUT_FRIENDS_STATS:
         if (NetworkStatsManager::Instance()->mScoreRequestComplete == 0)
         {
             break;
         }
         if (NetworkStatsManager::Instance()->mScoreRequestSucceeded != 0)
         {
-            mLoginStage = 5;
+            mLoginStage = NET_LOGIN_GET_SEASON_STATS;
             if (!NetworkStatsManager::Instance()->RequestRankings(2))
             {
                 tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats\n");
@@ -1130,12 +1130,12 @@ void NetworkSession::UpdateLogin()
                 "Error finishing PostResetMyPlayerStats pers cat %d login\n",
                 NetworkStatsManager::Instance()->mScoreCategory);
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
-    case 5:
+    case NET_LOGIN_GET_SEASON_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1150,7 +1150,7 @@ void NetworkSession::UpdateLogin()
                     tDebugPrintManager::Print(DC_NETWORK, "Starting new season clearing stats\n");
                     NetworkStatsManager::Instance()->CommitPendingOnlineTotals(record);
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(0, 0);
-                    mLoginStage = 6;
+                    mLoginStage = NET_LOGIN_PUT_SEASON_STATS;
                 }
                 else if (gNetworkMiiChanged != 0)
                 {
@@ -1158,7 +1158,7 @@ void NetworkSession::UpdateLogin()
                         "Detected Mii change putting own unchanged win/loss "
                         "stats\n");
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(0, 1);
-                    mLoginStage = 6;
+                    mLoginStage = NET_LOGIN_PUT_SEASON_STATS;
                 }
                 else
                 {
@@ -1171,19 +1171,19 @@ void NetworkSession::UpdateLogin()
                     "Login: Did not get own stats, first time user will now "
                     "put new own stats\n");
                 NetworkStatsManager::Instance()->PostResetMyPlayerStats(0, 0);
-                mLoginStage = 6;
+                mLoginStage = NET_LOGIN_PUT_SEASON_STATS;
             }
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting nearby stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 6:
+    case NET_LOGIN_PUT_SEASON_STATS:
         if (NetworkStatsManager::Instance()->mScoreRequestComplete == 0)
         {
             break;
@@ -1198,12 +1198,12 @@ void NetworkSession::UpdateLogin()
                 "Error finishing PostResetMyPlayerStats pers cat %d login\n",
                 NetworkStatsManager::Instance()->mScoreCategory);
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
-    case 7:
+    case NET_LOGIN_REFRESH_SEASON_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1216,12 +1216,12 @@ void NetworkSession::UpdateLogin()
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error REgetting nearby stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 8:
+    case NET_LOGIN_GET_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1235,7 +1235,7 @@ void NetworkSession::UpdateLogin()
                 {
                     tDebugPrintManager::Print(DC_NETWORK, "Starting new day clearing stats\n");
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(1, 0);
-                    mLoginStage = 9;
+                    mLoginStage = NET_LOGIN_PUT_DAILY_STATS;
                 }
                 else if (gNetworkMiiChanged != 0)
                 {
@@ -1243,7 +1243,7 @@ void NetworkSession::UpdateLogin()
                         "Detected Mii change putting SOD unchanged win/loss "
                         "stats\n");
                     NetworkStatsManager::Instance()->PostResetMyPlayerStats(1, 1);
-                    mLoginStage = 9;
+                    mLoginStage = NET_LOGIN_PUT_DAILY_STATS;
                 }
                 else if (!NetworkStatsManager::Instance()->UsesEuropeanRankings())
                 {
@@ -1260,19 +1260,19 @@ void NetworkSession::UpdateLogin()
                     "Login: Did not get own SOD stats, first time user will "
                     "now put new own SOD stats\n");
                 NetworkStatsManager::Instance()->PostResetMyPlayerStats(1, 0);
-                mLoginStage = 9;
+                mLoginStage = NET_LOGIN_PUT_DAILY_STATS;
             }
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting SOD nearbystats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 9:
+    case NET_LOGIN_PUT_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mScoreRequestComplete == 0)
         {
             break;
@@ -1287,12 +1287,12 @@ void NetworkSession::UpdateLogin()
                 "Error finishing PostResetMyPlayerStats pers cat %d login\n",
                 NetworkStatsManager::Instance()->mScoreCategory);
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mScoreRequestComplete = 0;
         break;
 
-    case 0xA:
+    case NET_LOGIN_REFRESH_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1312,12 +1312,12 @@ void NetworkSession::UpdateLogin()
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error REgetting SOD Nearby stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 0xB:
+    case NET_LOGIN_GET_FRIENDS_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1330,12 +1330,12 @@ void NetworkSession::UpdateLogin()
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting SEASON FRIENDS stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 0xC:
+    case NET_LOGIN_GET_TOP_DAILY_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
@@ -1348,20 +1348,20 @@ void NetworkSession::UpdateLogin()
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting SOD TOP stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 0xD:
+    case NET_LOGIN_GET_TOP_SEASON_STATS:
         if (NetworkStatsManager::Instance()->mLeaderboardRequestComplete == 0)
         {
             break;
         }
         if (NetworkStatsManager::Instance()->mLeaderboardRequestSucceeded != 0)
         {
-            mLoginStage = 0xE;
-            g_pNetworkSession->SetSessionState(2);
+            mLoginStage = NET_LOGIN_COMPLETE;
+            g_pNetworkSession->SetSessionState(NET_SESSION_MATCHMAKE);
             mLoginListener->OnStatsResult(true);
             NetworkStatsManager::Instance()->RefreshFriendCount();
             gNetworkMiiChanged = 0;
@@ -1370,13 +1370,13 @@ void NetworkSession::UpdateLogin()
         {
             tDebugPrintManager::Print(DC_NETWORK, "Error getting SEASON TOP stats at login\n");
             mLoginListener->OnStatsResult(false);
-            mLoginStage = 0xF;
+            mLoginStage = NET_LOGIN_FAILED;
         }
         NetworkStatsManager::Instance()->mLeaderboardRequestComplete = 0;
         break;
 
-    case 0xE:
-    case 0xF:
+    case NET_LOGIN_COMPLETE:
+    case NET_LOGIN_FAILED:
         break;
     }
 }
@@ -1419,24 +1419,24 @@ void NetworkSession::ShutdownOnline()
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_ALL_INPUTS_BUNDLE);
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_REQUEST);
     gNetworkMessageRegistry->UnregisterReceiver(NETMSG_PAUSE_RESPONSE);
-    mSessionMode = 0;
+    mSessionMode = NET_MODE_LOCAL;
 }
 
 void NetworkSession::Shutdown()
 {
     switch (mSessionMode)
     {
-    case 0:
+    case NET_MODE_LOCAL:
         break;
-    case 2:
+    case NET_MODE_ONLINE:
         ShutdownOnline();
         break;
-    case 1:
+    case NET_MODE_LAN:
         ShutdownLAN();
         break;
     }
-    mSessionMode = 0;
-    mSessionState = 0;
+    mSessionMode = NET_MODE_LOCAL;
+    mSessionState = NET_SESSION_NONE;
 }
 
 int NetworkSession::GetSessionMode()
@@ -1451,7 +1451,7 @@ int NetworkSession::GetSessionState()
 
 void NetworkSession::SetSessionState(int phase)
 {
-    mSessionState = phase;
+    mSessionState = static_cast<eNetworkSessionState>(phase);
 }
 
 NetworkSocket* NetworkSession::GetDirectSocket()
@@ -1461,11 +1461,11 @@ NetworkSocket* NetworkSession::GetDirectSocket()
 
 NetworkMachineRoster* NetworkSession::GetMachineRoster()
 {
-    if (mSessionMode == 2)
+    if (mSessionMode == NET_MODE_ONLINE)
     {
         return mLobby;
     }
-    if (mSessionMode == 1)
+    if (mSessionMode == NET_MODE_LAN)
     {
         return mTransport;
     }
@@ -1474,7 +1474,7 @@ NetworkMachineRoster* NetworkSession::GetMachineRoster()
 
 LANLobby* NetworkSession::GetTransport()
 {
-    if (mSessionMode == 1)
+    if (mSessionMode == NET_MODE_LAN)
     {
         return mTransport;
     }
@@ -1483,7 +1483,7 @@ LANLobby* NetworkSession::GetTransport()
 
 NetworkLobby* NetworkSession::GetOnlineLobby()
 {
-    if (mSessionMode == 2)
+    if (mSessionMode == NET_MODE_ONLINE)
     {
         return mLobby;
     }
@@ -1492,11 +1492,11 @@ NetworkLobby* NetworkSession::GetOnlineLobby()
 
 NetworkStatsInterface* NetworkSession::GetStatsInterface()
 {
-    if (mSessionMode == 2)
+    if (mSessionMode == NET_MODE_ONLINE)
     {
         return mRankingReporter;
     }
-    if (mSessionMode == 1)
+    if (mSessionMode == NET_MODE_LAN)
     {
         return mStatsReporter;
     }
@@ -1505,7 +1505,7 @@ NetworkStatsInterface* NetworkSession::GetStatsInterface()
 
 NetworkStatsReporter* NetworkSession::GetStatsReporter()
 {
-    if (mSessionMode == 1)
+    if (mSessionMode == NET_MODE_LAN)
     {
         return mStatsReporter;
     }
@@ -1514,7 +1514,7 @@ NetworkStatsReporter* NetworkSession::GetStatsReporter()
 
 NetworkRanking* NetworkSession::GetRankingReporter()
 {
-    if (mSessionMode == 2)
+    if (mSessionMode == NET_MODE_ONLINE)
     {
         return mRankingReporter;
     }
@@ -1703,7 +1703,7 @@ int NetworkSession::ProcessMessage(
         {
             StartNetworkedGame((NetMessageGameStart*)message);
         }
-        mSessionState = 4;
+        mSessionState = NET_SESSION_LOADING;
         GameSceneManager::Instance()->PopToScene((SceneList)0x1D);
         for (int component = 0; component < 4; ++component)
         {
@@ -1757,7 +1757,7 @@ int NetworkSession::ProcessMessage(
 
     case NETMSG_CHECK_CONNECTION:
     {
-        mSessionState = 3;
+        mSessionState = NET_SESSION_PRESTART;
         GetMachineRoster()->OnGameStarted();
         if (IsOnlineRankedMatch())
         {
@@ -1799,7 +1799,7 @@ int NetworkSession::ProcessMessage(
             mMachineLoadedGame[index] = 1;
         }
         RegisterLoadedGameActions(this);
-        mSessionState = 5;
+        mSessionState = NET_SESSION_IN_GAME;
         break;
     }
 
@@ -1817,7 +1817,7 @@ int NetworkSession::ProcessMessage(
                 (u8)message->GetType(), message->mSource);
             break;
         }
-        if (mSessionState != 5)
+        if (mSessionState != NET_SESSION_IN_GAME)
         {
             tDebugPrintManager::Print(DC_NETWORK, "Ignoring GameInput Message because in network stage %d",
                 mSessionState);
@@ -1851,7 +1851,7 @@ int NetworkSession::ProcessMessage(
                 (u8)message->GetType(), message->mSource);
             break;
         }
-        if (mSessionState != 5)
+        if (mSessionState != NET_SESSION_IN_GAME)
         {
             tDebugPrintManager::Print(DC_NETWORK, "Ignoring GameInput Message because in network stage %d",
                 mSessionState);
@@ -2216,7 +2216,7 @@ void PlaybackRecordedGame()
 void NetworkSession::EndNetworkedGame(int reason)
 {
     mGameEndReason = reason;
-    mSessionState = 6;
+    mSessionState = NET_SESSION_GAME_END;
     DisconnectEventOwner(&mPauseEventOwner);
     DisconnectEventOwner(&mResumingEventOwner);
 
@@ -2234,7 +2234,7 @@ void NetworkSession::EndNetworkedGame(int reason)
         }
     }
 
-    if (GetSessionMode() == 2)
+    if (GetSessionMode() == NET_MODE_ONLINE)
     {
         NetworkStatsManager::Instance()->BeginOnlineGame();
     }
@@ -2274,7 +2274,7 @@ int NetworkSession::Send(
 
 int NetworkSession::IsLiveNetworkGame()
 {
-    if (GetSessionMode() == 0)
+    if (GetSessionMode() == NET_MODE_LOCAL)
     {
         return 0;
     }
@@ -2283,7 +2283,7 @@ int NetworkSession::IsLiveNetworkGame()
 
 int NetworkSession::PollGameLoaded()
 {
-    if (mSessionState == 5)
+    if (mSessionState == NET_SESSION_IN_GAME)
     {
         return 1;
     }
@@ -2332,7 +2332,7 @@ int NetworkSession::PollGameLoaded()
 
     if (mOverlayRequest != 3)
     {
-        mSessionState = 5;
+        mSessionState = NET_SESSION_IN_GAME;
         RegisterLoadedGameActions(this);
         return 1;
     }
@@ -2359,7 +2359,7 @@ int NetworkSession::PollGameLoaded()
             Send(target, buffer, size, true);
         }
     }
-    mSessionState = 5;
+    mSessionState = NET_SESSION_IN_GAME;
     RegisterLoadedGameActions(this);
     return 1;
 }
@@ -2380,7 +2380,7 @@ u8 NetworkSession::GetPausedMachineMask()
 void NetworkSession::NotifyGameLoaded()
 {
     int ready;
-    if (GetSessionMode() == 0)
+    if (GetSessionMode() == NET_MODE_LOCAL)
     {
         ready = 0;
     }
@@ -2391,7 +2391,7 @@ void NetworkSession::NotifyGameLoaded()
 
     if (ready == 0)
     {
-        mSessionState = 5;
+        mSessionState = NET_SESSION_IN_GAME;
         RegisterLoadedGameActions(this);
         return;
     }
@@ -2426,7 +2426,7 @@ void NetworkSession::NotifyGameLoaded()
 
 void NetworkSession::SetTournamentMode(u8 value)
 {
-    NetworkLobby* lobby = mSessionMode == 2 ? mLobby : 0;
+    NetworkLobby* lobby = mSessionMode == NET_MODE_ONLINE ? mLobby : 0;
     if (lobby != 0)
     {
         lobby->mTournamentMode = value;
@@ -2482,7 +2482,7 @@ void NetworkSession::OnGameConnectionLost(u32 connection, int reason)
 {
     switch (GetSessionState())
     {
-    case 3:
+    case NET_SESSION_PRESTART:
         if (IsConnectedPeer(connection))
         {
             if (NetworkStatsManager::Instance()->ShouldRestoreDefaultDisconnectLoss())
@@ -2497,7 +2497,7 @@ void NetworkSession::OnGameConnectionLost(u32 connection, int reason)
         }
         break;
 
-    case 5:
+    case NET_SESSION_IN_GAME:
         if (IsConnectedPeer(connection))
         {
             NetworkStatsManager::Instance()->CalculateAndReportGameResult(4);
@@ -2510,15 +2510,15 @@ void NetworkSession::OnGameConnectionLost(u32 connection, int reason)
         }
         break;
 
-    case 6:
+    case NET_SESSION_GAME_END:
         tDebugPrintManager::Print(DC_NETWORK,
             "WARNING: Ignored Connection Lost Stage "
             "ENetworkStage_GameEnded\n");
         break;
 
-    case 1:
-    case 2:
-    case 4:
+    case NET_SESSION_LOGIN:
+    case NET_SESSION_MATCHMAKE:
+    case NET_SESSION_LOADING:
         break;
 
     default:
@@ -2531,13 +2531,13 @@ void NetworkSession::OnGameConnectionLost(u32 connection, int reason)
 
 void NetworkSession::DisconnectOnlineMatch()
 {
-    if (GetSessionMode() == 2)
+    if (GetSessionMode() == NET_MODE_ONLINE)
     {
         if (NetworkStatsManager::Instance() != 0)
         {
             NetworkStatsManager::Instance()->MarkDisconnectPending();
         }
-        NetworkLobby* lobby = mSessionMode == 2 ? mLobby : 0;
+        NetworkLobby* lobby = mSessionMode == NET_MODE_ONLINE ? mLobby : 0;
         lobby->CloseConnections();
     }
 }
