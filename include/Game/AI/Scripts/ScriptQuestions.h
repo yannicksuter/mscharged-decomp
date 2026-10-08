@@ -110,6 +110,15 @@ float InBetweenMyNetAnd(cFielder* pFielder, cFielder* pOtherFielder);
 float NearToFormationPosition(cFielder* pFielder);
 float InFrontOfTheirNet(cFielder* pFielder);
 float PositionIsInFrontOfNet(const nlVector3& v3Position, const cNet* pNet);
+float PositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
+    cPlayer* pCurrentPlayer, const nlVector2* vOpenRadius, bool bIgnoreIncapacitated,
+    float fPredictionTime);
+float WidePositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
+    cPlayer* pCurrentPlayer, bool bIgnoreIncapacitated, float fPredictionTime);
+float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
+    float fMin, float fMax);
+float PositionShotDistance(const nlVector3& vPosition, const nlVector3& vOffNetPosition,
+    float fShooting);
 float GoalieOutOfPosition(cFielder* pFielder);
 float LikelyToScore(cFielder* pFielder);
 float PlayerShotDistance(cFielder* pFielder);
