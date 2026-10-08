@@ -6717,7 +6717,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     g_pGame->ResetPowerups(false);
     gNPCManager->ResetNPCs();
     SetGoalieAction(GOALIEACTION_MEGA_STRIKE, 0);
-    if (gPeachPhotoState.state == 1)
+    if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
     {
         EndPeachPhoto(&gPeachPhotoState, true);
     }

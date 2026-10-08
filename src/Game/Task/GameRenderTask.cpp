@@ -333,7 +333,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
         {
         case 8:
         case 0x10:
-            if (gPeachPhotoState.state == 1)
+            if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
             {
                 EndPeachPhoto(&gPeachPhotoState, true);
             }

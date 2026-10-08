@@ -348,7 +348,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     GLSkinMesh* skinMesh;
     int characterClass = source.m_DetChar.m_eCharacterClass;
     int view = g_nCharacterView;
-    if (gPeachPhotoState.state == 1)
+    if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
     {
         view = eCLV_MoreCharacters;
         if (source.m_bCaughtInPhoto)

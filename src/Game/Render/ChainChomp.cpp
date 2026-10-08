@@ -849,7 +849,7 @@ void ChainChomp::DrawShadow(
         glSetCurrentTextureState(glHandleizeTextureState());
 
         RLView* view;
-        if (gPeachPhotoState.state == 1)
+        if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
         {
             view = GetLayerView(eCLV_MoreCharacters);
         }
