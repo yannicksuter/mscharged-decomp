@@ -7,11 +7,11 @@ inline void WorldObject::UnidentifiedVirtual18(World*)
 {
 }
 
-inline void WorldObject_80129EE0::ReleaseResources()
+inline void WorldHelperObject::ReleaseResources()
 {
 }
 
-inline void WorldObject_80129EE0::Initialize(WorldObjectLoadContext*)
+inline void WorldHelperObject::Initialize(WorldObjectLoadContext*)
 {
 }
 

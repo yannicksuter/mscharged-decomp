@@ -26,7 +26,7 @@ public:
     /* 0x8C */ float m_fBlend;
 }; // size: 0x90
 
-class StadiumLight : public WorldObject_80129EE0
+class StadiumLight : public WorldHelperObject
 {
 public:
     virtual ~StadiumLight();

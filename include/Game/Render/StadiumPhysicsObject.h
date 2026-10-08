@@ -8,7 +8,7 @@ struct WorldObjectLoadContext;
 
 // Registers itself with FEModelManager; its users look it up there by the id
 // at +0x60 and place models at its world matrix.
-class StadiumFEModelMarker : public WorldObject_80129EE0
+class StadiumFEModelMarker : public WorldHelperObject
 {
 public:
     virtual ~StadiumFEModelMarker();
@@ -20,7 +20,7 @@ public:
 }; // size: 0x70
 
 // Sets the current stadium's shadow height to the z of its world position.
-class StadiumShadowHeightMarker : public WorldObject_80129EE0
+class StadiumShadowHeightMarker : public WorldHelperObject
 {
 public:
     virtual ~StadiumShadowHeightMarker();

@@ -9,7 +9,7 @@ class WorldAnimController;
 class EmissionController;
 struct WorldObjectLoadContext;
 
-class WorldEffect : public WorldObject_80129EE0
+class WorldEffect : public WorldHelperObject
 {
 public:
     WorldEffect() : m_bActive(1) { }

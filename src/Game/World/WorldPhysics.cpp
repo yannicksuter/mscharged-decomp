@@ -10,7 +10,7 @@
 #include "Game/Physics/PhysicsSphere.h"
 #include "NL/nlMemory.h"
 
-void WorldObject_80129EE0::SetWorldMatrix(const nlMatrix4& transform)
+void WorldHelperObject::SetWorldMatrix(const nlMatrix4& transform)
 {
 }
 

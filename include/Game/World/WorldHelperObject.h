@@ -4,18 +4,17 @@
 #include "Game/World/WorldObject.h"
 #include "NL/nlMath.h"
 
-// Common base of the stream objects whose vtables share the matrix accessor at
-// 0x80129EE0 (it returns the matrix at +0x20) and the empty SetWorldMatrix at
-// 0x80341EE8: the stadium markers and WorldEffect. The 0x104 stream object
-// constructs this base directly.
-// No drawable vtable uses either body. WorldEffect also uses the world and
-// animation context in this prefix. The original class name is unknown.
+// Stream object type 0x104: a world-space transform node without a model,
+// also the base of the stadium markers, lights and WorldEffect. Its vtable
+// shares the matrix accessor at 0x80129EE0 (returning the matrix at +0x20)
+// and the empty SetWorldMatrix at 0x80341EE8. The predecessor named this kind
+// of node HelperObject.
 class WorldAnimController;
 
-class WorldObject_80129EE0 : public WorldObject
+class WorldHelperObject : public WorldObject
 {
 public:
-    virtual ~WorldObject_80129EE0() { }
+    virtual ~WorldHelperObject() { }
     virtual void Initialize(WorldObjectLoadContext* context);
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix() { return &mWorldMatrix; }
