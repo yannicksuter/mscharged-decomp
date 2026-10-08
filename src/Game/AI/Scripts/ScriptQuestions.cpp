@@ -1828,7 +1828,7 @@ float NearToFormationPosition(cFielder* pFielder)
     return NearToFormationPosition(pFielder, &pFielder->mUnidentified024.m_v3Position);
 }
 
-float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition)
+float NearToFormationPosition(cFielder* pFielder, const nlVector3* pPosition)
 {
     if (pFielder == NULL)
     {
@@ -1958,7 +1958,7 @@ float DistanceAndAngleConfidence(const nlVector3& vFrom, const nlVector3& vTo,
 static const nlVector2 lbl_806E4258 = { 10922.5f, 0.0f };
 
 
-extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
+float LaneOpenness(const nlVector3& vFrom, const nlVector3& vTo,
     cPlayer* pIgnorePlayer1, cPlayer* pIgnorePlayer2, float fTeamWeight,
     float fOpponentWeight, float fGoalieWeight, float fPredictionTime)
 {
@@ -2152,7 +2152,7 @@ extern "C" float fn_800DBB88(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return fn_800DAFCC(pFielder->mUnidentified024.m_v3Position,
+    return LaneOpenness(pFielder->mUnidentified024.m_v3Position,
         pFielder->GetAIOffNetLocation(NULL), pFielder, NULL, 0.0f, 0.2f, 1.0f, 0.0f);
 }
 
@@ -2223,7 +2223,7 @@ float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder)
         return 0.0f;
     }
 
-    float fResult = fn_800DAFCC(pFromFielder->mUnidentified024.m_v3Position,
+    float fResult = LaneOpenness(pFromFielder->mUnidentified024.m_v3Position,
         pToFielder->mUnidentified024.m_v3Position, pFromFielder, pToFielder,
         0.5f, 1.0f, 1.0f, 0.0f);
     return NormalizeVal(fResult, g_vOpenToAdjust);
@@ -2367,11 +2367,11 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     return fScore;
 }
 
-extern "C" float fn_800DCB4C(const nlVector3* pA, const nlVector3* pB)
+float NearToGoaliePosition(const nlVector3* position, const nlVector3* goaliePosition)
 {
     float fMax = g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax;
     float fMin = g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(*pA, *pB), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(*position, *goaliePosition), true);
     return NormalizeVal(fDist, fMin, fMax);
 }
 
@@ -2813,7 +2813,7 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
             break;
         case 12:
             if (aiPos.x > 0.0f)
-                fScore = fn_800DAFCC(pFielder->mUnidentified024.m_v3Position,
+                fScore = LaneOpenness(pFielder->mUnidentified024.m_v3Position,
                     pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation, pFielder, NULL,
                     1.0f, 1.0f, 0.0f, 0.0f);
             break;

@@ -222,11 +222,11 @@ extern "C" float fn_800DA130(cFielder*);
 extern "C" float fn_800DA310(cFielder*);
 extern "C" float fn_800DA330(cFielder*);
 extern "C" float fn_800DA518(cFielder*);
-float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition);
+float NearToFormationPosition(cFielder* pFielder, const nlVector3* pPosition);
 extern "C" float fn_800DA91C(cFielder*);
 extern "C" float fn_800DACF4(cPlayer*);
 extern "C" float fn_800DAD3C(cBall*);
-extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
+float LaneOpenness(const nlVector3& vFrom, const nlVector3& vTo,
     cPlayer* pIgnorePlayer1, cPlayer* pIgnorePlayer2, float fTeamWeight,
     float fOpponentWeight, float fGoalieWeight, float fPredictionTime);
 extern "C" float fn_800DBB0C(cFielder*);
@@ -234,7 +234,7 @@ extern "C" float fn_800DBB88(cFielder*);
 extern "C" float fn_800DBEF4(cFielder*, cFielder*);
 extern "C" float fn_800DC19C(cFielder*, cBall*);
 extern "C" float fn_800DC434(cFielder*, cBall*);
-extern "C" float fn_800DCB4C(const nlVector3*, const nlVector3*);
+float NearToGoaliePosition(const nlVector3* position, const nlVector3* goaliePosition);
 extern "C" float fn_800DD234(cFielder*);
 extern "C" float fn_800DD294(cFielder*);
 extern "C" float fn_800DD2F4(cBall*);

@@ -22,7 +22,7 @@
 #include "Game/FriendManager.h"
 #include "NL/nlPrint.h"
 #include "NL/nlAlgorithm.h"
-#include "NL/nlBasicString.h"
+#include "NL/nlLexicalCast.h"
 #include "NL/nlBind.h"
 #include "NL/nlFunction.h"
 #include "NL/nlLocalization.h"
@@ -31,10 +31,6 @@
 #include <string.h>
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/FE/FEAudio.h"
-#include "NL/nlPrint.h"
-
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 
 SHOnlineGuestControllerSelect::SHOnlineGuestControllerSelect()
     : mRespondingToInvitation(false)
@@ -125,7 +121,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
         }
     }
 
-    if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
+    if (!GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
         && !mRespondingToInvitation
         && g_pFriendManager->FindHostInvitation())
     {

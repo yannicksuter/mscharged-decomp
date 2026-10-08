@@ -1438,9 +1438,9 @@ int ChooseRunDirection(cFielder* fielder, const unsigned short* angles,
         nlSinCos(&direction.y, &direction.x, angle);
         if (!IsWaluigiWallAhead(&direction, fielder))
         {
-            float lane = fn_800DAFCC(fielder->mUnidentified024.m_v3Position, farPos,
+            float lane = LaneOpenness(fielder->mUnidentified024.m_v3Position, farPos,
                 fielder, 0, 0.0f, 1.0f, 1.0f, 0.0f);
-            float support = FuzzyNot(fn_800DCB4C(&nearPos,
+            float support = FuzzyNot(NearToGoaliePosition(&nearPos,
                 &fn_800D66C4(fielder)->mUnidentified024.m_v3Position));
             float sideline = 1.0f;
             if (question1 > 0.1f

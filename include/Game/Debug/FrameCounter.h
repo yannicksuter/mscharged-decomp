@@ -36,6 +36,7 @@ private:
 };
 
 extern FrameCounter g_FrameCounter;
+extern FrameCounter* g_pFrameCounter;
 extern const float gTimeRegionHistogramMinValue;
 extern const float gTimeRegionHistogramBinSize;
 

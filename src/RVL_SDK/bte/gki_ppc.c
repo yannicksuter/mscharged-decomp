@@ -37,11 +37,9 @@
 
 #define IS_BTE
 #include <revolution.h>
+#include <private/wud.h>
 
 static UINT8 GKI_init_btu_task(UINT8 task_id);
-
-extern void *App_MEMalloc(size_t size);
-extern int App_MEMfree(void *ptr);
 
 tGKI_CB	gki_cb;
 

@@ -189,7 +189,7 @@ void* MemoryAllocator::AllocateFromStart(unsigned long size, unsigned int alignm
     }
 
     u32 remaining = cur->m_size - usedSize;
-    if (remaining > 0xC)
+    if (remaining > sizeof(FreeBlockList))
     {
         FreeBlockList* newFree = (FreeBlockList*)((u8*)cur + usedSize);
         newFree->m_size = remaining;
@@ -316,9 +316,9 @@ void* MemoryAllocator::Allocate(unsigned long size, unsigned int alignment, bool
     {
         alignment = 4;
     }
-    if (size < 0xC)
+    if (size < sizeof(FreeBlockList))
     {
-        size = 0xC;
+        size = sizeof(FreeBlockList);
     }
     if (fromEnd)
     {
