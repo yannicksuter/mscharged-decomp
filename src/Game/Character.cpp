@@ -1339,7 +1339,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     }
 
     if (pFielder != NULL && !fn_80014D38(g_pBall)
-        && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != 28)
+        && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != ACTION_KNOCKDOWN_REACT)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
         unidentifiedSlide += pFielder->IsSlippery() ? gSlipperySlideFactor : 0.0f;
@@ -2463,13 +2463,13 @@ extern "C" void fn_80022824(cPlayer*)
                     pFielder->EndSuperPower(0);
                 }
                 else if (pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
-                    && pFielder->m_eActionState == ACTION_UNKNOWN_32)
+                    && pFielder->m_eActionState == ACTION_SKILLSHOT)
                 {
                     pFielder->EndDesire();
                     pFielder->EndAction();
                 }
                 else if (pFielder->m_DetChar.m_eCharacterClass == SHYGUY
-                    && pFielder->m_eActionState == ACTION_UNKNOWN_32)
+                    && pFielder->m_eActionState == ACTION_SKILLSHOT)
                 {
                     pFielder->EndDesire();
                     pFielder->EndAction();
@@ -2579,10 +2579,10 @@ extern "C" void fn_80022BD8(CollisionEggData* pEventData)
                     pEventData->pFielder->m_DetChar.m_v3Velocity);
             }
             else if (pFielder->IsCharacterInAir(pEventData->pEgg->mPhysics->GetRadius())
-                || (pFielder->m_eActionState == 0x1D && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == WARIO)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
-                || (pFielder->m_eActionState == 1 && pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS))
+                || (pFielder->m_eActionState == ACTION_SUPER_POWER && pFielder->m_DetChar.m_eCharacterClass == DONKEYKONG)
+                || (pFielder->m_eActionState == ACTION_DEKE && pFielder->m_DetChar.m_eCharacterClass == WARIO)
+                || (pFielder->m_eActionState == ACTION_DEKE && pFielder->m_DetChar.m_eCharacterClass == BOWSERJR)
+                || (pFielder->m_eActionState == ACTION_DEKE && pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS))
             {
                 pFielder->InitActionBombReact(pEventData->pEgg->mPosition, 0.0f);
                 EmitTackleImpact(pFielder);

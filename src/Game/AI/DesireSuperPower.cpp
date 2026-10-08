@@ -218,13 +218,13 @@ bool DesireSuperPower::Initialize(void* context)
     case DAISY:
         m_pFielder->InitDesire(
             (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        m_pFielder->SetAction((eFielderActionState)29);
+        m_pFielder->SetAction(ACTION_SUPER_POWER);
         m_pFielder->muInvincibleStatus |= 1;
         m_pFielder->SetAnimState(104, true, 0.2f, false, false);
         m_pFielder->InitMovementFromAnim(
             0, gSuperPowerZeroVector, 1.0f, false);
         mMaxDuration = gDaisySuperPowerTimeLimit;
-        result = m_pFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == ACTION_SUPER_POWER;
         break;
     case DIDDYKONG:
         result = InitializeDiddy(this, context);
@@ -236,7 +236,7 @@ bool DesireSuperPower::Initialize(void* context)
                 4.0f + gDKSuperShockwaveRadius);
         m_pFielder->InitActionDKSuper();
         mMaxDuration = gDKSuperPowerTimeLimit;
-        result = m_pFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == ACTION_SUPER_POWER;
         break;
     case LUIGI:
         m_pFielder->m_pTweaks = m_pFielder->m_pSuperPowerTweaks;
@@ -257,7 +257,7 @@ bool DesireSuperPower::Initialize(void* context)
     case PEACH:
         m_pFielder->InitActionPeachSuper();
         mMaxDuration = gPeachSuperPowerTimeLimit;
-        result = m_pFielder->m_eActionState == (eFielderActionState)29;
+        result = m_pFielder->m_eActionState == ACTION_SUPER_POWER;
         break;
     case PETEY:
     {
@@ -654,14 +654,14 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
     }
     self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    self->m_pFielder->SetAction((eFielderActionState)29);
+    self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
     self->m_pFielder->InitMovementFromAnim(
         dir, gSuperPowerZeroVector, 0.15f, false);
     self->mMaxDuration = gBowserJrSuperPowerTimeLimit;
     return self->m_pFielder->m_eActionState
-        == (eFielderActionState)29;
+        == ACTION_SUPER_POWER;
 }
 
 /**
@@ -679,7 +679,7 @@ void DesireSuperPower::UpdateBowserJr(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -700,7 +700,7 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -773,14 +773,14 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
     }
     self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    self->m_pFielder->SetAction((eFielderActionState)29);
+    self->m_pFielder->SetAction(ACTION_SUPER_POWER);
     self->m_pFielder->muInvincibleStatus |= 1;
     self->m_pFielder->SetAnimState(104, true, 0.2f, false, false);
     self->m_pFielder->InitMovementFromAnim(
         dir, gSuperPowerZeroVector, 0.15f, false);
     self->mMaxDuration = gDiddySuperPowerTimeLimit;
     return self->m_pFielder->m_eActionState
-        == (eFielderActionState)29;
+        == ACTION_SUPER_POWER;
 }
 
 /**
@@ -798,7 +798,7 @@ void DesireSuperPower::UpdateDiddy(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -816,7 +816,7 @@ void DesireSuperPower::UpdateDK(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -848,13 +848,13 @@ void DesireSuperPower::UpdateLuigi(DesireUpdate* update, float fDeltaT)
     m_pFielder->fn_8001EF6C(1.0f);
     switch (m_pFielder->m_eActionState)
     {
-    case (eFielderActionState)1:
+    case ACTION_DEKE:
         m_pFielder->fn_8001EF6C(lbl_806DC260);
         break;
     case ACTION_HIT:
         m_pFielder->fn_8001EF6C(gSuperGrowHitMovementScale);
         break;
-    case ACTION_SHOT:
+    case ACTION_MEGA_STRIKE:
         *update = 1;
         break;
     default:
@@ -892,13 +892,13 @@ void DesireSuperPower::UpdateMario(DesireUpdate* update, float fDeltaT)
     m_pFielder->fn_8001EF6C(1.0f);
     switch (m_pFielder->m_eActionState)
     {
-    case (eFielderActionState)1:
+    case ACTION_DEKE:
         m_pFielder->fn_8001EF6C(lbl_806DC260);
         break;
     case ACTION_HIT:
         m_pFielder->fn_8001EF6C(gSuperGrowHitMovementScale);
         break;
-    case ACTION_SHOT:
+    case ACTION_MEGA_STRIKE:
         *update = 1;
         break;
     default:
@@ -922,7 +922,7 @@ void DesireSuperPower::UpdatePeach(DesireUpdate* update, float fDeltaT)
         m_pFielder->EndDesire();
         *update = 1;
     }
-    if (m_pFielder->m_eActionState != (eFielderActionState)29)
+    if (m_pFielder->m_eActionState != ACTION_SUPER_POWER)
     {
         *update = 1;
     }
@@ -1630,7 +1630,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     }
     self->m_pFielder->bYoshiInWindup
         = (self->m_pFielder->m_eActionState
-            == ACTION_UNKNOWN_30);
+            == ACTION_SHOT_WINDUP);
     if ((self->m_pFielder->GetDesireState() == 21)
         || (self->m_pFielder->GetDesireState() == 19)
         || (self->m_pFielder->GetDesireState() == 18)
@@ -1640,7 +1640,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
         self->m_pFielder->StartRunning();
     }
     else if (self->m_pFielder->m_eActionState
-        == ACTION_UNKNOWN_30)
+        == ACTION_SHOT_WINDUP)
     {
         self->m_pFielder->StartRunning();
     }

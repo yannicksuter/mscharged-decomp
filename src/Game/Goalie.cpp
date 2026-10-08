@@ -718,7 +718,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     cFielder* pFldr = static_cast<cFielder*>(pPlayer);
     if ((int)pFldr->m_DetChar.m_eCharacterClass == MONTYMOLE
         && mGoalieActionState != GOALIEACTION_DEKE_STUNNED
-        && pFldr->IsInvincibleChars() && pFldr->m_eActionState == 0x20
+        && pFldr->IsInvincibleChars() && pFldr->m_eActionState == ACTION_SKILLSHOT
         && pFldr->m_fOpacity > 0.4f && !IsPlayerBelowHeight(pFldr, 0.0f))
     {
         InitActionDazed(true);
@@ -726,7 +726,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
     }
     if ((int)pFldr->m_DetChar.m_eCharacterClass == SHYGUY
         && mGoalieActionState != GOALIEACTION_SHOCKWAVE_REACT
-        && pFldr->m_eActionState == 0x20)
+        && pFldr->m_eActionState == ACTION_SKILLSHOT)
         return;
 
     float fHeight = 0.25f + GetJointPosition(m_nHeadJointIndex).z;
@@ -909,7 +909,7 @@ void Goalie::ExecutePounce(cPlayer* pPlayer, bool bCheckHitDistance)
             < nlGetLengthSquared1D(fMinHitDistance);
     }
     if ((int)pFldr->m_eActionState == ACTION_SHOOT_TO_SCORE
-        || (int)pFldr->m_eActionState == ACTION_SHOT)
+        || (int)pFldr->m_eActionState == ACTION_MEGA_STRIKE)
         bDoHit = true;
     bool bGetBall = false;
     if (pPlayer->m_pBall != NULL && g_pBall->m_v3Position.z < 1.0f)
@@ -2036,7 +2036,7 @@ bool Goalie::CheckForDekeAttack()
             {
                 if (FindSTSMissData(pFielder->m_DetChar.m_v3Position))
                     return false;
-                if ((int)pFielder->m_eActionState == 1)
+                if ((int)pFielder->m_eActionState == ACTION_DEKE)
                 {
                     float fThreshold = GetDekeAttackWindowEnd(pFielder);
                     float fCurrentTime = pFielder->m_pCurrentAnimController->m_fTime;
@@ -2290,7 +2290,7 @@ bool Goalie::FindApproachingMonty()
     cFielder* pFielder = g_pBall->GetOwnerFielder();
     if (pFielder != 0 && (int)pFielder->m_DetChar.m_eCharacterClass == MONTYMOLE
         && !pFielder->IsStarActive()
-        && (int)pFielder->m_eActionState == 0x20
+        && (int)pFielder->m_eActionState == ACTION_SKILLSHOT
         && pFielder->m_pCurrentAnimController->m_fTime < 0.55f)
     {
         float fDistSq = nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position,
@@ -2461,7 +2461,7 @@ bool Goalie::CheckForSTSAttack()
         float fShotMeter = fn_800DEB04(pFielder);
         if ((fShotMeter > fLower && fShotMeter < fUpper)
             || ((int)pFielder->m_DetChar.m_eCharacterClass == HAMMERBROS
-                && (int)pFielder->m_eActionState == 0x20))
+                && (int)pFielder->m_eActionState == ACTION_SKILLSHOT))
         {
             if (nlRandomf(lbl_806DBB5C) < fDifficulty)
             {
@@ -2603,7 +2603,7 @@ bool Goalie::IsWithinPounceRange()
     if (pFielder != 0 && !IsOnSameTeam(pFielder) && pFielder->mbTangible)
     {
         if ((int)pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE
-            || (int)pFielder->m_eActionState == ACTION_SHOT)
+            || (int)pFielder->m_eActionState == ACTION_MEGA_STRIKE)
             return false;
         float range = LooseBallAnims::mTrapBallInfo.mfPickupDistance;
         range += gfPounceRangeMargin;
@@ -2625,7 +2625,7 @@ bool Goalie::IsOpponentBallCarrierInRange()
     if (pFielder != 0 && !IsOnSameTeam(pFielder))
     {
         if ((int)pFielder->m_eActionState == ACTION_SHOOT_TO_SCORE
-            || (int)pFielder->m_eActionState == ACTION_SHOT)
+            || (int)pFielder->m_eActionState == ACTION_MEGA_STRIKE)
             return false;
         const nlVector3& v3Position = pFielder->m_DetChar.m_v3Position;
         if (IsCloseToNet(v3Position, gfBallCarrierNetRange))
@@ -2670,7 +2670,7 @@ inline bool Goalie::IsOpponentShooting()
     cFielder* pShooter = g_pBall->GetOwnerFielder();
     if (pShooter != NULL && !IsOnSameTeam(pShooter)
         && ((int)pShooter->m_eActionState == ACTION_SHOOT_TO_SCORE
-            || (int)pShooter->m_eActionState == ACTION_SHOT))
+            || (int)pShooter->m_eActionState == ACTION_MEGA_STRIKE))
         return true;
     return false;
 }
@@ -3609,7 +3609,7 @@ void Goalie::ReleaseMonty()
 {
     if (mpMonty != 0)
     {
-        if (mpMonty->m_eActionState == ACTION_UNKNOWN_34
+        if (mpMonty->m_eActionState == ACTION_MONTY_BURROWED
             && !mpMonty->m_bMontyDekeFinished)
         {
             if (mbGrabMonty
@@ -4203,7 +4203,7 @@ void Goalie::fn_80080BFC(float fDeltaT)
     {
         return;
     }
-    if (mpTarget->m_eActionState != (eFielderActionState)0x23)
+    if (mpTarget->m_eActionState != ACTION_LAUNCHED)
     {
         return;
     }

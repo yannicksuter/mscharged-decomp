@@ -209,7 +209,7 @@ void DesireMegaStrike::Update(
             fDeltaT, bButtonPressed, nParam);
         fn_80098098(m_pFielder);
     }
-    else if (m_pFielder->m_eActionState == ACTION_SHOT)
+    else if (m_pFielder->m_eActionState == ACTION_MEGA_STRIKE)
     {
         m_pFielder->EndStar();
         m_pFielder->fn_800489C0(fDeltaT);

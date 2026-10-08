@@ -25,7 +25,7 @@ bool DesireDeke::Initialize(void* context)
 
 void DesireDeke::Update(DesireUpdate* update, float)
 {
-    if (m_pFielder->m_eActionState == 1)
+    if (m_pFielder->m_eActionState == ACTION_DEKE)
     {
         return;
     }

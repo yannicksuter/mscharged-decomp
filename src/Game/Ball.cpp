@@ -467,7 +467,7 @@ void cBall::CollideWithCharacterCallback(
     if (meBallState == BALL_STATE_GOALIE_DEFLECTION && pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pCharacter;
-        if (pFielder->m_eActionState >= ACTION_SHOT
+        if (pFielder->m_eActionState >= ACTION_MEGA_STRIKE
             || pFielder->m_eActionState < ACTION_LOOSE_BALL_PASS)
         {
             if (m_pOwner != NULL)
@@ -965,7 +965,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     if (bBooSkillshot)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
-        if (pFielder->m_eActionState == (eFielderActionState)0x21
+        if (pFielder->m_eActionState == ACTION_BOO_SKILLSHOT
             && pFielder->mActionBooSkillshot.bFollowingBall)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
@@ -1374,7 +1374,7 @@ float GetBallChargeValue(cBall* pBall, int nParam)
         if (pBall->GetOwnerFielder() != NULL
             && pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
                 == SHYGUY
-            && pBall->GetOwnerFielder()->m_eActionState == ACTION_UNKNOWN_32)
+            && pBall->GetOwnerFielder()->m_eActionState == ACTION_SKILLSHOT)
         {
             return 0.0f;
         }

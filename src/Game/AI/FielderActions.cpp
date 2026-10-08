@@ -904,8 +904,8 @@ void cFielder::EndAction()
 
 void cFielder::fn_80043ADC()
 {
-    if (m_eActionState == (eFielderActionState)0
-        || m_eActionState == (eFielderActionState)0x23
+    if (m_eActionState == ACTION_CROWD_RIOT
+        || m_eActionState == ACTION_LAUNCHED
         || m_eActionState == ACTION_ELECTROCUTION)
     {
         return;
@@ -926,7 +926,7 @@ void cFielder::fn_80043ADC()
 
     InitDesire(
         FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0);
+    SetAction(ACTION_CROWD_RIOT);
     SetAnimState(0x7C, true, 0.2f, false, false);
     InitMovementCoast();
 }
@@ -1017,8 +1017,8 @@ void cFielder::fn_80043C18(float fDeltaT)
 
 void cFielder::fn_80044148(const nlVector3& v3Velocity)
 {
-    if (m_eActionState == (eFielderActionState)0
-        || m_eActionState == (eFielderActionState)0x23)
+    if (m_eActionState == ACTION_CROWD_RIOT
+        || m_eActionState == ACTION_LAUNCHED)
     {
         return;
     }
@@ -1030,7 +1030,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
 
     InitDesire(
         FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x23);
+    SetAction(ACTION_LAUNCHED);
     SetAnimState(0x7C, false, 0.0333333f, false, false);
     SetVelocity(v3Velocity);
     InitMovementCoast();
@@ -1161,7 +1161,7 @@ bool cFielder::fn_800447C0(unsigned short aDirection)
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)1);
+    SetAction(ACTION_DEKE);
     m_aDekeDirection = 0;
     m_bDekeReset = false;
     m_nDPadDownCounter = 2;
@@ -1682,7 +1682,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)0x18);
+        SetAction(ACTION_SUCKED_AWAY);
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
         SetVelocity(v3Zero);
@@ -1879,7 +1879,7 @@ void cFielder::fn_80046244()
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)3);
+        SetAction(ACTION_FALL);
         SetAnimState(0x7C, false, 0.2f, false, false);
         InitMovementCoast();
 
@@ -2070,7 +2070,7 @@ void cFielder::InitActionHit(cFielder* pTarget, unsigned short aDirection)
 
             nlVector3 targetVelocity = pTarget->m_DetChar.m_v3Velocity;
 
-            if (pTarget->m_eActionState == 1
+            if (pTarget->m_eActionState == ACTION_DEKE
                 && pTarget->m_pCurrentAnimController->m_fTime < 0.66f)
             {
                 targetVelocity = v3Zero;
@@ -2273,7 +2273,7 @@ bool cFielder::fn_800470B4(cFielder* pFielder, cPlayer* pAttacker)
     }
 
     if (pAttacker->m_DetChar.m_eCharacterClass == BIRDO
-        && ((cFielder*)pAttacker)->m_eActionState == 1)
+        && ((cFielder*)pAttacker)->m_eActionState == ACTION_DEKE)
     {
         aAngle = pFielder->m_DetChar.m_aActualFacingDirection;
     }
@@ -2335,7 +2335,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)5);
+    SetAction(ACTION_HIT_REACT);
 
     s16 angleDiff
         = (s16)((u16)(aDirection + 0x8000) - m_DetChar.m_aActualFacingDirection);
@@ -2984,7 +2984,7 @@ void cFielder::InitActionMegaStrikeMeter(bool bParam)
     {
         m_pHeadTrack->m_bTrackOOI = true;
 
-        if (m_eActionState != 0x12)
+        if (m_eActionState != ACTION_RUNNING)
         {
             mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
             m_DetChar.m_aActualMovementDirection = m_DetChar.m_aActualFacingDirection;
@@ -3280,7 +3280,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
             = (MegaStrikeMeterOverlay*)g_pOverlayManager->GetScene(
                 (SceneList)0x64);
         pScene->mMegaStrikeStarted = true;
-        SetAction((eFielderActionState)0xB);
+        SetAction(ACTION_MEGA_STRIKE);
         FreezeEveryoneButCaptain(0);
 
         m_pTeam->GetGoalie()->InitActionFrozen();
@@ -3799,7 +3799,7 @@ void cFielder::InitActionBombHitReact(const nlVector3& v3BombPosition)
     }
 
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_HIT_REACT);
+    SetAction(ACTION_BOMB_HIT_REACT);
 
     u32 index = (((u16)((u16)GetFacingDeltaToPosition(v3BombPosition)) >> 14) & 3);
     SetAnimState(gHitReactAnims[2][index], true, 0.2f, false, false);
@@ -3967,7 +3967,7 @@ void cFielder::ActionRunningWB(float dt)
 void cFielder::fn_8004B148()
 {
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x13);
+    SetAction(ACTION_RUNNING_PASS);
 
     u16 aDirection = m_DetChar.m_aActualFacingDirection;
     if (GetGlobalPad() != 0)
@@ -4068,7 +4068,7 @@ void cFielder::fn_8004B658()
     }
     else
     {
-        SetAction(ACTION_UNKNOWN_30);
+        SetAction(ACTION_SHOT_WINDUP);
         DoResetShotMeter(0.0f);
         SetWindupWBAnimState();
         InitMovementRunningNoTurn(0.0f, GetShotWindupDecel(this->GetTweaks()));
@@ -4167,7 +4167,7 @@ bool cFielder::InitActionShot(bool bIsChipShot, bool bIsOneTimer)
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction(ACTION_UNKNOWN_15);
+        SetAction(ACTION_REGULAR_SHOT);
         bIsModified = bIsChipShot;
 
         switch (m_eAnimID)
@@ -4282,11 +4282,11 @@ void cFielder::fn_8004BF58(eFielderActionState eNewAction)
     KillWindups();
     StopSound(0x900862AC, this);
 
-    if (eNewAction != ACTION_UNKNOWN_15)
+    if (eNewAction != ACTION_REGULAR_SHOT)
     {
         m_pShotMeter->Abort();
         if (m_DetChar.m_eCharacterClass == BOO
-            && eNewAction != (eFielderActionState)1)
+            && eNewAction != ACTION_DEKE)
         {
             m_fOpacity = 1.0f;
         }
@@ -4688,7 +4688,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
     EndFrozenOrDazed();
     fn_8009750C();
 
-    if (IsFallenDown() && m_eActionState == (eFielderActionState)0x1C)
+    if (IsFallenDown() && m_eActionState == ACTION_KNOCKDOWN_REACT)
     {
         SetAnimState(0x56, true, 0.2f, false, false);
         cPN_SAnimController* pController = m_pCurrentAnimController;
@@ -4706,7 +4706,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
 
         InitDesire(
             FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-        SetAction((eFielderActionState)0x1C);
+        SetAction(ACTION_KNOCKDOWN_REACT);
         SetAnimState(0x56, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
 
@@ -4882,7 +4882,7 @@ void cFielder::fn_8004E11C(float fParam)
     SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
     fn_80097358(this, fParam);
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_UNKNOWN_31);
+    SetAction(ACTION_BURNING);
     SetAnimState(0x80, false, 0.3f, false, false);
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
     m_pCurrentAnimController->m_fPlaybackSpeedScale = 1.5f;
@@ -4945,7 +4945,7 @@ void cFielder::fn_8004E438()
 {
     EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_UNKNOWN_32);
+    SetAction(ACTION_SKILLSHOT);
 
     nlVector3 v3Delta;
     nlVector3 v3NetPos = m_pTeam->GetOtherNet()->m_v3NetLocation;
@@ -4984,7 +4984,7 @@ void cFielder::fn_8004E438()
 
 void cFielder::ReleaseHammerProjectile()
 {
-    if (m_eActionState == ACTION_UNKNOWN_32)
+    if (m_eActionState == ACTION_SKILLSHOT)
     {
         for (int i = 0; i < 1; i++)
         {
@@ -5038,7 +5038,7 @@ void cFielder::ReleaseHammerProjectile()
 
 void cFielder::fn_8004E8B8()
 {
-    if (m_eActionState == ACTION_UNKNOWN_32)
+    if (m_eActionState == ACTION_SKILLSHOT)
     {
         muInvincibleStatus |= 1;
         if (m_DetChar.m_eCharacterClass == SHYGUY)
@@ -5054,7 +5054,7 @@ void cFielder::fn_8004E92C()
     bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
     if (bIsGameplay)
     {
-        if (m_pBall != 0 && m_eActionState == ACTION_UNKNOWN_32)
+        if (m_pBall != 0 && m_eActionState == ACTION_SKILLSHOT)
         {
             DoResetShotMeter(0.0f);
             m_pShotMeter->CalcOneTimerValue(this, false);
@@ -5094,7 +5094,7 @@ void cFielder::fn_8004E92C()
 
 void cFielder::fn_8004EA9C()
 {
-    if (m_eActionState == ACTION_UNKNOWN_32)
+    if (m_eActionState == ACTION_SKILLSHOT)
     {
         ClearInvincibility(0);
     }
@@ -5150,7 +5150,7 @@ void cFielder::fn_8004ED64()
 {
     EndShrink();
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction((eFielderActionState)0x21);
+    SetAction(ACTION_BOO_SKILLSHOT);
     InitMovementCoast();
 
     mActionBooSkillshot.v3StartPosition = m_DetChar.m_v3Position;
@@ -5246,7 +5246,7 @@ void cFielder::fn_8004F180()
 void cFielder::fn_8004F204()
 {
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
-    SetAction(ACTION_UNKNOWN_34);
+    SetAction(ACTION_MONTY_BURROWED);
     SetAnimState(0, false, 0.0f, false, false);
     InitMovementNone(0.0f, 0.0f);
 

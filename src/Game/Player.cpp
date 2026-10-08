@@ -682,7 +682,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         state = pMeter->m_eShotMeterState;
         if (state != SHOT_METER_ACTIVE && state != SHOT_METER_STS_ACTIVE)
             bShotInProgress = false;
-        if (bShotInProgress || (pFielder->GetActionState() != ACTION_UNKNOWN_15 && pMeter->m_eShotMeterState == SHOT_METER_RELEASED))
+        if (bShotInProgress || (pFielder->GetActionState() != ACTION_REGULAR_SHOT && pMeter->m_eShotMeterState == SHOT_METER_RELEASED))
         {
             pFielder->InitActionShot(false, false);
             return;
@@ -692,7 +692,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
     {
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-                || pFielder->GetActionState() == ACTION_SHOT))
+                || pFielder->GetActionState() == ACTION_MEGA_STRIKE))
         {
             pFielder->InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             return;
@@ -705,7 +705,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->IsSlideAttacking()
                 || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-                || pFielder->GetActionState() == ACTION_SHOT))
+                || pFielder->GetActionState() == ACTION_MEGA_STRIKE))
         {
             pFielder->InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             return;

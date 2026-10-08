@@ -420,7 +420,7 @@ void OnCrowdRiotCollision(void* param)
             = (cFielder*)((PhysicsCharacter*)parent)->m_pAICharacter;
         if (fielder->m_eClassType == FIELDER
             && fielder->m_eActionState != ACTION_SHOOT_TO_SCORE
-            && fielder->m_eActionState != ACTION_SHOT)
+            && fielder->m_eActionState != ACTION_MEGA_STRIKE)
         {
             fielder->fn_80043ADC();
         }

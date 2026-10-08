@@ -660,9 +660,9 @@ bool IsIdleAndNoShotInProgress(Presentation* presentation)
         return false;
     }
 
-    if (g_pTeams[0]->GetCaptain()->m_eActionState == ACTION_SHOT
+    if (g_pTeams[0]->GetCaptain()->m_eActionState == ACTION_MEGA_STRIKE
         || g_pTeams[0]->GetCaptain()->m_eActionState == ACTION_SHOOT_TO_SCORE
-        || g_pTeams[1]->GetCaptain()->m_eActionState == ACTION_SHOT
+        || g_pTeams[1]->GetCaptain()->m_eActionState == ACTION_MEGA_STRIKE
         || g_pTeams[1]->GetCaptain()->m_eActionState == ACTION_SHOOT_TO_SCORE)
     {
         return false;

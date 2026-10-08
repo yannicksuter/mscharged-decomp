@@ -60,7 +60,7 @@ void DesireUserControlled::Update(
         return;
     }
     else if (m_pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-        || m_pFielder->GetActionState() == ACTION_SHOT)
+        || m_pFielder->GetActionState() == ACTION_MEGA_STRIKE)
     {
         return;
     }
@@ -92,10 +92,10 @@ void DesireUserControlled::Update(
             return;
         }
 
-        if (m_pFielder->m_eActionState == ACTION_UNKNOWN_30)
+        if (m_pFielder->m_eActionState == ACTION_SHOT_WINDUP)
         {
             m_pFielder->TestButtonsWindup();
-            if (m_pFielder->m_eActionState != ACTION_UNKNOWN_30)
+            if (m_pFielder->m_eActionState != ACTION_SHOT_WINDUP)
             {
                 return;
             }

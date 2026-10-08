@@ -82,7 +82,7 @@ void DesireStar::Update(DesireUpdate* update, float fDeltaT)
 {
     eFielderActionState action = m_pFielder->m_eActionState;
     if (action == ACTION_SHOOT_TO_SCORE
-        || (action == ACTION_UNKNOWN_30
+        || (action == ACTION_SHOT_WINDUP
             && m_pFielder->m_pShotMeter->m_eShotMeterState
                 == SHOT_METER_STS_ACTIVE
             && IsSidekick(m_pFielder)))
@@ -93,9 +93,9 @@ void DesireStar::Update(DesireUpdate* update, float fDeltaT)
 
     switch (m_pFielder->m_eActionState)
     {
-    case ACTION_SHOT:
-    case ACTION_UNKNOWN_32:
-    case (eFielderActionState)0x21:
+    case ACTION_MEGA_STRIKE:
+    case ACTION_SKILLSHOT:
+    case ACTION_BOO_SKILLSHOT:
         *update = 1;
         break;
     default:
@@ -156,18 +156,18 @@ void DesireMushroom::Update(DesireUpdate* update, float)
 {
     switch (m_pFielder->m_eActionState)
     {
-    case (eFielderActionState)0:
+    case ACTION_CROWD_RIOT:
     case ACTION_ELECTROCUTION:
-    case (eFielderActionState)3:
-    case (eFielderActionState)5:
+    case ACTION_FALL:
     case ACTION_HIT_REACT:
-    case ACTION_SHOT:
+    case ACTION_BOMB_HIT_REACT:
+    case ACTION_MEGA_STRIKE:
     case ACTION_SLIDE_ATTACK_REACT:
-    case (eFielderActionState)24:
+    case ACTION_SUCKED_AWAY:
     case ACTION_BOMB_REACT:
     case ACTION_SHELL_REACT:
     case ACTION_BANANA_REACT:
-    case ACTION_UNKNOWN_31:
+    case ACTION_BURNING:
         *update = 1;
         break;
     default:
@@ -452,25 +452,25 @@ bool DesireFrozen::Initialize(void* context)
     bool result = Desire::Initialize(context);
     switch (m_pFielder->m_eActionState)
     {
-    case ACTION_SHOT:
+    case ACTION_MEGA_STRIKE:
     case ACTION_SHOOT_TO_SCORE:
-    case (eFielderActionState)19:
+    case ACTION_RUNNING_PASS:
     case ACTION_RUNNING_WB:
         if (!m_pFielder->IsYoshiSuperPowerActive())
         {
             m_pFielder->InitActionRunning();
         }
         break;
-    case ACTION_UNKNOWN_32:
+    case ACTION_SKILLSHOT:
         if (m_pFielder->GetCharacterClass() == SHYGUY
-            && m_pFielder->m_eActionState == ACTION_UNKNOWN_32
+            && m_pFielder->m_eActionState == ACTION_SKILLSHOT
             && m_pFielder->m_pBulletBill->active)
         {
             m_pFielder->m_pBulletBill->Hide(false);
         }
         break;
-    case (eFielderActionState)1:
-    case (eFielderActionState)33:
+    case ACTION_DEKE:
+    case ACTION_BOO_SKILLSHOT:
         if (m_pFielder->GetCharacterClass() == BOO)
         {
             m_pFielder->EndAction();
@@ -653,7 +653,7 @@ void DesireFrozen::Cleanup()
     {
         EmitElectrocution(m_pFielder);
     }
-    if (m_pFielder->m_eActionState == (eFielderActionState)1)
+    if (m_pFielder->m_eActionState == ACTION_DEKE)
     {
         EmitDeke(m_pFielder);
     }
@@ -753,7 +753,7 @@ bool DesireConfused::Initialize(void* context)
         else if (m_pFielder->m_DetChar.m_eCharacterClass
                      == SHYGUY
                  && m_pFielder->m_eActionState
-                        == ACTION_UNKNOWN_32)
+                        == ACTION_SKILLSHOT)
         {
             int direction = GetFacingDirection(m_pFielder);
             bool hasGlobalPad = m_pFielder->GetGlobalPad() != 0;
@@ -795,7 +795,7 @@ bool DesireConfused::Reinitialize(void* context)
         && (m_pFielder->m_DetChar.m_eCharacterClass
                 != SHYGUY
             || m_pFielder->m_eActionState
-                   != ACTION_UNKNOWN_32))
+                   != ACTION_SKILLSHOT))
     {
         m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
         m_pFielder->ShootBallDueToContact(

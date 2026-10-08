@@ -189,7 +189,7 @@ ContactType PhysicsBanana::Contact(
             {
                 return NO_CONTACT;
             }
-            if (fielder->m_eActionState == 0x0C)
+            if (fielder->m_eActionState == ACTION_SHOOT_TO_SCORE)
             {
                 return NO_CONTACT;
             }

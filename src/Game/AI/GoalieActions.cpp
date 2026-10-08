@@ -919,7 +919,7 @@ void Goalie::ActionGrabMonty(float)
     {
         float fGrabTime = gfGoalieMontyGrabFrame / 37.0f;
         if (m_pCurrentAnimController->TestTrigger(fGrabTime)
-            && mpMonty->m_eActionState == ACTION_UNKNOWN_34)
+            && mpMonty->m_eActionState == ACTION_MONTY_BURROWED)
         {
             nlVector3 v3Position
                 = GetJointPosition(m_nRightHandJointIndex);
@@ -947,7 +947,7 @@ void Goalie::ActionGrabMonty(float)
 
         if (m_pCurrentAnimController->TestTrigger(
                 gfGoalieMontyEjectFrame / 37.0f)
-            && mpMonty->m_eActionState == ACTION_UNKNOWN_34)
+            && mpMonty->m_eActionState == ACTION_MONTY_BURROWED)
         {
             unsigned short aDirection
                 = (unsigned short)(m_DetChar.m_aActualFacingDirection + 0x9FF6);
@@ -957,7 +957,7 @@ void Goalie::ActionGrabMonty(float)
 
         if (m_pCurrentAnimController->m_fTime >= fGrabTime
             && !mpMonty->m_bMontyDekeFinished
-            && mpMonty->m_eActionState == ACTION_UNKNOWN_34)
+            && mpMonty->m_eActionState == ACTION_MONTY_BURROWED)
         {
             nlVector3 v3Position
                 = GetJointPosition(m_nRightHandJointIndex);
@@ -971,7 +971,7 @@ void Goalie::ActionGrabMonty(float)
             || m_DetPlayer.m_tFireTimer.m_uPackedTime != 0
             || GetMonty()->IsStarActive()
             || mpMonty->mbTangible
-            || mpMonty->m_eActionState != ACTION_UNKNOWN_32
+            || mpMonty->m_eActionState != ACTION_SKILLSHOT
             || mpMonty->m_pCurrentAnimController->m_fTime > 0.55f)
         {
             bShouldEndAction = true;
@@ -3833,10 +3833,10 @@ void Goalie::ActionPreCrouch(float deltaTime)
             }
             else
             {
-                if (pOwnerFielder->m_eActionState != ACTION_UNKNOWN_15
+                if (pOwnerFielder->m_eActionState != ACTION_REGULAR_SHOT
                     && pOwnerFielder->m_eActionState
                            != ACTION_SHOOT_TO_SCORE
-                    && pOwnerFielder->m_eActionState != ACTION_SHOT)
+                    && pOwnerFielder->m_eActionState != ACTION_MEGA_STRIKE)
                 {
                     InitActionMove(true);
                 }
@@ -4213,7 +4213,7 @@ void Goalie::ActionPursueDeke(float fDeltaT)
         {
         case 1:
         case 2:
-            if (mpTarget->m_eActionState != (eFielderActionState)1)
+            if (mpTarget->m_eActionState != ACTION_DEKE)
             {
                 break;
             }
@@ -4244,7 +4244,7 @@ void Goalie::ActionPursueDeke(float fDeltaT)
         {
         case 6:
         {
-            if (mpTarget->m_eActionState != (eFielderActionState)1)
+            if (mpTarget->m_eActionState != ACTION_DEKE)
             {
                 InitActionMove(false);
                 return;
@@ -6310,7 +6310,7 @@ void Goalie::InitActionSTSAttack()
 
     bool bInRange = false;
     if (mpShooter->m_DetChar.m_eCharacterClass != HAMMERBROS
-        || mpShooter->m_eActionState != (eFielderActionState)32
+        || mpShooter->m_eActionState != ACTION_SKILLSHOT
         || fn_800DEB04(mpShooter) > 0.8f)
     {
         mpLooseBallInfo = &LooseBallAnims::mLooseBallKickInfo[2];

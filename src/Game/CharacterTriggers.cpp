@@ -1883,7 +1883,7 @@ void EndDeke(cFielder* pFielder)
         EffectsGroup* pGroup = EmissionManager::Instance()->GetEffectsGroup("dk_deke");
         EmissionManager::Instance()->Destroy((unsigned long)g_pBall, pGroup);
     }
-    else if (pFielder->m_eActionState == 1)
+    else if (pFielder->m_eActionState == ACTION_DEKE)
     {
         if (pFielder->m_DetChar.m_eCharacterClass == PETEY)
         {

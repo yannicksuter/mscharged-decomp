@@ -1547,7 +1547,7 @@ extern "C" float fn_800D9DD8(cPlayer* pPlayer)
         nlVector3 v3Position = pFielder->m_DetChar.m_v3Position;
         bool bOutOfBounds = cField::FixOutOfBoundsPosition(v3Position, -1.0f, true);
         bool bIncapacitated = pFielder->IsFrozenStateActive() || pFielder->IsInFallAction()
-            || pFielder->m_eActionState == 35
+            || pFielder->m_eActionState == ACTION_LAUNCHED
             || pFielder->m_eActionState == ACTION_ELECTROCUTION || bOutOfBounds;
         fScore = bIncapacitated ? 1.0f : 0.0f;
     }
@@ -2735,7 +2735,7 @@ extern "C" float fn_800DD99C(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (pFielder->m_eActionState == 0x1D)
+    if (pFielder->m_eActionState == ACTION_SUPER_POWER)
     {
         return 1.0f;
     }
@@ -3139,10 +3139,10 @@ extern "C" float fn_800DEAB4(cFielder* pFielder)
 
     if (pFielder->m_eClassType == FIELDER)
     {
-        if (pFielder->GetActionState() == ACTION_UNKNOWN_15
-            || pFielder->GetActionState() == ACTION_UNKNOWN_30
+        if (pFielder->GetActionState() == ACTION_REGULAR_SHOT
+            || pFielder->GetActionState() == ACTION_SHOT_WINDUP
             || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
-            || pFielder->GetActionState() == ACTION_SHOT)
+            || pFielder->GetActionState() == ACTION_MEGA_STRIKE)
         {
             return 1.0f;
         }

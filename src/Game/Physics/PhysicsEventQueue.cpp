@@ -403,7 +403,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                 {
                     break;
                 }
-                if (pFielder->m_eActionState == ACTION_HIT_REACT)
+                if (pFielder->m_eActionState == ACTION_BOMB_HIT_REACT)
                 {
                     break;
                 }
@@ -420,7 +420,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                     break;
                 }
                 if (pFielder->m_eActionState == ACTION_BOMB_REACT
-                    || pFielder->m_eActionState == ACTION_HIT_REACT)
+                    || pFielder->m_eActionState == ACTION_BOMB_HIT_REACT)
                 {
                     break;
                 }

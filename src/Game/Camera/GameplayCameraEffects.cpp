@@ -280,7 +280,7 @@ bool GameplayCameraEffects::AreFieldersClear() const
                 if (fielder->m_DetChar.m_v3Position.x > owner->m_DetChar.m_v3Position.x
                     && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
-                    && fielder->m_eActionState != (eFielderActionState)0x23)
+                    && fielder->m_eActionState != ACTION_LAUNCHED)
                 {
                     return false;
                 }
@@ -290,7 +290,7 @@ bool GameplayCameraEffects::AreFieldersClear() const
                 if (fielder->m_DetChar.m_v3Position.x < owner->m_DetChar.m_v3Position.x
                     && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
-                    && fielder->m_eActionState != (eFielderActionState)0x23)
+                    && fielder->m_eActionState != ACTION_LAUNCHED)
                 {
                     return false;
                 }

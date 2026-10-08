@@ -191,7 +191,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             && m_pAICharacter->m_eClassType == FIELDER)
         {
             cFielder* fielder = (cFielder*)m_pAICharacter;
-            if (fielder->m_pBall == 0 || fielder->m_eActionState == 1
+            if (fielder->m_pBall == 0 || fielder->m_eActionState == ACTION_DEKE
                 || (IsWaluigiSuperPowerActive(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 actionState = fielder->m_eActionState;

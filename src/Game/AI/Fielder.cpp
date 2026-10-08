@@ -188,8 +188,8 @@ static inline bool IsPowerupBlockedByAction(eFielderActionState eActionState)
 {
     switch (eActionState)
     {
-    case 3:
-    case 0x18:
+    case ACTION_FALL:
+    case ACTION_SUCKED_AWAY:
         return true;
     default:
         return false;
@@ -272,7 +272,7 @@ inline bool cFielder::CheckReceivePassState()
     }
 
     if (bPassesActionCheck
-        && m_eActionState != (eFielderActionState)0x21)
+        && m_eActionState != ACTION_BOO_SKILLSHOT)
     {
         bPassesSkillshotCheck = true;
     }
@@ -441,7 +441,7 @@ static inline void AimClearBallAtTeammate(cFielder* player, int index, float fCl
         }
 
         if (bCondition0
-            && pFielder->m_eActionState != (eFielderActionState)0x21)
+            && pFielder->m_eActionState != ACTION_BOO_SKILLSHOT)
         {
             bCondition1 = true;
         }
@@ -1148,7 +1148,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (eActionState == (eFielderActionState)0x23)
+    if (eActionState == ACTION_LAUNCHED)
     {
         return false;
     }
@@ -1166,7 +1166,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
 
     if (pFielder->GetDesireState() == (eFielderDesireState)0x20)
     {
-        if (pFielder->m_eActionState == ACTION_SHOT)
+        if (pFielder->m_eActionState == ACTION_MEGA_STRIKE)
         {
             return false;
         }
@@ -1198,7 +1198,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (pFielder->m_eActionState == ACTION_UNKNOWN_32
+    if (pFielder->m_eActionState == ACTION_SKILLSHOT
         && (nPowerupType == POWER_UP_MUSHROOM || nPowerupType == POWER_UP_STAR))
     {
         return false;
@@ -1213,7 +1213,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
 
         switch (pFielder->m_eActionState)
         {
-        case 1:
+        case ACTION_DEKE:
         case ACTION_HIT:
         case ACTION_LATE_ONETIMER_FROM_VOLLEY:
         case ACTION_LOOSE_BALL_PASS:
@@ -1223,11 +1223,11 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         case ACTION_ONETOUCH_PASS_FROM_VOLLEY:
         case ACTION_PASS:
         case ACTION_RECEIVE_PASS:
-        case (eFielderActionState)0x13:
-        case ACTION_UNKNOWN_15:
+        case ACTION_RUNNING_PASS:
+        case ACTION_REGULAR_SHOT:
         case ACTION_SLIDE_ATTACK:
             return false;
-        case ACTION_UNKNOWN_30:
+        case ACTION_SHOT_WINDUP:
             if (IsWaluigiSuperPowerActive(pFielder))
             {
                 return false;
@@ -1246,9 +1246,9 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
             {
             case ACTION_HIT:
                 return false;
-            case 1:
+            case ACTION_DEKE:
                 return false;
-            case (eFielderActionState)0x1C:
+            case ACTION_KNOCKDOWN_REACT:
                 return false;
             }
 
@@ -1271,8 +1271,8 @@ bool cFielder::CanBeHitBySkillshot()
     {
         switch (m_eActionState)
         {
-        case 3:
-        case 24:
+        case ACTION_FALL:
+        case ACTION_SUCKED_AWAY:
             result = false;
             break;
         case ACTION_ELECTROCUTION:
@@ -1294,7 +1294,7 @@ bool cFielder::CanGetElectrocuted() const
         return false;
     if (IsYoshiSuperPowerActive())
         return false;
-    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND && m_eActionState == 35)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND && m_eActionState == ACTION_LAUNCHED)
         return false;
     if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
@@ -1315,16 +1315,16 @@ bool cFielder::CanGetElectrocuted(
 
     switch (m_eActionState)
     {
-    case (eFielderActionState)0:
-    case (eFielderActionState)5:
-    case (eFielderActionState)6:
-    case (eFielderActionState)23:
-    case (eFielderActionState)25:
-    case (eFielderActionState)26:
-    case (eFielderActionState)27:
-    case (eFielderActionState)31:
-    case (eFielderActionState)34:
-    case (eFielderActionState)35:
+    case ACTION_CROWD_RIOT:
+    case ACTION_HIT_REACT:
+    case ACTION_BOMB_HIT_REACT:
+    case ACTION_SLIDE_ATTACK_REACT:
+    case ACTION_BOMB_REACT:
+    case ACTION_SHELL_REACT:
+    case ACTION_BANANA_REACT:
+    case ACTION_BURNING:
+    case ACTION_MONTY_BURROWED:
+    case ACTION_LAUNCHED:
     {
         if (IsFallenDown())
         {
@@ -1375,7 +1375,7 @@ bool cFielder::CanGetElectrocuted(
             if ((m_DetChar.m_eCharacterClass == WALUIGI
                     || m_DetChar.m_eCharacterClass == DAISY
                     || m_DetChar.m_eCharacterClass == DRYBONES)
-                && m_eActionState == (eFielderActionState)1)
+                && m_eActionState == ACTION_DEKE)
             {
                 if (m_pCurrentAnimController->m_fTime > 0.7f
                     || m_DetChar.m_v3Position.z > 1.0f)
@@ -1387,7 +1387,7 @@ bool cFielder::CanGetElectrocuted(
             if (gEnableStandingWallElectrocution != 0
                 || GameInfoManager::Instance()->IsRule0x4Equal3())
             {
-                if (m_eActionState != (eFielderActionState)2)
+                if (m_eActionState != ACTION_ELECTROCUTION)
                 {
                     return true;
                 }
@@ -1934,7 +1934,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
         pFielder->ReleaseBall(BALL_STATE_LOOSE);
         if ((pFielder->m_DetChar.m_eCharacterClass == KOOPA
                 || pFielder->m_DetChar.m_eCharacterClass == BIRDO)
-            && pFielder->m_eActionState == (eFielderActionState)0x15)
+            && pFielder->m_eActionState == ACTION_REGULAR_SHOT)
         {
             if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
             {
@@ -1947,7 +1947,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
         }
 
         if (pFielder->m_DetChar.m_eCharacterClass == BOWSER
-            && pFielder->m_eActionState == (eFielderActionState)1)
+            && pFielder->m_eActionState == ACTION_DEKE)
         {
             nlVector3 v3WarpPos = pFielder->m_DetChar.m_v3Position;
             v3WarpPos.z = 0.18f;
@@ -1980,7 +1980,7 @@ bool cFielder::FreezeWithPeachPhoto(float duration)
     bool tangible = CanBeAffectedByPhoto();
     if (GetCharacterClass() == MONTYMOLE)
     {
-        if (GetJointPosition(m_nHeadJointIndex).z < 0.0f || m_eActionState == 34)
+        if (GetJointPosition(m_nHeadJointIndex).z < 0.0f || m_eActionState == ACTION_MONTY_BURROWED)
             return false;
     }
     bool yoshiActive;
@@ -2088,7 +2088,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
 
 void cFielder::CollideWithWindDebrisCallback(WindDebris* debris)
 {
-    if (!IsInvincible() && !IsShattered() && mbTangible && m_eActionState != 0 && m_eActionState != 35)
+    if (!IsInvincible() && !IsShattered() && mbTangible && m_eActionState != ACTION_CROWD_RIOT && m_eActionState != ACTION_LAUNCHED)
     {
         EndFrozenOrDazed();
         nlVector3 debrisVelocity = debris->mv3Velocity;
@@ -2162,7 +2162,7 @@ void cFielder::CollideWithWallCallback(
 
     bool bShellReact;
     if (!bActionActive
-        && m_eActionState == (eFielderActionState)0x16)
+        && m_eActionState == ACTION_SLIDE_ATTACK)
     {
         bShellReact = true;
     }
@@ -2206,7 +2206,7 @@ void cFielder::CollideWithWallCallback(
             PlayCrowdReaction(soundID);
         }
     }
-    else if (m_eActionState != (eFielderActionState)3
+    else if (m_eActionState != ACTION_FALL
              && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         float distance = (float)fabs(m_DetChar.m_v3Position.y);
@@ -2228,7 +2228,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && m_eActionState != ACTION_ELECTROCUTION
             && !IsStuck() && !IsInvincible())
         {
-            if (m_eActionState == ACTION_UNKNOWN_34)
+            if (m_eActionState == ACTION_MONTY_BURROWED)
             {
                 fn_80097358(this, gFirePatchBurnDuration);
                 return;
@@ -2256,7 +2256,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
     else if (type == PATCH_HEAVENLY_LIGHT)
     {
         if (eventData->pPatch->m_pOwner != this
-            && !IsInFallAction() && GetActionState() != ACTION_UNKNOWN_34
+            && !IsInFallAction() && GetActionState() != ACTION_MONTY_BURROWED
             && !IsInvincible())
         {
             fn_80045AEC(eventData->pPatch);
@@ -2383,8 +2383,8 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
     else if (type == PATCH_LAVA_BALL || type == PATCH_LAVA_HOLE)
     {
         if (!IsInFallAction() && !IsInvincible()
-            && m_eActionState != (eFielderActionState)0x18
-            && m_eActionState != (eFielderActionState)0x23)
+            && m_eActionState != ACTION_SUCKED_AWAY
+            && m_eActionState != ACTION_LAUNCHED)
         {
             PlayRumbleAction(RUMBLE_SOLID_CONTACT, GetGlobalPad());
             nlVector3 v3KnockbackVelocity = m_DetChar.m_v3Velocity;
@@ -2443,8 +2443,8 @@ bool cFielder::IsInFallAction() const
 {
     switch (GetActionState())
     {
-    case 3:
-    case 0x18:
+    case ACTION_FALL:
+    case ACTION_SUCKED_AWAY:
         return true;
     default:
         return false;
@@ -2465,15 +2465,15 @@ bool IsFielderFrontInvincible(cFielder* pFielder, const nlVector3* position)
 bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
 {
     if (pOtherFielder->m_DetChar.m_eCharacterClass == BOWSER
-        && pOtherFielder->m_eActionState == 1)
+        && pOtherFielder->m_eActionState == ACTION_DEKE)
     {
         return IsCharacterInAir(pOtherFielder->m_DetChar.m_fPlayerScale);
     }
-    if (m_DetChar.m_eCharacterClass == BOWSER && m_eActionState == 1)
+    if (m_DetChar.m_eCharacterClass == BOWSER && m_eActionState == ACTION_DEKE)
         return false;
-    if (m_DetChar.m_eCharacterClass == YOSHI && m_eActionState == 1)
+    if (m_DetChar.m_eCharacterClass == YOSHI && m_eActionState == ACTION_DEKE)
         return false;
-    if (m_DetChar.m_eCharacterClass == DIDDYKONG && m_eActionState == 0x1E)
+    if (m_DetChar.m_eCharacterClass == DIDDYKONG && m_eActionState == ACTION_SHOT_WINDUP)
         return false;
     if (pOtherFielder->m_DetChar.m_eCharacterClass == BOWSERJR
         && pOtherFielder->m_eActionState == ACTION_SLIDE_ATTACK)
@@ -2577,7 +2577,7 @@ bool cFielder::HasLooseBallContactPriority(cFielder* pOtherFielder) const
 bool cFielder::IsRunning() const
 {
     bool bRunning = false;
-    if (m_eActionState == ACTION_RUNNING || m_eActionState == 0x13
+    if (m_eActionState == ACTION_RUNNING || m_eActionState == ACTION_RUNNING_PASS
         || IsRunningWithBall())
     {
         bRunning = true;
@@ -2623,14 +2623,14 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         }
         break;
 
-    case 0:
+    case ACTION_CROWD_RIOT:
         m_ModelType = CharModel_Rigid;
         m_DetChar.m_v3Position.z = 0.0f;
         m_DetChar.m_v3Velocity.z = 0.0f;
         EndElectrocution(this);
         break;
 
-    case 1:
+    case ACTION_DEKE:
         CleanActionDeke();
         break;
 
@@ -2641,7 +2641,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         EndElectrocution(this);
         break;
 
-    case 3:
+    case ACTION_FALL:
         m_bShadowVisible = true;
         m_DetChar.m_v3Position.z = 0.0f;
         m_DetChar.m_v3Velocity.z = 0.0f;
@@ -2652,7 +2652,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         }
         break;
 
-    case 0x18:
+    case ACTION_SUCKED_AWAY:
         m_DetChar.m_v3Position.z = 0.0f;
         m_DetChar.m_v3Velocity.z = 0.0f;
         break;
@@ -2691,7 +2691,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         }
         break;
 
-    case 0x13:
+    case ACTION_RUNNING_PASS:
     {
         PlayerTweaks* pTweaks = m_pTweaks;
         InitMovementRunning(fn_8002C0AC(pTweaks),
@@ -2715,7 +2715,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         }
         break;
 
-    case ACTION_UNKNOWN_15:
+    case ACTION_REGULAR_SHOT:
         CleanActionShot(actionState);
         break;
 
@@ -2724,7 +2724,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         StopSound(0x2AE03886, this);
         break;
 
-    case 0x1C:
+    case ACTION_KNOCKDOWN_REACT:
         KillDaze(this);
         if (IsBowserSuperPowerActive(this))
         {
@@ -2749,15 +2749,15 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         }
         break;
 
-    case ACTION_UNKNOWN_30:
+    case ACTION_SHOT_WINDUP:
         fn_8004BF58(actionState);
         break;
 
-    case ACTION_UNKNOWN_32:
+    case ACTION_SKILLSHOT:
         fn_8004EC40();
         break;
 
-    case 0x21:
+    case ACTION_BOO_SKILLSHOT:
     {
         Goalie* pGoalie = m_pTeam->GetOtherTeam()->GetGoalie();
         pGoalie->m_pPhysicsCharacter->m_CanCollideWithBall = true;
@@ -2774,11 +2774,11 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
     }
 
-    case ACTION_UNKNOWN_34:
+    case ACTION_MONTY_BURROWED:
         fn_8004F180();
         break;
 
-    case 0x23:
+    case ACTION_LAUNCHED:
         if (actionState != 3 && actionState != 0x18)
         {
             m_DetChar.m_v3Position.z = 0.0f;
@@ -2847,7 +2847,7 @@ void cFielder::SetSlideAttackSuccessFlag()
 
 void cFielder::ShootBallDueToContact(const nlVector3& v3IncomingVelocity)
 {
-    if (GetActionState() == ACTION_SHOOT_TO_SCORE || GetActionState() == ACTION_SHOT)
+    if (GetActionState() == ACTION_SHOOT_TO_SCORE || GetActionState() == ACTION_MEGA_STRIKE)
     {
         g_pBall->ShootRelease(v3Zero, SPINTYPE_NONE);
         return;
@@ -3586,7 +3586,7 @@ void cFielder::DoRegularShooting(bool bParam)
     }
     else if (m_eActionState == ACTION_ONETIMER
         || m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
-        || (m_eActionState == ACTION_UNKNOWN_15
+        || (m_eActionState == ACTION_REGULAR_SHOT
             && m_DetPlayer.m_tBallPossessionTimer.GetSeconds() < 0.1f))
     {
         g_pBall->m_uGoalType = 1;
@@ -3852,7 +3852,7 @@ bool cFielder::IsFallenDown() const
         return true;
     }
 
-    if (GetActionState() == (eFielderActionState)0x21)
+    if (GetActionState() == ACTION_BOO_SKILLSHOT)
     {
         if (m_eAnimID != 0x81 || m_pCurrentAnimController->m_fTime < 0.3f)
         {
@@ -3861,8 +3861,8 @@ bool cFielder::IsFallenDown() const
         return false;
     }
 
-    if (GetActionState() == (eFielderActionState)0x22
-        || GetActionState() == (eFielderActionState)0x23)
+    if (GetActionState() == ACTION_MONTY_BURROWED
+        || GetActionState() == ACTION_LAUNCHED)
     {
         return true;
     }
@@ -4058,8 +4058,8 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
     }
     else if (g_pBall->GetOwnerFielder() != 0
         && (g_pBall->GetOwnerFielder()->m_eActionState == ACTION_SHOOT_TO_SCORE
-            || g_pBall->GetOwnerFielder()->m_eActionState == ACTION_SHOT
-            || g_pBall->GetOwnerFielder()->m_eActionState == (eFielderActionState)1))
+            || g_pBall->GetOwnerFielder()->m_eActionState == ACTION_MEGA_STRIKE
+            || g_pBall->GetOwnerFielder()->m_eActionState == ACTION_DEKE))
     {
         velocity = v3Zero;
         position = g_pBall->GetOwnerFielder()->GetPosition();
@@ -4173,8 +4173,8 @@ bool cFielder::CanReactToGroundEffects() const
             return true;
         }
         return false;
-    case 3:
-    case 24:
+    case ACTION_FALL:
+    case ACTION_SUCKED_AWAY:
         if (m_fFallingTime > 0.0f)
             return false;
         return true;
@@ -4243,16 +4243,16 @@ void cFielder::BeginDekeIntangibility()
         {
             SetTangible(false, false);
             m_fOpacity = gIntangibleAlpha;
-            if (m_eActionState == (eFielderActionState)1 || m_eActionState == (eFielderActionState)32)
+            if (m_eActionState == ACTION_DEKE || m_eActionState == ACTION_SKILLSHOT)
             {
                 EmitMontyDekeEnter(this);
                 if (m_pBall != 0)
                     m_pBall->m_pPhysicsBall->mbCanGoThroughGround = true;
             }
-            else if (m_eActionState == (eFielderActionState)28)
+            else if (m_eActionState == ACTION_KNOCKDOWN_REACT)
                 EmitMontySquishEnter(this);
         }
-        else if (m_pBall != 0 && m_eActionState == (eFielderActionState)1)
+        else if (m_pBall != 0 && m_eActionState == ACTION_DEKE)
         {
             SetTangible(false, false);
             m_fOpacity = gIntangibleAlpha;
@@ -4379,7 +4379,7 @@ void cFielder::RestoreTangibility(bool fadeIn)
             }
             else
                 EmitMontySquishExit(this);
-            if (m_eActionState == (eFielderActionState)32 && m_pBall != 0)
+            if (m_eActionState == ACTION_SKILLSHOT && m_pBall != 0)
                 g_pBall->m_pPhysicsBall->mbCanCollideGoalie = false;
             g_pBall->m_pPhysicsBall->mbCanGoThroughGround = false;
         }
@@ -5306,7 +5306,7 @@ bool cFielder::IsDKSuperPowerActive() const
 {
     bool result = false;
     if (GetCharacterClass() == DONKEYKONG
-        && m_eActionState == (eFielderActionState)0x1D)
+        && m_eActionState == ACTION_SUPER_POWER)
     {
         result = true;
     }
@@ -5465,29 +5465,29 @@ void cFielder::UpdateActionState(float dt)
 {
     switch (m_eActionState)
     {
-    case 1:
+    case ACTION_DEKE:
         fn_80044BEC(dt);
         break;
     case ACTION_ELECTROCUTION:
         ActionElectrocution(dt);
         break;
-    case 3:
+    case ACTION_FALL:
         fn_8004643C(dt);
         break;
-    case 0x18:
+    case ACTION_SUCKED_AWAY:
         fn_80045C74(dt);
         break;
     case ACTION_HIT:
         ActionHit(dt);
         break;
-    case 0:
+    case ACTION_CROWD_RIOT:
         fn_80043C18(dt);
         break;
-    case 0x23:
+    case ACTION_LAUNCHED:
         fn_80044290(dt);
         break;
-    case 5:
     case ACTION_HIT_REACT:
+    case ACTION_BOMB_HIT_REACT:
         fn_800474FC(dt);
         break;
     case ACTION_LATE_ONETIMER_FROM_VOLLEY:
@@ -5514,7 +5514,7 @@ void cFielder::UpdateActionState(float dt)
     case ACTION_POST_WHISTLE:
         ActionPostWhistle(dt);
         break;
-    case 0x11:
+    case ACTION_RECEIVE_PASS:
         ActionReceivePass(dt);
         break;
     case ACTION_RUNNING:
@@ -5523,10 +5523,10 @@ void cFielder::UpdateActionState(float dt)
     case ACTION_RUNNING_WB:
         ActionRunningWB(dt);
         break;
-    case 0x13:
+    case ACTION_RUNNING_PASS:
         fn_8004B2E4(dt);
         break;
-    case ACTION_UNKNOWN_15:
+    case ACTION_REGULAR_SHOT:
         fn_8004C02C(dt);
         break;
     case ACTION_SLIDE_ATTACK:
@@ -5538,16 +5538,16 @@ void cFielder::UpdateActionState(float dt)
     case ACTION_BOMB_REACT:
         ActionBombReact(dt);
         break;
-    case 0x1B:
+    case ACTION_BANANA_REACT:
         ActionBananaReact(dt);
         break;
-    case 0x1A:
+    case ACTION_SHELL_REACT:
         ActionShellReact(dt);
         break;
-    case 0x1C:
+    case ACTION_KNOCKDOWN_REACT:
         ActionKnockdownReact(dt);
         break;
-    case 0x1D:
+    case ACTION_SUPER_POWER:
         if (!g_pGame->IsGameplayOrOvertime() && ShouldStartCrossBlend(4))
         {
             StartRunning();
@@ -5556,19 +5556,19 @@ void cFielder::UpdateActionState(float dt)
     case ACTION_WAIT:
         ActionWait(dt);
         break;
-    case ACTION_UNKNOWN_30:
+    case ACTION_SHOT_WINDUP:
         fn_8004BB80(dt);
         break;
-    case ACTION_UNKNOWN_31:
+    case ACTION_BURNING:
         fn_8004E228();
         break;
-    case ACTION_UNKNOWN_32:
+    case ACTION_SKILLSHOT:
         fn_8004EAB4(dt);
         break;
-    case 0x21:
+    case ACTION_BOO_SKILLSHOT:
         fn_8004EE48(dt);
         break;
-    case ACTION_UNKNOWN_34:
+    case ACTION_MONTY_BURROWED:
         fn_8004F2FC(dt);
         break;
     }
@@ -5673,37 +5673,37 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         {
             m_pHeadTrack->m_fSmoothTime = 0.005f;
         }
-    case 29:
+    case ACTION_SUPER_POWER:
         if (m_DetChar.m_eCharacterClass == BOWSERJR)
         {
             m_pHeadTrack->m_fSmoothTime = 0.005f;
         }
     case ACTION_NEED_ACTION:
-    case 0:
-    case 1:
+    case ACTION_CROWD_RIOT:
+    case ACTION_DEKE:
     case ACTION_ELECTROCUTION:
-    case 5:
     case ACTION_HIT_REACT:
+    case ACTION_BOMB_HIT_REACT:
     case ACTION_LATE_ONETIMER_FROM_VOLLEY:
-    case ACTION_SHOT:
+    case ACTION_MEGA_STRIKE:
     case ACTION_SHOOT_TO_SCORE:
     case ACTION_ONETOUCH_PASS_FROM_VOLLEY:
-    case ACTION_UNKNOWN_15:
+    case ACTION_REGULAR_SHOT:
     case ACTION_SLIDE_ATTACK_REACT:
     case ACTION_BOMB_REACT:
     case ACTION_SHELL_REACT:
     case ACTION_BANANA_REACT:
-    case 28:
-    case ACTION_UNKNOWN_31:
-    case ACTION_UNKNOWN_32:
-    case 33:
-    case ACTION_UNKNOWN_34:
-    case 35:
+    case ACTION_KNOCKDOWN_REACT:
+    case ACTION_BURNING:
+    case ACTION_SKILLSHOT:
+    case ACTION_BOO_SKILLSHOT:
+    case ACTION_MONTY_BURROWED:
+    case ACTION_LAUNCHED:
         m_pHeadTrack->m_bTrackOOI = false;
         break;
 
-    case 3:
-    case 24:
+    case ACTION_FALL:
+    case ACTION_SUCKED_AWAY:
         m_pHeadTrack->m_bTrackOOI = true;
         if (m_fFallingTime > 0.0f)
         {
@@ -5717,7 +5717,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         }
         break;
 
-    case ACTION_UNKNOWN_30:
+    case ACTION_SHOT_WINDUP:
         m_pHeadTrack->m_v3OOI = m_pTeam->GetOtherNet()->m_v3NetLocation;
         m_pHeadTrack->m_bTrackOOI = true;
         break;
@@ -5776,7 +5776,7 @@ void cFielder::UpdateHeadTracking(float fDeltaT)
         break;
 
     case ACTION_PASS:
-    case 19:
+    case ACTION_RUNNING_PASS:
     case ACTION_SLIDE_ATTACK:
         if (m_pBall == 0)
         {
@@ -5867,7 +5867,7 @@ void cFielder::UpdateController(float fDeltaT)
             case ACTION_NEED_ACTION:
             case ACTION_PASS:
             case ACTION_POST_WHISTLE:
-            case (eFielderActionState)0x13:
+            case ACTION_RUNNING_PASS:
             {
                 if (IsStuck())
                 {
@@ -5879,10 +5879,10 @@ void cFielder::UpdateController(float fDeltaT)
                 break;
             }
 
-            case ACTION_SHOT:
+            case ACTION_MEGA_STRIKE:
             case ACTION_SHOOT_TO_SCORE:
             case ACTION_RUNNING_WB:
-            case ACTION_UNKNOWN_30:
+            case ACTION_SHOT_WINDUP:
             {
                 if (IsStuck())
                 {
@@ -5900,13 +5900,13 @@ void cFielder::UpdateController(float fDeltaT)
                 break;
             }
 
-            case (eFielderActionState)0x00:
-            case (eFielderActionState)0x01:
+            case ACTION_CROWD_RIOT:
+            case ACTION_DEKE:
             case ACTION_ELECTROCUTION:
-            case (eFielderActionState)0x03:
+            case ACTION_FALL:
             case ACTION_HIT:
-            case (eFielderActionState)0x05:
             case ACTION_HIT_REACT:
+            case ACTION_BOMB_HIT_REACT:
             case ACTION_IDLE_TURN:
             case ACTION_LATE_ONETIMER_FROM_VOLLEY:
             case ACTION_LOOSE_BALL_PASS:
@@ -5915,20 +5915,20 @@ void cFielder::UpdateController(float fDeltaT)
             case ACTION_ONETOUCH_PASS_FROM_VOLLEY:
             case ACTION_RECEIVE_PASS:
             case ACTION_RUNNING:
-            case ACTION_UNKNOWN_15:
+            case ACTION_REGULAR_SHOT:
             case ACTION_SLIDE_ATTACK:
             case ACTION_SLIDE_ATTACK_REACT:
-            case (eFielderActionState)0x18:
+            case ACTION_SUCKED_AWAY:
             case ACTION_BOMB_REACT:
             case ACTION_SHELL_REACT:
             case ACTION_BANANA_REACT:
-            case (eFielderActionState)0x1C:
-            case (eFielderActionState)0x1D:
-            case ACTION_UNKNOWN_31:
-            case ACTION_UNKNOWN_32:
-            case (eFielderActionState)0x21:
-            case ACTION_UNKNOWN_34:
-            case (eFielderActionState)0x23:
+            case ACTION_KNOCKDOWN_REACT:
+            case ACTION_SUPER_POWER:
+            case ACTION_BURNING:
+            case ACTION_SKILLSHOT:
+            case ACTION_BOO_SKILLSHOT:
+            case ACTION_MONTY_BURROWED:
+            case ACTION_LAUNCHED:
             case ACTION_WAIT:
                 if (m_pBall == NULL)
                 {
