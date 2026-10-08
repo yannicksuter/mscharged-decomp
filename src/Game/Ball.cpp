@@ -1616,7 +1616,7 @@ static inline void UpdateBallShotClock(cBall* pBall)
 extern "C" void fn_80015C38(cBall* pBall, int nBallState)
 {
     ImmediateEvent<void(int, int)>* event
-        = &g_pGame->mUnidentified49C.mBallStateChangeEvent;
+        = &g_pGame->mEventQueue.mBallStateChangeEvent;
     event->Deliver(pBall->meBallState, nBallState);
 
     if (pBall->meBallState == 9)

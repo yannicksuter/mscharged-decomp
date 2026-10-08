@@ -6780,7 +6780,7 @@ void Goalie::InitActionMegaStrike(float numBalls, float accuracy)
     muMegaReadyToSave = 0;
     mBallsLaunched = 0;
     mfMegaAccuracy = accuracy;
-    g_pGame->mUnidentified49C.mMegaStrikeStartEvent.Queue(Function<FnVoidVoid>());
+    g_pGame->mEventQueue.mMegaStrikeStartEvent.Queue(Function<FnVoidVoid>());
     g_pGame->mpWeatherManager->Pause();
     for (int i = 0; i < 10; ++i)
     {

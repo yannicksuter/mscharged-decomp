@@ -182,7 +182,7 @@ private:
     /* 0x9C */ float mfDesiredTiltSpeed;
 
 public:
-    /* 0xA0 */ float mUnidentified0A0;
+    /* 0xA0 */ float mfTiltTime;
 
 private:
     /* 0xA4 */ u16 maTiltDir;
@@ -218,7 +218,7 @@ public:
     void QueueChainNisEnd(ShotAtGoalData* data);
     void fn_80060BFC(CollisionBulletBillData& data);
 
-    /* 0x49C */ GameEventQueue mUnidentified49C;
+    /* 0x49C */ GameEventQueue mEventQueue;
 
     /* 0x10D8 */ Terrain* mpTerrain;
     /* 0x10DC */ WeatherManager* mpWeatherManager;

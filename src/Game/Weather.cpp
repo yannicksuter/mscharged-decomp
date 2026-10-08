@@ -1445,7 +1445,7 @@ void StormShipWeather::Update(float value)
             {
                 CreateChainLightning(m_PathIndex1);
                 CreateChainLightning(m_PathIndex2);
-                g_pGame->mUnidentified0A0 = 0.0f;
+                g_pGame->mfTiltTime = 0.0f;
                 m_ChainCount++;
                 if (m_ChainCount < gStormChainCount)
                     m_ChainTrainTimer = gStormChainDelay;

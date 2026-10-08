@@ -3155,7 +3155,7 @@ void cFielder::DoPenaltyCardBooking(cFielder* foulee, ePenaltyType type)
         data->fPenaltyWorth = worth;
         data->pFouler = this;
         data->pFoulee = foulee;
-        g_pGame->mUnidentified49C.mPenaltyEvent.Queue(data, Function<PenaltyData*>(FreePenaltyData));
+        g_pGame->mEventQueue.mPenaltyEvent.Queue(data, Function<PenaltyData*>(FreePenaltyData));
     }
 }
 

@@ -187,7 +187,7 @@ void GameplayCameraEffects::Update(float deltaTime)
     }
 }
 
-void GameplayCameraEffects::UnidentifiedNoOp()
+void GameplayCameraEffects::FixedUpdate()
 {
 }
 

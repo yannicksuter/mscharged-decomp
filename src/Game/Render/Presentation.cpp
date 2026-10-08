@@ -396,7 +396,7 @@ void Presentation::Finish()
             if (DuringEndOfGamePresentation(this))
             {
                 NisPlayer::Instance()->StopNisCue();
-                g_pGame->mUnidentified49C.mGameOverEvent.Queue(
+                g_pGame->mEventQueue.mGameOverEvent.Queue(
                     Function<FnVoidVoid>());
                 nlTaskManager::SetNextState(1);
             }
@@ -566,7 +566,7 @@ void Presentation::Update(float deltaT)
             }
 
             tDebugPrintManager::Print(DC_NETWORK, "Bypassing...\n");
-            g_pGame->mUnidentified49C.mPresentationBypassEvent.Queue(
+            g_pGame->mEventQueue.mPresentationBypassEvent.Queue(
                 Function<FnVoidVoid>());
         }
 

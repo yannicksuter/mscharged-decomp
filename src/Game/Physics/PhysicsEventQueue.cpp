@@ -437,7 +437,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                     bool bHasPad = pFielder->GetGlobalPad() != 0;
                     pStats->nPlayerPadID =
                         bHasPad ? pFielder->GetGlobalPad()->GetPadID() : -1;
-                    g_pGame->mUnidentified49C.mEvent31.Queue(pStats,
+                    g_pGame->mEventQueue.mEvent31.Queue(pStats,
                         Function<CollisionPowerupStatsData*>(
                             FreeCollisionPowerupStatsData));
                 }

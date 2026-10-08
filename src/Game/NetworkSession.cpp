@@ -1916,12 +1916,12 @@ static inline void RegisterLoadedGameActions(NetworkSession* session)
 {
     Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
     TypedEvent0<void>* pauseEvent
-        = &g_pGame->mUnidentified49C.mPauseGameEvent;
+        = &g_pGame->mEventQueue.mPauseGameEvent;
     pauseEvent->Add(first, (unsigned int)&session->mPauseEventOwner, -1);
 
     Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
     TypedEvent0<void>* resumingEvent
-        = &g_pGame->mUnidentified49C.mResumingGameEvent;
+        = &g_pGame->mEventQueue.mResumingGameEvent;
     resumingEvent->Add(second, (unsigned int)&session->mResumingEventOwner, -1);
 
     if (NetTournManager::Instance()->mState != 0)

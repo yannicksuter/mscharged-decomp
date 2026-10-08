@@ -23,7 +23,7 @@ public:
 
     void RegisterEventListeners();
     void Update(float deltaTime);
-    void UnidentifiedNoOp();
+    void FixedUpdate();
     void Reset();
     void UpdateCameraFlags();
     bool AreFieldersClear() const;

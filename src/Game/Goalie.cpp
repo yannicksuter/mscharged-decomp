@@ -556,7 +556,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 data.saveType = pBall->m_uGoalType;
                 data.pShooter = pBall->m_pShooter;
                 data.pGoalie = this;
-                g_pGame->mUnidentified49C.mCollisionBallGoalieEvent.Deliver(&data);
+                g_pGame->mEventQueue.mCollisionBallGoalieEvent.Deliver(&data);
             }
             EmitGoalieCatch(this, "goalie_deflect", false);
             float fDistSquared = nlGetLengthSquared1D(gfHandCatchDist);
@@ -592,7 +592,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 data.saveType = pBall->m_uGoalType;
                 data.pShooter = pBall->m_pShooter;
                 data.pGoalie = this;
-                g_pGame->mUnidentified49C.mCollisionBallGoalieEvent.Deliver(&data);
+                g_pGame->mEventQueue.mCollisionBallGoalieEvent.Deliver(&data);
             }
             if (mpSkillShooter != NULL && mpSaveData != NULL)
             {

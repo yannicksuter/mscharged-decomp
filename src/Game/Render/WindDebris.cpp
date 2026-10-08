@@ -133,7 +133,7 @@ void WindDebris::CollisionCallback(
             CollisionWindDebrisPlayerData* pData = g_CollisionWindDebrisPlayerDataPool.Allocate();
             pData->pFielder = pFielder;
             pData->pDebris = pDebris;
-            g_pGame->mUnidentified49C.mCollisionWindDebrisPlayerEvent.Queue(pData,
+            g_pGame->mEventQueue.mCollisionWindDebrisPlayerEvent.Queue(pData,
                 Function<CollisionWindDebrisPlayerData*>(FreeCollisionWindDebrisPlayerData));
         }
     }

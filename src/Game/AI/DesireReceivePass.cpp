@@ -1475,7 +1475,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
         eventData.mPasserControllerID = bHasGlobalPad
             ? pPasser->GetGlobalPad()->GetPadID()
             : -1;
-        g_pGame->mUnidentified49C.mPassBallEvent.Deliver(&eventData);
+        g_pGame->mEventQueue.mPassBallEvent.Deliver(&eventData);
 
         UnidentifiedVariantCollection params;
         params.Set(14, FuzzyVariant(FT_VECTOR, v3PassPosition));
