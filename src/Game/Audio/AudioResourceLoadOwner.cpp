@@ -26,8 +26,9 @@ static inline void PopAllocator()
 }
 
 void OnAudioResourceBundleLoaded(
-    void* data, unsigned long, AudioResourceLoadOwner* state)
+    void* data, unsigned long, void* context)
 {
+    AudioResourceLoadOwner* state = static_cast<AudioResourceLoadOwner*>(context);
     PushAllocator(state->m_Allocator);
     state->m_LoadedData = data;
 
@@ -129,7 +130,7 @@ void LoadAudioResource(AudioResourceLoadOwner* state,
 
     if (g_pAudioSystem->IsAsyncLoading())
     {
-        nlLoadEntireFileAsync(path, (LoadAsyncCallback)OnAudioResourceBundleLoaded, state, 0x20, AllocateStart, 0, 0, state->m_Allocator);
+        nlLoadEntireFileAsync(path, OnAudioResourceBundleLoaded, state, 0x20, AllocateStart, 0, 0, state->m_Allocator);
         return;
     }
 

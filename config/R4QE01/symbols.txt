@@ -10503,7 +10503,7 @@ Clone__Q230Function1<b,R14Plat3dSoundSrc>127FunctorImpl<111BindExp3<b,Q26Detail5
 __dt__Q230Function1<b,R14Plat3dSoundSrc>127FunctorImpl<111BindExp3<b,Q26Detail54MemFunImpl<b,M11AudioSystemFPCvPvfR14Plat3dSoundSrc_b>,P11AudioSystem,f,14Placeholder<0>>>Fv = .text:0x802ECF14; // type:function size:0x44
 Call__Q286DLListContainerBase<14Plat3dSoundSrc,46BasicSlotPool<29DLListEntry<14Plat3dSoundSrc>>>12WalkCallbackFP29DLListEntry<14Plat3dSoundSrc> = .text:0x802ECF58; // type:function size:0x38
 __sinit_\AudioSystem_cpp = .text:0x802ECF90; // type:function size:0x1B4 scope:local
-OnAudioResourceBundleLoaded__FPvUlP22AudioResourceLoadOwner = .text:0x802ED144; // type:function size:0x238
+OnAudioResourceBundleLoaded__FPvUlPv = .text:0x802ED144; // type:function size:0x238
 UnloadAudioResource__FP22AudioResourceLoadOwner = .text:0x802ED37C; // type:function size:0xFC
 FindAudioResourceCue__FP22AudioResourceLoadOwnerUiUiUiUi = .text:0x802ED478; // type:function size:0x20
 LoadAudioResource__FP22AudioResourceLoadOwnerPCcPFP22AudioResourceLoadOwnerPv_vPvP15MemoryAllocator = .text:0x802ED498; // type:function size:0x1E0
