@@ -201,6 +201,14 @@ public:
 
 // Periodic state for one game in the online tournament bracket. The message
 // carries a full BasicGameInfo only when mHasGameInfo is set.
+enum eNetworkTournamentUpdate
+{
+    NET_TOURN_UPDATE_RESULT = 0,
+    NET_TOURN_UPDATE_PROGRESS = 1,
+    NET_TOURN_UPDATE_DID_NOT_FINISH = 2,
+    NET_TOURN_UPDATE_COULD_NOT_START = 3,
+};
+
 class NetMessageTournamentGameUpdate : public NetworkMessage
 {
 public:

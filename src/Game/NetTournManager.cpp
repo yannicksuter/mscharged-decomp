@@ -63,7 +63,7 @@ NetTournManager* NetTournManager::Instance()
 
 void NetTournManager::Reset(bool)
 {
-    mState = 0;
+    mState = NET_TOURN_INACTIVE;
     mMachineCount = 0;
     mLocalMachineIndex = -1;
     mLargeBracket = false;
@@ -132,7 +132,7 @@ void NetTournManager::TransitionOnlineMenuToTournament(
         mSeedings[i] = message->mSeedings[i];
     }
 
-    mState = 1;
+    mState = NET_TOURN_RUNNING;
     mCurrentRound = 0;
     mTimeToStartGames = s_fDefaultTimeToStartGames;
     mWaitingToStartGames = true;
@@ -327,7 +327,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     if (isHomeMachine)
     {
         NetMessageTournamentGameUpdate gameUpdate(
-            1, mCurrentGameIndex, isHomeMachine, 1, 0, false);
+            NET_TOURN_UPDATE_PROGRESS, mCurrentGameIndex, isHomeMachine, 1, 0, false);
         int gameSize = gNetworkMessageRegistry->Serialize(&gameUpdate, gameBuffer, sizeof(gameBuffer));
         SendToAllTournamentMachines(gameBuffer, gameSize);
     }
@@ -519,7 +519,7 @@ void NetTournManager::StartReadyGames()
                 game->mState = NET_TOURN_GAME_COULD_NOT_START;
                 u8 buffer[0xFF];
                 NetMessageTournamentGameUpdate update(
-                    3, gameIndex, true, 0, 0, false);
+                    NET_TOURN_UPDATE_COULD_NOT_START, gameIndex, true, 0, 0, false);
                 int size = gNetworkMessageRegistry->Serialize(
                     &update, buffer, sizeof(buffer));
                 SendToAllTournamentMachines(buffer, size);
@@ -736,7 +736,7 @@ void NetTournManager::Update(float dt)
     NetworkTournamentGame* game;
     switch (mState)
     {
-    case 1:
+    case NET_TOURN_RUNNING:
         for (int machine = 0; machine < mMachineCount; ++machine)
         {
             if (machine != mLocalMachineIndex
@@ -793,7 +793,7 @@ void NetTournManager::Update(float dt)
                 {
                     roster->Shutdown(true);
                 }
-                mState = 2;
+                mState = NET_TOURN_FINISHED;
             }
             else
             {
@@ -838,7 +838,7 @@ void NetTournManager::Update(float dt)
                     gameTimeDelta = gameDuration - gameTime;
                 }
 
-                NetMessageTournamentGameUpdate message(1,
+                NetMessageTournamentGameUpdate message(NET_TOURN_UPDATE_PROGRESS,
                     mCurrentGameIndex, isHomeMachine, gameStatus,
                     gameTimeDelta, majorUpdate);
                 if (majorUpdate)
@@ -859,8 +859,8 @@ void NetTournManager::Update(float dt)
         }
 
         break;
-    case 0:
-    case 2:
+    case NET_TOURN_INACTIVE:
+    case NET_TOURN_FINISHED:
     default:
         break;
     }
@@ -902,7 +902,7 @@ void NetTournManager::NotifyGameStarted()
             gameTimeDelta = gameDuration - gameTime;
         }
 
-        NetMessageTournamentGameUpdate message(1, mCurrentGameIndex,
+        NetMessageTournamentGameUpdate message(NET_TOURN_UPDATE_PROGRESS, mCurrentGameIndex,
             isHomeMachine, gameStatus, gameTimeDelta, false);
         u8 buffer[0xFF];
         int size = gNetworkMessageRegistry->Serialize(
@@ -931,7 +931,7 @@ void NetTournManager::NotifyOverlayPopped(int)
     {
         isHomeMachine = true;
     }
-    NetMessageTournamentGameUpdate message(2, mCurrentGameIndex,
+    NetMessageTournamentGameUpdate message(NET_TOURN_UPDATE_DID_NOT_FINISH, mCurrentGameIndex,
         isHomeMachine, 0, 0, false);
     u8 buffer[0xFF];
     int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
@@ -945,7 +945,7 @@ void NetTournManager::NotifyGameOver()
     {
         isHomeMachine = true;
     }
-    NetMessageTournamentGameUpdate message(0, mCurrentGameIndex,
+    NetMessageTournamentGameUpdate message(NET_TOURN_UPDATE_RESULT, mCurrentGameIndex,
         isHomeMachine, 1, 0, true);
     message.mGameInfo = *GameInfoManager::Instance()->GetCurrentGameInfo();
     u8 buffer[0xFF];
@@ -1013,7 +1013,7 @@ int NetTournManager::ProcessMessage(NetworkMessage* message)
 void NetTournManager::HandleTournamentGameUpdate(
     NetMessageTournamentGameUpdate* message)
 {
-    if (mState != 1)
+    if (mState != NET_TOURN_RUNNING)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Ignoring NetworkTournamentGameUpdate because in tournament stage %d\n",
@@ -1022,7 +1022,7 @@ void NetTournManager::HandleTournamentGameUpdate(
     }
 
     NetworkTournamentGame& game = mGames[message->mGameIndex];
-    if (message->mUpdateType == 2)
+    if (message->mUpdateType == NET_TOURN_UPDATE_DID_NOT_FINISH)
     {
         switch (game.mState)
         {
@@ -1041,7 +1041,7 @@ void NetTournManager::HandleTournamentGameUpdate(
             break;
         }
     }
-    else if (message->mUpdateType == 3)
+    else if (message->mUpdateType == NET_TOURN_UPDATE_COULD_NOT_START)
     {
         switch (game.mState)
         {
@@ -1057,7 +1057,7 @@ void NetTournManager::HandleTournamentGameUpdate(
             break;
         }
     }
-    else if (message->mUpdateType == 1)
+    else if (message->mUpdateType == NET_TOURN_UPDATE_PROGRESS)
     {
         switch (game.mState)
         {
@@ -1103,7 +1103,7 @@ void NetTournManager::HandleTournamentGameUpdate(
         }
         }
     }
-    else if (message->mUpdateType == 0)
+    else if (message->mUpdateType == NET_TOURN_UPDATE_RESULT)
     {
         switch (game.mState)
         {
