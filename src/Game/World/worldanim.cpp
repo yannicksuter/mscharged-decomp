@@ -166,7 +166,7 @@ void WorldAnimUpdate::Update(const unsigned long&,
             pController->m_pPoseAccumulator->Pose(
                 pController->m_pPoseTree, &pController->m_worldMatrix);
         }
-        if (pController->m_pPoseTree->UnidentifiedAtEnd()
+        if (pController->m_pPoseTree->IsFinished()
             && pController->m_pWorldAnimObject != 0)
         {
             SelectRandomWorldAnimation(pController->m_pWorldAnimObject);

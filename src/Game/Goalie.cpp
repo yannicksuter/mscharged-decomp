@@ -186,7 +186,7 @@ inline void Goalie::ResetGoalieState()
     muMegaReadyToSave = 0;
     mBallsLaunched = 0;
     mLowLobAnim = 0;
-    mFreezeTimer.UnidentifiedClear();
+    mFreezeTimer.Clear();
     mMegaMachine = -1;
     mpPassTarget = 0;
     mpShooter = 0;
@@ -361,8 +361,8 @@ inline void Goalie::StartStun()
 bool Goalie::CheckForDaze()
 {
     if (!mbStunEffectActive && !g_pBall->mbBallOnFire
-        && (g_pBall->UnidentifiedGetGoalType() == 0 || g_pBall->UnidentifiedGetGoalType() == 7
-            || g_pBall->UnidentifiedGetGoalType() == 1 || g_pBall->UnidentifiedGetGoalType() == 2))
+        && (g_pBall->GetGoalType() == 0 || g_pBall->GetGoalType() == 7
+            || g_pBall->GetGoalType() == 1 || g_pBall->GetGoalType() == 2))
     {
         cPlayer* pScorer = g_pGame->m_pScorer;
         bool bStunGoalieCheat = false;
@@ -382,7 +382,7 @@ bool Goalie::CheckForDaze()
             float fSpeedSquared = nlVec3LengthSquared(pBall->m_v3Velocity);
             float fLimitSquared = nlGetLengthSquared1D(gfDazeShotSpeed);
             if (bStunGoalieCheat
-                || (!pBall->UnidentifiedState7Shot()
+                || (!pBall->IsChipShotActive()
                         && g_pBall->m_tShotTimer.m_uPackedTime != 0
                         && pScorer == g_pBall->m_pShooter
                         && fSpeedSquared > fLimitSquared
@@ -431,7 +431,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
         {
             bool bPlayAnimation = false;
             bool bSkip = false;
-            const bool bLightningShot = pBall->UnidentifiedState8Shot();
+            const bool bLightningShot = pBall->IsSkillShotActive();
             if (bLightningShot && mpSkillShooter == NULL)
             {
                 switch (mGoalieActionState)
@@ -550,7 +550,7 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
                 EmitGoalieCatch(this, "goalie_catch", false);
                 break;
             }
-            if (pBall->UnidentifiedState7Shot())
+            if (pBall->IsChipShotActive())
             {
                 GoalieSaveData data;
                 data.saveType = pBall->m_uGoalType;
@@ -991,10 +991,10 @@ void Goalie::DoNavigation(float fDeltaT, float fIdleDistance, Goalie::eNaviMode 
         }
 
         bNeedChange = false;
-        if (mnSubstate != 1 || (bNeedChange = (m_pCurrentAnimController->UnidentifiedAtEnd())))
+        if (mnSubstate != 1 || (bNeedChange = (m_pCurrentAnimController->IsFinished())))
         {
             bNeedChange = false;
-            if (nNewAnim != m_eAnimID || (bNeedChange = (m_pCurrentAnimController->UnidentifiedAtEnd())))
+            if (nNewAnim != m_eAnimID || (bNeedChange = (m_pCurrentAnimController->IsFinished())))
             {
                 SetAnimState(nNewAnim, true, 0.2f, false, false);
             }
@@ -1295,7 +1295,7 @@ void Goalie::DoNavigation(float fDeltaT, float fIdleDistance, Goalie::eNaviMode 
         }
 
         bNeedChange = false;
-        if (eAnimID != m_eAnimID || (bNeedChange = (m_pCurrentAnimController->UnidentifiedAtEnd())))
+        if (eAnimID != m_eAnimID || (bNeedChange = (m_pCurrentAnimController->IsFinished())))
         {
             SetAnimState(eAnimID, true, 0.2f, false, false);
         }
@@ -1352,7 +1352,7 @@ void Goalie::DoNavigation(float fDeltaT, float fIdleDistance, Goalie::eNaviMode 
             if (nlVec3DistanceSquared2D(mv3NavTarget, mUnidentified024.m_v3Position)
                 <= nlVec3DistanceSquared2D(mv3NavTarget, mUnidentified024.m_v3PrevPosition))
             {
-                bool bAnimDone = m_pCurrentAnimController->UnidentifiedAtEnd();
+                bool bAnimDone = m_pCurrentAnimController->IsFinished();
                 if (!bAnimDone)
                 {
                     bDoStrafe = false;

@@ -367,7 +367,7 @@ void HandleCrowdRiotBallCollision(cBall* ball, CrowdRiot* crowdRiot)
         MakeRandomDirection2D(velocity, 10.0f);
         velocity.z = 10.0f + nlRandomf(5.0f);
         ball->SetVelocity(velocity, SPINTYPE_NONE, 0);
-        ball->mtStuckInRiotTimer.UnidentifiedClear();
+        ball->mtStuckInRiotTimer.Clear();
         ball->mbStuckInRiotDone = false;
     }
     else if (ball->mtStuckInRiotTimer.m_uPackedTime == 0)

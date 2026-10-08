@@ -291,7 +291,7 @@ static inline bool IsClass15BallShot(cBall* pBall, cPlayer* pShooter)
     bool bClassShot;
     bClassShot = false;
     bState8ShotWithShooter = false;
-    bool bState8Shot = pBall->UnidentifiedState8Shot();
+    bool bState8Shot = pBall->IsSkillShotActive();
     if (bState8Shot && pShooter != NULL)
     {
         bState8ShotWithShooter = true;
@@ -1578,7 +1578,7 @@ extern "C" void fn_80015B38(cBall* pBall, bool bParam)
 
 static inline void ClearBallStateTargets(cBall* pBall)
 {
-    pBall->m_tShotTimer.UnidentifiedClear();
+    pBall->m_tShotTimer.Clear();
     pBall->mpDamageTarget = NULL;
     if (pBall->m_pPassTarget != NULL)
     {
@@ -1588,7 +1588,7 @@ static inline void ClearBallStateTargets(cBall* pBall)
     pBall->m_v3PassIntercept.x = 0.0f;
     pBall->m_v3PassIntercept.y = 0.0f;
     pBall->m_v3PassIntercept.z = 0.0f;
-    pBall->m_tPassTargetTimer.UnidentifiedClear();
+    pBall->m_tPassTargetTimer.Clear();
     pBall->m_fTotalPassTime = 0.0f;
     if (pBall->m_uVoiceID != 0)
     {
@@ -1623,7 +1623,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     {
         pBall->m_pPhysicsBall->m_gravity = -22.5f;
         fn_801BDF08(0);
-        pBall->m_tLightningTimer.UnidentifiedClear();
+        pBall->m_tLightningTimer.Clear();
     }
 
     if ((pBall->meBallState == 6 || pBall->meBallState == 7)

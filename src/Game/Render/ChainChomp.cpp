@@ -897,7 +897,7 @@ void ChainChomp::Hide()
     mnThrowerPadID = -1;
     mbIsVisible = false;
     mpTarget = 0;
-    mtStateTimer.UnidentifiedClear();
+    mtStateTimer.Clear();
     mfChaseSpeed = 0.0f;
 }
 

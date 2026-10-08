@@ -120,7 +120,7 @@ struct UnidentifiedCharacterState_024
         nlVec3Set(m_v3Velocity, 0.0f, 0.0f, 0.0f);
         nlVec3Set(m_v3PrevVelocity, 0.0f, 0.0f, 0.0f);
         nlVec3Set(m_v3AnimMoveAdjust, 0.0f, 0.0f, 0.0f);
-        m_tScaleTimer.UnidentifiedClear();
+        m_tScaleTimer.Clear();
     }
 
     /* 0x00 */ eCharacterClass m_eCharacterClass;
@@ -194,7 +194,7 @@ public:
         cPN_SAnimController* pController);
 
     void UpdateMovementState(float fDeltaT);
-    void UnidentifiedSetScale(float unidentifiedScale);
+    void SetPlayerScale(float unidentifiedScale);
     void fn_80022D58(float fDeltaT);
 
     void SetElectrocutionTextureEnabled(bool isEnabled);

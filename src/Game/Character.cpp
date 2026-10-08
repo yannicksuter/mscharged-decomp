@@ -237,7 +237,7 @@ inline float ClampMax(float speedRatio, const float max)
     return max;
 }
 
-inline void cCharacter::UnidentifiedSetScale(float unidentifiedScale)
+inline void cCharacter::SetPlayerScale(float unidentifiedScale)
 {
     mUnidentified024.m_fPlayerScale = unidentifiedScale;
     m_pPoseAccumulator->m_Scale = unidentifiedScale;
@@ -503,14 +503,14 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
     animController.m_bMirror = m_pAnimInventory->GetMirrored(nAnimIndex);
     animController.SetTime(fTime);
 
-    UnidentifiedBitPacker unidentifiedKey;
+    BitPacker unidentifiedKey;
     if (unidentifiedCache)
     {
-        unidentifiedKey.UnidentifiedPack(nAnimIndex, 0, 178);
-        unidentifiedKey.UnidentifiedPack(nJointIndex, 0, 50);
-        unidentifiedKey.UnidentifiedPack(fTime, 0.0f, 1.0f, 0.01f);
+        unidentifiedKey.Pack(nAnimIndex, 0, 178);
+        unidentifiedKey.Pack(nJointIndex, 0, 50);
+        unidentifiedKey.Pack(fTime, 0.0f, 1.0f, 0.01f);
         nlVector3* unidentifiedValue;
-        if (mUnidentified1C0.FindGet(unidentifiedKey.UnidentifiedGet(), &unidentifiedValue))
+        if (mUnidentified1C0.FindGet(unidentifiedKey.GetBits(), &unidentifiedValue))
         {
             static unsigned int lbl_806E0C24;
             *v3Out = *unidentifiedValue;
@@ -525,9 +525,9 @@ void cCharacter::GetJointPositionFuture(nlVector3* v3Out, int nAnimIndex,
         *v3Out = *(nlVector3*)&m4NodeMatrix.e2[3][0];
         if (unidentifiedCache)
         {
-            mUnidentified1C0.Add(unidentifiedKey.UnidentifiedGet(), *v3Out);
+            mUnidentified1C0.Add(unidentifiedKey.GetBits(), *v3Out);
             nlVector3* unidentifiedValue;
-            mUnidentified1C0.Find(unidentifiedKey.UnidentifiedGet(), &unidentifiedValue, 0);
+            mUnidentified1C0.Find(unidentifiedKey.GetBits(), &unidentifiedValue, 0);
         }
     }
     if (bAddRootRot)
@@ -714,7 +714,7 @@ void cCharacter::MatchAnimSpeedToCharacterSpeed(unsigned int nParam,
         float min = 0.6f;
         float max = 1.4f;
         pController->m_fPlaybackSpeedScale = ClampMax(ClampMin(
-            pChar->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->UnidentifiedGetLinearSpeed(),
+            pChar->mUnidentified024.m_fActualSpeed / pController->m_pSAnim->GetLinearSpeed(),
             min), max);
     }
 }
@@ -1036,14 +1036,14 @@ void cCharacter::Update(float fDeltaT)
                 unidentifiedFraction = nlMinEquals(unidentifiedFraction, 1.0f);
                 float unidentifiedScale = Interpolate(mUnidentified024.m_fPlayerScale,
                     mUnidentified024.m_fDesiredPlayerScale, unidentifiedFraction);
-                UnidentifiedSetScale(unidentifiedScale);
+                SetPlayerScale(unidentifiedScale);
                 mUnidentified024.m_fMovementScale = Interpolate(mUnidentified024.m_fMovementScale,
                     mUnidentified024.m_fDesiredMovementScale, unidentifiedFraction);
             }
             else
             {
-                UnidentifiedSetScale(mUnidentified024.m_fDesiredPlayerScale);
-                mUnidentified024.m_tScaleTimer.UnidentifiedClear();
+                SetPlayerScale(mUnidentified024.m_fDesiredPlayerScale);
+                mUnidentified024.m_tScaleTimer.Clear();
                 mUnidentified024.m_fMovementScale = mUnidentified024.m_fDesiredMovementScale;
             }
         }
@@ -1447,8 +1447,8 @@ void cCharacter::fn_8001EE74(float fParam0, float fParam1, float fParam2)
     }
     else
     {
-        mUnidentified024.m_tScaleTimer.UnidentifiedClear();
-        UnidentifiedSetScale(fParam0);
+        mUnidentified024.m_tScaleTimer.Clear();
+        SetPlayerScale(fParam0);
         mUnidentified024.m_fMovementScale = mUnidentified024.m_fDesiredMovementScale;
     }
 }
@@ -1734,7 +1734,7 @@ void cCharacter::SyncLog(void* context, DebugWriteCache* cache)
     state.m_nHS = anim->m_nHierarchySignature;
     state.m_fDuration = anim->GetDuration();
     state.m_nNumRootKeys = (unsigned int)(float)anim->m_nNumKeys;
-    state.m_fLinearSpeed = anim->UnidentifiedGetLinearSpeed();
+    state.m_fLinearSpeed = anim->GetLinearSpeed();
 
     state.SyncLog(context, cache);
     m_pHeadTrack->SyncLog(context, cache);
@@ -1902,12 +1902,12 @@ extern "C" void fn_80020E20(ReceiveBallData* pEventData)
         return;
 
     cTeam* pTeam = pReceiver->GetTeam();
-    pTeam->mtMarkTimer.UnidentifiedClear();
-    pTeam->mtRoleTimer.UnidentifiedClear();
+    pTeam->mtMarkTimer.Clear();
+    pTeam->mtRoleTimer.Clear();
     cTeam* pOtherTeam = pTeam->GetOtherTeam();
-    pOtherTeam->mtMarkTimer.UnidentifiedClear();
+    pOtherTeam->mtMarkTimer.Clear();
     pOtherTeam = pTeam->GetOtherTeam();
-    pOtherTeam->mtRoleTimer.UnidentifiedClear();
+    pOtherTeam->mtRoleTimer.Clear();
 }
 
 extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)

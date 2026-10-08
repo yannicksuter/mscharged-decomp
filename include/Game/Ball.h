@@ -65,7 +65,7 @@ public:
     void Update(float fDeltaT);
     void SyncLog(void* context, DebugWriteCache* cache);
     void ChecksumState(RunningChecksum* runningChecksum);
-    unsigned int UnidentifiedGetGoalType() const
+    unsigned int GetGoalType() const
     {
         return m_uGoalType;
     }
@@ -78,7 +78,7 @@ public:
     void InitiateBallBlur(
         eBallShotEffectType effectType, cPlayer* pPlayer);
     bool GetInNet(int& nSide);
-    bool UnidentifiedPassState() const
+    bool IsInPassState() const
     {
         return meBallState == 5 || meBallState == 3;
     }
@@ -114,12 +114,12 @@ public:
     }
     const nlVector3& GetPassIntercept() const { return m_v3PassIntercept; }
 
-    bool UnidentifiedState8Shot()
+    bool IsSkillShotActive()
     {
         return m_tShotTimer.m_uPackedTime != 0 && meBallState == 8;
     }
 
-    bool UnidentifiedState7Shot()
+    bool IsChipShotActive()
     {
         return m_tShotTimer.m_uPackedTime != 0 && meBallState == 7;
     }

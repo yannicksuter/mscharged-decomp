@@ -419,7 +419,7 @@ float Lightning::GetStartChance()
 void Lightning::Reset()
 {
     Weather::Reset();
-    mtLightingTimer.UnidentifiedClear();
+    mtLightingTimer.Clear();
     mnAmountOfStrikes = gLightningStrikeCount;
 }
 
@@ -514,7 +514,7 @@ void Lightning::Stop(bool value)
         WorldDarkening::Instance().Fade(2.0f * gLightningFadeTime, 0.0f);
     }
     KillLightning(value);
-    mtLightingTimer.UnidentifiedClear();
+    mtLightingTimer.Clear();
     mnAmountOfStrikes = 0;
     Weather::Stop(value);
 }
@@ -542,7 +542,7 @@ float Windy::GetStartChance()
 void Windy::Reset()
 {
     Weather::Reset();
-    mtWindTimer.UnidentifiedClear();
+    mtWindTimer.Clear();
     aWindDirection = 0;
     fWindStrength = 0.0f;
     eDebrisType = -1;

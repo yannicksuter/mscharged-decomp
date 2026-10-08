@@ -1721,7 +1721,7 @@ void cTeam::ClearCurrentPowerUp()
 {
     m_ePowerupList[0].eType = POWER_UP_NONE;
     m_ePowerupList[0].nnumOfPowerups = 0;
-    mtToggleTimer.UnidentifiedClear();
+    mtToggleTimer.Clear();
 
     for (int i = 0; i < 2; i++)
     {
@@ -1865,11 +1865,11 @@ void cTeam::Reset()
     mfAttackIndicatorProgress = 0.0f;
     mfShotScore = 0.0f;
 
-    mtTeamStyleTimer.UnidentifiedClear();
-    mtMarkTimer.UnidentifiedClear();
-    mtRoleTimer.UnidentifiedClear();
-    mtToggleTimer.UnidentifiedClear();
-    mtDefensiveZoneTimer.UnidentifiedClear();
+    mtTeamStyleTimer.Clear();
+    mtMarkTimer.Clear();
+    mtRoleTimer.Clear();
+    mtToggleTimer.Clear();
+    mtDefensiveZoneTimer.Clear();
 
     for (int i = 0; i < 4; i++)
     {
@@ -1897,11 +1897,11 @@ cTeam::cTeam(int nSide)
     mfAttackIndicatorProgress = 0.0f;
     mfShotScore = 0.0f;
 
-    mtTeamStyleTimer.UnidentifiedClear();
-    mtMarkTimer.UnidentifiedClear();
-    mtRoleTimer.UnidentifiedClear();
-    mtToggleTimer.UnidentifiedClear();
-    mtDefensiveZoneTimer.UnidentifiedClear();
+    mtTeamStyleTimer.Clear();
+    mtMarkTimer.Clear();
+    mtRoleTimer.Clear();
+    mtToggleTimer.Clear();
+    mtDefensiveZoneTimer.Clear();
 
     for (int i = 0; i < 4; i++)
     {

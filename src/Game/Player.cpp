@@ -343,7 +343,7 @@ void cPlayer::UpdateGameplayTimers(float fDeltaT)
         }
         else
         {
-            mUnidentified1E4.m_tInactivityTimer.UnidentifiedClear();
+            mUnidentified1E4.m_tInactivityTimer.Clear();
         }
         if (mUnidentified1E4.m_fSkipTimer > 0.0f)
         {
@@ -571,11 +571,11 @@ void cPlayer::PickupBall(cBall* pBall)
                         float distSq = nlVec3DistanceSquared2D(
                             player->mUnidentified024.m_v3Position,
                             mUnidentified024.m_v3Position);
-                        bool bPassTarget = g_pBall->UnidentifiedPassState()
+                        bool bPassTarget = g_pBall->IsInPassState()
                                         && g_pBall->m_pPassTarget != NULL;
                         if ((bPassTarget && closest == g_pBall->m_pPrevOwner) || distSq < bestDistSq)
                         {
-                            bool bPlayerPassTarget = g_pBall->UnidentifiedPassState()
+                            bool bPlayerPassTarget = g_pBall->IsInPassState()
                                                   && g_pBall->m_pPassTarget != NULL;
                             if (!bPlayerPassTarget || player != g_pBall->m_pPrevOwner)
                             {
@@ -629,8 +629,8 @@ void cPlayer::PickupBall(cBall* pBall)
     }
     if (m_eClassType == FIELDER)
         ((cFielder*)this)->m_pShotMeter->Abort();
-    mUnidentified1E4.m_tBallPossessionTimer.UnidentifiedClear();
-    mUnidentified1E4.m_tBallUnPossessionTimer.UnidentifiedClear();
+    mUnidentified1E4.m_tBallPossessionTimer.Clear();
+    mUnidentified1E4.m_tBallUnPossessionTimer.Clear();
     pBall->SetOwner(this);
     if (m_pBall != NULL)
     {
@@ -1227,7 +1227,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
         {
             pCaptain->TurnOnSuperPowerTank();
         }
-        bool bCaptainPowerup = pSelf->UnidentifiedPowerupPredicate();
+        bool bCaptainPowerup = pSelf->IsCaptainPowerupNext();
         if (bCaptainPowerup)
         {
             if (pSelf->m_eClassType == FIELDER)
@@ -1272,7 +1272,7 @@ void cPlayer::SetNoPickUpTime(float NewNoPickUpTime)
     mUnidentified1E4.m_tNoPickupTimer.SetSeconds(NewNoPickUpTime);
 }
 
-inline bool cPlayer::UnidentifiedPowerupPredicate()
+inline bool cPlayer::IsCaptainPowerupNext()
 {
     if (GetGlobalPad() != NULL)
     {

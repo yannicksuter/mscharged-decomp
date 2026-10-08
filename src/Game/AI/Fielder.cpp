@@ -803,9 +803,9 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     {
         m_pMark[i] = 0;
     }
-    m_tMoveToTurboTimer.UnidentifiedClear();
-    mtPostDekeTimer.UnidentifiedClear();
-    mtPowerupThrowTime.UnidentifiedClear();
+    m_tMoveToTurboTimer.Clear();
+    mtPostDekeTimer.Clear();
+    mtPowerupThrowTime.Clear();
     muInvincibleStatus = 0;
     m_nMegaStrikeResultState = 0;
     m_pNormalTweaks = pCharTweaks;
@@ -2681,7 +2681,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
 
     case ACTION_RUNNING:
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
-        m_tMoveToTurboTimer.UnidentifiedClear();
+        m_tMoveToTurboTimer.Clear();
         if (IsYoshiSuperPowerActive())
         {
             if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x17))
@@ -2699,7 +2699,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
             fn_8002CF24(pTweaks));
         mActionRunningVars.eLastStrafeDirection = STRAFE_IDLE;
         mActionRunPassVars.fSpeed = 0.0f;
-        m_tMoveToTurboTimer.UnidentifiedClear();
+        m_tMoveToTurboTimer.Clear();
         mActionRunPassVars = ActRunPassVars();
         break;
     }
@@ -4230,7 +4230,7 @@ void cFielder::BeginDekeIntangibility()
         if (GetCharacterClass() == (eCharacterClass)16)
         {
             SetTangible(false, false);
-            mtPostDekeTimer.UnidentifiedClear();
+            mtPostDekeTimer.Clear();
             mUnidentified178 = gIntangibleAlpha;
             EmitBooDekePuffStart(this);
         }
@@ -5165,8 +5165,8 @@ void cFielder::TestAnimBallContact()
             case ACTION_LOOSE_BALL_PASS:
             {
                 g_pBall->SetOwner(this);
-                mUnidentified1E4.m_tBallPossessionTimer.UnidentifiedClear();
-                mUnidentified1E4.m_tBallUnPossessionTimer.UnidentifiedClear();
+                mUnidentified1E4.m_tBallPossessionTimer.Clear();
+                mUnidentified1E4.m_tBallUnPossessionTimer.Clear();
                 float slow = GetSlowestVolleyPassSpeed(m_pTweaks);
                 float fast = GetFastestVolleyPassSpeed(m_pTweaks);
                 if (!bIsModified)
@@ -5196,8 +5196,8 @@ void cFielder::TestAnimBallContact()
                 }
                 m_pShotMeter->CalcOneTimerValue(this, perfectPass);
                 g_pBall->SetOwner(this);
-                mUnidentified1E4.m_tBallPossessionTimer.UnidentifiedClear();
-                mUnidentified1E4.m_tBallUnPossessionTimer.UnidentifiedClear();
+                mUnidentified1E4.m_tBallPossessionTimer.Clear();
+                mUnidentified1E4.m_tBallUnPossessionTimer.Clear();
                 if (!ShouldIClearBall())
                 {
                     DoRegularShooting(false);
@@ -6001,8 +6001,8 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     cPlayer::Reset(v3Position, aDirection);
     m_pAIContext->mScriptMachine->Reset(false);
     CleanUpAction(ACTION_NEED_ACTION);
-    mtPowerupThrowTime.UnidentifiedClear();
-    m_tMoveToTurboTimer.UnidentifiedClear();
+    mtPowerupThrowTime.Clear();
+    m_tMoveToTurboTimer.Clear();
     ClearPowerupAnimState(true);
 
     mfAirInterceptHeight[0] = -1.0f;
@@ -6019,9 +6019,9 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     {
         m_pMark[i] = 0;
     }
-    m_tMoveToTurboTimer.UnidentifiedClear();
-    mtPostDekeTimer.UnidentifiedClear();
-    mtPowerupThrowTime.UnidentifiedClear();
+    m_tMoveToTurboTimer.Clear();
+    mtPostDekeTimer.Clear();
+    mtPowerupThrowTime.Clear();
     muInvincibleStatus = 0;
     m_nMegaStrikeResultState = 0;
     mUnidentified178 = 1.0f;

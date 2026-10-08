@@ -667,7 +667,7 @@ void cFielder::asmRunningWB(float fDeltaT)
         {
             if (mActionRunningWBVars.bWaitForAnimToFinish)
             {
-                bool bAnimFinished = m_pCurrentAnimController->UnidentifiedAtEnd();
+                bool bAnimFinished = m_pCurrentAnimController->IsFinished();
                 if (bAnimFinished
                     || mUnidentified024.m_fDesiredSpeed >= fIdleToRunWBDesiredSpeed)
                 {
@@ -832,7 +832,7 @@ void cFielder::asmRunningWB(float fDeltaT)
 
         case 0x18:
         {
-            bool bAnimFinished = m_pCurrentAnimController->UnidentifiedAtEnd();
+            bool bAnimFinished = m_pCurrentAnimController->IsFinished();
 
             if (bAnimFinished)
             {
@@ -1369,7 +1369,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
     fn_8009750C();
 
     float fElectrocutionTime;
-    m_pCurrentAnimController->m_pSAnim->UnidentifiedGetRemainingTime(
+    m_pCurrentAnimController->m_pSAnim->GetRemainingTime(
         m_pCurrentAnimController->m_fTime, fElectrocutionTime);
     fElectrocutionTime += lbl_806DB920;
 

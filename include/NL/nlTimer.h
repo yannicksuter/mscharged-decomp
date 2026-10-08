@@ -16,7 +16,7 @@ public:
     bool Countdown(float deltaTime, float thresholdSeconds);
     f32 GetSeconds() const;
     void SetSeconds(float seconds);
-    void UnidentifiedClear()
+    void Clear()
     {
         m_uWasRunning = m_uPackedTime ? 1 : 0;
         m_uPackedTime = 0;

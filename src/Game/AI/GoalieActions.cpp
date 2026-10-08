@@ -3199,7 +3199,7 @@ void Goalie::ActionSave(float fDeltaT)
                 && (mpSaveData->muSaveType & 0x80003) != 0
                 && !IsDryBonesSkillshot(g_pBall))
             {
-                bool bState8Shot = g_pBall->UnidentifiedState8Shot();
+                bool bState8Shot = g_pBall->IsSkillShotActive();
 
                 if (!bState8Shot
                     || g_pBall->m_bVisible == 0)
@@ -4697,7 +4697,7 @@ void Goalie::ActionSnapBall(float fDeltaT)
 void Goalie::ActionGrabBall(float fDeltaT)
 {
     if (mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
-        || m_pCurrentAnimController->UnidentifiedAtEnd())
+        || m_pCurrentAnimController->IsFinished())
     {
         if (m_pBall == 0)
         {

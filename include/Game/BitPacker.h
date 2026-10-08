@@ -5,16 +5,16 @@
 #include "Game/MathHelpers.h"
 #include <string.h>
 
-class UnidentifiedBitPacker
+class BitPacker
 {
 public:
-    UnidentifiedBitPacker()
+    BitPacker()
         : mUnidentified00(0)
     {
         memset(&mUnidentified04, 0, sizeof(mUnidentified04));
     }
 
-    void UnidentifiedPack(int value, int min, int max)
+    void Pack(int value, int min, int max)
     {
         value = value >= min ? value : min;
         value = value <= max ? value : max;
@@ -33,7 +33,7 @@ public:
         }
     }
 
-    void UnidentifiedPack(float value, float min, float max, float precision)
+    void Pack(float value, float min, float max, float precision)
     {
         value = nlMaxEquals(value, min);
         value = nlMinEquals(value, max);
@@ -41,10 +41,10 @@ public:
         int unidentifiedValue = (int)(value * scale + 0.5f * AIsgn(value));
         int unidentifiedMin = (int)(min * scale + 0.5f * AIsgn(min));
         int unidentifiedMax = (int)(max * scale + 0.5f * AIsgn(max));
-        UnidentifiedPack(unidentifiedValue, unidentifiedMin, unidentifiedMax);
+        Pack(unidentifiedValue, unidentifiedMin, unidentifiedMax);
     }
 
-    unsigned long UnidentifiedGet() const
+    unsigned long GetBits() const
     {
         return mUnidentified04;
     }

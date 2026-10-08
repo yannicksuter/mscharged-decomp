@@ -148,8 +148,8 @@ inline void UnidentifiedAvoidanceValue::UnidentifiedInitialize(
 {
     mUnidentified004 = pObject;
     mUnidentified008 = pOther;
-    mUnidentified01C.UnidentifiedClear();
-    mUnidentified024.UnidentifiedClear();
+    mUnidentified01C.Clear();
+    mUnidentified024.Clear();
     mUnidentified00C = v3Zero;
     mUnidentified018 = 0.0f;
     mUnidentified02C.UnidentifiedReset();
@@ -208,7 +208,7 @@ extern "C" void fn_8000F178(AvoidController* controller)
         controller->mUnidentified094[i] = 0.0f;
         controller->m_LastRepulVec[i] = v3Zero;
         controller->mUnidentified0B4[i].mRepulsion = v3Zero;
-        controller->mUnidentified0B4[i].mTimer.UnidentifiedClear();
+        controller->mUnidentified0B4[i].mTimer.Clear();
     }
 
     controller->mUnidentified174.Clear();
@@ -819,7 +819,7 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
         }
         if (bUnidentifiedResult && context.mUnidentified00C >= 0.1f)
         {
-            mUnidentified024.UnidentifiedClear();
+            mUnidentified024.Clear();
             mUnidentified018 = fWeight * context.mUnidentified010;
             context.mUnidentified00C *= context.mUnidentified010;
             nlVec3Scale(v3Repulsion, context.mUnidentified000, context.mUnidentified00C);
@@ -844,7 +844,7 @@ void UnidentifiedAvoidanceValue::Update(float fDeltaT)
         }
     }
     if (!fUnidentifiedPrevious && mUnidentified018)
-        mUnidentified01C.UnidentifiedClear();
+        mUnidentified01C.Clear();
     mUnidentified01C.Countup(fDeltaT, 10.0f);
 }
 
