@@ -345,7 +345,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
     AudioSettings* settings = GameInfoManager::Instance()->GetAudioSettings();
     switch (item)
     {
-    case 0:
+    case AUDIO_BUTTON_MUSIC_DOWN:
         settings->MusicVolume = --mSettings[0];
         settings->ApplyMusicVolume();
         UpdateVolumeBars(0);
@@ -353,7 +353,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
         mButtons[1]->SetActiveSlide("off", true, false);
         FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
         break;
-    case 1:
+    case AUDIO_BUTTON_MUSIC_UP:
         settings->MusicVolume = ++mSettings[0];
         settings->ApplyMusicVolume();
         UpdateVolumeBars(0);
@@ -361,7 +361,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
         mButtons[0]->SetActiveSlide("off", true, false);
         FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
         break;
-    case 2:
+    case AUDIO_BUTTON_SFX_DOWN:
         settings->SFXVolume = --mSettings[1];
         settings->ApplySFXVolume();
         UpdateVolumeBars(1);
@@ -369,7 +369,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
         mButtons[3]->SetActiveSlide("off", true, false);
         FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
         break;
-    case 3:
+    case AUDIO_BUTTON_SFX_UP:
         settings->SFXVolume = ++mSettings[1];
         settings->ApplySFXVolume();
         UpdateVolumeBars(1);
@@ -377,7 +377,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
         mButtons[2]->SetActiveSlide("off", true, false);
         FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
         break;
-    case 4:
+    case AUDIO_BUTTON_VOICE_DOWN:
         settings->VoiceVolume = --mSettings[2];
         settings->ApplyVoiceVolume();
         UpdateVolumeBars(2);
@@ -388,7 +388,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
             FEAudio::PlaySound(1, 0x270203ED, 0, 0);
         mButtons[5]->SetActiveSlide("off", true, false);
         break;
-    case 5:
+    case AUDIO_BUTTON_VOICE_UP:
         settings->VoiceVolume = ++mSettings[2];
         settings->ApplyVoiceVolume();
         UpdateVolumeBars(2);
