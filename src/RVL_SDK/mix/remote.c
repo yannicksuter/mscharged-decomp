@@ -1,27 +1,4 @@
-#include <revolution/mix.h>
-
-typedef struct MIXRmtChannel
-{
-    u32 mode;
-    int main[4];
-    int aux[4];
-    u16 vMain0;
-    u16 vMain0Target;
-    u16 vAux0;
-    u16 vAux0Target;
-    u16 vMain1;
-    u16 vMain1Target;
-    u16 vAux1;
-    u16 vAux1Target;
-    u16 vMain2;
-    u16 vMain2Target;
-    u16 vAux2;
-    u16 vAux2Target;
-    u16 vMain3;
-    u16 vMain3Target;
-    u16 vAux3;
-    u16 vAux3Target;
-} MIXRmtChannel;
+#include <revolution/mix/MIXPrivate.h>
 
 MIXRmtChannel __s_MIXRmtChannel[AX_VOICE_MAX];
 MIXRmtChannel* __MIXRmtChannel;
@@ -65,8 +42,6 @@ void MIXRmtSetFader(AXVPB* p, int channelIndex, int fader)
 
     channel->mode |= 0x40000000;
 }
-
-extern u16 __MIXGetVolume(int);
 
 void __MIXRmtUpdateSettings(u32 index, AXVPB* axvpb)
 {
