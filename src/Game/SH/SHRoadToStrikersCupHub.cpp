@@ -263,7 +263,7 @@ void RoadToStrikersCupHubScene::UpdateCupRecordText(TLTextInstance* text)
     WideString unformatted;
     WideString formatted;
 
-    CupRecordCounters& record = g_pCupManager->mCupRecord.mCurrentRecord;
+    CupRecordCounters& record = CupManager::s_pInstance->mCupRecord.mCurrentRecord;
     int wins = record.mValues[0];
     int losses = record.mValues[1];
     int overtimeLosses = record.mValues[2];
@@ -286,15 +286,15 @@ void RoadToStrikersCupHubScene::UpdateCupRecordText(TLTextInstance* text)
 void RoadToStrikersCupHubScene::UpdateCupStatus()
 {
     WideString formatted;
-    int roundType = g_pCupManager->GetCurrentRoundType();
+    int roundType = CupManager::s_pInstance->GetCurrentRoundType();
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "summary", "current round");
 
     if (roundType == 0)
     {
-        int numRounds = g_pCupManager->GetNumRegularRounds();
-        int round = g_pCupManager->GetCurrentRoundNumber() + 1;
+        int numRounds = CupManager::s_pInstance->GetNumRegularRounds();
+        int round = CupManager::s_pInstance->GetCurrentRoundNumber() + 1;
         char total[4];
         char current[4];
         unsigned short totalWide[4];
@@ -310,8 +310,8 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
     }
     else if (roundType == 1)
     {
-        int numRounds = g_pCupManager->GetNumPlayoffRounds();
-        int round = g_pCupManager->GetCurrentRoundNumber();
+        int numRounds = CupManager::s_pInstance->GetNumPlayoffRounds();
+        int round = CupManager::s_pInstance->GetCurrentRoundNumber();
         if (round == numRounds - 3)
             formatted = WideString(LookupLocString("CUP_STATUS_QUARTER"));
         else if (round == numRounds - 2)
@@ -323,10 +323,10 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
     {
         int wins = 0;
         int losses = 0;
-        int round = g_pCupManager->GetCurrentRoundNumber();
+        int round = CupManager::s_pInstance->GetCurrentRoundNumber();
         for (int i = 0; i < round; ++i)
         {
-            BasicGameInfo* game = g_pCupManager->GetMatchupInfo(2, (short)i, 0);
+            BasicGameInfo* game = CupManager::s_pInstance->GetMatchupInfo(2, (short)i, 0);
             bool captainSide = (i == 1) ? true : false;
             bool userSide = (i != 1) ? true : false;
             if (game->GetFinalScore(captainSide) > game->GetFinalScore(userSide))
@@ -357,7 +357,7 @@ void RoadToStrikersCupHubScene::UpdateRoundMessage()
     FEPresentation* presentation = GetPresentation();
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "summary", "current round");
-    if (g_pCupManager->mState == 4)
+    if (CupManager::s_pInstance->mState == 4)
         currentRound->SetStringId("HUB_CONGRATS");
     else
         currentRound->SetStringId("HUB_ELIMINATED");
@@ -370,7 +370,7 @@ void RoadToStrikersCupHubScene::UpdateRoundMessage()
 void RoadToStrikersCupHubScene::UpdateCupHeading()
 {
     WideString formatted;
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int captain;
     if (cupManager->GetCurrentRoundNumber() == -5
         && cupManager->mState == 4)

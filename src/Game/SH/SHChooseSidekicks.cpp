@@ -99,7 +99,7 @@ ChooseSidekicksSceneV2::ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::SceneType 
 
     if (GameInfoManager::Instance()->IsInMode3())
     {
-        mTeams[0] = g_pCupManager->mPendingCupTeam;
+        mTeams[0] = CupManager::s_pInstance->mPendingCupTeam;
         mTeams[1] = -1;
     }
     else if (GameInfoManager::Instance()->mIsOnlineMode != 0)
@@ -1195,7 +1195,7 @@ void ChooseSidekicksSceneV2::CommitSidekickChoices()
         rules.mValues[0] = (eSidekickID)mSidekickComponents[0].GetSidekick(0);
         rules.mValues[1] = (eSidekickID)mSidekickComponents[0].GetSidekick(1);
         rules.mValues[2] = (eSidekickID)mSidekickComponents[0].GetSidekick(2);
-        g_pCupManager->SetSidekicks(rules);
+        CupManager::s_pInstance->SetSidekicks(rules);
     }
     else
     {
@@ -1278,8 +1278,8 @@ void ChooseSidekicksSceneV2::UpdateSlotButtons()
  */
 static void StartCupNormalSkill()
 {
-    g_pCupManager->mForceHighestSkillLevel = false;
-    g_pCupManager->StartCupSeries();
+    CupManager::s_pInstance->mForceHighestSkillLevel = false;
+    CupManager::s_pInstance->StartCupSeries();
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
@@ -1299,8 +1299,8 @@ static void StartCupNormalSkill()
  */
 static void StartCupHighestSkill()
 {
-    g_pCupManager->mForceHighestSkillLevel = true;
-    g_pCupManager->StartCupSeries();
+    CupManager::s_pInstance->mForceHighestSkillLevel = true;
+    CupManager::s_pInstance->StartCupSeries();
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {

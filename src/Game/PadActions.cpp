@@ -74,7 +74,7 @@ void CreatePadBackends()
             g_pPadManager->SetActivePadSet(padSet);
             for (int padIndex = 0; padIndex < 4; ++padIndex)
             {
-                PadMonkey* monkey = new (nlMalloc(0xFC, 8, false))
+                PadMonkey* monkey = new (nlMalloc(sizeof(WiiPadMonkey), 8, false))
                     WiiPadMonkey(padIndex);
                 g_pPadManager->GetPad(padIndex)->mBackend = monkey;
             }

@@ -58,7 +58,7 @@ void MatchSummary::DisplayMatchSummary(TeamStats home, TeamStats away, FEPresent
     TLTextInstance* pTextInstanceRows[7] = { 0 };
     int percents[2];
 
-    float total = (float)(mPlayerStats[0].unknown_0x3C + mPlayerStats[1].unknown_0x3C);
+    float total = (float)(mPlayerStats[0].mBallPossessionTime + mPlayerStats[1].mBallPossessionTime);
     if (0.0 == total)
     {
         percents[0] = 0;
@@ -66,7 +66,7 @@ void MatchSummary::DisplayMatchSummary(TeamStats home, TeamStats away, FEPresent
     }
     else
     {
-        int percent = (int)(100.0f * ((float)mPlayerStats[0].unknown_0x3C / total));
+        int percent = (int)(100.0f * ((float)mPlayerStats[0].mBallPossessionTime / total));
         percents[0] = percent;
         percents[1] = 100 - percent;
     }
@@ -84,7 +84,7 @@ void MatchSummary::DisplayMatchSummary(TeamStats home, TeamStats away, FEPresent
                 value = displayedStats[side]->mNumShotsOnGoal;
                 break;
             case 1:
-                value = displayedStats[side]->unknown_0x14;
+                value = displayedStats[side]->mNumSTSAttempts;
                 break;
             case 2:
                 value = displayedStats[side]->mNumHitsMade;
@@ -93,8 +93,8 @@ void MatchSummary::DisplayMatchSummary(TeamStats home, TeamStats away, FEPresent
                 value = displayedStats[side]->mNumSteals;
                 break;
             case 4:
-                value = displayedStats[side]->unknown_0x18;
-                extra = displayedStats[side]->unknown_0x16;
+                value = displayedStats[side]->mNumMegaStrikeGoals;
+                extra = displayedStats[side]->mNumMegaStrikeAttempts;
                 break;
             case 5:
                 value = percents[side];

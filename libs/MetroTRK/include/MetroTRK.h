@@ -1,20 +1,7 @@
 #ifndef METROTRK_H
 #define METROTRK_H
 
-#include <revolution/types.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-    void InitMetroTRK(void);
-    void InitMetroTRK_BBA(void);
-    int InitMetroTRKCommTable(s32 type);
-    void EnableMetroTRKInterrupts(void);
-
-#ifdef __cplusplus
-}
-#endif
+#include <MetroTRK/dolphin_trk.h>
+#include <MetroTRK/dolphin_trk_glue.h>
 
 #endif // METROTRK_H

@@ -59,7 +59,7 @@ CupFinalRoundsScene::~CupFinalRoundsScene()
 
 void CupFinalRoundsScene::SceneCreated()
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     TLComponentInstance* title = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "TITLE2");
@@ -207,7 +207,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
 
 void CupFinalRoundsScene::PopulateMatchup(BasicGameInfo* game, TLInstance* group, int index)
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int userTeam = cupManager->GetUserSelectedCupTeam();
     int teams[2] = { game->mTeamIndex[0], game->mTeamIndex[1] };
     short homeScore = game->mFinalScore[0];
@@ -316,7 +316,7 @@ void CupFinalRoundsScene::PopulateMatchup(BasicGameInfo* game, TLInstance* group
 void CupFinalRoundsScene::UpdateRoundHighlight()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    int activeGame = g_pCupManager->GetCurrentRoundNumber();
+    int activeGame = CupManager::s_pInstance->GetCurrentRoundNumber();
     for (int i = 0; i < 3; ++i)
     {
         char lightningName[18];
@@ -449,7 +449,7 @@ void CupFinalRoundsScene::OnBracketPointerPress(unsigned int, void* context)
 void CupFinalRoundsScene::OnMatchupPointerPress(unsigned int, void* context)
 {
     FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
-    BasicGameInfo* game = g_pCupManager->GetGameInfo(2, (int)context);
+    BasicGameInfo* game = CupManager::s_pInstance->GetGameInfo(2, (int)context);
     if (game->mFinalScore[0] != 0 || game->mFinalScore[1] != 0)
     {
         GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(

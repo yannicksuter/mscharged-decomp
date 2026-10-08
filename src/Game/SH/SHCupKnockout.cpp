@@ -104,7 +104,7 @@ void CupKnockoutScene::SceneCreated()
     }
     else
     {
-        mTournament = g_pCupManager;
+        mTournament = CupManager::s_pInstance;
         TLSlide* slide = mPresentation->GetActiveSlide();
         TLTextInstance* timer = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
             slide, "Layer", "TimerText");
@@ -260,10 +260,10 @@ void CupKnockoutScene::PopulateMatchup(
     int teams[2] = { game->mTeamIndex[0], game->mTeamIndex[1] };
     short homeScore = game->mFinalScore[0];
     short awayScore = game->mFinalScore[1];
-    int userTeam = g_pCupManager->GetUserSelectedCupTeam();
-    TeamStats homeStats = g_pCupManager->GetTeamStats(teams[0]);
+    int userTeam = CupManager::s_pInstance->GetUserSelectedCupTeam();
+    TeamStats homeStats = CupManager::s_pInstance->GetTeamStats(teams[0]);
     int homeType = homeStats.mSkillLevel;
-    TeamStats awayStats = g_pCupManager->GetTeamStats(teams[1]);
+    TeamStats awayStats = CupManager::s_pInstance->GetTeamStats(teams[1]);
     int awayType = awayStats.mSkillLevel;
     if (teams[0] == userTeam)
         homeType = 6;

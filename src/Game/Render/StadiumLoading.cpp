@@ -124,7 +124,7 @@ bool CreatePowerupDrawables(glModel* models, unsigned long numModels)
             continue;
         }
 
-        DrawableObject* pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
+        DrawableObject* pObject = (DrawableObject*)nlMalloc(sizeof(PlanarShadowDrawable), 8, false);
         pObject = new (pObject) PlanarShadowDrawable(
             context, model, model->id);
         pObject->m_uHashID = model->id;
@@ -167,7 +167,7 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
     DrawableObject* pObject;
     if (entry == 0)
     {
-        pObject = (DrawableObject*)nlMalloc(0xFC, 8, false);
+        pObject = (DrawableObject*)nlMalloc(sizeof(ChargeShadowDrawable), 8, false);
         pObject = new (pObject) ChargeShadowDrawable(
             context, models, models->id);
         fn_8027876C(pBasicStadiumInstance, pObject);
@@ -177,7 +177,7 @@ bool CreateStadiumModelInstances(int entry, glModel* models, unsigned long numMo
     {
         for (; models < end; models++)
         {
-            pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
+            pObject = (DrawableObject*)nlMalloc(sizeof(PlanarShadowDrawable), 8, false);
             pObject = new (pObject) PlanarShadowDrawable(
                 context, models, models->id);
             fn_8027876C(pBasicStadiumInstance, pObject);
@@ -503,7 +503,7 @@ void FinishLoadTournamentTrophy()
 
     WorldObjectLoadContext* context = new (8, true) WorldObjectLoadContext(pBasicStadiumInstance);
 
-    DrawableObject* pObject = (DrawableObject*)nlMalloc(0x78, 8, false);
+    DrawableObject* pObject = (DrawableObject*)nlMalloc(sizeof(PlanarShadowDrawable), 8, false);
     pObject = new (pObject) PlanarShadowDrawable(
         context, models, models->id);
     pObject->m_uObjectFlags |= 1;

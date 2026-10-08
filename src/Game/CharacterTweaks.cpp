@@ -502,7 +502,7 @@ extern "C" float fn_8002CD2C(const PlayerTweaks* tweaks)
          * Interpolate(minimum, maximum, playerValue);
 }
 
-extern "C" float fn_8002CE14(PlayerTweaks* tweaks)
+float GetJogSpeed(const PlayerTweaks* tweaks)
 {
     float playerValue = tweaks->fMovementSpeed;
     FielderTweaks* fielderTweaks = gGameTweaks.mFielderTweaks;

@@ -190,8 +190,7 @@ extern SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
 extern SlotPool<ScriptActionQueue> g_ScriptActionQueuePool;
 extern SlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
 
-extern "C" UnidentifiedVariant_80054AB8 fn_80041AFC(InterpreterCore*, const char*, cFielder*);
-extern "C" UnidentifiedVariant_80054AB8 fn_80041B0C(void*, cFielder*, const char*);
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 
 inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
     const UnidentifiedVariant_80054AB8& other, float fParam1, float fParam2)

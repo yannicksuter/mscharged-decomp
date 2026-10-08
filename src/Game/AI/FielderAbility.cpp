@@ -52,7 +52,6 @@ float gDKSuperHitTiltScale = 0.4f;
 float gWaluigiTankOffCost;
 bool gPeachPhotoEmitEnabled;
 
-extern "C" bool fn_8002EDC8(cFielder* pFielder, int nParam);
 
 
 void cFielder::InitActionDKSuper()
@@ -63,7 +62,7 @@ void cFielder::InitActionDKSuper()
     muInvincibleStatus |= 1;
     InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitMovementDecelerateExponential(gDKSuperDeceleration);
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
     EmitDKSuperCharge(this);
@@ -90,7 +89,7 @@ void cFielder::ActionDKSuper(float fDeltaT)
         mUnidentified024.m_fActualSpeed = 0.0f;
         mUnidentified024.m_fDesiredSpeed = 0.0f;
         SetVelocity(v3Zero);
-        Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+        SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
     }
 
@@ -141,7 +140,7 @@ void cFielder::InitActionPeachSuper()
     }
 
     InitMovementFromAnim(0, v3Zero, 1.0f, false);
-    Unknown8(mUnidentified024.m_aActualFacingDirection, false);
+    SetDesiredFacingDirection(mUnidentified024.m_aActualFacingDirection, false);
     mUnidentified024.m_aDesiredMovementDirection = mUnidentified024.m_aActualMovementDirection;
     mUnidentified024.m_fDesiredSpeed = 0.0f;
 
@@ -265,83 +264,83 @@ void cFielder::fn_8004FF40()
 
 float cFielder::GetSuperPowerTankFraction()
 {
-    return mUnidentified3E0 / mUnidentified3E4;
+    return m_fSuperPowerTankLevel / m_fSuperPowerTankCapacity;
 }
 
 void cFielder::ClearSuperPowerTank()
 {
-    mUnidentified3E0 = 0.0f;
-    mUnidentified3E4 = 0.0f;
-    fn_8005001C(true);
+    m_fSuperPowerTankLevel = 0.0f;
+    m_fSuperPowerTankCapacity = 0.0f;
+    TurnOffSuperPowerTank(true);
 }
 
-void cFielder::fn_8005001C(bool bForce)
+void cFielder::TurnOffSuperPowerTank(bool bForce)
 {
-    if (mUnidentified024.m_eCharacterClass == DAISY)
+    if (mUnidentified024.m_eCharacterClass == BOWSER)
     {
-        if (mUnidentified3DC || bForce)
+        if (m_bSuperPowerTankOn || bForce)
         {
-            mUnidentified3DC = false;
+            m_bSuperPowerTankOn = false;
             float fDecay = gBowserTankOffCost;
-            mUnidentified3E0 = mUnidentified3E0 - fDecay;
-            bool bRunning = mUnidentified3E0 > 0.0f;
+            m_fSuperPowerTankLevel = m_fSuperPowerTankLevel - fDecay;
+            bool bRunning = m_fSuperPowerTankLevel > 0.0f;
             if (bRunning)
             {
-                if (mUnidentified3E0 < 0.03f)
+                if (m_fSuperPowerTankLevel < 0.03f)
                 {
-                    mUnidentified3E0 = 0.03f;
+                    m_fSuperPowerTankLevel = 0.03f;
                 }
             }
-            mUnidentified3E8.nextFireballTime = 0.0f;
+            mActionBowserSuper.nextFireballTime = 0.0f;
             SetNormalTweaks();
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == MARIO)
+    else if (mUnidentified024.m_eCharacterClass == WALUIGI)
     {
-        if (mUnidentified3DC)
+        if (m_bSuperPowerTankOn)
         {
-            if (mUnidentified3F8.mUnidentified00 <= 0.0f || bForce)
+            if (mWaluigiWallState.mUnidentified00 <= 0.0f || bForce)
             {
-                mUnidentified3DC = false;
-                mUnidentified3DD = false;
+                m_bSuperPowerTankOn = false;
+                m_bSuperPowerTankShutdownPending = false;
                 float fDecay = gWaluigiTankOffCost;
-                mUnidentified3E0 = mUnidentified3E0 - fDecay;
-                bool bRunning = mUnidentified3E0 > 0.0f;
+                m_fSuperPowerTankLevel = m_fSuperPowerTankLevel - fDecay;
+                bool bRunning = m_fSuperPowerTankLevel > 0.0f;
                 if (bRunning)
                 {
-                    if (mUnidentified3E0 < mUnidentified3F8.mUnidentified04)
+                    if (m_fSuperPowerTankLevel < mWaluigiWallState.mUnidentified04)
                     {
-                        mUnidentified3E0 = mUnidentified3F8.mUnidentified04;
+                        m_fSuperPowerTankLevel = mWaluigiWallState.mUnidentified04;
                     }
                 }
                 SetNormalTweaks();
-                if (IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
+                if (IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
                 {
-                    DeactivateConcurrentState(fn_8002E1A4(this), 0x23);
+                    DeactivateConcurrentState(GetFielderScriptMachine(this), 0x23);
                 }
                 StopSound(0x8A9FCF66, this);
             }
             else
             {
-                mUnidentified3DD = true;
+                m_bSuperPowerTankShutdownPending = true;
             }
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == PEACH)
+    else if (mUnidentified024.m_eCharacterClass == WARIO)
     {
-        if (mUnidentified3DC || bForce)
+        if (m_bSuperPowerTankOn || bForce)
         {
-            mUnidentified3DC = false;
+            m_bSuperPowerTankOn = false;
             StopSound(0x8A9FCF66, this);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == YOSHI)
+    else if (mUnidentified024.m_eCharacterClass == PETEY)
     {
-        if (mUnidentified3DC || bForce)
+        if (m_bSuperPowerTankOn || bForce)
         {
-            mUnidentified3DC = false;
-            mUnidentified408 = 0.0f;
+            m_bSuperPowerTankOn = false;
+            m_fPeteyMuckBallSpeed = 0.0f;
             SetNormalTweaks();
         }
     }
@@ -351,25 +350,25 @@ void cFielder::InitSuperPowerTank(bool bTurnOn)
 {
     switch (mUnidentified024.m_eCharacterClass)
     {
-    case DAISY:
-        mUnidentified3E4 = gBowserTankCapacity;
-        mUnidentified3E8.nextFireballTime = 0.0f;
+    case BOWSER:
+        m_fSuperPowerTankCapacity = gBowserTankCapacity;
+        mActionBowserSuper.nextFireballTime = 0.0f;
         break;
-    case MARIO:
-        mUnidentified3E4 = gWaluigiTankCapacity;
-        mUnidentified3F8.mUnidentified00
-            = mUnidentified3F8.mUnidentified04 = gWaluigiWallMinSegmentTime;
+    case WALUIGI:
+        m_fSuperPowerTankCapacity = gWaluigiTankCapacity;
+        mWaluigiWallState.mUnidentified00
+            = mWaluigiWallState.mUnidentified04 = gWaluigiWallMinSegmentTime;
         break;
-    case PEACH:
-        mUnidentified3E4 = gWarioTankCapacity;
-        mUnidentified3F4 = 0.0f;
+    case WARIO:
+        m_fSuperPowerTankCapacity = gWarioTankCapacity;
+        m_fNextGasTime = 0.0f;
         break;
-    case YOSHI:
-        mUnidentified3E4 = 1.0f;
+    case PETEY:
+        m_fSuperPowerTankCapacity = 1.0f;
         break;
     }
 
-    mUnidentified3E0 = mUnidentified3E4;
+    m_fSuperPowerTankLevel = m_fSuperPowerTankCapacity;
 
     if (bTurnOn)
     {
@@ -379,14 +378,14 @@ void cFielder::InitSuperPowerTank(bool bTurnOn)
 
 bool cFielder::TurnOnSuperPowerTank()
 {
-    if (!fn_8002EDC8(this, -1))
+    if (!CanUsePowerup(this, -1))
     {
         return false;
     }
 
-    if (!mUnidentified3DC)
+    if (!m_bSuperPowerTankOn)
     {
-        if (mUnidentified024.m_eCharacterClass == YOSHI)
+        if (mUnidentified024.m_eCharacterClass == PETEY)
         {
             PlaySound(m_uSoundSlotId, 0x8A9FCF66, 0, 0);
         }
@@ -394,24 +393,24 @@ bool cFielder::TurnOnSuperPowerTank()
         {
             PlaySound(m_uSoundSlotId, 0x8A9FCF66, "TankOn", this);
         }
-        mUnidentified3DC = true;
-        mUnidentified3DD = false;
+        m_bSuperPowerTankOn = true;
+        m_bSuperPowerTankShutdownPending = false;
     }
 
-    if (mUnidentified024.m_eCharacterClass == DAISY)
+    if (mUnidentified024.m_eCharacterClass == BOWSER)
     {
-        bool bRunning = mUnidentified3E0 > 0.0f;
+        bool bRunning = m_fSuperPowerTankLevel > 0.0f;
         if (bRunning)
         {
-            mUnidentified3E8.fireballStageTime = 0.0f;
-            mUnidentified3E8.fireballStageNum = 0;
+            mActionBowserSuper.fireballStageTime = 0.0f;
+            mActionBowserSuper.fireballStageNum = 0;
             SetSuperPowerTweaks();
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == MARIO)
+    else if (mUnidentified024.m_eCharacterClass == WALUIGI)
     {
-        m_pTweaks = mUnidentified328;
-        if (fn_8002E060() != (eFielderDesireState)0xC)
+        m_pTweaks = m_pSuperPowerTweaks;
+        if (GetDesireState() != (eFielderDesireState)0xC)
         {
             EndDesire();
         }
@@ -425,15 +424,15 @@ bool cFielder::TurnOnSuperPowerTank()
         }
         InitMovementCoast();
         mUnidentified024.m_fLeanAmount = 0.0f;
-        if (!IsConcurrentStateActive(fn_8002E1A4(this), 0x23))
+        if (!IsConcurrentStateActive(GetFielderScriptMachine(this), 0x23))
         {
-            ActivateConcurrentState(fn_8002E1A4(this), 0x23, 0, 0);
+            ActivateConcurrentState(GetFielderScriptMachine(this), 0x23, 0, 0);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == PEACH)
+    else if (mUnidentified024.m_eCharacterClass == WARIO)
     {
         if (m_eAnimID != 0x68 && IsRunning()
-            && fn_8002E060() != (eFielderDesireState)0x16)
+            && GetDesireState() != (eFielderDesireState)0x16)
         {
             SetAction((eFielderActionState)0x1D);
             SetAnimState(0x68, true, 0.2f, false, false);
@@ -442,9 +441,9 @@ bool cFielder::TurnOnSuperPowerTank()
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
         }
     }
-    else if (mUnidentified024.m_eCharacterClass == YOSHI)
+    else if (mUnidentified024.m_eCharacterClass == PETEY)
     {
-        mUnidentified408 = 0.0f;
+        m_fPeteyMuckBallSpeed = 0.0f;
         SetSuperPowerTweaks();
     }
 

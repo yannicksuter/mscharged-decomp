@@ -33,7 +33,6 @@
 #include "NL/platvmath.h"
 #include "NL/nlFunction.inl"
 
-extern "C" void fn_80060608(cGame*, cFielder*);
 
 void OnWaluigiWallEffectFinished(EmissionController&, int);
 void UpdateWaluigiWallEmitter(EmissionController&);
@@ -372,7 +371,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
     {
         if (player == mOwner)
         {
-            WaluigiWallManager* manager = player->mUnidentified3F8.mUnidentified08;
+            WaluigiWallManager* manager = player->mWaluigiWallState.mUnidentified08;
             float gracePeriod = 0.2f;
             if (manager->mCurrentWall == this)
                 return NO_CONTACT;
@@ -380,7 +379,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
                 return ONE_WAY_CONTACT_OTHER;
             OnWaluigiWallAbort(player);
         }
-        else if (player->fn_8003E74C())
+        else if (player->IsSuperGrowActive())
             ApplyDamage(gWaluigiWallDamage_806DCB24);
         else if (player->m_eActionState == ACTION_HIT)
             ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->mUnidentified064));
@@ -438,7 +437,7 @@ PhysicsWaluigiWall* WaluigiWallManager::CreateWall(cFielder* owner, float width,
             if (mCurrentWall != 0)
             {
                 mPreviousWall = mCurrentWall;
-                fn_80060608(g_pGame, mCurrentWall->mOwner);
+                DeliverWaluigiWallEndEvent(g_pGame, mCurrentWall->mOwner);
             }
             mCurrentWall = wall;
             mOwner = owner;
@@ -516,8 +515,8 @@ void WaluigiWallManager::Update(float dt)
             {
                 if (wall->mEmitter != 0 && wall->mHealth < 0.2f)
                 {
-                    if (wall->mOwner->mUnidentified3DC)
-                        wall->mOwner->fn_8005001C(true);
+                    if (wall->mOwner->m_bSuperPowerTankOn)
+                        wall->mOwner->TurnOffSuperPowerTank(true);
                     wall->mEmitter->m_uUserData = 0;
                     wall->mEmitter->m_TimeScale = 5.0f;
                     wall->mEmitter = 0;
@@ -609,20 +608,20 @@ void UpdateWaluigiWallEmitter(EmissionController& controller)
 
 void OnWaluigiWallStart(cPlayer* player)
 {
-    static_cast<cFielder*>(player)->mUnidentified3F8.mUnidentified08->CreateWall(
+    static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08->CreateWall(
         static_cast<cFielder*>(player), gWaluigiWallWidth, gWaluigiWallHeight);
 }
 
 void OnWaluigiWallEnd(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mUnidentified3F8.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
     if (manager->mCurrentWall != 0)
         manager->EndWall();
 }
 
 void OnWaluigiWallAbort(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mUnidentified3F8.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
     if (manager->mCurrentWall != 0)
     {
         manager->EndWall();
@@ -640,8 +639,8 @@ void OnWaluigiWallMegastrikeStart(void*)
         for (int i = 0; i < 4; ++i)
         {
             cFielder* player = team->GetFielder(i);
-            if (player != 0 && player->mUnidentified3F8.mUnidentified08 != 0)
-                player->mUnidentified3F8.mUnidentified08->ClearWalls();
+            if (player != 0 && player->mWaluigiWallState.mUnidentified08 != 0)
+                player->mWaluigiWallState.mUnidentified08->ClearWalls();
         }
     }
 }

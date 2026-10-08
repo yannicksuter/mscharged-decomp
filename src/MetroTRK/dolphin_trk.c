@@ -1,14 +1,13 @@
 #include <MetroTRK/dolphin_trk.h>
+#include <MetroTRK/__exception.h>
 #include <MetroTRK/dolphin_trk_glue.h>
+#include <MetroTRK/flush_cache.h>
 #include <MetroTRK/main_TRK.h>
 #include <MetroTRK/mem_TRK.h>
 #include <MetroTRK/mpc_7xx_603e.h>
 #include <MetroTRK/targimpl.h>
 #include <revolution/os/OSReset.h>
 #include <revolution/os/__ppc_eabi_init.h>
-
-extern u8 gTRKInterruptVectorTable[];
-extern void TRK_flush_cache(u32 address, u32 length);
 
 #define EXCEPTIONMASK_ADDR 0x80000044
 
@@ -42,20 +41,20 @@ void EnableMetroTRKInterrupts(void)
     EnableEXI2Interrupts();
 }
 
-u32 TRKTargetTranslate(u32 param_0)
+u32 TRKTargetTranslate(u32 address)
 {
-    if (param_0 >= lc_base)
+    if (address >= lc_base)
     {
-        if ((param_0 < lc_base + 0x4000) && ((gTRKCPUState.Extended1.DBAT3U & 3) != 0))
+        if ((address < lc_base + 0x4000) && ((gTRKCPUState.Extended1.DBAT3U & 3) != 0))
         {
-            return param_0;
+            return address;
         }
     }
-    if ((0x7E000000 <= param_0) && (param_0 <= 0x80000000))
+    if ((0x7E000000 <= address) && (address <= 0x80000000))
     {
-        return param_0;
+        return address;
     }
-    return (param_0 & 0x3FFFFFFF) | 0x80000000;
+    return (address & 0x3FFFFFFF) | 0x80000000;
 }
 
 static void TRK_copy_vector(u32 offset)
@@ -67,36 +66,37 @@ static void TRK_copy_vector(u32 offset)
 
 void __TRK_copy_vectors(void)
 {
-    u32 r3 = lc_base;
-    u32* isrOffsetPtr;
-    int i;
-    u32 r29;
+    u32 exceptionMaskAddress = lc_base;
+    u32* isrOffsets;
+    int vectorIndex;
+    u32 exceptionMask;
 
-    if (r3 <= 0x44 && r3 + 0x4000 > 0x44 && gTRKCPUState.Extended1.DBAT3U & 3)
+    if (exceptionMaskAddress <= 0x44 && exceptionMaskAddress + 0x4000 > 0x44
+        && gTRKCPUState.Extended1.DBAT3U & 3)
     {
-        r3 = 0x44;
+        exceptionMaskAddress = 0x44;
     }
     else
     {
-        r3 = EXCEPTIONMASK_ADDR;
+        exceptionMaskAddress = EXCEPTIONMASK_ADDR;
     }
 
-    i = 0;
-    r29 = *(u32*)r3;
-    isrOffsetPtr = TRK_ISR_OFFSETS;
+    vectorIndex = 0;
+    exceptionMask = *(u32*)exceptionMaskAddress;
+    isrOffsets = TRK_ISR_OFFSETS;
 
     do
     {
-        if ((r29 & (1 << i)) && i != 4)
+        if ((exceptionMask & (1 << vectorIndex)) && vectorIndex != 4)
         {
-            TRK_copy_vector(isrOffsetPtr[i]);
+            TRK_copy_vector(isrOffsets[vectorIndex]);
         }
 
-        i++;
-    } while (i <= 14);
+        vectorIndex++;
+    } while (vectorIndex <= 14);
 }
 
-DSError TRKInitializeTarget()
+DSError TRKInitializeTarget(void)
 {
     gTRKState.isStopped = TRUE;
     gTRKState.msr = __TRK_get_MSR();

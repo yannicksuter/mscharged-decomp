@@ -25,12 +25,9 @@
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
 
-class SHNavigation;
-
-
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
-static const char* lbl_8051B3E0[] = {
+static const char* sMatchupRowComponentNames[] = {
     "matchups", "matchups2", "matchups3", "matchups4"
 };
 
@@ -64,8 +61,8 @@ CupHubScene::CupHubScene()
     }
 
     BuildMatchupStates();
-    if (g_pCupManager->mState == 0x10
-        || g_pCupManager->GetCurrentRoundType() == 0)
+    if (CupManager::s_pInstance->mState == 0x10
+        || CupManager::s_pInstance->GetCurrentRoundType() == 0)
     {
         mPagingEnabled = false;
     }
@@ -83,14 +80,14 @@ inline void CupHubScene::UpdateRows()
 
 void CupHubScene::SceneCreated()
 {
-    g_pCupManager->GetNumGames(0);
+    CupManager::s_pInstance->GetNumGames(0);
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
     TLComponentInstance* title = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "schedule screen", "TITLE2");
     UpdateCupTitleText(title, mTitleBuffer, 64);
 
     for (int i = 0; i < 4; ++i)
     {
-        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "schedule screen", lbl_8051B3E0[i]);
+        mRowInstances[i] = FEFinder<TLComponentInstance, 4>::FindOrDefault(presentation->m_currentSlide, "Layer", "schedule screen", sMatchupRowComponentNames[i]);
         TLComponentInstance* highlight = FEFinder<TLComponentInstance, 4>::FindOrDefault(mRowInstances[i]->GetActiveSlide(), "highlite");
         TLImageInstance* image = FEFinder<TLImageInstance, 2>::FindOrDefault(highlight, "on", "RTSC_highlightbar");
         nlColour colour;
@@ -140,7 +137,7 @@ void CupHubScene::Update(float fDeltaT)
     {
         mScrollWidget.Initialize();
     }
-    g_pCupManager->GetNumGames(0);
+    CupManager::s_pInstance->GetNumGames(0);
     if (mState == 0 || mState == 2 || mState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
@@ -290,7 +287,7 @@ void CupHubScene::UpdateRow(int index)
     else
         mRowInstances[index]->SetActiveSlide("off", true, false);
 
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     cupManager->GetNumGamesPerRound(0, 0);
     cupManager->GetCurrentRoundNumber();
     cupManager->GetNumGamesPerRound(0, 0);
@@ -414,16 +411,16 @@ void CupHubScene::OnMatchupPointerPress(unsigned int index, void* context)
     {
         FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
         mSuppressInput = true;
-        BasicGameInfo* game = g_pCupManager->GetMatchupInfo(0, round, (u16)matchup);
+        BasicGameInfo* game = CupManager::s_pInstance->GetMatchupInfo(0, round, (u16)matchup);
         if (game->mFinalScore[0] != 0 || game->mFinalScore[1] != 0)
         {
-            GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push((SceneList)0x21, (ScreenMovement)0, false);
+            GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(SCENE_GAME_RESULTS, SCREEN_NOTHING, false);
             results->SetResultsData(game, this, 0);
             results->SetDisplayMode(0xD);
         }
         else
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, (ScreenMovement)0, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
         }
     }
@@ -530,10 +527,10 @@ void CupHubScene::OnRulesPointerPress(unsigned int, void* context)
 
 void CupHubScene::BuildMatchupStates()
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int entry = -1;
     int round = cupManager->GetCurrentRoundNumber();
-    for (int i = 0; i < g_pCupManager->GetNumRegularRounds(); ++i)
+    for (int i = 0; i < CupManager::s_pInstance->GetNumRegularRounds(); ++i)
     {
         ++entry;
         mMatchupStates[entry][0] = i;
@@ -542,7 +539,7 @@ void CupHubScene::BuildMatchupStates()
         {
             mScrollOffset = entry;
         }
-        for (int j = 0; j < g_pCupManager->GetNumGamesPerRound(0, i); ++j)
+        for (int j = 0; j < CupManager::s_pInstance->GetNumGamesPerRound(0, i); ++j)
         {
             ++entry;
             mMatchupStates[entry][0] = i;

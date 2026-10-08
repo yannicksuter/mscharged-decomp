@@ -24,7 +24,7 @@ bool TutorialMegastrikeDesire::Initialize(void*)
 
     for (int i = 0; i < 4; ++i)
     {
-        ScriptMachine* state = fn_8002E1A4(m_pTeam->GetFielder(i));
+        ScriptMachine* state = GetFielderScriptMachine(m_pTeam->GetFielder(i));
         ScriptTransitionFunc value(name);
         state->mTransition.mValue.mFuncHash = value.mValue.mFuncHash;
         state->mTransition.mValue.mNativeFunc = value.mValue.mNativeFunc;

@@ -381,7 +381,7 @@ Game/AI/DesirePass.cpp:
 	.sbss       start:0x806E0E38 end:0x806E0E40
 	.sdata2     start:0x806E3FC0 end:0x806E3FD8
 
-Game/AI/tu_800BC0C4.cpp:
+Game/AI/DesireStatusEffects.cpp:
 	.text       start:0x800BC0C4 end:0x800BFCA0
 	.ctors      start:0x804DB570 end:0x804DB574
 	.rodata     start:0x804DC1A0 end:0x804DC1B0

@@ -155,7 +155,7 @@ void UnidentifiedCameraEffects::Update(float deltaTime)
     }
 
     if (mPrimaryPlayer != 0
-        && mPrimaryPlayer->fn_8002E060() != (eFielderDesireState)0x16
+        && mPrimaryPlayer->GetDesireState() != (eFielderDesireState)0x16
         && mPrimaryPlayer->m_eActionState != ACTION_ONETIMER
         && mPrimaryPlayer->m_eActionState != ACTION_PASS
         && mPrimaryPlayer->m_eActionState != ACTION_ONETOUCH_PASS_FROM_VOLLEY)
@@ -247,8 +247,8 @@ facingGoalKnown:
     else
         mCameraFlags &= ~1;
 
-    if (g_pTeams[0]->GetCaptain()->fn_8003E74C()
-        || g_pTeams[1]->GetCaptain()->fn_8003E74C())
+    if (g_pTeams[0]->GetCaptain()->IsSuperGrowActive()
+        || g_pTeams[1]->GetCaptain()->IsSuperGrowActive())
         mCameraFlags |= 0x20;
     else
         mCameraFlags &= ~0x20;
@@ -278,7 +278,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
             if (goalLineX > 0.0f)
             {
                 if (fielder->mUnidentified024.m_v3Position.x > owner->mUnidentified024.m_v3Position.x
-                    && !fielder->fn_800344B0()
+                    && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
                 {
@@ -288,7 +288,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
             if (goalLineX < 0.0f)
             {
                 if (fielder->mUnidentified024.m_v3Position.x < owner->mUnidentified024.m_v3Position.x
-                    && !fielder->fn_800344B0()
+                    && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
                 {

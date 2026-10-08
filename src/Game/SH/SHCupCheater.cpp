@@ -27,11 +27,11 @@ static inline void TrackHomeWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    g_pCupManager->PrepareCurrentGame();
+    CupManager::s_pInstance->PrepareCurrentGame();
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 0, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_WIN, 0, 0, 1, 0, 0, 0);
-    g_pCupManager->SetRoundResult(false, 0);
+    CupManager::s_pInstance->SetRoundResult(false, 0);
 }
 
 static inline void TrackAwayWinResult()
@@ -39,11 +39,11 @@ static inline void TrackAwayWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    g_pCupManager->PrepareCurrentGame();
+    CupManager::s_pInstance->PrepareCurrentGame();
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 1, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_WIN, 1, 0, 0, 1, 0, 0);
-    g_pCupManager->SetRoundResult(false, 1);
+    CupManager::s_pInstance->SetRoundResult(false, 1);
 }
 
 static inline void TrackHomeOTWinResult()
@@ -51,11 +51,11 @@ static inline void TrackHomeOTWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    g_pCupManager->PrepareCurrentGame();
+    CupManager::s_pInstance->PrepareCurrentGame();
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 0, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_OT_WIN, 0, 0, 1, 0, 0, 0);
-    g_pCupManager->SetRoundResult(true, 0);
+    CupManager::s_pInstance->SetRoundResult(true, 0);
 }
 
 static inline void TrackAwayOTWinResult()
@@ -63,11 +63,11 @@ static inline void TrackAwayOTWinResult()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    g_pCupManager->PrepareCurrentGame();
+    CupManager::s_pInstance->PrepareCurrentGame();
     StatsTracker::s_pInstance->TrackStat(
         STATS_GOALS_FOR, 1, nlRandom(4, &nlDefaultSeed), -1, 0, 1, 0);
     StatsTracker::s_pInstance->TrackStat(STATS_OT_WIN, 1, 0, 0, 1, 0, 0);
-    g_pCupManager->SetRoundResult(true, 1);
+    CupManager::s_pInstance->SetRoundResult(true, 1);
 }
 
 CupCheaterScene::CupCheaterScene()
@@ -78,7 +78,7 @@ CupCheaterScene::CupCheaterScene()
 
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     int homeTeam = gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode]->mTeamIndex[0];
-    mUserSide = homeTeam != g_pCupManager->GetUserSelectedCupTeam();
+    mUserSide = homeTeam != CupManager::s_pInstance->GetUserSelectedCupTeam();
 }
 
 CupCheaterScene::~CupCheaterScene()
@@ -166,7 +166,7 @@ void CupCheaterScene::OnSelectScore()
     GameInfoManager* gameInfoManager = GameInfoManager::s_pInstance;
     StatsTracker::s_pInstance->SetBasicGameInfoPointer(
         gameInfoManager->mGameInfo[gameInfoManager->mCurrentMode], true);
-    g_pCupManager->PrepareCurrentGame();
+    CupManager::s_pInstance->PrepareCurrentGame();
 
     if (mHomeScore == mAwayScore)
     {
@@ -193,7 +193,7 @@ void CupCheaterScene::OnSelectScore()
     }
     StatsTracker::s_pInstance->TrackStat(
         STATS_WIN, winningSide, 0, mHomeScore, mAwayScore, 0, 0);
-    g_pCupManager->SetRoundResult(false, winningSide);
+    CupManager::s_pInstance->SetRoundResult(false, winningSide);
     ProcessPostGame();
 }
 

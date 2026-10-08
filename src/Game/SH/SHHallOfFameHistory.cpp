@@ -81,7 +81,7 @@ SHHallOfFameHistory::SHHallOfFameHistory(int mode)
     memset(mHistory, 0, sizeof(mHistory));
 
     int historyIndex;
-    CupProgressRecord& cupRecord = g_pCupManager->mCupRecord;
+    CupProgressRecord& cupRecord = CupManager::s_pInstance->mCupRecord;
     historyIndex = 11;
     if (cupRecord.mHistory.mWriteIndex[modeIndex] != 0)
     {

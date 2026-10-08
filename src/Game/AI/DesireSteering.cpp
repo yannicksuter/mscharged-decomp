@@ -23,11 +23,6 @@
 #include <math.h>
 #include <stddef.h>
 
-extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" bool fn_8003E8A0(const cFielder*);
-extern "C" bool fn_8003E948(const cFielder*);
-extern "C" void fn_80060608(cGame*, cFielder*);
 
 bool gForceSidelineAvoidance = false;
 
@@ -131,11 +126,11 @@ void ResetSteeringTargets(DesireSteering* desire)
 void DesireSteering::Update(
     DesireUpdate*, float fDeltaT)
 {
-    fn_8003E948(m_pFielder);
-    bool bUseAvoidance = !lbl_806E0C50
-                      && (!lbl_806E0C51
+    IsWaluigiSuperPowerActive(m_pFielder);
+    bool bUseAvoidance = !gForceUserControl
+                      && (!gForceHomeUserControl
                           || m_pFielder->m_pTeam->m_nSide != HOME)
-                      && (!lbl_806E0C52
+                      && (!gForceAwayUserControl
                           || m_pFielder->m_pTeam->m_nSide != AWAY);
 
     if (m_fTotalWeight < 0.0f)
@@ -216,10 +211,10 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
         if (bHasGlobalPad)
         {
-            if ((fn_8003E8A0(desire->m_pFielder)
-                    && desire->m_pFielder->mUnidentified3DC)
-                || (desire->m_pFielder->fn_8003E9F0()
-                    && desire->m_pFielder->mUnidentified3DC))
+            if ((IsBowserSuperPowerActive(desire->m_pFielder)
+                    && desire->m_pFielder->m_bSuperPowerTankOn)
+                || (desire->m_pFielder->IsPeteySuperPowerActive()
+                    && desire->m_pFielder->m_bSuperPowerTankOn))
             {
                 nThingsToAvoid = AVOID_NOTHING;
             }
@@ -249,7 +244,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
     }
 
     bHasGlobalPad = desire->m_pFielder->GetGlobalPad() != NULL;
-    if (!bHasGlobalPad && desire->m_pFielder->fn_8003EA6C())
+    if (!bHasGlobalPad && desire->m_pFielder->IsYoshiSuperPowerActive())
     {
         nThingsToAvoid &= ~(AVOID_FIELDERS | AVOID_POWERUPS);
     }
@@ -284,8 +279,8 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
         }
     }
 
-    if (fn_8003E948(desire->m_pFielder)
-        && desire->m_pFielder->mUnidentified3DC)
+    if (IsWaluigiSuperPowerActive(desire->m_pFielder)
+        && desire->m_pFielder->m_bSuperPowerTankOn)
     {
         nThingsToAvoid = AVOID_NOTHING;
     }
@@ -300,7 +295,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
 void AddSteeringTarget(DesireSteering* desire,
     const nlVector3& v3Position, float fUrgency, float fWeight)
 {
-    fn_8003E948(desire->m_pFielder);
+    IsWaluigiSuperPowerActive(desire->m_pFielder);
     if (desire->m_fTotalWeight == 0.0f)
     {
         desire->m_fUrgency = 0.0f;
@@ -331,7 +326,7 @@ void SetTimedSteeringTarget(DesireSteering* desire,
 
 const nlVector3* GetSteeringTargetPosition(DesireSteering* desire)
 {
-    DesireReceivePass* receivePass = (DesireReceivePass*)fn_8002E08C(
+    DesireReceivePass* receivePass = (DesireReceivePass*)GetFielderDesire(
         desire->m_pFielder, 22);
 
     if (g_pBall->UnidentifiedHasPassTarget()
@@ -393,7 +388,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
         desire->m_ePositionSeekState = PSS_ARRIVED;
         if (desire->m_fDesiredFacingDirection >= 0.0f)
         {
-            desire->m_pFielder->Unknown8(
+            desire->m_pFielder->SetDesiredFacingDirection(
                 (unsigned short)(desire->m_fDesiredFacingDirection
                     + 0.5f),
                 false);
@@ -417,7 +412,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
         fDesiredSpeed = 0.0f;
         if (desire->m_fDesiredFacingDirection >= 0.0f)
         {
-            desire->m_pFielder->Unknown8(
+            desire->m_pFielder->SetDesiredFacingDirection(
                 (unsigned short)(desire->m_fDesiredFacingDirection
                     + 0.5f),
                 false);
@@ -430,7 +425,7 @@ void SeekTimedSteeringTarget(DesireSteering* desire,
             desire->m_pFielder->mUnidentified024.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
         desire->m_pFielder->fn_8001DCE0(aDirection);
-        desire->m_pFielder->Unknown8(
+        desire->m_pFielder->SetDesiredFacingDirection(
             aDirection, false);
     }
 
@@ -478,7 +473,7 @@ void SeekSteeringTarget(DesireSteering* desire,
         nlVec3Sub(v3Direction, v3FixedPos,
             desire->m_pFielder->mUnidentified024.m_v3Position);
         unsigned short aDirection = nlVector3ToAngle(v3Direction);
-        desire->m_pFielder->Unknown8(aDirection, false);
+        desire->m_pFielder->SetDesiredFacingDirection(aDirection, false);
         desire->m_pFielder->fn_8001DCE0(aDirection);
     }
 
@@ -560,7 +555,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             break;
         case PSS_NEAR_SEEKING:
             fMinSpeed = fMinimumSpeedScale
-                      * fn_8002CE14(desire->m_pFielder->GetTweaks());
+                      * GetJogSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = GetRunSpeed(desire->m_pFielder->GetTweaks());
             fMinSpeed = nlMinEquals(fMinSpeed, fMaxSpeed);
             break;
@@ -595,7 +590,7 @@ void SeekSteeringTarget(DesireSteering* desire,
             break;
         case PSS_NEAR_SEEKING:
             fMinSpeed = fMinimumSpeedScale
-                      * fn_8002CE14(desire->m_pFielder->GetTweaks());
+                      * GetJogSpeed(desire->m_pFielder->GetTweaks());
             fMaxSpeed = desire->m_pFielder->GetTweaks()->GetRunningSpeed();
             fMinSpeed = nlMinEquals(fMinSpeed, fMaxSpeed);
             break;
@@ -680,14 +675,14 @@ static float GetMarkFacingWeight(cFielder* TheFielder)
 extern "C" void fn_800C6FDC(DesireSteering* desire, float)
 {
     bool bCanFaceBall = desire->m_pFielder->m_pBall == NULL
-                     && !desire->m_pFielder->fn_8003E70C()
+                     && !desire->m_pFielder->IsConfused()
                      && !HasGlobalPad(desire->m_pFielder)
-                     && !(fn_8003E948(desire->m_pFielder)
-                          && desire->m_pFielder->mUnidentified3DC)
-                     && !desire->m_pFielder->fn_8003EA6C()
-                     && !fn_8003E948(desire->m_pFielder)
-                     && !fn_8003E8A0(desire->m_pFielder)
-                     && !desire->m_pFielder->fn_8003E8F4()
+                     && !(IsWaluigiSuperPowerActive(desire->m_pFielder)
+                          && desire->m_pFielder->m_bSuperPowerTankOn)
+                     && !desire->m_pFielder->IsYoshiSuperPowerActive()
+                     && !IsWaluigiSuperPowerActive(desire->m_pFielder)
+                     && !IsBowserSuperPowerActive(desire->m_pFielder)
+                     && !desire->m_pFielder->IsPeachSuperPowerActive()
                      && !(bool)ReceivingPass(desire->m_pFielder)
                      && fn_800DED80(desire->m_pFielder) < 0.2f;
 
@@ -748,7 +743,7 @@ extern "C" void fn_800C6FDC(DesireSteering* desire, float)
         {
             aFacingDirection = desire->m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         }
-        desire->m_pFielder->Unknown8((unsigned short)aFacingDirection, false);
+        desire->m_pFielder->SetDesiredFacingDirection((unsigned short)aFacingDirection, false);
     }
     else
     {
@@ -825,21 +820,21 @@ bool UnidentifiedDesire35::Initialize(void*)
 {
     mMaxDuration = 10.0f;
     fn_8006040C(g_pGame, m_pFielder);
-    m_pFielder->mUnidentified3F8.mUnidentified00
-        = m_pFielder->mUnidentified3F8.mUnidentified04;
+    m_pFielder->mWaluigiWallState.mUnidentified00
+        = m_pFielder->mWaluigiWallState.mUnidentified04;
     return true;
 }
 
 void UnidentifiedDesire35::Update(
     DesireUpdate* update, float fDeltaT)
 {
-    if (!m_pFielder->mUnidentified3DC)
+    if (!m_pFielder->m_bSuperPowerTankOn)
     {
         return;
     }
-    if (!fn_8002EDC8(m_pFielder, -1))
+    if (!CanUsePowerup(m_pFielder, -1))
     {
-        m_pFielder->fn_8005001C(true);
+        m_pFielder->TurnOffSuperPowerTank(true);
         fn_80060804(g_pGame, m_pFielder);
         return;
     }
@@ -848,22 +843,22 @@ void UnidentifiedDesire35::Update(
                  ? m_pFielder->GetTweaks()->GetRunningSpeed()
                  : fn_8002C254(m_pFielder->GetTweaks());
     m_pFielder->mUnidentified024.m_fDesiredSpeed = fSpeed;
-    m_pFielder->mUnidentified3E0 -= fDeltaT;
-    bool bRunning = m_pFielder->mUnidentified3E0 > 0.0f;
+    m_pFielder->m_fSuperPowerTankLevel -= fDeltaT;
+    bool bRunning = m_pFielder->m_fSuperPowerTankLevel > 0.0f;
     if (!bRunning)
     {
         *update = 1;
         return;
     }
 
-    m_pFielder->mUnidentified3F8.mUnidentified00 -= fDeltaT;
+    m_pFielder->mWaluigiWallState.mUnidentified00 -= fDeltaT;
     short nFacingDelta = (short)(m_pFielder->mUnidentified024.m_aActualFacingDirection
         - m_pFielder->mUnidentified024.m_aDesiredFacingDirection);
-    if (m_pFielder->mUnidentified3F8.mUnidentified00 <= 0.0f)
+    if (m_pFielder->mWaluigiWallState.mUnidentified00 <= 0.0f)
     {
-        if (m_pFielder->mUnidentified3DD)
+        if (m_pFielder->m_bSuperPowerTankShutdownPending)
         {
-            m_pFielder->fn_8005001C(true);
+            m_pFielder->TurnOffSuperPowerTank(true);
             return;
         }
 
@@ -871,13 +866,13 @@ void UnidentifiedDesire35::Update(
             = nFacingDelta < 0 ? -nFacingDelta : nFacingDelta;
         if ((unsigned short)nAbsFacingDelta > 0x2000)
         {
-            fn_80060608(g_pGame, m_pFielder);
-            if (m_pFielder->mUnidentified3E0 > 0.0f
-                && m_pFielder->mUnidentified3E0
-                    < m_pFielder->mUnidentified3F8.mUnidentified04)
+            DeliverWaluigiWallEndEvent(g_pGame, m_pFielder);
+            if (m_pFielder->m_fSuperPowerTankLevel > 0.0f
+                && m_pFielder->m_fSuperPowerTankLevel
+                    < m_pFielder->mWaluigiWallState.mUnidentified04)
             {
-                m_pFielder->mUnidentified3E0
-                    = m_pFielder->mUnidentified3F8.mUnidentified04;
+                m_pFielder->m_fSuperPowerTankLevel
+                    = m_pFielder->mWaluigiWallState.mUnidentified04;
             }
             if (nFacingDelta < 0)
             {
@@ -890,8 +885,8 @@ void UnidentifiedDesire35::Update(
                     m_pFielder->mUnidentified024.m_aActualFacingDirection - 0x4000, true);
             }
             fn_8006040C(g_pGame, m_pFielder);
-            m_pFielder->mUnidentified3F8.mUnidentified00
-                = m_pFielder->mUnidentified3F8.mUnidentified04;
+            m_pFielder->mWaluigiWallState.mUnidentified00
+                = m_pFielder->mWaluigiWallState.mUnidentified04;
         }
     }
 
@@ -904,7 +899,7 @@ void UnidentifiedDesire35::Update(
 
 void UnidentifiedDesire35::Cleanup()
 {
-    fn_80060608(g_pGame, m_pFielder);
+    DeliverWaluigiWallEndEvent(g_pGame, m_pFielder);
 }
 
 #include "Game/AI/DesireSteeringDebug.inl"

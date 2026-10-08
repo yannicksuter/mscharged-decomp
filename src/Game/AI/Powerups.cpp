@@ -1756,7 +1756,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
                 else if (pObj->m_eType != POWER_UP_BOBOMB)
                 {
-                    bool bUnknown = fn_8003877C((cFielder*)pCharacter);
+                    bool bUnknown = IsFielderDazed((cFielder*)pCharacter);
                     if (pObj->m_eType != POWER_UP_FREEZE_SHELL)
                     {
                         if (!bUnknown || pObj->m_eType == POWER_UP_SPINY_SHELL)
@@ -1807,7 +1807,7 @@ void PowerupBase::CollisionCallback(PhysicsObject* pObjA,
                 }
             }
 
-            if (((cFielder*)pCharacter)->UnidentifiedInvinciblePowerups())
+            if (((cFielder*)pCharacter)->IsInvinciblePowerups())
             {
                 pObj->m_bShouldDestroy = true;
             }
@@ -2637,7 +2637,7 @@ void RedShell::SeekTarget()
         return;
     }
 
-    if (!target->mbTangible || target->fn_800344B0())
+    if (!target->mbTangible || target->IsInFallAction())
     {
         m_pTarget = 0;
         return;

@@ -280,7 +280,7 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
 {
     ++lbl_806E2130;
 
-    cGame* game = new (nlMalloc(0x10F4, 8, false)) cGame(terrainIndex, weatherType, startCrowdRiot);
+    cGame* game = new (nlMalloc(sizeof(cGame), 8, false)) cGame(terrainIndex, weatherType, startCrowdRiot);
     g_pGame = game;
 
     cTeam* team = new (8, false) cTeam(0);
@@ -313,7 +313,7 @@ void fn_80056CF4(void* terrainIndex, int weatherType, bool startCrowdRiot)
     {
         NumberDisplay* numberDisplay
             = static_cast<NumberDisplay*>(
-                nlMalloc(0x28, 8, false));
+                nlMalloc(sizeof(NumberDisplay), 8, false));
         numberDisplay
             = new (numberDisplay) NumberDisplay();
         gpNumberDisplay = numberDisplay;
@@ -591,8 +591,8 @@ void cGame::InitMegaStrikeGameplay()
 
     g_pBall->m_uGoalType = 6;
 
-    float accuracy = mpMegaStrikeShooter->mUnidentified394;
-    float numBalls = mpMegaStrikeShooter->mUnidentified390;
+    float accuracy = mpMegaStrikeShooter->m_fMegaStrikeAccuracy;
+    float numBalls = mpMegaStrikeShooter->m_fMegaStrikeNumBalls;
     Goalie* pGoalie = mpMegaStrikeShooter->m_pTeam->GetOtherTeam()->GetGoalie();
     pGoalie->InitActionMegaStrike(numBalls, accuracy);
     mpMegaStrikeShooter->EndAction();
@@ -2073,7 +2073,7 @@ void cGame::InitGameState(int state)
             for (int j = 0; j < 4; j++)
             {
                 cFielder* fielder = team->GetFielder(j);
-                if (fielder->fn_8002E060() == 31)
+                if (fielder->GetDesireState() == 31)
                 {
                     fielder->EndDesire();
                 }
@@ -2340,7 +2340,7 @@ void QueueAttackAttemptEvent(cGame* pGame, PlayerAttackData* pData)
     pGame->mUnidentified49C.mAttackAttemptEvent.Queue(
         pData, Function<PlayerAttackData*>(FreePlayerAttackData));
 }
-extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
+void QueueAttackSuccessEvent(cGame* pGame, PlayerAttackData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
@@ -2350,7 +2350,7 @@ extern "C" void fn_8005ED64(cGame* pGame, PlayerAttackData* pData)
     pGame->mUnidentified49C.mAttackSuccessEvent.Queue(
         pData, Function<PlayerAttackData*>(FreePlayerAttackData));
 }
-extern "C" void fn_8005EED0(cGame* pGame, ShotAtGoalData* pData)
+void QueueShotAtGoalEvent(cGame* pGame, ShotAtGoalData* pData)
 {
     if (g_pGame->m_eGameState == 4)
     {
@@ -2449,7 +2449,7 @@ extern "C" void fn_8006040C(cGame* pGame, cFielder* pFielder)
     }
     pGame->mUnidentified49C.mWaluigiWallStartEvent.Deliver(pFielder);
 }
-extern "C" void fn_80060608(cGame* pGame, cFielder* pFielder)
+void DeliverWaluigiWallEndEvent(cGame* pGame, cFielder* pFielder)
 {
     if (g_pGame->m_eGameState == 4)
     {

@@ -11,9 +11,8 @@
 #include "Game/Render/ThwompObject.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-// Charged-only shadow prop, second of the run described beside
-// DrawableBulletBill. This one is backed by a PhysicsObject rather than a
-// plain transform, and scales its shadow by a per-object factor.
+// Replay snapshot of a Thwomp's visibility, position and orientation.
+// Rendering also uses the live object's state, texture and shadow scale.
 
 static float gShadowSizeLow = 1.7f;
 static float gShadowSizeHigh = 0.8f;

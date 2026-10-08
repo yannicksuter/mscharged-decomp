@@ -956,7 +956,7 @@ void Goalie::fn_80083960(float)
         }
 
         if (m_pCurrentAnimController->m_fTime >= fGrabTime
-            && !mpMonty->mUnidentified424
+            && !mpMonty->m_bMontyDekeFinished
             && mpMonty->m_eActionState == ACTION_UNKNOWN_34)
         {
             nlVector3 v3Position
@@ -969,7 +969,7 @@ void Goalie::fn_80083960(float)
     {
         if (g_pBall->GetOwnerFielder() != GetMonty()
             || mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0
-            || GetMonty()->fn_8003E6FC()
+            || GetMonty()->IsStarActive()
             || mpMonty->mbTangible
             || mpMonty->m_eActionState != ACTION_UNKNOWN_32
             || mpMonty->m_pCurrentAnimController->m_fTime > 0.55f)
@@ -2155,16 +2155,16 @@ void Goalie::ActionMove(float deltaTime)
     {
         cFielder* pCaptain = m_pTeam->GetOtherTeam()->GetCaptain();
         PhysicsWaluigiWall* pWall = 0;
-        if (pCaptain->mUnidentified024.m_eCharacterClass == MARIO)
+        if (pCaptain->mUnidentified024.m_eCharacterClass == WALUIGI)
         {
-            pWall = pCaptain->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
+            pWall = pCaptain->mWaluigiWallState.mUnidentified08->FindWall(muWallID);
         }
         else
         {
             pCaptain = m_pTeam->GetCaptain();
-            if (pCaptain->mUnidentified024.m_eCharacterClass == MARIO)
+            if (pCaptain->mUnidentified024.m_eCharacterClass == WALUIGI)
             {
-                pWall = pCaptain->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
+                pWall = pCaptain->mWaluigiWallState.mUnidentified08->FindWall(muWallID);
             }
         }
 
@@ -4349,7 +4349,7 @@ void Goalie::fn_8008A610(float fDeltaT)
                 return;
             }
 
-            if (mpTarget->fn_8003E6FC())
+            if (mpTarget->IsStarActive())
             {
                 return;
             }
@@ -6615,8 +6615,8 @@ void Goalie::fn_8008ED44(bool bParam)
 
             if (bState8Shot
                 || (mpShooter != 0
-                    && (mpShooter->fn_8003E7F8()
-                        || mpShooter->fn_8003E84C())))
+                    && (mpShooter->IsMarioSuperPowerActive()
+                        || mpShooter->IsLuigiSuperPowerActive())))
             {
                 mpSaveData = GoalieSave::GetSTSSpinMissData(bMirrored);
                 bUseSTSSpinMiss = true;
@@ -7563,7 +7563,7 @@ bool Goalie::IsTeammateHoardingBall()
     {
         cBall* pBall;
         cFielder* pOwner = g_pBall->GetOwnerFielder();
-        if (pOwner != 0 && !pOwner->fn_8003EA6C()
+        if (pOwner != 0 && !pOwner->IsYoshiSuperPowerActive()
             && IsOnSameTeam(pOwner))
         {
             float ownerX;

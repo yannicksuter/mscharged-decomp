@@ -142,7 +142,7 @@ void PauseMenuScene::OnSelectPopupYESFORFEIT()
     FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide, InlineHasher("Layer"))->m_bVisible = false;
     mSelectionMade = true;
     GameInfoManager* gameInfoManager = GameInfoManager::Instance();
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     if (gameInfoManager->mIsInStrikers101Mode)
     {
         gpHBMManager->mBlocked = true;

@@ -135,7 +135,8 @@ const int gPlayoffSkillLevels[4][3] = {
 
 const int gFinalOpponentSkillLevels[3] = { 2, 4, 5 };
 
-CupManager* g_pCupManager;
+template <>
+CupManager* nlSingleton<CupManager>::s_pInstance = 0;
 
 static inline CupSidekicks GetRandomCupSidekicks()
 {

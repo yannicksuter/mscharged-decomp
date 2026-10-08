@@ -12,15 +12,8 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Field.h"
 
-// Charged-only shadow prop, fifth of the run described beside
-// DrawableBulletBill. The live object's translation unit spells
-// "yoshi_egg_trail". It is the same snapshot shape as the Birdo egg with its
-// own tunables and live-object layout. The live object and the material
-// services stay address-named.
-
-extern "C"
-{
-}
+// Replay snapshot of a Yoshi egg's visibility, transform and scale.
+// Rendering applies the captured transform to its drawable and draws a shadow.
 
 static float gShadowScaleIn = 1.0f;
 static float gShadowScaleHigh = 1.0f;

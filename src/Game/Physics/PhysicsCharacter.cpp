@@ -27,7 +27,6 @@
 
 
 #include <extras.h>
-extern "C" bool fn_8003E948(const cFielder*);
 
 
 static CollisionPlayerPlayerData* sPlayerPlayerCollisionData[100];
@@ -193,10 +192,10 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         {
             cFielder* fielder = (cFielder*)m_pAICharacter;
             if (fielder->m_pBall == 0 || fielder->m_eActionState == 1
-                || (fn_8003E948(fielder) && fielder->mUnidentified3DC))
+                || (IsWaluigiSuperPowerActive(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 actionState = fielder->m_eActionState;
-                bool superWall = fn_8003E948(fielder);
+                bool superWall = IsWaluigiSuperPowerActive(fielder);
                 DebugPrintf(
                     "bSidelineCollision action state %d superwal %d\n",
                     actionState,
@@ -296,14 +295,14 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 && fielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0)
             {
                 DebugPrintf("PhysChar Fallen down not on fire\n");
-                if (ball->GetOwnerFielder()->fn_800345EC(fielder)
+                if (ball->GetOwnerFielder()->IsAboveFielder(fielder)
                     || fielder->m_eAnimID == 0x76)
                 {
                     DebugPrintf("PhysChar Electro1200\n");
                     return NO_CONTACT;
                 }
-                if (fn_8003E948(ball->GetOwnerFielder())
-                    && ball->GetOwnerFielder()->mUnidentified3DC)
+                if (IsWaluigiSuperPowerActive(ball->GetOwnerFielder())
+                    && ball->GetOwnerFielder()->m_bSuperPowerTankOn)
                 {
                     DebugPrintf("PhysChar SuperWal\n");
                     return ONE_WAY_CONTACT_THIS;
@@ -317,7 +316,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
                 DebugPrintf("PhysChar IsInvincibleChars\n");
                 return ONE_WAY_CONTACT_THIS;
             }
-            if (fn_800344DC(fielder, &ball->m_v3Position))
+            if (IsFielderFrontInvincible(fielder, &ball->m_v3Position))
             {
                 DebugPrintf("PhysChar IsInvincibleCharsDirect\n");
                 return ONE_WAY_CONTACT_THIS;
@@ -400,37 +399,37 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
             cFielder* fielder = (cFielder*)thisPlayer;
             cFielder* otherFielder = (cFielder*)otherPlayer;
 
-            if (fielder->fn_800345EC(otherFielder)
-                || otherFielder->fn_800345EC(fielder))
+            if (fielder->IsAboveFielder(otherFielder)
+                || otherFielder->IsAboveFielder(fielder))
             {
                 return NO_CONTACT;
             }
 
             if (fielder->IsInvincibleChars()
-                || fn_800344DC(fielder, &otherFielder->mUnidentified024.m_v3Position)
+                || IsFielderFrontInvincible(fielder, &otherFielder->mUnidentified024.m_v3Position)
                 || fielder->IsStuck()
-                || (fn_8003E948(fielder) && fielder->mUnidentified3DC))
+                || (IsWaluigiSuperPowerActive(fielder) && fielder->m_bSuperPowerTankOn))
             {
                 contactType = ONE_WAY_CONTACT_OTHER;
             }
             else
             {
                 if (otherFielder->IsInvincibleChars()
-                    || fn_800344DC(otherFielder, &fielder->mUnidentified024.m_v3Position)
+                    || IsFielderFrontInvincible(otherFielder, &fielder->mUnidentified024.m_v3Position)
                     || otherFielder->IsStuck())
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
                 }
-                else if (fielder->fn_80034894(otherFielder))
+                else if (fielder->HasLooseBallContactPriority(otherFielder))
                 {
                     contactType = ONE_WAY_CONTACT_OTHER;
                 }
-                else if (otherFielder->fn_80034894(fielder))
+                else if (otherFielder->HasLooseBallContactPriority(fielder))
                 {
                     contactType = ONE_WAY_CONTACT_THIS;
                 }
-                else if (fielder->fn_80038918()
-                         && otherFielder->fn_80038918())
+                else if (fielder->IsFrozenStateActive()
+                         && otherFielder->IsFrozenStateActive())
                 {
                     contactType = NO_CONTACT;
                 }
@@ -585,7 +584,7 @@ void PhysicsCharacter::PostUpdate()
     }
 
     if (m_pAICharacter->m_eClassType == FIELDER
-        && ((cFielder*)m_pAICharacter)->fn_8003E74C())
+        && ((cFielder*)m_pAICharacter)->IsSuperGrowActive())
     {
         float goalLine = cField::GetGoalLineX(1U) - radius;
         position.x = Clamp(position.x, -goalLine, goalLine);

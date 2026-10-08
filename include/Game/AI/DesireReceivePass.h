@@ -25,8 +25,8 @@ public:
     void RequestOneTouchPass(bool, cPlayer*);
     void ExecutePass(cPlayer*, bool, bool, bool, const nlVector3*, float, float);
     void SetPassTransitionTimer();
-    bool IsGroundReceive() { return !fn_800C0E54(); }
-    bool fn_800C0E54();
+    bool IsGroundReceive() { return !IsVolleyReceive(); }
+    bool IsVolleyReceive();
     bool CalcRoughEstimates(int);
     bool CalcExactEstimates(bool);
     bool StartPickupAnimation();

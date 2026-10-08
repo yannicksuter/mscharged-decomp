@@ -68,7 +68,7 @@ StrikerCupAwardsScene::~StrikerCupAwardsScene()
 void StrikerCupAwardsScene::SceneCreated()
 {
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int teamCount = cupManager->GetNumPlayingTeams();
     PlayerStats stats[10];
 
@@ -155,7 +155,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
         mScrollBar.Initialize();
     }
 
-    g_pCupManager->GetNumPlayingTeams();
+    CupManager::s_pInstance->GetNumPlayingTeams();
 
     int state = mTransitionState;
     if (state == 0 || (unsigned int)(state - 2) <= 1)
@@ -296,7 +296,7 @@ void StrikerCupAwardsScene::UpdateAwards()
         }
     }
 
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int teamCount = cupManager->GetNumPlayingTeams();
     for (int team = 0; team < teamCount; ++team)
     {
@@ -313,7 +313,7 @@ void StrikerCupAwardsScene::UpdateAwards()
 
 bool StrikerCupAwardsScene::PopulateTeamRow(int row, int teamPosition)
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     TLComponentInstance* rowInstance;
     u16 statValue;
     if (row >= cupManager->GetNumPlayingTeams())

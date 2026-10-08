@@ -254,9 +254,9 @@ extern "C" float FuzzyInterpolateRange(float first, float second, float minimum,
 extern "C" float FuzzyInterpolateRangeClamped(float first, float second, float minimum, float maximum, float value);
 extern "C" void FuzzyNoOp_80314740(void*, bool);
 extern "C" void FuzzySetActionSelection( FuzzyRuntimeBase* runtime, int selection);
-extern "C" void FuzzySetTransition(void*, shdStateMachine* state, const char* name);
+extern "C" void FuzzySetContextTransition(void*, AIContext* context, const char* name);
 extern "C" bool fn_80314798(void*);
-extern "C" UnidentifiedFuzzyRuntimeValue* FuzzyGetCurrentContext( void*, FuzzyRuntimeBase* runtime);
+extern "C" AIContext* FuzzyGetScriptMachineContext(void*, ScriptMachine* machine);
 extern "C" int FuzzyGetCurrentContextType(FuzzyRuntimeBase* runtime);
 extern "C" void FuzzyPrintFloat(float value);
 extern "C" void FuzzyPrintString(void*, const char* value);

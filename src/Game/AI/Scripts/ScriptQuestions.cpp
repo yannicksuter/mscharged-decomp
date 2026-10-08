@@ -33,7 +33,6 @@
 #include "NL/nlPrint.h"
 #include "Game/Ball.h"
 #include "Game/Team.h"
-extern "C" float fn_8002CE14(PlayerTweaks* pTweaks);
 float GoalConeOpenness(const nlVector3&, const nlVector3&, cFielder*,
     float, float, float, float, cPlayer*);
 
@@ -46,7 +45,6 @@ static TweakFloatBinding sConfidenceIdealDistanceTweak("Ideal Distance", "Game/P
 static TweakFloatBinding sConfidenceIdealRangeTweak("Ideal Range", gLastTweakCategory, &gConfidenceDistanceRange.y);
 static TweakFloatBinding sConfidenceMinAngleTweak("Min Angle", gLastTweakCategory, &gConfidenceAngleRange.x);
 static TweakFloatBinding sConfidenceMaxAngleTweak("Max Angle", gLastTweakCategory, &gConfidenceAngleRange.y);
-extern "C" bool fn_8002EDC8(cFielder*, int);
 float lbl_806DC3E8 = 100000000000.0f;
 float lbl_806DC3EC = -100000000000.0f;
 
@@ -323,7 +321,7 @@ float Marking(cFielder* pMarking, cPlayer* pMarked)
         return 0.0f;
     }
 
-    if (pMarking->fn_800306F4((cFielder*)pMarked))
+    if (pMarking->IsMarking((cFielder*)pMarked))
     {
         return 1.0f;
     }
@@ -339,7 +337,7 @@ extern "C" float fn_800D6A90(cFielder* pFielder)
     }
 
     float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
-    float fAttribute = fn_8002CE14(pFielder->GetTweaks());
+    float fAttribute = GetJogSpeed(pFielder->GetTweaks());
     return NormalizeVal(fSpeed, 0.7f * fAttribute, 2.0f);
 }
 
@@ -351,7 +349,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
     }
 
     float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
-    float fBaseSpeed = fn_8002CE14(pFielder->GetTweaks());
+    float fBaseSpeed = GetJogSpeed(pFielder->GetTweaks());
     float fAttribute;
     if (pFielder->m_pBall != NULL)
     {
@@ -381,7 +379,7 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
     }
 
     float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
-    float fBaseSpeed = fn_8002CE14(pFielder->GetTweaks());
+    float fBaseSpeed = GetJogSpeed(pFielder->GetTweaks());
     float fAttribute;
     if (pFielder->m_pBall != NULL)
     {
@@ -761,7 +759,7 @@ extern "C" float fn_800D7988(int nAction, cFielder* pFielder)
         return 0.0f;
     }
 
-    Desire* pDesire = fn_8002E08C(pFielder, nAction);
+    Desire* pDesire = GetFielderDesire(pFielder, nAction);
     int bActive = 0;
     if ((pDesire != NULL) && pDesire->mActive)
     {
@@ -787,7 +785,7 @@ extern "C" float fn_800D79F4(int nAction, cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    Desire* pDesire = fn_8002E08C(pFielder, nAction);
+    Desire* pDesire = GetFielderDesire(pFielder, nAction);
     if (pDesire != NULL)
     {
         float fStartTime = pDesire->mLastActiveTime;
@@ -803,7 +801,7 @@ extern "C" float fn_800D7A70(cFielder* pFielder)
         return 0.0f;
     }
 
-    shdStateMachine* pState = fn_8002E1A4(pFielder)->mActiveState;
+    shdStateMachine* pState = GetFielderScriptMachine(pFielder)->mActiveState;
     if (pState != NULL)
     {
         pState->mAgeTimer.GetSeconds();
@@ -842,7 +840,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
     if (pOwner != NULL)
     {
         fOwnerRadius = pOwner->mUnidentified320->GetRadius();
-        if (pOwner->fn_800345EC(pFielder))
+        if (pOwner->IsAboveFielder(pFielder))
             return 0.0f;
     }
     const nlVector3& vTarget = pOwner != NULL ? pOwner->mUnidentified024.m_v3Position
@@ -856,7 +854,7 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
         fDistance -= fRadius + fOwnerRadius;
         fScore = NormalizeVal(fDistance / fSpeed, 4.3f * fDuration, 0.08f);
     }
-    if (pOwner != NULL && pOwner->fn_8003E74C() && !pFielder->fn_8003E74C())
+    if (pOwner != NULL && pOwner->IsSuperGrowActive() && !pFielder->IsSuperGrowActive())
         fScore = FacingAdjustedConfidence(fScore, pFielder, pOwner);
     return fScore;
 }
@@ -943,15 +941,15 @@ extern "C" float fn_800D84F8(cFielder* pFielder)
     if (pFielder == NULL)
         return 0.0f;
     float fScore = 0.0f;
-    if (pFielder->IsCaptain() && !pFielder->fn_8003E6EC())
+    if (pFielder->IsCaptain() && !pFielder->IsSuperPowerActive())
     {
         int powerup = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
-        if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
+        if (IsCaptainPowerup(powerup) && CanUsePowerup(pFielder, powerup))
             fScore = 1.0f;
         else if (pFielder->m_pTeam->fn_800A6560())
         {
             powerup = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
-            if (IsCaptainPowerup(powerup) && fn_8002EDC8(pFielder, powerup))
+            if (IsCaptainPowerup(powerup) && CanUsePowerup(pFielder, powerup))
                 fScore = 1.0f;
         }
     }
@@ -967,12 +965,12 @@ extern "C" float fn_800D85F8(cFielder* pFielder)
     if (pFielder->IsCaptain())
     {
         if (first != -1 || (pFielder->m_pTeam->fn_800A6560() && second != -1))
-            return (fn_8002EDC8(pFielder, first) || fn_8002EDC8(pFielder, second)) ? 1.0f : 0.0f;
+            return (CanUsePowerup(pFielder, first) || CanUsePowerup(pFielder, second)) ? 1.0f : 0.0f;
         return 0.0f;
     }
     if ((first >= 0 && first < 9)
         || (pFielder->m_pTeam->fn_800A6560() && second >= 0 && second < 9))
-        return (fn_8002EDC8(pFielder, first) || fn_8002EDC8(pFielder, second)) ? 1.0f : 0.0f;
+        return (CanUsePowerup(pFielder, first) || CanUsePowerup(pFielder, second)) ? 1.0f : 0.0f;
     return 0.0f;
 }
 
@@ -984,7 +982,7 @@ extern "C" float fn_800D8764(cFielder* pFielder, int powerup)
     int first = pFielder->m_pTeam->GetPowerUpByIndex(0).eType;
     int second = pFielder->m_pTeam->GetPowerUpByIndex(1).eType;
     if (first == powerup || (pFielder->m_pTeam->fn_800A6560() && second == powerup))
-        fScore = fn_8002EDC8(pFielder, powerup);
+        fScore = CanUsePowerup(pFielder, powerup);
     return fScore;
 }
 
@@ -1548,7 +1546,7 @@ extern "C" float fn_800D9DD8(cPlayer* pPlayer)
         cFielder* pFielder = (cFielder*)pPlayer;
         nlVector3 v3Position = pFielder->mUnidentified024.m_v3Position;
         bool bOutOfBounds = cField::FixOutOfBoundsPosition(v3Position, -1.0f, true);
-        bool bIncapacitated = pFielder->fn_80038918() || pFielder->fn_800344B0()
+        bool bIncapacitated = pFielder->IsFrozenStateActive() || pFielder->IsInFallAction()
             || pFielder->m_eActionState == 35
             || pFielder->m_eActionState == ACTION_ELECTROCUTION || bOutOfBounds;
         fScore = bIncapacitated ? 1.0f : 0.0f;
@@ -1572,7 +1570,7 @@ float Incapacitated(cPlayer* pPlayer)
     else if (pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
-        fScore = (pFielder->fn_80038918() || pFielder->IsFallenDown()) ? 1.0f : 0.0f;
+        fScore = (pFielder->IsFrozenStateActive() || pFielder->IsFallenDown()) ? 1.0f : 0.0f;
     }
     return fScore;
 }
@@ -1615,7 +1613,7 @@ extern "C" float fn_800DA050(cFielder* pFielder)
     }
 
     int bFlag = 0;
-    if (pFielder->fn_800344B0() || pFielder->IsShattered())
+    if (pFielder->IsInFallAction() || pFielder->IsShattered())
     {
         bFlag = 1;
     }
@@ -1631,10 +1629,10 @@ extern "C" float fn_800DA0C8(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    DesireGooey* pDesire = (DesireGooey*)fn_8002E08C(pFielder, 27);
+    DesireGooey* pDesire = (DesireGooey*)GetFielderDesire(pFielder, 27);
     if (pDesire != NULL && pDesire->IsActive())
     {
-        fScore = pDesire->fn_800BD1F0();
+        fScore = pDesire->GetSpeedScale();
     }
     return fScore;
 }
@@ -1647,7 +1645,7 @@ extern "C" float fn_800DA130(cFielder* pFielder)
     }
 
     float fResult = 0.0f;
-    Desire* pDesire = fn_8002E08C(pFielder, 0x1E);
+    Desire* pDesire = GetFielderDesire(pFielder, 0x1E);
     if ((pDesire != NULL) && pDesire->mActive)
     {
         fResult = 1.0f;
@@ -2721,7 +2719,7 @@ extern "C" float fn_800DD944(cPlayer* pPlayer)
 
     if (pPlayer->m_eClassType == FIELDER)
     {
-        if (((cFielder*)pPlayer)->fn_8003E6EC())
+        if (((cFielder*)pPlayer)->IsSuperPowerActive())
         {
             return 1.0f;
         }
@@ -2753,11 +2751,11 @@ extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
         return 0.0f;
     bool bHasGlobalPad = pFielder->GetGlobalPad() != NULL;
     if (!bHasGlobalPad && pTarget->m_eClassType == FIELDER
-        && ((cFielder*)pTarget)->fn_800345EC(pFielder))
+        && ((cFielder*)pTarget)->IsAboveFielder(pFielder))
         return 0.0f;
     float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
         pTarget->mUnidentified024.m_v3Position), true);
-    float fRange = fn_80030750(pFielder);
+    float fRange = GetFielderHitReach(pFielder);
     return NormalizeVal(fDistance, 0.5f + fRange, 0.66f * fRange);
 }
 
@@ -3250,7 +3248,7 @@ extern "C" float fn_800DED3C(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (pFielder->fn_8003E71C())
+    if (pFielder->IsMushroomActive())
     {
         return 1.0f;
     }
@@ -3273,13 +3271,13 @@ extern "C" float fn_800DED80(cPlayer* pPlayer)
     else if (pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
-        DesireRunToTarget* pDesire = pFielder->fn_8002E060() == 13
-            ? (DesireRunToTarget*)fn_8002E08C(pFielder, 13) : NULL;
+        DesireRunToTarget* pDesire = pFielder->GetDesireState() == 13
+            ? (DesireRunToTarget*)GetFielderDesire(pFielder, 13) : NULL;
         if ((pDesire != NULL && pDesire->GetTargetBall() != NULL)
-            || pFielder->fn_8002E060() == 7 || pFielder->fn_8002E060() == 16
+            || pFielder->GetDesireState() == 7 || pFielder->GetDesireState() == 16
             || pFielder->m_eActionState == ACTION_SLIDE_ATTACK)
             fScore = AbleToInterceptBall(pFielder);
-        else if (pFielder->fn_8002E060() == 20)
+        else if (pFielder->GetDesireState() == 20)
             fScore = FMIN(FMAX(1.5f * AbleToInterceptBall(pFielder), 0.0f), 1.0f);
     }
     return fScore;
@@ -3308,7 +3306,7 @@ float ReceivingPass(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    if (pFielder->fn_8002E060() == 22)
+    if (pFielder->GetDesireState() == 22)
     {
         fScore = 1.0f;
     }
@@ -3324,7 +3322,7 @@ extern "C" float fn_800DF028(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
     if (pFielder->m_eActionState == ACTION_ONETIMER
         || pFielder->m_eActionState == ACTION_LATE_ONETIMER_FROM_VOLLEY
         || (pDesire != NULL && pDesire->IsActive() && pDesire->IsOneTouchShot()))
@@ -3342,7 +3340,7 @@ extern "C" float fn_800DF0B8(cFielder* pFielder)
     }
 
     float fResult = 0.0f;
-    if ((pFielder->m_eClassType == FIELDER) && pFielder->fn_8003499C())
+    if ((pFielder->m_eClassType == FIELDER) && pFielder->IsReceivingVolleyPass())
     {
         fResult = 1.0f;
     }
@@ -3358,7 +3356,7 @@ extern "C" float fn_800DF118(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    if (ReceivingPass(pFielder) && !pFielder->fn_8003499C())
+    if (ReceivingPass(pFielder) && !pFielder->IsReceivingVolleyPass())
     {
         fScore = 1.0f;
     }
@@ -3414,7 +3412,7 @@ extern "C" float fn_800DF390(cPlayer* pPlayer)
     }
 
     float fScore = 0.0f;
-    if (pPlayer->m_eClassType == FIELDER && ((cFielder*)pPlayer)->fn_8003499C())
+    if (pPlayer->m_eClassType == FIELDER && ((cFielder*)pPlayer)->IsReceivingVolleyPass())
     {
         float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
@@ -3433,7 +3431,7 @@ extern "C" float fn_800DF474(cFielder* pFielder)
     }
 
     float fScore = 0.0f;
-    if (ReceivingPass(pFielder) && !pFielder->fn_8003499C())
+    if (ReceivingPass(pFielder) && !pFielder->IsReceivingVolleyPass())
     {
         float fReaction = 1.0f - fn_800A636C(g_pCurrentlyUpdatingTeam)->GetReaction(NULL);
         float fPassDeadZone = g_pGame->m_pFuzzyTweaks->fPassDeadZone;
@@ -3951,7 +3949,7 @@ extern "C" float fn_800E06F4(cPlayer* pPlayer)
             cPlayer* pOther = (cPlayer*)g_pCharacters[i];
             bool bUnavailable = false;
             if (pOther->m_eClassType == FIELDER)
-                bUnavailable = ((cFielder*)pOther)->fn_800344B0() || ((cFielder*)pOther)->IsShattered();
+                bUnavailable = ((cFielder*)pOther)->IsInFallAction() || ((cFielder*)pOther)->IsShattered();
             if (pOther == pPlayer || pOther->m_pBall != NULL
                 || pOther->m_eClassType == GOALIE || bUnavailable)
                 continue;

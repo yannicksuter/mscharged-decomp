@@ -6,10 +6,9 @@
 #include "Game/Render/CrowdImpostorManager.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glState.h"
-#include "Game/TweakValue.h"
 #include "Game/TweakValueInt.h"
 #include "Game/TweakValueFloat.h"
-
+#include "Game/UnidentifiedStaticStorage.h"
 
 static TweakValueInt siBackgroundRed(
     "siBackgroundRed", "/Render/Impostor/Cluster", 122);
@@ -36,7 +35,7 @@ unsigned long ImpostorCluster::GetTexture()
 {
     nlDLListIterator<ImpostorSprite*> it;
     it = mSprites.Begin();
-    return it.m_Curr->entry->GetTexture();
+    return (*it)->GetTexture();
 }
 
 void ImpostorCluster::UpdateView(
@@ -47,19 +46,10 @@ void ImpostorCluster::UpdateView(
 
     nlDLListIterator<ImpostorSprite*> it;
     it = mSprites.Begin();
-    DLListEntry<ImpostorSprite*>* head = it.m_Head;
-    DLListEntry<ImpostorSprite*>* entry = it.m_Curr;
-    while (entry != 0)
+    while (!it.IsDone())
     {
-        entry->entry->UpdateView(&direction, &up);
-        if (nlDLRingIsEnd(head, entry) || entry == 0)
-        {
-            entry = 0;
-        }
-        else
-        {
-            entry = entry->m_next;
-        }
+        (*it)->UpdateView(&direction, &up);
+        it.Step();
     }
 }
 

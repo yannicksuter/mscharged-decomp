@@ -237,7 +237,7 @@ Goalie::Goalie(eCharacterClass gcc, const int* pTemplate,
     m_pHeadTrack->m_bTrackOOI = true;
 }
 
-void Goalie::UnidentifiedVirtual1C()
+void Goalie::ResetAnimState()
 {
     fn_80097648(-1.0f);
     SetAnimState(5, false, 0.0f, false, false);
@@ -731,7 +731,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
     float fHeight = 0.25f + GetJointPosition(m_nHeadJointIndex).z;
     if (!pFldr->mbTangible || pFldr->IsFrozen() || pFldr->IsCharacterInAir(fHeight)
-        || pFldr->IsInvincible() || pFldr->fn_8003E6FC())
+        || pFldr->IsInvincible() || pFldr->IsStarActive())
         return;
 
     switch (mGoalieActionState)
@@ -1699,7 +1699,7 @@ extern "C" float CalcOpponentProximity(Goalie* pGoalie,
     for (int i = 0; i < 4; ++i)
     {
         cFielder* pFielder = pOtherTeam->GetFielder(i);
-        if (pFielder->IsFallenDown() || fn_8003877C(pFielder))
+        if (pFielder->IsFallenDown() || IsFielderDazed(pFielder))
             continue;
 
         if (v3TargetPosition.x
@@ -2038,9 +2038,9 @@ bool Goalie::CheckForDekeAttack()
         if (nlRandomf(100.0f) < fChance)
         {
             cFielder* pFielder = g_pBall->GetOwnerFielder();
-            bool bUnidentifiedSecond = pFielder->UnidentifiedClass17Or2Or6();
+            bool bUnidentifiedSecond = pFielder->HasTeleportDeke();
             float fDistance = bUnidentifiedSecond ? gfDekeAttackRangeLong : gfDekeAttackRange;
-            if (!pFielder->IsFallenDown() && !fn_8003877C(pFielder)
+            if (!pFielder->IsFallenDown() && !IsFielderDazed(pFielder)
                 && nlVec3DistanceSquared2D(g_pBall->m_v3Position, mUnidentified024.m_v3Position)
                     < nlGetLengthSquared1D(fDistance))
             {
@@ -2299,7 +2299,7 @@ bool Goalie::FindApproachingMonty()
         return false;
     cFielder* pFielder = g_pBall->GetOwnerFielder();
     if (pFielder != 0 && (int)pFielder->mUnidentified024.m_eCharacterClass == 0x12
-        && !pFielder->fn_8003E6FC()
+        && !pFielder->IsStarActive()
         && (int)pFielder->m_eActionState == 0x20
         && pFielder->m_pCurrentAnimController->m_fTime < 0.55f)
     {
@@ -2357,7 +2357,7 @@ bool Goalie::FindSTSMissData(const nlVector3& rPos)
         PhysicsWaluigiWall* pWall = NULL;
         if (muWallID != 0)
         {
-            pWall = pWaluigi->mUnidentified3F8.mUnidentified08->FindWall(muWallID);
+            pWall = pWaluigi->mWaluigiWallState.mUnidentified08->FindWall(muWallID);
             if (pWall == NULL)
                 muWallID = 0;
         }
@@ -2366,7 +2366,7 @@ bool Goalie::FindSTSMissData(const nlVector3& rPos)
         {
             if (i != 0 || pWall == NULL)
             {
-                pWall = pWaluigi->mUnidentified3F8.mUnidentified08->GetWall(i);
+                pWall = pWaluigi->mWaluigiWallState.mUnidentified08->GetWall(i);
                 ++i;
             }
             if (pWall != NULL)
@@ -2529,8 +2529,8 @@ bool Goalie::IsLooseBallClose(float fDistFromBox)
         cTeam* pOtherTeam = m_pTeam->GetOtherTeam();
         cFielder* pInterceptor = m_pTeam->GetBestBallInterceptor();
         cFielder* pOtherInterceptor = pOtherTeam->GetBestBallInterceptor();
-        bool bInterceptorDown = pInterceptor->IsFallenDown() || fn_8003877C(pInterceptor);
-        bool bOtherInterceptorDown = pOtherInterceptor->IsFallenDown() || fn_8003877C(pOtherInterceptor);
+        bool bInterceptorDown = pInterceptor->IsFallenDown() || IsFielderDazed(pInterceptor);
+        bool bOtherInterceptorDown = pOtherInterceptor->IsFallenDown() || IsFielderDazed(pOtherInterceptor);
         if (bInterceptorDown && bOtherInterceptorDown)
             return true;
         float fBallInTime = m_pTeam->mfBallInTimes[pInterceptor->mUnidentified1E4.m_ID];
@@ -3620,7 +3620,7 @@ void Goalie::ReleaseMonty()
     if (mpMonty != 0)
     {
         if (mpMonty->m_eActionState == ACTION_UNKNOWN_34
-            && !mpMonty->mUnidentified424)
+            && !mpMonty->m_bMontyDekeFinished)
         {
             if (mbGrabMonty
                 && mpMonty->mUnidentified024.m_v3Position.z > -0.25f)
@@ -4022,7 +4022,7 @@ void Goalie::TacklePlayer(cPlayer* pPlayer)
 {
     cFielder* pFielder = static_cast<cFielder*>(pPlayer);
     if (pPlayer != 0 && pPlayer->m_eClassType == FIELDER
-        && !pFielder->IsFallenDown() && !pFielder->fn_8003E6FC())
+        && !pFielder->IsFallenDown() && !pFielder->IsStarActive())
     {
         PlaySound(9, 0x06024E5D, 0, 0);
 
@@ -4049,7 +4049,7 @@ void Goalie::TacklePlayer(cPlayer* pPlayer)
 
 void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
 {
-    if (pFielder != NULL && !pFielder->IsFallenDown() && !pFielder->fn_8003E6FC())
+    if (pFielder != NULL && !pFielder->IsFallenDown() && !pFielder->IsStarActive())
     {
         PlaySound(9, 0x06024E5D, NULL, NULL);
         unsigned short aDirection;
@@ -4140,7 +4140,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
 
 void Goalie::HandleDekeAttackContact(cFielder* pTarget, bool bParam)
 {
-    if (pTarget->IsFallenDown() || IsOnSameTeam(pTarget) || pTarget->fn_8003E6FC())
+    if (pTarget->IsFallenDown() || IsOnSameTeam(pTarget) || pTarget->IsStarActive())
         return;
 
     if (mPursueDekeState == 0)
@@ -4255,7 +4255,7 @@ void Goalie::WhackSTSPlayer(cFielder* pFielder)
     {
         return;
     }
-    if (pFielder->fn_8003E6FC())
+    if (pFielder->IsStarActive())
     {
         return;
     }
@@ -4309,7 +4309,7 @@ void Goalie::StealBall(cPlayer* pPlayer)
     pPlayer->ReleaseBall(false);
 
     cFielder* pFielder = static_cast<cFielder*>(pPlayer);
-    if (pFielder->fn_8002E060() == FIELDERDESIRE_FINISH_ACTION)
+    if (pFielder->GetDesireState() == FIELDERDESIRE_FINISH_ACTION)
     {
         return;
     }
@@ -4494,9 +4494,9 @@ void Goalie::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_GOALIE_FIELD
 
-void Goalie::Unknown12(RunningChecksum* pChecksum)
+void Goalie::ChecksumState(RunningChecksum* pChecksum)
 {
-    cPlayer::Unknown12(pChecksum);
+    cPlayer::ChecksumState(pChecksum);
     pChecksum->ChecksumData(
         &mGoalieActionState, sizeof(mGoalieActionState));
     pChecksum->ChecksumData(&mUrgency, sizeof(mUrgency));
@@ -4537,7 +4537,7 @@ extern "C" void GoalieOnGameOver()
         else if (pPlayer->m_eClassType == FIELDER)
         {
             cFielder* pFielder = static_cast<cFielder*>(pPlayer);
-            pFielder->fn_8002E0FC();
+            pFielder->EndAllDesires();
             pFielder->EndAction();
         }
     }

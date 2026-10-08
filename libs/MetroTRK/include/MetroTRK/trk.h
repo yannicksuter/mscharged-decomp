@@ -2,6 +2,7 @@
 #define METROTRK_TRK_H
 
 #include <MetroTRK/dserror.h>
+#include <MetroTRK/flush_cache.h>
 #include <MetroTRK/trkenum.h>
 #include <revolution/types.h>
 #include <stddef.h>
@@ -239,8 +240,6 @@ extern "C"
     DSError HandleCloseFileSupportRequest(int replyError, DSIOResult* ioResult);
     DSError HandlePositionFileSupportRequest(DSReplyError replyErr, u32* param_2, u8 param_3, DSIOResult* ioResult);
     DSError TRKSuppAccessFile(u32 file_handle, u8* data, size_t* count, DSIOResult* io_result, BOOL need_reply, BOOL read);
-
-    void TRK_flush_cache(u32 address, u32 length);
 
 #ifdef __cplusplus
 }

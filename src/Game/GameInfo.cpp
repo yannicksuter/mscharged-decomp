@@ -188,7 +188,7 @@ void GameInfoManager::SetMode(int mode, bool flag)
 
 unsigned long GameInfoManager::GetSettingsDataSize() const
 {
-    return g_pCupManager->GetSaveDataSize() + 0x144;
+    return CupManager::s_pInstance->GetSaveDataSize() + 0x144;
 }
 
 unsigned long GameInfoManager::GetMemoryCardDataSize() const
@@ -201,7 +201,7 @@ void GameInfoManager::SerializeSettings(void* data) const
     memcpy(data, &mUserInfo, sizeof(mUserInfo));
     data = (u8*)data + 0x80;
     memcpy(data, mRulesTable, sizeof(mRulesTable));
-    g_pStrikerChallenge->SerializeData(g_pCupManager->SerializeData((u8*)data + sizeof(mRulesTable)));
+    g_pStrikerChallenge->SerializeData(CupManager::s_pInstance->SerializeData((u8*)data + sizeof(mRulesTable)));
 }
 
 void GameInfoManager::GetMemoryCardData(void* data) const
@@ -214,7 +214,7 @@ void GameInfoManager::DeserializeSettings(void* data)
     memcpy(&mUserInfo, data, sizeof(mUserInfo));
     data = (u8*)data + 0x80;
     memcpy(mRulesTable, data, sizeof(mRulesTable));
-    g_pStrikerChallenge->DeserializeData(g_pCupManager->DeserializeData((u8*)data + sizeof(mRulesTable)));
+    g_pStrikerChallenge->DeserializeData(CupManager::s_pInstance->DeserializeData((u8*)data + sizeof(mRulesTable)));
 }
 
 void GameInfoManager::SetMemoryCardData(const void* data)
@@ -295,7 +295,7 @@ const GameplaySettings* GameInfoManager::GetCurrentSettings() const
 
     if (mCurrentMode == GM_MODE_3) {
         const GameplaySettings* settings =
-            &g_pCupManager->mCurrentCup->mCupSettings;
+            &CupManager::s_pInstance->mCurrentCup->mCupSettings;
 
         return settings;
     }

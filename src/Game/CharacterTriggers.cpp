@@ -215,7 +215,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xD1B12A6E:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                fn_800318F8((cFielder*)g_pCurrentlyUpdatingCharacter);
+                TryFielderQueuedPass((cFielder*)g_pCurrentlyUpdatingCharacter);
             }
             break;
 
@@ -275,7 +275,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0x5D68C1D2:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
                 if (IsDesireActive(pDesire))
                 {
                     ((DesireSuperPower*)pDesire)->EmitHeavenlyLight();
@@ -286,7 +286,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
         case 0xCFEAC332:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter))
             {
-                Desire* pDesire = fn_8002E08C((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
+                Desire* pDesire = GetFielderDesire((cFielder*)g_pCurrentlyUpdatingCharacter, 0x17);
                 if (IsDesireActive(pDesire))
                 {
                     EmitBowserJrShriek((DesireSuperPower*)pDesire);
@@ -383,7 +383,7 @@ void CharacterTriggerHandler(cSAnim* pAnim, unsigned int uParam)
 
         case 0x00266A23:
             if (IsCharacterFielder(g_pCurrentlyUpdatingCharacter)
-                && !((cFielder*)g_pCurrentlyUpdatingCharacter)->fn_800344B0())
+                && !((cFielder*)g_pCurrentlyUpdatingCharacter)->IsInFallAction())
             {
                 EmitDaze((cPlayer*)g_pCurrentlyUpdatingCharacter);
             }
@@ -1046,7 +1046,7 @@ void ElectrocutionUpdateCallback(EmissionController& ec)
     UpdateEmitterFromCharacterUnculled(ec);
 
     cCharacter* pCharacter = (cCharacter*)ec.m_uUserData;
-    if (pCharacter->m_eClassType == FIELDER && fn_8003877C((cFielder*)pCharacter))
+    if (pCharacter->m_eClassType == FIELDER && IsFielderDazed((cFielder*)pCharacter))
     {
         return;
     }
@@ -1431,7 +1431,7 @@ void EmitLanding(cCharacter* pCharacter)
 {
     if (pCharacter->m_eClassType == FIELDER)
     {
-        if (((cFielder*)pCharacter)->fn_8003E74C())
+        if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
             PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
 
@@ -1498,7 +1498,7 @@ void EmitSlideTackleTrail(cCharacter* pCharacter)
 
 void EmitHitTrail(cCharacter* pCharacter)
 {
-    if (pCharacter->m_eClassType == FIELDER && !((cFielder*)pCharacter)->fn_800344B0())
+    if (pCharacter->m_eClassType == FIELDER && !((cFielder*)pCharacter)->IsInFallAction())
     {
         const char* szEffectName = "hit_trail";
         EmissionController* pController = EmitGeneric(pCharacter, szEffectName, 0);
@@ -1508,7 +1508,7 @@ void EmitHitTrail(cCharacter* pCharacter)
             pController->SetUpdateCallback(update2);
         }
 
-        if (((cFielder*)pCharacter)->fn_8003E74C())
+        if (((cFielder*)pCharacter)->IsSuperGrowActive())
         {
             PlayRumbleAction(2, ((cPlayer*)pCharacter)->GetGlobalPad());
         }

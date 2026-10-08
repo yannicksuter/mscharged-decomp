@@ -7,9 +7,9 @@
 /**
  * Offset/Address/Size: 0x9538 | 0x800D1C34 | size: 0x8
  */
-extern "C" inline bool fn_800D1C34(const cFielder* fielder)
+inline bool IsFielderSuperPowerTankOn(const cFielder* fielder)
 {
-    return fielder->mUnidentified3DC;
+    return fielder->m_bSuperPowerTankOn;
 }
 
 static inline float GetNormalizedContactTime(

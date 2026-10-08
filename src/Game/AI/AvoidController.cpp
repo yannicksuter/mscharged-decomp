@@ -73,7 +73,6 @@ public:
     nlList<UnidentifiedAvoidanceValue>& mUnidentified018;
 };
 
-extern "C" float fn_8002CE14(const PlayerTweaks*);
 bool lbl_806E0BB8;
 
 
@@ -130,14 +129,14 @@ inline bool AvoidController::UnidentifiedCanAvoid(int things)
     case AVOID_FIELDERS:
     {
         result = false;
-        bool bCanAvoidFielder = bCanAvoid && !m_pFielder->fn_8003E74C();
+        bool bCanAvoidFielder = bCanAvoid && !m_pFielder->IsSuperGrowActive();
         if (bCanAvoidFielder && !m_pFielder->IsInvincibleChars())
             result = true;
         break;
     }
     case AVOID_POWERUPS:
         result = false;
-        if (bCanAvoid && !m_pFielder->UnidentifiedInvinciblePowerups())
+        if (bCanAvoid && !m_pFielder->IsInvinciblePowerups())
             result = true;
         break;
     }
@@ -693,7 +692,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
             aDesiredMovementDir = nlVector3ToAngle(
                 *(const nlVector3*)&vNewDesiredVelDir);
             m_pFielder->fn_8001DCE0(aDesiredMovementDir);
-            m_pFielder->Unknown8(aDesiredMovementDir, false);
+            m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
         }
     }
     if (!bTurboAllowed && m_pFielder->IsRunning() && m_pFielder->m_pBall != NULL)
@@ -702,7 +701,7 @@ bool AvoidController::AvoidSidelines(nlVector3& v3OutRepulsion)
         aDesiredMovementDir = m_pFielder->mUnidentified024.m_aDesiredMovementDirection;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(aDesiredMovementDir);
-        m_pFielder->Unknown8(aDesiredMovementDir, false);
+        m_pFielder->SetDesiredFacingDirection(aDesiredMovementDir, false);
     }
     v3OutRepulsion = mUnidentified028;
     return bHitSideline;
@@ -761,13 +760,13 @@ void AvoidController::ApplyRepulsionVector(nlVector3 v3Repulsion)
     float fDesiredSpeed = m_pFielder->GetRunningSpeed();
     float fResultantMag = nlVec3Length(v3Repulsion);
     fDesiredSpeed = fResultantMag <= fDesiredSpeed ? fResultantMag : fDesiredSpeed;
-    float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(fn_8002CE14(m_pFielder->GetTweaks()));
+    float fUnidentifiedSpeed = m_pFielder->GetSpeedPowerupAdjusted(GetJogSpeed(m_pFielder->GetTweaks()));
     if (fDesiredSpeed >= 0.35f * fUnidentifiedSpeed)
     {
         fDesiredSpeed = fDesiredSpeed >= fUnidentifiedSpeed ? fDesiredSpeed : fUnidentifiedSpeed;
         m_pFielder->mUnidentified024.m_fDesiredSpeed = fDesiredSpeed;
         m_pFielder->fn_8001DCE0(nlVector3ToAngle(v3Repulsion));
-        m_pFielder->Unknown8(nlVector3ToAngle(v3Repulsion), false);
+        m_pFielder->SetDesiredFacingDirection(nlVector3ToAngle(v3Repulsion), false);
     }
     else
         m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;

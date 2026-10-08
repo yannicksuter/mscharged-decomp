@@ -94,8 +94,8 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
     {
         switch (m_pFielder->mUnidentified024.m_eCharacterClass)
         {
-        case DONKEYKONG:
-        case MARIO:
+        case DAISY:
+        case WALUIGI:
         case (eCharacterClass)17:
         {
             float fSign = AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
@@ -148,8 +148,8 @@ bool DesireShoot::Initialize(void* context)
     UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
-    if (m_pFielder->fn_8002E9D0() != 20
-        && m_pFielder->fn_8002E9D0() != 19)
+    if (m_pFielder->GetPreviousDesireState() != 20
+        && m_pFielder->GetPreviousDesireState() != 19)
     {
         m_pFielder->DoResetShotMeter(0.0f);
     }

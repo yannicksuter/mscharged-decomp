@@ -119,11 +119,11 @@ public:
         const CharacterPhysicsData* pPhysicsData, GoalieTweaks* pTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
     ~Goalie();
-    virtual void UnidentifiedVirtual1C();
+    virtual void ResetAnimState();
     virtual void Update(float dt);
     virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
     virtual void SyncLog(void* context, DebugWriteCache* cache);
-    virtual void Unknown12(RunningChecksum* pChecksum);
+    virtual void ChecksumState(RunningChecksum* pChecksum);
     virtual void CollideWithBallCallback(cBall* pBall);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);

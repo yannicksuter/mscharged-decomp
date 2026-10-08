@@ -385,8 +385,8 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 35:
     {
-        FuzzyRuntimeBase* arg0 = (FuzzyRuntimeBase*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyGetCurrentContext(this, arg0);
+        ScriptMachine* arg0 = (ScriptMachine*)m_SP[-1];
+        m_SP[-1] = (u32)FuzzyGetScriptMachineContext(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -2749,9 +2749,9 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 268:
     {
         const char* arg1 = (const char*)m_SP[-1];
-        shdStateMachine* arg0 = (shdStateMachine*)m_SP[-2];
+        AIContext* arg0 = (AIContext*)m_SP[-2];
         m_SP -= 2;
-        FuzzySetTransition(this, arg0, arg1);
+        FuzzySetContextTransition(this, arg0, arg1);
         break;
     }
     case 269:

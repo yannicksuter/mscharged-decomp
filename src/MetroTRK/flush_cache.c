@@ -1,4 +1,4 @@
-#include <revolution/types.h>
+#include <MetroTRK/flush_cache.h>
 
 // clang-format off
 asm void TRK_flush_cache(u32 addr, u32 length) {

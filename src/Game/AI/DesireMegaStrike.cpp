@@ -259,7 +259,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
         }
 
         if (nMeterResult >= mnRequestedBalls && !bAtRequestedValue
-            && m_pFielder->fn_8002E058() > 0.225f)
+            && m_pFielder->GetMegaStrikeMeterPosition() > 0.225f)
         {
             float fChance = InterpolateRangeClamped(
                 0.65f, 0.8f, 1.0f, 0.2f,
@@ -267,7 +267,7 @@ bool DesireMegaStrike::UpdateAIButtonPress(
             if (nlRandomf(1.0f) > fChance)
             {
                 bButtonPressed = true;
-                if (m_pFielder->fn_8002E058() <= 0.225f)
+                if (m_pFielder->GetMegaStrikeMeterPosition() <= 0.225f)
                 {
                     mnPressStage = 2;
                 }

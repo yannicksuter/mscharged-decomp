@@ -206,7 +206,7 @@ void FielderDesireMachine::Reset(bool deleting)
  */
 void FielderDesireMachine::Update(float deltaTime)
 {
-    Desire* frozen = fn_8002E08C(GetFielder(), 29);
+    Desire* frozen = GetFielderDesire(GetFielder(), 29);
     if (frozen->IsActive())
     {
         UnidentifiedVariant_80054AB8 result;
@@ -218,9 +218,9 @@ void FielderDesireMachine::Update(float deltaTime)
         return;
     }
 
-    bool forceUserControl = lbl_806E0C50
-        || (lbl_806E0C51 && GetFielder()->m_pTeam->m_nSide == HOME)
-        || (lbl_806E0C52 && GetFielder()->m_pTeam->m_nSide == AWAY);
+    bool forceUserControl = gForceUserControl
+        || (gForceHomeUserControl && GetFielder()->m_pTeam->m_nSide == HOME)
+        || (gForceAwayUserControl && GetFielder()->m_pTeam->m_nSide == AWAY);
     bool waitForController = false;
     if (forceUserControl)
     {
@@ -261,9 +261,9 @@ void FielderDesireMachine::SelectState()
     UnidentifiedVariantCollection params;
     cFielder* fielder = GetFielder();
 
-    if (lbl_806E0C50
-        || (lbl_806E0C51 && fielder->m_pTeam->m_nSide == HOME)
-        || (lbl_806E0C52 && fielder->m_pTeam->m_nSide == AWAY))
+    if (gForceUserControl
+        || (gForceHomeUserControl && fielder->m_pTeam->m_nSide == HOME)
+        || (gForceAwayUserControl && fielder->m_pTeam->m_nSide == AWAY))
     {
         bool hasController = fielder->GetGlobalPad();
         if (!hasController)
@@ -294,7 +294,7 @@ void FielderDesireMachine::SelectState()
             if ((outOfBoundsFielder->mUnidentified024.m_v3Position.x > 20.6f
                     || outOfBoundsFielder->mUnidentified024.m_v3Position.x < -20.6f)
                 && !Incapacitated(outOfBoundsFielder)
-                && !outOfBoundsFielder->fn_800344B0()
+                && !outOfBoundsFielder->IsInFallAction()
                 && !outOfBoundsFielder->IsShattered())
             {
                 shouldRunToTarget = true;

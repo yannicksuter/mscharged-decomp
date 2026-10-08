@@ -576,9 +576,9 @@ static void Initialize()
     {
         GameInfoManager::s_pInstance = new (8, false) GameInfoManager;
     }
-    if (g_pCupManager == 0)
+    if (CupManager::s_pInstance == 0)
     {
-        g_pCupManager = new (8, false) CupManager;
+        CupManager::s_pInstance = new (8, false) CupManager;
     }
     if (StatsTracker::s_pInstance == 0)
     {

@@ -76,7 +76,7 @@ void StrikerCupStandingsScene::SceneCreated()
     FEPresentation* presentation;
 
     presentation = mFEScene->m_pFEPackage->GetPresentation();
-    cupManager = g_pCupManager;
+    cupManager = CupManager::s_pInstance;
     numTeams = cupManager->GetNumPlayingTeams();
 
     TLComponentInstance* title =
@@ -167,7 +167,7 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
     if (!mScrollBar.mInitialized)
         mScrollBar.Initialize();
 
-    g_pCupManager->GetNumPlayingTeams();
+    CupManager::s_pInstance->GetNumPlayingTeams();
     if (mTransitionState == 0 || mTransitionState == 2 || mTransitionState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
@@ -293,7 +293,7 @@ void StrikerCupStandingsScene::UpdateStandings()
             userVisible = true;
     }
 
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     int numTeams = cupManager->GetNumPlayingTeams();
     for (int i = 0; i < numTeams; ++i)
     {
@@ -312,7 +312,7 @@ void StrikerCupStandingsScene::UpdateStandings()
     mMovingHighlight->SetActiveSlide(slideName, true, false);
     mHighlight->m_bVisible = userVisible;
 
-    int linePosition = g_pCupManager->GetNumPlayoffTeams() - mScrollOffset;
+    int linePosition = CupManager::s_pInstance->GetNumPlayoffTeams() - mScrollOffset;
     if (linePosition <= 5)
     {
         char lineName[2];
@@ -329,7 +329,7 @@ void StrikerCupStandingsScene::UpdateStandings()
 bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
 {
     bool isUserTeam = false;
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     if (row >= cupManager->GetNumPlayingTeams())
     {
         mTeamRows[row]->m_bVisible = false;
@@ -369,13 +369,13 @@ bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
             value = teamPosition + 1;
             break;
         case 1:
-            value = stats.unknown_0x10;
+            value = stats.mNumWins;
             break;
         case 2:
-            value = stats.unknown_0x12;
+            value = stats.mNumLosses;
             break;
         case 3:
-            value = stats.unknown_0x14;
+            value = stats.mNumOTLosses;
             break;
         case 4:
             value = stats.mPlayerTotalStats.mNumGoalsFor;
@@ -384,7 +384,7 @@ bool StrikerCupStandingsScene::PopulateTeamRow(int row, int teamPosition)
             value = stats.mPlayerTotalStats.mNumGoalsAgainst;
             break;
         case 6:
-            value = stats.unknown_0x16;
+            value = stats.mNumPoints;
             break;
         }
 

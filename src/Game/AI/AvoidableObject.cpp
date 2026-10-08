@@ -23,9 +23,6 @@
 #include "Game/Render/YoshiEggObject.h"
 
 
-extern "C" float fn_80030750(cFielder*);
-extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" bool fn_8003E948(const cFielder* pFielder);
 static const nlVector2 v2Zero = { 0.0f, 0.0f };
 static const nlVector2 sAvoidanceStrengthRange = { 0.5f, 1.0f };
 
@@ -155,7 +152,7 @@ const nlVector3& AvoidableFielder::GetVelocity()
 float AvoidableFielder::GetRadius()
 {
     float fRadius = 0.0f;
-    if (m_pFielder->fn_8003EA6C())
+    if (m_pFielder->IsYoshiSuperPowerActive())
     {
         fRadius = gNPCManager->mpYoshiEgg->mPhysics->GetRadius();
     }
@@ -169,11 +166,11 @@ float AvoidableFielder::GetRadius()
 float AvoidableFielder::GetAttackReach()
 {
     float fRadius;
-    if (fn_8003E8A0(m_pFielder))
+    if (IsBowserSuperPowerActive(m_pFielder))
     {
         fRadius = 11.0f;
     }
-    else if (m_pFielder->fn_8003E9F0())
+    else if (m_pFielder->IsPeteySuperPowerActive())
     {
         fRadius = 11.0f;
     }
@@ -181,9 +178,9 @@ float AvoidableFielder::GetAttackReach()
     {
         float fTime = m_pFielder->mUnidentified024.m_fPlayerScale;
         float fValue = fn_8002BFA8(m_pFielder->GetTweaks(), fTime);
-        fRadius = fn_80030750(m_pFielder) - fValue;
+        fRadius = GetFielderHitReach(m_pFielder) - fValue;
     }
-    if (m_pFielder->fn_8003EA6C())
+    if (m_pFielder->IsYoshiSuperPowerActive())
     {
         fRadius += 2.0f;
     }
@@ -253,7 +250,7 @@ float AvoidableFielder::GetAvoidanceStrength(
         {
             fStrength *= 0.5f;
         }
-        m_pFielder->fn_8003EA6C();
+        m_pFielder->IsYoshiSuperPowerActive();
         break;
     case AVOID_POLYGONS:
     {
@@ -261,7 +258,7 @@ float AvoidableFielder::GetAvoidanceStrength(
             = (AvoidablePolygon*)other;
         if (pPolygon->mPolygonType == 4)
         {
-            if (fn_8003E948(m_pFielder) && m_pFielder->m_pBall == 0
+            if (IsWaluigiSuperPowerActive(m_pFielder) && m_pFielder->m_pBall == 0
                 && fn_800DED80(m_pFielder) > 0.7f)
             {
                 fStrength = 0.0f;
@@ -271,7 +268,7 @@ float AvoidableFielder::GetAvoidanceStrength(
                 fStrength *= 1.3f;
             }
         }
-        else if (pPolygon->mPolygonType == 1 && m_pFielder->fn_8003EA6C())
+        else if (pPolygon->mPolygonType == 1 && m_pFielder->IsYoshiSuperPowerActive())
         {
             fStrength *= 0.3f;
         }
@@ -294,7 +291,7 @@ float AvoidableFielder::GetAvoidanceStrength(
         }
         else
         {
-            if (m_pFielder->fn_800306F4(pOther))
+            if (m_pFielder->IsMarking(pOther))
             {
                 fStrength *= 0.4f;
             }
@@ -304,12 +301,12 @@ float AvoidableFielder::GetAvoidanceStrength(
                 fStrength *= 2.0f;
             }
         }
-        if (fn_8003E8A0(m_pFielder) || m_pFielder->fn_8003E9F0()
-            || m_pFielder->IsPeachSuperPowerActive())
+        if (IsBowserSuperPowerActive(m_pFielder) || m_pFielder->IsPeteySuperPowerActive()
+            || m_pFielder->IsWarioSuperPowerActive())
         {
             cFielder* pTarget = 0;
             DesireRunInDirection* pDesire
-                = (DesireRunInDirection*)fn_8002E08C(m_pFielder, 12);
+                = (DesireRunInDirection*)GetFielderDesire(m_pFielder, 12);
             if (pDesire != 0 && pDesire->IsActive())
             {
                 pTarget = pDesire->GetTarget();
@@ -367,9 +364,9 @@ float AvoidableFielder::GetAvoidanceWeight(
         {
             bIgnore = true;
         }
-        if (bIgnore || pOther->fn_800344B0() || pOther->IsShattered()
+        if (bIgnore || pOther->IsInFallAction() || pOther->IsShattered()
             || (!m_pFielder->IsOnSameTeam(pOther)
-                && (m_pFielder->fn_8003E7F8() || m_pFielder->fn_8003E84C())))
+                && (m_pFielder->IsMarioSuperPowerActive() || m_pFielder->IsLuigiSuperPowerActive())))
         {
             return 0.0f;
         }
@@ -405,7 +402,7 @@ float AvoidableFielder::GetAvoidanceWeight(
     {
         cFielder* pOther
             = ((AvoidableFielder*)other)->m_pFielder;
-        if (fn_8003E8A0(pOther) || pOther->fn_8003E9F0())
+        if (IsBowserSuperPowerActive(pOther) || pOther->IsPeteySuperPowerActive())
         {
             fWeight *= 2.5f;
         }
@@ -413,7 +410,7 @@ float AvoidableFielder::GetAvoidanceWeight(
         {
             fWeight *= 0.8f;
         }
-        if (pOther->fn_8003EA6C())
+        if (pOther->IsYoshiSuperPowerActive())
         {
             fWeight *= 3.0f;
         }
@@ -429,25 +426,25 @@ float AvoidableFielder::GetAvoidanceWeight(
         {
             fWeight *= 1.5f;
         }
-        m_pFielder->fn_8003EA6C();
+        m_pFielder->IsYoshiSuperPowerActive();
         break;
     case AVOID_PATCHES:
         switch (((AvoidablePatch*)other)->m_pPatch->m_Type)
         {
         case 4:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == YOSHI)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == PETEY)
             {
                 fWeight = 0.0f;
             }
             break;
         case 0:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == PEACH)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == WARIO)
             {
                 fWeight = 0.0f;
             }
             break;
         case 2:
-            if (m_pFielder->mUnidentified024.m_eCharacterClass == WARIO)
+            if (m_pFielder->mUnidentified024.m_eCharacterClass == DIDDYKONG)
             {
                 fWeight = 0.0f;
             }

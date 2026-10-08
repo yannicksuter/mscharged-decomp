@@ -75,7 +75,7 @@ ContactType PhysicsYoshiEgg::Contact(PhysicsObject* other, dContact* contact, in
             eventData->mUnidentified10 = 0;
             QueueCollisionEggPlayer(eventData);
 
-            if (fielder->fn_8003E74C())
+            if (fielder->IsSuperGrowActive())
             {
                 return ONE_WAY_CONTACT_OTHER;
             }

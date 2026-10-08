@@ -21,6 +21,7 @@
 #include "Game/AI/HeadTrack.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/Fielder.h"
+#include "Game/AI/Desire.h"
 #include "Game/AI/Powerups.h"
 #include "Game/AI/FielderActions.h"
 #include "Game/Audio/GameStreams.h"
@@ -105,7 +106,6 @@ inline float ClampMax(float speedRatio, const float max);
 extern "C" void fn_80015B38(cBall*, bool);
 extern "C" void fn_800156F8(cBall*, cPlayer*);
 
-extern float lbl_806E0E40;
 
 float lbl_806DB5D8 = 12.5f;
 float lbl_806DB5DC = 0.4f;
@@ -864,7 +864,7 @@ void cCharacter::PrePhysicsUpdate()
 {
 }
 
-void cCharacter::UnidentifiedVirtual1C()
+void cCharacter::ResetAnimState()
 {
     SetAnimState(0, false, 0.0f, false, false);
     m_pCurrentAnimController->SetTime(0.0f);
@@ -1006,7 +1006,7 @@ bool cCharacter::ShouldStartCrossBlend(int nAnimID)
     return (1.0f - m_pCurrentAnimController->get_fTime()) * m_pCurrentAnimController->m_pSAnim->GetDuration() <= fCrossBlendTime;
 }
 
-void cCharacter::Unknown8(unsigned short aDirection, bool bParam)
+void cCharacter::SetDesiredFacingDirection(unsigned short aDirection, bool bParam)
 {
     mUnidentified024.m_aDesiredFacingDirection = aDirection;
     if (bParam)
@@ -1339,10 +1339,10 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     }
 
     if (pFielder != NULL && !fn_80014D38(g_pBall)
-        && pFielder->fn_800392D8() && pFielder->m_eActionState != 28)
+        && pFielder->CanReactToGroundEffects() && pFielder->m_eActionState != 28)
     {
         float unidentifiedSlide = g_pGame->mpTerrain->GetSlideFactor();
-        unidentifiedSlide += pFielder->fn_8003E72C() ? lbl_806E0E40 : 0.0f;
+        unidentifiedSlide += pFielder->IsSlippery() ? gSlipperySlideFactor : 0.0f;
         if (unidentifiedSlide > 1.0f)
         {
             unidentifiedSlide = 1.0f;
@@ -1404,7 +1404,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
                 cField::FixOutOfBoundsPosition(
                     mUnidentified024.m_v3Position, fMinDistanceFromWall, false);
             }
-            else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine && !pFielder->fn_800344B0())
+            else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine && !pFielder->IsInFallAction())
             {
                 cField::FixOutOfBoundsX(
                     mUnidentified024.m_v3Position, false, fMinDistanceFromWall);
@@ -1560,7 +1560,7 @@ void cCharacter::fn_8001F1D8()
 void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
     mUnidentified024.UnidentifiedReset();
-    UnidentifiedVirtual1C();
+    ResetAnimState();
     m_pHeadTrack->UnidentifiedReset();
     m_pPhysicsCharacter->Unknown0();
     SetPosition(v3Position);
@@ -1742,7 +1742,7 @@ void cCharacter::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_CHARACTER_FIELD
 
-void cCharacter::Unknown12(RunningChecksum* pChecksum)
+void cCharacter::ChecksumState(RunningChecksum* pChecksum)
 {
     pChecksum->ChecksumData(&mUnidentified024.m_eCharacterClass, sizeof(mUnidentified024.m_eCharacterClass));
     pChecksum->ChecksumData(&mUnidentified024.m_eMovementState, sizeof(mUnidentified024.m_eMovementState));
@@ -1919,7 +1919,7 @@ extern "C" void fn_80020EE8(CollisionBulletBillData* pEventData)
         pUnidentified1 = pEventData->bulletBill->target;
         if (pUnidentified1 != pUnidentified0)
         {
-            if (pUnidentified0->fn_8003E74C() || pUnidentified0->fn_8003E6FC())
+            if (pUnidentified0->IsSuperGrowActive() || pUnidentified0->IsStarActive())
             {
                 CollisionBulletBillData data = { pEventData->player, pEventData->bulletBill };
                 g_pGame->fn_80060BFC(data);
@@ -1980,7 +1980,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                 {
                     cFielder* pFielder = pTeam->GetFielder(j);
                     if (!pFielder->IsInvincible() && pFielder->mbTangible
-                        && !pFielder->fn_8003E74C() && pEventData->pCharacter != pFielder)
+                        && !pFielder->IsSuperGrowActive() && pEventData->pCharacter != pFielder)
                     {
                         nlVector3 v3Delta;
                         nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->mUnidentified024.m_v3Position.x,
@@ -1995,7 +1995,7 @@ extern "C" void fn_80021120(CharacterImpactEvent* pEventData)
                             }
                             else
                             {
-                                pFielder->fn_8004D480(pFielder->mUnidentified024.m_v3Velocity);
+                                pFielder->InitActionKnockdownReact(pFielder->mUnidentified024.m_v3Velocity);
                             }
                         }
                     }
@@ -2018,7 +2018,7 @@ extern "C" void fn_800212A0(CharacterImpactEvent* pEventData)
                 {
                     cFielder* pFielder = pTeam->GetFielder(j);
                     if (!pFielder->IsInvincible() && pFielder->mbTangible
-                        && !pFielder->fn_8003E74C() && pEventData->pCharacter != pFielder)
+                        && !pFielder->IsSuperGrowActive() && pEventData->pCharacter != pFielder)
                     {
                         nlVector3 v3Delta;
                         nlVec3Set(v3Delta, pEventData->v3Position.x - pFielder->mUnidentified024.m_v3Position.x,
@@ -2215,9 +2215,9 @@ extern "C" void fn_80021E30(CollisionKoopaShotBallPlayerData* pEventData)
     {
         return;
     }
-    if (pEventData->player->fn_8003E73C())
+    if (pEventData->player->IsShrunk())
     {
-        pEventData->player->fn_8004D480(v3Zero);
+        pEventData->player->InitActionKnockdownReact(v3Zero);
         return;
     }
 
@@ -2257,9 +2257,9 @@ extern "C" void fn_80022050(CollisionBirdoShotBallPlayerData* pEventData)
 {
     if (pEventData->player->CanBeHitBySkillshot())
     {
-        if (pEventData->player->fn_8003E73C())
+        if (pEventData->player->IsShrunk())
         {
-            pEventData->player->fn_8004D480(v3Zero);
+            pEventData->player->InitActionKnockdownReact(v3Zero);
         }
         else
         {
@@ -2458,7 +2458,7 @@ extern "C" void fn_80022824(cPlayer*)
             for (int j = 0; j < 4; j++)
             {
                 cFielder* pFielder = pTeam->GetFielder(j);
-                if (pFielder->fn_8003EA6C())
+                if (pFielder->IsYoshiSuperPowerActive())
                 {
                     pFielder->EndSuperPower(0);
                 }
@@ -2496,7 +2496,7 @@ extern "C" void fn_80022968(CollisionChainPlayerData* pEventData)
 {
     if (pEventData->pFielder != NULL && pEventData->pChain != NULL)
     {
-        if (!pEventData->pFielder->UnidentifiedInvinciblePowerups())
+        if (!pEventData->pFielder->IsInvinciblePowerups())
         {
             pEventData->pFielder->CollideWithChainCallback(pEventData->pChain);
         }
@@ -2507,9 +2507,9 @@ extern "C" void fn_800229F0(CollisionWindDebrisPlayerData* pEventData)
 {
     if (pEventData->pFielder != NULL && pEventData->pDebris != NULL)
     {
-        if (!pEventData->pFielder->UnidentifiedInvinciblePowerups())
+        if (!pEventData->pFielder->IsInvinciblePowerups())
         {
-            pEventData->pFielder->fn_8003295C(pEventData->pDebris);
+            pEventData->pFielder->CollideWithWindDebrisCallback(pEventData->pDebris);
         }
     }
 }
@@ -2518,7 +2518,7 @@ extern "C" void fn_80022A78(CollisionThwompPlayerData* pEventData)
 {
     if (pEventData->target->m_eClassType == FIELDER)
     {
-        ((cFielder*)pEventData->target)->fn_80032CB8(pEventData);
+        ((cFielder*)pEventData->target)->CollideWithThwompCallback(pEventData);
     }
 }
 
@@ -2546,7 +2546,7 @@ extern "C" void fn_80022B1C(UnidentifiedEventData26* pEventData)
         cFielder* pFielder = (cFielder*)pCharacter;
         if (!pFielder->IsFallenDown())
         {
-            pFielder->fn_8004D480(v3Zero);
+            pFielder->InitActionKnockdownReact(v3Zero);
         }
         PlaySound(pEventData->pFielder->m_uSoundSlotId, 0x52641B7BUL, NULL, NULL);
     }
@@ -2573,15 +2573,15 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
         }
         else if (!pFielder->IsFallenDown())
         {
-            if (pFielder->fn_8003E74C())
+            if (pFielder->IsSuperGrowActive())
             {
                 pFielder->InitActionShellReact(pEventData->mUnidentified08->mPosition,
                     pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
             }
             else if (pFielder->IsCharacterInAir(pEventData->mUnidentified08->mPhysics->GetRadius())
-                || (pFielder->m_eActionState == 0x1D && pFielder->mUnidentified024.m_eCharacterClass == HAMMERBROS)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == PEACH)
-                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == WALUIGI)
+                || (pFielder->m_eActionState == 0x1D && pFielder->mUnidentified024.m_eCharacterClass == DONKEYKONG)
+                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == WARIO)
+                || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == BOWSERJR)
                 || (pFielder->m_eActionState == 1 && pFielder->mUnidentified024.m_eCharacterClass == 13))
             {
                 pFielder->InitActionBombReact(pEventData->mUnidentified08->mPosition, 0.0f);
@@ -2589,7 +2589,7 @@ extern "C" void fn_80022BD8(UnidentifiedEventData34* pEventData)
             }
             else
             {
-                pFielder->fn_8004D480(pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
+                pFielder->InitActionKnockdownReact(pEventData->mUnidentified04->mUnidentified024.m_v3Velocity);
             }
         }
     }

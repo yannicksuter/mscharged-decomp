@@ -7,6 +7,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/DesireUpdate.inl"
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
@@ -18,9 +19,6 @@
 #include <stddef.h>
 #include "Game/UnidentifiedStaticStorage.h"
 
-extern "C" bool fn_8002EDC8(cFielder*, int);
-extern "C" DesireUpdate fn_80041B6C(
-    void*, const unsigned int&, cFielder*);
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on
 static int sTransDesireUsePowerupContinue = 0;
@@ -49,7 +47,7 @@ DesireUpdate TransDesireUsePowerup(
     {
         input->SetTimer(key, 0.4f);
         unsigned int hash = nlStringHash("TransDesireUsePowerup");
-        result = fn_80041B6C(input->mRuntime, hash, pFielder);
+        result = CallFielderFuzzyFunction(input->mRuntime, hash, pFielder);
     }
 
     return DesireUpdate(result, -1.0f, -1.0f);
@@ -142,7 +140,7 @@ void DesireUsePowerup::Cleanup()
  */
 extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 {
-    if (!fn_8002EDC8(pDesire->m_pFielder, -1))
+    if (!CanUsePowerup(pDesire->m_pFielder, -1))
     {
         return;
     }
@@ -163,7 +161,7 @@ extern "C" void fn_800D38D0(DesireUsePowerup* pDesire)
 void DesireUsePowerup::fn_800D3968(
     cFielder* pTarget, ePowerUpType ePowerup, bool bActivate)
 {
-    if (!fn_8002EDC8(m_pFielder, -1))
+    if (!CanUsePowerup(m_pFielder, -1))
     {
         return;
     }
@@ -345,7 +343,7 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     case (ePowerUpType)19:
     case (ePowerUpType)20:
     {
-        if (!pDesire->m_pFielder->fn_8003E6EC())
+        if (!pDesire->m_pFielder->IsSuperPowerActive())
         {
             UnidentifiedVariantCollection params;
             TransitionFunc* pTransition
@@ -421,30 +419,30 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     if (g_pGame->IsGameplayOrOvertime())
     {
         StatsTracker::s_pInstance->TrackStat(
-            STATS_19, pDesire->m_pFielder->m_pTeam->m_nSide,
+            STATS_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
             pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         if (IsMushroomPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1A, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_MUSHROOMS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (IsStarOrChainChompPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1C, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_STARS_AND_CHAIN_CHOMPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (IsCaptainPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1D, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_CAPTAIN_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
         else if (IsDrawablePowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
-                STATS_1B, pDesire->m_pFielder->m_pTeam->m_nSide,
+                STATS_DRAWABLE_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
                 pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
         }
     }

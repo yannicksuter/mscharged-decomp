@@ -104,9 +104,9 @@ inline void SHOnlineInviteStatus::ShowConnectionError()
 {
     FEPopupMenu* menu;
     int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x5B);
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         menu->Create((ePopupMenu)popup,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInviteStatus::OnConnectionErrorDismissed), this)));
         mPopupActive = true;

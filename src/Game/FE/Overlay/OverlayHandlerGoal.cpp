@@ -488,8 +488,8 @@ void GoalOverlay::DoCupWinOverlay(int cup)
     }
     else if (GameInfoManager::Instance()->IsInMode3())
     {
-        winners = (eTeamID)g_pCupManager->GetUserSelectedCupTeam();
-        cup = g_pCupManager->GetCurrentMode();
+        winners = (eTeamID)CupManager::s_pInstance->GetUserSelectedCupTeam();
+        cup = CupManager::s_pInstance->GetCurrentMode();
     }
     switch (cup)
     {

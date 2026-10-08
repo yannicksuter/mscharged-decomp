@@ -761,10 +761,12 @@ extern "C" void FuzzySetActionSelection(
     runtime->mActionQueues.mHead->mQueue->SetActionSelection(selection);
 }
 
-extern "C" void FuzzySetTransition(
-    void*, shdStateMachine* state, const char* name)
+// Script native 268. Every call in fuzzyai.byte_code passes an AIContext
+// (from natives 22 and 35).
+extern "C" void FuzzySetContextTransition(
+    void*, AIContext* context, const char* name)
 {
-    ScriptMachine* machine = state->mScriptMachine;
+    ScriptMachine* machine = context->mScriptMachine;
     machine->SetTransition(name);
 }
 
@@ -773,10 +775,12 @@ extern "C" bool fn_80314798(void*)
     return CheckScriptTimeBudget();
 }
 
-extern "C" UnidentifiedFuzzyRuntimeValue* FuzzyGetCurrentContext(
-    void*, FuzzyRuntimeBase* runtime)
+// Script native 35. Its only use in fuzzyai.byte_code passes the ScriptMachine
+// that ScriptMachine::Initialize hands to the script's init function.
+extern "C" AIContext* FuzzyGetScriptMachineContext(
+    void*, ScriptMachine* machine)
 {
-    return runtime->mCurrentContext;
+    return machine->mAIContext;
 }
 
 extern "C" int FuzzyGetCurrentContextType(

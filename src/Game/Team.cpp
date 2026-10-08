@@ -107,8 +107,6 @@ unsigned long GetTeamCaptainChantCue(cTeam*);
 void UpdateTeamCaptainChant(cTeam*);
 void AssignTeamRoles(cTeam*, bool);
 extern "C" void fn_80015B38(cBall*, bool);
-extern "C" bool fn_8003E8A0(const cFielder* pFielder);
-extern "C" bool fn_8003E948(const cFielder* pFielder);
 
 
 static inline cAIPad* GetPlayerController(const cPlayer* player)
@@ -124,7 +122,7 @@ float cTeam::GetAverageDefenseRating()
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        result += fn_8002BE38(GetFielder(i)->UnidentifiedGetTweaks());
+        result += fn_8002BE38(GetFielder(i)->GetNormalTweaks());
     }
     return result / 4.0f;
 }
@@ -137,7 +135,7 @@ float cTeam::GetAveragePassingRating()
     float fPassRating = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        fPassRating += GetFielder(i)->UnidentifiedGetTweaks()->fPassing;
+        fPassRating += GetFielder(i)->GetNormalTweaks()->fPassing;
     }
     return fPassRating / 4.0f;
 }
@@ -150,7 +148,7 @@ float cTeam::GetAverageShootingRating()
     float fShootRating = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        fShootRating += GetFielder(i)->UnidentifiedGetTweaks()->fShooting;
+        fShootRating += GetFielder(i)->GetNormalTweaks()->fShooting;
     }
     return fShootRating / 4.0f;
 }
@@ -163,7 +161,7 @@ float cTeam::GetAverageMovementRating()
     float fMovementRating = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        fMovementRating += GetFielder(i)->UnidentifiedGetTweaks()
+        fMovementRating += GetFielder(i)->GetNormalTweaks()
                                ->fMovementSpeed;
     }
     return fMovementRating / 4.0f;
@@ -184,7 +182,7 @@ void cTeam::ChecksumState(RunningChecksum* runningChecksum)
 
     for (int i = 0; i < 5; i++)
     {
-        m_pPlayers[i]->Unknown12(runningChecksum);
+        m_pPlayers[i]->ChecksumState(runningChecksum);
     }
 }
 
@@ -381,8 +379,8 @@ void cTeam::AssignMarks(bool bForceReMark)
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
-        pMyFielder->fn_800306DC();
-        bool bUnidentified = pMyFielder->fn_800344B0()
+        pMyFielder->ClearMarks();
+        bool bUnidentified = pMyFielder->IsInFallAction()
                           || pMyFielder->IsShattered()
                           || Incapacitated(pMyFielder);
         if (!bUnidentified)
@@ -404,14 +402,14 @@ void cTeam::AssignMarks(bool bForceReMark)
     if (pUnidentifiedBestFielder != NULL
         && pUnidentifiedFielder != NULL)
     {
-        pUnidentifiedBestFielder->fn_800306A0(pUnidentifiedFielder);
+        pUnidentifiedBestFielder->AddMark(pUnidentifiedFielder);
     }
 
     float fFielderMarkScores[4][4];
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
-        bool bUnidentifiedMyFielder = pMyFielder->fn_800344B0()
+        bool bUnidentifiedMyFielder = pMyFielder->IsInFallAction()
                                    || pMyFielder->IsShattered();
 
         nlVector3 v3UnidentifiedPosition;
@@ -420,7 +418,7 @@ void cTeam::AssignMarks(bool bForceReMark)
         for (int i_otherf = 0; i_otherf < 4; i_otherf++)
         {
             pOppFielder = GetOtherTeam()->GetFielder(i_otherf);
-            bool bUnidentifiedOppFielder = pOppFielder->fn_800344B0()
+            bool bUnidentifiedOppFielder = pOppFielder->IsInFallAction()
                                         || pOppFielder->IsShattered();
 
             if (bUnidentifiedMyFielder && !bUnidentifiedOppFielder)
@@ -448,7 +446,7 @@ void cTeam::AssignMarks(bool bForceReMark)
     {
         pMarkIDs[i_fielder]
             = nlMin(nlMax((int)pMarkIDs[i_fielder], 0), 3);
-        GetFielder(i_fielder)->fn_800306A0(
+        GetFielder(i_fielder)->AddMark(
             GetOtherTeam()->GetFielder(pMarkIDs[i_fielder]));
     }
 
@@ -1008,7 +1006,7 @@ void cTeam::ResetCharacters()
                 cFielder* pFielder = GetFielder(i);
                 if (!pFielder->IsShattered())
                 {
-                    fn_80031A30(pFielder, 4, 99999.0f);
+                    SetFielderFrozenState(pFielder, 4, 99999.0f);
                 }
             }
         }
@@ -1021,7 +1019,7 @@ void cTeam::ResetCharacters()
                     cFielder* pFielder = GetFielder(i);
                     if (!pFielder->IsShattered())
                     {
-                        fn_80031A30(pFielder, 4, 99999.0f);
+                        SetFielderFrozenState(pFielder, 4, 99999.0f);
                     }
                     nMissingSidekicks--;
                 }
@@ -1059,7 +1057,7 @@ void cTeam::UpdateControllers()
                     else if (!((cFielder*)m_pPlayers[j])->IsFallenDown()
                         && !((cFielder*)m_pPlayers[j])->IsStuck()
                         && !((cFielder*)m_pPlayers[j])->IsShattered()
-                        && !((cFielder*)m_pPlayers[j])->fn_8003881C())
+                        && !((cFielder*)m_pPlayers[j])->IsMegaStrikeFrozen())
                     {
                         nAvailableFielders++;
                     }
@@ -1086,7 +1084,7 @@ void cTeam::UpdateControllers()
                         && (((cFielder*)m_pPlayers[j])->IsFallenDown()
                             || ((cFielder*)m_pPlayers[j])->IsStuck()
                             || ((cFielder*)m_pPlayers[j])->IsShattered()
-                            || ((cFielder*)m_pPlayers[j])->fn_8003881C()))
+                            || ((cFielder*)m_pPlayers[j])->IsMegaStrikeFrozen()))
                     {
                         m_pPlayers[j]->SwapController(false);
                         nAvailableFielders--;
@@ -1114,7 +1112,7 @@ void cTeam::UpdateControllers()
                         && !((cFielder*)m_pPlayers[j])->IsFallenDown()
                         && !((cFielder*)m_pPlayers[j])->IsStuck()
                         && !((cFielder*)m_pPlayers[j])->IsShattered()
-                        && !((cFielder*)m_pPlayers[j])->fn_8003881C())
+                        && !((cFielder*)m_pPlayers[j])->IsMegaStrikeFrozen())
                     {
                         bAssigned = true;
                         m_pPlayers[j]->SetAIPad(pAIPad);
@@ -1195,7 +1193,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 
     if (bCaptainPowerupActive
         && GameInfoManager::Instance()->GetRule0x0() != 9
-        && !pCaptain->fn_8003E6EC())
+        && !pCaptain->IsSuperPowerActive())
     {
         bPlayCaptainChant = true;
     }
@@ -1627,11 +1625,11 @@ bool cTeam::fn_800A6764() const
     bCaptainPowerupActive
         |= m_ePowerupList[1].eType == nCaptainPowerup;
 
-    if (pCaptain->fn_8003E74C()
-        || fn_8003E8A0(pCaptain)
-        || fn_8003E948(pCaptain)
-        || pCaptain->IsPeachSuperPowerActive()
-        || pCaptain->fn_8003E9F0())
+    if (pCaptain->IsSuperGrowActive()
+        || IsBowserSuperPowerActive(pCaptain)
+        || IsWaluigiSuperPowerActive(pCaptain)
+        || pCaptain->IsWarioSuperPowerActive()
+        || pCaptain->IsPeteySuperPowerActive())
     {
         bCaptainPowerupActive = true;
     }
@@ -1672,10 +1670,10 @@ bool cTeam::TogglePowerup(bool bIsSilent)
 {
     bool result = false;
     if (mtToggleTimer.m_uPackedTime != 0
-        || fn_8003E8A0((cFielder*)m_pPlayers[0])
-        || fn_8003E948((cFielder*)m_pPlayers[0])
-        || ((cFielder*)m_pPlayers[0])->IsPeachSuperPowerActive()
-        || ((cFielder*)m_pPlayers[0])->fn_8003E9F0())
+        || IsBowserSuperPowerActive((cFielder*)m_pPlayers[0])
+        || IsWaluigiSuperPowerActive((cFielder*)m_pPlayers[0])
+        || ((cFielder*)m_pPlayers[0])->IsWarioSuperPowerActive()
+        || ((cFielder*)m_pPlayers[0])->IsPeteySuperPowerActive())
     {
         result = true;
     }
@@ -1706,10 +1704,10 @@ bool cTeam::fn_800A6560()
 {
     bool result = false;
     if (mtToggleTimer.m_uPackedTime == 0
-        && !fn_8003E8A0((cFielder*)m_pPlayers[0])
-        && !fn_8003E948((cFielder*)m_pPlayers[0])
-        && !((cFielder*)m_pPlayers[0])->IsPeachSuperPowerActive()
-        && !((cFielder*)m_pPlayers[0])->fn_8003E9F0())
+        && !IsBowserSuperPowerActive((cFielder*)m_pPlayers[0])
+        && !IsWaluigiSuperPowerActive((cFielder*)m_pPlayers[0])
+        && !((cFielder*)m_pPlayers[0])->IsWarioSuperPowerActive()
+        && !((cFielder*)m_pPlayers[0])->IsPeteySuperPowerActive())
     {
         result = true;
     }
@@ -1785,7 +1783,7 @@ float fn_800A6388(cTeam* team)
     float result = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        if (team->GetFielder(i)->fn_800344B0())
+        if (team->GetFielder(i)->IsInFallAction())
         {
             result += 1.0f;
         }

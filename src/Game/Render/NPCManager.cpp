@@ -244,7 +244,7 @@ void NPCManager::CreateDiddyBanana()
     NPCTemplate* pTemplate
         = fn_801ABBDC_inline("DiddyBanana");
     DiddyBanana* pObject
-        = (DiddyBanana*)nlMalloc(0x84, 8, false);
+        = (DiddyBanana*)nlMalloc(sizeof(DiddyBanana), 8, false);
     pObject = new (pObject) DiddyBanana(
         *pTemplate->hierarchy, pTemplate->modelID, pTemplate->mInventorySAnim, pTemplate->mResourcePool);
     mpDiddyBanana = pObject;

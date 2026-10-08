@@ -48,11 +48,11 @@ void FECaptainComponent::Initialize(TLComponentInstance* component, int side)
     int team;
     if (GameInfoManager::Instance()->IsInMode3())
     {
-        GameRules rules = g_pCupManager->mPendingCupSidekicks;
+        GameRules rules = CupManager::s_pInstance->mPendingCupSidekicks;
         mSidekicks[0] = rules.mValues[0];
         mSidekicks[1] = rules.mValues[1];
         mSidekicks[2] = rules.mValues[2];
-        team = g_pCupManager->mPendingCupTeam;
+        team = CupManager::s_pInstance->mPendingCupTeam;
     }
     else
     {
@@ -155,7 +155,7 @@ void FECaptainComponent::SetRecycleState(int index, int state)
     int team;
     if (GameInfoManager::Instance()->IsInMode3())
     {
-        team = g_pCupManager->mPendingCupTeam;
+        team = CupManager::s_pInstance->mPendingCupTeam;
     }
     else
     {
@@ -422,7 +422,7 @@ void FECaptainComponent::ResetSidekicks()
     int team;
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode3())
     {
-        team = g_pCupManager->mPendingCupTeam;
+        team = CupManager::s_pInstance->mPendingCupTeam;
     }
     else
     {
@@ -437,7 +437,7 @@ void FECaptainComponent::ReloadSidekicks()
     int team;
     if (nlSingleton<GameInfoManager>::Instance()->IsInMode3())
     {
-        team = g_pCupManager->mPendingCupTeam;
+        team = CupManager::s_pInstance->mPendingCupTeam;
     }
     else
     {

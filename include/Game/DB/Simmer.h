@@ -11,7 +11,7 @@ class Simulator
 {
 public:
     Simulator();
-    void fn_80109E34();
+    void SimulateGame();
 
     /* 0x000 */ StatsPair mStatistics[39];
 };

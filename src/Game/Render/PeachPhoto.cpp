@@ -32,7 +32,12 @@ bool gPeachPhotoDebugBounds;
 bool gPeachPhotoDisableImage;
 bool gPeachPhotoDisableMasks;
 
-extern const nlVector2 sPeachPhotoTexcoords[4];
+const nlVector2 sPeachPhotoTexcoords[4] = {
+    { 0.0f, 0.0f },
+    { 0.0f, 1.0f },
+    { 1.0f, 1.0f },
+    { 1.0f, 0.0f },
+};
 
 CrowdManager CrowdManager::instance;
 PeachPhotoState gPeachPhotoState;

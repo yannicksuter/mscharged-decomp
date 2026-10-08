@@ -63,8 +63,6 @@ cPlayer* FindClosestTeamPlayer(
     cPlayer* pSelf, cTeam* pTeam, int nNumPlayers,
     nlVector3* pPosition, bool bParam);
 
-extern "C" bool fn_8003E8A0(const cFielder*);
-extern "C" bool fn_8003E948(const cFielder*);
 extern "C" void fn_80015B38(cBall*, bool);
 
 float lbl_806DBD80 = 0.75f;
@@ -184,7 +182,7 @@ void SetDesiredFacingDirection(cPlayer* pPlayer)
         unsigned short aStickDirection = pPlayer->m_pController->GetMovementStickDirection();
         if (bMoving)
         {
-            pPlayer->Unknown8(aStickDirection, true);
+            pPlayer->SetDesiredFacingDirection(aStickDirection, true);
         }
         else
         {
@@ -217,7 +215,7 @@ u8 cPlayer::SwapController(bool bParam)
                     if (pSwapPlayer->m_pController != NULL || pSwapPlayer == this)
                         return 0;
                     if (!((cFielder*)pSwapPlayer)->CanReceivePass()
-                        && !((cFielder*)pSwapPlayer)->fn_8003EA6C())
+                        && !((cFielder*)pSwapPlayer)->IsYoshiSuperPowerActive())
                         return 0;
                 }
             }
@@ -446,7 +444,7 @@ void cPlayer::SetAnimID(int animID)
     cCharacter::SetAnimID(animID);
     eBallRotationMode ballRotationMode
         = (eBallRotationMode)m_pAnimInventory->GetBallRotationMode(animID);
-    if (mUnidentified024.m_eCharacterClass != MYSTERY)
+    if (mUnidentified024.m_eCharacterClass != BIRDO)
     {
         mUnidentified1E4.m_eBallRotationMode = ballRotationMode;
         if (m_pBall != NULL)
@@ -585,7 +583,7 @@ void cPlayer::PickupBall(cBall* pBall)
                                 closest = player;
                             }
                         }
-                        if (((cFielder*)player)->IsShattered() || ((cFielder*)player)->fn_800344B0())
+                        if (((cFielder*)player)->IsShattered() || ((cFielder*)player)->IsInFallAction())
                         {
                             closest = player;
                             break;
@@ -662,7 +660,7 @@ void cPlayer::fn_80096CDC(cBall* pBall)
     if (m_pBall == NULL && pBall != NULL && m_eClassType == FIELDER)
     {
         DesireSteering* pDesire
-            = (DesireSteering*)fn_8002E08C((cFielder*)this, 34);
+            = (DesireSteering*)GetFielderDesire((cFielder*)this, 34);
         ResetSteeringHistory(pDesire);
     }
     m_pBall = pBall;
@@ -690,7 +688,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
             return;
         }
     }
-    if (m_pController != NULL && pFielder->fn_8002E060() < 20)
+    if (m_pController != NULL && pFielder->GetDesireState() < 20)
     {
         if (g_pGame->IsGameplayOrOvertime()
             && (pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
@@ -702,10 +700,10 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         pFielder->EndDesire();
         return;
     }
-    if (m_pController == NULL && pFielder->fn_8002E060() == 20)
+    if (m_pController == NULL && pFielder->GetDesireState() == 20)
     {
         if (g_pGame->IsGameplayOrOvertime()
-            && (pFielder->fn_80038660()
+            && (pFielder->IsSlideAttacking()
                 || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
                 || pFielder->GetActionState() == ACTION_SHOT))
         {
@@ -715,7 +713,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
         pFielder->EndDesire();
         return;
     }
-    if (m_pController != NULL && pFielder->fn_8002E060() == 31 && g_pGame->m_eGameState == 1)
+    if (m_pController != NULL && pFielder->GetDesireState() == 31 && g_pGame->m_eGameState == 1)
     {
         pFielder->EndDesire();
     }
@@ -945,7 +943,7 @@ void cPlayer::DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
     bool bFindPosition, bool bPerfectPass, bool bParam4,
     float fMinPassSpeed, float fMaxPassSpeed)
 {
-    DesireReceivePass* pDesire = (DesireReceivePass*)fn_8002E08C((cFielder*)pTeammate, 22);
+    DesireReceivePass* pDesire = (DesireReceivePass*)GetFielderDesire((cFielder*)pTeammate, 22);
     pDesire->ExecutePass(this, bVolleyPass, bFindPosition, bPerfectPass, NULL, fMinPassSpeed, fMaxPassSpeed);
 }
 
@@ -988,7 +986,7 @@ void cPlayer::CollideWithWallCallback(const CollisionPlayerWallData* pData)
     {
         return;
     }
-    if (mUnidentified024.m_eCharacterClass != MYSTERY)
+    if (mUnidentified024.m_eCharacterClass != BIRDO)
     {
         mUnidentified1E4.m_eBallRotationMode = BRM_MATCH_VELOCITY;
         if (m_pBall != NULL)
@@ -1062,25 +1060,25 @@ void cPlayer::PlayerHeadTrackCallback(unsigned int nSelf, unsigned int nParam2,
     else
     {
         cc = self.mUnidentified024.m_eCharacterClass;
-        if (cc == PEACH)
+        if (cc == WARIO)
         {
             nHeadSpinMax = lbl_806E0D8C;
             nHeadTiltMax = lbl_806E0D88;
         }
-        else if (cc == MARIO)
+        else if (cc == WALUIGI)
         {
             nHeadSpinMax = lbl_806E0D84;
         }
-        else if (cc == DAISY)
+        else if (cc == BOWSER)
         {
             nHeadSpinMax = lbl_806E0D90;
         }
-        else if (cc == MYSTERY)
+        else if (cc == BIRDO)
         {
             nHeadTiltMax = lbl_806E0D7C;
             nHeadSpinMax = lbl_806E0D80;
         }
-        else if (cc == HAMMERBROS)
+        else if (cc == DONKEYKONG)
         {
             nHeadTiltMax = lbl_806E0D94;
             nHeadSpinMax = lbl_806E0D98;
@@ -1223,9 +1221,9 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     if (pSelf->GetGlobalPad()->JustPressed(PAD_AIM, true))
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
-        if ((fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-                || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
-            && !pCaptain->mUnidentified3DC)
+        if ((IsBowserSuperPowerActive(pCaptain) || IsWaluigiSuperPowerActive(pCaptain)
+                || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
+            && !pCaptain->m_bSuperPowerTankOn)
         {
             pCaptain->TurnOnSuperPowerTank();
         }
@@ -1245,8 +1243,8 @@ extern "C" void fn_80098098(cPlayer* pSelf)
     else if (!pSelf->GetGlobalPad()->IsPressed(PAD_AIM, true))
     {
         cFielder* pCaptain = pSelf->m_pTeam->GetCaptain();
-        if (fn_8003E8A0(pCaptain) || fn_8003E948(pCaptain)
-            || pCaptain->IsPeachSuperPowerActive() || pCaptain->fn_8003E9F0())
+        if (IsBowserSuperPowerActive(pCaptain) || IsWaluigiSuperPowerActive(pCaptain)
+            || pCaptain->IsWarioSuperPowerActive() || pCaptain->IsPeteySuperPowerActive())
         {
             bool bPressed = false;
             for (int i = 0; i < 4; i++)
@@ -1263,7 +1261,7 @@ extern "C" void fn_80098098(cPlayer* pSelf)
                 }
             }
             if (!bPressed)
-                pCaptain->fn_8005001C(false);
+                pCaptain->TurnOffSuperPowerTank(false);
         }
     }
 }
@@ -1289,9 +1287,9 @@ inline bool cPlayer::UnidentifiedPowerupPredicate()
     return false;
 }
 
-void cPlayer::UnidentifiedVirtual1C()
+void cPlayer::ResetAnimState()
 {
-    cCharacter::UnidentifiedVirtual1C();
+    cCharacter::ResetAnimState();
     if (m_pPowerupLayer->GetChild(1) != NULL)
     {
         m_pPowerupLayer->BeginBlendOut(-1.0f);
@@ -1555,9 +1553,9 @@ void cPlayer::SyncLog(void* context, DebugWriteCache* cache)
 
 #undef REGISTER_PLAYER_FIELD
 
-void cPlayer::Unknown12(RunningChecksum* pChecksum)
+void cPlayer::ChecksumState(RunningChecksum* pChecksum)
 {
-    cCharacter::Unknown12(pChecksum);
+    cCharacter::ChecksumState(pChecksum);
     pChecksum->ChecksumData(&mUnidentified1E4.m_v3AIPosition, sizeof(mUnidentified1E4.m_v3AIPosition));
     pChecksum->ChecksumData(&mUnidentified1E4.m_eBallRotationMode, sizeof(mUnidentified1E4.m_eBallRotationMode));
     pChecksum->ChecksumData(&mUnidentified1E4.m_BaseBallOrientation, sizeof(mUnidentified1E4.m_BaseBallOrientation));

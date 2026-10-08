@@ -101,7 +101,7 @@ void DrawableBall::Render() const
         bool useDefaultRendering = true;
         if (IndexToPlayer(ownerIndex) != 0)
         {
-            if (IndexToPlayer(ownerIndex)->character->GetCharacterClass() == MYSTERY)
+            if (IndexToPlayer(ownerIndex)->character->GetCharacterClass() == BIRDO)
             {
                 useDefaultRendering = false;
             }

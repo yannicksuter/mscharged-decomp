@@ -96,7 +96,7 @@ void DesirePreparePass::Update(DesireUpdate* update, float fDeltaT)
     bool bSwitchToPassDesire = false;
     if (mThinkTimer.m_uPackedTime != 0)
     {
-        float fInDanger = fn_80041B0C(GetFuzzyRuntime(),
+        float fInDanger = CallFielderFuzzyFunction(GetFuzzyRuntime(),
             m_pFielder, "InDangerDelayed").mData.f;
         float fNotFarToTheirGoalie =
             FLESS(FarToTheirGoalie(g_pScriptCurrentFielder), 0.3f);

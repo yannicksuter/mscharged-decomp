@@ -816,7 +816,7 @@ void SHChooseSides2::Proceed()
     if (mContext == CUP)
     {
         FEAudio::PlayAnimAudioEvent(0xF8350154, 0, 0, 1);
-        g_pCupManager->mGameInProgress = 1;
+        CupManager::s_pInstance->mGameInProgress = 1;
         CupManager* info = CupManager::Instance();
         info->mPreviousGameTeams[0] = GameInfoManager::Instance()->GetTeam(0);
         info->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);

@@ -340,17 +340,17 @@ void SHMainMenu::SelectItem(unsigned int index, void* context)
     {
         if (!SaveEnabled)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x46);
         }
         else if (!MiiManager::s_pInstance->mInitialized)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x87, Bind<void>(MemFun(&SHMainMenu::ReturnToWiiMenu), this));
         }
         else if (RFLGetAvailableOfficialDataNum() == 0)
         {
-            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+            FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             popup->Create((ePopupMenu)0x86);
         }
         else
@@ -421,7 +421,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
     }
     case 2:
         GameInfoManager::Instance()->SetMode(3, 0);
-        if (g_pCupManager->GetCurrentMode() == -1)
+        if (CupManager::s_pInstance->GetCurrentMode() == -1)
         {
             StartNewCup();
         }

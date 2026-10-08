@@ -175,7 +175,7 @@ inline void FormationManager::AccumulateWeightedFielderCenter(const float*& pWei
     for (i = 0; i < 4; i++)
     {
         pFielder = m_pTeam->m_pFieldersByTeamRelativeX[i];
-        bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
+        bool bIgnoreFielder = pFielder->IsInFallAction() || pFielder->IsShattered();
         if (!bIgnoreFielder)
         {
             float newY = m_v2WeightedFielderCenter.y + *pWeight * pFielder->mUnidentified024.m_v3Position.y;
@@ -322,7 +322,7 @@ void FormationManager::CalculateAIFielderCenter(nlVector2* pCenter)
     for (int i = 0; i < 4; i++)
     {
         cFielder* pFielder = m_pTeam->GetFielder(i);
-        bool bIgnoreFielder = pFielder->fn_800344B0() || pFielder->IsShattered();
+        bool bIgnoreFielder = pFielder->IsInFallAction() || pFielder->IsShattered();
         if (!bIgnoreFielder)
         {
             numFielders++;
@@ -810,7 +810,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     for (i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pFielder2 = team->GetFielder(i_fielder);
-        bool bApplyFielderOrder = pFielder2->fn_800344B0() || pFielder2->IsShattered();
+        bool bApplyFielderOrder = pFielder2->IsInFallAction() || pFielder2->IsShattered();
 
         for (i_pos = 0; i_pos < 4; i_pos++)
         {

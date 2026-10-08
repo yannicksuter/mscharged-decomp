@@ -824,7 +824,7 @@ void SolarFlare::OnGetReadyForKickoff()
             for (int j = 0; j < 4; j++)
             {
                 cFielder* fielder = g_pTeams[i]->GetFielder(j);
-                fn_8002E1A4(fielder)->mActiveState->mMaxDuration = duration;
+                GetFielderScriptMachine(fielder)->mActiveState->mMaxDuration = duration;
                 fielder->m_pPhysicsCharacter->m_CanCollideWithBall = false;
             }
         }
@@ -921,7 +921,7 @@ void SolarFlare::Update(float value)
         int team = m_NextVaporize % 2;
         int index = (int)floorf(m_NextVaporize / 2.0f);
         cFielder* fielder = g_pTeams[team]->GetFielder(m_TargetIndicies[index]);
-        fn_80031A30(fielder, 4, 99999.0f);
+        SetFielderFrozenState(fielder, 4, 99999.0f);
         PlaySound(16, 0x5FCB9348, 0, 0);
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_player_explode");
         EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->mUnidentified024.m_v3Position);

@@ -66,7 +66,7 @@ ContactType PhysicsBirdoEgg::Contact(
             shotData->egg = mBirdoEgg;
             QueueCollisionBirdoShotBallPlayer(shotData);
 
-            if (!fielder->fn_8003E73C() && mBirdoEgg->mShooter->m_pBall == 0)
+            if (!fielder->IsShrunk() && mBirdoEgg->mShooter->m_pBall == 0)
             {
                 endData = 0;
                 g_CollisionBirdoEggEndDataPool.Allocate(endData);

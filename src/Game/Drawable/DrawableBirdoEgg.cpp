@@ -10,14 +10,10 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "math.h"
-#include "Game/Render/BirdoEgg.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-// Charged-only shadow prop, fourth of the run described beside
-// DrawableBulletBill. The live object's translation unit spells
-// "birdo_egg_trail" and "BirdoEggShow". It carries a full orientation rather
-// than a spin angle. The live object and the material services stay
-// address-named.
+// Replay snapshot of a Birdo egg's visibility, transform and scale.
+// Rendering applies the captured transform to its drawable and draws a shadow.
 
 static float gShadowScaleIn = 0.125f;
 static float gShadowScaleHigh = 0.125f;

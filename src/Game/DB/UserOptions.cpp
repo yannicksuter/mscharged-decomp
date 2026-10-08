@@ -9,20 +9,20 @@
 
 // Audio category names hashed with nlStringLowerHash, kept in hash order, and
 // the index of each category's calculation slider.
-struct UnidentifiedAudioCategoryLookup
+struct AudioCategorySliderEntry
 {
-    UnidentifiedAudioCategoryLookup(u32 hash, s16 index) : mHash(hash), mIndex(index) {}
+    AudioCategorySliderEntry(u32 hash, s16 index) : mCategoryHash(hash), mSliderIndex(index) {}
 
-    u32 mHash;
-    s16 mIndex;
+    u32 mCategoryHash;
+    s16 mSliderIndex;
 };
 
-static UnidentifiedAudioCategoryLookup sUnidentifiedAudioCategoryLookup[] = {
-    UnidentifiedAudioCategoryLookup(0x00016A70, 4), // "sfx"
-    UnidentifiedAudioCategoryLookup(0x05A165C0, 2), // "music"
-    UnidentifiedAudioCategoryLookup(0x1883E244, 1), // "default"
-    UnidentifiedAudioCategoryLookup(0x52030129, 3), // "dialogue"
-    UnidentifiedAudioCategoryLookup(0xAB29FE50, 0), // "global"
+static AudioCategorySliderEntry sAudioCategorySliderLookup[] = {
+    AudioCategorySliderEntry(0x00016A70, 4), // "sfx"
+    AudioCategorySliderEntry(0x05A165C0, 2), // "music"
+    AudioCategorySliderEntry(0x1883E244, 1), // "default"
+    AudioCategorySliderEntry(0x52030129, 3), // "dialogue"
+    AudioCategorySliderEntry(0xAB29FE50, 0), // "global"
 };
 
 static const float VOLUME_TABLE[] = {

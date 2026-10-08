@@ -136,7 +136,7 @@ static inline bool IsCupWinner()
     int winnerTeam
         = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
     return gameInfo->IsInMode3()
-        && g_pCupManager->IsCupWinningGame(winnerTeam);
+        && CupManager::s_pInstance->IsCupWinningGame(winnerTeam);
 }
 
 static inline bool IsCupPersonaWinner()
@@ -1015,7 +1015,7 @@ void Presentation::OnMegaStrikeIntro(cPlayer* player)
     }
 
     NisPlayer::Instance()->mMaxNumBallsVisible
-        = (int)((cFielder*)player)->mUnidentified390;
+        = (int)((cFielder*)player)->m_fMegaStrikeNumBalls;
 }
 
 /**
@@ -1550,7 +1550,7 @@ void Presentation::LoadNis(const char* name, int variant)
             winnerTeam = gameInfo->GetCurrentGameInfo()->GetTeam((short)winnerSide);
             isCupWinner = false;
             if (gameInfo->IsInMode3()
-                && g_pCupManager->IsCupWinningGame(winnerTeam))
+                && CupManager::s_pInstance->IsCupWinningGame(winnerTeam))
             {
                 isCupWinner = true;
             }
@@ -1565,7 +1565,7 @@ void Presentation::LoadNis(const char* name, int variant)
             }
             else
             {
-                int cup = g_pCupManager->GetCurrentMode();
+                int cup = CupManager::s_pInstance->GetCurrentMode();
                 trophyName = GetCupTrophyNames()[cup];
             }
             nlSNPrintf(

@@ -340,12 +340,12 @@ void MatchLoadingScene::DisplayCupInfo()
         TeamStats homeStats = cup->GetTeamStats(homeTeam);
         TeamStats awayStats = cup->GetTeamStats(awayTeam);
         unsigned short wins[2][4], losses[2][4], suddenDeathLosses[2][4];
-        nlSNPrintf(wins[0], 4, (const unsigned short*)L"%d", homeStats.unknown_0x10);
-        nlSNPrintf(losses[0], 4, (const unsigned short*)L"%d", homeStats.unknown_0x12);
-        nlSNPrintf(suddenDeathLosses[0], 4, (const unsigned short*)L"%d", homeStats.unknown_0x14);
-        nlSNPrintf(wins[1], 4, (const unsigned short*)L"%d", awayStats.unknown_0x10);
-        nlSNPrintf(losses[1], 4, (const unsigned short*)L"%d", awayStats.unknown_0x12);
-        nlSNPrintf(suddenDeathLosses[1], 4, (const unsigned short*)L"%d", awayStats.unknown_0x14);
+        nlSNPrintf(wins[0], 4, (const unsigned short*)L"%d", homeStats.mNumWins);
+        nlSNPrintf(losses[0], 4, (const unsigned short*)L"%d", homeStats.mNumLosses);
+        nlSNPrintf(suddenDeathLosses[0], 4, (const unsigned short*)L"%d", homeStats.mNumOTLosses);
+        nlSNPrintf(wins[1], 4, (const unsigned short*)L"%d", awayStats.mNumWins);
+        nlSNPrintf(losses[1], 4, (const unsigned short*)L"%d", awayStats.mNumLosses);
+        nlSNPrintf(suddenDeathLosses[1], 4, (const unsigned short*)L"%d", awayStats.mNumOTLosses);
         homeRecord = Format(WideString(unformatted), wins[0], losses[0], suddenDeathLosses[0]);
         awayRecord = Format(WideString(unformatted), wins[1], losses[1], suddenDeathLosses[1]);
         memcpy(mTextBuffers[2], homeRecord.c_str(), sizeof(mTextBuffers[2]));

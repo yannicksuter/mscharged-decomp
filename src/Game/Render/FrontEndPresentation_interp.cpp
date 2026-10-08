@@ -14,7 +14,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         bool alternate = false;
         if (side == -1 && GameInfoManager::Instance()->mCurrentMode == 3)
         {
-            side = g_pCupManager->mPendingCupTeam;
+            side = CupManager::s_pInstance->mPendingCupTeam;
         }
         else
         {
@@ -33,7 +33,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         NetTournManager::Instance()->DestroyTournamentTrophy();
         break;
     case 4:
-        g_pCupManager->ShowRoundNews();
+        CupManager::s_pInstance->ShowRoundNews();
         break;
     case 5:
     {
@@ -214,7 +214,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         const char* baseName = (const char*)m_SP[-3];
         m_SP -= 3;
         char name[64];
-        int mode = g_pCupManager->GetCurrentMode();
+        int mode = CupManager::s_pInstance->GetCurrentMode();
         if (mode == 0)
             nlSNPrintf(name, sizeof(name), sBronzeFormat, baseName);
         else if (mode == 1)

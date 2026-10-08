@@ -358,6 +358,7 @@ inline void FreeCollisionPowerupStatsData(CollisionPowerupStatsData* data)
     g_CollisionPowerupStatsDataPool.Free(data);
 }
 
+void FreePenaltyData(PenaltyData* data);
 void FreeEventDataPools();
 
 struct PeachPhotoData

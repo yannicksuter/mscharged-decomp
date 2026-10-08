@@ -153,7 +153,7 @@ void UpdateFlyingCameras(float dt)
     bool shouldReset = true;
 
     if (gFlyingCameraTarget != 0 && gFlyingCameraTarget->m_eClassType == FIELDER
-        && fn_8003877C(gFlyingCameraTarget))
+        && IsFielderDazed(gFlyingCameraTarget))
     {
         gFlyingCameraTarget = 0;
     }

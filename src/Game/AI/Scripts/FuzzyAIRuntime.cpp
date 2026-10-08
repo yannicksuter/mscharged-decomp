@@ -350,5 +350,5 @@ extern "C" AIContext* FuzzyAIGetIteratorAIContext(
     void*, FuzzyFielderIterator* iterator)
 {
     cFielder* fielder = iterator->mTeam->GetFielder(iterator->mCurrent);
-    return fielder->mUnidentified428;
+    return fielder->m_pAIContext;
 }

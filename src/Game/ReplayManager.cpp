@@ -204,7 +204,7 @@ void RenderSnapshot::Replay(T& frame)
 void ReplayManager::Initialize()
 {
     mMemory = (u8*)nlMalloc(0x100000, 0x20, false);
-    mReplay = new (nlMalloc(0x48, 8, false)) Replay((char*)mMemory, 0x100000, 0x8000);
+    mReplay = new (nlMalloc(sizeof(Replay), 8, false)) Replay((char*)mMemory, 0x100000, 0x8000);
     mTime = 0.0f;
 }
 
@@ -343,7 +343,7 @@ RenderSnapshot& ReplayManager::GetMutableRenderSnapshot()
 void ReplayManager::Flush()
 {
     delete mReplay;
-    mReplay = new (nlMalloc(0x48, 8, false)) Replay((char*)mMemory, 0x100000, 0x8000);
+    mReplay = new (nlMalloc(sizeof(Replay), 8, false)) Replay((char*)mMemory, 0x100000, 0x8000);
 
     ResetSnapshots();
 }
@@ -430,7 +430,7 @@ void ReplayManager::DoPotentialDebugReplay(float& deltaTime)
         if (cCameraManager::PeekCamera()->GetType() != eCameraType_Debug)
         {
             mReplayDebugCamera
-                = new (nlMalloc(0xA0, 8, false)) cDebugCamera(true);
+                = new (nlMalloc(sizeof(cDebugCamera), 8, false)) cDebugCamera(true);
             cCameraManager::PushCamera(mReplayDebugCamera);
         }
 

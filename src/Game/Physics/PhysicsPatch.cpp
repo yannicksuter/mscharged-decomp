@@ -239,7 +239,7 @@ ContactType PhysicsPatch::Contact(
                 {
                     height = 0.5f;
                 }
-                if (fielder->fn_8003EA44())
+                if (fielder->IsDKSuperPowerActive())
                 {
                     height = 2.25f;
                 }

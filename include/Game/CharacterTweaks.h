@@ -208,6 +208,7 @@ extern "C" float fn_8002C758(PlayerTweaks* pTweaks);
 extern "C" float fn_8002C780(PlayerTweaks* pTweaks);
 extern "C" float fn_8002CC44(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002CD2C(const PlayerTweaks* pTweaks);
+float GetJogSpeed(const PlayerTweaks* pTweaks);
 extern "C" float fn_8002D020(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D038(PlayerTweaks* pTweaks);
 extern "C" float fn_8002D050(PlayerTweaks* pTweaks);

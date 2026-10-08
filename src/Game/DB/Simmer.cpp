@@ -30,7 +30,7 @@ Simulator::Simulator()
 /**
  * Offset/Address/Size: 0x4 | 0x80109E34 | size: 0x5C0
  */
-void Simulator::fn_80109E34()
+void Simulator::SimulateGame()
 {
     int goals[2] = { 0, 0 };
     int fouls[2] = { 0, 0 };
@@ -106,7 +106,7 @@ void Simulator::fn_80109E34()
             {
                 player = RandomRange(1, 4);
                 StatsTracker::Instance()->TrackStat(
-                    STATS_04, team, player, 1, 0, 0, 0);
+                    STATS_STS_ATTEMPTS, team, player, 1, 0, 0, 0);
                 assistedGoals--;
             }
 
@@ -119,14 +119,14 @@ void Simulator::fn_80109E34()
         }
 
         StatsTracker::Instance()->TrackStat(
-            STATS_09, team, 0, shotAttempts, 0, 0, 0);
+            STATS_MEGASTRIKE_ATTEMPTS, team, 0, shotAttempts, 0, 0, 0);
         StatsTracker::Instance()->TrackStat(
             STATS_SHOTS_ON_GOAL, team, 0, shotAttempts, 0, 0, 0);
 
         if (specialGoals > 0)
         {
             StatsTracker::Instance()->TrackStat(
-                STATS_0A, team, 0, specialGoals, 0, 0, 0);
+                STATS_MEGASTRIKE_GOALS, team, 0, specialGoals, 0, 0, 0);
             StatsTracker::Instance()->TrackStat(
                 STATS_GOALS_FOR, team, 0, -1, 0, specialGoals, 0);
         }
@@ -144,7 +144,7 @@ void Simulator::fn_80109E34()
         {
             int player = GetRandomPlayerIndex();
             StatsTracker::Instance()->TrackStat(
-                STATS_12, team, player, 0, 0, 0, 0);
+                STATS_HITS_MADE, team, player, 0, 0, 0, 0);
         }
     }
 
@@ -168,5 +168,5 @@ void Simulator::fn_80109E34()
             STATS_WIN, winningSide, 0, goals[0], goals[1], 0, 0);
     }
 
-    g_pCupManager->SetRoundResult(overtime, winningSide);
+    CupManager::s_pInstance->SetRoundResult(overtime, winningSide);
 }

@@ -150,7 +150,7 @@ void AsyncStartCameraLoading(bool frontEnd)
 
     if (frontEnd)
     {
-        pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(false);
+        pBaseCamera = new ((cDebugCamera*)nlMalloc(sizeof(cDebugCamera), 8, false)) cDebugCamera(false);
     }
     else
     {
@@ -242,7 +242,7 @@ void AsyncStartCameraLoading(bool frontEnd)
  */
 void AsyncStartCameraLoadingForStadiumViewer()
 {
-    cBaseCamera* pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(false);
+    cBaseCamera* pBaseCamera = new ((cDebugCamera*)nlMalloc(sizeof(cDebugCamera), 8, false)) cDebugCamera(false);
 
     cRumbleFilter* pRumbleFilter = new (8, false) cRumbleFilter();
     g_pRumbleFilter = pRumbleFilter;
@@ -455,7 +455,7 @@ void cCameraManager::UpdateGameCameraType()
         {
         case eCameraType_Debug:
         {
-            pBaseCamera = new ((cDebugCamera*)nlMalloc(0xA0, 8, false)) cDebugCamera(true);
+            pBaseCamera = new ((cDebugCamera*)nlMalloc(sizeof(cDebugCamera), 8, false)) cDebugCamera(true);
             break;
         }
         case eCameraType_Replay:

@@ -3,6 +3,7 @@
 
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/DesireUpdate.inl"
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AIContext.h"
 #include "Game/AI/Scripts/ScriptQuestions.h"
@@ -18,7 +19,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
-extern "C" DesireUpdate fn_80041B6C(void*, const unsigned int&, cFielder*);
 
 static float sMarkLookAheadTime = 0.1f;
 float gMarkUrgency = 0.8f;
@@ -60,7 +60,7 @@ void DesireMark::Update(DesireUpdate* update, float fDeltaT)
 {
     bool bBestBallInterceptor = m_pFielder->m_pTeam->GetBestBallInterceptor() == m_pFielder;
     cFielder* pMark = m_pFielder->GetMark();
-    if (pMark == 0 || pMark->fn_800344B0()
+    if (pMark == 0 || pMark->IsInFallAction()
         || m_pFielder == g_pBall->m_pOwner
         || (bBestBallInterceptor
             && m_pFielder->m_pTeam->mpCurrentSituation == SITUATION_LOOSE))
@@ -184,7 +184,7 @@ DesireUpdate TransDesireDefendPos(AIContext* input)
     {
         input->SetTimer(key, Interpolate(0.2f, 0.5f, 1.0f - Difficult(fn_800D6670(pFielder))));
         unsigned int hash = nlStringHash("TransDesireDefendPosHelper");
-        result = fn_80041B6C(input->mRuntime, hash, pFielder);
+        result = CallFielderFuzzyFunction(input->mRuntime, hash, pFielder);
     }
     return DesireUpdate(result, -1.0f, -1.0f);
 }
@@ -351,7 +351,7 @@ void DesireDefendPos::Cleanup()
 extern "C" DesireUpdate fn_800B9020(
     void* runtime, cFielder* fielder, const char* name)
 {
-    return fn_80041B0C(runtime, fielder, name);
+    return CallFielderFuzzyFunction(runtime, fielder, name);
 }
 
 /**

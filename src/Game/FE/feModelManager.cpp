@@ -713,7 +713,7 @@ void FEModelManager::FinishLoadModel(FEModelHandle* handle)
         ModelType modelType = Default;
         if (GameInfoManager::Instance()->IsInMode3())
         {
-            modelType = g_pCupManager->GetCurrentMode() == -1 ? InitialCup : Cup;
+            modelType = CupManager::s_pInstance->GetCurrentMode() == -1 ? InitialCup : Cup;
         }
         impostorModel->mCharacter = new (8, false) FEImpostorCharacter(
             characterInfo.mName, impostorModel->mModel,

@@ -421,7 +421,7 @@ void cBall::CollideWithCharacterCallback(
                         pFielder = NULL;
                     }
                     DesireReceivePass* pReceivePass
-                        = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                        = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
                     if (pReceivePass == NULL
                         || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
@@ -493,7 +493,7 @@ void cBall::CollideWithCharacterCallback(
                         pPassTarget = NULL;
                     }
                     DesireReceivePass* pReceivePass
-                        = (DesireReceivePass*)fn_8002E08C(
+                        = (DesireReceivePass*)GetFielderDesire(
                             pPassTarget, 22);
                     if (pReceivePass == NULL
                         || !pReceivePass->IsActive()
@@ -541,7 +541,7 @@ void cBall::CollideWithCharacterCallback(
                     pFielder = NULL;
                 }
                 DesireReceivePass* pReceivePass
-                    = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                    = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
                 if (pReceivePass == NULL
                     || !pReceivePass->IsActive()
                     || pReceivePass->meDesireSubState != 0)
@@ -570,11 +570,11 @@ void cBall::CollideWithCharacterCallback(
         && pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pCharacterFielder = (cFielder*)pCharacter;
-        pOwnerFielder->TestCollisionForInvicibility(pCharacterFielder);
+        pOwnerFielder->TestCollisionForInvincibility(pCharacterFielder);
 
         if (!pCharacterFielder->IsOnSameTeam(pOwnerFielder))
         {
-            if (pCharacterFielder->fn_80038660())
+            if (pCharacterFielder->IsSlideAttacking())
             {
                 nlVector3 v3ContactLocation
                     = pCharacter->mUnidentified024.m_v3Position;
@@ -601,7 +601,7 @@ void cBall::CollideWithCharacterCallback(
                     : nHitterContactLocationFacingDelta;
                 if (absFacingDelta < 0x2000)
                 {
-                    if (pOwnerFielder->fn_80038660())
+                    if (pOwnerFielder->IsSlideAttacking())
                     {
                         s16 nHitteeContactLocationFacingDelta
                             = pOwnerFielder->GetFacingDeltaToPosition(
@@ -681,7 +681,7 @@ void cBall::CollideWithCharacterCallback(
                     }
                 }
             }
-            else if (pOwnerFielder->fn_80038660()
+            else if (pOwnerFielder->IsSlideAttacking()
                 && !pCharacterFielder->IsHitting())
             {
                 pCharacterFielder->InitActionSlideAttackReact(
@@ -691,8 +691,8 @@ void cBall::CollideWithCharacterCallback(
         }
         else
         {
-            if (pOwnerFielder->fn_80038660()
-                && !pOwnerFielder->fn_8003E74C())
+            if (pOwnerFielder->IsSlideAttacking()
+                && !pOwnerFielder->IsSuperGrowActive())
             {
                 bool bInvincible = !pOwnerFielder->IsStuck()
                     && (pOwnerFielder->muInvincibleStatus & 1) != 0;
@@ -701,8 +701,8 @@ void cBall::CollideWithCharacterCallback(
                     pOwnerFielder->fn_8004D238();
                 }
             }
-            if (pCharacterFielder->fn_80038660()
-                && !pCharacterFielder->fn_8003E74C())
+            if (pCharacterFielder->IsSlideAttacking()
+                && !pCharacterFielder->IsSuperGrowActive())
             {
                 bool bInvincible = !pCharacterFielder->IsStuck()
                     && (pCharacterFielder->muInvincibleStatus & 1) != 0;
@@ -755,7 +755,7 @@ static inline void fn_80014494Impl(cBall* pBall)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -822,7 +822,7 @@ extern "C" void fn_800145A4(cBall* pBall)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -966,7 +966,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
         if (pFielder->m_eActionState == (eFielderActionState)0x21
-            && pFielder->mUnidentified410.mUnidentified0C)
+            && pFielder->mActionBooSkillshot.bFollowingBall)
         {
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
                 pFielder->m_nBip01JointIndex_0xA4);
@@ -1042,7 +1042,7 @@ static inline bool fn_80014D38Impl(cBall* pBall)
             pFielder = NULL;
         }
         DesireReceivePass* pReceivePass
-            = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+            = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
         if (pReceivePass != NULL
             && pReceivePass->IsActive())
         {
@@ -1366,7 +1366,7 @@ float GetBallChargeValue(cBall* pBall, int nParam)
         }
 
         if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == MYSTERY)
+            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == BIRDO)
         {
             return 0.0f;
         }
@@ -1451,7 +1451,7 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
             - 0.5f * lbl_806DB52C;
         fTimeScale = lbl_806DB51C;
         break;
-    case MYSTERY:
+    case BIRDO:
         v3Position.x += nlRandomf(lbl_806DB530)
             - 0.5f * lbl_806DB530;
         v3Position.y += nlRandomf(lbl_806DB530)
@@ -1556,7 +1556,7 @@ static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
             {
@@ -2208,7 +2208,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
             }
             if (pFielder != NULL)
             {
-                fn_80031A30(pFielder, 1, lbl_806DB55C);
+                SetFielderFrozenState(pFielder, 1, lbl_806DB55C);
             }
         }
     }
@@ -2780,7 +2780,7 @@ void OnBallGameOver()
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -2830,7 +2830,7 @@ void OnBallResetEffects(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -2954,7 +2954,7 @@ void OnBallTronWallCollision(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -2999,7 +2999,7 @@ void OnBallEggCollision(UnidentifiedEventData34*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -3157,7 +3157,7 @@ void OnBallDebrisCollision(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)
@@ -3202,7 +3202,7 @@ void OnBallThwompCollision(void*)
             }
 
             DesireReceivePass* pReceivePass
-                = (DesireReceivePass*)fn_8002E08C(pFielder, 22);
+                = (DesireReceivePass*)GetFielderDesire(pFielder, 22);
             if (pReceivePass != NULL
                 && pReceivePass->IsActive()
                 && pReceivePass->meDesireSubState == 0)

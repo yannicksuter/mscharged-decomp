@@ -12,13 +12,10 @@
 #include "NL/platqmath.h"
 #include "Game/UnidentifiedStaticStorage.h"
 
-// Charged-only shadow prop. It follows the same snapshot idiom as
-// DrawableBall: a compact replay-safe state that is grabbed from the live
-// object, blended between snapshots, and rendered through the shared render
-// object. The live object and the material/texture services it calls are not
-// reconstructed yet and stay address-named.
+// Replay snapshot of a Bullet Bill's visibility, transform and scale.
+// Rendering applies the captured transform to its drawable and draws a shadow.
 
-static float gShadowAlphaScale = 0.4f;
+static float gShadowSizeScale = 0.4f;
 static float gShadowScaleHigh = 0.5f;
 static int gShadowAlphaLow = 130;
 static int gShadowAlphaHigh = 10;
@@ -176,7 +173,7 @@ void DrawableBulletBill::Render(const BulletBillObject* object) const
     drawable->SetWorldMatrix(matrix);
     drawable->DrawToView((GLView*)GetLayerView(eCLV_MoreCharacters));
 
-    DrawShadow(matrix, gShadowAlphaScale);
+    DrawShadow(matrix, gShadowSizeScale);
 }
 
 void DrawableBulletBill::Blend(const float* factors, const DrawableBulletBill& lhs, const DrawableBulletBill& rhs)

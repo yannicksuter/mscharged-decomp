@@ -32,19 +32,26 @@ struct UnidentifiedCharacterObject_8001C158;
 enum eCharacterClass
 {
     CHARACTER_CLASS_INVALID = -1,
-    BIRDO = 0,
-    DAISY = 1,
-    DONKEYKONG = 2,
-    HAMMERBROS = 3,
-    KOOPA = 4,
-    LUIGI = 5,
-    MARIO = 6,
-    PEACH = 7,
-    TOAD = 8,
-    WALUIGI = 9,
-    WARIO = 10,
-    YOSHI = 11,
-    MYSTERY = 12,
+    MARIO = 0,
+    BOWSER = 1,
+    DAISY = 2,
+    DONKEYKONG = 3,
+    LUIGI = 4,
+    PEACH = 5,
+    WALUIGI = 6,
+    WARIO = 7,
+    YOSHI = 8,
+    BOWSERJR = 9,
+    DIDDYKONG = 10,
+    PETEY = 11,
+    BIRDO = 12,
+    HAMMERBROS = 13,
+    KOOPA = 14,
+    TOAD = 15,
+    BOO = 16,
+    DRYBONES = 17,
+    MONTYMOLE = 18,
+    SHYGUY = 19,
 };
 
 enum eMovementState
@@ -164,15 +171,15 @@ public:
     virtual void PrePhysicsUpdate();
     virtual void Unknown7(float dt);
     virtual void PreUpdate(float dt);
-    virtual void UnidentifiedVirtual1C();
+    virtual void ResetAnimState();
     virtual void ResetEffects();
     virtual void SetAnimID(int animID);
-    virtual void Unknown8(unsigned short aDirection, bool bParam);
+    virtual void SetDesiredFacingDirection(unsigned short aDirection, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
     virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
     virtual void SyncLog(void* context, DebugWriteCache* cache);
-    virtual void Unknown12(RunningChecksum* pChecksum);
+    virtual void ChecksumState(RunningChecksum* pChecksum);
 
     void SetAnimState(int animID, bool useBlendTime, float nonDefaultBlendTime,
         bool restartCyclic, bool forceMirrorSwap);

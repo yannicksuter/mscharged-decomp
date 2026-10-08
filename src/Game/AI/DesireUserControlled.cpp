@@ -15,8 +15,6 @@
 #include "Game/UnidentifiedStaticStorage.h"
 #include "Game/Task/FixedUpdateTask.h"
 
-extern "C" float fn_8002CE14(PlayerTweaks*);
-extern "C" bool fn_8003E948(const cFielder*);
 
 
 static unsigned short sDesireUserControlledType = 0xFFFF;
@@ -29,7 +27,7 @@ bool DesireUserControlled::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
 
-    DesireSteering* desire = (DesireSteering*)fn_8002E08C(
+    DesireSteering* desire = (DesireSteering*)GetFielderDesire(
         m_pFielder, 34);
     ResetSteeringTargets(desire);
     ResetSteeringHistory(desire);
@@ -80,14 +78,14 @@ void DesireUserControlled::Update(
         {
             float fMaxSpeed = fn_8002C254(
                 m_pFielder->GetTweaks());
-            float fMinSpeed = fn_8002CE14(
+            float fMinSpeed = GetJogSpeed(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             m_pFielder->TestLooseBallControls(false);
 
             if (g_pBall->m_pOwner == NULL
-                && (!fn_8003E948(m_pFielder)
-                    || !m_pFielder->mUnidentified3DC))
+                && (!IsWaluigiSuperPowerActive(m_pFielder)
+                    || !m_pFielder->m_bSuperPowerTankOn))
             {
                 m_pFielder->UpdateFacingToLooseBall();
             }
@@ -150,7 +148,7 @@ void DesireUserControlled::Update(
         if (m_pFielder->m_eActionState == ACTION_RUNNING_WB)
         {
             float fMaxSpeed = m_pFielder->GetTweaks()->GetRunningSpeed();
-            float fMinSpeed = fn_8002CE14(
+            float fMinSpeed = GetJogSpeed(
                 m_pFielder->GetTweaks());
             m_pFielder->SetDesiredSpeed(fMinSpeed, fMaxSpeed);
             m_pFielder->TestButtonsRunningWB(fDeltaT);

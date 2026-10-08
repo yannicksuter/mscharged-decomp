@@ -65,23 +65,22 @@ extern "C" inline UnidentifiedVariant_80054AB8 fn_800C3448(
         2, FuzzyArgumentBits(pPlayer), FuzzyArgumentBits(pTarget)));
 }
 
-extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B6C(
-    void*, const unsigned int&, cFielder*);
+#include "Game/AI/FuzzyRuntimeCall_fwd.h"
 
-extern "C" inline UnidentifiedVariant_80054AB8 fn_80041AFC(
+inline UnidentifiedVariant_80054AB8 CallFielderFuzzyFunction(
     InterpreterCore* runtime, const char* name, cFielder* fielder)
 {
-    return fn_80041B0C(runtime, fielder, name);
+    return CallFielderFuzzyFunction(runtime, fielder, name);
 }
 
-extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B0C(
+inline UnidentifiedVariant_80054AB8 CallFielderFuzzyFunction(
     void* runtime, cFielder* fielder, const char* name)
 {
     unsigned int functionHash = nlStringHash(name);
-    return fn_80041B6C(runtime, functionHash, fielder);
+    return CallFielderFuzzyFunction(runtime, functionHash, fielder);
 }
 
-extern "C" inline UnidentifiedVariant_80054AB8 fn_80041B6C(
+inline UnidentifiedVariant_80054AB8 CallFielderFuzzyFunction(
     void* runtime, const unsigned int& hash, cFielder* fielder)
 {
     unsigned int functionHash = hash;

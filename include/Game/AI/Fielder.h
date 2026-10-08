@@ -87,16 +87,16 @@ struct LooseBallContactAnimInfo
 }; // total size: 0xC
 
 class cFielder;
-extern "C" void fn_80031A30(cFielder* pFielder, int nParam, float fParam);
+void SetFielderFrozenState(cFielder* pFielder, int nParam, float fParam);
 class ChainChomp;
 class WindDebris;
 struct CollisionThwompPlayerData;
-extern "C" bool fn_800344DC(cFielder*, const nlVector3*);
+bool IsFielderFrontInvincible(cFielder*, const nlVector3*);
 class cSHierarchy;
 class AnimRetargetList;
 class CharacterPhysicsData;
 class WaluigiWallManager;
-void fn_80048870(cFielder* pFielder);
+void FreezeEveryoneButCaptain(cFielder* pFielder);
 const LooseBallContactAnimInfo* GetOneTimerIdleGroundContactAnims();
 int GetNumOneTimerIdleGroundContactAnims();
 const LooseBallContactAnimInfo* GetOneTimerIdleVolleyContactAnims();
@@ -104,31 +104,31 @@ int GetNumOneTimerIdleVolleyContactAnims();
 const LooseBallContactAnimInfo* GetOneTimerLeadGroundContactAnims();
 int GetNumOneTimerLeadGroundContactAnims();
 
-struct UnidentifiedFielderPair330
+struct ActCrowdVars
 {
-    UnidentifiedFielderPair330(bool bParam, float fParam)
-        : mUnidentified00(bParam)
-        , mUnidentified04(fParam)
+    ActCrowdVars(bool bParam, float fParam)
+        : bHasBeenSuckedToMiddle(bParam)
+        , fStuckInRiotTime(fParam)
     {
     }
-    /* 0x0 */ bool mUnidentified00;
-    /* 0x4 */ float mUnidentified04;
+    /* 0x0 */ bool bHasBeenSuckedToMiddle;
+    /* 0x4 */ float fStuckInRiotTime;
 }; // total size: 0x8
 
-struct UnidentifiedFielderPair374
+struct ActRunPassVars
 {
-    UnidentifiedFielderPair374()
-        : mUnidentified00(0)
-        , mUnidentified04(0.0f)
+    ActRunPassVars()
+        : nHeldTicks(0)
+        , fSpeed(0.0f)
     {
     }
-    /* 0x0 */ int mUnidentified00;
-    /* 0x4 */ float mUnidentified04;
+    /* 0x0 */ int nHeldTicks;
+    /* 0x4 */ float fSpeed;
 }; // total size: 0x8
 
-struct UnidentifiedFielderAction364
+struct ActLooseBallPass
 {
-    UnidentifiedFielderAction364()
+    ActLooseBallPass()
         : passTarget(0)
     {
     }
@@ -136,9 +136,9 @@ struct UnidentifiedFielderAction364
     cFielder* passTarget;
 };
 
-struct UnidentifiedFielderAction37C
+struct ActRunningVars
 {
-    UnidentifiedFielderAction37C()
+    ActRunningVars()
         : eLastStrafeDirection(STRAFE_IDLE)
         , bFirstCycleOfTurbo(false)
     {
@@ -148,9 +148,9 @@ struct UnidentifiedFielderAction37C
     bool bFirstCycleOfTurbo;
 };
 
-struct UnidentifiedFielderAction384
+struct ActRunningWBVars
 {
-    UnidentifiedFielderAction384()
+    ActRunningWBVars()
     {
         bWaitForAnimToFinish = false;
         bCuePitch = false;
@@ -160,16 +160,16 @@ struct UnidentifiedFielderAction384
     bool bWaitForAnimToFinish;
 };
 
-struct UnidentifiedFielderAction410
+struct ActBooSkillshot
 {
-    UnidentifiedFielderAction410()
+    ActBooSkillshot()
     {
-        nlVec3Set(mUnidentified00, 0.0f, 0.0f, 0.0f);
-        mUnidentified0C = false;
+        nlVec3Set(v3StartPosition, 0.0f, 0.0f, 0.0f);
+        bFollowingBall = false;
     }
 
-    nlVector3 mUnidentified00;
-    bool mUnidentified0C;
+    nlVector3 v3StartPosition;
+    bool bFollowingBall;
 };
 
 class FuzzyVariant;
@@ -179,13 +179,12 @@ class cPN_SingleAxisBlender;
 class DesireSteering;
 class DesireUserControlled;
 class UnidentifiedDesire35;
-class cFielder;
 class DesireSuperPower;
 extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
-extern "C" bool fn_800D1C34(const cFielder*);
+bool IsFielderSuperPowerTankOn(const cFielder*);
 extern "C" bool fn_800D0DB0(DesireSuperPower*, void*);
-extern "C" float fn_80030750(cFielder* pFielder);
+float GetFielderHitReach(cFielder* pFielder);
 class PhysicsObject;
 class ShotMeter;
 class AIContext;
@@ -224,12 +223,12 @@ class cFielder : public cPlayer
     friend class DesireSuperPower;
     friend class DesireUsePowerup;
     friend class DesireShrink;
-    friend bool fn_800D1C34(const cFielder*);
+    friend bool IsFielderSuperPowerTankOn(const cFielder*);
     friend bool fn_800D0DB0(class DesireSuperPower*, void*);
-    friend float fn_80030750(cFielder*);
+    friend float GetFielderHitReach(cFielder*);
 
 public:
-    bool fn_800392D8() const;
+    bool CanReactToGroundEffects() const;
     bool ActivateDesire(int state, UnidentifiedVariantCollection* parameters);
     const nlVector3& GetDesiredPosition();
     const nlVector3& GetDesiredVelocity();
@@ -265,7 +264,7 @@ public:
     void EndMontyDeke();
     float GetAirInterceptHeight(int type);
     bool CalculateFormationPosition(nlVector3& position);
-    bool IsPeachSuperPowerActive() const;
+    bool IsWarioSuperPowerActive() const;
 
     bool CanBeHitBySkillshot();
     bool CanGetElectrocuted() const;
@@ -301,12 +300,12 @@ public:
     void EndConfusion();
     void EndDaze();
     bool EndSuperPower(int);
-    bool EndDaisySuperPower(bool);
-    bool EndBirdoSuperPower();
-    bool EndKoopaSuperPower();
+    bool EndBowserSuperPower(bool);
     bool EndMarioSuperPower();
-    bool EndPeachSuperPower(bool);
-    bool EndYoshiSuperPower(bool);
+    bool EndLuigiSuperPower();
+    bool EndWaluigiSuperPower();
+    bool EndWarioSuperPower(bool);
+    bool EndPeteySuperPower(bool);
 
     void SetHardStopRecoverAnimState();
     void SetHardStopTurnAnimState();
@@ -319,8 +318,8 @@ public:
     void SetBackRunningStopStartAnimState();
     void SetBackRunningStopRecoverAnimState();
     void SetStopAnimState();
-    void fn_8003B5FC();
-    void fn_8003B664();
+    void SetStrafeRightStopAnimState();
+    void SetStrafeLeftStopAnimState();
     void SetIdleAnimState();
     void SetIdleWBAnimState();
     static void RunningSABcallback(unsigned int parameter, cPN_SingleAxisBlender* blender);
@@ -341,7 +340,7 @@ public:
     bool IsDaisySuperPowerActive() const;
     unsigned int IsFrozen() const;
     unsigned int IsShattered() const;
-    bool fn_8003881C() const;
+    bool IsMegaStrikeFrozen() const;
 
     cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
         const int* nModelID, cSHierarchy* pHierarchy,
@@ -352,14 +351,14 @@ public:
     virtual ~cFielder();
     virtual void PrePhysicsUpdate();
     virtual void PreUpdate(float fTime);
-    virtual void UnidentifiedVirtual1C();
+    virtual void ResetAnimState();
     virtual void ResetEffects();
-    virtual void Unknown8(unsigned short aParam, bool bParam);
+    virtual void SetDesiredFacingDirection(unsigned short aParam, bool bParam);
     virtual void SetPosition(const nlVector3& position);
     virtual void Update(float fDeltaT);
     virtual void Reset(const nlVector3& v3Position, unsigned short aDirection);
     virtual void SyncLog(void* context, DebugWriteCache* cache);
-    virtual void Unknown12(RunningChecksum* pChecksum);
+    virtual void ChecksumState(RunningChecksum* pChecksum);
     virtual bool CanPickupBall(cBall* pBall, bool bParam);
     virtual void CollideWithCharacterCallback(
         CollisionPlayerPlayerData* pData);
@@ -377,9 +376,9 @@ public:
     cFielder* DoFindBestHitTarget();
     void UpdateController(float fDeltaT);
     bool IsRunning() const;
-    bool fn_800345EC(cFielder* pOtherFielder) const;
-    bool fn_80034894(cFielder* pOtherFielder) const;
-    bool fn_800344B0() const;
+    bool IsAboveFielder(cFielder* pOtherFielder) const;
+    bool HasLooseBallContactPriority(cFielder* pOtherFielder) const;
+    bool IsInFallAction() const;
     bool IsRunningWithBall() const
     {
         bool bRunningWithBall = false;
@@ -402,50 +401,50 @@ public:
     bool CanReceivePass();
     void SetSlideAttackSuccessFlag();
     void IncrementPowerupMeter(int nParam, float fAmount);
-    bool fn_8003E8F4() const;
-    bool fn_8003E74C() const;
+    bool IsPeachSuperPowerActive() const;
+    bool IsSuperGrowActive() const;
     bool CollideWithFreezeCallback();
     bool CollideWithBananaCallback(const nlVector3& rv3BananaPosition);
     bool CollideWithShellCallback(ePowerupSize eSize, bool bUnknown, const nlVector3& rv3Pos1, const nlVector3& rv3Pos2);
     bool CollideWithBobombCallback(const nlVector3& v3CollisionLocation, float fBombRadius);
     void CollideWithChainCallback(ChainChomp* pChainChomp);
-    void fn_8003295C(WindDebris* pDebris);
-    void fn_80032CB8(CollisionThwompPlayerData*);
-    bool fn_8003E7F8() const;
-    bool fn_8003E84C() const;
-    bool fn_8003E9F0() const;
-    bool fn_8003EA44() const;
-    bool fn_8003EA6C() const;
+    void CollideWithWindDebrisCallback(WindDebris* pDebris);
+    void CollideWithThwompCallback(CollisionThwompPlayerData*);
+    bool IsMarioSuperPowerActive() const;
+    bool IsLuigiSuperPowerActive() const;
+    bool IsPeteySuperPowerActive() const;
+    bool IsDKSuperPowerActive() const;
+    bool IsYoshiSuperPowerActive() const;
     cFielder* GetMark() const { return m_pMark[0]; }
     cFielder* GetMark(int index) const { return m_pMark[index]; }
-    void fn_8003057C(int nParam);
-    void fn_800305DC(float fParam);
-    void fn_8003063C(PlayerTweaks* pParam);
-    void fn_800306A0(cFielder* pParam);
-    void fn_800306DC();
-    bool fn_800306F4(cFielder* pParam);
+    void SetThingsToAvoid(int nParam);
+    void SetAvoidanceMultiplier(float fParam);
+    void SetTweaks(PlayerTweaks* pParam);
+    void AddMark(cFielder* pParam);
+    void ClearMarks();
+    bool IsMarking(cFielder* pParam);
     void DoResetShotMeter(float fTime);
     bool IsActionDone() const;
     bool IsFallenDown() const;
-    void fn_800D0534(float amount)
+    void DrainSuperPowerTank(float amount)
     {
-        mUnidentified3E0 -= amount;
+        m_fSuperPowerTankLevel -= amount;
     }
     bool IsStuck() const;
-    bool UnidentifiedClass17Or2() const
+    bool IsDaisyOrDryBones() const
     {
         return (int)mUnidentified024.m_eCharacterClass == 0x11
             || (int)mUnidentified024.m_eCharacterClass == 2;
     }
-    bool UnidentifiedClass17Or2Or6() const
+    bool HasTeleportDeke() const
     {
-        return UnidentifiedClass17Or2() || (int)mUnidentified024.m_eCharacterClass == 6;
+        return IsDaisyOrDryBones() || (int)mUnidentified024.m_eCharacterClass == 6;
     }
     bool IsInvincible() const
     {
         return !IsStuck() && (muInvincibleStatus & 0x1F) == 0x1F;
     }
-    bool UnidentifiedInvinciblePowerups() const
+    bool IsInvinciblePowerups() const
     {
         bool result = !IsStuck() && (muInvincibleStatus & 8);
         return result;
@@ -455,7 +454,7 @@ public:
         bool result = !IsStuck() && (muInvincibleStatus & 0x10);
         return result;
     }
-    bool UnidentifiedInvincibleStatus2() const
+    bool IsInvincibleFront() const
     {
         bool result = !IsStuck() && (muInvincibleStatus & 2);
         return result;
@@ -465,26 +464,26 @@ public:
         bool result = !IsStuck() && (muInvincibleStatus & 1);
         return result;
     }
-    void TestCollisionForInvicibility(cFielder* pOpponent);
-    const LooseBallContactAnimInfo* fn_80038230(
+    void TestCollisionForInvincibility(cFielder* pOpponent);
+    const LooseBallContactAnimInfo* FindLooseBallContactAnim(
         const LooseBallContactAnimInfo* pBallContactAnimInfo,
         int nNumContactAnims, unsigned short aFutureFacingDirection,
         const nlVector3& v3FuturePosition, const nlVector3& v3OneTimerTarget,
         float fAngle);
     bool IsHitting() const;
-    bool fn_80038660() const;
-    bool fn_80038918() const;
-    float fn_8002E058();
-    eFielderDesireState fn_8002E060();
-    void fn_8002E0FC();
-    int fn_8002E9D0() const;
-    bool fn_8003499C() const;
-    bool fn_8003E6EC() const;
-    bool fn_8003E6FC() const;
-    bool fn_8003E70C() const;
-    bool fn_8003E71C() const;
-    bool fn_8003E72C() const;
-    bool fn_8003E73C() const;
+    bool IsSlideAttacking() const;
+    bool IsFrozenStateActive() const;
+    float GetMegaStrikeMeterPosition();
+    eFielderDesireState GetDesireState();
+    void EndAllDesires();
+    int GetPreviousDesireState() const;
+    bool IsReceivingVolleyPass() const;
+    bool IsSuperPowerActive() const;
+    bool IsStarActive() const;
+    bool IsConfused() const;
+    bool IsMushroomActive() const;
+    bool IsSlippery() const;
+    bool IsShrunk() const;
     bool fn_800470B4(cFielder* pFielder, cPlayer* pAttacker);
     bool fn_80047240(cPlayer* pParam0, unsigned short aParam1,
         int nParam2, bool bParam3, bool bParam4);
@@ -541,7 +540,7 @@ public:
     void fn_8004FF40();
     float GetSuperPowerTankFraction();
     void ClearSuperPowerTank();
-    void fn_8005001C(bool bForce);
+    void TurnOffSuperPowerTank(bool bForce);
     void InitSuperPowerTank(bool bTurnOn);
     bool TurnOnSuperPowerTank();
     void fn_80045AEC(PhysicsObject* pObject);
@@ -580,7 +579,7 @@ public:
     void fn_8004C02C(float fDeltaT);
     void fn_8004C88C(float fDeltaT);
     void fn_8004D238();
-    void fn_8004D480(const nlVector3& v3CollisionVelocity);
+    void InitActionKnockdownReact(const nlVector3& v3CollisionVelocity);
     void fn_8004E228();
     void fn_8004E8B8();
     void fn_8004EA9C();
@@ -596,10 +595,10 @@ public:
     void fn_8004E438();
     void ActionSlideAttackReact(float fDeltaT);
     void ActionBombReact(float fDeltaT);
-    void ActionSTSHitReact(float fDeltaT);
     void ActionShellReact(float fDeltaT);
     void ActionBananaReact(float fDeltaT);
-    void ActionSquishReact(float fDeltaT);
+    void ActionKnockdownReact(float fDeltaT);
+    void ActionReceivePass(float fDeltaT);
     void InitActionReceivePass(int animID, nlVector3& v3TargetPos,
         short sDirectionSeekSpeed, float fAdjustEndTime);
     void InitActionWait();
@@ -608,45 +607,42 @@ public:
     bool IsWinger() const;
     bool IsMidField() const;
     bool IsDefense() const;
-    PlayerTweaks* UnidentifiedGetTweaks() const { return mUnidentified32C; }
+    PlayerTweaks* GetNormalTweaks() const { return m_pNormalTweaks; }
 
-public:
     /* 0x324 */ PlayerTweaks* m_pTweaks;
 
 private:
-    /* 0x328 */ PlayerTweaks* mUnidentified328;
-    /* 0x32C */ PlayerTweaks* mUnidentified32C;
-    /* 0x330 */ UnidentifiedFielderPair330 mUnidentified330;
-    /* 0x338 */ u16 mUnidentified338;
+    /* 0x328 */ PlayerTweaks* m_pSuperPowerTweaks;
+    /* 0x32C */ PlayerTweaks* m_pNormalTweaks;
+    /* 0x330 */ ActCrowdVars mActionCrowdVars;
+    /* 0x338 */ u16 m_aDekeDirection;
 
 public:
-    /* 0x33A */ bool mUnidentified33A;
+    /* 0x33A */ bool m_bDekeReset;
 
 private:
     /* 0x33B */ u8 mUnknown33B[0x01];
 
 public:
-    /* 0x33C */ int mUnidentified33C;
+    /* 0x33C */ int m_nDPadDownCounter;
 
-public:
-    /* 0x340 */ float mUnidentified340;
-    /* 0x344 */ float mUnidentified344;
-    /* 0x348 */ bool mUnidentified348;
+    /* 0x340 */ float m_fElectrocutionTime;
+    /* 0x344 */ float m_fElectrocutionLiftTime;
+    /* 0x348 */ bool m_bGroundElectrocution;
 
 private:
     /* 0x349 */ u8 mUnknown349[0x03];
 
 public:
-    /* 0x34C */ float mUnidentified34C;
-    /* 0x350 */ nlVector3 mUnidentified350;
+    /* 0x34C */ float m_fFallingTime;
+    /* 0x350 */ nlVector3 m_v3SuckToSpot;
 
 private:
-    /* 0x35C */ float mUnidentified35C;
+    /* 0x35C */ float m_fHitDistance;
 
 public:
-    /* 0x360 */ bool mUnidentified360;
+    /* 0x360 */ bool m_bHitReactFrameLock;
 
-public:
     /* 0x361 */ bool bYoshiInWindup;
     /* 0x362 */ bool bIsModified;
 
@@ -654,106 +650,97 @@ private:
     /* 0x363 */ u8 mUnknown363[0x01];
 
 public:
-    /* 0x364 */ UnidentifiedFielderAction364 mActionLooseBallPassVars;
+    /* 0x364 */ ActLooseBallPass mActionLooseBallPassVars;
 
-public:
-    /* 0x368 */ float mUnidentified368;
+    /* 0x368 */ float m_fOneTimerAnimTime;
 
-private:
-public:
-    /* 0x36C */ cPlayer* mUnidentified36C;
-    /* 0x370 */ bool mUnidentified370;
-    /* 0x371 */ bool mUnidentified371;
+    /* 0x36C */ cPlayer* m_pPassTarget;
+    /* 0x370 */ bool m_bAllowLeadPass;
+    /* 0x371 */ bool m_bOneTouchPass;
 
 private:
     /* 0x372 */ u8 mUnknown372[0x02];
 
 public:
-    /* 0x374 */ UnidentifiedFielderPair374 mUnidentified374;
-    /* 0x37C */ UnidentifiedFielderAction37C mActionRunningVars;
+    /* 0x374 */ ActRunPassVars mActionRunPassVars;
+    /* 0x37C */ ActRunningVars mActionRunningVars;
 
-public:
-    /* 0x384 */ UnidentifiedFielderAction384 mActionRunningWBVars;
+    /* 0x384 */ ActRunningWBVars mActionRunningWBVars;
 
 private:
     /* 0x386 */ u8 mUnknown386[0x02];
 
 public:
-    /* 0x388 */ int mUnidentified388;
+    /* 0x388 */ int m_eSlideAttackState;
     /* 0x38C */ bool bAttackSucceeded;
-    /* 0x38D */ bool mUnidentified38D;
+    /* 0x38D */ bool m_bSlideAttackReset;
 
 private:
     /* 0x38E */ u8 mUnknown38E[0x02];
 
 public:
-    /* 0x390 */ float mUnidentified390;
-    /* 0x394 */ float mUnidentified394;
-    /* 0x398 */ float mUnidentified398;
-    /* 0x39C */ float mUnidentified39C;
-    /* 0x3A0 */ float mUnidentified3A0;
-    /* 0x3A4 */ float mUnidentified3A4;
-    /* 0x3A8 */ float mUnidentified3A8;
-    /* 0x3AC */ float mUnidentified3AC;
-    /* 0x3B0 */ float mUnidentified3B0;
-    /* 0x3B4 */ float mUnidentified3B4;
-    /* 0x3B8 */ bool mUnidentified3B8;
+    /* 0x390 */ float m_fMegaStrikeNumBalls;
+    /* 0x394 */ float m_fMegaStrikeAccuracy;
+    /* 0x398 */ float m_fMegaStrikeReceivedTimestamp;
+    /* 0x39C */ float m_fMegaStrikeFirstPressPosition;
+    /* 0x3A0 */ float m_fMegaStrikeSecondPressPosition;
+    /* 0x3A4 */ float m_fMegaStrikeGreenRegionWidth;
+    /* 0x3A8 */ float m_fMegaStrikeMeterPosition;
+    /* 0x3AC */ float m_fMegaStrikePhaseTimeRemaining;
+    /* 0x3B0 */ float m_fMegaStrikeSecondPhaseDuration;
+    /* 0x3B4 */ float m_fMegaStrikeFirstPhaseDuration;
+    /* 0x3B8 */ bool m_bMegaStrikeSecondPhase;
 
 private:
     /* 0x3B9 */ u8 mUnknown3B9[0x03];
 
 public:
-    /* 0x3BC */ float mUnidentified3BC;
-    /* 0x3C0 */ float mUnidentified3C0;
-    /* 0x3C4 */ float mUnidentified3C4;
-    /* 0x3C8 */ float mUnidentified3C8;
-    /* 0x3CC */ float mUnidentified3CC;
-    /* 0x3D0 */ float mUnidentified3D0;
+    /* 0x3BC */ float m_fLocalMegaStrikeNumBalls;
+    /* 0x3C0 */ float m_fLocalMegaStrikeAccuracy;
+    /* 0x3C4 */ float m_fMegaStrikeSegment1Position;
+    /* 0x3C8 */ float m_fMegaStrikeSegment2Position;
+    /* 0x3CC */ float m_fMegaStrikeSegment3Position;
+    /* 0x3D0 */ float m_fMegaStrikeSegment4Position;
     /* 0x3D4 */ float mUnidentified3D4;
 
-public:
-    /* 0x3D8 */ s16 mUnidentified3D8;
-    /* 0x3DA */ s16 mUnidentified3DA;
+    /* 0x3D8 */ s16 m_nStunnedAngularAcceleration;
+    /* 0x3DA */ s16 m_nStunnedAngularVelocity;
 
-public:
-    /* 0x3DC */ bool mUnidentified3DC;
+    /* 0x3DC */ bool m_bSuperPowerTankOn;
 
 private:
-    /* 0x3DD */ bool mUnidentified3DD;
+    /* 0x3DD */ bool m_bSuperPowerTankShutdownPending;
 
-private:
     /* 0x3DE */ u8 mUnknown3DE[0x02];
 
 public:
-    /* 0x3E0 */ float mUnidentified3E0;
-    /* 0x3E4 */ float mUnidentified3E4;
-    /* 0x3E8 */ ActBowserSuper mUnidentified3E8;
-    /* 0x3F4 */ float mUnidentified3F4;
-    /* 0x3F8 */ WaluigiWallState mUnidentified3F8;
+    /* 0x3E0 */ float m_fSuperPowerTankLevel;
+    /* 0x3E4 */ float m_fSuperPowerTankCapacity;
+    /* 0x3E8 */ ActBowserSuper mActionBowserSuper;
+    /* 0x3F4 */ float m_fNextGasTime;
+    /* 0x3F8 */ WaluigiWallState mWaluigiWallState;
 
 private:
-    /* 0x404 */ float mUnidentified404;
+    /* 0x404 */ float m_fPeteyLastMuckBallTime;
 
 public:
-    /* 0x408 */ float mUnidentified408;
+    /* 0x408 */ float m_fPeteyMuckBallSpeed;
 
 private:
-    /* 0x40C */ float mUnidentified40C;
+    /* 0x40C */ float m_fPeteySuperPowerTime;
 
 public:
-    /* 0x410 */ UnidentifiedFielderAction410 mUnidentified410;
+    /* 0x410 */ ActBooSkillshot mActionBooSkillshot;
 
-public:
     /* 0x420 */ BulletBillObject* m_pBulletBill;
 
-public:
-    /* 0x424 */ bool mUnidentified424;
+    /* 0x424 */ bool m_bMontyDekeFinished;
 
 private:
     /* 0x425 */ u8 mUnknown425[0x03];
 
 public:
-    /* 0x428 */ AIContext* mUnidentified428;
+    /* 0x428 */ AIContext* m_pAIContext;
 
 private:
     /* 0x42C */ bool m_bHasBeenUpdated;
@@ -770,7 +757,6 @@ private:
 public:
     /* 0x440 */ Timer mtPostDekeTimer;
 
-public:
     /* 0x448 */ int m_nPowerupAnimID;
 
 private:
@@ -797,9 +783,8 @@ private:
     /* 0x477 */ u8 mUnknown477;
 
 public:
-    /* 0x478 */ int mUnidentified478;
+    /* 0x478 */ int m_nMegaStrikeResultState;
 
-public:
     /* 0x47C */ ShotMeter* m_pShotMeter;
 private:
     bool ShouldSkipHardStopAnim();
@@ -810,27 +795,22 @@ private:
     bool IsAvailableToReceivePass();
 }; // total size: 0x480
 
-
 // Shared fielder functions and data.
-extern "C" int fn_8002E9FC(cFielder*, cFielder*, float);
-extern "C" void fn_800318F8(cFielder*);
-extern "C" float fn_8003C300(cFielder* pFielder, float fSpeed);
-extern bool lbl_806E0C50;
-extern bool lbl_806E0C51;
-extern bool lbl_806E0C52;
-extern unsigned char lbl_806E0C61;
-extern unsigned char lbl_806E0C62;
-extern float lbl_806E3418;
-extern float lbl_806E3420;
-extern float lbl_806E3424;
-extern float lbl_806E3428;
-extern float lbl_806E342C;
+class Desire;
+Desire* GetFielderDesire(cFielder*, int);
+bool CanUsePowerup(cFielder*, int);
+bool IsBowserSuperPowerActive(const cFielder*);
+bool IsWaluigiSuperPowerActive(const cFielder*);
+int GetFielderHitReaction(cFielder*, cFielder*, float);
+void TryFielderQueuedPass(cFielder*);
+extern bool gForceUserControl;
+extern bool gForceHomeUserControl;
+extern bool gForceAwayUserControl;
+extern unsigned char gEnableStandingWallElectrocution;
+extern unsigned char gForceHeavyHitReaction;
 
+bool IsFielderDazed(const cFielder* pFielder);
 
-extern "C" bool fn_8003877C(const cFielder* pFielder);
-
-
-
-ScriptMachine* fn_8002E1A4(cFielder* pFielder);
+ScriptMachine* GetFielderScriptMachine(cFielder* pFielder);
 
 #endif // GAME_AI_FIELDER_H

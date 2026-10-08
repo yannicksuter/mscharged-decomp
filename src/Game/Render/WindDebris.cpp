@@ -128,7 +128,7 @@ void WindDebris::CollisionCallback(
     {
         cFielder* pFielder = (cFielder*)pPlayer;
         if (pFielder->m_eActionState != 35 && pFielder->m_eActionState != 3
-            && !pFielder->fn_800344B0())
+            && !pFielder->IsInFallAction())
         {
             CollisionWindDebrisPlayerData* pData = g_CollisionWindDebrisPlayerDataPool.Allocate();
             pData->pFielder = pFielder;

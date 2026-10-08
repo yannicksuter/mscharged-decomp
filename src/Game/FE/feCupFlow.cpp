@@ -115,9 +115,9 @@ void CycleCupRoundPage(int currentPage, bool advance)
     int pageCount = 0;
     const int* pages = 0;
 
-    int roundType = g_pCupManager->mState == 0x10
+    int roundType = CupManager::s_pInstance->mState == 0x10
                       ? 0
-                      : g_pCupManager->GetCurrentRoundType();
+                      : CupManager::s_pInstance->GetCurrentRoundType();
 
     if (roundType != 0)
     {
@@ -182,9 +182,9 @@ void ShowFirstCupPage()
 void ShowCurrentCupRoundPage()
 {
     int scene = -2;
-    int roundType = g_pCupManager->mState == 0x10
+    int roundType = CupManager::s_pInstance->mState == 0x10
                       ? 0
-                      : g_pCupManager->GetCurrentRoundType();
+                      : CupManager::s_pInstance->GetCurrentRoundType();
 
     switch (roundType)
     {
@@ -204,7 +204,7 @@ void ShowCurrentCupRoundPage()
 
 void AdvanceCupFlow(bool pad)
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     if (cupManager->GetCurrentRoundNumber() == -5)
     {
         if (cupManager->mState == 4)
@@ -239,15 +239,15 @@ void AdvanceCupFlow(bool pad)
         else
         {
             FEMusic::StartStreamIfDifferent(9);
-            g_pCupManager->RestoreCupRecord();
-            g_pCupManager->RestartCupSeries();
+            CupManager::s_pInstance->RestoreCupRecord();
+            CupManager::s_pInstance->RestartCupSeries();
             GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, true);
             SaveLoad::StartSave(false);
         }
     }
     else
     {
-        CupManager* currentCup = g_pCupManager;
+        CupManager* currentCup = CupManager::s_pInstance;
         GameInfoManager* currentGame = GameInfoManager::Instance();
         bool home = currentGame->GetTeam(0)
                     == currentCup->GetUserSelectedCupTeam();
@@ -283,7 +283,7 @@ void HandleCupBack(int fromSubPage)
     if (!fromSubPage)
     {
         bool saveEnabled = SaveEnabled;
-        short roundNumber = g_pCupManager->GetCurrentRoundNumber();
+        short roundNumber = CupManager::s_pInstance->GetCurrentRoundNumber();
 
         if (roundNumber == -5)
         {
@@ -349,9 +349,9 @@ void UpdateCupBreadcrumbs(int currentPage)
         }
         else
         {
-            int roundType = g_pCupManager->mState == 0x10
+            int roundType = CupManager::s_pInstance->mState == 0x10
                                 ? 0
-                                : g_pCupManager->GetCurrentRoundType();
+                                : CupManager::s_pInstance->GetCurrentRoundType();
             switch (roundType)
             {
             case 0:
@@ -439,10 +439,10 @@ void StartNewCup()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    g_pCupManager->mState = -1;
-    g_pCupManager->ResetCupRecord();
-    g_pCupManager->SetMode(-1);
-    g_pCupManager->mGameInProgress = false;
+    CupManager::s_pInstance->mState = -1;
+    CupManager::s_pInstance->ResetCupRecord();
+    CupManager::s_pInstance->SetMode(-1);
+    CupManager::s_pInstance->mGameInProgress = false;
     GameSceneManager::Instance()->Pop();
     SaveLoad::StartSave(false);
     FEAudio::PlayAnimAudioEvent(0x5854D494, 0, 0, true);
@@ -454,8 +454,8 @@ void ContinueStrikerCup()
 {
     GameSceneManager::Instance()->Pop();
     FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);
-    g_pCupManager->UpdateCurrentCup();
-    BasicGameInfo* currentGame = g_pCupManager->GetCurrentGameInfo();
+    CupManager::s_pInstance->UpdateCurrentCup();
+    BasicGameInfo* currentGame = CupManager::s_pInstance->GetCurrentGameInfo();
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     gameInfo->mGameInfo[gameInfo->mCurrentMode] = currentGame;
 
@@ -464,12 +464,12 @@ void ContinueStrikerCup()
     {
         navigation->SetButtons(0, true);
     }
-    if (g_pCupManager->mGameInProgress)
+    if (CupManager::s_pInstance->mGameInProgress)
     {
         SavePreGameUnlockState();
-        g_pCupManager->ForfeitCurrentGame();
-        g_pCupManager->mGameInProgress = false;
-        g_pCupManager->AwardGoalTrophies();
+        CupManager::s_pInstance->ForfeitCurrentGame();
+        CupManager::s_pInstance->mGameInProgress = false;
+        CupManager::s_pInstance->AwardGoalTrophies();
         SaveLoad::StartSave(false);
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         gNextFETransition = "TransitionMainMenuToContinueStrikerCupForfeit";
@@ -488,8 +488,8 @@ void ContinueStrikerCup()
 void SaveAndShowCupHub()
 {
     FEMusic::StartStreamIfDifferent(9);
-    g_pCupManager->RestoreCupRecord();
-    g_pCupManager->RestartCupSeries();
+    CupManager::s_pInstance->RestoreCupRecord();
+    CupManager::s_pInstance->RestartCupSeries();
     GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, true);
     SaveLoad::StartSave(false);
 }
@@ -508,8 +508,8 @@ void ShowCupRulesPopup()
 
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
         (SceneList)10, SCREEN_NOTHING, false);
-    int cupMode = g_pCupManager->GetCurrentMode();
-    int roundType = g_pCupManager->GetCurrentRoundType();
+    int cupMode = CupManager::s_pInstance->GetCurrentMode();
+    int roundType = CupManager::s_pInstance->GetCurrentRoundType();
     int menuType = -1;
     if (roundType == 0 && cupMode == 0)
     {
@@ -560,9 +560,9 @@ void BeginCupAwardPresentation()
 {
     int firstStatistic = 0;
     int secondStatistic = 0;
-    int firstTeam = g_pCupManager->GetGoalsForLeader(&firstStatistic);
-    int secondTeam = g_pCupManager->GetGoalsAgainstLeader(&secondStatistic);
-    int userTeam = g_pCupManager->GetUserSelectedCupTeam();
+    int firstTeam = CupManager::s_pInstance->GetGoalsForLeader(&firstStatistic);
+    int secondTeam = CupManager::s_pInstance->GetGoalsAgainstLeader(&secondStatistic);
+    int userTeam = CupManager::s_pInstance->GetUserSelectedCupTeam();
 
     if (secondTeam == userTeam)
     {
@@ -588,8 +588,8 @@ void ShowCupBrickWallNews()
 void AdvanceCupAwardPresentation()
 {
     int statistic = 0;
-    int team = g_pCupManager->GetGoalsForLeader(&statistic);
-    if (team == g_pCupManager->GetUserSelectedCupTeam())
+    int team = CupManager::s_pInstance->GetGoalsForLeader(&statistic);
+    if (team == CupManager::s_pInstance->GetUserSelectedCupTeam())
     {
         FrontEndPresentation::GetInstance()->Call("TransitionCupLeftToRightAward");
     }
@@ -615,7 +615,7 @@ void ShowCupAwardRewardsPopup()
 {
     bool showRewards = false;
     int menuType = -1;
-    switch (g_pCupManager->GetCurrentMode())
+    switch (CupManager::s_pInstance->GetCurrentMode())
     {
     case 0:
         showRewards = HasWastelandsUnlockFlags() && WasWastelandsLockedBeforeGame();
@@ -650,7 +650,7 @@ void ShowCupTrophyRewardsPopup()
 {
     bool showRewards = false;
     int menuType = -1;
-    switch (g_pCupManager->GetCurrentMode())
+    switch (CupManager::s_pInstance->GetCurrentMode())
     {
     case 0:
         showRewards = IsUnlockFlagSet(1) && WereUnlockFlagsClearBeforeGame(1);
@@ -683,7 +683,7 @@ void ShowCupTrophyRewardsPopup()
 
 void UpdatePlayButtonText()
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     SHNavigation* navigation = GetNavigationScene();
     if (navigation && cupManager->GetCurrentRoundNumber() == -5)
     {
@@ -713,7 +713,7 @@ void UpdateCupTitleText(TLComponentInstance* component, unsigned short* buffer, 
 
     const unsigned short* oldTitle = title->GetString();
     WideString formatted;
-    switch (g_pCupManager->GetCurrentMode())
+    switch (CupManager::s_pInstance->GetCurrentMode())
     {
     case 0:
     {
@@ -793,7 +793,7 @@ void SetLockedTrophyVisibility(bool visible)
 
 void ResetCupFlow()
 {
-    CupManager* cupManager = g_pCupManager;
+    CupManager* cupManager = CupManager::s_pInstance;
     cupManager->mState = -1;
     cupManager->ResetCupRecord();
     cupManager->SetMode(-1);

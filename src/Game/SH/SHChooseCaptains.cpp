@@ -99,7 +99,7 @@ ChooseCaptainsSceneV2::ChooseCaptainsSceneV2(SceneType sceneType, ScreenMovement
     {
         if (mSceneType == ST_STRIKER_CUP)
         {
-            int team = g_pCupManager->mPendingCupTeam;
+            int team = CupManager::s_pInstance->mPendingCupTeam;
             mConfirmed[0] = true;
             mCaptainIds[0] = team;
         }
@@ -386,7 +386,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             if (mMovement == SCREEN_BACK && mSceneType == ST_STRIKER_CUP)
             {
-                int captain = g_pCupManager->GetPendingCupTeam();
+                int captain = CupManager::s_pInstance->GetPendingCupTeam();
                 mCaptainComponents[1].SetDisplayMode(6);
                 mCaptainComponents[1].SetCaptainInfo(captain, 0, 1);
             }
@@ -415,7 +415,7 @@ void ChooseCaptainsSceneV2::Update(float dt)
             if (mSceneType == ST_STRIKER_CUP)
             {
                 GameSceneManager::Instance()->Pop();
-                g_pCupManager->SetMode(-1);
+                CupManager::s_pInstance->SetMode(-1);
                 FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, true);
                 FrontEndPresentation::GetInstance()->Call("TransitionStrikerCupToMainMenu");
             }
@@ -920,7 +920,7 @@ void ChooseCaptainsSceneV2::OnDonePointerPress(int index, void* context)
 
     if (mSceneType == ST_STRIKER_CUP)
     {
-        g_pCupManager->mPendingCupTeam = mCaptainIds[0];
+        CupManager::s_pInstance->mPendingCupTeam = mCaptainIds[0];
     }
     else
     {
