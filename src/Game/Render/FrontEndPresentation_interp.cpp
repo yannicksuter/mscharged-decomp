@@ -50,7 +50,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
     {
         unsigned int value = m_SP[-1];
         m_SP[-1] = nlStringHash((const char*)value);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -86,7 +86,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
             isPlaying = 0;
         }
         m_SP[-1] = isPlaying;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = (unsigned int)objectName;
         }

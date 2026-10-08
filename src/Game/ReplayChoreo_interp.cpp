@@ -33,7 +33,7 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
         int original = m_SP[-2];
         m_SP--;
         m_SP[-1] = PickRandom(original);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -220,7 +220,7 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
             result = 0;
         }
         m_SP[-1] = result;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             *(float*)&m_SP[-1] = original;
         }

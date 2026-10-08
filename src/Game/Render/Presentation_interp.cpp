@@ -205,7 +205,7 @@ void Presentation::DoFunctionCall(unsigned int function)
                        ->GetCurrentGameInfo()
                        ->GetTeam((short)side);
         m_SP[-1] = team == original;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -215,7 +215,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = original == GameInfoManager::Instance()->GetStadium();
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -529,7 +529,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = (s8)mMegaStrikeResult.attempts > original;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -540,7 +540,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
             && (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) != 0;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -551,7 +551,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         int original = m_SP[-1];
         m_SP[-1] = original == (s8)mMegaStrikeResult.attempts - 1
             && g_pGame->GetMegaStrikeGoalMask() == 0;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }
@@ -561,7 +561,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         int original = m_SP[-1];
         m_SP[-1] = (g_pGame->GetMegaStrikeGoalMask() & (1 << original)) == 0;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = original;
         }

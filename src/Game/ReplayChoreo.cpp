@@ -387,7 +387,7 @@ void ReplayChoreo::Update(float deltaT)
         {
             mRunForTimeLeft -= deltaT;
         }
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             Run();
         }

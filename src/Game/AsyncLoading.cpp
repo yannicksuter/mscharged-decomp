@@ -890,7 +890,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         int value = m_SP[-1];
         m_SP[-1] = IsTeamInCurrentGame(value);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -900,7 +900,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         int value = m_SP[-1];
         m_SP[-1] = GameInfoManager::Instance()->GetStadium() == value;
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }
@@ -910,7 +910,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         eSidekickID value = (eSidekickID)m_SP[-1];
         m_SP[-1] = IsSidekickInCurrentGame(value);
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             m_SP[-1] = value;
         }

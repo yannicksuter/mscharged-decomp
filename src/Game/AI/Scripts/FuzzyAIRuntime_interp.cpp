@@ -3120,7 +3120,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
 
 extern "C" bool FuzzyAIIsUndoingCall(InterpreterCore* value)
 {
-    return value->m_RunState == 3;
+    return value->m_RunState == INTERPRETER_SUSPENDED;
 }
 
 extern "C" float FuzzyAIAutoCastParameterToFloat(void*, Variant* value)

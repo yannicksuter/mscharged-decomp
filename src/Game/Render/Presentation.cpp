@@ -508,7 +508,7 @@ void Presentation::Update(float deltaT)
             }
         }
 
-        if (m_RunState == 3)
+        if (m_RunState == INTERPRETER_SUSPENDED)
         {
             Run();
         }
@@ -570,7 +570,7 @@ void Presentation::Update(float deltaT)
                 Function<FnVoidVoid>());
         }
 
-        if (m_RunState == 2)
+        if (m_RunState == INTERPRETER_FINISHED)
         {
             Finish();
         }

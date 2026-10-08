@@ -41,6 +41,14 @@ struct ByteCodeHeader
 
 struct InterpreterTweakStorage;
 
+enum eInterpreterRunState
+{
+    INTERPRETER_READY = 0,
+    INTERPRETER_RUNNING = 1,
+    INTERPRETER_FINISHED = 2,
+    INTERPRETER_SUSPENDED = 3,
+};
+
 class InterpreterCore
 {
 public:
@@ -78,7 +86,7 @@ public:
     {
         return FindFunctionEntryPoint(hash) != 0;
     }
-    bool IsFinished() const { return m_RunState == 2; }
+    bool IsFinished() const { return m_RunState == INTERPRETER_FINISHED; }
 
 protected:
     u32 Pop()

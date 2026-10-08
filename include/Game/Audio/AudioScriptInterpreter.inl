@@ -7,7 +7,7 @@ inline void AudioScriptInterpreter::DoFunctionCall(unsigned int index)
 {
     u32 value = m_SP[-1];
     ((u8*)m_SP)[-1] = value != 0;
-    if (m_RunState == 3)
+    if (m_RunState == INTERPRETER_SUSPENDED)
         m_SP[-1] = value;
 }
 
