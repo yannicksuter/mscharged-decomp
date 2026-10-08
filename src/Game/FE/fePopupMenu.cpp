@@ -437,7 +437,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
 
     switch (type)
     {
-    case 23:
+    case POPUP_NEW_CUP_CONFIRM:
     {
         WStr cupName(g_pLocalization->GetString(GetLOCModeName(GameInfoManager::Instance()->fn_801CA658())));
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
@@ -448,9 +448,9 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.numOptions = 2;
         break;
     }
-    case 25:
-    case 26:
-    case 27:
+    case POPUP_CUP_WIN:
+    case POPUP_CUP_LOSE:
+    case POPUP_CUP_DNF:
     {
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         WStr cupName;
@@ -475,7 +475,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 28:
+    case POPUP_CUP_OTHER_WIN:
     {
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         WStr cupName;
@@ -491,7 +491,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 108:
+    case POPUP_NETWORK_CONNECT_WIFI_ERRORSPECIFIC:
     {
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         int error = SocketNetworkGetLastError();
@@ -504,7 +504,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 110:
+    case POPUP_NETWORK_LOGINDWC_AUTHERRSPECIFIC:
     {
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         int error = g_pNetworkSession->GetDWCErrorCode();
@@ -517,15 +517,15 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 116:
-    case 117:
-    case 118:
-    case 119:
-    case 120:
-    case 121:
-    case 122:
-    case 123:
-    case 124:
+    case POPUP_NETWORK_ERROR_NO_CONNECTION:
+    case POPUP_NETWORK_ERROR_SERVICE_DOWN:
+    case POPUP_NETWORK_ERROR_DISCONTINUED:
+    case POPUP_NETWORK_ERROR_NO_SPACE:
+    case POPUP_NETWORK_ERROR_UNABLE_TO_CONNECT:
+    case POPUP_NETWORK_ERROR_NO_RESPONSE:
+    case POPUP_NETWORK_ERROR_DISCONNECTED:
+    case POPUP_NETWORK_ERROR_COMMUNICATION:
+    case POPUP_NETWORK_NAND_CORRUPT:
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
@@ -538,7 +538,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 63:
+    case POPUP_NO_SAVE_SPACE:
     {
         int blockSize = 0x20000;
         int blocks = (int)std::ceil((float)SaveLoad::GetSaveBlockSize() / (float)blockSize);
@@ -558,7 +558,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 20:
+    case POPUP_CONFIRM_OPTIONS_CHANGES:
     {
         WStr message(g_pLocalization->GetString(popupEntry->mMessage));
         WStr optionsName;
@@ -585,7 +585,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 39:
+    case POPUP_CUP_AWARDS_BRICK:
     {
         int value = 0;
         CupManager::Instance()->GetGoalsAgainstLeader(&value);
@@ -601,7 +601,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 40:
+    case POPUP_CUP_AWARDS_STRIKER:
     {
         int value = 0;
         CupManager::Instance()->GetGoalsForLeader(&value);
@@ -617,7 +617,7 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = 0;
         break;
     }
-    case 47:
+    case POPUP_CHALLENGE_UNLOCK_CAPTAIN:
     {
         int captain = GetStrikerChallenge()->GetCurrentCaptain();
         const char* captainName = GetCharacterInfo(GetCharacterIndexFromCaptain(captain)).GetName();
@@ -631,23 +631,23 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         mPopup.pOptionLabels[2] = new (8, false) WStr(g_pLocalization->GetString(popupEntry->mOptions[2]));
         break;
     }
-    case 18:
+    case POPUP_NEW_TOURNAMENT:
         break;
     default:
         switch (type)
         {
-        case 96:
-        case 99:
-        case 100:
+        case POPUP_NETWORK_CONNECTION_LOST:
+        case POPUP_NETWORK_SYNC_ERROR:
+        case POPUP_NETWORK_OVERFLOW:
             GetFriendManager()->SetOwnStatusInitial(0);
             break;
         }
         switch (type)
         {
-        case 90:
-        case 91:
-        case 96:
-        case 114:
+        case POPUP_NETWORK_MATCHMAKING_ERROR:
+        case POPUP_ONLINE_ERROR_CONNECT_FRIEND:
+        case POPUP_NETWORK_CONNECTION_LOST:
+        case POPUP_NETWORK_CONNECTION_REJECTED:
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
