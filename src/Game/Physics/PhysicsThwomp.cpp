@@ -80,12 +80,12 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
         cBall* ball = ((PhysicsAIBall*)other)->m_pAIBall;
         if (ball->m_pOwner == 0)
         {
-            if (ball->meBallState == 8
+            if (ball->meBallState == BALL_STATE_SKILLSHOT
                 && ball->m_pShooter->m_DetChar.m_eCharacterClass == BOO)
             {
                 return NO_CONTACT;
             }
-            if (ball->meBallState != 10)
+            if (ball->meBallState != BALL_STATE_FALLING)
             {
                 QueueCollisionThwompBall(mThwomp);
             }

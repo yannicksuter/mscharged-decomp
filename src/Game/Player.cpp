@@ -144,7 +144,7 @@ cPlayer::~cPlayer()
     EndBlur();
     if (m_pBall != NULL)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
     }
     delete m_pSpaceSearch;
     delete m_pAvoidableObject;
@@ -1138,7 +1138,7 @@ void cPlayer::PrePhysicsUpdate()
 
 bool cPlayer::CanPickupBall(cBall* pBall, bool bParam)
 {
-    if (pBall->meBallState == 10)
+    if (pBall->meBallState == BALL_STATE_FALLING)
         return false;
     if (sbNoBallPickups)
         return false;

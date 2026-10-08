@@ -157,7 +157,7 @@ ContactType PhysicsAIBall::Contact(
             {
                 if (m_pAIBall->HasActivePassTarget()
                     || m_pAIBall->m_tShotTimer.m_uPackedTime != 0
-                    || m_pAIBall->meBallState == 1)
+                    || m_pAIBall->meBallState == BALL_STATE_CLEARING)
                 {
                     return NO_CONTACT;
                 }

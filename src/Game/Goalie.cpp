@@ -697,12 +697,12 @@ void Goalie::CollideWithBallCallback(cBall* pBall)
     }
     switch (pBall->meBallState)
     {
-    case 1:
-    case 3:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
+    case BALL_STATE_CLEARING:
+    case BALL_STATE_GROUND_PASS:
+    case BALL_STATE_VOLLEY_PASS:
+    case BALL_STATE_SHOT:
+    case BALL_STATE_CHIP_SHOT:
+    case BALL_STATE_SKILLSHOT:
         fn_80015B38(pBall, false);
         break;
     }
@@ -806,7 +806,7 @@ void Goalie::CollideWithCharacterCallback(CollisionPlayerPlayerData* pData)
 
 bool Goalie::PreCollideWithBallCallback(const dContact& contact)
 {
-    if (g_pBall->meBallState == 8 && !g_pBall->m_bVisible)
+    if (g_pBall->meBallState == BALL_STATE_SKILLSHOT && !g_pBall->m_bVisible)
         return false;
     switch (mGoalieActionState)
     {
@@ -3378,7 +3378,7 @@ void Goalie::StartStunEffect()
 
 void Goalie::FumbleBall()
 {
-    ReleaseBall(0);
+    ReleaseBall(BALL_STATE_LOOSE);
     const cBall* pBall = g_pBall;
     nlVector3 v3Velocity;
     v3Velocity.y = pBall->m_v3Position.y > 0.0f ? 1.0f : -1.0f;
@@ -3629,7 +3629,7 @@ void Goalie::ReleaseMonty()
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
     }
 
     if (!g_pBall->m_bVisible)
@@ -3841,7 +3841,7 @@ void Goalie::DoPassRelease()
     v3Velocity.y = v3Direction.y * fXYMag;
     v3Velocity.z = fSin * fShotSpeed;
     PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
-    ReleaseBall(0);
+    ReleaseBall(BALL_STATE_LOOSE);
     g_pBall->ShootRelease(v3Velocity, spinType);
     SetNoPickUpTime(0.25f);
     g_pBall->m_tNoPickupTimer.SetSeconds(0.15f);
@@ -4050,7 +4050,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
             {
                 if (pFielder->m_pBall != NULL)
                 {
-                    pFielder->ReleaseBall(0);
+                    pFielder->ReleaseBall(BALL_STATE_LOOSE);
                     bReleased = true;
                 }
                 pFielder->InitActionSlideAttackReact(this, false);
@@ -4065,7 +4065,7 @@ void Goalie::HitAttackTarget(cFielder* pFielder, bool bParam)
             mbDoHeadTrack = false;
             if (pFielder->m_pBall != NULL)
             {
-                pFielder->ReleaseBall(0);
+                pFielder->ReleaseBall(BALL_STATE_LOOSE);
                 bReleased = true;
             }
             if (mGoalieActionState != GOALIEACTION_PURSUE_DEKE)

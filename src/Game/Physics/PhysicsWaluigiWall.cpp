@@ -251,7 +251,7 @@ void PhysicsWaluigiWall::PreCollide()
     const nlVector3& velocity = g_pBall->m_v3Velocity;
     if (g_pBall->m_pOwner == 0 && !fn_800167A8(g_pBall)
         && nlVec3DotProduct(velocity, velocity) > 400.0f
-        && g_pBall->meBallState != 10)
+        && g_pBall->meBallState != BALL_STATE_FALLING)
     {
         const nlVector3& start = g_pBall->GetPosition();
         nlVector3 end;

@@ -1,3 +1,4 @@
+#include "Game/Ball.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
 #include "Game/CharacterTriggers.h"
@@ -250,7 +251,7 @@ void cFielder::fn_8004FF40()
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         InitDesire(

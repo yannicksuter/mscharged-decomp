@@ -991,7 +991,7 @@ void Goalie::ActionGrabMonty(float)
                 mbGrabMonty = true;
                 if (mpMonty->m_pBall != 0)
                 {
-                    mpMonty->ReleaseBall(0);
+                    mpMonty->ReleaseBall(BALL_STATE_LOOSE);
                     PickupBall(g_pBall);
                     g_pBall->m_bVisible = 0;
                 }
@@ -1034,7 +1034,7 @@ void Goalie::ActionGrabMonty(float)
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
     }
     InitActionMove(true);
 }
@@ -2269,7 +2269,7 @@ void Goalie::ActionMove(float deltaTime)
         {
             DetInput* pGlobalPad = GetGlobalPad();
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, pGlobalPad);
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
         SetNoPickUpTime(0.2f);
         if (GetGlobalPad() != 0)
@@ -6131,11 +6131,11 @@ void Goalie::LaunchSaveDeflection(float fParam)
 {
     if (m_pBall != 0)
     {
-        ReleaseBall(4);
+        ReleaseBall(BALL_STATE_GOALIE_DEFLECTION);
     }
-    else if (g_pBall->meBallState != 4)
+    else if (g_pBall->meBallState != BALL_STATE_GOALIE_DEFLECTION)
     {
-        fn_80015C38(g_pBall, 4);
+        fn_80015C38(g_pBall, BALL_STATE_GOALIE_DEFLECTION);
     }
 
     unsigned short aActualFacingDirection = GetActualFacing();
@@ -6389,7 +6389,7 @@ void Goalie::ActionSTSPursue(float fDeltaT)
         if (m_pBall != 0)
         {
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         SetNoPickUpTime(0.2f);
@@ -6471,7 +6471,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
         if (m_pBall != 0)
         {
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         SetNoPickUpTime(0.2f);
@@ -6572,7 +6572,7 @@ void Goalie::ActionSTSAttack(float deltaTime)
     }
 
     if (mpLooseBallInfo->mAnimType == LOOSEBALL_ANIM_KICK
-        && g_pBall->meBallState != 0
+        && g_pBall->meBallState != BALL_STATE_LOOSE
         && m_pCurrentAnimController->m_fTime < 0.45f)
     {
         FinishGoalieKick(this, m_pCurrentAnimController->m_fTime);
@@ -6602,7 +6602,7 @@ void Goalie::InitActionShockwaveReact()
         if (m_pBall != 0)
         {
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         if (GetGlobalPad() != 0)
@@ -6641,7 +6641,7 @@ void Goalie::InitActionDazed(bool bParam)
             pBall = g_pBall;
             bState8Shot = false;
             if (pBall->m_tShotTimer.m_uPackedTime != 0
-                && pBall->meBallState == 8)
+                && pBall->meBallState == BALL_STATE_SKILLSHOT)
             {
                 bState8Shot = true;
             }
@@ -6677,7 +6677,7 @@ void Goalie::InitActionDazed(bool bParam)
         if (m_pBall != 0)
         {
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         if (GetGlobalPad() != 0)
@@ -6958,7 +6958,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         || mGoalieActionState == GOALIEACTION_DAZED)
     {
         cPlayer* pSkillShooter = g_pBall->m_pShooter;
-        if (pSkillShooter != 0 && g_pBall->meBallState == 8)
+        if (pSkillShooter != 0 && g_pBall->meBallState == BALL_STATE_SKILLSHOT)
         {
             mpSkillShooter = pSkillShooter;
             switch ((int)pSkillShooter->m_DetChar.m_eCharacterClass)
@@ -7004,7 +7004,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
     mbIsDown = false;
 
     cPlayer* pSkillShooter = g_pBall->m_pShooter;
-    if (pSkillShooter != 0 && g_pBall->meBallState == 8)
+    if (pSkillShooter != 0 && g_pBall->meBallState == BALL_STATE_SKILLSHOT)
     {
         mpSkillShooter = pSkillShooter;
         switch ((int)pSkillShooter->m_DetChar.m_eCharacterClass)
@@ -7044,7 +7044,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
     if (m_DetPlayer.m_tFireTimer.m_uPackedTime == 0)
     {
         bool bState7Shot = g_pBall->m_tShotTimer.m_uPackedTime != 0
-                        && g_pBall->meBallState == 7;
+                        && g_pBall->meBallState == BALL_STATE_CHIP_SHOT;
         if (bState7Shot)
         {
             uSaveType = 3;
@@ -7053,7 +7053,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
         {
             bool bState8Shot
                 = g_pBall->m_tShotTimer.m_uPackedTime != 0
-               && g_pBall->meBallState == 8;
+               && g_pBall->meBallState == BALL_STATE_SKILLSHOT;
             if (!bState8Shot
                 && fTargetVelocitySq
                        < nlGetLengthSquared1D(fSaveSpeedLimit))
@@ -7083,7 +7083,7 @@ void Goalie::InitActionSaveSetup(bool bCanReposition)
             cBall* pBall = g_pBall;
             bool bState7Shot
                 = pBall->m_tShotTimer.m_uPackedTime != 0
-               && pBall->meBallState == 7;
+               && pBall->meBallState == BALL_STATE_CHIP_SHOT;
             if (bState7Shot)
             {
                 if (nlVec3DistanceSquared2D(m_DetChar.m_v3Position,
@@ -7420,7 +7420,7 @@ void Goalie::InitActionSnapBall()
 void Goalie::UpdateSkillShotShooter()
 {
     cPlayer* pShooter = g_pBall->m_pShooter;
-    if (pShooter != 0 && g_pBall->meBallState == 8)
+    if (pShooter != 0 && g_pBall->meBallState == BALL_STATE_SKILLSHOT)
     {
         mpSkillShooter = pShooter;
         switch (pShooter->m_DetChar.m_eCharacterClass)
@@ -7456,7 +7456,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
         pBall = g_pBall;
         bState8Shot = false;
         if (pBall->m_tShotTimer.m_uPackedTime != 0
-            && pBall->meBallState == 8)
+            && pBall->meBallState == BALL_STATE_SKILLSHOT)
         {
             bState8Shot = true;
         }
@@ -7562,7 +7562,7 @@ bool Goalie::HandleSkillShotImpact(bool bParam)
         pBall = g_pBall;
         bState8Shot = false;
         if (pBall->m_tShotTimer.m_uPackedTime != 0
-            && pBall->meBallState == 8)
+            && pBall->meBallState == BALL_STATE_SKILLSHOT)
         {
             bState8Shot = true;
         }

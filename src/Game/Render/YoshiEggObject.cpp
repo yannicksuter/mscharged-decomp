@@ -58,7 +58,7 @@ void YoshiEggObject::Suspend(bool, float delay)
         mPhysics->EnableCollisions();
         if (mFielder != 0 && mFielder->m_pBall != 0)
         {
-            mFielder->ReleaseBall(0);
+            mFielder->ReleaseBall(BALL_STATE_LOOSE);
             g_pBall->m_pPhysicsBall->EnableCollisions();
         }
     }

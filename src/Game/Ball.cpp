@@ -187,8 +187,8 @@ cBall::cBall()
     m_CurrentGlowEffect = 0;
     mfChargeValue = 0.0f;
     mfSkillShotTime = 0.0f;
-    meBallState = 0;
-    mePrevBallState = 0;
+    meBallState = BALL_STATE_LOOSE;
+    mePrevBallState = BALL_STATE_LOOSE;
     m_pOwner = NULL;
     m_pPrevOwner = NULL;
     m_pLastTouch = NULL;
@@ -251,7 +251,7 @@ cBall::cBall()
 
 cBall::~cBall()
 {
-    fn_80015C38(this, 0);
+    fn_80015C38(this, BALL_STATE_LOOSE);
     ClearBallEffects();
     fn_800154FC(this, 0.0f);
     StopSound(m_uGlowSoundCue, this);
@@ -310,7 +310,7 @@ void cBall::CollideWithCharacterCallback(
     bool bCanDamage;
     switch (meBallState)
     {
-    case 6:
+    case BALL_STATE_SHOT:
         if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true) > lbl_806DB578)
         {
             bCanDamage = true;
@@ -320,7 +320,7 @@ void cBall::CollideWithCharacterCallback(
             bCanDamage = false;
         }
         break;
-    case 8:
+    case BALL_STATE_SKILLSHOT:
         bCanDamage = true;
         break;
     default:
@@ -346,7 +346,7 @@ void cBall::CollideWithCharacterCallback(
         {
             if (pCharacter->m_pBall != NULL)
             {
-                pCharacter->ReleaseBall(0);
+                pCharacter->ReleaseBall(BALL_STATE_LOOSE);
             }
 
             cPlayer* pShooter = m_pShooter;
@@ -400,12 +400,12 @@ void cBall::CollideWithCharacterCallback(
         {
             if (m_pOwner != NULL)
             {
-                fn_80015C38(this, 2);
+                fn_80015C38(this, BALL_STATE_POSSESSED);
             }
             else
             {
-                bool bPassTarget = (meBallState == 5
-                                       || meBallState == 3)
+                bool bPassTarget = (meBallState == BALL_STATE_VOLLEY_PASS
+                                       || meBallState == BALL_STATE_GROUND_PASS)
                     && m_pPassTarget != NULL;
                 if (bPassTarget
                     && ReceivingPass((cFielder*)m_pPassTarget))
@@ -426,12 +426,12 @@ void cBall::CollideWithCharacterCallback(
                         || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
                     {
-                        fn_80015C38(this, 0);
+                        fn_80015C38(this, BALL_STATE_LOOSE);
                     }
                 }
                 else
                 {
-                    fn_80015C38(this, 0);
+                    fn_80015C38(this, BALL_STATE_LOOSE);
                 }
             }
 
@@ -464,7 +464,7 @@ void cBall::CollideWithCharacterCallback(
         }
     }
 
-    if (meBallState == 4 && pCharacter->m_eClassType == FIELDER)
+    if (meBallState == BALL_STATE_GOALIE_DEFLECTION && pCharacter->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pCharacter;
         if (pFielder->m_eActionState >= ACTION_SHOT
@@ -472,12 +472,12 @@ void cBall::CollideWithCharacterCallback(
         {
             if (m_pOwner != NULL)
             {
-                fn_80015C38(this, 2);
+                fn_80015C38(this, BALL_STATE_POSSESSED);
             }
             else
             {
-                bool bPassTarget = (meBallState == 5
-                                       || meBallState == 3)
+                bool bPassTarget = (meBallState == BALL_STATE_VOLLEY_PASS
+                                       || meBallState == BALL_STATE_GROUND_PASS)
                     && m_pPassTarget != NULL;
                 if (bPassTarget
                     && ReceivingPass((cFielder*)m_pPassTarget))
@@ -499,12 +499,12 @@ void cBall::CollideWithCharacterCallback(
                         || !pReceivePass->IsActive()
                         || pReceivePass->meDesireSubState != 0)
                     {
-                        fn_80015C38(this, 0);
+                        fn_80015C38(this, BALL_STATE_LOOSE);
                     }
                 }
                 else
                 {
-                    fn_80015C38(this, 0);
+                    fn_80015C38(this, BALL_STATE_LOOSE);
                 }
             }
         }
@@ -520,12 +520,12 @@ void cBall::CollideWithCharacterCallback(
 
         if (m_pOwner != NULL)
         {
-            fn_80015C38(this, 2);
+            fn_80015C38(this, BALL_STATE_POSSESSED);
         }
         else
         {
-            bool bHasPassTarget = (meBallState == 5
-                                      || meBallState == 3)
+            bool bHasPassTarget = (meBallState == BALL_STATE_VOLLEY_PASS
+                                      || meBallState == BALL_STATE_GROUND_PASS)
                 && m_pPassTarget != NULL;
             if (bHasPassTarget
                 && ReceivingPass((cFielder*)m_pPassTarget))
@@ -546,12 +546,12 @@ void cBall::CollideWithCharacterCallback(
                     || !pReceivePass->IsActive()
                     || pReceivePass->meDesireSubState != 0)
                 {
-                    fn_80015C38(this, 0);
+                    fn_80015C38(this, BALL_STATE_LOOSE);
                 }
             }
             else
             {
-                fn_80015C38(this, 0);
+                fn_80015C38(this, BALL_STATE_LOOSE);
             }
         }
     }
@@ -733,7 +733,7 @@ static inline void fn_80014494Impl(cBall* pBall)
 {
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
@@ -763,12 +763,12 @@ static inline void fn_80014494Impl(cBall* pBall)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 extern "C" void fn_80014494(cBall* pBall)
@@ -778,9 +778,9 @@ extern "C" void fn_80014494(cBall* pBall)
 
 void SetBallFallState(cBall* pBall)
 {
-    if (pBall->meBallState != 10)
+    if (pBall->meBallState != BALL_STATE_FALLING)
     {
-        fn_80015C38(pBall, 10);
+        fn_80015C38(pBall, BALL_STATE_FALLING);
     }
 }
 
@@ -791,19 +791,19 @@ extern "C" void fn_800145A4(cBall* pBall)
         return;
     }
 
-    if (pBall->meBallState == 4)
+    if (pBall->meBallState == BALL_STATE_GOALIE_DEFLECTION)
     {
         return;
     }
 
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -830,12 +830,12 @@ extern "C" void fn_800145A4(cBall* pBall)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 static inline float clampAbove(float minVal, float x)
@@ -856,7 +856,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     bool bCanDamage;
     switch (meBallState)
     {
-    case 6:
+    case BALL_STATE_SHOT:
         if (nlSqrt(m_v3Velocity.GetLengthSq3D(), true)
             > lbl_806DB578)
         {
@@ -867,7 +867,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             bCanDamage = false;
         }
         break;
-    case 8:
+    case BALL_STATE_SKILLSHOT:
         bCanDamage = true;
         break;
     default:
@@ -960,7 +960,7 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
     UpdateOrientation(fDeltaT);
 
     bool bBooSkillshot = m_tShotTimer.m_uPackedTime != 0
-        && meBallState == 8 && m_pShooter != NULL
+        && meBallState == BALL_STATE_SKILLSHOT && m_pShooter != NULL
         && m_pShooter->m_DetChar.m_eCharacterClass == BOO;
     if (bBooSkillshot)
     {
@@ -1025,8 +1025,8 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
 static inline bool fn_80014D38Impl(cBall* pBall)
 {
     bool bPassLockedIn = false;
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -1068,10 +1068,10 @@ extern "C" bool fn_80014E20(cBall* pBall)
 {
     switch (pBall->meBallState)
     {
-    case 6:
+    case BALL_STATE_SHOT:
         return nlSqrt(pBall->m_v3Velocity.GetLengthSq3D(), true)
             > lbl_806DB578;
-    case 8:
+    case BALL_STATE_SKILLSHOT:
         return true;
     default:
         return false;
@@ -1525,21 +1525,21 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
     PhysicsBall* pPhysicsBall = g_pBall->m_pPhysicsBall;
     pPhysicsBall->mbUseMagnusEffect = false;
     pPhysicsBall->mfChargeBonus = 0.0f;
-    fn_80015C38(g_pBall, 4);
+    fn_80015C38(g_pBall, BALL_STATE_GOALIE_DEFLECTION);
 }
 
 static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
 {
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
     if (!bParam)
     {
-        bool bPassTarget = (pBall->meBallState == 5
-                               || pBall->meBallState == 3)
+        bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                               || pBall->meBallState == BALL_STATE_GROUND_PASS)
             && pBall->m_pPassTarget != NULL;
         if (bPassTarget && ReceivingPass((cFielder*)pBall->m_pPassTarget))
         {
@@ -1563,12 +1563,12 @@ static inline void fn_80015B38Impl(cBall* pBall, bool bParam)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 extern "C" void fn_80015B38(cBall* pBall, bool bParam)
@@ -1619,31 +1619,31 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         = &g_pGame->mEventQueue.mBallStateChangeEvent;
     event->Deliver(pBall->meBallState, nBallState);
 
-    if (pBall->meBallState == 9)
+    if (pBall->meBallState == BALL_STATE_LIGHTNING)
     {
         pBall->m_pPhysicsBall->m_gravity = -22.5f;
         fn_801BDF08(0);
         pBall->m_tLightningTimer.Clear();
     }
 
-    if ((pBall->meBallState == 6 || pBall->meBallState == 7)
-        && nBallState != 6 && nBallState != 7 && nBallState != 10)
+    if ((pBall->meBallState == BALL_STATE_SHOT || pBall->meBallState == BALL_STATE_CHIP_SHOT)
+        && nBallState != BALL_STATE_SHOT && nBallState != BALL_STATE_CHIP_SHOT && nBallState != BALL_STATE_FALLING)
     {
         EmitBallChargeTransition(pBall);
         pBall->m_pPhysicsBall->ResetBallAirResistance();
     }
-    else if (pBall->meBallState == 1 && nBallState != 10)
+    else if (pBall->meBallState == BALL_STATE_CLEARING && nBallState != BALL_STATE_FALLING)
     {
         pBall->m_pPhysicsBall->ResetBallAirResistance();
     }
-    else if (pBall->meBallState == 10)
+    else if (pBall->meBallState == BALL_STATE_FALLING)
     {
         pBall->m_pPhysicsBall->ResetBallAirResistance();
     }
 
     switch (nBallState)
     {
-    case 2:
+    case BALL_STATE_POSSESSED:
         UpdateBallShotClock(pBall);
         ClearBallStateTargets(pBall);
         if (pBall->m_pBlurHandler != NULL)
@@ -1652,11 +1652,11 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
             pBall->m_pBlurHandler = NULL;
         }
         break;
-    case 10:
+    case BALL_STATE_FALLING:
         UpdateBallShotClock(pBall);
         ClearBallStateTargets(pBall);
         break;
-    case 9:
+    case BALL_STATE_LIGHTNING:
     {
         EmitLightningBall();
         pBall->SetVelocity(v3Zero, SPINTYPE_NONE, NULL);
@@ -1671,15 +1671,15 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
             pBall->m_pBlurHandler = NULL;
         }
     }
-    case 0:
+    case BALL_STATE_LOOSE:
         UpdateBallShotClock(pBall);
         ClearBallStateTargets(pBall);
         break;
-    case 4:
+    case BALL_STATE_GOALIE_DEFLECTION:
         ClearBallStateTargets(pBall);
         pBall->InitiateBallBlur((eBallShotEffectType)0, NULL);
         break;
-    case 1:
+    case BALL_STATE_CLEARING:
         UpdateBallShotClock(pBall);
         if (pBall->m_pPrevOwner != NULL
             && pBall->m_pPrevOwner->m_eClassType == FIELDER)
@@ -1688,7 +1688,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
                 = pBall->m_pPhysicsBall->GetDefaultBallAirResistance() * lbl_806DB574;
         }
         break;
-    case 6:
+    case BALL_STATE_SHOT:
         UpdateBallShotClock(pBall);
         cPlayer* pPrevOwner = pBall->m_pPrevOwner;
         if (pPrevOwner != NULL
@@ -1702,17 +1702,17 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
                     (float)tweaks->fShooting);
         }
         break;
-    case 7:
+    case BALL_STATE_CHIP_SHOT:
         UpdateBallShotClock(pBall);
         break;
-    case 3:
-    case 5:
-    case 8:
+    case BALL_STATE_GROUND_PASS:
+    case BALL_STATE_VOLLEY_PASS:
+    case BALL_STATE_SKILLSHOT:
     default:
         break;
     }
 
-    if (nBallState == 2 || nBallState == 4)
+    if (nBallState == BALL_STATE_POSSESSED || nBallState == BALL_STATE_GOALIE_DEFLECTION)
     {
         PlayOwnedSound(0, 0xBF92BBAF,
             (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
@@ -1722,12 +1722,12 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         && pBall->m_pPrevOwner->m_eClassType == FIELDER)
     {
         StopSound(0x65321E47, pBall);
-        if (nBallState == 7)
+        if (nBallState == BALL_STATE_CHIP_SHOT)
         {
             PlayOwnedSound(0, 0xDE8EC45D,
                 (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
         }
-        else if (nBallState == 6)
+        else if (nBallState == BALL_STATE_SHOT)
         {
             PlayOwnedSound(0, 0xDE8EC45D,
                 (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
@@ -1759,7 +1759,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
                     NULL);
             }
         }
-        else if (nBallState == 5 || nBallState == 3 || nBallState == 1)
+        else if (nBallState == BALL_STATE_VOLLEY_PASS || nBallState == BALL_STATE_GROUND_PASS || nBallState == BALL_STATE_CLEARING)
         {
             PlayOwnedSound(0, 0x874F86F2,
                 (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
@@ -1791,14 +1791,14 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
                     NULL);
             }
 
-            if (nBallState == 5)
+            if (nBallState == BALL_STATE_VOLLEY_PASS)
             {
                 PlayOwnedSound(0, 0x65321E47,
                     (XSoundOwner*)pBall->m_pSoundOwner,
                     "Volley Pass", pBall);
             }
         }
-        else if (nBallState == 8)
+        else if (nBallState == BALL_STATE_SKILLSHOT)
         {
             PlayOwnedSound(pBall->m_pPrevOwner->m_uSoundSlotId,
                 0x3D267BDF,
@@ -1807,7 +1807,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     }
 
     pBall->mePrevBallState = pBall->meBallState;
-    pBall->meBallState = nBallState;
+    pBall->meBallState = static_cast<eBallState>(nBallState);
 }
 
 void cBall::ClearBallBlur()
@@ -1822,7 +1822,7 @@ void cBall::ClearBallBlur()
 bool IsDryBonesSkillshot(cBall* pBall)
 {
     return pBall->m_tShotTimer.m_uPackedTime != 0
-        && pBall->meBallState == 8 && pBall->m_pShooter != NULL
+        && pBall->meBallState == BALL_STATE_SKILLSHOT && pBall->m_pShooter != NULL
         && pBall->m_pShooter->m_DetChar.m_eCharacterClass
         == DRYBONES;
 }
@@ -1830,7 +1830,7 @@ bool IsDryBonesSkillshot(cBall* pBall)
 extern "C" bool fn_800167A8(cBall* pBall)
 {
     return pBall->m_tShotTimer.m_uPackedTime != 0
-        && pBall->meBallState == 8 && pBall->m_pShooter != NULL
+        && pBall->meBallState == BALL_STATE_SKILLSHOT && pBall->m_pShooter != NULL
         && pBall->m_pShooter->m_DetChar.m_eCharacterClass
         == BOO;
 }
@@ -1845,7 +1845,7 @@ void cBall::SetOwner(cPlayer* pOwner)
     m_pOwner = pOwner;
     pOwner->fn_80096CDC(this);
     m_pLastTouch = pOwner;
-    fn_80015C38(this, 2);
+    fn_80015C38(this, BALL_STATE_POSSESSED);
 
     if (pOwner->m_eClassType != GOALIE)
     {
@@ -1990,7 +1990,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
     nlVector3* pVelocity, int nSpinType, bool bVolleyPass, bool bParam)
 {
-    if (bVolleyPass && pBall->mePrevBallState == 5)
+    if (bVolleyPass && pBall->mePrevBallState == BALL_STATE_VOLLEY_PASS)
     {
         ++pBall->m_iConsecutiveVolleyPasses;
     }
@@ -1999,7 +1999,7 @@ void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
         pBall->m_iConsecutiveVolleyPasses = 0;
     }
 
-    int nReleaseReason = bVolleyPass ? 5 : 3;
+    int nReleaseReason = bVolleyPass ? BALL_STATE_VOLLEY_PASS : BALL_STATE_GROUND_PASS;
     if (pPlayer->m_pBall != NULL)
     {
         pPlayer->ReleaseBall(nReleaseReason);
@@ -2149,7 +2149,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
 
     if (bIsGameplay)
     {
-        if (pBall->meBallState == 10)
+        if (pBall->meBallState == BALL_STATE_FALLING)
         {
             SteerBallToSideline(pBall);
         }
@@ -2159,8 +2159,8 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
         if (pBall->m_tLightningTimer.m_uPackedTime != 0
             && pBall->m_tLightningTimer.Countdown(fDeltaT, 0.0f))
         {
-            int& ballState = pBall->meBallState;
-            if (ballState == 9)
+            eBallState& ballState = pBall->meBallState;
+            if (ballState == BALL_STATE_LIGHTNING)
             {
                 fn_80014494(pBall);
             }
@@ -2241,12 +2241,12 @@ void cBall::Update(float fDeltaT)
         if (bIsGameplay)
         {
             if (lbl_806DB5A8
-                && meBallState != 6
-                && meBallState != 7
-                && meBallState != 8
-                && meBallState != 9
-                && meBallState != 2
-                && meBallState != 10)
+                && meBallState != BALL_STATE_SHOT
+                && meBallState != BALL_STATE_CHIP_SHOT
+                && meBallState != BALL_STATE_SKILLSHOT
+                && meBallState != BALL_STATE_LIGHTNING
+                && meBallState != BALL_STATE_POSSESSED
+                && meBallState != BALL_STATE_FALLING)
             {
                 if (sHeaderTargetVisible)
                 {
@@ -2278,8 +2278,8 @@ void cBall::Update(float fDeltaT)
             tHeaderTargetTimer.SetSeconds(lbl_806DB5B0);
         }
 
-        if (meBallState != 5
-            || (meBallState == 2 && m_pOwner != NULL
+        if (meBallState != BALL_STATE_VOLLEY_PASS
+            || (meBallState == BALL_STATE_POSSESSED && m_pOwner != NULL
                 && m_pOwner->m_DetPlayer.m_tBallPossessionTimer.GetSeconds() > 0.1f))
         {
             m_iConsecutiveVolleyPasses = 0;
@@ -2436,12 +2436,12 @@ void DecayBallCharge(cBall* pBall)
     bool bLoseCharge = false;
     switch (pBall->meBallState)
     {
-    case 0:
-    case 1:
-    case 4:
+    case BALL_STATE_LOOSE:
+    case BALL_STATE_CLEARING:
+    case BALL_STATE_GOALIE_DEFLECTION:
         bLoseCharge = true;
         break;
-    case 2:
+    case BALL_STATE_POSSESSED:
         if (pBall->GetOwnerFielder() != NULL)
         {
             cFielder* pOwnerFielder = pBall->GetOwnerFielder();
@@ -2616,7 +2616,7 @@ void ResetBall(cBall* pBall, bool bParam)
 
     if (pBall->m_pOwner != NULL)
     {
-        pBall->m_pOwner->ReleaseBall(0);
+        pBall->m_pOwner->ReleaseBall(BALL_STATE_LOOSE);
     }
 
     pBall->m_pPhysicsBall->Unknown0();
@@ -2631,8 +2631,8 @@ void ResetBall(cBall* pBall, bool bParam)
     pBall->m_CurrentGlowEffect = 0;
     pBall->mfChargeValue = 0.0f;
     pBall->mfSkillShotTime = 0.0f;
-    pBall->meBallState = 0;
-    pBall->mePrevBallState = 0;
+    pBall->meBallState = BALL_STATE_LOOSE;
+    pBall->mePrevBallState = BALL_STATE_LOOSE;
     pBall->m_pOwner = NULL;
     pBall->m_pPrevOwner = NULL;
     pBall->m_pLastTouch = NULL;
@@ -2756,12 +2756,12 @@ void OnBallGameOver()
 
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -2788,12 +2788,12 @@ void OnBallGameOver()
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 void OnBallResetEffects(void*)
@@ -2806,12 +2806,12 @@ void OnBallResetEffects(void*)
 
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -2838,12 +2838,12 @@ void OnBallResetEffects(void*)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 void OnBallGetReadyForKickoff(void*)
@@ -2919,9 +2919,9 @@ void OnBallKickoff()
 void OnBallFall(void*)
 {
     cBall* pBall = g_pBall;
-    if (pBall->meBallState != 10)
+    if (pBall->meBallState != BALL_STATE_FALLING)
     {
-        fn_80015C38(pBall, 10);
+        fn_80015C38(pBall, BALL_STATE_FALLING);
     }
 }
 
@@ -2930,12 +2930,12 @@ void OnBallTronWallCollision(void*)
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -2962,12 +2962,12 @@ void OnBallTronWallCollision(void*)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 void OnBallEggCollision(CollisionEggData*)
@@ -2975,12 +2975,12 @@ void OnBallEggCollision(CollisionEggData*)
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -3007,12 +3007,12 @@ void OnBallEggCollision(CollisionEggData*)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 // The reference keeps the reset inlines from reusing the predicate's ball load.
@@ -3068,10 +3068,10 @@ void OnBallPatchCollision(PhysicsPatch* pPatch)
     int nBallState = g_pBall->meBallState;
     switch (nBallState)
     {
-    case 2:
-    case 6:
-    case 7:
-    case 8:
+    case BALL_STATE_POSSESSED:
+    case BALL_STATE_SHOT:
+    case BALL_STATE_CHIP_SHOT:
+    case BALL_STATE_SKILLSHOT:
         return;
     default:
         break;
@@ -3133,12 +3133,12 @@ void OnBallDebrisCollision(void*)
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -3165,12 +3165,12 @@ void OnBallDebrisCollision(void*)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 void OnBallThwompCollision(void*)
@@ -3178,12 +3178,12 @@ void OnBallThwompCollision(void*)
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
     {
-        fn_80015C38(pBall, 2);
+        fn_80015C38(pBall, BALL_STATE_POSSESSED);
         return;
     }
 
-    bool bPassTarget = (pBall->meBallState == 5
-                           || pBall->meBallState == 3)
+    bool bPassTarget = (pBall->meBallState == BALL_STATE_VOLLEY_PASS
+                           || pBall->meBallState == BALL_STATE_GROUND_PASS)
                     && pBall->m_pPassTarget != NULL;
     if (bPassTarget)
     {
@@ -3210,17 +3210,17 @@ void OnBallThwompCollision(void*)
                 return;
             }
 
-            fn_80015C38(pBall, 0);
+            fn_80015C38(pBall, BALL_STATE_LOOSE);
             return;
         }
     }
 
-    fn_80015C38(pBall, 0);
+    fn_80015C38(pBall, BALL_STATE_LOOSE);
 }
 
 void OnBallStateChange(int previousState, int currentState)
 {
-    if (previousState == 8 && currentState != 8)
+    if (previousState == BALL_STATE_SKILLSHOT && currentState != BALL_STATE_SKILLSHOT)
     {
         g_pBall->mfSkillShotTime = 0.0f;
 

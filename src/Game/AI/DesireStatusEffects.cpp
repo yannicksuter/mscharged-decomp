@@ -371,13 +371,13 @@ bool DesireShrink::Initialize(void* context)
         if (m_pFielder->GetDesireState()
             == (eFielderDesireState)32)
         {
-            m_pFielder->ReleaseBall(0);
+            m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
             m_pFielder->EndDesire();
             m_pFielder->InitActionRunning();
         }
         else
         {
-            m_pFielder->ReleaseBall(0);
+            m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
             m_pFielder->ShootBallDueToContact(
                 m_pFielder->m_DetChar
                     .m_aActualFacingDirection);
@@ -746,7 +746,7 @@ bool DesireConfused::Initialize(void* context)
         if (m_pFielder->GetDesireState()
             == (eFielderDesireState)32)
         {
-            m_pFielder->ReleaseBall(0);
+            m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
             m_pFielder->EndDesire();
             m_pFielder->InitActionRunning();
         }
@@ -765,7 +765,7 @@ bool DesireConfused::Initialize(void* context)
         }
         else
         {
-            m_pFielder->ReleaseBall(0);
+            m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
             m_pFielder->ShootBallDueToContact(
                 m_pFielder->m_DetChar.m_aActualFacingDirection);
         }
@@ -797,7 +797,7 @@ bool DesireConfused::Reinitialize(void* context)
             || m_pFielder->m_eActionState
                    != ACTION_UNKNOWN_32))
     {
-        m_pFielder->ReleaseBall(0);
+        m_pFielder->ReleaseBall(BALL_STATE_LOOSE);
         m_pFielder->ShootBallDueToContact(
             m_pFielder->m_DetChar.m_aActualFacingDirection);
     }

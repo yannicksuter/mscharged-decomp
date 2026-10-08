@@ -578,8 +578,8 @@ void cTeam::UpdateShotScore()
     else
     {
         bool bHasPassTarget = false;
-        if (g_pBall->meBallState == 5
-            || g_pBall->meBallState == 3)
+        if (g_pBall->meBallState == BALL_STATE_VOLLEY_PASS
+            || g_pBall->meBallState == BALL_STATE_GROUND_PASS)
         {
             if (g_pBall->m_pPassTarget != NULL)
             {

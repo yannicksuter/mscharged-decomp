@@ -6,6 +6,21 @@
 
 #include "Game/CharacterTriggers.h"
 
+enum eBallState
+{
+    BALL_STATE_LOOSE = 0,
+    BALL_STATE_CLEARING = 1,
+    BALL_STATE_POSSESSED = 2,
+    BALL_STATE_GROUND_PASS = 3,
+    BALL_STATE_GOALIE_DEFLECTION = 4,
+    BALL_STATE_VOLLEY_PASS = 5,
+    BALL_STATE_SHOT = 6,
+    BALL_STATE_CHIP_SHOT = 7,
+    BALL_STATE_SKILLSHOT = 8,
+    BALL_STATE_LIGHTNING = 9,
+    BALL_STATE_FALLING = 10,
+};
+
 enum eSpinType
 {
     SPINTYPE_NONE = 0,
@@ -80,11 +95,11 @@ public:
     bool GetInNet(int& nSide);
     bool IsInPassState() const
     {
-        return meBallState == 5 || meBallState == 3;
+        return meBallState == BALL_STATE_VOLLEY_PASS || meBallState == BALL_STATE_GROUND_PASS;
     }
     bool HasActivePassTarget() const
     {
-        return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
+        return (meBallState == BALL_STATE_VOLLEY_PASS || meBallState == BALL_STATE_GROUND_PASS) && m_pPassTarget != 0;
     }
 
     bool HasPassTarget()
@@ -92,7 +107,7 @@ public:
         bool bState;
         bool bResult = false;
         bState = true;
-        if (meBallState != 5 && meBallState != 3)
+        if (meBallState != BALL_STATE_VOLLEY_PASS && meBallState != BALL_STATE_GROUND_PASS)
         {
             bState = false;
         }
@@ -116,12 +131,12 @@ public:
 
     bool IsSkillShotActive()
     {
-        return m_tShotTimer.m_uPackedTime != 0 && meBallState == 8;
+        return m_tShotTimer.m_uPackedTime != 0 && meBallState == BALL_STATE_SKILLSHOT;
     }
 
     bool IsChipShotActive()
     {
-        return m_tShotTimer.m_uPackedTime != 0 && meBallState == 7;
+        return m_tShotTimer.m_uPackedTime != 0 && meBallState == BALL_STATE_CHIP_SHOT;
     }
 
     /* 0x00 */ bool m_bVisible;
@@ -152,8 +167,8 @@ public:
     /* 0xAC */ unsigned int m_uGoalType;
     /* 0xB0 */ unsigned int m_uVoiceID;
     /* 0xB4 */ unsigned int m_CurrentGlowEffect;
-    /* 0xB8 */ int meBallState;
-    /* 0xBC */ int mePrevBallState;
+    /* 0xB8 */ eBallState meBallState;
+    /* 0xBC */ eBallState mePrevBallState;
     /* 0xC0 */ float mfChargeValue;
     /* 0xC4 */ float mfSkillShotTime;
     /* 0xC8 */ cPlayer* m_pOwner;

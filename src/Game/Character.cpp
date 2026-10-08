@@ -1959,9 +1959,9 @@ extern "C" void fn_80021050(LightningStrikeData* pEventData)
         if (nlSqrt(nlVec3DistanceSquared2D(g_pBall->m_v3Position,
                 pEventData->position), true) < pEventData->radius
             && g_pBall->m_pOwner == NULL
-            && g_pBall->meBallState != 10 && g_pBall->meBallState != 9)
+            && g_pBall->meBallState != BALL_STATE_FALLING && g_pBall->meBallState != BALL_STATE_LIGHTNING)
         {
-            fn_80015C38(g_pBall, 9);
+            fn_80015C38(g_pBall, BALL_STATE_LIGHTNING);
         }
         CreateLightningShockwave(&pEventData->position, pEventData->radius);
     }
@@ -2340,7 +2340,7 @@ extern "C" void fn_80022280(CollisionHammerbroShotBallPlayerData* pEventData)
             pEventData->pFielder->SetNoPickUpTime(0.06f);
             Goalie* pGoalie = pEventData->pBall->m_pShooter->m_pTeam->GetOtherTeam()->GetGoalie();
             pGoalie->mpSkillShooter = NULL;
-            fn_80015C38(pEventData->pBall, 6);
+            fn_80015C38(pEventData->pBall, BALL_STATE_SHOT);
         }
     }
     if (pEventData->pBall != NULL && pEventData->pFielder != NULL)
@@ -2368,7 +2368,7 @@ extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
 extern "C" void fn_80022594(CollisionBallGroundData* pEventData)
 {
     if (pEventData->pBall != NULL
-        && (pEventData->pBall->meBallState == 5 || pEventData->pBall->meBallState == 4 || pEventData->bIsShot))
+        && (pEventData->pBall->meBallState == BALL_STATE_VOLLEY_PASS || pEventData->pBall->meBallState == BALL_STATE_GOALIE_DEFLECTION || pEventData->bIsShot))
     {
         fn_80014494(pEventData->pBall);
     }

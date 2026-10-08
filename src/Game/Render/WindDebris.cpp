@@ -110,7 +110,7 @@ void WindDebris::CollisionCallback(
         {
             pPlayer = pBall->m_pOwner;
         }
-        else if (pBall->meBallState != 10)
+        else if (pBall->meBallState != BALL_STATE_FALLING)
         {
             QueueCollisionDebrisBall(pDebris);
         }

@@ -532,7 +532,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             if (pBall->GetOwnerGoalie() != 0)
             {
                 cPlayer* pGoalie = pBall->GetOwnerGoalie();
-                pGoalie->ReleaseBall(0);
+                pGoalie->ReleaseBall(BALL_STATE_LOOSE);
                 static_cast<Goalie*>(pGoalie)->InitActionSTSRecover();
             }
         }

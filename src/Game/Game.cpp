@@ -609,7 +609,7 @@ void cGame::CleanupMegaStrikeGameplay()
     {
         if (pGoalie->m_pBall == 0 && g_pBall->m_pOwner != 0)
         {
-            g_pBall->m_pOwner->ReleaseBall(0);
+            g_pBall->m_pOwner->ReleaseBall(BALL_STATE_LOOSE);
         }
         pGoalie->PickupBall(g_pBall);
         pGoalie->InitActionMoveWB();
@@ -932,7 +932,7 @@ void cGame::CheckForGoal()
         // A scorer still holding the ball (a captain carried in) lets go of it.
         if (m_pScorer != NULL && m_pScorer->m_pBall != NULL)
         {
-            m_pScorer->ReleaseBall(0);
+            m_pScorer->ReleaseBall(BALL_STATE_LOOSE);
             if (m_pScorer->m_eClassType == FIELDER)
             {
                 ((cFielder*)m_pScorer)->ShootBallDueToContact(m_pScorer->m_DetChar.m_v3Velocity);

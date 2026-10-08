@@ -1468,7 +1468,7 @@ bool cFielder::CanContactLooseBall(bool requireBestInterceptor)
     if (g_pBall->m_pOwner == 0 && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0)
     {
         bool bPassInFlight = false;
-        if ((g_pBall->meBallState == 5 || g_pBall->meBallState == 3) && g_pBall->m_pPassTarget != 0)
+        if ((g_pBall->meBallState == BALL_STATE_VOLLEY_PASS || g_pBall->meBallState == BALL_STATE_GROUND_PASS) && g_pBall->m_pPassTarget != 0)
         {
             bPassInFlight = true;
         }
@@ -1931,7 +1931,7 @@ void SetFielderFrozenState(cFielder* pFielder, int nFrozenState, float fFrozenTi
     }
     else if (pFielder->m_pBall != 0)
     {
-        pFielder->ReleaseBall(0);
+        pFielder->ReleaseBall(BALL_STATE_LOOSE);
         if ((pFielder->m_DetChar.m_eCharacterClass == KOOPA
                 || pFielder->m_DetChar.m_eCharacterClass == BIRDO)
             && pFielder->m_eActionState == (eFielderActionState)0x15)
@@ -2049,7 +2049,7 @@ void cFielder::CollideWithShockwaveCallback(const nlVector3& position)
         AddRandomDirt();
         if (g_pBall->m_pOwner == this)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             nlVector3 velocity;
             nlPolarToCartesian(velocity.x, velocity.y, m_DetChar.m_aActualFacingDirection, 2.0f + GetActualSpeed());
             velocity.z = 0.5f;
@@ -2068,7 +2068,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
             m_DetChar.m_v3Position.x - chain->mv3Position.x);
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             nlVector3 velocity;
             nlPolarToCartesian(velocity.x, velocity.y, direction, 2.0f + GetActualSpeed());
             velocity.z = 0.5f;
@@ -2123,7 +2123,7 @@ void cFielder::CollideWithThwompCallback(CollisionThwompPlayerData* event)
         {
             if (g_pBall->m_pOwner == this)
             {
-                ReleaseBall(0);
+                ReleaseBall(BALL_STATE_LOOSE);
                 nlVector3 velocity;
                 nlPolarToCartesian(velocity.x, velocity.y, m_DetChar.m_aActualFacingDirection, gThwompBallReleaseSpeed);
                 velocity.z = gThwompBallReleaseSpeed;
@@ -2235,7 +2235,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             }
             if (m_pBall != 0)
             {
-                ReleaseBall(0);
+                ReleaseBall(BALL_STATE_LOOSE);
                 ShootBallDueToContact(eventData->pPatch->m_Velocity);
             }
             fn_8004E11C(gFirePatchBurnDuration);
@@ -2429,11 +2429,11 @@ void cFielder::ClearPassTargetIfAmThePassTarget()
         {
             if (pBall->m_pOwner != 0)
             {
-                fn_80015C38(pBall, 2);
+                fn_80015C38(pBall, BALL_STATE_POSSESSED);
             }
             else
             {
-                fn_80015C38(pBall, 0);
+                fn_80015C38(pBall, BALL_STATE_LOOSE);
             }
         }
     }
@@ -2996,7 +2996,7 @@ void cFielder::DoClearBall()
     nlVec3Add(v3Target, m_DetChar.m_v3Position, v3Direction);
     if (m_pBall != NULL)
     {
-        ReleaseBall(1);
+        ReleaseBall(BALL_STATE_CLEARING);
     }
     if (gbUseDumpCharging && m_eClassType == FIELDER)
     {
@@ -3554,12 +3554,12 @@ void cFielder::DoRegularShooting(bool bParam)
 {
     nlVector3 v3BallVelocity;
     nlVector3 v3Target;
-    int nBallState = 6;
+    int nBallState = BALL_STATE_SHOT;
     bool bHideBall = false;
 
     if (m_pShotMeter->m_eShotMeterState == SHOT_METER_STS_RELEASED)
     {
-        nBallState = 8;
+        nBallState = BALL_STATE_SKILLSHOT;
         if (IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1C))
         {
             DeactivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C);
@@ -3572,7 +3572,7 @@ void cFielder::DoRegularShooting(bool bParam)
     }
     else if (bIsModified)
     {
-        nBallState = 7;
+        nBallState = BALL_STATE_CHIP_SHOT;
     }
 
     float fCharge = Interpolate(gShotChargeMin, gShotChargeMax,
@@ -3580,7 +3580,7 @@ void cFielder::DoRegularShooting(bool bParam)
     fn_800154FC(g_pBall, fCharge + GetBallChargeValue(g_pBall, 0));
     CalcRegularShot(v3BallVelocity, v3Target, nBallState);
 
-    if (nBallState == 8)
+    if (nBallState == BALL_STATE_SKILLSHOT)
     {
         g_pBall->m_uGoalType = 2;
     }
@@ -3608,7 +3608,7 @@ void cFielder::DoRegularShooting(bool bParam)
 
     eSpinType spinType;
     nlVector3 v3AngVel;
-    if (nBallState == 7)
+    if (nBallState == BALL_STATE_CHIP_SHOT)
     {
         spinType = SPINTYPE_BACK;
         v3AngVel = v3Zero;
@@ -3703,7 +3703,7 @@ void cFielder::DoRegularShooting(bool bParam)
 
     g_pBall->Shoot(this, v3BallVelocity, v3AngVel, spinType, nBallState, bParam);
     SetNoPickUpTime(0.2f);
-    if (nBallState == 8 && m_DetChar.m_eCharacterClass == BOO)
+    if (nBallState == BALL_STATE_SKILLSHOT && m_DetChar.m_eCharacterClass == BOO)
     {
         fn_8004ED64();
     }
@@ -3712,7 +3712,7 @@ void cFielder::DoRegularShooting(bool bParam)
         ShotAtGoalData* pShotData = g_ShotAtGoalDataPool.Allocate();
         pShotData->pShooter = this;
         QueueShotAtGoalEvent(g_pGame, pShotData);
-        if (nBallState != 8)
+        if (nBallState != BALL_STATE_SKILLSHOT)
         {
             ePlayerStats stat = STATS_00;
             float fCharge = fn_800156A8(g_pBall);
@@ -4034,7 +4034,7 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
     int count;
     float maxTime = GetSlideInterceptTimeLimit(m_pTweaks);
     const cBall* ball = g_pBall;
-    if (ball->GetOwner() == 0 && ball->meBallState != 5)
+    if (ball->GetOwner() == 0 && ball->meBallState != BALL_STATE_VOLLEY_PASS)
     {
         if (ball->HasActivePassTarget())
             maxTime = ball->m_tPassTargetTimer.GetSeconds();
@@ -4051,7 +4051,7 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
             position = g_pBall->m_v3PassIntercept;
         }
     }
-    else if (ball->meBallState == 5)
+    else if (ball->meBallState == BALL_STATE_VOLLEY_PASS)
     {
         velocity = g_pBall->GetPassTargetFielder()->GetVelocity();
         position = g_pBall->GetPassTargetFielder()->GetPosition();
@@ -4306,7 +4306,7 @@ void cFielder::BeginDekeIntangibility()
             SetPosition(destination);
             if (fixed && overGoal && m_pBall != 0)
             {
-                ReleaseBall(0);
+                ReleaseBall(BALL_STATE_LOOSE);
                 destination.x = AIsgn(destination.x) * (cField::GetGoalLineX(1U) - 0.5f);
                 g_pBall->SetPosition(destination);
                 fn_800156F8(g_pBall, 0);
@@ -4436,12 +4436,12 @@ void cFielder::CleanActionShot(eFielderActionState newAction)
     m_pShotMeter->Abort();
     if (m_DetChar.m_eCharacterClass == BOO && newAction != 33)
         m_fOpacity = 1.0f;
-    if (m_DetChar.m_eCharacterClass == BIRDO && g_pBall->meBallState != 8)
+    if (m_DetChar.m_eCharacterClass == BIRDO && g_pBall->meBallState != BALL_STATE_SKILLSHOT)
     {
         if (gNPCManager->mpBirdoEgg != 0 && gNPCManager->mpBirdoEgg->mVisible)
             gNPCManager->mpBirdoEgg->Hide(false);
     }
-    else if (m_DetChar.m_eCharacterClass == KOOPA && g_pBall->meBallState != 8)
+    else if (m_DetChar.m_eCharacterClass == KOOPA && g_pBall->meBallState != BALL_STATE_SKILLSHOT)
     {
         if (gNPCManager->mpKoopaShell != 0 && gNPCManager->mpKoopaShell->mVisible)
             gNPCManager->mpKoopaShell->Deactivate(false);
@@ -5145,7 +5145,7 @@ void cFielder::TestAnimBallContact()
 {
     if (m_pCurrentAnimController->TestTrigger(m_fOneTimerAnimTime)
         && g_pBall->m_pOwner == 0 && g_pBall->m_tNoPickupTimer.m_uPackedTime == 0
-        && g_pBall->meBallState != 10)
+        && g_pBall->meBallState != BALL_STATE_FALLING)
     {
         nlVector3 newBallPosition;
         g_pBall->m_pPhysicsBall->GetPosition(&newBallPosition);

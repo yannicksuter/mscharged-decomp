@@ -168,7 +168,7 @@ void BulletBillObject::Hide(bool destroyEffect)
         {
             g_pBall->m_pPhysicsBall->EnableCollisions();
             g_pBall->m_bVisible = true;
-            target->ReleaseBall(0);
+            target->ReleaseBall(BALL_STATE_LOOSE);
             target->SetNoPickUpTime(0.2f);
         }
         if (!destroyEffect)

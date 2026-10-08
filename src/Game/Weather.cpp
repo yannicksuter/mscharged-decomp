@@ -944,7 +944,7 @@ void SolarFlare::Update(float value)
         fielder->EndAction();
         if (fielder->m_pBall != 0)
         {
-            fielder->ReleaseBall(0);
+            fielder->ReleaseBall(BALL_STATE_LOOSE);
             g_pBall->SetVelocity(v3Zero, (eSpinType)0, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_zap");
@@ -1401,9 +1401,9 @@ void StormShipWeather::Update(float value)
                 PlaySound(12, 0x900C09E3, 0, 0);
                 float radiusSquared = gStormStrikeRadius * gStormStrikeRadius;
                 if (nlVec3DistanceSquared2D(g_pBall->m_v3Position, v3Zero) < radiusSquared
-                    && g_pBall->m_pOwner == 0 && g_pBall->meBallState != 10 && g_pBall->meBallState != 9)
+                    && g_pBall->m_pOwner == 0 && g_pBall->meBallState != BALL_STATE_FALLING && g_pBall->meBallState != BALL_STATE_LIGHTNING)
                 {
-                    fn_80015C38(g_pBall, 9);
+                    fn_80015C38(g_pBall, BALL_STATE_LIGHTNING);
                 }
             }
         }

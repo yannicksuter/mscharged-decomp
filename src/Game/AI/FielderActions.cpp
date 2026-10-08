@@ -913,7 +913,7 @@ void cFielder::fn_80043ADC()
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         nlVector3 v3Velocity = v3LaunchUp;
         ShootBallDueToContact(v3Velocity);
     }
@@ -1024,7 +1024,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     }
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         g_pBall->SetVelocity(m_DetChar.m_v3Velocity, SPINTYPE_NONE, 0);
     }
 
@@ -1378,7 +1378,7 @@ void cFielder::InitActionElectrocution(const nlVector3& wallPosition,
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
 
         nlVector3 v3BallVelocity;
         nlVec3Set(v3BallVelocity, 0.4f * m_DetChar.m_v3Velocity.x, 0.5f * -m_DetChar.m_v3Position.y, 6.0f);
@@ -1448,7 +1448,7 @@ void cFielder::fn_800451B0(const nlVector3& v3Position)
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
 
         float fSpread = 4.0f;
         nlVector3 v3BallVelocity;
@@ -1670,7 +1670,7 @@ void cFielder::fn_80045AEC(PhysicsObject* pObject)
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             g_pBall->ShootRelease(m_DetChar.m_v3Velocity, SPINTYPE_NONE);
         }
 
@@ -1866,7 +1866,7 @@ void cFielder::fn_80046244()
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             g_pBall->ShootRelease(m_DetChar.m_v3Velocity, SPINTYPE_NONE);
             SetBallFallState(g_pBall);
         }
@@ -2295,7 +2295,7 @@ bool cFielder::fn_80047240(cPlayer* pAttacker, unsigned short aDirection,
 
     if (m_pBall != 0)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         ShootBallDueToContact(pAttacker->m_DetChar.m_v3Velocity);
 
         if (bBookPenalty)
@@ -2575,7 +2575,7 @@ bool cFielder::DoCommonInitActionLooseBall(
 
     float fMaxCatchupSpeed = GetRunningSpeed();
     float fMinBallZ = 100.0f;
-    bool bBallState5 = g_pBall->meBallState == 5;
+    bool bBallState5 = g_pBall->meBallState == BALL_STATE_VOLLEY_PASS;
     bool bNoContactFound = true;
 
     while (fSimulatedTime < fMaxSimulatedTime)
@@ -3734,7 +3734,7 @@ void cFielder::InitActionBombReact(const nlVector3& v3BombPosition,
 
     if (g_pBall->m_pOwner == this)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         ShootBallDueToContact((unsigned short)(s32)nlRandomf(65535.0f));
     }
 
@@ -3830,7 +3830,7 @@ void cFielder::InitActionBananaReact(const nlVector3& fDeltaT)
 
     if (g_pBall->m_pOwner == this)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         ShootBallDueToContact(m_DetChar.m_aActualFacingDirection);
     }
 
@@ -3851,7 +3851,7 @@ void cFielder::InitActionShellReact(const nlVector3& v3CollisionLocation,
 {
     if (g_pBall->m_pOwner == this)
     {
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
 
         if (nlSqrt(v3CollisionVelocity.GetLengthSq3D(), true) > 0.05f)
         {
@@ -4030,9 +4030,9 @@ void cFielder::fn_8004B2E4(float fDeltaT)
         float fScale = lbl_806DB8E4 / nlSqrt(v3Spin.GetLengthSq3D(), true);
         nlVec3Scale(v3Spin, fScale);
 
-        ReleaseBall(0);
+        ReleaseBall(BALL_STATE_LOOSE);
         g_pBall->SetVelocity(v3BallVelocity, SPINTYPE_PARAMETER, &v3Spin);
-        fn_80015C38(g_pBall, 0);
+        fn_80015C38(g_pBall, BALL_STATE_LOOSE);
         g_pBall->SetVelocity(v3BallVelocity, SPINTYPE_PARAMETER, &v3Spin);
         SetNoPickUpTime(0.25f);
 
@@ -4329,7 +4329,7 @@ void cFielder::fn_8004C02C(float fDeltaT)
         {
             DoRegularShooting(false);
 
-            if (g_pBall->meBallState == 8)
+            if (g_pBall->meBallState == BALL_STATE_SKILLSHOT)
             {
                 if (m_DetChar.m_eCharacterClass == DRYBONES)
                 {
@@ -4700,7 +4700,7 @@ void cFielder::InitActionKnockdownReact(const nlVector3& v3CollisionVelocity)
     {
         if (g_pBall->m_pOwner == this)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
             ShootBallDueToContact(v3CollisionVelocity);
         }
 
@@ -4736,7 +4736,7 @@ void cFielder::InitActionSlideAttackReact(cPlayer* pAttacker, bool bSkipEvent)
         if (m_pBall != 0)
         {
             bHadBall = true;
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
 
         InitDesire(
@@ -5072,7 +5072,7 @@ void cFielder::fn_8004E92C()
                 }
                 else
                 {
-                    ReleaseBall(0);
+                    ReleaseBall(BALL_STATE_LOOSE);
                 }
                 EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, 0, 0);
             }
@@ -5087,7 +5087,7 @@ void cFielder::fn_8004E92C()
     {
         if (m_pBall != 0)
         {
-            ReleaseBall(0);
+            ReleaseBall(BALL_STATE_LOOSE);
         }
     }
 }

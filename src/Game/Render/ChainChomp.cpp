@@ -423,7 +423,7 @@ void ChainChomp::CollisionCallback(
         {
             pFielder = (cFielder*)pBall->m_pOwner;
         }
-        if (pFielder == 0 && pBall->meBallState != 10)
+        if (pFielder == 0 && pBall->meBallState != BALL_STATE_FALLING)
         {
             CollisionBallChainData* pData = g_CollisionBallChainDataPool.Allocate();
             pData->pChain = pChainChomp;
