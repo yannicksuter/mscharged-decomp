@@ -28,8 +28,6 @@ union VFSysDeviceTableEntry {
     struct VFSysDeviceBase ram_device;  // offset 0x0, size 0x10
 };
 
-s32 VFSysSetSyncMode(s32 i_handle_idx, u32 i_mode);
-
 static union VFSysDeviceTableEntry* l_vfsys_dev_table[26];
 static struct PDM_INIT_DISK l_dev_init_info_table[26];
 
@@ -41,6 +39,10 @@ static struct MEMiHeapHead* l_vfsys_exp_heap_handle;
 static s32 l_vfsys_last_err;
 static u32 l_vfsys_vol_max;
 
+
+static s32 VFSysCheckExistPrfFile_nandflash(struct VF_HANDLE_DEVICE* i_device_p, const s8* i_prf_file_name_p, void* i_memory_p, u32 i_handle_idx);
+static s32 VFSysCheckExistPrfFile_ram(struct VF_HANDLE_DEVICE* i_device_p, const s8* i_prf_file_name_p, void* i_memory_p, u32 i_handle_idx);
+static s32 VFSysCheckExistPrfFile_dvd(struct VF_HANDLE_DEVICE* i_device_p, const s8* i_prf_file_name_p, void* i_memory_p, u32 i_handle_idx);
 
 static s32 (*l_check_exist_file[4])(struct VF_HANDLE_DEVICE*, const s8*, void*, u32) = {
     VFSysCheckExistPrfFile_nandflash,
@@ -439,7 +441,7 @@ void VFSysInit(void* i_heap_start_address_p, u32 i_size) {
     VFi_InitSDWrok();
 }
 
-void VFSysFinalize() {
+void VFSysFinalize(void) {
     VFSys_destroy_handle_table();
     VFSys_destroy_device_table(l_vfsys_vol_max);
 
