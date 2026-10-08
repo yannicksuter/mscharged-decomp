@@ -225,13 +225,13 @@ void FixedUpdateTask::OnSyncError()
     {
         NetworkStatsManager::Instance()->CalculateAndReportGameResult(2);
     }
-    g_pNetworkSession->PopupNetworkError(1);
+    g_pNetworkSession->PopupNetworkError(NET_ERROR_SYNC);
 }
 
 void FixedUpdateTask::OnInputQueueOverflow()
 {
     NetworkStatsManager::Instance()->CalculateAndReportGameResult(4);
-    g_pNetworkSession->PopupNetworkError(2);
+    g_pNetworkSession->PopupNetworkError(NET_ERROR_QUEUE_OVERFLOW);
 }
 
 u16 FixedUpdateTask::GetInputRemapAngle()

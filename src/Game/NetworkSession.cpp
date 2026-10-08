@@ -155,7 +155,7 @@ void NetworkSession::Initialize(bool first)
     mSecondGameRandomSeed = 0;
     mThirdGameRandomSeed = 0;
     mOverlayRequest = 3;
-    mPoppedOverlay = 3;
+    mPoppedOverlay = NET_ERROR_NONE;
 }
 
 void NetworkSession::SendTournamentStartToEveryone()
@@ -512,7 +512,7 @@ static inline void PopupNetworkErrorOverlay(
     {
         return;
     }
-    if (session->mPoppedOverlay != 3)
+    if (session->mPoppedOverlay != NET_ERROR_NONE)
     {
         tDebugPrintManager::Print(DC_NETWORK,
             "Ignored overlayRequest %d because already popped overlay %d\n",

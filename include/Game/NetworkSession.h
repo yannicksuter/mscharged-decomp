@@ -17,6 +17,14 @@
 
 #include <dwc/dwc_main_fwd.h>
 
+enum eNetworkErrorOverlay
+{
+    NET_ERROR_CONNECTION_LOST = 0,
+    NET_ERROR_SYNC = 1,
+    NET_ERROR_QUEUE_OVERFLOW = 2,
+    NET_ERROR_NONE = 3,
+};
+
 enum eNetworkSessionMode
 {
     NET_MODE_LOCAL = 0,
