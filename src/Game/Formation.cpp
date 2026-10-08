@@ -759,7 +759,7 @@ void FormationEval::SortPlayers(const nlVector2* v2Center)
     for (i = 0; i < 4; i++)
     {
         pFielder = team->GetFielder(i);
-        if (ReceivingPass(pFielder) && g_pBall->UnidentifiedHasPassTarget())
+        if (ReceivingPass(pFielder) && g_pBall->HasPassTarget())
         {
             av3FielderAILocs[i] = g_pBall->m_v3PassIntercept;
         }

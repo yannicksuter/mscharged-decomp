@@ -10,26 +10,26 @@ enum eDesireUpdateResult
     DESIRE_CHANGE = 3,
 };
 
-class UnidentifiedFuzzyVariantData : public FuzzyVariant
+class IndexedFuzzyVariant : public FuzzyVariant
 {
 public:
-    UnidentifiedFuzzyVariantData()
+    IndexedFuzzyVariant()
         : FuzzyVariant()
         , mIndex(-1)
     {
     }
 
-    UnidentifiedFuzzyVariantData(
+    IndexedFuzzyVariant(
         int index, FuzzyVariant value);
 
-    ~UnidentifiedFuzzyVariantData()
+    ~IndexedFuzzyVariant()
     {
     }
 
     static void operator delete(void* entry);
 
-    UnidentifiedFuzzyVariantData& operator=(
-        const UnidentifiedFuzzyVariantData& other)
+    IndexedFuzzyVariant& operator=(
+        const IndexedFuzzyVariant& other)
     {
         FuzzyVariant::operator=(other);
         mIndex = other.mIndex;
@@ -39,11 +39,11 @@ public:
     int mIndex;
 };
 
-class UnidentifiedVariantCollection
+class FuzzyVariantCollection
 {
 public:
-    UnidentifiedVariantCollection();
-    ~UnidentifiedVariantCollection();
+    FuzzyVariantCollection();
+    ~FuzzyVariantCollection();
 
     bool IsSet(int index) const;
     FuzzyVariant* Get(int index);
@@ -62,10 +62,10 @@ public:
         Set(index, FuzzyVariant(value));
     }
 
-    UnidentifiedVariantCollection& operator=(
-        const UnidentifiedVariantCollection& other);
+    FuzzyVariantCollection& operator=(
+        const FuzzyVariantCollection& other);
 
-    UnidentifiedFuzzyVariantData* mData[19];
+    IndexedFuzzyVariant* mData[19];
 };
 
 class DesireUpdate : public FuzzyVariant
@@ -131,7 +131,7 @@ public:
     void SetParameter(int index, FuzzyVariant value);
 
     Variant* GetParameter(int index) { return ExtraData.Get(index); }
-    UnidentifiedVariantCollection* GetParameters() { return &ExtraData; }
+    FuzzyVariantCollection* GetParameters() { return &ExtraData; }
     bool IsParameterSet(int index) const { return ExtraData.IsSet(index); }
 
     int GetInt() const
@@ -147,7 +147,7 @@ public:
         return -1;
     }
 
-    float UnidentifiedGetFloat(int index)
+    float GetFloatParameter(int index)
     {
         if (ExtraData.IsSet(index))
             return ExtraData.Get(index)->mData.f;
@@ -155,7 +155,7 @@ public:
     }
 
     DesireUpdate* next;
-    UnidentifiedVariantCollection ExtraData;
+    FuzzyVariantCollection ExtraData;
     bool mTemporary;
 };
 
@@ -186,7 +186,7 @@ public:
 
 extern DesireUpdate lbl_80584250;
 
-extern SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
+extern SlotPool<IndexedFuzzyVariant> lbl_80584200;
 extern SlotPool<ScriptActionQueue> g_ScriptActionQueuePool;
 extern SlotPool<DesireUpdate> lbl_805842C8;
 
@@ -204,13 +204,13 @@ inline DesireUpdate::DesireUpdate(
         ExtraData.Set(6, fParam2);
 }
 
-inline void UnidentifiedFuzzyVariantData::operator delete(void* entry)
+inline void IndexedFuzzyVariant::operator delete(void* entry)
 {
-    lbl_80584200.DeleteEntry((UnidentifiedFuzzyVariantData*)entry);
+    lbl_80584200.DeleteEntry((IndexedFuzzyVariant*)entry);
 }
 
-inline UnidentifiedVariantCollection& UnidentifiedVariantCollection::operator=(
-    const UnidentifiedVariantCollection& other)
+inline FuzzyVariantCollection& FuzzyVariantCollection::operator=(
+    const FuzzyVariantCollection& other)
 {
     for (int i = 0; i < 19; i++)
     {
@@ -219,7 +219,7 @@ inline UnidentifiedVariantCollection& UnidentifiedVariantCollection::operator=(
             if (mData[i] == 0)
             {
                 mData[i] = new (lbl_80584200.Allocate())
-                    UnidentifiedFuzzyVariantData(
+                    IndexedFuzzyVariant(
                         i, (const FuzzyVariant&)*other.mData[i]);
             }
             else

@@ -2247,7 +2247,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
         if (eventData->pPatch->m_pOwner != this
             && !IsStuck() && !IsInvincible())
         {
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             params.Set(7, FuzzyVariant(gGasConfusionDuration));
             ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1E, &params,
                 IsConcurrentStateActive(m_pAIContext->mScriptMachine, 0x1E));
@@ -2273,7 +2273,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             && !IsInFallAction() && !IsInvincible())
         {
             PhysicsPatchInfo* info = GetPhysicsPatchInfo(type);
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             if (type == 5)
             {
                 params.Set(0, FuzzyVariant(info->mFriction));
@@ -2343,7 +2343,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
             {
                 return;
             }
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             params.Set(14, FuzzyVariant(pOwner));
             ActivateConcurrentState(m_pAIContext->mScriptMachine, 0x1C, &params, false);
         }
@@ -2423,7 +2423,7 @@ void cFielder::CollideWithPatchCallback(const CollisionPatchData* eventData)
 void cFielder::ClearPassTargetIfAmThePassTarget()
 {
     cBall* pBall = g_pBall;
-    if (pBall->UnidentifiedHasPassTarget())
+    if (pBall->HasPassTarget())
     {
         if (pBall->m_pPassTarget == this)
         {
@@ -2618,7 +2618,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         }
         if (m_DetChar.m_eCharacterClass == (eCharacterClass)8)
         {
-            m_pHeadTrack->UnidentifiedReset();
+            m_pHeadTrack->Reset();
             ClearPhysicsPatchesOfType(6);
         }
         break;
@@ -4045,7 +4045,7 @@ float cFielder::CalcSlideAttackBallIntercept(nlVector3& target, int direction)
                 target, interceptVelocity, interceptTime, closestDistance, maxTime)
             && target.z < 0.5f)
             return interceptTime;
-        if (g_pBall->UnidentifiedHasPassTarget())
+        if (g_pBall->HasPassTarget())
         {
             velocity = v3Zero;
             position = g_pBall->m_v3PassIntercept;
@@ -5050,7 +5050,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                 if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
                     && m_pTeam->mfBallInTimes[m_DetPlayer.m_ID] <= gLooseBallContactBufferTime)
                 {
-                    UnidentifiedVariantCollection parameters;
+                    FuzzyVariantCollection parameters;
                     parameters.Set(7, FuzzyVariant(0.1f + gLooseBallContactBufferTime));
                     parameters.Set(14, FuzzyVariant(g_pBall));
                     parameters.Set(16, FuzzyVariant(volley));
@@ -5071,7 +5071,7 @@ void cFielder::TestLooseBallControls(bool forceContact)
                 if (m_eActionState != ACTION_LOOSE_BALL_PASS && m_eActionState != ACTION_LOOSE_BALL_SHOT
                     && m_pTeam->mfBallInTimes[m_DetPlayer.m_ID] <= gLooseBallContactBufferTime)
                 {
-                    UnidentifiedVariantCollection parameters;
+                    FuzzyVariantCollection parameters;
                     parameters.Set(7, FuzzyVariant(0.1f + gLooseBallContactBufferTime));
                     parameters.Set(14, FuzzyVariant(g_pBall));
                     parameters.Set(16, FuzzyVariant(modified));
@@ -5347,7 +5347,7 @@ void cFielder::UpdateTimers(float deltaTime)
     }
 }
 
-bool cFielder::ActivateDesire(int state, UnidentifiedVariantCollection* parameters)
+bool cFielder::ActivateDesire(int state, FuzzyVariantCollection* parameters)
 {
     return m_pAIContext->mScriptMachine->ActivateState(state, parameters, true) != 0;
 }
@@ -5355,7 +5355,7 @@ bool cFielder::ActivateDesire(int state, UnidentifiedVariantCollection* paramete
 bool cFielder::InitDesire(eFielderDesireState eDesireType, float fConfidence,
     float fDuration, const FuzzyVariant& opt1, const FuzzyVariant& opt2)
 {
-    UnidentifiedVariantCollection params;
+    FuzzyVariantCollection params;
     params.Set(7, FuzzyVariant(fDuration));
     params.Set(4, FuzzyVariant(fConfidence));
     params.Set(0, FuzzyVariant(opt1));

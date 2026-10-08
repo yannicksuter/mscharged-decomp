@@ -55,7 +55,7 @@ public:
     virtual void Evaluate(
         nlVector3&, float, const nlVector3&) const = 0;
 
-    void UnidentifiedReset()
+    void Reset()
     {
         mWriteIndex = 0;
         mOldestIndex = 0;

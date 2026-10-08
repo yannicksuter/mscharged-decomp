@@ -65,14 +65,14 @@ struct FuzzyParameterList
     FuzzyParameterEntry* mTail;
 };
 
-class UnidentifiedFuzzyRuntimeValue : public FuzzyVariant
+class FuzzyRuntimeContext : public FuzzyVariant
 {
 public:
     FuzzyRuntimeBase* GetRuntime();
 
     FuzzyRuntimeBase* mRuntime;
     u32 mUnidentified018;
-    UnidentifiedVariantCollection ExtraData;
+    FuzzyVariantCollection ExtraData;
 };
 
 class FuzzyRuntimeBase : public InterpreterCore
@@ -86,8 +86,8 @@ public:
     virtual float FuzzyEqual(float, float);
     virtual float FLESS(float, float);
     virtual float FuzzyNot(float);
-    virtual float UnidentifiedVirtual6(float);
-    virtual float UnidentifiedVirtual7(float, float, float, bool);
+    virtual float GetBranchRatio(float);
+    virtual float UpdateBranchConfidence(float, float, float, bool);
     virtual float BeginActionQueue();
     virtual DesireUpdate* EndActionQueue();
     virtual float BeginConfidenceScope(float);
@@ -114,7 +114,7 @@ public:
     unsigned long mFunctionHash;
     bool mCaptureReturnValue;
     u8 mPadding061[3];
-    UnidentifiedFuzzyRuntimeValue* mCurrentContext;
+    FuzzyRuntimeContext* mCurrentContext;
 };
 
 class FuzzyAIRuntime : public FuzzyRuntimeBase
@@ -157,7 +157,7 @@ extern "C" int FuzzyFindParameterIndex(unsigned long hash);
 // current value and returns the result variant it leaves on the stack.
 DesireUpdate* ExecuteScriptFunction(
     FuzzyRuntimeBase* runtime, u32 hash,
-    UnidentifiedFuzzyRuntimeValue* action);
+    FuzzyRuntimeContext* action);
 extern "C" FuzzyRuntimeBase* FuzzyAIGetFielderRuntime(cFielder*);
 
 

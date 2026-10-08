@@ -38,8 +38,8 @@ static int sContinueDesire = DESIRE_CONTINUE;
  */
 bool DesirePreparePass::Initialize(void* context)
 {
-    UnidentifiedVariantCollection* params =
-        (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params =
+        (FuzzyVariantCollection*)context;
     mpPassTarget = params->Get(14)->mData.pPlayer;
     mbVolleyPass = params->Get(16)->mData.b;
     if (mpPassTarget == 0)
@@ -147,8 +147,8 @@ void DesirePreparePass::Cleanup()
 bool DesirePass::Initialize(void* context)
 {
     bool result = true;
-    UnidentifiedVariantCollection* params =
-        (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params =
+        (FuzzyVariantCollection*)context;
     Variant* pParam;
     if (params->IsSet(14))
     {
@@ -217,8 +217,8 @@ void DesirePass::Cleanup()
  * Offset/Address/Size: 0x9E4 | 0x800BAF60 | size: 0xCC8
  */
 DesireUpdate TransDesireLooseBallContact(
-    UnidentifiedFuzzyRuntimeValue* fielderValue,
-    UnidentifiedFuzzyRuntimeValue* action)
+    FuzzyRuntimeContext* fielderValue,
+    FuzzyRuntimeContext* action)
 {
     DesireUpdate result(FT_INT, sContinueDesire);
     if (g_pBall->m_pOwner != 0)

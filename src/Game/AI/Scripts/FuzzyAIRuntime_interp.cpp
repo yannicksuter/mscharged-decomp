@@ -1303,7 +1303,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 127:
     {
         float arg0 = ((float*)m_SP)[-1];
-        ((float*)m_SP)[-1] = UnidentifiedVirtual6(arg0);
+        ((float*)m_SP)[-1] = GetBranchRatio(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1317,7 +1317,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-3];
         float arg0 = ((float*)m_SP)[-4];
         m_SP -= 3;
-        ((float*)m_SP)[-1] = UnidentifiedVirtual7(arg0, arg1, arg2, arg3);
+        ((float*)m_SP)[-1] = UpdateBranchConfidence(arg0, arg1, arg2, arg3);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;

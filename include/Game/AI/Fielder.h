@@ -173,12 +173,12 @@ struct ActBooSkillshot
 };
 
 class FuzzyVariant;
-class UnidentifiedVariantCollection;
+class FuzzyVariantCollection;
 class AvoidController;
 class cPN_SingleAxisBlender;
 class DesireSteering;
 class DesireUserControlled;
-class UnidentifiedDesire35;
+class DesireWaluigiWall;
 class DesireSuperPower;
 extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
@@ -218,7 +218,7 @@ class cFielder : public cPlayer
     void RegisterActWarioSuperFields(unsigned short* type, DebugWriteCache* cache);
     friend void fn_800C5DBC(DesireSteering*, float);
     friend void fn_800C6FDC(DesireSteering*, float);
-    friend class UnidentifiedDesire35;
+    friend class DesireWaluigiWall;
     friend class DesireUserControlled;
     friend class DesireSuperPower;
     friend class DesireUsePowerup;
@@ -229,7 +229,7 @@ class cFielder : public cPlayer
 
 public:
     bool CanReactToGroundEffects() const;
-    bool ActivateDesire(int state, UnidentifiedVariantCollection* parameters);
+    bool ActivateDesire(int state, FuzzyVariantCollection* parameters);
     const nlVector3& GetDesiredPosition();
     const nlVector3& GetDesiredVelocity();
 

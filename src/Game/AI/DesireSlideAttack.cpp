@@ -22,8 +22,8 @@ bool DesireSlideAttack::Initialize(void* context)
     bool result = Desire::Initialize(context);
     UserControlledT(m_pFielder->m_pTeam);
 
-    UnidentifiedVariantCollection* params
-        = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params
+        = (FuzzyVariantCollection*)context;
     mpTarget = (cFielder*)params->Get(14)->mData.pPlayer;
     if (mpTarget == NULL)
     {

@@ -54,7 +54,7 @@ FuzzyRuntimeBase* ScriptMachine::GetFuzzyRuntime()
     return mAIContext->mRuntime;
 }
 
-FuzzyRuntimeBase* UnidentifiedFuzzyRuntimeValue::GetRuntime()
+FuzzyRuntimeBase* FuzzyRuntimeContext::GetRuntime()
 {
     return mRuntime;
 }
@@ -324,7 +324,7 @@ extern "C" DesireUpdate* ExecuteFuzzyFunction(
 
 DesireUpdate* ExecuteScriptFunction(
     FuzzyRuntimeBase* runtime, u32 hash,
-    UnidentifiedFuzzyRuntimeValue* action)
+    FuzzyRuntimeContext* action)
 {
     if (runtime->mAIContext->IsPointerType())
     {
@@ -378,7 +378,7 @@ float FuzzyRuntimeBase::FuzzyNot(float value)
     return 1.0f - value;
 }
 
-float FuzzyRuntimeBase::UnidentifiedVirtual6(float value)
+float FuzzyRuntimeBase::GetBranchRatio(float value)
 {
     float inverse = 1.0f - value;
     float minimum = value <= inverse ? value : inverse;
@@ -386,7 +386,7 @@ float FuzzyRuntimeBase::UnidentifiedVirtual6(float value)
     return minimum / maximum;
 }
 
-float FuzzyRuntimeBase::UnidentifiedVirtual7(
+float FuzzyRuntimeBase::UpdateBranchConfidence(
     float first, float second, float third, bool)
 {
     third = third <= first ? third : first;

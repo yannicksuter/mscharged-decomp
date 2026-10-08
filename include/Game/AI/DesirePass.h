@@ -3,7 +3,7 @@
 
 #include "Game/AI/Desire.h"
 
-class UnidentifiedFuzzyRuntimeValue;
+class FuzzyRuntimeContext;
 
 class DesirePreparePass : public Desire
 {
@@ -46,7 +46,7 @@ private:
 };
 
 DesireUpdate TransDesireLooseBallContact(
-    UnidentifiedFuzzyRuntimeValue* fielder,
-    UnidentifiedFuzzyRuntimeValue* action);
+    FuzzyRuntimeContext* fielder,
+    FuzzyRuntimeContext* action);
 
 #endif // GAME_AI_DESIREPASS_H

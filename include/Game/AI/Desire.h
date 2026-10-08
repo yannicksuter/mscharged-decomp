@@ -505,7 +505,7 @@ inline void Desire::RegisterDebugFields(void*, DebugWriteCache* cache)
 }
 
 int GetStateMachineState(const shdStateMachine*);
-UnidentifiedVariantCollection* GetStateMachineParameters(shdStateMachine*);
+FuzzyVariantCollection* GetStateMachineParameters(shdStateMachine*);
 float GetRunInDirectionMaxDistance(const DesireRunInDirection*);
 float GetRunInDirectionDistanceTravelled(const DesireRunInDirection*);
 

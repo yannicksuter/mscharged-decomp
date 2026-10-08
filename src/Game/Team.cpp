@@ -778,7 +778,7 @@ void cTeam::CalculateNewBallInterceptTimes()
                 }
                 else
                 {
-                    if (g_pBall->UnidentifiedHasPassTarget())
+                    if (g_pBall->HasPassTarget())
                     {
                         mvBallInterceptPosition[i]
                             = g_pBall->m_v3PassIntercept;

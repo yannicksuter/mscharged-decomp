@@ -17,10 +17,10 @@ ScriptTransitionFunc::ScriptTransitionFunc(const char* name)
 }
 
 typedef DesireUpdate (*NativeTransitionFuncPtr)(
-    AIContext*, UnidentifiedFuzzyRuntimeValue*);
+    AIContext*, FuzzyRuntimeContext*);
 
 void TransitionFunc::Execute(AIContext* input,
-    DesireUpdate* result, UnidentifiedFuzzyRuntimeValue* context)
+    DesireUpdate* result, FuzzyRuntimeContext* context)
 {
     if (mNativeFunc != 0)
     {

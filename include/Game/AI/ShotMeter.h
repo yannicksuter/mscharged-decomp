@@ -58,7 +58,7 @@ public:
     {
         return m_fShotDuration;
     }
-    bool UnidentifiedIsCharging() const
+    bool IsCharging() const
     {
         return m_eShotMeterState == SHOT_METER_ACTIVE
             || m_eShotMeterState == SHOT_METER_STS_ACTIVE;

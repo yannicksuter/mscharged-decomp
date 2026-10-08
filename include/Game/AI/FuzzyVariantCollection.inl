@@ -3,7 +3,7 @@
 
 #include "Game/AI/DesireUpdate.h"
 
-inline UnidentifiedFuzzyVariantData::UnidentifiedFuzzyVariantData(int index, FuzzyVariant value)
+inline IndexedFuzzyVariant::IndexedFuzzyVariant(int index, FuzzyVariant value)
     : FuzzyVariant(value)
     , mIndex(index)
 {

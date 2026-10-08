@@ -283,7 +283,7 @@ float SSearchOpenLane::EvaluatePosition(const nlVector3& position,
             0.0f);
         fTotalWeight += 1.0f;
 
-        const nlVector3& v3Ball = g_pBall->UnidentifiedHasPassTarget()
+        const nlVector3& v3Ball = g_pBall->HasPassTarget()
                                     ? g_pBall->m_v3PassIntercept
                                     : g_pBall->m_v3Position;
         nlVector2 v2Delta = { position.x - v3Ball.x, position.y - v3Ball.y };

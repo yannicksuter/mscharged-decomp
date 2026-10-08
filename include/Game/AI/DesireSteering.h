@@ -89,10 +89,10 @@ private:
 };
 
 
-class UnidentifiedDesire35 : public Desire
+class DesireWaluigiWall : public Desire
 {
 public:
-    UnidentifiedDesire35()
+    DesireWaluigiWall()
         : Desire(35, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }

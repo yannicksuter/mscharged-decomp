@@ -32,9 +32,9 @@ RegistryNode* DynamicRegistryContainer::AddNamed(
     return node;
 }
 
-void DynamicRegistryContainer::UnidentifiedVirtual34() {}
+void DynamicRegistryContainer::RegistryContainerVirtual34() {}
 
-void DynamicRegistryContainer::UnidentifiedVirtual38() {}
+void DynamicRegistryContainer::RegistryContainerVirtual38() {}
 
 RegistryContainer* DynamicRegistryContainer::AddChild(
     const char* name)

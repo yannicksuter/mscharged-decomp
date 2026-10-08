@@ -185,7 +185,7 @@ void FielderDesireMachine::Initialize()
     DesireSteering* steering = new (8, false) DesireSteering();
     AddState(34, steering, true);
 
-    UnidentifiedDesire35* desire35 = new (8, false) UnidentifiedDesire35();
+    DesireWaluigiWall* desire35 = new (8, false) DesireWaluigiWall();
     AddState(35, desire35, true);
 }
 
@@ -240,7 +240,7 @@ void FielderDesireMachine::Update(float deltaTime)
         && !UserControlledT(GetFielder()->m_pTeam)
         && !IsConcurrentStateActive(this, 17) && fn_800D85F8(GetFielder()))
     {
-        UnidentifiedVariantCollection params;
+        FuzzyVariantCollection params;
         params.Set(10, FuzzyVariant(FT_POINTER, (void*)TransDesireUsePowerup));
         ActivateConcurrentState(this, 17, &params, false);
     }
@@ -258,7 +258,7 @@ void FielderDesireMachine::Update(float deltaTime)
 void FielderDesireMachine::SelectState()
 {
     int state = 0;
-    UnidentifiedVariantCollection params;
+    FuzzyVariantCollection params;
     cFielder* fielder = GetFielder();
 
     if (gForceUserControl
@@ -354,7 +354,7 @@ void FielderDesireMachine::SelectState()
  * Offset/Address/Size: 0x1390 | 0x800D61BC | size: 0x18
  */
 shdStateMachine* FielderDesireMachine::ActivateState(
-    int state, UnidentifiedVariantCollection* params, bool force)
+    int state, FuzzyVariantCollection* params, bool force)
 {
     if (state == 17)
     {

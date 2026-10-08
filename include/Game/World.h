@@ -33,7 +33,7 @@ public:
     virtual void UpdateAnimations(float fDeltaT);
     virtual DrawableObject* HandleObjectCreation(
         unsigned long uType, WorldObjectLoadContext* pContext) = 0;
-    virtual void UnidentifiedVirtual20() { }
+    virtual void OnBeforeUnload() { }
     virtual void HandleUnknownChunk(nlChunk* pChunk);
 
     void AddDrawableObject(DrawableObject* pDrawableObject);

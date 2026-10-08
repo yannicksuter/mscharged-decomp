@@ -1178,7 +1178,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             nlVec3Sub(direction, pos, m_pFielder->m_DetChar.m_v3Position);
             float distance = nlVec2Length((const nlVector2&)direction);
             unsigned short angle = nlATan2Angle(direction.y, direction.x);
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             params.Set(7, FuzzyVariant(gFollowPathTimeLimit));
             params.Set(17, FuzzyVariant((unsigned long)angle));
             params.Set(18, FuzzyVariant(distance));
@@ -1207,7 +1207,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             unsigned short angle = angles[ChooseRunDirection(m_pFielder, angles, 4, &direction, &score)];
             if (score > 0.0f)
             {
-                UnidentifiedVariantCollection params;
+                FuzzyVariantCollection params;
                 params.Set(7, FuzzyVariant(gChooseDirectionTimeLimit));
                 params.Set(17, FuzzyVariant((unsigned long)angle));
                 params.Set(18, FuzzyVariant(gChooseDirectionMaxDistance));
@@ -1221,7 +1221,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             && NearToBall(fn_800D66A0(m_pFielder)) < 0.35f
             && FarToBall(m_pFielder) < 0.35f)
         {
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             params.Set(7, FuzzyVariant(gInterceptBallTimeLimit));
             params.Set(14, FuzzyVariant(g_pBall));
             params.Set(13, FuzzyVariant(gInterceptBallSpeed));
@@ -1297,7 +1297,7 @@ DesireUpdate DesireSuperPower::FollowPathTransition(
     return DesireUpdate(result, -1.0f, -1.0f);
 }
 
-struct UnidentifiedFielderRef
+struct FielderRef
 {
     cFielder* mFielder;
 };
@@ -1308,11 +1308,11 @@ DesireUpdate DesireSuperPower::ChooseDirectionTransition(
     DesireUpdate result(FT_INT, gChooseDirectionContinueResult);
     if (machine->GetState() != 12)
         return DesireUpdate(FT_INT, gChooseDirectionFinishedResult);
-    UnidentifiedFielderRef fielder = { (cFielder*)value.mData.pointer };
+    FielderRef fielder = { (cFielder*)value.mData.pointer };
     GetFielderDesire(fielder.mFielder, 23);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
-    float danger = CallFielderFuzzyFunction(((UnidentifiedFuzzyRuntimeValue*)&value)->GetRuntime(),
+    float danger = CallFielderFuzzyFunction(((FuzzyRuntimeContext*)&value)->GetRuntime(),
         fielder.mFielder, "InDangerForMegastrike").mData.f;
     float question = fn_800DBB0C(fielder.mFielder);
     bool good = ((1.0f - danger) / 2.0f + question / 2.0f) > 0.75f;
@@ -1583,7 +1583,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         nlVec3Sub(delta, pos, m_pFielder->m_DetChar.m_v3Position);
                         float distance = nlSqrt(delta.GetLengthSq2D(), true);
                         unsigned short angle = nlATan2Angle(delta.y, delta.x);
-                        UnidentifiedVariantCollection params;
+                        FuzzyVariantCollection params;
                         params.Set(7, FuzzyVariant(gWarioRunTimeLimit));
                         params.Set(17, FuzzyVariant((unsigned long)angle));
                         params.Set(18, FuzzyVariant(distance));

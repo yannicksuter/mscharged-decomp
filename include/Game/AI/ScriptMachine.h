@@ -19,7 +19,7 @@ public:
     virtual void Update(float deltaTime);
     virtual void Reset(bool deleting);
     virtual shdStateMachine* ActivateState(
-        int state, UnidentifiedVariantCollection* parameters, bool reinitialize);
+        int state, FuzzyVariantCollection* parameters, bool reinitialize);
     virtual void DeactivateState();
     virtual void SelectState();
     virtual void OnBudgetCheckFailed()
@@ -50,7 +50,7 @@ public:
     shdStateMachine* mPreviousState;
     UnsetTransitionFunc mTransition;
     int mPendingState;
-    UnidentifiedVariantCollection mPendingParameters;
+    FuzzyVariantCollection mPendingParameters;
     AIContext* mAIContext;
     bool mOwnsStates;
     u8 mPadding069[3];
@@ -65,7 +65,7 @@ AIContext* GetScriptMachineAIContext(ScriptMachine* machine);
 bool HasStateMachineTimedOut(const shdStateMachine* machine);
 DesireUpdate ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument);
 DesireUpdate ExecuteScriptStateFunction(FuzzyRuntimeBase* runtime, const u32& hash, void* argument, float value);
-void QueueScriptMachineState(ScriptMachine* machine, int state, const UnidentifiedVariantCollection* parameters);
+void QueueScriptMachineState(ScriptMachine* machine, int state, const FuzzyVariantCollection* parameters);
 
 extern const float gStateMachineZeroDuration;
 extern const float gStateMachineUnsetDuration;
@@ -78,7 +78,7 @@ void AddScriptState(ScriptMachine* machine, int state, const char* name, bool co
 void DeactivateConcurrentStates(ScriptMachine* machine);
 void DeactivateScriptMachine(ScriptMachine* machine);
 void DeactivateConcurrentState(ScriptMachine* machine, int state);
-shdStateMachine* ActivateConcurrentState(ScriptMachine* machine, int state, UnidentifiedVariantCollection* parameters, bool reinitialize);
+shdStateMachine* ActivateConcurrentState(ScriptMachine* machine, int state, FuzzyVariantCollection* parameters, bool reinitialize);
 shdStateMachine* GetScriptMachineState(ScriptMachine* machine, int state);
 shdStateMachine* GetConcurrentState(ScriptMachine* machine, int state);
 bool IsConcurrentStateActive(ScriptMachine* machine, int state);

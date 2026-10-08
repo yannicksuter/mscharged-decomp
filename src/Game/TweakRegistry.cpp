@@ -45,7 +45,7 @@ TweakPendingValue* gPendingTweakTail;
 
 void ResetDynamicTweaks(void)
 {
-    UnidentifiedStaticStorageScope scope;
+    SharedStaticStorageScope scope;
     RemoveDynamicTweakChildren(&sTweakRootEntry);
     RecycleTweakNames();
     gTweakNamePool.FreeBlocks();

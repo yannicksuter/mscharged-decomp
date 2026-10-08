@@ -13,7 +13,7 @@ bool DesireHit::Initialize(void* context)
     bool initialized = Desire::Initialize(context);
     UserControlledT(m_pFielder->m_pTeam);
     m_pFielder->InitActionHit(
-        (cFielder*)((UnidentifiedVariantCollection*)context)->Get(14)->mData.pPlayer,
+        (cFielder*)((FuzzyVariantCollection*)context)->Get(14)->mData.pPlayer,
         GetFielder()->GetActualFacing());
     return initialized;
 }

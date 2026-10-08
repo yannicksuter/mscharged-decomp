@@ -22,10 +22,10 @@ class WorldUpdateObject
 {
 public:
     virtual ~WorldUpdateObject();
-    virtual void UnidentifiedVirtual0C();
-    virtual void UnidentifiedVirtual10();
-    virtual void UnidentifiedVirtual14();
-    virtual void UnidentifiedVirtual18();
+    virtual void ReleaseResources();
+    virtual void GetWorldMatrix();
+    virtual void SetWorldMatrix();
+    virtual void OnWorldLoaded();
     virtual void Update(float fDeltaT);
 };
 
@@ -74,7 +74,7 @@ World::~World()
     }
 
     mWorldAnimManager.fn_80342324();
-    UnidentifiedVirtual20();
+    OnBeforeUnload();
     mWorldAnimManager.Clear();
     if (m_pOwnedData != 0)
     {
@@ -370,7 +370,7 @@ void World::InitializeObjects()
     DrawableIterator* pIterator = m_drawableMap.GetIterator();
     while (pIterator->IsValid())
     {
-        pIterator->Current()->value->UnidentifiedVirtual18(this);
+        pIterator->Current()->value->OnWorldLoaded(this);
         pIterator->Next();
     }
     if (pIterator != 0)

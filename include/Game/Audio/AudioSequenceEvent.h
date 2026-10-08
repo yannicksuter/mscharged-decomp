@@ -83,7 +83,7 @@ struct AudioSequenceEvent
     virtual void Resume() = 0;
     virtual int Update(float time) = 0;
     virtual void SequenceEventVirtual24() { }
-    virtual void UnidentifiedVirtual28() { }
+    virtual void SequenceEventVirtual28() { }
     virtual u32 GetSources(AudioSource** results) { return 0; }
 
     static AudioSequenceEvent* Create(AudioSequenceInstance* owner,

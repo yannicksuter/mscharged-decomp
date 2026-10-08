@@ -120,7 +120,7 @@ bool DesireRunInDirection::Initialize(void* context)
     m_aDirection = 0;
     m_eFieldDirection = DIR_NONE;
     bool initialized = true;
-    UnidentifiedVariantCollection* parameters = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* parameters = (FuzzyVariantCollection*)context;
 
     if (parameters->IsSet(14))
     {
@@ -225,7 +225,7 @@ bool DesireRunToTarget::Initialize(void* context)
     m_fUrgency = 2.0f;
     m_fAvoidanceCoeff = 1.0f;
     GetStateMachineAIContext(this)->SetTimer(1, 0.0f);
-    UnidentifiedVariantCollection* parameters = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* parameters = (FuzzyVariantCollection*)context;
 
     if (parameters->IsSet(17))
     {

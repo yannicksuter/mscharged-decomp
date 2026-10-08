@@ -36,7 +36,7 @@ public:
     virtual void OnGameJoined(int result);
     virtual void OnGameLaunched(int result);
     virtual void OnGameFound(LANGameInfo* game) { }
-    virtual void UnidentifiedVirtual10() { }
+    virtual void LobbyListenerVirtual10() { }
     virtual void OnGameExpired(LANGameInfo* game) { }
     virtual void OnLobbyShutdown() { }
 

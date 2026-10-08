@@ -88,10 +88,10 @@ struct DetChar
     void SyncLog(void* context, DebugWriteCache* cache);
     DetChar()
     {
-        UnidentifiedReset();
+        Reset();
     }
 
-    void UnidentifiedReset()
+    void Reset()
     {
         m_eMovementState = MOVEMENT_NONE;
         m_aDesiredFacingDirection = 0;

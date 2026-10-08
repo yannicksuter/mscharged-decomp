@@ -15,11 +15,11 @@ public:
     void SyncLog(void* context, DebugWriteCache* cache);
     cHeadTrack()
     {
-        UnidentifiedReset();
+        Reset();
     }
     virtual ~cHeadTrack() { }
 
-    void UnidentifiedReset()
+    void Reset()
     {
         m_m4HeadMatrix.SetIdentity();
         nlVec3Set(m_v3OOI, 0.0f, 0.0f, 0.0f);

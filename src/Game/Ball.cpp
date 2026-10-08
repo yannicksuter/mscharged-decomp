@@ -511,7 +511,7 @@ void cBall::CollideWithCharacterCallback(
     }
 
     if (m_tShotTimer.m_uPackedTime != 0
-        || UnidentifiedHasPassTarget())
+        || HasPassTarget())
     {
         if (pCharacter->m_eClassType == FIELDER)
         {
@@ -737,7 +737,7 @@ static inline void fn_80014494Impl(cBall* pBall)
         return;
     }
 
-    bool bPassTarget = pBall->UnidentifiedHasPassTarget();
+    bool bPassTarget = pBall->HasPassTarget();
     if (bPassTarget)
     {
         if (ReceivingPass((cFielder*)pBall->m_pPassTarget))

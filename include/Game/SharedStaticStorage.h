@@ -23,9 +23,9 @@
 // the GameCube predecessor (which has no guarded statics at all) carry no
 // evidence for any of them.
 
-struct UnidentifiedStaticState
+struct SharedStaticState
 {
-    UnidentifiedStaticState()
+    SharedStaticState()
         : value(0)
     {
     }
@@ -34,26 +34,26 @@ struct UnidentifiedStaticState
 };
 
 template <typename T>
-struct UnidentifiedStaticStorage
+struct SharedStaticStorage
 {
-    static UnidentifiedStaticState state;
+    static SharedStaticState state;
 };
 
-struct UnidentifiedStaticTag;
+struct SharedStaticTag;
 
 template <typename T>
-UnidentifiedStaticState UnidentifiedStaticStorage<T>::state;
+SharedStaticState SharedStaticStorage<T>::state;
 
-inline UnidentifiedStaticState& UnidentifiedStaticStorageState()
+inline SharedStaticState& GetSharedStaticState()
 {
-    return UnidentifiedStaticStorage<UnidentifiedStaticTag>::state;
+    return SharedStaticStorage<SharedStaticTag>::state;
 }
 
 // No code from this scope survives the link. It preserves the registry's
 // observed order of the initializer and inline value methods.
-struct UnidentifiedStaticStorageScope
+struct SharedStaticStorageScope
 {
-    ~UnidentifiedStaticStorageScope() { }
+    ~SharedStaticStorageScope() { }
 };
 
 #endif // GAME_SHARED_STATIC_STORAGE_H

@@ -3,7 +3,7 @@
 
 #include "Game/World/WorldHelperObject.h"
 
-inline void WorldObject::UnidentifiedVirtual18(World*)
+inline void WorldObject::OnWorldLoaded(World*)
 {
 }
 

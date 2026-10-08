@@ -111,7 +111,7 @@ public:
 
     // Transfers the callable out of the source, which the caller
     // holds by const reference while handing over ownership.
-    void UnidentifiedTransfer(const Function0& other)
+    void TransferFrom(const Function0& other)
     {
         Function0& source = const_cast<Function0&>(other);
         mTag = source.mTag;
@@ -134,7 +134,7 @@ public:
         return (*mFunctor)();
     }
 
-    void* UnidentifiedTarget() const
+    void* GetTarget() const
     {
         return (void*)mFreeFunction;
     }
@@ -278,7 +278,7 @@ public:
 
     // Transfers the callable out of the source, which the caller
     // holds by const reference while handing over ownership.
-    void UnidentifiedTransfer(const Function1& other)
+    void TransferFrom(const Function1& other)
     {
         Function1& source = const_cast<Function1&>(other);
         mTag = source.mTag;
@@ -306,7 +306,7 @@ public:
         return (*mFunctor)(p0);
     }
 
-    void* UnidentifiedTarget() const
+    void* GetTarget() const
     {
         return (void*)mFreeFunction;
     }
@@ -603,7 +603,7 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void UnidentifiedTransfer(Function3& other)
+    void TransferFrom(Function3& other)
     {
         mTag = other.mTag;
         mFreeFunction = other.mFreeFunction;
@@ -625,7 +625,7 @@ public:
         return (*mFunctor)(p1, p2, p3);
     }
 
-    void* UnidentifiedTarget() const
+    void* GetTarget() const
     {
         return (void*)mFreeFunction;
     }

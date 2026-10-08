@@ -22,7 +22,7 @@ public:
     virtual void InitializeFromParser(SimpleParser* parser) = 0;
     virtual void ApplyModifier(glPoly2& poly, float time) = 0;
     virtual void Cleanup() { }
-    virtual bool UnidentifiedVirtual18() { return false; }
+    virtual bool ConsumeScreenGrabRequest() { return false; }
 };
 
 class ScriptedScreenTransition : public ScreenTransition

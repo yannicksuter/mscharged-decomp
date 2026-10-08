@@ -152,7 +152,7 @@ inline void ObstacleAvoidance::Initialize(
     mFadeOutTimer.Clear();
     mRepulsion = v3Zero;
     mWeight = 0.0f;
-    mRepulsionHistory.UnidentifiedReset();
+    mRepulsionHistory.Reset();
 }
 
 inline void AvoidController::SetLastRepulsionVector(
@@ -834,7 +834,7 @@ void ObstacleAvoidance::Update(float fDeltaT)
             mFadeOutTimer.SetSeconds(0.3f);
         if (mFadeOutTimer.Countdown(fDeltaT, 0.0f))
         {
-            mRepulsionHistory.UnidentifiedReset();
+            mRepulsionHistory.Reset();
             mWeight = 0.0f;
         }
         else

@@ -32,7 +32,7 @@ void TeamPlayMachine::Update(float deltaTime)
 
 void TeamPlayMachine::SelectState()
 {
-    UnidentifiedVariantCollection values;
+    FuzzyVariantCollection values;
     int state = -1;
 
     if (g_pGame->m_eGameState == 1)

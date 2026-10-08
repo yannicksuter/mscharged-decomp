@@ -8,7 +8,7 @@ inline void* RegistryNode::GetData()
     return mValue.mData;
 }
 
-inline void* RegistryNode::UnidentifiedVirtual0C()
+inline void* RegistryNode::GetDataAlias()
 {
     return mValue.mData;
 }
@@ -53,7 +53,7 @@ inline RegistryValue DynamicRegistryContainer::NamedList()
     return RegistryValue(this, 1);
 }
 
-inline void DynamicRegistryContainer::UnidentifiedVirtual28() {}
+inline void DynamicRegistryContainer::RegistryContainerVirtual28() {}
 
 inline RegistryNode* DynamicRegistryContainer::FindNode(
     const u32& hash)
@@ -155,11 +155,11 @@ inline RegistryValue PackedRegistryContainer::NamedList()
     return RegistryValue(this, 1);
 }
 
-inline void PackedRegistryContainer::UnidentifiedVirtual28() {}
+inline void PackedRegistryContainer::RegistryContainerVirtual28() {}
 
-inline void PackedRegistryContainer::UnidentifiedVirtual38() {}
+inline void PackedRegistryContainer::RegistryContainerVirtual38() {}
 
-inline void PackedRegistryContainer::UnidentifiedVirtual34() {}
+inline void PackedRegistryContainer::RegistryContainerVirtual34() {}
 
 inline void PackedRegistryContainer::GetIterator(
     RegistryIteratorBase* iterator, int which) const
@@ -184,10 +184,10 @@ inline RegistryValue ScopedRegistryContainer::NamedList()
     return RegistryValue(this, 1);
 }
 
-inline void ScopedRegistryContainer::UnidentifiedVirtual28() {}
+inline void ScopedRegistryContainer::RegistryContainerVirtual28() {}
 
-inline void ScopedRegistryContainer::UnidentifiedVirtual38() {}
+inline void ScopedRegistryContainer::RegistryContainerVirtual38() {}
 
-inline void ScopedRegistryContainer::UnidentifiedVirtual34() {}
+inline void ScopedRegistryContainer::RegistryContainerVirtual34() {}
 
 #endif // NL_REGISTRY_INL

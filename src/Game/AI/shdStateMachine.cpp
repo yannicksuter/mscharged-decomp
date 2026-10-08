@@ -67,7 +67,7 @@ void DeactivateStateMachine(
 }
 
 bool ReinitializeStateMachine(
-    shdStateMachine* machine, UnidentifiedVariantCollection* parameters,
+    shdStateMachine* machine, FuzzyVariantCollection* parameters,
     bool reinitialize)
 {
     machine->mActive = false;
@@ -91,7 +91,7 @@ bool ReinitializeStateMachine(
 }
 
 bool InitializeStateMachine(
-    shdStateMachine* machine, UnidentifiedVariantCollection* parameters,
+    shdStateMachine* machine, FuzzyVariantCollection* parameters,
     bool initialize)
 {
     machine->mMaxDuration = gStateMachineUnsetDuration;
@@ -171,7 +171,7 @@ void UpdateStateMachine(
             machine->mOverrideTransition.Execute(
                 GetScriptMachineAIContext(machine->mScriptMachine),
                 update,
-                (UnidentifiedFuzzyRuntimeValue*)machine);
+                (FuzzyRuntimeContext*)machine);
         }
     }
     else if (IsTransitionFuncSet(&machine->mDefaultTransition.mValue)
@@ -180,7 +180,7 @@ void UpdateStateMachine(
         machine->mDefaultTransition.Execute(
             GetScriptMachineAIContext(machine->mScriptMachine),
             update,
-            (UnidentifiedFuzzyRuntimeValue*)machine);
+            (FuzzyRuntimeContext*)machine);
     }
     AccumulateScriptExecutionTime(start, gAIProfilingClock());
 

@@ -201,7 +201,7 @@ u8 cPlayer::SwapController(bool bParam)
 {
     if (m_DetPlayer.m_bCanTestController)
     {
-        if (!g_pBall->UnidentifiedHasPassTarget()
+        if (!g_pBall->HasPassTarget()
             || g_pBall->m_pPassTarget != this)
         {
             cPlayer* pSwapPlayer = NULL;

@@ -1662,7 +1662,7 @@ cPlayer* Goalie::FindOpenPassTarget()
         DesireUpdate vBestPassTarget = EvaluateGoalieFuzzyFunction(
             GetTeamFuzzyRuntime(m_pTeam), "BestPassTarget", this);
 
-        if (vBestPassTarget.UnidentifiedGetFloat(4) >= 0.5f)
+        if (vBestPassTarget.GetFloatParameter(4) >= 0.5f)
         {
             pPassTarget = vBestPassTarget.mData.pPlayer;
         }

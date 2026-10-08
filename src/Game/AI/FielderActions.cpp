@@ -4559,7 +4559,7 @@ void cFielder::fn_8004C88C(float fDeltaT)
 
         if (bTouched && bCanPickup)
         {
-            if (g_pBall->UnidentifiedHasPassTarget()
+            if (g_pBall->HasPassTarget()
                 && g_pBall->m_pPrevOwner != 0
                 && g_pBall->m_pPrevOwner->m_eClassType == FIELDER
                 && !IsOnSameTeam(g_pBall->m_pPrevOwner))

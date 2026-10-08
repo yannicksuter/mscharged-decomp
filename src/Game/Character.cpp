@@ -1162,7 +1162,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
     if (m_eClassType == FIELDER)
     {
         pFielder = (cFielder*)this;
-        bool isCharging = pFielder->m_pShotMeter->UnidentifiedIsCharging();
+        bool isCharging = pFielder->m_pShotMeter->IsCharging();
         if (!isCharging)
         {
             fDesiredSpeed = pFielder->GetSpeedPowerupAdjusted(m_DetChar.m_fDesiredSpeed);
@@ -1559,9 +1559,9 @@ void cCharacter::fn_8001F1D8()
 
 void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
 {
-    m_DetChar.UnidentifiedReset();
+    m_DetChar.Reset();
     ResetAnimState();
-    m_pHeadTrack->UnidentifiedReset();
+    m_pHeadTrack->Reset();
     m_pPhysicsCharacter->Unknown0();
     SetPosition(v3Position);
     m_DetChar.m_v3PrevPosition = v3Position;

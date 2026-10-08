@@ -16,9 +16,9 @@ static unsigned short sDesireDekeType = 0xFFFF;
 bool DesireDeke::Initialize(void* context)
 {
     mpTarget = 0;
-    if (((UnidentifiedVariantCollection*)context)->IsSet(14))
+    if (((FuzzyVariantCollection*)context)->IsSet(14))
     {
-        mpTarget = (cFielder*)((UnidentifiedVariantCollection*)context)->Get(14)->mData.pointer;
+        mpTarget = (cFielder*)((FuzzyVariantCollection*)context)->Get(14)->mData.pointer;
     }
     return true;
 }

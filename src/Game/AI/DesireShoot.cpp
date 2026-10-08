@@ -145,7 +145,7 @@ void DesireWindupShot::Cleanup()
 bool DesireShoot::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
     if (m_pFielder->GetPreviousDesireState() != 20
@@ -174,7 +174,7 @@ bool DesireShoot::Initialize(void* context)
     if (m_pFielder->m_pShotMeter->m_eShotMeterState
         == SHOT_METER_STS_RELEASED)
     {
-        UnidentifiedVariantCollection transitionParams;
+        FuzzyVariantCollection transitionParams;
         transitionParams.Set(
             7, FuzzyVariant(FT_FLOAT, sWindupSkillshotTimeLimit));
         transitionParams.Set(14, FuzzyVariant(g_pBall));

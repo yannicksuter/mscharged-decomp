@@ -9,7 +9,7 @@
 // template members are defined out of class, so they are instantiated with
 // the event's own destructor after the unit's vtables.
 template <typename P1, typename P2, typename P3, int Count>
-class UnidentifiedStaticEvent3
+class StaticEvent3
     : public TypedEvent3<P1, P2, P3>
 {
     typedef EventListener3<P1, P2, P3> Listener;
@@ -18,7 +18,7 @@ class UnidentifiedStaticEvent3
     typedef Function<void(P1, P2, P3)> Callback;
 
 public:
-    UnidentifiedStaticEvent3(const char* name, int length)
+    StaticEvent3(const char* name, int length)
         : TypedEvent3<P1, P2, P3>(name, length)
         , mListeners()
     {
@@ -26,7 +26,7 @@ public:
             this, TypedEvent3<P1, P2, P3>::sType);
     }
 
-    virtual ~UnidentifiedStaticEvent3();
+    virtual ~StaticEvent3();
 
     void RemoveAll()
     {
@@ -104,14 +104,14 @@ protected:
 };
 
 template <typename P1, typename P2, typename P3, int Count>
-UnidentifiedStaticEvent3<P1, P2, P3, Count>::~UnidentifiedStaticEvent3()
+StaticEvent3<P1, P2, P3, Count>::~StaticEvent3()
 {
     RemoveAll();
     UnregisterEvent(this);
 }
 
 template <typename P1, typename P2, typename P3, int Count>
-void UnidentifiedStaticEvent3<P1, P2, P3, Count>::Add(
+void StaticEvent3<P1, P2, P3, Count>::Add(
     Callback callback, unsigned int value, int flags)
 {
     ListenerEntry* entry;
@@ -120,22 +120,22 @@ void UnidentifiedStaticEvent3<P1, P2, P3, Count>::Add(
     nlDLRingAddEnd(&mListeners.m_Head, entry);
     Listener* listener = &entry->entry;
 
-    listener->callback.UnidentifiedTransfer(callback);
+    listener->callback.TransferFrom(callback);
     RegisterEventConnection(this, listener, value, flags);
 }
 
 template <typename P1, typename P2, typename P3, int Count>
-void UnidentifiedStaticEvent3<P1, P2, P3, Count>::Disconnect(void* owner)
+void StaticEvent3<P1, P2, P3, Count>::Disconnect(void* owner)
 {
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
 }
 
-class PadDeviceChangedEvent : public UnidentifiedStaticEvent3<int, int, int, 5>
+class PadDeviceChangedEvent : public StaticEvent3<int, int, int, 5>
 {
 public:
     PadDeviceChangedEvent()
-        : UnidentifiedStaticEvent3<int, int, int, 5>("DeviceChanged", -1)
+        : StaticEvent3<int, int, int, 5>("DeviceChanged", -1)
     {
     }
 

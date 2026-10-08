@@ -186,8 +186,8 @@ bool DesireReceivePass::Initialize(void* context)
             + g_pBall->m_v3Velocity.y * g_pBall->m_v3Velocity.y,
         true);
 
-    UnidentifiedVariantCollection* params =
-        (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params =
+        (FuzzyVariantCollection*)context;
     meReceiveAnimType = params->Get(11)->fn_800C2BD4();
     mbValidPassIntercept = params->IsSet(14);
     if (mbValidPassIntercept)
@@ -1477,7 +1477,7 @@ void DesireReceivePass::ExecutePass(cPlayer* pPasser, bool bVolleyPass, bool bFi
             : -1;
         g_pGame->mEventQueue.mPassBallEvent.Deliver(&eventData);
 
-        UnidentifiedVariantCollection params;
+        FuzzyVariantCollection params;
         params.Set(14, FuzzyVariant(FT_VECTOR, v3PassPosition));
         params.Set(11, FuzzyVariant(FT_INT, eReceiveAnimType));
         pPassTarget->ActivateDesire(22, &params);

@@ -72,7 +72,7 @@ bool DesireSteering::Initialize(void* context)
     m_v3DesiredPos = v3Zero;
     m_v3LastDesiredPos = v3Zero;
     m_v3DesiredVel = v3Zero;
-    m_AvoidanceHistory.UnidentifiedReset();
+    m_AvoidanceHistory.Reset();
     m_v3LastDesiredPos = v3Zero;
     m_v3DesiredPos = v3Zero;
     m_v3DesiredVel = v3Zero;
@@ -95,12 +95,12 @@ bool DesireSteering::Initialize(void* context)
 void DesireSteering::Cleanup()
 {
     fn_8000F178(m_pAvoidance);
-    m_AvoidanceHistory.UnidentifiedReset();
+    m_AvoidanceHistory.Reset();
 }
 
 void ResetSteeringHistory(DesireSteering* desire)
 {
-    desire->m_AvoidanceHistory.UnidentifiedReset();
+    desire->m_AvoidanceHistory.Reset();
 }
 
 void ResetSteeringAvoidance(DesireSteering* desire)
@@ -329,7 +329,7 @@ const nlVector3* GetSteeringTargetPosition(DesireSteering* desire)
     DesireReceivePass* receivePass = (DesireReceivePass*)GetFielderDesire(
         desire->m_pFielder, 22);
 
-    if (g_pBall->UnidentifiedHasPassTarget()
+    if (g_pBall->HasPassTarget()
         && g_pBall->m_pPassTarget == desire->m_pFielder
         && receivePass != NULL && receivePass->IsActive())
     {
@@ -816,7 +816,7 @@ eStrafeDirection GetSteeringStrafeDirection(DesireSteering* desire,
     return STRAFE_FORWARD;
 }
 
-bool UnidentifiedDesire35::Initialize(void*)
+bool DesireWaluigiWall::Initialize(void*)
 {
     mMaxDuration = 10.0f;
     fn_8006040C(g_pGame, m_pFielder);
@@ -825,7 +825,7 @@ bool UnidentifiedDesire35::Initialize(void*)
     return true;
 }
 
-void UnidentifiedDesire35::Update(
+void DesireWaluigiWall::Update(
     DesireUpdate* update, float fDeltaT)
 {
     if (!m_pFielder->m_bSuperPowerTankOn)
@@ -897,7 +897,7 @@ void UnidentifiedDesire35::Update(
     m_pFielder->fn_8001E304(fSpeed, fDeltaT);
 }
 
-void UnidentifiedDesire35::Cleanup()
+void DesireWaluigiWall::Cleanup()
 {
     DeliverWaluigiWallEndEvent(g_pGame, m_pFielder);
 }

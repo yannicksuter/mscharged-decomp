@@ -251,7 +251,7 @@ DesireGooey::DesireGooey()
 bool DesireGooey::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     float fGooEffect = params->Get(0)->mData.f;
     if (fGooEffect < mfMaxGooEffect)
     {
@@ -356,8 +356,8 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->fn_8001EE74(
         sShrinkPlayerScale, sShrinkScaleDuration, sShrinkMovementScale);
 
-    UnidentifiedVariantCollection* params
-        = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params
+        = (FuzzyVariantCollection*)context;
     source = (cFielder*)params->Get(14)->mData.pointer;
     m_pFielder->SetTweaks(source->m_pSuperPowerTweaks);
     m_pFielder->m_pTweaks->fHeight
@@ -521,7 +521,7 @@ bool DesireFrozen::Initialize(void* context)
         m_pFielder->EndDesire();
     }
 
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     SetFrozenState(params->Get(0)->mData.i);
     SetAnimationUpdatePaused(m_pFielder, true);
     SetActionUpdatePaused(m_pFielder, true);
@@ -543,7 +543,7 @@ bool DesireFrozen::Reinitialize(void* context)
     mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
     mAgeTimer.m_uPackedTime = 0;
 
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     SetFrozenState(params->Get(0)->mData.i);
     KillFreeze(m_pFielder);
     return Desire::Initialize(context);
@@ -671,7 +671,7 @@ void DesireFrozen::Cleanup()
  */
 void DesireFrozen::Activate(float duration, int state)
 {
-    UnidentifiedVariantCollection params;
+    FuzzyVariantCollection params;
     params.Set(7, FuzzyVariant(duration));
     params.Set(0, FuzzyVariant(state));
     ActivateConcurrentState(mScriptMachine, 29, &params, mActive);

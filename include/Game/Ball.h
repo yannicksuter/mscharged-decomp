@@ -87,7 +87,7 @@ public:
         return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
     }
 
-    bool UnidentifiedHasPassTarget()
+    bool HasPassTarget()
     {
         bool bState;
         bool bResult = false;

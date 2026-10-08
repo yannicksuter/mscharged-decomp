@@ -345,7 +345,7 @@ void ScriptMachine::DeactivateState()
 }
 
 shdStateMachine* ScriptMachine::ActivateState(
-    int state, UnidentifiedVariantCollection* parameters, bool reinitialize)
+    int state, FuzzyVariantCollection* parameters, bool reinitialize)
 {
     if ((u32)state == 0xA5A5A5A5)
     {
@@ -356,7 +356,7 @@ shdStateMachine* ScriptMachine::ActivateState(
         return 0;
     }
 
-    UnidentifiedVariantCollection emptyParameters;
+    FuzzyVariantCollection emptyParameters;
     if (parameters == 0)
     {
         parameters = &emptyParameters;
@@ -427,7 +427,7 @@ void DeactivateScriptMachineState(
 
 void QueueScriptMachineState(
     ScriptMachine* machine, int state,
-    const UnidentifiedVariantCollection* parameters)
+    const FuzzyVariantCollection* parameters)
 {
     machine->mPendingState = state;
     machine->mPendingParameters.Remove(-1);
@@ -461,7 +461,7 @@ void DeactivateConcurrentState(
 
 shdStateMachine* ActivateConcurrentState(
     ScriptMachine* machine, int state,
-    UnidentifiedVariantCollection* parameters, bool reinitialize)
+    FuzzyVariantCollection* parameters, bool reinitialize)
 {
     if ((u32)state == 0xA5A5A5A5)
     {
@@ -473,7 +473,7 @@ shdStateMachine* ActivateConcurrentState(
     }
 
     shdStateMachine* value = machine->mConcurrentStates[state];
-    UnidentifiedVariantCollection emptyParameters;
+    FuzzyVariantCollection emptyParameters;
     if (parameters == 0)
     {
         parameters = &emptyParameters;

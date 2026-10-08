@@ -22,13 +22,13 @@ int CompareActionConfidence(
     DesireUpdate*& first,
     DesireUpdate*& second)
 {
-    if (first->UnidentifiedGetFloat(4)
-        == second->UnidentifiedGetFloat(4))
+    if (first->GetFloatParameter(4)
+        == second->GetFloatParameter(4))
     {
         return 0;
     }
-    if (first->UnidentifiedGetFloat(4)
-        > second->UnidentifiedGetFloat(4))
+    if (first->GetFloatParameter(4)
+        > second->GetFloatParameter(4))
     {
         return -1;
     }

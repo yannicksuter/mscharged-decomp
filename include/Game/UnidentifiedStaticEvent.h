@@ -153,7 +153,7 @@ void UnidentifiedStaticEvent<T, Count>::Add(
     nlDLRingAddEnd(&mListeners.m_Head, entry);
     Listener* listener = &entry->entry;
 
-    listener->callback.UnidentifiedTransfer(callback);
+    listener->callback.TransferFrom(callback);
     RegisterEventConnection(this, listener, value, flags);
 }
 

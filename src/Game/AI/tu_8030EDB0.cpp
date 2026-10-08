@@ -1,9 +1,9 @@
 #include "Game/AI/DesireUpdate.h"
 
-UnidentifiedFuzzyVariantData gDefaultFuzzyVariantData;
-SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200(16, 16);
+IndexedFuzzyVariant gDefaultFuzzyVariantData;
+SlotPool<IndexedFuzzyVariant> lbl_80584200(16, 16);
 
-UnidentifiedVariantCollection::UnidentifiedVariantCollection()
+FuzzyVariantCollection::FuzzyVariantCollection()
 {
     for (int i = 0; i < 19; i++)
     {
@@ -11,12 +11,12 @@ UnidentifiedVariantCollection::UnidentifiedVariantCollection()
     }
 }
 
-UnidentifiedVariantCollection::~UnidentifiedVariantCollection()
+FuzzyVariantCollection::~FuzzyVariantCollection()
 {
     Remove(-1);
 }
 
-void UnidentifiedVariantCollection::Remove(int index)
+void FuzzyVariantCollection::Remove(int index)
 {
     if (index > -1 && index < 19)
     {
@@ -39,12 +39,12 @@ void UnidentifiedVariantCollection::Remove(int index)
     }
 }
 
-bool UnidentifiedVariantCollection::IsSet(int index) const
+bool FuzzyVariantCollection::IsSet(int index) const
 {
     return index > -1 && index < 19 && mData[index] != 0;
 }
 
-FuzzyVariant* UnidentifiedVariantCollection::Get(int index)
+FuzzyVariant* FuzzyVariantCollection::Get(int index)
 {
     if (IsSet(index))
     {
@@ -54,7 +54,7 @@ FuzzyVariant* UnidentifiedVariantCollection::Get(int index)
     return &gDefaultFuzzyVariantData;
 }
 
-void UnidentifiedVariantCollection::Set(int index, FuzzyVariant value)
+void FuzzyVariantCollection::Set(int index, FuzzyVariant value)
 {
     if (IsSet(index))
     {
@@ -64,6 +64,6 @@ void UnidentifiedVariantCollection::Set(int index, FuzzyVariant value)
     else
     {
         mData[index] = new (lbl_80584200.Allocate())
-            UnidentifiedFuzzyVariantData(index, value);
+            IndexedFuzzyVariant(index, value);
     }
 }

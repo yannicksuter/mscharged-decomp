@@ -255,7 +255,7 @@ protected:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        listener->callback.UnidentifiedTransfer(callback);
+        listener->callback.TransferFrom(callback);
         RegisterEventConnection(this, listener, value, flags);
     }
 
@@ -464,7 +464,7 @@ protected:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        listener->callback.UnidentifiedTransfer(callback);
+        listener->callback.TransferFrom(callback);
         RegisterEventConnection(this, listener, value, flags);
     }
 
@@ -752,7 +752,7 @@ protected:
     {
         Listener* listener = mListeners.AllocateAtEnd(0);
 
-        listener->callback.UnidentifiedTransfer(callback);
+        listener->callback.TransferFrom(callback);
         RegisterEventConnection(this, listener, value, flags);
     }
 

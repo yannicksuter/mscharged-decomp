@@ -12,7 +12,7 @@ inline int GetStateMachineState(const shdStateMachine* machine)
 /**
  * Offset/Address/Size: 0x9640 | 0x800D1D3C | size: 0x8
  */
-inline UnidentifiedVariantCollection* GetStateMachineParameters(
+inline FuzzyVariantCollection* GetStateMachineParameters(
     shdStateMachine* stateMachine)
 {
     return &stateMachine->mParameters;

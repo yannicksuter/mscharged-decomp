@@ -496,7 +496,7 @@ float StrategicBallOwner(cFielder* pFielder)
     else
     {
         float fPassValid
-            = g_pBall->UnidentifiedHasPassTarget() ? 1.0f : 0.0f;
+            = g_pBall->HasPassTarget() ? 1.0f : 0.0f;
         if (!fPassValid && pFielder == pFielder->m_pTeam->GetBestBallInterceptor())
         {
             fScore = InterpolateClamped(0.7f, 0.95f, AbleToInterceptBall(pFielder));
@@ -594,7 +594,7 @@ float InPassingLane(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (!g_pBall->UnidentifiedHasPassTarget())
+    if (!g_pBall->HasPassTarget())
     {
         return 0.0f;
     }
@@ -3159,7 +3159,7 @@ extern "C" float fn_800DEB04(cFielder* pFielder)
     }
 
     ShotMeter* pMeter = pFielder->m_pShotMeter;
-    bool bActive = pMeter->UnidentifiedIsCharging();
+    bool bActive = pMeter->IsCharging();
     if (bActive)
     {
         switch (pMeter->m_eShotMeterState)
@@ -3199,7 +3199,7 @@ extern "C" float fn_800DEBF4(cFielder* pFielder)
     }
 
     ShotMeter* pMeter = pFielder->m_pShotMeter;
-    bool bActive = pMeter->UnidentifiedIsCharging();
+    bool bActive = pMeter->IsCharging();
     if (bActive)
     {
         switch (pMeter->m_eShotMeterState)
@@ -3221,7 +3221,7 @@ extern "C" float fn_800DEC88(cFielder* pFielder)
     }
 
     ShotMeter* pMeter = pFielder->m_pShotMeter;
-    bool bActive = pMeter->UnidentifiedIsCharging();
+    bool bActive = pMeter->IsCharging();
     if (bActive)
     {
         switch (pMeter->m_eShotMeterState)
@@ -3759,7 +3759,7 @@ extern "C" float fn_800E0034()
 extern "C" float fn_800E00F8()
 {
     float fInitialScore;
-    if (g_pBall->UnidentifiedHasPassTarget())
+    if (g_pBall->HasPassTarget())
     {
         fInitialScore = 1.0f;
     }

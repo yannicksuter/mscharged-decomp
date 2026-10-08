@@ -62,10 +62,10 @@ bool DesireUsePowerup::Initialize(void* context)
 {
     bool result;
     ePowerUpType ePowerup;
-    UnidentifiedVariantCollection* params;
+    FuzzyVariantCollection* params;
 
     result = Desire::Initialize(context);
-    params = (UnidentifiedVariantCollection*)context;
+    params = (FuzzyVariantCollection*)context;
 
     mbThrowingPowerup = false;
     mePowerup = POWER_UP_NONE;
@@ -345,7 +345,7 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     {
         if (!pDesire->m_pFielder->IsSuperPowerActive())
         {
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             TransitionFunc* pTransition
                 = !pDesire->mOverrideTransition.IsUnset()
                 ? &pDesire->mOverrideTransition.mValue
