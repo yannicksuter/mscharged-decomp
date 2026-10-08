@@ -48,7 +48,7 @@ float gMegaBallTimerScale = 1.0f;
 int gRemoteMegaBallPointerTextureIndex = 1;
 
 cGlobalPad* gMegaBallController;
-bool lbl_806E15C4;
+bool gForceMegaBallPointerMagnetism;
 bool gMegaBallPointerMagnetism;
 bool gSuppressMegaBallPointerPackets;
 float gMegaBallTimerYOffset;
@@ -621,7 +621,7 @@ have_controller_data:
         float fY = -gMegaBallPointerYScale * v2Position.y + 240.0f;
         fY = nlMaxEquals(fY, 30.0f);
         fY = nlMinEquals(fY, 450.0f);
-        if (gMegaBallPointerMagnetism || lbl_806E15C4)
+        if (gMegaBallPointerMagnetism || gForceMegaBallPointerMagnetism)
         {
             float fRadiusSquared
                 = gMegaBallPointerMagnetRadius
