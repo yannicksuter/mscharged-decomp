@@ -33,8 +33,8 @@ static char sStatsSeparators[] = " \t\r\n:,";
 NetworkStatsReporter::NetworkStatsReporter()
 {
     mListener = 0;
-    mState = 0;
-    mFilter = 0;
+    mState = STATS_REPORT_IDLE;
+    mFilter = RANKING_FILTER_NEARBY;
     mLimit = 0;
     mLeaderboardPlayers = 0;
     mLeaderboardMetadata = 0;
@@ -60,8 +60,8 @@ void NetworkStatsPlayer::CopyFrom(const NetworkStatsPlayer& other)
 void NetworkStatsReporter::Reset()
 {
     mListener = 0;
-    mState = 0;
-    mFilter = 0;
+    mState = STATS_REPORT_IDLE;
+    mFilter = RANKING_FILTER_NEARBY;
     mLimit = 0;
     mLeaderboardPlayers = 0;
     mLeaderboardMetadata = 0;
@@ -141,7 +141,7 @@ bool NetworkStatsReporter::ReportGameResult(int,
     }
 
     tDebugPrintManager::Print(DC_NETWORK, "Connect (ReportGameResult) To Stats In Progress\n");
-    mState = 3;
+    mState = STATS_REPORT_SEND_RESULT;
     mHomePlayer.CopyFrom(*home);
     mAwayPlayer.CopyFrom(*away);
     mReportHome = reportHome;
@@ -192,7 +192,7 @@ bool NetworkStatsReporter::GetLeaderboardStats(int category,
     }
 
     tDebugPrintManager::Print(DC_NETWORK, "Connect To Stats In Progress\n");
-    mState = 1;
+    mState = STATS_REPORT_SEND_QUERY;
     mFilter = filter;
     mLimit = limit;
     mLeaderboardPlayers = players;
@@ -254,7 +254,7 @@ void NetworkStatsReporter::Update()
 {
     switch (mState)
     {
-    case 1:
+    case STATS_REPORT_SEND_QUERY:
     {
         char request[256];
         nlSNPrintf(request, 255,
@@ -263,18 +263,18 @@ void NetworkStatsReporter::Update()
         if (result > 0)
         {
             tDebugPrintManager::Print(DC_NETWORK, "Send Result to Stats Server %d\n", result);
-            mState = 2;
+            mState = STATS_REPORT_RECEIVE_QUERY;
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK, "Send Result to Stats Server %d\n", result);
             mListener->OnLeaderboardResult(false, 0, mFilter, 0, 0, 0);
-            mState = 0;
+            mState = STATS_REPORT_IDLE;
             Close();
         }
         break;
     }
-    case 2:
+    case STATS_REPORT_RECEIVE_QUERY:
     {
         char response[1000];
         int result = TransportSocketReceiveFrom(&mSocket, response, 999, 0, 0);
@@ -284,7 +284,7 @@ void NetworkStatsReporter::Update()
             {
                 tDebugPrintManager::Print(DC_NETWORK, "Received Stats String Error %d\n", result);
                 mListener->OnLeaderboardResult(false, 0, mFilter, 0, 0, 0);
-                mState = 0;
+                mState = STATS_REPORT_IDLE;
                 Close();
             }
         }
@@ -295,12 +295,12 @@ void NetworkStatsReporter::Update()
             response[result] = 0;
             tDebugPrintManager::Print(DC_NETWORK, response);
             ParseLeaderboardResponse(response, result);
-            mState = 0;
+            mState = STATS_REPORT_IDLE;
             Close();
         }
         break;
     }
-    case 3:
+    case STATS_REPORT_SEND_RESULT:
     {
         char homeName[11] = { 0 };
         char awayName[11] = { 0 };
@@ -315,31 +315,31 @@ void NetworkStatsReporter::Update()
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Send ReportGameResult to Stats Server %d\n", result);
-            mState = 4;
+            mState = STATS_REPORT_WAIT_CLOSE;
             mReportStartTime = nlGetTicker();
         }
         else
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Send Error ReportGameResult to Stats Server %d\n", result);
-            mState = 0;
+            mState = STATS_REPORT_IDLE;
             Close();
         }
         break;
     }
-    case 4:
+    case STATS_REPORT_WAIT_CLOSE:
     {
         if (nlGetTickerDifference(mReportStartTime, nlGetTicker())
             > sReportSocketLifetime)
         {
             tDebugPrintManager::Print(DC_NETWORK,
                 "Waited, now closing socket that was used for ReportGameResult\n");
-            mState = 0;
+            mState = STATS_REPORT_IDLE;
             Close();
         }
         break;
     }
-    case 0:
+    case STATS_REPORT_IDLE:
     default:
         break;
     }
@@ -354,7 +354,7 @@ NetworkRanking::NetworkRanking()
 void NetworkRanking::Reset()
 {
     mRequestFailed = false;
-    mOperation = 0;
+    mOperation = RANKING_OP_IDLE;
     mListener = 0;
     mSubmission.mWins = 0;
     mSubmission.mLosses = 0;
@@ -363,7 +363,7 @@ void NetworkRanking::Reset()
     memset(mSubmission.mMiiData, 0, sizeof(mSubmission.mMiiData));
     memset(mSubmission.mDigest, 0, sizeof(mSubmission.mDigest));
     mSubmittingScore = false;
-    mLimit = mFilter = 0;
+    mLimit = mFilter = RANKING_FILTER_NEARBY;
     mLeaderboardPlayers = 0;
     mLeaderboardMetadata = 0;
     mCategory = 0;
@@ -462,7 +462,7 @@ bool NetworkRanking::ReportGameResult(int category,
         fallback->mScore, &mSubmission, sizeof(mSubmission));
     if (result == DWC_RNK_SUCCESS)
     {
-        mOperation = 1;
+        mOperation = RANKING_OP_PUT_SCORE;
         tDebugPrintManager::Print(DC_NETWORK,
             "DWC_RnkPutScoreAsync start processing okay cat %d\n",
             mCategory);
@@ -551,7 +551,7 @@ bool NetworkRanking::SubmitScore(int category,
         category, region, score, &mSubmission, sizeof(mSubmission));
     if (result == DWC_RNK_SUCCESS)
     {
-        mOperation = 1;
+        mOperation = RANKING_OP_PUT_SCORE;
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkPutScoreAsync start processing okay\n");
         return true;
     }
@@ -619,7 +619,7 @@ bool NetworkRanking::GetLeaderboardStats(int category,
     DWCRnkGetMode mode = DWC_RNK_GET_MODE_NEAR;
     switch (filter)
     {
-    case 0:
+    case RANKING_FILTER_NEARBY:
     {
         mode = DWC_RNK_GET_MODE_NEAR;
         parameter.size = sizeof(parameter.near);
@@ -650,7 +650,7 @@ bool NetworkRanking::GetLeaderboardStats(int category,
         }
         break;
     }
-    case 1:
+    case RANKING_FILTER_FRIENDS:
     {
         mode = DWC_RNK_GET_MODE_FRIENDS;
         parameter.size = sizeof(parameter.friends);
@@ -665,7 +665,7 @@ bool NetworkRanking::GetLeaderboardStats(int category,
         }
         break;
     }
-    case 2:
+    case RANKING_FILTER_TOP:
     {
         mode = DWC_RNK_GET_MODE_TOPLIST;
         parameter.size = sizeof(parameter.toplist);
@@ -722,7 +722,7 @@ bool NetworkRanking::GetLeaderboardStats(int category,
         DWC_RnkGetScoreAsync(mode, category, region, &parameter);
     if (result == DWC_RNK_SUCCESS)
     {
-        mOperation = 2;
+        mOperation = RANKING_OP_GET_SCORE;
         tDebugPrintManager::Print(DC_NETWORK, "DWC_RnkGetScoreAsync start processing okay.\n");
         return true;
     }
@@ -819,7 +819,7 @@ void NetworkRanking::ProcessLeaderboardResults()
         }
     }
 
-    if (mFilter == 1)
+    if (mFilter == RANKING_FILTER_FRIENDS)
     {
         FilterCurrentSeason(retained);
     }
@@ -946,7 +946,7 @@ void NetworkRanking::SortLeaderboardResults(int count)
     }
     switch (mFilter)
     {
-    case 0:
+    case RANKING_FILTER_NEARBY:
     {
         int rankedRow = -1;
         for (int i = 0; i < count; ++i)
@@ -976,8 +976,8 @@ void NetworkRanking::SortLeaderboardResults(int count)
         }
         break;
     }
-    case 1:
-    case 2:
+    case RANKING_FILTER_FRIENDS:
+    case RANKING_FILTER_TOP:
         AssignDisplayRanks(count, mLeaderboardMetadata, 1);
         break;
     }
@@ -997,7 +997,7 @@ void NetworkRanking::Update()
     {
         return;
     }
-    if (mOperation == 0)
+    if (mOperation == RANKING_OP_IDLE)
     {
         return;
     }
@@ -1014,7 +1014,7 @@ void NetworkRanking::Update()
         mRequestFailed = true;
         switch (mOperation)
         {
-        case 1:
+        case RANKING_OP_PUT_SCORE:
             tDebugPrintManager::Print(DC_NETWORK, "Putting Score failed!\n");
             if (mSubmittingScore)
             {
@@ -1025,19 +1025,19 @@ void NetworkRanking::Update()
                 mListener->OnReportGameResult(false, mCategory);
             }
             break;
-        case 2:
+        case RANKING_OP_GET_SCORE:
             tDebugPrintManager::Print(DC_NETWORK, "Getting score failed!\n");
             mListener->OnLeaderboardResult(
                 false, mCategory, mFilter, 0, 0, 0);
             break;
         }
-        mOperation = 0;
+        mOperation = RANKING_OP_IDLE;
     }
     else if (result == DWC_RNK_PROCESS_NOTASK)
     {
         switch (mOperation)
         {
-        case 1:
+        case RANKING_OP_PUT_SCORE:
             tDebugPrintManager::Print(DC_NETWORK, "Putting Score succeeded!\n");
             if (mSubmittingScore)
             {
@@ -1048,12 +1048,12 @@ void NetworkRanking::Update()
                 mListener->OnReportGameResult(true, mCategory);
             }
             break;
-        case 2:
+        case RANKING_OP_GET_SCORE:
             tDebugPrintManager::Print(DC_NETWORK, "Getting score succeeded!\n");
             ProcessLeaderboardResults();
             break;
         }
-        mOperation = 0;
+        mOperation = RANKING_OP_IDLE;
     }
     else
     {
