@@ -167,6 +167,19 @@ typedef struct NHTTPSysInfo NHTTPSysInfo;
 typedef struct NHTTPMutexInfo NHTTPMutexInfo;
 typedef struct NHTTPThreadInfo NHTTPThreadInfo;
 
+void* NHTTPi_alloc(u32 size, int align);
+void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
+s32 NHTTPi_strlen(const char* string);
+s32 NHTTPi_compareToken(const char* string, const char* token);
+int NHTTPi_memfind(const char* data, int size,
+    const char* pattern, int patternSize);
+extern const char NHTTPi_strMultipartBound[];
+NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list);
+BOOL NHTTP_AddHeaderField(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
+    const char* name, const char* value);
+BOOL NHTTP_AddPostDataAscii(NHTTPRequestInfo* request, NHTTPBgnEndInfo* info,
+    const char* label, const char* value);
+
 void NHTTPi_InitBgnEndInfo(NHTTPBgnEndInfo* info);
 void NHTTPi_InitListInfo(NHTTPListInfo* info);
 void NHTTPi_InitRequestInfo(NHTTPReqInfo* info);

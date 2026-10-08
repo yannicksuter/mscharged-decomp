@@ -45,11 +45,8 @@ typedef struct NHTTPThreadData
     /* 0x33C */ BOOL isChunked;
 } NHTTPThreadData;
 
-void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* ptr);
-void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
 void* NHTTPi_memclr(void* destination, u32 size);
-s32 NHTTPi_strlen(const char* string);
 void* NHTTPi_memcpy(void* destination, const void* source, u32 size);
 s32 NHTTPi_strcmp(const char* left, const char* right);
 s32 NHTTPi_strnicmp(const char* left, const char* right, s32 size);
@@ -77,7 +74,6 @@ int NHTTPi_SocSend(const NHTTPRequestInfo* req_p, const int socket,
 int NHTTPi_SocRecv(const NHTTPRequestInfo* req_p, const int socket,
     char* buf_p, const int len, const int flags);
 
-NHTTPHeader* NHTTPi_getHdrFromList(NHTTPHeader** list);
 int NHTTPi_isRecvBufFull(const NHTTPResponseInfo* res_p, const int pos);
 s32 NHTTPi_RecvBuf(NHTTPRequestInfo* request, s32 socket, s32 offset,
     s32 flags);

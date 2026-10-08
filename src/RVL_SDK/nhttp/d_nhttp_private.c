@@ -1,8 +1,6 @@
 #include <private/nhttp.h>
 
-void* NHTTPi_alloc(u32 size, int align);
 void NHTTPi_free(void* buffer);
-void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
 NHTTPRequestInfo* NHTTP_CreateRequest(NHTTPBgnEndInfo* info, const char* url,
     s32 method, void* buffer, u32 bufferSize, void* userParam,
     NHTTPResponseCallback responseCallback, NHTTPResponseCleanup cleanup);

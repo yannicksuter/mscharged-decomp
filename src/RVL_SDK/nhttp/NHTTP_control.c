@@ -1,14 +1,5 @@
 #include <private/nhttp.h>
 
-extern const char NHTTPi_strMultipartBound[];
-
-s32 NHTTPi_compareToken(const char* lhs, const char* rhs);
-void* NHTTPi_alloc(u32 size, int align);
-void NHTTPi_SetError(NHTTPBgnEndInfo* info, NHTTPErr error);
-s32 NHTTPi_strlen(const char* string);
-s32 NHTTPi_memfind(const void* haystack, s32 haystackLength,
-    const void* needle, s32 needleLength);
-
 static BOOL addHdrList(NHTTPHeader** list, NHTTPBgnEndInfo* info, const char* name,
     const char* value)
 {
