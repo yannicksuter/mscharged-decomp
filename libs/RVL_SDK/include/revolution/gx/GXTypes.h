@@ -4,6 +4,7 @@
 #include <revolution/gx/GXTextureTypes.h>
 #include <revolution/gx/GXPublicTypes.h>
 #include <revolution/gx/GXBlendTypes.h>
+#include <revolution/gx/GXProjectionTypes.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -419,11 +420,6 @@ typedef enum _GXPrimitive {
     GX_TRIANGLEFAN = 0xA0,
     GX_QUADS = 0x80,
 } GXPrimitive;
-
-typedef enum _GXProjectionType {
-    GX_PERSPECTIVE,
-    GX_ORTHOGRAPHIC
-} GXProjectionType;
 
 typedef enum _GXSpotFn {
     GX_SP_OFF,

@@ -1,0 +1,9 @@
+#ifndef RVL_SDK_GX_PROJECTION_TYPES_H
+#define RVL_SDK_GX_PROJECTION_TYPES_H
+
+typedef enum _GXProjectionType {
+    GX_PERSPECTIVE,
+    GX_ORTHOGRAPHIC
+} GXProjectionType;
+
+#endif // RVL_SDK_GX_PROJECTION_TYPES_H
