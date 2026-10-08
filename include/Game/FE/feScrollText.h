@@ -7,6 +7,32 @@
 class TLTextInstance;
 class nlFont;
 
+enum eScrollAxis
+{
+    SCROLL_HORIZONTAL = 0,
+    SCROLL_VERTICAL = 1,
+};
+
+enum eScrollMode
+{
+    SCROLL_FULL_TEXT = 0,
+    SCROLL_OVERFLOW = 1,
+};
+
+enum eScrollDirection
+{
+    SCROLL_REVERSE = -1,
+    SCROLL_STOPPED = 0,
+    SCROLL_FORWARD = 1,
+};
+
+enum eScrollEndBehavior
+{
+    SCROLL_END_RESTART = 0,
+    SCROLL_END_REVERSE = 1,
+    SCROLL_END_STOP = 2,
+};
+
 class FEScrollText
 {
 public:

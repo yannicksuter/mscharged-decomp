@@ -43,8 +43,8 @@ FECharacterPDAComponent::FECharacterPDAComponent()
     {
         mSidekickAttributeBars[i] = 0;
     }
-    mScrollText.SetEndBehavior(2);
-    mScrollText.SetScrollMode(1);
+    mScrollText.SetEndBehavior(SCROLL_END_STOP);
+    mScrollText.SetScrollMode(SCROLL_OVERFLOW);
     m_pad2A8 = false;
 }
 
@@ -286,7 +286,7 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
     if (mDisplayMode == CHARACTER_PDA_DESCRIPTION)
     {
         mDescriptions->SetActiveSlide(GetTeamName((eTeamID)captain), false, false);
-        mScrollText.SetScrollDirection(-1);
+        mScrollText.SetScrollDirection(SCROLL_REVERSE);
         mScrollText.ApplyNewTextInstancePointer(FEFinder<TLTextInstance, 3>::FindOrDefault(mPDAScreens, "descriptions", "text"), -1, -1, 0);
         BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene(SCENE_CHOOSE_CAPTAINS_STRIKER_CUP);
         if (scene != 0)

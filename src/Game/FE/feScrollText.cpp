@@ -19,10 +19,10 @@ FEScrollText::FEScrollText(int axis)
     , m_messageWidth(0)
     , m_pos(-1)
     , m_width(-1)
-    , m_scrollDirection(-1)
+    , m_scrollDirection(SCROLL_REVERSE)
     , m_scrollAxis(axis)
-    , m_scrollMode(0)
-    , m_endBehavior(0)
+    , m_scrollMode(SCROLL_FULL_TEXT)
+    , m_endBehavior(SCROLL_END_RESTART)
     , m_scrollSpeed(0.0f)
     , m_scrollOffset(0.0f)
     , m_nextDeltaT(0.0f)
@@ -36,7 +36,7 @@ void FEScrollText::ApplyNewTextInstancePointer(TLTextInstance* controltext, int 
     if (m_controlText != 0)
     {
         feVector3 oldPosition = m_controlText->GetPosition();
-        if (m_scrollAxis == 0)
+        if (m_scrollAxis == SCROLL_HORIZONTAL)
         {
             m_controlText->SetAssetPosition((float)m_pos, oldPosition.f.y, oldPosition.f.z);
         }
@@ -51,7 +51,7 @@ void FEScrollText::ApplyNewTextInstancePointer(TLTextInstance* controltext, int 
     {
         if (m_pos == -1 && m_width == -1)
         {
-            if (m_scrollAxis == 0)
+            if (m_scrollAxis == SCROLL_HORIZONTAL)
             {
                 m_pos = (int)controltext->GetAssetPosition().f.x;
             }
@@ -76,7 +76,7 @@ void FEScrollText::ApplyNewTextInstancePointer(TLTextInstance* controltext, int 
         m_scrollSpeed *= aspectRatio;
     }
 
-    if (m_scrollAxis == 0)
+    if (m_scrollAxis == SCROLL_HORIZONTAL)
     {
         nlVector2 boxSize;
         boxSize.x = sScrollTextBoxWidth;
@@ -123,7 +123,7 @@ void FEScrollText::RefreshText()
         text = (const unsigned short*)L"";
     }
 
-    if (m_scrollAxis == 0)
+    if (m_scrollAxis == SCROLL_HORIZONTAL)
     {
         m_messageWidth = m_textFont->GetStringWidth(BasicString<unsigned short, Detail::TempStringAllocator>(text), true, 640, true);
         m_messageWidth = (int)((float)m_messageWidth * m_controlText->GetScale().f.x);
@@ -138,9 +138,9 @@ void FEScrollText::RefreshText()
         m_messageWidth = (int)((float)m_messageWidth * m_controlText->GetScale().f.y);
     }
 
-    if (m_scrollMode == 0)
+    if (m_scrollMode == SCROLL_FULL_TEXT)
     {
-        if (m_scrollDirection == -1)
+        if (m_scrollDirection == SCROLL_REVERSE)
         {
             m_scrollOffset = (float)m_width + m_scrollSpeed;
         }
@@ -151,11 +151,11 @@ void FEScrollText::RefreshText()
     }
     else
     {
-        if (m_scrollDirection == 1)
+        if (m_scrollDirection == SCROLL_FORWARD)
         {
             m_scrollOffset = (float)nlMin(m_width - m_messageWidth, 0);
         }
-        if (m_scrollDirection == -1)
+        if (m_scrollDirection == SCROLL_REVERSE)
         {
             m_scrollOffset = 0.0f;
         }
@@ -198,15 +198,15 @@ void FEScrollText::Update(float fDeltaT)
 
     float minOffset;
     float maxOffset;
-    if (m_scrollMode == 0)
+    if (m_scrollMode == SCROLL_FULL_TEXT)
     {
         minOffset = (float)-m_messageWidth;
         maxOffset = (float)m_width;
-        if (m_scrollDirection == -1 && m_scrollOffset < minOffset)
+        if (m_scrollDirection == SCROLL_REVERSE && m_scrollOffset < minOffset)
         {
             m_scrollOffset = minOffset;
         }
-        else if (m_scrollDirection == 1 && m_scrollOffset > maxOffset)
+        else if (m_scrollDirection == SCROLL_FORWARD && m_scrollOffset > maxOffset)
         {
             m_scrollOffset = maxOffset;
         }
@@ -227,17 +227,17 @@ void FEScrollText::Update(float fDeltaT)
     }
 
     bool finished = false;
-    if (m_scrollDirection == -1)
+    if (m_scrollDirection == SCROLL_REVERSE)
     {
         finished = m_scrollOffset == minOffset;
     }
-    else if (m_scrollDirection == 1)
+    else if (m_scrollDirection == SCROLL_FORWARD)
     {
         finished = m_scrollOffset == maxOffset;
     }
 
     feVector3 position = m_controlText->GetPosition();
-    if (m_scrollAxis == 0)
+    if (m_scrollAxis == SCROLL_HORIZONTAL)
     {
         m_controlText->SetAssetPosition((float)m_pos + m_scrollOffset, position.f.y, position.f.z);
     }
@@ -250,10 +250,10 @@ void FEScrollText::Update(float fDeltaT)
     {
         switch (m_endBehavior)
         {
-        case 0:
-            if (m_scrollMode == 0)
+        case SCROLL_END_RESTART:
+            if (m_scrollMode == SCROLL_FULL_TEXT)
             {
-                if (m_scrollDirection == -1)
+                if (m_scrollDirection == SCROLL_REVERSE)
                 {
                     m_scrollOffset = (float)m_width + m_scrollSpeed;
                 }
@@ -264,22 +264,22 @@ void FEScrollText::Update(float fDeltaT)
             }
             else
             {
-                if (m_scrollDirection == 1)
+                if (m_scrollDirection == SCROLL_FORWARD)
                 {
                     m_scrollOffset = (float)nlMin(m_width - m_messageWidth, 0);
                 }
-                if (m_scrollDirection == -1)
+                if (m_scrollDirection == SCROLL_REVERSE)
                 {
                     m_scrollOffset = 0.0f;
                 }
             }
             Update(0.0f);
             break;
-        case 1:
-            m_scrollDirection = m_scrollDirection == -1 ? 1 : -1;
-            if (m_scrollMode == 0)
+        case SCROLL_END_REVERSE:
+            m_scrollDirection = m_scrollDirection == SCROLL_REVERSE ? SCROLL_FORWARD : SCROLL_REVERSE;
+            if (m_scrollMode == SCROLL_FULL_TEXT)
             {
-                if (m_scrollDirection == -1)
+                if (m_scrollDirection == SCROLL_REVERSE)
                 {
                     m_scrollOffset = (float)m_width + m_scrollSpeed;
                 }
@@ -290,19 +290,19 @@ void FEScrollText::Update(float fDeltaT)
             }
             else
             {
-                if (m_scrollDirection == 1)
+                if (m_scrollDirection == SCROLL_FORWARD)
                 {
                     m_scrollOffset = (float)nlMin(m_width - m_messageWidth, 0);
                 }
-                if (m_scrollDirection == -1)
+                if (m_scrollDirection == SCROLL_REVERSE)
                 {
                     m_scrollOffset = 0.0f;
                 }
             }
             Update(0.0f);
             break;
-        case 2:
-            m_scrollDirection = 0;
+        case SCROLL_END_STOP:
+            m_scrollDirection = SCROLL_STOPPED;
             break;
         }
         if (m_messageFinishedCB)
@@ -335,12 +335,12 @@ void FEScrollText::SetMetrics(int pos)
     int boxPos;
     if (pos == -9999)
     {
-        if (m_scrollAxis == 0)
+        if (m_scrollAxis == SCROLL_HORIZONTAL)
             boxPos = m_controlText->m_ScissorRect.X;
         else
             boxPos = m_controlText->m_ScissorRect.Y;
     }
-    else if (m_scrollAxis == 0)
+    else if (m_scrollAxis == SCROLL_HORIZONTAL)
     {
         boxPos = screenWidth / 2 + pos;
         if (IsWidescreen())
@@ -355,7 +355,7 @@ void FEScrollText::SetMetrics(int pos)
     }
 
     int boxWidth = m_width;
-    if (m_scrollAxis == 0 && IsWidescreen())
+    if (m_scrollAxis == SCROLL_HORIZONTAL && IsWidescreen())
     {
         float scale = 640.0f / 854.0f;
         boxWidth = (int)(boxWidth * scale);
@@ -363,12 +363,12 @@ void FEScrollText::SetMetrics(int pos)
 
     if (boxPos < 0)
         boxPos = 0;
-    if (m_scrollAxis == 0 && boxWidth + boxPos >= screenInfo->ScreenWidth)
+    if (m_scrollAxis == SCROLL_HORIZONTAL && boxWidth + boxPos >= screenInfo->ScreenWidth)
         boxWidth = screenInfo->ScreenWidth - boxPos - 1;
-    else if (m_scrollAxis == 1 && boxWidth + boxPos >= screenInfo->ScreenHeight)
+    else if (m_scrollAxis == SCROLL_VERTICAL && boxWidth + boxPos >= screenInfo->ScreenHeight)
         boxWidth = screenInfo->ScreenHeight - boxPos - 1;
 
-    if (m_scrollAxis == 0)
+    if (m_scrollAxis == SCROLL_HORIZONTAL)
         m_controlText->SetScissorBox((u16)boxPos, 0, (u16)boxWidth, (u16)screenInfo->ScreenHeight);
     else
         m_controlText->SetScissorBox(0, (u16)boxPos, (u16)screenInfo->ScreenWidth, (u16)boxWidth);
@@ -376,7 +376,7 @@ void FEScrollText::SetMetrics(int pos)
 
 void FEScrollText::SetClippingTextInstance(TLTextInstance* controlText)
 {
-    if (m_scrollAxis == 0)
+    if (m_scrollAxis == SCROLL_HORIZONTAL)
     {
         nlVector2& boxSize = (controlText->m_OverloadFlags & 0x4)
             ? controlText->m_OverloadedAttributes.BoxSize

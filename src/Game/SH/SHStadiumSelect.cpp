@@ -119,7 +119,7 @@ void StadiumSelectScene::SceneCreated()
     if (tickerText != 0)
     {
         glGetScreenInfo();
-        m_pTicker = new (8, false) FEScrollText(0);
+        m_pTicker = new (8, false) FEScrollText(SCROLL_HORIZONTAL);
         m_pTicker->ApplyNewTextInstancePointer(tickerText, 0, 242, 0);
         m_pTicker->SetDisplayMessage(GetStadiumTickerStringID(0));
     }
