@@ -316,7 +316,7 @@ ContactType PhysicsBanana::Contact(
             }
 
             if (hasWallContact
-                && GameInfoManager::Instance()->GetStadium() == 0x0B)
+                && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
             {
                 float sidelineDistance
                     = fabsf(contactPos.y) - m_pPowerupObject->GetRadius();

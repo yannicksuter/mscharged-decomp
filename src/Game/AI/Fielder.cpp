@@ -1294,9 +1294,9 @@ bool cFielder::CanGetElectrocuted() const
         return false;
     if (IsYoshiSuperPowerActive())
         return false;
-    if (GameInfoManager::Instance()->GetStadium() == 11 && m_eActionState == 35)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND && m_eActionState == 35)
         return false;
-    if (GameInfoManager::Instance()->GetStadium() == 11)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         float x = (float)fabs(m_DetChar.m_v3Position.x);
         if (x < cField::GetGoalLineX(1U) - 1.0f)
@@ -2207,7 +2207,7 @@ void cFielder::CollideWithWallCallback(
         }
     }
     else if (m_eActionState != (eFielderActionState)3
-             && GameInfoManager::Instance()->GetStadium() == 0x0B)
+             && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         float distance = (float)fabs(m_DetChar.m_v3Position.y);
         distance -= fn_8002BFA8(m_pTweaks, 1.0f);
@@ -2645,7 +2645,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         m_bShadowVisible = true;
         m_DetChar.m_v3Position.z = 0.0f;
         m_DetChar.m_v3Velocity.z = 0.0f;
-        if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+        if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         {
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
             m_pPhysicsCharacter->m_CanCollideWithWall = true;
@@ -2784,7 +2784,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
             m_DetChar.m_v3Position.z = 0.0f;
             m_DetChar.m_v3Velocity.z = 0.0f;
         }
-        if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+        if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         {
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = true;
             m_pPhysicsCharacter->m_CanCollideWithWall = true;
@@ -4275,7 +4275,7 @@ void cFielder::BeginDekeIntangibility()
             nlVec3Add(destination, destination, m_DetChar.m_v3Position);
             bool beyondSideline = fabsf(destination.y) > cField::GetSidelineY(1U);
             bool fixed = false;
-            if (GameInfoManager::Instance()->GetStadium() != 11 && m_pPhysicsCharacter->m_CanCollideWithWall)
+            if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND && m_pPhysicsCharacter->m_CanCollideWithWall)
                 fixed = cField::FixOutOfBoundsPosition(destination, 0.9f * fn_8002BFA8(m_pTweaks, GetPlayerScale()), false);
             else if (m_pPhysicsCharacter->m_CanCollideWithGoalLine)
                 fixed = cField::FixOutOfBoundsX(destination, false, 0.9f * fn_8002BFA8(m_pTweaks, GetPlayerScale()));

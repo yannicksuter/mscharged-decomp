@@ -456,9 +456,9 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     mpBoundaryAvoidables[1] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
         AvoidablePolygon(1, avoidableCenter, avoidableWidth, 25.0f);
 
-    if (GameInfoManager::Instance()->GetStadium() == 15)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_SAND_TOMB)
         avoidableWidth = 6.0f;
-    else if (GameInfoManager::Instance()->GetStadium() == 11)
+    else if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         avoidableWidth = 3.0f;
 
     avoidableCenter.x = 0.0f;
@@ -1528,7 +1528,7 @@ void cGame::Update(float fDeltaT)
             mfYTilt, fDiff * gScoreTiltScale, gScoreTiltSeekRate, fDeltaT);
         SetFieldTilt(0, mfXTilt, mfYTilt);
     }
-    else if ((GameInfoManager::Instance()->GetStadium() == 9 || gForceWeatherTilt)
+    else if ((GameInfoManager::Instance()->GetStadium() == STAD_STORM_SHIP || gForceWeatherTilt)
         && !GetConfigBool(Config::Global(), "no_weather", false)
         && !GameInfoManager::Instance()->IsRule0x4Equal1())
     {

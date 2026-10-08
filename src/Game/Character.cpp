@@ -1399,7 +1399,7 @@ void cCharacter::UpdateMovementState(float fDeltaT)
             nlVec2Set(*(nlVector2*)&m_DetChar.m_v3Position,
                 unidentifiedForceScale * unidentifiedForce.x + m_DetChar.m_v3Position.x,
                 unidentifiedForceScale * unidentifiedForce.y + m_DetChar.m_v3Position.y);
-            if (GameInfoManager::Instance()->GetStadium() != 11 && m_pPhysicsCharacter->m_CanCollideWithWall)
+            if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND && m_pPhysicsCharacter->m_CanCollideWithWall)
             {
                 cField::FixOutOfBoundsPosition(
                     m_DetChar.m_v3Position, fMinDistanceFromWall, false);
@@ -2184,7 +2184,7 @@ extern "C" void fn_80021C98(CollisionPowerupWallData* pEventData)
     const nlVector3& pos = pEventData->position;
     const nlVector3& nrm = pEventData->normal;
     unsigned long powerupID = (unsigned long)pEventData->pPowerup;
-    if (GameInfoManager::Instance()->GetStadium() != 0xB
+    if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND
         || fabsf(pos.x) > cField::GetGoalLineX(1U) - 2.5f)
     {
         EmissionManager* unidentifiedManager = EmissionManager::Instance();
@@ -2354,7 +2354,7 @@ extern "C" void fn_800224DC(CollisionBallWallData* pEventData)
     if (pEventData->pBall != NULL)
     {
         fn_800145A4(pEventData->pBall);
-        if (GameInfoManager::Instance()->GetStadium() != 0xB
+        if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND
             || fabsf(pEventData->pBall->m_v3Position.x) > cField::GetGoalLineX(1U) - 2.5f)
         {
             if (EmitElectricFenceBallEffect(pEventData->position, pEventData->normal, (unsigned long)pEventData->pBall, false))

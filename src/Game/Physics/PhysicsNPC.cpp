@@ -113,7 +113,7 @@ ContactType PhysicsNPC::Contact(
     default:
     {
         if (object->GetObjectType() == PHYSOBJ_WALL
-            && GameInfoManager::Instance()->GetStadium() == 0x0B)
+            && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         {
             bool isChainChomp
                 = ((SkinAnimatedNPC*)mpAINPC)->GetSkinAnimatedNPC_Type()

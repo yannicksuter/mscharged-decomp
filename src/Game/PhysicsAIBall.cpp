@@ -181,7 +181,7 @@ ContactType PhysicsAIBall::Contact(
                 nlVec3Set(contactPos, info->geom.pos[0], info->geom.pos[1],
                     info->geom.pos[2]);
 
-                if (GameInfoManager::Instance()->GetStadium() == 11
+                if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
                     && objID == PHYSOBJ_WALL)
                 {
                     bool bAboveHeight = contactPos.z > 0.36f;

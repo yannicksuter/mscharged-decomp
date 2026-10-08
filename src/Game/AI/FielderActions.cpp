@@ -1037,7 +1037,7 @@ void cFielder::fn_80044148(const nlVector3& v3Velocity)
     SetTangible(1, 0);
     m_fOpacity = 1.0f;
 
-    if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+    if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         m_pPhysicsCharacter->m_CanCollideWithGoalLine = 0;
         m_pPhysicsCharacter->m_CanCollideWithWall = 0;
@@ -1065,7 +1065,7 @@ void cFielder::fn_80044290(float fDeltaT)
             float fSidelineY
                 = (float)fabs(0.5f * (2.0f * cField::mv3FieldPosition.y));
 
-            if (GameInfoManager::Instance()->GetStadium() == 0x0B
+            if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
                 && (((float)fabs(v3Position.x) - fGoalLineX > 0.0f
                         && (float)fabs(v3Position.x) - (5.0f + fGoalLineX)
                                < 0.0f)
@@ -1906,7 +1906,7 @@ void cFielder::fn_80046244()
             SwapController(false);
         }
 
-        if (GameInfoManager::Instance()->GetStadium() == 0x0B)
+        if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
         {
             m_pPhysicsCharacter->m_CanCollideWithGoalLine = 0;
             m_pPhysicsCharacter->m_CanCollideWithWall = 0;

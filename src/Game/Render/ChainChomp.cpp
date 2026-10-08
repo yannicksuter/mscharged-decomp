@@ -385,7 +385,7 @@ void ChainChomp::Update(float fDeltaT)
     v3UpdatedPosition.x = mv3Position.x + fDeltaT * mv3Velocity.x;
     v3UpdatedPosition.y = mv3Position.y + fDeltaT * mv3Velocity.y;
     v3UpdatedPosition.z = gfChainChompGroundHeight;
-    if (GameInfoManager::Instance()->GetStadium() != 0xB && meChainChompState != CHAIN_STATE_LEAVE)
+    if (GameInfoManager::Instance()->GetStadium() != STAD_THUNDER_ISLAND && meChainChompState != CHAIN_STATE_LEAVE)
     {
         cField::FixOutOfBoundsPosition(v3UpdatedPosition,
             gGameTweaks.m_pGameTweaks->fChainChompRadius.GetValue(),

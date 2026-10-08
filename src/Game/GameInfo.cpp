@@ -72,7 +72,7 @@ GameInfoManager::GameInfoManager()
         SetSidekick(0, 1, -1);
         SetTeam(1, 0);
         SetSidekick(1, 0, -1);
-        SetStadium(13);
+        SetStadium(STAD_VICE);
     }
 
     mUserInfo.mSaveID = nlRandom(0xFFFFFFFF, &nlDefaultSeed);
@@ -406,7 +406,7 @@ void GameInfoManager::SetupGameFromConfig()
     if (TweakExists("User/stadium")) {
         const char* value = GetTweakString("User/stadium", 0);
 
-        SetStadium(-1);
+        SetStadium(STAD_INVALID);
 
         for (int stadium = 0; stadium < 18; stadium++) {
             if (nlStrICmp(GetStadiumName(stadium), value) == 0) {

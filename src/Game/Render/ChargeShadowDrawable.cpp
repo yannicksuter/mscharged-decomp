@@ -166,7 +166,7 @@ void ChargeShadowDrawable::Draw()
         return;
 
     bool visible = true;
-    if (nlSingleton<GameInfoManager>::Instance()->GetStadium() == 0xB)
+    if (nlSingleton<GameInfoManager>::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         nlMatrix4* transform = GetWorldMatrix();
         float edge = nlAbs(transform->m42);

@@ -31,15 +31,15 @@ struct TeamStats
         mNumLosses = 0;
         mNumOTLosses = 0;
         mNumPoints = 0;
-        mSidekicks.mValues[0] = (eSidekickID)0;
-        mSidekicks.mValues[1] = (eSidekickID)0;
-        mSidekicks.mValues[2] = (eSidekickID)0;
+        mSidekicks.mValues[0] = SK_TOAD;
+        mSidekicks.mValues[1] = SK_TOAD;
+        mSidekicks.mValues[2] = SK_TOAD;
         mSkillLevel = 1;
     }
 
     TeamStats()
     {
-        Initialize((eTeamID)0);
+        Initialize(TEAM_MARIO);
     }
 
     void SetSidekicks(CupSidekicks sidekicks) { mSidekicks = sidekicks; }

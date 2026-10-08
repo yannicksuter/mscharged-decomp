@@ -218,7 +218,7 @@ extern "C" void fn_800C5DBC(DesireSteering* desire, float fDeltaT)
             {
                 nThingsToAvoid = AVOID_NOTHING;
             }
-            else if (GameInfoManager::Instance()->GetStadium() == 0x0B
+            else if (GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
                 || GameInfoManager::Instance()->IsRule0x4Equal3())
             {
                 if (desire->m_pFielder->fn_8001E160()

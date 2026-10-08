@@ -13,84 +13,84 @@ enum
 static CharacterValuePair kGoalieValues = { 1.5f, 2.0f };
 
 static CharacterInfo sCharacterInfo[NUM_CHARACTERS + 1] = {
-    { 0, "mario", "NAME_MARIO", 2, 0, 9, -1, 7, 7, 1, 0, 0,
+    { 0, "mario", "NAME_MARIO", 2, TEAM_MARIO, 9, SK_INVALID, 7, 7, 1, 0, 0,
       { 0.25f, 1.0f }, 0.6f, 0.6f, 0.6f, 0.6f, 4, 0x00000001, 1, 0x00ED0012, 0x00000000 },
-    { 1, "bowser", "NAME_BOWSER", 2, 1, 12, -1, 1, 0, 1, 0, 2,
+    { 1, "bowser", "NAME_BOWSER", 2, TEAM_BOWSER, 12, SK_INVALID, 1, 0, 1, 0, 2,
       { 0.25f, 1.4f }, 0.25f, 0.95f, 0.25f, 0.95f, 3, 0x00000001, 7, 0x00E6431A, 0x00FFF100 },
-    { 2, "daisy", "NAME_DAISY", 2, 2, 14, -1, 3, 3, 1, 0, 1,
+    { 2, "daisy", "NAME_DAISY", 2, TEAM_DAISY, 14, SK_INVALID, 3, 3, 1, 0, 1,
       { 0.25f, 1.0f }, 0.95f, 0.25f, 0.25f, 0.95f, 1, 0x00000011, 13, 0x00DD6B08, 0x0059C6A7 },
-    { 3, "donkeykong", "NAME_DK", 2, 3, 11, -1, 5, 5, 1, 0, 2,
+    { 3, "donkeykong", "NAME_DK", 2, TEAM_DONKEYKONG, 11, SK_INVALID, 5, 5, 1, 0, 2,
       { 0.25f, 1.4f }, 0.25f, 0.95f, 0.25f, 0.95f, 3, 0x00000010, 6, 0x00E9C435, 0x008B00CF },
-    { 4, "luigi", "NAME_LUIGI", 2, 4, 13, -1, 6, 6, 1, 0, 0,
+    { 4, "luigi", "NAME_LUIGI", 2, TEAM_LUIGI, 13, SK_INVALID, 6, 6, 1, 0, 0,
       { 0.25f, 1.0f }, 0.6f, 0.6f, 0.6f, 0.6f, 4, 0x00000002, 2, 0x002B7117, 0x00000000 },
-    { 5, "peach", "NAME_PEACH", 2, 5, 10, -1, 8, 8, 1, 0, 1,
+    { 5, "peach", "NAME_PEACH", 2, TEAM_PEACH, 10, SK_INVALID, 8, 8, 1, 0, 1,
       { 0.25f, 1.0f }, 0.95f, 0.25f, 0.95f, 0.25f, 2, 0x00000004, 5, 0x00E3578C, 0x005DB9FF },
-    { 6, "waluigi", "NAME_WALUIGI", 2, 6, 16, -1, 9, 9, 1, 0, 1,
+    { 6, "waluigi", "NAME_WALUIGI", 2, TEAM_WALUIGI, 16, SK_INVALID, 9, 9, 1, 0, 1,
       { 0.4f, 1.0f }, 0.95f, 0.25f, 0.25f, 0.95f, 1, 0x00000008, 4, 0x00501592, 0x00000000 },
-    { 7, "wario", "NAME_WARIO", 2, 7, 15, -1, 10, 10, 1, 0, 0,
+    { 7, "wario", "NAME_WARIO", 2, TEAM_WARIO, 15, SK_INVALID, 10, 10, 1, 0, 0,
       { 0.25f, 1.25f }, 0.25f, 0.95f, 0.95f, 0.25f, 0, 0x00000010, 3, 0x00FFCB05, 0x00000000 },
-    { 8, "yoshi", "NAME_YOSHI", 2, 8, 19, -1, 11, 11, 1, 0, 0,
+    { 8, "yoshi", "NAME_YOSHI", 2, TEAM_YOSHI, 19, SK_INVALID, 11, 11, 1, 0, 0,
       { 0.25f, 1.0f }, 0.6f, 0.6f, 0.6f, 0.6f, 4, 0x00000002, 9, 0x0034A631, 0x00F75D05 },
-    { 9, "bowserjr", "NAME_BOWSERJR", 2, 9, 17, -1, 2, 1, 1, 0, 0,
+    { 9, "bowserjr", "NAME_BOWSERJR", 2, TEAM_BOWSERJR, 17, SK_INVALID, 2, 1, 1, 0, 0,
       { 0.25f, 1.0f }, 0.25f, 0.95f, 0.95f, 0.25f, 0, 0x00000001, 10, 0x00E6431A, 0x00FFF100 },
-    { 10, "diddykong", "NAME_DIDDYKONG", 2, 10, 18, -1, 4, 4, 1, 0, 0,
+    { 10, "diddykong", "NAME_DIDDYKONG", 2, TEAM_DIDDYKONG, 18, SK_INVALID, 4, 4, 1, 0, 0,
       { 0.25f, 1.0f }, 0.95f, 0.25f, 0.95f, 0.25f, 2, 0x00000011, 14, 0x00FFA800, 0x009000D5 },
-    { 11, "petey", "NAME_PETEY", 2, 11, 20, -1, 21, 12, 1, 0, 2,
+    { 11, "petey", "NAME_PETEY", 2, TEAM_PETEY, 20, SK_INVALID, 21, 12, 1, 0, 2,
       { 0.75f, 1.4f }, 0.25f, 0.95f, 0.25f, 0.95f, 3, 0x00000001, 12, 0x00E6431A, 0x00FFF100 },
-    { 12, "birdo", "NAME_BIRDO", 2, -1, -1, 3, 20, 18, 1, 0, 0,
+    { 12, "birdo", "NAME_BIRDO", 2, TEAM_INVALID, -1, SK_BIRDO, 20, 18, 1, 0, 0,
       { 0.25f, 1.25f }, 0.25f, 0.95f, 0.25f, 0.95f, 3, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 13, "hammerbro", "NAME_HAMMERBROS", 2, -1, -1, 2, 15, 17, 1, 0, 0,
+    { 13, "hammerbro", "NAME_HAMMERBROS", 2, TEAM_INVALID, -1, SK_HAMMERBROS, 15, 17, 1, 0, 0,
       { 0.25f, 1.0f }, 0.25f, 0.95f, 0.95f, 0.25f, 0, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 14, "koopa", "NAME_KOOPA", 2, -1, -1, 1, 16, 13, 1, 0, 0,
+    { 14, "koopa", "NAME_KOOPA", 2, TEAM_INVALID, -1, SK_KOOPA, 16, 13, 1, 0, 0,
       { 0.25f, 1.0f }, 0.6f, 0.6f, 0.6f, 0.6f, 4, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 15, "toad", "NAME_TOAD", 2, -1, -1, 0, 19, 14, 1, 0, 0,
+    { 15, "toad", "NAME_TOAD", 2, TEAM_INVALID, -1, SK_TOAD, 19, 14, 1, 0, 0,
       { 0.25f, 1.0f }, 0.95f, 0.25f, 0.95f, 0.25f, 2, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 16, "boo", "NAME_BOO", 2, -1, -1, 4, 12, 15, 1, 0, 0,
+    { 16, "boo", "NAME_BOO", 2, TEAM_INVALID, -1, SK_BOO, 12, 15, 1, 0, 0,
       { 0.25f, 1.0f }, 0.95f, 0.25f, 0.95f, 0.25f, 2, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 17, "drybones", "NAME_DRYBONES", 2, -1, -1, 5, 14, 16, 1, 0, 0,
+    { 17, "drybones", "NAME_DRYBONES", 2, TEAM_INVALID, -1, SK_DRYBONES, 14, 16, 1, 0, 0,
       { 0.25f, 1.0f }, 0.95f, 0.25f, 0.25f, 0.95f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 18, "montymole", "NAME_MONTY", 2, -1, -1, 6, 17, 19, 1, 0, 0,
+    { 18, "montymole", "NAME_MONTY", 2, TEAM_INVALID, -1, SK_MONTYMOLE, 17, 19, 1, 0, 0,
       { 0.25f, 1.25f }, 0.25f, 0.95f, 0.25f, 0.95f, 3, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 19, "shyguy", "NAME_SHYGUY", 2, -1, -1, 7, 18, 20, 1, 0, 0,
+    { 19, "shyguy", "NAME_SHYGUY", 2, TEAM_INVALID, -1, SK_SHYGUY, 18, 20, 1, 0, 0,
       { 0.25f, 1.0f }, 0.6f, 0.6f, 0.6f, 0.6f, 4, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 20, "mariogoalie", "NAME_MARIO", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 20, "mariogoalie", "NAME_MARIO", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 21, "bowsergoalie", "NAME_BOWSER", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 21, "bowsergoalie", "NAME_BOWSER", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 22, "daisygoalie", "NAME_DAISY", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 22, "daisygoalie", "NAME_DAISY", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 23, "donkeykonggoalie", "NAME_DK", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 23, "donkeykonggoalie", "NAME_DK", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 24, "luigigoalie", "NAME_LUIGI", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 24, "luigigoalie", "NAME_LUIGI", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 25, "peachgoalie", "NAME_PEACH", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 25, "peachgoalie", "NAME_PEACH", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 26, "waluigigoalie", "NAME_WALUIGI", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 26, "waluigigoalie", "NAME_WALUIGI", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 27, "wariogoalie", "NAME_WARIO", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 27, "wariogoalie", "NAME_WARIO", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 28, "yoshigoalie", "NAME_YOSHI", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 28, "yoshigoalie", "NAME_YOSHI", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 29, "bowserjrgoalie", "NAME_BOWSERJR", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 29, "bowserjrgoalie", "NAME_BOWSERJR", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 30, "diddykonggoalie", "NAME_DIDDYKONG", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 30, "diddykonggoalie", "NAME_DIDDYKONG", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { 31, "peteygoalie", "NAME_UNKNOWN", 3, -1, -1, -1, 13, -1, 0, 0, 0,
+    { 31, "peteygoalie", "NAME_UNKNOWN", 3, TEAM_INVALID, -1, SK_INVALID, 13, -1, 0, 0, 0,
       kGoalieValues, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
-    { -1, "INVALID", "OFF", 0, -1, -1, -1, 0, -1, 0, 0, 0,
+    { -1, "INVALID", "OFF", 0, TEAM_INVALID, -1, SK_INVALID, 0, -1, 0, 0, 0,
       { 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, 0.0f, 1, 0x00000000, 0, 0x00000000, 0x00000000 },
 };
 
 BasicGameInfo::BasicGameInfo()
 {
-    mTeamIndex[0] = 3;
-    mSidekickIndex[0][0] = 1;
-    mSidekickIndex[0][1] = 1;
-    mSidekickIndex[0][2] = 1;
-    mTeamIndex[1] = 0;
-    mSidekickIndex[1][0] = 0;
-    mSidekickIndex[1][1] = 0;
-    mSidekickIndex[1][2] = 0;
+    mTeamIndex[0] = TEAM_DONKEYKONG;
+    mSidekickIndex[0][0] = SK_KOOPA;
+    mSidekickIndex[0][1] = SK_KOOPA;
+    mSidekickIndex[0][2] = SK_KOOPA;
+    mTeamIndex[1] = TEAM_MARIO;
+    mSidekickIndex[1][0] = SK_TOAD;
+    mSidekickIndex[1][1] = SK_TOAD;
+    mSidekickIndex[1][2] = SK_TOAD;
     mFinalScore[1] = 0;
     mFinalScore[0] = 0;
 
@@ -98,30 +98,30 @@ BasicGameInfo::BasicGameInfo()
         mPadSides[pad] = -1;
     }
 
-    mStadiumIndex = 13;
+    mStadiumIndex = STAD_VICE;
 }
 
 void BasicGameInfo::Reset(bool clearTeams)
 {
     if (clearTeams) {
-        mTeamIndex[0] = -1;
+        mTeamIndex[0] = TEAM_INVALID;
     } else {
-        mTeamIndex[0] = 3;
+        mTeamIndex[0] = TEAM_DONKEYKONG;
     }
 
-    mSidekickIndex[0][0] = 1;
-    mSidekickIndex[0][1] = 1;
-    mSidekickIndex[0][2] = 1;
+    mSidekickIndex[0][0] = SK_KOOPA;
+    mSidekickIndex[0][1] = SK_KOOPA;
+    mSidekickIndex[0][2] = SK_KOOPA;
 
     if (clearTeams) {
-        mTeamIndex[1] = -1;
+        mTeamIndex[1] = TEAM_INVALID;
     } else {
-        mTeamIndex[1] = 0;
+        mTeamIndex[1] = TEAM_MARIO;
     }
 
-    mSidekickIndex[1][0] = 0;
-    mSidekickIndex[1][1] = 0;
-    mSidekickIndex[1][2] = 0;
+    mSidekickIndex[1][0] = SK_TOAD;
+    mSidekickIndex[1][1] = SK_TOAD;
+    mSidekickIndex[1][2] = SK_TOAD;
     mFinalScore[1] = 0;
     mFinalScore[0] = 0;
 
@@ -129,7 +129,7 @@ void BasicGameInfo::Reset(bool clearTeams)
         mPadSides[pad] = -1;
     }
 
-    mStadiumIndex = 13;
+    mStadiumIndex = STAD_VICE;
 }
 
 const CharacterInfo& GetCharacterInfo(int index)

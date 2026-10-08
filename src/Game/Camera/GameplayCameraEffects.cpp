@@ -479,7 +479,7 @@ void GameplayCameraEffects::AdjustCameraVectors(float zoom,
         float amount = nlMaxEquals(fabsf(clampedX), fabsf(clampedY));
         target->y += gCameraTiltTargetOffset * (amount / gCameraMaxStadiumTilt);
     }
-    else if (GameInfoManager::Instance()->GetStadium() == 10)
+    else if (GameInfoManager::Instance()->GetStadium() == STAD_THE_PALACE)
     {
         camera->z += gStadium10CameraHeightZoomAdjustment * zoom;
     }

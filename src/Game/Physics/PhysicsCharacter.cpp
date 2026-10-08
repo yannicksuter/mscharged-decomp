@@ -187,7 +187,7 @@ ContactType PhysicsCharacter::Contact(PhysicsObject* other,
         }
 
         if (sidelineCollision && objectType == PHYSOBJ_WALL
-            && GameInfoManager::Instance()->GetStadium() == 0x0B
+            && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND
             && m_pAICharacter->m_eClassType == FIELDER)
         {
             cFielder* fielder = (cFielder*)m_pAICharacter;

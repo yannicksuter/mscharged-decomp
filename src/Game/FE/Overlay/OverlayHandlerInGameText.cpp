@@ -200,7 +200,7 @@ void InGameTextOverlay::DisplayFinalScore()
             = LookupLocHash(GetLOCTeamName(winningTeam));
         WideString winnerNameWideString(winnerNameLookup);
 
-        if (winningTeam == (eTeamID)0)
+        if (winningTeam == TEAM_MARIO)
         {
             const unsigned short* const& spaceCharacters = (const unsigned short*)L" ";
             WideString space(spaceCharacters);

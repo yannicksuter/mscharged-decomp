@@ -637,7 +637,7 @@ void Windy::Start()
     float angle = 360.0f * ((float)aWindDirection / 65536.0f);
     float value = nlRandomf(1.0f);
     if (!gDisableWeather && !GameInfoManager::Instance()->IsRule0x4Equal1()
-        && value <= gDebrisChance && GameInfoManager::Instance()->GetStadium() == 11)
+        && value <= gDebrisChance && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
     {
         if (fabsf(angle - 90.0f) < gWindAngleRange / 2.0f || fabsf(angle - 270.0f) < gWindAngleRange / 2.0f)
         {

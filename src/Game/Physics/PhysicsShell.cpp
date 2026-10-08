@@ -430,7 +430,7 @@ ContactType PhysicsShell::Contact(
             }
 
             if (bWasRicochet
-                && GameInfoManager::Instance()->GetStadium() == 0x0B)
+                && GameInfoManager::Instance()->GetStadium() == STAD_THUNDER_ISLAND)
             {
                 nlVector3 contactPos;
                 nlVec3Set(contactPos, info->geom.pos[0], info->geom.pos[1], info->geom.pos[2]);
