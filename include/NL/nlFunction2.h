@@ -106,7 +106,7 @@ public:
         mTag = FUNCTION_EMPTY;
     }
 
-    void UnidentifiedTransfer(const Function2& other)
+    void TransferFrom(const Function2& other)
     {
         Function2& source = const_cast<Function2&>(other);
         mTag = source.mTag;

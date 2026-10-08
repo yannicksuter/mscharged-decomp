@@ -28,7 +28,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
 #include "NL/nlFunction.inl"
@@ -52,7 +52,7 @@ float gWaluigiWallHeight = 1.2f;
 float gWaluigiWallShrinkSpeed = 16.5f;
 float gWaluigiWallShrinkDelay = 4.2f;
 float gWaluigiWallPatchDamage = 0.5f;
-float gWaluigiWallDamage_806DCB24 = 0.5f;
+float gWaluigiWallSuperGrowDamage = 0.5f;
 float gWaluigiWallYoshiEggDamage = 0.5f;
 float gWaluigiWallChainChompDamage = 0.5f;
 float gWaluigiWallWindDebrisDamage = 0.75f;
@@ -62,8 +62,8 @@ unsigned int gWaluigiWallNextID;
 bool gWaluigiWallShrinkAll;
 float gWaluigiWallDecayRate;
 float gWaluigiWallShellBananaDamage;
-float gWaluigiWallDamage_806E12FC;
-float gWaluigiWallDamage_806E1300;
+float gWaluigiWallType27Damage;
+float gWaluigiWallType26Damage;
 float gWaluigiWallGoalieDamage;
 float gWaluigiWallFielderDamage;
 float gWaluigiWallSlideAttackDamage;
@@ -81,11 +81,11 @@ PhysicsWaluigiWall::PhysicsWaluigiWall(cFielder* owner, float width, float heigh
 {
     nlMatrix3 rotation;
     nlMakeRotationMatrixZ(rotation,
-        0.0000958738f * owner->mUnidentified024.m_aActualFacingDirection);
+        0.0000958738f * owner->m_DetChar.m_aActualFacingDirection);
     nlVector3 direction;
     rotation.GetRow_(0, direction);
-    nlVec3ScaleAdd(mStartPoint, -0.1f, direction, owner->mUnidentified024.m_v3Position);
-    nlVec3ScaleAdd(mEndPoint, -0.0f, direction, owner->mUnidentified024.m_v3Position);
+    nlVec3ScaleAdd(mStartPoint, -0.1f, direction, owner->m_DetChar.m_v3Position);
+    nlVec3ScaleAdd(mEndPoint, -0.0f, direction, owner->m_DetChar.m_v3Position);
     Initialize(rotation, height);
 }
 
@@ -168,10 +168,10 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
             ApplyDamage(gWaluigiWallPatchDamage);
         else if (patch->m_Type == 6)
         {
-            UnidentifiedEventData24* data = 0;
-            g_UnidentifiedEventData24Pool.Allocate(data);
-            data->mUnidentified0C = patch->m_pOwner;
-            data->mUnidentified10 = patch;
+            CollisionPatchData* data = 0;
+            g_CollisionPatchDataPool.Allocate(data);
+            data->pPlayer = patch->m_pOwner;
+            data->pPatch = patch;
             QueueCollisionTongue(data);
         }
         return NO_CONTACT;
@@ -223,10 +223,10 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         return NO_CONTACT;
     }
     case 27:
-        ApplyDamage(gWaluigiWallDamage_806E12FC);
+        ApplyDamage(gWaluigiWallType27Damage);
         return NO_CONTACT;
     case 26:
-        ApplyDamage(gWaluigiWallDamage_806E1300);
+        ApplyDamage(gWaluigiWallType26Damage);
         return ONE_WAY_CONTACT_OTHER;
     case 32:
         ApplyDamage(gWaluigiWallYoshiEggDamage);
@@ -371,7 +371,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
     {
         if (player == mOwner)
         {
-            WaluigiWallManager* manager = player->mWaluigiWallState.mUnidentified08;
+            WaluigiWallManager* manager = player->mWaluigiWallState.mWallManager;
             float gracePeriod = 0.2f;
             if (manager->mCurrentWall == this)
                 return NO_CONTACT;
@@ -380,9 +380,9 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
             OnWaluigiWallAbort(player);
         }
         else if (player->IsSuperGrowActive())
-            ApplyDamage(gWaluigiWallDamage_806DCB24);
+            ApplyDamage(gWaluigiWallSuperGrowDamage);
         else if (player->m_eActionState == ACTION_HIT)
-            ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->mUnidentified064));
+            ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->fDefenseSize));
         else if (player->m_eActionState == ACTION_SLIDE_ATTACK)
             ApplyDamage(gWaluigiWallSlideAttackDamage);
         else
@@ -406,10 +406,10 @@ WaluigiWallManager::WaluigiWallManager()
     , mEmitterStarted(false)
     , mHeightUpdateDelay(0.0f)
 {
-    UnidentifiedFindEvent<cPlayer>(gWaluigiWallStartEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallStart), (unsigned int)&mStartConnection, -1);
-    UnidentifiedFindEvent<cPlayer>(gWaluigiWallEndEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallEnd), (unsigned int)&mEndConnection, -1);
-    UnidentifiedFindEvent<cPlayer>(gWaluigiWallAbortEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallAbort), (unsigned int)&mAbortConnection, -1);
-    UnidentifiedFindEvent<void>(gWaluigiWallMegastrikeEventName, -1)->Add(Function<void*>(OnWaluigiWallMegastrikeStart), (unsigned int)&mMegastrikeConnection, -1);
+    FindEvent<cPlayer>(gWaluigiWallStartEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallStart), (unsigned int)&mStartConnection, -1);
+    FindEvent<cPlayer>(gWaluigiWallEndEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallEnd), (unsigned int)&mEndConnection, -1);
+    FindEvent<cPlayer>(gWaluigiWallAbortEventName, -1)->Add(Function<cPlayer*>(OnWaluigiWallAbort), (unsigned int)&mAbortConnection, -1);
+    FindEvent<void>(gWaluigiWallMegastrikeEventName, -1)->Add(Function<void*>(OnWaluigiWallMegastrikeStart), (unsigned int)&mMegastrikeConnection, -1);
     for (unsigned int i = 0; i < 20; ++i)
         mWalls[i] = 0;
     ++gWaluigiWallManagerCount;
@@ -447,8 +447,8 @@ PhysicsWaluigiWall* WaluigiWallManager::CreateWall(cFielder* owner, float width,
                 if (group != 0)
                 {
                     EmissionController* controller = EmissionManager::Instance()->Create(group, 3, true, 0);
-                    controller->SetPosition(owner->mUnidentified024.m_v3Position);
-                    controller->SetVelocity(owner->mUnidentified024.m_v3Velocity);
+                    controller->SetPosition(owner->m_DetChar.m_v3Position);
+                    controller->SetVelocity(owner->m_DetChar.m_v3Velocity);
                     controller->m_uUserData = (unsigned long)wall;
                     controller->SetUpdateCallback(Function1<void, EmissionController&>(UpdateWaluigiWallEmitter));
                     controller->SetFinishedCallback(Function2<void, EmissionController&, int>(OnWaluigiWallEffectFinished));
@@ -553,7 +553,7 @@ void WaluigiWallManager::Update(float dt)
         nlVector3 direction;
         rotation.GetRow_(0, direction);
         nlVector3 end;
-        nlVec3ScaleAdd(end, -0.0f, direction, mCurrentWall->mOwner->mUnidentified024.m_v3Position);
+        nlVec3ScaleAdd(end, -0.0f, direction, mCurrentWall->mOwner->m_DetChar.m_v3Position);
         mCurrentWall->SetEndPoint(end);
         if (nlVec3DistanceSquared2D(mCurrentWall->mStartPoint, mCurrentWall->mEndPoint) > 25.0f)
             CreateWall(mCurrentWall->mOwner, gWaluigiWallWidth, gWaluigiWallHeight);
@@ -608,20 +608,20 @@ void UpdateWaluigiWallEmitter(EmissionController& controller)
 
 void OnWaluigiWallStart(cPlayer* player)
 {
-    static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08->CreateWall(
+    static_cast<cFielder*>(player)->mWaluigiWallState.mWallManager->CreateWall(
         static_cast<cFielder*>(player), gWaluigiWallWidth, gWaluigiWallHeight);
 }
 
 void OnWaluigiWallEnd(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mWallManager;
     if (manager->mCurrentWall != 0)
         manager->EndWall();
 }
 
 void OnWaluigiWallAbort(cPlayer* player)
 {
-    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mUnidentified08;
+    WaluigiWallManager* manager = static_cast<cFielder*>(player)->mWaluigiWallState.mWallManager;
     if (manager->mCurrentWall != 0)
     {
         manager->EndWall();
@@ -639,8 +639,8 @@ void OnWaluigiWallMegastrikeStart(void*)
         for (int i = 0; i < 4; ++i)
         {
             cFielder* player = team->GetFielder(i);
-            if (player != 0 && player->mWaluigiWallState.mUnidentified08 != 0)
-                player->mWaluigiWallState.mUnidentified08->ClearWalls();
+            if (player != 0 && player->mWaluigiWallState.mWallManager != 0)
+                player->mWaluigiWallState.mWallManager->ClearWalls();
         }
     }
 }

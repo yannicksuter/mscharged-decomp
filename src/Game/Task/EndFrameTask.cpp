@@ -10,7 +10,7 @@ unsigned char gDrawScreenBorder;
 #include "NL/gl/gl.h"
 #include "types.h"
 #include "Game/Render/Warble.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 void EndFrameTask::Run(float)
 {

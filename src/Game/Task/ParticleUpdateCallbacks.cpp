@@ -2,7 +2,7 @@
 
 #include "Game/Task/GameRenderTask.h"
 #include "Game/Task/ParticleUpdateTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 bool g_bRenderParticles = true;
 u8 lbl_806E1458;

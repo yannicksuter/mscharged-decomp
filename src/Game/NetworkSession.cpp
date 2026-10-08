@@ -46,7 +46,7 @@
 #include "Game/NetworkSync.h"
 #include "Game/SH/SHOnlineFriendsChooseSides.h"
 #include "Game/SH/SHOnlineConnectionQuality.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.h"
 #include <string.h>
 #include "Game/BaseGameSceneManager.h"
@@ -1575,7 +1575,7 @@ void NetworkSession::OnConnectionClosed(u32 connection, int reason)
     }
 }
 
-void NetworkSession::ListenerVirtual14()
+void NetworkSession::OnReservedConnectionEvent()
 {
 }
 
@@ -1915,13 +1915,13 @@ int NetworkSession::ProcessMessage(
 static inline void RegisterLoadedGameActions(NetworkSession* session)
 {
     Function<FnVoidVoid> first(BindMember(session, &NetworkSession::OnPauseGame));
-    UnidentifiedTypedEvent0<void>* pauseEvent
-        = &g_pGame->mUnidentified49C.mPauseGameEvent;
+    TypedEvent0<void>* pauseEvent
+        = &g_pGame->mEventQueue.mPauseGameEvent;
     pauseEvent->Add(first, (unsigned int)&session->mPauseEventOwner, -1);
 
     Function<FnVoidVoid> second(BindMember(session, &NetworkSession::OnResumingGame));
-    UnidentifiedTypedEvent0<void>* resumingEvent
-        = &g_pGame->mUnidentified49C.mResumingGameEvent;
+    TypedEvent0<void>* resumingEvent
+        = &g_pGame->mEventQueue.mResumingGameEvent;
     resumingEvent->Add(second, (unsigned int)&session->mResumingEventOwner, -1);
 
     if (NetTournManager::Instance()->mState != 0)
@@ -2010,7 +2010,7 @@ static void ApplyRecordedGameConfig(RecordedGameConfig* config)
     }
 }
 
-void NetworkSession::BaseVirtual40()
+void NetworkSession::ReservedSessionHook()
 {
 }
 

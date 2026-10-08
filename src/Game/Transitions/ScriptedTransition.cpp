@@ -515,7 +515,7 @@ public:
     {
     }
 
-    virtual bool UnidentifiedVirtual18()
+    virtual bool ConsumeScreenGrabRequest()
     {
         bool unknown = m_bDoGrab;
         m_bDoGrab = false;
@@ -632,7 +632,7 @@ bool ScriptedScreenTransition::ConsumeScreenGrabRequest()
     bool screenGrabRequested = false;
     for (int i = 0; i < m_nModifiers; i++)
     {
-        screenGrabRequested |= m_pModifiers[i]->UnidentifiedVirtual18();
+        screenGrabRequested |= m_pModifiers[i]->ConsumeScreenGrabRequest();
     }
     return screenGrabRequested;
 }

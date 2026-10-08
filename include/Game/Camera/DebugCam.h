@@ -37,7 +37,7 @@ public:
     /* 0x88 */ cGlobalPad* m_pPad;
     /* 0x8C */ bool m_bUseWiiControls;
     /* 0x8D */ bool m_bEnableControls;
-    /* 0x8E */ bool mUnidentified8E;
+    /* 0x8E */ bool m_pad8E;
     /* 0x8F */ bool m_bUpdateTargets;
     /* 0x90 */ DebugCameraTarget* m_pTarget;
     /* 0x94 */ DLListEntry<DebugCameraTarget*>* m_pTargetEntry;

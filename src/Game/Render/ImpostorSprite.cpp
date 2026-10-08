@@ -15,7 +15,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 float gImpostorAngleJitterDegrees = 10.0f;
@@ -98,7 +98,7 @@ ImpostorSprite::ImpostorSprite(
     , mRenderPair()
     , mMesh(0)
     , mEnabled(false)
-    , mUnidentified079(false)
+    , mCaptureDisabled(false)
     , mAngle(0)
     , mNumRenderSlots(0)
     , mUseIntensityAlpha(false)
@@ -204,7 +204,7 @@ void ImpostorSprite::UpdateViewport()
     view->m_Viewport.width = width;
     view->m_Viewport.height = height;
 
-    bool enabled = mEnabled && !mUnidentified079;
+    bool enabled = mEnabled && !mCaptureDisabled;
     mView->m_Target =
         enabled ? GLViewTarget_Mode9 : GLViewTarget_None;
 }
@@ -223,7 +223,7 @@ void ImpostorSprite::ResumeCapture()
     if (mCaptureSuspended)
     {
         mCaptureSuspended = false;
-        bool enabled = mEnabled && !mUnidentified079;
+        bool enabled = mEnabled && !mCaptureDisabled;
         mView->m_Target =
             enabled ? GLViewTarget_Mode9 : GLViewTarget_None;
     }
@@ -276,7 +276,7 @@ void ImpostorSprite::CreateRenderTarget(const char* name)
     activeView->m_Viewport.y = 0;
     activeView->m_Viewport.width = activeWidth;
     activeView->m_Viewport.height = activeHeight;
-    bool enabled = mEnabled && !mUnidentified079;
+    bool enabled = mEnabled && !mCaptureDisabled;
     mView->m_Target =
         enabled ? GLViewTarget_Mode9 : GLViewTarget_None;
 }

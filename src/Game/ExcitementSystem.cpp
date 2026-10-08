@@ -11,7 +11,7 @@
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlFunction.inl"
 
 namespace
@@ -65,15 +65,15 @@ void ExcitementSystem::RegisterEventHandlers()
         Detail::MemFunImpl<void, void (ExcitementSystem::*)(CollisionBallGoalpostData*)>,
         ExcitementSystem*, Placeholder<0> > GoalpostBinding;
 
-    UnidentifiedFindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(AttackBinding(MemFun(&ExcitementSystem::OnAttackSuccess), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(LightningBinding(MemFun(&ExcitementSystem::OnLightningStrike), this, placeholder0)), 0, -1);
-    UnidentifiedFindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(GoalpostBinding(MemFun(&ExcitementSystem::OnCollisionBallGoalpost), this, placeholder0)), 0, -1);
+    FindEvent<PlayerAttackData>("AttackSuccess", -1)->Add(Function<PlayerAttackData*>(AttackBinding(MemFun(&ExcitementSystem::OnAttackSuccess), this, placeholder0)), 0, -1);
+    FindEvent<LightningStrikeData>("LightningStrike", -1)->Add(Function<LightningStrikeData*>(LightningBinding(MemFun(&ExcitementSystem::OnLightningStrike), this, placeholder0)), 0, -1);
+    FindEvent<CollisionBallGoalpostData>("CollisionBallGoalpost", -1)->Add(Function<CollisionBallGoalpostData*>(GoalpostBinding(MemFun(&ExcitementSystem::OnCollisionBallGoalpost), this, placeholder0)), 0, -1);
 }
 
 void ExcitementSystem::OnAttackSuccess(
     PlayerAttackData* event)
 {
-    if (event->mUnidentified10 == 1 && mEventExcitement[1] != 0)
+    if (event->bIsSlideAttack == 1 && mEventExcitement[1] != 0)
     {
         mExcitement += mEventExcitement[1];
         mExcitementCount++;

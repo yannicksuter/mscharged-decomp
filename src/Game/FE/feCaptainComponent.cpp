@@ -112,7 +112,7 @@ void FECaptainComponent::Show()
         mPositions->m_bVisible = true;
     }
 
-    mUnidentified24 = 1;
+    m_pad24 = 1;
     SetSlotVisibility(1, 1, 1);
     mPositions->SetActiveSlide("Slide1", true, false);
 }

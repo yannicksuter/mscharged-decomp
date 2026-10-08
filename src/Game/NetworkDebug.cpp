@@ -3,7 +3,7 @@
 
 #include "Game/NetworkSession.h"
 #include "Game/TweakCallback.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlDebugViews.h"
 #include "Game/InputRouter.h"
@@ -77,7 +77,7 @@ void NetworkSessionBase::DebugDraw()
     glFontEnd();
     if (socket != 0)
     {
-        socket->SocketVirtual48();
+        socket->DrawScreenPrinter();
     }
 }
 

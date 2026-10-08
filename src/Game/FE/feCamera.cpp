@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/FE/feCamera.h"
 #include "Game/FE/feModelManager.h"
 #include "Game/Camera/animcam.h"

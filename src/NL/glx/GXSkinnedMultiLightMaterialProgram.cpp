@@ -3,7 +3,7 @@
 #include "NL/glx/GXSkinnedMultiLightMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXSkinnedMultiLightMaterialProgram* GXSkinnedMultiLightMaterialProgram::Instance;
 bool GXSkinnedMultiLightMaterialProgram::Initialized;

@@ -90,7 +90,7 @@ public:
     /* 0x190C */ TLInstance* mGreenArrows[2];
     /* 0x1914 */ TLComponentInstance* mSidekicksLayer;
     /* 0x1918 */ TLComponentInstance* mDoneButtonInstance;
-    /* 0x191C */ u8 mUnidentified191C[0x20];
+    /* 0x191C */ u8 mPadding191C[0x20];
     /* 0x193C */ int mDraftCountdown;
     /* 0x1940 */ unsigned short mTimerText[8];
     /* 0x1950 */ bool mDraftExitDone;

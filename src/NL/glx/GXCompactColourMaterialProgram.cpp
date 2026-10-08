@@ -4,7 +4,7 @@
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/gl/glLoadModel.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXCompactColourMaterialProgram* GXCompactColourMaterialProgram::Instance;
 bool GXCompactColourMaterialProgram::Initialized;

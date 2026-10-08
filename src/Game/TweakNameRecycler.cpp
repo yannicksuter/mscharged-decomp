@@ -21,7 +21,7 @@ public:
     }
     virtual ~TweakNameTable();
 
-    /* 0x14 */ u8 mUnidentified014[4]; // not accessed by retained code
+    /* 0x14 */ u8 m_pad014[4]; // not accessed by retained code
 }; // size: 0x18
 
 nlSlotPoolFixed<0x10> gTweakNamePool;

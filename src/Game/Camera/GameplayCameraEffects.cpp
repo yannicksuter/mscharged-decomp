@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 
 #include "Game/AI/Fielder.h"
 #include "Game/AI/AiUtil.h"
@@ -21,19 +21,19 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include <math.h>
 
 // Instantiate the Function classes RegisterEventListeners uses, in its order,
 // before BindMember is declared. MWCC emits late template copies grouped by
 // declaration point in reverse, which gives retail's tail: the BindMember
 // copies, then the Function constructors from the last event to the first.
-typedef char UnidentifiedFunctionSize0[sizeof(Function<GoalScoredData*>)];
-typedef char UnidentifiedFunctionSize1[sizeof(Function<FnVoidVoid>)];
-typedef char UnidentifiedFunctionSize2[sizeof(Function<MegaStrikeMeterData*>)];
-typedef char UnidentifiedFunctionSize3[sizeof(Function<GoalieSaveData*>)];
-typedef char UnidentifiedFunctionSize4[sizeof(Function<CollisionThwompPlayerData*>)];
-typedef char UnidentifiedFunctionSize5[sizeof(Function<PlayerAttackData*>)];
+typedef char GoalScoredCallbackInstantiation[sizeof(Function<GoalScoredData*>)];
+typedef char VoidCallbackInstantiation[sizeof(Function<FnVoidVoid>)];
+typedef char MegaStrikeMeterCallbackInstantiation[sizeof(Function<MegaStrikeMeterData*>)];
+typedef char GoalieSaveCallbackInstantiation[sizeof(Function<GoalieSaveData*>)];
+typedef char ThwompCollisionCallbackInstantiation[sizeof(Function<CollisionThwompPlayerData*>)];
+typedef char PlayerAttackCallbackInstantiation[sizeof(Function<PlayerAttackData*>)];
 
 #include "NL/nlBindMember.h"
 
@@ -101,13 +101,13 @@ float gCameraCaptainFlagZoomAdjustment;
 float gCameraStadiumTiltZoomAdjustment;
 
 template <>
-UnidentifiedCameraEffects*
-    nlSingleton<UnidentifiedCameraEffects>::s_pInstance = 0;
+GameplayCameraEffects*
+    nlSingleton<GameplayCameraEffects>::s_pInstance = 0;
 
-static UnidentifiedTypedEvent<GoalieSaveData>*
+static TypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length);
 
-UnidentifiedCameraEffects::UnidentifiedCameraEffects()
+GameplayCameraEffects::GameplayCameraEffects()
 {
     mCameraFlags = 0;
     mFlagUpdateTimer = 0.0f;
@@ -127,26 +127,26 @@ UnidentifiedCameraEffects::UnidentifiedCameraEffects()
     mTransitionScale = 0.0f;
 }
 
-void UnidentifiedCameraEffects::RegisterEventListeners()
+void GameplayCameraEffects::RegisterEventListeners()
 {
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &UnidentifiedCameraEffects::OnGoalScored)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnShotPresentation)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnShotPresentationEnd)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnCaptainClashPresentation)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnWindupPresentation)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnWindupPresentationEnd)), 0, -1);
-    UnidentifiedFindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &UnidentifiedCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &UnidentifiedCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
-    GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &UnidentifiedCameraEffects::OnGoalieSave)), 0, -1);
-    UnidentifiedFindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(BindMember(this, &UnidentifiedCameraEffects::OnCollisionThwompPlayer)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &UnidentifiedCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &UnidentifiedCameraEffects::OnGoalieSlamAttackAttempt)), 0, -1);
-    UnidentifiedFindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &GameplayCameraEffects::OnGoalScored)), 0, -1);
+    FindEvent<NoEventData>("ShotPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentation)), 0, -1);
+    FindEvent<NoEventData>("ShotPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnShotPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("CaptainClashPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentation)), 0, -1);
+    FindEvent<NoEventData>("CaptainClashPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnCaptainClashPresentationEnd)), 0, -1);
+    FindEvent<NoEventData>("WindupPresentation", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentation)), 0, -1);
+    FindEvent<NoEventData>("WindupPresentationEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnWindupPresentationEnd)), 0, -1);
+    FindEvent<MegaStrikeMeterData>("MegaStrikeMeterStart", -1)->Add(Function<MegaStrikeMeterData*>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterStart)), 0, -1);
+    FindEvent<NoEventData>("MegaStrikeMeterEnd", -1)->Add(Function<FnVoidVoid>(BindMember(this, &GameplayCameraEffects::OnMegaStrikeMeterEnd)), 0, -1);
+    GetGoalieSaveEvent("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSave)), 0, -1);
+    FindEvent<CollisionThwompPlayerData>("CollisionThwompPlayer", -1)->Add(Function<CollisionThwompPlayerData*>(BindMember(this, &GameplayCameraEffects::OnCollisionThwompPlayer)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieDekeAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackAttempt)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieDekeAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieDekeAttackSuccess)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieSlamAttackAttempt", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackAttempt)), 0, -1);
+    FindEvent<PlayerAttackData>("GoalieSlamAttackSuccess", -1)->Add(Function<PlayerAttackData*>(BindMember(this, &GameplayCameraEffects::OnGoalieSlamAttackSuccess)), 0, -1);
 }
 
-void UnidentifiedCameraEffects::Update(float deltaTime)
+void GameplayCameraEffects::Update(float deltaTime)
 {
     if (g_pGame->m_eGameState == 3)
     {
@@ -187,11 +187,11 @@ void UnidentifiedCameraEffects::Update(float deltaTime)
     }
 }
 
-void UnidentifiedCameraEffects::UnidentifiedNoOp()
+void GameplayCameraEffects::FixedUpdate()
 {
 }
 
-void UnidentifiedCameraEffects::Reset()
+void GameplayCameraEffects::Reset()
 {
     if (mOwnsTimeScale && g_pNetworkSessionBase->GetLocalMachineId() == 0
         && !gNetworkInputRecording->mPlaybackReady)
@@ -214,7 +214,7 @@ void UnidentifiedCameraEffects::Reset()
     mSecondaryPlayer = 0;
 }
 
-void UnidentifiedCameraEffects::UpdateCameraFlags()
+void GameplayCameraEffects::UpdateCameraFlags()
 {
     if (AreFieldersClear() == true)
         mCameraFlags |= 0x10;
@@ -228,13 +228,13 @@ void UnidentifiedCameraEffects::UpdateCameraFlags()
         float goalLineX = cField::GetGoalLineX((unsigned int)
             owner->m_pTeam->GetOtherTeam()->m_nSide);
         if (goalLineX > 0.0
-            && owner->mUnidentified024.m_v3Position.x > 0.0f)
+            && owner->m_DetChar.m_v3Position.x > 0.0f)
         {
             facingGoal = true;
             goto facingGoalKnown;
         }
         if (goalLineX < 0.0
-            && owner->mUnidentified024.m_v3Position.x < 0.0f)
+            && owner->m_DetChar.m_v3Position.x < 0.0f)
         {
             facingGoal = true;
             goto facingGoalKnown;
@@ -257,7 +257,7 @@ facingGoalKnown:
         mCameraFlags |= 0x40;
 }
 
-bool UnidentifiedCameraEffects::AreFieldersClear() const
+bool GameplayCameraEffects::AreFieldersClear() const
 {
     cFielder* owner = (cFielder*)g_pBall->m_pOwner;
     bool clear = false;
@@ -272,12 +272,12 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
         for (int i = 0; i < 4; ++i)
         {
             cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
-            if (fielder->mUnidentified120 == owner->mUnidentified120)
+            if (fielder->m_nCharacterIndex == owner->m_nCharacterIndex)
                 continue;
 
             if (goalLineX > 0.0f)
             {
-                if (fielder->mUnidentified024.m_v3Position.x > owner->mUnidentified024.m_v3Position.x
+                if (fielder->m_DetChar.m_v3Position.x > owner->m_DetChar.m_v3Position.x
                     && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
@@ -287,7 +287,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
             }
             if (goalLineX < 0.0f)
             {
-                if (fielder->mUnidentified024.m_v3Position.x < owner->mUnidentified024.m_v3Position.x
+                if (fielder->m_DetChar.m_v3Position.x < owner->m_DetChar.m_v3Position.x
                     && !fielder->IsInFallAction()
                     && !fielder->IsFallenDown()
                     && fielder->m_eActionState != (eFielderActionState)0x23)
@@ -296,9 +296,9 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
                 }
             }
 
-            dy = fielder->mUnidentified024.m_v3Position.y - owner->mUnidentified024.m_v3Position.y;
-            dx = fielder->mUnidentified024.m_v3Position.x - owner->mUnidentified024.m_v3Position.x;
-            dz = fielder->mUnidentified024.m_v3Position.z - owner->mUnidentified024.m_v3Position.z;
+            dy = fielder->m_DetChar.m_v3Position.y - owner->m_DetChar.m_v3Position.y;
+            dx = fielder->m_DetChar.m_v3Position.x - owner->m_DetChar.m_v3Position.x;
+            dz = fielder->m_DetChar.m_v3Position.z - owner->m_DetChar.m_v3Position.z;
             nlVector3 delta;
             delta.x = dx;
             delta.y = dy;
@@ -311,7 +311,7 @@ bool UnidentifiedCameraEffects::AreFieldersClear() const
     return clear;
 }
 
-bool UnidentifiedCameraEffects::IsPassTargetClear() const
+bool GameplayCameraEffects::IsPassTargetClear() const
 {
     cPlayer* owner = g_pBall->m_pOwner;
     cPlayer* passTarget = g_pBall->m_pPassTarget;
@@ -330,11 +330,11 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
     for (int i = 0; i < 4; ++i)
     {
         cFielder* fielder = g_pTeams[otherTeam]->GetFielder(i);
-        if (fielder->mUnidentified120 == passTarget->mUnidentified120)
+        if (fielder->m_nCharacterIndex == passTarget->m_nCharacterIndex)
             continue;
-        float dy = fielder->mUnidentified024.m_v3Position.y - passTarget->mUnidentified024.m_v3Position.y;
-        float dx = fielder->mUnidentified024.m_v3Position.x - passTarget->mUnidentified024.m_v3Position.x;
-        float dz = fielder->mUnidentified024.m_v3Position.z - passTarget->mUnidentified024.m_v3Position.z;
+        float dy = fielder->m_DetChar.m_v3Position.y - passTarget->m_DetChar.m_v3Position.y;
+        float dx = fielder->m_DetChar.m_v3Position.x - passTarget->m_DetChar.m_v3Position.x;
+        float dz = fielder->m_DetChar.m_v3Position.z - passTarget->m_DetChar.m_v3Position.z;
         nlVector3 delta;
         delta.x = dx;
         delta.y = dy;
@@ -345,7 +345,7 @@ bool UnidentifiedCameraEffects::IsPassTargetClear() const
     return true;
 }
 
-float UnidentifiedCameraEffects::CalculateZoomScale(float) const
+float GameplayCameraEffects::CalculateZoomScale(float) const
 {
     float result = 1.0f;
     if ((mCameraFlags & 1) != 0)
@@ -377,7 +377,7 @@ float UnidentifiedCameraEffects::CalculateZoomScale(float) const
     return result;
 }
 
-void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
+void GameplayCameraEffects::UpdateTransition(float deltaTime)
 {
     if (mUseRealTime == true)
     {
@@ -445,13 +445,13 @@ void UnidentifiedCameraEffects::UpdateTransition(float deltaTime)
     }
 }
 
-bool UnidentifiedCameraEffects::IsTransitionActive() const
+bool GameplayCameraEffects::IsTransitionActive() const
 {
     return (mTransitionInTime != 0.0f || mTransitionOutTime != 0.0f)
         && mTransitionTime >= -1.0f * mTransitionOutTime;
 }
 
-nlVector3 UnidentifiedCameraEffects::RotateCameraVector(
+nlVector3 GameplayCameraEffects::RotateCameraVector(
     const nlVector3& vector) const
 {
     nlVector3 result = vector;
@@ -467,7 +467,7 @@ nlVector3 UnidentifiedCameraEffects::RotateCameraVector(
     return result;
 }
 
-void UnidentifiedCameraEffects::AdjustCameraVectors(float zoom,
+void GameplayCameraEffects::AdjustCameraVectors(float zoom,
     nlVector3* camera, nlVector3* target) const
 {
     if ((mCameraFlags & 0x40) != 0)
@@ -485,7 +485,7 @@ void UnidentifiedCameraEffects::AdjustCameraVectors(float zoom,
     }
 }
 
-nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
+nlVector3 GameplayCameraEffects::CalculateTargetOffset(
     const GameplayCamera* camera) const
 {
     nlVector3 result = v3Zero;
@@ -503,7 +503,7 @@ nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
     if (mTransitionBlend != 0.0f && mTrackSecondaryPlayer
         && mSecondaryPlayer != 0)
     {
-        target = mSecondaryPlayer->mUnidentified024.m_v3Position;
+        target = mSecondaryPlayer->m_DetChar.m_v3Position;
         hasTarget = true;
     }
 
@@ -520,18 +520,18 @@ nlVector3 UnidentifiedCameraEffects::CalculateTargetOffset(
     return result;
 }
 
-void UnidentifiedCameraEffects::OnGoalScored(
+void GameplayCameraEffects::OnGoalScored(
     GoalScoredData*)
 {
     Reset();
 }
 
-void UnidentifiedCameraEffects::ResetForPresentation(void*)
+void GameplayCameraEffects::ResetForPresentation(void*)
 {
     Reset();
 }
 
-void UnidentifiedCameraEffects::OnShotPresentation()
+void GameplayCameraEffects::OnShotPresentation()
 {
     if (g_pGame->m_eGameState == 3)
     {
@@ -563,7 +563,7 @@ void UnidentifiedCameraEffects::OnShotPresentation()
     mPrimaryPlayer = (cFielder*)g_pBall->m_pPassTarget;
 }
 
-void UnidentifiedCameraEffects::OnShotPresentationEnd()
+void GameplayCameraEffects::OnShotPresentationEnd()
 {
     if (g_pGame->m_eGameState != 3 && IsTransitionActive()
         && mPrimaryPlayer != 0
@@ -574,7 +574,7 @@ void UnidentifiedCameraEffects::OnShotPresentationEnd()
     }
 }
 
-void UnidentifiedCameraEffects::OnCaptainClashPresentation()
+void GameplayCameraEffects::OnCaptainClashPresentation()
 {
     if (g_pGame->m_eGameState == 3)
     {
@@ -599,18 +599,18 @@ void UnidentifiedCameraEffects::OnCaptainClashPresentation()
 
         if (g_pBall->m_pLastTouch != 0
             && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-                   ->mUnidentified024.m_v3Velocity.x < 0.0f)
+                   ->m_DetChar.m_v3Velocity.x < 0.0f)
         {
             mRotationDegrees *= -1.0f;
         }
     }
 }
 
-void UnidentifiedCameraEffects::OnCaptainClashPresentationEnd()
+void GameplayCameraEffects::OnCaptainClashPresentationEnd()
 {
 }
 
-void UnidentifiedCameraEffects::OnWindupPresentation()
+void GameplayCameraEffects::OnWindupPresentation()
 {
     if (g_pGame->m_eGameState == 3)
     {
@@ -627,24 +627,24 @@ void UnidentifiedCameraEffects::OnWindupPresentation()
     }
 }
 
-void UnidentifiedCameraEffects::OnWindupPresentationEnd()
+void GameplayCameraEffects::OnWindupPresentationEnd()
 {
     mCameraFlags &= ~6;
     Reset();
 }
 
-void UnidentifiedCameraEffects::OnMegaStrikeMeterStart(
+void GameplayCameraEffects::OnMegaStrikeMeterStart(
     MegaStrikeMeterData*)
 {
     mCameraFlags |= 8;
 }
 
-void UnidentifiedCameraEffects::OnMegaStrikeMeterEnd()
+void GameplayCameraEffects::OnMegaStrikeMeterEnd()
 {
     mCameraFlags &= ~8;
 }
 
-void UnidentifiedCameraEffects::OnGoalieSave(
+void GameplayCameraEffects::OnGoalieSave(
     GoalieSaveData*)
 {
     if (g_pGame->m_eGameState == 3)
@@ -687,7 +687,7 @@ void UnidentifiedCameraEffects::OnGoalieSave(
     }
 }
 
-void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
+void GameplayCameraEffects::OnCollisionThwompPlayer(
     CollisionThwompPlayerData* eventData)
 {
     if (g_pGame->m_eGameState == 3)
@@ -719,12 +719,12 @@ void UnidentifiedCameraEffects::OnCollisionThwompPlayer(
     }
 }
 
-void UnidentifiedCameraEffects::OnGoalieDekeAttackAttempt(
+void GameplayCameraEffects::OnGoalieDekeAttackAttempt(
     PlayerAttackData*)
 {
 }
 
-void UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess(
+void GameplayCameraEffects::OnGoalieDekeAttackSuccess(
     PlayerAttackData*)
 {
     if (g_pGame->m_eGameState == 3)
@@ -753,18 +753,18 @@ void UnidentifiedCameraEffects::OnGoalieDekeAttackSuccess(
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-               ->mUnidentified024.m_v3Velocity.x < 0.0f)
+               ->m_DetChar.m_v3Velocity.x < 0.0f)
     {
         mRotationDegrees *= -1.0f;
     }
 }
 
-void UnidentifiedCameraEffects::OnGoalieSlamAttackAttempt(
+void GameplayCameraEffects::OnGoalieSlamAttackAttempt(
     PlayerAttackData*)
 {
 }
 
-void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
+void GameplayCameraEffects::OnGoalieSlamAttackSuccess(
     PlayerAttackData*)
 {
     if (g_pGame->m_eGameState == 3)
@@ -791,7 +791,7 @@ void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
 
     if (g_pBall->m_pLastTouch != 0
         && g_pBall->m_pLastTouch->m_pTeam->GetOtherTeam()->GetCaptain()
-               ->mUnidentified024.m_v3Velocity.x < 0.0f)
+               ->m_DetChar.m_v3Velocity.x < 0.0f)
     {
         mRotationDegrees *= -1.0f;
     }
@@ -800,12 +800,12 @@ void UnidentifiedCameraEffects::OnGoalieSlamAttackSuccess(
 #include "NL/nlBindMember.inl"
 #include "NL/nlFunction.inl"
 
-static UnidentifiedTypedEvent<GoalieSaveData>*
+static TypedEvent<GoalieSaveData>*
 GetGoalieSaveEvent(const char* name, int length)
 {
     unsigned int hash = HashEventName(name, length);
     EventRegistryValue* foundEvent = 0;
     g_pEventRegistry->Find(hash, &foundEvent, 0);
     EventBase* event = foundEvent != 0 ? foundEvent->event : 0;
-    return (UnidentifiedTypedEvent<GoalieSaveData>*)event;
+    return (TypedEvent<GoalieSaveData>*)event;
 }

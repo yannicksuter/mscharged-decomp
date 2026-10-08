@@ -25,7 +25,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "NL/nlstring_tmpl.h"
 
 SHOnlineFriendCodeEntry::SHOnlineFriendCodeEntry()
     : mHoverCount(0)
@@ -235,7 +234,7 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
         }
     }
 
-    if (!GameSceneManager::Instance()->IsOnStack((SceneList)0xA)
+    if (!GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
         && g_pFriendManager->FindHostInvitation())
     {
         FriendManager* friendManager = g_pFriendManager;
@@ -310,17 +309,17 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
     typedef Detail::MemFunImpl<void, void (SHOnlineFriendCodeEntry::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineFriendCodeEntry*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback padSelect(
+    FEPointerListener::Callback keypadPressCallback(
         PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback padOver(
+    FEPointerListener::Callback keypadEnterCallback(
         PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback padOff(
+    FEPointerListener::Callback keypadLeaveCallback(
         PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnKeypadPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback codeSelect(
+    FEPointerListener::Callback digitPressCallback(
         PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerPress), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback codeOver(
+    FEPointerListener::Callback digitEnterCallback(
         PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback codeOff(
+    FEPointerListener::Callback digitLeaveCallback(
         PointerBinding(MemFun(&SHOnlineFriendCodeEntry::OnDigitPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
 
     for (int i = 0; i < 12; ++i)
@@ -336,9 +335,9 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
         }
         mKeypadButtons[i].SetInstanceBounds(
             mKeypadInstances[i], true, position.f.x, position.f.y, scale, scale);
-        mKeypadButtons[i].SetPointerPressCallback(padSelect);
-        mKeypadButtons[i].SetPointerEnterCallback(padOver);
-        mKeypadButtons[i].SetPointerLeaveCallback(padOff);
+        mKeypadButtons[i].SetPointerPressCallback(keypadPressCallback);
+        mKeypadButtons[i].SetPointerEnterCallback(keypadEnterCallback);
+        mKeypadButtons[i].SetPointerLeaveCallback(keypadLeaveCallback);
     }
 
     for (int i = 0; i < 12; ++i)
@@ -350,9 +349,9 @@ void SHOnlineFriendCodeEntry::InitializeButtons()
         feVector3 position = positionInstance->GetAssetPosition();
         mDigitButtons[i].SetInstanceBounds(
             mDigitInstances[i], true, position.f.x, position.f.y, scale, scale);
-        mDigitButtons[i].SetPointerPressCallback(codeSelect);
-        mDigitButtons[i].SetPointerEnterCallback(codeOver);
-        mDigitButtons[i].SetPointerLeaveCallback(codeOff);
+        mDigitButtons[i].SetPointerPressCallback(digitPressCallback);
+        mDigitButtons[i].SetPointerEnterCallback(digitEnterCallback);
+        mDigitButtons[i].SetPointerLeaveCallback(digitLeaveCallback);
     }
 }
 
@@ -470,10 +469,10 @@ void SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed()
 inline void SHOnlineFriendCodeEntry::ShowAddFriendError(int error)
 {
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene())
-        != (SceneList)10)
+        != SCENE_POPUP_MENU)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendCodeEntry::OnAddFriendErrorDismissed), this)));
         mPopupActive = true;

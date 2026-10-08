@@ -15,7 +15,7 @@
 #include "Game/NetworkLobby.h"
 
 #include <string.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 FriendManager* g_pFriendManagerInstance;
 FriendManager* g_pFriendManager;

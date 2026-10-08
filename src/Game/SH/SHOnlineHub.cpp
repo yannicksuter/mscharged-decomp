@@ -32,7 +32,6 @@
 #include "NL/nlFunction.inl"
 #include "NL/nlFormat.h"
 #include "NL/nlLocalizationLookup.h"
-#include "NL/nlstring_tmpl.h"
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/SH/SHHallOfFame.h"
@@ -40,8 +39,6 @@
 #include "Game/MiiManager.h"
 #include "Game/FE/tlDefault.h"
 #include "Game/SH/SHOnlineHub.h"
-
-typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type);
 
@@ -157,7 +154,7 @@ void SHOnlineHub::Update(float dt)
                     GameSceneManager::Instance()->Push((SceneList)42, SCREEN_FORWARD, true);
                 break;
             case 1: GameSceneManager::Instance()->Push((SceneList)41, SCREEN_FORWARD, true); break;
-            case 2: GameSceneManager::Instance()->Push((SceneList)46, SCREEN_FORWARD, true); break;
+            case 2: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKING, SCREEN_FORWARD, true); break;
             case 3: GameSceneManager::Instance()->Push((SceneList)47, SCREEN_FORWARD, true); break;
             }
             return;
@@ -170,12 +167,12 @@ void SHOnlineHub::Update(float dt)
             return;
         }
     }
-    if (!GameSceneManager::Instance()->IsOnStack((SceneList)10) && g_pFriendManager->FindHostInvitation())
+    if (!GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU) && g_pFriendManager->FindHostInvitation())
     {
         FriendManager* friendManager = g_pFriendManager;
-        friendManager->mReturnScene = 40;
+        friendManager->mReturnScene = SCENE_ONLINE_MENU;
         friendManager->mPreviousRankedMode = 0;
-        GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
         return;
     }
     if (!NetworkStatsManager::Instance()->RefreshRankings())
@@ -257,7 +254,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
     u16 friendsText[4];
     nlSNPrintf(onlineText, 4, (const u16*)L"%d", online);
     nlSNPrintf(friendsText, 4, (const u16*)L"%d", friends);
-    WideString friendString = Format(WideString(LookupLocString("ONLINE_HUB_FRIENDS")), onlineText, friendsText);
+    WideBasicString friendString = Format(WideBasicString(LookupLocString("ONLINE_HUB_FRIENDS")), onlineText, friendsText);
     memcpy(mFriendsText, friendString.c_str(), sizeof(mFriendsText));
     text->SetString(mFriendsText);
     DWCDate date;
@@ -281,7 +278,7 @@ void SHOnlineHub::UpdateFriendAndSeasonText()
         }
     }
     text = FEFinder<TLTextInstance, 3>::Find<>(mPresentation->m_currentSlide, "Layer", "subheading");
-    WideString string = Format(WideString(LookupLocString("ONLINE_HUB_DAYS_REMAIN")), days, hours, minutes);
+    WideBasicString string = Format(WideBasicString(LookupLocString("ONLINE_HUB_DAYS_REMAIN")), days, hours, minutes);
     memcpy(mDaysRemainText, string.c_str(), sizeof(mDaysRemainText));
     text->SetString(mDaysRemainText);
 }
@@ -297,11 +294,11 @@ void SHOnlineHub::UpdateLocalStats()
     nlStrNCpy(mPlayerNameText, gNetworkMiiNameWide, 24);
     text->SetString(mPlayerNameText);
     text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord");
-    WideString points = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS_TODAY")), mPointsStats.mScore);
+    WideBasicString points = Format(WideBasicString(LookupLocString("ONLINE_HUB_SOTD_POINTS_TODAY")), mPointsStats.mScore);
     nlStrNCpy(mTodayPointsText, points.c_str(), 48);
     text->SetString(mTodayPointsText);
     text = FEFinder<TLTextInstance, 3>::Find<>(summary, "Rank");
-    WideString rank = Format(WideString(LookupLocString("ONLINE_HUB_CURRENT_RANK")), mRankStats.mDisplayRank);
+    WideBasicString rank = Format(WideBasicString(LookupLocString("ONLINE_HUB_CURRENT_RANK")), mRankStats.mDisplayRank);
     nlStrNCpy(mRankText, rank.c_str(), 48);
     text->SetString(mRankText);
 }
@@ -330,7 +327,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     TLTextInstance* text = FEFinder<TLTextInstance, 3>::Find<>(summary, "therecord2");
     if (mHasStrikerOfTheDay)
     {
-        WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_POINTS")), mStrikerOfTheDayStats.mScore);
+        WideBasicString string = Format(WideBasicString(LookupLocString("ONLINE_HUB_SOTD_POINTS")), mStrikerOfTheDayStats.mScore);
         nlStrNCpy(mStrikerPointsText, string.c_str(), 48);
         text->SetString(mStrikerPointsText);
         text->m_bVisible = true;
@@ -340,7 +337,7 @@ void SHOnlineHub::UpdateStrikerOfTheDay()
     text = FEFinder<TLTextInstance, 3>::Find<>(summary, "sotd description");
     if (mHasStrikerOfTheDay)
     {
-        WideString string = Format(WideString(LookupLocString("ONLINE_HUB_SOTD_DESCRIPTION")), mStrikerOfTheDay.mName);
+        WideBasicString string = Format(WideBasicString(LookupLocString("ONLINE_HUB_SOTD_DESCRIPTION")), mStrikerOfTheDay.mName);
         nlStrNCpy(mStrikerDescriptionText, string.c_str(), 128);
         text->SetString(mStrikerDescriptionText);
         text->m_bVisible = true;
@@ -361,22 +358,22 @@ void SHOnlineHub::InitializeButtons()
     typedef Detail::MemFunImpl<void, void (SHOnlineHub::*)(unsigned int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, SHOnlineHub*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback over(PointerBinding(MemFun(&SHOnlineHub::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback off(PointerBinding(MemFun(&SHOnlineHub::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback down(PointerBinding(MemFun(&SHOnlineHub::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback enterCallback(PointerBinding(MemFun(&SHOnlineHub::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leaveCallback(PointerBinding(MemFun(&SHOnlineHub::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback pressCallback(PointerBinding(MemFun(&SHOnlineHub::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 4; ++i)
     {
         mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mButtons[i].SetPointerEnterCallback(over);
-        mButtons[i].SetPointerLeaveCallback(off);
-        mButtons[i].SetPointerPressCallback(down);
+        mButtons[i].SetPointerEnterCallback(enterCallback);
+        mButtons[i].SetPointerLeaveCallback(leaveCallback);
+        mButtons[i].SetPointerPressCallback(pressCallback);
     }
     TLInstance* instance = FEFinder<TLInstance, 2>::FindOrDefault(mHelpButtonInstance, "OVER", "list_high_250x60");
     feVector3 position = mHelpButtonInstance->GetAssetPosition();
     mHelpButton.SetInstanceBounds(instance, true, position.f.x, position.f.y, 1.0f, 1.0f);
-    mHelpButton.SetPointerEnterCallback(over);
-    mHelpButton.SetPointerLeaveCallback(off);
-    mHelpButton.SetPointerPressCallback(down);
+    mHelpButton.SetPointerEnterCallback(enterCallback);
+    mHelpButton.SetPointerLeaveCallback(leaveCallback);
+    mHelpButton.SetPointerPressCallback(pressCallback);
 }
 
 void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
@@ -480,9 +477,9 @@ void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
 
 static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create(type, Bind<void>(MemFun(&SHOnlineHub::OnDialogDismissed), hub));
         hub->mPopupActive = true;
     }
@@ -490,9 +487,9 @@ static inline void ShowOnlineHubDialog(SHOnlineHub* hub, ePopupMenu type)
 
 inline void SHOnlineHub::ShowError(int error)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != 10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)error,
             Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineHub::OnErrorDismissed), this)));
         mPopupActive = true;

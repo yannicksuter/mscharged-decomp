@@ -3,7 +3,7 @@
 #include "NL/glx/GXCharacterSkinCustomMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/glx/glxTexture.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXCharacterSkinCustomMaterialProgram* GXCharacterSkinCustomMaterialProgram::Instance;
 bool GXCharacterSkinCustomMaterialProgram::Initialized;

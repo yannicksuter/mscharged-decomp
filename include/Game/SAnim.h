@@ -90,7 +90,7 @@ public:
         return m_pCallbackList;
     }
 
-    float UnidentifiedGetLinearSpeed() const
+    float GetLinearSpeed() const
     {
         return m_fLinearSpeed;
     }
@@ -111,7 +111,7 @@ public:
         return GetNumFrames() / 30.0f;
     }
 
-    void UnidentifiedGetRemainingTime(float normalizedTime, float& remainingTime) const
+    void GetRemainingTime(float normalizedTime, float& remainingTime) const
     {
         remainingTime = 1.0f - normalizedTime;
         remainingTime *= GetDuration();

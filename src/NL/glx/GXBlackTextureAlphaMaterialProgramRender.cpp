@@ -9,7 +9,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 bool glx_RenderBlackTextureAlpha = true;
 

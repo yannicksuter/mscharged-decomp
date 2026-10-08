@@ -28,7 +28,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/Sys/clock.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/globalpad.h"
 #include "NL/platpad.h"
 #include "NL/nlMain.h"
@@ -84,8 +84,8 @@ EventDispatcher* GetFixedUpdateEventDispatcher()
 
 void FixedUpdateTask::Reset()
 {
-    UnidentifiedDispatcherHeaderScope headerScope;
-    UnidentifiedDispatcherInlineScope inlineScope;
+    DispatcherHeaderScope headerScope;
+    DispatcherInlineScope inlineScope;
 
     mInterpolationDeltaT = mAccumulatedDeltaT = g_fFixedUpdateTick;
     mSimulationTime = 0.0f;
@@ -440,13 +440,13 @@ void FixedUpdateTask::CallFixedUpdateTasks()
     if (NetMesh::s_bAnimatedNetMeshEnabled)
     {
         bool i = true;
-        float goalieX = (float)fabs(g_pTeams[0]->GetGoalie()->mUnidentified024.m_v3Position.x);
+        float goalieX = (float)fabs(g_pTeams[0]->GetGoalie()->m_DetChar.m_v3Position.x);
         if (goalieX > cField::GetGoalLineX(1U))
         {
         }
         else
         {
-            goalieX = (float)fabs(g_pTeams[1]->GetGoalie()->mUnidentified024.m_v3Position.x);
+            goalieX = (float)fabs(g_pTeams[1]->GetGoalie()->m_DetChar.m_v3Position.x);
             if (goalieX > cField::GetGoalLineX(1U))
             {
             }

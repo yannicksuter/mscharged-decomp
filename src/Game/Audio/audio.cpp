@@ -22,7 +22,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlTask.h"
 #include "Game/Audio/RegistryPools.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "Game/Audio/AudioListener.inl"
 

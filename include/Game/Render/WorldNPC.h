@@ -11,6 +11,7 @@
 #include "Game/World/WorldObject.h"
 
 class GLView;
+class WorldAnimController;
 struct WorldObjectLoadContext;
 // Serialized world-NPC record used by the stadium/world object stream.
 class WorldNPC;
@@ -52,7 +53,7 @@ public:
         return mModelCallback;
     }
 
-    /* 0x004 */ bool mUnidentified004;
+    /* 0x004 */ bool mPadding004;
     /* 0x005 */ u8 mPadding005[3];
     /* 0x008 */ CrowdModelCollection* mModelCollection;
     /* 0x00C */ CrowdCharacterDefinition mTemplates[50];
@@ -81,10 +82,16 @@ public:
     virtual void SetWorldMatrix(const nlMatrix4& transform);
     virtual void Initialize(WorldObjectLoadContext* context);
 
-    /* 0x04 */ u8 mUnidentified004[0x1C];
+    /* 0x04 */ unsigned long m_uHashID;
+    /* 0x08 */ unsigned long m_uObjectType;
+    /* 0x0C */ unsigned long m_uObjectCreationFlags;
+    /* 0x10 */ World* m_pWorldContext;
+    /* 0x14 */ int m_nAnimNode;
+    /* 0x18 */ WorldAnimController* m_pAnimController;
+    /* 0x1C */ u8 m_pad1C[0x04];
     /* 0x20 */ nlMatrix4 mTransform;
     /* 0x60 */ unsigned long mTemplateHash;
-    /* 0x64 */ u8 mUnidentified064[0x0C];
+    /* 0x64 */ u8 mPadding64[0x0C];
 }; // size: 0x70
 
 extern WorldNPCManager* gpWorldNPCManager;

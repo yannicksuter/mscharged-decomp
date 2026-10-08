@@ -3,7 +3,7 @@
 #include "Game/TerrainTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/TweakFileLoader.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/DB/StadiumInfo.h"
 #include "NL/nlConfig.h"
 #include "NL/nlMemory.h"
@@ -34,7 +34,7 @@ void InitializeGameTweaks(GameTweaksManager* state)
     state->mTerrainTweaks = terrainTweaks;
 
     state->mWeatherType = GetStadiumUnknown0x0C(stadium);
-    state->mUnidentified0C = GetStadiumUnknown0x11(stadium);
+    state->mCrowdRiotEnabled = GetStadiumUnknown0x11(stadium);
 
     GameTweaks* gameTweaks = new (8, false)
         GameTweaks("/ini/GameTweaks.ini", "/Game/GameTweaks");

@@ -5,7 +5,7 @@
 #include "types.h"
 
 class AIContext;
-class UnidentifiedFuzzyRuntimeValue;
+class FuzzyRuntimeContext;
 
 // A state machine's transition function: either a compiled function
 // (mNativeFunc) or a script function named by the hash of its name
@@ -21,8 +21,8 @@ struct TransitionFunc
     // Runs the bound function, or the script function named by the hash
     // through the input's fuzzy runtime, and stores the desire update it
     // returns.
-    void Execute(AIContext* input, UnidentifiedVariant_80054AB8* result,
-        UnidentifiedFuzzyRuntimeValue* context);
+    void Execute(AIContext* input, DesireUpdate* result,
+        FuzzyRuntimeContext* context);
 
     u32 mFuncHash;
     void* mNativeFunc;
@@ -53,8 +53,8 @@ struct UnsetTransitionFunc
     }
 
     bool IsUnset() const { return mValue.IsUnset(); }
-    void Execute(AIContext* input, UnidentifiedVariant_80054AB8* result,
-        UnidentifiedFuzzyRuntimeValue* context)
+    void Execute(AIContext* input, DesireUpdate* result,
+        FuzzyRuntimeContext* context)
     {
         mValue.Execute(input, result, context);
     }

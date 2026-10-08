@@ -14,8 +14,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     bool mbShotMeterActivated;
@@ -31,8 +31,8 @@ public:
 
     virtual bool Initialize(void*);
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
 private:
     bool mbLobShot;

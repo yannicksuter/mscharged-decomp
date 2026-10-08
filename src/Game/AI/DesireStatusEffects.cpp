@@ -19,7 +19,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 float gSlipperySlideFactor;
@@ -251,7 +251,7 @@ DesireGooey::DesireGooey()
 bool DesireGooey::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     float fGooEffect = params->Get(0)->mData.f;
     if (fGooEffect < mfMaxGooEffect)
     {
@@ -356,12 +356,12 @@ bool DesireShrink::Initialize(void* context)
     m_pFielder->fn_8001EE74(
         sShrinkPlayerScale, sShrinkScaleDuration, sShrinkMovementScale);
 
-    UnidentifiedVariantCollection* params
-        = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params
+        = (FuzzyVariantCollection*)context;
     source = (cFielder*)params->Get(14)->mData.pointer;
     m_pFielder->SetTweaks(source->m_pSuperPowerTweaks);
-    m_pFielder->m_pTweaks->mUnidentified004
-        = m_pFielder->m_pNormalTweaks->mUnidentified004.GetValue();
+    m_pFielder->m_pTweaks->fHeight
+        = m_pFielder->m_pNormalTweaks->fHeight.GetValue();
     m_pFielder->m_pTweaks->fWidth
         = fn_8002BFA8(m_pFielder->m_pNormalTweaks, 1.0f);
     CreateMushroomEffect(m_pFielder);
@@ -379,7 +379,7 @@ bool DesireShrink::Initialize(void* context)
         {
             m_pFielder->ReleaseBall(0);
             m_pFielder->ShootBallDueToContact(
-                m_pFielder->mUnidentified024
+                m_pFielder->m_DetChar
                     .m_aActualFacingDirection);
         }
     }
@@ -405,7 +405,7 @@ float DesireShrink::GetSpeedScale()
  */
 void DesireShrink::Update(DesireUpdate* update, float)
 {
-    if (!(m_pFielder->mUnidentified024.m_fPlayerScale < 0.99f))
+    if (!(m_pFielder->m_DetChar.m_fPlayerScale < 0.99f))
     {
         m_pFielder->fn_8001EE74(
             sShrinkPlayerScale, 0.0f, sShrinkMovementScale);
@@ -434,14 +434,14 @@ void DesireShrink::Cleanup()
 
 static inline void SetAnimationUpdatePaused(cPlayer* player, bool paused)
 {
-    player->mUnidentified1E4.m_bSkipAnimUpdate = paused;
-    player->mUnidentified1E4.m_fSkipTimer = 0.0f;
+    player->m_DetPlayer.m_bSkipAnimUpdate = paused;
+    player->m_DetPlayer.m_fSkipTimer = 0.0f;
 }
 
 static inline void SetActionUpdatePaused(cPlayer* player, bool paused)
 {
-    player->mUnidentified1E4.m_bSkipActionUpdate = paused;
-    player->mUnidentified1E4.m_fSkipTimer = 0.0f;
+    player->m_DetPlayer.m_bSkipActionUpdate = paused;
+    player->m_DetPlayer.m_fSkipTimer = 0.0f;
 }
 
 /**
@@ -488,8 +488,8 @@ bool DesireFrozen::Initialize(void* context)
     mfPrevFrozenTime = -1.0f;
     mePrevFrozenState = FROZEN_NONE;
     m_pFielder->SetVelocity(gStatusEffectZeroVector);
-    m_pFielder->mUnidentified024.m_fDesiredSpeed = 0.0f;
-    m_pFielder->mUnidentified024.m_fActualSpeed = 0.0f;
+    m_pFielder->m_DetChar.m_fDesiredSpeed = 0.0f;
+    m_pFielder->m_DetChar.m_fActualSpeed = 0.0f;
     if (KillDaze(m_pFielder))
     {
         mbWasDazed = true;
@@ -504,7 +504,7 @@ bool DesireFrozen::Initialize(void* context)
     KillHitTrail(m_pFielder, 1);
     EndElectrocution(m_pFielder);
     KillDeke(m_pFielder);
-    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         KillSkillshotPlayerOnFire(m_pFielder);
     }
@@ -521,7 +521,7 @@ bool DesireFrozen::Initialize(void* context)
         m_pFielder->EndDesire();
     }
 
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     SetFrozenState(params->Get(0)->mData.i);
     SetAnimationUpdatePaused(m_pFielder, true);
     SetActionUpdatePaused(m_pFielder, true);
@@ -543,7 +543,7 @@ bool DesireFrozen::Reinitialize(void* context)
     mAgeTimer.m_uWasRunning = mAgeTimer.m_uPackedTime != 0;
     mAgeTimer.m_uPackedTime = 0;
 
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     SetFrozenState(params->Get(0)->mData.i);
     KillFreeze(m_pFielder);
     return Desire::Initialize(context);
@@ -551,7 +551,7 @@ bool DesireFrozen::Reinitialize(void* context)
 
 static inline float GetCharacterOpacity(const cCharacter* character)
 {
-    return character->mUnidentified178;
+    return character->m_fOpacity;
 }
 
 /**
@@ -563,7 +563,7 @@ void DesireFrozen::Update(DesireUpdate*, float)
     {
         if (GetCharacterOpacity(m_pFielder) != 0.0f)
         {
-            m_pFielder->mUnidentified178 = 0.0f;
+            m_pFielder->m_fOpacity = 0.0f;
         }
     }
     if (!g_pGame->IsGameplayOrOvertime())
@@ -590,9 +590,9 @@ void DesireFrozen::Cleanup()
             PowerupBase::PWRUP_SOUND_END, m_pFielder->m_pPhysicsCharacter, 0.0f, 0);
         break;
     case FROZEN_PHOTO:
-        m_pFielder->mUnidentified17D = false;
+        m_pFielder->m_bCaughtInPhoto = false;
         m_pFielder->SetTangible(true, false);
-        m_pFielder->mUnidentified178 = 1.0f;
+        m_pFielder->m_fOpacity = 1.0f;
         m_pFielder->SetModelType(0);
         break;
     case FROZEN_MEGA_STRIKE:
@@ -606,9 +606,9 @@ void DesireFrozen::Cleanup()
             EmitUnFreeze(m_pFielder);
             break;
         case FROZEN_PHOTO:
-            m_pFielder->mUnidentified17D = false;
+            m_pFielder->m_bCaughtInPhoto = false;
             m_pFielder->SetTangible(true, false);
-            m_pFielder->mUnidentified178 = 1.0f;
+            m_pFielder->m_fOpacity = 1.0f;
             m_pFielder->SetModelType(0);
             break;
         case FROZEN_MEGA_STRIKE:
@@ -617,7 +617,7 @@ void DesireFrozen::Cleanup()
             break;
         }
         m_pFielder->EndConfusion();
-        if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+        if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
         {
             m_pFielder->fn_8009750C();
             m_pFielder->EndAction();
@@ -629,11 +629,11 @@ void DesireFrozen::Cleanup()
         break;
     case FROZEN_SHATTERED:
         m_pFielder->SetTangible(true, false);
-        m_pFielder->mUnidentified178 = 1.0f;
+        m_pFielder->m_fOpacity = 1.0f;
         break;
     }
 
-    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         EmitSkillshotPlayerOnFire(m_pFielder);
     }
@@ -671,7 +671,7 @@ void DesireFrozen::Cleanup()
  */
 void DesireFrozen::Activate(float duration, int state)
 {
-    UnidentifiedVariantCollection params;
+    FuzzyVariantCollection params;
     params.Set(7, FuzzyVariant(duration));
     params.Set(0, FuzzyVariant(state));
     ActivateConcurrentState(mScriptMachine, 29, &params, mActive);
@@ -696,7 +696,7 @@ void DesireFrozen::SetFrozenState(int state)
         }
         break;
     case FROZEN_PHOTO:
-        m_pFielder->mUnidentified17D = true;
+        m_pFielder->m_bCaughtInPhoto = true;
         m_pFielder->SetTangible(false, false);
         break;
     case FROZEN_MEGA_STRIKE:
@@ -708,7 +708,7 @@ void DesireFrozen::SetFrozenState(int state)
         break;
     case FROZEN_SHATTERED:
         m_pFielder->SetTangible(false, false);
-        m_pFielder->mUnidentified178 = 0.0f;
+        m_pFielder->m_fOpacity = 0.0f;
         m_pFielder->ResetEffects();
         m_pFielder->ClearInvincibility(false);
         PowerupBase::StopPowerupInEffectSound(POWER_UP_STAR,
@@ -750,7 +750,7 @@ bool DesireConfused::Initialize(void* context)
             m_pFielder->EndDesire();
             m_pFielder->InitActionRunning();
         }
-        else if (m_pFielder->mUnidentified024.m_eCharacterClass
+        else if (m_pFielder->m_DetChar.m_eCharacterClass
                      == SHYGUY
                  && m_pFielder->m_eActionState
                         == ACTION_UNKNOWN_32)
@@ -767,7 +767,7 @@ bool DesireConfused::Initialize(void* context)
         {
             m_pFielder->ReleaseBall(0);
             m_pFielder->ShootBallDueToContact(
-                m_pFielder->mUnidentified024.m_aActualFacingDirection);
+                m_pFielder->m_DetChar.m_aActualFacingDirection);
         }
     }
 
@@ -792,14 +792,14 @@ bool DesireConfused::Reinitialize(void* context)
     }
 
     if (m_pFielder->m_pBall != 0
-        && (m_pFielder->mUnidentified024.m_eCharacterClass
+        && (m_pFielder->m_DetChar.m_eCharacterClass
                 != SHYGUY
             || m_pFielder->m_eActionState
                    != ACTION_UNKNOWN_32))
     {
         m_pFielder->ReleaseBall(0);
         m_pFielder->ShootBallDueToContact(
-            m_pFielder->mUnidentified024.m_aActualFacingDirection);
+            m_pFielder->m_DetChar.m_aActualFacingDirection);
     }
     return result;
 }
@@ -825,7 +825,7 @@ void DesireConfused::Update(
     {
         *update = 1;
     }
-    if (m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime
+    if (m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime
         != 0)
     {
         *update = 1;
@@ -876,23 +876,23 @@ void DesireConfused::Cleanup()
 /**
  * Offset/Address/Size: 0x3704 | 0x800BF7C8 | size: 0xC8
  */
-inline void DesireStar::UnidentifiedVirtual8(
+inline void DesireStar::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireStar");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x37CC | 0x800BF890 | size: 0x9C
  */
-inline void DesireStar::UnidentifiedVirtual7(
+inline void DesireStar::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireStarType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireStarType, cache);
+        RegisterDebugFields(&sDesireStarType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -904,23 +904,23 @@ inline void DesireStar::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x35A0 | 0x800BF664 | size: 0xC8
  */
-inline void DesireMushroom::UnidentifiedVirtual8(
+inline void DesireMushroom::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireMushroom");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3668 | 0x800BF72C | size: 0x9C
  */
-inline void DesireMushroom::UnidentifiedVirtual7(
+inline void DesireMushroom::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireMushroomType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireMushroomType, cache);
+        RegisterDebugFields(&sDesireMushroomType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -932,23 +932,23 @@ inline void DesireMushroom::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x343C | 0x800BF500 | size: 0xC8
  */
-inline void DesireSlippery::UnidentifiedVirtual8(
+inline void DesireSlippery::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireSlippery");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3504 | 0x800BF5C8 | size: 0x9C
  */
-inline void DesireSlippery::UnidentifiedVirtual7(
+inline void DesireSlippery::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSlipperyType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireSlipperyType, cache);
+        RegisterDebugFields(&sDesireSlipperyType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -960,7 +960,7 @@ inline void DesireSlippery::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x3224 | 0x800BF2E8 | size: 0x17C
  */
-inline void DesireGooey::UnidentifiedVirtual8(
+inline void DesireGooey::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireGooey");
@@ -969,19 +969,19 @@ inline void DesireGooey::UnidentifiedVirtual8(
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfGooTime - (u8*)&mvDesiredPosition, "mfGooTime");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mf_NotRunning_SpeedScale - (u8*)&mvDesiredPosition, "mf_NotRunning_SpeedScale");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mf_NotRunning_MovementScale - (u8*)&mvDesiredPosition, "mf_NotRunning_MovementScale");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x33A0 | 0x800BF464 | size: 0x9C
  */
-inline void DesireGooey::UnidentifiedVirtual7(
+inline void DesireGooey::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireGooeyType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireGooeyType, cache);
+        RegisterDebugFields(&sDesireGooeyType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -993,24 +993,24 @@ inline void DesireGooey::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x309C | 0x800BF160 | size: 0xEC
  */
-inline void DesireShrink::UnidentifiedVirtual8(
+inline void DesireShrink::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireShrink");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfSlowPercentage - (u8*)&mvDesiredPosition, "mfSlowPercentage");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3188 | 0x800BF24C | size: 0x9C
  */
-inline void DesireShrink::UnidentifiedVirtual7(
+inline void DesireShrink::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireShrinkType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireShrinkType, cache);
+        RegisterDebugFields(&sDesireShrinkType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -1022,7 +1022,7 @@ inline void DesireShrink::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x2E84 | 0x800BEF48 | size: 0x17C
  */
-inline void DesireFrozen::UnidentifiedVirtual8(
+inline void DesireFrozen::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireFrozen");
@@ -1031,19 +1031,19 @@ inline void DesireFrozen::UnidentifiedVirtual8(
     cache->AddField(DEBUG_FIELD_ENUM, gDebugFieldTypes[DEBUG_FIELD_ENUM].size, (u8*)&mePrevActionState - (u8*)&mvDesiredPosition, "mePrevActionState");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfPrevFrozenTime - (u8*)&mvDesiredPosition, "mfPrevFrozenTime");
     cache->AddField(DEBUG_FIELD_BOOL, gDebugFieldTypes[DEBUG_FIELD_BOOL].size, (u8*)&mbWasDazed - (u8*)&mvDesiredPosition, "mbWasDazed");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x3000 | 0x800BF0C4 | size: 0x9C
  */
-inline void DesireFrozen::UnidentifiedVirtual7(
+inline void DesireFrozen::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireFrozenType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireFrozenType, cache);
+        RegisterDebugFields(&sDesireFrozenType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -1055,25 +1055,25 @@ inline void DesireFrozen::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x2CD8 | 0x800BED9C | size: 0x110
  */
-inline void DesireConfused::UnidentifiedVirtual8(
+inline void DesireConfused::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireConfused");
     cache->AddField(DEBUG_FIELD_FLOAT, gDebugFieldTypes[DEBUG_FIELD_FLOAT].size, (u8*)&mfConfusedPercentage - (u8*)&mvDesiredPosition, "mfConfusedPercentage");
     cache->AddField(DEBUG_FIELD_INT, gDebugFieldTypes[DEBUG_FIELD_INT].size, (u8*)&mfConfusedDirection - (u8*)&mvDesiredPosition, "mfConfusedDirection");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->EndType();
 }
 
 /**
  * Offset/Address/Size: 0x2DE8 | 0x800BEEAC | size: 0x9C
  */
-inline void DesireConfused::UnidentifiedVirtual7(
+inline void DesireConfused::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireConfusedType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireConfusedType, cache);
+        RegisterDebugFields(&sDesireConfusedType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

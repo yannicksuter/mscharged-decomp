@@ -4,6 +4,6 @@
 #include "Game/DetermDataEvent.h"
 #include "Game/Event.h"
 
-UnidentifiedQueuedEvent<DetermDataEvent>* GetDetermDataEventQueue();
+QueuedEvent<DetermDataEvent>* GetDetermDataEventQueue();
 
 #endif // GAME_NETWORK_EVENTS_H

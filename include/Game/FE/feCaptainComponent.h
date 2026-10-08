@@ -38,11 +38,11 @@ public:
 
     /* 0x04 */ TLComponentInstance* mComponent;
     /* 0x08 */ TLComponentInstance* mPositions;
-    /* 0x0C */ int mUnidentified0C;
+    /* 0x0C */ int m_pad0C;
     /* 0x10 */ int mSide;
     /* 0x14 */ int mCaptain;
     /* 0x18 */ int mSidekicks[3];
-    /* 0x24 */ int mUnidentified24;
+    /* 0x24 */ int m_pad24;
 }; // size 0x28
 
 

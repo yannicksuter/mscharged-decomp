@@ -92,7 +92,7 @@ void FielderDesireMachine::Initialize()
     AddState(4, getInPosition, false);
 
     DesireGetOpen* getOpen
-        = new (8, false) DesireGetOpen(5, (void*)fn_800B4DC0);
+        = new (8, false) DesireGetOpen(5, (void*)TransDesireGetOpen);
     AddState(5, getOpen, false);
 
     DesireHit* hit = new (8, false) DesireHit(6, (void*)TransDesireActionDone);
@@ -135,7 +135,7 @@ void FielderDesireMachine::Initialize()
     AddState(12, runInDirection, false);
 
     DesireRunToTarget* runToTarget
-        = new (8, false) DesireRunToTarget(13, (void*)fn_800B38AC);
+        = new (8, false) DesireRunToTarget(13, (void*)TransDesireRunToTarget);
     AddState(13, runToTarget, false);
 
     DesireShoot* shoot
@@ -185,7 +185,7 @@ void FielderDesireMachine::Initialize()
     DesireSteering* steering = new (8, false) DesireSteering();
     AddState(34, steering, true);
 
-    UnidentifiedDesire35* desire35 = new (8, false) UnidentifiedDesire35();
+    DesireWaluigiWall* desire35 = new (8, false) DesireWaluigiWall();
     AddState(35, desire35, true);
 }
 
@@ -209,7 +209,7 @@ void FielderDesireMachine::Update(float deltaTime)
     Desire* frozen = GetFielderDesire(GetFielder(), 29);
     if (frozen->IsActive())
     {
-        UnidentifiedVariant_80054AB8 result;
+        DesireUpdate result;
         UpdateStateMachine(frozen, &result, true, deltaTime);
         if (result.mData.pointer != 0)
         {
@@ -240,7 +240,7 @@ void FielderDesireMachine::Update(float deltaTime)
         && !UserControlledT(GetFielder()->m_pTeam)
         && !IsConcurrentStateActive(this, 17) && fn_800D85F8(GetFielder()))
     {
-        UnidentifiedVariantCollection params;
+        FuzzyVariantCollection params;
         params.Set(10, FuzzyVariant(FT_POINTER, (void*)TransDesireUsePowerup));
         ActivateConcurrentState(this, 17, &params, false);
     }
@@ -258,7 +258,7 @@ void FielderDesireMachine::Update(float deltaTime)
 void FielderDesireMachine::SelectState()
 {
     int state = 0;
-    UnidentifiedVariantCollection params;
+    FuzzyVariantCollection params;
     cFielder* fielder = GetFielder();
 
     if (gForceUserControl
@@ -291,8 +291,8 @@ void FielderDesireMachine::SelectState()
         {
             cFielder* outOfBoundsFielder = GetFielder();
             bool shouldRunToTarget;
-            if ((outOfBoundsFielder->mUnidentified024.m_v3Position.x > 20.6f
-                    || outOfBoundsFielder->mUnidentified024.m_v3Position.x < -20.6f)
+            if ((outOfBoundsFielder->m_DetChar.m_v3Position.x > 20.6f
+                    || outOfBoundsFielder->m_DetChar.m_v3Position.x < -20.6f)
                 && !Incapacitated(outOfBoundsFielder)
                 && !outOfBoundsFielder->IsInFallAction()
                 && !outOfBoundsFielder->IsShattered())
@@ -311,7 +311,7 @@ void FielderDesireMachine::SelectState()
                 params.Set(2, FuzzyVariant(gBehindGoalLineRunAvoidanceCoeff[0]));
 
                 nlVector3 position = gFielderDesireZeroVector;
-                position.x = GetFielder()->mUnidentified024.m_v3Position.x;
+                position.x = GetFielder()->m_DetChar.m_v3Position.x;
                 position.x -= 10.0f * AIsgn(position.x);
                 params.Set(14, FuzzyVariant(FT_VECTOR, position));
             }
@@ -333,7 +333,7 @@ void FielderDesireMachine::SelectState()
         }
 
         nlVector3 position;
-        formation->m_Positions[GetFielder()->mUnidentified1E4.m_ID].GetLocationForTeam(
+        formation->m_Positions[GetFielder()->m_DetPlayer.m_ID].GetLocationForTeam(
             *(nlVector2*)&position, team->m_nSide);
         position.z = 0.0f;
         state = 13;
@@ -354,7 +354,7 @@ void FielderDesireMachine::SelectState()
  * Offset/Address/Size: 0x1390 | 0x800D61BC | size: 0x18
  */
 shdStateMachine* FielderDesireMachine::ActivateState(
-    int state, UnidentifiedVariantCollection* params, bool force)
+    int state, FuzzyVariantCollection* params, bool force)
 {
     if (state == 17)
     {

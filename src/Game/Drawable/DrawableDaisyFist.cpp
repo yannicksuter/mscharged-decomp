@@ -7,7 +7,7 @@
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
 #include "Game/Render/DaisyFist.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 DrawableDaisyFist::DrawableDaisyFist()
 {

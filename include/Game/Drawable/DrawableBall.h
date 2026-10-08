@@ -82,7 +82,7 @@ void DrawableBall::Replay(T& frame)
     Replayable<1>(frame, FloatCompressor<-127, 127, 7>(mPosition.x));
     Replayable<1>(frame, FloatCompressor<-127, 127, 7>(mPosition.y));
     Replayable<1>(frame, FloatCompressor<-127, 127, 7>(mPosition.z));
-    Replayable<1>(frame, UnidentifiedQuaternionCompressor(mOrientation));
+    Replayable<1>(frame, QuaternionCompressor(mOrientation));
     Replayable<1>(frame, FloatCompressor<-127, 127, 5>(mVelocity.x));
     Replayable<1>(frame, FloatCompressor<-127, 127, 5>(mVelocity.y));
     Replayable<1>(frame, FloatCompressor<-127, 127, 5>(mVelocity.z));
@@ -98,7 +98,7 @@ void DrawableBall::Replay(T& frame)
             Replayable<1>(frame, FloatCompressor<-127, 127, 7>(position.x));
             Replayable<1>(frame, FloatCompressor<-127, 127, 7>(position.y));
             Replayable<1>(frame, FloatCompressor<-127, 127, 7>(position.z));
-            Replayable<1>(frame, UnidentifiedQuaternionCompressor(mTrail[i].orientation));
+            Replayable<1>(frame, QuaternionCompressor(mTrail[i].orientation));
         }
     }
 }

@@ -15,7 +15,7 @@
 #include "Game/Team.h"
 #include "NL/nlMemory.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static bool sDebugPassSpaceSearch;
 const nlVector3 sStationaryTargetVelocity = { 0.0f, 0.0f, 0.0f };
@@ -38,8 +38,8 @@ static int sContinueDesire = DESIRE_CONTINUE;
  */
 bool DesirePreparePass::Initialize(void* context)
 {
-    UnidentifiedVariantCollection* params =
-        (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params =
+        (FuzzyVariantCollection*)context;
     mpPassTarget = params->Get(14)->mData.pPlayer;
     mbVolleyPass = params->Get(16)->mData.b;
     if (mpPassTarget == 0)
@@ -73,8 +73,8 @@ bool DesirePreparePass::Initialize(void* context)
     m_pFielder->SetSpaceSearch(m_pSpaceSearch);
     m_pFielder->m_pSpaceSearch->m_bDebugOn = sDebugPassSpaceSearch;
     m_pFielder->m_pSpaceSearch->FindBestPosition(
-        mvDesiredPosition, m_pFielder->mUnidentified024.m_v3Position,
-        DIR_UPFIELD, &mpPassTarget->mUnidentified024.m_v3Position,
+        mvDesiredPosition, m_pFielder->m_DetChar.m_v3Position,
+        DIR_UPFIELD, &mpPassTarget->m_DetChar.m_v3Position,
         sPassSearchRadius, 0x8000);
     return true;
 }
@@ -104,8 +104,8 @@ void DesirePreparePass::Update(DesireUpdate* update, float fDeltaT)
             m_pFielder->GetDistanceToDesiredPos();
         float fClosingSpeedToDesiredPos = GetClosingSpeed2D(
             mvDesiredPosition, sStationaryTargetVelocity,
-            m_pFielder->mUnidentified024.m_v3Position,
-            m_pFielder->mUnidentified024.m_v3Velocity);
+            m_pFielder->m_DetChar.m_v3Position,
+            m_pFielder->m_DetChar.m_v3Velocity);
         if (fClosingSpeedToDesiredPos < 0.0f
             || fDistanceToDesiredPos <= sPassArrivalDistance
             || ((fInDanger >= fNotFarToTheirGoalie
@@ -147,8 +147,8 @@ void DesirePreparePass::Cleanup()
 bool DesirePass::Initialize(void* context)
 {
     bool result = true;
-    UnidentifiedVariantCollection* params =
-        (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params =
+        (FuzzyVariantCollection*)context;
     Variant* pParam;
     if (params->IsSet(14))
     {
@@ -175,8 +175,8 @@ bool DesirePass::Initialize(void* context)
 
     PlayerTweaks* pTweaks = m_pFielder->GetTweaks();
     float fMaxSpeed = pTweaks->GetRunningSpeed();
-    m_pFielder->mUnidentified024.m_fDesiredSpeed =
-        FMIN(m_pFielder->mUnidentified024.m_fDesiredSpeed, fMaxSpeed);
+    m_pFielder->m_DetChar.m_fDesiredSpeed =
+        FMIN(m_pFielder->m_DetChar.m_fDesiredSpeed, fMaxSpeed);
 
     if (m_pFielder->m_pBall != 0)
     {
@@ -217,8 +217,8 @@ void DesirePass::Cleanup()
  * Offset/Address/Size: 0x9E4 | 0x800BAF60 | size: 0xCC8
  */
 DesireUpdate TransDesireLooseBallContact(
-    UnidentifiedFuzzyRuntimeValue* fielderValue,
-    UnidentifiedFuzzyRuntimeValue* action)
+    FuzzyRuntimeContext* fielderValue,
+    FuzzyRuntimeContext* action)
 {
     DesireUpdate result(FT_INT, sContinueDesire);
     if (g_pBall->m_pOwner != 0)
@@ -277,12 +277,12 @@ DesireUpdate TransDesireLooseBallContact(
 /**
  * Offset/Address/Size: 0x187C | 0x800BBDF8 | size: 0x134
  */
-inline void DesirePreparePass::UnidentifiedVirtual8(
+inline void DesirePreparePass::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field =
         cache->BeginType("DesirePreparePass");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
@@ -298,12 +298,12 @@ inline void DesirePreparePass::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x19B0 | 0x800BBF2C | size: 0xC0
  */
-inline void DesirePreparePass::UnidentifiedVirtual7(
+inline void DesirePreparePass::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesirePreparePassType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesirePreparePassType, cache);
+        RegisterDebugFields(&sDesirePreparePassType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -314,7 +314,7 @@ inline void DesirePreparePass::UnidentifiedVirtual7(
         DesirePreparePass* desire =
             (DesirePreparePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
-                ? -1 : mpPassTarget->mUnidentified120);
+                ? -1 : mpPassTarget->m_nCharacterIndex);
         cache->ChecksumData(sDesirePreparePassType, data, context);
     }
 }
@@ -322,11 +322,11 @@ inline void DesirePreparePass::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0x16AC | 0x800BBC28 | size: 0x110
  */
-inline void DesirePass::UnidentifiedVirtual8(
+inline void DesirePass::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesirePass");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpPassTarget - (u8*)&mvDesiredPosition,
         "mpPassTarget");
@@ -339,12 +339,12 @@ inline void DesirePass::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x17BC | 0x800BBD38 | size: 0xC0
  */
-inline void DesirePass::UnidentifiedVirtual7(
+inline void DesirePass::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesirePassType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesirePassType, cache);
+        RegisterDebugFields(&sDesirePassType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -355,7 +355,7 @@ inline void DesirePass::UnidentifiedVirtual7(
         DesirePass* desire =
             (DesirePass*)((u8*)data - offset);
         desire->mpPassTarget = (cPlayer*)(mpPassTarget == 0
-                ? -1 : mpPassTarget->mUnidentified120);
+                ? -1 : mpPassTarget->m_nCharacterIndex);
         cache->ChecksumData(sDesirePassType, data, context);
     }
 }

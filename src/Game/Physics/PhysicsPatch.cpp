@@ -31,7 +31,7 @@
 #include "Game/NetworkSync.h"
 
 #include <math.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
@@ -205,7 +205,7 @@ void PhysicsPatch::Unknown0()
 ContactType PhysicsPatch::Contact(
     PhysicsObject* other, dContact*, int)
 {
-    UnidentifiedEventData24* eventData;
+    CollisionPatchData* eventData;
     GetPhysicsPatchInfo(m_Type);
 
     switch (other->GetObjectType())
@@ -235,7 +235,7 @@ ContactType PhysicsPatch::Contact(
             case 12:
             {
                 float height = gfPatchAirborneHeight;
-                if (fielder->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10)
+                if (fielder->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10)
                 {
                     height = 0.5f;
                 }
@@ -243,7 +243,7 @@ ContactType PhysicsPatch::Contact(
                 {
                     height = 2.25f;
                 }
-                if (fielder->IsCharacterInAir(height * fielder->mUnidentified024.m_fPlayerScale))
+                if (fielder->IsCharacterInAir(height * fielder->m_DetChar.m_fPlayerScale))
                 {
                     return NO_CONTACT;
                 }
@@ -252,21 +252,21 @@ ContactType PhysicsPatch::Contact(
             }
         }
         eventData = 0;
-        g_UnidentifiedEventData24Pool.Allocate(eventData);
-        eventData->mUnidentified0C = fielder;
-        eventData->mUnidentified10 = this;
+        g_CollisionPatchDataPool.Allocate(eventData);
+        eventData->pPlayer = fielder;
+        eventData->pPatch = this;
         QueueCollisionPatchPlayer(eventData);
         return NO_CONTACT;
     }
     case 16:
     {
-        QueueCollisionPatchBall((UnidentifiedEventData31*)this);
+        QueueCollisionPatchBall(this);
         if (m_Type == 0 && !m_bKillMe && ((PhysicsAIBall*)other)->m_pAIBall->mbBallOnFire)
         {
             eventData = 0;
-            g_UnidentifiedEventData24Pool.Allocate(eventData);
-            eventData->mUnidentified0C = 0;
-            eventData->mUnidentified10 = this;
+            g_CollisionPatchDataPool.Allocate(eventData);
+            eventData->pPlayer = 0;
+            eventData->pPatch = this;
             QueueCollisionPatchPatch(eventData);
         }
         return NO_CONTACT;
@@ -274,27 +274,27 @@ ContactType PhysicsPatch::Contact(
     case 18:
     {
         eventData = 0;
-        g_UnidentifiedEventData24Pool.Allocate(eventData);
-        eventData->mUnidentified0C = 0;
-        eventData->mUnidentified10 = this;
+        g_CollisionPatchDataPool.Allocate(eventData);
+        eventData->pPlayer = 0;
+        eventData->pPatch = this;
         QueueCollisionPatchGround(eventData);
         return NO_CONTACT;
     }
     case 20:
     {
-        UnidentifiedEventData30* data = 0;
-        g_UnidentifiedEventData30Pool.Allocate(data);
-        data->mUnidentified00 = ((PhysicsShell*)other)->m_pPowerupObject;
-        data->mUnidentified04 = this;
+        CollisionPatchPowerupData* data = 0;
+        g_CollisionPatchPowerupDataPool.Allocate(data);
+        data->pPowerup = ((PhysicsShell*)other)->m_pPowerupObject;
+        data->pPatch = this;
         QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
     case 21:
     {
-        UnidentifiedEventData30* data = 0;
-        g_UnidentifiedEventData30Pool.Allocate(data);
-        data->mUnidentified00 = ((PhysicsBanana*)other)->m_pPowerupObject;
-        data->mUnidentified04 = this;
+        CollisionPatchPowerupData* data = 0;
+        g_CollisionPatchPowerupDataPool.Allocate(data);
+        data->pPowerup = ((PhysicsBanana*)other)->m_pPowerupObject;
+        data->pPatch = this;
         QueueCollisionPatchPowerup(data);
         return NO_CONTACT;
     }
@@ -306,14 +306,14 @@ ContactType PhysicsPatch::Contact(
            == SkinAnimatedNPC_CHAIN_CHOMP;
         if (isChainChomp)
         {
-            QueueCollisionPatchChain((UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
+            QueueCollisionPatchChain((ChainChomp*)((PhysicsNPC*)other)->mpAINPC);
         }
         return NO_CONTACT;
     }
     case 29:
         return m_Type == 1 ? ONE_WAY_CONTACT_THIS : NO_CONTACT;
     case 23:
-        QueueCollisionPatchWall((UnidentifiedEventData31*)this);
+        QueueCollisionPatchWall(this);
         return NO_CONTACT;
     case 28:
         if (m_Type == 0 && !m_bKillMe)
@@ -324,10 +324,10 @@ ContactType PhysicsPatch::Contact(
             case 8:
             case 9:
             {
-                UnidentifiedEventData24* data = 0;
-                g_UnidentifiedEventData24Pool.Allocate(data);
-                data->mUnidentified0C = m_pOwner;
-                data->mUnidentified10 = this;
+                CollisionPatchData* data = 0;
+                g_CollisionPatchDataPool.Allocate(data);
+                data->pPlayer = m_pOwner;
+                data->pPatch = this;
                 QueueCollisionPatchPatch(data);
                 break;
             }
@@ -579,7 +579,7 @@ PhysicsPatchManager::PhysicsPatchManager()
         mPatches[i] = 0;
     }
 
-    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(HandleResetEffects), (unsigned int)&mResetEffectsConnection, -1);
+    FindEvent<void>("ResetEffects", -1)->Add(Function<void*>(HandleResetEffects), (unsigned int)&mResetEffectsConnection, -1);
 }
 
 PhysicsPatchManager::~PhysicsPatchManager()
@@ -595,7 +595,7 @@ PhysicsPatch* PhysicsPatchManager::CreatePatch(
     DebugWriteCache* log = gNetworkSyncState->GetWriteCache();
     if (log != 0)
     {
-        int ownerID = owner == 0 ? -1 : owner->mUnidentified120;
+        int ownerID = owner == 0 ? -1 : owner->m_nCharacterIndex;
         char buffer[200];
         nlSNPrintf(buffer, sizeof(buffer), "Creating patch %d owner %d r1 %f r2 %f life %f at frame %d\n", type, ownerID, startRadius, endRadius, lifetime, GetFixedUpdateTask()->GetFrame());
         log->WriteText(buffer);
@@ -719,9 +719,9 @@ void PhysicsPatchManager::SyncLog(
         {
             PhysicsPatch* copy = (PhysicsPatch*)((unsigned char*)data - offset);
             cPlayer* owner = patch->m_pOwner;
-            copy->m_pOwner = (cPlayer*)(owner == 0 ? -1 : owner->mUnidentified120);
+            copy->m_pOwner = (cPlayer*)(owner == 0 ? -1 : owner->m_nCharacterIndex);
             cPlayer* target = patch->m_pTarget;
-            copy->m_pTarget = (cPlayer*)(target == 0 ? -1 : target->mUnidentified120);
+            copy->m_pTarget = (cPlayer*)(target == 0 ? -1 : target->m_nCharacterIndex);
             cache->ChecksumData(sPhysicsPatchType, data, context);
         }
     }

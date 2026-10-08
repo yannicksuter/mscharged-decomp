@@ -18,7 +18,7 @@
 #include <math.h>
 #include <stddef.h>
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static float sWindupShotTimeLimitMargin = 0.5f;
 static unsigned short sDesireWindupShotType = 0xFFFF;
@@ -92,7 +92,7 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
 
     if (sWindupSkillshotRollPending)
     {
-        switch (m_pFielder->mUnidentified024.m_eCharacterClass)
+        switch (m_pFielder->m_DetChar.m_eCharacterClass)
         {
         case DAISY:
         case WALUIGI:
@@ -100,18 +100,18 @@ void DesireWindupShot::Update(DesireUpdate* update, float fDeltaT)
         {
             float fSign = AIsgn(m_pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
             Goalie* pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-            float fGoalieX = fSign * pGoalie->mUnidentified024.m_v3Position.x;
-            if (fSign * m_pFielder->mUnidentified024.m_v3Position.x < fGoalieX
-                || (float)__fabs(m_pFielder->mUnidentified024.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
+            float fGoalieX = fSign * pGoalie->m_DetChar.m_v3Position.x;
+            if (fSign * m_pFielder->m_DetChar.m_v3Position.x < fGoalieX
+                || (float)__fabs(m_pFielder->m_DetChar.m_v3Position.y) > 0.6f * cNet::GetNetWidth())
             {
                 float fRange = m_pFielder->GetDekeDistance();
                 float fDistance = nlSqrt(nlVec3DistanceSquared2D(
-                    m_pFielder->mUnidentified024.m_v3Position,
-                    m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position), true);
+                    m_pFielder->m_DetChar.m_v3Position,
+                    m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie()->m_DetChar.m_v3Position), true);
                 pGoalie = m_pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-                AvoidableObject* pAvoidable = m_pFielder->mUnidentified320;
+                AvoidableObject* pAvoidable = m_pFielder->m_pAvoidableObject;
                 if (0.25f + (fDistance + (pAvoidable->GetRadius()
-                        + pGoalie->mUnidentified320->GetRadius())) < fRange)
+                        + pGoalie->m_pAvoidableObject->GetRadius())) < fRange)
                 {
                     float fSkillshotChance = fn_800A636C(g_pCurrentlyUpdatingTeam)->GetSkillValue(
                         nlStringLowerHash("Windup/Skillshot"), m_pFielder);
@@ -145,7 +145,7 @@ void DesireWindupShot::Cleanup()
 bool DesireShoot::Initialize(void* context)
 {
     bool result = Desire::Initialize(context);
-    UnidentifiedVariantCollection* params = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params = (FuzzyVariantCollection*)context;
     mbLobShot = params->Get(16)->mData.b;
 
     if (m_pFielder->GetPreviousDesireState() != 20
@@ -174,7 +174,7 @@ bool DesireShoot::Initialize(void* context)
     if (m_pFielder->m_pShotMeter->m_eShotMeterState
         == SHOT_METER_STS_RELEASED)
     {
-        UnidentifiedVariantCollection transitionParams;
+        FuzzyVariantCollection transitionParams;
         transitionParams.Set(
             7, FuzzyVariant(FT_FLOAT, sWindupSkillshotTimeLimit));
         transitionParams.Set(14, FuzzyVariant(g_pBall));
@@ -200,11 +200,11 @@ void DesireShoot::Update(
 /**
  * Offset/Address/Size: 0xFFC | 0x800C5194 | size: 0xEC
  */
-inline void DesireWindupShot::UnidentifiedVirtual8(
+inline void DesireWindupShot::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireWindupShot");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbShotMeterActivated - (u8*)&mvDesiredPosition, "mbShotMeterActivated");
     cache->EndType();
 }
@@ -212,12 +212,12 @@ inline void DesireWindupShot::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x10E8 | 0x800C5280 | size: 0x9C
  */
-inline void DesireWindupShot::UnidentifiedVirtual7(
+inline void DesireWindupShot::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireWindupShotType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireWindupShotType, cache);
+        RegisterDebugFields(&sDesireWindupShotType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -229,11 +229,11 @@ inline void DesireWindupShot::UnidentifiedVirtual7(
 /**
  * Offset/Address/Size: 0xE74 | 0x800C500C | size: 0xEC
  */
-inline void DesireShoot::UnidentifiedVirtual8(
+inline void DesireShoot::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field = cache->BeginType("DesireShoot");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(16, gDebugFieldTypes[16].size, (u8*)&mbLobShot - (u8*)&mvDesiredPosition, "mbLobShot");
     cache->EndType();
 }
@@ -241,12 +241,12 @@ inline void DesireShoot::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0xF60 | 0x800C50F8 | size: 0x9C
  */
-inline void DesireShoot::UnidentifiedVirtual7(
+inline void DesireShoot::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireShootType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireShootType, cache);
+        RegisterDebugFields(&sDesireShootType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;

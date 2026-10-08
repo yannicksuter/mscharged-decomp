@@ -3,7 +3,7 @@
 #include "NL/glx/GXMovieMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXMovieMaterialProgram* GXMovieMaterialProgram::Instance;
 bool GXMovieMaterialProgram::Initialized;

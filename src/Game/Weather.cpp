@@ -41,7 +41,7 @@
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlConfig.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Weather.h"
 #include "Game/WeatherData.h"
@@ -119,7 +119,7 @@ static u16 sBubblingLavaSyncLogType = 0xFFFF;
 static u16 sStormShipWeatherSyncLogType = 0xFFFF;
 static u16 sSandTombWeatherSyncLogType = 0xFFFF;
 
-void OnLavaCollisionPatchGround(UnidentifiedEventData24*);
+void OnLavaCollisionPatchGround(CollisionPatchData*);
 
 inline bool SolarFlare::IsTargetSelected(int target, int count)
 {
@@ -139,7 +139,7 @@ inline bool SandTombWeather::IsPlayerInDropZone(nlVector3 position)
         for (int player = 0; player < 4; player++)
         {
             nlVector3 delta;
-            nlVec3Sub(delta, g_pTeams[team]->GetFielder(player)->mUnidentified024.m_v3Position, position);
+            nlVec3Sub(delta, g_pTeams[team]->GetFielder(player)->m_DetChar.m_v3Position, position);
             if (nlVec3LengthSquared(delta) < radiusSquared)
                 return true;
         }
@@ -419,7 +419,7 @@ float Lightning::GetStartChance()
 void Lightning::Reset()
 {
     Weather::Reset();
-    mtLightingTimer.UnidentifiedClear();
+    mtLightingTimer.Clear();
     mnAmountOfStrikes = gLightningStrikeCount;
 }
 
@@ -514,7 +514,7 @@ void Lightning::Stop(bool value)
         WorldDarkening::Instance().Fade(2.0f * gLightningFadeTime, 0.0f);
     }
     KillLightning(value);
-    mtLightingTimer.UnidentifiedClear();
+    mtLightingTimer.Clear();
     mnAmountOfStrikes = 0;
     Weather::Stop(value);
 }
@@ -523,7 +523,7 @@ Windy::Windy()
 {
     meWeather = 2;
     Reset();
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &Windy::OnGetReadyForKickoff)), 0, -1);
+    FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &Windy::OnGetReadyForKickoff)), 0, -1);
 }
 
 void Windy::OnGetReadyForKickoff()
@@ -542,7 +542,7 @@ float Windy::GetStartChance()
 void Windy::Reset()
 {
     Weather::Reset();
-    mtWindTimer.UnidentifiedClear();
+    mtWindTimer.Clear();
     aWindDirection = 0;
     fWindStrength = 0.0f;
     eDebrisType = -1;
@@ -696,8 +696,8 @@ nlVector3 Windy::CalculateDebrisDisplacement(const nlVector3& position, const nl
     nlVec3Add(end, end, displacement);
     if (gDebrisGoalieClearance > 0.0f)
     {
-        AvoidDebrisObstacle(start, end, displacement, g_pTeams[0]->GetGoalie()->mUnidentified024.m_v3Position, gDebrisGoalieClearance + radius);
-        AvoidDebrisObstacle(start, end, displacement, g_pTeams[1]->GetGoalie()->mUnidentified024.m_v3Position, gDebrisGoalieClearance + radius);
+        AvoidDebrisObstacle(start, end, displacement, g_pTeams[0]->GetGoalie()->m_DetChar.m_v3Position, gDebrisGoalieClearance + radius);
+        AvoidDebrisObstacle(start, end, displacement, g_pTeams[1]->GetGoalie()->m_DetChar.m_v3Position, gDebrisGoalieClearance + radius);
     }
     if (gDebrisGoalClearance > 0.0f)
     {
@@ -778,8 +778,8 @@ void Windy::Stop(bool value)
 SolarFlare::SolarFlare()
 {
     meWeather = 4;
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnGetReadyForKickoff)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnKickoff)), 0, -1);
+    FindEvent<NoEventData>("GetReadyForKickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnGetReadyForKickoff)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SolarFlare::OnKickoff)), 0, -1);
     m_StartCount = 0;
     for (int i = 0; i < 3; i++)
         m_TargetIndicies[i] = -1;
@@ -924,7 +924,7 @@ void SolarFlare::Update(float value)
         SetFielderFrozenState(fielder, 4, 99999.0f);
         PlaySound(16, 0x5FCB9348, 0, 0);
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_player_explode");
-        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->mUnidentified024.m_v3Position);
+        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->m_DetChar.m_v3Position);
         ++m_NextVaporize;
         if (m_NextVaporize < 2.0f * m_NumToVaporizePerTeam)
             m_VaporizeTimer = gSolarFlareInterval;
@@ -936,7 +936,7 @@ void SolarFlare::Update(float value)
         int team = m_NextFlare % 2;
         int index = (int)floorf(m_NextFlare / 2.0f);
         cFielder* fielder = g_pTeams[team]->GetFielder(m_TargetIndicies[index]);
-        new (8, false) SolarFlareEffect(fielder->mUnidentified024.m_v3Position);
+        new (8, false) SolarFlareEffect(fielder->m_DetChar.m_v3Position);
         PlaySound(11, 0xE853C469, 0, 0);
         if (m_NextFlare == 0)
             PlaySound(13, 0xF68B3F0F, 0, 0);
@@ -948,7 +948,7 @@ void SolarFlare::Update(float value)
             g_pBall->SetVelocity(v3Zero, (eSpinType)0, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_zap");
-        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->mUnidentified024.m_v3Position);
+        EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->m_DetChar.m_v3Position);
         bool controlled = fielder->GetGlobalPad() != 0;
         if (controlled == true)
             fielder->SwapController(false);
@@ -1048,7 +1048,7 @@ void SolarFlare::ResetFlares(bool initialize)
 BubblingLava::BubblingLava()
 {
     meWeather = 5;
-    UnidentifiedFindEvent<UnidentifiedEventData24>("CollisionPatchGround", -1)->Add(Function<UnidentifiedEventData24*>(OnLavaCollisionPatchGround), 0, -1);
+    FindEvent<CollisionPatchData>("CollisionPatchGround", -1)->Add(Function<CollisionPatchData*>(OnLavaCollisionPatchGround), 0, -1);
     Reset();
 }
 
@@ -1077,9 +1077,9 @@ float BubblingLava::GetStartChance()
     return 0.0f;
 }
 
-void OnLavaCollisionPatchGround(UnidentifiedEventData24* event)
+void OnLavaCollisionPatchGround(CollisionPatchData* event)
 {
-    PhysicsPatch* patch = event->mUnidentified10;
+    PhysicsPatch* patch = event->pPatch;
     if (patch->m_Type == 8 && patch->m_Velocity.z < 0.0f)
     {
         Weather* state = g_pGame->mpWeatherManager->GetWeather(5);
@@ -1088,7 +1088,7 @@ void OnLavaCollisionPatchGround(UnidentifiedEventData24* event)
         nlVector3 position = patch->GetPosition();
         position.z = 0.0f;
         lbl_806E12C8->CreatePatch(9, 0, position, v3Zero, gLavaPoolStartRadius, gLavaPoolEndRadius, gLavaPoolLifetime)->SetStartRadiusTime(gLavaPoolGrowthTime);
-        event->mUnidentified10->Unknown0();
+        event->pPatch->Unknown0();
         PlaySound(11, 0xC15AA25B, 0, 0);
     }
 }
@@ -1269,7 +1269,7 @@ void BubblingLava::Stop(bool initialize)
 
 StormShipWeather::StormShipWeather()
 {
-    fn_800B0358();
+    InitChainLightningPaths();
     meWeather = 6;
     Reset();
     m_StartWeatherTimer = gStormStartDelay;
@@ -1326,13 +1326,13 @@ void StormShipWeather::CreateChainLightning(int index)
     int count;
     if (m_bRightSide == true)
     {
-        points = fn_800B048C(index);
-        count = fn_800B04A0(index);
+        points = GetRightChainLightningPath(index);
+        count = GetRightChainLightningPathLength(index);
     }
     else
     {
-        points = fn_800B0464(index);
-        count = fn_800B0478(index);
+        points = GetLeftChainLightningPath(index);
+        count = GetLeftChainLightningPathLength(index);
     }
     patch->SetWorldPosition(*points);
     patch->SetPath(points, count, gStormChainSpeed);
@@ -1359,11 +1359,11 @@ void StormShipWeather::Start()
     m_bRightSide = g_pBall->m_v3Position.x > 0.0f;
     m_FirstStrikeTimer = gStormFirstStrikeDelay;
     m_StartWeatherTimer = gStormStartDelay;
-    m_PathIndex1 = RandomWeatherIndex(fn_800B045C() - 1);
+    m_PathIndex1 = RandomWeatherIndex(GetNumChainLightningPaths() - 1);
     m_PathIndex2 = m_PathIndex1;
     while (m_PathIndex2 == m_PathIndex1)
     {
-        m_PathIndex2 = RandomWeatherIndex(fn_800B045C() - 1);
+        m_PathIndex2 = RandomWeatherIndex(GetNumChainLightningPaths() - 1);
     }
     m_ChainCount = 0;
     WorldDarkening::Instance().Fade(gStormFadeTime, gStormDarkness);
@@ -1445,7 +1445,7 @@ void StormShipWeather::Update(float value)
             {
                 CreateChainLightning(m_PathIndex1);
                 CreateChainLightning(m_PathIndex2);
-                g_pGame->mUnidentified0A0 = 0.0f;
+                g_pGame->mfTiltTime = 0.0f;
                 m_ChainCount++;
                 if (m_ChainCount < gStormChainCount)
                     m_ChainTrainTimer = gStormChainDelay;
@@ -1510,7 +1510,7 @@ SandTombWeather::SandTombWeather()
 {
     meWeather = 7;
     Reset();
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SandTombWeather::OnKickoff)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(BindMember(this, &SandTombWeather::OnKickoff)), 0, -1);
 }
 
 float SandTombWeather::GetStartChance()
@@ -1640,9 +1640,9 @@ void SandTombWeather::CreateSandPatches()
     }
     for (int side = 0; side < 2; side++)
     {
-        for (int i = 0; i < fn_800B04B4(this); i++)
+        for (int i = 0; i < GetNumSandPatches(this); i++)
         {
-            nlVector4 patch = fn_800B04BC(this, i, side == 1);
+            nlVector4 patch = GetSandPatch(this, i, side == 1);
             nlVector3 position = { patch.x, patch.y, patch.z };
             lbl_806E12C8->CreatePatch(11, 0, position, v3Zero, patch.w, patch.w, 99999.0f);
         }

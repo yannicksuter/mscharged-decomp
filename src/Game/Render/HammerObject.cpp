@@ -3,7 +3,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Fielder.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Physics/PhysicsObject.h"
@@ -11,30 +11,25 @@
 #include "NL/nlSlotPool.h"
 #include "ode/objects.h"
 #include "Game/CharacterTriggers.h"
+#include "Game/Sys/audio_fwd.h"
 
-extern "C"
-{
-    float gHammerGrowScale = 1.4f;
-    float gHammerGrowDuration = 0.15f;
-    float gHammerSpinSpeed = 25.0f;
-    float gHammerLandedDuration = 5.0f;
-    float gHammerMinLandingAngle = 105.0f;
-    float gHammerMaxLandingAngle = 165.0f;
+float gHammerGrowScale = 1.4f;
+float gHammerGrowDuration = 0.15f;
+float gHammerSpinSpeed = 25.0f;
+float gHammerLandedDuration = 5.0f;
+float gHammerMinLandingAngle = 105.0f;
+float gHammerMaxLandingAngle = 165.0f;
 
-    extern const float sHammerOne;
-    extern const float sHammerZero;
-    extern const float sHammerLengthEpsilon;
-    extern const float sHammerPi;
-    extern const float sHammerHalf;
-    extern const float sHammerDegreesPerHalfTurn;
-    extern const float sHammerRadiansToAngleUnits;
-    extern const float sHammerQuarter;
+extern const float sHammerOne;
+extern const float sHammerZero;
+extern const float sHammerLengthEpsilon;
+extern const float sHammerPi;
+extern const float sHammerHalf;
+extern const float sHammerDegreesPerHalfTurn;
+extern const float sHammerRadiansToAngleUnits;
+extern const float sHammerQuarter;
 
-    nlVector4 sHammerForward = { 1.0f, 0.0f, 0.0f, 0.0f };
-
-}
-
-bool PlaySound(int, unsigned long, const void*, void*);
+nlVector4 sHammerForward = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 inline AvoidablePoint::AvoidablePoint(
     int type, float radius, const nlVector3& position)
@@ -213,7 +208,7 @@ void HammerObject::OnLanding()
                 * ToRadians(sHammerHalf * (gHammerMaxLandingAngle + gHammerMinLandingAngle))));
 
         fn_802B549C(facing,
-            mOwner->mUnidentified024.m_aActualFacingDirection);
+            mOwner->m_DetChar.m_aActualFacingDirection);
 
         nlMultQuat(target, facing, tilt);
 
@@ -343,7 +338,7 @@ void HammerObject::Activate(cFielder* fielder)
     HammerObject* object = this;
     object->mOwner = fielder;
     object->mPhysics->SetPosition(
-        fielder->mUnidentified024.m_v3Position, PhysicsObject::WORLD_COORDINATES);
+        fielder->m_DetChar.m_v3Position, PhysicsObject::WORLD_COORDINATES);
     object->mPendingReset = false;
     object->mActive = true;
     object->mPhysics->EnableCollisions();
@@ -481,14 +476,11 @@ void HammerObject::Deactivate(bool emitEffect)
     }
 }
 
-extern "C"
-{
-    extern const float sHammerOne = 1.0f;
-    extern const float sHammerZero = 0.0f;
-    extern const float sHammerLengthEpsilon = 0.001f;
-    extern const float sHammerPi = 3.1415927f;
-    extern const float sHammerHalf = 0.5f;
-    extern const float sHammerDegreesPerHalfTurn = 180.0f;
-    extern const float sHammerRadiansToAngleUnits = 10430.378f;
-    extern const float sHammerQuarter = 0.25f;
-}
+extern const float sHammerOne = 1.0f;
+extern const float sHammerZero = 0.0f;
+extern const float sHammerLengthEpsilon = 0.001f;
+extern const float sHammerPi = 3.1415927f;
+extern const float sHammerHalf = 0.5f;
+extern const float sHammerDegreesPerHalfTurn = 180.0f;
+extern const float sHammerRadiansToAngleUnits = 10430.378f;
+extern const float sHammerQuarter = 0.25f;

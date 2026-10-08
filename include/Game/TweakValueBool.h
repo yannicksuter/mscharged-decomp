@@ -25,8 +25,8 @@ public:
     virtual void FormatValue(char*, unsigned long);
     virtual void ParseValue(const char*);
     virtual ~TweakValue();
-    virtual void UnidentifiedVirtual14(float*, float*, float*);
-    virtual void UnidentifiedVirtual18();
+    virtual void GetFloatParameters(float*, float*, float*);
+    virtual void ReservedValueHook();
 
     static void operator delete(void* pointer)
     {
@@ -159,7 +159,7 @@ inline TweakValue<T>::~TweakValue()
 }
 
 template <typename T>
-inline void TweakValue<T>::UnidentifiedVirtual14(
+inline void TweakValue<T>::GetFloatParameters(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;
@@ -168,7 +168,7 @@ inline void TweakValue<T>::UnidentifiedVirtual14(
 }
 
 template <typename T>
-inline void TweakValue<T>::UnidentifiedVirtual18()
+inline void TweakValue<T>::ReservedValueHook()
 {
 }
 

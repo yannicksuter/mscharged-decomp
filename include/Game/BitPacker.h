@@ -1,20 +1,20 @@
-#ifndef GAME_UNIDENTIFIED_BIT_PACKER_H
-#define GAME_UNIDENTIFIED_BIT_PACKER_H
+#ifndef GAME_BIT_PACKER_H
+#define GAME_BIT_PACKER_H
 
 #include "Game/AI/AiUtil.h"
 #include "Game/MathHelpers.h"
 #include <string.h>
 
-class UnidentifiedBitPacker
+class BitPacker
 {
 public:
-    UnidentifiedBitPacker()
-        : mUnidentified00(0)
+    BitPacker()
+        : mBitCount(0)
     {
-        memset(&mUnidentified04, 0, sizeof(mUnidentified04));
+        memset(&mBits, 0, sizeof(mBits));
     }
 
-    void UnidentifiedPack(int value, int min, int max)
+    void Pack(int value, int min, int max)
     {
         value = value >= min ? value : min;
         value = value <= max ? value : max;
@@ -26,14 +26,14 @@ public:
             if ((1 << i) & range)
                 bits = i + 1;
         }
-        if (bits + mUnidentified00 < 32)
+        if (bits + mBitCount < 32)
         {
-            mUnidentified00 += bits;
-            mUnidentified04 = (mUnidentified04 << bits) | (value - min);
+            mBitCount += bits;
+            mBits = (mBits << bits) | (value - min);
         }
     }
 
-    void UnidentifiedPack(float value, float min, float max, float precision)
+    void Pack(float value, float min, float max, float precision)
     {
         value = nlMaxEquals(value, min);
         value = nlMinEquals(value, max);
@@ -41,16 +41,16 @@ public:
         int unidentifiedValue = (int)(value * scale + 0.5f * AIsgn(value));
         int unidentifiedMin = (int)(min * scale + 0.5f * AIsgn(min));
         int unidentifiedMax = (int)(max * scale + 0.5f * AIsgn(max));
-        UnidentifiedPack(unidentifiedValue, unidentifiedMin, unidentifiedMax);
+        Pack(unidentifiedValue, unidentifiedMin, unidentifiedMax);
     }
 
-    unsigned long UnidentifiedGet() const
+    unsigned long GetBits() const
     {
-        return mUnidentified04;
+        return mBits;
     }
 
-    unsigned int mUnidentified00;
-    unsigned long mUnidentified04;
+    unsigned int mBitCount;
+    unsigned long mBits;
 };
 
 #endif

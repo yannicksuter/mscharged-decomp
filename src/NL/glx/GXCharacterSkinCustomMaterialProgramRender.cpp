@@ -12,7 +12,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxGXColour.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static bool sRenderCharacterSkin = true;
 static bool sEnableCharacterSkinLighting = true;

@@ -1,7 +1,7 @@
 #include "Game/Render/DiddyBanana.h"
 
 #include "Game/Render/RLView.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static RLView* sDiddyBananaShadowView;
 static const nlVector3 sHiddenPosition = { 0.0f, 0.0f, -15.0f };
@@ -21,7 +21,7 @@ DiddyBanana::DiddyBanana(
         SetAnimState(*mpZip, 0.0f, PM_HOLD);
     }
     mpCharacter = 0;
-    mUnidentified80 = false;
+    mPadding80 = false;
 }
 
 DiddyBanana::~DiddyBanana()
@@ -34,8 +34,8 @@ void DiddyBanana::Update(float dt)
     {
         if (mpCharacter != 0)
         {
-            maFacingDirection = mpCharacter->mUnidentified024.m_aActualFacingDirection;
-            SetPosition(mpCharacter->mUnidentified024.m_v3Position);
+            maFacingDirection = mpCharacter->m_DetChar.m_aActualFacingDirection;
+            SetPosition(mpCharacter->m_DetChar.m_v3Position);
         }
 
         if (mTimer.m_uPackedTime != 0)

@@ -2,14 +2,14 @@
 #define GAME_WORLD_WORLD_EFFECT_H
 
 #include "types.h"
-#include "Game/World/WorldObject_80129EE0.h"
+#include "Game/World/WorldHelperObject.h"
 
 class World;
 class WorldAnimController;
 class EmissionController;
 struct WorldObjectLoadContext;
 
-class WorldEffect : public WorldObject_80129EE0
+class WorldEffect : public WorldHelperObject
 {
 public:
     WorldEffect() : m_bActive(1) { }
@@ -22,7 +22,7 @@ public:
     void UpdateVisibility(EmissionController* pController);
 
     /* 0x60 */ float m_fEmissionInterval;
-    /* 0x64 */ float mUnidentified064;
+    /* 0x64 */ float m_fEmissionIntervalOffset;
     /* 0x68 */ float m_fEmissionRadius;
     /* 0x6C */ u8 m_pad6C[0x04];
     /* 0x70 */ unsigned long m_uEffectHash;

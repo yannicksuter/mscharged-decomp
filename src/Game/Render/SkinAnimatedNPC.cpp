@@ -20,7 +20,7 @@
 #include "NL/nlColour.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static char ShadowLevelName[] = "shadowLevel";
 static char AlphaValueName[] = "alphaValue";

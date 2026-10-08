@@ -2,7 +2,7 @@
 #include "NL/gl/glMaterialParameters.h"
 
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"

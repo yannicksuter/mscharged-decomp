@@ -46,7 +46,7 @@ void GLXTarget::Activate(unsigned long mode)
     sCurrentTarget = this;
 }
 
-void GLXTarget::UnidentifiedVirtual10()
+void GLXTarget::ReservedTargetHookA()
 {
 }
 
@@ -107,7 +107,7 @@ void GLXTarget::CreateTexture(unsigned long hash)
     glRegisterTexture(mTextureHash, mTexture, allocator);
 }
 
-void GLXTarget::UnidentifiedVirtual28()
+void GLXTarget::ReservedTargetHookB()
 {
 }
 

@@ -4,7 +4,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/nlColour.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 extern "C" void glxConfigureCharacterDamage(float megaBlend, const bool* damageEnabled, int stageCount, int texGenCount,
     int damageTexCoord1, int damageTexCoord2, int megaTexCoord, int damageTexture1,

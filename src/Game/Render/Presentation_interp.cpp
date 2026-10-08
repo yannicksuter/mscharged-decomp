@@ -43,7 +43,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             {
                 cFielder* fielder = (*team)->GetFielder(player);
                 fielder->m_Dirt = 0.0f;
-                fielder->mUnidentified16C = 0;
+                fielder->m_nDamageType = 0;
                 fielder->m_MinDirt = 0.0f;
             }
         }
@@ -54,7 +54,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             cFielder* captain = g_pTeams[0]->GetCaptain();
             captain->m_Dirt = 0.0f;
-            captain->mUnidentified16C = 0;
+            captain->m_nDamageType = 0;
         }
         {
             cFielder* captain = g_pTeams[0]->GetCaptain();
@@ -63,7 +63,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         {
             cFielder* captain = g_pTeams[1]->GetCaptain();
             captain->m_Dirt = 0.0f;
-            captain->mUnidentified16C = 0;
+            captain->m_nDamageType = 0;
         }
         {
             cFielder* captain = g_pTeams[1]->GetCaptain();
@@ -469,7 +469,7 @@ void Presentation::DoFunctionCall(unsigned int function)
         int side = NisPlayer::Instance()->mMegaStrikeSide == 0 ? 0 : 4;
         character = g_pCharacters[side];
         character->fn_80022D3C(value, direction ? 1.0f : 0.0f);
-        switch (character->mUnidentified024.m_eCharacterClass)
+        switch (character->m_DetChar.m_eCharacterClass)
         {
         case 5:
         case 6:
@@ -490,7 +490,7 @@ void Presentation::DoFunctionCall(unsigned int function)
     {
         bool enabled = m_SP[-1] != 0;
         --m_SP;
-        mUnidentified164 = enabled;
+        mNisStadiumEffectsEnabled = enabled;
         BasicStadium::GetCurrentStadium()->SetEffectsActive(55, enabled);
         break;
     }
@@ -515,15 +515,15 @@ void Presentation::DoFunctionCall(unsigned int function)
         break;
     case 67:
         ++m_SP;
-        m_SP[-1] = mUnidentified156;
+        m_SP[-1] = mPlayLoserReaction;
         break;
     case 68:
         ++m_SP;
-        m_SP[-1] = mUnidentified157;
+        m_SP[-1] = mLoserReactionOutraged;
         break;
     case 69:
         ++m_SP;
-        m_SP[-1] = mUnidentified158;
+        m_SP[-1] = mMegaStrikeScored;
         break;
     case 70:
     {

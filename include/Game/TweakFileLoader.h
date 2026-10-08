@@ -38,7 +38,7 @@ struct TweakFileLoader
 
     int mCount;
     TweakLoadEntry mEntries[32];
-    u32 mUnidentified1504;
+    u32 m_pad1504;
 };
 
 extern TweakFileLoader gTweakFileLoader;

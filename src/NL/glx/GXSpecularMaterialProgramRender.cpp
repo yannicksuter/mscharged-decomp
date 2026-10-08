@@ -11,7 +11,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxGXColour.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static bool sSpecularRenderingEnabled = true;
 static bool sSpecularDefaultLightingEnabled = true;

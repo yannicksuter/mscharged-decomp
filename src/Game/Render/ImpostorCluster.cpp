@@ -8,7 +8,7 @@
 #include "NL/gl/glState.h"
 #include "Game/TweakValueInt.h"
 #include "Game/TweakValueFloat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static TweakValueInt siBackgroundRed(
     "siBackgroundRed", "/Render/Impostor/Cluster", 122);

@@ -395,5 +395,3 @@ bool ChallengeSelectScene::IsChallengeAvailable(int)
 {
     return true;
 }
-
-#include "NL/nlstring_tmpl.h"

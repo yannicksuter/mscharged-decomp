@@ -13,7 +13,7 @@
 #include "NL/nlSlotPool.h"
 #include "Game/Physics/PhysicsShockwave.h"
 #include "Game/Physics/PhysicsEventQueue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "types.h"
 #include "Game/Camera/CameraMan.h"

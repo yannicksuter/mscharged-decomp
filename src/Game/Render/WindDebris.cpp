@@ -18,7 +18,7 @@
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
 #include "NL/nlFunction.inl"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 static RLView* sUnshadowedView;
@@ -31,7 +31,7 @@ WindDebris::WindDebris(
     cInventory<cSAnim>* pInventorySAnim, void* resource)
     : SkinAnimatedMovableNPC(pHierarchy, nModelID, rPhysObj, resource)
     , mActivationSoundCue(activationSoundCue)
-    , mUnidentified08C(impactSoundCue)
+    , mImpactSoundCue(impactSoundCue)
     , mbUpdateSuspended(false)
     , mfCollisionDelay(0.0f)
 {
@@ -133,7 +133,7 @@ void WindDebris::CollisionCallback(
             CollisionWindDebrisPlayerData* pData = g_CollisionWindDebrisPlayerDataPool.Allocate();
             pData->pFielder = pFielder;
             pData->pDebris = pDebris;
-            g_pGame->mUnidentified49C.mCollisionWindDebrisPlayerEvent.Queue(pData,
+            g_pGame->mEventQueue.mCollisionWindDebrisPlayerEvent.Queue(pData,
                 Function<CollisionWindDebrisPlayerData*>(FreeCollisionWindDebrisPlayerData));
         }
     }

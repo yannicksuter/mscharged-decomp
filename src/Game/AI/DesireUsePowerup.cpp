@@ -17,7 +17,7 @@
 #include "Game/Render/ChainChomp.h"
 #include "Game/Team.h"
 #include <stddef.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on
@@ -62,10 +62,10 @@ bool DesireUsePowerup::Initialize(void* context)
 {
     bool result;
     ePowerUpType ePowerup;
-    UnidentifiedVariantCollection* params;
+    FuzzyVariantCollection* params;
 
     result = Desire::Initialize(context);
-    params = (UnidentifiedVariantCollection*)context;
+    params = (FuzzyVariantCollection*)context;
 
     mbThrowingPowerup = false;
     mePowerup = POWER_UP_NONE;
@@ -254,10 +254,10 @@ void DesireUsePowerup::SetPowerup(
         if (mpTarget != NULL)
         {
             nDirection = (m_pFielder->GetFacingDeltaToPosition(
-                mpTarget->mUnidentified024.m_v3Position) >> 14) & 3;
+                mpTarget->m_DetChar.m_v3Position) >> 14) & 3;
         }
 
-        switch (m_pFielder->mUnidentified024.m_eCharacterClass)
+        switch (m_pFielder->m_DetChar.m_eCharacterClass)
         {
         case (eCharacterClass)3:
             if (m_pFielder->m_eAnimID == 0x52
@@ -345,7 +345,7 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     {
         if (!pDesire->m_pFielder->IsSuperPowerActive())
         {
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             TransitionFunc* pTransition
                 = !pDesire->mOverrideTransition.IsUnset()
                 ? &pDesire->mOverrideTransition.mValue
@@ -420,30 +420,30 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     {
         StatsTracker::s_pInstance->TrackStat(
             STATS_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-            pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+            pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         if (IsMushroomPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_MUSHROOMS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
         else if (IsStarOrChainChompPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_STARS_AND_CHAIN_CHOMPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
         else if (IsCaptainPowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_CAPTAIN_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
         else if (IsDrawablePowerup(ePowerup))
         {
             StatsTracker::s_pInstance->TrackStat(
                 STATS_DRAWABLE_POWERUPS_USED, pDesire->m_pFielder->m_pTeam->m_nSide,
-                pDesire->m_pFielder->mUnidentified1E4.m_ID, 0, 0, 0, 0);
+                pDesire->m_pFielder->m_DetPlayer.m_ID, 0, 0, 0, 0);
         }
     }
 }
@@ -451,12 +451,12 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
 /**
  * Offset/Address/Size: 0x2160 | 0x800D41D4 | size: 0x17C
  */
-void DesireUsePowerup::UnidentifiedVirtual8(
+void DesireUsePowerup::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireUsePowerup");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
     cache->AddField(16, gDebugFieldTypes[16].size,
@@ -476,12 +476,12 @@ void DesireUsePowerup::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x22DC | 0x800D4350 | size: 0xC0
  */
-void DesireUsePowerup::UnidentifiedVirtual7(
+void DesireUsePowerup::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireUsePowerupType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireUsePowerupType, cache);
+        RegisterDebugFields(&sDesireUsePowerupType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -492,7 +492,7 @@ void DesireUsePowerup::UnidentifiedVirtual7(
         DesireUsePowerup* copy
             = (DesireUsePowerup*)((u8*)data - offset);
         *(int*)&copy->mpTarget
-            = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
+            = mpTarget == NULL ? -1 : mpTarget->m_nCharacterIndex;
         cache->ChecksumData(sDesireUsePowerupType, data, context);
     }
 }

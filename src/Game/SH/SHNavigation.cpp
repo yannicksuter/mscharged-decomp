@@ -39,7 +39,7 @@ SHNavigation::SHNavigation()
     mTransitionPending = false;
     mHomeWarningPlaying = false;
     mIsWidescreen = false;
-    mUnidentified1E0 = 0;
+    mPadding1E0 = 0;
     mVisibleButtons = false;
 
     for (int channel = 0; channel < 4; ++channel)

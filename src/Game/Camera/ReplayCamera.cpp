@@ -1,7 +1,7 @@
 #include "Game/Camera/ReplayCamera.h"
 #include "Game/Camera/CameraDamping.h"
 #include "Game/Camera/CameraMan.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/Render/RLViewLayers.h"
 
 #include "Game/AI/AiUtil.h"
@@ -19,7 +19,7 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glPlat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include <math.h>
 
 static const nlVector3 sZeroVector = { 0.0f, 0.0f, 0.0f };
@@ -282,8 +282,8 @@ nlVector3 ReplayCamera::GetClampedFocusPosition(const nlVector3& position,
         if (cameraUp.GetLengthSq3D() < 0.0f)
             nlVec3Scale(cameraUp, -1.0f);
 
-        nlVector3 v3Unidentified;
-        nlVec3Set(v3Unidentified, 1.0f, 0.0f, 0.0f);
+        nlVector3 v3XAxis;
+        nlVec3Set(v3XAxis, 1.0f, 0.0f, 0.0f);
 
         nlMatrix4 cameraMatrix;
         nlMatrix4 inverseCameraMatrix;
@@ -354,7 +354,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
     case 3:
     {
         cCharacter* goalie = mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9];
-        result = goalie->mUnidentified024.m_v3Position;
+        result = goalie->m_DetChar.m_v3Position;
         result.z = 1.0f;
         break;
     }
@@ -402,7 +402,7 @@ nlVector3 ReplayCamera::GetFocusPosition(int focus) const
     {
         cPlayer* goalie = (cPlayer*)(mSideOfInterest == 0 ? g_pCharacters[8] : g_pCharacters[9]);
         cFielder* captain = goalie->m_pTeam->GetCaptain();
-        result = captain->mUnidentified024.m_v3Position;
+        result = captain->m_DetChar.m_v3Position;
         result.z = 1.0f;
         break;
     }

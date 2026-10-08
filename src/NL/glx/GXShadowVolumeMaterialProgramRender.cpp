@@ -7,7 +7,7 @@
 #include "NL/glx/GXMaterialShadowTweaks.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 enum ShadowVolumeMode
 {

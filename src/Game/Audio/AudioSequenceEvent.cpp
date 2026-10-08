@@ -13,6 +13,7 @@
 
 #include "Game/Audio/SoundInstance.h"
 #include "Game/Audio/AudioSequenceEvent.h"
+#include "Game/Audio/AudioBankLoader.h"
 
 SlotPool<SoundPlaybackEvent> sSoundPlaybackEventPool(32, 16);
 SlotPool<HitMarkerEvent> sHitMarkerEventPool(32, 16);
@@ -145,10 +146,9 @@ AudioSourceInfo* SoundPlaybackEvent::SelectSourceInfo()
         selectedIndex = definition->choices[index].index;
     }
 
-    void* entries = *(void**)((u8*)owner->soundInstance->owner->m_Slot
-                              + 0x10);
-    return (AudioSourceInfo*)((u8*)*(void**)((u8*)entries + 0x14)
-                              + selectedIndex * sizeof(AudioSourceInfo));
+    AudioResourceLoadOwner* resource =
+        (AudioResourceLoadOwner*)owner->soundInstance->owner->m_Slot;
+    return resource->m_Loader->GetChunk23200Entries() + selectedIndex;
 }
 
 int SoundPlaybackEvent::Update(float)

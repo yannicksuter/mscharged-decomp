@@ -9,7 +9,7 @@
 #include "NL/nlString.h"
 #include "NL/platqmath.h"
 #include "Game/Render/FlyingCamera.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 // Charged-only shadow prop, sixth of the run described beside
 // DrawableBulletBill. This one carries the index of its live camera instead of

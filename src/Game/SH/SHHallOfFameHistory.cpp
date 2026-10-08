@@ -54,7 +54,7 @@ SHHallOfFameHistory::SHHallOfFameHistory(int mode)
 
     mSelectedHistoryIndex = 0;
     mHistoryCount = 0;
-    mUnidentified324 = false;
+    mPadding324 = false;
     mState = 0;
     mImages[0] = 0;
     mImages[1] = 0;
@@ -626,10 +626,10 @@ SHHallOfFamePlayerCard::SHHallOfFamePlayerCard(int mode)
 {
     mFrontImageReady = false;
     mBackImageReady = false;
-    mUnidentified0FC[0] = 0;
-    mUnidentified0FC[1] = 0;
-    mUnidentified0FC[2] = 0;
-    mUnidentified0FC[3] = 0;
+    mHoverCounts[0] = 0;
+    mHoverCounts[1] = 0;
+    mHoverCounts[2] = 0;
+    mHoverCounts[3] = 0;
 
     mCardIndex = GetHallOfFamePlayerCardIndex();
     mIsUnlocked = IsUnlockFlagSet(GetHallOfFamePlayerUnlockFlag(mCardIndex));
@@ -717,7 +717,7 @@ void SHHallOfFamePlayerCard::Update(float fDeltaT)
                 goto checkInput;
             }
 
-            if (mUnidentified0FC[pad] > 0)
+            if (mHoverCounts[pad] > 0)
             {
                 controller->SetActiveSlide("A", true, false);
             }

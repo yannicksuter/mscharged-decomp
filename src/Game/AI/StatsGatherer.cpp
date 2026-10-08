@@ -1,5 +1,15 @@
-#include "NL/nlTask.h"
+#include "Game/AI/StatsGatherer.h"
 
-void nlTask::StateTransition(unsigned int, unsigned int)
+StatsGatherer::StatsGatherer()
+    : InterpreterCore(10)
 {
+}
+
+StatsGatherer::~StatsGatherer()
+{
+}
+
+void StatsGatherer::SetTestName(const char* name)
+{
+    m_testName = name;
 }

@@ -10,7 +10,7 @@ class cPlayer;
 class cTeam;
 class FormationManager;
 class InterpreterCore;
-class UnidentifiedVariant_80054AB8;
+class DesireUpdate;
 
 enum eFormationType
 {
@@ -220,9 +220,9 @@ public:
     static int m_NumFormationSets;
 };
 
-UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunction(InterpreterCore*, const char*, cTeam*);
-UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByName(InterpreterCore*, cTeam*, const char*);
-UnidentifiedVariant_80054AB8 EvaluateTeamFuzzyFunctionByHash(InterpreterCore*, const unsigned int&, cTeam*);
+DesireUpdate EvaluateTeamFuzzyFunction(InterpreterCore*, const char*, cTeam*);
+DesireUpdate EvaluateTeamFuzzyFunctionByName(InterpreterCore*, cTeam*, const char*);
+DesireUpdate EvaluateTeamFuzzyFunctionByHash(InterpreterCore*, const unsigned int&, cTeam*);
 extern const float g_fFielderOrderPenalty;
 
 #endif // _FORMATION_H_

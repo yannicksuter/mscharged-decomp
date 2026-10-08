@@ -17,7 +17,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/RenderSnapshot.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 static const nlVector3 sInitialVelocity = { 0.0f, 0.0f, 0.0f };

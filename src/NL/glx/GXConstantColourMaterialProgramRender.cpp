@@ -4,7 +4,7 @@
 #include "NL/glx/GXConstantColourMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static inline GXColor MakeGXColour(float r, float g, float b, float a)
 {

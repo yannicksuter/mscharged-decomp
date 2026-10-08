@@ -7,7 +7,7 @@
 
 #include "Game/MathHelpers.h"
 #include "Game/Render/ImpostorManager.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakConfig.h"
 #include "Game/TweakValue.h"
 #include "Game/TweakValueFloat.h"

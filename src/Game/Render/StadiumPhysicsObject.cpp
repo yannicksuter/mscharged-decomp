@@ -9,7 +9,7 @@
 #include "NL/nlList.h"
 #include "NL/nlListContainer.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 float sfStaticFinitePlaneThinDepth = 0.75f;
 float sfStaticFinitePlaneThickDepth = 10.0f;

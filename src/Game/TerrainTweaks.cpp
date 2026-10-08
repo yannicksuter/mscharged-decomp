@@ -20,4 +20,4 @@ TerrainTweaks::TerrainTweaks(const char* fileName, const char* category)
     gTweakFileLoader.LoadFileAsync(fileName, category);
 }
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"

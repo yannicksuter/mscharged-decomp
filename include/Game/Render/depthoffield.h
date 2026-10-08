@@ -19,7 +19,7 @@ public:
     /* 0x01 */ u8 m_bDebugView;
     /* 0x04 */ float m_fDistanceFromCamera;
     /* 0x08 */ float m_fIntensity;
-    /* 0x0C */ void* mUnidentified0C;
+    /* 0x0C */ void* m_pad0C;
 }; // total size: 0x10
 
 #endif // GAME_RENDER_DEPTH_OF_FIELD_H

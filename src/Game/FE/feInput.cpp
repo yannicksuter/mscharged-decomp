@@ -29,7 +29,7 @@ void FEInput::Reset(bool arg0)
     for (int i = 0; i < 4; i++)
     {
         m_bEnableInput[i] = true;
-        mUnidentified024[i] = 0;
+        m_DisabledButtonMask[i] = 0;
     }
 
     if (arg0)
@@ -88,7 +88,7 @@ bool FEInput::IsButtonDisabled(eFEINPUT_PAD pad, int button, bool remap) const
         for (int i = 0; i < 4; i++)
         {
             int buttonIndex = g_pPadManager->GetPad(i)->GetButtonIndex(button, remap);
-            if ((mUnidentified024[i] & (1 << buttonIndex)) != 0)
+            if ((m_DisabledButtonMask[i] & (1 << buttonIndex)) != 0)
             {
                 return true;
             }
@@ -97,7 +97,7 @@ bool FEInput::IsButtonDisabled(eFEINPUT_PAD pad, int button, bool remap) const
     }
 
     int buttonIndex = g_pPadManager->GetPad(pad)->GetButtonIndex(button, remap);
-    return (mUnidentified024[pad] & (1 << buttonIndex)) != 0;
+    return (m_DisabledButtonMask[pad] & (1 << buttonIndex)) != 0;
 }
 
 bool FEInput::IsPressed(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_PAD* pOutPad)
@@ -314,7 +314,7 @@ void FEInput::Update(float)
 {
     for (int i = 0; i < 4; i++)
     {
-        mUnidentified024[i] = 0;
+        m_DisabledButtonMask[i] = 0;
         for (int buttonindex = 0; buttonindex < 13; buttonindex++)
         {
             int button = g_pPadManager->GetPad(i)->GetButtonMask(buttonindex);

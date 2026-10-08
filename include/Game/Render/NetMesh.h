@@ -144,7 +144,7 @@ public:
     /* 0x6A */ u8 mPadding06A[2];
     /* 0x6C */ float mfMotion;
     /* 0x70 */ float mJolt;
-    /* 0x74 */ u8 mUnidentified074[8];
+    /* 0x74 */ u8 mPadding074[8];
     /* 0x7C */ cDistanceConstraint* m_aDistanceConstraints;
     /* 0x80 */ cPositionConstraint* m_aPositionConstraints;
 }; // size: 0x84

@@ -1,7 +1,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Render/MegastrikeBackgroundOverlay.h"
 
 #include "Game/Render/RLView.h"
@@ -70,7 +70,7 @@ void MegastrikeBackgroundOverlay::UpdateAndRender(float deltaTime)
 
     int playerIndex = mTeamIndex == 0 ? 0 : 4;
     char textureName[64];
-    nlSNPrintf(textureName, sizeof(textureName), sGameplayBackgroundFormat, g_pCharacters[playerIndex]->mUnidentified11C->mName);
+    nlSNPrintf(textureName, sizeof(textureName), sGameplayBackgroundFormat, g_pCharacters[playerIndex]->m_pCharacterInfo->mName);
 
     u32 texture = glGetTexture(textureName);
     u32 selectedTexture;

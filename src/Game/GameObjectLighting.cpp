@@ -33,8 +33,8 @@
 #include "Game/Render/LightingLookup.h"
 #include "Game/TweakValueFloat.h"
 #include "Game/TweakValueInt.h"
-#include "Game/UnidentifiedStaticStorage.h"
-#include "Game/UnidentifiedTweakAction.h"
+#include "Game/SharedStaticStorage.h"
+#include "Game/TweakAction.h"
 
 // GameRenderTask defines this flag as u8; this unit only matches closer when
 // it reads the byte as a bool.
@@ -154,11 +154,11 @@ TweakValueInt gCharacterLightBlue("siCharacterLightBlue", gLastTweakCategory, 0)
 
 void UpdateCharacterLightColour();
 
-UnidentifiedTweakAction gCharacterLightRedAction(
+TweakAction gCharacterLightRedAction(
     "Character Light Red", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
-UnidentifiedTweakAction gCharacterLightGreenAction(
+TweakAction gCharacterLightGreenAction(
     "Character Light Green", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
-UnidentifiedTweakAction gCharacterLightBlueAction(
+TweakAction gCharacterLightBlueAction(
     "Character Light Blue", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
 
 static const nlVector3 sInitialDirection = { 1.0f, 0.0f, 0.0f };

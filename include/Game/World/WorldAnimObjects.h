@@ -40,16 +40,16 @@ public:
     /* 0x28 */ u8 m_pad28[0x08];
 };
 
-class WorldObjectBase_803416DC : public WorldObject
+class WorldPhysicsDrawableBase : public WorldObject
 {
 public:
-    WorldObjectBase_803416DC() { m_uObjectCreationFlags |= 4; }
+    WorldPhysicsDrawableBase() { m_uObjectCreationFlags |= 4; }
 
     /* 0x04 */ u8 m_pad04[0x08];
     /* 0x0C */ unsigned long m_uObjectCreationFlags;
 }; // size: 0x10
 
-class WorldPhysicsDrawable : public WorldObjectBase_803416DC
+class WorldPhysicsDrawable : public WorldPhysicsDrawableBase
 {
 public:
     virtual ~WorldPhysicsDrawable() { }

@@ -19,7 +19,7 @@
 #include "NL/nlPrint.h"
 #include "NL/plat/DPDData.h"
 #include "decomp.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 TLComponentInstance* gFEPointerInstances[4];
 nlVector2 gFEPointerPositions[4];
@@ -58,7 +58,7 @@ FEDPDTask::FEDPDTask()
         gFEPointerPositions[i].y = 0.0f;
         gFEPointerEnabled[i] = false;
     }
-    g_pFEPointerManager->mUnidentified054 = 30;
+    g_pFEPointerManager->m_pad054 = 30;
 }
 
 FEDPDTask::~FEDPDTask()

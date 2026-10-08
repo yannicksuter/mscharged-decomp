@@ -15,7 +15,7 @@
 #include "Game/Render/HighRange.h"
 
 #include "Game/Render/ShadowVolume.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 struct RLViewLayerDesc
 {
@@ -109,10 +109,10 @@ GLRenderPair sWarbleOffsetTarget;
 GLRenderPair sWarbleTextureTarget;
 GLRenderPair sDofTarget;
 GLRenderPair sScreenGrabTarget;
-GLRenderPair sTarget_806E1950;
+GLRenderPair sUnusedTarget;
 bool sWidescreen;
 
-void fn_80271DE0()
+void ApplyLayerVisibilityTweaks()
 {
     sLayerViews[eCLV_ImpostorTexture]->m_Visible = eCLV_ImpostorTextureEnabled.GetValue();
     sLayerViews[eCLV_ShadowTexture]->m_Visible = eCLV_ShadowTextureEnabled.GetValue();
@@ -585,7 +585,7 @@ void fn_80273144(const nlMatrix4& view, const nlMatrix4& pipView, float aspect, 
     sAnark3DCamera.mView = lookAt;
 
     glx_SetFogClipPlanes(0.25f, 4096.0f);
-    fn_80271DE0();
+    ApplyLayerVisibilityTweaks();
 }
 
 void ShowLayerView(eCLV layer)

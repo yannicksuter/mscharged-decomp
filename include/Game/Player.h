@@ -21,7 +21,7 @@ class SpaceSearch;
 class AvoidableObject;
 struct CollisionPlayerPlayerData;
 struct CollisionPlayerWallData;
-struct UnidentifiedEventData24;
+struct CollisionPatchData;
 
 enum eBallRotationMode
 {
@@ -57,14 +57,14 @@ struct PlayerGameplayState
         nlVec3Set(m_v3AIPosition, 0.0f, 0.0f, 0.0f);
         m_BaseBallOrientation.x = m_BaseBallOrientation.y = m_BaseBallOrientation.z = 0.0f;
         m_BaseBallOrientation.w = 1.0f;
-        m_tBallPossessionTimer.UnidentifiedClear();
-        m_tBallUnPossessionTimer.UnidentifiedClear();
-        m_tNoPickupTimer.UnidentifiedClear();
-        m_tSlideAttackTimer.UnidentifiedClear();
-        m_tLooseBallPassTimer.UnidentifiedClear();
-        m_tInactivityTimer.UnidentifiedClear();
-        m_tFireTimer.UnidentifiedClear();
-        m_tSwapFacingTimer.UnidentifiedClear();
+        m_tBallPossessionTimer.Clear();
+        m_tBallUnPossessionTimer.Clear();
+        m_tNoPickupTimer.Clear();
+        m_tSlideAttackTimer.Clear();
+        m_tLooseBallPassTimer.Clear();
+        m_tInactivityTimer.Clear();
+        m_tFireTimer.Clear();
+        m_tSwapFacingTimer.Clear();
     }
     void SyncLog(void* context, DebugWriteCache* cache);
 
@@ -129,12 +129,12 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle() { }
-    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const CollisionPatchData*);
 
     void ClearSwapControllerTimer()
     {
         for (int i = 0; i < 16; i++)
-            m_tSwapControllerTimer[i].UnidentifiedClear();
+            m_tSwapControllerTimer[i].Clear();
     }
     void ReleaseBall(int nParam);
     void DoRegularPassing(cPlayer* pTeammate, bool bVolleyPass,
@@ -142,7 +142,7 @@ public:
         float fMinPassSpeed, float fMaxPassSpeed);
     void UpdateGameplayTimers(float fDeltaT);
     void GetAnimatedBallOrientation(nlQuaternion& qRetval);
-    bool UnidentifiedPowerupPredicate();
+    bool IsCaptainPowerupNext();
     void PickupBall(cBall* pBall);
     void SetNoPickUpTime(float NewNoPickUpTime);
     DetInput* GetGlobalPad();
@@ -189,7 +189,7 @@ public:
         float fInitialWeight);
 
 public:
-    /* 0x1E4 */ PlayerGameplayState mUnidentified1E4;
+    /* 0x1E4 */ PlayerGameplayState m_DetPlayer;
     /* 0x270 */ Timer m_tSwapControllerTimer[16];
 
 protected:
@@ -216,7 +216,7 @@ public:
 
 public:
     /* 0x31C */ SpaceSearch* m_pSpaceSearch;
-    /* 0x320 */ AvoidableObject* mUnidentified320;
+    /* 0x320 */ AvoidableObject* m_pAvoidableObject;
 
 }; // total size: 0x324
 

@@ -51,8 +51,6 @@ typedef struct
 
 extern tGKI_CB gki_cb;
 
-void gki_adjust_timer_count(INT32);
-
 // ---
 
 void gki_buffer_init(void);

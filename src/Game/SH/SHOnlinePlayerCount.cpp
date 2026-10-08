@@ -18,7 +18,7 @@
 #include "Game/OnlineMatchmaking.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/FriendManager.h"
 #include "NL/nlBind.h"
 #include "NL/nlPrint.h"

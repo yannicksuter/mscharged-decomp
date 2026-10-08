@@ -67,7 +67,7 @@ void DeactivateStateMachine(
 }
 
 bool ReinitializeStateMachine(
-    shdStateMachine* machine, UnidentifiedVariantCollection* parameters,
+    shdStateMachine* machine, FuzzyVariantCollection* parameters,
     bool reinitialize)
 {
     machine->mActive = false;
@@ -91,7 +91,7 @@ bool ReinitializeStateMachine(
 }
 
 bool InitializeStateMachine(
-    shdStateMachine* machine, UnidentifiedVariantCollection* parameters,
+    shdStateMachine* machine, FuzzyVariantCollection* parameters,
     bool initialize)
 {
     machine->mMaxDuration = gStateMachineUnsetDuration;
@@ -156,7 +156,7 @@ bool InitializeStateMachine(
 }
 
 void UpdateStateMachine(
-    shdStateMachine* machine, UnidentifiedVariant_80054AB8* update,
+    shdStateMachine* machine, DesireUpdate* update,
     bool runUpdate, float deltaTime)
 {
     *update = 0;
@@ -171,7 +171,7 @@ void UpdateStateMachine(
             machine->mOverrideTransition.Execute(
                 GetScriptMachineAIContext(machine->mScriptMachine),
                 update,
-                (UnidentifiedFuzzyRuntimeValue*)machine);
+                (FuzzyRuntimeContext*)machine);
         }
     }
     else if (IsTransitionFuncSet(&machine->mDefaultTransition.mValue)
@@ -180,7 +180,7 @@ void UpdateStateMachine(
         machine->mDefaultTransition.Execute(
             GetScriptMachineAIContext(machine->mScriptMachine),
             update,
-            (UnidentifiedFuzzyRuntimeValue*)machine);
+            (FuzzyRuntimeContext*)machine);
     }
     AccumulateScriptExecutionTime(start, gAIProfilingClock());
 
@@ -244,7 +244,7 @@ bool ScriptState::Initialize(void*)
         float start = gAIProfilingClock();
         void* context = mScriptMachine->mAIContext->mData.pointer;
         u32 hash = mInitFunctionHash;
-        UnidentifiedVariant_80054AB8 result
+        DesireUpdate result
             = ExecuteScriptStateFunction(GetFuzzyRuntime(), hash, context);
         initialized = result.mData.b;
         AccumulateScriptExecutionTime(start, gAIProfilingClock());
@@ -268,7 +268,7 @@ void ScriptState::Update(
     void* context = mScriptMachine->mAIContext->mData.pointer;
     u32 hash = mUpdateFunctionHash;
     {
-        UnidentifiedVariant_80054AB8 result = ExecuteScriptStateFunction(
+        DesireUpdate result = ExecuteScriptStateFunction(
             GetFuzzyRuntime(), hash, context, deltaTime);
         *update = result;
     }

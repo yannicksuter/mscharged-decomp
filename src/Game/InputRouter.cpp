@@ -12,7 +12,7 @@
 
 #include "Game/MathHelpers.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlDebugViews.h"
 #include "NL/nlMath.h"
@@ -43,7 +43,7 @@ InputRouter* gSimpleInputRouter;
 NetworkInputRouter* gNetworkInputRouter;
 
 static EventDispatcher sDetermDataDispatcher;
-static UnidentifiedQueuedEvent<DetermDataEvent> sDetermDataEventQueue(
+static QueuedEvent<DetermDataEvent> sDetermDataEventQueue(
     &sDetermDataDispatcher, "DetermDataEventQueue", -1);
 
 inline void FreeDetermDataEvent(DetermDataEvent* event);
@@ -100,7 +100,7 @@ void InputRouter::Reset(int)
     sDetermDataDispatcher.FreeBlocks();
 
     sDetermDataEventQueue.RemoveAll();
-    BasicSlotPool<DLListEntry<UnidentifiedListener<DetermDataEvent> > >*
+    BasicSlotPool<DLListEntry<EventListener<DetermDataEvent> > >*
         listenerPool = &sDetermDataEventQueue.mListeners.m_Allocator;
     listenerPool->FreeBlocks();
 
@@ -257,7 +257,7 @@ void DispatchDetermDataEvents()
     sDetermDataDispatcher.Dispatch(true);
 }
 
-UnidentifiedQueuedEvent<DetermDataEvent>* GetDetermDataEventQueue()
+QueuedEvent<DetermDataEvent>* GetDetermDataEventQueue()
 {
     return &sDetermDataEventQueue;
 }

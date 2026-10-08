@@ -173,12 +173,12 @@ struct ActBooSkillshot
 };
 
 class FuzzyVariant;
-class UnidentifiedVariantCollection;
+class FuzzyVariantCollection;
 class AvoidController;
 class cPN_SingleAxisBlender;
 class DesireSteering;
 class DesireUserControlled;
-class UnidentifiedDesire35;
+class DesireWaluigiWall;
 class DesireSuperPower;
 extern "C" void fn_800C5DBC(DesireSteering*, float);
 extern "C" void fn_800C6FDC(DesireSteering*, float);
@@ -218,7 +218,7 @@ class cFielder : public cPlayer
     void RegisterActWarioSuperFields(unsigned short* type, DebugWriteCache* cache);
     friend void fn_800C5DBC(DesireSteering*, float);
     friend void fn_800C6FDC(DesireSteering*, float);
-    friend class UnidentifiedDesire35;
+    friend class DesireWaluigiWall;
     friend class DesireUserControlled;
     friend class DesireSuperPower;
     friend class DesireUsePowerup;
@@ -229,7 +229,7 @@ class cFielder : public cPlayer
 
 public:
     bool CanReactToGroundEffects() const;
-    bool ActivateDesire(int state, UnidentifiedVariantCollection* parameters);
+    bool ActivateDesire(int state, FuzzyVariantCollection* parameters);
     const nlVector3& GetDesiredPosition();
     const nlVector3& GetDesiredVelocity();
 
@@ -346,7 +346,7 @@ public:
         const int* nModelID, cSHierarchy* pHierarchy,
         cAnimInventory* pAnimInventory,
         const CharacterPhysicsData* pCharacterPhysicsData, PlayerTweaks* pCharTweaks,
-        PlayerTweaks* pUnidentifiedTweaks,
+        PlayerTweaks* pSuperPowerTweaks,
         AnimRetargetList* pAnimRetargetList, int nIndex);
     virtual ~cFielder();
     virtual void PrePhysicsUpdate();
@@ -365,7 +365,7 @@ public:
     virtual void CollideWithWallCallback(
         const CollisionPlayerWallData* pData);
     virtual void InitActionPostWhistle();
-    virtual void CollideWithPatchCallback(const UnidentifiedEventData24*);
+    virtual void CollideWithPatchCallback(const CollisionPatchData*);
 
     void ClearPassTargetIfAmThePassTarget();
     void CleanUpAction(eFielderActionState actionState);
@@ -433,12 +433,12 @@ public:
     bool IsStuck() const;
     bool IsDaisyOrDryBones() const
     {
-        return (int)mUnidentified024.m_eCharacterClass == 0x11
-            || (int)mUnidentified024.m_eCharacterClass == 2;
+        return (int)m_DetChar.m_eCharacterClass == 0x11
+            || (int)m_DetChar.m_eCharacterClass == 2;
     }
     bool HasTeleportDeke() const
     {
-        return IsDaisyOrDryBones() || (int)mUnidentified024.m_eCharacterClass == 6;
+        return IsDaisyOrDryBones() || (int)m_DetChar.m_eCharacterClass == 6;
     }
     bool IsInvincible() const
     {
@@ -701,7 +701,7 @@ public:
     /* 0x3C8 */ float m_fMegaStrikeSegment2Position;
     /* 0x3CC */ float m_fMegaStrikeSegment3Position;
     /* 0x3D0 */ float m_fMegaStrikeSegment4Position;
-    /* 0x3D4 */ float mUnidentified3D4;
+    /* 0x3D4 */ float m_fMegaStrikeLastSegmentPosition;
 
     /* 0x3D8 */ s16 m_nStunnedAngularAcceleration;
     /* 0x3DA */ s16 m_nStunnedAngularVelocity;

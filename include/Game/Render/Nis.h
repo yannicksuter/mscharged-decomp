@@ -92,7 +92,7 @@ struct NisHeader
     /* 0x180 */ u32 renderMode;
     /* 0x184 */ nlVector3 stadiumOffset;
     /* 0x190 */ float mTime;
-    /* 0x194 */ bool mUnidentified194;
+    /* 0x194 */ bool m_pad194;
     /* 0x195 */ bool mirrored;
     /* 0x196 */ u8 unknown_0x196[0x02];
     /* 0x198 */ char* buffer;
@@ -187,7 +187,7 @@ public:
     /* 0x188 */ Trigger mTriggers[MAX_NUM_TRIGGERS];
     /* 0x848 */ int mMainCharacterIndex;
     /* 0x84C */ int mAudioCharacterIndex;
-    /* 0x850 */ u32 mUnidentified850;
+    /* 0x850 */ u32 m_pad850;
     /* 0x854 */ ImpostorModel* mDryBonesHead;
     /* 0x858 */ DrawableCharacter* mDryBonesHeadCharacter;
     /* 0x85C */ ImpostorModel* mShyGuyMask;

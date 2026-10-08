@@ -68,7 +68,7 @@ void DefensivePlayOverlay::SceneCreated()
     TLTextInstance* playerText = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(playersComponent->GetActiveSlide(), "PLAYER");
     cFielder* defendingCaptain = mGoalie->GetTeam()->GetCaptain();
     cFielder* attackingCaptain = mGoalie->GetTeam()->GetOtherTeam()->GetCaptain();
-    nlColour teamColour = GetTeamColour(*defendingCaptain->mUnidentified11C, *attackingCaptain->mUnidentified11C, true);
+    nlColour teamColour = GetTeamColour(*defendingCaptain->m_pCharacterInfo, *attackingCaptain->m_pCharacterInfo, true);
     playerText->SetAssetColour(teamColour);
 }
 

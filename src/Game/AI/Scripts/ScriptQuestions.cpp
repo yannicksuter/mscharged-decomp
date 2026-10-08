@@ -27,7 +27,7 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/debug.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "types.h"
 #include "NL/nlMath.inl"
 #include "NL/nlPrint.h"
@@ -187,13 +187,13 @@ float Striker(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsStriker = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsStriker())
     {
-        bUnidentified = true;
+        bIsStriker = true;
     }
 
-    if (bUnidentified)
+    if (bIsStriker)
     {
         return 1.0f;
     }
@@ -208,13 +208,13 @@ float Winger(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsWinger = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsWinger())
     {
-        bUnidentified = true;
+        bIsWinger = true;
     }
 
-    if (bUnidentified)
+    if (bIsWinger)
     {
         return 1.0f;
     }
@@ -229,13 +229,13 @@ float Midfield(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsMidfield = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsMidField())
     {
-        bUnidentified = true;
+        bIsMidfield = true;
     }
 
-    if (bUnidentified)
+    if (bIsMidfield)
     {
         return 1.0f;
     }
@@ -250,13 +250,13 @@ float Defence(cFielder* fielder)
         return 0.0f;
     }
 
-    bool bUnidentified = false;
+    bool bIsDefence = false;
     if (fielder->m_eClassType == FIELDER && fielder->IsDefense())
     {
-        bUnidentified = true;
+        bIsDefence = true;
     }
 
-    if (bUnidentified)
+    if (bIsDefence)
     {
         return 1.0f;
     }
@@ -336,7 +336,7 @@ extern "C" float fn_800D6A90(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
+    float fSpeed = pFielder->m_DetChar.m_fActualSpeed;
     float fAttribute = GetJogSpeed(pFielder->GetTweaks());
     return NormalizeVal(fSpeed, 0.7f * fAttribute, 2.0f);
 }
@@ -348,7 +348,7 @@ extern "C" float fn_800D6AF0(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
+    float fSpeed = pFielder->m_DetChar.m_fActualSpeed;
     float fBaseSpeed = GetJogSpeed(pFielder->GetTweaks());
     float fAttribute;
     if (pFielder->m_pBall != NULL)
@@ -378,7 +378,7 @@ extern "C" float fn_800D6BD8(cFielder* pFielder)
         return 0.0f;
     }
 
-    float fSpeed = pFielder->mUnidentified024.m_fActualSpeed;
+    float fSpeed = pFielder->m_DetChar.m_fActualSpeed;
     float fBaseSpeed = GetJogSpeed(pFielder->GetTweaks());
     float fAttribute;
     if (pFielder->m_pBall != NULL)
@@ -459,8 +459,8 @@ float OnTheGround(cPlayer* player)
         return 0.0f;
     }
 
-    float fFirstHeight = player->GetJointPosition(player->mUnidentified0E4).z;
-    float fSecondHeight = player->GetJointPosition(player->mUnidentified0E8).z;
+    float fFirstHeight = player->GetJointPosition(player->m_nLFootJointIndex).z;
+    float fSecondHeight = player->GetJointPosition(player->m_nRFootJointIndex).z;
     float fMinHeight = FMIN(fFirstHeight, fSecondHeight);
 
     return NormalizeVal(fMinHeight, g_pGame->m_pFuzzyTweaks->fOnGroundConfidenceDistanceMin,
@@ -496,7 +496,7 @@ float StrategicBallOwner(cFielder* pFielder)
     else
     {
         float fPassValid
-            = g_pBall->UnidentifiedHasPassTarget() ? 1.0f : 0.0f;
+            = g_pBall->HasPassTarget() ? 1.0f : 0.0f;
         if (!fPassValid && pFielder == pFielder->m_pTeam->GetBestBallInterceptor())
         {
             fScore = InterpolateClamped(0.7f, 0.95f, AbleToInterceptBall(pFielder));
@@ -572,12 +572,12 @@ static float InPassingLane(cFielder* pFielder, cPlayer* pPassTarget, float fPote
             }
 
             nlVector3 v3Between2 = GetClosestPointOnLineABFromPointC(
-                g_pBall->m_v3Position, g_pBall->m_v3PassIntercept, pFielder->mUnidentified024.m_v3Position);
+                g_pBall->m_v3Position, g_pBall->m_v3PassIntercept, pFielder->m_DetChar.m_v3Position);
             float fDistBall = nlSqrt(nlVec3DistanceSquared2D(g_pBall->m_v3Position, v3Between2), true);
             float fTime = fDistBall / fBallSpeed;
             fTime *= pFielder->GetRunningSpeed();
 
-            float fDist3 = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, v3Between2), true);
+            float fDist3 = nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position, v3Between2), true);
             FuzzyTweaks* pFuzzyTweaks2 = g_pGame->m_pFuzzyTweaks;
             float fResult = NormalizeVal(fDist3, fTime + pFuzzyTweaks2->fPassLaneDistance, fTime);
             fScore = FMIN(fResult, fRange);
@@ -594,7 +594,7 @@ float InPassingLane(cFielder* pFielder)
         return 0.0f;
     }
 
-    if (!g_pBall->UnidentifiedHasPassTarget())
+    if (!g_pBall->HasPassTarget())
     {
         return 0.0f;
     }
@@ -617,13 +617,13 @@ extern "C" float fn_800D74D8(cFielder* pFielder)
     if (pBall->m_pPrevOwner == NULL)
         return 0.0f;
     nlVector3 v3BetweenIntercept = GetClosestPointOnLineABFromPointC(
-        pBall->m_v3Position, pBall->m_pPrevOwner->GetAIOffNetLocation(NULL), pFielder->mUnidentified024.m_v3Position);
+        pBall->m_v3Position, pBall->m_pPrevOwner->GetAIOffNetLocation(NULL), pFielder->m_DetChar.m_v3Position);
     float fBallDistance = nlSqrt(nlVec3DistanceSquared2D(g_pBall->m_v3Position, v3BetweenIntercept), true);
     nlPolar pBallSpeedPolar;
     nlCartesianToPolar(pBallSpeedPolar, g_pBall->m_v3Velocity.x, g_pBall->m_v3Velocity.y);
     float fPossibleFielderDistance = fBallDistance / pBallSpeedPolar.r;
     fPossibleFielderDistance *= fn_8002C254(pFielder->GetTweaks());
-    float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
+    float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position,
         v3BetweenIntercept), true);
     return NormalizeVal(fDistance, fPossibleFielderDistance + g_pGame->m_pFuzzyTweaks->fShotLaneDistance,
         fPossibleFielderDistance);
@@ -744,7 +744,7 @@ extern "C" float fn_800D795C(cFielder* pFielder, int unidentified)
         return 0.0f;
     }
 
-    if (unidentified == pFielder->mUnidentified024.m_eCharacterClass)
+    if (unidentified == pFielder->m_DetChar.m_eCharacterClass)
     {
         return 1.0f;
     }
@@ -839,18 +839,18 @@ extern "C" float fn_800D7B00(cFielder* pFielder)
     cFielder* pOwner = g_pBall->GetOwnerFielder();
     if (pOwner != NULL)
     {
-        fOwnerRadius = pOwner->mUnidentified320->GetRadius();
+        fOwnerRadius = pOwner->m_pAvoidableObject->GetRadius();
         if (pOwner->IsAboveFielder(pFielder))
             return 0.0f;
     }
-    const nlVector3& vTarget = pOwner != NULL ? pOwner->mUnidentified024.m_v3Position
-        : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->mUnidentified1E4.m_ID);
+    const nlVector3& vTarget = pOwner != NULL ? pOwner->m_DetChar.m_v3Position
+        : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->m_DetPlayer.m_ID);
     if (pFielder->m_eActionState != ACTION_SLIDE_ATTACK && vTarget.z <= 0.35f)
     {
         float fDuration = GetSlideTime(pFielder->GetTweaks());
-        float fSpeed = pFielder->GetSlideAttackSpeed(pFielder->mUnidentified024.m_aActualFacingDirection);
-        float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position, vTarget), true);
-        float fRadius = pFielder->mUnidentified320->GetRadius();
+        float fSpeed = pFielder->GetSlideAttackSpeed(pFielder->m_DetChar.m_aActualFacingDirection);
+        float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position, vTarget), true);
+        float fRadius = pFielder->m_pAvoidableObject->GetRadius();
         fDistance -= fRadius + fOwnerRadius;
         fScore = NormalizeVal(fDistance / fSpeed, 4.3f * fDuration, 0.08f);
     }
@@ -877,13 +877,13 @@ float AbleToInterceptBall(cPlayer* pPlayer)
         else if (pPlayer->m_eClassType == FIELDER)
         {
             cFielder* pFielder = (cFielder*)pPlayer;
-            float fInterceptTime = pFielder->m_pTeam->mfBallInTimes[pFielder->mUnidentified1E4.m_ID];
+            float fInterceptTime = pFielder->m_pTeam->mfBallInTimes[pFielder->m_DetPlayer.m_ID];
             float fInterceptScore = NormalizeVal(fInterceptTime,
                 g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceTimeMin, g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceTimeMax);
             const nlVector3& v3Target = fInterceptScore < 0.35f ? g_pBall->m_v3Position
-                : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->mUnidentified1E4.m_ID);
+                : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->m_DetPlayer.m_ID);
             float fDistance = nlSqrt(nlVec3DistanceSquared2D(
-                pFielder->mUnidentified024.m_v3Position, v3Target), true);
+                pFielder->m_DetChar.m_v3Position, v3Target), true);
             float fClosenessScore = NormalizeVal(fDistance,
                 g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceDistanceMax);
             fScore = fInterceptScore * g_pGame->m_pFuzzyTweaks->fInterceptBallScoreWeight
@@ -917,13 +917,13 @@ extern "C" float fn_800D82C0(cFielder* pFielder)
             fScore = 1.0f;
         else
         {
-            float fInterceptTime = pFielder->m_pTeam->mfBallInTimes[pFielder->mUnidentified1E4.m_ID];
+            float fInterceptTime = pFielder->m_pTeam->mfBallInTimes[pFielder->m_DetPlayer.m_ID];
             float fInterceptScore = NormalizeVal(fInterceptTime,
                 g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceTimeMin, g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceTimeMax);
             const nlVector3& v3Target = fInterceptScore < 0.35f ? g_pBall->m_v3Position
-                : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->mUnidentified1E4.m_ID);
+                : pFielder->m_pTeam->GetBallInterceptPosition(pFielder->m_DetPlayer.m_ID);
             float fDistance = nlSqrt(nlVec3DistanceSquared2D(
-                pFielder->mUnidentified024.m_v3Position, v3Target), true);
+                pFielder->m_DetChar.m_v3Position, v3Target), true);
             float fClosenessScore = NormalizeVal(fDistance,
                 g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fInterceptBallConfidenceDistanceMax);
             fScore = fInterceptScore * g_pGame->m_pFuzzyTweaks->fInterceptBallSwapControlerScoreWeight
@@ -1057,7 +1057,7 @@ float ReallyCloseToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fReallyCloseToBallDistanceConfidenceMin,
         g_pGame->m_pFuzzyTweaks->fReallyCloseToBallDistanceConfidenceMax);
 }
@@ -1069,7 +1069,7 @@ float CloseToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fCloseBallConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fCloseBallConfidenceDistanceMax);
 }
@@ -1130,7 +1130,7 @@ float NearToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fNearBallConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fNearBallConfidenceDistanceMax);
 }
@@ -1142,7 +1142,7 @@ float FarToBall(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fFarBallConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fFarBallConfidenceDistanceMax);
 }
@@ -1159,8 +1159,8 @@ float CloseToMyNet(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fCloseNetConfidenceDistanceMin;
     const nlVector3& v3DefNetPos = pPlayer->GetAIDefNetLocation(NULL);
     nlVector2 v2Diff;
-    v2Diff.x = v3DefNetPos.x - pPlayer->mUnidentified024.m_v3Position.x;
-    v2Diff.y = v3DefNetPos.y - pPlayer->mUnidentified024.m_v3Position.y;
+    v2Diff.x = v3DefNetPos.x - pPlayer->m_DetChar.m_v3Position.x;
+    v2Diff.y = v3DefNetPos.y - pPlayer->m_DetChar.m_v3Position.y;
     float fDist = nlSqrt(v2Diff.x * v2Diff.x + v2Diff.y * v2Diff.y, true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
@@ -1177,8 +1177,8 @@ float NearToMyNet(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fNearNetConfidenceDistanceMin;
     const nlVector3& v3DefNetPos = pPlayer->GetAIDefNetLocation(NULL);
     nlVector2 v2Diff;
-    v2Diff.x = v3DefNetPos.x - pPlayer->mUnidentified024.m_v3Position.x;
-    v2Diff.y = v3DefNetPos.y - pPlayer->mUnidentified024.m_v3Position.y;
+    v2Diff.x = v3DefNetPos.x - pPlayer->m_DetChar.m_v3Position.x;
+    v2Diff.y = v3DefNetPos.y - pPlayer->m_DetChar.m_v3Position.y;
     float fDist = nlSqrt(v2Diff.x * v2Diff.x + v2Diff.y * v2Diff.y, true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
@@ -1195,8 +1195,8 @@ float FarToMyNet(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fFarNetConfidenceDistanceMin;
     const nlVector3& v3DefNetPos = pPlayer->GetAIDefNetLocation(NULL);
     nlVector2 v2Diff;
-    v2Diff.x = v3DefNetPos.x - pPlayer->mUnidentified024.m_v3Position.x;
-    v2Diff.y = v3DefNetPos.y - pPlayer->mUnidentified024.m_v3Position.y;
+    v2Diff.x = v3DefNetPos.x - pPlayer->m_DetChar.m_v3Position.x;
+    v2Diff.y = v3DefNetPos.y - pPlayer->m_DetChar.m_v3Position.y;
     float fDist = nlSqrt(v2Diff.x * v2Diff.x + v2Diff.y * v2Diff.y, true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
@@ -1213,8 +1213,8 @@ float CloseToTheirNet(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fCloseNetConfidenceDistanceMin;
     const nlVector3& v3OffNetPos = pPlayer->GetAIOffNetLocation(NULL);
     nlVector2 v2Diff;
-    v2Diff.x = v3OffNetPos.x - pPlayer->mUnidentified024.m_v3Position.x;
-    v2Diff.y = v3OffNetPos.y - pPlayer->mUnidentified024.m_v3Position.y;
+    v2Diff.x = v3OffNetPos.x - pPlayer->m_DetChar.m_v3Position.x;
+    v2Diff.y = v3OffNetPos.y - pPlayer->m_DetChar.m_v3Position.y;
     float fDist = nlSqrt(v2Diff.x * v2Diff.x + v2Diff.y * v2Diff.y, true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
@@ -1231,8 +1231,8 @@ float NearToTheirNet(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fNearNetConfidenceDistanceMin;
     const nlVector3& v3OffNetPos = pPlayer->GetAIOffNetLocation(NULL);
     nlVector2 v2Diff;
-    v2Diff.x = v3OffNetPos.x - pPlayer->mUnidentified024.m_v3Position.x;
-    v2Diff.y = v3OffNetPos.y - pPlayer->mUnidentified024.m_v3Position.y;
+    v2Diff.x = v3OffNetPos.x - pPlayer->m_DetChar.m_v3Position.x;
+    v2Diff.y = v3OffNetPos.y - pPlayer->m_DetChar.m_v3Position.y;
     float fDist = nlSqrt(v2Diff.x * v2Diff.x + v2Diff.y * v2Diff.y, true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
@@ -1249,8 +1249,8 @@ float FarToTheirNet(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fFarNetConfidenceDistanceMin;
     const nlVector3& v3OffNetPos = pPlayer->GetAIOffNetLocation(NULL);
     nlVector2 v2Diff;
-    v2Diff.x = v3OffNetPos.x - pPlayer->mUnidentified024.m_v3Position.x;
-    v2Diff.y = v3OffNetPos.y - pPlayer->mUnidentified024.m_v3Position.y;
+    v2Diff.x = v3OffNetPos.x - pPlayer->m_DetChar.m_v3Position.x;
+    v2Diff.y = v3OffNetPos.y - pPlayer->m_DetChar.m_v3Position.y;
     float fDist = nlSqrt(v2Diff.x * v2Diff.x + v2Diff.y * v2Diff.y, true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
@@ -1544,7 +1544,7 @@ extern "C" float fn_800D9DD8(cPlayer* pPlayer)
     else if (pPlayer->m_eClassType == FIELDER)
     {
         cFielder* pFielder = (cFielder*)pPlayer;
-        nlVector3 v3Position = pFielder->mUnidentified024.m_v3Position;
+        nlVector3 v3Position = pFielder->m_DetChar.m_v3Position;
         bool bOutOfBounds = cField::FixOutOfBoundsPosition(v3Position, -1.0f, true);
         bool bIncapacitated = pFielder->IsFrozenStateActive() || pFielder->IsInFallAction()
             || pFielder->m_eActionState == 35
@@ -1665,7 +1665,7 @@ float GoalieOutOfPosition(cFielder* pFielder)
     }
 
     pGoalie = (cPlayer*)pFielder->m_pTeam->GetOtherTeam()->GetGoalie();
-    goalieNetPos = pGoalie->mUnidentified024.m_v3Position;
+    goalieNetPos = pGoalie->m_DetChar.m_v3Position;
     goalieNetPos.x = pGoalie->m_pTeam->m_pNet->m_v3NetLocation.x;
 
     if (goalieNetPos.y < -(0.5f * cNet::GetNetWidth()))
@@ -1679,8 +1679,8 @@ float GoalieOutOfPosition(cFielder* pFielder)
 
     const nlVector3& offNetLocation = pFielder->GetAIOffNetLocation(NULL);
 
-    float fielderDistance = nlVec3Distance2D(pFielder->mUnidentified024.m_v3Position, offNetLocation);
-    float goalieDistance = nlVec3Distance2D(pGoalie->mUnidentified024.m_v3Position, goalieNetPos);
+    float fielderDistance = nlVec3Distance2D(pFielder->m_DetChar.m_v3Position, offNetLocation);
+    float goalieDistance = nlVec3Distance2D(pGoalie->m_DetChar.m_v3Position, goalieNetPos);
 
     if (!((double)fielderDistance > 0.0))
     {
@@ -1765,7 +1765,7 @@ float InFrontOfTheirNet(cFielder* pFielder)
 
     cTeam* pOtherTeam = pFielder->m_pTeam->GetOtherTeam();
     cNet* pNet = pOtherTeam->m_pNet;
-    return PositionIsInFrontOfNet(pFielder->mUnidentified024.m_v3Position, pNet);
+    return PositionIsInFrontOfNet(pFielder->m_DetChar.m_v3Position, pNet);
 }
 
 float InFrontOfMyNet(cFielder* pFielder)
@@ -1775,7 +1775,7 @@ float InFrontOfMyNet(cFielder* pFielder)
         return 0.0f;
     }
 
-    return PositionIsInFrontOfNet(pFielder->mUnidentified024.m_v3Position, pFielder->m_pTeam->m_pNet);
+    return PositionIsInFrontOfNet(pFielder->m_DetChar.m_v3Position, pFielder->m_pTeam->m_pNet);
 }
 
 extern "C" float fn_800DA518(cFielder* pFielder)
@@ -1786,7 +1786,7 @@ extern "C" float fn_800DA518(cFielder* pFielder)
     {
         nlVector3 v3FormationPos;
         if (pFielder->CalculateFormationPosition(v3FormationPos))
-            v3FormationPos = pFielder->mUnidentified024.m_v3Position;
+            v3FormationPos = pFielder->m_DetChar.m_v3Position;
         SSearchCutAndBreak search(pFielder);
         nlVector3 v3BestPosition;
         return search.FindBestPosition(v3BestPosition, v3FormationPos,
@@ -1825,10 +1825,10 @@ float NearToFormationPosition(cFielder* pFielder)
     {
         return 0.0f;
     }
-    return NearToFormationPosition(pFielder, &pFielder->mUnidentified024.m_v3Position);
+    return NearToFormationPosition(pFielder, &pFielder->m_DetChar.m_v3Position);
 }
 
-float NearToFormationPosition(cFielder* pFielder, nlVector3* pPosition)
+float NearToFormationPosition(cFielder* pFielder, const nlVector3* pPosition)
 {
     if (pFielder == NULL)
     {
@@ -1893,7 +1893,7 @@ extern "C" float fn_800DACF4(cPlayer* pPlayer)
         return 0.0f;
     }
 
-    if (cField::IsOnField(pPlayer->mUnidentified024.m_v3Position) == false)
+    if (cField::IsOnField(pPlayer->m_DetChar.m_v3Position) == false)
     {
         return 1.0f;
     }
@@ -1958,7 +1958,7 @@ float DistanceAndAngleConfidence(const nlVector3& vFrom, const nlVector3& vTo,
 static const nlVector2 lbl_806E4258 = { 10922.5f, 0.0f };
 
 
-extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
+float LaneOpenness(const nlVector3& vFrom, const nlVector3& vTo,
     cPlayer* pIgnorePlayer1, cPlayer* pIgnorePlayer2, float fTeamWeight,
     float fOpponentWeight, float fGoalieWeight, float fPredictionTime)
 {
@@ -1980,9 +1980,9 @@ extern "C" float fn_800DAFCC(const nlVector3& vFrom, const nlVector3& vTo,
             nlVector3 vPosition;
             if (fPredictionTime)
                 nlVec3ScaleAdd(vPosition, fPredictionTime,
-                    pPlayer->mUnidentified024.m_v3Velocity, pPlayer->mUnidentified024.m_v3Position);
+                    pPlayer->m_DetChar.m_v3Velocity, pPlayer->m_DetChar.m_v3Position);
             else
-                vPosition = pPlayer->mUnidentified024.m_v3Position;
+                vPosition = pPlayer->m_DetChar.m_v3Position;
             nlVector2 distanceRange = { 0.0f, 0.0f };
             distanceRange.y = fDistance;
             float fScore = DistanceAndAngleConfidence(vFrom, vPosition, aDirection, &distanceRange,
@@ -2042,9 +2042,9 @@ float GoalConeOpenness(const nlVector3& vFrom, const nlVector3& vTo,
             nlVector3 vPosition;
             if (fPredictionTime)
                 nlVec3ScaleAdd(vPosition, fPredictionTime,
-                    pPlayer->mUnidentified024.m_v3Velocity, pPlayer->mUnidentified024.m_v3Position);
+                    pPlayer->m_DetChar.m_v3Velocity, pPlayer->m_DetChar.m_v3Position);
             else
-                vPosition = pPlayer->mUnidentified024.m_v3Position;
+                vPosition = pPlayer->m_DetChar.m_v3Position;
             nlVector2 distanceRange = { 0.0f, 0.0f };
             distanceRange.y = fDistance;
             float fScore = DistanceAndAngleConfidence(vFrom, vPosition, aDirection, &distanceRange,
@@ -2085,7 +2085,7 @@ float PositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
         for (int player = 0; player < 5 && fTotalScore < 1.0f; player++)
         {
             if (pCurrentPlayer != NULL)
-                pPlayer = g_pGame->GetClosestPlayer(pCurrentPlayer->mUnidentified120, pTeam->m_nSide, player);
+                pPlayer = g_pGame->GetClosestPlayer(pCurrentPlayer->m_nCharacterIndex, pTeam->m_nSide, player);
             else
                 pPlayer = pTeam->GetPlayer(player);
             if (pPlayer == pCurrentPlayer)
@@ -2097,9 +2097,9 @@ float PositionOpenness(const nlVector3& v3Position, cTeam* pOpponentTeam,
             nlVector3 v3PlayerPosition;
             if (fPredictionTime)
                 nlVec3ScaleAdd(v3PlayerPosition, fPredictionTime,
-                    pPlayer->mUnidentified024.m_v3Velocity, pPlayer->mUnidentified024.m_v3Position);
+                    pPlayer->m_DetChar.m_v3Velocity, pPlayer->m_DetChar.m_v3Position);
             else
-                v3PlayerPosition = pPlayer->mUnidentified024.m_v3Position;
+                v3PlayerPosition = pPlayer->m_DetChar.m_v3Position;
             float distance = nlSqrt(nlVec3DistanceSquared2D(v3Position, v3PlayerPosition), true);
             distance -= fCurrentRadius + fPlayerRadius;
             float fScore;
@@ -2136,7 +2136,7 @@ extern "C" float fn_800DBAB0(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return PositionOpenness(pFielder->mUnidentified024.m_v3Position,
+    return PositionOpenness(pFielder->m_DetChar.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(), pFielder, NULL, true, 0.0f);
 }
 
@@ -2144,7 +2144,7 @@ extern "C" float fn_800DBB0C(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return WidePositionOpenness(pFielder->mUnidentified024.m_v3Position,
+    return WidePositionOpenness(pFielder->m_DetChar.m_v3Position,
         pFielder->m_pTeam->GetOtherTeam(), pFielder, true, 0.0f);
 }
 
@@ -2152,7 +2152,7 @@ extern "C" float fn_800DBB88(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    return fn_800DAFCC(pFielder->mUnidentified024.m_v3Position,
+    return LaneOpenness(pFielder->m_DetChar.m_v3Position,
         pFielder->GetAIOffNetLocation(NULL), pFielder, NULL, 0.0f, 0.2f, 1.0f, 0.0f);
 }
 
@@ -2164,7 +2164,7 @@ float LikelyToScore(cFielder* pFielder)
     }
 
     cNet* pNet = pFielder->m_pTeam->GetOtherNet();
-    return GoalConeOpenness(pFielder->mUnidentified024.m_v3Position, pNet->m_v3NetLocation,
+    return GoalConeOpenness(pFielder->m_DetChar.m_v3Position, pNet->m_v3NetLocation,
         pFielder, 0.0f, 0.2f, 1.0f, 0.0f, NULL);
 }
 
@@ -2223,8 +2223,8 @@ float OpenTo(cPlayer* pFromFielder, cPlayer* pToFielder)
         return 0.0f;
     }
 
-    float fResult = fn_800DAFCC(pFromFielder->mUnidentified024.m_v3Position,
-        pToFielder->mUnidentified024.m_v3Position, pFromFielder, pToFielder,
+    float fResult = LaneOpenness(pFromFielder->m_DetChar.m_v3Position,
+        pToFielder->m_DetChar.m_v3Position, pFromFielder, pToFielder,
         0.5f, 1.0f, 1.0f, 0.0f);
     return NormalizeVal(fResult, g_vOpenToAdjust);
 }
@@ -2245,13 +2245,13 @@ float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->mUnidentified120, pPlayer1->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax);
     }
     else
@@ -2269,7 +2269,7 @@ float CloseTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2291,13 +2291,13 @@ float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->mUnidentified120, pPlayer1->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax);
     }
     else
@@ -2315,7 +2315,7 @@ float NearTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
@@ -2337,13 +2337,13 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
     if (pPlayer1->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer2->mUnidentified120, pPlayer1->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer2->m_nCharacterIndex, pPlayer1->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMax);
     }
     else if (pPlayer2->m_eClassType == GOALIE)
     {
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMin, g_pGame->m_pFuzzyTweaks->fFarGoalieConfidenceDistanceMax);
     }
     else
@@ -2361,17 +2361,17 @@ float FarTo(cPlayer* pPlayer1, cPlayer* pPlayer2)
         }
 
         fScore = NormalizeVal(
-            g_pGame->fn_8005B748(pPlayer1->mUnidentified120, pPlayer2->mUnidentified120),
+            g_pGame->fn_8005B748(pPlayer1->m_nCharacterIndex, pPlayer2->m_nCharacterIndex),
             vConfidence);
     }
     return fScore;
 }
 
-extern "C" float fn_800DCB4C(const nlVector3* pA, const nlVector3* pB)
+float NearToGoaliePosition(const nlVector3* position, const nlVector3* goaliePosition)
 {
     float fMax = g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMax;
     float fMin = g_pGame->m_pFuzzyTweaks->fNearGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(*pA, *pB), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(*position, *goaliePosition), true);
     return NormalizeVal(fDist, fMin, fMax);
 }
 
@@ -2381,8 +2381,8 @@ float CloseToMyGoalie(cPlayer* pPlayer)
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax;
     float fMinDist = pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->mUnidentified024.m_v3Position,
-        pGoalie->mUnidentified024.m_v3Position), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->m_DetChar.m_v3Position,
+        pGoalie->m_DetChar.m_v3Position), true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
@@ -2392,8 +2392,8 @@ float NearToMyGoalie(cPlayer* pPlayer)
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fNearGoalieConfidenceDistanceMax;
     float fMinDist = pFuzzyTweaks->fNearGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->mUnidentified024.m_v3Position,
-        pGoalie->mUnidentified024.m_v3Position), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->m_DetChar.m_v3Position,
+        pGoalie->m_DetChar.m_v3Position), true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
@@ -2403,8 +2403,8 @@ float FarToMyGoalie(cPlayer* pPlayer)
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fFarGoalieConfidenceDistanceMax;
     float fMinDist = pFuzzyTweaks->fFarGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->mUnidentified024.m_v3Position,
-        pGoalie->mUnidentified024.m_v3Position), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->m_DetChar.m_v3Position,
+        pGoalie->m_DetChar.m_v3Position), true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
@@ -2414,8 +2414,8 @@ float CloseToTheirGoalie(cPlayer* pPlayer)
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fCloseGoalieConfidenceDistanceMax;
     float fMinDist = pFuzzyTweaks->fCloseGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->mUnidentified024.m_v3Position,
-        pGoalie->mUnidentified024.m_v3Position), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->m_DetChar.m_v3Position,
+        pGoalie->m_DetChar.m_v3Position), true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
@@ -2425,8 +2425,8 @@ float NearToTheirGoalie(cPlayer* pPlayer)
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fNearGoalieConfidenceDistanceMax;
     float fMinDist = pFuzzyTweaks->fNearGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->mUnidentified024.m_v3Position,
-        pGoalie->mUnidentified024.m_v3Position), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->m_DetChar.m_v3Position,
+        pGoalie->m_DetChar.m_v3Position), true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
@@ -2436,8 +2436,8 @@ float FarToTheirGoalie(cPlayer* pPlayer)
     FuzzyTweaks* pFuzzyTweaks = g_pGame->m_pFuzzyTweaks;
     float fMaxDist = pFuzzyTweaks->fFarGoalieConfidenceDistanceMax;
     float fMinDist = pFuzzyTweaks->fFarGoalieConfidenceDistanceMin;
-    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->mUnidentified024.m_v3Position,
-        pGoalie->mUnidentified024.m_v3Position), true);
+    float fDist = nlSqrt(nlVec3DistanceSquared2D(pPlayer->m_DetChar.m_v3Position,
+        pGoalie->m_DetChar.m_v3Position), true);
     return NormalizeVal(fDist, fMinDist, fMaxDist);
 }
 
@@ -2511,7 +2511,7 @@ float CloseToSideline(cFielder* pFielder)
         return 0.0f;
     }
 
-    return CloseToSideline(pFielder->mUnidentified024.m_v3Position, NULL, false, NULL);
+    return CloseToSideline(pFielder->m_DetChar.m_v3Position, NULL, false, NULL);
 }
 
 extern "C" float fn_800DD234(cFielder* pFielder)
@@ -2526,7 +2526,7 @@ extern "C" float fn_800DD234(cFielder* pFielder)
     nlVector2 v2Range;
     v2Range.x = fMin;
     v2Range.y = fMax;
-    return CloseToSideline(pFielder->mUnidentified024.m_v3Position, &v2Range, false, NULL);
+    return CloseToSideline(pFielder->m_DetChar.m_v3Position, &v2Range, false, NULL);
 }
 
 extern "C" float fn_800DD294(cFielder* pFielder)
@@ -2541,7 +2541,7 @@ extern "C" float fn_800DD294(cFielder* pFielder)
     nlVector2 v2Range;
     v2Range.x = fMin;
     v2Range.y = fMax;
-    return CloseToSideline(pFielder->mUnidentified024.m_v3Position, &v2Range, true, NULL);
+    return CloseToSideline(pFielder->m_DetChar.m_v3Position, &v2Range, true, NULL);
 }
 
 extern "C" float fn_800DD2F4(cBall* ball)
@@ -2566,7 +2566,7 @@ extern "C" float fn_800DD31C(cFielder* pFielder)
     nlVector2 v2Range;
     v2Range.x = fMin;
     v2Range.y = fMax;
-    return CloseToSideline(pFielder->mUnidentified024.m_v3PrevVelocity, &v2Range, false, NULL);
+    return CloseToSideline(pFielder->m_DetChar.m_v3PrevVelocity, &v2Range, false, NULL);
 }
 
 extern "C" float fn_800DD37C(cFielder* pFielder)
@@ -2581,7 +2581,7 @@ extern "C" float fn_800DD37C(cFielder* pFielder)
     nlVector2 v2Range;
     v2Range.x = fMin;
     v2Range.y = fMax;
-    return CloseToSideline(pFielder->mUnidentified024.m_v3PrevVelocity, &v2Range, true, NULL);
+    return CloseToSideline(pFielder->m_DetChar.m_v3PrevVelocity, &v2Range, true, NULL);
 }
 
 float PositionDistanceConfidence(const nlVector3& vFrom, const nlVector3& vTo,
@@ -2644,10 +2644,10 @@ extern "C" float fn_800DD504(cPlayer* pPlayer, cFielder* pFielder)
     }
     const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
-    diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
-    diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
+    diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
+    diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->mUnidentified320->GetRadius(), lbl_806E4270);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4270);
 }
 
 extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
@@ -2662,10 +2662,10 @@ extern "C" float fn_800DD5C4(cPlayer* pPlayer, cFielder* pFielder)
     }
     const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
-    diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
-    diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
+    diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
+    diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->mUnidentified320->GetRadius(), lbl_806E4278);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4278);
 }
 
 extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
@@ -2680,10 +2680,10 @@ extern "C" float fn_800DD684(cPlayer* pPlayer, cFielder* pFielder)
     }
     const nlVector3& vPosition = pFielder->GetDesiredPosition();
     nlVector2 diff;
-    diff.x = pPlayer->mUnidentified024.m_v3Position.x - vPosition.x;
-    diff.y = pPlayer->mUnidentified024.m_v3Position.y - vPosition.y;
+    diff.x = pPlayer->m_DetChar.m_v3Position.x - vPosition.x;
+    diff.y = pPlayer->m_DetChar.m_v3Position.y - vPosition.y;
     float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-    return NormalizeVal(fDistance - pFielder->mUnidentified320->GetRadius(), lbl_806E4280);
+    return NormalizeVal(fDistance - pFielder->m_pAvoidableObject->GetRadius(), lbl_806E4280);
 }
 
 extern "C" float fn_800DD744(cFielder* pFielder)
@@ -2694,10 +2694,10 @@ extern "C" float fn_800DD744(cFielder* pFielder)
     }
     float fScore = 0.0f;
     nlVector2 normal;
-    if (CloseToSideline(pFielder->mUnidentified024.m_v3Position, NULL, false, &normal))
+    if (CloseToSideline(pFielder->m_DetChar.m_v3Position, NULL, false, &normal))
     {
         nlVector2 facing;
-        nlSinCos(&facing.y, &facing.x, pFielder->mUnidentified024.m_aActualFacingDirection);
+        nlSinCos(&facing.y, &facing.x, pFielder->m_DetChar.m_aActualFacingDirection);
         fScore = FMAX(0.0f, normal.x * facing.x + normal.y * facing.y);
     }
     return fScore;
@@ -2753,8 +2753,8 @@ extern "C" float fn_800DD9C8(cFielder* pFielder, cPlayer* pTarget)
     if (!bHasGlobalPad && pTarget->m_eClassType == FIELDER
         && ((cFielder*)pTarget)->IsAboveFielder(pFielder))
         return 0.0f;
-    float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->mUnidentified024.m_v3Position,
-        pTarget->mUnidentified024.m_v3Position), true);
+    float fDistance = nlSqrt(nlVec3DistanceSquared2D(pFielder->m_DetChar.m_v3Position,
+        pTarget->m_DetChar.m_v3Position), true);
     float fRange = GetFielderHitReach(pFielder);
     return NormalizeVal(fDistance, 0.5f + fRange, 0.66f * fRange);
 }
@@ -2773,11 +2773,11 @@ float PlayerShotDistance(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    nlVector3 v3Position = pFielder->mUnidentified024.m_v3Position;
+    nlVector3 v3Position = pFielder->m_DetChar.m_v3Position;
     if (pFielder->m_pBall != NULL)
-        v3Position = pFielder->mUnidentified024.m_v3Position;
+        v3Position = pFielder->m_DetChar.m_v3Position;
     else if (ReceivingPass(pFielder) || fn_800DED80(pFielder) >= 0.2f)
-        v3Position = pFielder->m_pTeam->GetBallInterceptPosition(pFielder->mUnidentified1E4.m_ID);
+        v3Position = pFielder->m_pTeam->GetBallInterceptPosition(pFielder->m_DetPlayer.m_ID);
     float fScore = 0.0f;
     if (v3Position.x * pFielder->m_pTeam->GetOtherNet()->m_fDirection > 0.0f)
     {
@@ -2792,7 +2792,7 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
 {
     if (pFielder == NULL)
         return 0.0f;
-    nlVector2 aiPos = *(const nlVector2*)&pFielder->mUnidentified024.m_v3Position;
+    nlVector2 aiPos = *(const nlVector2*)&pFielder->m_DetChar.m_v3Position;
     if (pFielder->m_pTeam->m_nSide == AWAY)
         nlVec2Scale(aiPos, aiPos, -1.0f);
     float fScore = 0.0f;
@@ -2803,7 +2803,7 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
         nlVec2Sub(diff, *(const nlVector2*)&pGoalie->GetPosition(),
             *(const nlVector2*)&pFielder->GetPosition());
         float fDistance = nlSqrt(diff.x * diff.x + diff.y * diff.y, true);
-        switch (pFielder->mUnidentified024.m_eCharacterClass)
+        switch (pFielder->m_DetChar.m_eCharacterClass)
         {
         case 14:
         case 15:
@@ -2813,7 +2813,7 @@ extern "C" float fn_800DDD70(cFielder* pFielder)
             break;
         case 12:
             if (aiPos.x > 0.0f)
-                fScore = fn_800DAFCC(pFielder->mUnidentified024.m_v3Position,
+                fScore = LaneOpenness(pFielder->m_DetChar.m_v3Position,
                     pFielder->m_pTeam->GetOtherNet()->m_v3NetLocation, pFielder, NULL,
                     1.0f, 1.0f, 0.0f, 0.0f);
             break;
@@ -2908,8 +2908,8 @@ extern "C" float fn_800DE40C(cPlayer* pUpfieldPlayer, cPlayer* pFromPlayer)
     {
         return 0.0f;
     }
-    nlVector3 vUpfieldPos = pUpfieldPlayer->mUnidentified024.m_v3Position;
-    nlVector3 vFromPos = pFromPlayer->mUnidentified024.m_v3Position;
+    nlVector3 vUpfieldPos = pUpfieldPlayer->m_DetChar.m_v3Position;
+    nlVector3 vFromPos = pFromPlayer->m_DetChar.m_v3Position;
     float fDelta = (vUpfieldPos.x - vFromPos.x)
         * AIsgn(pUpfieldPlayer->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
     return NormalizeVal(fDelta, 0.0f,
@@ -2926,8 +2926,8 @@ extern "C" float fn_800DE4B0(cPlayer* pDownfieldPlayer, cPlayer* pFromPlayer)
     {
         return 0.0f;
     }
-    nlVector3 vDownfieldPos = pDownfieldPlayer->mUnidentified024.m_v3Position;
-    nlVector3 vFromPos = pFromPlayer->mUnidentified024.m_v3Position;
+    nlVector3 vDownfieldPos = pDownfieldPlayer->m_DetChar.m_v3Position;
+    nlVector3 vFromPos = pFromPlayer->m_DetChar.m_v3Position;
     float fDelta = (vFromPos.x - vDownfieldPos.x)
         * AIsgn(pDownfieldPlayer->m_pTeam->GetOtherNet()->m_v3NetLocation.x);
     return NormalizeVal(fDelta, 0.0f,
@@ -2987,10 +2987,10 @@ float SeparatingFrom(cPlayer* pFielder1, cPlayer* pFielder2)
     }
 
     float fClosingSpeed = GetClosingSpeed2D(
-        pFielder1->mUnidentified024.m_v3Position,
-        pFielder1->mUnidentified024.m_v3Velocity,
-        pFielder2->mUnidentified024.m_v3Position,
-        pFielder2->mUnidentified024.m_v3Velocity);
+        pFielder1->m_DetChar.m_v3Position,
+        pFielder1->m_DetChar.m_v3Velocity,
+        pFielder2->m_DetChar.m_v3Position,
+        pFielder2->m_DetChar.m_v3Velocity);
     return NormalizeVal(fClosingSpeed, 0.0f, -g_pGame->m_pFuzzyTweaks->fSeparatingSpeedMax);
 }
 
@@ -3007,8 +3007,8 @@ float SeparatingFrom(cPlayer* pPlayer, cBall* pBall)
     }
 
     float fClosingSpeed = GetClosingSpeed2D(
-        pPlayer->mUnidentified024.m_v3Position,
-        pPlayer->mUnidentified024.m_v3Velocity,
+        pPlayer->m_DetChar.m_v3Position,
+        pPlayer->m_DetChar.m_v3Velocity,
         pBall->m_v3Position,
         pBall->m_v3Velocity);
     return NormalizeVal(fClosingSpeed, 0.0f, -g_pGame->m_pFuzzyTweaks->fSeparatingSpeedMax);
@@ -3026,8 +3026,8 @@ extern "C" float fn_800DE71C(cPlayer* pPlayer)
     float fMinDist = pFuzzyTweaks->fOutOfNetConfidenceDistanceMin;
     const nlVector3& netLocation = pPlayer->GetAIDefNetLocation(NULL);
     nlVector2 diff;
-    diff.x = netLocation.x - pPlayer->mUnidentified024.m_v3Position.x;
-    diff.y = netLocation.y - pPlayer->mUnidentified024.m_v3Position.y;
+    diff.x = netLocation.x - pPlayer->m_DetChar.m_v3Position.x;
+    diff.y = netLocation.y - pPlayer->m_DetChar.m_v3Position.y;
     return NormalizeVal(nlSqrt(diff.x * diff.x + diff.y * diff.y, true),
         fMinDist, fMaxDist);
 }
@@ -3125,7 +3125,7 @@ float InControlOfBall(cFielder* fielder)
         return 0.0f;
     }
 
-    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[fielder->mUnidentified120],
+    return NormalizeVal(g_pGame->m_fCachedBallPlayerDistances[fielder->m_nCharacterIndex],
         g_pGame->m_pFuzzyTweaks->fControlConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fControlConfidenceDistanceMax);
 }
@@ -3159,7 +3159,7 @@ extern "C" float fn_800DEB04(cFielder* pFielder)
     }
 
     ShotMeter* pMeter = pFielder->m_pShotMeter;
-    bool bActive = pMeter->UnidentifiedIsCharging();
+    bool bActive = pMeter->IsCharging();
     if (bActive)
     {
         switch (pMeter->m_eShotMeterState)
@@ -3199,7 +3199,7 @@ extern "C" float fn_800DEBF4(cFielder* pFielder)
     }
 
     ShotMeter* pMeter = pFielder->m_pShotMeter;
-    bool bActive = pMeter->UnidentifiedIsCharging();
+    bool bActive = pMeter->IsCharging();
     if (bActive)
     {
         switch (pMeter->m_eShotMeterState)
@@ -3221,7 +3221,7 @@ extern "C" float fn_800DEC88(cFielder* pFielder)
     }
 
     ShotMeter* pMeter = pFielder->m_pShotMeter;
-    bool bActive = pMeter->UnidentifiedIsCharging();
+    bool bActive = pMeter->IsCharging();
     if (bActive)
     {
         switch (pMeter->m_eShotMeterState)
@@ -3583,7 +3583,7 @@ extern "C" float fn_800DF838(cPlayer* pPlayer)
     float fScore = 0.0f;
     if (pPlayer->m_pBall != NULL)
     {
-        fScore = NormalizeVal(pPlayer->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds(), 1.0f, 5.0f);
+        fScore = NormalizeVal(pPlayer->m_DetPlayer.m_tBallPossessionTimer.GetSeconds(), 1.0f, 5.0f);
     }
     return fScore;
 }
@@ -3749,7 +3749,7 @@ extern "C" float fn_800E0034()
         if (pPrevOwner != NULL && pPrevOwner->m_eClassType == FIELDER)
         {
             float fDistance = nlSqrt(nlVec3DistanceSquared2D(pBall->GetPosition(),
-                pPrevOwner->mUnidentified024.m_v3Position), true);
+                pPrevOwner->m_DetChar.m_v3Position), true);
             FMIN(FMAX(fDistance / g_pGame->m_pFuzzyTweaks->fShotInPlayFullConfidenceDistance, 0.0f), 1.0f);
         }
     }
@@ -3759,7 +3759,7 @@ extern "C" float fn_800E0034()
 extern "C" float fn_800E00F8()
 {
     float fInitialScore;
-    if (g_pBall->UnidentifiedHasPassTarget())
+    if (g_pBall->HasPassTarget())
     {
         fInitialScore = 1.0f;
     }
@@ -3847,7 +3847,7 @@ float InDefensiveZone(cPlayer* pPlayer)
     }
 
     nlVector3 aiLoc;
-    FieldLocToAILoc(aiLoc, pPlayer->mUnidentified024.m_v3Position, (eTeamSide)pPlayer->m_pTeam->m_nSide);
+    FieldLocToAILoc(aiLoc, pPlayer->m_DetChar.m_v3Position, (eTeamSide)pPlayer->m_pTeam->m_nSide);
 
     return NormalizeVal(aiLoc.x, g_pGame->m_pFuzzyTweaks->fDefensiveConfidenceDistancesMin,
         g_pGame->m_pFuzzyTweaks->fDefensiveConfidenceDistancesMax);
@@ -3861,7 +3861,7 @@ float InOffensiveZone(cPlayer* pPlayer)
     }
 
     nlVector3 aiLoc;
-    FieldLocToAILoc(aiLoc, pPlayer->mUnidentified024.m_v3Position, (eTeamSide)pPlayer->m_pTeam->m_nSide);
+    FieldLocToAILoc(aiLoc, pPlayer->m_DetChar.m_v3Position, (eTeamSide)pPlayer->m_pTeam->m_nSide);
 
     return NormalizeVal(aiLoc.x, g_pGame->m_pFuzzyTweaks->fOffensiveConfidenceDistancesMin,
         g_pGame->m_pFuzzyTweaks->fOffensiveConfidenceDistancesMax);
@@ -3881,7 +3881,7 @@ extern "C" float fn_800E0470(cPlayer* pPlayer)
     {
         return 0.0f;
     }
-    const nlVector3& playerPos = pPlayer->mUnidentified024.m_v3Position;
+    const nlVector3& playerPos = pPlayer->m_DetChar.m_v3Position;
     return 1.0f - FMAX(
         InDefensiveZone(playerPos, HOME),
         InOffensiveZone(playerPos, HOME));
@@ -3937,7 +3937,7 @@ extern "C" float fn_800E06F4(cPlayer* pPlayer)
     float fMinDistance;
     float fMaxDistanceForPlayer = lbl_806E42B0.y;
     float fMinDistanceForPlayer = lbl_806E42B0.x;
-    float fPlayerDistance = g_pGame->m_fCachedBallPlayerDistances[pPlayer->mUnidentified120];
+    float fPlayerDistance = g_pGame->m_fCachedBallPlayerDistances[pPlayer->m_nCharacterIndex];
     float fTotal = 0.0f;
     float fClose = NormalizeVal(fPlayerDistance, fMinDistanceForPlayer, fMaxDistanceForPlayer);
     if (fClose < 1.0f)

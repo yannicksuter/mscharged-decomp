@@ -34,7 +34,7 @@ public:
     /* 0x98 */ unsigned int m_CanCollideWithCharacters : 1;
     /* 0x98 */ unsigned int m_HasCollidedWithBall : 1;
     /* 0x98 */ unsigned int m_CanCollideWithGoalLine : 1;
-    /* 0x98 */ unsigned int mUnidentified098_5 : 27;
+    /* 0x98 */ unsigned int m_pad98 : 27;
     /* 0x9C */ int m_nDKBallStuckHackCounter;
     /* 0xA0 */ bool m_bSupportingBallThisFrame;
     /* 0xA1 */ bool m_bInsideNet;

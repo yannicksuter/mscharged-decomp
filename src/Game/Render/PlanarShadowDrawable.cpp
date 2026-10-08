@@ -26,7 +26,7 @@ PlanarShadowDrawable::PlanarShadowDrawable(
 void PlanarShadowDrawable::Initialize(glModel* model, unsigned long hash)
 {
     m_pModel = model;
-    m_uRenderLayer = 0x1000D;
+    m_uObjectType = 0x1000D;
     m_uObjectCreationFlags = 2;
     m_uHashID = hash;
     m_pAnimController = 0;

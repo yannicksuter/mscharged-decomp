@@ -22,8 +22,8 @@ bool DesireSlideAttack::Initialize(void* context)
     bool result = Desire::Initialize(context);
     UserControlledT(m_pFielder->m_pTeam);
 
-    UnidentifiedVariantCollection* params
-        = (UnidentifiedVariantCollection*)context;
+    FuzzyVariantCollection* params
+        = (FuzzyVariantCollection*)context;
     mpTarget = (cFielder*)params->Get(14)->mData.pPlayer;
     if (mpTarget == NULL)
     {
@@ -69,10 +69,10 @@ void DesireSlideAttack::Update(
             break;
         }
 
-        v3VictimPosition.x = mpTarget->mUnidentified024.m_v3Position.x
-                           + sSlideAttackTargetLeadTime * mpTarget->mUnidentified024.m_v3Velocity.x;
-        v3VictimPosition.y = mpTarget->mUnidentified024.m_v3Position.y
-                           + sSlideAttackTargetLeadTime * mpTarget->mUnidentified024.m_v3Velocity.y;
+        v3VictimPosition.x = mpTarget->m_DetChar.m_v3Position.x
+                           + sSlideAttackTargetLeadTime * mpTarget->m_DetChar.m_v3Velocity.x;
+        v3VictimPosition.y = mpTarget->m_DetChar.m_v3Position.y
+                           + sSlideAttackTargetLeadTime * mpTarget->m_DetChar.m_v3Velocity.y;
         v3VictimPosition.z = 0.0f;
         pFielder->AddDesiredPosition(v3VictimPosition, 1.5f, 1.0f);
         pFielder->GetAvoidController()->UseMinimumAvoidance(mpTarget);
@@ -81,7 +81,7 @@ void DesireSlideAttack::Update(
     case 1:
     {
         mMaxDuration = 5.0f;
-        if (pFielder->mUnidentified1E4.m_tSlideAttackTimer.m_uPackedTime != 0)
+        if (pFielder->m_DetPlayer.m_tSlideAttackTimer.m_uPackedTime != 0)
         {
             if (!pFielder->bAttackSucceeded)
             {
@@ -97,12 +97,12 @@ void DesireSlideAttack::Update(
                     fBallClosingSpeed = GetClosingSpeed2D(
                         pFielder->GetJointPosition(
                             pFielder->m_nLeftFootJointIndex),
-                        pFielder->mUnidentified024.m_v3Velocity,
+                        pFielder->m_DetChar.m_v3Velocity,
                         pBall->m_v3Position, ballVelocity);
                     if (fBallClosingSpeed < 0.0f
                         && nlRandomf(1.0f) > 0.5f)
                     {
-                        pFielder->mUnidentified1E4.m_tSlideAttackTimer.SetSeconds(0.0f);
+                        pFielder->m_DetPlayer.m_tSlideAttackTimer.SetSeconds(0.0f);
                         meDesireSubState = 2;
                     }
                 }
@@ -142,12 +142,12 @@ inline DesireSlideAttack::~DesireSlideAttack()
 /**
  * Offset/Address/Size: 0x750 | 0x800C852C | size: 0x110
  */
-inline void DesireSlideAttack::UnidentifiedVirtual8(
+inline void DesireSlideAttack::RegisterDebugFields(
     void* field, DebugWriteCache* cache)
 {
     *(unsigned short*)field
         = cache->BeginType("DesireSlideAttack");
-    Desire::UnidentifiedVirtual8(field, cache);
+    Desire::RegisterDebugFields(field, cache);
     cache->AddField(15, gDebugFieldTypes[15].size,
         (u8*)&mpTarget - (u8*)&mvDesiredPosition, "mpTarget");
     cache->AddField(14, gDebugFieldTypes[14].size,
@@ -159,12 +159,12 @@ inline void DesireSlideAttack::UnidentifiedVirtual8(
 /**
  * Offset/Address/Size: 0x860 | 0x800C863C | size: 0xC0
  */
-inline void DesireSlideAttack::UnidentifiedVirtual7(
+inline void DesireSlideAttack::SyncLog(
     void* context, DebugWriteCache* cache)
 {
     if (sDesireSlideAttackType == 0xFFFF)
     {
-        UnidentifiedVirtual8(&sDesireSlideAttackType, cache);
+        RegisterDebugFields(&sDesireSlideAttackType, cache);
     }
 
     unsigned int offset = (u8*)&mvDesiredPosition - (u8*)this;
@@ -175,7 +175,7 @@ inline void DesireSlideAttack::UnidentifiedVirtual7(
         DesireSlideAttack* copy
             = (DesireSlideAttack*)((u8*)data - offset);
         *(int*)&copy->mpTarget
-            = mpTarget == NULL ? -1 : mpTarget->mUnidentified120;
+            = mpTarget == NULL ? -1 : mpTarget->m_nCharacterIndex;
         cache->ChecksumData(sDesireSlideAttackType, data, context);
     }
 }

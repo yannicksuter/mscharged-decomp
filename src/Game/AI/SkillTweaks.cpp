@@ -14,7 +14,7 @@
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 #include "NL/nlPrint.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.inl"
 
 struct SkillTweakModifier

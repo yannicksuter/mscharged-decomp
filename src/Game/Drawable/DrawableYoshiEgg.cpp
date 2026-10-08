@@ -9,7 +9,7 @@
 #include "NL/nlMath.h"
 #include "math.h"
 #include "Game/Render/YoshiEggObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Field.h"
 
 // Replay snapshot of a Yoshi egg's visibility, transform and scale.

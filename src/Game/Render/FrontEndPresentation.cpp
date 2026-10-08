@@ -32,7 +32,7 @@
 #include "Game/FE/feDPD.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 
 static char sPresentationByteCode[] = "art/Scripts/fe_presentation.byte_code";

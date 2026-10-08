@@ -12,7 +12,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/GXMaterialProgramTextureAnimation.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 enum ScrollingShadowedDetailBlendLightingMode
 {

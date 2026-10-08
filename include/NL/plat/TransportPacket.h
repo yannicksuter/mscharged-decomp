@@ -21,7 +21,7 @@ struct TransportPacket
 
     /* 0x000 */ u32 mLastSendTick;
     /* 0x004 */ u8 mType;
-    /* 0x005 */ u8 mUnidentified05;
+    /* 0x005 */ u8 mPadding05;
     /* 0x006 */ u16 mSequence;
     /* 0x008 */ u16 mSize;
     /* 0x00A */ u8 mPayload[0x202];

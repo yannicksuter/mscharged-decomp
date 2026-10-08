@@ -64,7 +64,7 @@ public:
         : m_pPoseAccumulator(0)
         , m_pPoseTree(0)
         , m_pAnimationSet(0)
-        , mUnidentified4C(0)
+        , m_pad4C(0)
         , m_pWorldAnimObject(0)
     {
         m_worldMatrix.SetIdentity();
@@ -93,7 +93,7 @@ public:
     /* 0x04 */ cPN_SAnimController* m_pPoseTree;
     /* 0x08 */ AnimationSet* m_pAnimationSet;
     /* 0x0C */ nlMatrix4 m_worldMatrix;
-    /* 0x4C */ void* mUnidentified4C;
+    /* 0x4C */ void* m_pad4C;
     /* 0x50 */ WorldAnimObject* m_pWorldAnimObject;
 };
 

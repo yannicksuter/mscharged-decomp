@@ -1,6 +1,6 @@
 #include "Game/Render/SolarFlareEffect.h"
 #include "Game/BasicStadium.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/World/WorldDrawable.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
@@ -35,9 +35,9 @@ SolarFlareEffect::SolarFlareEffect(const nlVector3& targetPosition)
           + nlRandomf(-gSolarFlareEffectLifetimeVariation,
               gSolarFlareEffectLifetimeVariation, &nlDefaultSeed))
     , mTargetPosition(targetPosition)
-    , mUnidentified020(false)
+    , m_pad020(false)
 {
-    mUnidentified01C = lbl_806DEE90
+    m_pad01C = lbl_806DEE90
         + nlRandomf(-lbl_806DEE94, lbl_806DEE94, &nlDefaultSeed);
 }
 

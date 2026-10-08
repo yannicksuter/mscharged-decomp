@@ -196,7 +196,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 16:
     {
         void* arg0 = (void*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIPassThrough_800E3BF4(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastFielderToPlayer(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -206,7 +206,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 17:
     {
         void* arg0 = (void*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIPassThrough_800E3C04(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastPlayerToFielder(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -216,7 +216,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 18:
     {
         void* arg0 = (void*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIPassThrough_800E3C0C(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastNative18(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -226,7 +226,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 19:
     {
         void* arg0 = (void*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIPassThrough_800E3BE4(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastNative19(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -236,7 +236,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 20:
     {
         FuzzyFielderIterator* arg0 = (FuzzyFielderIterator*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetIteratorFielder_800E3F10(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastIteratorToFielder(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -246,7 +246,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 21:
     {
         FuzzyFielderIterator* arg0 = (FuzzyFielderIterator*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetIteratorFielder_800E3F1C(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastIteratorToPlayer(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -266,7 +266,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 23:
     {
         void* arg0 = (void*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIPassThrough_800E3BFC(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastGoalieToPlayer(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -276,7 +276,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 24:
     {
         void* arg0 = (void*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIPassThrough_800E3BEC(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastNative24(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -286,7 +286,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 25:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantPointer_800E3C5C(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastParameterToFielder(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -296,7 +296,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 26:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantPointer_800E3C44(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastParameterToPlayer(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -306,7 +306,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 27:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        ((float*)m_SP)[-1] = FuzzyAIGetVariantFloat_800E7ECC(this, arg0);
+        ((float*)m_SP)[-1] = FuzzyAIAutoCastParameterToFloat(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -316,7 +316,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 28:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantU32_800E7ED4(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastParameterToInt(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -326,7 +326,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 29:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantPointer_800E3C14(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastResultToFielder(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -336,7 +336,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 30:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantPointer_800E3C2C(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastResultToPlayer(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -346,7 +346,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 31:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantU32_800E8CB0(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastResultNative31(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -356,7 +356,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 32:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantU32_800E7EE4(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastResultNative32(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -366,7 +366,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 33:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        ((float*)m_SP)[-1] = FuzzyAIGetVariantFloat_800E7EEC(this, arg0);
+        ((float*)m_SP)[-1] = FuzzyAIAutoCastResultToFloat(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -376,7 +376,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 34:
     {
         Variant* arg0 = (Variant*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAIGetVariantU32_800E7EDC(this, arg0);
+        m_SP[-1] = (u32)FuzzyAIAutoCastResultToInt(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -760,7 +760,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 71:
     {
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-1];
         ((float*)m_SP)[-1] = FuzzyAIGetConfidence(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
@@ -868,7 +868,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     {
         bool arg0 = m_SP[-1] != 0;
         m_SP -= 1;
-        FuzzyNoOp_80314740(this, arg0);
+        FuzzyTransitionHook(this, arg0);
         break;
     }
     case 83:
@@ -1160,7 +1160,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 111:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         bool arg0 = m_SP[-3] != 0;
         m_SP -= 3;
@@ -1169,7 +1169,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 112:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         cBall* arg0 = (cBall*)m_SP[-3];
         m_SP -= 3;
@@ -1178,16 +1178,16 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 113:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         cPlayer* arg0 = (cPlayer*)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetPlayerParameter_800E8CB8(this, arg0, arg1, arg2);
+        FuzzyAISetFielderParameter(this, arg0, arg1, arg2);
         break;
     }
     case 114:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         const char* arg0 = (const char*)m_SP[-3];
         m_SP -= 3;
@@ -1196,61 +1196,61 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 115:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         cPlayer* arg0 = (cPlayer*)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetPlayerParameter_800E3A84(this, arg0, arg1, arg2);
+        FuzzyAISetPlayerParameter(this, arg0, arg1, arg2);
         break;
     }
     case 116:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetIntParameter_800E8D68(this, arg0, arg1, arg2);
+        FuzzyAISetDirectionParameter(this, arg0, arg1, arg2);
         break;
     }
     case 117:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetIntParameter_800E8D6C(this, arg0, arg1, arg2);
+        FuzzyAISetDesireStateParameter(this, arg0, arg1, arg2);
         break;
     }
     case 118:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetIntParameter_800E8D70(this, arg0, arg1, arg2);
+        FuzzyAISetPowerupParameter(this, arg0, arg1, arg2);
         break;
     }
     case 119:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetIntParameter_800E8D74(this, arg0, arg1, arg2);
+        FuzzyAISetTeamPlayStateParameter(this, arg0, arg1, arg2);
         break;
     }
     case 120:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         FuzzyFielderIterator* arg0 = (FuzzyFielderIterator*)m_SP[-3];
         m_SP -= 3;
-        FuzzyAISetFielderParameter(this, arg0, arg1, arg2);
+        FuzzyAISetIteratorParameter(this, arg0, arg1, arg2);
         break;
     }
     case 121:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         float arg0 = ((float*)m_SP)[-3];
         m_SP -= 3;
@@ -1259,7 +1259,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 122:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         int arg0 = (int)m_SP[-3];
         m_SP -= 3;
@@ -1268,7 +1268,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 123:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         Variant& arg0 = *(Variant*)m_SP[-3];
         m_SP -= 3;
@@ -1277,7 +1277,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 124:
     {
-        UnidentifiedVariant_80054AB8* arg2 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg2 = (DesireUpdate*)m_SP[-1];
         unsigned long arg1 = (unsigned long)m_SP[-2];
         unsigned long arg0 = (unsigned long)m_SP[-3];
         m_SP -= 3;
@@ -1303,7 +1303,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 127:
     {
         float arg0 = ((float*)m_SP)[-1];
-        ((float*)m_SP)[-1] = UnidentifiedVirtual6(arg0);
+        ((float*)m_SP)[-1] = GetBranchRatio(arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1317,7 +1317,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-3];
         float arg0 = ((float*)m_SP)[-4];
         m_SP -= 3;
-        ((float*)m_SP)[-1] = UnidentifiedVirtual7(arg0, arg1, arg2, arg3);
+        ((float*)m_SP)[-1] = UpdateBranchConfidence(arg0, arg1, arg2, arg3);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1353,7 +1353,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnInt_800E3958(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnDirection(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1365,7 +1365,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnInt_800E35D4(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnDesire(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1377,7 +1377,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnInt_800E3700(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnIntNative133(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1389,7 +1389,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnInt_800E8090(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnTransitionResult(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1401,7 +1401,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnInt_800E382C(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnTeamPlay(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1413,7 +1413,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         float arg0 = ((float*)m_SP)[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnFloat_800E82E8(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnFloatNative136(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1437,7 +1437,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         float arg0 = ((float*)m_SP)[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnFloat_800E8414(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnFloat(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1449,7 +1449,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         float arg1 = ((float*)m_SP)[-1];
         int arg0 = (int)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyAIReturnInt_800E81BC(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyAIReturnInt(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1459,7 +1459,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 140:
     {
         float arg1 = ((float*)m_SP)[-1];
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-2];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-2];
         m_SP -= 1;
         m_SP[-1] = (u32)FuzzyAIReturnVariant(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
@@ -1482,17 +1482,17 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 142:
     {
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-1];
         m_SP -= 1;
-        FuzzyNoOp_80314438(this, arg0);
+        FuzzyBlockExitHook(this, arg0);
         break;
     }
     case 143:
     {
         float arg1 = ((float*)m_SP)[-1];
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-2];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-2];
         m_SP -= 2;
-        FuzzyNoOp_80314434(this, arg0, arg1);
+        FuzzyBlockEnterHook(this, arg0, arg1);
         break;
     }
     case 144:
@@ -1500,7 +1500,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg1 = m_SP[-1] != 0;
         float arg0 = ((float*)m_SP)[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = FuzzyAIPassThrough_800E8CAC(this, arg0, arg1);
+        ((float*)m_SP)[-1] = FuzzyAIIsPredicateNative144(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1512,7 +1512,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg1 = m_SP[-1] != 0;
         float arg0 = ((float*)m_SP)[-2];
         m_SP -= 1;
-        ((float*)m_SP)[-1] = FuzzyPassThrough_80314444(this, arg0, arg1);
+        ((float*)m_SP)[-1] = FuzzyIsPredicateFloat(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             ((float*)m_SP)[-1] = arg0;
@@ -1524,7 +1524,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
         bool arg1 = m_SP[-1] != 0;
         void* arg0 = (void*)m_SP[-2];
         m_SP -= 1;
-        m_SP[-1] = (u32)FuzzyPassThrough_8031443C(this, arg0, arg1);
+        m_SP[-1] = (u32)FuzzyIsPredicateResult(this, arg0, arg1);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1594,7 +1594,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 155:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAITryCachedPlayerQuestion_800E90EC(this, arg0);
+        m_SP[-1] = (u32)FuzzyAITryCachedFielderQuestion(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1604,7 +1604,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 156:
     {
         cPlayer* arg0 = (cPlayer*)m_SP[-1];
-        m_SP[-1] = (u32)FuzzyAITryCachedPlayerQuestion_800E9194(this, arg0);
+        m_SP[-1] = (u32)FuzzyAITryCachedPlayerQuestion(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (u32)arg0;
@@ -1633,7 +1633,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     }
     case 159:
     {
-        UnidentifiedVariant_80054AB8* arg0 = (UnidentifiedVariant_80054AB8*)m_SP[-1];
+        DesireUpdate* arg0 = (DesireUpdate*)m_SP[-1];
         m_SP -= 1;
         AddAction(arg0);
         break;
@@ -2933,7 +2933,7 @@ void FuzzyAIRuntime::DoFunctionCall(unsigned int function)
     case 287:
     {
         char arg0 = (char)m_SP[-1];
-        m_SP[-1] = (unsigned char)FuzzyPassThrough_80312358(this, arg0);
+        m_SP[-1] = (unsigned char)FuzzyByteIdentityNative287(this, arg0);
         if (FuzzyAIIsUndoingCall(this))
         {
             m_SP[-1] = (unsigned char)arg0;
@@ -3123,33 +3123,33 @@ extern "C" bool FuzzyAIIsUndoingCall(InterpreterCore* value)
     return value->m_RunState == 3;
 }
 
-extern "C" float FuzzyAIGetVariantFloat_800E7ECC(void*, Variant* value)
+extern "C" float FuzzyAIAutoCastParameterToFloat(void*, Variant* value)
 {
     return value->mData.f;
 }
 
-extern "C" unsigned long FuzzyAIGetVariantU32_800E7ED4(void*, Variant* value)
+extern "C" unsigned long FuzzyAIAutoCastParameterToInt(void*, Variant* value)
 {
     return value->mData.u;
 }
 
-extern "C" unsigned long FuzzyAIGetVariantU32_800E7EDC(void*, Variant* value)
+extern "C" unsigned long FuzzyAIAutoCastResultToInt(void*, Variant* value)
 {
     return value->mData.u;
 }
 
-extern "C" unsigned long FuzzyAIGetVariantU32_800E7EE4(void*, Variant* value)
+extern "C" unsigned long FuzzyAIAutoCastResultNative32(void*, Variant* value)
 {
     return value->mData.u;
 }
 
-extern "C" float FuzzyAIGetVariantFloat_800E7EEC(void*, Variant* value)
+extern "C" float FuzzyAIAutoCastResultToFloat(void*, Variant* value)
 {
     return value->mData.f;
 }
 
 extern "C" float FuzzyAIGetConfidence(
-    void*, UnidentifiedVariant_80054AB8* value)
+    void*, DesireUpdate* value)
 {
     if (value->ExtraData.IsSet(4))
     {
@@ -3164,125 +3164,125 @@ extern "C" float FuzzyAIBoolToFloat(bool value)
     return value ? 1.0f : 0.0f;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnBool(
+extern "C" DesireUpdate* FuzzyAIReturnBool(
     FuzzyAIRuntime* runtime, bool value, float confidence)
 {
     return runtime->CreateReturnValue(FT_BOOL, value, confidence);
 }
 
-UnidentifiedVariant_80054AB8* FuzzyRuntimeBase::ReturnValue(
-    UnidentifiedVariant_80054AB8* value, float)
+DesireUpdate* FuzzyRuntimeBase::ReturnValue(
+    DesireUpdate* value, float)
 {
     return value;
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E8090(
+extern "C" DesireUpdate* FuzzyAIReturnTransitionResult(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnInt_800E81BC(
+extern "C" DesireUpdate* FuzzyAIReturnInt(
     FuzzyAIRuntime* runtime, int value, float confidence)
 {
     return runtime->CreateReturnValue(FT_INT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E82E8(
+extern "C" DesireUpdate* FuzzyAIReturnFloatNative136(
     FuzzyAIRuntime* runtime, float value, float confidence)
 {
     return runtime->CreateReturnValue(FT_FLOAT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFloat_800E8414(
+extern "C" DesireUpdate* FuzzyAIReturnFloat(
     FuzzyAIRuntime* runtime, float value, float confidence)
 {
     return runtime->CreateReturnValue(FT_FLOAT, value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnVariant(
+extern "C" DesireUpdate* FuzzyAIReturnVariant(
     FuzzyAIRuntime* runtime,
-    UnidentifiedVariant_80054AB8* value, float confidence)
+    DesireUpdate* value, float confidence)
 {
     return runtime->CreateReturnValue(value, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnU32(
+extern "C" DesireUpdate* FuzzyAIReturnU32(
     FuzzyAIRuntime* runtime, unsigned long value, float confidence)
 {
     return runtime->CreateReturnValue(FT_U32, value, confidence);
 }
 
-extern "C" float FuzzyAIPassThrough_800E8CAC(void* runtime, float value, bool flag)
+extern "C" float FuzzyAIIsPredicateNative144(void* runtime, float value, bool flag)
 {
-    return FuzzyPassThrough_80314444(runtime, value, flag);
+    return FuzzyIsPredicateFloat(runtime, value, flag);
 }
 
-extern "C" unsigned long FuzzyAIGetVariantU32_800E8CB0(void*, Variant* value)
+extern "C" unsigned long FuzzyAIAutoCastResultNative31(void*, Variant* value)
 {
     return value->mData.u;
 }
 
-extern "C" void FuzzyAISetPlayerParameter_800E8CB8(
+extern "C" void FuzzyAISetFielderParameter(
     void*, cPlayer* value, unsigned long parameterHash,
-    UnidentifiedVariant_80054AB8* action)
+    DesireUpdate* action)
 {
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant(value));
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D68(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetDirectionParameter(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D6C(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetDesireStateParameter(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D70(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetPowerupParameter(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetIntParameter_800E8D74(FuzzyRuntimeBase* runtime, int value, unsigned long hash, UnidentifiedVariant_80054AB8* action)
+extern "C" void FuzzyAISetTeamPlayStateParameter(FuzzyRuntimeBase* runtime, int value, unsigned long hash, DesireUpdate* action)
 {
     FuzzySetIntParameter(runtime, value, hash, action);
 }
 
-extern "C" void FuzzyAISetFielderParameter(
+extern "C" void FuzzyAISetIteratorParameter(
     void*, FuzzyFielderIterator* value,
-    unsigned long parameterHash, UnidentifiedVariant_80054AB8* action)
+    unsigned long parameterHash, DesireUpdate* action)
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
     int index = FuzzyFindParameterIndex(parameterHash);
     action->ExtraData.Set(index, FuzzyVariant((cPlayer*)fielder));
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnPlayer(
+extern "C" DesireUpdate* FuzzyAIReturnPlayer(
     FuzzyAIRuntime* runtime, cPlayer* value, float confidence)
 {
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(value);
+    DesireUpdate* result = new (lbl_805842C8.Allocate())
+        DesireUpdate(value);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
     return runtime->ReturnValue(result, confidence);
 }
 
-extern "C" UnidentifiedVariant_80054AB8* FuzzyAIReturnFielder(
+extern "C" DesireUpdate* FuzzyAIReturnFielder(
     FuzzyAIRuntime* runtime,
     FuzzyFielderIterator* value, float confidence)
 {
     cFielder* fielder = value->mTeam->GetFielder(value->mCurrent);
-    UnidentifiedVariant_80054AB8* result = new (lbl_805842C8.Allocate())
-        UnidentifiedVariant_80054AB8(fielder);
+    DesireUpdate* result = new (lbl_805842C8.Allocate())
+        DesireUpdate(fielder);
     result->SetParameter(4, FuzzyVariant(confidence));
     runtime->mReturnInstructionOffset = runtime->GetInstructionOffset() + 1;
     return runtime->ReturnValue(result, confidence);
 }
 
-extern "C" bool FuzzyAITryCachedPlayerQuestion_800E90EC(FuzzyRuntimeBase* runtime, cPlayer* value)
+extern "C" bool FuzzyAITryCachedFielderQuestion(FuzzyRuntimeBase* runtime, cPlayer* value)
 {
     FuzzyVariant variant;
     variant.mType = FT_PLAYER;
@@ -3290,7 +3290,7 @@ extern "C" bool FuzzyAITryCachedPlayerQuestion_800E90EC(FuzzyRuntimeBase* runtim
     return FuzzyTryCachedQuestion(runtime, variant);
 }
 
-extern "C" bool FuzzyAITryCachedPlayerQuestion_800E9194(FuzzyRuntimeBase* runtime, cPlayer* value)
+extern "C" bool FuzzyAITryCachedPlayerQuestion(FuzzyRuntimeBase* runtime, cPlayer* value)
 {
     FuzzyVariant variant;
     variant.mType = FT_PLAYER;

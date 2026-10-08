@@ -1,7 +1,7 @@
 #include "NL/glx/glxTexture.h"
 #include "Game/Sys/debug.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "NL/gc/gcSwizzler.h"
 #include "NL/gl/glMemory.h"

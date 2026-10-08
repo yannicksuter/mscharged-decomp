@@ -18,7 +18,7 @@
 #include "Game/OverlayManager.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/Task/GameRenderTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 #include "NL/glx/glxSwap.h"
 #include "NL/nlBind.h"

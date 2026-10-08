@@ -1,6 +1,6 @@
 #include "Game/Render/depthoffield.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Render/RLView.h"
 
 #include "NL/gl/glDraw2.h"
@@ -32,7 +32,7 @@ DepthOfFieldManager::DepthOfFieldManager()
     , m_bDebugView(false)
     , m_fDistanceFromCamera(16.0f)
     , m_fIntensity(1.0f)
-    , mUnidentified0C(0)
+    , m_pad0C(0)
 {
 }
 

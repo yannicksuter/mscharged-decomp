@@ -38,7 +38,7 @@
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Physics/PhysicsEventQueue.inl"
 #include "NL/nlFunction.inl"
 
@@ -55,88 +55,88 @@ public:
 
 public:
     EventDispatcher mDispatcher;
-    UnidentifiedQueuedEvent<UnidentifiedEventNoData> mBallFallEvent;
-    UnidentifiedQueuedEvent<CollisionPlayerPlayerData> mCollisionPlayerPlayerEvent;
-    UnidentifiedQueuedEvent<CollisionPlayerWallData> mCollisionPlayerWallEvent;
-    UnidentifiedQueuedEvent<CollisionPlayerBallData> mCollisionPlayerBallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData04> mCollisionBallNetmeshEvent;
-    UnidentifiedQueuedEvent<CollisionBallGroundData> mCollisionBallGroundEvent;
-    UnidentifiedQueuedEvent<CollisionBallWallData> mCollisionBallWallEvent;
-    UnidentifiedQueuedEvent<CollisionBallGoalpostData> mCollisionBallGoalpostEvent;
-    UnidentifiedQueuedEvent<CollisionBallShellData> mCollisionBallShellEvent;
-    UnidentifiedQueuedEvent<CollisionBallChainData> mCollisionBallChainEvent;
-    UnidentifiedQueuedEvent<CollisionKoopaShotBallPlayerData> mCollisionKoopaShotBallPlayerEvent;
-    UnidentifiedQueuedEvent<CollisionKoopaShellGoalieData> mCollisionKoopaShellGoalieEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData12> mCollisionKoopaShellEndEvent;
-    UnidentifiedQueuedEvent<CollisionBirdoShotBallPlayerData> mCollisionBirdoShotBallPlayerEvent;
-    UnidentifiedQueuedEvent<CollisionBirdoEggGoalieData> mCollisionBirdoEggGoalieEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData15> mCollisionBirdoEggEndEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData16> mCollisionHammerbroShotBallPlayerEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData17> mCollisionPowerupGroundEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData17> mCollisionPowerupGoalieEvent;
-    UnidentifiedQueuedEvent<CollisionPowerupWallData> mCollisionPowerupWallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData19> mPowerupHitEvent;
-    UnidentifiedQueuedEvent<CollisionPlayerBananaData> mCollisionPlayerBananaEvent;
-    UnidentifiedQueuedEvent<CollisionPlayerShellData> mCollisionPlayerShellEvent;
-    UnidentifiedQueuedEvent<CollisionPlayerFreezeData> mCollisionPlayerFreezeEvent;
-    UnidentifiedQueuedEvent<CollisionBulletBillData> mCollisionBulletBillPlayerEvent;
-    UnidentifiedQueuedEvent<CollisionBulletBillData> mCollisionBulletBillFreezeEvent;
-    UnidentifiedQueuedEvent<CollisionBulletBillData> mExplosionBulletBillEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData24> mCollisionTongueEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventNoData> mCollisionBallTronWallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData25> mPowerupUsedEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData26> mCollisionFireballPlayerEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData26> mCollisionFireballBallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData26> mCollisionFireballGroundEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData27> mCollisionFireballPowerupEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData28> mCollisionFireballChainEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData28> mCollisionChainCrowdEvent;
-    UnidentifiedQueuedEvent<CollisionChainPowerupData> mCollisionChainPowerupEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData24> mCollisionPatchPlayerEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData24> mCollisionPatchGroundEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData30> mCollisionPatchPowerupEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData28> mCollisionPatchChainEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData24> mCollisionPatchPatchEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData31> mCollisionPatchBallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData31> mCollisionPatchWallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData26> mCollisionHammerPlayerEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData26> mCollisionHammerBallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData26> mCollisionHammerGroundEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData27> mCollisionHammerPowerupEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData28> mCollisionHammerChainEvent;
-    UnidentifiedQueuedEvent<CollisionThwompPlayerData> mCollisionThwompPlayerEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData33> mCollisionThwompBallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData28> mCollisionThwompChainEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData34> mCollisionEggBallEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData34> mCollisionEggPlayerEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData34> mCollisionEggPowerupEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData34> mCollisionEggChainEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData34> mCollisionCrackEggEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData27> mDestroyPowerupEvent;
-    UnidentifiedQueuedEvent<UnidentifiedEventData35> mDestroyHammerEvent;
-    UnidentifiedQueuedEvent<cFielder> mKnockYoshiTongueEvent;
-    UnidentifiedQueuedEvent<WindDebris> mCollisionDebrisBallEvent;
-    UnidentifiedQueuedEvent<cFielder> mCollisionWaluigiWallEvent;
-    UnidentifiedQueuedEvent<CollisionShockwaveData> mCollisionShockwaveEvent;
+    QueuedEvent<NoEventData> mBallFallEvent;
+    QueuedEvent<CollisionPlayerPlayerData> mCollisionPlayerPlayerEvent;
+    QueuedEvent<CollisionPlayerWallData> mCollisionPlayerWallEvent;
+    QueuedEvent<CollisionPlayerBallData> mCollisionPlayerBallEvent;
+    QueuedEvent<BallNetmeshEventData> mCollisionBallNetmeshEvent;
+    QueuedEvent<CollisionBallGroundData> mCollisionBallGroundEvent;
+    QueuedEvent<CollisionBallWallData> mCollisionBallWallEvent;
+    QueuedEvent<CollisionBallGoalpostData> mCollisionBallGoalpostEvent;
+    QueuedEvent<CollisionBallShellData> mCollisionBallShellEvent;
+    QueuedEvent<CollisionBallChainData> mCollisionBallChainEvent;
+    QueuedEvent<CollisionKoopaShotBallPlayerData> mCollisionKoopaShotBallPlayerEvent;
+    QueuedEvent<CollisionKoopaShellGoalieData> mCollisionKoopaShellGoalieEvent;
+    QueuedEvent<CollisionKoopaShellEndData> mCollisionKoopaShellEndEvent;
+    QueuedEvent<CollisionBirdoShotBallPlayerData> mCollisionBirdoShotBallPlayerEvent;
+    QueuedEvent<CollisionBirdoEggGoalieData> mCollisionBirdoEggGoalieEvent;
+    QueuedEvent<CollisionBirdoEggEndData> mCollisionBirdoEggEndEvent;
+    QueuedEvent<CollisionHammerbroShotBallPlayerData> mCollisionHammerbroShotBallPlayerEvent;
+    QueuedEvent<CollisionPowerupGroundData> mCollisionPowerupGroundEvent;
+    QueuedEvent<CollisionPowerupGroundData> mCollisionPowerupGoalieEvent;
+    QueuedEvent<CollisionPowerupWallData> mCollisionPowerupWallEvent;
+    QueuedEvent<PowerupHitPlayerEventData> mPowerupHitEvent;
+    QueuedEvent<CollisionPlayerBananaData> mCollisionPlayerBananaEvent;
+    QueuedEvent<CollisionPlayerShellData> mCollisionPlayerShellEvent;
+    QueuedEvent<CollisionPlayerFreezeData> mCollisionPlayerFreezeEvent;
+    QueuedEvent<CollisionBulletBillData> mCollisionBulletBillPlayerEvent;
+    QueuedEvent<CollisionBulletBillData> mCollisionBulletBillFreezeEvent;
+    QueuedEvent<CollisionBulletBillData> mExplosionBulletBillEvent;
+    QueuedEvent<CollisionPatchData> mCollisionTongueEvent;
+    QueuedEvent<NoEventData> mCollisionBallTronWallEvent;
+    QueuedEvent<PowerupUsedEventData> mPowerupUsedEvent;
+    QueuedEvent<CollisionProjectileData> mCollisionFireballPlayerEvent;
+    QueuedEvent<CollisionProjectileData> mCollisionFireballBallEvent;
+    QueuedEvent<CollisionProjectileData> mCollisionFireballGroundEvent;
+    QueuedEvent<PowerupBase> mCollisionFireballPowerupEvent;
+    QueuedEvent<ChainChomp> mCollisionFireballChainEvent;
+    QueuedEvent<ChainChomp> mCollisionChainCrowdEvent;
+    QueuedEvent<CollisionChainPowerupData> mCollisionChainPowerupEvent;
+    QueuedEvent<CollisionPatchData> mCollisionPatchPlayerEvent;
+    QueuedEvent<CollisionPatchData> mCollisionPatchGroundEvent;
+    QueuedEvent<CollisionPatchPowerupData> mCollisionPatchPowerupEvent;
+    QueuedEvent<ChainChomp> mCollisionPatchChainEvent;
+    QueuedEvent<CollisionPatchData> mCollisionPatchPatchEvent;
+    QueuedEvent<PhysicsPatch> mCollisionPatchBallEvent;
+    QueuedEvent<PhysicsPatch> mCollisionPatchWallEvent;
+    QueuedEvent<CollisionProjectileData> mCollisionHammerPlayerEvent;
+    QueuedEvent<CollisionProjectileData> mCollisionHammerBallEvent;
+    QueuedEvent<CollisionProjectileData> mCollisionHammerGroundEvent;
+    QueuedEvent<PowerupBase> mCollisionHammerPowerupEvent;
+    QueuedEvent<ChainChomp> mCollisionHammerChainEvent;
+    QueuedEvent<CollisionThwompPlayerData> mCollisionThwompPlayerEvent;
+    QueuedEvent<ThwompObject> mCollisionThwompBallEvent;
+    QueuedEvent<ChainChomp> mCollisionThwompChainEvent;
+    QueuedEvent<CollisionEggData> mCollisionEggBallEvent;
+    QueuedEvent<CollisionEggData> mCollisionEggPlayerEvent;
+    QueuedEvent<CollisionEggData> mCollisionEggPowerupEvent;
+    QueuedEvent<CollisionEggData> mCollisionEggChainEvent;
+    QueuedEvent<CollisionEggData> mCollisionCrackEggEvent;
+    QueuedEvent<PowerupBase> mDestroyPowerupEvent;
+    QueuedEvent<HammerObject> mDestroyHammerEvent;
+    QueuedEvent<cFielder> mKnockYoshiTongueEvent;
+    QueuedEvent<WindDebris> mCollisionDebrisBallEvent;
+    QueuedEvent<cFielder> mCollisionWaluigiWallEvent;
+    QueuedEvent<CollisionShockwaveData> mCollisionShockwaveEvent;
 };
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 float gfDaisyFistShotTime = 1.0f;
 
-SlotPool<UnidentifiedEventData26> g_UnidentifiedEventData26Pool(16, 16);
-SlotPool<UnidentifiedEventData24> g_UnidentifiedEventData24Pool(16, 16);
-SlotPool<UnidentifiedEventData30> g_UnidentifiedEventData30Pool(16, 16);
-SlotPool<UnidentifiedEventData34> g_UnidentifiedEventData34Pool(16, 16);
+SlotPool<CollisionProjectileData> g_CollisionProjectileDataPool(16, 16);
+SlotPool<CollisionPatchData> g_CollisionPatchDataPool(16, 16);
+SlotPool<CollisionPatchPowerupData> g_CollisionPatchPowerupDataPool(16, 16);
+SlotPool<CollisionEggData> g_CollisionEggDataPool(16, 16);
 SlotPool<CollisionShockwaveData> gCollisionShockwaveDataPool(16, 16);
 
 PhysicsEventQueue* gPhysicsEventQueue;
 
 void FreePhysicsEventDataPools()
 {
-    g_UnidentifiedEventData26Pool.FreeBlocks();
-    g_UnidentifiedEventData24Pool.FreeBlocks();
-    g_UnidentifiedEventData30Pool.FreeBlocks();
-    g_UnidentifiedEventData34Pool.FreeBlocks();
+    g_CollisionProjectileDataPool.FreeBlocks();
+    g_CollisionPatchDataPool.FreeBlocks();
+    g_CollisionPatchPowerupDataPool.FreeBlocks();
+    g_CollisionEggDataPool.FreeBlocks();
     gCollisionShockwaveDataPool.FreeBlocks();
 }
 
@@ -261,17 +261,17 @@ void HandleCollisionShockwave(CollisionShockwaveData*);
 
 void RegisterPhysicsEventHandlers()
 {
-    UnidentifiedFindEvent<void>("CollisionPatchPowerup", -1)->Add(Function<void*>(HandleCollisionPatchPowerup), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionHammerPowerup", -1)->Add(Function<void*>(HandleCollisionHammerPowerup), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionFireballPowerup", -1)->Add(Function<void*>(HandleCollisionFireballPowerup), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionCrackEgg", -1)->Add(Function<void*>(HandleCollisionCrackEgg), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionShockwave", -1)->Add(Function<void*>((void (*)(void*))HandleCollisionShockwave), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionKoopaShellEnd", -1)->Add(Function<void*>(HandleCollisionKoopaShellEnd), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionBirdoEggEnd", -1)->Add(Function<void*>(HandleCollisionBirdoEggEnd), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionPatchPatch", -1)->Add(Function<void*>(HandleCollisionPatchPatch), 0, -1);
-    UnidentifiedFindEvent<void>("DestroyPowerup", -1)->Add(Function<void*>(HandleDestroyPowerup), 0, -1);
-    UnidentifiedFindEvent<void>("DestroyHammer", -1)->Add(Function<void*>(HandleDestroyHammer), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionWaluigiWall", -1)->Add(Function<void*>(HandleCollisionWaluigiWall), 0, -1);
+    FindEvent<void>("CollisionPatchPowerup", -1)->Add(Function<void*>(HandleCollisionPatchPowerup), 0, -1);
+    FindEvent<void>("CollisionHammerPowerup", -1)->Add(Function<void*>(HandleCollisionHammerPowerup), 0, -1);
+    FindEvent<void>("CollisionFireballPowerup", -1)->Add(Function<void*>(HandleCollisionFireballPowerup), 0, -1);
+    FindEvent<void>("CollisionCrackEgg", -1)->Add(Function<void*>(HandleCollisionCrackEgg), 0, -1);
+    FindEvent<void>("CollisionShockwave", -1)->Add(Function<void*>((void (*)(void*))HandleCollisionShockwave), 0, -1);
+    FindEvent<void>("CollisionKoopaShellEnd", -1)->Add(Function<void*>(HandleCollisionKoopaShellEnd), 0, -1);
+    FindEvent<void>("CollisionBirdoEggEnd", -1)->Add(Function<void*>(HandleCollisionBirdoEggEnd), 0, -1);
+    FindEvent<void>("CollisionPatchPatch", -1)->Add(Function<void*>(HandleCollisionPatchPatch), 0, -1);
+    FindEvent<void>("DestroyPowerup", -1)->Add(Function<void*>(HandleDestroyPowerup), 0, -1);
+    FindEvent<void>("DestroyHammer", -1)->Add(Function<void*>(HandleDestroyHammer), 0, -1);
+    FindEvent<void>("CollisionWaluigiWall", -1)->Add(Function<void*>(HandleCollisionWaluigiWall), 0, -1);
 }
 
 extern "C" void fn_800156F8(cBall* pBall, cPlayer* pShooter);
@@ -437,7 +437,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
                     bool bHasPad = pFielder->GetGlobalPad() != 0;
                     pStats->nPlayerPadID =
                         bHasPad ? pFielder->GetGlobalPad()->GetPadID() : -1;
-                    g_pGame->mUnidentified49C.mEvent31.Queue(pStats,
+                    g_pGame->mEventQueue.mEvent31.Queue(pStats,
                         Function<CollisionPowerupStatsData*>(
                             FreeCollisionPowerupStatsData));
                 }
@@ -482,16 +482,16 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
             {
             case SHOCKWAVE_BULLET_BILL:
                 if (pGoalie->mGoalieActionState
-                    != GOALIEACTION_UNIDENTIFIED_29)
+                    != GOALIEACTION_SHOCKWAVE_REACT)
                 {
-                    pGoalie->fn_8008EC2C();
+                    pGoalie->InitActionShockwaveReact();
                 }
                 break;
             case SHOCKWAVE_LIGHTNING:
                 if (pGoalie->mGoalieActionState
                     != GOALIEACTION_ELECTROCUTION)
                 {
-                    pGoalie->fn_8008E130();
+                    pGoalie->InitActionElectrocution();
                 }
                 break;
             }
@@ -549,7 +549,7 @@ void HandleCollisionShockwave(CollisionShockwaveData* data)
         if (shockwaveType == SHOCKWAVE_DAISY_FIST)
         {
             pBall->ShootAtFast(v3Velocity,
-                ((cCharacter*)pShockwave->mOwner)->mUnidentified024.m_v3Position, gfDaisyFistShotTime);
+                ((cCharacter*)pShockwave->mOwner)->m_DetChar.m_v3Position, gfDaisyFistShotTime);
             nlRandom(2);
         }
         else
@@ -668,10 +668,10 @@ void QueueCollisionPlayerWall(CollisionPlayerWallData* data)
     gPhysicsEventQueue->mCollisionPlayerWallEvent.Queue(data, Function<CollisionPlayerWallData*>(FreeCollisionPlayerWallData));
 }
 
-void QueueCollisionTongue(UnidentifiedEventData24* data)
+void QueueCollisionTongue(CollisionPatchData* data)
 {
     gPhysicsEventQueue->mCollisionTongueEvent.Queue(
-        data, Function<UnidentifiedEventData24*>((void (*)(UnidentifiedEventData24*))FreeUnidentifiedEventData24));
+        data, Function<CollisionPatchData*>((void (*)(CollisionPatchData*))FreeCollisionPatchData));
 }
 
 void QueueCollisionBallTronWall()
@@ -690,7 +690,7 @@ void QueueCollisionBallNetmesh(BallNetmeshEventData* data, bool release)
     if (!release)
     {
         gPhysicsEventQueue->mCollisionBallNetmeshEvent.Queue(
-            (UnidentifiedEventData04*)data, Function<UnidentifiedEventData04*>((void (*)(UnidentifiedEventData04*))FreeBallNetmeshEventData));
+            data, Function<BallNetmeshEventData*>((void (*)(BallNetmeshEventData*))FreeBallNetmeshEventData));
     }
     else
     {
@@ -743,7 +743,7 @@ void QueueCollisionKoopaShellGoalie(CollisionKoopaShellGoalieData* data)
 void QueueCollisionKoopaShellEnd(CollisionKoopaShellEndData* data)
 {
     gPhysicsEventQueue->mCollisionKoopaShellEndEvent.Queue(
-        (UnidentifiedEventData12*)data, Function<UnidentifiedEventData12*>((void (*)(UnidentifiedEventData12*))FreeCollisionKoopaShellEndData));
+        data, Function<CollisionKoopaShellEndData*>((void (*)(CollisionKoopaShellEndData*))FreeCollisionKoopaShellEndData));
 }
 
 void QueueCollisionBirdoShotBallPlayer(CollisionBirdoShotBallPlayerData* data)
@@ -761,19 +761,19 @@ void QueueCollisionBirdoEggGoalie(CollisionBirdoEggGoalieData* data)
 void QueueCollisionBirdoEggEnd(CollisionBirdoEggEndData* data)
 {
     gPhysicsEventQueue->mCollisionBirdoEggEndEvent.Queue(
-        (UnidentifiedEventData15*)data, Function<UnidentifiedEventData15*>((void (*)(UnidentifiedEventData15*))FreeCollisionBirdoEggEndData));
+        data, Function<CollisionBirdoEggEndData*>((void (*)(CollisionBirdoEggEndData*))FreeCollisionBirdoEggEndData));
 }
 
 void QueueCollisionPowerupGround(CollisionPowerupGroundData* data)
 {
     gPhysicsEventQueue->mCollisionPowerupGroundEvent.Queue(
-        (UnidentifiedEventData17*)data, Function<UnidentifiedEventData17*>((void (*)(UnidentifiedEventData17*))FreeCollisionPowerupGroundData));
+        data, Function<CollisionPowerupGroundData*>((void (*)(CollisionPowerupGroundData*))FreeCollisionPowerupGroundData));
 }
 
 void QueueCollisionPowerupGoalie(CollisionPowerupGroundData* data)
 {
     gPhysicsEventQueue->mCollisionPowerupGoalieEvent.Queue(
-        (UnidentifiedEventData17*)data, Function<UnidentifiedEventData17*>((void (*)(UnidentifiedEventData17*))FreeCollisionPowerupGroundData));
+        data, Function<CollisionPowerupGroundData*>((void (*)(CollisionPowerupGroundData*))FreeCollisionPowerupGroundData));
 }
 
 void QueueCollisionPowerupWall(CollisionPowerupWallData* data)
@@ -785,7 +785,7 @@ void QueueCollisionPowerupWall(CollisionPowerupWallData* data)
 void QueuePowerupHit(PowerupHitPlayerEventData* data)
 {
     gPhysicsEventQueue->mPowerupHitEvent.Queue(
-        (UnidentifiedEventData19*)data, Function<UnidentifiedEventData19*>((void (*)(UnidentifiedEventData19*))FreePowerupHitPlayerEventData));
+        data, Function<PowerupHitPlayerEventData*>((void (*)(PowerupHitPlayerEventData*))FreePowerupHitPlayerEventData));
 }
 
 void QueueCollisionPlayerBanana(CollisionPlayerBananaData* data)
@@ -827,12 +827,12 @@ void QueueExplosionBulletBill(CollisionBulletBillData* data)
 void QueuePowerupUsed(PowerupUsedEventData* data)
 {
     gPhysicsEventQueue->mPowerupUsedEvent.Queue(
-        (UnidentifiedEventData25*)data, Function<UnidentifiedEventData25*>((void (*)(UnidentifiedEventData25*))FreePowerupUsedEventData));
+        data, Function<PowerupUsedEventData*>((void (*)(PowerupUsedEventData*))FreePowerupUsedEventData));
 }
 
-void QueueCollisionChainCrowd(UnidentifiedEventData28* data)
+void QueueCollisionChainCrowd(ChainChomp* data)
 {
-    gPhysicsEventQueue->mCollisionChainCrowdEvent.Queue(data, Function<UnidentifiedEventData28*>());
+    gPhysicsEventQueue->mCollisionChainCrowdEvent.Queue(data, Function<ChainChomp*>());
 }
 
 void QueueCollisionChainPowerup(CollisionChainPowerupData* data)
@@ -841,80 +841,80 @@ void QueueCollisionChainPowerup(CollisionChainPowerupData* data)
         data, Function<CollisionChainPowerupData*>(FreeCollisionChainPowerupData));
 }
 
-void QueueCollisionPatchPlayer(UnidentifiedEventData24* data)
+void QueueCollisionPatchPlayer(CollisionPatchData* data)
 {
     gPhysicsEventQueue->mCollisionPatchPlayerEvent.Queue(
-        data, Function<UnidentifiedEventData24*>((void (*)(UnidentifiedEventData24*))FreeUnidentifiedEventData24));
+        data, Function<CollisionPatchData*>((void (*)(CollisionPatchData*))FreeCollisionPatchData));
 }
 
-void QueueCollisionPatchGround(UnidentifiedEventData24* data)
+void QueueCollisionPatchGround(CollisionPatchData* data)
 {
     gPhysicsEventQueue->mCollisionPatchGroundEvent.Queue(
-        data, Function<UnidentifiedEventData24*>((void (*)(UnidentifiedEventData24*))FreeUnidentifiedEventData24));
+        data, Function<CollisionPatchData*>((void (*)(CollisionPatchData*))FreeCollisionPatchData));
 }
 
-void QueueCollisionPatchPowerup(UnidentifiedEventData30* data)
+void QueueCollisionPatchPowerup(CollisionPatchPowerupData* data)
 {
     gPhysicsEventQueue->mCollisionPatchPowerupEvent.Queue(
-        data, Function<UnidentifiedEventData30*>((void (*)(UnidentifiedEventData30*))FreeUnidentifiedEventData30));
+        data, Function<CollisionPatchPowerupData*>((void (*)(CollisionPatchPowerupData*))FreeCollisionPatchPowerupData));
 }
 
-void QueueCollisionPatchChain(UnidentifiedEventData28* data)
+void QueueCollisionPatchChain(ChainChomp* data)
 {
-    gPhysicsEventQueue->mCollisionPatchChainEvent.Queue(data, Function<UnidentifiedEventData28*>());
+    gPhysicsEventQueue->mCollisionPatchChainEvent.Queue(data, Function<ChainChomp*>());
 }
 
-void QueueCollisionPatchPatch(UnidentifiedEventData24* data)
+void QueueCollisionPatchPatch(CollisionPatchData* data)
 {
     gPhysicsEventQueue->mCollisionPatchPatchEvent.Queue(
-        data, Function<UnidentifiedEventData24*>((void (*)(UnidentifiedEventData24*))FreeUnidentifiedEventData24));
+        data, Function<CollisionPatchData*>((void (*)(CollisionPatchData*))FreeCollisionPatchData));
 }
 
-void QueueCollisionPatchBall(UnidentifiedEventData31* data)
+void QueueCollisionPatchBall(PhysicsPatch* data)
 {
-    gPhysicsEventQueue->mCollisionPatchBallEvent.Queue(data, Function<UnidentifiedEventData31*>());
+    gPhysicsEventQueue->mCollisionPatchBallEvent.Queue(data, Function<PhysicsPatch*>());
 }
 
-void QueueCollisionPatchWall(UnidentifiedEventData31* data)
+void QueueCollisionPatchWall(PhysicsPatch* data)
 {
-    gPhysicsEventQueue->mCollisionPatchWallEvent.Queue(data, Function<UnidentifiedEventData31*>());
+    gPhysicsEventQueue->mCollisionPatchWallEvent.Queue(data, Function<PhysicsPatch*>());
 }
 
-void QueueCollisionHammerPlayer(UnidentifiedEventData26* data)
+void QueueCollisionHammerPlayer(CollisionProjectileData* data)
 {
     gPhysicsEventQueue->mCollisionHammerPlayerEvent.Queue(
-        data, Function<UnidentifiedEventData26*>(FreeUnidentifiedEventData26));
+        data, Function<CollisionProjectileData*>(FreeCollisionProjectileData));
 }
 
-void QueueCollisionHammerGround(UnidentifiedEventData26* data)
+void QueueCollisionHammerGround(CollisionProjectileData* data)
 {
     gPhysicsEventQueue->mCollisionHammerGroundEvent.Queue(
-        data, Function<UnidentifiedEventData26*>(FreeUnidentifiedEventData26));
+        data, Function<CollisionProjectileData*>(FreeCollisionProjectileData));
 }
 
-void QueueCollisionHammerPowerup(UnidentifiedEventData27* data)
+void QueueCollisionHammerPowerup(PowerupBase* data)
 {
-    gPhysicsEventQueue->mCollisionHammerPowerupEvent.Queue(data, Function<UnidentifiedEventData27*>());
+    gPhysicsEventQueue->mCollisionHammerPowerupEvent.Queue(data, Function<PowerupBase*>());
 }
 
-void QueueBirdoEggDestroyPowerup(UnidentifiedEventData27* data)
+void QueueBirdoEggDestroyPowerup(PowerupBase* data)
 {
-    gPhysicsEventQueue->mDestroyPowerupEvent.Queue(data, Function<UnidentifiedEventData27*>());
+    gPhysicsEventQueue->mDestroyPowerupEvent.Queue(data, Function<PowerupBase*>());
 }
 
-void QueueKoopaShellDestroyPowerup(UnidentifiedEventData27* data)
+void QueueKoopaShellDestroyPowerup(PowerupBase* data)
 {
-    gPhysicsEventQueue->mDestroyPowerupEvent.Queue(data, Function<UnidentifiedEventData27*>());
+    gPhysicsEventQueue->mDestroyPowerupEvent.Queue(data, Function<PowerupBase*>());
 }
 
-void QueueBirdoEggDestroyHammer(UnidentifiedEventData35* data)
+void QueueBirdoEggDestroyHammer(HammerObject* data)
 {
-    gPhysicsEventQueue->mDestroyHammerEvent.Queue(data, Function<UnidentifiedEventData35*>());
+    gPhysicsEventQueue->mDestroyHammerEvent.Queue(data, Function<HammerObject*>());
 }
 
-void QueueKoopaShellDestroyHammer(UnidentifiedEventData35* data)
+void QueueKoopaShellDestroyHammer(HammerObject* data)
 {
-    gPhysicsEventQueue->mDestroyHammerEvent.Queue(data, Function<UnidentifiedEventData35*>());
+    gPhysicsEventQueue->mDestroyHammerEvent.Queue(data, Function<HammerObject*>());
 }
 
 void QueueBirdoEggKnockYoshiTongue(cFielder* data)
@@ -927,9 +927,9 @@ void QueueKoopaShellKnockYoshiTongue(cFielder* data)
     gPhysicsEventQueue->mKnockYoshiTongueEvent.Queue(data, Function<cFielder*>());
 }
 
-void QueueCollisionHammerChain(UnidentifiedEventData28* data)
+void QueueCollisionHammerChain(ChainChomp* data)
 {
-    gPhysicsEventQueue->mCollisionHammerChainEvent.Queue(data, Function<UnidentifiedEventData28*>());
+    gPhysicsEventQueue->mCollisionHammerChainEvent.Queue(data, Function<ChainChomp*>());
 }
 
 void QueueCollisionThwompPlayer(ThwompObject* thwomp, cCharacter* target)
@@ -944,27 +944,27 @@ void QueueCollisionThwompPlayer(ThwompObject* thwomp, cCharacter* target)
         Function<CollisionThwompPlayerData*>(FreeCollisionThwompPlayerData));
 }
 
-void QueueCollisionThwompBall(UnidentifiedEventData33* data)
+void QueueCollisionThwompBall(ThwompObject* data)
 {
-    gPhysicsEventQueue->mCollisionThwompBallEvent.Queue(data, Function<UnidentifiedEventData33*>());
+    gPhysicsEventQueue->mCollisionThwompBallEvent.Queue(data, Function<ThwompObject*>());
 }
 
-void QueueCollisionEggBall(UnidentifiedEventData34* data)
+void QueueCollisionEggBall(CollisionEggData* data)
 {
     gPhysicsEventQueue->mCollisionEggBallEvent.Queue(
-        data, Function<UnidentifiedEventData34*>(FreeUnidentifiedEventData34));
+        data, Function<CollisionEggData*>(FreeCollisionEggData));
 }
 
-void QueueCollisionEggPlayer(UnidentifiedEventData34* data)
+void QueueCollisionEggPlayer(CollisionEggData* data)
 {
     gPhysicsEventQueue->mCollisionEggPlayerEvent.Queue(
-        data, Function<UnidentifiedEventData34*>(FreeUnidentifiedEventData34));
+        data, Function<CollisionEggData*>(FreeCollisionEggData));
 }
 
-void QueueCollisionCrackEgg(UnidentifiedEventData34* data)
+void QueueCollisionCrackEgg(CollisionEggData* data)
 {
     gPhysicsEventQueue->mCollisionCrackEggEvent.Queue(
-        data, Function<UnidentifiedEventData34*>(FreeUnidentifiedEventData34));
+        data, Function<CollisionEggData*>(FreeCollisionEggData));
 }
 
 void QueueCollisionDebrisBall(WindDebris* data)

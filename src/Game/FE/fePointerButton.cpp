@@ -94,11 +94,11 @@ void FEPointerButton::OnPointerRelease(int index, void* context)
     }
 }
 
-void FEPointerButton::UnidentifiedVirtual24(int index, void* context)
+void FEPointerButton::OnPointerAuxiliaryAction(int index, void* context)
 {
-    if (mUnidentified34)
+    if (mAuxiliaryCallback)
     {
-        mUnidentified34(index, context);
+        mAuxiliaryCallback(index, context);
     }
 }
 

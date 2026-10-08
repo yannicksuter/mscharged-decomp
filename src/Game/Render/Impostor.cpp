@@ -2,7 +2,7 @@
 #include "Game/Render/Impostor.h"
 
 #include "Game/Render/ImpostorCharacter.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 Impostor::Impostor()
 {

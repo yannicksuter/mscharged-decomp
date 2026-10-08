@@ -2,7 +2,7 @@
 
 #include "Game/Render/Frustum.h"
 #include "NL/nlChunk.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 WorldVisibilityNode* LoadWorldVisibilityNode(nlChunk* chunk)
 {

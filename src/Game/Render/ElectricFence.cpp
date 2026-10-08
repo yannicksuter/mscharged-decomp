@@ -7,7 +7,7 @@
 #include "Game/Field.h"
 #include "Game/GL/MeshWriter.h"
 #include "Game/Net.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"

@@ -64,7 +64,7 @@ const char* NisPlayer::GetTargetFilter(NisTarget target, NisWinnerType winnerTyp
 
     if (target == NIS_TARGET_SCORER)
     {
-        return g_pCharacters[mGoalScorerCharIndex]->mUnidentified11C->mName;
+        return g_pCharacters[mGoalScorerCharIndex]->m_pCharacterInfo->mName;
     }
 
     if (target == NIS_TARGET_WINNER_SIDEKICK)

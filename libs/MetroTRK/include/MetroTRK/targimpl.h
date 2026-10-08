@@ -122,6 +122,7 @@ extern "C"
 
     typedef ProcessorState_PPC_6xx_7xx ProcessorState_PPC;
     extern ProcessorState_PPC gTRKCPUState;
+    extern ProcessorRestoreFlags_PPC gTRKRestoreFlags;
 
     typedef struct TRKState
     {

@@ -23,7 +23,7 @@ public:
     void InitializePointerButtons();
 
     /* 0x01C */ float m_fTimeElapsed;
-    /* 0x020 */ u8 mUnidentified20[4];
+    /* 0x020 */ u8 mPadding20[4];
     /* 0x024 */ FEPointerButton mControllerComponent;
     /* 0x0D8 */ TLComponentInstance* mTextPressStart;
     /* 0x0DC */ bool mStartedDemo;

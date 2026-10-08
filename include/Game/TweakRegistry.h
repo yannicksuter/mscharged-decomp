@@ -82,8 +82,8 @@ public:
     TweakNode();
     virtual ~TweakNode();
     virtual int IsEntry();
-    virtual int UnidentifiedVirtual10() { return 1; }
-    virtual TweakNode* UnidentifiedVirtual14() { return 0; }
+    virtual int ReservedNodeQuery() { return 1; }
+    virtual TweakNode* AsEntryNode() { return 0; }
     virtual TweakEntry* AsEntry();
 
     TweakNode* GetNext() const { return m_Next; }
@@ -106,8 +106,8 @@ public:
     virtual ~TweakEntry();
     virtual int IsEntry();
     virtual TweakEntry* AsEntry();
-    virtual int UnidentifiedVirtual1C();
-    virtual TweakNode* UnidentifiedVirtual14();
+    virtual int ReservedEntryQuery();
+    virtual TweakNode* AsEntryNode();
 
     static void operator delete(void* ptr) { gTweakEntryPool.Free(ptr); }
 
@@ -126,11 +126,11 @@ inline TweakEntry* TweakEntry::AsEntry()
 {
     return this;
 }
-inline TweakNode* TweakEntry::UnidentifiedVirtual14()
+inline TweakNode* TweakEntry::AsEntryNode()
 {
     return this;
 }
-inline int TweakEntry::UnidentifiedVirtual1C()
+inline int TweakEntry::ReservedEntryQuery()
 {
     return 0;
 }
@@ -186,8 +186,8 @@ public:
         mName = name;
     }
     virtual ~TweakValueString() { }
-    virtual void UnidentifiedVirtual18() { }
-    virtual void UnidentifiedVirtual14(float* value, float* min, float* max)
+    virtual void ReservedValueHook() { }
+    virtual void GetFloatParameters(float* value, float* min, float* max)
     {
         *value = 0.0f;
         *min = 0.0f;

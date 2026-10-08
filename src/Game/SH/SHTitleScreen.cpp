@@ -29,7 +29,7 @@
 #include "Game/FE/feDPD.h"
 #include "Game/SH/SHLoading.h"
 #include "Game/SH/SHMoviePlayer.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 
 static bool sTitleDimmingTimeSet;

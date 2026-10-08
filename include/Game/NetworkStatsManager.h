@@ -82,7 +82,7 @@ public:
         return mHasLocalStats[category] ? &mLocalStats[category] : 0;
     }
 
-    virtual void StatsListenerVirtual00();
+    virtual void OnReservedStatsEvent();
     virtual void OnLeaderboardResult(bool success, int category, int filter,
         int count, NetworkStatsPlayer* players,
         NetworkRankingMeta* metadata);

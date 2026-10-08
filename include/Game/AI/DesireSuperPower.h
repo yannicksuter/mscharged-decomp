@@ -27,14 +27,14 @@ public:
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
     virtual void SetContext(ScriptMachine*);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
     void EmitHeavenlyLight();
 
 private:
-    static UnidentifiedVariant_80054AB8 FollowPathTransition(const FuzzyVariant&, shdStateMachine*);
-    static UnidentifiedVariant_80054AB8 ChooseDirectionTransition(const FuzzyVariant&, shdStateMachine*);
+    static DesireUpdate FollowPathTransition(const FuzzyVariant&, shdStateMachine*);
+    static DesireUpdate ChooseDirectionTransition(const FuzzyVariant&, shdStateMachine*);
     void UpdateWario(DesireUpdate*, float);
     bool IsMuckBallReady() const;
     void UpdatePetey(DesireUpdate*, float);

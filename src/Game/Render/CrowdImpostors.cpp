@@ -14,7 +14,7 @@
 #include "Game/Render/RLView.h"
 #include "Game/Render/CrowdImpostorManager.h"
 #include "Game/TweakRegistry.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "Game/TweakConfig.h"
 #include "NL/gl/glTextureManager.h"
@@ -464,14 +464,14 @@ void CreateCrowdLayoutObject()
 
 void SetCrowdModelTexture(u32 textureHash, unsigned long texture)
 {
-    nlDLListIterator<WorldListObject0_80340AC8*> iterator;
+    nlDLListIterator<WorldDrawable*> iterator;
     iterator = BasicStadium::GetCurrentStadium()->m_renderObjects.Begin();
     const unsigned long& textureIndex = glGetTextureManager()->GetTextureIndex(texture);
 
     for (; iterator.hasNext(); iterator.next())
     {
         DrawableObject* pObject = (DrawableObject*)*iterator;
-        if (pObject->m_uRenderLayer == 0x10002)
+        if (pObject->m_uObjectType == 0x10002)
         {
             glModel* pGlModel = pObject->GetModel();
             for (glModelPacket* pPacket = pGlModel->packets;

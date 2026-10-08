@@ -182,9 +182,9 @@ void FEPageControls::InitializeButtons()
     typedef Detail::MemFunImpl<void, void (FEPageControls::*)(int, void*)> PointerMethod;
     typedef BindExp3<void, PointerMethod, FEPageControls*, Placeholder<0>, Placeholder<1> > PointerBinding;
 
-    FEPointerListener::Callback callback0(PointerBinding(MemFun(&FEPageControls::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback1(PointerBinding(MemFun(&FEPageControls::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
-    FEPointerListener::Callback callback2(PointerBinding(MemFun(&FEPageControls::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback enterCallback(PointerBinding(MemFun(&FEPageControls::OnPointerEnter), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback leaveCallback(PointerBinding(MemFun(&FEPageControls::OnPointerLeave), this, Placeholder<0>(), Placeholder<1>()));
+    FEPointerListener::Callback pressCallback(PointerBinding(MemFun(&FEPageControls::OnPointerPress), this, Placeholder<0>(), Placeholder<1>()));
     for (int i = 0; i < 2; ++i)
     {
         mButtonInstances[i]->SetActiveSlide("over", true, false);
@@ -193,9 +193,9 @@ void FEPageControls::InitializeButtons()
         mButtonInstances[i]->GetActiveSlide()->m_time = end;
         mButtons[i].SetInstanceBounds(mButtonInstances[i], true, 0.0f, 0.0f, 1.0f, 1.0f);
         mButtonInstances[i]->SetActiveSlide("off", true, false);
-        mButtons[i].SetPointerEnterCallback(callback0);
-        mButtons[i].SetPointerLeaveCallback(callback1);
-        mButtons[i].SetPointerPressCallback(callback2);
+        mButtons[i].SetPointerEnterCallback(enterCallback);
+        mButtons[i].SetPointerLeaveCallback(leaveCallback);
+        mButtons[i].SetPointerPressCallback(pressCallback);
         mButtons[i].mContext = (void*)i;
         mButtons[i].SetMaxY(20.0f + mButtons[i].GetMaxY());
         mButtons[i].SetMinY(mButtons[i].GetMinY() - 20.0f);

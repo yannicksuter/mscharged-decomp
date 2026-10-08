@@ -14,11 +14,7 @@ public:
     float GetTranslucency() const { return m_fTranslucency; }
 
     /* 0x70 */ unsigned long m_uObjectFlags;
-    union
-    {
-        /* 0x74 */ float m_fTranslucency;
-        /* 0x74 */ int mUnidentified074;
-    };
+    /* 0x74 */ float m_fTranslucency;
 }; // size: 0x78
 
 #endif // GAME_DRAWABLE_DRAWABLE_OBJ_H

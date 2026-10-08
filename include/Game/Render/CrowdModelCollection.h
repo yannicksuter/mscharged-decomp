@@ -48,8 +48,8 @@ public:
     /* 0x14 */ int mLoadIndex;
     /* 0x18 */ void* mTextureBundleData;
     /* 0x1C */ unsigned long mTextureBundleSize;
-    /* 0x20 */ void* mUnidentified020;
-    /* 0x24 */ u32 mUnidentified024;
+    /* 0x20 */ void* m_pad020;
+    /* 0x24 */ u32 m_pad24;
     /* 0x28 */ void* mAnimationData;
     /* 0x2C */ unsigned long mAnimationSize;
     /* 0x30 */ void* mModelData;
@@ -57,7 +57,7 @@ public:
     /* 0x38 */ void* mHierarchyData;
     /* 0x3C */ unsigned long mHierarchySize;
     /* 0x40 */ unsigned long mModelHash;
-    /* 0x44 */ u32 mUnidentified044;
+    /* 0x44 */ u32 m_pad044;
     /* 0x48 */ ImpostorModel** mModels;
     /* 0x4C */ cInventory<cSAnim>** mAnimationInventories;
 }; // size: 0x50

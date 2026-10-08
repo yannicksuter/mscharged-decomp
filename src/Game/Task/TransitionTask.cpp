@@ -19,7 +19,7 @@
 #include "Game/Render/Wiper.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlTask.h"
 #include "types.h"
 #include "Game/Render/Presentation.h"
@@ -47,7 +47,7 @@ static inline void ClearCharacterEffectsTexturing()
     pGame = g_pGame;
     if (pGame != NULL)
     {
-        pGame->mUnidentified49C.mResetEffectsEvent.Deliver();
+        pGame->mEventQueue.mResetEffectsEvent.Deliver();
         DrawableCharacter::RenderAllCharacters();
     }
 }
@@ -85,7 +85,7 @@ void TransitionTask::StateTransition(u32 from, u32 to)
 
     if (BasicStadium::GetCurrentStadium() != NULL)
     {
-        if (to == 0x10 && GetPresentation()->mUnidentified164)
+        if (to == 0x10 && GetPresentation()->mNisStadiumEffectsEnabled)
         {
             BasicStadium::GetCurrentStadium()->SetEffectsActive(0x37, 1);
         }

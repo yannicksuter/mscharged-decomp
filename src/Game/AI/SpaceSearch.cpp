@@ -14,7 +14,7 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Field.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 // Not retained in R4QE01: the derived constructors inline this and the linker
 // strips the out-of-line copy.
@@ -235,7 +235,7 @@ void SSearchOpenLane::InitializeForPass(
 
     if (pBallOwner != NULL)
     {
-        m_v3OtherPos = pBallOwner->mUnidentified024.m_v3Position;
+        m_v3OtherPos = pBallOwner->m_DetChar.m_v3Position;
     }
     else
     {
@@ -264,11 +264,11 @@ float SSearchOpenLane::EvaluatePosition(const nlVector3& position,
     float fOpenToPosition;
     if (m_bOtherPosIsTarget)
     {
-        fOpenToPosition = fn_800DAFCC(position, m_v3OtherPos, m_pBallOwner, m_pPassTarget, 0.5f, 1.0f, 1.0f, 0.0f);
+        fOpenToPosition = LaneOpenness(position, m_v3OtherPos, m_pBallOwner, m_pPassTarget, 0.5f, 1.0f, 1.0f, 0.0f);
     }
     else
     {
-        fOpenToPosition = fn_800DAFCC(m_v3OtherPos, position, m_pBallOwner, m_pPassTarget, 0.5f, 1.0f, 1.0f, 0.0f);
+        fOpenToPosition = LaneOpenness(m_v3OtherPos, position, m_pBallOwner, m_pPassTarget, 0.5f, 1.0f, 1.0f, 0.0f);
     }
 
     fWeightedSum += NormalizeVal(fOpenToPosition, 0.0f, 0.8f);
@@ -283,7 +283,7 @@ float SSearchOpenLane::EvaluatePosition(const nlVector3& position,
             0.0f);
         fTotalWeight += 1.0f;
 
-        const nlVector3& v3Ball = g_pBall->UnidentifiedHasPassTarget()
+        const nlVector3& v3Ball = g_pBall->HasPassTarget()
                                     ? g_pBall->m_v3PassIntercept
                                     : g_pBall->m_v3Position;
         nlVector2 v2Delta = { position.x - v3Ball.x, position.y - v3Ball.y };
@@ -459,7 +459,7 @@ float SSearchIdealShot::EvaluatePosition(const nlVector3& position,
     float fWeightedSum = 0.0f;
     float fTotalWeight = 0.0f;
 
-    float fOpenToPosition = fn_800DAFCC(position,
+    float fOpenToPosition = LaneOpenness(position,
         m_SSearchOpenLane.m_pBallOwner->GetAIOffNetLocation(NULL),
         m_SSearchOpenLane.m_pBallOwner,
         NULL,
@@ -482,8 +482,8 @@ float SSearchIdealShot::EvaluatePosition(const nlVector3& position,
                   * PositionIsInFrontOfNet(position, m_pGoalie->m_pTeam->m_pNet);
     fTotalWeight += 0.5f;
 
-    float fNearToGoalie = fn_800DCB4C(
-        &position, &m_pGoalie->mUnidentified024.m_v3Position);
+    float fNearToGoalie = NearToGoaliePosition(
+        &position, &m_pGoalie->m_DetChar.m_v3Position);
     fWeightedSum += 1.0f - fNearToGoalie;
     fTotalWeight += 1.0f;
 
@@ -547,8 +547,8 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
 {
     nlVector3 v3ToPosition;
     nlVec3Set(v3ToPosition,
-        position.x - m_pPassTarget->mUnidentified024.m_v3Position.x,
-        position.y - m_pPassTarget->mUnidentified024.m_v3Position.y,
+        position.x - m_pPassTarget->m_DetChar.m_v3Position.x,
+        position.y - m_pPassTarget->m_DetChar.m_v3Position.y,
         0.0f);
     float fDistance = nlGetLength2D(v3ToPosition.x, v3ToPosition.y);
     if (fDistance > 0.0f)
@@ -561,7 +561,7 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
     if (pPassTarget->m_eClassType == FIELDER)
     {
         float fMaxSpeed = pPassTarget->GetRunningSpeed();
-        if (pPassTarget->mUnidentified024.m_fActualSpeed >= 1.0f)
+        if (pPassTarget->m_DetChar.m_fActualSpeed >= 1.0f)
         {
             float fTurn = InterpolateRangeClamped(0.0f, 1.0f, -0.95f, -0.5f, nlVec3DotProduct(v3ToPosition, m_v3PassDirection));
             fMaxSpeed = Interpolate(GetJogSpeed(pPassTarget->GetTweaks()),
@@ -591,14 +591,14 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
         return 0.0f;
     }
 
-    if (fn_800DCB4C(&position,
-            &m_pPassTarget->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position)
+    if (NearToGoaliePosition(&position,
+            &m_pPassTarget->m_pTeam->GetOtherTeam()->GetGoalie()->m_DetChar.m_v3Position)
         > 0.5f)
     {
         return 0.0f;
     }
 
-    float fInOffensiveZone = InOffensiveZone(m_pPassTarget->mUnidentified024.m_v3Position,
+    float fInOffensiveZone = InOffensiveZone(m_pPassTarget->m_DetChar.m_v3Position,
         (m_fNetDirection < 0.0f) ? HOME : AWAY);
     nlVector3 v3GoalLine = { 0.0f, 0.0f, 0.0f };
     v3GoalLine.x = cField::GetGoalLineX(-m_fNetDirection);
@@ -637,7 +637,7 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
             fTotalWeight += sfBestPassFormationWeight;
         }
 
-        if (m_pPassTarget->mUnidentified024.m_fActualSpeed >= 1.0f
+        if (m_pPassTarget->m_DetChar.m_fActualSpeed >= 1.0f
             && m_pPassTarget->m_eClassType == FIELDER)
         {
             nlVector3 v3Move;
@@ -649,7 +649,7 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
                 float fDot = FMAX(0.0f, nlVec3DotProduct(v3Move, m_v3PassDirection));
                 cFielder* pFielder = (cFielder*)m_pPassTarget;
                 float fRunDirection = fDot
-                                    * NormalizeVal(pFielder->mUnidentified024.m_fActualSpeed, 0.0f, pFielder->GetRunningSpeed());
+                                    * NormalizeVal(pFielder->m_DetChar.m_fActualSpeed, 0.0f, pFielder->GetRunningSpeed());
                 fWeightedSum += fRunDirection * sfBestPassRunDirectionWeight;
                 fTotalWeight += sfBestPassRunDirectionWeight;
             }
@@ -657,12 +657,12 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
 
         if (m_pBallOwner != NULL)
         {
-            const nlVector3& v3OwnerPosition = m_pBallOwner->mUnidentified024.m_v3Position;
+            const nlVector3& v3OwnerPosition = m_pBallOwner->m_DetChar.m_v3Position;
             cPlayer* pReceiver = m_pPassTarget;
             float fPrediction = FMIN(0.1f, fPassTime);
             if (!m_bAllowLeadPass)
             {
-                float fOpenLane = fn_800DAFCC(v3OwnerPosition, position, m_pBallOwner, pReceiver, 0.5f, 1.0f, 1.0f, fPrediction);
+                float fOpenLane = LaneOpenness(v3OwnerPosition, position, m_pBallOwner, pReceiver, 0.5f, 1.0f, 1.0f, fPrediction);
                 fWeightedSum += fOpenLane * sfBestPassLaneWeight;
                 fTotalWeight += sfBestPassLaneWeight;
                 // As in retail, the prediction time is passed as the incapacitated
@@ -688,8 +688,8 @@ float SSearchBestPass::EvaluatePosition(const nlVector3& position,
             }
 
             nlVector2 v2FromOwner = {
-                position.x - m_pBallOwner->mUnidentified024.m_v3Position.x,
-                position.y - m_pBallOwner->mUnidentified024.m_v3Position.y,
+                position.x - m_pBallOwner->m_DetChar.m_v3Position.x,
+                position.y - m_pBallOwner->m_DetChar.m_v3Position.y,
             };
             float fOwnerDistance = nlSqrt(nlVec2LengthSquared(v2FromOwner), true);
             if (m_bIsPerfectPass)
@@ -745,8 +745,8 @@ float SSearchRunToNet::EvaluatePosition(const nlVector3& v3TestPosition,
     nlVector3 v3NetPosition = pBallOwner->GetAIOffNetLocation(NULL);
 
     nlVector2 v2OwnerToNet = {
-        pBallOwner->mUnidentified024.m_v3Position.x - v3NetPosition.x,
-        pBallOwner->mUnidentified024.m_v3Position.y - v3NetPosition.y,
+        pBallOwner->m_DetChar.m_v3Position.x - v3NetPosition.x,
+        pBallOwner->m_DetChar.m_v3Position.y - v3NetPosition.y,
     };
     if (nlVec2LengthSquared(v2OwnerToNet) < 100.0f)
     {
@@ -772,7 +772,7 @@ float SSearchRunToNet::EvaluatePosition(const nlVector3& v3TestPosition,
         fTotalSum += 0.5f * fOpenPos;
         fTotalWeight += 0.5f;
 
-        fn_800DAFCC(v3TestPosition, v3NetPosition, pBallOwner, NULL, 0.25f, 0.5f, 1.0f, 0.0f);
+        LaneOpenness(v3TestPosition, v3NetPosition, pBallOwner, NULL, 0.25f, 0.5f, 1.0f, 0.0f);
 
         nlVector3 v3FormationPos;
         pBallOwner->CalculateFormationPosition(v3FormationPos);
@@ -817,8 +817,8 @@ float SSearchCutAndBreak::EvaluatePosition(const nlVector3& v3TestPosition,
         v3TestPosition,
         g_pGame->m_pFuzzyTweaks->fNearNetConfidenceDistanceMin,
         g_pGame->m_pFuzzyTweaks->fNearNetConfidenceDistanceMax);
-    float fNearGoalie = fn_800DCB4C(&v3TestPosition,
-        &m_pPlayer->m_pTeam->GetOtherTeam()->GetGoalie()->mUnidentified024.m_v3Position);
+    float fNearGoalie = NearToGoaliePosition(&v3TestPosition,
+        &m_pPlayer->m_pTeam->GetOtherTeam()->GetGoalie()->m_DetChar.m_v3Position);
     fNearNet = FMAX(fNearNet, fNearGoalie);
     if (fNearNet > 0.5f)
     {

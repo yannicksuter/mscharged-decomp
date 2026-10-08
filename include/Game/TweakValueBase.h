@@ -19,17 +19,17 @@ public:
     // 1: owned value, 2: pointer binding, 3: folder name.
     virtual int GetStorageKind() = 0;
     // These three slots have no established semantic names.
-    virtual void UnidentifiedVirtual14(
+    virtual void GetFloatParameters(
         float* minimum, float* maximum, float* increment)
     {
         *minimum = 0.0f;
         *maximum = 0.0f;
         *increment = 0.0f;
     }
-    virtual void UnidentifiedVirtual18()
+    virtual void ReservedValueHook()
     {
     }
-    virtual void* UnidentifiedVirtual1C();
+    virtual void* ReservedValueQuery();
     virtual void* GetValueAddress() = 0;
     virtual void FormatValue(char* buffer, unsigned long size)
     {

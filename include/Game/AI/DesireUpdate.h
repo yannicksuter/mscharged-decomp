@@ -10,26 +10,26 @@ enum eDesireUpdateResult
     DESIRE_CHANGE = 3,
 };
 
-class UnidentifiedFuzzyVariantData : public FuzzyVariant
+class IndexedFuzzyVariant : public FuzzyVariant
 {
 public:
-    UnidentifiedFuzzyVariantData()
+    IndexedFuzzyVariant()
         : FuzzyVariant()
         , mIndex(-1)
     {
     }
 
-    UnidentifiedFuzzyVariantData(
+    IndexedFuzzyVariant(
         int index, FuzzyVariant value);
 
-    ~UnidentifiedFuzzyVariantData()
+    ~IndexedFuzzyVariant()
     {
     }
 
     static void operator delete(void* entry);
 
-    UnidentifiedFuzzyVariantData& operator=(
-        const UnidentifiedFuzzyVariantData& other)
+    IndexedFuzzyVariant& operator=(
+        const IndexedFuzzyVariant& other)
     {
         FuzzyVariant::operator=(other);
         mIndex = other.mIndex;
@@ -39,11 +39,11 @@ public:
     int mIndex;
 };
 
-class UnidentifiedVariantCollection
+class FuzzyVariantCollection
 {
 public:
-    UnidentifiedVariantCollection();
-    ~UnidentifiedVariantCollection();
+    FuzzyVariantCollection();
+    ~FuzzyVariantCollection();
 
     bool IsSet(int index) const;
     FuzzyVariant* Get(int index);
@@ -62,39 +62,39 @@ public:
         Set(index, FuzzyVariant(value));
     }
 
-    UnidentifiedVariantCollection& operator=(
-        const UnidentifiedVariantCollection& other);
+    FuzzyVariantCollection& operator=(
+        const FuzzyVariantCollection& other);
 
-    UnidentifiedFuzzyVariantData* mData[19];
+    IndexedFuzzyVariant* mData[19];
 };
 
-class UnidentifiedVariant_80054AB8 : public FuzzyVariant
+class DesireUpdate : public FuzzyVariant
 {
 public:
-    UnidentifiedVariant_80054AB8()
+    DesireUpdate()
         : FuzzyVariant()
         , ExtraData()
         , mTemporary(false)
     {
     }
 
-    UnidentifiedVariant_80054AB8(cPlayer* value)
+    DesireUpdate(cPlayer* value)
         : FuzzyVariant(value)
         , mTemporary(false)
     {
     }
 
     template <typename T>
-    UnidentifiedVariant_80054AB8(eVariantType type, T value)
+    DesireUpdate(eVariantType type, T value)
         : FuzzyVariant(type, value)
         , mTemporary(false)
     {
     }
 
-    UnidentifiedVariant_80054AB8(const UnidentifiedVariant_80054AB8& other,
+    DesireUpdate(const DesireUpdate& other,
         float fParam1 = -1.0f, float fParam2 = -1.0f);
     template <typename T>
-    UnidentifiedVariant_80054AB8(const T& value, float fParam1, float fParam2)
+    DesireUpdate(const T& value, float fParam1, float fParam2)
         : FuzzyVariant(value)
         , mTemporary(false)
     {
@@ -103,24 +103,24 @@ public:
         if (fParam2 > -1.0f)
             ExtraData.Set(6, fParam2);
     }
-    UnidentifiedVariant_80054AB8(UnidentifiedVariant_80054AB8* other);
+    DesireUpdate(DesireUpdate* other);
 
-    ~UnidentifiedVariant_80054AB8()
+    ~DesireUpdate()
     {
     }
 
     static void operator delete(void* entry);
 
-    UnidentifiedVariant_80054AB8& operator=(const UnidentifiedVariant_80054AB8& other);
+    DesireUpdate& operator=(const DesireUpdate& other);
 
-    UnidentifiedVariant_80054AB8& operator=(UnidentifiedVariant_80054AB8* other);
+    DesireUpdate& operator=(DesireUpdate* other);
 
     template <typename T>
-    UnidentifiedVariant_80054AB8& operator=(T input);
+    DesireUpdate& operator=(T input);
 
-    UnidentifiedVariant_80054AB8& SetDesireFinished();
+    DesireUpdate& SetDesireFinished();
 
-    UnidentifiedVariant_80054AB8& operator=(const FuzzyVariant& other)
+    DesireUpdate& operator=(const FuzzyVariant& other)
     {
         Variant value(other);
         Reset();
@@ -128,10 +128,10 @@ public:
         return *this;
     }
 
-    void SetParameter(int index, const Variant& value);
+    void SetParameter(int index, FuzzyVariant value);
 
     Variant* GetParameter(int index) { return ExtraData.Get(index); }
-    UnidentifiedVariantCollection* GetParameters() { return &ExtraData; }
+    FuzzyVariantCollection* GetParameters() { return &ExtraData; }
     bool IsParameterSet(int index) const { return ExtraData.IsSet(index); }
 
     int GetInt() const
@@ -147,15 +147,15 @@ public:
         return -1;
     }
 
-    float UnidentifiedGetFloat(int index)
+    float GetFloatParameter(int index)
     {
         if (ExtraData.IsSet(index))
             return ExtraData.Get(index)->mData.f;
         return 0.0f;
     }
 
-    UnidentifiedVariant_80054AB8* next;
-    UnidentifiedVariantCollection ExtraData;
+    DesireUpdate* next;
+    FuzzyVariantCollection ExtraData;
     bool mTemporary;
 };
 
@@ -170,30 +170,30 @@ public:
     void ClearQueuedActions(bool preserveSelected);
     void SetActionSelection(int actionSelection);
     void SetSelectionWeights(float* weights, int count);
-    UnidentifiedVariant_80054AB8* QueueAction(
-        UnidentifiedVariant_80054AB8* pNewAction);
-    UnidentifiedVariant_80054AB8* FindQueuedAction(
-        UnidentifiedVariant_80054AB8* pFind);
-    UnidentifiedVariant_80054AB8* SelectAction();
+    DesireUpdate* QueueAction(
+        DesireUpdate* pNewAction);
+    DesireUpdate* FindQueuedAction(
+        DesireUpdate* pFind);
+    DesireUpdate* SelectAction();
 
-    UnidentifiedVariant_80054AB8* m_pLastQueuedAction;
-    UnidentifiedVariant_80054AB8* m_pSelectedAction;
-    nlList<UnidentifiedVariant_80054AB8> m_lQueuedActions;
+    DesireUpdate* m_pLastQueuedAction;
+    DesireUpdate* m_pSelectedAction;
+    nlList<DesireUpdate> m_lQueuedActions;
     int mActionSelection;
     float* m_pSelectionWeights;
     int mNumSelectionWeights;
 };
 
-extern UnidentifiedVariant_80054AB8 lbl_80584250;
+extern DesireUpdate lbl_80584250;
 
-extern SlotPool<UnidentifiedFuzzyVariantData> lbl_80584200;
+extern SlotPool<IndexedFuzzyVariant> lbl_80584200;
 extern SlotPool<ScriptActionQueue> g_ScriptActionQueuePool;
-extern SlotPool<UnidentifiedVariant_80054AB8> lbl_805842C8;
+extern SlotPool<DesireUpdate> lbl_805842C8;
 
 #include "Game/AI/FuzzyRuntimeCall_fwd.h"
 
-inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
-    const UnidentifiedVariant_80054AB8& other, float fParam1, float fParam2)
+inline DesireUpdate::DesireUpdate(
+    const DesireUpdate& other, float fParam1, float fParam2)
     : FuzzyVariant((const FuzzyVariant&)other)
     , mTemporary(false)
 {
@@ -204,13 +204,13 @@ inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
         ExtraData.Set(6, fParam2);
 }
 
-inline void UnidentifiedFuzzyVariantData::operator delete(void* entry)
+inline void IndexedFuzzyVariant::operator delete(void* entry)
 {
-    lbl_80584200.DeleteEntry((UnidentifiedFuzzyVariantData*)entry);
+    lbl_80584200.DeleteEntry((IndexedFuzzyVariant*)entry);
 }
 
-inline UnidentifiedVariantCollection& UnidentifiedVariantCollection::operator=(
-    const UnidentifiedVariantCollection& other)
+inline FuzzyVariantCollection& FuzzyVariantCollection::operator=(
+    const FuzzyVariantCollection& other)
 {
     for (int i = 0; i < 19; i++)
     {
@@ -219,7 +219,7 @@ inline UnidentifiedVariantCollection& UnidentifiedVariantCollection::operator=(
             if (mData[i] == 0)
             {
                 mData[i] = new (lbl_80584200.Allocate())
-                    UnidentifiedFuzzyVariantData(
+                    IndexedFuzzyVariant(
                         i, (const FuzzyVariant&)*other.mData[i]);
             }
             else
@@ -235,9 +235,9 @@ inline UnidentifiedVariantCollection& UnidentifiedVariantCollection::operator=(
     return *this;
 }
 
-inline void UnidentifiedVariant_80054AB8::operator delete(void* entry)
+inline void DesireUpdate::operator delete(void* entry)
 {
-    lbl_805842C8.DeleteEntry((UnidentifiedVariant_80054AB8*)entry);
+    lbl_805842C8.DeleteEntry((DesireUpdate*)entry);
 }
 
 inline void ScriptActionQueue::operator delete(void* entry)
@@ -245,8 +245,8 @@ inline void ScriptActionQueue::operator delete(void* entry)
     g_ScriptActionQueuePool.DeleteEntry((ScriptActionQueue*)entry);
 }
 
-inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
-    UnidentifiedVariant_80054AB8* other)
+inline DesireUpdate::DesireUpdate(
+    DesireUpdate* other)
     : FuzzyVariant((const FuzzyVariant&)*other)
 {
     ExtraData = other->ExtraData;
@@ -258,8 +258,8 @@ inline UnidentifiedVariant_80054AB8::UnidentifiedVariant_80054AB8(
     }
 }
 
-inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
-    const UnidentifiedVariant_80054AB8& other)
+inline DesireUpdate& DesireUpdate::operator=(
+    const DesireUpdate& other)
 {
     {
         FuzzyVariant base((const FuzzyVariant&)other);
@@ -271,8 +271,8 @@ inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
     return *this;
 }
 
-inline UnidentifiedVariant_80054AB8& UnidentifiedVariant_80054AB8::operator=(
-    UnidentifiedVariant_80054AB8* other)
+inline DesireUpdate& DesireUpdate::operator=(
+    DesireUpdate* other)
 {
     FuzzyVariant::operator=(*other);
     ExtraData = other->ExtraData;

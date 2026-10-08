@@ -5,7 +5,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "NL/nlChunk.h"
 #include "NL/gl/glState.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 unsigned int gEffectsRandomSeed = 0x9184EB0C;
 

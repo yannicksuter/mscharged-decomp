@@ -155,10 +155,10 @@ inline void FloatCompressor<MIN, MAX, BITS>::ReplayInterval(SaveFrame& frame) co
     Apply(frame, value);
 }
 
-class UnidentifiedQuaternionCompressor
+class QuaternionCompressor
 {
 public:
-    UnidentifiedQuaternionCompressor(nlQuaternion& q)
+    QuaternionCompressor(nlQuaternion& q)
         : mQ(q)
     {
     }

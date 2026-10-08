@@ -7,7 +7,7 @@
 #include "Game/EventRegistry.h"
 #include "Game/MathHelpers.h"
 #include "Game/ReplayManager.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/WorldTriggers.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlMath.h"
@@ -32,9 +32,9 @@ cFielder* gFlyingCameraTarget;
 u16 gFlyingCameraAngle;
 float gTimeUntilNextFlyingCameraFlash;
 unsigned int gFlyingCameraFlashesRemaining;
-UnidentifiedOwnerConnection gPeachCameraFlashConnection;
-UnidentifiedOwnerConnection gResetEffectsConnection;
-UnidentifiedOwnerConnection gMegaStrikeMeterEndConnection;
+GlobalEventConnectionOwner gPeachCameraFlashConnection;
+GlobalEventConnectionOwner gResetEffectsConnection;
+GlobalEventConnectionOwner gMegaStrikeMeterEndConnection;
 FlyingCamera gFlyingCameraStorage[10];
 nlArrayAllocator<FlyingCamera> gFlyingCameraAllocator(gFlyingCameraStorage, 10);
 
@@ -167,7 +167,7 @@ void UpdateFlyingCameras(float dt)
     else
     {
         shouldReset = false;
-        targetPosition = gFlyingCameraTarget->mUnidentified024.m_v3Position;
+        targetPosition = gFlyingCameraTarget->m_DetChar.m_v3Position;
         gFlyingCameraTargetPosition = targetPosition;
 
         if (gNextFlyingCameraFlashIndex < gFlyingCameraCount)
@@ -285,8 +285,8 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
 
     if (fielder != 0)
     {
-        initialPosition.x = fielder->mUnidentified024.m_v3Position.x;
-        initialPosition.y = fielder->mUnidentified024.m_v3Position.y;
+        initialPosition.x = fielder->m_DetChar.m_v3Position.x;
+        initialPosition.y = fielder->m_DetChar.m_v3Position.y;
     }
 
     for (unsigned int i = 0; i < (unsigned int)count; ++i)
@@ -304,15 +304,15 @@ void SetFlyingCameraCount(int count, cFielder* fielder, float orbitRadius)
     {
         if (gPeachCameraFlashConnection.mOwner == 0)
         {
-            UnidentifiedFindEvent<void>(sPeachCameraFlashEventName, -1)->Add(Function<void*>(OnPeachCameraFlash), (unsigned int)&gPeachCameraFlashConnection, -1);
+            FindEvent<void>(sPeachCameraFlashEventName, -1)->Add(Function<void*>(OnPeachCameraFlash), (unsigned int)&gPeachCameraFlashConnection, -1);
         }
         if (gResetEffectsConnection.mOwner == 0)
         {
-            UnidentifiedFindEvent<void>(sResetEffectsEventName, -1)->Add(Function<void*>(OnResetFlyingCameras), (unsigned int)&gResetEffectsConnection, -1);
+            FindEvent<void>(sResetEffectsEventName, -1)->Add(Function<void*>(OnResetFlyingCameras), (unsigned int)&gResetEffectsConnection, -1);
         }
         if (gMegaStrikeMeterEndConnection.mOwner == 0)
         {
-            UnidentifiedFindEvent<void>(sMegaStrikeMeterEndEventName, -1)->Add(Function<void*>(OnResetFlyingCameras), (unsigned int)&gMegaStrikeMeterEndConnection, -1);
+            FindEvent<void>(sMegaStrikeMeterEndEventName, -1)->Add(Function<void*>(OnResetFlyingCameras), (unsigned int)&gMegaStrikeMeterEndConnection, -1);
         }
     }
 }
@@ -327,7 +327,7 @@ void SetFlyingCameraTarget(cFielder* fielder)
     gFlyingCameraTarget = fielder;
     if (fielder != 0)
     {
-        gFlyingCameraTargetPosition = fielder->mUnidentified024.m_v3Position;
+        gFlyingCameraTargetPosition = fielder->m_DetChar.m_v3Position;
     }
 }
 

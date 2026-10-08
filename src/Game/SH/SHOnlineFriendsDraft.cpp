@@ -22,7 +22,6 @@
 #include "NL/nlLocalizationLookup.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
-#include "NL/nlstring_tmpl.h"
 
 SHOnlineFriendsDraft::SHOnlineFriendsDraft()
     : mIntroComplete(false)
@@ -207,10 +206,10 @@ void SHOnlineFriendsDraft::UpdateDisplay(int countdown)
 inline void SHOnlineFriendsDraft::ShowDisconnectedError()
 {
     g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) == (SceneList)10)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) == SCENE_POPUP_MENU)
         return;
     FEPopupMenu* menu = static_cast<FEPopupMenu*>(
-        GameSceneManager::Instance()->Push((SceneList)10, SCREEN_NOTHING, false));
+        GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
     menu->Create((ePopupMenu)0x60,
         Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsDraft::OnErrorDismissed), this)));
     mErrorPopupOpen = true;
@@ -242,5 +241,5 @@ void SHOnlineFriendsDraft::OnErrorDismissed()
 {
     mErrorPopupOpen = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
-    GameSceneManager::Instance()->Push((SceneList)40, SCREEN_BACK, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
 }

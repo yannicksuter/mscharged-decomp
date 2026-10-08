@@ -42,7 +42,7 @@ public:
     void CloseConnectionsAndReturn();
     void ShowError(int error);
 
-    /* 0x01C */ unsigned int mUnidentified01C;
+    /* 0x01C */ unsigned int mPadding01C;
     /* 0x020 */ int mPointerHoverCounts[4];
     /* 0x030 */ bool mInitialized;
     /* 0x031 */ bool mDecisionMade;

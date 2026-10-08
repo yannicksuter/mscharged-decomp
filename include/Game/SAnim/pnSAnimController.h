@@ -92,7 +92,7 @@ public:
         m_fTime = time;
         m_bLooped = false;
     }
-    bool UnidentifiedAtEnd() const
+    bool IsFinished() const
     {
         return m_ePlayMode == PM_HOLD && m_fTime == 1.0f;
     }

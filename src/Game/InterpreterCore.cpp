@@ -11,7 +11,7 @@
 
 #include <string.h>
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 struct InterpreterTweakStorage
 {

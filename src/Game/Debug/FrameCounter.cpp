@@ -2,7 +2,7 @@
 #include "Game/Debug/Histogram.h"
 #include "Game/GL/GLColourMeshWriter.h"
 #include "Game/Task/SmokeTestUpdateTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"
@@ -17,9 +17,8 @@
 #include "Game/Sys/tweak.h"
 
 #include <string.h>
-#include "NL/nlstring_tmpl.h"
 
-FrameCounter* lbl_806E1DC0;
+FrameCounter* g_pFrameCounter;
 
 int FrameCounter::NUM_FRAMES_TO_AVERAGE_OVER = 30;
 
@@ -44,7 +43,7 @@ nlListContainer<TimeRegion*> TimeRegion::sTimeRegionList;
 
 FrameCounter::FrameCounter(const char* first, const char* second)
 {
-    lbl_806E1DC0 = this;
+    g_pFrameCounter = this;
     m_FirstName = first;
     m_SecondName = second;
 

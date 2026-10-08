@@ -21,11 +21,11 @@
 FEBackButton::FEBackButton()
     : FEPointerButton((void*)0)
     , mBackScene(SCENE_INVALID)
-    , mUnidentifiedB8(0.0f)
+    , m_padB8(0.0f)
     , mButtonInstance(0)
     , mPressed(false)
-    , mUnidentifiedCD(false)
-    , mUnidentifiedCE(false)
+    , m_padCD(false)
+    , m_padCE(false)
     , mPushBackScene(true)
     , mPopScene(true)
     , mBoundsInitialized(false)
@@ -173,9 +173,9 @@ void FEBackButton::OnPointerLeave(int index, void* context)
 {
     if (!HasOtherPointerState(1, index))
     {
-        mUnidentifiedB8 = 0.0f;
+        m_padB8 = 0.0f;
         mButtonInstance->SetActiveSlide("off", true, false);
-        mUnidentifiedCE = false;
+        m_padCE = false;
     }
     SetPointerState(0, index);
     FEPointerButton::OnPointerLeave(index, context);

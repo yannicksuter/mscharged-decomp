@@ -10,7 +10,7 @@
 #include "NL/glx/glxGXColour.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 bool gScrollingSpecularEnabled = true;
 bool gScrollingSpecularHighlightsEnabled = true;

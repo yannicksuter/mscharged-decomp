@@ -803,4 +803,4 @@ void HUDPowerUpDisplay::Init(FEPresentation* presentation, HUDPowerUpTextures* t
     }
 }
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"

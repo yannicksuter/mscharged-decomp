@@ -5,7 +5,7 @@
 NetMessageAllInputs::NetMessageAllInputs()
 {
     mFlags = 0;
-    memset(mUnidentified3CC, 0, sizeof(mUnidentified3CC));
+    memset(mControl80Data, 0, sizeof(mControl80Data));
 }
 
 void NetMessageAllInputs::Serialize(
@@ -19,9 +19,9 @@ void NetMessageAllInputs::Serialize(
     }
     if (mFlags & 0x80)
     {
-        serializer->Transfer(&mUnidentified3CC[0], 4);
-        serializer->Transfer(&mUnidentified3CC[1], 4);
-        serializer->Transfer(&mUnidentified3CC[2], 4);
+        serializer->Transfer(&mControl80Data[0], 4);
+        serializer->Transfer(&mControl80Data[1], 4);
+        serializer->Transfer(&mControl80Data[2], 4);
     }
 }
 

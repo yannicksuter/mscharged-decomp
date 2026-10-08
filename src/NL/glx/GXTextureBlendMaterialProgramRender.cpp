@@ -5,7 +5,7 @@
 #include "NL/nlColour.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static inline GXColor MakeTextureBlendColour(float r, float g, float b, float a)
 {

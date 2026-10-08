@@ -9,7 +9,7 @@
 #include "NL/nlMath.h"
 #include "math.h"
 #include "Game/Render/KoopaShellObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Field.h"
 
 // Charged-only shadow prop, third of the run described beside

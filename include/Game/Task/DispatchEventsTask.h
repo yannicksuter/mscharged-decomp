@@ -83,15 +83,15 @@ public:
 // fully inlined code emit a function, only an object with a user-declared
 // empty destructor leaves nothing behind in its caller. That is the profile of
 // a debug facility whose body was compiled out of the release build, as with
-// UnidentifiedStaticStorage.
+// SharedStaticStorage.
 //
 // Still unidentified, hence the names: what the two types were, their real
 // spelling, and which function declared them. Any non-empty function compiled
 // before the constructor reproduces the layout; Reset() is where the unit
 // first operates on its dispatcher.
-struct UnidentifiedDispatcherHeaderScope
+struct DispatcherHeaderScope
 {
-    ~UnidentifiedDispatcherHeaderScope()
+    ~DispatcherHeaderScope()
     {
     }
 };

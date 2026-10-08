@@ -3,7 +3,7 @@
 #include "Game/TweakConfig.h"
 #include "types.h"
 #include "Game/TweakFileLoader.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.inl"
 
 FuzzyTweaks::FuzzyTweaks(const char* name, const char* category)

@@ -36,7 +36,7 @@
 #include "Game/Render/ShootToScoreMeter.h"
 #include "Game/RumbleActions.h"
 #include "Game/Sys/audio.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/TweakRegistry.h"
 #include "NL/nlLocalization.h"
@@ -245,7 +245,7 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
     {
         *(int*)&copy->mpBestBallInterceptor = mpBestBallInterceptor == NULL
             ? -1
-            : mpBestBallInterceptor->mUnidentified120;
+            : mpBestBallInterceptor->m_nCharacterIndex;
         cache->ChecksumData(gDetTeamDebugType, copy, context);
     }
 
@@ -259,11 +259,11 @@ inline void cTeam::WriteTeamStateLog(void* context, DebugWriteCache* cache)
     {
         data.m_nAIOrdFs[i] = m_pAIOrderedFielders[i] == NULL
             ? -1
-            : m_pAIOrderedFielders[i]->mUnidentified120;
+            : m_pAIOrderedFielders[i]->m_nCharacterIndex;
         data.BallIntOrdFs[i]
             = m_pBallInterceptOrderedFielders[i] == NULL
             ? -1
-            : m_pBallInterceptOrderedFielders[i]->mUnidentified120;
+            : m_pBallInterceptOrderedFielders[i]->m_nCharacterIndex;
     }
     data.m_nTeamPlayTransFunc
         = m_pAIContext->mScriptMachine->mTransition.mValue.mFuncHash;
@@ -305,7 +305,7 @@ cFielder* cTeam::GetRearMostFielder()
     {
         pFielder = (cFielder*)m_pPlayers[i_fielder];
         if ((pRearMostFielder == NULL)
-            || (pFielder->mUnidentified1E4.m_v3AIPosition.x < pRearMostFielder->mUnidentified1E4.m_v3AIPosition.x))
+            || (pFielder->m_DetPlayer.m_v3AIPosition.x < pRearMostFielder->m_DetPlayer.m_v3AIPosition.x))
         {
             pRearMostFielder = pFielder;
         }
@@ -326,7 +326,7 @@ cFielder* cTeam::GetFrontMostFielder()
     {
         pFielder = (cFielder*)m_pPlayers[i_fielder];
         if ((pFrontMostFielder == NULL)
-            || (pFielder->mUnidentified1E4.m_v3AIPosition.x > pFrontMostFielder->mUnidentified1E4.m_v3AIPosition.x))
+            || (pFielder->m_DetPlayer.m_v3AIPosition.x > pFrontMostFielder->m_DetPlayer.m_v3AIPosition.x))
         {
             pFrontMostFielder = pFielder;
         }
@@ -369,59 +369,59 @@ void cTeam::AssignMarks(bool bForceReMark)
         return;
     }
 
-    cFielder* pUnidentifiedFielder =
+    cFielder* pSBC =
         (cFielder*)fn_800DF790(GetOtherTeam());
     float fDownfield;
     float fScore;
-    cFielder* pUnidentifiedBestFielder = NULL;
-    float fUnidentifiedBestScore = 0.0f;
+    cFielder* pBestFielder = NULL;
+    float fBestScore = 0.0f;
 
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
         pMyFielder->ClearMarks();
-        bool bUnidentified = pMyFielder->IsInFallAction()
+        bool bUnavailable = pMyFielder->IsInFallAction()
                           || pMyFielder->IsShattered()
                           || Incapacitated(pMyFielder);
-        if (!bUnidentified)
+        if (!bUnavailable)
         {
             fDownfield = NearTo(
-                pMyFielder, pUnidentifiedFielder);
+                pMyFielder, pSBC);
             float fInBetween =
-                InBetweenMyNetAnd(pMyFielder, pUnidentifiedFielder);
+                InBetweenMyNetAnd(pMyFielder, pSBC);
             fScore = WeightedScore2(
                 fInBetween, 0.4f, fDownfield, 0.6f);
-            if (fScore > fUnidentifiedBestScore)
+            if (fScore > fBestScore)
             {
-                fUnidentifiedBestScore = fScore;
-                pUnidentifiedBestFielder = pMyFielder;
+                fBestScore = fScore;
+                pBestFielder = pMyFielder;
             }
         }
     }
 
-    if (pUnidentifiedBestFielder != NULL
-        && pUnidentifiedFielder != NULL)
+    if (pBestFielder != NULL
+        && pSBC != NULL)
     {
-        pUnidentifiedBestFielder->AddMark(pUnidentifiedFielder);
+        pBestFielder->AddMark(pSBC);
     }
 
     float fFielderMarkScores[4][4];
     for (int i_fielder = 0; i_fielder < 4; i_fielder++)
     {
         pMyFielder = GetFielder(i_fielder);
-        bool bUnidentifiedMyFielder = pMyFielder->IsInFallAction()
+        bool bMyFielderDown = pMyFielder->IsInFallAction()
                                    || pMyFielder->IsShattered();
 
-        nlVector3 v3UnidentifiedPosition;
-        pMyFielder->CalculateFormationPosition(v3UnidentifiedPosition);
+        nlVector3 v3FormationPosition;
+        pMyFielder->CalculateFormationPosition(v3FormationPosition);
 
         for (int i_otherf = 0; i_otherf < 4; i_otherf++)
         {
             pOppFielder = GetOtherTeam()->GetFielder(i_otherf);
-            bool bUnidentifiedOppFielder = pOppFielder->IsInFallAction()
+            bool bOppFielderDown = pOppFielder->IsInFallAction()
                                         || pOppFielder->IsShattered();
 
-            if (bUnidentifiedMyFielder && !bUnidentifiedOppFielder)
+            if (bMyFielderDown && !bOppFielderDown)
             {
                 fFielderMarkScores[i_fielder][i_otherf] = 200.0f;
             }
@@ -429,12 +429,12 @@ void cTeam::AssignMarks(bool bForceReMark)
             {
                 fFielderMarkScores[i_fielder][i_otherf] = 0.5f
                     * nlSqrt(nlVec3DistanceSquared2D(
-                        pOppFielder->mUnidentified024.m_v3Position,
-                        v3UnidentifiedPosition), true);
+                        pOppFielder->m_DetChar.m_v3Position,
+                        v3FormationPosition), true);
                 fFielderMarkScores[i_fielder][i_otherf] += 0.5f
                     * nlSqrt(nlVec3DistanceSquared2D(
-                        pOppFielder->mUnidentified024.m_v3Position,
-                        pMyFielder->mUnidentified024.m_v3Position), true);
+                        pOppFielder->m_DetChar.m_v3Position,
+                        pMyFielder->m_DetChar.m_v3Position), true);
             }
         }
     }
@@ -577,16 +577,16 @@ void cTeam::UpdateShotScore()
     }
     else
     {
-        bool bUnidentified = false;
+        bool bHasPassTarget = false;
         if (g_pBall->meBallState == 5
             || g_pBall->meBallState == 3)
         {
             if (g_pBall->m_pPassTarget != NULL)
             {
-                bUnidentified = true;
+                bHasPassTarget = true;
             }
         }
-        if (bUnidentified
+        if (bHasPassTarget
             && g_pBall->GetPassTargetFielder() != NULL)
         {
             cPlayer* pCaptain = m_pPlayers[0];
@@ -661,8 +661,8 @@ int CompareFieldersByTeamRelativeX(const void* a, const void* b)
     cFielder* p1 = *(cFielder**)a;
     cFielder* p2 = *(cFielder**)b;
 
-    float fPosition1 = p1->mUnidentified024.m_v3Position.x;
-    float fPosition2 = p2->mUnidentified024.m_v3Position.x;
+    float fPosition1 = p1->m_DetChar.m_v3Position.x;
+    float fPosition2 = p2->m_DetChar.m_v3Position.x;
     if (p1->m_pTeam->m_nSide == AWAY)
     {
         fPosition1 = -fPosition1;
@@ -694,7 +694,7 @@ void cTeam::CalculateNewBallInterceptTimes()
         pPlayer = GetPlayer(i);
         float interceptTime = -1.0f;
         float speed = ((cFielder*)pPlayer)->GetRunningSpeed();
-        float radius = pPlayer->mUnidentified320->GetRadius();
+        float radius = pPlayer->m_pAvoidableObject->GetRadius();
 
         if (Incapacitated(pPlayer))
         {
@@ -735,9 +735,9 @@ void cTeam::CalculateNewBallInterceptTimes()
                 {
                     nlVector2 v2Delta = {
                         v3PredictedLandingSpot.x
-                            - pPlayer->mUnidentified024.m_v3Position.x,
+                            - pPlayer->m_DetChar.m_v3Position.x,
                         v3PredictedLandingSpot.y
-                            - pPlayer->mUnidentified024.m_v3Position.y,
+                            - pPlayer->m_DetChar.m_v3Position.y,
                     };
                     float fDistance
                         = nlSqrt(nlVec2LengthSquared(v2Delta), true)
@@ -754,7 +754,7 @@ void cTeam::CalculateNewBallInterceptTimes()
                 nNumSolutions = 0;
                 pBallPosition = &g_pBall->m_v3Position;
                 nlVector3* pAIVelocity = g_pBall->GetAIVelocity();
-                CalcInterceptXY(pPlayer->mUnidentified024.m_v3Position,
+                CalcInterceptXY(pPlayer->m_DetChar.m_v3Position,
                     speed, radius, *pBallPosition, *pAIVelocity,
                     nNumSolutions, pSolutions);
 
@@ -778,15 +778,15 @@ void cTeam::CalculateNewBallInterceptTimes()
                 }
                 else
                 {
-                    if (g_pBall->UnidentifiedHasPassTarget())
+                    if (g_pBall->HasPassTarget())
                     {
                         mvBallInterceptPosition[i]
                             = g_pBall->m_v3PassIntercept;
                         nlVector2 v2Delta = {
                             mvBallInterceptPosition[i].x
-                                - pPlayer->mUnidentified024.m_v3Position.x,
+                                - pPlayer->m_DetChar.m_v3Position.x,
                             mvBallInterceptPosition[i].y
-                                - pPlayer->mUnidentified024.m_v3Position.y,
+                                - pPlayer->m_DetChar.m_v3Position.y,
                         };
                         float fDistance
                             = nlSqrt(nlVec2LengthSquared(v2Delta), true)
@@ -800,9 +800,9 @@ void cTeam::CalculateNewBallInterceptTimes()
                         mvBallInterceptPosition[i] = g_pBall->m_v3Position;
                         nlVector2 v2Delta = {
                             mvBallInterceptPosition[i].x
-                                - pPlayer->mUnidentified024.m_v3Position.x,
+                                - pPlayer->m_DetChar.m_v3Position.x,
                             mvBallInterceptPosition[i].y
-                                - pPlayer->mUnidentified024.m_v3Position.y,
+                                - pPlayer->m_DetChar.m_v3Position.y,
                         };
                         float fDistance
                             = nlSqrt(nlVec2LengthSquared(v2Delta), true)
@@ -907,7 +907,7 @@ void cTeam::ResetCharacters()
     {
         cFielder* pFielder = GetFielder(i);
         pFielder->m_Dirt = 0.0f;
-        pFielder->mUnidentified16C = 0;
+        pFielder->m_nDamageType = 0;
         pFielder->m_MinDirt = 0.0f;
 
         if (i == 0 && GetNumAssignedControllers() > 1)
@@ -1185,7 +1185,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 
     bool bPlayCaptainChant = false;
     cFielder* pCaptain = (cFielder*)pTeam->m_pPlayers[0];
-    int nCaptainPowerup = pCaptain->mUnidentified11C->unknown_0x14;
+    int nCaptainPowerup = pCaptain->m_pCharacterInfo->unknown_0x14;
     bool bCaptainPowerupActive
         = pTeam->m_ePowerupList[0].eType == nCaptainPowerup;
     bCaptainPowerupActive
@@ -1230,7 +1230,7 @@ void UpdateTeamCaptainChant(cTeam* pTeam)
 unsigned long GetTeamCaptainChantCue(cTeam* pTeam)
 {
     unsigned long result = 0;
-    switch (pTeam->m_pPlayers[0]->mUnidentified11C->unknown_0x14)
+    switch (pTeam->m_pPlayers[0]->m_pCharacterInfo->unknown_0x14)
     {
     case 9:
         result = 0xF1B432C3;
@@ -1619,7 +1619,7 @@ PowerUpTeamType cTeam::GetCurrentPowerUp() const
 bool cTeam::fn_800A6764() const
 {
     cFielder* pCaptain = (cFielder*)m_pPlayers[0];
-    int nCaptainPowerup = pCaptain->mUnidentified11C->unknown_0x14;
+    int nCaptainPowerup = pCaptain->m_pCharacterInfo->unknown_0x14;
     bool bCaptainPowerupActive
         = m_ePowerupList[0].eType == nCaptainPowerup;
     bCaptainPowerupActive
@@ -1634,7 +1634,7 @@ bool cTeam::fn_800A6764() const
         bCaptainPowerupActive = true;
     }
 
-    if (pCaptain->mUnidentified024.m_eCharacterClass == (eCharacterClass)5
+    if (pCaptain->m_DetChar.m_eCharacterClass == (eCharacterClass)5
         && gPeachPhotoState.state == 1)
     {
         bCaptainPowerupActive = true;
@@ -1721,7 +1721,7 @@ void cTeam::ClearCurrentPowerUp()
 {
     m_ePowerupList[0].eType = POWER_UP_NONE;
     m_ePowerupList[0].nnumOfPowerups = 0;
-    mtToggleTimer.UnidentifiedClear();
+    mtToggleTimer.Clear();
 
     for (int i = 0; i < 2; i++)
     {
@@ -1865,11 +1865,11 @@ void cTeam::Reset()
     mfAttackIndicatorProgress = 0.0f;
     mfShotScore = 0.0f;
 
-    mtTeamStyleTimer.UnidentifiedClear();
-    mtMarkTimer.UnidentifiedClear();
-    mtRoleTimer.UnidentifiedClear();
-    mtToggleTimer.UnidentifiedClear();
-    mtDefensiveZoneTimer.UnidentifiedClear();
+    mtTeamStyleTimer.Clear();
+    mtMarkTimer.Clear();
+    mtRoleTimer.Clear();
+    mtToggleTimer.Clear();
+    mtDefensiveZoneTimer.Clear();
 
     for (int i = 0; i < 4; i++)
     {
@@ -1897,11 +1897,11 @@ cTeam::cTeam(int nSide)
     mfAttackIndicatorProgress = 0.0f;
     mfShotScore = 0.0f;
 
-    mtTeamStyleTimer.UnidentifiedClear();
-    mtMarkTimer.UnidentifiedClear();
-    mtRoleTimer.UnidentifiedClear();
-    mtToggleTimer.UnidentifiedClear();
-    mtDefensiveZoneTimer.UnidentifiedClear();
+    mtTeamStyleTimer.Clear();
+    mtMarkTimer.Clear();
+    mtRoleTimer.Clear();
+    mtToggleTimer.Clear();
+    mtDefensiveZoneTimer.Clear();
 
     for (int i = 0; i < 4; i++)
     {
@@ -1921,7 +1921,7 @@ cTeam::cTeam(int nSide)
         m_pBallInterceptOrderedFielders[i] = NULL;
         m_pFieldersByTeamRelativeX[i] = NULL;
     }
-    mUnidentified0F4 = 0;
+    m_nCurrentPowerUp = 0;
 
     m_pNet = new (8, false) cNet(nSide);
     m_pFormationManager = new (8, false) FormationManager(this);

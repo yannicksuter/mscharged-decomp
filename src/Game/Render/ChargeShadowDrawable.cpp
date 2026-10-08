@@ -9,7 +9,7 @@
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/Presentation.h"
 #include "Game/Render/RLViewLayers.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"
@@ -44,7 +44,7 @@ void ChargeShadowDrawable::Initialize(glModel* model, unsigned long hash)
     PlanarShadowDrawable::Initialize(model, hash);
 
     m_pModel = model;
-    m_uRenderLayer = 0x1000B;
+    m_uObjectType = 0x1000B;
     m_uObjectCreationFlags = 2;
     m_uHashID = hash;
     m_pAnimController = 0;

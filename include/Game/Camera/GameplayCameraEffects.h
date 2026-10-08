@@ -1,5 +1,5 @@
-#ifndef GAME_CAMERA_TU_800F9460_H
-#define GAME_CAMERA_TU_800F9460_H
+#ifndef GAME_CAMERA_GAMEPLAY_CAMERA_EFFECTS_H
+#define GAME_CAMERA_GAMEPLAY_CAMERA_EFFECTS_H
 
 #include "NL/nlMath.h"
 #include "NL/nlSingleton.h"
@@ -15,15 +15,15 @@ struct GoalieSaveData;
 struct PlayerAttackData;
 struct MegaStrikeMeterData;
 
-class UnidentifiedCameraEffects
-    : public nlSingleton<UnidentifiedCameraEffects>
+class GameplayCameraEffects
+    : public nlSingleton<GameplayCameraEffects>
 {
 public:
-    UnidentifiedCameraEffects();
+    GameplayCameraEffects();
 
     void RegisterEventListeners();
     void Update(float deltaTime);
-    void UnidentifiedNoOp();
+    void FixedUpdate();
     void Reset();
     void UpdateCameraFlags();
     bool AreFieldersClear() const;
@@ -81,4 +81,4 @@ public:
     /* 0x38 */ float mTransitionScale;
 }; // total size: 0x3C
 
-#endif // GAME_CAMERA_TU_800F9460_H
+#endif // GAME_CAMERA_GAMEPLAY_CAMERA_EFFECTS_H

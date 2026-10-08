@@ -65,7 +65,7 @@ SHMainMenu::~SHMainMenu()
 {
 }
 
-void UnidentifiedMainMenuEarlyUser(SHMainMenu* menu)
+void EmitMainMenuCallbackTemplates(SHMainMenu* menu)
 {
     FEPointerListener::Callback callback;
     menu->GetPresentation()->SetActiveSlide("MAIN", true);

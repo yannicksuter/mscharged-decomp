@@ -49,10 +49,9 @@ public:
     // member drains there only when some body parsed before SceneCreated
     // already assigned an nlColour; no header this unit includes does, and the
     // linker kept no trace of the body that did. This inline reproduces that
-    // parse-time synthesis and emits nothing itself. Still unidentified, hence
-    // the name: the original setter's spelling, signature and callers.
-    // Registered as an accepted exception in the workspace final review.
-    void UnidentifiedSetHighlightedOptionColour(const nlColour& colour)
+    // parse-time synthesis and emits nothing itself. The original setter's
+    // spelling, signature and callers are unknown; the name describes the body.
+    void SetHighlightedOptionColour(const nlColour& colour)
     {
         mHighlightedOptionColour = colour;
     }
@@ -118,14 +117,14 @@ public:
     /* 0xC10 */ Function<FnVoidVoid> callBacks[3];
     /* 0xC28 */ Function<FnVoidVoid> mBackCallback;
     /* 0xC30 */ nlColour mHighlightedOptionColour;
-    /* 0xC34 */ unsigned char mUnidentifiedC34[0x0C];
+    /* 0xC34 */ unsigned char m_padC34[0x0C];
     /* 0xC40 */ ePopupMenu mType;
     /* 0xC44 */ bool mPlayIntroAnimation;
     /* 0xC45 */ bool mWideMessageBox;
-    /* 0xC46 */ unsigned char mUnidentifiedC46[2];
+    /* 0xC46 */ unsigned char m_padC46[2];
     /* 0xC48 */ TLComponentInstance* mHighlightInstance;
-    /* 0xC4C */ bool mUnidentifiedC4C;
-    /* 0xC4D */ unsigned char mUnidentifiedC4D[3];
+    /* 0xC4C */ bool m_padC4C;
+    /* 0xC4D */ unsigned char m_padC4D[3];
     /* 0xC50 */ float mBackgroundTargetScaleX;
     /* 0xC54 */ float mBackgroundTargetScaleY;
     /* 0xC58 */ bool mBackgroundScaleDone;

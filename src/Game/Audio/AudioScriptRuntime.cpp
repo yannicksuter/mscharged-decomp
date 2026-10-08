@@ -55,7 +55,7 @@ static inline void AddInstanceBinding(AudioScriptRuntime* script,
     sBindingNodes.Allocate(entry);
     entry->mBinding = binding;
     bool added;
-    AudioBindingNode** head = script->mInstanceBindings.UnidentifiedAddOrGet(instance, added);
+    AudioBindingNode** head = script->mInstanceBindings.AddOrGet(instance, added);
     if (added)
         *head = 0;
     nlDLRingAddEnd(head, entry);
@@ -65,7 +65,7 @@ static inline void AddSoundBinding(AudioScriptRuntime* script,
     u32 instance, u32 key)
 {
     bool added;
-    AudioEffectBinding* binding = script->mBindings.UnidentifiedAddOrGet(key, added);
+    AudioEffectBinding* binding = script->mBindings.AddOrGet(key, added);
     if (added)
         binding->OnBindingCreated(key);
     binding->OnSoundStarted(instance);

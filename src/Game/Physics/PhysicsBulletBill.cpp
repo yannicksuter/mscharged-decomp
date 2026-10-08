@@ -18,13 +18,13 @@
 #include "NL/nlSlotPool.h"
 
 #include <math.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 PhysicsBulletBill::PhysicsBulletBill(
     BulletBillObject* bulletBill, float radius, float)
     : PhysicsSphere(g_CollisionSpace, 0, radius)
-    , mUnidentified38(0)
+    , mPadding38(0)
     , mBulletBill(bulletBill)
 {
     SetCollide(0x62);

@@ -38,7 +38,7 @@
 #include "Game/Render/WorldNPC.h"
 #include "Game/ReplayManager.h"
 #include "Game/Task/FixedUpdateTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw2.h"
@@ -101,7 +101,7 @@ static void WarbleTest(float fDeltaT)
         WarbleConfiguration config;
         nlZeroMemory(&config, sizeof(config));
         config.view = GetLayerView(eCLV_Unshadowed);
-        config.position = g_pCharacters[0]->mUnidentified024.m_v3Position;
+        config.position = g_pCharacters[0]->m_DetChar.m_v3Position;
         config.position.z = (1.0f / 128.0f)
             + BasicStadium::GetCurrentStadium()->m_shadowHeight;
         config.blobScale = g_fWarbleBlobScale;

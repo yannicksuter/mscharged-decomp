@@ -8,7 +8,7 @@ inline EventBase::~EventBase()
 }
 
 template <typename ReturnType>
-inline UnidentifiedTypedEvent0<ReturnType>::~UnidentifiedTypedEvent0()
+inline TypedEvent0<ReturnType>::~TypedEvent0()
 {
 }
 

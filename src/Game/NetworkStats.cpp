@@ -13,7 +13,7 @@
 #include "Game/NetworkStatsManager.h"
 #include "Game/Sys/simpleparser.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
@@ -156,7 +156,7 @@ bool NetworkStatsReporter::SubmitScore(
     return false;
 }
 
-bool NetworkStatsReporter::StatsVirtual0C()
+bool NetworkStatsReporter::ReservedStatsQuery()
 {
     return false;
 }
@@ -559,7 +559,7 @@ bool NetworkRanking::SubmitScore(int category,
     return false;
 }
 
-bool NetworkRanking::StatsVirtual0C()
+bool NetworkRanking::ReservedStatsQuery()
 {
     return false;
 }

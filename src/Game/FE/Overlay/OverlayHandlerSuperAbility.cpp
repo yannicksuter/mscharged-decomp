@@ -1,6 +1,6 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/FE/Overlay/OverlayHandlerSuperAbility.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/FE/feInlineHasher.h"
 #include "Game/FE/feFinder_impl.h"

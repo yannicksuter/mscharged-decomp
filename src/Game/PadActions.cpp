@@ -8,7 +8,7 @@
 #include "Game/Event.h"
 #include "Game/PadMonkey.h"
 #include "Game/TweakRegistry.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "Game/TweakValueInt.h"
 #include "NL/globalpad.h"

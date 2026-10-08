@@ -27,7 +27,7 @@ FECharacterPDAComponent::FECharacterPDAComponent()
     , mCaptainAttributes(0)
     , mPositions(0)
     , mJoinPrompt(0)
-    , mUnidentified290(2)
+    , m_pad290(2)
     , mSelectedCaptain(-1)
     , mDisplayMode(-1)
 {
@@ -45,7 +45,7 @@ FECharacterPDAComponent::FECharacterPDAComponent()
     }
     mScrollText.SetEndBehavior(2);
     mScrollText.SetScrollMode(1);
-    mUnidentified2A8 = false;
+    m_pad2A8 = false;
 }
 
 FECharacterPDAComponent::~FECharacterPDAComponent()
@@ -66,7 +66,7 @@ void FECharacterPDAComponent::Initialize(TLComponentInstance* component, int sid
     static const char* sidekickAttributes[] = { "attribute_movement", "attribute_shooting", "attribute_passing", "attribute_defense" };
 
     mRootComponent = component;
-    mUnidentified24 = value;
+    m_pad24 = value;
     mSide = side;
     mPDAScreens = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mRootComponent->GetActiveSlide(), "pda_screens");
     mCaptainAttributes = (TLComponentInstance*)FEFinder<TLInstance, 4>::FindOrDefault(mPDAScreens->GetActiveSlide(), "attributes_captains");
@@ -214,12 +214,12 @@ void FECharacterPDAComponent::Update(float dt)
             mScrollBar.Initialize();
         }
     }
-    mUnidentified2A8 = false;
+    m_pad2A8 = false;
     for (int i = 0; i < 4; ++i)
     {
         if (mDisplayMode == 6 && mSide == 1 && i == gFEControllerIndex)
         {
-            mUnidentified2A8 = false;
+            m_pad2A8 = false;
             bool valid = true;
             FEPointerEvent event;
             event.mIndex = i;

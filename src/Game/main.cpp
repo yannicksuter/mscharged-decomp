@@ -102,7 +102,7 @@
 #include "NL/nlFileGC.h"
 #include <revolution/sc_fwd.h>
 #include <revolution/os/OSThread_fwd.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 class AudioUpdateTask : public nlTask
 {
@@ -150,9 +150,9 @@ static float sStandardUsedMiB;
 static float sSubsystemFreeMiB;
 static float sSubsystemUsedMiB;
 static float sSubsystemLargestFreeMiB;
-static float sUnidentifiedMemoryMetric0;
-static float sUnidentifiedMemoryMetric1;
-static float sUnidentifiedMemoryMetric2;
+static float sStandardM10MiB;
+static float sAudioM14MiB;
+static float sAudioM10MiB;
 int g_BuildNumber;
 
 FrameCounter g_FrameCounter("frame", "send");
@@ -288,9 +288,9 @@ void MemCheckTask::Run(float)
     sSubsystemFreeMiB = VirtualAllocator.m_14 / bytesPerMiB;
     sSubsystemUsedMiB = VirtualAllocator.m_10 / bytesPerMiB;
     sSubsystemLargestFreeMiB = StandardAllocator.m_14 / bytesPerMiB;
-    sUnidentifiedMemoryMetric0 = StandardAllocator.m_10 / bytesPerMiB;
-    sUnidentifiedMemoryMetric1 = audioAllocator->m_14 / bytesPerMiB;
-    sUnidentifiedMemoryMetric2 = audioAllocator->m_10 / bytesPerMiB;
+    sStandardM10MiB = StandardAllocator.m_10 / bytesPerMiB;
+    sAudioM14MiB = audioAllocator->m_14 / bytesPerMiB;
+    sAudioM10MiB = audioAllocator->m_10 / bytesPerMiB;
 
     if (nlTaskManager::m_pInstance->mCurrentState == 2 &&
         sPreviousTaskState == 2 && !g_bTweaking)
@@ -344,25 +344,25 @@ void ConfigureTweakerButtons(int)
     }
 
     const int classID = pad->mBackend->GetClassID();
-    const bool tweakerEnabled =
+    const bool justZButton =
         GetTweakBool("/user/Tweaker with just Z Button", false);
     const bool isWiiRemote =
         classID == gWiiRemotePadClassID || classID == gWiiFreestylePadClassID;
 
-    gTweakerButton_806DF2E0 = 9;
-    gTweakerButton_806DF2E4 = 10;
-    gTweakerButton_806DF2E8 = 8;
-    gTweakerButton_806DF2F0 = 11;
-    gTweakerButton_806DF2F4 = 12;
-    gTweakerButton_806DF2F8 = 13;
-    gTweakerButton_806DF2FC = 14;
-    if (!tweakerEnabled && !isWiiRemote)
+    gTweakerAccelButton = 9;
+    gTweakerBackButton = 10;
+    gTweakerToggleButton = 8;
+    gTweakerLeftButton = 11;
+    gTweakerRightButton = 12;
+    gTweakerUpButton = 13;
+    gTweakerDownButton = 14;
+    if (!justZButton && !isWiiRemote)
     {
-        gTweakerButton_806DF2EC = 23;
+        gTweakerModifierButton = 23;
     }
     else
     {
-        gTweakerButton_806DF2EC = -1;
+        gTweakerModifierButton = -1;
     }
 }
 

@@ -9,7 +9,6 @@
 class AIContext;
 class FuzzyRuntimeBase;
 class ScriptMachine;
-typedef UnidentifiedVariant_80054AB8 DesireUpdate;
 
 class shdStateMachine
 {
@@ -45,7 +44,7 @@ public:
     Timer mAgeTimer;
     float mLastActiveTime;
     ScriptMachine* mScriptMachine;
-    UnidentifiedVariantCollection mParameters;
+    FuzzyVariantCollection mParameters;
     // Copied from the constructor; executed when no override is set.
     UnsetTransitionFunc mDefaultTransition;
     // Supplied with the activation parameters (slot 10); takes precedence
@@ -60,8 +59,8 @@ public:
 void RequestStateMachineDeactivation(shdStateMachine* machine);
 AIContext* GetStateMachineAIContext(shdStateMachine* machine);
 void DeactivateStateMachine(shdStateMachine* machine, bool cleanup);
-bool ReinitializeStateMachine(shdStateMachine* machine, UnidentifiedVariantCollection* parameters, bool reinitialize);
-bool InitializeStateMachine(shdStateMachine* machine, UnidentifiedVariantCollection* parameters, bool initialize);
-void UpdateStateMachine(shdStateMachine* machine, UnidentifiedVariant_80054AB8* update, bool runUpdate, float deltaTime);
+bool ReinitializeStateMachine(shdStateMachine* machine, FuzzyVariantCollection* parameters, bool reinitialize);
+bool InitializeStateMachine(shdStateMachine* machine, FuzzyVariantCollection* parameters, bool initialize);
+void UpdateStateMachine(shdStateMachine* machine, DesireUpdate* update, bool runUpdate, float deltaTime);
 
 #endif // GAME_AI_SHDSTATEMACHINE_H

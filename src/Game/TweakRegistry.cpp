@@ -1,6 +1,6 @@
 #include "Game/TweakRegistry.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "Game/TweakValue.h"
 #include "Game/TweakValueFloat.h"
@@ -45,7 +45,7 @@ TweakPendingValue* gPendingTweakTail;
 
 void ResetDynamicTweaks(void)
 {
-    UnidentifiedStaticStorageScope scope;
+    SharedStaticStorageScope scope;
     RemoveDynamicTweakChildren(&sTweakRootEntry);
     RecycleTweakNames();
     gTweakNamePool.FreeBlocks();

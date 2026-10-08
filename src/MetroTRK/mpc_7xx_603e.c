@@ -1,8 +1,6 @@
 #include <MetroTRK/mpc_7xx_603e.h>
+#include <MetroTRK/targimpl.h>
 #include <revolution/types.h>
-
-extern u8 gTRKCPUState[];
-extern u8 gTRKRestoreFlags[];
 
 // clang-format off
 asm void TRKSaveExtended1Block(void)

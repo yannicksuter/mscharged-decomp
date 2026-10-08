@@ -5,7 +5,7 @@
 #include "Game/Render/LightingLookup.h"
 #include "Game/TweakValue.h"
 #include "Game/TweakValueInt.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/gl/glTexture.h"
 #include "NL/nlColour.h"

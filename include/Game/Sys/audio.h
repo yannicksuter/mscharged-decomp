@@ -6,6 +6,7 @@
 #include "Game/Audio/AudioResourceLoader.h"
 #include "Game/Audio/XSoundHandle.h"
 #include "types.h"
+#include "Game/Sys/audio_fwd.h"
 
 extern bool gAudioEnabled;
 
@@ -47,8 +48,6 @@ void LoadSoundBank(GameAudio* audio, int slotId,
     unsigned long cueId, AudioPlayCallback callback,
     void* context);
 void UnloadSoundBanks(GameAudio* audio);
-bool PlaySound(int slotId, unsigned long cueId,
-    const void* debugName, void* context);
 bool PlayOwnedSound(int slotId, unsigned long cueId,
     XSoundOwner* owner, const void* debugName,
     void* context);

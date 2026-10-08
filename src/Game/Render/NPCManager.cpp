@@ -29,7 +29,7 @@
 #include <string.h>
 #include "NL/nlstring_tmpl.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlPrint.h"
 
 float gHammerRadius = 0.48f;
@@ -231,7 +231,7 @@ void NPCManager::CreateWindDebris()
             pConfig->mRadius);
         WindDebris* pObject = new (8, false) WindDebris(
             *pTemplate->hierarchy, pTemplate->modelID,
-            pConfig->mCueId, pConfig->mUnidentified010,
+            pConfig->mCueId, pConfig->mImpactCueId,
             *pPhysics, &pTemplate->mInventorySAnim,
             pTemplate->mResourcePool);
         mWindDebris[i] = pObject;

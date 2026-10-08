@@ -20,7 +20,7 @@ public:
     /* 0x066 */ unsigned short mScorePointsText[32];
     /* 0x0A6 */ unsigned short mGoalsText[16];
     /* 0x0C6 */ unsigned short mGoalPointsText[32];
-    /* 0x106 */ u8 mUnidentified106[0x40];
+    /* 0x106 */ u8 mPadding106[0x40];
     /* 0x146 */ unsigned short mTotalPointsText[32];
     /* 0x188 */ FETimer mCountdownTimer;
     /* 0x1A4 */ bool mCountdownTicked;

@@ -7,7 +7,7 @@
 #include "Game/AnimInventory.h"
 #include "Game/CharacterTriggers.h"
 #include "Game/CharacterTweaks.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Field.h"
 #include "Game/Goalie.h"
 #include "Game/SAnim/pnSAnimController.h"

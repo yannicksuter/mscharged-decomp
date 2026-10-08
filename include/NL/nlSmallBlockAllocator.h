@@ -205,7 +205,7 @@ public:
     nlSlotPoolFixed<kSize1> m_Pool1;
     nlSlotPoolFixed<kSize2> m_Pool2;
     nlSlotPoolFixed<kSize3> m_Pool3;
-    int m_Unidentified;
+    int m_padCC;
     int m_MaxBlockSize;
 };
 
@@ -256,7 +256,7 @@ public:
 
     nlSlotPoolFixed<kSize1> m_Pool1;
     nlSlotPoolFixed<kSize2> m_Pool2;
-    int m_Unidentified;
+    int m_pad88;
     int m_MaxBlockSize;
 };
 

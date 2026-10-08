@@ -40,7 +40,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlstring_tmpl.h"
 #include "Game/Render/Presentation.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 GLView* g_pNisRenderView;
@@ -67,7 +67,7 @@ Nis::Nis(NisHeader& header, char* data, int size)
     , mNumTriggers(0)
     , mMainCharacterIndex(-1)
     , mAudioCharacterIndex(-1)
-    , mUnidentified850(0)
+    , m_pad850(0)
     , mDryBonesHead(0)
     , mDryBonesHeadCharacter(0)
     , mShyGuyMask(0)
@@ -918,10 +918,10 @@ ImpostorModel* Nis::AttachImpostorToCharacter(eCharacterClass characterClass, co
             DrawableCharacter* pDC = &snapshot.GetCharacter(i);
             cCharacter* character = pDC->character;
             if (character->m_eClassType == FIELDER
-                && characterClass == character->mUnidentified024.m_eCharacterClass
+                && characterClass == character->m_DetChar.m_eCharacterClass
                 && mCharacterControllers[i] != 0)
             {
-                model->SetReplacementTexture(character->mUnidentified104);
+                model->SetReplacementTexture(character->m_uSwapTextureID);
                 model->mOriginalTexture = glGetTexture(textureName);
                 *outCharacter = pDC;
                 break;
@@ -941,11 +941,11 @@ void Nis::ApplyDamageEffects(glModel* model, DrawableCharacter* character)
     int stadium = GameInfoManager::Instance()->GetStadium();
     u32 damageTexture = glGetTexture("global/scorch");
     char textureName[64];
-    nlSNPrintf(textureName, sizeof(textureName), "%s/dirt", character->character->mUnidentified11C->mName);
+    nlSNPrintf(textureName, sizeof(textureName), "%s/dirt", character->character->m_pCharacterInfo->mName);
     damageTexture = glGetTexture(textureName);
 
-    if (character->character->mUnidentified16C != 1
-        && (character->character->mUnidentified16C == 2
+    if (character->character->m_nDamageType != 1
+        && (character->character->m_nDamageType == 2
             || stadium == 0 || stadium == 5 || stadium == 7
             || stadium == 9 || stadium == 16 || stadium == 8
             || stadium == 14 || stadium == 11 || stadium == 15
@@ -1018,7 +1018,7 @@ void Nis::LoadCharacterAnimation(const char* animName, int characterIndex)
 
     if (entry != 0)
     {
-        eCharacterClass characterClass = character->mUnidentified024.m_eCharacterClass;
+        eCharacterClass characterClass = character->m_DetChar.m_eCharacterClass;
         entry->name = animName;
         entry->characterIndex = characterIndex;
         entry->loaded = false;

@@ -3,7 +3,7 @@
 #include "NL/gl/glMaterialParameters.h"
 
 #include <revolution/mtx.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlColour.h"
 
 #include "NL/gl/glMatrix.h"

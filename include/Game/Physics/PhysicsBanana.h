@@ -21,7 +21,7 @@ public:
     /* 0x40 */ PowerupBase* m_pPowerupObject;
     /* 0x44 */ bool m_bIsSupportedByGround;
     /* 0x45 */ u8 m_bAllowOutOfBoundsFall;
-    /* 0x46 */ u8 mUnidentified046[0x02];
+    /* 0x46 */ u8 mPadding046[0x02];
 }; // total size: 0x48
 
 #endif // GAME_PHYSICS_PHYSICS_BANANA_H

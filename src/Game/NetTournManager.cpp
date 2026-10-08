@@ -20,7 +20,7 @@
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Team.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMemory.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
@@ -876,7 +876,7 @@ void NetTournManager::NotifyGameStarted()
 
         Function<FnVoidVoid> callback(NetTournManagerBinding(
             MemFun(&NetTournManager::NotifyGameOver), this));
-        UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)
+        FindEvent<NoEventData>("GameOver", -1)
             ->Add(callback, 0, -1);
     }
 

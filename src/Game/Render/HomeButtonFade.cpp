@@ -1,7 +1,7 @@
 #include "Game/Render/HomeButtonFade.h"
 
 #include "Game/Render/RLView.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glState.h"
 
 const unsigned long LightTexture = glGetTexture("global/lightramp");

@@ -26,13 +26,13 @@ public:
     void OnPointerEnter(unsigned int index, void* context);
     void OnPointerLeave(unsigned int index, void* context);
 
-    /* 0x01C */ u32 mUnidentified01C;
+    /* 0x01C */ u32 m_pad01C;
     /* 0x020 */ FEPointerButton mButtons[4];
     /* 0x2F0 */ TLComponentInstance* mButtonInstances[4];
     /* 0x300 */ FEPointerButton mHelpButton;
     /* 0x3B4 */ TLComponentInstance* mHelpButtonInstance;
     /* 0x3B8 */ FEBackButton mBackButton;
-    /* 0x490 */ ButtonComponent mUnidentified490;
+    /* 0x490 */ ButtonComponent mButtonComponent;
     /* 0x4B4 */ bool mInitialized;
     /* 0x4B8 */ int mHoverCounts[4];
     /* 0x4C8 */ u16 mFriendsText[48];

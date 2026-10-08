@@ -142,7 +142,7 @@ public:
         return 0;
     }
 
-    ValueType* UnidentifiedAddOrGet(const KeyType& key)
+    ValueType* AddOrGet(const KeyType& key)
     {
         AVLTreeNode* existingNode;
         AVLTreeNode* node = AddAVLNode(
@@ -160,7 +160,7 @@ public:
         return &((Entry*)existingNode)->value;
     }
 
-    ValueType* UnidentifiedAddOrGet(const KeyType& key, bool& added)
+    ValueType* AddOrGet(const KeyType& key, bool& added)
     {
         AVLTreeNode* existingNode;
         AVLTreeNode* node = AddAVLNode(

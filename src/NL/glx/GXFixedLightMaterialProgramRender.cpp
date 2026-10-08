@@ -6,7 +6,7 @@
 #include "NL/glx/GXFixedLightMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static nlMatrix4 sFixedLightViewMatrix;
 

@@ -10,14 +10,14 @@ public:
     {
         Entry()
             : mPointer(0)
-            , mUnidentified004(0)
-            , mUnidentified006(0)
+            , m_pad004(0)
+            , m_pad006(0)
         {
         }
 
         /* 0x00 */ void* mPointer;
-        /* 0x04 */ unsigned short mUnidentified004;
-        /* 0x06 */ unsigned short mUnidentified006;
+        /* 0x04 */ unsigned short m_pad004;
+        /* 0x06 */ unsigned short m_pad006;
     };
 
     PointerEntryTable(int capacity, TweakNameAllocator* allocator);

@@ -4,7 +4,18 @@
 
 #include "Game/Audio/CategoryVolume.h"
 #include "Game/Audio/Pitch.h"
-#include "Game/Audio/LowPassFilter.inl"
+#include "Game/Audio/LowPassFilter.h"
+
+// Defined before the remaining effect headers: its string literal precedes theirs.
+inline LowPassFilter::LowPassFilter()
+    : AudioEffectBase("LowPassFilter")
+{
+    m_CurrentParameter = &m_Initial;
+    m_ResultParameter = &m_Final;
+    m_Initial.m_On = 0;
+    m_Initial.m_Frequency = 16000;
+}
+
 #include "Game/Audio/Delay.h"
 #include "Game/Audio/Reverb.h"
 #include "Game/Audio/AudioEffects.h"

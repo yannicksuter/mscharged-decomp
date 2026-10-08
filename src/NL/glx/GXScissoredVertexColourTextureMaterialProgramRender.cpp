@@ -5,7 +5,7 @@
 #include "NL/glx/GXScissoredVertexColourTextureMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 template <>
 void GXMaterialProgramImpl<GXScissoredVertexColourTextureMaterialProgram>::Activate(

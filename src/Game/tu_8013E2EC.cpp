@@ -1,6 +1,6 @@
 #include "NL/gl/glState.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 extern "C" bool fn_8013E2E4()
 {

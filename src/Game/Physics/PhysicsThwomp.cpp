@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/AI/Fielder.h"
@@ -81,13 +81,13 @@ ContactType PhysicsThwomp::Contact(PhysicsObject* other, dContact*, int)
         if (ball->m_pOwner == 0)
         {
             if (ball->meBallState == 8
-                && ball->m_pShooter->mUnidentified024.m_eCharacterClass == 16)
+                && ball->m_pShooter->m_DetChar.m_eCharacterClass == 16)
             {
                 return NO_CONTACT;
             }
             if (ball->meBallState != 10)
             {
-                QueueCollisionThwompBall((UnidentifiedEventData33*)mThwomp);
+                QueueCollisionThwompBall(mThwomp);
             }
         }
         ball = ((PhysicsAIBall*)other)->m_pAIBall;

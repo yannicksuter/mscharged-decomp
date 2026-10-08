@@ -4,7 +4,7 @@
 #include "NL/glx/GXFloatTexturedColourMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static bool sUseFloatTexturedColourDisplayLists = true;
 static bool sAllowFloatTexturedColourUncompiledDraws = true;

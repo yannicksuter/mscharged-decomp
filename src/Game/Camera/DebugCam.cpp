@@ -20,14 +20,14 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
-#include "Game/UnidentifiedTweakAction.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/TweakAction.h"
+#include "Game/SharedStaticStorage.h"
 
 static void ApplyDebugCameraFOV();
 
 struct DebugCameraTarget
 {
-    u8 mUnidentified00[0x20];
+    u8 m_pad00[0x20];
     nlVector3 mPosition;
 };
 
@@ -64,7 +64,7 @@ static TweakValueFloat gDebugCameraSensitivity(
     "gDebugCameraSensitivity", "Controller Config/DPD", 3.0f);
 
 static float sDebugCamFOVTweak = sfDebugCamFOV;
-static UnidentifiedTweakAction sDebugCamFOVAction(
+static TweakAction sDebugCamFOVAction(
     "Fov", gLastTweakCategory, Function0<void>(ApplyDebugCameraFOV));
 static TweakFloatBinding sSpeed0(
     "Speed 0", "Controller Config/DPD", &sControlTweakValues.speed0);
@@ -95,7 +95,7 @@ cDebugCamera::cDebugCamera(bool)
     , m_pPad(0)
     , m_bUseWiiControls(false)
     , m_bEnableControls(true)
-    , mUnidentified8E(false)
+    , m_pad8E(false)
     , m_bUpdateTargets(false)
     , m_pTarget(0)
 {
@@ -111,7 +111,7 @@ cDebugCamera::cDebugCamera(bool)
     {
         g_pPlatPadManager->SetDPDEnabled(pPad->m_padIndex, true);
     }
-    mUnidentified8E = true;
+    m_pad8E = true;
 }
 
 static inline void ClearTargetEntries(nlDLListContainer<DebugCameraTarget*>& targets)
@@ -158,7 +158,7 @@ void cDebugCamera::UpdateTargetPositions()
             cPlayer* player = (cPlayer*)g_pCharacters[i];
             if (player->m_eClassType == FIELDER)
             {
-                int index = player->mUnidentified1E4.m_ID + 4 * player->m_pTeam->m_nSide;
+                int index = player->m_DetPlayer.m_ID + 4 * player->m_pTeam->m_nSide;
                 position = ReplayManager::Instance()->mRender->mCharacters[index].position;
             }
             else if (player->m_eClassType == GOALIE)

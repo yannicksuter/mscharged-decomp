@@ -1,6 +1,6 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/CrowdRiot.h"
 #include "Game/Goalie.h"
@@ -83,10 +83,10 @@ CrowdRiot::CrowdRiot(bool enableRiot)
         mv3Target.z = 0.0f;
     }
 
-    UnidentifiedFindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(OnCrowdRiotCollision), 0, -1);
-    UnidentifiedFindEvent<void>("GoalScored", -1)->Add(Function<void*>(OnCrowdRiotGoalScored), 0, -1);
-    UnidentifiedFindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(OnCrowdRiotMegastrikeEnd), 0, -1);
-    UnidentifiedFindEvent<void>("GameOver", -1)->Add(Function<void*>(OnCrowdRiotGameOver), 0, -1);
+    FindEvent<void>("CollisionCrowd", -1)->Add(Function<void*>(OnCrowdRiotCollision), 0, -1);
+    FindEvent<void>("GoalScored", -1)->Add(Function<void*>(OnCrowdRiotGoalScored), 0, -1);
+    FindEvent<void>("MegastrikeEnd", -1)->Add(Function<void*>(OnCrowdRiotMegastrikeEnd), 0, -1);
+    FindEvent<void>("GameOver", -1)->Add(Function<void*>(OnCrowdRiotGameOver), 0, -1);
 }
 
 CrowdRiot::~CrowdRiot()
@@ -367,7 +367,7 @@ void HandleCrowdRiotBallCollision(cBall* ball, CrowdRiot* crowdRiot)
         MakeRandomDirection2D(velocity, 10.0f);
         velocity.z = 10.0f + nlRandomf(5.0f);
         ball->SetVelocity(velocity, SPINTYPE_NONE, 0);
-        ball->mtStuckInRiotTimer.UnidentifiedClear();
+        ball->mtStuckInRiotTimer.Clear();
         ball->mbStuckInRiotDone = false;
     }
     else if (ball->mtStuckInRiotTimer.m_uPackedTime == 0)

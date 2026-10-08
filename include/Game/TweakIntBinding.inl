@@ -69,7 +69,7 @@ int TweakIntBinding::IsBound()
     return m_pValue != 0;
 }
 
-void TweakIntBinding::UnidentifiedVirtual14(
+void TweakIntBinding::GetFloatParameters(
     float* minimum, float* maximum, float* increment)
 {
     *minimum = 0.0f;

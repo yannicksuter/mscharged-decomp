@@ -82,7 +82,7 @@ public:
     /* 0x974 */ FEOnlinePlayerRow mRows[4];
     /* 0xBD4 */ u16 mRankText[4][0x20];
     /* 0xCD4 */ u16 mRecordText[4][0x30];
-    /* 0xE54 */ u8 mUnidentifiedE54[8];
+    /* 0xE54 */ u8 m_padE54[8];
 }; // size 0xE5C
 
 #endif // GAME_SH_SHONLINEINVITEPLAYERS_H

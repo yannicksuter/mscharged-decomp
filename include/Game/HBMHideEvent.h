@@ -1,14 +1,14 @@
 #ifndef GAME_HBM_HIDE_EVENT_H
 #define GAME_HBM_HIDE_EVENT_H
 
-#include "Game/UnidentifiedStaticEvent.h"
+#include "Game/StaticEvent.h"
 
 class HBMHideEvent
-    : public UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>
+    : public StaticEvent<NoEventData, 8>
 {
 public:
     HBMHideEvent()
-        : UnidentifiedStaticEvent<UnidentifiedEventNoData, 8>("HBMHide", -1)
+        : StaticEvent<NoEventData, 8>("HBMHide", -1)
     {
     }
 

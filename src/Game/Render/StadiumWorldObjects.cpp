@@ -17,7 +17,7 @@
 #include "Game/Render/ShadowVolume.h"
 #include "Game/AI/Fielder.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
@@ -368,7 +368,7 @@ void StadiumWorldDrawable::UpdateBlend()
     if (cameraType == eCameraType_Gameplay
         || cameraType == eCameraType_ShootToScore
         || cameraType == eCameraType_Goal
-        || !GetPresentation()->mUnidentified164)
+        || !GetPresentation()->mNisStadiumEffectsEnabled)
     {
         hide = true;
     }

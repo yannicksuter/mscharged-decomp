@@ -12,7 +12,7 @@
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 u32 g_NisOverlayCheckerTexture = glGetTexture("global/checkers");
 u8 g_HolotronOpaque;

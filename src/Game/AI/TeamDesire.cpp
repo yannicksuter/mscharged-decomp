@@ -1,6 +1,6 @@
 #include "Game/AI/TeamPlayMachine.h"
 #include "Game/AI/AIContext.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 TeamDesire::TeamDesire(

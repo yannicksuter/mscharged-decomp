@@ -65,7 +65,7 @@ public:
     void Update(float fDeltaT);
     void SyncLog(void* context, DebugWriteCache* cache);
     void ChecksumState(RunningChecksum* runningChecksum);
-    unsigned int UnidentifiedGetGoalType() const
+    unsigned int GetGoalType() const
     {
         return m_uGoalType;
     }
@@ -78,7 +78,7 @@ public:
     void InitiateBallBlur(
         eBallShotEffectType effectType, cPlayer* pPlayer);
     bool GetInNet(int& nSide);
-    bool UnidentifiedPassState() const
+    bool IsInPassState() const
     {
         return meBallState == 5 || meBallState == 3;
     }
@@ -87,7 +87,7 @@ public:
         return (meBallState == 5 || meBallState == 3) && m_pPassTarget != 0;
     }
 
-    bool UnidentifiedHasPassTarget()
+    bool HasPassTarget()
     {
         bool bState;
         bool bResult = false;
@@ -114,12 +114,12 @@ public:
     }
     const nlVector3& GetPassIntercept() const { return m_v3PassIntercept; }
 
-    bool UnidentifiedState8Shot()
+    bool IsSkillShotActive()
     {
         return m_tShotTimer.m_uPackedTime != 0 && meBallState == 8;
     }
 
-    bool UnidentifiedState7Shot()
+    bool IsChipShotActive()
     {
         return m_tShotTimer.m_uPackedTime != 0 && meBallState == 7;
     }
@@ -165,8 +165,8 @@ public:
     /* 0xE0 */ BlurHandler* m_pBlurHandler;
     /* 0xE4 */ DrawableModel* m_pDrawableBall;
     /* 0xE8 */ PhysicsAIBall* m_pPhysicsBall;
-    /* 0xEC */ Plat3dSoundSrc* mUnidentifiedEC;
-    /* 0xF0 */ unsigned long mUnidentifiedF0;
+    /* 0xEC */ Plat3dSoundSrc* m_pSoundOwner;
+    /* 0xF0 */ unsigned long m_uGlowSoundCue;
 }; // total size: 0xF4
 
 extern "C" void fn_80015C38(cBall* pBall, int nBallState);
@@ -199,8 +199,8 @@ void OnBallGetReadyForKickoff(void*);
 void OnBallKickoff();
 void OnBallFall(void*);
 void OnBallTronWallCollision(void*);
-struct UnidentifiedEventData34;
-void OnBallEggCollision(UnidentifiedEventData34*);
+struct CollisionEggData;
+void OnBallEggCollision(CollisionEggData*);
 void OnBallPatchCollision(PhysicsPatch*);
 void OnBallDebrisCollision(void*);
 void OnBallThwompCollision(void*);

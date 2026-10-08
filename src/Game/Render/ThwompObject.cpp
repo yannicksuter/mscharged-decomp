@@ -18,7 +18,7 @@
 #include "ode/objects.h"
 #include "Game/Physics/PhysicsThwomp.h"
 #include "NL/gl/glTexture.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 bool gThwompHideAfterRise = true;
@@ -81,7 +81,7 @@ ThwompObject::ThwompObject(int index)
     mLandingTimer = 0.0f;
     mWarningTimer = 0.0f;
     mScaleTimer = 0.0f;
-    mUnidentified028 = -1;
+    mPadding028 = -1;
 
     mTexture3 = glGetTexture(gThwompTexture3Name);
     mTexture2 = glGetTexture(gThwompTexture2Name);

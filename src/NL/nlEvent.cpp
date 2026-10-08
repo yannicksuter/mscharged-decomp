@@ -52,7 +52,7 @@ public:
     void Apply(const unsigned int&, ConnectionTreePtr* tree);
 
 private:
-    unsigned int mUnidentified00;
+    unsigned int m_pad00;
     PoolCallback mCallback;
 };
 

@@ -16,7 +16,7 @@ public:
     virtual void ReleaseResources();
     virtual nlMatrix4* GetWorldMatrix();
     virtual void SetWorldMatrix(const nlMatrix4& transform);
-    virtual void UnidentifiedVirtual18(World* world);
+    virtual void OnWorldLoaded(World* world);
 };
 
 #endif // GAME_WORLD_WORLD_OBJECT_H

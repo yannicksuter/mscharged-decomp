@@ -143,7 +143,7 @@ public:
     /* 0xE8 */ cNet* m_pNet;
     /* 0xEC */ FormationManager* m_pFormationManager;
     /* 0xF0 */ AIContext* m_pAIContext;
-    /* 0xF4 */ u32 mUnidentified0F4;
+    /* 0xF4 */ u32 m_nCurrentPowerUp;
 };
 
 extern cTeam* g_pTeams[];

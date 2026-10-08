@@ -2,7 +2,7 @@
 
 #include "Game/TweakValueFloat.h"
 #include "Game/TweakValueInt.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/glx/glxSend.h"
 
 static float glx_FogNear = 0.25f;

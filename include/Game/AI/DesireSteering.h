@@ -48,8 +48,8 @@ public:
     virtual bool Initialize(void*);
     virtual void Cleanup();
     virtual void Update(DesireUpdate*, float);
-    virtual inline void UnidentifiedVirtual7(void*, DebugWriteCache*);
-    virtual inline void UnidentifiedVirtual8(void*, DebugWriteCache*);
+    virtual inline void SyncLog(void*, DebugWriteCache*);
+    virtual inline void RegisterDebugFields(void*, DebugWriteCache*);
 
     void SetAvoidanceMultiplier(float fAvoidanceMult) { m_fAvoidanceMult = fAvoidanceMult; }
 
@@ -85,14 +85,14 @@ private:
     float m_fFacingTotalWeight;
     float m_fDesiredArrivalTime;
     float m_fForcedArrivalRadius;
-    UnidentifiedAvoidanceHistory m_AvoidanceHistory;
+    VectorAverageHistory m_AvoidanceHistory;
 };
 
 
-class UnidentifiedDesire35 : public Desire
+class DesireWaluigiWall : public Desire
 {
 public:
-    UnidentifiedDesire35()
+    DesireWaluigiWall()
         : Desire(35, UnsetTransitionFunc(g_UnsetTransitionFunc))
     {
     }

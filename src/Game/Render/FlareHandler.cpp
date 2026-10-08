@@ -1,6 +1,6 @@
 #include "Game/Render/FlareHandler.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 

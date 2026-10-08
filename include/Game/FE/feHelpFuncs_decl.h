@@ -11,6 +11,9 @@ class FEModelHandle;
 
 nlVector2 fn_801CC48C(TLTextInstance* instance);
 
+void ZeroFloat(float* value);
+void HalveFloat(float* value);
+
 const char* GetLOCCharacterName(eTeamID teamid);
 const char* GetLOCTeamName(eTeamID teamID);
 eCharacterClass ConvertToCharacterClass(eTeamID teamID);

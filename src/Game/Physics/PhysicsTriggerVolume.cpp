@@ -62,7 +62,7 @@ ContactType PhysicsTriggerVolume::Contact(
         if (isChainChomp)
         {
             QueueCollisionChainCrowd(
-                (UnidentifiedEventData28*)((PhysicsNPC*)other)->mpAINPC);
+                (ChainChomp*)((PhysicsNPC*)other)->mpAINPC);
         }
         break;
     }

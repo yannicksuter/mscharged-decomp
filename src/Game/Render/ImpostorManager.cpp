@@ -4,7 +4,7 @@
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorCharacter.h"
 #include "Game/CharacterEffects.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakConfig.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glState.h"
@@ -34,11 +34,11 @@ ImpostorManager::ImpostorManager()
     , mImpostors(0)
     , mNumUsed(0)
     , mCapacity(0)
-    , mUnidentified010(0)
+    , mPadding010(0)
 {
     mParentView = 0;
     mInitialized = false;
-    mUnidentified035 = false;
+    mPadding035 = false;
     mHasClusters = false;
     mUpdateClusters = false;
     mCurrentResource = 0;
@@ -81,7 +81,7 @@ void ImpostorManager::Initialize(GLView* parentView, int capacity,
     mCaptured = false;
     mUpdateClusters = false;
     mHasClusters = false;
-    mUnidentified035 = false;
+    mPadding035 = false;
     mInvalidateCaptureOnRender = invalidateCaptureOnRender;
     LoadTweakConfigFile("ini/ImpostorCharacterTweaks.ini",
         "/Render/Impostor/CharacterTweaks", false);

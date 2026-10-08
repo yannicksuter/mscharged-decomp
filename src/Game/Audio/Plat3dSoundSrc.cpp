@@ -3,7 +3,7 @@
 #include "Game/Audio/Plat3dSoundSrc.h"
 
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "math.h"
 
 float sSpeedOfSound = 343.5f;

@@ -4,7 +4,7 @@
 #include "NL/glx/GXVertexColourDetailBlendMaterialProgram.h"
 #include "NL/nlColour.h"
 #include "NL/glx/glxGX.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static void ConfigureVertexColourDetailBlendStages()
 {

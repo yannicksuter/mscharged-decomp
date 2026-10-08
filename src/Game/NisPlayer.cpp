@@ -52,7 +52,7 @@
 #include "NL/gl/glTexture.h"
 #include "Game/Transitions/ModelTransition.h"
 #include "Game/Audio/RegistryPools.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include <revolution/os/OS_fwd.h>
 
@@ -283,7 +283,7 @@ void NisPlayer::ParseDictionary(char* data)
             }
             header.buffer = 0;
             header.bufferSize = 0;
-            header.mUnidentified194 = false;
+            header.m_pad194 = false;
             mDictSize++;
         }
         nlFree(data);
@@ -677,7 +677,7 @@ void NisPlayer::HideAllActors() const
     RenderSnapshot& snapshot = ReplayManager::Instance()->GetMutableRenderSnapshot();
     for (int i = 0; i < 150; i++)
     {
-        snapshot.GetPowerup(i).SetUnidentifiedVisible(false);
+        snapshot.GetPowerup(i).SetVisible(false);
     }
     for (int i = 0; i < 10; i++)
     {
@@ -888,10 +888,10 @@ bool g_ForceDoubleBallTransition;
 
 void NisPlayer::RegisterEventHandlers()
 {
-    UnidentifiedFindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &NisPlayer::OnGoalScored)), 0, -1);
-    UnidentifiedFindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &NisPlayer::OnGoalieSave)), 0, -1);
-    UnidentifiedFindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(BindMember(this, &NisPlayer::OnMegaStrikeIntro)), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::OnPauseGame)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(BindMember(this, &NisPlayer::OnGoalScored)), 0, -1);
+    FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(BindMember(this, &NisPlayer::OnGoalieSave)), 0, -1);
+    FindEvent<cPlayer>("MegaStrikeIntro", -1)->Add(Function<cPlayer*>(BindMember(this, &NisPlayer::OnMegaStrikeIntro)), 0, -1);
+    FindEvent<NoEventData>("PauseGame", -1)->Add(Function<FnVoidVoid>(BindMember(this, &NisPlayer::OnPauseGame)), 0, -1);
 }
 
 void NisPlayer::OnGoalScored(GoalScoredData* goalScoredData)
@@ -1056,7 +1056,7 @@ void NisPlayer::ReleaseCachedNisBuffers()
     for (int i = 0; i < mDictSize; i++)
     {
         delete mDict[i].buffer;
-        mDict[i].mUnidentified194 = false;
+        mDict[i].m_pad194 = false;
         mDict[i].buffer = 0;
         mDict[i].bufferSize = 0;
     }

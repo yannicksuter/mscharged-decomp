@@ -11,6 +11,7 @@
 
 class CrowdPointCallback;
 class GLView;
+class WorldAnimController;
 struct WorldObjectLoadContext;
 
 class CrowdLayoutObject : public WorldObject
@@ -27,14 +28,20 @@ public:
     bool ContainsLocalPoint(const nlVector3* point);
     int PlacePoints(CrowdPointCallback* callback, float rowSpacing, float memberSpacing);
 
-    /* 0x04 */ u8 mUnidentified004[0x1C];
+    /* 0x04 */ unsigned long m_uHashID;
+    /* 0x08 */ unsigned long m_uObjectType;
+    /* 0x0C */ unsigned long m_uObjectCreationFlags;
+    /* 0x10 */ World* m_pWorldContext;
+    /* 0x14 */ int m_nAnimNode;
+    /* 0x18 */ WorldAnimController* m_pAnimController;
+    /* 0x1C */ u8 m_pad1C[0x04];
     /* 0x20 */ nlMatrix4 mTransform;
     /* 0x60 */ float mStartWidth;
     /* 0x64 */ float mEndWidth;
     /* 0x68 */ float mLength;
     /* 0x6C */ float mEndOffset;
     /* 0x70 */ unsigned int mIsOcclusionVolume;
-    /* 0x74 */ u8 mUnidentified074[0x0C];
+    /* 0x74 */ u8 m_pad74[0x0C];
 }; // size: 0x80
 
 class CrowdSidelineFilter

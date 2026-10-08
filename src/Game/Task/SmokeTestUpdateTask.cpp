@@ -1,7 +1,7 @@
 #include "Game/Task/SmokeTestUpdateTask.h"
 
 #include "Game/TweakRegistry.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"

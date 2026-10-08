@@ -13,7 +13,7 @@ public:
     virtual void Update(float deltaTime);
     virtual void Reset(bool deleting);
     virtual shdStateMachine* ActivateState(
-        int state, UnidentifiedVariantCollection* params, bool force);
+        int state, FuzzyVariantCollection* params, bool force);
     virtual void DeactivateState();
     virtual void SelectState();
     virtual void OnBudgetCheckFailed();

@@ -40,7 +40,7 @@
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideString;
 
 SHOnlineFriends::SHOnlineFriends()
-    : mUnidentified001C(64)
+    : m_pad001C(64)
     , mScrollOffset(0)
     , mScrollRange(0)
     , mPointerHoverCount(0)

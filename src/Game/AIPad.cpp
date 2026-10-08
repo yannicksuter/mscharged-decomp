@@ -3,7 +3,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/TweakValueFloat.h"
 #include "Game/NetworkInput.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static float g_fMovementDeadZone = 0.3f;
 static float g_fCStickDeadZone = 0.5f;
@@ -300,7 +300,7 @@ void AIPadManager::UpdateAccelerationHistory()
     }
 }
 
-void* TweakValueBase::UnidentifiedVirtual1C()
+void* TweakValueBase::ReservedValueQuery()
 {
     return 0;
 }

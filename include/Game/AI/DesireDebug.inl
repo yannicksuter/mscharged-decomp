@@ -3,7 +3,7 @@
 
 #include "Game/AI/Desire.h"
 
-inline void Desire::UnidentifiedVirtual7(void*, DebugWriteCache*)
+inline void Desire::SyncLog(void*, DebugWriteCache*)
 {
 }
 

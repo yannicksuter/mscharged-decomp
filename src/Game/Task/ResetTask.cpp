@@ -11,7 +11,7 @@
 #include "Game/NetworkSession.h"
 #include "NL/globalpad.h"
 #include "Game/Audio/RegistryPools.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/PadActions.h"
 
 #define OSSleepMilliseconds(msec) OSSleepTicks(OSMillisecondsToTicks((OSTime)msec))

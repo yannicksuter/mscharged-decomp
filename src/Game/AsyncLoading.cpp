@@ -40,7 +40,7 @@
 #include "Game/Effects/EmissionManager.h"
 #include "Game/EventRegistry.h"
 #include "Game/ExcitementSystem.h"
-#include "Game/Camera/tu_800F9460.h"
+#include "Game/Camera/GameplayCameraEffects.h"
 #include "Game/Render/Presentation.h"
 #include "Game/SH/SHNavigation.h"
 #include "Game/FE/feModelManager.h"
@@ -63,7 +63,7 @@
 #include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/GameSceneManager.h"
 #include "Game/Sys/movie.h"
@@ -182,15 +182,14 @@ static TweakFloatBinding lbl_8056E4B8(
 
 static AsyncLoadingManager sAsyncLoadingManager;
 
-static inline void ReleaseUnidentifiedOwner(UnidentifiedOwnerHandle* handle)
+static inline void ReleaseEventConnection(EventConnection** owner)
 {
-    if (handle != 0 && handle->mOwner != 0
-        && ((handle->mOwner->mFlags >> 30) & 1) != 0)
+    if (owner != 0 && (*owner) != 0
+        && (((*owner)->mFlags >> 30) & 1) != 0)
     {
-        handle->mOwner->mTarget->Release(handle);
+        ((EventBase*)(*owner)->mEvent)->Disconnect(owner);
     }
 }
-
 struct PersistentResourceRequirements
 {
     GLMemoryRequirement entries[2];
@@ -875,7 +874,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     {
         SetLoadingComment("InitializeStadiumViewer2");
         fn_80056CF4((void*)gGameTweaks.mTerrainType,
-            gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
+            gGameTweaks.mWeatherType, gGameTweaks.mCrowdRiotEnabled);
         ParticleUpdateTask* particleUpdateTask = ParticleUpdateTask::sInstance;
         RLView* particleView = GetLayerView(eCLV_Particles);
         particleUpdateTask->Initialize(particleView, 0x5F6, 0x2FB);
@@ -1121,7 +1120,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
 AsyncLoadingManager::AsyncLoadingManager()
     : InterpreterCore(100)
 {
-    mLoadingHandle.mOwner = 0;
+    mGameOverConnection = 0;
     mByteCode = 0;
     mSequenceState = ASYNC_LOADING_IDLE;
     mLoadingState = 0;
@@ -1144,7 +1143,7 @@ AsyncLoadingManager::~AsyncLoadingManager()
         nlFree(mByteCode);
         mByteCode = 0;
     }
-    ReleaseUnidentifiedOwner(&mLoadingHandle);
+    ReleaseEventConnection(&mGameOverConnection);
 }
 
 extern "C" void fn_80118B38(void* data, unsigned long, void*)
@@ -1415,7 +1414,7 @@ extern "C" void fn_80119454(AsyncLoadingManager* manager)
         { GLM_TextureData, 0xA00000 },
     };
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "FE"));
-    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
     if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_MODE_3)
     {
@@ -1673,7 +1672,7 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     glCompact();
     g_PendingAnimationRequestPool.FreeBlocks();
 
-    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mPoolResourceMark);
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
     fn_80111658(2);
@@ -1701,7 +1700,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     requirements[1].mSize = 0x8B3333;
     requirements[2].mSize = 0x580000;
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 3, "InGame"));
-    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
     gDispatchEventsTask->dispatcher.Dispatch(true);
@@ -1718,7 +1717,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
     }
     GameInfoManager::Instance()->ApplyDifficultySettings();
     ReplayManager::Instance()->Initialize();
-    manager->mUnidentified50 = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mGameResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     g_pAudioSystem->GetBundleManager()->GetSoundMap()->SelectGroup(0);
     lbl_806E1050 = new (8, false) WorldNPCManager;
     lbl_806E1050->LoadTemplates("ini/WorldNPCs.ini");
@@ -1730,7 +1729,7 @@ extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameState2");
-    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mUnidentified0C);
+    fn_80056CF4((void*)gGameTweaks.mTerrainType, gGameTweaks.mWeatherType, gGameTweaks.mCrowdRiotEnabled);
     static_cast<OverlayManager*>(g_pOverlayManager)->RegisterEventHandlers();
     InitializeGameStreams();
     StatsTracker::Instance()->SetBasicGameInfoPointer(GameInfoManager::Instance()->GetCurrentGameInfo(), true);
@@ -1743,8 +1742,8 @@ extern "C" void fn_8011A0A8(AsyncLoadingManager* manager)
     ExcitementSystem::Instance().RegisterEventHandlers();
     fn_8001FE80();
     fn_80018A00();
-    UnidentifiedCameraEffects::Instance()->RegisterEventListeners();
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mLoadingHandle, -1);
+    GameplayCameraEffects::Instance()->RegisterEventListeners();
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(GoalieOnGameOver), (unsigned int)&manager->mGameOverConnection, -1);
     GLResourcePool* pool = glGetCurrentResourcePool();
     Jumbotron::instance.Initialize(pool);
     CrowdManager::instance.Initialize(pool);
@@ -1940,7 +1939,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
         FEResourceManager::Instance()->Run(0.0f);
     }
 
-    DisconnectEventOwner(&manager->mLoadingHandle);
+    DisconnectEventOwner(&manager->mGameOverConnection);
     FEMusic::StopStream();
     BeginFrameTask::s_FramerateLocked = false;
     OnInputSessionReset();
@@ -2027,7 +2026,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FEResourceManager::Instance()->Cleanup();
     DestroyFEResourcePool();
     ScreenTransitionManager::Instance()->CancelAllTransitions();
-    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified50);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mGameResourceMark);
 
     if (FontManager::s_pInstance != 0)
     {
@@ -2054,7 +2053,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     glCompact();
     g_PendingAnimationRequestPool.FreeBlocks();
     FreeFunctionMemoryPools();
-    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mUnidentified4C);
+    glGetCurrentResourcePool()->ReleaseResource((unsigned long)manager->mPoolResourceMark);
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
     FreeEventDataPools();
@@ -2229,7 +2228,7 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
         { GLM_TextureData, 0xB00000 },
     };
     glSetCurrentResourcePool(glCreateResourcePool(requirements, 2, "StadiumViewer"));
-    manager->mUnidentified4C = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mPoolResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     CreatePadBackends();
     NisPlayer::Instance()->fn_8027BD60();
     GameInfoManager::Instance()->SetMode(0, 0);
@@ -2239,7 +2238,7 @@ extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
     ReplayManager::Instance()->Initialize();
     CreateInstance(nlSingleton<TimedObjectManager>::s_pInstance);
     lbl_806E1050 = new (8, false) WorldNPCManager;
-    manager->mUnidentified50 = (void*)glGetCurrentResourcePool()->MarkResource();
+    manager->mGameResourceMark = (void*)glGetCurrentResourcePool()->MarkResource();
     FinishLoadingStep(manager);
 }
 
@@ -2248,11 +2247,11 @@ GLResourcePool* AsyncLoadingManager::GetPersistentResourcePool()
     return sPersistentResourcePool;
 }
 
-UnidentifiedOwnerConnection::~UnidentifiedOwnerConnection()
+GlobalEventConnectionOwner::~GlobalEventConnectionOwner()
 {
     if (mOwner != 0 && ((mOwner->mFlags >> 30) & 1) != 0)
     {
-        mOwner->mTarget->Release(this);
+        ((EventBase*)mOwner->mEvent)->Disconnect(this);
     }
 }
 

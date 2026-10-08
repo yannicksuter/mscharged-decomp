@@ -10,7 +10,7 @@
 #include "NL/nlString.h"
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/StadiumLoading.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 u8 sDrawPowerupShadows = 1;
 u8 sUseModelPowerupShadows = 1;

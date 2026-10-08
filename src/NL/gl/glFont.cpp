@@ -13,7 +13,7 @@
 
 #include <stdarg.h>
 #include "NL/nlstring_tmpl.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 enum eGLFont
 {

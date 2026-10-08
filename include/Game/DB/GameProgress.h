@@ -93,7 +93,7 @@ struct CupProgressRecord
     CupRecordCounters mCurrentRecord;
     CupRecordCounters mSavedRecord;
     u16 mUnlockFlags : 9;
-    u16 mUnidentified86AD : 7;
+    u16 m_pad86AD : 7;
     u8 unknown_0x86AE[2];
     CupHistory mHistory;
 };
@@ -207,7 +207,7 @@ struct ChallengeCompletionDate
     u32 mDay : 5;
     u32 mMonth : 4;
     u32 mYearOffset : 10;
-    u32 mUnidentified : 13;
+    u32 m_pad00 : 13;
 };
 
 struct ChallengeUnlockRecord

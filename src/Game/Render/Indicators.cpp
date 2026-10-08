@@ -16,7 +16,7 @@
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glTexture.h"
@@ -110,8 +110,8 @@ static inline nlColour GetIndicatorColour(cPlayer* pCharacter)
     cFielder* pCaptain = pCharacter->m_pTeam->GetCaptain();
     cFielder* pOtherCaptain
         = pCharacter->m_pTeam->GetOtherTeam()->GetCaptain();
-    const CharacterInfo* pInfo = pCaptain->mUnidentified11C;
-    const CharacterInfo* pOtherInfo = pOtherCaptain->mUnidentified11C;
+    const CharacterInfo* pInfo = pCaptain->m_pCharacterInfo;
+    const CharacterInfo* pOtherInfo = pOtherCaptain->m_pCharacterInfo;
     return GetTeamColour(*pInfo, *pOtherInfo, true);
 }
 
@@ -301,7 +301,7 @@ static void UpdateAndRenderOffScreenIndicators(float dt)
                 {
                     continue;
                 }
-                float height = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue();
+                float height = ((cFielder*)pCharacter)->GetTweaks()->fHeight.GetValue();
                 worldPos.z += height / 2.0f;
             }
             else
@@ -395,7 +395,7 @@ static void UpdateAndRenderPlayerIndicators(float)
                     continue;
                 }
                 fVerticalOffset
-                    = ((cFielder*)pCharacter)->GetTweaks()->mUnidentified004.GetValue() / 2.0f;
+                    = ((cFielder*)pCharacter)->GetTweaks()->fHeight.GetValue() / 2.0f;
                 fVerticalOffset *= pCharacter->GetPlayerScale();
             }
             else
@@ -414,7 +414,7 @@ static void UpdateAndRenderPlayerIndicators(float)
         v3ScreenPosition.y -= screenOffset;
 
         float switchScale
-            = ((cPlayer*)g_pCharacters[i])->mUnidentified1E4.m_UserControlledTime;
+            = ((cPlayer*)g_pCharacters[i])->m_DetPlayer.m_UserControlledTime;
         if (switchScale < 0.5f)
         {
             switchScale = (0.5f - switchScale) / 0.5f;

@@ -115,7 +115,7 @@ public:
 
     float GetRadius() const;
     ePowerUpType GetType() const { return m_eType; }
-    void fn_8009CEBC(const nlVector3& v3Unidentified);
+    void fn_8009CEBC(const nlVector3& v3ShockwaveOrigin);
     void fn_8009D500();
     void fn_8009D74C(float seconds, bool bEnableCollisions);
     void SpeedManagement();
@@ -283,8 +283,8 @@ void InitializePowerups();
 int IsMushroomPowerup(ePowerUpType eType);
 bool IsStarOrChainChompPowerup(ePowerUpType eType);
 bool IsDrawablePowerup(ePowerUpType eType);
-bool IsCaptainPowerup(int nUnidentified);
+bool IsCaptainPowerup(int nType);
 void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
-    int nnumOfPowerups, PowerupThrowParameters* pUnidentified);
+    int nnumOfPowerups, PowerupThrowParameters* pParameters);
 
 #endif // GAME_AI_POWERUPS_H

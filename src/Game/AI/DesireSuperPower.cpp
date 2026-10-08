@@ -42,7 +42,7 @@
 #include "Game/FE/Overlay/OverlayHandlerSuperAbility.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include <stdlib.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/EventRegistry.h"
@@ -175,11 +175,11 @@ void DesireSuperPower::SetContext(
 {
     Desire::SetContext(context);
 
-    if (m_pFielder->mUnidentified024.m_eCharacterClass == PETEY)
+    if (m_pFielder->m_DetChar.m_eCharacterClass == PETEY)
     {
-        UnidentifiedFindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
-        UnidentifiedFindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
-        UnidentifiedFindEvent<void>("CollisionPatchWall", -1)->Add(Function<void*>(HandleMuckBallWallCollision), 0, -1);
+        FindEvent<void>("CollisionPatchGround", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
+        FindEvent<void>("CollisionPatchPlayer", -1)->Add(Function<void*>(HandleMuckBallCollision), 0, -1);
+        FindEvent<void>("CollisionPatchWall", -1)->Add(Function<void*>(HandleMuckBallWallCollision), 0, -1);
     }
 }
 
@@ -191,7 +191,7 @@ bool DesireSuperPower::Initialize(void* context)
     bool result = Desire::Initialize(context);
     m_pFielder->EndShrink();
 
-    switch (m_pFielder->mUnidentified024.m_eCharacterClass)
+    switch (m_pFielder->m_DetChar.m_eCharacterClass)
     {
     case BOWSER:
     {
@@ -232,7 +232,7 @@ bool DesireSuperPower::Initialize(void* context)
     case DONKEYKONG:
         mpDKShockAvoidable = new (nlMalloc(sizeof(AvoidablePoint), 8, false))
             AvoidablePoint(AVOID_BOWSER,
-                (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position,
+                (const nlVector2&)m_pFielder->m_DetChar.m_v3Position,
                 4.0f + gDKSuperShockwaveRadius);
         m_pFielder->InitActionDKSuper();
         mMaxDuration = gDKSuperPowerTimeLimit;
@@ -322,10 +322,10 @@ bool DesireSuperPower::Initialize(void* context)
         }
 
         unsigned long sound = PowerupBase::GetSoundType(
-            (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
+            (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
             PowerupBase::PWRUP_SOUND_ACTIVATE);
-        if (m_pFielder->mUnidentified024.m_eCharacterClass == MARIO
-            || m_pFielder->mUnidentified024.m_eCharacterClass == LUIGI)
+        if (m_pFielder->m_DetChar.m_eCharacterClass == MARIO
+            || m_pFielder->m_DetChar.m_eCharacterClass == LUIGI)
         {
             PlayCaptainPowerupStream(18, sound, m_pFielder);
             u32 hash = nlStringLowerHash("MarioPowerup");
@@ -401,7 +401,7 @@ void DesireSuperPower::Cleanup()
 {
     DeactivateScriptMachine(fn_800A6968(m_pFielder->m_pTeam));
 
-    switch (m_pFielder->mUnidentified024.m_eCharacterClass)
+    switch (m_pFielder->m_DetChar.m_eCharacterClass)
     {
     case BOWSER:
         m_pFielder->ClearSuperPowerTank();
@@ -423,8 +423,8 @@ void DesireSuperPower::Cleanup()
         m_pFielder->ClearInvincibility(0);
         break;
     case DIDDYKONG:
-        m_pFielder->mUnidentified181 = false;
-        m_pFielder->mUnidentified182 = false;
+        m_pFielder->m_bPacketAVisible = false;
+        m_pFielder->m_bPacketBVisible = false;
         m_pFielder->ClearInvincibility(0);
         break;
     case DONKEYKONG:
@@ -489,11 +489,11 @@ void DesireSuperPower::Cleanup()
     }
 
     unsigned long sound = PowerupBase::GetSoundType(
-        (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
+        (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
         PowerupBase::PWRUP_SOUND_ACTIVATE);
     StopCaptainPowerupStream(sound, m_pFielder);
-    if ((m_pFielder->mUnidentified024.m_eCharacterClass == MARIO)
-        || (m_pFielder->mUnidentified024.m_eCharacterClass == LUIGI))
+    if ((m_pFielder->m_DetChar.m_eCharacterClass == MARIO)
+        || (m_pFielder->m_DetChar.m_eCharacterClass == LUIGI))
     {
         ResumeSuddenDeathMusic();
         u32 hash = nlStringLowerHash("MarioPowerup");
@@ -562,7 +562,7 @@ void DesireSuperPower::UpdateBowser(DesireUpdate* update, float fDeltaT)
                         += Interpolate(gBowserFireBallMinInterval, gBowserFireBallMaxInterval, stage);
                     float speed = Interpolate(gBowserFireBallMinSpeed, gBowserFireBallMaxSpeed, stage);
                     nlVec3ScaleAdd(direction, speed,
-                        direction, m_pFielder->mUnidentified024.m_v3Velocity);
+                        direction, m_pFielder->m_DetChar.m_v3Velocity);
                     float radius = Interpolate(gBowserFireBallMinEndRadius, gBowserFireBallMaxEndRadius, stage);
                     float lifetime = Interpolate(gBowserFireBallMinLifetime, gBowserFireBallMaxLifetime, stage);
                     lbl_806E12C8->CreatePatch(1, m_pFielder, pos, direction,
@@ -603,7 +603,7 @@ void EmitBowserJrShriek(DesireSuperPower* self)
     nlVector3 vel;
     vel.z = 0.0f;
     nlPolarToCartesian(vel.x, vel.y,
-        self->m_pFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
+        self->m_pFielder->m_DetChar.m_aActualFacingDirection, 1.0f);
     nlVec3Scale(vel, vel, gBowserJrShriekSpeed);
     nlVector3 pos = self->m_pFielder->GetJointPosition(
         self->m_pFielder->m_nHeadJointIndex);
@@ -620,9 +620,9 @@ void EmitBowserJrShriek(DesireSuperPower* self)
             group, 3, true, 0);
         controller->m_uUserData = (u32)self->m_pFielder;
         controller->SetPosition(
-            self->m_pFielder->mUnidentified024.m_v3Position);
+            self->m_pFielder->m_DetChar.m_v3Position);
         controller->SetVelocity(
-            self->m_pFielder->mUnidentified024.m_v3Velocity);
+            self->m_pFielder->m_DetChar.m_v3Velocity);
         controller->SetUpdateCallback(
             Function1<void, EmissionController&>(
                 UpdateEmitterFromCharacterForward));
@@ -650,7 +650,7 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
     if ((target != 0) && (gBowserJrFaceTarget != 0))
     {
         dir = self->m_pFielder->GetFacingDeltaToPosition(
-            target->mUnidentified024.m_v3Position);
+            target->m_DetChar.m_v3Position);
     }
     self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -708,7 +708,7 @@ void DesireSuperPower::UpdateDaisy(DesireUpdate* update, float fDeltaT)
     if (m_pFielder->m_pCurrentAnimController->TestTrigger(gDaisyFistSpawnTime))
     {
         int step = 65536 / gDaisyFistCount;
-        unsigned short angle = m_pFielder->mUnidentified024.m_aActualFacingDirection;
+        unsigned short angle = m_pFielder->m_DetChar.m_aActualFacingDirection;
         for (int i = 0; i < gDaisyFistCount; i++)
         {
             DaisyFistObject* fist = gNPCManager->GetDaisyFist(-1);
@@ -730,7 +730,7 @@ void DesireSuperPower::EmitHeavenlyLight()
     m_pFielder->ClearInvincibility(0);
     nlVector3 direction;
     nlPolarToCartesian(direction.x, direction.y,
-        m_pFielder->mUnidentified024.m_aActualFacingDirection, 1.0f);
+        m_pFielder->m_DetChar.m_aActualFacingDirection, 1.0f);
     direction.z = 0.0f;
     nlVector3 pos = m_pFielder->GetJointPosition(
         m_pFielder->m_nRightHandJointIndex);
@@ -769,7 +769,7 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
     if ((target != 0) && (gDiddyFaceTarget != 0))
     {
         dir = self->m_pFielder->GetFacingDeltaToPosition(
-            target->mUnidentified024.m_v3Position);
+            target->m_DetChar.m_v3Position);
     }
     self->m_pFielder->InitDesire(
         (eFielderDesireState)21, 0.5f, -1.0f, fvNotSet, fvNotSet);
@@ -990,7 +990,7 @@ void DesireSuperPower::UpdatePetey(DesireUpdate* update, float fDeltaT)
                     direction.x = m_pFielder->m_fPeteyMuckBallSpeed * nlSin(angle + 0x4000);
                     direction.y = m_pFielder->m_fPeteyMuckBallSpeed * nlSin(angle);
                     direction.z = gPeteyMuckBallUpSpeed;
-                    nlVec3Add(direction, direction, m_pFielder->mUnidentified024.m_v3Velocity);
+                    nlVec3Add(direction, direction, m_pFielder->m_DetChar.m_v3Velocity);
                     PhysicsPatch* patch = lbl_806E12C8->CreatePatch(3, m_pFielder,
                         pos, direction, gPeteyMuckBallRadius, gPeteyMuckBallRadius, 9999.0f);
                     patch->m_Gravity = gPeteyMuckBallGravity;
@@ -1072,9 +1072,9 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
     nlSinCos(&s, &c, 0x4000);
     normal.x = direction->x * c - direction->y * s;
     normal.y = direction->y * c + direction->x * s;
-    float radius = fielder->mUnidentified320->GetRadius();
-    nlVec2Set(left[1], radius * normal.x + fielder->mUnidentified024.m_v3Position.x,
-        radius * normal.y + fielder->mUnidentified024.m_v3Position.y);
+    float radius = fielder->m_pAvoidableObject->GetRadius();
+    nlVec2Set(left[1], radius * normal.x + fielder->m_DetChar.m_v3Position.x,
+        radius * normal.y + fielder->m_DetChar.m_v3Position.y);
     nlVec2Set(left[1], distance * direction->x + left[1].x, distance * direction->y + left[1].y);
     nlVec2Set(left[0], -(distance - 1.2f) * direction->x + left[1].x,
         -(distance - 1.2f) * direction->y + left[1].y);
@@ -1082,16 +1082,16 @@ bool IsWaluigiWallAhead(const nlVector2* direction, cFielder* fielder)
     nlSinCos(&s2, &c2, 0xC000);
     normal.x = direction->x * c2 - direction->y * s2;
     normal.y = direction->y * c2 + direction->x * s2;
-    radius = fielder->mUnidentified320->GetRadius();
-    nlVec2Set(right[1], radius * normal.x + fielder->mUnidentified024.m_v3Position.x,
-        radius * normal.y + fielder->mUnidentified024.m_v3Position.y);
+    radius = fielder->m_pAvoidableObject->GetRadius();
+    nlVec2Set(right[1], radius * normal.x + fielder->m_DetChar.m_v3Position.x,
+        radius * normal.y + fielder->m_DetChar.m_v3Position.y);
     nlVec2Set(right[1], distance * direction->x + right[1].x, distance * direction->y + right[1].y);
     nlVec2Set(right[0], -(distance - 1.2f) * direction->x + right[1].x,
         -(distance - 1.2f) * direction->y + right[1].y);
     bool result = false;
     for (int i = 0; i < 20; i++)
     {
-        PhysicsWaluigiWall* wall = fielder->mWaluigiWallState.mUnidentified08->GetWall(i);
+        PhysicsWaluigiWall* wall = fielder->mWaluigiWallState.mWallManager->GetWall(i);
         if (wall != 0)
         {
             AvoidablePolygon* polygon = wall->GetAvoidablePolygon();
@@ -1111,7 +1111,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
     if (m_pFielder->GetDesireState() == 13 && m_pFielder->m_bSuperPowerTankOn)
     {
         nlVector2 direction;
-        nlSinCos(&direction.y, &direction.x, m_pFielder->mUnidentified024.m_aActualFacingDirection);
+        nlSinCos(&direction.y, &direction.x, m_pFielder->m_DetChar.m_aActualFacingDirection);
         if (m_pFielder->m_pBall == 0 && NearToBall(m_pFielder) >= 0.7f
             || IsWaluigiWallAhead(&direction, m_pFielder))
             m_pFielder->TurnOffSuperPowerTank(true);
@@ -1124,7 +1124,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             m_pFielder->SetAvoidanceMultiplier(0.0f);
             nlVector3 direction;
             const nlVector3& target = m_pFielder->GetDesiredPosition();
-            nlVec3Sub(direction, target, m_pFielder->mUnidentified024.m_v3Position);
+            nlVec3Sub(direction, target, m_pFielder->m_DetChar.m_v3Position);
             bool valid;
             float lengthSq = direction.GetLengthSq3D();
             if (lengthSq == 0.0f)
@@ -1139,7 +1139,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             if (valid)
             {
                 unsigned short angle = nlATan2Angle(direction.y, direction.x);
-                short delta = m_pFielder->mUnidentified024.m_aActualFacingDirection - angle;
+                short delta = m_pFielder->m_DetChar.m_aActualFacingDirection - angle;
                 float sideline = CloseToSideline(m_pFielder);
                 float question = fn_800DD744(m_pFielder);
                 int difference = nlAbsAngle(delta);
@@ -1148,7 +1148,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 bool clear = false;
                 if (near && sideline < 0.9f && question < 0.9f)
                     clear = true;
-                bool moving = clear && m_pFielder->mUnidentified024.m_fActualSpeed > 1.0f;
+                bool moving = clear && m_pFielder->m_DetChar.m_fActualSpeed > 1.0f;
                 bool start = moving && !IsWaluigiWallAhead((const nlVector2*)&direction, m_pFielder);
                 if (start)
                 {
@@ -1175,10 +1175,10 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             nlVector3 pos;
             nlVec3Set(pos, mvPathPoints[0].x, mvPathPoints[0].y, 0.0f);
             nlVector3 direction;
-            nlVec3Sub(direction, pos, m_pFielder->mUnidentified024.m_v3Position);
+            nlVec3Sub(direction, pos, m_pFielder->m_DetChar.m_v3Position);
             float distance = nlVec2Length((const nlVector2&)direction);
             unsigned short angle = nlATan2Angle(direction.y, direction.x);
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             params.Set(7, FuzzyVariant(gFollowPathTimeLimit));
             params.Set(17, FuzzyVariant((unsigned long)angle));
             params.Set(18, FuzzyVariant(distance));
@@ -1201,13 +1201,13 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
                 x = AIsgn(m_pFielder->GetAIDefNetLocation(0).x);
             nlVector2 direction;
             nlVec2Set(direction, x, 0.0f);
-            unsigned short facing = m_pFielder->mUnidentified024.m_aActualFacingDirection;
+            unsigned short facing = m_pFielder->m_DetChar.m_aActualFacingDirection;
             unsigned short angles[4] = { facing, facing + 0x4000, facing - 0x4000, facing + 0x8000 };
             float score = 0.0f;
             unsigned short angle = angles[ChooseRunDirection(m_pFielder, angles, 4, &direction, &score)];
             if (score > 0.0f)
             {
-                UnidentifiedVariantCollection params;
+                FuzzyVariantCollection params;
                 params.Set(7, FuzzyVariant(gChooseDirectionTimeLimit));
                 params.Set(17, FuzzyVariant((unsigned long)angle));
                 params.Set(18, FuzzyVariant(gChooseDirectionMaxDistance));
@@ -1221,7 +1221,7 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
             && NearToBall(fn_800D66A0(m_pFielder)) < 0.35f
             && FarToBall(m_pFielder) < 0.35f)
         {
-            UnidentifiedVariantCollection params;
+            FuzzyVariantCollection params;
             params.Set(7, FuzzyVariant(gInterceptBallTimeLimit));
             params.Set(14, FuzzyVariant(g_pBall));
             params.Set(13, FuzzyVariant(gInterceptBallSpeed));
@@ -1231,12 +1231,12 @@ void DesireSuperPower::UpdateWaluigiAI(DesireUpdate*, float)
     }
 }
 
-UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
+DesireUpdate DesireSuperPower::FollowPathTransition(
     const FuzzyVariant& value, shdStateMachine* machine)
 {
-    UnidentifiedVariant_80054AB8 result(gFollowPathContinueResult, -1.0f, -1.0f);
+    DesireUpdate result(gFollowPathContinueResult, -1.0f, -1.0f);
     if (GetStateMachineState(machine) != 12)
-        return UnidentifiedVariant_80054AB8(gFollowPathFinishedResult, -1.0f, -1.0f);
+        return DesireUpdate(gFollowPathFinishedResult, -1.0f, -1.0f);
     cFielder* fielder = (cFielder*)value.GetPlayer();
     DesireSuperPower* desire = (DesireSuperPower*)GetFielderDesire(fielder, 23);
     int index = GetStateMachineParameters(machine)->Get(0)->fn_800C2BD4();
@@ -1294,25 +1294,25 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::FollowPathTransition(
             }
         }
     }
-    return UnidentifiedVariant_80054AB8(result, -1.0f, -1.0f);
+    return DesireUpdate(result, -1.0f, -1.0f);
 }
 
-struct UnidentifiedFielderRef
+struct FielderRef
 {
     cFielder* mFielder;
 };
 
-UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
+DesireUpdate DesireSuperPower::ChooseDirectionTransition(
     const FuzzyVariant& value, shdStateMachine* machine)
 {
-    UnidentifiedVariant_80054AB8 result(FT_INT, gChooseDirectionContinueResult);
+    DesireUpdate result(FT_INT, gChooseDirectionContinueResult);
     if (machine->GetState() != 12)
-        return UnidentifiedVariant_80054AB8(FT_INT, gChooseDirectionFinishedResult);
-    UnidentifiedFielderRef fielder = { (cFielder*)value.mData.pointer };
+        return DesireUpdate(FT_INT, gChooseDirectionFinishedResult);
+    FielderRef fielder = { (cFielder*)value.mData.pointer };
     GetFielderDesire(fielder.mFielder, 23);
     float maxDistance = ((DesireRunInDirection*)machine)->GetMaxDistance();
     float distanceTravelled = ((DesireRunInDirection*)machine)->GetDistanceTravelled();
-    float danger = CallFielderFuzzyFunction(((UnidentifiedFuzzyRuntimeValue*)&value)->GetRuntime(),
+    float danger = CallFielderFuzzyFunction(((FuzzyRuntimeContext*)&value)->GetRuntime(),
         fielder.mFielder, "InDangerForMegastrike").mData.f;
     float question = fn_800DBB0C(fielder.mFielder);
     bool good = ((1.0f - danger) / 2.0f + question / 2.0f) > 0.75f;
@@ -1359,7 +1359,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
         float question2 = fn_800DD744(fielder.mFielder);
         nlVector2 facingDirection;
         nlSinCos(&facingDirection.y, &facingDirection.x,
-            fielder.mFielder->mUnidentified024.m_aActualFacingDirection);
+            fielder.mFielder->m_DetChar.m_aActualFacingDirection);
         if (best > 0.6f || FMIN(question1, question2) > 0.75f
             || (float)fabs(distanceTravelled - maxDistance) < 1.5f
             || IsWaluigiWallAhead(&facingDirection, fielder.mFielder))
@@ -1373,7 +1373,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
                 x = AIsgn(fielder.mFielder->GetAIDefNetLocation(0).x);
             nlVector2 direction;
             nlVec2Set(direction, x, 0.0f);
-            unsigned short facing = fielder.mFielder->mUnidentified024.m_aActualFacingDirection;
+            unsigned short facing = fielder.mFielder->m_DetChar.m_aActualFacingDirection;
             unsigned short angles[3] = { facing, facing + 0x4000, facing - 0x4000 };
             float score = 0.0f;
             unsigned short angle = angles[ChooseRunDirection(fielder.mFielder, angles, 3, &direction, &score)];
@@ -1398,7 +1398,7 @@ UnidentifiedVariant_80054AB8 DesireSuperPower::ChooseDirectionTransition(
             if (fielder.mFielder->m_bSuperPowerTankOn && machine->GetState() == 12)
             {
                 unsigned short absolute = nlAbsAngle(nlAbsAngle(
-                    nlAngleDelta(fielder.mFielder->mUnidentified024.m_aActualFacingDirection, angle)));
+                    nlAngleDelta(fielder.mFielder->m_DetChar.m_aActualFacingDirection, angle)));
                 short folded = absolute % 0x4000;
                 bool okay = folded < 0x2000 || (unsigned int)nlAbsInt(folded - 0x4000) < 0x2000;
                 if (!okay)
@@ -1423,28 +1423,28 @@ int ChooseRunDirection(cFielder* fielder, const unsigned short* angles,
     for (int i = 0; i < count; i++)
     {
         unsigned short angle = angles[i];
-        if (forward->x * fielder->mUnidentified024.m_v3Position.x < 12.360001f
+        if (forward->x * fielder->m_DetChar.m_v3Position.x < 12.360001f
             && nlAbsAngle((short)(angle - desiredAngle)) > 0x5555)
             continue;
         farPos = zero;
         nearPos = zero;
         nlPolarToCartesian(farPos.x, farPos.y, angle, 6.0f);
         nlPolarToCartesian(nearPos.x, nearPos.y, angle, 4.0f);
-        nlVec3Add(nearPos, nearPos, fielder->mUnidentified024.m_v3Position);
-        nlVec3Add(farPos, farPos, fielder->mUnidentified024.m_v3Position);
+        nlVec3Add(nearPos, nearPos, fielder->m_DetChar.m_v3Position);
+        nlVec3Add(farPos, farPos, fielder->m_DetChar.m_v3Position);
         cField::FixOutOfBoundsPosition(nearPos, 0.2f, true);
         cField::FixOutOfBoundsPosition(farPos, 0.2f, true);
         nlVector2 direction;
         nlSinCos(&direction.y, &direction.x, angle);
         if (!IsWaluigiWallAhead(&direction, fielder))
         {
-            float lane = fn_800DAFCC(fielder->mUnidentified024.m_v3Position, farPos,
+            float lane = LaneOpenness(fielder->m_DetChar.m_v3Position, farPos,
                 fielder, 0, 0.0f, 1.0f, 1.0f, 0.0f);
-            float support = FuzzyNot(fn_800DCB4C(&nearPos,
-                &fn_800D66C4(fielder)->mUnidentified024.m_v3Position));
+            float support = FuzzyNot(NearToGoaliePosition(&nearPos,
+                &fn_800D66C4(fielder)->m_DetChar.m_v3Position));
             float sideline = 1.0f;
             if (question1 > 0.1f
-                || (angle == fielder->mUnidentified024.m_aActualFacingDirection && question2 >= 0.9f))
+                || (angle == fielder->m_DetChar.m_aActualFacingDirection && question2 >= 0.9f))
                 sideline = FuzzyNot(CloseToSideline(nearPos, 0, false, 0));
             support = FMIN(support, sideline);
             lane = FMIN(lane, support);
@@ -1464,15 +1464,15 @@ int DesireSuperPower::BuildPathPoints()
     int count;
     if (UserControlledT(m_pFielder->m_pTeam))
     {
-        mvPathPoints[0] = (const nlVector2&)m_pFielder->mUnidentified024.m_v3Position;
+        mvPathPoints[0] = (const nlVector2&)m_pFielder->m_DetChar.m_v3Position;
         count = 2;
         nlVector3 pos;
         pos.z = 0.0f;
         nlPolarToCartesian(pos.x, pos.y,
-            m_pFielder->mUnidentified024.m_aActualFacingDirection, 4.0f);
-        nlVec3Add(pos, m_pFielder->mUnidentified024.m_v3Position, pos);
+            m_pFielder->m_DetChar.m_aActualFacingDirection, 4.0f);
+        nlVec3Add(pos, m_pFielder->m_DetChar.m_v3Position, pos);
         cField::FixOutOfBoundsPosition(pos,
-            m_pFielder->mUnidentified320->GetRadius(), true);
+            m_pFielder->m_pAvoidableObject->GetRadius(), true);
         mvPathPoints[1] = (const nlVector2&)pos;
     }
     else
@@ -1488,7 +1488,7 @@ int DesireSuperPower::BuildPathPoints()
             count = 2;
             positions = gPathPointsWithoutBall;
         }
-        bool flip = m_pFielder->mUnidentified024.m_v3Position.y > 0.0f;
+        bool flip = m_pFielder->m_DetChar.m_v3Position.y > 0.0f;
         for (int i = 0; i < count; i++)
         {
             mvPathPoints[i] = positions[i];
@@ -1541,7 +1541,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                 if (m_pFielder->m_fNextGasTime <= 0.0f)
                 {
                     unsigned long sound = PowerupBase::GetSoundType(
-                        (ePowerUpType)m_pFielder->mUnidentified11C->unknown_0x14,
+                        (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
                     m_pFielder->PlayImpactCameraRumble();
@@ -1550,7 +1550,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                     nlVector3 pos;
                     nlVector3 offset;
                     nlPolarToCartesian(offset.x, offset.y,
-                        m_pFielder->mUnidentified024.m_aActualFacingDirection, gWarioGasOffset);
+                        m_pFielder->m_DetChar.m_aActualFacingDirection, gWarioGasOffset);
                     offset.z = 0.0f;
                     const nlMatrix4& mat = m_pFielder->m_pPoseAccumulator->GetNodeMatrix(
                         m_pFielder->m_nBip01JointIndex_0xA4);
@@ -1563,8 +1563,8 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                     {
                         EmissionController* emitter = EmissionManager::Instance()->Create(group, 3, true, 0);
                         emitter->m_uUserData = (unsigned int)m_pFielder;
-                        emitter->SetPosition(m_pFielder->mUnidentified024.m_v3Position);
-                        emitter->SetVelocity(m_pFielder->mUnidentified024.m_v3Velocity);
+                        emitter->SetPosition(m_pFielder->m_DetChar.m_v3Position);
+                        emitter->SetVelocity(m_pFielder->m_DetChar.m_v3Velocity);
                         emitter->SetUpdateCallback(UpdateEmitterFromCharacterBackward);
                     }
                 }
@@ -1576,14 +1576,14 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                         nlVector3 pos;
                         pos.z = 0.0f;
                         nlPolarToCartesian(pos.x, pos.y,
-                            m_pFielder->mUnidentified024.m_aActualFacingDirection, 5.0f);
-                        nlVec3Add(pos, m_pFielder->mUnidentified024.m_v3Position, pos);
-                        cField::FixOutOfBoundsPosition(pos, m_pFielder->mUnidentified320->GetRadius(), true);
+                            m_pFielder->m_DetChar.m_aActualFacingDirection, 5.0f);
+                        nlVec3Add(pos, m_pFielder->m_DetChar.m_v3Position, pos);
+                        cField::FixOutOfBoundsPosition(pos, m_pFielder->m_pAvoidableObject->GetRadius(), true);
                         nlVector3 delta;
-                        nlVec3Sub(delta, pos, m_pFielder->mUnidentified024.m_v3Position);
+                        nlVec3Sub(delta, pos, m_pFielder->m_DetChar.m_v3Position);
                         float distance = nlSqrt(delta.GetLengthSq2D(), true);
                         unsigned short angle = nlATan2Angle(delta.y, delta.x);
-                        UnidentifiedVariantCollection params;
+                        FuzzyVariantCollection params;
                         params.Set(7, FuzzyVariant(gWarioRunTimeLimit));
                         params.Set(17, FuzzyVariant((unsigned long)angle));
                         params.Set(18, FuzzyVariant(distance));
@@ -1623,7 +1623,7 @@ extern "C" bool fn_800D0DB0(DesireSuperPower* self, void*)
     self->m_pFielder->m_pTweaks
         = self->m_pFielder->m_pSuperPowerTweaks;
     self->m_pFielder->EndConfusion();
-    if (self->m_pFielder->mUnidentified1E4.m_tFireTimer.m_uPackedTime != 0)
+    if (self->m_pFielder->m_DetPlayer.m_tFireTimer.m_uPackedTime != 0)
     {
         self->m_pFielder->fn_8009750C();
         self->m_pFielder->EndAction();
@@ -1687,28 +1687,28 @@ static inline bool IsClearOfMuckHoles(nlVector3 point)
 
 void HandleMuckBallCollision(void* context)
 {
-    UnidentifiedEventData24* event = (UnidentifiedEventData24*)context;
+    CollisionPatchData* event = (CollisionPatchData*)context;
     bool hit = false;
-    if (event->mUnidentified10->GetPosition().z < 0.0f
-        && event->mUnidentified10->m_Velocity.z < 0.0f)
+    if (event->pPatch->GetPosition().z < 0.0f
+        && event->pPatch->m_Velocity.z < 0.0f)
     {
         hit = true;
     }
-    if (event->mUnidentified0C != 0
-        && event->mUnidentified0C->mUnidentified024.m_eCharacterClass != PETEY)
+    if (event->pPlayer != 0
+        && event->pPlayer->m_DetChar.m_eCharacterClass != PETEY)
     {
         hit = true;
     }
-    if (hit == true && event->mUnidentified10->m_Type == 3)
+    if (hit == true && event->pPatch->m_Type == 3)
     {
-        nlVector3 pos = event->mUnidentified10->GetPosition();
+        nlVector3 pos = event->pPatch->GetPosition();
         pos.z = 0.0f;
         if (IsClearOfMuckHoles(pos) == true)
         {
-            lbl_806E12C8->CreatePatch(4, event->mUnidentified10->m_pOwner,
+            lbl_806E12C8->CreatePatch(4, event->pPatch->m_pOwner,
                 pos, gSuperPowerZeroVector, gPeteyMuckHoleRadius, gPeteyMuckHoleRadius, gPeteyMuckHoleLifetime);
         }
-        event->mUnidentified10->Unknown0();
+        event->pPatch->Unknown0();
     }
 }
 
@@ -1740,7 +1740,7 @@ void HandleMuckBallWallCollision(void* context)
  */
 eCharacterClass GetCharacterClass(const cCharacter* character)
 {
-    return character->mUnidentified024.m_eCharacterClass;
+    return character->m_DetChar.m_eCharacterClass;
 }
 
 /**
@@ -1748,7 +1748,7 @@ eCharacterClass GetCharacterClass(const cCharacter* character)
  */
 unsigned short GetCharacterFacing(const cCharacter* character)
 {
-    return character->mUnidentified024.m_aActualFacingDirection;
+    return character->m_DetChar.m_aActualFacingDirection;
 }
 
 /**
@@ -1756,7 +1756,7 @@ unsigned short GetCharacterFacing(const cCharacter* character)
  */
 const nlVector3* GetCharacterPosition(const cCharacter* character)
 {
-    return &character->mUnidentified024.m_v3Position;
+    return &character->m_DetChar.m_v3Position;
 }
 
 /**

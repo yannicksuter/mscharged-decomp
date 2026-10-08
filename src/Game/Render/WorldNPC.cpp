@@ -10,7 +10,7 @@
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 #include "Game/Render/CrowdImpostors.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/World/WorldObject.h"
 
 bool gDisableWorldNPCs;
@@ -66,7 +66,7 @@ static inline void FindLoadedTemplate(const WorldNPCManager& manager,
 }
 
 WorldNPCManager::WorldNPCManager()
-    : mUnidentified004(false)
+    : mPadding004(false)
     , mNumTemplates(0)
     , mNumLoadTemplates(0)
     , mNumLoadedModels(0)

@@ -6,7 +6,7 @@
 #include "Game/GL/glModelBuilder.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glPlat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GLColourMeshWriter::GLColourMeshWriter()
     : count(0)

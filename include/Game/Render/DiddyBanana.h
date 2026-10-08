@@ -27,7 +27,7 @@ public:
     /* 0x70 */ cSAnim* mpZip;
     /* 0x74 */ cSAnim* mpUnzip;
     /* 0x78 */ Timer mTimer;
-    /* 0x80 */ bool mUnidentified80;
+    /* 0x80 */ bool mPadding80;
     /* 0x81 */ unsigned char mPadding81[3];
 }; // total size: 0x84
 

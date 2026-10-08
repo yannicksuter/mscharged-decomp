@@ -1,7 +1,7 @@
 #include "Game/CharacterTweaks.h"
 
 #include "Game/TweakFileLoader.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.inl"
 
 GoalieTweaks::GoalieTweaks(const char* name, const char* category)
@@ -82,8 +82,8 @@ void GoalieTweaks::Init()
 
     fShotFatigueMax = 0.0f;
 
-    mUnidentified2A8.BindWithDefault("Min On Fire Time", 5.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
-    mUnidentified2B8.BindWithDefault("Max On Fire Time", 8.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOnFireTimeMin.BindWithDefault("Min On Fire Time", 5.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
+    fOnFireTimeMax.BindWithDefault("Max On Fire Time", 8.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fPounceRange.BindWithDefault("Pounce Range", 1.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fPhysCapsuleHeight.BindWithDefault("Capsule Height", 1.0f, mCategory, false, 0.0f, 0.0f, 0.0f);
     fPhysCapsuleRadius.BindWithDefault("Capsule Width", 1.0f, mCategory, false, 0.0f, 0.0f, 0.0f);

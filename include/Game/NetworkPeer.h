@@ -29,7 +29,7 @@ public:
     /* 0x004 */ s8 mChannelIndex;
     /* 0x005 */ u8 mPadding005[3];
     /* 0x008 */ int mGlobalPadIndex;
-    /* 0x00C */ bool mUnidentified00C;
+    /* 0x00C */ bool mPadding00C;
     /* 0x00D */ u8 mPadding00D[3];
     /* 0x010 */ DetInput mPrevInput;
     /* 0x09C */ DetInput mInput;

@@ -2,7 +2,7 @@
 
 #include "Game/PoseAccumulator.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 int gMorphOverrideID = -1;
 float gMorphOverrideWeight = 1.0f;

@@ -29,7 +29,7 @@ public:
     /* 0x30C */ int mSelectedHistoryIndex;
     /* 0x310 */ int mHistoryCount;
     /* 0x314 */ int mHoverCounts[4];
-    /* 0x324 */ bool mUnidentified324;
+    /* 0x324 */ bool mPadding324;
     /* 0x325 */ unsigned char mPadding325[3];
     /* 0x328 */ int mState;
     /* 0x32C */ unsigned short mTitleText[0x40];

@@ -8,7 +8,7 @@
 #include "Game/RenderSnapshot.h"
 #include "Game/Render/Presentation.h"
 #include "NL/nlTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static float g_fBallTrailScale = 2.25f;
 

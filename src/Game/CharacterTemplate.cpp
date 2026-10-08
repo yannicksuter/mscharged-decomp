@@ -14,7 +14,7 @@
 #include "Game/WorldTriggers.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 SebringAnimTagScriptInterpreter* g_pAnimScriptInterp;
@@ -748,7 +748,7 @@ int GetCharacterIndex(const cCharacter* character)
 {
     if (character != NULL)
     {
-        return character->mUnidentified120;
+        return character->m_nCharacterIndex;
     }
     return -1;
 }

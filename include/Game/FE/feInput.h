@@ -30,7 +30,7 @@ struct FEInput
 {
     /* 0x00 */ InputLockEntry m_nExclusiveInputSceneHashIDStack[4];
     /* 0x20 */ int m_InputLockDepth;
-    /* 0x24 */ unsigned long mUnidentified024[4];
+    /* 0x24 */ unsigned long m_DisabledButtonMask[4];
     /* 0x34 */ bool m_bEnableInput[4];
     /* 0x38 */ bool m_bInputAllowed;
 

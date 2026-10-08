@@ -159,7 +159,7 @@ struct LexicalCastImpl<BasicString<unsigned short, Allocator>, int>
     static BasicString<unsigned short, Allocator> Do(int t)
     {
         return LexicalCast<BasicString<unsigned short, Allocator> >(
-            LexicalCast<BasicString<char, StringAllocator_801CBA50> >(t));
+            LexicalCast<BasicString<char, TempStringHeapAllocator> >(t));
     }
 };
 } // namespace Detail

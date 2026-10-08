@@ -9,7 +9,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 Mtx glx_SpecularLookupTextureMatrix = {
     { 0.5f, 0.0f, 0.0f, 0.5f },

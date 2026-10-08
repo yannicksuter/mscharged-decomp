@@ -2,7 +2,7 @@
 #include "Game/GameInfo.h"
 #include "Game/TweakConfig.h"
 #include "Game/TweakFileLoader.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GameTweaks::GameTweaks(const char* name, const char* category)
     : TweaksBase(name)

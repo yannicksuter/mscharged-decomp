@@ -53,7 +53,7 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 
@@ -66,7 +66,7 @@ unsigned char lbl_806E0BCC;
 float lbl_806E0BD0;
 float lbl_806E0BD4;
 float lbl_806E0BD8;
-bool lbl_806E0BDC;
+bool gbUseShotClock;
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 static const char szPerfectPassBallBlurTexture[]
@@ -105,8 +105,8 @@ extern const nlVector3 lbl_804DBE30 = { 12.5f, 0.0f, 0.18f };
 static nlMatrix3 m3Ident
     = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
-bool lbl_806DB500 = true;
-bool lbl_806DB501 = true;
+bool gbUsePassCharging = true;
+bool gbUseShotCharging = true;
 float lbl_806DB504 = .55f;
 float lbl_806DB508 = .55f;
 float lbl_806DB50C = 6.0f;
@@ -128,8 +128,8 @@ float lbl_806DB548 = 2.0f;
 float lbl_806DB54C = .1f;
 float lbl_806DB550 = 2.2f;
 int lbl_806DB554 = 150;
-float lbl_806DB558 = 10.0f;
-float lbl_806DB55C = 10.0f;
+float gfShotClockTime = 10.0f;
+float gfShotClockFrozenTime = 10.0f;
 float lbl_806DB560 = .8f;
 float lbl_806DB564 = 7.5f;
 float lbl_806DB568 = 22.5f;
@@ -152,16 +152,16 @@ bool lbl_806DB5A8 = true;
 float lbl_806DB5AC = .33f;
 float lbl_806DB5B0 = .33f;
 
-static TweakBoolBinding sUnidentifiedTweak_8056B478(
-    "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &lbl_806DB500, true);
-static TweakBoolBinding sUnidentifiedTweak_8056B498(
-    "gbUseShotCharging", "Game/Gameplay/Charging/Shot", &lbl_806DB501, true);
-static TweakFloatBinding sUnidentifiedTweak_8056B4B8(
-    "gfShotClockTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB558, true);
-static TweakFloatBinding sUnidentifiedTweak_8056B4D8(
-    "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &lbl_806DB55C, true);
-static TweakBoolBinding sUnidentifiedTweak_8056B4F8(
-    "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &lbl_806E0BDC, true);
+static TweakBoolBinding sUsePassChargingTweak(
+    "gbUsePassCharging", "Game/Gameplay/Charging/Pass", &gbUsePassCharging, true);
+static TweakBoolBinding sUseShotChargingTweak(
+    "gbUseShotCharging", "Game/Gameplay/Charging/Shot", &gbUseShotCharging, true);
+static TweakFloatBinding sShotClockTimeTweak(
+    "gfShotClockTime", "Game/Gameplay/Charging/Shot Clock", &gfShotClockTime, true);
+static TweakFloatBinding sShotClockFrozenTimeTweak(
+    "gfShotClockFrozenTime", "Game/Gameplay/Charging/Shot Clock", &gfShotClockFrozenTime, true);
+static TweakBoolBinding sUseShotClockTweak(
+    "gbUseShotClock", "Game/Gameplay/Charging/Shot Clock", &gbUseShotClock, true);
 LiveBallTrail lbl_8056B518[10];
 
 static inline float FullBallCharge()
@@ -232,7 +232,7 @@ cBall::cBall()
     m_v3ShotOrigin.z = 0.0f;
 
     m_pBlurHandler = NULL;
-    mUnidentifiedF0 = 0;
+    m_uGlowSoundCue = 0;
     m_pDrawableBall = (DrawableModel*)FindStadiumDrawableObject(
         nlStringHash("gameplay/ball"));
 
@@ -244,9 +244,9 @@ cBall::cBall()
     m_pPhysicsBall->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsBall->SetAngularVelocity(v3Zero);
 
-    mUnidentifiedEC = CreateAudioSoundOwner(g_pAudioSystem);
-    mUnidentifiedEC->m_SpatialBits |= 0x00800000;
-    mUnidentifiedEC->SetPosition(&m_v3Position);
+    m_pSoundOwner = CreateAudioSoundOwner(g_pAudioSystem);
+    m_pSoundOwner->m_SpatialBits |= 0x00800000;
+    m_pSoundOwner->SetPosition(&m_v3Position);
 }
 
 cBall::~cBall()
@@ -254,9 +254,9 @@ cBall::~cBall()
     fn_80015C38(this, 0);
     ClearBallEffects();
     fn_800154FC(this, 0.0f);
-    StopSound(mUnidentifiedF0, this);
-    mUnidentifiedF0 = 0;
-    ReleaseAudioSoundOwner(g_pAudioSystem, mUnidentifiedEC);
+    StopSound(m_uGlowSoundCue, this);
+    m_uGlowSoundCue = 0;
+    ReleaseAudioSoundOwner(g_pAudioSystem, m_pSoundOwner);
     delete m_pPhysicsBall;
 }
 
@@ -291,13 +291,13 @@ static inline bool IsClass15BallShot(cBall* pBall, cPlayer* pShooter)
     bool bClassShot;
     bClassShot = false;
     bState8ShotWithShooter = false;
-    bool bState8Shot = pBall->UnidentifiedState8Shot();
+    bool bState8Shot = pBall->IsSkillShotActive();
     if (bState8Shot && pShooter != NULL)
     {
         bState8ShotWithShooter = true;
     }
     if (bState8ShotWithShooter
-        && pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0xF)
+        && pShooter->m_DetChar.m_eCharacterClass == (eCharacterClass)0xF)
     {
         bClassShot = true;
     }
@@ -333,7 +333,7 @@ void cBall::CollideWithCharacterCallback(
         cFielder* pCharacterFielder = (cFielder*)pCharacter;
         nlVector3 v3BallDirection;
         nlVec3Sub(v3BallDirection, m_v3Position,
-            m_pPrevOwner->mUnidentified024.m_v3Position);
+            m_pPrevOwner->m_DetChar.m_v3Position);
         unsigned short aBallDirection
             = (unsigned short)(int)(10430.378f
                 * nlATan2f(v3BallDirection.y, v3BallDirection.x));
@@ -357,7 +357,7 @@ void cBall::CollideWithCharacterCallback(
             else if (IsDryBonesSkillshot(this))
             {
                 fn_800156F8(this, pShooter);
-                pCharacterFielder->fn_800451B0(pShooter->mUnidentified024.m_v3Position);
+                pCharacterFielder->fn_800451B0(pShooter->m_DetChar.m_v3Position);
                 if (GetStadiumUnknown0x10(
                         GameInfoManager::Instance()->GetStadium()))
                 {
@@ -443,7 +443,7 @@ void cBall::CollideWithCharacterCallback(
             {
                 nlVec3Scale(v3Velocity, m_v3Velocity, -0.1f);
                 nlVector3 v3CharacterToBall;
-                nlVec3Sub(v3CharacterToBall, m_v3Position, pCharacter->mUnidentified024.m_v3Position);
+                nlVec3Sub(v3CharacterToBall, m_v3Position, pCharacter->m_DetChar.m_v3Position);
                 if (nlVec3DotProduct(v3CharacterToBall, v3Velocity) < 0.0f)
                 {
                     const nlVector3& previousPosition = m_v3PrevPosition;
@@ -511,7 +511,7 @@ void cBall::CollideWithCharacterCallback(
     }
 
     if (m_tShotTimer.m_uPackedTime != 0
-        || UnidentifiedHasPassTarget())
+        || HasPassTarget())
     {
         if (pCharacter->m_eClassType == FIELDER)
         {
@@ -577,12 +577,12 @@ void cBall::CollideWithCharacterCallback(
             if (pCharacterFielder->IsSlideAttacking())
             {
                 nlVector3 v3ContactLocation
-                    = pCharacter->mUnidentified024.m_v3Position;
+                    = pCharacter->m_DetChar.m_v3Position;
                 nlVector3 v3PhysicsRadialSpot;
                 float fPlayerScale
-                    = pCharacter->mUnidentified024.m_fPlayerScale;
+                    = pCharacter->m_DetChar.m_fPlayerScale;
                 const unsigned short aActualFacingDirection
-                    = pCharacter->mUnidentified024.m_aActualFacingDirection;
+                    = pCharacter->m_DetChar.m_aActualFacingDirection;
                 float fRadius = fn_8002BFA8(
                     pCharacterFielder->GetTweaks(), fPlayerScale);
                 nlPolarToCartesian(v3PhysicsRadialSpot.x,
@@ -613,9 +613,9 @@ void cBall::CollideWithCharacterCallback(
                         if (absOwnerFacingDelta < 0x2000)
                         {
                             if (pOwnerFielder->GetTweaks()
-                                    ->mUnidentified064
+                                    ->fDefenseSize
                                 < pCharacterFielder->GetTweaks()
-                                      ->mUnidentified064)
+                                      ->fDefenseSize)
                             {
                                 pOwnerFielder->InitActionSlideAttackReact(
                                     pCharacterFielder, false);
@@ -623,9 +623,9 @@ void cBall::CollideWithCharacterCallback(
                                 pCharacterFielder->PickupBall(g_pBall);
                             }
                             else if (pOwnerFielder->GetTweaks()
-                                         ->mUnidentified064
+                                         ->fDefenseSize
                                 > pCharacterFielder->GetTweaks()
-                                      ->mUnidentified064)
+                                      ->fDefenseSize)
                             {
                                 pCharacterFielder
                                     ->InitActionSlideAttackReact(
@@ -634,8 +634,8 @@ void cBall::CollideWithCharacterCallback(
                             }
                             else
                             {
-                                float hitterSpeed = pCharacterFielder->mUnidentified024.m_fActualSpeed;
-                                float hitteeSpeed = pOwnerFielder->mUnidentified024.m_fActualSpeed;
+                                float hitterSpeed = pCharacterFielder->m_DetChar.m_fActualSpeed;
+                                float hitteeSpeed = pOwnerFielder->m_DetChar.m_fActualSpeed;
                                 if (hitteeSpeed < hitterSpeed)
                                 {
                                     pOwnerFielder->InitActionSlideAttackReact(
@@ -737,7 +737,7 @@ static inline void fn_80014494Impl(cBall* pBall)
         return;
     }
 
-    bool bPassTarget = pBall->UnidentifiedHasPassTarget();
+    bool bPassTarget = pBall->HasPassTarget();
     if (bPassTarget)
     {
         if (ReceivingPass((cFielder*)pBall->m_pPassTarget))
@@ -959,10 +959,10 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
 
     UpdateOrientation(fDeltaT);
 
-    bool bUnidentified = m_tShotTimer.m_uPackedTime != 0
+    bool bBooSkillshot = m_tShotTimer.m_uPackedTime != 0
         && meBallState == 8 && m_pShooter != NULL
-        && m_pShooter->mUnidentified024.m_eCharacterClass == (eCharacterClass)0x10;
-    if (bUnidentified)
+        && m_pShooter->m_DetChar.m_eCharacterClass == (eCharacterClass)0x10;
+    if (bBooSkillshot)
     {
         cFielder* pFielder = (cFielder*)m_pShooter;
         if (pFielder->m_eActionState == (eFielderActionState)0x21
@@ -971,13 +971,13 @@ void cBall::PostPhysicsUpdate(float fDeltaT)
             nlVector3 v3JointPosition = pFielder->GetJointPosition(
                 pFielder->m_nBip01JointIndex_0xA4);
             nlVector2 v2Delta;
-            v2Delta.x = v3JointPosition.x - pFielder->mUnidentified024.m_v3Position.x;
-            v2Delta.y = v3JointPosition.y - pFielder->mUnidentified024.m_v3Position.y;
+            v2Delta.x = v3JointPosition.x - pFielder->m_DetChar.m_v3Position.x;
+            v2Delta.y = v3JointPosition.y - pFielder->m_DetChar.m_v3Position.y;
             float fDistance
                 = nlSqrt(v2Delta.x * v2Delta.x + v2Delta.y * v2Delta.y,
                     true);
             float fHeight
-                = pFielder->mUnidentified024.m_v3Position.z - v3JointPosition.z;
+                = pFielder->m_DetChar.m_v3Position.z - v3JointPosition.z;
 
             nlVector3 v3Position;
             nlVector3 v3Velocity = m_v3Velocity;
@@ -1110,7 +1110,7 @@ nlVector3* cBall::GetAIVelocity() const
     cPlayer* temp_r4 = m_pOwner;
     if (temp_r4 != NULL)
     {
-        return &(temp_r4->mUnidentified024.m_v3Velocity);
+        return &(temp_r4->m_DetChar.m_v3Velocity);
     }
     return (nlVector3*)&(m_v3Velocity);
 }
@@ -1366,13 +1366,13 @@ float GetBallChargeValue(cBall* pBall, int nParam)
         }
 
         if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass == BIRDO)
+            && pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass == BIRDO)
         {
             return 0.0f;
         }
 
         if (pBall->GetOwnerFielder() != NULL
-            && pBall->GetOwnerFielder()->mUnidentified024.m_eCharacterClass
+            && pBall->GetOwnerFielder()->m_DetChar.m_eCharacterClass
                 == (eCharacterClass)0x13
             && pBall->GetOwnerFielder()->m_eActionState == ACTION_UNKNOWN_32)
         {
@@ -1428,8 +1428,8 @@ extern "C" void fn_800156F8(cBall*, cPlayer* pShooter)
     eCharacterClass eClass = CHARACTER_CLASS_INVALID;
     if (pShooter != NULL)
     {
-        eClass = pShooter->mUnidentified024.m_eCharacterClass;
-        v3Position = pShooter->mUnidentified024.m_v3Position;
+        eClass = pShooter->m_DetChar.m_eCharacterClass;
+        v3Position = pShooter->m_DetChar.m_v3Position;
     }
 
     float fTimeScale;
@@ -1578,7 +1578,7 @@ extern "C" void fn_80015B38(cBall* pBall, bool bParam)
 
 static inline void ClearBallStateTargets(cBall* pBall)
 {
-    pBall->m_tShotTimer.UnidentifiedClear();
+    pBall->m_tShotTimer.Clear();
     pBall->mpDamageTarget = NULL;
     if (pBall->m_pPassTarget != NULL)
     {
@@ -1588,7 +1588,7 @@ static inline void ClearBallStateTargets(cBall* pBall)
     pBall->m_v3PassIntercept.x = 0.0f;
     pBall->m_v3PassIntercept.y = 0.0f;
     pBall->m_v3PassIntercept.z = 0.0f;
-    pBall->m_tPassTargetTimer.UnidentifiedClear();
+    pBall->m_tPassTargetTimer.Clear();
     pBall->m_fTotalPassTime = 0.0f;
     if (pBall->m_uVoiceID != 0)
     {
@@ -1602,7 +1602,7 @@ static inline void UpdateBallShotClock(cBall* pBall)
     {
         if (!pBall->m_pOwner->IsOnSameTeam(pBall->m_pPrevOwner))
         {
-            pBall->mtShotClockTimer.SetSeconds(lbl_806DB558);
+            pBall->mtShotClockTimer.SetSeconds(gfShotClockTime);
             pBall->mnShotClockTeam = pBall->m_pOwner->m_pTeam->m_nSide;
         }
     }
@@ -1616,14 +1616,14 @@ static inline void UpdateBallShotClock(cBall* pBall)
 extern "C" void fn_80015C38(cBall* pBall, int nBallState)
 {
     ImmediateEvent<void(int, int)>* event
-        = &g_pGame->mUnidentified49C.mBallStateChangeEvent;
+        = &g_pGame->mEventQueue.mBallStateChangeEvent;
     event->Deliver(pBall->meBallState, nBallState);
 
     if (pBall->meBallState == 9)
     {
         pBall->m_pPhysicsBall->m_gravity = -22.5f;
         fn_801BDF08(0);
-        pBall->m_tLightningTimer.UnidentifiedClear();
+        pBall->m_tLightningTimer.Clear();
     }
 
     if ((pBall->meBallState == 6 || pBall->meBallState == 7)
@@ -1715,7 +1715,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
     if (nBallState == 2 || nBallState == 4)
     {
         PlayOwnedSound(0, 0xBF92BBAF,
-            (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
+            (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
     }
 
     if (pBall->m_pPrevOwner != NULL
@@ -1725,76 +1725,76 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         if (nBallState == 7)
         {
             PlayOwnedSound(0, 0xDE8EC45D,
-                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
+                (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
         }
         else if (nBallState == 6)
         {
             PlayOwnedSound(0, 0xDE8EC45D,
-                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
+                (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
             if (pBall->mfChargeValue >= 1.0f
                 && pBall->mfChargeValue < 2.0f)
             {
                 PlayOwnedSound(0, 0xDE8EC45E,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 2.0f
                 && pBall->mfChargeValue < 3.0f)
             {
                 PlayOwnedSound(0, 0xDE8EC45F,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 3.0f
                 && pBall->mfChargeValue < 4.0f)
             {
                 PlayOwnedSound(0, 0xDE8EC460,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 4.0f)
             {
                 PlayOwnedSound(0, 0xDE8EC461,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
         }
         else if (nBallState == 5 || nBallState == 3 || nBallState == 1)
         {
             PlayOwnedSound(0, 0x874F86F2,
-                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
+                (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
             if (pBall->mfChargeValue >= 1.0f
                 && pBall->mfChargeValue < 2.0f)
             {
                 PlayOwnedSound(0, 0x71406564,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 2.0f
                 && pBall->mfChargeValue < 3.0f)
             {
                 PlayOwnedSound(0, 0x71406565,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 3.0f
                 && pBall->mfChargeValue < 4.0f)
             {
                 PlayOwnedSound(0, 0x71406566,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
             else if (pBall->mfChargeValue >= 4.0f)
             {
                 PlayOwnedSound(0, 0x71406567,
-                    (XSoundOwner*)pBall->mUnidentifiedEC, NULL,
+                    (XSoundOwner*)pBall->m_pSoundOwner, NULL,
                     NULL);
             }
 
             if (nBallState == 5)
             {
                 PlayOwnedSound(0, 0x65321E47,
-                    (XSoundOwner*)pBall->mUnidentifiedEC,
+                    (XSoundOwner*)pBall->m_pSoundOwner,
                     "Volley Pass", pBall);
             }
         }
@@ -1802,7 +1802,7 @@ extern "C" void fn_80015C38(cBall* pBall, int nBallState)
         {
             PlayOwnedSound(pBall->m_pPrevOwner->m_uSoundSlotId,
                 0x3D267BDF,
-                (XSoundOwner*)pBall->mUnidentifiedEC, NULL, NULL);
+                (XSoundOwner*)pBall->m_pSoundOwner, NULL, NULL);
         }
     }
 
@@ -1823,7 +1823,7 @@ bool IsDryBonesSkillshot(cBall* pBall)
 {
     return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
-        && pBall->m_pShooter->mUnidentified024.m_eCharacterClass
+        && pBall->m_pShooter->m_DetChar.m_eCharacterClass
         == (eCharacterClass)0x11;
 }
 
@@ -1831,7 +1831,7 @@ extern "C" bool fn_800167A8(cBall* pBall)
 {
     return pBall->m_tShotTimer.m_uPackedTime != 0
         && pBall->meBallState == 8 && pBall->m_pShooter != NULL
-        && pBall->m_pShooter->mUnidentified024.m_eCharacterClass
+        && pBall->m_pShooter->m_DetChar.m_eCharacterClass
         == (eCharacterClass)0x10;
 }
 
@@ -1929,7 +1929,7 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
     nlVector3 v3ToDir;
     nlVector3 v3FromDir;
     nlQuaternion qRot;
-    nlVector3 v3Unidentified;
+    nlVector3 v3TargetOffset;
 
     SetVelocity(v3Dir, spinType, &v3Spin);
     m_tNoPickupTimer.SetSeconds(0.1f);
@@ -1944,11 +1944,11 @@ void cBall::Shoot(cPlayer* pShooter, const nlVector3& v3Dir,
 
     if (m_pPhysicsBall->mbUseMagnusEffect)
     {
-        nlVec3Set(v3Unidentified,
+        nlVec3Set(v3TargetOffset,
             m_v3Position.x - m_v3ShotTarget.x,
             m_v3Position.y - m_v3ShotTarget.y,
             m_v3Position.z - m_v3ShotTarget.z);
-        float fDist = nlSqrt(v3Unidentified.GetLengthSq3D(), true);
+        float fDist = nlSqrt(v3TargetOffset.GetLengthSq3D(), true);
 
         DisablePredictedGoaliePlanes();
         FakeBallWorld::GetPredictedPosAtDistance(
@@ -2015,7 +2015,7 @@ void ReleaseBallForPass(cBall* pBall, cPlayer* pPlayer,
     pPhysicsBall->mbUseMagnusEffect = false;
     pPhysicsBall->mfChargeBonus = 0.0f;
 
-    if (lbl_806DB500 && pPlayer->m_eClassType == FIELDER)
+    if (gbUsePassCharging && pPlayer->m_eClassType == FIELDER)
     {
         float fValue = GetPlaymakerRating(((cFielder*)pPlayer)->GetTweaks());
         float fPercent = InterpolateRangeClamped(
@@ -2195,7 +2195,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
 
         if (pBall->mtShotClockTimer.m_uPackedTime != 0
             && pBall->mtShotClockTimer.Countdown(fDeltaT, 0.0f)
-            && lbl_806E0BDC)
+            && gbUseShotClock)
         {
             cFielder* pFielder = NULL;
             if (GetOwnerFielderImpl(pBall) != NULL)
@@ -2208,7 +2208,7 @@ void UpdateBallStateAndTimers(cBall* pBall, float fDeltaT)
             }
             if (pFielder != NULL)
             {
-                SetFielderFrozenState(pFielder, 1, lbl_806DB55C);
+                SetFielderFrozenState(pFielder, 1, gfShotClockFrozenTime);
             }
         }
     }
@@ -2233,7 +2233,7 @@ void cBall::Update(float fDeltaT)
         UpdateBallStateAndTimers(this, fDeltaT);
         DecayBallCharge(this);
 
-        bool bUnidentified = true;
+        bool bKillHeaderTarget = true;
         static Timer tHeaderTargetTimer(0.33f);
 
         bool bIsGameplay = g_pGame->IsGameplayOrOvertime();
@@ -2250,21 +2250,21 @@ void cBall::Update(float fDeltaT)
             {
                 if (sHeaderTargetVisible)
                 {
-                    bUnidentified = m_v3Position.z < 0.4f;
+                    bKillHeaderTarget = m_v3Position.z < 0.4f;
                 }
                 else if (m_v3Position.z > gHeaderTargetPredictionHeight
                     && tHeaderTargetTimer.Countdown(fDeltaT, 0.0f))
                 {
-                    nlVector3 v3Unidentified;
-                    PredictLandingSpotAndTime(v3Unidentified,
+                    nlVector3 v3LandingSpot;
+                    PredictLandingSpotAndTime(v3LandingSpot,
                         NULL, NULL, gHeaderTargetPredictionHeight);
-                    EmitHeaderTarget(this, &v3Unidentified, false);
+                    EmitHeaderTarget(this, &v3LandingSpot, false);
                     sHeaderTargetVisible = true;
-                    bUnidentified = false;
+                    bKillHeaderTarget = false;
                 }
             }
 
-            if (sHeaderTargetVisible && bUnidentified)
+            if (sHeaderTargetVisible && bKillHeaderTarget)
             {
                 KillHeaderTarget(this, false);
                 sHeaderTargetVisible = false;
@@ -2280,12 +2280,12 @@ void cBall::Update(float fDeltaT)
 
         if (meBallState != 5
             || (meBallState == 2 && m_pOwner != NULL
-                && m_pOwner->mUnidentified1E4.m_tBallPossessionTimer.GetSeconds() > 0.1f))
+                && m_pOwner->m_DetPlayer.m_tBallPossessionTimer.GetSeconds() > 0.1f))
         {
             m_iConsecutiveVolleyPasses = 0;
         }
 
-        mUnidentifiedEC->count.zeroVelocity
+        m_pSoundOwner->count.zeroVelocity
             = !g_pGame->IsGameplayOrOvertime();
     }
 }
@@ -2382,7 +2382,7 @@ void cBall::UpdateOrientation(float fDeltaT)
     {
         m_pPhysicsBall->SetUseAngularVelocity(false);
 
-        switch (m_pOwner->mUnidentified1E4.m_eBallRotationMode)
+        switch (m_pOwner->m_DetPlayer.m_eBallRotationMode)
         {
         case BRM_ANIMATED:
             m_pOwner->GetAnimatedBallOrientation(m_qOrientation);
@@ -2608,10 +2608,10 @@ void ResetBall(cBall* pBall, bool bParam)
         v3Pos.z = lbl_806E0BC8;
     }
 
-    float fUnidentified = 0.0f;
+    float fChargeValue = 0.0f;
     if (lbl_806DB544)
     {
-        fUnidentified = pBall->mfChargeValue;
+        fChargeValue = pBall->mfChargeValue;
     }
 
     if (pBall->m_pOwner != NULL)
@@ -2682,7 +2682,7 @@ void ResetBall(cBall* pBall, bool bParam)
     {
         if (!pBall->m_pOwner->IsOnSameTeam(pBall->m_pPrevOwner))
         {
-            pBall->mtShotClockTimer.SetSeconds(lbl_806DB558);
+            pBall->mtShotClockTimer.SetSeconds(gfShotClockTime);
             pBall->mnShotClockTeam = pBall->m_pOwner->m_pTeam->m_nSide;
         }
     }
@@ -2694,7 +2694,7 @@ void ResetBall(cBall* pBall, bool bParam)
 
     if (lbl_806DB544 && bParam)
     {
-        fn_800154FC(pBall, fUnidentified);
+        fn_800154FC(pBall, fChargeValue);
     }
     else if (lbl_806E0BC4)
     {
@@ -2706,25 +2706,25 @@ void ResetBall(cBall* pBall, bool bParam)
 
 extern "C" void fn_800189C4(cBall* pBall)
 {
-    StopSound(pBall->mUnidentifiedF0, pBall);
-    pBall->mUnidentifiedF0 = 0;
+    StopSound(pBall->m_uGlowSoundCue, pBall);
+    pBall->m_uGlowSoundCue = 0;
 }
 
 static const nlVector3 sBallTrailUpVector = { 0.0f, 1.0f, 0.0f };
 
 extern "C" void fn_80018A00()
 {
-    UnidentifiedFindEvent<void>("BallFall", -1)->Add(Function<void*>(OnBallFall), 0, -1);
-    UnidentifiedFindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(OnBallStateChange), 0, -1);
-    UnidentifiedFindEvent<void>("ResetEffects", -1)->Add(Function<void*>(OnBallResetEffects), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
-    UnidentifiedFindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventNoData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
-    UnidentifiedFindEvent<UnidentifiedEventData34>("CollisionEggBall", -1)->Add(Function<UnidentifiedEventData34*>(OnBallEggCollision), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);
-    UnidentifiedFindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
-    UnidentifiedFindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
+    FindEvent<void>("BallFall", -1)->Add(Function<void*>(OnBallFall), 0, -1);
+    FindEvent<void(int, int)>("BallStateChange", -1)->Add(Function<void(int, int)>(OnBallStateChange), 0, -1);
+    FindEvent<void>("ResetEffects", -1)->Add(Function<void*>(OnBallResetEffects), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(OnBallKickoff), 0, -1);
+    FindEvent<void>("GetReadyForKickoff", -1)->Add(Function<void*>(OnBallGetReadyForKickoff), 0, -1);
+    FindEvent<NoEventData>("GameOver", -1)->Add(Function<FnVoidVoid>(OnBallGameOver), 0, -1);
+    FindEvent<void>("CollisionBallTronWall", -1)->Add(Function<void*>(OnBallTronWallCollision), 0, -1);
+    FindEvent<CollisionEggData>("CollisionEggBall", -1)->Add(Function<CollisionEggData*>(OnBallEggCollision), 0, -1);
+    FindEvent<void>("CollisionDebrisBall", -1)->Add(Function<void*>(OnBallDebrisCollision), 0, -1);
+    FindEvent<PhysicsPatch>("CollisionPatchBall", -1)->Add(Function<PhysicsPatch*>(OnBallPatchCollision), 0, -1);
+    FindEvent<void>("CollisionThwompBall", -1)->Add(Function<void*>(OnBallThwompCollision), 0, -1);
 
     lbl_806E0C10 = 0;
     unsigned int i = 0;
@@ -2736,10 +2736,10 @@ extern "C" void fn_80018A00()
         {
             EmissionManager::Instance()->Destroy(
                 (unsigned long)pBallTrail, NULL);
-            if (pBallTrail->mUnidentified038 != NULL)
+            if (pBallTrail->blurHandler != NULL)
             {
-                pBallTrail->mUnidentified038->Die(lbl_806DB54C);
-                pBallTrail->mUnidentified038 = NULL;
+                pBallTrail->blurHandler->Die(lbl_806DB54C);
+                pBallTrail->blurHandler = NULL;
             }
         }
         ++pBallTrail;
@@ -2898,16 +2898,16 @@ void OnBallKickoff()
         return;
     }
 
-    float fUnidentified0
+    float fSpeedX
         = nlRandomf(lbl_806DB548 * lbl_806E0BD8)
         + lbl_806DB548 * (1.0f - lbl_806E0BD8);
-    float fUnidentified1
+    float fSpreadY
         = nlRandomf(lbl_806E0BD0 * lbl_806E0BD8)
         + lbl_806E0BD0 * (1.0f - lbl_806E0BD8);
 
-    nlVector3 v3Velocity = { fUnidentified0, 0.0f, 0.0f };
+    nlVector3 v3Velocity = { fSpeedX, 0.0f, 0.0f };
     v3Velocity.y
-        = 0.5f * fUnidentified1 - nlRandomf(fUnidentified1);
+        = 0.5f * fSpreadY - nlRandomf(fSpreadY);
     v3Velocity.x = 0.0f;
     v3Velocity.z
         = 0.75f * lbl_806E0BD4
@@ -2970,7 +2970,7 @@ void OnBallTronWallCollision(void*)
     fn_80015C38(pBall, 0);
 }
 
-void OnBallEggCollision(UnidentifiedEventData34*)
+void OnBallEggCollision(CollisionEggData*)
 {
     cBall* pBall = g_pBall;
     if (pBall->m_pOwner != NULL)
@@ -3382,17 +3382,17 @@ void cBall::SyncLog(void* context, DebugWriteCache* cache)
     if (copy != NULL)
     {
         *(int*)&copy->m_pOwner
-            = m_pOwner == NULL ? -1 : m_pOwner->mUnidentified120;
+            = m_pOwner == NULL ? -1 : m_pOwner->m_nCharacterIndex;
         *(int*)&copy->m_pPrevOwner
-            = m_pPrevOwner == NULL ? -1 : m_pPrevOwner->mUnidentified120;
+            = m_pPrevOwner == NULL ? -1 : m_pPrevOwner->m_nCharacterIndex;
         *(int*)&copy->m_pLastTouch
-            = m_pLastTouch == NULL ? -1 : m_pLastTouch->mUnidentified120;
+            = m_pLastTouch == NULL ? -1 : m_pLastTouch->m_nCharacterIndex;
         *(int*)&copy->m_pPassTarget
-            = m_pPassTarget == NULL ? -1 : m_pPassTarget->mUnidentified120;
+            = m_pPassTarget == NULL ? -1 : m_pPassTarget->m_nCharacterIndex;
         *(int*)&copy->m_pShooter
-            = m_pShooter == NULL ? -1 : m_pShooter->mUnidentified120;
+            = m_pShooter == NULL ? -1 : m_pShooter->m_nCharacterIndex;
         *(int*)&copy->mpDamageTarget
-            = mpDamageTarget == NULL ? -1 : mpDamageTarget->mUnidentified120;
+            = mpDamageTarget == NULL ? -1 : mpDamageTarget->m_nCharacterIndex;
         cache->ChecksumData(lbl_806DB5C0, copy, context);
     }
 }
@@ -3411,7 +3411,7 @@ void cBall::ChecksumState(RunningChecksum* runningChecksum)
 LiveBallTrail::LiveBallTrail()
 {
     drawable = NULL;
-    mUnidentified038 = NULL;
+    blurHandler = NULL;
     visible = false;
     orientation.z = 0.0f;
     orientation.y = 0.0f;
@@ -3419,15 +3419,15 @@ LiveBallTrail::LiveBallTrail()
     orientation.w = 1.0f;
     position = v3Zero;
     velocity = v3Zero;
-    mUnidentified028 = v3Zero;
+    angularVelocity = v3Zero;
 }
 
 LiveBallTrail::~LiveBallTrail()
 {
-    if (mUnidentified038 != NULL)
+    if (blurHandler != NULL)
     {
-        mUnidentified038->Die(lbl_806DB54C);
-        mUnidentified038 = NULL;
+        blurHandler->Die(lbl_806DB54C);
+        blurHandler = NULL;
     }
 }
 
@@ -3438,10 +3438,10 @@ void SetBallTrailVisible(LiveBallTrail* pBallTrail, bool bParam)
     {
         EmissionManager::Instance()->Destroy(
             (unsigned long)pBallTrail, NULL);
-        if (pBallTrail->mUnidentified038 != NULL)
+        if (pBallTrail->blurHandler != NULL)
         {
-            pBallTrail->mUnidentified038->Die(lbl_806DB54C);
-            pBallTrail->mUnidentified038 = NULL;
+            pBallTrail->blurHandler->Die(lbl_806DB54C);
+            pBallTrail->blurHandler = NULL;
         }
     }
 }
@@ -3451,7 +3451,7 @@ void UpdateBallTrail(LiveBallTrail* pBallTrail, float fParam)
     nlVec3ScaleAdd(pBallTrail->position, fParam,
         pBallTrail->velocity, pBallTrail->position);
 
-    if (pBallTrail->mUnidentified038 != NULL)
+    if (pBallTrail->blurHandler != NULL)
     {
         nlVector3 v3Position;
         float fVelocityLengthSq
@@ -3473,7 +3473,7 @@ void UpdateBallTrail(LiveBallTrail* pBallTrail, float fParam)
         {
             v3Up = v3Zero;
         }
-        pBallTrail->mUnidentified038->AddViewOrientedPoint(
+        pBallTrail->blurHandler->AddViewOrientedPoint(
             v3Position, v3Up);
     }
 
@@ -3488,7 +3488,7 @@ void UpdateBallTrail(LiveBallTrail* pBallTrail, float fParam)
 
     nlVector3 v3Rotation;
     nlVec3Scale(
-        v3Rotation, pBallTrail->mUnidentified028, fParam);
+        v3Rotation, pBallTrail->angularVelocity, fParam);
     nlQuaternion qOrientation;
     qOrientation.x = pBallTrail->orientation.x
         + 0.5f * (v3Rotation.x * pBallTrail->orientation.w
@@ -3517,7 +3517,7 @@ void InitializeMegaStrikeBallTrail(
 
     nlSNPrintf(effectName, sizeof(effectName),
         "%s_megastrike_home_3_gameplay",
-        pFielder->mUnidentified11C->mName);
+        pFielder->m_pCharacterInfo->mName);
 
     EffectsGroup* pEffectsGroup = EmissionManager::Instance()->GetEffectsGroup(effectName);
     EmissionController* pController = EmissionManager::Instance()->Create(pEffectsGroup, 0, true, 0);
@@ -3532,13 +3532,13 @@ void InitializeMegaStrikeBallTrail(
     pController->SetPosition(pBallTrail->position);
     pController->SetVelocity(v3Zero);
 
-    if (pBallTrail->mUnidentified038 != NULL)
+    if (pBallTrail->blurHandler != NULL)
     {
-        pBallTrail->mUnidentified038->Die(lbl_806DB54C);
-        pBallTrail->mUnidentified038 = NULL;
+        pBallTrail->blurHandler->Die(lbl_806DB54C);
+        pBallTrail->blurHandler = NULL;
     }
 
-    switch (pFielder->mUnidentified024.m_eCharacterClass)
+    switch (pFielder->m_DetChar.m_eCharacterClass)
     {
     case (eCharacterClass)1:
         nlStrNCpy(textureName,
@@ -3602,7 +3602,7 @@ void InitializeMegaStrikeBallTrail(
         break;
     }
 
-    pBallTrail->mUnidentified038 = BlurManager::GetNewHandler(
+    pBallTrail->blurHandler = BlurManager::GetNewHandler(
         textureName,
         0.18f * lbl_806DB550 * 0.925f,
         lbl_806DB554,
@@ -3635,15 +3635,15 @@ unsigned int GetNumBallTrails()
 void InitializeBallTrails(unsigned int nNumTrails)
 {
     lbl_806E0C10 = nNumTrails;
-    nlVector3 v3Unidentified = v3Zero;
+    nlVector3 v3ZeroValue = v3Zero;
 
     unsigned int i = 0;
     for (; i < nNumTrails; ++i)
     {
         LiveBallTrail* pBallTrail = &lbl_8056B518[i];
         SetBallTrailVisible(pBallTrail, false);
-        pBallTrail->position = v3Unidentified;
-        pBallTrail->velocity = v3Unidentified;
+        pBallTrail->position = v3ZeroValue;
+        pBallTrail->velocity = v3ZeroValue;
         pBallTrail->drawable = (DrawableModel*)GetBallRenderObject(i);
     }
 

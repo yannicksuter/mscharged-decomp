@@ -1,6 +1,6 @@
 #include "NL/gl/glDrawSyncLog.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GLDrawSyncLog* glGetDrawSyncLog()
 {

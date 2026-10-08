@@ -24,7 +24,7 @@ public:
     void ResetAccelerationHistory();
 
 private:
-    /* 0x000 */ u32 mUnidentified000;
+    /* 0x000 */ u32 m_pad000;
     /* 0x004 */ nlVector3 mRemoteAccelerationHistory[30];
     /* 0x16C */ nlVector3 mFreestyleAccelerationHistory[30];
     /* 0x2D4 */ u32 mAccelerationHistoryIndex;

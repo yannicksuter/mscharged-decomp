@@ -15,7 +15,7 @@
 #include "Game/Render/Warble.h"
 #include "Game/Render/depthoffield.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw3.h"

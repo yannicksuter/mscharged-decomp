@@ -36,7 +36,7 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 #include "Game/Render/StadiumLoading.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 void UpdateBobombEmitter(EmissionController&);
@@ -178,36 +178,36 @@ const char* uBANANA_STREAK_TEXTURE;
 
 int IsMushroomPowerup(ePowerUpType eType)
 {
-    int nUnidentified = 0;
+    int nIsMushroom = 0;
     switch (eType)
     {
     case POWER_UP_MUSHROOM:
-        nUnidentified = 1;
+        nIsMushroom = 1;
         break;
     default:
         break;
     }
-    return nUnidentified;
+    return nIsMushroom;
 }
 
 bool IsStarOrChainChompPowerup(ePowerUpType eType)
 {
-    bool bUnidentified = false;
+    bool bIsStarOrChainChomp = false;
     switch (eType)
     {
     case POWER_UP_CHAIN_CHOMP:
     case POWER_UP_STAR:
-        bUnidentified = true;
+        bIsStarOrChainChomp = true;
         break;
     default:
         break;
     }
-    return bUnidentified;
+    return bIsStarOrChainChomp;
 }
 
 bool IsDrawablePowerup(ePowerUpType eType)
 {
-    bool bUnidentified = false;
+    bool bIsDrawable = false;
     switch (eType)
     {
     case POWER_UP_GREEN_SHELL:
@@ -216,17 +216,17 @@ bool IsDrawablePowerup(ePowerUpType eType)
     case POWER_UP_FREEZE_SHELL:
     case POWER_UP_BANANA:
     case POWER_UP_BOBOMB:
-        bUnidentified = true;
+        bIsDrawable = true;
         break;
     default:
         break;
     }
-    return bUnidentified;
+    return bIsDrawable;
 }
 
-bool IsCaptainPowerup(int nUnidentified)
+bool IsCaptainPowerup(int nType)
 {
-    return nUnidentified >= NUM_POWER_UPS && nUnidentified <= 20;
+    return nType >= NUM_POWER_UPS && nType <= 20;
 }
 
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
@@ -240,7 +240,7 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
     cFielder* pCandidate;
 
     pTeam = pThrower->m_pTeam->GetOtherTeam();
-    aDirection = pThrower->mUnidentified024.m_aActualFacingDirection;
+    aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
 
     if (pThrower->m_pController != 0)
     {
@@ -261,7 +261,7 @@ cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)
             && !pCandidate->IsShattered())
         {
             fTempScore = pThrower->DoFlashLight(
-                pCandidate->mUnidentified024.m_v3Position, aDirection, 0.0001f, 0.0f, 30.0f);
+                pCandidate->m_DetChar.m_v3Position, aDirection, 0.0001f, 0.0f, 30.0f);
         }
 
         if (gbAlwaysSurround || eType == POWER_UP_BOBOMB)
@@ -460,7 +460,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
         }
         else
         {
-            nFlipAngle += pFirstPowerup->m_pThrower->mUnidentified024.m_aActualFacingDirection;
+            nFlipAngle += pFirstPowerup->m_pThrower->m_DetChar.m_aActualFacingDirection;
         }
 
         nlVector3 v3CurrentVelocity = { 0.0f, 0.0f, 0.0f };
@@ -499,7 +499,7 @@ void PowerupThrowPosition(int nThrowOrder, eThrowStyle eStyle,
 
 float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
 {
-    float fUnidentified = 0.0f;
+    float fRadius = 0.0f;
 
     switch (eType)
     {
@@ -510,13 +510,13 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fShellBigRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fShellBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fShellMediumRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fShellMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fShellSmallRadius;
             break;
         }
         break;
@@ -524,13 +524,13 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaBigRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBananaBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaMediumRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBananaMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBananaSmallRadius;
             break;
         }
         break;
@@ -538,13 +538,13 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         switch (eSize)
         {
         case POWERUPSIZE_LARGE:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombBigRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBobombBigRadius;
             break;
         case POWERUPSIZE_MEDIUM:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombMediumRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBobombMediumRadius;
             break;
         case POWERUPSIZE_SMALL:
-            fUnidentified = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
+            fRadius = gGameTweaks.m_pGameTweaks->fBobombSmallRadius;
             break;
         }
         break;
@@ -552,18 +552,18 @@ float GetPowerupRadius(ePowerUpType eType, ePowerupSize eSize)
         break;
     }
 
-    return fUnidentified;
+    return fRadius;
 }
 
 void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
-    int nnumOfPowerups, PowerupThrowParameters* pUnidentified)
+    int nnumOfPowerups, PowerupThrowParameters* pParameters)
 {
-    pUnidentified->bExplode = false;
-    pUnidentified->nnumOfPowerups = nnumOfPowerups;
-    pUnidentified->eStyle = THROW_ARROW;
-    pUnidentified->eSize = POWERUPSIZE_SMALL;
-    pUnidentified->eType = eType;
-    pUnidentified->fRadius = 0.0f;
+    pParameters->bExplode = false;
+    pParameters->nnumOfPowerups = nnumOfPowerups;
+    pParameters->eStyle = THROW_ARROW;
+    pParameters->eSize = POWERUPSIZE_SMALL;
+    pParameters->eType = eType;
+    pParameters->fRadius = 0.0f;
 
     float fMediumChance = gGameTweaks.m_pGameTweaks->fShellMediumChance;
     float fExplodeChance = gGameTweaks.m_pGameTweaks->fShellExplodeChance;
@@ -583,7 +583,7 @@ void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
     }
 
     if (GameInfoManager::Instance()->GetRule0x0() == 4
-        && pUnidentified->nnumOfPowerups == 1)
+        && pParameters->nnumOfPowerups == 1)
     {
         fMediumChance = 0.0f;
     }
@@ -592,44 +592,44 @@ void BuildPowerupThrowParameters(cFielder* pThrower, ePowerUpType eType,
         fExplodeChance = 1.0f;
     }
 
-    if (pUnidentified->nnumOfPowerups > 1)
+    if (pParameters->nnumOfPowerups > 1)
     {
-        if (pUnidentified->eType == POWER_UP_RED_SHELL)
+        if (pParameters->eType == POWER_UP_RED_SHELL)
         {
-            pUnidentified->eStyle = THROW_SURROUND;
+            pParameters->eStyle = THROW_SURROUND;
         }
-        else if (pUnidentified->eType == POWER_UP_BANANA)
+        else if (pParameters->eType == POWER_UP_BANANA)
         {
-            pUnidentified->eStyle = THROW_HORIZONTAL_LINE;
+            pParameters->eStyle = THROW_HORIZONTAL_LINE;
         }
-        else if (pUnidentified->nnumOfPowerups > 3)
+        else if (pParameters->nnumOfPowerups > 3)
         {
-            pUnidentified->eStyle = THROW_ARROW;
+            pParameters->eStyle = THROW_ARROW;
         }
         else
         {
-            pUnidentified->eStyle = THROW_HORIZONTAL_LINE;
+            pParameters->eStyle = THROW_HORIZONTAL_LINE;
         }
     }
     else
     {
         if (nlRandomf(1.0f) <= fExplodeChance)
         {
-            pUnidentified->bExplode = true;
+            pParameters->bExplode = true;
         }
 
         if (nlRandomf(1.0f) < fMediumChance)
         {
-            pUnidentified->eSize = POWERUPSIZE_MEDIUM;
+            pParameters->eSize = POWERUPSIZE_MEDIUM;
         }
         else
         {
-            pUnidentified->eSize = POWERUPSIZE_LARGE;
+            pParameters->eSize = POWERUPSIZE_LARGE;
         }
     }
 
-    pUnidentified->fRadius = GetPowerupRadius(
-        pUnidentified->eType, pUnidentified->eSize);
+    pParameters->fRadius = GetPowerupRadius(
+        pParameters->eType, pParameters->eSize);
 }
 
 inline Banana::Banana(cFielder* pTarget, int nIndex, float fRadius,
@@ -775,7 +775,7 @@ int PowerupCreateAndThrow(cFielder* pThrower, cFielder* pTarget,
             else
             {
                 PowerupThrowPosition(j, params.eStyle, pPowerup,
-                    pFirstPowerup, pThrower->mUnidentified024.m_aActualFacingDirection);
+                    pFirstPowerup, pThrower->m_DetChar.m_aActualFacingDirection);
 
                 if (pPowerup->m_eType == POWER_UP_RED_SHELL)
                 {
@@ -894,7 +894,7 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     , m_eType(eType)
     , m_unk20(true)
 {
-    AvoidablePowerup* pUnidentified = 0;
+    AvoidablePowerup* pAvoidable = 0;
 
     m_aOrientation = 0;
     m_scale = 1.0f;
@@ -1024,8 +1024,8 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_unk34.m_uWasRunning = m_unk34.m_uPackedTime != 0;
     m_unk34.m_uPackedTime = 0;
 
-    nlVector3 v3Unidentified = v3Zero;
-    m_v3SavedVelocity = v3Unidentified;
+    nlVector3 v3ZeroVelocity = v3Zero;
+    m_v3SavedVelocity = v3ZeroVelocity;
     m_v3PrevPosition = m_v3Position;
     m_v3Velocity = v3Zero;
 
@@ -1034,9 +1034,9 @@ PowerupBase::PowerupBase(cFielder* pTarget, ePowerUpType eType, float fRadius,
     m_pPhysicsObject->SetLinearVelocity(m_v3Velocity);
     m_pPhysicsObject->EnableCollisions();
 
-    pUnidentified = (AvoidablePowerup*)nlMalloc(sizeof(AvoidablePowerup), 8, false);
-    pUnidentified = new (pUnidentified) AvoidablePowerup(this);
-    m_pAvoidableObject = pUnidentified;
+    pAvoidable = (AvoidablePowerup*)nlMalloc(sizeof(AvoidablePowerup), 8, false);
+    pAvoidable = new (pAvoidable) AvoidablePowerup(this);
+    m_pAvoidableObject = pAvoidable;
 
     if (eType == POWER_UP_RED_SHELL)
     {
@@ -1842,7 +1842,7 @@ void PowerupBase::fn_8009CAC0(cFielder* pFielder)
         }
     }
 
-    m_v3Position = pFielder->mUnidentified024.m_v3Position;
+    m_v3Position = pFielder->m_DetChar.m_v3Position;
     m_pPhysicsObject->SetPosition(
         m_v3Position, PhysicsObject::WORLD_COORDINATES);
     m_v3Velocity = v3Zero;
@@ -1870,13 +1870,13 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
     nlVector3 v3TargetPos;
     nlVector3 v3TargetVel;
 
-    v3TargetPos = pThrower->mUnidentified024.m_v3Position;
-    v3TargetVel = pThrower->mUnidentified024.m_v3Velocity;
+    v3TargetPos = pThrower->m_DetChar.m_v3Position;
+    v3TargetVel = pThrower->m_DetChar.m_v3Velocity;
 
     if (m_pTarget != 0)
     {
-        v3TargetPos = m_pTarget->mUnidentified024.m_v3Position;
-        v3TargetVel = m_pTarget->mUnidentified024.m_v3Velocity;
+        v3TargetPos = m_pTarget->m_DetChar.m_v3Position;
+        v3TargetVel = m_pTarget->m_DetChar.m_v3Velocity;
     }
 
     float fSpeed = GetShellSpeed(pThrower->GetTweaks());
@@ -1928,7 +1928,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
     }
     else
     {
-        unsigned short aDirection = pThrower->mUnidentified024.m_aActualFacingDirection;
+        unsigned short aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
         if (pThrower->m_pController != 0
             && pThrower->m_pController->GetMovementStickMagnitude() > 0.01f)
         {
@@ -1952,7 +1952,7 @@ void PowerupBase::ThrowAt(cFielder* pThrower)
 /**
  * Offset/Address/Size: 0x385C | 0x8009CEBC | size: 0x23C
  */
-void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
+void PowerupBase::fn_8009CEBC(const nlVector3& v3ShockwaveOrigin)
 {
     if (m_unk44.m_uPackedTime == 0)
     {
@@ -1963,7 +1963,7 @@ void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
 
             const nlVector3& v3Velocity = m_v3Velocity;
             float fVerticalVelocity = -v3Velocity.z;
-            nlVec3Sub(v3Direction, m_v3Position, v3Unidentified);
+            nlVec3Sub(v3Direction, m_v3Position, v3ShockwaveOrigin);
 
             if (nlVec3DotProduct(v3Direction, v3Velocity) < 0.0f)
             {
@@ -1992,9 +1992,9 @@ void PowerupBase::fn_8009CEBC(const nlVector3& v3Unidentified)
         else
         {
             nlVector3 v3Direction;
-            float fDirectionY = m_v3Position.y - v3Unidentified.y;
-            float fDirectionX = m_v3Position.x - v3Unidentified.x;
-            float fDirectionZ = m_v3Position.z - v3Unidentified.z;
+            float fDirectionY = m_v3Position.y - v3ShockwaveOrigin.y;
+            float fDirectionX = m_v3Position.x - v3ShockwaveOrigin.x;
+            float fDirectionZ = m_v3Position.z - v3ShockwaveOrigin.z;
             nlVec3Set(v3Direction, fDirectionX, fDirectionY, fDirectionZ);
             float fInvDistance = nlRecipSqrt(
                 nlVec3LengthSquared(v3Direction), true);
@@ -2050,9 +2050,9 @@ void PowerupBase::Destroy(bool bSilent)
         StopSound(soundID, this);
     }
 
-    bool bUnidentified = m_v3Position.z < -1.0f;
+    bool bBelowGround = m_v3Position.z < -1.0f;
 
-    if (!bSilent && !bUnidentified
+    if (!bSilent && !bBelowGround
         && (m_eType == POWER_UP_BOBOMB || mbExploder))
     {
         if (m_eType != POWER_UP_FREEZE_SHELL)
@@ -2529,8 +2529,8 @@ void GreenShell::Update(float dt)
  */
 void GreenShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2593,8 +2593,8 @@ void RedShell::Update(float dt)
  */
 void RedShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2644,7 +2644,7 @@ void RedShell::SeekTarget()
     }
 
     const nlVector3& targetPos =
-        ((cCharacter*)m_pTarget)->mUnidentified024.m_v3Position;
+        ((cCharacter*)m_pTarget)->m_DetChar.m_v3Position;
     nlVector2 v2Delta;
     nlVector2 v2Direction;
     v2Delta.x = targetPos.x - m_v3Position.x;
@@ -2686,21 +2686,21 @@ Banana::~Banana()
  */
 void Banana::ThrowAt(cFielder* pThrower)
 {
-    nlVector3 v3Unidentified = { 0.0f, 0.0f, 0.0f };
-    unsigned short aDirection = pThrower->mUnidentified024.m_aActualFacingDirection;
-    float fUnidentified = pThrower->mUnidentified024.m_fPlayerScale;
+    nlVector3 v3SpawnPosition = { 0.0f, 0.0f, 0.0f };
+    unsigned short aDirection = pThrower->m_DetChar.m_aActualFacingDirection;
+    float fThrowerScale = pThrower->m_DetChar.m_fPlayerScale;
     float fRadius = GetRadius();
-    float fUnidentified2 = fn_8002BFA8(
-        pThrower->GetTweaks(), fUnidentified);
+    float fThrowerRadius = fn_8002BFA8(
+        pThrower->GetTweaks(), fThrowerScale);
 
-    nlPolarToCartesian(v3Unidentified.x, v3Unidentified.y,
+    nlPolarToCartesian(v3SpawnPosition.x, v3SpawnPosition.y,
         (unsigned short)(aDirection + 0x8000),
-        0.15f + fRadius + fUnidentified2);
+        0.15f + fRadius + fThrowerRadius);
 
-    nlVec3Add(v3Unidentified,
-        pThrower->mUnidentified024.m_v3Position, v3Unidentified);
+    nlVec3Add(v3SpawnPosition,
+        pThrower->m_DetChar.m_v3Position, v3SpawnPosition);
 
-    m_v3Position = v3Unidentified;
+    m_v3Position = v3SpawnPosition;
     m_pPhysicsObject->SetPosition(
         m_v3Position, PhysicsObject::WORLD_COORDINATES);
 
@@ -2733,12 +2733,12 @@ void Banana::Update(float dt)
         return;
     }
 
-    nlVector3 v3Unidentified = m_v3Position;
-    float fUnidentified =
+    nlVector3 v3BoundedPosition = m_v3Position;
+    float fPhysicsRadius =
         ((PhysicsSphere*)m_pPhysicsObject)->GetRadius();
-    if (cField::FixOutOfBoundsPosition(v3Unidentified,
+    if (cField::FixOutOfBoundsPosition(v3BoundedPosition,
             ((PhysicsSphere*)m_pPhysicsObject)->GetRadius()
-                - 0.85f * fUnidentified,
+                - 0.85f * fPhysicsRadius,
             false))
     {
         m_bShouldDestroy = true;
@@ -2761,8 +2761,8 @@ void Banana::Update(float dt)
  */
 void Banana::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2819,8 +2819,8 @@ void SpinyShell::Update(float dt)
  */
 void SpinyShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2877,8 +2877,8 @@ void FreezeShell::Update(float fDeltaT)
  */
 void FreezeShell::Destroy(bool bSilent)
 {
-    bool bUnidentified = m_v3Position.z < 0.0f;
-    if (!bSilent && !bUnidentified)
+    bool bBelowGround = m_v3Position.z < 0.0f;
+    if (!bSilent && !bBelowGround)
     {
         EmissionManager* pUnk = EmissionManager::Instance();
         EffectsGroup* pEffectsGroup;
@@ -2977,14 +2977,14 @@ void Bobomb::ThrowInSequence(PowerupBase*, int nThrowOrder)
     }
 
     float t = (float)nThrowOrder * lbl_806DBDAC + lbl_806DBDA8;
-    nlVector3 v3TargetPos = pTarget->mUnidentified024.m_v3Position;
-    nlVector3 v3TargetVel = pTarget->mUnidentified024.m_v3Velocity;
+    nlVector3 v3TargetPos = pTarget->m_DetChar.m_v3Position;
+    nlVector3 v3TargetVel = pTarget->m_DetChar.m_v3Velocity;
 
     if (nlVec3Length(v3TargetVel) < lbl_806DBDDC)
     {
         if (nlVec3Length(v3TargetVel) < 0.01f)
         {
-            nlPolarToCartesian(v3TargetVel.x, v3TargetVel.y, pTarget->mUnidentified024.m_aActualFacingDirection, lbl_806DBDDC);
+            nlPolarToCartesian(v3TargetVel.x, v3TargetVel.y, pTarget->m_DetChar.m_aActualFacingDirection, lbl_806DBDDC);
             v3TargetVel.z = 0.0f;
         }
         else

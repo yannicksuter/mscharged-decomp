@@ -6,7 +6,7 @@
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"
 #include "NL/gl/glTexture.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 bool glAttachQuad3(eGLView view, unsigned long count, glQuad3* quads)

@@ -9,7 +9,7 @@ struct GoalScoredData;
 struct ReceiveBallData;
 struct PassBallData;
 struct GoalieSaveData;
-struct UnidentifiedEventData_80066590;
+struct ShotAtGoalData;
 
 class ReplayManager
 {
@@ -25,7 +25,7 @@ public:
     void InitializeSnapshots();
     void OnMegaStrikeResult();
     void OnReceiveBall(ReceiveBallData* event);
-    void OnShotAtGoal(UnidentifiedEventData_80066590* event);
+    void OnShotAtGoal(ShotAtGoalData* event);
     void OnPassBall(PassBallData* event);
     void OnGoalScored(GoalScoredData* event);
     void OnGoalieSave(GoalieSaveData* event);
