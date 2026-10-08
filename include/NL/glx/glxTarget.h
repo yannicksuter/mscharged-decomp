@@ -27,12 +27,12 @@ public:
 
     virtual ~GLXTarget();
     virtual void Activate(unsigned long mode);
-    virtual void UnidentifiedVirtual10();
+    virtual void ReservedTargetHookA();
     virtual void CreateTexture(unsigned long hash);
     virtual void DestroyTexture(unsigned long hash);
     virtual void ClearDefault();
     virtual void ClearBuffers(bool clearColourBuffer, bool clearDepthBuffer, bool unknown);
-    virtual void UnidentifiedVirtual28();
+    virtual void ReservedTargetHookB();
 
     void CopyToTexture(bool flag0, bool flag1);
 
