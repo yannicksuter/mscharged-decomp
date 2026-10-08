@@ -41,7 +41,7 @@
 #include "NL/nlFunctionMemory.h"
 #include "NL/nlDLListContainer.h"
 #include "NL/nlConfig.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Weather.h"
 #include "Game/WeatherData.h"

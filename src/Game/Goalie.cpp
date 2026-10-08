@@ -59,7 +59,7 @@
 #include "Game/Weather.h"
 #include "Game/Render/MegaBallIndicators.h"
 #include "Game/NetworkPeer.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 #include <math.h>

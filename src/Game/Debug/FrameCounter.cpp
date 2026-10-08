@@ -2,7 +2,7 @@
 #include "Game/Debug/Histogram.h"
 #include "Game/GL/GLColourMeshWriter.h"
 #include "Game/Task/SmokeTestUpdateTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"

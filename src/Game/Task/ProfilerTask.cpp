@@ -1,5 +1,5 @@
 #include "Game/Task/ProfilerTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 bool g_bProfiling;
 bool g_bShowProfiler;

@@ -7,7 +7,7 @@
 #include "Game/EventRegistry.h"
 #include "Game/MathHelpers.h"
 #include "Game/ReplayManager.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/WorldTriggers.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlMath.h"

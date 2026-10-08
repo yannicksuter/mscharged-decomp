@@ -12,7 +12,7 @@
 #include "NL/gl/glTexture.h"
 #include "NL/gl/glView.h"
 #include "NL/nlPrint.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Render/CrowdImpostorManager.h"
 #include "Game/Render/WorldNPC.h"
 #include "Game/World/WorldAnimObjects.h"

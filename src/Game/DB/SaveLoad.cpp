@@ -27,7 +27,7 @@
 
 #include <string.h>
 #include <wchar.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/BaseGameSceneManager.h"
 #include "NL/nlFunction.inl"
 

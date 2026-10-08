@@ -101,6 +101,6 @@ void Terrain::SyncLog(void* context, DebugWriteCache* cache)
     cache->WriteData(sFieldTerrainType, &mIndex, sizeof(mIndex));
 }
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "Game/TerrainTweakValue.inl"

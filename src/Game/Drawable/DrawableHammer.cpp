@@ -4,7 +4,7 @@
 #include "NL/nlMath.h"
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/RenderShadow.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 u8 gHammerShadowEnabled = 1;
 

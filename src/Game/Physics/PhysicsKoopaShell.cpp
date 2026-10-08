@@ -17,7 +17,7 @@
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 PhysicsKoopaShell::PhysicsKoopaShell(KoopaShellObject* shell, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)

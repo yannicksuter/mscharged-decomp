@@ -13,7 +13,7 @@
 #include "Game/NetworkStatsManager.h"
 #include "Game/Sys/simpleparser.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"

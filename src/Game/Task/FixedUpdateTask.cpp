@@ -28,7 +28,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/Sys/clock.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/globalpad.h"
 #include "NL/platpad.h"
 #include "NL/nlMain.h"

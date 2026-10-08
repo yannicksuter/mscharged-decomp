@@ -18,7 +18,7 @@
 #include "Game/Sys/audio.h"
 #include "NL/nlString.h"
 #include "NL/nlFunction.inl"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 static RLView* sUnshadowedView;

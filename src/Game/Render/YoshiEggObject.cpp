@@ -16,7 +16,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/Sys/audio.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 float gYoshiEggRollScale = 1.0f;

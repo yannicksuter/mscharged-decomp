@@ -2,7 +2,7 @@
 #include "Game/Sys/debug.h"
 
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlMemory.h"
 #include "NL/nlPrint.h"

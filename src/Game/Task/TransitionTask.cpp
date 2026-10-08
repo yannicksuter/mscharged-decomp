@@ -19,7 +19,7 @@
 #include "Game/Render/Wiper.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlTask.h"
 #include "types.h"
 #include "Game/Render/Presentation.h"

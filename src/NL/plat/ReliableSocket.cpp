@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Sys/tweak.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlMain.h"

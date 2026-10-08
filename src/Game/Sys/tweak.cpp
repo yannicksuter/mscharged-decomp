@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"
 #include "NL/gl/glState.h"

@@ -10,7 +10,7 @@
 #include "NL/gl/glState.h"
 #include "NL/nlMath.h"
 #include "math.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 // Replay snapshot of a Birdo egg's visibility, transform and scale.
 // Rendering applies the captured transform to its drawable and draws a shadow.

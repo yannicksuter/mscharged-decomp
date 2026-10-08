@@ -3,7 +3,7 @@
 #include "NL/glx/GXSpecularLookupMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXSpecularLookupMaterialProgram* GXSpecularLookupMaterialProgram::Instance;
 bool GXSpecularLookupMaterialProgram::Initialized;

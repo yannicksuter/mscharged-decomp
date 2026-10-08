@@ -4,7 +4,7 @@
 #include "NL/glx/GXMaskedDiffuseBlendMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 template <>
 void GXMaterialProgramImpl<GXMaskedDiffuseBlendMaterialProgram>::Activate(GLView*)

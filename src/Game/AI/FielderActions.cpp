@@ -71,7 +71,7 @@
 #include "Game/Render/BirdoEgg.h"
 #include "Game/Render/ShootToScoreMeter.h"
 #include "math.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 float lbl_806DB890 = 0.99f;

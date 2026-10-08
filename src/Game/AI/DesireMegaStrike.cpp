@@ -16,7 +16,7 @@
 #include "Game/NetworkInput.h"
 #include <stdlib.h>
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 bool gMegaStrikeUsePassButton;
 bool gMegaStrikeInvincible;

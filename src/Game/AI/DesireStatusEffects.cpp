@@ -19,7 +19,7 @@
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/audio.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 float gSlipperySlideFactor;

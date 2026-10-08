@@ -25,7 +25,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include "NL/nlstring_tmpl.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GLView* ModeledScreenTransition::s_3DView;
 void (*g_ModelTransitionRenderCallback)(glModel*);

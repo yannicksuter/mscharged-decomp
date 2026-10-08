@@ -3,7 +3,7 @@
 #include "NL/glx/GXCharacterDamageMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXCharacterDamageMaterialProgram* GXCharacterDamageMaterialProgram::Instance;
 bool GXCharacterDamageMaterialProgram::Initialized;

@@ -2,7 +2,7 @@
 #include "Game/GL/GLWarbleMeshWriter.h"
 #include "Game/Render/RLView.h"
 #include "Game/TweakValueFloat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glView.h"

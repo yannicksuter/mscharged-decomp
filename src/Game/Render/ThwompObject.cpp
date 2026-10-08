@@ -18,7 +18,7 @@
 #include "ode/objects.h"
 #include "Game/Physics/PhysicsThwomp.h"
 #include "NL/gl/glTexture.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 bool gThwompHideAfterRise = true;

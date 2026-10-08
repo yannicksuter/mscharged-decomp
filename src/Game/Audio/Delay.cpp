@@ -8,7 +8,7 @@
 
 #include "Game/Audio/Delay.h"
 #include "Game/Audio/AudioBackend.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlString.h"
 
 #include <float.h>

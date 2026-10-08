@@ -42,7 +42,7 @@
 #include "Game/FE/Overlay/OverlayHandlerSuperAbility.h"
 #include "Game/Physics/PhysicsWaluigiWall.h"
 #include <stdlib.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/EventRegistry.h"

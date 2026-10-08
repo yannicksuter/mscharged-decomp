@@ -10,7 +10,7 @@
 #include "NL/nlString.h"
 #include "NL/platvmath.h"
 #include "Game/Render/CrowdImpostors.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/World/WorldObject.h"
 
 bool gDisableWorldNPCs;

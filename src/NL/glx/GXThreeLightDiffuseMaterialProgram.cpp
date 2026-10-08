@@ -4,7 +4,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXThreeLightDiffuseMaterialProgram* GXThreeLightDiffuseMaterialProgram::Instance;
 bool GXThreeLightDiffuseMaterialProgram::Initialized;

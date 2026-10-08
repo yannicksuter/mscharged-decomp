@@ -1,7 +1,7 @@
 #include "Game/DB/CharacterInfo.h"
 #include "Game/Character.h"
 #include "Game/CharacterTemplate.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Render/MegastrikeBackgroundOverlay.h"
 
 #include "Game/Render/RLView.h"

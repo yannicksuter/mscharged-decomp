@@ -3,7 +3,7 @@
 #include "NL/glx/GXBlackTextureAlphaMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXBlackTextureAlphaMaterialProgram* GXBlackTextureAlphaMaterialProgram::Instance;
 bool GXBlackTextureAlphaMaterialProgram::Initialized;

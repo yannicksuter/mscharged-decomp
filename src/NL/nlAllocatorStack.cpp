@@ -1,6 +1,6 @@
 #include "NL/nlAllocatorStack.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 void PushMemoryAllocator(MemoryAllocator* allocator)
 {

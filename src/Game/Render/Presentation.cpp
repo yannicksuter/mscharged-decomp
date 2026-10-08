@@ -5,7 +5,7 @@
 
 #include "Game/Ball.h"
 #include "Game/CharacterTriggers.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/BaseGameSceneManager.h"
 #include "Game/OverlayManager.h"

@@ -18,7 +18,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/nlPrint.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Game.h"
 #include <mem.h>
 

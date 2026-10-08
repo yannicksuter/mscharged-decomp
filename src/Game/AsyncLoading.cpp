@@ -63,7 +63,7 @@
 #include "Game/Audio/AudioResourceRuntime.h"
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioSystem.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/GameSceneManager.h"
 #include "Game/Sys/movie.h"

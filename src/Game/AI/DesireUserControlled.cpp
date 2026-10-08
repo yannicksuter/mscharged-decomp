@@ -12,7 +12,7 @@
 #include "Game/DebugWriteCache.h"
 #include "Game/Game.h"
 #include <stddef.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Task/FixedUpdateTask.h"
 
 

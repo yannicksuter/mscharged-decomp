@@ -16,7 +16,7 @@
 #include "Game/Player.h"
 #include "Game/ReplayManager.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glState.h"
 #include "NL/gl/glTexture.h"

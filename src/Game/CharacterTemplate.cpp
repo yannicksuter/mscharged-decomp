@@ -14,7 +14,7 @@
 #include "Game/WorldTriggers.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 SebringAnimTagScriptInterpreter* g_pAnimScriptInterp;

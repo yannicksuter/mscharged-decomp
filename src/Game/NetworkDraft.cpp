@@ -9,7 +9,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/OnlineMatchmaking.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"

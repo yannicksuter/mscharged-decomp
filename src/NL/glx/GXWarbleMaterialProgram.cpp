@@ -3,7 +3,7 @@
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXWarbleMaterialProgram* GXWarbleMaterialProgram::Instance;
 bool GXWarbleMaterialProgram::Initialized;

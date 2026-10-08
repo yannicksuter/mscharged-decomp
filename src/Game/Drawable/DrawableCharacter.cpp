@@ -30,7 +30,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "NL/gl/glTexture.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static int g_nOnscreenUpdate[3] = { 2, 2, 2 };
 static int g_nOffscreenUpdate[3] = { 4, 4, 4 };

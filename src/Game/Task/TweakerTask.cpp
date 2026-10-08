@@ -5,7 +5,7 @@
 #include "Game/NetworkSync.h"
 
 #include "types.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 s32 gTweakerAccelButton = -1;
 s32 gTweakerBackButton = -1;

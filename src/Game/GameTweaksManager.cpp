@@ -3,7 +3,7 @@
 #include "Game/TerrainTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/TweakFileLoader.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/DB/StadiumInfo.h"
 #include "NL/nlConfig.h"
 #include "NL/nlMemory.h"

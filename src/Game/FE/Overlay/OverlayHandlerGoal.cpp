@@ -27,7 +27,7 @@
 #include <cmath>
 #include <string.h>
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static inline void CreateGoalEventHandler(GoalOverlay* goalOverlay);
 

@@ -6,7 +6,7 @@
 #include "Game/Audio/AudioBackend.h"
 #include "Game/Audio/AudioGlobals.h"
 #include "Game/Audio/Plat3dSoundSrc.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlArrayAllocator.h"
 #include "NL/nlFileGC.h"
 #include "NL/nlMath.h"

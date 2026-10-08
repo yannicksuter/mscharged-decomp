@@ -3,7 +3,7 @@
 #include "NL/glx/GXVertexColourMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/gl/glLoadModel.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXVertexColourMaterialProgram* GXVertexColourMaterialProgram::Instance;
 bool GXVertexColourMaterialProgram::Initialized;

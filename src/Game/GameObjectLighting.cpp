@@ -33,7 +33,7 @@
 #include "Game/Render/LightingLookup.h"
 #include "Game/TweakValueFloat.h"
 #include "Game/TweakValueInt.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/UnidentifiedTweakAction.h"
 
 // GameRenderTask defines this flag as u8; this unit only matches closer when

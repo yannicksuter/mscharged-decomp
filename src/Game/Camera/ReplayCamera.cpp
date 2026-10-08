@@ -19,7 +19,7 @@
 #include "NL/nlTask.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glPlat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include <math.h>
 
 static const nlVector3 sZeroVector = { 0.0f, 0.0f, 0.0f };

@@ -1,6 +1,6 @@
 #include "Game/Render/SolarFlareEffect.h"
 #include "Game/BasicStadium.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/World/WorldDrawable.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"

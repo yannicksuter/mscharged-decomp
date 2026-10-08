@@ -46,7 +46,7 @@
 #include "NL/nlTask.h"
 #include "Game/InputManager.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 float GetRemoteReplaySpeed();

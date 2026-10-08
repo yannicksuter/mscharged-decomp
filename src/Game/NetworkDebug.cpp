@@ -3,7 +3,7 @@
 
 #include "Game/NetworkSession.h"
 #include "Game/TweakCallback.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlDebugViews.h"
 #include "Game/InputRouter.h"

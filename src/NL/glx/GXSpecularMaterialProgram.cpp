@@ -3,7 +3,7 @@
 #include "NL/glx/GXSpecularMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXSpecularMaterialProgram* GXSpecularMaterialProgram::Instance;
 bool GXSpecularMaterialProgram::Initialized;

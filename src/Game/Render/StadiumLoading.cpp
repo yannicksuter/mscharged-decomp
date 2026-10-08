@@ -38,7 +38,7 @@
 #include "Game/Render/RenderShadow.h"
 #include "NL/gl/glState.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 extern "C"
 {
     extern bool lbl_806DEE60;

@@ -8,7 +8,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/platvmath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static nlMatrix4 sSkinnedUnlitTextureViewMatrix;
 

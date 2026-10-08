@@ -2,7 +2,7 @@
 #include "Game/Effects/EffectsGroup.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Sys/simpleparser.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlChunk.h"
 #include "NL/nlDebugString.h"
 #include "NL/nlMemory.h"

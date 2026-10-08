@@ -5,7 +5,7 @@
 #include "Game/Effects/EmissionController.h"
 #include "Game/Effects/EmissionManager.h"
 #include "Game/Render/Frustum.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/World.h"
 #include "Game/World/worldanim.h"
 #include "NL/gl/glView.h"

@@ -16,7 +16,7 @@
 #include "NL/gl/glView.h"
 #include "NL/gl/glMaterialParameters.h"
 #include "Game/TweakValueFloat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlMemory.h"
 #include "NL/nlString.h"
 #include "NL/platvmath.h"

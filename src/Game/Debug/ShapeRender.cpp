@@ -6,7 +6,7 @@
 
 #include "NL/nlDebugViews.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw2.h"

@@ -12,7 +12,7 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "math.h"
 #include "types.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 float g_BallFriction = 5.0f;
 float g_BallFrictionWall = 4.0f;

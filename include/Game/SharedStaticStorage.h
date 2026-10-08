@@ -1,5 +1,5 @@
-#ifndef GAME_UNIDENTIFIED_STATIC_STORAGE_H
-#define GAME_UNIDENTIFIED_STATIC_STORAGE_H
+#ifndef GAME_SHARED_STATIC_STORAGE_H
+#define GAME_SHARED_STATIC_STORAGE_H
 
 // One shared four-byte state object, dynamically zeroed behind a guard by the
 // static initializer of every translation unit that includes this header:
@@ -56,4 +56,4 @@ struct UnidentifiedStaticStorageScope
     ~UnidentifiedStaticStorageScope() { }
 };
 
-#endif // GAME_UNIDENTIFIED_STATIC_STORAGE_H
+#endif // GAME_SHARED_STATIC_STORAGE_H

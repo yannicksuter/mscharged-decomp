@@ -17,7 +17,7 @@
 #include "Game/Render/NPCManager.h"
 #include "Game/Render/ChainChomp.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlList.h"
 #include "NL/nlMath.h"
 #include "Game/Render/YoshiEggObject.h"

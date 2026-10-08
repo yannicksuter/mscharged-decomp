@@ -7,7 +7,7 @@
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlColour.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 template <>
 void GXMaterialProgramImpl<GXThreeLightDiffuseMaterialProgram>::Activate(

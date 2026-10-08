@@ -52,7 +52,7 @@
 #include "Game/Render/MegaBallIndicators.h"
 #include "Game/NetTournManager.h"
 #include "Game/Render/NetMesh.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AIPad.h"

@@ -8,7 +8,7 @@
 #include "Game/TweakQuery.h"
 #include "NL/nlDebug.h"
 #include "NL/gl/glPlat.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMaterialProgram.h"
 #include "Game/Sys/debug.h"
 #include "NL/gl/glView.h"

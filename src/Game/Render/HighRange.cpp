@@ -1,6 +1,6 @@
 #include "Game/Render/HighRange.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlDebugViews.h"
 
 #include "Game/Render/RLView.h"

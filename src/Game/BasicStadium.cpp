@@ -26,7 +26,7 @@
 #include "Game/Render/HighRange.h"
 #include "Game/TweakValue.inl"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 extern "C"
 {

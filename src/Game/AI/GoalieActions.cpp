@@ -65,7 +65,7 @@
 #include "Game/Render/MegaBallIndicators.h"
 #include "Game/Render/NPCManager.h"
 #include "math.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };

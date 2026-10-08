@@ -53,7 +53,7 @@
 #include "Game/DB/StadiumInfo.h"
 #include "Game/Render/StadiumLoading.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 

@@ -1,4 +1,4 @@
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glPlat.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glModel.h"

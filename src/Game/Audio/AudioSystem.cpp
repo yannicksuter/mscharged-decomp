@@ -1,7 +1,7 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioSystem.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "Game/Audio/AudioBankTable.h"
 #include "Game/Audio/AudioBundleManager.h"

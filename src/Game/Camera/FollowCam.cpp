@@ -9,7 +9,7 @@
 #include "Game/Team.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/globalpad.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 static float g_fDistanceSeek = 0.4f;

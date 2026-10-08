@@ -14,7 +14,7 @@
 #include "NL/glx/glxMatrix.h"
 #include "NL/nlMath.h"
 #include "NL/platvmath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static nlMatrix4 sSkinnedMultiLightViewMatrix;
 static int sSkinnedMultiLightAnimationFrames = 5;

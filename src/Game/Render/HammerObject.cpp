@@ -3,7 +3,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/AI/AvoidableObject.h"
 #include "Game/AI/Fielder.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Drawable/RenderObject.h"
 #include "Game/Physics/PhysicsObject.h"

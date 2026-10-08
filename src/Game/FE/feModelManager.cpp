@@ -33,7 +33,7 @@
 #include "NL/nlPrint.h"
 #include "NL/nlString.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.inl"
 
 template <>

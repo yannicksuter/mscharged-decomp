@@ -19,7 +19,7 @@
 #include "Game/MathHelpers.h"
 #include "Game/Net.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include <math.h>
 #include <stddef.h>
 

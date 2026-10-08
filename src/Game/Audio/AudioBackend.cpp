@@ -17,7 +17,7 @@
 #include "revolution/wpad.h"
 
 #include <string.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 static bool sDoubleMixUpdate = true;

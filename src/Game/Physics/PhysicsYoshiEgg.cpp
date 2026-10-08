@@ -16,7 +16,7 @@
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/ThwompObject.h"
 #include "Game/Render/YoshiEggObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 PhysicsYoshiEgg::PhysicsYoshiEgg(YoshiEggObject* egg, float radius)

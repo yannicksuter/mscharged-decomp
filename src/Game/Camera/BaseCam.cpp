@@ -1,5 +1,5 @@
 #include "Game/Camera/BaseCam.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 // In this reconstruction, the disposal function causes MWCC to emit the weak
 // destructor before GetFOV and Reactivate; the disposal function itself is

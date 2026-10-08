@@ -7,7 +7,7 @@
 #include "Game/SH/SHHallOfFame.h"
 #include "Game/FE/feDPD.h"
 #include "NL/nlBind.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/BasicStadium.h"
 #include "Game/GameSceneManager.h"
 #include "Game/DB/GameProgress.h"

@@ -22,7 +22,7 @@
 #include "Game/Render/FrontEndPresentation.h"
 #include "Game/Render/HomeButtonFade.h"
 #include "Game/TweakRegistry.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/main.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"

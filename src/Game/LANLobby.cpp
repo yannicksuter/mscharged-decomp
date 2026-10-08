@@ -6,7 +6,7 @@
 #include "Game/NetworkRandom.h"
 
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlString.h"
 #include "NL/nlTicker.h"

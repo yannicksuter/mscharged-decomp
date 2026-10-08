@@ -14,7 +14,7 @@
 #include "Game/Render/RLView.h"
 #include "Game/Render/CrowdImpostorManager.h"
 #include "Game/TweakRegistry.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include "Game/TweakConfig.h"
 #include "NL/gl/glTextureManager.h"

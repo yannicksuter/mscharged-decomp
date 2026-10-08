@@ -16,7 +16,7 @@
 #include "Game/Team.h"
 #include "NL/nlString.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 extern "C" DesireUpdate fn_800B9020(void*, cFielder*, const char*);
 

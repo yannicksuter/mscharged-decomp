@@ -36,7 +36,7 @@
 #include <string.h>
 #include "Game/FE/fePageControls.h"
 #include "NL/nlstring_tmpl.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 typedef BasicString<unsigned short, Detail::TempStringAllocator> WideBasicString;
 

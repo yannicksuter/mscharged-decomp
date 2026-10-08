@@ -23,7 +23,7 @@
 #include "NL/nlSlotPool.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "math.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static const nlVector3 v3Zero = { 0.0f, 0.0f, 0.0f };
 

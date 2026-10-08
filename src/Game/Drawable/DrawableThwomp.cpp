@@ -9,7 +9,7 @@
 #include "NL/nlMath.h"
 #include "NL/platqmath.h"
 #include "Game/Render/ThwompObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 // Replay snapshot of a Thwomp's visibility, position and orientation.
 // Rendering also uses the live object's state, texture and shadow scale.

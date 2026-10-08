@@ -7,7 +7,7 @@
 #include "Game/AI/AiUtil.h"
 #include "Game/Game.h"
 #include "Game/GameTweaks.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakConfig.h"
 #include "Game/TweakFileLoader.h"
 #include "Game/TweakValue.inl"

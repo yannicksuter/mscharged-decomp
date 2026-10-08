@@ -46,7 +46,7 @@
 #include "Game/NetworkSync.h"
 #include "Game/SH/SHOnlineFriendsChooseSides.h"
 #include "Game/SH/SHOnlineConnectionQuality.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.h"
 #include <string.h>
 #include "Game/BaseGameSceneManager.h"

@@ -19,7 +19,7 @@
 #include "NL/nlPrint.h"
 #include "NL/plat/DPDData.h"
 #include "decomp.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 TLComponentInstance* gFEPointerInstances[4];
 nlVector2 gFEPointerPositions[4];

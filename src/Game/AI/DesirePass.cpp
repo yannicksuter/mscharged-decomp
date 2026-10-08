@@ -15,7 +15,7 @@
 #include "Game/Team.h"
 #include "NL/nlMemory.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static bool sDebugPassSpaceSearch;
 const nlVector3 sStationaryTargetVelocity = { 0.0f, 0.0f, 0.0f };

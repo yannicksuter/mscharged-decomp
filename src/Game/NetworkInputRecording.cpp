@@ -5,7 +5,7 @@
 #include "Game/NetworkSession.h"
 #include "Game/PackedDetInput.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlDebugFile.h"
 #include "NL/nlFile.h"
 #include "NL/nlMemory.h"

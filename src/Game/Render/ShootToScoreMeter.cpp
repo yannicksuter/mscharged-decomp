@@ -2,7 +2,7 @@
 #include "NL/gl/glPlat.h"
 #include "Game/Render/ShootToScoreMeter.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/AI/AiUtil.h"
 #include "Game/Camera/CameraMan.h"
 #include "Game/Game.h"

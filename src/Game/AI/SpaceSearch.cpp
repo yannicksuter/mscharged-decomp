@@ -14,7 +14,7 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/Debug/ShapeRender.h"
 #include "Game/Field.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 // Not retained in R4QE01: the derived constructors inline this and the linker
 // strips the out-of-line copy.

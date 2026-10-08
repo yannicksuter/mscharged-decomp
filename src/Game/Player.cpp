@@ -55,7 +55,7 @@
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "NL/nlPolygonRegion.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "NL/nlFunction.inl"
 

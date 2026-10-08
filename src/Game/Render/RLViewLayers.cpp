@@ -15,7 +15,7 @@
 #include "Game/Render/HighRange.h"
 
 #include "Game/Render/ShadowVolume.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 struct RLViewLayerDesc
 {

@@ -36,7 +36,7 @@
 #include "NL/nlSlotPool.h"
 #include "NL/nlString.h"
 #include "Game/Render/StadiumLoading.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 void UpdateBobombEmitter(EmissionController&);

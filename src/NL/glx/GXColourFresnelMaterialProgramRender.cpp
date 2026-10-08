@@ -1,6 +1,6 @@
 #include <revolution/gx.h>
 #include "Game/GameObjectLighting.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMaterialParameters.h"
 #include <revolution/mtx.h>
 

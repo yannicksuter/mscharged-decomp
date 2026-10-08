@@ -13,7 +13,7 @@
 #include "Game/SHierarchy.h"
 #include "Game/Team.h"
 #include "NL/nlTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static const nlVector3 sZeroVelocity = { 0.0f, 0.0f, 0.0f };
 

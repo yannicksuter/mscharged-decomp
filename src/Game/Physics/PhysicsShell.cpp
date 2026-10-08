@@ -30,7 +30,7 @@
 #include "Game/Render/KoopaShellObject.h"
 
 #include <math.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 

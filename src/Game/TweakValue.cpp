@@ -1,7 +1,7 @@
 #include "Game/TweakValue.h"
 #include "Game/TweakRegistry.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlString.h"
 #include "NL/nlstring_tmpl.h"
 

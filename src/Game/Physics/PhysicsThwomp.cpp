@@ -1,5 +1,5 @@
 #include "NL/nlDLListContainer.inl"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Physics/PhysicsEventQueue.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/AI/Fielder.h"

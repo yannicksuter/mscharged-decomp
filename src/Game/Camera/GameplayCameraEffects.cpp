@@ -21,7 +21,7 @@
 #include "NL/nlAVLTree.h"
 #include "NL/nlBind.h"
 #include "NL/nlTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include <math.h>
 
 // Instantiate the Function classes RegisterEventListeners uses, in its order,

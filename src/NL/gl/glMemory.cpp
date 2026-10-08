@@ -3,7 +3,7 @@
 #include "Game/GL/GLInventory.h"
 #include "NL/nlDLRing.h"
 #include "NL/nlMemory.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static GLResourcePool* sCurrentResourcePool;
 static GLResourcePool* sResourcePoolList;

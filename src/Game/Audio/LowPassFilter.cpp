@@ -4,7 +4,7 @@
 #include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/AudioConfig.h"
 #include "Game/Audio/LowPassFilter.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlString.h"
 
 static u32 sLowPassFilterFrequency = 1000;

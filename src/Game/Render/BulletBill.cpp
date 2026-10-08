@@ -13,7 +13,7 @@
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Physics/PhysicsBulletBill.h"
 #include "Game/Physics/PhysicsObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 
 #include "NL/nlMath.h"

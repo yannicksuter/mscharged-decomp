@@ -21,7 +21,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 #include "Game/UnidentifiedTweakAction.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static void ApplyDebugCameraFOV();
 

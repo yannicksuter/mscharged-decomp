@@ -22,7 +22,7 @@
 #include "NL/nlMemory.h"
 #include "NL/nlTask.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 float g_AllActorsHidden;
 static nlVector3 sInvalidDrawablePosition = {};

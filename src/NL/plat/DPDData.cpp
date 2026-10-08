@@ -2,7 +2,7 @@
 
 #include "NL/plat/DPDData.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 DPDData::DPDData()
 {

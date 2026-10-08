@@ -18,7 +18,7 @@
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/YoshiEggObject.h"
 #include "NL/nlSlotPool.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 PhysicsBirdoEgg::PhysicsBirdoEgg(BirdoEggObject* egg, float radius)
     : PhysicsSphere(g_CollisionSpace, 0, radius)

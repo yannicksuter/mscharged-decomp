@@ -22,7 +22,7 @@
 #include "Game/Font/fontmanager.h"
 #include "Game/GameInfo.h"
 #include "Game/SH/SHNavigation.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/nlBasicString.h"
 #include "NL/nlFont.h"

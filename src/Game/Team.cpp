@@ -36,7 +36,7 @@
 #include "Game/Render/ShootToScoreMeter.h"
 #include "Game/RumbleActions.h"
 #include "Game/Sys/audio.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/TweakRegistry.h"
 #include "NL/nlLocalization.h"

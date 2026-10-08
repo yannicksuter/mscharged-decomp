@@ -3,7 +3,7 @@
 #include "NL/glx/GXMaskedDiffuseBlendMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXMaskedDiffuseBlendMaterialProgram* GXMaskedDiffuseBlendMaterialProgram::Instance;
 bool GXMaskedDiffuseBlendMaterialProgram::Initialized;

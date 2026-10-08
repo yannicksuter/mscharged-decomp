@@ -22,7 +22,7 @@
 #include "NL/nlMath.h"
 #include "NL/nlSlotPool.h"
 #include "types.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Camera/CameraMan.h"
 

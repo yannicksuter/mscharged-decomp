@@ -4,7 +4,7 @@
 
 #include "Game/NetworkPeer.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/globalpad.h"
 #include "NL/nlConfig.h"
 #include "types.h"

@@ -10,7 +10,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxGXColour.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static nlMatrix4 sMegaDiffuseViewMatrix;
 static int sMegaDiffuseLightCount;

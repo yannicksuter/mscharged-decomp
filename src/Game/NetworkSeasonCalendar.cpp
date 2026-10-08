@@ -1,7 +1,7 @@
 #include <dwc/dwc_nastime.h>
 #include "Game/NetworkSeasonCalendar.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/TweakValue.inl"
 #include <string.h>
 

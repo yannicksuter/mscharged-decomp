@@ -10,7 +10,7 @@
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 int gCameraOverlayStageCount = 4;
 bool gCameraOverlayShadowsEnabled = true;

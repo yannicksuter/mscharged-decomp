@@ -38,7 +38,7 @@
 #include "Game/Render/WorldNPC.h"
 #include "Game/ReplayManager.h"
 #include "Game/Task/FixedUpdateTask.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/MemAlloc.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw2.h"

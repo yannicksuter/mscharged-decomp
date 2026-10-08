@@ -8,7 +8,7 @@
 #include "Game/CharacterTweaks.h"
 #include "Game/GameInfo.h"
 #include "Game/Game.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlMath.h"
 
 float gShotMeterChargeGainMin = 1.55f;

@@ -17,7 +17,7 @@
 
 #include <string.h>
 #include "NL/gl/glTexture.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static int QuadMap[4] = { 0, 1, 2, 3 };
 static int TriListMap[6] = { 0, 1, 2, 3, 0, 2 };

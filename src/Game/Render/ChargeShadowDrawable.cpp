@@ -9,7 +9,7 @@
 #include "Game/Render/RenderShadow.h"
 #include "Game/Render/Presentation.h"
 #include "Game/Render/RLViewLayers.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glModel.h"
 #include "NL/gl/glState.h"

@@ -18,7 +18,7 @@
 #include <math.h>
 #include <stddef.h>
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static float sWindupShotTimeLimitMargin = 0.5f;
 static unsigned short sDesireWindupShotType = 0xFFFF;

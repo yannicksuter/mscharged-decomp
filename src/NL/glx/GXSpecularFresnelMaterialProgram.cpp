@@ -3,7 +3,7 @@
 #include "NL/glx/GXSpecularFresnelMaterialProgram.h"
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXSpecularFresnelMaterialProgram* GXSpecularFresnelMaterialProgram::Instance;
 bool GXSpecularFresnelMaterialProgram::Initialized;

@@ -12,7 +12,7 @@
 
 #include "Game/MathHelpers.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/glFont.h"
 #include "NL/nlDebugViews.h"
 #include "NL/nlMath.h"

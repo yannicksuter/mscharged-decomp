@@ -17,7 +17,7 @@
 #include "Game/Render/ChainChomp.h"
 #include "Game/Team.h"
 #include <stddef.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static unsigned short sDesireUsePowerupType = 0xFFFF;
 #pragma explicit_zero_data on

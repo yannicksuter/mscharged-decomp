@@ -24,7 +24,7 @@
 #include "NL/nlString.h"
 #include "NL/nlTask.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include <math.h>
 #include <string.h>

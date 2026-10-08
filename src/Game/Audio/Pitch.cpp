@@ -4,7 +4,7 @@
 #include "Game/Audio/XSoundCueHandle.h"
 #include "Game/Audio/Pitch.h"
 #include "Game/Audio/AudioConfig.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlMath.h"
 #include "NL/nlString.h"
 

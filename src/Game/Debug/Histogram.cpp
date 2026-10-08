@@ -1,5 +1,5 @@
 #include "Game/Debug/Histogram.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/GL/GLColourMeshWriter.h"
 #include "NL/gl/glDraw2.h"
 #include "NL/gl/glFont.h"

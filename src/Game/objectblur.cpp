@@ -6,7 +6,7 @@
 #include "Game/GL/GLTexturedColourMeshWriter.h"
 #include "Game/MathHelpers.h"
 #include "Game/ReplayManager.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMatrix.h"
 #include "NL/gl/glState.h"

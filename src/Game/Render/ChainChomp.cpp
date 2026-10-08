@@ -7,7 +7,7 @@
 #include "Game/AI/Fielder.h"
 #include "Game/AI/Powerups.h"
 #include "Game/Audio/GameStreams.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/Ball.h"
 #include "Game/BasicStadium.h"

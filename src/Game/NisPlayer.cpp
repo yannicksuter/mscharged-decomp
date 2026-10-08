@@ -52,7 +52,7 @@
 #include "NL/gl/glTexture.h"
 #include "Game/Transitions/ModelTransition.h"
 #include "Game/Audio/RegistryPools.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 #include <revolution/os/OS_fwd.h>
 

@@ -12,7 +12,7 @@
 #include "NL/gl/glMultiTextureModelWriter.h"
 
 #include <string.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 char sPeachPhotoTexture[] = "target/grayscale";
 char sPeachPhotoWhiteTexture[] = "global/white";

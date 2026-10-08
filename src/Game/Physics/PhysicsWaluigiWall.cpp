@@ -28,7 +28,7 @@
 #include "Game/ReplayManager.h"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/Team.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/nlMemory.h"
 #include "NL/platvmath.h"
 #include "NL/nlFunction.inl"

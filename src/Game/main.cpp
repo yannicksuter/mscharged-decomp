@@ -102,7 +102,7 @@
 #include "NL/nlFileGC.h"
 #include <revolution/sc_fwd.h>
 #include <revolution/os/OSThread_fwd.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 class AudioUpdateTask : public nlTask
 {

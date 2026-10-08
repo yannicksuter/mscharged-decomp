@@ -9,7 +9,7 @@
 #include "NL/glx/glxTexture.h"
 #include "NL/glx/GXMaterialProgramTextureAnimation.h"
 #include "NL/nlMath.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 enum ScrollingMaskedDetailBlendLightingMode
 {

@@ -5,7 +5,7 @@
 #include "NL/glx/GXShadowedDiffuseMaterialProgram.h"
 #include "NL/glx/glxGX.h"
 #include "NL/glx/glxDisplayList.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 static bool sShadowedDiffuseShadowStageEnabled;
 

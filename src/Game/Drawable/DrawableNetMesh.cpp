@@ -18,7 +18,7 @@
 #include "NL/nlMath.h"
 
 #include <string.h>
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 __declspec(weak) char LightTextureName[] = "global/lightramp";
 __declspec(weak) char BlackTextureName[] = "global/black";

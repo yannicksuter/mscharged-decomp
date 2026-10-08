@@ -8,7 +8,7 @@
 #include "Game/Player.h"
 #include "NL/nlMemory.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 
 bool gDebugRunToNetSpaceSearch;

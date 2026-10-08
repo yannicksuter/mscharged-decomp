@@ -8,7 +8,7 @@
 #include "NL/nlString.h"
 #include "types.h"
 #include "Game/Audio/RegistryPools.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 struct CategoryEntry
 {

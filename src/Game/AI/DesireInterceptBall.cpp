@@ -11,7 +11,7 @@
 #include "NL/nlString.h"
 #include "Game/DebugWriteCache.h"
 
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 float gInterceptBallMaxPredictionTime = 3.0f;
 static unsigned short sDesireInterceptBallType = 0xFFFF;

@@ -33,7 +33,7 @@
 #include "Game/Team.h"
 #include "Game/CharacterTweaks.h"
 #include "Game/TweakValue.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/AI/AvoidableObject.h"
 #include "NL/globalpad.h"
 #include "NL/nlMemory.h"

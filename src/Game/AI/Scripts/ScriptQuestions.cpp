@@ -27,7 +27,7 @@
 #include "Game/Physics/PhysicsCharacter.h"
 #include "Game/SAnim/pnSAnimController.h"
 #include "Game/Sys/debug.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "types.h"
 #include "NL/nlMath.inl"
 #include "NL/nlPrint.h"

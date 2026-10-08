@@ -2,7 +2,7 @@
 
 #include "NL/glx/GXMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 
 GXRedColourMaterialProgram* GXRedColourMaterialProgram::Instance;
 bool GXRedColourMaterialProgram::Initialized;

@@ -12,7 +12,7 @@
 #include "Game/Render/RLView.h"
 #include "Game/Render/RLViewLayers.h"
 #include "Game/Render/Frustum.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glDraw3.h"
 #include "NL/gl/glMaterialParameters.h"

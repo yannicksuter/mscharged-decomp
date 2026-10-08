@@ -4,7 +4,7 @@
 
 #include "Game/Render/Impostor.h"
 #include "Game/Render/ImpostorManager.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "NL/gl/gl.h"
 #include "NL/gl/glMemory.h"
 #include "NL/gl/glView.h"

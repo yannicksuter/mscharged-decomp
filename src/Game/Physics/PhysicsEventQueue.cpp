@@ -38,7 +38,7 @@
 #include "Game/Render/HammerObject.h"
 #include "Game/Render/KoopaShellObject.h"
 #include "Game/Render/YoshiEggObject.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Physics/PhysicsEventQueue.inl"
 #include "NL/nlFunction.inl"
 

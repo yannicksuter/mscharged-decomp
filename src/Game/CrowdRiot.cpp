@@ -1,6 +1,6 @@
 #include "NL/nlDLListContainer.inl"
 #include "Game/Sys/audio.h"
-#include "Game/UnidentifiedStaticStorage.h"
+#include "Game/SharedStaticStorage.h"
 #include "Game/Audio/RegistryPools.h"
 #include "Game/CrowdRiot.h"
 #include "Game/Goalie.h"
