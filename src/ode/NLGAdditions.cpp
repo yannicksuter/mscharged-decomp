@@ -19,16 +19,16 @@ enum
 /**
  * Offset/Address/Size: 0x0 | 0x80358E7C | size: 0x34
  */
-void dBodySetUpdateMode(dxBody* body, int arg1, int arg2)
+void dBodySetUpdateMode(dxBody* body, int updateLinear, int updateAngular)
 {
-    body->flags &= 0xFFFFFF9F;
-    if (arg1 == 0)
+    body->flags &= ~(dxBodyLinearUpdateDisabled | dxBodyAngularUpdateDisabled);
+    if (updateLinear == 0)
     {
-        body->flags |= 0x20;
+        body->flags |= dxBodyLinearUpdateDisabled;
     }
-    if (arg2 == 0)
+    if (updateAngular == 0)
     {
-        body->flags |= 0x40;
+        body->flags |= dxBodyAngularUpdateDisabled;
     }
 }
 
@@ -276,11 +276,11 @@ void dInvertRigidTransformation(dReal* TInv, const dReal* R, const dReal* p)
 /**
  * Offset/Address/Size: 0x45C | 0x803592D8 | size: 0x30
  */
-void dExtractColumn3(float* __restrict arg0, const float* __restrict arg1, int col)
+void dExtractColumn3(float* __restrict result, const float* __restrict matrix, int col)
 {
-    arg0[0] = arg1[col];
-    arg0[1] = arg1[col + 4];
-    arg0[2] = arg1[col + 8];
+    result[0] = matrix[col];
+    result[1] = matrix[col + 4];
+    result[2] = matrix[col + 8];
 }
 
 /**
@@ -307,11 +307,11 @@ void dVector4Set(float* v, float x, float y, float z, float w)
 /**
  * Offset/Address/Size: 0x4B0 | 0x8035932C | size: 0x28
  */
-void dVectorScale(float* v1, float arg8)
+void dVectorScale(float* v1, float scale)
 {
-    v1[0] *= arg8;
-    v1[1] *= arg8;
-    v1[2] *= arg8;
+    v1[0] *= scale;
+    v1[1] *= scale;
+    v1[2] *= scale;
 }
 
 /**
@@ -330,7 +330,7 @@ void dVector3Add(float* __restrict v1, const float* __restrict v2)
 void dGeomComputeAABB(dxGeom* geomID)
 {
     geomID->computeAABB();
-    geomID->gflags &= 0xFFFFFFFC;
+    geomID->gflags &= ~(GEOM_DIRTY | GEOM_AABB_BAD);
 }
 
 /**
@@ -338,7 +338,7 @@ void dGeomComputeAABB(dxGeom* geomID)
  */
 void dGeomMarkAABBAsValid(dxGeom* geomID)
 {
-    geomID->gflags = geomID->gflags & 0xFFFFFFFC;
+    geomID->gflags = geomID->gflags & ~(GEOM_DIRTY | GEOM_AABB_BAD);
 }
 
 /**
@@ -346,10 +346,10 @@ void dGeomMarkAABBAsValid(dxGeom* geomID)
  */
 static void collideAABBs(dxGeom*, dxGeom*, void*, dNearCallback*);
 
-void dGeomCollideAABBs(dxGeom* arg0, dxGeom* arg1, void* arg2,
-    void (*arg3)(void*, dxGeom*, dxGeom*))
+void dGeomCollideAABBs(dxGeom* g1, dxGeom* g2, void* userData,
+    dNearCallback* callback)
 {
-    collideAABBs(arg0, arg1, arg2, arg3);
+    collideAABBs(g1, g2, userData, callback);
 }
 
 
