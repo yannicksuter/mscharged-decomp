@@ -52,7 +52,7 @@ float gWaluigiWallHeight = 1.2f;
 float gWaluigiWallShrinkSpeed = 16.5f;
 float gWaluigiWallShrinkDelay = 4.2f;
 float gWaluigiWallPatchDamage = 0.5f;
-float gWaluigiWallDamage_806DCB24 = 0.5f;
+float gWaluigiWallSuperGrowDamage = 0.5f;
 float gWaluigiWallYoshiEggDamage = 0.5f;
 float gWaluigiWallChainChompDamage = 0.5f;
 float gWaluigiWallWindDebrisDamage = 0.75f;
@@ -62,8 +62,8 @@ unsigned int gWaluigiWallNextID;
 bool gWaluigiWallShrinkAll;
 float gWaluigiWallDecayRate;
 float gWaluigiWallShellBananaDamage;
-float gWaluigiWallDamage_806E12FC;
-float gWaluigiWallDamage_806E1300;
+float gWaluigiWallType27Damage;
+float gWaluigiWallType26Damage;
 float gWaluigiWallGoalieDamage;
 float gWaluigiWallFielderDamage;
 float gWaluigiWallSlideAttackDamage;
@@ -223,10 +223,10 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
         return NO_CONTACT;
     }
     case 27:
-        ApplyDamage(gWaluigiWallDamage_806E12FC);
+        ApplyDamage(gWaluigiWallType27Damage);
         return NO_CONTACT;
     case 26:
-        ApplyDamage(gWaluigiWallDamage_806E1300);
+        ApplyDamage(gWaluigiWallType26Damage);
         return ONE_WAY_CONTACT_OTHER;
     case 32:
         ApplyDamage(gWaluigiWallYoshiEggDamage);
@@ -380,7 +380,7 @@ ContactType PhysicsWaluigiWall::FielderContact(cFielder* player)
             OnWaluigiWallAbort(player);
         }
         else if (player->IsSuperGrowActive())
-            ApplyDamage(gWaluigiWallDamage_806DCB24);
+            ApplyDamage(gWaluigiWallSuperGrowDamage);
         else if (player->m_eActionState == ACTION_HIT)
             ApplyDamage(Interpolate(gWaluigiWallMinHitDamage, gWaluigiWallMaxHitDamage, player->GetTweaks()->mUnidentified064));
         else if (player->m_eActionState == ACTION_SLIDE_ATTACK)
