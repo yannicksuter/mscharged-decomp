@@ -314,9 +314,6 @@ void FrontEndTask::HandleSoftReset(float fDeltaT)
     }
 }
 
-// The single out-of-line body for FEResourceManager::Run lives here: retail
-// places it inside this unit's text, right after HandleSoftReset, and
-// feResourceManager.o carries no copy of it.
 void FEResourceManager::Run(float dt)
 {
     Update(dt);
