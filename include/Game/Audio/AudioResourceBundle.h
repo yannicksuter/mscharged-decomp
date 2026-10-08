@@ -22,6 +22,16 @@ struct AudioCueEntry
     u8 pad_11[3];
 };
 
+enum eAudioCueSelection
+{
+    AUDIO_CUE_DISABLED = -1,
+    AUDIO_CUE_SEQUENTIAL = 0,
+    AUDIO_CUE_RANDOM_START = 1,
+    AUDIO_CUE_RANDOM = 2,
+    AUDIO_CUE_RANDOM_NO_REPEAT = 3,
+    AUDIO_CUE_SHUFFLE = 4,
+};
+
 struct AudioCueDefinition
 {
     const char* name;
@@ -29,7 +39,7 @@ struct AudioCueDefinition
     AudioCueEntry* voices;
     u8 useSlider;
     u8 pad_0D[3];
-    s32 selectionMode;
+    eAudioCueSelection selectionMode;
     u32 sliderIndex;
     u32 selectedVoiceIndex;
     u32 activeCount;

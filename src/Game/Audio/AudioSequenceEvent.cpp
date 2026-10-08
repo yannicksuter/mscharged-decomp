@@ -214,14 +214,14 @@ static inline void AccumulateRpcModifier(
     AudioRpcRuntimeNode* node, u32& volumeCount, u32& pitchCount,
     float* volume, float* pitch)
 {
-    if (node->definition->kind == 1)
+    if (node->definition->kind == AUDIO_RPC_PITCH)
     {
         pitchCount++;
         float value = 0.01f * node->value;
         value = 0.091f * value;
         *pitch += value;
     }
-    else if (node->definition->kind == 0)
+    else if (node->definition->kind == AUDIO_RPC_VOLUME)
     {
         volumeCount++;
         *volume += node->value;
