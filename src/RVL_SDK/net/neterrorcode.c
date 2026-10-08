@@ -1,6 +1,6 @@
 #include <revolution/os.h>
 
-extern s32 NCDiGetEnabledConfigList(u32* list0, u32* list1, u32* list2);
+#include <revolution/ncd.h>
 
 s32 GetStartupErrorCode(s32 soErr, s32 connType);
 
