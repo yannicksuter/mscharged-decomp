@@ -1,5 +1,6 @@
 #include "Game/Render/MegaBallIndicators.h"
 #include "Game/NetworkMessageRegistry.h"
+#include "Game/NetworkMessages.h"
 #include "Game/MathHelpers.h"
 #include "Game/Render/RLView.h"
 #include "Game/Render/RLViewLayers.h"
@@ -1058,13 +1059,13 @@ void SendMegaBallPointerUpdate(u16 nAngle, u32 nTextureIndex,
 
 void ReceiveMegaBallPointerUpdate(void* pMessage)
 {
-    u8* pData = (u8*)pMessage;
+    NetMessageMegaBallPointer* pData = static_cast<NetMessageMegaBallPointer*>(pMessage);
     gRemoteMegaBallPointerReceived = true;
-    gRemoteMegaBallPointerX = (float)*(s16*)(pData + 8);
-    gRemoteMegaBallPointerY = (float)*(s16*)(pData + 10);
-    gRemoteMegaBallPointerAngle = (u16)(pData[12] << 8);
-    gRemoteMegaBallPointerTextureIndex = pData[13];
-    gRemoteMegaBallPointerStatus = pData[14];
+    gRemoteMegaBallPointerX = (float)pData->mPointerX;
+    gRemoteMegaBallPointerY = (float)pData->mPointerY;
+    gRemoteMegaBallPointerAngle = (u16)(pData->mAngleHighByte << 8);
+    gRemoteMegaBallPointerTextureIndex = pData->mTextureIndex;
+    gRemoteMegaBallPointerStatus = pData->mStatus;
 }
 
 inline MegaBallIndicator::MegaBallIndicator()
