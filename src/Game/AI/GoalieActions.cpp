@@ -103,7 +103,7 @@ float gfMegaMidAccuracyCountdown = 2.0f;
 float gfMegaHighAccuracyCountdown = 1.2f;
 float gfMegaGoalieRetreatSpeed = 5.0f;
 float gfMegaGoalieFadeRate = 2.0f;
-float gfMegaTargetActivationTime = 0.5f;
+float gfMegaTargetActivationParameter = 0.5f;
 float gfMegaTargetEndScale = 0.9f;
 float gfMegaTargetStartScale = 0.9f;
 float gfGoalieElectrocutionAnimSpeed = 0.9f;
@@ -165,7 +165,7 @@ unsigned char gbShowMegaStrikeTargets;
 unsigned char gbKeepStoppedMegaBallSpin;
 unsigned char gbAnimateMissedMegaBalls;
 float gfMegaLaunchStartDelay;
-unsigned char gbForceShortLobSave;
+unsigned char gbForceLobDeflection;
 unsigned char gbDisableLobPredictionUpdates;
 unsigned char gbForceGoalieUserMovement;
 float gfMegaReadyTimeRemaining;
@@ -1756,8 +1756,8 @@ void Goalie::ActionMegaStrike(float deltaTime)
             muMegaNextTarget = 0;
             if (muMegaNextTarget < g_pGame->m_uMegastrikeNumShots && mfWaitTime < 0.01f)
             {
-                float targetDuration = gfMegaTargetActivationTime;
-                ActivateMegaStrikeTarget(GetNextMegaStrikeTarget(), targetDuration);
+                float activationParameter = gfMegaTargetActivationParameter;
+                ActivateMegaStrikeTarget(GetNextMegaStrikeTarget(), activationParameter);
                 mfWaitTime += mfMegaTargetTime;
                 ++muMegaNextTarget;
             }
@@ -1775,8 +1775,8 @@ void Goalie::ActionMegaStrike(float deltaTime)
         bool exhausted = false;
         if (muMegaNextTarget < g_pGame->m_uMegastrikeNumShots && mfWaitTime < 0.01f)
         {
-            float targetDuration = gfMegaTargetActivationTime;
-            ActivateMegaStrikeTarget(GetNextMegaStrikeTarget(), targetDuration);
+            float activationParameter = gfMegaTargetActivationParameter;
+            ActivateMegaStrikeTarget(GetNextMegaStrikeTarget(), activationParameter);
             mfWaitTime += mfMegaTargetTime;
             ++muMegaNextTarget;
         }
@@ -2976,9 +2976,9 @@ void Goalie::ActionSaveReposition(float deltaTime)
 void Goalie::CheckForLimbEndZoneCollision()
 {
     nlVector3 v3HeadCopy;
-    const nlVector3& v3LHandPos
+    const nlVector3& v3HeadPos
         = GetJointPosition(m_nHeadJointIndex);
-    v3HeadCopy = v3LHandPos;
+    v3HeadCopy = v3HeadPos;
 
     float fHeadAdjustment = 0.0f;
     float fAbsX = (float)fabs(v3HeadCopy.x);
@@ -3028,9 +3028,9 @@ void Goalie::CheckForLimbEndZoneCollision()
     fAbsY = fNetY - 0.4f;
     GetLimbEndZoneAdjustment(bAdjustY, fXAdjustment, fYAdjustment, GetJointPosition(m_nRightHandJointIndex), fLimbXLimit, fAbsY);
 
-    const nlVector3& v3LHandPos2
+    const nlVector3& v3LHandPos
         = GetJointPosition(m_nLeftHandJointIndex);
-    GetLimbEndZoneAdjustment(bAdjustY, fXAdjustment, fYAdjustment, v3LHandPos2, fLimbXLimit, fAbsY);
+    GetLimbEndZoneAdjustment(bAdjustY, fXAdjustment, fYAdjustment, v3LHandPos, fLimbXLimit, fAbsY);
 
     const nlVector3& v3RFootPos
         = GetJointPosition(m_nRightFootJointIndex);
@@ -5817,17 +5817,17 @@ void Goalie::ActionLobSave(float fDeltaT)
         mUnidentified024.m_v3Position,
         maSaveAngle);
 
-    bool bUseShortSave = true;
+    bool bUseDeflection = true;
     bool bSubstateOne = mnSubstate == 1;
-    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && gbForceShortLobSave == 0)
+    if (mUnidentified1E4.m_tFireTimer.m_uPackedTime == 0 && gbForceLobDeflection == 0)
     {
-        bUseShortSave = false;
+        bUseDeflection = false;
     }
 
     bool bNeedsFallback = false;
     if (mpSaveData == 0 || mpSaveData->muSaveType != 4)
     {
-        if (bUseShortSave)
+        if (bUseDeflection)
         {
             if (nlVec3DistanceSquared2D(mUnidentified024.m_v3Position, mv3NavTarget) < 2.25f)
             {
