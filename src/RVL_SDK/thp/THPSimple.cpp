@@ -933,7 +933,7 @@ extern "C" int THPSimpleSetVolume(long vol, long time)
     return 0;
 }
 
-extern "C" void fn_80372970(bool mono)
+extern "C" void THPSimpleSetMono(bool mono)
 {
     SimpleControl.mono = mono;
 }
