@@ -425,9 +425,9 @@ void SHOptionsCheatsList::UpdateCheatText(int item)
 
     for (int i = 0; i < 3; ++i)
     {
-        TLTextInstance* nameText = FEFinder<TLTextInstance, 3>::Find(
+        TLTextInstance* nameText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
             mCheatInstances[item], slideNames[i], "CHALLENGE_0", "stat_0");
-        TLTextInstance* descriptionText = FEFinder<TLTextInstance, 3>::Find(
+        TLTextInstance* descriptionText = FEFinder<TLTextInstance, TLAT_TEXT>::Find(
             mCheatInstances[item], slideNames[i], "CHALLENGE_0", "stat_1");
 
         nameText->SetStringId(strings[0]);
