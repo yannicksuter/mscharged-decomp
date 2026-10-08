@@ -249,15 +249,15 @@ void PhysicsCharacterBase::AddBoneVolumes(PhysicsWorld* world,
 
         switch (element->uPrimitiveType)
         {
-        case 1:
+        case PHYS_PRIMITIVE_SPHERE:
             object = new (nlMalloc(sizeof(PhysicsSphereBone), 8, false))
                 PhysicsSphereBone(collisionSpace, world, element->fRadius);
             break;
-        case 2:
+        case PHYS_PRIMITIVE_CAPSULE:
             object = new (nlMalloc(sizeof(PhysicsCapsuleBone), 8, false))
                 PhysicsCapsuleBone(collisionSpace, world, element->fRadius, element->fHeight);
             break;
-        case 3:
+        case PHYS_PRIMITIVE_CYLINDER:
             object = new (nlMalloc(sizeof(PhysicsCylinderBone), 8, false))
                 PhysicsCylinderBone(collisionSpace, world, element->fRadius, element->fHeight);
             break;
@@ -276,13 +276,13 @@ void PhysicsCharacterBase::AddBoneVolumes(PhysicsWorld* world,
 
         switch (element->uPrimitiveType)
         {
-        case 1:
+        case PHYS_PRIMITIVE_SPHERE:
             ((PhysicsSphereBone*)object)->m_pBoneVolume = volume;
             break;
-        case 2:
+        case PHYS_PRIMITIVE_CAPSULE:
             ((PhysicsCapsuleBone*)object)->m_pBoneVolume = volume;
             break;
-        case 3:
+        case PHYS_PRIMITIVE_CYLINDER:
             ((PhysicsCylinderBone*)object)->m_pBoneVolume = volume;
             break;
         }

@@ -10,6 +10,16 @@ class DebugWriteCache;
 class PhysicsObject;
 class PhysicsWorld;
 
+enum ePhysicsPrimitiveType
+{
+    PHYS_PRIMITIVE_BOX = 0,
+    PHYS_PRIMITIVE_SPHERE = 1,
+    PHYS_PRIMITIVE_CAPSULE = 2,
+    PHYS_PRIMITIVE_CYLINDER = 3,
+    PHYS_PRIMITIVE_FINITE_PLANE = 4,
+    PHYS_PRIMITIVE_PLANE = 6,
+};
+
 enum ePhysicsObjectType
 {
     PHYSOBJ_BOX = 0x01,
