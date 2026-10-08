@@ -1012,11 +1012,11 @@ extern "C" float fn_800D88B4(cFielder* pFielder)
     {
         switch (pFielder->m_pTeam->GetPowerUpByIndex(i).eType)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 5:
+        case POWER_UP_GREEN_SHELL:
+        case POWER_UP_RED_SHELL:
+        case POWER_UP_SPINY_SHELL:
+        case POWER_UP_FREEZE_SHELL:
+        case POWER_UP_BOBOMB:
             nPowerups++;
             break;
         }
@@ -1035,12 +1035,12 @@ extern "C" float fn_800D8970(cFielder* pFielder)
     {
         switch (pFielder->m_pTeam->GetPowerUpByIndex(i).eType)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
+        case POWER_UP_GREEN_SHELL:
+        case POWER_UP_RED_SHELL:
+        case POWER_UP_SPINY_SHELL:
+        case POWER_UP_FREEZE_SHELL:
+        case POWER_UP_BANANA:
+        case POWER_UP_BOBOMB:
             break;
         default:
             nPowerups++;

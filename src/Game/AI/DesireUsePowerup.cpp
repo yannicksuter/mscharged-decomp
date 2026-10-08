@@ -231,22 +231,22 @@ void DesireUsePowerup::SetPowerup(
     bool bRetainPowerup = false;
     switch (ePowerup)
     {
-    case (ePowerUpType)12:
-    case (ePowerUpType)15:
-    case (ePowerUpType)16:
-    case (ePowerUpType)20:
+    case POWER_UP_BOWSER:
+    case POWER_UP_WARIO:
+    case POWER_UP_WALUIGI:
+    case POWER_UP_PETEY:
         bRetainPowerup = true;
-    case (ePowerUpType)6:
-    case (ePowerUpType)7:
-    case (ePowerUpType)8:
-    case (ePowerUpType)9:
-    case (ePowerUpType)10:
-    case (ePowerUpType)11:
-    case (ePowerUpType)13:
-    case (ePowerUpType)14:
-    case (ePowerUpType)17:
-    case (ePowerUpType)18:
-    case (ePowerUpType)19:
+    case POWER_UP_CHAIN_CHOMP:
+    case POWER_UP_MUSHROOM:
+    case POWER_UP_STAR:
+    case POWER_UP_MARIO:
+    case POWER_UP_PEACH:
+    case POWER_UP_DONKEYKONG:
+    case POWER_UP_LUIGI:
+    case POWER_UP_DAISY:
+    case POWER_UP_BOWSERJR:
+    case POWER_UP_DIDDYKONG:
+    case POWER_UP_YOSHI:
         ThrowPowerup(this);
         break;
     default:
@@ -330,18 +330,18 @@ void ThrowPowerup(DesireUsePowerup* pDesire)
     ePowerUpType ePowerup = pDesire->m_pFielder->GetPowerupType();
     switch (ePowerup)
     {
-    case (ePowerUpType)9:
-    case (ePowerUpType)10:
-    case (ePowerUpType)11:
-    case (ePowerUpType)12:
-    case (ePowerUpType)13:
-    case (ePowerUpType)14:
-    case (ePowerUpType)15:
-    case (ePowerUpType)16:
-    case (ePowerUpType)17:
-    case (ePowerUpType)18:
-    case (ePowerUpType)19:
-    case (ePowerUpType)20:
+    case POWER_UP_MARIO:
+    case POWER_UP_PEACH:
+    case POWER_UP_DONKEYKONG:
+    case POWER_UP_BOWSER:
+    case POWER_UP_LUIGI:
+    case POWER_UP_DAISY:
+    case POWER_UP_WARIO:
+    case POWER_UP_WALUIGI:
+    case POWER_UP_BOWSERJR:
+    case POWER_UP_DIDDYKONG:
+    case POWER_UP_YOSHI:
+    case POWER_UP_PETEY:
     {
         if (!pDesire->m_pFielder->IsSuperPowerActive())
         {

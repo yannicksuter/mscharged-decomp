@@ -226,7 +226,7 @@ bool IsDrawablePowerup(ePowerUpType eType)
 
 bool IsCaptainPowerup(int nType)
 {
-    return nType >= NUM_POWER_UPS && nType <= 20;
+    return nType >= NUM_POWER_UPS && nType <= POWER_UP_PETEY;
 }
 
 cFielder* FindPowerupTarget(cFielder* pThrower, ePowerUpType eType)

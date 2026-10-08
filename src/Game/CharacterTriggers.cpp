@@ -1547,67 +1547,67 @@ void EmitPowerupIcon(cCharacter* pCharacter, int nIcon)
 
     switch (nIcon)
     {
-    case 6:
+    case POWER_UP_CHAIN_CHOMP:
         nlStrNCpy<char>(szIconName, "icon_chomp", 0x20);
         break;
-    case 0:
+    case POWER_UP_GREEN_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_green", 0x20);
         break;
-    case 1:
+    case POWER_UP_RED_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_red", 0x20);
         break;
-    case 2:
+    case POWER_UP_SPINY_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_spike", 0x20);
         break;
-    case 3:
+    case POWER_UP_FREEZE_SHELL:
         nlStrNCpy<char>(szIconName, "icon_shell_blue", 0x20);
         break;
-    case 7:
+    case POWER_UP_MUSHROOM:
         nlStrNCpy<char>(szIconName, "icon_mushroom", 0x20);
         break;
-    case 9:
+    case POWER_UP_MARIO:
         nlStrNCpy<char>(szIconName, "icon_mario", 0x20);
         break;
-    case 20:
+    case POWER_UP_PETEY:
         nlStrNCpy<char>(szIconName, "icon_petey", 0x20);
         break;
-    case 10:
+    case POWER_UP_PEACH:
         nlStrNCpy<char>(szIconName, "icon_peach", 0x20);
         break;
-    case 11:
+    case POWER_UP_DONKEYKONG:
         nlStrNCpy<char>(szIconName, "icon_dk", 0x20);
         break;
-    case 12:
+    case POWER_UP_BOWSER:
         nlStrNCpy<char>(szIconName, "icon_bowser", 0x20);
         break;
-    case 13:
+    case POWER_UP_LUIGI:
         nlStrNCpy<char>(szIconName, "icon_luigi", 0x20);
         break;
-    case 14:
+    case POWER_UP_DAISY:
         nlStrNCpy<char>(szIconName, "icon_daisy", 0x20);
         break;
-    case 15:
+    case POWER_UP_WARIO:
         nlStrNCpy<char>(szIconName, "icon_wario", 0x20);
         break;
-    case 16:
+    case POWER_UP_WALUIGI:
         nlStrNCpy<char>(szIconName, "icon_waluigi", 0x20);
         break;
-    case 17:
+    case POWER_UP_BOWSERJR:
         nlStrNCpy<char>(szIconName, "icon_bowserjr", 0x20);
         break;
-    case 18:
+    case POWER_UP_DIDDYKONG:
         nlStrNCpy<char>(szIconName, "icon_diddy", 0x20);
         break;
-    case 19:
+    case POWER_UP_YOSHI:
         nlStrNCpy<char>(szIconName, "icon_yoshi", 0x20);
         break;
-    case 8:
+    case POWER_UP_STAR:
         nlStrNCpy<char>(szIconName, "icon_star", 0x20);
         break;
-    case 4:
+    case POWER_UP_BANANA:
         nlStrNCpy<char>(szIconName, "icon_banana", 0x20);
         break;
-    case 5:
+    case POWER_UP_BOBOMB:
         nlStrNCpy<char>(szIconName, "icon_bobomb", 0x20);
         break;
     }

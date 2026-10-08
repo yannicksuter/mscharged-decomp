@@ -319,19 +319,19 @@ void FECharacterPDAComponent::SetCaptainInfo(int captain, int, unsigned long fla
     {
         switch (info.mPlayStyle)
         {
-        case 0:
+        case PLAYSTYLE_OFFENSIVE:
             overall->SetActiveSlide("offensive", true, false);
             break;
-        case 1:
+        case PLAYSTYLE_DEFENSIVE:
             overall->SetActiveSlide("defensive", true, false);
             break;
-        case 2:
+        case PLAYSTYLE_PLAYMAKER:
             overall->SetActiveSlide("playmaker", true, false);
             break;
-        case 3:
+        case PLAYSTYLE_POWER:
             overall->SetActiveSlide("power", true, false);
             break;
-        case 4:
+        case PLAYSTYLE_BALANCED:
             overall->SetActiveSlide("balanced", true, false);
             break;
         }
@@ -379,19 +379,19 @@ void FECharacterPDAComponent::SetSidekickInfo(int sidekick, int, unsigned long)
     {
         switch (info.mPlayStyle)
         {
-        case 0:
+        case PLAYSTYLE_OFFENSIVE:
             overall->SetActiveSlide("offensive", true, false);
             break;
-        case 1:
+        case PLAYSTYLE_DEFENSIVE:
             overall->SetActiveSlide("defensive", true, false);
             break;
-        case 2:
+        case PLAYSTYLE_PLAYMAKER:
             overall->SetActiveSlide("playmaker", true, false);
             break;
-        case 3:
+        case PLAYSTYLE_POWER:
             overall->SetActiveSlide("power", true, false);
             break;
-        case 4:
+        case PLAYSTYLE_BALANCED:
             overall->SetActiveSlide("balanced", true, false);
             break;
         }

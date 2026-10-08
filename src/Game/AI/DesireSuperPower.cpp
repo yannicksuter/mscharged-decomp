@@ -322,7 +322,7 @@ bool DesireSuperPower::Initialize(void* context)
         }
 
         unsigned long sound = PowerupBase::GetSoundType(
-            (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
+            (ePowerUpType)m_pFielder->m_pCharacterInfo->mCaptainPowerup,
             PowerupBase::PWRUP_SOUND_ACTIVATE);
         if (m_pFielder->m_DetChar.m_eCharacterClass == MARIO
             || m_pFielder->m_DetChar.m_eCharacterClass == LUIGI)
@@ -489,7 +489,7 @@ void DesireSuperPower::Cleanup()
     }
 
     unsigned long sound = PowerupBase::GetSoundType(
-        (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
+        (ePowerUpType)m_pFielder->m_pCharacterInfo->mCaptainPowerup,
         PowerupBase::PWRUP_SOUND_ACTIVATE);
     StopCaptainPowerupStream(sound, m_pFielder);
     if ((m_pFielder->m_DetChar.m_eCharacterClass == MARIO)
@@ -645,7 +645,7 @@ bool InitializeBowserJr(DesireSuperPower* self, void*)
     }
     short dir = 0;
     cFielder* target = FindPowerupTarget(
-        self->m_pFielder, (ePowerUpType)-1);
+        self->m_pFielder, POWER_UP_NONE);
     self->mpTarget = target;
     if ((target != 0) && (gBowserJrFaceTarget != 0))
     {
@@ -764,7 +764,7 @@ bool InitializeDiddy(DesireSuperPower* self, void*)
     }
     short dir = 0;
     cFielder* target = FindPowerupTarget(
-        self->m_pFielder, (ePowerUpType)-1);
+        self->m_pFielder, POWER_UP_NONE);
     self->mpTarget = target;
     if ((target != 0) && (gDiddyFaceTarget != 0))
     {
@@ -1541,7 +1541,7 @@ void DesireSuperPower::UpdateWario(DesireUpdate* update, float fDeltaT)
                 if (m_pFielder->m_fNextGasTime <= 0.0f)
                 {
                     unsigned long sound = PowerupBase::GetSoundType(
-                        (ePowerUpType)m_pFielder->m_pCharacterInfo->unknown_0x14,
+                        (ePowerUpType)m_pFielder->m_pCharacterInfo->mCaptainPowerup,
                         PowerupBase::PWRUP_SOUND_ACTIVATE);
                     PlaySound(m_pFielder->m_uSoundSlotId, sound, 0, 0);
                     m_pFielder->PlayImpactCameraRumble();
