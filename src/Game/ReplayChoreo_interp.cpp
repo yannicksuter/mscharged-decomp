@@ -145,8 +145,8 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
     {
         int focus = m_SP[-1];
         m_SP--;
-        mCamera.mFocus = focus;
-        mCamera.mSecondaryFocus = focus;
+        mCamera.mFocus = static_cast<eReplayCameraFocus>(focus);
+        mCamera.mSecondaryFocus = static_cast<eReplayCameraFocus>(focus);
         break;
     }
     case 20:
@@ -190,7 +190,7 @@ void ReplayChoreo::DoFunctionCall(unsigned int function)
     {
         int focus = m_SP[-1];
         m_SP--;
-        mCamera.mSecondaryFocus = focus;
+        mCamera.mSecondaryFocus = static_cast<eReplayCameraFocus>(focus);
         break;
     }
     case 25:
