@@ -83,37 +83,37 @@ DrawableObject* BasicStadium::HandleObjectCreation(
     DrawableObject* pObject = 0;
     switch (uType)
     {
-    case 0x10000:
+    case WORLD_OBJECT_STADIUM_PHYSICS:
         pObject = LoadStadiumObject<StadiumPhysicsObject>(pContext, 0x90);
         break;
-    case 0x10001:
+    case WORLD_OBJECT_CUP_TROPHY:
         pObject = LoadStadiumObject<StadiumCupTrophyDrawable>(pContext, 0x80);
         break;
-    case 0x10002:
+    case WORLD_OBJECT_STADIUM_DRAWABLE:
         pObject = LoadStadiumObject<StadiumWorldDrawable>(pContext, 0x90);
         break;
-    case 0x10003:
+    case WORLD_OBJECT_STADIUM_LIGHT:
         pObject = LoadStadiumObject<StadiumLight>(pContext, 0x90);
         break;
-    case 0x10004:
+    case WORLD_OBJECT_ATTACK_SIDE_INDICATOR:
         pObject = LoadStadiumObject<StadiumAttackSideIndicator>(pContext, 0x80);
         break;
-    case 0x10005:
+    case WORLD_OBJECT_SOLAR_FLARE:
         pObject = LoadStadiumObject<SolarFlareDrawable>(pContext, 0x80);
         break;
-    case 0x10006:
+    case WORLD_OBJECT_FE_MODEL_MARKER:
         pObject = LoadStadiumObject<StadiumFEModelMarker>(pContext, 0x70);
         break;
-    case 0x10007:
+    case WORLD_OBJECT_SHADOW_HEIGHT_MARKER:
         pObject = LoadStadiumObject<StadiumShadowHeightMarker>(pContext, 0x70);
         break;
-    case 0x10008:
+    case WORLD_OBJECT_TOGGLE:
         pObject = LoadStadiumObject<StadiumToggleDrawable>(pContext, 0x80);
         break;
-    case 0x10009:
+    case WORLD_OBJECT_SHADOW_VOLUME:
         pObject = LoadStadiumObject<StadiumShadowVolumeDrawable>(pContext, 0x80);
         break;
-    case 0x1000A:
+    case WORLD_OBJECT_HIGH_RANGE:
         pObject = LoadStadiumObject<StadiumHighRangeDrawable>(pContext, 0x90);
         break;
     default:

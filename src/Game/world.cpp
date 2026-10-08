@@ -284,14 +284,14 @@ DrawableObject* World::CreateObject(
     {
     case 0xFFFFFFFF:
         break;
-    case 0x101:
+    case WORLD_OBJECT_DRAWABLE:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldDrawable;
         ((WorldDrawable*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x70;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x102:
+    case WORLD_OBJECT_VISIBILITY:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldVisibilityDrawable;
         InitializeWorldVisibilityDrawable(
@@ -299,42 +299,42 @@ DrawableObject* World::CreateObject(
         pContext->m_pObject += 0x30;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x103:
+    case WORLD_OBJECT_PHYSICS:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldPhysicsDrawable;
         InitializeWorldPhysicsDrawable((WorldPhysicsDrawable*)pObject, pContext);
         pContext->m_pObject += 0x90;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x104:
+    case WORLD_OBJECT_HELPER:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldHelperObject;
         ((WorldHelperObject*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x60;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x106:
+    case WORLD_OBJECT_ANIMATION:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldAnimObject;
         ((WorldAnimObject*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x90;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x107:
+    case WORLD_OBJECT_CROWD_LAYOUT:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) CrowdLayoutObject;
         ((CrowdLayoutObject*)pObject)->RegisterWithCrowdManager(pContext);
         pContext->m_pObject += 0x80;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x108:
+    case WORLD_OBJECT_NPC:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldNPC;
         ((WorldNPC*)pObject)->Initialize(pContext);
         pContext->m_pObject += 0x70;
         ++pContext->m_uNumObjectsLoaded;
         break;
-    case 0x109:
+    case WORLD_OBJECT_EFFECT:
         pObject = (DrawableObject*)pContext->m_pObject;
         new (pObject) WorldEffect;
         ((WorldEffect*)pObject)->Initialize(pContext);
