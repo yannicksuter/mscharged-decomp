@@ -355,7 +355,7 @@ void AvoidController::Update(float fDeltaT)
                 && ((AvoidablePolygon*)pObject)->mPolygonType == 1)
                 continue;
             ++m_NumAvoidances;
-            value = m_Avoidances.UnidentifiedAddOrGet((u32)pObject->mId);
+            value = m_Avoidances.AddOrGet((u32)pObject->mId);
             value->Initialize(pSelf, pObject);
             value->Update(fDeltaT);
             float fWeight = value->GetWeight();

@@ -3,9 +3,9 @@
 
 #include "NL/nlRegistry.h"
 
-struct UnidentifiedAudioPoolOwner
+struct RegistryPoolsOwner
 {
-    ~UnidentifiedAudioPoolOwner();
+    ~RegistryPoolsOwner();
 };
 
 // Registry storage backed by the shared audio container and node pools.
@@ -19,7 +19,7 @@ public:
     virtual RegistryNode* AllocNode();
     virtual RegistryContainer* AllocContainer();
 
-    /* 0x1C */ UnidentifiedAudioPoolOwner m_Pools;
+    /* 0x1C */ RegistryPoolsOwner m_Pools;
 }; // size: 0x20
 
 #endif // GAME_AUDIO_AUDIO_REGISTRY_OWNER_H

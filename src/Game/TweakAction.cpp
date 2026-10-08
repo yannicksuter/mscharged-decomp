@@ -1,6 +1,6 @@
 #include "Game/TweakAction.h"
 
-UnidentifiedTweakAction::UnidentifiedTweakAction(
+TweakAction::TweakAction(
     const char* name, const char* category, const Function0<void>& action)
 {
 }

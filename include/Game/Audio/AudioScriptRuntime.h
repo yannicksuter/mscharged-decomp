@@ -159,7 +159,7 @@ public:
 
     AudioEffectBinding* GetBinding(const u32& key)
     {
-        return mBindings.UnidentifiedAddOrGet(key);
+        return mBindings.AddOrGet(key);
     }
     bool StartEffect(const u32& key, u32 definition,
         void* parameterData, bool invert, float blendTime);

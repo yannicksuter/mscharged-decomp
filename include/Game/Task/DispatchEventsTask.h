@@ -89,9 +89,9 @@ public:
 // spelling, and which function declared them. Any non-empty function compiled
 // before the constructor reproduces the layout; Reset() is where the unit
 // first operates on its dispatcher.
-struct UnidentifiedDispatcherHeaderScope
+struct DispatcherHeaderScope
 {
-    ~UnidentifiedDispatcherHeaderScope()
+    ~DispatcherHeaderScope()
     {
     }
 };

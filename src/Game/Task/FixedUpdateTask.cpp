@@ -84,8 +84,8 @@ EventDispatcher* GetFixedUpdateEventDispatcher()
 
 void FixedUpdateTask::Reset()
 {
-    UnidentifiedDispatcherHeaderScope headerScope;
-    UnidentifiedDispatcherInlineScope inlineScope;
+    DispatcherHeaderScope headerScope;
+    DispatcherInlineScope inlineScope;
 
     mInterpolationDeltaT = mAccumulatedDeltaT = g_fFixedUpdateTick;
     mSimulationTime = 0.0f;

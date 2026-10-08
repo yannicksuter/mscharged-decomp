@@ -42,7 +42,7 @@ inline void RegistryFreeNode(RegistryNode* node)
     RegistryPoolTypes::sNodePool.Free(node);
 }
 
-inline UnidentifiedAudioPoolOwner::~UnidentifiedAudioPoolOwner()
+inline RegistryPoolsOwner::~RegistryPoolsOwner()
 {
     SlotPoolBase::BaseFreeBlocks(&RegistryPoolTypes::sContainerPool, sizeof(ScopedRegistryContainer));
     SlotPoolBase::BaseFreeBlocks(&RegistryPoolTypes::sNodePool, sizeof(RegistryNode));

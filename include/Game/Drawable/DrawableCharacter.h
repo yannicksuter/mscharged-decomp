@@ -182,7 +182,7 @@ template <typename T>
 struct ReplayFrameTraits;
 template <int Min, int Max, int Bits>
 class FloatCompressor;
-class UnidentifiedQuaternionCompressor;
+class QuaternionCompressor;
 template <int N, typename FrameType, typename T>
 void ReplayablePolymorphic(FrameType& frame, T*& ptr);
 
@@ -230,7 +230,7 @@ void DrawableCharacter::Replay(T& frame)
                     Replayable<1>(frame, FloatCompressor<-128, 128, 8>(frozenHammerTranslation.x));
                     Replayable<1>(frame, FloatCompressor<-128, 128, 8>(frozenHammerTranslation.y));
                     Replayable<1>(frame, FloatCompressor<-128, 128, 8>(frozenHammerTranslation.z));
-                    Replayable<1>(frame, UnidentifiedQuaternionCompressor(frozenHammerRotation));
+                    Replayable<1>(frame, QuaternionCompressor(frozenHammerRotation));
                     Replayable<1>(frame, FloatCompressor<0, 7, 5>(frozenHammerScale));
                 }
                 else

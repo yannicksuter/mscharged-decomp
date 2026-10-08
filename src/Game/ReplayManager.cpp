@@ -212,7 +212,7 @@ template <typename EventData>
 static inline BindExp2<void,
     Detail::MemFunImpl<void, void (ReplayManager::*)(EventData*)>,
     ReplayManager*, Placeholder<0> >
-UnidentifiedMakeReplayBinding(
+MakeReplayBinding(
     void (ReplayManager::*callback)(EventData*), ReplayManager* manager)
 {
     typedef Detail::MemFunImpl<void,
@@ -226,7 +226,7 @@ UnidentifiedMakeReplayBinding(
 
 static inline BindExp1<void,
     Detail::MemFunImpl<void, void (ReplayManager::*)()>, ReplayManager*>
-UnidentifiedMakeReplayBinding(
+MakeReplayBinding(
     void (ReplayManager::*callback)(), ReplayManager* manager)
 {
     typedef Detail::MemFunImpl<void, void (ReplayManager::*)()>
@@ -238,12 +238,12 @@ UnidentifiedMakeReplayBinding(
 
 void ReplayManager::RegisterEventHandlers()
 {
-    FindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnReceiveBall, this)), 0, -1);
-    FindEvent<ShotAtGoalData>("ShotAtGoal", -1)->Add(Function<ShotAtGoalData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
-    FindEvent<PassBallData>("PassBall", -1)->Add(Function<PassBallData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
-    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
-    FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(UnidentifiedMakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
-    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(UnidentifiedMakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
+    FindEvent<ReceiveBallData>("ReceiveBall", -1)->Add(Function<ReceiveBallData*>(MakeReplayBinding(&ReplayManager::OnReceiveBall, this)), 0, -1);
+    FindEvent<ShotAtGoalData>("ShotAtGoal", -1)->Add(Function<ShotAtGoalData*>(MakeReplayBinding(&ReplayManager::OnShotAtGoal, this)), 0, -1);
+    FindEvent<PassBallData>("PassBall", -1)->Add(Function<PassBallData*>(MakeReplayBinding(&ReplayManager::OnPassBall, this)), 0, -1);
+    FindEvent<GoalScoredData>("GoalScored", -1)->Add(Function<GoalScoredData*>(MakeReplayBinding(&ReplayManager::OnGoalScored, this)), 0, -1);
+    FindEvent<GoalieSaveData>("GoalieSave", -1)->Add(Function<GoalieSaveData*>(MakeReplayBinding(&ReplayManager::OnGoalieSave, this)), 0, -1);
+    FindEvent<NoEventData>("Kickoff", -1)->Add(Function<FnVoidVoid>(MakeReplayBinding(&ReplayManager::OnKickoff, this)), 0, -1);
 }
 
 void ReplayManager::InitializeSnapshots()

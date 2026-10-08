@@ -14,7 +14,7 @@ public:
     void Render(int) const;
     void Blend(const float*, const DrawablePowerup&, const DrawablePowerup&);
 
-    void SetUnidentifiedVisible(bool visible)
+    void SetVisible(bool visible)
     {
         mVisible = visible;
     }

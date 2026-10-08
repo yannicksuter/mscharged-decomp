@@ -124,7 +124,7 @@ inline void cPoseAccumulator::Replay(T& frame)
 {
     for (unsigned int i = 0; i < m_nNumNodes; i++)
     {
-        const UnidentifiedQuaternionCompressor quaternion(m_pQuaternions[i]);
+        const QuaternionCompressor quaternion(m_pQuaternions[i]);
         frame.template Replayable<0>(quaternion);
     }
     for (unsigned int i = 0; i < m_nNumNodes; i++)

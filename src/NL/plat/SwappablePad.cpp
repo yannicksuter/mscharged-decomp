@@ -14,7 +14,7 @@ bool gEnableWiiFreestylePad = true;
 bool gEnableWiiClassicPad = true;
 
 SwappablePadChangedEvent::SwappablePadChangedEvent()
-    : UnidentifiedStaticEvent<void(int), 5>("SwappablePadChanged", -1)
+    : StaticEvent<void(int), 5>("SwappablePadChanged", -1)
 {
 }
 

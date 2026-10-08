@@ -5,24 +5,24 @@
 
 // An event whose listeners come from a fixed-size pool.
 template <typename T, int Count>
-class UnidentifiedStaticEvent : public EventInterface<T>::Type
+class StaticEvent : public EventInterface<T>::Type
 {
-    typedef typename EventInterface<T>::Type TypedEvent;
+    typedef typename EventInterface<T>::Type Base;
     typedef EventListener<T> Listener;
     typedef DLListEntry<Listener> ListenerEntry;
     typedef nlStaticArrayAllocator<ListenerEntry, Count> ListenerPool;
 
 public:
-    typedef typename TypedEvent::Callback Callback;
+    typedef typename Base::Callback Callback;
 
-    UnidentifiedStaticEvent(const char* name, int length)
-        : TypedEvent(name, length)
+    StaticEvent(const char* name, int length)
+        : Base(name, length)
         , mListeners()
     {
-        RegisterEvent(this, TypedEvent::sType);
+        RegisterEvent(this, Base::sType);
     }
 
-    virtual ~UnidentifiedStaticEvent();
+    virtual ~StaticEvent();
 
     void RemoveAll()
     {
@@ -130,21 +130,21 @@ protected:
 };
 
 template <typename T, int Count>
-UnidentifiedStaticEvent<T, Count>::~UnidentifiedStaticEvent()
+StaticEvent<T, Count>::~StaticEvent()
 {
     RemoveAll();
     UnregisterEvent(this);
 }
 
 template <typename T, int Count>
-void UnidentifiedStaticEvent<T, Count>::Disconnect(void* owner)
+void StaticEvent<T, Count>::Disconnect(void* owner)
 {
     Listener* listener = (Listener*)FindEventConnection(this, owner);
     Remove(listener);
 }
 
 template <typename T, int Count>
-void UnidentifiedStaticEvent<T, Count>::Add(
+void StaticEvent<T, Count>::Add(
     const Callback& callback, unsigned int value, int flags)
 {
     ListenerEntry* entry;

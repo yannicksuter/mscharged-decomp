@@ -677,7 +677,7 @@ void NisPlayer::HideAllActors() const
     RenderSnapshot& snapshot = ReplayManager::Instance()->GetMutableRenderSnapshot();
     for (int i = 0; i < 150; i++)
     {
-        snapshot.GetPowerup(i).SetUnidentifiedVisible(false);
+        snapshot.GetPowerup(i).SetVisible(false);
     }
     for (int i = 0; i < 10; i++)
     {

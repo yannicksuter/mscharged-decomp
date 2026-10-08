@@ -5,7 +5,7 @@
 // destructor before GetFOV and Reactivate; the disposal function itself is
 // discarded at link time. The retail destructor order does not establish an
 // original disposal function, its signature or its source owner.
-static void UnidentifiedCameraDisposal(cBaseCamera* pCamera)
+static void DestroyBaseCamera(cBaseCamera* pCamera)
 {
     delete pCamera;
 }

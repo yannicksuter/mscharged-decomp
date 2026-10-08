@@ -154,11 +154,11 @@ TweakValueInt gCharacterLightBlue("siCharacterLightBlue", gLastTweakCategory, 0)
 
 void UpdateCharacterLightColour();
 
-UnidentifiedTweakAction gCharacterLightRedAction(
+TweakAction gCharacterLightRedAction(
     "Character Light Red", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
-UnidentifiedTweakAction gCharacterLightGreenAction(
+TweakAction gCharacterLightGreenAction(
     "Character Light Green", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
-UnidentifiedTweakAction gCharacterLightBlueAction(
+TweakAction gCharacterLightBlueAction(
     "Character Light Blue", gLastTweakCategory, Function0<void>(UpdateCharacterLightColour));
 
 static const nlVector3 sInitialDirection = { 1.0f, 0.0f, 0.0f };

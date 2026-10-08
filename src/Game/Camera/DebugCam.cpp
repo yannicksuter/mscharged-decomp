@@ -64,7 +64,7 @@ static TweakValueFloat gDebugCameraSensitivity(
     "gDebugCameraSensitivity", "Controller Config/DPD", 3.0f);
 
 static float sDebugCamFOVTweak = sfDebugCamFOV;
-static UnidentifiedTweakAction sDebugCamFOVAction(
+static TweakAction sDebugCamFOVAction(
     "Fov", gLastTweakCategory, Function0<void>(ApplyDebugCameraFOV));
 static TweakFloatBinding sSpeed0(
     "Speed 0", "Controller Config/DPD", &sControlTweakValues.speed0);

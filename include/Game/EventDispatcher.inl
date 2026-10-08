@@ -12,10 +12,10 @@ inline EventDispatcher::EventDispatcher()
 {
 }
 
-// See UnidentifiedDispatcherHeaderScope in DispatchEventsTask.h.
-struct UnidentifiedDispatcherInlineScope
+// See DispatcherHeaderScope in DispatchEventsTask.h.
+struct DispatcherInlineScope
 {
-    ~UnidentifiedDispatcherInlineScope()
+    ~DispatcherInlineScope()
     {
     }
 };

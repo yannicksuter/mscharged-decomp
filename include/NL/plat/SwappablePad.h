@@ -6,7 +6,7 @@
 class PadBackend;
 bool UpdatePadBackend(PadBackend* pad);
 
-class SwappablePadChangedEvent : public UnidentifiedStaticEvent<void(int), 5>
+class SwappablePadChangedEvent : public StaticEvent<void(int), 5>
 {
 public:
     SwappablePadChangedEvent();

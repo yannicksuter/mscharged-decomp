@@ -2,26 +2,18 @@
 #define GAME_SHARED_STATIC_STORAGE_H
 
 // One shared four-byte state object, dynamically zeroed behind a guard by the
-// static initializer of every translation unit that includes this header:
-// 363 objects in R4QE01 carry that block, `Game/AIPad.cpp` is first in link
-// order and therefore owns the object (`.sbss 0x806E0B80`) and its guard, and
-// no retained code ever reads it. That is the profile of a debug facility
-// whose readers were compiled out of the release build while its storage was
-// not.
+// static initializer of each including translation unit. The retail code has
+// 363 such initializer blocks. AIPad is first in link order and supplies the
+// state at 0x806E0B80 and its guard; no retained code reads the state.
 //
-// The shape is fixed by the compiler, not by us. A static data member of a
-// class template is the only construct that gives every including unit a weak
-// copy with a guarded initializer in `__sinit`, and MWCC instantiates such a
-// member only when it analyses a function body that forms its address. The
-// accessor below is that body: it is what makes plain inclusion reproduce the
-// retail initializer, byte for byte, in the position retail keeps it (after the
-// unit's own file-scope objects). Its callers did not survive the release
-// build, which is exactly why the object is never read.
+// This reconstruction uses a template static member for the weak copies and
+// guarded initialization. With the configured compiler, the accessor body
+// requests that member during parsing, placing the initializer after each
+// unit's own file-scope objects. The accessor has no retained caller.
 //
-// Still unidentified, hence the names: the template's real spelling, its tag,
-// the accessor's real name and the header's real path. The stripped DOL and
-// the GameCube predecessor (which has no guarded statics at all) carry no
-// evidence for any of them.
+// The original owner, purpose, names and header boundary are unknown. This
+// preserves the observed shared storage and initialization order; a debug
+// facility with removed readers is only one possible explanation.
 
 struct SharedStaticState
 {
