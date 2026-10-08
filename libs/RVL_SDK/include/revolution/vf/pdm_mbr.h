@@ -1,6 +1,10 @@
 #ifndef RVL_SDK_VF_PDM_MBR_H
 #define RVL_SDK_VF_PDM_MBR_H
 #include <revolution/types.h>
+
+struct PDM_DISK;
+struct PDM_MBR;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
