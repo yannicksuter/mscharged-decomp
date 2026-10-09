@@ -1051,7 +1051,7 @@ DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, bool read)
 #define FP_FPECR_ACCESS 33
 
 // clang-format off
-ASM s32 ReadFPSCR(void* ptr){
+ASM void ReadFPSCR(void* ptr){
     nofralloc
 
     stwu      r1, -0x40(r1)
