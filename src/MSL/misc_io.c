@@ -1,4 +1,5 @@
 #include <misc_io.h>
+#include <file_struct.h>
 #include <abort_exit.h>
 #include <ansi_files.h>
 
