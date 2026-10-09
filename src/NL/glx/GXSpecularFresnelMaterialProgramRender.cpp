@@ -50,7 +50,7 @@ static bool sSpecularFresnelLightingEnabled;
 static bool sSpecularFresnelIndicesInitialized;
 static unsigned long sSpecularFresnelBoundTexture;
 
-extern "C" void glxConfigureSpecularFresnelLighting(bool enabled)
+void glxConfigureSpecularFresnelLighting(bool enabled)
 {
     if (enabled)
     {

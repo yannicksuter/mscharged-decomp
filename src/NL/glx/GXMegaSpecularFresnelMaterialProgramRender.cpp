@@ -39,7 +39,7 @@ static bool sMegaSpecularFresnelLightingEnabled;
 static bool sMegaSpecularFresnelIndicesInitialized;
 static unsigned long sMegaSpecularFresnelBoundTexture;
 
-extern "C" void glxConfigureMegaSpecularFresnelLighting(bool enabled)
+void glxConfigureMegaSpecularFresnelLighting(bool enabled)
 {
     if (enabled)
     {

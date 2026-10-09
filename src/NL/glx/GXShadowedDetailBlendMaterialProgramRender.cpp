@@ -27,7 +27,7 @@ bool sShadowedDetailBlendShadowsActive;
 int sShadowedDetailBlendLightCount;
 int sShadowedDetailBlendLightingMode;
 
-extern "C" void glxConfigureShadowedDetailBlendLighting(
+void glxConfigureShadowedDetailBlendLighting(
     int mode, GXShadowedDetailBlendMaterialProgram*)
 {
     sShadowedDetailBlendLightingMode = mode;

@@ -24,7 +24,7 @@ static int sSpecularLightCount;
 static float sSpecularExponent;
 static bool sSpecularLightingEnabled;
 
-extern "C" void glxConfigureSpecularLighting(bool enabled)
+void glxConfigureSpecularLighting(bool enabled)
 {
     bool subtract;
     unsigned int numChans;
