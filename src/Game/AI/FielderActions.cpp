@@ -4241,7 +4241,7 @@ void cFielder::fn_8004BB80(float fDeltaT)
 
             lbl_806E0C74 = new (nlMalloc(
                 sizeof(AvoidablePolygon), 8, false))
-                AvoidablePolygon(2, v3Dir, m_pTeam->GetOtherNet()->m_v3NetLocation, 3.5f);
+                AvoidablePolygon(AVOID_POLYGON_SHOT_LANE, v3Dir, m_pTeam->GetOtherNet()->m_v3NetLocation, 3.5f);
             lbl_806E0C74->mOwner = this;
         }
     }

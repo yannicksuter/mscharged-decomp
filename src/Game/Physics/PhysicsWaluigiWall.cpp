@@ -101,7 +101,7 @@ void PhysicsWaluigiWall::Initialize(const nlMatrix3& rotation, float height)
     SetCategory(0x4000);
     SetCollide(0xB062);
     mAvoidable = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
-        AvoidablePolygon(4, mStartPoint, mEndPoint, gWaluigiWallWidth);
+        AvoidablePolygon(AVOID_POLYGON_WALUIGI_WALL, mStartPoint, mEndPoint, gWaluigiWallWidth);
 }
 
 PhysicsWaluigiWall::~PhysicsWaluigiWall()

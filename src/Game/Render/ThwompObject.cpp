@@ -305,7 +305,7 @@ void ThwompObject::SetState(eThwompState state)
         mAvoidable = new (nlMalloc(
             sizeof(AvoidablePolygon), 8, false))
             AvoidablePolygon(
-                3, mPhysics->GetPosition(), 3.14f, 2.88f);
+                AVOID_POLYGON_THWOMP, mPhysics->GetPosition(), 3.14f, 2.88f);
     }
     else if (state == THWOMP_STATE_FALLING)
     {
