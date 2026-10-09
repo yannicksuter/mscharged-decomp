@@ -43,18 +43,18 @@ void glxConfigureCharacterSkinCustomLighting(bool enabled)
         numTevStages = 3;
         doubleLightRampColour = sDoubleLightRampColour != 0;
 
-        gxSetTevOrder(0, 1, 1, 255);
-        gxSetTevOrder(1, 0, 0, 255);
-        gxSetTevOrder(2, 2, 2, 4);
-        gxSetTexCoordGen(2, 10, 19, 60);
-        gxSetTevColourOp(2, 0, 0, doubleLightRampColour, true, 0);
+        gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
+        gxSetTexCoordGen(GX_TEXCOORD2, GX_TG_SRTG, GX_TG_COLOR0, GX_IDENTITY);
+        gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, doubleLightRampColour, true, GX_TEVPREV);
         GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
-        gxSetTevColourIn(0, 15, 12, 8, 14);
-        gxSetTevColourIn(1, 15, 0, 8, 15);
-        gxSetTevColourIn(2, 15, 0, 8, 15);
-        gxSetTevAlphaIn(0, 7, 7, 7, 7);
-        gxSetTevAlphaIn(1, 7, 7, 7, 4);
-        gxSetTevAlphaIn(2, 7, 7, 7, 0);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_KONST);
+        gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     }
     else if (enabled)
     {
@@ -63,18 +63,18 @@ void glxConfigureCharacterSkinCustomLighting(bool enabled)
         numTexGens = 2;
         numTevStages = 3;
 
-        gxSetTevOrder(0, 1, 1, 255);
-        gxSetTevOrder(1, 0, 0, 255);
-        gxSetTevOrder(2, 255, 255, 4);
+        gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
         if (ShouldDoubleGameObjectLighting() != 0)
-            gxSetTevColourOp(2, 0, 0, 1, true, 0);
-        gxSetTevColourIn(0, 15, 12, 8, 14);
-        gxSetTevColourIn(1, 15, 0, 8, 15);
-        gxSetTevColourIn(2, 15, 0, 10, 15);
-        gxSetTevAlphaIn(0, 7, 7, 7, 7);
-        gxSetTevAlphaIn(1, 7, 7, 7, 4);
-        gxSetTevAlphaIn(2, 7, 7, 7, 0);
+            gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, true, GX_TEVPREV);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_KONST);
+        gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     }
     else
     {
@@ -82,16 +82,16 @@ void glxConfigureCharacterSkinCustomLighting(bool enabled)
         numTexGens = 2;
         numTevStages = 3;
 
-        gxSetTevOrder(0, 1, 1, 255);
-        gxSetTevOrder(1, 0, 0, 255);
-        gxSetTevOrder(2, 255, 255, 255);
+        gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
         GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
-        gxSetTevColourIn(0, 15, 12, 8, 14);
-        gxSetTevColourIn(1, 15, 0, 8, 15);
-        gxSetTevColourIn(2, 15, 0, 12, 15);
-        gxSetTevAlphaIn(0, 7, 7, 7, 7);
-        gxSetTevAlphaIn(1, 7, 7, 7, 4);
-        gxSetTevAlphaIn(2, 7, 7, 7, 0);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_KONST);
+        gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     }
 
     gxSetNumChans(numChans);
@@ -119,8 +119,8 @@ void GXMaterialProgramImpl<GXCharacterSkinCustomMaterialProgram>::Deactivate()
     gxSetCurrentMtx(0, true);
     SetGameObjectAmbientLightingEnabled(0);
     SetGameObjectLightingEnabled(0, sCharacterLightCount, 1);
-    gxSetTevColourOp(2, 0, 0, 0, true, 0);
-    gxSetTexCoordGen(2, 1, 6, 60);
+    gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+    gxSetTexCoordGen(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX2, GX_IDENTITY);
 }
 
 template <>
@@ -215,7 +215,7 @@ void GXMaterialProgramImpl<GXCharacterSkinCustomMaterialProgram>::Draw(
         gxSaveBlendMode();
         gxSetBlendMode(true, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, false);
         GXSetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KASEL_K1_A);
-        gxSetTevAlphaIn(1, 7, 7, 7, 6);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);
         gxRestoreBlendMode();
         gxRestoreZMode();
