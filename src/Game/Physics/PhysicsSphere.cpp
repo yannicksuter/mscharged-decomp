@@ -1,6 +1,7 @@
 #include "Game/Physics/PhysicsSphere.h"
 
 #include "Game/Physics/CollisionSpace.h"
+#include "ode/mass.h"
 
 PhysicsSphere::PhysicsSphere(CollisionSpace* collisionSpace, PhysicsWorld* world, float radius)
     : PhysicsObject(world)
