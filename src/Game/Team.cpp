@@ -716,12 +716,12 @@ void cTeam::CalculateNewBallInterceptTimes()
         {
             int nNumSolutions;
             float pSolutions[2];
-            float fContactHeight = ((cFielder*)pPlayer)->GetAirInterceptHeight(1);
+            float fContactHeight = ((cFielder*)pPlayer)->GetAirInterceptHeight(AIR_INTERCEPT_VOLLEY);
             float fBallHeight = g_pBall->m_v3Position.z;
             if (fBallHeight > fContactHeight)
             {
                 float fOtherContactHeight
-                    = ((cFielder*)pPlayer)->GetAirInterceptHeight(0);
+                    = ((cFielder*)pPlayer)->GetAirInterceptHeight(AIR_INTERCEPT_GROUND);
                 if (fBallHeight < fOtherContactHeight)
                 {
                     fOtherContactHeight = fContactHeight;

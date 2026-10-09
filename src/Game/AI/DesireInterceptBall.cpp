@@ -63,7 +63,7 @@ void DesireInterceptBall::Update(DesireUpdate* update, float)
         cFielder* target = static_cast<cFielder*>(passTarget);
         if (fn_800DF0B8(target))
         {
-            if (g_pBall->GetPosition().z > m_pFielder->GetAirInterceptHeight(0))
+            if (g_pBall->GetPosition().z > m_pFielder->GetAirInterceptHeight(AIR_INTERCEPT_GROUND))
             {
                 float interceptTime = m_pFielder->m_pTeam->mfBallInTimes[m_pFielder->m_DetPlayer.m_ID];
                 float predictionTime = gInterceptBallMaxPredictionTime <= interceptTime ? gInterceptBallMaxPredictionTime : interceptTime;

@@ -43,6 +43,12 @@ enum eHitReaction
     HIT_REACTION_HEAVY = 2,
 };
 
+enum eAirInterceptType
+{
+    AIR_INTERCEPT_GROUND = 0,
+    AIR_INTERCEPT_VOLLEY = 1,
+};
+
 enum eFielderActionState
 {
     ACTION_NEED_ACTION = -1,

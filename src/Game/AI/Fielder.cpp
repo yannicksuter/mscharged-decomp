@@ -4203,7 +4203,7 @@ float cFielder::GetAirInterceptHeight(int type)
     if (mfAirInterceptHeight[type] < 0.0f)
     {
         const LooseBallContactAnimInfo* anim = gOneTimerIdleVolleyContactAnims;
-        if (type == PATCH_GAS_BALL)
+        if (type == AIR_INTERCEPT_GROUND)
             anim = gOneTimerLeadGroundContactAnims;
         nlVector3 position;
         const cSAnim* contactAnim = m_pAnimInventory->GetAnim(anim->nAnimID);
