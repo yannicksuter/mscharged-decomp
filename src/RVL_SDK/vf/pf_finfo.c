@@ -1,4 +1,6 @@
-#include <revolution/vf.h>
+#include <revolution/vf/pf_finfo.h>
+#include <revolution/vf/pf_file.h>
+#include <revolution/vf/pf_api_util.h>
 
 int VFipf2_finfo(struct PF_FILE* p_file, struct PF_INFO* p_info) {
     s32 err;
