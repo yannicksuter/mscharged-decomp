@@ -53,7 +53,7 @@ static OSAlarm _arm;
 static u8 _discNumResps;
 static s8 _discRssi;
 
-// clang-format off
+
 static u8 descriptor[] = {
     0x05, 0x01, // Usage Page (Generic Desktop Ctrls)
     0x09, 0x05, // Usage (Game Pad)
@@ -191,7 +191,7 @@ static u8 descriptor[] = {
 
     0xC0,       // End Collection
 };
-// clang-format on
+
 
 void* App_MEMalloc(u32 size) {
     DEBUGPrint("App_MEMalloc\n");
@@ -616,7 +616,7 @@ static u8 WUDiStoredLinkKey(void) {
 
     pInfo = WUDiGetDevInfo(_work.devAddr);
 
-    // clang-format off
+
     DEBUGPrint("write stored link key\n");
 
     DEBUGPrint("addr : %02x:%02x:%02x:%02x:%02x:%02x\n",
@@ -628,7 +628,7 @@ static u8 WUDiStoredLinkKey(void) {
                pInfo->linkKey[4],  pInfo->linkKey[5],  pInfo->linkKey[6],  pInfo->linkKey[7],
                pInfo->linkKey[8],  pInfo->linkKey[9],  pInfo->linkKey[10], pInfo->linkKey[11],
                pInfo->linkKey[12], pInfo->linkKey[13], pInfo->linkKey[14], pInfo->linkKey[15]);
-    // clang-format on
+
 
     p->linkKeyState = WUD_STATE_LINK_KEY_WRITING;
 
@@ -1515,10 +1515,10 @@ static BOOL StopSync(void) {
     return success;
 }
 
-// clang-format off
+
 DECOMP_FORCEACTIVE(WUD_c,
     "WUDCancelSyncDevice()\n");
-// clang-format on
+
 
 BOOL WUDStopSyncSimple(void) {
     return StopSync();
@@ -1664,7 +1664,7 @@ void reset_again(void) {
     BTM_DeviceReset(reset_again_cb);
 }
 
-// clang-format off
+
 static u8 patch_binary[] = {
     0x70, 0x99, 0x08, 0x00, // address (little-endian)
     0xB4, 0x00, 0x00, 0x00, // size (little-endian)
@@ -1716,9 +1716,9 @@ static u8 patch_binary[] = {
     0x30, 0xFC, 0x0E, 0x00,
     0x7F, 0xFF, 0x00, 0x00
 };
-// clang-format on
 
-// clang-format off
+
+
 static WUDPatchList patch_install = {
     7,
     {
@@ -1731,7 +1731,7 @@ static WUDPatchList patch_install = {
         {0x26, 0x74, 0x2F, 0x00, 0x00, 0x86, 0xF0, 0x18, 0xFD, 0x21, 0x4F, 0x3B, 0x60}
     }
 };
-// clang-format on
+
 
 static u8 remove_patch[] = {0x00};
 
@@ -1935,10 +1935,10 @@ void WUDiAutoSync(void) {
     }
 }
 
-// clang-format off
+
 DECOMP_FORCEACTIVE(WUD_c_1,
                    "WUDiCancelSync()\n");
-// clang-format on
+
 
 void WUDiDeleteAllLinkKeys(void) {
     WUDCB* p = &_wcb;
@@ -2534,13 +2534,13 @@ void WUDSecurityCallback(tBTA_DM_SEC_EVT event, tBTA_DM_SEC* pData) {
                    pAuthCmpl->bd_addr[2], pAuthCmpl->bd_addr[3],
                    pAuthCmpl->bd_addr[4], pAuthCmpl->bd_addr[5]);
 
-        // clang-format off
+
         DEBUGPrint("  key  : %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
                    pAuthCmpl->key[0],  pAuthCmpl->key[1],  pAuthCmpl->key[2],  pAuthCmpl->key[3],
                    pAuthCmpl->key[4],  pAuthCmpl->key[5],  pAuthCmpl->key[6],  pAuthCmpl->key[7],
                    pAuthCmpl->key[8],  pAuthCmpl->key[9],  pAuthCmpl->key[10], pAuthCmpl->key[11],
                    pAuthCmpl->key[12], pAuthCmpl->key[13], pAuthCmpl->key[14], pAuthCmpl->key[15]);
-        // clang-format on
+
 
         DEBUGPrint("  result = %d\n", pAuthCmpl->success);
 
@@ -2666,13 +2666,13 @@ void WUDSearchCallback(tBTA_DM_SEARCH_EVT event, tBTA_DM_SEARCH* pData) {
     case BTA_DM_INQ_RES_EVT: {
         tBTA_DM_INQ_RES* pResp = &pData->inq_res;
 
-        // clang-format off
+
         DEBUGPrint("INQUIRY RESULT: %02x:%02x:%02x:%02x:%02x:%02x   %02x%02x%02x   %d\n",
                    pResp->bd_addr[0], pResp->bd_addr[1], pResp->bd_addr[2],
                    pResp->bd_addr[3], pResp->bd_addr[4], pResp->bd_addr[5],
                    pResp->dev_class[0], pResp->dev_class[1], pResp->dev_class[2],
                    pResp->rssi);
-        // clang-format on
+
 
         _discRssi = pResp->rssi;
 
@@ -2704,12 +2704,12 @@ void WUDSearchCallback(tBTA_DM_SEARCH_EVT event, tBTA_DM_SEARCH* pData) {
         _discResp.services = dmDiscRes->services;
         _discNumResps++;
 
-        // clang-format off
+
         DEBUGPrint("DISCOVER RESULT:  %02x:%02x:%02x:%02x:%02x:%02x   %s (%04x)\n",
                    _discResp.devAddr[0], _discResp.devAddr[1], _discResp.devAddr[2],
                    _discResp.devAddr[3], _discResp.devAddr[4], _discResp.devAddr[5],
                    _discResp.devName, _discResp.services);
-        // clang-format on
+
         break;
     }
 
@@ -2765,10 +2765,10 @@ void WUDVendorSpecificCallback(UINT8 len, UINT8* pData) {
     case WUD_VSE_WATCH_DOG_RESET_HW: {
         DEBUGPrint("VSE:- WATCH_DOG_RESET  HW error = %d\n", pData[1]);
 
-        // clang-format off
+
 #line 3877
         OS_ERROR("MODULE FATAL ERROR\n");
-        // clang-format on
+
         break;
     }
     }
@@ -2810,13 +2810,13 @@ void WUDStoredLinkKeyCallback(void* p1) {
                        pPair->bd_addr[0], pPair->bd_addr[1], pPair->bd_addr[2],
                        pPair->bd_addr[3], pPair->bd_addr[4], pPair->bd_addr[5]);
 
-            // clang-format off
+
             DEBUGPrint("LINKKEY: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
                        pPair->link_key[0],  pPair->link_key[1],  pPair->link_key[2],  pPair->link_key[3],
                        pPair->link_key[4],  pPair->link_key[5],  pPair->link_key[6],  pPair->link_key[7],
                        pPair->link_key[8],  pPair->link_key[9],  pPair->link_key[10], pPair->link_key[11],
                        pPair->link_key[12], pPair->link_key[13], pPair->link_key[14], pPair->link_key[15]);
-            // clang-format on
+
 
             if (pInfo == NULL) {
                 DEBUGPrint("this device is not stored in NAND\n");
@@ -2898,10 +2898,10 @@ void WUDStoredLinkKeyCallback(void* p1) {
     }
 
     default: {
-        // clang-format off
+
 #line 4029
         OS_ERROR("Unknown event\n");
-        // clang-format on
+
     }
     }
 }
@@ -2994,10 +2994,9 @@ u8 _WUDGetLinkNumber(void) {
     return num;
 }
 
-// clang-format off
+
 DECOMP_FORCEACTIVE(WUD_c_2,
                    "_WUDEnableTestMode\n",
                    "_WUDStartSyncDevice()\n",
                    "_WUDDeleteStoreDevice()\n",
                    "dev number = %d\n");
-// clang-format on
