@@ -36,6 +36,14 @@ enum AsyncLoadingSequenceState
     ASYNC_LOADING_STADIUM_VIEWER_RUN = 12,
 };
 
+enum AsyncLoadingResourceState
+{
+    ASYNC_RESOURCES_UNLOADED = 0,
+    ASYNC_RESOURCES_LOADED = 1,
+    ASYNC_RESOURCES_LOADING = 2,
+    ASYNC_RESOURCES_UNLOADING = 3,
+};
+
 enum AsyncLoadingResult
 {
     ASYNC_LOADING_WAITING_FOR_BYTE_CODE = 0,

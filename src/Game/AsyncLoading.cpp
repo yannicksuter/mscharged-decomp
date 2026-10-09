@@ -787,7 +787,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
     case 83:
         break;
     case 84:
-        mLoadingState = 2;
+        mLoadingState = ASYNC_RESOURCES_LOADING;
         fn_80111660(2);
         DestroyFEResourcePool();
         CreateLargeFEResourcePool();
@@ -800,7 +800,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
             nlSingleton<GameSceneManager>::s_pInstance
                 = new (8, false) GameSceneManager;
         }
-        mLoadingState = 1;
+        mLoadingState = ASYNC_RESOURCES_LOADED;
         break;
     case 85:
         fn_80119454(this);
@@ -826,7 +826,7 @@ void AsyncLoadingManager::DoFunctionCall(unsigned int functionIndex)
         BeginFrameTask::s_FramerateLocked = false;
         InitializeGameObjectLighting();
         UseDefaultFreestyleButtonRemap(IsNetworkOrRecordedGame());
-        mLoadingState = 1;
+        mLoadingState = ASYNC_RESOURCES_LOADED;
         FinishLoadingStep(this);
         break;
     case 92:
@@ -1123,7 +1123,7 @@ AsyncLoadingManager::AsyncLoadingManager()
     mGameOverConnection = 0;
     mByteCode = 0;
     mSequenceState = ASYNC_LOADING_IDLE;
-    mLoadingState = 0;
+    mLoadingState = ASYNC_RESOURCES_UNLOADED;
     mPreviousStageTick = 0;
     mSequenceStartTime = 0;
     mStageStartTick = 0;
@@ -1362,7 +1362,7 @@ extern "C" void fn_80119220(AsyncLoadingManager* manager)
 
 extern "C" void fn_8011926C(AsyncLoadingManager* manager)
 {
-    manager->mLoadingState = 3;
+    manager->mLoadingState = ASYNC_RESOURCES_UNLOADING;
     manager->SetLoadingComment("DestroyFEFast");
     g_pFEInput->Reset(true);
     while (!FESceneManager::Instance()->AreAllScenesValid())
@@ -1399,13 +1399,13 @@ extern "C" void fn_8011926C(AsyncLoadingManager* manager)
     g_PendingAnimationRequestPool.FreeBlocks();
 
     fn_80111658(2);
-    manager->mLoadingState = 0;
+    manager->mLoadingState = ASYNC_RESOURCES_UNLOADED;
     FinishLoadingStep(manager);
 }
 
 extern "C" void fn_80119454(AsyncLoadingManager* manager)
 {
-    manager->mLoadingState = 2;
+    manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeFEState1");
     fn_80111654(2);
     ClearTweakRegistryReset();
@@ -1577,7 +1577,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
     }
 
     GameInfoManager::Instance()->unknown_0x71C8 = 0;
-    manager->mLoadingState = 1;
+    manager->mLoadingState = ASYNC_RESOURCES_LOADED;
     lbl_806E1040->SetVisible(false);
     ResetHallOfFameImagePreload();
     FinishLoadingStep(manager);
@@ -1585,7 +1585,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
 
 extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
 {
-    manager->mLoadingState = 3;
+    manager->mLoadingState = ASYNC_RESOURCES_UNLOADING;
     manager->SetLoadingComment("DestroyFEState");
     g_pFEInput->Reset(true);
     while (!FESceneManager::Instance()->AreAllScenesValid())
@@ -1676,13 +1676,13 @@ extern "C" void fn_80119B0C(AsyncLoadingManager* manager)
     glDestroyResourcePool(glGetCurrentResourcePool());
     glSetCurrentResourcePool(0);
     fn_80111658(2);
-    manager->mLoadingState = 0;
+    manager->mLoadingState = ASYNC_RESOURCES_UNLOADED;
     FinishLoadingStep(manager);
 }
 
 extern "C" void fn_80119EC0(AsyncLoadingManager* manager)
 {
-    manager->mLoadingState = 2;
+    manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeGameState1");
     fn_80111654(1);
     ClearTweakRegistryReset();
@@ -1863,7 +1863,7 @@ extern "C" void fn_8011A800(AsyncLoadingManager* manager)
     InitializeTimeRegions();
     UseDefaultFreestyleButtonRemap(IsNetworkOrRecordedGame());
 
-    manager->mLoadingState = 1;
+    manager->mLoadingState = ASYNC_RESOURCES_LOADED;
     lbl_806E1040->SetVisible(false);
     g_pNetworkSession->mGameLoadComplete = true;
 
@@ -1900,7 +1900,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     nlPrintf("RL memory free: %dK\n", glGetCurrentResourcePool()->GetFreeMemory() >> 10);
     glGetCurrentResourcePool();
 
-    manager->mLoadingState = 3;
+    manager->mLoadingState = ASYNC_RESOURCES_UNLOADING;
 
     fn_80056EA8();
 
@@ -2060,7 +2060,7 @@ extern "C" void fn_8011A9DC(AsyncLoadingManager* manager)
     FreePhysicsEventDataPools();
     fn_80111658(1);
 
-    manager->mLoadingState = 0;
+    manager->mLoadingState = ASYNC_RESOURCES_UNLOADED;
     PopFunctionMemoryState();
     PopEventConnectionState();
     FinishLoadingStep(manager);
@@ -2219,7 +2219,7 @@ void AsyncLoadingManager::LoadTrophyTemplates()
 
 extern "C" void fn_8011B6E8(AsyncLoadingManager* manager)
 {
-    manager->mLoadingState = 2;
+    manager->mLoadingState = ASYNC_RESOURCES_LOADING;
     manager->SetLoadingComment("InitializeStadiumViewer");
     fn_80111654(1);
     ClearTweakRegistryReset();
