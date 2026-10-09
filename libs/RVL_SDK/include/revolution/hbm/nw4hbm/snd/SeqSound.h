@@ -77,8 +77,8 @@ private:
     static void NotifyLoadAsyncEndSeqData(bool result, const void* seqBase, s32 seqOffset, void* userData);
 
     /* 0x0D8 */ SeqPlayer mSeqPlayer;
-    /* 0x1F4 */ SeqSoundHandle* mTempSpecialHandle;
-    /* 0x1F8 */ SoundInstanceManager<SeqSound>* mManager;
+    /* 0x1E0 */ SeqSoundHandle* mTempSpecialHandle;
+    /* 0x1E4 */ SoundInstanceManager<SeqSound>* mManager;
     /* 0x1E8 */ bool mLoadingFlag;
     /* 0x1EC */ const SeqLoadCallback* mCallback;
     /* 0x1F0 */ u32 mCallbackData;
