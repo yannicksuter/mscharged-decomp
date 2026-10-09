@@ -373,15 +373,15 @@ void SHHallOfFameCup::OnItemPointerEnter(unsigned int index, void* context)
 
     if (item == 0)
     {
-        mCupButton.SetPointerState(1, index);
+        mCupButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
     else if (item <= 2)
     {
-        mAwardButtons[item - 1].SetPointerState(1, index);
+        mAwardButtons[item - 1].SetPointerState(POINTER_BUTTON_HOVER, index);
     }
     else if (item <= 6)
     {
-        mPlayerCardButtons[item - 3].SetPointerState(1, index);
+        mPlayerCardButtons[item - 3].SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
@@ -394,15 +394,15 @@ void SHHallOfFameCup::OnItemPointerLeave(unsigned int index, void* context)
 
     if (item == 0)
     {
-        mCupButton.SetPointerState(0, index);
+        mCupButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
     else if (item <= 2)
     {
-        mAwardButtons[item - 1].SetPointerState(0, index);
+        mAwardButtons[item - 1].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
     else if (item <= 6)
     {
-        mPlayerCardButtons[item - 3].SetPointerState(0, index);
+        mPlayerCardButtons[item - 3].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
@@ -411,7 +411,7 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
     int i;
     unsigned int item = (unsigned int)context;
 
-    mPlayerCardButtons[item].SetPointerState(2, index);
+    mPlayerCardButtons[item].SetPointerState(POINTER_BUTTON_SELECTED, index);
     StopHallOfFameTrophyEffects();
     for (i = 0; i < 4; ++i)
     {
@@ -489,21 +489,21 @@ void SHHallOfFameCup::OnItemPointerPress(unsigned int index, void* context)
 void SHHallOfFameCup::OnProgressPointerEnter(unsigned int index, void*)
 {
     ++mPointerHoverCounts[index];
-    if (!mProgressButton.HasOtherPointerState(1, index))
+    if (!mProgressButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mProgressButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
-        mProgressButton.SetPointerState(1, index);
+        mProgressButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
 void SHHallOfFameCup::OnProgressPointerLeave(unsigned int index, void*)
 {
     --mPointerHoverCounts[index];
-    if (!mProgressButton.HasOtherPointerState(1, index))
+    if (!mProgressButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mProgressButtonInstance->SetActiveSlide("off", true, false);
-        mProgressButton.SetPointerState(0, index);
+        mProgressButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
@@ -596,24 +596,24 @@ void SHHallOfFameProfile::InitializeButtons()
 void SHHallOfFameProfile::OnSummaryPointerEnter(unsigned int index, void*)
 {
     ++mPointerHoverCounts[index];
-    if (!mSummaryButton.HasOtherPointerState(1, index))
+    if (!mSummaryButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSummaryButtonInstance->SetActiveSlide("over", true, false);
         mSummaryButton.SetInstanceBounds(
             mSummaryButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mSummaryButton.SetPointerState(1, index);
+        mSummaryButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
 void SHHallOfFameProfile::OnSummaryPointerLeave(unsigned int index, void*)
 {
     --mPointerHoverCounts[index];
-    if (!mSummaryButton.HasOtherPointerState(1, index))
+    if (!mSummaryButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSummaryButtonInstance->SetActiveSlide("off", true, false);
         mSummaryButton.SetInstanceBounds(
             mSummaryButtonInstance, true, 0.0f, 0.0f, 1.0f, 1.0f);
-        mSummaryButton.SetPointerState(0, index);
+        mSummaryButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 

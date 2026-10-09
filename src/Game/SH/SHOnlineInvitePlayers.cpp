@@ -591,14 +591,14 @@ void SHOnlineInvitePlayers::OnInvitePointerEnter(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     ++mHoverCounts[(int)context];
     mRowInstances[(int)context]->SetActiveSlide("over", true, false);
-    mInviteButtons[(int)context].SetPointerState(1, index);
+    mInviteButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void SHOnlineInvitePlayers::OnInvitePointerLeave(int index, void* context)
 {
     --mHoverCounts[(int)context];
     mRowInstances[(int)context]->SetActiveSlide("off", true, false);
-    mInviteButtons[(int)context].SetPointerState(0, index);
+    mInviteButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineInvitePlayers::OnInvitePointerPress(int index, void* context)
@@ -614,14 +614,14 @@ void SHOnlineInvitePlayers::OnCancelPointerEnter(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
     ++mHoverCounts[(int)context];
     mCancelInstances[(int)context]->SetActiveSlide("over", true, false);
-    mCancelButtons[(int)context].SetPointerState(1, index);
+    mCancelButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void SHOnlineInvitePlayers::OnCancelPointerLeave(int index, void* context)
 {
     --mHoverCounts[(int)context];
     mCancelInstances[(int)context]->SetActiveSlide("off", true, false);
-    mCancelButtons[(int)context].SetPointerState(0, index);
+    mCancelButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineInvitePlayers::OnCancelPointerPress(int, void*)
@@ -636,7 +636,7 @@ void SHOnlineInvitePlayers::OnCancelPointerPress(int, void*)
 void SHOnlineInvitePlayers::OnStartPointerEnter(int index, void*)
 {
     mStartButtonInstance->SetActiveSlide("over", true, false);
-    mStartButton.SetPointerState(1, index);
+    mStartButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
     mStartHovered = true;
 }
@@ -644,7 +644,7 @@ void SHOnlineInvitePlayers::OnStartPointerEnter(int index, void*)
 void SHOnlineInvitePlayers::OnStartPointerLeave(int index, void*)
 {
     mStartButtonInstance->SetActiveSlide("off", true, false);
-    mStartButton.SetPointerState(0, index);
+    mStartButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     mStartHovered = false;
 }
 

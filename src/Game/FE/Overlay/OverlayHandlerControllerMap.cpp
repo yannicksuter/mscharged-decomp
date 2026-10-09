@@ -147,29 +147,29 @@ void ControllerMapOverlay::SceneCreated()
 
 void ControllerMapOverlay::OnDonePointerEnter(int index, void*)
 {
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void ControllerMapOverlay::OnDonePointerLeave(int index, void*)
 {
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mDoneButton.SetPointerState(0, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void ControllerMapOverlay::OnDonePointerPress(int index, void*)
 {
     mDoneButtonInstance->SetActiveSlide("down", true, false);
-    mDoneButton.SetPointerState(2, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_SELECTED, index);
     mDonePressed = true;
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
 

@@ -459,37 +459,37 @@ void RoadToStrikersCupHubScene::OnButtonPointerEnter(
 
     if (context == (void*)ButtonPlay)
     {
-        if (!mPlayButton.HasOtherPointerState(1, index))
+        if (!mPlayButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mPlayButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-            mPlayButton.SetPointerState(1, index);
+            mPlayButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
     else if (context == (void*)ButtonSchedule)
     {
-        if (!mScheduleButton.HasOtherPointerState(1, index))
+        if (!mScheduleButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mScheduleButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
-            mScheduleButton.SetPointerState(1, index);
+            mScheduleButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
     else if (context == (void*)ButtonCupStats)
     {
-        if (!mCupStatsButton.HasOtherPointerState(1, index))
+        if (!mCupStatsButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mCupStatsButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
-            mCupStatsButton.SetPointerState(1, index);
+            mCupStatsButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
     else if (context == (void*)ButtonRules
-             && !mRulesButton.HasOtherPointerState(1, index))
+             && !mRulesButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRulesButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
-        mRulesButton.SetPointerState(1, index);
+        mRulesButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
@@ -500,33 +500,33 @@ void RoadToStrikersCupHubScene::OnButtonPointerLeave(
 
     if (context == (void*)ButtonPlay)
     {
-        if (!mPlayButton.HasOtherPointerState(1, index))
+        if (!mPlayButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mPlayButtonInstance->SetActiveSlide("off", true, false);
-            mPlayButton.SetPointerState(0, index);
+            mPlayButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
     else if (context == (void*)ButtonSchedule)
     {
-        if (!mScheduleButton.HasOtherPointerState(1, index))
+        if (!mScheduleButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mScheduleButtonInstance->SetActiveSlide("off", true, false);
-            mScheduleButton.SetPointerState(0, index);
+            mScheduleButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
     else if (context == (void*)ButtonCupStats)
     {
-        if (!mCupStatsButton.HasOtherPointerState(1, index))
+        if (!mCupStatsButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mCupStatsButtonInstance->SetActiveSlide("off", true, false);
-            mCupStatsButton.SetPointerState(0, index);
+            mCupStatsButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
     else if (context == (void*)ButtonRules
-             && !mRulesButton.HasOtherPointerState(1, index))
+             && !mRulesButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRulesButtonInstance->SetActiveSlide("off", true, false);
-        mRulesButton.SetPointerState(0, index);
+        mRulesButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 

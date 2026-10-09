@@ -376,12 +376,12 @@ void PauseMenuScene::OnOptionPointerEnter(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
     ++mHoverCounts[index];
-    if (!mOptionButtons[which].HasOtherPointerState(1, index))
+    if (!mOptionButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
         mOptionInstances[which]->SetActiveSlide("over", true, false);
     }
-    mOptionButtons[which].SetPointerState(1, index);
+    mOptionButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -391,9 +391,9 @@ void PauseMenuScene::OnOptionPointerLeave(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
     --mHoverCounts[index];
-    if (!mOptionButtons[which].HasOtherPointerState(1, index))
+    if (!mOptionButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         mOptionInstances[which]->SetActiveSlide("off", true, false);
-    mOptionButtons[which].SetPointerState(0, index);
+    mOptionButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**

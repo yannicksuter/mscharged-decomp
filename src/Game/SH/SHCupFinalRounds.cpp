@@ -352,21 +352,21 @@ void CupFinalRoundsScene::UpdateRoundHighlight()
 void CupFinalRoundsScene::OnBracketPointerEnter(unsigned int index, void* context)
 {
     ++mPointerHoverCounts[index];
-    if (context == 0 && !mBracketButton.HasOtherPointerState(1, index))
+    if (context == 0 && !mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mBracketButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-        mBracketButton.SetPointerState(1, index);
+        mBracketButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
 void CupFinalRoundsScene::OnBracketPointerLeave(unsigned int index, void* context)
 {
     --mPointerHoverCounts[index];
-    if (context == 0 && !mBracketButton.HasOtherPointerState(1, index))
+    if (context == 0 && !mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mBracketButtonInstance->SetActiveSlide("off", true, false);
-        mBracketButton.SetPointerState(0, index);
+        mBracketButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
@@ -376,7 +376,7 @@ void CupFinalRoundsScene::OnMatchupPointerEnter(unsigned int index, void* contex
     ++mPointerHoverCounts[index];
     mMatchupInstances[matchup]->SetActiveSlide("slide2", true, false);
     FEAudio::PlayAnimAudioEvent(0x50204AFA, 0, 0, 1);
-    mMatchupButtons[matchup].SetPointerState(1, index);
+    mMatchupButtons[matchup].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void CupFinalRoundsScene::OnMatchupPointerLeave(unsigned int index, void* context)
@@ -384,7 +384,7 @@ void CupFinalRoundsScene::OnMatchupPointerLeave(unsigned int index, void* contex
     unsigned int matchup = (unsigned int)context;
     --mPointerHoverCounts[index];
     mMatchupInstances[matchup]->SetActiveSlide("slide1", true, false);
-    mMatchupButtons[matchup].SetPointerState(0, index);
+    mMatchupButtons[matchup].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void CupFinalRoundsScene::InitializePointerButtons()

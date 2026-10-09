@@ -448,7 +448,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerEnter(unsigned int index, vo
 {
     ++mPointerHoverCounts[index];
     mDecisionButtonInstances[(int)context]->SetActiveSlide("OVER", true, false);
-    mDecisionButtons[(int)context].SetPointerState(1, index);
+    mDecisionButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
 }
 
@@ -456,7 +456,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerLeave(unsigned int index, vo
 {
     --mPointerHoverCounts[index];
     mDecisionButtonInstances[(int)context]->SetActiveSlide("OFF", true, false);
-    mDecisionButtons[(int)context].SetPointerState(0, index);
+    mDecisionButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void OnlineConnectionQualityScene::CloseConnectionsAndReturn()

@@ -816,25 +816,25 @@ void FEPopupMenu::OnOptionPointerEnter(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
     ++mPointerHoverCounts[index];
-    if (!mControllerComponents[optionIndex].HasOtherPointerState(1, index))
+    if (!mControllerComponents[optionIndex].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mOptionInstances[optionIndex]->SetActiveSlide("over", true, false);
         FEAudio::EnableSounds(true);
         FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
         FEAudio::EnableSounds(false);
     }
-    mControllerComponents[optionIndex].SetPointerState(1, index);
+    mControllerComponents[optionIndex].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void FEPopupMenu::OnOptionPointerLeave(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
     --mPointerHoverCounts[index];
-    if (!mControllerComponents[optionIndex].HasOtherPointerState(1, index))
+    if (!mControllerComponents[optionIndex].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mOptionInstances[optionIndex]->SetActiveSlide("off", true, false);
     }
-    mControllerComponents[optionIndex].SetPointerState(0, index);
+    mControllerComponents[optionIndex].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void FEPopupMenu::OnOptionPointerPress(unsigned int index, void* context)

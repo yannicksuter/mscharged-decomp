@@ -270,12 +270,12 @@ void SHOptionsCheatsList::OnCheatPointerEnter(unsigned int index, void* context)
     {
         ++mPointerInsideCounts[index];
         mComponents[item].PlayHoverFeedback(index);
-        if (!mComponents[item].HasOtherPointerState(1, index))
+        if (!mComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mCheatInstances[item]->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
         }
-        mComponents[item].SetPointerState(1, index);
+        mComponents[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
@@ -340,13 +340,13 @@ void SHOptionsCheatsList::OnCheatPointerInside(unsigned int index, void* context
         unlocked = true;
     }
 
-    if (!unlocked && mComponents[item].GetPointerState(index) == 1)
+    if (!unlocked && mComponents[item].GetPointerState(index) == POINTER_BUTTON_HOVER)
     {
         --mPointerInsideCounts[index];
         mCheatInstances[item]->SetActiveSlide("off", true, false);
-        mComponents[item].SetPointerState(0, index);
+        mComponents[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
-    else if (unlocked && mComponents[item].GetPointerState(index) == 0)
+    else if (unlocked && mComponents[item].GetPointerState(index) == POINTER_BUTTON_NORMAL)
     {
         OnCheatPointerEnter(index, context);
     }
@@ -373,11 +373,11 @@ void SHOptionsCheatsList::OnCheatPointerLeave(unsigned int index, void* context)
     if (unlocked)
     {
         --mPointerInsideCounts[index];
-        if (!mComponents[item].HasOtherPointerState(1, index))
+        if (!mComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mCheatInstances[item]->SetActiveSlide("off", true, false);
         }
-        mComponents[item].SetPointerState(0, index);
+        mComponents[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 

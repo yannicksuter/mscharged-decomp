@@ -561,10 +561,10 @@ void ChooseCaptainsSceneV2::OnCaptainPointerPress(int index, void* context)
     mSidePads[side] = -1;
     mCaptainIds[side] = sCaptainButtonSelectionOrder[mSelectedCaptains[side]];
     mSelectDisplays[side]->SetActiveSlide("off", true, false);
-    mSelectButtons[side].SetPointerState(0, index);
+    mSelectButtons[side].SetPointerState(POINTER_BUTTON_NORMAL, index);
     for (int i = 0; i < 4; ++i)
     {
-        mCaptainButtons[which].SetPointerState(0, i);
+        mCaptainButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
     mGreenArrows[side]->m_bVisible = false;
 
@@ -643,12 +643,12 @@ void ChooseCaptainsSceneV2::OnCaptainPointerEnter(int index, void* context)
 
     mCaptainComponents[side].SetCaptainInfo(selectedCaptain, index, 1);
 
-    if (!mCaptainButtons[which].HasOtherPointerState(1, index))
+    if (!mCaptainButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mCaptainInstances[which]->SetActiveSlide("over", true, false);
     }
 
-    mCaptainButtons[which].SetPointerState(1, index);
+    mCaptainButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
     mCaptainButtons[which].PlayHoverFeedback(index);
 
     switch (index)
@@ -680,12 +680,12 @@ void ChooseCaptainsSceneV2::OnCaptainPointerLeave(int index, void* context)
         return;
     }
 
-    if (!mCaptainButtons[which].HasOtherPointerState(1, index))
+    if (!mCaptainButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mCaptainInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mCaptainButtons[which].SetPointerState(0, index);
+    mCaptainButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void ChooseCaptainsSceneV2::OnSelectPointerPress(int index, void* context)
@@ -737,7 +737,7 @@ void ChooseCaptainsSceneV2::OnSelectPointerEnter(int index, void* context)
         return;
     }
 
-    if (!mSelectButtons[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSelectDisplays[which]->SetActiveSlide("over", true, false);
 
@@ -751,7 +751,7 @@ void ChooseCaptainsSceneV2::OnSelectPointerEnter(int index, void* context)
         }
     }
 
-    mSelectButtons[which].SetPointerState(1, index);
+    mSelectButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
     mSelectButtons[which].PlayHoverFeedback(index);
 }
 
@@ -767,12 +767,12 @@ void ChooseCaptainsSceneV2::OnSelectPointerLeave(int index, void* context)
         return;
     }
 
-    if (!mSelectButtons[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSelectDisplays[which]->SetActiveSlide("off", true, false);
     }
 
-    mSelectButtons[which].SetPointerState(0, index);
+    mSelectButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -787,9 +787,9 @@ void ChooseCaptainsSceneV2::OnSelectPointerInside(int index, void* context)
         return;
     }
 
-    if (mSelectButtons[which].GetPointerState(index) == 0 && mSidePads[which] == -1 && GetSide(index) == -1)
+    if (mSelectButtons[which].GetPointerState(index) == POINTER_BUTTON_NORMAL && mSidePads[which] == -1 && GetSide(index) == -1)
     {
-        if (!mSelectButtons[which].HasOtherPointerState(1, index))
+        if (!mSelectButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mSelectDisplays[which]->SetActiveSlide("over", true, false);
 
@@ -803,7 +803,7 @@ void ChooseCaptainsSceneV2::OnSelectPointerInside(int index, void* context)
             }
         }
 
-        mSelectButtons[which].SetPointerState(1, index);
+        mSelectButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
         mSelectButtons[which].PlayHoverFeedback(index);
     }
 }
@@ -825,7 +825,7 @@ void ChooseCaptainsSceneV2::OnReadyPointerPress(int index, void* context)
 
     for (int i = 0; i < 4; ++i)
     {
-        mReadyButtons[which].SetPointerState(0, i);
+        mReadyButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
 
     mReadyPressed[which] = true;
@@ -843,12 +843,12 @@ void ChooseCaptainsSceneV2::OnReadyPointerEnter(int index, void* context)
         return;
     }
 
-    if (!mReadyButtons[(unsigned long)context].HasOtherPointerState(1, index))
+    if (!mReadyButtons[(unsigned long)context].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mOkButtonInstances[(unsigned long)context]->SetActiveSlide("over", true, false);
     }
 
-    mReadyButtons[(unsigned long)context].SetPointerState(1, index);
+    mReadyButtons[(unsigned long)context].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -863,12 +863,12 @@ void ChooseCaptainsSceneV2::OnReadyPointerLeave(int index, void* context)
         return;
     }
 
-    if (!mReadyButtons[which].HasOtherPointerState(1, index))
+    if (!mReadyButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mOkButtonInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mReadyButtons[which].SetPointerState(0, index);
+    mReadyButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -882,7 +882,7 @@ void ChooseCaptainsSceneV2::OnReadyPointerInside(int index, void* context)
         return;
     }
 
-    if (mReadyButtons[(unsigned long)context].GetPointerState(index) == 0)
+    if (mReadyButtons[(unsigned long)context].GetPointerState(index) == POINTER_BUTTON_NORMAL)
     {
         OnReadyPointerEnter(index, context);
     }
@@ -902,7 +902,7 @@ void ChooseCaptainsSceneV2::OnDonePointerPress(int index, void* context)
 
     for (int i = 0; i < 4; ++i)
     {
-        mDoneButton.SetPointerState(0, i);
+        mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
 
     mDoneButton.Disable();
@@ -942,13 +942,13 @@ void ChooseCaptainsSceneV2::OnDonePointerEnter(int index, void* context)
         return;
     }
 
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     mDoneButton.PlayHoverFeedback(index);
 }
 
@@ -962,12 +962,12 @@ void ChooseCaptainsSceneV2::OnDonePointerLeave(int index, void* context)
         return;
     }
 
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mDoneButton.SetPointerState(0, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -980,7 +980,7 @@ void ChooseCaptainsSceneV2::OnDonePointerInside(int index, void* context)
         return;
     }
 
-    if (mDoneButton.GetPointerState(index) == 0)
+    if (mDoneButton.GetPointerState(index) == POINTER_BUTTON_NORMAL)
     {
         OnDonePointerEnter(index, context);
     }
@@ -1074,12 +1074,12 @@ void ChooseCaptainsSceneV2::UpdatePointerCursors()
         else
         {
             pointer->SetActiveSlide("cursor", true, false);
-            bool overButton = mDoneButton.GetPointerState(i) == 1;
+            bool overButton = mDoneButton.GetPointerState(i) == POINTER_BUTTON_HOVER;
             if (!overButton)
             {
                 for (int side = 0; side < 2; ++side)
                 {
-                    if (mReadyButtons[side].GetPointerState(i) == 1 || mSelectButtons[side].GetPointerState(i) == 1)
+                    if (mReadyButtons[side].GetPointerState(i) == POINTER_BUTTON_HOVER || mSelectButtons[side].GetPointerState(i) == POINTER_BUTTON_HOVER)
                     {
                         overButton = true;
                         break;
@@ -1090,7 +1090,7 @@ void ChooseCaptainsSceneV2::UpdatePointerCursors()
             {
                 for (int j = 0; j < 12; ++j)
                 {
-                    if (mCaptainButtons[j].GetPointerState(i) == 1)
+                    if (mCaptainButtons[j].GetPointerState(i) == POINTER_BUTTON_HOVER)
                     {
                         if (mSidePads[0] == i)
                             idle[0] = false;
@@ -1117,7 +1117,7 @@ void ChooseCaptainsSceneV2::UpdatePointerCursors()
     }
     for (int i = 0; i < 12; ++i)
     {
-        if (!mCaptainButtons[i].HasOtherPointerState(1, -1))
+        if (!mCaptainButtons[i].HasOtherPointerState(POINTER_BUTTON_HOVER, -1))
             mCaptainInstances[i]->SetActiveSlide("off", true, false);
     }
 }
@@ -1229,7 +1229,7 @@ void ChooseCaptainsSceneV2::ReleaseController(int index)
     else
         side = AWAY;
     mSelectDisplays[side]->SetActiveSlide("off", true, false);
-    mSelectButtons[side].SetPointerState(0, index);
+    mSelectButtons[side].SetPointerState(POINTER_BUTTON_NORMAL, index);
     mCaptainComponents[side].SetCaptainInfo(-1, index, 1);
     mGreenArrows[side]->m_bVisible = false;
     mSidePads[side] = -1;

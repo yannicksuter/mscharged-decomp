@@ -448,7 +448,7 @@ void StadiumSelectScene::InitializeButtons()
 void StadiumSelectScene::OnPointerEnter(int index, void*)
 {
     mPlayButtonInstance->SetActiveSlide("over", true, false);
-    mPlayButton.SetPointerState(1, index);
+    mPlayButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, true);
     mPointerOverPlayButton = true;
 }
@@ -456,7 +456,7 @@ void StadiumSelectScene::OnPointerEnter(int index, void*)
 void StadiumSelectScene::OnPointerLeave(int index, void*)
 {
     mPlayButtonInstance->SetActiveSlide("off", true, false);
-    mPlayButton.SetPointerState(0, index);
+    mPlayButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     mPointerOverPlayButton = false;
 }
 

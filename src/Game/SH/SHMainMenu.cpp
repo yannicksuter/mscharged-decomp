@@ -290,11 +290,11 @@ void SHMainMenu::CloseItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mHighlightedItemCounts[index];
-    if (!mMenuItems[item].HasOtherPointerState(1, index))
+    if (!mMenuItems[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mMenuHighlights[item]->SetActiveSlide("off", true, false);
         mMenuArrows[item]->SetActiveSlide("off", true, false);
-        mMenuItems[item].SetPointerState(0, index);
+        mMenuItems[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
@@ -314,11 +314,11 @@ void SHMainMenu::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHighlightedItemCounts[index];
-    if (!mMenuItems[item].HasOtherPointerState(1, index))
+    if (!mMenuItems[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mMenuHighlights[item]->SetActiveSlide("over", true, false);
         mMenuArrows[item]->SetActiveSlide("over", true, false);
-        mMenuItems[item].SetPointerState(1, index);
+        mMenuItems[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         FEAudio::PlayAnimAudioEvent(0x6B0689D4, 0, 0, true);
     }
 }

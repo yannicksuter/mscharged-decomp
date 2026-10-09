@@ -360,7 +360,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerEnter(int index, void* context)
     unsigned int item = (unsigned int)context;
     ++mHoverCount;
     mKeypadInstances[item]->SetActiveSlide("over", true, false);
-    mKeypadButtons[item].SetPointerState(1, index);
+    mKeypadButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0x0E2B7F90, 0, 0, 1);
 }
 
@@ -369,7 +369,7 @@ void SHOnlineFriendCodeEntry::OnKeypadPointerLeave(int index, void* context)
     unsigned int item = (unsigned int)context;
     --mHoverCount;
     mKeypadInstances[item]->SetActiveSlide("off", true, false);
-    mKeypadButtons[item].SetPointerState(0, index);
+    mKeypadButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineFriendCodeEntry::OnDigitPointerPress(int, void* context)
@@ -386,7 +386,7 @@ void SHOnlineFriendCodeEntry::OnDigitPointerEnter(int index, void* context)
     {
         ++mHoverCount;
         mDigitInstances[item]->SetActiveSlide("over", true, false);
-        mDigitButtons[item].SetPointerState(1, index);
+        mDigitButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
     }
 }
@@ -398,7 +398,7 @@ void SHOnlineFriendCodeEntry::OnDigitPointerLeave(int index, void* context)
     {
         --mHoverCount;
         mDigitInstances[item]->SetActiveSlide("off", true, false);
-        mDigitButtons[item].SetPointerState(0, index);
+        mDigitButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 

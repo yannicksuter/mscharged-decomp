@@ -460,21 +460,21 @@ void StrikerCupStandingsScene::OnButtonPointerEnter(unsigned int index, void* co
     ++mPointerHoverCounts[index];
     if (context == 0)
     {
-        if (!mBracketButton.HasOtherPointerState(1, index))
+        if (!mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mBracketButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-            mBracketButton.SetPointerState(1, index);
+            mBracketButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
         return;
     }
     if (context == (void*)1)
     {
-        if (!mHelpButton.HasOtherPointerState(1, index))
+        if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mHelpButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
-            mHelpButton.SetPointerState(1, index);
+            mHelpButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
 }
@@ -484,19 +484,19 @@ void StrikerCupStandingsScene::OnButtonPointerLeave(unsigned int index, void* co
     --mPointerHoverCounts[index];
     if (context == 0)
     {
-        if (!mBracketButton.HasOtherPointerState(1, index))
+        if (!mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mBracketButtonInstance->SetActiveSlide("off", true, false);
-            mBracketButton.SetPointerState(0, index);
+            mBracketButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
         return;
     }
     if (context == (void*)1)
     {
-        if (!mHelpButton.HasOtherPointerState(1, index))
+        if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mHelpButtonInstance->SetActiveSlide("off", true, false);
-            mHelpButton.SetPointerState(0, index);
+            mHelpButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
 }
@@ -540,12 +540,12 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
 
 void StrikerCupStandingsScene::OnTeamPointerEnter(unsigned int index, void* context)
 {
-    mTeamButtons[(unsigned int)context].SetPointerState(1, index);
+    mTeamButtons[(unsigned int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void StrikerCupStandingsScene::OnTeamPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     mTeamRows[item]->SetActiveSlide("off", true, false);
-    mTeamButtons[item].SetPointerState(0, index);
+    mTeamButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }

@@ -130,12 +130,12 @@ bool FEBackButton::UpdateBackButton(FEPointerEvent event, float)
  */
 void FEBackButton::OnPointerEnter(int index, void* context)
 {
-    if (!HasOtherPointerState(1, index))
+    if (!HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
-    SetPointerState(1, index);
+    SetPointerState(POINTER_BUTTON_HOVER, index);
     FEPointerButton::OnPointerEnter(index, context);
 }
 
@@ -171,12 +171,12 @@ void FEBackButton::OnPointerRelease(int index, void* context)
  */
 void FEBackButton::OnPointerLeave(int index, void* context)
 {
-    if (!HasOtherPointerState(1, index))
+    if (!HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         m_padB8 = 0.0f;
         mButtonInstance->SetActiveSlide("off", true, false);
         m_padCE = false;
     }
-    SetPointerState(0, index);
+    SetPointerState(POINTER_BUTTON_NORMAL, index);
     FEPointerButton::OnPointerLeave(index, context);
 }

@@ -492,10 +492,10 @@ void SHOnlineMiiSelect::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHoverCounts[index];
-    if (!mMiiButtons[item].HasOtherPointerState(1, index))
+    if (!mMiiButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mMiiInstances[item]->SetActiveSlide("over", true, false);
-        mMiiButtons[item].SetPointerState(1, index);
+        mMiiButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
     }
 }
@@ -505,7 +505,7 @@ void SHOnlineMiiSelect::CloseItem(unsigned int index, void* context)
     unsigned int item = (unsigned int)context;
     --mHoverCounts[index];
     mMiiInstances[item]->SetActiveSlide("off", true, false);
-    mMiiButtons[item].SetPointerState(0, index);
+    mMiiButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineMiiSelect::SelectMii(unsigned int, void* context)

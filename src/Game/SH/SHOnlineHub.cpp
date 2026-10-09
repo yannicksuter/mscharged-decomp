@@ -441,16 +441,16 @@ void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
     ++mHoverCounts[index];
     if (item < 4)
     {
-        if (!mButtons[item].HasOtherPointerState(1, index))
+        if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
-            mButtons[item].SetPointerState(1, index);
+            mButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
             mButtonInstances[item]->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         }
     }
-    else if (!mHelpButton.HasOtherPointerState(1, index))
+    else if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mHelpButton.SetPointerState(1, index);
+        mHelpButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         mHelpButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
@@ -462,15 +462,15 @@ void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
     --mHoverCounts[index];
     if (item < 4)
     {
-        if (!mButtons[item].HasOtherPointerState(1, index))
+        if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
-            mButtons[item].SetPointerState(0, index);
+            mButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
             mButtonInstances[item]->SetActiveSlide("off", true, false);
         }
     }
-    else if (!mHelpButton.HasOtherPointerState(1, index))
+    else if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mHelpButton.SetPointerState(0, index);
+        mHelpButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         mHelpButtonInstance->SetActiveSlide("off", true, false);
     }
 }

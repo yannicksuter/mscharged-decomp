@@ -376,7 +376,7 @@ void TitleScene::StartDemoMatch()
 void TitleScene::OnControllerPointerPress(int index, void*)
 {
     mTextPressStart->SetActiveSlide("down", true, false);
-    mControllerComponent.SetPointerState(2, index);
+    mControllerComponent.SetPointerState(POINTER_BUTTON_SELECTED, index);
     FEAudio::PlayAnimAudioEvent(0x55C84A9D, 0, 0, 1);
     SetPointerEnabled(1);
     GameSceneManager::Instance()->Pop();
@@ -401,7 +401,7 @@ void TitleScene::OnControllerPointerPress(int index, void*)
 void TitleScene::OnControllerPointerEnter(int index, void*)
 {
     mTextPressStart->SetActiveSlide("over", true, false);
-    mControllerComponent.SetPointerState(1, index);
+    mControllerComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF32, 0, 0, 1);
     mPointerOverStartButton = true;
 }
@@ -409,7 +409,7 @@ void TitleScene::OnControllerPointerEnter(int index, void*)
 void TitleScene::OnControllerPointerLeave(int index, void*)
 {
     mTextPressStart->SetActiveSlide("off", true, false);
-    mControllerComponent.SetPointerState(0, index);
+    mControllerComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
     mPointerOverStartButton = false;
 }
 

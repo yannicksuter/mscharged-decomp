@@ -522,7 +522,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
     {
         mSlotButtons[side][i].ResetPointerStates();
     }
-    mSidekickButtons[which].SetPointerState(0, index);
+    mSidekickButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
     mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
     mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
@@ -549,11 +549,11 @@ void ChooseSidekicksSceneV2::OnSidekickPointerEnter(int index, void* context)
     mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_SIDEKICK);
     mCaptainComponents[side].SetSidekickInfo(sidekick, index, 0);
     mGreenArrows[side]->m_bVisible = false;
-    if (!mSidekickButtons[which].HasOtherPointerState(1, index))
+    if (!mSidekickButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSidekickInstances[which]->SetActiveSlide("over", true, false);
     }
-    mSidekickButtons[which].SetPointerState(1, index);
+    mSidekickButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
     mSidekickButtons[which].PlayHoverFeedback(index);
 
     switch (index)
@@ -585,11 +585,11 @@ void ChooseSidekicksSceneV2::OnSidekickPointerLeave(int index, void* context)
         return;
     }
 
-    if (!mSidekickButtons[which].HasOtherPointerState(1, index))
+    if (!mSidekickButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSidekickInstances[which]->SetActiveSlide("off", true, false);
     }
-    mSidekickButtons[which].SetPointerState(0, index);
+    mSidekickButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -633,26 +633,26 @@ void ChooseSidekicksSceneV2::OnSlotPointerPress(int index, void* context)
     {
         for (int j = 0; j < 4; ++j)
         {
-            mSlotButtons[group][i].SetPointerState(2, j);
+            mSlotButtons[group][i].SetPointerState(POINTER_BUTTON_SELECTED, j);
         }
         for (int j = 0; j < 4; ++j)
         {
-            mSlotClickButtons[group][i].SetPointerState(2, j);
+            mSlotClickButtons[group][i].SetPointerState(POINTER_BUTTON_SELECTED, j);
         }
     }
     mRandomButtonInstances[group]->SetActiveSlide("off", true, false);
     mSelectButtonInstances[group]->SetActiveSlide("off", true, false);
     for (int i = 0; i < 4; ++i)
     {
-        mRandomButtons[group].SetPointerState(0, i);
+        mRandomButtons[group].SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
     for (int i = 0; i < 4; ++i)
     {
-        mSelectButtons[group].SetPointerState(0, i);
+        mSelectButtons[group].SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
     for (int i = 0; i < 4; ++i)
     {
-        mDoneButton.SetPointerState(0, i);
+        mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
     mGreenArrows[group]->m_bVisible = true;
     mSidePads[group] = index;
@@ -677,7 +677,7 @@ void ChooseSidekicksSceneV2::OnSlotPointerEnter(int index, void* context)
         return;
     }
 
-    if (!mSlotButtons[group][slot].HasOtherPointerState(1, index))
+    if (!mSlotButtons[group][slot].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         if (mSlotClickEnabled[group][slot])
         {
@@ -694,8 +694,8 @@ void ChooseSidekicksSceneV2::OnSlotPointerEnter(int index, void* context)
         FEAudio::PlayAnimAudioEvent(0x23628A1D, 0, 0, 1);
     }
 
-    mSlotButtons[group][slot].SetPointerState(1, index);
-    mSlotClickButtons[group][slot].SetPointerState(1, index);
+    mSlotButtons[group][slot].SetPointerState(POINTER_BUTTON_HOVER, index);
+    mSlotClickButtons[group][slot].SetPointerState(POINTER_BUTTON_HOVER, index);
     mSlotButtons[group][slot].PlayHoverFeedback(index);
 }
 
@@ -714,8 +714,8 @@ void ChooseSidekicksSceneV2::OnSlotPointerLeave(int index, void* context)
         return;
     }
 
-    mSlotButtons[group][slot].SetPointerState(0, index);
-    mSlotClickButtons[group][slot].SetPointerState(0, index);
+    mSlotButtons[group][slot].SetPointerState(POINTER_BUTTON_NORMAL, index);
+    mSlotClickButtons[group][slot].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -733,7 +733,7 @@ void ChooseSidekicksSceneV2::OnSlotPointerInside(int index, void* context)
         return;
     }
 
-    if (mSlotButtons[group][slot].GetPointerState(index) != 0)
+    if (mSlotButtons[group][slot].GetPointerState(index) != POINTER_BUTTON_NORMAL)
     {
         return;
     }
@@ -759,7 +759,7 @@ void ChooseSidekicksSceneV2::OnRandomPointerPress(int index, void* context)
 
     for (int i = 0; i < 4; ++i)
     {
-        mRandomButtons[which].SetPointerState(2, i);
+        mRandomButtons[which].SetPointerState(POINTER_BUTTON_SELECTED, i);
     }
 
     mSidekickComponents[which].RandomizeSidekicks();
@@ -778,14 +778,14 @@ void ChooseSidekicksSceneV2::OnRandomPointerEnter(int index, void* context)
         return;
     }
 
-    if (!mRandomButtons[which].HasOtherPointerState(1, index))
+    if (!mRandomButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRandomButtonInstances[which]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
     }
 
     mRandomButtons[which].PlayHoverFeedback(index);
-    mRandomButtons[which].SetPointerState(1, index);
+    mRandomButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -801,12 +801,12 @@ void ChooseSidekicksSceneV2::OnRandomPointerLeave(int index, void* context)
         return;
     }
 
-    if (!mRandomButtons[which].HasOtherPointerState(1, index))
+    if (!mRandomButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRandomButtonInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mRandomButtons[which].SetPointerState(0, index);
+    mRandomButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -827,7 +827,7 @@ void ChooseSidekicksSceneV2::OnSelectPointerPress(int index, void* context)
 
     for (int i = 0; i < 4; ++i)
     {
-        mSelectButtons[which].SetPointerState(2, i);
+        mSelectButtons[which].SetPointerState(POINTER_BUTTON_SELECTED, i);
     }
 
     mCaptainComponents[which].SetReadyPromptVisible(false);
@@ -848,14 +848,14 @@ void ChooseSidekicksSceneV2::OnSelectPointerEnter(int index, void* context)
         return;
     }
 
-    if (!mSelectButtons[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSelectButtonInstances[which]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
     }
 
     mSelectButtons[which].PlayHoverFeedback(index);
-    mSelectButtons[which].SetPointerState(1, index);
+    mSelectButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -871,12 +871,12 @@ void ChooseSidekicksSceneV2::OnSelectPointerLeave(int index, void* context)
         return;
     }
 
-    if (!mSelectButtons[which].HasOtherPointerState(1, index))
+    if (!mSelectButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSelectButtonInstances[which]->SetActiveSlide("off", true, false);
     }
 
-    mSelectButtons[which].SetPointerState(0, index);
+    mSelectButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -893,7 +893,7 @@ void ChooseSidekicksSceneV2::OnDonePointerPress(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
     for (int i = 0; i < 4; ++i)
     {
-        mDoneButton.SetPointerState(0, i);
+        mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, i);
     }
     mDoneButton.Disable();
     mSelectionMade = true;
@@ -930,13 +930,13 @@ void ChooseSidekicksSceneV2::OnDonePointerEnter(int index, void* context)
         return;
     }
 
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     mDoneButton.PlayHoverFeedback(index);
 }
 
@@ -950,12 +950,12 @@ void ChooseSidekicksSceneV2::OnDonePointerLeave(int index, void* context)
         return;
     }
 
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mDoneButton.SetPointerState(0, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -968,7 +968,7 @@ void ChooseSidekicksSceneV2::OnDonePointerInside(int index, void* context)
         return;
     }
 
-    if (mDoneButton.GetPointerState(index) == 0)
+    if (mDoneButton.GetPointerState(index) == POINTER_BUTTON_NORMAL)
     {
         OnDonePointerEnter(index, context);
     }
@@ -1100,7 +1100,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
             pointer->SetActiveSlide("cursor", true, false);
             for (int j = 0; j < 8; ++j)
             {
-                if (mSidekickButtons[j].GetPointerState(i) == 1)
+                if (mSidekickButtons[j].GetPointerState(i) == POINTER_BUTTON_HOVER)
                 {
                     if (mSidePads[0] == i)
                     {
@@ -1125,7 +1125,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
         }
         for (int i = 0; i < 3; ++i)
         {
-            if (!mSlotButtons[side][i].HasOtherPointerState(1, -1) && !mSlotButtons[side][i].HasOtherPointerState(2, -1))
+            if (!mSlotButtons[side][i].HasOtherPointerState(POINTER_BUTTON_HOVER, -1) && !mSlotButtons[side][i].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
             {
                 mSlotInstances[side][i]->SetActiveSlide("off", true, false);
                 mSlotClickInstances[side][i]->SetActiveSlide("off", true, false);
@@ -1134,7 +1134,7 @@ void ChooseSidekicksSceneV2::UpdatePointerCursors()
     }
     for (int i = 0; i < 8; ++i)
     {
-        if (!mSidekickButtons[i].HasOtherPointerState(1, -1))
+        if (!mSidekickButtons[i].HasOtherPointerState(POINTER_BUTTON_HOVER, -1))
         {
             mSidekickInstances[i]->SetActiveSlide("off", true, false);
         }

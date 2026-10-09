@@ -490,7 +490,7 @@ void SHOnlineFriends::OnPointerEnter(int index, void* context)
     int item = (int)context;
     ++mPointerHoverCount;
     mRowInstances[item]->SetActiveSlide("over", true, false);
-    mRowButtons[item].SetPointerState(1, index);
+    mRowButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
 }
 
@@ -499,7 +499,7 @@ void SHOnlineFriends::OnPointerLeave(int index, void* context)
     int item = (int)context;
     --mPointerHoverCount;
     mRowInstances[item]->SetActiveSlide("off", true, false);
-    mRowButtons[item].SetPointerState(0, index);
+    mRowButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineFriends::DeleteFriend(int index)

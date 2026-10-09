@@ -461,12 +461,12 @@ void SHOnlineFriendsChooseSides::OnSidePointerEnter(unsigned int index, void* co
             return;
         }
     }
-    if (!mSideButtons[(int)context].HasOtherPointerState(1, index))
+    if (!mSideButtons[(int)context].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSideInstances[(int)context]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
-    mSideButtons[(int)context].SetPointerState(1, index);
+    mSideButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
     ++mPointerHoverCounts[index];
     mSideButtons[(int)context].PlayHoverFeedback(index);
     FEAudio::PlayAnimAudioEvent(0x19E7B6AE, 0, 0, 1);
@@ -479,18 +479,18 @@ void SHOnlineFriendsChooseSides::OnSidePointerLeave(unsigned int index, void* co
     {
         return;
     }
-    if (!mSideButtons[(int)context].HasOtherPointerState(1, index))
+    if (!mSideButtons[(int)context].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSideInstances[(int)context]->SetActiveSlide("controllers", true, false);
     }
-    mSideButtons[(int)context].SetPointerState(0, index);
+    mSideButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
     --mPointerHoverCounts[index];
 }
 
 void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* context)
 {
     int slot = GetOnlinePlayerIndex(index);
-    if (mSideButtons[(int)context].GetPointerState(index) == 0)
+    if (mSideButtons[(int)context].GetPointerState(index) == POINTER_BUTTON_NORMAL)
     {
         if (mPlayerSides[slot] != -1)
         {
@@ -502,16 +502,16 @@ void SHOnlineFriendsChooseSides::OnSidePointerInside(unsigned int index, void* c
             OnSidePointerEnter(index, context);
         }
     }
-    else if (mSideButtons[(int)context].GetPointerState(index) == 1 && mPlayerSides[slot] == -1)
+    else if (mSideButtons[(int)context].GetPointerState(index) == POINTER_BUTTON_HOVER && mPlayerSides[slot] == -1)
     {
         int count = CountSidePlayers(index, (int)context);
         if (count >= mPlayerCount - 1)
         {
-            if (!mSideButtons[(int)context].HasOtherPointerState(1, index))
+            if (!mSideButtons[(int)context].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
             {
                 mSideInstances[(int)context]->SetActiveSlide("controllers", true, false);
             }
-            mSideButtons[(int)context].SetPointerState(0, index);
+            mSideButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
             --mPointerHoverCounts[index];
         }
     }
@@ -560,9 +560,9 @@ void SHOnlineFriendsChooseSides::OnDonePointerEnter(unsigned int index, void* co
         return;
     }
     ++mPointerHoverCounts[index];
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     mDoneButton.PlayHoverFeedback(index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -571,7 +571,7 @@ void SHOnlineFriendsChooseSides::OnDonePointerEnter(unsigned int index, void* co
 
 void SHOnlineFriendsChooseSides::OnDonePointerInside(unsigned int index, void* context)
 {
-    if (mDoneButton.GetPointerState(index) == 0)
+    if (mDoneButton.GetPointerState(index) == POINTER_BUTTON_NORMAL)
     {
         OnDonePointerEnter(index, context);
     }
@@ -584,8 +584,8 @@ void SHOnlineFriendsChooseSides::OnDonePointerLeave(unsigned int index, void* co
         return;
     }
     --mPointerHoverCounts[index];
-    mDoneButton.SetPointerState(0, index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
@@ -663,10 +663,10 @@ void SHOnlineFriendsChooseSides::UpdateDoneButton()
             mDoneButton.Disable();
             for (int i = 0; i < 4; ++i)
             {
-                if (mDoneButton.GetPointerState(i) == 1)
+                if (mDoneButton.GetPointerState(i) == POINTER_BUTTON_HOVER)
                 {
                     --mPointerHoverCounts[i];
-                    mDoneButton.SetPointerState(0, i);
+                    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, i);
                 }
             }
         }

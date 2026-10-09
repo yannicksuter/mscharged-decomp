@@ -299,10 +299,10 @@ void SHGameplayOptions::ToggleOptionsView()
             mOptionButtons[i].Enable();
         else
         {
-            if (mOptionButtons[i].HasOtherPointerState(1, -1))
+            if (mOptionButtons[i].HasOtherPointerState(POINTER_BUTTON_HOVER, -1))
             {
                 for (int j = 0; j < 4; ++j)
-                    mOptionButtons[i].SetPointerState(0, j);
+                    mOptionButtons[i].SetPointerState(POINTER_BUTTON_NORMAL, j);
                 mOptionInstances[i]->SetActiveSlide("off", true, false);
             }
             mOptionButtons[i].Disable();
@@ -314,10 +314,10 @@ void SHGameplayOptions::ToggleOptionsView()
             mCheatButtons[i].Enable();
         else
         {
-            if (mCheatButtons[i].HasOtherPointerState(1, -1))
+            if (mCheatButtons[i].HasOtherPointerState(POINTER_BUTTON_HOVER, -1))
             {
                 for (int j = 0; j < 4; ++j)
-                    mCheatButtons[i].SetPointerState(0, j);
+                    mCheatButtons[i].SetPointerState(POINTER_BUTTON_NORMAL, j);
                 mCheatInstances[i]->SetActiveSlide("off", true, false);
             }
             mCheatButtons[i].Disable();
@@ -394,7 +394,7 @@ void SHGameplayOptions::InitializeSelections()
     mOptionInstances[selected]->SetActiveSlide("down", true, false);
     FEPointerButton* button = &mOptionButtons[mSelectedLimitType];
     for (int j = 0; j < 4; ++j)
-        button->SetPointerState(2, j);
+        button->SetPointerState(POINTER_BUTTON_SELECTED, j);
     UpdateLimitText(type, value);
     for (int i = 0; i < 5; ++i)
     {
@@ -404,7 +404,7 @@ void SHGameplayOptions::InitializeSelections()
             mOptionInstances[i]->SetActiveSlide("down", true, false);
             FEPointerButton* button = &mOptionButtons[mSelectedSkill];
             for (int j = 0; j < 4; ++j)
-                button->SetPointerState(2, j);
+                button->SetPointerState(POINTER_BUTTON_SELECTED, j);
             break;
         }
     }
@@ -416,7 +416,7 @@ void SHGameplayOptions::InitializeSelections()
             mOptionInstances[mSelectedSeries]->SetActiveSlide("down", true, false);
             FEPointerButton* button = &mOptionButtons[mSelectedSeries];
             for (int j = 0; j < 4; ++j)
-                button->SetPointerState(2, j);
+                button->SetPointerState(POINTER_BUTTON_SELECTED, j);
             break;
         }
     }
@@ -428,7 +428,7 @@ void SHGameplayOptions::InitializeSelections()
             mOptionInstances[mSelectedGoals]->SetActiveSlide("down", true, false);
             FEPointerButton* button = &mOptionButtons[mSelectedGoals];
             for (int j = 0; j < 4; ++j)
-                button->SetPointerState(2, j);
+                button->SetPointerState(POINTER_BUTTON_SELECTED, j);
             break;
         }
     }
@@ -440,7 +440,7 @@ void SHGameplayOptions::InitializeSelections()
             mOptionInstances[mSelectedTime]->SetActiveSlide("down", true, false);
             FEPointerButton* button = &mOptionButtons[mSelectedTime];
             for (int j = 0; j < 4; ++j)
-                button->SetPointerState(2, j);
+                button->SetPointerState(POINTER_BUTTON_SELECTED, j);
             break;
         }
     }
@@ -548,15 +548,15 @@ void SHGameplayOptions::InitializePointerButtons()
 void SHGameplayOptions::OnOptionPointerEnter(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mOptionButtons[item].HasOtherPointerState(2, -1))
+    if (!mOptionButtons[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
     {
         ++mPointerInsideCounts[index];
         mOptionButtons[item].PlayHoverFeedback(index);
-        if (!mOptionButtons[item].HasOtherPointerState(1, index))
+        if (!mOptionButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mOptionInstances[item]->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-            mOptionButtons[item].SetPointerState(1, index);
+            mOptionButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
 }
@@ -564,13 +564,13 @@ void SHGameplayOptions::OnOptionPointerEnter(unsigned int index, void* context)
 void SHGameplayOptions::OnOptionPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mOptionButtons[item].HasOtherPointerState(2, -1))
+    if (!mOptionButtons[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
     {
         --mPointerInsideCounts[index];
-        if (!mOptionButtons[item].HasOtherPointerState(1, index))
+        if (!mOptionButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mOptionInstances[item]->SetActiveSlide("off", true, false);
-            mOptionButtons[item].SetPointerState(1, index);
+            mOptionButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
 }
@@ -578,11 +578,11 @@ void SHGameplayOptions::OnOptionPointerLeave(unsigned int index, void* context)
 void SHGameplayOptions::OnOptionPointerPress(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (mOptionButtons[item].HasOtherPointerState(2, -1))
+    if (mOptionButtons[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
         return;
     mOptionInstances[item]->SetActiveSlide("down", true, false);
     for (int j = 0; j < 4; ++j)
-        mOptionButtons[item].SetPointerState(2, j);
+        mOptionButtons[item].SetPointerState(POINTER_BUTTON_SELECTED, j);
     --mPointerInsideCounts[index];
     int previous = -1;
     if (item < 5)
@@ -619,7 +619,7 @@ void SHGameplayOptions::OnOptionPointerPress(unsigned int index, void* context)
     ApplyOptionSelection(item);
     mOptionInstances[previous]->SetActiveSlide("off", true, false);
     for (int j = 0; j < 4; ++j)
-        mOptionButtons[previous].SetPointerState(0, j);
+        mOptionButtons[previous].SetPointerState(POINTER_BUTTON_NORMAL, j);
 }
 
 void SHGameplayOptions::OnCheatPointerEnter(unsigned int index, void* context)
@@ -627,11 +627,11 @@ void SHGameplayOptions::OnCheatPointerEnter(unsigned int index, void* context)
     unsigned int item = (unsigned int)context;
     ++mPointerInsideCounts[index];
     mCheatButtons[item].PlayHoverFeedback(index);
-    if (!mCheatButtons[item].HasOtherPointerState(1, index))
+    if (!mCheatButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mCheatInstances[item]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
-        mCheatButtons[item].SetPointerState(1, index);
+        mCheatButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
@@ -639,10 +639,10 @@ void SHGameplayOptions::OnCheatPointerLeave(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mPointerInsideCounts[index];
-    if (!mCheatButtons[item].HasOtherPointerState(1, index))
+    if (!mCheatButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mCheatInstances[item]->SetActiveSlide("off", true, false);
-        mCheatButtons[item].SetPointerState(1, index);
+        mCheatButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
@@ -658,8 +658,8 @@ void SHGameplayOptions::OnCheatPointerPress(unsigned int index, void* context)
 void SHGameplayOptions::OnDonePointerEnter(unsigned int index, void* context)
 {
     ++mPointerInsideCounts[index];
-    mDoneButton.SetPointerState(1, index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -669,8 +669,8 @@ void SHGameplayOptions::OnDonePointerEnter(unsigned int index, void* context)
 void SHGameplayOptions::OnDonePointerLeave(unsigned int index, void* context)
 {
     --mPointerInsideCounts[index];
-    mDoneButton.SetPointerState(0, index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         mDoneButtonInstance->SetActiveSlide("off", true, false);
 }
 

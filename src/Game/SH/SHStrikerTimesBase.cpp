@@ -493,9 +493,9 @@ void SHStrikerTimesBase::InitializeControls()
 
 void SHStrikerTimesBase::OnDonePointerEnter(int index, void* context)
 {
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     TLComponentInstance* done = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "done");
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         done->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -504,9 +504,9 @@ void SHStrikerTimesBase::OnDonePointerEnter(int index, void* context)
 
 void SHStrikerTimesBase::OnDonePointerLeave(int index, void* context)
 {
-    mDoneButton.SetPointerState(0, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     TLComponentInstance* done = FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "done");
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         done->SetActiveSlide("off", true, false);
     }

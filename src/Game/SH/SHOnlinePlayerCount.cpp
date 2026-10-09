@@ -215,9 +215,9 @@ void SHOnlinePlayerCount::OnButtonPointerEnter(unsigned int index, void* context
 {
     unsigned int item = (unsigned int)context;
     ++mPointerInsideCount[index];
-    if (!mButtons[item].HasOtherPointerState(1, index))
+    if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mButtons[item].SetPointerState(1, index);
+        mButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         mButtonInstances[item]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     }
@@ -227,9 +227,9 @@ void SHOnlinePlayerCount::OnButtonPointerLeave(unsigned int index, void* context
 {
     unsigned int item = (unsigned int)context;
     --mPointerInsideCount[index];
-    if (!mButtons[item].HasOtherPointerState(1, index))
+    if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mButtons[item].SetPointerState(0, index);
+        mButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
         mButtonInstances[item]->SetActiveSlide("off", true, false);
     }
 }

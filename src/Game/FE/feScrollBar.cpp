@@ -193,7 +193,7 @@ void FEScrollBar::SetValue(int value)
 void FEScrollBar::OnPointerEnter(int index, void* context)
 {
     int direction = (int)context;
-    mButtons[direction].SetPointerState(1, index);
+    mButtons[direction].SetPointerState(POINTER_BUTTON_HOVER, index);
     int other = -1;
     if (context == 0)
     {
@@ -240,7 +240,7 @@ bool FEScrollBar::IsScrolling(int direction, bool value)
 void FEScrollBar::OnPointerLeave(int index, void* context)
 {
     int direction = (int)context;
-    mButtons[direction].SetPointerState(0, index);
+    mButtons[direction].SetPointerState(POINTER_BUTTON_NORMAL, index);
     if (context == 0)
     {
         if (mCurrentValue <= 0)
@@ -309,9 +309,9 @@ void FEScrollBar::OnPointerRelease(int index, void* context)
             return;
         }
     }
-    if (mButtons[direction].GetPointerState(index) == 0)
+    if (mButtons[direction].GetPointerState(index) == POINTER_BUTTON_NORMAL)
         mButtonInstances[direction]->SetActiveSlide("off", true, false);
-    else if (mButtons[direction].GetPointerState(index) == 1)
+    else if (mButtons[direction].GetPointerState(index) == POINTER_BUTTON_HOVER)
         mButtonInstances[direction]->SetActiveSlide("over", true, false);
 }
 
@@ -352,16 +352,16 @@ void FEScrollBar::OnPadRelease(int index, void* context)
     int other = direction == 0 ? 1 : 0;
     if ((context == 0 && mCurrentValue <= 0) || (context == (void*)1 && mCurrentValue >= mMaxValue))
         mButtonInstances[direction]->SetActiveSlide("off", true, false);
-    else if (mButtons[direction].GetPointerState(index) == 0)
+    else if (mButtons[direction].GetPointerState(index) == POINTER_BUTTON_NORMAL)
         mButtonInstances[direction]->SetActiveSlide("off", true, false);
-    else if (mButtons[direction].GetPointerState(index) == 1)
+    else if (mButtons[direction].GetPointerState(index) == POINTER_BUTTON_HOVER)
         mButtonInstances[direction]->SetActiveSlide("over", true, false);
 
     if ((other == 0 && mCurrentValue <= 0) || (other == 1 && mCurrentValue >= mMaxValue))
         mButtonInstances[other]->SetActiveSlide("off", true, false);
-    else if (mButtons[other].GetPointerState(index) == 0)
+    else if (mButtons[other].GetPointerState(index) == POINTER_BUTTON_NORMAL)
         mButtonInstances[other]->SetActiveSlide("off", true, false);
-    else if (mButtons[other].GetPointerState(index) == 1)
+    else if (mButtons[other].GetPointerState(index) == POINTER_BUTTON_HOVER)
         mButtonInstances[other]->SetActiveSlide("over", true, false);
 }
 

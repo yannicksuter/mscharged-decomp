@@ -635,13 +635,13 @@ void SHChooseSides2::OnControllerPointerEnter(unsigned int index, void* context)
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    if (!mControllerComponents[side].HasOtherPointerState(1, index))
+    if (!mControllerComponents[side].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSideGroups[side]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0x19E7B6AE, 0, 0, 1);
     }
 
-    mControllerComponents[side].SetPointerState(1, index);
+    mControllerComponents[side].SetPointerState(POINTER_BUTTON_HOVER, index);
     ++mControllerCounts[index];
     mControllerComponents[side].PlayHoverFeedback(index);
 }
@@ -655,12 +655,12 @@ void SHChooseSides2::OnControllerPointerLeave(unsigned int index, void* context)
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    if (!mControllerComponents[side].HasOtherPointerState(1, index))
+    if (!mControllerComponents[side].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSideGroups[side]->SetActiveSlide("controllers", true, false);
     }
 
-    mControllerComponents[side].SetPointerState(0, index);
+    mControllerComponents[side].SetPointerState(POINTER_BUTTON_NORMAL, index);
     --mControllerCounts[index];
 }
 
@@ -715,9 +715,9 @@ void SHChooseSides2::OnControllerPointerPress(unsigned int index, void* context)
 void SHChooseSides2::OnHomeAwayPointerEnter(unsigned int index, void*)
 {
     ++mControllerCounts[index];
-    mHomeAwayComponent.SetPointerState(1, index);
+    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
     mHomeAwayComponent.PlayHoverFeedback(index);
-    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
+    if (!mHomeAwayComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHomeAwayBox->SetActiveSlide("over", true, false);
         if (mContext == CUP || mContext == TOURNAMENT)
@@ -736,13 +736,13 @@ void SHChooseSides2::OnHomeAwayPointerEnter(unsigned int index, void*)
  */
 void SHChooseSides2::OnHomeAwayPointerInside(unsigned int index, void*)
 {
-    if (mHomeAwayComponent.GetPointerState(index) != 0)
+    if (mHomeAwayComponent.GetPointerState(index) != POINTER_BUTTON_NORMAL)
         return;
 
     ++mControllerCounts[index];
-    mHomeAwayComponent.SetPointerState(1, index);
+    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
     mHomeAwayComponent.PlayHoverFeedback(index);
-    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
+    if (!mHomeAwayComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHomeAwayBox->SetActiveSlide("over", true, false);
         if (mContext == CUP || mContext == TOURNAMENT)
@@ -762,8 +762,8 @@ void SHChooseSides2::OnHomeAwayPointerInside(unsigned int index, void*)
 void SHChooseSides2::OnHomeAwayPointerLeave(unsigned int index, void*)
 {
     --mControllerCounts[index];
-    mHomeAwayComponent.SetPointerState(0, index);
-    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
+    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mHomeAwayComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHomeAwayBox->SetActiveSlide("off", true, false);
     }
@@ -857,12 +857,12 @@ void SHChooseSides2::Proceed()
 void SHChooseSides2::OnHelpPointerEnter(unsigned int index, void*)
 {
     ++mControllerCounts[index];
-    if (!mHelpComponent.HasOtherPointerState(1, index))
+    if (!mHelpComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHelpButton->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
-    mHelpComponent.SetPointerState(1, index);
+    mHelpComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -871,11 +871,11 @@ void SHChooseSides2::OnHelpPointerEnter(unsigned int index, void*)
 void SHChooseSides2::OnHelpPointerLeave(unsigned int index, void*)
 {
     --mControllerCounts[index];
-    if (!mHelpComponent.HasOtherPointerState(1, index))
+    if (!mHelpComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHelpButton->SetActiveSlide("off", true, false);
     }
-    mHelpComponent.SetPointerState(0, index);
+    mHelpComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -968,10 +968,10 @@ void SHChooseSides2::UpdateHomeAwayVisibility()
 
             for (int i = 0; i < 4; ++i)
             {
-                if (mHomeAwayComponent.GetPointerState(i) == 1)
+                if (mHomeAwayComponent.GetPointerState(i) == POINTER_BUTTON_HOVER)
                 {
                     --mControllerCounts[i];
-                    mHomeAwayComponent.SetPointerState(0, i);
+                    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_NORMAL, i);
                 }
             }
         }
