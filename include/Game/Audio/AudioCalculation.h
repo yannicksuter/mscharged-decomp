@@ -11,7 +11,7 @@ struct AudioCalculationDefinition
 {
     u8 pad_00[8];
     float initialValue;
-    s32* field_0C;
+    s32* modifierSliderIndex;
     s32* field_10;
     s32* field_14;
 };
