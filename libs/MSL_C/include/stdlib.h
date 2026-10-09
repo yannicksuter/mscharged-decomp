@@ -57,14 +57,12 @@ void free(void* ptr);
 void* malloc(size_t size);
 void* realloc(void* ptr, size_t size);
 
-/* Communication with the environment (C89 4.10.4). `exit` is deliberately
-   absent: the EABI startup header already declares this build's own
-   `void exit(void)`, and a second, differing declaration would make every
-   translation unit that reaches both invalid. */
+/* Communication with the environment (C89 4.10.4). */
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
 void abort(void);
+void exit(int status);
 char* getenv(const char* name);
 
 /* Searching and sorting (C89 4.10.5). */

@@ -80,7 +80,7 @@ void __fini_cpp(void) {
     }
 }
 
-void exit(void) {
+void exit(int status) {
     __fini_cpp();
     _ExitProcess();
 }

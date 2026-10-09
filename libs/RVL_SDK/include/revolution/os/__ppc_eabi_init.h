@@ -4,6 +4,7 @@
 #include <decomp.h>
 #include <revolution/types.h>
 #include <size_t.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +53,6 @@ DECL_SECTION(".init") extern const BssSection _bss_init_info[];
 void __init_user(void);
 void __init_cpp(void);
 void __fini_cpp(void);
-void exit(void);
 void _ExitProcess(void);
 
 #ifdef __cplusplus
