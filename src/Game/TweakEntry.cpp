@@ -151,7 +151,7 @@ void RemoveDynamicTweakChildren(TweakEntry* entry)
     for (TweakNode* child = entry->m_ChildHead; child != 0;)
     {
         next = child->GetNext();
-        if (child->m_State == 2)
+        if (child->m_State == TWEAK_NODE_PUSHED)
         {
             delete child;
         }
