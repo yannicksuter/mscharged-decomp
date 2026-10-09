@@ -37,7 +37,7 @@ bool FESceneManager::AreAllScenesValid()
 
     while (currentEntry != 0)
     {
-        if (currentEntry->entry->mFEScene->mState != 6)
+        if (currentEntry->entry->mFEScene->mState != FE_SCENE_READY)
         {
             return false;
         }
@@ -228,7 +228,7 @@ void FESceneManager::RenderActiveScenes()
         if (!IsObjectQueuedForPop(m_topMostScene))
         {
             FEScene* scene = m_topMostScene->mFEScene;
-            if (scene->mState == 6 && m_topMostScene->mVisible)
+            if (scene->mState == FE_SCENE_READY && m_topMostScene->mVisible)
             {
                 FERender::RenderScene(scene);
             }
@@ -247,7 +247,7 @@ void FESceneManager::RenderActiveScenes()
             if (!IsObjectQueuedForPop(pSceneHandler))
             {
                 FEScene* scene = pSceneHandler->mFEScene;
-                if (scene->mState == 6 && pSceneHandler->mVisible)
+                if (scene->mState == FE_SCENE_READY && pSceneHandler->mVisible)
                 {
                     FERender::RenderScene(scene);
                 }
@@ -285,7 +285,7 @@ void FESceneManager::Update(float dt)
 
     while (currentEntry != 0)
     {
-        if (((FEScene*)currentEntry->entry->mFEScene)->mState == 6)
+        if (((FEScene*)currentEntry->entry->mFEScene)->mState == FE_SCENE_READY)
         {
             g_pFEInput->EnableInputIfSceneHasFocus(currentEntry->entry);
             currentEntry->entry->Update(dt);

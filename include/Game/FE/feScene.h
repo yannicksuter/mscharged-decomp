@@ -10,6 +10,13 @@ class FEPackage;
 class MemoryAllocator;
 struct FE_FILE_HEADER;
 
+enum eFESceneLoadState
+{
+    FE_SCENE_INITIAL = 1,
+    FE_SCENE_LOADING_RESOURCES = 5,
+    FE_SCENE_READY = 6,
+};
+
 class FEScene
 {
 public:

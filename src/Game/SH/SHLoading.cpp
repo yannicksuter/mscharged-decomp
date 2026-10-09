@@ -191,7 +191,7 @@ void BaseLoadingScene::SceneCreated()
 
 void BaseLoadingScene::OnHomeButtonPressed()
 {
-    if (mFEScene == 0 || mFEScene->mState != 6 || mTransitionActive)
+    if (mFEScene == 0 || mFEScene->mState != FE_SCENE_READY || mTransitionActive)
     {
         return;
     }

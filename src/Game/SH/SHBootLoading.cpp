@@ -293,7 +293,7 @@ void BootLoadingScene::SetPhaseSlide()
 
 void BootLoadingScene::ShowHomeButtonWarning()
 {
-    if (mFEScene == 0 || mFEScene->mState != 6 || mHomeButtonWarningActive)
+    if (mFEScene == 0 || mFEScene->mState != FE_SCENE_READY || mHomeButtonWarningActive)
     {
         return;
     }

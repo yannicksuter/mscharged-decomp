@@ -472,7 +472,7 @@ void SHNavigation::StartTransition()
 
 void SHNavigation::ShowHomeButtonWarning()
 {
-    if (this->mFEScene == 0 || this->mFEScene->mState != 6
+    if (this->mFEScene == 0 || this->mFEScene->mState != FE_SCENE_READY
         || this->mHomeWarningPlaying)
     {
         return;
