@@ -35,12 +35,16 @@ Nintendo Wii, developed by Next Level Games and published by Nintendo.
 This repository does **not** contain game assets or assembly. You must provide
 your own legally obtained copy of the game.
 
-## Supported version
+## Supported versions
 
-- `R4QE01`: USA, disc revision 1
-- `main.dol` SHA-1: `e96d2298067b70652752145b4e63644e6e1b1560`
+| Version | Region and title | Revision | Status | `main.dol` SHA-1 |
+| --- | --- | --- | --- | --- |
+| `R4QE01` | USA - *Mario Strikers Charged* | Rev 1 | **Complete: 100% code and linking** | `e96d2298067b70652752145b4e63644e6e1b1560` |
+| `R4QP01` | Europe - *Mario Strikers Charged Football* | Rev 2 | **In progress** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
 
-Other regions and revisions are not configured.
+`R4QE01` remains the default. Its build links entirely from reconstructed
+source. The EU build currently uses extracted objects while its source
+matching work is in progress. Both builds reproduce their original DOL.
 
 Decompilation
 =============
@@ -68,8 +72,9 @@ objdiff-cli, and wibo when needed.
 
 ## Building
 
-Place a supported disc image in `orig/R4QE01`. ISO, RVZ, WIA, WBFS, CISO, NFS,
-GCZ, and TGC images are supported.
+Place a supported disc image in `orig/<version>` (`orig/R4QE01` for USA or
+`orig/R4QP01` for Europe). ISO, RVZ, WIA, WBFS, CISO, NFS, GCZ, and TGC images
+are supported. Use the disc revision listed above.
 
 Then configure and build:
 
@@ -78,9 +83,20 @@ python3 configure.py
 ninja
 ```
 
+To select the EU version:
+
+```sh
+python3 configure.py --version R4QP01
+ninja
+```
+
+Running `python3 configure.py` without `--version` selects USA again. Build
+outputs are kept separately in `build/<version>`; `build.ninja` and
+`objdiff.json` describe the currently selected version.
+
 On the first build, decomp-toolkit extracts `sys/main.dol` from the disc image
 and performs the initial analysis. Once extraction succeeds, the disc image can
-be removed from `orig/R4QE01` to save space.
+be removed from `orig/<version>` to save space.
 
 The generated `config/R4QE01/symbols.txt` and `config/R4QE01/splits.txt` are
 checked into the repository. A successful build ends with:
@@ -96,7 +112,7 @@ python3 configure.py --map
 ninja
 ```
 
-The result is written to `build/R4QE01/main.elf.MAP`. It describes the
+The result is written to `build/<version>/main.elf.MAP`. It describes the
 reconstructed link rather than an original development map and is intentionally
 ignored by Git.
 
