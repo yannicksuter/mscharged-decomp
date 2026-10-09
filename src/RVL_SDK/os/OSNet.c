@@ -1,9 +1,9 @@
 #include <decomp.h>
+#include <revolution/nwc24/NWC24Schedule.h>
+#include <revolution/nwc24/internal/NWC24iSystem.h>
 #include <revolution/os.h>
 
-// @bug Wrong prototypes. Somebody forgot to include the header!!!
-int NWC24iPrepareShutdown();
-int NWC24SuspendScheduler();
+// RTC synchronization still uses the legacy unprototyped declaration.
 int NWC24iSynchronizeRtcCounter();
 
 void __OSInitNet(void) {
