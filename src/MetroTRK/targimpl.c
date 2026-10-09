@@ -50,6 +50,7 @@ typedef void (*RegAccessFunc)(void* srcDestPtr, u128 val);
 static void TRKExceptionHandler(u16);
 void TRKInterruptHandlerEnableInterrupts();
 static void GetThreadInfo(int*, int*);
+static bool TRKTargetCheckStep(void);
 
 // Instruction macros
 #define INSTR_NOP 0x60000000
@@ -424,7 +425,6 @@ DSError TRKTargetAccessExtended2(u32 firstRegister, u32 lastRegister, MessageBuf
     return err;
 }
 
-void TRKUARTInterruptHandler(void);
 
 // clang-format off
 ASM void TRKInterruptHandler(u16) {
