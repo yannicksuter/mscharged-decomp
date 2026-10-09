@@ -26,7 +26,7 @@ int sSpecularDetailBlendLightCount;
 float sSpecularDetailBlendSpecularExponent;
 int sSpecularDetailBlendLightingMode;
 
-extern "C" void glxConfigureSpecularDetailBlendLighting(int mode)
+void glxConfigureSpecularDetailBlendLighting(int mode)
 {
     sSpecularDetailBlendLightingMode = mode;
     SetGameObjectSpecularLightingEnabled(1, sSpecularDetailBlendLightCount);

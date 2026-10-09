@@ -8561,7 +8561,7 @@ Deactivate__70GXMaterialProgramImpl<45GXScrollingShadowedDetailBlendMaterialProg
 Prepare__70GXMaterialProgramImpl<45GXScrollingShadowedDetailBlendMaterialProgram>FP13glModelPacket = .text:0x80292B58; // type:function size:0xC
 Draw__70GXMaterialProgramImpl<45GXScrollingShadowedDetailBlendMaterialProgram>FPC13glModelPacket = .text:0x80292B64; // type:function size:0x5D0
 __sinit_\GXScrollingShadowedDetailBlendMaterialProgramRender_cpp = .text:0x80293134; // type:function size:0x20 scope:local
-glxConfigureSpecularDetailBlendLighting = .text:0x80293154; // type:function size:0x2EC
+glxConfigureSpecularDetailBlendLighting__Fi = .text:0x80293154; // type:function size:0x2EC
 Activate__61GXMaterialProgramImpl<36GXSpecularDetailBlendMaterialProgram>FP6GLView = .text:0x80293440; // type:function size:0x78
 Deactivate__61GXMaterialProgramImpl<36GXSpecularDetailBlendMaterialProgram>Fv = .text:0x802934B8; // type:function size:0xA8
 Prepare__61GXMaterialProgramImpl<36GXSpecularDetailBlendMaterialProgram>FP13glModelPacket = .text:0x80293560; // type:function size:0xC
@@ -8579,7 +8579,7 @@ Deactivate__58GXMaterialProgramImpl<33GXScrollingDiffuseMaterialProgram>Fv = .te
 Prepare__58GXMaterialProgramImpl<33GXScrollingDiffuseMaterialProgram>FP13glModelPacket = .text:0x80294730; // type:function size:0x74
 Draw__58GXMaterialProgramImpl<33GXScrollingDiffuseMaterialProgram>FPC13glModelPacket = .text:0x802947A4; // type:function size:0x364
 __sinit_\GXScrollingDiffuseMaterialProgramRender_cpp = .text:0x80294B08; // type:function size:0x20 scope:local
-glxConfigureDetailModulateLighting = .text:0x80294B28; // type:function size:0x2E0
+glxConfigureDetailModulateLighting__FiP31GXDetailModulateMaterialProgram = .text:0x80294B28; // type:function size:0x2E0
 Activate__56GXMaterialProgramImpl<31GXDetailModulateMaterialProgram>FP6GLView = .text:0x80294E08; // type:function size:0x70
 Deactivate__56GXMaterialProgramImpl<31GXDetailModulateMaterialProgram>Fv = .text:0x80294E78; // type:function size:0xA8
 Prepare__56GXMaterialProgramImpl<31GXDetailModulateMaterialProgram>FP13glModelPacket = .text:0x80294F20; // type:function size:0xC
