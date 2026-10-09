@@ -1,4 +1,4 @@
-#include <revolution/os.h>
+#include <private/ssl.h>
 
 void SSL_InitMutex(OSMutex* mutex_p)
 {
