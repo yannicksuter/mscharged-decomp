@@ -37,8 +37,8 @@ public:
 
 private:
     /* 0x0D8 */ WsdPlayer mWsdPlayer;
-    /* 0x1B0 */ WaveSoundHandle* mTempSpecialHandle;
-    /* 0x1B4 */ SoundInstanceManager<WaveSound>* mManager;
+    /* 0x1AC */ WaveSoundHandle* mTempSpecialHandle;
+    /* 0x1B0 */ SoundInstanceManager<WaveSound>* mManager;
 };
 
 } // namespace detail
