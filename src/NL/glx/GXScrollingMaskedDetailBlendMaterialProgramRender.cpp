@@ -26,7 +26,7 @@ bool sScrollingMaskedDetailBlendShadowsActive;
 int sScrollingMaskedDetailBlendLightCount;
 int sScrollingMaskedDetailBlendLightingMode;
 
-extern "C" void glxConfigureScrollingMaskedDetailBlendLighting(
+void glxConfigureScrollingMaskedDetailBlendLighting(
     int mode, GXScrollingMaskedDetailBlendMaterialProgram*)
 {
     sScrollingMaskedDetailBlendLightingMode = mode;

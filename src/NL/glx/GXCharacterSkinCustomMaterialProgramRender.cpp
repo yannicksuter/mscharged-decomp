@@ -26,7 +26,7 @@ static bool sUseCharacterLightRamp;
 static int sCharacterLightCount;
 static bool sCharacterSkinLightingEnabled;
 
-extern "C" void glxConfigureCharacterSkinCustomLighting(bool enabled)
+void glxConfigureCharacterSkinCustomLighting(bool enabled)
 {
     bool doubleLightRampColour;
     unsigned int numChans;

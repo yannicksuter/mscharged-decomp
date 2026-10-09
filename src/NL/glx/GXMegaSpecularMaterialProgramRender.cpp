@@ -17,7 +17,7 @@ static int sMegaSpecularLightCount;
 static float sMegaSpecularExponent;
 static bool sMegaSpecularLightingEnabled;
 
-extern "C" void glxConfigureMegaSpecularLighting(bool enabled)
+void glxConfigureMegaSpecularLighting(bool enabled)
 {
     bool subtract;
     unsigned int numChans;
