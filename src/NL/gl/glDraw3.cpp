@@ -130,58 +130,58 @@ void glQuad3::SetupRotatedRectangle(
 void glQuad3::SetupRotatedRectangle(float w, float h0, float h1,
     const nlMatrix4& mtx, bool flipU, bool flipV)
 {
-    nlVector3 sp8;
+    nlVector3 corner;
     {
-        float f3 = 0.5f;
-        float temp_f31;
-        float temp_f29;
-        temp_f29 = -w * f3;
-        temp_f31 = -h0 * f3;
-        nlVec3Set(sp8, temp_f29, temp_f31, 0.0f);
+        float half = 0.5f;
+        float bottom;
+        float left;
+        left = -w * half;
+        bottom = -h0 * half;
+        nlVec3Set(corner, left, bottom, 0.0f);
     }
-    nlMultPosVectorMatrix(sp8, mtx);
-    m_pos[0] = sp8;
-
-    {
-        float temp_f30 = w;
-        float temp_f31 = -h1;
-        float f3 = 0.5f;
-        nlVec3Set(sp8, temp_f30 * f3, temp_f31 * f3, 0.0f);
-    }
-    nlMultPosVectorMatrix(sp8, mtx);
-    m_pos[1] = sp8;
+    nlMultPosVectorMatrix(corner, mtx);
+    m_pos[0] = corner;
 
     {
-        float f3 = 0.5f;
-        float temp_f30 = w;
-        float temp_f31_2 = h1;
-        nlVec3Set(sp8, temp_f30 * f3, temp_f31_2 * f3, 0.0f);
+        float right = w;
+        float bottom = -h1;
+        float half = 0.5f;
+        nlVec3Set(corner, right * half, bottom * half, 0.0f);
     }
-    nlMultPosVectorMatrix(sp8, mtx);
-    m_pos[2] = sp8;
+    nlMultPosVectorMatrix(corner, mtx);
+    m_pos[1] = corner;
 
     {
-        float f3 = 0.5f;
-        float temp_f29 = -w;
-        float temp_f31_2 = h0;
-        nlVec3Set(sp8, temp_f29 * f3, temp_f31_2 * f3, 0.0f);
+        float half = 0.5f;
+        float right = w;
+        float top = h1;
+        nlVec3Set(corner, right * half, top * half, 0.0f);
     }
-    nlMultPosVectorMatrix(sp8, mtx);
-    m_pos[3] = sp8;
+    nlMultPosVectorMatrix(corner, mtx);
+    m_pos[2] = corner;
 
-    float var_f0 = flipU ? 1.0f : 0.0f;
-    float var_f1 = flipU ? 0.0f : 1.0f;
-    float var_f2 = flipV ? 1.0f : 0.0f;
-    float var_f3 = flipV ? 0.0f : 1.0f;
+    {
+        float half = 0.5f;
+        float left = -w;
+        float top = h0;
+        nlVec3Set(corner, left * half, top * half, 0.0f);
+    }
+    nlMultPosVectorMatrix(corner, mtx);
+    m_pos[3] = corner;
 
-    m_uv[0].x = var_f0;
-    m_uv[0].y = var_f2;
-    m_uv[1].x = var_f1;
-    m_uv[1].y = var_f2;
-    m_uv[2].x = var_f1;
-    m_uv[2].y = var_f3;
-    m_uv[3].x = var_f0;
-    m_uv[3].y = var_f3;
+    float leftU = flipU ? 1.0f : 0.0f;
+    float rightU = flipU ? 0.0f : 1.0f;
+    float bottomV = flipV ? 1.0f : 0.0f;
+    float topV = flipV ? 0.0f : 1.0f;
+
+    m_uv[0].x = leftU;
+    m_uv[0].y = bottomV;
+    m_uv[1].x = rightU;
+    m_uv[1].y = bottomV;
+    m_uv[2].x = rightU;
+    m_uv[2].y = topV;
+    m_uv[3].x = leftU;
+    m_uv[3].y = topV;
 
     m_colour[0].c[0] = 0xFF;
     m_colour[0].c[1] = 0xFF;
