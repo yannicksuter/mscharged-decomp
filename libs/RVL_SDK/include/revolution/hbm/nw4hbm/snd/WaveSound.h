@@ -24,10 +24,10 @@ public:
     /* 0x08 */ NW4HBM_UT_RUNTIME_TYPEINFO;
     /* 0x28 */ virtual void Shutdown();
     /* 0x4C */ virtual void SetPlayerPriority(int priority);
-    /* 0x5C */ virtual bool IsAttachedTempSpecialHandle();
-    /* 0x60 */ virtual void DetachTempSpecialHandle();
-    /* 0x68 */ virtual BasicPlayer& GetBasicPlayer() { return mWsdPlayer; }
-    /* 0x6C */ virtual const BasicPlayer& GetBasicPlayer() const { return mWsdPlayer; }
+    /* 0x50 */ virtual bool IsAttachedTempSpecialHandle();
+    /* 0x54 */ virtual void DetachTempSpecialHandle();
+    /* 0x5C */ virtual BasicPlayer& GetBasicPlayer() { return mWsdPlayer; }
+    /* 0x60 */ virtual const BasicPlayer& GetBasicPlayer() const { return mWsdPlayer; }
 
     bool Prepare(const void* waveSoundBase, s32 waveSoundOffset, int voices, const WsdTrack::WsdCallback* callback,
                  u32 callbackData);
