@@ -9,6 +9,11 @@ class nlChunk;
 class XSoundHandle;
 class XSoundCueHandle;
 
+enum eAudioSliderScope
+{
+    AUDIO_SLIDER_GLOBAL = 2,
+};
+
 struct AudioSliderDefinition
 {
     u32 field_00;
