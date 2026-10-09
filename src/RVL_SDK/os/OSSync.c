@@ -1,5 +1,5 @@
 #include <revolution/os.h>
-#include <cstring>
+#include <string.h>
 
 static void __OSSystemCallVectorStart(void);
 static void __OSSystemCallVectorEnd(void);
