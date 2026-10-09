@@ -66,9 +66,9 @@ void FECaptainComponent::Initialize(TLComponentInstance* component, int side)
     logos->SetActiveSlide(name, true, false);
     TLInstance* background = FEFinder<TLInstance, 1>::Find<>(mPositions->GetActiveSlide(), "positions", "white_8x8");
     ApplyTeamColour(background, team, 180);
-    SetRecycleState(0, 1);
-    SetRecycleState(1, 1);
-    SetRecycleState(2, 1);
+    SetRecycleState(0, SIDEKICK_RECYCLE_IDLE);
+    SetRecycleState(1, SIDEKICK_RECYCLE_IDLE);
+    SetRecycleState(2, SIDEKICK_RECYCLE_IDLE);
 }
 
 void FECaptainComponent::ApplyTeamColour(TLInstance* instance, int captain, unsigned char alpha)
@@ -181,7 +181,7 @@ void FECaptainComponent::SetRecycleState(int index, int state)
     TLComponentInstance* component = FEFinder<TLComponentInstance, 4>::Find<>(
         mPositions->GetActiveSlide(), "positions", "field_positions", "idle", "dummies", textureName);
     component = FEFinder<TLComponentInstance, 4>::FindOrDefault(component->GetActiveSlide(), "recycle");
-    if (state == 1)
+    if (state == SIDEKICK_RECYCLE_IDLE)
     {
         component->SetActiveSlide("Slide1", true, false);
         TLInstance* button = FEFinder<TLInstance, 1>::Find<>(component->GetActiveSlide(), "button_recycle_or_die");

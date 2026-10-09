@@ -12,6 +12,12 @@ class TLInstance;
 struct TLGroupInstance;
 struct CharacterInfo;
 
+enum eSidekickRecycleState
+{
+    SIDEKICK_RECYCLE_SELECTING = 0,
+    SIDEKICK_RECYCLE_IDLE = 1,
+};
+
 class FECaptainComponent
 {
 public:

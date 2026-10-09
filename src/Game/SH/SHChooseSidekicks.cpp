@@ -525,7 +525,7 @@ void ChooseSidekicksSceneV2::OnSidekickPointerPress(int index, void* context)
     mSidekickButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
     mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
-    mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
+    mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], SIDEKICK_RECYCLE_IDLE);
     mSelectedSlots[side] = -1;
     mSidePads[side] = -1;
     FEAudio::PlayAnimAudioEvent(FECharacterSound::GetSidekickAcceptSound((eSidekickID)sSidekickButtonIDs[which]), 0, 0, 1);
@@ -658,7 +658,7 @@ void ChooseSidekicksSceneV2::OnSlotPointerPress(int index, void* context)
     mSidePads[group] = index;
     mSelectedSlots[group] = slot;
     mSlotClickEnabled[group][slot] = false;
-    mSidekickComponents[group].SetRecycleState(slot, 0);
+    mSidekickComponents[group].SetRecycleState(slot, SIDEKICK_RECYCLE_SELECTING);
     FEAudio::PlayAnimAudioEvent(0x970D6164, 0, 0, 1);
 }
 
@@ -1469,7 +1469,7 @@ void ChooseSidekicksSceneV2::ReleaseController(int index)
     }
     mCaptainComponents[side].SetDisplayMode(CHARACTER_PDA_SELECT_POSITION);
     mGreenArrows[side]->m_bVisible = false;
-    mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], 1);
+    mSidekickComponents[side].SetRecycleState(mSelectedSlots[side], SIDEKICK_RECYCLE_IDLE);
     mSelectedSlots[side] = -1;
     mSidePads[side] = -1;
 }
