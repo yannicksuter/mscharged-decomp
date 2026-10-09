@@ -3,6 +3,7 @@
 
 #include <revolution/gx/GXBlendTypes.h>
 #include <revolution/gx/GXPublicTypes.h>
+#include <revolution/gx/GXMiscTypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,6 +11,7 @@ extern "C" {
 
 typedef void (*GXDrawDoneCallback)(void);
 
+void GXSetMisc(GXMiscToken token, unsigned long value);
 void GXFlush(void);
 void GXAbortFrame(void);
 unsigned short GXReadDrawSync(void);

@@ -4,6 +4,9 @@
 #include <revolution/gx/GXMisc_fwd.h>
 #include <revolution/os/OSError_fwd.h>
 #include <revolution/gx/GXTransform.h>
+#include <revolution/gx/GXInit_fwd.h>
+#include <revolution/os/OSCache_fwd.h>
+#include <revolution/sc_fwd.h>
 
 #include "Game/TweakQuery.h"
 #include "NL/nlDebug.h"
@@ -24,19 +27,6 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-extern "C"
-{
-    void DCFlushRange(void* address, u32 length);
-    void GXSetMisc(s32 token, s32 value);
-    void* GXInit(void* fifo, u32 size);
-
-    void SCInit();
-    u32 SCCheckStatus();
-    u8 SCGetProgressiveMode();
-    u8 SCGetEuRgb60Mode();
-
-    void GXInitFifoLimits(void* fifo, u32 highWatermark, u32 lowWatermark);
-}
 
 static GXRenderModeObj glPal480IntDf = {
     4,
@@ -67,7 +57,7 @@ static u32 glx_ClearPixel = 0x10801080;
 static s32 glx_VideoMode;
 static s32 prev_VIWidth = glx_VIWidth;
 static void* glx_FIFOMem;
-static void* glx_FIFO;
+static GXFifoObj* glx_FIFO;
 static void* glx_FrameBuffer[2];
 static s32 glx_FBSize;
 
@@ -103,7 +93,7 @@ void glx_ClearXFB(void* xfb)
 static void glx_InitGX()
 {
     gxInit();
-    GXSetMisc(1, 8);
+    GXSetMisc(GX_MT_XF_FLUSH, 8);
     GXRenderModeObj& mode = glx_rmode;
     GXSetViewport(0.0f, 0.0f, (f32)mode.fbWidth, (f32)mode.efbHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, mode.fbWidth, mode.efbHeight);

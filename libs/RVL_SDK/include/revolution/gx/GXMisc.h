@@ -9,7 +9,6 @@ extern "C" {
 
 typedef void (*GXDrawSyncCallback)(u16 token);
 
-void GXSetMisc(GXMiscToken token, u32 val);
 void GXResetWriteGatherPipe(void);
 
 void __GXAbort(void);

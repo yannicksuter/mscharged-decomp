@@ -3,6 +3,7 @@
 #include <revolution/types.h>
 
 #include <revolution/gx/GXFifo.h>
+#include <revolution/gx/GXInit_fwd.h>
 #include <revolution/gx/GXTexture.h>
 #include <revolution/gx/GXTransform.h>
 #ifdef __cplusplus
@@ -231,7 +232,6 @@ extern GXData* const __GXData;
 #define gx __GXData
 #define gxdt __GXData
 
-GXFifoObj* GXInit(void*, u32);
 void __GXInitGX(void);
 
 #ifdef __cplusplus

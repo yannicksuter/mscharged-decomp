@@ -3,6 +3,7 @@
 #include <revolution/types.h>
 #include <revolution/gx/GXTextureTypes.h>
 #include <revolution/gx/GXPublicTypes.h>
+#include <revolution/gx/GXMiscTypes.h>
 #include <revolution/gx/GXBlendTypes.h>
 #include <revolution/gx/GXProjectionTypes.h>
 #ifdef __cplusplus
@@ -821,12 +822,6 @@ typedef enum _GXAlphaReadMode {
     GX_READ_NONE,
 } GXAlphaReadMode;
 
-typedef enum _GXMiscToken {
-    GX_MT_NULL,
-    GX_MT_XF_FLUSH,
-    GX_MT_DL_SAVE_CONTEXT,
-    GX_MT_ABORT_WAIT_COPYOUT,
-} GXMiscToken;
 
 typedef enum _GXPerf0 {
     GX_PERF0_VERTICES,
