@@ -19,7 +19,7 @@ static bool sMegaSpecularLightingEnabled;
 
 void glxConfigureMegaSpecularLighting(bool enabled)
 {
-    bool subtract;
+    bool doubleLighting;
     unsigned int numChans;
     unsigned int numTexGens;
     unsigned int numTevStages;
@@ -29,7 +29,7 @@ void glxConfigureMegaSpecularLighting(bool enabled)
     {
         SetGameObjectAmbientLightingEnabled(1);
         SetGameObjectLightingEnabled(enabled, sMegaSpecularLightCount, 0);
-        subtract = ShouldDoubleGameObjectLighting() != 0;
+        doubleLighting = ShouldDoubleGameObjectLighting() != 0;
         numChans = 2;
         numTexGens = 4;
         numTevStages = 6;
@@ -40,7 +40,7 @@ void glxConfigureMegaSpecularLighting(bool enabled)
         gxSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
         gxSetTevOrder(GX_TEVSTAGE4, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR1A1);
         gxSetTevOrder(GX_TEVSTAGE5, GX_TEXCOORD3, GX_TEXMAP3, GX_COLOR_NULL);
-        gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, subtract, true, GX_TEVREG0);
+        gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, doubleLighting, true, GX_TEVREG0);
         GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
         GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
         GXSetTevKColorSel(GX_TEVSTAGE5, GX_TEV_KCSEL_K3);
