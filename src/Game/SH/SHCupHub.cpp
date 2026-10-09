@@ -41,7 +41,7 @@ CupHubScene::CupHubScene()
     , mNavigationComponent()
     , mRulesButton(0)
     , mEntryCount(false)
-    , mState(0)
+    , mState(CUP_HUB_ENTERING)
 {
     mRulesComponent.mContext = 0;
     mHoverCounts[0] = 0;
@@ -138,7 +138,7 @@ void CupHubScene::Update(float fDeltaT)
         mScrollWidget.Initialize();
     }
     CupManager::s_pInstance->GetNumGames(0);
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == CUP_HUB_ENTERING || mState == CUP_HUB_TRANSITIONING || mState == CUP_HUB_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -149,7 +149,7 @@ void CupHubScene::Update(float fDeltaT)
             }
             return;
         }
-        if (mState == 0)
+        if (mState == CUP_HUB_ENTERING)
         {
             if (!mInitialized)
             {
@@ -162,9 +162,9 @@ void CupHubScene::Update(float fDeltaT)
                 InitializePointerButtons();
                 mInitialized = true;
             }
-            mState = 1;
+            mState = CUP_HUB_ACTIVE;
         }
-        else if (mState == 2)
+        else if (mState == CUP_HUB_TRANSITIONING)
         {
             if (mPreviousPagePressed)
             {
@@ -179,7 +179,7 @@ void CupHubScene::Update(float fDeltaT)
             AdvanceCupFlow(false);
             return;
         }
-        else if (mState == 3)
+        else if (mState == CUP_HUB_EXITING_BACK)
         {
             HandleCupBack(true);
             return;
@@ -225,7 +225,7 @@ void CupHubScene::Update(float fDeltaT)
         {
             for (int j = 0; j < 4; ++j)
                 mMatchupComponents[j].Disable();
-            mState = 3;
+            mState = CUP_HUB_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->HideButtons();
@@ -241,7 +241,7 @@ void CupHubScene::Update(float fDeltaT)
             {
                 FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
-                mState = 2;
+                mState = CUP_HUB_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
                 if (mPageControls->IsButtonPressed(1))
                     mPreviousPagePressed = true;
@@ -512,7 +512,7 @@ void CupHubScene::OnRulesPointerPress(unsigned int, void* context)
     case 0:
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
-        mState = 2;
+        mState = CUP_HUB_TRANSITIONING;
 
         SHNavigation* object = GetNavigationScene();
         if (object != 0)

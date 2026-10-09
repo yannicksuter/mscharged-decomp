@@ -9,6 +9,12 @@ class TLComponentInstance;
 class TLInstance;
 class TLTextInstance;
 
+enum eOptionsContext
+{
+    OPTIONS_CONTEXT_FRONTEND = 0,
+    OPTIONS_CONTEXT_PAUSE = 1,
+};
+
 class OptionsSubMenu : public BaseSceneHandler
 {
 public:
@@ -35,6 +41,13 @@ enum eAudioOptionButton
     AUDIO_BUTTON_SFX_UP = 3,
     AUDIO_BUTTON_VOICE_DOWN = 4,
     AUDIO_BUTTON_VOICE_UP = 5,
+};
+
+enum eOptionsAudioMenuV2Phase
+{
+    AUDIO_OPTIONS_ENTERING = 0,
+    AUDIO_OPTIONS_ACTIVE = 1,
+    AUDIO_OPTIONS_EXITING_BACK = 3,
 };
 
 class OptionsAudioMenuV2 : public OptionsSubMenu
@@ -102,6 +115,13 @@ public:
     /* 0x6A0 */ u16 mFormattedSettings[3][16];
     /* 0x700 */ int mState;
 }; // size 0x704
+
+enum eOptionsVisualMenuV2Phase
+{
+    VISUAL_OPTIONS_ENTERING = 0,
+    VISUAL_OPTIONS_ACTIVE = 1,
+    VISUAL_OPTIONS_EXITING_BACK = 3,
+};
 
 class OptionsVisualMenuV2 : public OptionsSubMenu
 {

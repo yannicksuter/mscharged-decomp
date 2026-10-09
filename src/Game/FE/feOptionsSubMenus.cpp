@@ -38,7 +38,7 @@ OptionsAudioMenuV2::OptionsAudioMenuV2(int mode)
     , mPointerButtonsInitialized(false)
     , mIntroSoundPlayed(false)
     , mSaveStarted(false)
-    , mState(0)
+    , mState(AUDIO_OPTIONS_ENTERING)
 {
     for (int i = 0; i < 6; ++i)
     {
@@ -76,7 +76,7 @@ void OptionsAudioMenuV2::SceneCreated()
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
 
-    if (mOverlayMode == 0)
+    if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
     {
         FEFinder<TLInstance, 2>::Find<>(presentation,
             "OPTIONS_IN", "Layer", "blackbox")->m_bVisible = false;
@@ -137,7 +137,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
     if (g_pFEInput->m_InputLockDepth != 0)
         return;
 
-    if (!mIntroSoundPlayed && mOverlayMode == 1)
+    if (!mIntroSoundPlayed && mOverlayMode == OPTIONS_CONTEXT_PAUSE)
     {
         mIntroSoundPlayed = true;
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
@@ -145,7 +145,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
 
     BaseSceneHandler::Update(fDeltaT);
 
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == AUDIO_OPTIONS_ENTERING || mState == 2 || mState == AUDIO_OPTIONS_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -155,7 +155,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
             return;
         }
 
-        if (mState == 0)
+        if (mState == AUDIO_OPTIONS_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
@@ -163,15 +163,15 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
                 navigation->SetButtons(0x24, true);
                 navigation->SetDoneButtonText(1);
             }
-            mState = 1;
+            mState = AUDIO_OPTIONS_ACTIVE;
         }
         else if (mState == 2)
         {
             return;
         }
-        else if (mState == 3)
+        else if (mState == AUDIO_OPTIONS_EXITING_BACK)
         {
-            if (mOverlayMode == 0)
+            if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
                 GameSceneManager::Instance()->Push((SceneList)13, SCREEN_NOTHING, true);
             else
                 g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, true);
@@ -188,7 +188,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
     for (int i = 0; i < 4; ++i)
     {
         TLComponentInstance* pointer = GetPointerInstance(i);
-        if (mOverlayMode == 0 && (unsigned int)i != gFEControllerIndex)
+        if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND && (unsigned int)i != gFEControllerIndex)
         {
             pointer->SetActiveSlide("waiting", true, false);
             continue;
@@ -210,7 +210,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
             settings->VoiceVolume = mBackupSettings[2];
             settings->ApplySettings();
             FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
-            mState = 3;
+            mState = AUDIO_OPTIONS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->SetButtons(0, true);
@@ -382,7 +382,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
         settings->ApplyVoiceVolume();
         UpdateVolumeBars(2);
         UpdateVolumeLevelText(2);
-        if (mOverlayMode == 0)
+        if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
             FEAudio::PlayAnimAudioEvent(0x1F824C84, 0, 0, 1);
         else
             FEAudio::PlaySound(1, 0x270203ED, 0, 0);
@@ -393,7 +393,7 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
         settings->ApplyVoiceVolume();
         UpdateVolumeBars(2);
         UpdateVolumeLevelText(2);
-        if (mOverlayMode == 0)
+        if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
             FEAudio::PlayAnimAudioEvent(0x1F824C84, 0, 0, 1);
         else
             FEAudio::PlaySound(1, 0x270203ED, 0, 0);
@@ -428,7 +428,7 @@ void OptionsAudioMenuV2::OnSaveButtonPointerLeave(int index, void*)
 
 void OptionsAudioMenuV2::OnSaveButtonPointerPress(int, void*)
 {
-    mState = 3;
+    mState = AUDIO_OPTIONS_EXITING_BACK;
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
@@ -486,7 +486,7 @@ OptionsVisualMenuV2::OptionsVisualMenuV2(int mode)
     , mPointerButtonsInitialized(false)
     , mIntroSoundPlayed(false)
     , mSaveStarted(false)
-    , mState(0)
+    , mState(VISUAL_OPTIONS_ENTERING)
 {
     for (int i = 0; i < 5; ++i)
     {
@@ -532,7 +532,7 @@ void OptionsVisualMenuV2::SceneCreated()
     }
     mNavigation.SetButtonInstance(backButton);
 
-    if (mOverlayMode == 0)
+    if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
     {
         FEFinder<TLInstance, 2>::Find<>(presentation,
             "OPTIONS_IN", "Layer", "blackbox")->m_bVisible = false;
@@ -576,7 +576,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
     if (g_pFEInput->m_InputLockDepth != 0)
         return;
 
-    if (!mIntroSoundPlayed && mOverlayMode == 1)
+    if (!mIntroSoundPlayed && mOverlayMode == OPTIONS_CONTEXT_PAUSE)
     {
         mIntroSoundPlayed = true;
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
@@ -584,7 +584,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
 
     BaseSceneHandler::Update(fDeltaT);
 
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == VISUAL_OPTIONS_ENTERING || mState == 2 || mState == VISUAL_OPTIONS_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -594,7 +594,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
             return;
         }
 
-        if (mState == 0)
+        if (mState == VISUAL_OPTIONS_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
@@ -602,15 +602,15 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
                 navigation->SetButtons(0x24, true);
                 navigation->SetDoneButtonText(1);
             }
-            mState = 1;
+            mState = VISUAL_OPTIONS_ACTIVE;
         }
         else if (mState == 2)
         {
             return;
         }
-        else if (mState == 3)
+        else if (mState == VISUAL_OPTIONS_EXITING_BACK)
         {
-            if (mOverlayMode == 0)
+            if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
                 GameSceneManager::Instance()->Push((SceneList)13, SCREEN_NOTHING, true);
             else
                 g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, true);
@@ -627,7 +627,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
     for (int i = 0; i < 4; ++i)
     {
         TLComponentInstance* pointer = GetPointerInstance(i);
-        if (mOverlayMode == 0 && (unsigned int)i != gFEControllerIndex)
+        if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND && (unsigned int)i != gFEControllerIndex)
         {
             pointer->SetActiveSlide("waiting", true, false);
             continue;
@@ -646,7 +646,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
             GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel = mBackupSettings[1] / 4.0;
             GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera = mBackupSettings[0] == 0;
             FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
-            mState = 3;
+            mState = VISUAL_OPTIONS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->SetButtons(0, true);
@@ -841,7 +841,7 @@ void OptionsVisualMenuV2::OnSaveButtonPointerLeave(int index, void*)
 
 void OptionsVisualMenuV2::OnSaveButtonPointerPress(int, void*)
 {
-    mState = 3;
+    mState = VISUAL_OPTIONS_EXITING_BACK;
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {

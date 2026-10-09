@@ -250,7 +250,7 @@ void GameRenderTask::Run(float fDeltaT)
 
         NisPlayer::Instance()->Render(0);
 
-        if (NisPlayer::Instance()->mOverlayMode == 4)
+        if (NisPlayer::Instance()->mOverlayMode == NIS_OVERLAY_HOLOTRON)
         {
             ReplayManager::Instance()->RenderSnapshotAt(0.0f);
         }

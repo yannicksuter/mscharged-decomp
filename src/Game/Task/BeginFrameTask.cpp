@@ -129,7 +129,7 @@ void SetupMatrices(cBaseCamera* pCamera, const nlMatrix4* pOverride)
     float fFOVRad = DegreesToRadians(fFOV);
 
     if (NisPlayer::Instance()->HasSecondaryNis()
-        && NisPlayer::Instance()->mOverlayMode == 4)
+        && NisPlayer::Instance()->mOverlayMode == NIS_OVERLAY_HOLOTRON)
     {
         fAspect = 1.666f;
         if (IsWidescreen() && GetPresentation()->mLetterBoxEnabled)
