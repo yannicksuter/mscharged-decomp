@@ -87,7 +87,7 @@ void GameResultsScene::Update(float dt)
     {
         switch (tournamentGame->mGameStatus)
         {
-        case 2:
+        case TOURN_GAME_STATUS_PLAYING:
         {
             char buffer[0x20];
             int seconds = tournamentGame->mGameTimeDelta;
@@ -101,7 +101,7 @@ void GameResultsScene::Update(float dt)
             mTitleText->SetString(mTitleBuffer);
             break;
         }
-        case 3:
+        case TOURN_GAME_STATUS_SUDDEN_DEATH:
             mTitleText->SetStringId("SUDDEN_DEATH");
             break;
         default:

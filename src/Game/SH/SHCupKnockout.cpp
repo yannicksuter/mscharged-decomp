@@ -471,12 +471,12 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
     case NET_TOURN_GAME_IN_PROGRESS:
         switch (tournamentGame->mGameStatus)
         {
-        case 1:
+        case TOURN_GAME_STATUS_INACTIVE:
             timer->SetActiveSlide("loading", true, false);
             timer->m_bVisible = true;
             break;
-        case 2:
-        case 3:
+        case TOURN_GAME_STATUS_PLAYING:
+        case TOURN_GAME_STATUS_SUDDEN_DEATH:
         {
             int seconds = tournamentGame->mGameTimeDelta;
             int minutes = seconds / 60;
@@ -486,7 +486,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
                 nlSNPrintf(time, sizeof(time), "%d:0%d", minutes, remainder);
             else
                 nlSNPrintf(time, sizeof(time), "%d:%d", minutes, remainder);
-            if (tournamentGame->mGameStatus == 3)
+            if (tournamentGame->mGameStatus == TOURN_GAME_STATUS_SUDDEN_DEATH)
                 timer->SetActiveSlide("Slide1", true, false);
             else
                 timer->SetActiveSlide("time_remaining", true, false);
@@ -496,7 +496,7 @@ void CupKnockoutScene::PopulateNetworkMatchup(NetworkTournamentGame* tournamentG
             timer->m_bVisible = true;
             break;
         }
-        case 0:
+        case TOURN_GAME_STATUS_NONE:
         default:
             timer->m_bVisible = false;
             break;

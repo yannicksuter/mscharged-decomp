@@ -215,7 +215,7 @@ void NetTournManager::BuildInitialBracket()
         game.mMachines[0] = -1;
         game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
-        game.mGameStatus = 0;
+        game.mGameStatus = TOURN_GAME_STATUS_NONE;
         game.mGameTimeDelta = 0;
         BasicGameInfo& gameInfo = game.mGameInfo;
         gameInfo.Reset(true);
@@ -262,7 +262,7 @@ void NetTournManager::AdvanceBracket()
         game.mMachines[0] = -1;
         game.mMachines[1] = -1;
         game.mBracketIndex = gameIndex;
-        game.mGameStatus = 0;
+        game.mGameStatus = TOURN_GAME_STATUS_NONE;
         game.mGameTimeDelta = 0;
         BasicGameInfo& gameInfo = game.mGameInfo;
         gameInfo.Reset(true);
@@ -327,7 +327,7 @@ void NetTournManager::OnTournamentGameStart(NetMessageGameStart* message)
     if (isHomeMachine)
     {
         NetMessageTournamentGameUpdate gameUpdate(
-            NET_TOURN_UPDATE_PROGRESS, mCurrentGameIndex, isHomeMachine, 1, 0, false);
+            NET_TOURN_UPDATE_PROGRESS, mCurrentGameIndex, isHomeMachine, TOURN_GAME_STATUS_INACTIVE, 0, false);
         int gameSize = gNetworkMessageRegistry->Serialize(&gameUpdate, gameBuffer, sizeof(gameBuffer));
         SendToAllTournamentMachines(gameBuffer, gameSize);
     }
@@ -519,7 +519,7 @@ void NetTournManager::StartReadyGames()
                 game->mState = NET_TOURN_GAME_COULD_NOT_START;
                 u8 buffer[0xFF];
                 NetMessageTournamentGameUpdate update(
-                    NET_TOURN_UPDATE_COULD_NOT_START, gameIndex, true, 0, 0, false);
+                    NET_TOURN_UPDATE_COULD_NOT_START, gameIndex, true, TOURN_GAME_STATUS_NONE, 0, false);
                 int size = gNetworkMessageRegistry->Serialize(
                     &update, buffer, sizeof(buffer));
                 SendToAllTournamentMachines(buffer, size);
@@ -827,11 +827,11 @@ void NetTournManager::Update(float dt)
 
                 int gameDuration = (int)g_pGame->m_fGameDuration;
                 int gameTimeDelta;
-                int gameStatus = 2;
+                int gameStatus = TOURN_GAME_STATUS_PLAYING;
                 if (gameTime > gameDuration)
                 {
                     gameTimeDelta = gameTime - gameDuration;
-                    gameStatus = 3;
+                    gameStatus = TOURN_GAME_STATUS_SUDDEN_DEATH;
                 }
                 else
                 {
@@ -891,11 +891,11 @@ void NetTournManager::NotifyGameStarted()
         int gameDuration = (int)g_pGame->m_fGameDuration;
         int gameTime = (int)g_pGame->GetGameTime();
         int gameTimeDelta;
-        int gameStatus = 2;
+        int gameStatus = TOURN_GAME_STATUS_PLAYING;
         if (gameTime > gameDuration)
         {
             gameTimeDelta = gameTime - gameDuration;
-            gameStatus = 3;
+            gameStatus = TOURN_GAME_STATUS_SUDDEN_DEATH;
         }
         else
         {
@@ -932,7 +932,7 @@ void NetTournManager::NotifyOverlayPopped(int)
         isHomeMachine = true;
     }
     NetMessageTournamentGameUpdate message(NET_TOURN_UPDATE_DID_NOT_FINISH, mCurrentGameIndex,
-        isHomeMachine, 0, 0, false);
+        isHomeMachine, TOURN_GAME_STATUS_NONE, 0, false);
     u8 buffer[0xFF];
     int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
     SendToAllTournamentMachines(buffer, size);
@@ -946,7 +946,7 @@ void NetTournManager::NotifyGameOver()
         isHomeMachine = true;
     }
     NetMessageTournamentGameUpdate message(NET_TOURN_UPDATE_RESULT, mCurrentGameIndex,
-        isHomeMachine, 1, 0, true);
+        isHomeMachine, TOURN_GAME_STATUS_INACTIVE, 0, true);
     message.mGameInfo = *GameInfoManager::Instance()->GetCurrentGameInfo();
     u8 buffer[0xFF];
     int size = gNetworkMessageRegistry->Serialize(&message, buffer, sizeof(buffer));
@@ -1084,16 +1084,16 @@ void NetTournManager::HandleTournamentGameUpdate(
             game.mGameTimeDelta = message->mGameTimeDelta;
             switch (status)
             {
-            case 2:
-            case 3:
+            case TOURN_GAME_STATUS_PLAYING:
+            case TOURN_GAME_STATUS_SUDDEN_DEATH:
                 game.mState = NET_TOURN_GAME_IN_PROGRESS;
                 if (message->mHasGameInfo)
                 {
                     game.mGameInfo = message->mGameInfo;
                 }
                 break;
-            case 0:
-            case 1:
+            case TOURN_GAME_STATUS_NONE:
+            case TOURN_GAME_STATUS_INACTIVE:
                 tDebugPrintManager::Print(DC_NETWORK,
                     "Received GameInProgress status %d\n",
                     status);

@@ -37,7 +37,7 @@ struct NetworkTournamentGame
         mMachines[0] = -1;
         mMachines[1] = -1;
         mBracketIndex = bracketIndex;
-        mGameStatus = 0;
+        mGameStatus = TOURN_GAME_STATUS_NONE;
         mGameTimeDelta = 0;
         mGameInfo.Reset(true);
     }
