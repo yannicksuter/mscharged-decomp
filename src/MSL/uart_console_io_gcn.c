@@ -1,9 +1,6 @@
 #include "uart_console_io_gcn.h"
+#include <revolution/euart.h>
 #include <revolution/os.h>
-
-int InitializeUART(size_t);
-int WriteUARTN(unsigned char*, size_t);
-DSIOResult __TRK_write_console(__file_handle handle, unsigned char* buffer, size_t* count, __idle_proc idle_fn);
 
 DSIOResult __write_console(__file_handle handle, unsigned char* buffer, size_t* count, __idle_proc idle_fn)
 {
@@ -27,7 +24,7 @@ DSIOResult __write_console(__file_handle handle, unsigned char* buffer, size_t* 
             return 1;
         }
 
-        if (WriteUARTN(buffer, *count) != 0)
+        if (WriteUARTN((const char*)buffer, *count) != 0)
         {
             *count = 0;
             return 1;
