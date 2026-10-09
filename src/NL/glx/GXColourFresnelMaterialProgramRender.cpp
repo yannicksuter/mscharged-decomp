@@ -52,8 +52,8 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Activate(GLView* vie
     view->m_Interface->GetViewMatrix(sColourFresnelViewMatrix);
     sColourFresnelModelMatrix = -1;
     sColourFresnelBoundTexture = -1;
-    GXLoadTexMtxImm(sColourFresnelLookupMatrix, 67, GX_MTX3x4);
-    gxSetTexCoordGen(3, 0, 1, 30, true, 67);
+    GXLoadTexMtxImm(sColourFresnelLookupMatrix, GX_PTTEXMTX1, GX_MTX3x4);
+    gxSetTexCoordGen(GX_TEXCOORD3, GX_TG_MTX3x4, GX_TG_NRM, GX_TEXMTX0, true, GX_PTTEXMTX1);
 
     if (sColourFresnelLightingEnabled)
     {
@@ -80,29 +80,29 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Activate(GLView* vie
         numTexGens = 5;
         numTevStages = 6;
         lightingScale = sColourFresnelDoubleLighting ? GX_CS_SCALE_2 : GX_CS_SCALE_1;
-        gxSetTevOrder(0, 0, 0, 255);
-        gxSetTevOrder(1, 3, 3, 255);
-        gxSetTevOrder(2, 2, 2, 255);
-        gxSetTevOrder(3, 1, 1, 255);
-        gxSetTevOrder(4, 255, 255, 255);
-        gxSetTevOrder(5, 4, 4, 4);
-        gxSetTexCoordGen(4, 10, 19, 60);
-        gxSetTevColourOp(0, 0, 0, 0, true, 1);
-        gxSetTevColourOp(2, 0, 0, 0, true, 2);
-        gxSetTevColourOp(5, 0, 0, lightingScale, true, 0);
+        gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD3, GX_TEXMAP3, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE4, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE5, GX_TEXCOORD4, GX_TEXMAP4, GX_COLOR0A0);
+        gxSetTexCoordGen(GX_TEXCOORD4, GX_TG_SRTG, GX_TG_COLOR0, GX_IDENTITY);
+        gxSetTevColourOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVREG0);
+        gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVREG1);
+        gxSetTevColourOp(GX_TEVSTAGE5, GX_TEV_ADD, GX_TB_ZERO, lightingScale, true, GX_TEVPREV);
         GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K0);
-        gxSetTevColourIn(0, 15, 15, 15, 8);
-        gxSetTevColourIn(1, 15, 15, 15, 8);
-        gxSetTevColourIn(2, 2, 8, 0, 15);
-        gxSetTevColourIn(3, 15, 12, 8, 14);
-        gxSetTevColourIn(4, 15, 0, 4, 15);
-        gxSetTevColourIn(5, 15, 0, 8, 15);
-        gxSetTevAlphaIn(0, 7, 7, 7, 4);
-        gxSetTevAlphaIn(1, 7, 7, 7, 0);
-        gxSetTevAlphaIn(2, 7, 7, 7, 0);
-        gxSetTevAlphaIn(3, 7, 7, 7, 0);
-        gxSetTevAlphaIn(4, 7, 7, 7, 0);
-        gxSetTevAlphaIn(5, 7, 7, 7, 0);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_C0, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_KONST);
+        gxSetTevColourIn(GX_TEVSTAGE4, GX_CC_ZERO, GX_CC_CPREV, GX_CC_C1, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE5, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE3, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE4, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE5, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     }
     else if (sColourFresnelLightingEnabled)
     {
@@ -110,27 +110,27 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Activate(GLView* vie
         numChans = 1;
         numTexGens = 4;
         numTevStages = 6;
-        gxSetTevOrder(0, 0, 0, 255);
-        gxSetTevOrder(1, 3, 3, 255);
-        gxSetTevOrder(2, 2, 2, 255);
-        gxSetTevOrder(3, 1, 1, 255);
-        gxSetTevOrder(4, 255, 255, 255);
-        gxSetTevOrder(5, 255, 255, 4);
-        gxSetTevColourOp(0, 0, 0, 0, true, 1);
-        gxSetTevColourOp(2, 0, 0, 0, true, 2);
+        gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD3, GX_TEXMAP3, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE4, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+        gxSetTevOrder(GX_TEVSTAGE5, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+        gxSetTevColourOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVREG0);
+        gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVREG1);
         GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K0);
-        gxSetTevColourIn(0, 15, 15, 15, 8);
-        gxSetTevColourIn(1, 15, 15, 15, 8);
-        gxSetTevColourIn(2, 2, 8, 0, 15);
-        gxSetTevColourIn(3, 15, 12, 8, 14);
-        gxSetTevColourIn(4, 15, 0, 4, 15);
-        gxSetTevColourIn(5, 15, 0, 10, 15);
-        gxSetTevAlphaIn(0, 7, 7, 7, 4);
-        gxSetTevAlphaIn(1, 7, 7, 7, 0);
-        gxSetTevAlphaIn(2, 7, 7, 7, 0);
-        gxSetTevAlphaIn(3, 7, 7, 7, 0);
-        gxSetTevAlphaIn(4, 7, 7, 7, 0);
-        gxSetTevAlphaIn(5, 7, 7, 7, 0);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        gxSetTevColourIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        gxSetTevColourIn(GX_TEVSTAGE2, GX_CC_C0, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_KONST);
+        gxSetTevColourIn(GX_TEVSTAGE4, GX_CC_ZERO, GX_CC_CPREV, GX_CC_C1, GX_CC_ZERO);
+        gxSetTevColourIn(GX_TEVSTAGE5, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        gxSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE3, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE4, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        gxSetTevAlphaIn(GX_TEVSTAGE5, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     }
     else
     {
@@ -138,9 +138,9 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Activate(GLView* vie
         numTexGens = 1;
         sColourFresnelLightCount = 0;
         numTevStages = 1;
-        gxSetTevOrder(0, 0, 0, 255);
-        gxSetTevColourIn(0, 15, 12, 8, 15);
-        gxSetTevAlphaIn(0, 7, 6, 4, 7);
+        gxSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        gxSetTevColourIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ONE, GX_CC_TEXC, GX_CC_ZERO);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
     }
 
     gxSetNumChans(numChans);
@@ -157,15 +157,15 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Deactivate()
     {
         SetGameObjectAmbientLightingEnabled(0);
         SetGameObjectLightingEnabled(0, sColourFresnelLightCount, 1);
-        gxSetTevColourOp(0, 0, 0, 0, true, 0);
-        gxSetTevColourOp(2, 0, 0, 0, true, 0);
+        gxSetTevColourOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+        gxSetTevColourOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
         if (sColourFresnelLightRampEnabled)
         {
-            gxSetTevColourOp(5, 0, 0, 0, true, 0);
-            gxSetTexCoordGen(4, 1, 8, 60);
+            gxSetTevColourOp(GX_TEVSTAGE5, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, true, GX_TEVPREV);
+            gxSetTexCoordGen(GX_TEXCOORD4, GX_TG_MTX2x4, GX_TG_TEX4, GX_IDENTITY);
         }
     }
-    gxSetTexCoordGen(3, 1, 7, 60);
+    gxSetTexCoordGen(GX_TEXCOORD3, GX_TG_MTX2x4, GX_TG_TEX3, GX_IDENTITY);
 }
 
 template <>
@@ -226,7 +226,7 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Draw(
         Mtx normalMatrix;
         glxCopyMatrix(modelViewTransform, modelview);
         PSMTXInvXpose(modelViewTransform, normalMatrix);
-        GXLoadTexMtxImm(normalMatrix, 30, GX_MTX3x4);
+        GXLoadTexMtxImm(normalMatrix, GX_TEXMTX0, GX_MTX3x4);
         sColourFresnelModelMatrix = modelMatrix;
     }
 
@@ -256,7 +256,7 @@ void GXMaterialProgramImpl<GXColourFresnelMaterialProgram>::Draw(
         gxSaveBlendMode();
         gxSetBlendMode(true, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, false);
         GXSetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KASEL_K1_A);
-        gxSetTevAlphaIn(0, 7, 7, 7, 6);
+        gxSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
         GXCallDisplayList(packet->displayList->list, packet->displayList->size);
         gxRestoreBlendMode();
         gxRestoreZMode();
