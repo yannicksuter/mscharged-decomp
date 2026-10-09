@@ -5,8 +5,111 @@ hash: c39e1eda1942aa2fc96a6a71bfef051698e23516
 extract_objects: true
 symbols: config/R4QP01/symbols.txt
 splits: config/R4QP01/splits.txt
-mw_comment_version: 14 # GC Linker 3.0+
+mw_comment_version: 14
 force_active:
   - __init_cpp_exceptions_reference
   - __destroy_global_chain_reference
   - __fini_cpp_exceptions_reference
+add_relocations:
+  # Addresses hoisted through r0 and stack slots.
+  - { source: .text:0x8009A474, type: ha, target: "__vt__6Bobomb" }
+  - { source: .text:0x8009A480, type: ha, target: "__vt__10GreenShell" }
+  - { source: .text:0x8009A498, type: ha, target: "__vt__11FreezeShell" }
+  - { source: .text:0x8009A49C, type: l, target: "__vt__6Bobomb" }
+  - { source: .text:0x8009A4B8, type: ha, target: "__vt__8RedShell" }
+  - { source: .text:0x8009A4BC, type: l, target: "__vt__10GreenShell" }
+  - { source: .text:0x8009A4DC, type: l, target: "__vt__11FreezeShell" }
+  - { source: .text:0x8009A4FC, type: l, target: "__vt__8RedShell" }
+  - { source: .text:0x801EAADC, type: ha, target: "POWER_UP_IMAGE_NAMES" }
+  - { source: .text:0x801EAB24, type: l, target: "POWER_UP_IMAGE_NAMES" }
+  - { source: .text:0x802CF49C, type: ha, target: "glReleaseTextureAnim__FP13GLTextureAnim" }
+  - { source: .text:0x802CF4A8, type: ha, target: "glReleaseTexture__FP11PlatTexture" }
+  - { source: .text:0x802CF4C8, type: ha, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF4CC, type: l, target: "glReleaseTextureAnim__FP13GLTextureAnim" }
+  - { source: .text:0x802CF4E8, type: ha, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF4EC, type: l, target: "glReleaseTexture__FP11PlatTexture" }
+  - { source: .text:0x802CF508, type: ha, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF50C, type: l, target: "__vt__92AVLTreeBase<Ul,P7nlChunk,40NewAdapter<26AVLTreeEntry<Ul,P7nlChunk>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF528, type: ha, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF52C, type: l, target: "__vt__106AVLTreeBase<Ul,P13GLTextureAnim,47NewAdapter<33AVLTreeEntry<Ul,P13GLTextureAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF54C, type: l, target: "__vt__104AVLTreeBase<Ul,P12GLVertexAnim,46NewAdapter<32AVLTreeEntry<Ul,P12GLVertexAnim>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802CF56C, type: l, target: "__vt__92AVLTreeBase<Ul,P7glModel,40NewAdapter<26AVLTreeEntry<Ul,P7glModel>>,21DefaultKeyCompare<Ul>>" }
+  - { source: .text:0x802AB49C, type: ha, target: "lbl_8052A788" }
+  - { source: .text:0x802AB4A8, type: ha, target: "lenfix$247" }
+  - { source: .text:0x802AB4D0, type: ha, target: "distfix$248" }
+  - { source: .text:0x802AB4D4, type: l, target: "lbl_8052A788" }
+  - { source: .text:0x802AB4F0, type: ha, target: "lbl_8052A710" }
+  - { source: .text:0x802AB4F4, type: l, target: "lenfix$247" }
+  - { source: .text:0x802AB510, type: ha, target: "lbl_8052A744" }
+  - { source: .text:0x802AB514, type: l, target: "distfix$248" }
+  - { source: .text:0x802AB530, type: ha, target: "lbl_8052A758" }
+  - { source: .text:0x802AB534, type: l, target: "lbl_8052A710" }
+  - { source: .text:0x802AB544, type: ha, target: "lbl_8052A774" }
+  - { source: .text:0x802AB548, type: l, target: "lbl_8052A744" }
+  - { source: .text:0x802AB558, type: ha, target: "lbl_8052A79C" }
+  - { source: .text:0x802AB55C, type: l, target: "lbl_8052A758" }
+  - { source: .text:0x802AB56C, type: ha, target: "lbl_8052A7BC" }
+  - { source: .text:0x802AB570, type: l, target: "lbl_8052A774" }
+  - { source: .text:0x802AB580, type: ha, target: "lbl_8052A7E0" }
+  - { source: .text:0x802AB584, type: l, target: "lbl_8052A79C" }
+  - { source: .text:0x802AB594, type: ha, target: "lbl_8052A818" }
+  - { source: .text:0x802AB598, type: l, target: "lbl_8052A7BC" }
+  - { source: .text:0x802AB5A8, type: ha, target: "lbl_8052A834" }
+  - { source: .text:0x802AB5AC, type: l, target: "lbl_8052A7E0" }
+  - { source: .text:0x802AB5BC, type: ha, target: "lbl_8052A84C" }
+  - { source: .text:0x802AB5C0, type: l, target: "lbl_8052A818" }
+  - { source: .text:0x802AB5D0, type: ha, target: "lbl_8052A868" }
+  - { source: .text:0x802AB5D4, type: l, target: "lbl_8052A834" }
+  - { source: .text:0x802AB5E4, type: ha, target: "lbl_8052A880" }
+  - { source: .text:0x802AB5E8, type: l, target: "lbl_8052A84C" }
+  - { source: .text:0x802AB5F8, type: ha, target: "lbl_8052A8A0" }
+  - { source: .text:0x802AB5FC, type: l, target: "lbl_8052A868" }
+  - { source: .text:0x802AB610, type: l, target: "lbl_8052A880" }
+  - { source: .text:0x802AB620, type: l, target: "lbl_8052A8A0" }
+block_relocations:
+  # Constants and chunk IDs whose values overlap the address space.
+  - { source: 0x802C9964 }
+  - { source: 0x802C9A18 }
+  - { source: 0x802C9A28 }
+  - { source: 0x802CEF48 }
+  - { source: 0x802CEF50 }
+  - { source: 0x802CEF70 }
+  - { source: 0x8033FB40 }
+  - { source: 0x8033FB48 }
+  - { source: 0x8033FB50 }
+  - { source: 0x8033FB8C }
+  - { source: 0x8033FB9C }
+  - { source: 0x8033FBAC }
+  - { source: 0x8033FBCC }
+  - { source: 0x802EBCD0 }
+  - { source: 0x802EBCF0 }
+  - { source: 0x802EBD00 }
+  - { source: 0x802EBD10 }
+  - { source: 0x802EC710 }
+  - { source: 0x802EC718 }
+  - { source: 0x802EC738 }
+  - { source: 0x802EC748 }
+  - { source: 0x802EC758 }
+  - { source: 0x802EE188 }
+  - { source: 0x802EE18C }
+  - { source: 0x802EE498 }
+  - { source: 0x802EE4A0 }
+  - { source: 0x803B1F10 }
+  - { source: 0x803B1F88 }
+  - { source: 0x8054B5C0 }
+  - { source: 0x804F9600 }
+  - { source: 0x8052A50C }
+  - { source: 0x8053055C }
+  - { source: 0x8054AFCC }
+  - { source: 0x8054B440 }
+  - { source: 0x804EF8D8 }
+  - { source: 0x804EF8DC }
+  - { source: 0x804EF8E0 }
+  - { source: 0x8052C7B8 }
+  - { source: 0x8052C7BC }
+  - { source: 0x8052C830 }
+  - { source: 0x8052CA74 }
+  - { source: 0x8052D208 }
+  - { source: 0x8052D20C }
+  - { source: 0x8052D268 }
+  - { source: 0x8052D458 }

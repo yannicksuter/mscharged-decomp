@@ -43,8 +43,9 @@ your own legally obtained copy of the game.
 | `R4QP01` | Europe - *Mario Strikers Charged Football* | Rev 2 | **In progress** | `c39e1eda1942aa2fc96a6a71bfef051698e23516` |
 
 `R4QE01` remains the default. Its build links entirely from reconstructed
-source. The EU build currently uses extracted objects while its source
-matching work is in progress. Both builds reproduce their original DOL.
+source. The EU build reuses matching source units from USA; regional differences
+and unresolved ranges still use extracted objects. Both builds reproduce their
+original DOL.
 
 Decompilation
 =============
