@@ -33,7 +33,7 @@ float sScrollingSpecularExponent;
 nlVector2 sScrollingSpecularResetValues;
 int sScrollingSpecularLightingMode;
 
-extern "C" void glxConfigureScrollingSpecularLighting(int mode)
+void glxConfigureScrollingSpecularLighting(int mode)
 {
     sScrollingSpecularLightingMode = mode;
     gxSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_TEX0, GX_TEXMTX0);

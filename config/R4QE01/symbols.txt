@@ -8585,7 +8585,7 @@ Deactivate__56GXMaterialProgramImpl<31GXDetailModulateMaterialProgram>Fv = .text
 Prepare__56GXMaterialProgramImpl<31GXDetailModulateMaterialProgram>FP13glModelPacket = .text:0x80294F20; // type:function size:0xC
 Draw__56GXMaterialProgramImpl<31GXDetailModulateMaterialProgram>FPC13glModelPacket = .text:0x80294F2C; // type:function size:0x258
 __sinit_\GXDetailModulateMaterialProgramRender_cpp = .text:0x80295184; // type:function size:0x20 scope:local
-glxConfigureMaskedSpecularFresnelLighting = .text:0x802951A4; // type:function size:0x5B8
+glxConfigureMaskedSpecularFresnelLighting__Fi = .text:0x802951A4; // type:function size:0x5B8
 Activate__63GXMaterialProgramImpl<38GXMaskedSpecularFresnelMaterialProgram>FP6GLView = .text:0x8029575C; // type:function size:0xD0
 Deactivate__63GXMaterialProgramImpl<38GXMaskedSpecularFresnelMaterialProgram>Fv = .text:0x8029582C; // type:function size:0x12C
 Prepare__63GXMaterialProgramImpl<38GXMaskedSpecularFresnelMaterialProgram>FP13glModelPacket = .text:0x80295958; // type:function size:0xC
@@ -8603,7 +8603,7 @@ Deactivate__64GXMaterialProgramImpl<39GXScrollingCameraOverlayMaterialProgram>Fv
 Prepare__64GXMaterialProgramImpl<39GXScrollingCameraOverlayMaterialProgram>FP13glModelPacket = .text:0x80296678; // type:function size:0xC
 Draw__64GXMaterialProgramImpl<39GXScrollingCameraOverlayMaterialProgram>FPC13glModelPacket = .text:0x80296684; // type:function size:0x508
 __sinit_\GXScrollingCameraOverlayMaterialProgramRender_cpp = .text:0x80296B8C; // type:function size:0x20 scope:local
-glxConfigureScrollingSpecularLighting = .text:0x80296BAC; // type:function size:0x580
+glxConfigureScrollingSpecularLighting__Fi = .text:0x80296BAC; // type:function size:0x580
 Activate__59GXMaterialProgramImpl<34GXScrollingSpecularMaterialProgram>FP6GLView = .text:0x8029712C; // type:function size:0x88
 Deactivate__59GXMaterialProgramImpl<34GXScrollingSpecularMaterialProgram>Fv = .text:0x802971B4; // type:function size:0x124
 Prepare__59GXMaterialProgramImpl<34GXScrollingSpecularMaterialProgram>FP13glModelPacket = .text:0x802972D8; // type:function size:0xC
