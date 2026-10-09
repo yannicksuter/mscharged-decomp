@@ -224,12 +224,12 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
         }
         else if (state == FRIEND_CODE_ENTRY_TRANSITIONING)
         {
-            GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS, SCREEN_FORWARD, true);
             return;
         }
         else if (state == FRIEND_CODE_ENTRY_EXITING_BACK)
         {
-            GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_BACK, true);
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS, SCREEN_BACK, true);
             return;
         }
     }

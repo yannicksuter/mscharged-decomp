@@ -531,7 +531,7 @@ void StrikerCupStandingsScene::OnButtonPointerPress(unsigned int, void* context)
     {
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x26, FEPopupMenu::Nothing);
         break;
     }

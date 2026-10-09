@@ -3278,7 +3278,7 @@ void cFielder::fn_8004923C(float fDeltaT, bool bButtonPressed, int nParam)
     {
         MegaStrikeMeterOverlay* pScene
             = (MegaStrikeMeterOverlay*)g_pOverlayManager->GetScene(
-                (SceneList)0x64);
+                OVERLAY_MEGA_STRIKE_METER);
         pScene->mMegaStrikeStarted = true;
         SetAction(ACTION_MEGA_STRIKE);
         FreezeEveryoneButCaptain(0);

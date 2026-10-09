@@ -1436,13 +1436,13 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
     particleTask->Initialize(GetLayerView((eCLV)0x19), 0x5F6, 0x2FB);
     GameInfoManager::Instance()->ResetUnknown0xA0();
     FEMusic::StopStream();
-    BaseSceneHandler* scene = GameSceneManager::Instance()->Push((SceneList)0x1D, SCREEN_NOTHING, false);
+    BaseSceneHandler* scene = GameSceneManager::Instance()->Push(SCENE_NAVIGATION, SCREEN_NOTHING, false);
     FESceneManager::Instance()->SetTopMostScene(scene);
     SetPointerEnabled(false);
     if (!lbl_806E1044)
     {
         lbl_806E1044 = true;
-        GameSceneManager::Instance()->Push((SceneList)0x16, SCREEN_NOTHING, false);
+        GameSceneManager::Instance()->Push(SCENE_INTRO_MOVIE, SCREEN_NOTHING, false);
         FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");
     }
     else
@@ -1459,12 +1459,12 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
         {
             NetTournManager::Instance()->NotifyFinishedLoadingToKnockout();
             FrontEndPresentation::GetInstance()->Call("TransitionGameToOnlineTournament");
-            GameSceneManager::Instance()->Push((SceneList)0x22, SCREEN_NOTHING, false);
+            GameSceneManager::Instance()->Push(SCENE_CUP_KNOCKOUT, SCREEN_NOTHING, false);
         }
         else if (GameInfoManager::Instance()->IsOnline())
         {
             FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
-            GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_NOTHING, false);
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_NOTHING, false);
             FrontEndPresentation::GetInstance()->Call("TransitionGameToOnlineMainMenu");
         }
         else if (GameInfoManager::Instance()->IsInMode2())
@@ -1518,7 +1518,7 @@ extern "C" void fn_80119528(AsyncLoadingManager* manager)
             if (GameInfoManager::Instance()->unknown_0x71C8 == 1)
             {
                 ChallengeSelectScene* challengeScene = static_cast<ChallengeSelectScene*>(
-                    GameSceneManager::Instance()->Push(g_pStrikerChallenge->mCurrentChallenge < 10 ? (SceneList)0x4C : (SceneList)0x4B,
+                    GameSceneManager::Instance()->Push(g_pStrikerChallenge->mCurrentChallenge < 10 ? SCENE_STRIKERS_101_SELECT : SCENE_CHALLENGE_SELECT,
                         SCREEN_NOTHING, false));
                 if (challengeScene != 0)
                 {
@@ -1824,7 +1824,7 @@ extern "C" void fn_8011A2E8(AsyncLoadingManager* manager)
 extern "C" void fn_8011A570(AsyncLoadingManager* manager)
 {
     manager->SetLoadingComment("InitializeGameStateInGameFE1");
-    g_pOverlayManager->Push((SceneList)0x5A, SCREEN_NOTHING, false);
+    g_pOverlayManager->Push(OVERLAY_IN_GAME_TEXT, SCREEN_NOTHING, false);
     g_pOverlayManager->Push(OVERLAY_HUD, SCREEN_NOTHING, false)->SetVisible(false);
     lbl_806E1058 += gAudioEnabled ? 2 : 0;
     LoadSoundBank(static_cast<GameAudio*>(g_pAudioSystem), 0x1C, 0xF, fn_80116988, (void*)"HUD_GEN");
@@ -1833,20 +1833,20 @@ extern "C" void fn_8011A570(AsyncLoadingManager* manager)
     FEMusic::SetInGame(true);
     if (GameInfoManager::Instance()->mIsInStrikers101Mode)
     {
-        g_pOverlayManager->Push((SceneList)0x61, SCREEN_NOTHING, false);
+        g_pOverlayManager->Push(OVERLAY_TICKER, SCREEN_NOTHING, false);
         Presentation* presentation = GetPresentation();
         presentation->mLetterBoxEnabled = false;
         presentation->mLetterBoxDuration = 0.0f;
     }
-    g_pOverlayManager->Push((SceneList)0x5F, SCREEN_NOTHING, false)->SetVisible(false);
+    g_pOverlayManager->Push(OVERLAY_GOAL, SCREEN_NOTHING, false)->SetVisible(false);
     if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_DEMO)
     {
-        g_pOverlayManager->Push((SceneList)0x60, SCREEN_NOTHING, false);
+        g_pOverlayManager->Push(OVERLAY_DEMO, SCREEN_NOTHING, false);
     }
-    g_pOverlayManager->Push((SceneList)0x64, SCREEN_NOTHING, false)->SetVisible(false);
-    g_pOverlayManager->Push((SceneList)0x65, SCREEN_NOTHING, false)->SetVisible(false);
-    g_pOverlayManager->Push((SceneList)0x66, SCREEN_NOTHING, false)->SetVisible(false);
-    BaseSceneHandler* scene = g_pOverlayManager->Push((SceneList)0x1E, SCREEN_NOTHING, false);
+    g_pOverlayManager->Push(OVERLAY_MEGA_STRIKE_METER, SCREEN_NOTHING, false)->SetVisible(false);
+    g_pOverlayManager->Push(OVERLAY_PIP, SCREEN_NOTHING, false)->SetVisible(false);
+    g_pOverlayManager->Push(OVERLAY_SUPER_ABILITY, SCREEN_NOTHING, false)->SetVisible(false);
+    BaseSceneHandler* scene = g_pOverlayManager->Push(SCENE_WII_CURSOR, SCREEN_NOTHING, false);
     FESceneManager::Instance()->SetTopMostScene(scene);
     SetPointerEnabled(false);
     FinishLoadingStep(manager);
@@ -2087,7 +2087,7 @@ extern "C" void fn_8011B02C(AsyncLoadingManager* manager)
         }
     }
 
-    GameSceneManager::Instance()->Push((SceneList)0x10, SCREEN_NOTHING, false);
+    GameSceneManager::Instance()->Push(SCENE_LEGAL, SCREEN_NOTHING, false);
     MovieInit();
     FinishLoadingStep(manager);
 }

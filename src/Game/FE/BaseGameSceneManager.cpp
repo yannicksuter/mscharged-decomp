@@ -150,108 +150,108 @@ SceneEntry SceneEntryTable[] = {
     { SCENE_MAIN_MENU, "art/fe/main_menu_v3.fen" },
     { SCENE_CHOOSE_CAPTAINS_DOMINATION, "art/fe/choose_captains_domination.fen" },
     { SCENE_CHOOSE_SIDEKICKS_DOMINATION, "art/fe/choose_sidekicks_domination.fen" },
-    { (SceneList)4, "art/fe/domination_choose_sides.fen" },
-    { (SceneList)5, "art/fe/choose_stadiums_domination.fen" },
+    { SCENE_CHOOSE_SIDES_DOMINATION, "art/fe/domination_choose_sides.fen" },
+    { SCENE_CHOOSE_STADIUM, "art/fe/choose_stadiums_domination.fen" },
     { SCENE_CHOOSE_CAPTAINS_STRIKER_CUP, "art/fe/choose_captains_domination.fen" },
     { SCENE_CHOOSE_SIDEKICKS_STRIKER_CUP, "art/fe/choose_sidekicks_domination.fen" },
-    { (SceneList)8, "art/fe/domination_choose_sides.fen" },
-    { (SceneList)9, "art/fe/cup_cheater.fen" },
+    { SCENE_CHOOSE_SIDES_STRIKER_CUP, "art/fe/domination_choose_sides.fen" },
+    { SCENE_CUP_CHEATER, "art/fe/cup_cheater.fen" },
     { SCENE_POPUP_MENU, "art/fe/popup_menu.fen" },
-    { (SceneList)11, "art/fe/spoils_menu_v2.fen" },
-    { (SceneList)12, "art/fe/custom_tournament_options_v2.fen" },
-    { (SceneList)13, "art/fe/options_main_menu.fen" },
+    { SCENE_SPOILS_MENU, "art/fe/spoils_menu_v2.fen" },
+    { SCENE_CUSTOM_TOURNAMENT_OPTIONS, "art/fe/custom_tournament_options_v2.fen" },
+    { SCENE_OPTIONS, "art/fe/options_main_menu.fen" },
     { SCENE_AUDIO_OPTIONS, "art/fe/options_audio_options.fen" },
     { SCENE_VISUAL_OPTIONS, "art/fe/options_visual_options.fen" },
-    { (SceneList)16, "art/fe/englegal.fen" },
+    { SCENE_LEGAL, "art/fe/englegal.fen" },
     { SCENE_SUPER_LOADING, "art/fe/loadingscreen.fen" },
     { SCENE_BOOT_LOADING, "art/fe/boot_loading.fen" },
     { SCENE_BOOT_LOADING_JPN, "art/fe/boot_loading_jpn.fen" },
-    { (SceneList)20, "art/fe/movieplayer.fen" },
-    { (SceneList)21, "art/fe/movieplayer.fen" },
+    { SCENE_MOVIE_PLAYER, "art/fe/movieplayer.fen" },
+    { SCENE_NLG_LOGO, "art/fe/movieplayer.fen" },
     { SCENE_INTRO_MOVIE, "art/fe/movieplayer.fen" },
     { SCENE_CREDITS, "art/fe/credits.fen" },
-    { (SceneList)24, "art/fe/sms2_network_start.fen" },
+    { SCENE_NETWORK_START, "art/fe/sms2_network_start.fen" },
     { SCENE_ASYNC_LOADING, "art/fe/asyncloading.fen" },
     { SCENE_WIDESCREEN_LOADING, "art/fe/WIDESCREEN_LOADING_SCREEN.fen" },
     { SCENE_GAMEPLAY_OPTIONS, "art/fe/options.fen" },
     { SCENE_OPTIONS_CHEATS_LIST, "art/fe/options_cheats_list.fen" },
-    { (SceneList)29, "art/fe/fe_overlay.fen" },
-    { (SceneList)30, "art/fe/wiicursor.fen" },
-    { (SceneList)31, "art/fe/roadtostrikerscup_hub.fen" },
-    { (SceneList)32, "art/fe/cup_schedule.fen" },
-    { (SceneList)33, "art/fe/striker_times_2.fen" },
-    { (SceneList)34, "art/fe/cup_knockout.fen" },
-    { (SceneList)35, "art/fe/cup_final_rounds.fen" },
-    { (SceneList)36, "art/fe/striker_cup_standings.fen" },
-    { (SceneList)37, "art/fe/striker_cup_awards_golden_boot.fen" },
-    { (SceneList)38, "art/fe/striker_cup_awards_brick_wall.fen" },
-    { (SceneList)39, "art/fe/striker_times_2.fen" },
+    { SCENE_NAVIGATION, "art/fe/fe_overlay.fen" },
+    { SCENE_WII_CURSOR, "art/fe/wiicursor.fen" },
+    { SCENE_ROAD_TO_STRIKERS_CUP, "art/fe/roadtostrikerscup_hub.fen" },
+    { SCENE_CUP_SCHEDULE, "art/fe/cup_schedule.fen" },
+    { SCENE_GAME_RESULTS, "art/fe/striker_times_2.fen" },
+    { SCENE_CUP_KNOCKOUT, "art/fe/cup_knockout.fen" },
+    { SCENE_CUP_FINAL_ROUNDS, "art/fe/cup_final_rounds.fen" },
+    { SCENE_CUP_STANDINGS, "art/fe/striker_cup_standings.fen" },
+    { SCENE_CUP_GOLDEN_BOOT, "art/fe/striker_cup_awards_golden_boot.fen" },
+    { SCENE_CUP_BRICK_WALL, "art/fe/striker_cup_awards_brick_wall.fen" },
+    { SCENE_CUP_NEWS, "art/fe/striker_times_2.fen" },
     { SCENE_ONLINE_MENU, "art/fe/online_menu.fen" },
-    { (SceneList)41, "art/fe/online_ranked_menu.fen" },
-    { (SceneList)42, "art/fe/online_unranked_menu.fen" },
+    { SCENE_ONLINE_RANKED, "art/fe/online_ranked_menu.fen" },
+    { SCENE_ONLINE_UNRANKED, "art/fe/online_unranked_menu.fen" },
     { SCENE_ONLINE_GUEST_CONTROLLER_SELECT, "art/fe/online_active_controllers.fen" },
-    { (SceneList)44, "art/fe/online_invite_players.fen" },
+    { SCENE_ONLINE_INVITE_PLAYERS, "art/fe/online_invite_players.fen" },
     { SCENE_ONLINE_INVITE_PREVIEW, "art/fe/online_preview.fen" },
     { SCENE_ONLINE_RANKING, "art/fe/leaderboard_rankings.fen" },
-    { (SceneList)47, "art/fe/online_friends_list.fen" },
+    { SCENE_ONLINE_FRIENDS, "art/fe/online_friends_list.fen" },
     { SCENE_ONLINE_FRIEND_CODE_ENTRY, "art/fe/online_friends_code_enter.fen" },
-    { (SceneList)49, "art/fe/online_draft_screen.fen" },
-    { (SceneList)50, "art/fe/online_draft_screen.fen" },
+    { SCENE_ONLINE_MATCHMAKING_DRAFT, "art/fe/online_draft_screen.fen" },
+    { SCENE_ONLINE_FRIENDS_DRAFT, "art/fe/online_draft_screen.fen" },
     { SCENE_ONLINE_LOGIN, "art/fe/online_login.fen" },
     { SCENE_ONLINE_INVITE_RESPONSE, "art/fe/online_invitation.fen" },
     { SCENE_ONLINE_INVITE_STATUS, "art/fe/online_login.fen" },
     { SCENE_ONLINE_MII_SELECT, "art/fe/online_mii_select.fen" },
     { SCENE_ONLINE_MII_SELECT_OVERLAY, "art/fe/online_mii_select_overlay.fen" },
-    { (SceneList)56, "art/fe/online_friends_choose_sides.fen" },
-    { (SceneList)57, "art/fe/online_connection_quality.fen" },
-    { (SceneList)58, "art/fe/hof_profile.fen" },
-    { (SceneList)59, "art/fe/hof_game_summary.fen" },
-    { (SceneList)60, "art/fe/hof_game_summary.fen" },
-    { (SceneList)61, "art/fe/hof_game_summary.fen" },
-    { (SceneList)62, "art/fe/hof_fire_cup.fen" },
-    { (SceneList)63, "art/fe/hof_striker_cup.fen" },
-    { (SceneList)64, "art/fe/hof_crystal_cup.fen" },
-    { (SceneList)65, "art/fe/hof_player_cards.fen" },
-    { (SceneList)66, "art/fe/hof_cup_history.fen" },
-    { (SceneList)67, "art/fe/hof_award_history.fen" },
-    { (SceneList)68, "art/fe/hof_award_history.fen" },
-    { (SceneList)69, "art/fe/hof_cup_history.fen" },
-    { (SceneList)70, "art/fe/hof_award_history.fen" },
-    { (SceneList)71, "art/fe/hof_award_history.fen" },
-    { (SceneList)72, "art/fe/hof_cup_history.fen" },
-    { (SceneList)73, "art/fe/hof_award_history.fen" },
-    { (SceneList)74, "art/fe/hof_award_history.fen" },
-    { (SceneList)75, "art/fe/striker_challenge_hub.fen" },
-    { (SceneList)76, "art/fe/striker_challenge_hub.fen" },
-    { (SceneList)77, "art/fe/striker_times_2.fen" },
-    { (SceneList)78, "art/fe/domination_choose_sides.fen" },
-    { (SceneList)79, "art/fe/e3howtoholdcontroller.fen" },
-    { (SceneList)80, "art/fe/pausemenu_v3.fen" },
-    { (SceneList)81, "art/fe/ingame_choose_sides.fen" },
-    { (SceneList)82, "art/fe/options_audio_options.fen" },
-    { (SceneList)83, "art/fe/options_visual_options.fen" },
-    { (SceneList)84, "art/fe/pausemenu101_v3.fen" },
-    { (SceneList)85, "art/fe/lesson.fen" },
-    { (SceneList)86, "art/fe/strikers_101_lessons_v3.fen" },
-    { (SceneList)87, "art/fe/lessonmovieplayer.fen" },
+    { SCENE_ONLINE_FRIENDS_CHOOSE_SIDES, "art/fe/online_friends_choose_sides.fen" },
+    { SCENE_ONLINE_CONNECTION_QUALITY, "art/fe/online_connection_quality.fen" },
+    { SCENE_HOF_PROFILE, "art/fe/hof_profile.fen" },
+    { SCENE_HOF_TROPHY_SUMMARY, "art/fe/hof_game_summary.fen" },
+    { SCENE_HOF_UNLOCK_SUMMARY, "art/fe/hof_game_summary.fen" },
+    { SCENE_HOF_CHALLENGE_SUMMARY, "art/fe/hof_game_summary.fen" },
+    { SCENE_HOF_FIRE_CUP, "art/fe/hof_fire_cup.fen" },
+    { SCENE_HOF_STRIKER_CUP, "art/fe/hof_striker_cup.fen" },
+    { SCENE_HOF_CRYSTAL_CUP, "art/fe/hof_crystal_cup.fen" },
+    { SCENE_HOF_PLAYER_CARDS, "art/fe/hof_player_cards.fen" },
+    { SCENE_HOF_FIRE_CUP_HISTORY, "art/fe/hof_cup_history.fen" },
+    { SCENE_HOF_FIRE_GOLDEN_BOOT_HISTORY, "art/fe/hof_award_history.fen" },
+    { SCENE_HOF_FIRE_BRICK_WALL_HISTORY, "art/fe/hof_award_history.fen" },
+    { SCENE_HOF_STRIKER_CUP_HISTORY, "art/fe/hof_cup_history.fen" },
+    { SCENE_HOF_STRIKER_GOLDEN_BOOT_HISTORY, "art/fe/hof_award_history.fen" },
+    { SCENE_HOF_STRIKER_BRICK_WALL_HISTORY, "art/fe/hof_award_history.fen" },
+    { SCENE_HOF_CRYSTAL_CUP_HISTORY, "art/fe/hof_cup_history.fen" },
+    { SCENE_HOF_CRYSTAL_GOLDEN_BOOT_HISTORY, "art/fe/hof_award_history.fen" },
+    { SCENE_HOF_CRYSTAL_BRICK_WALL_HISTORY, "art/fe/hof_award_history.fen" },
+    { SCENE_CHALLENGE_SELECT, "art/fe/striker_challenge_hub.fen" },
+    { SCENE_STRIKERS_101_SELECT, "art/fe/striker_challenge_hub.fen" },
+    { SCENE_CHALLENGE_NEWS, "art/fe/striker_times_2.fen" },
+    { SCENE_CHOOSE_SIDES_TOURNAMENT, "art/fe/domination_choose_sides.fen" },
+    { SCENE_HEALTH_WARNING, "art/fe/e3howtoholdcontroller.fen" },
+    { SCENE_PAUSE, "art/fe/pausemenu_v3.fen" },
+    { SCENE_PAUSE_CHOOSE_SIDES, "art/fe/ingame_choose_sides.fen" },
+    { SCENE_PAUSE_AUDIO_OPTIONS, "art/fe/options_audio_options.fen" },
+    { SCENE_PAUSE_VISUAL_OPTIONS, "art/fe/options_visual_options.fen" },
+    { SCENE_STRIKERS_101_PAUSE, "art/fe/pausemenu101_v3.fen" },
+    { SCENE_LESSON, "art/fe/lesson.fen" },
+    { SCENE_STRIKERS_101_LESSONS, "art/fe/strikers_101_lessons_v3.fen" },
+    { SCENE_LESSON_MOVIE, "art/fe/lessonmovieplayer.fen" },
     { (SceneList)88, 0 },
     { OVERLAY_HUD, "art/fe/hud_2.fen" },
-    { (SceneList)90, "art/fe/ingame_text.fen" },
-    { (SceneList)91, "art/fe/striker_times_2.fen" },
-    { (SceneList)92, "art/fe/striker_times_2.fen" },
-    { (SceneList)93, "art/fe/online_ranking.fen" },
-    { (SceneList)94, "art/fe/striker_times_2.fen" },
-    { (SceneList)95, "art/fe/goal_overlay.fen" },
-    { (SceneList)96, "art/fe/demo_overlay.fen" },
-    { (SceneList)97, "art/fe/igticker.fen" },
-    { (SceneList)98, "art/fe/x2_sts.fen" },
-    { (SceneList)99, "art/fe/loading_screen.fen" },
-    { (SceneList)100, "art/fe/megastrike_metre.fen" },
-    { (SceneList)101, "art/fe/pip.fen" },
-    { (SceneList)102, "art/fe/SUPER_ABILITY_PRESENTATION.fen" },
-    { (SceneList)103, "art/fe/challenge_preview.fen" },
-    { (SceneList)104, "art/fe/controller_config.fen" },
-    { (SceneList)105, "art/fe/defensive_play.fen" },
+    { OVERLAY_IN_GAME_TEXT, "art/fe/ingame_text.fen" },
+    { OVERLAY_POST_GAME_RESULTS, "art/fe/striker_times_2.fen" },
+    { OVERLAY_POST_GAME_STATISTICS, "art/fe/striker_times_2.fen" },
+    { OVERLAY_ONLINE_RANKING, "art/fe/online_ranking.fen" },
+    { OVERLAY_STRIKER_TIMES, "art/fe/striker_times_2.fen" },
+    { OVERLAY_GOAL, "art/fe/goal_overlay.fen" },
+    { OVERLAY_DEMO, "art/fe/demo_overlay.fen" },
+    { OVERLAY_TICKER, "art/fe/igticker.fen" },
+    { OVERLAY_X2_STS, "art/fe/x2_sts.fen" },
+    { OVERLAY_LOADING, "art/fe/loading_screen.fen" },
+    { OVERLAY_MEGA_STRIKE_METER, "art/fe/megastrike_metre.fen" },
+    { OVERLAY_PIP, "art/fe/pip.fen" },
+    { OVERLAY_SUPER_ABILITY, "art/fe/SUPER_ABILITY_PRESENTATION.fen" },
+    { OVERLAY_CHALLENGE_PREVIEW, "art/fe/challenge_preview.fen" },
+    { OVERLAY_CONTROLLER_MAP, "art/fe/controller_config.fen" },
+    { OVERLAY_DEFENSIVE_PLAY, "art/fe/defensive_play.fen" },
     { (SceneList)106, 0 },
 };
 
@@ -290,11 +290,11 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
 
     if (g_pLocalization->m_CurrentLanguage == nlLocalization::LangJapanese)
     {
-        if (newscene == (SceneList)39 || newscene == (SceneList)77 || newscene == (SceneList)91)
+        if (newscene == SCENE_CUP_NEWS || newscene == SCENE_CHALLENGE_NEWS || newscene == OVERLAY_POST_GAME_RESULTS)
         {
             filename = "art/fe/striker_times_jp.fen";
         }
-        else if (newscene == (SceneList)104)
+        else if (newscene == OVERLAY_CONTROLLER_MAP)
         {
             filename = "art/fe/controller_config_jp.fen";
         }
@@ -314,10 +314,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_CHOOSE_SIDEKICKS_DOMINATION:
         newHandler = new (nlMalloc(sizeof(ChooseSidekicksSceneV2), 8, false)) ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::ST_DOMINATION, movement);
         break;
-    case (SceneList)4:
+    case SCENE_CHOOSE_SIDES_DOMINATION:
         newHandler = new (nlMalloc(sizeof(SHChooseSides2), 8, false)) SHChooseSides2(SHChooseSides2::FRIENDLY, movement);
         break;
-    case (SceneList)5:
+    case SCENE_CHOOSE_STADIUM:
         newHandler = new (nlMalloc(sizeof(StadiumSelectScene), 8, false)) StadiumSelectScene();
         break;
     case SCENE_CHOOSE_CAPTAINS_STRIKER_CUP:
@@ -326,16 +326,16 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_CHOOSE_SIDEKICKS_STRIKER_CUP:
         newHandler = new (nlMalloc(sizeof(ChooseSidekicksSceneV2), 8, false)) ChooseSidekicksSceneV2(ChooseCaptainsSceneV2::ST_STRIKER_CUP, movement);
         break;
-    case (SceneList)8:
+    case SCENE_CHOOSE_SIDES_STRIKER_CUP:
         newHandler = new (nlMalloc(sizeof(SHChooseSides2), 8, false)) SHChooseSides2(SHChooseSides2::CUP, movement);
         break;
-    case (SceneList)9:
+    case SCENE_CUP_CHEATER:
         newHandler = new (nlMalloc(sizeof(CupCheaterScene), 8, false)) CupCheaterScene();
         break;
     case SCENE_POPUP_MENU:
         newHandler = new (nlMalloc(sizeof(FEPopupMenu), 8, false)) FEPopupMenu();
         break;
-    case (SceneList)13:
+    case SCENE_OPTIONS:
         newHandler = new (nlMalloc(sizeof(OptionsScene), 8, false)) OptionsScene();
         break;
     case SCENE_AUDIO_OPTIONS:
@@ -344,7 +344,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_VISUAL_OPTIONS:
         newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(OPTIONS_CONTEXT_FRONTEND);
         break;
-    case (SceneList)16:
+    case SCENE_LEGAL:
         newHandler = new (nlMalloc(sizeof(CrossFaderScene), 8, false)) CrossFaderScene();
         break;
     case SCENE_SUPER_LOADING:
@@ -356,10 +356,10 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_BOOT_LOADING_JPN:
         newHandler = new (nlMalloc(sizeof(BootLoadingScene), 8, false)) BootLoadingScene();
         break;
-    case (SceneList)20:
+    case SCENE_MOVIE_PLAYER:
         newHandler = new (nlMalloc(sizeof(MoviePlayerScene), 8, false)) MoviePlayerScene();
         break;
-    case (SceneList)21:
+    case SCENE_NLG_LOGO:
         newHandler = new (nlMalloc(sizeof(NLGLogoMovieScene), 8, false)) NLGLogoMovieScene();
         break;
     case SCENE_INTRO_MOVIE:
@@ -368,7 +368,7 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_CREDITS:
         newHandler = new (nlMalloc(sizeof(CreditScene), 8, false)) CreditScene();
         break;
-    case (SceneList)24:
+    case SCENE_NETWORK_START:
         newHandler = new (nlMalloc(sizeof(NetworkStartScene), 8, false)) NetworkStartScene();
         break;
     case SCENE_ASYNC_LOADING:
@@ -383,52 +383,52 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_OPTIONS_CHEATS_LIST:
         newHandler = new (nlMalloc(sizeof(SHOptionsCheatsList), 8, false)) SHOptionsCheatsList();
         break;
-    case (SceneList)29:
+    case SCENE_NAVIGATION:
         newHandler = new (nlMalloc(sizeof(SHNavigation), 8, false)) SHNavigation();
         break;
-    case (SceneList)30:
+    case SCENE_WII_CURSOR:
         newHandler = new (nlMalloc(sizeof(SHNavigation), 8, false)) SHNavigation();
         break;
-    case (SceneList)31:
+    case SCENE_ROAD_TO_STRIKERS_CUP:
         newHandler = new (nlMalloc(sizeof(RoadToStrikersCupHubScene), 8, false)) RoadToStrikersCupHubScene();
         break;
-    case (SceneList)32:
+    case SCENE_CUP_SCHEDULE:
         newHandler = new (nlMalloc(sizeof(CupHubScene), 8, false)) CupHubScene();
         break;
-    case (SceneList)33:
+    case SCENE_GAME_RESULTS:
         newHandler = new (nlMalloc(sizeof(GameResultsScene), 8, false)) GameResultsScene();
         break;
-    case (SceneList)34:
+    case SCENE_CUP_KNOCKOUT:
         newHandler = new (nlMalloc(sizeof(CupKnockoutScene), 8, false)) CupKnockoutScene();
         break;
-    case (SceneList)35:
+    case SCENE_CUP_FINAL_ROUNDS:
         newHandler = new (nlMalloc(sizeof(CupFinalRoundsScene), 8, false)) CupFinalRoundsScene();
         break;
-    case (SceneList)36:
+    case SCENE_CUP_STANDINGS:
         newHandler = new (nlMalloc(sizeof(StrikerCupStandingsScene), 8, false)) StrikerCupStandingsScene();
         break;
-    case (SceneList)37:
+    case SCENE_CUP_GOLDEN_BOOT:
         newHandler = new (nlMalloc(sizeof(StrikerCupAwardsScene), 8, false)) StrikerCupAwardsScene(5);
         break;
-    case (SceneList)38:
+    case SCENE_CUP_BRICK_WALL:
         newHandler = new (nlMalloc(sizeof(StrikerCupAwardsScene), 8, false)) StrikerCupAwardsScene(6);
         break;
-    case (SceneList)39:
+    case SCENE_CUP_NEWS:
         newHandler = new (nlMalloc(sizeof(CupNewsScene), 8, false)) CupNewsScene();
         break;
     case SCENE_ONLINE_MENU:
         newHandler = new (nlMalloc(sizeof(SHOnlineHub), 8, false)) SHOnlineHub();
         break;
-    case (SceneList)41:
+    case SCENE_ONLINE_RANKED:
         newHandler = new (nlMalloc(sizeof(SHOnlinePlayerCount), 8, false)) SHOnlinePlayerCount(SHOnlinePlayerCount::ModeRanked);
         break;
-    case (SceneList)42:
+    case SCENE_ONLINE_UNRANKED:
         newHandler = new (nlMalloc(sizeof(SHOnlinePlayerCount), 8, false)) SHOnlinePlayerCount(SHOnlinePlayerCount::ModeUnranked);
         break;
     case SCENE_ONLINE_GUEST_CONTROLLER_SELECT:
         newHandler = new (nlMalloc(sizeof(SHOnlineGuestControllerSelect), 8, false)) SHOnlineGuestControllerSelect();
         break;
-    case (SceneList)44:
+    case SCENE_ONLINE_INVITE_PLAYERS:
         newHandler = new (nlMalloc(sizeof(SHOnlineInvitePlayers), 8, false)) SHOnlineInvitePlayers();
         break;
     case SCENE_ONLINE_INVITE_PREVIEW:
@@ -437,16 +437,16 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_ONLINE_RANKING:
         newHandler = new (nlMalloc(sizeof(SHOnlineRanking), 8, false)) SHOnlineRanking();
         break;
-    case (SceneList)47:
+    case SCENE_ONLINE_FRIENDS:
         newHandler = new (nlMalloc(sizeof(SHOnlineFriends), 8, false)) SHOnlineFriends();
         break;
     case SCENE_ONLINE_FRIEND_CODE_ENTRY:
         newHandler = new (nlMalloc(sizeof(SHOnlineFriendCodeEntry), 8, false)) SHOnlineFriendCodeEntry();
         break;
-    case (SceneList)49:
+    case SCENE_ONLINE_MATCHMAKING_DRAFT:
         newHandler = new (nlMalloc(sizeof(SHOnlineMatchmakingDraft), 8, false)) SHOnlineMatchmakingDraft();
         break;
-    case (SceneList)50:
+    case SCENE_ONLINE_FRIENDS_DRAFT:
         newHandler = new (nlMalloc(sizeof(SHOnlineFriendsDraft), 8, false)) SHOnlineFriendsDraft();
         break;
     case SCENE_ONLINE_LOGIN:
@@ -464,139 +464,139 @@ BaseSceneHandler* BaseGameSceneManager::Push(SceneList newscene, ScreenMovement 
     case SCENE_ONLINE_MII_SELECT_OVERLAY:
         newHandler = new (nlMalloc(sizeof(SHOnlineMiiSelectOverlay), 8, false)) SHOnlineMiiSelectOverlay();
         break;
-    case (SceneList)56:
+    case SCENE_ONLINE_FRIENDS_CHOOSE_SIDES:
         newHandler = new (nlMalloc(sizeof(SHOnlineFriendsChooseSides), 8, false)) SHOnlineFriendsChooseSides();
         break;
-    case (SceneList)57:
+    case SCENE_ONLINE_CONNECTION_QUALITY:
         newHandler = new (nlMalloc(sizeof(OnlineConnectionQualityScene), 8, false)) OnlineConnectionQualityScene();
         break;
-    case (SceneList)58:
+    case SCENE_HOF_PROFILE:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameProfile), 8, false)) SHHallOfFameProfile();
         break;
-    case (SceneList)59:
+    case SCENE_HOF_TROPHY_SUMMARY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameSummary), 8, false)) SHHallOfFameSummary(HOF_TROPHY_SUMMARY);
         break;
-    case (SceneList)60:
+    case SCENE_HOF_UNLOCK_SUMMARY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameSummary), 8, false)) SHHallOfFameSummary(HOF_UNLOCK_SUMMARY);
         break;
-    case (SceneList)61:
+    case SCENE_HOF_CHALLENGE_SUMMARY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameSummary), 8, false)) SHHallOfFameSummary(HOF_CHALLENGE_SUMMARY);
         break;
-    case (SceneList)62:
+    case SCENE_HOF_FIRE_CUP:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameCup), 8, false)) SHHallOfFameCup(HOF_FIRE_CUP);
         break;
-    case (SceneList)63:
+    case SCENE_HOF_STRIKER_CUP:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameCup), 8, false)) SHHallOfFameCup(HOF_STRIKER_CUP);
         break;
-    case (SceneList)64:
+    case SCENE_HOF_CRYSTAL_CUP:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameCup), 8, false)) SHHallOfFameCup(HOF_CRYSTAL_CUP);
         break;
-    case (SceneList)65:
+    case SCENE_HOF_PLAYER_CARDS:
         newHandler = new (nlMalloc(sizeof(SHHallOfFamePlayerCard), 8, false)) SHHallOfFamePlayerCard(HOF_PLAYER_CARD);
         break;
-    case (SceneList)66:
+    case SCENE_HOF_FIRE_CUP_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_FIRE_CUP_HISTORY);
         break;
-    case (SceneList)67:
+    case SCENE_HOF_FIRE_GOLDEN_BOOT_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_FIRE_GOLDEN_BOOT_HISTORY);
         break;
-    case (SceneList)68:
+    case SCENE_HOF_FIRE_BRICK_WALL_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_FIRE_BRICK_WALL_HISTORY);
         break;
-    case (SceneList)69:
+    case SCENE_HOF_STRIKER_CUP_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_STRIKER_CUP_HISTORY);
         break;
-    case (SceneList)70:
+    case SCENE_HOF_STRIKER_GOLDEN_BOOT_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_STRIKER_GOLDEN_BOOT_HISTORY);
         break;
-    case (SceneList)71:
+    case SCENE_HOF_STRIKER_BRICK_WALL_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_STRIKER_BRICK_WALL_HISTORY);
         break;
-    case (SceneList)72:
+    case SCENE_HOF_CRYSTAL_CUP_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_CRYSTAL_CUP_HISTORY);
         break;
-    case (SceneList)73:
+    case SCENE_HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_CRYSTAL_GOLDEN_BOOT_HISTORY);
         break;
-    case (SceneList)74:
+    case SCENE_HOF_CRYSTAL_BRICK_WALL_HISTORY:
         newHandler = new (nlMalloc(sizeof(SHHallOfFameHistory), 8, false)) SHHallOfFameHistory(HOF_CRYSTAL_BRICK_WALL_HISTORY);
         break;
-    case (SceneList)75:
+    case SCENE_CHALLENGE_SELECT:
         newHandler = new (nlMalloc(sizeof(ChallengeSelectScene), 8, false)) ChallengeSelectScene(false);
         break;
-    case (SceneList)76:
+    case SCENE_STRIKERS_101_SELECT:
         newHandler = new (nlMalloc(sizeof(ChallengeSelectScene), 8, false)) ChallengeSelectScene(true);
         break;
-    case (SceneList)77:
+    case SCENE_CHALLENGE_NEWS:
         newHandler = new (nlMalloc(sizeof(SHStrikerTimesChallenge), 8, false)) SHStrikerTimesChallenge();
         break;
-    case (SceneList)78:
+    case SCENE_CHOOSE_SIDES_TOURNAMENT:
         newHandler = new (nlMalloc(sizeof(SHChooseSides2), 8, false)) SHChooseSides2(SHChooseSides2::TOURNAMENT, movement);
         break;
-    case (SceneList)79:
+    case SCENE_HEALTH_WARNING:
         newHandler = new (nlMalloc(sizeof(HealthWarningSceneV2), 8, false)) HealthWarningSceneV2();
         break;
-    case (SceneList)80:
+    case SCENE_PAUSE:
         newHandler = new (nlMalloc(sizeof(PauseMenuScene), 8, false)) PauseMenuScene();
         break;
-    case (SceneList)81:
+    case SCENE_PAUSE_CHOOSE_SIDES:
         newHandler = new (nlMalloc(sizeof(SHChooseSides2), 8, false)) SHChooseSides2(SHChooseSides2::PAUSE, movement);
         break;
-    case (SceneList)82:
+    case SCENE_PAUSE_AUDIO_OPTIONS:
         newHandler = new (nlMalloc(sizeof(OptionsAudioMenuV2), 8, false)) OptionsAudioMenuV2(OPTIONS_CONTEXT_PAUSE);
         break;
-    case (SceneList)83:
+    case SCENE_PAUSE_VISUAL_OPTIONS:
         newHandler = new (nlMalloc(sizeof(OptionsVisualMenuV2), 8, false)) OptionsVisualMenuV2(OPTIONS_CONTEXT_PAUSE);
         break;
-    case (SceneList)84:
+    case SCENE_STRIKERS_101_PAUSE:
         newHandler = new (nlMalloc(sizeof(PauseMenuScene), 8, false)) PauseMenuScene();
         break;
-    case (SceneList)87:
+    case SCENE_LESSON_MOVIE:
         newHandler = new (nlMalloc(sizeof(LessonMoviePlayerScene), 8, false)) LessonMoviePlayerScene();
         break;
     case OVERLAY_HUD:
         newHandler = new (nlMalloc(sizeof(HUDOverlay), 8, false)) HUDOverlay();
         break;
-    case (SceneList)90:
+    case OVERLAY_IN_GAME_TEXT:
         newHandler = new (nlMalloc(sizeof(InGameTextOverlay), 8, false)) InGameTextOverlay();
         break;
-    case (SceneList)91:
+    case OVERLAY_POST_GAME_RESULTS:
         newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(PausePostGameScene::MODE_RESULTS);
         break;
-    case (SceneList)92:
+    case OVERLAY_POST_GAME_STATISTICS:
         newHandler = new (nlMalloc(sizeof(PausePostGameScene), 8, false)) PausePostGameScene(PausePostGameScene::MODE_STATISTICS);
         break;
-    case (SceneList)93:
+    case OVERLAY_ONLINE_RANKING:
         newHandler = new (nlMalloc(sizeof(OnlineRankingOverlay), 8, false)) OnlineRankingOverlay();
         break;
-    case (SceneList)94:
+    case OVERLAY_STRIKER_TIMES:
         newHandler = new (nlMalloc(sizeof(StrikerTimesOverlay), 8, false)) StrikerTimesOverlay();
         break;
-    case (SceneList)95:
+    case OVERLAY_GOAL:
         newHandler = new (nlMalloc(sizeof(GoalOverlay), 8, false)) GoalOverlay();
         break;
-    case (SceneList)96:
+    case OVERLAY_DEMO:
         newHandler = new (nlMalloc(sizeof(DemoOverlay), 8, false)) DemoOverlay();
         break;
-    case (SceneList)99:
+    case OVERLAY_LOADING:
         newHandler = new (nlMalloc(sizeof(BaseSceneHandler), 8, false)) BaseSceneHandler();
         break;
-    case (SceneList)100:
+    case OVERLAY_MEGA_STRIKE_METER:
         newHandler = new (nlMalloc(sizeof(MegaStrikeMeterOverlay), 8, false)) MegaStrikeMeterOverlay();
         break;
-    case (SceneList)101:
+    case OVERLAY_PIP:
         newHandler = new (nlMalloc(sizeof(PIPOverlay), 8, false)) PIPOverlay();
         break;
-    case (SceneList)102:
+    case OVERLAY_SUPER_ABILITY:
         newHandler = new (nlMalloc(sizeof(SuperAbilityOverlay), 8, false)) SuperAbilityOverlay();
         break;
-    case (SceneList)103:
+    case OVERLAY_CHALLENGE_PREVIEW:
         newHandler = new (nlMalloc(sizeof(ChallengePreviewOverlay), 8, false)) ChallengePreviewOverlay(movement);
         break;
-    case (SceneList)104:
+    case OVERLAY_CONTROLLER_MAP:
         newHandler = new (nlMalloc(sizeof(ControllerMapOverlay), 8, false)) ControllerMapOverlay();
         break;
-    case (SceneList)105:
+    case OVERLAY_DEFENSIVE_PLAY:
         newHandler = new (nlMalloc(sizeof(DefensivePlayOverlay), 8, false)) DefensivePlayOverlay();
         break;
     }

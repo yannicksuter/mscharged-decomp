@@ -1704,7 +1704,7 @@ int NetworkSession::ProcessMessage(
             StartNetworkedGame((NetMessageGameStart*)message);
         }
         mSessionState = NET_SESSION_LOADING;
-        GameSceneManager::Instance()->PopToScene((SceneList)0x1D);
+        GameSceneManager::Instance()->PopToScene(SCENE_NAVIGATION);
         for (int component = 0; component < 4; ++component)
         {
             GetPointerInstance(component)->SetActiveSlide("waiting", true, false);
@@ -1721,7 +1721,7 @@ int NetworkSession::ProcessMessage(
         if (((NetMessageDraft*)message)->mChooseSides != 0)
         {
             SHOnlineFriendsChooseSides* scene = (SHOnlineFriendsChooseSides*)
-                GameSceneManager::Instance()->Push((SceneList)0x38, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS_CHOOSE_SIDES, SCREEN_FORWARD, true);
             scene->SetDraftMessage(*(NetMessageDraft*)message);
         }
         else
@@ -1742,7 +1742,7 @@ int NetworkSession::ProcessMessage(
 
     case NETMSG_SIDES_CHANGED:
     {
-        BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene((SceneList)0x38);
+        BaseSceneHandler* scene = GameSceneManager::Instance()->GetScene(SCENE_ONLINE_FRIENDS_CHOOSE_SIDES);
         SHOnlineFriendsChooseSides* handler = 0;
         if (scene != 0)
         {
@@ -1765,7 +1765,7 @@ int NetworkSession::ProcessMessage(
         }
         FEMusic::StartStreamIfDifferent(8);
         OnlineConnectionQualityScene* scene = static_cast<OnlineConnectionQualityScene*>(
-            GameSceneManager::Instance()->Push((SceneList)0x39, SCREEN_FORWARD, true));
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_CONNECTION_QUALITY, SCREEN_FORWARD, true));
         scene->OnCheckConnection(static_cast<NetMessageCheckConnection*>(message));
         break;
     }
@@ -1773,7 +1773,7 @@ int NetworkSession::ProcessMessage(
     case NETMSG_CONNECTION_DECISION:
     {
         OnlineConnectionQualityScene* scene = static_cast<OnlineConnectionQualityScene*>(
-            GameSceneManager::Instance()->GetScene((SceneList)0x39));
+            GameSceneManager::Instance()->GetScene(SCENE_ONLINE_CONNECTION_QUALITY));
         if (scene != 0)
         {
             scene->OnConnectionDecision(static_cast<NetMessageConnectionDecision*>(message));

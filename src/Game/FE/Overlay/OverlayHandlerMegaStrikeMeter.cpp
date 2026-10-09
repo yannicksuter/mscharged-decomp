@@ -48,7 +48,7 @@ void MegaStrikeMeterOverlay::Update(float dt)
         mNumbers->m_bVisible = true;
     }
     if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED
-        && g_pOverlayManager->IsOnStack((SceneList)81))
+        && g_pOverlayManager->IsOnStack(SCENE_PAUSE_CHOOSE_SIDES))
     {
         if (mVisible == true)
         {

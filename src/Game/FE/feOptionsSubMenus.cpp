@@ -172,9 +172,9 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
         else if (mState == AUDIO_OPTIONS_EXITING_BACK)
         {
             if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
-                GameSceneManager::Instance()->Push((SceneList)13, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_OPTIONS, SCREEN_NOTHING, true);
             else
-                g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, true);
+                g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_NOTHING, true);
             return;
         }
     }
@@ -611,9 +611,9 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
         else if (mState == VISUAL_OPTIONS_EXITING_BACK)
         {
             if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
-                GameSceneManager::Instance()->Push((SceneList)13, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_OPTIONS, SCREEN_NOTHING, true);
             else
-                g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, true);
+                g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_NOTHING, true);
             return;
         }
     }

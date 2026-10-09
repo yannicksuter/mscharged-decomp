@@ -122,7 +122,7 @@ void NetworkDraft::BeginSortedDraft(NetMessageDraft* message)
     mFinalCountdown = s_fDefaultTimeFinalCountdown;
     mState = NET_DRAFT_CAPTAINS;
     gOnlineStartMatchmaking = 0;
-    GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_NOTHING, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_MATCHMAKING_DRAFT, SCREEN_NOTHING, true);
 }
 
 struct DraftMachineCursor
@@ -178,7 +178,7 @@ void NetworkDraft::BeginTeamDraft(NetMessageDraft* message)
     mTimeToChooseSidekicks = s_fDefaultTimeToChooseSidekicks;
     mFinalCountdown = s_fDefaultTimeFinalCountdown;
     mState = NET_DRAFT_CAPTAINS;
-    GameSceneManager::Instance()->Push((SceneList)0x32, SCREEN_FORWARD, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS_DRAFT, SCREEN_FORWARD, true);
 }
 
 struct DraftSidePlayer
@@ -558,12 +558,12 @@ void NetworkDraft::SendSidekickChoice()
     if (IsOnlineRankedMatch())
     {
         GameSceneManager::Instance()->Push(
-            (SceneList)0x31, SCREEN_NOTHING, true);
+            SCENE_ONLINE_MATCHMAKING_DRAFT, SCREEN_NOTHING, true);
     }
     else
     {
         GameSceneManager::Instance()->Push(
-            (SceneList)0x32, SCREEN_NOTHING, true);
+            SCENE_ONLINE_FRIENDS_DRAFT, SCREEN_NOTHING, true);
     }
 }
 

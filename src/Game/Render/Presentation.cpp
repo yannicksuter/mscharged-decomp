@@ -440,7 +440,7 @@ void HandlePresentationStateTransition(Presentation* presentation, u32 from, u32
 {
     if (to == 1)
     {
-        g_pOverlayManager->GetScene((SceneList)0x66)->SetVisible(false);
+        g_pOverlayManager->GetScene(OVERLAY_SUPER_ABILITY)->SetVisible(false);
     }
 }
 
@@ -1048,7 +1048,7 @@ void Presentation::HandleMegaStrikeResult(MegaStrikeEndData* __restrict data)
     int scoringSide = 1 - data->defendingSide;
     int teamScore;
     const char* gameEndFunction;
-    ((GoalOverlay*)g_pOverlayManager->GetScene((SceneList)0x5F))
+    ((GoalOverlay*)g_pOverlayManager->GetScene(OVERLAY_GOAL))
         ->UpdateCaptainS2SGoalInfo(scoringSide);
     NisPlayer::Instance()->mWinnerSide[NIS_GOAL_WINNER] = scoringSide;
 
@@ -1610,7 +1610,7 @@ void Presentation::PlayOverlay(
 
     if (nlStrCmp<char>("goal", name) == 0)
     {
-        mOverlayToDisplay = (SceneList)0x5F;
+        mOverlayToDisplay = OVERLAY_GOAL;
         mOverlayDelay = delay;
         mOverlayDisplayLength = length;
         mOverlayDisplayed = false;
@@ -1619,36 +1619,36 @@ void Presentation::PlayOverlay(
 
     if (nlStrCmp<char>("highlight", name) == 0)
     {
-        mOverlayToDisplay = (SceneList)0x5F;
+        mOverlayToDisplay = OVERLAY_GOAL;
         mOverlayDelay = delay;
         mOverlayDisplayLength = length;
         mOverlayDisplayed = false;
         GoalOverlay* scene = static_cast<GoalOverlay*>(
-            g_pOverlayManager->GetScene((SceneList)0x5F));
+            g_pOverlayManager->GetScene(OVERLAY_GOAL));
         scene->SetHighlightNumber(ReplayChoreo::Instance().GetHighlightNumber());
         return;
     }
 
     if (nlStrCmp<char>("end", name) == 0)
     {
-        mOverlayToDisplay = (SceneList)0x5F;
+        mOverlayToDisplay = OVERLAY_GOAL;
         mOverlayDelay = delay;
         mOverlayDisplayLength = length;
         mOverlayDisplayed = false;
         GoalOverlay* scene = static_cast<GoalOverlay*>(
-            g_pOverlayManager->GetScene((SceneList)0x5F));
+            g_pOverlayManager->GetScene(OVERLAY_GOAL));
         scene->DoMatchEndOverlay();
         return;
     }
 
     if (nlStrCmp<char>("cup", name) == 0)
     {
-        mOverlayToDisplay = (SceneList)0x5F;
+        mOverlayToDisplay = OVERLAY_GOAL;
         mOverlayDelay = delay;
         mOverlayDisplayLength = length;
         mOverlayDisplayed = false;
         GoalOverlay* scene = static_cast<GoalOverlay*>(
-            g_pOverlayManager->GetScene((SceneList)0x5F));
+            g_pOverlayManager->GetScene(OVERLAY_GOAL));
         if (sUseCupTrophy)
         {
             scene->DoCupWinOverlay(sCupTrophy);
@@ -1662,7 +1662,7 @@ void Presentation::PlayOverlay(
 
     if (nlStrCmp<char>("megastrike", name) == 0)
     {
-        mOverlayToDisplay = (SceneList)0x5F;
+        mOverlayToDisplay = OVERLAY_GOAL;
         mOverlayDelay = delay;
         mOverlayDisplayLength = length;
         mOverlayDisplayed = false;

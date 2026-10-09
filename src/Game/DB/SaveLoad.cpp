@@ -115,7 +115,7 @@ static inline u32 SaveFileSize()
 
 static inline FEPopupMenu* PushSavePopup()
 {
-    return (FEPopupMenu*)SaveSceneManager->Push((SceneList)10, SCREEN_NOTHING, false);
+    return (FEPopupMenu*)SaveSceneManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
 }
 
 static inline void WriteLocalizedBanner(NANDResultCallback callback)

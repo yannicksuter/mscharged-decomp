@@ -75,7 +75,7 @@ void ChallengePreviewOverlay::Update(float fDeltaT)
             }
             else
             {
-                g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+                g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
             }
         }
     }

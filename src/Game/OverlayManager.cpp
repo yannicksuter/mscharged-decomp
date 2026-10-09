@@ -198,7 +198,7 @@ void OverlayManager::ShowDemoSlide()
 {
     if (!mIsDemoSlideVisible)
     {
-        BaseSceneHandler* scene = GetScene((SceneList)96);
+        BaseSceneHandler* scene = GetScene(OVERLAY_DEMO);
         if (scene != 0)
         {
             scene->SetVisible(true);
@@ -209,7 +209,7 @@ void OverlayManager::ShowDemoSlide()
 
 void OverlayManager::RestartGoalOverlay()
 {
-    ((GoalOverlay*)GetScene((SceneList)95))->Restart();
+    ((GoalOverlay*)GetScene(OVERLAY_GOAL))->Restart();
 }
 
 void OverlayManager::OnGetReadyForKickoff()
@@ -218,7 +218,7 @@ void OverlayManager::OnGetReadyForKickoff()
 
 void OverlayManager::OnKickoff()
 {
-    static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)90, false, false);
+    static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_IN_GAME_TEXT, false, false);
 }
 
 void OverlayManager::OnGameOver()
@@ -232,12 +232,12 @@ void OverlayManager::OnGameOver()
 
     if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY)
     {
-        SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false));
+        SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push(OVERLAY_POST_GAME_RESULTS, SCREEN_NOTHING, false));
         scene->SetDisplayMode(NEWS_FRIENDLY_RESULTS);
     }
     else if (GameInfoManager::Instance()->IsInMode4())
     {
-        SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push((SceneList)77, SCREEN_NOTHING, false));
+        SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push(SCENE_CHALLENGE_NEWS, SCREEN_NOTHING, false));
         if (scene != 0)
         {
             scene->SetDisplayMode(NEWS_CHALLENGE_RESULTS);
@@ -245,7 +245,7 @@ void OverlayManager::OnGameOver()
     }
     else
     {
-        SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false));
+        SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push(OVERLAY_POST_GAME_RESULTS, SCREEN_NOTHING, false));
         scene->SetDisplayMode(NEWS_MATCH_SUMMARY);
     }
 
@@ -257,14 +257,14 @@ void OverlayManager::OnGameOver()
 void OverlayManager::OnMegaStrikeMeterStart(MegaStrikeMeterData* eventData)
 {
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();
-    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene(OVERLAY_MEGA_STRIKE_METER));
     overlay->SetVisible(true);
     overlay->Start(eventData->pFielder);
 }
 
 void OverlayManager::OnMegaStrikeMeterEnd()
 {
-    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene(OVERLAY_MEGA_STRIKE_METER));
     overlay->SetVisible(false);
     if (!overlay->mMegaStrikeStarted)
     {
@@ -274,13 +274,13 @@ void OverlayManager::OnMegaStrikeMeterEnd()
 
 void OverlayManager::OnMegaStrikeMeterFirst(MegaStrikeMeterData* eventData)
 {
-    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene(OVERLAY_MEGA_STRIKE_METER));
     overlay->SetFirstResult(eventData->fMeterValue);
 }
 
 void OverlayManager::OnMegaStrikeMeterSecond(MegaStrikeMeterData* eventData)
 {
-    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* overlay = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene(OVERLAY_MEGA_STRIKE_METER));
     overlay->SetSecondResult(eventData->fMeterValue);
 }
 
@@ -301,7 +301,7 @@ void OverlayManager::OnMegastrikeEnd(MegaStrikeEndData* eventData)
 
 void OverlayManager::SetMegaStrikeMeterPosition(nlVector3 position)
 {
-    MegaStrikeMeterOverlay* ov = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene((SceneList)100));
+    MegaStrikeMeterOverlay* ov = static_cast<MegaStrikeMeterOverlay*>(g_pOverlayManager->GetScene(OVERLAY_MEGA_STRIKE_METER));
     ov->SetPosition(position);
 }
 

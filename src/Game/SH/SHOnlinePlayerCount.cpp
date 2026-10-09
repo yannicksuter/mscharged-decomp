@@ -131,7 +131,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
     if (!GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
         && g_pFriendManager->FindHostInvitation())
     {
-        SceneList invitationScene = (mMode == ModeRanked) ? (SceneList)0x29 : (SceneList)0x2A;
+        SceneList invitationScene = (mMode == ModeRanked) ? SCENE_ONLINE_RANKED : SCENE_ONLINE_UNRANKED;
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = invitationScene;
         friendManager->mPreviousRankedMode = 0;
@@ -328,7 +328,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)0x18, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_NETWORK_START, SCREEN_FORWARD, true);
         }
         break;
     case ButtonTwoLocalPlayers:
@@ -339,7 +339,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)0x18, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_NETWORK_START, SCREEN_FORWARD, true);
         }
         break;
     case 2:

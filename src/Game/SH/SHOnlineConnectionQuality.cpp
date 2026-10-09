@@ -486,12 +486,12 @@ void OnlineConnectionQualityScene::CloseConnectionsAndReturn()
         tDebugPrintManager::Print(DC_NETWORK,
             "Adding rejected PID %d to last rejected PIDS Q size now %d\n",
             profileId, gRejectedOpponentProfileIds.GetCount());
-        GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_MATCHMAKING_DRAFT, SCREEN_BACK, true);
     }
     else if (isHost)
     {
         SHOnlineInvitePlayers* scene = static_cast<SHOnlineInvitePlayers*>(
-            GameSceneManager::Instance()->Push((SceneList)0x2C, SCREEN_NOTHING, true));
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true));
         scene->mIsHost = true;
         scene->mStartFriendServer = true;
     }

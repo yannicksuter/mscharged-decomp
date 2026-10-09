@@ -238,7 +238,7 @@ void FrontEndPresentation::DoFunctionCall(unsigned int function)
         break;
     }
     case 26:
-        GameSceneManager::Instance()->Push((SceneList)8, SCREEN_FORWARD, false);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDES_STRIKER_CUP, SCREEN_FORWARD, false);
         break;
     case 27:
     {

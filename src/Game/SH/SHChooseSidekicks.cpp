@@ -404,10 +404,10 @@ void ChooseSidekicksSceneV2::Update(float dt)
             if (mSceneType == ChooseCaptainsSceneV2::ST_STRIKER_CUP)
             {
                 FrontEndPresentation::GetInstance()->Call("RemoveStrikerCupCaptainHologram");
-                GameSceneManager::Instance()->Push((SceneList)6, SCREEN_BACK, true);
+                GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_STRIKER_CUP, SCREEN_BACK, true);
             }
             else
-                GameSceneManager::Instance()->Push((SceneList)2, SCREEN_BACK, true);
+                GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_BACK, true);
             return;
         }
     }
@@ -1224,12 +1224,12 @@ void ChooseSidekicksSceneV2::SubmitSidekickChoice()
     {
         mReadyPressed[0] = false;
         mCaptainComponents[0].SetReadyPromptVisible(false);
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, true);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
         popup->Create((ePopupMenu)0x39, Function<FnVoidVoid>(StartCupNormalSkill), Function<FnVoidVoid>(StartCupHighestSkill));
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)0x4, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDES_DOMINATION, SCREEN_FORWARD, true);
     }
 }
 
@@ -1285,7 +1285,7 @@ static void StartCupNormalSkill()
     {
         navigation->HideButtons();
     }
-    CupNewsScene* news = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)0x27, SCREEN_NOTHING, false);
+    CupNewsScene* news = (CupNewsScene*)GameSceneManager::Instance()->Push(SCENE_CUP_NEWS, SCREEN_NOTHING, false);
     news->SetDisplayMode(NEWS_CUP_START);
     for (int i = 0; i < 4; ++i)
     {
@@ -1306,7 +1306,7 @@ static void StartCupHighestSkill()
     {
         navigation->HideButtons();
     }
-    CupNewsScene* news = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)0x27, SCREEN_NOTHING, false);
+    CupNewsScene* news = (CupNewsScene*)GameSceneManager::Instance()->Push(SCENE_CUP_NEWS, SCREEN_NOTHING, false);
     news->SetDisplayMode(NEWS_CUP_START);
     for (int i = 0; i < 4; ++i)
     {
@@ -1456,7 +1456,7 @@ void ChooseSidekicksSceneV2::OnDisconnectDismissed()
 {
     mPopupActive = false;
     FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
-    GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_BACK, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_BACK, true);
 }
 
 void ChooseSidekicksSceneV2::ReleaseController(int index)
@@ -1478,9 +1478,9 @@ inline void ChooseSidekicksSceneV2::ShowDisconnectedError()
 {
     g_pNetworkSession->GetOnlineLobby()->CloseConnectionsAndReset();
     NetworkDraft::Instance()->UnregisterMessageReceivers();
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x60, Function<FnVoidVoid>(Bind<void>(MemFun(&ChooseSidekicksSceneV2::OnDisconnectDismissed), this)));
         mPopupActive = true;
     }

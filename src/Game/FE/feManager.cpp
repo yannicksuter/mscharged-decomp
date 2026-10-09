@@ -177,22 +177,22 @@ void FrontEnd::EnterMenuState(FrontEnd::MenuEnterType menuType)
     case MET_PAUSE:
         if (nlSingleton<GameInfoManager>::Instance()->mIsInStrikers101Mode)
         {
-            g_pOverlayManager->Push((SceneList)0x54, SCREEN_NOTHING, false);
+            g_pOverlayManager->Push(SCENE_STRIKERS_101_PAUSE, SCREEN_NOTHING, false);
         }
         else if (nlSingleton<GameInfoManager>::Instance()->IsInMode4()
                  && !sInitialModePauseMenuShown)
         {
-            g_pOverlayManager->Push((SceneList)0x67, SCREEN_FORWARD, false);
+            g_pOverlayManager->Push(OVERLAY_CHALLENGE_PREVIEW, SCREEN_FORWARD, false);
         }
         else
         {
-            g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, false);
+            g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_NOTHING, false);
         }
         PauseMenuScene::mControllingInput = FE_ALL_PADS;
         break;
 
     case MET_CHOOSESIDES:
-        g_pOverlayManager->Push((SceneList)0x51, SCREEN_NOTHING, false);
+        g_pOverlayManager->Push(SCENE_PAUSE_CHOOSE_SIDES, SCREEN_NOTHING, false);
         PauseMenuScene::mControllingInput = FE_ALL_PADS;
         break;
 

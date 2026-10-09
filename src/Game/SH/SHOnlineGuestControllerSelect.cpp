@@ -179,7 +179,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             }
             else if (IsOnlineRankedMatch())
             {
-                GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_MATCHMAKING_DRAFT, SCREEN_FORWARD, true);
             }
             else
             {
@@ -197,7 +197,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             }
             else
             {
-                SceneList nextScene = IsOnlineRankedMatch() ? (SceneList)0x29 : (SceneList)0x2A;
+                SceneList nextScene = IsOnlineRankedMatch() ? SCENE_ONLINE_RANKED : SCENE_ONLINE_UNRANKED;
                 GameSceneManager::Instance()->Push(nextScene, SCREEN_NOTHING, true);
             }
             SetOnlineTwoLocalPlayers(false);

@@ -675,7 +675,7 @@ void cGame::StartSlowDown(float timeScale, float transitionTime)
                 ApplyAudioTransition(&hash, 0, 0);
             }
 
-            g_pOverlayManager->GetScene((SceneList)89)->SetVisible(false);
+            g_pOverlayManager->GetScene(OVERLAY_HUD)->SetVisible(false);
             gpNumberDisplay->mVisible = false;
 
             if (transitionTime <= 0.0f)
@@ -1285,7 +1285,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
                 PlaySound(10, 0x54A8A6A0, 0, 0);
                 u32 hash = nlStringLowerHash("Slow-mo_Captain_Hit");
                 ApplyAudioTransition(&hash, true, 0);
-                g_pOverlayManager->GetScene((SceneList)89)->SetVisible(true);
+                g_pOverlayManager->GetScene(OVERLAY_HUD)->SetVisible(true);
                 gpNumberDisplay->mVisible = true;
             }
         }
@@ -2269,7 +2269,7 @@ void cGame::ResumeAfterPresentation()
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_HUD, true, true);
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDIn(0.25f);
-    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->DisplayNewScore();
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->DisplayNewScore();
 
     if (mpWeatherManager != 0)
     {

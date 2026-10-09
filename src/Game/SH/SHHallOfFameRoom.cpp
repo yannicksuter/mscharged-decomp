@@ -520,7 +520,7 @@ void SHHallOfFameCup::OnProgressPointerPress(unsigned int, void*)
 void SHHallOfFameCup::ShowLockedItemMessage(unsigned int item)
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-        (SceneList)0xA, SCREEN_NOTHING, false);
+        SCENE_POPUP_MENU, SCREEN_NOTHING, false);
 
     ePopupMenu type = INVALID_TYPE;
     if (item == 0)

@@ -66,9 +66,9 @@ void SHStrikerTimesChallenge::SetDisplayMode(unsigned int transition)
 void SHStrikerTimesChallenge::OnBackTransitionComplete()
 {
     GameSceneManager* manager = GameSceneManager::Instance();
-    SceneList sceneID = (SceneList)75;
+    SceneList sceneID = SCENE_CHALLENGE_SELECT;
     if (g_pStrikerChallenge->mCurrentChallenge < 10)
-        sceneID = (SceneList)76;
+        sceneID = SCENE_STRIKERS_101_SELECT;
     ChallengeSelectScene* scene = static_cast<ChallengeSelectScene*>(manager->Push(sceneID, SCREEN_BACK, true));
     if (scene != 0)
         scene->mChallengeOffset = g_pStrikerChallenge->mChallengeOffset;
@@ -192,7 +192,7 @@ void SHStrikerTimesChallenge::Update(float dt)
             gTweakFileLoader.mCount = 0;
             g_pStrikerChallenge->LoadSettings();
             FrontEndPresentation::GetInstance()->Call("TransitionToStrikerChallengeChooseSides");
-            GameSceneManager::Instance()->Push((SceneList)78, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDES_TOURNAMENT, SCREEN_FORWARD, true);
             return;
         }
         return;

@@ -564,10 +564,10 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         WStr optionsName;
         int menu = -1;
         if (fn_801CA660() != 0)
-            menu = ((OptionsSubMenu*)fn_801CA660()->GetScene((SceneList)13))->fn_801CAA10();
-        else if (GetOverlayManager()->GetScene((SceneList)82) != 0)
+            menu = ((OptionsSubMenu*)fn_801CA660()->GetScene(SCENE_OPTIONS))->fn_801CAA10();
+        else if (GetOverlayManager()->GetScene(SCENE_PAUSE_AUDIO_OPTIONS) != 0)
             menu = 1;
-        else if (GetOverlayManager()->GetScene((SceneList)83) != 0)
+        else if (GetOverlayManager()->GetScene(SCENE_PAUSE_VISUAL_OPTIONS) != 0)
             menu = 2;
         switch (menu)
         {

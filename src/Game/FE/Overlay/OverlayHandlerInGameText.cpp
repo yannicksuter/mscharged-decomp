@@ -149,8 +149,8 @@ void InGameTextOverlay::Update(float fDeltaT)
     if (mCurrentSlideName == SLIDE_NAME_TEXT_WINNER
         && g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0) && mVisible)
     {
-        static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible((SceneList)90, false, false);
-        g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false);
+        static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_IN_GAME_TEXT, false, false);
+        g_pOverlayManager->Push(OVERLAY_POST_GAME_RESULTS, SCREEN_NOTHING, false);
     }
 }
 

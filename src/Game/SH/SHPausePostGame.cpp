@@ -189,7 +189,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
     SHStrikerTimesBase::OnDoneTransitionComplete();
     if (mMode == MODE_STATISTICS)
     {
-        BaseSceneHandler* scene = g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+        BaseSceneHandler* scene = g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
         // The retail caller writes this byte in the returned pause scene.
         reinterpret_cast<u8*>(scene)[0x241] = true;
     }
@@ -200,7 +200,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
         navigation->mTimer->m_bVisible = false;
         if (NetTournManager::Instance()->mState != 0)
         {
-            g_pOverlayManager->Push((SceneList)93, SCREEN_NOTHING, true);
+            g_pOverlayManager->Push(OVERLAY_ONLINE_RANKING, SCREEN_NOTHING, true);
         }
         else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY)
         {
@@ -213,7 +213,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
             else if (mIsNetworkGame && IsOnlineRankedMatch())
             {
                 SetPointerEnabled(true);
-                g_pOverlayManager->Push((SceneList)93, SCREEN_NOTHING, true);
+                g_pOverlayManager->Push(OVERLAY_ONLINE_RANKING, SCREEN_NOTHING, true);
             }
             else
             {

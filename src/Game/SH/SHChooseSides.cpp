@@ -535,7 +535,7 @@ void SHChooseSides2::LeaveScene()
         }
         FrontEndPresentation::GetInstance()->Call("TransitionFromStrikerChallengeChooseSides");
         SHStrikerTimesChallenge* scene = static_cast<SHStrikerTimesChallenge*>(GameSceneManager::Instance()->Push(
-            (SceneList)77, SCREEN_BACK, false));
+            SCENE_CHALLENGE_NEWS, SCREEN_BACK, false));
         if (scene != 0)
         {
             scene->SetDisplayMode(NEWS_CHALLENGE_BRIEFING);
@@ -550,7 +550,7 @@ void SHChooseSides2::LeaveScene()
             GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             SetPointerColour(i, white);
         }
-        GameSceneManager::Instance()->Push((SceneList)3, SCREEN_BACK, false);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDEKICKS_DOMINATION, SCREEN_BACK, false);
         FEAudio::PlayAnimAudioEvent(0xF8F6BB3C, 0, 0, 1);
     }
     else
@@ -834,7 +834,7 @@ void SHChooseSides2::Proceed()
     else if (mContext != PAUSE)
     {
         FEAudio::PlayAnimAudioEvent(0x64B85E8D, 0, 0, 1);
-        GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_STADIUM, SCREEN_FORWARD, true);
     }
     else
     {
@@ -845,7 +845,7 @@ void SHChooseSides2::Proceed()
             GameInfoManager::Instance()->mCurrentDifficulty[1],
             4,
             false);
-        g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+        g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
     }
 
     FrontEnd::SetControllerState();
@@ -893,14 +893,14 @@ void SHChooseSides2::OnHelpPointerPress(unsigned int, void*)
     if (mContext == PAUSE)
     {
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mAllPointersActive = true;
     }
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mAllPointersActive = true;
     }
@@ -1060,7 +1060,7 @@ bool SHChooseSides2::RemoveDisconnectedControllers(bool playSound)
         }
 
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x3C, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mAllPointersActive = true;
     }

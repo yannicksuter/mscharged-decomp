@@ -170,7 +170,7 @@ void SHGameplayOptions::Update(float dt)
                 if (gameInfo->mOnlineTwoLocalPlayers)
                     GameSceneManager::Instance()->Push(SCENE_ONLINE_GUEST_CONTROLLER_SELECT, SCREEN_NOTHING, true);
                 else
-                    GameSceneManager::Instance()->Push((SceneList)42, SCREEN_NOTHING, true);
+                    GameSceneManager::Instance()->Push(SCENE_ONLINE_UNRANKED, SCREEN_NOTHING, true);
             }
             else
             {
@@ -195,7 +195,7 @@ void SHGameplayOptions::Update(float dt)
     }
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     if (gameInfo->UseAltRules()
-        && !GameSceneManager::Instance()->IsOnStack((SceneList)10)
+        && !GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
         && g_pFriendManager->FindHostInvitation())
     {
         if (GameSceneManager::Instance()->IsOnStack(SCENE_OPTIONS_CHEATS_LIST))
@@ -203,7 +203,7 @@ void SHGameplayOptions::Update(float dt)
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = 27;
         friendManager->mPreviousRankedMode = 0;
-        GameSceneManager::Instance()->Push((SceneList)52, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_RESPONSE, SCREEN_FORWARD, true);
         return;
     }
     for (int i = 0; i < 4; ++i)
@@ -699,13 +699,13 @@ void SHGameplayOptions::CommitSettings()
         GameInfoManager::Instance()->mNoCheatSettings = mSettings;
         GameInfoManager::Instance()->mUserInfo.mAltCheatOptions = mPowerupSettings;
         GameInfoManager::Instance()->mRulesA = mPowerupSettings;
-        GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_STADIUM, SCREEN_FORWARD, true);
     }
     else
     {
         gameInfo->mUserInfo.mGameplayOptions = mSettings;
         GameInfoManager::Instance()->mUserInfo.mCheatOptions = mPowerupSettings;
-        GameSceneManager::Instance()->Push((SceneList)2, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_CAPTAINS_DOMINATION, SCREEN_FORWARD, true);
     }
 }
 

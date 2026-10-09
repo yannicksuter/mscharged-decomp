@@ -1210,27 +1210,27 @@ void CupManager::ShowRoundNews()
     int state = mState;
     if (roundType == CUP_ROUND_LEAGUE && round == (mCurrentCup->GetNumRegularRounds() >> 1))
     {
-        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
+        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(SCENE_CUP_NEWS, SCREEN_NOTHING, false);
         scene->SetDisplayMode(NEWS_MIDSEASON);
     }
     else if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == CUP_STATE_NOT_QUALIFIED)
     {
-        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
+        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(SCENE_CUP_NEWS, SCREEN_NOTHING, false);
         scene->SetDisplayMode(NEWS_QUALIFICATION);
     }
     else if ((roundType == CUP_ROUND_FINALS && round == 0) || state == CUP_STATE_ELIMINATED)
     {
-        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
+        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(SCENE_CUP_NEWS, SCREEN_NOTHING, false);
         scene->SetDisplayMode(NEWS_KNOCKOUT_RESULT);
     }
     else if (round == -5)
     {
-        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
+        CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(SCENE_CUP_NEWS, SCREEN_NOTHING, false);
         scene->SetDisplayMode(NEWS_CUP_FINAL_RESULT);
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, false);
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, false);
     }
 }
 

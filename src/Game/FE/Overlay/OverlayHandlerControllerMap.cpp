@@ -178,5 +178,5 @@ void ControllerMapOverlay::OnDonePointerPress(int index, void*)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+    g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
 }

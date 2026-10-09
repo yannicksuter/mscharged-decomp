@@ -378,7 +378,7 @@ void StadiumSelectScene::Update(float deltaTime)
             }
 
             if (GameInfoManager::Instance()->UseAltRules()
-                && !GameSceneManager::Instance()->IsOnStack((SceneList)10)
+                && !GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
                 && g_pFriendManager->FindHostInvitation())
             {
                 FriendManager* manager = g_pFriendManager;
@@ -470,7 +470,7 @@ void StadiumSelectScene::OnSelectStadium(int, void*)
             FEAudio::PlayAnimAudioEvent(0xBF2ED62D, 0, 0, true);
             FrontEndPresentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
             GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
-            SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_NOTHING, true);
+            SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true);
             scene->mIsHost = true;
             scene->mStartFriendServer = true;
         }

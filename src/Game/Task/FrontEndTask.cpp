@@ -232,7 +232,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
                 {
                     if (!GameSceneManager::Instance()->IsOnStack(SCENE_TITLE))
                     {
-                        GameSceneManager::Instance()->PopToScene((SceneList)0x19);
+                        GameSceneManager::Instance()->PopToScene(SCENE_ASYNC_LOADING);
                         FESceneManager::Instance()->ForceImmediateStackProcessing();
                         GameSceneManager::Instance()->Push(SCENE_TITLE, SCREEN_NOTHING, false);
                         FrontEndPresentation::GetInstance()->Call("StartTitleScreenSequence");

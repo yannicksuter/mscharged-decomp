@@ -568,9 +568,9 @@ void SHOnlineInvitePlayers::InitializeButtons()
 
 inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitationErrorDismissed), this)));
         mPopupActive = true;
     }
@@ -578,9 +578,9 @@ inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
 
 inline void SHOnlineInvitePlayers::ShowLobbyError(int popup)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnLobbyErrorDismissed), this)));
         mPopupActive = true;
     }
@@ -606,7 +606,7 @@ void SHOnlineInvitePlayers::OnInvitePointerPress(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     SetOnlineFriendSelectionMode(1);
     SetOnlineFriendSelectionContext(context);
-    GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS, SCREEN_FORWARD, true);
 }
 
 void SHOnlineInvitePlayers::OnCancelPointerEnter(int index, void* context)
@@ -670,7 +670,7 @@ void SHOnlineInvitePlayers::OnLobbyErrorDismissed()
     }
     if (mIsHost)
     {
-        GameSceneManager::Instance()->Push((SceneList)5, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_STADIUM, SCREEN_BACK, true);
         return;
     }
     g_pFriendManager->SetOwnStatusAvailable();

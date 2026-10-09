@@ -70,7 +70,7 @@ void CupNewsScene::OnDoneTransitionComplete()
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, true);
     }
 }
 

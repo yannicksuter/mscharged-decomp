@@ -317,7 +317,7 @@ bool DesireSuperPower::Initialize(void* context)
         if (fielder->m_pBall != 0 && g_pGame->IsGameplayOrOvertime())
         {
             gSuperAbilityTeam = (eTeamID)GameInfoManager::Instance()->GetTeam(fielder->m_pTeam->m_nSide);
-            ((SuperAbilityOverlay*)g_pOverlayManager->GetScene((SceneList)102))->Start();
+            ((SuperAbilityOverlay*)g_pOverlayManager->GetScene(OVERLAY_SUPER_ABILITY))->Start();
             PlaySound(fielder->m_uSoundSlotId, 0x790F135F, 0, 0);
             fn_80060A00(g_pGame, fielder);
         }

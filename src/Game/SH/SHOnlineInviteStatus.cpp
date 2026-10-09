@@ -136,7 +136,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
         }
         else if (gOnlineFourMachineFriendLobby && lobby->AreAllConnectionsReady())
         {
-            SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)0x2C, SCREEN_NOTHING, true);
+            SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true);
             scene->mIsHost = false;
             scene->mStartFriendServer = true;
         }

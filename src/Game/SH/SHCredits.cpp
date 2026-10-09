@@ -35,7 +35,7 @@ enum eCreditsPhase
     CREDITS_FINISHED = 4,
 };
 
-SceneList CreditScene::mNextScene = (SceneList)13;
+SceneList CreditScene::mNextScene = SCENE_OPTIONS;
 
 CreditScene::CreditScene()
     : mAreCreditsOver(false)
@@ -144,7 +144,7 @@ void CreditScene::SetupForPhase()
     case CREDITS_FINISHED:
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
         GameSceneManager::Instance()->Push(mNextScene, SCREEN_NOTHING, true);
-        if (mNextScene == (SceneList)13)
+        if (mNextScene == SCENE_OPTIONS)
         {
             FEMusic::StartStreamIfDifferent(1);
         }
@@ -152,7 +152,7 @@ void CreditScene::SetupForPhase()
         {
             FEMusic::StartStreamIfDifferent(0);
         }
-        mNextScene = (SceneList)13;
+        mNextScene = SCENE_OPTIONS;
         {
             BasicStadium* pStadium = BasicStadium::GetCurrentStadium();
             pStadium->m_bRenderingEnabled = true;

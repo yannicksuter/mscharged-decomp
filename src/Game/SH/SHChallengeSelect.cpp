@@ -241,7 +241,7 @@ void ChallengeSelectScene::Update(float dt)
         else if (mState == CHALLENGE_SELECT_TRANSITIONING)
         {
             SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(
-                GameSceneManager::Instance()->Push((SceneList)0x4D, SCREEN_NOTHING, true));
+                GameSceneManager::Instance()->Push(SCENE_CHALLENGE_NEWS, SCREEN_NOTHING, true));
             g_pStrikerChallenge->mChallengeOffset = mChallengeOffset;
             if (scene != 0)
             {

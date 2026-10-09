@@ -453,14 +453,14 @@ void CupFinalRoundsScene::OnMatchupPointerPress(unsigned int, void* context)
     if (game->mFinalScore[0] != 0 || game->mFinalScore[1] != 0)
     {
         GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(
-            (SceneList)0x21, SCREEN_NOTHING, false);
+            SCENE_GAME_RESULTS, SCREEN_NOTHING, false);
         results->SetResultsData(game, this, 0);
         results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
     }
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)0xA, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
     }
 }

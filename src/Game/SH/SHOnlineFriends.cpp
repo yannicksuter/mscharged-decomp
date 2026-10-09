@@ -245,7 +245,7 @@ void SHOnlineFriends::Update(float dt)
         {
             if (IsOnlineFriendSelectionMode())
             {
-                GameSceneManager::Instance()->Push((SceneList)44, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true);
                 SetOnlineFriendSelectionMode(false);
             }
             else
@@ -563,7 +563,7 @@ inline void SHOnlineFriends::ShowError(int error)
 
 inline void SHOnlineFriends::StartFriendInvite()
 {
-    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);
+    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_FORWARD, true);
     scene->mIsHost = true;
     scene->mStartFriendServer = false;
     SetOnlineFriendSelectionMode(false);

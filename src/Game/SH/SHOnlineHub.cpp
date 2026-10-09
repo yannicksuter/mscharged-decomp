@@ -151,11 +151,11 @@ void SHOnlineHub::Update(float dt)
             {
             case ONLINE_HUB_FRIEND_MATCH:
                 if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
-                    GameSceneManager::Instance()->Push((SceneList)42, SCREEN_FORWARD, true);
+                    GameSceneManager::Instance()->Push(SCENE_ONLINE_UNRANKED, SCREEN_FORWARD, true);
                 break;
-            case ONLINE_HUB_RANKED_MATCH: GameSceneManager::Instance()->Push((SceneList)41, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_RANKED_MATCH: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKED, SCREEN_FORWARD, true); break;
             case ONLINE_HUB_RANKINGS: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKING, SCREEN_FORWARD, true); break;
-            case ONLINE_HUB_FRIENDS: GameSceneManager::Instance()->Push((SceneList)47, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_FRIENDS: GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS, SCREEN_FORWARD, true); break;
             }
             return;
         }

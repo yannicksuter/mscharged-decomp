@@ -144,7 +144,7 @@ void CycleHallOfFameCup(int mode, bool advance)
         {
             PushPresentationCamera("43hofbronze", 0, 0.5f, true);
         }
-        GameSceneManager::Instance()->Push((SceneList)62, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_CUP, SCREEN_NOTHING, true);
         break;
     case HOF_STRIKER_CUP:
         if (wideScreen)
@@ -155,7 +155,7 @@ void CycleHallOfFameCup(int mode, bool advance)
         {
             PushPresentationCamera("43hofgold", 0, 0.5f, true);
         }
-        GameSceneManager::Instance()->Push((SceneList)63, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_CUP, SCREEN_NOTHING, true);
         break;
     case HOF_CRYSTAL_CUP:
         if (wideScreen)
@@ -166,7 +166,7 @@ void CycleHallOfFameCup(int mode, bool advance)
         {
             PushPresentationCamera("43hofsilver", 0, 0.5f, true);
         }
-        GameSceneManager::Instance()->Push((SceneList)64, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_CUP, SCREEN_NOTHING, true);
         break;
     }
 }
@@ -177,39 +177,39 @@ void ShowHallOfFameTrophy(int camera)
     {
     case HOF_FIRE_CUP_HISTORY:
         PushPresentationCamera("trophycentreofbronzehof", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)66, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_CUP_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_STRIKER_CUP_HISTORY:
         PushPresentationCamera("trophycentreofgoldhof", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)69, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_CUP_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_CRYSTAL_CUP_HISTORY:
         PushPresentationCamera("trophycentreofsilverhof", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)72, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_CUP_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_FIRE_GOLDEN_BOOT_HISTORY:
         PushPresentationCamera("trophyrightofbronze", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)67, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_GOLDEN_BOOT_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_FIRE_BRICK_WALL_HISTORY:
         PushPresentationCamera("trophyleftofbronze", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)68, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_BRICK_WALL_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_STRIKER_GOLDEN_BOOT_HISTORY:
         PushPresentationCamera("trophyrightofgold", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)70, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_GOLDEN_BOOT_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_STRIKER_BRICK_WALL_HISTORY:
         PushPresentationCamera("trophyleftofgold", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)71, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_BRICK_WALL_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_CRYSTAL_GOLDEN_BOOT_HISTORY:
         PushPresentationCamera("trophyrightofsilver", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)73, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_GOLDEN_BOOT_HISTORY, SCREEN_NOTHING, true);
         break;
     case HOF_CRYSTAL_BRICK_WALL_HISTORY:
         PushPresentationCamera("trophyleftofsilver", 0, 0.5f, true);
-        GameSceneManager::Instance()->Push((SceneList)74, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_BRICK_WALL_HISTORY, SCREEN_NOTHING, true);
         break;
     }
 
@@ -219,7 +219,7 @@ void ShowHallOfFameTrophy(int camera)
 void ShowHallOfFamePlayerCard(int camera)
 {
     sHallOfFamePlayerCardIndex = camera;
-    GameSceneManager::Instance()->Push((SceneList)65, SCREEN_NOTHING, true);
+    GameSceneManager::Instance()->Push(SCENE_HOF_PLAYER_CARDS, SCREEN_NOTHING, true);
 }
 
 void CycleHallOfFameDetailPage(int mode, bool advance)
@@ -229,35 +229,35 @@ void CycleHallOfFameDetailPage(int mode, bool advance)
     case HOF_TROPHY_SUMMARY:
         if (advance)
         {
-            GameSceneManager::Instance()->Push((SceneList)60, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_UNLOCK_SUMMARY, SCREEN_NOTHING, true);
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)61, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_CHALLENGE_SUMMARY, SCREEN_NOTHING, true);
         }
         break;
     case HOF_UNLOCK_SUMMARY:
         if (advance)
         {
-            GameSceneManager::Instance()->Push((SceneList)61, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_CHALLENGE_SUMMARY, SCREEN_NOTHING, true);
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)59, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_TROPHY_SUMMARY, SCREEN_NOTHING, true);
         }
         break;
     case HOF_CHALLENGE_SUMMARY:
         if (advance)
         {
-            GameSceneManager::Instance()->Push((SceneList)59, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_TROPHY_SUMMARY, SCREEN_NOTHING, true);
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)60, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_UNLOCK_SUMMARY, SCREEN_NOTHING, true);
         }
         break;
     default:
-        GameSceneManager::Instance()->Push((SceneList)59, SCREEN_NOTHING, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_TROPHY_SUMMARY, SCREEN_NOTHING, true);
         sHallOfFameReturnMode = mode;
         break;
     }
@@ -288,7 +288,7 @@ void LeaveHallOfFamePage(int mode)
         {
             PushPresentationCamera("43hofbronze", 0, 0.5f, true);
         }
-        GameSceneManager::Instance()->Push((SceneList)62, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_CUP, SCREEN_BACK, true);
         break;
     case HOF_STRIKER_CUP_HISTORY:
     case HOF_STRIKER_BRICK_WALL_HISTORY:
@@ -301,7 +301,7 @@ void LeaveHallOfFamePage(int mode)
         {
             PushPresentationCamera("43hofgold", 0, 0.5f, true);
         }
-        GameSceneManager::Instance()->Push((SceneList)63, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_CUP, SCREEN_BACK, true);
         break;
     case HOF_CRYSTAL_CUP_HISTORY:
     case HOF_CRYSTAL_BRICK_WALL_HISTORY:
@@ -314,7 +314,7 @@ void LeaveHallOfFamePage(int mode)
         {
             PushPresentationCamera("43hofsilver", 0, 0.5f, true);
         }
-        GameSceneManager::Instance()->Push((SceneList)64, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_CUP, SCREEN_BACK, true);
         break;
     case HOF_PLAYER_CARD:
         if (sHallOfFamePlayerCardIndex < 4)
@@ -327,7 +327,7 @@ void LeaveHallOfFamePage(int mode)
             {
                 PushPresentationCamera("43hofbronze", 0, 0.5f, true);
             }
-            GameSceneManager::Instance()->Push((SceneList)62, SCREEN_BACK, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_CUP, SCREEN_BACK, true);
         }
         else if (sHallOfFamePlayerCardIndex < 8)
         {
@@ -339,7 +339,7 @@ void LeaveHallOfFamePage(int mode)
             {
                 PushPresentationCamera("43hofsilver", 0, 0.5f, true);
             }
-            GameSceneManager::Instance()->Push((SceneList)64, SCREEN_BACK, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_CUP, SCREEN_BACK, true);
         }
         else
         {
@@ -351,7 +351,7 @@ void LeaveHallOfFamePage(int mode)
             {
                 PushPresentationCamera("43hofgold", 0, 0.5f, true);
             }
-            GameSceneManager::Instance()->Push((SceneList)63, SCREEN_BACK, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_CUP, SCREEN_BACK, true);
         }
         break;
     case HOF_TROPHY_SUMMARY:
@@ -359,15 +359,15 @@ void LeaveHallOfFamePage(int mode)
     case HOF_CHALLENGE_SUMMARY:
         if (sHallOfFameReturnMode == HOF_STRIKER_CUP)
         {
-            GameSceneManager::Instance()->Push((SceneList)63, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_STRIKER_CUP, SCREEN_NOTHING, true);
         }
         else if (sHallOfFameReturnMode == HOF_CRYSTAL_CUP)
         {
-            GameSceneManager::Instance()->Push((SceneList)64, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_CRYSTAL_CUP, SCREEN_NOTHING, true);
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)62, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_HOF_FIRE_CUP, SCREEN_NOTHING, true);
         }
         break;
     }
