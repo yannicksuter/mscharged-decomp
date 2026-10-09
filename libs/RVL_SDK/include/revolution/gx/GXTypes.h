@@ -62,7 +62,6 @@ extern "C" {
  * Common structs
  */
 
-
 typedef struct _GXColorS10 {
     s16 r, g, b, a;
 } GXColorS10;
@@ -79,7 +78,6 @@ typedef enum _GXAlphaOp {
 
     GX_MAX_ALPHAOP
 } GXAlphaOp;
-
 
 typedef enum _GXAttnFn {
     GX_AF_SPEC,
@@ -131,10 +129,6 @@ typedef enum _GXAttrType {
     GX_INDEX16 // 16-bit index sent to FIFO
 } GXAttrType;
 
-
-
-
-
 typedef enum _GXClearZ {
     GX_CLEAR_Z_MIN = 0,
     GX_CLEAR_Z_MAX = (1 << 24) - 1,
@@ -147,7 +141,6 @@ typedef enum _GXClipMode {
 } GXClipMode;
 
 typedef enum _GXColorSrc { GX_SRC_REG, GX_SRC_VTX } GXColorSrc;
-
 
 typedef enum _GXCompCnt {
     GX_POS_XY = 0,
@@ -363,7 +356,6 @@ typedef enum _GXLightID {
     GX_MAX_LIGHT = (1 << 8),
     GX_LIGHT_NULL = 0
 } GXLightID;
-
 
 typedef enum _GXMtxType {
     GX_MTX_3x4,
@@ -644,9 +636,6 @@ typedef enum _GXTexCoordID {
     GX_TEXCOORD_NULL = 255
 } GXTexCoordID;
 
-
-
-
 typedef enum _GXTexGenSrc {
     GX_TG_POS,
     GX_TG_NRM,
@@ -684,7 +673,6 @@ typedef enum _GXTexGenType {
     GX_TG_BUMP7,
     GX_TG_SRTG
 } GXTexGenType;
-
 
 typedef enum _GXTexMtx {
     // Any dimension (in standard XF matrix memory)
@@ -764,7 +752,6 @@ typedef enum _GXAlphaReadMode {
     GX_READ_NONE,
 } GXAlphaReadMode;
 
-
 typedef enum _GXPerf0 {
     GX_PERF0_VERTICES,
     GX_PERF0_CLIP_VTX,
@@ -830,8 +817,6 @@ typedef enum _GXPerf1 {
     GX_PERF1_NONE
 } GXPerf1;
 
-
-
 typedef enum _GXTlut {
     GX_TLUT0,
     GX_TLUT1,
@@ -859,8 +844,6 @@ typedef enum _GXTlut {
     GX_MAX_BIGTLUT = 4,
     GX_MAX_TLUT_ALL = GX_MAX_TLUT + GX_MAX_BIGTLUT,
 } GXTlut;
-
-
 
 typedef enum _GXTlutSize {
     GX_TLUT_16 = 1,

@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 enum eGLTextureMode
 {
     GLTM_WrapWrap = 0,
@@ -27,7 +26,6 @@ enum eGLTextureMode
     GLTM_ClampClamp = 3,
     GLTM_Num = 4
 };
-
 
 TweakValueBool gbReduceTextures("gbReduceTextures", "/Rendering/Engine", false);
 

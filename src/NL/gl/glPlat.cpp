@@ -27,7 +27,6 @@
 #include "NL/nlMath.h"
 #include "NL/nlMemory.h"
 
-
 static GXRenderModeObj glPal480IntDf = {
     4,
     640,

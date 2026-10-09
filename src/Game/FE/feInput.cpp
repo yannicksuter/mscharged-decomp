@@ -15,7 +15,6 @@ struct FEPadData
     /* 0x9C */ bool bIsPressed[13];
 }; // size 0xAC
 
-
 FEInput* g_pFEInput = 0;
 FEPadData g_aFEPadData[4];
 

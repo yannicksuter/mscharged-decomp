@@ -70,5 +70,4 @@ private:
 
 extern FEInput* g_pFEInput;
 
-
 #endif // GAME_FE_INPUT_H

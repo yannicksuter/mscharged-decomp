@@ -25,8 +25,6 @@ void __GXSetTmemConfig(u32 config);
 void __GetImageTileCount(GXTexFmt fmt, u16 wd, u16 ht, u32* rowTiles,
                          u32* colTiles, u32* cmpTiles);
 
-
-
 void GXInitTexObjFilter(GXTexObj* obj, GXTexFilter min_filt,
                         GXTexFilter mag_filt);
 
@@ -53,9 +51,6 @@ void GXLoadTexObjPreLoaded(const GXTexObj* obj, const GXTexRegion* region,
 void GXInitTexObjUserData(const GXTexObj* obj, void* user_data);
 void* GXGetTexObjUserData(const GXTexObj* obj);
 u32 GXGetTexObjTlut(GXTexObj*);
-
-
-
 
 void GXInitTexCacheRegion(GXTexRegion* pRegion, GXBool is_32b_mipmap,
                           u32 tmem_even, GXTexCacheSize size_even, u32 tmem_odd,

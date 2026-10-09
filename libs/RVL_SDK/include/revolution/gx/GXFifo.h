@@ -17,7 +17,6 @@ typedef void (*GXBreakPtCallback)(void);
 void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size);
 void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr);
 
-
 void GXSetCPUFifo(GXFifoObj* fifo);
 void GXSetGPFifo(GXFifoObj* fifo);
 GXBool GXGetCPUFifo(GXFifoObj* fifo);
