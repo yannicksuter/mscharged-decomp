@@ -24,7 +24,7 @@ void FEInput::Initialize()
     g_pFEInput = new ((u8*)nlMalloc(sizeof(FEInput), 8, false)) FEInput();
 }
 
-void FEInput::Reset(bool arg0)
+void FEInput::Reset(bool resetInputLocks)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -32,7 +32,7 @@ void FEInput::Reset(bool arg0)
         m_DisabledButtonMask[i] = 0;
     }
 
-    if (arg0)
+    if (resetInputLocks)
     {
         m_InputLockDepth = 0;
         m_bInputAllowed = true;
@@ -272,7 +272,7 @@ bool FEInput::JustReleased(eFEINPUT_PAD pad, int button, bool remap, eFEINPUT_PA
 void FEInput::EnableInputIfSceneHasFocus(BaseSceneHandler* pSceneHandler)
 {
     int depth = m_InputLockDepth;
-    if (depth == 0 || m_nExclusiveInputSceneHashIDStack[depth - 1].m_pBaseSceneHandler == pSceneHandler)
+    if (depth == 0 || m_ExclusiveInputLocks[depth - 1].m_pBaseSceneHandler == pSceneHandler)
     {
         m_bInputAllowed = true;
         return;
@@ -282,15 +282,15 @@ void FEInput::EnableInputIfSceneHasFocus(BaseSceneHandler* pSceneHandler)
 
 void FEInput::PushExclusiveInputLock(BaseSceneHandler* pRequestingSceneHandler, int customID)
 {
-    m_nExclusiveInputSceneHashIDStack[m_InputLockDepth].m_pBaseSceneHandler = pRequestingSceneHandler;
-    m_nExclusiveInputSceneHashIDStack[m_InputLockDepth].m_customID = customID;
+    m_ExclusiveInputLocks[m_InputLockDepth].m_pBaseSceneHandler = pRequestingSceneHandler;
+    m_ExclusiveInputLocks[m_InputLockDepth].m_customID = customID;
     m_InputLockDepth++;
 }
 
 void FEInput::PopExclusiveInputLock(BaseSceneHandler*)
 {
     m_InputLockDepth--;
-    InputLockEntry& entry = m_nExclusiveInputSceneHashIDStack[m_InputLockDepth];
+    InputLockEntry& entry = m_ExclusiveInputLocks[m_InputLockDepth];
     entry.m_pBaseSceneHandler = 0;
     entry.m_customID = -1;
 }
@@ -302,7 +302,7 @@ bool FEInput::HasInputLock(BaseSceneHandler* pRequestingSceneHandler) const
     {
         return false;
     }
-    return m_nExclusiveInputSceneHashIDStack[depth - 1].m_pBaseSceneHandler == pRequestingSceneHandler;
+    return m_ExclusiveInputLocks[depth - 1].m_pBaseSceneHandler == pRequestingSceneHandler;
 }
 
 static inline bool IsAtLeast(float value, float threshold)
