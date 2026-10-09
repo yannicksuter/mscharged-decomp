@@ -1,4 +1,4 @@
-#include <revolution/ax.h>
+#include <revolution/ax/AXProf.h>
 
 static BOOL __AXProfileInitialized = FALSE;
 static AXPROFILE* __AXProfile;
