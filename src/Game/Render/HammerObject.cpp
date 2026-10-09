@@ -134,7 +134,7 @@ HammerObject::HammerObject(int index, float radius)
     physics->mHammer = object;
     object->mPhysics->SetPosition(
         sHammerInactivePosition, PhysicsObject::WORLD_COORDINATES);
-    object->mDrawable = GetRenderObject(2, index);
+    object->mDrawable = GetRenderObject(STADIUM_MODEL_HAMMER, index);
     object->mAvoidable = 0;
     ::Reset(object);
 }

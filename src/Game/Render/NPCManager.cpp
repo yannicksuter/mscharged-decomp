@@ -146,19 +146,19 @@ void NPCManager::CreateChainChomp()
 
 void NPCManager::CreateYoshiEgg()
 {
-    mpYoshiEgg = new (8, false) YoshiEggObject(GetRenderObject(3, 0));
+    mpYoshiEgg = new (8, false) YoshiEggObject(GetRenderObject(STADIUM_MODEL_YOSHI_EGG, 0));
 }
 
 void NPCManager::CreateBirdoEgg()
 {
     BirdoEggObject* pObject = new (nlMalloc(sizeof(BirdoEggObject), 8, false))
-        BirdoEggObject(GetRenderObject(4, 0));
+        BirdoEggObject(GetRenderObject(STADIUM_MODEL_BIRDO_EGG, 0));
     mpBirdoEgg = pObject;
 }
 
 void NPCManager::CreateKoopaShell()
 {
-    mpKoopaShell = new (8, false) KoopaShellObject(GetRenderObject(5, 0));
+    mpKoopaShell = new (8, false) KoopaShellObject(GetRenderObject(STADIUM_MODEL_KOOPA_SHELL, 0));
 }
 
 void NPCManager::CreateDaisyFists()
@@ -205,7 +205,7 @@ BulletBillObject* NPCManager::fn_801A9D20()
         if (mBulletBills[i] == 0)
         {
             pObject = new (8, false) BulletBillObject(
-                GetRenderObject(1, i), i, sBulletBillRadius, lbl_806E5214);
+                GetRenderObject(STADIUM_MODEL_BULLET_BILL, i), i, sBulletBillRadius, lbl_806E5214);
             mBulletBills[i] = pObject;
             mNumBulletBills = i + 1;
             break;

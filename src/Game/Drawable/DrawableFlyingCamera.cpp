@@ -125,7 +125,7 @@ void DrawableFlyingCamera::Grab()
 void DrawableFlyingCamera::Render() const
 {
     nlMatrix4 matrix;
-    RenderObject* drawable = GetRenderObject(7, mCameraIndex);
+    RenderObject* drawable = GetRenderObject(STADIUM_MODEL_FLYING_CAMERA, mCameraIndex);
 
     if (drawable == 0)
     {
