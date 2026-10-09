@@ -34,7 +34,7 @@ SHGameplayOptions::SHGameplayOptions()
     : mViewIndex(1)
     , mInitialized(false)
     , mGoalLimitSelected(true)
-    , mFlowState(0)
+    , mFlowState(GAMEPLAY_OPTIONS_ENTERING)
 {
     for (int i = 0; i < 24; ++i)
     {
@@ -140,7 +140,7 @@ void SHGameplayOptions::Update(float dt)
     BaseSceneHandler::Update(dt);
     TLSlide* slide;
     int state = mFlowState;
-    if (state == 0 || (unsigned int)(state - 2) <= 2)
+    if (state == GAMEPLAY_OPTIONS_ENTERING || (unsigned int)(state - GAMEPLAY_OPTIONS_APPLYING) <= 2)
     {
         slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -149,20 +149,20 @@ void SHGameplayOptions::Update(float dt)
                 GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
             return;
         }
-        if (state == 0)
+        if (state == GAMEPLAY_OPTIONS_ENTERING)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->SetButtons(79, true);
-            mFlowState = 1;
+            mFlowState = GAMEPLAY_OPTIONS_ACTIVE;
             ToggleOptionsView();
         }
-        else if (state == 2)
+        else if (state == GAMEPLAY_OPTIONS_APPLYING)
         {
             CommitSettings();
             return;
         }
-        else if (state == 3)
+        else if (state == GAMEPLAY_OPTIONS_EXITING_BACK)
         {
             GameInfoManager* gameInfo = GameInfoManager::Instance();
             if (gameInfo->UseAltRules())
@@ -180,9 +180,9 @@ void SHGameplayOptions::Update(float dt)
             }
             return;
         }
-        else if (state == 4)
+        else if (state == GAMEPLAY_OPTIONS_REENTERING)
         {
-            mFlowState = 0;
+            mFlowState = GAMEPLAY_OPTIONS_ENTERING;
             mPresentation->SetActiveSlide("IN", true);
             mPresentation->Update(0.0f);
             return;
@@ -237,7 +237,7 @@ void SHGameplayOptions::Update(float dt)
         {
             FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
             FEAudio::PlayAnimAudioEvent(0xEA7AD449, 0, 0, 1);
-            mFlowState = 4;
+            mFlowState = GAMEPLAY_OPTIONS_REENTERING;
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             mPresentation->Update(0.0f);
             SHNavigation* scene = GetNavigationScene();
@@ -252,7 +252,7 @@ void SHGameplayOptions::Update(float dt)
         }
         if (mNavigation.UpdateBackButton(event, dt))
         {
-            mFlowState = 3;
+            mFlowState = GAMEPLAY_OPTIONS_EXITING_BACK;
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
                 scene->HideButtons();
@@ -676,7 +676,7 @@ void SHGameplayOptions::OnDonePointerLeave(unsigned int index, void* context)
 
 void SHGameplayOptions::OnDonePointerPress(unsigned int index, void* context)
 {
-    mFlowState = 2;
+    mFlowState = GAMEPLAY_OPTIONS_APPLYING;
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)

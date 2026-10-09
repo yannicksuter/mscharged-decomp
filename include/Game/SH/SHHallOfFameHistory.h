@@ -8,6 +8,13 @@
 
 class AsyncImage;
 
+enum eHallOfFameHistoryPhase
+{
+    HOF_HISTORY_ENTERING = 0,
+    HOF_HISTORY_ACTIVE = 1,
+    HOF_HISTORY_EXITING_BACK = 3,
+};
+
 class SHHallOfFameHistory : public BaseSceneHandler
 {
 public:

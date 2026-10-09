@@ -7,6 +7,14 @@
 
 struct FEPageControls;
 
+enum eHallOfFameSummaryPhase
+{
+    HOF_SUMMARY_ENTERING = 0,
+    HOF_SUMMARY_ACTIVE = 1,
+    HOF_SUMMARY_TRANSITIONING = 2,
+    HOF_SUMMARY_EXITING_BACK = 3,
+};
+
 class SHHallOfFameSummary : public BaseSceneHandler
 {
 public:

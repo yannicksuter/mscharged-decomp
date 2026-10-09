@@ -89,7 +89,7 @@ SHHallOfFameSummary::SHHallOfFameSummary(int mode)
     mInitialized = false;
     mNextPageRequested = false;
     mPreviousPageRequested = false;
-    mState = 0;
+    mState = HOF_SUMMARY_ENTERING;
     mPointerInsideCount[0] = 0;
     mPointerInsideCount[1] = 0;
     mPointerInsideCount[2] = 0;
@@ -179,7 +179,7 @@ void SHHallOfFameSummary::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
 
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == HOF_SUMMARY_ENTERING || mState == HOF_SUMMARY_TRANSITIONING || mState == HOF_SUMMARY_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -191,11 +191,11 @@ void SHHallOfFameSummary::Update(float fDeltaT)
             return;
         }
 
-        if (mState == 0)
+        if (mState == HOF_SUMMARY_ENTERING)
         {
-            mState = 1;
+            mState = HOF_SUMMARY_ACTIVE;
         }
-        else if (mState == 2)
+        else if (mState == HOF_SUMMARY_TRANSITIONING)
         {
             if (mPreviousPageRequested)
             {
@@ -208,7 +208,7 @@ void SHHallOfFameSummary::Update(float fDeltaT)
             }
             return;
         }
-        else if (mState == 3)
+        else if (mState == HOF_SUMMARY_EXITING_BACK)
         {
             LeaveHallOfFamePage(mMode);
             return;
@@ -266,7 +266,7 @@ void SHHallOfFameSummary::Update(float fDeltaT)
 
             if (mBackButton.UpdateBackButton(event, fDeltaT))
             {
-                mState = 3;
+                mState = HOF_SUMMARY_EXITING_BACK;
                 SHNavigation* scene = GetNavigationScene();
                 if (scene != 0)
                 {
@@ -281,7 +281,7 @@ void SHHallOfFameSummary::Update(float fDeltaT)
             {
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
                 FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
-                mState = 2;
+                mState = HOF_SUMMARY_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
 
                 if (mPageControls->IsButtonPressed(1))

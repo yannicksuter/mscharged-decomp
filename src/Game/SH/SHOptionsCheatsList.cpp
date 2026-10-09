@@ -26,7 +26,7 @@ SHOptionsCheatsList::SHOptionsCheatsList()
     , mButtonsInitialized(false)
     , mNavigation()
     , mSavedNavigationButtons(false)
-    , mState(0)
+    , mState(CHEATS_LIST_ENTERING)
     , mFirstVisibleCheat(0)
     , mSettings(0)
     , mCheatCategory(-1)
@@ -68,7 +68,7 @@ void SHOptionsCheatsList::Update(float fDeltaT)
     BaseSceneHandler::Update(fDeltaT);
 
     int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == CHEATS_LIST_ENTERING || (unsigned int)(state - CHEATS_LIST_APPLYING) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -80,7 +80,7 @@ void SHOptionsCheatsList::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == CHEATS_LIST_ENTERING)
         {
             GetNavigationScene()->SetButtons(4, true);
             if (!mButtonsInitialized)
@@ -88,15 +88,15 @@ void SHOptionsCheatsList::Update(float fDeltaT)
                 InitializeButtons();
                 mButtonsInitialized = true;
             }
-            mState = 1;
+            mState = CHEATS_LIST_ACTIVE;
         }
-        else if (state == 2)
+        else if (state == CHEATS_LIST_APPLYING)
         {
             GameSceneManager::Instance()->Pop();
             ((SHGameplayOptions*)GameSceneManager::Instance()->GetScene(SCENE_GAMEPLAY_OPTIONS))->UpdateCheatText();
             return;
         }
-        else if (state == 3)
+        else if (state == CHEATS_LIST_EXITING_BACK)
         {
             GameSceneManager::Instance()->Pop();
             return;
@@ -131,7 +131,7 @@ void SHOptionsCheatsList::Update(float fDeltaT)
 
         if (mNavigation.UpdateBackButton(event, fDeltaT))
         {
-            mState = 3;
+            mState = CHEATS_LIST_EXITING_BACK;
             GetNavigationScene()->HideButtons();
             mPresentation->SetActiveSlide("out", true);
             return;
@@ -316,7 +316,7 @@ void SHOptionsCheatsList::OnCheatPointerPress(unsigned int, void* context)
 
         FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
-        mState = 2;
+        mState = CHEATS_LIST_APPLYING;
         GetNavigationScene()->HideButtons();
         mPresentation->SetActiveSlide("out", true);
     }

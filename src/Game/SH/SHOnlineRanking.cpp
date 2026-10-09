@@ -67,7 +67,7 @@ SHOnlineRanking::SHOnlineRanking()
     , mRowButtons()
     , mScrollBar()
     , mBackButton()
-    , mTransitionState(0)
+    , mTransitionState(ONLINE_RANKING_ENTERING)
     , mErrorPopupOpen(false)
 {
     mPointerHoverCounts[0] = 0;
@@ -192,7 +192,7 @@ void SHOnlineRanking::Update(float fDeltaT)
         mScrollBar.Initialize();
 
     int state = mTransitionState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == ONLINE_RANKING_ENTERING || (unsigned int)(state - 2) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime()
@@ -203,7 +203,7 @@ void SHOnlineRanking::Update(float fDeltaT)
             return;
         }
 
-        if (state == 0)
+        if (state == ONLINE_RANKING_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
@@ -214,9 +214,9 @@ void SHOnlineRanking::Update(float fDeltaT)
             }
 
             InitializeButtons();
-            mTransitionState = 1;
+            mTransitionState = ONLINE_RANKING_ACTIVE;
         }
-        else if (state == 3)
+        else if (state == ONLINE_RANKING_EXITING_BACK)
         {
             FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, 1);
             GameSceneManager::Instance()->Push(
@@ -291,7 +291,7 @@ void SHOnlineRanking::Update(float fDeltaT)
 
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mTransitionState = 3;
+            mTransitionState = ONLINE_RANKING_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->HideButtons();

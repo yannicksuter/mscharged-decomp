@@ -10,6 +10,14 @@
 class TLComponentInstance;
 class FEPageControls;
 
+enum eStrikerCupAwardsPhase
+{
+    STRIKER_CUP_AWARDS_ENTERING = 0,
+    STRIKER_CUP_AWARDS_ACTIVE = 1,
+    STRIKER_CUP_AWARDS_TRANSITIONING = 2,
+    STRIKER_CUP_AWARDS_EXITING_BACK = 3,
+};
+
 class StrikerCupAwardsScene : public BaseSceneHandler
 {
 public:

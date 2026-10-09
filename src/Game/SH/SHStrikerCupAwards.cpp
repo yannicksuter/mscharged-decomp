@@ -42,7 +42,7 @@ StrikerCupAwardsScene::StrikerCupAwardsScene(int cupPage)
     , mPlayButton()
     , mDescriptionScroller(0)
     , mPlayButtonInstance(0)
-    , mTransitionState(0)
+    , mTransitionState(STRIKER_CUP_AWARDS_ENTERING)
 {
     mPlayButton.mContext = 0;
 
@@ -158,7 +158,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
     CupManager::s_pInstance->GetNumPlayingTeams();
 
     int state = mTransitionState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == STRIKER_CUP_AWARDS_ENTERING || (unsigned int)(state - STRIKER_CUP_AWARDS_TRANSITIONING) <= 1)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -170,7 +170,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
             return;
         }
 
-        if (state == 0)
+        if (state == STRIKER_CUP_AWARDS_ENTERING)
         {
             if (!mPointerButtonsInitialized)
             {
@@ -179,9 +179,9 @@ void StrikerCupAwardsScene::Update(float deltaTime)
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
-            mTransitionState = 1;
+            mTransitionState = STRIKER_CUP_AWARDS_ACTIVE;
         }
-        else if (state == 2)
+        else if (state == STRIKER_CUP_AWARDS_TRANSITIONING)
         {
             if (mPreviousPagePressed)
             {
@@ -196,7 +196,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
             AdvanceCupFlow(false);
             return;
         }
-        else if (state == 3)
+        else if (state == STRIKER_CUP_AWARDS_EXITING_BACK)
         {
             HandleCupBack(mCupPage);
             return;
@@ -243,7 +243,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
 
         if (mBackButton.UpdateBackButton(event, deltaTime))
         {
-            mTransitionState = 3;
+            mTransitionState = STRIKER_CUP_AWARDS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
             {
@@ -257,7 +257,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
         {
             FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, true);
             FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, true);
-            mTransitionState = 2;
+            mTransitionState = STRIKER_CUP_AWARDS_TRANSITIONING;
             GetNavigationScene();
             mPresentation->SetActiveSlide("out", true);
 
@@ -435,7 +435,7 @@ void StrikerCupAwardsScene::OnButtonPointerPress(unsigned int, void* context)
     case 0:
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
-        mTransitionState = 2;
+        mTransitionState = STRIKER_CUP_AWARDS_TRANSITIONING;
 
         SHNavigation* object = GetNavigationScene();
         if (object != 0)

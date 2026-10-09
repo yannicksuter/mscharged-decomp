@@ -7,6 +7,14 @@
 
 class TLComponentInstance;
 
+enum eGuestControllerSelectPhase
+{
+    GUEST_CONTROLLER_SELECT_ENTERING = 0,
+    GUEST_CONTROLLER_SELECT_ACTIVE = 1,
+    GUEST_CONTROLLER_SELECT_TRANSITIONING = 2,
+    GUEST_CONTROLLER_SELECT_EXITING_BACK = 3,
+};
+
 class SHOnlineGuestControllerSelect : public BaseSceneHandler
 {
 public:

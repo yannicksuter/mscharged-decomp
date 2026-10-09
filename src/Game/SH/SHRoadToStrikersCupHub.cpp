@@ -45,7 +45,7 @@ RoadToStrikersCupHubScene::RoadToStrikersCupHubScene()
     , mCupStatsButton()
     , mRulesButton()
     , mPlayButtonInstance(0)
-    , mTransitionState(0)
+    , mTransitionState(ROAD_TO_STRIKERS_CUP_ENTERING)
 {
     mPlayButton.mContext = (void*)ButtonPlay;
     mScheduleButton.mContext = (void*)ButtonSchedule;
@@ -166,7 +166,7 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
         mIntroAudioPlayed = true;
     }
 
-    if (mTransitionState == 0 || mTransitionState == 2
+    if (mTransitionState == ROAD_TO_STRIKERS_CUP_ENTERING || mTransitionState == ROAD_TO_STRIKERS_CUP_TRANSITIONING
         || mTransitionState == 3)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
@@ -178,14 +178,14 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
             return;
         }
 
-        if (mTransitionState == 0)
+        if (mTransitionState == ROAD_TO_STRIKERS_CUP_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
             navigation->SetButtons(0x14, true);
             UpdatePlayButtonText();
-            mTransitionState = 1;
+            mTransitionState = ROAD_TO_STRIKERS_CUP_ACTIVE;
         }
-        else if (mTransitionState == 2)
+        else if (mTransitionState == ROAD_TO_STRIKERS_CUP_TRANSITIONING)
         {
             if (mSelectedButton == ButtonPlay)
                 AdvanceCupFlow(false);
@@ -554,7 +554,7 @@ void RoadToStrikersCupHubScene::OnButtonPointerPress(
     if (button != ButtonRules)
     {
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
-        mTransitionState = 2;
+        mTransitionState = ROAD_TO_STRIKERS_CUP_TRANSITIONING;
 
         SHNavigation* navigation = GetNavigationScene();
         if (navigation != 0)

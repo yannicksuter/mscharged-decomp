@@ -41,7 +41,7 @@ CupFinalRoundsScene::CupFinalRoundsScene()
     , mMatchupButtons()
     , mBracketButton()
     , mBracketButtonInstance(0)
-    , mTransitionState(0)
+    , mTransitionState(CUP_FINAL_ROUNDS_ENTERING)
 {
     mBracketButton.mContext = 0;
     mPointerHoverCounts[0] = 0;
@@ -103,7 +103,7 @@ void CupFinalRoundsScene::SceneCreated()
 void CupFinalRoundsScene::Update(float fDeltaT)
 {
     BaseSceneHandler::Update(fDeltaT);
-    if (mTransitionState == 0 || mTransitionState == 2 || mTransitionState == 3)
+    if (mTransitionState == CUP_FINAL_ROUNDS_ENTERING || mTransitionState == CUP_FINAL_ROUNDS_TRANSITIONING || mTransitionState == CUP_FINAL_ROUNDS_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->m_currentSlide;
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -114,7 +114,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
             }
             return;
         }
-        if (mTransitionState == 0)
+        if (mTransitionState == CUP_FINAL_ROUNDS_ENTERING)
         {
             if (!mPointerButtonsInitialized)
             {
@@ -124,9 +124,9 @@ void CupFinalRoundsScene::Update(float fDeltaT)
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
             }
-            mTransitionState = 1;
+            mTransitionState = CUP_FINAL_ROUNDS_ACTIVE;
         }
-        else if (mTransitionState == 2)
+        else if (mTransitionState == CUP_FINAL_ROUNDS_TRANSITIONING)
         {
             if (mPreviousPagePressed)
             {
@@ -141,7 +141,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
             AdvanceCupFlow(false);
             return;
         }
-        else if (mTransitionState == 3)
+        else if (mTransitionState == CUP_FINAL_ROUNDS_EXITING_BACK)
         {
             HandleCupBack(3);
             return;
@@ -179,7 +179,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
         }
         if (mBackButton.UpdateBackButton(event, fDeltaT))
         {
-            mTransitionState = 3;
+            mTransitionState = CUP_FINAL_ROUNDS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
                 navigation->HideButtons();
@@ -193,7 +193,7 @@ void CupFinalRoundsScene::Update(float fDeltaT)
             {
                 FEAudio::PlayAnimAudioEvent(0x304FDD1E, 0, 0, 1);
                 FEAudio::PlayAnimAudioEvent(0x375C885A, 0, 0, 1);
-                mTransitionState = 2;
+                mTransitionState = CUP_FINAL_ROUNDS_TRANSITIONING;
                 mPresentation->SetActiveSlide("out", true);
                 if (mPageControls->IsButtonPressed(1))
                     mPreviousPagePressed = true;
@@ -433,7 +433,7 @@ void CupFinalRoundsScene::OnBracketPointerPress(unsigned int, void* context)
     case 0:
         FEAudio::PlayAnimAudioEvent(0x6E5C794C, 0, 0, 1);
         FEAudio::PlayAnimAudioEvent(0x2ECB0035, 0, 0, 1);
-        mTransitionState = 2;
+        mTransitionState = CUP_FINAL_ROUNDS_TRANSITIONING;
 
         SHNavigation* navigation = GetNavigationScene();
         if (navigation != 0)

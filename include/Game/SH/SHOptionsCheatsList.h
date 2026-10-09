@@ -9,6 +9,14 @@
 
 class TLComponentInstance;
 
+enum eCheatsListPhase
+{
+    CHEATS_LIST_ENTERING = 0,
+    CHEATS_LIST_ACTIVE = 1,
+    CHEATS_LIST_APPLYING = 2,
+    CHEATS_LIST_EXITING_BACK = 3,
+};
+
 class SHOptionsCheatsList : public BaseSceneHandler
 {
 public:

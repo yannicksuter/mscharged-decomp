@@ -13,6 +13,14 @@ class TLInstance;
 struct BasicGameInfo;
 struct NetworkTournamentGame;
 
+enum eCupKnockoutPhase
+{
+    CUP_KNOCKOUT_ENTERING = 0,
+    CUP_KNOCKOUT_ACTIVE = 1,
+    CUP_KNOCKOUT_TRANSITIONING = 2,
+    CUP_KNOCKOUT_EXITING_BACK = 3,
+};
+
 class CupKnockoutScene : public BaseSceneHandler
 {
 public:

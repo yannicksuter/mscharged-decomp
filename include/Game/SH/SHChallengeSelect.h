@@ -9,6 +9,14 @@
 class FEPresentation;
 class TLComponentInstance;
 
+enum eChallengeSelectPhase
+{
+    CHALLENGE_SELECT_ENTERING = 0,
+    CHALLENGE_SELECT_ACTIVE = 1,
+    CHALLENGE_SELECT_TRANSITIONING = 2,
+    CHALLENGE_SELECT_EXITING_BACK = 3,
+};
+
 class ChallengeSelectScene : public BaseSceneHandler
 {
 public:

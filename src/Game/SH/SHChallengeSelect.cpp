@@ -41,7 +41,7 @@ ChallengeSelectScene::ChallengeSelectScene(bool tutorial)
     , mButtonsInitialized(false)
     , mTutorial(tutorial)
 {
-    mState = 0;
+    mState = CHALLENGE_SELECT_ENTERING;
     mChallengeButtons[0].mContext = 0;
     mChallengeButtons[0].mSpeakerEnabled = false;
     mChallengeButtons[1].mContext = (void*)1;
@@ -216,7 +216,7 @@ void ChallengeSelectScene::UpdateRow(int index)
 void ChallengeSelectScene::Update(float dt)
 {
     BaseSceneHandler::Update(dt);
-    if (mState == 0 || mState == 2 || mState == 3)
+    if (mState == CHALLENGE_SELECT_ENTERING || mState == CHALLENGE_SELECT_TRANSITIONING || mState == CHALLENGE_SELECT_EXITING_BACK)
     {
         TLSlide* slide = mPresentation->GetActiveSlide();
         if (slide->GetCurrentTime() < slide->GetStartTime() + slide->GetDuration())
@@ -228,7 +228,7 @@ void ChallengeSelectScene::Update(float dt)
             return;
         }
 
-        if (mState == 0)
+        if (mState == CHALLENGE_SELECT_ENTERING)
         {
             if (!mButtonsInitialized)
             {
@@ -236,9 +236,9 @@ void ChallengeSelectScene::Update(float dt)
                 InitializeButtons();
                 mButtonsInitialized = true;
             }
-            mState = 1;
+            mState = CHALLENGE_SELECT_ACTIVE;
         }
-        else if (mState == 2)
+        else if (mState == CHALLENGE_SELECT_TRANSITIONING)
         {
             SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(
                 GameSceneManager::Instance()->Push((SceneList)0x4D, SCREEN_NOTHING, true));
@@ -249,7 +249,7 @@ void ChallengeSelectScene::Update(float dt)
             }
             return;
         }
-        else if (mState == 3)
+        else if (mState == CHALLENGE_SELECT_EXITING_BACK)
         {
             FEAudio::PlayAnimAudioEvent(0x4430B152, 0, 0, 1);
             FrontEndPresentation::GetInstance()->Call("TransitionChallengesToMainMenu");
@@ -289,7 +289,7 @@ void ChallengeSelectScene::Update(float dt)
         }
         if (mBackButton.UpdateBackButton(event, dt))
         {
-            mState = 3;
+            mState = CHALLENGE_SELECT_EXITING_BACK;
             GetNavigationScene()->HideButtons();
             mPresentation->SetActiveSlide("out", true);
             return;
@@ -355,7 +355,7 @@ void ChallengeSelectScene::OnChallengePressed(int, void* context)
     challengeData->SetCurrentChallenge(challenge);
 
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
-    mState = 2;
+    mState = CHALLENGE_SELECT_TRANSITIONING;
     GetNavigationScene()->HideButtons();
     mPresentation->SetActiveSlide("out", true);
 }

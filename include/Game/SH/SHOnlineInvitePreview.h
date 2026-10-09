@@ -7,6 +7,13 @@
 
 class TLComponentInstance;
 
+enum eInvitePreviewPhase
+{
+    INVITE_PREVIEW_ENTERING = 0,
+    INVITE_PREVIEW_ACTIVE = 1,
+    INVITE_PREVIEW_TRANSITIONING = 2,
+};
+
 class SHOnlineInvitePreview : public BaseSceneHandler
 {
 public:
