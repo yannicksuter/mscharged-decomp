@@ -315,7 +315,7 @@ void MatchLoadingScene::DisplayCupInfo()
     GameInfoManager* gameInfo = GameInfoManager::Instance();
     int homeTeam = gameInfo->GetTeam(0);
     int awayTeam = gameInfo->GetTeam(1);
-    if (cup->GetCurrentRoundType() == 2)
+    if (cup->GetCurrentRoundType() == CUP_ROUND_FINALS)
     {
         mTextInstances[2]->SetVisible(false);
         mTextInstances[3]->SetVisible(false);

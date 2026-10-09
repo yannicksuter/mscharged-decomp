@@ -987,7 +987,7 @@ void StatsTracker::CompileEndOfGameStats()
         eTeamID awayid = (eTeamID)mBasicGameInfo->mTeamIndex[1];
         int numTeams = cup->GetNumPlayingTeams();
         int previousTeam = cup->GetFinalOpponentTeam();
-        if (cup->GetCurrentRoundType() == 2)
+        if (cup->GetCurrentRoundType() == CUP_ROUND_FINALS)
         {
             if (homeid == previousTeam)
                 homeAwayIndex[0] = numTeams;
@@ -1015,7 +1015,7 @@ void StatsTracker::CompileEndOfGameStats()
             {
                 tempStat = mCumulativeTeamStats[homeaway]->mPlayerTotalStats.mNumShotsOnGoal;
                 cumulative->mPlayerTotalStats.mNumShotsOnGoal += tempStat;
-                if (cup->GetCurrentRoundType() == 0)
+                if (cup->GetCurrentRoundType() == CUP_ROUND_LEAGUE)
                 {
                     tempStat = mCumulativeTeamStats[homeaway]->mPlayerTotalStats.mNumGoalsFor;
                     cumulative->mPlayerTotalStats.mNumGoalsFor += tempStat;
@@ -1074,7 +1074,7 @@ void StatsTracker::CompileEndOfGameStats()
             else
             {
                 mBasicGameInfo->mFinalScore[(short)homeaway] = 0;
-                if (cup->GetCurrentRoundType() == 0)
+                if (cup->GetCurrentRoundType() == CUP_ROUND_LEAGUE)
                 {
                     u16 otherGoals = mCumulativeTeamStats[otherSide]->mPlayerTotalStats.mNumGoalsFor;
                     mCumulativeTeamStats[homeaway]->mPlayerTotalStats.mNumGoalsAgainst = otherGoals;
@@ -1100,7 +1100,7 @@ void StatsTracker::CompileEndOfGameStats()
                 mCumulativeTeamStats[homeaway]->mPlayerTotalStats.mNumMegaStrikeAttempts = 0;
                 mCumulativeTeamStats[homeaway]->mPlayerTotalStats.mNumMegaStrikeGoals = 0;
             }
-            if (cup->GetCurrentRoundType() == 0)
+            if (cup->GetCurrentRoundType() == CUP_ROUND_LEAGUE)
             {
                 tempStat = mCumulativeTeamStats[homeaway]->mNumWins;
                 cumulative->mNumWins += tempStat;

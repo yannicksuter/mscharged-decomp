@@ -62,7 +62,7 @@ CupHubScene::CupHubScene()
 
     BuildMatchupStates();
     if (CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
-        || CupManager::s_pInstance->GetCurrentRoundType() == 0)
+        || CupManager::s_pInstance->GetCurrentRoundType() == CUP_ROUND_LEAGUE)
     {
         mPagingEnabled = false;
     }
@@ -535,7 +535,7 @@ void CupHubScene::BuildMatchupStates()
         ++entry;
         mMatchupStates[entry][0] = i;
         mMatchupStates[entry][1] = -1;
-        if (cupManager->GetCurrentRoundType() == 0 && i != -5 && i == round)
+        if (cupManager->GetCurrentRoundType() == CUP_ROUND_LEAGUE && i != -5 && i == round)
         {
             mScrollOffset = entry;
         }

@@ -124,7 +124,7 @@ void RoadToStrikersCupHubScene::SceneCreated()
 
     if (CupManager::Instance()->ShouldShowCupPhasePopup() == true)
     {
-        if (CupManager::Instance()->GetCurrentRoundType() != 0)
+        if (CupManager::Instance()->GetCurrentRoundType() != CUP_ROUND_LEAGUE)
             ShowCupRulesPopup();
         CupManager::Instance()->SetShowCupPhasePopup(false);
     }

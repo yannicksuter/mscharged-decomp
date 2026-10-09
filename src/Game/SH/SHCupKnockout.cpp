@@ -595,7 +595,7 @@ void CupKnockoutScene::UpdateRoundHighlight()
             FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(
                 presentation, "OUT", "Layer", "tournament_screens", lightningName);
 
-        if (mTournament->GetCurrentRoundType() == 1
+        if (mTournament->GetCurrentRoundType() == CUP_ROUND_KNOCKOUT
             && ((currentRound == numRounds - 3 && i < 4)
                 || (currentRound == numRounds - 2 && i < 6 && i >= 4)
                 || (currentRound == numRounds - 1 && i >= 6)))

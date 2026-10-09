@@ -488,7 +488,7 @@ void SHGameplayOptions::UpdateLimitText(int type, int value)
     unsigned short number[4];
     nlSNPrintf(number, 4, (const unsigned short*)L"%d", value);
     const char* id = "X_GOALS";
-    if (type == 0)
+    if (type == GAME_LIMIT_TIME)
         id = "X_MINUTES";
     WideString string = Format(WideString(LookupLocString(id)), number);
     memcpy(mLimitText, string.c_str(), sizeof(mLimitText));

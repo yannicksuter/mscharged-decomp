@@ -1674,7 +1674,7 @@ static inline bool IsClearOfMuckHoles(nlVector3 point)
         for (int i = 0; i < 60; i++)
         {
             PhysicsPatch* patch = lbl_806E12C8->fn_801745B8(i);
-            if (patch != 0 && patch->m_Type == 4)
+            if (patch != 0 && patch->m_Type == PATCH_MUCK_HOLE)
             {
                 nlVector3 delta;
                 nlVec3Sub(delta, point, patch->GetPosition());
@@ -1700,7 +1700,7 @@ void HandleMuckBallCollision(void* context)
     {
         hit = true;
     }
-    if (hit == true && event->pPatch->m_Type == 3)
+    if (hit == true && event->pPatch->m_Type == PATCH_MUCK_BALL)
     {
         nlVector3 pos = event->pPatch->GetPosition();
         pos.z = 0.0f;
@@ -1716,7 +1716,7 @@ void HandleMuckBallCollision(void* context)
 void HandleMuckBallWallCollision(void* context)
 {
     PhysicsPatch* patch = (PhysicsPatch*)context;
-    if (patch->m_Type == 3)
+    if (patch->m_Type == PATCH_MUCK_BALL)
     {
         float length = fabs(cField::GetGoalLineX(0U));
         float width = fabs(0.5f * (2.0f * cField::mv3FieldPosition.y));

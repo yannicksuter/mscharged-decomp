@@ -889,7 +889,7 @@ void CupManager::PrepareCurrentGame()
     {
         skill = 5;
     }
-    else if (GetCurrentRoundType() == 1)
+    else if (GetCurrentRoundType() == CUP_ROUND_KNOCKOUT)
     {
         skill = gPlayoffSkillLevels[GetCurrentMode()][GetCurrentRoundNumber()];
     }
@@ -1168,7 +1168,7 @@ void CupManager::SelectFinalOpponents()
 
 bool CupManager::IsCupWinningGame(int team) const
 {
-    if (GetCurrentRoundType() == 2 && team == mCurrentCup->mUserSelectedTeam)
+    if (GetCurrentRoundType() == CUP_ROUND_FINALS && team == mCurrentCup->mUserSelectedTeam)
     {
         return mState == CUP_STATE_WON;
     }

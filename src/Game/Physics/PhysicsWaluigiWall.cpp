@@ -164,9 +164,9 @@ ContactType PhysicsWaluigiWall::Contact(PhysicsObject* other, dContact*, int)
     case PHYSOBJ_PATCH:
     {
         PhysicsPatch* patch = (PhysicsPatch*)other;
-        if (patch->m_Type == 1)
+        if (patch->m_Type == PATCH_FIRE_BALL)
             ApplyDamage(gWaluigiWallPatchDamage);
-        else if (patch->m_Type == 6)
+        else if (patch->m_Type == PATCH_YOSHI_TONGUE)
         {
             CollisionPatchData* data = 0;
             g_CollisionPatchDataPool.Allocate(data);

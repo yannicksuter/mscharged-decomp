@@ -94,7 +94,7 @@ ContactType PhysicsShockwave::Contact(
         break;
     }
     case PHYSOBJ_PATCH:
-        if (((PhysicsPatch*)other)->m_Type != 0)
+        if (((PhysicsPatch*)other)->m_Type != PATCH_GAS_BALL)
         {
             break;
         }

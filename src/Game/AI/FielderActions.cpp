@@ -2155,7 +2155,7 @@ void cFielder::ActionHit(float fDeltaT)
         for (int i = 0; i < 0x3C; i++)
         {
             PhysicsPatch* pEffect = lbl_806E12C8->fn_801745B8(i);
-            if (pEffect != 0 && pEffect->m_Type == 6)
+            if (pEffect != 0 && pEffect->m_Type == PATCH_YOSHI_TONGUE)
             {
                 cSHierarchy* pHierarchy = m_pPoseAccumulator->GetBaseHierarchy();
                 nlVector3 jointPos = GetJointPosition(
