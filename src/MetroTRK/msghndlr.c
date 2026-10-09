@@ -1,10 +1,12 @@
 #include <MetroTRK/msghndlr.h>
+#include <MetroTRK/dolphin_trk_glue.h>
 #include <MetroTRK/msg.h>
 #include <MetroTRK/usr_put.h>
 #include <MetroTRK/msgbuf.h>
 #include <MetroTRK/nubevent.h>
 #include <MetroTRK/trk.h>
 #include <MetroTRK/mem_TRK.h>
+#include <MetroTRK/targcont.h>
 
 static BOOL IsTRKConnected;
 static u32 g_CurrentSequence;

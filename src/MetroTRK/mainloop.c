@@ -1,4 +1,5 @@
 #include <MetroTRK/serpoll.h>
+#include <MetroTRK/targcont.h>
 #include <MetroTRK/targimpl.h>
 #include <MetroTRK/trk.h>
 
