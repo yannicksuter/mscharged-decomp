@@ -45,11 +45,11 @@ static inline void ShowDoneButtons(TLSlide* first)
 
 SHStrikerTimesBase::SHStrikerTimesBase()
     : BaseOverlayHandler(1, POSITION_ALL)
-    , mDisplayMode(-1)
+    , mDisplayMode(NEWS_DISPLAY_NONE)
     , mPage(-1)
     , mDonePressed(false)
     , mUseCustomText(false)
-    , mState(0)
+    , mState(NEWS_PHASE_ENTERING)
     , mControlsInitialized(false)
     , mDoneVisible(false)
     , mCanShowDone(true)
@@ -78,12 +78,12 @@ SHStrikerTimesBase::~SHStrikerTimesBase()
 void SHStrikerTimesBase::SceneCreated()
 {
     mScrollBar.SetComponent(FEFinder<TLComponentInstance, TLAT_COMPONENT>::FindOrDefault(mPresentation->m_currentSlide, "Layer", "scrollbar"));
-    if ((unsigned int)(mDisplayMode - 0xB) <= 2)
+    if ((unsigned int)(mDisplayMode - NEWS_MATCH_SUMMARY) <= 2)
     {
         mScrollBar.SetRange(0);
         mLogoReady = true;
     }
-    else if (mDisplayMode == 0xA)
+    else if (mDisplayMode == NEWS_FRIENDLY_RESULTS)
     {
         mScrollBar.SetRange(2);
     }
@@ -105,13 +105,13 @@ void SHStrikerTimesBase::SceneCreated()
         slide = slide->m_next;
     } while (slide != first);
 
-    if (mDisplayMode != 0xA)
+    if (mDisplayMode != NEWS_FRIENDLY_RESULTS)
     {
         TLInstance* more = FEFinder<TLComponentInstance, 4>::FindOrDefault(mPresentation, "story", "Layer", "more");
         more->m_bVisible = false;
     }
 
-    if (mDisplayMode != 8 && mDisplayMode != 0xD)
+    if (mDisplayMode != NEWS_CHALLENGE_BRIEFING && mDisplayMode != NEWS_CUP_GAME_RESULTS)
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
@@ -162,7 +162,7 @@ void SHStrikerTimesBase::Update(float dt)
         return;
     }
     BaseSceneHandler::Update(dt);
-    if (mDisplayMode != 0xD && mDisplayMode != 0xC && mDisplayMode != 0xB)
+    if (mDisplayMode != NEWS_CUP_GAME_RESULTS && mDisplayMode != NEWS_PAUSE_STATISTICS && mDisplayMode != NEWS_MATCH_SUMMARY)
     {
         if (!mContentInitialized)
             InitializeContent();
@@ -175,7 +175,7 @@ void SHStrikerTimesBase::Update(float dt)
         FEAudio::PlayAnimAudioEvent(0xAFE4352B, 0, 0, 1);
     }
     int state = mState;
-    if (state == 0 || (unsigned int)(state - 2) <= 1)
+    if (state == NEWS_PHASE_ENTERING || (unsigned int)(state - NEWS_PHASE_EXITING_DONE) <= 1)
     {
         FEPresentation* presentation = mPresentation;
         TLSlide* slide = presentation->m_currentSlide;
@@ -187,20 +187,20 @@ void SHStrikerTimesBase::Update(float dt)
             }
             return;
         }
-        if (state == 0)
+        if (state == NEWS_PHASE_ENTERING)
         {
             if (!mControlsInitialized)
             {
                 InitializeControls();
                 mControlsInitialized = true;
             }
-            mState = 1;
-            if ((unsigned int)(mDisplayMode - 0xB) <= 2)
+            mState = NEWS_PHASE_ACTIVE;
+            if ((unsigned int)(mDisplayMode - NEWS_MATCH_SUMMARY) <= 2)
             {
                 mPresentation->SetActiveSlide("game summary", true);
                 mPresentation->Update(0.0f);
             }
-            else if (mDisplayMode == 0xA)
+            else if (mDisplayMode == NEWS_FRIENDLY_RESULTS)
             {
                 mPresentation->SetActiveSlide("logo", true);
                 mPresentation->Update(0.0f);
@@ -212,12 +212,12 @@ void SHStrikerTimesBase::Update(float dt)
             }
             return;
         }
-        if (state == 2)
+        if (state == NEWS_PHASE_EXITING_DONE)
         {
             OnDoneTransitionComplete();
             return;
         }
-        if (state == 3)
+        if (state == NEWS_PHASE_EXITING_BACK)
         {
             OnBackTransitionComplete();
             return;
@@ -254,7 +254,7 @@ void SHStrikerTimesBase::Update(float dt)
     for (int pad = 0; pad < 4; ++pad)
     {
         TLComponentInstance* instance = GetPointerInstance(pad);
-        if (mDisplayMode != 0xC && pad != gFEControllerIndex)
+        if (mDisplayMode != NEWS_PAUSE_STATISTICS && pad != gFEControllerIndex)
         {
             instance->SetActiveSlide("waiting", true, false);
         }
@@ -333,7 +333,7 @@ void SHStrikerTimesBase::InitializeContent()
 void SHStrikerTimesBase::SetArticleImageName(int captain, int mood, int special)
 {
     int variant = nlRandom(3, &nlDefaultSeed);
-    if (mDisplayMode == 8)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         s8 stored = g_pStrikerChallenge->mHeadlineVariant;
         if (stored != -1)
@@ -405,13 +405,13 @@ void SHStrikerTimesBase::SetDisplayMode(unsigned int transition)
 void SHStrikerTimesBase::ShowPreviousPage()
 {
     FEPresentation* presentation = mPresentation;
-    if (mDisplayMode == 0xD)
+    if (mDisplayMode == NEWS_CUP_GAME_RESULTS)
         return;
-    if (mDisplayMode == 0xC)
+    if (mDisplayMode == NEWS_PAUSE_STATISTICS)
         return;
-    if (mDisplayMode == 0xB)
+    if (mDisplayMode == NEWS_MATCH_SUMMARY)
         return;
-    if (mDisplayMode == 0xA)
+    if (mDisplayMode == NEWS_FRIENDLY_RESULTS)
     {
         if (mPage == 2)
         {
@@ -437,11 +437,11 @@ void SHStrikerTimesBase::ShowPreviousPage()
 void SHStrikerTimesBase::ShowNextPage()
 {
     FEPresentation* presentation = mPresentation;
-    if ((unsigned int)(mDisplayMode - 0xB) <= 2)
+    if ((unsigned int)(mDisplayMode - NEWS_MATCH_SUMMARY) <= 2)
     {
         mCanShowDone = true;
     }
-    else if (mDisplayMode == 0xA)
+    else if (mDisplayMode == NEWS_FRIENDLY_RESULTS)
     {
         if (mPage == 2)
         {
@@ -516,14 +516,14 @@ void SHStrikerTimesBase::OnDonePointerPress(int index, void* context)
 {
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     mDonePressed = true;
-    mState = 2;
+    mState = NEWS_PHASE_EXITING_DONE;
     mPresentation->SetActiveSlide("out", true);
     mPresentation->Update(0.0f);
-    if (mDisplayMode != 0xD)
+    if (mDisplayMode != NEWS_CUP_GAME_RESULTS)
     {
         GetNavigationScene()->HideButtons();
     }
-    if (mDisplayMode == 8)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         FEAudio::PlayAnimAudioEvent(0x4861E03D, 0, 0, 1);
     }

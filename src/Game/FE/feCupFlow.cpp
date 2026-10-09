@@ -216,7 +216,7 @@ void AdvanceCupFlow(bool pad)
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
                     (SceneList)39, SCREEN_NOTHING, true);
-                scene->SetDisplayMode(1);
+                scene->SetDisplayMode(NEWS_NEXT_CUP);
                 SaveLoad::StartSave(false);
             }
             else if (cupManager->GetCurrentMode() == CUP_CRYSTAL)
@@ -226,7 +226,7 @@ void AdvanceCupFlow(bool pad)
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
                     (SceneList)39, SCREEN_NOTHING, true);
-                scene->SetDisplayMode(1);
+                scene->SetDisplayMode(NEWS_NEXT_CUP);
                 SaveLoad::StartSave(false);
             }
             else
@@ -582,7 +582,7 @@ void ShowCupBrickWallNews()
 {
     CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
         (SceneList)39, SCREEN_NOTHING, false);
-    scene->SetDisplayMode(7);
+    scene->SetDisplayMode(NEWS_BRICK_WALL);
 }
 
 void AdvanceCupAwardPresentation()
@@ -603,7 +603,7 @@ void ShowCupGoldenBootNews()
 {
     CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
         (SceneList)39, SCREEN_NOTHING, false);
-    scene->SetDisplayMode(6);
+    scene->SetDisplayMode(NEWS_GOLDEN_BOOT);
 }
 
 void FinishCupAwardPresentation()

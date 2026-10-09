@@ -1211,22 +1211,22 @@ void CupManager::ShowRoundNews()
     if (roundType == CUP_ROUND_LEAGUE && round == (mCurrentCup->GetNumRegularRounds() >> 1))
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
-        scene->SetDisplayMode(2);
+        scene->SetDisplayMode(NEWS_MIDSEASON);
     }
     else if ((roundType == CUP_ROUND_KNOCKOUT && round == 0) || state == CUP_STATE_NOT_QUALIFIED)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
-        scene->SetDisplayMode(3);
+        scene->SetDisplayMode(NEWS_QUALIFICATION);
     }
     else if ((roundType == CUP_ROUND_FINALS && round == 0) || state == CUP_STATE_ELIMINATED)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
-        scene->SetDisplayMode(4);
+        scene->SetDisplayMode(NEWS_KNOCKOUT_RESULT);
     }
     else if (round == -5)
     {
         CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)39, SCREEN_NOTHING, false);
-        scene->SetDisplayMode(5);
+        scene->SetDisplayMode(NEWS_CUP_FINAL_RESULT);
     }
     else
     {

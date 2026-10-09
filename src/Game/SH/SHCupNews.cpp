@@ -34,24 +34,24 @@ void CupNewsScene::OnDoneTransitionComplete()
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    if (mDisplayMode == 1)
+    if (mDisplayMode == NEWS_NEXT_CUP)
     {
         GameSceneManager::Instance()->Pop();
         FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
         FrontEndPresentation::GetInstance()->Call("TransitionToStrikerCupHub");
     }
-    else if (mDisplayMode == 0)
+    else if (mDisplayMode == NEWS_CUP_START)
     {
         GameSceneManager::Instance()->Pop();
         FEAudio::PlayAnimAudioEvent(0xD276AFE5, 0, 0, 1);
         FrontEndPresentation::GetInstance()->Call("TransitionToInitialStrikerCupHub");
     }
-    else if (mDisplayMode == 7)
+    else if (mDisplayMode == NEWS_BRICK_WALL)
     {
         GameSceneManager::Instance()->Pop();
         AdvanceCupAwardPresentation();
     }
-    else if (mDisplayMode == 6)
+    else if (mDisplayMode == NEWS_GOLDEN_BOOT)
     {
         GameSceneManager::Instance()->Pop();
         FinishCupAwardPresentation();
@@ -109,13 +109,13 @@ void CupNewsScene::SceneCreated()
 
     switch (mDisplayMode)
     {
-    case 0:
-    case 1:
+    case NEWS_CUP_START:
+    case NEWS_NEXT_CUP:
         nlSNPrintf(mStoryStringID, 0x40, "ST_%s_INTRO_%s_%d", cupName, character.GetName(), 0);
         nlSNPrintf(mHeadlineStringID, 0x40, "STH_%s_INTRO_%s_%d", cupName, character.GetName(), 0);
         mood = NEWS_MOOD_NEUTRAL;
         break;
-    case 2:
+    case NEWS_MIDSEASON:
         for (int i = 0; i < 3; ++i)
         {
             int minimumRank = sCupRankRanges[cup][i][0];
@@ -144,7 +144,7 @@ void CupNewsScene::SceneCreated()
             break;
         }
         break;
-    case 3:
+    case NEWS_QUALIFICATION:
         mShowAwardsOnClose = true;
         if (GetCupState(cupManager) == CUP_STATE_NOT_QUALIFIED)
         {
@@ -160,7 +160,7 @@ void CupNewsScene::SceneCreated()
             mood = NEWS_MOOD_POSITIVE;
         }
         break;
-    case 4:
+    case NEWS_KNOCKOUT_RESULT:
         if (GetCupState(cupManager) == CUP_STATE_ELIMINATED)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_ELIMINATED_%s_%d", cupName, character.GetName(), 0);
@@ -176,7 +176,7 @@ void CupNewsScene::SceneCreated()
             mood = NEWS_MOOD_POSITIVE;
         }
         break;
-    case 5:
+    case NEWS_CUP_FINAL_RESULT:
         if (GetCupState(cupManager) == CUP_STATE_FINAL_LOST)
         {
             nlSNPrintf(mStoryStringID, 0x40, "ST_%s_LOSE_CUP_%s_%d", cupName, character.GetName(), 0);
@@ -193,7 +193,7 @@ void CupNewsScene::SceneCreated()
             mShowWinnerRewardsOnClose = true;
         }
         break;
-    case 6:
+    case NEWS_GOLDEN_BOOT:
     {
         int statistic = 0;
         CupManager::Instance()->GetGoalsForLeader(&statistic);
@@ -207,7 +207,7 @@ void CupNewsScene::SceneCreated()
         mood = NEWS_MOOD_POSITIVE;
         break;
     }
-    case 7:
+    case NEWS_BRICK_WALL:
     {
         int statistic = 0;
         CupManager::Instance()->GetGoalsAgainstLeader(&statistic);

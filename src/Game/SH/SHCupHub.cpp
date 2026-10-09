@@ -416,7 +416,7 @@ void CupHubScene::OnMatchupPointerPress(unsigned int index, void* context)
         {
             GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(SCENE_GAME_RESULTS, SCREEN_NOTHING, false);
             results->SetResultsData(game, this, 0);
-            results->SetDisplayMode(0xD);
+            results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
         }
         else
         {

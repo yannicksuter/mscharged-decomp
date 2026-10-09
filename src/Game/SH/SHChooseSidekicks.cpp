@@ -1286,7 +1286,7 @@ static void StartCupNormalSkill()
         navigation->HideButtons();
     }
     CupNewsScene* news = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)0x27, SCREEN_NOTHING, false);
-    news->SetDisplayMode(0);
+    news->SetDisplayMode(NEWS_CUP_START);
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -1307,7 +1307,7 @@ static void StartCupHighestSkill()
         navigation->HideButtons();
     }
     CupNewsScene* news = (CupNewsScene*)GameSceneManager::Instance()->Push((SceneList)0x27, SCREEN_NOTHING, false);
-    news->SetDisplayMode(0);
+    news->SetDisplayMode(NEWS_CUP_START);
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);

@@ -101,7 +101,7 @@ void SHStrikerTimesChallenge::OnSelectMainMenu()
  */
 void SHStrikerTimesChallenge::SceneCreated()
 {
-    if (mDisplayMode == ModeChallengeResults && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
+    if (mDisplayMode == NEWS_CHALLENGE_RESULTS && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
     {
         mNewUnlock = g_pStrikerChallenge->UnlockCurrentChallenge();
         if (mNewUnlock)
@@ -112,7 +112,7 @@ void SHStrikerTimesChallenge::SceneCreated()
     int captain = challenge->GetCurrentCaptain();
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     int mood = NEWS_MOOD_NONE;
-    if (mDisplayMode == ModeChallengeBriefing)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         if (challenge->mCurrentChallenge < 10)
         {
@@ -126,7 +126,7 @@ void SHStrikerTimesChallenge::SceneCreated()
         }
         mood = NEWS_MOOD_NEUTRAL;
     }
-    else if (mDisplayMode == ModeChallengeResults)
+    else if (mDisplayMode == NEWS_CHALLENGE_RESULTS)
     {
         FEMusic::StartStreamIfDifferent(13);
         if (challenge->IsCurrentChallengeWon() == true)
@@ -166,7 +166,7 @@ void SHStrikerTimesChallenge::SceneCreated()
         SetArticleImageName(captain, NEWS_MOOD_NEUTRAL, 4);
     else
         SetArticleImageName(captain, mood, -1);
-    if (mDisplayMode == ModeChallengeBriefing)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
@@ -198,22 +198,22 @@ void SHStrikerTimesChallenge::Update(float dt)
         return;
     }
     SHStrikerTimesBase::Update(dt);
-    if (mDisplayMode == ModeChallengeResults)
+    if (mDisplayMode == NEWS_CHALLENGE_RESULTS)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide,
             "Layer", "blackbox2");
         nlColour colour = instance->GetAssetColour();
-        if (mState == 2)
+        if (mState == NEWS_PHASE_EXITING_DONE)
             nlColourSet(colour, colour[0], colour[1], colour[2], 255);
         else
             nlColourSet(colour, colour[0], colour[1], colour[2], 178);
         instance->SetAssetColour(colour);
     }
-    if (mState != 1 || mPage == 0)
+    if (mState != NEWS_PHASE_ACTIVE || mPage == 0)
         return;
     for (int pad = 0; pad < 4; ++pad)
     {
-        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == ModeChallengeBriefing)
+        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == NEWS_CHALLENGE_BRIEFING)
         {
             mBackButtonInstance->m_bVisible = true;
             u8 valid = true;
@@ -223,9 +223,9 @@ void SHStrikerTimesChallenge::Update(float dt)
             event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 30, true, 0);
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                if (mDisplayMode != ModeChallengeBriefing)
+                if (mDisplayMode != NEWS_CHALLENGE_BRIEFING)
                     continue;
-                mState = 3;
+                mState = NEWS_PHASE_EXITING_BACK;
                 SHNavigation* scene = GetNavigationScene();
                 if (scene != 0)
                     scene->HideButtons();
@@ -246,7 +246,7 @@ void SHStrikerTimesChallenge::Update(float dt)
 void SHStrikerTimesChallenge::OnDoneTransitionComplete()
 {
     SHStrikerTimesBase::OnDoneTransitionComplete();
-    if (mDisplayMode == ModeChallengeBriefing)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         mLoadingChallengeSettings = true;
         gTweakFileLoader.LoadFileAsync(g_pStrikerChallenge->GetConfigPath(), "/challenge");

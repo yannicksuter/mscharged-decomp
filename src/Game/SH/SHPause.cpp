@@ -281,7 +281,7 @@ void PauseMenuScene::Update(float fDeltaT)
             mSelectionMade = true;
             PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push((SceneList)92, SCREEN_FORWARD, true));
             scene->mControllingInput = mControllingInput;
-            scene->SetDisplayMode(12);
+            scene->SetDisplayMode(NEWS_PAUSE_STATISTICS);
             break;
         }
         case TT_CONTROLLER_MAP:

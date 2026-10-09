@@ -455,7 +455,7 @@ void CupFinalRoundsScene::OnMatchupPointerPress(unsigned int, void* context)
         GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(
             (SceneList)0x21, SCREEN_NOTHING, false);
         results->SetResultsData(game, this, 0);
-        results->SetDisplayMode(0xD);
+        results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
     }
     else
     {

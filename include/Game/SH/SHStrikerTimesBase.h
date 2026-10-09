@@ -22,6 +22,33 @@ enum eNewsMood
     NEWS_MOOD_CUP_WIN = 3,
 };
 
+enum eStrikerTimesDisplayMode
+{
+    NEWS_DISPLAY_NONE = -1,
+    NEWS_CUP_START = 0,
+    NEWS_NEXT_CUP = 1,
+    NEWS_MIDSEASON = 2,
+    NEWS_QUALIFICATION = 3,
+    NEWS_KNOCKOUT_RESULT = 4,
+    NEWS_CUP_FINAL_RESULT = 5,
+    NEWS_GOLDEN_BOOT = 6,
+    NEWS_BRICK_WALL = 7,
+    NEWS_CHALLENGE_BRIEFING = 8,
+    NEWS_CHALLENGE_RESULTS = 9,
+    NEWS_FRIENDLY_RESULTS = 10,
+    NEWS_MATCH_SUMMARY = 11,
+    NEWS_PAUSE_STATISTICS = 12,
+    NEWS_CUP_GAME_RESULTS = 13,
+};
+
+enum eStrikerTimesPhase
+{
+    NEWS_PHASE_ENTERING = 0,
+    NEWS_PHASE_ACTIVE = 1,
+    NEWS_PHASE_EXITING_DONE = 2,
+    NEWS_PHASE_EXITING_BACK = 3,
+};
+
 class SHStrikerTimesBase : public BaseOverlayHandler
 {
 public:

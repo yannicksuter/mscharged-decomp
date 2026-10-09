@@ -538,7 +538,7 @@ void SHChooseSides2::LeaveScene()
             (SceneList)77, SCREEN_BACK, false));
         if (scene != 0)
         {
-            scene->SetDisplayMode(8);
+            scene->SetDisplayMode(NEWS_CHALLENGE_BRIEFING);
         }
     }
     else if (mContext != PAUSE)

@@ -233,20 +233,20 @@ void OverlayManager::OnGameOver()
     if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY)
     {
         SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false));
-        scene->SetDisplayMode(10);
+        scene->SetDisplayMode(NEWS_FRIENDLY_RESULTS);
     }
     else if (GameInfoManager::Instance()->IsInMode4())
     {
         SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push((SceneList)77, SCREEN_NOTHING, false));
         if (scene != 0)
         {
-            scene->SetDisplayMode(9);
+            scene->SetDisplayMode(NEWS_CHALLENGE_RESULTS);
         }
     }
     else
     {
         SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, false));
-        scene->SetDisplayMode(11);
+        scene->SetDisplayMode(NEWS_MATCH_SUMMARY);
     }
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDOut();

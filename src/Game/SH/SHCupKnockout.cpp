@@ -726,12 +726,12 @@ void CupKnockoutScene::OnMatchupPointerPress(unsigned int, void* context)
         {
             results->SetResultsData(game, this,
                 mTournament->GetTournamentGame(1, matchup));
-            results->SetDisplayMode(0xD);
+            results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
         }
         else
         {
             results->SetResultsData(game, this, 0);
-            results->SetDisplayMode(0xD);
+            results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
         }
     }
     else

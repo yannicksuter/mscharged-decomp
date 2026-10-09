@@ -132,7 +132,7 @@ void PausePostGameScene::Update(float dt)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "blackbox2");
         nlColour colour = instance->GetAssetColour();
-        if (mState == 2)
+        if (mState == NEWS_PHASE_EXITING_DONE)
             nlColourSet(colour, colour[0], colour[1], colour[2], 255);
         else
             nlColourSet(colour, colour[0], colour[1], colour[2], 178);

@@ -245,7 +245,7 @@ void ChallengeSelectScene::Update(float dt)
             g_pStrikerChallenge->mChallengeOffset = mChallengeOffset;
             if (scene != 0)
             {
-                scene->SetDisplayMode(8);
+                scene->SetDisplayMode(NEWS_CHALLENGE_BRIEFING);
             }
             return;
         }
