@@ -1,4 +1,5 @@
 #include <private/wud.h>
+#include <private/wud/WUDHidHost.h>
 
 #include <private/bte/bt_trace.h>
 #include <private/bte/bta_api.h>
@@ -27,7 +28,6 @@ void WUDDeviceStatusCallback(tBTM_DEV_STATUS status);
 void WUDStoredLinkKeyCallback(void* p1);
 void WUDPowerManagerCallback(BD_ADDR addr, tBTM_PM_STATUS status, UINT16 value,
                              UINT8 hciStatus);
-void WUDHidHostCallback(tBTA_HH_EVT event, tBTA_HH* pData);
 
 static void InitCore(void);
 
