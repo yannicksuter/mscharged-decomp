@@ -60,7 +60,7 @@ static GLInventory::ModelReleaseCallback sModelReleaseCallback;
 static unsigned long sFrameMemory[2][2];
 static unsigned long sFrameMemoryUsed[2][2];
 
-static inline int RealOrVirtual(eGLMemory memType)
+static inline int GetMemoryPoolIndex(eGLMemory memType)
 {
     switch (memType)
     {
@@ -172,7 +172,7 @@ GLXResourcePool::
 void* GLXResourcePool::Allocate(
     unsigned long allocationSize, eGLMemory memType)
 {
-    int pool = RealOrVirtual(memType);
+    int pool = GetMemoryPoolIndex(memType);
     unsigned long aligned = (mPoolMemory[pool] + mUsedMemory[pool] + 31) & ~31u;
     mUsedMemory[pool] = allocationSize + (aligned - mPoolMemory[pool]);
     mPeakMemory[pool] = mUsedMemory[pool] > mPeakMemory[pool]
@@ -235,20 +235,20 @@ unsigned long GLXResourcePool::GetPeakMemoryUsage()
 }
 
 bool GLXResourcePool::GetPoolMemoryInfo(
-    unsigned long arg0, const char** arg1, unsigned long* arg2,
-    unsigned long* arg3, unsigned long* arg4, const char** arg5)
+    unsigned long pool, const char** poolName, unsigned long* totalBytes,
+    unsigned long* freeBytes, unsigned long* peakBytes, const char** description)
 {
-    if (arg0 > 1)
+    if (pool > 1)
     {
         return false;
     }
-    *arg1 = arg0 != 0 ? sMEM2Name : sMEM1Name;
-    *arg2 = mPoolSizes[arg0];
-    *arg3 = mPoolSizes[arg0] - mUsedMemory[arg0];
-    *arg4 = mPeakMemory[arg0];
-    if (arg5 != 0)
+    *poolName = pool != 0 ? sMEM2Name : sMEM1Name;
+    *totalBytes = mPoolSizes[pool];
+    *freeBytes = mPoolSizes[pool] - mUsedMemory[pool];
+    *peakBytes = mPeakMemory[pool];
+    if (description != 0)
     {
-        *arg5 = "";
+        *description = "";
     }
     return true;
 }
@@ -260,7 +260,7 @@ GLResourcePool* glplatCreateResourcePool(
     unsigned long sizes[2] = { 0, 0 };
     for (unsigned long i = 0; i < count; ++i)
     {
-        int pool = RealOrVirtual(requirements[i].mType);
+        int pool = GetMemoryPoolIndex(requirements[i].mType);
         sizes[pool] += requirements[i].mSize;
     }
 
@@ -277,18 +277,18 @@ void* glplatResourceAlloc(
 
 void* glplatFrameAlloc(unsigned long size, eGLMemory memType)
 {
-    unsigned long isLow = RealOrVirtual(memType);
+    unsigned long pool = GetMemoryPoolIndex(memType);
     unsigned long newTop
-        = (sFrameMemory[sCurrentFrame][isLow] + sFrameMemoryUsed[sCurrentFrame][isLow] + 31)
+        = (sFrameMemory[sCurrentFrame][pool] + sFrameMemoryUsed[sCurrentFrame][pool] + 31)
         & ~31u;
-    unsigned long newSize = size + (newTop - sFrameMemory[sCurrentFrame][isLow]);
-    if (newSize > sFrameMemorySizes[isLow])
+    unsigned long newSize = size + (newTop - sFrameMemory[sCurrentFrame][pool]);
+    if (newSize > sFrameMemorySizes[pool])
     {
         OSReport(sOutOfFrameMemoryFormat, szMemoryNames[memType]);
         nlBreak();
         return 0;
     }
-    sFrameMemoryUsed[sCurrentFrame][isLow] = newSize;
+    sFrameMemoryUsed[sCurrentFrame][pool] = newSize;
     return (void*)newTop;
 }
 
