@@ -2,8 +2,6 @@
 #include <revolution/vf.h>
 
 void dTM_GetNowTime(struct PF_SYS_DATE* sdate, struct PF_SYS_TIME* stime) {
-    void (*getTimeCallBack)(struct VFSysTime*);  // Present in DWARF but unused here.
-    struct VFSysTime time;
     struct OSCalendarTime CalenderTime;
 
     sdate->sys_year = 0;
