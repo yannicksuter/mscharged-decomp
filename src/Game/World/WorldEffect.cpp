@@ -16,7 +16,7 @@ static bool s_drawEffectBounds;
 void WorldEffect::Initialize(WorldObjectLoadContext* pContext)
 {
     m_bActive = true;
-    if (m_nTimingMode == 0)
+    if (m_nTimingMode == WORLD_EFFECT_ELAPSED_TIME)
     {
         float fEmissionInterval = m_fEmissionInterval;
         m_fEmissionTime = fEmissionInterval + 1.0f;
@@ -60,7 +60,7 @@ void WorldEffect::Update(float fDeltaT)
     if (fDeltaT != 0.0f && m_bActive)
     {
         bool bEmit = false;
-        if (m_nTimingMode == 0)
+        if (m_nTimingMode == WORLD_EFFECT_ELAPSED_TIME)
         {
             if (m_nRemainingEmissions > 0
                 || m_nRemainingEmissions == -1)
