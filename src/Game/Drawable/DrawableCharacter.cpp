@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Drawable/DrawableCharacter.h"
 #include "Game/Render/StadiumLoading.h"
@@ -310,7 +311,7 @@ void DrawableCharacter::Render(cCharacter& source)
 
     if (!renderShockModel || g_bRenderScorchPass != 0)
     {
-        if (nlTaskManager::m_pInstance->mCurrentState == 2)
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
         {
             source.PoseSkinMesh(poseAccumulator, 2);
         }
@@ -363,7 +364,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
 
     if (renderPass != 2)
     {
-        if (nlTaskManager::m_pInstance->mCurrentState == 2)
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
         {
             skinMesh = source.GetSkinMesh(2);
         }
@@ -391,7 +392,7 @@ void DrawableCharacter::SendToGl(cCharacter& source, int renderPass)
     }
 
     bool isVisible;
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x10)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_NIS)
     {
         isVisible = true;
     }
@@ -1087,7 +1088,7 @@ void DrawableCharacter::RenderCharacterShadow(const cCharacter& source, glModel*
     params.fScalar = fScalar;
     params.nPartitionIndex = source.m_nCharacterIndex;
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 2)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
     {
         params.nVisibleInterval = g_nOnscreenUpdate[characterSizeIndex];
         params.nInvisibleInterval = g_nOffscreenUpdate[characterSizeIndex];

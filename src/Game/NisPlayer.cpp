@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/NisPlayer.h"
 #include "Game/Blinker.h"
@@ -366,7 +367,7 @@ float NisPlayer::GetCameraTimeLeft(int cameraIndex) const
 
 bool NisPlayer::WorldIsFrozen() const
 {
-    bool stateOK = (nlTaskManager::m_pInstance->mCurrentState == 0x10);
+    bool stateOK = (nlTaskManager::m_pInstance->mCurrentState == TASK_NIS);
     if (stateOK)
     {
         stateOK = TimeLeft() == 0.0f;
@@ -443,7 +444,7 @@ void NisPlayer::Update(float deltaT)
         }
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x10)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_NIS)
     {
         UpdateStadium(deltaT);
         StartLoadedScripts();

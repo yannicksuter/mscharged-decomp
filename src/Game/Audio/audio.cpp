@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "revolution/types.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioBackend.h"
@@ -115,7 +116,7 @@ void GameAudio::Update(float deltaTime)
 {
     bool transformValid = false;
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 2
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY
         && GetNextCamera() != 0)
     {
         nlVector3 listenerVector;

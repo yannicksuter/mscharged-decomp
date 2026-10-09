@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/RenderSnapshot.h"
 
 #include "Game/Camera/CameraMan.h"
@@ -413,7 +414,7 @@ void RenderSnapshot::Render(float deltaTime)
     }
     mpNetMeshPositiveX->Render();
     mpNetMeshNegativeX->Render();
-    if (nlTaskManager::m_pInstance->mCurrentState == 2)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
         cCameraManager::m_UpVectorStack[cCameraManager::m_UpVectorStackSize] = mCameraUp;
     static unsigned long goalLightTexture = glGetTexture("wario_stadium/goallight.ifl");
     GLTextureAnim* animation = glGetCurrentResourcePool()->m_inventory->GetTextureAnim(goalLightTexture);

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/StadiumLoading.h"
 
@@ -535,7 +536,7 @@ void UpdateStadium(float fDeltaT)
 {
     bool bUpdateNPCs = true;
     if (GameInfoManager::Instance() != 0
-        && nlTaskManager::m_pInstance->mCurrentState == 2 && lbl_806DEE60
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && lbl_806DEE60
         && GameInfoManager::Instance()->GetStadium() == STAD_VICE)
     {
         bUpdateNPCs = false;

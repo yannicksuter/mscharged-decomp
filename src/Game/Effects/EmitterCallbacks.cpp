@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Effects/EmitterCallbacks.h"
 #include "Game/Ball.h"
@@ -124,7 +125,7 @@ void UpdateEmitterFromBall(EmissionController& emitter)
     if (ReplayManager::Instance()->mRender != 0)
     {
         if (!g_pGame->IsGameplayOrOvertime()
-            && nlTaskManager::m_pInstance->mCurrentState != 8)
+            && nlTaskManager::m_pInstance->mCurrentState != TASK_REPLAY)
         {
             emitter.m_bVisible = ReplayManager::Instance()
                                      ->mRender->mBall.mFlags.bits.visible;

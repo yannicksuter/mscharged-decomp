@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Task/BeginFrameTask.h"
 
@@ -157,7 +158,7 @@ static void SetupRenderInfo()
 
     switch (nlTaskManager::m_pInstance->mCurrentState)
     {
-    case 16:
+    case TASK_NIS:
         if (BeginFrameTask::s_FramerateLocked)
         {
             swapMode = 2;
@@ -167,8 +168,8 @@ static void SetupRenderInfo()
             swapMode = 1;
         }
         break;
-    case 4:
-    case 8:
+    case TASK_FRONTEND:
+    case TASK_REPLAY:
         swapMode = 1;
         break;
     default:
@@ -486,7 +487,7 @@ void BeginFrameTask::Run(float dt)
 
     switch (nlTaskManager::m_pInstance->mCurrentState)
     {
-    case 8:
+    case TASK_REPLAY:
         ParticleSystem::m_AllowInFront = false;
         break;
     default:

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Camera/GameplayCameraEffects.h"
 
@@ -176,7 +177,7 @@ void GameplayCameraEffects::Update(float deltaTime)
     {
         if (IsTransitionActive())
         {
-            if (nlTaskManager::m_pInstance->mCurrentState == 2)
+            if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY)
                 UpdateTransition(deltaTime);
         }
         else if (mOwnsTimeScale == true)

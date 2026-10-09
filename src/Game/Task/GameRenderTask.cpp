@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/HBMManager.h"
 #include "Game/Task/GameRenderTask.h"
@@ -322,7 +323,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     float h;
 
     bool bCaptainShot = false;
-    if (nlTaskManager::m_pInstance->mCurrentState == 2 && g_pGame->mbCaptainShotToScoreOn)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY && g_pGame->mbCaptainShotToScoreOn)
     {
         bCaptainShot = true;
     }
@@ -331,8 +332,8 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     {
         switch (nlTaskManager::m_pInstance->mCurrentState)
         {
-        case 8:
-        case 0x10:
+        case TASK_REPLAY:
+        case TASK_NIS:
             if (gPeachPhotoState.state == PEACH_PHOTO_ACTIVE)
             {
                 EndPeachPhoto(&gPeachPhotoState, true);
@@ -387,7 +388,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
 
     u32 whiteTexture = glGetTexture("global/white");
 
-    float dt = (nlTaskManager::m_pInstance->mCurrentState == 1) ? 0.0f : fDeltaT;
+    float dt = (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED) ? 0.0f : fDeltaT;
 
     Jumbotron::instance.Update(dt);
     CrowdManager::instance.Update(dt);
@@ -428,7 +429,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
     }
     UpdateHighRange();
 
-    if (nlTaskManager::m_pInstance->mCurrentState != 4)
+    if (nlTaskManager::m_pInstance->mCurrentState != TASK_FRONTEND)
     {
         ReplayManager::Instance()->RenderSnapshotAt(fDeltaT);
     }
@@ -440,7 +441,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
 
     u32 currState = nlTaskManager::m_pInstance->mCurrentState;
     if (currState == 2
-        || (currState == 1 && nlTaskManager::m_pInstance->mPreviousState == 2))
+        || (currState == 1 && nlTaskManager::m_pInstance->mPreviousState == TASK_GAMEPLAY))
     {
         if (g_pGame->mbCaptainShotToScoreOn)
         {
@@ -518,7 +519,7 @@ void GameRenderTask::RenderFrame(float fDeltaT, bool bPictureInPicture)
                 GetCrowdImpostorManager()->ReleaseCrowdImpostors();
             }
 
-            bool paused = nlTaskManager::m_pInstance->mCurrentState == 0x10;
+            bool paused = nlTaskManager::m_pInstance->mCurrentState == TASK_NIS;
             ImpostorManager::GetInstance()->mUseRenderCache = g_bUpdateImpostorSprites && !paused;
             ImpostorManager::GetInstance()->UpdateSprites();
 

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/BasicStadium.h"
 #include "Game/Render/StadiumWorldObjects.h"
@@ -178,7 +179,7 @@ void fn_802785FC(BasicStadium* pStadium, float fDeltaT)
     pStadium->m_fTime += fDeltaT;
     pStadium->World::UpdateAnimations(fDeltaT);
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 0x10)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_NIS)
     {
         pStadium->UpdateEffects(fDeltaT);
 

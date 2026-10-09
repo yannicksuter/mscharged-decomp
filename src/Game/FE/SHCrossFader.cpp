@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/FE/SHCrossFader.h"
 #include "Game/FE/FEAudio.h"
 #include "Game/FE/fePresentation.h"
@@ -196,7 +197,7 @@ void CrossFaderScene::Update(float fDeltaT)
             mFadeToBlackTimer += fDeltaT;
             if (mFadeToBlackTimer >= 0.2f)
             {
-                nlTaskManager::SetNextState(0x00080000);
+                nlTaskManager::SetNextState(TASK_CLEAN_BOOT);
                 mFadeToBlackTimer = 0.0f;
             }
         }

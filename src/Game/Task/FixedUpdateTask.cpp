@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Task/FixedUpdateTask.h"
 #include "Game/EventDispatcher.inl"
@@ -281,7 +282,7 @@ float FixedUpdateTask::GetTimeScale()
 void FixedUpdateTask::SetFrameLock(float frameLockTime)
 {
     fixedUpdateTask.mfFrameLockTime = frameLockTime;
-    nlTaskManager::SetNextState(1);
+    nlTaskManager::SetNextState(TASK_PAUSED);
 }
 
 void FixedUpdateTask::DecrementFrameLock(float fDeltaT)
@@ -289,10 +290,10 @@ void FixedUpdateTask::DecrementFrameLock(float fDeltaT)
     fixedUpdateTask.mfFrameLockTime -= fDeltaT;
     if (fixedUpdateTask.mfFrameLockTime < 0.0f)
     {
-        if (nlTaskManager::m_pInstance->mCurrentState == 1
-            && nlTaskManager::m_pInstance->mPendingState != 16)
+        if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED
+            && nlTaskManager::m_pInstance->mPendingState != TASK_NIS)
         {
-            nlTaskManager::SetNextState(2);
+            nlTaskManager::SetNextState(TASK_GAMEPLAY);
         }
         fixedUpdateTask.mfFrameLockTime = 0.0f;
     }
@@ -309,13 +310,13 @@ void FixedUpdateTask::Run(float dt)
     {
         runFixedUpdate = false;
     }
-    if (nlTaskManager::m_pInstance->mPendingState == 16)
+    if (nlTaskManager::m_pInstance->mPendingState == TASK_NIS)
     {
         runFixedUpdate = false;
     }
 
     if (runFixedUpdate
-        && nlTaskManager::m_pInstance->mCurrentState == 2
+        && nlTaskManager::m_pInstance->mCurrentState == TASK_GAMEPLAY
         && !g_pNetworkSession->GetPausedMachineMask())
     {
         float simulationTick;

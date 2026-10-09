@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Render/PlanarShadowDrawable.h"
 
@@ -142,7 +143,7 @@ void ChargeShadowDrawable::Draw()
 
     GLView* previous;
     int level = (int)(4.0f * charge);
-    if (nlTaskManager::m_pInstance->mCurrentState != 0x10)
+    if (nlTaskManager::m_pInstance->mCurrentState != TASK_NIS)
     {
         previous = m_pWorldContext->m_pOpaqueView;
         m_pWorldContext->m_pOpaqueView = GetLayerView((eCLV)0xD);

@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "revolution/types.h"
 #include "NL/nlDLListContainer.inl"
 #include "Game/Audio/AudioBackend.h"
@@ -280,7 +281,7 @@ void HBMManager::Show()
 
     MovieStop();
     nlTaskManager::m_pInstance->mLocked = false;
-    nlTaskManager::SetNextState(0x02000000);
+    nlTaskManager::SetNextState(TASK_HOME_BUTTON_MENU);
 }
 
 void HBMManager::Update()

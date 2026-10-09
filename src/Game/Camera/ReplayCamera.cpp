@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Camera/ReplayCamera.h"
 #include "Game/Camera/CameraDamping.h"
 #include "Game/Camera/CameraMan.h"
@@ -230,7 +231,7 @@ void ReplayCamera::ManualUpdate(float deltaT)
             mFov = 120.0f;
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 8)
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_REPLAY)
     {
         float fovScale = BlendCameraValue(1.0f, gReplayCameraDepthOfFieldReferenceFov / mFov, gReplayCameraDepthOfFieldFovBlend);
         fovScale *= fovScale;

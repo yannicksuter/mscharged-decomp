@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/HBMManager.h"
 
 #include "Game/SH/SHLoading.h"
@@ -53,7 +54,7 @@ void SuperLoadingScene::Update(float fDeltaT)
     {
         if (!FrontEndPresentation::GetInstance()->IsActive())
         {
-            nlTaskManager::SetNextState(0x200000);
+            nlTaskManager::SetNextState(TASK_FE_TO_GAME);
         }
     }
     else
@@ -66,7 +67,7 @@ void SuperLoadingScene::Update(float fDeltaT)
         {
             if (mType == TT_IN)
             {
-                nlTaskManager::SetNextState(0x200000);
+                nlTaskManager::SetNextState(TASK_FE_TO_GAME);
             }
             else if (mType == TT_OUT)
             {

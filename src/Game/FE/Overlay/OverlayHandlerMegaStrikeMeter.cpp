@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/FE/Overlay/OverlayHandlerMegaStrikeMeter.h"
 #include "Game/AI/FielderActions.h"
 
@@ -46,7 +47,7 @@ void MegaStrikeMeterOverlay::Update(float dt)
         mNumbers->SetActiveSlide(sNumberSlides[(int)(value - 1.0f)], true, false);
         mNumbers->m_bVisible = true;
     }
-    if (nlTaskManager::m_pInstance->mCurrentState == 1
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_PAUSED
         && g_pOverlayManager->IsOnStack((SceneList)81))
     {
         if (mVisible == true)

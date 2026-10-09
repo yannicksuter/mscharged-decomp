@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "Game/Task/ParticleUpdateCallbacks.h"
 
 #include "Game/Task/GameRenderTask.h"
@@ -14,7 +15,7 @@ void ParticleUpdateNoOp(u8*)
 
 bool CanUpdateParticles()
 {
-    return nlTaskManager::m_pInstance->mCurrentState != 1;
+    return nlTaskManager::m_pInstance->mCurrentState != TASK_PAUSED;
 }
 
 bool CanRenderParticles()

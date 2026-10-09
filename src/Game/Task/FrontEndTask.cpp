@@ -1,3 +1,4 @@
+#include "Game/Task/GameTaskState.h"
 #include "revolution/types.h"
 #include "NL/nlDLListContainer.inl"
 #include <revolution/pad.h>
@@ -95,7 +96,7 @@ static void DrawFrontEndElements(float fDeltaT)
         FEModelManager::Instance()->Render();
     }
 
-    if (nlTaskManager::m_pInstance->mCurrentState == 4 && IsStadiumWorldLoaded()
+    if (nlTaskManager::m_pInstance->mCurrentState == TASK_FRONTEND && IsStadiumWorldLoaded()
         && !IsHBMActive())
     {
         glx_Fog(true);
@@ -145,7 +146,7 @@ void FrontEndTask::Run(float dt)
     FrontEndPresentation::GetInstance()->Update(dt);
     DrawFrontEndElements(dt);
 
-    if (nlTaskManager::m_pInstance->mCurrentState != 4)
+    if (nlTaskManager::m_pInstance->mCurrentState != TASK_FRONTEND)
     {
         if (GetConfigBool(Config::Global(), "domemsnapshot", false))
         {
@@ -227,7 +228,7 @@ void FrontEndTask::HandleE3IdleReset(float fDeltaT)
 
             if (g_fIdleGameTime >= 60.0f)
             {
-                if (nlTaskManager::m_pInstance->mCurrentState == 4)
+                if (nlTaskManager::m_pInstance->mCurrentState == TASK_FRONTEND)
                 {
                     if (!GameSceneManager::Instance()->IsOnStack(SCENE_TITLE))
                     {
