@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-int VFipf2_errnum();
+int VFipf2_errnum(void);
 
 #ifdef __cplusplus
 }
