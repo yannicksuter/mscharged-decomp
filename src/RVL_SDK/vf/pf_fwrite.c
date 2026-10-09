@@ -1,4 +1,5 @@
-#include <revolution/vf.h>
+#include <revolution/vf/pf_fwrite.h>
+#include <revolution/vf/pf_file.h>
 
 u32 VFipf2_fwrite(void* p_buf, u32 size, u32 count, struct PF_FILE* p_file) {
     u32 count_written;
