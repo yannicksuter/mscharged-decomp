@@ -3,7 +3,6 @@
 #include "NL/glx/GXSpecularDetailBlendMaterialProgram.h"
 #include "NL/glx/GXMaterialProgramInternal.h"
 #include "NL/glx/glxTexture.h"
-#include "NL/gl/glLoadModel.h"
 #include "Game/SharedStaticStorage.h"
 
 GXSpecularDetailBlendMaterialProgram* GXSpecularDetailBlendMaterialProgram::Instance;
