@@ -31,17 +31,17 @@ class ToScreenCoordinates : public TransitionModifierInterface
 public:
     ToScreenCoordinates()
     {
-        float temp_f30 = 0.5f * glGetOrthographicWidth();
-        float temp_f31 = 0.5f * glGetOrthographicHeight();
-        float temp_f1 = -glGetScreenInfo()->PixelCentre;
+        float halfWidth = 0.5f * glGetOrthographicWidth();
+        float halfHeight = 0.5f * glGetOrthographicHeight();
+        float pixelCentreOffset = -glGetScreenInfo()->PixelCentre;
 
         m_m3Position.SetIdentity();
         m_m3UV.SetIdentity();
 
-        m_m3Position.m11 = temp_f30;
-        m_m3Position.m22 = temp_f31;
-        m_m3Position.m31 = temp_f30 - temp_f1;
-        m_m3Position.m32 = temp_f31 - temp_f1;
+        m_m3Position.m11 = halfWidth;
+        m_m3Position.m22 = halfHeight;
+        m_m3Position.m31 = halfWidth - pixelCentreOffset;
+        m_m3Position.m32 = halfHeight - pixelCentreOffset;
 
         m_m3UV.m32 = 0.5f;
         m_m3UV.m31 = 0.5f;
@@ -173,16 +173,16 @@ public:
     virtual void ApplyModifier(glPoly2& poly, float time)
     {
         nlColour col;
-        s32 temp_r6;
-        u32 temp_r3;
+        s32 startWeight;
+        u32 endWeight;
 
-        temp_r3 = 255.0f * time;
-        temp_r6 = 0xFF - temp_r3;
+        endWeight = 255.0f * time;
+        startWeight = 0xFF - endWeight;
 
-        col.c[0] = ((temp_r6 * m_cStartColour.c[0]) + (temp_r3 * m_cEndColour.c[0])) >> 8;
-        col.c[1] = ((temp_r6 * m_cStartColour.c[1]) + (temp_r3 * m_cEndColour.c[1])) >> 8;
-        col.c[2] = ((temp_r6 * m_cStartColour.c[2]) + (temp_r3 * m_cEndColour.c[2])) >> 8;
-        col.c[3] = ((temp_r6 * m_cStartColour.c[3]) + (temp_r3 * m_cEndColour.c[3])) >> 8;
+        col.c[0] = ((startWeight * m_cStartColour.c[0]) + (endWeight * m_cEndColour.c[0])) >> 8;
+        col.c[1] = ((startWeight * m_cStartColour.c[1]) + (endWeight * m_cEndColour.c[1])) >> 8;
+        col.c[2] = ((startWeight * m_cStartColour.c[2]) + (endWeight * m_cEndColour.c[2])) >> 8;
+        col.c[3] = ((startWeight * m_cStartColour.c[3]) + (endWeight * m_cEndColour.c[3])) >> 8;
         poly.SetColour(col);
     }
 
@@ -311,38 +311,38 @@ class ScaleTexture : public TransitionModifierInterface
 public:
     ScaleTexture()
     {
-        m_v2StartShift.x = 1.0f;
-        m_v2StartShift.y = 1.0f;
-        m_v2EndShift.x = 1.0f;
-        m_v2EndShift.y = 1.0f;
+        m_v2StartScale.x = 1.0f;
+        m_v2StartScale.y = 1.0f;
+        m_v2EndScale.x = 1.0f;
+        m_v2EndScale.y = 1.0f;
     }
 
     virtual void InitializeFromParser(SimpleParser* parser)
     {
-        m_v2StartShift.x = atof(parser->NextTokenOnLine(true));
-        m_v2StartShift.y = atof(parser->NextTokenOnLine(true));
-        f32 val = m_v2StartShift.x;
+        m_v2StartScale.x = atof(parser->NextTokenOnLine(true));
+        m_v2StartScale.y = atof(parser->NextTokenOnLine(true));
+        f32 val = m_v2StartScale.x;
         char* token = parser->NextTokenOnLine(true);
         if (token != NULL)
         {
             val = atof(token);
         }
-        m_v2EndShift.x = val;
+        m_v2EndScale.x = val;
 
-        val = m_v2StartShift.y;
+        val = m_v2StartScale.y;
         token = parser->NextTokenOnLine(true);
         if (token != NULL)
         {
             val = atof(token);
         }
-        m_v2EndShift.y = val;
+        m_v2EndScale.y = val;
     }
 
     virtual void ApplyModifier(glPoly2& poly, float time)
     {
         nlVector2 scale = {
-            ((1.0f - time) * m_v2StartShift.x) + (time * m_v2EndShift.x),
-            ((1.0f - time) * m_v2StartShift.y) + (time * m_v2EndShift.y),
+            ((1.0f - time) * m_v2StartScale.x) + (time * m_v2EndScale.x),
+            ((1.0f - time) * m_v2StartScale.y) + (time * m_v2EndScale.y),
         };
 
         poly.m_uv[0].x *= scale.x;
@@ -355,8 +355,8 @@ public:
         poly.m_uv[3].y *= scale.y;
     }
 
-    /* 0x4 */ nlVector2 m_v2StartShift;
-    /* 0xC */ nlVector2 m_v2EndShift;
+    /* 0x4 */ nlVector2 m_v2StartScale;
+    /* 0xC */ nlVector2 m_v2EndScale;
 }; // total size: 0x14
 
 class TranslateTexture : public TransitionModifierInterface
@@ -517,9 +517,9 @@ public:
 
     virtual bool ConsumeScreenGrabRequest()
     {
-        bool unknown = m_bDoGrab;
+        bool grabRequested = m_bDoGrab;
         m_bDoGrab = false;
-        return unknown;
+        return grabRequested;
     }
 
     virtual void Cleanup()
@@ -563,7 +563,7 @@ void ScriptedScreenTransition::Update(float dt)
     m_fCurrentTime += dt;
 }
 
-float ScriptedScreenTransition::GetDuration()
+float ScriptedScreenTransition::GetEasedTime()
 {
     float normalizedTime;
     if (m_fLength > 0.00001)
@@ -610,7 +610,7 @@ void ScriptedScreenTransition::Render(GLView* view)
     *(u32*)&poly.m_colour[2] = *(u32*)&colour;
     *(u32*)&poly.m_colour[3] = *(u32*)&colour;
 
-    float finalTime = GetDuration();
+    float finalTime = GetEasedTime();
 
     glSetDefaultState(false);
     glSetCurrentTexture(m_nTexture, GLTT_Diffuse);
@@ -665,16 +665,16 @@ void ScriptedScreenTransition::InitializeFromParser(SimpleParser* parser)
         }
         else if (nlStrCmp<char>(pToken, "time") == 0)
         {
-            char* temp_r3 = parser->NextTokenOnLine(true);
-            if (nlStrCmp<char>(temp_r3, "linear") == 0)
+            char* timeCurveName = parser->NextTokenOnLine(true);
+            if (nlStrCmp<char>(timeCurveName, "linear") == 0)
             {
                 m_eTimeLine = TIME_LINEAR;
             }
-            else if (nlStrCmp<char>(temp_r3, "accelerate") == 0)
+            else if (nlStrCmp<char>(timeCurveName, "accelerate") == 0)
             {
                 m_eTimeLine = TIME_ACCEL;
             }
-            else if (nlStrCmp<char>(temp_r3, "decelarate") == 0)
+            else if (nlStrCmp<char>(timeCurveName, "decelarate") == 0)
             {
                 m_eTimeLine = TIME_DECEL;
             }
