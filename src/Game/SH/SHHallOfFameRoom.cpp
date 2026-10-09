@@ -69,9 +69,9 @@ void SHHallOfFameRoom::SceneCreated()
     TLComponentInstance* breadcrumbs = 0;
     if (navigation != 0)
     {
-        navigation->SetButtons(0x8F, false);
-        backButton = navigation->GetButton(4);
-        breadcrumbs = navigation->GetButton(8);
+        navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PROGRESS, false);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        breadcrumbs = navigation->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
         mPageControls = navigation->GetPageControls();
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, true, true);
@@ -263,7 +263,7 @@ void SHHallOfFameCup::SceneCreated()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
-        mProgressButtonInstance = navigation->GetButton(0x80);
+        mProgressButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PROGRESS);
     }
 
     mRollovers = FEFinder<TLComponentInstance, 4>::Find<TLSlide>(

@@ -133,9 +133,9 @@ void SHOnlineInvitePlayers::SceneCreated()
     else
         mBackEnabled = false;
     SHNavigation* screen = GetNavigationScene();
-    screen->SetButtons(0x24, true);
-    mBackButtonInstance = screen->GetButton(4);
-    mStartButtonInstance = screen->GetButton(0x20);
+    screen->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
+    mBackButtonInstance = screen->GetButton(NAVIGATION_BUTTON_BACK);
+    mStartButtonInstance = screen->GetButton(NAVIGATION_BUTTON_DONE);
     mBackButton.SetButtonInstance(mBackButtonInstance);
     if (mBackEnabled)
     {
@@ -144,11 +144,11 @@ void SHOnlineInvitePlayers::SceneCreated()
     }
     else
     {
-        screen->SetButtonVisibility(4, false);
+        screen->SetButtonVisibility(NAVIGATION_BUTTON_BACK, false);
         mBackButton.Disable();
     }
     SetDoneButtonBounds(&mStartButton, mStartButtonInstance, 0);
-    screen->SetButtonVisibility(0x20, false);
+    screen->SetButtonVisibility(NAVIGATION_BUTTON_DONE, false);
     mStartButton.Disable();
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();

@@ -202,8 +202,8 @@ void SHOnlineFriends::SceneCreated()
     TLComponentInstance* done = 0;
     if (scene != 0)
     {
-        scene->SetButtons(0, true);
-        done = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
+        done = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(done);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
@@ -228,7 +228,7 @@ void SHOnlineFriends::Update(float dt)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
-                scene->SetButtons(4, true);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
             mTransitionState = StateInteractive;
             InitializeButtons();
             mInitialized = true;

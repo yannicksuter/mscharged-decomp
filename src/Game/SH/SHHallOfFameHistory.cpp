@@ -126,7 +126,7 @@ void SHHallOfFameHistory::SceneCreated()
     if (object != 0)
     {
         object->HideButtons();
-        screen = object->GetButton(4);
+        screen = object->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mNavigation.SetButtonInstance(screen);
 
@@ -177,7 +177,7 @@ void SHHallOfFameHistory::Update(float fDeltaT)
 
         if (state == HOF_HISTORY_ENTERING)
         {
-            GetNavigationScene()->SetButtons(4, true);
+            GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK, true);
             mState = HOF_HISTORY_ACTIVE;
             if (!mScrollWidget.mInitialized)
             {
@@ -647,8 +647,8 @@ void SHHallOfFamePlayerCard::SceneCreated()
     TLComponentInstance* screen = 0;
     if (object != 0)
     {
-        object->SetButtons(4, true);
-        screen = object->GetButton(4);
+        object->SetButtons(NAVIGATION_BUTTON_BACK, true);
+        screen = object->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mNavigation.SetButtonInstance(screen);
 

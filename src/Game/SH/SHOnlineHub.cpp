@@ -103,8 +103,8 @@ void SHOnlineHub::SceneCreated()
     if (scene != 0)
     {
         scene->HideButtons();
-        done = scene->GetButton(4);
-        scene->SetBackButtonText(1);
+        done = scene->GetButton(NAVIGATION_BUTTON_BACK);
+        scene->SetBackButtonText(NAV_LOG_OUT);
     }
     mBackButton.SetButtonInstance(done);
     g_pNetworkSessionBase->SetSessionState(NET_SESSION_MATCHMAKE);
@@ -134,8 +134,8 @@ void SHOnlineHub::Update(float dt)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                scene->SetButtons(4, true);
-                scene->SetBackButtonText(1);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+                scene->SetBackButtonText(NAV_LOG_OUT);
             }
             InitializeButtons();
             mInitialized = true;

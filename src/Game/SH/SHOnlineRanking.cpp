@@ -149,7 +149,7 @@ void SHOnlineRanking::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
         mPageControls = navigation->GetPageControls();
     }
     mBackButton.SetButtonInstance(backButton);
@@ -217,7 +217,7 @@ void SHOnlineRanking::Update(float fDeltaT)
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
             {
-                navigation->SetButtons(15, false);
+                navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS, false);
                 mPageControls->SetButtonState(1, true, true);
                 mPageControls->SetButtonState(0, true, true);
             }

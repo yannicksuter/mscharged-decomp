@@ -67,8 +67,8 @@ void SHOnlineGuestControllerSelect::SceneCreated()
     if (object != 0)
     {
         object->HideButtons();
-        screen = object->GetButton(4);
-        mDoneButtonInstance = object->GetButton(0x20);
+        screen = object->GetButton(NAVIGATION_BUTTON_BACK);
+        mDoneButtonInstance = object->GetButton(NAVIGATION_BUTTON_DONE);
     }
 
     mNavigation.SetButtonInstance(screen);
@@ -152,7 +152,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                scene->SetButtons(0x24, true);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
             }
             InitializeButtons();
             UpdateDoneButtonVisibility();

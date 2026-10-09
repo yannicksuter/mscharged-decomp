@@ -87,11 +87,11 @@ void SHOnlineInviteStatus::SceneCreated()
     if (mCanCancel)
     {
         mBackButton.SetBackScene(g_pFriendManager->mReturnScene);
-        scene->SetButtons(4, true);
+        scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
     }
     else
-        scene->SetButtons(0, true);
-    mBackButton.SetButtonInstance(scene->GetButton(4));
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
+    mBackButton.SetButtonInstance(scene->GetButton(NAVIGATION_BUTTON_BACK));
     if (mCanCancel)
         mBackButton.Enable();
     else
@@ -170,7 +170,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
     {
         if (!CanCancel())
         {
-            GetNavigationScene()->SetButtons(0, true);
+            GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_NONE, true);
             mBackButton.Disable();
             mCanCancel = false;
         }
@@ -179,7 +179,7 @@ void SHOnlineInviteStatus::Update(float fDeltaT)
     {
         if (CanCancel())
         {
-            GetNavigationScene()->SetButtons(4, true);
+            GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK, true);
             mBackButton.Enable();
             mCanCancel = true;
         }

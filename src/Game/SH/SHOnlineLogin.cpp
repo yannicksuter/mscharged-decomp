@@ -46,7 +46,7 @@ void SHOnlineLogin::SceneCreated()
     mLoginComponent->SetActiveSlide("CONNECTING", false, false);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
-        scene->SetButtons(0, true);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
     g_pNetworkSession->SetLoginListener(this);
     FEAudio::PlayAnimAudioEvent(0x71D9CD2F, "FE_LOGIN", this, true);
 }

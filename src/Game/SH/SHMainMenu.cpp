@@ -127,8 +127,8 @@ void SHMainMenu::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (scene != 0)
     {
-        scene->SetButtons(4, true);
-        backButton = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+        backButton = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
 
     for (int i = 0; i < NUM_ITEMS; ++i)
@@ -413,7 +413,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
         {
-            scene->SetButtons(0, true);
+            scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
         }
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);

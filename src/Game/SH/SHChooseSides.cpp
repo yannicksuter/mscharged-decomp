@@ -170,21 +170,21 @@ void SHChooseSides2::SceneCreated()
         if (mContext == CUP || mContext == TOURNAMENT)
         {
             object->HideButtons();
-            screen = object->GetButton(4);
-            mHomeAwayBox = object->GetButton(0x10);
+            screen = object->GetButton(NAVIGATION_BUTTON_BACK);
+            mHomeAwayBox = object->GetButton(NAVIGATION_BUTTON_PLAY);
             mHomeAwayButtonMask = 0x10;
         }
         else if (mContext != PAUSE)
         {
             object->HideButtons();
-            screen = object->GetButton(4);
-            mHomeAwayBox = object->GetButton(0x20);
+            screen = object->GetButton(NAVIGATION_BUTTON_BACK);
+            mHomeAwayBox = object->GetButton(NAVIGATION_BUTTON_DONE);
             mHomeAwayButtonMask = 0x20;
         }
         else
         {
             object->HideButtons();
-            mHomeAwayBox = object->GetButton(0x20);
+            mHomeAwayBox = object->GetButton(NAVIGATION_BUTTON_DONE);
             mHomeAwayButtonMask = 0x20;
         }
     }
@@ -360,15 +360,15 @@ void SHChooseSides2::Update(float fDeltaT)
                 SHNavigation* object = GetNavigationScene();
                 if (mContext == CUP || mContext == TOURNAMENT)
                 {
-                    object->SetButtons(20, true);
+                    object->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_PLAY, true);
                 }
                 else if (mContext != PAUSE)
                 {
-                    object->SetButtons(36, true);
+                    object->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
                 }
                 else
                 {
-                    object->SetButtons(32, true);
+                    object->SetButtons(NAVIGATION_BUTTON_DONE, true);
                 }
 
                 object->SetButtonVisibility(mHomeAwayButtonMask, false);
@@ -822,14 +822,14 @@ void SHChooseSides2::Proceed()
         info->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);
         GameSceneManager::Instance()->PushLoadingScene(true);
         SaveLoad::StartSave(false);
-        object->SetButtons(0, true);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     else if (mContext == TOURNAMENT)
     {
         GameInfoManager::Instance()->unknown_0x71C8 = 1;
         FrontEndPresentation::GetInstance()->Call("StartChallengeSequence");
         GameSceneManager::Instance()->PushLoadingScene(true);
-        object->SetButtons(0, true);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     else if (mContext != PAUSE)
     {

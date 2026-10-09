@@ -137,8 +137,8 @@ void RoadToStrikersCupHubScene::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
-        mPlayButtonInstance = navigation->GetButton(16);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
     }
     mBackButton.SetButtonInstance(backButton);
     UpdateCupBreadcrumbs(0);
@@ -181,7 +181,7 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
         if (mTransitionState == ROAD_TO_STRIKERS_CUP_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
-            navigation->SetButtons(0x14, true);
+            navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_PLAY, true);
             UpdatePlayButtonText();
             mTransitionState = ROAD_TO_STRIKERS_CUP_ACTIVE;
         }

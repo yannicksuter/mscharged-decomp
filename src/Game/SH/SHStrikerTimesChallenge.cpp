@@ -171,8 +171,8 @@ void SHStrikerTimesChallenge::SceneCreated()
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
         {
-            scene->SetButtons(4, true);
-            mBackButtonInstance = scene->GetButton(4);
+            scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+            mBackButtonInstance = scene->GetButton(NAVIGATION_BUTTON_BACK);
             mBackButtonInstance->m_bVisible = false;
         }
         mBackButton.SetButtonInstance(mBackButtonInstance);

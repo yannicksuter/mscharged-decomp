@@ -86,7 +86,7 @@ void ChallengeSelectScene::SceneCreated()
     if (menu != 0)
     {
         menu->HideButtons();
-        menuComponent = menu->GetButton(4);
+        menuComponent = menu->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(menuComponent);
     mBackButton.SetPushBackScene(false);
@@ -232,7 +232,7 @@ void ChallengeSelectScene::Update(float dt)
         {
             if (!mButtonsInitialized)
             {
-                GetNavigationScene()->SetButtons(4, true);
+                GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK, true);
                 InitializeButtons();
                 mButtonsInitialized = true;
             }

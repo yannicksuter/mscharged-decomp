@@ -82,7 +82,7 @@ void SHOptionsCheatsList::Update(float fDeltaT)
 
         if (state == CHEATS_LIST_ENTERING)
         {
-            GetNavigationScene()->SetButtons(4, true);
+            GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK, true);
             if (!mButtonsInitialized)
             {
                 InitializeButtons();
@@ -164,7 +164,7 @@ void SHOptionsCheatsList::SceneCreated()
     {
         mSavedNavigationButtons = scene->mVisibleButtons;
         scene->HideButtons();
-        backButton = scene->GetButton(4);
+        backButton = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mNavigation.SetButtonInstance(backButton);
 

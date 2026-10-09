@@ -171,8 +171,8 @@ void ChooseCaptainsSceneV2::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        back = navigation->GetButton(4);
-        mDoneButtonInstance = navigation->GetButton(0x20);
+        back = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mDoneButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mDoneButtonInstance->SetActiveSlide("off", true, false);
 
@@ -374,9 +374,9 @@ void ChooseCaptainsSceneV2::Update(float dt)
         if (mScenePhase == PHASE_ENTERING)
         {
             if (GameInfoManager::Instance()->IsOnline())
-                GetNavigationScene()->SetButtons(0x20, true);
+                GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_DONE, true);
             else
-                GetNavigationScene()->SetButtons(0x24, true);
+                GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
             UpdateDoneButton();
             if (!mSideJoined[0])
                 mPDALayers[0]->SetActiveSlide("off", true, false);

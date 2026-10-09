@@ -279,9 +279,9 @@ void SHNavigation::ResetButtons(bool enabled)
     this->mDoneButton->SetActiveSlide("off", true, false);
     this->mLowerDoneButton->SetActiveSlide("off", true, false);
     this->mProgressButton->SetActiveSlide("off", true, false);
-    SetPlayButtonText(0);
-    SetBackButtonText(0);
-    SetDoneButtonText(0);
+    SetPlayButtonText(NAV_PLAY_NOW);
+    SetBackButtonText(NAV_BACK);
+    SetDoneButtonText(NAV_DONE);
 }
 
 void SHNavigation::SetButtons(int value, bool enabled)
@@ -296,9 +296,9 @@ void SHNavigation::SetButtons(int value, bool enabled)
     this->mDoneButton->m_bVisible = (this->mVisibleButtons >> 5) & 1;
     this->mLowerDoneButton->m_bVisible = (this->mVisibleButtons >> 6) & 1;
     this->mProgressButton->m_bVisible = (this->mVisibleButtons >> 7) & 1;
-    SetPlayButtonText(0);
-    SetBackButtonText(0);
-    SetDoneButtonText(0);
+    SetPlayButtonText(NAV_PLAY_NOW);
+    SetBackButtonText(NAV_BACK);
+    SetDoneButtonText(NAV_DONE);
 }
 
 TLComponentInstance* SHNavigation::GetButton(int value)
@@ -306,28 +306,28 @@ TLComponentInstance* SHNavigation::GetButton(int value)
     TLComponentInstance* component = 0;
     switch (value)
     {
-    case 1:
+    case NAVIGATION_BUTTON_PLUS:
         component = this->mPlusButton;
         break;
-    case 2:
+    case NAVIGATION_BUTTON_MINUS:
         component = this->mMinusButton;
         break;
-    case 4:
+    case NAVIGATION_BUTTON_BACK:
         component = this->mBackButton;
         break;
-    case 8:
+    case NAVIGATION_BUTTON_BREADCRUMBS:
         component = this->mBreadcrumbs;
         break;
-    case 0x10:
+    case NAVIGATION_BUTTON_PLAY:
         component = this->mPlayButton;
         break;
-    case 0x20:
+    case NAVIGATION_BUTTON_DONE:
         component = this->mDoneButton;
         break;
-    case 0x40:
+    case NAVIGATION_BUTTON_LOWER_DONE:
         component = this->mLowerDoneButton;
         break;
-    case 0x80:
+    case NAVIGATION_BUTTON_PROGRESS:
         component = this->mProgressButton;
         break;
     }
@@ -352,22 +352,22 @@ void SHNavigation::SetPlayButtonText(int value)
 
     switch (value)
     {
-    case 0:
+    case NAV_PLAY_NOW:
         text0->SetStringId("PLAY_NOW");
         text1->SetStringId("PLAY_NOW");
         text2->SetStringId("PLAY_NOW");
         break;
-    case 1:
+    case NAV_RESTART_CUP:
         text0->SetStringId("RESTART_CUP");
         text1->SetStringId("RESTART_CUP");
         text2->SetStringId("RESTART_CUP");
         break;
-    case 2:
+    case NAV_CONTINUE:
         text0->SetStringId("CONTINUE");
         text1->SetStringId("CONTINUE");
         text2->SetStringId("CONTINUE");
         break;
-    case 3:
+    case NAV_PLAY_READY:
         text0->SetStringId("PLAY_NOW_READY");
         text1->SetStringId("PLAY_NOW_READY");
         text2->SetStringId("PLAY_NOW_READY");
@@ -388,12 +388,12 @@ void SHNavigation::SetDoneButtonText(int value)
 
     switch (value)
     {
-    case 0:
+    case NAV_DONE:
         text0->SetStringId("DONE");
         text1->SetStringId("DONE");
         text2->SetStringId("DONE");
         break;
-    case 1:
+    case NAV_ACCEPT:
         text0->SetStringId("OPTIONS_ACCEPT");
         text1->SetStringId("OPTIONS_ACCEPT");
         text2->SetStringId("OPTIONS_ACCEPT");
@@ -417,12 +417,12 @@ void SHNavigation::SetBackButtonText(int value)
 
     switch (value)
     {
-    case 0:
+    case NAV_BACK:
         text0->SetStringId("BACK");
         text1->SetStringId("BACK");
         text2->SetStringId("BACK");
         break;
-    case 1:
+    case NAV_LOG_OUT:
         text0->SetStringId("LOG_OUT");
         text1->SetStringId("LOG_OUT");
         text2->SetStringId("LOG_OUT");

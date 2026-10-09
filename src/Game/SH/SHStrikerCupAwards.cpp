@@ -124,8 +124,8 @@ void StrikerCupAwardsScene::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (navigation != 0)
     {
-        backButton = navigation->GetButton(4);
-        mPlayButtonInstance = navigation->GetButton(0x10);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         mPageControls = navigation->GetPageControls();
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, true, true);
@@ -174,7 +174,7 @@ void StrikerCupAwardsScene::Update(float deltaTime)
         {
             if (!mPointerButtonsInitialized)
             {
-                GetNavigationScene()->SetButtons(0x1F, false);
+                GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, false);
                 UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;

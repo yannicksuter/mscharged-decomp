@@ -68,7 +68,7 @@ void SHOnlineInviteResponse::SceneCreated()
     g_pFriendManager->SetOwnStatusReceivedInvitation(index);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
-        scene->SetButtons(0, true);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
     SetOnlineRankedMatch(false);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
 }

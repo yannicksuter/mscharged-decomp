@@ -124,8 +124,8 @@ void SHGameplayOptions::SceneCreated()
     if (scene != 0)
     {
         scene->HideButtons();
-        done = scene->GetButton(4);
-        mDoneButtonInstance = scene->GetButton(64);
+        done = scene->GetButton(NAVIGATION_BUTTON_BACK);
+        mDoneButtonInstance = scene->GetButton(NAVIGATION_BUTTON_LOWER_DONE);
         mPageControls = &scene->mPageControls;
         mPageControls->SetButtonState(1, true, false);
         mPageControls->SetButtonState(0, true, false);
@@ -153,7 +153,7 @@ void SHGameplayOptions::Update(float dt)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
-                scene->SetButtons(79, true);
+                scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_LOWER_DONE, true);
             mFlowState = GAMEPLAY_OPTIONS_ACTIVE;
             ToggleOptionsView();
         }
@@ -244,9 +244,9 @@ void SHGameplayOptions::Update(float dt)
             if (scene != 0)
             {
                 if (mPageControls->IsButtonPressed(0))
-                    scene->SetButtons(9, false);
+                    scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_BREADCRUMBS, false);
                 else
-                    scene->SetButtons(10, false);
+                    scene->SetButtons(NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BREADCRUMBS, false);
             }
             return;
         }
@@ -276,7 +276,7 @@ void SHGameplayOptions::ToggleOptionsView()
         mPageControls->ClearButtonHighlight(1);
         SetBreadcrumbs(2, 0);
         if (scene != 0)
-            scene->SetButtonVisibility(2, false);
+            scene->SetButtonVisibility(NAVIGATION_BUTTON_MINUS, false);
     }
     else
     {
@@ -289,7 +289,7 @@ void SHGameplayOptions::ToggleOptionsView()
         SetBreadcrumbs(2, 1);
         UpdateCheatText();
         if (scene != 0)
-            scene->SetButtonVisibility(1, false);
+            scene->SetButtonVisibility(NAVIGATION_BUTTON_PLUS, false);
     }
     bool options = mViewIndex == 0;
     bool cheats = mViewIndex == 1;
@@ -680,7 +680,7 @@ void SHGameplayOptions::OnDonePointerPress(unsigned int index, void* context)
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
-        scene->SetButtons(64, true);
+        scene->SetButtons(NAVIGATION_BUTTON_LOWER_DONE, true);
     mDoneButtonInstance->SetActiveSlide("down", true, false);
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     GameInfoManager* gameInfo = GameInfoManager::Instance();

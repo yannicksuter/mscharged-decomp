@@ -76,7 +76,7 @@ void SHOnlinePlayerCount::SceneCreated()
     if (scene != 0)
     {
         scene->HideButtons();
-        screen = scene->GetButton(4);
+        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(screen);
 
@@ -105,7 +105,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                scene->SetButtons(4, true);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
             }
             InitializeButtons();
             mButtonsInitialized = true;

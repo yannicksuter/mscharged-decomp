@@ -247,8 +247,8 @@ void ChooseSidekicksSceneV2::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        back = navigation->GetButton(4);
-        mDoneButtonInstance = navigation->GetButton(0x20);
+        back = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mDoneButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mSidekickComponents[0].ReloadSidekicks();
     mSidekickComponents[1].ReloadSidekicks();
@@ -384,9 +384,9 @@ void ChooseSidekicksSceneV2::Update(float dt)
             {
                 UpdateSlotButtons();
                 if (GameInfoManager::Instance()->IsOnline())
-                    GetNavigationScene()->SetButtons(0x20, true);
+                    GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_DONE, true);
                 else
-                    GetNavigationScene()->SetButtons(0x24, true);
+                    GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
                 for (int i = 0; i < 4; ++i)
                     GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
                 InitializePointerButtons();

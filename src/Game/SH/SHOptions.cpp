@@ -53,7 +53,7 @@ void OptionsScene::SceneCreated()
     if (object != 0)
     {
         object->HideButtons();
-        screen = object->GetButton(4);
+        screen = object->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(screen);
     mBackButton.SetPushBackScene(false);
@@ -86,7 +86,7 @@ void OptionsScene::Update(float fDeltaT)
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                object->SetButtons(4, true);
+                object->SetButtons(NAVIGATION_BUTTON_BACK, true);
             }
             mScenePhase = PHASE_CHOOSING;
         }

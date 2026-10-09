@@ -101,8 +101,8 @@ void SHOnlineFriendCodeEntry::SceneCreated()
     TLComponentInstance* screen = 0;
     if (object != 0)
     {
-        object->SetButtons(0, true);
-        screen = object->GetButton(4);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
+        screen = object->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(screen);
 
@@ -216,7 +216,7 @@ void SHOnlineFriendCodeEntry::Update(float fDeltaT)
             SHNavigation* object = GetNavigationScene();
             if (object != 0)
             {
-                object->SetButtons(4, true);
+                object->SetButtons(NAVIGATION_BUTTON_BACK, true);
             }
             mState = FRIEND_CODE_ENTRY_ACTIVE;
             InitializeButtons();

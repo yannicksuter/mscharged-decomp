@@ -103,8 +103,8 @@ void ControllerMapOverlay::SceneCreated()
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
     {
-        scene->SetButtons(0x20, true);
-        mDoneButtonInstance = scene->GetButton(0x20);
+        scene->SetButtons(NAVIGATION_BUTTON_DONE, true);
+        mDoneButtonInstance = scene->GetButton(NAVIGATION_BUTTON_DONE);
         mDoneButtonInstance->m_bVisible = false;
     }
 

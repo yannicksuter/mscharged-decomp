@@ -128,8 +128,8 @@ void CupKnockoutScene::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (navigation != 0)
     {
-        backButton = navigation->GetButton(4);
-        mBracketButtonInstance = navigation->GetButton(16);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mBracketButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         mPageControls = navigation->GetPageControls();
         if (!mNetworkTournament)
         {
@@ -171,7 +171,7 @@ void CupKnockoutScene::Update(float fDeltaT)
             if (!mPointerButtonsInitialized)
             {
                 SHNavigation* navigation = GetNavigationScene();
-                navigation->SetButtons(0x1F, false);
+                navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, false);
                 UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;

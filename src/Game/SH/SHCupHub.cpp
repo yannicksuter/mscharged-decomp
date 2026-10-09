@@ -104,8 +104,8 @@ void CupHubScene::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (navigation != 0)
     {
-        backButton = navigation->GetButton(4);
-        mRulesButton = navigation->GetButton(16);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mRulesButton = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         mPageControls = navigation->GetPageControls();
     }
     mNavigationComponent.SetButtonInstance(backButton);
@@ -155,9 +155,9 @@ void CupHubScene::Update(float fDeltaT)
             {
                 SHNavigation* navigation = GetNavigationScene();
                 if (mPagingEnabled)
-                    navigation->SetButtons(0x1F, false);
+                    navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, false);
                 else
-                    navigation->SetButtons(0x14, true);
+                    navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_PLAY, true);
                 UpdatePlayButtonText();
                 InitializePointerButtons();
                 mInitialized = true;

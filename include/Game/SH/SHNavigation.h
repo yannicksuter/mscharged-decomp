@@ -23,6 +23,26 @@ enum NavigationButton
     NAVIGATION_BUTTON_PROGRESS = 0x80
 };
 
+enum eNavigationPlayText
+{
+    NAV_PLAY_NOW = 0,
+    NAV_RESTART_CUP = 1,
+    NAV_CONTINUE = 2,
+    NAV_PLAY_READY = 3,
+};
+
+enum eNavigationDoneText
+{
+    NAV_DONE = 0,
+    NAV_ACCEPT = 1,
+};
+
+enum eNavigationBackText
+{
+    NAV_BACK = 0,
+    NAV_LOG_OUT = 1,
+};
+
 class SHNavigation : public BaseSceneHandler
 {
 public:

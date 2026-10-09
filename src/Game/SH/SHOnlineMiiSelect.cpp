@@ -100,8 +100,8 @@ void SHOnlineMiiSelect::SceneCreated()
     TLComponentInstance* screen = 0;
     if (scene != 0)
     {
-        scene->SetButtons(7, true);
-        screen = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK, true);
+        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
         mPageControls = &scene->mPageControls;
         mPageControls->SetButtonState(1, false, false);
         mPageControls->SetButtonState(0, false, false);
@@ -442,27 +442,27 @@ void SHOnlineMiiSelect::UpdatePage()
     {
         mPageControls->SetButtonState(1, false, false);
         mPageControls->SetButtonState(0, false, false);
-        scene->SetButtons(4, true);
+        scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
     }
     else if (mCurrentPage <= 0)
     {
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, false, false);
         mPageControls->ClearButtonHighlight(1);
-        scene->SetButtons(5, true);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_BACK, true);
     }
     else if (mCurrentPage >= mPageCount - 1)
     {
         mPageControls->SetButtonState(1, false, false);
         mPageControls->SetButtonState(0, true, true);
         mPageControls->ClearButtonHighlight(0);
-        scene->SetButtons(6, true);
+        scene->SetButtons(NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK, true);
     }
     else
     {
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, true, true);
-        scene->SetButtons(7, true);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK, true);
     }
 }
 

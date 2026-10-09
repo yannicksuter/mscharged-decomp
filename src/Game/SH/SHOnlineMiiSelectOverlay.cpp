@@ -161,8 +161,8 @@ void SHOnlineMiiSelectOverlay::SceneCreated()
     TLComponentInstance* screen = 0;
     if (scene != 0)
     {
-        scene->SetButtons(4, true);
-        screen = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
         mPageControls = scene->GetPageControls();
         mPageControls->SetButtonState(1, true, false);
         mPageControls->SetButtonState(0, true, false);

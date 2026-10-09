@@ -146,7 +146,7 @@ void SHOnlineFriendsDraft::SceneCreated()
     mScrollBar.SetComponent(scrollbar == 0 ? &TLComponentDefault::sInstance : scrollbar);
     mScrollBar.SetRange(0);
     mScrollBar.SetValue(0);
-    GetNavigationScene()->SetButtons(0, true);
+    GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_NONE, true);
     RefreshPlayerRows();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);

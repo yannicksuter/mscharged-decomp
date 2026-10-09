@@ -106,7 +106,7 @@ void TitleScene::SceneCreated()
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        object->SetButtons(0, true);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
 
     if (mMovement != SCREEN_BACK)

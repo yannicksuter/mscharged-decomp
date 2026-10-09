@@ -68,8 +68,8 @@ void OptionsAudioMenuV2::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
-        mSaveButton = navigation->GetButton(0x20);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mSaveButton = navigation->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mNavigation.SetButtonInstance(backButton);
 
@@ -160,8 +160,8 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
             {
-                navigation->SetButtons(0x24, true);
-                navigation->SetDoneButtonText(1);
+                navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
+                navigation->SetDoneButtonText(NAV_ACCEPT);
             }
             mState = AUDIO_OPTIONS_ACTIVE;
         }
@@ -213,7 +213,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
             mState = AUDIO_OPTIONS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
-                navigation->SetButtons(0, true);
+                navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             return;
         }
@@ -432,7 +432,7 @@ void OptionsAudioMenuV2::OnSaveButtonPointerPress(int, void*)
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     mSaveStarted = true;
@@ -527,8 +527,8 @@ void OptionsVisualMenuV2::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
-        mSaveButton = navigation->GetButton(0x20);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mSaveButton = navigation->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mNavigation.SetButtonInstance(backButton);
 
@@ -599,8 +599,8 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
             {
-                navigation->SetButtons(0x24, true);
-                navigation->SetDoneButtonText(1);
+                navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
+                navigation->SetDoneButtonText(NAV_ACCEPT);
             }
             mState = VISUAL_OPTIONS_ACTIVE;
         }
@@ -649,7 +649,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
             mState = VISUAL_OPTIONS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
-                navigation->SetButtons(0, true);
+                navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             mPresentation->Update(0.0f);
             return;
@@ -845,7 +845,7 @@ void OptionsVisualMenuV2::OnSaveButtonPointerPress(int, void*)
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     mPresentation->Update(0.0f);

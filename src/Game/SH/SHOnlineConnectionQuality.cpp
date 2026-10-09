@@ -142,7 +142,7 @@ void OnlineConnectionQualityScene::SceneCreated()
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
     {
-        scene->SetButtons(0, true);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     for (int i = 0; i < 4; ++i)
     {

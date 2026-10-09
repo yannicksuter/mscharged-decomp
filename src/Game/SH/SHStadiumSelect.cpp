@@ -143,17 +143,17 @@ void StadiumSelectScene::SceneCreated()
     {
         if (GameInfoManager::Instance()->UseAltRules())
         {
-            navigation->SetButtons(0x2F, true);
-            mPlayButtonInstance = navigation->GetButton(0x20);
+            navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_DONE, true);
+            mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_DONE);
         }
         else
         {
-            navigation->SetButtons(0x1F, true);
-            mPlayButtonInstance = navigation->GetButton(0x10);
+            navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, true);
+            mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         }
-        backButton = navigation->GetButton(4);
-        plusButton = navigation->GetButton(1);
-        minusButton = navigation->GetButton(2);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        plusButton = navigation->GetButton(NAVIGATION_BUTTON_PLUS);
+        minusButton = navigation->GetButton(NAVIGATION_BUTTON_MINUS);
         navigation->HideButtons();
     }
     mBackButton.SetButtonInstance(backButton);
@@ -487,7 +487,7 @@ void StadiumSelectScene::OnSelectStadium(int, void*)
                 SaveLoad::StartSave(false);
             }
             GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
-            GetNavigationScene()->SetButtons(0, true);
+            GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_NONE, true);
         }
         mBackButton.Disable();
         mPlayButton.Disable();

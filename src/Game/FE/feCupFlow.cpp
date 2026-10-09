@@ -334,7 +334,7 @@ void UpdateCupBreadcrumbs(int currentPage)
     int pageCount = 0;
     const int* pages = 0;
     SHNavigation* navigation = GetNavigationScene();
-    TLComponentInstance* breadcrumbs = navigation->GetButton(8);
+    TLComponentInstance* breadcrumbs = navigation->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
 
     if (currentPage == 0)
     {
@@ -355,7 +355,7 @@ void UpdateCupBreadcrumbs(int currentPage)
             switch (roundType)
             {
             case CUP_ROUND_LEAGUE:
-                navigation->SetButtonVisibility(8, false);
+                navigation->SetButtonVisibility(NAVIGATION_BUTTON_BREADCRUMBS, false);
                 breadcrumbs->m_bVisible = false;
                 return;
             case CUP_ROUND_KNOCKOUT:
@@ -432,7 +432,7 @@ void StartNewCup()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     for (int i = 0; i < 4; ++i)
     {
@@ -462,7 +462,7 @@ void ContinueStrikerCup()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     if (CupManager::s_pInstance->mGameInProgress)
     {
@@ -689,16 +689,16 @@ void UpdatePlayButtonText()
     {
         if (cupManager->mState == CUP_STATE_WON)
         {
-            navigation->SetPlayButtonText(2);
+            navigation->SetPlayButtonText(NAV_CONTINUE);
         }
         else
         {
-            navigation->SetPlayButtonText(1);
+            navigation->SetPlayButtonText(NAV_RESTART_CUP);
         }
     }
     else
     {
-        navigation->SetPlayButtonText(3);
+        navigation->SetPlayButtonText(NAV_PLAY_READY);
     }
 }
 
@@ -801,7 +801,7 @@ void ResetCupFlow()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     FrontEndPresentation::GetInstance()->Call("TransitionCupToChooseNewCaptain");
 }

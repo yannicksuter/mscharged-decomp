@@ -98,8 +98,8 @@ void SHOnlineFriendsChooseSides::SceneCreated()
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        object->SetButtons(0x20, true);
-        mDoneButtonInstance = object->GetButton(0x20);
+        object->SetButtons(NAVIGATION_BUTTON_DONE, true);
+        mDoneButtonInstance = object->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mDoneButtonInstance->m_bVisible = false;
 
