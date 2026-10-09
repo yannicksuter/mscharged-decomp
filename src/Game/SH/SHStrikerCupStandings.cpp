@@ -158,7 +158,7 @@ void StrikerCupStandingsScene::SceneCreated()
         mPageControls->SetButtonState(0, true, true);
     }
     mBackButton.SetButtonInstance(backButton);
-    UpdateCupBreadcrumbs(4);
+    UpdateCupBreadcrumbs(CUP_PAGE_STANDINGS);
 }
 
 void StrikerCupStandingsScene::Update(float fDeltaT)
@@ -193,12 +193,12 @@ void StrikerCupStandingsScene::Update(float fDeltaT)
         {
             if (mPreviousPagePressed)
             {
-                CycleCupPage(4, false);
+                CycleCupPage(CUP_PAGE_STANDINGS, false);
                 return;
             }
             if (mNextPagePressed)
             {
-                CycleCupPage(4, true);
+                CycleCupPage(CUP_PAGE_STANDINGS, true);
                 return;
             }
             AdvanceCupFlow(false);

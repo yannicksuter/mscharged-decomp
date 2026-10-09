@@ -145,7 +145,7 @@ void CupKnockoutScene::SceneCreated()
     }
     else
     {
-        UpdateCupBreadcrumbs(2);
+        UpdateCupBreadcrumbs(CUP_PAGE_KNOCKOUT);
     }
 
     m_pad2E8 = 0.0f;
@@ -182,12 +182,12 @@ void CupKnockoutScene::Update(float fDeltaT)
         {
             if (mPreviousPagePressed)
             {
-                CycleCupPage(2, false);
+                CycleCupPage(CUP_PAGE_KNOCKOUT, false);
                 return;
             }
             if (mNextPagePressed)
             {
-                CycleCupPage(2, true);
+                CycleCupPage(CUP_PAGE_KNOCKOUT, true);
                 return;
             }
             AdvanceCupFlow(false);

@@ -93,7 +93,7 @@ void CupFinalRoundsScene::SceneCreated()
         mPageControls->SetButtonState(0, true, true);
     }
     mBackButton.SetButtonInstance(backButton);
-    UpdateCupBreadcrumbs(3);
+    UpdateCupBreadcrumbs(CUP_PAGE_FINAL_ROUNDS);
     for (int i = 0; i < 4; ++i)
     {
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -130,12 +130,12 @@ void CupFinalRoundsScene::Update(float fDeltaT)
         {
             if (mPreviousPagePressed)
             {
-                CycleCupPage(3, false);
+                CycleCupPage(CUP_PAGE_FINAL_ROUNDS, false);
                 return;
             }
             if (mNextPagePressed)
             {
-                CycleCupPage(3, true);
+                CycleCupPage(CUP_PAGE_FINAL_ROUNDS, true);
                 return;
             }
             AdvanceCupFlow(false);

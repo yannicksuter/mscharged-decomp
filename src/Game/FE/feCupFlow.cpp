@@ -30,9 +30,9 @@ StadiumCupTrophyDrawable* gCupAwardModels[10];
 unsigned int gFEControllerIndex;
 bool gFEPointerEnabled[4];
 
-extern const int sCupPageOrder[3] = { 4, 5, 6 };
-extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
-extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
+extern const int sCupPageOrder[3] = { CUP_PAGE_STANDINGS, CUP_PAGE_GOLDEN_BOOT, CUP_PAGE_BRICK_WALL };
+extern const int sCupRoundPageOrderThree[3] = { CUP_PAGE_FINAL_ROUNDS, CUP_PAGE_KNOCKOUT, CUP_PAGE_SCHEDULE };
+extern const int sCupRoundPageOrderTwo[2] = { CUP_PAGE_KNOCKOUT, CUP_PAGE_SCHEDULE };
 
 struct CupTrophyUnlock
 {
@@ -59,7 +59,7 @@ static void CycleCupStatsPage(int currentPage, bool advance);
 
 void CycleCupPage(int currentPage, bool advance)
 {
-    if ((unsigned int)(currentPage - 4) <= 2)
+    if ((unsigned int)(currentPage - CUP_PAGE_STANDINGS) <= 2)
     {
         CycleCupStatsPage(currentPage, advance);
     }
@@ -97,13 +97,13 @@ static void CycleCupStatsPage(int currentPage, bool advance)
 
     switch (sCupPageOrder[nextIndex])
     {
-    case 4:
+    case CUP_PAGE_STANDINGS:
         GameSceneManager::Instance()->Push(SCENE_CUP_STANDINGS, SCREEN_NOTHING, true);
         break;
-    case 5:
+    case CUP_PAGE_GOLDEN_BOOT:
         GameSceneManager::Instance()->Push(SCENE_CUP_GOLDEN_BOOT, SCREEN_NOTHING, true);
         break;
-    case 6:
+    case CUP_PAGE_BRICK_WALL:
         GameSceneManager::Instance()->Push(SCENE_CUP_BRICK_WALL, SCREEN_NOTHING, true);
         break;
     }
@@ -161,13 +161,13 @@ void CycleCupRoundPage(int currentPage, bool advance)
 
         switch (pages[currentIndex])
         {
-        case 1:
+        case CUP_PAGE_SCHEDULE:
             GameSceneManager::Instance()->Push(SCENE_CUP_SCHEDULE, SCREEN_NOTHING, true);
             break;
-        case 2:
+        case CUP_PAGE_KNOCKOUT:
             GameSceneManager::Instance()->Push(SCENE_CUP_KNOCKOUT, SCREEN_NOTHING, true);
             break;
-        case 3:
+        case CUP_PAGE_FINAL_ROUNDS:
             GameSceneManager::Instance()->Push(SCENE_CUP_FINAL_ROUNDS, SCREEN_NOTHING, true);
             break;
         }
@@ -336,13 +336,13 @@ void UpdateCupBreadcrumbs(int currentPage)
     SHNavigation* navigation = GetNavigationScene();
     TLComponentInstance* breadcrumbs = navigation->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
 
-    if (currentPage == 0)
+    if (currentPage == CUP_PAGE_NONE)
     {
         breadcrumbs->m_bVisible = false;
     }
     else
     {
-        if ((unsigned int)(currentPage - 4) <= 2)
+        if ((unsigned int)(currentPage - CUP_PAGE_STANDINGS) <= 2)
         {
             pageCount = 3;
             pages = sCupPageOrder;

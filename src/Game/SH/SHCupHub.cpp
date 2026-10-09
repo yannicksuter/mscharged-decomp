@@ -119,7 +119,7 @@ void CupHubScene::SceneCreated()
         mPageControls->SetButtonState(1, true, false);
         mPageControls->SetButtonState(0, true, false);
     }
-    UpdateCupBreadcrumbs(true);
+    UpdateCupBreadcrumbs(CUP_PAGE_SCHEDULE);
     mScrollWidget.SetComponent(scrollbar);
     mScrollWidget.SetRange(mEntryCount - 4);
     mScrollWidget.SetValue(mScrollOffset);
@@ -168,12 +168,12 @@ void CupHubScene::Update(float fDeltaT)
         {
             if (mPreviousPagePressed)
             {
-                CycleCupPage(1, false);
+                CycleCupPage(CUP_PAGE_SCHEDULE, false);
                 return;
             }
             if (mNextPagePressed)
             {
-                CycleCupPage(1, true);
+                CycleCupPage(CUP_PAGE_SCHEDULE, true);
                 return;
             }
             AdvanceCupFlow(false);

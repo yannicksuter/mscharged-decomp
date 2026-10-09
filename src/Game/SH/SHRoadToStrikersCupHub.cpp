@@ -141,7 +141,7 @@ void RoadToStrikersCupHubScene::SceneCreated()
         mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
     }
     mBackButton.SetButtonInstance(backButton);
-    UpdateCupBreadcrumbs(0);
+    UpdateCupBreadcrumbs(CUP_PAGE_NONE);
 
     FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
         presentation->GetActiveSlide(), "Layer", "summary", "TROPHY WIN")

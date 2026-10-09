@@ -1,6 +1,17 @@
 #ifndef GAME_SH_CUP_SCENE_HELPERS_H
 #define GAME_SH_CUP_SCENE_HELPERS_H
 
+enum eCupPage
+{
+    CUP_PAGE_NONE = 0,
+    CUP_PAGE_SCHEDULE = 1,
+    CUP_PAGE_KNOCKOUT = 2,
+    CUP_PAGE_FINAL_ROUNDS = 3,
+    CUP_PAGE_STANDINGS = 4,
+    CUP_PAGE_GOLDEN_BOOT = 5,
+    CUP_PAGE_BRICK_WALL = 6,
+};
+
 class TLComponentInstance;
 class StadiumCupTrophyDrawable;
 
