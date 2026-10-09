@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-static const char* lbl_806E0368 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-";
+static const char* sBase64EncodeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-";
 
 int DWC_Base64Encode(const char* src, u32 srclen, char* dst, u32 dstlen) {
   u32 copySize;
@@ -35,19 +35,19 @@ int DWC_Base64Encode(const char* src, u32 srclen, char* dst, u32 dstlen) {
     memset(work, 0, sizeof(work));
     memcpy(work, srcPos, copySize);
 
-    dstPos[0] = lbl_806E0368[work[0] >> 2];
+    dstPos[0] = sBase64EncodeAlphabet[work[0] >> 2];
     if (encodeCount >= 2)
-      dstPos[1] = lbl_806E0368[((work[0] & 3) << 4) | (work[1] >> 4)];
+      dstPos[1] = sBase64EncodeAlphabet[((work[0] & 3) << 4) | (work[1] >> 4)];
     else
       dstPos[1] = '*';
 
     if (encodeCount >= 3)
-      dstPos[2] = lbl_806E0368[((work[1] & 15) << 2) | (work[2] >> 6)];
+      dstPos[2] = sBase64EncodeAlphabet[((work[1] & 15) << 2) | (work[2] >> 6)];
     else
       dstPos[2] = '*';
 
     if (encodeCount >= 4)
-      dstPos[3] = lbl_806E0368[work[2] & 63];
+      dstPos[3] = sBase64EncodeAlphabet[work[2] & 63];
     else
       dstPos[3] = '*';
 
