@@ -1,5 +1,6 @@
-#include <revolution/os.h>
-#include <revolution/vf.h>
+#include <revolution/os/OSTime.h>
+#include <revolution/vf/vf_struct.h>
+#include <revolution/vf/d_time.h>
 
 void dTM_GetNowTime(struct PF_SYS_DATE* sdate, struct PF_SYS_TIME* stime) {
     struct OSCalendarTime CalenderTime;
