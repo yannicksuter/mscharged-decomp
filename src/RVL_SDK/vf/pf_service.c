@@ -1,4 +1,4 @@
-#include <revolution/vf.h>
+#include <revolution/vf/pf_service.h>
 
 u16 VFiPF_GET_LE_U16(const u8* buf) {
     return buf[0] | buf[1] << 8;
