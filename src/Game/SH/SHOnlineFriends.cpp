@@ -450,7 +450,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     if (item == 0 && !IsOnlineFriendSelectionMode())
     {
         if (g_pFriendManager->CountFriends() >= 64)
-            ShowDialog(104);
+            ShowDialog(POPUP_NETWORK_FRIEND_LIST_FULL);
         else
             change = true;
     }
@@ -468,7 +468,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
             gNetworkSaveSlotIndex, mSortedFriendRows[selected]->mFriendIndex);
         bool differentRegion = region != GetOnlineRegion();
         if (differentRegion)
-            ShowDialog(105);
+            ShowDialog(POPUP_ONLINE_REGION_NOT_CONFIRMED);
         else
             change = true;
     }

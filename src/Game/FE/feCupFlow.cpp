@@ -181,7 +181,7 @@ void ShowFirstCupPage()
 
 void ShowCurrentCupRoundPage()
 {
-    int scene = -2;
+    int scene = SCENE_INVALID;
     int roundType = CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
                       ? CUP_ROUND_LEAGUE
                       : CupManager::s_pInstance->GetCurrentRoundType();
@@ -189,13 +189,13 @@ void ShowCurrentCupRoundPage()
     switch (roundType)
     {
     case CUP_ROUND_LEAGUE:
-        scene = 32;
+        scene = SCENE_CUP_SCHEDULE;
         break;
     case CUP_ROUND_KNOCKOUT:
-        scene = 34;
+        scene = SCENE_CUP_KNOCKOUT;
         break;
     case CUP_ROUND_FINALS:
-        scene = 35;
+        scene = SCENE_CUP_FINAL_ROUNDS;
         break;
     }
 
@@ -513,39 +513,39 @@ void ShowCupRulesPopup()
     int menuType = -1;
     if (roundType == CUP_ROUND_LEAGUE && cupMode == 0)
     {
-        menuType = 29;
+        menuType = POPUP_FIRE_QUAL_RULES;
     }
     else if (roundType == CUP_ROUND_LEAGUE && cupMode == 1)
     {
-        menuType = 30;
+        menuType = POPUP_CRYSTAL_QUAL_RULES;
     }
     else if (roundType == CUP_ROUND_LEAGUE && cupMode == 2)
     {
-        menuType = 31;
+        menuType = POPUP_STRIKER_QUAL_RULES;
     }
     else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 0)
     {
-        menuType = 32;
+        menuType = POPUP_FIRE_ELIM_RULES;
     }
     else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 1)
     {
-        menuType = 33;
+        menuType = POPUP_CRYSTAL_ELIM_RULES;
     }
     else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 2)
     {
-        menuType = 34;
+        menuType = POPUP_STRIKER_ELIM_RULES;
     }
     else if (roundType == CUP_ROUND_FINALS && cupMode == 0)
     {
-        menuType = 35;
+        menuType = POPUP_FIRE_FINAL_RULES;
     }
     else if (roundType == CUP_ROUND_FINALS && cupMode == 1)
     {
-        menuType = 36;
+        menuType = POPUP_CRYSTAL_FINAL_RULES;
     }
     else if (roundType == CUP_ROUND_FINALS && cupMode == 2)
     {
-        menuType = 37;
+        menuType = POPUP_STRIKER_FINAL_RULES;
     }
     popup->Create((ePopupMenu)menuType,
                   Function<FnVoidVoid>(FEPopupMenu::Nothing));
@@ -619,15 +619,15 @@ void ShowCupAwardRewardsPopup()
     {
     case CUP_FIRE:
         showRewards = HasWastelandsUnlockFlags() && WasWastelandsLockedBeforeGame();
-        menuType = 41;
+        menuType = POPUP_WIN_FIRECUP_BOOT_WALL_REWARDS;
         break;
     case CUP_CRYSTAL:
         showRewards = HasDumpUnlockFlags() && WasDumpLockedBeforeGame();
-        menuType = 42;
+        menuType = POPUP_WIN_CRYSTALCUP_BOOT_WALL_REWARDS;
         break;
     case CUP_STRIKER:
         showRewards = HasGalacticStadiumUnlockFlags() && WasGalacticStadiumLockedBeforeGame();
-        menuType = 43;
+        menuType = POPUP_WIN_STRIKERCUP_BOOT_WALL_REWARDS;
         break;
     default:
         showRewards = false;
@@ -654,15 +654,15 @@ void ShowCupTrophyRewardsPopup()
     {
     case CUP_FIRE:
         showRewards = IsUnlockFlagSet(1) && WereUnlockFlagsClearBeforeGame(1);
-        menuType = 44;
+        menuType = POPUP_WIN_FIRECUP_MAINCUP_REWARDS;
         break;
     case CUP_CRYSTAL:
         showRewards = IsUnlockFlagSet(2) && WereUnlockFlagsClearBeforeGame(2);
-        menuType = 45;
+        menuType = POPUP_WIN_CRYSTALCUP_MAINCUP_REWARDS;
         break;
     case CUP_STRIKER:
         showRewards = IsUnlockFlagSet(4) && WereUnlockFlagsClearBeforeGame(4);
-        menuType = 46;
+        menuType = POPUP_WIN_STRIKERCUP_MAINCUP_REWARDS;
         break;
     default:
         showRewards = false;
