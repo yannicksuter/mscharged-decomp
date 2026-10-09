@@ -319,7 +319,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetCurrentTextOverlaySlide(SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
-                ->SetVisible((SceneList)0x5A, true, true);
+                ->SetVisible(OVERLAY_IN_GAME_TEXT, true, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->mIsInHighlights = false;
         }
@@ -347,7 +347,7 @@ void Presentation::DoFunctionCall(unsigned int function)
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->SetCurrentTextOverlaySlide(SLIDE_NAME_TEXT_REPLAY);
             static_cast<OverlayManager*>(g_pOverlayManager)
-                ->SetVisible((SceneList)0x5A, false, true);
+                ->SetVisible(OVERLAY_IN_GAME_TEXT, false, true);
             static_cast<OverlayManager*>(g_pOverlayManager)
                 ->mIsInHighlights = true;
             StopOverlay();

@@ -66,9 +66,9 @@ void SHStrikerTimesChallenge::SetDisplayMode(unsigned int transition)
 void SHStrikerTimesChallenge::OnBackTransitionComplete()
 {
     GameSceneManager* manager = GameSceneManager::Instance();
-    SceneList sceneID = (SceneList)75;
+    SceneList sceneID = SCENE_CHALLENGE_SELECT;
     if (g_pStrikerChallenge->mCurrentChallenge < 10)
-        sceneID = (SceneList)76;
+        sceneID = SCENE_STRIKERS_101_SELECT;
     ChallengeSelectScene* scene = static_cast<ChallengeSelectScene*>(manager->Push(sceneID, SCREEN_BACK, true));
     if (scene != 0)
         scene->mChallengeOffset = g_pStrikerChallenge->mChallengeOffset;
@@ -101,7 +101,7 @@ void SHStrikerTimesChallenge::OnSelectMainMenu()
  */
 void SHStrikerTimesChallenge::SceneCreated()
 {
-    if (mDisplayMode == ModeChallengeResults && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
+    if (mDisplayMode == NEWS_CHALLENGE_RESULTS && g_pStrikerChallenge->IsCurrentChallengeWon() == true)
     {
         mNewUnlock = g_pStrikerChallenge->UnlockCurrentChallenge();
         if (mNewUnlock)
@@ -112,7 +112,7 @@ void SHStrikerTimesChallenge::SceneCreated()
     int captain = challenge->GetCurrentCaptain();
     const CharacterInfo& character = GetCharacterInfo(GetCharacterIndexFromCaptain(captain));
     int mood = NEWS_MOOD_NONE;
-    if (mDisplayMode == ModeChallengeBriefing)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         if (challenge->mCurrentChallenge < 10)
         {
@@ -126,7 +126,7 @@ void SHStrikerTimesChallenge::SceneCreated()
         }
         mood = NEWS_MOOD_NEUTRAL;
     }
-    else if (mDisplayMode == ModeChallengeResults)
+    else if (mDisplayMode == NEWS_CHALLENGE_RESULTS)
     {
         FEMusic::StartStreamIfDifferent(13);
         if (challenge->IsCurrentChallengeWon() == true)
@@ -158,21 +158,21 @@ void SHStrikerTimesChallenge::SceneCreated()
             mood = NEWS_MOOD_NEGATIVE;
         }
     }
-    if (challenge->mCurrentChallenge == 2)
+    if (challenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES)
         SetArticleImageName(captain, mood, 8);
-    else if (challenge->mCurrentChallenge == 4)
+    else if (challenge->mCurrentChallenge == TUTORIAL_SIDEKICK_SKILLSHOT)
         SetArticleImageName(captain, mood, 2);
-    else if (challenge->mCurrentChallenge == 5)
+    else if (challenge->mCurrentChallenge == TUTORIAL_SKILLSHOT_PART_TWO)
         SetArticleImageName(captain, NEWS_MOOD_NEUTRAL, 4);
     else
         SetArticleImageName(captain, mood, -1);
-    if (mDisplayMode == ModeChallengeBriefing)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
         {
-            scene->SetButtons(4, true);
-            mBackButtonInstance = scene->GetButton(4);
+            scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+            mBackButtonInstance = scene->GetButton(NAVIGATION_BUTTON_BACK);
             mBackButtonInstance->m_bVisible = false;
         }
         mBackButton.SetButtonInstance(mBackButtonInstance);
@@ -192,28 +192,28 @@ void SHStrikerTimesChallenge::Update(float dt)
             gTweakFileLoader.mCount = 0;
             g_pStrikerChallenge->LoadSettings();
             FrontEndPresentation::GetInstance()->Call("TransitionToStrikerChallengeChooseSides");
-            GameSceneManager::Instance()->Push((SceneList)78, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDES_TOURNAMENT, SCREEN_FORWARD, true);
             return;
         }
         return;
     }
     SHStrikerTimesBase::Update(dt);
-    if (mDisplayMode == ModeChallengeResults)
+    if (mDisplayMode == NEWS_CHALLENGE_RESULTS)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find<>(mPresentation->m_currentSlide,
             "Layer", "blackbox2");
         nlColour colour = instance->GetAssetColour();
-        if (mState == 2)
+        if (mState == NEWS_PHASE_EXITING_DONE)
             nlColourSet(colour, colour[0], colour[1], colour[2], 255);
         else
             nlColourSet(colour, colour[0], colour[1], colour[2], 178);
         instance->SetAssetColour(colour);
     }
-    if (mState != 1 || mPage == 0)
+    if (mState != NEWS_PHASE_ACTIVE || mPage == 0)
         return;
     for (int pad = 0; pad < 4; ++pad)
     {
-        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == ModeChallengeBriefing)
+        if ((unsigned int)pad == gFEControllerIndex && mDisplayMode == NEWS_CHALLENGE_BRIEFING)
         {
             mBackButtonInstance->m_bVisible = true;
             u8 valid = true;
@@ -223,9 +223,9 @@ void SHStrikerTimesChallenge::Update(float dt)
             event.mPressed = g_pFEInput->JustPressed((eFEINPUT_PAD)pad, 30, true, 0);
             if (mBackButton.UpdateBackButton(event, dt))
             {
-                if (mDisplayMode != ModeChallengeBriefing)
+                if (mDisplayMode != NEWS_CHALLENGE_BRIEFING)
                     continue;
-                mState = 3;
+                mState = NEWS_PHASE_EXITING_BACK;
                 SHNavigation* scene = GetNavigationScene();
                 if (scene != 0)
                     scene->HideButtons();
@@ -246,7 +246,7 @@ void SHStrikerTimesChallenge::Update(float dt)
 void SHStrikerTimesChallenge::OnDoneTransitionComplete()
 {
     SHStrikerTimesBase::OnDoneTransitionComplete();
-    if (mDisplayMode == ModeChallengeBriefing)
+    if (mDisplayMode == NEWS_CHALLENGE_BRIEFING)
     {
         mLoadingChallengeSettings = true;
         gTweakFileLoader.LoadFileAsync(g_pStrikerChallenge->GetConfigPath(), "/challenge");
@@ -260,15 +260,15 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
             if (mNewUnlock && challenge >= 10)
             {
                 FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
-                popup->Create((ePopupMenu)47, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                popup->Create(POPUP_CHALLENGE_UNLOCK_CAPTAIN, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             }
             else
             {
                 FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
                 if (challenge >= 10)
-                    popup->Create((ePopupMenu)48, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                    popup->Create(POPUP_CHALLENGE_SUCCEEDED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
                 else
-                    popup->Create((ePopupMenu)51, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                    popup->Create(POPUP_TUTORIAL_SUCCEEDED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             }
         }
         else
@@ -276,9 +276,9 @@ void SHStrikerTimesChallenge::OnDoneTransitionComplete()
             int challenge = g_pStrikerChallenge->mCurrentChallenge;
             FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, true);
             if (challenge >= 10)
-                popup->Create((ePopupMenu)49, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                popup->Create(POPUP_CHALLENGE_FAILED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
             else
-                popup->Create((ePopupMenu)52, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
+                popup->Create(POPUP_TUTORIAL_FAILED, OnSelectNewChallenge, OnRestartChallenge, OnSelectMainMenu);
         }
     }
 }

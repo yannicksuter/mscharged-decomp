@@ -104,8 +104,8 @@ void CupHubScene::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (navigation != 0)
     {
-        backButton = navigation->GetButton(4);
-        mRulesButton = navigation->GetButton(16);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mRulesButton = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         mPageControls = navigation->GetPageControls();
     }
     mNavigationComponent.SetButtonInstance(backButton);
@@ -119,7 +119,7 @@ void CupHubScene::SceneCreated()
         mPageControls->SetButtonState(1, true, false);
         mPageControls->SetButtonState(0, true, false);
     }
-    UpdateCupBreadcrumbs(true);
+    UpdateCupBreadcrumbs(CUP_PAGE_SCHEDULE);
     mScrollWidget.SetComponent(scrollbar);
     mScrollWidget.SetRange(mEntryCount - 4);
     mScrollWidget.SetValue(mScrollOffset);
@@ -155,9 +155,9 @@ void CupHubScene::Update(float fDeltaT)
             {
                 SHNavigation* navigation = GetNavigationScene();
                 if (mPagingEnabled)
-                    navigation->SetButtons(0x1F, false);
+                    navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, false);
                 else
-                    navigation->SetButtons(0x14, true);
+                    navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_PLAY, true);
                 UpdatePlayButtonText();
                 InitializePointerButtons();
                 mInitialized = true;
@@ -168,12 +168,12 @@ void CupHubScene::Update(float fDeltaT)
         {
             if (mPreviousPagePressed)
             {
-                CycleCupPage(1, false);
+                CycleCupPage(CUP_PAGE_SCHEDULE, false);
                 return;
             }
             if (mNextPagePressed)
             {
-                CycleCupPage(1, true);
+                CycleCupPage(CUP_PAGE_SCHEDULE, true);
                 return;
             }
             AdvanceCupFlow(false);
@@ -282,7 +282,7 @@ void CupHubScene::UpdateRoundText(int index, int value)
 
 void CupHubScene::UpdateRow(int index)
 {
-    if (mMatchupComponents[index].HasOtherPointerState(1, -1))
+    if (mMatchupComponents[index].HasOtherPointerState(POINTER_BUTTON_HOVER, -1))
         mRowInstances[index]->SetActiveSlide("over", true, false);
     else
         mRowInstances[index]->SetActiveSlide("off", true, false);
@@ -416,12 +416,12 @@ void CupHubScene::OnMatchupPointerPress(unsigned int index, void* context)
         {
             GameResultsScene* results = (GameResultsScene*)GameSceneManager::Instance()->Push(SCENE_GAME_RESULTS, SCREEN_NOTHING, false);
             results->SetResultsData(game, this, 0);
-            results->SetDisplayMode(0xD);
+            results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
         }
         else
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
+            popup->Create(POPUP_NO_GAME_RESULTS, FEPopupMenu::Nothing);
         }
     }
 }
@@ -438,7 +438,7 @@ void CupHubScene::OnMatchupPointerEnter(unsigned int index, void* context)
     ++mHoverCounts[index];
     mMatchupComponents[row].PlayHoverFeedback(index);
     FEFinder<TLComponentInstance, 4>::FindOrDefault(mRowInstances[row]->GetActiveSlide(), "highlite")->SetActiveSlide("on", true, false);
-    mMatchupComponents[row].SetPointerState(1, index);
+    mMatchupComponents[row].SetPointerState(POINTER_BUTTON_HOVER, index);
     mRowInstances[row]->SetActiveSlide("over", true, false);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     UpdateRow(row);
@@ -456,7 +456,7 @@ void CupHubScene::OnMatchupPointerLeave(unsigned int index, void* context)
     {
         --mHoverCounts[index];
         FEFinder<TLComponentInstance, 4>::FindOrDefault(mRowInstances[row]->GetActiveSlide(), "highlite")->SetActiveSlide("off", true, false);
-        mMatchupComponents[row].SetPointerState(0, index);
+        mMatchupComponents[row].SetPointerState(POINTER_BUTTON_NORMAL, index);
         mRowInstances[row]->SetActiveSlide("off", true, false);
         UpdateRow(row);
     }
@@ -466,15 +466,15 @@ void CupHubScene::OnMatchupPointerInside(unsigned int index, void* context)
 {
     int matchup = mMatchupStates[mScrollOffset + (int)context][1];
     int state = mMatchupComponents[(int)context].GetPointerState(index);
-    if (state == 1 && matchup == -1)
+    if (state == POINTER_BUTTON_HOVER && matchup == -1)
     {
         --mHoverCounts[index];
         FEFinder<TLComponentInstance, 4>::FindOrDefault(mRowInstances[(int)context]->GetActiveSlide(), "highlite")->SetActiveSlide("off", true, false);
-        mMatchupComponents[(int)context].SetPointerState(0, index);
+        mMatchupComponents[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
         mRowInstances[(int)context]->SetActiveSlide("off", true, false);
         UpdateRow((int)context);
     }
-    else if (state == 0 && matchup != -1)
+    else if (state == POINTER_BUTTON_NORMAL && matchup != -1)
     {
         OnMatchupPointerEnter(index, context);
     }
@@ -482,20 +482,20 @@ void CupHubScene::OnMatchupPointerInside(unsigned int index, void* context)
 
 void CupHubScene::OnRulesPointerEnter(unsigned int index, void* context)
 {
-    if (context == 0 && !mRulesComponent.HasOtherPointerState(1, index))
+    if (context == 0 && !mRulesComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRulesButton->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-        mRulesComponent.SetPointerState(1, index);
+        mRulesComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
 void CupHubScene::OnRulesPointerLeave(unsigned int index, void* context)
 {
-    if (context == 0 && !mRulesComponent.HasOtherPointerState(1, index))
+    if (context == 0 && !mRulesComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRulesButton->SetActiveSlide("off", true, false);
-        mRulesComponent.SetPointerState(0, index);
+        mRulesComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 

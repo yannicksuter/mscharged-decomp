@@ -62,7 +62,7 @@ void cFielder::InitActionDKSuper()
     SetAction(ACTION_SUPER_POWER);
     SetAnimState(0x68, true, 0.2f, false, false);
     muInvincibleStatus |= 1;
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitMovementDecelerateExponential(gDKSuperDeceleration);
     SetDesiredFacingDirection(m_DetChar.m_aActualFacingDirection, false);
     m_DetChar.m_aDesiredMovementDirection = m_DetChar.m_aActualMovementDirection;
@@ -126,7 +126,7 @@ void cFielder::CleanUpPeachSuper()
 void cFielder::InitActionPeachSuper()
 {
     EndFrozenOrDazed();
-    InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+    InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
     SetAction(ACTION_SUPER_POWER);
     muInvincibleStatus |= 1;
 
@@ -256,7 +256,7 @@ void cFielder::fn_8004FF40()
         }
 
         InitDesire(
-            FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
         SetAction(ACTION_HIT_REACT);
         SetAnimState(0x68, true, 0.2f, false, false);
         InitMovementFromAnim(0, v3Zero, 1.0f, false);
@@ -412,7 +412,7 @@ bool cFielder::TurnOnSuperPowerTank()
     else if (m_DetChar.m_eCharacterClass == WALUIGI)
     {
         m_pTweaks = m_pSuperPowerTweaks;
-        if (GetDesireState() != (eFielderDesireState)0xC)
+        if (GetDesireState() != FIELDER_DESIRE_RUN_IN_DIRECTION)
         {
             EndDesire();
         }
@@ -434,11 +434,11 @@ bool cFielder::TurnOnSuperPowerTank()
     else if (m_DetChar.m_eCharacterClass == WARIO)
     {
         if (m_eAnimID != 0x68 && IsRunning()
-            && GetDesireState() != (eFielderDesireState)0x16)
+            && GetDesireState() != FIELDER_DESIRE_RECEIVE_PASS)
         {
             SetAction(ACTION_SUPER_POWER);
             SetAnimState(0x68, true, 0.2f, false, false);
-            InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet,
+            InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet,
                 fvNotSet);
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
         }

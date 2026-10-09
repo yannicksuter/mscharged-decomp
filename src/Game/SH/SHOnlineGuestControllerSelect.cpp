@@ -67,8 +67,8 @@ void SHOnlineGuestControllerSelect::SceneCreated()
     if (object != 0)
     {
         object->HideButtons();
-        screen = object->GetButton(4);
-        mDoneButtonInstance = object->GetButton(0x20);
+        screen = object->GetButton(NAVIGATION_BUTTON_BACK);
+        mDoneButtonInstance = object->GetButton(NAVIGATION_BUTTON_DONE);
     }
 
     mNavigation.SetButtonInstance(screen);
@@ -152,7 +152,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                scene->SetButtons(0x24, true);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
             }
             InitializeButtons();
             UpdateDoneButtonVisibility();
@@ -179,7 +179,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             }
             else if (IsOnlineRankedMatch())
             {
-                GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_FORWARD, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_MATCHMAKING_DRAFT, SCREEN_FORWARD, true);
             }
             else
             {
@@ -197,7 +197,7 @@ void SHOnlineGuestControllerSelect::Update(float fDeltaT)
             }
             else
             {
-                SceneList nextScene = IsOnlineRankedMatch() ? (SceneList)0x29 : (SceneList)0x2A;
+                SceneList nextScene = IsOnlineRankedMatch() ? SCENE_ONLINE_RANKED : SCENE_ONLINE_UNRANKED;
                 GameSceneManager::Instance()->Push(nextScene, SCREEN_NOTHING, true);
             }
             SetOnlineTwoLocalPlayers(false);
@@ -324,10 +324,10 @@ void SHOnlineGuestControllerSelect::UpdateDoneButtonVisibility()
 
             for (int i = 0; i < 4; ++i)
             {
-                if (mDoneButton.GetPointerState(i) == 1)
+                if (mDoneButton.GetPointerState(i) == POINTER_BUTTON_HOVER)
                 {
                     --mHoverCounts[i];
-                    mDoneButton.SetPointerState(0, i);
+                    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, i);
                 }
             }
         }
@@ -353,13 +353,13 @@ void SHOnlineGuestControllerSelect::OnControllerPointerEnter(int index, void*)
     if (mPrimaryController == which)
         return;
 
-    if (!mControllerButton.HasOtherPointerState(1, which))
+    if (!mControllerButton.HasOtherPointerState(POINTER_BUTTON_HOVER, which))
     {
         mHomeInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mControllerButton.SetPointerState(1, which);
+    mControllerButton.SetPointerState(POINTER_BUTTON_HOVER, which);
     ++mHoverCounts[which];
     mControllerButton.PlayHoverFeedback(index);
 }
@@ -376,10 +376,10 @@ void SHOnlineGuestControllerSelect::OnControllerPointerLeave(int index, void*)
     if (mPrimaryController == which)
         return;
 
-    if (!mControllerButton.HasOtherPointerState(1, which))
+    if (!mControllerButton.HasOtherPointerState(POINTER_BUTTON_HOVER, which))
         mHomeInstance->SetActiveSlide("controllers", true, false);
 
-    mControllerButton.SetPointerState(0, which);
+    mControllerButton.SetPointerState(POINTER_BUTTON_NORMAL, which);
     --mHoverCounts[which];
 }
 
@@ -430,9 +430,9 @@ void SHOnlineGuestControllerSelect::OnControllerPointerPress(int index, void*)
 void SHOnlineGuestControllerSelect::OnDonePointerEnter(int index, void*)
 {
     ++mHoverCounts[index];
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     mDoneButton.PlayHoverFeedback(index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -441,13 +441,13 @@ void SHOnlineGuestControllerSelect::OnDonePointerEnter(int index, void*)
 
 void SHOnlineGuestControllerSelect::OnDonePointerInside(int index, void*)
 {
-    if (mDoneButton.GetPointerState(index) != 0)
+    if (mDoneButton.GetPointerState(index) != POINTER_BUTTON_NORMAL)
         return;
 
     ++mHoverCounts[index];
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     mDoneButton.PlayHoverFeedback(index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -480,8 +480,8 @@ void SHOnlineGuestControllerSelect::OnDonePointerPress(int, void*)
 void SHOnlineGuestControllerSelect::OnDonePointerLeave(int index, void*)
 {
     --mHoverCounts[index];
-    mDoneButton.SetPointerState(0, index);
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
     }

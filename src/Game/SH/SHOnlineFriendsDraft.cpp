@@ -146,7 +146,7 @@ void SHOnlineFriendsDraft::SceneCreated()
     mScrollBar.SetComponent(scrollbar == 0 ? &TLComponentDefault::sInstance : scrollbar);
     mScrollBar.SetRange(0);
     mScrollBar.SetValue(0);
-    GetNavigationScene()->SetButtons(0, true);
+    GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_NONE, true);
     RefreshPlayerRows();
     for (int i = 0; i < 4; ++i)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
@@ -210,7 +210,7 @@ inline void SHOnlineFriendsDraft::ShowDisconnectedError()
         return;
     FEPopupMenu* menu = static_cast<FEPopupMenu*>(
         GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-    menu->Create((ePopupMenu)0x60,
+    menu->Create(POPUP_NETWORK_CONNECTION_LOST,
         Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineFriendsDraft::OnErrorDismissed), this)));
     mErrorPopupOpen = true;
 }

@@ -86,7 +86,7 @@ void ChallengeSelectScene::SceneCreated()
     if (menu != 0)
     {
         menu->HideButtons();
-        menuComponent = menu->GetButton(4);
+        menuComponent = menu->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(menuComponent);
     mBackButton.SetPushBackScene(false);
@@ -232,7 +232,7 @@ void ChallengeSelectScene::Update(float dt)
         {
             if (!mButtonsInitialized)
             {
-                GetNavigationScene()->SetButtons(4, true);
+                GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_BACK, true);
                 InitializeButtons();
                 mButtonsInitialized = true;
             }
@@ -241,11 +241,11 @@ void ChallengeSelectScene::Update(float dt)
         else if (mState == CHALLENGE_SELECT_TRANSITIONING)
         {
             SHStrikerTimesBase* scene = static_cast<SHStrikerTimesBase*>(
-                GameSceneManager::Instance()->Push((SceneList)0x4D, SCREEN_NOTHING, true));
+                GameSceneManager::Instance()->Push(SCENE_CHALLENGE_NEWS, SCREEN_NOTHING, true));
             g_pStrikerChallenge->mChallengeOffset = mChallengeOffset;
             if (scene != 0)
             {
-                scene->SetDisplayMode(8);
+                scene->SetDisplayMode(NEWS_CHALLENGE_BRIEFING);
             }
             return;
         }
@@ -365,7 +365,7 @@ void ChallengeSelectScene::OnChallengeEnter(int pointerIndex, void* context)
     int row = (int)context;
     ++mPointerInsideCount;
     mChallengeSlides[row]->SetActiveSlide("over", true, false);
-    mChallengeButtons[row].SetPointerState(1, pointerIndex);
+    mChallengeButtons[row].SetPointerState(POINTER_BUTTON_HOVER, pointerIndex);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     mChallengeButtons[row].PlayHoverFeedback(pointerIndex);
 }
@@ -375,17 +375,17 @@ void ChallengeSelectScene::OnChallengeLeave(int pointerIndex, void* context)
     int row = (int)context;
     --mPointerInsideCount;
     mChallengeSlides[row]->SetActiveSlide("off", true, false);
-    mChallengeButtons[row].SetPointerState(0, pointerIndex);
+    mChallengeButtons[row].SetPointerState(POINTER_BUTTON_NORMAL, pointerIndex);
 }
 
 void ChallengeSelectScene::OnChallengeInside(int pointerIndex, void* context)
 {
     int row = (int)context;
-    if (mChallengeButtons[row].GetPointerState(pointerIndex) == 0)
+    if (mChallengeButtons[row].GetPointerState(pointerIndex) == POINTER_BUTTON_NORMAL)
     {
         ++mPointerInsideCount;
         mChallengeSlides[row]->SetActiveSlide("over", true, false);
-        mChallengeButtons[row].SetPointerState(1, pointerIndex);
+        mChallengeButtons[row].SetPointerState(POINTER_BUTTON_HOVER, pointerIndex);
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
         mChallengeButtons[row].PlayHoverFeedback(pointerIndex);
     }

@@ -568,7 +568,7 @@ void NetworkInputRouter::OnInputReady()
             int eventCount = message->mEventCount;
             u8 serializedData[300];
             NetworkMessageSerializer serializer(
-                1, serializedData, sizeof(serializedData));
+                NETWORK_SERIALIZE_WRITE, serializedData, sizeof(serializedData));
             message->Serialize(&serializer);
             u32 serializedLength = serializer.GetLength();
 

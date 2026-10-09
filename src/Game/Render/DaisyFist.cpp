@@ -33,7 +33,7 @@ DaisyFistObject::DaisyFistObject(int index)
     mDelayTimer = 0.0f;
     mPosition = sHiddenPosition;
     mOrientation = 0;
-    mDrawable = GetRenderObject(6, index);
+    mDrawable = GetRenderObject(STADIUM_MODEL_DAISY_FIST, index);
 }
 
 DaisyFistObject::~DaisyFistObject()

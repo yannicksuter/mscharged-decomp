@@ -36,7 +36,7 @@ ChallengePreviewOverlay::ChallengePreviewOverlay(ScreenMovement movement)
     SHNavigation* object = GetNavigationScene();
     if (object != 0)
     {
-        object->SetButtons(0, true);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
 }
 
@@ -75,7 +75,7 @@ void ChallengePreviewOverlay::Update(float fDeltaT)
             }
             else
             {
-                g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+                g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
             }
         }
     }
@@ -184,29 +184,29 @@ void ChallengePreviewOverlay::SceneCreated()
 }
 void ChallengePreviewOverlay::OnContinuePointerEnter(int index, void*)
 {
-    if (!mContinueButton.HasOtherPointerState(1, index))
+    if (!mContinueButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mContinueButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mContinueButton.SetPointerState(1, index);
+    mContinueButton.SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void ChallengePreviewOverlay::OnContinuePointerLeave(int index, void*)
 {
-    if (!mContinueButton.HasOtherPointerState(1, index))
+    if (!mContinueButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mContinueButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mContinueButton.SetPointerState(0, index);
+    mContinueButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void ChallengePreviewOverlay::OnContinuePointerPress(int index, void*)
 {
     mContinueButtonInstance->SetActiveSlide("down", true, false);
-    mContinueButton.SetPointerState(2, index);
+    mContinueButton.SetPointerState(POINTER_BUTTON_SELECTED, index);
     mContinuePressed = true;
 
     for (int i = 0; i < 4; ++i)

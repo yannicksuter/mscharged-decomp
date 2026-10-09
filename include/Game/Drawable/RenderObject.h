@@ -2,6 +2,7 @@
 #define GAME_DRAWABLE_RENDER_OBJECT_H
 
 #include "Game/Drawable/DrawableObj.h"
+#include "Game/Render/StadiumLoading.h"
 
 typedef DrawableObject RenderObject;
 

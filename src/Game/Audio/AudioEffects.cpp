@@ -74,19 +74,19 @@ AudioEffectBase* AudioEffectFactory::CreateEffect(unsigned int effectId)
 {
     switch (effectId)
     {
-    case 0xCE5C5677:
+    case AUDIO_EFFECT_VOLUME:
         return new Volume;
-    case 0x7DDB838E:
+    case AUDIO_EFFECT_CONTROLLER_SPEAKER:
         return new ControllerSpeaker;
-    case 0xC457F745:
+    case AUDIO_EFFECT_REVERB:
         return new Reverb;
-    case 0x04F5A46E:
+    case AUDIO_EFFECT_DELAY:
         return new Delay;
-    case 0x0BCF338E:
+    case AUDIO_EFFECT_LOW_PASS_FILTER:
         return new LowPassFilter;
-    case 0x05D11E37:
+    case AUDIO_EFFECT_PITCH:
         return new Pitch;
-    case 0xFA8EC255:
+    case AUDIO_EFFECT_CATEGORY_VOLUME:
         return new CategoryVolume;
     default:
         return 0;
@@ -210,7 +210,7 @@ void Volume::CreateParameter(unsigned int definition, const void* context, bool 
     *output = parameter;
     if (type == 2)
     {
-        unsigned int volumeKey = 0xCE5C5677;
+        unsigned int volumeKey = AUDIO_EFFECT_VOLUME;
         parameter->m_VolumeOffset = node->Get(volumeKey).m_Float;
     }
     else

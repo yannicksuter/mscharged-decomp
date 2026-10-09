@@ -28,7 +28,7 @@ AudioSlider* GetAudioSlider(
     AudioSliderTable* table, unsigned long index, XSoundHandle* owner)
 {
     AudioSliderDefinition* definition = table->globalDefinitions + table->localToGlobal[index];
-    if (definition->kind == 2)
+    if (definition->kind == AUDIO_SLIDER_GLOBAL)
         return table->globalSliders + definition->index;
     return owner->m_LocalSliders->sliders
          + definition->index;

@@ -133,9 +133,9 @@ void SHOnlineInvitePlayers::SceneCreated()
     else
         mBackEnabled = false;
     SHNavigation* screen = GetNavigationScene();
-    screen->SetButtons(0x24, true);
-    mBackButtonInstance = screen->GetButton(4);
-    mStartButtonInstance = screen->GetButton(0x20);
+    screen->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
+    mBackButtonInstance = screen->GetButton(NAVIGATION_BUTTON_BACK);
+    mStartButtonInstance = screen->GetButton(NAVIGATION_BUTTON_DONE);
     mBackButton.SetButtonInstance(mBackButtonInstance);
     if (mBackEnabled)
     {
@@ -144,11 +144,11 @@ void SHOnlineInvitePlayers::SceneCreated()
     }
     else
     {
-        screen->SetButtonVisibility(4, false);
+        screen->SetButtonVisibility(NAVIGATION_BUTTON_BACK, false);
         mBackButton.Disable();
     }
     SetDoneButtonBounds(&mStartButton, mStartButtonInstance, 0);
-    screen->SetButtonVisibility(0x20, false);
+    screen->SetButtonVisibility(NAVIGATION_BUTTON_DONE, false);
     mStartButton.Disable();
 
     FEPresentation* presentation = mFEScene->m_pFEPackage->GetPresentation();
@@ -568,9 +568,9 @@ void SHOnlineInvitePlayers::InitializeButtons()
 
 inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnInvitationErrorDismissed), this)));
         mPopupActive = true;
     }
@@ -578,9 +578,9 @@ inline void SHOnlineInvitePlayers::ShowInvitationError(int popup)
 
 inline void SHOnlineInvitePlayers::ShowLobbyError(int popup)
 {
-    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+    if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
-        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+        FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         menu->Create((ePopupMenu)popup, Function<FnVoidVoid>(Bind<void>(MemFun(&SHOnlineInvitePlayers::OnLobbyErrorDismissed), this)));
         mPopupActive = true;
     }
@@ -591,14 +591,14 @@ void SHOnlineInvitePlayers::OnInvitePointerEnter(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     ++mHoverCounts[(int)context];
     mRowInstances[(int)context]->SetActiveSlide("over", true, false);
-    mInviteButtons[(int)context].SetPointerState(1, index);
+    mInviteButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void SHOnlineInvitePlayers::OnInvitePointerLeave(int index, void* context)
 {
     --mHoverCounts[(int)context];
     mRowInstances[(int)context]->SetActiveSlide("off", true, false);
-    mInviteButtons[(int)context].SetPointerState(0, index);
+    mInviteButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineInvitePlayers::OnInvitePointerPress(int index, void* context)
@@ -606,7 +606,7 @@ void SHOnlineInvitePlayers::OnInvitePointerPress(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xF0AFD586, 0, 0, 1);
     SetOnlineFriendSelectionMode(1);
     SetOnlineFriendSelectionContext(context);
-    GameSceneManager::Instance()->Push((SceneList)0x2F, SCREEN_FORWARD, true);
+    GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS, SCREEN_FORWARD, true);
 }
 
 void SHOnlineInvitePlayers::OnCancelPointerEnter(int index, void* context)
@@ -614,14 +614,14 @@ void SHOnlineInvitePlayers::OnCancelPointerEnter(int index, void* context)
     FEAudio::PlayAnimAudioEvent(0xAA73EF35, 0, 0, 1);
     ++mHoverCounts[(int)context];
     mCancelInstances[(int)context]->SetActiveSlide("over", true, false);
-    mCancelButtons[(int)context].SetPointerState(1, index);
+    mCancelButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void SHOnlineInvitePlayers::OnCancelPointerLeave(int index, void* context)
 {
     --mHoverCounts[(int)context];
     mCancelInstances[(int)context]->SetActiveSlide("off", true, false);
-    mCancelButtons[(int)context].SetPointerState(0, index);
+    mCancelButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineInvitePlayers::OnCancelPointerPress(int, void*)
@@ -636,7 +636,7 @@ void SHOnlineInvitePlayers::OnCancelPointerPress(int, void*)
 void SHOnlineInvitePlayers::OnStartPointerEnter(int index, void*)
 {
     mStartButtonInstance->SetActiveSlide("over", true, false);
-    mStartButton.SetPointerState(1, index);
+    mStartButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
     mStartHovered = true;
 }
@@ -644,7 +644,7 @@ void SHOnlineInvitePlayers::OnStartPointerEnter(int index, void*)
 void SHOnlineInvitePlayers::OnStartPointerLeave(int index, void*)
 {
     mStartButtonInstance->SetActiveSlide("off", true, false);
-    mStartButton.SetPointerState(0, index);
+    mStartButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     mStartHovered = false;
 }
 
@@ -670,7 +670,7 @@ void SHOnlineInvitePlayers::OnLobbyErrorDismissed()
     }
     if (mIsHost)
     {
-        GameSceneManager::Instance()->Push((SceneList)5, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_STADIUM, SCREEN_BACK, true);
         return;
     }
     g_pFriendManager->SetOwnStatusAvailable();

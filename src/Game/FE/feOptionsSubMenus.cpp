@@ -68,8 +68,8 @@ void OptionsAudioMenuV2::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
-        mSaveButton = navigation->GetButton(0x20);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mSaveButton = navigation->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mNavigation.SetButtonInstance(backButton);
 
@@ -160,8 +160,8 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
             {
-                navigation->SetButtons(0x24, true);
-                navigation->SetDoneButtonText(1);
+                navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
+                navigation->SetDoneButtonText(NAV_ACCEPT);
             }
             mState = AUDIO_OPTIONS_ACTIVE;
         }
@@ -172,9 +172,9 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
         else if (mState == AUDIO_OPTIONS_EXITING_BACK)
         {
             if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
-                GameSceneManager::Instance()->Push((SceneList)13, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_OPTIONS, SCREEN_NOTHING, true);
             else
-                g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, true);
+                g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_NOTHING, true);
             return;
         }
     }
@@ -213,7 +213,7 @@ void OptionsAudioMenuV2::Update(float fDeltaT)
             mState = AUDIO_OPTIONS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
-                navigation->SetButtons(0, true);
+                navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             return;
         }
@@ -304,41 +304,41 @@ void OptionsAudioMenuV2::UpdateVolumeBars(int setting)
 void OptionsAudioMenuV2::OnVolumeButtonPointerEnter(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (mButtonComponents[item].HasOtherPointerState(2, -1)
+    if (mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1)
         || !IsVolumeButtonEnabled(item))
     {
         return;
     }
 
     mButtonComponents[item].PlayHoverFeedback(index);
-    if (!mButtonComponents[item].HasOtherPointerState(1, index))
+    if (!mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mButtons[item]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
     }
-    mButtonComponents[item].SetPointerState(1, index);
+    mButtonComponents[item].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void OptionsAudioMenuV2::OnVolumeButtonPointerLeave(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (mButtonComponents[item].HasOtherPointerState(2, -1)
+    if (mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1)
         || !IsVolumeButtonEnabled(item))
     {
         return;
     }
 
-    if (!mButtonComponents[item].HasOtherPointerState(1, index))
+    if (!mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mButtons[item]->SetActiveSlide("off", true, false);
     }
-    mButtonComponents[item].SetPointerState(0, index);
+    mButtonComponents[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (mButtonComponents[item].HasOtherPointerState(2, -1)
+    if (mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1)
         || !IsVolumeButtonEnabled(item))
         return;
 
@@ -409,8 +409,8 @@ void OptionsAudioMenuV2::OnVolumeButtonPointerPress(int index, void* context)
 
 void OptionsAudioMenuV2::OnSaveButtonPointerEnter(int index, void*)
 {
-    mSaveButtonComponent.SetPointerState(1, index);
-    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
+    mSaveButtonComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSaveButton->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -419,8 +419,8 @@ void OptionsAudioMenuV2::OnSaveButtonPointerEnter(int index, void*)
 
 void OptionsAudioMenuV2::OnSaveButtonPointerLeave(int index, void*)
 {
-    mSaveButtonComponent.SetPointerState(0, index);
-    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
+    mSaveButtonComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSaveButton->SetActiveSlide("off", true, false);
     }
@@ -432,7 +432,7 @@ void OptionsAudioMenuV2::OnSaveButtonPointerPress(int, void*)
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     mSaveStarted = true;
@@ -527,8 +527,8 @@ void OptionsVisualMenuV2::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
-        mSaveButton = navigation->GetButton(0x20);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mSaveButton = navigation->GetButton(NAVIGATION_BUTTON_DONE);
     }
     mNavigation.SetButtonInstance(backButton);
 
@@ -558,11 +558,11 @@ void OptionsVisualMenuV2::SceneCreated()
     mZoomButtons[mSettings[0]]->SetActiveSlide("down", true, false);
     FEPointerButton& zoomButton = mZoomButtonComponents[mSettings[0]];
     for (int i = 0; i < 4; ++i)
-        zoomButton.SetPointerState(2, i);
+        zoomButton.SetPointerState(POINTER_BUTTON_SELECTED, i);
     mButtons[mSettings[1]]->SetActiveSlide("down", true, false);
     FEPointerButton& button = mButtonComponents[mSettings[1]];
     for (int i = 0; i < 4; ++i)
-        button.SetPointerState(2, i);
+        button.SetPointerState(POINTER_BUTTON_SELECTED, i);
 
     TLTextInstance* text = FEFinder<TLTextInstance, 4>::Find(
         mPresentation->m_currentSlide, "Layer", "visual_options", "SERIES SETTING");
@@ -599,8 +599,8 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
             {
-                navigation->SetButtons(0x24, true);
-                navigation->SetDoneButtonText(1);
+                navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
+                navigation->SetDoneButtonText(NAV_ACCEPT);
             }
             mState = VISUAL_OPTIONS_ACTIVE;
         }
@@ -611,9 +611,9 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
         else if (mState == VISUAL_OPTIONS_EXITING_BACK)
         {
             if (mOverlayMode == OPTIONS_CONTEXT_FRONTEND)
-                GameSceneManager::Instance()->Push((SceneList)13, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_OPTIONS, SCREEN_NOTHING, true);
             else
-                g_pOverlayManager->Push((SceneList)0x50, SCREEN_NOTHING, true);
+                g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_NOTHING, true);
             return;
         }
     }
@@ -649,7 +649,7 @@ void OptionsVisualMenuV2::Update(float fDeltaT)
             mState = VISUAL_OPTIONS_EXITING_BACK;
             SHNavigation* navigation = GetNavigationScene();
             if (navigation != 0)
-                navigation->SetButtons(0, true);
+                navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
             mPresentation->SetActiveSlide("OPTIONS_OUT", true);
             mPresentation->Update(0.0f);
             return;
@@ -717,35 +717,35 @@ void OptionsVisualMenuV2::InitializePointerButtons()
 void OptionsVisualMenuV2::OnZoomLevelPointerEnter(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
+    if (!mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
     {
         mButtonComponents[item].PlayHoverFeedback(index);
-        if (!mButtonComponents[item].HasOtherPointerState(1, index))
+        if (!mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mButtons[item]->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         }
-        mButtonComponents[item].SetPointerState(1, index);
+        mButtonComponents[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
 void OptionsVisualMenuV2::OnZoomLevelPointerLeave(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
-    if (!mButtonComponents[item].HasOtherPointerState(2, -1))
+    if (!mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
     {
-        if (!mButtonComponents[item].HasOtherPointerState(1, index))
+        if (!mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mButtons[item]->SetActiveSlide("off", true, false);
         }
-        mButtonComponents[item].SetPointerState(0, index);
+        mButtonComponents[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
 void OptionsVisualMenuV2::OnZoomLevelPointerPress(int index, void* context)
 {
     int item = (int)context;
-    if (mButtonComponents[item].HasOtherPointerState(2, -1))
+    if (mButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
         return;
 
     FEAudio::PlayAnimAudioEvent(0x3021A1EE, 0, 0, 1);
@@ -753,7 +753,7 @@ void OptionsVisualMenuV2::OnZoomLevelPointerPress(int index, void* context)
     mButtonComponents[mSettings[1]].ResetPointerStates();
     mButtons[item]->SetActiveSlide("down", true, false);
     for (int i = 0; i < 4; ++i)
-        mButtonComponents[item].SetPointerState(2, i);
+        mButtonComponents[item].SetPointerState(POINTER_BUTTON_SELECTED, i);
     mSettings[1] = item;
     GameInfoManager::Instance()->mUserInfo.mVisualOptions.mCameraZoomLevel = item / 4.0;
 
@@ -768,47 +768,47 @@ void OptionsVisualMenuV2::OnZoomModePointerEnter(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if ((unsigned int)mSettings[0] == item
-        || mZoomButtonComponents[item].HasOtherPointerState(2, -1))
+        || mZoomButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
     {
         return;
     }
 
     mZoomButtonComponents[item].PlayHoverFeedback(index);
-    if (!mZoomButtonComponents[item].HasOtherPointerState(1, index))
+    if (!mZoomButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mZoomButtons[item]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     }
-    mZoomButtonComponents[item].SetPointerState(1, index);
+    mZoomButtonComponents[item].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void OptionsVisualMenuV2::OnZoomModePointerLeave(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if ((unsigned int)mSettings[0] == item
-        || mZoomButtonComponents[item].HasOtherPointerState(2, -1))
+        || mZoomButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
     {
         return;
     }
-    if (!mZoomButtonComponents[item].HasOtherPointerState(1, index))
+    if (!mZoomButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mZoomButtons[item]->SetActiveSlide("off", true, false);
     }
-    mZoomButtonComponents[item].SetPointerState(0, index);
+    mZoomButtonComponents[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void OptionsVisualMenuV2::OnZoomModePointerPress(int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     if ((unsigned int)mSettings[0] == item
-        || mZoomButtonComponents[item].HasOtherPointerState(2, -1))
+        || mZoomButtonComponents[item].HasOtherPointerState(POINTER_BUTTON_SELECTED, -1))
         return;
 
     mZoomButtons[mSettings[0]]->SetActiveSlide("off", true, false);
     mZoomButtonComponents[mSettings[0]].ResetPointerStates();
     mZoomButtons[item]->SetActiveSlide("down", true, false);
     for (int i = 0; i < 4; ++i)
-        mZoomButtonComponents[item].SetPointerState(2, i);
+        mZoomButtonComponents[item].SetPointerState(POINTER_BUTTON_SELECTED, i);
     FEAudio::PlayAnimAudioEvent(0x362F2841, 0, 0, 1);
     mSettings[0] = item;
     GameInfoManager::Instance()->mUserInfo.mVisualOptions.mIsAutoZoomCamera = item == 0;
@@ -822,8 +822,8 @@ void OptionsVisualMenuV2::OnZoomModePointerPress(int index, void* context)
 
 void OptionsVisualMenuV2::OnSaveButtonPointerEnter(int index, void*)
 {
-    mSaveButtonComponent.SetPointerState(1, index);
-    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
+    mSaveButtonComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSaveButton->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
@@ -832,8 +832,8 @@ void OptionsVisualMenuV2::OnSaveButtonPointerEnter(int index, void*)
 
 void OptionsVisualMenuV2::OnSaveButtonPointerLeave(int index, void*)
 {
-    mSaveButtonComponent.SetPointerState(0, index);
-    if (!mSaveButtonComponent.HasOtherPointerState(1, index))
+    mSaveButtonComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mSaveButtonComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSaveButton->SetActiveSlide("off", true, false);
     }
@@ -845,7 +845,7 @@ void OptionsVisualMenuV2::OnSaveButtonPointerPress(int, void*)
     SHNavigation* navigation = GetNavigationScene();
     if (navigation != 0)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     mPresentation->SetActiveSlide("OPTIONS_OUT", true);
     mPresentation->Update(0.0f);

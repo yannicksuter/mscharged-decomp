@@ -143,17 +143,17 @@ void StadiumSelectScene::SceneCreated()
     {
         if (GameInfoManager::Instance()->UseAltRules())
         {
-            navigation->SetButtons(0x2F, true);
-            mPlayButtonInstance = navigation->GetButton(0x20);
+            navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_DONE, true);
+            mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_DONE);
         }
         else
         {
-            navigation->SetButtons(0x1F, true);
-            mPlayButtonInstance = navigation->GetButton(0x10);
+            navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, true);
+            mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         }
-        backButton = navigation->GetButton(4);
-        plusButton = navigation->GetButton(1);
-        minusButton = navigation->GetButton(2);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        plusButton = navigation->GetButton(NAVIGATION_BUTTON_PLUS);
+        minusButton = navigation->GetButton(NAVIGATION_BUTTON_MINUS);
         navigation->HideButtons();
     }
     mBackButton.SetButtonInstance(backButton);
@@ -378,7 +378,7 @@ void StadiumSelectScene::Update(float deltaTime)
             }
 
             if (GameInfoManager::Instance()->UseAltRules()
-                && !GameSceneManager::Instance()->IsOnStack((SceneList)10)
+                && !GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
                 && g_pFriendManager->FindHostInvitation())
             {
                 FriendManager* manager = g_pFriendManager;
@@ -448,7 +448,7 @@ void StadiumSelectScene::InitializeButtons()
 void StadiumSelectScene::OnPointerEnter(int index, void*)
 {
     mPlayButtonInstance->SetActiveSlide("over", true, false);
-    mPlayButton.SetPointerState(1, index);
+    mPlayButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, true);
     mPointerOverPlayButton = true;
 }
@@ -456,7 +456,7 @@ void StadiumSelectScene::OnPointerEnter(int index, void*)
 void StadiumSelectScene::OnPointerLeave(int index, void*)
 {
     mPlayButtonInstance->SetActiveSlide("off", true, false);
-    mPlayButton.SetPointerState(0, index);
+    mPlayButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     mPointerOverPlayButton = false;
 }
 
@@ -470,7 +470,7 @@ void StadiumSelectScene::OnSelectStadium(int, void*)
             FEAudio::PlayAnimAudioEvent(0xBF2ED62D, 0, 0, true);
             FrontEndPresentation::GetInstance()->Call("FromStadiumSelectToUnrankedMatch");
             GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
-            SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_NOTHING, true);
+            SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true);
             scene->mIsHost = true;
             scene->mStartFriendServer = true;
         }
@@ -487,7 +487,7 @@ void StadiumSelectScene::OnSelectStadium(int, void*)
                 SaveLoad::StartSave(false);
             }
             GameInfoManager::Instance()->SetStadium(mStadiumOrder[mStadiumIndex]);
-            GetNavigationScene()->SetButtons(0, true);
+            GetNavigationScene()->SetButtons(NAVIGATION_BUTTON_NONE, true);
         }
         mBackButton.Disable();
         mPlayButton.Disable();

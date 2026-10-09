@@ -674,7 +674,7 @@ inline bool cFielder::ShouldSkipHardStopAnim()
             || (IsCharacterSuperPowerActive(this, PETEY) && m_bSuperPowerTankOn))
         || IsConcurrentStateActive(m_pAIContext->mScriptMachine, FIELDER_DESIRE_GOOEY);
     bool skip = specialMovement || (ReceivingPass(this) && g_pBall->m_tPassTargetTimer.GetSeconds() < 0.5f);
-    if (!skip && GetDesireState() == (eFielderDesireState)20)
+    if (!skip && GetDesireState() == FIELDER_DESIRE_USER_CONTROLLED)
     {
         Desire* desire = GetFielderDesire(this, FIELDER_DESIRE_USER_CONTROLLED);
         if (desire->mAgeTimer.GetSeconds() < 0.05f)
@@ -796,7 +796,7 @@ cFielder::cFielder(int nPlayerID, int nTeamID, eCharacterClass cc,
     m_eActionState = ACTION_NEED_ACTION;
     m_bInPosition = false;
     m_nPowerupAnimID = -1;
-    m_eRole = (eRole)0;
+    m_eRole = ROLE_STRIKER;
     mbWasHitByPowerupThisFrame = false;
     mbTangible = true;
     mbIgnorePadSwitchRelease = false;
@@ -868,7 +868,7 @@ eFielderDesireState cFielder::GetDesireState()
     {
         return (eFielderDesireState)machine->mActiveState->mState;
     }
-    return (eFielderDesireState)-1;
+    return FIELDER_DESIRE_NONE;
 }
 
 Desire* GetFielderDesire(cFielder* pFielder, int nAction)
@@ -1165,7 +1165,7 @@ bool CanUsePowerup(cFielder* pFielder, int nPowerupType)
         return false;
     }
 
-    if (pFielder->GetDesireState() == (eFielderDesireState)0x20)
+    if (pFielder->GetDesireState() == FIELDER_DESIRE_MEGA_STRIKE)
     {
         if (pFielder->m_eActionState == ACTION_MEGA_STRIKE)
         {
@@ -2082,7 +2082,7 @@ void cFielder::CollideWithChainCallback(ChainChomp* chain)
         else
             InitActionKnockdownReact(chain->mv3Velocity);
         if (chain->mpThrower != 0 && g_pGame->IsGameplayOrOvertime() && !IsOnSameTeam(chain->mpThrower))
-            StatsTracker::Instance()->TrackStat((ePlayerStats)0x1E, m_pTeam->m_nSide,
+            StatsTracker::Instance()->TrackStat(STATS_POWERUPS_HIT, m_pTeam->m_nSide,
                 m_DetPlayer.m_ID, chain->mnThrowerPadID, 0, 0, 0);
     }
 }
@@ -2500,7 +2500,7 @@ bool cFielder::IsAboveFielder(cFielder* pOtherFielder) const
     float rightFootZ = GetJointPosition(m_nRightFootJointIndex).z;
     bool bRunning = false;
     eFielderActionState eActionState = m_eActionState;
-    if (eActionState == ACTION_RUNNING || eActionState == 0x13
+    if (eActionState == ACTION_RUNNING || eActionState == ACTION_RUNNING_PASS
         || IsRunningWithBall())
     {
         bRunning = true;
@@ -2780,7 +2780,7 @@ void cFielder::CleanUpAction(eFielderActionState actionState)
         break;
 
     case ACTION_LAUNCHED:
-        if (actionState != 3 && actionState != 0x18)
+        if (actionState != ACTION_FALL && actionState != ACTION_SUCKED_AWAY)
         {
             m_DetChar.m_v3Position.z = 0.0f;
             m_DetChar.m_v3Velocity.z = 0.0f;
@@ -2816,7 +2816,7 @@ void cFielder::CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballS
     float distance = GetShotTargetDistance(ball->m_v3Position, target);
     float speed = distance * inverseTime;
     float accuracy;
-    if (ballState == 7)
+    if (ballState == BALL_STATE_CHIP_SHOT)
         accuracy = (1.1f - shotValue) * (1.5f * distance);
     else
         accuracy = distance * (1.0f - 0.3f * shotValue);
@@ -2825,10 +2825,10 @@ void cFielder::CalcRegularShot(nlVector3& velocity, nlVector3& target, int ballS
     heightVariance = accuracy * tweaks->fShotHeightVariance.GetValue();
     target.y += 0.5f * widthVariance - nlRandomf(widthVariance);
     target.z += nlRandomf(heightVariance);
-    if (ballState == 7)
+    if (ballState == BALL_STATE_CHIP_SHOT)
         g_pBall->m_pPhysicsBall->mfBallAirResistance = gChipShotAirResistance;
     g_pBall->ShootAtFast(velocity, target, speed);
-    if (ballState == 7)
+    if (ballState == BALL_STATE_CHIP_SHOT)
     {
         float maxHeightVelocity = Interpolate(gChipShotMinVerticalSpeed, gChipShotMaxVerticalSpeed, m_pTweaks->fShooting);
         if (velocity.z > maxHeightVelocity)
@@ -4203,7 +4203,7 @@ float cFielder::GetAirInterceptHeight(int type)
     if (mfAirInterceptHeight[type] < 0.0f)
     {
         const LooseBallContactAnimInfo* anim = gOneTimerIdleVolleyContactAnims;
-        if (type == PATCH_GAS_BALL)
+        if (type == AIR_INTERCEPT_GROUND)
             anim = gOneTimerLeadGroundContactAnims;
         nlVector3 position;
         const cSAnim* contactAnim = m_pAnimInventory->GetAnim(anim->nAnimID);
@@ -5203,12 +5203,12 @@ void cFielder::TestAnimBallContact()
                 {
                     DoRegularShooting(false);
                     DeliverShotPresentationEndEvent(g_pGame);
-                    EmitBallShot(this, (eBallShotEffectType)2, 0, false, true);
+                    EmitBallShot(this, BALL_EFFECT_PERFECT_SHOT, 0, false, true);
                 }
                 else
                 {
                     DoClearBall();
-                    EmitBallShot(this, (eBallShotEffectType)1, 0, false, false);
+                    EmitBallShot(this, BALL_EFFECT_S2S_SHOT, 0, false, false);
                 }
                 FixedUpdateTask::GetTargetTimeScale();
                 break;
@@ -6012,7 +6012,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_eActionState = ACTION_NEED_ACTION;
     m_bInPosition = false;
     m_nPowerupAnimID = -1;
-    m_eRole = (eRole)0;
+    m_eRole = ROLE_STRIKER;
     mbWasHitByPowerupThisFrame = false;
     mbTangible = true;
     mbIgnorePadSwitchRelease = false;
@@ -6087,7 +6087,7 @@ void cFielder::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_fMegaStrikeSegment4Position = 0.0f;
     m_fMegaStrikeLastSegmentPosition = 0.0f;
     InitDesire(
-        (eFielderDesireState)0x1F, 0.5f, -1.0f, fvNotSet, fvNotSet);
+        FIELDER_DESIRE_WAIT, 0.5f, -1.0f, fvNotSet, fvNotSet);
     InitActionWait();
 }
 

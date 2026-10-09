@@ -100,8 +100,8 @@ void SHOnlineMiiSelect::SceneCreated()
     TLComponentInstance* screen = 0;
     if (scene != 0)
     {
-        scene->SetButtons(7, true);
-        screen = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK, true);
+        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
         mPageControls = &scene->mPageControls;
         mPageControls->SetButtonState(1, false, false);
         mPageControls->SetButtonState(0, false, false);
@@ -148,7 +148,7 @@ void SHOnlineMiiSelect::ClearMissingMiiSaveSlots()
 
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x8C,
+            popup->Create(POPUP_DELETED_MII,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::UpdatePage), this)));
         }
@@ -168,7 +168,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -191,7 +191,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -214,7 +214,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -237,7 +237,7 @@ void SHOnlineMiiSelect::BuildMiiList()
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
                 SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87,
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT,
                 Function<FnVoidVoid>(
                     Bind<void>(MemFun(&SHOnlineMiiSelect::ReturnToWiiMenu), this)));
             return;
@@ -442,27 +442,27 @@ void SHOnlineMiiSelect::UpdatePage()
     {
         mPageControls->SetButtonState(1, false, false);
         mPageControls->SetButtonState(0, false, false);
-        scene->SetButtons(4, true);
+        scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
     }
     else if (mCurrentPage <= 0)
     {
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, false, false);
         mPageControls->ClearButtonHighlight(1);
-        scene->SetButtons(5, true);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_BACK, true);
     }
     else if (mCurrentPage >= mPageCount - 1)
     {
         mPageControls->SetButtonState(1, false, false);
         mPageControls->SetButtonState(0, true, true);
         mPageControls->ClearButtonHighlight(0);
-        scene->SetButtons(6, true);
+        scene->SetButtons(NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK, true);
     }
     else
     {
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, true, true);
-        scene->SetButtons(7, true);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK, true);
     }
 }
 
@@ -492,10 +492,10 @@ void SHOnlineMiiSelect::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHoverCounts[index];
-    if (!mMiiButtons[item].HasOtherPointerState(1, index))
+    if (!mMiiButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mMiiInstances[item]->SetActiveSlide("over", true, false);
-        mMiiButtons[item].SetPointerState(1, index);
+        mMiiButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         FEAudio::PlayAnimAudioEvent(0xFFC8A55D, 0, 0, 1);
     }
 }
@@ -505,7 +505,7 @@ void SHOnlineMiiSelect::CloseItem(unsigned int index, void* context)
     unsigned int item = (unsigned int)context;
     --mHoverCounts[index];
     mMiiInstances[item]->SetActiveSlide("off", true, false);
-    mMiiButtons[item].SetPointerState(0, index);
+    mMiiButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineMiiSelect::SelectMii(unsigned int, void* context)

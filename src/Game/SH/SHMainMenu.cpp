@@ -127,8 +127,8 @@ void SHMainMenu::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (scene != 0)
     {
-        scene->SetButtons(4, true);
-        backButton = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+        backButton = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
 
     for (int i = 0; i < NUM_ITEMS; ++i)
@@ -290,11 +290,11 @@ void SHMainMenu::CloseItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     --mHighlightedItemCounts[index];
-    if (!mMenuItems[item].HasOtherPointerState(1, index))
+    if (!mMenuItems[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mMenuHighlights[item]->SetActiveSlide("off", true, false);
         mMenuArrows[item]->SetActiveSlide("off", true, false);
-        mMenuItems[item].SetPointerState(0, index);
+        mMenuItems[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
@@ -314,11 +314,11 @@ void SHMainMenu::OpenItem(unsigned int index, void* context)
 {
     unsigned int item = (unsigned int)context;
     ++mHighlightedItemCounts[index];
-    if (!mMenuItems[item].HasOtherPointerState(1, index))
+    if (!mMenuItems[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mMenuHighlights[item]->SetActiveSlide("over", true, false);
         mMenuArrows[item]->SetActiveSlide("over", true, false);
-        mMenuItems[item].SetPointerState(1, index);
+        mMenuItems[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         FEAudio::PlayAnimAudioEvent(0x6B0689D4, 0, 0, true);
     }
 }
@@ -341,17 +341,17 @@ void SHMainMenu::SelectItem(unsigned int index, void* context)
         if (!SaveEnabled)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x46);
+            popup->Create(POPUP_ONLINE_SAVE_DATA_REQUIRED);
         }
         else if (!MiiManager::s_pInstance->mInitialized)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x87, Bind<void>(MemFun(&SHMainMenu::ReturnToWiiMenu), this));
+            popup->Create(POPUP_PROFILE_DATABASE_CORRUPT, Bind<void>(MemFun(&SHMainMenu::ReturnToWiiMenu), this));
         }
         else if (RFLGetAvailableOfficialDataNum() == 0)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-            popup->Create((ePopupMenu)0x86);
+            popup->Create(POPUP_PROFILE_NO_MIIS);
         }
         else
         {
@@ -413,7 +413,7 @@ void SHMainMenu::ApplyItem(unsigned int item)
         SHNavigation* scene = GetNavigationScene();
         if (scene != 0)
         {
-            scene->SetButtons(0, true);
+            scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
         }
         FrontEndPresentation::GetInstance()->Call("TransitionFromMainMenu");
         FEAudio::PlayAnimAudioEvent(0xB19DBC20, 0, 0, true);

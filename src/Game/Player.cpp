@@ -624,7 +624,7 @@ void cPlayer::PickupBall(cBall* pBall)
             PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
         }
     }
-    else if (m_eClassType != GOALIE || ((Goalie*)this)->mGoalieActionState != 26)
+    else if (m_eClassType != GOALIE || ((Goalie*)this)->mGoalieActionState != GOALIEACTION_MEGA_STRIKE)
     {
         PlayRumbleAction(RUMBLE_SMALL_CONTACT, GetGlobalPad());
     }
@@ -695,7 +695,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
             && (pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
                 || pFielder->GetActionState() == ACTION_MEGA_STRIKE))
         {
-            pFielder->InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            pFielder->InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             return;
         }
         pFielder->EndDesire();
@@ -708,7 +708,7 @@ void cPlayer::SetAIPad(cAIPad* pPad)
                 || pFielder->GetActionState() == ACTION_SHOOT_TO_SCORE
                 || pFielder->GetActionState() == ACTION_MEGA_STRIKE))
         {
-            pFielder->InitDesire(FIELDERDESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
+            pFielder->InitDesire(FIELDER_DESIRE_FINISH_ACTION, 0.5f, -1.0f, fvNotSet, fvNotSet);
             return;
         }
         pFielder->EndDesire();

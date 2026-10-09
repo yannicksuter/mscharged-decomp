@@ -180,6 +180,14 @@ public:
     /* 0x18 */ nlVector3 mPathVelocity;
 }; // size: 0x24
 
+enum eAvoidablePolygonType
+{
+    AVOID_POLYGON_FIELD_BOUNDARY = 1,
+    AVOID_POLYGON_SHOT_LANE = 2,
+    AVOID_POLYGON_THWOMP = 3,
+    AVOID_POLYGON_WALUIGI_WALL = 4,
+};
+
 class AvoidablePolygon : public AvoidableObject
 {
 public:

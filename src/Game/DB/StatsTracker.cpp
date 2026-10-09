@@ -480,7 +480,7 @@ void StatsTracker::OnGoalieSave(GoalieSaveData* data)
 
 void StatsTracker::OnBallStateChange(int previousState, int currentState)
 {
-    if (previousState == 8 && currentState != 8 && g_pBall->m_pShooter != 0)
+    if (previousState == BALL_STATE_SKILLSHOT && currentState != BALL_STATE_SKILLSHOT && g_pBall->m_pShooter != 0)
     {
         s_pInstance->TrackStat(
             STATS_STS_ATTEMPTS, g_pBall->m_pShooter->m_pTeam->m_nSide,

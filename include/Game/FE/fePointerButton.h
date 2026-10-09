@@ -3,6 +3,13 @@
 
 #include "Game/FE/fePointer.h"
 
+enum ePointerButtonState
+{
+    POINTER_BUTTON_NORMAL = 0,
+    POINTER_BUTTON_HOVER = 1,
+    POINTER_BUTTON_SELECTED = 2,
+};
+
 class FEPointerButton : public FEPointerRegion
 {
 public:
@@ -21,10 +28,10 @@ public:
     }
     void ResetPointerStates()
     {
-        mPointerStates[0] = 0;
-        mPointerStates[1] = 0;
-        mPointerStates[2] = 0;
-        mPointerStates[3] = 0;
+        mPointerStates[0] = POINTER_BUTTON_NORMAL;
+        mPointerStates[1] = POINTER_BUTTON_NORMAL;
+        mPointerStates[2] = POINTER_BUTTON_NORMAL;
+        mPointerStates[3] = POINTER_BUTTON_NORMAL;
     }
     void PlayHoverFeedback(int index);
     void HandlePointerEvent(const FEPointerEvent* event);

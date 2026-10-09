@@ -149,9 +149,9 @@ void SHHallOfFameSummary::SceneCreated()
     TLComponentInstance* breadcrumbs = 0;
     if (scene != 0)
     {
-        scene->SetButtons(15, false);
-        screen = scene->GetButton(4);
-        breadcrumbs = scene->GetButton(8);
+        scene->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS, false);
+        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
+        breadcrumbs = scene->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
         mPageControls = &scene->mPageControls;
         mPageControls->SetButtonState(1, true, true);
         mPageControls->SetButtonState(0, true, true);

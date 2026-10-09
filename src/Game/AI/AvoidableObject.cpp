@@ -257,7 +257,7 @@ float AvoidableFielder::GetAvoidanceStrength(
     {
         AvoidablePolygon* pPolygon
             = (AvoidablePolygon*)other;
-        if (pPolygon->mPolygonType == 4)
+        if (pPolygon->mPolygonType == AVOID_POLYGON_WALUIGI_WALL)
         {
             if (IsWaluigiSuperPowerActive(m_pFielder) && m_pFielder->m_pBall == 0
                 && fn_800DED80(m_pFielder) > 0.7f)
@@ -269,11 +269,11 @@ float AvoidableFielder::GetAvoidanceStrength(
                 fStrength *= 1.3f;
             }
         }
-        else if (pPolygon->mPolygonType == 1 && m_pFielder->IsYoshiSuperPowerActive())
+        else if (pPolygon->mPolygonType == AVOID_POLYGON_FIELD_BOUNDARY && m_pFielder->IsYoshiSuperPowerActive())
         {
             fStrength *= 0.3f;
         }
-        else if (pPolygon->mPolygonType != 3)
+        else if (pPolygon->mPolygonType != AVOID_POLYGON_THWOMP)
         {
             if (fn_800DED80(m_pFielder))
             {

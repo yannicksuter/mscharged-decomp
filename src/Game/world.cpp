@@ -474,7 +474,7 @@ void World::ResetEffects()
         pEffect->m_fEmissionTime = 0.0f;
         pEffect->m_nRemainingEmissions = pEffect->m_nEmissionCount;
         pEffect->m_fPreviousEmissionTime = 0.0f;
-        if (pEffect->m_nTimingMode == 0)
+        if (pEffect->m_nTimingMode == WORLD_EFFECT_ELAPSED_TIME)
         {
             float fEmissionTime = pEffect->m_fEmissionInterval;
             fEmissionTime = 1.0f + fEmissionTime;

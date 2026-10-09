@@ -451,10 +451,10 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     float avoidableWidth = 1.0f;
     nlVector3 avoidableCenter = { 20.6f, 0.0f, 0.0f };
     mpBoundaryAvoidables[0] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
-        AvoidablePolygon(1, avoidableCenter, avoidableWidth, 25.0f);
+        AvoidablePolygon(AVOID_POLYGON_FIELD_BOUNDARY, avoidableCenter, avoidableWidth, 25.0f);
     avoidableCenter.x *= -1.0f;
     mpBoundaryAvoidables[1] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
-        AvoidablePolygon(1, avoidableCenter, avoidableWidth, 25.0f);
+        AvoidablePolygon(AVOID_POLYGON_FIELD_BOUNDARY, avoidableCenter, avoidableWidth, 25.0f);
 
     if (GameInfoManager::Instance()->GetStadium() == STAD_SAND_TOMB)
         avoidableWidth = 6.0f;
@@ -465,10 +465,10 @@ cGame::cGame(void* terrainIndex, int weatherType, bool startCrowdRiot)
     avoidableCenter.y = 12.5f;
     avoidableCenter.z = 0.0f;
     mpBoundaryAvoidables[2] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
-        AvoidablePolygon(1, avoidableCenter, 41.2f, avoidableWidth);
+        AvoidablePolygon(AVOID_POLYGON_FIELD_BOUNDARY, avoidableCenter, 41.2f, avoidableWidth);
     avoidableCenter.y *= -1.0f;
     mpBoundaryAvoidables[3] = new (nlMalloc(sizeof(AvoidablePolygon), 8, false))
-        AvoidablePolygon(1, avoidableCenter, 41.2f, avoidableWidth);
+        AvoidablePolygon(AVOID_POLYGON_FIELD_BOUNDARY, avoidableCenter, 41.2f, avoidableWidth);
 }
 static inline const char* SuddenDeathEventName() { return "SuddenDeath"; }
 static inline const char* GameOverEventName() { return "GameOver"; }
@@ -675,7 +675,7 @@ void cGame::StartSlowDown(float timeScale, float transitionTime)
                 ApplyAudioTransition(&hash, 0, 0);
             }
 
-            g_pOverlayManager->GetScene((SceneList)89)->SetVisible(false);
+            g_pOverlayManager->GetScene(OVERLAY_HUD)->SetVisible(false);
             gpNumberDisplay->mVisible = false;
 
             if (transitionTime <= 0.0f)
@@ -1285,7 +1285,7 @@ void cGame::ReceiveCustomDetermData(DetermDataEvent* pEvent)
                 PlaySound(10, 0x54A8A6A0, 0, 0);
                 u32 hash = nlStringLowerHash("Slow-mo_Captain_Hit");
                 ApplyAudioTransition(&hash, true, 0);
-                g_pOverlayManager->GetScene((SceneList)89)->SetVisible(true);
+                g_pOverlayManager->GetScene(OVERLAY_HUD)->SetVisible(true);
                 gpNumberDisplay->mVisible = true;
             }
         }
@@ -1436,7 +1436,7 @@ void cGame::Update(float fDeltaT)
             if (m_eGameState == GS_GAMEPLAY)
             {
                 if (GameInfoManager::Instance()->IsInMode4()
-                    && g_pStrikerChallenge->mCurrentChallenge == 2
+                    && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore)
                 {
                     ChangeGameState(GS_END_GAME);
@@ -1659,7 +1659,7 @@ void cGame::Update(float fDeltaT)
         if ((GameInfoManager::Instance()->IsInMode4()
                 && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                 && g_pTeams[1]->m_nScore > 0)
-            || (g_pStrikerChallenge->mCurrentChallenge == 2
+            || (g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                 && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
         {
             NisPlayer* pNisPlayer = NisPlayer::Instance();
@@ -1948,7 +1948,7 @@ void cGame::ChangeGameState(eGameState state)
             if ((GameInfoManager::Instance()->IsInMode4()
                     && g_pStrikerChallenge->mCondition == CHALLENGE_SHUTOUT
                     && g_pTeams[1]->m_nScore > 0)
-                || (g_pStrikerChallenge->mCurrentChallenge == 2
+                || (g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES
                     && g_pTeams[0]->m_nScore == g_pTeams[1]->m_nScore))
             {
                 PlayCrowdReaction(0xEF3369E0);
@@ -2269,7 +2269,7 @@ void cGame::ResumeAfterPresentation()
 
     static_cast<OverlayManager*>(g_pOverlayManager)->SetVisible(OVERLAY_HUD, true, true);
     static_cast<OverlayManager*>(g_pOverlayManager)->SlideHUDIn(0.25f);
-    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene((SceneList)89))->DisplayNewScore();
+    static_cast<HUDOverlay*>(g_pOverlayManager->GetScene(OVERLAY_HUD))->DisplayNewScore();
 
     if (mpWeatherManager != 0)
     {

@@ -16,6 +16,7 @@
 #include "Game/Render/ShootToScoreMeter.h"
 #include "Game/Physics/PhysicsAIBall.h"
 #include "Game/Character.h"
+#include "Game/CharacterTemplate.h"
 #include "Game/Player.h"
 
 #include "Game/AI/HeadTrack.h"
@@ -262,7 +263,7 @@ cCharacter::cCharacter(eCharacterClass cc, const int* nModelID,
     float fPhysicsCapsuleWidth, AnimRetargetList* pAnimRetargetList,
     int nIndex, eClassTypes eNewClassType)
     : m_pPhysicsData(pPhysicsData)
-    , m_ModelType(0)
+    , m_ModelType(CHAR_MODEL_NORMAL)
     , m_pPhysicsCharacter(0)
     , m_pAnimInventory(pAnimInventory)
     , m_pPoseAccumulator(0)
@@ -403,7 +404,7 @@ cCharacter::~cCharacter()
 
 void cCharacter::SetModelType(int modelType)
 {
-    if (modelType == 0 || m_pSkinMesh[modelType] != NULL)
+    if (modelType == CHAR_MODEL_NORMAL || m_pSkinMesh[modelType] != NULL)
     {
         m_ModelType = modelType;
     }
@@ -843,7 +844,7 @@ void cCharacter::PoseSkinMesh(cPoseAccumulator* pPoseAccumulator, int modelType)
 {
     if (m_pSkinMesh[modelType] == NULL)
     {
-        modelType = 0;
+        modelType = CHAR_MODEL_NORMAL;
     }
     if (!unknown_0x018[modelType])
     {
@@ -1583,7 +1584,7 @@ void cCharacter::Reset(const nlVector3& v3Position, unsigned short aDirection)
     m_bPacketAVisible = false;
     m_bPacketBVisible = false;
     m_bIsUsingElectrocutionTexture = false;
-    m_ModelType = 0;
+    m_ModelType = CHAR_MODEL_NORMAL;
     m_fOpacity = 1.0f;
     m_bShadowVisible = true;
     ResetEffects();

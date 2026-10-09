@@ -385,7 +385,7 @@ bool CharacterLoader::FinalizeLoadingCharacterEffects()
         return false;
     }
 
-    EmissionManager::LoadBundle(mEffectsData, mEffectsNonResData, glGetCurrentResourcePool(), true);
+    EmissionManager::LoadBundle(mEffectsData, mEffectsNonResData, glGetCurrentResourcePool(), EFFECTS_BUNDLE_ADDITIONAL);
     sPendingEffectsLoadCount--;
     return true;
 }

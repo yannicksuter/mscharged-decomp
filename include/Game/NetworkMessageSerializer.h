@@ -5,6 +5,12 @@
 
 #include "types.h"
 
+enum eNetworkSerializationDirection
+{
+    NETWORK_SERIALIZE_READ = 0,
+    NETWORK_SERIALIZE_WRITE = 1,
+};
+
 class NetworkMessageSerializer
 {
 public:
@@ -15,7 +21,7 @@ public:
 
     void Transfer(void* value, unsigned long size)
     {
-        if (mDirection == 0)
+        if (mDirection == NETWORK_SERIALIZE_READ)
         {
             memcpy(value, mPosition, size);
             mPosition += size;

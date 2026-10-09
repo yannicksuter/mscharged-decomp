@@ -117,7 +117,7 @@ int LANLobby::CreateGame(int gameType)
     if (address == 0)
     {
         tDebugPrintManager::Print(DC_NETWORK, "LANLobby: Failed to Create Game, failed to get local address!\n");
-        return 1;
+        return LAN_RESULT_NO_LOCAL_ADDRESS;
     }
     mIsHost = true;
     mHostState = LAN_HOST_IDLE;
@@ -143,13 +143,13 @@ int LANLobby::CreateGame(int gameType)
         mAdvertiseGame = true;
     mSocket->SetConnectionEnabled(true);
     if (mListener != 0)
-        mListener->OnGameCreated(0);
-    return 0;
+        mListener->OnGameCreated(LAN_RESULT_OK);
+    return LAN_RESULT_OK;
 }
 
 int LANLobby::AbortCreateGame()
 {
-    return AbortCreateGame(8);
+    return AbortCreateGame(LAN_RESULT_CANCELED);
 }
 
 int LANLobby::AbortCreateGame(int result)
@@ -157,7 +157,7 @@ int LANLobby::AbortCreateGame(int result)
     if (!mIsHost)
     {
         tDebugPrintManager::Print(DC_NETWORK, "Ignored abort create game..We are not a host\n");
-        return 3;
+        return LAN_RESULT_NOT_HOST;
     }
     mIsHost = false;
     mGameType = 0;
@@ -181,7 +181,7 @@ int LANLobby::AbortCreateGame(int result)
         if (m_ConnectionPool[index].m_Connection != 0)
             mSocket->Disconnect(m_ConnectionPool[index].m_Connection, true);
     }
-    return 0;
+    return LAN_RESULT_OK;
 }
 
 int LANLobby::JoinGame(LANGameInfo* game, int gameType)
@@ -189,12 +189,12 @@ int LANLobby::JoinGame(LANGameInfo* game, int gameType)
     if (mJoinState != LAN_JOIN_IDLE)
     {
         tDebugPrintManager::Print(DC_NETWORK, "Ignored join current join state %d\n", mJoinState);
-        return 2;
+        return LAN_RESULT_INVALID_STATE;
     }
     if (mSocket->GetLocalAddress() == 0)
     {
         tDebugPrintManager::Print(DC_NETWORK, "LANLobby: Failed to Join Game, failed to get local address!\n");
-        return 1;
+        return LAN_RESULT_NO_LOCAL_ADDRESS;
     }
     if (game == 0)
     {
@@ -223,7 +223,7 @@ int LANLobby::JoinGame(LANGameInfo* game, int gameType)
             if (game == 0)
             {
                 tDebugPrintManager::Print(DC_NETWORK, "No games to join\n");
-                return 5;
+                return LAN_RESULT_NO_GAME_FOUND;
             }
         }
     }
@@ -243,10 +243,10 @@ int LANLobby::JoinGame(LANGameInfo* game, int gameType)
         m_ConnectionPool[0].mStatus = LAN_CONNECTION_FREE;
         mSocket->SetConnectionEnabled(false);
         tDebugPrintManager::Print(DC_NETWORK, "Connection failed at outset\n");
-        return 4;
+        return LAN_RESULT_CONNECTION_FAILED;
     }
     mJoinState = LAN_JOIN_CONNECTING;
-    return 0;
+    return LAN_RESULT_OK;
 }
 
 void LANLobby::OnGameStarted()
@@ -390,7 +390,7 @@ void LANLobby::OnConnected(unsigned int connection, int result)
                     m_ConnectionPool[index].mStatus = LAN_CONNECTION_FREE;
                 }
                 if (mListener != 0)
-                    mListener->OnGameJoined(4);
+                    mListener->OnGameJoined(LAN_RESULT_CONNECTION_FAILED);
             }
         }
         else if (mTopology == 0)
@@ -491,10 +491,10 @@ void LANLobby::OnConnectionClosed(unsigned int connection, int)
     else if (mIsHost)
     {
         if (mListener != 0)
-            mListener->OnGameCreated(7);
+            mListener->OnGameCreated(LAN_RESULT_CONNECTION_LOST);
     }
     else if (mListener != 0)
-        mListener->OnGameJoined(7);
+        mListener->OnGameJoined(LAN_RESULT_CONNECTION_LOST);
 }
 
 void LANLobby::SendFindGame()
@@ -586,7 +586,7 @@ void LANLobby::Update(float dt)
             {
                 tDebugPrintManager::Print(DC_NETWORK, "Confirm connections timed out after %f ms\n", elapsed);
                 if (mListener != 0)
-                    mListener->OnGameLaunched(9);
+                    mListener->OnGameLaunched(LAN_RESULT_CONFIRM_TIMEOUT);
                 mLaunchState = LAN_LAUNCH_IDLE;
             }
         }
@@ -614,18 +614,18 @@ int LANLobby::StartGame()
         if (mPeerCount >= 2 && mLaunchState == LAN_LAUNCH_IDLE)
         {
             mLaunchState = LAN_LAUNCH_WAIT_PEERS;
-            return 0;
+            return LAN_RESULT_OK;
         }
-        return 2;
+        return LAN_RESULT_INVALID_STATE;
     }
-    return 3;
+    return LAN_RESULT_NOT_HOST;
 }
 
 void LANLobby::CompleteLaunch()
 {
     mLaunchState = LAN_LAUNCH_COMPLETE;
     if (mListener != 0)
-        mListener->OnGameLaunched(0);
+        mListener->OnGameLaunched(LAN_RESULT_OK);
 }
 
 void LANLobby::SendReadyToLaunchRequest()
@@ -874,7 +874,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
             mPlayerListener->OnPlayerListChanged();
         mJoinState = LAN_JOIN_JOINED;
         if (mListener != 0)
-            mListener->OnGameJoined(0);
+            mListener->OnGameJoined(LAN_RESULT_OK);
         tDebugPrintManager::Print(DC_NETWORK, "Successfully joined game.\n");
         DumpPeerInfo();
         if (GetTopology() == 0)
@@ -897,7 +897,7 @@ void LANLobby::ProcessJoinResponse(int index, NetMessageJoinResponse* message)
         mPeerCount = 0;
         mLocalMachineIndex = -1;
         if (mListener != 0)
-            mListener->OnGameJoined(6);
+            mListener->OnGameJoined(LAN_RESULT_JOIN_REFUSED);
         tDebugPrintManager::Print(DC_NETWORK, "Join was refused.\n");
     }
 }

@@ -103,8 +103,8 @@ void SHOnlineHub::SceneCreated()
     if (scene != 0)
     {
         scene->HideButtons();
-        done = scene->GetButton(4);
-        scene->SetBackButtonText(1);
+        done = scene->GetButton(NAVIGATION_BUTTON_BACK);
+        scene->SetBackButtonText(NAV_LOG_OUT);
     }
     mBackButton.SetButtonInstance(done);
     g_pNetworkSessionBase->SetSessionState(NET_SESSION_MATCHMAKE);
@@ -134,8 +134,8 @@ void SHOnlineHub::Update(float dt)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                scene->SetButtons(4, true);
-                scene->SetBackButtonText(1);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
+                scene->SetBackButtonText(NAV_LOG_OUT);
             }
             InitializeButtons();
             mInitialized = true;
@@ -151,11 +151,11 @@ void SHOnlineHub::Update(float dt)
             {
             case ONLINE_HUB_FRIEND_MATCH:
                 if (g_pNetworkSessionBase->GetSessionMode() == NET_MODE_ONLINE)
-                    GameSceneManager::Instance()->Push((SceneList)42, SCREEN_FORWARD, true);
+                    GameSceneManager::Instance()->Push(SCENE_ONLINE_UNRANKED, SCREEN_FORWARD, true);
                 break;
-            case ONLINE_HUB_RANKED_MATCH: GameSceneManager::Instance()->Push((SceneList)41, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_RANKED_MATCH: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKED, SCREEN_FORWARD, true); break;
             case ONLINE_HUB_RANKINGS: GameSceneManager::Instance()->Push(SCENE_ONLINE_RANKING, SCREEN_FORWARD, true); break;
-            case ONLINE_HUB_FRIENDS: GameSceneManager::Instance()->Push((SceneList)47, SCREEN_FORWARD, true); break;
+            case ONLINE_HUB_FRIENDS: GameSceneManager::Instance()->Push(SCENE_ONLINE_FRIENDS, SCREEN_FORWARD, true); break;
             }
             return;
         }
@@ -389,7 +389,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
             if (g_pFriendManager->CountBuddies() > 0)
                 change = true;
             else
-                ShowOnlineHubDialog(this, (ePopupMenu)113);
+                ShowOnlineHubDialog(this, POPUP_NETWORK_NO_FRIENDS);
         }
         break;
     case ONLINE_HUB_RANKED_MATCH:
@@ -404,7 +404,7 @@ void SHOnlineHub::OnPointerPress(unsigned int index, void* context)
         break;
     case ONLINE_HUB_HELP:
         g_pFriendManager->SetOwnStatusInitial(0);
-        ShowOnlineHubDialog(this, (ePopupMenu)58);
+        ShowOnlineHubDialog(this, POPUP_ONLINE_MENU_HELP);
         break;
     }
     if (change)
@@ -441,16 +441,16 @@ void SHOnlineHub::OnPointerEnter(unsigned int index, void* context)
     ++mHoverCounts[index];
     if (item < 4)
     {
-        if (!mButtons[item].HasOtherPointerState(1, index))
+        if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
-            mButtons[item].SetPointerState(1, index);
+            mButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
             mButtonInstances[item]->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
         }
     }
-    else if (!mHelpButton.HasOtherPointerState(1, index))
+    else if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mHelpButton.SetPointerState(1, index);
+        mHelpButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         mHelpButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
@@ -462,15 +462,15 @@ void SHOnlineHub::OnPointerLeave(unsigned int index, void* context)
     --mHoverCounts[index];
     if (item < 4)
     {
-        if (!mButtons[item].HasOtherPointerState(1, index))
+        if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
-            mButtons[item].SetPointerState(0, index);
+            mButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
             mButtonInstances[item]->SetActiveSlide("off", true, false);
         }
     }
-    else if (!mHelpButton.HasOtherPointerState(1, index))
+    else if (!mHelpButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mHelpButton.SetPointerState(0, index);
+        mHelpButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         mHelpButtonInstance->SetActiveSlide("off", true, false);
     }
 }

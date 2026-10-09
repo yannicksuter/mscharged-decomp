@@ -106,7 +106,7 @@ void StrikerTimesOverlay::Update(float dt)
 
     if ((mIsNetworkGame && mCountdownSeconds <= 0) || (!mIsNetworkGame && g_pFEInput->JustPressed(FE_ALL_PADS, 0x1E, true, 0)))
     {
-        g_pOverlayManager->Push((SceneList)91, SCREEN_NOTHING, true);
+        g_pOverlayManager->Push(OVERLAY_POST_GAME_RESULTS, SCREEN_NOTHING, true);
     }
     else if (g_pFEInput->IsPressed(FE_ALL_PADS, 0xE, true, 0) || g_pFEInput->IsPressed(FE_ALL_PADS, 0xD, true, 0))
     {

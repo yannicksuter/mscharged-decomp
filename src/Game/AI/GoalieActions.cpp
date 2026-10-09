@@ -358,7 +358,7 @@ inline void Goalie::PopDefensivePlayOverlay()
 {
     if (mbDefensivePlayOverlayPushed)
     {
-        BaseSceneHandler* scene = g_pOverlayManager->GetScene((SceneList)105);
+        BaseSceneHandler* scene = g_pOverlayManager->GetScene(OVERLAY_DEFENSIVE_PLAY);
         if (scene != 0 && scene->IsSceneReady())
         {
             g_pOverlayManager->Pop();
@@ -1569,7 +1569,7 @@ void Goalie::ActionMegaStrike(float deltaTime)
     {
     case 0:
     {
-        DefensivePlayOverlay* overlay = static_cast<DefensivePlayOverlay*>(g_pOverlayManager->Push((SceneList)105, SCREEN_NOTHING, false));
+        DefensivePlayOverlay* overlay = static_cast<DefensivePlayOverlay*>(g_pOverlayManager->Push(OVERLAY_DEFENSIVE_PLAY, SCREEN_NOTHING, false));
         mbDefensivePlayOverlayPushed = true;
         if (input != 0 && isLocal)
         {
@@ -1709,7 +1709,7 @@ void Goalie::ActionMegaStrike(float deltaTime)
         }
         else
         {
-            DefensivePlayOverlay* overlay = static_cast<DefensivePlayOverlay*>(g_pOverlayManager->GetScene((SceneList)105));
+            DefensivePlayOverlay* overlay = static_cast<DefensivePlayOverlay*>(g_pOverlayManager->GetScene(OVERLAY_DEFENSIVE_PLAY));
             if (overlay != 0 && overlay->IsSceneReady()
                 && !overlay->mCountdownStarted && !overlay->mCountdownComplete)
                 overlay->StartCountdown();
@@ -3893,7 +3893,7 @@ void Goalie::ActionPursueBallCarrier(float fDeltaT)
         {
             CleanupStun();
             ChooseSwatAnim(1);
-            SetGoalieAction((eGoalieActionState)0x1F, 0);
+            SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
             m_DetChar.m_fDesiredSpeed = 0.0f;
             m_DetChar.m_fActualSpeed = 0.0f;
             SetVelocity(v3Zero);
@@ -4066,7 +4066,7 @@ void Goalie::ActionPursueBallPounce(float fDeltaT)
     {
         CleanupStun();
         ChooseSwatAnim(1);
-        SetGoalieAction((eGoalieActionState)0x1F, 0);
+        SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
         m_DetChar.m_fDesiredSpeed = 0.0f;
         m_DetChar.m_fActualSpeed = 0.0f;
         SetVelocity(v3Zero);
@@ -4364,7 +4364,7 @@ void Goalie::ActionPursueDeke(float fDeltaT)
 
             PlayNewAnim(0xAD);
             InitMovementFromAnim(0, v3Zero, 1.0f, false);
-            SetGoalieAction((eGoalieActionState)0x1F, 0);
+            SetGoalieAction(GOALIEACTION_GRAB_MONTY, 0);
             mbGrabMonty = true;
             mpMonty = mpTarget;
             mpTarget->fn_8004F204();

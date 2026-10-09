@@ -145,7 +145,7 @@ void NetTournManager::TransitionOnlineMenuToTournament(
     FrontEndPresentation::GetInstance()->Call(
         "TransitionOnlineMenuToTournament");
     GameSceneManager::Instance()->Push(
-        (SceneList)0x22, SCREEN_NOTHING, true);
+        SCENE_CUP_KNOCKOUT, SCREEN_NOTHING, true);
 }
 
 int NetTournManager::ChooseFirstRoundMachine(int machineCount, bool* used)

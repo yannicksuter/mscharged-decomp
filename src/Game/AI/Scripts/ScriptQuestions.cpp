@@ -930,7 +930,7 @@ extern "C" float fn_800D82C0(cFielder* pFielder)
             fScore = fInterceptScore * g_pGame->m_pFuzzyTweaks->fInterceptBallSwapControlerScoreWeight
                 + fClosenessScore * (1.0f - g_pGame->m_pFuzzyTweaks->fInterceptBallSwapControlerScoreWeight.GetValue());
             if (fScore == 0.0f)
-                tDebugPrintManager::Print((eDEBUG_CHANNEL)4,
+                tDebugPrintManager::Print(DC_AI,
                     "AbleToInterceptBall should never return 0! Debug yer code.\n");
         }
     }
@@ -1791,7 +1791,7 @@ extern "C" float fn_800DA518(cFielder* pFielder)
         SSearchCutAndBreak search(pFielder);
         nlVector3 v3BestPosition;
         return search.FindBestPosition(v3BestPosition, v3FormationPos,
-            (eFieldDirection)0, NULL, 8.0f, 0x8000);
+            DIR_NONE, NULL, 8.0f, 0x8000);
     }
     return 0.0f;
 }

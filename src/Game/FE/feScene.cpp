@@ -82,7 +82,7 @@ FEScene::FEScene()
     , m_uHashID(0)
     , m_uRenderView(0)
     , m_pFileHeader(0)
-    , mState(1)
+    , mState(FE_SCENE_INITIAL)
     , m_pResourceHandles(0)
     , m_pAllocator(0)
 {
@@ -173,7 +173,7 @@ void FEScene::LoadPackage(void* pData, unsigned long)
 
     nlFree(m_pPointerTable);
     m_pPointerTable = 0;
-    mState = 5;
+    mState = FE_SCENE_LOADING_RESOURCES;
 
     LoadPackageResources(m_pFEPackage);
 

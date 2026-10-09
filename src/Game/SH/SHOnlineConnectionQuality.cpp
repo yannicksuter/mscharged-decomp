@@ -142,7 +142,7 @@ void OnlineConnectionQualityScene::SceneCreated()
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
     {
-        scene->SetButtons(0, true);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     for (int i = 0; i < 4; ++i)
     {
@@ -448,7 +448,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerEnter(unsigned int index, vo
 {
     ++mPointerHoverCounts[index];
     mDecisionButtonInstances[(int)context]->SetActiveSlide("OVER", true, false);
-    mDecisionButtons[(int)context].SetPointerState(1, index);
+    mDecisionButtons[(int)context].SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
 }
 
@@ -456,7 +456,7 @@ void OnlineConnectionQualityScene::OnDecisionPointerLeave(unsigned int index, vo
 {
     --mPointerHoverCounts[index];
     mDecisionButtonInstances[(int)context]->SetActiveSlide("OFF", true, false);
-    mDecisionButtons[(int)context].SetPointerState(0, index);
+    mDecisionButtons[(int)context].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void OnlineConnectionQualityScene::CloseConnectionsAndReturn()
@@ -486,12 +486,12 @@ void OnlineConnectionQualityScene::CloseConnectionsAndReturn()
         tDebugPrintManager::Print(DC_NETWORK,
             "Adding rejected PID %d to last rejected PIDS Q size now %d\n",
             profileId, gRejectedOpponentProfileIds.GetCount());
-        GameSceneManager::Instance()->Push((SceneList)0x31, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_MATCHMAKING_DRAFT, SCREEN_BACK, true);
     }
     else if (isHost)
     {
         SHOnlineInvitePlayers* scene = static_cast<SHOnlineInvitePlayers*>(
-            GameSceneManager::Instance()->Push((SceneList)0x2C, SCREEN_NOTHING, true));
+            GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true));
         scene->mIsHost = true;
         scene->mStartFriendServer = true;
     }

@@ -30,9 +30,9 @@ StadiumCupTrophyDrawable* gCupAwardModels[10];
 unsigned int gFEControllerIndex;
 bool gFEPointerEnabled[4];
 
-extern const int sCupPageOrder[3] = { 4, 5, 6 };
-extern const int sCupRoundPageOrderThree[3] = { 3, 2, 1 };
-extern const int sCupRoundPageOrderTwo[2] = { 2, 1 };
+extern const int sCupPageOrder[3] = { CUP_PAGE_STANDINGS, CUP_PAGE_GOLDEN_BOOT, CUP_PAGE_BRICK_WALL };
+extern const int sCupRoundPageOrderThree[3] = { CUP_PAGE_FINAL_ROUNDS, CUP_PAGE_KNOCKOUT, CUP_PAGE_SCHEDULE };
+extern const int sCupRoundPageOrderTwo[2] = { CUP_PAGE_KNOCKOUT, CUP_PAGE_SCHEDULE };
 
 struct CupTrophyUnlock
 {
@@ -59,7 +59,7 @@ static void CycleCupStatsPage(int currentPage, bool advance);
 
 void CycleCupPage(int currentPage, bool advance)
 {
-    if ((unsigned int)(currentPage - 4) <= 2)
+    if ((unsigned int)(currentPage - CUP_PAGE_STANDINGS) <= 2)
     {
         CycleCupStatsPage(currentPage, advance);
     }
@@ -97,14 +97,14 @@ static void CycleCupStatsPage(int currentPage, bool advance)
 
     switch (sCupPageOrder[nextIndex])
     {
-    case 4:
-        GameSceneManager::Instance()->Push((SceneList)36, SCREEN_NOTHING, true);
+    case CUP_PAGE_STANDINGS:
+        GameSceneManager::Instance()->Push(SCENE_CUP_STANDINGS, SCREEN_NOTHING, true);
         break;
-    case 5:
-        GameSceneManager::Instance()->Push((SceneList)37, SCREEN_NOTHING, true);
+    case CUP_PAGE_GOLDEN_BOOT:
+        GameSceneManager::Instance()->Push(SCENE_CUP_GOLDEN_BOOT, SCREEN_NOTHING, true);
         break;
-    case 6:
-        GameSceneManager::Instance()->Push((SceneList)38, SCREEN_NOTHING, true);
+    case CUP_PAGE_BRICK_WALL:
+        GameSceneManager::Instance()->Push(SCENE_CUP_BRICK_WALL, SCREEN_NOTHING, true);
         break;
     }
 }
@@ -161,14 +161,14 @@ void CycleCupRoundPage(int currentPage, bool advance)
 
         switch (pages[currentIndex])
         {
-        case 1:
-            GameSceneManager::Instance()->Push((SceneList)32, SCREEN_NOTHING, true);
+        case CUP_PAGE_SCHEDULE:
+            GameSceneManager::Instance()->Push(SCENE_CUP_SCHEDULE, SCREEN_NOTHING, true);
             break;
-        case 2:
-            GameSceneManager::Instance()->Push((SceneList)34, SCREEN_NOTHING, true);
+        case CUP_PAGE_KNOCKOUT:
+            GameSceneManager::Instance()->Push(SCENE_CUP_KNOCKOUT, SCREEN_NOTHING, true);
             break;
-        case 3:
-            GameSceneManager::Instance()->Push((SceneList)35, SCREEN_NOTHING, true);
+        case CUP_PAGE_FINAL_ROUNDS:
+            GameSceneManager::Instance()->Push(SCENE_CUP_FINAL_ROUNDS, SCREEN_NOTHING, true);
             break;
         }
     }
@@ -176,12 +176,12 @@ void CycleCupRoundPage(int currentPage, bool advance)
 
 void ShowFirstCupPage()
 {
-    GameSceneManager::Instance()->Push((SceneList)36, SCREEN_NOTHING, true);
+    GameSceneManager::Instance()->Push(SCENE_CUP_STANDINGS, SCREEN_NOTHING, true);
 }
 
 void ShowCurrentCupRoundPage()
 {
-    int scene = -2;
+    int scene = SCENE_INVALID;
     int roundType = CupManager::s_pInstance->mState == CUP_STATE_NOT_QUALIFIED
                       ? CUP_ROUND_LEAGUE
                       : CupManager::s_pInstance->GetCurrentRoundType();
@@ -189,13 +189,13 @@ void ShowCurrentCupRoundPage()
     switch (roundType)
     {
     case CUP_ROUND_LEAGUE:
-        scene = 32;
+        scene = SCENE_CUP_SCHEDULE;
         break;
     case CUP_ROUND_KNOCKOUT:
-        scene = 34;
+        scene = SCENE_CUP_KNOCKOUT;
         break;
     case CUP_ROUND_FINALS:
-        scene = 35;
+        scene = SCENE_CUP_FINAL_ROUNDS;
         break;
     }
 
@@ -215,8 +215,8 @@ void AdvanceCupFlow(bool pad)
                 cupManager->mState = CUP_STATE_NONE;
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
-                    (SceneList)39, SCREEN_NOTHING, true);
-                scene->SetDisplayMode(1);
+                    SCENE_CUP_NEWS, SCREEN_NOTHING, true);
+                scene->SetDisplayMode(NEWS_NEXT_CUP);
                 SaveLoad::StartSave(false);
             }
             else if (cupManager->GetCurrentMode() == CUP_CRYSTAL)
@@ -225,15 +225,15 @@ void AdvanceCupFlow(bool pad)
                 cupManager->mState = CUP_STATE_NONE;
                 cupManager->DetermineNextMatchups(19);
                 CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
-                    (SceneList)39, SCREEN_NOTHING, true);
-                scene->SetDisplayMode(1);
+                    SCENE_CUP_NEWS, SCREEN_NOTHING, true);
+                scene->SetDisplayMode(NEWS_NEXT_CUP);
                 SaveLoad::StartSave(false);
             }
             else
             {
                 FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                    (SceneList)10, SCREEN_NOTHING, true);
-                popup->Create((ePopupMenu)56, Function<FnVoidVoid>(ResetCupFlow));
+                    SCENE_POPUP_MENU, SCREEN_NOTHING, true);
+                popup->Create(POPUP_STRIKER_CUP_COMPLETE, Function<FnVoidVoid>(ResetCupFlow));
             }
         }
         else
@@ -241,7 +241,7 @@ void AdvanceCupFlow(bool pad)
             FEMusic::StartStreamIfDifferent(9);
             CupManager::s_pInstance->RestoreCupRecord();
             CupManager::s_pInstance->RestartCupSeries();
-            GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, true);
+            GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, true);
             SaveLoad::StartSave(false);
         }
     }
@@ -263,7 +263,7 @@ void AdvanceCupFlow(bool pad)
 
         if (GetTweakBool("/user/cup_cheat", false))
         {
-            GameSceneManager::Instance()->Push((SceneList)9, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_CUP_CHEATER, SCREEN_FORWARD, true);
         }
         else
         {
@@ -288,16 +288,16 @@ void HandleCupBack(int fromSubPage)
         if (roundNumber == -5)
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             if (saveEnabled)
             {
-                popup->Create((ePopupMenu)0,
+                popup->Create(POPUP_LEAVE_CUP_SAVE,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
             else
             {
-                popup->Create((ePopupMenu)2,
+                popup->Create(POPUP_LEAVE_CUP_QUIT,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
@@ -305,17 +305,17 @@ void HandleCupBack(int fromSubPage)
         else
         {
             FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-                (SceneList)10, SCREEN_NOTHING, false);
+                SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             if (saveEnabled)
             {
-                popup->Create((ePopupMenu)1,
+                popup->Create(POPUP_LEAVE_CUP_SAVE_OR_RESTART,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(ShowCupSavePrompt),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
             }
             else
             {
-                popup->Create((ePopupMenu)3,
+                popup->Create(POPUP_LEAVE_CUP_QUIT_OR_RESTART,
                               Function<FnVoidVoid>(ExitCupToMainMenu),
                               Function<FnVoidVoid>(ShowCupSavePrompt),
                               Function<FnVoidVoid>(RequestMainMenuInputReset));
@@ -324,7 +324,7 @@ void HandleCupBack(int fromSubPage)
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)31, SCREEN_BACK, true);
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_BACK, true);
     }
 }
 
@@ -334,15 +334,15 @@ void UpdateCupBreadcrumbs(int currentPage)
     int pageCount = 0;
     const int* pages = 0;
     SHNavigation* navigation = GetNavigationScene();
-    TLComponentInstance* breadcrumbs = navigation->GetButton(8);
+    TLComponentInstance* breadcrumbs = navigation->GetButton(NAVIGATION_BUTTON_BREADCRUMBS);
 
-    if (currentPage == 0)
+    if (currentPage == CUP_PAGE_NONE)
     {
         breadcrumbs->m_bVisible = false;
     }
     else
     {
-        if ((unsigned int)(currentPage - 4) <= 2)
+        if ((unsigned int)(currentPage - CUP_PAGE_STANDINGS) <= 2)
         {
             pageCount = 3;
             pages = sCupPageOrder;
@@ -355,7 +355,7 @@ void UpdateCupBreadcrumbs(int currentPage)
             switch (roundType)
             {
             case CUP_ROUND_LEAGUE:
-                navigation->SetButtonVisibility(8, false);
+                navigation->SetButtonVisibility(NAVIGATION_BUTTON_BREADCRUMBS, false);
                 breadcrumbs->m_bVisible = false;
                 return;
             case CUP_ROUND_KNOCKOUT:
@@ -392,8 +392,8 @@ void ShowCupStartOptions()
 {
     gMainMenuInputResetPending = false;
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-        (SceneList)10, SCREEN_NOTHING, false);
-    popup->Create((ePopupMenu)15,
+        SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+    popup->Create(POPUP_CONTINUE_OR_NEW_CUP,
                   Function<FnVoidVoid>(ContinueStrikerCup),
                   Function<FnVoidVoid>(ShowNewCupPrompt),
                   Function<FnVoidVoid>(RequestMainMenuInputReset));
@@ -402,8 +402,8 @@ void ShowCupStartOptions()
 void ShowNewCupPrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-        (SceneList)10, SCREEN_NOTHING, false);
-    popup->Create((ePopupMenu)16,
+        SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+    popup->Create(POPUP_CONFIRM_NEW_CUP,
                   Function<FnVoidVoid>(StartNewCup),
                   Function<FnVoidVoid>(ShowCupStartOptions));
 }
@@ -411,8 +411,8 @@ void ShowNewCupPrompt()
 void ShowCupSavePrompt()
 {
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-        (SceneList)10, SCREEN_NOTHING, false);
-    popup->Create((ePopupMenu)4,
+        SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+    popup->Create(POPUP_RESTART_CUP,
                   Function<FnVoidVoid>(SaveAndShowCupHub),
                   Function<FnVoidVoid>(ShowCupExitPopup));
 }
@@ -432,7 +432,7 @@ void StartNewCup()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     for (int i = 0; i < 4; ++i)
     {
@@ -462,7 +462,7 @@ void ContinueStrikerCup()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     if (CupManager::s_pInstance->mGameInProgress)
     {
@@ -490,7 +490,7 @@ void SaveAndShowCupHub()
     FEMusic::StartStreamIfDifferent(9);
     CupManager::s_pInstance->RestoreCupRecord();
     CupManager::s_pInstance->RestartCupSeries();
-    GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, true);
+    GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, true);
     SaveLoad::StartSave(false);
 }
 
@@ -507,45 +507,45 @@ void ShowCupRulesPopup()
     }
 
     FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-        (SceneList)10, SCREEN_NOTHING, false);
+        SCENE_POPUP_MENU, SCREEN_NOTHING, false);
     int cupMode = CupManager::s_pInstance->GetCurrentMode();
     int roundType = CupManager::s_pInstance->GetCurrentRoundType();
     int menuType = -1;
-    if (roundType == CUP_ROUND_LEAGUE && cupMode == 0)
+    if (roundType == CUP_ROUND_LEAGUE && cupMode == CUP_FIRE)
     {
-        menuType = 29;
+        menuType = POPUP_FIRE_QUAL_RULES;
     }
-    else if (roundType == CUP_ROUND_LEAGUE && cupMode == 1)
+    else if (roundType == CUP_ROUND_LEAGUE && cupMode == CUP_CRYSTAL)
     {
-        menuType = 30;
+        menuType = POPUP_CRYSTAL_QUAL_RULES;
     }
-    else if (roundType == CUP_ROUND_LEAGUE && cupMode == 2)
+    else if (roundType == CUP_ROUND_LEAGUE && cupMode == CUP_STRIKER)
     {
-        menuType = 31;
+        menuType = POPUP_STRIKER_QUAL_RULES;
     }
-    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 0)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == CUP_FIRE)
     {
-        menuType = 32;
+        menuType = POPUP_FIRE_ELIM_RULES;
     }
-    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 1)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == CUP_CRYSTAL)
     {
-        menuType = 33;
+        menuType = POPUP_CRYSTAL_ELIM_RULES;
     }
-    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == 2)
+    else if (roundType == CUP_ROUND_KNOCKOUT && cupMode == CUP_STRIKER)
     {
-        menuType = 34;
+        menuType = POPUP_STRIKER_ELIM_RULES;
     }
-    else if (roundType == CUP_ROUND_FINALS && cupMode == 0)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == CUP_FIRE)
     {
-        menuType = 35;
+        menuType = POPUP_FIRE_FINAL_RULES;
     }
-    else if (roundType == CUP_ROUND_FINALS && cupMode == 1)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == CUP_CRYSTAL)
     {
-        menuType = 36;
+        menuType = POPUP_CRYSTAL_FINAL_RULES;
     }
-    else if (roundType == CUP_ROUND_FINALS && cupMode == 2)
+    else if (roundType == CUP_ROUND_FINALS && cupMode == CUP_STRIKER)
     {
-        menuType = 37;
+        menuType = POPUP_STRIKER_FINAL_RULES;
     }
     popup->Create((ePopupMenu)menuType,
                   Function<FnVoidVoid>(FEPopupMenu::Nothing));
@@ -553,7 +553,7 @@ void ShowCupRulesPopup()
 
 void ShowCupHub()
 {
-    GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, false);
+    GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, false);
 }
 
 void BeginCupAwardPresentation()
@@ -574,15 +574,15 @@ void BeginCupAwardPresentation()
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, false);
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, false);
     }
 }
 
 void ShowCupBrickWallNews()
 {
     CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
-        (SceneList)39, SCREEN_NOTHING, false);
-    scene->SetDisplayMode(7);
+        SCENE_CUP_NEWS, SCREEN_NOTHING, false);
+    scene->SetDisplayMode(NEWS_BRICK_WALL);
 }
 
 void AdvanceCupAwardPresentation()
@@ -602,8 +602,8 @@ void AdvanceCupAwardPresentation()
 void ShowCupGoldenBootNews()
 {
     CupNewsScene* scene = (CupNewsScene*)GameSceneManager::Instance()->Push(
-        (SceneList)39, SCREEN_NOTHING, false);
-    scene->SetDisplayMode(6);
+        SCENE_CUP_NEWS, SCREEN_NOTHING, false);
+    scene->SetDisplayMode(NEWS_GOLDEN_BOOT);
 }
 
 void FinishCupAwardPresentation()
@@ -619,15 +619,15 @@ void ShowCupAwardRewardsPopup()
     {
     case CUP_FIRE:
         showRewards = HasWastelandsUnlockFlags() && WasWastelandsLockedBeforeGame();
-        menuType = 41;
+        menuType = POPUP_WIN_FIRECUP_BOOT_WALL_REWARDS;
         break;
     case CUP_CRYSTAL:
         showRewards = HasDumpUnlockFlags() && WasDumpLockedBeforeGame();
-        menuType = 42;
+        menuType = POPUP_WIN_CRYSTALCUP_BOOT_WALL_REWARDS;
         break;
     case CUP_STRIKER:
         showRewards = HasGalacticStadiumUnlockFlags() && WasGalacticStadiumLockedBeforeGame();
-        menuType = 43;
+        menuType = POPUP_WIN_STRIKERCUP_BOOT_WALL_REWARDS;
         break;
     default:
         showRewards = false;
@@ -637,12 +637,12 @@ void ShowCupAwardRewardsPopup()
     if (showRewards)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)menuType, Function<FnVoidVoid>(ShowCupHub));
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, false);
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, false);
     }
 }
 
@@ -654,15 +654,15 @@ void ShowCupTrophyRewardsPopup()
     {
     case CUP_FIRE:
         showRewards = IsUnlockFlagSet(1) && WereUnlockFlagsClearBeforeGame(1);
-        menuType = 44;
+        menuType = POPUP_WIN_FIRECUP_MAINCUP_REWARDS;
         break;
     case CUP_CRYSTAL:
         showRewards = IsUnlockFlagSet(2) && WereUnlockFlagsClearBeforeGame(2);
-        menuType = 45;
+        menuType = POPUP_WIN_CRYSTALCUP_MAINCUP_REWARDS;
         break;
     case CUP_STRIKER:
         showRewards = IsUnlockFlagSet(4) && WereUnlockFlagsClearBeforeGame(4);
-        menuType = 46;
+        menuType = POPUP_WIN_STRIKERCUP_MAINCUP_REWARDS;
         break;
     default:
         showRewards = false;
@@ -672,12 +672,12 @@ void ShowCupTrophyRewardsPopup()
     if (showRewards)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->Create((ePopupMenu)menuType, Function<FnVoidVoid>(ShowCupHub));
     }
     else
     {
-        GameSceneManager::Instance()->Push((SceneList)31, SCREEN_NOTHING, false);
+        GameSceneManager::Instance()->Push(SCENE_ROAD_TO_STRIKERS_CUP, SCREEN_NOTHING, false);
     }
 }
 
@@ -689,16 +689,16 @@ void UpdatePlayButtonText()
     {
         if (cupManager->mState == CUP_STATE_WON)
         {
-            navigation->SetPlayButtonText(2);
+            navigation->SetPlayButtonText(NAV_CONTINUE);
         }
         else
         {
-            navigation->SetPlayButtonText(1);
+            navigation->SetPlayButtonText(NAV_RESTART_CUP);
         }
     }
     else
     {
-        navigation->SetPlayButtonText(3);
+        navigation->SetPlayButtonText(NAV_PLAY_READY);
     }
 }
 
@@ -801,7 +801,7 @@ void ResetCupFlow()
     SHNavigation* navigation = GetNavigationScene();
     if (navigation)
     {
-        navigation->SetButtons(0, true);
+        navigation->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     FrontEndPresentation::GetInstance()->Call("TransitionCupToChooseNewCaptain");
 }

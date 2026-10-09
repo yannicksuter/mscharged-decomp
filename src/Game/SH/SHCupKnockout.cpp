@@ -128,8 +128,8 @@ void CupKnockoutScene::SceneCreated()
     TLComponentInstance* backButton = 0;
     if (navigation != 0)
     {
-        backButton = navigation->GetButton(4);
-        mBracketButtonInstance = navigation->GetButton(16);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mBracketButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
         mPageControls = navigation->GetPageControls();
         if (!mNetworkTournament)
         {
@@ -145,7 +145,7 @@ void CupKnockoutScene::SceneCreated()
     }
     else
     {
-        UpdateCupBreadcrumbs(2);
+        UpdateCupBreadcrumbs(CUP_PAGE_KNOCKOUT);
     }
 
     m_pad2E8 = 0.0f;
@@ -171,7 +171,7 @@ void CupKnockoutScene::Update(float fDeltaT)
             if (!mPointerButtonsInitialized)
             {
                 SHNavigation* navigation = GetNavigationScene();
-                navigation->SetButtons(0x1F, false);
+                navigation->SetButtons(NAVIGATION_BUTTON_PLUS | NAVIGATION_BUTTON_MINUS | NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_BREADCRUMBS | NAVIGATION_BUTTON_PLAY, false);
                 UpdatePlayButtonText();
                 InitializePointerButtons();
                 mPointerButtonsInitialized = true;
@@ -182,12 +182,12 @@ void CupKnockoutScene::Update(float fDeltaT)
         {
             if (mPreviousPagePressed)
             {
-                CycleCupPage(2, false);
+                CycleCupPage(CUP_PAGE_KNOCKOUT, false);
                 return;
             }
             if (mNextPagePressed)
             {
-                CycleCupPage(2, true);
+                CycleCupPage(CUP_PAGE_KNOCKOUT, true);
                 return;
             }
             AdvanceCupFlow(false);
@@ -657,21 +657,21 @@ void CupKnockoutScene::InitializePointerButtons()
 void CupKnockoutScene::OnBracketPointerEnter(unsigned int index, void* context)
 {
     ++mPointerHoverCounts[index];
-    if (context == 0 && !mBracketButton.HasOtherPointerState(1, index))
+    if (context == 0 && !mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mBracketButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-        mBracketButton.SetPointerState(1, index);
+        mBracketButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
 void CupKnockoutScene::OnBracketPointerLeave(unsigned int index, void* context)
 {
     --mPointerHoverCounts[index];
-    if (context == 0 && !mBracketButton.HasOtherPointerState(1, index))
+    if (context == 0 && !mBracketButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mBracketButtonInstance->SetActiveSlide("off", true, false);
-        mBracketButton.SetPointerState(0, index);
+        mBracketButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 
@@ -701,7 +701,7 @@ void CupKnockoutScene::OnMatchupPointerEnter(unsigned int index, void* context)
     ++mPointerHoverCounts[index];
     mMatchupInstances[matchup]->SetActiveSlide("over", true, false);
     FEAudio::PlayAnimAudioEvent(0x50204AFA, 0, 0, 1);
-    mMatchupButtons[matchup].SetPointerState(1, index);
+    mMatchupButtons[matchup].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void CupKnockoutScene::OnMatchupPointerLeave(unsigned int index, void* context)
@@ -709,7 +709,7 @@ void CupKnockoutScene::OnMatchupPointerLeave(unsigned int index, void* context)
     unsigned int matchup = (unsigned int)context;
     --mPointerHoverCounts[index];
     mMatchupInstances[matchup]->SetActiveSlide("off", true, false);
-    mMatchupButtons[matchup].SetPointerState(0, index);
+    mMatchupButtons[matchup].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void CupKnockoutScene::OnMatchupPointerPress(unsigned int, void* context)
@@ -726,18 +726,18 @@ void CupKnockoutScene::OnMatchupPointerPress(unsigned int, void* context)
         {
             results->SetResultsData(game, this,
                 mTournament->GetTournamentGame(1, matchup));
-            results->SetDisplayMode(0xD);
+            results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
         }
         else
         {
             results->SetResultsData(game, this, 0);
-            results->SetDisplayMode(0xD);
+            results->SetDisplayMode(NEWS_CUP_GAME_RESULTS);
         }
     }
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
             SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x36, FEPopupMenu::Nothing);
+        popup->Create(POPUP_NO_GAME_RESULTS, FEPopupMenu::Nothing);
     }
 }

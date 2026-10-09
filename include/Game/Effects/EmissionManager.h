@@ -7,6 +7,13 @@
 #include "NL/nlMath.h"
 #include "types.h"
 
+enum eEffectsBundleType
+{
+    EFFECTS_BUNDLE_DEFAULT = 0,
+    EFFECTS_BUNDLE_ADDITIONAL = 1,
+    EFFECTS_BUNDLE_ADDITIONAL_CHUNK = 2,
+};
+
 class EmissionController;
 class EffectsGroup;
 class GLInventory;

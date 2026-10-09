@@ -352,7 +352,7 @@ void AvoidController::Update(float fDeltaT)
         {
             if (!IsAvoiding(AVOID_SIDELINES)
                 && pObject->mType == AVOID_POLYGONS
-                && ((AvoidablePolygon*)pObject)->mPolygonType == 1)
+                && ((AvoidablePolygon*)pObject)->mPolygonType == AVOID_POLYGON_FIELD_BOUNDARY)
                 continue;
             ++m_NumAvoidances;
             value = m_Avoidances.AddOrGet((u32)pObject->mId);
@@ -879,7 +879,7 @@ void ObstacleAvoidance::CalcContext(
     if (mpObstacle->mType == AVOID_POLYGONS)
     {
         AvoidablePolygon* pPolygon = (AvoidablePolygon*)mpObstacle;
-        if (pPolygon->mPolygonType == 2 && pPolygon->mOwner != 0
+        if (pPolygon->mPolygonType == AVOID_POLYGON_SHOT_LANE && pPolygon->mOwner != 0
             && !pPolygon->mOwner->IsOnSameTeam(((AvoidableFielder*)mpAvoider)->m_pFielder))
             nlVec3Scale(context.mObstacleNormal, -1.0f);
     }

@@ -9,6 +9,11 @@ class WorldAnimController;
 class EmissionController;
 struct WorldObjectLoadContext;
 
+enum eWorldEffectTimingMode
+{
+    WORLD_EFFECT_ELAPSED_TIME = 0,
+};
+
 class WorldEffect : public WorldHelperObject
 {
 public:

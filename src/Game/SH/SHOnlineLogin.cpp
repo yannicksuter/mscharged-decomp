@@ -46,7 +46,7 @@ void SHOnlineLogin::SceneCreated()
     mLoginComponent->SetActiveSlide("CONNECTING", false, false);
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
-        scene->SetButtons(0, true);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
     g_pNetworkSession->SetLoginListener(this);
     FEAudio::PlayAnimAudioEvent(0x71D9CD2F, "FE_LOGIN", this, true);
 }
@@ -88,9 +88,9 @@ void SHOnlineLogin::Update(float fDeltaT)
             else
             {
                 int popup = GetOnlineErrorPopup(NETGetStartupErrorCode(SocketNetworkGetLastError()), true, 0x78);
-                if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+                if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
                 {
-                    FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+                    FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                     CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
                     mPopupActive = true;
                 }
@@ -107,9 +107,9 @@ void SHOnlineLogin::Update(float fDeltaT)
         if (!g_pNetworkSession->mLoginRequestStarted)
         {
             int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x74);
-            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+            if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
             {
-                FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+                FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
                 CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
                 mPopupActive = true;
             }
@@ -120,7 +120,7 @@ void SHOnlineLogin::Update(float fDeltaT)
             mState = ONLINE_LOGIN_WAIT_RESULT;
         break;
     case ONLINE_LOGIN_SUCCESS:
-        GameSceneManager::Instance()->Push((SceneList)0x28, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_ONLINE_MENU, SCREEN_FORWARD, true);
         FEAudio::StopAnimAudioEvent(0x71D9CD2F, this);
         FEAudio::PlayAnimAudioEvent(0x37A9934D, 0, 0, true);
         break;
@@ -143,9 +143,9 @@ void SHOnlineLogin::OnLoginResult(int result)
     if (result == 1)
     {
         int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x74);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
             mPopupActive = true;
         }
@@ -155,10 +155,10 @@ void SHOnlineLogin::OnLoginResult(int result)
     }
     if (result == 2)
     {
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-            CreateOnlineLoginErrorPopup(menu, (ePopupMenu)0x70, this);
+            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+            CreateOnlineLoginErrorPopup(menu, POPUP_NETWORK_LOGINBADNAME, this);
             mPopupActive = true;
         }
         mState = ONLINE_LOGIN_LOGIN_ERROR;
@@ -168,10 +168,10 @@ void SHOnlineLogin::OnLoginResult(int result)
     mLoginComponent->SetActiveSlide("GETTING", false, false);
     if (!g_pNetworkSession->RequestLoginRankings())
     {
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
-            CreateOnlineLoginErrorPopup(menu, (ePopupMenu)0x6F, this);
+            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+            CreateOnlineLoginErrorPopup(menu, POPUP_NETWORK_LOGINGETSTATS_ERROR, this);
             mPopupActive = true;
         }
         mState = ONLINE_LOGIN_STATS_ERROR;
@@ -189,9 +189,9 @@ void SHOnlineLogin::OnStatsResult(bool success)
     {
         g_pNetworkSession->ReadAndClearDWCError();
         int popup = GetOnlineErrorPopup(g_pNetworkSession->mDWCErrorCode, true, 0x6F);
-        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != (SceneList)0xA)
+        if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
         {
-            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push((SceneList)0xA, SCREEN_NOTHING, false);
+            FEPopupMenu* menu = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
             CreateOnlineLoginErrorPopup(menu, (ePopupMenu)popup, this);
             mPopupActive = true;
         }

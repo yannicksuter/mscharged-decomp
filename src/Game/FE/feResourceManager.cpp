@@ -446,7 +446,7 @@ ResourceResult FEResourceManager::IssueSceneContextSwitch(FESceneResource* pFeSc
         && s_pCurrentFESceneResourceContext != pFeSceneResource
         && s_pPermanentBundleSceneResource != s_pCurrentFESceneResourceContext)
     {
-        s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = 6;
+        s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = FE_SCENE_READY;
         s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
     }
 
@@ -496,7 +496,7 @@ void FEResourceManager::Update(float dt)
             s_pCurrentResourceBeingLoaded = 0;
             if (pendingResourceQueue.m_Head == 0 && s_pCurrentFESceneResourceContext != 0)
             {
-                s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = 6;
+                s_pCurrentFESceneResourceContext->m_pFESceneContext->mState = FE_SCENE_READY;
                 s_pCurrentFESceneResourceContext->m_pFESceneContext->AllResourcesLoadedCallback();
                 s_pCurrentFESceneResourceContext = 0;
             }

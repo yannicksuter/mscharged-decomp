@@ -92,20 +92,20 @@ void PauseMenuScene::OnSelectQUIT()
     }
     else
     {
-        FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push((SceneList)10, SCREEN_NOTHING, false);
+        FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
         popup->mControlInput = mQuittingController;
         popup->mAllPointersActive = true;
         WorldDarkening::Instance().Fade(100.0f, 1.0f);
         if (GameInfoManager::Instance()->mIsInStrikers101Mode)
         {
-            popup->Create((ePopupMenu)11,
+            popup->Create(POPUP_STRIKERS_101_QUITTING,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
         else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY
             || GameInfoManager::Instance()->IsInMode4() || g_pGame->m_eGameState == GS_END_GAME)
         {
-            popup->Create((ePopupMenu)10,
+            popup->Create(POPUP_QUIT,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
@@ -113,13 +113,13 @@ void PauseMenuScene::OnSelectQUIT()
             || (GameInfoManager::Instance()->IsInMode1()
                 && GameInfoManager::Instance()->GetPlayingSide((unsigned short)mQuittingController) != -1))
         {
-            popup->Create((ePopupMenu)9,
+            popup->Create(POPUP_FORFEIT,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupYESFORFEIT), this),
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
         else
         {
-            popup->Create((ePopupMenu)22,
+            popup->Create(POPUP_FORFEIT_NO_TEAM,
                 Bind<void>(MemFun(&PauseMenuScene::OnSelectPopupNOFORFEIT), this));
         }
     }
@@ -216,7 +216,7 @@ void PauseMenuScene::Update(float fDeltaT)
     if (mQuitDelay > 0.0f)
     {
         mQuitDelay -= fDeltaT;
-        if (!g_pOverlayManager->IsOnStack((SceneList)10))
+        if (!g_pOverlayManager->IsOnStack(SCENE_POPUP_MENU))
             glxSwapSetBlack(true);
         if (mQuitDelay <= 0.0f)
         {
@@ -262,31 +262,31 @@ void PauseMenuScene::Update(float fDeltaT)
             break;
         case TT_CHOOSE_SIDES:
             mSelectionMade = true;
-            g_pOverlayManager->Push((SceneList)81, SCREEN_FORWARD, true);
+            g_pOverlayManager->Push(SCENE_PAUSE_CHOOSE_SIDES, SCREEN_FORWARD, true);
             break;
         case TT_AUDIO_OPTIONS:
             mSelectionMade = true;
-            g_pOverlayManager->Push((SceneList)82, SCREEN_FORWARD, true);
+            g_pOverlayManager->Push(SCENE_PAUSE_AUDIO_OPTIONS, SCREEN_FORWARD, true);
             break;
         case TT_VISUAL_OPTIONS:
             mSelectionMade = true;
-            g_pOverlayManager->Push((SceneList)83, SCREEN_FORWARD, true);
+            g_pOverlayManager->Push(SCENE_PAUSE_VISUAL_OPTIONS, SCREEN_FORWARD, true);
             break;
         case TT_CHALLENGE_PREVIEW:
             mSelectionMade = true;
-            g_pOverlayManager->Push((SceneList)103, SCREEN_NOTHING, true);
+            g_pOverlayManager->Push(OVERLAY_CHALLENGE_PREVIEW, SCREEN_NOTHING, true);
             break;
         case TT_STATISTICS:
         {
             mSelectionMade = true;
-            PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push((SceneList)92, SCREEN_FORWARD, true));
+            PausePostGameScene* scene = static_cast<PausePostGameScene*>(g_pOverlayManager->Push(OVERLAY_POST_GAME_STATISTICS, SCREEN_FORWARD, true));
             scene->mControllingInput = mControllingInput;
-            scene->SetDisplayMode(12);
+            scene->SetDisplayMode(NEWS_PAUSE_STATISTICS);
             break;
         }
         case TT_CONTROLLER_MAP:
             mSelectionMade = true;
-            g_pOverlayManager->Push((SceneList)104, SCREEN_NOTHING, true);
+            g_pOverlayManager->Push(OVERLAY_CONTROLLER_MAP, SCREEN_NOTHING, true);
             break;
         }
         mIsInTransition = false;
@@ -309,7 +309,7 @@ void PauseMenuScene::Update(float fDeltaT)
                     FESceneManager::Instance()->ForceImmediateStackProcessing();
                 }
                 mSelectionMade = true;
-                g_pOverlayManager->Push((SceneList)81, SCREEN_FORWARD, true);
+                g_pOverlayManager->Push(SCENE_PAUSE_CHOOSE_SIDES, SCREEN_FORWARD, true);
             }
             goToChooseSides = 1;
         }
@@ -376,12 +376,12 @@ void PauseMenuScene::OnOptionPointerEnter(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
     ++mHoverCounts[index];
-    if (!mOptionButtons[which].HasOtherPointerState(1, index))
+    if (!mOptionButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
         mOptionInstances[which]->SetActiveSlide("over", true, false);
     }
-    mOptionButtons[which].SetPointerState(1, index);
+    mOptionButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -391,9 +391,9 @@ void PauseMenuScene::OnOptionPointerLeave(unsigned int index, void* context)
 {
     unsigned int which = (unsigned int)context;
     --mHoverCounts[index];
-    if (!mOptionButtons[which].HasOtherPointerState(1, index))
+    if (!mOptionButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         mOptionInstances[which]->SetActiveSlide("off", true, false);
-    mOptionButtons[which].SetPointerState(0, index);
+    mOptionButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**

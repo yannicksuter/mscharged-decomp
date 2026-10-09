@@ -13,7 +13,7 @@ void InitializeNetworkMessageRegistry()
 int MessageRegistry::Serialize(
     NetworkMessage* message, u8* buffer, unsigned long size)
 {
-    NetworkMessageSerializer serializer(1, buffer, size);
+    NetworkMessageSerializer serializer(NETWORK_SERIALIZE_WRITE, buffer, size);
     u8 type = message->GetType();
     memcpy(serializer.mPosition, &type, sizeof(type));
     serializer.mPosition += sizeof(type);
@@ -24,7 +24,7 @@ int MessageRegistry::Serialize(
 void MessageRegistry::Dispatch(
     int source, u8* buffer, unsigned long size)
 {
-    NetworkMessageSerializer serializer(0, buffer, size);
+    NetworkMessageSerializer serializer(NETWORK_SERIALIZE_READ, buffer, size);
     u8 type = 0;
     memcpy(&type, serializer.mPosition, sizeof(type));
     serializer.mPosition += sizeof(type);

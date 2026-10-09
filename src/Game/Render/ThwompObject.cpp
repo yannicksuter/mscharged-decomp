@@ -86,7 +86,7 @@ ThwompObject::ThwompObject(int index)
     mTexture3 = glGetTexture(gThwompTexture3Name);
     mTexture2 = glGetTexture(gThwompTexture2Name);
     mTexture1 = glGetTexture(gThwompTexture1Name);
-    mDrawable = GetRenderObject(8, index);
+    mDrawable = GetRenderObject(STADIUM_MODEL_THWOMP, index);
 
     PhysicsObject* physics
         = new PhysicsThwomp(this, 3.14f, 2.88f, 3.5f);
@@ -305,7 +305,7 @@ void ThwompObject::SetState(eThwompState state)
         mAvoidable = new (nlMalloc(
             sizeof(AvoidablePolygon), 8, false))
             AvoidablePolygon(
-                3, mPhysics->GetPosition(), 3.14f, 2.88f);
+                AVOID_POLYGON_THWOMP, mPhysics->GetPosition(), 3.14f, 2.88f);
     }
     else if (state == THWOMP_STATE_FALLING)
     {

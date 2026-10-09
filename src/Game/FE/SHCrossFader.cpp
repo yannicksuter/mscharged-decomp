@@ -82,7 +82,7 @@ void CrossFaderScene::Update(float fDeltaT)
     const nlColour colWhite = { { 255, 255, 255, 255 } };
     const nlColour colTransparent = { { 255, 255, 255, 0 } };
     BaseSceneHandler::Update(fDeltaT);
-    if (mFadeState != CROSSFADE_TO_BLACK && g_pFEInput->JustPressed((eFEINPUT_PAD)8, 0x2E, true, 0))
+    if (mFadeState != CROSSFADE_TO_BLACK && g_pFEInput->JustPressed(FE_ALL_PADS, 0x2E, true, 0))
     {
         TLSlide* slide = mHomeMessage->GetActiveSlide();
         if (!mHomeMessage->m_bVisible || slide->GetCurrentTime() == slide->GetStartTime() + slide->GetDuration())

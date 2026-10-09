@@ -212,13 +212,13 @@ void FEPageControls::InitializeButtons()
 void FEPageControls::OnPointerEnter(int index, void* context)
 {
     unsigned int which = (unsigned int)context;
-    if (!mButtons[which].HasOtherPointerState(1, index))
+    if (!mButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         if (mPointerHeld && (unsigned int)mHeldButton == which)
             mButtonInstances[which]->SetActiveSlide("down", true, false);
         else
             mButtonInstances[which]->SetActiveSlide("over", true, false);
-        mButtons[which].SetPointerState(1, index);
+        mButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
         mPointerInside[which] = true;
         FEAudio::PlayAnimAudioEvent(0xAA73EF32, 0, 0, 1);
     }
@@ -230,7 +230,7 @@ void FEPageControls::OnPointerEnter(int index, void* context)
 void FEPageControls::OnPointerLeave(int index, void* context)
 {
     unsigned int which = (unsigned int)context;
-    if (!mButtons[which].HasOtherPointerState(1, index))
+    if (!mButtons[which].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         int button = 49;
         if (which == 0)
@@ -244,7 +244,7 @@ void FEPageControls::OnPointerLeave(int index, void* context)
         {
             mButtonInstances[which]->SetActiveSlide("down", true, false);
         }
-        mButtons[which].SetPointerState(0, index);
+        mButtons[which].SetPointerState(POINTER_BUTTON_NORMAL, index);
         mPointerInside[which] = false;
     }
 }
@@ -259,7 +259,7 @@ void FEPageControls::OnPointerPress(int index, void* context)
     mPointerHeld = true;
     mRepeatTime = 0.0f;
     mButtonInstances[which]->SetActiveSlide("down", true, false);
-    mButtons[which].SetPointerState(1, index);
+    mButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
     if (!mPadHeld[0] && !mPadHeld[1])
         mPointerPressed[which] = true;
 }
@@ -273,7 +273,7 @@ void FEPageControls::OnPadPress(int index, void* context)
     mPadHeld[which] = true;
     mRepeatTime = 0.0f;
     mButtonInstances[which]->SetActiveSlide("down", true, false);
-    mButtons[which].SetPointerState(1, index);
+    mButtons[which].SetPointerState(POINTER_BUTTON_HOVER, index);
     if (!mPointerHeld)
         mPadPressed[which] = true;
 }

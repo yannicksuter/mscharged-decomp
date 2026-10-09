@@ -106,7 +106,7 @@ void SHOnlineFriends::UpdateFriend(int index)
         row->mStatus = ONLINE_ROW_OFFLINE;
         break;
     case 1:
-        if (g_pFriendManager->GetFriendStatusPayload(index)->mHeader.mStatus == 1)
+        if (g_pFriendManager->GetFriendStatusPayload(index)->mHeader.mStatus == EFriendStatus_Initial_Available)
         {
             if (row->mStatus != ONLINE_ROW_AVAILABLE)
                 FEAudio::PlayAnimAudioEvent(0xCC2C93F1, 0, 0, 1);
@@ -202,8 +202,8 @@ void SHOnlineFriends::SceneCreated()
     TLComponentInstance* done = 0;
     if (scene != 0)
     {
-        scene->SetButtons(0, true);
-        done = scene->GetButton(4);
+        scene->SetButtons(NAVIGATION_BUTTON_NONE, true);
+        done = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(done);
     FEAudio::PlayAnimAudioEvent(0xBB142B94, 0, 0, 1);
@@ -228,7 +228,7 @@ void SHOnlineFriends::Update(float dt)
         {
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
-                scene->SetButtons(4, true);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
             mTransitionState = StateInteractive;
             InitializeButtons();
             mInitialized = true;
@@ -245,7 +245,7 @@ void SHOnlineFriends::Update(float dt)
         {
             if (IsOnlineFriendSelectionMode())
             {
-                GameSceneManager::Instance()->Push((SceneList)44, SCREEN_NOTHING, true);
+                GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_NOTHING, true);
                 SetOnlineFriendSelectionMode(false);
             }
             else
@@ -431,7 +431,7 @@ inline void SHOnlineFriends::ConfirmDeleteFriend(int index)
     if (GameSceneManager::Instance()->GetSceneType(GameSceneManager::Instance()->GetCurrentScene()) != SCENE_POPUP_MENU)
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)106,
+        popup->Create(POPUP_NETWORK_DELETE_FRIEND,
             Bind<void>(MemFun(&SHOnlineFriends::DeleteFriend), this, index),
             Bind<void>(MemFun(&SHOnlineFriends::CancelDeleteFriend), this));
         mPopupActive = true;
@@ -450,7 +450,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
     if (item == 0 && !IsOnlineFriendSelectionMode())
     {
         if (g_pFriendManager->CountFriends() >= 64)
-            ShowDialog(104);
+            ShowDialog(POPUP_NETWORK_FRIEND_LIST_FULL);
         else
             change = true;
     }
@@ -468,7 +468,7 @@ void SHOnlineFriends::OnPointerPress(int index, void* context)
             gNetworkSaveSlotIndex, mSortedFriendRows[selected]->mFriendIndex);
         bool differentRegion = region != GetOnlineRegion();
         if (differentRegion)
-            ShowDialog(105);
+            ShowDialog(POPUP_ONLINE_REGION_NOT_CONFIRMED);
         else
             change = true;
     }
@@ -490,7 +490,7 @@ void SHOnlineFriends::OnPointerEnter(int index, void* context)
     int item = (int)context;
     ++mPointerHoverCount;
     mRowInstances[item]->SetActiveSlide("over", true, false);
-    mRowButtons[item].SetPointerState(1, index);
+    mRowButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
     FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
 }
 
@@ -499,7 +499,7 @@ void SHOnlineFriends::OnPointerLeave(int index, void* context)
     int item = (int)context;
     --mPointerHoverCount;
     mRowInstances[item]->SetActiveSlide("off", true, false);
-    mRowButtons[item].SetPointerState(0, index);
+    mRowButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void SHOnlineFriends::DeleteFriend(int index)
@@ -563,7 +563,7 @@ inline void SHOnlineFriends::ShowError(int error)
 
 inline void SHOnlineFriends::StartFriendInvite()
 {
-    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push((SceneList)44, SCREEN_FORWARD, true);
+    SHOnlineInvitePlayers* scene = (SHOnlineInvitePlayers*)GameSceneManager::Instance()->Push(SCENE_ONLINE_INVITE_PLAYERS, SCREEN_FORWARD, true);
     scene->mIsHost = true;
     scene->mStartFriendServer = false;
     SetOnlineFriendSelectionMode(false);

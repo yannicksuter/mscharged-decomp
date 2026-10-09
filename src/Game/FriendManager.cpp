@@ -508,7 +508,7 @@ void FriendManager::Update(float dt)
         matchmaking = true;
     }
     bool invitationScene = false;
-    if (GameSceneManager::Instance()->IsOnStack(static_cast<SceneList>(0x2F)))
+    if (GameSceneManager::Instance()->IsOnStack(SCENE_ONLINE_FRIENDS))
     {
         invitationScene = true;
     }

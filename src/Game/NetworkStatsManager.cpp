@@ -1209,7 +1209,7 @@ void NetworkStatsManager::CalculateAndReportGameResult(int result)
 
     NetworkDraftTeam* homeTeam;
     NetworkDraftTeam* awayTeam;
-    if (NetTournManager::Instance()->mState != 0)
+    if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
     {
         int homeIndex = NetTournManager::Instance()->MachineIdxToTournamentIdx(0);
         int awayIndex = NetTournManager::Instance()->MachineIdxToTournamentIdx(1);

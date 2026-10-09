@@ -564,10 +564,10 @@ void FEPopupMenu::Create(ePopupMenu type, Function<FnVoidVoid> option1,
         WStr optionsName;
         int menu = -1;
         if (fn_801CA660() != 0)
-            menu = ((OptionsSubMenu*)fn_801CA660()->GetScene((SceneList)13))->fn_801CAA10();
-        else if (GetOverlayManager()->GetScene((SceneList)82) != 0)
+            menu = ((OptionsSubMenu*)fn_801CA660()->GetScene(SCENE_OPTIONS))->fn_801CAA10();
+        else if (GetOverlayManager()->GetScene(SCENE_PAUSE_AUDIO_OPTIONS) != 0)
             menu = 1;
-        else if (GetOverlayManager()->GetScene((SceneList)83) != 0)
+        else if (GetOverlayManager()->GetScene(SCENE_PAUSE_VISUAL_OPTIONS) != 0)
             menu = 2;
         switch (menu)
         {
@@ -816,25 +816,25 @@ void FEPopupMenu::OnOptionPointerEnter(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
     ++mPointerHoverCounts[index];
-    if (!mControllerComponents[optionIndex].HasOtherPointerState(1, index))
+    if (!mControllerComponents[optionIndex].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mOptionInstances[optionIndex]->SetActiveSlide("over", true, false);
         FEAudio::EnableSounds(true);
         FEAudio::PlayAnimAudioEvent(0xDE912775, 0, 0, true);
         FEAudio::EnableSounds(false);
     }
-    mControllerComponents[optionIndex].SetPointerState(1, index);
+    mControllerComponents[optionIndex].SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void FEPopupMenu::OnOptionPointerLeave(unsigned int index, void* context)
 {
     int optionIndex = (int)context;
     --mPointerHoverCounts[index];
-    if (!mControllerComponents[optionIndex].HasOtherPointerState(1, index))
+    if (!mControllerComponents[optionIndex].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mOptionInstances[optionIndex]->SetActiveSlide("off", true, false);
     }
-    mControllerComponents[optionIndex].SetPointerState(0, index);
+    mControllerComponents[optionIndex].SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void FEPopupMenu::OnOptionPointerPress(unsigned int index, void* context)

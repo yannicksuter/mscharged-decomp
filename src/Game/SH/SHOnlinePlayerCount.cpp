@@ -76,7 +76,7 @@ void SHOnlinePlayerCount::SceneCreated()
     if (scene != 0)
     {
         scene->HideButtons();
-        screen = scene->GetButton(4);
+        screen = scene->GetButton(NAVIGATION_BUTTON_BACK);
     }
     mBackButton.SetButtonInstance(screen);
 
@@ -105,7 +105,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
             SHNavigation* scene = GetNavigationScene();
             if (scene != 0)
             {
-                scene->SetButtons(4, true);
+                scene->SetButtons(NAVIGATION_BUTTON_BACK, true);
             }
             InitializeButtons();
             mButtonsInitialized = true;
@@ -131,7 +131,7 @@ void SHOnlinePlayerCount::Update(float fDeltaT)
     if (!GameSceneManager::Instance()->IsOnStack(SCENE_POPUP_MENU)
         && g_pFriendManager->FindHostInvitation())
     {
-        SceneList invitationScene = (mMode == ModeRanked) ? (SceneList)0x29 : (SceneList)0x2A;
+        SceneList invitationScene = (mMode == ModeRanked) ? SCENE_ONLINE_RANKED : SCENE_ONLINE_UNRANKED;
         FriendManager* friendManager = g_pFriendManager;
         friendManager->mReturnScene = invitationScene;
         friendManager->mPreviousRankedMode = 0;
@@ -215,9 +215,9 @@ void SHOnlinePlayerCount::OnButtonPointerEnter(unsigned int index, void* context
 {
     unsigned int item = (unsigned int)context;
     ++mPointerInsideCount[index];
-    if (!mButtons[item].HasOtherPointerState(1, index))
+    if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mButtons[item].SetPointerState(1, index);
+        mButtons[item].SetPointerState(POINTER_BUTTON_HOVER, index);
         mButtonInstances[item]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xF6EB899E, 0, 0, 1);
     }
@@ -227,9 +227,9 @@ void SHOnlinePlayerCount::OnButtonPointerLeave(unsigned int index, void* context
 {
     unsigned int item = (unsigned int)context;
     --mPointerInsideCount[index];
-    if (!mButtons[item].HasOtherPointerState(1, index))
+    if (!mButtons[item].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
-        mButtons[item].SetPointerState(0, index);
+        mButtons[item].SetPointerState(POINTER_BUTTON_NORMAL, index);
         mButtonInstances[item]->SetActiveSlide("off", true, false);
     }
 }
@@ -328,7 +328,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)0x18, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_NETWORK_START, SCREEN_FORWARD, true);
         }
         break;
     case ButtonTwoLocalPlayers:
@@ -339,7 +339,7 @@ void SHOnlinePlayerCount::OnButtonPointerPress(unsigned int, void* context)
         }
         else
         {
-            GameSceneManager::Instance()->Push((SceneList)0x18, SCREEN_FORWARD, true);
+            GameSceneManager::Instance()->Push(SCENE_NETWORK_START, SCREEN_FORWARD, true);
         }
         break;
     case 2:

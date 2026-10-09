@@ -194,7 +194,7 @@ void EffectsBundleManager::Load(void* data, void* nonResidentData,
         = new (nlMalloc(sizeof(EffectsBundle), 8, false)) EffectsBundle;
     EffectsBundleChunkLoader loader(context, bundle);
 
-    if (bundleType == 2)
+    if (bundleType == EFFECTS_BUNDLE_ADDITIONAL_CHUNK)
     {
         loader.LoadChunk((nlChunk*)data);
     }
@@ -211,7 +211,7 @@ void EffectsBundleManager::Load(void* data, void* nonResidentData,
     }
 
     bundle->mData = data;
-    if (bundleType == 0)
+    if (bundleType == EFFECTS_BUNDLE_DEFAULT)
     {
         nlDLRingAddEnd(&mDefaultBundles, bundle);
     }
@@ -347,7 +347,7 @@ bool EmissionManager::FinishLoading(GLResourcePool* context)
     }
 
     gEffectsBundleManager.Load(gEffectsData, gEffectsNonResidentData,
-        context, 0);
+        context, EFFECTS_BUNDLE_DEFAULT);
     nlFree(gEffectsNonResidentData);
     gEffectsNonResidentData = 0;
     return true;

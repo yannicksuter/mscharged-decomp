@@ -170,21 +170,21 @@ void SHChooseSides2::SceneCreated()
         if (mContext == CUP || mContext == TOURNAMENT)
         {
             object->HideButtons();
-            screen = object->GetButton(4);
-            mHomeAwayBox = object->GetButton(0x10);
+            screen = object->GetButton(NAVIGATION_BUTTON_BACK);
+            mHomeAwayBox = object->GetButton(NAVIGATION_BUTTON_PLAY);
             mHomeAwayButtonMask = 0x10;
         }
         else if (mContext != PAUSE)
         {
             object->HideButtons();
-            screen = object->GetButton(4);
-            mHomeAwayBox = object->GetButton(0x20);
+            screen = object->GetButton(NAVIGATION_BUTTON_BACK);
+            mHomeAwayBox = object->GetButton(NAVIGATION_BUTTON_DONE);
             mHomeAwayButtonMask = 0x20;
         }
         else
         {
             object->HideButtons();
-            mHomeAwayBox = object->GetButton(0x20);
+            mHomeAwayBox = object->GetButton(NAVIGATION_BUTTON_DONE);
             mHomeAwayButtonMask = 0x20;
         }
     }
@@ -360,15 +360,15 @@ void SHChooseSides2::Update(float fDeltaT)
                 SHNavigation* object = GetNavigationScene();
                 if (mContext == CUP || mContext == TOURNAMENT)
                 {
-                    object->SetButtons(20, true);
+                    object->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_PLAY, true);
                 }
                 else if (mContext != PAUSE)
                 {
-                    object->SetButtons(36, true);
+                    object->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_DONE, true);
                 }
                 else
                 {
-                    object->SetButtons(32, true);
+                    object->SetButtons(NAVIGATION_BUTTON_DONE, true);
                 }
 
                 object->SetButtonVisibility(mHomeAwayButtonMask, false);
@@ -535,10 +535,10 @@ void SHChooseSides2::LeaveScene()
         }
         FrontEndPresentation::GetInstance()->Call("TransitionFromStrikerChallengeChooseSides");
         SHStrikerTimesChallenge* scene = static_cast<SHStrikerTimesChallenge*>(GameSceneManager::Instance()->Push(
-            (SceneList)77, SCREEN_BACK, false));
+            SCENE_CHALLENGE_NEWS, SCREEN_BACK, false));
         if (scene != 0)
         {
-            scene->SetDisplayMode(8);
+            scene->SetDisplayMode(NEWS_CHALLENGE_BRIEFING);
         }
     }
     else if (mContext != PAUSE)
@@ -550,7 +550,7 @@ void SHChooseSides2::LeaveScene()
             GetPointerInstance(i)->SetActiveSlide("cursor", true, false);
             SetPointerColour(i, white);
         }
-        GameSceneManager::Instance()->Push((SceneList)3, SCREEN_BACK, false);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_SIDEKICKS_DOMINATION, SCREEN_BACK, false);
         FEAudio::PlayAnimAudioEvent(0xF8F6BB3C, 0, 0, 1);
     }
     else
@@ -635,13 +635,13 @@ void SHChooseSides2::OnControllerPointerEnter(unsigned int index, void* context)
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    if (!mControllerComponents[side].HasOtherPointerState(1, index))
+    if (!mControllerComponents[side].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSideGroups[side]->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0x19E7B6AE, 0, 0, 1);
     }
 
-    mControllerComponents[side].SetPointerState(1, index);
+    mControllerComponents[side].SetPointerState(POINTER_BUTTON_HOVER, index);
     ++mControllerCounts[index];
     mControllerComponents[side].PlayHoverFeedback(index);
 }
@@ -655,12 +655,12 @@ void SHChooseSides2::OnControllerPointerLeave(unsigned int index, void* context)
     if (mPlayingSides[index] != -1 && mPlayingSides[index] != side)
         return;
 
-    if (!mControllerComponents[side].HasOtherPointerState(1, index))
+    if (!mControllerComponents[side].HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mSideGroups[side]->SetActiveSlide("controllers", true, false);
     }
 
-    mControllerComponents[side].SetPointerState(0, index);
+    mControllerComponents[side].SetPointerState(POINTER_BUTTON_NORMAL, index);
     --mControllerCounts[index];
 }
 
@@ -715,9 +715,9 @@ void SHChooseSides2::OnControllerPointerPress(unsigned int index, void* context)
 void SHChooseSides2::OnHomeAwayPointerEnter(unsigned int index, void*)
 {
     ++mControllerCounts[index];
-    mHomeAwayComponent.SetPointerState(1, index);
+    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
     mHomeAwayComponent.PlayHoverFeedback(index);
-    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
+    if (!mHomeAwayComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHomeAwayBox->SetActiveSlide("over", true, false);
         if (mContext == CUP || mContext == TOURNAMENT)
@@ -736,13 +736,13 @@ void SHChooseSides2::OnHomeAwayPointerEnter(unsigned int index, void*)
  */
 void SHChooseSides2::OnHomeAwayPointerInside(unsigned int index, void*)
 {
-    if (mHomeAwayComponent.GetPointerState(index) != 0)
+    if (mHomeAwayComponent.GetPointerState(index) != POINTER_BUTTON_NORMAL)
         return;
 
     ++mControllerCounts[index];
-    mHomeAwayComponent.SetPointerState(1, index);
+    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
     mHomeAwayComponent.PlayHoverFeedback(index);
-    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
+    if (!mHomeAwayComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHomeAwayBox->SetActiveSlide("over", true, false);
         if (mContext == CUP || mContext == TOURNAMENT)
@@ -762,8 +762,8 @@ void SHChooseSides2::OnHomeAwayPointerInside(unsigned int index, void*)
 void SHChooseSides2::OnHomeAwayPointerLeave(unsigned int index, void*)
 {
     --mControllerCounts[index];
-    mHomeAwayComponent.SetPointerState(0, index);
-    if (!mHomeAwayComponent.HasOtherPointerState(1, index))
+    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
+    if (!mHomeAwayComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHomeAwayBox->SetActiveSlide("off", true, false);
     }
@@ -822,19 +822,19 @@ void SHChooseSides2::Proceed()
         info->mPreviousGameTeams[1] = GameInfoManager::Instance()->GetTeam(1);
         GameSceneManager::Instance()->PushLoadingScene(true);
         SaveLoad::StartSave(false);
-        object->SetButtons(0, true);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     else if (mContext == TOURNAMENT)
     {
         GameInfoManager::Instance()->unknown_0x71C8 = 1;
         FrontEndPresentation::GetInstance()->Call("StartChallengeSequence");
         GameSceneManager::Instance()->PushLoadingScene(true);
-        object->SetButtons(0, true);
+        object->SetButtons(NAVIGATION_BUTTON_NONE, true);
     }
     else if (mContext != PAUSE)
     {
         FEAudio::PlayAnimAudioEvent(0x64B85E8D, 0, 0, 1);
-        GameSceneManager::Instance()->Push((SceneList)5, SCREEN_FORWARD, true);
+        GameSceneManager::Instance()->Push(SCENE_CHOOSE_STADIUM, SCREEN_FORWARD, true);
     }
     else
     {
@@ -845,7 +845,7 @@ void SHChooseSides2::Proceed()
             GameInfoManager::Instance()->mCurrentDifficulty[1],
             4,
             false);
-        g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+        g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
     }
 
     FrontEnd::SetControllerState();
@@ -857,12 +857,12 @@ void SHChooseSides2::Proceed()
 void SHChooseSides2::OnHelpPointerEnter(unsigned int index, void*)
 {
     ++mControllerCounts[index];
-    if (!mHelpComponent.HasOtherPointerState(1, index))
+    if (!mHelpComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHelpButton->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
     }
-    mHelpComponent.SetPointerState(1, index);
+    mHelpComponent.SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 /**
@@ -871,11 +871,11 @@ void SHChooseSides2::OnHelpPointerEnter(unsigned int index, void*)
 void SHChooseSides2::OnHelpPointerLeave(unsigned int index, void*)
 {
     --mControllerCounts[index];
-    if (!mHelpComponent.HasOtherPointerState(1, index))
+    if (!mHelpComponent.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mHelpButton->SetActiveSlide("off", true, false);
     }
-    mHelpComponent.SetPointerState(0, index);
+    mHelpComponent.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 /**
@@ -893,15 +893,15 @@ void SHChooseSides2::OnHelpPointerPress(unsigned int, void*)
     if (mContext == PAUSE)
     {
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create(POPUP_CHOOSE_SIDES_HELP, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mAllPointersActive = true;
     }
     else
     {
         FEPopupMenu* popup = (FEPopupMenu*)GameSceneManager::Instance()->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x3B, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create(POPUP_CHOOSE_SIDES_HELP, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mAllPointersActive = true;
     }
 
@@ -968,10 +968,10 @@ void SHChooseSides2::UpdateHomeAwayVisibility()
 
             for (int i = 0; i < 4; ++i)
             {
-                if (mHomeAwayComponent.GetPointerState(i) == 1)
+                if (mHomeAwayComponent.GetPointerState(i) == POINTER_BUTTON_HOVER)
                 {
                     --mControllerCounts[i];
-                    mHomeAwayComponent.SetPointerState(0, i);
+                    mHomeAwayComponent.SetPointerState(POINTER_BUTTON_NORMAL, i);
                 }
             }
         }
@@ -1060,8 +1060,8 @@ bool SHChooseSides2::RemoveDisconnectedControllers(bool playSound)
         }
 
         FEPopupMenu* popup = (FEPopupMenu*)g_pOverlayManager->Push(
-            (SceneList)10, SCREEN_NOTHING, false);
-        popup->Create((ePopupMenu)0x3C, Function<FnVoidVoid>(FEPopupMenu::Nothing));
+            SCENE_POPUP_MENU, SCREEN_NOTHING, false);
+        popup->Create(POPUP_CHOOSE_SIDES_NUNCHUCK, Function<FnVoidVoid>(FEPopupMenu::Nothing));
         popup->mAllPointersActive = true;
     }
     return removedController;

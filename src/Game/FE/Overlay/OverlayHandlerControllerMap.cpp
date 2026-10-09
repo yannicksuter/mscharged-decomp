@@ -103,8 +103,8 @@ void ControllerMapOverlay::SceneCreated()
     SHNavigation* scene = GetNavigationScene();
     if (scene != 0)
     {
-        scene->SetButtons(0x20, true);
-        mDoneButtonInstance = scene->GetButton(0x20);
+        scene->SetButtons(NAVIGATION_BUTTON_DONE, true);
+        mDoneButtonInstance = scene->GetButton(NAVIGATION_BUTTON_DONE);
         mDoneButtonInstance->m_bVisible = false;
     }
 
@@ -147,29 +147,29 @@ void ControllerMapOverlay::SceneCreated()
 
 void ControllerMapOverlay::OnDonePointerEnter(int index, void*)
 {
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xAA73EF33, 0, 0, 1);
     }
 
-    mDoneButton.SetPointerState(1, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_HOVER, index);
 }
 
 void ControllerMapOverlay::OnDonePointerLeave(int index, void*)
 {
-    if (!mDoneButton.HasOtherPointerState(1, index))
+    if (!mDoneButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mDoneButtonInstance->SetActiveSlide("off", true, false);
     }
 
-    mDoneButton.SetPointerState(0, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
 }
 
 void ControllerMapOverlay::OnDonePointerPress(int index, void*)
 {
     mDoneButtonInstance->SetActiveSlide("down", true, false);
-    mDoneButton.SetPointerState(2, index);
+    mDoneButton.SetPointerState(POINTER_BUTTON_SELECTED, index);
     mDonePressed = true;
     FEAudio::PlayAnimAudioEvent(0x9F9BF00F, 0, 0, 1);
 
@@ -178,5 +178,5 @@ void ControllerMapOverlay::OnDonePointerPress(int index, void*)
         GetPointerInstance(i)->SetActiveSlide("waiting", true, false);
     }
 
-    g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+    g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
 }

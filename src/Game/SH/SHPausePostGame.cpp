@@ -96,7 +96,7 @@ void ContinuePostGame(bool online)
             tracker->mNumGamesWon[1] = 0;
             SetPointerEnabled(true);
             FEPopupMenu* popup = static_cast<FEPopupMenu*>(g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-            popup->Create((ePopupMenu)53, Function<FnVoidVoid>(PausePostGameScene::OnSelectRematch),
+            popup->Create(POPUP_SERIES_OVER, Function<FnVoidVoid>(PausePostGameScene::OnSelectRematch),
                 Function<FnVoidVoid>(PausePostGameScene::OnSelectChangeTeams), Function<FnVoidVoid>(PausePostGameScene::OnSelectQuit));
         }
         else
@@ -132,7 +132,7 @@ void PausePostGameScene::Update(float dt)
     {
         TLInstance* instance = FEFinder<TLInstance, 2>::Find<TLSlide>(mPresentation->m_currentSlide, "Layer", "blackbox2");
         nlColour colour = instance->GetAssetColour();
-        if (mState == 2)
+        if (mState == NEWS_PHASE_EXITING_DONE)
             nlColourSet(colour, colour[0], colour[1], colour[2], 255);
         else
             nlColourSet(colour, colour[0], colour[1], colour[2], 178);
@@ -189,7 +189,7 @@ void PausePostGameScene::OnDoneTransitionComplete()
     SHStrikerTimesBase::OnDoneTransitionComplete();
     if (mMode == MODE_STATISTICS)
     {
-        BaseSceneHandler* scene = g_pOverlayManager->Push((SceneList)80, SCREEN_BACK, true);
+        BaseSceneHandler* scene = g_pOverlayManager->Push(SCENE_PAUSE, SCREEN_BACK, true);
         // The retail caller writes this byte in the returned pause scene.
         reinterpret_cast<u8*>(scene)[0x241] = true;
     }
@@ -198,9 +198,9 @@ void PausePostGameScene::OnDoneTransitionComplete()
         SetPointerEnabled(false);
         SHNavigation* navigation = GetNavigationScene();
         navigation->mTimer->m_bVisible = false;
-        if (NetTournManager::Instance()->mState != 0)
+        if (NetTournManager::Instance()->mState != NET_TOURN_INACTIVE)
         {
-            g_pOverlayManager->Push((SceneList)93, SCREEN_NOTHING, true);
+            g_pOverlayManager->Push(OVERLAY_ONLINE_RANKING, SCREEN_NOTHING, true);
         }
         else if (GameInfoManager::Instance()->mCurrentMode == GameInfoManager::GM_FRIENDLY)
         {
@@ -208,12 +208,12 @@ void PausePostGameScene::OnDoneTransitionComplete()
             {
                 mMode = MODE_DEMO_EXIT_PROMPT;
                 FEPopupMenu* popup = static_cast<FEPopupMenu*>(g_pOverlayManager->Push(SCENE_POPUP_MENU, SCREEN_NOTHING, false));
-                popup->Create((ePopupMenu)142, Function<FnVoidVoid>(OnSelectQuit));
+                popup->Create(POPUP_E3_THANKS_FOR_PLAYING, Function<FnVoidVoid>(OnSelectQuit));
             }
             else if (mIsNetworkGame && IsOnlineRankedMatch())
             {
                 SetPointerEnabled(true);
-                g_pOverlayManager->Push((SceneList)93, SCREEN_NOTHING, true);
+                g_pOverlayManager->Push(OVERLAY_ONLINE_RANKING, SCREEN_NOTHING, true);
             }
             else
             {

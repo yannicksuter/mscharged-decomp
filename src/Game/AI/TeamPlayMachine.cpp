@@ -48,7 +48,7 @@ void TeamPlayMachine::SelectState()
         state = TEAM_PLAY_KICKOFF;
     }
     else if (GameInfoManager::Instance()->IsInMode4()
-        && g_pStrikerChallenge->mCurrentChallenge == 2)
+        && g_pStrikerChallenge->mCurrentChallenge == TUTORIAL_MEGA_SAVES)
     {
         state = TEAM_PLAY_TUTORIAL_MEGA_STRIKE;
     }

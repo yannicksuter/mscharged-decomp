@@ -945,7 +945,7 @@ void SolarFlare::Update(float value)
         if (fielder->m_pBall != 0)
         {
             fielder->ReleaseBall(BALL_STATE_LOOSE);
-            g_pBall->SetVelocity(v3Zero, (eSpinType)0, 0);
+            g_pBall->SetVelocity(v3Zero, SPINTYPE_NONE, 0);
         }
         EffectsGroup* group = EmissionManager::Instance()->GetEffectsGroup("crystal_canyon_zap");
         EmissionManager::Instance()->Create(group, 2, true, 0)->SetPosition(fielder->m_DetChar.m_v3Position);

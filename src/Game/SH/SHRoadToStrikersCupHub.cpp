@@ -137,11 +137,11 @@ void RoadToStrikersCupHubScene::SceneCreated()
     if (navigation != 0)
     {
         navigation->HideButtons();
-        backButton = navigation->GetButton(4);
-        mPlayButtonInstance = navigation->GetButton(16);
+        backButton = navigation->GetButton(NAVIGATION_BUTTON_BACK);
+        mPlayButtonInstance = navigation->GetButton(NAVIGATION_BUTTON_PLAY);
     }
     mBackButton.SetButtonInstance(backButton);
-    UpdateCupBreadcrumbs(0);
+    UpdateCupBreadcrumbs(CUP_PAGE_NONE);
 
     FEFinder<TLImageInstance, TLAT_IMAGE>::FindOrDefault(
         presentation->GetActiveSlide(), "Layer", "summary", "TROPHY WIN")
@@ -181,7 +181,7 @@ void RoadToStrikersCupHubScene::Update(float fDeltaT)
         if (mTransitionState == ROAD_TO_STRIKERS_CUP_ENTERING)
         {
             SHNavigation* navigation = GetNavigationScene();
-            navigation->SetButtons(0x14, true);
+            navigation->SetButtons(NAVIGATION_BUTTON_BACK | NAVIGATION_BUTTON_PLAY, true);
             UpdatePlayButtonText();
             mTransitionState = ROAD_TO_STRIKERS_CUP_ACTIVE;
         }
@@ -291,7 +291,7 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
     TLTextInstance* currentRound = FEFinder<TLTextInstance, TLAT_TEXT>::FindOrDefault(
         presentation->m_currentSlide, "Layer", "summary", "current round");
 
-    if (roundType == 0)
+    if (roundType == CUP_ROUND_LEAGUE)
     {
         int numRounds = CupManager::s_pInstance->GetNumRegularRounds();
         int round = CupManager::s_pInstance->GetCurrentRoundNumber() + 1;
@@ -308,7 +308,7 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
             currentWide,
             totalWide);
     }
-    else if (roundType == 1)
+    else if (roundType == CUP_ROUND_KNOCKOUT)
     {
         int numRounds = CupManager::s_pInstance->GetNumPlayoffRounds();
         int round = CupManager::s_pInstance->GetCurrentRoundNumber();
@@ -319,7 +319,7 @@ void RoadToStrikersCupHubScene::UpdateCupStatus()
         else
             formatted = WideString(LookupLocString("CUP_STATUS_FINAL"));
     }
-    else if (roundType == 2)
+    else if (roundType == CUP_ROUND_FINALS)
     {
         int wins = 0;
         int losses = 0;
@@ -459,37 +459,37 @@ void RoadToStrikersCupHubScene::OnButtonPointerEnter(
 
     if (context == (void*)ButtonPlay)
     {
-        if (!mPlayButton.HasOtherPointerState(1, index))
+        if (!mPlayButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mPlayButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0xAA73EF34, 0, 0, 1);
-            mPlayButton.SetPointerState(1, index);
+            mPlayButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
     else if (context == (void*)ButtonSchedule)
     {
-        if (!mScheduleButton.HasOtherPointerState(1, index))
+        if (!mScheduleButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mScheduleButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
-            mScheduleButton.SetPointerState(1, index);
+            mScheduleButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
     else if (context == (void*)ButtonCupStats)
     {
-        if (!mCupStatsButton.HasOtherPointerState(1, index))
+        if (!mCupStatsButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mCupStatsButtonInstance->SetActiveSlide("over", true, false);
             FEAudio::PlayAnimAudioEvent(0x96DEB5C3, 0, 0, 1);
-            mCupStatsButton.SetPointerState(1, index);
+            mCupStatsButton.SetPointerState(POINTER_BUTTON_HOVER, index);
         }
     }
     else if (context == (void*)ButtonRules
-             && !mRulesButton.HasOtherPointerState(1, index))
+             && !mRulesButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRulesButtonInstance->SetActiveSlide("over", true, false);
         FEAudio::PlayAnimAudioEvent(0xACCDCA48, 0, 0, 1);
-        mRulesButton.SetPointerState(1, index);
+        mRulesButton.SetPointerState(POINTER_BUTTON_HOVER, index);
     }
 }
 
@@ -500,33 +500,33 @@ void RoadToStrikersCupHubScene::OnButtonPointerLeave(
 
     if (context == (void*)ButtonPlay)
     {
-        if (!mPlayButton.HasOtherPointerState(1, index))
+        if (!mPlayButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mPlayButtonInstance->SetActiveSlide("off", true, false);
-            mPlayButton.SetPointerState(0, index);
+            mPlayButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
     else if (context == (void*)ButtonSchedule)
     {
-        if (!mScheduleButton.HasOtherPointerState(1, index))
+        if (!mScheduleButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mScheduleButtonInstance->SetActiveSlide("off", true, false);
-            mScheduleButton.SetPointerState(0, index);
+            mScheduleButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
     else if (context == (void*)ButtonCupStats)
     {
-        if (!mCupStatsButton.HasOtherPointerState(1, index))
+        if (!mCupStatsButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
         {
             mCupStatsButtonInstance->SetActiveSlide("off", true, false);
-            mCupStatsButton.SetPointerState(0, index);
+            mCupStatsButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
         }
     }
     else if (context == (void*)ButtonRules
-             && !mRulesButton.HasOtherPointerState(1, index))
+             && !mRulesButton.HasOtherPointerState(POINTER_BUTTON_HOVER, index))
     {
         mRulesButtonInstance->SetActiveSlide("off", true, false);
-        mRulesButton.SetPointerState(0, index);
+        mRulesButton.SetPointerState(POINTER_BUTTON_NORMAL, index);
     }
 }
 

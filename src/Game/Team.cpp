@@ -716,12 +716,12 @@ void cTeam::CalculateNewBallInterceptTimes()
         {
             int nNumSolutions;
             float pSolutions[2];
-            float fContactHeight = ((cFielder*)pPlayer)->GetAirInterceptHeight(1);
+            float fContactHeight = ((cFielder*)pPlayer)->GetAirInterceptHeight(AIR_INTERCEPT_VOLLEY);
             float fBallHeight = g_pBall->m_v3Position.z;
             if (fBallHeight > fContactHeight)
             {
                 float fOtherContactHeight
-                    = ((cFielder*)pPlayer)->GetAirInterceptHeight(0);
+                    = ((cFielder*)pPlayer)->GetAirInterceptHeight(AIR_INTERCEPT_GROUND);
                 if (fBallHeight < fOtherContactHeight)
                 {
                     fOtherContactHeight = fContactHeight;
@@ -998,8 +998,8 @@ void cTeam::ResetCharacters()
     {
         int nMissingSidekicks
             = g_pStrikerChallenge->mMissingSidekicks[m_nSide];
-        if (!(g_pStrikerChallenge->mCurrentChallenge != 4
-                && g_pStrikerChallenge->mCurrentChallenge != 5))
+        if (!(g_pStrikerChallenge->mCurrentChallenge != TUTORIAL_SIDEKICK_SKILLSHOT
+                && g_pStrikerChallenge->mCurrentChallenge != TUTORIAL_SKILLSHOT_PART_TWO))
         {
             for (int i = 0; i < nMissingSidekicks; i++)
             {
